@@ -6,6 +6,7 @@ import {
   copyCanvasSelection,
   groupCanvasSelection,
   removeCanvasItems,
+  reorderCanvasItems,
   translateCanvasItems,
   ungroupCanvasSelection,
 } from '../CanvasOperations'
@@ -21,6 +22,8 @@ export const CANVAS_ITEM_COMMAND_ADAPTER: CanvasCommandAdapter<CanvasItem> = {
     cloneCanvasItemsWithNewIds(clipboard, createId, offset),
   nudgeSelection: ({ dx, dy, items, selection }) =>
     translateCanvasItems(items, selection, dx, dy),
+  reorderSelection: ({ items, mode, selection }) =>
+    reorderCanvasItems(items, selection, mode),
   ungroupSelection: ({ items, selection }) =>
     ungroupCanvasSelection(items, selection),
 }

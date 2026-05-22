@@ -14,8 +14,10 @@ import {
   groupCanvasCommand,
   nudgeCanvasCommand,
   pasteCanvasCommand,
+  reorderCanvasCommand,
   ungroupCanvasCommand,
   type CanvasCommandAdapter,
+  type CanvasReorderMode,
 } from '../../engine/CanvasCommandEngine'
 import type { CanvasAffordanceConfig } from '../../engine/CanvasAffordances'
 import type { Point } from '../../engine/CanvasPrimitives'
@@ -263,6 +265,29 @@ export function useCanvasCommands({
     [commandAdapter, config, selection, setItems],
   )
 
+  const reorderSelection = useCallback(
+    (mode: CanvasReorderMode) => {
+      const result = reorderCanvasCommand({
+        adapter: commandAdapter,
+        config,
+        items,
+        mode,
+        selection,
+      })
+
+      if (!result) {
+        return
+      }
+
+      setItems(result.items, {
+        before: selection,
+        after: result.selection,
+      })
+      setSelection(result.selection)
+    },
+    [commandAdapter, config, items, selection, setItems, setSelection],
+  )
+
   return {
     cloneItems,
     copySelection,
@@ -273,6 +298,7 @@ export function useCanvasCommands({
     moveSelection,
     pasteSelection,
     redoHistory,
+    reorderSelection,
     undoHistory,
     ungroupSelection,
   }

@@ -14,6 +14,12 @@ export type CanvasCommandItemsResult<TItem extends CanvasCommandItem> = {
   selection: string[]
 }
 
+export type CanvasReorderMode =
+  | 'bringForward'
+  | 'bringToFront'
+  | 'sendBackward'
+  | 'sendToBack'
+
 export type CanvasCommandAdapter<TItem extends CanvasCommandItem> = {
   cloneSelection: (input: {
     createId: (prefix: string) => string
@@ -39,6 +45,11 @@ export type CanvasCommandAdapter<TItem extends CanvasCommandItem> = {
     items: TItem[]
     selection: string[]
   }) => TItem[]
+  reorderSelection: (input: {
+    items: TItem[]
+    mode: CanvasReorderMode
+    selection: string[]
+  }) => TItem[]
   ungroupSelection: (input: {
     items: TItem[]
     selection: string[]
@@ -46,10 +57,14 @@ export type CanvasCommandAdapter<TItem extends CanvasCommandItem> = {
 }
 
 export type CanvasCommandAvailability = {
+  bringForward: boolean
+  bringToFront: boolean
   delete: boolean
   duplicate: boolean
   group: boolean
   redo: boolean
+  sendBackward: boolean
+  sendToBack: boolean
   undo: boolean
   ungroup: boolean
 }
@@ -92,10 +107,14 @@ export function getCanvasCommandAvailability({
   const hasSelection = selection.length > 0
 
   return {
+    bringForward: config.commands.bringForward && hasSelection,
+    bringToFront: config.commands.bringToFront && hasSelection,
     delete: config.commands.delete && hasSelection,
     duplicate: config.commands.duplicate && hasSelection,
     group: config.commands.group && selection.length > 1,
     redo: config.commands.redo && canRedo,
+    sendBackward: config.commands.sendBackward && hasSelection,
+    sendToBack: config.commands.sendToBack && hasSelection,
     undo: config.commands.undo && canUndo,
     ungroup: config.commands.ungroup && hasSelectedGroup,
   }
@@ -324,4 +343,27 @@ export function nudgeCanvasCommand<TItem extends CanvasCommandItem>({
   }
 
   return adapter.nudgeSelection({ dx, dy, items, selection })
+}
+
+export function reorderCanvasCommand<TItem extends CanvasCommandItem>({
+  adapter,
+  config,
+  items,
+  mode,
+  selection,
+}: {
+  adapter: CanvasCommandAdapter<TItem>
+  config: CanvasAffordanceConfig
+  items: TItem[]
+  mode: CanvasReorderMode
+  selection: string[]
+}): CanvasCommandItemsResult<TItem> | null {
+  if (!config.commands[mode] || selection.length === 0) {
+    return null
+  }
+
+  return {
+    items: adapter.reorderSelection({ items, mode, selection }),
+    selection,
+  }
 }

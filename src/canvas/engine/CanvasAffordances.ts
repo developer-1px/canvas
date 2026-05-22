@@ -1,6 +1,8 @@
 import type { CanvasInteractionKind, Tool } from './CanvasPrimitives'
 
 export type CanvasCommandId =
+  | 'bringForward'
+  | 'bringToFront'
   | 'copy'
   | 'cut'
   | 'delete'
@@ -10,6 +12,8 @@ export type CanvasCommandId =
   | 'nudge'
   | 'paste'
   | 'redo'
+  | 'sendBackward'
+  | 'sendToBack'
   | 'undo'
   | 'ungroup'
   | 'zoomIn'
@@ -45,6 +49,8 @@ export type CanvasOverlayId =
   | 'zoomControls'
 
 export type CanvasShortcutId =
+  | 'bringForward'
+  | 'bringToFront'
   | 'copy'
   | 'cut'
   | 'delete'
@@ -59,6 +65,8 @@ export type CanvasShortcutId =
   | 'rectTool'
   | 'redo'
   | 'selectTool'
+  | 'sendBackward'
+  | 'sendToBack'
   | 'temporaryPan'
   | 'textTool'
   | 'undo'
@@ -116,6 +124,8 @@ export const CANVAS_TOOL_AFFORDANCES = {
 >
 
 export const CANVAS_COMMAND_AFFORDANCES = {
+  bringForward: { ariaLabel: 'Bring forward', title: 'Bring forward' },
+  bringToFront: { ariaLabel: 'Bring to front', title: 'Bring to front' },
   copy: { ariaLabel: 'Copy', title: 'Copy' },
   cut: { ariaLabel: 'Cut', title: 'Cut' },
   delete: { ariaLabel: 'Delete', title: 'Delete' },
@@ -125,6 +135,8 @@ export const CANVAS_COMMAND_AFFORDANCES = {
   nudge: { ariaLabel: 'Nudge', title: 'Nudge' },
   paste: { ariaLabel: 'Paste', title: 'Paste' },
   redo: { ariaLabel: 'Redo', title: 'Redo' },
+  sendBackward: { ariaLabel: 'Send backward', title: 'Send backward' },
+  sendToBack: { ariaLabel: 'Send to back', title: 'Send to back' },
   undo: { ariaLabel: 'Undo', title: 'Undo' },
   ungroup: { ariaLabel: 'Ungroup', title: 'Ungroup' },
   zoomIn: { ariaLabel: 'Zoom in', title: 'Zoom in' },
@@ -157,6 +169,8 @@ export function createCanvasAffordanceConfig(
     commands: mergeFeatureGroup(
       {
         copy: true,
+        bringForward: true,
+        bringToFront: true,
         cut: true,
         delete: true,
         duplicate: true,
@@ -165,6 +179,8 @@ export function createCanvasAffordanceConfig(
         nudge: true,
         paste: true,
         redo: true,
+        sendBackward: true,
+        sendToBack: true,
         undo: true,
         ungroup: true,
         zoomIn: true,
@@ -210,6 +226,8 @@ export function createCanvasAffordanceConfig(
     shortcuts: mergeFeatureGroup(
       {
         copy: true,
+        bringForward: true,
+        bringToFront: true,
         cut: true,
         delete: true,
         duplicate: true,
@@ -223,6 +241,8 @@ export function createCanvasAffordanceConfig(
         rectTool: true,
         redo: true,
         selectTool: true,
+        sendBackward: true,
+        sendToBack: true,
         temporaryPan: true,
         textTool: true,
         undo: true,

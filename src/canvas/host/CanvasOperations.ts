@@ -16,3 +16,7 @@ export {
   updateItemText,
   updateTextItem,
 } from './operations/CanvasItemTextOperations'
+export {
+  reorderCanvasItems,
+  type CanvasZOrderMode,
+} from './operations/CanvasItemZOrderOperations'

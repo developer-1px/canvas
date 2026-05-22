@@ -21,6 +21,9 @@ type UseCanvasKeyboardShortcutsArgs = {
   moveSelection: (dx: number, dy: number) => void
   pasteSelection: () => void
   redoHistory: () => void
+  reorderSelection: (
+    mode: 'bringForward' | 'bringToFront' | 'sendBackward' | 'sendToBack',
+  ) => void
   selection: string[]
   setDraftRect: Dispatch<SetStateAction<Bounds | null>>
   setEditing: Dispatch<SetStateAction<EditingText | null>>
@@ -53,6 +56,7 @@ export function useCanvasKeyboardShortcuts({
   moveSelection,
   pasteSelection,
   redoHistory,
+  reorderSelection,
   selection,
   setDraftRect,
   setEditing,
@@ -147,6 +151,30 @@ export function useCanvasKeyboardShortcuts({
       if (mod && key === 'd' && config.shortcuts.duplicate) {
         event.preventDefault()
         duplicateSelection()
+        return
+      }
+
+      if (
+        mod &&
+        event.code === 'BracketRight' &&
+        (event.shiftKey
+          ? config.shortcuts.bringToFront
+          : config.shortcuts.bringForward)
+      ) {
+        event.preventDefault()
+        reorderSelection(event.shiftKey ? 'bringToFront' : 'bringForward')
+        return
+      }
+
+      if (
+        mod &&
+        event.code === 'BracketLeft' &&
+        (event.shiftKey
+          ? config.shortcuts.sendToBack
+          : config.shortcuts.sendBackward)
+      ) {
+        event.preventDefault()
+        reorderSelection(event.shiftKey ? 'sendToBack' : 'sendBackward')
         return
       }
 
@@ -249,6 +277,7 @@ export function useCanvasKeyboardShortcuts({
     moveSelection,
     pasteSelection,
     redoHistory,
+    reorderSelection,
     selection,
     setDraftRect,
     setEditing,
