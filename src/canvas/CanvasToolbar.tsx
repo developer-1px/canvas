@@ -105,7 +105,7 @@ export function CanvasToolbar({
           disabled={!canUndo}
           aria-label={CANVAS_COMMAND_AFFORDANCES.undo.ariaLabel}
           title={CANVAS_COMMAND_AFFORDANCES.undo.title}
-          onClick={onUndo}
+          onClick={() => onUndo()}
         >
           <UndoIcon />
         </button>
@@ -117,7 +117,7 @@ export function CanvasToolbar({
           disabled={!canRedo}
           aria-label={CANVAS_COMMAND_AFFORDANCES.redo.ariaLabel}
           title={CANVAS_COMMAND_AFFORDANCES.redo.title}
-          onClick={onRedo}
+          onClick={() => onRedo()}
         >
           <RedoIcon />
         </button>
@@ -131,7 +131,7 @@ export function CanvasToolbar({
           disabled={!canDuplicate}
           aria-label={CANVAS_COMMAND_AFFORDANCES.duplicate.ariaLabel}
           title={CANVAS_COMMAND_AFFORDANCES.duplicate.title}
-          onClick={onDuplicate}
+          onClick={() => onDuplicate()}
         >
           <DuplicateIcon />
         </button>
@@ -143,7 +143,7 @@ export function CanvasToolbar({
           disabled={!canDelete}
           aria-label={CANVAS_COMMAND_AFFORDANCES.delete.ariaLabel}
           title={CANVAS_COMMAND_AFFORDANCES.delete.title}
-          onClick={onDelete}
+          onClick={() => onDelete()}
         >
           <DeleteIcon />
         </button>
@@ -157,7 +157,7 @@ export function CanvasToolbar({
           disabled={!canGroup}
           aria-label={CANVAS_COMMAND_AFFORDANCES.group.ariaLabel}
           title={CANVAS_COMMAND_AFFORDANCES.group.title}
-          onClick={onGroup}
+          onClick={() => onGroup()}
         >
           <GroupIcon />
         </button>
@@ -169,7 +169,7 @@ export function CanvasToolbar({
           disabled={!canUngroup}
           aria-label={CANVAS_COMMAND_AFFORDANCES.ungroup.ariaLabel}
           title={CANVAS_COMMAND_AFFORDANCES.ungroup.title}
-          onClick={onUngroup}
+          onClick={() => onUngroup()}
         >
           <UngroupIcon />
         </button>

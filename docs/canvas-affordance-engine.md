@@ -47,7 +47,7 @@ type CanvasAffordanceConfig = {
 
 1. `CanvasAffordances`: 안정적인 tool/command/gesture/overlay/shortcut id와 label, title, default toggle. 완료.
 2. `CanvasOverlayEngine`: Renderer Adapter가 그릴 renderer-independent overlay state 생성. 진행 중.
-3. `CanvasCommandEngine`: command availability 계산. 실행 routing은 `useCanvasCommands`에 남아 있음.
+3. `CanvasCommandEngine`: command availability와 item command 결과 계산. React state/history 적용은 `useCanvasCommands` Adapter에 남아 있음.
 4. `CanvasGestureEngine`: pointer event를 gesture intent로 변환.
 5. `CanvasSelectionEngine`: selection 계산, ancestor/group selection, marquee hit.
 

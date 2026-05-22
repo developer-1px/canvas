@@ -5,20 +5,19 @@ import {
   type SetStateAction,
 } from 'react'
 import {
-  cloneCanvasItemsWithNewIds,
-  cloneCanvasSelection,
-  copyCanvasSelection,
-  groupCanvasSelection,
-  removeCanvasItems,
-  translateCanvasItems,
-  ungroupCanvasSelection,
-} from './CanvasOperations'
+  CANVAS_COMMAND_INSERT_OFFSET,
+  cloneCanvasCommandItems,
+  copyCanvasCommand,
+  cutCanvasCommand,
+  deleteCanvasCommand,
+  duplicateCanvasCommand,
+  groupCanvasCommand,
+  nudgeCanvasCommand,
+  pasteCanvasCommand,
+  ungroupCanvasCommand,
+} from './CanvasCommandEngine'
 import type { CanvasAffordanceConfig } from './CanvasAffordances'
-import type {
-  CanvasItem,
-  EditingText,
-  Point,
-} from './CanvasModel'
+import type { CanvasItem, EditingText, Point } from './CanvasModel'
 import type { CommitCanvasItems } from './useCanvasHistory'
 
 type UseCanvasCommandsArgs = {
@@ -48,90 +47,86 @@ export function useCanvasCommands({
 
   const cloneItems = useCallback(
     (ids: string[], offset: Point) =>
-      cloneCanvasSelection(items, ids, createId, offset),
+      cloneCanvasCommandItems({ createId, ids, items, offset }),
     [createId, items],
   )
 
   const duplicateSelection = useCallback(
-    (sourceIds = selection, offset: Point = { x: 28, y: 28 }) => {
-      if (!config.commands.duplicate) {
-        return []
-      }
-
-      const clones = cloneItems(sourceIds, offset)
-
-      if (clones.length === 0) {
-        return []
-      }
-
-      const cloneIds = clones.map((item) => item.id)
-
-      setItems([...items, ...clones], {
-        before: selection,
-        after: cloneIds,
+    (sourceIds = selection, offset: Point = CANVAS_COMMAND_INSERT_OFFSET) => {
+      const result = duplicateCanvasCommand({
+        config,
+        createId,
+        items,
+        offset,
+        selection,
+        sourceIds,
       })
-      setSelection(cloneIds)
-      return clones
+
+      if (!result) {
+        return []
+      }
+
+      setItems(result.items, {
+        before: selection,
+        after: result.selection,
+      })
+      setSelection(result.selection)
+      return result.clones
     },
-    [cloneItems, config.commands.duplicate, items, selection, setItems, setSelection],
+    [config, createId, items, selection, setItems, setSelection],
   )
 
   const copySelection = useCallback(() => {
-    if (!config.commands.copy) {
+    const clipboard = copyCanvasCommand({ config, items, selection })
+
+    if (!clipboard) {
       return
     }
 
-    clipboardRef.current = copyCanvasSelection(items, selection)
-  }, [config.commands.copy, items, selection])
+    clipboardRef.current = clipboard
+  }, [config, items, selection])
 
   const pasteSelection = useCallback(() => {
-    if (!config.commands.paste) {
-      return
-    }
-
-    const clones = cloneCanvasItemsWithNewIds(
-      clipboardRef.current,
+    const result = pasteCanvasCommand({
+      clipboard: clipboardRef.current,
+      config,
       createId,
-      { x: 28, y: 28 },
-    )
+      items,
+    })
 
-    if (clones.length === 0) {
+    if (!result) {
       return
     }
 
-    clipboardRef.current = clones
-    const cloneIds = clones.map((item) => item.id)
-
-    setItems([...items, ...clones], {
+    clipboardRef.current = result.clipboard
+    setItems(result.items, {
       before: selection,
-      after: cloneIds,
+      after: result.selection,
     })
-    setSelection(cloneIds)
-  }, [config.commands.paste, createId, items, selection, setItems, setSelection])
+    setSelection(result.selection)
+  }, [config, createId, items, selection, setItems, setSelection])
 
   const deleteSelection = useCallback(() => {
-    if (!config.commands.delete || selection.length === 0) {
+    const result = deleteCanvasCommand({ config, items, selection })
+
+    if (!result) {
       return
     }
 
-    setItems((current) => removeCanvasItems(current, selection), {
+    setItems(result.items, {
       before: selection,
-      after: [],
+      after: result.selection,
     })
     setEditing((current) =>
-      current && selection.includes(current.id) ? null : current,
+      current && result.clearEditingIds.includes(current.id) ? null : current,
     )
-    setSelection([])
-  }, [config.commands.delete, selection, setEditing, setItems, setSelection])
+    setSelection(result.selection)
+  }, [config, items, selection, setEditing, setItems, setSelection])
 
   const groupSelection = useCallback(() => {
-    if (!config.commands.group || selection.length < 2) {
-      return
-    }
+    const result = groupCanvasCommand({ config, createId, items, selection })
 
-    const result = groupCanvasSelection(items, selection, createId('group'))
-
-    if (result.items === items) {
+    if (!result) {
       return
     }
 
@@ -140,16 +135,12 @@ export function useCanvasCommands({
       after: result.selection,
     })
     setSelection(result.selection)
-  }, [config.commands.group, createId, items, selection, setItems, setSelection])
+  }, [config, createId, items, selection, setItems, setSelection])
 
   const ungroupSelection = useCallback(() => {
-    if (!config.commands.ungroup) {
-      return
-    }
+    const result = ungroupCanvasCommand({ config, items, selection })
 
-    const result = ungroupCanvasSelection(items, selection)
-
-    if (result.selection.length === 0) {
+    if (!result) {
       return
     }
 
@@ -158,7 +149,7 @@ export function useCanvasCommands({
       after: result.selection,
     })
     setSelection(result.selection)
-  }, [config.commands.ungroup, items, selection, setItems, setSelection])
+  }, [config, items, selection, setItems, setSelection])
 
   const undoHistory = useCallback(() => {
     if (!config.commands.undo) {
@@ -185,23 +176,47 @@ export function useCanvasCommands({
   }, [config.commands.redo, redo, setEditing, setSelection])
 
   const cutSelection = useCallback(() => {
-    if (!config.commands.cut) {
+    const result = cutCanvasCommand({ config, items, selection })
+
+    if (!result) {
       return
     }
 
-    copySelection()
-    deleteSelection()
-  }, [config.commands.cut, copySelection, deleteSelection])
+    if (result.clipboard) {
+      clipboardRef.current = result.clipboard
+    }
+
+    const deletion = result.deletion
+
+    if (!deletion) {
+      return
+    }
+
+    setItems(deletion.items, {
+      before: selection,
+      after: deletion.selection,
+    })
+    setEditing((current) =>
+      current && deletion.clearEditingIds.includes(current.id)
+        ? null
+        : current,
+    )
+    setSelection(deletion.selection)
+  }, [config, items, selection, setEditing, setItems, setSelection])
 
   const moveSelection = useCallback(
     (dx: number, dy: number) => {
-      if (!config.commands.nudge) {
-        return
-      }
-
-      setItems((current) => translateCanvasItems(current, selection, dx, dy))
+      setItems((current) =>
+        nudgeCanvasCommand({
+          config,
+          dx,
+          dy,
+          items: current,
+          selection,
+        }) ?? current,
+      )
     },
-    [config.commands.nudge, selection, setItems],
+    [config, selection, setItems],
   )
 
   return {
