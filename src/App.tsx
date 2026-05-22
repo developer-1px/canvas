@@ -36,7 +36,7 @@ import { useCanvasKeyboardShortcuts } from './canvas/useCanvasKeyboardShortcuts'
 import { useCanvasHistory } from './canvas/useCanvasHistory'
 import { createCanvasOverlayState } from './canvas/CanvasOverlayEngine'
 import { getCanvasCommandAvailability } from './canvas/CanvasCommandEngine'
-import { createCanvasItemScene } from './canvas/CanvasSceneAdapter'
+import { createCanvasItemScene } from './canvas/CanvasItemSceneAdapter'
 import './App.css'
 
 const canvasAffordanceConfig = DEFAULT_CANVAS_AFFORDANCE_CONFIG

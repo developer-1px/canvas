@@ -21,7 +21,7 @@
 | Engine | Creation Router | create tool 결과 계산과 생성 요청 | 꺼진 gesture에서는 실행되지 않는다 |
 | Engine | Command Router | duplicate, delete, group, undo 같은 명령 실행 | 꺼진 command는 UI/shortcut/API에서 막힌다 |
 | Engine | Overlay Model | handle, outline, marquee, draft 표시 상태 | 꺼진 overlay는 렌더 입력에서 빠진다 |
-| Adapter | Scene Adapter | item tree, bounds, hit, editable target 제공 | Feature와 무관하게 최소 질의만 제공한다 |
+| Adapter | Scene Adapter | scene entry, bounds, parent/group 질의 제공 | Feature와 무관하게 최소 질의만 제공한다 |
 | Adapter | Renderer Adapter | SVG/Canvas/DOM/WebGL 렌더링 | 받은 overlay만 그린다 |
 
 ## Feature Toggle Shape
@@ -47,13 +47,14 @@ type CanvasAffordanceConfig = {
 현재 앱에서 뽑는 Module:
 
 1. `CanvasAffordances`: 안정적인 tool/command/gesture/overlay/shortcut id와 label, title, default toggle. 완료.
-2. `CanvasOverlayEngine`: Renderer Adapter가 그릴 renderer-independent overlay state 생성. `CanvasSceneAdapter` 입력으로 전환 중.
+2. `CanvasOverlayEngine`: Renderer Adapter가 그릴 renderer-independent overlay state 생성. `CanvasSceneAdapter` 입력 사용.
 3. `CanvasSvgOverlayRenderer`: SVG Renderer Adapter로 overlay state를 그린다. 진행 중.
 4. `CanvasSvgItemRenderer`: Demo Host item을 SVG로 그린다.
 5. `CanvasCommandEngine`: command availability와 command result routing. Demo item 변경은 `CanvasItemCommandAdapter`가 수행한다.
-6. `CanvasSelectionEngine`: item click selection과 marquee hit selection 계산. `CanvasSceneAdapter` 입력으로 전환 중.
+6. `CanvasSelectionEngine`: item click selection과 marquee hit selection 계산. `CanvasSceneAdapter` 입력 사용.
 7. `CanvasTransformEngine`: move/resize transform routing. Demo item 변경은 `CanvasItemTransformAdapter`가 수행한다.
 8. `CanvasGestureEngine`: pointer input을 canvas/item gesture intent로 변환. 진행 중.
 9. `CanvasCreationEngine`: create tool result routing. Demo item 생성은 `CanvasItemCreationAdapter`가 수행한다.
+10. `CanvasItemSceneAdapter`: Demo item tree를 renderer-independent scene entry로 변환한다.
 
 추출 순서는 동작 변경 없이 Host App에서 Engine 책임을 하나씩 떼어내는 방식으로 진행한다.

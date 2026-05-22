@@ -1,12 +1,11 @@
-import type { Bounds, CanvasItem } from './CanvasModel'
-import { flattenCanvasItems, getItemBounds } from './CanvasTree'
+import type { Bounds } from './CanvasModel'
 
 export type CanvasSceneEntry = {
   bounds: Bounds
   id: string
+  isGroup: boolean
   parentId: string | null
   path: number[]
-  type: CanvasItem['type']
 }
 
 export type CanvasSceneAdapter = {
@@ -17,21 +16,9 @@ export type CanvasSceneAdapter = {
   isGroup: (id: string) => boolean
 }
 
-export function createCanvasItemScene(items: CanvasItem[]): CanvasSceneAdapter {
-  const treeEntries = flattenCanvasItems(items)
-  const treeEntryByPath = new Map(
-    treeEntries.map((entry) => [pathKey(entry.path), entry]),
-  )
-  const entries = treeEntries.map((entry): CanvasSceneEntry => ({
-    bounds: getItemBounds(entry.item),
-    id: entry.item.id,
-    parentId:
-      entry.parentPath.length === 0
-        ? null
-        : treeEntryByPath.get(pathKey(entry.parentPath))?.item.id ?? null,
-    path: entry.path,
-    type: entry.item.type,
-  }))
+export function createCanvasSceneAdapter(
+  entries: CanvasSceneEntry[],
+): CanvasSceneAdapter {
   const entryById = new Map(entries.map((entry) => [entry.id, entry]))
 
   return {
@@ -57,7 +44,7 @@ export function createCanvasItemScene(items: CanvasItem[]): CanvasSceneAdapter {
           .sort((a, b) => a.path.length - b.path.length)[0]?.id ?? null
       )
     },
-    isGroup: (id) => entryById.get(id)?.type === 'group',
+    isGroup: (id) => entryById.get(id)?.isGroup ?? false,
   }
 }
 
@@ -97,10 +84,6 @@ function isAncestorPath(parent: number[], child: number[]) {
     parent.length < child.length &&
     parent.every((segment, index) => segment === child[index])
   )
-}
-
-function pathKey(path: number[]) {
-  return path.join('/')
 }
 
 function samePath(a: number[], b: number[]) {
