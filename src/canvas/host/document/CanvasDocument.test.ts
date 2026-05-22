@@ -12,9 +12,12 @@ import {
 import { INITIAL_ITEMS } from '../component/CanvasInitialItems'
 import { createCanvasComponentItem } from '../component/CanvasComponentFactory'
 import {
+  alignCanvasSelection,
   groupCanvasSelection,
   cloneCanvasItemsWithNewIds,
+  lockCanvasSelection,
   removeCanvasItems,
+  translateCanvasItems,
 } from '../operations/CanvasOperations'
 import {
   copyCanvasDocumentSelectionToClipboard,
@@ -24,6 +27,7 @@ import {
 import {
   createAddCanvasItemsPatch,
   createRemoveCanvasItemsPatch,
+  createReplaceChangedCanvasItemsPatch,
   createResizeCanvasItemsPatch,
   createSetCanvasItemTextPatch,
 } from './CanvasDocumentPatches'
@@ -447,6 +451,96 @@ describe('CanvasDocument history', () => {
     expect(document.history.undo()).toBe(true)
     expect(document.value[2]).toMatchObject({ id: 'component-card', x: 560 })
     expect(getCanvasDocumentSelectionIds(document)).toEqual(['component-card'])
+  })
+
+  test('commits alignment results as zod-crud replace patches', () => {
+    const document = createCanvasItemsDocument(INITIAL_ITEMS, {
+      selection: ['component-sticky', 'component-card'],
+    })
+    const nextItems = alignCanvasSelection(
+      INITIAL_ITEMS,
+      ['component-sticky', 'component-card'],
+      'alignLeft',
+    )
+    const patch = createReplaceChangedCanvasItemsPatch(INITIAL_ITEMS, nextItems)
+
+    expect(patch).toEqual([{
+      op: 'replace',
+      path: '/2',
+      value: {
+        ...INITIAL_ITEMS[2],
+        x: 92,
+      },
+    }])
+    expect(
+      commitCanvasItemsPatch({
+        document,
+        patch,
+        selection: {
+          before: ['component-sticky', 'component-card'],
+          after: ['component-sticky', 'component-card'],
+        },
+      }),
+    ).toBe(true)
+
+    expect(document.lastPatch).toEqual(patch)
+    expect(document.value[2]).toMatchObject({ id: 'component-card', x: 92 })
+  })
+
+  test('commits lock and nudge results as zod-crud replace patches', () => {
+    const document = createCanvasItemsDocument(INITIAL_ITEMS, {
+      selection: ['component-card'],
+    })
+    const locked = lockCanvasSelection(INITIAL_ITEMS, ['component-card'])
+    const lockPatch = createReplaceChangedCanvasItemsPatch(
+      INITIAL_ITEMS,
+      locked.items,
+    )
+
+    expect(lockPatch).toEqual([{
+      op: 'replace',
+      path: '/2',
+      value: {
+        ...INITIAL_ITEMS[2],
+        locked: true,
+      },
+    }])
+    expect(
+      commitCanvasItemsPatch({
+        document,
+        patch: lockPatch,
+        selection: {
+          before: ['component-card'],
+          after: locked.selection,
+        },
+      }),
+    ).toBe(true)
+
+    expect(document.value[2]).toMatchObject({
+      id: 'component-card',
+      locked: true,
+    })
+    expect(getCanvasDocumentSelectionIds(document)).toEqual([])
+
+    expect(document.history.undo()).toBe(true)
+    expect(document.value[2]).toMatchObject({ id: 'component-card' })
+    expect(document.value[2]).not.toHaveProperty('locked')
+    expect(getCanvasDocumentSelectionIds(document)).toEqual(['component-card'])
+
+    const nudged = translateCanvasItems(INITIAL_ITEMS, ['component-card'], 8, 0)
+    const nudgePatch = createReplaceChangedCanvasItemsPatch(
+      INITIAL_ITEMS,
+      nudged,
+    )
+
+    expect(nudgePatch).toEqual([{
+      op: 'replace',
+      path: '/2',
+      value: {
+        ...INITIAL_ITEMS[2],
+        x: 568,
+      },
+    }])
   })
 
   test('round-trips document selection through JSON pointers', () => {

@@ -93,7 +93,7 @@ export function createSetCanvasItemTextPatch(
   }]
 }
 
-function createReplaceChangedCanvasItemsPatch(
+export function createReplaceChangedCanvasItemsPatch(
   beforeItems: CanvasItem[],
   afterItems: CanvasItem[],
 ): JSONPatchOperation[] {
