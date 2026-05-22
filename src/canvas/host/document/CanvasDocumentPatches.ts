@@ -1,6 +1,10 @@
 import type { JSONPatchOperation, Pointer } from 'zod-crud'
+import type { Bounds } from '../../engine/primitives/CanvasPrimitives'
 import type { CanvasItem } from '../model/CanvasModel'
-import { removeCanvasItems } from '../operations/CanvasOperations'
+import {
+  removeCanvasItems,
+  resizeCanvasItems,
+} from '../operations/CanvasOperations'
 import {
   findCanvasItemEntry,
   flattenCanvasItems,
@@ -53,6 +57,18 @@ export function createAddCanvasItemsPatch(
   }))
 }
 
+export function createResizeCanvasItemsPatch(
+  items: CanvasItem[],
+  selection: string[],
+  from: Bounds,
+  to: Bounds,
+): JSONPatchOperation[] {
+  return createReplaceChangedCanvasItemsPatch(
+    items,
+    resizeCanvasItems(items, selection, from, to),
+  )
+}
+
 export function createSetCanvasItemTextPatch(
   items: CanvasItem[],
   id: string,
@@ -75,6 +91,28 @@ export function createSetCanvasItemTextPatch(
     path: `${canvasItemPathToPointer(entry.path)}/text` as Pointer,
     value: text,
   }]
+}
+
+function createReplaceChangedCanvasItemsPatch(
+  beforeItems: CanvasItem[],
+  afterItems: CanvasItem[],
+): JSONPatchOperation[] {
+  const beforeEntries = flattenCanvasItems(beforeItems)
+  const afterEntries = flattenCanvasItems(afterItems)
+  const beforeById = new Map(
+    beforeEntries.map((entry) => [entry.item.id, entry]),
+  )
+  const changedEntries = afterEntries.filter((entry) => {
+    const before = beforeById.get(entry.item.id)
+
+    return before ? !canvasItemsEqual(before.item, entry.item) : false
+  })
+
+  return getTopmostEntries(changedEntries).map((entry) => ({
+    op: 'replace',
+    path: canvasItemPathToPointer(entry.path),
+    value: entry.item,
+  }))
 }
 
 function getTopmostEntries(entries: CanvasItemEntry[]) {

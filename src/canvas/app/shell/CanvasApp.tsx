@@ -99,10 +99,10 @@ function CanvasApp() {
   const scene = useMemo(() => createCanvasItemScene(items), [items])
   const selectedBounds = useMemo(() => scene.getBounds(selection), [scene, selection])
   const inspector = useCanvasObjectInspector({
+    commitItemsPatch,
     items,
     selected,
     selection,
-    setItems,
   })
   const commandAvailability = useMemo(
     () =>

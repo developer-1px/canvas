@@ -24,6 +24,7 @@ import {
 import {
   createAddCanvasItemsPatch,
   createRemoveCanvasItemsPatch,
+  createResizeCanvasItemsPatch,
   createSetCanvasItemTextPatch,
 } from './CanvasDocumentPatches'
 import type { CanvasItem } from '../model/CanvasModel'
@@ -358,6 +359,54 @@ describe('CanvasDocument history', () => {
 
     expect(document.lastPatch).toEqual(patch)
     expect(document.value[0]).toMatchObject({ text: 'Label' })
+  })
+
+  test('commits inspector bounds edits as zod-crud replace patches', () => {
+    const document = createCanvasItemsDocument(INITIAL_ITEMS, {
+      selection: ['component-card'],
+    })
+    const card = INITIAL_ITEMS[2]
+
+    expect(card).toMatchObject({
+      h: 128,
+      id: 'component-card',
+      w: 220,
+      x: 560,
+      y: 88,
+    })
+
+    const patch = createResizeCanvasItemsPatch(
+      INITIAL_ITEMS,
+      ['component-card'],
+      { x: 560, y: 88, w: 220, h: 128 },
+      { x: 600, y: 88, w: 220, h: 128 },
+    )
+
+    expect(patch).toEqual([{
+      op: 'replace',
+      path: '/2',
+      value: {
+        ...card,
+        x: 600,
+      },
+    }])
+    expect(
+      commitCanvasItemsPatch({
+        document,
+        patch,
+        selection: {
+          before: ['component-card'],
+          after: ['component-card'],
+        },
+      }),
+    ).toBe(true)
+
+    expect(document.lastPatch).toEqual(patch)
+    expect(document.value[2]).toMatchObject({ id: 'component-card', x: 600 })
+
+    expect(document.history.undo()).toBe(true)
+    expect(document.value[2]).toMatchObject({ id: 'component-card', x: 560 })
+    expect(getCanvasDocumentSelectionIds(document)).toEqual(['component-card'])
   })
 
   test('round-trips document selection through JSON pointers', () => {

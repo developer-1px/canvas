@@ -1,22 +1,22 @@
 import { useCallback, useMemo } from 'react'
 import type { Bounds } from '../../engine/primitives/CanvasPrimitives'
-import { resizeCanvasItems } from '../../host/operations/CanvasOperations'
 import type { CanvasItem } from '../../host/model/CanvasModel'
+import { createResizeCanvasItemsPatch } from '../../host/document/CanvasDocumentPatches'
 import { findCanvasItem, unionBounds } from '../../host/tree/CanvasTree'
-import type { CommitCanvasItems } from '../document/useCanvasDocument'
+import type { CommitCanvasItemsPatch } from '../document/useCanvasDocument'
 
 type UseCanvasObjectInspectorArgs = {
   items: CanvasItem[]
   selected: Set<string>
   selection: string[]
-  setItems: CommitCanvasItems
+  commitItemsPatch: CommitCanvasItemsPatch
 }
 
 export function useCanvasObjectInspector({
+  commitItemsPatch,
   items,
   selected,
   selection,
-  setItems,
 }: UseCanvasObjectInspectorArgs) {
   const bounds = useMemo(
     () => unionBounds(items, selected),
@@ -34,25 +34,19 @@ export function useCanvasObjectInspector({
 
   const updateBounds = useCallback(
     (nextBounds: Bounds) => {
-      if (selection.length === 0) {
+      if (selection.length === 0 || !bounds) {
         return
       }
 
-      setItems(
-        (current) => {
-          const currentBounds = unionBounds(current, new Set(selection))
-
-          return currentBounds
-            ? resizeCanvasItems(current, selection, currentBounds, nextBounds)
-            : current
-        },
+      commitItemsPatch(
+        createResizeCanvasItemsPatch(items, selection, bounds, nextBounds),
         {
           before: selection,
           after: selection,
         },
       )
     },
-    [selection, setItems],
+    [bounds, commitItemsPatch, items, selection],
   )
 
   return {
