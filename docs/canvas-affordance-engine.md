@@ -47,8 +47,9 @@ type CanvasAffordanceConfig = {
 
 1. `CanvasAffordances`: 안정적인 tool/command/gesture/overlay/shortcut id와 label, title, default toggle. 완료.
 2. `CanvasOverlayEngine`: Renderer Adapter가 그릴 renderer-independent overlay state 생성. `CanvasSceneAdapter` 입력으로 전환 중.
-3. `CanvasCommandEngine`: command availability와 item command 결과 계산. React state/history 적용은 `useCanvasCommands` Adapter에 남아 있음.
-4. `CanvasSelectionEngine`: item click selection과 marquee hit selection 계산. `CanvasSceneAdapter` 입력으로 전환 중.
-5. `CanvasGestureEngine`: pointer input을 canvas/item gesture intent로 변환. 진행 중.
+3. `CanvasSvgOverlayRenderer`: SVG Renderer Adapter로 overlay state를 그린다. 진행 중.
+4. `CanvasCommandEngine`: command availability와 item command 결과 계산. React state/history 적용은 `useCanvasCommands` Adapter에 남아 있음.
+5. `CanvasSelectionEngine`: item click selection과 marquee hit selection 계산. `CanvasSceneAdapter` 입력으로 전환 중.
+6. `CanvasGestureEngine`: pointer input을 canvas/item gesture intent로 변환. 진행 중.
 
 추출 순서는 동작 변경 없이 Host App에서 Engine 책임을 하나씩 떼어내는 방식으로 진행한다.

@@ -1,6 +1,5 @@
 import type { PointerEvent, RefObject } from 'react'
 import {
-  type Bounds,
   type CanvasItem,
   type Interaction,
   type RectItem,
@@ -10,6 +9,12 @@ import {
   type Viewport,
 } from './CanvasModel'
 import type { CanvasOverlayState } from './CanvasOverlayEngine'
+import {
+  CanvasSvgInteractionOverlays,
+  CanvasSvgOverlayDefs,
+  CanvasSvgOverlayPlane,
+  CanvasSvgSelectionOutline,
+} from './CanvasSvgOverlayRenderer'
 import { getItemBounds } from './CanvasTree'
 
 type CanvasStageProps = {
@@ -65,26 +70,14 @@ export function CanvasStage({
       onPointerUp={onPointerUp}
       onPointerCancel={onPointerCancel}
     >
-      <defs>
-        <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-          <path d="M 40 0 L 0 0 0 40" className="grid-line" />
-        </pattern>
-      </defs>
+      <CanvasSvgOverlayDefs />
 
       <rect className="canvas-hit" width="100%" height="100%" />
 
       <g
         transform={`translate(${viewport.x} ${viewport.y}) scale(${viewport.scale})`}
       >
-        {overlays.grid ? (
-          <rect
-            className="grid-plane"
-            x="-10000"
-            y="-10000"
-            width="20000"
-            height="20000"
-          />
-        ) : null}
+        <CanvasSvgOverlayPlane overlays={overlays} />
 
         {items.map((item) =>
           renderCanvasItem({
@@ -96,56 +89,10 @@ export function CanvasStage({
           }),
         )}
 
-        {overlays.draftRect ? (
-          <rect
-            className="draft-rect"
-            x={overlays.draftRect.x}
-            y={overlays.draftRect.y}
-            width={overlays.draftRect.w}
-            height={overlays.draftRect.h}
-            vectorEffect="non-scaling-stroke"
-          />
-        ) : null}
-
-        {overlays.selectionBounds ? (
-          <rect
-            className="selection-bounds"
-            x={overlays.selectionBounds.x}
-            y={overlays.selectionBounds.y}
-            width={overlays.selectionBounds.w}
-            height={overlays.selectionBounds.h}
-            vectorEffect="non-scaling-stroke"
-          />
-        ) : null}
-
-        {overlays.resizeHandles.length > 0 ? (
-          <g className="resize-handles">
-            {overlays.resizeHandles.map(({ handle, point, size }) => (
-              <rect
-                key={handle}
-                className="resize-handle"
-                data-handle={handle}
-                x={point.x - size / 2}
-                y={point.y - size / 2}
-                width={size}
-                height={size}
-                vectorEffect="non-scaling-stroke"
-                onPointerDown={(event) => onResizePointerDown(event, handle)}
-              />
-            ))}
-          </g>
-        ) : null}
-
-        {overlays.marquee ? (
-          <rect
-            className="marquee"
-            x={overlays.marquee.x}
-            y={overlays.marquee.y}
-            width={overlays.marquee.w}
-            height={overlays.marquee.h}
-            vectorEffect="non-scaling-stroke"
-          />
-        ) : null}
+        <CanvasSvgInteractionOverlays
+          overlays={overlays}
+          onResizePointerDown={onResizePointerDown}
+        />
       </g>
     </svg>
   )
@@ -199,7 +146,7 @@ function renderCanvasItem({
           }),
         )}
         {hasOutline ? (
-          <SelectionOutline bounds={bounds} kind="group" />
+          <CanvasSvgSelectionOutline bounds={bounds} kind="group" />
         ) : null}
       </g>
     )
@@ -239,28 +186,7 @@ function renderCanvasItem({
         </foreignObject>
       )}
 
-      {hasOutline ? (
-        <SelectionOutline bounds={bounds} />
-      ) : null}
+      {hasOutline ? <CanvasSvgSelectionOutline bounds={bounds} /> : null}
     </g>
-  )
-}
-
-function SelectionOutline({
-  bounds,
-  kind,
-}: {
-  bounds: Bounds
-  kind?: 'group'
-}) {
-  return (
-    <rect
-      className={kind === 'group' ? 'item-outline group-outline' : 'item-outline'}
-      x={bounds.x}
-      y={bounds.y}
-      width={bounds.w}
-      height={bounds.h}
-      vectorEffect="non-scaling-stroke"
-    />
   )
 }
