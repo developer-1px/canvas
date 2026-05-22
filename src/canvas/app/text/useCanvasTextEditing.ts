@@ -5,13 +5,13 @@ import {
   type RefObject,
   type SetStateAction,
 } from 'react'
-import type { Viewport } from '../../engine/primitives/CanvasPrimitives'
+import type { Viewport } from '../../entities'
 import type {
   CanvasItem,
   EditingText,
   RectItem,
   TextItem,
-} from '../../host/model/CanvasModel'
+} from '../../entities'
 import { createSetCanvasItemTextPatch } from '../../host/document/CanvasDocumentPatches'
 import type { CommitCanvasItemsPatch } from '../document/useCanvasDocument'
 

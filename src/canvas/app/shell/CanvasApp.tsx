@@ -6,15 +6,15 @@ import {
 } from 'react'
 import { CanvasAppView } from './CanvasAppView'
 import { DEFAULT_CANVAS_AFFORDANCE_CONFIG } from '../../engine/affordance/CanvasAffordances'
+import type {
+  Bounds,
+  EditingText,
+  Tool,
+  Viewport,
+} from '../../entities'
 import {
   INITIAL_VIEWPORT,
-  type Bounds,
-  type Tool,
-  type Viewport,
 } from '../../engine/primitives/CanvasPrimitives'
-import {
-  type EditingText,
-} from '../../host/model/CanvasModel'
 import { INITIAL_ITEMS } from '../../host/component/CanvasInitialItems'
 import { findEditableTextItem } from '../../host/tree/CanvasTree'
 import type { Interaction } from '../pointer/CanvasInteractionState'

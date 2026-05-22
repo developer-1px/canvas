@@ -6,7 +6,7 @@ import {
   CANVAS_TOOL_AFFORDANCES,
   type CanvasAffordanceConfig,
 } from '../../engine/affordance/CanvasAffordances'
-import type { Tool } from '../../engine/primitives/CanvasPrimitives'
+import type { Tool } from '../../entities'
 import {
   AlignBottomIcon,
   AlignCenterIcon,

@@ -13,8 +13,8 @@ import {
   type CanvasCommandAdapter,
 } from '../../engine/command/CanvasCommandEngine'
 import type { CanvasAffordanceConfig } from '../../engine/affordance/CanvasAffordances'
-import type { Point, Viewport } from '../../engine/primitives/CanvasPrimitives'
-import type { CanvasItem, EditingText } from '../../host/model/CanvasModel'
+import type { Point, Viewport } from '../../entities'
+import type { CanvasItem, EditingText } from '../../entities'
 import {
   createAddCanvasItemsPatch,
   createRemoveCanvasItemsPatch,

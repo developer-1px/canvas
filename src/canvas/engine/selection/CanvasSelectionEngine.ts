@@ -1,4 +1,5 @@
-import { unique, type Bounds } from '../primitives/CanvasPrimitives'
+import type { Bounds } from '../../entities'
+import { unique } from '../primitives/CanvasPrimitives'
 import type { CanvasSceneAdapter } from '../scene/CanvasSceneAdapter'
 
 export type CanvasItemPointerSelection = {

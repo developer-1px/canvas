@@ -7,7 +7,7 @@ import {
   type SetStateAction,
 } from 'react'
 import type { JSONPatchOperation } from 'zod-crud'
-import type { CanvasItem } from '../../host/model/CanvasModel'
+import type { CanvasItem } from '../../entities'
 import {
   copyCanvasDocumentSelectionToClipboard,
   readCanvasDocumentClipboardItems,

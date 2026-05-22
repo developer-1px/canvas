@@ -1,4 +1,4 @@
-import type { Bounds } from '../primitives/CanvasPrimitives'
+import type { Bounds } from '../../entities'
 
 export function translateCanvasSnapBounds(
   bounds: Bounds,

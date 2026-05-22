@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react'
-import type { Bounds } from '../../engine/primitives/CanvasPrimitives'
-import type { CanvasItem } from '../../host/model/CanvasModel'
+import type { Bounds } from '../../entities'
+import type { CanvasItem } from '../../entities'
 import { createResizeCanvasItemsPatch } from '../../host/document/CanvasDocumentPatches'
 import { findCanvasItem, unionBounds } from '../../host/tree/CanvasTree'
 import type { CommitCanvasItemsPatch } from '../document/useCanvasDocument'

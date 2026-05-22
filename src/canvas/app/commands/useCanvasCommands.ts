@@ -21,8 +21,8 @@ import {
   type CanvasReorderMode,
 } from '../../engine/command/CanvasCommandEngine'
 import type { CanvasAffordanceConfig } from '../../engine/affordance/CanvasAffordances'
-import type { Viewport } from '../../engine/primitives/CanvasPrimitives'
-import type { CanvasItem, EditingText } from '../../host/model/CanvasModel'
+import type { Viewport } from '../../entities'
+import type { CanvasItem, EditingText } from '../../entities'
 import {
   createGroupCanvasItemsPatch,
   createRemoveCanvasItemsPatch,

@@ -2,7 +2,7 @@ import {
   CANVAS_GESTURE_STATUS_LABELS,
   CANVAS_TOOL_AFFORDANCES,
 } from '../../engine/affordance/CanvasAffordances'
-import type { CanvasInteractionKind, Tool } from '../../engine/primitives/CanvasPrimitives'
+import type { CanvasInteractionKind, Tool } from '../../entities'
 
 type CanvasStatusProps = {
   gesture: CanvasInteractionKind

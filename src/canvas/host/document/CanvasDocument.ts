@@ -4,13 +4,12 @@ import {
   type JSONPatchOperation,
   type JSONResult,
 } from 'zod-crud'
-import type { CanvasItem } from '../model/CanvasModel'
+import type { CanvasItem, CanvasSelectionIds } from '../../entities'
 import { CanvasItemsSchema, validateCanvasItems } from './CanvasItemSchema'
 import { syncCanvasItems } from '../tree/CanvasTree'
 import {
   createCanvasSelectionSnapshot,
   restoreCanvasDocumentSelection,
-  type CanvasSelectionIds,
 } from './CanvasDocumentSelection'
 
 export {
@@ -24,7 +23,7 @@ export {
   type CanvasTextSearchMatch,
   type CanvasTextSearchOptions,
 } from './CanvasDocumentSearch'
-export type { CanvasSelectionIds } from './CanvasDocumentSelection'
+export type { CanvasSelectionIds } from '../../entities'
 
 export const CANVAS_DOCUMENT_HISTORY_LIMIT = 100
 

@@ -1,12 +1,11 @@
 import { useEffect } from 'react'
+import type { CanvasItem, Viewport } from '../../entities'
 import {
   clamp,
   MAX_SCALE,
   MIN_SCALE,
-  type Viewport,
 } from '../../engine/primitives/CanvasPrimitives'
 import { validateCanvasItems } from '../../host/document/CanvasItemSchema'
-import type { CanvasItem } from '../../host/model/CanvasModel'
 import { flattenCanvasItems, pruneNestedSelection } from '../../host/tree/CanvasTree'
 
 export const CANVAS_WORKSPACE_STORAGE_KEY =

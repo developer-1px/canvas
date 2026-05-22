@@ -1,4 +1,4 @@
-import type { Bounds } from '../primitives/CanvasPrimitives'
+import type { Bounds } from '../../entities'
 import type { CanvasSceneEntry } from '../scene/CanvasSceneAdapter'
 import type {
   CanvasAlignmentGuide,

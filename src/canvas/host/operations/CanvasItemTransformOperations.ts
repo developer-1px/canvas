@@ -1,8 +1,7 @@
+import type { Bounds, CanvasItem } from '../../entities'
 import {
   scaleItemBounds,
-  type Bounds,
 } from '../../engine/primitives/CanvasPrimitives'
-import type { CanvasItem } from '../model/CanvasModel'
 import {
   getItemBounds,
   pruneNestedSelection,

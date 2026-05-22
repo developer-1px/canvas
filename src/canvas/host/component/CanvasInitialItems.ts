@@ -1,6 +1,6 @@
-import type { Point } from '../../engine/primitives/CanvasPrimitives'
+import type { Point } from '../../entities'
 import { createCanvasComponentItem } from './CanvasComponentFactory'
-import type { CanvasComponentKind, CanvasItem } from '../model/CanvasModel'
+import type { CanvasComponentKind, CanvasItem } from '../../entities'
 
 export const INITIAL_ITEMS: CanvasItem[] = createInitialCanvasComponents()
 

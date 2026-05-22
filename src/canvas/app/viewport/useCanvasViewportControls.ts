@@ -4,13 +4,12 @@ import {
   type RefObject,
   type SetStateAction,
 } from 'react'
+import type { CanvasItem, Viewport } from '../../entities'
 import {
   fitBoundsIntoViewport,
   INITIAL_VIEWPORT,
   zoomViewport,
-  type Viewport,
 } from '../../engine/primitives/CanvasPrimitives'
-import type { CanvasItem } from '../../host/model/CanvasModel'
 import { flattenCanvasItems, unionBounds } from '../../host/tree/CanvasTree'
 
 type UseCanvasViewportControlsArgs = {

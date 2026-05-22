@@ -1,6 +1,6 @@
 import type { JSONPatchOperation, Pointer } from 'zod-crud'
 import { parsePointer } from 'zod-crud'
-import type { CanvasItem } from '../model/CanvasModel'
+import type { CanvasItem } from '../../entities'
 import type { CanvasItemsDocument } from './CanvasDocument'
 
 export type CanvasSearchField =

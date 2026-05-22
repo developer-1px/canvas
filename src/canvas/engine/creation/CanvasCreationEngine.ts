@@ -1,4 +1,5 @@
-import { normalizeBounds, type Bounds, type Point } from '../primitives/CanvasPrimitives'
+import type { Bounds, Point } from '../../entities'
+import { normalizeBounds } from '../primitives/CanvasPrimitives'
 
 export type CanvasCreationItem = {
   id: string

@@ -4,8 +4,8 @@ import type {
   SetStateAction,
 } from 'react'
 import type { CanvasAffordanceConfig } from '../../engine/affordance/CanvasAffordances'
-import type { Bounds, Tool } from '../../engine/primitives/CanvasPrimitives'
-import type { EditingText } from '../../host/model/CanvasModel'
+import type { Bounds, Tool } from '../../entities'
+import type { EditingText } from '../../entities'
 import type { Interaction } from '../pointer/CanvasInteractionState'
 import type { CommitCanvasSelection } from '../document/useCanvasDocument'
 

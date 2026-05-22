@@ -1,4 +1,4 @@
-import type { CanvasComponentKind } from '../model/CanvasModel'
+import type { CanvasComponentKind } from '../../entities'
 
 export type CanvasComponentTemplate = {
   accent: string

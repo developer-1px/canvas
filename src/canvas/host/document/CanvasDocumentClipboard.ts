@@ -1,4 +1,4 @@
-import type { CanvasItem } from '../model/CanvasModel'
+import type { CanvasItem } from '../../entities'
 import {
   findCanvasItemEntry,
   pruneNestedSelection,

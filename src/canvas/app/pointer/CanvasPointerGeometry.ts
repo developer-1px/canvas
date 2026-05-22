@@ -1,5 +1,5 @@
 import type { RefObject } from 'react'
-import type { Point, Viewport } from '../../engine/primitives/CanvasPrimitives'
+import type { Point, Viewport } from '../../entities'
 
 export function screenPoint(
   svgRef: RefObject<SVGSVGElement | null>,

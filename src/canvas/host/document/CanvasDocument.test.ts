@@ -35,7 +35,7 @@ import {
   createTransformCanvasItemsPatch,
   createUngroupCanvasItemsPatch,
 } from './CanvasDocumentPatches'
-import type { CanvasItem } from '../model/CanvasModel'
+import type { CanvasItem } from '../../entities'
 
 describe('CanvasDocument history', () => {
   test('seeds zod-crud document selection from canvas ids', () => {

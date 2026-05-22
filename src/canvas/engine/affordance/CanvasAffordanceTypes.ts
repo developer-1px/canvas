@@ -1,4 +1,4 @@
-import type { Tool } from '../primitives/CanvasPrimitives'
+import type { Tool } from '../../entities'
 
 export type CanvasCommandId =
   | 'alignBottom'

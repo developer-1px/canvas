@@ -1,5 +1,5 @@
 import type { CanvasCommandAdapter } from '../../engine/command/CanvasCommandEngine'
-import type { CanvasItem } from '../model/CanvasModel'
+import type { CanvasItem } from '../../entities'
 import {
   alignCanvasSelection,
   cloneCanvasItemsWithNewIds,

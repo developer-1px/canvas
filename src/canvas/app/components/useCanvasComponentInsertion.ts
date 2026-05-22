@@ -4,12 +4,12 @@ import {
   type RefObject,
   type SetStateAction,
 } from 'react'
-import type { Tool, Viewport } from '../../engine/primitives/CanvasPrimitives'
+import type { Tool, Viewport } from '../../entities'
 import { createCanvasComponentItem } from '../../host/component/CanvasComponentFactory'
 import type {
   CanvasComponentKind,
   EditingText,
-} from '../../host/model/CanvasModel'
+} from '../../entities'
 import type { CommitCanvasItemsPatch } from '../document/useCanvasDocument'
 
 type UseCanvasComponentInsertionArgs = {

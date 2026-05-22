@@ -7,21 +7,21 @@ import type {
 } from 'react'
 import { useRef } from 'react'
 import type { CanvasAffordanceConfig } from '../../engine/affordance/CanvasAffordances'
+import type {
+  Bounds,
+  CanvasItem,
+  EditingText,
+  Point,
+  RectItem,
+  ResizeHandle,
+  TextItem,
+  Tool,
+  Viewport,
+} from '../../entities'
 import {
   normalizeBounds,
   pointDistance,
-  type Bounds,
-  type Point,
-  type ResizeHandle,
-  type Tool,
-  type Viewport,
 } from '../../engine/primitives/CanvasPrimitives'
-import type {
-  CanvasItem,
-  EditingText,
-  RectItem,
-  TextItem,
-} from '../../host/model/CanvasModel'
 import { capturePointer, screenPoint, screenToWorld } from './CanvasPointerGeometry'
 import {
   createCanvasText,

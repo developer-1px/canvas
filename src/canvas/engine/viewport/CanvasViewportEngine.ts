@@ -1,5 +1,6 @@
 import type { CanvasAffordanceConfig } from '../affordance/CanvasAffordances'
-import { zoomViewport, type Point, type Viewport } from '../primitives/CanvasPrimitives'
+import type { Point, Viewport } from '../../entities'
+import { zoomViewport } from '../primitives/CanvasPrimitives'
 
 export type CanvasWheelInput = {
   ctrlKey: boolean

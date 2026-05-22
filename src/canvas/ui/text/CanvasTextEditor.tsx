@@ -4,7 +4,7 @@ import type {
   PointerEvent,
   RefObject,
 } from 'react'
-import type { EditingText } from '../../host/model/CanvasModel'
+import type { EditingText } from '../../entities'
 
 type CanvasTextEditorProps = {
   editing: EditingText | null

@@ -1,6 +1,6 @@
 import type { JSONPatchOperation, Pointer } from 'zod-crud'
-import type { Bounds } from '../../engine/primitives/CanvasPrimitives'
-import type { CanvasItem } from '../model/CanvasModel'
+import type { Bounds } from '../../entities'
+import type { CanvasItem } from '../../entities'
 import {
   groupCanvasSelection,
   removeCanvasItems,

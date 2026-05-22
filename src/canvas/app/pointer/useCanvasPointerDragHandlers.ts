@@ -6,18 +6,18 @@ import type {
   SetStateAction,
 } from 'react'
 import type { CanvasAffordanceConfig } from '../../engine/affordance/CanvasAffordances'
+import type {
+  Bounds,
+  CanvasItem,
+  EditingText,
+  Tool,
+  Viewport,
+} from '../../entities'
 import {
   DRAG_THRESHOLD,
   normalizeBounds,
   pointDistance,
-  type Bounds,
-  type Tool,
-  type Viewport,
 } from '../../engine/primitives/CanvasPrimitives'
-import type {
-  CanvasItem,
-  EditingText,
-} from '../../host/model/CanvasModel'
 import {
   createCanvasRect,
   type CanvasCreationAdapter,

@@ -1,13 +1,11 @@
 import type { JSONPatchOperation, JSONResult, SelectionSnap } from 'zod-crud'
-import type { CanvasItem } from '../model/CanvasModel'
+import type { CanvasItem, CanvasSelectionIds } from '../../entities'
 import type { CanvasItemsDocument } from './CanvasDocument'
 import {
   findCanvasItemEntry,
   flattenCanvasItems,
 } from '../tree/CanvasTree'
 import { canvasItemPathToPointer } from './CanvasDocumentPointers'
-
-export type CanvasSelectionIds = string[]
 
 export function restoreCanvasDocumentSelection(
   document: CanvasItemsDocument,

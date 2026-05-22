@@ -1,11 +1,13 @@
 import type { CanvasAffordanceConfig } from '../affordance/CanvasAffordances'
+import type {
+  Bounds,
+  Point,
+  ResizeHandle,
+  Viewport,
+} from '../../entities'
 import {
   handlePoint,
   RESIZE_HANDLES,
-  type Bounds,
-  type Point,
-  type ResizeHandle,
-  type Viewport,
 } from '../primitives/CanvasPrimitives'
 import type { CanvasSceneAdapter } from '../scene/CanvasSceneAdapter'
 import type { CanvasSnapGuides } from '../snap/CanvasSnapEngine'

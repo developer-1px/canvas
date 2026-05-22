@@ -1,4 +1,4 @@
-import type { CanvasItem } from '../model/CanvasModel'
+import type { CanvasItem } from '../../entities'
 import { pruneNestedSelection, syncGroupBounds } from '../tree/CanvasTree'
 import { mapCanvasItems } from './CanvasItemOperationTree'
 

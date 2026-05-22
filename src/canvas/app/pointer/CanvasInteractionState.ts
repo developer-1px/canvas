@@ -3,8 +3,8 @@ import type {
   Point,
   ResizeHandle,
   Viewport,
-} from '../../engine/primitives/CanvasPrimitives'
-import type { CanvasItem, EditingText } from '../../host/model/CanvasModel'
+} from '../../entities'
+import type { CanvasItem, EditingText } from '../../entities'
 
 export type Interaction =
   | { kind: 'none' }

@@ -1,9 +1,7 @@
+import type { Bounds, Point, ResizeHandle } from '../../entities'
 import {
   resizeBounds,
-  type Bounds,
-  type Point,
   type ResizeBoundsOptions,
-  type ResizeHandle,
 } from '../primitives/CanvasPrimitives'
 
 export type CanvasTransformItem = {

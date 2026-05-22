@@ -1,5 +1,5 @@
 import type { CanvasCreationAdapter } from '../../engine/creation/CanvasCreationEngine'
-import type { CanvasItem } from '../model/CanvasModel'
+import type { CanvasItem } from '../../entities'
 
 export const CANVAS_ITEM_CREATION_ADAPTER: CanvasCreationAdapter<CanvasItem> = {
   createRect: ({ bounds, id }) => ({

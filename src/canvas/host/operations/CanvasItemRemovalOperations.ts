@@ -1,4 +1,4 @@
-import type { CanvasItem } from '../model/CanvasModel'
+import type { CanvasItem } from '../../entities'
 import { syncGroupBounds } from '../tree/CanvasTree'
 import { isCanvasItemLocked } from './CanvasItemLockOperations'
 

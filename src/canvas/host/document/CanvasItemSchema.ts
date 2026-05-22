@@ -1,5 +1,5 @@
 import * as z from 'zod'
-import type { CanvasItem } from '../model/CanvasModel'
+import type { CanvasItem } from '../../entities'
 import { syncCanvasItems } from '../tree/CanvasTree'
 
 export const CanvasItemsSchema = z.array(z.custom<CanvasItem>(isCanvasItem))
