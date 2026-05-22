@@ -1,13 +1,13 @@
 import {
   scaleItemBounds,
   type Bounds,
-} from '../../engine/CanvasPrimitives'
-import type { CanvasItem } from '../CanvasModel'
+} from '../../engine/primitives/CanvasPrimitives'
+import type { CanvasItem } from '../model/CanvasModel'
 import {
   getItemBounds,
   pruneNestedSelection,
   syncGroupBounds,
-} from '../CanvasTree'
+} from '../tree/CanvasTree'
 import { mapCanvasItems } from './CanvasItemOperationTree'
 import { isCanvasItemLocked } from './CanvasItemLockOperations'
 

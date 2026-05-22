@@ -1,6 +1,6 @@
 import type { PointerEvent } from 'react'
-import type { CanvasOverlayState } from '../../engine/CanvasOverlayEngine'
-import type { Bounds, ResizeHandle } from '../../engine/CanvasPrimitives'
+import type { CanvasOverlayState } from '../../engine/overlay/CanvasOverlayEngine'
+import type { Bounds, ResizeHandle } from '../../engine/primitives/CanvasPrimitives'
 
 type CanvasSvgInteractionOverlaysProps = {
   overlays: CanvasOverlayState

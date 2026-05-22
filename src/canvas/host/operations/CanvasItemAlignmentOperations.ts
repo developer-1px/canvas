@@ -1,12 +1,12 @@
-import type { Bounds } from '../../engine/CanvasPrimitives'
-import type { CanvasItem } from '../CanvasModel'
+import type { Bounds } from '../../engine/primitives/CanvasPrimitives'
+import type { CanvasItem } from '../model/CanvasModel'
 import {
   flattenCanvasItems,
   getItemBounds,
   getItemsBounds,
   pruneNestedSelection,
   syncGroupBounds,
-} from '../CanvasTree'
+} from '../tree/CanvasTree'
 import {
   replaceCanvasChildrenAtPath,
   sameCanvasPath,

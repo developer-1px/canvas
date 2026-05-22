@@ -1,5 +1,5 @@
-import type { CanvasCommandAdapter } from '../../engine/CanvasCommandEngine'
-import type { CanvasItem } from '../CanvasModel'
+import type { CanvasCommandAdapter } from '../../engine/command/CanvasCommandEngine'
+import type { CanvasItem } from '../model/CanvasModel'
 import {
   alignCanvasSelection,
   cloneCanvasItemsWithNewIds,
@@ -13,7 +13,7 @@ import {
   translateCanvasItems,
   ungroupCanvasSelection,
   unlockAllCanvasItems,
-} from '../CanvasOperations'
+} from '../operations/CanvasOperations'
 
 export const CANVAS_ITEM_COMMAND_ADAPTER: CanvasCommandAdapter<CanvasItem> = {
   alignSelection: ({ items, mode, selection }) =>

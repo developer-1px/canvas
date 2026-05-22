@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import type { CanvasItem } from '../CanvasModel'
+import type { CanvasItem } from '../model/CanvasModel'
 import { reorderCanvasItems } from './CanvasItemZOrderOperations'
 
 function rect(id: string): CanvasItem {

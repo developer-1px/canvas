@@ -1,10 +1,10 @@
-import type { Point } from '../../engine/CanvasPrimitives'
-import type { CanvasItem, GroupItem } from '../CanvasModel'
+import type { Point } from '../../engine/primitives/CanvasPrimitives'
+import type { CanvasItem, GroupItem } from '../model/CanvasModel'
 import {
   flattenCanvasItems,
   pruneNestedSelection,
   syncGroupBounds,
-} from '../CanvasTree'
+} from '../tree/CanvasTree'
 
 export function copyCanvasSelection(items: CanvasItem[], ids: string[]) {
   const selected = new Set(pruneNestedSelection(items, ids))

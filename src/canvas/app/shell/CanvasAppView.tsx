@@ -1,13 +1,13 @@
 import type { ComponentProps } from 'react'
-import { CanvasStage } from '../../ui/CanvasStage'
-import { CanvasComponentPalette } from '../../ui/CanvasComponentPalette'
-import { CanvasObjectInspector } from '../../ui/CanvasObjectInspector'
-import { CanvasTextEditor } from '../../ui/CanvasTextEditor'
-import { CanvasToolbar } from '../../ui/CanvasToolbar'
-import { CanvasStatus } from '../../ui/CanvasStatus'
-import { ZoomControls } from '../../ui/ZoomControls'
-import type { CanvasAffordanceConfig } from '../../engine/CanvasAffordances'
-import type { CanvasCommandAvailability } from '../../engine/CanvasCommandEngine'
+import { CanvasStage } from '../../ui/stage/CanvasStage'
+import { CanvasComponentPalette } from '../../ui/palette/CanvasComponentPalette'
+import { CanvasObjectInspector } from '../../ui/inspector/CanvasObjectInspector'
+import { CanvasTextEditor } from '../../ui/text/CanvasTextEditor'
+import { CanvasToolbar } from '../../ui/toolbar/CanvasToolbar'
+import { CanvasStatus } from '../../ui/status/CanvasStatus'
+import { ZoomControls } from '../../ui/zoom/ZoomControls'
+import type { CanvasAffordanceConfig } from '../../engine/affordance/CanvasAffordances'
+import type { CanvasCommandAvailability } from '../../engine/command/CanvasCommandEngine'
 
 type StageProps = ComponentProps<typeof CanvasStage>
 type ToolbarProps = ComponentProps<typeof CanvasToolbar>

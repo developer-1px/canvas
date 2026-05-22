@@ -1,4 +1,4 @@
-import type { CanvasItem } from '../CanvasModel'
+import type { CanvasItem } from '../model/CanvasModel'
 import { mapCanvasItems } from './CanvasItemOperationTree'
 
 export function updateTextItem(

@@ -1,4 +1,4 @@
-import type { CanvasItem, RectItem, TextItem } from '../CanvasModel'
+import type { CanvasItem, RectItem, TextItem } from '../model/CanvasModel'
 import { samePath } from './CanvasTreePath'
 
 export type CanvasItemEntry = {

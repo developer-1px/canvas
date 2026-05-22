@@ -6,40 +6,40 @@ import {
   useState,
 } from 'react'
 import { CanvasAppView } from './CanvasAppView'
-import { DEFAULT_CANVAS_AFFORDANCE_CONFIG } from '../../engine/CanvasAffordances'
+import { DEFAULT_CANVAS_AFFORDANCE_CONFIG } from '../../engine/affordance/CanvasAffordances'
 import {
   INITIAL_VIEWPORT,
   type Bounds,
   type Tool,
   type Viewport,
-} from '../../engine/CanvasPrimitives'
+} from '../../engine/primitives/CanvasPrimitives'
 import {
   type EditingText,
-} from '../../host/CanvasModel'
-import { INITIAL_ITEMS } from '../../host/CanvasInitialItems'
-import { findEditableTextItem } from '../../host/CanvasTree'
-import type { Interaction } from '../workflow/CanvasInteractionState'
-import { useCanvasPointerDragHandlers } from '../workflow/useCanvasPointerDragHandlers'
-import { useCanvasPointerDownHandlers } from '../workflow/useCanvasPointerDownHandlers'
-import { useCanvasCommands } from '../workflow/useCanvasCommands'
-import { useCanvasKeyboardShortcuts } from '../workflow/useCanvasKeyboardShortcuts'
-import { useCanvasHistory } from '../workflow/useCanvasHistory'
-import { useCanvasWheelViewport } from '../workflow/useCanvasWheelViewport'
-import { useCanvasTextEditing } from '../workflow/useCanvasTextEditing'
-import { useCanvasViewportControls } from '../workflow/useCanvasViewportControls'
-import { useCanvasComponentInsertion } from '../workflow/useCanvasComponentInsertion'
-import { useCanvasObjectInspector } from '../workflow/useCanvasObjectInspector'
+} from '../../host/model/CanvasModel'
+import { INITIAL_ITEMS } from '../../host/component/CanvasInitialItems'
+import { findEditableTextItem } from '../../host/tree/CanvasTree'
+import type { Interaction } from '../pointer/CanvasInteractionState'
+import { useCanvasPointerDragHandlers } from '../pointer/useCanvasPointerDragHandlers'
+import { useCanvasPointerDownHandlers } from '../pointer/useCanvasPointerDownHandlers'
+import { useCanvasCommands } from '../commands/useCanvasCommands'
+import { useCanvasKeyboardShortcuts } from '../keyboard/useCanvasKeyboardShortcuts'
+import { useCanvasHistory } from '../document/useCanvasHistory'
+import { useCanvasWheelViewport } from '../viewport/useCanvasWheelViewport'
+import { useCanvasTextEditing } from '../text/useCanvasTextEditing'
+import { useCanvasViewportControls } from '../viewport/useCanvasViewportControls'
+import { useCanvasComponentInsertion } from '../components/useCanvasComponentInsertion'
+import { useCanvasObjectInspector } from '../inspector/useCanvasObjectInspector'
 import {
   getCanvasItemIdSeed,
   readStoredCanvasWorkspace,
   useCanvasWorkspacePersistence,
-} from '../workflow/CanvasWorkspacePersistence'
-import { createCanvasOverlayState } from '../../engine/CanvasOverlayEngine'
+} from '../document/CanvasWorkspacePersistence'
+import { createCanvasOverlayState } from '../../engine/overlay/CanvasOverlayEngine'
 import {
   EMPTY_CANVAS_SNAP_GUIDES,
   type CanvasSnapGuides,
-} from '../../engine/CanvasSnapEngine'
-import { getCanvasCommandAvailability } from '../../engine/CanvasCommandEngine'
+} from '../../engine/snap/CanvasSnapEngine'
+import { getCanvasCommandAvailability } from '../../engine/command/CanvasCommandEngine'
 import { CANVAS_ITEM_COMMAND_ADAPTER } from '../../host/adapters/CanvasItemCommandAdapter'
 import { CANVAS_ITEM_CREATION_ADAPTER } from '../../host/adapters/CanvasItemCreationAdapter'
 import { createCanvasItemScene } from '../../host/adapters/CanvasItemSceneAdapter'

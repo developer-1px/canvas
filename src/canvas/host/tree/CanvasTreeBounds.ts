@@ -1,5 +1,5 @@
-import type { Bounds } from '../../engine/CanvasPrimitives'
-import type { CanvasItem, GroupItem } from '../CanvasModel'
+import type { Bounds } from '../../engine/primitives/CanvasPrimitives'
+import type { CanvasItem, GroupItem } from '../model/CanvasModel'
 
 export function boundsIntersect(a: Bounds, b: Bounds) {
   return (

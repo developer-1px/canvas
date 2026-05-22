@@ -1,5 +1,5 @@
-import type { CanvasItem } from '../CanvasModel'
-import { syncGroupBounds } from '../CanvasTree'
+import type { CanvasItem } from '../model/CanvasModel'
+import { syncGroupBounds } from '../tree/CanvasTree'
 
 export function mapCanvasItems(
   items: CanvasItem[],

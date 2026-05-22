@@ -1,11 +1,11 @@
-import { unique } from '../../engine/CanvasPrimitives'
-import type { CanvasItem } from '../CanvasModel'
+import { unique } from '../../engine/primitives/CanvasPrimitives'
+import type { CanvasItem } from '../model/CanvasModel'
 import {
   flattenCanvasItems,
   pruneNestedSelection,
   syncCanvasItems,
   syncGroupBounds,
-} from '../CanvasTree'
+} from '../tree/CanvasTree'
 import {
   replaceCanvasChildrenAtPath,
   sameCanvasPath,

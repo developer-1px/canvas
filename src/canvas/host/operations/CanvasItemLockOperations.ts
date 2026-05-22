@@ -1,5 +1,5 @@
-import type { CanvasItem } from '../CanvasModel'
-import { pruneNestedSelection, syncGroupBounds } from '../CanvasTree'
+import type { CanvasItem } from '../model/CanvasModel'
+import { pruneNestedSelection, syncGroupBounds } from '../tree/CanvasTree'
 import { mapCanvasItems } from './CanvasItemOperationTree'
 
 export function isCanvasItemLocked(item: CanvasItem) {

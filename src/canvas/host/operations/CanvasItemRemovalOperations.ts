@@ -1,5 +1,5 @@
-import type { CanvasItem } from '../CanvasModel'
-import { syncGroupBounds } from '../CanvasTree'
+import type { CanvasItem } from '../model/CanvasModel'
+import { syncGroupBounds } from '../tree/CanvasTree'
 import { isCanvasItemLocked } from './CanvasItemLockOperations'
 
 export function removeCanvasItems(items: CanvasItem[], ids: string[]) {
