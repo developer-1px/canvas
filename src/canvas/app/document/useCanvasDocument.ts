@@ -6,10 +6,12 @@ import {
   type Dispatch,
   type SetStateAction,
 } from 'react'
+import type { JSONPatchOperation } from 'zod-crud'
 import type { CanvasItem } from '../../host/model/CanvasModel'
 import {
   canvasItemsEqual,
   commitCanvasItemsDocument,
+  commitCanvasItemsPatch,
   createCanvasItemsDocument,
   getCanvasDocumentSelectionIds,
   loadCanvasItemsDocument,
@@ -29,6 +31,11 @@ export type SelectionHistory = {
 
 export type CommitCanvasItems = (
   action: SetStateAction<CanvasItem[]>,
+  selection?: SelectionHistory,
+) => void
+
+export type CommitCanvasItemsPatch = (
+  patch: JSONPatchOperation[],
   selection?: SelectionHistory,
 ) => void
 
@@ -84,6 +91,25 @@ export function useCanvasDocument(
       const didCommit = commitCanvasItemsDocument({
         document,
         nextItems: next,
+        selection,
+      })
+
+      if (!didCommit) {
+        return
+      }
+
+      itemsRef.current = document.value
+      setItemsState(itemsRef.current)
+      syncHistoryAvailability()
+    },
+    [document, syncHistoryAvailability],
+  )
+
+  const commitItemsPatch: CommitCanvasItemsPatch = useCallback(
+    (patch, selection) => {
+      const didCommit = commitCanvasItemsPatch({
+        document,
+        patch,
         selection,
       })
 
@@ -163,6 +189,7 @@ export function useCanvasDocument(
   return {
     ...historyAvailability,
     commitItems,
+    commitItemsPatch,
     items,
     redo,
     recordHistoryFrom,

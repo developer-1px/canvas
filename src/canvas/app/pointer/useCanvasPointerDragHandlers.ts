@@ -36,10 +36,13 @@ import {
   resizeCanvasSelection,
   type CanvasTransformAdapter,
 } from '../../engine/transform/CanvasTransformEngine'
-import type { CommitCanvasItems } from '../document/useCanvasDocument'
+import type {
+  CommitCanvasItemsPatch,
+} from '../document/useCanvasDocument'
 import type { Interaction } from './CanvasInteractionState'
 
 type UseCanvasPointerDragHandlersArgs = {
+  commitItemsPatch: CommitCanvasItemsPatch
   config: CanvasAffordanceConfig
   creationAdapter: CanvasCreationAdapter<CanvasItem>
   createId: (prefix: string) => string
@@ -50,7 +53,6 @@ type UseCanvasPointerDragHandlersArgs = {
     selection?: { after: string[]; before: string[] },
   ) => void
   selection: string[]
-  setItems: CommitCanvasItems
   setDraftRect: Dispatch<SetStateAction<Bounds | null>>
   setEditing: Dispatch<SetStateAction<EditingText | null>>
   setGesture: Dispatch<SetStateAction<Interaction['kind']>>
@@ -66,6 +68,7 @@ type UseCanvasPointerDragHandlersArgs = {
 }
 
 export function useCanvasPointerDragHandlers({
+  commitItemsPatch,
   config,
   creationAdapter,
   createId,
@@ -73,7 +76,6 @@ export function useCanvasPointerDragHandlers({
   scene,
   recordHistoryFrom,
   selection,
-  setItems,
   setDraftRect,
   setEditing,
   setGesture,
@@ -279,11 +281,10 @@ export function useCanvasPointerDragHandlers({
         startWorld: interaction.startWorld,
       })
 
-      setItems((current) => [...current, nextItem], {
+      commitItemsPatch([{ op: 'add', path: '/-', value: nextItem }], {
         before: selection,
         after: [nextItem.id],
       })
-      setSelection([nextItem.id])
       setTool('select')
     }
 

@@ -100,6 +100,50 @@ export function commitCanvasItemsDocument({
   return true
 }
 
+export function commitCanvasItemsPatch({
+  document,
+  patch,
+  selection,
+}: {
+  document: CanvasItemsDocument
+  patch: JSONPatchOperation[]
+  selection?: {
+    after: CanvasSelectionIds
+    before: CanvasSelectionIds
+  }
+}) {
+  if (patch.length === 0) {
+    return false
+  }
+
+  const next = applyCanvasItemsPatch(document.value, patch)
+
+  if (canvasItemsEqual(document.value, next)) {
+    return false
+  }
+
+  if (selection) {
+    restoreCanvasDocumentSelection(document, selection.before, document.value)
+  }
+
+  const result = document.commit(
+    patch,
+    selection
+      ? {
+          label: 'canvas items',
+          origin: 'canvas',
+          selection: createCanvasSelectionSnapshot(next, selection.after),
+        }
+      : {
+          label: 'canvas items',
+          origin: 'canvas',
+        },
+  )
+
+  assertJSONResult(result)
+  return true
+}
+
 export function loadCanvasItemsDocument(
   document: CanvasItemsDocument,
   items: CanvasItem[],

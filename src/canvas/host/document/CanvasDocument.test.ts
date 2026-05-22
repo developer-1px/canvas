@@ -1,11 +1,13 @@
 import { describe, expect, test } from 'vitest'
 import {
   commitCanvasItemsDocument,
+  commitCanvasItemsPatch,
   createCanvasItemsDocument,
   getCanvasDocumentSelectionIds,
   restoreCanvasDocumentSelection,
 } from './CanvasDocument'
 import { INITIAL_ITEMS } from '../component/CanvasInitialItems'
+import { createCanvasComponentItem } from '../component/CanvasComponentFactory'
 import { groupCanvasSelection } from '../operations/CanvasOperations'
 
 describe('CanvasDocument history', () => {
@@ -50,6 +52,36 @@ describe('CanvasDocument history', () => {
     expect(document.history.redo()).toBe(true)
     expect(document.value).toEqual(nextItems)
     expect(getCanvasDocumentSelectionIds(document)).toEqual(['component-card'])
+  })
+
+  test('commits item creation as a zod-crud add patch', () => {
+    const document = createCanvasItemsDocument(INITIAL_ITEMS)
+    const nextItem = createCanvasComponentItem({
+      id: 'component-created',
+      point: { x: 120, y: 140 },
+      templateId: 'card',
+    })
+
+    expect(
+      commitCanvasItemsPatch({
+        document,
+        patch: [{ op: 'add', path: '/-', value: nextItem }],
+        selection: {
+          before: [],
+          after: [nextItem.id],
+        },
+      }),
+    ).toBe(true)
+
+    expect(document.lastPatch).toEqual([
+      {
+        op: 'add',
+        path: `/${INITIAL_ITEMS.length}`,
+        value: nextItem,
+      },
+    ])
+    expect(document.value.at(-1)).toEqual(nextItem)
+    expect(getCanvasDocumentSelectionIds(document)).toEqual([nextItem.id])
   })
 
   test('round-trips document selection through JSON pointers', () => {

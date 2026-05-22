@@ -8,28 +8,25 @@ import type { Tool, Viewport } from '../../engine/primitives/CanvasPrimitives'
 import { createCanvasComponentItem } from '../../host/component/CanvasComponentFactory'
 import type {
   CanvasComponentKind,
-  CanvasItem,
   EditingText,
 } from '../../host/model/CanvasModel'
-import type { CommitCanvasItems } from '../document/useCanvasDocument'
+import type { CommitCanvasItemsPatch } from '../document/useCanvasDocument'
 
 type UseCanvasComponentInsertionArgs = {
+  commitItemsPatch: CommitCanvasItemsPatch
   createId: (prefix: string) => string
   selection: string[]
   setEditing: Dispatch<SetStateAction<EditingText | null>>
-  setItems: CommitCanvasItems
-  setSelection: Dispatch<SetStateAction<string[]>>
   setTool: Dispatch<SetStateAction<Tool>>
   svgRef: RefObject<SVGSVGElement | null>
   viewport: Viewport
 }
 
 export function useCanvasComponentInsertion({
+  commitItemsPatch,
   createId,
   selection,
   setEditing,
-  setItems,
-  setSelection,
   setTool,
   svgRef,
   viewport,
@@ -49,20 +46,18 @@ export function useCanvasComponentInsertion({
         templateId: component,
       })
 
-      setItems((current: CanvasItem[]) => [...current, nextItem], {
+      commitItemsPatch([{ op: 'add', path: '/-', value: nextItem }], {
         before: selection,
         after: [nextItem.id],
       })
-      setSelection([nextItem.id])
       setEditing(null)
       setTool('select')
     },
     [
+      commitItemsPatch,
       createId,
       selection,
       setEditing,
-      setItems,
-      setSelection,
       setTool,
       svgRef,
       viewport,

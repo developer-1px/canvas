@@ -36,11 +36,14 @@ import { getCanvasItemPointerSelection } from '../../engine/selection/CanvasSele
 import { snapCanvasPointToGrid } from '../../engine/snap/CanvasSnapEngine'
 import type { CanvasSceneAdapter } from '../../engine/scene/CanvasSceneAdapter'
 import { findEditableTextItem } from '../../host/tree/CanvasTree'
-import type { CommitCanvasItems } from '../document/useCanvasDocument'
+import type {
+  CommitCanvasItemsPatch,
+} from '../document/useCanvasDocument'
 import type { Interaction } from './CanvasInteractionState'
 
 type UseCanvasPointerDownHandlersArgs = {
   cloneItems: (ids: string[], offset: Point) => CanvasItem[]
+  commitItemsPatch: CommitCanvasItemsPatch
   config: CanvasAffordanceConfig
   creationAdapter: CanvasCreationAdapter<CanvasItem>
   createId: (prefix: string) => string
@@ -52,7 +55,6 @@ type UseCanvasPointerDownHandlersArgs = {
   setDraftRect: Dispatch<SetStateAction<Bounds | null>>
   setEditing: Dispatch<SetStateAction<EditingText | null>>
   setGesture: Dispatch<SetStateAction<Interaction['kind']>>
-  setItems: CommitCanvasItems
   setLiveItems: Dispatch<SetStateAction<CanvasItem[]>>
   setSelection: Dispatch<SetStateAction<string[]>>
   setTool: Dispatch<SetStateAction<Tool>>
@@ -64,6 +66,7 @@ type UseCanvasPointerDownHandlersArgs = {
 
 export function useCanvasPointerDownHandlers({
   cloneItems,
+  commitItemsPatch,
   config,
   creationAdapter,
   createId,
@@ -75,7 +78,6 @@ export function useCanvasPointerDownHandlers({
   setDraftRect,
   setEditing,
   setGesture,
-  setItems,
   setLiveItems,
   setSelection,
   setTool,
@@ -115,11 +117,10 @@ export function useCanvasPointerDownHandlers({
       point,
     })
 
-    setItems((current) => [...current, created.item], {
+    commitItemsPatch([{ op: 'add', path: '/-', value: created.item }], {
       before: selection,
       after: [created.item.id],
     })
-    setSelection([created.item.id])
     setEditing({ id: created.item.id, value: created.editValue })
     setTool('select')
   }
