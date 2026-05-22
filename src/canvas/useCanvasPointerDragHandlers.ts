@@ -22,12 +22,13 @@ import {
 import { releasePointer, screenPoint, screenToWorld } from './CanvasPointerGeometry'
 import { resizeCanvasItems, translateCanvasItems } from './CanvasOperations'
 import { getCanvasMarqueeSelection } from './CanvasSelectionEngine'
+import type { CanvasSceneAdapter } from './CanvasSceneAdapter'
 
 type UseCanvasPointerDragHandlersArgs = {
   config: CanvasAffordanceConfig
   createId: (prefix: string) => string
   interactionRef: MutableRefObject<Interaction>
-  items: CanvasItem[]
+  scene: CanvasSceneAdapter
   recordHistoryFrom: (before: CanvasItem[]) => void
   setItems: Dispatch<SetStateAction<CanvasItem[]>>
   setDraftRect: Dispatch<SetStateAction<Bounds | null>>
@@ -46,7 +47,7 @@ export function useCanvasPointerDragHandlers({
   config,
   createId,
   interactionRef,
-  items,
+  scene,
   recordHistoryFrom,
   setItems,
   setDraftRect,
@@ -173,7 +174,7 @@ export function useCanvasPointerDragHandlers({
           additive: interaction.additive,
           baseSelection: interaction.baseSelection,
           bounds,
-          items,
+          scene,
         }),
       )
       return

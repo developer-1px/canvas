@@ -23,6 +23,7 @@ import {
 } from './CanvasModel'
 import { capturePointer, screenPoint, screenToWorld } from './CanvasPointerGeometry'
 import { getCanvasItemPointerSelection } from './CanvasSelectionEngine'
+import type { CanvasSceneAdapter } from './CanvasSceneAdapter'
 import { findEditableTextItem } from './CanvasTree'
 
 type UseCanvasPointerHandlersArgs = {
@@ -31,6 +32,7 @@ type UseCanvasPointerHandlersArgs = {
   createId: (prefix: string) => string
   interactionRef: MutableRefObject<Interaction>
   items: CanvasItem[]
+  scene: CanvasSceneAdapter
   selectedBounds: Bounds | null
   selection: string[]
   setDraftRect: Dispatch<SetStateAction<Bounds | null>>
@@ -53,6 +55,7 @@ export function useCanvasPointerHandlers({
   createId,
   interactionRef,
   items,
+  scene,
   selectedBounds,
   selection,
   setDraftRect,
@@ -200,7 +203,7 @@ export function useCanvasPointerHandlers({
     const itemSelection = getCanvasItemPointerSelection({
       additive,
       itemId,
-      items,
+      scene,
       selection,
     })
     let nextSelection = itemSelection.nextSelection

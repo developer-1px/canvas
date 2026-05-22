@@ -36,6 +36,7 @@ import { useCanvasKeyboardShortcuts } from './canvas/useCanvasKeyboardShortcuts'
 import { useCanvasHistory } from './canvas/useCanvasHistory'
 import { createCanvasOverlayState } from './canvas/CanvasOverlayEngine'
 import { getCanvasCommandAvailability } from './canvas/CanvasCommandEngine'
+import { createCanvasItemScene } from './canvas/CanvasSceneAdapter'
 import './App.css'
 
 const canvasAffordanceConfig = DEFAULT_CANVAS_AFFORDANCE_CONFIG
@@ -66,6 +67,7 @@ function App() {
   const [editing, setEditing] = useState<EditingText | null>(null)
 
   const selected = useMemo(() => new Set(selection), [selection])
+  const scene = useMemo(() => createCanvasItemScene(items), [items])
   const selectedBounds = useMemo(
     () => unionBounds(items, selected),
     [items, selected],
@@ -252,6 +254,7 @@ function App() {
     createId,
     interactionRef,
     items,
+    scene,
     selectedBounds,
     selection,
     setDraftRect,
@@ -277,7 +280,7 @@ function App() {
     createId,
     recordHistoryFrom,
     interactionRef,
-    items,
+    scene,
     setItems,
     setDraftRect,
     setEditing,

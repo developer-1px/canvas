@@ -1,12 +1,6 @@
-import type { Bounds, CanvasItem } from './CanvasModel'
+import type { Bounds } from './CanvasModel'
 import { unique } from './CanvasModel'
-import {
-  boundsIntersect,
-  findParentGroupId,
-  findSelectedAncestorId,
-  flattenCanvasItems,
-  getItemBounds,
-} from './CanvasTree'
+import type { CanvasSceneAdapter } from './CanvasSceneAdapter'
 
 export type CanvasItemPointerSelection = {
   alreadySelected: boolean
@@ -17,23 +11,23 @@ export type CanvasItemPointerSelection = {
 export function getCanvasItemPointerSelection({
   additive,
   itemId,
-  items,
+  scene,
   selection,
 }: {
   additive: boolean
   itemId: string
-  items: CanvasItem[]
+  scene: CanvasSceneAdapter
   selection: string[]
 }): CanvasItemPointerSelection {
-  const selectedAncestorId = findSelectedAncestorId(items, itemId, selection)
+  const selectedAncestorId = scene.getSelectedAncestorId(itemId, selection)
   const dragItemId = additive
     ? itemId
-    : selectedAncestorId ?? findParentGroupId(items, itemId) ?? itemId
+    : selectedAncestorId ?? scene.getParentId(itemId) ?? itemId
   const alreadySelected = selection.includes(itemId)
   const dragAlreadySelected = selection.includes(dragItemId)
 
   if (additive) {
-    const parentGroupId = findParentGroupId(items, itemId)
+    const parentGroupId = scene.getParentId(itemId)
     const baseSelection =
       parentGroupId && !alreadySelected
         ? selection.filter((id) => id !== parentGroupId)
@@ -59,18 +53,27 @@ export function getCanvasMarqueeSelection({
   additive,
   baseSelection,
   bounds,
-  items,
+  scene,
 }: {
   additive: boolean
   baseSelection: string[]
   bounds: Bounds
-  items: CanvasItem[]
+  scene: CanvasSceneAdapter
 }) {
   const hitIds = unique(
-    flattenCanvasItems(items)
-      .filter((entry) => boundsIntersect(bounds, getItemBounds(entry.item)))
-      .map((entry) => findParentGroupId(items, entry.item.id) ?? entry.item.id),
+    scene.entries
+      .filter((entry) => boundsIntersect(bounds, entry.bounds))
+      .map((entry) => scene.getParentId(entry.id) ?? entry.id),
   )
 
   return additive ? unique([...baseSelection, ...hitIds]) : hitIds
+}
+
+function boundsIntersect(a: Bounds, b: Bounds) {
+  return (
+    a.x <= b.x + b.w &&
+    a.x + a.w >= b.x &&
+    a.y <= b.y + b.h &&
+    a.y + a.h >= b.y
+  )
 }
