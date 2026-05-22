@@ -7,6 +7,7 @@ import {
   type ResizeHandle,
   type Viewport,
 } from './CanvasModel'
+import type { CanvasSceneAdapter } from './CanvasSceneAdapter'
 
 export type CanvasResizeHandleOverlay = {
   handle: ResizeHandle
@@ -27,17 +28,19 @@ export function createCanvasOverlayState({
   config,
   draftRect,
   marquee,
-  selectedBounds,
+  scene,
   selection,
   viewport,
 }: {
   config: CanvasAffordanceConfig
   draftRect: Bounds | null
   marquee: Bounds | null
-  selectedBounds: Bounds | null
+  scene: CanvasSceneAdapter
   selection: string[]
   viewport: Viewport
 }): CanvasOverlayState {
+  const selectedBounds = scene.getBounds(selection)
+
   return {
     draftRect: config.overlays.draftRect ? draftRect : null,
     grid: config.overlays.grid,

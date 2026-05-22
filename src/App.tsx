@@ -68,10 +68,7 @@ function App() {
 
   const selected = useMemo(() => new Set(selection), [selection])
   const scene = useMemo(() => createCanvasItemScene(items), [items])
-  const selectedBounds = useMemo(
-    () => unionBounds(items, selected),
-    [items, selected],
-  )
+  const selectedBounds = useMemo(() => scene.getBounds(selection), [scene, selection])
   const commandAvailability = useMemo(
     () =>
       getCanvasCommandAvailability({
@@ -89,11 +86,11 @@ function App() {
         config: canvasAffordanceConfig,
         draftRect,
         marquee,
-        selectedBounds,
+        scene,
         selection,
         viewport,
       }),
-    [draftRect, marquee, selectedBounds, selection, viewport],
+    [draftRect, marquee, scene, selection, viewport],
   )
   const editingItem = editing ? findEditableTextItem(items, editing.id) : null
   const editingId = editing?.id

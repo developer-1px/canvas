@@ -46,7 +46,7 @@ type CanvasAffordanceConfig = {
 현재 앱에서 뽑는 Module:
 
 1. `CanvasAffordances`: 안정적인 tool/command/gesture/overlay/shortcut id와 label, title, default toggle. 완료.
-2. `CanvasOverlayEngine`: Renderer Adapter가 그릴 renderer-independent overlay state 생성. 진행 중.
+2. `CanvasOverlayEngine`: Renderer Adapter가 그릴 renderer-independent overlay state 생성. `CanvasSceneAdapter` 입력으로 전환 중.
 3. `CanvasCommandEngine`: command availability와 item command 결과 계산. React state/history 적용은 `useCanvasCommands` Adapter에 남아 있음.
 4. `CanvasSelectionEngine`: item click selection과 marquee hit selection 계산. `CanvasSceneAdapter` 입력으로 전환 중.
 5. `CanvasGestureEngine`: pointer event를 gesture intent로 변환.
