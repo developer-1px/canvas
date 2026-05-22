@@ -12,6 +12,7 @@ export type CanvasCommandId =
   | 'nudge'
   | 'paste'
   | 'redo'
+  | 'selectAll'
   | 'sendBackward'
   | 'sendToBack'
   | 'undo'
@@ -64,6 +65,7 @@ export type CanvasShortcutId =
   | 'paste'
   | 'rectTool'
   | 'redo'
+  | 'selectAll'
   | 'selectTool'
   | 'sendBackward'
   | 'sendToBack'
@@ -135,6 +137,7 @@ export const CANVAS_COMMAND_AFFORDANCES = {
   nudge: { ariaLabel: 'Nudge', title: 'Nudge' },
   paste: { ariaLabel: 'Paste', title: 'Paste' },
   redo: { ariaLabel: 'Redo', title: 'Redo' },
+  selectAll: { ariaLabel: 'Select all', title: 'Select all' },
   sendBackward: { ariaLabel: 'Send backward', title: 'Send backward' },
   sendToBack: { ariaLabel: 'Send to back', title: 'Send to back' },
   undo: { ariaLabel: 'Undo', title: 'Undo' },
@@ -179,6 +182,7 @@ export function createCanvasAffordanceConfig(
         nudge: true,
         paste: true,
         redo: true,
+        selectAll: true,
         sendBackward: true,
         sendToBack: true,
         undo: true,
@@ -240,6 +244,7 @@ export function createCanvasAffordanceConfig(
         paste: true,
         rectTool: true,
         redo: true,
+        selectAll: true,
         selectTool: true,
         sendBackward: true,
         sendToBack: true,

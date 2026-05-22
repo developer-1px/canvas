@@ -50,6 +50,7 @@ export type CanvasCommandAdapter<TItem extends CanvasCommandItem> = {
     mode: CanvasReorderMode
     selection: string[]
   }) => TItem[]
+  selectAll: (input: { items: TItem[] }) => string[]
   ungroupSelection: (input: {
     items: TItem[]
     selection: string[]
@@ -63,6 +64,7 @@ export type CanvasCommandAvailability = {
   duplicate: boolean
   group: boolean
   redo: boolean
+  selectAll: boolean
   sendBackward: boolean
   sendToBack: boolean
   undo: boolean
@@ -113,6 +115,7 @@ export function getCanvasCommandAvailability({
     duplicate: config.commands.duplicate && hasSelection,
     group: config.commands.group && selection.length > 1,
     redo: config.commands.redo && canRedo,
+    selectAll: config.commands.selectAll,
     sendBackward: config.commands.sendBackward && hasSelection,
     sendToBack: config.commands.sendToBack && hasSelection,
     undo: config.commands.undo && canUndo,
@@ -366,4 +369,20 @@ export function reorderCanvasCommand<TItem extends CanvasCommandItem>({
     items: adapter.reorderSelection({ items, mode, selection }),
     selection,
   }
+}
+
+export function selectAllCanvasCommand<TItem extends CanvasCommandItem>({
+  adapter,
+  config,
+  items,
+}: {
+  adapter: CanvasCommandAdapter<TItem>
+  config: CanvasAffordanceConfig
+  items: TItem[]
+}) {
+  if (!config.commands.selectAll) {
+    return null
+  }
+
+  return adapter.selectAll({ items })
 }

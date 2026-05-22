@@ -150,6 +150,7 @@ function CanvasApp() {
     pasteSelection,
     redoHistory,
     reorderSelection,
+    selectAll,
     undoHistory,
     ungroupSelection,
   } = useCanvasCommands({
@@ -184,6 +185,7 @@ function CanvasApp() {
     pasteSelection,
     redoHistory,
     reorderSelection,
+    selectAll,
     selection,
     setDraftRect,
     setEditing,

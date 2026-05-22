@@ -15,6 +15,7 @@ import {
   nudgeCanvasCommand,
   pasteCanvasCommand,
   reorderCanvasCommand,
+  selectAllCanvasCommand,
   ungroupCanvasCommand,
   type CanvasCommandAdapter,
   type CanvasReorderMode,
@@ -288,6 +289,20 @@ export function useCanvasCommands({
     [commandAdapter, config, items, selection, setItems, setSelection],
   )
 
+  const selectAll = useCallback(() => {
+    const nextSelection = selectAllCanvasCommand({
+      adapter: commandAdapter,
+      config,
+      items,
+    })
+
+    if (!nextSelection) {
+      return
+    }
+
+    setSelection(nextSelection)
+  }, [commandAdapter, config, items, setSelection])
+
   return {
     cloneItems,
     copySelection,
@@ -299,6 +314,7 @@ export function useCanvasCommands({
     pasteSelection,
     redoHistory,
     reorderSelection,
+    selectAll,
     undoHistory,
     ungroupSelection,
   }

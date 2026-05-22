@@ -24,6 +24,7 @@ export const CANVAS_ITEM_COMMAND_ADAPTER: CanvasCommandAdapter<CanvasItem> = {
     translateCanvasItems(items, selection, dx, dy),
   reorderSelection: ({ items, mode, selection }) =>
     reorderCanvasItems(items, selection, mode),
+  selectAll: ({ items }) => items.map((item) => item.id),
   ungroupSelection: ({ items, selection }) =>
     ungroupCanvasSelection(items, selection),
 }
