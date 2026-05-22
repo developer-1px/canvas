@@ -4,12 +4,12 @@ import {
   type MutableRefObject,
   type SetStateAction,
 } from 'react'
-import type { CanvasAffordanceConfig } from '../engine/CanvasAffordances'
-import type { Bounds, Tool } from '../engine/CanvasPrimitives'
+import type { CanvasAffordanceConfig } from '../../engine/CanvasAffordances'
+import type { Bounds, Tool } from '../../engine/CanvasPrimitives'
 import type {
   EditingText,
   Interaction,
-} from '../host/CanvasModel'
+} from '../../host/CanvasModel'
 
 type UseCanvasKeyboardShortcutsArgs = {
   config: CanvasAffordanceConfig

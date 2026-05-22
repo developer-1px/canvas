@@ -6,13 +6,13 @@ import {
   useState,
   type CSSProperties,
 } from 'react'
-import { CanvasStage } from './canvas/ui/CanvasStage'
-import { CanvasComponentPalette } from './canvas/ui/CanvasComponentPalette'
-import { CanvasTextEditor } from './canvas/ui/CanvasTextEditor'
-import { CanvasToolbar } from './canvas/ui/CanvasToolbar'
-import { CanvasStatus } from './canvas/ui/CanvasStatus'
-import { createCanvasComponentItem } from './canvas/host/CanvasComponentCatalog'
-import { DEFAULT_CANVAS_AFFORDANCE_CONFIG } from './canvas/engine/CanvasAffordances'
+import { CanvasStage } from '../../ui/CanvasStage'
+import { CanvasComponentPalette } from '../../ui/CanvasComponentPalette'
+import { CanvasTextEditor } from '../../ui/CanvasTextEditor'
+import { CanvasToolbar } from '../../ui/CanvasToolbar'
+import { CanvasStatus } from '../../ui/CanvasStatus'
+import { createCanvasComponentItem } from '../../host/CanvasComponentCatalog'
+import { DEFAULT_CANVAS_AFFORDANCE_CONFIG } from '../../engine/CanvasAffordances'
 import {
   fitBoundsIntoViewport,
   INITIAL_VIEWPORT,
@@ -20,45 +20,45 @@ import {
   type Bounds,
   type Tool,
   type Viewport,
-} from './canvas/engine/CanvasPrimitives'
+} from '../../engine/CanvasPrimitives'
 import {
   INITIAL_ITEMS,
   type CanvasComponentKind,
   type EditingText,
   type Interaction,
-} from './canvas/host/CanvasModel'
-import { updateItemText } from './canvas/host/CanvasOperations'
+} from '../../host/CanvasModel'
+import { updateItemText } from '../../host/CanvasOperations'
 import {
   findEditableTextItem,
   flattenCanvasItems,
   unionBounds,
-} from './canvas/host/CanvasTree'
-import { useCanvasPointerDragHandlers } from './canvas/hooks/useCanvasPointerDragHandlers'
-import { useCanvasPointerHandlers } from './canvas/hooks/useCanvasPointerHandlers'
-import { ZoomControls } from './canvas/ui/ZoomControls'
-import { useCanvasCommands } from './canvas/hooks/useCanvasCommands'
-import { useCanvasKeyboardShortcuts } from './canvas/hooks/useCanvasKeyboardShortcuts'
-import { useCanvasHistory } from './canvas/hooks/useCanvasHistory'
-import { createCanvasOverlayState } from './canvas/engine/CanvasOverlayEngine'
+} from '../../host/CanvasTree'
+import { useCanvasPointerDragHandlers } from '../workflow/useCanvasPointerDragHandlers'
+import { useCanvasPointerHandlers } from '../workflow/useCanvasPointerHandlers'
+import { ZoomControls } from '../../ui/ZoomControls'
+import { useCanvasCommands } from '../workflow/useCanvasCommands'
+import { useCanvasKeyboardShortcuts } from '../workflow/useCanvasKeyboardShortcuts'
+import { useCanvasHistory } from '../workflow/useCanvasHistory'
+import { createCanvasOverlayState } from '../../engine/CanvasOverlayEngine'
 import {
   EMPTY_CANVAS_SNAP_GUIDES,
   type CanvasSnapGuides,
-} from './canvas/engine/CanvasSnapEngine'
+} from '../../engine/CanvasSnapEngine'
 import {
   getCanvasWheelViewport,
   shouldHandleCanvasWheelViewport,
   type CanvasWheelInput,
-} from './canvas/engine/CanvasViewportEngine'
-import { getCanvasCommandAvailability } from './canvas/engine/CanvasCommandEngine'
-import { CANVAS_ITEM_COMMAND_ADAPTER } from './canvas/host/adapters/CanvasItemCommandAdapter'
-import { CANVAS_ITEM_CREATION_ADAPTER } from './canvas/host/adapters/CanvasItemCreationAdapter'
-import { createCanvasItemScene } from './canvas/host/adapters/CanvasItemSceneAdapter'
-import { CANVAS_ITEM_TRANSFORM_ADAPTER } from './canvas/host/adapters/CanvasItemTransformAdapter'
-import './App.css'
+} from '../../engine/CanvasViewportEngine'
+import { getCanvasCommandAvailability } from '../../engine/CanvasCommandEngine'
+import { CANVAS_ITEM_COMMAND_ADAPTER } from '../../host/adapters/CanvasItemCommandAdapter'
+import { CANVAS_ITEM_CREATION_ADAPTER } from '../../host/adapters/CanvasItemCreationAdapter'
+import { createCanvasItemScene } from '../../host/adapters/CanvasItemSceneAdapter'
+import { CANVAS_ITEM_TRANSFORM_ADAPTER } from '../../host/adapters/CanvasItemTransformAdapter'
+import './CanvasApp.css'
 
 const canvasAffordanceConfig = DEFAULT_CANVAS_AFFORDANCE_CONFIG
 
-function App() {
+function CanvasApp() {
   const svgRef = useRef<SVGSVGElement | null>(null)
   const editorRef = useRef<HTMLTextAreaElement | null>(null)
   const interactionRef = useRef<Interaction>({ kind: 'none' })
@@ -485,4 +485,4 @@ function getCanvasWheelInput(event: globalThis.WheelEvent): CanvasWheelInput {
   }
 }
 
-export default App
+export default CanvasApp

@@ -6,7 +6,7 @@ import type {
   SetStateAction,
 } from 'react'
 import { useRef } from 'react'
-import type { CanvasAffordanceConfig } from '../engine/CanvasAffordances'
+import type { CanvasAffordanceConfig } from '../../engine/CanvasAffordances'
 import {
   normalizeBounds,
   pointDistance,
@@ -15,28 +15,28 @@ import {
   type ResizeHandle,
   type Tool,
   type Viewport,
-} from '../engine/CanvasPrimitives'
+} from '../../engine/CanvasPrimitives'
 import type {
   CanvasItem,
   EditingText,
   Interaction,
   RectItem,
   TextItem,
-} from '../host/CanvasModel'
-import { capturePointer, screenPoint, screenToWorld } from './CanvasPointerGeometry'
+} from '../../host/CanvasModel'
+import { capturePointer, screenPoint, screenToWorld } from '../geometry/CanvasPointerGeometry'
 import {
   createCanvasText,
   type CanvasCreationAdapter,
-} from '../engine/CanvasCreationEngine'
+} from '../../engine/CanvasCreationEngine'
 import {
   getCanvasItemPointerIntent,
   getCanvasPointerGesture,
   isAdditivePointerInput,
-} from '../engine/CanvasGestureEngine'
-import { getCanvasItemPointerSelection } from '../engine/CanvasSelectionEngine'
-import { snapCanvasPointToGrid } from '../engine/CanvasSnapEngine'
-import type { CanvasSceneAdapter } from '../engine/CanvasSceneAdapter'
-import { findEditableTextItem } from '../host/CanvasTree'
+} from '../../engine/CanvasGestureEngine'
+import { getCanvasItemPointerSelection } from '../../engine/CanvasSelectionEngine'
+import { snapCanvasPointToGrid } from '../../engine/CanvasSnapEngine'
+import type { CanvasSceneAdapter } from '../../engine/CanvasSceneAdapter'
+import { findEditableTextItem } from '../../host/CanvasTree'
 import type { CommitCanvasItems } from './useCanvasHistory'
 
 type UseCanvasPointerHandlersArgs = {

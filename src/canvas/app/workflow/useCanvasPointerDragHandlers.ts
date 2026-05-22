@@ -5,7 +5,7 @@ import type {
   RefObject,
   SetStateAction,
 } from 'react'
-import type { CanvasAffordanceConfig } from '../engine/CanvasAffordances'
+import type { CanvasAffordanceConfig } from '../../engine/CanvasAffordances'
 import {
   DRAG_THRESHOLD,
   normalizeBounds,
@@ -13,30 +13,30 @@ import {
   type Bounds,
   type Tool,
   type Viewport,
-} from '../engine/CanvasPrimitives'
+} from '../../engine/CanvasPrimitives'
 import type {
   CanvasItem,
   EditingText,
   Interaction,
-} from '../host/CanvasModel'
+} from '../../host/CanvasModel'
 import {
   createCanvasRect,
   type CanvasCreationAdapter,
-} from '../engine/CanvasCreationEngine'
-import { releasePointer, screenPoint, screenToWorld } from './CanvasPointerGeometry'
-import { getCanvasMarqueeSelection } from '../engine/CanvasSelectionEngine'
-import type { CanvasSceneAdapter } from '../engine/CanvasSceneAdapter'
+} from '../../engine/CanvasCreationEngine'
+import { releasePointer, screenPoint, screenToWorld } from '../geometry/CanvasPointerGeometry'
+import { getCanvasMarqueeSelection } from '../../engine/CanvasSelectionEngine'
+import type { CanvasSceneAdapter } from '../../engine/CanvasSceneAdapter'
 import {
   EMPTY_CANVAS_SNAP_GUIDES,
   getCanvasMoveSnap,
   snapCanvasPointToGrid,
   type CanvasSnapGuides,
-} from '../engine/CanvasSnapEngine'
+} from '../../engine/CanvasSnapEngine'
 import {
   moveCanvasSelection,
   resizeCanvasSelection,
   type CanvasTransformAdapter,
-} from '../engine/CanvasTransformEngine'
+} from '../../engine/CanvasTransformEngine'
 import type { CommitCanvasItems } from './useCanvasHistory'
 
 type UseCanvasPointerDragHandlersArgs = {

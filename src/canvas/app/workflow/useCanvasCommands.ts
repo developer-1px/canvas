@@ -16,10 +16,10 @@ import {
   pasteCanvasCommand,
   ungroupCanvasCommand,
   type CanvasCommandAdapter,
-} from '../engine/CanvasCommandEngine'
-import type { CanvasAffordanceConfig } from '../engine/CanvasAffordances'
-import type { Point } from '../engine/CanvasPrimitives'
-import type { CanvasItem, EditingText } from '../host/CanvasModel'
+} from '../../engine/CanvasCommandEngine'
+import type { CanvasAffordanceConfig } from '../../engine/CanvasAffordances'
+import type { Point } from '../../engine/CanvasPrimitives'
+import type { CanvasItem, EditingText } from '../../host/CanvasModel'
 import type { CommitCanvasItems } from './useCanvasHistory'
 
 type UseCanvasCommandsArgs = {

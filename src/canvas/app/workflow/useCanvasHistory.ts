@@ -5,7 +5,7 @@ import {
   type Dispatch,
   type SetStateAction,
 } from 'react'
-import type { CanvasItem } from '../host/CanvasModel'
+import type { CanvasItem } from '../../host/CanvasModel'
 import {
   canvasItemsEqual,
   commitCanvasItemsDocument,
@@ -14,7 +14,7 @@ import {
   loadCanvasItemsDocument,
   replaceCanvasItems,
   restoreCanvasDocumentSelection,
-} from '../host/CanvasDocument'
+} from '../../host/CanvasDocument'
 
 type HistoryAvailability = {
   canRedo: boolean
