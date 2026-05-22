@@ -65,6 +65,70 @@
   stroke-width: 1.25;
 }
 
+.component-card,
+.component-section {
+  stroke-width: 1.4;
+}
+
+.component-section {
+  stroke-dasharray: 8 6;
+}
+
+.component-hit {
+  fill: transparent;
+  pointer-events: all;
+}
+
+.component-text {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  padding: 18px 18px;
+  color: #111827;
+  font-family: var(--sans);
+  pointer-events: none;
+}
+
+.component-text-compact {
+  padding: 10px 12px;
+}
+
+.component-title {
+  font-size: 18px;
+  font-weight: 750;
+  line-height: 1.15;
+}
+
+.component-body {
+  margin-top: 10px;
+  color: #475569;
+  font-size: 14px;
+  font-weight: 550;
+  line-height: 1.35;
+}
+
+.component-svg-title,
+.component-svg-text {
+  fill: #111827;
+  font-family: var(--sans);
+  pointer-events: none;
+}
+
+.component-svg-title {
+  font-size: 14px;
+  font-weight: 750;
+}
+
+.component-svg-title-invert {
+  fill: #ffffff;
+}
+
+.component-svg-text {
+  fill: #334155;
+  font-size: 13px;
+  font-weight: 550;
+}
+
 .group-hit {
   fill: transparent;
   pointer-events: all;
@@ -141,6 +205,7 @@
 }
 
 .toolbar,
+.component-palette,
 .zoom-controls,
 .canvas-status {
   position: absolute;
@@ -160,6 +225,13 @@
   left: 14px;
   max-width: calc(100vw - 28px);
   flex-wrap: wrap;
+}
+
+.component-palette {
+  top: 14px;
+  right: 14px;
+  display: grid;
+  grid-template-columns: repeat(5, 34px);
 }
 
 .zoom-controls {
@@ -186,6 +258,7 @@
 }
 
 .tool-button,
+.component-button,
 .zoom-value {
   display: inline-grid;
   place-items: center;
@@ -199,6 +272,20 @@
 
 .tool-button {
   width: 34px;
+}
+
+.component-button {
+  width: 34px;
+}
+
+.component-button-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border: 1.4px solid;
+  border-radius: 5px;
+  font: 750 12px/1 var(--sans);
 }
 
 .zoom-value {
@@ -218,6 +305,7 @@
 }
 
 .tool-button:hover,
+.component-button:hover,
 .zoom-value:hover,
 .tool-button[data-active='true'] {
   background: #e5edff;
@@ -241,6 +329,7 @@
 }
 
 .tool-button:focus-visible,
+.component-button:focus-visible,
 .zoom-value:focus-visible,
 .text-editor:focus-visible {
   outline: 2px solid #2563eb;
@@ -270,8 +359,19 @@
   .toolbar {
     top: 10px;
     left: 10px;
-    width: calc(100vw - 20px);
-    max-width: 340px;
+    max-width: calc(100vw - 20px);
+  }
+
+  .component-palette {
+    top: 54px;
+    left: 10px;
+    right: auto;
+    grid-template-columns: repeat(10, 30px);
+    max-width: calc(100vw - 20px);
+  }
+
+  .component-button {
+    width: 30px;
   }
 
   .zoom-controls {

@@ -7,9 +7,11 @@ import {
   type CSSProperties,
 } from 'react'
 import { CanvasStage } from './canvas/CanvasStage'
+import { CanvasComponentPalette } from './canvas/CanvasComponentPalette'
 import { CanvasTextEditor } from './canvas/CanvasTextEditor'
 import { CanvasToolbar } from './canvas/CanvasToolbar'
 import { CanvasStatus } from './canvas/CanvasStatus'
+import { createCanvasComponentItem } from './canvas/CanvasComponentCatalog'
 import { DEFAULT_CANVAS_AFFORDANCE_CONFIG } from './canvas/CanvasAffordances'
 import {
   fitBoundsIntoViewport,
@@ -21,6 +23,7 @@ import {
 } from './canvas/CanvasPrimitives'
 import {
   INITIAL_ITEMS,
+  type CanvasComponentKind,
   type EditingText,
   type Interaction,
 } from './canvas/CanvasModel'
@@ -50,7 +53,7 @@ function App() {
   const svgRef = useRef<SVGSVGElement | null>(null)
   const editorRef = useRef<HTMLTextAreaElement | null>(null)
   const interactionRef = useRef<Interaction>({ kind: 'none' })
-  const idSeed = useRef(3)
+  const idSeed = useRef(INITIAL_ITEMS.length)
 
   const [tool, setTool] = useState<Tool>('select')
   const {
@@ -63,7 +66,10 @@ function App() {
     setLiveItems,
     undo,
   } = useCanvasHistory(INITIAL_ITEMS)
-  const [selection, setSelection] = useState<string[]>(['rect-1', 'text-1'])
+  const [selection, setSelection] = useState<string[]>([
+    'component-sticky',
+    'component-card',
+  ])
   const [viewport, setViewport] = useState<Viewport>(INITIAL_VIEWPORT)
   const [spaceDown, setSpaceDown] = useState(false)
   const [gesture, setGesture] = useState<Interaction['kind']>('none')
@@ -315,6 +321,29 @@ function App() {
     setViewport((current) => zoomViewport(current, point, multiplier))
   }
 
+  function insertComponent(component: CanvasComponentKind) {
+    const rect = svgRef.current?.getBoundingClientRect()
+    const point = rect
+      ? {
+          x: (rect.width / 2 - viewport.x) / viewport.scale,
+          y: (rect.height / 2 - viewport.y) / viewport.scale,
+        }
+      : { x: 120, y: 120 }
+    const nextItem = createCanvasComponentItem({
+      id: createId('component'),
+      point,
+      templateId: component,
+    })
+
+    setItems((current) => [...current, nextItem], {
+      before: selection,
+      after: [nextItem.id],
+    })
+    setSelection([nextItem.id])
+    setEditing(null)
+    setTool('select')
+  }
+
   const editorStyle: CSSProperties | undefined =
     editingItem && editing
       ? {
@@ -348,6 +377,8 @@ function App() {
           onUngroup={ungroupSelection}
         />
       ) : null}
+
+      <CanvasComponentPalette onInsert={insertComponent} />
 
       <CanvasStage
         activeMode={activeMode}

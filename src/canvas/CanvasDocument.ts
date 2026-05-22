@@ -73,6 +73,19 @@ function isCanvasItem(value: unknown): value is CanvasItem {
     return Array.isArray(value.children) && value.children.every(isCanvasItem)
   }
 
+  if (value.type === 'component') {
+    return (
+      typeof value.component === 'string' &&
+      typeof value.title === 'string' &&
+      typeof value.fill === 'string' &&
+      typeof value.stroke === 'string' &&
+      typeof value.accent === 'string' &&
+      (value.body === undefined || typeof value.body === 'string') &&
+      (value.items === undefined || isStringArray(value.items)) &&
+      (value.columns === undefined || isStringArray(value.columns))
+    )
+  }
+
   return false
 }
 
@@ -82,4 +95,8 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function isFiniteNumber(value: unknown) {
   return typeof value === 'number' && Number.isFinite(value)
+}
+
+function isStringArray(value: unknown) {
+  return Array.isArray(value) && value.every((entry) => typeof entry === 'string')
 }

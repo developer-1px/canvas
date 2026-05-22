@@ -4,6 +4,7 @@ import type {
   ResizeHandle,
   Viewport,
 } from './CanvasPrimitives'
+import { createInitialCanvasComponents } from './CanvasComponentCatalog'
 
 export {
   clamp,
@@ -51,7 +52,32 @@ export type GroupItem = Bounds & {
   children: CanvasItem[]
 }
 
-export type CanvasItem = RectItem | TextItem | GroupItem
+export type CanvasComponentKind =
+  | 'card'
+  | 'checklist'
+  | 'connector'
+  | 'image'
+  | 'kanban'
+  | 'label'
+  | 'section'
+  | 'sticky'
+  | 'table'
+  | 'vote'
+
+export type CanvasComponentItem = Bounds & {
+  id: string
+  type: 'component'
+  accent: string
+  body?: string
+  columns?: string[]
+  component: CanvasComponentKind
+  fill: string
+  items?: string[]
+  stroke: string
+  title: string
+}
+
+export type CanvasItem = RectItem | TextItem | GroupItem | CanvasComponentItem
 
 export type Interaction =
   | { kind: 'none' }
@@ -108,34 +134,4 @@ export type EditingText = {
   value: string
 }
 
-export const INITIAL_ITEMS: CanvasItem[] = [
-  {
-    id: 'rect-1',
-    type: 'rect',
-    x: 96,
-    y: 96,
-    w: 210,
-    h: 126,
-    fill: '#dbeafe',
-    stroke: '#3b82f6',
-  },
-  {
-    id: 'rect-2',
-    type: 'rect',
-    x: 354,
-    y: 168,
-    w: 168,
-    h: 112,
-    fill: '#dcfce7',
-    stroke: '#16a34a',
-  },
-  {
-    id: 'text-1',
-    type: 'text',
-    x: 122,
-    y: 266,
-    w: 190,
-    h: 42,
-    text: 'Text',
-  },
-]
+export const INITIAL_ITEMS: CanvasItem[] = createInitialCanvasComponents()
