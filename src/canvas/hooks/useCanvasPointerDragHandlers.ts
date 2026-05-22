@@ -37,6 +37,7 @@ import {
   resizeCanvasSelection,
   type CanvasTransformAdapter,
 } from '../engine/CanvasTransformEngine'
+import type { CommitCanvasItems } from './useCanvasHistory'
 
 type UseCanvasPointerDragHandlersArgs = {
   config: CanvasAffordanceConfig
@@ -44,8 +45,12 @@ type UseCanvasPointerDragHandlersArgs = {
   createId: (prefix: string) => string
   interactionRef: MutableRefObject<Interaction>
   scene: CanvasSceneAdapter
-  recordHistoryFrom: (before: CanvasItem[]) => void
-  setItems: Dispatch<SetStateAction<CanvasItem[]>>
+  recordHistoryFrom: (
+    before: CanvasItem[],
+    selection?: { after: string[]; before: string[] },
+  ) => void
+  selection: string[]
+  setItems: CommitCanvasItems
   setDraftRect: Dispatch<SetStateAction<Bounds | null>>
   setEditing: Dispatch<SetStateAction<EditingText | null>>
   setGesture: Dispatch<SetStateAction<Interaction['kind']>>
@@ -67,6 +72,7 @@ export function useCanvasPointerDragHandlers({
   interactionRef,
   scene,
   recordHistoryFrom,
+  selection,
   setItems,
   setDraftRect,
   setEditing,
@@ -271,13 +277,22 @@ export function useCanvasPointerDragHandlers({
         startWorld: interaction.startWorld,
       })
 
-      setItems((current) => [...current, nextItem])
+      setItems((current) => [...current, nextItem], {
+        before: selection,
+        after: [nextItem.id],
+      })
       setSelection([nextItem.id])
       setTool('select')
     }
 
     if (interaction.kind === 'move' || interaction.kind === 'resize') {
-      recordHistoryFrom(interaction.historyItems)
+      recordHistoryFrom(interaction.historyItems, {
+        before:
+          interaction.kind === 'move'
+            ? interaction.historySelection
+            : interaction.ids,
+        after: interaction.ids,
+      })
     }
 
     if (interaction.kind === 'move' && !interaction.moved && interaction.edit) {

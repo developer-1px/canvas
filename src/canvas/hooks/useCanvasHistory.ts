@@ -6,14 +6,15 @@ import {
   type SetStateAction,
 } from 'react'
 import type { CanvasItem } from '../host/CanvasModel'
-import { canvasItemsEqual, replaceCanvasItems } from '../host/CanvasDocument'
-
-type HistoryEntry = {
-  before: CanvasItem[]
-  beforeSelection?: string[]
-  after: CanvasItem[]
-  afterSelection?: string[]
-}
+import {
+  canvasItemsEqual,
+  commitCanvasItemsDocument,
+  createCanvasItemsDocument,
+  getCanvasDocumentSelectionIds,
+  loadCanvasItemsDocument,
+  replaceCanvasItems,
+  restoreCanvasDocumentSelection,
+} from '../host/CanvasDocument'
 
 type HistoryAvailability = {
   canRedo: boolean
@@ -31,22 +32,21 @@ export type CommitCanvasItems = (
 ) => void
 
 export function useCanvasHistory(initialItems: CanvasItem[]) {
-  const [items, setItemsState] = useState(initialItems)
+  const [document] = useState(() => createCanvasItemsDocument(initialItems))
+  const [items, setItemsState] = useState(() => document.value)
   const [historyAvailability, setHistoryAvailability] =
     useState<HistoryAvailability>({
       canRedo: false,
       canUndo: false,
     })
-  const itemsRef = useRef(initialItems)
-  const undoStack = useRef<HistoryEntry[]>([])
-  const redoStack = useRef<HistoryEntry[]>([])
+  const itemsRef = useRef(items)
 
   const syncHistoryAvailability = useCallback(() => {
     setHistoryAvailability({
-      canRedo: redoStack.current.length > 0,
-      canUndo: undoStack.current.length > 0,
+      canRedo: document.canRedo().ok,
+      canUndo: document.canUndo().ok,
     })
-  }, [])
+  }, [document])
 
   const setLiveItems: Dispatch<SetStateAction<CanvasItem[]>> = useCallback(
     (action) => {
@@ -66,65 +66,75 @@ export function useCanvasHistory(initialItems: CanvasItem[]) {
       const current = itemsRef.current
       const next = replaceCanvasItems(current, resolve(action, current))
 
-      if (canvasItemsEqual(current, next)) {
+      const didCommit = commitCanvasItemsDocument({
+        document,
+        nextItems: next,
+        selection,
+      })
+
+      if (!didCommit) {
         return
       }
 
-      undoStack.current.push({
-        before: current,
-        beforeSelection: selection?.before,
-        after: next,
-        afterSelection: selection?.after,
-      })
-      redoStack.current = []
-      itemsRef.current = next
-      setItemsState(next)
+      itemsRef.current = document.value
+      setItemsState(itemsRef.current)
       syncHistoryAvailability()
     },
-    [syncHistoryAvailability],
+    [document, syncHistoryAvailability],
   )
 
-  const recordHistoryFrom = useCallback((before: CanvasItem[]) => {
-    const current = itemsRef.current
+  const recordHistoryFrom = useCallback((
+    before: CanvasItem[],
+    selection?: SelectionHistory,
+  ) => {
+    const current = replaceCanvasItems(before, itemsRef.current)
 
     if (!canvasItemsEqual(before, current)) {
-      undoStack.current.push({ before, after: current })
-      redoStack.current = []
+      loadCanvasItemsDocument(document, before)
+      commitCanvasItemsDocument({
+        document,
+        nextItems: current,
+        selection,
+      })
+      itemsRef.current = document.value
+      setItemsState(document.value)
       syncHistoryAvailability()
     }
-  }, [syncHistoryAvailability])
+  }, [document, syncHistoryAvailability])
 
   const undo = useCallback(() => {
-    const entry = undoStack.current.pop()
-
-    if (!entry) {
+    if (!document.history.undo()) {
       return undefined
     }
 
-    redoStack.current.push(entry)
-    const next = replaceCanvasItems(itemsRef.current, entry.before)
+    const next = replaceCanvasItems(itemsRef.current, document.value)
 
     itemsRef.current = next
     setItemsState(next)
     syncHistoryAvailability()
-    return entry.beforeSelection
-  }, [syncHistoryAvailability])
+    return getCanvasDocumentSelectionIds(document)
+  }, [document, syncHistoryAvailability])
 
   const redo = useCallback(() => {
-    const entry = redoStack.current.pop()
-
-    if (!entry) {
+    if (!document.history.redo()) {
       return undefined
     }
 
-    undoStack.current.push({ ...entry, before: itemsRef.current })
-    const next = replaceCanvasItems(itemsRef.current, entry.after)
+    const next = replaceCanvasItems(itemsRef.current, document.value)
 
     itemsRef.current = next
     setItemsState(next)
     syncHistoryAvailability()
-    return entry.afterSelection
-  }, [syncHistoryAvailability])
+    return getCanvasDocumentSelectionIds(document)
+  }, [document, syncHistoryAvailability])
+
+  const syncDocumentSelection = useCallback((selection: string[]) => {
+    restoreCanvasDocumentSelection(
+      document,
+      selection,
+      itemsRef.current,
+    )
+  }, [document])
 
   return {
     ...historyAvailability,
@@ -132,6 +142,7 @@ export function useCanvasHistory(initialItems: CanvasItem[]) {
     items,
     redo,
     recordHistoryFrom,
+    syncDocumentSelection,
     setLiveItems,
     undo,
   }

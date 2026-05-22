@@ -37,6 +37,7 @@ import { getCanvasItemPointerSelection } from '../engine/CanvasSelectionEngine'
 import { snapCanvasPointToGrid } from '../engine/CanvasSnapEngine'
 import type { CanvasSceneAdapter } from '../engine/CanvasSceneAdapter'
 import { findEditableTextItem } from '../host/CanvasTree'
+import type { CommitCanvasItems } from './useCanvasHistory'
 
 type UseCanvasPointerHandlersArgs = {
   cloneItems: (ids: string[], offset: Point) => CanvasItem[]
@@ -51,7 +52,7 @@ type UseCanvasPointerHandlersArgs = {
   setDraftRect: Dispatch<SetStateAction<Bounds | null>>
   setEditing: Dispatch<SetStateAction<EditingText | null>>
   setGesture: Dispatch<SetStateAction<Interaction['kind']>>
-  setItems: Dispatch<SetStateAction<CanvasItem[]>>
+  setItems: CommitCanvasItems
   setLiveItems: Dispatch<SetStateAction<CanvasItem[]>>
   setMarquee: Dispatch<SetStateAction<Bounds | null>>
   setSelection: Dispatch<SetStateAction<string[]>>
@@ -116,7 +117,10 @@ export function useCanvasPointerHandlers({
       point,
     })
 
-    setItems((current) => [...current, created.item])
+    setItems((current) => [...current, created.item], {
+      before: selection,
+      after: [created.item.id],
+    })
     setSelection([created.item.id])
     setEditing({ id: created.item.id, value: created.editValue })
     setTool('select')
@@ -227,6 +231,7 @@ export function useCanvasPointerHandlers({
       selection,
     })
     let nextSelection = itemSelection.nextSelection
+    const historySelection = nextSelection
     const moveBounds = scene.getBounds(nextSelection)
 
     if (editItem) {
@@ -276,6 +281,7 @@ export function useCanvasPointerHandlers({
       startWorld,
       ids: nextSelection,
       bounds: moveBounds,
+      historySelection,
       startItems,
       historyItems,
       edit: editItem

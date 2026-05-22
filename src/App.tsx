@@ -68,6 +68,7 @@ function App() {
     redo,
     recordHistoryFrom,
     setLiveItems,
+    syncDocumentSelection,
     undo,
   } = useCanvasHistory(INITIAL_ITEMS)
   const [selection, setSelection] = useState<string[]>([
@@ -114,6 +115,10 @@ function App() {
   const editingItem = editing ? findEditableTextItem(items, editing.id) : null
   const editingId = editing?.id
   const activeMode = spaceDown ? 'pan' : tool
+
+  useEffect(() => {
+    syncDocumentSelection(selection)
+  }, [selection, syncDocumentSelection])
 
   useEffect(() => {
     if (!editingId) {
@@ -248,7 +253,10 @@ function App() {
         ? 'Text'
         : editing.value
 
-    setItems((current) => updateItemText(current, editing.id, value))
+    setItems((current) => updateItemText(current, editing.id, value), {
+      before: selection,
+      after: selection,
+    })
     setEditing(null)
   }
 
@@ -300,6 +308,7 @@ function App() {
     recordHistoryFrom,
     interactionRef,
     scene,
+    selection,
     setItems,
     setDraftRect,
     setEditing,

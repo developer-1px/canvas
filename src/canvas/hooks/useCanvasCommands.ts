@@ -244,15 +244,20 @@ export function useCanvasCommands({
 
   const moveSelection = useCallback(
     (dx: number, dy: number) => {
-      setItems((current) =>
-        nudgeCanvasCommand({
-          adapter: commandAdapter,
-          config,
-          dx,
-          dy,
-          items: current,
-          selection,
-        }) ?? current,
+      setItems(
+        (current) =>
+          nudgeCanvasCommand({
+            adapter: commandAdapter,
+            config,
+            dx,
+            dy,
+            items: current,
+            selection,
+          }) ?? current,
+        {
+          before: selection,
+          after: selection,
+        },
       )
     },
     [commandAdapter, config, selection, setItems],
