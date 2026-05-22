@@ -3,7 +3,7 @@ import {
   type Bounds,
   type Point,
   type ResizeHandle,
-} from './CanvasModel'
+} from './CanvasPrimitives'
 
 export type CanvasTransformItem = {
   id: string

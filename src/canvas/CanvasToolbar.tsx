@@ -4,7 +4,7 @@ import {
   CANVAS_TOOL_AFFORDANCES,
   type CanvasAffordanceConfig,
 } from './CanvasAffordances'
-import type { Tool } from './CanvasModel'
+import type { Tool } from './CanvasPrimitives'
 import {
   DeleteIcon,
   DuplicateIcon,

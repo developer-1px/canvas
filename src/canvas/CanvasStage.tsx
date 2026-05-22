@@ -1,13 +1,11 @@
 import type { PointerEvent, RefObject } from 'react'
-import {
-  type CanvasItem,
-  type Interaction,
-  type RectItem,
-  type ResizeHandle,
-  type TextItem,
-  type Tool,
-  type Viewport,
-} from './CanvasModel'
+import type { CanvasItem, RectItem, TextItem } from './CanvasModel'
+import type {
+  CanvasInteractionKind,
+  ResizeHandle,
+  Tool,
+  Viewport,
+} from './CanvasPrimitives'
 import type { CanvasOverlayState } from './CanvasOverlayEngine'
 import { CanvasSvgItemRenderer } from './CanvasSvgItemRenderer'
 import {
@@ -18,7 +16,7 @@ import {
 
 type CanvasStageProps = {
   activeMode: Tool
-  gesture: Interaction['kind']
+  gesture: CanvasInteractionKind
   items: CanvasItem[]
   overlays: CanvasOverlayState
   selected: Set<string>

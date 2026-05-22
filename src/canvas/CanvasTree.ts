@@ -1,11 +1,5 @@
-import type {
-  Bounds,
-  CanvasItem,
-  GroupItem,
-  RectItem,
-  TextItem,
-} from './CanvasModel'
-import { unique } from './CanvasModel'
+import { unique, type Bounds } from './CanvasPrimitives'
+import type { CanvasItem, GroupItem, RectItem, TextItem } from './CanvasModel'
 
 export type CanvasItemEntry = {
   item: CanvasItem

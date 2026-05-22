@@ -5,11 +5,10 @@ import {
   type SetStateAction,
 } from 'react'
 import type { CanvasAffordanceConfig } from './CanvasAffordances'
+import type { Bounds, Tool } from './CanvasPrimitives'
 import type {
-  Bounds,
   EditingText,
   Interaction,
-  Tool,
 } from './CanvasModel'
 
 type UseCanvasKeyboardShortcutsArgs = {

@@ -11,15 +11,17 @@ import {
   normalizeBounds,
   pointDistance,
   type Bounds,
-  type CanvasItem,
-  type EditingText,
-  type Interaction,
   type Point,
-  type RectItem,
   type ResizeHandle,
-  type TextItem,
   type Tool,
   type Viewport,
+} from './CanvasPrimitives'
+import type {
+  CanvasItem,
+  EditingText,
+  Interaction,
+  RectItem,
+  TextItem,
 } from './CanvasModel'
 import { capturePointer, screenPoint, screenToWorld } from './CanvasPointerGeometry'
 import {

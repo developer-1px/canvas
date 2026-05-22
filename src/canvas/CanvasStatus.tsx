@@ -2,10 +2,10 @@ import {
   CANVAS_GESTURE_STATUS_LABELS,
   CANVAS_TOOL_AFFORDANCES,
 } from './CanvasAffordances'
-import type { Interaction, Tool } from './CanvasModel'
+import type { CanvasInteractionKind, Tool } from './CanvasPrimitives'
 
 type CanvasStatusProps = {
-  gesture: Interaction['kind']
+  gesture: CanvasInteractionKind
   scale: number
   selectionLength: number
   tool: Tool

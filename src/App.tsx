@@ -13,14 +13,16 @@ import { CanvasStatus } from './canvas/CanvasStatus'
 import { DEFAULT_CANVAS_AFFORDANCE_CONFIG } from './canvas/CanvasAffordances'
 import {
   fitBoundsIntoViewport,
-  INITIAL_ITEMS,
   INITIAL_VIEWPORT,
   zoomViewport,
   type Bounds,
-  type EditingText,
-  type Interaction,
   type Tool,
   type Viewport,
+} from './canvas/CanvasPrimitives'
+import {
+  INITIAL_ITEMS,
+  type EditingText,
+  type Interaction,
 } from './canvas/CanvasModel'
 import { updateItemText } from './canvas/CanvasOperations'
 import {

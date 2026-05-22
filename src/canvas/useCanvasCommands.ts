@@ -18,7 +18,8 @@ import {
   type CanvasCommandAdapter,
 } from './CanvasCommandEngine'
 import type { CanvasAffordanceConfig } from './CanvasAffordances'
-import type { CanvasItem, EditingText, Point } from './CanvasModel'
+import type { Point } from './CanvasPrimitives'
+import type { CanvasItem, EditingText } from './CanvasModel'
 import type { CommitCanvasItems } from './useCanvasHistory'
 
 type UseCanvasCommandsArgs = {

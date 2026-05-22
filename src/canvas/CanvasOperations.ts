@@ -2,9 +2,11 @@ import {
   scaleItemBounds,
   unique,
   type Bounds,
-  type CanvasItem,
-  type GroupItem,
   type Point,
+} from './CanvasPrimitives'
+import type {
+  CanvasItem,
+  GroupItem,
 } from './CanvasModel'
 import {
   flattenCanvasItems,

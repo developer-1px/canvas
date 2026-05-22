@@ -6,7 +6,7 @@ import {
   type Point,
   type ResizeHandle,
   type Viewport,
-} from './CanvasModel'
+} from './CanvasPrimitives'
 import type { CanvasSceneAdapter } from './CanvasSceneAdapter'
 
 export type CanvasResizeHandleOverlay = {

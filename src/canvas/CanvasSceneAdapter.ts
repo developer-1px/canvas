@@ -1,4 +1,4 @@
-import type { Bounds } from './CanvasModel'
+import type { Bounds } from './CanvasPrimitives'
 
 export type CanvasSceneEntry = {
   bounds: Bounds

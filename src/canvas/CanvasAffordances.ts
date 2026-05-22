@@ -1,4 +1,4 @@
-import type { Interaction, Tool } from './CanvasModel'
+import type { CanvasInteractionKind, Tool } from './CanvasPrimitives'
 
 export type CanvasCommandId =
   | 'copy'
@@ -134,7 +134,7 @@ export const CANVAS_COMMAND_AFFORDANCES = {
 >
 
 export const CANVAS_GESTURE_STATUS_LABELS: Partial<
-  Record<Interaction['kind'], string>
+  Record<CanvasInteractionKind, string>
 > = {
   'create-rect': 'Drawing',
   marquee: 'Selecting',
