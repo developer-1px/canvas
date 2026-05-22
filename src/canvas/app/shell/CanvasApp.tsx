@@ -4,51 +4,40 @@ import {
   useMemo,
   useRef,
   useState,
-  type CSSProperties,
 } from 'react'
 import { CanvasStage } from '../../ui/CanvasStage'
 import { CanvasComponentPalette } from '../../ui/CanvasComponentPalette'
 import { CanvasTextEditor } from '../../ui/CanvasTextEditor'
 import { CanvasToolbar } from '../../ui/CanvasToolbar'
 import { CanvasStatus } from '../../ui/CanvasStatus'
-import { createCanvasComponentItem } from '../../host/CanvasComponentCatalog'
 import { DEFAULT_CANVAS_AFFORDANCE_CONFIG } from '../../engine/CanvasAffordances'
 import {
-  fitBoundsIntoViewport,
   INITIAL_VIEWPORT,
-  zoomViewport,
   type Bounds,
   type Tool,
   type Viewport,
 } from '../../engine/CanvasPrimitives'
 import {
   INITIAL_ITEMS,
-  type CanvasComponentKind,
   type EditingText,
   type Interaction,
 } from '../../host/CanvasModel'
-import { updateItemText } from '../../host/CanvasOperations'
-import {
-  findEditableTextItem,
-  flattenCanvasItems,
-  unionBounds,
-} from '../../host/CanvasTree'
+import { findEditableTextItem } from '../../host/CanvasTree'
 import { useCanvasPointerDragHandlers } from '../workflow/useCanvasPointerDragHandlers'
 import { useCanvasPointerHandlers } from '../workflow/useCanvasPointerHandlers'
 import { ZoomControls } from '../../ui/ZoomControls'
 import { useCanvasCommands } from '../workflow/useCanvasCommands'
 import { useCanvasKeyboardShortcuts } from '../workflow/useCanvasKeyboardShortcuts'
 import { useCanvasHistory } from '../workflow/useCanvasHistory'
+import { useCanvasWheelViewport } from '../workflow/useCanvasWheelViewport'
+import { useCanvasTextEditing } from '../workflow/useCanvasTextEditing'
+import { useCanvasViewportControls } from '../workflow/useCanvasViewportControls'
+import { useCanvasComponentInsertion } from '../workflow/useCanvasComponentInsertion'
 import { createCanvasOverlayState } from '../../engine/CanvasOverlayEngine'
 import {
   EMPTY_CANVAS_SNAP_GUIDES,
   type CanvasSnapGuides,
 } from '../../engine/CanvasSnapEngine'
-import {
-  getCanvasWheelViewport,
-  shouldHandleCanvasWheelViewport,
-  type CanvasWheelInput,
-} from '../../engine/CanvasViewportEngine'
 import { getCanvasCommandAvailability } from '../../engine/CanvasCommandEngine'
 import { CANVAS_ITEM_COMMAND_ADAPTER } from '../../host/adapters/CanvasItemCommandAdapter'
 import { CANVAS_ITEM_CREATION_ADAPTER } from '../../host/adapters/CanvasItemCreationAdapter'
@@ -118,72 +107,32 @@ function CanvasApp() {
     [draftRect, marquee, scene, selection, snapGuides, viewport],
   )
   const editingItem = editing ? findEditableTextItem(items, editing.id) : null
-  const editingId = editing?.id
   const activeMode = spaceDown ? 'pan' : tool
 
   useEffect(() => {
     syncDocumentSelection(selection)
   }, [selection, syncDocumentSelection])
 
-  useEffect(() => {
-    if (!editingId) {
-      return
-    }
+  useCanvasWheelViewport({
+    config: canvasAffordanceConfig,
+    setViewport,
+    svgRef,
+  })
 
-    const frame = requestAnimationFrame(() => {
-      editorRef.current?.focus()
-      editorRef.current?.select()
-    })
-
-    return () => cancelAnimationFrame(frame)
-  }, [editingId])
-
-  useEffect(() => {
-    const svg = svgRef.current
-
-    if (!svg) {
-      return
-    }
-
-    const svgElement = svg
-
-    function handleNativeWheel(event: globalThis.WheelEvent) {
-      const input = getCanvasWheelInput(event)
-
-      if (
-        !shouldHandleCanvasWheelViewport({
-          config: canvasAffordanceConfig,
-          input,
-        })
-      ) {
-        return
-      }
-
-      event.preventDefault()
-
-      const rect = svgElement.getBoundingClientRect()
-      const point = {
-        x: event.clientX - rect.left,
-        y: event.clientY - rect.top,
-      }
-
-      setViewport(
-        (current) =>
-          getCanvasWheelViewport({
-            config: canvasAffordanceConfig,
-            input,
-            point,
-            viewport: current,
-          }) ?? current,
-      )
-    }
-
-    svgElement.addEventListener('wheel', handleNativeWheel, { passive: false })
-
-    return () => {
-      svgElement.removeEventListener('wheel', handleNativeWheel)
-    }
-  }, [])
+  const {
+    blurTextEditor,
+    cancelTextEdit,
+    commitText,
+    editorStyle,
+  } = useCanvasTextEditing({
+    editing,
+    editingItem,
+    editorRef,
+    selection,
+    setEditing,
+    setItems,
+    viewport,
+  })
 
   const createId = useCallback((prefix: string) => {
     idSeed.current += 1
@@ -215,23 +164,11 @@ function CanvasApp() {
     undo,
   })
 
-  const fitToItems = useCallback(
-    (ids?: string[]) => {
-      const targetIds =
-        ids && ids.length > 0
-          ? ids
-          : flattenCanvasItems(items).map((entry) => entry.item.id)
-      const bounds = unionBounds(items, new Set(targetIds))
-      const rect = svgRef.current?.getBoundingClientRect()
-
-      if (!bounds || !rect) {
-        return
-      }
-
-      setViewport(fitBoundsIntoViewport(bounds, rect))
-    },
-    [items],
-  )
+  const { fitToItems, resetViewport, zoomBy } = useCanvasViewportControls({
+    items,
+    setViewport,
+    svgRef,
+  })
 
   useCanvasKeyboardShortcuts({
     config: canvasAffordanceConfig,
@@ -256,36 +193,6 @@ function CanvasApp() {
     undoHistory,
     ungroupSelection,
   })
-
-  function commitText() {
-    if (!editing) {
-      return
-    }
-
-    if (!editingItem) {
-      setEditing(null)
-      return
-    }
-
-    const value =
-      editingItem.type === 'text' && !editing.value.trim()
-        ? 'Text'
-        : editing.value
-
-    setItems((current) => updateItemText(current, editing.id, value), {
-      before: selection,
-      after: selection,
-    })
-    setEditing(null)
-  }
-
-  function cancelTextEdit() {
-    setEditing(null)
-  }
-
-  function blurTextEditor() {
-    editorRef.current?.blur()
-  }
 
   const {
     handleCanvasPointerDown,
@@ -343,55 +250,16 @@ function CanvasApp() {
     viewport,
   })
 
-  function zoomBy(multiplier: number) {
-    const rect = svgRef.current?.getBoundingClientRect()
-
-    if (!rect) {
-      return
-    }
-
-    const point = {
-      x: rect.width / 2,
-      y: rect.height / 2,
-    }
-
-    setViewport((current) => zoomViewport(current, point, multiplier))
-  }
-
-  function insertComponent(component: CanvasComponentKind) {
-    const rect = svgRef.current?.getBoundingClientRect()
-    const point = rect
-      ? {
-          x: (rect.width / 2 - viewport.x) / viewport.scale,
-          y: (rect.height / 2 - viewport.y) / viewport.scale,
-        }
-      : { x: 120, y: 120 }
-    const nextItem = createCanvasComponentItem({
-      id: createId('component'),
-      point,
-      templateId: component,
-    })
-
-    setItems((current) => [...current, nextItem], {
-      before: selection,
-      after: [nextItem.id],
-    })
-    setSelection([nextItem.id])
-    setEditing(null)
-    setTool('select')
-  }
-
-  const editorStyle: CSSProperties | undefined =
-    editingItem && editing
-      ? {
-          left: viewport.x + editingItem.x * viewport.scale,
-          top: viewport.y + editingItem.y * viewport.scale,
-          width: editingItem.w * viewport.scale,
-          height: editingItem.h * viewport.scale,
-          minHeight: editingItem.h * viewport.scale,
-          fontSize: 16 * viewport.scale,
-        }
-      : undefined
+  const insertComponent = useCanvasComponentInsertion({
+    createId,
+    selection,
+    setEditing,
+    setItems,
+    setSelection,
+    setTool,
+    svgRef,
+    viewport,
+  })
 
   return (
     <main className="canvas-app">
@@ -456,7 +324,7 @@ function CanvasApp() {
           config={canvasAffordanceConfig}
           scale={viewport.scale}
           onFit={() => fitToItems(selection.length > 0 ? selection : undefined)}
-          onReset={() => setViewport(INITIAL_VIEWPORT)}
+          onReset={resetViewport}
           onZoomIn={() => zoomBy(1.25)}
           onZoomOut={() => zoomBy(0.8)}
         />
@@ -472,17 +340,6 @@ function CanvasApp() {
       ) : null}
     </main>
   )
-}
-
-function getCanvasWheelInput(event: globalThis.WheelEvent): CanvasWheelInput {
-  return {
-    ctrlKey: event.ctrlKey,
-    deltaMode: event.deltaMode,
-    deltaX: event.deltaX,
-    deltaY: event.deltaY,
-    metaKey: event.metaKey,
-    shiftKey: event.shiftKey,
-  }
 }
 
 export default CanvasApp
