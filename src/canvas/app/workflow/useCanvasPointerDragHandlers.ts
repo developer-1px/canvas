@@ -17,7 +17,6 @@ import {
 import type {
   CanvasItem,
   EditingText,
-  Interaction,
 } from '../../host/CanvasModel'
 import {
   createCanvasRect,
@@ -38,6 +37,7 @@ import {
   type CanvasTransformAdapter,
 } from '../../engine/CanvasTransformEngine'
 import type { CommitCanvasItems } from './useCanvasHistory'
+import type { Interaction } from './CanvasInteractionState'
 
 type UseCanvasPointerDragHandlersArgs = {
   config: CanvasAffordanceConfig

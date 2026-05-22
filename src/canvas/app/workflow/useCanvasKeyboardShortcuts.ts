@@ -6,10 +6,8 @@ import {
 } from 'react'
 import type { CanvasAffordanceConfig } from '../../engine/CanvasAffordances'
 import type { Bounds, Tool } from '../../engine/CanvasPrimitives'
-import type {
-  EditingText,
-  Interaction,
-} from '../../host/CanvasModel'
+import type { EditingText } from '../../host/CanvasModel'
+import type { Interaction } from './CanvasInteractionState'
 
 type UseCanvasKeyboardShortcutsArgs = {
   config: CanvasAffordanceConfig

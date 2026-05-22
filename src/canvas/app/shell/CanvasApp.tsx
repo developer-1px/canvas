@@ -18,11 +18,11 @@ import {
   type Viewport,
 } from '../../engine/CanvasPrimitives'
 import {
-  INITIAL_ITEMS,
   type EditingText,
-  type Interaction,
 } from '../../host/CanvasModel'
+import { INITIAL_ITEMS } from '../../host/CanvasInitialItems'
 import { findEditableTextItem } from '../../host/CanvasTree'
+import type { Interaction } from '../workflow/CanvasInteractionState'
 import { useCanvasPointerDragHandlers } from '../workflow/useCanvasPointerDragHandlers'
 import { useCanvasPointerDownHandlers } from '../workflow/useCanvasPointerDownHandlers'
 import { ZoomControls } from '../../ui/ZoomControls'

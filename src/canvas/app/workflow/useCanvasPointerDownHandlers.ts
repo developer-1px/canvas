@@ -19,7 +19,6 @@ import {
 import type {
   CanvasItem,
   EditingText,
-  Interaction,
   RectItem,
   TextItem,
 } from '../../host/CanvasModel'
@@ -38,6 +37,7 @@ import { snapCanvasPointToGrid } from '../../engine/CanvasSnapEngine'
 import type { CanvasSceneAdapter } from '../../engine/CanvasSceneAdapter'
 import { findEditableTextItem } from '../../host/CanvasTree'
 import type { CommitCanvasItems } from './useCanvasHistory'
+import type { Interaction } from './CanvasInteractionState'
 
 type UseCanvasPointerDownHandlersArgs = {
   cloneItems: (ids: string[], offset: Point) => CanvasItem[]

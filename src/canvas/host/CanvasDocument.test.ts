@@ -5,7 +5,7 @@ import {
   getCanvasDocumentSelectionIds,
   restoreCanvasDocumentSelection,
 } from './CanvasDocument'
-import { INITIAL_ITEMS } from './CanvasModel'
+import { INITIAL_ITEMS } from './CanvasInitialItems'
 import { groupCanvasSelection } from './CanvasOperations'
 
 describe('CanvasDocument history', () => {
