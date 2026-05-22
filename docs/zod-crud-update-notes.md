@@ -15,11 +15,12 @@ history, validation, and document selection state.
   boundary.
 - Canvas clipboard, command availability, duplicate, group, ungroup, nudge, and delete are implemented in the canvas command engine.
 
-This is an intermediate state. Canvas is no longer applyPatch-only, and item
-creation commits now use zod-crud `add` patches. Most other content commands
-still produce `CanvasItem[]` and commit them as root document replacements. The
-next migration step is to make more commands produce zod-crud patch batches and
-use zod-crud clipboard/find/replace surfaces.
+This is an intermediate state. Canvas is no longer applyPatch-only. Item
+creation commits now use zod-crud `add` patches, and selection delete commits
+use zod-crud `remove` patches with group-bound repair patches when needed. Most
+other content commands still produce `CanvasItem[]` and commit them as root
+document replacements. The next migration step is to make more commands produce
+zod-crud patch batches and use zod-crud clipboard/find/replace surfaces.
 
 ## Changelog Impact
 
@@ -65,9 +66,9 @@ and document selection state.
 - Canvas command semantics such as grouping, nudging, and geometry transforms
   remain local until patch planners replace root document replacement commits.
 
-Current migration scope: history, validation, selection ownership, and item
-creation patches. Clipboard, find, replace, and generic command availability
-stay app-owned until command patch planning is introduced.
+Current migration scope: history, validation, selection ownership, item creation
+patches, and selection delete patches. Clipboard, find, replace, and generic
+command availability stay app-owned until command patch planning is introduced.
 
 ## Suggested Local Work Items
 

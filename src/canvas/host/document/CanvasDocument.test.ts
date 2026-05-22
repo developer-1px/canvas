@@ -8,7 +8,11 @@ import {
 } from './CanvasDocument'
 import { INITIAL_ITEMS } from '../component/CanvasInitialItems'
 import { createCanvasComponentItem } from '../component/CanvasComponentFactory'
-import { groupCanvasSelection } from '../operations/CanvasOperations'
+import {
+  groupCanvasSelection,
+  removeCanvasItems,
+} from '../operations/CanvasOperations'
+import { createRemoveCanvasItemsPatch } from './CanvasDocumentPatches'
 
 describe('CanvasDocument history', () => {
   test('seeds zod-crud document selection from canvas ids', () => {
@@ -82,6 +86,65 @@ describe('CanvasDocument history', () => {
     ])
     expect(document.value.at(-1)).toEqual(nextItem)
     expect(getCanvasDocumentSelectionIds(document)).toEqual([nextItem.id])
+  })
+
+  test('commits top-level deletion as zod-crud remove patch', () => {
+    const document = createCanvasItemsDocument(INITIAL_ITEMS, {
+      selection: ['component-card'],
+    })
+    const patch = createRemoveCanvasItemsPatch(INITIAL_ITEMS, [
+      'component-card',
+    ])
+
+    expect(
+      commitCanvasItemsPatch({
+        document,
+        patch,
+        selection: {
+          before: ['component-card'],
+          after: [],
+        },
+      }),
+    ).toBe(true)
+
+    expect(document.lastPatch).toEqual([{ op: 'remove', path: '/2' }])
+    expect(document.value.map((item) => item.id)).not.toContain('component-card')
+    expect(getCanvasDocumentSelectionIds(document)).toEqual([])
+  })
+
+  test('commits nested deletion with group bounds patch', () => {
+    const grouped = groupCanvasSelection(
+      INITIAL_ITEMS,
+      ['component-sticky', 'component-label'],
+      'group-1',
+    ).items
+    const expected = removeCanvasItems(grouped, ['component-label'])
+    const document = createCanvasItemsDocument(grouped, {
+      selection: ['component-label'],
+    })
+    const patch = createRemoveCanvasItemsPatch(grouped, ['component-label'])
+
+    expect(
+      commitCanvasItemsPatch({
+        document,
+        patch,
+        selection: {
+          before: ['component-label'],
+          after: [],
+        },
+      }),
+    ).toBe(true)
+
+    expect(document.lastPatch.map((operation) => operation.op)).toEqual([
+      'remove',
+      'replace',
+    ])
+    expect(document.lastPatch[0]).toEqual({
+      op: 'remove',
+      path: '/0/children/1',
+    })
+    expect(document.value).toEqual(expected)
+    expect(getCanvasDocumentSelectionIds(document)).toEqual([])
   })
 
   test('round-trips document selection through JSON pointers', () => {

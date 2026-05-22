@@ -1,10 +1,11 @@
-import type { Pointer, SelectionSnap } from 'zod-crud'
+import type { SelectionSnap } from 'zod-crud'
 import type { CanvasItem } from '../model/CanvasModel'
 import type { CanvasItemsDocument } from './CanvasDocument'
 import {
   findCanvasItemEntry,
   flattenCanvasItems,
 } from '../tree/CanvasTree'
+import { canvasItemPathToPointer } from './CanvasDocumentPointers'
 
 export type CanvasSelectionIds = string[]
 
@@ -68,14 +69,6 @@ function getCanvasSelectionIdsFromSnapshot(
 
     return id ? [id] : []
   })
-}
-
-function canvasItemPathToPointer(path: number[]): Pointer {
-  return `/${path
-    .flatMap((index, depth) =>
-      depth === 0 ? [String(index)] : ['children', String(index)],
-    )
-    .join('/')}` as Pointer
 }
 
 function createEmptyCanvasSelectionSnapshot(): SelectionSnap {

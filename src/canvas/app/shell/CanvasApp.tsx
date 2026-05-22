@@ -174,6 +174,7 @@ function CanvasApp() {
     unlockAll,
   } = useCanvasCommands({
     commandAdapter: CANVAS_ITEM_COMMAND_ADAPTER,
+    commitItemsPatch,
     config: canvasAffordanceConfig,
     createId,
     items,

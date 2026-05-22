@@ -23,11 +23,16 @@ import {
 import type { CanvasAffordanceConfig } from '../../engine/affordance/CanvasAffordances'
 import type { Viewport } from '../../engine/primitives/CanvasPrimitives'
 import type { CanvasItem, EditingText } from '../../host/model/CanvasModel'
+import { createRemoveCanvasItemsPatch } from '../../host/document/CanvasDocumentPatches'
 import { useCanvasClipboardCommands } from './useCanvasClipboardCommands'
-import type { CommitCanvasItems } from '../document/useCanvasDocument'
+import type {
+  CommitCanvasItems,
+  CommitCanvasItemsPatch,
+} from '../document/useCanvasDocument'
 
 type UseCanvasCommandsArgs = {
   commandAdapter: CanvasCommandAdapter<CanvasItem>
+  commitItemsPatch: CommitCanvasItemsPatch
   config: CanvasAffordanceConfig
   createId: (prefix: string) => string
   items: CanvasItem[]
@@ -43,6 +48,7 @@ type UseCanvasCommandsArgs = {
 
 export function useCanvasCommands({
   commandAdapter,
+  commitItemsPatch,
   config,
   createId,
   items,
@@ -132,15 +138,29 @@ export function useCanvasCommands({
       return
     }
 
-    setItems(result.items, {
-      before: selection,
-      after: result.selection,
-    })
+    const patch = createRemoveCanvasItemsPatch(items, selection)
+
+    if (patch.length > 0) {
+      commitItemsPatch(patch, {
+        before: selection,
+        after: result.selection,
+      })
+    } else {
+      setSelection(result.selection)
+    }
+
     setEditing((current) =>
       current && result.clearEditingIds.includes(current.id) ? null : current,
     )
-    setSelection(result.selection)
-  }, [commandAdapter, config, items, selection, setEditing, setItems, setSelection])
+  }, [
+    commandAdapter,
+    commitItemsPatch,
+    config,
+    items,
+    selection,
+    setEditing,
+    setSelection,
+  ])
 
   const groupSelection = useCallback(() => {
     const result = groupCanvasCommand({
