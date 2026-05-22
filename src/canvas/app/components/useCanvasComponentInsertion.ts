@@ -11,7 +11,7 @@ import type {
   CanvasItem,
   EditingText,
 } from '../../host/model/CanvasModel'
-import type { CommitCanvasItems } from '../document/useCanvasHistory'
+import type { CommitCanvasItems } from '../document/useCanvasDocument'
 
 type UseCanvasComponentInsertionArgs = {
   createId: (prefix: string) => string

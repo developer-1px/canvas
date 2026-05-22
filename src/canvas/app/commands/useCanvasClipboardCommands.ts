@@ -18,7 +18,7 @@ import type { CanvasAffordanceConfig } from '../../engine/affordance/CanvasAffor
 import type { Point, Viewport } from '../../engine/primitives/CanvasPrimitives'
 import type { CanvasItem, EditingText } from '../../host/model/CanvasModel'
 import { getCanvasPasteOffset } from './CanvasPastePosition'
-import type { CommitCanvasItems } from '../document/useCanvasHistory'
+import type { CommitCanvasItems } from '../document/useCanvasDocument'
 
 type UseCanvasClipboardCommandsArgs = {
   commandAdapter: CanvasCommandAdapter<CanvasItem>

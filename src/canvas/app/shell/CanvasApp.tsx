@@ -1,6 +1,5 @@
 import {
   useCallback,
-  useEffect,
   useMemo,
   useRef,
   useState,
@@ -23,7 +22,7 @@ import { useCanvasPointerDragHandlers } from '../pointer/useCanvasPointerDragHan
 import { useCanvasPointerDownHandlers } from '../pointer/useCanvasPointerDownHandlers'
 import { useCanvasCommands } from '../commands/useCanvasCommands'
 import { useCanvasKeyboardShortcuts } from '../keyboard/useCanvasKeyboardShortcuts'
-import { useCanvasHistory } from '../document/useCanvasHistory'
+import { useCanvasDocument } from '../document/useCanvasDocument'
 import { useCanvasWheelViewport } from '../viewport/useCanvasWheelViewport'
 import { useCanvasTextEditing } from '../text/useCanvasTextEditing'
 import { useCanvasViewportControls } from '../viewport/useCanvasViewportControls'
@@ -66,12 +65,13 @@ function CanvasApp() {
     items,
     redo,
     recordHistoryFrom,
+    selection,
     setLiveItems,
-    syncDocumentSelection,
+    setSelection,
     undo,
-  } = useCanvasHistory(initialItems)
-  const [selection, setSelection] = useState<string[]>(
-    () => storedWorkspace?.selection ?? [...DEFAULT_INITIAL_SELECTION],
+  } = useCanvasDocument(
+    initialItems,
+    storedWorkspace?.selection ?? [...DEFAULT_INITIAL_SELECTION],
   )
   const [viewport, setViewport] = useState<Viewport>(
     () => storedWorkspace?.viewport ?? INITIAL_VIEWPORT,
@@ -120,10 +120,6 @@ function CanvasApp() {
   )
   const editingItem = editing ? findEditableTextItem(items, editing.id) : null
   const activeMode = spaceDown ? 'pan' : tool
-
-  useEffect(() => {
-    syncDocumentSelection(selection)
-  }, [selection, syncDocumentSelection])
 
   useCanvasWorkspacePersistence({
     items,

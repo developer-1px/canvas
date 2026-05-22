@@ -1,5 +1,6 @@
 import {
   useCallback,
+  useEffect,
   useRef,
   useState,
   type Dispatch,
@@ -31,15 +32,29 @@ export type CommitCanvasItems = (
   selection?: SelectionHistory,
 ) => void
 
-export function useCanvasHistory(initialItems: CanvasItem[]) {
-  const [document] = useState(() => createCanvasItemsDocument(initialItems))
+export function useCanvasDocument(
+  initialItems: CanvasItem[],
+  initialSelection: string[] = [],
+) {
+  const [document] = useState(() =>
+    createCanvasItemsDocument(initialItems, { selection: initialSelection }),
+  )
   const [items, setItemsState] = useState(() => document.value)
+  const [selection, setSelectionState] = useState(() =>
+    getCanvasDocumentSelectionIds(document),
+  )
   const [historyAvailability, setHistoryAvailability] =
     useState<HistoryAvailability>({
       canRedo: false,
       canUndo: false,
     })
   const itemsRef = useRef(items)
+
+  useEffect(() => {
+    return document.selection?.subscribe(() => {
+      setSelectionState(getCanvasDocumentSelectionIds(document))
+    })
+  }, [document])
 
   const syncHistoryAvailability = useCallback(() => {
     setHistoryAvailability({
@@ -102,6 +117,23 @@ export function useCanvasHistory(initialItems: CanvasItem[]) {
     }
   }, [document, syncHistoryAvailability])
 
+  const setSelection: Dispatch<SetStateAction<string[]>> = useCallback(
+    (action) => {
+      const current = getCanvasDocumentSelectionIds(document)
+      const next =
+        typeof action === 'function'
+          ? (action as (current: string[]) => string[])(current)
+          : action
+
+      restoreCanvasDocumentSelection(
+        document,
+        next,
+        itemsRef.current,
+      )
+    },
+    [document],
+  )
+
   const undo = useCallback(() => {
     if (!document.history.undo()) {
       return undefined
@@ -128,21 +160,14 @@ export function useCanvasHistory(initialItems: CanvasItem[]) {
     return getCanvasDocumentSelectionIds(document)
   }, [document, syncHistoryAvailability])
 
-  const syncDocumentSelection = useCallback((selection: string[]) => {
-    restoreCanvasDocumentSelection(
-      document,
-      selection,
-      itemsRef.current,
-    )
-  }, [document])
-
   return {
     ...historyAvailability,
     commitItems,
     items,
     redo,
     recordHistoryFrom,
-    syncDocumentSelection,
+    selection,
+    setSelection,
     setLiveItems,
     undo,
   }

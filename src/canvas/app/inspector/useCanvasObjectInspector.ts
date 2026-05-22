@@ -3,7 +3,7 @@ import type { Bounds } from '../../engine/primitives/CanvasPrimitives'
 import { resizeCanvasItems } from '../../host/operations/CanvasOperations'
 import type { CanvasItem } from '../../host/model/CanvasModel'
 import { findCanvasItem, unionBounds } from '../../host/tree/CanvasTree'
-import type { CommitCanvasItems } from '../document/useCanvasHistory'
+import type { CommitCanvasItems } from '../document/useCanvasDocument'
 
 type UseCanvasObjectInspectorArgs = {
   items: CanvasItem[]

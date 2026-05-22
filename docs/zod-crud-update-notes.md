@@ -4,14 +4,21 @@ Date: 2026-05-22
 
 ## Current State
 
-`canvas` currently uses zod-crud as a pure schema-checked patch engine.
+`canvas` currently uses zod-crud as the host document facade for item content,
+history, validation, and document selection state.
 
-- `CanvasDocument.ts` imports `applyPatch` and `JSONPatchOperation`.
-- Canvas history is owned by `useCanvasHistory`.
-- Canvas selection is geometric/id-based and app-owned.
+- `CanvasDocument.ts` creates a `JSONDocument<CanvasItem[]>` with
+  `createJSONDocument`.
+- zod-crud owns undo/redo history through `doc.history`.
+- zod-crud owns document selection state through `doc.selection`.
+- Canvas converts between geometric item ids and JSON Pointers at the document
+  boundary.
 - Canvas clipboard, command availability, duplicate, group, ungroup, nudge, and delete are implemented in the canvas command engine.
 
-This is valid if canvas intentionally treats zod-crud as a patch validator only. It does mean canvas is not using document history/clipboard/can* from zod-crud.
+This is an intermediate state. Canvas is no longer applyPatch-only, but content
+commands still mostly produce `CanvasItem[]` and commit them as root document
+replacements. The next migration step is to make commands produce zod-crud patch
+batches and use zod-crud clipboard/find/replace surfaces.
 
 ## Changelog Impact
 
@@ -28,11 +35,13 @@ Current zod-crud public API offers more than `applyPatch`:
 
 ## Improvement Direction
 
-1. Decide whether canvas should adopt `createJSONDocument`.
-   If yes, zod-crud can own item document history and schema validation while canvas keeps geometry selection and rendering.
+1. Keep `createJSONDocument` as the canvas item document facade.
+   zod-crud owns item document history, schema validation, and document
+   selection state while canvas keeps gesture preview and rendering.
 
-2. Keep geometric selection app-owned.
-   Canvas selection is not the same as JSON document selection. Convert selected item ids to item pointers only at mutation boundaries.
+2. Keep canvas selection expressed as item ids at the UI boundary.
+   Convert ids to JSON Pointers when mutating `doc.selection`, then convert
+   `doc.selection` snapshots back to ids for renderer and command inputs.
 
 3. Consider mapping command availability to `can*` where it is model-based.
    Geometry-specific commands can stay app-owned.
@@ -42,20 +51,29 @@ Current zod-crud public API offers more than `applyPatch`:
 
 ## Decision
 
-Adopt `createJSONDocument` for canvas item document history and schema validation.
+Adopt `createJSONDocument` for canvas item document history, schema validation,
+and document selection state.
 
-- Canvas keeps geometric/id-based selection as app state.
 - zod-crud owns undo/redo patch history for `CanvasItem[]`.
-- Canvas converts selected item ids to JSON Pointers only when committing history entries, then converts restored pointers back to ids after undo/redo.
-- Canvas command semantics such as grouping, nudging, and geometry transforms remain local.
+- zod-crud owns document selection state through `doc.selection`.
+- Canvas converts selected item ids to JSON Pointers when mutating
+  `doc.selection`, then converts snapshots back to ids for renderer and command
+  inputs.
+- Canvas keeps gesture preview state such as marquee bounds, hover, and drag
+  previews.
+- Canvas command semantics such as grouping, nudging, and geometry transforms
+  remain local until patch planners replace root document replacement commits.
 
-First migration scope: history only. Clipboard and generic command availability stay app-owned until history behavior is verified.
+Current migration scope: history, validation, and selection ownership. Clipboard,
+find, replace, and generic command availability stay app-owned until command
+patch planning is introduced.
 
 ## Suggested Local Work Items
 
-- Write a short decision note: "applyPatch-only" vs "JSONDocument-backed canvas state".
-- If adopting `JSONDocument`, start with history only: replace snapshot `useCanvasHistory` with `doc.history` for item patches.
-- Add tests around undo/redo and selection preservation before changing command behavior.
+- Replace command `nextItems` producers with patch planners.
+- Move clipboard to `doc.clipboard` with canvas id rekey and paste offset policy.
+- Add find/replace over searchable canvas item fields using zod-crud query and
+  patch batches.
 
 ## Verification
 

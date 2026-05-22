@@ -8,7 +8,7 @@ import {
 import type { Viewport } from '../../engine/primitives/CanvasPrimitives'
 import type { EditingText, RectItem, TextItem } from '../../host/model/CanvasModel'
 import { updateItemText } from '../../host/operations/CanvasOperations'
-import type { CommitCanvasItems } from '../document/useCanvasHistory'
+import type { CommitCanvasItems } from '../document/useCanvasDocument'
 
 type EditableCanvasTextItem = RectItem | TextItem
 

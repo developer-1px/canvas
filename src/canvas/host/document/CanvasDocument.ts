@@ -41,9 +41,9 @@ export function applyCanvasItemsPatch(
 
 export function createCanvasItemsDocument(
   initialItems: CanvasItem[],
-  options: { history?: number } = {},
+  options: { history?: number; selection?: CanvasSelectionIds } = {},
 ): CanvasItemsDocument {
-  return createJSONDocument(
+  const document = createJSONDocument(
     CanvasItemsSchema as never,
     syncCanvasItems(initialItems) as never,
     {
@@ -52,6 +52,12 @@ export function createCanvasItemsDocument(
       strict: false,
     },
   ) as CanvasItemsDocument
+
+  if (options.selection) {
+    restoreCanvasDocumentSelection(document, options.selection)
+  }
+
+  return document
 }
 
 export function commitCanvasItemsDocument({

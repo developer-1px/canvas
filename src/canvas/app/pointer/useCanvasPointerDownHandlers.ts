@@ -36,7 +36,7 @@ import { getCanvasItemPointerSelection } from '../../engine/selection/CanvasSele
 import { snapCanvasPointToGrid } from '../../engine/snap/CanvasSnapEngine'
 import type { CanvasSceneAdapter } from '../../engine/scene/CanvasSceneAdapter'
 import { findEditableTextItem } from '../../host/tree/CanvasTree'
-import type { CommitCanvasItems } from '../document/useCanvasHistory'
+import type { CommitCanvasItems } from '../document/useCanvasDocument'
 import type { Interaction } from './CanvasInteractionState'
 
 type UseCanvasPointerDownHandlersArgs = {

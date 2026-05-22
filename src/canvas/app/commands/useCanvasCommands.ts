@@ -24,7 +24,7 @@ import type { CanvasAffordanceConfig } from '../../engine/affordance/CanvasAffor
 import type { Viewport } from '../../engine/primitives/CanvasPrimitives'
 import type { CanvasItem, EditingText } from '../../host/model/CanvasModel'
 import { useCanvasClipboardCommands } from './useCanvasClipboardCommands'
-import type { CommitCanvasItems } from '../document/useCanvasHistory'
+import type { CommitCanvasItems } from '../document/useCanvasDocument'
 
 type UseCanvasCommandsArgs = {
   commandAdapter: CanvasCommandAdapter<CanvasItem>

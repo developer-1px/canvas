@@ -36,7 +36,7 @@ import {
   resizeCanvasSelection,
   type CanvasTransformAdapter,
 } from '../../engine/transform/CanvasTransformEngine'
-import type { CommitCanvasItems } from '../document/useCanvasHistory'
+import type { CommitCanvasItems } from '../document/useCanvasDocument'
 import type { Interaction } from './CanvasInteractionState'
 
 type UseCanvasPointerDragHandlersArgs = {
