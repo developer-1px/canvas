@@ -5,7 +5,7 @@ import {
   type SetStateAction,
 } from 'react'
 import type { Tool, Viewport } from '../../engine/CanvasPrimitives'
-import { createCanvasComponentItem } from '../../host/CanvasComponentCatalog'
+import { createCanvasComponentItem } from '../../host/CanvasComponentFactory'
 import type {
   CanvasComponentKind,
   CanvasItem,

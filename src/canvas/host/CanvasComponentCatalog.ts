@@ -1,5 +1,4 @@
-import type { CanvasComponentItem, CanvasComponentKind } from './CanvasModel'
-import type { Point } from '../engine/CanvasPrimitives'
+import type { CanvasComponentKind } from './CanvasModel'
 
 export type CanvasComponentTemplate = {
   accent: string
@@ -127,45 +126,6 @@ export const CANVAS_COMPONENT_TEMPLATES = [
     accent: '#0f766e',
   },
 ] satisfies readonly CanvasComponentTemplate[]
-
-export function createCanvasComponentItem({
-  id,
-  point,
-  templateId,
-}: {
-  id: string
-  point: Point
-  templateId: CanvasComponentKind
-}): CanvasComponentItem {
-  const template = getCanvasComponentTemplate(templateId)
-  const item: CanvasComponentItem = {
-    id,
-    type: 'component',
-    component: template.id,
-    x: point.x,
-    y: point.y,
-    w: template.w,
-    h: template.h,
-    title: template.title,
-    fill: template.fill,
-    stroke: template.stroke,
-    accent: template.accent,
-  }
-
-  if (template.body !== undefined) {
-    item.body = template.body
-  }
-
-  if (template.items) {
-    item.items = [...template.items]
-  }
-
-  if (template.columns) {
-    item.columns = [...template.columns]
-  }
-
-  return item
-}
 
 export function getCanvasComponentTemplate(id: CanvasComponentKind) {
   return CANVAS_COMPONENT_TEMPLATES.find((template) => template.id === id) ??
