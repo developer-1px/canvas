@@ -7,6 +7,7 @@ import {
 } from 'react'
 import { CanvasStage } from '../../ui/CanvasStage'
 import { CanvasComponentPalette } from '../../ui/CanvasComponentPalette'
+import { CanvasObjectInspector } from '../../ui/CanvasObjectInspector'
 import { CanvasTextEditor } from '../../ui/CanvasTextEditor'
 import { CanvasToolbar } from '../../ui/CanvasToolbar'
 import { CanvasStatus } from '../../ui/CanvasStatus'
@@ -19,9 +20,15 @@ import {
 } from '../../engine/CanvasPrimitives'
 import {
   type EditingText,
+  type CanvasItem,
 } from '../../host/CanvasModel'
 import { INITIAL_ITEMS } from '../../host/CanvasInitialItems'
-import { findEditableTextItem } from '../../host/CanvasTree'
+import { resizeCanvasItems } from '../../host/CanvasOperations'
+import {
+  findCanvasItem,
+  findEditableTextItem,
+  unionBounds,
+} from '../../host/CanvasTree'
 import type { Interaction } from '../workflow/CanvasInteractionState'
 import { useCanvasPointerDragHandlers } from '../workflow/useCanvasPointerDragHandlers'
 import { useCanvasPointerDownHandlers } from '../workflow/useCanvasPointerDownHandlers'
@@ -92,6 +99,19 @@ function CanvasApp() {
   const selected = useMemo(() => new Set(selection), [selection])
   const scene = useMemo(() => createCanvasItemScene(items), [items])
   const selectedBounds = useMemo(() => scene.getBounds(selection), [scene, selection])
+  const inspectorBounds = useMemo(
+    () => unionBounds(items, selected),
+    [items, selected],
+  )
+  const selectedItems = useMemo(
+    () =>
+      selection
+        .map((id) => findCanvasItem(items, id))
+        .filter((item): item is CanvasItem => item !== undefined),
+    [items, selection],
+  )
+  const inspectorLabel = getInspectorLabel(selectedItems, selection.length)
+  const inspectorDisabled = selectedItems.some((item) => item.locked === true)
   const commandAvailability = useMemo(
     () =>
       getCanvasCommandAvailability({
@@ -223,6 +243,29 @@ function CanvasApp() {
     unlockAll,
     zoomBy,
   })
+
+  const updateSelectionBounds = useCallback(
+    (bounds: Bounds) => {
+      if (selection.length === 0) {
+        return
+      }
+
+      setItems(
+        (current) => {
+          const currentBounds = unionBounds(current, new Set(selection))
+
+          return currentBounds
+            ? resizeCanvasItems(current, selection, currentBounds, bounds)
+            : current
+        },
+        {
+          before: selection,
+          after: selection,
+        },
+      )
+    },
+    [selection, setItems],
+  )
 
   const {
     handleCanvasPointerDown,
@@ -366,6 +409,13 @@ function CanvasApp() {
         />
       ) : null}
 
+      <CanvasObjectInspector
+        bounds={inspectorBounds}
+        disabled={inspectorDisabled}
+        label={inspectorLabel}
+        onChangeBounds={updateSelectionBounds}
+      />
+
       {canvasAffordanceConfig.overlays.status ? (
         <CanvasStatus
           gesture={gesture}
@@ -376,6 +426,32 @@ function CanvasApp() {
       ) : null}
     </main>
   )
+}
+
+function getInspectorLabel(items: CanvasItem[], selectionLength: number) {
+  if (selectionLength === 0) {
+    return null
+  }
+
+  if (selectionLength > 1) {
+    return `${selectionLength} selected`
+  }
+
+  const [item] = items
+
+  if (!item) {
+    return null
+  }
+
+  if (item.type === 'component') {
+    return capitalize(item.component)
+  }
+
+  return capitalize(item.type)
+}
+
+function capitalize(value: string) {
+  return `${value.slice(0, 1).toUpperCase()}${value.slice(1)}`
 }
 
 export default CanvasApp

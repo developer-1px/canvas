@@ -220,6 +220,7 @@
 .toolbar,
 .component-palette,
 .zoom-controls,
+.object-inspector,
 .canvas-status {
   position: absolute;
   z-index: 3;
@@ -251,6 +252,56 @@
   left: 14px;
   bottom: 14px;
   align-items: center;
+}
+
+.object-inspector {
+  top: 104px;
+  right: 14px;
+  display: grid;
+  width: 188px;
+  gap: 8px;
+  padding: 8px;
+}
+
+.inspector-header {
+  overflow: hidden;
+  color: #374151;
+  font: 700 12px/1 var(--sans);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.inspector-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.inspector-field {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr);
+  align-items: center;
+  gap: 4px;
+  color: #4b5563;
+  font: 700 11px/1 var(--sans);
+}
+
+.inspector-field input {
+  width: 100%;
+  height: 28px;
+  min-width: 0;
+  padding: 0 5px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  color: #111827;
+  background: #ffffff;
+  font: 650 12px/1 var(--sans);
+  font-variant-numeric: tabular-nums;
+}
+
+.inspector-field input:disabled {
+  color: #9ca3af;
+  background: #f3f4f6;
 }
 
 .canvas-status {
@@ -344,6 +395,7 @@
 .tool-button:focus-visible,
 .component-button:focus-visible,
 .zoom-value:focus-visible,
+.inspector-field input:focus-visible,
 .text-editor:focus-visible {
   outline: 2px solid #2563eb;
   outline-offset: 2px;
@@ -390,6 +442,15 @@
   .zoom-controls {
     left: 10px;
     bottom: 10px;
+  }
+
+  .object-inspector {
+    top: auto;
+    right: 10px;
+    bottom: 108px;
+    left: 10px;
+    width: auto;
+    max-width: 340px;
   }
 
   .canvas-status {
