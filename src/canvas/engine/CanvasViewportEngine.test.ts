@@ -19,7 +19,7 @@ const baseWheel: CanvasWheelInput = {
 }
 
 describe('CanvasViewportEngine', () => {
-  test('uses wheel delta as 1.5x pan offset for trackpads', () => {
+  test('uses wheel delta as 0.9x pan offset for trackpads', () => {
     expect(
       getCanvasWheelViewport({
         config,
@@ -31,7 +31,7 @@ describe('CanvasViewportEngine', () => {
         point: { x: 100, y: 100 },
         viewport,
       }),
-    ).toEqual({ x: -15, y: -30, scale: 1 })
+    ).toEqual({ x: -9, y: -18, scale: 1 })
   })
 
   test('uses pinch wheel input as 1.5x zoom around the pointer', () => {

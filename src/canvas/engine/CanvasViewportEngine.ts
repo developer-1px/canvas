@@ -10,7 +10,8 @@ export type CanvasWheelInput = {
   shiftKey: boolean
 }
 
-const WHEEL_DELTA_MULTIPLIER = 1.5
+const WHEEL_PAN_MULTIPLIER = 0.9
+const WHEEL_ZOOM_MULTIPLIER = 1.5
 const WHEEL_LINE_DELTA = 16
 const WHEEL_PAGE_DELTA = 800
 const WHEEL_ZOOM_SENSITIVITY = 0.001
@@ -50,7 +51,7 @@ export function getCanvasWheelViewport({
 
   if (isPinchWheelInput(input)) {
     const multiplier = Math.exp(
-      -delta.y * WHEEL_ZOOM_SENSITIVITY * WHEEL_DELTA_MULTIPLIER,
+      -delta.y * WHEEL_ZOOM_SENSITIVITY * WHEEL_ZOOM_MULTIPLIER,
     )
 
     return zoomViewport(viewport, point, multiplier)
@@ -60,8 +61,8 @@ export function getCanvasWheelViewport({
 
   return {
     ...viewport,
-    x: viewport.x - panDelta.x * WHEEL_DELTA_MULTIPLIER,
-    y: viewport.y - panDelta.y * WHEEL_DELTA_MULTIPLIER,
+    x: viewport.x - panDelta.x * WHEEL_PAN_MULTIPLIER,
+    y: viewport.y - panDelta.y * WHEEL_PAN_MULTIPLIER,
   }
 }
 
