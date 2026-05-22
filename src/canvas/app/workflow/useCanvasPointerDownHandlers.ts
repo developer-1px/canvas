@@ -54,7 +54,6 @@ type UseCanvasPointerDownHandlersArgs = {
   setGesture: Dispatch<SetStateAction<Interaction['kind']>>
   setItems: CommitCanvasItems
   setLiveItems: Dispatch<SetStateAction<CanvasItem[]>>
-  setMarquee: Dispatch<SetStateAction<Bounds | null>>
   setSelection: Dispatch<SetStateAction<string[]>>
   setTool: Dispatch<SetStateAction<Tool>>
   spaceDown: boolean
@@ -78,7 +77,6 @@ export function useCanvasPointerDownHandlers({
   setGesture,
   setItems,
   setLiveItems,
-  setMarquee,
   setSelection,
   setTool,
   spaceDown,
@@ -189,7 +187,6 @@ export function useCanvasPointerDownHandlers({
       baseSelection: selection,
       moved: false,
     }
-    setMarquee(normalizeBounds(startWorld, startWorld))
     setGesture('marquee')
   }
 

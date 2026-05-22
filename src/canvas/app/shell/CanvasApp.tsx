@@ -226,7 +226,6 @@ function CanvasApp() {
     setGesture,
     setItems,
     setLiveItems,
-    setMarquee,
     setSelection,
     setTool,
     spaceDown,
