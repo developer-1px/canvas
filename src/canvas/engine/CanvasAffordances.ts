@@ -1,12 +1,20 @@
 import type { CanvasInteractionKind, Tool } from './CanvasPrimitives'
 
 export type CanvasCommandId =
+  | 'alignBottom'
+  | 'alignCenter'
+  | 'alignLeft'
+  | 'alignMiddle'
+  | 'alignRight'
+  | 'alignTop'
   | 'bringForward'
   | 'bringToFront'
   | 'copy'
   | 'cut'
   | 'delete'
   | 'duplicate'
+  | 'distributeHorizontal'
+  | 'distributeVertical'
   | 'fitView'
   | 'group'
   | 'lockSelection'
@@ -130,12 +138,26 @@ export const CANVAS_TOOL_AFFORDANCES = {
 >
 
 export const CANVAS_COMMAND_AFFORDANCES = {
+  alignBottom: { ariaLabel: 'Align bottom', title: 'Align bottom' },
+  alignCenter: { ariaLabel: 'Align center', title: 'Align center' },
+  alignLeft: { ariaLabel: 'Align left', title: 'Align left' },
+  alignMiddle: { ariaLabel: 'Align middle', title: 'Align middle' },
+  alignRight: { ariaLabel: 'Align right', title: 'Align right' },
+  alignTop: { ariaLabel: 'Align top', title: 'Align top' },
   bringForward: { ariaLabel: 'Bring forward', title: 'Bring forward' },
   bringToFront: { ariaLabel: 'Bring to front', title: 'Bring to front' },
   copy: { ariaLabel: 'Copy', title: 'Copy' },
   cut: { ariaLabel: 'Cut', title: 'Cut' },
   delete: { ariaLabel: 'Delete', title: 'Delete' },
   duplicate: { ariaLabel: 'Duplicate', title: 'Duplicate' },
+  distributeHorizontal: {
+    ariaLabel: 'Distribute horizontally',
+    title: 'Distribute horizontally',
+  },
+  distributeVertical: {
+    ariaLabel: 'Distribute vertically',
+    title: 'Distribute vertically',
+  },
   fitView: { ariaLabel: 'Fit view', title: 'Fit view' },
   group: { ariaLabel: 'Group', title: 'Group' },
   lockSelection: { ariaLabel: 'Lock selection', title: 'Lock selection' },
@@ -177,12 +199,20 @@ export function createCanvasAffordanceConfig(
   return {
     commands: mergeFeatureGroup(
       {
+        alignBottom: true,
+        alignCenter: true,
+        alignLeft: true,
+        alignMiddle: true,
+        alignRight: true,
+        alignTop: true,
         copy: true,
         bringForward: true,
         bringToFront: true,
         cut: true,
         delete: true,
         duplicate: true,
+        distributeHorizontal: true,
+        distributeVertical: true,
         fitView: true,
         group: true,
         lockSelection: true,

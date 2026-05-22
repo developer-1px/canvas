@@ -140,10 +140,12 @@ function CanvasApp() {
   }, [])
 
   const {
+    alignSelection,
     cloneItems,
     copySelection,
     cutSelection,
     deleteSelection,
+    distributeSelection,
     duplicateSelection,
     groupSelection,
     lockSelection,
@@ -277,7 +279,9 @@ function CanvasApp() {
         <CanvasToolbar
           canDelete={commandAvailability.delete}
           canDuplicate={commandAvailability.duplicate}
+          canDistribute={selection.length > 2}
           canGroup={commandAvailability.group}
+          canAlign={selection.length > 1}
           canLock={commandAvailability.lockSelection}
           canUngroup={commandAvailability.ungroup}
           canRedo={commandAvailability.redo}
@@ -285,6 +289,8 @@ function CanvasApp() {
           config={canvasAffordanceConfig}
           tool={tool}
           onDelete={deleteSelection}
+          onAlign={alignSelection}
+          onDistribute={distributeSelection}
           onDuplicate={duplicateSelection}
           onGroup={groupSelection}
           onLock={lockSelection}

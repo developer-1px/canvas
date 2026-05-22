@@ -14,6 +14,18 @@ export type CanvasCommandItemsResult<TItem extends CanvasCommandItem> = {
   selection: string[]
 }
 
+export type CanvasAlignMode =
+  | 'alignBottom'
+  | 'alignCenter'
+  | 'alignLeft'
+  | 'alignMiddle'
+  | 'alignRight'
+  | 'alignTop'
+
+export type CanvasDistributeMode =
+  | 'distributeHorizontal'
+  | 'distributeVertical'
+
 export type CanvasReorderMode =
   | 'bringForward'
   | 'bringToFront'
@@ -21,6 +33,11 @@ export type CanvasReorderMode =
   | 'sendToBack'
 
 export type CanvasCommandAdapter<TItem extends CanvasCommandItem> = {
+  alignSelection: (input: {
+    items: TItem[]
+    mode: CanvasAlignMode
+    selection: string[]
+  }) => TItem[]
   cloneSelection: (input: {
     createId: (prefix: string) => string
     ids: string[]
@@ -34,6 +51,11 @@ export type CanvasCommandAdapter<TItem extends CanvasCommandItem> = {
     items: TItem[]
     selection: string[]
   }) => CanvasCommandItemsResult<TItem>
+  distributeSelection: (input: {
+    items: TItem[]
+    mode: CanvasDistributeMode
+    selection: string[]
+  }) => TItem[]
   lockSelection: (input: {
     items: TItem[]
     selection: string[]
@@ -66,10 +88,18 @@ export type CanvasCommandAdapter<TItem extends CanvasCommandItem> = {
 }
 
 export type CanvasCommandAvailability = {
+  alignBottom: boolean
+  alignCenter: boolean
+  alignLeft: boolean
+  alignMiddle: boolean
+  alignRight: boolean
+  alignTop: boolean
   bringForward: boolean
   bringToFront: boolean
   delete: boolean
   duplicate: boolean
+  distributeHorizontal: boolean
+  distributeVertical: boolean
   group: boolean
   lockSelection: boolean
   redo: boolean
@@ -117,12 +147,23 @@ export function getCanvasCommandAvailability({
   selection: string[]
 }): CanvasCommandAvailability {
   const hasSelection = selection.length > 0
+  const canAlign = selection.length > 1
+  const canDistribute = selection.length > 2
 
   return {
+    alignBottom: config.commands.alignBottom && canAlign,
+    alignCenter: config.commands.alignCenter && canAlign,
+    alignLeft: config.commands.alignLeft && canAlign,
+    alignMiddle: config.commands.alignMiddle && canAlign,
+    alignRight: config.commands.alignRight && canAlign,
+    alignTop: config.commands.alignTop && canAlign,
     bringForward: config.commands.bringForward && hasSelection,
     bringToFront: config.commands.bringToFront && hasSelection,
     delete: config.commands.delete && hasSelection,
     duplicate: config.commands.duplicate && hasSelection,
+    distributeHorizontal:
+      config.commands.distributeHorizontal && canDistribute,
+    distributeVertical: config.commands.distributeVertical && canDistribute,
     group: config.commands.group && selection.length > 1,
     lockSelection: config.commands.lockSelection && hasSelection,
     redo: config.commands.redo && canRedo,
@@ -132,6 +173,52 @@ export function getCanvasCommandAvailability({
     undo: config.commands.undo && canUndo,
     ungroup: config.commands.ungroup && hasSelectedGroup,
     unlockAll: config.commands.unlockAll,
+  }
+}
+
+export function alignCanvasCommand<TItem extends CanvasCommandItem>({
+  adapter,
+  config,
+  items,
+  mode,
+  selection,
+}: {
+  adapter: CanvasCommandAdapter<TItem>
+  config: CanvasAffordanceConfig
+  items: TItem[]
+  mode: CanvasAlignMode
+  selection: string[]
+}): CanvasCommandItemsResult<TItem> | null {
+  if (!config.commands[mode] || selection.length < 2) {
+    return null
+  }
+
+  return {
+    items: adapter.alignSelection({ items, mode, selection }),
+    selection,
+  }
+}
+
+export function distributeCanvasCommand<TItem extends CanvasCommandItem>({
+  adapter,
+  config,
+  items,
+  mode,
+  selection,
+}: {
+  adapter: CanvasCommandAdapter<TItem>
+  config: CanvasAffordanceConfig
+  items: TItem[]
+  mode: CanvasDistributeMode
+  selection: string[]
+}): CanvasCommandItemsResult<TItem> | null {
+  if (!config.commands[mode] || selection.length < 3) {
+    return null
+  }
+
+  return {
+    items: adapter.distributeSelection({ items, mode, selection }),
+    selection,
   }
 }
 

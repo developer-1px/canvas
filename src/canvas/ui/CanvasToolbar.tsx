@@ -1,4 +1,8 @@
 import type { ReactNode } from 'react'
+import type {
+  CanvasAlignMode,
+  CanvasDistributeMode,
+} from '../engine/CanvasCommandEngine'
 import {
   CANVAS_COMMAND_AFFORDANCES,
   CANVAS_TOOL_AFFORDANCES,
@@ -6,7 +10,15 @@ import {
 } from '../engine/CanvasAffordances'
 import type { Tool } from '../engine/CanvasPrimitives'
 import {
+  AlignBottomIcon,
+  AlignCenterIcon,
+  AlignLeftIcon,
+  AlignMiddleIcon,
+  AlignRightIcon,
+  AlignTopIcon,
   DeleteIcon,
+  DistributeHorizontalIcon,
+  DistributeVerticalIcon,
   DuplicateIcon,
   GroupIcon,
   LockIcon,
@@ -21,7 +33,9 @@ import {
 } from './CanvasIcons'
 
 type CanvasToolbarProps = {
+  canAlign: boolean
   canDelete: boolean
+  canDistribute: boolean
   canDuplicate: boolean
   canGroup: boolean
   canLock: boolean
@@ -30,7 +44,9 @@ type CanvasToolbarProps = {
   canUngroup: boolean
   config: CanvasAffordanceConfig
   tool: Tool
+  onAlign: (mode: CanvasAlignMode) => void
   onDelete: () => void
+  onDistribute: (mode: CanvasDistributeMode) => void
   onDuplicate: () => void
   onGroup: () => void
   onLock: () => void
@@ -42,7 +58,9 @@ type CanvasToolbarProps = {
 }
 
 export function CanvasToolbar({
+  canAlign,
   canDelete,
+  canDistribute,
   canDuplicate,
   canGroup,
   canLock,
@@ -51,7 +69,9 @@ export function CanvasToolbar({
   canUngroup,
   config,
   tool,
+  onAlign,
   onDelete,
+  onDistribute,
   onDuplicate,
   onGroup,
   onLock,
@@ -66,6 +86,15 @@ export function CanvasToolbar({
     config.commands.duplicate || config.commands.delete
   const hasGroupingCommands = config.commands.group || config.commands.ungroup
   const hasLockCommands = config.commands.lockSelection || config.commands.unlockAll
+  const hasAlignmentCommands =
+    config.commands.alignLeft ||
+    config.commands.alignCenter ||
+    config.commands.alignRight ||
+    config.commands.alignTop ||
+    config.commands.alignMiddle ||
+    config.commands.alignBottom ||
+    config.commands.distributeHorizontal ||
+    config.commands.distributeVertical
 
   return (
     <div className="toolbar" role="toolbar" aria-label="Tools">
@@ -184,6 +213,80 @@ export function CanvasToolbar({
         </button>
       ) : null}
 
+      {hasAlignmentCommands ? <ToolbarDivider /> : null}
+      {config.commands.alignLeft ? (
+        <CommandButton
+          command="alignLeft"
+          disabled={!canAlign}
+          onClick={() => onAlign('alignLeft')}
+        >
+          <AlignLeftIcon />
+        </CommandButton>
+      ) : null}
+      {config.commands.alignCenter ? (
+        <CommandButton
+          command="alignCenter"
+          disabled={!canAlign}
+          onClick={() => onAlign('alignCenter')}
+        >
+          <AlignCenterIcon />
+        </CommandButton>
+      ) : null}
+      {config.commands.alignRight ? (
+        <CommandButton
+          command="alignRight"
+          disabled={!canAlign}
+          onClick={() => onAlign('alignRight')}
+        >
+          <AlignRightIcon />
+        </CommandButton>
+      ) : null}
+      {config.commands.alignTop ? (
+        <CommandButton
+          command="alignTop"
+          disabled={!canAlign}
+          onClick={() => onAlign('alignTop')}
+        >
+          <AlignTopIcon />
+        </CommandButton>
+      ) : null}
+      {config.commands.alignMiddle ? (
+        <CommandButton
+          command="alignMiddle"
+          disabled={!canAlign}
+          onClick={() => onAlign('alignMiddle')}
+        >
+          <AlignMiddleIcon />
+        </CommandButton>
+      ) : null}
+      {config.commands.alignBottom ? (
+        <CommandButton
+          command="alignBottom"
+          disabled={!canAlign}
+          onClick={() => onAlign('alignBottom')}
+        >
+          <AlignBottomIcon />
+        </CommandButton>
+      ) : null}
+      {config.commands.distributeHorizontal ? (
+        <CommandButton
+          command="distributeHorizontal"
+          disabled={!canDistribute}
+          onClick={() => onDistribute('distributeHorizontal')}
+        >
+          <DistributeHorizontalIcon />
+        </CommandButton>
+      ) : null}
+      {config.commands.distributeVertical ? (
+        <CommandButton
+          command="distributeVertical"
+          disabled={!canDistribute}
+          onClick={() => onDistribute('distributeVertical')}
+        >
+          <DistributeVerticalIcon />
+        </CommandButton>
+      ) : null}
+
       {hasLockCommands ? <ToolbarDivider /> : null}
       {config.commands.lockSelection ? (
         <button
@@ -242,4 +345,31 @@ function ToolButton({
 
 function ToolbarDivider() {
   return <span className="toolbar-divider" aria-hidden="true" />
+}
+
+function CommandButton({
+  children,
+  command,
+  disabled,
+  onClick,
+}: {
+  children: ReactNode
+  command: keyof typeof CANVAS_COMMAND_AFFORDANCES
+  disabled: boolean
+  onClick: () => void
+}) {
+  const affordance = CANVAS_COMMAND_AFFORDANCES[command]
+
+  return (
+    <button
+      type="button"
+      className="tool-button"
+      disabled={disabled}
+      aria-label={affordance.ariaLabel}
+      title={affordance.title}
+      onClick={onClick}
+    >
+      {children}
+    </button>
+  )
 }

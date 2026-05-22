@@ -7,10 +7,12 @@ import {
 } from 'react'
 import {
   CANVAS_COMMAND_INSERT_OFFSET,
+  alignCanvasCommand,
   cloneCanvasCommandItems,
   copyCanvasCommand,
   cutCanvasCommand,
   deleteCanvasCommand,
+  distributeCanvasCommand,
   duplicateCanvasCommand,
   groupCanvasCommand,
   lockCanvasCommand,
@@ -20,7 +22,9 @@ import {
   selectAllCanvasCommand,
   ungroupCanvasCommand,
   unlockAllCanvasCommand,
+  type CanvasAlignMode,
   type CanvasCommandAdapter,
+  type CanvasDistributeMode,
   type CanvasReorderMode,
 } from '../../engine/CanvasCommandEngine'
 import type { CanvasAffordanceConfig } from '../../engine/CanvasAffordances'
@@ -60,6 +64,52 @@ export function useCanvasCommands({
 }: UseCanvasCommandsArgs) {
   const clipboardRef = useRef<CanvasItem[]>([])
   const pasteIndexRef = useRef(0)
+
+  const alignSelection = useCallback(
+    (mode: CanvasAlignMode) => {
+      const result = alignCanvasCommand({
+        adapter: commandAdapter,
+        config,
+        items,
+        mode,
+        selection,
+      })
+
+      if (!result) {
+        return
+      }
+
+      setItems(result.items, {
+        before: selection,
+        after: result.selection,
+      })
+      setSelection(result.selection)
+    },
+    [commandAdapter, config, items, selection, setItems, setSelection],
+  )
+
+  const distributeSelection = useCallback(
+    (mode: CanvasDistributeMode) => {
+      const result = distributeCanvasCommand({
+        adapter: commandAdapter,
+        config,
+        items,
+        mode,
+        selection,
+      })
+
+      if (!result) {
+        return
+      }
+
+      setItems(result.items, {
+        before: selection,
+        after: result.selection,
+      })
+      setSelection(result.selection)
+    },
+    [commandAdapter, config, items, selection, setItems, setSelection],
+  )
 
   const cloneItems = useCallback(
     (ids: string[], offset: Point) =>
@@ -370,10 +420,12 @@ export function useCanvasCommands({
   }, [commandAdapter, config, items, setSelection])
 
   return {
+    alignSelection,
     cloneItems,
     copySelection,
     cutSelection,
     deleteSelection,
+    distributeSelection,
     duplicateSelection,
     groupSelection,
     lockSelection,

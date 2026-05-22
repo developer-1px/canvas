@@ -4,6 +4,12 @@ export {
   copyCanvasSelection,
 } from './operations/CanvasItemCloneOperations'
 export {
+  alignCanvasSelection,
+  distributeCanvasSelection,
+  type CanvasAlignMode,
+  type CanvasDistributeMode,
+} from './operations/CanvasItemAlignmentOperations'
+export {
   groupCanvasSelection,
   ungroupCanvasSelection,
 } from './operations/CanvasItemGroupOperations'

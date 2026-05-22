@@ -89,6 +89,86 @@ export function UngroupIcon() {
   )
 }
 
+export function AlignLeftIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M5 5v14" />
+      <rect x="8" y="6" width="10" height="4" rx="1" />
+      <rect x="8" y="14" width="7" height="4" rx="1" />
+    </svg>
+  )
+}
+
+export function AlignCenterIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 5v14" />
+      <rect x="7" y="6" width="10" height="4" rx="1" />
+      <rect x="8.5" y="14" width="7" height="4" rx="1" />
+    </svg>
+  )
+}
+
+export function AlignRightIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M19 5v14" />
+      <rect x="6" y="6" width="10" height="4" rx="1" />
+      <rect x="9" y="14" width="7" height="4" rx="1" />
+    </svg>
+  )
+}
+
+export function AlignTopIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M5 5h14" />
+      <rect x="6" y="8" width="4" height="10" rx="1" />
+      <rect x="14" y="8" width="4" height="7" rx="1" />
+    </svg>
+  )
+}
+
+export function AlignMiddleIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M5 12h14" />
+      <rect x="6" y="7" width="4" height="10" rx="1" />
+      <rect x="14" y="8.5" width="4" height="7" rx="1" />
+    </svg>
+  )
+}
+
+export function AlignBottomIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M5 19h14" />
+      <rect x="6" y="6" width="4" height="10" rx="1" />
+      <rect x="14" y="9" width="4" height="7" rx="1" />
+    </svg>
+  )
+}
+
+export function DistributeHorizontalIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 5v14M20 5v14" />
+      <rect x="7" y="8" width="3" height="8" rx="1" />
+      <rect x="14" y="8" width="3" height="8" rx="1" />
+    </svg>
+  )
+}
+
+export function DistributeVerticalIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M5 4h14M5 20h14" />
+      <rect x="8" y="7" width="8" height="3" rx="1" />
+      <rect x="8" y="14" width="8" height="3" rx="1" />
+    </svg>
+  )
+}
+
 export function LockIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
