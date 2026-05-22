@@ -16,8 +16,7 @@ history, validation, and document selection state.
   restore selection without changing item content.
 - Canvas converts between geometric item ids and JSON Pointers at the document
   boundary.
-- Canvas command availability and z-order are still implemented in the canvas
-  command engine.
+- Canvas command availability is still implemented in the canvas command engine.
 - Canvas copy/paste/cut use zod-crud `doc.clipboard` for clipboard payload
   storage while canvas keeps id rekey and paste offset policy.
 - Canvas duplicate commits cloned items through zod-crud `add` patches.
@@ -33,15 +32,17 @@ history, validation, and document selection state.
   `replace` patch batches for changed item subtrees.
 - Group and ungroup commands commit zod-crud structural `remove`/`add` patch
   batches instead of replacing the root item array.
+- Z-order commands commit zod-crud `move` patch batches instead of replacing
+  the root item array.
 
 This is an intermediate state. Canvas is no longer applyPatch-only. Item
 creation, paste, and duplicate commits now use zod-crud `add` patches, text
 edits use text field patches, inspector geometry and simple geometry/property
 commands use item subtree `replace` patches, group and ungroup use structural
 `remove`/`add` patches, and selection delete commits use zod-crud `remove`
-patches with group-bound repair patches when needed. Z-order still produces
-`CanvasItem[]` and commits as a root document replacement. The next migration
-step is to make z-order produce zod-crud patch batches.
+patches with group-bound repair patches when needed. Pointer drag/resize commit
+still records a root document replacement after live preview; the next migration
+step is to make pointer transform history produce zod-crud patch batches.
 
 ## Changelog Impact
 
@@ -94,14 +95,14 @@ and document selection state.
 Current migration scope: history, validation, selection ownership, item creation
 patches, duplicate patches, selection delete patches, zod-crud-backed clipboard
 payloads, and zod-crud-backed find/replace, text-edit, inspector geometry,
-align, distribute, lock, unlock, nudge, group, and ungroup patch helpers.
-Generic command availability stays app-owned until command patch planning is
-introduced.
+align, distribute, lock, unlock, nudge, group, ungroup, and z-order patch
+helpers. Generic command availability stays app-owned until command patch
+planning is introduced.
 
 ## Suggested Local Work Items
 
 - Replace command `nextItems` producers with patch planners.
-- Replace z-order with patch planners.
+- Replace pointer transform history with patch planners.
 
 ## Verification
 

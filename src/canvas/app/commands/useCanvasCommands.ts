@@ -26,6 +26,7 @@ import type { CanvasItem, EditingText } from '../../host/model/CanvasModel'
 import {
   createGroupCanvasItemsPatch,
   createRemoveCanvasItemsPatch,
+  createReorderCanvasItemsPatch,
   createReplaceChangedCanvasItemsPatch,
   createUngroupCanvasItemsPatch,
 } from '../../host/document/CanvasDocumentPatches'
@@ -33,7 +34,6 @@ import { useCanvasClipboardCommands } from './useCanvasClipboardCommands'
 import type {
   CanvasDocumentClipboard,
   CommitCanvasSelection,
-  CommitCanvasItems,
   CommitCanvasItemsPatch,
 } from '../document/useCanvasDocument'
 
@@ -50,7 +50,6 @@ type UseCanvasCommandsArgs = {
   selection: string[]
   setEditing: Dispatch<SetStateAction<EditingText | null>>
   setClipboardItems: CanvasDocumentClipboard['setClipboardItems']
-  setItems: CommitCanvasItems
   setSelection: Dispatch<SetStateAction<string[]>>
   svgRef: RefObject<SVGSVGElement | null>
   undo: () => string[] | undefined
@@ -70,7 +69,6 @@ export function useCanvasCommands({
   selection,
   setEditing,
   setClipboardItems,
-  setItems,
   setSelection,
   svgRef,
   undo,
@@ -352,13 +350,12 @@ export function useCanvasCommands({
         return
       }
 
-      setItems(result.items, {
+      commitItemsPatch(createReorderCanvasItemsPatch(items, selection, mode), {
         before: selection,
         after: result.selection,
       })
-      setSelection(result.selection)
     },
-    [commandAdapter, config, items, selection, setItems, setSelection],
+    [commandAdapter, commitItemsPatch, config, items, selection],
   )
 
   const selectAll = useCallback(() => {

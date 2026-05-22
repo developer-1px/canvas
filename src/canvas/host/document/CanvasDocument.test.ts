@@ -29,6 +29,7 @@ import {
   createAddCanvasItemsPatch,
   createGroupCanvasItemsPatch,
   createRemoveCanvasItemsPatch,
+  createReorderCanvasItemsPatch,
   createReplaceChangedCanvasItemsPatch,
   createResizeCanvasItemsPatch,
   createSetCanvasItemTextPatch,
@@ -644,6 +645,56 @@ describe('CanvasDocument history', () => {
     }])
   })
 
+  test('commits z-order changes as zod-crud move patches', () => {
+    const items: CanvasItem[] = [
+      rectItem('a'),
+      rectItem('b'),
+      rectItem('c'),
+      rectItem('d'),
+    ]
+    const document = createCanvasItemsDocument(items, {
+      selection: ['b', 'd'],
+    })
+    const patch = createReorderCanvasItemsPatch(
+      items,
+      ['b', 'd'],
+      'bringForward',
+    )
+
+    expect(patch).toEqual([{
+      op: 'move',
+      from: '/2',
+      path: '/1',
+    }])
+    expect(
+      commitCanvasItemsPatch({
+        document,
+        patch,
+        selection: {
+          before: ['b', 'd'],
+          after: ['b', 'd'],
+        },
+      }),
+    ).toBe(true)
+
+    expect(document.value.map((item) => item.id)).toEqual([
+      'a',
+      'c',
+      'b',
+      'd',
+    ])
+    expect(getCanvasDocumentSelectionIds(document)).toEqual(['b', 'd'])
+
+    expect(document.history.undo()).toBe(true)
+    expect(document.value.map((item) => item.id)).toEqual([
+      'a',
+      'b',
+      'c',
+      'd',
+    ])
+    expect(getCanvasDocumentSelectionIds(document)).toEqual(['b', 'd'])
+  })
+
   test('round-trips document selection through JSON pointers', () => {
     const grouped = groupCanvasSelection(
       INITIAL_ITEMS,
@@ -665,3 +716,16 @@ describe('CanvasDocument history', () => {
     ])
   })
 })
+
+function rectItem(id: string): CanvasItem {
+  return {
+    fill: '#ffffff',
+    h: 40,
+    id,
+    stroke: '#111111',
+    type: 'rect',
+    w: 40,
+    x: 0,
+    y: 0,
+  }
+}
