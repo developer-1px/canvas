@@ -18,6 +18,7 @@ type UseCanvasKeyboardShortcutsArgs = {
   fitToItems: (ids?: string[]) => void
   groupSelection: () => void
   interactionRef: MutableRefObject<Interaction>
+  lockSelection: () => void
   moveSelection: (dx: number, dy: number) => void
   pasteSelection: () => void
   redoHistory: () => void
@@ -35,6 +36,7 @@ type UseCanvasKeyboardShortcutsArgs = {
   setTool: Dispatch<SetStateAction<Tool>>
   undoHistory: () => void
   ungroupSelection: () => void
+  unlockAll: () => void
 }
 
 function isTypingTarget(target: EventTarget | null) {
@@ -54,6 +56,7 @@ export function useCanvasKeyboardShortcuts({
   fitToItems,
   groupSelection,
   interactionRef,
+  lockSelection,
   moveSelection,
   pasteSelection,
   redoHistory,
@@ -69,6 +72,7 @@ export function useCanvasKeyboardShortcuts({
   setTool,
   undoHistory,
   ungroupSelection,
+  unlockAll,
 }: UseCanvasKeyboardShortcutsArgs) {
   useEffect(() => {
     function handleKeyDown(event: globalThis.KeyboardEvent) {
@@ -159,6 +163,24 @@ export function useCanvasKeyboardShortcuts({
       if (mod && key === 'd' && config.shortcuts.duplicate) {
         event.preventDefault()
         duplicateSelection()
+        return
+      }
+
+      if (
+        mod &&
+        key === 'l' &&
+        (event.shiftKey
+          ? config.shortcuts.unlockAll
+          : config.shortcuts.lockSelection)
+      ) {
+        event.preventDefault()
+
+        if (event.shiftKey) {
+          unlockAll()
+        } else {
+          lockSelection()
+        }
+
         return
       }
 
@@ -282,6 +304,7 @@ export function useCanvasKeyboardShortcuts({
     fitToItems,
     groupSelection,
     interactionRef,
+    lockSelection,
     moveSelection,
     pasteSelection,
     redoHistory,
@@ -297,5 +320,6 @@ export function useCanvasKeyboardShortcuts({
     setTool,
     undoHistory,
     ungroupSelection,
+    unlockAll,
   ])
 }

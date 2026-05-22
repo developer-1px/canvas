@@ -7,6 +7,11 @@ export {
   groupCanvasSelection,
   ungroupCanvasSelection,
 } from './operations/CanvasItemGroupOperations'
+export {
+  isCanvasItemLocked,
+  lockCanvasSelection,
+  unlockAllCanvasItems,
+} from './operations/CanvasItemLockOperations'
 export { removeCanvasItems } from './operations/CanvasItemRemovalOperations'
 export {
   resizeCanvasItems,

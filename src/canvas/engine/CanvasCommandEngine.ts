@@ -34,6 +34,10 @@ export type CanvasCommandAdapter<TItem extends CanvasCommandItem> = {
     items: TItem[]
     selection: string[]
   }) => CanvasCommandItemsResult<TItem>
+  lockSelection: (input: {
+    items: TItem[]
+    selection: string[]
+  }) => CanvasCommandItemsResult<TItem>
   pasteItems: (input: {
     clipboard: TItem[]
     createId: (prefix: string) => string
@@ -55,6 +59,10 @@ export type CanvasCommandAdapter<TItem extends CanvasCommandItem> = {
     items: TItem[]
     selection: string[]
   }) => CanvasCommandItemsResult<TItem>
+  unlockAll: (input: {
+    items: TItem[]
+    selection: string[]
+  }) => CanvasCommandItemsResult<TItem>
 }
 
 export type CanvasCommandAvailability = {
@@ -63,12 +71,14 @@ export type CanvasCommandAvailability = {
   delete: boolean
   duplicate: boolean
   group: boolean
+  lockSelection: boolean
   redo: boolean
   selectAll: boolean
   sendBackward: boolean
   sendToBack: boolean
   undo: boolean
   ungroup: boolean
+  unlockAll: boolean
 }
 
 export type DuplicateCanvasCommandResult<TItem extends CanvasCommandItem> =
@@ -114,12 +124,14 @@ export function getCanvasCommandAvailability({
     delete: config.commands.delete && hasSelection,
     duplicate: config.commands.duplicate && hasSelection,
     group: config.commands.group && selection.length > 1,
+    lockSelection: config.commands.lockSelection && hasSelection,
     redo: config.commands.redo && canRedo,
     selectAll: config.commands.selectAll,
     sendBackward: config.commands.sendBackward && hasSelection,
     sendToBack: config.commands.sendToBack && hasSelection,
     undo: config.commands.undo && canUndo,
     ungroup: config.commands.ungroup && hasSelectedGroup,
+    unlockAll: config.commands.unlockAll,
   }
 }
 
@@ -303,6 +315,42 @@ export function ungroupCanvasCommand<TItem extends CanvasCommandItem>({
   }
 
   return result
+}
+
+export function lockCanvasCommand<TItem extends CanvasCommandItem>({
+  adapter,
+  config,
+  items,
+  selection,
+}: {
+  adapter: CanvasCommandAdapter<TItem>
+  config: CanvasAffordanceConfig
+  items: TItem[]
+  selection: string[]
+}): CanvasCommandItemsResult<TItem> | null {
+  if (!config.commands.lockSelection || selection.length === 0) {
+    return null
+  }
+
+  return adapter.lockSelection({ items, selection })
+}
+
+export function unlockAllCanvasCommand<TItem extends CanvasCommandItem>({
+  adapter,
+  config,
+  items,
+  selection,
+}: {
+  adapter: CanvasCommandAdapter<TItem>
+  config: CanvasAffordanceConfig
+  items: TItem[]
+  selection: string[]
+}): CanvasCommandItemsResult<TItem> | null {
+  if (!config.commands.unlockAll) {
+    return null
+  }
+
+  return adapter.unlockAll({ items, selection })
 }
 
 export function cutCanvasCommand<TItem extends CanvasCommandItem>({

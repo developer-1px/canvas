@@ -24,7 +24,8 @@ function isCanvasItem(value: unknown): value is CanvasItem {
     isFiniteNumber(value.x) &&
     isFiniteNumber(value.y) &&
     isFiniteNumber(value.w) &&
-    isFiniteNumber(value.h)
+    isFiniteNumber(value.h) &&
+    (value.locked === undefined || typeof value.locked === 'boolean')
 
   if (!base) {
     return false

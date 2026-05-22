@@ -89,6 +89,24 @@ export function UngroupIcon() {
   )
 }
 
+export function LockIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="6" y="10" width="12" height="9" rx="1.5" />
+      <path d="M9 10V7a3 3 0 0 1 6 0v3" />
+    </svg>
+  )
+}
+
+export function UnlockIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="6" y="10" width="12" height="9" rx="1.5" />
+      <path d="M9 10V7a3 3 0 0 1 5.2-2" />
+    </svg>
+  )
+}
+
 export function MinusIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">

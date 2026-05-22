@@ -28,22 +28,24 @@ export type {
   Viewport,
 } from '../engine/CanvasPrimitives'
 
-export type RectItem = Bounds & {
+type CanvasItemBase = Bounds & {
   id: string
+  locked?: boolean
+}
+
+export type RectItem = CanvasItemBase & {
   type: 'rect'
   fill: string
   stroke: string
   text?: string
 }
 
-export type TextItem = Bounds & {
-  id: string
+export type TextItem = CanvasItemBase & {
   type: 'text'
   text: string
 }
 
-export type GroupItem = Bounds & {
-  id: string
+export type GroupItem = CanvasItemBase & {
   type: 'group'
   children: CanvasItem[]
 }
@@ -60,8 +62,7 @@ export type CanvasComponentKind =
   | 'table'
   | 'vote'
 
-export type CanvasComponentItem = Bounds & {
-  id: string
+export type CanvasComponentItem = CanvasItemBase & {
   type: 'component'
   accent: string
   body?: string

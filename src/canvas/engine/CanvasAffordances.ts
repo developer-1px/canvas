@@ -9,6 +9,7 @@ export type CanvasCommandId =
   | 'duplicate'
   | 'fitView'
   | 'group'
+  | 'lockSelection'
   | 'nudge'
   | 'paste'
   | 'redo'
@@ -17,6 +18,7 @@ export type CanvasCommandId =
   | 'sendToBack'
   | 'undo'
   | 'ungroup'
+  | 'unlockAll'
   | 'zoomIn'
   | 'zoomOut'
   | 'zoomReset'
@@ -60,6 +62,7 @@ export type CanvasShortcutId =
   | 'fitAll'
   | 'fitSelection'
   | 'group'
+  | 'lockSelection'
   | 'nudge'
   | 'panTool'
   | 'paste'
@@ -73,6 +76,7 @@ export type CanvasShortcutId =
   | 'textTool'
   | 'undo'
   | 'ungroup'
+  | 'unlockAll'
 
 export type CanvasAffordanceConfig = {
   commands: Record<CanvasCommandId, boolean>
@@ -134,6 +138,7 @@ export const CANVAS_COMMAND_AFFORDANCES = {
   duplicate: { ariaLabel: 'Duplicate', title: 'Duplicate' },
   fitView: { ariaLabel: 'Fit view', title: 'Fit view' },
   group: { ariaLabel: 'Group', title: 'Group' },
+  lockSelection: { ariaLabel: 'Lock selection', title: 'Lock selection' },
   nudge: { ariaLabel: 'Nudge', title: 'Nudge' },
   paste: { ariaLabel: 'Paste', title: 'Paste' },
   redo: { ariaLabel: 'Redo', title: 'Redo' },
@@ -142,6 +147,7 @@ export const CANVAS_COMMAND_AFFORDANCES = {
   sendToBack: { ariaLabel: 'Send to back', title: 'Send to back' },
   undo: { ariaLabel: 'Undo', title: 'Undo' },
   ungroup: { ariaLabel: 'Ungroup', title: 'Ungroup' },
+  unlockAll: { ariaLabel: 'Unlock all', title: 'Unlock all' },
   zoomIn: { ariaLabel: 'Zoom in', title: 'Zoom in' },
   zoomOut: { ariaLabel: 'Zoom out', title: 'Zoom out' },
   zoomReset: { ariaLabel: 'Reset zoom', title: 'Reset zoom' },
@@ -179,6 +185,7 @@ export function createCanvasAffordanceConfig(
         duplicate: true,
         fitView: true,
         group: true,
+        lockSelection: true,
         nudge: true,
         paste: true,
         redo: true,
@@ -187,6 +194,7 @@ export function createCanvasAffordanceConfig(
         sendToBack: true,
         undo: true,
         ungroup: true,
+        unlockAll: true,
         zoomIn: true,
         zoomOut: true,
         zoomReset: true,
@@ -239,6 +247,7 @@ export function createCanvasAffordanceConfig(
         fitAll: true,
         fitSelection: true,
         group: true,
+        lockSelection: true,
         nudge: true,
         panTool: true,
         paste: true,
@@ -252,6 +261,7 @@ export function createCanvasAffordanceConfig(
         textTool: true,
         undo: true,
         ungroup: true,
+        unlockAll: true,
       },
       overrides.shortcuts,
     ),

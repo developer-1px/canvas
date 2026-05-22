@@ -9,6 +9,7 @@ import {
   DeleteIcon,
   DuplicateIcon,
   GroupIcon,
+  LockIcon,
   PanIcon,
   RedoIcon,
   RectIcon,
@@ -16,12 +17,14 @@ import {
   TextIcon,
   UndoIcon,
   UngroupIcon,
+  UnlockIcon,
 } from './CanvasIcons'
 
 type CanvasToolbarProps = {
   canDelete: boolean
   canDuplicate: boolean
   canGroup: boolean
+  canLock: boolean
   canRedo: boolean
   canUndo: boolean
   canUngroup: boolean
@@ -30,16 +33,19 @@ type CanvasToolbarProps = {
   onDelete: () => void
   onDuplicate: () => void
   onGroup: () => void
+  onLock: () => void
   onRedo: () => void
   onToolChange: (tool: Tool) => void
   onUndo: () => void
   onUngroup: () => void
+  onUnlockAll: () => void
 }
 
 export function CanvasToolbar({
   canDelete,
   canDuplicate,
   canGroup,
+  canLock,
   canRedo,
   canUndo,
   canUngroup,
@@ -48,15 +54,18 @@ export function CanvasToolbar({
   onDelete,
   onDuplicate,
   onGroup,
+  onLock,
   onRedo,
   onToolChange,
   onUndo,
   onUngroup,
+  onUnlockAll,
 }: CanvasToolbarProps) {
   const hasHistoryCommands = config.commands.undo || config.commands.redo
   const hasSelectionCommands =
     config.commands.duplicate || config.commands.delete
   const hasGroupingCommands = config.commands.group || config.commands.ungroup
+  const hasLockCommands = config.commands.lockSelection || config.commands.unlockAll
 
   return (
     <div className="toolbar" role="toolbar" aria-label="Tools">
@@ -172,6 +181,31 @@ export function CanvasToolbar({
           onClick={() => onUngroup()}
         >
           <UngroupIcon />
+        </button>
+      ) : null}
+
+      {hasLockCommands ? <ToolbarDivider /> : null}
+      {config.commands.lockSelection ? (
+        <button
+          type="button"
+          className="tool-button"
+          disabled={!canLock}
+          aria-label={CANVAS_COMMAND_AFFORDANCES.lockSelection.ariaLabel}
+          title={CANVAS_COMMAND_AFFORDANCES.lockSelection.title}
+          onClick={() => onLock()}
+        >
+          <LockIcon />
+        </button>
+      ) : null}
+      {config.commands.unlockAll ? (
+        <button
+          type="button"
+          className="tool-button"
+          aria-label={CANVAS_COMMAND_AFFORDANCES.unlockAll.ariaLabel}
+          title={CANVAS_COMMAND_AFFORDANCES.unlockAll.title}
+          onClick={() => onUnlockAll()}
+        >
+          <UnlockIcon />
         </button>
       ) : null}
     </div>

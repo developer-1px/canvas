@@ -146,6 +146,7 @@ function CanvasApp() {
     deleteSelection,
     duplicateSelection,
     groupSelection,
+    lockSelection,
     moveSelection,
     pasteSelection,
     redoHistory,
@@ -153,6 +154,7 @@ function CanvasApp() {
     selectAll,
     undoHistory,
     ungroupSelection,
+    unlockAll,
   } = useCanvasCommands({
     commandAdapter: CANVAS_ITEM_COMMAND_ADAPTER,
     config: canvasAffordanceConfig,
@@ -180,6 +182,7 @@ function CanvasApp() {
     duplicateSelection,
     fitToItems,
     groupSelection,
+    lockSelection,
     interactionRef,
     moveSelection,
     pasteSelection,
@@ -196,6 +199,7 @@ function CanvasApp() {
     setTool,
     undoHistory,
     ungroupSelection,
+    unlockAll,
   })
 
   const {
@@ -272,6 +276,7 @@ function CanvasApp() {
           canDelete={commandAvailability.delete}
           canDuplicate={commandAvailability.duplicate}
           canGroup={commandAvailability.group}
+          canLock={commandAvailability.lockSelection}
           canUngroup={commandAvailability.ungroup}
           canRedo={commandAvailability.redo}
           canUndo={commandAvailability.undo}
@@ -280,10 +285,12 @@ function CanvasApp() {
           onDelete={deleteSelection}
           onDuplicate={duplicateSelection}
           onGroup={groupSelection}
+          onLock={lockSelection}
           onRedo={redoHistory}
           onToolChange={setTool}
           onUndo={undoHistory}
           onUngroup={ungroupSelection}
+          onUnlockAll={unlockAll}
         />
       ) : null}
 

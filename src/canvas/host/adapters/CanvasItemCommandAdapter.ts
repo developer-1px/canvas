@@ -5,10 +5,12 @@ import {
   cloneCanvasSelection,
   copyCanvasSelection,
   groupCanvasSelection,
+  lockCanvasSelection,
   removeCanvasItems,
   reorderCanvasItems,
   translateCanvasItems,
   ungroupCanvasSelection,
+  unlockAllCanvasItems,
 } from '../CanvasOperations'
 
 export const CANVAS_ITEM_COMMAND_ADAPTER: CanvasCommandAdapter<CanvasItem> = {
@@ -18,6 +20,7 @@ export const CANVAS_ITEM_COMMAND_ADAPTER: CanvasCommandAdapter<CanvasItem> = {
   deleteSelection: ({ items, selection }) => removeCanvasItems(items, selection),
   groupSelection: ({ groupId, items, selection }) =>
     groupCanvasSelection(items, selection, groupId),
+  lockSelection: ({ items, selection }) => lockCanvasSelection(items, selection),
   pasteItems: ({ clipboard, createId, offset }) =>
     cloneCanvasItemsWithNewIds(clipboard, createId, offset),
   nudgeSelection: ({ dx, dy, items, selection }) =>
@@ -27,4 +30,8 @@ export const CANVAS_ITEM_COMMAND_ADAPTER: CanvasCommandAdapter<CanvasItem> = {
   selectAll: ({ items }) => items.map((item) => item.id),
   ungroupSelection: ({ items, selection }) =>
     ungroupCanvasSelection(items, selection),
+  unlockAll: ({ items, selection }) => ({
+    items: unlockAllCanvasItems(items),
+    selection,
+  }),
 }

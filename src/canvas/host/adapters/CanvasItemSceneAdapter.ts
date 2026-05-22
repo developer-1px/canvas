@@ -11,18 +11,34 @@ export function createCanvasItemScene(items: CanvasItem[]): CanvasSceneAdapter {
   const treeEntryByPath = new Map(
     treeEntries.map((entry) => [pathKey(entry.path), entry]),
   )
-  const entries = treeEntries.map((entry): CanvasSceneEntry => ({
-    bounds: getItemBounds(entry.item),
-    id: entry.item.id,
-    isGroup: entry.item.type === 'group',
-    parentId:
-      entry.parentPath.length === 0
-        ? null
-        : treeEntryByPath.get(pathKey(entry.parentPath))?.item.id ?? null,
-    path: entry.path,
-  }))
+  const entries = treeEntries
+    .filter(
+      (entry) =>
+        !entry.item.locked &&
+        !treeEntries.some(
+          (candidate) =>
+            candidate.item.locked && isAncestorPath(candidate.path, entry.path),
+        ),
+    )
+    .map((entry): CanvasSceneEntry => ({
+      bounds: getItemBounds(entry.item),
+      id: entry.item.id,
+      isGroup: entry.item.type === 'group',
+      parentId:
+        entry.parentPath.length === 0
+          ? null
+          : treeEntryByPath.get(pathKey(entry.parentPath))?.item.id ?? null,
+      path: entry.path,
+    }))
 
   return createCanvasSceneAdapter(entries)
+}
+
+function isAncestorPath(parent: number[], child: number[]) {
+  return (
+    parent.length < child.length &&
+    parent.every((segment, index) => segment === child[index])
+  )
 }
 
 function pathKey(path: number[]) {

@@ -1,10 +1,15 @@
 import type { CanvasItem } from '../CanvasModel'
 import { syncGroupBounds } from '../CanvasTree'
+import { isCanvasItemLocked } from './CanvasItemLockOperations'
 
 export function removeCanvasItems(items: CanvasItem[], ids: string[]) {
   const selected = new Set(ids)
 
   return items.flatMap((item): CanvasItem[] => {
+    if (isCanvasItemLocked(item)) {
+      return [item]
+    }
+
     if (selected.has(item.id)) {
       return []
     }

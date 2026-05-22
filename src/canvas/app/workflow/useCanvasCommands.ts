@@ -12,11 +12,13 @@ import {
   deleteCanvasCommand,
   duplicateCanvasCommand,
   groupCanvasCommand,
+  lockCanvasCommand,
   nudgeCanvasCommand,
   pasteCanvasCommand,
   reorderCanvasCommand,
   selectAllCanvasCommand,
   ungroupCanvasCommand,
+  unlockAllCanvasCommand,
   type CanvasCommandAdapter,
   type CanvasReorderMode,
 } from '../../engine/CanvasCommandEngine'
@@ -187,6 +189,44 @@ export function useCanvasCommands({
     setSelection(result.selection)
   }, [commandAdapter, config, items, selection, setItems, setSelection])
 
+  const lockSelection = useCallback(() => {
+    const result = lockCanvasCommand({
+      adapter: commandAdapter,
+      config,
+      items,
+      selection,
+    })
+
+    if (!result) {
+      return
+    }
+
+    setItems(result.items, {
+      before: selection,
+      after: result.selection,
+    })
+    setSelection(result.selection)
+  }, [commandAdapter, config, items, selection, setItems, setSelection])
+
+  const unlockAll = useCallback(() => {
+    const result = unlockAllCanvasCommand({
+      adapter: commandAdapter,
+      config,
+      items,
+      selection,
+    })
+
+    if (!result) {
+      return
+    }
+
+    setItems(result.items, {
+      before: selection,
+      after: result.selection,
+    })
+    setSelection(result.selection)
+  }, [commandAdapter, config, items, selection, setItems, setSelection])
+
   const undoHistory = useCallback(() => {
     if (!config.commands.undo) {
       return
@@ -310,6 +350,7 @@ export function useCanvasCommands({
     deleteSelection,
     duplicateSelection,
     groupSelection,
+    lockSelection,
     moveSelection,
     pasteSelection,
     redoHistory,
@@ -317,5 +358,6 @@ export function useCanvasCommands({
     selectAll,
     undoHistory,
     ungroupSelection,
+    unlockAll,
   }
 }

@@ -9,6 +9,7 @@ import {
   syncGroupBounds,
 } from '../CanvasTree'
 import { mapCanvasItems } from './CanvasItemOperationTree'
+import { isCanvasItemLocked } from './CanvasItemLockOperations'
 
 export function translateCanvasItems(
   items: CanvasItem[],
@@ -19,7 +20,9 @@ export function translateCanvasItems(
   const selected = new Set(pruneNestedSelection(items, ids))
 
   return mapCanvasItems(items, (item) =>
-    selected.has(item.id) ? translateCanvasItem(item, dx, dy) : item,
+    selected.has(item.id) && !isCanvasItemLocked(item)
+      ? translateCanvasItem(item, dx, dy)
+      : item,
   )
 }
 
@@ -32,7 +35,9 @@ export function resizeCanvasItems(
   const selected = new Set(pruneNestedSelection(items, ids))
 
   return mapCanvasItems(items, (item) =>
-    selected.has(item.id) ? scaleCanvasItem(item, from, to) : item,
+    selected.has(item.id) && !isCanvasItemLocked(item)
+      ? scaleCanvasItem(item, from, to)
+      : item,
   )
 }
 
