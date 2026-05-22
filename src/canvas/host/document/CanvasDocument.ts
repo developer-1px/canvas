@@ -70,46 +70,6 @@ export function createCanvasItemsDocument(
   return document
 }
 
-export function commitCanvasItemsDocument({
-  document,
-  nextItems,
-  selection,
-}: {
-  document: CanvasItemsDocument
-  nextItems: CanvasItem[]
-  selection?: {
-    after: CanvasSelectionIds
-    before: CanvasSelectionIds
-  }
-}) {
-  const next = validateCanvasItems(nextItems)
-
-  if (canvasItemsEqual(document.value, next)) {
-    return false
-  }
-
-  if (selection) {
-    restoreCanvasDocumentSelection(document, selection.before, document.value)
-  }
-
-  const result = document.commit(
-    [{ op: 'replace', path: '', value: next }],
-    selection
-      ? {
-          label: 'canvas items',
-          origin: 'canvas',
-          selection: createCanvasSelectionSnapshot(next, selection.after),
-        }
-      : {
-          label: 'canvas items',
-          origin: 'canvas',
-        },
-  )
-
-  assertJSONResult(result)
-  return true
-}
-
 export function commitCanvasItemsPatch({
   document,
   patch,
@@ -152,17 +112,6 @@ export function commitCanvasItemsPatch({
 
   assertJSONResult(result)
   return true
-}
-
-export function loadCanvasItemsDocument(
-  document: CanvasItemsDocument,
-  items: CanvasItem[],
-) {
-  const result = document.load(validateCanvasItems(items), {
-    preserveHistory: true,
-  })
-
-  assertJSONResult(result)
 }
 
 export function canvasItemsEqual(a: CanvasItem[], b: CanvasItem[]) {

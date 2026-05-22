@@ -1,7 +1,6 @@
 import { describe, expect, test } from 'vitest'
 import {
   commitCanvasDocumentSelection,
-  commitCanvasItemsDocument,
   commitCanvasItemsPatch,
   createReplaceCanvasDocumentTextPatch,
   createCanvasItemsDocument,
@@ -61,9 +60,13 @@ describe('CanvasDocument history', () => {
     )
 
     expect(
-      commitCanvasItemsDocument({
+      commitCanvasItemsPatch({
         document,
-        nextItems,
+        patch: [{
+          op: 'replace',
+          path: '/2',
+          value: nextItems[2],
+        }],
         selection: {
           before: ['component-sticky'],
           after: ['component-card'],
