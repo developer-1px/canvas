@@ -129,6 +129,10 @@ function getAlignmentSnap({
   for (const candidate of candidates) {
     for (const source of getXAnchors(proposed)) {
       for (const target of getXAnchors(candidate.bounds)) {
+        if (source.kind !== target.kind) {
+          continue
+        }
+
         const delta = target.value - source.value
 
         if (Math.abs(delta) <= threshold && isCloser(delta, xSnap)) {
@@ -150,6 +154,10 @@ function getAlignmentSnap({
 
     for (const source of getYAnchors(proposed)) {
       for (const target of getYAnchors(candidate.bounds)) {
+        if (source.kind !== target.kind) {
+          continue
+        }
+
         const delta = target.value - source.value
 
         if (Math.abs(delta) <= threshold && isCloser(delta, ySnap)) {
