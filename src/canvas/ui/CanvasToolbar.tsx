@@ -1,10 +1,8 @@
-import type { ReactNode } from 'react'
 import type {
   CanvasAlignMode,
   CanvasDistributeMode,
 } from '../engine/CanvasCommandEngine'
 import {
-  CANVAS_COMMAND_AFFORDANCES,
   CANVAS_TOOL_AFFORDANCES,
   type CanvasAffordanceConfig,
 } from '../engine/CanvasAffordances'
@@ -31,6 +29,11 @@ import {
   UngroupIcon,
   UnlockIcon,
 } from './CanvasIcons'
+import {
+  CommandButton,
+  ToolbarDivider,
+  ToolButton,
+} from './CanvasToolbarButtons'
 
 type CanvasToolbarProps = {
   canAlign: boolean
@@ -137,80 +140,62 @@ export function CanvasToolbar({
 
       {hasHistoryCommands ? <ToolbarDivider /> : null}
       {config.commands.undo ? (
-        <button
-          type="button"
-          className="tool-button"
+        <CommandButton
+          command="undo"
           disabled={!canUndo}
-          aria-label={CANVAS_COMMAND_AFFORDANCES.undo.ariaLabel}
-          title={CANVAS_COMMAND_AFFORDANCES.undo.title}
           onClick={() => onUndo()}
         >
           <UndoIcon />
-        </button>
+        </CommandButton>
       ) : null}
       {config.commands.redo ? (
-        <button
-          type="button"
-          className="tool-button"
+        <CommandButton
+          command="redo"
           disabled={!canRedo}
-          aria-label={CANVAS_COMMAND_AFFORDANCES.redo.ariaLabel}
-          title={CANVAS_COMMAND_AFFORDANCES.redo.title}
           onClick={() => onRedo()}
         >
           <RedoIcon />
-        </button>
+        </CommandButton>
       ) : null}
 
       {hasSelectionCommands ? <ToolbarDivider /> : null}
       {config.commands.duplicate ? (
-        <button
-          type="button"
-          className="tool-button"
+        <CommandButton
+          command="duplicate"
           disabled={!canDuplicate}
-          aria-label={CANVAS_COMMAND_AFFORDANCES.duplicate.ariaLabel}
-          title={CANVAS_COMMAND_AFFORDANCES.duplicate.title}
           onClick={() => onDuplicate()}
         >
           <DuplicateIcon />
-        </button>
+        </CommandButton>
       ) : null}
       {config.commands.delete ? (
-        <button
-          type="button"
-          className="tool-button"
+        <CommandButton
+          command="delete"
           disabled={!canDelete}
-          aria-label={CANVAS_COMMAND_AFFORDANCES.delete.ariaLabel}
-          title={CANVAS_COMMAND_AFFORDANCES.delete.title}
           onClick={() => onDelete()}
         >
           <DeleteIcon />
-        </button>
+        </CommandButton>
       ) : null}
 
       {hasGroupingCommands ? <ToolbarDivider /> : null}
       {config.commands.group ? (
-        <button
-          type="button"
-          className="tool-button"
+        <CommandButton
+          command="group"
           disabled={!canGroup}
-          aria-label={CANVAS_COMMAND_AFFORDANCES.group.ariaLabel}
-          title={CANVAS_COMMAND_AFFORDANCES.group.title}
           onClick={() => onGroup()}
         >
           <GroupIcon />
-        </button>
+        </CommandButton>
       ) : null}
       {config.commands.ungroup ? (
-        <button
-          type="button"
-          className="tool-button"
+        <CommandButton
+          command="ungroup"
           disabled={!canUngroup}
-          aria-label={CANVAS_COMMAND_AFFORDANCES.ungroup.ariaLabel}
-          title={CANVAS_COMMAND_AFFORDANCES.ungroup.title}
           onClick={() => onUngroup()}
         >
           <UngroupIcon />
-        </button>
+        </CommandButton>
       ) : null}
 
       {hasAlignmentCommands ? <ToolbarDivider /> : null}
@@ -289,87 +274,23 @@ export function CanvasToolbar({
 
       {hasLockCommands ? <ToolbarDivider /> : null}
       {config.commands.lockSelection ? (
-        <button
-          type="button"
-          className="tool-button"
+        <CommandButton
+          command="lockSelection"
           disabled={!canLock}
-          aria-label={CANVAS_COMMAND_AFFORDANCES.lockSelection.ariaLabel}
-          title={CANVAS_COMMAND_AFFORDANCES.lockSelection.title}
           onClick={() => onLock()}
         >
           <LockIcon />
-        </button>
+        </CommandButton>
       ) : null}
       {config.commands.unlockAll ? (
-        <button
-          type="button"
-          className="tool-button"
-          aria-label={CANVAS_COMMAND_AFFORDANCES.unlockAll.ariaLabel}
-          title={CANVAS_COMMAND_AFFORDANCES.unlockAll.title}
+        <CommandButton
+          command="unlockAll"
+          disabled={false}
           onClick={() => onUnlockAll()}
         >
           <UnlockIcon />
-        </button>
+        </CommandButton>
       ) : null}
     </div>
-  )
-}
-
-type ToolButtonProps = {
-  active: boolean
-  affordance: (typeof CANVAS_TOOL_AFFORDANCES)[Tool]
-  children: ReactNode
-  onClick: () => void
-}
-
-function ToolButton({
-  active,
-  affordance,
-  children,
-  onClick,
-}: ToolButtonProps) {
-  return (
-    <button
-      type="button"
-      className="tool-button"
-      data-active={active}
-      aria-label={affordance.ariaLabel}
-      aria-pressed={active}
-      title={affordance.title}
-      onClick={onClick}
-    >
-      {children}
-    </button>
-  )
-}
-
-function ToolbarDivider() {
-  return <span className="toolbar-divider" aria-hidden="true" />
-}
-
-function CommandButton({
-  children,
-  command,
-  disabled,
-  onClick,
-}: {
-  children: ReactNode
-  command: keyof typeof CANVAS_COMMAND_AFFORDANCES
-  disabled: boolean
-  onClick: () => void
-}) {
-  const affordance = CANVAS_COMMAND_AFFORDANCES[command]
-
-  return (
-    <button
-      type="button"
-      className="tool-button"
-      disabled={disabled}
-      aria-label={affordance.ariaLabel}
-      title={affordance.title}
-      onClick={onClick}
-    >
-      {children}
-    </button>
   )
 }

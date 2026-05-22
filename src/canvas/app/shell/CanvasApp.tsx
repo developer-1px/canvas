@@ -5,12 +5,7 @@ import {
   useRef,
   useState,
 } from 'react'
-import { CanvasStage } from '../../ui/CanvasStage'
-import { CanvasComponentPalette } from '../../ui/CanvasComponentPalette'
-import { CanvasObjectInspector } from '../../ui/CanvasObjectInspector'
-import { CanvasTextEditor } from '../../ui/CanvasTextEditor'
-import { CanvasToolbar } from '../../ui/CanvasToolbar'
-import { CanvasStatus } from '../../ui/CanvasStatus'
+import { CanvasAppView } from './CanvasAppView'
 import { DEFAULT_CANVAS_AFFORDANCE_CONFIG } from '../../engine/CanvasAffordances'
 import {
   INITIAL_VIEWPORT,
@@ -20,19 +15,12 @@ import {
 } from '../../engine/CanvasPrimitives'
 import {
   type EditingText,
-  type CanvasItem,
 } from '../../host/CanvasModel'
 import { INITIAL_ITEMS } from '../../host/CanvasInitialItems'
-import { resizeCanvasItems } from '../../host/CanvasOperations'
-import {
-  findCanvasItem,
-  findEditableTextItem,
-  unionBounds,
-} from '../../host/CanvasTree'
+import { findEditableTextItem } from '../../host/CanvasTree'
 import type { Interaction } from '../workflow/CanvasInteractionState'
 import { useCanvasPointerDragHandlers } from '../workflow/useCanvasPointerDragHandlers'
 import { useCanvasPointerDownHandlers } from '../workflow/useCanvasPointerDownHandlers'
-import { ZoomControls } from '../../ui/ZoomControls'
 import { useCanvasCommands } from '../workflow/useCanvasCommands'
 import { useCanvasKeyboardShortcuts } from '../workflow/useCanvasKeyboardShortcuts'
 import { useCanvasHistory } from '../workflow/useCanvasHistory'
@@ -40,6 +28,7 @@ import { useCanvasWheelViewport } from '../workflow/useCanvasWheelViewport'
 import { useCanvasTextEditing } from '../workflow/useCanvasTextEditing'
 import { useCanvasViewportControls } from '../workflow/useCanvasViewportControls'
 import { useCanvasComponentInsertion } from '../workflow/useCanvasComponentInsertion'
+import { useCanvasObjectInspector } from '../workflow/useCanvasObjectInspector'
 import {
   getCanvasItemIdSeed,
   readStoredCanvasWorkspace,
@@ -99,19 +88,12 @@ function CanvasApp() {
   const selected = useMemo(() => new Set(selection), [selection])
   const scene = useMemo(() => createCanvasItemScene(items), [items])
   const selectedBounds = useMemo(() => scene.getBounds(selection), [scene, selection])
-  const inspectorBounds = useMemo(
-    () => unionBounds(items, selected),
-    [items, selected],
-  )
-  const selectedItems = useMemo(
-    () =>
-      selection
-        .map((id) => findCanvasItem(items, id))
-        .filter((item): item is CanvasItem => item !== undefined),
-    [items, selection],
-  )
-  const inspectorLabel = getInspectorLabel(selectedItems, selection.length)
-  const inspectorDisabled = selectedItems.some((item) => item.locked === true)
+  const inspector = useCanvasObjectInspector({
+    items,
+    selected,
+    selection,
+    setItems,
+  })
   const commandAvailability = useMemo(
     () =>
       getCanvasCommandAvailability({
@@ -244,29 +226,6 @@ function CanvasApp() {
     zoomBy,
   })
 
-  const updateSelectionBounds = useCallback(
-    (bounds: Bounds) => {
-      if (selection.length === 0) {
-        return
-      }
-
-      setItems(
-        (current) => {
-          const currentBounds = unionBounds(current, new Set(selection))
-
-          return currentBounds
-            ? resizeCanvasItems(current, selection, currentBounds, bounds)
-            : current
-        },
-        {
-          before: selection,
-          after: selection,
-        },
-      )
-    },
-    [selection, setItems],
-  )
-
   const {
     handleCanvasPointerDown,
     handleItemPointerDown,
@@ -334,124 +293,50 @@ function CanvasApp() {
   })
 
   return (
-    <main className="canvas-app">
-      {canvasAffordanceConfig.overlays.toolbar ? (
-        <CanvasToolbar
-          canDelete={commandAvailability.delete}
-          canDuplicate={commandAvailability.duplicate}
-          canDistribute={selection.length > 2}
-          canGroup={commandAvailability.group}
-          canAlign={selection.length > 1}
-          canLock={commandAvailability.lockSelection}
-          canUngroup={commandAvailability.ungroup}
-          canRedo={commandAvailability.redo}
-          canUndo={commandAvailability.undo}
-          config={canvasAffordanceConfig}
-          tool={tool}
-          onDelete={deleteSelection}
-          onAlign={alignSelection}
-          onDistribute={distributeSelection}
-          onDuplicate={duplicateSelection}
-          onGroup={groupSelection}
-          onLock={lockSelection}
-          onRedo={redoHistory}
-          onToolChange={setTool}
-          onUndo={undoHistory}
-          onUngroup={ungroupSelection}
-          onUnlockAll={unlockAll}
-        />
-      ) : null}
-
-      <CanvasComponentPalette onInsert={insertComponent} />
-
-      <CanvasStage
-        activeMode={activeMode}
-        gesture={gesture}
-        items={items}
-        overlays={overlays}
-        selected={selected}
-        svgRef={svgRef}
-        viewport={viewport}
-        onCanvasPointerDown={(event) => {
-          blurTextEditor()
-          handleCanvasPointerDown(event)
-        }}
-        onContextMenu={(event) => event.preventDefault()}
-        onItemPointerDown={(event, itemId) => {
-          blurTextEditor()
-          handleItemPointerDown(event, itemId)
-        }}
-        onPointerCancel={handlePointerCancel}
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
-        onResizePointerDown={handleResizePointerDown}
-        onTextDoubleClick={handleTextDoubleClick}
-      />
-
-      <CanvasTextEditor
-        editing={editing}
-        editorRef={editorRef}
-        style={editingItem ? editorStyle : undefined}
-        onBlur={commitText}
-        onCancel={cancelTextEdit}
-        onChange={setEditing}
-        onCommit={commitText}
-      />
-
-      {canvasAffordanceConfig.overlays.zoomControls ? (
-        <ZoomControls
-          config={canvasAffordanceConfig}
-          scale={viewport.scale}
-          onFit={() => fitToItems(selection.length > 0 ? selection : undefined)}
-          onReset={resetViewport}
-          onZoomIn={() => zoomBy(1.25)}
-          onZoomOut={() => zoomBy(0.8)}
-        />
-      ) : null}
-
-      <CanvasObjectInspector
-        bounds={inspectorBounds}
-        disabled={inspectorDisabled}
-        label={inspectorLabel}
-        onChangeBounds={updateSelectionBounds}
-      />
-
-      {canvasAffordanceConfig.overlays.status ? (
-        <CanvasStatus
-          gesture={gesture}
-          scale={viewport.scale}
-          selectionLength={selection.length}
-          tool={tool}
-        />
-      ) : null}
-    </main>
+    <CanvasAppView
+      activeMode={activeMode}
+      blurTextEditor={blurTextEditor}
+      commandAvailability={commandAvailability}
+      config={canvasAffordanceConfig}
+      editing={editing}
+      editorRef={editorRef}
+      editorStyle={editingItem ? editorStyle : undefined}
+      fitToItems={fitToItems}
+      gesture={gesture}
+      inspector={inspector}
+      insertComponent={insertComponent}
+      items={items}
+      overlays={overlays}
+      selected={selected}
+      selection={selection}
+      svgRef={svgRef}
+      tool={tool}
+      viewport={viewport}
+      onAlign={alignSelection}
+      onCancelTextEdit={cancelTextEdit}
+      onChangeEditing={setEditing}
+      onCommitText={commitText}
+      onDelete={deleteSelection}
+      onDistribute={distributeSelection}
+      onDuplicate={duplicateSelection}
+      onGroup={groupSelection}
+      onItemPointerDown={handleItemPointerDown}
+      onLock={lockSelection}
+      onPointerCancel={handlePointerCancel}
+      onPointerDown={handleCanvasPointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onRedo={redoHistory}
+      onResetViewport={resetViewport}
+      onResizePointerDown={handleResizePointerDown}
+      onTextDoubleClick={handleTextDoubleClick}
+      onToolChange={setTool}
+      onUndo={undoHistory}
+      onUngroup={ungroupSelection}
+      onUnlockAll={unlockAll}
+      onZoomBy={zoomBy}
+    />
   )
-}
-
-function getInspectorLabel(items: CanvasItem[], selectionLength: number) {
-  if (selectionLength === 0) {
-    return null
-  }
-
-  if (selectionLength > 1) {
-    return `${selectionLength} selected`
-  }
-
-  const [item] = items
-
-  if (!item) {
-    return null
-  }
-
-  if (item.type === 'component') {
-    return capitalize(item.component)
-  }
-
-  return capitalize(item.type)
-}
-
-function capitalize(value: string) {
-  return `${value.slice(0, 1).toUpperCase()}${value.slice(1)}`
 }
 
 export default CanvasApp
