@@ -22,6 +22,11 @@ import {
   type Viewport,
 } from './CanvasModel'
 import { capturePointer, screenPoint, screenToWorld } from './CanvasPointerGeometry'
+import {
+  getCanvasItemPointerIntent,
+  getCanvasPointerGesture,
+  isAdditivePointerInput,
+} from './CanvasGestureEngine'
 import { getCanvasItemPointerSelection } from './CanvasSelectionEngine'
 import type { CanvasSceneAdapter } from './CanvasSceneAdapter'
 import { findEditableTextItem } from './CanvasTree'
@@ -114,7 +119,14 @@ export function useCanvasPointerHandlers({
   }
 
   function handleCanvasPointerDown(event: PointerEvent<SVGSVGElement>) {
-    if (event.button !== 0 && event.button !== 1) {
+    const pointerGesture = getCanvasPointerGesture({
+      config,
+      input: event,
+      spaceDown,
+      tool,
+    })
+
+    if (pointerGesture === 'none') {
       return
     }
 
@@ -124,15 +136,12 @@ export function useCanvasPointerHandlers({
     const startScreen = screenPoint(svgRef, event)
     const startWorld = screenToWorld(startScreen, viewport)
 
-    if (
-      config.gestures.pan &&
-      (event.button === 1 || spaceDown || tool === 'pan')
-    ) {
+    if (pointerGesture === 'pan') {
       beginPan(event.pointerId, startScreen)
       return
     }
 
-    if (tool === 'rect' && config.gestures.createRect) {
+    if (pointerGesture === 'create-rect') {
       interactionRef.current = {
         kind: 'create-rect',
         pointerId: event.pointerId,
@@ -146,16 +155,14 @@ export function useCanvasPointerHandlers({
       return
     }
 
-    if (tool === 'text' && config.gestures.createText) {
+    if (pointerGesture === 'create-text') {
       beginCreateText(startWorld)
       return
     }
 
-    if (!config.gestures.marquee) {
-      return
-    }
+    const additive = isAdditivePointerInput(event)
 
-    if (!event.shiftKey && !event.metaKey && !event.ctrlKey) {
+    if (!additive) {
       setSelection([])
     }
 
@@ -165,7 +172,7 @@ export function useCanvasPointerHandlers({
       startScreen,
       startWorld,
       currentWorld: startWorld,
-      additive: event.shiftKey || event.metaKey || event.ctrlKey,
+      additive,
       baseSelection: selection,
       moved: false,
     }
@@ -195,13 +202,17 @@ export function useCanvasPointerHandlers({
 
     lastClickRef.current = { id: itemId, point: startScreen, time: now }
 
-    const additive = event.shiftKey || event.metaKey || event.ctrlKey
+    const itemIntent = getCanvasItemPointerIntent({
+      config,
+      input: event,
+      isDoubleClick,
+    })
     const editItem =
-      isDoubleClick && !additive && config.gestures.textEdit
+      itemIntent.textEdit
         ? findEditableTextItem(items, itemId)
         : null
     const itemSelection = getCanvasItemPointerSelection({
-      additive,
+      additive: itemIntent.additive,
       itemId,
       scene,
       selection,
@@ -212,7 +223,7 @@ export function useCanvasPointerHandlers({
       lastClickRef.current = null
     }
 
-    if (additive) {
+    if (itemIntent.additive) {
       setSelection(nextSelection)
 
       if (itemSelection.alreadySelected) {
@@ -228,9 +239,7 @@ export function useCanvasPointerHandlers({
     const historyItems = items
 
     if (
-      event.altKey &&
-      config.gestures.altDragDuplicate &&
-      config.commands.duplicate
+      itemIntent.altDragDuplicate
     ) {
       const clones = cloneItems(nextSelection, { x: 0, y: 0 })
 
