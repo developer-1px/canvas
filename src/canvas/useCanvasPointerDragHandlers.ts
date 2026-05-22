@@ -11,7 +11,6 @@ import {
   normalizeBounds,
   pointDistance,
   resizeBounds,
-  unique,
   type Bounds,
   type CanvasItem,
   type EditingText,
@@ -22,12 +21,7 @@ import {
 } from './CanvasModel'
 import { releasePointer, screenPoint, screenToWorld } from './CanvasPointerGeometry'
 import { resizeCanvasItems, translateCanvasItems } from './CanvasOperations'
-import {
-  boundsIntersect,
-  findParentGroupId,
-  flattenCanvasItems,
-  getItemBounds,
-} from './CanvasTree'
+import { getCanvasMarqueeSelection } from './CanvasSelectionEngine'
 
 type UseCanvasPointerDragHandlersArgs = {
   config: CanvasAffordanceConfig
@@ -173,17 +167,14 @@ export function useCanvasPointerDragHandlers({
         return
       }
 
-      const hitIds = unique(
-        flattenCanvasItems(items)
-          .filter((entry) => boundsIntersect(bounds, getItemBounds(entry.item)))
-          .map((entry) => findParentGroupId(items, entry.item.id) ?? entry.item.id),
-      )
-
       setMarquee(bounds)
       setSelection(
-        interaction.additive
-          ? unique([...interaction.baseSelection, ...hitIds])
-          : hitIds,
+        getCanvasMarqueeSelection({
+          additive: interaction.additive,
+          baseSelection: interaction.baseSelection,
+          bounds,
+          items,
+        }),
       )
       return
     }

@@ -10,7 +10,6 @@ import type { CanvasAffordanceConfig } from './CanvasAffordances'
 import {
   normalizeBounds,
   pointDistance,
-  unique,
   type Bounds,
   type CanvasItem,
   type EditingText,
@@ -23,11 +22,8 @@ import {
   type Viewport,
 } from './CanvasModel'
 import { capturePointer, screenPoint, screenToWorld } from './CanvasPointerGeometry'
-import {
-  findEditableTextItem,
-  findParentGroupId,
-  findSelectedAncestorId,
-} from './CanvasTree'
+import { getCanvasItemPointerSelection } from './CanvasSelectionEngine'
+import { findEditableTextItem } from './CanvasTree'
 
 type UseCanvasPointerHandlersArgs = {
   cloneItems: (ids: string[], offset: Point) => CanvasItem[]
@@ -201,37 +197,27 @@ export function useCanvasPointerHandlers({
       isDoubleClick && !additive && config.gestures.textEdit
         ? findEditableTextItem(items, itemId)
         : null
-    const selectedAncestorId = findSelectedAncestorId(items, itemId, selection)
-    const dragItemId = additive
-      ? itemId
-      : selectedAncestorId ?? findParentGroupId(items, itemId) ?? itemId
-    const alreadySelected = selection.includes(itemId)
-    const dragAlreadySelected = selection.includes(dragItemId)
-    let nextSelection = selection
+    const itemSelection = getCanvasItemPointerSelection({
+      additive,
+      itemId,
+      items,
+      selection,
+    })
+    let nextSelection = itemSelection.nextSelection
 
     if (editItem) {
       lastClickRef.current = null
     }
 
     if (additive) {
-      const parentGroupId = findParentGroupId(items, itemId)
-      const baseSelection =
-        parentGroupId && !alreadySelected
-          ? selection.filter((id) => id !== parentGroupId)
-          : selection
-
-      nextSelection = alreadySelected
-        ? selection.filter((id) => id !== itemId)
-        : unique([...baseSelection, itemId])
       setSelection(nextSelection)
 
-      if (alreadySelected) {
+      if (itemSelection.alreadySelected) {
         interactionRef.current = { kind: 'none' }
         setGesture('none')
         return
       }
-    } else if (!dragAlreadySelected) {
-      nextSelection = [dragItemId]
+    } else if (nextSelection !== selection) {
       setSelection(nextSelection)
     }
 
