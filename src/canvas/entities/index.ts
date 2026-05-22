@@ -1,0 +1,18 @@
+export type {
+  Bounds,
+  CanvasComponentItem,
+  CanvasComponentKind,
+  CanvasInteractionKind,
+  CanvasItem,
+  CanvasItemBase,
+  CanvasItemId,
+  CanvasSelectionIds,
+  EditingText,
+  GroupItem,
+  Point,
+  RectItem,
+  ResizeHandle,
+  TextItem,
+  Tool,
+  Viewport,
+} from './CanvasEntities'

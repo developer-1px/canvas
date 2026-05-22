@@ -1,28 +1,18 @@
-export type Tool = 'select' | 'pan' | 'rect' | 'text'
+import type {
+  Bounds,
+  Point,
+  ResizeHandle,
+  Viewport,
+} from '../../entities'
 
-export type CanvasInteractionKind =
-  | 'none'
-  | 'pan'
-  | 'move'
-  | 'marquee'
-  | 'create-rect'
-  | 'resize'
-
-export type Point = {
-  x: number
-  y: number
-}
-
-export type Viewport = Point & {
-  scale: number
-}
-
-export type Bounds = Point & {
-  w: number
-  h: number
-}
-
-export type ResizeHandle = 'nw' | 'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w'
+export type {
+  Bounds,
+  CanvasInteractionKind,
+  Point,
+  ResizeHandle,
+  Tool,
+  Viewport,
+} from '../../entities'
 
 export type ResizeBoundsOptions = {
   preserveAspectRatio?: boolean
