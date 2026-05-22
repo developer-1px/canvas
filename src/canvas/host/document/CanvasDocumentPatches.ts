@@ -2,8 +2,10 @@ import type { JSONPatchOperation, Pointer } from 'zod-crud'
 import type { Bounds } from '../../engine/primitives/CanvasPrimitives'
 import type { CanvasItem } from '../model/CanvasModel'
 import {
+  groupCanvasSelection,
   removeCanvasItems,
   resizeCanvasItems,
+  ungroupCanvasSelection,
 } from '../operations/CanvasOperations'
 import {
   findCanvasItemEntry,
@@ -55,6 +57,80 @@ export function createAddCanvasItemsPatch(
     path: '/-',
     value: item,
   }))
+}
+
+export function createGroupCanvasItemsPatch(
+  items: CanvasItem[],
+  selection: string[],
+  groupId: string,
+): JSONPatchOperation[] {
+  const next = groupCanvasSelection(items, selection, groupId)
+
+  if (canvasItemsEqual(items, next.items)) {
+    return []
+  }
+
+  const selected = new Set(selection)
+  const groupedEntries = getTopmostEntries(
+    flattenCanvasItems(items).filter((entry) => selected.has(entry.item.id)),
+  )
+  const groupEntry = findCanvasItemEntry(next.items, groupId)
+
+  if (!groupEntry || groupedEntries.length === 0) {
+    return []
+  }
+
+  return [
+    ...groupedEntries
+      .sort(compareEntriesByDescendingPath)
+      .map((entry): JSONPatchOperation => ({
+        op: 'remove',
+        path: canvasItemPathToPointer(entry.path),
+      })),
+    {
+      op: 'add',
+      path: canvasItemPathToPointer(groupEntry.path),
+      value: groupEntry.item,
+    },
+  ]
+}
+
+export function createUngroupCanvasItemsPatch(
+  items: CanvasItem[],
+  selection: string[],
+): JSONPatchOperation[] {
+  const next = ungroupCanvasSelection(items, selection)
+
+  if (canvasItemsEqual(items, next.items)) {
+    return []
+  }
+
+  return getTopmostEntries(
+    flattenCanvasItems(items).filter(
+      (entry) => entry.item.type === 'group' && selection.includes(entry.item.id),
+    ),
+  )
+    .sort(compareEntriesByDescendingPath)
+    .flatMap((entry): JSONPatchOperation[] => {
+      if (entry.item.type !== 'group') {
+        return []
+      }
+
+      return [
+        {
+          op: 'remove',
+          path: canvasItemPathToPointer(entry.path),
+        },
+        ...entry.item.children.map((child, index): JSONPatchOperation => ({
+          op: 'add',
+          path: canvasItemPathToPointer([
+            ...entry.parentPath,
+            entry.index + index,
+          ]),
+          value: child,
+        })),
+      ]
+    })
 }
 
 export function createResizeCanvasItemsPatch(
@@ -159,6 +235,6 @@ function compareEntriesByDescendingPath(
   return b.path.length - a.path.length
 }
 
-function canvasItemsEqual(a: CanvasItem, b: CanvasItem) {
+function canvasItemsEqual(a: unknown, b: unknown) {
   return JSON.stringify(a) === JSON.stringify(b)
 }

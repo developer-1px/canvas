@@ -18,6 +18,7 @@ import {
   lockCanvasSelection,
   removeCanvasItems,
   translateCanvasItems,
+  ungroupCanvasSelection,
 } from '../operations/CanvasOperations'
 import {
   copyCanvasDocumentSelectionToClipboard,
@@ -26,10 +27,12 @@ import {
 } from './CanvasDocumentClipboard'
 import {
   createAddCanvasItemsPatch,
+  createGroupCanvasItemsPatch,
   createRemoveCanvasItemsPatch,
   createReplaceChangedCanvasItemsPatch,
   createResizeCanvasItemsPatch,
   createSetCanvasItemTextPatch,
+  createUngroupCanvasItemsPatch,
 } from './CanvasDocumentPatches'
 import type { CanvasItem } from '../model/CanvasModel'
 
@@ -187,6 +190,104 @@ describe('CanvasDocument history', () => {
     })
     expect(document.value).toEqual(expected)
     expect(getCanvasDocumentSelectionIds(document)).toEqual([])
+  })
+
+  test('commits grouping as zod-crud remove and add patches', () => {
+    const document = createCanvasItemsDocument(INITIAL_ITEMS, {
+      selection: ['component-sticky', 'component-label'],
+    })
+    const result = groupCanvasSelection(
+      INITIAL_ITEMS,
+      ['component-sticky', 'component-label'],
+      'group-1',
+    )
+    const patch = createGroupCanvasItemsPatch(
+      INITIAL_ITEMS,
+      ['component-sticky', 'component-label'],
+      'group-1',
+    )
+
+    expect(patch.map((operation) => operation.op)).toEqual([
+      'remove',
+      'remove',
+      'add',
+    ])
+    expect(patch[0]).toEqual({ op: 'remove', path: '/1' })
+    expect(patch[1]).toEqual({ op: 'remove', path: '/0' })
+    expect(patch[2]).toMatchObject({
+      op: 'add',
+      path: '/0',
+      value: {
+        id: 'group-1',
+        type: 'group',
+      },
+    })
+    expect(
+      commitCanvasItemsPatch({
+        document,
+        patch,
+        selection: {
+          before: ['component-sticky', 'component-label'],
+          after: result.selection,
+        },
+      }),
+    ).toBe(true)
+
+    expect(document.value).toEqual(result.items)
+    expect(getCanvasDocumentSelectionIds(document)).toEqual(['group-1'])
+
+    expect(document.history.undo()).toBe(true)
+    expect(document.value).toEqual(INITIAL_ITEMS)
+    expect(getCanvasDocumentSelectionIds(document)).toEqual([
+      'component-sticky',
+      'component-label',
+    ])
+  })
+
+  test('commits ungrouping as zod-crud remove and add patches', () => {
+    const grouped = groupCanvasSelection(
+      INITIAL_ITEMS,
+      ['component-sticky', 'component-label'],
+      'group-1',
+    ).items
+    const result = ungroupCanvasSelection(grouped, ['group-1'])
+    const document = createCanvasItemsDocument(grouped, {
+      selection: ['group-1'],
+    })
+    const patch = createUngroupCanvasItemsPatch(grouped, ['group-1'])
+
+    expect(patch.map((operation) => operation.op)).toEqual([
+      'remove',
+      'add',
+      'add',
+    ])
+    expect(patch[0]).toEqual({ op: 'remove', path: '/0' })
+    expect(patch[1]).toMatchObject({
+      op: 'add',
+      path: '/0',
+      value: { id: 'component-sticky' },
+    })
+    expect(patch[2]).toMatchObject({
+      op: 'add',
+      path: '/1',
+      value: { id: 'component-label' },
+    })
+    expect(
+      commitCanvasItemsPatch({
+        document,
+        patch,
+        selection: {
+          before: ['group-1'],
+          after: result.selection,
+        },
+      }),
+    ).toBe(true)
+
+    expect(document.value).toEqual(result.items)
+    expect(getCanvasDocumentSelectionIds(document)).toEqual([
+      'component-sticky',
+      'component-label',
+    ])
   })
 
   test('stores copied items in zod-crud document clipboard', () => {

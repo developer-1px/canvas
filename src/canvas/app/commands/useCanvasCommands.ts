@@ -24,8 +24,10 @@ import type { CanvasAffordanceConfig } from '../../engine/affordance/CanvasAffor
 import type { Viewport } from '../../engine/primitives/CanvasPrimitives'
 import type { CanvasItem, EditingText } from '../../host/model/CanvasModel'
 import {
+  createGroupCanvasItemsPatch,
   createRemoveCanvasItemsPatch,
   createReplaceChangedCanvasItemsPatch,
+  createUngroupCanvasItemsPatch,
 } from '../../host/document/CanvasDocumentPatches'
 import { useCanvasClipboardCommands } from './useCanvasClipboardCommands'
 import type {
@@ -177,10 +179,11 @@ export function useCanvasCommands({
   ])
 
   const groupSelection = useCallback(() => {
+    const groupId = createId('group')
     const result = groupCanvasCommand({
       adapter: commandAdapter,
       config,
-      createId,
+      createId: () => groupId,
       items,
       selection,
     })
@@ -189,12 +192,26 @@ export function useCanvasCommands({
       return
     }
 
-    setItems(result.items, {
-      before: selection,
-      after: result.selection,
-    })
-    setSelection(result.selection)
-  }, [commandAdapter, config, createId, items, selection, setItems, setSelection])
+    const didCommit = commitItemsPatch(
+      createGroupCanvasItemsPatch(items, selection, groupId),
+      {
+        before: selection,
+        after: result.selection,
+      },
+    )
+
+    if (!didCommit) {
+      commitSelection(result.selection)
+    }
+  }, [
+    commandAdapter,
+    commitItemsPatch,
+    commitSelection,
+    config,
+    createId,
+    items,
+    selection,
+  ])
 
   const ungroupSelection = useCallback(() => {
     const result = ungroupCanvasCommand({
@@ -208,12 +225,18 @@ export function useCanvasCommands({
       return
     }
 
-    setItems(result.items, {
-      before: selection,
-      after: result.selection,
-    })
-    setSelection(result.selection)
-  }, [commandAdapter, config, items, selection, setItems, setSelection])
+    const didCommit = commitItemsPatch(
+      createUngroupCanvasItemsPatch(items, selection),
+      {
+        before: selection,
+        after: result.selection,
+      },
+    )
+
+    if (!didCommit) {
+      commitSelection(result.selection)
+    }
+  }, [commandAdapter, commitItemsPatch, commitSelection, config, items, selection])
 
   const lockSelection = useCallback(() => {
     const result = lockCanvasCommand({
