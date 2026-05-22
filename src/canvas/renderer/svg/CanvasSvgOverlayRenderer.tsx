@@ -53,6 +53,57 @@ export function CanvasSvgInteractionOverlays({
         />
       ) : null}
 
+      {overlays.alignmentGuides.length > 0 ? (
+        <g className="alignment-guides">
+          {overlays.alignmentGuides.map((guide, index) =>
+            guide.orientation === 'vertical' ? (
+              <line
+                key={`${guide.orientation}-${guide.position}-${index}`}
+                className="alignment-guide"
+                x1={guide.position}
+                y1={guide.start}
+                x2={guide.position}
+                y2={guide.end}
+                vectorEffect="non-scaling-stroke"
+              />
+            ) : (
+              <line
+                key={`${guide.orientation}-${guide.position}-${index}`}
+                className="alignment-guide"
+                x1={guide.start}
+                y1={guide.position}
+                x2={guide.end}
+                y2={guide.position}
+                vectorEffect="non-scaling-stroke"
+              />
+            ),
+          )}
+        </g>
+      ) : null}
+
+      {overlays.spacingGuides.length > 0 ? (
+        <g className="spacing-guides">
+          {overlays.spacingGuides.map((guide, guideIndex) => (
+            <g
+              key={`${guide.orientation}-${guide.gap}-${guideIndex}`}
+              data-gap={guide.gap}
+            >
+              {guide.segments.map((segment, segmentIndex) => (
+                <line
+                  key={segmentIndex}
+                  className="spacing-guide"
+                  x1={segment.start.x}
+                  y1={segment.start.y}
+                  x2={segment.end.x}
+                  y2={segment.end.y}
+                  vectorEffect="non-scaling-stroke"
+                />
+              ))}
+            </g>
+          ))}
+        </g>
+      ) : null}
+
       {overlays.selectionBounds ? (
         <rect
           className="selection-bounds"

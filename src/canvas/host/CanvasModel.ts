@@ -93,6 +93,7 @@ export type Interaction =
       startScreen: Point
       startWorld: Point
       ids: string[]
+      bounds: Bounds | null
       startItems: CanvasItem[]
       historyItems: CanvasItem[]
       edit?: EditingText

@@ -24,17 +24,22 @@ export type CanvasGestureId =
   | 'move'
   | 'pan'
   | 'resize'
+  | 'snapToAlignment'
+  | 'snapToGrid'
+  | 'snapToSpacing'
   | 'temporaryPan'
   | 'textEdit'
   | 'wheelZoom'
 
 export type CanvasOverlayId =
+  | 'alignmentGuides'
   | 'draftRect'
   | 'grid'
   | 'itemOutline'
   | 'marquee'
   | 'resizeHandles'
   | 'selectionBounds'
+  | 'spacingGuides'
   | 'status'
   | 'toolbar'
   | 'zoomControls'
@@ -177,6 +182,9 @@ export function createCanvasAffordanceConfig(
         move: true,
         pan: true,
         resize: true,
+        snapToAlignment: true,
+        snapToGrid: true,
+        snapToSpacing: true,
         temporaryPan: true,
         textEdit: true,
         wheelZoom: true,
@@ -185,12 +193,14 @@ export function createCanvasAffordanceConfig(
     ),
     overlays: mergeFeatureGroup(
       {
+        alignmentGuides: true,
         draftRect: true,
         grid: true,
         itemOutline: true,
         marquee: true,
         resizeHandles: true,
         selectionBounds: true,
+        spacingGuides: true,
         status: true,
         toolbar: true,
         zoomControls: true,

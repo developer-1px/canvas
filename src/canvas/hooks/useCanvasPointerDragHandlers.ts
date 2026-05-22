@@ -27,6 +27,12 @@ import { releasePointer, screenPoint, screenToWorld } from './CanvasPointerGeome
 import { getCanvasMarqueeSelection } from '../engine/CanvasSelectionEngine'
 import type { CanvasSceneAdapter } from '../engine/CanvasSceneAdapter'
 import {
+  EMPTY_CANVAS_SNAP_GUIDES,
+  getCanvasMoveSnap,
+  snapCanvasPointToGrid,
+  type CanvasSnapGuides,
+} from '../engine/CanvasSnapEngine'
+import {
   moveCanvasSelection,
   resizeCanvasSelection,
   type CanvasTransformAdapter,
@@ -46,6 +52,7 @@ type UseCanvasPointerDragHandlersArgs = {
   setLiveItems: Dispatch<SetStateAction<CanvasItem[]>>
   setMarquee: Dispatch<SetStateAction<Bounds | null>>
   setSelection: Dispatch<SetStateAction<string[]>>
+  setSnapGuides: Dispatch<SetStateAction<CanvasSnapGuides>>
   setTool: Dispatch<SetStateAction<Tool>>
   setViewport: Dispatch<SetStateAction<Viewport>>
   svgRef: RefObject<SVGSVGElement | null>
@@ -67,6 +74,7 @@ export function useCanvasPointerDragHandlers({
   setLiveItems,
   setMarquee,
   setSelection,
+  setSnapGuides,
   setTool,
   setViewport,
   svgRef,
@@ -90,6 +98,7 @@ export function useCanvasPointerDragHandlers({
         return
       }
 
+      setSnapGuides(EMPTY_CANVAS_SNAP_GUIDES)
       const dx = currentScreen.x - interaction.startScreen.x
       const dy = currentScreen.y - interaction.startScreen.y
       setViewport({
@@ -115,16 +124,35 @@ export function useCanvasPointerDragHandlers({
 
       const dx = currentWorld.x - interaction.startWorld.x
       const dy = currentWorld.y - interaction.startWorld.y
+      const snap = interaction.bounds
+        ? getCanvasMoveSnap({
+            bounds: interaction.bounds,
+            config,
+            dx,
+            dy,
+            scene,
+            selection: interaction.ids,
+            viewport,
+          })
+        : {
+            ...EMPTY_CANVAS_SNAP_GUIDES,
+            dx,
+            dy,
+          }
 
       interactionRef.current = {
         ...interaction,
         moved: true,
       }
+      setSnapGuides({
+        alignmentGuides: snap.alignmentGuides,
+        spacingGuides: snap.spacingGuides,
+      })
       setLiveItems(
         moveCanvasSelection({
           adapter: transformAdapter,
-          dx,
-          dy,
+          dx: snap.dx,
+          dy: snap.dy,
           items: interaction.startItems,
           selection: interaction.ids,
         }),
@@ -145,6 +173,12 @@ export function useCanvasPointerDragHandlers({
         return
       }
 
+      setSnapGuides(EMPTY_CANVAS_SNAP_GUIDES)
+      const snappedCurrentWorld = snapCanvasPointToGrid({
+        config,
+        point: currentWorld,
+      })
+
       interactionRef.current = {
         ...interaction,
         moved: true,
@@ -155,7 +189,7 @@ export function useCanvasPointerDragHandlers({
           bounds: interaction.bounds,
           handle: interaction.handle,
           items: interaction.startItems,
-          point: currentWorld,
+          point: snappedCurrentWorld,
           selection: interaction.ids,
         }),
       )
@@ -172,6 +206,7 @@ export function useCanvasPointerDragHandlers({
         pointDistance(currentScreen, interaction.startScreen) > DRAG_THRESHOLD
       const bounds = normalizeBounds(interaction.startWorld, currentWorld)
 
+      setSnapGuides(EMPTY_CANVAS_SNAP_GUIDES)
       interactionRef.current = {
         ...interaction,
         currentWorld,
@@ -202,11 +237,16 @@ export function useCanvasPointerDragHandlers({
       const moved =
         interaction.moved ||
         pointDistance(currentScreen, interaction.startScreen) > DRAG_THRESHOLD
-      const bounds = normalizeBounds(interaction.startWorld, currentWorld)
+      const snappedCurrentWorld = snapCanvasPointToGrid({
+        config,
+        point: currentWorld,
+      })
+      const bounds = normalizeBounds(interaction.startWorld, snappedCurrentWorld)
 
+      setSnapGuides(EMPTY_CANVAS_SNAP_GUIDES)
       interactionRef.current = {
         ...interaction,
-        currentWorld,
+        currentWorld: snappedCurrentWorld,
         moved,
       }
       setDraftRect(bounds)
@@ -256,6 +296,7 @@ export function useCanvasPointerDragHandlers({
     setGesture('none')
     setMarquee(null)
     setDraftRect(null)
+    setSnapGuides(EMPTY_CANVAS_SNAP_GUIDES)
   }
 
   function handlePointerCancel(event: PointerEvent<SVGSVGElement>) {
@@ -270,6 +311,7 @@ export function useCanvasPointerDragHandlers({
     setGesture('none')
     setMarquee(null)
     setDraftRect(null)
+    setSnapGuides(EMPTY_CANVAS_SNAP_GUIDES)
   }
 
   return {

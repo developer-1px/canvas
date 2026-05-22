@@ -21,7 +21,7 @@
 | Engine | Selection Model | 선택, additive 선택, ancestor 선택 | 꺼진 selection 기능은 명령 대상이 되지 않는다 |
 | Engine | Creation Router | create tool 결과 계산과 생성 요청 | 꺼진 gesture에서는 실행되지 않는다 |
 | Engine | Command Router | duplicate, delete, group, undo 같은 명령 실행 | 꺼진 command는 UI/shortcut/API에서 막힌다 |
-| Engine | Overlay Model | handle, outline, marquee, draft 표시 상태 | 꺼진 overlay는 렌더 입력에서 빠진다 |
+| Engine | Overlay Model | handle, outline, marquee, draft, snap guide 표시 상태 | 꺼진 overlay는 렌더 입력에서 빠진다 |
 | Adapter | Scene Adapter | scene entry, bounds, parent/group 질의 제공 | Feature와 무관하게 최소 질의만 제공한다 |
 | Adapter | Renderer Adapter | SVG/Canvas/DOM/WebGL 렌더링 | 받은 overlay만 그린다 |
 
@@ -51,6 +51,7 @@ type CanvasAffordanceConfig = {
 규칙:
 
 - Toggle이 꺼진 기능은 시각 entry point, shortcut, pointer gesture, command API에서 모두 꺼진다.
+- Snap 계열 gesture와 guide overlay도 toggle로 독립 제어한다.
 - Toggle이 꺼져도 문서 상태는 손상하지 않는다.
 - Toggle 기본값은 모두 on이다. Host App이 필요한 것만 끈다.
 
@@ -69,6 +70,7 @@ type CanvasAffordanceConfig = {
 9. `CanvasGestureEngine`: pointer input을 canvas/item gesture intent로 변환한다.
 10. `CanvasCreationEngine`: create tool result routing. Demo item 생성은 `CanvasItemCreationAdapter`가 수행한다.
 11. `CanvasItemSceneAdapter`: Demo item tree를 renderer-independent scene entry로 변환한다.
+12. `CanvasSnapEngine`: move/create/resize에서 grid, alignment, spacing snap과 renderer-independent guide state를 계산한다.
 
 ## Boundary Check
 

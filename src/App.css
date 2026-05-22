@@ -159,6 +159,19 @@
   stroke-dasharray: 6 4;
 }
 
+.alignment-guide {
+  stroke: #dc2626;
+  stroke-width: 1.25;
+  pointer-events: none;
+}
+
+.spacing-guide {
+  stroke: #0891b2;
+  stroke-width: 1.25;
+  stroke-dasharray: 4 3;
+  pointer-events: none;
+}
+
 .group-outline {
   stroke-dasharray: 5 3;
 }

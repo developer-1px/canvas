@@ -40,6 +40,10 @@ import { useCanvasCommands } from './canvas/hooks/useCanvasCommands'
 import { useCanvasKeyboardShortcuts } from './canvas/hooks/useCanvasKeyboardShortcuts'
 import { useCanvasHistory } from './canvas/hooks/useCanvasHistory'
 import { createCanvasOverlayState } from './canvas/engine/CanvasOverlayEngine'
+import {
+  EMPTY_CANVAS_SNAP_GUIDES,
+  type CanvasSnapGuides,
+} from './canvas/engine/CanvasSnapEngine'
 import { getCanvasCommandAvailability } from './canvas/engine/CanvasCommandEngine'
 import { CANVAS_ITEM_COMMAND_ADAPTER } from './canvas/host/adapters/CanvasItemCommandAdapter'
 import { CANVAS_ITEM_CREATION_ADAPTER } from './canvas/host/adapters/CanvasItemCreationAdapter'
@@ -75,6 +79,9 @@ function App() {
   const [gesture, setGesture] = useState<Interaction['kind']>('none')
   const [marquee, setMarquee] = useState<Bounds | null>(null)
   const [draftRect, setDraftRect] = useState<Bounds | null>(null)
+  const [snapGuides, setSnapGuides] = useState<CanvasSnapGuides>(
+    EMPTY_CANVAS_SNAP_GUIDES,
+  )
   const [editing, setEditing] = useState<EditingText | null>(null)
 
   const selected = useMemo(() => new Set(selection), [selection])
@@ -99,9 +106,10 @@ function App() {
         marquee,
         scene,
         selection,
+        snapGuides,
         viewport,
       }),
-    [draftRect, marquee, scene, selection, viewport],
+    [draftRect, marquee, scene, selection, snapGuides, viewport],
   )
   const editingItem = editing ? findEditableTextItem(items, editing.id) : null
   const editingId = editing?.id
@@ -299,6 +307,7 @@ function App() {
     setLiveItems,
     setMarquee,
     setSelection,
+    setSnapGuides,
     setTool,
     setViewport,
     svgRef,

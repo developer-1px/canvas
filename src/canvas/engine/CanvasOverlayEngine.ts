@@ -8,6 +8,7 @@ import {
   type Viewport,
 } from './CanvasPrimitives'
 import type { CanvasSceneAdapter } from './CanvasSceneAdapter'
+import type { CanvasSnapGuides } from './CanvasSnapEngine'
 
 export type CanvasResizeHandleOverlay = {
   handle: ResizeHandle
@@ -16,12 +17,14 @@ export type CanvasResizeHandleOverlay = {
 }
 
 export type CanvasOverlayState = {
+  alignmentGuides: CanvasSnapGuides['alignmentGuides']
   draftRect: Bounds | null
   grid: boolean
   itemOutlineIds: Set<string>
   marquee: Bounds | null
   resizeHandles: CanvasResizeHandleOverlay[]
   selectionBounds: Bounds | null
+  spacingGuides: CanvasSnapGuides['spacingGuides']
 }
 
 export function createCanvasOverlayState({
@@ -30,6 +33,7 @@ export function createCanvasOverlayState({
   marquee,
   scene,
   selection,
+  snapGuides,
   viewport,
 }: {
   config: CanvasAffordanceConfig
@@ -37,11 +41,15 @@ export function createCanvasOverlayState({
   marquee: Bounds | null
   scene: CanvasSceneAdapter
   selection: string[]
+  snapGuides: CanvasSnapGuides
   viewport: Viewport
 }): CanvasOverlayState {
   const selectedBounds = scene.getBounds(selection)
 
   return {
+    alignmentGuides: config.overlays.alignmentGuides
+      ? snapGuides.alignmentGuides
+      : [],
     draftRect: config.overlays.draftRect ? draftRect : null,
     grid: config.overlays.grid,
     itemOutlineIds: config.overlays.itemOutline
@@ -60,5 +68,8 @@ export function createCanvasOverlayState({
       config.overlays.selectionBounds && selectedBounds && selection.length > 1
         ? selectedBounds
         : null,
+    spacingGuides: config.overlays.spacingGuides
+      ? snapGuides.spacingGuides
+      : [],
   }
 }

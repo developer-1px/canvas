@@ -34,6 +34,7 @@ import {
   isAdditivePointerInput,
 } from '../engine/CanvasGestureEngine'
 import { getCanvasItemPointerSelection } from '../engine/CanvasSelectionEngine'
+import { snapCanvasPointToGrid } from '../engine/CanvasSnapEngine'
 import type { CanvasSceneAdapter } from '../engine/CanvasSceneAdapter'
 import { findEditableTextItem } from '../host/CanvasTree'
 
@@ -145,15 +146,20 @@ export function useCanvasPointerHandlers({
     }
 
     if (pointerGesture === 'create-rect') {
+      const snappedStartWorld = snapCanvasPointToGrid({
+        config,
+        point: startWorld,
+      })
+
       interactionRef.current = {
         kind: 'create-rect',
         pointerId: event.pointerId,
         startScreen,
-        startWorld,
-        currentWorld: startWorld,
+        startWorld: snappedStartWorld,
+        currentWorld: snappedStartWorld,
         moved: false,
       }
-      setDraftRect(normalizeBounds(startWorld, startWorld))
+      setDraftRect(normalizeBounds(snappedStartWorld, snappedStartWorld))
       setGesture('create-rect')
       return
     }
@@ -221,6 +227,7 @@ export function useCanvasPointerHandlers({
       selection,
     })
     let nextSelection = itemSelection.nextSelection
+    const moveBounds = scene.getBounds(nextSelection)
 
     if (editItem) {
       lastClickRef.current = null
@@ -268,6 +275,7 @@ export function useCanvasPointerHandlers({
       startScreen,
       startWorld,
       ids: nextSelection,
+      bounds: moveBounds,
       startItems,
       historyItems,
       edit: editItem
