@@ -1,5 +1,5 @@
 import type { CanvasTransformAdapter } from '../../engine/transform/CanvasTransformEngine'
-import type { CanvasItem } from '../../entities'
+import type { CanvasItem } from '../model'
 import { resizeCanvasItems, translateCanvasItems } from '../operations/CanvasOperations'
 
 export const CANVAS_ITEM_TRANSFORM_ADAPTER: CanvasTransformAdapter<CanvasItem> = {

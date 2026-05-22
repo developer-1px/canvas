@@ -1,5 +1,5 @@
 import { unique } from '../../engine/primitives/CanvasPrimitives'
-import type { CanvasItem } from '../../entities'
+import type { CanvasItem } from '../model'
 import { getItemsBounds } from './CanvasTreeBounds'
 import { isAncestorPath, samePath } from './CanvasTreePath'
 import { flattenCanvasItems } from './CanvasTreeTraversal'

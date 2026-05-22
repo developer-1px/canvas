@@ -1,4 +1,8 @@
-import type { Bounds, Point, ResizeHandle } from '../../entities'
+import type {
+  Bounds,
+  Point,
+  ResizeHandle
+} from '../../core'
 import {
   resizeBounds,
   type ResizeBoundsOptions,

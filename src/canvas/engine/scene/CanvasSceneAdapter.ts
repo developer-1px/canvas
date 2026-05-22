@@ -1,4 +1,4 @@
-import type { Bounds } from '../../entities'
+import type { Bounds } from '../../core'
 
 export type CanvasSceneEntry = {
   bounds: Bounds

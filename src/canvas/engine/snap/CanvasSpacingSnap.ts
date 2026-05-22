@@ -1,4 +1,4 @@
-import type { Bounds } from '../../entities'
+import type { Bounds } from '../../core'
 import type { CanvasSceneEntry } from '../scene/CanvasSceneAdapter'
 import type {
   CanvasAxisSnap,

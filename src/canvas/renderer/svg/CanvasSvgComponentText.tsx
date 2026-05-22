@@ -1,4 +1,4 @@
-import type { CanvasComponentItem } from '../../entities'
+import type { CanvasComponentItem } from '../../host/model'
 
 type CanvasSvgComponentTextProps = {
   compact?: boolean

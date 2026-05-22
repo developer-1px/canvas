@@ -1,5 +1,5 @@
-import type { Bounds } from '../../entities'
-import type { CanvasItem } from '../../entities'
+import type { Bounds } from '../../core'
+import type { CanvasItem } from '../model'
 import {
   flattenCanvasItems,
   getItemBounds,

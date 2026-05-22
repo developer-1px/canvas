@@ -8,10 +8,10 @@ import { CanvasAppView } from './CanvasAppView'
 import { DEFAULT_CANVAS_AFFORDANCE_CONFIG } from '../../engine/affordance/CanvasAffordances'
 import type {
   Bounds,
-  EditingText,
   Tool,
-  Viewport,
-} from '../../entities'
+  Viewport
+} from '../../core'
+import type { EditingText } from '../../host/model'
 import {
   INITIAL_VIEWPORT,
 } from '../../engine/primitives/CanvasPrimitives'

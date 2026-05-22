@@ -1,4 +1,7 @@
-import type { CanvasInteractionKind, Tool } from '../../entities'
+import type {
+  CanvasInteractionKind,
+  Tool
+} from '../../core'
 import type { CanvasCommandId } from './CanvasAffordanceTypes'
 
 export const CANVAS_TOOL_AFFORDANCES = {

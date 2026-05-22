@@ -28,9 +28,11 @@
 | `src/canvas/app/shell` | CanvasApp composition과 shell style |
 | `src/canvas/app/workflow` | React state와 engine/host/renderer wiring |
 | `src/canvas/app/geometry` | DOM/SVG pointer 좌표 변환 |
+| `src/canvas/core` | Host item과 renderer를 모르는 geometry, viewport, id 같은 재사용 계약 |
 | `src/canvas/engine` | Host item과 renderer를 모르는 조작 규칙 |
 | `src/canvas/engine/snap` | Grid, alignment, spacing snap과 guide 계산 |
-| `src/canvas/host` | Demo canvas item model, schema, document, document selection, initial data, catalog, factory |
+| `src/canvas/host/model` | Demo canvas item model. Core 재사용 계약에 포함하지 않는다 |
+| `src/canvas/host` | Demo canvas item schema, document, document selection, initial data, catalog, factory |
 | `src/canvas/host/operations` | Transform, text, clone, remove, group item operations |
 | `src/canvas/host/tree` | Bounds, traversal, selection tree helpers |
 | `src/canvas/host/adapters` | Demo host item을 engine interface에 맞추는 adapter |
@@ -60,7 +62,7 @@ type CanvasAffordanceConfig = {
 
 현재 앱에서 뽑는 Module:
 
-1. `CanvasPrimitives`: Engine과 Renderer Adapter가 공유하는 geometry, viewport, tool, interaction kind.
+1. `core`: Engine과 Renderer Adapter가 공유하는 geometry, viewport, id, tool, interaction kind.
 2. `CanvasAffordances`: 안정적인 tool/command/gesture/overlay/shortcut id와 label, title, default toggle. 완료.
 3. `CanvasOverlayEngine`: Renderer Adapter가 그릴 renderer-independent overlay state 생성. `CanvasSceneAdapter` 입력 사용.
 4. `CanvasSvgOverlayRenderer`: SVG Renderer Adapter로 overlay state를 그린다.
@@ -75,8 +77,8 @@ type CanvasAffordanceConfig = {
 
 ## Boundary Check
 
-- Engine Module은 `CanvasPrimitives`, `CanvasAffordances`, `CanvasSceneAdapter` 같은 renderer-independent 입력만 사용한다.
-- Engine Module은 Demo `CanvasModel`, `CanvasOperations`, `CanvasTree`, SVG Renderer를 import하지 않는다.
+- Engine Module은 `core`, `CanvasAffordances`, `CanvasSceneAdapter` 같은 renderer-independent 입력만 사용한다.
+- Engine Module은 Demo `CanvasItem`, `CanvasOperations`, `CanvasTree`, SVG Renderer를 import하지 않는다.
 - App workflow는 `CANVAS_ITEM_COMMAND_ADAPTER`, `CANVAS_ITEM_CREATION_ADAPTER`, `CANVAS_ITEM_TRANSFORM_ADAPTER`, `createCanvasItemScene`을 주입한다.
 - Renderer Adapter는 `CanvasOverlayState`를 받아 SVG로 그리며, Engine은 SVG/DOM 구현을 모른다.
 

@@ -1,5 +1,8 @@
 import type { CanvasAffordanceConfig } from '../affordance/CanvasAffordances'
-import type { Point, Viewport } from '../../entities'
+import type {
+  Point,
+  Viewport
+} from '../../core'
 import { zoomViewport } from '../primitives/CanvasPrimitives'
 
 export type CanvasWheelInput = {

@@ -1,5 +1,8 @@
 import type { CanvasAffordanceConfig } from '../affordance/CanvasAffordances'
-import type { Bounds, Point } from '../../entities'
+import type {
+  Bounds,
+  Point
+} from '../../core'
 
 const CANVAS_GRID_SIZE = 40
 

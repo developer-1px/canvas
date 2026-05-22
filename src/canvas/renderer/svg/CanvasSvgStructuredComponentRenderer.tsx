@@ -1,26 +1,14 @@
-import type { CanvasComponentItem } from '../../entities'
+import type { CanvasComponentItem } from '../../host/model'
 import {
   CanvasSvgComponentHeader,
   CanvasSvgText,
 } from './CanvasSvgComponentText'
 
-export function CanvasSvgStructuredComponentRenderer({
+export function CanvasSvgChecklistComponent({
   item,
 }: {
   item: CanvasComponentItem
 }) {
-  if (item.component === 'checklist') {
-    return <ChecklistComponent item={item} />
-  }
-
-  if (item.component === 'kanban') {
-    return <KanbanComponent item={item} />
-  }
-
-  return <TableComponent item={item} />
-}
-
-function ChecklistComponent({ item }: { item: CanvasComponentItem }) {
   const rows = item.items ?? []
 
   return (
@@ -71,7 +59,11 @@ function ChecklistComponent({ item }: { item: CanvasComponentItem }) {
   )
 }
 
-function KanbanComponent({ item }: { item: CanvasComponentItem }) {
+export function CanvasSvgKanbanComponent({
+  item,
+}: {
+  item: CanvasComponentItem
+}) {
   const rows = item.items ?? []
 
   return (
@@ -107,7 +99,7 @@ function KanbanComponent({ item }: { item: CanvasComponentItem }) {
   )
 }
 
-function TableComponent({ item }: { item: CanvasComponentItem }) {
+export function CanvasSvgTableComponent({ item }: { item: CanvasComponentItem }) {
   const cols = 3
   const rows = 3
   const cellW = item.w / cols

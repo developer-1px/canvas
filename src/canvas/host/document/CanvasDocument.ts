@@ -4,7 +4,8 @@ import {
   type JSONPatchOperation,
   type JSONResult,
 } from 'zod-crud'
-import type { CanvasItem, CanvasSelectionIds } from '../../entities'
+import type { CanvasSelectionIds } from '../../core'
+import type { CanvasItem } from '../model'
 import { CanvasItemsSchema, validateCanvasItems } from './CanvasItemSchema'
 import { syncCanvasItems } from '../tree/CanvasTree'
 import {
@@ -23,7 +24,7 @@ export {
   type CanvasTextSearchMatch,
   type CanvasTextSearchOptions,
 } from './CanvasDocumentSearch'
-export type { CanvasSelectionIds } from '../../entities'
+export type { CanvasSelectionIds } from '../../core'
 
 export const CANVAS_DOCUMENT_HISTORY_LIMIT = 100
 

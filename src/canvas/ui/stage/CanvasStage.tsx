@@ -1,11 +1,15 @@
 import type { PointerEvent, RefObject } from 'react'
-import type { CanvasItem, RectItem, TextItem } from '../../entities'
+import type {
+  CanvasItem,
+  RectItem,
+  TextItem
+} from '../../host/model'
 import type {
   CanvasInteractionKind,
   ResizeHandle,
   Tool,
-  Viewport,
-} from '../../entities'
+  Viewport
+} from '../../core'
 import type { CanvasOverlayState } from '../../engine/overlay/CanvasOverlayEngine'
 import { CanvasSvgItemRenderer } from '../../renderer/svg/CanvasSvgItemRenderer'
 import {

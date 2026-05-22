@@ -1,5 +1,8 @@
 import type { RefObject } from 'react'
-import type { Point, Viewport } from '../../entities'
+import type {
+  Point,
+  Viewport
+} from '../../core'
 
 export function screenPoint(
   svgRef: RefObject<SVGSVGElement | null>,

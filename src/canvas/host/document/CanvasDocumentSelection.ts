@@ -1,5 +1,6 @@
 import type { JSONPatchOperation, JSONResult, SelectionSnap } from 'zod-crud'
-import type { CanvasItem, CanvasSelectionIds } from '../../entities'
+import type { CanvasSelectionIds } from '../../core'
+import type { CanvasItem } from '../model'
 import type { CanvasItemsDocument } from './CanvasDocument'
 import {
   findCanvasItemEntry,

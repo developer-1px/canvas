@@ -1,4 +1,4 @@
-import type { Bounds } from '../../entities'
+import type { Bounds } from '../../core'
 import { unique } from '../primitives/CanvasPrimitives'
 import type { CanvasSceneAdapter } from '../scene/CanvasSceneAdapter'
 

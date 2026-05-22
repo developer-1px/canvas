@@ -3,8 +3,8 @@ import type {
   Bounds,
   Point,
   ResizeHandle,
-  Viewport,
-} from '../../entities'
+  Viewport
+} from '../../core'
 import {
   handlePoint,
   RESIZE_HANDLES,

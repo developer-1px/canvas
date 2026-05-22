@@ -5,7 +5,7 @@ import {
   shouldHandleCanvasWheelViewport,
   type CanvasWheelInput,
 } from './CanvasViewportEngine'
-import type { Viewport } from '../../entities'
+import type { Viewport } from '../../core'
 
 const config = createCanvasAffordanceConfig()
 const viewport: Viewport = { x: 0, y: 0, scale: 1 }

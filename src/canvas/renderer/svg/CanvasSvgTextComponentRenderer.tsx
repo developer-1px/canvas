@@ -1,31 +1,7 @@
-import type { CanvasComponentItem } from '../../entities'
+import type { CanvasComponentItem } from '../../host/model'
 import { CanvasSvgComponentText } from './CanvasSvgComponentText'
 
-export function CanvasSvgTextComponentRenderer({
-  item,
-}: {
-  item: CanvasComponentItem
-}) {
-  if (item.component === 'sticky') {
-    return <StickyComponent item={item} />
-  }
-
-  if (item.component === 'label') {
-    return <LabelComponent item={item} />
-  }
-
-  if (item.component === 'section') {
-    return <SectionComponent item={item} />
-  }
-
-  if (item.component === 'image') {
-    return <ImageComponent item={item} />
-  }
-
-  return <CardComponent item={item} />
-}
-
-function CardComponent({ item }: { item: CanvasComponentItem }) {
+export function CanvasSvgCardComponent({ item }: { item: CanvasComponentItem }) {
   return (
     <>
       <rect
@@ -52,7 +28,11 @@ function CardComponent({ item }: { item: CanvasComponentItem }) {
   )
 }
 
-function StickyComponent({ item }: { item: CanvasComponentItem }) {
+export function CanvasSvgStickyComponent({
+  item,
+}: {
+  item: CanvasComponentItem
+}) {
   return (
     <>
       <rect
@@ -77,7 +57,11 @@ function StickyComponent({ item }: { item: CanvasComponentItem }) {
   )
 }
 
-function LabelComponent({ item }: { item: CanvasComponentItem }) {
+export function CanvasSvgLabelComponent({
+  item,
+}: {
+  item: CanvasComponentItem
+}) {
   return (
     <>
       <rect
@@ -92,7 +76,11 @@ function LabelComponent({ item }: { item: CanvasComponentItem }) {
   )
 }
 
-function SectionComponent({ item }: { item: CanvasComponentItem }) {
+export function CanvasSvgSectionComponent({
+  item,
+}: {
+  item: CanvasComponentItem
+}) {
   return (
     <>
       <rect
@@ -111,7 +99,11 @@ function SectionComponent({ item }: { item: CanvasComponentItem }) {
   )
 }
 
-function ImageComponent({ item }: { item: CanvasComponentItem }) {
+export function CanvasSvgImageComponent({
+  item,
+}: {
+  item: CanvasComponentItem
+}) {
   return (
     <>
       <rect

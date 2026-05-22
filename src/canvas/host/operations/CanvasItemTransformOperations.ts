@@ -1,4 +1,5 @@
-import type { Bounds, CanvasItem } from '../../entities'
+import type { Bounds } from '../../core'
+import type { CanvasItem } from '../model'
 import {
   scaleItemBounds,
 } from '../../engine/primitives/CanvasPrimitives'

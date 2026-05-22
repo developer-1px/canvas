@@ -2,8 +2,8 @@ import {
   CANVAS_COMMAND_INSERT_OFFSET,
   type CanvasCommandOffset,
 } from '../../engine/command/CanvasCommandEngine'
-import type { Point } from '../../entities'
-import type { CanvasItem } from '../../entities'
+import type { Point } from '../../core'
+import type { CanvasItem } from '../../host/model'
 import { getItemsBounds } from '../../host/tree/CanvasTree'
 
 export function getCanvasPasteOffset({

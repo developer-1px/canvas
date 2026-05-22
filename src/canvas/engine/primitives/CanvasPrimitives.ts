@@ -3,7 +3,7 @@ import type {
   Point,
   ResizeHandle,
   Viewport,
-} from '../../entities'
+} from '../../core'
 
 export type {
   Bounds,
@@ -12,7 +12,7 @@ export type {
   ResizeHandle,
   Tool,
   Viewport,
-} from '../../entities'
+} from '../../core'
 
 export type ResizeBoundsOptions = {
   preserveAspectRatio?: boolean

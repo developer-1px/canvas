@@ -1,5 +1,5 @@
 import type { KeyboardEvent } from 'react'
-import type { Bounds } from '../../entities'
+import type { Bounds } from '../../core'
 import { MIN_ITEM_SIZE } from '../../engine/primitives/CanvasPrimitives'
 
 type CanvasObjectInspectorProps = {

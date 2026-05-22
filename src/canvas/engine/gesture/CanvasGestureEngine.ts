@@ -1,5 +1,5 @@
 import type { CanvasAffordanceConfig } from '../affordance/CanvasAffordances'
-import type { Tool } from '../../entities'
+import type { Tool } from '../../core'
 
 export type CanvasPointerInput = {
   altKey: boolean

@@ -1,30 +1,4 @@
-export type CanvasItemId = string
-
-export type Tool = 'select' | 'pan' | 'rect' | 'text'
-
-export type CanvasInteractionKind =
-  | 'none'
-  | 'pan'
-  | 'move'
-  | 'marquee'
-  | 'create-rect'
-  | 'resize'
-
-export type Point = {
-  x: number
-  y: number
-}
-
-export type Viewport = Point & {
-  scale: number
-}
-
-export type Bounds = Point & {
-  w: number
-  h: number
-}
-
-export type ResizeHandle = 'nw' | 'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w'
+import type { Bounds, CanvasItemId } from '../../core'
 
 export type CanvasItemBase = Bounds & {
   id: CanvasItemId
@@ -48,17 +22,7 @@ export type GroupItem = CanvasItemBase & {
   children: CanvasItem[]
 }
 
-export type CanvasComponentKind =
-  | 'card'
-  | 'checklist'
-  | 'connector'
-  | 'image'
-  | 'kanban'
-  | 'label'
-  | 'section'
-  | 'sticky'
-  | 'table'
-  | 'vote'
+export type CanvasComponentKind = string
 
 export type CanvasComponentItem = CanvasItemBase & {
   type: 'component'
@@ -73,8 +37,6 @@ export type CanvasComponentItem = CanvasItemBase & {
 }
 
 export type CanvasItem = RectItem | TextItem | GroupItem | CanvasComponentItem
-
-export type CanvasSelectionIds = CanvasItemId[]
 
 export type EditingText = {
   id: CanvasItemId

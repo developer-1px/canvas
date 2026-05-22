@@ -5,7 +5,7 @@ import {
   type SetStateAction,
 } from 'react'
 import type { CanvasAffordanceConfig } from '../../engine/affordance/CanvasAffordances'
-import type { Viewport } from '../../entities'
+import type { Viewport } from '../../core'
 import {
   getCanvasWheelViewport,
   shouldHandleCanvasWheelViewport,

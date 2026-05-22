@@ -2,8 +2,8 @@ import type { PointerEvent } from 'react'
 import type {
   CanvasItem,
   RectItem,
-  TextItem,
-} from '../../entities'
+  TextItem
+} from '../../host/model'
 import { CanvasSvgSelectionOutline } from './CanvasSvgOverlayRenderer'
 import { getItemBounds } from '../../host/tree/CanvasTree'
 import { CanvasSvgComponentRenderer } from './CanvasSvgComponentRenderer'

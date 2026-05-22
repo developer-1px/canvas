@@ -1,19 +1,11 @@
-import type { CanvasComponentItem } from '../../entities'
+import type { CanvasComponentItem } from '../../host/model'
 import { CanvasSvgText } from './CanvasSvgComponentText'
 
-export function CanvasSvgShapeComponentRenderer({
+export function CanvasSvgConnectorComponent({
   item,
 }: {
   item: CanvasComponentItem
 }) {
-  if (item.component === 'connector') {
-    return <ConnectorComponent item={item} />
-  }
-
-  return <VoteComponent item={item} />
-}
-
-function ConnectorComponent({ item }: { item: CanvasComponentItem }) {
   const y = item.y + item.h / 2
 
   return (
@@ -48,7 +40,7 @@ function ConnectorComponent({ item }: { item: CanvasComponentItem }) {
   )
 }
 
-function VoteComponent({ item }: { item: CanvasComponentItem }) {
+export function CanvasSvgVoteComponent({ item }: { item: CanvasComponentItem }) {
   return (
     <>
       <circle

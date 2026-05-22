@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import type { CanvasItem } from '../../entities'
+import type { CanvasItem } from '../model'
 import { createCanvasItemScene } from '../adapters/CanvasItemSceneAdapter'
 import {
   lockCanvasSelection,

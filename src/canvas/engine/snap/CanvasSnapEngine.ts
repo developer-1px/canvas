@@ -1,5 +1,8 @@
 import type { CanvasAffordanceConfig } from '../affordance/CanvasAffordances'
-import type { Bounds, Viewport } from '../../entities'
+import type {
+  Bounds,
+  Viewport
+} from '../../core'
 import type { CanvasSceneAdapter } from '../scene/CanvasSceneAdapter'
 import { getCanvasAlignmentSnap } from './CanvasAlignmentSnap'
 import { getCanvasGridSnap } from './CanvasGridSnap'

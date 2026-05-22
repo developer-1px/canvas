@@ -1,5 +1,8 @@
-import type { Point } from '../../entities'
-import type { CanvasComponentItem, CanvasComponentKind } from '../../entities'
+import type { Point } from '../../core'
+import type {
+  CanvasComponentItem,
+  CanvasComponentKind
+} from '../model'
 import { getCanvasComponentTemplate } from './CanvasComponentCatalog'
 
 export function createCanvasComponentItem({

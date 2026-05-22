@@ -4,12 +4,15 @@ import {
   type RefObject,
   type SetStateAction,
 } from 'react'
-import type { Tool, Viewport } from '../../entities'
+import type {
+  Tool,
+  Viewport
+} from '../../core'
 import { createCanvasComponentItem } from '../../host/component/CanvasComponentFactory'
 import type {
   CanvasComponentKind,
-  EditingText,
-} from '../../entities'
+  EditingText
+} from '../../host/model'
 import type { CommitCanvasItemsPatch } from '../document/useCanvasDocument'
 
 type UseCanvasComponentInsertionArgs = {

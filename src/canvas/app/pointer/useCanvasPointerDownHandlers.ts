@@ -9,15 +9,17 @@ import { useRef } from 'react'
 import type { CanvasAffordanceConfig } from '../../engine/affordance/CanvasAffordances'
 import type {
   Bounds,
+  Point,
+  ResizeHandle,
+  Tool,
+  Viewport
+} from '../../core'
+import type {
   CanvasItem,
   EditingText,
-  Point,
   RectItem,
-  ResizeHandle,
-  TextItem,
-  Tool,
-  Viewport,
-} from '../../entities'
+  TextItem
+} from '../../host/model'
 import {
   normalizeBounds,
   pointDistance,

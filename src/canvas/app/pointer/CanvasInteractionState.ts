@@ -2,9 +2,12 @@ import type {
   Bounds,
   Point,
   ResizeHandle,
-  Viewport,
-} from '../../entities'
-import type { CanvasItem, EditingText } from '../../entities'
+  Viewport
+} from '../../core'
+import type {
+  CanvasItem,
+  EditingText
+} from '../../host/model'
 
 export type Interaction =
   | { kind: 'none' }

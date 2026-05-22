@@ -1,5 +1,8 @@
-import type { Point } from '../../entities'
-import type { CanvasItem, GroupItem } from '../../entities'
+import type { Point } from '../../core'
+import type {
+  CanvasItem,
+  GroupItem
+} from '../model'
 import {
   flattenCanvasItems,
   pruneNestedSelection,

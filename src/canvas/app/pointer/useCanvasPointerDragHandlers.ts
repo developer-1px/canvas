@@ -8,11 +8,13 @@ import type {
 import type { CanvasAffordanceConfig } from '../../engine/affordance/CanvasAffordances'
 import type {
   Bounds,
-  CanvasItem,
-  EditingText,
   Tool,
-  Viewport,
-} from '../../entities'
+  Viewport
+} from '../../core'
+import type {
+  CanvasItem,
+  EditingText
+} from '../../host/model'
 import {
   DRAG_THRESHOLD,
   normalizeBounds,
