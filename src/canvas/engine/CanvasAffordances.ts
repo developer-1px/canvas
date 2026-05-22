@@ -85,6 +85,9 @@ export type CanvasShortcutId =
   | 'undo'
   | 'ungroup'
   | 'unlockAll'
+  | 'zoomIn'
+  | 'zoomOut'
+  | 'zoomReset'
 
 export type CanvasAffordanceConfig = {
   commands: Record<CanvasCommandId, boolean>
@@ -292,6 +295,9 @@ export function createCanvasAffordanceConfig(
         undo: true,
         ungroup: true,
         unlockAll: true,
+        zoomIn: true,
+        zoomOut: true,
+        zoomReset: true,
       },
       overrides.shortcuts,
     ),

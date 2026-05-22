@@ -191,6 +191,7 @@ function CanvasApp() {
     moveSelection,
     pasteSelection,
     redoHistory,
+    resetViewport,
     reorderSelection,
     selectAll,
     selection,
@@ -204,6 +205,7 @@ function CanvasApp() {
     undoHistory,
     ungroupSelection,
     unlockAll,
+    zoomBy,
   })
 
   const {

@@ -22,6 +22,7 @@ type UseCanvasKeyboardShortcutsArgs = {
   moveSelection: (dx: number, dy: number) => void
   pasteSelection: () => void
   redoHistory: () => void
+  resetViewport: () => void
   reorderSelection: (
     mode: 'bringForward' | 'bringToFront' | 'sendBackward' | 'sendToBack',
   ) => void
@@ -37,6 +38,7 @@ type UseCanvasKeyboardShortcutsArgs = {
   undoHistory: () => void
   ungroupSelection: () => void
   unlockAll: () => void
+  zoomBy: (multiplier: number) => void
 }
 
 function isTypingTarget(target: EventTarget | null) {
@@ -60,6 +62,7 @@ export function useCanvasKeyboardShortcuts({
   moveSelection,
   pasteSelection,
   redoHistory,
+  resetViewport,
   reorderSelection,
   selectAll,
   selection,
@@ -73,6 +76,7 @@ export function useCanvasKeyboardShortcuts({
   undoHistory,
   ungroupSelection,
   unlockAll,
+  zoomBy,
 }: UseCanvasKeyboardShortcutsArgs) {
   useEffect(() => {
     function handleKeyDown(event: globalThis.KeyboardEvent) {
@@ -133,6 +137,39 @@ export function useCanvasKeyboardShortcuts({
       if (mod && key === 'y' && config.shortcuts.redo) {
         event.preventDefault()
         redoHistory()
+        return
+      }
+
+      if (
+        mod &&
+        (key === '=' || key === '+') &&
+        config.shortcuts.zoomIn &&
+        config.commands.zoomIn
+      ) {
+        event.preventDefault()
+        zoomBy(1.25)
+        return
+      }
+
+      if (
+        mod &&
+        key === '-' &&
+        config.shortcuts.zoomOut &&
+        config.commands.zoomOut
+      ) {
+        event.preventDefault()
+        zoomBy(0.8)
+        return
+      }
+
+      if (
+        mod &&
+        key === '0' &&
+        config.shortcuts.zoomReset &&
+        config.commands.zoomReset
+      ) {
+        event.preventDefault()
+        resetViewport()
         return
       }
 
@@ -308,6 +345,7 @@ export function useCanvasKeyboardShortcuts({
     moveSelection,
     pasteSelection,
     redoHistory,
+    resetViewport,
     reorderSelection,
     selectAll,
     selection,
@@ -321,5 +359,6 @@ export function useCanvasKeyboardShortcuts({
     undoHistory,
     ungroupSelection,
     unlockAll,
+    zoomBy,
   ])
 }
