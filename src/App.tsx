@@ -44,6 +44,11 @@ import {
   EMPTY_CANVAS_SNAP_GUIDES,
   type CanvasSnapGuides,
 } from './canvas/engine/CanvasSnapEngine'
+import {
+  getCanvasWheelViewport,
+  shouldHandleCanvasWheelViewport,
+  type CanvasWheelInput,
+} from './canvas/engine/CanvasViewportEngine'
 import { getCanvasCommandAvailability } from './canvas/engine/CanvasCommandEngine'
 import { CANVAS_ITEM_COMMAND_ADAPTER } from './canvas/host/adapters/CanvasItemCommandAdapter'
 import { CANVAS_ITEM_CREATION_ADAPTER } from './canvas/host/adapters/CanvasItemCreationAdapter'
@@ -143,7 +148,14 @@ function App() {
     const svgElement = svg
 
     function handleNativeWheel(event: globalThis.WheelEvent) {
-      if (!canvasAffordanceConfig.gestures.wheelZoom) {
+      const input = getCanvasWheelInput(event)
+
+      if (
+        !shouldHandleCanvasWheelViewport({
+          config: canvasAffordanceConfig,
+          input,
+        })
+      ) {
         return
       }
 
@@ -154,9 +166,16 @@ function App() {
         x: event.clientX - rect.left,
         y: event.clientY - rect.top,
       }
-      const zoomFactor = Math.exp(-event.deltaY * 0.001)
 
-      setViewport((current) => zoomViewport(current, point, zoomFactor))
+      setViewport(
+        (current) =>
+          getCanvasWheelViewport({
+            config: canvasAffordanceConfig,
+            input,
+            point,
+            viewport: current,
+          }) ?? current,
+      )
     }
 
     svgElement.addEventListener('wheel', handleNativeWheel, { passive: false })
@@ -453,6 +472,17 @@ function App() {
       ) : null}
     </main>
   )
+}
+
+function getCanvasWheelInput(event: globalThis.WheelEvent): CanvasWheelInput {
+  return {
+    ctrlKey: event.ctrlKey,
+    deltaMode: event.deltaMode,
+    deltaX: event.deltaX,
+    deltaY: event.deltaY,
+    metaKey: event.metaKey,
+    shiftKey: event.shiftKey,
+  }
 }
 
 export default App

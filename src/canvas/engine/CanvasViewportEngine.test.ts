@@ -1,0 +1,72 @@
+import { describe, expect, test } from 'vitest'
+import { createCanvasAffordanceConfig } from './CanvasAffordances'
+import {
+  getCanvasWheelViewport,
+  shouldHandleCanvasWheelViewport,
+  type CanvasWheelInput,
+} from './CanvasViewportEngine'
+import type { Viewport } from './CanvasPrimitives'
+
+const config = createCanvasAffordanceConfig()
+const viewport: Viewport = { x: 0, y: 0, scale: 1 }
+const baseWheel: CanvasWheelInput = {
+  ctrlKey: false,
+  deltaMode: 0,
+  deltaX: 0,
+  deltaY: 0,
+  metaKey: false,
+  shiftKey: false,
+}
+
+describe('CanvasViewportEngine', () => {
+  test('uses wheel delta as 1.5x pan offset for trackpads', () => {
+    expect(
+      getCanvasWheelViewport({
+        config,
+        input: {
+          ...baseWheel,
+          deltaX: 10,
+          deltaY: 20,
+        },
+        point: { x: 100, y: 100 },
+        viewport,
+      }),
+    ).toEqual({ x: -15, y: -30, scale: 1 })
+  })
+
+  test('uses pinch wheel input as 1.5x zoom around the pointer', () => {
+    const next = getCanvasWheelViewport({
+      config,
+      input: {
+        ...baseWheel,
+        ctrlKey: true,
+        deltaY: -100,
+      },
+      point: { x: 100, y: 100 },
+      viewport,
+    })
+
+    expect(next?.scale).toBeCloseTo(Math.exp(0.15))
+    expect(next?.x).toBeCloseTo(100 - 100 * Math.exp(0.15))
+    expect(next?.y).toBeCloseTo(100 - 100 * Math.exp(0.15))
+  })
+
+  test('routes ordinary wheel to pan and pinch wheel to zoom', () => {
+    expect(
+      shouldHandleCanvasWheelViewport({
+        config: createCanvasAffordanceConfig({
+          gestures: { pan: false, wheelZoom: true },
+        }),
+        input: { ...baseWheel, deltaY: 20 },
+      }),
+    ).toBe(false)
+    expect(
+      shouldHandleCanvasWheelViewport({
+        config: createCanvasAffordanceConfig({
+          gestures: { pan: false, wheelZoom: true },
+        }),
+        input: { ...baseWheel, ctrlKey: true, deltaY: 20 },
+      }),
+    ).toBe(true)
+  })
+})
