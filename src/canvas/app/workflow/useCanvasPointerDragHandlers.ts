@@ -196,6 +196,8 @@ export function useCanvasPointerDragHandlers({
           handle: interaction.handle,
           items: interaction.startItems,
           point: snappedCurrentWorld,
+          preserveAspectRatio: event.shiftKey,
+          resizeFromCenter: event.altKey,
           selection: interaction.ids,
         }),
       )

@@ -24,6 +24,11 @@ export type Bounds = Point & {
 
 export type ResizeHandle = 'nw' | 'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w'
 
+export type ResizeBoundsOptions = {
+  preserveAspectRatio?: boolean
+  resizeFromCenter?: boolean
+}
+
 export const INITIAL_VIEWPORT: Viewport = {
   x: 0,
   y: 0,
@@ -79,7 +84,27 @@ export function resizeBounds(
   bounds: Bounds,
   handle: ResizeHandle,
   point: Point,
+  options: ResizeBoundsOptions = {},
 ): Bounds {
+  const resized = options.resizeFromCenter
+    ? resizeBoundsFromCenter(bounds, handle, point)
+    : resizeBoundsFromAnchor(bounds, handle, point)
+
+  return options.preserveAspectRatio
+    ? preserveResizeAspectRatio(
+        bounds,
+        handle,
+        resized,
+        options.resizeFromCenter === true,
+      )
+    : resized
+}
+
+function resizeBoundsFromAnchor(
+  bounds: Bounds,
+  handle: ResizeHandle,
+  point: Point,
+) {
   let left = bounds.x
   let right = bounds.x + bounds.w
   let top = bounds.y
@@ -106,6 +131,89 @@ export function resizeBounds(
     y: top,
     w: right - left,
     h: bottom - top,
+  }
+}
+
+function resizeBoundsFromCenter(
+  bounds: Bounds,
+  handle: ResizeHandle,
+  point: Point,
+) {
+  const centerX = bounds.x + bounds.w / 2
+  const centerY = bounds.y + bounds.h / 2
+  let halfW = bounds.w / 2
+  let halfH = bounds.h / 2
+
+  if (handle.includes('w') || handle.includes('e')) {
+    halfW = Math.max(MIN_ITEM_SIZE / 2, Math.abs(point.x - centerX))
+  }
+
+  if (handle.includes('n') || handle.includes('s')) {
+    halfH = Math.max(MIN_ITEM_SIZE / 2, Math.abs(point.y - centerY))
+  }
+
+  return {
+    x: centerX - halfW,
+    y: centerY - halfH,
+    w: halfW * 2,
+    h: halfH * 2,
+  }
+}
+
+function preserveResizeAspectRatio(
+  origin: Bounds,
+  handle: ResizeHandle,
+  resized: Bounds,
+  resizeFromCenter: boolean,
+) {
+  const aspectRatio = origin.w / origin.h
+  const changesX = handle.includes('w') || handle.includes('e')
+  const changesY = handle.includes('n') || handle.includes('s')
+  let width = resized.w
+  let height = resized.h
+
+  if (changesX && !changesY) {
+    height = Math.max(MIN_ITEM_SIZE, width / aspectRatio)
+  } else if (!changesX && changesY) {
+    width = Math.max(MIN_ITEM_SIZE, height * aspectRatio)
+  } else if (width / height > aspectRatio) {
+    height = Math.max(MIN_ITEM_SIZE, width / aspectRatio)
+  } else {
+    width = Math.max(MIN_ITEM_SIZE, height * aspectRatio)
+  }
+
+  return placeResizedBounds(origin, handle, width, height, resizeFromCenter)
+}
+
+function placeResizedBounds(
+  origin: Bounds,
+  handle: ResizeHandle,
+  width: number,
+  height: number,
+  resizeFromCenter: boolean,
+) {
+  const centerX = origin.x + origin.w / 2
+  const centerY = origin.y + origin.h / 2
+  const changesX = handle.includes('w') || handle.includes('e')
+  const changesY = handle.includes('n') || handle.includes('s')
+  const x =
+    resizeFromCenter || !changesX
+      ? centerX - width / 2
+      : handle.includes('w')
+        ? origin.x + origin.w - width
+        : origin.x
+  const y =
+    resizeFromCenter || !changesY
+      ? centerY - height / 2
+      : handle.includes('n')
+        ? origin.y + origin.h - height
+        : origin.y
+
+  return {
+    x,
+    y,
+    w: width,
+    h: height,
   }
 }
 

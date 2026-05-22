@@ -2,6 +2,7 @@ import {
   resizeBounds,
   type Bounds,
   type Point,
+  type ResizeBoundsOptions,
   type ResizeHandle,
 } from './CanvasPrimitives'
 
@@ -46,6 +47,8 @@ export function resizeCanvasSelection<TItem extends CanvasTransformItem>({
   handle,
   items,
   point,
+  preserveAspectRatio,
+  resizeFromCenter,
   selection,
 }: {
   adapter: CanvasTransformAdapter<TItem>
@@ -53,12 +56,17 @@ export function resizeCanvasSelection<TItem extends CanvasTransformItem>({
   handle: ResizeHandle
   items: TItem[]
   point: Point
+  preserveAspectRatio?: boolean
+  resizeFromCenter?: boolean
   selection: string[]
 }) {
   return adapter.resizeSelection({
     from: bounds,
     items,
     selection,
-    to: resizeBounds(bounds, handle, point),
+    to: resizeBounds(bounds, handle, point, {
+      preserveAspectRatio,
+      resizeFromCenter,
+    } satisfies ResizeBoundsOptions),
   })
 }
