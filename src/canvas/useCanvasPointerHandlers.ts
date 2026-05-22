@@ -22,13 +22,15 @@ import {
   type Viewport,
 } from './CanvasModel'
 import { capturePointer, screenPoint, screenToWorld } from './CanvasPointerGeometry'
-import { createCanvasText } from './CanvasCreationEngine'
+import {
+  createCanvasText,
+  type CanvasCreationAdapter,
+} from './CanvasCreationEngine'
 import {
   getCanvasItemPointerIntent,
   getCanvasPointerGesture,
   isAdditivePointerInput,
 } from './CanvasGestureEngine'
-import { CANVAS_ITEM_CREATION_ADAPTER } from './CanvasItemCreationAdapter'
 import { getCanvasItemPointerSelection } from './CanvasSelectionEngine'
 import type { CanvasSceneAdapter } from './CanvasSceneAdapter'
 import { findEditableTextItem } from './CanvasTree'
@@ -36,6 +38,7 @@ import { findEditableTextItem } from './CanvasTree'
 type UseCanvasPointerHandlersArgs = {
   cloneItems: (ids: string[], offset: Point) => CanvasItem[]
   config: CanvasAffordanceConfig
+  creationAdapter: CanvasCreationAdapter<CanvasItem>
   createId: (prefix: string) => string
   interactionRef: MutableRefObject<Interaction>
   items: CanvasItem[]
@@ -59,6 +62,7 @@ type UseCanvasPointerHandlersArgs = {
 export function useCanvasPointerHandlers({
   cloneItems,
   config,
+  creationAdapter,
   createId,
   interactionRef,
   items,
@@ -104,7 +108,7 @@ export function useCanvasPointerHandlers({
     }
 
     const created = createCanvasText({
-      adapter: CANVAS_ITEM_CREATION_ADAPTER,
+      adapter: creationAdapter,
       createId,
       point,
     })

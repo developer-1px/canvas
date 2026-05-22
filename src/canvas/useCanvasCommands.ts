@@ -15,13 +15,14 @@ import {
   nudgeCanvasCommand,
   pasteCanvasCommand,
   ungroupCanvasCommand,
+  type CanvasCommandAdapter,
 } from './CanvasCommandEngine'
 import type { CanvasAffordanceConfig } from './CanvasAffordances'
-import { CANVAS_ITEM_COMMAND_ADAPTER } from './CanvasItemCommandAdapter'
 import type { CanvasItem, EditingText, Point } from './CanvasModel'
 import type { CommitCanvasItems } from './useCanvasHistory'
 
 type UseCanvasCommandsArgs = {
+  commandAdapter: CanvasCommandAdapter<CanvasItem>
   config: CanvasAffordanceConfig
   createId: (prefix: string) => string
   items: CanvasItem[]
@@ -34,6 +35,7 @@ type UseCanvasCommandsArgs = {
 }
 
 export function useCanvasCommands({
+  commandAdapter,
   config,
   createId,
   items,
@@ -49,19 +51,19 @@ export function useCanvasCommands({
   const cloneItems = useCallback(
     (ids: string[], offset: Point) =>
       cloneCanvasCommandItems({
-        adapter: CANVAS_ITEM_COMMAND_ADAPTER,
+        adapter: commandAdapter,
         createId,
         ids,
         items,
         offset,
       }),
-    [createId, items],
+    [commandAdapter, createId, items],
   )
 
   const duplicateSelection = useCallback(
     (sourceIds = selection, offset: Point = CANVAS_COMMAND_INSERT_OFFSET) => {
       const result = duplicateCanvasCommand({
-        adapter: CANVAS_ITEM_COMMAND_ADAPTER,
+        adapter: commandAdapter,
         config,
         createId,
         items,
@@ -81,12 +83,12 @@ export function useCanvasCommands({
       setSelection(result.selection)
       return result.clones
     },
-    [config, createId, items, selection, setItems, setSelection],
+    [commandAdapter, config, createId, items, selection, setItems, setSelection],
   )
 
   const copySelection = useCallback(() => {
     const clipboard = copyCanvasCommand({
-      adapter: CANVAS_ITEM_COMMAND_ADAPTER,
+      adapter: commandAdapter,
       config,
       items,
       selection,
@@ -97,11 +99,11 @@ export function useCanvasCommands({
     }
 
     clipboardRef.current = clipboard
-  }, [config, items, selection])
+  }, [commandAdapter, config, items, selection])
 
   const pasteSelection = useCallback(() => {
     const result = pasteCanvasCommand({
-      adapter: CANVAS_ITEM_COMMAND_ADAPTER,
+      adapter: commandAdapter,
       clipboard: clipboardRef.current,
       config,
       createId,
@@ -118,11 +120,11 @@ export function useCanvasCommands({
       after: result.selection,
     })
     setSelection(result.selection)
-  }, [config, createId, items, selection, setItems, setSelection])
+  }, [commandAdapter, config, createId, items, selection, setItems, setSelection])
 
   const deleteSelection = useCallback(() => {
     const result = deleteCanvasCommand({
-      adapter: CANVAS_ITEM_COMMAND_ADAPTER,
+      adapter: commandAdapter,
       config,
       items,
       selection,
@@ -140,11 +142,11 @@ export function useCanvasCommands({
       current && result.clearEditingIds.includes(current.id) ? null : current,
     )
     setSelection(result.selection)
-  }, [config, items, selection, setEditing, setItems, setSelection])
+  }, [commandAdapter, config, items, selection, setEditing, setItems, setSelection])
 
   const groupSelection = useCallback(() => {
     const result = groupCanvasCommand({
-      adapter: CANVAS_ITEM_COMMAND_ADAPTER,
+      adapter: commandAdapter,
       config,
       createId,
       items,
@@ -160,11 +162,11 @@ export function useCanvasCommands({
       after: result.selection,
     })
     setSelection(result.selection)
-  }, [config, createId, items, selection, setItems, setSelection])
+  }, [commandAdapter, config, createId, items, selection, setItems, setSelection])
 
   const ungroupSelection = useCallback(() => {
     const result = ungroupCanvasCommand({
-      adapter: CANVAS_ITEM_COMMAND_ADAPTER,
+      adapter: commandAdapter,
       config,
       items,
       selection,
@@ -179,7 +181,7 @@ export function useCanvasCommands({
       after: result.selection,
     })
     setSelection(result.selection)
-  }, [config, items, selection, setItems, setSelection])
+  }, [commandAdapter, config, items, selection, setItems, setSelection])
 
   const undoHistory = useCallback(() => {
     if (!config.commands.undo) {
@@ -207,7 +209,7 @@ export function useCanvasCommands({
 
   const cutSelection = useCallback(() => {
     const result = cutCanvasCommand({
-      adapter: CANVAS_ITEM_COMMAND_ADAPTER,
+      adapter: commandAdapter,
       config,
       items,
       selection,
@@ -237,13 +239,13 @@ export function useCanvasCommands({
         : current,
     )
     setSelection(deletion.selection)
-  }, [config, items, selection, setEditing, setItems, setSelection])
+  }, [commandAdapter, config, items, selection, setEditing, setItems, setSelection])
 
   const moveSelection = useCallback(
     (dx: number, dy: number) => {
       setItems((current) =>
         nudgeCanvasCommand({
-          adapter: CANVAS_ITEM_COMMAND_ADAPTER,
+          adapter: commandAdapter,
           config,
           dx,
           dy,
@@ -252,7 +254,7 @@ export function useCanvasCommands({
         }) ?? current,
       )
     },
-    [config, selection, setItems],
+    [commandAdapter, config, selection, setItems],
   )
 
   return {

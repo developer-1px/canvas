@@ -36,7 +36,10 @@ import { useCanvasKeyboardShortcuts } from './canvas/useCanvasKeyboardShortcuts'
 import { useCanvasHistory } from './canvas/useCanvasHistory'
 import { createCanvasOverlayState } from './canvas/CanvasOverlayEngine'
 import { getCanvasCommandAvailability } from './canvas/CanvasCommandEngine'
+import { CANVAS_ITEM_COMMAND_ADAPTER } from './canvas/CanvasItemCommandAdapter'
+import { CANVAS_ITEM_CREATION_ADAPTER } from './canvas/CanvasItemCreationAdapter'
 import { createCanvasItemScene } from './canvas/CanvasItemSceneAdapter'
+import { CANVAS_ITEM_TRANSFORM_ADAPTER } from './canvas/CanvasItemTransformAdapter'
 import './App.css'
 
 const canvasAffordanceConfig = DEFAULT_CANVAS_AFFORDANCE_CONFIG
@@ -160,6 +163,7 @@ function App() {
     undoHistory,
     ungroupSelection,
   } = useCanvasCommands({
+    commandAdapter: CANVAS_ITEM_COMMAND_ADAPTER,
     config: canvasAffordanceConfig,
     createId,
     items,
@@ -248,6 +252,7 @@ function App() {
   } = useCanvasPointerHandlers({
     cloneItems,
     config: canvasAffordanceConfig,
+    creationAdapter: CANVAS_ITEM_CREATION_ADAPTER,
     createId,
     interactionRef,
     items,
@@ -274,6 +279,7 @@ function App() {
     handlePointerUp,
   } = useCanvasPointerDragHandlers({
     config: canvasAffordanceConfig,
+    creationAdapter: CANVAS_ITEM_CREATION_ADAPTER,
     createId,
     recordHistoryFrom,
     interactionRef,
@@ -288,6 +294,7 @@ function App() {
     setTool,
     setViewport,
     svgRef,
+    transformAdapter: CANVAS_ITEM_TRANSFORM_ADAPTER,
     viewport,
   })
 

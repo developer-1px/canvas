@@ -17,19 +17,22 @@ import {
   type Tool,
   type Viewport,
 } from './CanvasModel'
-import { createCanvasRect } from './CanvasCreationEngine'
-import { CANVAS_ITEM_CREATION_ADAPTER } from './CanvasItemCreationAdapter'
+import {
+  createCanvasRect,
+  type CanvasCreationAdapter,
+} from './CanvasCreationEngine'
 import { releasePointer, screenPoint, screenToWorld } from './CanvasPointerGeometry'
-import { CANVAS_ITEM_TRANSFORM_ADAPTER } from './CanvasItemTransformAdapter'
 import { getCanvasMarqueeSelection } from './CanvasSelectionEngine'
 import type { CanvasSceneAdapter } from './CanvasSceneAdapter'
 import {
   moveCanvasSelection,
   resizeCanvasSelection,
+  type CanvasTransformAdapter,
 } from './CanvasTransformEngine'
 
 type UseCanvasPointerDragHandlersArgs = {
   config: CanvasAffordanceConfig
+  creationAdapter: CanvasCreationAdapter<CanvasItem>
   createId: (prefix: string) => string
   interactionRef: MutableRefObject<Interaction>
   scene: CanvasSceneAdapter
@@ -44,11 +47,13 @@ type UseCanvasPointerDragHandlersArgs = {
   setTool: Dispatch<SetStateAction<Tool>>
   setViewport: Dispatch<SetStateAction<Viewport>>
   svgRef: RefObject<SVGSVGElement | null>
+  transformAdapter: CanvasTransformAdapter<CanvasItem>
   viewport: Viewport
 }
 
 export function useCanvasPointerDragHandlers({
   config,
+  creationAdapter,
   createId,
   interactionRef,
   scene,
@@ -63,6 +68,7 @@ export function useCanvasPointerDragHandlers({
   setTool,
   setViewport,
   svgRef,
+  transformAdapter,
   viewport,
 }: UseCanvasPointerDragHandlersArgs) {
   function handlePointerMove(event: PointerEvent<SVGSVGElement>) {
@@ -114,7 +120,7 @@ export function useCanvasPointerDragHandlers({
       }
       setLiveItems(
         moveCanvasSelection({
-          adapter: CANVAS_ITEM_TRANSFORM_ADAPTER,
+          adapter: transformAdapter,
           dx,
           dy,
           items: interaction.startItems,
@@ -143,7 +149,7 @@ export function useCanvasPointerDragHandlers({
       }
       setLiveItems(
         resizeCanvasSelection({
-          adapter: CANVAS_ITEM_TRANSFORM_ADAPTER,
+          adapter: transformAdapter,
           bounds: interaction.bounds,
           handle: interaction.handle,
           items: interaction.startItems,
@@ -217,7 +223,7 @@ export function useCanvasPointerDragHandlers({
 
     if (interaction.kind === 'create-rect') {
       const nextItem = createCanvasRect({
-        adapter: CANVAS_ITEM_CREATION_ADAPTER,
+        adapter: creationAdapter,
         createId,
         currentWorld: interaction.currentWorld,
         startWorld: interaction.startWorld,

@@ -6,9 +6,10 @@
 
 1. 모든 Affordance는 Feature Toggle 뒤에 둔다.
 2. Host App은 데이터와 저장을 소유한다.
-3. Engine은 intent, gesture, selection, creation result, overlay state, command routing을 소유한다.
-4. Renderer Adapter는 그리기만 한다.
-5. Scene Adapter는 bounds, hit target, parent/group, editable target만 제공한다.
+3. Host App은 concrete item adapter를 주입한다.
+4. Engine은 intent, gesture, selection, creation result, overlay state, command routing을 소유한다.
+5. Renderer Adapter는 그리기만 한다.
+6. Scene Adapter는 bounds, hit target, parent/group, editable target만 제공한다.
 
 ## Layer
 
