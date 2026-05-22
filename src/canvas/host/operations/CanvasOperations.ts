@@ -24,10 +24,6 @@ export {
   translateCanvasItems,
 } from './CanvasItemTransformOperations'
 export {
-  updateItemText,
-  updateTextItem,
-} from './CanvasItemTextOperations'
-export {
   reorderCanvasItems,
   type CanvasZOrderMode,
 } from './CanvasItemZOrderOperations'

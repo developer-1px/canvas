@@ -24,7 +24,9 @@ import {
 import {
   createAddCanvasItemsPatch,
   createRemoveCanvasItemsPatch,
+  createSetCanvasItemTextPatch,
 } from './CanvasDocumentPatches'
+import type { CanvasItem } from '../model/CanvasModel'
 
 describe('CanvasDocument history', () => {
   test('seeds zod-crud document selection from canvas ids', () => {
@@ -281,6 +283,81 @@ describe('CanvasDocument history', () => {
       },
     ])
     expect(getCanvasDocumentSelectionIds(document)).toEqual(['component-card'])
+  })
+
+  test('commits text editing as a zod-crud replace patch', () => {
+    const items: CanvasItem[] = [{
+      h: 48,
+      id: 'text-1',
+      text: 'Draft',
+      type: 'text',
+      w: 120,
+      x: 10,
+      y: 20,
+    }]
+    const document = createCanvasItemsDocument(items, {
+      selection: ['text-1'],
+    })
+    const patch = createSetCanvasItemTextPatch(items, 'text-1', 'Final')
+
+    expect(patch).toEqual([{
+      op: 'replace',
+      path: '/0/text',
+      value: 'Final',
+    }])
+    expect(
+      commitCanvasItemsPatch({
+        document,
+        patch,
+        selection: {
+          before: ['text-1'],
+          after: ['text-1'],
+        },
+      }),
+    ).toBe(true)
+
+    expect(document.lastPatch).toEqual(patch)
+    expect(document.value[0]).toMatchObject({ text: 'Final' })
+
+    expect(document.history.undo()).toBe(true)
+    expect(document.value[0]).toMatchObject({ text: 'Draft' })
+    expect(getCanvasDocumentSelectionIds(document)).toEqual(['text-1'])
+  })
+
+  test('commits empty rect text editing as a zod-crud add patch', () => {
+    const items: CanvasItem[] = [{
+      fill: '#ffffff',
+      h: 48,
+      id: 'rect-1',
+      stroke: '#111111',
+      type: 'rect',
+      w: 120,
+      x: 10,
+      y: 20,
+    }]
+    const document = createCanvasItemsDocument(items, {
+      selection: ['rect-1'],
+    })
+    const patch = createSetCanvasItemTextPatch(items, 'rect-1', 'Label')
+
+    expect(patch).toEqual([{
+      op: 'add',
+      path: '/0/text',
+      value: 'Label',
+    }])
+    expect(
+      commitCanvasItemsPatch({
+        document,
+        patch,
+        selection: {
+          before: ['rect-1'],
+          after: ['rect-1'],
+        },
+      }),
+    ).toBe(true)
+
+    expect(document.lastPatch).toEqual(patch)
+    expect(document.value[0]).toMatchObject({ text: 'Label' })
   })
 
   test('round-trips document selection through JSON pointers', () => {

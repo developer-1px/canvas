@@ -144,12 +144,13 @@ function CanvasApp() {
     commitText,
     editorStyle,
   } = useCanvasTextEditing({
+    commitItemsPatch,
     editing,
     editingItem,
     editorRef,
+    items,
     selection,
     setEditing,
-    setItems,
     viewport,
   })
 

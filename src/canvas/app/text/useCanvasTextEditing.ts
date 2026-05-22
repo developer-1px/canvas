@@ -6,29 +6,36 @@ import {
   type SetStateAction,
 } from 'react'
 import type { Viewport } from '../../engine/primitives/CanvasPrimitives'
-import type { EditingText, RectItem, TextItem } from '../../host/model/CanvasModel'
-import { updateItemText } from '../../host/operations/CanvasOperations'
-import type { CommitCanvasItems } from '../document/useCanvasDocument'
+import type {
+  CanvasItem,
+  EditingText,
+  RectItem,
+  TextItem,
+} from '../../host/model/CanvasModel'
+import { createSetCanvasItemTextPatch } from '../../host/document/CanvasDocumentPatches'
+import type { CommitCanvasItemsPatch } from '../document/useCanvasDocument'
 
 type EditableCanvasTextItem = RectItem | TextItem
 
 type UseCanvasTextEditingArgs = {
+  commitItemsPatch: CommitCanvasItemsPatch
   editing: EditingText | null
   editingItem: EditableCanvasTextItem | null
   editorRef: RefObject<HTMLTextAreaElement | null>
+  items: CanvasItem[]
   selection: string[]
   setEditing: Dispatch<SetStateAction<EditingText | null>>
-  setItems: CommitCanvasItems
   viewport: Viewport
 }
 
 export function useCanvasTextEditing({
+  commitItemsPatch,
   editing,
   editingItem,
   editorRef,
+  items,
   selection,
   setEditing,
-  setItems,
   viewport,
 }: UseCanvasTextEditingArgs) {
   const editingId = editing?.id
@@ -61,7 +68,7 @@ export function useCanvasTextEditing({
         ? 'Text'
         : editing.value
 
-    setItems((current) => updateItemText(current, editing.id, value), {
+    commitItemsPatch(createSetCanvasItemTextPatch(items, editing.id, value), {
       before: selection,
       after: selection,
     })

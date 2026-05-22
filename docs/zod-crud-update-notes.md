@@ -22,13 +22,16 @@ history, validation, and document selection state.
   storage while canvas keeps id rekey and paste offset policy.
 - Canvas find/replace helpers use zod-crud `doc.query`, `doc.at`, and
   `replace` patch batches over searchable text fields.
+- Canvas text edits commit zod-crud `add`/`replace` patches at the edited
+  item text pointer instead of replacing the root item array.
 
 This is an intermediate state. Canvas is no longer applyPatch-only. Item
-creation commits now use zod-crud `add` patches, and selection delete commits
-use zod-crud `remove` patches with group-bound repair patches when needed. Most
-other content commands still produce `CanvasItem[]` and commit them as root
-document replacements. The next migration step is to make more commands produce
-zod-crud patch batches and wire the find/replace helpers into UI when needed.
+creation commits now use zod-crud `add` patches, text edits use text field
+patches, and selection delete commits use zod-crud `remove` patches with
+group-bound repair patches when needed. Most other content commands still
+produce `CanvasItem[]` and commit them as root document replacements. The next
+migration step is to make more commands produce zod-crud patch batches and wire
+the find/replace helpers into UI when needed.
 
 ## Changelog Impact
 
@@ -80,14 +83,13 @@ and document selection state.
 
 Current migration scope: history, validation, selection ownership, item creation
 patches, selection delete patches, zod-crud-backed clipboard payloads, and
-zod-crud-backed find/replace patch helpers. Generic command availability stays
-app-owned until command patch planning is introduced.
+zod-crud-backed find/replace and text-edit patch helpers. Generic command
+availability stays app-owned until command patch planning is introduced.
 
 ## Suggested Local Work Items
 
 - Replace command `nextItems` producers with patch planners.
-- Replace duplicate, align, distribute, lock, z-order, and text edits with patch
-  planners.
+- Replace duplicate, align, distribute, lock, and z-order with patch planners.
 - Add UI entry points for find/replace when the demo needs them.
 
 ## Verification

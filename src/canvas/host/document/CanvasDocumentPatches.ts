@@ -1,7 +1,8 @@
-import type { JSONPatchOperation } from 'zod-crud'
+import type { JSONPatchOperation, Pointer } from 'zod-crud'
 import type { CanvasItem } from '../model/CanvasModel'
 import { removeCanvasItems } from '../operations/CanvasOperations'
 import {
+  findCanvasItemEntry,
   flattenCanvasItems,
   type CanvasItemEntry,
 } from '../tree/CanvasTree'
@@ -50,6 +51,30 @@ export function createAddCanvasItemsPatch(
     path: '/-',
     value: item,
   }))
+}
+
+export function createSetCanvasItemTextPatch(
+  items: CanvasItem[],
+  id: string,
+  text: string,
+): JSONPatchOperation[] {
+  const entry = findCanvasItemEntry(items, id)
+
+  if (
+    !entry ||
+    (entry.item.type !== 'rect' && entry.item.type !== 'text') ||
+    entry.item.text === text
+  ) {
+    return []
+  }
+
+  return [{
+    op: entry.item.type === 'rect' && entry.item.text === undefined
+      ? 'add'
+      : 'replace',
+    path: `${canvasItemPathToPointer(entry.path)}/text` as Pointer,
+    value: text,
+  }]
 }
 
 function getTopmostEntries(entries: CanvasItemEntry[]) {
