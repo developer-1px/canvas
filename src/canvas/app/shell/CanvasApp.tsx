@@ -33,6 +33,11 @@ import { useCanvasWheelViewport } from '../workflow/useCanvasWheelViewport'
 import { useCanvasTextEditing } from '../workflow/useCanvasTextEditing'
 import { useCanvasViewportControls } from '../workflow/useCanvasViewportControls'
 import { useCanvasComponentInsertion } from '../workflow/useCanvasComponentInsertion'
+import {
+  getCanvasItemIdSeed,
+  readStoredCanvasWorkspace,
+  useCanvasWorkspacePersistence,
+} from '../workflow/CanvasWorkspacePersistence'
 import { createCanvasOverlayState } from '../../engine/CanvasOverlayEngine'
 import {
   EMPTY_CANVAS_SNAP_GUIDES,
@@ -46,12 +51,16 @@ import { CANVAS_ITEM_TRANSFORM_ADAPTER } from '../../host/adapters/CanvasItemTra
 import './CanvasApp.css'
 
 const canvasAffordanceConfig = DEFAULT_CANVAS_AFFORDANCE_CONFIG
+const DEFAULT_INITIAL_SELECTION = ['component-sticky', 'component-card']
 
 function CanvasApp() {
+  const storedWorkspace = useMemo(() => readStoredCanvasWorkspace(), [])
+  const initialItems = storedWorkspace?.items ?? INITIAL_ITEMS
+
   const svgRef = useRef<SVGSVGElement | null>(null)
   const editorRef = useRef<HTMLTextAreaElement | null>(null)
   const interactionRef = useRef<Interaction>({ kind: 'none' })
-  const idSeed = useRef(INITIAL_ITEMS.length)
+  const idSeed = useRef(getCanvasItemIdSeed(initialItems))
 
   const [tool, setTool] = useState<Tool>('select')
   const {
@@ -64,12 +73,13 @@ function CanvasApp() {
     setLiveItems,
     syncDocumentSelection,
     undo,
-  } = useCanvasHistory(INITIAL_ITEMS)
-  const [selection, setSelection] = useState<string[]>([
-    'component-sticky',
-    'component-card',
-  ])
-  const [viewport, setViewport] = useState<Viewport>(INITIAL_VIEWPORT)
+  } = useCanvasHistory(initialItems)
+  const [selection, setSelection] = useState<string[]>(
+    () => storedWorkspace?.selection ?? [...DEFAULT_INITIAL_SELECTION],
+  )
+  const [viewport, setViewport] = useState<Viewport>(
+    () => storedWorkspace?.viewport ?? INITIAL_VIEWPORT,
+  )
   const [spaceDown, setSpaceDown] = useState(false)
   const [gesture, setGesture] = useState<Interaction['kind']>('none')
   const [marquee, setMarquee] = useState<Bounds | null>(null)
@@ -112,6 +122,12 @@ function CanvasApp() {
   useEffect(() => {
     syncDocumentSelection(selection)
   }, [selection, syncDocumentSelection])
+
+  useCanvasWorkspacePersistence({
+    items,
+    selection,
+    viewport,
+  })
 
   useCanvasWheelViewport({
     config: canvasAffordanceConfig,
