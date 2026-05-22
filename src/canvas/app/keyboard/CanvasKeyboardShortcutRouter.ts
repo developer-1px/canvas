@@ -21,6 +21,7 @@ export type CanvasKeyboardShortcutHandlers = {
   interactionRef: MutableRefObject<Interaction>
   lockSelection: () => void
   moveSelection: (dx: number, dy: number) => void
+  openFindReplace: () => void
   pasteSelection: () => void
   redoHistory: () => void
   resetViewport: () => void
@@ -45,6 +46,15 @@ export function handleCanvasKeyboardShortcut(
   event: globalThis.KeyboardEvent,
   handlers: CanvasKeyboardShortcutHandlers,
 ) {
+  const key = event.key.toLowerCase()
+  const mod = event.metaKey || event.ctrlKey
+
+  if (mod && key === 'f') {
+    event.preventDefault()
+    handlers.openFindReplace()
+    return
+  }
+
   if (isTypingTarget(event.target)) {
     return
   }
@@ -109,9 +119,6 @@ export function handleCanvasKeyboardShortcut(
     deleteSelection()
     return
   }
-
-  const key = event.key.toLowerCase()
-  const mod = event.metaKey || event.ctrlKey
 
   if (
     mod &&

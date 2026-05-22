@@ -22,6 +22,7 @@ export {
   createReplaceCanvasDocumentTextPatch,
   findCanvasDocumentText,
   type CanvasTextSearchMatch,
+  type CanvasTextSearchOptions,
 } from './CanvasDocumentSearch'
 export type { CanvasSelectionIds } from './CanvasDocumentSelection'
 

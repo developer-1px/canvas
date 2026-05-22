@@ -19,10 +19,14 @@ import {
   commitCanvasItemsDocument,
   commitCanvasItemsPatch,
   createCanvasItemsDocument,
+  createReplaceCanvasDocumentTextPatch,
+  findCanvasDocumentText,
   getCanvasDocumentSelectionIds,
   loadCanvasItemsDocument,
   replaceCanvasItems,
   restoreCanvasDocumentSelection,
+  type CanvasTextSearchMatch,
+  type CanvasTextSearchOptions,
 } from '../../host/document/CanvasDocument'
 
 type HistoryAvailability = {
@@ -53,6 +57,18 @@ export type CanvasDocumentClipboard = {
   copyItemsToClipboard: (selection: string[]) => boolean
   getClipboardItems: () => CanvasItem[]
   setClipboardItems: (items: CanvasItem[]) => boolean
+}
+
+export type CanvasDocumentTextSearch = {
+  findDocumentText: (
+    text: string,
+    options?: CanvasTextSearchOptions,
+  ) => CanvasTextSearchMatch[]
+  replaceDocumentText: (
+    searchText: string,
+    replacement: string,
+    options?: CanvasTextSearchOptions,
+  ) => boolean
 }
 
 export function useCanvasDocument(
@@ -214,6 +230,38 @@ export function useCanvasDocument(
     [document],
   )
 
+  const findDocumentText: CanvasDocumentTextSearch['findDocumentText'] =
+    useCallback((text, options) =>
+      findCanvasDocumentText(document, text, options),
+    [document])
+
+  const replaceDocumentText: CanvasDocumentTextSearch['replaceDocumentText'] =
+    useCallback((searchText, replacement, options) => {
+      const currentSelection = getCanvasDocumentSelectionIds(document)
+      const didCommit = commitCanvasItemsPatch({
+        document,
+        patch: createReplaceCanvasDocumentTextPatch(
+          document,
+          searchText,
+          replacement,
+          options,
+        ),
+        selection: {
+          before: currentSelection,
+          after: currentSelection,
+        },
+      })
+
+      if (!didCommit) {
+        return false
+      }
+
+      itemsRef.current = document.value
+      setItemsState(itemsRef.current)
+      syncHistoryAvailability()
+      return true
+    }, [document, syncHistoryAvailability])
+
   const undo = useCallback(() => {
     if (!document.history.undo()) {
       return undefined
@@ -246,10 +294,12 @@ export function useCanvasDocument(
     commitItems,
     commitItemsPatch,
     copyItemsToClipboard,
+    findDocumentText,
     getClipboardItems,
     items,
     redo,
     recordHistoryFrom,
+    replaceDocumentText,
     selection,
     setClipboardItems,
     setSelection,

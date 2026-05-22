@@ -18,7 +18,7 @@ export type CanvasTextSearchMatch = {
   value: string
 }
 
-type CanvasTextSearchOptions = {
+export type CanvasTextSearchOptions = {
   caseSensitive?: boolean
 }
 

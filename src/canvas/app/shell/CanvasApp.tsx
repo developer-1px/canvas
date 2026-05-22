@@ -66,9 +66,11 @@ function CanvasApp() {
     commitItemsPatch,
     copyItemsToClipboard,
     getClipboardItems,
+    findDocumentText,
     items,
     redo,
     recordHistoryFrom,
+    replaceDocumentText,
     selection,
     setClipboardItems,
     setLiveItems,
@@ -89,6 +91,9 @@ function CanvasApp() {
     EMPTY_CANVAS_SNAP_GUIDES,
   )
   const [editing, setEditing] = useState<EditingText | null>(null)
+  const [findReplaceOpen, setFindReplaceOpen] = useState(false)
+  const [findQuery, setFindQuery] = useState('')
+  const [findReplacement, setFindReplacement] = useState('')
 
   const selected = useMemo(() => new Set(selection), [selection])
   const scene = useMemo(() => createCanvasItemScene(items), [items])
@@ -125,6 +130,11 @@ function CanvasApp() {
   )
   const editingItem = editing ? findEditableTextItem(items, editing.id) : null
   const activeMode = spaceDown ? 'pan' : tool
+  const findMatches = findDocumentText(findQuery)
+  const findMatchCount = findMatches.reduce(
+    (total, match) => total + match.occurrences,
+    0,
+  )
 
   useCanvasWorkspacePersistence({
     items,
@@ -203,6 +213,14 @@ function CanvasApp() {
     svgRef,
   })
 
+  const openFindReplace = useCallback(() => {
+    setFindReplaceOpen(true)
+  }, [])
+
+  const replaceAllText = useCallback(() => {
+    replaceDocumentText(findQuery, findReplacement)
+  }, [findQuery, findReplacement, replaceDocumentText])
+
   useCanvasKeyboardShortcuts({
     config: canvasAffordanceConfig,
     copySelection,
@@ -214,6 +232,7 @@ function CanvasApp() {
     lockSelection,
     interactionRef,
     moveSelection,
+    openFindReplace,
     pasteSelection,
     redoHistory,
     resetViewport,
@@ -310,6 +329,16 @@ function CanvasApp() {
       editorRef={editorRef}
       editorStyle={editingItem ? editorStyle : undefined}
       fitToItems={fitToItems}
+      findReplace={{
+        matchCount: findMatchCount,
+        open: findReplaceOpen,
+        query: findQuery,
+        replacement: findReplacement,
+        onClose: () => setFindReplaceOpen(false),
+        onQueryChange: setFindQuery,
+        onReplaceAll: replaceAllText,
+        onReplacementChange: setFindReplacement,
+      }}
       gesture={gesture}
       inspector={inspector}
       insertComponent={insertComponent}

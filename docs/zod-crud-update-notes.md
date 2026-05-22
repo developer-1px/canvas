@@ -22,6 +22,8 @@ history, validation, and document selection state.
   storage while canvas keeps id rekey and paste offset policy.
 - Canvas find/replace helpers use zod-crud `doc.query`, `doc.at`, and
   `replace` patch batches over searchable text fields.
+- The app exposes a compact find/replace panel opened with Cmd/Ctrl+F; replace
+  commits those zod-crud text patch batches into document history.
 - Canvas text edits commit zod-crud `add`/`replace` patches at the edited
   item text pointer instead of replacing the root item array.
 
@@ -30,8 +32,7 @@ creation commits now use zod-crud `add` patches, text edits use text field
 patches, and selection delete commits use zod-crud `remove` patches with
 group-bound repair patches when needed. Most other content commands still
 produce `CanvasItem[]` and commit them as root document replacements. The next
-migration step is to make more commands produce zod-crud patch batches and wire
-the find/replace helpers into UI when needed.
+migration step is to make more commands produce zod-crud patch batches.
 
 ## Changelog Impact
 
@@ -90,7 +91,6 @@ availability stays app-owned until command patch planning is introduced.
 
 - Replace command `nextItems` producers with patch planners.
 - Replace duplicate, align, distribute, lock, and z-order with patch planners.
-- Add UI entry points for find/replace when the demo needs them.
 
 ## Verification
 

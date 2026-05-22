@@ -219,6 +219,7 @@
 
 .toolbar,
 .component-palette,
+.find-replace-panel,
 .zoom-controls,
 .object-inspector,
 .canvas-status {
@@ -246,6 +247,13 @@
   right: 14px;
   display: grid;
   grid-template-columns: repeat(5, 34px);
+}
+
+.find-replace-panel {
+  bottom: 14px;
+  left: 50%;
+  align-items: center;
+  transform: translateX(-50%);
 }
 
 .zoom-controls {
@@ -323,7 +331,8 @@
 
 .tool-button,
 .component-button,
-.zoom-value {
+.zoom-value,
+.find-replace-panel button {
   display: inline-grid;
   place-items: center;
   height: 34px;
@@ -358,6 +367,32 @@
   font-variant-numeric: tabular-nums;
 }
 
+.find-replace-panel input {
+  width: 132px;
+  height: 34px;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 0 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 5px;
+  color: #111827;
+  background: #ffffff;
+  font: 600 12px/1 var(--sans);
+}
+
+.find-replace-panel button {
+  min-width: 34px;
+  padding: 0 10px;
+}
+
+.find-replace-count {
+  min-width: 24px;
+  color: #475569;
+  font: 700 12px/1 var(--sans);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
 .tool-button svg {
   width: 20px;
   height: 20px;
@@ -371,17 +406,20 @@
 .tool-button:hover,
 .component-button:hover,
 .zoom-value:hover,
+.find-replace-panel button:hover,
 .tool-button[data-active='true'] {
   background: #e5edff;
   color: #1d4ed8;
 }
 
-.tool-button:disabled {
+.tool-button:disabled,
+.find-replace-panel button:disabled {
   color: #9ca3af;
   cursor: not-allowed;
 }
 
-.tool-button:disabled:hover {
+.tool-button:disabled:hover,
+.find-replace-panel button:disabled:hover {
   background: transparent;
   color: #9ca3af;
 }
@@ -395,6 +433,8 @@
 .tool-button:focus-visible,
 .component-button:focus-visible,
 .zoom-value:focus-visible,
+.find-replace-panel input:focus-visible,
+.find-replace-panel button:focus-visible,
 .inspector-field input:focus-visible,
 .text-editor:focus-visible {
   outline: 2px solid #2563eb;
@@ -433,6 +473,19 @@
     right: auto;
     grid-template-columns: repeat(10, 30px);
     max-width: calc(100vw - 20px);
+  }
+
+  .find-replace-panel {
+    top: 96px;
+    right: 10px;
+    bottom: auto;
+    left: 10px;
+    transform: none;
+  }
+
+  .find-replace-panel input {
+    flex: 1 1 0;
+    width: auto;
   }
 
   .component-button {

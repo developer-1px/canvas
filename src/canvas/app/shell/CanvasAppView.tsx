@@ -2,6 +2,7 @@ import type { ComponentProps } from 'react'
 import { CanvasStage } from '../../ui/stage/CanvasStage'
 import { CanvasComponentPalette } from '../../ui/palette/CanvasComponentPalette'
 import { CanvasObjectInspector } from '../../ui/inspector/CanvasObjectInspector'
+import { CanvasFindReplacePanel } from '../../ui/search/CanvasFindReplacePanel'
 import { CanvasTextEditor } from '../../ui/text/CanvasTextEditor'
 import { CanvasToolbar } from '../../ui/toolbar/CanvasToolbar'
 import { CanvasStatus } from '../../ui/status/CanvasStatus'
@@ -12,6 +13,7 @@ import type { CanvasCommandAvailability } from '../../engine/command/CanvasComma
 type StageProps = ComponentProps<typeof CanvasStage>
 type ToolbarProps = ComponentProps<typeof CanvasToolbar>
 type TextEditorProps = ComponentProps<typeof CanvasTextEditor>
+type FindReplaceProps = ComponentProps<typeof CanvasFindReplacePanel>
 type InspectorProps = ComponentProps<typeof CanvasObjectInspector>
 type PaletteInsert = ComponentProps<typeof CanvasComponentPalette>['onInsert']
 
@@ -24,6 +26,7 @@ type CanvasAppViewProps = {
   editorRef: TextEditorProps['editorRef']
   editorStyle: TextEditorProps['style']
   fitToItems: (ids?: string[]) => void
+  findReplace: FindReplaceProps
   gesture: StageProps['gesture']
   inspector: InspectorProps
   insertComponent: PaletteInsert
@@ -68,6 +71,7 @@ export function CanvasAppView({
   editorRef,
   editorStyle,
   fitToItems,
+  findReplace,
   gesture,
   inspector,
   insertComponent,
@@ -132,6 +136,8 @@ export function CanvasAppView({
       ) : null}
 
       <CanvasComponentPalette onInsert={insertComponent} />
+
+      <CanvasFindReplacePanel {...findReplace} />
 
       <CanvasStage
         activeMode={activeMode}
