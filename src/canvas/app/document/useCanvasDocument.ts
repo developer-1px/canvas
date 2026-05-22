@@ -6,8 +6,11 @@ import {
   type Dispatch,
   type SetStateAction,
 } from 'react'
-import type { JSONPatchOperation } from 'zod-crud'
 import type { CanvasItem } from '../../host/model'
+import {
+  commitCanvasItemsChange,
+  type CanvasItemsChange,
+} from '../../host'
 import {
   copyCanvasDocumentSelectionToClipboard,
   readCanvasDocumentClipboardItems,
@@ -36,8 +39,13 @@ export type SelectionHistory = {
   after: string[]
 }
 
-export type CommitCanvasItemsPatch = (
-  patch: JSONPatchOperation[],
+type CommitCanvasItemsPatch = (
+  patch: Parameters<typeof commitCanvasItemsPatch>[0]['patch'],
+  selection?: SelectionHistory,
+) => boolean
+
+export type CommitCanvasItemsChange = (
+  change: CanvasItemsChange,
   selection?: SelectionHistory,
 ) => boolean
 
@@ -107,6 +115,12 @@ export function useCanvasDocument(
     [],
   )
 
+  const syncCommittedItems = useCallback(() => {
+    itemsRef.current = document.value
+    setItemsState(itemsRef.current)
+    syncHistoryAvailability()
+  }, [document, syncHistoryAvailability])
+
   const commitItemsPatch: CommitCanvasItemsPatch = useCallback(
     (patch, selection) => {
       const didCommit = commitCanvasItemsPatch({
@@ -119,12 +133,29 @@ export function useCanvasDocument(
         return false
       }
 
-      itemsRef.current = document.value
-      setItemsState(itemsRef.current)
-      syncHistoryAvailability()
+      syncCommittedItems()
       return true
     },
-    [document, syncHistoryAvailability],
+    [document, syncCommittedItems],
+  )
+
+  const commitItemsChange: CommitCanvasItemsChange = useCallback(
+    (change, selection) => {
+      const didCommit = commitCanvasItemsChange({
+        change,
+        currentItems: itemsRef.current,
+        document,
+        selection,
+      })
+
+      if (!didCommit) {
+        return false
+      }
+
+      syncCommittedItems()
+      return true
+    },
+    [document, syncCommittedItems],
   )
 
   const setSelection: Dispatch<SetStateAction<string[]>> = useCallback(
@@ -188,29 +219,19 @@ export function useCanvasDocument(
   const replaceDocumentText: CanvasDocumentTextSearch['replaceDocumentText'] =
     useCallback((searchText, replacement, options) => {
       const currentSelection = getCanvasDocumentSelectionIds(document)
-      const didCommit = commitCanvasItemsPatch({
-        document,
-        patch: createReplaceCanvasDocumentTextPatch(
+      return commitItemsPatch(
+        createReplaceCanvasDocumentTextPatch(
           document,
           searchText,
           replacement,
           options,
         ),
-        selection: {
+        {
           before: currentSelection,
           after: currentSelection,
         },
-      })
-
-      if (!didCommit) {
-        return false
-      }
-
-      itemsRef.current = document.value
-      setItemsState(itemsRef.current)
-      syncHistoryAvailability()
-      return true
-    }, [document, syncHistoryAvailability])
+      )
+    }, [commitItemsPatch, document])
 
   const undo = useCallback(() => {
     if (!document.history.undo()) {
@@ -241,7 +262,7 @@ export function useCanvasDocument(
   return {
     ...historyAvailability,
     commitSelection,
-    commitItemsPatch,
+    commitItemsChange,
     copyItemsToClipboard,
     findDocumentText,
     getClipboardItems,

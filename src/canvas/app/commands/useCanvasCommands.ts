@@ -24,26 +24,19 @@ import type { CanvasAffordanceConfig } from '../../engine/affordance/CanvasAffor
 import type { Viewport } from '../../core'
 import type {
   CanvasItem,
-  EditingText
+  EditingText,
 } from '../../host/model'
-import {
-  createGroupCanvasItemsPatch,
-  createRemoveCanvasItemsPatch,
-  createReorderCanvasItemsPatch,
-  createReplaceChangedCanvasItemsPatch,
-  createUngroupCanvasItemsPatch,
-} from '../../host/document/CanvasDocumentPatches'
 import { useCanvasClipboardCommands } from './useCanvasClipboardCommands'
 import type {
   CanvasDocumentClipboard,
+  CommitCanvasItemsChange,
   CommitCanvasSelection,
-  CommitCanvasItemsPatch,
 } from '../document/useCanvasDocument'
 
 type UseCanvasCommandsArgs = {
   commandAdapter: CanvasCommandAdapter<CanvasItem>
   commitSelection: CommitCanvasSelection
-  commitItemsPatch: CommitCanvasItemsPatch
+  commitItemsChange: CommitCanvasItemsChange
   config: CanvasAffordanceConfig
   copyItemsToClipboard: CanvasDocumentClipboard['copyItemsToClipboard']
   createId: (prefix: string) => string
@@ -62,7 +55,7 @@ type UseCanvasCommandsArgs = {
 export function useCanvasCommands({
   commandAdapter,
   commitSelection,
-  commitItemsPatch,
+  commitItemsChange,
   config,
   copyItemsToClipboard,
   createId,
@@ -85,7 +78,7 @@ export function useCanvasCommands({
     pasteSelection,
   } = useCanvasClipboardCommands({
     commandAdapter,
-    commitItemsPatch,
+    commitItemsChange,
     config,
     copyItemsToClipboard,
     createId,
@@ -113,12 +106,12 @@ export function useCanvasCommands({
         return
       }
 
-      commitItemsPatch(createReplaceChangedCanvasItemsPatch(items, result.items), {
+      commitItemsChange({ type: 'replace-changed', items: result.items }, {
         before: selection,
         after: result.selection,
       })
     },
-    [commandAdapter, commitItemsPatch, config, items, selection],
+    [commandAdapter, commitItemsChange, config, items, selection],
   )
 
   const distributeSelection = useCallback(
@@ -135,12 +128,12 @@ export function useCanvasCommands({
         return
       }
 
-      commitItemsPatch(createReplaceChangedCanvasItemsPatch(items, result.items), {
+      commitItemsChange({ type: 'replace-changed', items: result.items }, {
         before: selection,
         after: result.selection,
       })
     },
-    [commandAdapter, commitItemsPatch, config, items, selection],
+    [commandAdapter, commitItemsChange, config, items, selection],
   )
 
   const deleteSelection = useCallback(() => {
@@ -155,14 +148,15 @@ export function useCanvasCommands({
       return
     }
 
-    const patch = createRemoveCanvasItemsPatch(items, selection)
-
-    if (patch.length > 0) {
-      commitItemsPatch(patch, {
+    const didCommit = commitItemsChange(
+      { type: 'remove-selection', selection },
+      {
         before: selection,
         after: result.selection,
-      })
-    } else {
+      },
+    )
+
+    if (!didCommit) {
       commitSelection(result.selection)
     }
 
@@ -172,7 +166,7 @@ export function useCanvasCommands({
   }, [
     commandAdapter,
     commitSelection,
-    commitItemsPatch,
+    commitItemsChange,
     config,
     items,
     selection,
@@ -193,8 +187,8 @@ export function useCanvasCommands({
       return
     }
 
-    const didCommit = commitItemsPatch(
-      createGroupCanvasItemsPatch(items, selection, groupId),
+    const didCommit = commitItemsChange(
+      { type: 'group-selection', groupId, selection },
       {
         before: selection,
         after: result.selection,
@@ -206,7 +200,7 @@ export function useCanvasCommands({
     }
   }, [
     commandAdapter,
-    commitItemsPatch,
+    commitItemsChange,
     commitSelection,
     config,
     createId,
@@ -226,8 +220,8 @@ export function useCanvasCommands({
       return
     }
 
-    const didCommit = commitItemsPatch(
-      createUngroupCanvasItemsPatch(items, selection),
+    const didCommit = commitItemsChange(
+      { type: 'ungroup-selection', selection },
       {
         before: selection,
         after: result.selection,
@@ -237,7 +231,7 @@ export function useCanvasCommands({
     if (!didCommit) {
       commitSelection(result.selection)
     }
-  }, [commandAdapter, commitItemsPatch, commitSelection, config, items, selection])
+  }, [commandAdapter, commitItemsChange, commitSelection, config, items, selection])
 
   const lockSelection = useCallback(() => {
     const result = lockCanvasCommand({
@@ -251,8 +245,8 @@ export function useCanvasCommands({
       return
     }
 
-    const didCommit = commitItemsPatch(
-      createReplaceChangedCanvasItemsPatch(items, result.items),
+    const didCommit = commitItemsChange(
+      { type: 'replace-changed', items: result.items },
       {
         before: selection,
         after: result.selection,
@@ -262,7 +256,7 @@ export function useCanvasCommands({
     if (!didCommit) {
       commitSelection(result.selection)
     }
-  }, [commandAdapter, commitItemsPatch, commitSelection, config, items, selection])
+  }, [commandAdapter, commitItemsChange, commitSelection, config, items, selection])
 
   const unlockAll = useCallback(() => {
     const result = unlockAllCanvasCommand({
@@ -276,8 +270,8 @@ export function useCanvasCommands({
       return
     }
 
-    const didCommit = commitItemsPatch(
-      createReplaceChangedCanvasItemsPatch(items, result.items),
+    const didCommit = commitItemsChange(
+      { type: 'replace-changed', items: result.items },
       {
         before: selection,
         after: result.selection,
@@ -287,7 +281,7 @@ export function useCanvasCommands({
     if (!didCommit) {
       commitSelection(result.selection)
     }
-  }, [commandAdapter, commitItemsPatch, commitSelection, config, items, selection])
+  }, [commandAdapter, commitItemsChange, commitSelection, config, items, selection])
 
   const undoHistory = useCallback(() => {
     if (!config.commands.undo) {
@@ -328,15 +322,15 @@ export function useCanvasCommands({
         return
       }
 
-      commitItemsPatch(
-        createReplaceChangedCanvasItemsPatch(items, result),
+      commitItemsChange(
+        { type: 'replace-changed', items: result },
         {
           before: selection,
           after: selection,
         },
       )
     },
-    [commandAdapter, commitItemsPatch, config, items, selection],
+    [commandAdapter, commitItemsChange, config, items, selection],
   )
 
   const reorderSelection = useCallback(
@@ -353,12 +347,12 @@ export function useCanvasCommands({
         return
       }
 
-      commitItemsPatch(createReorderCanvasItemsPatch(items, selection, mode), {
+      commitItemsChange({ type: 'reorder-selection', mode, selection }, {
         before: selection,
         after: result.selection,
       })
     },
-    [commandAdapter, commitItemsPatch, config, items, selection],
+    [commandAdapter, commitItemsChange, config, items, selection],
   )
 
   const selectAll = useCallback(() => {

@@ -39,15 +39,14 @@ import {
   type CanvasTransformAdapter,
 } from '../../engine/transform/CanvasTransformEngine'
 import type {
+  CommitCanvasItemsChange,
   CommitCanvasSelection,
-  CommitCanvasItemsPatch,
 } from '../document/useCanvasDocument'
-import { createTransformCanvasItemsPatch } from '../../host/document/CanvasDocumentPatches'
 import type { Interaction } from './CanvasInteractionState'
 
 type UseCanvasPointerDragHandlersArgs = {
   commitSelection: CommitCanvasSelection
-  commitItemsPatch: CommitCanvasItemsPatch
+  commitItemsChange: CommitCanvasItemsChange
   config: CanvasAffordanceConfig
   creationAdapter: CanvasCreationAdapter<CanvasItem>
   createId: (prefix: string) => string
@@ -70,7 +69,7 @@ type UseCanvasPointerDragHandlersArgs = {
 
 export function useCanvasPointerDragHandlers({
   commitSelection,
-  commitItemsPatch,
+  commitItemsChange,
   config,
   creationAdapter,
   createId,
@@ -284,7 +283,7 @@ export function useCanvasPointerDragHandlers({
         startWorld: interaction.startWorld,
       })
 
-      commitItemsPatch([{ op: 'add', path: '/-', value: nextItem }], {
+      commitItemsChange({ type: 'add', items: [nextItem] }, {
         before: selection,
         after: [nextItem.id],
       })
@@ -292,11 +291,12 @@ export function useCanvasPointerDragHandlers({
     }
 
     if (interaction.kind === 'move' || interaction.kind === 'resize') {
-      commitItemsPatch(
-        createTransformCanvasItemsPatch(
-          interaction.historyItems,
-          interaction.currentItems,
-        ),
+      commitItemsChange(
+        {
+          type: 'transform',
+          beforeItems: interaction.historyItems,
+          afterItems: interaction.currentItems,
+        },
         {
           before:
             interaction.kind === 'move'

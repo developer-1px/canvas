@@ -5,7 +5,7 @@ import type {
   TextItem
 } from '../../host/model'
 import { CanvasSvgSelectionOutline } from './CanvasSvgOverlayRenderer'
-import { getItemBounds } from '../../host/tree/CanvasTree'
+import { getItemBounds } from '../../host'
 import { CanvasSvgComponentRenderer } from './CanvasSvgComponentRenderer'
 
 type CanvasSvgItemRendererProps = {

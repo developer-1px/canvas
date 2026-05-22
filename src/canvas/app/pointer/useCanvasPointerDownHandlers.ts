@@ -12,13 +12,13 @@ import type {
   Point,
   ResizeHandle,
   Tool,
-  Viewport
+  Viewport,
 } from '../../core'
 import type {
   CanvasItem,
   EditingText,
   RectItem,
-  TextItem
+  TextItem,
 } from '../../host/model'
 import {
   normalizeBounds,
@@ -37,17 +37,17 @@ import {
 import { getCanvasItemPointerSelection } from '../../engine/selection/CanvasSelectionEngine'
 import { snapCanvasPointToGrid } from '../../engine/snap/CanvasSnapEngine'
 import type { CanvasSceneAdapter } from '../../engine/scene/CanvasSceneAdapter'
-import { findEditableTextItem } from '../../host/tree/CanvasTree'
+import { findEditableTextItem } from '../../host'
 import type {
+  CommitCanvasItemsChange,
   CommitCanvasSelection,
-  CommitCanvasItemsPatch,
 } from '../document/useCanvasDocument'
 import type { Interaction } from './CanvasInteractionState'
 
 type UseCanvasPointerDownHandlersArgs = {
   cloneItems: (ids: string[], offset: Point) => CanvasItem[]
   commitSelection: CommitCanvasSelection
-  commitItemsPatch: CommitCanvasItemsPatch
+  commitItemsChange: CommitCanvasItemsChange
   config: CanvasAffordanceConfig
   creationAdapter: CanvasCreationAdapter<CanvasItem>
   createId: (prefix: string) => string
@@ -71,7 +71,7 @@ type UseCanvasPointerDownHandlersArgs = {
 export function useCanvasPointerDownHandlers({
   cloneItems,
   commitSelection,
-  commitItemsPatch,
+  commitItemsChange,
   config,
   creationAdapter,
   createId,
@@ -122,7 +122,7 @@ export function useCanvasPointerDownHandlers({
       point,
     })
 
-    commitItemsPatch([{ op: 'add', path: '/-', value: created.item }], {
+    commitItemsChange({ type: 'add', items: [created.item] }, {
       before: selection,
       after: [created.item.id],
     })

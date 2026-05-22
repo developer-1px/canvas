@@ -1,7 +1,7 @@
 import {
   CANVAS_COMPONENT_TEMPLATES,
   type CanvasComponentTemplate,
-} from '../../host/component/CanvasComponentCatalog'
+} from '../../host'
 import type { CanvasComponentKind } from '../../host/model'
 
 type CanvasComponentPaletteProps = {

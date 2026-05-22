@@ -7,7 +7,7 @@ import {
   MIN_SCALE,
 } from '../../engine/primitives/CanvasPrimitives'
 import { validateCanvasItems } from '../../host/document/CanvasItemSchema'
-import { flattenCanvasItems, pruneNestedSelection } from '../../host/tree/CanvasTree'
+import { flattenCanvasItems, pruneNestedSelection } from '../../host'
 
 export const CANVAS_WORKSPACE_STORAGE_KEY =
   'interactive-os.canvas.workspace.v1'

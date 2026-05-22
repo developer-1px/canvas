@@ -7,33 +7,29 @@ import {
 } from 'react'
 import type { Viewport } from '../../core'
 import type {
-  CanvasItem,
   EditingText,
   RectItem,
-  TextItem
+  TextItem,
 } from '../../host/model'
-import { createSetCanvasItemTextPatch } from '../../host/document/CanvasDocumentPatches'
-import type { CommitCanvasItemsPatch } from '../document/useCanvasDocument'
+import type { CommitCanvasItemsChange } from '../document/useCanvasDocument'
 
 type EditableCanvasTextItem = RectItem | TextItem
 
 type UseCanvasTextEditingArgs = {
-  commitItemsPatch: CommitCanvasItemsPatch
+  commitItemsChange: CommitCanvasItemsChange
   editing: EditingText | null
   editingItem: EditableCanvasTextItem | null
   editorRef: RefObject<HTMLTextAreaElement | null>
-  items: CanvasItem[]
   selection: string[]
   setEditing: Dispatch<SetStateAction<EditingText | null>>
   viewport: Viewport
 }
 
 export function useCanvasTextEditing({
-  commitItemsPatch,
+  commitItemsChange,
   editing,
   editingItem,
   editorRef,
-  items,
   selection,
   setEditing,
   viewport,
@@ -68,7 +64,7 @@ export function useCanvasTextEditing({
         ? 'Text'
         : editing.value
 
-    commitItemsPatch(createSetCanvasItemTextPatch(items, editing.id, value), {
+    commitItemsChange({ type: 'set-text', id: editing.id, text: value }, {
       before: selection,
       after: selection,
     })

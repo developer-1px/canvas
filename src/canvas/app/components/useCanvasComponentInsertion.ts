@@ -6,17 +6,17 @@ import {
 } from 'react'
 import type {
   Tool,
-  Viewport
+  Viewport,
 } from '../../core'
-import { createCanvasComponentItem } from '../../host/component/CanvasComponentFactory'
+import { createCanvasComponentItem } from '../../host'
 import type {
   CanvasComponentKind,
-  EditingText
+  EditingText,
 } from '../../host/model'
-import type { CommitCanvasItemsPatch } from '../document/useCanvasDocument'
+import type { CommitCanvasItemsChange } from '../document/useCanvasDocument'
 
 type UseCanvasComponentInsertionArgs = {
-  commitItemsPatch: CommitCanvasItemsPatch
+  commitItemsChange: CommitCanvasItemsChange
   createId: (prefix: string) => string
   selection: string[]
   setEditing: Dispatch<SetStateAction<EditingText | null>>
@@ -26,7 +26,7 @@ type UseCanvasComponentInsertionArgs = {
 }
 
 export function useCanvasComponentInsertion({
-  commitItemsPatch,
+  commitItemsChange,
   createId,
   selection,
   setEditing,
@@ -49,7 +49,7 @@ export function useCanvasComponentInsertion({
         templateId: component,
       })
 
-      commitItemsPatch([{ op: 'add', path: '/-', value: nextItem }], {
+      commitItemsChange({ type: 'add', items: [nextItem] }, {
         before: selection,
         after: [nextItem.id],
       })
@@ -57,7 +57,7 @@ export function useCanvasComponentInsertion({
       setTool('select')
     },
     [
-      commitItemsPatch,
+      commitItemsChange,
       createId,
       selection,
       setEditing,

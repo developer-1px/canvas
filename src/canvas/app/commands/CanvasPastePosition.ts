@@ -4,7 +4,7 @@ import {
 } from '../../engine/command/CanvasCommandEngine'
 import type { Point } from '../../core'
 import type { CanvasItem } from '../../host/model'
-import { getItemsBounds } from '../../host/tree/CanvasTree'
+import { getItemsBounds } from '../../host'
 
 export function getCanvasPasteOffset({
   clipboard,

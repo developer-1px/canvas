@@ -1,19 +1,18 @@
 import { useCallback, useMemo } from 'react'
 import type { Bounds } from '../../core'
 import type { CanvasItem } from '../../host/model'
-import { createResizeCanvasItemsPatch } from '../../host/document/CanvasDocumentPatches'
-import { findCanvasItem, unionBounds } from '../../host/tree/CanvasTree'
-import type { CommitCanvasItemsPatch } from '../document/useCanvasDocument'
+import { findCanvasItem, unionBounds } from '../../host'
+import type { CommitCanvasItemsChange } from '../document/useCanvasDocument'
 
 type UseCanvasObjectInspectorArgs = {
   items: CanvasItem[]
   selected: Set<string>
   selection: string[]
-  commitItemsPatch: CommitCanvasItemsPatch
+  commitItemsChange: CommitCanvasItemsChange
 }
 
 export function useCanvasObjectInspector({
-  commitItemsPatch,
+  commitItemsChange,
   items,
   selected,
   selection,
@@ -38,15 +37,20 @@ export function useCanvasObjectInspector({
         return
       }
 
-      commitItemsPatch(
-        createResizeCanvasItemsPatch(items, selection, bounds, nextBounds),
+      commitItemsChange(
+        {
+          type: 'resize-selection',
+          from: bounds,
+          selection,
+          to: nextBounds,
+        },
         {
           before: selection,
           after: selection,
         },
       )
     },
-    [bounds, commitItemsPatch, items, selection],
+    [bounds, commitItemsChange, selection],
   )
 
   return {

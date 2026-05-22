@@ -11,7 +11,7 @@ import {
   INITIAL_VIEWPORT,
   zoomViewport,
 } from '../../engine/primitives/CanvasPrimitives'
-import { flattenCanvasItems, unionBounds } from '../../host/tree/CanvasTree'
+import { flattenCanvasItems, unionBounds } from '../../host'
 
 type UseCanvasViewportControlsArgs = {
   items: CanvasItem[]

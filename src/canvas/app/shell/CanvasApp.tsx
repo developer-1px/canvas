@@ -9,14 +9,16 @@ import { DEFAULT_CANVAS_AFFORDANCE_CONFIG } from '../../engine/affordance/Canvas
 import type {
   Bounds,
   Tool,
-  Viewport
+  Viewport,
 } from '../../core'
 import type { EditingText } from '../../host/model'
+import { INITIAL_VIEWPORT } from '../../engine/primitives/CanvasPrimitives'
 import {
-  INITIAL_VIEWPORT,
-} from '../../engine/primitives/CanvasPrimitives'
-import { INITIAL_ITEMS } from '../../host/component/CanvasInitialItems'
-import { findEditableTextItem } from '../../host/tree/CanvasTree'
+  CANVAS_ITEM_ENGINE_ADAPTERS,
+  INITIAL_ITEMS,
+  createCanvasItemScene,
+  findEditableTextItem,
+} from '../../host'
 import type { Interaction } from '../pointer/CanvasInteractionState'
 import { useCanvasPointerDragHandlers } from '../pointer/useCanvasPointerDragHandlers'
 import { useCanvasPointerDownHandlers } from '../pointer/useCanvasPointerDownHandlers'
@@ -39,10 +41,6 @@ import {
   type CanvasSnapGuides,
 } from '../../engine/snap/CanvasSnapEngine'
 import { getCanvasCommandAvailability } from '../../engine/command/CanvasCommandEngine'
-import { CANVAS_ITEM_COMMAND_ADAPTER } from '../../host/adapters/CanvasItemCommandAdapter'
-import { CANVAS_ITEM_CREATION_ADAPTER } from '../../host/adapters/CanvasItemCreationAdapter'
-import { createCanvasItemScene } from '../../host/adapters/CanvasItemSceneAdapter'
-import { CANVAS_ITEM_TRANSFORM_ADAPTER } from '../../host/adapters/CanvasItemTransformAdapter'
 import './CanvasApp.css'
 
 const canvasAffordanceConfig = DEFAULT_CANVAS_AFFORDANCE_CONFIG
@@ -62,7 +60,7 @@ function CanvasApp() {
     canRedo,
     canUndo,
     commitSelection,
-    commitItemsPatch,
+    commitItemsChange,
     copyItemsToClipboard,
     getClipboardItems,
     findDocumentText,
@@ -97,7 +95,7 @@ function CanvasApp() {
   const scene = useMemo(() => createCanvasItemScene(items), [items])
   const selectedBounds = useMemo(() => scene.getBounds(selection), [scene, selection])
   const inspector = useCanvasObjectInspector({
-    commitItemsPatch,
+    commitItemsChange,
     items,
     selected,
     selection,
@@ -152,11 +150,10 @@ function CanvasApp() {
     commitText,
     editorStyle,
   } = useCanvasTextEditing({
-    commitItemsPatch,
+    commitItemsChange,
     editing,
     editingItem,
     editorRef,
-    items,
     selection,
     setEditing,
     viewport,
@@ -186,9 +183,9 @@ function CanvasApp() {
     ungroupSelection,
     unlockAll,
   } = useCanvasCommands({
-    commandAdapter: CANVAS_ITEM_COMMAND_ADAPTER,
+    commandAdapter: CANVAS_ITEM_ENGINE_ADAPTERS.command,
     commitSelection,
-    commitItemsPatch,
+    commitItemsChange,
     config: canvasAffordanceConfig,
     copyItemsToClipboard,
     createId,
@@ -258,9 +255,9 @@ function CanvasApp() {
     cloneItems,
     commitSelection,
     config: canvasAffordanceConfig,
-    creationAdapter: CANVAS_ITEM_CREATION_ADAPTER,
+    creationAdapter: CANVAS_ITEM_ENGINE_ADAPTERS.creation,
     createId,
-    commitItemsPatch,
+    commitItemsChange,
     interactionRef,
     items,
     scene,
@@ -284,8 +281,8 @@ function CanvasApp() {
     handlePointerUp,
   } = useCanvasPointerDragHandlers({
     config: canvasAffordanceConfig,
-    creationAdapter: CANVAS_ITEM_CREATION_ADAPTER,
-    commitItemsPatch,
+    creationAdapter: CANVAS_ITEM_ENGINE_ADAPTERS.creation,
+    commitItemsChange,
     createId,
     commitSelection,
     interactionRef,
@@ -301,12 +298,12 @@ function CanvasApp() {
     setTool,
     setViewport,
     svgRef,
-    transformAdapter: CANVAS_ITEM_TRANSFORM_ADAPTER,
+    transformAdapter: CANVAS_ITEM_ENGINE_ADAPTERS.transform,
     viewport,
   })
 
   const insertComponent = useCanvasComponentInsertion({
-    commitItemsPatch,
+    commitItemsChange,
     createId,
     selection,
     setEditing,

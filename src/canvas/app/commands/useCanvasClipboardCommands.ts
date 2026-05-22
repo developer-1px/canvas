@@ -15,27 +15,23 @@ import {
 import type { CanvasAffordanceConfig } from '../../engine/affordance/CanvasAffordances'
 import type {
   Point,
-  Viewport
+  Viewport,
 } from '../../core'
 import type {
   CanvasItem,
-  EditingText
+  EditingText,
 } from '../../host/model'
-import {
-  createAddCanvasItemsPatch,
-  createRemoveCanvasItemsPatch,
-} from '../../host/document/CanvasDocumentPatches'
 import { getCanvasPasteOffset } from './CanvasPastePosition'
 import type {
   CanvasDocumentClipboard,
+  CommitCanvasItemsChange,
   CommitCanvasSelection,
-  CommitCanvasItemsPatch,
 } from '../document/useCanvasDocument'
 
 type UseCanvasClipboardCommandsArgs = {
   commandAdapter: CanvasCommandAdapter<CanvasItem>
   commitSelection: CommitCanvasSelection
-  commitItemsPatch: CommitCanvasItemsPatch
+  commitItemsChange: CommitCanvasItemsChange
   config: CanvasAffordanceConfig
   copyItemsToClipboard: CanvasDocumentClipboard['copyItemsToClipboard']
   createId: (prefix: string) => string
@@ -51,7 +47,7 @@ type UseCanvasClipboardCommandsArgs = {
 export function useCanvasClipboardCommands({
   commandAdapter,
   commitSelection,
-  commitItemsPatch,
+  commitItemsChange,
   config,
   copyItemsToClipboard,
   createId,
@@ -93,7 +89,7 @@ export function useCanvasClipboardCommands({
         return []
       }
 
-      const didCommit = commitItemsPatch(createAddCanvasItemsPatch(result.clones), {
+      const didCommit = commitItemsChange({ type: 'add', items: result.clones }, {
         before: selection,
         after: result.selection,
       })
@@ -106,7 +102,7 @@ export function useCanvasClipboardCommands({
     },
     [
       commandAdapter,
-      commitItemsPatch,
+      commitItemsChange,
       config,
       createId,
       items,
@@ -143,7 +139,7 @@ export function useCanvasClipboardCommands({
       return
     }
 
-    const didCommit = commitItemsPatch(createAddCanvasItemsPatch(clones), {
+    const didCommit = commitItemsChange({ type: 'add', items: clones }, {
       before: selection,
       after: clones.map((item) => item.id),
     })
@@ -156,7 +152,7 @@ export function useCanvasClipboardCommands({
     pasteIndexRef.current += 1
   }, [
     commandAdapter,
-    commitItemsPatch,
+    commitItemsChange,
     config.commands.paste,
     createId,
     getClipboardItems,
@@ -186,14 +182,15 @@ export function useCanvasClipboardCommands({
       return
     }
 
-    const patch = createRemoveCanvasItemsPatch(items, selection)
-
-    if (patch.length > 0) {
-      commitItemsPatch(patch, {
+    const didCommit = commitItemsChange(
+      { type: 'remove-selection', selection },
+      {
         before: selection,
         after: deletion.selection,
-      })
-    } else {
+      },
+    )
+
+    if (!didCommit) {
       commitSelection(deletion.selection)
     }
 
@@ -205,7 +202,7 @@ export function useCanvasClipboardCommands({
   }, [
     commandAdapter,
     commitSelection,
-    commitItemsPatch,
+    commitItemsChange,
     config,
     copyItemsToClipboard,
     items,
