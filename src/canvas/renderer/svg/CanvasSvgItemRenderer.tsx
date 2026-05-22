@@ -4,9 +4,9 @@ import type {
   CanvasItem,
   RectItem,
   TextItem,
-} from './CanvasModel'
+} from '../../host/CanvasModel'
 import { CanvasSvgSelectionOutline } from './CanvasSvgOverlayRenderer'
-import { getItemBounds } from './CanvasTree'
+import { getItemBounds } from '../../host/CanvasTree'
 
 type CanvasSvgItemRendererProps = {
   items: CanvasItem[]

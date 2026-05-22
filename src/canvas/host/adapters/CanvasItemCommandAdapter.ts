@@ -1,5 +1,5 @@
-import type { CanvasCommandAdapter } from './CanvasCommandEngine'
-import type { CanvasItem } from './CanvasModel'
+import type { CanvasCommandAdapter } from '../../engine/CanvasCommandEngine'
+import type { CanvasItem } from '../CanvasModel'
 import {
   cloneCanvasItemsWithNewIds,
   cloneCanvasSelection,
@@ -8,7 +8,7 @@ import {
   removeCanvasItems,
   translateCanvasItems,
   ungroupCanvasSelection,
-} from './CanvasOperations'
+} from '../CanvasOperations'
 
 export const CANVAS_ITEM_COMMAND_ADAPTER: CanvasCommandAdapter<CanvasItem> = {
   cloneSelection: ({ createId, ids, items, offset }) =>

@@ -1,5 +1,5 @@
 import type { CanvasComponentItem, CanvasComponentKind } from './CanvasModel'
-import type { Point } from './CanvasPrimitives'
+import type { Point } from '../engine/CanvasPrimitives'
 
 export type CanvasComponentTemplate = {
   accent: string

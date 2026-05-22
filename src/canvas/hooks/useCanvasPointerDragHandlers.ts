@@ -5,7 +5,7 @@ import type {
   RefObject,
   SetStateAction,
 } from 'react'
-import type { CanvasAffordanceConfig } from './CanvasAffordances'
+import type { CanvasAffordanceConfig } from '../engine/CanvasAffordances'
 import {
   DRAG_THRESHOLD,
   normalizeBounds,
@@ -13,24 +13,24 @@ import {
   type Bounds,
   type Tool,
   type Viewport,
-} from './CanvasPrimitives'
+} from '../engine/CanvasPrimitives'
 import type {
   CanvasItem,
   EditingText,
   Interaction,
-} from './CanvasModel'
+} from '../host/CanvasModel'
 import {
   createCanvasRect,
   type CanvasCreationAdapter,
-} from './CanvasCreationEngine'
+} from '../engine/CanvasCreationEngine'
 import { releasePointer, screenPoint, screenToWorld } from './CanvasPointerGeometry'
-import { getCanvasMarqueeSelection } from './CanvasSelectionEngine'
-import type { CanvasSceneAdapter } from './CanvasSceneAdapter'
+import { getCanvasMarqueeSelection } from '../engine/CanvasSelectionEngine'
+import type { CanvasSceneAdapter } from '../engine/CanvasSceneAdapter'
 import {
   moveCanvasSelection,
   resizeCanvasSelection,
   type CanvasTransformAdapter,
-} from './CanvasTransformEngine'
+} from '../engine/CanvasTransformEngine'
 
 type UseCanvasPointerDragHandlersArgs = {
   config: CanvasAffordanceConfig

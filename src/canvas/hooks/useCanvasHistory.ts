@@ -5,8 +5,8 @@ import {
   type Dispatch,
   type SetStateAction,
 } from 'react'
-import type { CanvasItem } from './CanvasModel'
-import { canvasItemsEqual, replaceCanvasItems } from './CanvasDocument'
+import type { CanvasItem } from '../host/CanvasModel'
+import { canvasItemsEqual, replaceCanvasItems } from '../host/CanvasDocument'
 
 type HistoryEntry = {
   before: CanvasItem[]

@@ -1,10 +1,10 @@
-import type { CanvasItem } from './CanvasModel'
+import type { CanvasItem } from '../CanvasModel'
 import {
   createCanvasSceneAdapter,
   type CanvasSceneAdapter,
   type CanvasSceneEntry,
-} from './CanvasSceneAdapter'
-import { flattenCanvasItems, getItemBounds } from './CanvasTree'
+} from '../../engine/CanvasSceneAdapter'
+import { flattenCanvasItems, getItemBounds } from '../CanvasTree'
 
 export function createCanvasItemScene(items: CanvasItem[]): CanvasSceneAdapter {
   const treeEntries = flattenCanvasItems(items)

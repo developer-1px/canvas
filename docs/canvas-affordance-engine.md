@@ -25,6 +25,17 @@
 | Adapter | Scene Adapter | scene entry, bounds, parent/group 질의 제공 | Feature와 무관하게 최소 질의만 제공한다 |
 | Adapter | Renderer Adapter | SVG/Canvas/DOM/WebGL 렌더링 | 받은 overlay만 그린다 |
 
+## Folder Structure
+
+| Folder | 책임 |
+| --- | --- |
+| `src/canvas/engine` | Host item과 renderer를 모르는 Affordance Engine |
+| `src/canvas/host` | Demo Host item model, document, tree, operations, component catalog |
+| `src/canvas/host/adapters` | Demo Host item을 Engine Interface에 맞추는 Adapter |
+| `src/canvas/renderer/svg` | SVG Renderer Adapter |
+| `src/canvas/ui` | React toolbar, palette, status, stage, editor UI |
+| `src/canvas/hooks` | App state와 Engine/Adapter를 연결하는 React wiring |
+
 ## Feature Toggle Shape
 
 ```ts

@@ -1,8 +1,8 @@
 import {
   CANVAS_COMPONENT_TEMPLATES,
   type CanvasComponentTemplate,
-} from './CanvasComponentCatalog'
-import type { CanvasComponentKind } from './CanvasModel'
+} from '../host/CanvasComponentCatalog'
+import type { CanvasComponentKind } from '../host/CanvasModel'
 
 type CanvasComponentPaletteProps = {
   onInsert: (component: CanvasComponentKind) => void

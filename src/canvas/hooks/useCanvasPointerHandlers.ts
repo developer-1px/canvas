@@ -6,7 +6,7 @@ import type {
   SetStateAction,
 } from 'react'
 import { useRef } from 'react'
-import type { CanvasAffordanceConfig } from './CanvasAffordances'
+import type { CanvasAffordanceConfig } from '../engine/CanvasAffordances'
 import {
   normalizeBounds,
   pointDistance,
@@ -15,27 +15,27 @@ import {
   type ResizeHandle,
   type Tool,
   type Viewport,
-} from './CanvasPrimitives'
+} from '../engine/CanvasPrimitives'
 import type {
   CanvasItem,
   EditingText,
   Interaction,
   RectItem,
   TextItem,
-} from './CanvasModel'
+} from '../host/CanvasModel'
 import { capturePointer, screenPoint, screenToWorld } from './CanvasPointerGeometry'
 import {
   createCanvasText,
   type CanvasCreationAdapter,
-} from './CanvasCreationEngine'
+} from '../engine/CanvasCreationEngine'
 import {
   getCanvasItemPointerIntent,
   getCanvasPointerGesture,
   isAdditivePointerInput,
-} from './CanvasGestureEngine'
-import { getCanvasItemPointerSelection } from './CanvasSelectionEngine'
-import type { CanvasSceneAdapter } from './CanvasSceneAdapter'
-import { findEditableTextItem } from './CanvasTree'
+} from '../engine/CanvasGestureEngine'
+import { getCanvasItemPointerSelection } from '../engine/CanvasSelectionEngine'
+import type { CanvasSceneAdapter } from '../engine/CanvasSceneAdapter'
+import { findEditableTextItem } from '../host/CanvasTree'
 
 type UseCanvasPointerHandlersArgs = {
   cloneItems: (ids: string[], offset: Point) => CanvasItem[]

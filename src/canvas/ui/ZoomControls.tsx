@@ -1,7 +1,7 @@
 import {
   CANVAS_COMMAND_AFFORDANCES,
   type CanvasAffordanceConfig,
-} from './CanvasAffordances'
+} from '../engine/CanvasAffordances'
 import { FitIcon, MinusIcon, PlusIcon } from './CanvasIcons'
 
 type ZoomControlsProps = {

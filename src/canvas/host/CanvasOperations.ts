@@ -3,7 +3,7 @@ import {
   unique,
   type Bounds,
   type Point,
-} from './CanvasPrimitives'
+} from '../engine/CanvasPrimitives'
 import type {
   CanvasItem,
   GroupItem,

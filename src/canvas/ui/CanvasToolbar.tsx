@@ -3,8 +3,8 @@ import {
   CANVAS_COMMAND_AFFORDANCES,
   CANVAS_TOOL_AFFORDANCES,
   type CanvasAffordanceConfig,
-} from './CanvasAffordances'
-import type { Tool } from './CanvasPrimitives'
+} from '../engine/CanvasAffordances'
+import type { Tool } from '../engine/CanvasPrimitives'
 import {
   DeleteIcon,
   DuplicateIcon,

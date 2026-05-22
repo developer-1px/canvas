@@ -3,7 +3,7 @@ import type {
   Point,
   ResizeHandle,
   Viewport,
-} from './CanvasPrimitives'
+} from '../engine/CanvasPrimitives'
 import { createInitialCanvasComponents } from './CanvasComponentCatalog'
 
 export {
@@ -22,7 +22,7 @@ export {
   scaleItemBounds,
   unique,
   zoomViewport,
-} from './CanvasPrimitives'
+} from '../engine/CanvasPrimitives'
 export type {
   Bounds,
   CanvasInteractionKind,
@@ -30,7 +30,7 @@ export type {
   ResizeHandle,
   Tool,
   Viewport,
-} from './CanvasPrimitives'
+} from '../engine/CanvasPrimitives'
 
 export type RectItem = Bounds & {
   id: string

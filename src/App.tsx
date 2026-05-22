@@ -6,13 +6,13 @@ import {
   useState,
   type CSSProperties,
 } from 'react'
-import { CanvasStage } from './canvas/CanvasStage'
-import { CanvasComponentPalette } from './canvas/CanvasComponentPalette'
-import { CanvasTextEditor } from './canvas/CanvasTextEditor'
-import { CanvasToolbar } from './canvas/CanvasToolbar'
-import { CanvasStatus } from './canvas/CanvasStatus'
-import { createCanvasComponentItem } from './canvas/CanvasComponentCatalog'
-import { DEFAULT_CANVAS_AFFORDANCE_CONFIG } from './canvas/CanvasAffordances'
+import { CanvasStage } from './canvas/ui/CanvasStage'
+import { CanvasComponentPalette } from './canvas/ui/CanvasComponentPalette'
+import { CanvasTextEditor } from './canvas/ui/CanvasTextEditor'
+import { CanvasToolbar } from './canvas/ui/CanvasToolbar'
+import { CanvasStatus } from './canvas/ui/CanvasStatus'
+import { createCanvasComponentItem } from './canvas/host/CanvasComponentCatalog'
+import { DEFAULT_CANVAS_AFFORDANCE_CONFIG } from './canvas/engine/CanvasAffordances'
 import {
   fitBoundsIntoViewport,
   INITIAL_VIEWPORT,
@@ -20,31 +20,31 @@ import {
   type Bounds,
   type Tool,
   type Viewport,
-} from './canvas/CanvasPrimitives'
+} from './canvas/engine/CanvasPrimitives'
 import {
   INITIAL_ITEMS,
   type CanvasComponentKind,
   type EditingText,
   type Interaction,
-} from './canvas/CanvasModel'
-import { updateItemText } from './canvas/CanvasOperations'
+} from './canvas/host/CanvasModel'
+import { updateItemText } from './canvas/host/CanvasOperations'
 import {
   findEditableTextItem,
   flattenCanvasItems,
   unionBounds,
-} from './canvas/CanvasTree'
-import { useCanvasPointerDragHandlers } from './canvas/useCanvasPointerDragHandlers'
-import { useCanvasPointerHandlers } from './canvas/useCanvasPointerHandlers'
-import { ZoomControls } from './canvas/ZoomControls'
-import { useCanvasCommands } from './canvas/useCanvasCommands'
-import { useCanvasKeyboardShortcuts } from './canvas/useCanvasKeyboardShortcuts'
-import { useCanvasHistory } from './canvas/useCanvasHistory'
-import { createCanvasOverlayState } from './canvas/CanvasOverlayEngine'
-import { getCanvasCommandAvailability } from './canvas/CanvasCommandEngine'
-import { CANVAS_ITEM_COMMAND_ADAPTER } from './canvas/CanvasItemCommandAdapter'
-import { CANVAS_ITEM_CREATION_ADAPTER } from './canvas/CanvasItemCreationAdapter'
-import { createCanvasItemScene } from './canvas/CanvasItemSceneAdapter'
-import { CANVAS_ITEM_TRANSFORM_ADAPTER } from './canvas/CanvasItemTransformAdapter'
+} from './canvas/host/CanvasTree'
+import { useCanvasPointerDragHandlers } from './canvas/hooks/useCanvasPointerDragHandlers'
+import { useCanvasPointerHandlers } from './canvas/hooks/useCanvasPointerHandlers'
+import { ZoomControls } from './canvas/ui/ZoomControls'
+import { useCanvasCommands } from './canvas/hooks/useCanvasCommands'
+import { useCanvasKeyboardShortcuts } from './canvas/hooks/useCanvasKeyboardShortcuts'
+import { useCanvasHistory } from './canvas/hooks/useCanvasHistory'
+import { createCanvasOverlayState } from './canvas/engine/CanvasOverlayEngine'
+import { getCanvasCommandAvailability } from './canvas/engine/CanvasCommandEngine'
+import { CANVAS_ITEM_COMMAND_ADAPTER } from './canvas/host/adapters/CanvasItemCommandAdapter'
+import { CANVAS_ITEM_CREATION_ADAPTER } from './canvas/host/adapters/CanvasItemCreationAdapter'
+import { createCanvasItemScene } from './canvas/host/adapters/CanvasItemSceneAdapter'
+import { CANVAS_ITEM_TRANSFORM_ADAPTER } from './canvas/host/adapters/CanvasItemTransformAdapter'
 import './App.css'
 
 const canvasAffordanceConfig = DEFAULT_CANVAS_AFFORDANCE_CONFIG

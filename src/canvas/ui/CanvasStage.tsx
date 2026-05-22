@@ -1,18 +1,18 @@
 import type { PointerEvent, RefObject } from 'react'
-import type { CanvasItem, RectItem, TextItem } from './CanvasModel'
+import type { CanvasItem, RectItem, TextItem } from '../host/CanvasModel'
 import type {
   CanvasInteractionKind,
   ResizeHandle,
   Tool,
   Viewport,
-} from './CanvasPrimitives'
-import type { CanvasOverlayState } from './CanvasOverlayEngine'
-import { CanvasSvgItemRenderer } from './CanvasSvgItemRenderer'
+} from '../engine/CanvasPrimitives'
+import type { CanvasOverlayState } from '../engine/CanvasOverlayEngine'
+import { CanvasSvgItemRenderer } from '../renderer/svg/CanvasSvgItemRenderer'
 import {
   CanvasSvgInteractionOverlays,
   CanvasSvgOverlayDefs,
   CanvasSvgOverlayPlane,
-} from './CanvasSvgOverlayRenderer'
+} from '../renderer/svg/CanvasSvgOverlayRenderer'
 
 type CanvasStageProps = {
   activeMode: Tool
