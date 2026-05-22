@@ -51,6 +51,7 @@ type CanvasAffordanceConfig = {
 4. `CanvasSvgItemRenderer`: Demo Host item을 SVG로 그린다.
 5. `CanvasCommandEngine`: command availability와 command result routing. Demo item 변경은 `CanvasItemCommandAdapter`가 수행한다.
 6. `CanvasSelectionEngine`: item click selection과 marquee hit selection 계산. `CanvasSceneAdapter` 입력으로 전환 중.
-7. `CanvasGestureEngine`: pointer input을 canvas/item gesture intent로 변환. 진행 중.
+7. `CanvasTransformEngine`: move/resize transform routing. Demo item 변경은 `CanvasItemTransformAdapter`가 수행한다.
+8. `CanvasGestureEngine`: pointer input을 canvas/item gesture intent로 변환. 진행 중.
 
 추출 순서는 동작 변경 없이 Host App에서 Engine 책임을 하나씩 떼어내는 방식으로 진행한다.

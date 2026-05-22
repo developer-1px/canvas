@@ -10,7 +10,6 @@ import {
   DRAG_THRESHOLD,
   normalizeBounds,
   pointDistance,
-  resizeBounds,
   type Bounds,
   type CanvasItem,
   type EditingText,
@@ -20,9 +19,13 @@ import {
   type Viewport,
 } from './CanvasModel'
 import { releasePointer, screenPoint, screenToWorld } from './CanvasPointerGeometry'
-import { resizeCanvasItems, translateCanvasItems } from './CanvasOperations'
+import { CANVAS_ITEM_TRANSFORM_ADAPTER } from './CanvasItemTransformAdapter'
 import { getCanvasMarqueeSelection } from './CanvasSelectionEngine'
 import type { CanvasSceneAdapter } from './CanvasSceneAdapter'
+import {
+  moveCanvasSelection,
+  resizeCanvasSelection,
+} from './CanvasTransformEngine'
 
 type UseCanvasPointerDragHandlersArgs = {
   config: CanvasAffordanceConfig
@@ -109,7 +112,13 @@ export function useCanvasPointerDragHandlers({
         moved: true,
       }
       setLiveItems(
-        translateCanvasItems(interaction.startItems, interaction.ids, dx, dy),
+        moveCanvasSelection({
+          adapter: CANVAS_ITEM_TRANSFORM_ADAPTER,
+          dx,
+          dy,
+          items: interaction.startItems,
+          selection: interaction.ids,
+        }),
       )
       return
     }
@@ -127,23 +136,19 @@ export function useCanvasPointerDragHandlers({
         return
       }
 
-      const bounds = resizeBounds(
-        interaction.bounds,
-        interaction.handle,
-        currentWorld,
-      )
-
       interactionRef.current = {
         ...interaction,
         moved: true,
       }
       setLiveItems(
-        resizeCanvasItems(
-          interaction.startItems,
-          interaction.ids,
-          interaction.bounds,
-          bounds,
-        ),
+        resizeCanvasSelection({
+          adapter: CANVAS_ITEM_TRANSFORM_ADAPTER,
+          bounds: interaction.bounds,
+          handle: interaction.handle,
+          items: interaction.startItems,
+          point: currentWorld,
+          selection: interaction.ids,
+        }),
       )
       return
     }
