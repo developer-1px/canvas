@@ -26,6 +26,7 @@ import type { CanvasItem, EditingText } from '../../host/model/CanvasModel'
 import { createRemoveCanvasItemsPatch } from '../../host/document/CanvasDocumentPatches'
 import { useCanvasClipboardCommands } from './useCanvasClipboardCommands'
 import type {
+  CanvasDocumentClipboard,
   CommitCanvasItems,
   CommitCanvasItemsPatch,
 } from '../document/useCanvasDocument'
@@ -34,11 +35,14 @@ type UseCanvasCommandsArgs = {
   commandAdapter: CanvasCommandAdapter<CanvasItem>
   commitItemsPatch: CommitCanvasItemsPatch
   config: CanvasAffordanceConfig
+  copyItemsToClipboard: CanvasDocumentClipboard['copyItemsToClipboard']
   createId: (prefix: string) => string
+  getClipboardItems: CanvasDocumentClipboard['getClipboardItems']
   items: CanvasItem[]
   redo: () => string[] | undefined
   selection: string[]
   setEditing: Dispatch<SetStateAction<EditingText | null>>
+  setClipboardItems: CanvasDocumentClipboard['setClipboardItems']
   setItems: CommitCanvasItems
   setSelection: Dispatch<SetStateAction<string[]>>
   svgRef: RefObject<SVGSVGElement | null>
@@ -50,11 +54,14 @@ export function useCanvasCommands({
   commandAdapter,
   commitItemsPatch,
   config,
+  copyItemsToClipboard,
   createId,
+  getClipboardItems,
   items,
   redo,
   selection,
   setEditing,
+  setClipboardItems,
   setItems,
   setSelection,
   svgRef,
@@ -69,11 +76,15 @@ export function useCanvasCommands({
     pasteSelection,
   } = useCanvasClipboardCommands({
     commandAdapter,
+    commitItemsPatch,
     config,
+    copyItemsToClipboard,
     createId,
+    getClipboardItems,
     items,
     selection,
     setEditing,
+    setClipboardItems,
     setItems,
     setSelection,
     svgRef,

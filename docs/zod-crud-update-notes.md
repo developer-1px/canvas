@@ -13,14 +13,17 @@ history, validation, and document selection state.
 - zod-crud owns document selection state through `doc.selection`.
 - Canvas converts between geometric item ids and JSON Pointers at the document
   boundary.
-- Canvas clipboard, command availability, duplicate, group, ungroup, nudge, and delete are implemented in the canvas command engine.
+- Canvas command availability, duplicate, group, ungroup, and nudge are still
+  implemented in the canvas command engine.
+- Canvas copy/paste/cut use zod-crud `doc.clipboard` for clipboard payload
+  storage while canvas keeps id rekey and paste offset policy.
 
 This is an intermediate state. Canvas is no longer applyPatch-only. Item
 creation commits now use zod-crud `add` patches, and selection delete commits
 use zod-crud `remove` patches with group-bound repair patches when needed. Most
 other content commands still produce `CanvasItem[]` and commit them as root
 document replacements. The next migration step is to make more commands produce
-zod-crud patch batches and use zod-crud clipboard/find/replace surfaces.
+zod-crud patch batches and add zod-crud-backed find/replace surfaces.
 
 ## Changelog Impact
 
@@ -67,15 +70,17 @@ and document selection state.
   remain local until patch planners replace root document replacement commits.
 
 Current migration scope: history, validation, selection ownership, item creation
-patches, and selection delete patches. Clipboard, find, replace, and generic
-command availability stay app-owned until command patch planning is introduced.
+patches, selection delete patches, and zod-crud-backed clipboard payloads. Find,
+replace, and generic command availability stay app-owned until command patch
+planning is introduced.
 
 ## Suggested Local Work Items
 
 - Replace command `nextItems` producers with patch planners.
-- Move clipboard to `doc.clipboard` with canvas id rekey and paste offset policy.
 - Add find/replace over searchable canvas item fields using zod-crud query and
   patch batches.
+- Replace duplicate, align, distribute, lock, z-order, and text edits with patch
+  planners.
 
 ## Verification
 

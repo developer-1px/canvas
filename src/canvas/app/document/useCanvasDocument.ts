@@ -9,6 +9,11 @@ import {
 import type { JSONPatchOperation } from 'zod-crud'
 import type { CanvasItem } from '../../host/model/CanvasModel'
 import {
+  copyCanvasDocumentSelectionToClipboard,
+  readCanvasDocumentClipboardItems,
+  writeCanvasDocumentClipboardItems,
+} from '../../host/document/CanvasDocumentClipboard'
+import {
   canvasItemsEqual,
   commitCanvasItemsDocument,
   commitCanvasItemsPatch,
@@ -37,7 +42,13 @@ export type CommitCanvasItems = (
 export type CommitCanvasItemsPatch = (
   patch: JSONPatchOperation[],
   selection?: SelectionHistory,
-) => void
+) => boolean
+
+export type CanvasDocumentClipboard = {
+  copyItemsToClipboard: (selection: string[]) => boolean
+  getClipboardItems: () => CanvasItem[]
+  setClipboardItems: (items: CanvasItem[]) => boolean
+}
 
 export function useCanvasDocument(
   initialItems: CanvasItem[],
@@ -95,12 +106,13 @@ export function useCanvasDocument(
       })
 
       if (!didCommit) {
-        return
+        return false
       }
 
       itemsRef.current = document.value
       setItemsState(itemsRef.current)
       syncHistoryAvailability()
+      return true
     },
     [document, syncHistoryAvailability],
   )
@@ -114,12 +126,13 @@ export function useCanvasDocument(
       })
 
       if (!didCommit) {
-        return
+        return false
       }
 
       itemsRef.current = document.value
       setItemsState(itemsRef.current)
       syncHistoryAvailability()
+      return true
     },
     [document, syncHistoryAvailability],
   )
@@ -160,6 +173,27 @@ export function useCanvasDocument(
     [document],
   )
 
+  const copyItemsToClipboard = useCallback(
+    (selection: string[]) =>
+      copyCanvasDocumentSelectionToClipboard(
+        document,
+        selection,
+        itemsRef.current,
+      ),
+    [document],
+  )
+
+  const getClipboardItems = useCallback(
+    () => readCanvasDocumentClipboardItems(document),
+    [document],
+  )
+
+  const setClipboardItems = useCallback(
+    (items: CanvasItem[]) =>
+      writeCanvasDocumentClipboardItems(document, items),
+    [document],
+  )
+
   const undo = useCallback(() => {
     if (!document.history.undo()) {
       return undefined
@@ -190,10 +224,13 @@ export function useCanvasDocument(
     ...historyAvailability,
     commitItems,
     commitItemsPatch,
+    copyItemsToClipboard,
+    getClipboardItems,
     items,
     redo,
     recordHistoryFrom,
     selection,
+    setClipboardItems,
     setSelection,
     setLiveItems,
     undo,

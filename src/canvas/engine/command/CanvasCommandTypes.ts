@@ -42,7 +42,6 @@ export type CanvasCommandAdapter<TItem extends CanvasCommandItem> = {
     items: TItem[]
     offset: CanvasCommandOffset
   }) => TItem[]
-  copySelection: (input: { items: TItem[]; selection: string[] }) => TItem[]
   deleteSelection: (input: { items: TItem[]; selection: string[] }) => TItem[]
   groupSelection: (input: {
     groupId: string
@@ -118,15 +117,5 @@ export type DeleteCanvasCommandResult<TItem extends CanvasCommandItem> =
   CanvasCommandItemsResult<TItem> & {
     clearEditingIds: string[]
   }
-
-export type PasteCanvasCommandResult<TItem extends CanvasCommandItem> =
-  CanvasCommandItemsResult<TItem> & {
-    clipboard: TItem[]
-  }
-
-export type CutCanvasCommandResult<TItem extends CanvasCommandItem> = {
-  clipboard: TItem[] | null
-  deletion: DeleteCanvasCommandResult<TItem> | null
-}
 
 export const CANVAS_COMMAND_INSERT_OFFSET: CanvasCommandOffset = { x: 28, y: 28 }

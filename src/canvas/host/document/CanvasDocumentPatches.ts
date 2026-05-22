@@ -42,6 +42,16 @@ export function createRemoveCanvasItemsPatch(
   return [...removeOps, ...replaceGroupOps]
 }
 
+export function createAddCanvasItemsPatch(
+  items: CanvasItem[],
+): JSONPatchOperation[] {
+  return items.map((item) => ({
+    op: 'add',
+    path: '/-',
+    value: item,
+  }))
+}
+
 function getTopmostEntries(entries: CanvasItemEntry[]) {
   return entries.filter(
     (entry) =>

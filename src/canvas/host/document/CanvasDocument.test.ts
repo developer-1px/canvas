@@ -10,9 +10,18 @@ import { INITIAL_ITEMS } from '../component/CanvasInitialItems'
 import { createCanvasComponentItem } from '../component/CanvasComponentFactory'
 import {
   groupCanvasSelection,
+  cloneCanvasItemsWithNewIds,
   removeCanvasItems,
 } from '../operations/CanvasOperations'
-import { createRemoveCanvasItemsPatch } from './CanvasDocumentPatches'
+import {
+  copyCanvasDocumentSelectionToClipboard,
+  readCanvasDocumentClipboardItems,
+  writeCanvasDocumentClipboardItems,
+} from './CanvasDocumentClipboard'
+import {
+  createAddCanvasItemsPatch,
+  createRemoveCanvasItemsPatch,
+} from './CanvasDocumentPatches'
 
 describe('CanvasDocument history', () => {
   test('seeds zod-crud document selection from canvas ids', () => {
@@ -145,6 +154,54 @@ describe('CanvasDocument history', () => {
     })
     expect(document.value).toEqual(expected)
     expect(getCanvasDocumentSelectionIds(document)).toEqual([])
+  })
+
+  test('stores copied items in zod-crud document clipboard', () => {
+    const document = createCanvasItemsDocument(INITIAL_ITEMS)
+
+    expect(
+      copyCanvasDocumentSelectionToClipboard(document, ['component-card']),
+    ).toBe(true)
+
+    expect(document.clipboard.hasData).toBe(true)
+    expect(readCanvasDocumentClipboardItems(document).map((item) => item.id))
+      .toEqual(['component-card'])
+  })
+
+  test('pastes zod-crud clipboard items through add patches', () => {
+    const document = createCanvasItemsDocument(INITIAL_ITEMS)
+
+    expect(
+      copyCanvasDocumentSelectionToClipboard(document, ['component-card']),
+    ).toBe(true)
+
+    const clones = cloneCanvasItemsWithNewIds(
+      readCanvasDocumentClipboardItems(document),
+      (prefix) => `${prefix}-pasted`,
+      { x: 28, y: 28 },
+    )
+    const didCommit = commitCanvasItemsPatch({
+      document,
+      patch: createAddCanvasItemsPatch(clones),
+      selection: {
+        before: ['component-card'],
+        after: clones.map((item) => item.id),
+      },
+    })
+
+    expect(didCommit).toBe(true)
+    expect(writeCanvasDocumentClipboardItems(document, clones)).toBe(true)
+    expect(document.lastPatch.map((operation) => operation.op)).toEqual(['add'])
+    expect(document.value.at(-1)).toMatchObject({
+      id: 'component-pasted',
+      x: 588,
+      y: 116,
+    })
+    expect(readCanvasDocumentClipboardItems(document).map((item) => item.id))
+      .toEqual(['component-pasted'])
+    expect(getCanvasDocumentSelectionIds(document)).toEqual([
+      'component-pasted',
+    ])
   })
 
   test('round-trips document selection through JSON pointers', () => {
