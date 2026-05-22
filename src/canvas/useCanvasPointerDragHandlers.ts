@@ -14,10 +14,11 @@ import {
   type CanvasItem,
   type EditingText,
   type Interaction,
-  type RectItem,
   type Tool,
   type Viewport,
 } from './CanvasModel'
+import { createCanvasRect } from './CanvasCreationEngine'
+import { CANVAS_ITEM_CREATION_ADAPTER } from './CanvasItemCreationAdapter'
 import { releasePointer, screenPoint, screenToWorld } from './CanvasPointerGeometry'
 import { CANVAS_ITEM_TRANSFORM_ADAPTER } from './CanvasItemTransformAdapter'
 import { getCanvasMarqueeSelection } from './CanvasSelectionEngine'
@@ -215,30 +216,15 @@ export function useCanvasPointerDragHandlers({
     releasePointer(svgRef, event.pointerId)
 
     if (interaction.kind === 'create-rect') {
-      const rawBounds = normalizeBounds(
-        interaction.startWorld,
-        interaction.currentWorld,
-      )
-      const bounds =
-        rawBounds.w > 6 && rawBounds.h > 6
-          ? rawBounds
-          : {
-              x: interaction.startWorld.x,
-              y: interaction.startWorld.y,
-              w: 168,
-              h: 112,
-            }
-      const id = createId('rect')
-      const nextItem: RectItem = {
-        id,
-        type: 'rect',
-        ...bounds,
-        fill: '#fef3c7',
-        stroke: '#d97706',
-      }
+      const nextItem = createCanvasRect({
+        adapter: CANVAS_ITEM_CREATION_ADAPTER,
+        createId,
+        currentWorld: interaction.currentWorld,
+        startWorld: interaction.startWorld,
+      })
 
       setItems((current) => [...current, nextItem])
-      setSelection([id])
+      setSelection([nextItem.id])
       setTool('select')
     }
 

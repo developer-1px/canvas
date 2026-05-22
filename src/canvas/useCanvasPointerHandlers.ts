@@ -22,11 +22,13 @@ import {
   type Viewport,
 } from './CanvasModel'
 import { capturePointer, screenPoint, screenToWorld } from './CanvasPointerGeometry'
+import { createCanvasText } from './CanvasCreationEngine'
 import {
   getCanvasItemPointerIntent,
   getCanvasPointerGesture,
   isAdditivePointerInput,
 } from './CanvasGestureEngine'
+import { CANVAS_ITEM_CREATION_ADAPTER } from './CanvasItemCreationAdapter'
 import { getCanvasItemPointerSelection } from './CanvasSelectionEngine'
 import type { CanvasSceneAdapter } from './CanvasSceneAdapter'
 import { findEditableTextItem } from './CanvasTree'
@@ -101,20 +103,15 @@ export function useCanvasPointerHandlers({
       return
     }
 
-    const id = createId('text')
-    const nextItem: TextItem = {
-      id,
-      type: 'text',
-      x: point.x,
-      y: point.y,
-      w: 190,
-      h: 42,
-      text: 'Text',
-    }
+    const created = createCanvasText({
+      adapter: CANVAS_ITEM_CREATION_ADAPTER,
+      createId,
+      point,
+    })
 
-    setItems((current) => [...current, nextItem])
-    setSelection([id])
-    setEditing({ id, value: nextItem.text })
+    setItems((current) => [...current, created.item])
+    setSelection([created.item.id])
+    setEditing({ id: created.item.id, value: created.editValue })
     setTool('select')
   }
 
