@@ -29,8 +29,9 @@
 | `src/canvas/app/workflow` | React state와 engine/host/renderer wiring |
 | `src/canvas/app/geometry` | DOM/SVG pointer 좌표 변환 |
 | `src/canvas/engine` | Host item과 renderer를 모르는 조작 규칙 |
-| `src/canvas/host` | Demo canvas item model, schema, document, tree, catalog |
+| `src/canvas/host` | Demo canvas item model, schema, document, initial data, catalog, factory |
 | `src/canvas/host/operations` | Transform, text, clone, remove, group item operations |
+| `src/canvas/host/tree` | Bounds, traversal, selection tree helpers |
 | `src/canvas/host/adapters` | Demo host item을 engine interface에 맞추는 adapter |
 | `src/canvas/renderer/svg` | SVG renderer adapter |
 | `src/canvas/ui` | Toolbar, palette, status, stage, editor controls |
