@@ -49,7 +49,7 @@ type CanvasAffordanceConfig = {
 2. `CanvasOverlayEngine`: Renderer Adapter가 그릴 renderer-independent overlay state 생성. `CanvasSceneAdapter` 입력으로 전환 중.
 3. `CanvasSvgOverlayRenderer`: SVG Renderer Adapter로 overlay state를 그린다. 진행 중.
 4. `CanvasSvgItemRenderer`: Demo Host item을 SVG로 그린다.
-5. `CanvasCommandEngine`: command availability와 item command 결과 계산. React state/history 적용은 `useCanvasCommands` Adapter에 남아 있음.
+5. `CanvasCommandEngine`: command availability와 command result routing. Demo item 변경은 `CanvasItemCommandAdapter`가 수행한다.
 6. `CanvasSelectionEngine`: item click selection과 marquee hit selection 계산. `CanvasSceneAdapter` 입력으로 전환 중.
 7. `CanvasGestureEngine`: pointer input을 canvas/item gesture intent로 변환. 진행 중.
 

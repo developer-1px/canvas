@@ -17,6 +17,7 @@ import {
   ungroupCanvasCommand,
 } from './CanvasCommandEngine'
 import type { CanvasAffordanceConfig } from './CanvasAffordances'
+import { CANVAS_ITEM_COMMAND_ADAPTER } from './CanvasItemCommandAdapter'
 import type { CanvasItem, EditingText, Point } from './CanvasModel'
 import type { CommitCanvasItems } from './useCanvasHistory'
 
@@ -47,13 +48,20 @@ export function useCanvasCommands({
 
   const cloneItems = useCallback(
     (ids: string[], offset: Point) =>
-      cloneCanvasCommandItems({ createId, ids, items, offset }),
+      cloneCanvasCommandItems({
+        adapter: CANVAS_ITEM_COMMAND_ADAPTER,
+        createId,
+        ids,
+        items,
+        offset,
+      }),
     [createId, items],
   )
 
   const duplicateSelection = useCallback(
     (sourceIds = selection, offset: Point = CANVAS_COMMAND_INSERT_OFFSET) => {
       const result = duplicateCanvasCommand({
+        adapter: CANVAS_ITEM_COMMAND_ADAPTER,
         config,
         createId,
         items,
@@ -77,7 +85,12 @@ export function useCanvasCommands({
   )
 
   const copySelection = useCallback(() => {
-    const clipboard = copyCanvasCommand({ config, items, selection })
+    const clipboard = copyCanvasCommand({
+      adapter: CANVAS_ITEM_COMMAND_ADAPTER,
+      config,
+      items,
+      selection,
+    })
 
     if (!clipboard) {
       return
@@ -88,6 +101,7 @@ export function useCanvasCommands({
 
   const pasteSelection = useCallback(() => {
     const result = pasteCanvasCommand({
+      adapter: CANVAS_ITEM_COMMAND_ADAPTER,
       clipboard: clipboardRef.current,
       config,
       createId,
@@ -107,7 +121,12 @@ export function useCanvasCommands({
   }, [config, createId, items, selection, setItems, setSelection])
 
   const deleteSelection = useCallback(() => {
-    const result = deleteCanvasCommand({ config, items, selection })
+    const result = deleteCanvasCommand({
+      adapter: CANVAS_ITEM_COMMAND_ADAPTER,
+      config,
+      items,
+      selection,
+    })
 
     if (!result) {
       return
@@ -124,7 +143,13 @@ export function useCanvasCommands({
   }, [config, items, selection, setEditing, setItems, setSelection])
 
   const groupSelection = useCallback(() => {
-    const result = groupCanvasCommand({ config, createId, items, selection })
+    const result = groupCanvasCommand({
+      adapter: CANVAS_ITEM_COMMAND_ADAPTER,
+      config,
+      createId,
+      items,
+      selection,
+    })
 
     if (!result) {
       return
@@ -138,7 +163,12 @@ export function useCanvasCommands({
   }, [config, createId, items, selection, setItems, setSelection])
 
   const ungroupSelection = useCallback(() => {
-    const result = ungroupCanvasCommand({ config, items, selection })
+    const result = ungroupCanvasCommand({
+      adapter: CANVAS_ITEM_COMMAND_ADAPTER,
+      config,
+      items,
+      selection,
+    })
 
     if (!result) {
       return
@@ -176,7 +206,12 @@ export function useCanvasCommands({
   }, [config.commands.redo, redo, setEditing, setSelection])
 
   const cutSelection = useCallback(() => {
-    const result = cutCanvasCommand({ config, items, selection })
+    const result = cutCanvasCommand({
+      adapter: CANVAS_ITEM_COMMAND_ADAPTER,
+      config,
+      items,
+      selection,
+    })
 
     if (!result) {
       return
@@ -208,6 +243,7 @@ export function useCanvasCommands({
     (dx: number, dy: number) => {
       setItems((current) =>
         nudgeCanvasCommand({
+          adapter: CANVAS_ITEM_COMMAND_ADAPTER,
           config,
           dx,
           dy,

@@ -6,6 +6,7 @@ export type CanvasSceneEntry = {
   id: string
   parentId: string | null
   path: number[]
+  type: CanvasItem['type']
 }
 
 export type CanvasSceneAdapter = {
@@ -13,6 +14,7 @@ export type CanvasSceneAdapter = {
   getBounds: (ids: string[]) => Bounds | null
   getParentId: (id: string) => string | null
   getSelectedAncestorId: (id: string, selectedIds: string[]) => string | null
+  isGroup: (id: string) => boolean
 }
 
 export function createCanvasItemScene(items: CanvasItem[]): CanvasSceneAdapter {
@@ -28,6 +30,7 @@ export function createCanvasItemScene(items: CanvasItem[]): CanvasSceneAdapter {
         ? null
         : treeEntryByPath.get(pathKey(entry.parentPath))?.item.id ?? null,
     path: entry.path,
+    type: entry.item.type,
   }))
   const entryById = new Map(entries.map((entry) => [entry.id, entry]))
 
@@ -54,6 +57,7 @@ export function createCanvasItemScene(items: CanvasItem[]): CanvasSceneAdapter {
           .sort((a, b) => a.path.length - b.path.length)[0]?.id ?? null
       )
     },
+    isGroup: (id) => entryById.get(id)?.type === 'group',
   }
 }
 

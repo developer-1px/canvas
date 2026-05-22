@@ -1,15 +1,49 @@
 import type { CanvasAffordanceConfig } from './CanvasAffordances'
-import {
-  cloneCanvasItemsWithNewIds,
-  cloneCanvasSelection,
-  copyCanvasSelection,
-  groupCanvasSelection,
-  removeCanvasItems,
-  translateCanvasItems,
-  ungroupCanvasSelection,
-} from './CanvasOperations'
-import type { CanvasItem, Point } from './CanvasModel'
-import { findCanvasItem } from './CanvasTree'
+
+export type CanvasCommandOffset = {
+  x: number
+  y: number
+}
+
+export type CanvasCommandItem = {
+  id: string
+}
+
+export type CanvasCommandItemsResult<TItem extends CanvasCommandItem> = {
+  items: TItem[]
+  selection: string[]
+}
+
+export type CanvasCommandAdapter<TItem extends CanvasCommandItem> = {
+  cloneSelection: (input: {
+    createId: (prefix: string) => string
+    ids: string[]
+    items: TItem[]
+    offset: CanvasCommandOffset
+  }) => TItem[]
+  copySelection: (input: { items: TItem[]; selection: string[] }) => TItem[]
+  deleteSelection: (input: { items: TItem[]; selection: string[] }) => TItem[]
+  groupSelection: (input: {
+    groupId: string
+    items: TItem[]
+    selection: string[]
+  }) => CanvasCommandItemsResult<TItem>
+  pasteItems: (input: {
+    clipboard: TItem[]
+    createId: (prefix: string) => string
+    offset: CanvasCommandOffset
+  }) => TItem[]
+  nudgeSelection: (input: {
+    dx: number
+    dy: number
+    items: TItem[]
+    selection: string[]
+  }) => TItem[]
+  ungroupSelection: (input: {
+    items: TItem[]
+    selection: string[]
+  }) => CanvasCommandItemsResult<TItem>
+}
 
 export type CanvasCommandAvailability = {
   delete: boolean
@@ -20,41 +54,39 @@ export type CanvasCommandAvailability = {
   ungroup: boolean
 }
 
-export type CanvasCommandItemsResult = {
-  items: CanvasItem[]
-  selection: string[]
+export type DuplicateCanvasCommandResult<TItem extends CanvasCommandItem> =
+  CanvasCommandItemsResult<TItem> & {
+    clones: TItem[]
+  }
+
+export type DeleteCanvasCommandResult<TItem extends CanvasCommandItem> =
+  CanvasCommandItemsResult<TItem> & {
+    clearEditingIds: string[]
+  }
+
+export type PasteCanvasCommandResult<TItem extends CanvasCommandItem> =
+  CanvasCommandItemsResult<TItem> & {
+    clipboard: TItem[]
+  }
+
+export type CutCanvasCommandResult<TItem extends CanvasCommandItem> = {
+  clipboard: TItem[] | null
+  deletion: DeleteCanvasCommandResult<TItem> | null
 }
 
-export type DuplicateCanvasCommandResult = CanvasCommandItemsResult & {
-  clones: CanvasItem[]
-}
-
-export type DeleteCanvasCommandResult = CanvasCommandItemsResult & {
-  clearEditingIds: string[]
-}
-
-export type PasteCanvasCommandResult = CanvasCommandItemsResult & {
-  clipboard: CanvasItem[]
-}
-
-export type CutCanvasCommandResult = {
-  clipboard: CanvasItem[] | null
-  deletion: DeleteCanvasCommandResult | null
-}
-
-export const CANVAS_COMMAND_INSERT_OFFSET: Point = { x: 28, y: 28 }
+export const CANVAS_COMMAND_INSERT_OFFSET: CanvasCommandOffset = { x: 28, y: 28 }
 
 export function getCanvasCommandAvailability({
   canRedo,
   canUndo,
   config,
-  items,
+  hasSelectedGroup,
   selection,
 }: {
   canRedo: boolean
   canUndo: boolean
   config: CanvasAffordanceConfig
-  items: CanvasItem[]
+  hasSelectedGroup: boolean
   selection: string[]
 }): CanvasCommandAvailability {
   const hasSelection = selection.length > 0
@@ -65,27 +97,28 @@ export function getCanvasCommandAvailability({
     group: config.commands.group && selection.length > 1,
     redo: config.commands.redo && canRedo,
     undo: config.commands.undo && canUndo,
-    ungroup:
-      config.commands.ungroup &&
-      selection.some((id) => findCanvasItem(items, id)?.type === 'group'),
+    ungroup: config.commands.ungroup && hasSelectedGroup,
   }
 }
 
-export function cloneCanvasCommandItems({
+export function cloneCanvasCommandItems<TItem extends CanvasCommandItem>({
+  adapter,
   createId,
   ids,
   items,
   offset,
 }: {
+  adapter: CanvasCommandAdapter<TItem>
   createId: (prefix: string) => string
   ids: string[]
-  items: CanvasItem[]
-  offset: Point
+  items: TItem[]
+  offset: CanvasCommandOffset
 }) {
-  return cloneCanvasSelection(items, ids, createId, offset)
+  return adapter.cloneSelection({ createId, ids, items, offset })
 }
 
-export function duplicateCanvasCommand({
+export function duplicateCanvasCommand<TItem extends CanvasCommandItem>({
+  adapter,
   config,
   createId,
   items,
@@ -93,18 +126,20 @@ export function duplicateCanvasCommand({
   selection,
   sourceIds = selection,
 }: {
+  adapter: CanvasCommandAdapter<TItem>
   config: CanvasAffordanceConfig
   createId: (prefix: string) => string
-  items: CanvasItem[]
-  offset?: Point
+  items: TItem[]
+  offset?: CanvasCommandOffset
   selection: string[]
   sourceIds?: string[]
-}): DuplicateCanvasCommandResult | null {
+}): DuplicateCanvasCommandResult<TItem> | null {
   if (!config.commands.duplicate) {
     return null
   }
 
   const clones = cloneCanvasCommandItems({
+    adapter,
     createId,
     ids: sourceIds,
     items,
@@ -122,40 +157,44 @@ export function duplicateCanvasCommand({
   }
 }
 
-export function copyCanvasCommand({
+export function copyCanvasCommand<TItem extends CanvasCommandItem>({
+  adapter,
   config,
   items,
   selection,
 }: {
+  adapter: CanvasCommandAdapter<TItem>
   config: CanvasAffordanceConfig
-  items: CanvasItem[]
+  items: TItem[]
   selection: string[]
 }) {
   if (!config.commands.copy) {
     return null
   }
 
-  return copyCanvasSelection(items, selection)
+  return adapter.copySelection({ items, selection })
 }
 
-export function pasteCanvasCommand({
+export function pasteCanvasCommand<TItem extends CanvasCommandItem>({
+  adapter,
   clipboard,
   config,
   createId,
   items,
   offset = CANVAS_COMMAND_INSERT_OFFSET,
 }: {
-  clipboard: CanvasItem[]
+  adapter: CanvasCommandAdapter<TItem>
+  clipboard: TItem[]
   config: CanvasAffordanceConfig
   createId: (prefix: string) => string
-  items: CanvasItem[]
-  offset?: Point
-}): PasteCanvasCommandResult | null {
+  items: TItem[]
+  offset?: CanvasCommandOffset
+}): PasteCanvasCommandResult<TItem> | null {
   if (!config.commands.paste) {
     return null
   }
 
-  const clones = cloneCanvasItemsWithNewIds(clipboard, createId, offset)
+  const clones = adapter.pasteItems({ clipboard, createId, offset })
 
   if (clones.length === 0) {
     return null
@@ -168,42 +207,50 @@ export function pasteCanvasCommand({
   }
 }
 
-export function deleteCanvasCommand({
+export function deleteCanvasCommand<TItem extends CanvasCommandItem>({
+  adapter,
   config,
   items,
   selection,
 }: {
+  adapter: CanvasCommandAdapter<TItem>
   config: CanvasAffordanceConfig
-  items: CanvasItem[]
+  items: TItem[]
   selection: string[]
-}): DeleteCanvasCommandResult | null {
+}): DeleteCanvasCommandResult<TItem> | null {
   if (!config.commands.delete || selection.length === 0) {
     return null
   }
 
   return {
     clearEditingIds: selection,
-    items: removeCanvasItems(items, selection),
+    items: adapter.deleteSelection({ items, selection }),
     selection: [],
   }
 }
 
-export function groupCanvasCommand({
+export function groupCanvasCommand<TItem extends CanvasCommandItem>({
+  adapter,
   config,
   createId,
   items,
   selection,
 }: {
+  adapter: CanvasCommandAdapter<TItem>
   config: CanvasAffordanceConfig
   createId: (prefix: string) => string
-  items: CanvasItem[]
+  items: TItem[]
   selection: string[]
-}): CanvasCommandItemsResult | null {
+}): CanvasCommandItemsResult<TItem> | null {
   if (!config.commands.group || selection.length < 2) {
     return null
   }
 
-  const result = groupCanvasSelection(items, selection, createId('group'))
+  const result = adapter.groupSelection({
+    groupId: createId('group'),
+    items,
+    selection,
+  })
 
   if (result.items === items) {
     return null
@@ -212,20 +259,22 @@ export function groupCanvasCommand({
   return result
 }
 
-export function ungroupCanvasCommand({
+export function ungroupCanvasCommand<TItem extends CanvasCommandItem>({
+  adapter,
   config,
   items,
   selection,
 }: {
+  adapter: CanvasCommandAdapter<TItem>
   config: CanvasAffordanceConfig
-  items: CanvasItem[]
+  items: TItem[]
   selection: string[]
-}): CanvasCommandItemsResult | null {
+}): CanvasCommandItemsResult<TItem> | null {
   if (!config.commands.ungroup) {
     return null
   }
 
-  const result = ungroupCanvasSelection(items, selection)
+  const result = adapter.ungroupSelection({ items, selection })
 
   if (result.selection.length === 0) {
     return null
@@ -234,41 +283,45 @@ export function ungroupCanvasCommand({
   return result
 }
 
-export function cutCanvasCommand({
+export function cutCanvasCommand<TItem extends CanvasCommandItem>({
+  adapter,
   config,
   items,
   selection,
 }: {
+  adapter: CanvasCommandAdapter<TItem>
   config: CanvasAffordanceConfig
-  items: CanvasItem[]
+  items: TItem[]
   selection: string[]
-}): CutCanvasCommandResult | null {
+}): CutCanvasCommandResult<TItem> | null {
   if (!config.commands.cut) {
     return null
   }
 
   return {
-    clipboard: copyCanvasCommand({ config, items, selection }),
-    deletion: deleteCanvasCommand({ config, items, selection }),
+    clipboard: copyCanvasCommand({ adapter, config, items, selection }),
+    deletion: deleteCanvasCommand({ adapter, config, items, selection }),
   }
 }
 
-export function nudgeCanvasCommand({
+export function nudgeCanvasCommand<TItem extends CanvasCommandItem>({
+  adapter,
   config,
   dx,
   dy,
   items,
   selection,
 }: {
+  adapter: CanvasCommandAdapter<TItem>
   config: CanvasAffordanceConfig
   dx: number
   dy: number
-  items: CanvasItem[]
+  items: TItem[]
   selection: string[]
 }) {
   if (!config.commands.nudge) {
     return null
   }
 
-  return translateCanvasItems(items, selection, dx, dy)
+  return adapter.nudgeSelection({ dx, dy, items, selection })
 }

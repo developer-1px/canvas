@@ -75,10 +75,10 @@ function App() {
         canRedo,
         canUndo,
         config: canvasAffordanceConfig,
-        items,
+        hasSelectedGroup: selection.some(scene.isGroup),
         selection,
       }),
-    [canRedo, canUndo, items, selection],
+    [canRedo, canUndo, scene, selection],
   )
   const overlays = useMemo(
     () =>
