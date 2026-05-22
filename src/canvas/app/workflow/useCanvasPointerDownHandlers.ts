@@ -39,7 +39,7 @@ import type { CanvasSceneAdapter } from '../../engine/CanvasSceneAdapter'
 import { findEditableTextItem } from '../../host/CanvasTree'
 import type { CommitCanvasItems } from './useCanvasHistory'
 
-type UseCanvasPointerHandlersArgs = {
+type UseCanvasPointerDownHandlersArgs = {
   cloneItems: (ids: string[], offset: Point) => CanvasItem[]
   config: CanvasAffordanceConfig
   creationAdapter: CanvasCreationAdapter<CanvasItem>
@@ -63,7 +63,7 @@ type UseCanvasPointerHandlersArgs = {
   viewport: Viewport
 }
 
-export function useCanvasPointerHandlers({
+export function useCanvasPointerDownHandlers({
   cloneItems,
   config,
   creationAdapter,
@@ -85,7 +85,7 @@ export function useCanvasPointerHandlers({
   svgRef,
   tool,
   viewport,
-}: UseCanvasPointerHandlersArgs) {
+}: UseCanvasPointerDownHandlersArgs) {
   const lastClickRef = useRef<{
     id: string
     point: Point

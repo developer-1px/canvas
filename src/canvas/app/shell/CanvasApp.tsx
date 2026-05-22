@@ -24,7 +24,7 @@ import {
 } from '../../host/CanvasModel'
 import { findEditableTextItem } from '../../host/CanvasTree'
 import { useCanvasPointerDragHandlers } from '../workflow/useCanvasPointerDragHandlers'
-import { useCanvasPointerHandlers } from '../workflow/useCanvasPointerHandlers'
+import { useCanvasPointerDownHandlers } from '../workflow/useCanvasPointerDownHandlers'
 import { ZoomControls } from '../../ui/ZoomControls'
 import { useCanvasCommands } from '../workflow/useCanvasCommands'
 import { useCanvasKeyboardShortcuts } from '../workflow/useCanvasKeyboardShortcuts'
@@ -199,7 +199,7 @@ function CanvasApp() {
     handleItemPointerDown,
     handleResizePointerDown,
     handleTextDoubleClick,
-  } = useCanvasPointerHandlers({
+  } = useCanvasPointerDownHandlers({
     cloneItems,
     config: canvasAffordanceConfig,
     creationAdapter: CANVAS_ITEM_CREATION_ADAPTER,
