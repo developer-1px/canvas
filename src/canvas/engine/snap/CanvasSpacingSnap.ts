@@ -1,5 +1,5 @@
-import type { Bounds } from './CanvasPrimitives'
-import type { CanvasSceneEntry } from './CanvasSceneAdapter'
+import type { Bounds } from '../CanvasPrimitives'
+import type { CanvasSceneEntry } from '../CanvasSceneAdapter'
 import type {
   CanvasAxisSnap,
   CanvasSpacingGuide,
