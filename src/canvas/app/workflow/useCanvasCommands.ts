@@ -2,6 +2,7 @@ import {
   useCallback,
   useRef,
   type Dispatch,
+  type RefObject,
   type SetStateAction,
 } from 'react'
 import {
@@ -23,8 +24,9 @@ import {
   type CanvasReorderMode,
 } from '../../engine/CanvasCommandEngine'
 import type { CanvasAffordanceConfig } from '../../engine/CanvasAffordances'
-import type { Point } from '../../engine/CanvasPrimitives'
+import type { Point, Viewport } from '../../engine/CanvasPrimitives'
 import type { CanvasItem, EditingText } from '../../host/CanvasModel'
+import { getCanvasPasteOffset } from './CanvasPastePosition'
 import type { CommitCanvasItems } from './useCanvasHistory'
 
 type UseCanvasCommandsArgs = {
@@ -37,7 +39,9 @@ type UseCanvasCommandsArgs = {
   setEditing: Dispatch<SetStateAction<EditingText | null>>
   setItems: CommitCanvasItems
   setSelection: Dispatch<SetStateAction<string[]>>
+  svgRef: RefObject<SVGSVGElement | null>
   undo: () => string[] | undefined
+  viewport: Viewport
 }
 
 export function useCanvasCommands({
@@ -50,9 +54,12 @@ export function useCanvasCommands({
   setEditing,
   setItems,
   setSelection,
+  svgRef,
   undo,
+  viewport,
 }: UseCanvasCommandsArgs) {
   const clipboardRef = useRef<CanvasItem[]>([])
+  const pasteIndexRef = useRef(0)
 
   const cloneItems = useCallback(
     (ids: string[], offset: Point) =>
@@ -105,15 +112,22 @@ export function useCanvasCommands({
     }
 
     clipboardRef.current = clipboard
+    pasteIndexRef.current = 0
   }, [commandAdapter, config, items, selection])
 
   const pasteSelection = useCallback(() => {
+    const offset = getCanvasPasteOffset({
+      clipboard: clipboardRef.current,
+      pasteIndex: pasteIndexRef.current,
+      viewportCenter: getViewportCenter(svgRef, viewport),
+    })
     const result = pasteCanvasCommand({
       adapter: commandAdapter,
       clipboard: clipboardRef.current,
       config,
       createId,
       items,
+      offset,
     })
 
     if (!result) {
@@ -121,12 +135,23 @@ export function useCanvasCommands({
     }
 
     clipboardRef.current = result.clipboard
+    pasteIndexRef.current += 1
     setItems(result.items, {
       before: selection,
       after: result.selection,
     })
     setSelection(result.selection)
-  }, [commandAdapter, config, createId, items, selection, setItems, setSelection])
+  }, [
+    commandAdapter,
+    config,
+    createId,
+    items,
+    selection,
+    setItems,
+    setSelection,
+    svgRef,
+    viewport,
+  ])
 
   const deleteSelection = useCallback(() => {
     const result = deleteCanvasCommand({
@@ -265,6 +290,7 @@ export function useCanvasCommands({
 
     if (result.clipboard) {
       clipboardRef.current = result.clipboard
+      pasteIndexRef.current = 0
     }
 
     const deletion = result.deletion
@@ -359,5 +385,21 @@ export function useCanvasCommands({
     undoHistory,
     ungroupSelection,
     unlockAll,
+  }
+}
+
+function getViewportCenter(
+  svgRef: RefObject<SVGSVGElement | null>,
+  viewport: Viewport,
+): Point | null {
+  const rect = svgRef.current?.getBoundingClientRect()
+
+  if (!rect) {
+    return null
+  }
+
+  return {
+    x: (rect.width / 2 - viewport.x) / viewport.scale,
+    y: (rect.height / 2 - viewport.y) / viewport.scale,
   }
 }

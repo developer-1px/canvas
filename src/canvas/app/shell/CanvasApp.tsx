@@ -165,7 +165,9 @@ function CanvasApp() {
     setEditing,
     setItems,
     setSelection,
+    svgRef,
     undo,
+    viewport,
   })
 
   const { fitToItems, resetViewport, zoomBy } = useCanvasViewportControls({
