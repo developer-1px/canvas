@@ -88,8 +88,6 @@ export function useCanvasCommands({
     selection,
     setEditing,
     setClipboardItems,
-    setItems,
-    setSelection,
     svgRef,
     viewport,
     commitSelection,

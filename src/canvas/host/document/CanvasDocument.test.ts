@@ -233,6 +233,46 @@ describe('CanvasDocument history', () => {
     ])
   })
 
+  test('commits duplicate clones through zod-crud add patches', () => {
+    const document = createCanvasItemsDocument(INITIAL_ITEMS)
+    const clones = cloneCanvasItemsWithNewIds(
+      [INITIAL_ITEMS[2]],
+      (prefix) => `${prefix}-duplicated`,
+      { x: 28, y: 28 },
+    )
+
+    expect(
+      commitCanvasItemsPatch({
+        document,
+        patch: createAddCanvasItemsPatch(clones),
+        selection: {
+          before: ['component-card'],
+          after: clones.map((item) => item.id),
+        },
+      }),
+    ).toBe(true)
+
+    expect(document.lastPatch).toEqual([{
+      op: 'add',
+      path: `/${INITIAL_ITEMS.length}`,
+      value: clones[0],
+    }])
+    expect(document.value.at(-1)).toMatchObject({
+      id: 'component-duplicated',
+      x: 588,
+      y: 116,
+    })
+    expect(getCanvasDocumentSelectionIds(document)).toEqual([
+      'component-duplicated',
+    ])
+
+    expect(document.history.undo()).toBe(true)
+    expect(document.value.map((item) => item.id)).not.toContain(
+      'component-duplicated',
+    )
+    expect(getCanvasDocumentSelectionIds(document)).toEqual(['component-card'])
+  })
+
   test('finds searchable canvas text fields through zod-crud query', () => {
     const document = createCanvasItemsDocument(INITIAL_ITEMS)
 

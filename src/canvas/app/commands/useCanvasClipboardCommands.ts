@@ -23,7 +23,6 @@ import { getCanvasPasteOffset } from './CanvasPastePosition'
 import type {
   CanvasDocumentClipboard,
   CommitCanvasSelection,
-  CommitCanvasItems,
   CommitCanvasItemsPatch,
 } from '../document/useCanvasDocument'
 
@@ -39,8 +38,6 @@ type UseCanvasClipboardCommandsArgs = {
   selection: string[]
   setEditing: Dispatch<SetStateAction<EditingText | null>>
   setClipboardItems: CanvasDocumentClipboard['setClipboardItems']
-  setItems: CommitCanvasItems
-  setSelection: Dispatch<SetStateAction<string[]>>
   svgRef: RefObject<SVGSVGElement | null>
   viewport: Viewport
 }
@@ -57,8 +54,6 @@ export function useCanvasClipboardCommands({
   selection,
   setEditing,
   setClipboardItems,
-  setItems,
-  setSelection,
   svgRef,
   viewport,
 }: UseCanvasClipboardCommandsArgs) {
@@ -92,14 +87,25 @@ export function useCanvasClipboardCommands({
         return []
       }
 
-      setItems(result.items, {
+      const didCommit = commitItemsPatch(createAddCanvasItemsPatch(result.clones), {
         before: selection,
         after: result.selection,
       })
-      setSelection(result.selection)
+
+      if (!didCommit) {
+        return []
+      }
+
       return result.clones
     },
-    [commandAdapter, config, createId, items, selection, setItems, setSelection],
+    [
+      commandAdapter,
+      commitItemsPatch,
+      config,
+      createId,
+      items,
+      selection,
+    ],
   )
 
   const copySelection = useCallback(() => {
