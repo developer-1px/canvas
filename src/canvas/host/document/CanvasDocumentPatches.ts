@@ -176,6 +176,19 @@ export function createResizeCanvasItemsPatch(
   )
 }
 
+export function createTransformCanvasItemsPatch(
+  beforeItems: CanvasItem[],
+  afterItems: CanvasItem[],
+): JSONPatchOperation[] {
+  const beforeRootIds = new Set(beforeItems.map((item) => item.id))
+  const addedRootItems = afterItems.filter((item) => !beforeRootIds.has(item.id))
+
+  return [
+    ...createReplaceChangedCanvasItemsPatch(beforeItems, afterItems),
+    ...createAddCanvasItemsPatch(addedRootItems),
+  ]
+}
+
 export function createSetCanvasItemTextPatch(
   items: CanvasItem[],
   id: string,

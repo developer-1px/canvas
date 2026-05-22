@@ -14,15 +14,12 @@ import {
   writeCanvasDocumentClipboardItems,
 } from '../../host/document/CanvasDocumentClipboard'
 import {
-  canvasItemsEqual,
   commitCanvasDocumentSelection,
-  commitCanvasItemsDocument,
   commitCanvasItemsPatch,
   createCanvasItemsDocument,
   createReplaceCanvasDocumentTextPatch,
   findCanvasDocumentText,
   getCanvasDocumentSelectionIds,
-  loadCanvasItemsDocument,
   replaceCanvasItems,
   restoreCanvasDocumentSelection,
   type CanvasTextSearchMatch,
@@ -38,11 +35,6 @@ export type SelectionHistory = {
   before: string[]
   after: string[]
 }
-
-export type CommitCanvasItems = (
-  action: SetStateAction<CanvasItem[]>,
-  selection?: SelectionHistory,
-) => void
 
 export type CommitCanvasItemsPatch = (
   patch: JSONPatchOperation[],
@@ -115,29 +107,6 @@ export function useCanvasDocument(
     [],
   )
 
-  const commitItems: CommitCanvasItems = useCallback(
-    (action, selection) => {
-      const current = itemsRef.current
-      const next = replaceCanvasItems(current, resolve(action, current))
-
-      const didCommit = commitCanvasItemsDocument({
-        document,
-        nextItems: next,
-        selection,
-      })
-
-      if (!didCommit) {
-        return false
-      }
-
-      itemsRef.current = document.value
-      setItemsState(itemsRef.current)
-      syncHistoryAvailability()
-      return true
-    },
-    [document, syncHistoryAvailability],
-  )
-
   const commitItemsPatch: CommitCanvasItemsPatch = useCallback(
     (patch, selection) => {
       const didCommit = commitCanvasItemsPatch({
@@ -157,25 +126,6 @@ export function useCanvasDocument(
     },
     [document, syncHistoryAvailability],
   )
-
-  const recordHistoryFrom = useCallback((
-    before: CanvasItem[],
-    selection?: SelectionHistory,
-  ) => {
-    const current = replaceCanvasItems(before, itemsRef.current)
-
-    if (!canvasItemsEqual(before, current)) {
-      loadCanvasItemsDocument(document, before)
-      commitCanvasItemsDocument({
-        document,
-        nextItems: current,
-        selection,
-      })
-      itemsRef.current = document.value
-      setItemsState(document.value)
-      syncHistoryAvailability()
-    }
-  }, [document, syncHistoryAvailability])
 
   const setSelection: Dispatch<SetStateAction<string[]>> = useCallback(
     (action) => {
@@ -291,14 +241,12 @@ export function useCanvasDocument(
   return {
     ...historyAvailability,
     commitSelection,
-    commitItems,
     commitItemsPatch,
     copyItemsToClipboard,
     findDocumentText,
     getClipboardItems,
     items,
     redo,
-    recordHistoryFrom,
     replaceDocumentText,
     selection,
     setClipboardItems,

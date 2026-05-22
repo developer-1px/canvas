@@ -23,6 +23,7 @@ export type Interaction =
       bounds: Bounds | null
       historySelection: string[]
       startItems: CanvasItem[]
+      currentItems: CanvasItem[]
       historyItems: CanvasItem[]
       edit?: EditingText
       moved: boolean
@@ -54,6 +55,7 @@ export type Interaction =
       ids: string[]
       bounds: Bounds
       startItems: CanvasItem[]
+      currentItems: CanvasItem[]
       historyItems: CanvasItem[]
       moved: boolean
     }

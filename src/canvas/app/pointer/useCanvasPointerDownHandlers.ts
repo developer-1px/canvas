@@ -284,6 +284,7 @@ export function useCanvasPointerDownHandlers({
       bounds: moveBounds,
       historySelection,
       startItems,
+      currentItems: startItems,
       historyItems,
       edit: editItem
         ? {
@@ -320,6 +321,7 @@ export function useCanvasPointerDownHandlers({
       ids: selection,
       bounds: selectedBounds,
       startItems: items,
+      currentItems: items,
       historyItems: items,
       moved: false,
     }

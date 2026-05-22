@@ -40,6 +40,7 @@ import type {
   CommitCanvasSelection,
   CommitCanvasItemsPatch,
 } from '../document/useCanvasDocument'
+import { createTransformCanvasItemsPatch } from '../../host/document/CanvasDocumentPatches'
 import type { Interaction } from './CanvasInteractionState'
 
 type UseCanvasPointerDragHandlersArgs = {
@@ -50,10 +51,6 @@ type UseCanvasPointerDragHandlersArgs = {
   createId: (prefix: string) => string
   interactionRef: MutableRefObject<Interaction>
   scene: CanvasSceneAdapter
-  recordHistoryFrom: (
-    before: CanvasItem[],
-    selection?: { after: string[]; before: string[] },
-  ) => void
   selection: string[]
   setDraftRect: Dispatch<SetStateAction<Bounds | null>>
   setEditing: Dispatch<SetStateAction<EditingText | null>>
@@ -77,7 +74,6 @@ export function useCanvasPointerDragHandlers({
   createId,
   interactionRef,
   scene,
-  recordHistoryFrom,
   selection,
   setDraftRect,
   setEditing,
@@ -151,23 +147,24 @@ export function useCanvasPointerDragHandlers({
             dy,
           }
 
+      const nextItems = moveCanvasSelection({
+        adapter: transformAdapter,
+        dx: snap.dx,
+        dy: snap.dy,
+        items: interaction.startItems,
+        selection: interaction.ids,
+      })
+
       interactionRef.current = {
         ...interaction,
+        currentItems: nextItems,
         moved: true,
       }
       setSnapGuides({
         alignmentGuides: snap.alignmentGuides,
         spacingGuides: snap.spacingGuides,
       })
-      setLiveItems(
-        moveCanvasSelection({
-          adapter: transformAdapter,
-          dx: snap.dx,
-          dy: snap.dy,
-          items: interaction.startItems,
-          selection: interaction.ids,
-        }),
-      )
+      setLiveItems(nextItems)
       return
     }
 
@@ -190,22 +187,23 @@ export function useCanvasPointerDragHandlers({
         point: currentWorld,
       })
 
+      const nextItems = resizeCanvasSelection({
+        adapter: transformAdapter,
+        bounds: interaction.bounds,
+        handle: interaction.handle,
+        items: interaction.startItems,
+        point: snappedCurrentWorld,
+        preserveAspectRatio: event.shiftKey,
+        resizeFromCenter: event.altKey,
+        selection: interaction.ids,
+      })
+
       interactionRef.current = {
         ...interaction,
+        currentItems: nextItems,
         moved: true,
       }
-      setLiveItems(
-        resizeCanvasSelection({
-          adapter: transformAdapter,
-          bounds: interaction.bounds,
-          handle: interaction.handle,
-          items: interaction.startItems,
-          point: snappedCurrentWorld,
-          preserveAspectRatio: event.shiftKey,
-          resizeFromCenter: event.altKey,
-          selection: interaction.ids,
-        }),
-      )
+      setLiveItems(nextItems)
       return
     }
 
@@ -292,13 +290,19 @@ export function useCanvasPointerDragHandlers({
     }
 
     if (interaction.kind === 'move' || interaction.kind === 'resize') {
-      recordHistoryFrom(interaction.historyItems, {
-        before:
-          interaction.kind === 'move'
-            ? interaction.historySelection
-            : interaction.ids,
-        after: interaction.ids,
-      })
+      commitItemsPatch(
+        createTransformCanvasItemsPatch(
+          interaction.historyItems,
+          interaction.currentItems,
+        ),
+        {
+          before:
+            interaction.kind === 'move'
+              ? interaction.historySelection
+              : interaction.ids,
+          after: interaction.ids,
+        },
+      )
     }
 
     if (interaction.kind === 'move' && !interaction.moved && interaction.edit) {

@@ -33,6 +33,7 @@ import {
   createReplaceChangedCanvasItemsPatch,
   createResizeCanvasItemsPatch,
   createSetCanvasItemTextPatch,
+  createTransformCanvasItemsPatch,
   createUngroupCanvasItemsPatch,
 } from './CanvasDocumentPatches'
 import type { CanvasItem } from '../model/CanvasModel'
@@ -693,6 +694,57 @@ describe('CanvasDocument history', () => {
       'd',
     ])
     expect(getCanvasDocumentSelectionIds(document)).toEqual(['b', 'd'])
+  })
+
+  test('commits pointer transform previews as zod-crud patches', () => {
+    const items: CanvasItem[] = [
+      rectItem('a'),
+      rectItem('b'),
+    ]
+    const moved = translateCanvasItems(items, ['a'], 24, 0)
+    const clone: CanvasItem = {
+      ...rectItem('clone'),
+      x: 80,
+    }
+    const document = createCanvasItemsDocument(items, {
+      selection: ['a'],
+    })
+    const patch = createTransformCanvasItemsPatch(items, [...moved, clone])
+
+    expect(patch).toEqual([
+      {
+        op: 'replace',
+        path: '/0',
+        value: {
+          ...items[0],
+          x: 24,
+        },
+      },
+      {
+        op: 'add',
+        path: '/-',
+        value: clone,
+      },
+    ])
+    expect(
+      commitCanvasItemsPatch({
+        document,
+        patch,
+        selection: {
+          before: ['a'],
+          after: ['clone'],
+        },
+      }),
+    ).toBe(true)
+
+    expect(document.value.map((item) => item.id)).toEqual(['a', 'b', 'clone'])
+    expect(document.value[0]).toMatchObject({ id: 'a', x: 24 })
+    expect(getCanvasDocumentSelectionIds(document)).toEqual(['clone'])
+
+    expect(document.history.undo()).toBe(true)
+    expect(document.value.map((item) => item.id)).toEqual(['a', 'b'])
+    expect(document.value[0]).toMatchObject({ id: 'a', x: 0 })
+    expect(getCanvasDocumentSelectionIds(document)).toEqual(['a'])
   })
 
   test('round-trips document selection through JSON pointers', () => {
