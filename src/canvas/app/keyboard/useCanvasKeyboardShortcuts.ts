@@ -5,6 +5,7 @@ import {
 } from './CanvasKeyboardShortcutRouter'
 
 export function useCanvasKeyboardShortcuts({
+  commitSelection,
   config,
   copySelection,
   cutSelection,
@@ -25,7 +26,6 @@ export function useCanvasKeyboardShortcuts({
   setEditing,
   setGesture,
   setMarquee,
-  setSelection,
   setSpaceDown,
   setTool,
   undoHistory,
@@ -35,6 +35,7 @@ export function useCanvasKeyboardShortcuts({
 }: CanvasKeyboardShortcutHandlers) {
   useEffect(() => {
     const handlers: CanvasKeyboardShortcutHandlers = {
+      commitSelection,
       config,
       copySelection,
       cutSelection,
@@ -55,7 +56,6 @@ export function useCanvasKeyboardShortcuts({
       setEditing,
       setGesture,
       setMarquee,
-      setSelection,
       setSpaceDown,
       setTool,
       undoHistory,
@@ -89,6 +89,7 @@ export function useCanvasKeyboardShortcuts({
     }
   }, [
     copySelection,
+    commitSelection,
     config,
     cutSelection,
     deleteSelection,
@@ -108,7 +109,6 @@ export function useCanvasKeyboardShortcuts({
     setEditing,
     setGesture,
     setMarquee,
-    setSelection,
     setSpaceDown,
     setTool,
     undoHistory,

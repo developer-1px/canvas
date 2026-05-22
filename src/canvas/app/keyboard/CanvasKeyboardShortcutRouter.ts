@@ -7,8 +7,10 @@ import type { CanvasAffordanceConfig } from '../../engine/affordance/CanvasAffor
 import type { Bounds, Tool } from '../../engine/primitives/CanvasPrimitives'
 import type { EditingText } from '../../host/model/CanvasModel'
 import type { Interaction } from '../pointer/CanvasInteractionState'
+import type { CommitCanvasSelection } from '../document/useCanvasDocument'
 
 export type CanvasKeyboardShortcutHandlers = {
+  commitSelection: CommitCanvasSelection
   config: CanvasAffordanceConfig
   copySelection: () => void
   cutSelection: () => void
@@ -31,7 +33,6 @@ export type CanvasKeyboardShortcutHandlers = {
   setEditing: Dispatch<SetStateAction<EditingText | null>>
   setGesture: Dispatch<SetStateAction<Interaction['kind']>>
   setMarquee: Dispatch<SetStateAction<Bounds | null>>
-  setSelection: Dispatch<SetStateAction<string[]>>
   setSpaceDown: Dispatch<SetStateAction<boolean>>
   setTool: Dispatch<SetStateAction<Tool>>
   undoHistory: () => void
@@ -49,6 +50,7 @@ export function handleCanvasKeyboardShortcut(
   }
 
   const {
+    commitSelection,
     config,
     copySelection,
     cutSelection,
@@ -69,7 +71,6 @@ export function handleCanvasKeyboardShortcut(
     setEditing,
     setGesture,
     setMarquee,
-    setSelection,
     setSpaceDown,
     setTool,
     undoHistory,
@@ -94,7 +95,7 @@ export function handleCanvasKeyboardShortcut(
     setMarquee(null)
     setDraftRect(null)
     setEditing(null)
-    setSelection([])
+    commitSelection([])
     setTool('select')
     return
   }

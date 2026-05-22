@@ -1,4 +1,4 @@
-import type { SelectionSnap } from 'zod-crud'
+import type { JSONPatchOperation, JSONResult, SelectionSnap } from 'zod-crud'
 import type { CanvasItem } from '../model/CanvasModel'
 import type { CanvasItemsDocument } from './CanvasDocument'
 import {
@@ -15,6 +15,31 @@ export function restoreCanvasDocumentSelection(
   items: CanvasItem[] = document.value,
 ) {
   document.selection?.restore(createCanvasSelectionSnapshot(items, ids))
+}
+
+export function commitCanvasDocumentSelection(
+  document: CanvasItemsDocument,
+  ids: CanvasSelectionIds,
+) {
+  const before = getCanvasDocumentSelectionIds(document)
+  const afterSnapshot = createCanvasSelectionSnapshot(document.value, ids)
+  const after = getCanvasSelectionIdsFromSnapshot(document.value, afterSnapshot)
+
+  if (canvasSelectionIdsEqual(before, after)) {
+    return false
+  }
+
+  const result = document.commit(
+    createCanvasSelectionMutationPatch(document.value),
+    {
+      label: 'canvas selection',
+      origin: 'canvas',
+      selection: afterSnapshot,
+    },
+  )
+
+  assertJSONResult(result)
+  return true
 }
 
 export function getCanvasDocumentSelectionIds(
@@ -78,5 +103,31 @@ function createEmptyCanvasSelectionSnapshot(): SelectionSnap {
     primaryIndex: -1,
     anchor: null,
     focus: null,
+  }
+}
+
+function createCanvasSelectionMutationPatch(
+  items: CanvasItem[],
+): JSONPatchOperation[] {
+  const firstItem = items[0]
+
+  return firstItem
+    ? [{ op: 'test', path: '/0/id', value: firstItem.id }]
+    : [{ op: 'test', path: '', value: [] }]
+}
+
+function canvasSelectionIdsEqual(
+  left: CanvasSelectionIds,
+  right: CanvasSelectionIds,
+) {
+  return (
+    left.length === right.length &&
+    left.every((id, index) => id === right[index])
+  )
+}
+
+function assertJSONResult(result: JSONResult): asserts result is { ok: true } {
+  if (!result.ok) {
+    throw new Error(result.reason ?? result.code)
   }
 }

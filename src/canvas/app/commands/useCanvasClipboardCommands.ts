@@ -22,12 +22,14 @@ import {
 import { getCanvasPasteOffset } from './CanvasPastePosition'
 import type {
   CanvasDocumentClipboard,
+  CommitCanvasSelection,
   CommitCanvasItems,
   CommitCanvasItemsPatch,
 } from '../document/useCanvasDocument'
 
 type UseCanvasClipboardCommandsArgs = {
   commandAdapter: CanvasCommandAdapter<CanvasItem>
+  commitSelection: CommitCanvasSelection
   commitItemsPatch: CommitCanvasItemsPatch
   config: CanvasAffordanceConfig
   copyItemsToClipboard: CanvasDocumentClipboard['copyItemsToClipboard']
@@ -45,6 +47,7 @@ type UseCanvasClipboardCommandsArgs = {
 
 export function useCanvasClipboardCommands({
   commandAdapter,
+  commitSelection,
   commitItemsPatch,
   config,
   copyItemsToClipboard,
@@ -179,7 +182,7 @@ export function useCanvasClipboardCommands({
         after: deletion.selection,
       })
     } else {
-      setSelection(deletion.selection)
+      commitSelection(deletion.selection)
     }
 
     setEditing((current) =>
@@ -189,13 +192,13 @@ export function useCanvasClipboardCommands({
     )
   }, [
     commandAdapter,
+    commitSelection,
     commitItemsPatch,
     config,
     copyItemsToClipboard,
     items,
     selection,
     setEditing,
-    setSelection,
   ])
 
   return {

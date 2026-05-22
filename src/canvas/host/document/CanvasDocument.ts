@@ -13,7 +13,16 @@ import {
   type CanvasSelectionIds,
 } from './CanvasDocumentSelection'
 
-export { getCanvasDocumentSelectionIds, restoreCanvasDocumentSelection } from './CanvasDocumentSelection'
+export {
+  commitCanvasDocumentSelection,
+  getCanvasDocumentSelectionIds,
+  restoreCanvasDocumentSelection,
+} from './CanvasDocumentSelection'
+export {
+  createReplaceCanvasDocumentTextPatch,
+  findCanvasDocumentText,
+  type CanvasTextSearchMatch,
+} from './CanvasDocumentSearch'
 export type { CanvasSelectionIds } from './CanvasDocumentSelection'
 
 export const CANVAS_DOCUMENT_HISTORY_LIMIT = 100

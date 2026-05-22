@@ -15,6 +15,7 @@ import {
 } from '../../host/document/CanvasDocumentClipboard'
 import {
   canvasItemsEqual,
+  commitCanvasDocumentSelection,
   commitCanvasItemsDocument,
   commitCanvasItemsPatch,
   createCanvasItemsDocument,
@@ -42,6 +43,10 @@ export type CommitCanvasItems = (
 export type CommitCanvasItemsPatch = (
   patch: JSONPatchOperation[],
   selection?: SelectionHistory,
+) => boolean
+
+export type CommitCanvasSelection = (
+  action: SetStateAction<string[]>,
 ) => boolean
 
 export type CanvasDocumentClipboard = {
@@ -173,6 +178,21 @@ export function useCanvasDocument(
     [document],
   )
 
+  const commitSelection: CommitCanvasSelection = useCallback((action) => {
+    const current = getCanvasDocumentSelectionIds(document)
+    const next =
+      typeof action === 'function'
+        ? (action as (current: string[]) => string[])(current)
+        : action
+    const didCommit = commitCanvasDocumentSelection(document, next)
+
+    if (didCommit) {
+      syncHistoryAvailability()
+    }
+
+    return didCommit
+  }, [document, syncHistoryAvailability])
+
   const copyItemsToClipboard = useCallback(
     (selection: string[]) =>
       copyCanvasDocumentSelectionToClipboard(
@@ -222,6 +242,7 @@ export function useCanvasDocument(
 
   return {
     ...historyAvailability,
+    commitSelection,
     commitItems,
     commitItemsPatch,
     copyItemsToClipboard,

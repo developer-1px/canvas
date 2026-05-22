@@ -37,12 +37,14 @@ import { snapCanvasPointToGrid } from '../../engine/snap/CanvasSnapEngine'
 import type { CanvasSceneAdapter } from '../../engine/scene/CanvasSceneAdapter'
 import { findEditableTextItem } from '../../host/tree/CanvasTree'
 import type {
+  CommitCanvasSelection,
   CommitCanvasItemsPatch,
 } from '../document/useCanvasDocument'
 import type { Interaction } from './CanvasInteractionState'
 
 type UseCanvasPointerDownHandlersArgs = {
   cloneItems: (ids: string[], offset: Point) => CanvasItem[]
+  commitSelection: CommitCanvasSelection
   commitItemsPatch: CommitCanvasItemsPatch
   config: CanvasAffordanceConfig
   creationAdapter: CanvasCreationAdapter<CanvasItem>
@@ -66,6 +68,7 @@ type UseCanvasPointerDownHandlersArgs = {
 
 export function useCanvasPointerDownHandlers({
   cloneItems,
+  commitSelection,
   commitItemsPatch,
   config,
   creationAdapter,
@@ -237,7 +240,7 @@ export function useCanvasPointerDownHandlers({
     }
 
     if (itemIntent.additive) {
-      setSelection(nextSelection)
+      commitSelection(nextSelection)
 
       if (itemSelection.alreadySelected) {
         interactionRef.current = { kind: 'none' }
@@ -245,7 +248,7 @@ export function useCanvasPointerDownHandlers({
         return
       }
     } else if (nextSelection !== selection) {
-      setSelection(nextSelection)
+      commitSelection(nextSelection)
     }
 
     let startItems = items
@@ -328,7 +331,7 @@ export function useCanvasPointerDownHandlers({
       return
     }
 
-    setSelection([item.id])
+    commitSelection([item.id])
     setEditing({
       id: item.id,
       value: item.type === 'rect' ? item.text ?? '' : item.text,

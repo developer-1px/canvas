@@ -1,8 +1,11 @@
 import { describe, expect, test } from 'vitest'
 import {
+  commitCanvasDocumentSelection,
   commitCanvasItemsDocument,
   commitCanvasItemsPatch,
+  createReplaceCanvasDocumentTextPatch,
   createCanvasItemsDocument,
+  findCanvasDocumentText,
   getCanvasDocumentSelectionIds,
   restoreCanvasDocumentSelection,
 } from './CanvasDocument'
@@ -64,6 +67,29 @@ describe('CanvasDocument history', () => {
 
     expect(document.history.redo()).toBe(true)
     expect(document.value).toEqual(nextItems)
+    expect(getCanvasDocumentSelectionIds(document)).toEqual(['component-card'])
+  })
+
+  test('commits selection-only changes as zod-crud mutation diffs', () => {
+    const document = createCanvasItemsDocument(INITIAL_ITEMS, {
+      selection: ['component-sticky'],
+    })
+
+    expect(
+      commitCanvasDocumentSelection(document, ['component-card']),
+    ).toBe(true)
+    expect(document.value).toEqual(INITIAL_ITEMS)
+    expect(document.canUndo()).toEqual({ ok: true })
+    expect(getCanvasDocumentSelectionIds(document)).toEqual(['component-card'])
+
+    expect(document.history.undo()).toBe(true)
+    expect(document.value).toEqual(INITIAL_ITEMS)
+    expect(getCanvasDocumentSelectionIds(document)).toEqual([
+      'component-sticky',
+    ])
+
+    expect(document.history.redo()).toBe(true)
+    expect(document.value).toEqual(INITIAL_ITEMS)
     expect(getCanvasDocumentSelectionIds(document)).toEqual(['component-card'])
   })
 
@@ -202,6 +228,59 @@ describe('CanvasDocument history', () => {
     expect(getCanvasDocumentSelectionIds(document)).toEqual([
       'component-pasted',
     ])
+  })
+
+  test('finds searchable canvas text fields through zod-crud query', () => {
+    const document = createCanvasItemsDocument(INITIAL_ITEMS)
+
+    expect(findCanvasDocumentText(document, 'concept')).toEqual([
+      {
+        field: 'body',
+        itemId: 'component-card',
+        occurrences: 1,
+        path: '/2/body',
+        value: 'Concept block',
+      },
+    ])
+  })
+
+  test('commits find replace as zod-crud replace patches', () => {
+    const document = createCanvasItemsDocument(INITIAL_ITEMS)
+    const patch = createReplaceCanvasDocumentTextPatch(
+      document,
+      'Concept',
+      'Content',
+    )
+
+    expect(patch).toEqual([
+      {
+        op: 'replace',
+        path: '/2/body',
+        value: 'Content block',
+      },
+    ])
+    expect(
+      commitCanvasItemsPatch({
+        document,
+        patch,
+        selection: {
+          before: ['component-card'],
+          after: ['component-card'],
+        },
+      }),
+    ).toBe(true)
+
+    expect(document.lastPatch).toEqual(patch)
+    expect(findCanvasDocumentText(document, 'Content')).toEqual([
+      {
+        field: 'body',
+        itemId: 'component-card',
+        occurrences: 1,
+        path: '/2/body',
+        value: 'Content block',
+      },
+    ])
+    expect(getCanvasDocumentSelectionIds(document)).toEqual(['component-card'])
   })
 
   test('round-trips document selection through JSON pointers', () => {

@@ -37,11 +37,13 @@ import {
   type CanvasTransformAdapter,
 } from '../../engine/transform/CanvasTransformEngine'
 import type {
+  CommitCanvasSelection,
   CommitCanvasItemsPatch,
 } from '../document/useCanvasDocument'
 import type { Interaction } from './CanvasInteractionState'
 
 type UseCanvasPointerDragHandlersArgs = {
+  commitSelection: CommitCanvasSelection
   commitItemsPatch: CommitCanvasItemsPatch
   config: CanvasAffordanceConfig
   creationAdapter: CanvasCreationAdapter<CanvasItem>
@@ -68,6 +70,7 @@ type UseCanvasPointerDragHandlersArgs = {
 }
 
 export function useCanvasPointerDragHandlers({
+  commitSelection,
   commitItemsPatch,
   config,
   creationAdapter,
@@ -299,14 +302,28 @@ export function useCanvasPointerDragHandlers({
     }
 
     if (interaction.kind === 'move' && !interaction.moved && interaction.edit) {
-      setSelection([interaction.edit.id])
+      commitSelection([interaction.edit.id])
       setEditing(interaction.edit)
       setTool('select')
     }
 
-    if (interaction.kind === 'marquee' && !interaction.moved) {
-      if (!interaction.additive) {
-        setSelection([])
+    if (interaction.kind === 'marquee') {
+      if (interaction.moved) {
+        const nextSelection = getCanvasMarqueeSelection({
+          additive: interaction.additive,
+          baseSelection: interaction.baseSelection,
+          bounds: normalizeBounds(
+            interaction.startWorld,
+            interaction.currentWorld,
+          ),
+          scene,
+        })
+
+        setSelection(interaction.baseSelection)
+        commitSelection(nextSelection)
+      } else if (!interaction.additive) {
+        setSelection(interaction.baseSelection)
+        commitSelection([])
       }
     }
 
@@ -322,6 +339,8 @@ export function useCanvasPointerDragHandlers({
 
     if (interaction.kind === 'move' || interaction.kind === 'resize') {
       setLiveItems(interaction.historyItems)
+    } else if (interaction.kind === 'marquee') {
+      setSelection(interaction.baseSelection)
     }
 
     releasePointer(svgRef, event.pointerId)

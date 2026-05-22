@@ -27,12 +27,14 @@ import { createRemoveCanvasItemsPatch } from '../../host/document/CanvasDocument
 import { useCanvasClipboardCommands } from './useCanvasClipboardCommands'
 import type {
   CanvasDocumentClipboard,
+  CommitCanvasSelection,
   CommitCanvasItems,
   CommitCanvasItemsPatch,
 } from '../document/useCanvasDocument'
 
 type UseCanvasCommandsArgs = {
   commandAdapter: CanvasCommandAdapter<CanvasItem>
+  commitSelection: CommitCanvasSelection
   commitItemsPatch: CommitCanvasItemsPatch
   config: CanvasAffordanceConfig
   copyItemsToClipboard: CanvasDocumentClipboard['copyItemsToClipboard']
@@ -52,6 +54,7 @@ type UseCanvasCommandsArgs = {
 
 export function useCanvasCommands({
   commandAdapter,
+  commitSelection,
   commitItemsPatch,
   config,
   copyItemsToClipboard,
@@ -89,6 +92,7 @@ export function useCanvasCommands({
     setSelection,
     svgRef,
     viewport,
+    commitSelection,
   })
 
   const alignSelection = useCallback(
@@ -157,7 +161,7 @@ export function useCanvasCommands({
         after: result.selection,
       })
     } else {
-      setSelection(result.selection)
+      commitSelection(result.selection)
     }
 
     setEditing((current) =>
@@ -165,12 +169,12 @@ export function useCanvasCommands({
     )
   }, [
     commandAdapter,
+    commitSelection,
     commitItemsPatch,
     config,
     items,
     selection,
     setEditing,
-    setSelection,
   ])
 
   const groupSelection = useCallback(() => {
@@ -329,8 +333,8 @@ export function useCanvasCommands({
       return
     }
 
-    setSelection(nextSelection)
-  }, [commandAdapter, config, items, setSelection])
+    commitSelection(nextSelection)
+  }, [commandAdapter, commitSelection, config, items])
 
   return {
     alignSelection,
