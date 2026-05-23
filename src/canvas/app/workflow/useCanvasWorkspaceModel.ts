@@ -16,10 +16,10 @@ import {
   type CanvasCustomItemValidators,
 } from '../../host'
 import {
-  getCanvasItemIdSeed,
   readStoredCanvasWorkspace,
   useCanvasWorkspacePersistence,
 } from '../document/CanvasWorkspacePersistence'
+import { getCanvasItemIdSeed } from '../document/CanvasWorkspaceSnapshot'
 import { useCanvasDocument } from '../document/useCanvasDocument'
 
 const DEFAULT_INITIAL_SELECTION = ['component-sticky', 'component-card']

@@ -1531,6 +1531,40 @@ describe('Canvas module boundaries', () => {
     expect(violations).toEqual([])
   })
 
+  it('keeps App workspace snapshot contracts behind a named module', () => {
+    const persistenceFile = getSourceFile(
+      'src/canvas/app/document/CanvasWorkspacePersistence.ts',
+    )
+    const snapshotFile = getSourceFile(
+      'src/canvas/app/document/CanvasWorkspaceSnapshot.ts',
+    )
+
+    expect(persistenceFile.source).toContain(
+      "from './CanvasWorkspaceSnapshot'",
+    )
+    expect(persistenceFile.source).not.toContain('normalizeCanvasItems')
+    expect(persistenceFile.source).not.toContain(
+      'createCanvasItemReadModel',
+    )
+    expect(persistenceFile.source).not.toContain('getCanvasItemIdSeed')
+    expect(persistenceFile.source).not.toContain(
+      'CANVAS_WORKSPACE_VERSION',
+    )
+    expect(persistenceFile.source).not.toContain('normalizeCanvasViewport')
+    expect(snapshotFile.source).toContain(
+      'export function parseCanvasWorkspaceSnapshot',
+    )
+    expect(snapshotFile.source).toContain(
+      'export function createCanvasWorkspaceSnapshot',
+    )
+    expect(snapshotFile.source).toContain(
+      'export function getCanvasItemIdSeed',
+    )
+    expect(snapshotFile.source).toContain('normalizeCanvasItems')
+    expect(snapshotFile.source).toContain('createCanvasItemReadModel')
+    expect(snapshotFile.source).toContain('CANVAS_WORKSPACE_VERSION')
+  })
+
   it('keeps Demo SVG renderer names out of app authoring seams', () => {
     const publicAuthoringFiles = new Set([
       'src/canvas/index.ts',

@@ -6,13 +6,6 @@ import {
   type CanvasWorkspaceSnapshotInput,
 } from './CanvasWorkspaceSnapshot'
 
-export {
-  createCanvasWorkspaceSnapshot,
-  getCanvasItemIdSeed,
-  parseCanvasWorkspaceSnapshot,
-  type CanvasWorkspaceSnapshot,
-} from './CanvasWorkspaceSnapshot'
-
 export const CANVAS_WORKSPACE_STORAGE_KEY =
   'interactive-os.canvas.workspace.v1'
 
