@@ -2904,6 +2904,13 @@ describe('Canvas module boundaries', () => {
     expect(effectsFile.source).toContain(
       'export function applyCanvasClipboardCommandEffect',
     )
+    expect(effectsFile.source).toContain(
+      'CANVAS_CLIPBOARD_COMMAND_EFFECT_APPLIERS',
+    )
+    expect(effectsFile.source).not.toContain('switch (effect.kind)')
+    expect(effectsFile.source).not.toContain(
+      'assertUnhandledCanvasClipboardCommandEffect',
+    )
     expect(effectsFile.source).toContain('copyItemsToClipboard(')
     expect(effectsFile.source).toContain('context.commitItemsChange(')
     expect(effectsFile.source).toContain('context.commitSelection(')

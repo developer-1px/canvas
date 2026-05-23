@@ -60,6 +60,38 @@ export const EMPTY_CLIPBOARD_COMMAND_RESULT:
     executed: false,
   }
 
+type CanvasClipboardCommandEffectApplier<
+  TKind extends CanvasClipboardCommandEffect['kind'],
+> = (args: {
+  context: CanvasClipboardCommandEffectContext
+  effect: Extract<CanvasClipboardCommandEffect, { kind: TKind }>
+}) => CanvasClipboardCommandExecutionResult
+
+type CanvasClipboardCommandEffectAppliers = {
+  [TKind in CanvasClipboardCommandEffect['kind']]:
+    CanvasClipboardCommandEffectApplier<TKind>
+}
+
+type CanvasClipboardCommandAnyEffectApplier = (args: {
+  context: CanvasClipboardCommandEffectContext
+  effect: CanvasClipboardCommandEffect
+}) => CanvasClipboardCommandExecutionResult
+
+const CANVAS_CLIPBOARD_COMMAND_EFFECT_APPLIERS = Object.freeze({
+  'add-items': ({ context, effect }) =>
+    applyCanvasClipboardAddItemsEffect({ context, effect }),
+  'clone-result': ({ effect }) => ({
+    clonedItems: effect.clonedItems,
+    executed: true,
+  }),
+  'copy-selection': ({ context }) =>
+    applyCanvasClipboardCopySelectionEffect(context),
+  'cut-copy-only': ({ context, effect }) =>
+    applyCanvasClipboardCutCopyOnlyEffect({ context, effect }),
+  'cut-selection': ({ context, effect }) =>
+    applyCanvasClipboardCutSelectionEffect({ context, effect }),
+} satisfies CanvasClipboardCommandEffectAppliers)
+
 export function applyCanvasClipboardCommandEffect({
   context,
   effect,
@@ -67,23 +99,11 @@ export function applyCanvasClipboardCommandEffect({
   context: CanvasClipboardCommandEffectContext
   effect: CanvasClipboardCommandEffect
 }): CanvasClipboardCommandExecutionResult {
-  switch (effect.kind) {
-    case 'clone-result':
-      return {
-        clonedItems: effect.clonedItems,
-        executed: true,
-      }
-    case 'copy-selection':
-      return applyCanvasClipboardCopySelectionEffect(context)
-    case 'add-items':
-      return applyCanvasClipboardAddItemsEffect({ context, effect })
-    case 'cut-selection':
-      return applyCanvasClipboardCutSelectionEffect({ context, effect })
-    case 'cut-copy-only':
-      return applyCanvasClipboardCutCopyOnlyEffect({ context, effect })
-  }
+  const applier = CANVAS_CLIPBOARD_COMMAND_EFFECT_APPLIERS[
+    effect.kind
+  ] as CanvasClipboardCommandAnyEffectApplier
 
-  return assertUnhandledCanvasClipboardCommandEffect(effect)
+  return applier({ context, effect })
 }
 
 function applyCanvasClipboardCopySelectionEffect(
@@ -192,10 +212,4 @@ function copyCanvasClipboardSelectionForCut({
     context.copyItemsToClipboard(context.selection)
     ? { nextPasteIndex: 0 }
     : {}
-}
-
-function assertUnhandledCanvasClipboardCommandEffect(
-  effect: never,
-): never {
-  throw new Error(`Unhandled canvas clipboard command effect: ${String(effect)}`)
 }
