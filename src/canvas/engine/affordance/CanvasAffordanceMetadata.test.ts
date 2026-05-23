@@ -40,6 +40,12 @@ describe('CanvasAffordanceMetadata', () => {
       shiftKey: true,
       shortcutId: 'highlighterTool',
     })
+    expect(CANVAS_TOOL_AFFORDANCES.highlight.shortcut).toBe('Shift+M')
+    expect(CANVAS_TOOL_AFFORDANCES.highlight.title).toBe(
+      'Highlighter (Shift+M)',
+    )
+    expect(CANVAS_TOOL_AFFORDANCES.select.shortcut).toBe('V')
+    expect(CANVAS_TOOL_AFFORDANCES.select.title).toBe('Select (V)')
   })
 
   it('snapshots public affordance metadata against runtime mutation', () => {

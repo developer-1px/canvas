@@ -2394,6 +2394,9 @@ describe('Canvas module boundaries', () => {
     const affordanceConfigFile = getSourceFile(
       'src/canvas/engine/affordance/CanvasAffordanceConfig.ts',
     )
+    const affordanceMetadataFile = getSourceFile(
+      'src/canvas/engine/affordance/CanvasAffordanceMetadata.ts',
+    )
     const affordanceTypesFile = getSourceFile(
       'src/canvas/engine/affordance/CanvasAffordanceTypes.ts',
     )
@@ -2435,6 +2438,14 @@ describe('Canvas module boundaries', () => {
     expect(affordanceConfigFile.source).toContain(
       'snapshotCanvasAffordanceConfig',
     )
+    expect(affordanceMetadataFile.source).toContain(
+      'function createCanvasToolAffordance',
+    )
+    expect(affordanceMetadataFile.source).toContain(
+      'formatCanvasToolKeyboardShortcut',
+    )
+    expect(affordanceMetadataFile.source).not.toContain("shortcut: 'V'")
+    expect(affordanceMetadataFile.source).not.toContain("title: 'Select (")
   })
 
   it('keeps app workflow hooks from recreating the workspace read model', () => {

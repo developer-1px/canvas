@@ -38,83 +38,108 @@ export const CANVAS_TOOL_AFFORDANCE_ORDER = Object.freeze([
 ] as const satisfies readonly CanvasBuiltinTool[])
 
 export const CANVAS_TOOL_AFFORDANCES = Object.freeze({
-  arrow: Object.freeze({
+  arrow: createCanvasToolAffordance({
     ariaLabel: 'Arrow tool',
-    keyboardShortcut: Object.freeze({
+    keyboardShortcut: {
       key: 'l',
       shiftInsensitive: true,
       shortcutId: 'arrowTool',
-    }),
-    shortcut: 'L',
+    },
     statusLabel: 'Arrow',
-    title: 'Arrow (L)',
   }),
-  highlight: Object.freeze({
+  highlight: createCanvasToolAffordance({
     ariaLabel: 'Highlighter tool',
-    keyboardShortcut: Object.freeze({
+    keyboardShortcut: {
       key: 'm',
       shiftKey: true,
       shortcutId: 'highlighterTool',
-    }),
-    shortcut: 'Shift+M',
+    },
     statusLabel: 'Highlight',
-    title: 'Highlighter (Shift+M)',
   }),
-  marker: Object.freeze({
+  marker: createCanvasToolAffordance({
     ariaLabel: 'Marker tool',
-    keyboardShortcut: Object.freeze({
+    keyboardShortcut: {
       key: 'm',
       shortcutId: 'markerTool',
-    }),
-    shortcut: 'M',
+    },
     statusLabel: 'Marker',
-    title: 'Marker (M)',
   }),
-  pan: Object.freeze({
+  pan: createCanvasToolAffordance({
     ariaLabel: 'Pan tool',
-    keyboardShortcut: Object.freeze({
+    keyboardShortcut: {
       key: 'h',
       shiftInsensitive: true,
       shortcutId: 'panTool',
-    }),
-    shortcut: 'H',
+    },
     statusLabel: 'Pan',
-    title: 'Pan (H)',
   }),
-  rect: Object.freeze({
+  rect: createCanvasToolAffordance({
     ariaLabel: 'Rectangle tool',
-    keyboardShortcut: Object.freeze({
+    keyboardShortcut: {
       key: 'r',
       shiftInsensitive: true,
       shortcutId: 'rectTool',
-    }),
-    shortcut: 'R',
+    },
     statusLabel: 'Rect',
-    title: 'Rectangle (R)',
   }),
-  select: Object.freeze({
+  select: createCanvasToolAffordance({
     ariaLabel: 'Select tool',
-    keyboardShortcut: Object.freeze({
+    keyboardShortcut: {
       key: 'v',
       shiftInsensitive: true,
       shortcutId: 'selectTool',
-    }),
-    shortcut: 'V',
+    },
     statusLabel: 'Select',
-    title: 'Select (V)',
   }),
-  text: Object.freeze({
+  text: createCanvasToolAffordance({
     ariaLabel: 'Text tool',
-    keyboardShortcut: Object.freeze({
+    keyboardShortcut: {
       key: 't',
       shiftInsensitive: true,
       shortcutId: 'textTool',
-    }),
-    shortcut: 'T',
+    },
     statusLabel: 'Text',
-    title: 'Text (T)',
   }),
 } satisfies Readonly<Record<CanvasBuiltinTool, CanvasToolAffordance>>)
+
+function createCanvasToolAffordance({
+  ariaLabel,
+  keyboardShortcut,
+  statusLabel,
+}: {
+  ariaLabel: string
+  keyboardShortcut: CanvasToolKeyboardShortcut
+  statusLabel: string
+}): CanvasToolAffordance {
+  const frozenKeyboardShortcut = Object.freeze({ ...keyboardShortcut })
+  const shortcut = formatCanvasToolKeyboardShortcut(keyboardShortcut)
+
+  return Object.freeze({
+    ariaLabel,
+    keyboardShortcut: frozenKeyboardShortcut,
+    shortcut,
+    statusLabel,
+    title: `${getCanvasToolAffordanceTitleLabel(ariaLabel)} (${shortcut})`,
+  })
+}
+
+function getCanvasToolAffordanceTitleLabel(ariaLabel: string) {
+  return ariaLabel.endsWith(' tool')
+    ? ariaLabel.slice(0, -' tool'.length)
+    : ariaLabel
+}
+
+function formatCanvasToolKeyboardShortcut(
+  shortcut: CanvasToolKeyboardShortcut,
+) {
+  const key = formatCanvasToolKeyboardShortcutKey(shortcut.key)
+
+  return shortcut.shiftKey ? `Shift+${key}` : key
+}
+
+function formatCanvasToolKeyboardShortcutKey(key: string) {
+  return key.length === 1 ? key.toUpperCase() : key
+}
 
 export const CANVAS_COMMAND_AFFORDANCES = Object.freeze({
   alignBottom: Object.freeze({
