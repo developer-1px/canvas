@@ -1,4 +1,4 @@
-import type { PointerEvent, ReactNode, RefObject } from 'react'
+import type { PointerEvent, ReactNode, RefCallback } from 'react'
 import type {
   CanvasInteractionKind,
   ResizeHandle,
@@ -16,8 +16,8 @@ type CanvasSvgStageProps = {
   activeMode: Tool
   children?: ReactNode
   gesture: CanvasInteractionKind
+  onStageElement?: RefCallback<SVGSVGElement>
   overlays: CanvasOverlayState
-  svgRef: RefObject<SVGSVGElement | null>
   viewport: Viewport
   onCanvasPointerDown: (event: PointerEvent<SVGSVGElement>) => void
   onContextMenu: (event: PointerEvent<SVGSVGElement>) => void
@@ -34,8 +34,8 @@ export function CanvasSvgStage({
   activeMode,
   children,
   gesture,
+  onStageElement,
   overlays,
-  svgRef,
   viewport,
   onCanvasPointerDown,
   onContextMenu,
@@ -46,7 +46,7 @@ export function CanvasSvgStage({
 }: CanvasSvgStageProps) {
   return (
     <svg
-      ref={svgRef}
+      ref={onStageElement}
       className="canvas-stage"
       data-mode={activeMode}
       data-gesture={gesture}

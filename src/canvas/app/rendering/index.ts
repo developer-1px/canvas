@@ -1,5 +1,10 @@
 export { CanvasDemoSvgItemLayer } from './CanvasDemoSvgItemLayer'
 export {
+  DEFAULT_CANVAS_APP_STAGE_ADAPTER,
+  type CanvasAppStageAdapter,
+  type CanvasAppStageRenderInput,
+} from './CanvasAppStageAdapter'
+export {
   DEFAULT_CANVAS_APP_ITEM_LAYER_ADAPTER,
   type CanvasAppComponentPresentationRenderers,
   type CanvasAppComponentRendererStrategy,

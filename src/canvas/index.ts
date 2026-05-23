@@ -37,6 +37,8 @@ export {
   type CanvasAppItemAdapters,
   type CanvasAppItemLayerAdapter,
   type CanvasAppItemLayerRenderInput,
+  type CanvasAppStageAdapter,
+  type CanvasAppStageRenderInput,
   type CanvasAppCustomItemRendererStrategy,
   type CanvasAppCustomItemRenderers,
 } from './app'

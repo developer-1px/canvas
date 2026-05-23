@@ -64,9 +64,13 @@ export function useCanvasAppModel({
     initialItems,
     itemAdapters,
     itemLayerAdapter,
+    stageAdapter,
   } = validatedAssembly
   const svgRef = useRef<SVGSVGElement | null>(null)
   const editorRef = useRef<HTMLTextAreaElement | null>(null)
+  const setStageElement = useCallback((element: SVGSVGElement | null) => {
+    svgRef.current = element
+  }, [])
   const {
     canRedo,
     canUndo,
@@ -376,31 +380,34 @@ export function useCanvasAppModel({
     findReplace,
     inspector,
     stage: {
-      activeMode,
-      children: renderCanvasAppItemLayer({
-        adapter: itemLayerAdapter,
-        input: {
-          componentPresentationRenderers,
-          customItemRenderers,
-          getComponentPresentation: componentLibrary.getPresentation,
-          items,
-          onItemPointerDown: handleStageItemPointerDown,
-          onTextDoubleClick: handleTextDoubleClick,
-          outlineIds: overlays.itemOutlineIds,
-          selected,
-        },
-      }),
-      gesture,
-      overlays,
-      svgRef,
-      viewport,
-      onCanvasPointerDown: handleStageCanvasPointerDown,
-      onContextMenu: (event: PointerEvent<SVGSVGElement>) =>
-        event.preventDefault(),
-      onPointerCancel: handlePointerCancel,
-      onPointerMove: handlePointerMove,
-      onPointerUp: handlePointerUp,
-      onResizePointerDown: handleResizePointerDown,
+      Stage: stageAdapter.Stage,
+      props: {
+        activeMode,
+        children: renderCanvasAppItemLayer({
+          adapter: itemLayerAdapter,
+          input: {
+            componentPresentationRenderers,
+            customItemRenderers,
+            getComponentPresentation: componentLibrary.getPresentation,
+            items,
+            onItemPointerDown: handleStageItemPointerDown,
+            onTextDoubleClick: handleTextDoubleClick,
+            outlineIds: overlays.itemOutlineIds,
+            selected,
+          },
+        }),
+        gesture,
+        overlays,
+        onStageElement: setStageElement,
+        viewport,
+        onCanvasPointerDown: handleStageCanvasPointerDown,
+        onContextMenu: (event: PointerEvent<SVGSVGElement>) =>
+          event.preventDefault(),
+        onPointerCancel: handlePointerCancel,
+        onPointerMove: handlePointerMove,
+        onPointerUp: handlePointerUp,
+        onResizePointerDown: handleResizePointerDown,
+      },
     },
     status: {
       mode: getCanvasAppStatusMode({

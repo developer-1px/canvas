@@ -9,6 +9,7 @@ import {
   defineCanvasAppCustomItemModule,
   type CanvasAppCustomItemModule,
   type CanvasAppItemLayerAdapter,
+  type CanvasAppStageAdapter,
   type CanvasCustomItem,
   type CanvasItem,
 } from 'canvas'
@@ -57,11 +58,15 @@ describe('Canvas package consumer imports', () => {
     const itemLayerAdapter: CanvasAppItemLayerAdapter = {
       renderItems: ({ items }) => items.length,
     }
+    const stageAdapter: CanvasAppStageAdapter = {
+      Stage: () => 'stage',
+    }
 
     const assembly = createCanvasAppAssembly({
       customItemModules: [module],
       initialItems: [rect],
       itemLayerAdapter,
+      stageAdapter,
     })
 
     expect(assembly.initialItems).toEqual([rect])
@@ -75,6 +80,7 @@ describe('Canvas package consumer imports', () => {
       outlineIds: new Set(),
       selected: new Set(),
     })).toBe(1)
+    expect(assembly.stageAdapter.Stage).toBe(stageAdapter.Stage)
     expect(assembly.customItemValidators.smoke(customItem)).toBe(true)
     expect(createCanvasAppAssemblyFromApp().initialItems.length).toBeGreaterThan(
       0,

@@ -14,6 +14,7 @@ import {
   type CanvasAppCustomItemRendererStrategy,
   type CanvasAppInspectorPanel,
   type CanvasAppItemLayerAdapter,
+  type CanvasAppStageAdapter,
 } from './index'
 
 describe('CanvasAppAssembly', () => {
@@ -177,16 +178,23 @@ describe('CanvasAppAssembly', () => {
     ).toBe(renderRisk)
   })
 
-  it('accepts item layer adapters at the app assembly seam', () => {
+  it('accepts rendering adapters at the app assembly seam', () => {
     const itemLayerAdapter: CanvasAppItemLayerAdapter = {
       renderItems: ({ items }) => items.length,
     }
+    const stageAdapter: CanvasAppStageAdapter = {
+      Stage: ({ children }) => children,
+    }
 
-    const assembly = createCanvasAppAssembly({ itemLayerAdapter })
+    const assembly = createCanvasAppAssembly({
+      itemLayerAdapter,
+      stageAdapter,
+    })
 
     expect(assembly.itemLayerAdapter.renderItems(
       createItemLayerInput({ items: DEFAULT_CANVAS_APP_ASSEMBLY.initialItems }),
     )).toBe(DEFAULT_CANVAS_APP_ASSEMBLY.initialItems.length)
+    expect(assembly.stageAdapter.Stage).toBe(stageAdapter.Stage)
   })
 
   it('rejects direct extension ids outside the app extension id contract', () => {
@@ -288,6 +296,12 @@ describe('CanvasAppAssembly', () => {
         itemLayerAdapter: {} as unknown as CanvasAppItemLayerAdapter,
       }),
     ).toThrow('Canvas app item layer adapter requires renderItems')
+
+    expect(() =>
+      createCanvasAppAssembly({
+        stageAdapter: {} as unknown as CanvasAppStageAdapter,
+      }),
+    ).toThrow('Canvas app stage adapter requires Stage')
   })
 
   it('validates assembled output before app runtime use', () => {
@@ -412,6 +426,10 @@ describe('CanvasAppAssembly', () => {
     const itemLayerAdapter: CanvasAppItemLayerAdapter = {
       renderItems: itemLayerRenderItems,
     }
+    const Stage: CanvasAppStageAdapter['Stage'] = ({ children }) => children
+    const stageAdapter: CanvasAppStageAdapter = {
+      Stage,
+    }
     const moduleCreationTool: CanvasAppCustomItemModuleCreationTool = {
       id: 'risk',
       label: '!',
@@ -443,6 +461,7 @@ describe('CanvasAppAssembly', () => {
       inspectorPanels: [customInspectorPanel],
       itemAdapters,
       itemLayerAdapter,
+      stageAdapter,
     })
 
     componentLibrary.getPresentation = () => 'mutated-card'
@@ -463,6 +482,7 @@ describe('CanvasAppAssembly', () => {
     })
     itemAdapters.command.selectAll = () => ['mutated']
     itemLayerAdapter.renderItems = () => 'mutated'
+    stageAdapter.Stage = () => 'mutated'
     moduleCreationTool.createItem = ({ startWorld }) => ({
       title: 'Mutated risk',
       x: startWorld.x,
@@ -500,6 +520,7 @@ describe('CanvasAppAssembly', () => {
       createItemLayerInput({ items: assembly.initialItems }),
     )).toBe(1)
     expect(assembly.itemLayerAdapter.renderItems).toBe(itemLayerRenderItems)
+    expect(assembly.stageAdapter.Stage).toBe(Stage)
     expect(assembly.customCreationTools[0]?.createItem({
       createId: (prefix) => `${prefix}-1`,
       currentWorld: { x: 10, y: 20 },
@@ -522,6 +543,7 @@ describe('CanvasAppAssembly', () => {
     expect(Object.isFrozen(assembly.initialItems[0])).toBe(true)
     expect(Object.isFrozen(assembly.itemAdapters.command)).toBe(true)
     expect(Object.isFrozen(assembly.itemLayerAdapter)).toBe(true)
+    expect(Object.isFrozen(assembly.stageAdapter)).toBe(true)
   })
 
   it('can disable custom item modules at the app assembly seam', () => {

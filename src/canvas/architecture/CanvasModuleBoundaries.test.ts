@@ -224,6 +224,13 @@ describe('Canvas module boundaries', () => {
     expect(violations).toEqual([])
   })
 
+  it('keeps the app shell independent from concrete renderer stage modules', () => {
+    const violations = getImportsFrom('src/canvas/app/shell/')
+      .filter((reference) => reference.target.startsWith('src/canvas/renderer'))
+
+    expect(violations).toEqual([])
+  })
+
   it('keeps app workflow hooks from recreating the workspace read model', () => {
     const violations = sourceFiles
       .filter((file) =>

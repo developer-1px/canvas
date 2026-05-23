@@ -43,4 +43,6 @@ export {
   type CanvasAppCustomItemRenderers,
   type CanvasAppItemLayerAdapter,
   type CanvasAppItemLayerRenderInput,
+  type CanvasAppStageAdapter,
+  type CanvasAppStageRenderInput,
 } from './workflow'

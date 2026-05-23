@@ -1,5 +1,9 @@
-import type { ComponentProps } from 'react'
-import { CanvasSvgStage } from '../../renderer'
+import {
+  createElement,
+  type ComponentProps,
+  type ComponentType,
+} from 'react'
+import type { CanvasAppStageRenderInput } from '../workflow'
 import { CanvasComponentPalette } from '../../ui/palette/CanvasComponentPalette'
 import { CanvasObjectInspector } from '../../ui/inspector/CanvasObjectInspector'
 import { CanvasFindReplacePanel } from '../../ui/search/CanvasFindReplacePanel'
@@ -8,7 +12,6 @@ import { CanvasToolbar } from '../../ui/toolbar/CanvasToolbar'
 import { CanvasStatus } from '../../ui/status/CanvasStatus'
 import { ZoomControls } from '../../ui/zoom/ZoomControls'
 
-type StageProps = ComponentProps<typeof CanvasSvgStage>
 type ToolbarProps = ComponentProps<typeof CanvasToolbar>
 type TextEditorProps = ComponentProps<typeof CanvasTextEditor>
 type FindReplaceProps = ComponentProps<typeof CanvasFindReplacePanel>
@@ -19,12 +22,16 @@ type StatusProps = ComponentProps<typeof CanvasStatus>
 type VisibleProps<TProps> = TProps & {
   visible: boolean
 }
+type StageView = {
+  Stage: ComponentType<CanvasAppStageRenderInput>
+  props: CanvasAppStageRenderInput
+}
 
 type CanvasAppViewProps = {
   componentPalette: PaletteProps
   findReplace: FindReplaceProps
   inspector: InspectorProps
-  stage: StageProps
+  stage: StageView
   status: VisibleProps<StatusProps>
   textEditor: TextEditorProps
   toolbar: VisibleProps<ToolbarProps>
@@ -53,7 +60,7 @@ export function CanvasAppView({
 
       <CanvasFindReplacePanel {...findReplace} />
 
-      <CanvasSvgStage {...stage} />
+      {createElement(stage.Stage, stage.props)}
 
       <CanvasTextEditor {...textEditor} />
 

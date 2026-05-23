@@ -17,12 +17,14 @@ import {
   DEFAULT_CANVAS_APP_CUSTOM_ITEM_RENDERERS,
   DEFAULT_CANVAS_APP_COMPONENT_PRESENTATION_RENDERERS,
   DEFAULT_CANVAS_APP_ITEM_LAYER_ADAPTER,
+  DEFAULT_CANVAS_APP_STAGE_ADAPTER,
   assertCanvasAppComponentPresentationRenderers,
   assertCanvasAppCustomItemRenderers,
   createCanvasAppComponentPresentationRenderers,
   type CanvasAppComponentPresentationRenderers,
   type CanvasAppCustomItemRenderers,
   type CanvasAppItemLayerAdapter,
+  type CanvasAppStageAdapter,
 } from '../rendering'
 import {
   assertCanvasAppCustomCommands,
@@ -69,6 +71,7 @@ export type CanvasAppAssembly = {
   initialItems: CanvasItem[]
   itemAdapters: CanvasAppItemAdapters
   itemLayerAdapter: CanvasAppItemLayerAdapter
+  stageAdapter: CanvasAppStageAdapter
 }
 
 export type CanvasAppAssemblyInput = {
@@ -81,6 +84,7 @@ export type CanvasAppAssemblyInput = {
   inspectorPanels?: readonly CanvasAppInspectorPanel[]
   itemAdapters?: CanvasAppItemAdapters
   itemLayerAdapter?: CanvasAppItemLayerAdapter
+  stageAdapter?: CanvasAppStageAdapter
 }
 
 export const DEFAULT_CANVAS_APP_ASSEMBLY: CanvasAppAssembly =
@@ -96,6 +100,7 @@ export const DEFAULT_CANVAS_APP_ASSEMBLY: CanvasAppAssembly =
     initialItems: INITIAL_ITEMS,
     itemAdapters: CANVAS_ITEM_ENGINE_ADAPTERS,
     itemLayerAdapter: DEFAULT_CANVAS_APP_ITEM_LAYER_ADAPTER,
+    stageAdapter: DEFAULT_CANVAS_APP_STAGE_ADAPTER,
   })
 
 export function createCanvasAppAssembly(
@@ -156,6 +161,7 @@ export function createCanvasAppAssembly(
     itemAdapters: input.itemAdapters ?? DEFAULT_CANVAS_APP_ASSEMBLY.itemAdapters,
     itemLayerAdapter:
       input.itemLayerAdapter ?? DEFAULT_CANVAS_APP_ASSEMBLY.itemLayerAdapter,
+    stageAdapter: input.stageAdapter ?? DEFAULT_CANVAS_APP_ASSEMBLY.stageAdapter,
   }
 
   assertCanvasAppExtensionRecordKeys({
@@ -185,6 +191,7 @@ export function assertCanvasAppAssembly(assembly: CanvasAppAssembly) {
   })
   assertCanvasAppItemAdapters(assembly.itemAdapters)
   assertCanvasAppItemLayerAdapter(assembly.itemLayerAdapter)
+  assertCanvasAppStageAdapter(assembly.stageAdapter)
 
   return assembly
 }
@@ -349,6 +356,15 @@ function assertCanvasAppItemLayerAdapter(
   })
 }
 
+function assertCanvasAppStageAdapter(adapter: CanvasAppStageAdapter) {
+  assertCanvasAppDescriptorObject(adapter, 'stage adapter')
+  assertCanvasAppDescriptorFunctionField({
+    field: 'Stage',
+    owner: 'stage adapter',
+    value: adapter.Stage,
+  })
+}
+
 function snapshotCanvasAppAssembly(
   assembly: CanvasAppAssembly,
 ): CanvasAppAssembly {
@@ -382,6 +398,7 @@ function snapshotCanvasAppAssembly(
     itemLayerAdapter: snapshotCanvasAppItemLayerAdapter(
       assembly.itemLayerAdapter,
     ),
+    stageAdapter: snapshotCanvasAppStageAdapter(assembly.stageAdapter),
   })
 }
 
@@ -452,6 +469,12 @@ function snapshotCanvasAppItemAdapters(
 function snapshotCanvasAppItemLayerAdapter(
   adapter: CanvasAppItemLayerAdapter,
 ): CanvasAppItemLayerAdapter {
+  return Object.freeze({ ...adapter })
+}
+
+function snapshotCanvasAppStageAdapter(
+  adapter: CanvasAppStageAdapter,
+): CanvasAppStageAdapter {
   return Object.freeze({ ...adapter })
 }
 
