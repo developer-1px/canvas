@@ -12,6 +12,7 @@ import type {
 import type {
   CanvasItem,
   EditingText,
+  Point,
   Viewport,
 } from '../../entities'
 import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
@@ -24,7 +25,13 @@ import {
   executeCanvasClipboardCommand,
   type CanvasClipboardCommand,
 } from './CanvasClipboardCommandExecution'
-import { getCanvasClipboardCommandHandlers } from './CanvasClipboardCommandHandlers'
+import {
+  cloneCanvasClipboardItems,
+  copyCanvasClipboardSelection,
+  cutCanvasClipboardSelection,
+  duplicateCanvasClipboardSelection,
+  pasteCanvasClipboardSelection,
+} from './CanvasClipboardCommandHandlers'
 
 type UseCanvasClipboardCommandsArgs = {
   commandAdapter: CanvasCommandAdapter<CanvasItem>
@@ -58,7 +65,6 @@ export function useCanvasClipboardCommands({
   viewport,
 }: UseCanvasClipboardCommandsArgs) {
   const pasteIndexRef = useRef(0)
-  const getPasteIndex = useCallback(() => pasteIndexRef.current, [])
 
   const runClipboardCommand = useCallback(
     (command: CanvasClipboardCommand) => {
@@ -104,13 +110,62 @@ export function useCanvasClipboardCommands({
     ],
   )
 
-  return useMemo(
-    () =>
-      getCanvasClipboardCommandHandlers({
-        getPasteIndex,
+  const cloneItems = useCallback(
+    (ids: string[], offset: Point) =>
+      cloneCanvasClipboardItems({
+        ids,
+        offset,
+        runClipboardCommand,
+      }),
+    [runClipboardCommand],
+  )
+
+  const copySelection = useCallback(() => {
+    copyCanvasClipboardSelection({
+      pasteIndex: pasteIndexRef.current,
+      runClipboardCommand,
+    })
+  }, [runClipboardCommand])
+
+  const cutSelection = useCallback(() => {
+    cutCanvasClipboardSelection({
+      pasteIndex: pasteIndexRef.current,
+      runClipboardCommand,
+    })
+  }, [runClipboardCommand])
+
+  const duplicateSelection = useCallback(
+    (sourceIds?: string[], offset?: Point) =>
+      duplicateCanvasClipboardSelection({
+        offset,
         runClipboardCommand,
         selection,
+        sourceIds,
       }),
-    [getPasteIndex, runClipboardCommand, selection],
+    [runClipboardCommand, selection],
+  )
+
+  const pasteSelection = useCallback(() => {
+    pasteCanvasClipboardSelection({
+      pasteIndex: pasteIndexRef.current,
+      runClipboardCommand,
+    })
+  }, [runClipboardCommand])
+
+  return useMemo(
+    () => ({
+      cloneItems,
+      copySelection,
+      cutSelection,
+      duplicateSelection,
+      pasteSelection,
+    }),
+    [
+      cloneItems,
+      copySelection,
+      cutSelection,
+      duplicateSelection,
+      pasteSelection,
+    ],
   )
 }

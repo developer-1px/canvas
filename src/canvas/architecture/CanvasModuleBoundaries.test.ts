@@ -968,6 +968,47 @@ describe('Canvas module boundaries', () => {
     )
   })
 
+  it('keeps pointer drag effect application behind a named module', () => {
+    const dragHookFile = getSourceFile(
+      'src/canvas/app/pointer/useCanvasPointerDragHandlers.ts',
+    )
+    const dragEffectsFile = getSourceFile(
+      'src/canvas/app/pointer/CanvasPointerInteractionDragEffects.ts',
+    )
+
+    expect(dragHookFile.source).toContain(
+      "from './CanvasPointerInteractionDragEffects'",
+    )
+    for (const dragEffectDetail of [
+      'setSnapGuides(preview.snapGuides)',
+      'setViewport(preview.viewport)',
+      'setLiveItems(preview.liveItems)',
+      'setMarquee(preview.marquee)',
+      'setSelection(preview.selection)',
+      'setDraftRect(preview.draftRect)',
+      'setDraftStroke(preview.draftStroke)',
+      'setDraftArrow(preview.draftArrow)',
+      "interactionRef.current = { kind: 'none' }",
+      'setMarquee(null)',
+      'setDraftArrow(null)',
+      'setDraftRect(null)',
+      'setDraftStroke(null)',
+      'EMPTY_CANVAS_SNAP_GUIDES',
+    ]) {
+      expect(dragHookFile.source).not.toContain(dragEffectDetail)
+      expect(dragEffectsFile.source).toContain(dragEffectDetail)
+    }
+    expect(dragEffectsFile.source).toContain(
+      'export function applyCanvasPointerInteractionPreviewEffect',
+    )
+    expect(dragEffectsFile.source).toContain(
+      'export function applyCanvasPointerInteractionEndEffect',
+    )
+    expect(dragEffectsFile.source).toContain(
+      'export function applyCanvasPointerInteractionCancelEffect',
+    )
+  })
+
   it('keeps app keyboard handler wiring behind a named workflow module', () => {
     const appModelFile = getSourceFile(
       'src/canvas/app/workflow/useCanvasAppModel.ts',
@@ -2121,14 +2162,21 @@ describe('Canvas module boundaries', () => {
       "kind: 'cut'",
       "kind: 'duplicate'",
       "kind: 'paste'",
-      'sourceIds = selection',
-      'pasteIndex: getPasteIndex()',
+      'sourceIds: sourceIds ?? selection',
+      'pasteIndex,',
     ]) {
       expect(clipboardHookFile.source).not.toContain(clipboardHandlerDetail)
       expect(clipboardHandlersFile.source).toContain(clipboardHandlerDetail)
     }
+    expect(clipboardHookFile.source).not.toContain('getPasteIndex')
     expect(clipboardHandlersFile.source).toContain(
-      'export function getCanvasClipboardCommandHandlers',
+      'export function cloneCanvasClipboardItems',
+    )
+    expect(clipboardHandlersFile.source).toContain(
+      'export function copyCanvasClipboardSelection',
+    )
+    expect(clipboardHandlersFile.source).toContain(
+      'export function duplicateCanvasClipboardSelection',
     )
     expect(clipboardHookFile.source).not.toContain(
       'cloneCanvasCommandItems',

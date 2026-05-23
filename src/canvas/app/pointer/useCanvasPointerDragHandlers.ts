@@ -11,7 +11,6 @@ import type {
   Viewport,
 } from '../../entities'
 import {
-  EMPTY_CANVAS_SNAP_GUIDES,
   type CanvasAffordanceConfig,
   type CanvasCreationAdapter,
   type CanvasDraftArrowOverlay,
@@ -20,7 +19,7 @@ import {
   type CanvasSnapGuides,
   type CanvasTransformAdapter,
 } from '../../engine'
-import { releasePointer, screenPoint, screenToWorld } from './CanvasPointerGeometry'
+import { screenPoint, screenToWorld } from './CanvasPointerGeometry'
 import type {
   CommitCanvasItemsChange,
   CommitCanvasSelection,
@@ -30,9 +29,13 @@ import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
 import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
 import {
-  cancelCanvasPointerInteraction,
   commitCanvasPointerInteraction,
 } from './CanvasPointerInteractionLifecycle'
+import {
+  applyCanvasPointerInteractionCancelEffect,
+  applyCanvasPointerInteractionEndEffect,
+  applyCanvasPointerInteractionPreviewEffect,
+} from './CanvasPointerInteractionDragEffects'
 import { previewCanvasPointerInteraction } from './CanvasPointerInteractionPreview'
 
 type UseCanvasPointerDragHandlersArgs = {
@@ -86,6 +89,20 @@ export function useCanvasPointerDragHandlers({
   transformAdapter,
   viewport,
 }: UseCanvasPointerDragHandlersArgs) {
+  const dragEffectContext = {
+    interactionRef,
+    setDraftArrow,
+    setDraftRect,
+    setDraftStroke,
+    setGesture,
+    setLiveItems,
+    setMarquee,
+    setSelection,
+    setSnapGuides,
+    setViewport,
+    stageElement,
+  }
+
   function handlePointerMove(event: CanvasAppPointerInput) {
     const interaction = interactionRef.current
 
@@ -108,45 +125,10 @@ export function useCanvasPointerDragHandlers({
       viewport,
     })
 
-    if (preview.kind === 'none') {
-      return
-    }
-
-    if (preview.snapGuides) {
-      setSnapGuides(preview.snapGuides)
-    }
-
-    if (preview.viewport) {
-      setViewport(preview.viewport)
-    }
-
-    if (preview.interaction) {
-      interactionRef.current = preview.interaction
-    }
-
-    if (preview.liveItems) {
-      setLiveItems(preview.liveItems)
-    }
-
-    if (preview.marquee) {
-      setMarquee(preview.marquee)
-    }
-
-    if (preview.selection) {
-      setSelection(preview.selection)
-    }
-
-    if (preview.draftRect) {
-      setDraftRect(preview.draftRect)
-    }
-
-    if (preview.draftStroke) {
-      setDraftStroke(preview.draftStroke)
-    }
-
-    if (preview.draftArrow) {
-      setDraftArrow(preview.draftArrow)
-    }
+    applyCanvasPointerInteractionPreviewEffect({
+      context: dragEffectContext,
+      preview,
+    })
   }
 
   function handlePointerUp(event: CanvasAppPointerInput) {
@@ -157,8 +139,6 @@ export function useCanvasPointerDragHandlers({
     }
 
     event.preventDefault()
-    releasePointer(stageElement, event.pointerId)
-
     commitCanvasPointerInteraction({
       commitItemsChange,
       commitSelection,
@@ -173,32 +153,20 @@ export function useCanvasPointerDragHandlers({
       setTool,
     })
 
-    interactionRef.current = { kind: 'none' }
-    setGesture('none')
-    setMarquee(null)
-    setDraftArrow(null)
-    setDraftRect(null)
-    setDraftStroke(null)
-    setSnapGuides(EMPTY_CANVAS_SNAP_GUIDES)
+    applyCanvasPointerInteractionEndEffect({
+      context: dragEffectContext,
+      event,
+    })
   }
 
   function handlePointerCancel(event: CanvasAppPointerInput) {
     const interaction = interactionRef.current
 
-    cancelCanvasPointerInteraction({
+    applyCanvasPointerInteractionCancelEffect({
+      context: dragEffectContext,
+      event,
       interaction,
-      setLiveItems,
-      setSelection,
     })
-
-    releasePointer(stageElement, event.pointerId)
-    interactionRef.current = { kind: 'none' }
-    setGesture('none')
-    setMarquee(null)
-    setDraftArrow(null)
-    setDraftRect(null)
-    setDraftStroke(null)
-    setSnapGuides(EMPTY_CANVAS_SNAP_GUIDES)
   }
 
   return {
