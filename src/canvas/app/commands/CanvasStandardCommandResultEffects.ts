@@ -15,6 +15,10 @@ export type CanvasStandardChangedItemsResult = {
   selection: string[]
 }
 
+export type CanvasStandardSelectionResult = {
+  selection: string[]
+}
+
 export type CanvasStandardRemoveSelectionResult =
   CanvasStandardChangedItemsResult & {
     clearEditingIds: readonly string[]
@@ -68,7 +72,7 @@ export function createCanvasStandardUngroupSelectionResultEffect({
   result,
   selection,
 }: {
-  result: Pick<CanvasStandardChangedItemsResult, 'selection'>
+  result: CanvasStandardSelectionResult
   selection: string[]
 }): CanvasStandardCommandDocumentEffect {
   return createCanvasStandardUngroupSelectionEffect({
@@ -91,7 +95,7 @@ export function createCanvasStandardReorderSelectionResultEffect({
   selection,
 }: {
   mode: CanvasReorderMode
-  result: Pick<CanvasStandardChangedItemsResult, 'selection'>
+  result: CanvasStandardSelectionResult
   selection: string[]
 }): CanvasStandardCommandDocumentEffect {
   return createCanvasStandardReorderSelectionEffect({

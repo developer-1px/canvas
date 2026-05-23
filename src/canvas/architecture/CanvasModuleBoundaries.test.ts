@@ -3046,6 +3046,10 @@ describe('Canvas module boundaries', () => {
       'export function createCanvasStandardUngroupSelectionResultEffect',
     )
     expect(resultEffectsFile.source).toContain(
+      'export type CanvasStandardSelectionResult',
+    )
+    expect(resultEffectsFile.source).not.toContain('Pick<')
+    expect(resultEffectsFile.source).toContain(
       'createCanvasStandardRemoveSelectionEffect',
     )
     expect(resultEffectsFile.source).toContain(
@@ -3062,10 +3066,30 @@ describe('Canvas module boundaries', () => {
     const effectsFile = getSourceFile(
       'src/canvas/app/commands/CanvasStandardCommandDocumentEffects.ts',
     )
+    const effectContractsFile = getSourceFile(
+      'src/canvas/app/commands/CanvasStandardCommandDocumentEffectContracts.ts',
+    )
 
     expect(executionFile.source).toContain(
       "from './CanvasStandardCommandDocumentEffects'",
     )
+    expect(effectsFile.source).toContain(
+      "from './CanvasStandardCommandDocumentEffectContracts'",
+    )
+    expect(effectsFile.source).not.toContain('Parameters<')
+    expect(effectContractsFile.source).toContain(
+      'export type CanvasStandardCommandDocumentEffect',
+    )
+    expect(effectContractsFile.source).toContain(
+      'export type CanvasStandardCommandItemsChange',
+    )
+    expect(effectContractsFile.source).toContain(
+      'export type CanvasStandardCommandDocumentEffectContext',
+    )
+    expect(effectContractsFile.source).not.toContain(
+      'applyCanvasStandardDocumentEffect',
+    )
+    expect(effectContractsFile.source).not.toContain('Parameters<')
     expect(effectsFile.source).toContain(
       'export function applyCanvasStandardDocumentEffect',
     )
