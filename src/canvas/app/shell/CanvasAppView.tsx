@@ -22,12 +22,12 @@ type VisibleProps<TProps> = TProps & {
 }
 
 type CanvasAppViewProps = {
-  componentPalette: PaletteProps
+  componentPalette: VisibleProps<PaletteProps>
   findReplace: FindReplaceProps
-  inspector: InspectorProps
+  inspector: VisibleProps<InspectorProps>
   stage: ReactNode
   status: VisibleProps<StatusProps>
-  textEditor: TextEditorProps
+  textEditor: VisibleProps<TextEditorProps>
   toolbar: VisibleProps<ToolbarProps>
   zoomControls: VisibleProps<ZoomControlsProps>
 }
@@ -42,6 +42,12 @@ export function CanvasAppView({
   toolbar,
   zoomControls,
 }: CanvasAppViewProps) {
+  const {
+    visible: showComponentPalette,
+    ...componentPaletteProps
+  } = componentPalette
+  const { visible: showInspector, ...inspectorProps } = inspector
+  const { visible: showTextEditor, ...textEditorProps } = textEditor
   const { visible: showToolbar, ...toolbarProps } = toolbar
   const { visible: showZoomControls, ...zoomControlProps } = zoomControls
   const { visible: showStatus, ...statusProps } = status
@@ -50,17 +56,19 @@ export function CanvasAppView({
     <main className="canvas-app">
       {showToolbar ? <CanvasToolbar {...toolbarProps} /> : null}
 
-      <CanvasComponentPalette {...componentPalette} />
+      {showComponentPalette ? (
+        <CanvasComponentPalette {...componentPaletteProps} />
+      ) : null}
 
       <CanvasFindReplacePanel {...findReplace} />
 
       {stage}
 
-      <CanvasTextEditor {...textEditor} />
+      {showTextEditor ? <CanvasTextEditor {...textEditorProps} /> : null}
 
       {showZoomControls ? <ZoomControls {...zoomControlProps} /> : null}
 
-      <CanvasObjectInspector {...inspector} />
+      {showInspector ? <CanvasObjectInspector {...inspectorProps} /> : null}
 
       {showStatus ? <CanvasStatus {...statusProps} /> : null}
     </main>

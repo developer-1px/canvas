@@ -52,16 +52,20 @@ export type CanvasGestureId =
 
 export type CanvasOverlayId =
   | 'alignmentGuides'
+  | 'componentPalette'
   | 'draftArrow'
   | 'draftRect'
   | 'draftStroke'
+  | 'findReplace'
   | 'grid'
+  | 'inspector'
   | 'itemOutline'
   | 'marquee'
   | 'resizeHandles'
   | 'selectionBounds'
   | 'spacingGuides'
   | 'status'
+  | 'textEditor'
   | 'toolbar'
   | 'zoomControls'
 

@@ -87,6 +87,7 @@ export function getCanvasAppControlModel({
   return {
     componentPalette: {
       components,
+      visible: config.overlays.componentPalette,
       onInsert: onInsertComponent,
     },
     status: {

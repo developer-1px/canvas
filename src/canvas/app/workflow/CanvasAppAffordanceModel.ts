@@ -16,10 +16,16 @@ export function getCanvasAppAffordanceModel(
     interaction: {
       config,
     },
+    inspector: {
+      config,
+    },
     keyboard: {
       config,
     },
     pointer: {
+      config,
+    },
+    text: {
       config,
     },
     viewport: {

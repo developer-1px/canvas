@@ -3,7 +3,7 @@
 ## Domain Terms
 
 - Canvas Affordance Engine: 캔버스 앱마다 반복되는 선택, 이동, 리사이즈, 편집, 줌, 명령, 오버레이 문법을 제공하는 Module.
-- Affordance: 사용자가 캔버스에서 할 수 있다고 인지하고 실행하는 조작 단위. 예: resize handle, marquee, pan, duplicate.
+- Affordance: 사용자가 캔버스에서 할 수 있다고 인지하고 실행하는 조작 단위 또는 UI surface. 예: resize handle, marquee, component palette, inspector, pan, duplicate.
 - Feature Toggle: Affordance를 켜거나 끄는 설정. 모든 Affordance는 기본적으로 toggle 뒤에 있어야 한다.
 - Host App: 엔진을 사용하는 실제 제품. 데이터 모델, 저장, 도메인 명령, 화면 구성을 소유한다.
 - Core Contract: 특정 Host App, Renderer, React 상태에 묶이지 않는 재사용 부품의 입력과 출력 계약.
@@ -143,6 +143,7 @@
 - Canvas App Assembly input은 output type을 부분 노출하지 않고 명시적 필드 계약으로 유지한다.
 - Canvas App Assembly는 내부 표준 Affordance 문법을 외부 구현으로 넘기지 않고, 제품별 feature toggle config만 명시 입력 계약으로 조립한다.
 - Canvas App Shell은 일반 소비자에게 `assemblyInput`을 열고, prebuilt `assembly`는 고급 Host seam으로만 남긴다.
+- App UI surface는 Shell에서 항상 렌더링하지 않고 Canvas Affordance overlay toggle을 view prop으로 소비해 숨긴다.
 - App Model은 Canvas App Assembly output field를 직접 배분하지 않고 Canvas App Assembly Model에서 consumer별 assembly context를 받는다.
 - App Model은 Canvas Affordance config를 직접 fan-out하지 않고 Canvas App Affordance Model에서 consumer별 affordance context를 받는다.
 - Canvas App Assembly composition, output contract validation, output snapshot/freeze는 분리하고, validation은 Canvas App Assembly Contracts가, mutation 방어는 Canvas App Assembly Snapshot이 소유한다.

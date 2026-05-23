@@ -8,12 +8,14 @@ import type {
   EditingText,
   Viewport,
 } from '../../entities'
+import type { CanvasAffordanceConfig } from '../../engine'
 import type { CanvasItemReadModel } from '../../host'
 import { useCanvasTextEditing } from '../text/useCanvasTextEditing'
 import type { CommitCanvasItemsChange } from './CanvasWorkflowContract'
 
 type UseCanvasTextEditorModelArgs = {
   commitItemsChange: CommitCanvasItemsChange
+  config: CanvasAffordanceConfig
   editorRef: RefObject<HTMLTextAreaElement | null>
   itemReadModel: CanvasItemReadModel
   selection: string[]
@@ -27,6 +29,7 @@ type CanvasTextEditorModel = {
     editing: EditingText | null
     editorRef: RefObject<HTMLTextAreaElement | null>
     style: ReturnType<typeof useCanvasTextEditing>['editorStyle']
+    visible: boolean
     onBlur: () => void
     onCancel: () => void
     onChange: Dispatch<SetStateAction<EditingText | null>>
@@ -36,6 +39,7 @@ type CanvasTextEditorModel = {
 
 export function useCanvasTextEditorModel({
   commitItemsChange,
+  config,
   editorRef,
   itemReadModel,
   selection,
@@ -68,6 +72,7 @@ export function useCanvasTextEditorModel({
       editing,
       editorRef,
       style: editingItem ? editorStyle : undefined,
+      visible: config.overlays.textEditor,
       onBlur: commitText,
       onCancel: cancelTextEdit,
       onChange: setEditing,

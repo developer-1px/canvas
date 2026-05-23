@@ -7,6 +7,7 @@ import type {
   EditingText,
   Viewport,
 } from '../../entities'
+import type { CanvasAffordanceConfig } from '../../engine'
 import type { CanvasItemReadModel } from '../../host'
 import { useCanvasFindReplaceModel } from './useCanvasFindReplaceModel'
 import { useCanvasTextEditorModel } from './useCanvasTextEditorModel'
@@ -22,6 +23,7 @@ type CanvasAppTextDocumentModel = {
 }
 
 type UseCanvasAppTextModelArgs = {
+  config: CanvasAffordanceConfig
   document: CanvasAppTextDocumentModel
   itemReadModel: CanvasItemReadModel
   selection: string[]
@@ -61,6 +63,7 @@ type CanvasAppTextModel = {
 }
 
 export function useCanvasAppTextModel({
+  config,
   document,
   itemReadModel,
   selection,
@@ -73,12 +76,14 @@ export function useCanvasAppTextModel({
     textEditor,
   } = useCanvasTextEditorModel({
     commitItemsChange: document.commitItemsChange,
+    config,
     editorRef,
     itemReadModel,
     selection,
     viewport,
   })
   const { findReplace, openFindReplace } = useCanvasFindReplaceModel({
+    enabled: config.overlays.findReplace,
     findDocumentText: document.findDocumentText,
     replaceDocumentText: document.replaceDocumentText,
   })

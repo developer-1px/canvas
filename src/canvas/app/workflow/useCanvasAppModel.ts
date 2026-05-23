@@ -41,11 +41,15 @@ export function useCanvasAppModel({
   })
 
   const inspector = useCanvasAppInspectorModel({
+    ...affordance.inspector,
     ...workspace.inspector,
     ...appAssembly.inspector,
   })
 
-  const text = useCanvasAppTextModel(workspace.text)
+  const text = useCanvasAppTextModel({
+    ...affordance.text,
+    ...workspace.text,
+  })
 
   const extension = useCanvasAppExtensionModel({
     ...workspace.extension,

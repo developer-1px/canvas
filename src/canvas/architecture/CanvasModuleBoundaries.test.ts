@@ -211,6 +211,7 @@ describe('Canvas module boundaries', () => {
       'DEFAULT_CANVAS_AFFORDANCE_CONFIG',
     )
     expect(appModelFile.source).not.toContain('canvasAffordanceConfig')
+    expect(appModelFile.source).not.toContain('config.overlays')
     expect(affordanceModelFile.source).toContain(
       'DEFAULT_CANVAS_AFFORDANCE_CONFIG',
     )
@@ -218,8 +219,10 @@ describe('Canvas module boundaries', () => {
       'command: {',
       'control: {',
       'interaction: {',
+      'inspector: {',
       'keyboard: {',
       'pointer: {',
+      'text: {',
       'viewport: {',
     ]) {
       expect(affordanceModelFile.source).toContain(consumerContext)
@@ -462,6 +465,9 @@ describe('Canvas module boundaries', () => {
     expect(shellFile.source).not.toContain('CanvasAppStageRenderInput')
     expect(shellFile.source).not.toContain('ComponentType')
     expect(shellFile.source).not.toContain('createElement(stage.')
+    expect(shellFile.source).toContain('showComponentPalette')
+    expect(shellFile.source).toContain('showInspector')
+    expect(shellFile.source).toContain('showTextEditor')
   })
 
   it('keeps app shell open to assembly input without exposing assembly construction to consumers', () => {

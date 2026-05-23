@@ -33,6 +33,7 @@ describe('CanvasAppControlModel', () => {
     }))
 
     expect(model.componentPalette.components).toBe(components)
+    expect(model.componentPalette.visible).toBe(true)
     expect(model.status).toMatchObject({
       mode: 'Risk',
       scale: 1.5,
@@ -82,6 +83,7 @@ describe('CanvasAppControlModel', () => {
     const selectedModel = getCanvasAppControlModel(createInput({
       config: createCanvasAffordanceConfig({
         overlays: {
+          componentPalette: false,
           status: false,
           toolbar: false,
           zoomControls: false,
@@ -94,6 +96,7 @@ describe('CanvasAppControlModel', () => {
     selectedModel.zoomControls.onFit()
 
     expect(onFitItems).toHaveBeenLastCalledWith(['rect-1'])
+    expect(selectedModel.componentPalette.visible).toBe(false)
     expect(selectedModel.status.visible).toBe(false)
     expect(selectedModel.toolbar.visible).toBe(false)
     expect(selectedModel.zoomControls.visible).toBe(false)
