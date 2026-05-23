@@ -2,6 +2,9 @@ export {
   default as CanvasApp,
   type CanvasAppProps,
 } from './shell/CanvasApp'
+export type {
+  CanvasAppAssemblySource,
+} from './shell/CanvasAppAssemblySource'
 export {
   DEFAULT_CANVAS_APP_ASSEMBLY,
   assertCanvasAppAssembly,

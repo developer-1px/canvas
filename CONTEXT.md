@@ -17,7 +17,7 @@
 - Canvas Document Reorder Patch: before/after Demo item tree의 sibling order 차이를 zod-crud JSON Patch `move` operation으로 변환하는 Host-owned patch Module.
 - Host Public Facade: Demo Host model type, read model, component library, document controller를 외부 레이어에 노출하는 안정된 Module 경계.
 - Canvas Package Public Entry: 외부 조립자와 Demo가 사용하는 `src/canvas` 단일 entry. App, Engine, Host, Renderer, Entities facade를 다시 노출하고 내부 하위 경로를 숨긴다.
-- Canvas App Public Facade: Canvas App Shell과 workflow 조립 계약을 노출하는 `src/canvas/app` entry.
+- Canvas App Public Facade: Canvas App Shell, Canvas App Assembly Source, workflow 조립 계약을 노출하는 `src/canvas/app` entry.
 - Canvas Item Read Model: Demo `CanvasItem` tree의 조회, bounds, selection 정규화, Scene Adapter 생성을 tree helper 세부 구현 없이 제공하는 Module.
 - Canvas Component Library: Demo component template, presentation key, component item 생성을 함께 제공하는 Module.
 - Canvas Built-in Component Templates: Sticky, label, card 같은 기본 Demo component catalogue를 소유하는 Host-owned Module.

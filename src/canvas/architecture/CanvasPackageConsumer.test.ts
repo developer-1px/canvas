@@ -6,10 +6,12 @@ import {
   CanvasRenderer,
   createCanvasAppAssembly,
   defineCanvasAppCustomItemModule,
+  type CanvasAppAssemblySource,
   type CanvasAppComponentRendererStrategy,
   type CanvasAppCustomItemModule,
   type CanvasAppCustomItemRendererStrategy,
   type CanvasAppItemLayerAdapter,
+  type CanvasAppProps,
   type CanvasAppPointerInput,
   type CanvasAppStageAdapter,
   type CanvasAppStageMount,
@@ -21,6 +23,8 @@ import {
   createCanvasAppComponentPresentationRenderers,
   createCanvasAppAssembly as createCanvasAppAssemblyFromApp,
   createCanvasAppCustomItemRenderers,
+  type CanvasAppAssemblySource as CanvasAppAssemblySourceFromApp,
+  type CanvasAppProps as CanvasAppPropsFromApp,
 } from 'canvas/app'
 import { isCanvasCustomToolId, normalizeBounds } from 'canvas/core'
 import { createCanvasAffordanceConfig } from 'canvas/engine'
@@ -95,8 +99,35 @@ describe('Canvas package consumer imports', () => {
       itemLayerAdapter,
       stageAdapter,
     })
+    const shellInputProps = {
+      assemblyInput: {
+        affordanceConfig: {
+          overlays: {
+            toolbar: false,
+          },
+        },
+        customItemModules: [module],
+      },
+    } satisfies CanvasAppProps
+    const shellInputSource =
+      shellInputProps satisfies CanvasAppAssemblySource
+    const shellSubpathProps = {
+      assemblyInput: shellInputProps.assemblyInput,
+    } satisfies CanvasAppPropsFromApp
+    const shellSubpathSource =
+      shellSubpathProps satisfies CanvasAppAssemblySourceFromApp
+    const shellAssemblyProps = {
+      assembly,
+    } satisfies CanvasAppProps
 
     expect(assembly.initialItems).toEqual([rect])
+    expect(
+      shellInputSource.assemblyInput.affordanceConfig?.overlays?.toolbar,
+    ).toBe(false)
+    expect(shellSubpathSource.assemblyInput).toBe(
+      shellInputProps.assemblyInput,
+    )
+    expect(shellAssemblyProps.assembly).toBe(assembly)
     const entityItem: CanvasEntityItem = rect
 
     expect(entityItem.id).toBe('rect-1')

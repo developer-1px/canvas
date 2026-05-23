@@ -1,5 +1,6 @@
 export {
   CanvasApp,
+  type CanvasAppAssemblySource,
   type CanvasAppProps,
 } from './app'
 export {

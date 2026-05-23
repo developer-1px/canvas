@@ -469,6 +469,8 @@ describe('Canvas module boundaries', () => {
     const assemblySourceFile = getSourceFile(
       'src/canvas/app/shell/CanvasAppAssemblySource.ts',
     )
+    const appFacadeFile = getSourceFile('src/canvas/app/index.ts')
+    const packageFacadeFile = getSourceFile('src/canvas/index.ts')
     const mainFile = getSourceFile('src/main.tsx')
 
     expect(shellFile.source).toContain('resolveCanvasAppAssemblySource')
@@ -478,6 +480,8 @@ describe('Canvas module boundaries', () => {
     expect(assemblySourceFile.source).toContain(
       'createCanvasAppAssembly(assemblyInput)',
     )
+    expect(appFacadeFile.source).toContain('CanvasAppAssemblySource')
+    expect(packageFacadeFile.source).toContain('CanvasAppAssemblySource')
     expect(mainFile.source).toContain('assemblyInput=')
     expect(mainFile.source).not.toContain('createCanvasAppAssembly')
   })
