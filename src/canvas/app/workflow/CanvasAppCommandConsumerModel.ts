@@ -7,6 +7,7 @@ import type {
   CanvasItem,
   Point,
 } from '../../entities'
+import type { CanvasAppControlCommandHandlers } from './CanvasAppControlCommandContracts'
 
 type CanvasAppCommandRuntime = {
   alignSelection: (mode: CanvasAlignMode) => void
@@ -28,19 +29,6 @@ type CanvasAppCommandRuntime = {
   unlockAll: () => void
 }
 
-type CanvasAppCommandControlHandlers = {
-  onAlign: (mode: CanvasAlignMode) => void
-  onDelete: () => void
-  onDistribute: (mode: CanvasDistributeMode) => void
-  onDuplicate: () => void
-  onGroup: () => void
-  onLock: () => void
-  onRedo: () => void
-  onUndo: () => void
-  onUngroup: () => void
-  onUnlockAll: () => void
-}
-
 export function getCanvasAppCommandConsumerModel(
   commands: CanvasAppCommandRuntime,
 ) {
@@ -57,7 +45,7 @@ export function getCanvasAppCommandConsumerModel(
         onUndo: commands.undoHistory,
         onUngroup: commands.ungroupSelection,
         onUnlockAll: commands.unlockAll,
-      } satisfies CanvasAppCommandControlHandlers,
+      } satisfies CanvasAppControlCommandHandlers,
     },
     keyboard: {
       copySelection: commands.copySelection,

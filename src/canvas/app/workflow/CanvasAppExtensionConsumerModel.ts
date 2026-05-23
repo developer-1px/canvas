@@ -9,16 +9,26 @@ type CanvasAppExtensionRuntime = {
   runCustomCommand: (commandId: string) => boolean
 }
 
-export type CanvasAppExtensionModel = ReturnType<
-  typeof getCanvasAppExtensionConsumerModel
->
+export type CanvasAppExtensionModel = {
+  control: {
+    customCommands: readonly CanvasAppCustomCommandState[]
+    customTools: readonly CanvasAppCustomCreationToolState[]
+    onRunCustomCommand: (commandId: string) => boolean
+  }
+  keyboard: {
+    customCreationTools: readonly CanvasAppCustomCreationToolState[]
+  }
+  pointer: {
+    customCreationTools: readonly CanvasAppCustomCreationTool[]
+  }
+}
 
 export function getCanvasAppExtensionConsumerModel({
   customCommandStates,
   customCreationToolStates,
   customCreationTools,
   runCustomCommand,
-}: CanvasAppExtensionRuntime) {
+}: CanvasAppExtensionRuntime): CanvasAppExtensionModel {
   return {
     control: {
       customCommands: customCommandStates,

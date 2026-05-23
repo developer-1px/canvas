@@ -695,6 +695,9 @@ describe('Canvas module boundaries', () => {
     const controlModelFile = getSourceFile(
       'src/canvas/app/workflow/CanvasAppControlModel.ts',
     )
+    const controlCommandContractsFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppControlCommandContracts.ts',
+    )
 
     expect(appModelFile.source).toContain("from './CanvasAppControlModel'")
     expect(appModelFile.source).not.toContain(
@@ -710,6 +713,19 @@ describe('Canvas module boundaries', () => {
     expect(controlModelFile.source).not.toContain('selection.length > 2')
     expect(controlModelFile.source).toContain(
       'export function getCanvasAppControlModel',
+    )
+    expect(controlModelFile.source).toContain(
+      "from './CanvasAppControlCommandContracts'",
+    )
+    expect(controlModelFile.source).not.toContain(
+      'type CanvasAppControlCommandHandlers',
+    )
+    expect(controlCommandContractsFile.source).toContain(
+      'export type CanvasAppControlCommandHandlers',
+    )
+    expect(controlCommandContractsFile.source).toContain('onAlign:')
+    expect(controlCommandContractsFile.source).not.toContain(
+      'getCanvasAppControlModel',
     )
     expect(controlModelFile.source).toContain(
       'getCanvasCommandAvailability',
@@ -859,6 +875,15 @@ describe('Canvas module boundaries', () => {
     expect(commandModelFile.source).not.toContain('pointer: {')
     expect(commandConsumerModelFile.source).toContain(
       'export function getCanvasAppCommandConsumerModel',
+    )
+    expect(commandConsumerModelFile.source).toContain(
+      "from './CanvasAppControlCommandContracts'",
+    )
+    expect(commandConsumerModelFile.source).toContain(
+      'satisfies CanvasAppControlCommandHandlers',
+    )
+    expect(commandConsumerModelFile.source).not.toContain(
+      'type CanvasAppCommandControlHandlers',
     )
     expect(commandConsumerModelFile.source).toContain('control: {')
     expect(commandConsumerModelFile.source).toContain('keyboard: {')
@@ -2785,6 +2810,13 @@ describe('Canvas module boundaries', () => {
     expect(extensionConsumerModelFile.source).toContain(
       'export function getCanvasAppExtensionConsumerModel',
     )
+    expect(extensionConsumerModelFile.source).toContain(
+      'export type CanvasAppExtensionModel',
+    )
+    expect(extensionConsumerModelFile.source).toContain(
+      '): CanvasAppExtensionModel',
+    )
+    expect(extensionConsumerModelFile.source).not.toContain('ReturnType<')
     expect(extensionConsumerModelFile.source).toContain('control: {')
     expect(extensionConsumerModelFile.source).toContain('keyboard: {')
     expect(extensionConsumerModelFile.source).toContain('pointer: {')

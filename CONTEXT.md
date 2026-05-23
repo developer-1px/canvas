@@ -135,6 +135,7 @@
 - Canvas App Model: App Shell이 렌더링할 control별 view props를 만들고 command, pointer, keyboard, viewport, text editing wiring을 숨기는 workflow Module.
 - Canvas App Command Model: App Model이 document, clipboard, history, stage context와 command runtime wiring을 직접 알지 않도록 숨기는 workflow Module.
 - Canvas App Command Consumer Model: Command runtime callbacks를 toolbar, keyboard, pointer consumer별 command context로 변환하는 workflow Module.
+- Canvas App Control Command Contracts: App workflow에서 toolbar control에 넘기는 built-in command handler bundle의 what 계약을 소유하는 Module.
 - Canvas App Component Model: App Model이 component insertion의 component library, document commit, selection, stage, viewport wiring과 control fan-out 세부를 직접 알지 않도록 component control context를 만드는 workflow Module.
 - Canvas Component Insertion Execution: component insertion의 생성 위치, id prefix, document add commit, post-insert selection, editing/tool reset 규칙을 소유하는 App-owned runtime Module.
 - Canvas App Control Model: component palette, toolbar, status, zoom controls props를 만들고 command availability, status label, selected fit target 규칙을 숨기는 workflow Module.
@@ -305,9 +306,11 @@
 - App Model은 Stage Element Adapter를 직접 fan-out하지 않고 Canvas App Stage Element Model에서 consumer별 stage element context를 받는다. Stage Element Adapter 생성은 Canvas App Stage Element Model이, consumer별 fan-out은 Canvas App Stage Element Consumer Model이 소유한다.
 - App View는 raw workflow state 대신 Canvas App Model이 조립한 control별 props만 받는다.
 - App Model은 command hook context wiring 세부를 직접 알지 않고 Canvas App Command Model에서 command handlers를 받는다. Command runtime 생성은 Canvas App Command Model이, consumer별 command fan-out은 Canvas App Command Consumer Model이 소유한다.
+- Toolbar control command handler bundle의 what 계약은 Canvas App Control Command Contracts가 소유하고, Canvas App Control Model과 Canvas App Command Consumer Model은 그 계약을 소비한다.
 - App Model은 component insertion hook context wiring과 control fan-out 세부를 직접 알지 않고 Canvas App Component Model에서 component control context를 받는다. Component insertion hook은 callback memoization만 맡고, 실제 insert 실행 규칙은 Canvas Component Insertion Execution이 소유한다.
 - App Model은 control별 view props, command availability, status label, selected fit target 규칙을 직접 알지 않고 Canvas App Control Model에 위임한다.
 - App Model은 custom command/tool descriptor 실행과 toolbar/keyboard/pointer fan-out 세부를 직접 알지 않고 Canvas App Extension Model에서 consumer별 extension context를 받는다. custom command/tool runtime 생성은 Canvas App Extension Model이, consumer별 extension fan-out은 Canvas App Extension Consumer Model이 소유한다.
+- Canvas App Extension Consumer Model은 반환 Interface를 implementation `ReturnType`에서 역산하지 않고 명시적인 consumer별 extension context 계약으로 고정한다.
 - App Model은 inspector panel wiring 세부를 직접 알지 않고 Canvas App Inspector Model에서 object inspector props를 받는다.
 - App Model은 keyboard shortcut handler wiring 세부를 직접 알지 않고 Canvas App Keyboard Model에 위임한다.
 - App Model은 pointer down/drag hook 조립 세부를 직접 알지 않고 Canvas App Pointer Model에서 stage/item layer pointer handlers를 받는다. Pointer runtime 생성은 Canvas App Pointer Model이, consumer별 handler fan-out은 Canvas App Pointer Consumer Model이 소유한다.

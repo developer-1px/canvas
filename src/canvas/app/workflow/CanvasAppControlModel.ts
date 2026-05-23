@@ -4,8 +4,6 @@ import {
   CANVAS_TOOL_AFFORDANCES,
   getCanvasCommandAvailability,
   type CanvasAffordanceConfig,
-  type CanvasAlignMode,
-  type CanvasDistributeMode,
   type CanvasSceneAdapter,
 } from '../../engine'
 import type {
@@ -16,6 +14,7 @@ import type {
 import type { CanvasComponentTemplate } from '../../host'
 import type { CanvasAppCustomCommandState } from '../commands/CanvasAppCustomCommands'
 import type { CanvasAppCustomCreationToolState } from '../tools/CanvasAppCustomCreationTools'
+import type { CanvasAppControlCommandHandlers } from './CanvasAppControlCommandContracts'
 
 type CanvasAppControlModelInput = {
   canRedo: boolean
@@ -36,19 +35,6 @@ type CanvasAppControlModelInput = {
   onToolChange: (tool: Tool) => void
   onViewportReset: () => void
   onZoomBy: (multiplier: number) => void
-}
-
-type CanvasAppControlCommandHandlers = {
-  onAlign: (mode: CanvasAlignMode) => void
-  onDelete: () => void
-  onDistribute: (mode: CanvasDistributeMode) => void
-  onDuplicate: () => void
-  onGroup: () => void
-  onLock: () => void
-  onRedo: () => void
-  onUndo: () => void
-  onUngroup: () => void
-  onUnlockAll: () => void
 }
 
 export function getCanvasAppControlModel({
