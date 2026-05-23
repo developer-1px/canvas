@@ -101,6 +101,7 @@
 | `src/canvas/app/pointer/CanvasPointerInteractionMovement.ts` | Drag threshold 기반 moved 판정을 pointer interaction Module들이 공유한다 |
 | `src/canvas/app/pointer/CanvasPointerInteractionLifecycle.ts` | Pointer-up/cancel 시 active interaction을 문서 변경, selection 변경, edit 진입, cancel rollback으로 확정하거나 되돌린다 |
 | `src/canvas/core` | Host item과 renderer를 모르는 geometry, viewport, id, primitive math 같은 재사용 계약 |
+| `src/canvas/core/CanvasBoundsResize.ts` | Bounds resize, aspect ratio lock, center resize, handle point, item bounds scaling을 소유한다 |
 | `src/canvas/core/CanvasStableIds.ts` | persisted kind, presentation key, registry key에 쓰는 lower-kebab 안정 id 계약 |
 | `src/canvas/entities` | Core geometry와 Demo canvas item의 안정적인 type-only entity 계약. Runtime helper는 Core/Host/App seam에 둔다 |
 | `src/canvas/engine` | Host item과 renderer를 모르는 조작 규칙. 외부 소비자는 `src/canvas/engine` public facade를 사용한다 |
@@ -113,6 +114,7 @@
 | `src/canvas/host/drawing/CanvasDrawingItemStyles.ts` | Built-in Drawing Item의 stroke/opacity 기본값을 소유하고 draft overlay와 item creation이 공유하게 한다 |
 | `src/canvas/host/document/CanvasDocumentController.ts` | App workflow가 사용하는 Host Document Controller. zod-crud, JSON Patch, selection snapshot, clipboard 구현을 숨긴다 |
 | `src/canvas/host/document/CanvasDocumentChangePatch.ts` | High-level CanvasItemsChange를 Host-owned JSON Patch factory 호출로 변환하는 change-to-patch grammar를 소유한다 |
+| `src/canvas/host/document/CanvasDocumentPatchTreeDiff.ts` | before/after Demo item tree를 patch factory용 topmost changed entry, changed group entry, removal entry로 변환한다 |
 | `src/canvas/host/document/CanvasDocumentReorderPatch.ts` | before/after Demo item tree의 sibling order 차이를 zod-crud JSON Patch `move` operation으로 변환한다 |
 | `src/canvas/host/read/CanvasItemReadModel.ts` | Demo item tree 조회, bounds, selection 정규화, Scene Adapter 생성을 tree helper 구현 없이 제공한다 |
 | `src/canvas/host/operations` | Transform, text, clone, remove, group item operations |
@@ -173,6 +175,7 @@ type CanvasAffordanceConfig = {
 - App workflow는 Host document 구현 파일을 import하지 않는다. 문서 변경, history, selection, clipboard, text search는 명시적인 Host Document Controller interface를 통해 사용한다.
 - zod-crud document, JSON Patch, selection snapshot, clipboard 구현은 Host document layer 밖으로 새지 않는다.
 - Canvas Document Changes는 document commit orchestration을 맡고, CanvasItemsChange별 JSON Patch factory 선택은 Canvas Document Change Patch가 소유한다.
+- Canvas Document Patches는 tree flattening, topmost filtering, item equality, removal path ordering을 Canvas Document Patch Tree Diff에 위임한다.
 - Canvas Document Patches는 z-order sibling traversal와 JSON Patch move sequence 생성을 Canvas Document Reorder Patch에 위임한다.
 - App hook들은 `useCanvasDocument` 구현 파일에서 타입을 가져오지 않는다. document commit과 selection contract는 Canvas Workflow Contract를 통해 공유한다.
 - App workflow는 Host tree helper를 import하지 않는다. item 조회, bounds, selection 정규화, Scene Adapter 생성은 Canvas Item Read Model을 통해 사용한다.
@@ -216,6 +219,7 @@ type CanvasAffordanceConfig = {
 - Item pointer down hook은 DOM event routing과 시작 결과 적용을 맡고, selection/edit/duplicate/move 시작 규칙은 Canvas Item Pointer Interaction Start가 소유한다.
 - Pointer drag hook은 DOM pointer routing과 preview 결과 적용을 맡고, pointer-move live preview 계산은 Canvas Pointer Interaction Preview가, 생성/드로잉 draft preview는 Canvas Pointer Creation Preview가, pointer-up/cancel 확정 규칙은 Canvas Pointer Interaction Lifecycle이 소유한다.
 - Marker, highlighter, arrow는 제품별 custom item이 아니라 내부 Drawing Item이다. Drawing Item의 `x/y/w/h`는 외부 입력이 아니라 `points` 또는 `start/end`에서 Host tree/document가 동기화하는 canonical bounds다. Drawing Item style 기본값은 Host Drawing Item Style Module이 소유하고 draft overlay와 item creation이 같은 값을 쓴다.
+- Core primitive facade는 resize/handle/scale 규칙을 직접 구현하지 않고 Canvas Bounds Resize에 위임한다.
 - 제품별 item kind는 내부 `CanvasItem` variant를 추가하지 않고 Canvas App Custom Item Module로 묶어 등록한다.
 - Canvas App Custom Item Module의 `id`는 소유한 custom item kind이며, module은 `presentation`, `renderItem`, `validateItem`을 받아 renderer registry와 validator registry를 내부에서 조립한다.
 - Canvas App Custom Item Module descriptor/assembly, contract validation, module-owned creation/validator runtime은 분리하고, validation은 Canvas App Custom Item Module Contracts가, runtime containment는 Canvas App Custom Item Module Runtime이 소유한다.

@@ -9,13 +9,14 @@ import {
   type CanvasZOrderMode,
   ungroupCanvasSelection,
 } from '../operations/CanvasOperations'
-import {
-  findCanvasItemEntry,
-  flattenCanvasItems,
-  type CanvasItemEntry,
-} from '../tree/CanvasTree'
-import { isAncestorPath } from '../tree/CanvasTreePath'
+import { findCanvasItemEntry } from '../tree/CanvasTree'
 import { canvasItemPathToPointer } from './CanvasDocumentPointers'
+import {
+  areCanvasDocumentPatchItemsEqual,
+  createCanvasDocumentPatchTreeDiff,
+  getCanvasDocumentPatchEntries,
+  getCanvasDocumentPatchRemovalEntries,
+} from './CanvasDocumentPatchTreeDiff'
 import { createReorderCanvasSiblingArraysPatch } from './CanvasDocumentReorderPatch'
 
 export function createRemoveCanvasItemsPatch(
@@ -23,31 +24,25 @@ export function createRemoveCanvasItemsPatch(
   selection: string[],
 ): JSONPatchOperation[] {
   const nextItems = removeCanvasItems(items, selection)
-  const beforeEntries = flattenCanvasItems(items)
-  const afterEntries = flattenCanvasItems(nextItems)
-  const afterIds = new Set(afterEntries.map((entry) => entry.item.id))
-  const removedEntries = beforeEntries.filter(
-    (entry) => !afterIds.has(entry.item.id),
-  )
+  const diff = createCanvasDocumentPatchTreeDiff({
+    afterItems: nextItems,
+    beforeItems: items,
+  })
 
-  if (removedEntries.length === 0) {
+  if (diff.removalEntries.length === 0) {
     return []
   }
 
-  const removeOps = getTopmostEntries(removedEntries)
-    .sort(compareEntriesByDescendingPath)
-    .map((entry): JSONPatchOperation => ({
-      op: 'remove',
-      path: canvasItemPathToPointer(entry.path),
-    }))
-  const replaceGroupOps = getChangedTopmostGroups(
-    beforeEntries,
-    afterEntries,
-  ).map((entry): JSONPatchOperation => ({
-    op: 'replace',
+  const removeOps = diff.removalEntries.map((entry): JSONPatchOperation => ({
+    op: 'remove',
     path: canvasItemPathToPointer(entry.path),
-    value: entry.item,
   }))
+  const replaceGroupOps =
+    diff.changedTopmostGroupEntries.map((entry): JSONPatchOperation => ({
+      op: 'replace',
+      path: canvasItemPathToPointer(entry.path),
+      value: entry.item,
+    }))
 
   return [...removeOps, ...replaceGroupOps]
 }
@@ -69,13 +64,15 @@ export function createGroupCanvasItemsPatch(
 ): JSONPatchOperation[] {
   const next = groupCanvasSelection(items, selection, groupId)
 
-  if (canvasItemsEqual(items, next.items)) {
+  if (areCanvasDocumentPatchItemsEqual(items, next.items)) {
     return []
   }
 
   const selected = new Set(selection)
-  const groupedEntries = getTopmostEntries(
-    flattenCanvasItems(items).filter((entry) => selected.has(entry.item.id)),
+  const groupedEntries = getCanvasDocumentPatchRemovalEntries(
+    getCanvasDocumentPatchEntries(items).filter((entry) =>
+      selected.has(entry.item.id),
+    ),
   )
   const groupEntry = findCanvasItemEntry(next.items, groupId)
 
@@ -84,12 +81,10 @@ export function createGroupCanvasItemsPatch(
   }
 
   return [
-    ...groupedEntries
-      .sort(compareEntriesByDescendingPath)
-      .map((entry): JSONPatchOperation => ({
-        op: 'remove',
-        path: canvasItemPathToPointer(entry.path),
-      })),
+    ...groupedEntries.map((entry): JSONPatchOperation => ({
+      op: 'remove',
+      path: canvasItemPathToPointer(entry.path),
+    })),
     {
       op: 'add',
       path: canvasItemPathToPointer(groupEntry.path),
@@ -104,16 +99,15 @@ export function createUngroupCanvasItemsPatch(
 ): JSONPatchOperation[] {
   const next = ungroupCanvasSelection(items, selection)
 
-  if (canvasItemsEqual(items, next.items)) {
+  if (areCanvasDocumentPatchItemsEqual(items, next.items)) {
     return []
   }
 
-  return getTopmostEntries(
-    flattenCanvasItems(items).filter(
+  return getCanvasDocumentPatchRemovalEntries(
+    getCanvasDocumentPatchEntries(items).filter(
       (entry) => entry.item.type === 'group' && selection.includes(entry.item.id),
     ),
   )
-    .sort(compareEntriesByDescendingPath)
     .flatMap((entry): JSONPatchOperation[] => {
       if (entry.item.type !== 'group') {
         return []
@@ -143,7 +137,7 @@ export function createReorderCanvasItemsPatch(
 ): JSONPatchOperation[] {
   const nextItems = reorderCanvasItems(items, selection, mode)
 
-  if (canvasItemsEqual(items, nextItems)) {
+  if (areCanvasDocumentPatchItemsEqual(items, nextItems)) {
     return []
   }
 
@@ -169,11 +163,15 @@ export function createTransformCanvasItemsPatch(
   beforeItems: CanvasItem[],
   afterItems: CanvasItem[],
 ): JSONPatchOperation[] {
+  const diff = createCanvasDocumentPatchTreeDiff({
+    afterItems,
+    beforeItems,
+  })
   const beforeRootIds = new Set(beforeItems.map((item) => item.id))
   const addedRootItems = afterItems.filter((item) => !beforeRootIds.has(item.id))
 
   return [
-    ...createReplaceChangedCanvasItemsPatch(beforeItems, afterItems),
+    ...createReplaceChangedCanvasItemsPatchFromDiff(diff),
     ...createAddCanvasItemsPatch(addedRootItems),
   ]
 }
@@ -206,68 +204,20 @@ export function createReplaceChangedCanvasItemsPatch(
   beforeItems: CanvasItem[],
   afterItems: CanvasItem[],
 ): JSONPatchOperation[] {
-  const beforeEntries = flattenCanvasItems(beforeItems)
-  const afterEntries = flattenCanvasItems(afterItems)
-  const beforeById = new Map(
-    beforeEntries.map((entry) => [entry.item.id, entry]),
+  return createReplaceChangedCanvasItemsPatchFromDiff(
+    createCanvasDocumentPatchTreeDiff({
+      afterItems,
+      beforeItems,
+    }),
   )
-  const changedEntries = afterEntries.filter((entry) => {
-    const before = beforeById.get(entry.item.id)
+}
 
-    return before ? !canvasItemsEqual(before.item, entry.item) : false
-  })
-
-  return getTopmostEntries(changedEntries).map((entry) => ({
+function createReplaceChangedCanvasItemsPatchFromDiff(
+  diff: ReturnType<typeof createCanvasDocumentPatchTreeDiff>,
+): JSONPatchOperation[] {
+  return diff.changedTopmostEntries.map((entry) => ({
     op: 'replace',
     path: canvasItemPathToPointer(entry.path),
     value: entry.item,
   }))
-}
-
-function getTopmostEntries(entries: CanvasItemEntry[]) {
-  return entries.filter(
-    (entry) =>
-      !entries.some((candidate) => isAncestorPath(candidate.path, entry.path)),
-  )
-}
-
-function getChangedTopmostGroups(
-  beforeEntries: CanvasItemEntry[],
-  afterEntries: CanvasItemEntry[],
-) {
-  const beforeById = new Map(
-    beforeEntries.map((entry) => [entry.item.id, entry]),
-  )
-  const changedGroups = afterEntries.filter((entry) => {
-    if (entry.item.type !== 'group') {
-      return false
-    }
-
-    const before = beforeById.get(entry.item.id)
-    return before ? !canvasItemsEqual(before.item, entry.item) : false
-  })
-
-  return getTopmostEntries(changedGroups)
-}
-
-function compareEntriesByDescendingPath(
-  a: CanvasItemEntry,
-  b: CanvasItemEntry,
-) {
-  const length = Math.max(a.path.length, b.path.length)
-
-  for (let index = 0; index < length; index += 1) {
-    const left = a.path[index] ?? -1
-    const right = b.path[index] ?? -1
-
-    if (left !== right) {
-      return right - left
-    }
-  }
-
-  return b.path.length - a.path.length
-}
-
-function canvasItemsEqual(a: unknown, b: unknown) {
-  return JSON.stringify(a) === JSON.stringify(b)
 }

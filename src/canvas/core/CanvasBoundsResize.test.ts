@@ -1,9 +1,9 @@
 import { describe, expect, test } from 'vitest'
-import { resizeBounds } from './CanvasCorePrimitives'
+import { resizeBounds } from './CanvasBoundsResize'
 
 const bounds = { x: 0, y: 0, w: 100, h: 50 }
 
-describe('resizeBounds', () => {
+describe('CanvasBoundsResize', () => {
   test('resizes from the opposite handle by default', () => {
     expect(resizeBounds(bounds, 'se', { x: 200, y: 100 })).toEqual({
       x: 0,

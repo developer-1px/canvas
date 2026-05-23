@@ -216,6 +216,24 @@ describe('Canvas module boundaries', () => {
     expect(privateTargets).toEqual([])
   })
 
+  it('keeps Core bounds resize rules behind a named module', () => {
+    const primitivesFile = getSourceFile(
+      'src/canvas/core/CanvasCorePrimitives.ts',
+    )
+    const boundsResizeFile = getSourceFile(
+      'src/canvas/core/CanvasBoundsResize.ts',
+    )
+
+    expect(primitivesFile.source).toContain("from './CanvasBoundsResize'")
+    expect(primitivesFile.source).not.toContain('resizeBoundsFromAnchor')
+    expect(primitivesFile.source).not.toContain('preserveResizeAspectRatio')
+    expect(boundsResizeFile.source).toContain(
+      'export function resizeBounds',
+    )
+    expect(boundsResizeFile.source).toContain('resizeBoundsFromAnchor')
+    expect(boundsResizeFile.source).toContain('preserveResizeAspectRatio')
+  })
+
   it('keeps renderer stage orchestration independent from demo canvas items', () => {
     const demoItemTerms =
       /\b(CanvasItem|RectItem|TextItem|GroupItem|CanvasComponentItem|getCanvasItemBounds|getCanvasItemsBounds|CANVAS_COMPONENT_LIBRARY)\b/
@@ -1523,6 +1541,27 @@ describe('Canvas module boundaries', () => {
     expect(reorderPatchFile.source).toContain('createReorderSiblingArrayPatch')
     expect(reorderPatchFile.source).toContain('canvasArrayItemPointer')
     expect(reorderPatchFile.source).toContain("op: 'move'")
+  })
+
+  it('keeps Host document patch tree diff behind a named module', () => {
+    const patchesFile = getSourceFile(
+      'src/canvas/host/document/CanvasDocumentPatches.ts',
+    )
+    const patchTreeDiffFile = getSourceFile(
+      'src/canvas/host/document/CanvasDocumentPatchTreeDiff.ts',
+    )
+
+    expect(patchesFile.source).toContain(
+      "from './CanvasDocumentPatchTreeDiff'",
+    )
+    expect(patchesFile.source).not.toContain('flattenCanvasItems')
+    expect(patchesFile.source).not.toContain('isAncestorPath')
+    expect(patchTreeDiffFile.source).toContain(
+      'export function createCanvasDocumentPatchTreeDiff',
+    )
+    expect(patchTreeDiffFile.source).toContain('flattenCanvasItems')
+    expect(patchTreeDiffFile.source).toContain('isAncestorPath')
+    expect(patchTreeDiffFile.source).toContain('removalEntries')
   })
 
   it('keeps app document hooks behind the Host Document Controller', () => {

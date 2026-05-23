@@ -7,11 +7,13 @@
 - Feature Toggle: Affordance를 켜거나 끄는 설정. 모든 Affordance는 기본적으로 toggle 뒤에 있어야 한다.
 - Host App: 엔진을 사용하는 실제 제품. 데이터 모델, 저장, 도메인 명령, 화면 구성을 소유한다.
 - Core Contract: 특정 Host App, Renderer, React 상태에 묶이지 않는 재사용 부품의 입력과 출력 계약.
+- Canvas Bounds Resize: bounds resize, aspect ratio lock, center resize, handle point, item bounds scaling을 제공하는 Core geometry Module.
 - Canvas Stable Id: persisted kind, presentation key, registry key에 쓰는 lower-kebab 문자열 계약.
 - Entities Contract: 런타임 구현 없이 Core geometry type과 Demo canvas item type을 노출하는 type-only 계약. Runtime helper는 Core/Host/App seam에 둔다.
 - Engine Public Facade: Host App, Demo App, UI, Renderer Adapter가 Engine을 사용할 때 import하는 안정된 Module 경계.
 - Host Document Controller: Demo `CanvasItem` 문서의 history, selection, clipboard, text search, item commit을 React와 zod-crud 세부 구현 없이 제공하는 Module.
 - Canvas Document Change Patch: high-level CanvasItemsChange를 Host-owned JSON Patch factory 호출로 변환하는 change-to-patch grammar Module.
+- Canvas Document Patch Tree Diff: before/after Demo item tree를 patch factory가 쓰는 topmost changed entry, changed group entry, removal entry로 변환하는 Host-owned tree diff Module.
 - Canvas Document Reorder Patch: before/after Demo item tree의 sibling order 차이를 zod-crud JSON Patch `move` operation으로 변환하는 Host-owned patch Module.
 - Host Public Facade: Demo Host model type, read model, component library, document controller를 외부 레이어에 노출하는 안정된 Module 경계.
 - Canvas Package Public Entry: 외부 조립자와 Demo가 사용하는 `src/canvas` 단일 entry. App, Engine, Host, Renderer, Entities facade를 다시 노출하고 내부 하위 경로를 숨긴다.
@@ -104,6 +106,7 @@
 - 기본 드로잉 item의 style 기본값은 Host Drawing Item Style Module이 소유하고 draft overlay와 item creation이 재사용한다.
 - 엔진은 Fabric.js 같은 완성형 객체 모델을 감싸기보다, 커스텀 가능한 Affordance 문법을 작은 Interface로 제공한다.
 - Demo `CanvasItem`과 SVG 렌더링 방식은 재사용 Core Contract에 포함하지 않는다.
+- Core primitive facade는 resize/handle/scale 규칙을 직접 구현하지 않고 Canvas Bounds Resize에 위임한다.
 - Renderer Stage는 Demo `CanvasItem`, Host read model, component library를 import하지 않는다.
 - Demo item SVG 렌더링은 App의 Demo SVG Item Layer Adapter가 소유한다.
 - SVG drawing path data와 arrow marker id/IRI는 Canvas SVG Drawing Primitives가 소유한다.
@@ -171,6 +174,7 @@
 - Clipboard payload는 Host Document Controller에서 현재 item 저장 계약으로 다시 검증하고, 실패하면 command loop로 throw하지 않고 빈 clipboard/false로 containment 한다.
 - Host Document Controller는 invalid item mutation을 App workflow로 throw하지 않고 false/current items로 containment 한다.
 - Canvas Document Changes는 document commit orchestration을 맡고, CanvasItemsChange별 JSON Patch factory 선택은 Canvas Document Change Patch가 소유한다.
+- Canvas Document Patches는 tree flattening, topmost filtering, item equality, removal path ordering을 직접 알지 않고 Canvas Document Patch Tree Diff에 위임한다.
 - Canvas Document Patches는 z-order sibling traversal와 JSON Patch move sequence 생성을 직접 알지 않고 Canvas Document Reorder Patch에 위임한다.
 - App Shell은 command, pointer, keyboard, viewport, text editing wiring을 직접 알지 않는다.
 - App Shell은 concrete Renderer Stage를 직접 import하지 않고 Canvas App Stage Adapter가 만든 stage ReactNode를 배치한다.
