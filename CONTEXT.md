@@ -36,6 +36,7 @@
 - Canvas Custom Item Validator: `Canvas Custom Item`의 `kind`별 domain-specific payload 규칙을 document validation에 주입하는 App-owned validator.
 - Canvas Component Presentation Registry: Demo component presentation key를 SVG rendering strategy에 연결하는 외부 조립 가능한 registry.
 - Demo SVG Component Render Fallback: component presentation resolver나 renderer 실행 실패를 기본 component card로 containment 하는 App rendering 내부 Module.
+- Demo SVG Custom Item Render Fallback: custom item renderer 누락이나 실행 실패를 unknown custom item card로 containment 하는 App rendering 내부 Module.
 - Drawing Item: Demo `CanvasItem` 중 marker, highlighter, arrow처럼 캔버스 위에 빠르게 주석을 그리는 항목. `points` 또는 `start/end`가 실제 geometry이고 `x/y/w/h`는 Host가 동기화하는 bounds cache다.
 - Drawing Item Style: built-in marker, highlighter, arrow의 stroke/opacity 기본값. Draft overlay와 Host item creation이 같은 Host-owned 계약을 쓴다.
 - Canvas App Model: App Shell이 렌더링할 control별 view props를 만들고 command, pointer, keyboard, viewport, text editing wiring을 숨기는 workflow Module.
@@ -105,6 +106,7 @@
 - Canvas App Custom Creation Tool shortcut은 내부 canvas shortcut, shift-insensitive built-in shortcut, temporary pan, nudge shortcut, 다른 custom tool shortcut과 충돌하면 assembly 단계에서 실패해야 한다.
 - 제품별 renderer 스타일은 Canvas App Shell CSS에 두지 않고 Host App/Demo module이 소유한다.
 - 제품별 SVG renderer와 inspector panel 실행 실패는 캔버스 렌더를 깨지 않고 fallback/omit으로 containment 한다.
+- Custom item renderer 누락과 실행 실패는 Demo SVG Custom Item Render Fallback이 containment 한다.
 - App workflow는 Demo SVG Item Layer를 직접 생성하지 않고 Canvas App Item Layer Adapter를 통해 stage children을 만든다.
 - 제품별 inspector UI는 기본 Object Inspector를 수정하지 않고 Canvas App Inspector Panel로 등록한다.
 - 제품별 저장 payload는 Canvas Custom Item의 JSON `data` 안에 두고, payload 의미 검증은 Canvas Custom Item Validator로 등록한다.

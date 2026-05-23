@@ -20,7 +20,7 @@ import {
   getCanvasDemoSvgCustomItemRenderer,
   type CanvasDemoSvgCustomItemRenderers,
 } from './CanvasDemoSvgCustomItemRendererRegistry'
-import { CanvasDemoSvgUnknownCustomItem } from './CanvasDemoSvgUnknownCustomItem'
+import { renderCanvasDemoSvgCustomItemFallback } from './CanvasDemoSvgCustomItemRenderFallback'
 
 type CanvasDemoSvgItemLayerProps = {
   getComponentPresentation: (component: string) => string
@@ -294,6 +294,6 @@ function renderCanvasDemoSvgCustomItemSafely({
   try {
     return renderCustomItem({ item })
   } catch {
-    return <CanvasDemoSvgUnknownCustomItem item={item} />
+    return renderCanvasDemoSvgCustomItemFallback({ item })
   }
 }

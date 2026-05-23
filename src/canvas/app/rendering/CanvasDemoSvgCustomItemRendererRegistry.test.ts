@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import type { CanvasCustomItem } from '../../entities'
+import { getCanvasDemoSvgCustomItemFallbackRenderer } from './CanvasDemoSvgCustomItemRenderFallback'
 import {
   createCanvasDemoSvgCustomItemRenderers,
+  DEFAULT_CANVAS_DEMO_SVG_CUSTOM_ITEM_RENDERERS,
   getCanvasDemoSvgCustomItemRenderer,
   type CanvasDemoSvgCustomItemRendererStrategy,
   type CanvasDemoSvgCustomItemRenderers,
@@ -34,6 +36,15 @@ describe('CanvasDemoSvgCustomItemRenderer registry', () => {
         renderers,
       }),
     ).toBe(renderRisk)
+  })
+
+  it('uses the fallback renderer when a custom presentation is missing', () => {
+    expect(
+      getCanvasDemoSvgCustomItemRenderer({
+        item: customItem,
+        renderers: DEFAULT_CANVAS_DEMO_SVG_CUSTOM_ITEM_RENDERERS,
+      }),
+    ).toBe(getCanvasDemoSvgCustomItemFallbackRenderer())
   })
 
   it('rejects custom renderer keys outside the app extension id contract', () => {

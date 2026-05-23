@@ -44,6 +44,7 @@
 | `src/canvas/app/rendering/CanvasDemoSvgComponentPresentationRegistry.ts` | Demo component presentation key와 SVG rendering strategy를 외부 조립 가능한 registry로 연결한다 |
 | `src/canvas/app/rendering/CanvasDemoSvgComponentRenderFallback.tsx` | Component presentation resolver나 renderer 실행 실패를 기본 component card로 containment 한다 |
 | `src/canvas/app/rendering/CanvasDemoSvgCustomItemRendererRegistry.tsx` | Custom item presentation key와 SVG rendering strategy를 외부 조립 가능한 registry로 연결한다 |
+| `src/canvas/app/rendering/CanvasDemoSvgCustomItemRenderFallback.tsx` | Custom item renderer 누락이나 실행 실패를 unknown custom item card로 containment 한다 |
 | `src/canvas/app/workflow` | React state와 engine/host/renderer wiring |
 | `src/canvas/app/commands/CanvasAppCustomCommands.ts` | Engine command union을 수정하지 않고 제품별 business action을 toolbar command로 등록하는 descriptor를 제공한다 |
 | `src/canvas/app/inspector/CanvasAppInspectorPanels.ts` | 기본 bounds inspector를 수정하지 않고 제품별 선택 항목 패널을 등록하는 descriptor를 제공한다 |
@@ -144,6 +145,7 @@ type CanvasAffordanceConfig = {
 - Demo SVG Item Layer Adapter는 App-owned Adapter로 Demo component presentation key resolver와 presentation registry를 받아 그리기 전략을 고른다.
 - Demo SVG Item Frame이 lock/selected/pointer/outline wrapper 문법을 소유해서 item type별 shape renderer branch가 공통 interaction frame을 복사하지 않는다.
 - Demo SVG Component Render Fallback이 component presentation resolver와 renderer 실행 실패를 기본 component card로 containment 한다.
+- Demo SVG Custom Item Render Fallback이 custom item renderer 누락과 실행 실패를 unknown custom item card로 containment 한다.
 - 새 Demo component kind가 기존 presentation을 재사용하면 외부 조립된 `CanvasComponentLibrary`만 바꾼다. 새 presentation은 Canvas App Assembly에 presentation renderer를 함께 등록한다.
 - Canvas Component Library의 presentation key가 component presentation renderer registry에 없으면 Canvas App Assembly가 실패한다.
 - Canvas Component Library는 외부 component template의 id/presentation, 필수 display/style string, 양수 크기, optional string list shape를 생성 단계에서 검증하고, 생성 후 외부 template mutation에 흔들리지 않도록 snapshot을 보관한다.

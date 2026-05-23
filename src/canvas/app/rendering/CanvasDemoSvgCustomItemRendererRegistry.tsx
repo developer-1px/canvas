@@ -5,7 +5,7 @@ import type {
   CanvasAppCustomItemRendererStrategy,
   CanvasAppCustomItemRenderers,
 } from './CanvasAppRenderingContracts'
-import { CanvasDemoSvgUnknownCustomItem } from './CanvasDemoSvgUnknownCustomItem'
+import { getCanvasDemoSvgCustomItemFallbackRenderer } from './CanvasDemoSvgCustomItemRenderFallback'
 
 export type CanvasDemoSvgCustomItemRendererStrategy =
   CanvasAppCustomItemRendererStrategy
@@ -39,7 +39,9 @@ export function getCanvasDemoSvgCustomItemRenderer({
   item: CanvasCustomItem
   renderers: CanvasDemoSvgCustomItemRenderers
 }) {
-  return renderers[item.presentation] ?? CanvasDemoSvgUnknownCustomItem
+  return (
+    renderers[item.presentation] ?? getCanvasDemoSvgCustomItemFallbackRenderer()
+  )
 }
 
 function assertCanvasDemoSvgCustomItemRendererStrategies(
