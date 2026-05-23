@@ -374,6 +374,25 @@ describe('Canvas module boundaries', () => {
     expect(violations).toEqual([])
   })
 
+  it('keeps Demo SVG item frame concerns out of item rendering branches', () => {
+    const itemLayerFile = getSourceFile(
+      'src/canvas/app/rendering/CanvasDemoSvgItemLayer.tsx',
+    )
+    const itemFrameFile = getSourceFile(
+      'src/canvas/app/rendering/CanvasDemoSvgItemFrame.tsx',
+    )
+
+    expect(itemLayerFile.source).toContain('CanvasDemoSvgItemFrame')
+    expect(itemLayerFile.source).not.toContain('data-locked')
+    expect(itemLayerFile.source).not.toContain('data-selected')
+    expect(itemLayerFile.source).not.toContain('pointerEvents')
+    expect(itemLayerFile.source).not.toContain('item-outline')
+    expect(itemFrameFile.source).toContain('data-locked')
+    expect(itemFrameFile.source).toContain('data-selected')
+    expect(itemFrameFile.source).toContain('pointerEvents')
+    expect(itemFrameFile.source).toContain('item-outline')
+  })
+
   it('keeps app workflow hooks from recreating the workspace read model', () => {
     const violations = sourceFiles
       .filter((file) =>

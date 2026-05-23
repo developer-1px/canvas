@@ -1,6 +1,5 @@
 import type { PointerEvent } from 'react'
 import type {
-  Bounds,
   CanvasItem,
   RectItem,
   TextItem,
@@ -11,6 +10,7 @@ import {
   createCanvasSvgPathData,
 } from '../../renderer'
 import { CanvasDemoSvgComponentRenderer } from './CanvasDemoSvgComponentRenderer'
+import { CanvasDemoSvgItemFrame } from './CanvasDemoSvgItemFrame'
 import {
   DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS,
   type CanvasDemoSvgComponentPresentationRenderers,
@@ -94,21 +94,22 @@ function renderCanvasItem({
 }: RenderCanvasItemArgs) {
   const isSelected = selected.has(item.id)
   const isLocked = locked || item.locked === true
-  const hasOutline = outlineIds.has(item.id)
+  const outlined = outlineIds.has(item.id)
   const bounds = getCanvasItemBounds(item)
 
   if (item.type === 'group') {
     return (
-      <g
+      <CanvasDemoSvgItemFrame
         key={item.id}
+        bounds={bounds}
         className="canvas-item canvas-group"
-        data-locked={isLocked || undefined}
-        data-selected={isSelected}
-        data-type="group"
-        pointerEvents={isLocked ? 'none' : undefined}
-        onPointerDown={
-          isLocked ? undefined : (event) => onItemPointerDown(event, item.id)
-        }
+        itemId={item.id}
+        itemType="group"
+        locked={isLocked}
+        outlined={outlined}
+        outlineKind="group"
+        selected={isSelected}
+        onItemPointerDown={onItemPointerDown}
       >
         <rect
           className="group-hit"
@@ -130,34 +131,29 @@ function renderCanvasItem({
             selected,
           }),
         )}
-        {hasOutline ? (
-          <CanvasDemoSvgSelectionOutline bounds={bounds} kind="group" />
-        ) : null}
-      </g>
+      </CanvasDemoSvgItemFrame>
     )
   }
 
   if (item.type === 'component') {
     return (
-      <g
+      <CanvasDemoSvgItemFrame
         key={item.id}
-        className="canvas-item"
-        data-component={item.component}
-        data-locked={isLocked || undefined}
-        data-selected={isSelected}
-        data-type={item.type}
-        pointerEvents={isLocked ? 'none' : undefined}
-        onPointerDown={
-          isLocked ? undefined : (event) => onItemPointerDown(event, item.id)
-        }
+        bounds={bounds}
+        component={item.component}
+        itemId={item.id}
+        itemType={item.type}
+        locked={isLocked}
+        outlined={outlined}
+        selected={isSelected}
+        onItemPointerDown={onItemPointerDown}
       >
         <CanvasDemoSvgComponentRenderer
           getComponentPresentation={getComponentPresentation}
           item={item}
           renderers={componentPresentationRenderers}
         />
-        {hasOutline ? <CanvasDemoSvgSelectionOutline bounds={bounds} /> : null}
-      </g>
+      </CanvasDemoSvgItemFrame>
     )
   }
 
@@ -168,36 +164,33 @@ function renderCanvasItem({
     })
 
     return (
-      <g
+      <CanvasDemoSvgItemFrame
         key={item.id}
-        className="canvas-item"
-        data-custom-kind={item.kind}
-        data-locked={isLocked || undefined}
-        data-selected={isSelected}
-        data-type={item.type}
-        pointerEvents={isLocked ? 'none' : undefined}
-        onPointerDown={
-          isLocked ? undefined : (event) => onItemPointerDown(event, item.id)
-        }
+        bounds={bounds}
+        customKind={item.kind}
+        itemId={item.id}
+        itemType={item.type}
+        locked={isLocked}
+        outlined={outlined}
+        selected={isSelected}
+        onItemPointerDown={onItemPointerDown}
       >
         {renderCanvasDemoSvgCustomItemSafely({ item, renderCustomItem })}
-        {hasOutline ? <CanvasDemoSvgSelectionOutline bounds={bounds} /> : null}
-      </g>
+      </CanvasDemoSvgItemFrame>
     )
   }
 
   if (item.type === 'marker' || item.type === 'highlight') {
     return (
-      <g
+      <CanvasDemoSvgItemFrame
         key={item.id}
-        className="canvas-item"
-        data-locked={isLocked || undefined}
-        data-selected={isSelected}
-        data-type={item.type}
-        pointerEvents={isLocked ? 'none' : undefined}
-        onPointerDown={
-          isLocked ? undefined : (event) => onItemPointerDown(event, item.id)
-        }
+        bounds={bounds}
+        itemId={item.id}
+        itemType={item.type}
+        locked={isLocked}
+        outlined={outlined}
+        selected={isSelected}
+        onItemPointerDown={onItemPointerDown}
       >
         <path
           className={`${item.type}-hit`}
@@ -212,23 +205,21 @@ function renderCanvasItem({
           strokeWidth={item.strokeWidth}
           vectorEffect="non-scaling-stroke"
         />
-        {hasOutline ? <CanvasDemoSvgSelectionOutline bounds={bounds} /> : null}
-      </g>
+      </CanvasDemoSvgItemFrame>
     )
   }
 
   if (item.type === 'arrow') {
     return (
-      <g
+      <CanvasDemoSvgItemFrame
         key={item.id}
-        className="canvas-item"
-        data-locked={isLocked || undefined}
-        data-selected={isSelected}
-        data-type={item.type}
-        pointerEvents={isLocked ? 'none' : undefined}
-        onPointerDown={
-          isLocked ? undefined : (event) => onItemPointerDown(event, item.id)
-        }
+        bounds={bounds}
+        itemId={item.id}
+        itemType={item.type}
+        locked={isLocked}
+        outlined={outlined}
+        selected={isSelected}
+        onItemPointerDown={onItemPointerDown}
       >
         <line
           className="arrow-hit"
@@ -249,23 +240,21 @@ function renderCanvasItem({
           markerEnd={CANVAS_SVG_ARROW_MARKER_IRI}
           vectorEffect="non-scaling-stroke"
         />
-        {hasOutline ? <CanvasDemoSvgSelectionOutline bounds={bounds} /> : null}
-      </g>
+      </CanvasDemoSvgItemFrame>
     )
   }
 
   return (
-    <g
+    <CanvasDemoSvgItemFrame
       key={item.id}
-      className="canvas-item"
-      data-locked={isLocked || undefined}
-      data-selected={isSelected}
-      data-type={item.type}
-      pointerEvents={isLocked ? 'none' : undefined}
-      onPointerDown={
-        isLocked ? undefined : (event) => onItemPointerDown(event, item.id)
-      }
-      onDoubleClick={isLocked ? undefined : () => onTextDoubleClick(item)}
+      bounds={bounds}
+      itemId={item.id}
+      itemType={item.type}
+      locked={isLocked}
+      outlined={outlined}
+      selected={isSelected}
+      onDoubleClick={() => onTextDoubleClick(item)}
+      onItemPointerDown={onItemPointerDown}
     >
       {item.type === 'rect' ? (
         <>
@@ -291,9 +280,7 @@ function renderCanvasItem({
           <div className="canvas-text">{item.text}</div>
         </foreignObject>
       )}
-
-      {hasOutline ? <CanvasDemoSvgSelectionOutline bounds={bounds} /> : null}
-    </g>
+    </CanvasDemoSvgItemFrame>
   )
 }
 
@@ -309,23 +296,4 @@ function renderCanvasDemoSvgCustomItemSafely({
   } catch {
     return <CanvasDemoSvgUnknownCustomItem item={item} />
   }
-}
-
-function CanvasDemoSvgSelectionOutline({
-  bounds,
-  kind,
-}: {
-  bounds: Bounds
-  kind?: 'group'
-}) {
-  return (
-    <rect
-      className={kind === 'group' ? 'item-outline group-outline' : 'item-outline'}
-      x={bounds.x}
-      y={bounds.y}
-      width={bounds.w}
-      height={bounds.h}
-      vectorEffect="non-scaling-stroke"
-    />
-  )
 }
