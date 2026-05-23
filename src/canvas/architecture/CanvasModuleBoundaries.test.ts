@@ -662,6 +662,16 @@ describe('Canvas module boundaries', () => {
     )
     expect(appModelFile.source).not.toContain('useRef<')
     expect(appModelFile.source).not.toContain('editorRef')
+    for (const flatTextTerm of [
+      'text.setEditing',
+      'text.openFindReplace',
+      'text.blurTextEditor',
+      'text.findReplace',
+      'text.keyboard.openFindReplace',
+      'text.textEditor',
+    ]) {
+      expect(appModelFile.source).not.toContain(flatTextTerm)
+    }
     expect(textModelFile.source).toContain(
       "from './useCanvasTextEditorModel'",
     )
@@ -674,6 +684,17 @@ describe('Canvas module boundaries', () => {
     expect(textModelFile.source).toContain(
       'export function useCanvasAppTextModel',
     )
+    for (const consumerContext of [
+      'command: {',
+      'component: {',
+      'extension: {',
+      'keyboard: {',
+      'pointer: {',
+      'stage: {',
+      'view: {',
+    ]) {
+      expect(textModelFile.source).toContain(consumerContext)
+    }
   })
 
   it('keeps app interaction state routing behind the interaction model', () => {

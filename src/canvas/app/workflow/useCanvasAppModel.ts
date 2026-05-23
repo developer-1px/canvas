@@ -50,7 +50,7 @@ export function useCanvasAppModel({
   const extension = useCanvasAppExtensionModel({
     ...workspace.extension,
     ...appAssembly.extension,
-    setEditing: text.setEditing,
+    ...text.extension,
   })
 
   const commands = useCanvasAppCommandModel({
@@ -58,7 +58,7 @@ export function useCanvasAppModel({
     config: canvasAffordanceConfig,
     createId: workspace.command.createId,
     document: workspace.command.document,
-    setEditing: text.setEditing,
+    ...text.command,
     stageElement,
     workspace: workspace.command.workspace,
   })
@@ -76,11 +76,11 @@ export function useCanvasAppModel({
     },
     config: canvasAffordanceConfig,
     ...extension.keyboard,
+    ...text.keyboard,
     interaction: {
       ...interaction.keyboard,
-      setEditing: text.setEditing,
+      ...text.keyboard.interaction,
     },
-    openFindReplace: text.openFindReplace,
     selection: workspace.keyboard.selection,
     viewport: viewportControls.keyboard,
   })
@@ -98,7 +98,7 @@ export function useCanvasAppModel({
     stageElement,
     workspace: {
       ...workspace.pointer.workspace,
-      setEditing: text.setEditing,
+      ...text.pointer.workspace,
     },
   })
 
@@ -108,7 +108,7 @@ export function useCanvasAppModel({
     createId: workspace.component.createId,
     interaction: {
       ...interaction.component,
-      setEditing: text.setEditing,
+      ...text.component.interaction,
     },
     stageElement,
     workspace: workspace.component.workspace,
@@ -128,11 +128,11 @@ export function useCanvasAppModel({
   })
 
   return {
+    ...text.view,
     componentPalette: controls.componentPalette,
-    findReplace: text.findReplace,
     inspector,
     stage: renderCanvasAppStageModel({
-      blurTextEditor: text.blurTextEditor,
+      ...text.stage,
       itemLayer: workspace.itemLayer,
       pointer,
       rendering: appAssembly.rendering,
@@ -143,7 +143,6 @@ export function useCanvasAppModel({
       },
     }),
     status: controls.status,
-    textEditor: text.textEditor,
     toolbar: controls.toolbar,
     zoomControls: controls.zoomControls,
   }

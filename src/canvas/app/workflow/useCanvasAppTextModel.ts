@@ -29,11 +29,35 @@ type UseCanvasAppTextModelArgs = {
 }
 
 type CanvasAppTextModel = {
-  blurTextEditor: () => void
-  findReplace: ReturnType<typeof useCanvasFindReplaceModel>['findReplace']
-  openFindReplace: ReturnType<typeof useCanvasFindReplaceModel>['openFindReplace']
-  setEditing: Dispatch<SetStateAction<EditingText | null>>
-  textEditor: ReturnType<typeof useCanvasTextEditorModel>['textEditor']
+  command: {
+    setEditing: Dispatch<SetStateAction<EditingText | null>>
+  }
+  component: {
+    interaction: {
+      setEditing: Dispatch<SetStateAction<EditingText | null>>
+    }
+  }
+  extension: {
+    setEditing: Dispatch<SetStateAction<EditingText | null>>
+  }
+  keyboard: {
+    interaction: {
+      setEditing: Dispatch<SetStateAction<EditingText | null>>
+    }
+    openFindReplace: ReturnType<typeof useCanvasFindReplaceModel>['openFindReplace']
+  }
+  pointer: {
+    workspace: {
+      setEditing: Dispatch<SetStateAction<EditingText | null>>
+    }
+  }
+  stage: {
+    blurTextEditor: () => void
+  }
+  view: {
+    findReplace: ReturnType<typeof useCanvasFindReplaceModel>['findReplace']
+    textEditor: ReturnType<typeof useCanvasTextEditorModel>['textEditor']
+  }
 }
 
 export function useCanvasAppTextModel({
@@ -60,10 +84,34 @@ export function useCanvasAppTextModel({
   })
 
   return {
-    blurTextEditor,
-    findReplace,
-    openFindReplace,
-    setEditing,
-    textEditor,
+    command: {
+      setEditing,
+    },
+    component: {
+      interaction: {
+        setEditing,
+      },
+    },
+    extension: {
+      setEditing,
+    },
+    keyboard: {
+      interaction: {
+        setEditing,
+      },
+      openFindReplace,
+    },
+    pointer: {
+      workspace: {
+        setEditing,
+      },
+    },
+    stage: {
+      blurTextEditor,
+    },
+    view: {
+      findReplace,
+      textEditor,
+    },
   }
 }
