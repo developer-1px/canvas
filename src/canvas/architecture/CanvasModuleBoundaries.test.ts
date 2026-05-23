@@ -1407,6 +1407,59 @@ describe('Canvas module boundaries', () => {
     expect(creationCommitFile.source).toContain('commitCanvasCustomCreation')
   })
 
+  it('keeps pointer creation kind routing behind a named grammar module', () => {
+    const lifecycleFile = getSourceFile(
+      'src/canvas/app/pointer/CanvasPointerInteractionLifecycle.ts',
+    )
+    const interactionPreviewFile = getSourceFile(
+      'src/canvas/app/pointer/CanvasPointerInteractionPreview.ts',
+    )
+    const creationStartFile = getSourceFile(
+      'src/canvas/app/pointer/CanvasPointerCreationStart.ts',
+    )
+    const creationPreviewFile = getSourceFile(
+      'src/canvas/app/pointer/CanvasPointerCreationPreview.ts',
+    )
+    const creationCommitFile = getSourceFile(
+      'src/canvas/app/pointer/CanvasPointerCreationCommit.ts',
+    )
+    const creationGrammarFile = getSourceFile(
+      'src/canvas/app/pointer/CanvasPointerCreationGrammar.ts',
+    )
+
+    expect(creationGrammarFile.source).toContain(
+      'export function isCanvasPointerCreationGesture',
+    )
+    expect(creationGrammarFile.source).toContain(
+      'export function isCanvasPointerCreationInteraction',
+    )
+    expect(creationStartFile.source).toContain(
+      "from './CanvasPointerCreationGrammar'",
+    )
+    expect(creationPreviewFile.source).toContain(
+      "from './CanvasPointerCreationGrammar'",
+    )
+    expect(creationCommitFile.source).toContain(
+      "from './CanvasPointerCreationGrammar'",
+    )
+    expect(interactionPreviewFile.source).toContain(
+      'isCanvasPointerCreationInteraction(interaction)',
+    )
+    expect(lifecycleFile.source).toContain(
+      'isCanvasPointerCreationInteraction(interaction)',
+    )
+    for (const creationKindCheck of [
+      "interaction.kind === 'create-arrow'",
+      "interaction.kind === 'create-custom'",
+      "interaction.kind === 'create-rect'",
+      "interaction.kind === 'draw-highlight'",
+      "interaction.kind === 'draw-marker'",
+    ]) {
+      expect(interactionPreviewFile.source).not.toContain(creationKindCheck)
+      expect(lifecycleFile.source).not.toContain(creationKindCheck)
+    }
+  })
+
   it('keeps pointer interaction preview rules behind a named module', () => {
     const dragHandlersFile = getSourceFile(
       'src/canvas/app/pointer/useCanvasPointerDragHandlers.ts',

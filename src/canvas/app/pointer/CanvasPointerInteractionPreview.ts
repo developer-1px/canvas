@@ -19,6 +19,9 @@ import {
 } from '../../engine'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import type { Interaction } from './CanvasInteractionState'
+import {
+  isCanvasPointerCreationInteraction,
+} from './CanvasPointerCreationGrammar'
 import { previewCanvasPointerCreation } from './CanvasPointerCreationPreview'
 import { previewCanvasPointerTransform } from './CanvasPointerTransformPreview'
 import { hasCanvasInteractionMoved } from './CanvasPointerInteractionMovement'
@@ -142,40 +145,7 @@ export function previewCanvasPointerInteraction({
     }
   }
 
-  if (interaction.kind === 'create-rect') {
-    return previewCanvasPointerCreation({
-      config,
-      currentScreen,
-      currentWorld,
-      input,
-      interaction,
-    })
-  }
-
-  if (
-    interaction.kind === 'draw-marker' ||
-    interaction.kind === 'draw-highlight'
-  ) {
-    return previewCanvasPointerCreation({
-      config,
-      currentScreen,
-      currentWorld,
-      input,
-      interaction,
-    })
-  }
-
-  if (interaction.kind === 'create-arrow') {
-    return previewCanvasPointerCreation({
-      config,
-      currentScreen,
-      currentWorld,
-      input,
-      interaction,
-    })
-  }
-
-  if (interaction.kind === 'create-custom') {
+  if (isCanvasPointerCreationInteraction(interaction)) {
     return previewCanvasPointerCreation({
       config,
       currentScreen,

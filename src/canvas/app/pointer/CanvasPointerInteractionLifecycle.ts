@@ -16,6 +16,9 @@ import type {
 import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
 import type { Interaction } from './CanvasInteractionState'
 import { commitCanvasPointerCreation } from './CanvasPointerCreationCommit'
+import {
+  isCanvasPointerCreationInteraction,
+} from './CanvasPointerCreationGrammar'
 
 export type CanvasPointerInteractionCommitInput = {
   commitItemsChange: CommitCanvasItemsChange
@@ -44,13 +47,7 @@ export function commitCanvasPointerInteraction({
   setSelection,
   setTool,
 }: CanvasPointerInteractionCommitInput) {
-  if (
-    interaction.kind === 'create-rect' ||
-    interaction.kind === 'draw-marker' ||
-    interaction.kind === 'draw-highlight' ||
-    interaction.kind === 'create-arrow' ||
-    interaction.kind === 'create-custom'
-  ) {
+  if (isCanvasPointerCreationInteraction(interaction)) {
     commitCanvasPointerCreation({
       commitItemsChange,
       creationAdapter,

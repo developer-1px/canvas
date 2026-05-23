@@ -22,17 +22,10 @@ import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreati
 import { getCanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationToolRuntime'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import type { Interaction } from './CanvasInteractionState'
+import {
+  isCanvasPointerCreationGesture,
+} from './CanvasPointerCreationGrammar'
 import { createCanvasDraftStroke } from './CanvasPointerDrawing'
-
-type CanvasPointerCreationGesture = Extract<
-  CanvasPointerGesture,
-  | 'create-arrow'
-  | 'create-custom'
-  | 'create-rect'
-  | 'create-text'
-  | 'draw-highlight'
-  | 'draw-marker'
->
 
 export type CanvasPointerCreationStartResult =
   | { kind: 'none' }
@@ -192,17 +185,4 @@ export function startCanvasPointerCreation({
   }
 
   return { kind: 'none' }
-}
-
-function isCanvasPointerCreationGesture(
-  gesture: CanvasPointerGesture,
-): gesture is CanvasPointerCreationGesture {
-  return (
-    gesture === 'create-arrow' ||
-    gesture === 'create-custom' ||
-    gesture === 'create-rect' ||
-    gesture === 'create-text' ||
-    gesture === 'draw-highlight' ||
-    gesture === 'draw-marker'
-  )
 }

@@ -13,23 +13,14 @@ import {
 } from '../../engine'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import type { Interaction } from './CanvasInteractionState'
+import type {
+  CanvasPointerCreationInteraction,
+} from './CanvasPointerCreationGrammar'
 import {
   createCanvasDraftStroke,
   getNextCanvasDrawingPoints,
 } from './CanvasPointerDrawing'
 import { hasCanvasInteractionMoved } from './CanvasPointerInteractionMovement'
-
-type CanvasPointerCreationInteraction = Extract<
-  Interaction,
-  {
-    kind:
-      | 'create-arrow'
-      | 'create-custom'
-      | 'create-rect'
-      | 'draw-highlight'
-      | 'draw-marker'
-  }
->
 
 type CanvasPointerCreationPreviewInput = {
   config: CanvasAffordanceConfig

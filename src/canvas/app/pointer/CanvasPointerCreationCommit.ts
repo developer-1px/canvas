@@ -12,16 +12,9 @@ import {
 import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
 import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract'
 import { commitCanvasCustomCreation } from './CanvasCustomCreationCommit'
-import type { Interaction } from './CanvasInteractionState'
-
-type CanvasPointerCreationInteraction = Extract<
-  Interaction,
-  | { kind: 'create-arrow' }
-  | { kind: 'create-custom' }
-  | { kind: 'create-rect' }
-  | { kind: 'draw-highlight' }
-  | { kind: 'draw-marker' }
->
+import type {
+  CanvasPointerCreationInteraction,
+} from './CanvasPointerCreationGrammar'
 
 export type CanvasPointerCreationCommitInput = {
   commitItemsChange: CommitCanvasItemsChange
