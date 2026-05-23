@@ -11,6 +11,7 @@
 5. Renderer Adapter는 그리기만 한다.
 6. Scene Adapter는 bounds, hit target, parent/group, editable target만 제공한다.
 7. Drawing Item은 Demo Host item이며 Core Contract에 포함하지 않는다.
+8. 사회적 약속이 된 캔버스 문법은 내부 Module이 관리하고, 제품별 의미는 Canvas App Assembly에서 외부 등록한다.
 
 ## Layer / Concept / Role
 
@@ -29,7 +30,9 @@
 | `src/canvas/architecture/CanvasModuleBoundaries.test.ts` | Module seam import 규칙을 회귀 테스트로 검증한다 |
 | `src/canvas/app/shell` | CanvasApp composition과 shell style |
 | `src/canvas/app/rendering` | Demo `CanvasItem` tree를 SVG item layer로 바꾸는 App-owned Adapter |
+| `src/canvas/app/rendering/CanvasDemoSvgComponentPresentationRegistry.ts` | Demo component presentation key와 SVG rendering strategy를 외부 조립 가능한 registry로 연결한다 |
 | `src/canvas/app/workflow` | React state와 engine/host/renderer wiring |
+| `src/canvas/app/workflow/CanvasAppAssembly.ts` | Host item adapter, component library, initial items, SVG presentation registry 같은 제품별 의미를 외부 조립 seam으로 제공한다 |
 | `src/canvas/app/workflow/index.ts` | App Shell이 사용하는 workflow public entry |
 | `src/canvas/app/workflow/useCanvasAppModel.ts` | command, pointer, keyboard, viewport, text editing wiring과 control별 view props 조립을 App Shell에 숨긴다 |
 | `src/canvas/app/workflow/CanvasWorkflowContract.ts` | App workflow hook들이 공유하는 document commit, selection, clipboard contract |
@@ -106,11 +109,12 @@ type CanvasAffordanceConfig = {
 - App Shell은 workflow public entry만 import한다. command, pointer, keyboard, viewport, text editing wiring은 Canvas App Model이 소유한다.
 - App Shell은 workspace 저장, initial item seed, read model 생성, id seed 계산을 직접 import하지 않는다. Canvas Workspace Model을 통해 사용한다.
 - App workflow는 `CANVAS_ITEM_ENGINE_ADAPTERS`를 통해 concrete item adapter를 주입한다.
+- App workflow는 Canvas App Assembly를 통해 concrete item adapter, component library, initial items, presentation registry를 주입받는다.
 - App과 UI는 Renderer Adapter 내부 파일을 import하지 않는다. SVG stage는 `src/canvas/renderer` public facade에서 사용한다.
 - Renderer Adapter는 `CanvasOverlayState`와 주입된 item layer를 받아 SVG로 배치하며, Engine은 SVG/DOM 구현을 모른다.
 - Renderer Stage는 Demo `CanvasItem`, Host read model, Canvas Component Library를 import하지 않는다.
-- Demo SVG Item Layer Adapter는 App-owned Adapter로 Demo component presentation key resolver를 받아 그리기 전략을 고른다.
-- 새 Demo component kind가 기존 presentation을 재사용하면 `CanvasComponentLibrary`만 수정한다. 새 presentation을 추가할 때만 Renderer Adapter 전략을 추가한다.
+- Demo SVG Item Layer Adapter는 App-owned Adapter로 Demo component presentation key resolver와 presentation registry를 받아 그리기 전략을 고른다.
+- 새 Demo component kind가 기존 presentation을 재사용하면 외부 조립된 `CanvasComponentLibrary`만 바꾼다. 새 presentation은 Canvas App Assembly에 presentation renderer를 함께 등록한다.
 - 위 import 경계는 `src/canvas/architecture/CanvasModuleBoundaries.test.ts`에서 검증한다.
 
 추출 순서는 동작 변경 없이 app workflow에서 Engine 책임을 하나씩 떼어내는 방식으로 진행한다.

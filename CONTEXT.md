@@ -14,6 +14,8 @@
 - Canvas Item Read Model: Demo `CanvasItem` tree의 조회, bounds, selection 정규화, Scene Adapter 생성을 tree helper 세부 구현 없이 제공하는 Module.
 - Canvas Component Library: Demo component template, presentation key, component item 생성을 함께 제공하는 Module.
 - Canvas Component Presentation: Demo component kind를 Renderer Adapter의 그리기 전략과 연결하는 key. 새 component kind는 기존 presentation을 재사용할 수 있다.
+- Canvas App Assembly: 내부 캔버스 문법은 유지하면서 Host item adapter, component library, initial items, SVG presentation registry 같은 제품별 의미를 외부에서 조립하는 composition Module.
+- Canvas Component Presentation Registry: Demo component presentation key를 SVG rendering strategy에 연결하는 외부 조립 가능한 registry.
 - Drawing Item: Demo `CanvasItem` 중 하이라이터, 화살표처럼 캔버스 위에 빠르게 주석을 그리는 항목.
 - Canvas App Model: App Shell이 렌더링할 control별 view props를 만들고 command, pointer, keyboard, viewport, text editing wiring을 숨기는 workflow Module.
 - Canvas Interaction Model: tool, gesture, marquee, draft, snap guide, overlay state 생명주기를 App Shell에 숨기는 workflow Module.
@@ -38,6 +40,7 @@
 - 안정 entity type은 `src/canvas/entities`에서 import한다.
 - 모든 기능은 on/off 가능해야 한다.
 - 새 Demo component kind가 기존 presentation을 재사용하면 Canvas Component Library만 수정한다.
+- 새 Demo component kind와 새 SVG presentation은 Canvas App Assembly에서 component library와 presentation registry를 조립해 붙인다.
 - App Shell은 command, pointer, keyboard, viewport, text editing wiring을 직접 알지 않는다.
 - App View는 raw workflow state 대신 Canvas App Model이 조립한 control별 props만 받는다.
 - App Shell은 workspace 저장, document history, read model 생성 방식을 직접 알지 않는다.

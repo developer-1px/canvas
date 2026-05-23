@@ -10,10 +10,11 @@ import type {
   Tool,
   Viewport,
 } from '../../entities'
-import { CANVAS_COMPONENT_LIBRARY } from '../../host'
+import type { CanvasComponentLibrary } from '../../host'
 import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract'
 
 type UseCanvasComponentInsertionArgs = {
+  componentLibrary: CanvasComponentLibrary
   commitItemsChange: CommitCanvasItemsChange
   createId: (prefix: string) => string
   selection: string[]
@@ -24,6 +25,7 @@ type UseCanvasComponentInsertionArgs = {
 }
 
 export function useCanvasComponentInsertion({
+  componentLibrary,
   commitItemsChange,
   createId,
   selection,
@@ -41,7 +43,7 @@ export function useCanvasComponentInsertion({
             y: (rect.height / 2 - viewport.y) / viewport.scale,
           }
         : { x: 120, y: 120 }
-      const nextItem = CANVAS_COMPONENT_LIBRARY.createItem({
+      const nextItem = componentLibrary.createItem({
         id: createId('component'),
         point,
         templateId: component,
@@ -55,6 +57,7 @@ export function useCanvasComponentInsertion({
       setTool('select')
     },
     [
+      componentLibrary,
       commitItemsChange,
       createId,
       selection,

@@ -76,6 +76,23 @@ describe('Canvas module boundaries', () => {
     expect(violations).toEqual([])
   })
 
+  it('keeps demo app assembly details at the workflow assembly seam', () => {
+    const assemblyTerms =
+      /\b(CANVAS_COMPONENT_LIBRARY|CANVAS_ITEM_ENGINE_ADAPTERS|INITIAL_ITEMS)\b/
+    const violations = sourceFiles
+      .filter((file) =>
+        file.path.startsWith('src/canvas/app/') &&
+        !file.path.endsWith('.test.ts') &&
+        !file.path.endsWith('.test.tsx') &&
+        file.path !== 'src/canvas/app/workflow/CanvasAppAssembly.ts',
+      )
+      .flatMap((file) =>
+        assemblyTerms.test(file.source) ? [file.path] : [],
+      )
+
+    expect(violations).toEqual([])
+  })
+
   it('keeps renderer stage orchestration independent from demo canvas items', () => {
     const demoItemTerms =
       /\b(CanvasItem|RectItem|TextItem|GroupItem|CanvasComponentItem|getCanvasItemBounds|getCanvasItemsBounds|CANVAS_COMPONENT_LIBRARY)\b/

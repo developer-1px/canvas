@@ -36,7 +36,11 @@ export type CanvasComponentLibrary = {
   templates: readonly CanvasComponentTemplate[]
 }
 
-const CANVAS_COMPONENT_TEMPLATES = [
+export type CreateCanvasComponentLibraryInput = {
+  templates?: readonly CanvasComponentTemplate[]
+}
+
+export const DEFAULT_CANVAS_COMPONENT_TEMPLATES = [
   {
     id: 'sticky',
     label: 'N',
@@ -159,17 +163,22 @@ const CANVAS_COMPONENT_TEMPLATES = [
   },
 ] satisfies readonly CanvasComponentTemplate[]
 
-function getCanvasComponentTemplate(id: CanvasComponentKind) {
-  return CANVAS_COMPONENT_TEMPLATES.find((template) => template.id === id) ??
-    CANVAS_COMPONENT_TEMPLATES[0]
+function getCanvasComponentTemplate(
+  templates: readonly CanvasComponentTemplate[],
+  id: CanvasComponentKind,
+) {
+  return templates.find((template) => template.id === id) ?? templates[0]
 }
 
 function createCanvasComponentItem({
   id,
   point,
   templateId,
-}: CreateCanvasComponentItemInput): CanvasComponentItem {
-  const template = getCanvasComponentTemplate(templateId)
+  templates,
+}: CreateCanvasComponentItemInput & {
+  templates: readonly CanvasComponentTemplate[]
+}): CanvasComponentItem {
+  const template = getCanvasComponentTemplate(templates, templateId)
   const item: CanvasComponentItem = {
     id,
     type: 'component',
@@ -199,9 +208,20 @@ function createCanvasComponentItem({
   return item
 }
 
-export const CANVAS_COMPONENT_LIBRARY: CanvasComponentLibrary = {
-  createItem: createCanvasComponentItem,
-  getPresentation: (id) => getCanvasComponentTemplate(id).presentation,
-  getTemplate: getCanvasComponentTemplate,
-  templates: CANVAS_COMPONENT_TEMPLATES,
+export function createCanvasComponentLibrary({
+  templates = DEFAULT_CANVAS_COMPONENT_TEMPLATES,
+}: CreateCanvasComponentLibraryInput = {}): CanvasComponentLibrary {
+  if (templates.length === 0) {
+    throw new Error('Canvas component library requires at least one template')
+  }
+
+  return {
+    createItem: (input) => createCanvasComponentItem({ ...input, templates }),
+    getPresentation: (id) =>
+      getCanvasComponentTemplate(templates, id).presentation,
+    getTemplate: (id) => getCanvasComponentTemplate(templates, id),
+    templates,
+  }
 }
+
+export const CANVAS_COMPONENT_LIBRARY = createCanvasComponentLibrary()

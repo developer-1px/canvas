@@ -1,53 +1,24 @@
-import type { ReactNode } from 'react'
 import type { CanvasComponentItem } from '../../entities'
 import {
-  CanvasDemoSvgConnectorComponent,
-  CanvasDemoSvgVoteComponent,
-} from './CanvasDemoSvgShapeComponentRenderer'
-import {
-  CanvasDemoSvgChecklistComponent,
-  CanvasDemoSvgKanbanComponent,
-  CanvasDemoSvgTableComponent,
-} from './CanvasDemoSvgStructuredComponentRenderer'
-import {
-  CanvasDemoSvgCardComponent,
-  CanvasDemoSvgImageComponent,
-  CanvasDemoSvgLabelComponent,
-  CanvasDemoSvgSectionComponent,
-  CanvasDemoSvgStickyComponent,
-} from './CanvasDemoSvgTextComponentRenderer'
-
-type CanvasDemoSvgComponentRendererStrategy = (input: {
-  item: CanvasComponentItem
-}) => ReactNode
-
-const CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS: Record<
-  string,
-  CanvasDemoSvgComponentRendererStrategy
-> = {
-  'accent-card': CanvasDemoSvgCardComponent,
-  'checklist-list': CanvasDemoSvgChecklistComponent,
-  'image-frame': CanvasDemoSvgImageComponent,
-  'inline-label': CanvasDemoSvgLabelComponent,
-  'kanban-stack': CanvasDemoSvgKanbanComponent,
-  'line-connector': CanvasDemoSvgConnectorComponent,
-  'matrix-table': CanvasDemoSvgTableComponent,
-  'note-card': CanvasDemoSvgStickyComponent,
-  'section-frame': CanvasDemoSvgSectionComponent,
-  'vote-badge': CanvasDemoSvgVoteComponent,
-}
+  DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS,
+  getCanvasDemoSvgComponentPresentationRenderer,
+  type CanvasDemoSvgComponentPresentationRenderers,
+} from './CanvasDemoSvgComponentPresentationRegistry'
 
 export function CanvasDemoSvgComponentRenderer({
   getComponentPresentation,
   item,
+  renderers = DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS,
 }: {
   getComponentPresentation: (component: string) => string
   item: CanvasComponentItem
+  renderers?: CanvasDemoSvgComponentPresentationRenderers
 }) {
   const presentation = getComponentPresentation(item.component)
-  const renderComponent =
-    CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS[presentation] ??
-    CanvasDemoSvgCardComponent
+  const renderComponent = getCanvasDemoSvgComponentPresentationRenderer({
+    presentation,
+    renderers,
+  })
 
   return renderComponent({ item })
 }

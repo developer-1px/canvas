@@ -9,10 +9,6 @@ import {
   DEFAULT_CANVAS_AFFORDANCE_CONFIG,
   getCanvasCommandAvailability,
 } from '../../engine'
-import {
-  CANVAS_COMPONENT_LIBRARY,
-  CANVAS_ITEM_ENGINE_ADAPTERS,
-} from '../../host'
 import { useCanvasCommands } from '../commands/useCanvasCommands'
 import { useCanvasComponentInsertion } from '../components/useCanvasComponentInsertion'
 import { useCanvasObjectInspector } from '../inspector/useCanvasObjectInspector'
@@ -26,10 +22,24 @@ import { useCanvasFindReplaceModel } from './useCanvasFindReplaceModel'
 import { useCanvasInteractionModel } from './useCanvasInteractionModel'
 import { useCanvasWorkspaceModel } from './useCanvasWorkspaceModel'
 import { useCanvasTextEditorModel } from './useCanvasTextEditorModel'
+import {
+  DEFAULT_CANVAS_APP_ASSEMBLY,
+  type CanvasAppAssembly,
+} from './CanvasAppAssembly'
 
 const canvasAffordanceConfig = DEFAULT_CANVAS_AFFORDANCE_CONFIG
 
-export function useCanvasAppModel() {
+export function useCanvasAppModel({
+  assembly = DEFAULT_CANVAS_APP_ASSEMBLY,
+}: {
+  assembly?: CanvasAppAssembly
+} = {}) {
+  const {
+    componentLibrary,
+    componentPresentationRenderers,
+    initialItems,
+    itemAdapters,
+  } = assembly
   const svgRef = useRef<SVGSVGElement | null>(null)
   const editorRef = useRef<HTMLTextAreaElement | null>(null)
   const {
@@ -55,7 +65,7 @@ export function useCanvasAppModel() {
     setViewport,
     undo,
     viewport,
-  } = useCanvasWorkspaceModel()
+  } = useCanvasWorkspaceModel({ initialItems })
   const {
     activeMode,
     gesture,
@@ -137,7 +147,7 @@ export function useCanvasAppModel() {
     ungroupSelection,
     unlockAll,
   } = useCanvasCommands({
-    commandAdapter: CANVAS_ITEM_ENGINE_ADAPTERS.command,
+    commandAdapter: itemAdapters.command,
     commitSelection,
     commitItemsChange,
     config: canvasAffordanceConfig,
@@ -204,7 +214,7 @@ export function useCanvasAppModel() {
     cloneItems,
     commitSelection,
     config: canvasAffordanceConfig,
-    creationAdapter: CANVAS_ITEM_ENGINE_ADAPTERS.creation,
+    creationAdapter: itemAdapters.creation,
     createId,
     commitItemsChange,
     interactionRef,
@@ -233,7 +243,7 @@ export function useCanvasAppModel() {
     handlePointerUp,
   } = useCanvasPointerDragHandlers({
     config: canvasAffordanceConfig,
-    creationAdapter: CANVAS_ITEM_ENGINE_ADAPTERS.creation,
+    creationAdapter: itemAdapters.creation,
     commitItemsChange,
     createId,
     commitSelection,
@@ -252,11 +262,12 @@ export function useCanvasAppModel() {
     setTool,
     setViewport,
     svgRef,
-    transformAdapter: CANVAS_ITEM_ENGINE_ADAPTERS.transform,
+    transformAdapter: itemAdapters.transform,
     viewport,
   })
 
   const insertComponent = useCanvasComponentInsertion({
+    componentLibrary,
     commitItemsChange,
     createId,
     selection,
@@ -284,7 +295,7 @@ export function useCanvasAppModel() {
 
   return {
     componentPalette: {
-      components: CANVAS_COMPONENT_LIBRARY.templates,
+      components: componentLibrary.templates,
       onInsert: insertComponent,
     },
     findReplace,
@@ -292,7 +303,8 @@ export function useCanvasAppModel() {
     stage: {
       activeMode,
       children: createElement(CanvasDemoSvgItemLayer, {
-        getComponentPresentation: CANVAS_COMPONENT_LIBRARY.getPresentation,
+        componentPresentationRenderers,
+        getComponentPresentation: componentLibrary.getPresentation,
         items,
         onItemPointerDown: handleStageItemPointerDown,
         onTextDoubleClick: handleTextDoubleClick,

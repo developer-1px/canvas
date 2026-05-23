@@ -1,0 +1,58 @@
+import type { ReactNode } from 'react'
+import type { CanvasComponentItem } from '../../entities'
+import {
+  CanvasDemoSvgConnectorComponent,
+  CanvasDemoSvgVoteComponent,
+} from './CanvasDemoSvgShapeComponentRenderer'
+import {
+  CanvasDemoSvgChecklistComponent,
+  CanvasDemoSvgKanbanComponent,
+  CanvasDemoSvgTableComponent,
+} from './CanvasDemoSvgStructuredComponentRenderer'
+import {
+  CanvasDemoSvgCardComponent,
+  CanvasDemoSvgImageComponent,
+  CanvasDemoSvgLabelComponent,
+  CanvasDemoSvgSectionComponent,
+  CanvasDemoSvgStickyComponent,
+} from './CanvasDemoSvgTextComponentRenderer'
+
+export type CanvasDemoSvgComponentRendererStrategy = (input: {
+  item: CanvasComponentItem
+}) => ReactNode
+
+export type CanvasDemoSvgComponentPresentationRenderers = Readonly<
+  Record<string, CanvasDemoSvgComponentRendererStrategy>
+>
+
+export const DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS: CanvasDemoSvgComponentPresentationRenderers = {
+  'accent-card': CanvasDemoSvgCardComponent,
+  'checklist-list': CanvasDemoSvgChecklistComponent,
+  'image-frame': CanvasDemoSvgImageComponent,
+  'inline-label': CanvasDemoSvgLabelComponent,
+  'kanban-stack': CanvasDemoSvgKanbanComponent,
+  'line-connector': CanvasDemoSvgConnectorComponent,
+  'matrix-table': CanvasDemoSvgTableComponent,
+  'note-card': CanvasDemoSvgStickyComponent,
+  'section-frame': CanvasDemoSvgSectionComponent,
+  'vote-badge': CanvasDemoSvgVoteComponent,
+}
+
+export function createCanvasDemoSvgComponentPresentationRenderers(
+  extensions: CanvasDemoSvgComponentPresentationRenderers = {},
+): CanvasDemoSvgComponentPresentationRenderers {
+  return {
+    ...DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS,
+    ...extensions,
+  }
+}
+
+export function getCanvasDemoSvgComponentPresentationRenderer({
+  presentation,
+  renderers,
+}: {
+  presentation: string
+  renderers: CanvasDemoSvgComponentPresentationRenderers
+}) {
+  return renderers[presentation] ?? CanvasDemoSvgCardComponent
+}

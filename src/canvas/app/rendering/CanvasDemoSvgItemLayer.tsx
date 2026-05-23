@@ -7,11 +7,16 @@ import type {
 } from '../../entities'
 import { getCanvasItemBounds } from '../../host'
 import { CanvasDemoSvgComponentRenderer } from './CanvasDemoSvgComponentRenderer'
+import {
+  DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS,
+  type CanvasDemoSvgComponentPresentationRenderers,
+} from './CanvasDemoSvgComponentPresentationRegistry'
 
 type CanvasDemoSvgItemLayerProps = {
   getComponentPresentation: (component: string) => string
   items: CanvasItem[]
   outlineIds: Set<string>
+  componentPresentationRenderers?: CanvasDemoSvgComponentPresentationRenderers
   selected: Set<string>
   onItemPointerDown: (
     event: PointerEvent<SVGGElement>,
@@ -21,6 +26,8 @@ type CanvasDemoSvgItemLayerProps = {
 }
 
 export function CanvasDemoSvgItemLayer({
+  componentPresentationRenderers =
+    DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS,
   getComponentPresentation,
   items,
   onItemPointerDown,
@@ -35,6 +42,7 @@ export function CanvasDemoSvgItemLayer({
           getComponentPresentation,
           item,
           locked: false,
+          componentPresentationRenderers,
           onItemPointerDown,
           onTextDoubleClick,
           outlineIds,
@@ -50,6 +58,7 @@ type RenderCanvasItemArgs = {
   item: CanvasItem
   locked: boolean
   outlineIds: Set<string>
+  componentPresentationRenderers: CanvasDemoSvgComponentPresentationRenderers
   selected: Set<string>
   onItemPointerDown: (
     event: PointerEvent<SVGGElement>,
@@ -62,6 +71,7 @@ function renderCanvasItem({
   getComponentPresentation,
   item,
   locked,
+  componentPresentationRenderers,
   onItemPointerDown,
   onTextDoubleClick,
   outlineIds,
@@ -97,6 +107,7 @@ function renderCanvasItem({
             getComponentPresentation,
             item: child,
             locked: isLocked,
+            componentPresentationRenderers,
             onItemPointerDown,
             onTextDoubleClick,
             outlineIds,
@@ -127,6 +138,7 @@ function renderCanvasItem({
         <CanvasDemoSvgComponentRenderer
           getComponentPresentation={getComponentPresentation}
           item={item}
+          renderers={componentPresentationRenderers}
         />
         {hasOutline ? <CanvasDemoSvgSelectionOutline bounds={bounds} /> : null}
       </g>

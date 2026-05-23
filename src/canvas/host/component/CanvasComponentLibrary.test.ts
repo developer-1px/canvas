@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { CANVAS_COMPONENT_LIBRARY } from './CanvasComponentLibrary'
+import {
+  CANVAS_COMPONENT_LIBRARY,
+  createCanvasComponentLibrary,
+} from './CanvasComponentLibrary'
 
 describe('CANVAS_COMPONENT_LIBRARY', () => {
   it('creates component items from the public template contract', () => {
@@ -43,5 +46,47 @@ describe('CANVAS_COMPONENT_LIBRARY', () => {
         templateId: 'unknown',
       }).component,
     ).toBe(fallback.id)
+  })
+
+  it('accepts externally assembled component templates', () => {
+    const library = createCanvasComponentLibrary({
+      templates: [
+        ...CANVAS_COMPONENT_LIBRARY.templates,
+        {
+          id: 'risk',
+          label: '!',
+          title: 'Risk',
+          body: 'Open issue',
+          w: 180,
+          h: 96,
+          fill: '#fff7ed',
+          stroke: '#fb923c',
+          accent: '#ea580c',
+          presentation: 'risk-card',
+        },
+      ],
+    })
+
+    const item = library.createItem({
+      id: 'component-risk',
+      point: { x: 10, y: 20 },
+      templateId: 'risk',
+    })
+
+    expect(library.getPresentation('risk')).toBe('risk-card')
+    expect(item).toMatchObject({
+      accent: '#ea580c',
+      body: 'Open issue',
+      component: 'risk',
+      fill: '#fff7ed',
+      h: 96,
+      id: 'component-risk',
+      stroke: '#fb923c',
+      title: 'Risk',
+      type: 'component',
+      w: 180,
+      x: 10,
+      y: 20,
+    })
   })
 })

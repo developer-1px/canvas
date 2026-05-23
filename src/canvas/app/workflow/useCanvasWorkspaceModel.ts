@@ -7,9 +7,11 @@ import {
 import {
   INITIAL_VIEWPORT,
 } from '../../core'
-import type { Viewport } from '../../entities'
+import type {
+  CanvasItem,
+  Viewport,
+} from '../../entities'
 import {
-  INITIAL_ITEMS,
   createCanvasItemReadModel,
 } from '../../host'
 import {
@@ -21,12 +23,16 @@ import { useCanvasDocument } from '../document/useCanvasDocument'
 
 const DEFAULT_INITIAL_SELECTION = ['component-sticky', 'component-card']
 
-export function useCanvasWorkspaceModel() {
+export function useCanvasWorkspaceModel({
+  initialItems,
+}: {
+  initialItems: CanvasItem[]
+}) {
   const storedWorkspace = useMemo(() => readStoredCanvasWorkspace(), [])
-  const initialItems = storedWorkspace?.items ?? INITIAL_ITEMS
-  const idSeed = useRef(getCanvasItemIdSeed(initialItems))
+  const workspaceInitialItems = storedWorkspace?.items ?? initialItems
+  const idSeed = useRef(getCanvasItemIdSeed(workspaceInitialItems))
   const document = useCanvasDocument(
-    initialItems,
+    workspaceInitialItems,
     storedWorkspace?.selection ?? [...DEFAULT_INITIAL_SELECTION],
   )
   const [viewport, setViewport] = useState<Viewport>(
