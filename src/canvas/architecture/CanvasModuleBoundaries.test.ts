@@ -1726,8 +1726,14 @@ describe('Canvas module boundaries', () => {
     expect(effectPlanFile.source).toContain('groupCanvasCommand')
     expect(effectPlanFile.source).toContain('nudgeCanvasCommand')
     expect(effectPlanFile.source).toContain('selectAllCanvasCommand')
-    expect(effectPlanFile.source).toContain("type: 'remove-selection'")
-    expect(effectPlanFile.source).toContain("type: 'group-selection'")
+    expect(effectPlanFile.source).toContain(
+      'createCanvasStandardRemoveSelectionEffect',
+    )
+    expect(effectPlanFile.source).toContain(
+      'createCanvasStandardGroupSelectionEffect',
+    )
+    expect(effectPlanFile.source).not.toContain("type: 'remove-selection'")
+    expect(effectPlanFile.source).not.toContain("type: 'group-selection'")
   })
 
   it('keeps App standard command document effects behind a named module', () => {
@@ -1744,6 +1750,12 @@ describe('Canvas module boundaries', () => {
     expect(effectsFile.source).toContain(
       'export function applyCanvasStandardDocumentEffect',
     )
+    expect(effectsFile.source).toContain(
+      'export function createCanvasStandardReplaceChangedEffect',
+    )
+    expect(effectsFile.source).toContain(
+      'export function createCanvasStandardGroupSelectionEffect',
+    )
     expect(executionFile.source).not.toContain('context.commitItemsChange(')
     expect(executionFile.source).not.toContain('context.commitSelection(')
     expect(executionFile.source).not.toContain('context.setEditing(null)')
@@ -1757,6 +1769,8 @@ describe('Canvas module boundaries', () => {
     expect(effectsFile.source).toContain('context.commitSelection(')
     expect(effectsFile.source).toContain('context.setEditing(null)')
     expect(effectsFile.source).toContain('clearEditingIds.includes')
+    expect(effectsFile.source).toContain("type: 'remove-selection'")
+    expect(effectsFile.source).toContain("type: 'group-selection'")
   })
 
   it('keeps App clipboard command execution behind a named module', () => {

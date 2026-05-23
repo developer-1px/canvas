@@ -44,7 +44,7 @@
 - Canvas App Descriptor Shape Contract: 제품별 descriptor가 외부 조립 seam을 통과하기 전에 필수 함수 slot을 갖췄는지 검증하는 외부 Interface 계약.
 - Canvas Standard Command Execution: 내부 canvas command grammar 실행을 effect plan 생성과 document effect 적용으로 조립하는 App-owned runtime Module.
 - Canvas Standard Command Effect Plan: 내부 canvas command grammar와 Engine command 결과를 App document effect descriptor로 변환하는 App-owned runtime Module.
-- Canvas Standard Command Document Effects: standard command 결과를 document commit fallback, selection commit, editing clear, history restore effect로 반영하는 App-owned runtime Module.
+- Canvas Standard Command Document Effects: standard command 결과의 document effect descriptor 생성과 document commit fallback, selection commit, editing clear, history restore effect 반영을 소유하는 App-owned runtime Module.
 - Canvas Command Selection Rules: built-in command 실행과 availability가 공유하는 선택 개수 기준을 소유하는 Engine-owned Module.
 - Canvas Clipboard Command Execution: clipboard command effect plan 생성과 clipboard/document effect 적용을 조립하는 App-owned runtime Module.
 - Canvas Clipboard Command Effect Plan: copy, cut, paste, duplicate, clone command를 clone result/add item/copy/cut effect descriptor로 변환하고 paste offset 계산을 소유하는 App-owned runtime Module.
@@ -242,7 +242,7 @@
 - App Shell은 workspace 저장, document history, read model 생성 방식을 직접 알지 않는다.
 - App workflow hook들은 Canvas Item Read Model, document action, viewport setter를 직접 생성하지 않고 Canvas Workspace Model의 consumer별 workspace context로 주입받는다.
 - App workflow는 editor/search 상태를 각각의 workflow Module 뒤에 숨긴다.
-- Standard command hook은 toolbar/keyboard용 callback wiring을 맡고, Canvas Standard Command Execution은 plan 생성과 effect 적용만 조립한다. Engine command 호출과 document effect descriptor 생성은 Canvas Standard Command Effect Plan이, document commit/selection/editing/history effect routing은 Canvas Standard Command Document Effects가 소유한다.
+- Standard command hook은 toolbar/keyboard용 callback wiring을 맡고, Canvas Standard Command Execution은 plan 생성과 effect 적용만 조립한다. Engine command 호출은 Canvas Standard Command Effect Plan이, document effect descriptor 생성과 document commit/selection/editing/history effect routing은 Canvas Standard Command Document Effects가 소유한다.
 - Built-in command의 선택 개수 기준은 Canvas Command Selection Rules가 소유하고, App control model과 command action/availability는 raw threshold를 반복하지 않는다.
 - Clipboard command hook은 paste index와 callback wiring을 맡고, Canvas Clipboard Command Execution은 plan 생성과 effect 적용만 조립한다. Clone/duplicate/paste/cut plan과 paste offset 계산은 Canvas Clipboard Command Effect Plan이, Host clipboard/document/editing effect routing은 Canvas Clipboard Command Effects가 소유한다.
 - UI controls는 Demo Host를 직접 import하지 않는다.

@@ -4,11 +4,58 @@ import {
   applyCanvasStandardHistoryEffect,
   applyCanvasStandardItemsChangeEffect,
   applyCanvasStandardSelectionEffect,
+  createCanvasStandardGroupSelectionEffect,
+  createCanvasStandardRemoveSelectionEffect,
+  createCanvasStandardReplaceChangedEffect,
   type CanvasEditingUpdate,
   type CanvasStandardCommandDocumentEffectContext,
 } from './CanvasStandardCommandDocumentEffects'
 
 describe('CanvasStandardCommandDocumentEffects', () => {
+  it('creates standard item change effect descriptors', () => {
+    expect(
+      createCanvasStandardReplaceChangedEffect({
+        afterSelection: ['rect-1'],
+        fallbackSelection: ['rect-1'],
+        items: [],
+      }),
+    ).toEqual({
+      afterSelection: ['rect-1'],
+      change: { type: 'replace-changed', items: [] },
+      fallbackSelection: ['rect-1'],
+      kind: 'items-change',
+    })
+    expect(
+      createCanvasStandardRemoveSelectionEffect({
+        afterSelection: [],
+        clearEditingIds: ['rect-1'],
+        selection: ['rect-1'],
+      }),
+    ).toEqual({
+      afterSelection: [],
+      change: { type: 'remove-selection', selection: ['rect-1'] },
+      clearEditingIds: ['rect-1'],
+      fallbackSelection: [],
+      kind: 'items-change',
+    })
+    expect(
+      createCanvasStandardGroupSelectionEffect({
+        afterSelection: ['group-1'],
+        groupId: 'group-1',
+        selection: ['rect-1'],
+      }),
+    ).toEqual({
+      afterSelection: ['group-1'],
+      change: {
+        groupId: 'group-1',
+        selection: ['rect-1'],
+        type: 'group-selection',
+      },
+      fallbackSelection: ['group-1'],
+      kind: 'items-change',
+    })
+  })
+
   it('commits item changes with selection history', () => {
     const context = createContext()
 

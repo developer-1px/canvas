@@ -16,8 +16,15 @@ import {
   type CanvasReorderMode,
 } from '../../engine'
 import type { CanvasItem } from '../../entities'
-import type {
-  CanvasStandardCommandDocumentEffect,
+import {
+  createCanvasStandardGroupSelectionEffect,
+  createCanvasStandardHistoryEffect,
+  createCanvasStandardRemoveSelectionEffect,
+  createCanvasStandardReorderSelectionEffect,
+  createCanvasStandardReplaceChangedEffect,
+  createCanvasStandardSelectionEffect,
+  createCanvasStandardUngroupSelectionEffect,
+  type CanvasStandardCommandDocumentEffect,
 } from './CanvasStandardCommandDocumentEffects'
 
 export type CanvasStandardCommand =
@@ -92,11 +99,10 @@ function planCanvasAlignCommand(
   })
 
   return result
-    ? {
+    ? createCanvasStandardReplaceChangedEffect({
         afterSelection: result.selection,
-        change: { type: 'replace-changed', items: result.items },
-        kind: 'items-change',
-      }
+        items: result.items,
+      })
     : null
 }
 
@@ -113,11 +119,10 @@ function planCanvasDistributeCommand(
   })
 
   return result
-    ? {
+    ? createCanvasStandardReplaceChangedEffect({
         afterSelection: result.selection,
-        change: { type: 'replace-changed', items: result.items },
-        kind: 'items-change',
-      }
+        items: result.items,
+      })
     : null
 }
 
@@ -132,13 +137,11 @@ function planCanvasDeleteCommand(
   })
 
   return result
-    ? {
+    ? createCanvasStandardRemoveSelectionEffect({
         afterSelection: result.selection,
-        change: { type: 'remove-selection', selection: context.selection },
         clearEditingIds: result.clearEditingIds,
-        fallbackSelection: result.selection,
-        kind: 'items-change',
-      }
+        selection: context.selection,
+      })
     : null
 }
 
@@ -155,12 +158,11 @@ function planCanvasGroupCommand(
   })
 
   return result
-    ? {
+    ? createCanvasStandardGroupSelectionEffect({
         afterSelection: result.selection,
-        change: { type: 'group-selection', groupId, selection: context.selection },
-        fallbackSelection: result.selection,
-        kind: 'items-change',
-      }
+        groupId,
+        selection: context.selection,
+      })
     : null
 }
 
@@ -175,12 +177,10 @@ function planCanvasUngroupCommand(
   })
 
   return result
-    ? {
+    ? createCanvasStandardUngroupSelectionEffect({
         afterSelection: result.selection,
-        change: { type: 'ungroup-selection', selection: context.selection },
-        fallbackSelection: result.selection,
-        kind: 'items-change',
-      }
+        selection: context.selection,
+      })
     : null
 }
 
@@ -195,12 +195,11 @@ function planCanvasLockCommand(
   })
 
   return result
-    ? {
+    ? createCanvasStandardReplaceChangedEffect({
         afterSelection: result.selection,
-        change: { type: 'replace-changed', items: result.items },
         fallbackSelection: result.selection,
-        kind: 'items-change',
-      }
+        items: result.items,
+      })
     : null
 }
 
@@ -215,12 +214,11 @@ function planCanvasUnlockAllCommand(
   })
 
   return result
-    ? {
+    ? createCanvasStandardReplaceChangedEffect({
         afterSelection: result.selection,
-        change: { type: 'replace-changed', items: result.items },
         fallbackSelection: result.selection,
-        kind: 'items-change',
-      }
+        items: result.items,
+      })
     : null
 }
 
@@ -228,7 +226,7 @@ function planCanvasUndoCommand(
   context: CanvasStandardCommandEffectPlanContext,
 ): CanvasStandardCommandDocumentEffect | null {
   return context.config.commands.undo
-    ? { direction: 'undo', kind: 'history' }
+    ? createCanvasStandardHistoryEffect({ direction: 'undo' })
     : null
 }
 
@@ -236,7 +234,7 @@ function planCanvasRedoCommand(
   context: CanvasStandardCommandEffectPlanContext,
 ): CanvasStandardCommandDocumentEffect | null {
   return context.config.commands.redo
-    ? { direction: 'redo', kind: 'history' }
+    ? createCanvasStandardHistoryEffect({ direction: 'redo' })
     : null
 }
 
@@ -254,10 +252,7 @@ function planCanvasNudgeCommand(
   })
 
   return result
-    ? {
-        change: { type: 'replace-changed', items: result },
-        kind: 'items-change',
-      }
+    ? createCanvasStandardReplaceChangedEffect({ items: result })
     : null
 }
 
@@ -274,11 +269,11 @@ function planCanvasReorderCommand(
   })
 
   return result
-    ? {
+    ? createCanvasStandardReorderSelectionEffect({
         afterSelection: result.selection,
-        change: { type: 'reorder-selection', mode, selection: context.selection },
-        kind: 'items-change',
-      }
+        mode,
+        selection: context.selection,
+      })
     : null
 }
 
@@ -292,7 +287,7 @@ function planCanvasSelectAllCommand(
   })
 
   return nextSelection
-    ? { kind: 'selection', selection: nextSelection }
+    ? createCanvasStandardSelectionEffect({ selection: nextSelection })
     : null
 }
 

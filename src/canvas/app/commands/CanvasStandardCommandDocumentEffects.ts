@@ -39,6 +39,126 @@ export type CanvasStandardCommandDocumentEffect =
       selection: string[]
     }
 
+type CanvasStandardReplaceChangedChange = Extract<
+  CanvasStandardCommandItemsChange,
+  { type: 'replace-changed' }
+>
+type CanvasStandardRemoveSelectionChange = Extract<
+  CanvasStandardCommandItemsChange,
+  { type: 'remove-selection' }
+>
+type CanvasStandardGroupSelectionChange = Extract<
+  CanvasStandardCommandItemsChange,
+  { type: 'group-selection' }
+>
+type CanvasStandardUngroupSelectionChange = Extract<
+  CanvasStandardCommandItemsChange,
+  { type: 'ungroup-selection' }
+>
+type CanvasStandardReorderSelectionChange = Extract<
+  CanvasStandardCommandItemsChange,
+  { type: 'reorder-selection' }
+>
+
+export function createCanvasStandardReplaceChangedEffect({
+  afterSelection,
+  fallbackSelection,
+  items,
+}: {
+  afterSelection?: string[]
+  fallbackSelection?: string[]
+  items: CanvasStandardReplaceChangedChange['items']
+}): CanvasStandardCommandDocumentEffect {
+  return {
+    afterSelection,
+    change: { type: 'replace-changed', items },
+    fallbackSelection,
+    kind: 'items-change',
+  }
+}
+
+export function createCanvasStandardRemoveSelectionEffect({
+  afterSelection,
+  clearEditingIds,
+  selection,
+}: {
+  afterSelection: string[]
+  clearEditingIds: readonly string[]
+  selection: CanvasStandardRemoveSelectionChange['selection']
+}): CanvasStandardCommandDocumentEffect {
+  return {
+    afterSelection,
+    change: { type: 'remove-selection', selection },
+    clearEditingIds,
+    fallbackSelection: afterSelection,
+    kind: 'items-change',
+  }
+}
+
+export function createCanvasStandardGroupSelectionEffect({
+  afterSelection,
+  groupId,
+  selection,
+}: {
+  afterSelection: string[]
+  groupId: CanvasStandardGroupSelectionChange['groupId']
+  selection: CanvasStandardGroupSelectionChange['selection']
+}): CanvasStandardCommandDocumentEffect {
+  return {
+    afterSelection,
+    change: { type: 'group-selection', groupId, selection },
+    fallbackSelection: afterSelection,
+    kind: 'items-change',
+  }
+}
+
+export function createCanvasStandardUngroupSelectionEffect({
+  afterSelection,
+  selection,
+}: {
+  afterSelection: string[]
+  selection: CanvasStandardUngroupSelectionChange['selection']
+}): CanvasStandardCommandDocumentEffect {
+  return {
+    afterSelection,
+    change: { type: 'ungroup-selection', selection },
+    fallbackSelection: afterSelection,
+    kind: 'items-change',
+  }
+}
+
+export function createCanvasStandardReorderSelectionEffect({
+  afterSelection,
+  mode,
+  selection,
+}: {
+  afterSelection: string[]
+  mode: CanvasStandardReorderSelectionChange['mode']
+  selection: CanvasStandardReorderSelectionChange['selection']
+}): CanvasStandardCommandDocumentEffect {
+  return {
+    afterSelection,
+    change: { type: 'reorder-selection', mode, selection },
+    kind: 'items-change',
+  }
+}
+
+export function createCanvasStandardHistoryEffect({
+  direction,
+}: {
+  direction: 'redo' | 'undo'
+}): CanvasStandardCommandDocumentEffect {
+  return { direction, kind: 'history' }
+}
+
+export function createCanvasStandardSelectionEffect({
+  selection,
+}: {
+  selection: string[]
+}): CanvasStandardCommandDocumentEffect {
+  return { kind: 'selection', selection }
+}
+
 export function applyCanvasStandardDocumentEffect({
   context,
   effect,
