@@ -54,6 +54,7 @@ export {
   getCanvasItemPointerIntent,
   getCanvasPointerGesture,
   isAdditivePointerInput,
+  shouldRouteCanvasItemPointerToCanvasGesture,
   type CanvasItemPointerIntent,
   type CanvasPointerGesture,
   type CanvasPointerInput,

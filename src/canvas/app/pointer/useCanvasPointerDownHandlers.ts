@@ -30,6 +30,7 @@ import {
   getCanvasPointerGesture,
   isAdditivePointerInput,
   snapCanvasPointToGrid,
+  shouldRouteCanvasItemPointerToCanvasGesture,
   type CanvasAffordanceConfig,
   type CanvasCreationAdapter,
   type CanvasDraftArrowOverlay,
@@ -245,6 +246,12 @@ export function useCanvasPointerDownHandlers({
     itemId: string,
   ) {
     if (event.button !== 0) {
+      return
+    }
+
+    if (shouldRouteCanvasItemPointerToCanvasGesture({ spaceDown, tool })) {
+      event.stopPropagation()
+      handleCanvasPointerDown(event as unknown as PointerEvent<SVGSVGElement>)
       return
     }
 

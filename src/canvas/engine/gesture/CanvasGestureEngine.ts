@@ -70,6 +70,24 @@ export function getCanvasPointerGesture({
   return config.gestures.marquee ? 'marquee' : 'none'
 }
 
+export function shouldRouteCanvasItemPointerToCanvasGesture({
+  spaceDown,
+  tool,
+}: {
+  spaceDown: boolean
+  tool: Tool
+}) {
+  return (
+    spaceDown ||
+    tool === 'pan' ||
+    tool === 'rect' ||
+    tool === 'text' ||
+    tool === 'marker' ||
+    tool === 'highlight' ||
+    tool === 'arrow'
+  )
+}
+
 export function getCanvasItemPointerIntent({
   config,
   input,
