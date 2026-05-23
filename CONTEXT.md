@@ -197,7 +197,8 @@
 - Demo SVG Item Frame: Demo SVG item의 lock, selected, pointer event, outline wrapper 문법을 item type별 shape rendering과 분리해 소유하는 Module.
 - Demo SVG Drawing Item Renderer: drawing item type guard와 public render entry를 소유하고 SVG shape dispatch는 Demo SVG Drawing Item Render Routing에 위임하는 App rendering Module.
 - Demo SVG Drawing Item Render Routing: marker/highlighter stroke path rendering과 arrow line/marker rendering strategy를 소유하는 App rendering Module.
-- Demo SVG Rect/Text Item Renderer: rect와 text item의 SVG shape, embedded text foreignObject 문법을 소유하는 App rendering Module.
+- Demo SVG Rect/Text Item Renderer: editable text item public render entry를 소유하고 rect/text SVG shape dispatch는 Demo SVG Rect/Text Item Render Routing에 위임하는 App rendering Module.
+- Demo SVG Rect/Text Item Render Routing: rect geometry, embedded rect text, standalone text foreignObject rendering strategy를 소유하는 App rendering Module.
 - Renderer Component Presentation Resolver: Demo component kind를 Renderer Adapter가 이해하는 presentation key로 바꾸는 함수. App workflow가 Host의 Canvas Component Library에서 꺼내 Renderer Adapter에 주입한다.
 - Renderer Public Facade: App과 UI가 Renderer Adapter를 사용할 때 import하는 안정된 Module 경계. SVG 내부 파일 구조를 숨긴다.
 - Scene Adapter: Host App의 항목 트리, bounds, hit target, editable target을 엔진이 읽을 수 있게 맞추는 Adapter.
@@ -233,7 +234,7 @@
 - SVG drawing path data와 arrow marker id/IRI는 Canvas SVG Drawing Primitives가 소유한다.
 - Demo SVG item의 lock/selected/pointer/outline wrapper 문법은 Demo SVG Item Frame이 소유한다.
 - Demo SVG Item Layer Adapter는 item layer list injection을 맡고, frame orchestration은 Demo SVG Item Renderer가, recursive tree content와 item type dispatch는 Demo SVG Item Render Routing이 소유한다. marker/highlighter/arrow shape 렌더링 strategy는 Demo SVG Drawing Item Render Routing이 소유한다.
-- Demo SVG Item Layer Adapter는 rect/text shape와 embedded text foreignObject 문법을 알지 않고 Demo SVG Rect/Text Item Renderer에 위임한다.
+- Demo SVG Item Layer Adapter는 rect/text shape와 embedded text foreignObject 문법을 알지 않고 Demo SVG Rect/Text Item Renderer에 위임하고, rect/text shape strategy는 Demo SVG Rect/Text Item Render Routing이 소유한다.
 - 안정 entity type은 `src/canvas/entities`에서 import한다. `entities` public facade는 type-only로 유지한다.
 - persisted kind와 registry key는 Canvas Stable Id 형식을 사용한다.
 - 알 수 없는 stable component kind는 fallback할 수 있지만, malformed component kind는 validation/lookup 단계에서 실패해야 한다.

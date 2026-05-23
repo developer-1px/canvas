@@ -2792,6 +2792,9 @@ describe('Canvas module boundaries', () => {
     const rectTextRendererFile = getSourceFile(
       'src/canvas/app/rendering/CanvasDemoSvgRectTextItemRenderer.tsx',
     )
+    const rectTextRoutingFile = getSourceFile(
+      'src/canvas/app/rendering/CanvasDemoSvgRectTextItemRenderRouting.tsx',
+    )
 
     expect(itemRenderRoutingFile.source).toContain(
       "from './CanvasDemoSvgRectTextItemRenderer'",
@@ -2805,9 +2808,23 @@ describe('Canvas module boundaries', () => {
     expect(rectTextRendererFile.source).toContain(
       'export function renderCanvasDemoSvgRectTextItem',
     )
-    expect(rectTextRendererFile.source).toContain('className="rect-item"')
-    expect(rectTextRendererFile.source).toContain('canvas-rect-text')
-    expect(rectTextRendererFile.source).toContain('<foreignObject')
+    expect(rectTextRendererFile.source).toContain(
+      "from './CanvasDemoSvgRectTextItemRenderRouting'",
+    )
+    expect(rectTextRendererFile.source).not.toContain("item.type === 'rect'")
+    expect(rectTextRendererFile.source).not.toContain('className="rect-item"')
+    expect(rectTextRendererFile.source).not.toContain('canvas-rect-text')
+    expect(rectTextRendererFile.source).not.toContain('<foreignObject')
+    expect(rectTextRoutingFile.source).toContain(
+      'CANVAS_DEMO_SVG_RECT_TEXT_ITEM_RENDER_STRATEGIES',
+    )
+    expect(rectTextRoutingFile.source).toContain(
+      'export function renderCanvasDemoSvgRectTextItemByRoute',
+    )
+    expect(rectTextRoutingFile.source).toContain('isCanvasTextItem')
+    expect(rectTextRoutingFile.source).toContain('className="rect-item"')
+    expect(rectTextRoutingFile.source).toContain('canvas-rect-text')
+    expect(rectTextRoutingFile.source).toContain('<foreignObject')
   })
 
   it('keeps Demo SVG component render fallback behind a named module', () => {
