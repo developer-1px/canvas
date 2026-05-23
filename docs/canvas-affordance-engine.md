@@ -22,6 +22,7 @@
 | host | domain | demo canvas item, document, tree, operations |
 | renderer | adapter | engine overlay와 주입된 item layer를 실제 SVG로 배치 |
 | ui | controls | toolbar, palette, editor 같은 화면 조각 |
+| ui | toolbar items | feature toggle과 built-in/custom state를 toolbar item group grammar로 변환 |
 
 ## Folder Structure
 
@@ -54,6 +55,7 @@
 | `src/canvas/app/commands/CanvasAppCustomCommands.ts` | Engine command union을 수정하지 않고 제품별 business action을 toolbar command로 등록하는 descriptor를 제공한다 |
 | `src/canvas/app/commands/CanvasAppCustomCommandContracts.ts` | Custom command descriptor shape와 id registry contract를 검증한다 |
 | `src/canvas/app/commands/CanvasAppCustomCommandExecution.ts` | Custom command toolbar state, availability, run 호출과 실패 containment를 소유한다 |
+| `src/canvas/ui/toolbar/CanvasToolbarItems.ts` | Feature toggle, availability, built-in/custom tool, built-in/custom command 상태를 toolbar item group grammar로 변환한다 |
 | `src/canvas/app/inspector/CanvasAppInspectorPanels.ts` | 기본 bounds inspector를 수정하지 않고 제품별 선택 항목 패널을 등록하는 descriptor를 제공한다 |
 | `src/canvas/app/inspector/CanvasAppInspectorPanelContracts.ts` | Inspector panel descriptor shape와 id registry contract를 검증한다 |
 | `src/canvas/app/modules/CanvasAppCustomItemModules.ts` | 제품별 item kind에 필요한 creation tool, renderer, validator, inspector, command를 한 Module로 조립하고 registry/envelope를 내부에서 만든다 |
@@ -161,6 +163,7 @@ type CanvasAffordanceConfig = {
 - App Shell은 workspace 저장, initial item seed, read model 생성, id seed 계산을 직접 import하지 않는다. Canvas Workspace Model을 통해 사용한다.
 - Standard command hook은 toolbar/keyboard용 callback wiring을 맡고, Engine command 호출과 document commit/selection/editing effect routing은 Canvas Standard Command Execution이 소유한다.
 - Clipboard command hook은 paste index와 callback wiring을 맡고, copy/cut/paste/duplicate 실행과 Host clipboard/document effect routing은 Canvas Clipboard Command Execution이 소유한다.
+- Canvas Toolbar는 item/button 렌더링과 click dispatch를 맡고, feature toggle 기반 toolbar 항목 grammar는 Canvas Toolbar Items가 소유한다.
 - Keyboard shortcut router는 event preventDefault와 handler 실행을 맡고, shortcut grammar와 built-in/custom precedence는 Canvas Keyboard Shortcut Intent가 소유한다.
 - Pointer down hook은 DOM pointer capture/event routing과 시작 결과 적용을 맡고, canvas/item/resize/text edit 시작 규칙은 named pointer interaction start Module들이 소유한다.
 - App workflow는 `CANVAS_ITEM_ENGINE_ADAPTERS`를 통해 concrete item adapter를 주입한다.

@@ -1,11 +1,16 @@
 import {
+  Fragment,
+  type ReactNode,
+} from 'react'
+import {
   CANVAS_TOOL_AFFORDANCES,
   type CanvasAffordanceConfig,
   type CanvasAlignMode,
+  type CanvasCommandId,
   type CanvasDistributeMode,
 } from '../../engine'
 import type {
-  CanvasCustomToolId,
+  CanvasBuiltinTool,
   Tool,
 } from '../../entities'
 import {
@@ -40,21 +45,13 @@ import {
   ToolbarDivider,
   ToolButton,
 } from './CanvasToolbarButtons'
-
-type CanvasToolbarCustomCommand = {
-  ariaLabel: string
-  disabled: boolean
-  id: string
-  label: string
-  title: string
-}
-
-type CanvasToolbarCustomTool = {
-  ariaLabel: string
-  id: CanvasCustomToolId
-  label: string
-  title: string
-}
+import {
+  getCanvasToolbarGroups,
+  type CanvasToolbarCommandAction,
+  type CanvasToolbarCustomCommand,
+  type CanvasToolbarCustomTool,
+  type CanvasToolbarItem,
+} from './CanvasToolbarItems'
 
 type CanvasToolbarProps = {
   canAlign: boolean
@@ -84,289 +81,153 @@ type CanvasToolbarProps = {
   onUnlockAll: () => void
 }
 
-export function CanvasToolbar({
-  canAlign,
-  canDelete,
-  canDistribute,
-  canDuplicate,
-  canGroup,
-  canLock,
-  canRedo,
-  canUndo,
-  canUngroup,
-  config,
-  customCommands,
-  customTools,
-  tool,
-  onAlign,
-  onDelete,
-  onDistribute,
-  onDuplicate,
-  onCustomCommand,
-  onGroup,
-  onLock,
-  onRedo,
-  onToolChange,
-  onUndo,
-  onUngroup,
-  onUnlockAll,
-}: CanvasToolbarProps) {
-  const hasHistoryCommands = config.commands.undo || config.commands.redo
-  const hasSelectionCommands =
-    config.commands.duplicate || config.commands.delete
-  const hasGroupingCommands = config.commands.group || config.commands.ungroup
-  const hasLockCommands = config.commands.lockSelection || config.commands.unlockAll
-  const hasAlignmentCommands =
-    config.commands.alignLeft ||
-    config.commands.alignCenter ||
-    config.commands.alignRight ||
-    config.commands.alignTop ||
-    config.commands.alignMiddle ||
-    config.commands.alignBottom ||
-    config.commands.distributeHorizontal ||
-    config.commands.distributeVertical
+const CANVAS_TOOLBAR_TOOL_ICONS = {
+  arrow: ArrowIcon,
+  highlight: HighlighterIcon,
+  marker: MarkerIcon,
+  pan: PanIcon,
+  rect: RectIcon,
+  select: SelectIcon,
+  text: TextIcon,
+} satisfies Record<CanvasBuiltinTool, () => ReactNode>
+
+const CANVAS_TOOLBAR_COMMAND_ICONS: Partial<
+  Record<CanvasCommandId, () => ReactNode>
+> = {
+  alignBottom: AlignBottomIcon,
+  alignCenter: AlignCenterIcon,
+  alignLeft: AlignLeftIcon,
+  alignMiddle: AlignMiddleIcon,
+  alignRight: AlignRightIcon,
+  alignTop: AlignTopIcon,
+  delete: DeleteIcon,
+  duplicate: DuplicateIcon,
+  distributeHorizontal: DistributeHorizontalIcon,
+  distributeVertical: DistributeVerticalIcon,
+  group: GroupIcon,
+  lockSelection: LockIcon,
+  redo: RedoIcon,
+  undo: UndoIcon,
+  ungroup: UngroupIcon,
+  unlockAll: UnlockIcon,
+}
+
+export function CanvasToolbar(props: CanvasToolbarProps) {
+  const groups = getCanvasToolbarGroups(props)
 
   return (
     <div className="toolbar" role="toolbar" aria-label="Tools">
-      {config.tools.select ? (
-        <ToolButton
-          active={tool === 'select'}
-          affordance={CANVAS_TOOL_AFFORDANCES.select}
-          onClick={() => onToolChange('select')}
-        >
-          <SelectIcon />
-        </ToolButton>
-      ) : null}
-      {config.tools.pan ? (
-        <ToolButton
-          active={tool === 'pan'}
-          affordance={CANVAS_TOOL_AFFORDANCES.pan}
-          onClick={() => onToolChange('pan')}
-        >
-          <PanIcon />
-        </ToolButton>
-      ) : null}
-      {config.tools.rect ? (
-        <ToolButton
-          active={tool === 'rect'}
-          affordance={CANVAS_TOOL_AFFORDANCES.rect}
-          onClick={() => onToolChange('rect')}
-        >
-          <RectIcon />
-        </ToolButton>
-      ) : null}
-      {config.tools.text ? (
-        <ToolButton
-          active={tool === 'text'}
-          affordance={CANVAS_TOOL_AFFORDANCES.text}
-          onClick={() => onToolChange('text')}
-        >
-          <TextIcon />
-        </ToolButton>
-      ) : null}
-      {config.tools.marker ? (
-        <ToolButton
-          active={tool === 'marker'}
-          affordance={CANVAS_TOOL_AFFORDANCES.marker}
-          onClick={() => onToolChange('marker')}
-        >
-          <MarkerIcon />
-        </ToolButton>
-      ) : null}
-      {config.tools.highlight ? (
-        <ToolButton
-          active={tool === 'highlight'}
-          affordance={CANVAS_TOOL_AFFORDANCES.highlight}
-          onClick={() => onToolChange('highlight')}
-        >
-          <HighlighterIcon />
-        </ToolButton>
-      ) : null}
-      {config.tools.arrow ? (
-        <ToolButton
-          active={tool === 'arrow'}
-          affordance={CANVAS_TOOL_AFFORDANCES.arrow}
-          onClick={() => onToolChange('arrow')}
-        >
-          <ArrowIcon />
-        </ToolButton>
-      ) : null}
-      {customTools.map((customTool) => (
-        <CustomToolButton
-          key={customTool.id}
-          active={tool === customTool.id}
-          ariaLabel={customTool.ariaLabel}
-          label={customTool.label}
-          title={customTool.title}
-          onClick={() => onToolChange(customTool.id)}
-        />
-      ))}
-
-      {hasHistoryCommands ? <ToolbarDivider /> : null}
-      {config.commands.undo ? (
-        <CommandButton
-          command="undo"
-          disabled={!canUndo}
-          onClick={() => onUndo()}
-        >
-          <UndoIcon />
-        </CommandButton>
-      ) : null}
-      {config.commands.redo ? (
-        <CommandButton
-          command="redo"
-          disabled={!canRedo}
-          onClick={() => onRedo()}
-        >
-          <RedoIcon />
-        </CommandButton>
-      ) : null}
-
-      {hasSelectionCommands ? <ToolbarDivider /> : null}
-      {config.commands.duplicate ? (
-        <CommandButton
-          command="duplicate"
-          disabled={!canDuplicate}
-          onClick={() => onDuplicate()}
-        >
-          <DuplicateIcon />
-        </CommandButton>
-      ) : null}
-      {config.commands.delete ? (
-        <CommandButton
-          command="delete"
-          disabled={!canDelete}
-          onClick={() => onDelete()}
-        >
-          <DeleteIcon />
-        </CommandButton>
-      ) : null}
-
-      {hasGroupingCommands ? <ToolbarDivider /> : null}
-      {config.commands.group ? (
-        <CommandButton
-          command="group"
-          disabled={!canGroup}
-          onClick={() => onGroup()}
-        >
-          <GroupIcon />
-        </CommandButton>
-      ) : null}
-      {config.commands.ungroup ? (
-        <CommandButton
-          command="ungroup"
-          disabled={!canUngroup}
-          onClick={() => onUngroup()}
-        >
-          <UngroupIcon />
-        </CommandButton>
-      ) : null}
-
-      {hasAlignmentCommands ? <ToolbarDivider /> : null}
-      {config.commands.alignLeft ? (
-        <CommandButton
-          command="alignLeft"
-          disabled={!canAlign}
-          onClick={() => onAlign('alignLeft')}
-        >
-          <AlignLeftIcon />
-        </CommandButton>
-      ) : null}
-      {config.commands.alignCenter ? (
-        <CommandButton
-          command="alignCenter"
-          disabled={!canAlign}
-          onClick={() => onAlign('alignCenter')}
-        >
-          <AlignCenterIcon />
-        </CommandButton>
-      ) : null}
-      {config.commands.alignRight ? (
-        <CommandButton
-          command="alignRight"
-          disabled={!canAlign}
-          onClick={() => onAlign('alignRight')}
-        >
-          <AlignRightIcon />
-        </CommandButton>
-      ) : null}
-      {config.commands.alignTop ? (
-        <CommandButton
-          command="alignTop"
-          disabled={!canAlign}
-          onClick={() => onAlign('alignTop')}
-        >
-          <AlignTopIcon />
-        </CommandButton>
-      ) : null}
-      {config.commands.alignMiddle ? (
-        <CommandButton
-          command="alignMiddle"
-          disabled={!canAlign}
-          onClick={() => onAlign('alignMiddle')}
-        >
-          <AlignMiddleIcon />
-        </CommandButton>
-      ) : null}
-      {config.commands.alignBottom ? (
-        <CommandButton
-          command="alignBottom"
-          disabled={!canAlign}
-          onClick={() => onAlign('alignBottom')}
-        >
-          <AlignBottomIcon />
-        </CommandButton>
-      ) : null}
-      {config.commands.distributeHorizontal ? (
-        <CommandButton
-          command="distributeHorizontal"
-          disabled={!canDistribute}
-          onClick={() => onDistribute('distributeHorizontal')}
-        >
-          <DistributeHorizontalIcon />
-        </CommandButton>
-      ) : null}
-      {config.commands.distributeVertical ? (
-        <CommandButton
-          command="distributeVertical"
-          disabled={!canDistribute}
-          onClick={() => onDistribute('distributeVertical')}
-        >
-          <DistributeVerticalIcon />
-        </CommandButton>
-      ) : null}
-
-      {hasLockCommands ? <ToolbarDivider /> : null}
-      {config.commands.lockSelection ? (
-        <CommandButton
-          command="lockSelection"
-          disabled={!canLock}
-          onClick={() => onLock()}
-        >
-          <LockIcon />
-        </CommandButton>
-      ) : null}
-      {config.commands.unlockAll ? (
-        <CommandButton
-          command="unlockAll"
-          disabled={false}
-          onClick={() => onUnlockAll()}
-        >
-          <UnlockIcon />
-        </CommandButton>
-      ) : null}
-
-      {customCommands.length > 0 ? <ToolbarDivider /> : null}
-      {customCommands.map((command) => (
-        <CustomCommandButton
-          key={command.id}
-          ariaLabel={command.ariaLabel}
-          disabled={command.disabled}
-          label={command.label}
-          title={command.title}
-          onClick={() => onCustomCommand(command.id)}
-        />
+      {groups.map((group, index) => (
+        <Fragment key={group.id}>
+          {index > 0 ? <ToolbarDivider /> : null}
+          {group.items.map((item) => renderCanvasToolbarItem(item, props))}
+        </Fragment>
       ))}
     </div>
   )
+}
+
+function renderCanvasToolbarItem(
+  item: CanvasToolbarItem,
+  props: CanvasToolbarProps,
+) {
+  if (item.kind === 'builtin-tool') {
+    const Icon = CANVAS_TOOLBAR_TOOL_ICONS[item.tool]
+
+    return (
+      <ToolButton
+        key={item.tool}
+        active={item.active}
+        affordance={CANVAS_TOOL_AFFORDANCES[item.tool]}
+        onClick={() => props.onToolChange(item.tool)}
+      >
+        <Icon />
+      </ToolButton>
+    )
+  }
+
+  if (item.kind === 'custom-tool') {
+    return (
+      <CustomToolButton
+        key={item.tool}
+        active={item.active}
+        ariaLabel={item.ariaLabel}
+        label={item.label}
+        title={item.title}
+        onClick={() => props.onToolChange(item.tool)}
+      />
+    )
+  }
+
+  if (item.kind === 'custom-command') {
+    return (
+      <CustomCommandButton
+        key={item.id}
+        ariaLabel={item.ariaLabel}
+        disabled={item.disabled}
+        label={item.label}
+        title={item.title}
+        onClick={() => props.onCustomCommand(item.id)}
+      />
+    )
+  }
+
+  const Icon = CANVAS_TOOLBAR_COMMAND_ICONS[item.command]
+
+  return (
+    <CommandButton
+      key={item.command}
+      command={item.command}
+      disabled={item.disabled}
+      onClick={() => runCanvasToolbarCommandAction(item.action, props)}
+    >
+      {Icon ? <Icon /> : null}
+    </CommandButton>
+  )
+}
+
+function runCanvasToolbarCommandAction(
+  action: CanvasToolbarCommandAction,
+  props: CanvasToolbarProps,
+) {
+  switch (action.kind) {
+    case 'align':
+      props.onAlign(action.mode)
+      return
+    case 'delete':
+      props.onDelete()
+      return
+    case 'distribute':
+      props.onDistribute(action.mode)
+      return
+    case 'duplicate':
+      props.onDuplicate()
+      return
+    case 'group':
+      props.onGroup()
+      return
+    case 'lock':
+      props.onLock()
+      return
+    case 'redo':
+      props.onRedo()
+      return
+    case 'undo':
+      props.onUndo()
+      return
+    case 'ungroup':
+      props.onUngroup()
+      return
+    case 'unlock-all':
+      props.onUnlockAll()
+      return
+  }
+
+  return assertUnhandledCanvasToolbarCommandAction(action)
+}
+
+function assertUnhandledCanvasToolbarCommandAction(
+  action: never,
+): never {
+  throw new Error(`Unhandled canvas toolbar command action: ${String(action)}`)
 }

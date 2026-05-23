@@ -241,6 +241,34 @@ describe('Canvas module boundaries', () => {
     expect(violations).toEqual([])
   })
 
+  it('keeps toolbar item grammar behind a named module', () => {
+    const toolbarFile = getSourceFile(
+      'src/canvas/ui/toolbar/CanvasToolbar.tsx',
+    )
+    const itemsFile = getSourceFile(
+      'src/canvas/ui/toolbar/CanvasToolbarItems.ts',
+    )
+
+    expect(toolbarFile.source).toContain("from './CanvasToolbarItems'")
+    expect(toolbarFile.source).not.toContain('config.commands.')
+    expect(toolbarFile.source).not.toContain('config.tools.')
+    expect(toolbarFile.source).not.toContain('customCommands.map')
+    expect(toolbarFile.source).not.toContain('customTools.map')
+    expect(toolbarFile.source).not.toContain('CANVAS_TOOL_AFFORDANCES.select')
+    expect(itemsFile.source).toContain(
+      'export function getCanvasToolbarGroups',
+    )
+    expect(itemsFile.source).toContain(
+      "getCanvasToolbarAlignItem('alignLeft'",
+    )
+    expect(itemsFile.source).toContain(
+      "getCanvasToolbarDistributeItem(\n        'distributeHorizontal'",
+    )
+    expect(itemsFile.source).toContain('config.tools[builtinTool]')
+    expect(itemsFile.source).toContain('customCommands.map')
+    expect(itemsFile.source).toContain('customTools.map')
+  })
+
   it('keeps the app shell independent from concrete renderer stage modules', () => {
     const violations = getImportsFrom('src/canvas/app/shell/')
       .filter((reference) => reference.target.startsWith('src/canvas/renderer'))
