@@ -48,6 +48,22 @@ export type Interaction =
       moved: boolean
     }
   | {
+      kind: 'create-highlight'
+      pointerId: number
+      startScreen: Point
+      startWorld: Point
+      currentWorld: Point
+      moved: boolean
+    }
+  | {
+      kind: 'create-arrow'
+      pointerId: number
+      startScreen: Point
+      startWorld: Point
+      currentWorld: Point
+      moved: boolean
+    }
+  | {
       kind: 'resize'
       pointerId: number
       handle: ResizeHandle

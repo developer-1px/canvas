@@ -43,6 +43,22 @@ function isCanvasItem(value: unknown): value is CanvasItem {
     return typeof value.text === 'string'
   }
 
+  if (value.type === 'highlight') {
+    return (
+      typeof value.fill === 'string' &&
+      isFiniteNumber(value.opacity)
+    )
+  }
+
+  if (value.type === 'arrow') {
+    return (
+      isPoint(value.start) &&
+      isPoint(value.end) &&
+      typeof value.stroke === 'string' &&
+      isFiniteNumber(value.strokeWidth)
+    )
+  }
+
   if (value.type === 'group') {
     return Array.isArray(value.children) && value.children.every(isCanvasItem)
   }
@@ -69,6 +85,14 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function isFiniteNumber(value: unknown) {
   return typeof value === 'number' && Number.isFinite(value)
+}
+
+function isPoint(value: unknown) {
+  return (
+    isRecord(value) &&
+    isFiniteNumber(value.x) &&
+    isFiniteNumber(value.y)
+  )
 }
 
 function isStringArray(value: unknown) {

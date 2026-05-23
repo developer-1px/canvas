@@ -1,6 +1,7 @@
 import type {
   Bounds,
   CanvasItemId,
+  Point,
 } from '../core'
 
 export type CanvasItemBase = Bounds & {
@@ -18,6 +19,20 @@ export type RectItem = CanvasItemBase & {
 export type TextItem = CanvasItemBase & {
   type: 'text'
   text: string
+}
+
+export type HighlightItem = CanvasItemBase & {
+  type: 'highlight'
+  fill: string
+  opacity: number
+}
+
+export type ArrowItem = CanvasItemBase & {
+  type: 'arrow'
+  end: Point
+  start: Point
+  stroke: string
+  strokeWidth: number
 }
 
 export type GroupItem = CanvasItemBase & {
@@ -42,6 +57,8 @@ export type CanvasComponentItem = CanvasItemBase & {
 export type CanvasItem =
   | RectItem
   | TextItem
+  | HighlightItem
+  | ArrowItem
   | GroupItem
   | CanvasComponentItem
 

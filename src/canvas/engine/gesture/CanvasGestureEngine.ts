@@ -10,6 +10,8 @@ export type CanvasPointerInput = {
 }
 
 export type CanvasPointerGesture =
+  | 'create-arrow'
+  | 'create-highlight'
   | 'create-rect'
   | 'create-text'
   | 'marquee'
@@ -46,6 +48,14 @@ export function getCanvasPointerGesture({
 
   if (tool === 'rect' && config.gestures.createRect) {
     return 'create-rect'
+  }
+
+  if (tool === 'highlight' && config.gestures.createHighlight) {
+    return 'create-highlight'
+  }
+
+  if (tool === 'arrow' && config.gestures.createArrow) {
+    return 'create-arrow'
   }
 
   if (tool === 'text' && config.gestures.createText) {

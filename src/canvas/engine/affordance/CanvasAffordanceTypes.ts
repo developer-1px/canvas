@@ -33,6 +33,8 @@ export type CanvasCommandId =
 
 export type CanvasGestureId =
   | 'altDragDuplicate'
+  | 'createArrow'
+  | 'createHighlight'
   | 'createRect'
   | 'createText'
   | 'marquee'
@@ -48,6 +50,7 @@ export type CanvasGestureId =
 
 export type CanvasOverlayId =
   | 'alignmentGuides'
+  | 'draftArrow'
   | 'draftRect'
   | 'grid'
   | 'itemOutline'
@@ -60,6 +63,7 @@ export type CanvasOverlayId =
   | 'zoomControls'
 
 export type CanvasShortcutId =
+  | 'arrowTool'
   | 'bringForward'
   | 'bringToFront'
   | 'copy'
@@ -70,6 +74,7 @@ export type CanvasShortcutId =
   | 'fitAll'
   | 'fitSelection'
   | 'group'
+  | 'highlightTool'
   | 'lockSelection'
   | 'nudge'
   | 'panTool'

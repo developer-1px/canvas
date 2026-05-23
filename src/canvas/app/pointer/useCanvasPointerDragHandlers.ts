@@ -19,6 +19,8 @@ import {
 } from '../../core'
 import {
   EMPTY_CANVAS_SNAP_GUIDES,
+  createCanvasArrow,
+  createCanvasHighlight,
   createCanvasRect,
   getCanvasMarqueeSelection,
   getCanvasMoveSnap,
@@ -27,6 +29,7 @@ import {
   snapCanvasPointToGrid,
   type CanvasAffordanceConfig,
   type CanvasCreationAdapter,
+  type CanvasDraftArrowOverlay,
   type CanvasSceneAdapter,
   type CanvasSnapGuides,
   type CanvasTransformAdapter,
@@ -47,6 +50,7 @@ type UseCanvasPointerDragHandlersArgs = {
   interactionRef: MutableRefObject<Interaction>
   scene: CanvasSceneAdapter
   selection: string[]
+  setDraftArrow: Dispatch<SetStateAction<CanvasDraftArrowOverlay | null>>
   setDraftRect: Dispatch<SetStateAction<Bounds | null>>
   setEditing: Dispatch<SetStateAction<EditingText | null>>
   setGesture: Dispatch<SetStateAction<Interaction['kind']>>
@@ -70,6 +74,7 @@ export function useCanvasPointerDragHandlers({
   interactionRef,
   scene,
   selection,
+  setDraftArrow,
   setDraftRect,
   setEditing,
   setGesture,
@@ -256,6 +261,56 @@ export function useCanvasPointerDragHandlers({
         moved,
       }
       setDraftRect(bounds)
+      return
+    }
+
+    if (interaction.kind === 'create-highlight') {
+      if (!config.gestures.createHighlight) {
+        return
+      }
+
+      const moved =
+        interaction.moved ||
+        pointDistance(currentScreen, interaction.startScreen) > DRAG_THRESHOLD
+      const snappedCurrentWorld = snapCanvasPointToGrid({
+        config,
+        point: currentWorld,
+      })
+      const bounds = normalizeBounds(interaction.startWorld, snappedCurrentWorld)
+
+      setSnapGuides(EMPTY_CANVAS_SNAP_GUIDES)
+      interactionRef.current = {
+        ...interaction,
+        currentWorld: snappedCurrentWorld,
+        moved,
+      }
+      setDraftRect(bounds)
+      return
+    }
+
+    if (interaction.kind === 'create-arrow') {
+      if (!config.gestures.createArrow) {
+        return
+      }
+
+      const moved =
+        interaction.moved ||
+        pointDistance(currentScreen, interaction.startScreen) > DRAG_THRESHOLD
+      const snappedCurrentWorld = snapCanvasPointToGrid({
+        config,
+        point: currentWorld,
+      })
+
+      setSnapGuides(EMPTY_CANVAS_SNAP_GUIDES)
+      interactionRef.current = {
+        ...interaction,
+        currentWorld: snappedCurrentWorld,
+        moved,
+      }
+      setDraftArrow({
+        end: snappedCurrentWorld,
+        start: interaction.startWorld,
+      })
     }
   }
 
@@ -271,6 +326,36 @@ export function useCanvasPointerDragHandlers({
 
     if (interaction.kind === 'create-rect') {
       const nextItem = createCanvasRect({
+        adapter: creationAdapter,
+        createId,
+        currentWorld: interaction.currentWorld,
+        startWorld: interaction.startWorld,
+      })
+
+      commitItemsChange({ type: 'add', items: [nextItem] }, {
+        before: selection,
+        after: [nextItem.id],
+      })
+      setTool('select')
+    }
+
+    if (interaction.kind === 'create-highlight') {
+      const nextItem = createCanvasHighlight({
+        adapter: creationAdapter,
+        createId,
+        currentWorld: interaction.currentWorld,
+        startWorld: interaction.startWorld,
+      })
+
+      commitItemsChange({ type: 'add', items: [nextItem] }, {
+        before: selection,
+        after: [nextItem.id],
+      })
+      setTool('select')
+    }
+
+    if (interaction.kind === 'create-arrow') {
+      const nextItem = createCanvasArrow({
         adapter: creationAdapter,
         createId,
         currentWorld: interaction.currentWorld,
@@ -330,6 +415,7 @@ export function useCanvasPointerDragHandlers({
     interactionRef.current = { kind: 'none' }
     setGesture('none')
     setMarquee(null)
+    setDraftArrow(null)
     setDraftRect(null)
     setSnapGuides(EMPTY_CANVAS_SNAP_GUIDES)
   }
@@ -347,6 +433,7 @@ export function useCanvasPointerDragHandlers({
     interactionRef.current = { kind: 'none' }
     setGesture('none')
     setMarquee(null)
+    setDraftArrow(null)
     setDraftRect(null)
     setSnapGuides(EMPTY_CANVAS_SNAP_GUIDES)
   }

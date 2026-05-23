@@ -32,6 +32,7 @@ import {
   snapCanvasPointToGrid,
   type CanvasAffordanceConfig,
   type CanvasCreationAdapter,
+  type CanvasDraftArrowOverlay,
   type CanvasSceneAdapter,
 } from '../../engine'
 import type {
@@ -53,6 +54,7 @@ type UseCanvasPointerDownHandlersArgs = {
   scene: CanvasSceneAdapter
   selectedBounds: Bounds | null
   selection: string[]
+  setDraftArrow: Dispatch<SetStateAction<CanvasDraftArrowOverlay | null>>
   setDraftRect: Dispatch<SetStateAction<Bounds | null>>
   setEditing: Dispatch<SetStateAction<EditingText | null>>
   setGesture: Dispatch<SetStateAction<Interaction['kind']>>
@@ -78,6 +80,7 @@ export function useCanvasPointerDownHandlers({
   scene,
   selectedBounds,
   selection,
+  setDraftArrow,
   setDraftRect,
   setEditing,
   setGesture,
@@ -167,6 +170,47 @@ export function useCanvasPointerDownHandlers({
       }
       setDraftRect(normalizeBounds(snappedStartWorld, snappedStartWorld))
       setGesture('create-rect')
+      return
+    }
+
+    if (pointerGesture === 'create-highlight') {
+      const snappedStartWorld = snapCanvasPointToGrid({
+        config,
+        point: startWorld,
+      })
+
+      interactionRef.current = {
+        kind: 'create-highlight',
+        pointerId: event.pointerId,
+        startScreen,
+        startWorld: snappedStartWorld,
+        currentWorld: snappedStartWorld,
+        moved: false,
+      }
+      setDraftRect(normalizeBounds(snappedStartWorld, snappedStartWorld))
+      setGesture('create-highlight')
+      return
+    }
+
+    if (pointerGesture === 'create-arrow') {
+      const snappedStartWorld = snapCanvasPointToGrid({
+        config,
+        point: startWorld,
+      })
+
+      interactionRef.current = {
+        kind: 'create-arrow',
+        pointerId: event.pointerId,
+        startScreen,
+        startWorld: snappedStartWorld,
+        currentWorld: snappedStartWorld,
+        moved: false,
+      }
+      setDraftArrow({
+        end: snappedStartWorld,
+        start: snappedStartWorld,
+      })
+      setGesture('create-arrow')
       return
     }
 

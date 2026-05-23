@@ -38,8 +38,12 @@ export {
   type DuplicateCanvasCommandResult,
 } from './command/CanvasCommandEngine'
 export {
+  createCanvasArrow,
+  createCanvasHighlight,
   createCanvasRect,
   createCanvasText,
+  getCanvasCreatedArrowEnd,
+  getCanvasCreatedHighlightBounds,
   getCanvasCreatedRectBounds,
   type CanvasCreatedText,
   type CanvasCreationAdapter,
@@ -55,6 +59,7 @@ export {
 } from './gesture/CanvasGestureEngine'
 export {
   createCanvasOverlayState,
+  type CanvasDraftArrowOverlay,
   type CanvasOverlayState,
   type CanvasResizeHandleOverlay,
 } from './overlay/CanvasOverlayEngine'

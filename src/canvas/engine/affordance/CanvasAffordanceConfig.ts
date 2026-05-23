@@ -46,6 +46,8 @@ export function createCanvasAffordanceConfig(
     gestures: mergeFeatureGroup(
       {
         altDragDuplicate: true,
+        createArrow: true,
+        createHighlight: true,
         createRect: true,
         createText: true,
         marquee: true,
@@ -64,6 +66,7 @@ export function createCanvasAffordanceConfig(
     overlays: mergeFeatureGroup(
       {
         alignmentGuides: true,
+        draftArrow: true,
         draftRect: true,
         grid: true,
         itemOutline: true,
@@ -79,6 +82,7 @@ export function createCanvasAffordanceConfig(
     ),
     shortcuts: mergeFeatureGroup(
       {
+        arrowTool: true,
         copy: true,
         bringForward: true,
         bringToFront: true,
@@ -89,6 +93,7 @@ export function createCanvasAffordanceConfig(
         fitAll: true,
         fitSelection: true,
         group: true,
+        highlightTool: true,
         lockSelection: true,
         nudge: true,
         panTool: true,
@@ -112,6 +117,8 @@ export function createCanvasAffordanceConfig(
     ),
     tools: mergeFeatureGroup(
       {
+        arrow: true,
+        highlight: true,
         pan: true,
         rect: true,
         select: true,

@@ -66,6 +66,23 @@ function cloneCanvasItemWithNewId(
     return syncGroupBounds(group)
   }
 
+  if (item.type === 'arrow') {
+    return {
+      ...item,
+      id: createId(item.type),
+      x: item.x + offset.x,
+      y: item.y + offset.y,
+      start: {
+        x: item.start.x + offset.x,
+        y: item.start.y + offset.y,
+      },
+      end: {
+        x: item.end.x + offset.x,
+        y: item.end.y + offset.y,
+      },
+    }
+  }
+
   return {
     ...item,
     id: createId(item.type),

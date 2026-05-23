@@ -16,6 +16,8 @@ export type {
   CanvasItemBase,
   EditingText,
   GroupItem,
+  HighlightItem,
+  ArrowItem,
   RectItem,
   TextItem,
 } from './CanvasItemEntities'

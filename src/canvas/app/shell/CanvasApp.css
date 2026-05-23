@@ -21,7 +21,9 @@
 }
 
 .canvas-stage[data-mode='rect'],
-.canvas-stage[data-mode='text'] {
+.canvas-stage[data-mode='text'],
+.canvas-stage[data-mode='highlight'],
+.canvas-stage[data-mode='arrow'] {
   cursor: crosshair;
 }
 
@@ -63,6 +65,32 @@
 
 .rect-item {
   stroke-width: 1.25;
+}
+
+.highlight-item {
+  mix-blend-mode: multiply;
+}
+
+.arrow-item,
+.draft-arrow {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.arrow-hit {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 18;
+  pointer-events: stroke;
+}
+
+.arrow-head {
+  fill: #334155;
+}
+
+.draft-arrow-head {
+  fill: #2563eb;
 }
 
 .component-card,
@@ -207,6 +235,12 @@
   fill: rgba(217, 119, 6, 0.14);
   stroke: #d97706;
   stroke-width: 1.5;
+  pointer-events: none;
+}
+
+.draft-arrow {
+  stroke: #2563eb;
+  stroke-width: 2.5;
   pointer-events: none;
 }
 

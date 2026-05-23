@@ -3,7 +3,10 @@ import type {
   MutableRefObject,
   SetStateAction,
 } from 'react'
-import type { CanvasAffordanceConfig } from '../../engine'
+import type {
+  CanvasAffordanceConfig,
+  CanvasDraftArrowOverlay,
+} from '../../engine'
 import type {
   Bounds,
   EditingText,
@@ -34,6 +37,7 @@ export type CanvasKeyboardShortcutHandlers = {
   selectAll: () => void
   selection: string[]
   setDraftRect: Dispatch<SetStateAction<Bounds | null>>
+  setDraftArrow: Dispatch<SetStateAction<CanvasDraftArrowOverlay | null>>
   setEditing: Dispatch<SetStateAction<EditingText | null>>
   setGesture: Dispatch<SetStateAction<Interaction['kind']>>
   setMarquee: Dispatch<SetStateAction<Bounds | null>>
@@ -81,6 +85,7 @@ export function handleCanvasKeyboardShortcut(
     selectAll,
     selection,
     setDraftRect,
+    setDraftArrow,
     setEditing,
     setGesture,
     setMarquee,
@@ -106,6 +111,7 @@ export function handleCanvasKeyboardShortcut(
     interactionRef.current = { kind: 'none' }
     setGesture('none')
     setMarquee(null)
+    setDraftArrow(null)
     setDraftRect(null)
     setEditing(null)
     commitSelection([])
@@ -309,6 +315,14 @@ export function handleCanvasKeyboardShortcut(
     setTool('select')
   } else if (config.shortcuts.panTool && config.tools.pan && key === 'h') {
     setTool('pan')
+  } else if (
+    config.shortcuts.highlightTool &&
+    config.tools.highlight &&
+    key === 'k'
+  ) {
+    setTool('highlight')
+  } else if (config.shortcuts.arrowTool && config.tools.arrow && key === 'a') {
+    setTool('arrow')
   } else if (config.shortcuts.rectTool && config.tools.rect && key === 'r') {
     setTool('rect')
   } else if (config.shortcuts.textTool && config.tools.text && key === 't') {

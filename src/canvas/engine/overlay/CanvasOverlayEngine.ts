@@ -18,8 +18,14 @@ export type CanvasResizeHandleOverlay = {
   size: number
 }
 
+export type CanvasDraftArrowOverlay = {
+  end: Point
+  start: Point
+}
+
 export type CanvasOverlayState = {
   alignmentGuides: CanvasSnapGuides['alignmentGuides']
+  draftArrow: CanvasDraftArrowOverlay | null
   draftRect: Bounds | null
   grid: boolean
   itemOutlineIds: Set<string>
@@ -31,6 +37,7 @@ export type CanvasOverlayState = {
 
 export function createCanvasOverlayState({
   config,
+  draftArrow,
   draftRect,
   marquee,
   scene,
@@ -39,6 +46,7 @@ export function createCanvasOverlayState({
   viewport,
 }: {
   config: CanvasAffordanceConfig
+  draftArrow: CanvasDraftArrowOverlay | null
   draftRect: Bounds | null
   marquee: Bounds | null
   scene: CanvasSceneAdapter
@@ -52,6 +60,7 @@ export function createCanvasOverlayState({
     alignmentGuides: config.overlays.alignmentGuides
       ? snapGuides.alignmentGuides
       : [],
+    draftArrow: config.overlays.draftArrow ? draftArrow : null,
     draftRect: config.overlays.draftRect ? draftRect : null,
     grid: config.overlays.grid,
     itemOutlineIds: config.overlays.itemOutline

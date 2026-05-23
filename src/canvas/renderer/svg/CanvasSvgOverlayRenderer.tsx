@@ -16,6 +16,28 @@ export function CanvasSvgOverlayDefs() {
       <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
         <path d="M 40 0 L 0 0 0 40" className="grid-line" />
       </pattern>
+      <marker
+        id="canvas-arrow-head"
+        markerHeight="8"
+        markerWidth="8"
+        orient="auto"
+        refX="7"
+        refY="4"
+        viewBox="0 0 8 8"
+      >
+        <path d="M 0 0 L 8 4 L 0 8 z" className="arrow-head" />
+      </marker>
+      <marker
+        id="canvas-draft-arrow-head"
+        markerHeight="8"
+        markerWidth="8"
+        orient="auto"
+        refX="7"
+        refY="4"
+        viewBox="0 0 8 8"
+      >
+        <path d="M 0 0 L 8 4 L 0 8 z" className="draft-arrow-head" />
+      </marker>
     </defs>
   )
 }
@@ -49,6 +71,18 @@ export function CanvasSvgInteractionOverlays({
           y={overlays.draftRect.y}
           width={overlays.draftRect.w}
           height={overlays.draftRect.h}
+          vectorEffect="non-scaling-stroke"
+        />
+      ) : null}
+
+      {overlays.draftArrow ? (
+        <line
+          className="draft-arrow"
+          x1={overlays.draftArrow.start.x}
+          y1={overlays.draftArrow.start.y}
+          x2={overlays.draftArrow.end.x}
+          y2={overlays.draftArrow.end.y}
+          markerEnd="url(#canvas-draft-arrow-head)"
           vectorEffect="non-scaling-stroke"
         />
       ) : null}

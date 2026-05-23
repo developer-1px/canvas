@@ -12,11 +12,13 @@ import {
   AlignMiddleIcon,
   AlignRightIcon,
   AlignTopIcon,
+  ArrowIcon,
   DeleteIcon,
   DistributeHorizontalIcon,
   DistributeVerticalIcon,
   DuplicateIcon,
   GroupIcon,
+  HighlighterIcon,
   LockIcon,
   PanIcon,
   RedoIcon,
@@ -133,6 +135,24 @@ export function CanvasToolbar({
           onClick={() => onToolChange('text')}
         >
           <TextIcon />
+        </ToolButton>
+      ) : null}
+      {config.tools.highlight ? (
+        <ToolButton
+          active={tool === 'highlight'}
+          affordance={CANVAS_TOOL_AFFORDANCES.highlight}
+          onClick={() => onToolChange('highlight')}
+        >
+          <HighlighterIcon />
+        </ToolButton>
+      ) : null}
+      {config.tools.arrow ? (
+        <ToolButton
+          active={tool === 'arrow'}
+          affordance={CANVAS_TOOL_AFFORDANCES.arrow}
+          onClick={() => onToolChange('arrow')}
+        >
+          <ArrowIcon />
         </ToolButton>
       ) : null}
 

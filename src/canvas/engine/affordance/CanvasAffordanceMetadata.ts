@@ -5,6 +5,18 @@ import type {
 import type { CanvasCommandId } from './CanvasAffordanceTypes'
 
 export const CANVAS_TOOL_AFFORDANCES = {
+  arrow: {
+    ariaLabel: 'Arrow tool',
+    shortcut: 'A',
+    statusLabel: 'Arrow',
+    title: 'Arrow (A)',
+  },
+  highlight: {
+    ariaLabel: 'Highlighter tool',
+    shortcut: 'K',
+    statusLabel: 'Highlight',
+    title: 'Highlighter (K)',
+  },
   pan: {
     ariaLabel: 'Pan tool',
     shortcut: 'H',
@@ -86,6 +98,8 @@ export const CANVAS_COMMAND_AFFORDANCES = {
 export const CANVAS_GESTURE_STATUS_LABELS: Partial<
   Record<CanvasInteractionKind, string>
 > = {
+  'create-arrow': 'Drawing',
+  'create-highlight': 'Highlighting',
   'create-rect': 'Drawing',
   marquee: 'Selecting',
   move: 'Moving',

@@ -133,6 +133,72 @@ function renderCanvasItem({
     )
   }
 
+  if (item.type === 'highlight') {
+    return (
+      <g
+        key={item.id}
+        className="canvas-item"
+        data-locked={isLocked || undefined}
+        data-selected={isSelected}
+        data-type={item.type}
+        pointerEvents={isLocked ? 'none' : undefined}
+        onPointerDown={
+          isLocked ? undefined : (event) => onItemPointerDown(event, item.id)
+        }
+      >
+        <rect
+          className="highlight-item"
+          x={item.x}
+          y={item.y}
+          width={item.w}
+          height={item.h}
+          rx="5"
+          fill={item.fill}
+          opacity={item.opacity}
+          vectorEffect="non-scaling-stroke"
+        />
+        {hasOutline ? <CanvasDemoSvgSelectionOutline bounds={bounds} /> : null}
+      </g>
+    )
+  }
+
+  if (item.type === 'arrow') {
+    return (
+      <g
+        key={item.id}
+        className="canvas-item"
+        data-locked={isLocked || undefined}
+        data-selected={isSelected}
+        data-type={item.type}
+        pointerEvents={isLocked ? 'none' : undefined}
+        onPointerDown={
+          isLocked ? undefined : (event) => onItemPointerDown(event, item.id)
+        }
+      >
+        <line
+          className="arrow-hit"
+          x1={item.start.x}
+          y1={item.start.y}
+          x2={item.end.x}
+          y2={item.end.y}
+          vectorEffect="non-scaling-stroke"
+        />
+        <line
+          className="arrow-item"
+          x1={item.start.x}
+          y1={item.start.y}
+          x2={item.end.x}
+          y2={item.end.y}
+          stroke={item.stroke}
+          strokeWidth={item.strokeWidth}
+          markerEnd="url(#canvas-arrow-head)"
+          vectorEffect="non-scaling-stroke"
+        />
+        {hasOutline ? <CanvasDemoSvgSelectionOutline bounds={bounds} /> : null}
+      </g>
+    )
+  }
+
   return (
     <g
       key={item.id}

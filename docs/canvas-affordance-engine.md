@@ -10,6 +10,7 @@
 4. Engine은 intent, gesture, selection, creation result, overlay state, command routing을 소유한다.
 5. Renderer Adapter는 그리기만 한다.
 6. Scene Adapter는 bounds, hit target, parent/group, editable target만 제공한다.
+7. Drawing Item은 Demo Host item이며 Core Contract에 포함하지 않는다.
 
 ## Layer / Concept / Role
 

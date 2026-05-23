@@ -33,6 +33,25 @@ export function TextIcon() {
   )
 }
 
+export function HighlighterIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M5 15.5 13.5 7l3.5 3.5L8.5 19H5v-3.5z" />
+      <path d="M14.5 6 16 4.5a1.8 1.8 0 0 1 2.5 0l1 1a1.8 1.8 0 0 1 0 2.5L18 9.5" />
+      <path d="M4 20h12" />
+    </svg>
+  )
+}
+
+export function ArrowIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M5 19 18 6" />
+      <path d="M11 6h7v7" />
+    </svg>
+  )
+}
+
 export function GroupIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
