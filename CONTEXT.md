@@ -57,10 +57,12 @@
 - Drawing Item: Demo `CanvasItem` 중 marker, highlighter, arrow처럼 캔버스 위에 빠르게 주석을 그리는 항목. `points` 또는 `start/end`가 실제 geometry이고 `x/y/w/h`는 Host가 동기화하는 bounds cache다.
 - Drawing Item Style: built-in marker, highlighter, arrow의 stroke/opacity 기본값. Draft overlay와 Host item creation이 같은 Host-owned 계약을 쓴다.
 - Canvas Pointer Interaction Start: pointer-down 시 tool/gesture/config/custom tool 상태를 active interaction, draft overlay, immediate text creation으로 변환하는 App-owned runtime Module.
-- Canvas Item Pointer Interaction Start: item pointer-down 시 selection, double-click edit, alt-drag duplicate, move interaction 시작 상태를 계산하는 App-owned runtime Module.
+- Canvas Item Pointer Interaction Start: item pointer-down/text double-click 시 selection, edit state, alt-drag duplicate, move interaction 시작 상태를 계산하는 App-owned runtime Module.
+- Canvas Resize Pointer Interaction Start: resize handle pointer-down 시 selected bounds, handle, selection, item snapshot을 resize interaction 시작 상태로 변환하는 App-owned runtime Module.
 - Canvas Pointer Interaction Preview: pointer-move 시 active interaction을 viewport, live item, marquee, selection, draft overlay, snap guide preview로 변환하는 App-owned runtime Module.
 - Canvas Pointer Interaction Lifecycle: pointer-up/cancel 시 active interaction을 문서 변경, selection 변경, edit 진입, cancel rollback으로 확정하거나 되돌리는 App-owned runtime Module.
 - Canvas App Model: App Shell이 렌더링할 control별 view props를 만들고 command, pointer, keyboard, viewport, text editing wiring을 숨기는 workflow Module.
+- Canvas Keyboard Shortcut Intent: keydown 입력, feature toggle, selection, custom creation tool shortcut을 실행 가능한 keyboard intent로 변환하는 App-owned runtime Module.
 - Canvas Interaction Model: tool, gesture, marquee, draft, snap guide, overlay state 생명주기를 App Shell에 숨기는 workflow Module.
 - Canvas Workspace Model: Demo workspace의 저장된 snapshot, document history, viewport, read model, id 생성을 App Shell에 숨기는 workflow Module.
 - Canvas Workflow Contract: App workflow hook들이 공유하는 document commit, selection commit, clipboard 계약. 개별 hook이 `useCanvasDocument` 구현 파일을 직접 알지 않게 한다.
@@ -114,6 +116,8 @@
 - Canvas App Custom Creation Tool이 item 생성을 거부하거나 실패하거나 invalid item을 반환해도 pointer lifecycle을 깨지 않아야 한다.
 - Pointer down hook은 DOM pointer capture와 시작 결과 적용을 맡고, tool/gesture/config/custom tool 기반 interaction 시작 규칙은 Canvas Pointer Interaction Start가 소유한다.
 - Item pointer down hook은 DOM event routing과 시작 결과 적용을 맡고, selection/edit/duplicate/move 시작 규칙은 Canvas Item Pointer Interaction Start가 소유한다.
+- Resize pointer down hook은 DOM event routing과 시작 결과 적용을 맡고, resize handle/selected bounds/config 기반 시작 규칙은 Canvas Resize Pointer Interaction Start가 소유한다.
+- Text double-click hook은 시작 결과 적용을 맡고, text edit 가능 여부/selection/edit state/tool 전환 규칙은 Canvas Item Pointer Interaction Start가 소유한다.
 - Pointer drag hook은 DOM pointer routing과 preview 결과 적용을 맡고, pointer-move live preview 계산은 Canvas Pointer Interaction Preview가, pointer-up/cancel 확정 규칙은 Canvas Pointer Interaction Lifecycle이 소유한다.
 - 제품별 item kind는 내부 `CanvasItem` union에 새 variant를 추가하지 않고 Canvas App Custom Item Module로 등록한다.
 - Canvas App Custom Item Module은 `id`, `presentation`, `renderItem`, `validateItem`을 외부 Interface로 받고, renderer registry와 validator registry는 내부에서 조립한다.
@@ -154,6 +158,7 @@
 - App workflow hook들은 Canvas Item Read Model을 직접 생성하지 않고 Canvas Workspace Model에서 주입받는다.
 - App workflow는 editor/search 상태를 각각의 workflow Module 뒤에 숨긴다.
 - UI controls는 Demo Host를 직접 import하지 않는다.
+- Keyboard shortcut router는 event preventDefault와 handler 실행을 맡고, shortcut grammar와 built-in/custom precedence는 Canvas Keyboard Shortcut Intent가 소유한다.
 - Module seam import 규칙은 Canvas Module Boundary Guardrail로 검증한다.
 - Linked peer dependency는 앱 번들에 한 번만 들어가야 하며, Vite config에서 `react`, `react-dom`, `zod`를 dedupe한다.
 - Production build는 React runtime을 별도 chunk로 분리해 app chunk가 경고 임계값을 넘지 않게 유지한다.

@@ -6,7 +6,10 @@ import {
 } from '../../engine'
 import type { CanvasItemReadModel } from '../../host'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
-import { startCanvasItemPointerInteraction } from './CanvasItemPointerInteractionStart'
+import {
+  startCanvasItemPointerInteraction,
+  startCanvasTextEditInteraction,
+} from './CanvasItemPointerInteractionStart'
 
 const rectItem = createRectItem('rect-1')
 
@@ -108,6 +111,39 @@ describe('CanvasItemPointerInteractionStart', () => {
       commitSelection: ['rect-1'],
       kind: 'none',
     })
+  })
+
+  it('starts direct text editing for renderer text double clicks', () => {
+    const result = startCanvasTextEditInteraction({
+      config: createCanvasAffordanceConfig(),
+      item: createRectItem('rect-1', { text: 'Label' }),
+    })
+
+    expect(result).toEqual({
+      editing: { id: 'rect-1', value: 'Label' },
+      kind: 'text-edit',
+      selection: ['rect-1'],
+      tool: 'select',
+    })
+  })
+
+  it('does not start direct text editing when disabled', () => {
+    const result = startCanvasTextEditInteraction({
+      config: createCanvasAffordanceConfig({
+        gestures: { textEdit: false },
+      }),
+      item: {
+        h: 40,
+        id: 'text-1',
+        text: 'Body',
+        type: 'text',
+        w: 120,
+        x: 0,
+        y: 0,
+      },
+    })
+
+    expect(result).toEqual({ kind: 'none' })
   })
 })
 

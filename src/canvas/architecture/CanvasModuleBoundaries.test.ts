@@ -421,14 +421,47 @@ describe('Canvas module boundaries', () => {
     expect(downHandlersFile.source).not.toContain('findEditableTextItem')
     expect(downHandlersFile.source).not.toContain('altDragDuplicate')
     expect(downHandlersFile.source).not.toContain('historySelection')
+    expect(downHandlersFile.source).not.toContain('config.gestures.textEdit')
+    expect(downHandlersFile.source).not.toContain("item.type === 'rect'")
+    expect(downHandlersFile.source).not.toContain('commitSelection([item.id])')
     expect(itemStartFile.source).toContain(
       'export function startCanvasItemPointerInteraction',
+    )
+    expect(itemStartFile.source).toContain(
+      'export function startCanvasTextEditInteraction',
     )
     expect(itemStartFile.source).toContain('getCanvasItemPointerIntent')
     expect(itemStartFile.source).toContain('getCanvasItemPointerSelection')
     expect(itemStartFile.source).toContain('findEditableTextItem')
     expect(itemStartFile.source).toContain('altDragDuplicate')
     expect(itemStartFile.source).toContain('historySelection')
+    expect(itemStartFile.source).toContain('config.gestures.textEdit')
+    expect(itemStartFile.source).toContain("item.type === 'rect'")
+    expect(itemStartFile.source).toContain('selection: [item.id]')
+  })
+
+  it('keeps resize pointer interaction start rules behind a named module', () => {
+    const downHandlersFile = getSourceFile(
+      'src/canvas/app/pointer/useCanvasPointerDownHandlers.ts',
+    )
+    const resizeStartFile = getSourceFile(
+      'src/canvas/app/pointer/CanvasResizePointerInteractionStart.ts',
+    )
+
+    expect(downHandlersFile.source).toContain(
+      "from './CanvasResizePointerInteractionStart'",
+    )
+    expect(downHandlersFile.source).not.toContain('config.gestures.resize')
+    expect(downHandlersFile.source).not.toContain("kind: 'resize'")
+    expect(downHandlersFile.source).not.toContain('currentItems: items')
+    expect(downHandlersFile.source).not.toContain('historyItems: items')
+    expect(resizeStartFile.source).toContain(
+      'export function startCanvasResizePointerInteraction',
+    )
+    expect(resizeStartFile.source).toContain('config.gestures.resize')
+    expect(resizeStartFile.source).toContain("kind: 'resize'")
+    expect(resizeStartFile.source).toContain('currentItems: items')
+    expect(resizeStartFile.source).toContain('historyItems: items')
   })
 
   it('keeps app rendering authoring contracts independent from Demo SVG registry names', () => {
@@ -790,6 +823,9 @@ describe('Canvas module boundaries', () => {
     const keyboardRouterFile = getSourceFile(
       'src/canvas/app/keyboard/CanvasKeyboardShortcutRouter.ts',
     )
+    const keyboardIntentFile = getSourceFile(
+      'src/canvas/app/keyboard/CanvasKeyboardShortcutIntent.ts',
+    )
     const pointerCommitFile = getSourceFile(
       'src/canvas/app/pointer/CanvasCustomCreationCommit.ts',
     )
@@ -815,11 +851,42 @@ describe('Canvas module boundaries', () => {
     expect(runtimeFile.source).toContain(
       'export function matchesCanvasAppCustomToolShortcut',
     )
-    for (const file of [appModelFile, keyboardRouterFile, pointerCommitFile]) {
+    expect(keyboardRouterFile.source).toContain(
+      "from './CanvasKeyboardShortcutIntent'",
+    )
+    for (const file of [appModelFile, keyboardIntentFile, pointerCommitFile]) {
       expect(file.source).toContain(
         'CanvasAppCustomCreationToolRuntime',
       )
     }
+  })
+
+  it('keeps keyboard shortcut intent rules behind a named module', () => {
+    const routerFile = getSourceFile(
+      'src/canvas/app/keyboard/CanvasKeyboardShortcutRouter.ts',
+    )
+    const intentFile = getSourceFile(
+      'src/canvas/app/keyboard/CanvasKeyboardShortcutIntent.ts',
+    )
+
+    expect(routerFile.source).toContain(
+      "from './CanvasKeyboardShortcutIntent'",
+    )
+    expect(routerFile.source).not.toContain('config.shortcuts.temporaryPan')
+    expect(routerFile.source).not.toContain(
+      'matchesCanvasAppCustomToolShortcut',
+    )
+    expect(routerFile.source).not.toContain("event.key.startsWith('Arrow')")
+    expect(routerFile.source).not.toContain("key === 'z'")
+    expect(intentFile.source).toContain(
+      'export function getCanvasKeyboardShortcutIntent',
+    )
+    expect(intentFile.source).toContain('config.shortcuts.temporaryPan')
+    expect(intentFile.source).toContain(
+      'matchesCanvasAppCustomToolShortcut',
+    )
+    expect(intentFile.source).toContain("event.key.startsWith('Arrow')")
+    expect(intentFile.source).toContain("key === 'z'")
   })
 
   it('keeps App custom creation tool contracts behind a named module', () => {

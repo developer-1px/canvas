@@ -35,7 +35,11 @@ import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
 import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
 import { startCanvasPointerInteraction } from './CanvasPointerInteractionStart'
-import { startCanvasItemPointerInteraction } from './CanvasItemPointerInteractionStart'
+import {
+  startCanvasItemPointerInteraction,
+  startCanvasTextEditInteraction,
+} from './CanvasItemPointerInteractionStart'
+import { startCanvasResizePointerInteraction } from './CanvasResizePointerInteractionStart'
 
 type UseCanvasPointerDownHandlersArgs = {
   cloneItems: (ids: string[], offset: Point) => CanvasItem[]
@@ -228,44 +232,44 @@ export function useCanvasPointerDownHandlers({
     event: CanvasAppPointerInput,
     handle: ResizeHandle,
   ) {
-    if (event.button !== 0 || !selectedBounds || !config.gestures.resize) {
+    const startScreen = screenPoint(stageElement, event)
+    const startWorld = screenToWorld(startScreen, viewport)
+    const start = startCanvasResizePointerInteraction({
+      config,
+      handle,
+      input: event,
+      items,
+      selectedBounds,
+      selection,
+      startScreen,
+      startWorld,
+    })
+
+    if (start.kind === 'none') {
       return
     }
 
     event.preventDefault()
     event.stopPropagation()
-    capturePointer(stageElement, event.pointerId)
 
-    const startScreen = screenPoint(stageElement, event)
-    const startWorld = screenToWorld(startScreen, viewport)
-
-    interactionRef.current = {
-      kind: 'resize',
-      pointerId: event.pointerId,
-      handle,
-      startScreen,
-      startWorld,
-      ids: selection,
-      bounds: selectedBounds,
-      startItems: items,
-      currentItems: items,
-      historyItems: items,
-      moved: false,
+    if (start.capturePointer) {
+      capturePointer(stageElement, event.pointerId)
     }
-    setGesture('resize')
+
+    interactionRef.current = start.interaction
+    setGesture(start.gesture)
   }
 
   function handleTextDoubleClick(item: RectItem | TextItem) {
-    if (!config.gestures.textEdit) {
+    const start = startCanvasTextEditInteraction({ config, item })
+
+    if (start.kind === 'none') {
       return
     }
 
-    commitSelection([item.id])
-    setEditing({
-      id: item.id,
-      value: item.type === 'rect' ? item.text ?? '' : item.text,
-    })
-    setTool('select')
+    commitSelection(start.selection)
+    setEditing(start.editing)
+    setTool(start.tool)
   }
 
   return {

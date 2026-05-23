@@ -11,14 +11,15 @@ import type {
 import type {
   Bounds,
   EditingText,
-  Tool
+  Tool,
 } from '../../entities'
 import type { Interaction } from '../pointer/CanvasInteractionState'
 import type { CommitCanvasSelection } from '../workflow/CanvasWorkflowContract'
+import type { CanvasAppCustomCreationToolState } from '../tools/CanvasAppCustomCreationToolRuntime'
 import {
-  matchesCanvasAppCustomToolShortcut,
-  type CanvasAppCustomCreationToolState,
-} from '../tools/CanvasAppCustomCreationToolRuntime'
+  getCanvasKeyboardShortcutIntent,
+  type CanvasKeyboardReorderMode,
+} from './CanvasKeyboardShortcutIntent'
 
 export type CanvasKeyboardShortcutHandlers = {
   commitSelection: CommitCanvasSelection
@@ -37,9 +38,7 @@ export type CanvasKeyboardShortcutHandlers = {
   pasteSelection: () => void
   redoHistory: () => void
   resetViewport: () => void
-  reorderSelection: (
-    mode: 'bringForward' | 'bringToFront' | 'sendBackward' | 'sendToBack',
-  ) => void
+  reorderSelection: (mode: CanvasKeyboardReorderMode) => void
   selectAll: () => void
   selection: string[]
   setDraftRect: Dispatch<SetStateAction<Bounds | null>>
@@ -60,315 +59,101 @@ export function handleCanvasKeyboardShortcut(
   event: globalThis.KeyboardEvent,
   handlers: CanvasKeyboardShortcutHandlers,
 ) {
-  const key = event.key.toLowerCase()
-  const mod = event.metaKey || event.ctrlKey
+  const intent = getCanvasKeyboardShortcutIntent({
+    config: handlers.config,
+    customCreationTools: handlers.customCreationTools,
+    event,
+    selection: handlers.selection,
+  })
 
-  if (mod && key === 'f') {
+  if (intent.preventDefault) {
     event.preventDefault()
-    handlers.openFindReplace()
-    return
   }
 
-  if (isTypingTarget(event.target)) {
-    return
-  }
-
-  const {
-    commitSelection,
-    config,
-    copySelection,
-    cutSelection,
-    deleteSelection,
-    duplicateSelection,
-    customCreationTools,
-    fitToItems,
-    groupSelection,
-    interactionRef,
-    lockSelection,
-    moveSelection,
-    pasteSelection,
-    redoHistory,
-    resetViewport,
-    reorderSelection,
-    selectAll,
-    selection,
-    setDraftRect,
-    setDraftArrow,
-    setDraftStroke,
-    setEditing,
-    setGesture,
-    setMarquee,
-    setSpaceDown,
-    setTool,
-    undoHistory,
-    ungroupSelection,
-    unlockAll,
-    zoomBy,
-  } = handlers
-
-  if (
-    config.shortcuts.temporaryPan &&
-    config.gestures.temporaryPan &&
-    event.code === 'Space'
-  ) {
-    event.preventDefault()
-    setSpaceDown(true)
-    return
-  }
-
-  if (config.shortcuts.escape && event.key === 'Escape') {
-    interactionRef.current = { kind: 'none' }
-    setGesture('none')
-    setMarquee(null)
-    setDraftArrow(null)
-    setDraftRect(null)
-    setDraftStroke(null)
-    setEditing(null)
-    commitSelection([])
-    setTool('select')
-    return
-  }
-
-  if (
-    config.shortcuts.delete &&
-    config.commands.delete &&
-    (event.key === 'Delete' || event.key === 'Backspace')
-  ) {
-    event.preventDefault()
-    deleteSelection()
-    return
-  }
-
-  if (
-    mod &&
-    key === 'z' &&
-    (event.shiftKey ? config.shortcuts.redo : config.shortcuts.undo)
-  ) {
-    event.preventDefault()
-
-    if (event.shiftKey) {
-      redoHistory()
-    } else {
-      undoHistory()
-    }
-
-    return
-  }
-
-  if (mod && key === 'y' && config.shortcuts.redo) {
-    event.preventDefault()
-    redoHistory()
-    return
-  }
-
-  if (
-    mod &&
-    (key === '=' || key === '+') &&
-    config.shortcuts.zoomIn &&
-    config.commands.zoomIn
-  ) {
-    event.preventDefault()
-    zoomBy(1.25)
-    return
-  }
-
-  if (
-    mod &&
-    key === '-' &&
-    config.shortcuts.zoomOut &&
-    config.commands.zoomOut
-  ) {
-    event.preventDefault()
-    zoomBy(0.8)
-    return
-  }
-
-  if (
-    mod &&
-    key === '0' &&
-    config.shortcuts.zoomReset &&
-    config.commands.zoomReset
-  ) {
-    event.preventDefault()
-    resetViewport()
-    return
-  }
-
-  if (mod && key === 'c' && config.shortcuts.copy) {
-    event.preventDefault()
-    copySelection()
-    return
-  }
-
-  if (mod && key === 'x' && config.shortcuts.cut) {
-    event.preventDefault()
-    cutSelection()
-    return
-  }
-
-  if (mod && key === 'v' && config.shortcuts.paste) {
-    event.preventDefault()
-    pasteSelection()
-    return
-  }
-
-  if (mod && key === 'a' && config.shortcuts.selectAll) {
-    event.preventDefault()
-    selectAll()
-    return
-  }
-
-  if (mod && key === 'd' && config.shortcuts.duplicate) {
-    event.preventDefault()
-    duplicateSelection()
-    return
-  }
-
-  if (
-    mod &&
-    key === 'l' &&
-    (event.shiftKey
-      ? config.shortcuts.unlockAll
-      : config.shortcuts.lockSelection)
-  ) {
-    event.preventDefault()
-
-    if (event.shiftKey) {
-      unlockAll()
-    } else {
-      lockSelection()
-    }
-
-    return
-  }
-
-  if (
-    mod &&
-    event.code === 'BracketRight' &&
-    (event.shiftKey
-      ? config.shortcuts.bringToFront
-      : config.shortcuts.bringForward)
-  ) {
-    event.preventDefault()
-    reorderSelection(event.shiftKey ? 'bringToFront' : 'bringForward')
-    return
-  }
-
-  if (
-    mod &&
-    event.code === 'BracketLeft' &&
-    (event.shiftKey ? config.shortcuts.sendToBack : config.shortcuts.sendBackward)
-  ) {
-    event.preventDefault()
-    reorderSelection(event.shiftKey ? 'sendToBack' : 'sendBackward')
-    return
-  }
-
-  if (
-    mod &&
-    key === 'g' &&
-    (event.shiftKey ? config.shortcuts.ungroup : config.shortcuts.group)
-  ) {
-    event.preventDefault()
-
-    if (event.shiftKey) {
-      ungroupSelection()
-    } else {
-      groupSelection()
-    }
-
-    return
-  }
-
-  if (
-    config.shortcuts.nudge &&
-    config.commands.nudge &&
-    event.key.startsWith('Arrow')
-  ) {
-    if (selection.length === 0) {
+  switch (intent.kind) {
+    case 'none':
       return
-    }
-
-    event.preventDefault()
-
-    const distance = event.shiftKey ? 10 : 1
-    const dx =
-      event.key === 'ArrowLeft' ? -distance : event.key === 'ArrowRight' ? distance : 0
-    const dy =
-      event.key === 'ArrowUp' ? -distance : event.key === 'ArrowDown' ? distance : 0
-
-    moveSelection(dx, dy)
-    return
+    case 'open-find-replace':
+      handlers.openFindReplace()
+      return
+    case 'temporary-pan':
+      handlers.setSpaceDown(true)
+      return
+    case 'escape':
+      handlers.interactionRef.current = { kind: 'none' }
+      handlers.setGesture('none')
+      handlers.setMarquee(null)
+      handlers.setDraftArrow(null)
+      handlers.setDraftRect(null)
+      handlers.setDraftStroke(null)
+      handlers.setEditing(null)
+      handlers.commitSelection([])
+      handlers.setTool('select')
+      return
+    case 'delete-selection':
+      handlers.deleteSelection()
+      return
+    case 'undo-history':
+      handlers.undoHistory()
+      return
+    case 'redo-history':
+      handlers.redoHistory()
+      return
+    case 'zoom-by':
+      handlers.zoomBy(intent.multiplier)
+      return
+    case 'reset-viewport':
+      handlers.resetViewport()
+      return
+    case 'copy-selection':
+      handlers.copySelection()
+      return
+    case 'cut-selection':
+      handlers.cutSelection()
+      return
+    case 'paste-selection':
+      handlers.pasteSelection()
+      return
+    case 'select-all':
+      handlers.selectAll()
+      return
+    case 'duplicate-selection':
+      handlers.duplicateSelection()
+      return
+    case 'lock-selection':
+      handlers.lockSelection()
+      return
+    case 'unlock-all':
+      handlers.unlockAll()
+      return
+    case 'reorder-selection':
+      handlers.reorderSelection(intent.mode)
+      return
+    case 'group-selection':
+      handlers.groupSelection()
+      return
+    case 'ungroup-selection':
+      handlers.ungroupSelection()
+      return
+    case 'nudge-selection':
+      handlers.moveSelection(intent.dx, intent.dy)
+      return
+    case 'fit-all':
+      handlers.fitToItems()
+      return
+    case 'fit-selection':
+      handlers.fitToItems(intent.ids)
+      return
+    case 'set-tool':
+      handlers.setTool(intent.tool)
+      return
   }
 
-  if (config.shortcuts.fitAll && config.commands.fitView && event.key === '0') {
-    event.preventDefault()
-    fitToItems()
-    return
-  }
-
-  if (
-    config.shortcuts.fitSelection &&
-    config.commands.fitView &&
-    event.key === '1'
-  ) {
-    event.preventDefault()
-    fitToItems(selection.length > 0 ? selection : undefined)
-    return
-  }
-
-  if (event.metaKey || event.ctrlKey || event.altKey) {
-    return
-  }
-
-  if (config.shortcuts.selectTool && config.tools.select && key === 'v') {
-    setTool('select')
-  } else if (config.shortcuts.panTool && config.tools.pan && key === 'h') {
-    setTool('pan')
-  } else if (
-    config.shortcuts.highlighterTool &&
-    config.tools.highlight &&
-    event.shiftKey &&
-    key === 'm'
-  ) {
-    setTool('highlight')
-  } else if (
-    config.shortcuts.markerTool &&
-    config.tools.marker &&
-    !event.shiftKey &&
-    key === 'm'
-  ) {
-    setTool('marker')
-  } else if (config.shortcuts.arrowTool && config.tools.arrow && key === 'l') {
-    setTool('arrow')
-  } else if (config.shortcuts.rectTool && config.tools.rect && key === 'r') {
-    setTool('rect')
-  } else if (config.shortcuts.textTool && config.tools.text && key === 't') {
-    setTool('text')
-  } else {
-    const customTool = customCreationTools.find(
-      (tool) =>
-        tool.shortcut &&
-        matchesCanvasAppCustomToolShortcut({
-          event,
-          shortcut: tool.shortcut,
-        }),
-    )
-
-    if (customTool) {
-      setTool(customTool.id)
-    }
-  }
+  return assertUnhandledCanvasKeyboardShortcutIntent(intent)
 }
 
-function isTypingTarget(target: EventTarget | null) {
-  return (
-    (typeof HTMLInputElement !== 'undefined' &&
-      target instanceof HTMLInputElement) ||
-    (typeof HTMLTextAreaElement !== 'undefined' &&
-      target instanceof HTMLTextAreaElement) ||
-    (typeof HTMLElement !== 'undefined' &&
-      target instanceof HTMLElement &&
-      target.isContentEditable)
-  )
+function assertUnhandledCanvasKeyboardShortcutIntent(
+  intent: never,
+): never {
+  throw new Error(`Unhandled canvas keyboard shortcut intent: ${String(intent)}`)
 }

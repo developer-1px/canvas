@@ -2,6 +2,9 @@ import type {
   CanvasItem,
   EditingText,
   Point,
+  RectItem,
+  TextItem,
+  Tool,
 } from '../../entities'
 import type { CanvasItemReadModel } from '../../host'
 import {
@@ -45,6 +48,20 @@ export type CanvasItemPointerInteractionStartInput = {
   startScreen: Point
   startWorld: Point
 }
+
+export type CanvasTextEditInteractionStartInput = {
+  config: CanvasAffordanceConfig
+  item: RectItem | TextItem
+}
+
+export type CanvasTextEditInteractionStartResult =
+  | { kind: 'none' }
+  | {
+      editing: EditingText
+      kind: 'text-edit'
+      selection: string[]
+      tool: Extract<Tool, 'select'>
+    }
 
 export function startCanvasItemPointerInteraction({
   cloneItems,
@@ -143,8 +160,24 @@ export function startCanvasItemPointerInteraction({
   }
 }
 
+export function startCanvasTextEditInteraction({
+  config,
+  item,
+}: CanvasTextEditInteractionStartInput): CanvasTextEditInteractionStartResult {
+  if (!config.gestures.textEdit) {
+    return { kind: 'none' }
+  }
+
+  return {
+    editing: createCanvasItemEditState(item),
+    kind: 'text-edit',
+    selection: [item.id],
+    tool: 'select',
+  }
+}
+
 function createCanvasItemEditState(
-  item: NonNullable<ReturnType<CanvasItemReadModel['findEditableTextItem']>>,
+  item: RectItem | TextItem,
 ): EditingText {
   return {
     id: item.id,

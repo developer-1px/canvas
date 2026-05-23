@@ -73,10 +73,13 @@
 | `src/canvas/app/workflow/useCanvasTextEditorModel.ts` | text editing state, editable item lookup, text editor props를 App Shell에 숨긴다 |
 | `src/canvas/app/workflow/useCanvasWorkspaceModel.ts` | 저장된 workspace snapshot, document history, viewport, read model, id 생성을 App Shell에 숨긴다 |
 | `src/canvas/app/inspector/CanvasAppInspectorPanelExecution.ts` | Inspector panel visibility/render 호출과 실패 시 omit containment를 소유한다 |
+| `src/canvas/app/keyboard/CanvasKeyboardShortcutIntent.ts` | Keydown 입력, feature toggle, selection, custom creation tool shortcut을 실행 가능한 keyboard intent로 변환한다 |
+| `src/canvas/app/keyboard/CanvasKeyboardShortcutRouter.ts` | Keyboard intent의 preventDefault와 handler 실행을 적용한다 |
 | `src/canvas/app/pointer/CanvasAppPointerInput.ts` | React/SVG pointer event를 App workflow가 쓰는 최소 pointer/event Interface로 변환한다 |
 | `src/canvas/app/pointer/CanvasPointerGeometry.ts` | DOM/SVG pointer 좌표 변환 |
 | `src/canvas/app/pointer/CanvasPointerInteractionStart.ts` | Pointer-down 시 tool/gesture/config/custom tool 상태를 active interaction, draft overlay, immediate text creation으로 변환한다 |
-| `src/canvas/app/pointer/CanvasItemPointerInteractionStart.ts` | Item pointer-down 시 selection, double-click edit, alt-drag duplicate, move interaction 시작 상태를 계산한다 |
+| `src/canvas/app/pointer/CanvasItemPointerInteractionStart.ts` | Item pointer-down/text double-click 시 selection, edit state, alt-drag duplicate, move interaction 시작 상태를 계산한다 |
+| `src/canvas/app/pointer/CanvasResizePointerInteractionStart.ts` | Resize handle pointer-down 시 selected bounds, handle, selection, item snapshot을 resize interaction 시작 상태로 변환한다 |
 | `src/canvas/app/pointer/CanvasPointerInteractionPreview.ts` | Pointer-move 시 active interaction을 viewport, live item, marquee, selection, draft overlay, snap guide preview로 변환한다 |
 | `src/canvas/app/pointer/CanvasPointerInteractionLifecycle.ts` | Pointer-up/cancel 시 active interaction을 문서 변경, selection 변경, edit 진입, cancel rollback으로 확정하거나 되돌린다 |
 | `src/canvas/core` | Host item과 renderer를 모르는 geometry, viewport, id, primitive math 같은 재사용 계약 |
@@ -154,6 +157,8 @@ type CanvasAffordanceConfig = {
 - App workflow에서 read model 생성은 Canvas Workspace Model이 소유한다. Inspector, pointer, viewport hook은 생성하지 않고 주입받은 Canvas Item Read Model만 사용한다.
 - App Shell은 workflow public entry만 import한다. command, pointer, keyboard, viewport, text editing wiring은 Canvas App Model이 소유한다.
 - App Shell은 workspace 저장, initial item seed, read model 생성, id seed 계산을 직접 import하지 않는다. Canvas Workspace Model을 통해 사용한다.
+- Keyboard shortcut router는 event preventDefault와 handler 실행을 맡고, shortcut grammar와 built-in/custom precedence는 Canvas Keyboard Shortcut Intent가 소유한다.
+- Pointer down hook은 DOM pointer capture/event routing과 시작 결과 적용을 맡고, canvas/item/resize/text edit 시작 규칙은 named pointer interaction start Module들이 소유한다.
 - App workflow는 `CANVAS_ITEM_ENGINE_ADAPTERS`를 통해 concrete item adapter를 주입한다.
 - App workflow는 Canvas App Assembly를 통해 concrete item adapter, component library, custom command, custom item module, inspector panel, initial items, presentation registry를 주입받는다.
 - Canvas App Assembly input은 output type의 `Partial`이 아니라 Host가 조립할 수 있는 필드만 명시한 외부 입력 계약이다.
