@@ -351,6 +351,38 @@ describe('Canvas module boundaries', () => {
     expect(stageModelFile.source).toContain('catch')
   })
 
+  it('keeps app control props behind a named workflow module', () => {
+    const appModelFile = getSourceFile(
+      'src/canvas/app/workflow/useCanvasAppModel.ts',
+    )
+    const controlModelFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppControlModel.ts',
+    )
+
+    expect(appModelFile.source).toContain("from './CanvasAppControlModel'")
+    expect(appModelFile.source).not.toContain(
+      'getCanvasCommandAvailability',
+    )
+    expect(appModelFile.source).not.toContain(
+      'CANVAS_GESTURE_STATUS_LABELS',
+    )
+    expect(appModelFile.source).not.toContain('CANVAS_TOOL_AFFORDANCES')
+    expect(appModelFile.source).not.toContain('selection.length > 1')
+    expect(appModelFile.source).not.toContain('selection.length > 2')
+    expect(controlModelFile.source).toContain(
+      'export function getCanvasAppControlModel',
+    )
+    expect(controlModelFile.source).toContain(
+      'getCanvasCommandAvailability',
+    )
+    expect(controlModelFile.source).toContain(
+      'CANVAS_GESTURE_STATUS_LABELS',
+    )
+    expect(controlModelFile.source).toContain('CANVAS_TOOL_AFFORDANCES')
+    expect(controlModelFile.source).toContain('selection.length > 1')
+    expect(controlModelFile.source).toContain('selection.length > 2')
+  })
+
   it('keeps app item layer render input on the app pointer input interface', () => {
     const itemLayerAdapterFile = getSourceFile(
       'src/canvas/app/rendering/CanvasAppItemLayerAdapter.tsx',

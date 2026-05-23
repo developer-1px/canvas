@@ -3,26 +3,18 @@ import {
   useRef,
 } from 'react'
 import {
-  CANVAS_GESTURE_STATUS_LABELS,
-  CANVAS_TOOL_AFFORDANCES,
   DEFAULT_CANVAS_AFFORDANCE_CONFIG,
-  getCanvasCommandAvailability,
 } from '../../engine'
-import { isCanvasCustomToolId } from '../../core'
-import {
-  type CanvasInteractionKind,
-  type Tool,
-} from '../../entities'
 import { useCanvasCommands } from '../commands/useCanvasCommands'
 import { useCanvasComponentInsertion } from '../components/useCanvasComponentInsertion'
 import { useCanvasObjectInspector } from '../inspector/useCanvasObjectInspector'
 import { useCanvasKeyboardShortcuts } from '../keyboard/useCanvasKeyboardShortcuts'
 import { useCanvasPointerDownHandlers } from '../pointer/useCanvasPointerDownHandlers'
 import { useCanvasPointerDragHandlers } from '../pointer/useCanvasPointerDragHandlers'
-import type { CanvasAppCustomCreationToolState } from '../tools/CanvasAppCustomCreationTools'
 import { useCanvasAppStageElement } from '../stage/CanvasAppStageElement'
 import { useCanvasViewportControls } from '../viewport/useCanvasViewportControls'
 import { useCanvasWheelViewport } from '../viewport/useCanvasWheelViewport'
+import { getCanvasAppControlModel } from './CanvasAppControlModel'
 import { renderCanvasAppStageModel } from './CanvasAppStageModel'
 import { useCanvasAppExtensionModel } from './useCanvasAppExtensionModel'
 import { useCanvasFindReplaceModel } from './useCanvasFindReplaceModel'
@@ -117,17 +109,6 @@ export function useCanvasAppModel({
     selected,
     selection,
   })
-  const commandAvailability = useMemo(
-    () =>
-      getCanvasCommandAvailability({
-        canRedo,
-        canUndo,
-        config: canvasAffordanceConfig,
-        hasSelectedGroup: selection.some(scene.isGroup),
-        selection,
-      }),
-    [canRedo, canUndo, scene, selection],
-  )
   useCanvasWheelViewport({
     config: canvasAffordanceConfig,
     setViewport,
@@ -319,11 +300,38 @@ export function useCanvasAppModel({
     viewport,
   })
 
+  const controls = getCanvasAppControlModel({
+    canRedo,
+    canUndo,
+    components: componentLibrary.templates,
+    config: canvasAffordanceConfig,
+    customCommands: customCommandStates,
+    customTools: customCreationToolStates,
+    gesture,
+    scene,
+    selection,
+    tool,
+    viewport,
+    onAlign: alignSelection,
+    onDelete: deleteSelection,
+    onDistribute: distributeSelection,
+    onDuplicate: duplicateSelection,
+    onFitItems: fitToItems,
+    onGroup: groupSelection,
+    onInsertComponent: insertComponent,
+    onLock: lockSelection,
+    onRedo: redoHistory,
+    onRunCustomCommand: runCustomCommand,
+    onToolChange: setTool,
+    onUndo: undoHistory,
+    onUngroup: ungroupSelection,
+    onUnlockAll: unlockAll,
+    onViewportReset: resetViewport,
+    onZoomBy: zoomBy,
+  })
+
   return {
-    componentPalette: {
-      components: componentLibrary.templates,
-      onInsert: insertComponent,
-    },
+    componentPalette: controls.componentPalette,
     findReplace,
     inspector,
     stage: renderCanvasAppStageModel({
@@ -353,78 +361,9 @@ export function useCanvasAppModel({
         onResizePointerDown: handleResizePointerDown,
       },
     }),
-    status: {
-      mode: getCanvasAppStatusMode({
-        customCreationTools: customCreationToolStates,
-        gesture,
-        tool,
-      }),
-      scale: viewport.scale,
-      selectionLength: selection.length,
-      visible: canvasAffordanceConfig.overlays.status,
-    },
+    status: controls.status,
     textEditor,
-    toolbar: {
-      canAlign: selection.length > 1,
-      canDelete: commandAvailability.delete,
-      canDuplicate: commandAvailability.duplicate,
-      canDistribute: selection.length > 2,
-      canGroup: commandAvailability.group,
-      canLock: commandAvailability.lockSelection,
-      canRedo: commandAvailability.redo,
-      canUndo: commandAvailability.undo,
-      canUngroup: commandAvailability.ungroup,
-      config: canvasAffordanceConfig,
-      customCommands: customCommandStates,
-      customTools: customCreationToolStates,
-      tool,
-      visible: canvasAffordanceConfig.overlays.toolbar,
-      onAlign: alignSelection,
-      onDelete: deleteSelection,
-      onDistribute: distributeSelection,
-      onDuplicate: duplicateSelection,
-      onGroup: groupSelection,
-      onLock: lockSelection,
-      onRedo: redoHistory,
-      onToolChange: setTool,
-      onCustomCommand: runCustomCommand,
-      onUndo: undoHistory,
-      onUngroup: ungroupSelection,
-      onUnlockAll: unlockAll,
-    },
-    zoomControls: {
-      config: canvasAffordanceConfig,
-      scale: viewport.scale,
-      visible: canvasAffordanceConfig.overlays.zoomControls,
-      onFit: () => fitToItems(selection.length > 0 ? selection : undefined),
-      onReset: resetViewport,
-      onZoomIn: () => zoomBy(1.25),
-      onZoomOut: () => zoomBy(0.8),
-    },
+    toolbar: controls.toolbar,
+    zoomControls: controls.zoomControls,
   }
-}
-
-function getCanvasAppStatusMode({
-  customCreationTools,
-  gesture,
-  tool,
-}: {
-  customCreationTools: readonly CanvasAppCustomCreationToolState[]
-  gesture: CanvasInteractionKind
-  tool: Tool
-}) {
-  const gestureLabel = CANVAS_GESTURE_STATUS_LABELS[gesture]
-
-  if (gestureLabel) {
-    return gestureLabel
-  }
-
-  if (isCanvasCustomToolId(tool)) {
-    return (
-      customCreationTools.find((customTool) => customTool.id === tool)
-        ?.statusLabel ?? 'Canvas'
-    )
-  }
-
-  return CANVAS_TOOL_AFFORDANCES[tool].statusLabel
 }
