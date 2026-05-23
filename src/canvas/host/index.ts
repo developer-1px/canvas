@@ -89,6 +89,7 @@ export {
   type CanvasDocumentSelectionHistory,
   type CanvasDocumentTextSearch,
 } from './document/CanvasDocumentController'
+export type { CanvasTextSearchOptions } from './document/CanvasDocumentSearch'
 export {
   validateCanvasItems as normalizeCanvasItems,
   type CanvasItemValidationOptions,

@@ -4430,9 +4430,35 @@ describe('Canvas module boundaries', () => {
     const documentRuntimeFile = getSourceFile(
       'src/canvas/app/document/CanvasDocumentRuntime.ts',
     )
+    const documentRuntimeContractsFile = getSourceFile(
+      'src/canvas/app/document/CanvasDocumentRuntimeContracts.ts',
+    )
 
     expect(documentHookFile.source).toContain(
       "from './CanvasDocumentRuntime'",
+    )
+    expect(documentRuntimeFile.source).toContain(
+      "from './CanvasDocumentRuntimeContracts'",
+    )
+    expect(documentRuntimeFile.source).not.toContain('Parameters<')
+    expect(documentRuntimeFile.source).not.toContain('ReturnType<')
+    expect(documentRuntimeContractsFile.source).toContain(
+      'export type CanvasDocumentCommittedState',
+    )
+    expect(documentRuntimeContractsFile.source).toContain(
+      'export type CanvasDocumentHistoryState',
+    )
+    expect(documentRuntimeContractsFile.source).toContain(
+      'export type CommitCanvasDocumentItemsChangeArgs',
+    )
+    expect(documentRuntimeContractsFile.source).toContain(
+      'export type ReplaceCanvasDocumentTextArgs',
+    )
+    expect(documentRuntimeContractsFile.source).not.toContain(
+      'Parameters<',
+    )
+    expect(documentRuntimeContractsFile.source).not.toContain(
+      'ReturnType<',
     )
     for (const documentRuntimeDetail of [
       'document.replaceItems(',

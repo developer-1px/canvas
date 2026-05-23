@@ -176,6 +176,7 @@
 - Canvas Workspace Consumer Model: Workspace document/read/viewport state를 command, component, control, extension, inspector, interaction, item layer, keyboard, pointer, stage, text, viewport consumer context로 변환하는 workflow Module.
 - Canvas Workspace Snapshot: 저장된 workspace payload의 version, item validation, viewport normalization, selection sanitization, id seed contract를 소유하는 App-owned Module.
 - Canvas Document Runtime: Host Document Controller mutation result를 App React state가 반영할 committed state로 변환하고 live item replacement, selection action resolution, text replace, history result application을 소유하는 App-owned runtime Module.
+- Canvas Document Runtime Contracts: App document runtime이 Host Document Controller와 주고받는 change, selection action, text search options, history result, committed state의 명시 Interface 계약을 소유하는 App-owned contract Module.
 - Canvas Workflow Contract: App workflow hook들이 공유하는 document commit, selection commit, clipboard 계약. 개별 hook이 `useCanvasDocument` 구현 파일을 직접 알지 않게 한다.
 - Canvas Toolbar Items: tool group, command group, custom command group을 toolbar item group grammar로 합성하는 UI-owned Module.
 - Canvas Toolbar Tool Items: built-in tool stable order, feature toggle, custom tool 상태를 tool item group grammar로 변환하는 UI-owned Module.
@@ -335,6 +336,7 @@
 - App workflow hook들은 Canvas Item Read Model, document action, viewport setter를 직접 생성하지 않고 Canvas Workspace Model의 consumer별 workspace context로 주입받는다. Workspace state/persistence wiring은 Canvas Workspace Model이, consumer별 context fan-out은 Canvas Workspace Consumer Model이 소유한다.
 - Canvas Workspace Model hook은 React state/persistence wiring을 맡고, stored/default initial state, id generator seed, selected/read model/selected bounds derivation은 Canvas Workspace Runtime Model이 소유한다.
 - Canvas Document hook은 controller 생성, React state/ref bridge, subscription binding을 맡고, document mutation result interpretation은 Canvas Document Runtime이 소유한다.
+- Canvas Document Runtime은 workflow callback 또는 Host Controller method signature에서 args/result shape를 역산하지 않고 Canvas Document Runtime Contracts를 소비한다.
 - App workflow는 editor/search 상태를 각각의 workflow Module 뒤에 숨긴다.
 - Standard command hook은 execution context와 runner memoization을 맡고, toolbar/keyboard callback grammar는 Canvas Standard Command Handlers가 소유한다. Canvas Standard Command Execution은 plan 생성과 effect 적용만 조립한다. Engine command 호출은 Canvas Standard Command Effect Plan이, Engine result-to-document effect descriptor mapping은 Canvas Standard Command Result Effects가, document effect primitive 생성과 document commit/selection/editing/history effect routing은 Canvas Standard Command Document Effects가 소유한다.
 - Standard command의 what union은 Canvas Standard Command Contracts가 소유하고, Effect Plan/Execution은 그 command 계약을 소비해 how만 구현한다.

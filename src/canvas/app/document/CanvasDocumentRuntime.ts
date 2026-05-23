@@ -1,56 +1,22 @@
-import type { CanvasItem } from '../../entities'
 import type {
-  CanvasDocumentController,
-  CanvasDocumentHistoryAvailability,
-} from '../../host'
-import type {
-  CommitCanvasItemsChange,
-  CommitCanvasSelection,
-  CanvasDocumentTextSearch,
-} from '../workflow/CanvasWorkflowContract'
+  CanvasDocumentCommittedState,
+  CanvasDocumentHistoryArgs,
+  CanvasDocumentHistoryRuntimeResult,
+  CanvasDocumentHistoryState,
+  CanvasDocumentRuntimeController,
+  CanvasDocumentRuntimeHistoryAvailability,
+  CanvasDocumentStateAction,
+  CommitCanvasDocumentItemsChangeArgs,
+  CommitCanvasDocumentSelectionArgs,
+  ReplaceCanvasDocumentLiveItemsArgs,
+  ReplaceCanvasDocumentTextArgs,
+  RestoreCanvasDocumentSelectionArgs,
+} from './CanvasDocumentRuntimeContracts'
 
-export type CanvasDocumentStateAction<T> = T | ((current: T) => T)
-
-type CanvasDocumentCommittedState = {
-  historyAvailability: CanvasDocumentHistoryAvailability
-  items: CanvasItem[]
-}
-
-type ReplaceCanvasDocumentLiveItemsArgs = {
-  action: CanvasDocumentStateAction<CanvasItem[]>
-  currentItems: CanvasItem[]
-  document: CanvasDocumentController
-}
-
-type CommitCanvasDocumentItemsChangeArgs = {
-  change: Parameters<CommitCanvasItemsChange>[0]
-  currentItems: CanvasItem[]
-  document: CanvasDocumentController
-  selection?: Parameters<CommitCanvasItemsChange>[1]
-}
-
-type RestoreCanvasDocumentSelectionArgs = {
-  action: Parameters<CommitCanvasSelection>[0]
-  currentItems: CanvasItem[]
-  document: CanvasDocumentController
-}
-
-type CommitCanvasDocumentSelectionArgs = {
-  action: Parameters<CommitCanvasSelection>[0]
-  document: CanvasDocumentController
-}
-
-type ReplaceCanvasDocumentTextArgs = {
-  document: CanvasDocumentController
-  options?: Parameters<CanvasDocumentTextSearch['replaceDocumentText']>[2]
-  replacement: string
-  searchText: string
-}
-
-type CanvasDocumentHistoryArgs = {
-  currentItems: CanvasItem[]
-  document: CanvasDocumentController
-}
+export type {
+  CanvasDocumentCommittedState,
+  CanvasDocumentStateAction,
+} from './CanvasDocumentRuntimeContracts'
 
 export function replaceCanvasDocumentLiveItems({
   action,
@@ -64,7 +30,7 @@ export function replaceCanvasDocumentLiveItems({
 }
 
 export function readCanvasCommittedDocumentState(
-  document: CanvasDocumentController,
+  document: CanvasDocumentRuntimeController,
 ): CanvasDocumentCommittedState {
   return {
     historyAvailability: document.readHistoryAvailability(),
@@ -99,7 +65,8 @@ export function restoreCanvasDocumentSelection({
 export function commitCanvasDocumentSelection({
   action,
   document,
-}: CommitCanvasDocumentSelectionArgs): CanvasDocumentHistoryAvailability | null {
+}: CommitCanvasDocumentSelectionArgs):
+  CanvasDocumentRuntimeHistoryAvailability | null {
   const didCommit = document.commitSelection(
     resolveCanvasDocumentStateAction(action, document.readSelection()),
   )
@@ -128,9 +95,9 @@ export function replaceCanvasDocumentText({
 }
 
 export function applyCanvasDocumentHistoryResult(
-  result: ReturnType<CanvasDocumentController['undo']>,
-  document: CanvasDocumentController,
-): (CanvasDocumentCommittedState & { selection: string[] }) | null {
+  result: CanvasDocumentHistoryRuntimeResult,
+  document: CanvasDocumentHistoryArgs['document'],
+): CanvasDocumentHistoryState | null {
   return result
     ? {
         historyAvailability: document.readHistoryAvailability(),
