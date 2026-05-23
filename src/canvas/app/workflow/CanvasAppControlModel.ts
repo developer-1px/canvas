@@ -3,6 +3,7 @@ import {
   CANVAS_GESTURE_STATUS_LABELS,
   CANVAS_TOOL_AFFORDANCES,
   getCanvasCommandAvailability,
+  getCanvasCommandSelectionState,
   type CanvasAffordanceConfig,
   type CanvasAlignMode,
   type CanvasDistributeMode,
@@ -83,6 +84,7 @@ export function getCanvasAppControlModel({
     hasSelectedGroup: selection.some(scene.isGroup),
     selection,
   })
+  const commandSelection = getCanvasCommandSelectionState({ selection })
 
   return {
     componentPalette: {
@@ -101,10 +103,10 @@ export function getCanvasAppControlModel({
       visible: config.overlays.status,
     },
     toolbar: {
-      canAlign: selection.length > 1,
+      canAlign: commandSelection.canAlign,
       canDelete: commandAvailability.delete,
       canDuplicate: commandAvailability.duplicate,
-      canDistribute: selection.length > 2,
+      canDistribute: commandSelection.canDistribute,
       canGroup: commandAvailability.group,
       canLock: commandAvailability.lockSelection,
       canRedo: commandAvailability.redo,

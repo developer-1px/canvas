@@ -617,6 +617,8 @@ describe('Canvas module boundaries', () => {
     expect(appModelFile.source).not.toContain('CANVAS_TOOL_AFFORDANCES')
     expect(appModelFile.source).not.toContain('selection.length > 1')
     expect(appModelFile.source).not.toContain('selection.length > 2')
+    expect(controlModelFile.source).not.toContain('selection.length > 1')
+    expect(controlModelFile.source).not.toContain('selection.length > 2')
     expect(controlModelFile.source).toContain(
       'export function getCanvasAppControlModel',
     )
@@ -624,11 +626,46 @@ describe('Canvas module boundaries', () => {
       'getCanvasCommandAvailability',
     )
     expect(controlModelFile.source).toContain(
+      'getCanvasCommandSelectionState',
+    )
+    expect(controlModelFile.source).toContain(
       'CANVAS_GESTURE_STATUS_LABELS',
     )
     expect(controlModelFile.source).toContain('CANVAS_TOOL_AFFORDANCES')
-    expect(controlModelFile.source).toContain('selection.length > 1')
-    expect(controlModelFile.source).toContain('selection.length > 2')
+  })
+
+  it('keeps built-in command selection thresholds in Engine command selection rules', () => {
+    const actionFile = getSourceFile(
+      'src/canvas/engine/command/CanvasCommandActions.ts',
+    )
+    const availabilityFile = getSourceFile(
+      'src/canvas/engine/command/CanvasCommandAvailability.ts',
+    )
+    const rulesFile = getSourceFile(
+      'src/canvas/engine/command/CanvasCommandSelectionRules.ts',
+    )
+
+    expect(actionFile.source).toContain(
+      'canAlignCanvasCommandSelection',
+    )
+    expect(actionFile.source).toContain(
+      'canDistributeCanvasCommandSelection',
+    )
+    expect(actionFile.source).toContain(
+      'canGroupCanvasCommandSelection',
+    )
+    expect(actionFile.source).not.toContain('selection.length < 2')
+    expect(actionFile.source).not.toContain('selection.length < 3')
+    expect(availabilityFile.source).toContain(
+      'getCanvasCommandSelectionState',
+    )
+    expect(availabilityFile.source).not.toContain('selection.length > 1')
+    expect(availabilityFile.source).not.toContain('selection.length > 2')
+    expect(rulesFile.source).toContain(
+      'CANVAS_COMMAND_SELECTION_MINIMUMS',
+    )
+    expect(rulesFile.source).toContain('align: 2')
+    expect(rulesFile.source).toContain('distribute: 3')
   })
 
   it('keeps app command handler wiring behind a named workflow module', () => {

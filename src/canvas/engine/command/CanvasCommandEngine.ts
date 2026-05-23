@@ -1,5 +1,13 @@
 export { getCanvasCommandAvailability } from './CanvasCommandAvailability'
 export {
+  canAlignCanvasCommandSelection,
+  canDistributeCanvasCommandSelection,
+  canGroupCanvasCommandSelection,
+  getCanvasCommandSelectionState,
+  hasCanvasCommandSelection,
+  type CanvasCommandSelectionState,
+} from './CanvasCommandSelectionRules'
+export {
   alignCanvasCommand,
   deleteCanvasCommand,
   distributeCanvasCommand,
