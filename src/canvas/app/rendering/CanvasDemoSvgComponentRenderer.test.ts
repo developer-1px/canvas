@@ -3,6 +3,7 @@ import {
   createCanvasDemoSvgComponentPresentationRenderers,
   getCanvasDemoSvgComponentPresentationRenderer,
   type CanvasDemoSvgComponentRendererStrategy,
+  type CanvasDemoSvgComponentPresentationRenderers,
 } from './CanvasDemoSvgComponentPresentationRegistry'
 
 describe('CanvasDemoSvgComponentRenderer registry', () => {
@@ -27,5 +28,15 @@ describe('CanvasDemoSvgComponentRenderer registry', () => {
         'Risk Card': () => null,
       }),
     ).toThrow('Invalid canvas app component presentation renderer id: Risk Card')
+  })
+
+  it('rejects malformed presentation renderer strategies before registration', () => {
+    expect(() =>
+      createCanvasDemoSvgComponentPresentationRenderers({
+        'risk-card': undefined,
+      } as unknown as CanvasDemoSvgComponentPresentationRenderers),
+    ).toThrow(
+      'Canvas app component presentation renderer risk-card requires render strategy',
+    )
   })
 })

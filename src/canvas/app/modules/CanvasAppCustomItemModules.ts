@@ -7,16 +7,19 @@ import {
   type CanvasCustomItemValidator,
   type CanvasCustomItemValidators,
 } from '../../host'
-import type { CanvasAppCustomCommand } from '../commands/CanvasAppCustomCommands'
 import {
-  assertCanvasAppExtensionEntries,
-  assertCanvasAppExtensionId,
-} from '../extensions/CanvasAppExtensionIds'
+  assertCanvasAppCustomCommands,
+  type CanvasAppCustomCommand,
+} from '../commands/CanvasAppCustomCommands'
+import { assertCanvasAppExtensionId } from '../extensions/CanvasAppExtensionIds'
 import {
   appendUniqueCanvasAppExtensionEntries,
   mergeUniqueCanvasAppExtensionRecord,
 } from '../extensions/CanvasAppExtensionRegistries'
-import type { CanvasAppInspectorPanel } from '../inspector/CanvasAppInspectorPanels'
+import {
+  assertCanvasAppInspectorPanels,
+  type CanvasAppInspectorPanel,
+} from '../inspector/CanvasAppInspectorPanels'
 import type {
   CanvasDemoSvgCustomItemRendererStrategy,
   CanvasDemoSvgCustomItemRenderers,
@@ -148,10 +151,7 @@ function assertCanvasAppCustomItemModuleContracts(
     id: module.id,
     label: 'custom item module',
   })
-  assertCanvasAppExtensionEntries({
-    entries: module.customCommands ?? [],
-    label: 'custom command',
-  })
+  assertCanvasAppCustomCommands(module.customCommands ?? [])
   assertCanvasAppCustomItemModuleCreationTools(module)
   assertCanvasAppExtensionId({
     id: module.presentation,
@@ -167,10 +167,7 @@ function assertCanvasAppCustomItemModuleContracts(
     label: 'validator',
     moduleId: module.id,
   })
-  assertCanvasAppExtensionEntries({
-    entries: module.inspectorPanels ?? [],
-    label: 'inspector panel',
-  })
+  assertCanvasAppInspectorPanels(module.inspectorPanels ?? [])
 }
 
 function assertCanvasAppCustomItemModuleFunction({

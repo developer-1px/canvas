@@ -19,6 +19,7 @@
 - Canvas App Assembly Input: Canvas App Assembly output을 `Partial`로 노출하지 않고 Host가 조립할 수 있는 필드만 명시한 외부 입력 계약.
 - Canvas App Extension Id: custom command, creation tool, item module, component presentation renderer key, custom item renderer key, validator key, inspector panel에서 공유하는 안정 lower-kebab 외부 계약.
 - Canvas App Extension Registry: assembly 단계에서 extension entry와 record key를 검증하고 중복을 실패시키는 내부 merge 계약.
+- Canvas App Descriptor Shape Contract: 제품별 descriptor가 외부 조립 seam을 통과하기 전에 필수 함수 slot을 갖췄는지 검증하는 외부 Interface 계약.
 - Canvas App Custom Command: 내부 command grammar를 수정하지 않고 제품별 business action을 toolbar action으로 등록하는 App-owned command descriptor.
 - Canvas App Custom Creation Tool: 내부 tool grammar를 수정하지 않고 제품별 item 생성 도구를 toolbar, shortcut, pointer lifecycle에 등록하는 App-owned tool descriptor.
 - Canvas App Custom Item Module Creation Tool: Module-owned creation descriptor. bounds/title/data만 반환하고 custom item `id`, `kind`, `presentation`, `type` envelope는 Module assembly가 만든다.
@@ -73,6 +74,7 @@
 - Demo custom item module은 `src/demo/custom-items/<name>/index.ts` convention으로 자동 수집한다.
 - Demo custom item module은 `src/canvas/app/workflow` public entry만 사용하고 app 내부 파일을 직접 import하지 않는다.
 - Canvas App extension id와 registry key는 lower-kebab 안정 id만 허용하고, 잘못된 id는 define/assembly 단계에서 실패해야 한다.
+- Canvas App descriptor는 id뿐 아니라 필수 함수 slot도 define/assembly 단계에서 실패해야 한다. 실행 중 throw는 runtime containment로 처리하지만, malformed descriptor shape는 등록되지 않아야 한다.
 - Canvas Custom Item의 `kind`와 `presentation`, Canvas Component Template의 `id`와 `presentation`도 같은 안정 id 계약을 따라야 한다.
 - Canvas App Custom Item Module은 `disabledCustomItemModuleIds`로 Host App에서 끌 수 있어야 하며, 알 수 없는 id는 실패해야 한다.
 - Canvas App Custom Creation Tool shortcut은 내부 canvas shortcut, shift-insensitive built-in shortcut, temporary pan, nudge shortcut, 다른 custom tool shortcut과 충돌하면 assembly 단계에서 실패해야 한다.

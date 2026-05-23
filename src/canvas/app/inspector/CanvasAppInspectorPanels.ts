@@ -3,6 +3,7 @@ import type {
   Bounds,
   CanvasItem,
 } from '../../entities'
+import { assertCanvasAppExtensionEntries } from '../extensions/CanvasAppExtensionIds'
 import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract'
 
 export type CanvasAppInspectorPanelContext = {
@@ -23,6 +24,31 @@ export type CanvasAppInspectorPanel = {
 export type CanvasAppInspectorPanelView = {
   content: ReactNode
   id: string
+}
+
+export function assertCanvasAppInspectorPanels(
+  panels: readonly CanvasAppInspectorPanel[],
+) {
+  assertCanvasAppExtensionEntries({
+    entries: panels,
+    label: 'inspector panel',
+  })
+
+  for (const panel of panels) {
+    assertCanvasAppInspectorPanelFunction({
+      fn: panel.render,
+      label: 'render',
+      panelId: panel.id,
+    })
+
+    if (panel.isVisible !== undefined) {
+      assertCanvasAppInspectorPanelFunction({
+        fn: panel.isVisible,
+        label: 'isVisible',
+        panelId: panel.id,
+      })
+    }
+  }
 }
 
 export function getCanvasAppInspectorPanelViews({
@@ -46,4 +72,18 @@ export function getCanvasAppInspectorPanelViews({
       return []
     }
   })
+}
+
+function assertCanvasAppInspectorPanelFunction({
+  fn,
+  label,
+  panelId,
+}: {
+  fn: unknown
+  label: string
+  panelId: string
+}) {
+  if (typeof fn !== 'function') {
+    throw new Error(`Canvas app inspector panel ${panelId} requires ${label}`)
+  }
 }

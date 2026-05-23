@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import type { CanvasAppInspectorPanelContext } from './CanvasAppInspectorPanels'
 import {
+  assertCanvasAppInspectorPanels,
   getCanvasAppInspectorPanelViews,
   type CanvasAppInspectorPanel,
 } from './CanvasAppInspectorPanels'
@@ -79,5 +80,25 @@ describe('CanvasAppInspectorPanels', () => {
         id: 'stable-panel',
       },
     ])
+  })
+
+  it('rejects malformed inspector panel descriptors before registration', () => {
+    expect(() =>
+      assertCanvasAppInspectorPanels([
+        {
+          id: 'risk-meta',
+        } as unknown as CanvasAppInspectorPanel,
+      ]),
+    ).toThrow('Canvas app inspector panel risk-meta requires render')
+
+    expect(() =>
+      assertCanvasAppInspectorPanels([
+        {
+          id: 'risk-meta',
+          isVisible: true,
+          render: () => null,
+        } as unknown as CanvasAppInspectorPanel,
+      ]),
+    ).toThrow('Canvas app inspector panel risk-meta requires isVisible')
   })
 })

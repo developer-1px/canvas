@@ -10,7 +10,7 @@ export type CanvasAppExtensionEntry = {
 }
 
 export function isCanvasAppExtensionId(
-  id: string,
+  id: unknown,
 ): id is CanvasAppExtensionId {
   return isCanvasStableId(id)
 }
@@ -19,7 +19,7 @@ export function assertCanvasAppExtensionId({
   id,
   label,
 }: {
-  id: string
+  id: unknown
   label: string
 }) {
   if (!isCanvasAppExtensionId(id)) {

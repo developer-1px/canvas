@@ -187,6 +187,15 @@ export function assertCanvasAppCustomCreationTools(
     entries: tools,
     label: 'custom creation tool',
   })
+
+  for (const tool of tools) {
+    if (typeof tool.createItem !== 'function') {
+      throw new Error(
+        `Canvas app custom creation tool ${tool.id} requires createItem`,
+      )
+    }
+  }
+
   assertCanvasAppCustomCreationToolShortcuts(tools)
 }
 

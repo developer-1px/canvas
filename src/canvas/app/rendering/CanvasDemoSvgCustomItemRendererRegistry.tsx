@@ -20,6 +20,7 @@ export function createCanvasDemoSvgCustomItemRenderers(
     entries: extensions,
     label: 'custom item renderer',
   })
+  assertCanvasDemoSvgCustomItemRendererStrategies(extensions)
 
   return { ...extensions }
 }
@@ -32,4 +33,16 @@ export function getCanvasDemoSvgCustomItemRenderer({
   renderers: CanvasDemoSvgCustomItemRenderers
 }) {
   return renderers[item.presentation] ?? CanvasDemoSvgUnknownCustomItem
+}
+
+function assertCanvasDemoSvgCustomItemRendererStrategies(
+  renderers: CanvasDemoSvgCustomItemRenderers,
+) {
+  for (const [presentation, renderer] of Object.entries(renderers)) {
+    if (typeof renderer !== 'function') {
+      throw new Error(
+        `Canvas app custom item renderer ${presentation} requires render strategy`,
+      )
+    }
+  }
 }

@@ -151,6 +151,30 @@ describe('CanvasAppCustomItemModules', () => {
     ).toThrow('Canvas custom item module risk requires validator')
   })
 
+  it('rejects malformed module-owned command and inspector descriptors', () => {
+    expect(() =>
+      defineRiskModule({
+        customCommands: [
+          {
+            id: 'publish-risk',
+            label: 'Pub',
+            title: 'Publish risk',
+          },
+        ],
+      } as unknown as Partial<CanvasAppCustomItemModule>),
+    ).toThrow('Canvas app custom command publish-risk requires run')
+
+    expect(() =>
+      defineRiskModule({
+        inspectorPanels: [
+          {
+            id: 'risk-meta',
+          },
+        ],
+      } as unknown as Partial<CanvasAppCustomItemModule>),
+    ).toThrow('Canvas app inspector panel risk-meta requires render')
+  })
+
   it('omits disabled modules from the assembled extension parts', () => {
     const module = defineRiskModule({
       customCreationTools: [

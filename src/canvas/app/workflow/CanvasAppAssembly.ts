@@ -19,13 +19,19 @@ import {
   type CanvasDemoSvgComponentPresentationRenderers,
   type CanvasDemoSvgCustomItemRenderers,
 } from '../rendering'
-import type { CanvasAppCustomCommand } from '../commands/CanvasAppCustomCommands'
+import {
+  assertCanvasAppCustomCommands,
+  type CanvasAppCustomCommand,
+} from '../commands/CanvasAppCustomCommands'
 import { assertCanvasAppExtensionRecordKeys } from '../extensions/CanvasAppExtensionIds'
 import {
   appendUniqueCanvasAppExtensionEntries,
   mergeUniqueCanvasAppExtensionRecord,
 } from '../extensions/CanvasAppExtensionRegistries'
-import type { CanvasAppInspectorPanel } from '../inspector/CanvasAppInspectorPanels'
+import {
+  assertCanvasAppInspectorPanels,
+  type CanvasAppInspectorPanel,
+} from '../inspector/CanvasAppInspectorPanels'
 import {
   createCanvasAppCustomItemModuleAssembly,
   type CanvasAppCustomItemModule,
@@ -141,7 +147,9 @@ export function createCanvasAppAssembly(
     label: 'component presentation renderer',
   })
   assertCanvasComponentPresentationRendererCoverage(assembly)
+  assertCanvasAppCustomCommands(assembly.customCommands)
   assertCanvasAppCustomCreationTools(assembly.customCreationTools)
+  assertCanvasAppInspectorPanels(assembly.inspectorPanels)
 
   return assembly
 }

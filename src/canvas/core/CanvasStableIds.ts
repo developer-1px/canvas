@@ -6,15 +6,15 @@ export type CanvasStableId = string & {
   readonly [canvasStableIdBrand]: true
 }
 
-export function isCanvasStableId(id: string): id is CanvasStableId {
-  return CANVAS_STABLE_ID_PATTERN.test(id)
+export function isCanvasStableId(id: unknown): id is CanvasStableId {
+  return typeof id === 'string' && CANVAS_STABLE_ID_PATTERN.test(id)
 }
 
 export function assertCanvasStableId({
   id,
   label,
 }: {
-  id: string
+  id: unknown
   label: string
 }) {
   if (!isCanvasStableId(id)) {

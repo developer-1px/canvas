@@ -4,6 +4,7 @@ import {
   createCanvasDemoSvgCustomItemRenderers,
   getCanvasDemoSvgCustomItemRenderer,
   type CanvasDemoSvgCustomItemRendererStrategy,
+  type CanvasDemoSvgCustomItemRenderers,
 } from './CanvasDemoSvgCustomItemRendererRegistry'
 
 const customItem: CanvasCustomItem = {
@@ -41,5 +42,15 @@ describe('CanvasDemoSvgCustomItemRenderer registry', () => {
         'Risk Node': () => null,
       }),
     ).toThrow('Invalid canvas app custom item renderer id: Risk Node')
+  })
+
+  it('rejects malformed custom item renderer strategies before registration', () => {
+    expect(() =>
+      createCanvasDemoSvgCustomItemRenderers({
+        'risk-node': undefined,
+      } as unknown as CanvasDemoSvgCustomItemRenderers),
+    ).toThrow(
+      'Canvas app custom item renderer risk-node requires render strategy',
+    )
   })
 })

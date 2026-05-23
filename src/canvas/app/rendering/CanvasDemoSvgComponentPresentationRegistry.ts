@@ -46,6 +46,7 @@ export function createCanvasDemoSvgComponentPresentationRenderers(
     entries: extensions,
     label: 'component presentation renderer',
   })
+  assertCanvasDemoSvgComponentPresentationRendererStrategies(extensions)
 
   return {
     ...DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS,
@@ -61,4 +62,16 @@ export function getCanvasDemoSvgComponentPresentationRenderer({
   renderers: CanvasDemoSvgComponentPresentationRenderers
 }) {
   return renderers[presentation] ?? CanvasDemoSvgCardComponent
+}
+
+function assertCanvasDemoSvgComponentPresentationRendererStrategies(
+  renderers: CanvasDemoSvgComponentPresentationRenderers,
+) {
+  for (const [presentation, renderer] of Object.entries(renderers)) {
+    if (typeof renderer !== 'function') {
+      throw new Error(
+        `Canvas app component presentation renderer ${presentation} requires render strategy`,
+      )
+    }
+  }
 }

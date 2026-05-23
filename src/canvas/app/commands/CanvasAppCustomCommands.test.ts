@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import type { CanvasAppCustomCommandContext } from './CanvasAppCustomCommands'
 import {
+  assertCanvasAppCustomCommands,
   getCanvasAppCustomCommandStates,
   runCanvasAppCustomCommand,
   type CanvasAppCustomCommand,
@@ -129,5 +130,29 @@ describe('CanvasAppCustomCommands', () => {
       }),
     ).toBe(false)
     expect(throwingRun).toHaveBeenCalledTimes(1)
+  })
+
+  it('rejects malformed custom command descriptors before registration', () => {
+    expect(() =>
+      assertCanvasAppCustomCommands([
+        {
+          id: 'publish',
+          label: 'Pub',
+          title: 'Publish selection',
+        } as unknown as CanvasAppCustomCommand,
+      ]),
+    ).toThrow('Canvas app custom command publish requires run')
+
+    expect(() =>
+      assertCanvasAppCustomCommands([
+        {
+          id: 'publish',
+          label: 'Pub',
+          title: 'Publish selection',
+          isEnabled: true,
+          run: vi.fn(),
+        } as unknown as CanvasAppCustomCommand,
+      ]),
+    ).toThrow('Canvas app custom command publish requires isEnabled')
   })
 })

@@ -4,6 +4,7 @@ import type {
   EditingText,
   Viewport,
 } from '../../entities'
+import { assertCanvasAppExtensionEntries } from '../extensions/CanvasAppExtensionIds'
 import type {
   CommitCanvasItemsChange,
   CommitCanvasSelection,
@@ -34,6 +35,31 @@ export type CanvasAppCustomCommandState = {
   id: string
   label: string
   title: string
+}
+
+export function assertCanvasAppCustomCommands(
+  commands: readonly CanvasAppCustomCommand[],
+) {
+  assertCanvasAppExtensionEntries({
+    entries: commands,
+    label: 'custom command',
+  })
+
+  for (const command of commands) {
+    assertCanvasAppCustomCommandFunction({
+      commandId: command.id,
+      fn: command.run,
+      label: 'run',
+    })
+
+    if (command.isEnabled !== undefined) {
+      assertCanvasAppCustomCommandFunction({
+        commandId: command.id,
+        fn: command.isEnabled,
+        label: 'isEnabled',
+      })
+    }
+  }
 }
 
 export function getCanvasAppCustomCommandStates({
@@ -88,5 +114,19 @@ function isCanvasAppCustomCommandDisabled(
     return !command.isEnabled(context)
   } catch {
     return true
+  }
+}
+
+function assertCanvasAppCustomCommandFunction({
+  commandId,
+  fn,
+  label,
+}: {
+  commandId: string
+  fn: unknown
+  label: string
+}) {
+  if (typeof fn !== 'function') {
+    throw new Error(`Canvas app custom command ${commandId} requires ${label}`)
   }
 }

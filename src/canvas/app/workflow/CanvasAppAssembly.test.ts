@@ -2,12 +2,15 @@ import { describe, expect, it } from 'vitest'
 import {
   createCanvasDemoSvgComponentPresentationRenderers,
   type CanvasDemoSvgComponentRendererStrategy,
+  type CanvasDemoSvgComponentPresentationRenderers,
   type CanvasDemoSvgCustomItemRendererStrategy,
 } from '../rendering'
 import { createCanvasComponentLibrary } from '../../host'
 import {
   createCanvasAppAssembly,
   defineCanvasAppCustomItemModule,
+  type CanvasAppCustomCommand,
+  type CanvasAppInspectorPanel,
 } from './index'
 
 describe('CanvasAppAssembly', () => {
@@ -230,6 +233,40 @@ describe('CanvasAppAssembly', () => {
         },
       }),
     ).toThrow('Invalid canvas app component presentation renderer id: Risk Card')
+  })
+
+  it('rejects malformed direct app descriptors at the assembly seam', () => {
+    expect(() =>
+      createCanvasAppAssembly({
+        customCommands: [
+          {
+            id: 'publish',
+            label: 'Pub',
+            title: 'Publish risk',
+          } as unknown as CanvasAppCustomCommand,
+        ],
+      }),
+    ).toThrow('Canvas app custom command publish requires run')
+
+    expect(() =>
+      createCanvasAppAssembly({
+        inspectorPanels: [
+          {
+            id: 'risk-meta',
+          } as unknown as CanvasAppInspectorPanel,
+        ],
+      }),
+    ).toThrow('Canvas app inspector panel risk-meta requires render')
+
+    expect(() =>
+      createCanvasAppAssembly({
+        componentPresentationRenderers: {
+          'risk-card': undefined,
+        } as unknown as CanvasDemoSvgComponentPresentationRenderers,
+      }),
+    ).toThrow(
+      'Canvas app component presentation renderer risk-card requires render strategy',
+    )
   })
 
   it('can disable custom item modules at the app assembly seam', () => {

@@ -27,6 +27,12 @@ describe('CanvasStableIds', () => {
     expect(invalidIds.filter((id) => isCanvasStableId(id))).toEqual([])
   })
 
+  it('rejects non-string ids instead of coercing them', () => {
+    expect(isCanvasStableId(undefined)).toBe(false)
+    expect(isCanvasStableId(null)).toBe(false)
+    expect(isCanvasStableId(true)).toBe(false)
+  })
+
   it('uses the caller label in assertion errors', () => {
     expect(() =>
       assertCanvasStableId({

@@ -104,6 +104,17 @@ describe('CanvasAppCustomCreationTools', () => {
     )
   })
 
+  it('rejects malformed custom creation tool descriptors before registration', () => {
+    expect(() =>
+      assertCanvasAppCustomCreationTools([
+        {
+          ...tool,
+          createItem: undefined,
+        } as unknown as CanvasAppCustomCreationTool,
+      ]),
+    ).toThrow('Canvas app custom creation tool risk requires createItem')
+  })
+
   it('rejects built-in canvas shortcut conflicts', () => {
     expect(() =>
       assertCanvasAppCustomCreationToolShortcuts([

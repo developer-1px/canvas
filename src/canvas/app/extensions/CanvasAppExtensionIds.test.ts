@@ -29,6 +29,12 @@ describe('CanvasAppExtensionIds', () => {
     ).toEqual([])
   })
 
+  it('rejects non-string extension ids instead of coercing them', () => {
+    expect(isCanvasAppExtensionId(undefined)).toBe(false)
+    expect(isCanvasAppExtensionId(null)).toBe(false)
+    expect(isCanvasAppExtensionId(true)).toBe(false)
+  })
+
   it('names invalid extension ids by the public contract slot', () => {
     expect(() =>
       assertCanvasAppExtensionId({
