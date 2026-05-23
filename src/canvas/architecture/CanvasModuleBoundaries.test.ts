@@ -255,12 +255,85 @@ describe('Canvas module boundaries', () => {
       'createCanvasAppCustomItemModuleAssembly',
     )
     expect(extensionAssemblyFile.source).toContain(
-      'appendUniqueCanvasAppExtensionEntries',
+      "from '../extensions/CanvasAppExtensionBundle'",
     )
     expect(extensionAssemblyFile.source).toContain(
+      'mergeCanvasAppExtensionBundle',
+    )
+    expect(extensionAssemblyFile.source).toContain(
+      'createCanvasAppExtensionBundle',
+    )
+    expect(extensionAssemblyFile.source).toContain(
+      "owner: 'app assembly'",
+    )
+    expect(extensionAssemblyFile.source).not.toContain(
+      'appendUniqueCanvasAppExtensionEntries',
+    )
+    expect(extensionAssemblyFile.source).not.toContain(
       'mergeUniqueCanvasAppExtensionRecord',
     )
-    expect(extensionAssemblyFile.source).toContain("owner: 'app assembly'")
+  })
+
+  it('keeps App extension bundle slot merging behind a named module', () => {
+    const extensionAssemblyFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppExtensionAssembly.ts',
+    )
+    const customItemModuleFile = getSourceFile(
+      'src/canvas/app/modules/CanvasAppCustomItemModules.ts',
+    )
+    const customItemModuleRuntimeFile = getSourceFile(
+      'src/canvas/app/modules/CanvasAppCustomItemModuleRuntime.ts',
+    )
+    const extensionBundleFile = getSourceFile(
+      'src/canvas/app/extensions/CanvasAppExtensionBundle.ts',
+    )
+
+    expect(extensionAssemblyFile.source).toContain(
+      "from '../extensions/CanvasAppExtensionBundle'",
+    )
+    expect(customItemModuleFile.source).toContain(
+      "from '../extensions/CanvasAppExtensionBundle'",
+    )
+    expect(customItemModuleRuntimeFile.source).toContain(
+      'getCanvasAppCustomItemModuleExtensionBundle',
+    )
+    expect(customItemModuleRuntimeFile.source).toContain(
+      'createCanvasAppExtensionBundle',
+    )
+    for (const consumerFile of [
+      extensionAssemblyFile,
+      customItemModuleFile,
+    ]) {
+      expect(consumerFile.source).not.toContain(
+        'appendUniqueCanvasAppExtensionEntries',
+      )
+      expect(consumerFile.source).not.toContain(
+        'mergeUniqueCanvasAppExtensionRecord',
+      )
+      expect(consumerFile.source).not.toContain("label: 'custom command'")
+      expect(consumerFile.source).not.toContain(
+        "label: 'custom item renderer'",
+      )
+    }
+    expect(extensionBundleFile.source).toContain(
+      'export type CanvasAppExtensionBundle',
+    )
+    expect(extensionBundleFile.source).toContain(
+      'export function createEmptyCanvasAppExtensionBundle',
+    )
+    expect(extensionBundleFile.source).toContain(
+      'export function mergeCanvasAppExtensionBundle',
+    )
+    expect(extensionBundleFile.source).toContain(
+      'appendUniqueCanvasAppExtensionEntries',
+    )
+    expect(extensionBundleFile.source).toContain(
+      'mergeUniqueCanvasAppExtensionRecord',
+    )
+    expect(extensionBundleFile.source).toContain("label: 'custom command'")
+    expect(extensionBundleFile.source).toContain(
+      "label: 'custom item renderer'",
+    )
   })
 
   it('keeps App Model from distributing Assembly output fields directly', () => {

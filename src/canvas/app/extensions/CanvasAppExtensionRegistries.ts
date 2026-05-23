@@ -3,7 +3,7 @@ import {
   assertCanvasAppExtensionRecordKeys,
 } from './CanvasAppExtensionIds'
 
-type CanvasAppExtensionRegistryOwner =
+export type CanvasAppExtensionRegistryOwner =
   | 'app assembly'
   | 'custom item module'
 

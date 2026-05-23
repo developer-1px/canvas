@@ -4,6 +4,10 @@ import type {
   CanvasCustomItemValidators,
 } from '../../host'
 import { normalizeCanvasItems } from '../../host'
+import {
+  createCanvasAppExtensionBundle,
+  type CanvasAppExtensionBundle,
+} from '../extensions/CanvasAppExtensionBundle'
 import type { CanvasAppCustomItemRenderers } from '../rendering/CanvasAppRendererRegistries'
 import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
 import type {
@@ -66,6 +70,18 @@ export function getCanvasAppCustomItemModuleCreationTools({
         }
       },
     }
+  })
+}
+
+export function getCanvasAppCustomItemModuleExtensionBundle(
+  module: CanvasAppCustomItemModule,
+): CanvasAppExtensionBundle {
+  return createCanvasAppExtensionBundle({
+    customCommands: module.customCommands,
+    customCreationTools: getCanvasAppCustomItemModuleCreationTools(module),
+    customItemRenderers: getCanvasAppCustomItemModuleRenderers(module),
+    customItemValidators: getCanvasAppCustomItemModuleValidators(module),
+    inspectorPanels: module.inspectorPanels,
   })
 }
 

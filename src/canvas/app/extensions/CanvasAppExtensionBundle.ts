@@ -1,0 +1,95 @@
+import type { CanvasCustomItemValidators } from '../../host'
+import type { CanvasAppCustomCommand } from '../commands/CanvasAppCustomCommands'
+import type { CanvasAppInspectorPanel } from '../inspector/CanvasAppInspectorPanels'
+import type { CanvasAppCustomItemRenderers } from '../rendering/CanvasAppRendererRegistries'
+import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
+import {
+  appendUniqueCanvasAppExtensionEntries,
+  type CanvasAppExtensionRegistryOwner,
+  mergeUniqueCanvasAppExtensionRecord,
+} from './CanvasAppExtensionRegistries'
+
+export type CanvasAppExtensionBundle = {
+  customCommands: readonly CanvasAppCustomCommand[]
+  customCreationTools: readonly CanvasAppCustomCreationTool[]
+  customItemRenderers: CanvasAppCustomItemRenderers
+  customItemValidators: CanvasCustomItemValidators
+  inspectorPanels: readonly CanvasAppInspectorPanel[]
+}
+
+export type CanvasAppExtensionBundleInput = {
+  customCommands?: readonly CanvasAppCustomCommand[]
+  customCreationTools?: readonly CanvasAppCustomCreationTool[]
+  customItemRenderers?: CanvasAppCustomItemRenderers
+  customItemValidators?: CanvasCustomItemValidators
+  inspectorPanels?: readonly CanvasAppInspectorPanel[]
+}
+
+export function createEmptyCanvasAppExtensionBundle(): CanvasAppExtensionBundle {
+  return {
+    customCommands: [],
+    customCreationTools: [],
+    customItemRenderers: {},
+    customItemValidators: {},
+    inspectorPanels: [],
+  }
+}
+
+export function createCanvasAppExtensionBundle({
+  customCommands = [],
+  customCreationTools = [],
+  customItemRenderers = {},
+  customItemValidators = {},
+  inspectorPanels = [],
+}: CanvasAppExtensionBundleInput = {}): CanvasAppExtensionBundle {
+  return {
+    customCommands,
+    customCreationTools,
+    customItemRenderers,
+    customItemValidators,
+    inspectorPanels,
+  }
+}
+
+export function mergeCanvasAppExtensionBundle({
+  current,
+  entries,
+  owner,
+}: {
+  current: CanvasAppExtensionBundle
+  entries: CanvasAppExtensionBundle
+  owner: CanvasAppExtensionRegistryOwner
+}): CanvasAppExtensionBundle {
+  return {
+    customCommands: appendUniqueCanvasAppExtensionEntries({
+      current: current.customCommands,
+      entries: entries.customCommands,
+      label: 'custom command',
+      owner,
+    }),
+    customCreationTools: appendUniqueCanvasAppExtensionEntries({
+      current: current.customCreationTools,
+      entries: entries.customCreationTools,
+      label: 'custom creation tool',
+      owner,
+    }),
+    customItemRenderers: mergeUniqueCanvasAppExtensionRecord({
+      current: current.customItemRenderers,
+      entries: entries.customItemRenderers,
+      label: 'custom item renderer',
+      owner,
+    }),
+    customItemValidators: mergeUniqueCanvasAppExtensionRecord({
+      current: current.customItemValidators,
+      entries: entries.customItemValidators,
+      label: 'custom item validator',
+      owner,
+    }),
+    inspectorPanels: appendUniqueCanvasAppExtensionEntries({
+      current: current.inspectorPanels,
+      entries: entries.inspectorPanels,
+      label: 'inspector panel',
+      owner,
+    }),
+  }
+}

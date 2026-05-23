@@ -2,22 +2,18 @@ import type {
   Bounds,
   CanvasJsonObject,
 } from '../../entities'
-import {
-  type CanvasCustomItemValidator,
-  type CanvasCustomItemValidators,
-} from '../../host'
+import { type CanvasCustomItemValidator } from '../../host'
 import type { CanvasAppCustomCommand } from '../commands/CanvasAppCustomCommands'
 import {
-  appendUniqueCanvasAppExtensionEntries,
-  mergeUniqueCanvasAppExtensionRecord,
-} from '../extensions/CanvasAppExtensionRegistries'
+  createEmptyCanvasAppExtensionBundle,
+  type CanvasAppExtensionBundle,
+  mergeCanvasAppExtensionBundle,
+} from '../extensions/CanvasAppExtensionBundle'
 import type { CanvasAppInspectorPanel } from '../inspector/CanvasAppInspectorPanels'
 import type {
   CanvasAppCustomItemRendererStrategy,
-  CanvasAppCustomItemRenderers,
 } from '../rendering/CanvasAppRendererRegistries'
 import {
-  type CanvasAppCustomCreationTool,
   type CanvasAppCustomCreationToolContext,
   type CanvasAppCustomToolShortcut,
 } from '../tools/CanvasAppCustomCreationTools'
@@ -27,9 +23,7 @@ import {
   assertCanvasAppCustomItemModuleAssemblyInput,
 } from './CanvasAppCustomItemModuleContracts'
 import {
-  getCanvasAppCustomItemModuleCreationTools,
-  getCanvasAppCustomItemModuleRenderers,
-  getCanvasAppCustomItemModuleValidators,
+  getCanvasAppCustomItemModuleExtensionBundle,
 } from './CanvasAppCustomItemModuleRuntime'
 import {
   snapshotCanvasAppCustomItemModule,
@@ -64,13 +58,7 @@ export type CanvasAppCustomItemModule = {
   validateItem: CanvasCustomItemValidator
 }
 
-export type CanvasAppCustomItemModuleAssembly = {
-  customCommands: readonly CanvasAppCustomCommand[]
-  customCreationTools: readonly CanvasAppCustomCreationTool[]
-  customItemRenderers: CanvasAppCustomItemRenderers
-  customItemValidators: CanvasCustomItemValidators
-  inspectorPanels: readonly CanvasAppInspectorPanel[]
-}
+export type CanvasAppCustomItemModuleAssembly = CanvasAppExtensionBundle
 
 export type CanvasAppCustomItemModuleAssemblyOptions = {
   disabledModuleIds?: readonly string[]
@@ -98,45 +86,13 @@ export function createCanvasAppCustomItemModuleAssembly(
   )
 
   const assembly = enabledModules.reduce<CanvasAppCustomItemModuleAssembly>(
-    (assembly, module) => ({
-      customCommands: appendUniqueCanvasAppExtensionEntries({
-        current: assembly.customCommands,
-        entries: module.customCommands ?? [],
-        label: 'custom command',
+    (assembly, module) =>
+      mergeCanvasAppExtensionBundle({
+        current: assembly,
+        entries: getCanvasAppCustomItemModuleExtensionBundle(module),
         owner: 'custom item module',
       }),
-      customCreationTools: appendUniqueCanvasAppExtensionEntries({
-        current: assembly.customCreationTools,
-        entries: getCanvasAppCustomItemModuleCreationTools(module),
-        label: 'custom creation tool',
-        owner: 'custom item module',
-      }),
-      customItemRenderers: mergeUniqueCanvasAppExtensionRecord({
-        current: assembly.customItemRenderers,
-        entries: getCanvasAppCustomItemModuleRenderers(module),
-        label: 'custom item renderer',
-        owner: 'custom item module',
-      }),
-      customItemValidators: mergeUniqueCanvasAppExtensionRecord({
-        current: assembly.customItemValidators,
-        entries: getCanvasAppCustomItemModuleValidators(module),
-        label: 'custom item validator',
-        owner: 'custom item module',
-      }),
-      inspectorPanels: appendUniqueCanvasAppExtensionEntries({
-        current: assembly.inspectorPanels,
-        entries: module.inspectorPanels ?? [],
-        label: 'inspector panel',
-        owner: 'custom item module',
-      }),
-    }),
-    {
-      customCommands: [],
-      customCreationTools: [],
-      customItemRenderers: {},
-      customItemValidators: {},
-      inspectorPanels: [],
-    },
+    createEmptyCanvasAppExtensionBundle(),
   )
 
   assertCanvasAppCustomItemModuleAssembly(assembly)
