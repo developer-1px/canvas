@@ -1263,6 +1263,9 @@ describe('Canvas module boundaries', () => {
     const contractsFile = getSourceFile(
       'src/canvas/app/rendering/CanvasDemoSvgComponentPresentationRegistryContracts.ts',
     )
+    const rendererRegistryContractsFile = getSourceFile(
+      'src/canvas/app/rendering/CanvasAppRendererRegistryContracts.ts',
+    )
 
     expect(registryFile.source).toContain(
       "from './CanvasDemoSvgBuiltInComponentPresentationRenderers'",
@@ -1285,9 +1288,19 @@ describe('Canvas module boundaries', () => {
       'export function assertCanvasDemoSvgComponentPresentationRenderers',
     )
     expect(contractsFile.source).toContain(
+      'assertCanvasAppRendererRegistry',
+    )
+    expect(contractsFile.source).not.toContain(
       'assertCanvasAppExtensionRecordKeys',
     )
-    expect(contractsFile.source).toContain('render strategy')
+    expect(contractsFile.source).not.toContain('render strategy')
+    expect(rendererRegistryContractsFile.source).toContain(
+      'export function assertCanvasAppRendererRegistry',
+    )
+    expect(rendererRegistryContractsFile.source).toContain(
+      'assertCanvasAppExtensionRecordKeys',
+    )
+    expect(rendererRegistryContractsFile.source).toContain('render strategy')
   })
 
   it('keeps Demo SVG custom item render fallback behind a named module', () => {
@@ -1337,6 +1350,9 @@ describe('Canvas module boundaries', () => {
     const contractsFile = getSourceFile(
       'src/canvas/app/rendering/CanvasDemoSvgCustomItemRendererRegistryContracts.ts',
     )
+    const rendererRegistryContractsFile = getSourceFile(
+      'src/canvas/app/rendering/CanvasAppRendererRegistryContracts.ts',
+    )
 
     expect(registryFile.source).toContain(
       "from './CanvasDemoSvgCustomItemRendererRegistryContracts'",
@@ -1349,9 +1365,15 @@ describe('Canvas module boundaries', () => {
       'export function assertCanvasDemoSvgCustomItemRenderers',
     )
     expect(contractsFile.source).toContain(
+      'assertCanvasAppRendererRegistry',
+    )
+    expect(contractsFile.source).not.toContain(
       'assertCanvasAppExtensionRecordKeys',
     )
-    expect(contractsFile.source).toContain('render strategy')
+    expect(contractsFile.source).not.toContain('render strategy')
+    expect(rendererRegistryContractsFile.source).toContain(
+      'export function assertCanvasAppRendererRegistry',
+    )
   })
 
   it('keeps App inspector panel execution behind a named module', () => {

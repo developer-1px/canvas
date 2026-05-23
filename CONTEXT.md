@@ -67,6 +67,7 @@
 - Canvas App Custom Item Validator Contracts: custom item validator registry key와 validate strategy slot을 검증하는 App-owned contract Module.
 - Canvas Component Presentation Registry: Demo component presentation key를 SVG rendering strategy에 연결하는 외부 조립 가능한 registry.
 - Demo SVG Built-in Component Presentation Renderers: 기본 Demo component presentation key와 SVG renderer strategy mapping을 소유하는 App rendering Module.
+- Canvas App Renderer Registry Contracts: component/custom item renderer registry key와 render strategy slot 검증을 공유하는 App rendering contract Module.
 - Demo SVG Component Presentation Registry Contracts: component presentation renderer registry key와 render strategy slot을 검증하는 App rendering contract Module.
 - Demo SVG Component Renderer Execution: component presentation resolver 호출, renderer lookup, render 실행, throw 시 fallback containment를 소유하는 App rendering Module.
 - Canvas Component Library Contracts: component library input, component template descriptor shape, stable id/presentation, duplicate template id를 검증하는 Host-owned contract Module.
@@ -142,7 +143,7 @@
 - 새 Demo component kind와 새 SVG presentation은 Canvas App Assembly에서 component library와 presentation registry를 조립해 붙인다.
 - Canvas Component Library의 모든 presentation은 Canvas App Assembly의 component presentation renderer registry에 있어야 한다.
 - 기본 component presentation renderer mapping은 Demo SVG Built-in Component Presentation Renderers가 소유하고, 제품별 renderer는 Canvas App Assembly에서 extension으로 조립한다.
-- 제품별 custom item renderer registry shape는 Demo SVG Custom Item Renderer Registry Contracts에서 검증한다.
+- 제품별 renderer registry shape는 Canvas App Renderer Registry Contracts에서 공통 검증하고, Demo SVG Component Presentation Registry Contracts와 Demo SVG Custom Item Renderer Registry Contracts는 registry 종류만 지정한다.
 - Canvas Component Template은 id/presentation뿐 아니라 필수 label/title/style string, 양수 크기, optional string list shape도 Canvas Component Library Contracts에서 실패해야 하며, 생성된 library는 외부 template mutation에 흔들리지 않는 snapshot을 보관한다.
 - Canvas App Assembly는 주입된 Canvas Component Library의 `templates`, `getTemplate`, `getPresentation` 결과가 일관되지 않으면 실패해야 한다.
 - Canvas App Assembly input은 output type을 부분 노출하지 않고 명시적 필드 계약으로 유지한다.
