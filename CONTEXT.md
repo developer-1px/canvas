@@ -45,6 +45,7 @@
 - Demo 설명과 장식은 최소화한다.
 - 이 프로젝트는 단일 서비스 앱보다 재사용 가능한 캔버스 부품공장을 우선한다.
 - 당연한 사회적 약속이 되어 있는 캔버스 기능은 내부 모듈이 관리하고, 제품별 커스텀 기능은 외부에서 조립식으로 등록할 수 있어야 한다.
+- marker, highlighter, arrow 같은 기본 드로잉 도구는 제품별 custom item module이 아니라 내부 Affordance로 관리한다.
 - 엔진은 Fabric.js 같은 완성형 객체 모델을 감싸기보다, 커스텀 가능한 Affordance 문법을 작은 Interface로 제공한다.
 - Demo `CanvasItem`과 SVG 렌더링 방식은 재사용 Core Contract에 포함하지 않는다.
 - Renderer Stage는 Demo `CanvasItem`, Host read model, component library를 import하지 않는다.
@@ -59,6 +60,7 @@
 - Canvas App Assembly input은 output type을 부분 노출하지 않고 명시적 필드 계약으로 유지한다.
 - Canvas App Assembly의 component presentation renderer input은 기본 registry를 대체하지 않고 extension/override로 합성한다.
 - Canvas App Assembly의 initial items는 조립된 Canvas Custom Item Validator로 assembly 단계에서 검증한다.
+- Canvas App Assembly input은 custom item renderer/validator/creation registry를 직접 받지 않고 Canvas App Custom Item Module만 받는다.
 - 제품별 business action은 Engine command union에 넣지 않고 Canvas App Custom Command로 등록한다.
 - Canvas App Custom Command의 availability/run 실패는 내부 command loop를 깨지 않고 disabled/false로 containment 한다.
 - 제품별 item creation tool은 내부 Tool union에 구체 id를 넣지 않고 Canvas App Custom Item Module에 등록한다.

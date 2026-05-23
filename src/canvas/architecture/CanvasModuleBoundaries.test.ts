@@ -123,6 +123,23 @@ describe('Canvas module boundaries', () => {
     expect(violations).toEqual([])
   })
 
+  it('keeps custom item registries as Assembly output, not input', () => {
+    const assemblyFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppAssembly.ts',
+    )
+    const inputContract =
+      assemblyFile.source.match(
+        /export type CanvasAppAssemblyInput = \{[\s\S]*?\n\}/,
+      )?.[0] ?? ''
+
+    expect(inputContract).toContain(
+      'customItemModules?: readonly CanvasAppCustomItemModule[]',
+    )
+    expect(inputContract).not.toMatch(
+      /\b(customCreationTools|customItemRenderers|customItemValidators)\?:/,
+    )
+  })
+
   it('keeps product-specific custom item ids outside canvas implementation', () => {
     const productCustomTerms =
       /\b(risk|risk-node|custom:risk|demo-risk-text)\b|kind:\s*['"]risk['"]/
@@ -223,6 +240,16 @@ function getImportsFromOutside(pathPrefix: string) {
   return sourceFiles
     .filter((file) => !file.path.startsWith(pathPrefix))
     .flatMap(getImportReferences)
+}
+
+function getSourceFile(path: string) {
+  const sourceFile = sourceFiles.find((file) => file.path === path)
+
+  if (!sourceFile) {
+    throw new Error(`Missing source file: ${path}`)
+  }
+
+  return sourceFile
 }
 
 function getImportReferences(file: SourceFile): ImportReference[] {
