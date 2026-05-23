@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   CANVAS_COMPONENT_LIBRARY,
   createCanvasComponentLibrary,
+  type CanvasComponentTemplate,
 } from './CanvasComponentLibrary'
 
 describe('CANVAS_COMPONENT_LIBRARY', () => {
@@ -114,6 +115,61 @@ describe('CANVAS_COMPONENT_LIBRARY', () => {
         ],
       }),
     ).toThrow('Invalid canvas component template id: Risk')
+  })
+
+  it('rejects malformed externally assembled component templates', () => {
+    const template = CANVAS_COMPONENT_LIBRARY.templates[0]
+
+    expect(() =>
+      createCanvasComponentLibrary(
+        null as unknown as Parameters<typeof createCanvasComponentLibrary>[0],
+      ),
+    ).toThrow('Canvas component library input must be an object')
+
+    expect(() =>
+      createCanvasComponentLibrary({
+        templates: {} as unknown as CanvasComponentTemplate[],
+      }),
+    ).toThrow('Canvas component library templates must be an array')
+
+    expect(() =>
+      createCanvasComponentLibrary({
+        templates: [undefined] as unknown as CanvasComponentTemplate[],
+      }),
+    ).toThrow('Canvas component template descriptor must be an object')
+
+    expect(() =>
+      createCanvasComponentLibrary({
+        templates: [
+          {
+            ...template,
+            label: '',
+          },
+        ],
+      }),
+    ).toThrow('Canvas component template sticky requires label')
+
+    expect(() =>
+      createCanvasComponentLibrary({
+        templates: [
+          {
+            ...template,
+            w: 0,
+          },
+        ],
+      }),
+    ).toThrow('Canvas component template sticky requires positive w')
+
+    expect(() =>
+      createCanvasComponentLibrary({
+        templates: [
+          {
+            ...template,
+            items: ['Scope', 1],
+          } as unknown as CanvasComponentTemplate,
+        ],
+      }),
+    ).toThrow('Canvas component template sticky requires items')
   })
 
   it('rejects component presentation keys outside the stable id contract', () => {
