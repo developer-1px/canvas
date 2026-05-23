@@ -1031,6 +1031,9 @@ describe('Canvas module boundaries', () => {
     const executionFile = getSourceFile(
       'src/canvas/app/commands/CanvasStandardCommandExecution.ts',
     )
+    const effectPlanFile = getSourceFile(
+      'src/canvas/app/commands/CanvasStandardCommandEffectPlan.ts',
+    )
 
     expect(commandHookFile.source).toContain(
       "from './CanvasStandardCommandExecution'",
@@ -1045,13 +1048,29 @@ describe('Canvas module boundaries', () => {
     expect(executionFile.source).toContain(
       'export function executeCanvasStandardCommand',
     )
-    expect(executionFile.source).toContain('alignCanvasCommand')
-    expect(executionFile.source).toContain('deleteCanvasCommand')
-    expect(executionFile.source).toContain('groupCanvasCommand')
-    expect(executionFile.source).toContain('nudgeCanvasCommand')
-    expect(executionFile.source).toContain('selectAllCanvasCommand')
-    expect(executionFile.source).toContain("type: 'remove-selection'")
-    expect(executionFile.source).toContain("type: 'group-selection'")
+    expect(executionFile.source).toContain(
+      "from './CanvasStandardCommandEffectPlan'",
+    )
+    expect(executionFile.source).toContain(
+      'applyCanvasStandardDocumentEffect',
+    )
+    expect(executionFile.source).not.toContain('alignCanvasCommand')
+    expect(executionFile.source).not.toContain('deleteCanvasCommand')
+    expect(executionFile.source).not.toContain('groupCanvasCommand')
+    expect(executionFile.source).not.toContain('nudgeCanvasCommand')
+    expect(executionFile.source).not.toContain('selectAllCanvasCommand')
+    expect(executionFile.source).not.toContain("type: 'remove-selection'")
+    expect(executionFile.source).not.toContain("type: 'group-selection'")
+    expect(effectPlanFile.source).toContain(
+      'export function createCanvasStandardCommandEffectPlan',
+    )
+    expect(effectPlanFile.source).toContain('alignCanvasCommand')
+    expect(effectPlanFile.source).toContain('deleteCanvasCommand')
+    expect(effectPlanFile.source).toContain('groupCanvasCommand')
+    expect(effectPlanFile.source).toContain('nudgeCanvasCommand')
+    expect(effectPlanFile.source).toContain('selectAllCanvasCommand')
+    expect(effectPlanFile.source).toContain("type: 'remove-selection'")
+    expect(effectPlanFile.source).toContain("type: 'group-selection'")
   })
 
   it('keeps App standard command document effects behind a named module', () => {
@@ -1064,6 +1083,9 @@ describe('Canvas module boundaries', () => {
 
     expect(executionFile.source).toContain(
       "from './CanvasStandardCommandDocumentEffects'",
+    )
+    expect(effectsFile.source).toContain(
+      'export function applyCanvasStandardDocumentEffect',
     )
     expect(executionFile.source).not.toContain('context.commitItemsChange(')
     expect(executionFile.source).not.toContain('context.commitSelection(')

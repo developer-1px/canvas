@@ -22,6 +22,54 @@ export type CanvasStandardCommandDocumentEffectContext = {
 type CanvasStandardCommandItemsChange =
   Parameters<CommitCanvasItemsChange>[0]
 
+export type CanvasStandardCommandDocumentEffect =
+  | {
+      afterSelection?: string[]
+      change: CanvasStandardCommandItemsChange
+      clearEditingIds?: readonly string[]
+      fallbackSelection?: string[]
+      kind: 'items-change'
+    }
+  | {
+      direction: 'redo' | 'undo'
+      kind: 'history'
+    }
+  | {
+      kind: 'selection'
+      selection: string[]
+    }
+
+export function applyCanvasStandardDocumentEffect({
+  context,
+  effect,
+}: {
+  context: CanvasStandardCommandDocumentEffectContext
+  effect: CanvasStandardCommandDocumentEffect
+}) {
+  switch (effect.kind) {
+    case 'items-change':
+      return applyCanvasStandardItemsChangeEffect({
+        afterSelection: effect.afterSelection,
+        change: effect.change,
+        clearEditingIds: effect.clearEditingIds,
+        context,
+        fallbackSelection: effect.fallbackSelection,
+      })
+    case 'history':
+      return applyCanvasStandardHistoryEffect({
+        context,
+        direction: effect.direction,
+      })
+    case 'selection':
+      return applyCanvasStandardSelectionEffect({
+        context,
+        selection: effect.selection,
+      })
+  }
+
+  return assertUnhandledCanvasStandardDocumentEffect(effect)
+}
+
 export function applyCanvasStandardItemsChangeEffect({
   afterSelection,
   change,
@@ -52,6 +100,12 @@ export function applyCanvasStandardItemsChangeEffect({
   }
 
   return true
+}
+
+function assertUnhandledCanvasStandardDocumentEffect(
+  effect: never,
+): never {
+  throw new Error(`Unhandled canvas standard document effect: ${String(effect)}`)
 }
 
 export function applyCanvasStandardSelectionEffect({
