@@ -17,6 +17,15 @@ import type {
   CommitCanvasSelection,
   CanvasDocumentTextSearch,
 } from '../workflow/CanvasWorkflowContract'
+import {
+  commitCanvasDocumentItemsChange,
+  commitCanvasDocumentSelection,
+  redoCanvasDocumentHistory,
+  replaceCanvasDocumentLiveItems,
+  replaceCanvasDocumentText,
+  restoreCanvasDocumentSelection,
+  undoCanvasDocumentHistory,
+} from './CanvasDocumentRuntime'
 
 export function useCanvasDocument(
   initialItems: CanvasItem[],
@@ -38,16 +47,22 @@ export function useCanvasDocument(
     })
   }, [document])
 
-  const syncHistoryAvailability = useCallback(() => {
-    setHistoryAvailability(document.readHistoryAvailability())
-  }, [document])
+  const syncCommittedState = useCallback((state: {
+    historyAvailability: typeof historyAvailability
+    items: CanvasItem[]
+  }) => {
+    itemsRef.current = state.items
+    setItemsState(state.items)
+    setHistoryAvailability(state.historyAvailability)
+  }, [])
 
   const setLiveItems: Dispatch<SetStateAction<CanvasItem[]>> = useCallback(
     (action) => {
-      const next = document.replaceItems(
-        itemsRef.current,
-        resolve(action, itemsRef.current),
-      )
+      const next = replaceCanvasDocumentLiveItems({
+        action,
+        currentItems: itemsRef.current,
+        document,
+      })
 
       itemsRef.current = next
       setItemsState(next)
@@ -55,57 +70,48 @@ export function useCanvasDocument(
     [document],
   )
 
-  const syncCommittedItems = useCallback(() => {
-    itemsRef.current = document.readItems()
-    setItemsState(itemsRef.current)
-    syncHistoryAvailability()
-  }, [document, syncHistoryAvailability])
-
   const commitItemsChange: CommitCanvasItemsChange = useCallback(
     (change, selection) => {
-      const didCommit = document.commitItemsChange(
+      const committedState = commitCanvasDocumentItemsChange({
         change,
-        itemsRef.current,
+        currentItems: itemsRef.current,
+        document,
         selection,
-      )
+      })
 
-      if (!didCommit) {
+      if (!committedState) {
         return false
       }
 
-      syncCommittedItems()
+      syncCommittedState(committedState)
       return true
     },
-    [document, syncCommittedItems],
+    [document, syncCommittedState],
   )
 
   const setSelection: Dispatch<SetStateAction<string[]>> = useCallback(
     (action) => {
-      const current = document.readSelection()
-      const next =
-        typeof action === 'function'
-          ? (action as (current: string[]) => string[])(current)
-          : action
-
-      document.restoreSelection(next, itemsRef.current)
+      restoreCanvasDocumentSelection({
+        action,
+        currentItems: itemsRef.current,
+        document,
+      })
     },
     [document],
   )
 
   const commitSelection: CommitCanvasSelection = useCallback((action) => {
-    const current = document.readSelection()
-    const next =
-      typeof action === 'function'
-        ? (action as (current: string[]) => string[])(current)
-        : action
-    const didCommit = document.commitSelection(next)
+    const nextHistoryAvailability = commitCanvasDocumentSelection({
+      action,
+      document,
+    })
 
-    if (didCommit) {
-      syncHistoryAvailability()
+    if (nextHistoryAvailability) {
+      setHistoryAvailability(nextHistoryAvailability)
     }
 
-    return didCommit
-  }, [document, syncHistoryAvailability])
+    return nextHistoryAvailability !== null
+  }, [document])
 
   const copyItemsToClipboard = useCallback(
     (selection: string[]) =>
@@ -131,46 +137,48 @@ export function useCanvasDocument(
 
   const replaceDocumentText: CanvasDocumentTextSearch['replaceDocumentText'] =
     useCallback((searchText, replacement, options) => {
-      const didCommit = document.replaceText(
+      const committedState = replaceCanvasDocumentText({
+        document,
+        options,
         searchText,
         replacement,
-        document.readSelection(),
-        options,
-      )
+      })
 
-      if (!didCommit) {
+      if (!committedState) {
         return false
       }
 
-      syncCommittedItems()
+      syncCommittedState(committedState)
       return true
-    }, [document, syncCommittedItems])
+    }, [document, syncCommittedState])
 
   const undo = useCallback(() => {
-    const result = document.undo(itemsRef.current)
+    const result = undoCanvasDocumentHistory({
+      currentItems: itemsRef.current,
+      document,
+    })
 
     if (!result) {
       return undefined
     }
 
-    itemsRef.current = result.items
-    setItemsState(result.items)
-    syncHistoryAvailability()
+    syncCommittedState(result)
     return result.selection
-  }, [document, syncHistoryAvailability])
+  }, [document, syncCommittedState])
 
   const redo = useCallback(() => {
-    const result = document.redo(itemsRef.current)
+    const result = redoCanvasDocumentHistory({
+      currentItems: itemsRef.current,
+      document,
+    })
 
     if (!result) {
       return undefined
     }
 
-    itemsRef.current = result.items
-    setItemsState(result.items)
-    syncHistoryAvailability()
+    syncCommittedState(result)
     return result.selection
-  }, [document, syncHistoryAvailability])
+  }, [document, syncCommittedState])
 
   return {
     ...historyAvailability,
@@ -188,13 +196,4 @@ export function useCanvasDocument(
     setLiveItems,
     undo,
   }
-}
-
-function resolve(
-  action: SetStateAction<CanvasItem[]>,
-  current: CanvasItem[],
-): CanvasItem[] {
-  return typeof action === 'function'
-    ? (action as (current: CanvasItem[]) => CanvasItem[])(current)
-    : action
 }

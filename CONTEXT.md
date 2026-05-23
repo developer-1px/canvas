@@ -137,6 +137,7 @@
 - Canvas Workspace Runtime Model: stored workspace fallback, default selection, initial viewport, id generator seed, selected/read model/selected bounds derivation을 소유하는 workflow Module.
 - Canvas Workspace Consumer Model: Workspace document/read/viewport state를 command, component, control, extension, inspector, interaction, item layer, keyboard, pointer, stage, text, viewport consumer context로 변환하는 workflow Module.
 - Canvas Workspace Snapshot: 저장된 workspace payload의 version, item validation, viewport normalization, selection sanitization, id seed contract를 소유하는 App-owned Module.
+- Canvas Document Runtime: Host Document Controller mutation result를 App React state가 반영할 committed state로 변환하고 live item replacement, selection action resolution, text replace, history result application을 소유하는 App-owned runtime Module.
 - Canvas Workflow Contract: App workflow hook들이 공유하는 document commit, selection commit, clipboard 계약. 개별 hook이 `useCanvasDocument` 구현 파일을 직접 알지 않게 한다.
 - Canvas Toolbar Items: tool group, command group, custom command group을 toolbar item group grammar로 합성하는 UI-owned Module.
 - Canvas Toolbar Tool Items: built-in tool stable order, feature toggle, custom tool 상태를 tool item group grammar로 변환하는 UI-owned Module.
@@ -273,6 +274,7 @@
 - App Shell은 workspace 저장, document history, read model 생성 방식을 직접 알지 않는다.
 - App workflow hook들은 Canvas Item Read Model, document action, viewport setter를 직접 생성하지 않고 Canvas Workspace Model의 consumer별 workspace context로 주입받는다. Workspace state/persistence wiring은 Canvas Workspace Model이, consumer별 context fan-out은 Canvas Workspace Consumer Model이 소유한다.
 - Canvas Workspace Model hook은 React state/persistence wiring을 맡고, stored/default initial state, id generator seed, selected/read model/selected bounds derivation은 Canvas Workspace Runtime Model이 소유한다.
+- Canvas Document hook은 controller 생성, React state/ref bridge, subscription binding을 맡고, document mutation result interpretation은 Canvas Document Runtime이 소유한다.
 - App workflow는 editor/search 상태를 각각의 workflow Module 뒤에 숨긴다.
 - Standard command hook은 toolbar/keyboard용 callback wiring을 맡고, Canvas Standard Command Execution은 plan 생성과 effect 적용만 조립한다. Engine command 호출은 Canvas Standard Command Effect Plan이, document effect descriptor 생성과 document commit/selection/editing/history effect routing은 Canvas Standard Command Document Effects가 소유한다.
 - Built-in command의 선택 개수 기준은 Canvas Command Selection Rules가 소유하고, App control model과 command action/availability는 raw threshold를 반복하지 않는다.

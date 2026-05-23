@@ -3059,6 +3059,32 @@ describe('Canvas module boundaries', () => {
 
     expect(violations).toEqual([])
   })
+
+  it('keeps app document runtime rules out of the React document hook', () => {
+    const documentHookFile = getSourceFile(
+      'src/canvas/app/document/useCanvasDocument.ts',
+    )
+    const documentRuntimeFile = getSourceFile(
+      'src/canvas/app/document/CanvasDocumentRuntime.ts',
+    )
+
+    expect(documentHookFile.source).toContain(
+      "from './CanvasDocumentRuntime'",
+    )
+    for (const documentRuntimeDetail of [
+      'document.replaceItems(',
+      'document.commitItemsChange(',
+      'document.restoreSelection(',
+      'document.commitSelection(',
+      'document.replaceText(',
+      'document.undo(',
+      'document.redo(',
+      'resolveCanvasDocumentStateAction',
+    ]) {
+      expect(documentHookFile.source).not.toContain(documentRuntimeDetail)
+      expect(documentRuntimeFile.source).toContain(documentRuntimeDetail)
+    }
+  })
 })
 
 function getImportsFrom(pathPrefix: string) {
