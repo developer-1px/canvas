@@ -13,6 +13,7 @@ import {
 } from 'canvas'
 import {
   CanvasApp,
+  createCanvasAppComponentPresentationRenderers,
   createCanvasAppAssembly as createCanvasAppAssemblyFromApp,
 } from 'canvas/app'
 import { normalizeBounds } from 'canvas/core'
@@ -78,6 +79,9 @@ describe('Canvas package consumer imports', () => {
       .toEqual(normalizeBounds({ x: 10, y: 20 }, { x: 2, y: 4 }))
     expect(createCanvasAffordanceConfig().tools.select).toBe(true)
     expect(CanvasEngine.createCanvasAffordanceConfig().tools.select).toBe(true)
+    expect(
+      createCanvasAppComponentPresentationRenderers(),
+    ).toBeTypeOf('object')
     expect(isCanvasCustomToolId('custom:smoke')).toBe(true)
     expect(CanvasEntities.isCanvasCustomToolId('custom:smoke')).toBe(true)
     expect(createCanvasComponentLibrary({

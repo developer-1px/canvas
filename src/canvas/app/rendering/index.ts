@@ -1,17 +1,27 @@
 export { CanvasDemoSvgItemLayer } from './CanvasDemoSvgItemLayer'
 export {
   DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS,
+  DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS as DEFAULT_CANVAS_APP_COMPONENT_PRESENTATION_RENDERERS,
   assertCanvasDemoSvgComponentPresentationRenderers,
+  assertCanvasDemoSvgComponentPresentationRenderers as assertCanvasAppComponentPresentationRenderers,
   createCanvasDemoSvgComponentPresentationRenderers,
+  createCanvasDemoSvgComponentPresentationRenderers as createCanvasAppComponentPresentationRenderers,
   getCanvasDemoSvgComponentPresentationRenderer,
+  type CanvasDemoSvgComponentPresentationRenderers as CanvasAppComponentPresentationRenderers,
   type CanvasDemoSvgComponentPresentationRenderers,
+  type CanvasDemoSvgComponentRendererStrategy as CanvasAppComponentRendererStrategy,
   type CanvasDemoSvgComponentRendererStrategy,
 } from './CanvasDemoSvgComponentPresentationRegistry'
 export {
   DEFAULT_CANVAS_DEMO_SVG_CUSTOM_ITEM_RENDERERS,
+  DEFAULT_CANVAS_DEMO_SVG_CUSTOM_ITEM_RENDERERS as DEFAULT_CANVAS_APP_CUSTOM_ITEM_RENDERERS,
   assertCanvasDemoSvgCustomItemRenderers,
+  assertCanvasDemoSvgCustomItemRenderers as assertCanvasAppCustomItemRenderers,
   createCanvasDemoSvgCustomItemRenderers,
+  createCanvasDemoSvgCustomItemRenderers as createCanvasAppCustomItemRenderers,
   getCanvasDemoSvgCustomItemRenderer,
+  type CanvasDemoSvgCustomItemRenderers as CanvasAppCustomItemRenderers,
   type CanvasDemoSvgCustomItemRenderers,
+  type CanvasDemoSvgCustomItemRendererStrategy as CanvasAppCustomItemRendererStrategy,
   type CanvasDemoSvgCustomItemRendererStrategy,
 } from './CanvasDemoSvgCustomItemRendererRegistry'

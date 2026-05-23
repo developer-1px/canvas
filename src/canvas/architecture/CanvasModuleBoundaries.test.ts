@@ -188,7 +188,6 @@ describe('Canvas module boundaries', () => {
         reference.target.startsWith('src/canvas/') &&
         ![
           'src/canvas/app',
-          'src/canvas/app/rendering',
           'src/canvas/core',
           'src/canvas/engine',
           'src/canvas/entities',
@@ -234,6 +233,28 @@ describe('Canvas module boundaries', () => {
       )
       .flatMap((file) =>
         file.source.includes('createCanvasItemReadModel') ? [file.path] : [],
+      )
+
+    expect(violations).toEqual([])
+  })
+
+  it('keeps Demo SVG renderer names out of app authoring seams', () => {
+    const publicAuthoringFiles = new Set([
+      'src/canvas/index.ts',
+      'src/canvas/app/index.ts',
+      'src/canvas/app/workflow/index.ts',
+      'src/canvas/app/workflow/CanvasAppAssembly.ts',
+      'src/canvas/app/modules/CanvasAppCustomItemModules.ts',
+    ])
+    const violations = sourceFiles
+      .filter((file) =>
+        publicAuthoringFiles.has(file.path) ||
+        file.path.startsWith('src/demo/custom-items/'),
+      )
+      .flatMap((file) =>
+        /CanvasDemoSvg|createCanvasDemoSvg/.test(file.source)
+          ? [file.path]
+          : [],
       )
 
     expect(violations).toEqual([])

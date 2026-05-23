@@ -1,19 +1,17 @@
 import { describe, expect, it } from 'vitest'
-import {
-  createCanvasDemoSvgComponentPresentationRenderers,
-  type CanvasDemoSvgComponentRendererStrategy,
-  type CanvasDemoSvgComponentPresentationRenderers,
-  type CanvasDemoSvgCustomItemRendererStrategy,
-} from '../rendering'
 import { createCanvasComponentLibrary } from '../../host'
 import {
   DEFAULT_CANVAS_APP_ASSEMBLY,
   assertCanvasAppAssembly,
   createCanvasAppAssembly,
+  createCanvasAppComponentPresentationRenderers,
   defineCanvasAppCustomItemModule,
   type CanvasAppAssembly,
+  type CanvasAppComponentPresentationRenderers,
+  type CanvasAppComponentRendererStrategy,
   type CanvasAppCustomCommand,
   type CanvasAppCustomItemModuleCreationTool,
+  type CanvasAppCustomItemRendererStrategy,
   type CanvasAppInspectorPanel,
 } from './index'
 
@@ -34,13 +32,13 @@ describe('CanvasAppAssembly', () => {
         },
       ],
     })
-    const renderRisk: CanvasDemoSvgComponentRendererStrategy = ({ item }) =>
+    const renderRisk: CanvasAppComponentRendererStrategy = ({ item }) =>
       item.title
     const componentPresentationRenderers =
-      createCanvasDemoSvgComponentPresentationRenderers({
+      createCanvasAppComponentPresentationRenderers({
         'risk-card': renderRisk,
       })
-    const renderRiskItem: CanvasDemoSvgCustomItemRendererStrategy = ({ item }) =>
+    const renderRiskItem: CanvasAppCustomItemRendererStrategy = ({ item }) =>
       item.title
     const riskModule = defineCanvasAppCustomItemModule({
       id: 'risk',
@@ -131,7 +129,7 @@ describe('CanvasAppAssembly', () => {
   })
 
   it('treats direct component presentation renderers as extensions', () => {
-    const renderRisk: CanvasDemoSvgComponentRendererStrategy = ({ item }) =>
+    const renderRisk: CanvasAppComponentRendererStrategy = ({ item }) =>
       item.title
 
     const assembly = createCanvasAppAssembly({
@@ -160,7 +158,7 @@ describe('CanvasAppAssembly', () => {
         },
       ],
     })
-    const renderRisk: CanvasDemoSvgComponentRendererStrategy = ({ item }) =>
+    const renderRisk: CanvasAppComponentRendererStrategy = ({ item }) =>
       item.title
 
     expect(() =>
@@ -266,7 +264,7 @@ describe('CanvasAppAssembly', () => {
       createCanvasAppAssembly({
         componentPresentationRenderers: {
           'risk-card': undefined,
-        } as unknown as CanvasDemoSvgComponentPresentationRenderers,
+        } as unknown as CanvasAppComponentPresentationRenderers,
       }),
     ).toThrow(
       'Canvas app component presentation renderer risk-card requires render strategy',
@@ -338,9 +336,9 @@ describe('CanvasAppAssembly', () => {
   })
 
   it('snapshots assembled output against caller mutation', () => {
-    const renderRisk: CanvasDemoSvgComponentRendererStrategy = ({ item }) =>
+    const renderRisk: CanvasAppComponentRendererStrategy = ({ item }) =>
       item.title
-    const renderMutatedRisk: CanvasDemoSvgComponentRendererStrategy = () =>
+    const renderMutatedRisk: CanvasAppComponentRendererStrategy = () =>
       'mutated'
     const componentPresentationRenderers = {
       'risk-card': renderRisk,

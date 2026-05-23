@@ -1,13 +1,13 @@
 import {
   defineCanvasAppCustomItemModule,
   type CanvasAppCustomItemModuleCreationTool,
+  type CanvasAppCustomItemRendererStrategy,
   type CanvasAppInspectorPanel,
   type CanvasCustomItem,
-  type CanvasDemoSvgCustomItemRendererStrategy,
 } from '../../../canvas'
 import './RiskCustomItemModule.css'
 
-const riskItemRenderer: CanvasDemoSvgCustomItemRendererStrategy = ({ item }) => {
+const riskItemRenderer: CanvasAppCustomItemRendererStrategy = ({ item }) => {
   const severity = String(item.data.severity ?? 'Risk')
 
   return (

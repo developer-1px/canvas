@@ -33,9 +33,12 @@ export type {
   CanvasAppCustomToolShortcut,
 } from '../tools/CanvasAppCustomCreationTools'
 export {
-  createCanvasDemoSvgCustomItemRenderers,
-  type CanvasDemoSvgCustomItemRendererStrategy,
-  type CanvasDemoSvgCustomItemRenderers,
+  createCanvasAppComponentPresentationRenderers,
+  createCanvasAppCustomItemRenderers,
+  type CanvasAppComponentPresentationRenderers,
+  type CanvasAppComponentRendererStrategy,
+  type CanvasAppCustomItemRendererStrategy,
+  type CanvasAppCustomItemRenderers,
 } from '../rendering'
 export {
   assertCanvasAppExtensionId,

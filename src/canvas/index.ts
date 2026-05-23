@@ -9,12 +9,15 @@ export {
   assertCanvasAppExtensionRecordKeys,
   createCanvasAppAssembly,
   createCanvasAppCustomItemModuleAssembly,
-  createCanvasDemoSvgCustomItemRenderers,
+  createCanvasAppComponentPresentationRenderers,
+  createCanvasAppCustomItemRenderers,
   defineCanvasAppCustomItemModule,
   isCanvasAppExtensionId,
   useCanvasAppModel,
   type CanvasAppAssembly,
   type CanvasAppAssemblyInput,
+  type CanvasAppComponentPresentationRenderers,
+  type CanvasAppComponentRendererStrategy,
   type CanvasAppCustomCommand,
   type CanvasAppCustomCommandContext,
   type CanvasAppCustomCommandState,
@@ -32,14 +35,9 @@ export {
   type CanvasAppInspectorPanelContext,
   type CanvasAppInspectorPanelView,
   type CanvasAppItemAdapters,
-  type CanvasDemoSvgCustomItemRendererStrategy,
-  type CanvasDemoSvgCustomItemRenderers,
+  type CanvasAppCustomItemRendererStrategy,
+  type CanvasAppCustomItemRenderers,
 } from './app'
-export {
-  createCanvasDemoSvgComponentPresentationRenderers,
-  type CanvasDemoSvgComponentPresentationRenderers,
-  type CanvasDemoSvgComponentRendererStrategy,
-} from './app/rendering'
 export {
   CANVAS_COMPONENT_LIBRARY,
   CANVAS_ITEM_ENGINE_ADAPTERS,

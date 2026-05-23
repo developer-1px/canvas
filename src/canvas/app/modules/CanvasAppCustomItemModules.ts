@@ -25,8 +25,8 @@ import {
   type CanvasAppInspectorPanel,
 } from '../inspector/CanvasAppInspectorPanels'
 import type {
-  CanvasDemoSvgCustomItemRendererStrategy,
-  CanvasDemoSvgCustomItemRenderers,
+  CanvasAppCustomItemRendererStrategy,
+  CanvasAppCustomItemRenderers,
 } from '../rendering'
 import {
   assertCanvasAppCustomCreationTools,
@@ -55,14 +55,14 @@ export type CanvasAppCustomItemModule = {
   id: string
   inspectorPanels?: readonly CanvasAppInspectorPanel[]
   presentation: string
-  renderItem: CanvasDemoSvgCustomItemRendererStrategy
+  renderItem: CanvasAppCustomItemRendererStrategy
   validateItem: CanvasCustomItemValidator
 }
 
 export type CanvasAppCustomItemModuleAssembly = {
   customCommands: readonly CanvasAppCustomCommand[]
   customCreationTools: readonly CanvasAppCustomCreationTool[]
-  customItemRenderers: CanvasDemoSvgCustomItemRenderers
+  customItemRenderers: CanvasAppCustomItemRenderers
   customItemValidators: CanvasCustomItemValidators
   inspectorPanels: readonly CanvasAppInspectorPanel[]
 }
@@ -266,7 +266,7 @@ function getCanvasAppCustomItemModuleCreationTools({
 function getCanvasAppCustomItemModuleRenderers({
   presentation,
   renderItem,
-}: CanvasAppCustomItemModule): CanvasDemoSvgCustomItemRenderers {
+}: CanvasAppCustomItemModule): CanvasAppCustomItemRenderers {
   return {
     [presentation]: renderItem,
   }

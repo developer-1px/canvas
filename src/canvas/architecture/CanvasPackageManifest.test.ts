@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
 type CanvasPackageJson = {
+  dependencies?: Record<string, string>
   exports?: Record<string, string>
+  peerDependencies?: Record<string, string>
   private?: boolean
   sideEffects?: boolean | string[]
   types?: string
@@ -22,6 +24,7 @@ const sourceModules = import.meta.glob('../**/index.ts', {
 const packageJson = JSON.parse(
   packageModules['../../../package.json'],
 ) as CanvasPackageJson
+const hostDocumentDependencyName = ['zod', 'crud'].join('-')
 const sourcePaths = new Set(
   Object.keys(sourceModules).map((path) =>
     path.replace(/^\.\.\//, './src/canvas/'),
@@ -50,5 +53,21 @@ describe('Canvas package manifest', () => {
     expect(exportedPaths).toHaveLength(7)
     expect(exportedPaths.every((path) => sourcePaths.has(path))).toBe(true)
     expect(exportedPaths.every((path) => path.endsWith('/index.ts'))).toBe(true)
+  })
+
+  it('declares shared runtimes as peer dependencies', () => {
+    expect(packageJson.peerDependencies).toEqual({
+      react: '^19.0.0',
+      'react-dom': '^19.0.0',
+      zod: '^4.0.0',
+    })
+    expect(packageJson.dependencies).toEqual(
+      expect.objectContaining({
+        react: expect.any(String),
+        'react-dom': expect.any(String),
+        zod: expect.any(String),
+        [hostDocumentDependencyName]: expect.any(String),
+      }),
+    )
   })
 })

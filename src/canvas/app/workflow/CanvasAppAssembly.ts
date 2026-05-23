@@ -14,13 +14,13 @@ import {
   type CanvasItem,
 } from '../../host'
 import {
-  DEFAULT_CANVAS_DEMO_SVG_CUSTOM_ITEM_RENDERERS,
-  DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS,
-  assertCanvasDemoSvgComponentPresentationRenderers,
-  assertCanvasDemoSvgCustomItemRenderers,
-  createCanvasDemoSvgComponentPresentationRenderers,
-  type CanvasDemoSvgComponentPresentationRenderers,
-  type CanvasDemoSvgCustomItemRenderers,
+  DEFAULT_CANVAS_APP_CUSTOM_ITEM_RENDERERS,
+  DEFAULT_CANVAS_APP_COMPONENT_PRESENTATION_RENDERERS,
+  assertCanvasAppComponentPresentationRenderers,
+  assertCanvasAppCustomItemRenderers,
+  createCanvasAppComponentPresentationRenderers,
+  type CanvasAppComponentPresentationRenderers,
+  type CanvasAppCustomItemRenderers,
 } from '../rendering'
 import {
   assertCanvasAppCustomCommands,
@@ -58,10 +58,10 @@ export type CanvasAppItemAdapters = {
 
 export type CanvasAppAssembly = {
   componentLibrary: CanvasComponentLibrary
-  componentPresentationRenderers: CanvasDemoSvgComponentPresentationRenderers
+  componentPresentationRenderers: CanvasAppComponentPresentationRenderers
   customCommands: readonly CanvasAppCustomCommand[]
   customCreationTools: readonly CanvasAppCustomCreationTool[]
-  customItemRenderers: CanvasDemoSvgCustomItemRenderers
+  customItemRenderers: CanvasAppCustomItemRenderers
   customItemValidators: CanvasCustomItemValidators
   inspectorPanels: readonly CanvasAppInspectorPanel[]
   initialItems: CanvasItem[]
@@ -70,7 +70,7 @@ export type CanvasAppAssembly = {
 
 export type CanvasAppAssemblyInput = {
   componentLibrary?: CanvasComponentLibrary
-  componentPresentationRenderers?: CanvasDemoSvgComponentPresentationRenderers
+  componentPresentationRenderers?: CanvasAppComponentPresentationRenderers
   customCommands?: readonly CanvasAppCustomCommand[]
   customItemModules?: readonly CanvasAppCustomItemModule[]
   disabledCustomItemModuleIds?: CanvasAppCustomItemModuleAssemblyOptions['disabledModuleIds']
@@ -83,10 +83,10 @@ export const DEFAULT_CANVAS_APP_ASSEMBLY: CanvasAppAssembly =
   snapshotCanvasAppAssembly({
     componentLibrary: CANVAS_COMPONENT_LIBRARY,
     componentPresentationRenderers:
-      DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS,
+      DEFAULT_CANVAS_APP_COMPONENT_PRESENTATION_RENDERERS,
     customCommands: [],
     customCreationTools: [],
-    customItemRenderers: DEFAULT_CANVAS_DEMO_SVG_CUSTOM_ITEM_RENDERERS,
+    customItemRenderers: DEFAULT_CANVAS_APP_CUSTOM_ITEM_RENDERERS,
     customItemValidators: {},
     inspectorPanels: [],
     initialItems: INITIAL_ITEMS,
@@ -110,7 +110,7 @@ export function createCanvasAppAssembly(
   const assembly: CanvasAppAssembly = {
     componentLibrary:
       input.componentLibrary ?? DEFAULT_CANVAS_APP_ASSEMBLY.componentLibrary,
-    componentPresentationRenderers: createCanvasDemoSvgComponentPresentationRenderers(
+    componentPresentationRenderers: createCanvasAppComponentPresentationRenderers(
       input.componentPresentationRenderers,
     ),
     customCommands: appendUniqueCanvasAppExtensionEntries({
@@ -163,13 +163,13 @@ export function createCanvasAppAssembly(
 export function assertCanvasAppAssembly(assembly: CanvasAppAssembly) {
   assertCanvasAppDescriptorObject(assembly, 'assembly')
   assertCanvasAppComponentLibrary(assembly.componentLibrary)
-  assertCanvasDemoSvgComponentPresentationRenderers(
+  assertCanvasAppComponentPresentationRenderers(
     assembly.componentPresentationRenderers,
   )
   assertCanvasComponentPresentationRendererCoverage(assembly)
   assertCanvasAppCustomCommands(assembly.customCommands)
   assertCanvasAppCustomCreationTools(assembly.customCreationTools)
-  assertCanvasDemoSvgCustomItemRenderers(assembly.customItemRenderers)
+  assertCanvasAppCustomItemRenderers(assembly.customItemRenderers)
   assertCanvasAppCustomItemValidators(assembly.customItemValidators)
   assertCanvasAppInspectorPanels(assembly.inspectorPanels)
   assertCanvasAppArray(assembly.initialItems, 'assembly initial items')
