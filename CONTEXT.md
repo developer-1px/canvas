@@ -36,7 +36,9 @@
 - Canvas Standard Command Execution: 내부 canvas command grammar 실행을 effect plan 생성과 document effect 적용으로 조립하는 App-owned runtime Module.
 - Canvas Standard Command Effect Plan: 내부 canvas command grammar와 Engine command 결과를 App document effect descriptor로 변환하는 App-owned runtime Module.
 - Canvas Standard Command Document Effects: standard command 결과를 document commit fallback, selection commit, editing clear, history restore effect로 반영하는 App-owned runtime Module.
-- Canvas Clipboard Command Execution: copy, cut, paste, duplicate, clone command를 Host clipboard, paste offset, document commit/selection/editing effect로 연결하는 App-owned runtime Module.
+- Canvas Clipboard Command Execution: clipboard command effect plan 생성과 clipboard/document effect 적용을 조립하는 App-owned runtime Module.
+- Canvas Clipboard Command Effect Plan: copy, cut, paste, duplicate, clone command를 clone result/add item/copy/cut effect descriptor로 변환하고 paste offset 계산을 소유하는 App-owned runtime Module.
+- Canvas Clipboard Command Effects: clipboard command effect descriptor를 Host clipboard, document commit/selection/editing update와 실행 결과로 적용하는 App-owned runtime Module.
 - Canvas App Custom Command: 내부 command grammar를 수정하지 않고 제품별 business action을 toolbar action으로 등록하는 App-owned command descriptor.
 - Canvas App Custom Command Contracts: custom command descriptor shape와 id registry contract를 검증하는 App-owned contract Module.
 - Canvas App Custom Command Execution: custom command toolbar state, availability, run 호출과 실패 containment를 소유하는 App-owned execution Module.
@@ -188,7 +190,7 @@
 - App workflow hook들은 Canvas Item Read Model을 직접 생성하지 않고 Canvas Workspace Model에서 주입받는다.
 - App workflow는 editor/search 상태를 각각의 workflow Module 뒤에 숨긴다.
 - Standard command hook은 toolbar/keyboard용 callback wiring을 맡고, Canvas Standard Command Execution은 plan 생성과 effect 적용만 조립한다. Engine command 호출과 document effect descriptor 생성은 Canvas Standard Command Effect Plan이, document commit/selection/editing/history effect routing은 Canvas Standard Command Document Effects가 소유한다.
-- Clipboard command hook은 paste index와 callback wiring을 맡고, copy/cut/paste/duplicate 실행과 Host clipboard/document effect routing은 Canvas Clipboard Command Execution이 소유한다.
+- Clipboard command hook은 paste index와 callback wiring을 맡고, Canvas Clipboard Command Execution은 plan 생성과 effect 적용만 조립한다. Clone/duplicate/paste/cut plan과 paste offset 계산은 Canvas Clipboard Command Effect Plan이, Host clipboard/document/editing effect routing은 Canvas Clipboard Command Effects가 소유한다.
 - UI controls는 Demo Host를 직접 import하지 않는다.
 - Canvas Toolbar는 item/button 렌더링과 click dispatch를 맡고, tool/custom command 항목 assembly는 Canvas Toolbar Items가, built-in command group grammar는 Canvas Toolbar Command Items가 소유한다.
 - Keyboard shortcut router는 event preventDefault와 handler 실행을 맡고, command shortcut grammar는 Canvas Keyboard Shortcut Intent가, built-in/custom tool shortcut precedence는 Canvas Keyboard Tool Shortcut Intent가 소유한다.

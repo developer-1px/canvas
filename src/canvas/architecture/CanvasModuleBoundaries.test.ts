@@ -1109,6 +1109,12 @@ describe('Canvas module boundaries', () => {
     const executionFile = getSourceFile(
       'src/canvas/app/commands/CanvasClipboardCommandExecution.ts',
     )
+    const effectPlanFile = getSourceFile(
+      'src/canvas/app/commands/CanvasClipboardCommandEffectPlan.ts',
+    )
+    const effectsFile = getSourceFile(
+      'src/canvas/app/commands/CanvasClipboardCommandEffects.ts',
+    )
 
     expect(clipboardHookFile.source).toContain(
       "from './CanvasClipboardCommandExecution'",
@@ -1126,12 +1132,36 @@ describe('Canvas module boundaries', () => {
     expect(executionFile.source).toContain(
       'export function executeCanvasClipboardCommand',
     )
-    expect(executionFile.source).toContain('cloneCanvasCommandItems')
-    expect(executionFile.source).toContain('duplicateCanvasCommand')
-    expect(executionFile.source).toContain('deleteCanvasCommand')
-    expect(executionFile.source).toContain('getCanvasPasteOffset')
-    expect(executionFile.source).toContain('copyItemsToClipboard(')
-    expect(executionFile.source).toContain("type: 'remove-selection'")
+    expect(executionFile.source).toContain(
+      "from './CanvasClipboardCommandEffectPlan'",
+    )
+    expect(executionFile.source).toContain(
+      "from './CanvasClipboardCommandEffects'",
+    )
+    expect(executionFile.source).toContain('applyCanvasClipboardCommandEffect')
+    expect(executionFile.source).not.toContain('cloneCanvasCommandItems')
+    expect(executionFile.source).not.toContain('duplicateCanvasCommand')
+    expect(executionFile.source).not.toContain('deleteCanvasCommand')
+    expect(executionFile.source).not.toContain('getCanvasPasteOffset')
+    expect(executionFile.source).not.toContain('copyItemsToClipboard(')
+    expect(executionFile.source).not.toContain("type: 'remove-selection'")
+    expect(effectPlanFile.source).toContain(
+      'export function createCanvasClipboardCommandEffectPlan',
+    )
+    expect(effectPlanFile.source).toContain('cloneCanvasCommandItems')
+    expect(effectPlanFile.source).toContain('duplicateCanvasCommand')
+    expect(effectPlanFile.source).toContain('deleteCanvasCommand')
+    expect(effectPlanFile.source).toContain('getCanvasPasteOffset')
+    expect(effectPlanFile.source).not.toContain('copyItemsToClipboard(')
+    expect(effectPlanFile.source).not.toContain("type: 'remove-selection'")
+    expect(effectsFile.source).toContain(
+      'export function applyCanvasClipboardCommandEffect',
+    )
+    expect(effectsFile.source).toContain('copyItemsToClipboard(')
+    expect(effectsFile.source).toContain('context.commitItemsChange(')
+    expect(effectsFile.source).toContain('context.commitSelection(')
+    expect(effectsFile.source).toContain("type: 'remove-selection'")
+    expect(effectsFile.source).toContain('clearEditingIds.includes')
   })
 
   it('keeps App custom command contracts behind a named module', () => {
