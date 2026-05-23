@@ -53,11 +53,7 @@ describe('CanvasAppAssembly', () => {
           id: 'risk',
           label: '!',
           title: 'Risk',
-          createItem: ({ createId, startWorld }) => ({
-            id: createId('risk'),
-            type: 'custom',
-            kind: 'risk',
-            presentation: 'risk-node',
+          createItem: ({ startWorld }) => ({
             title: 'Risk',
             x: startWorld.x,
             y: startWorld.y,

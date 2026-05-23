@@ -17,6 +17,8 @@ export {
   type CanvasAppCustomItemModule,
   type CanvasAppCustomItemModuleAssembly,
   type CanvasAppCustomItemModuleAssemblyOptions,
+  type CanvasAppCustomItemModuleCreationItem,
+  type CanvasAppCustomItemModuleCreationTool,
 } from '../modules/CanvasAppCustomItemModules'
 export type {
   CanvasAppInspectorPanel,

@@ -136,6 +136,7 @@ type CanvasAffordanceConfig = {
 - Custom creation tool이 item 생성을 거부하거나 실패하거나 invalid item을 반환해도 pointer interaction cleanup은 계속 진행되고 문서 상태는 손상하지 않는다.
 - 제품별 item kind는 내부 `CanvasItem` variant를 추가하지 않고 Canvas App Custom Item Module로 묶어 등록한다.
 - Canvas App Custom Item Module의 `id`는 소유한 custom item kind이며, module은 `presentation`, `renderItem`, `validateItem`을 받아 renderer registry와 validator registry를 내부에서 조립한다.
+- Module-owned custom creation tool은 bounds/title/data만 반환하고, `id`, `type`, `kind`, `presentation`은 Canvas App Custom Item Module이 주입한다.
 - Demo custom item module은 `src/demo/custom-items/<name>/index.ts`에서 default export하면 자동 수집된다.
 - Demo custom item module은 `src/canvas/app/workflow` public entry만 사용하고 app 내부 파일을 직접 import하지 않는다.
 - Canvas App extension id와 registry key는 lower-kebab 안정 id만 허용한다. 잘못된 module id, command id, tool id, renderer key, validator key, inspector id는 define 또는 assembly 단계에서 실패한다.

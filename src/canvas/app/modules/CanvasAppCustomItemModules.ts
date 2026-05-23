@@ -1,4 +1,8 @@
 import type {
+  Bounds,
+  CanvasJsonObject,
+} from '../../entities'
+import type {
   CanvasCustomItemValidator,
   CanvasCustomItemValidators,
 } from '../../host'
@@ -19,11 +23,27 @@ import type {
 import {
   assertCanvasAppCustomCreationTools,
   type CanvasAppCustomCreationTool,
+  type CanvasAppCustomCreationToolContext,
 } from '../tools/CanvasAppCustomCreationTools'
+
+export type CanvasAppCustomItemModuleCreationItem = Bounds & {
+  data: CanvasJsonObject
+  locked?: boolean
+  title: string
+}
+
+export type CanvasAppCustomItemModuleCreationTool = Omit<
+  CanvasAppCustomCreationTool,
+  'createItem'
+> & {
+  createItem: (
+    context: CanvasAppCustomCreationToolContext,
+  ) => CanvasAppCustomItemModuleCreationItem | null
+}
 
 export type CanvasAppCustomItemModule = {
   customCommands?: readonly CanvasAppCustomCommand[]
-  customCreationTools?: readonly CanvasAppCustomCreationTool[]
+  customCreationTools?: readonly CanvasAppCustomItemModuleCreationTool[]
   id: string
   inspectorPanels?: readonly CanvasAppInspectorPanel[]
   presentation: string
@@ -83,7 +103,7 @@ export function createCanvasAppCustomItemModuleAssembly(
       }),
       customCreationTools: appendUniqueCanvasAppExtensionEntries({
         current: assembly.customCreationTools,
-        entries: module.customCreationTools ?? [],
+        entries: getCanvasAppCustomItemModuleCreationTools(module),
         label: 'custom creation tool',
         owner: 'custom item module',
       }),
@@ -131,7 +151,7 @@ function assertCanvasAppCustomItemModuleContracts(
     entries: module.customCommands ?? [],
     label: 'custom command',
   })
-  assertCanvasAppCustomCreationTools(module.customCreationTools ?? [])
+  assertCanvasAppCustomItemModuleCreationTools(module)
   assertCanvasAppExtensionId({
     id: module.presentation,
     label: 'custom item presentation',
@@ -164,6 +184,45 @@ function assertCanvasAppCustomItemModuleFunction({
   if (typeof fn !== 'function') {
     throw new Error(`Canvas custom item module ${moduleId} requires ${label}`)
   }
+}
+
+function assertCanvasAppCustomItemModuleCreationTools(
+  module: CanvasAppCustomItemModule,
+) {
+  assertCanvasAppCustomCreationTools(
+    getCanvasAppCustomItemModuleCreationTools(module),
+  )
+
+  for (const tool of module.customCreationTools ?? []) {
+    assertCanvasAppCustomItemModuleFunction({
+      fn: tool.createItem,
+      label: `creation tool ${tool.id}`,
+      moduleId: module.id,
+    })
+  }
+}
+
+function getCanvasAppCustomItemModuleCreationTools({
+  customCreationTools = [],
+  id,
+  presentation,
+}: CanvasAppCustomItemModule): readonly CanvasAppCustomCreationTool[] {
+  return customCreationTools.map((tool) => ({
+    ...tool,
+    createItem: (context) => {
+      const item = tool.createItem(context)
+
+      return item
+        ? {
+            ...item,
+            id: context.createId(id),
+            kind: id,
+            presentation,
+            type: 'custom',
+          }
+        : null
+    },
+  }))
 }
 
 function getCanvasAppCustomItemModuleRenderers({

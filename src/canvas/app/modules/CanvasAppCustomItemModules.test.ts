@@ -24,11 +24,7 @@ describe('CanvasAppCustomItemModules', () => {
           id: 'risk',
           label: '!',
           title: 'Risk',
-          createItem: ({ createId, startWorld }) => ({
-            id: createId('risk'),
-            type: 'custom',
-            kind: 'risk',
-            presentation: 'risk-node',
+          createItem: ({ startWorld }) => ({
             title: 'Risk',
             x: startWorld.x,
             y: startWorld.y,
@@ -54,6 +50,23 @@ describe('CanvasAppCustomItemModules', () => {
     expect(assembly.customCreationTools.map((tool) => tool.id)).toEqual([
       'risk',
     ])
+    expect(assembly.customCreationTools[0]?.createItem({
+      createId: (prefix) => `${prefix}-1`,
+      currentWorld: { x: 100, y: 140 },
+      moved: false,
+      startWorld: { x: 80, y: 120 },
+    })).toEqual({
+      id: 'risk-1',
+      type: 'custom',
+      kind: 'risk',
+      presentation: 'risk-node',
+      title: 'Risk',
+      x: 80,
+      y: 120,
+      w: 120,
+      h: 80,
+      data: { severity: 'high' },
+    })
     expect(assembly.customItemRenderers['risk-node']).toBe(renderRisk)
     expect(assembly.customItemValidators.risk(createRiskItem())).toBe(true)
     expect(assembly.customItemValidators.risk({
@@ -72,11 +85,7 @@ describe('CanvasAppCustomItemModules', () => {
           id: 'risk',
           label: '!',
           title: 'Risk',
-          createItem: ({ createId, startWorld }) => ({
-            id: createId('risk'),
-            type: 'custom',
-            kind: 'risk',
-            presentation: 'risk-node',
+          createItem: ({ startWorld }) => ({
             title: 'Risk',
             x: startWorld.x,
             y: startWorld.y,

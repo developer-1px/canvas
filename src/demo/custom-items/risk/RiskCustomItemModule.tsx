@@ -1,7 +1,7 @@
 import {
   defineCanvasAppCustomItemModule,
-  type CanvasAppCustomCreationTool,
   type CanvasAppInspectorPanel,
+  type CanvasAppCustomItemModuleCreationTool,
   type CanvasDemoSvgCustomItemRendererStrategy,
 } from '../../../canvas/app/workflow'
 import type { CanvasCustomItem } from '../../../canvas/entities'
@@ -49,12 +49,12 @@ const riskItemRenderer: CanvasDemoSvgCustomItemRendererStrategy = ({ item }) => 
   )
 }
 
-const riskTool: CanvasAppCustomCreationTool = {
+const riskTool: CanvasAppCustomItemModuleCreationTool = {
   id: 'risk',
   label: '!',
   title: 'Risk',
   shortcut: { key: 'e', shiftKey: true },
-  createItem: ({ createId, currentWorld, moved, startWorld }) => {
+  createItem: ({ currentWorld, moved, startWorld }) => {
     const bounds = moved
       ? {
           x: Math.min(startWorld.x, currentWorld.x),
@@ -70,10 +70,6 @@ const riskTool: CanvasAppCustomCreationTool = {
         }
 
     return {
-      id: createId('risk'),
-      type: 'custom',
-      kind: 'risk',
-      presentation: 'risk-node',
       title: 'Risk',
       data: { severity: 'High' },
       ...bounds,

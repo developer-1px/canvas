@@ -21,6 +21,7 @@
 - Canvas App Extension Registry: assembly 단계에서 extension entry와 record key를 검증하고 중복을 실패시키는 내부 merge 계약.
 - Canvas App Custom Command: 내부 command grammar를 수정하지 않고 제품별 business action을 toolbar action으로 등록하는 App-owned command descriptor.
 - Canvas App Custom Creation Tool: 내부 tool grammar를 수정하지 않고 제품별 item 생성 도구를 toolbar, shortcut, pointer lifecycle에 등록하는 App-owned tool descriptor.
+- Canvas App Custom Item Module Creation Tool: Module-owned creation descriptor. bounds/title/data만 반환하고 custom item `id`, `kind`, `presentation`, `type` envelope는 Module assembly가 만든다.
 - Canvas App Inspector Panel: 기본 bounds inspector를 수정하지 않고 제품별 선택 항목 정보를 렌더링하는 App-owned inspector descriptor.
 - Canvas Custom Item: 제품별 item kind를 내부 `CanvasItem` union 확장 없이 저장하기 위한 안정 envelope. `kind`, `presentation`, JSON `data`, bounds를 가진다.
 - Canvas App Custom Item Module: 하나의 제품별 item kind에 필요한 presentation, renderer, validator, creation tool, inspector, command를 한 번에 등록하는 App-owned Module descriptor. Module `id`는 소유한 custom item kind다.
@@ -65,6 +66,7 @@
 - Canvas App Custom Creation Tool이 item 생성을 거부하거나 실패하거나 invalid item을 반환해도 pointer lifecycle을 깨지 않아야 한다.
 - 제품별 item kind는 내부 `CanvasItem` union에 새 variant를 추가하지 않고 Canvas App Custom Item Module로 등록한다.
 - Canvas App Custom Item Module은 `id`, `presentation`, `renderItem`, `validateItem`을 외부 Interface로 받고, renderer registry와 validator registry는 내부에서 조립한다.
+- Canvas App Custom Item Module Creation Tool은 bounds/title/data만 반환하고, `id`, `type`, `kind`, `presentation`은 Canvas App Custom Item Module이 주입한다.
 - Demo custom item module은 `src/demo/custom-items/<name>/index.ts` convention으로 자동 수집한다.
 - Demo custom item module은 `src/canvas/app/workflow` public entry만 사용하고 app 내부 파일을 직접 import하지 않는다.
 - Canvas App extension id와 registry key는 lower-kebab 안정 id만 허용하고, 잘못된 id는 define/assembly 단계에서 실패해야 한다.
