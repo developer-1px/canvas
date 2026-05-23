@@ -2411,7 +2411,15 @@ describe('Canvas module boundaries', () => {
     expect(affordanceConfigFile.source).toContain(
       "from './CanvasAffordanceCatalog'",
     )
+    expect(affordanceConfigFile.source).toContain(
+      'for (const group of CANVAS_AFFORDANCE_CONFIG_GROUPS)',
+    )
     expect(affordanceConfigFile.source).not.toContain('alignBottom: true')
+    expect(affordanceConfigFile.source).not.toContain('config.commands')
+    expect(affordanceConfigFile.source).not.toContain('config.gestures')
+    expect(affordanceConfigFile.source).not.toContain('config.overlays')
+    expect(affordanceConfigFile.source).not.toContain('config.shortcuts')
+    expect(affordanceConfigFile.source).not.toContain('config.tools')
     expect(affordanceConfigFile.source).toContain(
       'export function assertCanvasAffordanceConfig',
     )

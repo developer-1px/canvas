@@ -8,6 +8,10 @@ import {
   type CanvasAffordanceConfigGroup,
 } from './CanvasAffordanceCatalog'
 
+type WritableCanvasAffordanceConfig = {
+  -readonly [Group in CanvasAffordanceConfigGroup]: CanvasAffordanceConfig[Group]
+}
+
 export const DEFAULT_CANVAS_AFFORDANCE_CONFIG = createCanvasAffordanceConfig()
 
 export function createCanvasAffordanceConfig(
@@ -15,28 +19,17 @@ export function createCanvasAffordanceConfig(
 ): CanvasAffordanceConfig {
   assertCanvasAffordanceConfigInput(overrides)
 
-  return snapshotCanvasAffordanceConfig({
-    commands: mergeFeatureGroup(
-      CANVAS_AFFORDANCE_CONFIG_DEFAULTS.commands,
-      overrides.commands,
-    ),
-    gestures: mergeFeatureGroup(
-      CANVAS_AFFORDANCE_CONFIG_DEFAULTS.gestures,
-      overrides.gestures,
-    ),
-    overlays: mergeFeatureGroup(
-      CANVAS_AFFORDANCE_CONFIG_DEFAULTS.overlays,
-      overrides.overlays,
-    ),
-    shortcuts: mergeFeatureGroup(
-      CANVAS_AFFORDANCE_CONFIG_DEFAULTS.shortcuts,
-      overrides.shortcuts,
-    ),
-    tools: mergeFeatureGroup(
-      CANVAS_AFFORDANCE_CONFIG_DEFAULTS.tools,
-      overrides.tools,
-    ),
-  })
+  const config = {} as CanvasAffordanceConfig
+
+  for (const group of CANVAS_AFFORDANCE_CONFIG_GROUPS) {
+    setCanvasAffordanceConfigGroup(
+      config,
+      group,
+      mergeCanvasAffordanceConfigGroup(group, overrides[group]),
+    )
+  }
+
+  return snapshotCanvasAffordanceConfig(config)
 }
 
 export function assertCanvasAffordanceConfig(
@@ -85,14 +78,28 @@ function assertCanvasAffordanceConfigInput(
   }
 }
 
-function mergeFeatureGroup<T extends string>(
-  defaults: Readonly<Record<T, boolean>>,
-  overrides: Partial<Record<T, boolean>> | undefined,
-) {
+function mergeCanvasAffordanceConfigGroup<
+  Group extends CanvasAffordanceConfigGroup,
+>(
+  group: Group,
+  overrides: CanvasAffordanceConfigInput[Group],
+): CanvasAffordanceConfig[Group] {
   return {
-    ...defaults,
+    ...CANVAS_AFFORDANCE_CONFIG_DEFAULTS[group],
     ...overrides,
-  }
+  } as CanvasAffordanceConfig[Group]
+}
+
+function setCanvasAffordanceConfigGroup<
+  Group extends CanvasAffordanceConfigGroup,
+>(
+  config: CanvasAffordanceConfig,
+  group: Group,
+  values: CanvasAffordanceConfig[Group],
+) {
+  const writableConfig = config as WritableCanvasAffordanceConfig
+
+  writableConfig[group] = values
 }
 
 function assertCanvasAffordanceConfigGroup({
@@ -152,17 +159,21 @@ function snapshotCanvasAffordanceConfig(
 ): CanvasAffordanceConfig {
   assertCanvasAffordanceConfig(config)
 
-  return Object.freeze({
-    commands: freezeCanvasAffordanceConfigGroup(config.commands),
-    gestures: freezeCanvasAffordanceConfigGroup(config.gestures),
-    overlays: freezeCanvasAffordanceConfigGroup(config.overlays),
-    shortcuts: freezeCanvasAffordanceConfigGroup(config.shortcuts),
-    tools: freezeCanvasAffordanceConfigGroup(config.tools),
-  }) as CanvasAffordanceConfig
+  const snapshot = {} as CanvasAffordanceConfig
+
+  for (const group of CANVAS_AFFORDANCE_CONFIG_GROUPS) {
+    setCanvasAffordanceConfigGroup(
+      snapshot,
+      group,
+      freezeCanvasAffordanceConfigGroup(config[group]),
+    )
+  }
+
+  return Object.freeze(snapshot) as CanvasAffordanceConfig
 }
 
-function freezeCanvasAffordanceConfigGroup<T extends string>(
-  values: Record<T, boolean>,
-) {
-  return Object.freeze({ ...values })
+function freezeCanvasAffordanceConfigGroup<
+  Group extends CanvasAffordanceConfigGroup,
+>(values: CanvasAffordanceConfig[Group]): CanvasAffordanceConfig[Group] {
+  return Object.freeze({ ...values }) as CanvasAffordanceConfig[Group]
 }
