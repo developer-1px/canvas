@@ -53,6 +53,7 @@
 - Canvas App Extension Bundle: custom command, custom creation tool, custom item renderer, custom item validator, inspector panel output slot과 slot별 중복 병합/snapshot/defaulting 규칙을 소유하고 Canvas App Assembly output 계약에 합성되는 App-owned extension output 계약.
 - Canvas App Descriptor Snapshot: 외부 등록 descriptor array, registry record, shortcut descriptor의 copy/freeze 규칙을 소유해 Assembly와 Custom Item Module snapshot이 같은 mutation 방어 계약을 쓰게 하는 App-owned Module.
 - Canvas App Extension Assembly: custom command, custom item module, custom creation tool, custom item renderer, validator, inspector panel을 App Assembly output bundle로 합성하는 App-owned composition Module.
+- Canvas App Extension Assembly Input: custom command, custom item module, disabled module id, inspector panel 같은 외부 extension input field 계약을 소유하고 Canvas App Assembly Input에 합성되는 App-owned type 계약.
 - Canvas App Descriptor Shape Contract: 제품별 descriptor가 외부 조립 seam을 통과하기 전에 필수 함수 slot을 갖췄는지 검증하는 외부 Interface 계약.
 - Canvas Standard Command Execution: 내부 canvas command grammar 실행을 effect plan 생성과 document effect 적용으로 조립하는 App-owned runtime Module.
 - Canvas Standard Command Handlers: toolbar/keyboard callback을 내부 standard command descriptor로 변환하는 App-owned handler grammar Module.

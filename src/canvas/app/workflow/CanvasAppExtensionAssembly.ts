@@ -1,24 +1,14 @@
-import type { CanvasAppCustomCommand } from '../commands/CanvasAppCustomCommands'
 import {
   createCanvasAppExtensionBundle,
   type CanvasAppExtensionBundle,
   mergeCanvasAppExtensionBundle,
 } from '../extensions/CanvasAppExtensionBundle'
-import type { CanvasAppInspectorPanel } from '../inspector/CanvasAppInspectorPanels'
 import {
   createCanvasAppCustomItemModuleAssembly,
-  type CanvasAppCustomItemModule,
-  type CanvasAppCustomItemModuleAssemblyOptions,
 } from '../modules/CanvasAppCustomItemModules'
+import type { CanvasAppExtensionAssemblyInput } from './CanvasAppExtensionAssemblyTypes'
 
 export type CanvasAppExtensionAssembly = CanvasAppExtensionBundle
-
-export type CanvasAppExtensionAssemblyInput = {
-  customCommands?: readonly CanvasAppCustomCommand[]
-  customItemModules?: readonly CanvasAppCustomItemModule[]
-  disabledCustomItemModuleIds?: CanvasAppCustomItemModuleAssemblyOptions['disabledModuleIds']
-  inspectorPanels?: readonly CanvasAppInspectorPanel[]
-}
 
 export function createCanvasAppExtensionAssembly(
   input: CanvasAppExtensionAssemblyInput,

@@ -144,7 +144,7 @@ describe('Canvas module boundaries', () => {
     )
 
     expect(typeContractFile.source).toContain(
-      'export type CanvasAppAssemblyInput = {',
+      'export type CanvasAppAssemblyInput = CanvasAppExtensionAssemblyInput & {',
     )
     expect(typeContractFile.source).not.toContain('Partial<CanvasAppAssembly>')
   })
@@ -183,7 +183,10 @@ describe('Canvas module boundaries', () => {
       'export type CanvasAppAssembly = CanvasAppExtensionBundle & {',
     )
     expect(typeContractFile.source).toContain(
-      'export type CanvasAppAssemblyInput = {',
+      "from './CanvasAppExtensionAssemblyTypes'",
+    )
+    expect(typeContractFile.source).toContain(
+      'export type CanvasAppAssemblyInput = CanvasAppExtensionAssemblyInput & {',
     )
     expect(typeContractFile.source).not.toContain(
       'customCreationTools: readonly',
@@ -207,6 +210,9 @@ describe('Canvas module boundaries', () => {
     expect(defaultAssemblyFile.source).toContain(
       "from './CanvasAppAssemblyTypes'",
     )
+    expect(getSourceFile(
+      'src/canvas/app/workflow/CanvasAppExtensionAssembly.ts',
+    ).source).toContain("from './CanvasAppExtensionAssemblyTypes'")
   })
 
   it('keeps App component composition behind a named Assembly module', () => {
@@ -448,18 +454,23 @@ describe('Canvas module boundaries', () => {
     const typeContractFile = getSourceFile(
       'src/canvas/app/workflow/CanvasAppAssemblyTypes.ts',
     )
-    const inputContract =
-      typeContractFile.source.match(
-        /export type CanvasAppAssemblyInput = \{[\s\S]*?\n\}/,
-      )?.[0] ?? ''
+    const extensionInputFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppExtensionAssemblyTypes.ts',
+    )
 
-    expect(inputContract).toContain(
+    expect(typeContractFile.source).toContain(
+      'CanvasAppExtensionAssemblyInput',
+    )
+    expect(extensionInputFile.source).toContain(
       'customItemModules?: readonly CanvasAppCustomItemModule[]',
     )
-    expect(inputContract).toContain(
+    expect(typeContractFile.source).toContain(
       'affordanceConfig?: CanvasAffordanceConfigInput',
     )
-    expect(inputContract).not.toMatch(
+    expect(typeContractFile.source).not.toMatch(
+      /\b(customCreationTools|customItemRenderers|customItemValidators)\?:/,
+    )
+    expect(extensionInputFile.source).not.toMatch(
       /\b(customCreationTools|customItemRenderers|customItemValidators)\?:/,
     )
   })

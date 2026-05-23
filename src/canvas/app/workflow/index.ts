@@ -10,6 +10,9 @@ export type {
   CanvasAppAssemblyInput,
 } from './CanvasAppAssemblyTypes'
 export type {
+  CanvasAppExtensionAssemblyInput,
+} from './CanvasAppExtensionAssemblyTypes'
+export type {
   CanvasAppCustomCommand,
   CanvasAppCustomCommandContext,
   CanvasAppCustomCommandState,
