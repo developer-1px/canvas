@@ -6,8 +6,9 @@ import {
 } from 'react'
 import type {
   Bounds,
+  EditingText,
   Tool,
-} from '../../core'
+} from '../../entities'
 import {
   DEFAULT_CANVAS_AFFORDANCE_CONFIG,
   EMPTY_CANVAS_SNAP_GUIDES,
@@ -18,7 +19,6 @@ import {
 import {
   CANVAS_COMPONENT_LIBRARY,
   CANVAS_ITEM_ENGINE_ADAPTERS,
-  type EditingText,
 } from '../../host'
 import { useCanvasCommands } from '../commands/useCanvasCommands'
 import { useCanvasComponentInsertion } from '../components/useCanvasComponentInsertion'

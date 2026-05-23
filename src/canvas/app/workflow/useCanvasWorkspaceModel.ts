@@ -6,8 +6,8 @@ import {
 } from 'react'
 import {
   INITIAL_VIEWPORT,
-  type Viewport,
 } from '../../core'
+import type { Viewport } from '../../entities'
 import {
   INITIAL_ITEMS,
   createCanvasItemReadModel,

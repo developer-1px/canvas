@@ -3,7 +3,7 @@ import type { CanvasOverlayState } from '../../engine'
 import type {
   Bounds,
   ResizeHandle
-} from '../../core'
+} from '../../entities'
 
 type CanvasSvgInteractionOverlaysProps = {
   overlays: CanvasOverlayState

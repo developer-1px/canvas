@@ -1,13 +1,11 @@
 import type {
   Bounds,
+  CanvasItem,
+  EditingText,
   Point,
   ResizeHandle,
   Viewport
-} from '../../core'
-import type {
-  CanvasItem,
-  EditingText
-} from '../../host'
+} from '../../entities'
 
 export type Interaction =
   | { kind: 'none' }

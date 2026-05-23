@@ -4,7 +4,7 @@ import {
   type CanvasAlignMode,
   type CanvasDistributeMode,
 } from '../../engine'
-import type { Tool } from '../../core'
+import type { Tool } from '../../entities'
 import {
   AlignBottomIcon,
   AlignCenterIcon,

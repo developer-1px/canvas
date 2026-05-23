@@ -7,13 +7,11 @@ import type {
 } from 'react'
 import type {
   Bounds,
-  Tool,
-  Viewport,
-} from '../../core'
-import type {
   CanvasItem,
   EditingText,
-} from '../../host'
+  Tool,
+  Viewport,
+} from '../../entities'
 import {
   DRAG_THRESHOLD,
   normalizeBounds,

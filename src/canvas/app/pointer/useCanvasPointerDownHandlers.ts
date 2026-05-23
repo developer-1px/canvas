@@ -8,18 +8,16 @@ import type {
 import { useRef } from 'react'
 import type {
   Bounds,
+  CanvasItem,
+  EditingText,
   Point,
   ResizeHandle,
-  Tool,
-  Viewport,
-} from '../../core'
-import type {
-  CanvasItem,
-  CanvasItemReadModel,
-  EditingText,
   RectItem,
   TextItem,
-} from '../../host'
+  Tool,
+  Viewport,
+} from '../../entities'
+import type { CanvasItemReadModel } from '../../host'
 import {
   normalizeBounds,
   pointDistance,

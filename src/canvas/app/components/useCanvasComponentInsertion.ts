@@ -5,14 +5,12 @@ import {
   type SetStateAction,
 } from 'react'
 import type {
-  Tool,
-  Viewport,
-} from '../../core'
-import { CANVAS_COMPONENT_LIBRARY } from '../../host'
-import type {
   CanvasComponentKind,
   EditingText,
-} from '../../host'
+  Tool,
+  Viewport,
+} from '../../entities'
+import { CANVAS_COMPONENT_LIBRARY } from '../../host'
 import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract'
 
 type UseCanvasComponentInsertionArgs = {

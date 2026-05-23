@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import type { CanvasItem } from '../../host'
+import type { CanvasItem } from '../../entities'
 import { getCanvasPasteOffset } from './CanvasPastePosition'
 
 const item: CanvasItem = {

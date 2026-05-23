@@ -14,13 +14,11 @@ import {
   type CanvasCommandAdapter,
 } from '../../engine'
 import type {
-  Point,
-  Viewport,
-} from '../../core'
-import type {
   CanvasItem,
   EditingText,
-} from '../../host'
+  Point,
+  Viewport,
+} from '../../entities'
 import { getCanvasPasteOffset } from './CanvasPastePosition'
 import type {
   CanvasDocumentClipboard,

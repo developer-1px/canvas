@@ -6,9 +6,9 @@ import type {
 import type { CanvasAffordanceConfig } from '../../engine'
 import type {
   Bounds,
+  EditingText,
   Tool
-} from '../../core'
-import type { EditingText } from '../../host'
+} from '../../entities'
 import type { Interaction } from '../pointer/CanvasInteractionState'
 import type { CommitCanvasSelection } from '../workflow/CanvasWorkflowContract'
 

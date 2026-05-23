@@ -3,7 +3,7 @@ import {
   CANVAS_COMMAND_AFFORDANCES,
   CANVAS_TOOL_AFFORDANCES,
 } from '../../engine'
-import type { Tool } from '../../core'
+import type { Tool } from '../../entities'
 
 type ToolButtonProps = {
   active: boolean

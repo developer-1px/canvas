@@ -25,6 +25,7 @@
 
 | Folder | 책임 |
 | --- | --- |
+| `src/canvas/architecture/CanvasModuleBoundaries.test.ts` | Module seam import 규칙을 회귀 테스트로 검증한다 |
 | `src/canvas/app/shell` | CanvasApp composition과 shell style |
 | `src/canvas/app/workflow` | React state와 engine/host/renderer wiring |
 | `src/canvas/app/workflow/index.ts` | App Shell이 사용하는 workflow public entry |
@@ -33,6 +34,7 @@
 | `src/canvas/app/workflow/useCanvasWorkspaceModel.ts` | 저장된 workspace snapshot, document history, viewport, read model, id 생성을 App Shell에 숨긴다 |
 | `src/canvas/app/geometry` | DOM/SVG pointer 좌표 변환 |
 | `src/canvas/core` | Host item과 renderer를 모르는 geometry, viewport, id, primitive math 같은 재사용 계약 |
+| `src/canvas/entities` | Core geometry와 Demo canvas item의 안정적인 type-only entity 계약 |
 | `src/canvas/engine` | Host item과 renderer를 모르는 조작 규칙. 외부 소비자는 `src/canvas/engine` public facade를 사용한다 |
 | `src/canvas/engine/snap` | Grid, alignment, spacing snap과 guide 계산 |
 | `src/canvas/host/model` | Demo canvas item model. Core 재사용 계약에 포함하지 않는다 |
@@ -87,8 +89,9 @@ type CanvasAffordanceConfig = {
 
 - Engine Module은 `core`, `CanvasAffordances`, `CanvasSceneAdapter` 같은 renderer-independent 입력만 사용한다.
 - Engine Module은 Demo `CanvasItem`, `CanvasOperations`, `CanvasTree`, SVG Renderer를 import하지 않는다.
+- Entities Module은 `core` type만 사용하고 app, engine, host, renderer, ui 구현을 import하지 않는다.
 - Host domain Module은 Engine 구현 파일을 import하지 않는다. Engine Adapter 타입은 `src/canvas/engine` public facade에서 받는다.
-- App과 Renderer는 Demo Host 내부 subpath를 import하지 않는다. Demo model type도 `src/canvas/host` public facade에서 받는다.
+- App과 Renderer는 Demo Host 내부 subpath를 import하지 않는다. 안정 entity type은 `src/canvas/entities` public contract에서 받는다.
 - UI controls는 Demo Host를 import하지 않는다. Host component/template/text editing 값은 App workflow가 UI prop으로 주입한다.
 - App workflow는 Host document 구현 파일을 import하지 않는다. 문서 변경, history, selection, clipboard, text search는 Host Document Controller를 통해 사용한다.
 - App hook들은 `useCanvasDocument` 구현 파일에서 타입을 가져오지 않는다. document commit과 selection contract는 Canvas Workflow Contract를 통해 공유한다.
@@ -101,5 +104,6 @@ type CanvasAffordanceConfig = {
 - Renderer Adapter는 `CanvasOverlayState`를 받아 SVG로 그리며, Engine은 SVG/DOM 구현을 모른다.
 - Renderer Adapter는 Demo component kind별 분기를 소유하지 않고 Canvas Component Library를 import하지 않는다. App workflow가 주입한 presentation key resolver로 그리기 전략을 고른다.
 - 새 Demo component kind가 기존 presentation을 재사용하면 `CanvasComponentLibrary`만 수정한다. 새 presentation을 추가할 때만 Renderer Adapter 전략을 추가한다.
+- 위 import 경계는 `src/canvas/architecture/CanvasModuleBoundaries.test.ts`에서 검증한다.
 
 추출 순서는 동작 변경 없이 app workflow에서 Engine 책임을 하나씩 떼어내는 방식으로 진행한다.

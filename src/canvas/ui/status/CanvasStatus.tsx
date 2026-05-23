@@ -5,7 +5,7 @@ import {
 import type {
   CanvasInteractionKind,
   Tool
-} from '../../core'
+} from '../../entities'
 
 type CanvasStatusProps = {
   gesture: CanvasInteractionKind

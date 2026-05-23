@@ -5,12 +5,12 @@ import {
   type RefObject,
   type SetStateAction,
 } from 'react'
-import type { Viewport } from '../../core'
 import type {
   EditingText,
   RectItem,
   TextItem,
-} from '../../host'
+  Viewport,
+} from '../../entities'
 import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract'
 
 type EditableCanvasTextItem = RectItem | TextItem

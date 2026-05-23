@@ -4,7 +4,7 @@ import {
   type RefObject,
   type SetStateAction,
 } from 'react'
-import type { Viewport } from '../../core'
+import type { Viewport } from '../../entities'
 import type { CanvasItemReadModel } from '../../host'
 import {
   fitBoundsIntoViewport,

@@ -21,11 +21,11 @@ import {
   type CanvasDistributeMode,
   type CanvasReorderMode,
 } from '../../engine'
-import type { Viewport } from '../../core'
 import type {
   CanvasItem,
   EditingText,
-} from '../../host'
+  Viewport,
+} from '../../entities'
 import { useCanvasClipboardCommands } from './useCanvasClipboardCommands'
 import type {
   CanvasDocumentClipboard,

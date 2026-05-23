@@ -6,7 +6,7 @@ import {
   type Dispatch,
   type SetStateAction,
 } from 'react'
-import type { CanvasItem } from '../../host'
+import type { CanvasItem } from '../../entities'
 import {
   createCanvasDocumentController,
 } from '../../host'

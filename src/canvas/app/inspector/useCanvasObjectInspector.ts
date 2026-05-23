@@ -1,9 +1,9 @@
 import { useCallback, useMemo } from 'react'
-import type { Bounds } from '../../core'
 import type {
+  Bounds,
   CanvasItem,
-  CanvasItemReadModel,
-} from '../../host'
+} from '../../entities'
+import type { CanvasItemReadModel } from '../../host'
 import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract'
 
 type UseCanvasObjectInspectorArgs = {
