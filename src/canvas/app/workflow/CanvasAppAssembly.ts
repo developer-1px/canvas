@@ -1,7 +1,11 @@
-import type {
-  CanvasCommandAdapter,
-  CanvasCreationAdapter,
-  CanvasTransformAdapter,
+import {
+  DEFAULT_CANVAS_AFFORDANCE_CONFIG,
+  createCanvasAffordanceConfig,
+  type CanvasAffordanceConfig,
+  type CanvasAffordanceConfigInput,
+  type CanvasCommandAdapter,
+  type CanvasCreationAdapter,
+  type CanvasTransformAdapter,
 } from '../../engine'
 import {
   CANVAS_COMPONENT_LIBRARY,
@@ -47,6 +51,7 @@ export type CanvasAppItemAdapters = {
 }
 
 export type CanvasAppAssembly = {
+  affordanceConfig: CanvasAffordanceConfig
   componentLibrary: CanvasComponentLibrary
   componentPresentationRenderers: CanvasAppComponentPresentationRenderers
   customCommands: readonly CanvasAppCustomCommand[]
@@ -61,6 +66,7 @@ export type CanvasAppAssembly = {
 }
 
 export type CanvasAppAssemblyInput = {
+  affordanceConfig?: CanvasAffordanceConfigInput
   componentLibrary?: CanvasComponentLibrary
   componentPresentationRenderers?: CanvasAppComponentPresentationRenderers
   customCommands?: readonly CanvasAppCustomCommand[]
@@ -75,6 +81,7 @@ export type CanvasAppAssemblyInput = {
 
 export const DEFAULT_CANVAS_APP_ASSEMBLY: CanvasAppAssembly =
   snapshotCanvasAppAssembly({
+    affordanceConfig: DEFAULT_CANVAS_AFFORDANCE_CONFIG,
     componentLibrary: CANVAS_COMPONENT_LIBRARY,
     componentPresentationRenderers:
       DEFAULT_CANVAS_APP_COMPONENT_PRESENTATION_RENDERERS,
@@ -104,6 +111,9 @@ export function createCanvasAppAssembly(
   })
 
   const assembly: CanvasAppAssembly = {
+    affordanceConfig: input.affordanceConfig === undefined
+      ? DEFAULT_CANVAS_APP_ASSEMBLY.affordanceConfig
+      : createCanvasAffordanceConfig(input.affordanceConfig),
     componentLibrary:
       input.componentLibrary ?? DEFAULT_CANVAS_APP_ASSEMBLY.componentLibrary,
     componentPresentationRenderers: createCanvasAppComponentPresentationRenderers(

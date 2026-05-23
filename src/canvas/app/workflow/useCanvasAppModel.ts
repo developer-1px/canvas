@@ -25,10 +25,13 @@ export function useCanvasAppModel({
 }: {
   assembly?: CanvasAppAssembly
 } = {}) {
-  const affordance = useMemo(() => getCanvasAppAffordanceModel(), [])
   const appAssembly = useMemo(
     () => getCanvasAppAssemblyModel(assertCanvasAppAssembly(assembly)),
     [assembly],
+  )
+  const affordance = useMemo(
+    () => getCanvasAppAffordanceModel(appAssembly.affordance.config),
+    [appAssembly],
   )
   const stageElement = useCanvasAppStageElementModel()
   const workspace = useCanvasWorkspaceModel(appAssembly.workspace)

@@ -18,6 +18,9 @@ export function snapshotCanvasAppAssembly(
   )
 
   return Object.freeze({
+    affordanceConfig: snapshotCanvasAppAffordanceConfig(
+      assembly.affordanceConfig,
+    ),
     componentLibrary: snapshotCanvasAppComponentLibrary(
       assembly.componentLibrary,
     ),
@@ -43,6 +46,18 @@ export function snapshotCanvasAppAssembly(
     itemLayerAdapter: Object.freeze({ ...assembly.itemLayerAdapter }),
     stageAdapter: Object.freeze({ ...assembly.stageAdapter }),
   })
+}
+
+function snapshotCanvasAppAffordanceConfig(
+  config: CanvasAppAssembly['affordanceConfig'],
+): CanvasAppAssembly['affordanceConfig'] {
+  return Object.freeze({
+    commands: freezeCanvasAppRecord(config.commands),
+    gestures: freezeCanvasAppRecord(config.gestures),
+    overlays: freezeCanvasAppRecord(config.overlays),
+    shortcuts: freezeCanvasAppRecord(config.shortcuts),
+    tools: freezeCanvasAppRecord(config.tools),
+  }) as CanvasAppAssembly['affordanceConfig']
 }
 
 function snapshotCanvasAppComponentLibrary(

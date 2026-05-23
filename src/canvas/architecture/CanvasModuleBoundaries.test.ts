@@ -163,6 +163,7 @@ describe('Canvas module boundaries', () => {
       "from './CanvasAppAssemblyModel'",
     )
     for (const assemblyOutputField of [
+      'affordanceConfig',
       'componentLibrary',
       'componentPresentationRenderers',
       'customCommands',
@@ -178,6 +179,7 @@ describe('Canvas module boundaries', () => {
       expect(appModelFile.source).not.toContain(assemblyOutputField)
     }
     for (const consumerContext of [
+      'affordance: {',
       'command: {',
       'component: {',
       'control: {',
@@ -201,6 +203,9 @@ describe('Canvas module boundaries', () => {
 
     expect(appModelFile.source).toContain(
       "from './CanvasAppAffordanceModel'",
+    )
+    expect(appModelFile.source).toContain(
+      'getCanvasAppAffordanceModel(appAssembly.affordance.config)',
     )
     expect(appModelFile.source).not.toContain(
       'DEFAULT_CANVAS_AFFORDANCE_CONFIG',
@@ -232,6 +237,9 @@ describe('Canvas module boundaries', () => {
 
     expect(inputContract).toContain(
       'customItemModules?: readonly CanvasAppCustomItemModule[]',
+    )
+    expect(inputContract).toContain(
+      'affordanceConfig?: CanvasAffordanceConfigInput',
     )
     expect(inputContract).not.toMatch(
       /\b(customCreationTools|customItemRenderers|customItemValidators)\?:/,

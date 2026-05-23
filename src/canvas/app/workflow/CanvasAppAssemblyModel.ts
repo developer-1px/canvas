@@ -1,6 +1,7 @@
 import type { CanvasAppAssembly } from './CanvasAppAssembly'
 
 export function getCanvasAppAssemblyModel({
+  affordanceConfig,
   componentLibrary,
   componentPresentationRenderers,
   customCommands,
@@ -14,6 +15,9 @@ export function getCanvasAppAssemblyModel({
   stageAdapter,
 }: CanvasAppAssembly) {
   return {
+    affordance: {
+      config: affordanceConfig,
+    },
     command: {
       commandAdapter: itemAdapters.command,
     },

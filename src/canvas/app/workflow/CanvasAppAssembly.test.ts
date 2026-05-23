@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import type { CanvasAffordanceConfigInput } from '../../engine'
 import { createCanvasComponentLibrary } from '../../host'
 import {
   DEFAULT_CANVAS_APP_ASSEMBLY,
@@ -18,6 +19,25 @@ import {
 } from './index'
 
 describe('CanvasAppAssembly', () => {
+  it('assembles product affordance config at the app assembly seam', () => {
+    const assembly = createCanvasAppAssembly({
+      affordanceConfig: {
+        commands: { duplicate: false },
+        gestures: { drawMarker: false },
+        overlays: { grid: false },
+        shortcuts: { markerTool: false },
+        tools: { marker: false },
+      },
+    })
+
+    expect(assembly.affordanceConfig.commands.duplicate).toBe(false)
+    expect(assembly.affordanceConfig.gestures.drawMarker).toBe(false)
+    expect(assembly.affordanceConfig.overlays.grid).toBe(false)
+    expect(assembly.affordanceConfig.shortcuts.markerTool).toBe(false)
+    expect(assembly.affordanceConfig.tools.marker).toBe(false)
+    expect(assembly.affordanceConfig.tools.select).toBe(true)
+  })
+
   it('assembles product-specific component library and presentation registry', () => {
     const componentLibrary = createCanvasComponentLibrary({
       templates: [
@@ -261,6 +281,14 @@ describe('CanvasAppAssembly', () => {
   it('rejects malformed direct app descriptors at the assembly seam', () => {
     expect(() =>
       createCanvasAppAssembly({
+        affordanceConfig: {
+          tools: { marker: 'off' },
+        },
+      } as unknown as Parameters<typeof createCanvasAppAssembly>[0]),
+    ).toThrow('Canvas app affordance config tools.marker must be boolean')
+
+    expect(() =>
+      createCanvasAppAssembly({
         customCommands: [
           {
             id: 'publish',
@@ -431,6 +459,12 @@ describe('CanvasAppAssembly', () => {
     const stageAdapter: CanvasAppStageAdapter = {
       renderStage,
     }
+    const affordanceTools: NonNullable<
+      CanvasAffordanceConfigInput['tools']
+    > = { marker: false }
+    const affordanceConfig: CanvasAffordanceConfigInput = {
+      tools: affordanceTools,
+    }
     const moduleCreationTool: CanvasAppCustomItemModuleCreationTool = {
       id: 'risk',
       label: '!',
@@ -454,6 +488,7 @@ describe('CanvasAppAssembly', () => {
     })
 
     const assembly = createCanvasAppAssembly({
+      affordanceConfig,
       componentLibrary,
       componentPresentationRenderers,
       customCommands: [customCommand],
@@ -484,6 +519,7 @@ describe('CanvasAppAssembly', () => {
     itemAdapters.command.selectAll = () => ['mutated']
     itemLayerAdapter.renderItems = () => 'mutated'
     stageAdapter.renderStage = () => 'mutated'
+    affordanceTools.marker = true
     moduleCreationTool.createItem = ({ startWorld }) => ({
       title: 'Mutated risk',
       x: startWorld.x,
@@ -493,6 +529,7 @@ describe('CanvasAppAssembly', () => {
       data: { severity: 'high' },
     })
 
+    expect(assembly.affordanceConfig.tools.marker).toBe(false)
     expect(assembly.componentLibrary.getPresentation('risk')).toBe('risk-card')
     expect(assembly.componentLibrary.getTemplate('risk')).toMatchObject({
       id: 'risk',
@@ -532,6 +569,9 @@ describe('CanvasAppAssembly', () => {
       title: 'Risk',
     })
     expect(Object.isFrozen(assembly)).toBe(true)
+    expect(Object.isFrozen(assembly.affordanceConfig)).toBe(true)
+    expect(Object.isFrozen(assembly.affordanceConfig.commands)).toBe(true)
+    expect(Object.isFrozen(assembly.affordanceConfig.tools)).toBe(true)
     expect(Object.isFrozen(assembly.componentLibrary)).toBe(true)
     expect(Object.isFrozen(assembly.componentLibrary.templates)).toBe(true)
     expect(Object.isFrozen(assembly.componentLibrary.templates[0])).toBe(true)
