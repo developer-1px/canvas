@@ -78,6 +78,7 @@
 | `src/canvas/app/tools/CanvasAppCustomCreationToolContracts.ts` | Custom creation tool descriptor shape와 reserved/duplicate shortcut conflict를 검증한다 |
 | `src/canvas/app/tools/CanvasAppCustomCreationToolRuntime.ts` | Custom creation tool id 변환, toolbar state, lookup, shortcut matching을 소유한다 |
 | `src/canvas/app/workflow/CanvasAppAssembly.ts` | Host item adapter, component library, custom command, custom item module, inspector panel, initial items, SVG presentation registry 같은 제품별 의미를 외부 조립 seam으로 제공한다 |
+| `src/canvas/app/workflow/CanvasAppAdapterAssembly.ts` | Item, item layer, stage adapter fallback을 조립한다 |
 | `src/canvas/app/workflow/CanvasAppAssemblyContracts.ts` | 조립된 assembly output의 component library resolver, renderer coverage, custom extension registry, initial item, adapter shape를 검증한다 |
 | `src/canvas/app/workflow/CanvasAppWorkspaceAssembly.ts` | Workspace 초기 items normalization, Demo default selection fallback, storage provider fallback을 조립한다 |
 | `src/canvas/app/workflow/CanvasAppWorkspaceAssemblyContracts.ts` | Workspace 초기 items, 초기 selection, storage provider 계약을 검증하고, selection과 item tree 불일치를 runtime 진입 전에 차단한다 |
@@ -255,6 +256,7 @@ type CanvasAffordanceConfig = {
 - Custom item `kind`/`presentation`과 Component Template `id`/`presentation`도 같은 안정 id 계약을 따르며, 잘못된 persisted key는 Host validation 또는 component library 생성 단계에서 실패한다.
 - App workflow는 Demo SVG Item Layer를 직접 생성하지 않고 Canvas App Item Layer Adapter를 통해 stage children을 만든다.
 - App Shell은 concrete Renderer Stage를 직접 import하지 않고 Canvas App Stage Adapter가 만든 stage ReactNode를 배치한다.
+- Canvas App Adapter Assembly는 item, item layer, stage adapter fallback 조립을 소유하고, Canvas App Assembly는 adapter 선택 규칙을 직접 알지 않는다.
 - App workflow와 command/pointer/viewport hook은 raw SVG ref를 직접 읽지 않고 Canvas App Stage Element를 통해 stage DOM 기능을 사용한다.
 - App rendering Adapter의 public render input은 React/SVG pointer event를 직접 요구하지 않고 Canvas App Pointer Input을 사용한다.
 - 알 수 없는 stable component kind는 forward compatibility를 위해 기본 template로 fallback할 수 있지만, malformed component kind는 schema validation 또는 component lookup 단계에서 실패한다.

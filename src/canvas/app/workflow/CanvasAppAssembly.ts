@@ -37,6 +37,7 @@ import type {
   CanvasAppCustomItemModuleAssemblyOptions,
 } from '../modules/CanvasAppCustomItemModules'
 import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
+import { createCanvasAppAdapterAssembly } from './CanvasAppAdapterAssembly'
 import { assertCanvasAppAssembly } from './CanvasAppAssemblyContracts'
 import { createCanvasAppComponentAssembly } from './CanvasAppComponentAssembly'
 import { createCanvasAppExtensionAssembly } from './CanvasAppExtensionAssembly'
@@ -120,6 +121,10 @@ export function createCanvasAppAssembly(
     DEFAULT_CANVAS_APP_ASSEMBLY,
     { customItemValidators: extensionAssembly.customItemValidators },
   )
+  const adapterAssembly = createCanvasAppAdapterAssembly(
+    input,
+    DEFAULT_CANVAS_APP_ASSEMBLY,
+  )
 
   const assembly: CanvasAppAssembly = {
     affordanceConfig: input.affordanceConfig === undefined
@@ -135,10 +140,9 @@ export function createCanvasAppAssembly(
     inspectorPanels: extensionAssembly.inspectorPanels,
     initialItems: workspaceAssembly.initialItems,
     initialSelection: workspaceAssembly.initialSelection,
-    itemAdapters: input.itemAdapters ?? DEFAULT_CANVAS_APP_ASSEMBLY.itemAdapters,
-    itemLayerAdapter:
-      input.itemLayerAdapter ?? DEFAULT_CANVAS_APP_ASSEMBLY.itemLayerAdapter,
-    stageAdapter: input.stageAdapter ?? DEFAULT_CANVAS_APP_ASSEMBLY.stageAdapter,
+    itemAdapters: adapterAssembly.itemAdapters,
+    itemLayerAdapter: adapterAssembly.itemLayerAdapter,
+    stageAdapter: adapterAssembly.stageAdapter,
     workspaceStorageProvider: workspaceAssembly.workspaceStorageProvider,
   }
 

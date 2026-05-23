@@ -316,6 +316,7 @@
 - Toolbar shell은 group layout만 맡고, Canvas Toolbar Item Renderer는 rendering entry만 제공하며 item kind별 button/icon/command dispatch wiring은 Canvas Toolbar Item Render Dispatch가 소유한다.
 - Custom item renderer lookup과 실행 실패 containment는 Demo SVG Custom Item Renderer Execution이 소유하고, fallback shape는 Demo SVG Custom Item Render Fallback이 소유한다.
 - App workflow는 Demo SVG Item Layer를 직접 생성하지 않고 Canvas App Item Layer Adapter를 통해 stage children을 만든다.
+- Canvas App Adapter Assembly는 item, item layer, stage adapter fallback 조립을 소유하고, Canvas App Assembly는 adapter 선택 규칙을 직접 알지 않는다.
 - 제품별 inspector UI는 기본 Object Inspector를 수정하지 않고 Canvas App Inspector Panel로 등록한다.
 - 제품별 저장 payload는 Canvas Custom Item의 JSON `data` 안에 두고, payload 의미 검증은 Canvas Custom Item Validator로 등록한다.
 - 저장된 workspace snapshot은 현재 Canvas Custom Item Validator로 다시 검증하고, 실패하면 앱 초기화 대신 저장 snapshot을 제거한 뒤 버려야 한다.

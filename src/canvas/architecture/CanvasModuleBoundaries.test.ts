@@ -4438,6 +4438,50 @@ describe('Canvas module boundaries', () => {
     )
   })
 
+  it('keeps App adapter assembly creation behind a named module', () => {
+    const assemblyFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppAssembly.ts',
+    )
+    const adapterAssemblyFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppAdapterAssembly.ts',
+    )
+
+    expect(assemblyFile.source).toContain(
+      "from './CanvasAppAdapterAssembly'",
+    )
+    expect(assemblyFile.source).toContain(
+      'createCanvasAppAdapterAssembly',
+    )
+    expect(assemblyFile.source).not.toContain(
+      'input.itemAdapters ?? DEFAULT_CANVAS_APP_ASSEMBLY.itemAdapters',
+    )
+    expect(assemblyFile.source).not.toContain(
+      'input.itemLayerAdapter ?? DEFAULT_CANVAS_APP_ASSEMBLY.itemLayerAdapter',
+    )
+    expect(assemblyFile.source).not.toContain(
+      'input.stageAdapter ?? DEFAULT_CANVAS_APP_ASSEMBLY.stageAdapter',
+    )
+    expect(adapterAssemblyFile.source).toContain(
+      'export function createCanvasAppAdapterAssembly',
+    )
+    expect(adapterAssemblyFile.source).toContain(
+      'export type CanvasAppAdapterAssemblyInput',
+    )
+    expect(adapterAssemblyFile.source).not.toContain('Pick<')
+    expect(adapterAssemblyFile.source).not.toContain(
+      "from './CanvasAppAssembly'",
+    )
+    expect(adapterAssemblyFile.source).toContain(
+      'itemAdapters: input.itemAdapters ?? defaults.itemAdapters',
+    )
+    expect(adapterAssemblyFile.source).toContain(
+      'itemLayerAdapter: input.itemLayerAdapter ?? defaults.itemLayerAdapter',
+    )
+    expect(adapterAssemblyFile.source).toContain(
+      'stageAdapter: input.stageAdapter ?? defaults.stageAdapter',
+    )
+  })
+
   it('keeps App Assembly output contracts behind a named module', () => {
     const assemblyFile = getSourceFile(
       'src/canvas/app/workflow/CanvasAppAssembly.ts',
