@@ -9,13 +9,9 @@ import {
   type CanvasWorkspaceSnapshot,
 } from '../document/CanvasWorkspaceSnapshot'
 
-export const DEFAULT_CANVAS_WORKSPACE_SELECTION = [
-  'component-sticky',
-  'component-card',
-]
-
 type CanvasWorkspaceInitialStateArgs = {
   initialItems: CanvasItem[]
+  initialSelection: readonly string[]
   storedWorkspace: CanvasWorkspaceSnapshot | null
 }
 
@@ -26,17 +22,19 @@ type CanvasWorkspaceRuntimeModelArgs = {
 
 export function getCanvasWorkspaceInitialState({
   initialItems,
+  initialSelection,
   storedWorkspace,
 }: CanvasWorkspaceInitialStateArgs): {
   items: CanvasItem[]
   selection: string[]
   viewport: Viewport
 } {
+  const items = storedWorkspace?.items ?? initialItems
+
   return {
-    items: storedWorkspace?.items ?? initialItems,
-    selection: storedWorkspace?.selection ?? [
-      ...DEFAULT_CANVAS_WORKSPACE_SELECTION,
-    ],
+    items,
+    selection: storedWorkspace?.selection ??
+      createCanvasItemReadModel(items).getSelection([...initialSelection]),
     viewport: storedWorkspace?.viewport ?? INITIAL_VIEWPORT,
   }
 }

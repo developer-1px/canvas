@@ -24,6 +24,10 @@ export function assertCanvasAppAssembly(assembly: CanvasAppAssembly) {
   assertCanvasAppCustomItemValidators(assembly.customItemValidators)
   assertCanvasAppInspectorPanels(assembly.inspectorPanels)
   assertCanvasAppArray(assembly.initialItems, 'assembly initial items')
+  assertCanvasAppArray(
+    assembly.initialSelection,
+    'assembly initial selection',
+  )
   assertCanvasAppDescriptorFunctionField({
     field: 'workspaceStorageProvider',
     owner: 'assembly',

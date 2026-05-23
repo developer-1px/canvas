@@ -44,6 +44,11 @@ import { createCanvasAppExtensionAssembly } from './CanvasAppExtensionAssembly'
 import { snapshotCanvasAppAssembly } from './CanvasAppAssemblySnapshot'
 import type { CanvasAppItemAdapters } from './CanvasAppAdapterContracts'
 
+const DEFAULT_CANVAS_APP_INITIAL_SELECTION = [
+  'component-sticky',
+  'component-card',
+]
+
 export { assertCanvasAppAssembly } from './CanvasAppAssemblyContracts'
 export type { CanvasAppItemAdapters } from './CanvasAppAdapterContracts'
 
@@ -57,6 +62,7 @@ export type CanvasAppAssembly = {
   customItemValidators: CanvasCustomItemValidators
   inspectorPanels: readonly CanvasAppInspectorPanel[]
   initialItems: CanvasItem[]
+  initialSelection: readonly string[]
   itemAdapters: CanvasAppItemAdapters
   itemLayerAdapter: CanvasAppItemLayerAdapter
   stageAdapter: CanvasAppStageAdapter
@@ -71,6 +77,7 @@ export type CanvasAppAssemblyInput = {
   customItemModules?: readonly CanvasAppCustomItemModule[]
   disabledCustomItemModuleIds?: CanvasAppCustomItemModuleAssemblyOptions['disabledModuleIds']
   initialItems?: CanvasItem[]
+  initialSelection?: readonly string[]
   inspectorPanels?: readonly CanvasAppInspectorPanel[]
   itemAdapters?: CanvasAppItemAdapters
   itemLayerAdapter?: CanvasAppItemLayerAdapter
@@ -90,6 +97,7 @@ export const DEFAULT_CANVAS_APP_ASSEMBLY: CanvasAppAssembly =
     customItemValidators: {},
     inspectorPanels: [],
     initialItems: INITIAL_ITEMS,
+    initialSelection: DEFAULT_CANVAS_APP_INITIAL_SELECTION,
     itemAdapters: CANVAS_ITEM_ENGINE_ADAPTERS,
     itemLayerAdapter: DEFAULT_CANVAS_APP_ITEM_LAYER_ADAPTER,
     stageAdapter: DEFAULT_CANVAS_APP_STAGE_ADAPTER,
@@ -124,6 +132,12 @@ export function createCanvasAppAssembly(
       input.initialItems ?? DEFAULT_CANVAS_APP_ASSEMBLY.initialItems,
       { customItemValidators: extensionAssembly.customItemValidators },
     ),
+    initialSelection: [
+      ...(input.initialSelection ??
+        (input.initialItems === undefined
+          ? DEFAULT_CANVAS_APP_ASSEMBLY.initialSelection
+          : [])),
+    ],
     itemAdapters: input.itemAdapters ?? DEFAULT_CANVAS_APP_ASSEMBLY.itemAdapters,
     itemLayerAdapter:
       input.itemLayerAdapter ?? DEFAULT_CANVAS_APP_ASSEMBLY.itemLayerAdapter,

@@ -104,6 +104,7 @@ describe('Canvas package consumer imports', () => {
     const assembly = createCanvasAppAssembly({
       customItemModules: [module],
       initialItems: [rect],
+      initialSelection: [rect.id],
       itemLayerAdapter,
       stageAdapter,
       workspaceStorageProvider,
@@ -130,6 +131,7 @@ describe('Canvas package consumer imports', () => {
     } satisfies CanvasAppProps
 
     expect(assembly.initialItems).toEqual([rect])
+    expect(assembly.initialSelection).toEqual([rect.id])
     expect(
       shellInputSource.assemblyInput.affordanceConfig?.overlays?.toolbar,
     ).toBe(false)

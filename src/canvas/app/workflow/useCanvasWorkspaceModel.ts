@@ -22,10 +22,12 @@ import {
 export function useCanvasWorkspaceModel({
   customItemValidators,
   initialItems,
+  initialSelection,
   storageProvider,
 }: {
   customItemValidators?: CanvasCustomItemValidators
   initialItems: CanvasItem[]
+  initialSelection: readonly string[]
   storageProvider: CanvasWorkspaceStorageProvider
 }) {
   const validation = useMemo(
@@ -38,6 +40,7 @@ export function useCanvasWorkspaceModel({
   )
   const initialState = getCanvasWorkspaceInitialState({
     initialItems,
+    initialSelection,
     storedWorkspace,
   })
   const [createId] = useState(() => {

@@ -7,7 +7,6 @@ import { INITIAL_VIEWPORT } from '../../core'
 import type { CanvasItem } from '../../entities'
 import type { CanvasWorkspaceSnapshot } from '../document/CanvasWorkspaceSnapshot'
 import {
-  DEFAULT_CANVAS_WORKSPACE_SELECTION,
   createCanvasWorkspaceIdGenerator,
   getCanvasWorkspaceInitialState,
   getCanvasWorkspaceRuntimeModel,
@@ -26,6 +25,7 @@ describe('CanvasWorkspaceRuntimeModel', () => {
 
     expect(getCanvasWorkspaceInitialState({
       initialItems,
+      initialSelection: ['rect-1'],
       storedWorkspace,
     })).toEqual({
       items: storedItems,
@@ -34,19 +34,31 @@ describe('CanvasWorkspaceRuntimeModel', () => {
     })
   })
 
-  it('falls back to demo items, default selection, and initial viewport', () => {
+  it('falls back to supplied items, supplied selection, and initial viewport', () => {
     const initialItems = [createRectItem('rect-1')]
+    const initialSelection = ['rect-1']
     const initialState = getCanvasWorkspaceInitialState({
       initialItems,
+      initialSelection,
       storedWorkspace: null,
     })
 
     expect(initialState).toEqual({
       items: initialItems,
-      selection: DEFAULT_CANVAS_WORKSPACE_SELECTION,
+      selection: ['rect-1'],
       viewport: INITIAL_VIEWPORT,
     })
-    expect(initialState.selection).not.toBe(DEFAULT_CANVAS_WORKSPACE_SELECTION)
+    expect(initialState.selection).not.toBe(initialSelection)
+  })
+
+  it('sanitizes supplied initial selection against supplied items', () => {
+    const initialItems = [createRectItem('rect-1')]
+
+    expect(getCanvasWorkspaceInitialState({
+      initialItems,
+      initialSelection: ['missing', 'rect-1'],
+      storedWorkspace: null,
+    }).selection).toEqual(['rect-1'])
   })
 
   it('creates ids from the max current item id seed', () => {

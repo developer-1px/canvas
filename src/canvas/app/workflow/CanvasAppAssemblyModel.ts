@@ -10,6 +10,7 @@ export function getCanvasAppAssemblyModel({
   customItemValidators,
   inspectorPanels,
   initialItems,
+  initialSelection,
   itemAdapters,
   itemLayerAdapter,
   stageAdapter,
@@ -51,6 +52,7 @@ export function getCanvasAppAssemblyModel({
     workspace: {
       customItemValidators,
       initialItems,
+      initialSelection,
       storageProvider: workspaceStorageProvider,
     },
   }

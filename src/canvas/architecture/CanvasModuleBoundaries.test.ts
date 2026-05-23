@@ -238,6 +238,7 @@ describe('Canvas module boundaries', () => {
       'customItemValidators',
       'inspectorPanels',
       'initialItems',
+      'initialSelection',
       'itemAdapters',
       'itemLayerAdapter',
       'stageAdapter',
@@ -4633,6 +4634,9 @@ describe('Canvas module boundaries', () => {
     const workspaceRuntimeModelFile = getSourceFile(
       'src/canvas/app/workflow/CanvasWorkspaceRuntimeModel.ts',
     )
+    const assemblyFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppAssembly.ts',
+    )
     const rawWorkspaceTerms =
       /\b(canRedo|canUndo|commitSelection|commitItemsChange|copyItemsToClipboard|getClipboardItems|findDocumentText|itemReadModel|redo|replaceDocumentText|selectedBounds|setClipboardItems|setLiveItems|setSelection|setViewport|undo)\b/
 
@@ -4651,8 +4655,16 @@ describe('Canvas module boundaries', () => {
     expect(workspaceRuntimeModelFile.source).not.toContain(
       'CanvasWorkspaceStorage',
     )
+    expect(workspaceRuntimeModelFile.source).not.toContain(
+      'component-sticky',
+    )
+    expect(workspaceRuntimeModelFile.source).not.toContain(
+      'component-card',
+    )
+    expect(assemblyFile.source).toContain(
+      'DEFAULT_CANVAS_APP_INITIAL_SELECTION',
+    )
     for (const runtimeImplementationDetail of [
-      'DEFAULT_CANVAS_WORKSPACE_SELECTION',
       'INITIAL_VIEWPORT',
       'getCanvasItemIdSeed',
       'createCanvasItemReadModel',

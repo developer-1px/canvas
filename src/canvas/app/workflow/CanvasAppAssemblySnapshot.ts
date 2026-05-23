@@ -43,6 +43,7 @@ export function snapshotCanvasAppAssembly(
       assembly.initialItems,
       customItemValidators,
     ),
+    initialSelection: freezeCanvasAppArray(assembly.initialSelection),
     itemAdapters: adapterSnapshot.itemAdapters,
     itemLayerAdapter: adapterSnapshot.itemLayerAdapter,
     stageAdapter: adapterSnapshot.stageAdapter,

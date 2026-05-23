@@ -238,6 +238,31 @@ describe('CanvasAppAssembly', () => {
     ).toThrow('Canvas app assembly requires workspaceStorageProvider')
   })
 
+  it('keeps demo default selection inside the default assembly only', () => {
+    const customInitialItems = [{
+      fill: '#ffffff',
+      h: 40,
+      id: 'rect-1',
+      stroke: '#111111',
+      type: 'rect',
+      w: 80,
+      x: 0,
+      y: 0,
+    }] as const
+
+    expect(DEFAULT_CANVAS_APP_ASSEMBLY.initialSelection).toEqual([
+      'component-sticky',
+      'component-card',
+    ])
+    expect(createCanvasAppAssembly({
+      initialItems: [...customInitialItems],
+    }).initialSelection).toEqual([])
+    expect(createCanvasAppAssembly({
+      initialItems: [...customInitialItems],
+      initialSelection: ['rect-1'],
+    }).initialSelection).toEqual(['rect-1'])
+  })
+
   it('rejects direct extension ids outside the app extension id contract', () => {
     expect(() =>
       createCanvasAppAssembly({
@@ -515,6 +540,7 @@ describe('CanvasAppAssembly', () => {
       customCommands: [customCommand],
       customItemModules: [riskModule],
       initialItems,
+      initialSelection: ['rect-1'],
       inspectorPanels: [customInspectorPanel],
       itemAdapters,
       itemLayerAdapter,
@@ -574,6 +600,7 @@ describe('CanvasAppAssembly', () => {
     })).toBe(1)
     expect(assembly.initialItems).toHaveLength(1)
     expect(assembly.initialItems[0]).toMatchObject({ id: 'rect-1', x: 0 })
+    expect(assembly.initialSelection).toEqual(['rect-1'])
     expect(assembly.itemAdapters.command.selectAll({ items: [] })).toEqual([])
     expect(assembly.itemLayerAdapter.renderItems(
       createItemLayerInput({ items: assembly.initialItems }),
@@ -603,6 +630,7 @@ describe('CanvasAppAssembly', () => {
     expect(Object.isFrozen(assembly.customItemValidators)).toBe(true)
     expect(Object.isFrozen(assembly.initialItems)).toBe(true)
     expect(Object.isFrozen(assembly.initialItems[0])).toBe(true)
+    expect(Object.isFrozen(assembly.initialSelection)).toBe(true)
     expect(Object.isFrozen(assembly.itemAdapters.command)).toBe(true)
     expect(Object.isFrozen(assembly.itemLayerAdapter)).toBe(true)
     expect(Object.isFrozen(assembly.stageAdapter)).toBe(true)
