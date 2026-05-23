@@ -45,7 +45,7 @@ export type CanvasAppStageElement = {
 }
 
 type CanvasAppStageElementMount = {
-  ref: RefCallback<SVGSVGElement>
+  ref: RefCallback<Element>
 }
 
 export type CanvasAppStageElementController = CanvasAppStageElement & {
@@ -54,12 +54,12 @@ export type CanvasAppStageElementController = CanvasAppStageElement & {
 
 type CreateCanvasAppStageElementInput = {
   getElement: () => CanvasAppStageDomElement | null
-  setElement: RefCallback<SVGSVGElement>
+  setElement: RefCallback<Element>
 }
 
 export function useCanvasAppStageElement(): CanvasAppStageElementController {
   const [stageElement] = useState(() => {
-    let element: SVGSVGElement | null = null
+    let element: Element | null = null
 
     return createCanvasAppStageElement({
       getElement: () => element,

@@ -1,6 +1,5 @@
 import {
   createElement,
-  type PointerEvent,
   type ReactNode,
 } from 'react'
 import type {
@@ -8,6 +7,10 @@ import type {
   RectItem,
   TextItem,
 } from '../../entities'
+import {
+  createCanvasAppPointerInput,
+  type CanvasAppPointerInput,
+} from '../pointer/CanvasAppPointerInput'
 import { CanvasDemoSvgItemLayer } from './CanvasDemoSvgItemLayer'
 import type {
   CanvasDemoSvgComponentPresentationRenderers,
@@ -36,10 +39,7 @@ export type CanvasAppItemLayerRenderInput = {
   items: CanvasItem[]
   outlineIds: Set<string>
   selected: Set<string>
-  onItemPointerDown: (
-    event: PointerEvent<SVGGElement>,
-    itemId: string,
-  ) => void
+  onItemPointerDown: (event: CanvasAppPointerInput, itemId: string) => void
   onTextDoubleClick: (item: RectItem | TextItem) => void
 }
 
@@ -49,5 +49,10 @@ export type CanvasAppItemLayerAdapter = {
 
 export const DEFAULT_CANVAS_APP_ITEM_LAYER_ADAPTER: CanvasAppItemLayerAdapter =
   Object.freeze({
-    renderItems: (input) => createElement(CanvasDemoSvgItemLayer, input),
+    renderItems: (input) =>
+      createElement(CanvasDemoSvgItemLayer, {
+        ...input,
+        onItemPointerDown: (event, itemId) =>
+          input.onItemPointerDown(createCanvasAppPointerInput(event), itemId),
+      }),
   })

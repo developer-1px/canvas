@@ -1,7 +1,6 @@
 import type {
   Dispatch,
   MutableRefObject,
-  PointerEvent,
   SetStateAction,
 } from 'react'
 import { useRef } from 'react'
@@ -43,6 +42,7 @@ import type {
 } from '../workflow/CanvasWorkflowContract'
 import type { Interaction } from './CanvasInteractionState'
 import { createCanvasDraftStroke } from './CanvasPointerDrawing'
+import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import {
   getCanvasAppCustomCreationTool,
   type CanvasAppCustomCreationTool,
@@ -143,7 +143,7 @@ export function useCanvasPointerDownHandlers({
     setTool('select')
   }
 
-  function handleCanvasPointerDown(event: PointerEvent<SVGSVGElement>) {
+  function handleCanvasPointerDown(event: CanvasAppPointerInput) {
     const pointerGesture = getCanvasPointerGesture({
       config,
       input: event,
@@ -272,7 +272,7 @@ export function useCanvasPointerDownHandlers({
   }
 
   function handleItemPointerDown(
-    event: PointerEvent<SVGGElement>,
+    event: CanvasAppPointerInput,
     itemId: string,
   ) {
     if (event.button !== 0) {
@@ -281,7 +281,7 @@ export function useCanvasPointerDownHandlers({
 
     if (shouldRouteCanvasItemPointerToCanvasGesture({ spaceDown, tool })) {
       event.stopPropagation()
-      handleCanvasPointerDown(event as unknown as PointerEvent<SVGSVGElement>)
+      handleCanvasPointerDown(event)
       return
     }
 
@@ -381,7 +381,7 @@ export function useCanvasPointerDownHandlers({
   }
 
   function handleResizePointerDown(
-    event: PointerEvent<SVGRectElement>,
+    event: CanvasAppPointerInput,
     handle: ResizeHandle,
   ) {
     if (event.button !== 0 || !selectedBounds || !config.gestures.resize) {

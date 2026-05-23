@@ -2,7 +2,6 @@ import {
   useCallback,
   useMemo,
   useRef,
-  type PointerEvent,
 } from 'react'
 import {
   CANVAS_GESTURE_STATUS_LABELS,
@@ -26,6 +25,10 @@ import { useCanvasObjectInspector } from '../inspector/useCanvasObjectInspector'
 import { useCanvasKeyboardShortcuts } from '../keyboard/useCanvasKeyboardShortcuts'
 import { useCanvasPointerDownHandlers } from '../pointer/useCanvasPointerDownHandlers'
 import { useCanvasPointerDragHandlers } from '../pointer/useCanvasPointerDragHandlers'
+import type {
+  CanvasAppEventInput,
+  CanvasAppPointerInput,
+} from '../pointer/CanvasAppPointerInput'
 import {
   getCanvasAppCustomCreationToolStates,
   type CanvasAppCustomCreationToolState,
@@ -355,7 +358,7 @@ export function useCanvasAppModel({
   })
 
   const handleStageCanvasPointerDown = useCallback(
-    (event: PointerEvent<SVGSVGElement>) => {
+    (event: CanvasAppPointerInput) => {
       blurTextEditor()
       handleCanvasPointerDown(event)
     },
@@ -363,7 +366,7 @@ export function useCanvasAppModel({
   )
 
   const handleStageItemPointerDown = useCallback(
-    (event: PointerEvent<SVGGElement>, itemId: string) => {
+    (event: CanvasAppPointerInput, itemId: string) => {
       blurTextEditor()
       handleItemPointerDown(event, itemId)
     },
@@ -399,8 +402,7 @@ export function useCanvasAppModel({
         stageElement: stageElement.mount,
         viewport,
         onCanvasPointerDown: handleStageCanvasPointerDown,
-        onContextMenu: (event: PointerEvent<SVGSVGElement>) =>
-          event.preventDefault(),
+        onContextMenu: (event: CanvasAppEventInput) => event.preventDefault(),
         onPointerCancel: handlePointerCancel,
         onPointerMove: handlePointerMove,
         onPointerUp: handlePointerUp,

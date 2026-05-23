@@ -14,6 +14,10 @@ export {
   type CanvasAppItemLayerAdapter,
   type CanvasAppItemLayerRenderInput,
 } from './CanvasAppItemLayerAdapter'
+export type {
+  CanvasAppEventInput,
+  CanvasAppPointerInput,
+} from '../pointer/CanvasAppPointerInput'
 export {
   DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS,
   DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS as DEFAULT_CANVAS_APP_COMPONENT_PRESENTATION_RENDERERS,

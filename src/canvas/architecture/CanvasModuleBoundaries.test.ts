@@ -252,14 +252,36 @@ describe('Canvas module boundaries', () => {
     const stageAdapterFile = getSourceFile(
       'src/canvas/app/rendering/CanvasAppStageAdapter.tsx',
     )
+    const stageMount =
+      stageAdapterFile.source.match(
+        /export type CanvasAppStageMount = \{[\s\S]*?\n\}/,
+      )?.[0] ?? ''
     const renderInput =
       stageAdapterFile.source.match(
         /export type CanvasAppStageRenderInput = \{[\s\S]*?\n\}/,
       )?.[0] ?? ''
 
+    expect(stageMount).toContain('ref: RefCallback<Element>')
+    expect(stageMount).not.toContain('SVGSVGElement')
     expect(renderInput).toContain('stageElement: CanvasAppStageMount')
     expect(renderInput).not.toContain('onStageElement')
     expect(renderInput).not.toContain('RefCallback<SVGSVGElement>')
+    expect(renderInput).not.toContain('PointerEvent<')
+    expect(renderInput).not.toContain('SVGSVGElement')
+  })
+
+  it('keeps app item layer render input on the app pointer input interface', () => {
+    const itemLayerAdapterFile = getSourceFile(
+      'src/canvas/app/rendering/CanvasAppItemLayerAdapter.tsx',
+    )
+    const renderInput =
+      itemLayerAdapterFile.source.match(
+        /export type CanvasAppItemLayerRenderInput = \{[\s\S]*?\n\}/,
+      )?.[0] ?? ''
+
+    expect(renderInput).toContain('CanvasAppPointerInput')
+    expect(renderInput).not.toContain('PointerEvent<')
+    expect(renderInput).not.toContain('SVGGElement')
   })
 
   it('keeps app workflow hooks from recreating the workspace read model', () => {

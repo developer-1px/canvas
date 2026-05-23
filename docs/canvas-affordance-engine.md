@@ -38,7 +38,7 @@
 | `src/canvas/app/stage/CanvasAppStageElement.ts` | stage DOM element의 bounds, pointer capture, wheel listener를 caller Interface 뒤에 숨기고 mount ref bridge는 Controller로 분리한다 |
 | `src/canvas/app/rendering` | Demo `CanvasItem` tree를 SVG item layer로 바꾸는 App-owned Adapter |
 | `src/canvas/app/rendering/CanvasAppStageAdapter.tsx` | App Shell이 concrete Renderer Stage를 직접 import하지 않도록 stage ReactNode를 만드는 Adapter Interface를 제공하고, stage mount Interface를 기본 SVG Stage ref로 매핑한다 |
-| `src/canvas/app/rendering/CanvasAppItemLayerAdapter.tsx` | App workflow가 concrete Demo SVG item layer 없이 stage children을 만들도록 하는 Adapter Interface와 기본 Demo SVG Adapter를 제공한다 |
+| `src/canvas/app/rendering/CanvasAppItemLayerAdapter.tsx` | App workflow가 concrete Demo SVG item layer 없이 stage children을 만들도록 하는 Adapter Interface를 제공하고, SVG item pointer event를 App pointer Interface로 매핑한다 |
 | `src/canvas/app/rendering/CanvasDemoSvgComponentPresentationRegistry.ts` | Demo component presentation key와 SVG rendering strategy를 외부 조립 가능한 registry로 연결한다 |
 | `src/canvas/app/rendering/CanvasDemoSvgCustomItemRendererRegistry.tsx` | Custom item presentation key와 SVG rendering strategy를 외부 조립 가능한 registry로 연결한다 |
 | `src/canvas/app/workflow` | React state와 engine/host/renderer wiring |
@@ -54,6 +54,7 @@
 | `src/canvas/app/workflow/useCanvasInteractionModel.ts` | tool, gesture, marquee, draft, snap guide, overlay 상태 생명주기를 App Shell에 숨긴다 |
 | `src/canvas/app/workflow/useCanvasTextEditorModel.ts` | text editing state, editable item lookup, text editor props를 App Shell에 숨긴다 |
 | `src/canvas/app/workflow/useCanvasWorkspaceModel.ts` | 저장된 workspace snapshot, document history, viewport, read model, id 생성을 App Shell에 숨긴다 |
+| `src/canvas/app/pointer/CanvasAppPointerInput.ts` | React/SVG pointer event를 App workflow가 쓰는 최소 pointer/event Interface로 변환한다 |
 | `src/canvas/app/pointer/CanvasPointerGeometry.ts` | DOM/SVG pointer 좌표 변환 |
 | `src/canvas/core` | Host item과 renderer를 모르는 geometry, viewport, id, primitive math 같은 재사용 계약 |
 | `src/canvas/core/CanvasStableIds.ts` | persisted kind, presentation key, registry key에 쓰는 lower-kebab 안정 id 계약 |
@@ -162,6 +163,7 @@ type CanvasAffordanceConfig = {
 - App workflow는 Demo SVG Item Layer를 직접 생성하지 않고 Canvas App Item Layer Adapter를 통해 stage children을 만든다.
 - App Shell은 concrete Renderer Stage를 직접 import하지 않고 Canvas App Stage Adapter가 만든 stage ReactNode를 배치한다.
 - App workflow와 command/pointer/viewport hook은 raw SVG ref를 직접 읽지 않고 Canvas App Stage Element를 통해 stage DOM 기능을 사용한다.
+- App rendering Adapter의 public render input은 React/SVG pointer event를 직접 요구하지 않고 Canvas App Pointer Input을 사용한다.
 - 알 수 없는 stable component kind는 forward compatibility를 위해 기본 template로 fallback할 수 있지만, malformed component kind는 schema validation 또는 component lookup 단계에서 실패한다.
 - 저장된 workspace snapshot은 현재 custom item validator로 다시 검증한다. validator가 바뀌어 저장 payload가 더 이상 유효하지 않으면 저장 snapshot을 제거하고 앱 초기값으로 시작한다.
 - Custom Item Module 간 module id, tool id, renderer key, validator key, inspector id, command id가 겹치면 조용히 덮어쓰지 않고 assembly 단계에서 실패한다.

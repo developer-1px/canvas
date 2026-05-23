@@ -1,7 +1,6 @@
 import type {
   Dispatch,
   MutableRefObject,
-  PointerEvent,
   SetStateAction,
 } from 'react'
 import type {
@@ -45,6 +44,7 @@ import {
   createCanvasDraftStroke,
   getNextCanvasDrawingPoints,
 } from './CanvasPointerDrawing'
+import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
 import { commitCanvasCustomCreation } from './CanvasCustomCreationCommit'
 import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
@@ -100,7 +100,7 @@ export function useCanvasPointerDragHandlers({
   transformAdapter,
   viewport,
 }: UseCanvasPointerDragHandlersArgs) {
-  function handlePointerMove(event: PointerEvent<SVGSVGElement>) {
+  function handlePointerMove(event: CanvasAppPointerInput) {
     const interaction = interactionRef.current
 
     if (interaction.kind === 'none' || interaction.pointerId !== event.pointerId) {
@@ -356,7 +356,7 @@ export function useCanvasPointerDragHandlers({
     }
   }
 
-  function handlePointerUp(event: PointerEvent<SVGSVGElement>) {
+  function handlePointerUp(event: CanvasAppPointerInput) {
     const interaction = interactionRef.current
 
     if (interaction.kind === 'none' || interaction.pointerId !== event.pointerId) {
@@ -488,7 +488,7 @@ export function useCanvasPointerDragHandlers({
     setSnapGuides(EMPTY_CANVAS_SNAP_GUIDES)
   }
 
-  function handlePointerCancel(event: PointerEvent<SVGSVGElement>) {
+  function handlePointerCancel(event: CanvasAppPointerInput) {
     const interaction = interactionRef.current
 
     if (interaction.kind === 'move' || interaction.kind === 'resize') {

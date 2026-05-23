@@ -1,6 +1,5 @@
 import type {
   ComponentType,
-  PointerEvent,
   ReactNode,
   RefCallback,
 } from 'react'
@@ -12,9 +11,15 @@ import type {
 } from '../../core'
 import type { CanvasOverlayState } from '../../engine'
 import { CanvasSvgStage } from '../../renderer'
+import {
+  createCanvasAppEventInput,
+  createCanvasAppPointerInput,
+  type CanvasAppEventInput,
+  type CanvasAppPointerInput,
+} from '../pointer/CanvasAppPointerInput'
 
 export type CanvasAppStageMount = {
-  ref: RefCallback<SVGSVGElement>
+  ref: RefCallback<Element>
 }
 
 export type CanvasAppStageRenderInput = {
@@ -24,13 +29,13 @@ export type CanvasAppStageRenderInput = {
   overlays: CanvasOverlayState
   stageElement: CanvasAppStageMount
   viewport: Viewport
-  onCanvasPointerDown: (event: PointerEvent<SVGSVGElement>) => void
-  onContextMenu: (event: PointerEvent<SVGSVGElement>) => void
-  onPointerCancel: (event: PointerEvent<SVGSVGElement>) => void
-  onPointerMove: (event: PointerEvent<SVGSVGElement>) => void
-  onPointerUp: (event: PointerEvent<SVGSVGElement>) => void
+  onCanvasPointerDown: (event: CanvasAppPointerInput) => void
+  onContextMenu: (event: CanvasAppEventInput) => void
+  onPointerCancel: (event: CanvasAppPointerInput) => void
+  onPointerMove: (event: CanvasAppPointerInput) => void
+  onPointerUp: (event: CanvasAppPointerInput) => void
   onResizePointerDown: (
-    event: PointerEvent<SVGRectElement>,
+    event: CanvasAppPointerInput,
     handle: ResizeHandle,
   ) => void
 }
@@ -45,8 +50,37 @@ export const DEFAULT_CANVAS_APP_STAGE_ADAPTER: CanvasAppStageAdapter =
   })
 
 function renderCanvasAppSvgStage({
+  onCanvasPointerDown,
+  onContextMenu,
+  onPointerCancel,
+  onPointerMove,
+  onPointerUp,
+  onResizePointerDown,
   stageElement,
   ...props
 }: CanvasAppStageRenderInput) {
-  return <CanvasSvgStage {...props} onStageElement={stageElement.ref} />
+  return (
+    <CanvasSvgStage
+      {...props}
+      onStageElement={stageElement.ref}
+      onCanvasPointerDown={(event) =>
+        onCanvasPointerDown(createCanvasAppPointerInput(event))
+      }
+      onContextMenu={(event) =>
+        onContextMenu(createCanvasAppEventInput(event))
+      }
+      onPointerCancel={(event) =>
+        onPointerCancel(createCanvasAppPointerInput(event))
+      }
+      onPointerMove={(event) =>
+        onPointerMove(createCanvasAppPointerInput(event))
+      }
+      onPointerUp={(event) =>
+        onPointerUp(createCanvasAppPointerInput(event))
+      }
+      onResizePointerDown={(event, handle) =>
+        onResizePointerDown(createCanvasAppPointerInput(event), handle)
+      }
+    />
+  )
 }

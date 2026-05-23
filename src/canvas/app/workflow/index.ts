@@ -22,6 +22,10 @@ export {
   type CanvasAppCustomItemModuleCreationTool,
 } from '../modules/CanvasAppCustomItemModules'
 export type {
+  CanvasAppEventInput,
+  CanvasAppPointerInput,
+} from '../pointer/CanvasAppPointerInput'
+export type {
   CanvasAppInspectorPanel,
   CanvasAppInspectorPanelContext,
   CanvasAppInspectorPanelView,
