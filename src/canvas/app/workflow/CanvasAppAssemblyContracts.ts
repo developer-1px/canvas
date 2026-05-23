@@ -1,7 +1,4 @@
-import {
-  DEFAULT_CANVAS_AFFORDANCE_CONFIG,
-  type CanvasAffordanceConfig,
-} from '../../engine'
+import { assertCanvasAffordanceConfig } from '../../engine'
 import {
   createCanvasComponentLibrary,
   normalizeCanvasItems,
@@ -29,7 +26,7 @@ import type {
 
 export function assertCanvasAppAssembly(assembly: CanvasAppAssembly) {
   assertCanvasAppDescriptorObject(assembly, 'assembly')
-  assertCanvasAppAffordanceConfig(assembly.affordanceConfig)
+  assertCanvasAffordanceConfig(assembly.affordanceConfig)
   assertCanvasAppComponentLibrary(assembly.componentLibrary)
   assertCanvasAppComponentPresentationRenderers(
     assembly.componentPresentationRenderers,
@@ -49,54 +46,6 @@ export function assertCanvasAppAssembly(assembly: CanvasAppAssembly) {
   assertCanvasAppStageAdapter(assembly.stageAdapter)
 
   return assembly
-}
-
-const CANVAS_APP_AFFORDANCE_CONFIG_GROUPS = [
-  'commands',
-  'gestures',
-  'overlays',
-  'shortcuts',
-  'tools',
-] as const
-
-function assertCanvasAppAffordanceConfig(config: CanvasAffordanceConfig) {
-  assertCanvasAppDescriptorObject(config, 'affordance config')
-
-  for (const group of CANVAS_APP_AFFORDANCE_CONFIG_GROUPS) {
-    assertCanvasAppAffordanceConfigGroup({
-      defaults: DEFAULT_CANVAS_AFFORDANCE_CONFIG[group],
-      group,
-      values: config[group],
-    })
-  }
-}
-
-function assertCanvasAppAffordanceConfigGroup({
-  defaults,
-  group,
-  values,
-}: {
-  defaults: object
-  group: (typeof CANVAS_APP_AFFORDANCE_CONFIG_GROUPS)[number]
-  values: object
-}) {
-  assertCanvasAppDescriptorObject(values, `affordance config ${group}`)
-  const defaultRecord = defaults as Readonly<Record<string, boolean>>
-  const valueRecord = values as Readonly<Record<string, unknown>>
-
-  for (const key of Object.keys(valueRecord)) {
-    if (!Object.hasOwn(defaultRecord, key)) {
-      throw new Error(`Unknown canvas app affordance config ${group}: ${key}`)
-    }
-  }
-
-  for (const key of Object.keys(defaultRecord)) {
-    if (typeof valueRecord[key] !== 'boolean') {
-      throw new Error(
-        `Canvas app affordance config ${group}.${key} must be boolean`,
-      )
-    }
-  }
 }
 
 function assertCanvasComponentPresentationRendererCoverage({

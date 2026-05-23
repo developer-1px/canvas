@@ -81,6 +81,7 @@ export {
   DEFAULT_CANVAS_AFFORDANCE_CONFIG,
   EMPTY_CANVAS_SNAP_GUIDES,
   alignCanvasCommand,
+  assertCanvasAffordanceConfig,
   cloneCanvasCommandItems,
   createCanvasAffordanceConfig,
   createCanvasArrow,

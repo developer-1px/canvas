@@ -1941,6 +1941,34 @@ describe('Canvas module boundaries', () => {
     expect(contractsFile.source).toContain('command adapter')
   })
 
+  it('keeps affordance config contracts in the Engine affordance module', () => {
+    const assemblyContractsFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppAssemblyContracts.ts',
+    )
+    const affordanceConfigFile = getSourceFile(
+      'src/canvas/engine/affordance/CanvasAffordanceConfig.ts',
+    )
+
+    expect(assemblyContractsFile.source).toContain(
+      'assertCanvasAffordanceConfig',
+    )
+    expect(assemblyContractsFile.source).not.toContain(
+      'Canvas affordance config',
+    )
+    expect(assemblyContractsFile.source).not.toContain(
+      'Unknown canvas affordance config',
+    )
+    expect(affordanceConfigFile.source).toContain(
+      'export function assertCanvasAffordanceConfig',
+    )
+    expect(affordanceConfigFile.source).toContain(
+      'Unknown canvas affordance config',
+    )
+    expect(affordanceConfigFile.source).toContain(
+      'snapshotCanvasAffordanceConfig',
+    )
+  })
+
   it('keeps app workflow hooks from recreating the workspace read model', () => {
     const violations = sourceFiles
       .filter((file) =>

@@ -3,6 +3,7 @@ export {
   CANVAS_GESTURE_STATUS_LABELS,
   CANVAS_TOOL_AFFORDANCES,
   DEFAULT_CANVAS_AFFORDANCE_CONFIG,
+  assertCanvasAffordanceConfig,
   createCanvasAffordanceConfig,
   type CanvasAffordanceConfig,
   type CanvasAffordanceConfigInput,

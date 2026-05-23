@@ -285,7 +285,7 @@ describe('CanvasAppAssembly', () => {
           tools: { marker: 'off' },
         },
       } as unknown as Parameters<typeof createCanvasAppAssembly>[0]),
-    ).toThrow('Canvas app affordance config tools.marker must be boolean')
+    ).toThrow('Canvas affordance config tools.marker must be boolean')
 
     expect(() =>
       createCanvasAppAssembly({

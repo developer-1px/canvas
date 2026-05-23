@@ -1,5 +1,6 @@
 export {
   DEFAULT_CANVAS_AFFORDANCE_CONFIG,
+  assertCanvasAffordanceConfig,
   createCanvasAffordanceConfig,
 } from './CanvasAffordanceConfig'
 export {

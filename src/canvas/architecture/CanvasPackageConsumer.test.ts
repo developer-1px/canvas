@@ -4,6 +4,7 @@ import {
   CanvasEngine,
   CanvasHost,
   CanvasRenderer,
+  assertCanvasAffordanceConfig,
   createCanvasAppAssembly,
   defineCanvasAppCustomItemModule,
   type CanvasAppAssemblySource,
@@ -27,7 +28,10 @@ import {
   type CanvasAppProps as CanvasAppPropsFromApp,
 } from 'canvas/app'
 import { isCanvasCustomToolId, normalizeBounds } from 'canvas/core'
-import { createCanvasAffordanceConfig } from 'canvas/engine'
+import {
+  assertCanvasAffordanceConfig as assertCanvasAffordanceConfigFromEngine,
+  createCanvasAffordanceConfig,
+} from 'canvas/engine'
 import type { CanvasItem as CanvasEntityItem } from 'canvas/entities'
 import { createCanvasComponentLibrary } from 'canvas/host'
 import {
@@ -167,8 +171,18 @@ describe('Canvas package consumer imports', () => {
     })
     expect(CanvasCore.normalizeBounds({ x: 10, y: 20 }, { x: 2, y: 4 }))
       .toEqual(normalizeBounds({ x: 10, y: 20 }, { x: 2, y: 4 }))
-    expect(createCanvasAffordanceConfig().tools.select).toBe(true)
+    const affordanceConfig = createCanvasAffordanceConfig()
+    expect(affordanceConfig.tools.select).toBe(true)
+    expect(assertCanvasAffordanceConfig(affordanceConfig)).toBe(
+      affordanceConfig,
+    )
+    expect(assertCanvasAffordanceConfigFromEngine(affordanceConfig)).toBe(
+      affordanceConfig,
+    )
     expect(CanvasEngine.createCanvasAffordanceConfig().tools.select).toBe(true)
+    expect(CanvasEngine.assertCanvasAffordanceConfig(affordanceConfig)).toBe(
+      affordanceConfig,
+    )
     expect(
       createCanvasAppComponentPresentationRenderers(),
     ).toBeTypeOf('object')

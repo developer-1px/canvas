@@ -2,7 +2,7 @@
 
 ## Domain Terms
 
-- Canvas Affordance Engine: 캔버스 앱마다 반복되는 선택, 이동, 리사이즈, 편집, 줌, 명령, 오버레이 문법을 제공하는 Module.
+- Canvas Affordance Engine: 캔버스 앱마다 반복되는 선택, 이동, 리사이즈, 편집, 줌, 명령, 오버레이 문법과 feature toggle config contract를 제공하는 Module.
 - Affordance: 사용자가 캔버스에서 할 수 있다고 인지하고 실행하는 조작 단위 또는 UI surface. 예: resize handle, marquee, component palette, inspector, pan, duplicate.
 - Feature Toggle: Affordance를 켜거나 끄는 설정. 모든 Affordance는 기본적으로 toggle 뒤에 있어야 한다.
 - Host App: 엔진을 사용하는 실제 제품. 데이터 모델, 저장, 도메인 명령, 화면 구성을 소유한다.
@@ -133,6 +133,7 @@
 - persisted kind와 registry key는 Canvas Stable Id 형식을 사용한다.
 - 알 수 없는 stable component kind는 fallback할 수 있지만, malformed component kind는 validation/lookup 단계에서 실패해야 한다.
 - 모든 기능은 on/off 가능해야 한다.
+- Canvas Affordance Config는 Engine public contract이며, 생성/검증/snapshot은 Engine Affordance Config Module이 소유한다.
 - 새 Demo component kind가 기존 presentation을 재사용하면 Canvas Built-in Component Templates만 수정한다.
 - 새 Demo component kind와 새 SVG presentation은 Canvas App Assembly에서 component library와 presentation registry를 조립해 붙인다.
 - Canvas Component Library의 모든 presentation은 Canvas App Assembly의 component presentation renderer registry에 있어야 한다.
