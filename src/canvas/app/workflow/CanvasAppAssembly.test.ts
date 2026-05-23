@@ -285,6 +285,9 @@ describe('CanvasAppAssembly', () => {
           createItem: () => null,
         },
       ],
+      customItemValidators: {
+        risk: () => true,
+      },
     })
 
     expect(() =>

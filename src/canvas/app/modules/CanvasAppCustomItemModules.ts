@@ -20,7 +20,7 @@ export type CanvasAppCustomItemModule = {
   customCommands?: readonly CanvasAppCustomCommand[]
   customCreationTools?: readonly CanvasAppCustomCreationTool[]
   customItemRenderers?: CanvasDemoSvgCustomItemRenderers
-  customItemValidators?: CanvasCustomItemValidators
+  customItemValidators: CanvasCustomItemValidators
   id: string
   inspectorPanels?: readonly CanvasAppInspectorPanel[]
 }
@@ -89,7 +89,7 @@ export function createCanvasAppCustomItemModuleAssembly(
       }),
       customItemValidators: mergeUniqueCanvasAppExtensionRecord({
         current: assembly.customItemValidators,
-        entries: module.customItemValidators ?? {},
+        entries: module.customItemValidators,
         label: 'custom item validator',
         owner: 'custom item module',
       }),
@@ -131,13 +131,34 @@ function assertCanvasAppCustomItemModuleContracts(
     label: 'custom item renderer',
   })
   assertCanvasAppExtensionRecordKeys({
-    entries: module.customItemValidators ?? {},
+    entries: module.customItemValidators,
     label: 'custom item validator',
   })
+  assertCanvasAppCustomItemModuleValidatorCoverage(module)
   assertCanvasAppExtensionEntries({
     entries: module.inspectorPanels ?? [],
     label: 'inspector panel',
   })
+}
+
+function assertCanvasAppCustomItemModuleValidatorCoverage(
+  module: CanvasAppCustomItemModule,
+) {
+  const validatorKeys = Object.keys(module.customItemValidators)
+
+  for (const validatorKey of validatorKeys) {
+    if (validatorKey !== module.id) {
+      throw new Error(
+        `Canvas custom item module validator must match module id: ${module.id} owns ${validatorKey}`,
+      )
+    }
+  }
+
+  if (!Object.hasOwn(module.customItemValidators, module.id)) {
+    throw new Error(
+      `Canvas custom item module must register validator for its item kind: ${module.id}`,
+    )
+  }
 }
 
 function assertUniqueModuleIds(modules: readonly CanvasAppCustomItemModule[]) {

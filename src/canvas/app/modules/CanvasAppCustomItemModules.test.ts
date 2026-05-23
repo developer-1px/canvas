@@ -88,6 +88,9 @@ describe('CanvasAppCustomItemModules', () => {
           }),
         },
       ],
+      customItemValidators: {
+        risk: () => true,
+      },
     })
     const second = defineCanvasAppCustomItemModule({
       id: 'duplicate-risk',
@@ -99,6 +102,9 @@ describe('CanvasAppCustomItemModules', () => {
           createItem: () => null,
         },
       ],
+      customItemValidators: {
+        'duplicate-risk': () => true,
+      },
     })
 
     expect(() =>
@@ -107,8 +113,18 @@ describe('CanvasAppCustomItemModules', () => {
   })
 
   it('rejects duplicate module ids', () => {
-    const first = defineCanvasAppCustomItemModule({ id: 'risk' })
-    const second = defineCanvasAppCustomItemModule({ id: 'risk' })
+    const first = defineCanvasAppCustomItemModule({
+      id: 'risk',
+      customItemValidators: {
+        risk: () => true,
+      },
+    })
+    const second = defineCanvasAppCustomItemModule({
+      id: 'risk',
+      customItemValidators: {
+        risk: () => true,
+      },
+    })
 
     expect(() =>
       createCanvasAppCustomItemModuleAssembly([first, second]),
@@ -117,8 +133,37 @@ describe('CanvasAppCustomItemModules', () => {
 
   it('rejects module ids outside the app extension id contract', () => {
     expect(() =>
-      defineCanvasAppCustomItemModule({ id: 'Risk Module' }),
+      defineCanvasAppCustomItemModule({
+        id: 'Risk Module',
+        customItemValidators: {
+          risk: () => true,
+        },
+      }),
     ).toThrow('Invalid canvas app custom item module id: Risk Module')
+  })
+
+  it('rejects modules without a validator for their item kind', () => {
+    expect(() =>
+      defineCanvasAppCustomItemModule({
+        id: 'risk',
+        customItemValidators: {},
+      }),
+    ).toThrow(
+      'Canvas custom item module must register validator for its item kind: risk',
+    )
+  })
+
+  it('rejects validators owned by a different item kind', () => {
+    expect(() =>
+      defineCanvasAppCustomItemModule({
+        id: 'risk',
+        customItemValidators: {
+          dependency: () => true,
+        },
+      }),
+    ).toThrow(
+      'Canvas custom item module validator must match module id: risk owns dependency',
+    )
   })
 
   it('rejects module-owned registry keys outside the app extension id contract', () => {
@@ -128,6 +173,9 @@ describe('CanvasAppCustomItemModules', () => {
           id: 'risk',
           customItemRenderers: {
             'Risk Node': () => null,
+          },
+          customItemValidators: {
+            risk: () => true,
           },
         },
       ]),
@@ -159,7 +207,12 @@ describe('CanvasAppCustomItemModules', () => {
   })
 
   it('rejects unknown disabled module ids', () => {
-    const module = defineCanvasAppCustomItemModule({ id: 'risk' })
+    const module = defineCanvasAppCustomItemModule({
+      id: 'risk',
+      customItemValidators: {
+        risk: () => true,
+      },
+    })
 
     expect(() =>
       createCanvasAppCustomItemModuleAssembly([module], {
@@ -180,6 +233,9 @@ describe('CanvasAppCustomItemModules', () => {
           createItem: () => null,
         },
       ],
+      customItemValidators: {
+        risk: () => true,
+      },
     })
     const second = defineCanvasAppCustomItemModule({
       id: 'dependency',
@@ -192,6 +248,9 @@ describe('CanvasAppCustomItemModules', () => {
           createItem: () => null,
         },
       ],
+      customItemValidators: {
+        dependency: () => true,
+      },
     })
 
     expect(() =>
