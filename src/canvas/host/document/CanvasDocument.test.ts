@@ -9,7 +9,7 @@ import {
   restoreCanvasDocumentSelection,
 } from './CanvasDocument'
 import { INITIAL_ITEMS } from '../component/CanvasInitialItems'
-import { createCanvasComponentItem } from '../component/CanvasComponentFactory'
+import { CANVAS_COMPONENT_LIBRARY } from '../component/CanvasComponentLibrary'
 import {
   alignCanvasSelection,
   groupCanvasSelection,
@@ -110,7 +110,7 @@ describe('CanvasDocument history', () => {
 
   test('commits item creation as a zod-crud add patch', () => {
     const document = createCanvasItemsDocument(INITIAL_ITEMS)
-    const nextItem = createCanvasComponentItem({
+    const nextItem = CANVAS_COMPONENT_LIBRARY.createItem({
       id: 'component-created',
       point: { x: 120, y: 140 },
       templateId: 'card',

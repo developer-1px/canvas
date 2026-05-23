@@ -28,13 +28,14 @@
 | `src/canvas/app/shell` | CanvasApp composition과 shell style |
 | `src/canvas/app/workflow` | React state와 engine/host/renderer wiring |
 | `src/canvas/app/workflow/CanvasWorkflowContract.ts` | App workflow hook들이 공유하는 document commit, selection, clipboard contract |
+| `src/canvas/app/workflow/useCanvasWorkspaceModel.ts` | 저장된 workspace snapshot, document history, viewport, read model, id 생성을 App Shell에 숨긴다 |
 | `src/canvas/app/geometry` | DOM/SVG pointer 좌표 변환 |
 | `src/canvas/core` | Host item과 renderer를 모르는 geometry, viewport, id, primitive math 같은 재사용 계약 |
 | `src/canvas/engine` | Host item과 renderer를 모르는 조작 규칙. 외부 소비자는 `src/canvas/engine` public facade를 사용한다 |
 | `src/canvas/engine/snap` | Grid, alignment, spacing snap과 guide 계산 |
 | `src/canvas/host/model` | Demo canvas item model. Core 재사용 계약에 포함하지 않는다 |
 | `src/canvas/host` | Demo canvas item public facade |
-| `src/canvas/host/component/CanvasComponentLibrary.ts` | Demo component template 목록과 component item 생성을 함께 제공한다 |
+| `src/canvas/host/component/CanvasComponentLibrary.ts` | Demo component template, presentation key, component item 생성을 함께 제공한다 |
 | `src/canvas/host/document/CanvasDocumentController.ts` | App workflow가 사용하는 Host Document Controller. zod-crud, JSON Patch, selection snapshot, clipboard 구현을 숨긴다 |
 | `src/canvas/host/read/CanvasItemReadModel.ts` | Demo item tree 조회, bounds, selection 정규화, Scene Adapter 생성을 tree helper 구현 없이 제공한다 |
 | `src/canvas/host/operations` | Transform, text, clone, remove, group item operations |
@@ -89,8 +90,11 @@ type CanvasAffordanceConfig = {
 - App workflow는 Host document 구현 파일을 import하지 않는다. 문서 변경, history, selection, clipboard, text search는 Host Document Controller를 통해 사용한다.
 - App hook들은 `useCanvasDocument` 구현 파일에서 타입을 가져오지 않는다. document commit과 selection contract는 Canvas Workflow Contract를 통해 공유한다.
 - App workflow는 Host tree helper를 import하지 않는다. item 조회, bounds, selection 정규화, Scene Adapter 생성은 Canvas Item Read Model을 통해 사용한다.
+- App Shell은 workspace 저장, initial item seed, read model 생성, id seed 계산을 직접 import하지 않는다. Canvas Workspace Model을 통해 사용한다.
 - App workflow는 `CANVAS_ITEM_ENGINE_ADAPTERS`를 통해 concrete item adapter를 주입한다.
 - App과 UI는 Renderer Adapter 내부 파일을 import하지 않는다. SVG stage는 `src/canvas/renderer` public facade에서 사용한다.
 - Renderer Adapter는 `CanvasOverlayState`를 받아 SVG로 그리며, Engine은 SVG/DOM 구현을 모른다.
+- Renderer Adapter는 Demo component kind별 분기를 소유하지 않는다. SVG renderer는 Canvas Component Library의 presentation key를 받아 그리기 전략을 고른다.
+- 새 Demo component kind가 기존 presentation을 재사용하면 `CanvasComponentLibrary`만 수정한다. 새 presentation을 추가할 때만 Renderer Adapter 전략을 추가한다.
 
 추출 순서는 동작 변경 없이 app workflow에서 Engine 책임을 하나씩 떼어내는 방식으로 진행한다.

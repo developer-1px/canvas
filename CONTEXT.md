@@ -11,7 +11,9 @@
 - Host Document Controller: Demo `CanvasItem` 문서의 history, selection, clipboard, text search, item commit을 React와 zod-crud 세부 구현 없이 제공하는 Module.
 - Host Public Facade: Demo Host model type, read model, component library, document controller를 외부 레이어에 노출하는 안정된 Module 경계.
 - Canvas Item Read Model: Demo `CanvasItem` tree의 조회, bounds, selection 정규화, Scene Adapter 생성을 tree helper 세부 구현 없이 제공하는 Module.
-- Canvas Component Library: Demo component template 목록과 component item 생성을 함께 제공하는 Module.
+- Canvas Component Library: Demo component template, presentation key, component item 생성을 함께 제공하는 Module.
+- Canvas Component Presentation: Demo component kind를 Renderer Adapter의 그리기 전략과 연결하는 key. 새 component kind는 기존 presentation을 재사용할 수 있다.
+- Canvas Workspace Model: Demo workspace의 저장된 snapshot, document history, viewport, read model, id 생성을 App Shell에 숨기는 workflow Module.
 - Canvas Workflow Contract: App workflow hook들이 공유하는 document commit, selection commit, clipboard 계약. 개별 hook이 `useCanvasDocument` 구현 파일을 직접 알지 않게 한다.
 - Renderer Adapter: Affordance 상태를 SVG, Canvas, DOM, WebGL 등으로 그리는 Adapter.
 - Renderer Public Facade: App과 UI가 Renderer Adapter를 사용할 때 import하는 안정된 Module 경계. SVG 내부 파일 구조를 숨긴다.
@@ -24,3 +26,5 @@
 - 엔진은 Fabric.js 같은 완성형 객체 모델을 감싸기보다, 커스텀 가능한 Affordance 문법을 작은 Interface로 제공한다.
 - Demo `CanvasItem`과 SVG 렌더링 방식은 재사용 Core Contract에 포함하지 않는다.
 - 모든 기능은 on/off 가능해야 한다.
+- 새 Demo component kind가 기존 presentation을 재사용하면 Canvas Component Library만 수정한다.
+- App Shell은 workspace 저장, document history, read model 생성 방식을 직접 알지 않는다.

@@ -1,5 +1,8 @@
 import type { ReactNode } from 'react'
-import type { CanvasComponentItem } from '../../host'
+import {
+  CANVAS_COMPONENT_LIBRARY,
+  type CanvasComponentItem,
+} from '../../host'
 import {
   CanvasSvgConnectorComponent,
   CanvasSvgVoteComponent,
@@ -21,20 +24,20 @@ type CanvasSvgComponentRendererStrategy = (input: {
   item: CanvasComponentItem
 }) => ReactNode
 
-const CANVAS_SVG_COMPONENT_RENDERERS: Record<
+const CANVAS_SVG_COMPONENT_PRESENTATION_RENDERERS: Record<
   string,
   CanvasSvgComponentRendererStrategy
 > = {
-  card: CanvasSvgCardComponent,
-  checklist: CanvasSvgChecklistComponent,
-  connector: CanvasSvgConnectorComponent,
-  image: CanvasSvgImageComponent,
-  kanban: CanvasSvgKanbanComponent,
-  label: CanvasSvgLabelComponent,
-  section: CanvasSvgSectionComponent,
-  sticky: CanvasSvgStickyComponent,
-  table: CanvasSvgTableComponent,
-  vote: CanvasSvgVoteComponent,
+  'accent-card': CanvasSvgCardComponent,
+  'checklist-list': CanvasSvgChecklistComponent,
+  'image-frame': CanvasSvgImageComponent,
+  'inline-label': CanvasSvgLabelComponent,
+  'kanban-stack': CanvasSvgKanbanComponent,
+  'line-connector': CanvasSvgConnectorComponent,
+  'matrix-table': CanvasSvgTableComponent,
+  'note-card': CanvasSvgStickyComponent,
+  'section-frame': CanvasSvgSectionComponent,
+  'vote-badge': CanvasSvgVoteComponent,
 }
 
 export function CanvasSvgComponentRenderer({
@@ -42,8 +45,10 @@ export function CanvasSvgComponentRenderer({
 }: {
   item: CanvasComponentItem
 }) {
+  const presentation = CANVAS_COMPONENT_LIBRARY.getPresentation(item.component)
   const renderComponent =
-    CANVAS_SVG_COMPONENT_RENDERERS[item.component] ?? CanvasSvgCardComponent
+    CANVAS_SVG_COMPONENT_PRESENTATION_RENDERERS[presentation] ??
+    CanvasSvgCardComponent
 
   return renderComponent({ item })
 }

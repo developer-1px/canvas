@@ -15,44 +15,30 @@ import {
 import type {
   Bounds,
   Tool,
-  Viewport,
 } from '../../core'
 import type { EditingText } from '../../host'
-import { INITIAL_VIEWPORT } from '../../core'
 import {
   CANVAS_ITEM_ENGINE_ADAPTERS,
-  INITIAL_ITEMS,
-  createCanvasItemReadModel,
 } from '../../host'
 import type { Interaction } from '../pointer/CanvasInteractionState'
 import { useCanvasPointerDragHandlers } from '../pointer/useCanvasPointerDragHandlers'
 import { useCanvasPointerDownHandlers } from '../pointer/useCanvasPointerDownHandlers'
 import { useCanvasCommands } from '../commands/useCanvasCommands'
 import { useCanvasKeyboardShortcuts } from '../keyboard/useCanvasKeyboardShortcuts'
-import { useCanvasDocument } from '../document/useCanvasDocument'
 import { useCanvasWheelViewport } from '../viewport/useCanvasWheelViewport'
 import { useCanvasTextEditing } from '../text/useCanvasTextEditing'
 import { useCanvasViewportControls } from '../viewport/useCanvasViewportControls'
 import { useCanvasComponentInsertion } from '../components/useCanvasComponentInsertion'
 import { useCanvasObjectInspector } from '../inspector/useCanvasObjectInspector'
-import {
-  getCanvasItemIdSeed,
-  readStoredCanvasWorkspace,
-  useCanvasWorkspacePersistence,
-} from '../document/CanvasWorkspacePersistence'
+import { useCanvasWorkspaceModel } from '../workflow/useCanvasWorkspaceModel'
 import './CanvasApp.css'
 
 const canvasAffordanceConfig = DEFAULT_CANVAS_AFFORDANCE_CONFIG
-const DEFAULT_INITIAL_SELECTION = ['component-sticky', 'component-card']
 
 function CanvasApp() {
-  const storedWorkspace = useMemo(() => readStoredCanvasWorkspace(), [])
-  const initialItems = storedWorkspace?.items ?? INITIAL_ITEMS
-
   const svgRef = useRef<SVGSVGElement | null>(null)
   const editorRef = useRef<HTMLTextAreaElement | null>(null)
   const interactionRef = useRef<Interaction>({ kind: 'none' })
-  const idSeed = useRef(getCanvasItemIdSeed(initialItems))
 
   const [tool, setTool] = useState<Tool>('select')
   const {
@@ -61,23 +47,24 @@ function CanvasApp() {
     commitSelection,
     commitItemsChange,
     copyItemsToClipboard,
+    createId,
     getClipboardItems,
     findDocumentText,
+    itemReadModel,
     items,
     redo,
     replaceDocumentText,
+    scene,
+    selected,
+    selectedBounds,
     selection,
     setClipboardItems,
     setLiveItems,
     setSelection,
+    setViewport,
     undo,
-  } = useCanvasDocument(
-    initialItems,
-    storedWorkspace?.selection ?? [...DEFAULT_INITIAL_SELECTION],
-  )
-  const [viewport, setViewport] = useState<Viewport>(
-    () => storedWorkspace?.viewport ?? INITIAL_VIEWPORT,
-  )
+    viewport,
+  } = useCanvasWorkspaceModel()
   const [spaceDown, setSpaceDown] = useState(false)
   const [gesture, setGesture] = useState<Interaction['kind']>('none')
   const [marquee, setMarquee] = useState<Bounds | null>(null)
@@ -90,10 +77,6 @@ function CanvasApp() {
   const [findQuery, setFindQuery] = useState('')
   const [findReplacement, setFindReplacement] = useState('')
 
-  const selected = useMemo(() => new Set<string>(selection), [selection])
-  const itemReadModel = useMemo(() => createCanvasItemReadModel(items), [items])
-  const scene = itemReadModel.scene
-  const selectedBounds = useMemo(() => scene.getBounds(selection), [scene, selection])
   const inspector = useCanvasObjectInspector({
     commitItemsChange,
     items,
@@ -134,12 +117,6 @@ function CanvasApp() {
     0,
   )
 
-  useCanvasWorkspacePersistence({
-    items,
-    selection,
-    viewport,
-  })
-
   useCanvasWheelViewport({
     config: canvasAffordanceConfig,
     setViewport,
@@ -160,11 +137,6 @@ function CanvasApp() {
     setEditing,
     viewport,
   })
-
-  const createId = useCallback((prefix: string) => {
-    idSeed.current += 1
-    return `${prefix}-${idSeed.current}`
-  }, [])
 
   const {
     alignSelection,

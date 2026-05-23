@@ -1,5 +1,5 @@
 import type { Point } from '../../core'
-import { createCanvasComponentItem } from './CanvasComponentFactory'
+import { CANVAS_COMPONENT_LIBRARY } from './CanvasComponentLibrary'
 import type {
   CanvasComponentKind,
   CanvasItem
@@ -22,7 +22,7 @@ function createInitialCanvasComponents() {
   ]
 
   return layout.map(([templateId, point]) =>
-    createCanvasComponentItem({
+    CANVAS_COMPONENT_LIBRARY.createItem({
       id: `component-${templateId}`,
       point,
       templateId,

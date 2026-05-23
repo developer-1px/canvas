@@ -22,6 +22,7 @@ export const CANVAS_ITEM_ENGINE_ADAPTERS = {
 export {
   CANVAS_COMPONENT_LIBRARY,
   type CanvasComponentLibrary,
+  type CanvasComponentPresentation,
   type CanvasComponentTemplate,
 } from './component/CanvasComponentLibrary'
 export { INITIAL_ITEMS } from './component/CanvasInitialItems'

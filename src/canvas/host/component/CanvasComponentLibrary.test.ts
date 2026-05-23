@@ -1,0 +1,47 @@
+import { describe, expect, it } from 'vitest'
+import { CANVAS_COMPONENT_LIBRARY } from './CanvasComponentLibrary'
+
+describe('CANVAS_COMPONENT_LIBRARY', () => {
+  it('creates component items from the public template contract', () => {
+    for (const template of CANVAS_COMPONENT_LIBRARY.templates) {
+      const item = CANVAS_COMPONENT_LIBRARY.createItem({
+        id: `component-${template.id}`,
+        point: { x: 12, y: 34 },
+        templateId: template.id,
+      })
+
+      expect(item).toMatchObject({
+        accent: template.accent,
+        component: template.id,
+        fill: template.fill,
+        h: template.h,
+        id: `component-${template.id}`,
+        stroke: template.stroke,
+        title: template.title,
+        type: 'component',
+        w: template.w,
+        x: 12,
+        y: 34,
+      })
+      expect(CANVAS_COMPONENT_LIBRARY.getPresentation(template.id)).toBe(
+        template.presentation,
+      )
+    }
+  })
+
+  it('falls back to the default component contract for unknown persisted kinds', () => {
+    const fallback = CANVAS_COMPONENT_LIBRARY.templates[0]
+
+    expect(CANVAS_COMPONENT_LIBRARY.getTemplate('unknown')).toBe(fallback)
+    expect(CANVAS_COMPONENT_LIBRARY.getPresentation('unknown')).toBe(
+      fallback.presentation,
+    )
+    expect(
+      CANVAS_COMPONENT_LIBRARY.createItem({
+        id: 'component-unknown',
+        point: { x: 0, y: 0 },
+        templateId: 'unknown',
+      }).component,
+    ).toBe(fallback.id)
+  })
+})
