@@ -2402,6 +2402,9 @@ describe('Canvas module boundaries', () => {
     const viewportShortcutFile = getSourceFile(
       'src/canvas/app/keyboard/CanvasKeyboardViewportShortcuts.ts',
     )
+    const viewportShortcutCatalogFile = getSourceFile(
+      'src/canvas/app/keyboard/CanvasKeyboardViewportShortcutCatalog.ts',
+    )
     const systemShortcutFile = getSourceFile(
       'src/canvas/app/keyboard/CanvasKeyboardSystemShortcuts.ts',
     )
@@ -2581,10 +2584,32 @@ describe('Canvas module boundaries', () => {
     expect(viewportShortcutFile.source).toContain(
       'export function getCanvasKeyboardReservedViewportShortcuts',
     )
-    expect(viewportShortcutFile.source).toContain("shortcutId: 'fitAll'")
-    expect(viewportShortcutFile.source).toContain("shortcutId: 'zoomIn'")
-    expect(viewportShortcutFile.source).toContain("kind: 'fit-selection'")
-    expect(viewportShortcutFile.source).toContain("kind: 'zoom-by'")
+    expect(viewportShortcutFile.source).toContain(
+      "from './CanvasKeyboardViewportShortcutCatalog'",
+    )
+    expect(viewportShortcutFile.source).not.toContain("shortcutId: 'fitAll'")
+    expect(viewportShortcutFile.source).not.toContain("shortcutId: 'zoomIn'")
+    expect(viewportShortcutFile.source).not.toContain("kind: 'fit-selection'")
+    expect(viewportShortcutFile.source).not.toContain("kind: 'zoom-by'")
+    expect(viewportShortcutCatalogFile.source).toContain(
+      'CANVAS_KEYBOARD_VIEWPORT_SHORTCUTS',
+    )
+    expect(viewportShortcutCatalogFile.source).toContain(
+      "shortcutId: 'fitAll'",
+    )
+    expect(viewportShortcutCatalogFile.source).toContain(
+      "shortcutId: 'zoomIn'",
+    )
+    expect(viewportShortcutCatalogFile.source).toContain(
+      "kind: 'fit-selection'",
+    )
+    expect(viewportShortcutCatalogFile.source).toContain("kind: 'zoom-by'")
+    expect(viewportShortcutCatalogFile.source).not.toContain(
+      "shortcutId: 'nudge'",
+    )
+    expect(viewportShortcutCatalogFile.source).not.toContain(
+      "'large nudge left'",
+    )
     expect(systemShortcutFile.source).toContain(
       'export function getCanvasKeyboardSystemShortcutIntent',
     )
