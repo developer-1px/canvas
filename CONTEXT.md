@@ -42,6 +42,7 @@
 - Canvas Workspace Model: Demo workspace의 저장된 snapshot, document history, viewport, read model, id 생성을 App Shell에 숨기는 workflow Module.
 - Canvas Workflow Contract: App workflow hook들이 공유하는 document commit, selection commit, clipboard 계약. 개별 hook이 `useCanvasDocument` 구현 파일을 직접 알지 않게 한다.
 - Renderer Adapter: Affordance 상태와 주입된 item layer를 SVG, Canvas, DOM, WebGL 등으로 배치하고 그리는 Adapter. Demo `CanvasItem`을 직접 알지 않는다.
+- Canvas SVG Drawing Primitives: SVG path data와 marker id/IRI처럼 Renderer Stage defs와 App-owned item layer가 공유해야 하는 SVG drawing primitive 계약.
 - Demo SVG Item Layer Adapter: Demo `CanvasItem` tree와 component presentation을 SVG item layer로 바꾸어 Renderer Adapter에 주입하는 App-owned Adapter.
 - Renderer Component Presentation Resolver: Demo component kind를 Renderer Adapter가 이해하는 presentation key로 바꾸는 함수. App workflow가 Host의 Canvas Component Library에서 꺼내 Renderer Adapter에 주입한다.
 - Renderer Public Facade: App과 UI가 Renderer Adapter를 사용할 때 import하는 안정된 Module 경계. SVG 내부 파일 구조를 숨긴다.
@@ -61,6 +62,7 @@
 - Demo `CanvasItem`과 SVG 렌더링 방식은 재사용 Core Contract에 포함하지 않는다.
 - Renderer Stage는 Demo `CanvasItem`, Host read model, component library를 import하지 않는다.
 - Demo item SVG 렌더링은 App의 Demo SVG Item Layer Adapter가 소유한다.
+- SVG drawing path data와 arrow marker id/IRI는 Canvas SVG Drawing Primitives가 소유한다.
 - 안정 entity type은 `src/canvas/entities`에서 import한다. `entities` public facade는 type-only로 유지한다.
 - persisted kind와 registry key는 Canvas Stable Id 형식을 사용한다.
 - 알 수 없는 stable component kind는 fallback할 수 있지만, malformed component kind는 validation/lookup 단계에서 실패해야 한다.

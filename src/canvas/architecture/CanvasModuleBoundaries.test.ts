@@ -353,6 +353,27 @@ describe('Canvas module boundaries', () => {
     expect(drawingStyleConsumers).not.toContain('#334155')
   })
 
+  it('keeps shared svg drawing primitives in the renderer module', () => {
+    const primitiveFile =
+      getSourceFile('src/canvas/renderer/svg/CanvasSvgDrawingPrimitives.ts')
+    const hardcodedSvgDrawingTerms =
+      /\bcreateSvgPathData\b|canvas-arrow-head|canvas-draft-arrow-head|url\(#canvas-/
+    const violations = sourceFiles
+      .filter((file) =>
+        !file.path.endsWith('.test.ts') &&
+        !file.path.endsWith('.test.tsx') &&
+        file.path !== primitiveFile.path,
+      )
+      .flatMap((file) =>
+        hardcodedSvgDrawingTerms.test(file.source) ? [file.path] : [],
+      )
+
+    expect(primitiveFile.source).toContain('createCanvasSvgPathData')
+    expect(primitiveFile.source).toContain('CANVAS_SVG_ARROW_MARKER_IRI')
+    expect(primitiveFile.source).toContain('CANVAS_SVG_DRAFT_ARROW_MARKER_IRI')
+    expect(violations).toEqual([])
+  })
+
   it('keeps app workflow hooks from recreating the workspace read model', () => {
     const violations = sourceFiles
       .filter((file) =>

@@ -26,7 +26,11 @@ import { isCanvasCustomToolId, normalizeBounds } from 'canvas/core'
 import { createCanvasAffordanceConfig } from 'canvas/engine'
 import type { CanvasItem as CanvasEntityItem } from 'canvas/entities'
 import { createCanvasComponentLibrary } from 'canvas/host'
-import { CanvasSvgStage } from 'canvas/renderer'
+import {
+  CANVAS_SVG_ARROW_MARKER_IRI,
+  CanvasSvgStage,
+  createCanvasSvgPathData,
+} from 'canvas/renderer'
 
 describe('Canvas package consumer imports', () => {
   it('supports assembling a canvas app from package exports', () => {
@@ -142,5 +146,10 @@ describe('Canvas package consumer imports', () => {
     expect(createCanvasComponentLibrary({
       templates: CanvasHost.DEFAULT_CANVAS_COMPONENT_TEMPLATES,
     }).templates.length).toBe(CanvasHost.DEFAULT_CANVAS_COMPONENT_TEMPLATES.length)
+    expect(CANVAS_SVG_ARROW_MARKER_IRI).toBe('url(#canvas-arrow-head)')
+    expect(createCanvasSvgPathData([{ x: 1, y: 2 }, { x: 3, y: 4 }]))
+      .toBe('M 1 2 L 3 4')
+    expect(CanvasRenderer.CANVAS_SVG_ARROW_MARKER_IRI)
+      .toBe(CANVAS_SVG_ARROW_MARKER_IRI)
   })
 })

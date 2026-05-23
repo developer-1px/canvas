@@ -72,6 +72,7 @@
 | `src/canvas/host/tree` | Bounds, traversal, selection tree helpers |
 | `src/canvas/host/adapters` | Demo host item을 engine interface에 맞추는 adapter |
 | `src/canvas/renderer` | Renderer public facade |
+| `src/canvas/renderer/svg/CanvasSvgDrawingPrimitives.ts` | SVG path data와 arrow marker id/IRI를 Renderer-owned drawing primitive 계약으로 제공한다 |
 | `src/canvas/renderer/svg` | Demo item을 모르는 SVG stage/overlay adapter |
 | `src/canvas/index.ts` | 외부 조립자와 Demo가 사용하는 Canvas package public entry |
 | `src/canvas/ui` | Toolbar, palette, status, editor controls |
@@ -137,6 +138,7 @@ type CanvasAffordanceConfig = {
 - App과 UI는 Renderer Adapter 내부 파일을 import하지 않는다. SVG stage는 `src/canvas/renderer` public facade에서 사용한다.
 - Renderer Adapter는 `CanvasOverlayState`와 주입된 item layer를 받아 SVG로 배치하며, Engine은 SVG/DOM 구현을 모른다.
 - Renderer Stage는 Demo `CanvasItem`, Host read model, Canvas Component Library를 import하지 않는다.
+- Canvas SVG Drawing Primitives가 SVG path data와 arrow marker id/IRI를 소유해서 Renderer Stage defs와 App-owned item layer가 문자열 계약을 중복하지 않는다.
 - Demo SVG Item Layer Adapter는 App-owned Adapter로 Demo component presentation key resolver와 presentation registry를 받아 그리기 전략을 고른다.
 - 새 Demo component kind가 기존 presentation을 재사용하면 외부 조립된 `CanvasComponentLibrary`만 바꾼다. 새 presentation은 Canvas App Assembly에 presentation renderer를 함께 등록한다.
 - Canvas Component Library의 presentation key가 component presentation renderer registry에 없으면 Canvas App Assembly가 실패한다.

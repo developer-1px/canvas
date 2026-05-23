@@ -1,6 +1,12 @@
 import type { PointerEvent } from 'react'
 import type { CanvasOverlayState } from '../../engine'
 import type { ResizeHandle } from '../../core'
+import {
+  CANVAS_SVG_ARROW_MARKER_ID,
+  CANVAS_SVG_DRAFT_ARROW_MARKER_ID,
+  CANVAS_SVG_DRAFT_ARROW_MARKER_IRI,
+  createCanvasSvgPathData,
+} from './CanvasSvgDrawingPrimitives'
 
 type CanvasSvgInteractionOverlaysProps = {
   overlays: CanvasOverlayState
@@ -17,7 +23,7 @@ export function CanvasSvgOverlayDefs() {
         <path d="M 40 0 L 0 0 0 40" className="grid-line" />
       </pattern>
       <marker
-        id="canvas-arrow-head"
+        id={CANVAS_SVG_ARROW_MARKER_ID}
         markerHeight="8"
         markerWidth="8"
         orient="auto"
@@ -28,7 +34,7 @@ export function CanvasSvgOverlayDefs() {
         <path d="M 0 0 L 8 4 L 0 8 z" className="arrow-head" />
       </marker>
       <marker
-        id="canvas-draft-arrow-head"
+        id={CANVAS_SVG_DRAFT_ARROW_MARKER_ID}
         markerHeight="8"
         markerWidth="8"
         orient="auto"
@@ -82,7 +88,7 @@ export function CanvasSvgInteractionOverlays({
           y1={overlays.draftArrow.start.y}
           x2={overlays.draftArrow.end.x}
           y2={overlays.draftArrow.end.y}
-          markerEnd="url(#canvas-draft-arrow-head)"
+          markerEnd={CANVAS_SVG_DRAFT_ARROW_MARKER_IRI}
           vectorEffect="non-scaling-stroke"
         />
       ) : null}
@@ -90,7 +96,7 @@ export function CanvasSvgInteractionOverlays({
       {overlays.draftStroke ? (
         <path
           className={`draft-stroke draft-${overlays.draftStroke.kind}`}
-          d={createSvgPathData(overlays.draftStroke.points)}
+          d={createCanvasSvgPathData(overlays.draftStroke.points)}
           opacity={overlays.draftStroke.opacity}
           stroke={overlays.draftStroke.stroke}
           strokeWidth={overlays.draftStroke.strokeWidth}
@@ -190,17 +196,4 @@ export function CanvasSvgInteractionOverlays({
       ) : null}
     </>
   )
-}
-
-function createSvgPathData(points: { x: number; y: number }[]) {
-  const [first, ...rest] = points
-
-  if (!first) {
-    return ''
-  }
-
-  return [
-    `M ${first.x} ${first.y}`,
-    ...rest.map((point) => `L ${point.x} ${point.y}`),
-  ].join(' ')
 }

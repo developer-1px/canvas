@@ -6,6 +6,10 @@ import type {
   TextItem,
 } from '../../entities'
 import { getCanvasItemBounds } from '../../host'
+import {
+  CANVAS_SVG_ARROW_MARKER_IRI,
+  createCanvasSvgPathData,
+} from '../../renderer'
 import { CanvasDemoSvgComponentRenderer } from './CanvasDemoSvgComponentRenderer'
 import {
   DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS,
@@ -197,12 +201,12 @@ function renderCanvasItem({
       >
         <path
           className={`${item.type}-hit`}
-          d={createSvgPathData(item.points)}
+          d={createCanvasSvgPathData(item.points)}
           vectorEffect="non-scaling-stroke"
         />
         <path
           className={`${item.type}-item`}
-          d={createSvgPathData(item.points)}
+          d={createCanvasSvgPathData(item.points)}
           opacity={item.opacity}
           stroke={item.stroke}
           strokeWidth={item.strokeWidth}
@@ -242,7 +246,7 @@ function renderCanvasItem({
           y2={item.end.y}
           stroke={item.stroke}
           strokeWidth={item.strokeWidth}
-          markerEnd="url(#canvas-arrow-head)"
+          markerEnd={CANVAS_SVG_ARROW_MARKER_IRI}
           vectorEffect="non-scaling-stroke"
         />
         {hasOutline ? <CanvasDemoSvgSelectionOutline bounds={bounds} /> : null}
@@ -305,19 +309,6 @@ function renderCanvasDemoSvgCustomItemSafely({
   } catch {
     return <CanvasDemoSvgUnknownCustomItem item={item} />
   }
-}
-
-function createSvgPathData(points: { x: number; y: number }[]) {
-  const [first, ...rest] = points
-
-  if (!first) {
-    return ''
-  }
-
-  return [
-    `M ${first.x} ${first.y}`,
-    ...rest.map((point) => `L ${point.x} ${point.y}`),
-  ].join(' ')
 }
 
 function CanvasDemoSvgSelectionOutline({
