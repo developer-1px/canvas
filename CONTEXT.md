@@ -47,6 +47,7 @@
 - Canvas App Custom Command Contracts: custom command descriptor shape와 id registry contract를 검증하는 App-owned contract Module.
 - Canvas App Custom Command Execution: custom command toolbar state, availability, run 호출과 실패 containment를 소유하는 App-owned execution Module.
 - Canvas App Custom Creation Tool: 내부 tool grammar를 수정하지 않고 제품별 item 생성 도구를 toolbar, shortcut, pointer lifecycle에 등록하는 App-owned tool descriptor.
+- Canvas Keyboard Tool Shortcuts: built-in tool shortcut descriptor와 custom creation tool 예약 shortcut 목록을 함께 제공하는 App keyboard contract Module.
 - Canvas App Custom Creation Tool Contracts: custom creation tool descriptor shape와 reserved/duplicate shortcut conflict를 검증하는 App-owned contract Module.
 - Canvas App Custom Creation Tool Runtime: custom creation tool id 변환, toolbar state, lookup, shortcut matching을 소유하는 App-owned runtime Module.
 - Canvas App Custom Item Module Creation Tool: Module-owned creation descriptor. bounds/title/data만 반환하고 custom item `id`, `kind`, `presentation`, `type` envelope는 Module assembly가 만든다.

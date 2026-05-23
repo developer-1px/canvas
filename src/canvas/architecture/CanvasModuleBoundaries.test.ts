@@ -1694,6 +1694,9 @@ describe('Canvas module boundaries', () => {
     const toolIntentFile = getSourceFile(
       'src/canvas/app/keyboard/CanvasKeyboardToolShortcutIntent.ts',
     )
+    const toolShortcutFile = getSourceFile(
+      'src/canvas/app/keyboard/CanvasKeyboardToolShortcuts.ts',
+    )
 
     expect(routerFile.source).toContain(
       "from './CanvasKeyboardShortcutIntent'",
@@ -1729,10 +1732,21 @@ describe('Canvas module boundaries', () => {
       'export function getCanvasKeyboardToolShortcutIntent',
     )
     expect(toolIntentFile.source).toContain(
+      "from './CanvasKeyboardToolShortcuts'",
+    )
+    expect(toolIntentFile.source).toContain(
       'matchesCanvasAppCustomToolShortcut',
     )
-    expect(toolIntentFile.source).toContain("key === 'v'")
-    expect(toolIntentFile.source).toContain("key === 'm'")
+    expect(toolIntentFile.source).not.toContain("key === 'v'")
+    expect(toolIntentFile.source).not.toContain("key === 'm'")
+    expect(toolShortcutFile.source).toContain(
+      'export function getCanvasKeyboardBuiltinToolShortcut',
+    )
+    expect(toolShortcutFile.source).toContain(
+      'export function getCanvasKeyboardReservedToolShortcuts',
+    )
+    expect(toolShortcutFile.source).toContain("shortcutId: 'selectTool'")
+    expect(toolShortcutFile.source).toContain("shortcutId: 'markerTool'")
   })
 
   it('keeps App custom creation tool contracts behind a named module', () => {
@@ -1764,6 +1778,11 @@ describe('Canvas module boundaries', () => {
     expect(contractsFile.source).toContain(
       'RESERVED_CANVAS_APP_CUSTOM_TOOL_SHORTCUTS',
     )
+    expect(contractsFile.source).toContain(
+      'getCanvasKeyboardReservedToolShortcuts',
+    )
+    expect(contractsFile.source).not.toContain("label: 'select tool'")
+    expect(contractsFile.source).not.toContain("label: 'marker tool'")
     expect(contractsFile.source).toContain('shortcut conflicts with')
     expect(contractsFile.source).toContain(
       'Duplicate canvas app custom creation tool shortcut',

@@ -1,5 +1,10 @@
 import type { CanvasCustomToolId } from '../../entities'
 import { assertCanvasAppExtensionId } from '../extensions/CanvasAppExtensionIds'
+import {
+  formatCanvasKeyboardShortcutChord,
+  getCanvasKeyboardShortcutChordKey,
+  matchesCanvasKeyboardShortcutChord,
+} from '../keyboard/CanvasKeyboardShortcutChords'
 import type {
   CanvasAppCustomCreationTool,
   CanvasAppCustomToolShortcut,
@@ -58,47 +63,17 @@ export function matchesCanvasAppCustomToolShortcut({
   event: KeyboardEvent
   shortcut: CanvasAppCustomToolShortcut
 }) {
-  return (
-    normalizeCanvasAppCustomToolShortcutKey(event.key).toLowerCase() ===
-      normalizeCanvasAppCustomToolShortcutKey(shortcut.key).toLowerCase() &&
-    event.shiftKey === (shortcut.shiftKey ?? false)
-  )
+  return matchesCanvasKeyboardShortcutChord({ event, shortcut })
 }
 
 export function getCanvasAppCustomToolShortcutKey(
   shortcut: CanvasAppCustomToolShortcut,
 ) {
-  const key = normalizeCanvasAppCustomToolShortcutKey(
-    shortcut.key,
-  ).toLowerCase()
-
-  return `${shortcut.shiftKey === true ? 'shift+' : ''}${key}`
+  return getCanvasKeyboardShortcutChordKey(shortcut)
 }
 
 export function formatCanvasAppCustomToolShortcut(
   shortcut: CanvasAppCustomToolShortcut,
 ) {
-  const key = formatCanvasAppCustomToolShortcutKey(shortcut.key)
-
-  return shortcut.shiftKey ? `Shift+${key}` : key
-}
-
-function normalizeCanvasAppCustomToolShortcutKey(key: string) {
-  return key === ' ' ? 'Space' : key
-}
-
-function formatCanvasAppCustomToolShortcutKey(key: string) {
-  const normalizedKey = normalizeCanvasAppCustomToolShortcutKey(key)
-
-  if (normalizedKey === 'Space') {
-    return 'Space'
-  }
-
-  if (normalizedKey.startsWith('Arrow')) {
-    return normalizedKey
-  }
-
-  return normalizedKey.length === 1
-    ? normalizedKey.toUpperCase()
-    : normalizedKey
+  return formatCanvasKeyboardShortcutChord(shortcut)
 }

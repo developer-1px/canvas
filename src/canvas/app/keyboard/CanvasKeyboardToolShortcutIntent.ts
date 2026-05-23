@@ -1,5 +1,6 @@
 import type { CanvasAffordanceConfig } from '../../engine'
 import type { Tool } from '../../entities'
+import { getCanvasKeyboardBuiltinToolShortcut } from './CanvasKeyboardToolShortcuts'
 import {
   matchesCanvasAppCustomToolShortcut,
   type CanvasAppCustomCreationToolState,
@@ -18,42 +19,14 @@ export function getCanvasKeyboardToolShortcutIntent({
   event,
   key,
 }: CanvasKeyboardToolShortcutIntentInput): Tool | null {
-  if (config.shortcuts.selectTool && config.tools.select && key === 'v') {
-    return 'select'
-  }
+  const builtInTool = getCanvasKeyboardBuiltinToolShortcut({
+    config,
+    event,
+    key,
+  })
 
-  if (config.shortcuts.panTool && config.tools.pan && key === 'h') {
-    return 'pan'
-  }
-
-  if (
-    config.shortcuts.highlighterTool &&
-    config.tools.highlight &&
-    event.shiftKey &&
-    key === 'm'
-  ) {
-    return 'highlight'
-  }
-
-  if (
-    config.shortcuts.markerTool &&
-    config.tools.marker &&
-    !event.shiftKey &&
-    key === 'm'
-  ) {
-    return 'marker'
-  }
-
-  if (config.shortcuts.arrowTool && config.tools.arrow && key === 'l') {
-    return 'arrow'
-  }
-
-  if (config.shortcuts.rectTool && config.tools.rect && key === 'r') {
-    return 'rect'
-  }
-
-  if (config.shortcuts.textTool && config.tools.text && key === 't') {
-    return 'text'
+  if (builtInTool) {
+    return builtInTool
   }
 
   const customTool = customCreationTools.find(

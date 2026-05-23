@@ -7,6 +7,10 @@ import {
 } from '../extensions/CanvasAppDescriptorContracts'
 import { assertCanvasAppExtensionEntries } from '../extensions/CanvasAppExtensionIds'
 import {
+  getCanvasKeyboardReservedToolShortcuts,
+} from '../keyboard/CanvasKeyboardToolShortcuts'
+import { reserveCanvasKeyboardShortcut } from '../keyboard/CanvasKeyboardShortcutChords'
+import {
   formatCanvasAppCustomToolShortcut,
   getCanvasAppCustomToolShortcutKey,
 } from './CanvasAppCustomCreationToolRuntime'
@@ -20,40 +24,20 @@ type ReservedCanvasAppCustomToolShortcut = {
   shortcut: CanvasAppCustomToolShortcut
 }
 
-type CanvasAppCustomToolShortcutReservationOptions = {
-  shiftInsensitive?: boolean
-}
-
 const RESERVED_CANVAS_APP_CUSTOM_TOOL_SHORTCUTS = [
-  ...reserveCanvasAppCustomToolShortcut('select tool', { key: 'v' }, {
-    shiftInsensitive: true,
-  }),
-  ...reserveCanvasAppCustomToolShortcut('pan tool', { key: 'h' }, {
-    shiftInsensitive: true,
-  }),
-  ...reserveCanvasAppCustomToolShortcut('rectangle tool', { key: 'r' }, {
-    shiftInsensitive: true,
-  }),
-  ...reserveCanvasAppCustomToolShortcut('text tool', { key: 't' }, {
-    shiftInsensitive: true,
-  }),
-  { label: 'marker tool', shortcut: { key: 'm' } },
-  { label: 'highlighter tool', shortcut: { key: 'm', shiftKey: true } },
-  ...reserveCanvasAppCustomToolShortcut('arrow tool', { key: 'l' }, {
-    shiftInsensitive: true,
-  }),
-  ...reserveCanvasAppCustomToolShortcut('temporary pan', { key: 'Space' }, {
+  ...getCanvasKeyboardReservedToolShortcuts(),
+  ...reserveCanvasKeyboardShortcut('temporary pan', { key: 'Space' }, {
     shiftInsensitive: true,
   }),
   { label: 'fit all', shortcut: { key: '0' } },
   { label: 'fit selection', shortcut: { key: '1' } },
-  ...reserveCanvasAppCustomToolShortcut('escape', { key: 'Escape' }, {
+  ...reserveCanvasKeyboardShortcut('escape', { key: 'Escape' }, {
     shiftInsensitive: true,
   }),
-  ...reserveCanvasAppCustomToolShortcut('delete', { key: 'Delete' }, {
+  ...reserveCanvasKeyboardShortcut('delete', { key: 'Delete' }, {
     shiftInsensitive: true,
   }),
-  ...reserveCanvasAppCustomToolShortcut('delete', { key: 'Backspace' }, {
+  ...reserveCanvasKeyboardShortcut('delete', { key: 'Backspace' }, {
     shiftInsensitive: true,
   }),
   { label: 'nudge left', shortcut: { key: 'ArrowLeft' } },
@@ -175,19 +159,4 @@ function assertCanvasAppCustomToolShortcutDescriptor({
     owner,
     value: shortcut.shiftKey,
   })
-}
-
-function reserveCanvasAppCustomToolShortcut(
-  label: string,
-  shortcut: CanvasAppCustomToolShortcut,
-  options: CanvasAppCustomToolShortcutReservationOptions = {},
-): ReservedCanvasAppCustomToolShortcut[] {
-  if (!options.shiftInsensitive) {
-    return [{ label, shortcut }]
-  }
-
-  return [
-    { label, shortcut },
-    { label, shortcut: { ...shortcut, shiftKey: true } },
-  ]
 }
