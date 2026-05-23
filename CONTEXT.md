@@ -117,6 +117,7 @@
 - Canvas Pointer Start Session: pointer-down 시 stage-local screen coordinate와 viewport-projected world coordinate를 start interaction Module들에 제공하는 App-owned start lifecycle Module.
 - Canvas App Pointer Input: Renderer/DOM pointer event에서 App pointer grammar가 필요한 screen point, pointer id, modifier, cancellation 함수만 명시하는 App-owned event source Interface 계약.
 - Canvas Pointer Creation Grammar: shape creation, drawing creation, custom creation, text creation gesture와 active creation interaction kind set을 소유하는 App-owned what 계약 Module.
+- Canvas Pointer Interaction Routing: active interaction kind를 pan, transform, marquee, creation, none handler로 분류하는 App-owned internal grammar Module.
 - Canvas Pointer Creation Start: pointer-down 시 shape creation, drawing creation, custom creation, text creation 시작 상태를 각 creation lifecycle Module에 위임하는 App-owned runtime Module.
 - Canvas Pointer Shape Creation: built-in rect/arrow shape creation gesture, draft shape preview, enabled gate, item creation commit, post-create tool selection descriptor를 소유하는 App-owned shape lifecycle Module.
 - Canvas Pointer Drawing Creation: built-in marker/highlighter stroke drawing gesture, draft stroke preview, enabled gate, item creation commit descriptor를 소유하는 App-owned drawing lifecycle Module.
@@ -269,7 +270,7 @@
 - Item pointer down hook은 DOM event routing과 시작 결과 적용을 맡고, item double-click memory 규칙은 Canvas Pointer Click Memory가, selection/edit/duplicate/move 시작 규칙은 Canvas Item Pointer Interaction Start가 소유한다.
 - Resize pointer down hook은 DOM event routing과 시작 결과 적용을 맡고, resize handle/selected bounds/config 기반 시작 규칙은 Canvas Resize Pointer Interaction Start가 소유한다.
 - Text double-click hook은 시작 결과 적용을 맡고, text edit 가능 여부/selection/edit state/tool 전환 규칙은 Canvas Item Pointer Interaction Start가 소유한다.
-- Pointer drag hook은 DOM pointer routing과 coordinate 변환, preview/commit/cancel runtime 호출만 맡고, pointer-move preview orchestration은 Canvas Pointer Interaction Preview가, creation interaction kind routing은 Canvas Pointer Creation Grammar가, move/resize live item preview는 Canvas Pointer Transform Preview가, 생성/드로잉 draft preview는 Canvas Pointer Creation Preview가, pointer-up/cancel 확정 규칙은 Canvas Pointer Interaction Lifecycle이, preview result state 반영과 pointer-up/cancel cleanup/rollback effect는 Canvas Pointer Interaction Drag Effects가 소유한다.
+- Pointer drag hook은 DOM pointer routing과 coordinate 변환, preview/commit/cancel runtime 호출만 맡고, active interaction kind 분류는 Canvas Pointer Interaction Routing이, pointer-move preview orchestration은 Canvas Pointer Interaction Preview가, creation interaction kind set은 Canvas Pointer Creation Grammar가, move/resize live item preview는 Canvas Pointer Transform Preview가, 생성/드로잉 draft preview는 Canvas Pointer Creation Preview가, pointer-up/cancel 확정 규칙은 Canvas Pointer Interaction Lifecycle이, preview result state 반영과 pointer-up/cancel cleanup/rollback effect는 Canvas Pointer Interaction Drag Effects가 소유한다.
 - Canvas Pointer Interaction Lifecycle은 생성/드로잉 item commit 세부를 직접 알지 않고 Canvas Pointer Creation Commit에 위임한다.
 - 제품별 item kind는 내부 `CanvasItem` union에 새 variant를 추가하지 않고 Canvas App Custom Item Module로 등록한다.
 - Canvas Item Schema는 custom item envelope와 validator registry 세부를 직접 알지 않고 Canvas Custom Item Validation에 위임한다.

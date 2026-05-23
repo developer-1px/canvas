@@ -1638,6 +1638,9 @@ describe('Canvas module boundaries', () => {
     const transformInteractionFile = getSourceFile(
       'src/canvas/app/pointer/CanvasPointerTransformInteraction.ts',
     )
+    const interactionRoutingFile = getSourceFile(
+      'src/canvas/app/pointer/CanvasPointerInteractionRouting.ts',
+    )
 
     expect(dragHandlersFile.source).toContain(
       "from './CanvasPointerInteractionLifecycle'",
@@ -1665,6 +1668,9 @@ describe('Canvas module boundaries', () => {
     expect(lifecycleFile.source).toContain(
       "from './CanvasPointerTransformInteraction'",
     )
+    expect(lifecycleFile.source).toContain(
+      "from './CanvasPointerInteractionRouting'",
+    )
     expect(lifecycleFile.source).not.toContain('createCanvasRect({')
     expect(lifecycleFile.source).not.toContain('createCanvasMarker({')
     expect(lifecycleFile.source).not.toContain('createCanvasArrow({')
@@ -1677,6 +1683,21 @@ describe('Canvas module boundaries', () => {
     expect(lifecycleFile.source).not.toContain('setEditing(interaction.edit)')
     expect(lifecycleFile.source).not.toContain(
       'setLiveItems(interaction.historyItems)',
+    )
+    expect(lifecycleFile.source).not.toContain(
+      "interaction.kind === 'move'",
+    )
+    expect(lifecycleFile.source).not.toContain(
+      "interaction.kind === 'resize'",
+    )
+    expect(lifecycleFile.source).not.toContain(
+      "interaction.kind === 'marquee'",
+    )
+    expect(interactionRoutingFile.source).toContain(
+      'export function routeCanvasPointerInteraction',
+    )
+    expect(interactionRoutingFile.source).toContain(
+      "interaction.kind === 'move' || interaction.kind === 'resize'",
     )
     const shapeCreationFile = getSourceFile(
       'src/canvas/app/pointer/CanvasPointerShapeCreation.ts',
@@ -1753,6 +1774,9 @@ describe('Canvas module boundaries', () => {
     )
     const creationGrammarFile = getSourceFile(
       'src/canvas/app/pointer/CanvasPointerCreationGrammar.ts',
+    )
+    const interactionRoutingFile = getSourceFile(
+      'src/canvas/app/pointer/CanvasPointerInteractionRouting.ts',
     )
     const drawingCreationFile = getSourceFile(
       'src/canvas/app/pointer/CanvasPointerDrawingCreation.ts',
@@ -1836,10 +1860,10 @@ describe('Canvas module boundaries', () => {
     expect(textCreationFile.source).toContain(
       'CANVAS_POINTER_TEXT_CREATION_KINDS',
     )
-    expect(interactionPreviewFile.source).toContain(
-      'isCanvasPointerCreationInteraction(interaction)',
+    expect(interactionRoutingFile.source).toContain(
+      'export function routeCanvasPointerInteraction',
     )
-    expect(lifecycleFile.source).toContain(
+    expect(interactionRoutingFile.source).toContain(
       'isCanvasPointerCreationInteraction(interaction)',
     )
     for (const creationKindCheck of [
@@ -1851,6 +1875,7 @@ describe('Canvas module boundaries', () => {
     ]) {
       expect(interactionPreviewFile.source).not.toContain(creationKindCheck)
       expect(lifecycleFile.source).not.toContain(creationKindCheck)
+      expect(interactionRoutingFile.source).not.toContain(creationKindCheck)
     }
     for (const drawingKindCheck of [
       "interaction.kind === 'draw-highlight'",
@@ -1891,6 +1916,9 @@ describe('Canvas module boundaries', () => {
     )
     const previewFile = getSourceFile(
       'src/canvas/app/pointer/CanvasPointerInteractionPreview.ts',
+    )
+    const interactionRoutingFile = getSourceFile(
+      'src/canvas/app/pointer/CanvasPointerInteractionRouting.ts',
     )
     const creationPreviewFile = getSourceFile(
       'src/canvas/app/pointer/CanvasPointerCreationPreview.ts',
@@ -1938,7 +1966,28 @@ describe('Canvas module boundaries', () => {
       "from './CanvasPointerPanInteraction'",
     )
     expect(previewFile.source).toContain(
+      "from './CanvasPointerInteractionRouting'",
+    )
+    expect(previewFile.source).toContain(
       'export function previewCanvasPointerInteraction',
+    )
+    expect(previewFile.source).not.toContain("interaction.kind === 'pan'")
+    expect(previewFile.source).not.toContain("interaction.kind === 'move'")
+    expect(previewFile.source).not.toContain("interaction.kind === 'resize'")
+    expect(previewFile.source).not.toContain(
+      "interaction.kind === 'marquee'",
+    )
+    expect(interactionRoutingFile.source).toContain(
+      'export function routeCanvasPointerInteraction',
+    )
+    expect(interactionRoutingFile.source).toContain(
+      "interaction.kind === 'pan'",
+    )
+    expect(interactionRoutingFile.source).toContain(
+      "interaction.kind === 'move' || interaction.kind === 'resize'",
+    )
+    expect(interactionRoutingFile.source).toContain(
+      "interaction.kind === 'marquee'",
     )
     expect(previewFile.source).not.toContain('EMPTY_CANVAS_SNAP_GUIDES')
     expect(previewFile.source).not.toContain('config.gestures.pan')

@@ -41,9 +41,9 @@ describe('Canvas build config', () => {
     ).toBeUndefined()
   })
 
-  it('keeps the local dev server URL deterministic', () => {
+  it('keeps the local dev server port deterministic across loopback hosts', () => {
     expect(config.server).toMatchObject({
-      host: '127.0.0.1',
+      host: '::',
       port: 5173,
       strictPort: true,
     })

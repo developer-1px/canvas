@@ -15,12 +15,10 @@ import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreati
 import type { Interaction } from './CanvasInteractionState'
 import { commitCanvasPointerCreation } from './CanvasPointerCreationCommit'
 import {
-  isCanvasPointerCreationInteraction,
-} from './CanvasPointerCreationGrammar'
-import {
   cancelCanvasPointerMarqueeInteraction,
   commitCanvasPointerMarqueeInteraction,
 } from './CanvasPointerMarqueeInteraction'
+import { routeCanvasPointerInteraction } from './CanvasPointerInteractionRouting'
 import {
   cancelCanvasPointerTransformInteraction,
   commitCanvasPointerTransformInteraction,
@@ -53,36 +51,34 @@ export function commitCanvasPointerInteraction({
   setSelection,
   setTool,
 }: CanvasPointerInteractionCommitInput) {
-  if (isCanvasPointerCreationInteraction(interaction)) {
-    commitCanvasPointerCreation({
-      commitItemsChange,
-      creationAdapter,
-      createId,
-      customCreationTools,
-      interaction,
-      selection,
-      setTool,
-    })
-  }
-
-  if (interaction.kind === 'move' || interaction.kind === 'resize') {
-    commitCanvasPointerTransformInteraction({
-      commitItemsChange,
-      commitSelection,
-      interaction,
-      setEditing,
-      setTool,
-    })
-  }
-
-  if (interaction.kind === 'marquee') {
-    commitCanvasPointerMarqueeInteraction({
-      commitSelection,
-      interaction,
-      scene,
-      setSelection,
-    })
-  }
+  routeCanvasPointerInteraction(interaction, {
+    creation: (interaction) =>
+      commitCanvasPointerCreation({
+        commitItemsChange,
+        creationAdapter,
+        createId,
+        customCreationTools,
+        interaction,
+        selection,
+        setTool,
+      }),
+    fallback: () => undefined,
+    marquee: (interaction) =>
+      commitCanvasPointerMarqueeInteraction({
+        commitSelection,
+        interaction,
+        scene,
+        setSelection,
+      }),
+    transform: (interaction) =>
+      commitCanvasPointerTransformInteraction({
+        commitItemsChange,
+        commitSelection,
+        interaction,
+        setEditing,
+        setTool,
+      }),
+  })
 }
 
 export type CanvasPointerInteractionCancelInput = {
@@ -96,15 +92,17 @@ export function cancelCanvasPointerInteraction({
   setLiveItems,
   setSelection,
 }: CanvasPointerInteractionCancelInput) {
-  if (interaction.kind === 'move' || interaction.kind === 'resize') {
-    cancelCanvasPointerTransformInteraction({
-      interaction,
-      setLiveItems,
-    })
-  } else if (interaction.kind === 'marquee') {
-    cancelCanvasPointerMarqueeInteraction({
-      interaction,
-      setSelection,
-    })
-  }
+  routeCanvasPointerInteraction(interaction, {
+    fallback: () => undefined,
+    marquee: (interaction) =>
+      cancelCanvasPointerMarqueeInteraction({
+        interaction,
+        setSelection,
+      }),
+    transform: (interaction) =>
+      cancelCanvasPointerTransformInteraction({
+        interaction,
+        setLiveItems,
+      }),
+  })
 }

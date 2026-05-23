@@ -14,12 +14,10 @@ import {
 } from '../../engine'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import type { Interaction } from './CanvasInteractionState'
-import {
-  isCanvasPointerCreationInteraction,
-} from './CanvasPointerCreationGrammar'
 import { previewCanvasPointerCreation } from './CanvasPointerCreationPreview'
 import { previewCanvasPointerMarqueeInteraction } from './CanvasPointerMarqueeInteraction'
 import { previewCanvasPointerPanInteraction } from './CanvasPointerPanInteraction'
+import { routeCanvasPointerInteraction } from './CanvasPointerInteractionRouting'
 import { previewCanvasPointerTransform } from './CanvasPointerTransformPreview'
 
 export type CanvasPointerInteractionPreviewInput = {
@@ -58,59 +56,40 @@ export function previewCanvasPointerInteraction({
   transformAdapter,
   viewport,
 }: CanvasPointerInteractionPreviewInput): CanvasPointerInteractionPreviewResult {
-  if (interaction.kind === 'pan') {
-    return previewCanvasPointerPanInteraction({
-      config,
-      currentScreen,
-      interaction,
-    })
-  }
-
-  if (interaction.kind === 'move') {
-    return previewCanvasPointerTransform({
-      config,
-      currentScreen,
-      currentWorld,
-      input,
-      interaction,
-      scene,
-      transformAdapter,
-      viewport,
-    })
-  }
-
-  if (interaction.kind === 'resize') {
-    return previewCanvasPointerTransform({
-      config,
-      currentScreen,
-      currentWorld,
-      input,
-      interaction,
-      scene,
-      transformAdapter,
-      viewport,
-    })
-  }
-
-  if (interaction.kind === 'marquee') {
-    return previewCanvasPointerMarqueeInteraction({
-      config,
-      currentScreen,
-      currentWorld,
-      interaction,
-      scene,
-    })
-  }
-
-  if (isCanvasPointerCreationInteraction(interaction)) {
-    return previewCanvasPointerCreation({
-      config,
-      currentScreen,
-      currentWorld,
-      input,
-      interaction,
-    })
-  }
-
-  return { kind: 'none' }
+  return routeCanvasPointerInteraction(interaction, {
+    creation: (interaction) =>
+      previewCanvasPointerCreation({
+        config,
+        currentScreen,
+        currentWorld,
+        input,
+        interaction,
+      }),
+    fallback: () => ({ kind: 'none' }),
+    marquee: (interaction) =>
+      previewCanvasPointerMarqueeInteraction({
+        config,
+        currentScreen,
+        currentWorld,
+        interaction,
+        scene,
+      }),
+    pan: (interaction) =>
+      previewCanvasPointerPanInteraction({
+        config,
+        currentScreen,
+        interaction,
+      }),
+    transform: (interaction) =>
+      previewCanvasPointerTransform({
+        config,
+        currentScreen,
+        currentWorld,
+        input,
+        interaction,
+        scene,
+        transformAdapter,
+        viewport,
+      }),
+  })
 }
