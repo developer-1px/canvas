@@ -1,6 +1,7 @@
 import {
   createCanvasAppAssembly,
   createCanvasDemoSvgCustomItemRenderers,
+  defineCanvasAppCustomItemModule,
   type CanvasAppCustomCreationTool,
   type CanvasAppInspectorPanel,
   type CanvasDemoSvgCustomItemRendererStrategy,
@@ -99,7 +100,7 @@ const riskInspectorPanel: CanvasAppInspectorPanel = {
   },
 }
 
-export const DEMO_CANVAS_APP_ASSEMBLY = createCanvasAppAssembly({
+const riskModule = defineCanvasAppCustomItemModule({
   customCreationTools: [riskTool],
   customItemRenderers: createCanvasDemoSvgCustomItemRenderers({
     'risk-node': riskItemRenderer,
@@ -110,6 +111,10 @@ export const DEMO_CANVAS_APP_ASSEMBLY = createCanvasAppAssembly({
       typeof item.data.severity === 'string',
   },
   inspectorPanels: [riskInspectorPanel],
+})
+
+export const DEMO_CANVAS_APP_ASSEMBLY = createCanvasAppAssembly({
+  customItemModules: [riskModule],
 })
 
 function isRiskItem(item: unknown): item is CanvasCustomItem {

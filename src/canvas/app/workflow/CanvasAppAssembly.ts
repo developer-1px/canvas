@@ -19,6 +19,10 @@ import {
 } from '../rendering'
 import type { CanvasAppCustomCommand } from '../commands/CanvasAppCustomCommands'
 import type { CanvasAppInspectorPanel } from '../inspector/CanvasAppInspectorPanels'
+import {
+  createCanvasAppCustomItemModuleAssembly,
+  type CanvasAppCustomItemModule,
+} from '../modules/CanvasAppCustomItemModules'
 import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
 
 export type CanvasAppItemAdapters = {
@@ -39,7 +43,9 @@ export type CanvasAppAssembly = {
   itemAdapters: CanvasAppItemAdapters
 }
 
-export type CanvasAppAssemblyInput = Partial<CanvasAppAssembly>
+export type CanvasAppAssemblyInput = Partial<CanvasAppAssembly> & {
+  customItemModules?: readonly CanvasAppCustomItemModule[]
+}
 
 export const DEFAULT_CANVAS_APP_ASSEMBLY: CanvasAppAssembly = {
   componentLibrary: CANVAS_COMPONENT_LIBRARY,
@@ -57,25 +63,41 @@ export const DEFAULT_CANVAS_APP_ASSEMBLY: CanvasAppAssembly = {
 export function createCanvasAppAssembly(
   input: CanvasAppAssemblyInput = {},
 ): CanvasAppAssembly {
+  const customItemModuleAssembly = createCanvasAppCustomItemModuleAssembly(
+    input.customItemModules,
+  )
+
   return {
     componentLibrary:
       input.componentLibrary ?? DEFAULT_CANVAS_APP_ASSEMBLY.componentLibrary,
     componentPresentationRenderers:
       input.componentPresentationRenderers ??
       DEFAULT_CANVAS_APP_ASSEMBLY.componentPresentationRenderers,
-    customCommands:
-      input.customCommands ?? DEFAULT_CANVAS_APP_ASSEMBLY.customCommands,
-    customCreationTools:
-      input.customCreationTools ??
-      DEFAULT_CANVAS_APP_ASSEMBLY.customCreationTools,
-    customItemRenderers:
-      input.customItemRenderers ??
-      DEFAULT_CANVAS_APP_ASSEMBLY.customItemRenderers,
-    customItemValidators:
-      input.customItemValidators ??
-      DEFAULT_CANVAS_APP_ASSEMBLY.customItemValidators,
-    inspectorPanels:
-      input.inspectorPanels ?? DEFAULT_CANVAS_APP_ASSEMBLY.inspectorPanels,
+    customCommands: [
+      ...DEFAULT_CANVAS_APP_ASSEMBLY.customCommands,
+      ...customItemModuleAssembly.customCommands,
+      ...(input.customCommands ?? []),
+    ],
+    customCreationTools: [
+      ...DEFAULT_CANVAS_APP_ASSEMBLY.customCreationTools,
+      ...customItemModuleAssembly.customCreationTools,
+      ...(input.customCreationTools ?? []),
+    ],
+    customItemRenderers: {
+      ...DEFAULT_CANVAS_APP_ASSEMBLY.customItemRenderers,
+      ...customItemModuleAssembly.customItemRenderers,
+      ...(input.customItemRenderers ?? {}),
+    },
+    customItemValidators: {
+      ...DEFAULT_CANVAS_APP_ASSEMBLY.customItemValidators,
+      ...customItemModuleAssembly.customItemValidators,
+      ...(input.customItemValidators ?? {}),
+    },
+    inspectorPanels: [
+      ...DEFAULT_CANVAS_APP_ASSEMBLY.inspectorPanels,
+      ...customItemModuleAssembly.inspectorPanels,
+      ...(input.inspectorPanels ?? []),
+    ],
     initialItems: input.initialItems ?? DEFAULT_CANVAS_APP_ASSEMBLY.initialItems,
     itemAdapters: input.itemAdapters ?? DEFAULT_CANVAS_APP_ASSEMBLY.itemAdapters,
   }

@@ -26,7 +26,8 @@ The canvas code is intended to work as a reusable component factory, not as one 
 4. `CanvasAppAssembly` is the composition seam for product-specific meaning: concrete Host item adapters, component library, custom commands, custom creation tools, custom item renderers, custom item validators, inspector panels, initial items, and SVG presentation registry are injected there instead of being hard-wired across workflow code.
 5. Host document behavior is exposed through the explicit `CanvasDocumentController` interface. zod-crud document, JSON Patch, selection snapshot, and clipboard internals stay inside `src/canvas/host/document`.
 6. Product-specific item kinds use the stable `custom` item storage envelope with JSON `data`, `kind`, and `presentation`. The SVG renderer resolves presentation through an injected custom item renderer registry, and the Host document controller runs injected validators by `kind`.
-7. Architecture guardrails verify the seams with tests.
+7. `CanvasAppCustomItemModule` bundles the creation tool, renderer, validator, inspector panel, and commands for one product-specific item kind so adding a new kind has one definition unit.
+8. Architecture guardrails verify the seams with tests.
 
 ## Consequences
 
@@ -39,4 +40,4 @@ The canvas code is intended to work as a reusable component factory, not as one 
 - Product-specific business actions can be registered as App custom commands without changing the internal Engine command grammar.
 - Product-specific inspector panels can be registered without changing the default Object Inspector.
 - Product-specific creation tools can be registered without changing the internal builtin tool grammar.
-- Product-specific item kinds can be stored, validated, and rendered without adding a new `CanvasItem` variant or a new SVG renderer branch.
+- Product-specific item kinds can be stored, validated, rendered, created, inspected, and commanded through one App-owned module without adding a new `CanvasItem` variant or a new SVG renderer branch.

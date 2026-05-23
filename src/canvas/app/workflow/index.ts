@@ -11,6 +11,12 @@ export type {
   CanvasAppCustomCommandContext,
   CanvasAppCustomCommandState,
 } from '../commands/CanvasAppCustomCommands'
+export {
+  createCanvasAppCustomItemModuleAssembly,
+  defineCanvasAppCustomItemModule,
+  type CanvasAppCustomItemModule,
+  type CanvasAppCustomItemModuleAssembly,
+} from '../modules/CanvasAppCustomItemModules'
 export type {
   CanvasAppInspectorPanel,
   CanvasAppInspectorPanelContext,

@@ -6,7 +6,10 @@ import {
   type CanvasDemoSvgCustomItemRendererStrategy,
 } from '../rendering'
 import { createCanvasComponentLibrary } from '../../host'
-import { createCanvasAppAssembly } from './CanvasAppAssembly'
+import {
+  createCanvasAppAssembly,
+  defineCanvasAppCustomItemModule,
+} from './index'
 
 describe('CanvasAppAssembly', () => {
   it('assembles product-specific component library and presentation registry', () => {
@@ -36,10 +39,7 @@ describe('CanvasAppAssembly', () => {
     const customItemRenderers = createCanvasDemoSvgCustomItemRenderers({
       'risk-node': renderRiskItem,
     })
-
-    const assembly = createCanvasAppAssembly({
-      componentLibrary,
-      componentPresentationRenderers,
+    const riskModule = defineCanvasAppCustomItemModule({
       customCommands: [
         {
           id: 'publish',
@@ -75,6 +75,12 @@ describe('CanvasAppAssembly', () => {
           render: ({ selection }) => selection.length,
         },
       ],
+    })
+
+    const assembly = createCanvasAppAssembly({
+      componentLibrary,
+      componentPresentationRenderers,
+      customItemModules: [riskModule],
       initialItems: [],
     })
 
