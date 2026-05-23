@@ -330,6 +330,27 @@ describe('Canvas module boundaries', () => {
     expect(shellFile.source).not.toContain('createElement(stage.')
   })
 
+  it('keeps app stage rendering containment behind a named workflow module', () => {
+    const appModelFile = getSourceFile(
+      'src/canvas/app/workflow/useCanvasAppModel.ts',
+    )
+    const stageModelFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppStageModel.tsx',
+    )
+
+    expect(appModelFile.source).toContain("from './CanvasAppStageModel'")
+    expect(appModelFile.source).not.toContain('adapter.renderStage(input)')
+    expect(appModelFile.source).not.toContain('adapter.renderItems(input)')
+    expect(appModelFile.source).not.toContain('onContextMenu')
+    expect(stageModelFile.source).toContain(
+      'export function renderCanvasAppStageModel',
+    )
+    expect(stageModelFile.source).toContain('adapter.renderStage(input)')
+    expect(stageModelFile.source).toContain('adapter.renderItems(input)')
+    expect(stageModelFile.source).toContain('blurTextEditor()')
+    expect(stageModelFile.source).toContain('catch')
+  })
+
   it('keeps app item layer render input on the app pointer input interface', () => {
     const itemLayerAdapterFile = getSourceFile(
       'src/canvas/app/rendering/CanvasAppItemLayerAdapter.tsx',
@@ -791,6 +812,9 @@ describe('Canvas module boundaries', () => {
     const executionFile = getSourceFile(
       'src/canvas/app/commands/CanvasAppCustomCommandExecution.ts',
     )
+    const extensionModelFile = getSourceFile(
+      'src/canvas/app/workflow/useCanvasAppExtensionModel.ts',
+    )
     const appModelFile = getSourceFile(
       'src/canvas/app/workflow/useCanvasAppModel.ts',
     )
@@ -804,8 +828,14 @@ describe('Canvas module boundaries', () => {
     expect(executionFile.source).toContain('command.run(context)')
     expect(executionFile.source).toContain('command.isEnabled(context)')
     expect(executionFile.source).toContain('catch')
-    expect(appModelFile.source).toContain(
+    expect(extensionModelFile.source).toContain(
       "from '../commands/CanvasAppCustomCommandExecution'",
+    )
+    expect(appModelFile.source).toContain(
+      "from './useCanvasAppExtensionModel'",
+    )
+    expect(appModelFile.source).not.toContain(
+      'CanvasAppCustomCommandExecution',
     )
   })
 
@@ -907,6 +937,9 @@ describe('Canvas module boundaries', () => {
     const runtimeFile = getSourceFile(
       'src/canvas/app/tools/CanvasAppCustomCreationToolRuntime.ts',
     )
+    const extensionModelFile = getSourceFile(
+      'src/canvas/app/workflow/useCanvasAppExtensionModel.ts',
+    )
     const appModelFile = getSourceFile(
       'src/canvas/app/workflow/useCanvasAppModel.ts',
     )
@@ -944,11 +977,21 @@ describe('Canvas module boundaries', () => {
     expect(keyboardRouterFile.source).toContain(
       "from './CanvasKeyboardShortcutIntent'",
     )
-    for (const file of [appModelFile, keyboardIntentFile, pointerCommitFile]) {
+    for (const file of [
+      extensionModelFile,
+      keyboardIntentFile,
+      pointerCommitFile,
+    ]) {
       expect(file.source).toContain(
         'CanvasAppCustomCreationToolRuntime',
       )
     }
+    expect(appModelFile.source).toContain(
+      "from './useCanvasAppExtensionModel'",
+    )
+    expect(appModelFile.source).not.toContain(
+      'CanvasAppCustomCreationToolRuntime',
+    )
   })
 
   it('keeps keyboard shortcut intent rules behind a named module', () => {

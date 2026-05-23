@@ -1,5 +1,4 @@
 import {
-  useCallback,
   useMemo,
   useRef,
 } from 'react'
@@ -15,27 +14,17 @@ import {
   type Tool,
 } from '../../entities'
 import { useCanvasCommands } from '../commands/useCanvasCommands'
-import {
-  getCanvasAppCustomCommandStates,
-  runCanvasAppCustomCommand,
-} from '../commands/CanvasAppCustomCommandExecution'
-import type { CanvasAppCustomCommandContext } from '../commands/CanvasAppCustomCommands'
 import { useCanvasComponentInsertion } from '../components/useCanvasComponentInsertion'
 import { useCanvasObjectInspector } from '../inspector/useCanvasObjectInspector'
 import { useCanvasKeyboardShortcuts } from '../keyboard/useCanvasKeyboardShortcuts'
 import { useCanvasPointerDownHandlers } from '../pointer/useCanvasPointerDownHandlers'
 import { useCanvasPointerDragHandlers } from '../pointer/useCanvasPointerDragHandlers'
-import type {
-  CanvasAppEventInput,
-  CanvasAppPointerInput,
-} from '../pointer/CanvasAppPointerInput'
-import {
-  getCanvasAppCustomCreationToolStates,
-  type CanvasAppCustomCreationToolState,
-} from '../tools/CanvasAppCustomCreationToolRuntime'
+import type { CanvasAppCustomCreationToolState } from '../tools/CanvasAppCustomCreationTools'
 import { useCanvasAppStageElement } from '../stage/CanvasAppStageElement'
 import { useCanvasViewportControls } from '../viewport/useCanvasViewportControls'
 import { useCanvasWheelViewport } from '../viewport/useCanvasWheelViewport'
+import { renderCanvasAppStageModel } from './CanvasAppStageModel'
+import { useCanvasAppExtensionModel } from './useCanvasAppExtensionModel'
 import { useCanvasFindReplaceModel } from './useCanvasFindReplaceModel'
 import { useCanvasInteractionModel } from './useCanvasInteractionModel'
 import { useCanvasWorkspaceModel } from './useCanvasWorkspaceModel'
@@ -162,48 +151,21 @@ export function useCanvasAppModel({
     replaceDocumentText,
   })
 
-  const customCommandContext = useMemo<CanvasAppCustomCommandContext>(
-    () => ({
-      commitItemsChange,
-      commitSelection,
-      createId,
-      items,
-      selection,
-      setEditing,
-      viewport,
-    }),
-    [
-      commitItemsChange,
-      commitSelection,
-      createId,
-      items,
-      selection,
-      setEditing,
-      viewport,
-    ],
-  )
-  const customCommandStates = useMemo(
-    () =>
-      getCanvasAppCustomCommandStates({
-        commands: customCommands,
-        context: customCommandContext,
-      }),
-    [customCommandContext, customCommands],
-  )
-  const customCreationToolStates = useMemo(
-    () => getCanvasAppCustomCreationToolStates(customCreationTools),
-    [customCreationTools],
-  )
-  const runCustomCommand = useCallback(
-    (commandId: string) => {
-      runCanvasAppCustomCommand({
-        commandId,
-        commands: customCommands,
-        context: customCommandContext,
-      })
-    },
-    [customCommandContext, customCommands],
-  )
+  const {
+    customCommandStates,
+    customCreationToolStates,
+    runCustomCommand,
+  } = useCanvasAppExtensionModel({
+    commitItemsChange,
+    commitSelection,
+    createId,
+    customCommands,
+    customCreationTools,
+    items,
+    selection,
+    setEditing,
+    viewport,
+  })
 
   const {
     alignSelection,
@@ -357,22 +319,6 @@ export function useCanvasAppModel({
     viewport,
   })
 
-  const handleStageCanvasPointerDown = useCallback(
-    (event: CanvasAppPointerInput) => {
-      blurTextEditor()
-      handleCanvasPointerDown(event)
-    },
-    [blurTextEditor, handleCanvasPointerDown],
-  )
-
-  const handleStageItemPointerDown = useCallback(
-    (event: CanvasAppPointerInput, itemId: string) => {
-      blurTextEditor()
-      handleItemPointerDown(event, itemId)
-    },
-    [blurTextEditor, handleItemPointerDown],
-  )
-
   return {
     componentPalette: {
       components: componentLibrary.templates,
@@ -380,29 +326,27 @@ export function useCanvasAppModel({
     },
     findReplace,
     inspector,
-    stage: renderCanvasAppStage({
-      adapter: stageAdapter,
-      input: {
+    stage: renderCanvasAppStageModel({
+      blurTextEditor,
+      itemLayerAdapter,
+      itemLayerInput: {
+        componentPresentationRenderers,
+        customItemRenderers,
+        getComponentPresentation: componentLibrary.getPresentation,
+        items,
+        onItemPointerDown: handleItemPointerDown,
+        onTextDoubleClick: handleTextDoubleClick,
+        outlineIds: overlays.itemOutlineIds,
+        selected,
+      },
+      stageAdapter,
+      stageInput: {
         activeMode,
-        children: renderCanvasAppItemLayer({
-          adapter: itemLayerAdapter,
-          input: {
-            componentPresentationRenderers,
-            customItemRenderers,
-            getComponentPresentation: componentLibrary.getPresentation,
-            items,
-            onItemPointerDown: handleStageItemPointerDown,
-            onTextDoubleClick: handleTextDoubleClick,
-            outlineIds: overlays.itemOutlineIds,
-            selected,
-          },
-        }),
         gesture,
         overlays,
         stageElement: stageElement.mount,
         viewport,
-        onCanvasPointerDown: handleStageCanvasPointerDown,
-        onContextMenu: (event: CanvasAppEventInput) => event.preventDefault(),
+        onCanvasPointerDown: handleCanvasPointerDown,
         onPointerCancel: handlePointerCancel,
         onPointerMove: handlePointerMove,
         onPointerUp: handlePointerUp,
@@ -457,34 +401,6 @@ export function useCanvasAppModel({
       onZoomIn: () => zoomBy(1.25),
       onZoomOut: () => zoomBy(0.8),
     },
-  }
-}
-
-function renderCanvasAppItemLayer({
-  adapter,
-  input,
-}: {
-  adapter: CanvasAppAssembly['itemLayerAdapter']
-  input: Parameters<CanvasAppAssembly['itemLayerAdapter']['renderItems']>[0]
-}) {
-  try {
-    return adapter.renderItems(input)
-  } catch {
-    return null
-  }
-}
-
-function renderCanvasAppStage({
-  adapter,
-  input,
-}: {
-  adapter: CanvasAppAssembly['stageAdapter']
-  input: Parameters<CanvasAppAssembly['stageAdapter']['renderStage']>[0]
-}) {
-  try {
-    return adapter.renderStage(input)
-  } catch {
-    return null
   }
 }
 

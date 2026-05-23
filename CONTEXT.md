@@ -64,6 +64,8 @@
 - Canvas Pointer Interaction Preview: pointer-move 시 active interaction을 viewport, live item, marquee, selection, draft overlay, snap guide preview로 변환하는 App-owned runtime Module.
 - Canvas Pointer Interaction Lifecycle: pointer-up/cancel 시 active interaction을 문서 변경, selection 변경, edit 진입, cancel rollback으로 확정하거나 되돌리는 App-owned runtime Module.
 - Canvas App Model: App Shell이 렌더링할 control별 view props를 만들고 command, pointer, keyboard, viewport, text editing wiring을 숨기는 workflow Module.
+- Canvas App Extension Model: 외부 custom command/tool descriptor를 toolbar state, custom tool state, custom command run callback으로 바꾸는 workflow Module.
+- Canvas App Stage Model: stage와 item layer Adapter 호출 순서, text editor blur, context menu 차단, render 실패 containment를 소유하는 workflow Module.
 - Canvas Keyboard Shortcut Intent: keydown 입력, feature toggle, selection, custom creation tool shortcut을 실행 가능한 keyboard intent로 변환하는 App-owned runtime Module.
 - Canvas Interaction Model: tool, gesture, marquee, draft, snap guide, overlay state 생명주기를 App Shell에 숨기는 workflow Module.
 - Canvas Workspace Model: Demo workspace의 저장된 snapshot, document history, viewport, read model, id 생성을 App Shell에 숨기는 workflow Module.
@@ -157,6 +159,8 @@
 - App Shell은 concrete Renderer Stage를 직접 import하지 않고 Canvas App Stage Adapter가 만든 stage ReactNode를 배치한다.
 - App workflow와 command/pointer/viewport hook은 raw SVG ref를 직접 읽지 않고 Canvas App Stage Element를 통해 stage DOM 기능을 사용한다.
 - App View는 raw workflow state 대신 Canvas App Model이 조립한 control별 props만 받는다.
+- App Model은 custom command/tool descriptor 실행 세부를 직접 알지 않고 Canvas App Extension Model에서 toolbar/custom tool state와 custom command callback을 받는다.
+- App Model은 stage/item layer Adapter 호출, context menu 차단, text editor blur timing, render 실패 containment를 직접 알지 않고 Canvas App Stage Model에 위임한다.
 - App Shell은 workspace 저장, document history, read model 생성 방식을 직접 알지 않는다.
 - App workflow hook들은 Canvas Item Read Model을 직접 생성하지 않고 Canvas Workspace Model에서 주입받는다.
 - App workflow는 editor/search 상태를 각각의 workflow Module 뒤에 숨긴다.
