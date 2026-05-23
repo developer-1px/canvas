@@ -255,6 +255,7 @@
 - Canvas App Assembly는 주입된 Canvas Component Library의 `templates`, `getTemplate`, `getPresentation` 결과가 일관되지 않으면 실패해야 한다.
 - Canvas App Assembly input은 output type을 부분 노출하지 않고 명시적 필드 계약으로 유지한다.
 - Canvas App Assembly는 내부 표준 Affordance 문법을 외부 구현으로 넘기지 않고, 제품별 feature toggle config만 명시 입력 계약으로 조립한다.
+- Canvas App Affordance Assembly는 제품별 affordance feature toggle override와 default affordance config fallback 조립을 소유한다.
 - Canvas App Shell은 일반 소비자에게 `assemblyInput`을 열고, prebuilt `assembly`는 고급 Host seam으로만 남긴다.
 - App UI surface는 Shell에서 항상 렌더링하지 않고 Canvas Affordance overlay toggle을 view prop으로 소비해 숨긴다.
 - App Model은 Canvas App Assembly output field를 직접 배분하지 않고 Canvas App Assembly Model에서 consumer별 assembly context를 받는다.

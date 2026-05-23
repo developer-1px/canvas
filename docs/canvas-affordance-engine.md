@@ -79,6 +79,7 @@
 | `src/canvas/app/tools/CanvasAppCustomCreationToolRuntime.ts` | Custom creation tool id 변환, toolbar state, lookup, shortcut matching을 소유한다 |
 | `src/canvas/app/workflow/CanvasAppAssembly.ts` | Host item adapter, component library, custom command, custom item module, inspector panel, initial items, SVG presentation registry 같은 제품별 의미를 외부 조립 seam으로 제공한다 |
 | `src/canvas/app/workflow/CanvasAppAdapterAssembly.ts` | Item, item layer, stage adapter fallback을 조립한다 |
+| `src/canvas/app/workflow/CanvasAppAffordanceAssembly.ts` | 제품별 affordance feature toggle override와 default affordance config fallback을 조립한다 |
 | `src/canvas/app/workflow/CanvasAppAssemblyContracts.ts` | 조립된 assembly output의 component library resolver, renderer coverage, custom extension registry, initial item, adapter shape를 검증한다 |
 | `src/canvas/app/workflow/CanvasAppWorkspaceAssembly.ts` | Workspace 초기 items normalization, Demo default selection fallback, storage provider fallback을 조립한다 |
 | `src/canvas/app/workflow/CanvasAppWorkspaceAssemblyContracts.ts` | Workspace 초기 items, 초기 selection, storage provider 계약을 검증하고, selection과 item tree 불일치를 runtime 진입 전에 차단한다 |
@@ -155,6 +156,7 @@ type CanvasAffordanceConfig = {
 - Snap 계열 gesture와 guide overlay도 toggle로 독립 제어한다.
 - Toggle이 꺼져도 문서 상태는 손상하지 않는다.
 - Toggle 기본값은 모두 on이다. App workflow가 필요한 것만 끈다.
+- Canvas App Affordance Assembly는 제품별 feature toggle override와 default affordance config fallback 조립을 소유한다.
 
 ## Extraction State
 

@@ -1,6 +1,5 @@
 import {
   DEFAULT_CANVAS_AFFORDANCE_CONFIG,
-  createCanvasAffordanceConfig,
   type CanvasAffordanceConfig,
   type CanvasAffordanceConfigInput,
 } from '../../engine'
@@ -38,6 +37,7 @@ import type {
 } from '../modules/CanvasAppCustomItemModules'
 import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
 import { createCanvasAppAdapterAssembly } from './CanvasAppAdapterAssembly'
+import { createCanvasAppAffordanceAssembly } from './CanvasAppAffordanceAssembly'
 import { assertCanvasAppAssembly } from './CanvasAppAssemblyContracts'
 import { createCanvasAppComponentAssembly } from './CanvasAppComponentAssembly'
 import { createCanvasAppExtensionAssembly } from './CanvasAppExtensionAssembly'
@@ -125,11 +125,13 @@ export function createCanvasAppAssembly(
     input,
     DEFAULT_CANVAS_APP_ASSEMBLY,
   )
+  const affordanceAssembly = createCanvasAppAffordanceAssembly(
+    input,
+    DEFAULT_CANVAS_APP_ASSEMBLY,
+  )
 
   const assembly: CanvasAppAssembly = {
-    affordanceConfig: input.affordanceConfig === undefined
-      ? DEFAULT_CANVAS_APP_ASSEMBLY.affordanceConfig
-      : createCanvasAffordanceConfig(input.affordanceConfig),
+    affordanceConfig: affordanceAssembly.affordanceConfig,
     componentLibrary: componentAssembly.componentLibrary,
     componentPresentationRenderers:
       componentAssembly.componentPresentationRenderers,
