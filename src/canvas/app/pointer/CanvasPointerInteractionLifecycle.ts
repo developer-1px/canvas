@@ -5,10 +5,6 @@ import type {
 } from '../../entities'
 import { normalizeBounds } from '../../core'
 import {
-  createCanvasArrow,
-  createCanvasHighlight,
-  createCanvasMarker,
-  createCanvasRect,
   getCanvasMarqueeSelection,
   type CanvasCreationAdapter,
   type CanvasSceneAdapter,
@@ -18,8 +14,8 @@ import type {
   CommitCanvasSelection,
 } from '../workflow/CanvasWorkflowContract'
 import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
-import { commitCanvasCustomCreation } from './CanvasCustomCreationCommit'
 import type { Interaction } from './CanvasInteractionState'
+import { commitCanvasPointerCreation } from './CanvasPointerCreationCommit'
 
 export type CanvasPointerInteractionCommitInput = {
   commitItemsChange: CommitCanvasItemsChange
@@ -48,73 +44,21 @@ export function commitCanvasPointerInteraction({
   setSelection,
   setTool,
 }: CanvasPointerInteractionCommitInput) {
-  if (interaction.kind === 'create-rect') {
-    const nextItem = createCanvasRect({
-      adapter: creationAdapter,
-      createId,
-      currentWorld: interaction.currentWorld,
-      startWorld: interaction.startWorld,
-    })
-
-    commitItemsChange({ type: 'add', items: [nextItem] }, {
-      before: selection,
-      after: [nextItem.id],
-    })
-    setTool('select')
-  }
-
-  if (interaction.kind === 'draw-marker') {
-    const nextItem = createCanvasMarker({
-      adapter: creationAdapter,
-      createId,
-      points: interaction.points,
-      startWorld: interaction.startWorld,
-    })
-
-    commitItemsChange({ type: 'add', items: [nextItem] }, {
-      before: selection,
-      after: [nextItem.id],
-    })
-  }
-
-  if (interaction.kind === 'draw-highlight') {
-    const nextItem = createCanvasHighlight({
-      adapter: creationAdapter,
-      createId,
-      points: interaction.points,
-      startWorld: interaction.startWorld,
-    })
-
-    commitItemsChange({ type: 'add', items: [nextItem] }, {
-      before: selection,
-      after: [nextItem.id],
-    })
-  }
-
-  if (interaction.kind === 'create-arrow') {
-    const nextItem = createCanvasArrow({
-      adapter: creationAdapter,
-      createId,
-      currentWorld: interaction.currentWorld,
-      startWorld: interaction.startWorld,
-    })
-
-    commitItemsChange({ type: 'add', items: [nextItem] }, {
-      before: selection,
-      after: [nextItem.id],
-    })
-  }
-
-  if (interaction.kind === 'create-custom') {
-    commitCanvasCustomCreation({
+  if (
+    interaction.kind === 'create-rect' ||
+    interaction.kind === 'draw-marker' ||
+    interaction.kind === 'draw-highlight' ||
+    interaction.kind === 'create-arrow' ||
+    interaction.kind === 'create-custom'
+  ) {
+    commitCanvasPointerCreation({
       commitItemsChange,
+      creationAdapter,
       createId,
       customCreationTools,
-      currentWorld: interaction.currentWorld,
-      moved: interaction.moved,
+      interaction,
       selection,
-      startWorld: interaction.startWorld,
-      tool: interaction.tool,
+      setTool,
     })
   }
 

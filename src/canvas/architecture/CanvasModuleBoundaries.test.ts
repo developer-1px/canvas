@@ -910,6 +910,9 @@ describe('Canvas module boundaries', () => {
     const lifecycleFile = getSourceFile(
       'src/canvas/app/pointer/CanvasPointerInteractionLifecycle.ts',
     )
+    const creationCommitFile = getSourceFile(
+      'src/canvas/app/pointer/CanvasPointerCreationCommit.ts',
+    )
 
     expect(dragHandlersFile.source).toContain(
       "from './CanvasPointerInteractionLifecycle'",
@@ -926,10 +929,23 @@ describe('Canvas module boundaries', () => {
     expect(lifecycleFile.source).toContain(
       'export function cancelCanvasPointerInteraction',
     )
-    expect(lifecycleFile.source).toContain('createCanvasRect({')
-    expect(lifecycleFile.source).toContain('commitCanvasCustomCreation')
+    expect(lifecycleFile.source).toContain(
+      "from './CanvasPointerCreationCommit'",
+    )
+    expect(lifecycleFile.source).not.toContain('createCanvasRect({')
+    expect(lifecycleFile.source).not.toContain('createCanvasMarker({')
+    expect(lifecycleFile.source).not.toContain('createCanvasArrow({')
+    expect(lifecycleFile.source).not.toContain('commitCanvasCustomCreation')
     expect(lifecycleFile.source).toContain("type: 'transform'")
     expect(lifecycleFile.source).toContain('setEditing(interaction.edit)')
+    expect(creationCommitFile.source).toContain(
+      'export function commitCanvasPointerCreation',
+    )
+    expect(creationCommitFile.source).toContain('createCanvasRect({')
+    expect(creationCommitFile.source).toContain('createCanvasMarker({')
+    expect(creationCommitFile.source).toContain('createCanvasHighlight({')
+    expect(creationCommitFile.source).toContain('createCanvasArrow({')
+    expect(creationCommitFile.source).toContain('commitCanvasCustomCreation')
   })
 
   it('keeps pointer interaction preview rules behind a named module', () => {

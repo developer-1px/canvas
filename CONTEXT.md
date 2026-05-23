@@ -88,6 +88,7 @@
 - Canvas Resize Pointer Interaction Start: resize handle pointer-down 시 selected bounds, handle, selection, item snapshot을 resize interaction 시작 상태로 변환하는 App-owned runtime Module.
 - Canvas Pointer Interaction Preview: pointer-move 시 active interaction을 viewport, live item, marquee, selection, draft overlay, snap guide preview로 변환하는 App-owned runtime Module.
 - Canvas Pointer Creation Preview: create-rect, marker, highlighter, arrow, custom creation의 draft overlay와 currentWorld/moved preview를 소유하는 App-owned runtime Module.
+- Canvas Pointer Creation Commit: create-rect, marker, highlighter, arrow, custom creation의 document add commit과 post-create tool 전환 규칙을 소유하는 App-owned runtime Module.
 - Canvas Pointer Interaction Movement: drag threshold 기반 moved 판정을 pointer interaction preview/start/lifecycle Module들이 공유하는 App-owned runtime Module.
 - Canvas Pointer Interaction Lifecycle: pointer-up/cancel 시 active interaction을 문서 변경, selection 변경, edit 진입, cancel rollback으로 확정하거나 되돌리는 App-owned runtime Module.
 - Canvas App Model: App Shell이 렌더링할 control별 view props를 만들고 command, pointer, keyboard, viewport, text editing wiring을 숨기는 workflow Module.
@@ -176,6 +177,7 @@
 - Resize pointer down hook은 DOM event routing과 시작 결과 적용을 맡고, resize handle/selected bounds/config 기반 시작 규칙은 Canvas Resize Pointer Interaction Start가 소유한다.
 - Text double-click hook은 시작 결과 적용을 맡고, text edit 가능 여부/selection/edit state/tool 전환 규칙은 Canvas Item Pointer Interaction Start가 소유한다.
 - Pointer drag hook은 DOM pointer routing과 preview 결과 적용을 맡고, pointer-move live preview 계산은 Canvas Pointer Interaction Preview가, 생성/드로잉 draft preview는 Canvas Pointer Creation Preview가, pointer-up/cancel 확정 규칙은 Canvas Pointer Interaction Lifecycle이 소유한다.
+- Canvas Pointer Interaction Lifecycle은 생성/드로잉 item commit 세부를 직접 알지 않고 Canvas Pointer Creation Commit에 위임한다.
 - 제품별 item kind는 내부 `CanvasItem` union에 새 variant를 추가하지 않고 Canvas App Custom Item Module로 등록한다.
 - Canvas App Custom Item Module은 `id`, `presentation`, `renderItem`, `validateItem`을 외부 Interface로 받고, renderer registry와 validator registry는 내부에서 조립한다.
 - Canvas App Custom Item Module descriptor/assembly, contract validation, module-owned creation/validator runtime은 분리하고, validation은 Canvas App Custom Item Module Contracts가, runtime containment는 Canvas App Custom Item Module Runtime이 소유한다.
