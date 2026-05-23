@@ -39,7 +39,12 @@ export function readCanvasDocumentClipboardItems(
   }
 
   const payload = Array.isArray(read.payload) ? read.payload : [read.payload]
-  return validateCanvasItems(payload as CanvasItem[], validation)
+
+  try {
+    return validateCanvasItems(payload as CanvasItem[], validation)
+  } catch {
+    return []
+  }
 }
 
 export function writeCanvasDocumentClipboardItems(
@@ -47,7 +52,15 @@ export function writeCanvasDocumentClipboardItems(
   items: CanvasItem[],
   validation?: CanvasItemValidationOptions,
 ) {
-  const result = document.clipboard.write(validateCanvasItems(items, validation))
+  let validItems: CanvasItem[]
+
+  try {
+    validItems = validateCanvasItems(items, validation)
+  } catch {
+    return false
+  }
+
+  const result = document.clipboard.write(validItems)
 
   return result.ok
 }

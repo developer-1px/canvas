@@ -343,6 +343,39 @@ describe('CanvasDocument history', () => {
     ])
   })
 
+  test('contains invalid drawing items at the document clipboard seam', () => {
+    const document = createCanvasItemsDocument(INITIAL_ITEMS)
+    const markerItem: CanvasItem = {
+      h: 24,
+      id: 'marker-1',
+      opacity: 1,
+      points: [
+        { x: 10, y: 20 },
+        { x: 30, y: 40 },
+      ],
+      stroke: '#475569',
+      strokeWidth: 4,
+      type: 'marker',
+      w: 24,
+      x: 8,
+      y: 18,
+    }
+    const invalidMarkerItem = {
+      ...markerItem,
+      opacity: 0,
+    }
+
+    expect(
+      writeCanvasDocumentClipboardItems(document, [invalidMarkerItem]),
+    ).toBe(false)
+    expect(readCanvasDocumentClipboardItems(document)).toEqual([])
+
+    expect(writeCanvasDocumentClipboardItems(document, [markerItem])).toBe(true)
+    document.clipboard.write([invalidMarkerItem])
+
+    expect(readCanvasDocumentClipboardItems(document)).toEqual([])
+  })
+
   test('commits duplicate clones through zod-crud add patches', () => {
     const document = createCanvasItemsDocument(INITIAL_ITEMS)
     const clones = cloneCanvasItemsWithNewIds(
