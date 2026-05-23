@@ -439,6 +439,31 @@ describe('Canvas module boundaries', () => {
     )
   })
 
+  it('keeps app component insertion wiring behind a named workflow module', () => {
+    const appModelFile = getSourceFile(
+      'src/canvas/app/workflow/useCanvasAppModel.ts',
+    )
+    const componentModelFile = getSourceFile(
+      'src/canvas/app/workflow/useCanvasAppComponentModel.ts',
+    )
+
+    expect(appModelFile.source).toContain(
+      "from './useCanvasAppComponentModel'",
+    )
+    expect(appModelFile.source).not.toContain(
+      "from '../components/useCanvasComponentInsertion'",
+    )
+    expect(appModelFile.source).not.toContain('useCanvasComponentInsertion')
+    expect(componentModelFile.source).toContain(
+      "from '../components/useCanvasComponentInsertion'",
+    )
+    expect(componentModelFile.source).toContain(
+      'export function useCanvasAppComponentModel',
+    )
+    expect(componentModelFile.source).toContain('componentLibrary')
+    expect(componentModelFile.source).toContain('selection: workspace.selection')
+  })
+
   it('keeps app inspector wiring behind a named workflow module', () => {
     const appModelFile = getSourceFile(
       'src/canvas/app/workflow/useCanvasAppModel.ts',

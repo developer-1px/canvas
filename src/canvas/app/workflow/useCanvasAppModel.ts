@@ -5,11 +5,11 @@ import {
 import {
   DEFAULT_CANVAS_AFFORDANCE_CONFIG,
 } from '../../engine'
-import { useCanvasComponentInsertion } from '../components/useCanvasComponentInsertion'
 import { useCanvasAppStageElement } from '../stage/CanvasAppStageElement'
 import { getCanvasAppControlModel } from './CanvasAppControlModel'
 import { renderCanvasAppStageModel } from './CanvasAppStageModel'
 import { useCanvasAppCommandModel } from './useCanvasAppCommandModel'
+import { useCanvasAppComponentModel } from './useCanvasAppComponentModel'
 import { useCanvasAppExtensionModel } from './useCanvasAppExtensionModel'
 import { useCanvasAppInspectorModel } from './useCanvasAppInspectorModel'
 import { useCanvasAppKeyboardModel } from './useCanvasAppKeyboardModel'
@@ -250,15 +250,21 @@ export function useCanvasAppModel({
     },
   })
 
-  const insertComponent = useCanvasComponentInsertion({
+  const components = useCanvasAppComponentModel({
+    command: {
+      commitItemsChange,
+    },
     componentLibrary,
-    commitItemsChange,
     createId,
-    selection,
-    setEditing,
-    setTool,
+    interaction: {
+      setEditing,
+      setTool,
+    },
     stageElement,
-    viewport,
+    workspace: {
+      selection,
+      viewport,
+    },
   })
 
   const controls = getCanvasAppControlModel({
@@ -279,7 +285,7 @@ export function useCanvasAppModel({
     onDuplicate: commands.duplicateSelection,
     onFitItems: viewportControls.fitToItems,
     onGroup: commands.groupSelection,
-    onInsertComponent: insertComponent,
+    onInsertComponent: components.insertComponent,
     onLock: commands.lockSelection,
     onRedo: commands.redoHistory,
     onRunCustomCommand: runCustomCommand,

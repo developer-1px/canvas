@@ -78,6 +78,7 @@
 - Canvas Pointer Interaction Lifecycle: pointer-up/cancel 시 active interaction을 문서 변경, selection 변경, edit 진입, cancel rollback으로 확정하거나 되돌리는 App-owned runtime Module.
 - Canvas App Model: App Shell이 렌더링할 control별 view props를 만들고 command, pointer, keyboard, viewport, text editing wiring을 숨기는 workflow Module.
 - Canvas App Command Model: App Model이 document, clipboard, history, stage context를 직접 모아 command hook을 조립하지 않도록 command handlers를 만드는 workflow Module.
+- Canvas App Component Model: App Model이 component insertion의 component library, document commit, selection, stage, viewport wiring 세부를 직접 알지 않도록 component handlers를 만드는 workflow Module.
 - Canvas App Control Model: component palette, toolbar, status, zoom controls props를 만들고 command availability, status label, selected fit target 규칙을 숨기는 workflow Module.
 - Canvas App Extension Model: 외부 custom command/tool descriptor를 toolbar state, custom tool state, custom command run callback으로 바꾸는 workflow Module.
 - Canvas App Inspector Model: App Model이 inspector panel list, read model, selection wiring 세부를 직접 알지 않도록 object inspector props를 만드는 workflow Module.
@@ -192,6 +193,7 @@
 - App workflow와 command/pointer/viewport hook은 raw SVG ref를 직접 읽지 않고 Canvas App Stage Element를 통해 stage DOM 기능을 사용한다.
 - App View는 raw workflow state 대신 Canvas App Model이 조립한 control별 props만 받는다.
 - App Model은 command hook context wiring 세부를 직접 알지 않고 Canvas App Command Model에서 command handlers를 받는다.
+- App Model은 component insertion hook context wiring 세부를 직접 알지 않고 Canvas App Component Model에서 component handlers를 받는다.
 - App Model은 control별 view props, command availability, status label, selected fit target 규칙을 직접 알지 않고 Canvas App Control Model에 위임한다.
 - App Model은 custom command/tool descriptor 실행 세부를 직접 알지 않고 Canvas App Extension Model에서 toolbar/custom tool state와 custom command callback을 받는다.
 - App Model은 inspector panel wiring 세부를 직접 알지 않고 Canvas App Inspector Model에서 object inspector props를 받는다.
