@@ -764,6 +764,12 @@ describe('Canvas module boundaries', () => {
     const commandConsumerModelFile = getSourceFile(
       'src/canvas/app/workflow/CanvasAppCommandConsumerModel.ts',
     )
+    const commandHookFile = getSourceFile(
+      'src/canvas/app/commands/useCanvasCommands.ts',
+    )
+    const standardCommandHandlersFile = getSourceFile(
+      'src/canvas/app/commands/CanvasStandardCommandHandlers.ts',
+    )
 
     expect(appModelFile.source).toContain(
       "from './useCanvasAppCommandModel'",
@@ -798,6 +804,33 @@ describe('Canvas module boundaries', () => {
     expect(commandConsumerModelFile.source).toContain('pointer: {')
     expect(appModelFile.source).not.toMatch(/commands\.\w+Selection/)
     expect(appModelFile.source).not.toContain('commands.cloneItems')
+    expect(commandHookFile.source).toContain(
+      "from './CanvasStandardCommandHandlers'",
+    )
+    for (const standardCommandHandlerDetail of [
+      "kind: 'align'",
+      "kind: 'delete'",
+      "kind: 'distribute'",
+      "kind: 'group'",
+      "kind: 'lock'",
+      "kind: 'nudge'",
+      "kind: 'redo'",
+      "kind: 'reorder'",
+      "kind: 'select-all'",
+      "kind: 'undo'",
+      "kind: 'ungroup'",
+      "kind: 'unlock-all'",
+    ]) {
+      expect(commandHookFile.source).not.toContain(
+        standardCommandHandlerDetail,
+      )
+      expect(standardCommandHandlersFile.source).toContain(
+        standardCommandHandlerDetail,
+      )
+    }
+    expect(standardCommandHandlersFile.source).toContain(
+      'export function getCanvasStandardCommandHandlers',
+    )
   })
 
   it('keeps app component insertion wiring behind a named workflow module', () => {

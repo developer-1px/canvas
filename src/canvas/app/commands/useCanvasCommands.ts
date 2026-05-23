@@ -1,14 +1,12 @@
 import {
   useCallback,
+  useMemo,
   type Dispatch,
   type SetStateAction,
 } from 'react'
 import type {
   CanvasAffordanceConfig,
-  CanvasAlignMode,
   CanvasCommandAdapter,
-  CanvasDistributeMode,
-  CanvasReorderMode,
 } from '../../engine'
 import type {
   CanvasItem,
@@ -25,6 +23,7 @@ import {
   executeCanvasStandardCommand,
   type CanvasStandardCommand,
 } from './CanvasStandardCommandExecution'
+import { getCanvasStandardCommandHandlers } from './CanvasStandardCommandHandlers'
 import { useCanvasClipboardCommands } from './useCanvasClipboardCommands'
 
 type UseCanvasCommandsArgs = {
@@ -120,83 +119,17 @@ export function useCanvasCommands({
     ],
   )
 
-  const alignSelection = useCallback(
-    (mode: CanvasAlignMode) => {
-      runStandardCommand({ kind: 'align', mode })
-    },
+  const standardCommandHandlers = useMemo(
+    () => getCanvasStandardCommandHandlers(runStandardCommand),
     [runStandardCommand],
   )
-
-  const distributeSelection = useCallback(
-    (mode: CanvasDistributeMode) => {
-      runStandardCommand({ kind: 'distribute', mode })
-    },
-    [runStandardCommand],
-  )
-
-  const deleteSelection = useCallback(() => {
-    runStandardCommand({ kind: 'delete' })
-  }, [runStandardCommand])
-
-  const groupSelection = useCallback(() => {
-    runStandardCommand({ kind: 'group' })
-  }, [runStandardCommand])
-
-  const ungroupSelection = useCallback(() => {
-    runStandardCommand({ kind: 'ungroup' })
-  }, [runStandardCommand])
-
-  const lockSelection = useCallback(() => {
-    runStandardCommand({ kind: 'lock' })
-  }, [runStandardCommand])
-
-  const unlockAll = useCallback(() => {
-    runStandardCommand({ kind: 'unlock-all' })
-  }, [runStandardCommand])
-
-  const undoHistory = useCallback(() => {
-    runStandardCommand({ kind: 'undo' })
-  }, [runStandardCommand])
-
-  const redoHistory = useCallback(() => {
-    runStandardCommand({ kind: 'redo' })
-  }, [runStandardCommand])
-
-  const moveSelection = useCallback(
-    (dx: number, dy: number) => {
-      runStandardCommand({ dx, dy, kind: 'nudge' })
-    },
-    [runStandardCommand],
-  )
-
-  const reorderSelection = useCallback(
-    (mode: CanvasReorderMode) => {
-      runStandardCommand({ kind: 'reorder', mode })
-    },
-    [runStandardCommand],
-  )
-
-  const selectAll = useCallback(() => {
-    runStandardCommand({ kind: 'select-all' })
-  }, [runStandardCommand])
 
   return {
-    alignSelection,
     cloneItems,
     copySelection,
     cutSelection,
-    deleteSelection,
-    distributeSelection,
     duplicateSelection,
-    groupSelection,
-    lockSelection,
-    moveSelection,
     pasteSelection,
-    redoHistory,
-    reorderSelection,
-    selectAll,
-    undoHistory,
-    ungroupSelection,
-    unlockAll,
+    ...standardCommandHandlers,
   }
 }
