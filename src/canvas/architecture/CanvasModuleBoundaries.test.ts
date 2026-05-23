@@ -1102,6 +1102,9 @@ describe('Canvas module boundaries', () => {
     const startFile = getSourceFile(
       'src/canvas/app/pointer/CanvasPointerInteractionStart.ts',
     )
+    const creationStartFile = getSourceFile(
+      'src/canvas/app/pointer/CanvasPointerCreationStart.ts',
+    )
 
     expect(downHandlersFile.source).toContain(
       "from './CanvasPointerInteractionStart'",
@@ -1118,11 +1121,24 @@ describe('Canvas module boundaries', () => {
     expect(startFile.source).toContain(
       'export function startCanvasPointerInteraction',
     )
+    expect(startFile.source).toContain(
+      "from './CanvasPointerCreationStart'",
+    )
     expect(startFile.source).toContain('getCanvasPointerGesture')
     expect(startFile.source).toContain('isAdditivePointerInput')
-    expect(startFile.source).toContain('createCanvasText')
-    expect(startFile.source).toContain('getCanvasAppCustomCreationTool')
-    expect(startFile.source).toContain('createCanvasDraftStroke')
+    expect(startFile.source).not.toContain('createCanvasText')
+    expect(startFile.source).not.toContain(
+      'getCanvasAppCustomCreationTool',
+    )
+    expect(startFile.source).not.toContain('createCanvasDraftStroke')
+    expect(creationStartFile.source).toContain(
+      'export function startCanvasPointerCreation',
+    )
+    expect(creationStartFile.source).toContain('createCanvasText')
+    expect(creationStartFile.source).toContain(
+      'getCanvasAppCustomCreationTool',
+    )
+    expect(creationStartFile.source).toContain('createCanvasDraftStroke')
   })
 
   it('keeps pointer interaction start effects behind a named module', () => {
