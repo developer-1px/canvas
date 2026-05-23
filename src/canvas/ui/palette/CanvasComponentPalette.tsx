@@ -1,5 +1,5 @@
 import {
-  CANVAS_COMPONENT_TEMPLATES,
+  CANVAS_COMPONENT_LIBRARY,
   type CanvasComponentTemplate,
 } from '../../host'
 import type { CanvasComponentKind } from '../../host/model'
@@ -13,7 +13,7 @@ export function CanvasComponentPalette({
 }: CanvasComponentPaletteProps) {
   return (
     <div className="component-palette" role="toolbar" aria-label="Components">
-      {CANVAS_COMPONENT_TEMPLATES.map((template) => (
+      {CANVAS_COMPONENT_LIBRARY.templates.map((template) => (
         <button
           key={template.id}
           type="button"

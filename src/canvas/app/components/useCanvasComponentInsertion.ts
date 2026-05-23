@@ -8,7 +8,7 @@ import type {
   Tool,
   Viewport,
 } from '../../core'
-import { createCanvasComponentItem } from '../../host'
+import { CANVAS_COMPONENT_LIBRARY } from '../../host'
 import type {
   CanvasComponentKind,
   EditingText,
@@ -43,7 +43,7 @@ export function useCanvasComponentInsertion({
             y: (rect.height / 2 - viewport.y) / viewport.scale,
           }
         : { x: 120, y: 120 }
-      const nextItem = createCanvasComponentItem({
+      const nextItem = CANVAS_COMPONENT_LIBRARY.createItem({
         id: createId('component'),
         point,
         templateId: component,

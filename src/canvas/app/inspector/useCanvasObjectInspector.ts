@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react'
 import type { Bounds } from '../../core'
 import type { CanvasItem } from '../../host/model'
-import { findCanvasItem, unionBounds } from '../../host'
+import { createCanvasItemReadModel } from '../../host'
 import type { CommitCanvasItemsChange } from '../document/useCanvasDocument'
 
 type UseCanvasObjectInspectorArgs = {
@@ -17,16 +17,14 @@ export function useCanvasObjectInspector({
   selected,
   selection,
 }: UseCanvasObjectInspectorArgs) {
+  const itemReadModel = useMemo(() => createCanvasItemReadModel(items), [items])
   const bounds = useMemo(
-    () => unionBounds(items, selected),
-    [items, selected],
+    () => itemReadModel.getSelectionBounds(selected),
+    [itemReadModel, selected],
   )
   const selectedItems = useMemo(
-    () =>
-      selection
-        .map((id) => findCanvasItem(items, id))
-        .filter((item): item is CanvasItem => item !== undefined),
-    [items, selection],
+    () => itemReadModel.getSelectedItems(selection),
+    [itemReadModel, selection],
   )
   const label = getInspectorLabel(selectedItems, selection.length)
   const disabled = selectedItems.some((item) => item.locked === true)

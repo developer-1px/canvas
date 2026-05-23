@@ -22,8 +22,7 @@ import { INITIAL_VIEWPORT } from '../../core'
 import {
   CANVAS_ITEM_ENGINE_ADAPTERS,
   INITIAL_ITEMS,
-  createCanvasItemScene,
-  findEditableTextItem,
+  createCanvasItemReadModel,
 } from '../../host'
 import type { Interaction } from '../pointer/CanvasInteractionState'
 import { useCanvasPointerDragHandlers } from '../pointer/useCanvasPointerDragHandlers'
@@ -91,8 +90,9 @@ function CanvasApp() {
   const [findQuery, setFindQuery] = useState('')
   const [findReplacement, setFindReplacement] = useState('')
 
-  const selected = useMemo(() => new Set(selection), [selection])
-  const scene = useMemo(() => createCanvasItemScene(items), [items])
+  const selected = useMemo(() => new Set<string>(selection), [selection])
+  const itemReadModel = useMemo(() => createCanvasItemReadModel(items), [items])
+  const scene = itemReadModel.scene
   const selectedBounds = useMemo(() => scene.getBounds(selection), [scene, selection])
   const inspector = useCanvasObjectInspector({
     commitItemsChange,
@@ -124,7 +124,9 @@ function CanvasApp() {
       }),
     [draftRect, marquee, scene, selection, snapGuides, viewport],
   )
-  const editingItem = editing ? findEditableTextItem(items, editing.id) : null
+  const editingItem = editing
+    ? itemReadModel.findEditableTextItem(editing.id)
+    : null
   const activeMode = spaceDown ? 'pan' : tool
   const findMatches = findDocumentText(findQuery)
   const findMatchCount = findMatches.reduce(

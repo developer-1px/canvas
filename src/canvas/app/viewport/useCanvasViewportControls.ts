@@ -11,7 +11,7 @@ import {
   INITIAL_VIEWPORT,
   zoomViewport,
 } from '../../core'
-import { flattenCanvasItems, unionBounds } from '../../host'
+import { createCanvasItemReadModel } from '../../host'
 
 type UseCanvasViewportControlsArgs = {
   items: CanvasItem[]
@@ -26,11 +26,12 @@ export function useCanvasViewportControls({
 }: UseCanvasViewportControlsArgs) {
   const fitToItems = useCallback(
     (ids?: string[]) => {
+      const itemReadModel = createCanvasItemReadModel(items)
       const targetIds =
         ids && ids.length > 0
           ? ids
-          : flattenCanvasItems(items).map((entry) => entry.item.id)
-      const bounds = unionBounds(items, new Set(targetIds))
+          : itemReadModel.getAllIds()
+      const bounds = itemReadModel.getSelectionBounds(targetIds)
       const rect = svgRef.current?.getBoundingClientRect()
 
       if (!bounds || !rect) {

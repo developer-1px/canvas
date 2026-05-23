@@ -5,7 +5,7 @@ import type {
   TextItem
 } from '../../host/model'
 import { CanvasSvgSelectionOutline } from './CanvasSvgOverlayRenderer'
-import { getItemBounds } from '../../host'
+import { getCanvasItemBounds } from '../../host'
 import { CanvasSvgComponentRenderer } from './CanvasSvgComponentRenderer'
 
 type CanvasSvgItemRendererProps = {
@@ -65,7 +65,7 @@ function renderCanvasItem({
   const isSelected = selected.has(item.id)
   const isLocked = locked || item.locked === true
   const hasOutline = outlineIds.has(item.id)
-  const bounds = getItemBounds(item)
+  const bounds = getCanvasItemBounds(item)
 
   if (item.type === 'group') {
     return (

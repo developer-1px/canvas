@@ -20,29 +20,20 @@ export const CANVAS_ITEM_ENGINE_ADAPTERS = {
 }
 
 export {
-  CANVAS_COMPONENT_TEMPLATES,
-  getCanvasComponentTemplate,
+  CANVAS_COMPONENT_LIBRARY,
+  type CanvasComponentLibrary,
   type CanvasComponentTemplate,
-} from './component/CanvasComponentCatalog'
-export { createCanvasComponentItem } from './component/CanvasComponentFactory'
+} from './component/CanvasComponentLibrary'
 export { INITIAL_ITEMS } from './component/CanvasInitialItems'
 
-export { createCanvasItemScene } from './adapters/CanvasItemSceneAdapter'
-
 export {
-  findCanvasItem,
-  findEditableTextItem,
-  flattenCanvasItems,
-  getItemBounds,
-  getItemsBounds,
-  pruneNestedSelection,
-  unionBounds,
-} from './tree/CanvasTree'
+  createCanvasItemReadModel,
+  getCanvasItemBounds,
+  getCanvasItemsBounds,
+  type CanvasItemReadModel,
+} from './read/CanvasItemReadModel'
 
-export {
-  commitCanvasItemsChange,
-  type CanvasItemsChange,
-} from './document/CanvasDocumentChanges'
+export type { CanvasItemsChange } from './document/CanvasDocumentChanges'
 export {
   createCanvasDocumentController,
   type CanvasDocumentClipboard,

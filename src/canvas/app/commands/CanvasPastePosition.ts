@@ -4,7 +4,7 @@ import {
 } from '../../engine'
 import type { Point } from '../../core'
 import type { CanvasItem } from '../../host/model'
-import { getItemsBounds } from '../../host'
+import { getCanvasItemsBounds } from '../../host'
 
 export function getCanvasPasteOffset({
   clipboard,
@@ -19,7 +19,7 @@ export function getCanvasPasteOffset({
     return CANVAS_COMMAND_INSERT_OFFSET
   }
 
-  const bounds = getItemsBounds(clipboard)
+  const bounds = getCanvasItemsBounds(clipboard)
 
   if (!bounds) {
     return CANVAS_COMMAND_INSERT_OFFSET

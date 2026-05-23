@@ -35,7 +35,7 @@ import {
   type CanvasCreationAdapter,
   type CanvasSceneAdapter,
 } from '../../engine'
-import { findEditableTextItem } from '../../host'
+import { createCanvasItemReadModel } from '../../host'
 import type {
   CommitCanvasItemsChange,
   CommitCanvasSelection,
@@ -223,7 +223,7 @@ export function useCanvasPointerDownHandlers({
     })
     const editItem =
       itemIntent.textEdit
-        ? findEditableTextItem(items, itemId)
+        ? createCanvasItemReadModel(items).findEditableTextItem(itemId)
         : null
     const itemSelection = getCanvasItemPointerSelection({
       additive: itemIntent.additive,

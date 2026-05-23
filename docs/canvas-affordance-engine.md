@@ -32,8 +32,10 @@
 | `src/canvas/engine` | Host item과 renderer를 모르는 조작 규칙. 외부 소비자는 `src/canvas/engine` public facade를 사용한다 |
 | `src/canvas/engine/snap` | Grid, alignment, spacing snap과 guide 계산 |
 | `src/canvas/host/model` | Demo canvas item model. Core 재사용 계약에 포함하지 않는다 |
-| `src/canvas/host` | Demo canvas item schema, document, document selection, initial data, catalog, factory |
+| `src/canvas/host` | Demo canvas item public facade |
+| `src/canvas/host/component/CanvasComponentLibrary.ts` | Demo component template 목록과 component item 생성을 함께 제공한다 |
 | `src/canvas/host/document/CanvasDocumentController.ts` | App workflow가 사용하는 Host Document Controller. zod-crud, JSON Patch, selection snapshot, clipboard 구현을 숨긴다 |
+| `src/canvas/host/read/CanvasItemReadModel.ts` | Demo item tree 조회, bounds, selection 정규화, Scene Adapter 생성을 tree helper 구현 없이 제공한다 |
 | `src/canvas/host/operations` | Transform, text, clone, remove, group item operations |
 | `src/canvas/host/tree` | Bounds, traversal, selection tree helpers |
 | `src/canvas/host/adapters` | Demo host item을 engine interface에 맞추는 adapter |
@@ -82,7 +84,8 @@ type CanvasAffordanceConfig = {
 - Engine Module은 Demo `CanvasItem`, `CanvasOperations`, `CanvasTree`, SVG Renderer를 import하지 않는다.
 - Host domain Module은 Engine 구현 파일을 import하지 않는다. Engine Adapter 타입은 `src/canvas/engine` public facade에서 받는다.
 - App workflow는 Host document 구현 파일을 import하지 않는다. 문서 변경, history, selection, clipboard, text search는 Host Document Controller를 통해 사용한다.
-- App workflow는 `CANVAS_ITEM_COMMAND_ADAPTER`, `CANVAS_ITEM_CREATION_ADAPTER`, `CANVAS_ITEM_TRANSFORM_ADAPTER`, `createCanvasItemScene`을 주입한다.
+- App workflow는 Host tree helper를 import하지 않는다. item 조회, bounds, selection 정규화, Scene Adapter 생성은 Canvas Item Read Model을 통해 사용한다.
+- App workflow는 `CANVAS_ITEM_ENGINE_ADAPTERS`를 통해 concrete item adapter를 주입한다.
 - Renderer Adapter는 `CanvasOverlayState`를 받아 SVG로 그리며, Engine은 SVG/DOM 구현을 모른다.
 
 추출 순서는 동작 변경 없이 app workflow에서 Engine 책임을 하나씩 떼어내는 방식으로 진행한다.

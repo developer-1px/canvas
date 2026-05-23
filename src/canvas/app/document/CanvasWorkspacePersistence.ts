@@ -7,9 +7,8 @@ import {
   MIN_SCALE,
 } from '../../core'
 import {
-  flattenCanvasItems,
+  createCanvasItemReadModel,
   normalizeCanvasItems,
-  pruneNestedSelection,
 } from '../../host'
 
 export const CANVAS_WORKSPACE_STORAGE_KEY =
@@ -120,8 +119,9 @@ export function createCanvasWorkspaceSnapshot({
 }
 
 export function getCanvasItemIdSeed(items: CanvasItem[]) {
-  const numericSuffixes = flattenCanvasItems(items)
-    .map(({ item }) => item.id.match(/-(\d+)$/)?.[1])
+  const numericSuffixes = createCanvasItemReadModel(items)
+    .getAllIds()
+    .map((id) => id.match(/-(\d+)$/)?.[1])
     .filter((value): value is string => value !== undefined)
     .map((value) => Number.parseInt(value, 10))
     .filter(Number.isFinite)
@@ -161,12 +161,13 @@ function sanitizeCanvasSelection(items: CanvasItem[], value: unknown) {
     return []
   }
 
-  const itemIds = new Set(flattenCanvasItems(items).map(({ item }) => item.id))
+  const itemReadModel = createCanvasItemReadModel(items)
+  const itemIds = new Set(itemReadModel.getAllIds())
   const selection = value.filter(
     (id): id is string => typeof id === 'string' && itemIds.has(id),
   )
 
-  return pruneNestedSelection(items, selection)
+  return itemReadModel.getSelection(selection)
 }
 
 function normalizeViewport(value: unknown): Viewport | null {
