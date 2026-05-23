@@ -30,6 +30,7 @@
 - Canvas App Assembly Contracts: assembly output의 component library consistency, renderer coverage, extension registry, item adapter shape, initial item validity를 검증하는 App-owned contract Module.
 - Canvas App Adapter Contracts: Host item adapter, item layer Adapter, stage Adapter의 필수 함수 slot을 검증하는 App-owned contract Module.
 - Canvas App Assembly Snapshot: 조립된 assembly output을 외부 mutation에서 보호하기 위해 component library, extension registry, initial item, adapter를 snapshot/freeze 하는 App-owned Module.
+- Canvas App Adapter Snapshot: Host item adapter, item layer Adapter, stage Adapter의 snapshot/freeze 규칙을 소유하는 App-owned Module.
 - Canvas App Rendering Contracts: 외부 조립자가 component/custom item renderer를 등록할 때 쓰는 App-owned authoring Interface. Demo SVG registry type name에 기대지 않는다.
 - Canvas App Stage Adapter: App Shell이 concrete Renderer Stage를 직접 import하지 않고 stage ReactNode를 받도록 만드는 Adapter Interface.
 - Canvas App Stage Element: stage DOM element의 bounds, pointer capture, wheel listener를 한 Module에 숨기는 App-owned element Adapter.
@@ -209,6 +210,7 @@
 - App Shell은 concrete Renderer Stage를 직접 import하지 않고 Canvas App Stage Adapter가 만든 stage ReactNode를 배치한다.
 - App workflow와 command/pointer/viewport hook은 raw SVG ref를 직접 읽지 않고 Canvas App Stage Element를 통해 stage DOM 기능을 사용한다.
 - Canvas App Assembly Contracts는 Adapter 함수 slot 세부를 직접 검증하지 않고 Canvas App Adapter Contracts에 위임한다.
+- Canvas App Assembly Snapshot은 Adapter snapshot/freeze 세부를 직접 알지 않고 Canvas App Adapter Snapshot에 위임한다.
 - App Model은 Stage Element Adapter를 직접 fan-out하지 않고 Canvas App Stage Element Model에서 consumer별 stage element context를 받는다.
 - App View는 raw workflow state 대신 Canvas App Model이 조립한 control별 props만 받는다.
 - App Model은 command hook context wiring 세부를 직접 알지 않고 Canvas App Command Model에서 command handlers를 받는다.

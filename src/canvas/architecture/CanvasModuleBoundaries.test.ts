@@ -1980,6 +1980,9 @@ describe('Canvas module boundaries', () => {
     const snapshotFile = getSourceFile(
       'src/canvas/app/workflow/CanvasAppAssemblySnapshot.ts',
     )
+    const adapterSnapshotFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppAdapterSnapshot.ts',
+    )
 
     expect(assemblyFile.source).toContain(
       "from './CanvasAppAssemblySnapshot'",
@@ -1992,6 +1995,30 @@ describe('Canvas module boundaries', () => {
     expect(snapshotFile.source).toContain('deepFreezeCanvasAppValue')
     expect(snapshotFile.source).toContain('freezeCanvasAppRecord')
     expect(snapshotFile.source).toContain('freezeCanvasAppArray')
+    expect(snapshotFile.source).toContain(
+      "from './CanvasAppAdapterSnapshot'",
+    )
+    expect(snapshotFile.source).not.toContain(
+      'function snapshotCanvasAppItemAdapters',
+    )
+    expect(snapshotFile.source).not.toContain(
+      'itemLayerAdapter: Object.freeze',
+    )
+    expect(snapshotFile.source).not.toContain(
+      'stageAdapter: Object.freeze',
+    )
+    expect(adapterSnapshotFile.source).toContain(
+      'export function snapshotCanvasAppAssemblyAdapters',
+    )
+    expect(adapterSnapshotFile.source).toContain(
+      'function snapshotCanvasAppItemAdapters',
+    )
+    expect(adapterSnapshotFile.source).toContain(
+      'itemLayerAdapter: Object.freeze',
+    )
+    expect(adapterSnapshotFile.source).toContain(
+      'stageAdapter: Object.freeze',
+    )
   })
 
   it('keeps App Assembly output contracts behind a named module', () => {

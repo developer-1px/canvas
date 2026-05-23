@@ -7,8 +7,8 @@ import type { CanvasAppInspectorPanel } from '../inspector/CanvasAppInspectorPan
 import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
 import type {
   CanvasAppAssembly,
-  CanvasAppItemAdapters,
 } from './CanvasAppAssembly'
+import { snapshotCanvasAppAssemblyAdapters } from './CanvasAppAdapterSnapshot'
 
 export function snapshotCanvasAppAssembly(
   assembly: CanvasAppAssembly,
@@ -16,6 +16,7 @@ export function snapshotCanvasAppAssembly(
   const customItemValidators = freezeCanvasAppRecord(
     assembly.customItemValidators,
   )
+  const adapterSnapshot = snapshotCanvasAppAssemblyAdapters(assembly)
 
   return Object.freeze({
     affordanceConfig: snapshotCanvasAppAffordanceConfig(
@@ -42,9 +43,9 @@ export function snapshotCanvasAppAssembly(
       assembly.initialItems,
       customItemValidators,
     ),
-    itemAdapters: snapshotCanvasAppItemAdapters(assembly.itemAdapters),
-    itemLayerAdapter: Object.freeze({ ...assembly.itemLayerAdapter }),
-    stageAdapter: Object.freeze({ ...assembly.stageAdapter }),
+    itemAdapters: adapterSnapshot.itemAdapters,
+    itemLayerAdapter: adapterSnapshot.itemLayerAdapter,
+    stageAdapter: adapterSnapshot.stageAdapter,
   })
 }
 
@@ -112,16 +113,6 @@ function snapshotCanvasAppInitialItems(
     normalizeCanvasItems(items, { customItemValidators })
       .map((item) => deepFreezeCanvasAppValue(structuredClone(item))),
   ) as CanvasAppAssembly['initialItems']
-}
-
-function snapshotCanvasAppItemAdapters(
-  itemAdapters: CanvasAppItemAdapters,
-): CanvasAppItemAdapters {
-  return Object.freeze({
-    command: Object.freeze({ ...itemAdapters.command }),
-    creation: Object.freeze({ ...itemAdapters.creation }),
-    transform: Object.freeze({ ...itemAdapters.transform }),
-  })
 }
 
 function freezeCanvasAppRecord<TValue>(
