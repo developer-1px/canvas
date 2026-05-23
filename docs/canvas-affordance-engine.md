@@ -141,6 +141,7 @@ type CanvasAffordanceConfig = {
 - Custom creation tool shortcut이 내부 canvas shortcut, shift-insensitive built-in shortcut, temporary pan, nudge shortcut, 다른 custom creation tool shortcut과 겹치면 assembly 단계에서 실패한다.
 - 제품별 renderer 세부 스타일은 canvas shell CSS에 두지 않고 Host App/Demo module 쪽에서 소유한다.
 - 제품별 inspector UI는 기본 Object Inspector 구현을 수정하지 않고 Canvas App Assembly의 inspector panel descriptor로 등록한다.
+- Linked peer dependency는 앱 번들에 한 번만 들어가야 한다. Vite config는 `zod-crud` 같은 linked package가 `react`, `react-dom`, `zod`를 중복 번들링하지 않도록 dedupe한다.
 - 위 import 경계는 `src/canvas/architecture/CanvasModuleBoundaries.test.ts`에서 검증한다.
 
 추출 순서는 동작 변경 없이 app workflow에서 Engine 책임을 하나씩 떼어내는 방식으로 진행한다.
