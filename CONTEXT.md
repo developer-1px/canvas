@@ -46,6 +46,7 @@
 - 이 프로젝트는 단일 서비스 앱보다 재사용 가능한 캔버스 부품공장을 우선한다.
 - 당연한 사회적 약속이 되어 있는 캔버스 기능은 내부 모듈이 관리하고, 제품별 커스텀 기능은 외부에서 조립식으로 등록할 수 있어야 한다.
 - marker, highlighter, arrow 같은 기본 드로잉 도구는 제품별 custom item module이 아니라 내부 Affordance로 관리한다.
+- 기본 드로잉 item은 저장 계약에서 최소 visible geometry, 양수 stroke width, 0보다 크고 1 이하인 opacity를 검증한다.
 - 엔진은 Fabric.js 같은 완성형 객체 모델을 감싸기보다, 커스텀 가능한 Affordance 문법을 작은 Interface로 제공한다.
 - Demo `CanvasItem`과 SVG 렌더링 방식은 재사용 Core Contract에 포함하지 않는다.
 - Renderer Stage는 Demo `CanvasItem`, Host read model, component library를 import하지 않는다.

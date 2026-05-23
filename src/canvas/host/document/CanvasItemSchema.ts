@@ -2,6 +2,7 @@ import * as z from 'zod'
 import {
   assertCanvasStableIdRecordKeys,
   isCanvasStableId,
+  type Point,
 } from '../../core'
 import type {
   CanvasCustomItem,
@@ -75,10 +76,10 @@ function isCanvasItem(value: unknown): value is CanvasItem {
 
   if (value.type === 'marker' || value.type === 'highlight') {
     return (
-      isPointArray(value.points) &&
+      isDrawingPointArray(value.points) &&
       typeof value.stroke === 'string' &&
-      isFiniteNumber(value.strokeWidth) &&
-      isFiniteNumber(value.opacity)
+      isPositiveFiniteNumber(value.strokeWidth) &&
+      isOpacity(value.opacity)
     )
   }
 
@@ -86,8 +87,9 @@ function isCanvasItem(value: unknown): value is CanvasItem {
     return (
       isPoint(value.start) &&
       isPoint(value.end) &&
+      !isSamePoint(value.start, value.end) &&
       typeof value.stroke === 'string' &&
-      isFiniteNumber(value.strokeWidth)
+      isPositiveFiniteNumber(value.strokeWidth)
     )
   }
 
@@ -127,11 +129,19 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null
 }
 
-function isFiniteNumber(value: unknown) {
+function isFiniteNumber(value: unknown): value is number {
   return typeof value === 'number' && Number.isFinite(value)
 }
 
-function isPoint(value: unknown) {
+function isPositiveFiniteNumber(value: unknown): value is number {
+  return isFiniteNumber(value) && value > 0
+}
+
+function isOpacity(value: unknown): value is number {
+  return isFiniteNumber(value) && value > 0 && value <= 1
+}
+
+function isPoint(value: unknown): value is Point {
   return (
     isRecord(value) &&
     isFiniteNumber(value.x) &&
@@ -139,8 +149,16 @@ function isPoint(value: unknown) {
   )
 }
 
-function isPointArray(value: unknown) {
+function isPointArray(value: unknown): value is Point[] {
   return Array.isArray(value) && value.every(isPoint)
+}
+
+function isDrawingPointArray(value: unknown): value is Point[] {
+  return isPointArray(value) && value.length >= 2
+}
+
+function isSamePoint(left: Point, right: Point) {
+  return left.x === right.x && left.y === right.y
 }
 
 function isStringArray(value: unknown) {

@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import type { CanvasCustomItem } from '../model'
+import type {
+  CanvasCustomItem,
+  CanvasItem,
+} from '../model'
 import { validateCanvasItems } from './CanvasItemSchema'
 
 const customItem: CanvasCustomItem = {
@@ -95,5 +98,92 @@ describe('CanvasItemSchema custom items', () => {
         },
       }),
     ).toThrow('Invalid custom canvas item: risk')
+  })
+})
+
+const markerItem: CanvasItem = {
+  id: 'marker-1',
+  type: 'marker',
+  x: 8,
+  y: 18,
+  w: 24,
+  h: 24,
+  points: [
+    { x: 10, y: 20 },
+    { x: 30, y: 40 },
+  ],
+  opacity: 1,
+  stroke: '#475569',
+  strokeWidth: 4,
+}
+
+const arrowItem: CanvasItem = {
+  id: 'arrow-1',
+  type: 'arrow',
+  x: 88,
+  y: 108,
+  w: 164,
+  h: 44,
+  start: { x: 100, y: 120 },
+  end: { x: 240, y: 140 },
+  stroke: '#334155',
+  strokeWidth: 3,
+}
+
+describe('CanvasItemSchema drawing items', () => {
+  it('accepts built-in drawing item storage envelopes', () => {
+    expect(validateCanvasItems([markerItem, arrowItem])).toEqual([
+      markerItem,
+      arrowItem,
+    ])
+  })
+
+  it('rejects drawing strokes without visible geometry', () => {
+    expect(() =>
+      validateCanvasItems([
+        {
+          ...markerItem,
+          points: [{ x: 10, y: 20 }],
+        },
+      ]),
+    ).toThrow()
+
+    expect(() =>
+      validateCanvasItems([
+        {
+          ...arrowItem,
+          end: arrowItem.start,
+        },
+      ]),
+    ).toThrow()
+  })
+
+  it('rejects drawing styles that cannot render predictably', () => {
+    expect(() =>
+      validateCanvasItems([
+        {
+          ...markerItem,
+          strokeWidth: 0,
+        },
+      ]),
+    ).toThrow()
+
+    expect(() =>
+      validateCanvasItems([
+        {
+          ...markerItem,
+          opacity: 0,
+        },
+      ]),
+    ).toThrow()
+
+    expect(() =>
+      validateCanvasItems([
+        {
+          ...markerItem,
+          opacity: 2,
+        },
+      ]),
+    ).toThrow()
   })
 })
