@@ -45,15 +45,11 @@ export function createCanvasAppAssembly(
   )
 
   const assembly: CanvasAppAssembly = {
+    ...extensionAssembly,
     affordanceConfig: affordanceAssembly.affordanceConfig,
     componentLibrary: componentAssembly.componentLibrary,
     componentPresentationRenderers:
       componentAssembly.componentPresentationRenderers,
-    customCommands: extensionAssembly.customCommands,
-    customCreationTools: extensionAssembly.customCreationTools,
-    customItemRenderers: extensionAssembly.customItemRenderers,
-    customItemValidators: extensionAssembly.customItemValidators,
-    inspectorPanels: extensionAssembly.inspectorPanels,
     initialItems: workspaceAssembly.initialItems,
     initialSelection: workspaceAssembly.initialSelection,
     itemAdapters: adapterAssembly.itemAdapters,

@@ -4,11 +4,11 @@ import type {
 } from '../../engine'
 import type {
   CanvasComponentLibrary,
-  CanvasCustomItemValidators,
   CanvasItem,
 } from '../../host'
 import type { CanvasAppCustomCommand } from '../commands/CanvasAppCustomCommands'
 import type { CanvasWorkspaceStorageProvider } from '../document/CanvasWorkspacePersistence'
+import type { CanvasAppExtensionBundle } from '../extensions/CanvasAppExtensionBundle'
 import type { CanvasAppInspectorPanel } from '../inspector/CanvasAppInspectorPanels'
 import type {
   CanvasAppCustomItemModule,
@@ -16,22 +16,15 @@ import type {
 } from '../modules/CanvasAppCustomItemModules'
 import type {
   CanvasAppComponentPresentationRenderers,
-  CanvasAppCustomItemRenderers,
 } from '../rendering/CanvasAppRendererRegistries'
 import type { CanvasAppItemLayerAdapter } from '../rendering/CanvasAppItemLayerAdapter'
 import type { CanvasAppStageAdapter } from '../rendering/CanvasAppStageAdapter'
-import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
 import type { CanvasAppItemAdapters } from './CanvasAppAdapterContracts'
 
-export type CanvasAppAssembly = {
+export type CanvasAppAssembly = CanvasAppExtensionBundle & {
   affordanceConfig: CanvasAffordanceConfig
   componentLibrary: CanvasComponentLibrary
   componentPresentationRenderers: CanvasAppComponentPresentationRenderers
-  customCommands: readonly CanvasAppCustomCommand[]
-  customCreationTools: readonly CanvasAppCustomCreationTool[]
-  customItemRenderers: CanvasAppCustomItemRenderers
-  customItemValidators: CanvasCustomItemValidators
-  inspectorPanels: readonly CanvasAppInspectorPanel[]
   initialItems: CanvasItem[]
   initialSelection: readonly string[]
   itemAdapters: CanvasAppItemAdapters

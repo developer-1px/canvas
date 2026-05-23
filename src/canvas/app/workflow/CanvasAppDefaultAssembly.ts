@@ -8,6 +8,7 @@ import {
   DEFAULT_CANVAS_APP_COMPONENT_PRESENTATION_RENDERERS,
   DEFAULT_CANVAS_APP_CUSTOM_ITEM_RENDERERS,
 } from '../rendering/CanvasAppRendererRegistries'
+import { createCanvasAppExtensionBundle } from '../extensions/CanvasAppExtensionBundle'
 import { DEFAULT_CANVAS_APP_ITEM_LAYER_ADAPTER } from '../rendering/CanvasAppItemLayerAdapter'
 import { DEFAULT_CANVAS_APP_STAGE_ADAPTER } from '../rendering/CanvasAppStageAdapter'
 import { DEFAULT_CANVAS_WORKSPACE_STORAGE_PROVIDER } from '../document/CanvasWorkspacePersistence'
@@ -21,15 +22,13 @@ const DEFAULT_CANVAS_APP_INITIAL_SELECTION = [
 
 export const DEFAULT_CANVAS_APP_ASSEMBLY: CanvasAppAssembly =
   snapshotCanvasAppAssembly({
+    ...createCanvasAppExtensionBundle({
+      customItemRenderers: DEFAULT_CANVAS_APP_CUSTOM_ITEM_RENDERERS,
+    }),
     affordanceConfig: DEFAULT_CANVAS_AFFORDANCE_CONFIG,
     componentLibrary: CANVAS_COMPONENT_LIBRARY,
     componentPresentationRenderers:
       DEFAULT_CANVAS_APP_COMPONENT_PRESENTATION_RENDERERS,
-    customCommands: [],
-    customCreationTools: [],
-    customItemRenderers: DEFAULT_CANVAS_APP_CUSTOM_ITEM_RENDERERS,
-    customItemValidators: {},
-    inspectorPanels: [],
     initialItems: INITIAL_ITEMS,
     initialSelection: DEFAULT_CANVAS_APP_INITIAL_SELECTION,
     itemAdapters: CANVAS_ITEM_ENGINE_ADAPTERS,

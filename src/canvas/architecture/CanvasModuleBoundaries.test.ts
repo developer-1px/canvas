@@ -177,10 +177,22 @@ describe('Canvas module boundaries', () => {
       'export type CanvasAppAssemblyInput = {',
     )
     expect(typeContractFile.source).toContain(
-      'export type CanvasAppAssembly = {',
+      "from '../extensions/CanvasAppExtensionBundle'",
+    )
+    expect(typeContractFile.source).toContain(
+      'export type CanvasAppAssembly = CanvasAppExtensionBundle & {',
     )
     expect(typeContractFile.source).toContain(
       'export type CanvasAppAssemblyInput = {',
+    )
+    expect(typeContractFile.source).not.toContain(
+      'customCreationTools: readonly',
+    )
+    expect(typeContractFile.source).not.toContain(
+      'customItemRenderers: CanvasAppCustomItemRenderers',
+    )
+    expect(typeContractFile.source).not.toContain(
+      'customItemValidators: CanvasCustomItemValidators',
     )
     expect(typeContractFile.source).not.toContain(
       "from './CanvasAppAssembly'",
@@ -272,6 +284,16 @@ describe('Canvas module boundaries', () => {
     expect(extensionAssemblyFile.source).not.toContain(
       'mergeUniqueCanvasAppExtensionRecord',
     )
+    expect(assemblyFile.source).toContain('...extensionAssembly')
+    expect(assemblyFile.source).not.toContain(
+      'customCommands: extensionAssembly.customCommands',
+    )
+    expect(assemblyFile.source).not.toContain(
+      'customCreationTools: extensionAssembly.customCreationTools',
+    )
+    expect(assemblyFile.source).not.toContain(
+      'inspectorPanels: extensionAssembly.inspectorPanels',
+    )
   })
 
   it('keeps App extension bundle slot merging behind a named module', () => {
@@ -326,6 +348,9 @@ describe('Canvas module boundaries', () => {
     )
     expect(extensionBundleFile.source).toContain(
       'export function snapshotCanvasAppExtensionBundle',
+    )
+    expect(extensionBundleFile.source).toContain(
+      'CanvasAppExtensionBundleInput',
     )
     expect(extensionBundleFile.source).toContain(
       'appendUniqueCanvasAppExtensionEntries',
@@ -4675,6 +4700,12 @@ describe('Canvas module boundaries', () => {
       'export const DEFAULT_CANVAS_APP_ASSEMBLY',
     )
     expect(defaultAssemblyFile.source).toContain(
+      "from '../extensions/CanvasAppExtensionBundle'",
+    )
+    expect(defaultAssemblyFile.source).toContain(
+      'createCanvasAppExtensionBundle',
+    )
+    expect(defaultAssemblyFile.source).toContain(
       'DEFAULT_CANVAS_APP_INITIAL_SELECTION',
     )
     expect(defaultAssemblyFile.source).toContain(
@@ -4684,6 +4715,11 @@ describe('Canvas module boundaries', () => {
     expect(defaultAssemblyFile.source).toContain('CANVAS_ITEM_ENGINE_ADAPTERS')
     expect(defaultAssemblyFile.source).toContain('INITIAL_ITEMS')
     expect(defaultAssemblyFile.source).toContain('snapshotCanvasAppAssembly')
+    expect(defaultAssemblyFile.source).not.toContain('customCommands: []')
+    expect(defaultAssemblyFile.source).not.toContain(
+      'customCreationTools: []',
+    )
+    expect(defaultAssemblyFile.source).not.toContain('inspectorPanels: []')
   })
 
   it('keeps App Assembly output contracts behind a named module', () => {
