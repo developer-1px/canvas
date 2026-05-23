@@ -977,6 +977,12 @@ describe('Canvas module boundaries', () => {
     const viewportControlExecutionFile = getSourceFile(
       'src/canvas/app/viewport/CanvasViewportControlExecution.ts',
     )
+    const wheelViewportHookFile = getSourceFile(
+      'src/canvas/app/viewport/useCanvasWheelViewport.ts',
+    )
+    const wheelViewportExecutionFile = getSourceFile(
+      'src/canvas/app/viewport/CanvasWheelViewportExecution.ts',
+    )
 
     expect(appModelFile.source).toContain(
       "from './useCanvasAppViewportModel'",
@@ -1038,6 +1044,26 @@ describe('Canvas module boundaries', () => {
     )
     expect(viewportControlExecutionFile.source).toContain(
       'export function zoomCanvasViewportBy',
+    )
+    expect(wheelViewportHookFile.source).toContain(
+      "from './CanvasWheelViewportExecution'",
+    )
+    for (const wheelHookImplementationDetail of [
+      'shouldHandleCanvasWheelViewport',
+      'getCanvasWheelViewport',
+      'type CanvasWheelInput',
+      'preventDefault',
+      'clientX - rect.left',
+    ]) {
+      expect(wheelViewportHookFile.source).not.toContain(
+        wheelHookImplementationDetail,
+      )
+      expect(wheelViewportExecutionFile.source).toContain(
+        wheelHookImplementationDetail,
+      )
+    }
+    expect(wheelViewportExecutionFile.source).toContain(
+      'export function runCanvasWheelViewport',
     )
   })
 
