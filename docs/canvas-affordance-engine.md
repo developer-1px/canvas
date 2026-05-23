@@ -27,6 +27,8 @@
 | --- | --- |
 | `src/canvas/app/shell` | CanvasApp composition과 shell style |
 | `src/canvas/app/workflow` | React state와 engine/host/renderer wiring |
+| `src/canvas/app/workflow/index.ts` | App Shell이 사용하는 workflow public entry |
+| `src/canvas/app/workflow/useCanvasAppModel.ts` | command, pointer, keyboard, viewport, text editing wiring을 App Shell에 숨긴다 |
 | `src/canvas/app/workflow/CanvasWorkflowContract.ts` | App workflow hook들이 공유하는 document commit, selection, clipboard contract |
 | `src/canvas/app/workflow/useCanvasWorkspaceModel.ts` | 저장된 workspace snapshot, document history, viewport, read model, id 생성을 App Shell에 숨긴다 |
 | `src/canvas/app/geometry` | DOM/SVG pointer 좌표 변환 |
@@ -86,10 +88,12 @@ type CanvasAffordanceConfig = {
 - Engine Module은 `core`, `CanvasAffordances`, `CanvasSceneAdapter` 같은 renderer-independent 입력만 사용한다.
 - Engine Module은 Demo `CanvasItem`, `CanvasOperations`, `CanvasTree`, SVG Renderer를 import하지 않는다.
 - Host domain Module은 Engine 구현 파일을 import하지 않는다. Engine Adapter 타입은 `src/canvas/engine` public facade에서 받는다.
-- App, UI, Renderer는 Demo Host 내부 subpath를 import하지 않는다. Demo model type도 `src/canvas/host` public facade에서 받는다.
+- App과 Renderer는 Demo Host 내부 subpath를 import하지 않는다. Demo model type도 `src/canvas/host` public facade에서 받는다.
+- UI controls는 Demo Host를 import하지 않는다. Host component/template/text editing 값은 App workflow가 UI prop으로 주입한다.
 - App workflow는 Host document 구현 파일을 import하지 않는다. 문서 변경, history, selection, clipboard, text search는 Host Document Controller를 통해 사용한다.
 - App hook들은 `useCanvasDocument` 구현 파일에서 타입을 가져오지 않는다. document commit과 selection contract는 Canvas Workflow Contract를 통해 공유한다.
 - App workflow는 Host tree helper를 import하지 않는다. item 조회, bounds, selection 정규화, Scene Adapter 생성은 Canvas Item Read Model을 통해 사용한다.
+- App Shell은 workflow public entry만 import한다. command, pointer, keyboard, viewport, text editing wiring은 Canvas App Model이 소유한다.
 - App Shell은 workspace 저장, initial item seed, read model 생성, id seed 계산을 직접 import하지 않는다. Canvas Workspace Model을 통해 사용한다.
 - App workflow는 `CANVAS_ITEM_ENGINE_ADAPTERS`를 통해 concrete item adapter를 주입한다.
 - App과 UI는 Renderer Adapter 내부 파일을 import하지 않는다. SVG stage는 `src/canvas/renderer` public facade에서 사용한다.

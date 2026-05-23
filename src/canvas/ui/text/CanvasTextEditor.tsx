@@ -4,14 +4,18 @@ import type {
   PointerEvent,
   RefObject,
 } from 'react'
-import type { EditingText } from '../../host'
+
+type CanvasTextEditorValue = {
+  id: string
+  value: string
+}
 
 type CanvasTextEditorProps = {
-  editing: EditingText | null
+  editing: CanvasTextEditorValue | null
   editorRef: RefObject<HTMLTextAreaElement | null>
   style: CSSProperties | undefined
   onBlur: () => void
-  onChange: (editing: EditingText) => void
+  onChange: (editing: CanvasTextEditorValue) => void
   onCancel: () => void
   onCommit: () => void
 }

@@ -17,12 +17,13 @@ type ToolbarProps = ComponentProps<typeof CanvasToolbar>
 type TextEditorProps = ComponentProps<typeof CanvasTextEditor>
 type FindReplaceProps = ComponentProps<typeof CanvasFindReplacePanel>
 type InspectorProps = ComponentProps<typeof CanvasObjectInspector>
-type PaletteInsert = ComponentProps<typeof CanvasComponentPalette>['onInsert']
+type PaletteProps = ComponentProps<typeof CanvasComponentPalette>
 
 type CanvasAppViewProps = {
   activeMode: StageProps['activeMode']
   blurTextEditor: () => void
   commandAvailability: CanvasCommandAvailability
+  componentPalette: PaletteProps
   config: CanvasAffordanceConfig
   editing: TextEditorProps['editing']
   editorRef: TextEditorProps['editorRef']
@@ -31,7 +32,6 @@ type CanvasAppViewProps = {
   findReplace: FindReplaceProps
   gesture: StageProps['gesture']
   inspector: InspectorProps
-  insertComponent: PaletteInsert
   items: StageProps['items']
   overlays: StageProps['overlays']
   selected: StageProps['selected']
@@ -68,6 +68,7 @@ export function CanvasAppView({
   activeMode,
   blurTextEditor,
   commandAvailability,
+  componentPalette,
   config,
   editing,
   editorRef,
@@ -76,7 +77,6 @@ export function CanvasAppView({
   findReplace,
   gesture,
   inspector,
-  insertComponent,
   items,
   overlays,
   selected,
@@ -137,7 +137,7 @@ export function CanvasAppView({
         />
       ) : null}
 
-      <CanvasComponentPalette onInsert={insertComponent} />
+      <CanvasComponentPalette {...componentPalette} />
 
       <CanvasFindReplacePanel {...findReplace} />
 

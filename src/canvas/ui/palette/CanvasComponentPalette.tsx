@@ -1,28 +1,33 @@
-import {
-  CANVAS_COMPONENT_LIBRARY,
-  type CanvasComponentTemplate,
-} from '../../host'
-import type { CanvasComponentKind } from '../../host'
-
 type CanvasComponentPaletteProps = {
-  onInsert: (component: CanvasComponentKind) => void
+  components: readonly CanvasComponentPaletteItem[]
+  onInsert: (component: string) => void
+}
+
+type CanvasComponentPaletteItem = {
+  accent: string
+  fill: string
+  id: string
+  label: string
+  stroke: string
+  title: string
 }
 
 export function CanvasComponentPalette({
+  components,
   onInsert,
 }: CanvasComponentPaletteProps) {
   return (
     <div className="component-palette" role="toolbar" aria-label="Components">
-      {CANVAS_COMPONENT_LIBRARY.templates.map((template) => (
+      {components.map((component) => (
         <button
-          key={template.id}
+          key={component.id}
           type="button"
           className="component-button"
-          aria-label={template.title}
-          title={template.title}
-          onClick={() => onInsert(template.id)}
+          aria-label={component.title}
+          title={component.title}
+          onClick={() => onInsert(component.id)}
         >
-          <ComponentButtonMark template={template} />
+          <ComponentButtonMark component={component} />
         </button>
       ))}
     </div>
@@ -30,21 +35,24 @@ export function CanvasComponentPalette({
 }
 
 function ComponentButtonMark({
-  template,
+  component,
 }: {
-  template: CanvasComponentTemplate
+  component: CanvasComponentPaletteItem
 }) {
   return (
     <span
       className="component-button-mark"
       style={{
-        background: template.fill === 'transparent' ? '#ffffff' : template.fill,
+        background:
+          component.fill === 'transparent' ? '#ffffff' : component.fill,
         borderColor:
-          template.stroke === 'transparent' ? template.accent : template.stroke,
-        color: template.accent,
+          component.stroke === 'transparent'
+            ? component.accent
+            : component.stroke,
+        color: component.accent,
       }}
     >
-      {template.label}
+      {component.label}
     </span>
   )
 }

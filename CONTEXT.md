@@ -13,6 +13,7 @@
 - Canvas Item Read Model: Demo `CanvasItem` tree의 조회, bounds, selection 정규화, Scene Adapter 생성을 tree helper 세부 구현 없이 제공하는 Module.
 - Canvas Component Library: Demo component template, presentation key, component item 생성을 함께 제공하는 Module.
 - Canvas Component Presentation: Demo component kind를 Renderer Adapter의 그리기 전략과 연결하는 key. 새 component kind는 기존 presentation을 재사용할 수 있다.
+- Canvas App Model: App Shell이 렌더링할 view props를 만들고 command, pointer, keyboard, viewport, text editing wiring을 숨기는 workflow Module.
 - Canvas Workspace Model: Demo workspace의 저장된 snapshot, document history, viewport, read model, id 생성을 App Shell에 숨기는 workflow Module.
 - Canvas Workflow Contract: App workflow hook들이 공유하는 document commit, selection commit, clipboard 계약. 개별 hook이 `useCanvasDocument` 구현 파일을 직접 알지 않게 한다.
 - Renderer Adapter: Affordance 상태를 SVG, Canvas, DOM, WebGL 등으로 그리는 Adapter.
@@ -27,4 +28,6 @@
 - Demo `CanvasItem`과 SVG 렌더링 방식은 재사용 Core Contract에 포함하지 않는다.
 - 모든 기능은 on/off 가능해야 한다.
 - 새 Demo component kind가 기존 presentation을 재사용하면 Canvas Component Library만 수정한다.
+- App Shell은 command, pointer, keyboard, viewport, text editing wiring을 직접 알지 않는다.
 - App Shell은 workspace 저장, document history, read model 생성 방식을 직접 알지 않는다.
+- UI controls는 Demo Host를 직접 import하지 않는다.
