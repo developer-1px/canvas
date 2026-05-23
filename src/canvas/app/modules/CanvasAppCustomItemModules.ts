@@ -6,32 +6,25 @@ import {
   type CanvasCustomItemValidator,
   type CanvasCustomItemValidators,
 } from '../../host'
-import {
-  assertCanvasAppCustomCommands,
-  type CanvasAppCustomCommand,
-} from '../commands/CanvasAppCustomCommands'
-import {
-  assertCanvasAppArray,
-  assertCanvasAppDescriptorObject,
-} from '../extensions/CanvasAppDescriptorContracts'
-import { assertCanvasAppExtensionId } from '../extensions/CanvasAppExtensionIds'
+import type { CanvasAppCustomCommand } from '../commands/CanvasAppCustomCommands'
 import {
   appendUniqueCanvasAppExtensionEntries,
   mergeUniqueCanvasAppExtensionRecord,
 } from '../extensions/CanvasAppExtensionRegistries'
-import {
-  assertCanvasAppInspectorPanels,
-  type CanvasAppInspectorPanel,
-} from '../inspector/CanvasAppInspectorPanels'
+import type { CanvasAppInspectorPanel } from '../inspector/CanvasAppInspectorPanels'
 import type {
   CanvasAppCustomItemRendererStrategy,
   CanvasAppCustomItemRenderers,
 } from '../rendering'
 import {
-  assertCanvasAppCustomCreationTools,
   type CanvasAppCustomCreationTool,
   type CanvasAppCustomCreationToolContext,
 } from '../tools/CanvasAppCustomCreationTools'
+import {
+  assertCanvasAppCustomItemModule,
+  assertCanvasAppCustomItemModuleAssembly,
+  assertCanvasAppCustomItemModuleAssemblyInput,
+} from './CanvasAppCustomItemModuleContracts'
 import {
   getCanvasAppCustomItemModuleCreationTools,
   getCanvasAppCustomItemModuleRenderers,
@@ -82,7 +75,7 @@ export type CanvasAppCustomItemModuleAssemblyOptions = {
 export function defineCanvasAppCustomItemModule(
   module: CanvasAppCustomItemModule,
 ) {
-  assertCanvasAppCustomItemModuleContracts(module)
+  assertCanvasAppCustomItemModule(module)
 
   return snapshotCanvasAppCustomItemModule(module)
 }
@@ -91,26 +84,11 @@ export function createCanvasAppCustomItemModuleAssembly(
   modules: readonly CanvasAppCustomItemModule[] = [],
   options: CanvasAppCustomItemModuleAssemblyOptions = {},
 ): CanvasAppCustomItemModuleAssembly {
-  assertCanvasAppArray(modules, 'custom item modules')
-
-  const disabledModuleIds = options.disabledModuleIds ?? []
-  assertCanvasAppArray(disabledModuleIds, 'disabled custom item module ids')
-
-  for (const module of modules) {
-    assertCanvasAppCustomItemModuleContracts(module)
-  }
-
-  for (const disabledModuleId of disabledModuleIds) {
-    assertCanvasAppExtensionId({
-      id: disabledModuleId,
-      label: 'disabled custom item module',
-    })
-  }
-  const validatedDisabledModuleIds = disabledModuleIds as readonly string[]
-
-  assertUniqueModuleIds(modules)
-  assertKnownDisabledModuleIds(modules, validatedDisabledModuleIds)
-  const disabledModuleIdSet = new Set(validatedDisabledModuleIds)
+  const disabledModuleIds = assertCanvasAppCustomItemModuleAssemblyInput({
+    disabledModuleIds: options.disabledModuleIds ?? [],
+    modules,
+  })
+  const disabledModuleIdSet = new Set(disabledModuleIds)
   const enabledModules = modules.filter(
     (module) => !disabledModuleIdSet.has(module.id),
   )
@@ -157,89 +135,7 @@ export function createCanvasAppCustomItemModuleAssembly(
     },
   )
 
-  assertCanvasAppCustomCreationTools(assembly.customCreationTools)
+  assertCanvasAppCustomItemModuleAssembly(assembly)
 
   return snapshotCanvasAppCustomItemModuleAssembly(assembly)
-}
-
-function assertCanvasAppCustomItemModuleContracts(
-  module: CanvasAppCustomItemModule,
-) {
-  assertCanvasAppDescriptorObject(module, 'custom item module')
-  assertCanvasAppExtensionId({
-    id: module.id,
-    label: 'custom item module',
-  })
-  assertCanvasAppCustomCommands(module.customCommands ?? [])
-  assertCanvasAppCustomItemModuleCreationTools(module)
-  assertCanvasAppExtensionId({
-    id: module.presentation,
-    label: 'custom item presentation',
-  })
-  assertCanvasAppCustomItemModuleFunction({
-    fn: module.renderItem,
-    label: 'renderer',
-    moduleId: module.id,
-  })
-  assertCanvasAppCustomItemModuleFunction({
-    fn: module.validateItem,
-    label: 'validator',
-    moduleId: module.id,
-  })
-  assertCanvasAppInspectorPanels(module.inspectorPanels ?? [])
-}
-
-function assertCanvasAppCustomItemModuleFunction({
-  fn,
-  label,
-  moduleId,
-}: {
-  fn: unknown
-  label: string
-  moduleId: string
-}) {
-  if (typeof fn !== 'function') {
-    throw new Error(`Canvas custom item module ${moduleId} requires ${label}`)
-  }
-}
-
-function assertCanvasAppCustomItemModuleCreationTools(
-  module: CanvasAppCustomItemModule,
-) {
-  assertCanvasAppCustomCreationTools(
-    getCanvasAppCustomItemModuleCreationTools(module),
-  )
-
-  for (const tool of module.customCreationTools ?? []) {
-    assertCanvasAppCustomItemModuleFunction({
-      fn: tool.createItem,
-      label: `creation tool ${tool.id}`,
-      moduleId: module.id,
-    })
-  }
-}
-
-function assertUniqueModuleIds(modules: readonly CanvasAppCustomItemModule[]) {
-  const ids = new Set<string>()
-
-  for (const module of modules) {
-    if (ids.has(module.id)) {
-      throw new Error(`Duplicate canvas custom item module: ${module.id}`)
-    }
-
-    ids.add(module.id)
-  }
-}
-
-function assertKnownDisabledModuleIds(
-  modules: readonly CanvasAppCustomItemModule[],
-  disabledModuleIds: readonly string[],
-) {
-  const ids = new Set(modules.map((module) => module.id))
-
-  for (const disabledModuleId of disabledModuleIds) {
-    if (!ids.has(disabledModuleId)) {
-      throw new Error(`Unknown disabled canvas custom item module: ${disabledModuleId}`)
-    }
-  }
 }

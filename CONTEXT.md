@@ -37,6 +37,7 @@
 - Canvas App Inspector Panel Execution: inspector panel visibility/render 호출과 실패 시 omit containment를 소유하는 App-owned execution Module.
 - Canvas Custom Item: 제품별 item kind를 내부 `CanvasItem` union 확장 없이 저장하기 위한 안정 envelope. `kind`, `presentation`, JSON `data`, bounds를 가진다.
 - Canvas App Custom Item Module: 하나의 제품별 item kind에 필요한 presentation, renderer, validator, creation tool, inspector, command를 한 번에 등록하는 App-owned Module descriptor. Module `id`는 소유한 custom item kind다.
+- Canvas App Custom Item Module Contracts: custom item module descriptor, disabled module id, duplicate module id, assembled tool shortcut contract를 검증하는 App-owned contract Module.
 - Canvas App Custom Item Module Runtime: module-owned creation tool envelope 생성, item validation, renderer/validator registry 변환과 실패 containment를 소유하는 App-owned runtime Module.
 - Canvas App Custom Item Module Snapshot: custom item module define/assembly 후 외부 descriptor mutation에서 module과 assembled extension parts를 보호하는 App-owned Module.
 - Canvas Custom Item Renderer Registry: `Canvas Custom Item`의 presentation key를 SVG rendering strategy에 연결하는 외부 조립 가능한 registry.
@@ -98,7 +99,7 @@
 - Canvas App Custom Creation Tool이 item 생성을 거부하거나 실패하거나 invalid item을 반환해도 pointer lifecycle을 깨지 않아야 한다.
 - 제품별 item kind는 내부 `CanvasItem` union에 새 variant를 추가하지 않고 Canvas App Custom Item Module로 등록한다.
 - Canvas App Custom Item Module은 `id`, `presentation`, `renderItem`, `validateItem`을 외부 Interface로 받고, renderer registry와 validator registry는 내부에서 조립한다.
-- Canvas App Custom Item Module descriptor/assembly와 module-owned creation/validator runtime은 분리하고, runtime containment는 Canvas App Custom Item Module Runtime이 소유한다.
+- Canvas App Custom Item Module descriptor/assembly, contract validation, module-owned creation/validator runtime은 분리하고, validation은 Canvas App Custom Item Module Contracts가, runtime containment는 Canvas App Custom Item Module Runtime이 소유한다.
 - Canvas App Custom Item Module mutation 방어는 Canvas App Custom Item Module Snapshot이 소유한다.
 - Canvas App Custom Item Module Creation Tool은 bounds/title/data만 반환하고, `id`, `type`, `kind`, `presentation`은 Canvas App Custom Item Module이 주입한다.
 - Canvas App Custom Item Module Creation Tool의 실행/반환값은 Module assembly가 현재 item 저장 계약과 module validator로 검증하고, 실패하면 null/false로 containment 한다.

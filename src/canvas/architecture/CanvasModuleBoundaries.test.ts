@@ -555,6 +555,42 @@ describe('Canvas module boundaries', () => {
     expect(runtimeFile.source).toContain('catch')
   })
 
+  it('keeps App custom item module contracts behind a named module', () => {
+    const moduleFile = getSourceFile(
+      'src/canvas/app/modules/CanvasAppCustomItemModules.ts',
+    )
+    const contractsFile = getSourceFile(
+      'src/canvas/app/modules/CanvasAppCustomItemModuleContracts.ts',
+    )
+
+    expect(moduleFile.source).toContain(
+      "from './CanvasAppCustomItemModuleContracts'",
+    )
+    expect(moduleFile.source).not.toContain(
+      'function assertCanvasAppCustomItemModule',
+    )
+    expect(moduleFile.source).not.toContain(
+      'Duplicate canvas custom item module',
+    )
+    expect(moduleFile.source).not.toContain(
+      'Unknown disabled canvas custom item module',
+    )
+    expect(moduleFile.source).not.toContain("label: 'renderer'")
+    expect(moduleFile.source).not.toContain("label: 'validator'")
+    expect(contractsFile.source).toContain(
+      'export function assertCanvasAppCustomItemModule',
+    )
+    expect(contractsFile.source).toContain(
+      'Duplicate canvas custom item module',
+    )
+    expect(contractsFile.source).toContain(
+      'Unknown disabled canvas custom item module',
+    )
+    expect(contractsFile.source).toContain("label: 'renderer'")
+    expect(contractsFile.source).toContain("label: 'validator'")
+    expect(contractsFile.source).toContain('requires ${label}')
+  })
+
   it('keeps App custom item module snapshot behavior behind a named module', () => {
     const moduleFile = getSourceFile(
       'src/canvas/app/modules/CanvasAppCustomItemModules.ts',
