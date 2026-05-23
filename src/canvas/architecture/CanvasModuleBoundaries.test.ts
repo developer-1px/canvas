@@ -413,6 +413,9 @@ describe('Canvas module boundaries', () => {
     const itemRendererFile = getSourceFile(
       'src/canvas/ui/toolbar/CanvasToolbarItemRenderer.tsx',
     )
+    const itemRenderDispatchFile = getSourceFile(
+      'src/canvas/ui/toolbar/CanvasToolbarItemRenderDispatch.tsx',
+    )
     const itemsFile = getSourceFile(
       'src/canvas/ui/toolbar/CanvasToolbarItems.ts',
     )
@@ -450,13 +453,28 @@ describe('Canvas module boundaries', () => {
     expect(itemRendererFile.source).toContain(
       'export function renderCanvasToolbarItem',
     )
-    expect(itemRendererFile.source).toContain('CANVAS_TOOLBAR_TOOL_ICONS')
-    expect(itemRendererFile.source).toContain('CANVAS_TOOLBAR_COMMAND_ICONS')
-    expect(itemRendererFile.source).toContain("item.kind === 'builtin-tool'")
     expect(itemRendererFile.source).toContain(
+      "from './CanvasToolbarItemRenderDispatch'",
+    )
+    expect(itemRendererFile.source).not.toContain('CANVAS_TOOLBAR_TOOL_ICONS')
+    expect(itemRendererFile.source).not.toContain(
+      'CANVAS_TOOLBAR_COMMAND_ICONS',
+    )
+    expect(itemRendererFile.source).not.toContain("item.kind === '")
+    expect(itemRenderDispatchFile.source).toContain(
+      'CANVAS_TOOLBAR_ITEM_RENDER_STRATEGIES',
+    )
+    expect(itemRenderDispatchFile.source).toContain('CANVAS_TOOLBAR_TOOL_ICONS')
+    expect(itemRenderDispatchFile.source).toContain(
+      'CANVAS_TOOLBAR_COMMAND_ICONS',
+    )
+    expect(itemRenderDispatchFile.source).toContain(
+      'renderCanvasToolbarBuiltinToolItem',
+    )
+    expect(itemRenderDispatchFile.source).toContain(
       'runCanvasToolbarCommandAction',
     )
-    expect(itemRendererFile.source).toContain(
+    expect(itemRenderDispatchFile.source).toContain(
       "from './CanvasToolbarCommandContracts'",
     )
     expect(itemsFile.source).toContain(
