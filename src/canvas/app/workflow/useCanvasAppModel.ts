@@ -10,6 +10,11 @@ import {
   getCanvasCommandAvailability,
 } from '../../engine'
 import { useCanvasCommands } from '../commands/useCanvasCommands'
+import {
+  getCanvasAppCustomCommandStates,
+  runCanvasAppCustomCommand,
+  type CanvasAppCustomCommandContext,
+} from '../commands/CanvasAppCustomCommands'
 import { useCanvasComponentInsertion } from '../components/useCanvasComponentInsertion'
 import { useCanvasObjectInspector } from '../inspector/useCanvasObjectInspector'
 import { useCanvasKeyboardShortcuts } from '../keyboard/useCanvasKeyboardShortcuts'
@@ -37,6 +42,8 @@ export function useCanvasAppModel({
   const {
     componentLibrary,
     componentPresentationRenderers,
+    customCommands,
+    inspectorPanels,
     initialItems,
     itemAdapters,
   } = assembly
@@ -90,6 +97,7 @@ export function useCanvasAppModel({
 
   const inspector = useCanvasObjectInspector({
     commitItemsChange,
+    inspectorPanels,
     itemReadModel,
     selected,
     selection,
@@ -127,6 +135,45 @@ export function useCanvasAppModel({
     findDocumentText,
     replaceDocumentText,
   })
+
+  const customCommandContext = useMemo<CanvasAppCustomCommandContext>(
+    () => ({
+      commitItemsChange,
+      commitSelection,
+      createId,
+      items,
+      selection,
+      setEditing,
+      viewport,
+    }),
+    [
+      commitItemsChange,
+      commitSelection,
+      createId,
+      items,
+      selection,
+      setEditing,
+      viewport,
+    ],
+  )
+  const customCommandStates = useMemo(
+    () =>
+      getCanvasAppCustomCommandStates({
+        commands: customCommands,
+        context: customCommandContext,
+      }),
+    [customCommandContext, customCommands],
+  )
+  const runCustomCommand = useCallback(
+    (commandId: string) => {
+      runCanvasAppCustomCommand({
+        commandId,
+        commands: customCommands,
+        context: customCommandContext,
+      })
+    },
+    [customCommandContext, customCommands],
+  )
 
   const {
     alignSelection,
@@ -342,6 +389,7 @@ export function useCanvasAppModel({
       canUndo: commandAvailability.undo,
       canUngroup: commandAvailability.ungroup,
       config: canvasAffordanceConfig,
+      customCommands: customCommandStates,
       tool,
       visible: canvasAffordanceConfig.overlays.toolbar,
       onAlign: alignSelection,
@@ -352,6 +400,7 @@ export function useCanvasAppModel({
       onLock: lockSelection,
       onRedo: redoHistory,
       onToolChange: setTool,
+      onCustomCommand: runCustomCommand,
       onUndo: undoHistory,
       onUngroup: ungroupSelection,
       onUnlockAll: unlockAll,

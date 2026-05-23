@@ -14,6 +14,8 @@ import {
   DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS,
   type CanvasDemoSvgComponentPresentationRenderers,
 } from '../rendering'
+import type { CanvasAppCustomCommand } from '../commands/CanvasAppCustomCommands'
+import type { CanvasAppInspectorPanel } from '../inspector/CanvasAppInspectorPanels'
 
 export type CanvasAppItemAdapters = {
   command: CanvasCommandAdapter<CanvasItem>
@@ -24,6 +26,8 @@ export type CanvasAppItemAdapters = {
 export type CanvasAppAssembly = {
   componentLibrary: CanvasComponentLibrary
   componentPresentationRenderers: CanvasDemoSvgComponentPresentationRenderers
+  customCommands: readonly CanvasAppCustomCommand[]
+  inspectorPanels: readonly CanvasAppInspectorPanel[]
   initialItems: CanvasItem[]
   itemAdapters: CanvasAppItemAdapters
 }
@@ -34,6 +38,8 @@ export const DEFAULT_CANVAS_APP_ASSEMBLY: CanvasAppAssembly = {
   componentLibrary: CANVAS_COMPONENT_LIBRARY,
   componentPresentationRenderers:
     DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS,
+  customCommands: [],
+  inspectorPanels: [],
   initialItems: INITIAL_ITEMS,
   itemAdapters: CANVAS_ITEM_ENGINE_ADAPTERS,
 }
@@ -47,6 +53,10 @@ export function createCanvasAppAssembly(
     componentPresentationRenderers:
       input.componentPresentationRenderers ??
       DEFAULT_CANVAS_APP_ASSEMBLY.componentPresentationRenderers,
+    customCommands:
+      input.customCommands ?? DEFAULT_CANVAS_APP_ASSEMBLY.customCommands,
+    inspectorPanels:
+      input.inspectorPanels ?? DEFAULT_CANVAS_APP_ASSEMBLY.inspectorPanels,
     initialItems: input.initialItems ?? DEFAULT_CANVAS_APP_ASSEMBLY.initialItems,
     itemAdapters: input.itemAdapters ?? DEFAULT_CANVAS_APP_ASSEMBLY.itemAdapters,
   }

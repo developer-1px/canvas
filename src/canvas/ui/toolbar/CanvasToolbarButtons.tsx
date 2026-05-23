@@ -63,3 +63,30 @@ export function CommandButton({
     </button>
   )
 }
+
+export function CustomCommandButton({
+  ariaLabel,
+  disabled,
+  label,
+  onClick,
+  title,
+}: {
+  ariaLabel: string
+  disabled: boolean
+  label: string
+  onClick: () => void
+  title: string
+}) {
+  return (
+    <button
+      type="button"
+      className="tool-button custom-command-button"
+      disabled={disabled}
+      aria-label={ariaLabel}
+      title={title}
+      onClick={onClick}
+    >
+      {label}
+    </button>
+  )
+}

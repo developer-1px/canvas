@@ -6,3 +6,13 @@ export {
   type CanvasAppAssemblyInput,
   type CanvasAppItemAdapters,
 } from './CanvasAppAssembly'
+export type {
+  CanvasAppCustomCommand,
+  CanvasAppCustomCommandContext,
+  CanvasAppCustomCommandState,
+} from '../commands/CanvasAppCustomCommands'
+export type {
+  CanvasAppInspectorPanel,
+  CanvasAppInspectorPanelContext,
+  CanvasAppInspectorPanelView,
+} from '../inspector/CanvasAppInspectorPanels'

@@ -5,9 +5,14 @@ import type {
 } from '../../entities'
 import type { CanvasItemReadModel } from '../../host'
 import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract'
+import {
+  getCanvasAppInspectorPanelViews,
+  type CanvasAppInspectorPanel,
+} from './CanvasAppInspectorPanels'
 
 type UseCanvasObjectInspectorArgs = {
   itemReadModel: CanvasItemReadModel
+  inspectorPanels: readonly CanvasAppInspectorPanel[]
   selected: Set<string>
   selection: string[]
   commitItemsChange: CommitCanvasItemsChange
@@ -16,6 +21,7 @@ type UseCanvasObjectInspectorArgs = {
 export function useCanvasObjectInspector({
   commitItemsChange,
   itemReadModel,
+  inspectorPanels,
   selected,
   selection,
 }: UseCanvasObjectInspectorArgs) {
@@ -29,6 +35,29 @@ export function useCanvasObjectInspector({
   )
   const label = getInspectorLabel(selectedItems, selection.length)
   const disabled = selectedItems.some((item) => item.locked === true)
+  const customPanels = useMemo(
+    () =>
+      getCanvasAppInspectorPanelViews({
+        context: {
+          bounds,
+          commitItemsChange,
+          disabled,
+          label,
+          selectedItems,
+          selection,
+        },
+        panels: inspectorPanels,
+      }),
+    [
+      bounds,
+      commitItemsChange,
+      disabled,
+      inspectorPanels,
+      label,
+      selectedItems,
+      selection,
+    ],
+  )
 
   const updateBounds = useCallback(
     (nextBounds: Bounds) => {
@@ -54,6 +83,7 @@ export function useCanvasObjectInspector({
 
   return {
     bounds,
+    customPanels,
     disabled,
     label,
     onChangeBounds: updateBounds,

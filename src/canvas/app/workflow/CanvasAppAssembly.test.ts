@@ -33,11 +33,31 @@ describe('CanvasAppAssembly', () => {
     const assembly = createCanvasAppAssembly({
       componentLibrary,
       componentPresentationRenderers,
+      customCommands: [
+        {
+          id: 'publish',
+          label: 'Pub',
+          title: 'Publish selection',
+          run: () => undefined,
+        },
+      ],
+      inspectorPanels: [
+        {
+          id: 'risk-meta',
+          render: ({ selection }) => selection.length,
+        },
+      ],
       initialItems: [],
     })
 
     expect(assembly.componentLibrary.getPresentation('risk')).toBe('risk-card')
     expect(assembly.componentPresentationRenderers['risk-card']).toBe(renderRisk)
+    expect(assembly.customCommands.map((command) => command.id)).toEqual([
+      'publish',
+    ])
+    expect(assembly.inspectorPanels.map((panel) => panel.id)).toEqual([
+      'risk-meta',
+    ])
     expect(assembly.initialItems).toEqual([])
   })
 })

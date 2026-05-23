@@ -48,9 +48,13 @@ describe('Canvas module boundaries', () => {
     expect(violations).toEqual([])
   })
 
-  it('keeps ui controls independent from the demo host', () => {
+  it('keeps ui controls independent from app workflow and the demo host', () => {
     const violations = getImportsFrom('src/canvas/ui/')
-      .filter((reference) => reference.target === 'src/canvas/host')
+      .filter((reference) =>
+        reference.target === 'src/canvas/host' ||
+        reference.target === 'src/canvas/app' ||
+        reference.target.startsWith('src/canvas/app/'),
+      )
 
     expect(violations).toEqual([])
   })

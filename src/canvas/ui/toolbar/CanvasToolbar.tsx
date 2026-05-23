@@ -32,9 +32,18 @@ import {
 } from '../icons/CanvasIcons'
 import {
   CommandButton,
+  CustomCommandButton,
   ToolbarDivider,
   ToolButton,
 } from './CanvasToolbarButtons'
+
+type CanvasToolbarCustomCommand = {
+  ariaLabel: string
+  disabled: boolean
+  id: string
+  label: string
+  title: string
+}
 
 type CanvasToolbarProps = {
   canAlign: boolean
@@ -47,11 +56,13 @@ type CanvasToolbarProps = {
   canUndo: boolean
   canUngroup: boolean
   config: CanvasAffordanceConfig
+  customCommands: readonly CanvasToolbarCustomCommand[]
   tool: Tool
   onAlign: (mode: CanvasAlignMode) => void
   onDelete: () => void
   onDistribute: (mode: CanvasDistributeMode) => void
   onDuplicate: () => void
+  onCustomCommand: (commandId: string) => void
   onGroup: () => void
   onLock: () => void
   onRedo: () => void
@@ -72,11 +83,13 @@ export function CanvasToolbar({
   canUndo,
   canUngroup,
   config,
+  customCommands,
   tool,
   onAlign,
   onDelete,
   onDistribute,
   onDuplicate,
+  onCustomCommand,
   onGroup,
   onLock,
   onRedo,
@@ -319,6 +332,18 @@ export function CanvasToolbar({
           <UnlockIcon />
         </CommandButton>
       ) : null}
+
+      {customCommands.length > 0 ? <ToolbarDivider /> : null}
+      {customCommands.map((command) => (
+        <CustomCommandButton
+          key={command.id}
+          ariaLabel={command.ariaLabel}
+          disabled={command.disabled}
+          label={command.label}
+          title={command.title}
+          onClick={() => onCustomCommand(command.id)}
+        />
+      ))}
     </div>
   )
 }
