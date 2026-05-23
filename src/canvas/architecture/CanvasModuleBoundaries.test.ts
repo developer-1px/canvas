@@ -697,14 +697,9 @@ describe('Canvas module boundaries', () => {
     )
 
     expect(actionFile.source).toContain(
-      'canAlignCanvasCommandSelection',
+      "from './CanvasCommandAvailabilityRules'",
     )
-    expect(actionFile.source).toContain(
-      'canDistributeCanvasCommandSelection',
-    )
-    expect(actionFile.source).toContain(
-      'canGroupCanvasCommandSelection',
-    )
+    expect(actionFile.source).toContain('canUseCanvasCommand')
     expect(actionFile.source).not.toContain('selection.length < 2')
     expect(actionFile.source).not.toContain('selection.length < 3')
     expect(availabilityFile.source).toContain(
@@ -712,6 +707,9 @@ describe('Canvas module boundaries', () => {
     )
     expect(availabilityRulesFile.source).toContain(
       'CANVAS_COMMAND_AVAILABILITY_RULES',
+    )
+    expect(availabilityRulesFile.source).toContain(
+      'export function canUseCanvasCommand',
     )
     expect(availabilityRulesFile.source).toContain(
       'getCanvasCommandSelectionState',

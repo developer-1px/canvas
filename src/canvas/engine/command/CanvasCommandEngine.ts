@@ -1,4 +1,7 @@
-export { getCanvasCommandAvailability } from './CanvasCommandAvailability'
+export {
+  canUseCanvasCommand,
+  getCanvasCommandAvailability,
+} from './CanvasCommandAvailability'
 export {
   canAlignCanvasCommandSelection,
   canDistributeCanvasCommandSelection,

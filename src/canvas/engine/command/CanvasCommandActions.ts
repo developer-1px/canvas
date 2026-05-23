@@ -8,12 +8,7 @@ import {
   type CanvasReorderMode,
   type DeleteCanvasCommandResult,
 } from './CanvasCommandTypes'
-import {
-  canAlignCanvasCommandSelection,
-  canDistributeCanvasCommandSelection,
-  canGroupCanvasCommandSelection,
-  hasCanvasCommandSelection,
-} from './CanvasCommandSelectionRules'
+import { canUseCanvasCommand } from './CanvasCommandAvailabilityRules'
 
 export function alignCanvasCommand<TItem extends CanvasCommandItem>({
   adapter,
@@ -28,7 +23,7 @@ export function alignCanvasCommand<TItem extends CanvasCommandItem>({
   mode: CanvasAlignMode
   selection: string[]
 }): CanvasCommandItemsResult<TItem> | null {
-  if (!config.commands[mode] || !canAlignCanvasCommandSelection(selection)) {
+  if (!canUseCanvasCommand({ commandId: mode, config, selection })) {
     return null
   }
 
@@ -51,10 +46,7 @@ export function distributeCanvasCommand<TItem extends CanvasCommandItem>({
   mode: CanvasDistributeMode
   selection: string[]
 }): CanvasCommandItemsResult<TItem> | null {
-  if (
-    !config.commands[mode] ||
-    !canDistributeCanvasCommandSelection(selection)
-  ) {
+  if (!canUseCanvasCommand({ commandId: mode, config, selection })) {
     return null
   }
 
@@ -75,7 +67,7 @@ export function deleteCanvasCommand<TItem extends CanvasCommandItem>({
   items: TItem[]
   selection: string[]
 }): DeleteCanvasCommandResult<TItem> | null {
-  if (!config.commands.delete || !hasCanvasCommandSelection(selection)) {
+  if (!canUseCanvasCommand({ commandId: 'delete', config, selection })) {
     return null
   }
 
@@ -99,7 +91,7 @@ export function groupCanvasCommand<TItem extends CanvasCommandItem>({
   items: TItem[]
   selection: string[]
 }): CanvasCommandItemsResult<TItem> | null {
-  if (!config.commands.group || !canGroupCanvasCommandSelection(selection)) {
+  if (!canUseCanvasCommand({ commandId: 'group', config, selection })) {
     return null
   }
 
@@ -152,8 +144,11 @@ export function lockCanvasCommand<TItem extends CanvasCommandItem>({
   selection: string[]
 }): CanvasCommandItemsResult<TItem> | null {
   if (
-    !config.commands.lockSelection ||
-    !hasCanvasCommandSelection(selection)
+    !canUseCanvasCommand({
+      commandId: 'lockSelection',
+      config,
+      selection,
+    })
   ) {
     return null
   }
@@ -172,7 +167,7 @@ export function unlockAllCanvasCommand<TItem extends CanvasCommandItem>({
   items: TItem[]
   selection: string[]
 }): CanvasCommandItemsResult<TItem> | null {
-  if (!config.commands.unlockAll) {
+  if (!canUseCanvasCommand({ commandId: 'unlockAll', config, selection })) {
     return null
   }
 
@@ -214,7 +209,7 @@ export function reorderCanvasCommand<TItem extends CanvasCommandItem>({
   mode: CanvasReorderMode
   selection: string[]
 }): CanvasCommandItemsResult<TItem> | null {
-  if (!config.commands[mode] || !hasCanvasCommandSelection(selection)) {
+  if (!canUseCanvasCommand({ commandId: mode, config, selection })) {
     return null
   }
 
@@ -233,7 +228,7 @@ export function selectAllCanvasCommand<TItem extends CanvasCommandItem>({
   config: CanvasAffordanceConfig
   items: TItem[]
 }) {
-  if (!config.commands.selectAll) {
+  if (!canUseCanvasCommand({ commandId: 'selectAll', config })) {
     return null
   }
 

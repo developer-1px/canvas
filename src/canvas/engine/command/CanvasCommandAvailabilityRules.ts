@@ -33,6 +33,15 @@ export type CanvasCommandAvailabilityInput = Readonly<{
   selection: readonly string[]
 }>
 
+export type CanvasCommandUseInput = Readonly<{
+  canRedo?: boolean
+  canUndo?: boolean
+  commandId: CanvasAvailableCommandId
+  config: CanvasAffordanceConfig
+  hasSelectedGroup?: boolean
+  selection?: readonly string[]
+}>
+
 export const CANVAS_COMMAND_AVAILABILITY_RULES = Object.freeze({
   alignBottom: 'canAlign',
   alignCenter: 'canAlign',
@@ -77,11 +86,48 @@ export function getCanvasCommandAvailability({
   const availability = {} as CanvasCommandAvailability
 
   for (const commandId of CANVAS_COMMAND_AVAILABILITY_COMMAND_IDS) {
-    const rule = CANVAS_COMMAND_AVAILABILITY_RULES[commandId]
-    availability[commandId] = config.commands[commandId] && ruleState[rule]
+    availability[commandId] = canUseCanvasCommandWithRuleState({
+      commandId,
+      config,
+      ruleState,
+    })
   }
 
   return availability
+}
+
+export function canUseCanvasCommand({
+  canRedo = false,
+  canUndo = false,
+  commandId,
+  config,
+  hasSelectedGroup = false,
+  selection = [],
+}: CanvasCommandUseInput) {
+  return canUseCanvasCommandWithRuleState({
+    commandId,
+    config,
+    ruleState: getCanvasCommandAvailabilityRuleState({
+      canRedo,
+      canUndo,
+      hasSelectedGroup,
+      selection,
+    }),
+  })
+}
+
+function canUseCanvasCommandWithRuleState({
+  commandId,
+  config,
+  ruleState,
+}: {
+  commandId: CanvasAvailableCommandId
+  config: CanvasAffordanceConfig
+  ruleState: CanvasCommandAvailabilityRuleState
+}) {
+  const rule = CANVAS_COMMAND_AVAILABILITY_RULES[commandId]
+
+  return config.commands[commandId] && ruleState[rule]
 }
 
 function getCanvasCommandAvailabilityRuleState({

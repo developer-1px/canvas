@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { createCanvasAffordanceConfig } from '../affordance/CanvasAffordances'
 import {
   CANVAS_COMMAND_AVAILABILITY_RULES,
+  canUseCanvasCommand,
   getCanvasCommandAvailability,
 } from './CanvasCommandAvailabilityRules'
 
@@ -69,5 +70,47 @@ describe('CanvasCommandAvailabilityRules', () => {
       ungroup: false,
       unlockAll: true,
     })
+  })
+
+  it('exposes the same rule table to command action guards', () => {
+    const config = createCanvasAffordanceConfig({
+      commands: { delete: false },
+    })
+
+    expect(
+      canUseCanvasCommand({
+        commandId: 'alignLeft',
+        config,
+        selection: ['rect-1'],
+      }),
+    ).toBe(false)
+    expect(
+      canUseCanvasCommand({
+        commandId: 'alignLeft',
+        config,
+        selection: ['rect-1', 'rect-2'],
+      }),
+    ).toBe(true)
+    expect(
+      canUseCanvasCommand({
+        commandId: 'delete',
+        config,
+        selection: ['rect-1'],
+      }),
+    ).toBe(false)
+    expect(
+      canUseCanvasCommand({
+        commandId: 'undo',
+        config,
+        canUndo: true,
+      }),
+    ).toBe(true)
+    expect(
+      canUseCanvasCommand({
+        commandId: 'ungroup',
+        config,
+        hasSelectedGroup: false,
+      }),
+    ).toBe(false)
   })
 })
