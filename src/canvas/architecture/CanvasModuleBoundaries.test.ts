@@ -2390,6 +2390,9 @@ describe('Canvas module boundaries', () => {
     const commandShortcutFile = getSourceFile(
       'src/canvas/app/keyboard/CanvasKeyboardCommandShortcuts.ts',
     )
+    const commandShortcutCatalogFile = getSourceFile(
+      'src/canvas/app/keyboard/CanvasKeyboardCommandShortcutCatalog.ts',
+    )
     const commandDispatchFile = getSourceFile(
       'src/canvas/app/keyboard/CanvasKeyboardCommandDispatch.ts',
     )
@@ -2522,12 +2525,36 @@ describe('Canvas module boundaries', () => {
     expect(commandShortcutFile.source).toContain(
       'export function getCanvasKeyboardReservedCommandShortcuts',
     )
-    expect(commandShortcutFile.source).toContain("shortcutId: 'undo'")
+    expect(commandShortcutFile.source).toContain(
+      "from './CanvasKeyboardCommandShortcutCatalog'",
+    )
+    expect(commandShortcutFile.source).not.toContain("shortcutId: 'undo'")
+    expect(commandShortcutFile.source).not.toContain(
+      "kind: 'reorder-selection'",
+    )
+    expect(commandShortcutCatalogFile.source).toContain(
+      'CANVAS_KEYBOARD_COMMAND_SHORTCUTS',
+    )
+    expect(commandShortcutCatalogFile.source).toContain("shortcutId: 'undo'")
+    expect(commandShortcutCatalogFile.source).toContain(
+      "kind: 'reorder-selection'",
+    )
     expect(commandShortcutFile.source).not.toContain("shortcutId: 'fitAll'")
     expect(commandShortcutFile.source).not.toContain("shortcutId: 'zoomIn'")
     expect(commandShortcutFile.source).not.toContain("shortcutId: 'nudge'")
     expect(commandShortcutFile.source).not.toContain("'large nudge left'")
-    expect(commandShortcutFile.source).toContain("kind: 'reorder-selection'")
+    expect(commandShortcutCatalogFile.source).not.toContain(
+      "shortcutId: 'fitAll'",
+    )
+    expect(commandShortcutCatalogFile.source).not.toContain(
+      "shortcutId: 'zoomIn'",
+    )
+    expect(commandShortcutCatalogFile.source).not.toContain(
+      "shortcutId: 'nudge'",
+    )
+    expect(commandShortcutCatalogFile.source).not.toContain(
+      "'large nudge left'",
+    )
     expect(commandDispatchFile.source).toContain(
       'export function runCanvasKeyboardCommandIntent',
     )
