@@ -3,6 +3,10 @@ import type {
   Bounds,
   CanvasItem,
 } from '../../entities'
+import {
+  assertCanvasAppDescriptorFunctionField,
+  assertCanvasAppOptionalDescriptorFunctionField,
+} from '../extensions/CanvasAppDescriptorContracts'
 import { assertCanvasAppExtensionEntries } from '../extensions/CanvasAppExtensionIds'
 import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract'
 
@@ -35,19 +39,18 @@ export function assertCanvasAppInspectorPanels(
   })
 
   for (const panel of panels) {
-    assertCanvasAppInspectorPanelFunction({
-      fn: panel.render,
-      label: 'render',
-      panelId: panel.id,
-    })
+    const owner = `inspector panel ${panel.id}`
 
-    if (panel.isVisible !== undefined) {
-      assertCanvasAppInspectorPanelFunction({
-        fn: panel.isVisible,
-        label: 'isVisible',
-        panelId: panel.id,
-      })
-    }
+    assertCanvasAppDescriptorFunctionField({
+      field: 'render',
+      owner,
+      value: panel.render,
+    })
+    assertCanvasAppOptionalDescriptorFunctionField({
+      field: 'isVisible',
+      owner,
+      value: panel.isVisible,
+    })
   }
 }
 
@@ -72,18 +75,4 @@ export function getCanvasAppInspectorPanelViews({
       return []
     }
   })
-}
-
-function assertCanvasAppInspectorPanelFunction({
-  fn,
-  label,
-  panelId,
-}: {
-  fn: unknown
-  label: string
-  panelId: string
-}) {
-  if (typeof fn !== 'function') {
-    throw new Error(`Canvas app inspector panel ${panelId} requires ${label}`)
-  }
 }

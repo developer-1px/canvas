@@ -24,6 +24,14 @@ describe('CanvasDemoSvgComponentRenderer registry', () => {
 
   it('rejects presentation renderer keys outside the app extension id contract', () => {
     expect(() =>
+      createCanvasDemoSvgComponentPresentationRenderers(
+        null as unknown as CanvasDemoSvgComponentPresentationRenderers,
+      ),
+    ).toThrow(
+      'Canvas app component presentation renderer registry must be an object',
+    )
+
+    expect(() =>
       createCanvasDemoSvgComponentPresentationRenderers({
         'Risk Card': () => null,
       }),

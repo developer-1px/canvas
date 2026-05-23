@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import type { CanvasCustomItem } from '../../entities'
+import { assertCanvasAppDescriptorFunctionField } from '../extensions/CanvasAppDescriptorContracts'
 import { assertCanvasAppExtensionRecordKeys } from '../extensions/CanvasAppExtensionIds'
 import { CanvasDemoSvgUnknownCustomItem } from './CanvasDemoSvgUnknownCustomItem'
 
@@ -40,9 +41,11 @@ function assertCanvasDemoSvgCustomItemRendererStrategies(
 ) {
   for (const [presentation, renderer] of Object.entries(renderers)) {
     if (typeof renderer !== 'function') {
-      throw new Error(
-        `Canvas app custom item renderer ${presentation} requires render strategy`,
-      )
+      assertCanvasAppDescriptorFunctionField({
+        field: 'render strategy',
+        owner: `custom item renderer ${presentation}`,
+        value: renderer,
+      })
     }
   }
 }

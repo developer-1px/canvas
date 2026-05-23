@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import type { CanvasComponentItem } from '../../entities'
+import { assertCanvasAppDescriptorFunctionField } from '../extensions/CanvasAppDescriptorContracts'
 import { assertCanvasAppExtensionRecordKeys } from '../extensions/CanvasAppExtensionIds'
 import {
   CanvasDemoSvgConnectorComponent,
@@ -69,9 +70,11 @@ function assertCanvasDemoSvgComponentPresentationRendererStrategies(
 ) {
   for (const [presentation, renderer] of Object.entries(renderers)) {
     if (typeof renderer !== 'function') {
-      throw new Error(
-        `Canvas app component presentation renderer ${presentation} requires render strategy`,
-      )
+      assertCanvasAppDescriptorFunctionField({
+        field: 'render strategy',
+        owner: `component presentation renderer ${presentation}`,
+        value: renderer,
+      })
     }
   }
 }

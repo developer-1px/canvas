@@ -134,6 +134,42 @@ describe('CanvasAppCustomCommands', () => {
 
   it('rejects malformed custom command descriptors before registration', () => {
     expect(() =>
+      assertCanvasAppCustomCommands({} as unknown as CanvasAppCustomCommand[]),
+    ).toThrow('Canvas app custom command descriptors must be an array')
+
+    expect(() =>
+      assertCanvasAppCustomCommands([
+        {
+          id: 'publish',
+          title: 'Publish selection',
+          run: vi.fn(),
+        } as unknown as CanvasAppCustomCommand,
+      ]),
+    ).toThrow('Canvas app custom command publish requires label')
+
+    expect(() =>
+      assertCanvasAppCustomCommands([
+        {
+          id: 'publish',
+          label: 'Pub',
+          run: vi.fn(),
+        } as unknown as CanvasAppCustomCommand,
+      ]),
+    ).toThrow('Canvas app custom command publish requires title')
+
+    expect(() =>
+      assertCanvasAppCustomCommands([
+        {
+          id: 'publish',
+          ariaLabel: true,
+          label: 'Pub',
+          title: 'Publish selection',
+          run: vi.fn(),
+        } as unknown as CanvasAppCustomCommand,
+      ]),
+    ).toThrow('Canvas app custom command publish requires ariaLabel')
+
+    expect(() =>
       assertCanvasAppCustomCommands([
         {
           id: 'publish',

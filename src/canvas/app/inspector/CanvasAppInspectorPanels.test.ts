@@ -84,6 +84,10 @@ describe('CanvasAppInspectorPanels', () => {
 
   it('rejects malformed inspector panel descriptors before registration', () => {
     expect(() =>
+      assertCanvasAppInspectorPanels({} as unknown as CanvasAppInspectorPanel[]),
+    ).toThrow('Canvas app inspector panel descriptors must be an array')
+
+    expect(() =>
       assertCanvasAppInspectorPanels([
         {
           id: 'risk-meta',

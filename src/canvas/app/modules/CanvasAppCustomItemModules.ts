@@ -11,6 +11,10 @@ import {
   assertCanvasAppCustomCommands,
   type CanvasAppCustomCommand,
 } from '../commands/CanvasAppCustomCommands'
+import {
+  assertCanvasAppArray,
+  assertCanvasAppDescriptorObject,
+} from '../extensions/CanvasAppDescriptorContracts'
 import { assertCanvasAppExtensionId } from '../extensions/CanvasAppExtensionIds'
 import {
   appendUniqueCanvasAppExtensionEntries,
@@ -79,22 +83,28 @@ export function createCanvasAppCustomItemModuleAssembly(
   modules: readonly CanvasAppCustomItemModule[] = [],
   options: CanvasAppCustomItemModuleAssemblyOptions = {},
 ): CanvasAppCustomItemModuleAssembly {
+  assertCanvasAppArray(modules, 'custom item modules')
+
+  const disabledModuleIds = options.disabledModuleIds ?? []
+  assertCanvasAppArray(disabledModuleIds, 'disabled custom item module ids')
+
   for (const module of modules) {
     assertCanvasAppCustomItemModuleContracts(module)
   }
 
-  for (const disabledModuleId of options.disabledModuleIds ?? []) {
+  for (const disabledModuleId of disabledModuleIds) {
     assertCanvasAppExtensionId({
       id: disabledModuleId,
       label: 'disabled custom item module',
     })
   }
+  const validatedDisabledModuleIds = disabledModuleIds as readonly string[]
 
   assertUniqueModuleIds(modules)
-  assertKnownDisabledModuleIds(modules, options.disabledModuleIds ?? [])
-  const disabledModuleIds = new Set(options.disabledModuleIds ?? [])
+  assertKnownDisabledModuleIds(modules, validatedDisabledModuleIds)
+  const disabledModuleIdSet = new Set(validatedDisabledModuleIds)
   const enabledModules = modules.filter(
-    (module) => !disabledModuleIds.has(module.id),
+    (module) => !disabledModuleIdSet.has(module.id),
   )
 
   const assembly = enabledModules.reduce<CanvasAppCustomItemModuleAssembly>(
@@ -147,6 +157,7 @@ export function createCanvasAppCustomItemModuleAssembly(
 function assertCanvasAppCustomItemModuleContracts(
   module: CanvasAppCustomItemModule,
 ) {
+  assertCanvasAppDescriptorObject(module, 'custom item module')
   assertCanvasAppExtensionId({
     id: module.id,
     label: 'custom item module',

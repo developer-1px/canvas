@@ -38,6 +38,12 @@ describe('CanvasDemoSvgCustomItemRenderer registry', () => {
 
   it('rejects custom renderer keys outside the app extension id contract', () => {
     expect(() =>
+      createCanvasDemoSvgCustomItemRenderers(
+        null as unknown as CanvasDemoSvgCustomItemRenderers,
+      ),
+    ).toThrow('Canvas app custom item renderer registry must be an object')
+
+    expect(() =>
       createCanvasDemoSvgCustomItemRenderers({
         'Risk Node': () => null,
       }),

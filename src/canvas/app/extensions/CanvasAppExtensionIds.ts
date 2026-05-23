@@ -2,6 +2,11 @@ import {
   isCanvasStableId,
   type CanvasStableId,
 } from '../../core'
+import {
+  assertCanvasAppArray,
+  assertCanvasAppDescriptorObject,
+  assertCanvasAppRegistryRecord,
+} from './CanvasAppDescriptorContracts'
 
 export type CanvasAppExtensionId = CanvasStableId
 
@@ -31,10 +36,13 @@ export function assertCanvasAppExtensionEntries({
   entries,
   label,
 }: {
-  entries: readonly CanvasAppExtensionEntry[]
+  entries: unknown
   label: string
 }) {
+  assertCanvasAppArray(entries, `${label} descriptors`)
+
   for (const entry of entries) {
+    assertCanvasAppDescriptorObject(entry, label)
     assertCanvasAppExtensionId({
       id: entry.id,
       label,
@@ -42,13 +50,15 @@ export function assertCanvasAppExtensionEntries({
   }
 }
 
-export function assertCanvasAppExtensionRecordKeys<TValue>({
+export function assertCanvasAppExtensionRecordKeys({
   entries,
   label,
 }: {
-  entries: Readonly<Record<string, TValue>>
+  entries: unknown
   label: string
 }) {
+  assertCanvasAppRegistryRecord(entries, label)
+
   for (const id of Object.keys(entries)) {
     assertCanvasAppExtensionId({
       id,

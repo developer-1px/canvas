@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  assertCanvasAppExtensionEntries,
   assertCanvasAppExtensionId,
   assertCanvasAppExtensionRecordKeys,
   isCanvasAppExtensionId,
@@ -54,5 +55,28 @@ describe('CanvasAppExtensionIds', () => {
         label: 'custom item renderer',
       }),
     ).toThrow('Invalid canvas app custom item renderer id: Risk Node')
+  })
+
+  it('rejects malformed descriptor collections and registries', () => {
+    expect(() =>
+      assertCanvasAppExtensionEntries({
+        entries: {},
+        label: 'custom command',
+      }),
+    ).toThrow('Canvas app custom command descriptors must be an array')
+
+    expect(() =>
+      assertCanvasAppExtensionEntries({
+        entries: [undefined],
+        label: 'custom command',
+      }),
+    ).toThrow('Canvas app custom command descriptor must be an object')
+
+    expect(() =>
+      assertCanvasAppExtensionRecordKeys({
+        entries: null,
+        label: 'custom item renderer',
+      }),
+    ).toThrow('Canvas app custom item renderer registry must be an object')
   })
 })

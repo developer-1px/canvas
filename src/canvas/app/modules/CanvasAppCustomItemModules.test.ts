@@ -124,6 +124,18 @@ describe('CanvasAppCustomItemModules', () => {
 
   it('rejects module ids outside the app extension id contract', () => {
     expect(() =>
+      defineCanvasAppCustomItemModule(
+        undefined as unknown as CanvasAppCustomItemModule,
+      ),
+    ).toThrow('Canvas app custom item module descriptor must be an object')
+
+    expect(() =>
+      createCanvasAppCustomItemModuleAssembly(
+        {} as unknown as CanvasAppCustomItemModule[],
+      ),
+    ).toThrow('Canvas app custom item modules must be an array')
+
+    expect(() =>
       defineRiskModule({
         id: 'Risk Module',
       }),
@@ -198,6 +210,12 @@ describe('CanvasAppCustomItemModules', () => {
 
   it('rejects unknown disabled module ids', () => {
     const module = defineRiskModule()
+
+    expect(() =>
+      createCanvasAppCustomItemModuleAssembly([module], {
+        disabledModuleIds: {} as unknown as string[],
+      }),
+    ).toThrow('Canvas app disabled custom item module ids must be an array')
 
     expect(() =>
       createCanvasAppCustomItemModuleAssembly([module], {

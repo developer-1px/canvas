@@ -7,6 +7,13 @@ import {
   assertCanvasAppExtensionEntries,
   assertCanvasAppExtensionId,
 } from '../extensions/CanvasAppExtensionIds'
+import {
+  assertCanvasAppDescriptorFunctionField,
+  assertCanvasAppDescriptorObject,
+  assertCanvasAppDescriptorStringField,
+  assertCanvasAppOptionalDescriptorBooleanField,
+  assertCanvasAppOptionalDescriptorStringField,
+} from '../extensions/CanvasAppDescriptorContracts'
 
 export type CanvasAppCustomToolShortcut = {
   key: string
@@ -189,14 +196,69 @@ export function assertCanvasAppCustomCreationTools(
   })
 
   for (const tool of tools) {
-    if (typeof tool.createItem !== 'function') {
-      throw new Error(
-        `Canvas app custom creation tool ${tool.id} requires createItem`,
-      )
-    }
+    assertCanvasAppCustomCreationToolDescriptor(tool)
   }
 
   assertCanvasAppCustomCreationToolShortcuts(tools)
+}
+
+function assertCanvasAppCustomCreationToolDescriptor(
+  tool: CanvasAppCustomCreationTool,
+) {
+  const owner = `custom creation tool ${tool.id}`
+
+  assertCanvasAppDescriptorStringField({
+    field: 'label',
+    owner,
+    value: tool.label,
+  })
+  assertCanvasAppDescriptorStringField({
+    field: 'title',
+    owner,
+    value: tool.title,
+  })
+  assertCanvasAppOptionalDescriptorStringField({
+    field: 'ariaLabel',
+    owner,
+    value: tool.ariaLabel,
+  })
+  assertCanvasAppOptionalDescriptorStringField({
+    field: 'statusLabel',
+    owner,
+    value: tool.statusLabel,
+  })
+  assertCanvasAppDescriptorFunctionField({
+    field: 'createItem',
+    owner,
+    value: tool.createItem,
+  })
+
+  if (tool.shortcut !== undefined) {
+    assertCanvasAppCustomToolShortcutDescriptor({
+      owner,
+      shortcut: tool.shortcut,
+    })
+  }
+}
+
+function assertCanvasAppCustomToolShortcutDescriptor({
+  owner,
+  shortcut,
+}: {
+  owner: string
+  shortcut: CanvasAppCustomToolShortcut
+}) {
+  assertCanvasAppDescriptorObject(shortcut, `${owner} shortcut`)
+  assertCanvasAppDescriptorStringField({
+    field: 'shortcut.key',
+    owner,
+    value: shortcut.key,
+  })
+  assertCanvasAppOptionalDescriptorBooleanField({
+    field: 'shortcut.shiftKey',
+    owner,
+    value: shortcut.shiftKey,
+  })
 }
 
 export function getCanvasAppCustomToolShortcutKey(

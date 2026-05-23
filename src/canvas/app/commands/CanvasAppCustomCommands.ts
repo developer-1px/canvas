@@ -4,6 +4,12 @@ import type {
   EditingText,
   Viewport,
 } from '../../entities'
+import {
+  assertCanvasAppDescriptorFunctionField,
+  assertCanvasAppDescriptorStringField,
+  assertCanvasAppOptionalDescriptorFunctionField,
+  assertCanvasAppOptionalDescriptorStringField,
+} from '../extensions/CanvasAppDescriptorContracts'
 import { assertCanvasAppExtensionEntries } from '../extensions/CanvasAppExtensionIds'
 import type {
   CommitCanvasItemsChange,
@@ -46,19 +52,33 @@ export function assertCanvasAppCustomCommands(
   })
 
   for (const command of commands) {
-    assertCanvasAppCustomCommandFunction({
-      commandId: command.id,
-      fn: command.run,
-      label: 'run',
-    })
+    const owner = `custom command ${command.id}`
 
-    if (command.isEnabled !== undefined) {
-      assertCanvasAppCustomCommandFunction({
-        commandId: command.id,
-        fn: command.isEnabled,
-        label: 'isEnabled',
-      })
-    }
+    assertCanvasAppDescriptorStringField({
+      field: 'label',
+      owner,
+      value: command.label,
+    })
+    assertCanvasAppDescriptorStringField({
+      field: 'title',
+      owner,
+      value: command.title,
+    })
+    assertCanvasAppOptionalDescriptorStringField({
+      field: 'ariaLabel',
+      owner,
+      value: command.ariaLabel,
+    })
+    assertCanvasAppDescriptorFunctionField({
+      field: 'run',
+      owner,
+      value: command.run,
+    })
+    assertCanvasAppOptionalDescriptorFunctionField({
+      field: 'isEnabled',
+      owner,
+      value: command.isEnabled,
+    })
   }
 }
 
@@ -114,19 +134,5 @@ function isCanvasAppCustomCommandDisabled(
     return !command.isEnabled(context)
   } catch {
     return true
-  }
-}
-
-function assertCanvasAppCustomCommandFunction({
-  commandId,
-  fn,
-  label,
-}: {
-  commandId: string
-  fn: unknown
-  label: string
-}) {
-  if (typeof fn !== 'function') {
-    throw new Error(`Canvas app custom command ${commandId} requires ${label}`)
   }
 }

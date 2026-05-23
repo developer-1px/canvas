@@ -106,6 +106,28 @@ describe('CanvasAppCustomCreationTools', () => {
 
   it('rejects malformed custom creation tool descriptors before registration', () => {
     expect(() =>
+      assertCanvasAppCustomCreationTools({} as unknown as CanvasAppCustomCreationTool[]),
+    ).toThrow('Canvas app custom creation tool descriptors must be an array')
+
+    expect(() =>
+      assertCanvasAppCustomCreationTools([
+        {
+          ...tool,
+          label: undefined,
+        } as unknown as CanvasAppCustomCreationTool,
+      ]),
+    ).toThrow('Canvas app custom creation tool risk requires label')
+
+    expect(() =>
+      assertCanvasAppCustomCreationTools([
+        {
+          ...tool,
+          title: undefined,
+        } as unknown as CanvasAppCustomCreationTool,
+      ]),
+    ).toThrow('Canvas app custom creation tool risk requires title')
+
+    expect(() =>
       assertCanvasAppCustomCreationTools([
         {
           ...tool,
@@ -113,6 +135,33 @@ describe('CanvasAppCustomCreationTools', () => {
         } as unknown as CanvasAppCustomCreationTool,
       ]),
     ).toThrow('Canvas app custom creation tool risk requires createItem')
+
+    expect(() =>
+      assertCanvasAppCustomCreationTools([
+        {
+          ...tool,
+          ariaLabel: true,
+        } as unknown as CanvasAppCustomCreationTool,
+      ]),
+    ).toThrow('Canvas app custom creation tool risk requires ariaLabel')
+
+    expect(() =>
+      assertCanvasAppCustomCreationTools([
+        {
+          ...tool,
+          shortcut: { shiftKey: true },
+        } as unknown as CanvasAppCustomCreationTool,
+      ]),
+    ).toThrow('Canvas app custom creation tool risk requires shortcut.key')
+
+    expect(() =>
+      assertCanvasAppCustomCreationTools([
+        {
+          ...tool,
+          shortcut: { key: 'e', shiftKey: 'yes' },
+        } as unknown as CanvasAppCustomCreationTool,
+      ]),
+    ).toThrow('Canvas app custom creation tool risk requires shortcut.shiftKey')
   })
 
   it('rejects built-in canvas shortcut conflicts', () => {
