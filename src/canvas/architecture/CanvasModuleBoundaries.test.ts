@@ -2745,6 +2745,9 @@ describe('Canvas module boundaries', () => {
     const drawingRendererFile = getSourceFile(
       'src/canvas/app/rendering/CanvasDemoSvgDrawingItemRenderer.tsx',
     )
+    const drawingRoutingFile = getSourceFile(
+      'src/canvas/app/rendering/CanvasDemoSvgDrawingItemRenderRouting.tsx',
+    )
 
     expect(itemRenderRoutingFile.source).toContain(
       "from './CanvasDemoSvgDrawingItemRenderer'",
@@ -2761,8 +2764,22 @@ describe('Canvas module boundaries', () => {
     expect(drawingRendererFile.source).toContain(
       'export function isCanvasDemoSvgDrawingItem',
     )
-    expect(drawingRendererFile.source).toContain('createCanvasSvgPathData')
-    expect(drawingRendererFile.source).toContain('CANVAS_SVG_ARROW_MARKER_IRI')
+    expect(drawingRendererFile.source).toContain(
+      "from './CanvasDemoSvgDrawingItemRenderRouting'",
+    )
+    expect(drawingRendererFile.source).not.toContain("item.type === 'arrow'")
+    expect(drawingRendererFile.source).not.toContain('createCanvasSvgPathData')
+    expect(drawingRendererFile.source).not.toContain(
+      'CANVAS_SVG_ARROW_MARKER_IRI',
+    )
+    expect(drawingRoutingFile.source).toContain(
+      'CANVAS_DEMO_SVG_DRAWING_ITEM_RENDER_STRATEGIES',
+    )
+    expect(drawingRoutingFile.source).toContain(
+      'export function renderCanvasDemoSvgDrawingItemByRoute',
+    )
+    expect(drawingRoutingFile.source).toContain('createCanvasSvgPathData')
+    expect(drawingRoutingFile.source).toContain('CANVAS_SVG_ARROW_MARKER_IRI')
   })
 
   it('keeps Demo SVG rect and text item rendering behind a named module', () => {
