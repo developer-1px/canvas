@@ -3,6 +3,16 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "types": "./src/canvas/index.ts",
+  "exports": {
+    ".": "./src/canvas/index.ts",
+    "./app": "./src/canvas/app/index.ts",
+    "./core": "./src/canvas/core/index.ts",
+    "./engine": "./src/canvas/engine/index.ts",
+    "./entities": "./src/canvas/entities/index.ts",
+    "./host": "./src/canvas/host/index.ts",
+    "./renderer": "./src/canvas/renderer/index.ts"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
