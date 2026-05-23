@@ -1,14 +1,16 @@
-import type {
-  CanvasAffordanceConfig,
-  CanvasAlignMode,
-  CanvasCommandId,
-  CanvasDistributeMode,
-} from '../../engine'
+import type { CanvasAffordanceConfig } from '../../engine'
 import type {
   CanvasBuiltinTool,
   CanvasCustomToolId,
   Tool,
 } from '../../entities'
+import {
+  getCanvasToolbarCommandGroups,
+  type CanvasToolbarCommandGroupId,
+  type CanvasToolbarCommandItem,
+} from './CanvasToolbarCommandItems'
+
+export type { CanvasToolbarCommandAction } from './CanvasToolbarCommandItems'
 
 export type CanvasToolbarCustomCommand = {
   ariaLabel: string
@@ -25,18 +27,6 @@ export type CanvasToolbarCustomTool = {
   title: string
 }
 
-export type CanvasToolbarCommandAction =
-  | { kind: 'align'; mode: CanvasAlignMode }
-  | { kind: 'delete' }
-  | { kind: 'distribute'; mode: CanvasDistributeMode }
-  | { kind: 'duplicate' }
-  | { kind: 'group' }
-  | { kind: 'lock' }
-  | { kind: 'redo' }
-  | { kind: 'undo' }
-  | { kind: 'ungroup' }
-  | { kind: 'unlock-all' }
-
 export type CanvasToolbarItem =
   | {
       active: boolean
@@ -51,12 +41,7 @@ export type CanvasToolbarItem =
       title: string
       tool: CanvasCustomToolId
     }
-  | {
-      action: CanvasToolbarCommandAction
-      command: CanvasCommandId
-      disabled: boolean
-      kind: 'command'
-    }
+  | CanvasToolbarCommandItem
   | {
       ariaLabel: string
       disabled: boolean
@@ -68,11 +53,7 @@ export type CanvasToolbarItem =
 
 export type CanvasToolbarGroupId =
   | 'tools'
-  | 'history'
-  | 'selection'
-  | 'grouping'
-  | 'alignment'
-  | 'lock'
+  | CanvasToolbarCommandGroupId
   | 'custom-commands'
 
 export type CanvasToolbarGroup = {
@@ -144,107 +125,18 @@ export function getCanvasToolbarGroups({
     ],
   })
 
-  pushCanvasToolbarGroup(groups, {
-    id: 'history',
-    items: [
-      config.commands.undo
-        ? getCanvasToolbarCommandItem({
-            action: { kind: 'undo' },
-            command: 'undo',
-            disabled: !canUndo,
-          })
-        : null,
-      config.commands.redo
-        ? getCanvasToolbarCommandItem({
-            action: { kind: 'redo' },
-            command: 'redo',
-            disabled: !canRedo,
-          })
-        : null,
-    ],
-  })
-
-  pushCanvasToolbarGroup(groups, {
-    id: 'selection',
-    items: [
-      config.commands.duplicate
-        ? getCanvasToolbarCommandItem({
-            action: { kind: 'duplicate' },
-            command: 'duplicate',
-            disabled: !canDuplicate,
-          })
-        : null,
-      config.commands.delete
-        ? getCanvasToolbarCommandItem({
-            action: { kind: 'delete' },
-            command: 'delete',
-            disabled: !canDelete,
-          })
-        : null,
-    ],
-  })
-
-  pushCanvasToolbarGroup(groups, {
-    id: 'grouping',
-    items: [
-      config.commands.group
-        ? getCanvasToolbarCommandItem({
-            action: { kind: 'group' },
-            command: 'group',
-            disabled: !canGroup,
-          })
-        : null,
-      config.commands.ungroup
-        ? getCanvasToolbarCommandItem({
-            action: { kind: 'ungroup' },
-            command: 'ungroup',
-            disabled: !canUngroup,
-          })
-        : null,
-    ],
-  })
-
-  pushCanvasToolbarGroup(groups, {
-    id: 'alignment',
-    items: [
-      getCanvasToolbarAlignItem('alignLeft', canAlign, config),
-      getCanvasToolbarAlignItem('alignCenter', canAlign, config),
-      getCanvasToolbarAlignItem('alignRight', canAlign, config),
-      getCanvasToolbarAlignItem('alignTop', canAlign, config),
-      getCanvasToolbarAlignItem('alignMiddle', canAlign, config),
-      getCanvasToolbarAlignItem('alignBottom', canAlign, config),
-      getCanvasToolbarDistributeItem(
-        'distributeHorizontal',
-        canDistribute,
-        config,
-      ),
-      getCanvasToolbarDistributeItem(
-        'distributeVertical',
-        canDistribute,
-        config,
-      ),
-    ],
-  })
-
-  pushCanvasToolbarGroup(groups, {
-    id: 'lock',
-    items: [
-      config.commands.lockSelection
-        ? getCanvasToolbarCommandItem({
-            action: { kind: 'lock' },
-            command: 'lockSelection',
-            disabled: !canLock,
-          })
-        : null,
-      config.commands.unlockAll
-        ? getCanvasToolbarCommandItem({
-            action: { kind: 'unlock-all' },
-            command: 'unlockAll',
-            disabled: false,
-          })
-        : null,
-    ],
-  })
+  groups.push(...getCanvasToolbarCommandGroups({
+    canAlign,
+    canDelete,
+    canDistribute,
+    canDuplicate,
+    canGroup,
+    canLock,
+    canRedo,
+    canUndo,
+    canUngroup,
+    config,
+  }))
 
   pushCanvasToolbarGroup(groups, {
     id: 'custom-commands',
@@ -275,49 +167,4 @@ function pushCanvasToolbarGroup(
   if (items.length > 0) {
     groups.push({ id: group.id, items })
   }
-}
-
-function getCanvasToolbarCommandItem({
-  action,
-  command,
-  disabled,
-}: {
-  action: CanvasToolbarCommandAction
-  command: CanvasCommandId
-  disabled: boolean
-}): CanvasToolbarItem {
-  return {
-    action,
-    command,
-    disabled,
-    kind: 'command',
-  }
-}
-
-function getCanvasToolbarAlignItem(
-  command: CanvasAlignMode,
-  canAlign: boolean,
-  config: CanvasAffordanceConfig,
-) {
-  return config.commands[command]
-    ? getCanvasToolbarCommandItem({
-        action: { kind: 'align', mode: command },
-        command,
-        disabled: !canAlign,
-      })
-    : null
-}
-
-function getCanvasToolbarDistributeItem(
-  command: CanvasDistributeMode,
-  canDistribute: boolean,
-  config: CanvasAffordanceConfig,
-) {
-  return config.commands[command]
-    ? getCanvasToolbarCommandItem({
-        action: { kind: 'distribute', mode: command },
-        command,
-        disabled: !canDistribute,
-      })
-    : null
 }
