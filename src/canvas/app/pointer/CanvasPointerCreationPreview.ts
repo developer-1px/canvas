@@ -2,7 +2,6 @@ import type {
   Bounds,
   Point,
 } from '../../entities'
-import { normalizeBounds } from '../../core'
 import {
   EMPTY_CANVAS_SNAP_GUIDES,
   snapCanvasPointToGrid,
@@ -19,6 +18,9 @@ import type {
 import {
   previewCanvasPointerDrawingCreation,
 } from './CanvasPointerDrawingCreation'
+import {
+  previewCanvasPointerShapeCreation,
+} from './CanvasPointerShapeCreation'
 import { hasCanvasInteractionMoved } from './CanvasPointerInteractionMovement'
 
 type CanvasPointerCreationPreviewInput = {
@@ -47,30 +49,15 @@ export function previewCanvasPointerCreation({
   input,
   interaction,
 }: CanvasPointerCreationPreviewInput): CanvasPointerCreationPreviewResult {
-  if (interaction.kind === 'create-rect') {
-    if (!config.gestures.createRect) {
-      return { kind: 'none' }
-    }
+  const shapePreview = previewCanvasPointerShapeCreation({
+    config,
+    currentScreen,
+    currentWorld,
+    interaction,
+  })
 
-    const moved = hasCanvasInteractionMoved({
-      currentScreen,
-      interaction,
-    })
-    const snappedCurrentWorld = snapCanvasPointToGrid({
-      config,
-      point: currentWorld,
-    })
-
-    return {
-      draftRect: normalizeBounds(interaction.startWorld, snappedCurrentWorld),
-      interaction: {
-        ...interaction,
-        currentWorld: snappedCurrentWorld,
-        moved,
-      },
-      kind: 'preview',
-      snapGuides: EMPTY_CANVAS_SNAP_GUIDES,
-    }
+  if (shapePreview) {
+    return shapePreview
   }
 
   const drawingPreview = previewCanvasPointerDrawingCreation({
@@ -83,35 +70,6 @@ export function previewCanvasPointerCreation({
 
   if (drawingPreview) {
     return drawingPreview
-  }
-
-  if (interaction.kind === 'create-arrow') {
-    if (!config.gestures.createArrow) {
-      return { kind: 'none' }
-    }
-
-    const moved = hasCanvasInteractionMoved({
-      currentScreen,
-      interaction,
-    })
-    const snappedCurrentWorld = snapCanvasPointToGrid({
-      config,
-      point: currentWorld,
-    })
-
-    return {
-      draftArrow: {
-        end: snappedCurrentWorld,
-        start: interaction.startWorld,
-      },
-      interaction: {
-        ...interaction,
-        currentWorld: snappedCurrentWorld,
-        moved,
-      },
-      kind: 'preview',
-      snapGuides: EMPTY_CANVAS_SNAP_GUIDES,
-    }
   }
 
   if (interaction.kind === 'create-custom') {

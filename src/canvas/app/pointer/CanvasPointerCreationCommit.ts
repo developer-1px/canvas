@@ -3,8 +3,6 @@ import type {
   Tool,
 } from '../../entities'
 import {
-  createCanvasArrow,
-  createCanvasRect,
   type CanvasCreationAdapter,
 } from '../../engine'
 import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
@@ -17,6 +15,10 @@ import {
   commitCanvasPointerDrawingCreation,
   isCanvasPointerDrawingCreationInteraction,
 } from './CanvasPointerDrawingCreation'
+import {
+  commitCanvasPointerShapeCreation,
+  isCanvasPointerShapeCreationInteraction,
+} from './CanvasPointerShapeCreation'
 
 export type CanvasPointerCreationCommitInput = {
   commitItemsChange: CommitCanvasItemsChange
@@ -37,16 +39,15 @@ export function commitCanvasPointerCreation({
   selection,
   setTool,
 }: CanvasPointerCreationCommitInput) {
-  if (interaction.kind === 'create-rect') {
-    const nextItem = createCanvasRect({
-      adapter: creationAdapter,
+  if (isCanvasPointerShapeCreationInteraction(interaction)) {
+    commitCanvasPointerShapeCreation({
+      commitItemsChange,
+      creationAdapter,
       createId,
-      currentWorld: interaction.currentWorld,
-      startWorld: interaction.startWorld,
+      interaction,
+      selection,
+      setTool,
     })
-
-    commitCanvasCreatedItem({ commitItemsChange, item: nextItem, selection })
-    setTool('select')
     return
   }
 
@@ -61,18 +62,6 @@ export function commitCanvasPointerCreation({
     return
   }
 
-  if (interaction.kind === 'create-arrow') {
-    const nextItem = createCanvasArrow({
-      adapter: creationAdapter,
-      createId,
-      currentWorld: interaction.currentWorld,
-      startWorld: interaction.startWorld,
-    })
-
-    commitCanvasCreatedItem({ commitItemsChange, item: nextItem, selection })
-    return
-  }
-
   commitCanvasCustomCreation({
     commitItemsChange,
     createId,
@@ -82,20 +71,5 @@ export function commitCanvasPointerCreation({
     selection,
     startWorld: interaction.startWorld,
     tool: interaction.tool,
-  })
-}
-
-function commitCanvasCreatedItem({
-  commitItemsChange,
-  item,
-  selection,
-}: {
-  commitItemsChange: CommitCanvasItemsChange
-  item: CanvasItem
-  selection: string[]
-}) {
-  commitItemsChange({ type: 'add', items: [item] }, {
-    before: selection,
-    after: [item.id],
   })
 }

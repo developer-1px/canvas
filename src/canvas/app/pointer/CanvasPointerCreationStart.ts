@@ -7,7 +7,6 @@ import type {
 } from '../../entities'
 import {
   isCanvasCustomToolId,
-  normalizeBounds,
 } from '../../core'
 import {
   createCanvasText,
@@ -28,6 +27,9 @@ import {
 import {
   startCanvasPointerDrawingCreation,
 } from './CanvasPointerDrawingCreation'
+import {
+  startCanvasPointerShapeCreation,
+} from './CanvasPointerShapeCreation'
 
 export type CanvasPointerCreationStartResult =
   | { kind: 'none' }
@@ -74,26 +76,16 @@ export function startCanvasPointerCreation({
     return null
   }
 
-  if (pointerGesture === 'create-rect') {
-    const snappedStartWorld = snapCanvasPointToGrid({
-      config,
-      point: startWorld,
-    })
+  const shapeStart = startCanvasPointerShapeCreation({
+    config,
+    input,
+    pointerGesture,
+    startScreen,
+    startWorld,
+  })
 
-    return {
-      kind: 'interaction',
-      capturePointer: true,
-      draftRect: normalizeBounds(snappedStartWorld, snappedStartWorld),
-      gesture: 'create-rect',
-      interaction: {
-        kind: 'create-rect',
-        pointerId: input.pointerId,
-        startScreen,
-        startWorld: snappedStartWorld,
-        currentWorld: snappedStartWorld,
-        moved: false,
-      },
-    }
+  if (shapeStart) {
+    return shapeStart
   }
 
   const drawingStart = startCanvasPointerDrawingCreation({
@@ -105,31 +97,6 @@ export function startCanvasPointerCreation({
 
   if (drawingStart) {
     return drawingStart
-  }
-
-  if (pointerGesture === 'create-arrow') {
-    const snappedStartWorld = snapCanvasPointToGrid({
-      config,
-      point: startWorld,
-    })
-
-    return {
-      kind: 'interaction',
-      capturePointer: true,
-      draftArrow: {
-        end: snappedStartWorld,
-        start: snappedStartWorld,
-      },
-      gesture: 'create-arrow',
-      interaction: {
-        kind: 'create-arrow',
-        pointerId: input.pointerId,
-        startScreen,
-        startWorld: snappedStartWorld,
-        currentWorld: snappedStartWorld,
-        moved: false,
-      },
-    }
   }
 
   if (pointerGesture === 'create-custom' && isCanvasCustomToolId(tool)) {

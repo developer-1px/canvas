@@ -108,8 +108,9 @@
 - Drawing Item Style: built-in marker, highlighter, arrow의 stroke/opacity 기본값. Draft overlay와 Host item creation이 같은 Host-owned 계약을 쓴다.
 - Canvas Pointer Interaction Start: pointer-down 시 gesture routing, pan, marquee 시작을 active interaction으로 변환하고 생성 시작은 Canvas Pointer Creation Start에 위임하는 App-owned runtime Module.
 - Canvas Tool Gesture Routing: built-in tool과 custom tool을 pointer gesture, feature gate, item pointer rerouting rule로 변환하는 Engine-owned what 계약 Module.
-- Canvas Pointer Creation Grammar: create-rect, drawing creation, arrow, custom creation, text creation gesture와 active creation interaction kind set을 소유하는 App-owned what 계약 Module.
-- Canvas Pointer Creation Start: pointer-down 시 create-rect, drawing creation, arrow, custom creation, text creation 시작 상태와 initial draft overlay, immediate text creation을 소유하는 App-owned runtime Module.
+- Canvas Pointer Creation Grammar: shape creation, drawing creation, custom creation, text creation gesture와 active creation interaction kind set을 소유하는 App-owned what 계약 Module.
+- Canvas Pointer Creation Start: pointer-down 시 shape creation, drawing creation, custom creation, text creation 시작 상태와 initial draft overlay, immediate text creation을 소유하는 App-owned runtime Module.
+- Canvas Pointer Shape Creation: built-in rect/arrow shape creation gesture, draft shape preview, enabled gate, item creation commit, post-create tool selection descriptor를 소유하는 App-owned shape lifecycle Module.
 - Canvas Pointer Drawing Creation: built-in marker/highlighter stroke drawing gesture, draft stroke preview, enabled gate, item creation commit descriptor를 소유하는 App-owned drawing lifecycle Module.
 - Canvas Pointer Interaction Start Effects: pointer-down start 결과를 pointer capture, document commit, selection/live item, draft overlay, editing/tool/gesture state로 적용하는 App-owned runtime Module.
 - Canvas Pointer Click Memory: item pointer-down double-click 판정을 위한 previous click memory, time threshold, distance threshold를 소유하는 App-owned pointer rule Module.
@@ -118,8 +119,8 @@
 - Canvas Pointer Interaction Preview: pointer-move 시 active interaction을 viewport, live item, marquee, selection, draft overlay, snap guide preview로 변환하는 App-owned runtime Module.
 - Canvas Pointer Interaction Drag Effects: pointer-move preview descriptor 적용, pointer-up/cancel 후 pointer release와 drag overlay cleanup, cancel rollback state 적용을 소유하는 App-owned effect Module.
 - Canvas Pointer Transform Preview: pointer-move 시 move/resize interaction을 drag threshold, snap guide, grid snap, transform Adapter live item preview로 변환하는 App-owned runtime Module.
-- Canvas Pointer Creation Preview: create-rect, drawing creation, arrow, custom creation의 draft overlay와 currentWorld/moved preview를 소유하는 App-owned runtime Module.
-- Canvas Pointer Creation Commit: create-rect, drawing creation, arrow, custom creation의 document add commit과 post-create tool 전환 규칙을 소유하는 App-owned runtime Module.
+- Canvas Pointer Creation Preview: shape creation, drawing creation, custom creation의 draft overlay와 currentWorld/moved preview를 소유하는 App-owned runtime Module.
+- Canvas Pointer Creation Commit: shape creation, drawing creation, custom creation의 document add commit과 post-create tool 전환 규칙을 소유하는 App-owned runtime Module.
 - Canvas Pointer Interaction Movement: drag threshold 기반 moved 판정을 pointer interaction preview/start/lifecycle Module들이 공유하는 App-owned runtime Module.
 - Canvas Pointer Interaction Lifecycle: pointer-up/cancel 시 active interaction을 문서 변경, selection 변경, edit 진입, cancel rollback으로 확정하거나 되돌리는 App-owned runtime Module.
 - Canvas App Model: App Shell이 렌더링할 control별 view props를 만들고 command, pointer, keyboard, viewport, text editing wiring을 숨기는 workflow Module.
@@ -182,6 +183,7 @@
 - 당연한 사회적 약속이 되어 있는 캔버스 기능은 내부 모듈이 관리하고, 제품별 커스텀 기능은 외부에서 조립식으로 등록할 수 있어야 한다.
 - marker, highlighter, arrow 같은 기본 드로잉 도구는 제품별 custom item module이 아니라 내부 Affordance로 관리한다.
 - marker/highlighter stroke drawing lifecycle의 gesture kind, draft stroke, enabled gate, item commit은 Canvas Pointer Drawing Creation Module이 소유한다.
+- rect/arrow shape creation lifecycle의 gesture kind, draft shape, enabled gate, item commit, post-create tool selection은 Canvas Pointer Shape Creation Module이 소유한다.
 - Tool에서 pointer gesture와 item pointer rerouting으로 변환하는 규칙은 Canvas Tool Gesture Routing Module이 소유하고, Canvas Gesture Engine은 input button/pan precedence와 fallback orchestration만 맡는다.
 - 기본 드로잉 item은 저장 계약에서 최소 visible geometry, 양수 stroke width, 0보다 크고 1 이하인 opacity를 Host Drawing Item Validation Module에서 검증한다.
 - 기본 드로잉 item의 bounds는 caller 입력을 믿지 않고 Host tree/document가 `points` 또는 `start/end`에서 canonical하게 동기화한다.

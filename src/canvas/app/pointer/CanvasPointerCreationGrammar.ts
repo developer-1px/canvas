@@ -3,20 +3,21 @@ import type { Interaction } from './CanvasInteractionState'
 import {
   CANVAS_POINTER_DRAWING_CREATION_KINDS,
 } from './CanvasPointerDrawingCreation'
+import {
+  CANVAS_POINTER_SHAPE_CREATION_KINDS,
+} from './CanvasPointerShapeCreation'
 
 const CANVAS_POINTER_CREATION_GESTURES = [
-  'create-arrow',
   'create-custom',
-  'create-rect',
   'create-text',
   ...CANVAS_POINTER_DRAWING_CREATION_KINDS,
+  ...CANVAS_POINTER_SHAPE_CREATION_KINDS,
 ] as const satisfies readonly CanvasPointerGesture[]
 
 const CANVAS_POINTER_CREATION_INTERACTION_KINDS = [
-  'create-arrow',
   'create-custom',
-  'create-rect',
   ...CANVAS_POINTER_DRAWING_CREATION_KINDS,
+  ...CANVAS_POINTER_SHAPE_CREATION_KINDS,
 ] as const satisfies readonly Interaction['kind'][]
 
 export type CanvasPointerCreationGesture =
