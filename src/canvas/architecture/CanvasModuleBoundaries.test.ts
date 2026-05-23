@@ -1694,6 +1694,9 @@ describe('Canvas module boundaries', () => {
     const commandShortcutFile = getSourceFile(
       'src/canvas/app/keyboard/CanvasKeyboardCommandShortcuts.ts',
     )
+    const systemShortcutFile = getSourceFile(
+      'src/canvas/app/keyboard/CanvasKeyboardSystemShortcuts.ts',
+    )
     const toolIntentFile = getSourceFile(
       'src/canvas/app/keyboard/CanvasKeyboardToolShortcutIntent.ts',
     )
@@ -1722,7 +1725,13 @@ describe('Canvas module boundaries', () => {
     expect(intentFile.source).toContain(
       "from './CanvasKeyboardCommandShortcutIntent'",
     )
-    expect(intentFile.source).toContain('config.shortcuts.temporaryPan')
+    expect(intentFile.source).toContain(
+      "from './CanvasKeyboardSystemShortcuts'",
+    )
+    expect(intentFile.source).not.toContain('config.shortcuts.temporaryPan')
+    expect(intentFile.source).not.toContain("key === 'f'")
+    expect(intentFile.source).not.toContain("event.code === 'Space'")
+    expect(intentFile.source).not.toContain("event.key === 'Escape'")
     expect(intentFile.source).not.toContain(
       'matchesCanvasAppCustomToolShortcut',
     )
@@ -1747,6 +1756,15 @@ describe('Canvas module boundaries', () => {
     expect(commandShortcutFile.source).toContain("shortcutId: 'undo'")
     expect(commandShortcutFile.source).toContain("shortcutId: 'nudge'")
     expect(commandShortcutFile.source).toContain("kind: 'reorder-selection'")
+    expect(systemShortcutFile.source).toContain(
+      'export function getCanvasKeyboardSystemShortcutIntent',
+    )
+    expect(systemShortcutFile.source).toContain(
+      'export function getCanvasKeyboardReservedSystemShortcuts',
+    )
+    expect(systemShortcutFile.source).toContain("shortcutId: 'findReplace'")
+    expect(systemShortcutFile.source).toContain("shortcutId: 'temporaryPan'")
+    expect(systemShortcutFile.source).toContain("shortcutId: 'escape'")
     expect(toolIntentFile.source).toContain(
       'export function getCanvasKeyboardToolShortcutIntent',
     )
@@ -1775,7 +1793,10 @@ describe('Canvas module boundaries', () => {
     expect(reservedShortcutFile.source).toContain(
       'getCanvasKeyboardReservedCommandShortcuts',
     )
-    expect(reservedShortcutFile.source).toContain("'temporary pan'")
+    expect(reservedShortcutFile.source).toContain(
+      'getCanvasKeyboardReservedSystemShortcuts',
+    )
+    expect(reservedShortcutFile.source).not.toContain("'temporary pan'")
     expect(reservedShortcutFile.source).not.toContain("'large nudge left'")
   })
 

@@ -3,6 +3,7 @@ import {
   handleCanvasKeyboardShortcut,
   type CanvasKeyboardShortcutHandlers,
 } from './CanvasKeyboardShortcutRouter'
+import { shouldReleaseCanvasKeyboardTemporaryPan } from './CanvasKeyboardSystemShortcuts'
 
 export function useCanvasKeyboardShortcuts({
   commitSelection,
@@ -77,7 +78,7 @@ export function useCanvasKeyboardShortcuts({
     }
 
     function handleKeyUp(event: globalThis.KeyboardEvent) {
-      if (config.shortcuts.temporaryPan && event.code === 'Space') {
+      if (shouldReleaseCanvasKeyboardTemporaryPan({ config, event })) {
         setSpaceDown(false)
       }
     }

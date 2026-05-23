@@ -1,8 +1,6 @@
-import {
-  reserveCanvasKeyboardShortcut,
-  type CanvasKeyboardReservedShortcut,
-} from './CanvasKeyboardShortcutChords'
+import type { CanvasKeyboardReservedShortcut } from './CanvasKeyboardShortcutChords'
 import { getCanvasKeyboardReservedCommandShortcuts } from './CanvasKeyboardCommandShortcuts'
+import { getCanvasKeyboardReservedSystemShortcuts } from './CanvasKeyboardSystemShortcuts'
 import { getCanvasKeyboardReservedToolShortcuts } from './CanvasKeyboardToolShortcuts'
 
 export function getCanvasKeyboardReservedShortcuts():
@@ -10,11 +8,6 @@ export function getCanvasKeyboardReservedShortcuts():
   return [
     ...getCanvasKeyboardReservedToolShortcuts(),
     ...getCanvasKeyboardReservedCommandShortcuts(),
-    ...reserveCanvasKeyboardShortcut('temporary pan', { key: 'Space' }, {
-      shiftInsensitive: true,
-    }),
-    ...reserveCanvasKeyboardShortcut('escape', { key: 'Escape' }, {
-      shiftInsensitive: true,
-    }),
+    ...getCanvasKeyboardReservedSystemShortcuts(),
   ]
 }

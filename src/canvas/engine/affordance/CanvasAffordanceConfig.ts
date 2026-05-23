@@ -95,6 +95,7 @@ const CANVAS_AFFORDANCE_CONFIG_DEFAULTS = {
     escape: true,
     fitAll: true,
     fitSelection: true,
+    findReplace: true,
     group: true,
     highlighterTool: true,
     lockSelection: true,

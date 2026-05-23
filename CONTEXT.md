@@ -49,7 +49,8 @@
 - Canvas App Custom Creation Tool: 내부 tool grammar를 수정하지 않고 제품별 item 생성 도구를 toolbar, shortcut, pointer lifecycle에 등록하는 App-owned tool descriptor.
 - Canvas Keyboard Tool Shortcuts: built-in tool shortcut descriptor와 custom creation tool 예약 shortcut 목록을 함께 제공하는 App keyboard contract Module.
 - Canvas Keyboard Command Shortcuts: built-in command, viewport, nudge shortcut descriptor와 custom creation tool 예약 shortcut 목록을 함께 제공하는 App keyboard contract Module.
-- Canvas Keyboard Reserved Shortcuts: built-in tool, command, navigation, gesture shortcut을 custom creation tool shortcut과 충돌하지 않게 예약하는 App keyboard contract Module.
+- Canvas Keyboard System Shortcuts: find/replace, temporary pan, escape 같은 global keyboard shortcut descriptor와 custom creation tool 예약 shortcut 목록을 함께 제공하는 App keyboard contract Module.
+- Canvas Keyboard Reserved Shortcuts: built-in tool, command, system shortcut을 custom creation tool shortcut과 충돌하지 않게 예약하는 App keyboard contract Module.
 - Canvas App Custom Creation Tool Contracts: custom creation tool descriptor shape와 reserved/duplicate shortcut conflict를 검증하는 App-owned contract Module.
 - Canvas App Custom Creation Tool Runtime: custom creation tool id 변환, toolbar state, lookup, shortcut matching을 소유하는 App-owned runtime Module.
 - Canvas App Custom Item Module Creation Tool: Module-owned creation descriptor. bounds/title/data만 반환하고 custom item `id`, `kind`, `presentation`, `type` envelope는 Module assembly가 만든다.
@@ -225,7 +226,7 @@
 - Clipboard command hook은 paste index와 callback wiring을 맡고, Canvas Clipboard Command Execution은 plan 생성과 effect 적용만 조립한다. Clone/duplicate/paste/cut plan과 paste offset 계산은 Canvas Clipboard Command Effect Plan이, Host clipboard/document/editing effect routing은 Canvas Clipboard Command Effects가 소유한다.
 - UI controls는 Demo Host를 직접 import하지 않는다.
 - Canvas Toolbar는 item/button 렌더링과 click dispatch를 맡고, tool/custom command 항목 assembly는 Canvas Toolbar Items가, built-in command group grammar는 Canvas Toolbar Command Items가 소유한다.
-- Keyboard shortcut router는 event preventDefault와 handler 실행을 맡고, keydown orchestration은 Canvas Keyboard Shortcut Intent가, built-in command/viewport/nudge shortcut grammar와 reserved command shortcut 목록은 Canvas Keyboard Command Shortcuts가, built-in/custom tool shortcut precedence는 Canvas Keyboard Tool Shortcut Intent가 소유한다.
+- Keyboard shortcut router는 event preventDefault와 handler 실행을 맡고, keydown orchestration은 Canvas Keyboard Shortcut Intent가, built-in command/viewport/nudge shortcut grammar와 reserved command shortcut 목록은 Canvas Keyboard Command Shortcuts가, global system shortcut grammar와 reserved system shortcut 목록은 Canvas Keyboard System Shortcuts가, built-in/custom tool shortcut precedence는 Canvas Keyboard Tool Shortcut Intent가 소유한다.
 - Module seam import 규칙은 Canvas Module Boundary Guardrail로 검증한다.
 - Linked peer dependency는 앱 번들에 한 번만 들어가야 하며, Vite config에서 `react`, `react-dom`, `zod`를 dedupe한다.
 - Local dev server는 다른 Vite 앱과 포트/호스트가 섞이지 않도록 `127.0.0.1:5173` strict port로 고정한다.

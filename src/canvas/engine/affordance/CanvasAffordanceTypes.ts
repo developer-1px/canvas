@@ -80,6 +80,7 @@ export type CanvasShortcutId =
   | 'escape'
   | 'fitAll'
   | 'fitSelection'
+  | 'findReplace'
   | 'group'
   | 'highlighterTool'
   | 'lockSelection'

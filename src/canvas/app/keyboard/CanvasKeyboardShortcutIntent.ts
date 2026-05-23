@@ -6,15 +6,17 @@ import {
   type CanvasKeyboardCommandShortcutIntent,
   type CanvasKeyboardReorderMode,
 } from './CanvasKeyboardCommandShortcutIntent'
+import {
+  getCanvasKeyboardSystemShortcutIntent,
+  type CanvasKeyboardSystemShortcutIntent,
+} from './CanvasKeyboardSystemShortcuts'
 import { getCanvasKeyboardToolShortcutIntent } from './CanvasKeyboardToolShortcutIntent'
 
 export type { CanvasKeyboardReorderMode }
 
 export type CanvasKeyboardShortcutIntent =
   | { kind: 'none'; preventDefault: false }
-  | { kind: 'open-find-replace'; preventDefault: true }
-  | { kind: 'temporary-pan'; preventDefault: true }
-  | { kind: 'escape'; preventDefault: false }
+  | CanvasKeyboardSystemShortcutIntent
   | CanvasKeyboardCommandShortcutIntent
   | { kind: 'set-tool'; preventDefault: false; tool: Tool }
 
@@ -34,24 +36,32 @@ export function getCanvasKeyboardShortcutIntent({
   const key = event.key.toLowerCase()
   const mod = event.metaKey || event.ctrlKey
 
-  if (mod && key === 'f') {
-    return { kind: 'open-find-replace', preventDefault: true }
+  const preTypingSystemIntent = getCanvasKeyboardSystemShortcutIntent({
+    config,
+    event,
+    key,
+    mod,
+    phase: 'before-typing-target',
+  })
+
+  if (preTypingSystemIntent) {
+    return preTypingSystemIntent
   }
 
   if (isCanvasKeyboardTypingTarget(event.target)) {
     return { kind: 'none', preventDefault: false }
   }
 
-  if (
-    config.shortcuts.temporaryPan &&
-    config.gestures.temporaryPan &&
-    event.code === 'Space'
-  ) {
-    return { kind: 'temporary-pan', preventDefault: true }
-  }
+  const systemIntent = getCanvasKeyboardSystemShortcutIntent({
+    config,
+    event,
+    key,
+    mod,
+    phase: 'after-typing-target',
+  })
 
-  if (config.shortcuts.escape && event.key === 'Escape') {
-    return { kind: 'escape', preventDefault: false }
+  if (systemIntent) {
+    return systemIntent
   }
 
   const commandIntent = getCanvasKeyboardCommandShortcutIntent({

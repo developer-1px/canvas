@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { DEFAULT_CANVAS_AFFORDANCE_CONFIG } from '../../engine'
+import {
+  DEFAULT_CANVAS_AFFORDANCE_CONFIG,
+  createCanvasAffordanceConfig,
+} from '../../engine'
 import type { CanvasAppCustomCreationToolState } from '../tools/CanvasAppCustomCreationToolRuntime'
 import { getCanvasKeyboardShortcutIntent } from './CanvasKeyboardShortcutIntent'
 
@@ -84,6 +87,22 @@ describe('CanvasKeyboardShortcutIntent', () => {
       kind: 'open-find-replace',
       preventDefault: true,
     })
+  })
+
+  it('honors find/replace shortcut and overlay toggles', () => {
+    expect(getCanvasKeyboardShortcutIntent(createInput({
+      config: createCanvasAffordanceConfig({
+        shortcuts: { findReplace: false },
+      }),
+      event: createKeyboardEvent({ ctrlKey: true, key: 'f' }),
+    }))).toEqual({ kind: 'none', preventDefault: false })
+
+    expect(getCanvasKeyboardShortcutIntent(createInput({
+      config: createCanvasAffordanceConfig({
+        overlays: { findReplace: false },
+      }),
+      event: createKeyboardEvent({ ctrlKey: true, key: 'f' }),
+    }))).toEqual({ kind: 'none', preventDefault: false })
   })
 })
 
