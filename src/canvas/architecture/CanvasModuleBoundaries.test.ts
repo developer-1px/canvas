@@ -410,6 +410,35 @@ describe('Canvas module boundaries', () => {
     expect(controlModelFile.source).toContain('selection.length > 2')
   })
 
+  it('keeps app command handler wiring behind a named workflow module', () => {
+    const appModelFile = getSourceFile(
+      'src/canvas/app/workflow/useCanvasAppModel.ts',
+    )
+    const commandModelFile = getSourceFile(
+      'src/canvas/app/workflow/useCanvasAppCommandModel.ts',
+    )
+
+    expect(appModelFile.source).toContain(
+      "from './useCanvasAppCommandModel'",
+    )
+    expect(appModelFile.source).not.toContain(
+      "from '../commands/useCanvasCommands'",
+    )
+    expect(appModelFile.source).not.toContain('useCanvasCommands({')
+    expect(commandModelFile.source).toContain(
+      "from '../commands/useCanvasCommands'",
+    )
+    expect(commandModelFile.source).toContain(
+      'export function useCanvasAppCommandModel',
+    )
+    expect(commandModelFile.source).toContain(
+      'commitItemsChange: document.commitItemsChange',
+    )
+    expect(commandModelFile.source).toContain(
+      'setSelection: workspace.setSelection',
+    )
+  })
+
   it('keeps app pointer handler wiring behind a named workflow module', () => {
     const appModelFile = getSourceFile(
       'src/canvas/app/workflow/useCanvasAppModel.ts',

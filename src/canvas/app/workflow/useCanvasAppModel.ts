@@ -5,7 +5,6 @@ import {
 import {
   DEFAULT_CANVAS_AFFORDANCE_CONFIG,
 } from '../../engine'
-import { useCanvasCommands } from '../commands/useCanvasCommands'
 import { useCanvasComponentInsertion } from '../components/useCanvasComponentInsertion'
 import { useCanvasObjectInspector } from '../inspector/useCanvasObjectInspector'
 import { useCanvasAppStageElement } from '../stage/CanvasAppStageElement'
@@ -13,6 +12,7 @@ import { useCanvasViewportControls } from '../viewport/useCanvasViewportControls
 import { useCanvasWheelViewport } from '../viewport/useCanvasWheelViewport'
 import { getCanvasAppControlModel } from './CanvasAppControlModel'
 import { renderCanvasAppStageModel } from './CanvasAppStageModel'
+import { useCanvasAppCommandModel } from './useCanvasAppCommandModel'
 import { useCanvasAppExtensionModel } from './useCanvasAppExtensionModel'
 import { useCanvasAppKeyboardModel } from './useCanvasAppKeyboardModel'
 import { useCanvasAppPointerModel } from './useCanvasAppPointerModel'
@@ -147,41 +147,27 @@ export function useCanvasAppModel({
     viewport,
   })
 
-  const {
-    alignSelection,
-    cloneItems,
-    copySelection,
-    cutSelection,
-    deleteSelection,
-    distributeSelection,
-    duplicateSelection,
-    groupSelection,
-    lockSelection,
-    moveSelection,
-    pasteSelection,
-    redoHistory,
-    reorderSelection,
-    selectAll,
-    undoHistory,
-    ungroupSelection,
-    unlockAll,
-  } = useCanvasCommands({
+  const commands = useCanvasAppCommandModel({
     commandAdapter: itemAdapters.command,
-    commitSelection,
-    commitItemsChange,
     config: canvasAffordanceConfig,
-    copyItemsToClipboard,
     createId,
-    getClipboardItems,
-    items,
-    redo,
-    selection,
+    document: {
+      commitItemsChange,
+      commitSelection,
+      copyItemsToClipboard,
+      getClipboardItems,
+      redo,
+      setClipboardItems,
+      undo,
+    },
     setEditing,
-    setClipboardItems,
-    setSelection,
     stageElement,
-    undo,
-    viewport,
+    workspace: {
+      items,
+      selection,
+      setSelection,
+      viewport,
+    },
   })
 
   const { fitToItems, resetViewport, zoomBy } =
@@ -194,20 +180,20 @@ export function useCanvasAppModel({
   useCanvasAppKeyboardModel({
     command: {
       commitSelection,
-      copySelection,
-      cutSelection,
-      deleteSelection,
-      duplicateSelection,
-      groupSelection,
-      lockSelection,
-      moveSelection,
-      pasteSelection,
-      redoHistory,
-      reorderSelection,
-      selectAll,
-      undoHistory,
-      ungroupSelection,
-      unlockAll,
+      copySelection: commands.copySelection,
+      cutSelection: commands.cutSelection,
+      deleteSelection: commands.deleteSelection,
+      duplicateSelection: commands.duplicateSelection,
+      groupSelection: commands.groupSelection,
+      lockSelection: commands.lockSelection,
+      moveSelection: commands.moveSelection,
+      pasteSelection: commands.pasteSelection,
+      redoHistory: commands.redoHistory,
+      reorderSelection: commands.reorderSelection,
+      selectAll: commands.selectAll,
+      undoHistory: commands.undoHistory,
+      ungroupSelection: commands.ungroupSelection,
+      unlockAll: commands.unlockAll,
     },
     config: canvasAffordanceConfig,
     customCreationTools: customCreationToolStates,
@@ -233,7 +219,7 @@ export function useCanvasAppModel({
 
   const pointer = useCanvasAppPointerModel({
     command: {
-      cloneItems,
+      cloneItems: commands.cloneItems,
       commitItemsChange,
       commitSelection,
     },
@@ -294,20 +280,20 @@ export function useCanvasAppModel({
     selection,
     tool,
     viewport,
-    onAlign: alignSelection,
-    onDelete: deleteSelection,
-    onDistribute: distributeSelection,
-    onDuplicate: duplicateSelection,
+    onAlign: commands.alignSelection,
+    onDelete: commands.deleteSelection,
+    onDistribute: commands.distributeSelection,
+    onDuplicate: commands.duplicateSelection,
     onFitItems: fitToItems,
-    onGroup: groupSelection,
+    onGroup: commands.groupSelection,
     onInsertComponent: insertComponent,
-    onLock: lockSelection,
-    onRedo: redoHistory,
+    onLock: commands.lockSelection,
+    onRedo: commands.redoHistory,
     onRunCustomCommand: runCustomCommand,
     onToolChange: setTool,
-    onUndo: undoHistory,
-    onUngroup: ungroupSelection,
-    onUnlockAll: unlockAll,
+    onUndo: commands.undoHistory,
+    onUngroup: commands.ungroupSelection,
+    onUnlockAll: commands.unlockAll,
     onViewportReset: resetViewport,
     onZoomBy: zoomBy,
   })
