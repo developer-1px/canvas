@@ -689,6 +689,9 @@ describe('Canvas module boundaries', () => {
     const availabilityFile = getSourceFile(
       'src/canvas/engine/command/CanvasCommandAvailability.ts',
     )
+    const availabilityRulesFile = getSourceFile(
+      'src/canvas/engine/command/CanvasCommandAvailabilityRules.ts',
+    )
     const rulesFile = getSourceFile(
       'src/canvas/engine/command/CanvasCommandSelectionRules.ts',
     )
@@ -705,10 +708,20 @@ describe('Canvas module boundaries', () => {
     expect(actionFile.source).not.toContain('selection.length < 2')
     expect(actionFile.source).not.toContain('selection.length < 3')
     expect(availabilityFile.source).toContain(
+      "from './CanvasCommandAvailabilityRules'",
+    )
+    expect(availabilityRulesFile.source).toContain(
+      'CANVAS_COMMAND_AVAILABILITY_RULES',
+    )
+    expect(availabilityRulesFile.source).toContain(
       'getCanvasCommandSelectionState',
     )
-    expect(availabilityFile.source).not.toContain('selection.length > 1')
-    expect(availabilityFile.source).not.toContain('selection.length > 2')
+    expect(availabilityRulesFile.source).not.toContain(
+      'selection.length > 1',
+    )
+    expect(availabilityRulesFile.source).not.toContain(
+      'selection.length > 2',
+    )
     expect(rulesFile.source).toContain(
       'CANVAS_COMMAND_SELECTION_MINIMUMS',
     )
