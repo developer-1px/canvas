@@ -102,13 +102,15 @@ export function createCanvasDocumentController(
       currentItems: CanvasItem[],
       selection?: CanvasDocumentSelectionHistory,
     ) {
-      return commitCanvasItemsChange({
-        change,
-        currentItems,
-        document,
-        selection,
-        validation,
-      })
+      return containCanvasDocumentMutation(false, () =>
+        commitCanvasItemsChange({
+          change,
+          currentItems,
+          document,
+          selection,
+          validation,
+        }),
+      )
     },
     commitSelection(ids: CanvasSelectionIds) {
       return commitCanvasDocumentSelection(document, ids)
@@ -148,7 +150,9 @@ export function createCanvasDocumentController(
       }
     },
     replaceItems(currentItems: CanvasItem[], nextItems: CanvasItem[]) {
-      return replaceCanvasItems(currentItems, nextItems, validation)
+      return containCanvasDocumentMutation(currentItems, () =>
+        replaceCanvasItems(currentItems, nextItems, validation),
+      )
     },
     replaceText(
       searchText: string,
@@ -156,20 +160,22 @@ export function createCanvasDocumentController(
       selection: CanvasSelectionIds,
       options?: CanvasTextSearchOptions,
     ) {
-      return commitCanvasItemsPatch({
-        document,
-        patch: createReplaceCanvasDocumentTextPatch(
+      return containCanvasDocumentMutation(false, () =>
+        commitCanvasItemsPatch({
           document,
-          searchText,
-          replacement,
-          options,
-        ),
-        selection: {
-          before: selection,
-          after: selection,
-        },
-        validation,
-      })
+          patch: createReplaceCanvasDocumentTextPatch(
+            document,
+            searchText,
+            replacement,
+            options,
+          ),
+          selection: {
+            before: selection,
+            after: selection,
+          },
+          validation,
+        }),
+      )
     },
     restoreSelection(ids: CanvasSelectionIds, items: CanvasItem[] = document.value) {
       restoreCanvasDocumentSelection(document, ids, items)
@@ -190,5 +196,13 @@ export function createCanvasDocumentController(
     writeClipboardItems(items: CanvasItem[]) {
       return writeCanvasDocumentClipboardItems(document, items, validation)
     },
+  }
+}
+
+function containCanvasDocumentMutation<T>(fallback: T, mutate: () => T) {
+  try {
+    return mutate()
+  } catch {
+    return fallback
   }
 }

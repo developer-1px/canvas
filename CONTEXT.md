@@ -80,6 +80,7 @@
 - 제품별 저장 payload는 Canvas Custom Item의 JSON `data` 안에 두고, payload 의미 검증은 Canvas Custom Item Validator로 등록한다.
 - 저장된 workspace snapshot은 현재 Canvas Custom Item Validator로 다시 검증하고, 실패하면 앱 초기화 대신 저장 snapshot을 제거한 뒤 버려야 한다.
 - Clipboard payload는 Host Document Controller에서 현재 item 저장 계약으로 다시 검증하고, 실패하면 command loop로 throw하지 않고 빈 clipboard/false로 containment 한다.
+- Host Document Controller는 invalid item mutation을 App workflow로 throw하지 않고 false/current items로 containment 한다.
 - App Shell은 command, pointer, keyboard, viewport, text editing wiring을 직접 알지 않는다.
 - App View는 raw workflow state 대신 Canvas App Model이 조립한 control별 props만 받는다.
 - App Shell은 workspace 저장, document history, read model 생성 방식을 직접 알지 않는다.
