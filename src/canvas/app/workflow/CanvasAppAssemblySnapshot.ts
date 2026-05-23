@@ -2,9 +2,12 @@ import {
   createCanvasComponentLibrary,
   normalizeCanvasItems,
 } from '../../host'
-import type { CanvasAppCustomCommand } from '../commands/CanvasAppCustomCommands'
-import type { CanvasAppInspectorPanel } from '../inspector/CanvasAppInspectorPanels'
-import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
+import {
+  snapshotCanvasAppArray,
+  snapshotCanvasAppDescriptorArray,
+  snapshotCanvasAppRecord,
+  snapshotCanvasAppShortcutDescriptorArray,
+} from '../extensions/CanvasAppDescriptorSnapshot'
 import type {
   CanvasAppAssembly,
 } from './CanvasAppAssemblyTypes'
@@ -13,7 +16,7 @@ import { snapshotCanvasAppAssemblyAdapters } from './CanvasAppAdapterSnapshot'
 export function snapshotCanvasAppAssembly(
   assembly: CanvasAppAssembly,
 ): CanvasAppAssembly {
-  const customItemValidators = freezeCanvasAppRecord(
+  const customItemValidators = snapshotCanvasAppRecord(
     assembly.customItemValidators,
   )
   const adapterSnapshot = snapshotCanvasAppAssemblyAdapters(assembly)
@@ -25,25 +28,21 @@ export function snapshotCanvasAppAssembly(
     componentLibrary: snapshotCanvasAppComponentLibrary(
       assembly.componentLibrary,
     ),
-    componentPresentationRenderers: freezeCanvasAppRecord(
+    componentPresentationRenderers: snapshotCanvasAppRecord(
       assembly.componentPresentationRenderers,
     ),
-    customCommands: freezeCanvasAppArray(
-      assembly.customCommands.map(snapshotCanvasAppCustomCommand),
+    customCommands: snapshotCanvasAppDescriptorArray(assembly.customCommands),
+    customCreationTools: snapshotCanvasAppShortcutDescriptorArray(
+      assembly.customCreationTools,
     ),
-    customCreationTools: freezeCanvasAppArray(
-      assembly.customCreationTools.map(snapshotCanvasAppCustomCreationTool),
-    ),
-    customItemRenderers: freezeCanvasAppRecord(assembly.customItemRenderers),
+    customItemRenderers: snapshotCanvasAppRecord(assembly.customItemRenderers),
     customItemValidators,
-    inspectorPanels: freezeCanvasAppArray(
-      assembly.inspectorPanels.map(snapshotCanvasAppInspectorPanel),
-    ),
+    inspectorPanels: snapshotCanvasAppDescriptorArray(assembly.inspectorPanels),
     initialItems: snapshotCanvasAppInitialItems(
       assembly.initialItems,
       customItemValidators,
     ),
-    initialSelection: freezeCanvasAppArray(assembly.initialSelection),
+    initialSelection: snapshotCanvasAppArray(assembly.initialSelection),
     itemAdapters: adapterSnapshot.itemAdapters,
     itemLayerAdapter: adapterSnapshot.itemLayerAdapter,
     stageAdapter: adapterSnapshot.stageAdapter,
@@ -55,11 +54,11 @@ function snapshotCanvasAppAffordanceConfig(
   config: CanvasAppAssembly['affordanceConfig'],
 ): CanvasAppAssembly['affordanceConfig'] {
   return Object.freeze({
-    commands: freezeCanvasAppRecord(config.commands),
-    gestures: freezeCanvasAppRecord(config.gestures),
-    overlays: freezeCanvasAppRecord(config.overlays),
-    shortcuts: freezeCanvasAppRecord(config.shortcuts),
-    tools: freezeCanvasAppRecord(config.tools),
+    commands: snapshotCanvasAppRecord(config.commands),
+    gestures: snapshotCanvasAppRecord(config.gestures),
+    overlays: snapshotCanvasAppRecord(config.overlays),
+    shortcuts: snapshotCanvasAppRecord(config.shortcuts),
+    tools: snapshotCanvasAppRecord(config.tools),
   }) as CanvasAppAssembly['affordanceConfig']
 }
 
@@ -81,50 +80,14 @@ function snapshotCanvasAppComponentLibrary(
   })
 }
 
-function snapshotCanvasAppCustomCommand(
-  command: CanvasAppCustomCommand,
-): CanvasAppCustomCommand {
-  return Object.freeze({ ...command })
-}
-
-function snapshotCanvasAppCustomCreationTool(
-  tool: CanvasAppCustomCreationTool,
-): CanvasAppCustomCreationTool {
-  const snapshot: CanvasAppCustomCreationTool = {
-    ...tool,
-  }
-
-  if (tool.shortcut) {
-    snapshot.shortcut = Object.freeze({ ...tool.shortcut })
-  }
-
-  return Object.freeze(snapshot)
-}
-
-function snapshotCanvasAppInspectorPanel(
-  panel: CanvasAppInspectorPanel,
-): CanvasAppInspectorPanel {
-  return Object.freeze({ ...panel })
-}
-
 function snapshotCanvasAppInitialItems(
   items: CanvasAppAssembly['initialItems'],
   customItemValidators: CanvasAppAssembly['customItemValidators'],
 ) {
-  return freezeCanvasAppArray(
+  return snapshotCanvasAppArray(
     normalizeCanvasItems(items, { customItemValidators })
       .map((item) => deepFreezeCanvasAppValue(structuredClone(item))),
   ) as CanvasAppAssembly['initialItems']
-}
-
-function freezeCanvasAppRecord<TValue>(
-  record: Readonly<Record<string, TValue>>,
-) {
-  return Object.freeze({ ...record })
-}
-
-function freezeCanvasAppArray<TValue>(items: readonly TValue[]) {
-  return Object.freeze([...items]) as readonly TValue[]
 }
 
 function deepFreezeCanvasAppValue<TValue>(value: TValue): TValue {

@@ -29,6 +29,7 @@
 - Canvas Component Item Validation: component item의 stable component id, title/style string, optional text list 저장 shape 검증을 소유하는 Host-owned validation Module.
 - Canvas Editable Text Item: rect와 text item이 공유하는 editable target 판정, 저장 shape, edit initial value, commit fallback, patch operation을 소유하는 Host-owned text Module.
 - Canvas App Assembly: 내부 캔버스 문법은 유지하면서 affordance feature toggle, Host item adapter, component library, custom item module, initial items, SVG presentation registry 같은 제품별 의미를 외부에서 조립하는 composition Module.
+- Canvas App Assembly Types: public assembly input/output type 계약만 소유하고 runtime assembly/default/snapshot/contract Module은 이 type Module을 참조한다.
 - Canvas App Assembly Input: Canvas App Assembly output을 `Partial`로 노출하지 않고 Host가 조립할 수 있는 필드만 명시한 외부 입력 계약.
 - Canvas App Assembly Child Contract: component assembly와 adapter bundle 같은 하위 조립 seam이 full Canvas App Assembly output에서 `Pick`으로 파생하지 않고 필요한 field만 명시하는 내부 Interface 계약.
 - Canvas App Assembly Source: App Shell이 prebuilt Canvas App Assembly와 Canvas App Assembly Input 중 하나를 받아 내부에서 조립/검증/snapshot 경로로 정규화하는 Module.
@@ -49,6 +50,7 @@
 - Canvas App Item Layer Adapter: App workflow가 concrete Demo SVG item layer를 직접 알지 않고 items를 stage children으로 렌더링하도록 주입받는 Adapter Interface.
 - Canvas App Extension Id: custom command, creation tool, item module, component presentation renderer key, custom item renderer key, validator key, inspector panel에서 공유하는 안정 lower-kebab 외부 계약.
 - Canvas App Extension Registry: assembly 단계에서 extension entry와 record key를 검증하고 중복을 실패시키는 내부 merge 계약.
+- Canvas App Descriptor Snapshot: 외부 등록 descriptor array, registry record, shortcut descriptor의 copy/freeze 규칙을 소유해 Assembly와 Custom Item Module snapshot이 같은 mutation 방어 계약을 쓰게 하는 App-owned Module.
 - Canvas App Extension Assembly: custom command, custom item module, custom creation tool, custom item renderer, validator, inspector panel을 App Assembly output bundle로 합성하는 App-owned composition Module.
 - Canvas App Descriptor Shape Contract: 제품별 descriptor가 외부 조립 seam을 통과하기 전에 필수 함수 slot을 갖췄는지 검증하는 외부 Interface 계약.
 - Canvas Standard Command Execution: 내부 canvas command grammar 실행을 effect plan 생성과 document effect 적용으로 조립하는 App-owned runtime Module.

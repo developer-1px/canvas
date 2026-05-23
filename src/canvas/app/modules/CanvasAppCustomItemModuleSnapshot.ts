@@ -1,25 +1,24 @@
-import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
+import {
+  snapshotCanvasAppDescriptorArray,
+  snapshotCanvasAppRecord,
+  snapshotCanvasAppShortcutDescriptorArray,
+} from '../extensions/CanvasAppDescriptorSnapshot'
 import type {
   CanvasAppCustomItemModule,
   CanvasAppCustomItemModuleAssembly,
-  CanvasAppCustomItemModuleCreationTool,
 } from './CanvasAppCustomItemModules'
 
 export function snapshotCanvasAppCustomItemModuleAssembly(
   assembly: CanvasAppCustomItemModuleAssembly,
 ): CanvasAppCustomItemModuleAssembly {
   return Object.freeze({
-    customCommands: freezeCanvasAppArray(
-      assembly.customCommands.map((command) => Object.freeze({ ...command })),
+    customCommands: snapshotCanvasAppDescriptorArray(assembly.customCommands),
+    customCreationTools: snapshotCanvasAppShortcutDescriptorArray(
+      assembly.customCreationTools,
     ),
-    customCreationTools: freezeCanvasAppArray(
-      assembly.customCreationTools.map(snapshotCanvasAppCustomCreationTool),
-    ),
-    customItemRenderers: freezeCanvasAppRecord(assembly.customItemRenderers),
-    customItemValidators: freezeCanvasAppRecord(assembly.customItemValidators),
-    inspectorPanels: freezeCanvasAppArray(
-      assembly.inspectorPanels.map((panel) => Object.freeze({ ...panel })),
-    ),
+    customItemRenderers: snapshotCanvasAppRecord(assembly.customItemRenderers),
+    customItemValidators: snapshotCanvasAppRecord(assembly.customItemValidators),
+    inspectorPanels: snapshotCanvasAppDescriptorArray(assembly.inspectorPanels),
   })
 }
 
@@ -34,58 +33,22 @@ export function snapshotCanvasAppCustomItemModule(
   }
 
   if (module.customCommands) {
-    snapshot.customCommands = freezeCanvasAppArray(
-      module.customCommands.map((command) => Object.freeze({ ...command })),
+    snapshot.customCommands = snapshotCanvasAppDescriptorArray(
+      module.customCommands,
     )
   }
 
   if (module.customCreationTools) {
-    snapshot.customCreationTools = freezeCanvasAppArray(
-      module.customCreationTools.map(
-        snapshotCanvasAppCustomItemModuleCreationTool,
-      ),
+    snapshot.customCreationTools = snapshotCanvasAppShortcutDescriptorArray(
+      module.customCreationTools,
     )
   }
 
   if (module.inspectorPanels) {
-    snapshot.inspectorPanels = freezeCanvasAppArray(
-      module.inspectorPanels.map((panel) => Object.freeze({ ...panel })),
+    snapshot.inspectorPanels = snapshotCanvasAppDescriptorArray(
+      module.inspectorPanels,
     )
   }
 
   return Object.freeze(snapshot)
-}
-
-function snapshotCanvasAppCustomItemModuleCreationTool(
-  tool: CanvasAppCustomItemModuleCreationTool,
-): CanvasAppCustomItemModuleCreationTool {
-  const snapshot: CanvasAppCustomItemModuleCreationTool = { ...tool }
-
-  if (tool.shortcut) {
-    snapshot.shortcut = Object.freeze({ ...tool.shortcut })
-  }
-
-  return Object.freeze(snapshot)
-}
-
-function snapshotCanvasAppCustomCreationTool(
-  tool: CanvasAppCustomCreationTool,
-): CanvasAppCustomCreationTool {
-  const snapshot: CanvasAppCustomCreationTool = { ...tool }
-
-  if (tool.shortcut) {
-    snapshot.shortcut = Object.freeze({ ...tool.shortcut })
-  }
-
-  return Object.freeze(snapshot)
-}
-
-function freezeCanvasAppRecord<TValue>(
-  record: Readonly<Record<string, TValue>>,
-) {
-  return Object.freeze({ ...record })
-}
-
-function freezeCanvasAppArray<TValue>(items: readonly TValue[]) {
-  return Object.freeze([...items]) as readonly TValue[]
 }

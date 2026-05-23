@@ -139,17 +139,62 @@ describe('Canvas module boundaries', () => {
   })
 
   it('keeps Canvas App Assembly input explicit instead of mirroring output', () => {
-    const violations = sourceFiles
-      .filter((file) =>
-        file.path === 'src/canvas/app/workflow/CanvasAppAssembly.ts',
-      )
-      .flatMap((file) =>
-        file.source.includes('Partial<CanvasAppAssembly>')
-          ? [file.path]
-          : [],
-      )
+    const typeContractFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppAssemblyTypes.ts',
+    )
 
-    expect(violations).toEqual([])
+    expect(typeContractFile.source).toContain(
+      'export type CanvasAppAssemblyInput = {',
+    )
+    expect(typeContractFile.source).not.toContain('Partial<CanvasAppAssembly>')
+  })
+
+  it('keeps App Assembly type contracts behind a named module', () => {
+    const assemblyFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppAssembly.ts',
+    )
+    const typeContractFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppAssemblyTypes.ts',
+    )
+    const snapshotFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppAssemblySnapshot.ts',
+    )
+    const contractsFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppAssemblyContracts.ts',
+    )
+    const modelFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppAssemblyModel.ts',
+    )
+    const defaultAssemblyFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppDefaultAssembly.ts',
+    )
+
+    expect(assemblyFile.source).toContain("from './CanvasAppAssemblyTypes'")
+    expect(assemblyFile.source).not.toContain(
+      'export type CanvasAppAssembly = {',
+    )
+    expect(assemblyFile.source).not.toContain(
+      'export type CanvasAppAssemblyInput = {',
+    )
+    expect(typeContractFile.source).toContain(
+      'export type CanvasAppAssembly = {',
+    )
+    expect(typeContractFile.source).toContain(
+      'export type CanvasAppAssemblyInput = {',
+    )
+    expect(typeContractFile.source).not.toContain(
+      "from './CanvasAppAssembly'",
+    )
+    expect(typeContractFile.source).not.toContain(
+      'DEFAULT_CANVAS_APP_ASSEMBLY',
+    )
+    expect(typeContractFile.source).not.toContain('snapshotCanvasAppAssembly')
+    expect(snapshotFile.source).toContain("from './CanvasAppAssemblyTypes'")
+    expect(contractsFile.source).toContain("from './CanvasAppAssemblyTypes'")
+    expect(modelFile.source).toContain("from './CanvasAppAssemblyTypes'")
+    expect(defaultAssemblyFile.source).toContain(
+      "from './CanvasAppAssemblyTypes'",
+    )
   })
 
   it('keeps App component composition behind a named Assembly module', () => {
@@ -299,11 +344,11 @@ describe('Canvas module boundaries', () => {
   })
 
   it('keeps custom item registries as Assembly output, not input', () => {
-    const assemblyFile = getSourceFile(
-      'src/canvas/app/workflow/CanvasAppAssembly.ts',
+    const typeContractFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppAssemblyTypes.ts',
     )
     const inputContract =
-      assemblyFile.source.match(
+      typeContractFile.source.match(
         /export type CanvasAppAssemblyInput = \{[\s\S]*?\n\}/,
       )?.[0] ?? ''
 
@@ -4338,6 +4383,9 @@ describe('Canvas module boundaries', () => {
     const snapshotFile = getSourceFile(
       'src/canvas/app/modules/CanvasAppCustomItemModuleSnapshot.ts',
     )
+    const descriptorSnapshotFile = getSourceFile(
+      'src/canvas/app/extensions/CanvasAppDescriptorSnapshot.ts',
+    )
 
     expect(moduleFile.source).toContain(
       "from './CanvasAppCustomItemModuleSnapshot'",
@@ -4356,8 +4404,20 @@ describe('Canvas module boundaries', () => {
     expect(snapshotFile.source).toContain(
       'export function snapshotCanvasAppCustomItemModule(',
     )
-    expect(snapshotFile.source).toContain('function freezeCanvasAppRecord')
-    expect(snapshotFile.source).toContain('function freezeCanvasAppArray')
+    expect(snapshotFile.source).toContain(
+      "from '../extensions/CanvasAppDescriptorSnapshot'",
+    )
+    expect(snapshotFile.source).not.toContain('function freezeCanvasAppRecord')
+    expect(snapshotFile.source).not.toContain('function freezeCanvasAppArray')
+    expect(descriptorSnapshotFile.source).toContain(
+      'export function snapshotCanvasAppDescriptorArray',
+    )
+    expect(descriptorSnapshotFile.source).toContain(
+      'export function snapshotCanvasAppShortcutDescriptorArray',
+    )
+    expect(descriptorSnapshotFile.source).toContain(
+      'export function snapshotCanvasAppRecord',
+    )
   })
 
   it('keeps App custom item validator contracts behind a named module', () => {
@@ -4400,12 +4460,15 @@ describe('Canvas module boundaries', () => {
     )
     expect(assemblyFile.source).not.toContain('structuredClone')
     expect(assemblyFile.source).not.toContain('deepFreezeCanvasAppValue')
-    expect(assemblyFile.source).not.toContain('freezeCanvasAppRecord')
-    expect(assemblyFile.source).not.toContain('freezeCanvasAppArray')
+    expect(assemblyFile.source).not.toContain('snapshotCanvasAppRecord')
+    expect(assemblyFile.source).not.toContain('snapshotCanvasAppArray')
     expect(snapshotFile.source).toContain('structuredClone')
     expect(snapshotFile.source).toContain('deepFreezeCanvasAppValue')
-    expect(snapshotFile.source).toContain('freezeCanvasAppRecord')
-    expect(snapshotFile.source).toContain('freezeCanvasAppArray')
+    expect(snapshotFile.source).toContain(
+      "from '../extensions/CanvasAppDescriptorSnapshot'",
+    )
+    expect(snapshotFile.source).toContain('snapshotCanvasAppRecord')
+    expect(snapshotFile.source).toContain('snapshotCanvasAppArray')
     expect(snapshotFile.source).toContain(
       "from './CanvasAppAdapterSnapshot'",
     )
