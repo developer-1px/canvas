@@ -63,6 +63,7 @@
 - Canvas App Custom Command: 내부 command grammar를 수정하지 않고 제품별 business action을 toolbar action으로 등록하는 App-owned command descriptor.
 - Canvas App Custom Command Contracts: custom command descriptor shape와 id registry contract를 검증하는 App-owned contract Module.
 - Canvas App Custom Command Execution: custom command toolbar state, availability, run 호출과 실패 containment를 소유하는 App-owned execution Module.
+- Canvas Standard Command Contracts: 내부 built-in command의 what union을 execution/effect planning how와 분리해 소유하는 App-owned command contract Module.
 - Canvas App Custom Creation Tool: 내부 tool grammar를 수정하지 않고 제품별 item 생성 도구를 toolbar, shortcut, pointer lifecycle에 등록하는 App-owned tool descriptor.
 - Canvas Keyboard Tool Shortcut Catalog: Canvas Affordance Metadata의 built-in tool shortcut/order를 App keyboard descriptor 목록으로 projection하는 immutable App keyboard what 계약.
 - Canvas Keyboard Tool Shortcuts: built-in tool shortcut matching과 custom creation tool 예약 built-in tool shortcut projection을 함께 제공하는 App keyboard contract Module.
@@ -152,6 +153,7 @@
 - Canvas Viewport Control Execution: fit-to-items target selection, missing geometry no-op, reset viewport, stage-center zoom 규칙을 소유하는 App-owned runtime Module.
 - Canvas Wheel Viewport Execution: wheel event input extraction, gesture gate, preventDefault timing, stage-local pointer projection, viewport updater fallback을 소유하는 App-owned runtime Module.
 - Canvas Toolbar Command Dispatch: Toolbar built-in command action runner table과 command handler bundle 호출 mechanics를 소유하는 UI-owned Module.
+- Canvas Toolbar Item Renderer: toolbar item kind별 button component, icon lookup, command dispatch wiring을 소유하고 Toolbar shell에서 item rendering branch를 숨기는 UI-owned Module.
 - Canvas Keyboard Intent Dispatch Table: Keyboard intent runner table의 define, supported kind 판정, run lookup mechanics를 소유하는 App keyboard helper Module.
 - Canvas Keyboard Command Dispatch: Keyboard document command intent runner entries를 소유하고, Canvas Keyboard Intent Dispatch Table로 지원 intent 판정과 command handler bundle 호출을 파생하는 App-owned Module.
 - Canvas Keyboard System Dispatch: Keyboard system intent runner entries를 소유하고, Canvas Keyboard Intent Dispatch Table로 지원 system intent 판정과 system handler bundle 호출을 파생하며 temporary pan release를 처리하는 App-owned Module.
@@ -280,6 +282,7 @@
 - 제품별 SVG renderer와 inspector panel 실행 실패는 캔버스 렌더를 깨지 않고 fallback/omit으로 containment 한다.
 - Canvas App Inspector Panel descriptor shape 검증과 visibility/render execution은 분리하고, validation은 Canvas App Inspector Panel Contracts가, 실행 실패 omit은 Canvas App Inspector Panel Execution이 소유한다.
 - Object Inspector hook은 read model 조회와 memoization만 맡고, selection label, disabled state, custom panel context, bounds resize commit 규칙은 Canvas Object Inspector Model이 소유한다.
+- Toolbar shell은 group layout만 맡고, item kind별 button/icon/command dispatch wiring은 Canvas Toolbar Item Renderer가 소유한다.
 - Custom item renderer lookup과 실행 실패 containment는 Demo SVG Custom Item Renderer Execution이 소유하고, fallback shape는 Demo SVG Custom Item Render Fallback이 소유한다.
 - App workflow는 Demo SVG Item Layer를 직접 생성하지 않고 Canvas App Item Layer Adapter를 통해 stage children을 만든다.
 - 제품별 inspector UI는 기본 Object Inspector를 수정하지 않고 Canvas App Inspector Panel로 등록한다.
@@ -321,6 +324,7 @@
 - Canvas Document hook은 controller 생성, React state/ref bridge, subscription binding을 맡고, document mutation result interpretation은 Canvas Document Runtime이 소유한다.
 - App workflow는 editor/search 상태를 각각의 workflow Module 뒤에 숨긴다.
 - Standard command hook은 execution context와 runner memoization을 맡고, toolbar/keyboard callback grammar는 Canvas Standard Command Handlers가 소유한다. Canvas Standard Command Execution은 plan 생성과 effect 적용만 조립한다. Engine command 호출은 Canvas Standard Command Effect Plan이, Engine result-to-document effect descriptor mapping은 Canvas Standard Command Result Effects가, document effect primitive 생성과 document commit/selection/editing/history effect routing은 Canvas Standard Command Document Effects가 소유한다.
+- Standard command의 what union은 Canvas Standard Command Contracts가 소유하고, Effect Plan/Execution은 그 command 계약을 소비해 how만 구현한다.
 - Built-in command의 선택 개수 기준은 Canvas Command Selection Rules가 소유하고, App control model과 command action/availability는 raw threshold를 반복하지 않는다.
 - Built-in command의 availability condition table은 Canvas Command Availability Rules가 소유하고, Engine command availability facade와 selection-gated Engine command action guard는 같은 rule table에 위임한다.
 - Clipboard command hook은 paste index ref/current read, execution context, runner memoization을 맡고, clone/duplicate/copy/paste/cut callback grammar와 supplied paste index descriptor injection은 Canvas Clipboard Command Handlers가 소유한다. Canvas Clipboard Command Execution은 plan 생성과 effect 적용만 조립한다. Clone/duplicate/paste/cut command 호출과 paste offset 계산은 Canvas Clipboard Command Effect Plan이, clipboard result-to-effect descriptor mapping은 Canvas Clipboard Command Result Effects가, Host clipboard/document/editing effect routing은 Canvas Clipboard Command Effects가 소유한다.

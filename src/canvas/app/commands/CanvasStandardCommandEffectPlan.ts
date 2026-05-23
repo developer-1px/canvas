@@ -16,6 +16,7 @@ import {
   type CanvasReorderMode,
 } from '../../engine'
 import type { CanvasItem } from '../../entities'
+import type { CanvasStandardCommand } from './CanvasStandardCommandContracts'
 import {
   createCanvasStandardHistoryEffect,
   type CanvasStandardCommandDocumentEffect,
@@ -29,20 +30,6 @@ import {
   createCanvasStandardSelectAllResultEffect,
   createCanvasStandardUngroupSelectionResultEffect,
 } from './CanvasStandardCommandResultEffects'
-
-export type CanvasStandardCommand =
-  | { kind: 'align'; mode: CanvasAlignMode }
-  | { kind: 'distribute'; mode: CanvasDistributeMode }
-  | { kind: 'delete' }
-  | { kind: 'group' }
-  | { kind: 'ungroup' }
-  | { kind: 'lock' }
-  | { kind: 'unlock-all' }
-  | { kind: 'undo' }
-  | { kind: 'redo' }
-  | { dx: number; dy: number; kind: 'nudge' }
-  | { kind: 'reorder'; mode: CanvasReorderMode }
-  | { kind: 'select-all' }
 
 export type CanvasStandardCommandEffectPlanContext = {
   commandAdapter: CanvasCommandAdapter<CanvasItem>

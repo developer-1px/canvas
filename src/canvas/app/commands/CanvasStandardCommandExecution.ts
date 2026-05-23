@@ -4,12 +4,12 @@ import {
 } from './CanvasStandardCommandDocumentEffects'
 import {
   createCanvasStandardCommandEffectPlan,
-  type CanvasStandardCommand,
   type CanvasStandardCommandEffectPlanContext,
 } from './CanvasStandardCommandEffectPlan'
+import type { CanvasStandardCommand } from './CanvasStandardCommandContracts'
 
 export type { CanvasEditingUpdate } from './CanvasStandardCommandDocumentEffects'
-export type { CanvasStandardCommand } from './CanvasStandardCommandEffectPlan'
+export type { CanvasStandardCommand } from './CanvasStandardCommandContracts'
 
 export type CanvasStandardCommandExecutionContext =
   CanvasStandardCommandDocumentEffectContext &

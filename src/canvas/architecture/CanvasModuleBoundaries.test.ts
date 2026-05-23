@@ -405,6 +405,9 @@ describe('Canvas module boundaries', () => {
     const toolbarFile = getSourceFile(
       'src/canvas/ui/toolbar/CanvasToolbar.tsx',
     )
+    const itemRendererFile = getSourceFile(
+      'src/canvas/ui/toolbar/CanvasToolbarItemRenderer.tsx',
+    )
     const itemsFile = getSourceFile(
       'src/canvas/ui/toolbar/CanvasToolbarItems.ts',
     )
@@ -422,7 +425,8 @@ describe('Canvas module boundaries', () => {
     )
 
     expect(toolbarFile.source).toContain("from './CanvasToolbarItems'")
-    expect(toolbarFile.source).toContain(
+    expect(toolbarFile.source).toContain("from './CanvasToolbarItemRenderer'")
+    expect(toolbarFile.source).not.toContain(
       "from './CanvasToolbarCommandDispatch'",
     )
     expect(toolbarFile.source).not.toContain('config.commands.')
@@ -430,8 +434,20 @@ describe('Canvas module boundaries', () => {
     expect(toolbarFile.source).not.toContain('customCommands.map')
     expect(toolbarFile.source).not.toContain('customTools.map')
     expect(toolbarFile.source).not.toContain('CANVAS_TOOL_AFFORDANCES.select')
+    expect(toolbarFile.source).not.toContain('CANVAS_TOOLBAR_TOOL_ICONS')
+    expect(toolbarFile.source).not.toContain('CANVAS_TOOLBAR_COMMAND_ICONS')
+    expect(toolbarFile.source).not.toContain("item.kind === 'builtin-tool'")
     expect(toolbarFile.source).not.toContain('switch (action.kind)')
     expect(toolbarFile.source).not.toContain('onAlign:')
+    expect(itemRendererFile.source).toContain(
+      'export function renderCanvasToolbarItem',
+    )
+    expect(itemRendererFile.source).toContain('CANVAS_TOOLBAR_TOOL_ICONS')
+    expect(itemRendererFile.source).toContain('CANVAS_TOOLBAR_COMMAND_ICONS')
+    expect(itemRendererFile.source).toContain("item.kind === 'builtin-tool'")
+    expect(itemRendererFile.source).toContain(
+      'runCanvasToolbarCommandAction',
+    )
     expect(itemsFile.source).toContain(
       'export function getCanvasToolbarGroups',
     )
@@ -2771,6 +2787,9 @@ describe('Canvas module boundaries', () => {
     const executionFile = getSourceFile(
       'src/canvas/app/commands/CanvasStandardCommandExecution.ts',
     )
+    const contractsFile = getSourceFile(
+      'src/canvas/app/commands/CanvasStandardCommandContracts.ts',
+    )
     const effectPlanFile = getSourceFile(
       'src/canvas/app/commands/CanvasStandardCommandEffectPlan.ts',
     )
@@ -2795,6 +2814,9 @@ describe('Canvas module boundaries', () => {
       "from './CanvasStandardCommandEffectPlan'",
     )
     expect(executionFile.source).toContain(
+      "from './CanvasStandardCommandContracts'",
+    )
+    expect(executionFile.source).toContain(
       'applyCanvasStandardDocumentEffect',
     )
     expect(executionFile.source).not.toContain('alignCanvasCommand')
@@ -2804,8 +2826,26 @@ describe('Canvas module boundaries', () => {
     expect(executionFile.source).not.toContain('selectAllCanvasCommand')
     expect(executionFile.source).not.toContain("type: 'remove-selection'")
     expect(executionFile.source).not.toContain("type: 'group-selection'")
+    expect(contractsFile.source).toContain(
+      'export type CanvasStandardCommand',
+    )
+    expect(contractsFile.source).toContain("kind: 'align'")
+    expect(contractsFile.source).toContain("kind: 'select-all'")
+    expect(contractsFile.source).not.toContain('alignCanvasCommand')
+    expect(contractsFile.source).not.toContain(
+      'createCanvasStandardCommandEffectPlan',
+    )
+    expect(contractsFile.source).not.toContain(
+      'applyCanvasStandardDocumentEffect',
+    )
     expect(effectPlanFile.source).toContain(
       'export function createCanvasStandardCommandEffectPlan',
+    )
+    expect(effectPlanFile.source).toContain(
+      "from './CanvasStandardCommandContracts'",
+    )
+    expect(effectPlanFile.source).not.toContain(
+      'export type CanvasStandardCommand =',
     )
     expect(effectPlanFile.source).toContain(
       'CANVAS_STANDARD_COMMAND_EFFECT_PLANNERS',
