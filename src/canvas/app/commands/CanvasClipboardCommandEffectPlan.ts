@@ -16,6 +16,7 @@ import type { CanvasDocumentClipboard } from '../workflow/CanvasWorkflowContract
 import type { CanvasClipboardCommandEffect } from './CanvasClipboardCommandEffects'
 import {
   createCanvasClipboardCloneResultEffect,
+  createCanvasClipboardCopySelectionEffect,
   createCanvasClipboardCutCopyOnlyResultEffect,
   createCanvasClipboardCutSelectionResultEffect,
   createCanvasClipboardDuplicateResultEffect,
@@ -102,7 +103,7 @@ function planCanvasCopyCommand(
   context: CanvasClipboardCommandEffectPlanContext,
 ): CanvasClipboardCommandEffect | null {
   return context.config.commands.copy
-    ? { kind: 'copy-selection' }
+    ? createCanvasClipboardCopySelectionEffect()
     : null
 }
 

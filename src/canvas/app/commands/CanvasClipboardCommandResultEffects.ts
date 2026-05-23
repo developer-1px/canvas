@@ -11,6 +11,13 @@ export type CanvasClipboardDeleteResult = {
   selection: string[]
 }
 
+export function createCanvasClipboardCopySelectionEffect():
+  CanvasClipboardCommandEffect {
+  return {
+    kind: 'copy-selection',
+  }
+}
+
 export function createCanvasClipboardCloneResultEffect({
   clonedItems,
 }: {

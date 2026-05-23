@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import type { CanvasItem } from '../../entities'
 import {
   createCanvasClipboardCloneResultEffect,
+  createCanvasClipboardCopySelectionEffect,
   createCanvasClipboardCutCopyOnlyResultEffect,
   createCanvasClipboardCutSelectionResultEffect,
   createCanvasClipboardDuplicateResultEffect,
@@ -12,6 +13,12 @@ const rect1 = createRectItem('rect-1')
 const rect2 = createRectItem('rect-2')
 
 describe('CanvasClipboardCommandResultEffects', () => {
+  it('maps copy selection to copy-selection effects', () => {
+    expect(createCanvasClipboardCopySelectionEffect()).toEqual({
+      kind: 'copy-selection',
+    })
+  })
+
   it('maps clone results to clone-result effects', () => {
     expect(createCanvasClipboardCloneResultEffect({
       clonedItems: [rect1],

@@ -2324,17 +2324,24 @@ describe('Canvas module boundaries', () => {
       "from './CanvasClipboardCommandResultEffects'",
     )
     expect(effectPlanFile.source).toContain(
+      'createCanvasClipboardCopySelectionEffect',
+    )
+    expect(effectPlanFile.source).toContain(
       'createCanvasClipboardDuplicateResultEffect',
     )
     expect(effectPlanFile.source).toContain(
       'createCanvasClipboardCutSelectionResultEffect',
     )
     expect(effectPlanFile.source).not.toContain("kind: 'clone-result'")
+    expect(effectPlanFile.source).not.toContain("kind: 'copy-selection'")
     expect(effectPlanFile.source).not.toContain("kind: 'add-items'")
     expect(effectPlanFile.source).not.toContain("kind: 'cut-selection'")
     expect(effectPlanFile.source).not.toContain("kind: 'cut-copy-only'")
     expect(effectPlanFile.source).not.toContain('copyItemsToClipboard(')
     expect(effectPlanFile.source).not.toContain("type: 'remove-selection'")
+    expect(resultEffectsFile.source).toContain(
+      'export function createCanvasClipboardCopySelectionEffect',
+    )
     expect(resultEffectsFile.source).toContain(
       'export function createCanvasClipboardDuplicateResultEffect',
     )
@@ -2342,6 +2349,7 @@ describe('Canvas module boundaries', () => {
       'export function createCanvasClipboardCutSelectionResultEffect',
     )
     expect(resultEffectsFile.source).toContain("kind: 'clone-result'")
+    expect(resultEffectsFile.source).toContain("kind: 'copy-selection'")
     expect(resultEffectsFile.source).toContain("kind: 'add-items'")
     expect(resultEffectsFile.source).toContain("kind: 'cut-selection'")
     expect(resultEffectsFile.source).toContain("kind: 'cut-copy-only'")
