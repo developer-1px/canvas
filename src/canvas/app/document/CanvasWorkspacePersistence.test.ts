@@ -133,6 +133,51 @@ describe('CanvasWorkspacePersistence', () => {
     ).toEqual([customItem])
   })
 
+  test('removes stored drawing items that fail the built-in item contract', () => {
+    const markerItem: CanvasItem = {
+      h: 24,
+      id: 'marker-1',
+      opacity: 1,
+      points: [
+        { x: 10, y: 20 },
+        { x: 30, y: 40 },
+      ],
+      stroke: '#475569',
+      strokeWidth: 4,
+      type: 'marker',
+      w: 24,
+      x: 8,
+      y: 18,
+    }
+    const storedValue = JSON.stringify({
+      items: [
+        {
+          ...markerItem,
+          opacity: 0,
+        },
+      ],
+      selection: [markerItem.id],
+      version: 1,
+      viewport: { scale: 1, x: 0, y: 0 },
+    })
+    const storage = new MemoryStorage()
+
+    storage.setItem(CANVAS_WORKSPACE_STORAGE_KEY, storedValue)
+
+    expect(readStoredCanvasWorkspace(storage)).toBeNull()
+    expect(storage.getItem(CANVAS_WORKSPACE_STORAGE_KEY)).toBeNull()
+    expect(
+      parseCanvasWorkspaceSnapshot(
+        JSON.stringify({
+          items: [markerItem],
+          selection: [markerItem.id],
+          version: 1,
+          viewport: { scale: 1, x: 0, y: 0 },
+        }),
+      )?.items,
+    ).toEqual([markerItem])
+  })
+
   test('derives the next id seed from nested numeric suffixes', () => {
     const group: CanvasItem = {
       children: [
