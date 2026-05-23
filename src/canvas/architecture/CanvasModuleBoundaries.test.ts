@@ -1984,6 +1984,9 @@ describe('Canvas module boundaries', () => {
     const hookFile = getSourceFile(
       'src/canvas/app/keyboard/useCanvasKeyboardShortcuts.ts',
     )
+    const listenerFile = getSourceFile(
+      'src/canvas/app/keyboard/CanvasKeyboardShortcutListeners.ts',
+    )
     const intentFile = getSourceFile(
       'src/canvas/app/keyboard/CanvasKeyboardShortcutIntent.ts',
     )
@@ -2051,15 +2054,37 @@ describe('Canvas module boundaries', () => {
     expect(routerFile.source).not.toContain("event.key.startsWith('Arrow')")
     expect(routerFile.source).not.toContain("key === 'z'")
     expect(hookFile.source).toContain(
-      "from './CanvasKeyboardSystemDispatch'",
+      "from './CanvasKeyboardShortcutListeners'",
     )
     expect(hookFile.source).not.toContain(
       "from './CanvasKeyboardSystemShortcuts'",
     )
     expect(hookFile.source).not.toContain(
+      "from './CanvasKeyboardSystemDispatch'",
+    )
+    expect(hookFile.source).not.toContain(
       'shouldReleaseCanvasKeyboardTemporaryPan',
     )
     expect(hookFile.source).not.toContain('setSpaceDown(false)')
+    expect(hookFile.source).not.toContain('addEventListener')
+    expect(hookFile.source).not.toContain('removeEventListener')
+    expect(hookFile.source).not.toContain('handleCanvasKeyboardShortcut(')
+    expect(hookFile.source).not.toContain(
+      'runCanvasKeyboardSystemKeyUp',
+    )
+    expect(hookFile.source).not.toContain(
+      'runCanvasKeyboardSystemWindowBlur',
+    )
+    expect(listenerFile.source).toContain(
+      'export function bindCanvasKeyboardShortcutListeners',
+    )
+    expect(listenerFile.source).toContain('handleCanvasKeyboardShortcut(')
+    expect(listenerFile.source).toContain('runCanvasKeyboardSystemKeyUp')
+    expect(listenerFile.source).toContain(
+      'runCanvasKeyboardSystemWindowBlur',
+    )
+    expect(listenerFile.source).toContain("addEventListener('keydown'")
+    expect(listenerFile.source).toContain("removeEventListener('keydown'")
     expect(intentFile.source).toContain(
       'export function getCanvasKeyboardShortcutIntent',
     )

@@ -1,133 +1,26 @@
-import { useEffect } from 'react'
 import {
-  handleCanvasKeyboardShortcut,
-  type CanvasKeyboardShortcutHandlers,
-} from './CanvasKeyboardShortcutRouter'
-import {
-  runCanvasKeyboardSystemKeyUp,
-  runCanvasKeyboardSystemWindowBlur,
-} from './CanvasKeyboardSystemDispatch'
+  useEffect,
+  useLayoutEffect,
+  useRef,
+} from 'react'
+import type { CanvasKeyboardShortcutHandlers } from './CanvasKeyboardShortcutRouter'
+import { bindCanvasKeyboardShortcutListeners } from './CanvasKeyboardShortcutListeners'
 
-export function useCanvasKeyboardShortcuts({
-  commitSelection,
-  config,
-  copySelection,
-  customCreationTools,
-  cutSelection,
-  deleteSelection,
-  duplicateSelection,
-  fitToItems,
-  groupSelection,
-  interactionRef,
-  lockSelection,
-  moveSelection,
-  openFindReplace,
-  pasteSelection,
-  redoHistory,
-  resetViewport,
-  reorderSelection,
-  selectAll,
-  selection,
-  setDraftArrow,
-  setDraftRect,
-  setDraftStroke,
-  setEditing,
-  setGesture,
-  setMarquee,
-  setSpaceDown,
-  setTool,
-  undoHistory,
-  ungroupSelection,
-  unlockAll,
-  zoomBy,
-}: CanvasKeyboardShortcutHandlers) {
-  useEffect(() => {
-    const handlers: CanvasKeyboardShortcutHandlers = {
-      commitSelection,
-      config,
-      copySelection,
-      customCreationTools,
-      cutSelection,
-      deleteSelection,
-      duplicateSelection,
-      fitToItems,
-      groupSelection,
-      interactionRef,
-      lockSelection,
-      moveSelection,
-      openFindReplace,
-      pasteSelection,
-      redoHistory,
-      resetViewport,
-      reorderSelection,
-      selectAll,
-      selection,
-      setDraftArrow,
-      setDraftRect,
-      setDraftStroke,
-      setEditing,
-      setGesture,
-      setMarquee,
-      setSpaceDown,
-      setTool,
-      undoHistory,
-      ungroupSelection,
-      unlockAll,
-      zoomBy,
-    }
+export function useCanvasKeyboardShortcuts(
+  handlers: CanvasKeyboardShortcutHandlers,
+) {
+  const handlersRef = useRef<CanvasKeyboardShortcutHandlers>(handlers)
 
-    function handleKeyDown(event: globalThis.KeyboardEvent) {
-      handleCanvasKeyboardShortcut(event, handlers)
-    }
+  useLayoutEffect(() => {
+    handlersRef.current = handlers
+  }, [handlers])
 
-    function handleKeyUp(event: globalThis.KeyboardEvent) {
-      runCanvasKeyboardSystemKeyUp({ config, event, handlers })
-    }
-
-    function handleWindowBlur() {
-      runCanvasKeyboardSystemWindowBlur({ handlers })
-    }
-
-    window.addEventListener('keydown', handleKeyDown)
-    window.addEventListener('keyup', handleKeyUp)
-    window.addEventListener('blur', handleWindowBlur)
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown)
-      window.removeEventListener('keyup', handleKeyUp)
-      window.removeEventListener('blur', handleWindowBlur)
-    }
-  }, [
-    copySelection,
-    commitSelection,
-    config,
-    customCreationTools,
-    cutSelection,
-    deleteSelection,
-    duplicateSelection,
-    fitToItems,
-    groupSelection,
-    interactionRef,
-    lockSelection,
-    moveSelection,
-    openFindReplace,
-    pasteSelection,
-    redoHistory,
-    resetViewport,
-    reorderSelection,
-    selectAll,
-    selection,
-    setDraftArrow,
-    setDraftRect,
-    setDraftStroke,
-    setEditing,
-    setGesture,
-    setMarquee,
-    setSpaceDown,
-    setTool,
-    undoHistory,
-    ungroupSelection,
-    unlockAll,
-    zoomBy,
-  ])
+  useEffect(
+    () =>
+      bindCanvasKeyboardShortcutListeners({
+        handlersRef,
+        target: window,
+      }),
+    [],
+  )
 }
