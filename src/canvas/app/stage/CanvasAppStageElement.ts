@@ -44,8 +44,12 @@ export type CanvasAppStageElement = {
   releasePointer: (pointerId: number) => void
 }
 
+type CanvasAppStageElementMount = {
+  ref: RefCallback<SVGSVGElement>
+}
+
 export type CanvasAppStageElementController = CanvasAppStageElement & {
-  setElement: RefCallback<SVGSVGElement>
+  mount: CanvasAppStageElementMount
 }
 
 type CreateCanvasAppStageElementInput = {
@@ -135,7 +139,9 @@ export function createCanvasAppStageElement({
         element.releasePointerCapture(pointerId)
       }
     },
-    setElement,
+    mount: {
+      ref: setElement,
+    },
   }
 }
 

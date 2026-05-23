@@ -396,7 +396,7 @@ export function useCanvasAppModel({
         }),
         gesture,
         overlays,
-        onStageElement: stageElement.setElement,
+        stageElement: stageElement.mount,
         viewport,
         onCanvasPointerDown: handleStageCanvasPointerDown,
         onContextMenu: (event: PointerEvent<SVGSVGElement>) =>

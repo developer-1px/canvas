@@ -2,6 +2,7 @@ export { CanvasDemoSvgItemLayer } from './CanvasDemoSvgItemLayer'
 export {
   DEFAULT_CANVAS_APP_STAGE_ADAPTER,
   type CanvasAppStageAdapter,
+  type CanvasAppStageMount,
   type CanvasAppStageRenderInput,
 } from './CanvasAppStageAdapter'
 export {

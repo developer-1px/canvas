@@ -38,6 +38,7 @@ export {
   type CanvasAppItemLayerAdapter,
   type CanvasAppItemLayerRenderInput,
   type CanvasAppStageAdapter,
+  type CanvasAppStageMount,
   type CanvasAppStageRenderInput,
   type CanvasAppCustomItemRendererStrategy,
   type CanvasAppCustomItemRenderers,

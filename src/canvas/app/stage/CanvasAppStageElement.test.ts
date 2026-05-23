@@ -32,6 +32,19 @@ describe('CanvasAppStageElement', () => {
     expect(() => stageElement.addWheelListener(vi.fn())()).not.toThrow()
   })
 
+  it('exposes stage mounting as a controller concern', () => {
+    const setElement = vi.fn()
+    const stageElement = createCanvasAppStageElement({
+      getElement: () => null,
+      setElement,
+    })
+    const svgElement = {} as SVGSVGElement
+
+    stageElement.mount.ref(svgElement)
+
+    expect(setElement).toHaveBeenCalledWith(svgElement)
+  })
+
   it('calculates stage geometry from the stage element rect', () => {
     const { element } = createStageElementFake({
       height: 200,

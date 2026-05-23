@@ -13,12 +13,16 @@ import type {
 import type { CanvasOverlayState } from '../../engine'
 import { CanvasSvgStage } from '../../renderer'
 
+export type CanvasAppStageMount = {
+  ref: RefCallback<SVGSVGElement>
+}
+
 export type CanvasAppStageRenderInput = {
   activeMode: Tool
   children?: ReactNode
   gesture: CanvasInteractionKind
-  onStageElement: RefCallback<SVGSVGElement>
   overlays: CanvasOverlayState
+  stageElement: CanvasAppStageMount
   viewport: Viewport
   onCanvasPointerDown: (event: PointerEvent<SVGSVGElement>) => void
   onContextMenu: (event: PointerEvent<SVGSVGElement>) => void
@@ -37,5 +41,12 @@ export type CanvasAppStageAdapter = {
 
 export const DEFAULT_CANVAS_APP_STAGE_ADAPTER: CanvasAppStageAdapter =
   Object.freeze({
-    Stage: CanvasSvgStage,
+    Stage: renderCanvasAppSvgStage,
   })
+
+function renderCanvasAppSvgStage({
+  stageElement,
+  ...props
+}: CanvasAppStageRenderInput) {
+  return <CanvasSvgStage {...props} onStageElement={stageElement.ref} />
+}

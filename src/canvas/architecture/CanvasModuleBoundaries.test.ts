@@ -248,6 +248,20 @@ describe('Canvas module boundaries', () => {
     expect(violations).toEqual([])
   })
 
+  it('keeps app stage render input on the stage mount interface', () => {
+    const stageAdapterFile = getSourceFile(
+      'src/canvas/app/rendering/CanvasAppStageAdapter.tsx',
+    )
+    const renderInput =
+      stageAdapterFile.source.match(
+        /export type CanvasAppStageRenderInput = \{[\s\S]*?\n\}/,
+      )?.[0] ?? ''
+
+    expect(renderInput).toContain('stageElement: CanvasAppStageMount')
+    expect(renderInput).not.toContain('onStageElement')
+    expect(renderInput).not.toContain('RefCallback<SVGSVGElement>')
+  })
+
   it('keeps app workflow hooks from recreating the workspace read model', () => {
     const violations = sourceFiles
       .filter((file) =>
