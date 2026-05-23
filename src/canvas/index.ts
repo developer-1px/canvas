@@ -14,7 +14,6 @@ export {
   createCanvasAppCustomItemRenderers,
   defineCanvasAppCustomItemModule,
   isCanvasAppExtensionId,
-  useCanvasAppModel,
   type CanvasAppAssembly,
   type CanvasAppAssemblyInput,
   type CanvasAppComponentPresentationRenderers,

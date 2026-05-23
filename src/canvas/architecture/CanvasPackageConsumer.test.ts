@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest'
+import * as CanvasPackage from 'canvas'
+import * as CanvasAppFacade from 'canvas/app'
 import {
   CanvasCore,
   CanvasEngine,
@@ -162,6 +164,8 @@ describe('Canvas package consumer imports', () => {
 
   it('keeps package subpaths usable as public facades', () => {
     expect(CanvasApp).toBeTypeOf('function')
+    expect('useCanvasAppModel' in CanvasPackage).toBe(false)
+    expect(CanvasAppFacade.useCanvasAppModel).toBeTypeOf('function')
     expect(CanvasSvgStage).toBe(CanvasRenderer.CanvasSvgStage)
     expect(normalizeBounds({ x: 10, y: 20 }, { x: 2, y: 4 })).toEqual({
       h: 16,

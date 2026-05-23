@@ -363,6 +363,19 @@ describe('Canvas module boundaries', () => {
     expect(privateTargets).toEqual([])
   })
 
+  it('keeps the canvas package public entry on authoring contracts, not workflow hooks', () => {
+    const appFacadeFile = getSourceFile('src/canvas/app/index.ts')
+    const packageFacadeFile = getSourceFile('src/canvas/index.ts')
+
+    expect(packageFacadeFile.source).toContain('CanvasAppAssemblySource')
+    expect(packageFacadeFile.source).toContain('createCanvasAppAssembly')
+    expect(packageFacadeFile.source).toContain(
+      'defineCanvasAppCustomItemModule',
+    )
+    expect(appFacadeFile.source).toContain('useCanvasAppModel')
+    expect(packageFacadeFile.source).not.toContain('useCanvasAppModel')
+  })
+
   it('keeps Core bounds resize rules behind a named module', () => {
     const primitivesFile = getSourceFile(
       'src/canvas/core/CanvasCorePrimitives.ts',
