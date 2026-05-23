@@ -16,30 +16,21 @@ import type {
 import type { Interaction } from '../pointer/CanvasInteractionState'
 import type { CommitCanvasSelection } from '../workflow/CanvasWorkflowContract'
 import type { CanvasAppCustomCreationToolState } from '../tools/CanvasAppCustomCreationToolRuntime'
+import { getCanvasKeyboardShortcutIntent } from './CanvasKeyboardShortcutIntent'
 import {
-  getCanvasKeyboardShortcutIntent,
-  type CanvasKeyboardReorderMode,
-} from './CanvasKeyboardShortcutIntent'
+  isCanvasKeyboardCommandIntent,
+  runCanvasKeyboardCommandIntent,
+  type CanvasKeyboardCommandHandlers,
+} from './CanvasKeyboardCommandDispatch'
 
-export type CanvasKeyboardShortcutHandlers = {
+export type CanvasKeyboardShortcutHandlers = CanvasKeyboardCommandHandlers & {
   commitSelection: CommitCanvasSelection
   config: CanvasAffordanceConfig
-  copySelection: () => void
-  cutSelection: () => void
-  deleteSelection: () => void
-  duplicateSelection: () => void
   customCreationTools: readonly CanvasAppCustomCreationToolState[]
   fitToItems: (ids?: string[]) => void
-  groupSelection: () => void
   interactionRef: MutableRefObject<Interaction>
-  lockSelection: () => void
-  moveSelection: (dx: number, dy: number) => void
   openFindReplace: () => void
-  pasteSelection: () => void
-  redoHistory: () => void
   resetViewport: () => void
-  reorderSelection: (mode: CanvasKeyboardReorderMode) => void
-  selectAll: () => void
   selection: string[]
   setDraftRect: Dispatch<SetStateAction<Bounds | null>>
   setDraftArrow: Dispatch<SetStateAction<CanvasDraftArrowOverlay | null>>
@@ -49,9 +40,6 @@ export type CanvasKeyboardShortcutHandlers = {
   setMarquee: Dispatch<SetStateAction<Bounds | null>>
   setSpaceDown: Dispatch<SetStateAction<boolean>>
   setTool: Dispatch<SetStateAction<Tool>>
-  undoHistory: () => void
-  ungroupSelection: () => void
-  unlockAll: () => void
   zoomBy: (multiplier: number) => void
 }
 
@@ -68,6 +56,11 @@ export function handleCanvasKeyboardShortcut(
 
   if (intent.preventDefault) {
     event.preventDefault()
+  }
+
+  if (isCanvasKeyboardCommandIntent(intent)) {
+    runCanvasKeyboardCommandIntent({ handlers, intent })
+    return
   }
 
   switch (intent.kind) {
@@ -90,53 +83,11 @@ export function handleCanvasKeyboardShortcut(
       handlers.commitSelection([])
       handlers.setTool('select')
       return
-    case 'delete-selection':
-      handlers.deleteSelection()
-      return
-    case 'undo-history':
-      handlers.undoHistory()
-      return
-    case 'redo-history':
-      handlers.redoHistory()
-      return
     case 'zoom-by':
       handlers.zoomBy(intent.multiplier)
       return
     case 'reset-viewport':
       handlers.resetViewport()
-      return
-    case 'copy-selection':
-      handlers.copySelection()
-      return
-    case 'cut-selection':
-      handlers.cutSelection()
-      return
-    case 'paste-selection':
-      handlers.pasteSelection()
-      return
-    case 'select-all':
-      handlers.selectAll()
-      return
-    case 'duplicate-selection':
-      handlers.duplicateSelection()
-      return
-    case 'lock-selection':
-      handlers.lockSelection()
-      return
-    case 'unlock-all':
-      handlers.unlockAll()
-      return
-    case 'reorder-selection':
-      handlers.reorderSelection(intent.mode)
-      return
-    case 'group-selection':
-      handlers.groupSelection()
-      return
-    case 'ungroup-selection':
-      handlers.ungroupSelection()
-      return
-    case 'nudge-selection':
-      handlers.moveSelection(intent.dx, intent.dy)
       return
     case 'fit-all':
       handlers.fitToItems()

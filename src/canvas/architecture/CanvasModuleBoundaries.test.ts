@@ -1990,6 +1990,9 @@ describe('Canvas module boundaries', () => {
     const commandShortcutFile = getSourceFile(
       'src/canvas/app/keyboard/CanvasKeyboardCommandShortcuts.ts',
     )
+    const commandDispatchFile = getSourceFile(
+      'src/canvas/app/keyboard/CanvasKeyboardCommandDispatch.ts',
+    )
     const nudgeShortcutFile = getSourceFile(
       'src/canvas/app/keyboard/CanvasKeyboardNudgeShortcuts.ts',
     )
@@ -2012,9 +2015,17 @@ describe('Canvas module boundaries', () => {
     expect(routerFile.source).toContain(
       "from './CanvasKeyboardShortcutIntent'",
     )
+    expect(routerFile.source).toContain(
+      "from './CanvasKeyboardCommandDispatch'",
+    )
     expect(routerFile.source).not.toContain('config.shortcuts.temporaryPan')
     expect(routerFile.source).not.toContain(
       'matchesCanvasAppCustomToolShortcut',
+    )
+    expect(routerFile.source).not.toContain('handlers.deleteSelection()')
+    expect(routerFile.source).not.toContain('handlers.moveSelection(')
+    expect(routerFile.source).not.toContain(
+      'handlers.reorderSelection(',
     )
     expect(routerFile.source).not.toContain("event.key.startsWith('Arrow')")
     expect(routerFile.source).not.toContain("key === 'z'")
@@ -2067,6 +2078,18 @@ describe('Canvas module boundaries', () => {
     expect(commandShortcutFile.source).not.toContain("shortcutId: 'nudge'")
     expect(commandShortcutFile.source).not.toContain("'large nudge left'")
     expect(commandShortcutFile.source).toContain("kind: 'reorder-selection'")
+    expect(commandDispatchFile.source).toContain(
+      'export function runCanvasKeyboardCommandIntent',
+    )
+    expect(commandDispatchFile.source).toContain(
+      'export function isCanvasKeyboardCommandIntent',
+    )
+    expect(commandDispatchFile.source).toContain(
+      "case 'delete-selection'",
+    )
+    expect(commandDispatchFile.source).toContain(
+      "case 'nudge-selection'",
+    )
     expect(nudgeShortcutFile.source).toContain(
       'export function getCanvasKeyboardNudgeShortcutIntent',
     )
