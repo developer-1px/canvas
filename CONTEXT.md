@@ -80,7 +80,8 @@
 - Canvas App Control Model: component palette, toolbar, status, zoom controls props를 만들고 command availability, status label, selected fit target 규칙을 숨기는 workflow Module.
 - Canvas App Extension Model: 외부 custom command/tool descriptor를 toolbar state, custom tool state, custom command run callback으로 바꾸는 workflow Module.
 - Canvas App Stage Model: stage와 item layer Adapter 호출 순서, text editor blur, context menu 차단, render 실패 containment를 소유하는 workflow Module.
-- Canvas Keyboard Shortcut Intent: keydown 입력, feature toggle, selection을 실행 가능한 keyboard intent로 변환하고 command shortcut precedence를 소유하는 App-owned runtime Module.
+- Canvas Keyboard Shortcut Intent: keydown 입력, typing target suppression, temporary pan, escape, command/tool shortcut precedence를 실행 가능한 keyboard intent로 조립하는 App-owned runtime Module.
+- Canvas Keyboard Command Shortcut Intent: built-in command, viewport, nudge keyboard shortcut grammar를 feature toggle과 selection 기준으로 keyboard intent로 변환하는 App-owned runtime Module.
 - Canvas Keyboard Tool Shortcut Intent: built-in tool shortcut precedence와 custom creation tool shortcut matching을 소유하는 App-owned runtime Module.
 - Canvas Interaction Model: tool, gesture, marquee, draft, snap guide, overlay state 생명주기를 App Shell에 숨기는 workflow Module.
 - Canvas Workspace Model: Demo workspace의 저장된 snapshot, document history, viewport, read model, id 생성을 App Shell에 숨기는 workflow Module.
@@ -193,7 +194,7 @@
 - Clipboard command hook은 paste index와 callback wiring을 맡고, Canvas Clipboard Command Execution은 plan 생성과 effect 적용만 조립한다. Clone/duplicate/paste/cut plan과 paste offset 계산은 Canvas Clipboard Command Effect Plan이, Host clipboard/document/editing effect routing은 Canvas Clipboard Command Effects가 소유한다.
 - UI controls는 Demo Host를 직접 import하지 않는다.
 - Canvas Toolbar는 item/button 렌더링과 click dispatch를 맡고, tool/custom command 항목 assembly는 Canvas Toolbar Items가, built-in command group grammar는 Canvas Toolbar Command Items가 소유한다.
-- Keyboard shortcut router는 event preventDefault와 handler 실행을 맡고, command shortcut grammar는 Canvas Keyboard Shortcut Intent가, built-in/custom tool shortcut precedence는 Canvas Keyboard Tool Shortcut Intent가 소유한다.
+- Keyboard shortcut router는 event preventDefault와 handler 실행을 맡고, keydown orchestration은 Canvas Keyboard Shortcut Intent가, built-in command/viewport/nudge shortcut grammar는 Canvas Keyboard Command Shortcut Intent가, built-in/custom tool shortcut precedence는 Canvas Keyboard Tool Shortcut Intent가 소유한다.
 - Module seam import 규칙은 Canvas Module Boundary Guardrail로 검증한다.
 - Linked peer dependency는 앱 번들에 한 번만 들어가야 하며, Vite config에서 `react`, `react-dom`, `zod`를 dedupe한다.
 - Local dev server는 다른 Vite 앱과 포트/호스트가 섞이지 않도록 `127.0.0.1:5173` strict port로 고정한다.

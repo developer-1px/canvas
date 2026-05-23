@@ -1264,6 +1264,9 @@ describe('Canvas module boundaries', () => {
     const intentFile = getSourceFile(
       'src/canvas/app/keyboard/CanvasKeyboardShortcutIntent.ts',
     )
+    const commandIntentFile = getSourceFile(
+      'src/canvas/app/keyboard/CanvasKeyboardCommandShortcutIntent.ts',
+    )
     const toolIntentFile = getSourceFile(
       'src/canvas/app/keyboard/CanvasKeyboardToolShortcutIntent.ts',
     )
@@ -1283,12 +1286,21 @@ describe('Canvas module boundaries', () => {
     expect(intentFile.source).toContain(
       "from './CanvasKeyboardToolShortcutIntent'",
     )
+    expect(intentFile.source).toContain(
+      "from './CanvasKeyboardCommandShortcutIntent'",
+    )
     expect(intentFile.source).toContain('config.shortcuts.temporaryPan')
     expect(intentFile.source).not.toContain(
       'matchesCanvasAppCustomToolShortcut',
     )
-    expect(intentFile.source).toContain("event.key.startsWith('Arrow')")
-    expect(intentFile.source).toContain("key === 'z'")
+    expect(intentFile.source).not.toContain("event.key.startsWith('Arrow')")
+    expect(intentFile.source).not.toContain("key === 'z'")
+    expect(commandIntentFile.source).toContain(
+      'export function getCanvasKeyboardCommandShortcutIntent',
+    )
+    expect(commandIntentFile.source).toContain("event.key.startsWith('Arrow')")
+    expect(commandIntentFile.source).toContain("key === 'z'")
+    expect(commandIntentFile.source).toContain("kind: 'reorder-selection'")
     expect(toolIntentFile.source).toContain(
       'export function getCanvasKeyboardToolShortcutIntent',
     )
