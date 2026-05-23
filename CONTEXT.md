@@ -24,6 +24,7 @@
 - Canvas Component Library: Demo component template, presentation key, component item 생성을 함께 제공하는 Module.
 - Canvas Built-in Component Templates: Sticky, label, card 같은 기본 Demo component catalogue를 소유하는 Host-owned Module.
 - Canvas Component Presentation: Demo component kind를 Renderer Adapter의 그리기 전략과 연결하는 key. 새 component kind는 기존 presentation을 재사용할 수 있다.
+- Canvas Component Item Validation: component item의 stable component id, title/style string, optional text list 저장 shape 검증을 소유하는 Host-owned validation Module.
 - Canvas App Assembly: 내부 캔버스 문법은 유지하면서 affordance feature toggle, Host item adapter, component library, custom item module, initial items, SVG presentation registry 같은 제품별 의미를 외부에서 조립하는 composition Module.
 - Canvas App Assembly Input: Canvas App Assembly output을 `Partial`로 노출하지 않고 Host가 조립할 수 있는 필드만 명시한 외부 입력 계약.
 - Canvas App Assembly Source: App Shell이 prebuilt Canvas App Assembly와 Canvas App Assembly Input 중 하나를 받아 내부에서 조립/검증/snapshot 경로로 정규화하는 Module.
@@ -200,6 +201,7 @@
 - 기본 component presentation renderer mapping은 Demo SVG Built-in Component Presentation Renderers가 소유하고, 제품별 renderer는 Canvas App Assembly에서 extension으로 조립한다.
 - 제품별 renderer registry shape는 Canvas App Renderer Registry Contracts에서 공통 검증하고, Demo SVG Component Presentation Registry Contracts와 Demo SVG Custom Item Renderer Registry Contracts는 registry 종류만 지정한다.
 - Canvas Component Template은 id/presentation뿐 아니라 필수 label/title/style string, 양수 크기, optional string list shape도 Canvas Component Library Contracts에서 실패해야 하며, 생성된 library는 외부 template mutation에 흔들리지 않는 snapshot을 보관한다.
+- Canvas Component Item은 component id와 렌더링에 필요한 title/style/string list 저장 shape를 Host Component Item Validation Module에서 검증한다.
 - Canvas App Assembly는 주입된 Canvas Component Library의 `templates`, `getTemplate`, `getPresentation` 결과가 일관되지 않으면 실패해야 한다.
 - Canvas App Assembly input은 output type을 부분 노출하지 않고 명시적 필드 계약으로 유지한다.
 - Canvas App Assembly는 내부 표준 Affordance 문법을 외부 구현으로 넘기지 않고, 제품별 feature toggle config만 명시 입력 계약으로 조립한다.

@@ -1781,6 +1781,30 @@ describe('Canvas module boundaries', () => {
     expect(drawingValidationFile.source).toContain('function isSamePoint')
   })
 
+  it('keeps component item validation in the host component module', () => {
+    const itemSchemaFile = getSourceFile(
+      'src/canvas/host/document/CanvasItemSchema.ts',
+    )
+    const componentValidationFile = getSourceFile(
+      'src/canvas/host/component/CanvasComponentItemValidation.ts',
+    )
+
+    expect(itemSchemaFile.source).toContain(
+      "from '../component/CanvasComponentItemValidation'",
+    )
+    expect(itemSchemaFile.source).toContain(
+      'isCanvasComponentItemStorageShape(value)',
+    )
+    expect(itemSchemaFile.source).not.toContain('isCanvasStableId')
+    expect(itemSchemaFile.source).not.toContain('function isStringArray')
+    expect(itemSchemaFile.source).not.toContain("value.type === 'component'")
+    expect(componentValidationFile.source).toContain(
+      'export function isCanvasComponentItemStorageShape',
+    )
+    expect(componentValidationFile.source).toContain('isCanvasStableId')
+    expect(componentValidationFile.source).toContain('function isStringArray')
+  })
+
   it('keeps Host custom item validation behind a named module', () => {
     const itemSchemaFile = getSourceFile(
       'src/canvas/host/document/CanvasItemSchema.ts',

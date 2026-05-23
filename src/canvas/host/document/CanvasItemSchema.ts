@@ -1,5 +1,5 @@
 import * as z from 'zod'
-import { isCanvasStableId } from '../../core'
+import { isCanvasComponentItemStorageShape } from '../component/CanvasComponentItemValidation'
 import { isCanvasDrawingItemStorageShape } from '../drawing/CanvasDrawingItemValidation'
 import type { CanvasItem } from '../model'
 import { syncCanvasItems } from '../tree/CanvasTree'
@@ -78,18 +78,8 @@ function isCanvasItem(value: unknown): value is CanvasItem {
     return Array.isArray(value.children) && value.children.every(isCanvasItem)
   }
 
-  if (value.type === 'component') {
-    return (
-      typeof value.component === 'string' &&
-      isCanvasStableId(value.component) &&
-      typeof value.title === 'string' &&
-      typeof value.fill === 'string' &&
-      typeof value.stroke === 'string' &&
-      typeof value.accent === 'string' &&
-      (value.body === undefined || typeof value.body === 'string') &&
-      (value.items === undefined || isStringArray(value.items)) &&
-      (value.columns === undefined || isStringArray(value.columns))
-    )
+  if (isCanvasComponentItemStorageShape(value)) {
+    return true
   }
 
   if (value.type === 'custom') {
@@ -105,8 +95,4 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function isFiniteNumber(value: unknown): value is number {
   return typeof value === 'number' && Number.isFinite(value)
-}
-
-function isStringArray(value: unknown) {
-  return Array.isArray(value) && value.every((entry) => typeof entry === 'string')
 }
