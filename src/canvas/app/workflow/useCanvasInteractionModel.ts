@@ -18,6 +18,7 @@ import {
   type CanvasSnapGuides,
 } from '../../engine'
 import type { Interaction } from '../pointer/CanvasInteractionState'
+import { getCanvasInteractionConsumerModel } from './CanvasInteractionConsumerModel'
 
 type UseCanvasInteractionModelArgs = {
   config: CanvasAffordanceConfig
@@ -70,43 +71,37 @@ export function useCanvasInteractionModel({
       viewport,
     ],
   )
-  const activeMode = spaceDown ? 'pan' : tool
+  const interactionConsumers = getCanvasInteractionConsumerModel({
+    draft: {
+      setDraftArrow,
+      setDraftRect,
+      setDraftStroke,
+    },
+    gesture,
+    marquee: {
+      setMarquee,
+    },
+    overlays,
+    setGesture,
+    setSnapGuides,
+    setSpaceDown,
+    setTool,
+    spaceDown,
+    tool,
+  })
+
+  const keyboard = {
+    interactionRef,
+    ...interactionConsumers.keyboard,
+  }
+  const pointer = {
+    interactionRef,
+    ...interactionConsumers.pointer,
+  }
 
   return {
-    component: {
-      setTool,
-    },
-    control: {
-      gesture,
-      onToolChange: setTool,
-      tool,
-    },
-    keyboard: {
-      interactionRef,
-      setDraftArrow,
-      setDraftRect,
-      setDraftStroke,
-      setGesture,
-      setMarquee,
-      setSpaceDown,
-      setTool,
-    },
-    pointer: {
-      interactionRef,
-      setDraftArrow,
-      setDraftRect,
-      setDraftStroke,
-      setGesture,
-      setMarquee,
-      setSnapGuides,
-      setTool,
-      spaceDown,
-      tool,
-    },
-    stage: {
-      activeMode,
-      gesture,
-      overlays,
-    },
+    ...interactionConsumers,
+    keyboard,
+    pointer,
   }
 }

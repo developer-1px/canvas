@@ -132,6 +132,7 @@
 - Canvas Keyboard Command Shortcut Intent: built-in command, viewport, nudge keyboard shortcut grammar를 feature toggle과 selection 기준으로 keyboard intent로 변환하는 App-owned runtime Module.
 - Canvas Keyboard Tool Shortcut Intent: built-in tool shortcut precedence와 custom creation tool shortcut matching을 소유하는 App-owned runtime Module.
 - Canvas Interaction Model: tool, gesture, marquee, draft, snap guide, overlay state 생명주기와 consumer별 interaction context를 App Shell에 숨기는 workflow Module.
+- Canvas Interaction Consumer Model: Interaction runtime state와 setter를 component, control, keyboard, pointer, stage consumer별 context로 변환하는 workflow Module.
 - Canvas Workspace Model: Demo workspace의 저장된 snapshot, document history, viewport, read model, id 생성, persistence wiring을 App Shell에 숨기는 workflow Module.
 - Canvas Workspace Consumer Model: Workspace document/read/viewport state를 command, component, control, extension, inspector, interaction, item layer, keyboard, pointer, stage, text, viewport consumer context로 변환하는 workflow Module.
 - Canvas Workspace Snapshot: 저장된 workspace payload의 version, item validation, viewport normalization, selection sanitization, id seed contract를 소유하는 App-owned Module.
@@ -267,6 +268,7 @@
 - Viewport control hook은 callback memoization만 맡고, fit target defaulting, missing bounds/rect no-op, reset, stage-center zoom 실행 규칙은 Canvas Viewport Control Execution이 소유한다.
 - Wheel viewport hook은 listener binding과 cleanup만 맡고, wheel event-to-engine adaptation, preventDefault timing, stage-local point projection, null-result viewport fallback은 Canvas Wheel Viewport Execution이 소유한다.
 - App Model은 draft, marquee, snap guide, temporary pan raw setter routing을 직접 알지 않고 Canvas Interaction Model의 consumer별 interaction context를 전달한다.
+- Canvas Interaction Model은 state storage와 overlay creation을 맡고, consumer별 interaction fan-out과 temporary pan active mode precedence는 Canvas Interaction Consumer Model이 소유한다.
 - App Shell은 workspace 저장, document history, read model 생성 방식을 직접 알지 않는다.
 - App workflow hook들은 Canvas Item Read Model, document action, viewport setter를 직접 생성하지 않고 Canvas Workspace Model의 consumer별 workspace context로 주입받는다. Workspace state/persistence wiring은 Canvas Workspace Model이, consumer별 context fan-out은 Canvas Workspace Consumer Model이 소유한다.
 - App workflow는 editor/search 상태를 각각의 workflow Module 뒤에 숨긴다.

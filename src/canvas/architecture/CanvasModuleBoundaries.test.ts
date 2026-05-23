@@ -1184,6 +1184,9 @@ describe('Canvas module boundaries', () => {
     const interactionModelFile = getSourceFile(
       'src/canvas/app/workflow/useCanvasInteractionModel.ts',
     )
+    const interactionConsumerModelFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasInteractionConsumerModel.ts',
+    )
 
     expect(appModelFile.source).toContain(
       "from './useCanvasInteractionModel'",
@@ -1209,8 +1212,21 @@ describe('Canvas module boundaries', () => {
       'pointer: {',
       'stage: {',
     ]) {
-      expect(interactionModelFile.source).toContain(consumerContext)
+      expect(interactionModelFile.source).not.toContain(consumerContext)
+      expect(interactionConsumerModelFile.source).toContain(consumerContext)
     }
+    expect(interactionModelFile.source).toContain(
+      "from './CanvasInteractionConsumerModel'",
+    )
+    expect(interactionConsumerModelFile.source).toContain(
+      'export function getCanvasInteractionConsumerModel',
+    )
+    expect(interactionModelFile.source).not.toContain(
+      "spaceDown ? 'pan' : tool",
+    )
+    expect(interactionConsumerModelFile.source).toContain(
+      "spaceDown ? 'pan' : tool",
+    )
   })
 
   it('keeps app item layer render input on the app pointer input interface', () => {
