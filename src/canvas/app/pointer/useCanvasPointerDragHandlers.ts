@@ -17,10 +17,6 @@ import {
 } from '../../core'
 import {
   EMPTY_CANVAS_SNAP_GUIDES,
-  createCanvasArrow,
-  createCanvasHighlight,
-  createCanvasMarker,
-  createCanvasRect,
   getCanvasMarqueeSelection,
   getCanvasMoveSnap,
   moveCanvasSelection,
@@ -46,8 +42,11 @@ import {
 } from './CanvasPointerDrawing'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
-import { commitCanvasCustomCreation } from './CanvasCustomCreationCommit'
 import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
+import {
+  cancelCanvasPointerInteraction,
+  commitCanvasPointerInteraction,
+} from './CanvasPointerInteractionLifecycle'
 
 type UseCanvasPointerDragHandlersArgs = {
   commitSelection: CommitCanvasSelection
@@ -366,118 +365,19 @@ export function useCanvasPointerDragHandlers({
     event.preventDefault()
     releasePointer(stageElement, event.pointerId)
 
-    if (interaction.kind === 'create-rect') {
-      const nextItem = createCanvasRect({
-        adapter: creationAdapter,
-        createId,
-        currentWorld: interaction.currentWorld,
-        startWorld: interaction.startWorld,
-      })
-
-      commitItemsChange({ type: 'add', items: [nextItem] }, {
-        before: selection,
-        after: [nextItem.id],
-      })
-      setTool('select')
-    }
-
-    if (interaction.kind === 'draw-marker') {
-      const nextItem = createCanvasMarker({
-        adapter: creationAdapter,
-        createId,
-        points: interaction.points,
-        startWorld: interaction.startWorld,
-      })
-
-      commitItemsChange({ type: 'add', items: [nextItem] }, {
-        before: selection,
-        after: [nextItem.id],
-      })
-    }
-
-    if (interaction.kind === 'draw-highlight') {
-      const nextItem = createCanvasHighlight({
-        adapter: creationAdapter,
-        createId,
-        points: interaction.points,
-        startWorld: interaction.startWorld,
-      })
-
-      commitItemsChange({ type: 'add', items: [nextItem] }, {
-        before: selection,
-        after: [nextItem.id],
-      })
-    }
-
-    if (interaction.kind === 'create-arrow') {
-      const nextItem = createCanvasArrow({
-        adapter: creationAdapter,
-        createId,
-        currentWorld: interaction.currentWorld,
-        startWorld: interaction.startWorld,
-      })
-
-      commitItemsChange({ type: 'add', items: [nextItem] }, {
-        before: selection,
-        after: [nextItem.id],
-      })
-    }
-
-    if (interaction.kind === 'create-custom') {
-      commitCanvasCustomCreation({
-        commitItemsChange,
-        createId,
-        customCreationTools,
-        currentWorld: interaction.currentWorld,
-        moved: interaction.moved,
-        selection,
-        startWorld: interaction.startWorld,
-        tool: interaction.tool,
-      })
-    }
-
-    if (interaction.kind === 'move' || interaction.kind === 'resize') {
-      commitItemsChange(
-        {
-          type: 'transform',
-          beforeItems: interaction.historyItems,
-          afterItems: interaction.currentItems,
-        },
-        {
-          before:
-            interaction.kind === 'move'
-              ? interaction.historySelection
-              : interaction.ids,
-          after: interaction.ids,
-        },
-      )
-    }
-
-    if (interaction.kind === 'move' && !interaction.moved && interaction.edit) {
-      commitSelection([interaction.edit.id])
-      setEditing(interaction.edit)
-      setTool('select')
-    }
-
-    if (interaction.kind === 'marquee') {
-      if (interaction.moved) {
-        const nextSelection = getCanvasMarqueeSelection({
-          additive: interaction.additive,
-          baseSelection: interaction.baseSelection,
-          bounds: normalizeBounds(
-            interaction.startWorld,
-            interaction.currentWorld,
-          ),
-          scene,
-        })
-
-        setSelection(interaction.baseSelection)
-        commitSelection(nextSelection)
-      } else if (!interaction.additive) {
-        setSelection(interaction.baseSelection)
-        commitSelection([])
-      }
-    }
+    commitCanvasPointerInteraction({
+      commitItemsChange,
+      commitSelection,
+      creationAdapter,
+      createId,
+      customCreationTools,
+      interaction,
+      scene,
+      selection,
+      setEditing,
+      setSelection,
+      setTool,
+    })
 
     interactionRef.current = { kind: 'none' }
     setGesture('none')
@@ -491,11 +391,11 @@ export function useCanvasPointerDragHandlers({
   function handlePointerCancel(event: CanvasAppPointerInput) {
     const interaction = interactionRef.current
 
-    if (interaction.kind === 'move' || interaction.kind === 'resize') {
-      setLiveItems(interaction.historyItems)
-    } else if (interaction.kind === 'marquee') {
-      setSelection(interaction.baseSelection)
-    }
+    cancelCanvasPointerInteraction({
+      interaction,
+      setLiveItems,
+      setSelection,
+    })
 
     releasePointer(stageElement, event.pointerId)
     interactionRef.current = { kind: 'none' }

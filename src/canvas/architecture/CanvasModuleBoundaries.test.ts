@@ -316,6 +316,35 @@ describe('Canvas module boundaries', () => {
     expect(renderInput).not.toContain('SVGGElement')
   })
 
+  it('keeps pointer interaction commit and cancel lifecycle behind a named module', () => {
+    const dragHandlersFile = getSourceFile(
+      'src/canvas/app/pointer/useCanvasPointerDragHandlers.ts',
+    )
+    const lifecycleFile = getSourceFile(
+      'src/canvas/app/pointer/CanvasPointerInteractionLifecycle.ts',
+    )
+
+    expect(dragHandlersFile.source).toContain(
+      "from './CanvasPointerInteractionLifecycle'",
+    )
+    expect(dragHandlersFile.source).not.toContain('createCanvasRect({')
+    expect(dragHandlersFile.source).not.toContain('createCanvasMarker({')
+    expect(dragHandlersFile.source).not.toContain('createCanvasArrow({')
+    expect(dragHandlersFile.source).not.toContain('commitCanvasCustomCreation')
+    expect(dragHandlersFile.source).not.toContain("type: 'transform'")
+    expect(dragHandlersFile.source).not.toContain('setEditing(interaction.edit)')
+    expect(lifecycleFile.source).toContain(
+      'export function commitCanvasPointerInteraction',
+    )
+    expect(lifecycleFile.source).toContain(
+      'export function cancelCanvasPointerInteraction',
+    )
+    expect(lifecycleFile.source).toContain('createCanvasRect({')
+    expect(lifecycleFile.source).toContain('commitCanvasCustomCreation')
+    expect(lifecycleFile.source).toContain("type: 'transform'")
+    expect(lifecycleFile.source).toContain('setEditing(interaction.edit)')
+  })
+
   it('keeps app rendering authoring contracts independent from Demo SVG registry names', () => {
     const contractsFile = getSourceFile(
       'src/canvas/app/rendering/CanvasAppRenderingContracts.ts',
