@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import type { Viewport } from '../../core'
-import type { CanvasItem } from '../../host/model'
+import type { CanvasItem } from '../../host'
 import {
   clamp,
   MAX_SCALE,

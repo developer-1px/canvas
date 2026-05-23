@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import type { CanvasComponentItem } from '../../host/model'
+import type { CanvasComponentItem } from '../../host'
 import {
   CanvasSvgConnectorComponent,
   CanvasSvgVoteComponent,

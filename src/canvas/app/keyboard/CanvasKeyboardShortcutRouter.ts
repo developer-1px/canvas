@@ -8,7 +8,7 @@ import type {
   Bounds,
   Tool
 } from '../../core'
-import type { EditingText } from '../../host/model'
+import type { EditingText } from '../../host'
 import type { Interaction } from '../pointer/CanvasInteractionState'
 import type { CommitCanvasSelection } from '../workflow/CanvasWorkflowContract'
 

@@ -84,6 +84,7 @@ type CanvasAffordanceConfig = {
 - Engine Module은 `core`, `CanvasAffordances`, `CanvasSceneAdapter` 같은 renderer-independent 입력만 사용한다.
 - Engine Module은 Demo `CanvasItem`, `CanvasOperations`, `CanvasTree`, SVG Renderer를 import하지 않는다.
 - Host domain Module은 Engine 구현 파일을 import하지 않는다. Engine Adapter 타입은 `src/canvas/engine` public facade에서 받는다.
+- App, UI, Renderer는 Demo Host 내부 subpath를 import하지 않는다. Demo model type도 `src/canvas/host` public facade에서 받는다.
 - App workflow는 Host document 구현 파일을 import하지 않는다. 문서 변경, history, selection, clipboard, text search는 Host Document Controller를 통해 사용한다.
 - App hook들은 `useCanvasDocument` 구현 파일에서 타입을 가져오지 않는다. document commit과 selection contract는 Canvas Workflow Contract를 통해 공유한다.
 - App workflow는 Host tree helper를 import하지 않는다. item 조회, bounds, selection 정규화, Scene Adapter 생성은 Canvas Item Read Model을 통해 사용한다.

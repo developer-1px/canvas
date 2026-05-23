@@ -3,7 +3,7 @@ import {
   type CanvasCommandOffset,
 } from '../../engine'
 import type { Point } from '../../core'
-import type { CanvasItem } from '../../host/model'
+import type { CanvasItem } from '../../host'
 import { getCanvasItemsBounds } from '../../host'
 
 export function getCanvasPasteOffset({

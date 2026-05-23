@@ -1,4 +1,4 @@
-import type { CanvasComponentItem } from '../../host/model'
+import type { CanvasComponentItem } from '../../host'
 import { CanvasSvgComponentText } from './CanvasSvgComponentText'
 
 export function CanvasSvgCardComponent({ item }: { item: CanvasComponentItem }) {

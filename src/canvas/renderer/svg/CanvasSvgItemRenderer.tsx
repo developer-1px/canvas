@@ -3,7 +3,7 @@ import type {
   CanvasItem,
   RectItem,
   TextItem
-} from '../../host/model'
+} from '../../host'
 import { CanvasSvgSelectionOutline } from './CanvasSvgOverlayRenderer'
 import { getCanvasItemBounds } from '../../host'
 import { CanvasSvgComponentRenderer } from './CanvasSvgComponentRenderer'

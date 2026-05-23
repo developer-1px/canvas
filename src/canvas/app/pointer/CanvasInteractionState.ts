@@ -7,7 +7,7 @@ import type {
 import type {
   CanvasItem,
   EditingText
-} from '../../host/model'
+} from '../../host'
 
 export type Interaction =
   | { kind: 'none' }

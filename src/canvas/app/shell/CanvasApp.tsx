@@ -17,7 +17,7 @@ import type {
   Tool,
   Viewport,
 } from '../../core'
-import type { EditingText } from '../../host/model'
+import type { EditingText } from '../../host'
 import { INITIAL_VIEWPORT } from '../../core'
 import {
   CANVAS_ITEM_ENGINE_ADAPTERS,

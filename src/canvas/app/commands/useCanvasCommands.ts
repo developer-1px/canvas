@@ -25,7 +25,7 @@ import type { Viewport } from '../../core'
 import type {
   CanvasItem,
   EditingText,
-} from '../../host/model'
+} from '../../host'
 import { useCanvasClipboardCommands } from './useCanvasClipboardCommands'
 import type {
   CanvasDocumentClipboard,

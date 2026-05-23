@@ -18,7 +18,7 @@ import type {
   EditingText,
   RectItem,
   TextItem,
-} from '../../host/model'
+} from '../../host'
 import {
   normalizeBounds,
   pointDistance,

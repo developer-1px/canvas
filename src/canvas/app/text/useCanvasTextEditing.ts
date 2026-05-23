@@ -10,7 +10,7 @@ import type {
   EditingText,
   RectItem,
   TextItem,
-} from '../../host/model'
+} from '../../host'
 import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract'
 
 type EditableCanvasTextItem = RectItem | TextItem

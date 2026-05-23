@@ -13,7 +13,7 @@ import type {
 import type {
   CanvasItem,
   EditingText,
-} from '../../host/model'
+} from '../../host'
 import {
   DRAG_THRESHOLD,
   normalizeBounds,

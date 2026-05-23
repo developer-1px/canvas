@@ -3,7 +3,7 @@ import type {
   CanvasItem,
   RectItem,
   TextItem
-} from '../../host/model'
+} from '../../host'
 import type {
   CanvasInteractionKind,
   ResizeHandle,

@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest'
 import { MAX_SCALE } from '../../core'
 import { INITIAL_ITEMS } from '../../host'
-import type { CanvasItem } from '../../host/model'
+import type { CanvasItem } from '../../host'
 import {
   CANVAS_WORKSPACE_STORAGE_KEY,
   createCanvasWorkspaceSnapshot,

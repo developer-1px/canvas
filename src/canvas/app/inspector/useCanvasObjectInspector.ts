@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react'
 import type { Bounds } from '../../core'
-import type { CanvasItem } from '../../host/model'
+import type { CanvasItem } from '../../host'
 import { createCanvasItemReadModel } from '../../host'
 import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract'
 

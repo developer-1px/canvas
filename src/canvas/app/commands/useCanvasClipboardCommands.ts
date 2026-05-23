@@ -20,7 +20,7 @@ import type {
 import type {
   CanvasItem,
   EditingText,
-} from '../../host/model'
+} from '../../host'
 import { getCanvasPasteOffset } from './CanvasPastePosition'
 import type {
   CanvasDocumentClipboard,

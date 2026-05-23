@@ -12,7 +12,7 @@ import { CANVAS_COMPONENT_LIBRARY } from '../../host'
 import type {
   CanvasComponentKind,
   EditingText,
-} from '../../host/model'
+} from '../../host'
 import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract'
 
 type UseCanvasComponentInsertionArgs = {

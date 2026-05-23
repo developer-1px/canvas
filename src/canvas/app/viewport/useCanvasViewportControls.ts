@@ -5,7 +5,7 @@ import {
   type SetStateAction,
 } from 'react'
 import type { Viewport } from '../../core'
-import type { CanvasItem } from '../../host/model'
+import type { CanvasItem } from '../../host'
 import {
   fitBoundsIntoViewport,
   INITIAL_VIEWPORT,
