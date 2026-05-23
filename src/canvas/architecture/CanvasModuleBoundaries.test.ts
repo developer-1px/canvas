@@ -433,6 +433,12 @@ describe('Canvas module boundaries', () => {
     const previewFile = getSourceFile(
       'src/canvas/app/pointer/CanvasPointerInteractionPreview.ts',
     )
+    const creationPreviewFile = getSourceFile(
+      'src/canvas/app/pointer/CanvasPointerCreationPreview.ts',
+    )
+    const movementFile = getSourceFile(
+      'src/canvas/app/pointer/CanvasPointerInteractionMovement.ts',
+    )
 
     expect(dragHandlersFile.source).toContain(
       "from './CanvasPointerInteractionPreview'",
@@ -443,13 +449,26 @@ describe('Canvas module boundaries', () => {
     expect(dragHandlersFile.source).not.toContain('getNextCanvasDrawingPoints')
     expect(dragHandlersFile.source).not.toContain('DRAG_THRESHOLD')
     expect(previewFile.source).toContain(
+      "from './CanvasPointerCreationPreview'",
+    )
+    expect(previewFile.source).toContain(
       'export function previewCanvasPointerInteraction',
     )
     expect(previewFile.source).toContain('getCanvasMoveSnap')
     expect(previewFile.source).toContain('resizeCanvasSelection')
     expect(previewFile.source).toContain('getCanvasMarqueeSelection')
-    expect(previewFile.source).toContain('getNextCanvasDrawingPoints')
-    expect(previewFile.source).toContain('DRAG_THRESHOLD')
+    expect(previewFile.source).not.toContain('getNextCanvasDrawingPoints')
+    expect(previewFile.source).not.toContain('createCanvasDraftStroke')
+    expect(previewFile.source).not.toContain('DRAG_THRESHOLD')
+    expect(creationPreviewFile.source).toContain(
+      'export function previewCanvasPointerCreation',
+    )
+    expect(creationPreviewFile.source).toContain('getNextCanvasDrawingPoints')
+    expect(creationPreviewFile.source).toContain('createCanvasDraftStroke')
+    expect(movementFile.source).toContain(
+      'export function hasCanvasInteractionMoved',
+    )
+    expect(movementFile.source).toContain('DRAG_THRESHOLD')
   })
 
   it('keeps pointer interaction start rules behind a named module', () => {

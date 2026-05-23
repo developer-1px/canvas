@@ -89,6 +89,8 @@
 | `src/canvas/app/pointer/CanvasItemPointerInteractionStart.ts` | Item pointer-down/text double-click 시 selection, edit state, alt-drag duplicate, move interaction 시작 상태를 계산한다 |
 | `src/canvas/app/pointer/CanvasResizePointerInteractionStart.ts` | Resize handle pointer-down 시 selected bounds, handle, selection, item snapshot을 resize interaction 시작 상태로 변환한다 |
 | `src/canvas/app/pointer/CanvasPointerInteractionPreview.ts` | Pointer-move 시 active interaction을 viewport, live item, marquee, selection, draft overlay, snap guide preview로 변환한다 |
+| `src/canvas/app/pointer/CanvasPointerCreationPreview.ts` | Create-rect, marker, highlighter, arrow, custom creation의 draft overlay와 currentWorld/moved preview를 소유한다 |
+| `src/canvas/app/pointer/CanvasPointerInteractionMovement.ts` | Drag threshold 기반 moved 판정을 pointer interaction Module들이 공유한다 |
 | `src/canvas/app/pointer/CanvasPointerInteractionLifecycle.ts` | Pointer-up/cancel 시 active interaction을 문서 변경, selection 변경, edit 진입, cancel rollback으로 확정하거나 되돌린다 |
 | `src/canvas/core` | Host item과 renderer를 모르는 geometry, viewport, id, primitive math 같은 재사용 계약 |
 | `src/canvas/core/CanvasStableIds.ts` | persisted kind, presentation key, registry key에 쓰는 lower-kebab 안정 id 계약 |
@@ -201,7 +203,7 @@ type CanvasAffordanceConfig = {
 - Custom creation tool이 item 생성을 거부하거나 실패하거나 invalid item을 반환해도 pointer interaction cleanup은 계속 진행되고 문서 상태는 손상하지 않는다.
 - Pointer down hook은 DOM pointer capture와 시작 결과 적용을 맡고, tool/gesture/config/custom tool 기반 interaction 시작 규칙은 Canvas Pointer Interaction Start가 소유한다.
 - Item pointer down hook은 DOM event routing과 시작 결과 적용을 맡고, selection/edit/duplicate/move 시작 규칙은 Canvas Item Pointer Interaction Start가 소유한다.
-- Pointer drag hook은 DOM pointer routing과 preview 결과 적용을 맡고, pointer-move live preview 계산은 Canvas Pointer Interaction Preview가, pointer-up/cancel 확정 규칙은 Canvas Pointer Interaction Lifecycle이 소유한다.
+- Pointer drag hook은 DOM pointer routing과 preview 결과 적용을 맡고, pointer-move live preview 계산은 Canvas Pointer Interaction Preview가, 생성/드로잉 draft preview는 Canvas Pointer Creation Preview가, pointer-up/cancel 확정 규칙은 Canvas Pointer Interaction Lifecycle이 소유한다.
 - Marker, highlighter, arrow는 제품별 custom item이 아니라 내부 Drawing Item이다. Drawing Item의 `x/y/w/h`는 외부 입력이 아니라 `points` 또는 `start/end`에서 Host tree/document가 동기화하는 canonical bounds다. Drawing Item style 기본값은 Host Drawing Item Style Module이 소유하고 draft overlay와 item creation이 같은 값을 쓴다.
 - 제품별 item kind는 내부 `CanvasItem` variant를 추가하지 않고 Canvas App Custom Item Module로 묶어 등록한다.
 - Canvas App Custom Item Module의 `id`는 소유한 custom item kind이며, module은 `presentation`, `renderItem`, `validateItem`을 받아 renderer registry와 validator registry를 내부에서 조립한다.
