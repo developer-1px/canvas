@@ -11,7 +11,7 @@ type ImportReference = {
   target: string
 }
 
-const modules = import.meta.glob('../**/*.{ts,tsx}', {
+const modules = import.meta.glob('../**/*.{ts,tsx,css}', {
   eager: true,
   import: 'default',
   query: '?raw',
@@ -98,7 +98,8 @@ describe('Canvas module boundaries', () => {
   })
 
   it('keeps product-specific custom item ids outside canvas implementation', () => {
-    const productCustomTerms = /\b(risk-node|custom:risk)\b|kind:\s*['"]risk['"]/
+    const productCustomTerms =
+      /\b(risk|risk-node|custom:risk|demo-risk-text)\b|kind:\s*['"]risk['"]/
     const violations = sourceFiles
       .filter((file) =>
         file.path.startsWith('src/canvas/') &&

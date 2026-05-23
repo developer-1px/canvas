@@ -52,6 +52,7 @@
 - 제품별 creation tool은 내부 Tool union에 구체 id를 넣지 않고 Canvas App Custom Creation Tool로 등록한다.
 - 제품별 item kind는 내부 `CanvasItem` union에 새 variant를 추가하지 않고 Canvas App Custom Item Module로 등록한다.
 - Canvas App Custom Item Module과 직접 assembly input의 extension key가 겹치면 assembly 단계에서 실패해야 한다.
+- 제품별 renderer 스타일은 Canvas App Shell CSS에 두지 않고 Host App/Demo module이 소유한다.
 - 제품별 inspector UI는 기본 Object Inspector를 수정하지 않고 Canvas App Inspector Panel로 등록한다.
 - 제품별 저장 payload는 Canvas Custom Item의 JSON `data` 안에 두고, payload 의미 검증은 Canvas Custom Item Validator로 등록한다.
 - App Shell은 command, pointer, keyboard, viewport, text editing wiring을 직접 알지 않는다.

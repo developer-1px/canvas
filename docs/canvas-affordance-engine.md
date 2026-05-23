@@ -61,7 +61,8 @@
 | `src/canvas/renderer` | Renderer public facade |
 | `src/canvas/renderer/svg` | Demo item을 모르는 SVG stage/overlay adapter |
 | `src/canvas/ui` | Toolbar, palette, status, editor controls |
-| `src/demo/CanvasDemoAssembly.tsx` | canvas Module 밖에서 demo-specific custom item, renderer, creation tool, inspector panel을 조립한다 |
+| `src/demo/CanvasDemoAssembly.ts` | canvas Module 밖에서 demo-specific custom item modules를 조립한다 |
+| `src/demo/custom-items` | demo-specific custom item module 구현과 해당 표현 스타일 |
 
 ## Feature Toggle Shape
 
@@ -126,6 +127,7 @@ type CanvasAffordanceConfig = {
 - 제품별 item kind는 내부 `CanvasItem` variant를 추가하지 않고 Canvas App Custom Item Module로 묶어 등록한다.
 - Custom Item Module 간 module id, tool id, renderer key, validator key, inspector id, command id가 겹치면 조용히 덮어쓰지 않고 assembly 단계에서 실패한다.
 - Custom Item Module과 직접 Canvas App Assembly input 간 extension key가 겹쳐도 assembly 단계에서 실패한다.
+- 제품별 renderer 세부 스타일은 canvas shell CSS에 두지 않고 Host App/Demo module 쪽에서 소유한다.
 - 제품별 inspector UI는 기본 Object Inspector 구현을 수정하지 않고 Canvas App Assembly의 inspector panel descriptor로 등록한다.
 - 위 import 경계는 `src/canvas/architecture/CanvasModuleBoundaries.test.ts`에서 검증한다.
 

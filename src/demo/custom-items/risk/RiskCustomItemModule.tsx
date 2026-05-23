@@ -1,12 +1,11 @@
 import {
-  createCanvasAppAssembly,
   createCanvasDemoSvgCustomItemRenderers,
   defineCanvasAppCustomItemModule,
   type CanvasAppCustomCreationTool,
   type CanvasAppInspectorPanel,
   type CanvasDemoSvgCustomItemRendererStrategy,
-} from '../canvas/app/workflow'
-import type { CanvasCustomItem } from '../canvas/entities'
+} from '../../../canvas/app/workflow'
+import type { CanvasCustomItem } from '../../../canvas/entities'
 
 const riskItemRenderer: CanvasDemoSvgCustomItemRendererStrategy = ({ item }) => {
   const severity = String(item.data.severity ?? 'Risk')
@@ -41,7 +40,7 @@ const riskItemRenderer: CanvasDemoSvgCustomItemRendererStrategy = ({ item }) => 
         width={item.w - 64}
         height="56"
       >
-        <div className="canvas-text canvas-risk-text">
+        <div className="demo-risk-text">
           <strong>{item.title}</strong>
           <span>{severity}</span>
         </div>
@@ -100,7 +99,7 @@ const riskInspectorPanel: CanvasAppInspectorPanel = {
   },
 }
 
-const riskModule = defineCanvasAppCustomItemModule({
+export const RISK_CUSTOM_ITEM_MODULE = defineCanvasAppCustomItemModule({
   id: 'risk',
   customCreationTools: [riskTool],
   customItemRenderers: createCanvasDemoSvgCustomItemRenderers({
@@ -112,10 +111,6 @@ const riskModule = defineCanvasAppCustomItemModule({
       typeof item.data.severity === 'string',
   },
   inspectorPanels: [riskInspectorPanel],
-})
-
-export const DEMO_CANVAS_APP_ASSEMBLY = createCanvasAppAssembly({
-  customItemModules: [riskModule],
 })
 
 function isRiskItem(item: unknown): item is CanvasCustomItem {

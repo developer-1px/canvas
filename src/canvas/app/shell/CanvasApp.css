@@ -203,20 +203,6 @@
   pointer-events: none;
 }
 
-.canvas-risk-text {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 2px;
-  padding: 0;
-  font-size: 13px;
-}
-
-.canvas-risk-text span {
-  color: #9a3412;
-  font-size: 12px;
-}
-
 .item-outline,
 .selection-bounds {
   fill: none;

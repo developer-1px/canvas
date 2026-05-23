@@ -1,0 +1,18 @@
+.demo-risk-text {
+  box-sizing: border-box;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  overflow: hidden;
+  color: #111827;
+  font: 500 13px/1.35 var(--sans);
+  pointer-events: none;
+}
+
+.demo-risk-text span {
+  color: #9a3412;
+  font-size: 12px;
+}
