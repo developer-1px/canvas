@@ -15,6 +15,7 @@ import type {
 } from '../../entities'
 import type { Interaction } from '../pointer/CanvasInteractionState'
 import type { CommitCanvasSelection } from '../workflow/CanvasWorkflowContract'
+import { createCanvasKeyboardIntentDispatchTable } from './CanvasKeyboardIntentDispatchTable'
 import type { CanvasKeyboardShortcutIntent } from './CanvasKeyboardShortcutIntent'
 import { shouldReleaseCanvasKeyboardTemporaryPan } from './CanvasKeyboardSystemShortcuts'
 
@@ -37,27 +38,11 @@ export type CanvasKeyboardSystemReleaseHandlers = Pick<
   'setSpaceDown'
 >
 
-type CanvasKeyboardSystemShortcutIntentKind =
-  CanvasKeyboardShortcutIntent['kind']
-
-type CanvasKeyboardSystemIntentRunner<
-  TKind extends CanvasKeyboardSystemShortcutIntentKind,
-> = (args: {
-  handlers: CanvasKeyboardSystemHandlers
-  intent: Extract<CanvasKeyboardShortcutIntent, { kind: TKind }>
-}) => void
-
-function defineCanvasKeyboardSystemIntentRunners<
-  const TRunners extends Partial<{
-    [TKind in CanvasKeyboardSystemShortcutIntentKind]:
-      CanvasKeyboardSystemIntentRunner<TKind>
-  }>,
->(runners: TRunners) {
-  return Object.freeze(runners)
-}
-
-const CANVAS_KEYBOARD_SYSTEM_INTENT_RUNNERS =
-  defineCanvasKeyboardSystemIntentRunners({
+const CANVAS_KEYBOARD_SYSTEM_INTENT_DISPATCH =
+  createCanvasKeyboardIntentDispatchTable<
+    CanvasKeyboardShortcutIntent,
+    CanvasKeyboardSystemHandlers
+  >()({
     escape: ({ handlers }) => {
       handlers.interactionRef.current = { kind: 'none' }
       handlers.setGesture('none')
@@ -78,29 +63,9 @@ const CANVAS_KEYBOARD_SYSTEM_INTENT_RUNNERS =
   })
 
 type CanvasKeyboardSystemIntentKind = Extract<
-  keyof typeof CANVAS_KEYBOARD_SYSTEM_INTENT_RUNNERS,
-  CanvasKeyboardSystemShortcutIntentKind
+  keyof typeof CANVAS_KEYBOARD_SYSTEM_INTENT_DISPATCH.runners,
+  CanvasKeyboardShortcutIntent['kind']
 >
-
-type CanvasKeyboardAnySystemIntentRunner =
-  CanvasKeyboardSystemIntentRunner<CanvasKeyboardSystemIntentKind>
-
-function hasCanvasKeyboardSystemIntentRunner(
-  kind: string,
-): kind is CanvasKeyboardSystemIntentKind {
-  return Object.prototype.hasOwnProperty.call(
-    CANVAS_KEYBOARD_SYSTEM_INTENT_RUNNERS,
-    kind,
-  )
-}
-
-function getCanvasKeyboardSystemIntentRunner(
-  kind: CanvasKeyboardSystemIntentKind,
-): CanvasKeyboardAnySystemIntentRunner {
-  return CANVAS_KEYBOARD_SYSTEM_INTENT_RUNNERS[
-    kind
-  ] as CanvasKeyboardAnySystemIntentRunner
-}
 
 export type CanvasKeyboardSystemIntent = Extract<
   CanvasKeyboardShortcutIntent,
@@ -110,7 +75,7 @@ export type CanvasKeyboardSystemIntent = Extract<
 export function isCanvasKeyboardSystemIntent(
   intent: CanvasKeyboardShortcutIntent,
 ): intent is CanvasKeyboardSystemIntent {
-  return hasCanvasKeyboardSystemIntentRunner(intent.kind)
+  return CANVAS_KEYBOARD_SYSTEM_INTENT_DISPATCH.hasKind(intent.kind)
 }
 
 export function runCanvasKeyboardSystemIntent({
@@ -120,7 +85,7 @@ export function runCanvasKeyboardSystemIntent({
   handlers: CanvasKeyboardSystemHandlers
   intent: CanvasKeyboardSystemIntent
 }) {
-  getCanvasKeyboardSystemIntentRunner(intent.kind)({ handlers, intent })
+  CANVAS_KEYBOARD_SYSTEM_INTENT_DISPATCH.run({ handlers, intent })
 }
 
 export function runCanvasKeyboardSystemKeyUp({

@@ -2782,6 +2782,9 @@ describe('Canvas module boundaries', () => {
     const commandDispatchFile = getSourceFile(
       'src/canvas/app/keyboard/CanvasKeyboardCommandDispatch.ts',
     )
+    const intentDispatchTableFile = getSourceFile(
+      'src/canvas/app/keyboard/CanvasKeyboardIntentDispatchTable.ts',
+    )
     const nudgeShortcutFile = getSourceFile(
       'src/canvas/app/keyboard/CanvasKeyboardNudgeShortcuts.ts',
     )
@@ -2960,10 +2963,13 @@ describe('Canvas module boundaries', () => {
       'export function isCanvasKeyboardCommandIntent',
     )
     expect(commandDispatchFile.source).toContain(
-      'CANVAS_KEYBOARD_COMMAND_INTENT_RUNNERS',
+      "from './CanvasKeyboardIntentDispatchTable'",
     )
     expect(commandDispatchFile.source).toContain(
-      'getCanvasKeyboardCommandIntentRunner(intent.kind)',
+      'CANVAS_KEYBOARD_COMMAND_INTENT_DISPATCH',
+    )
+    expect(commandDispatchFile.source).toContain(
+      'CANVAS_KEYBOARD_COMMAND_INTENT_DISPATCH.run',
     )
     expect(commandDispatchFile.source).toContain(
       'handlers.moveSelection(intent.dx, intent.dy)',
@@ -2972,6 +2978,15 @@ describe('Canvas module boundaries', () => {
       'CANVAS_KEYBOARD_COMMAND_INTENT_KINDS',
     )
     expect(commandDispatchFile.source).not.toContain('switch (intent.kind)')
+    expect(commandDispatchFile.source).not.toContain(
+      'function defineCanvasKeyboardCommandIntentRunners',
+    )
+    expect(commandDispatchFile.source).not.toContain(
+      'function hasCanvasKeyboardCommandIntentRunner',
+    )
+    expect(commandDispatchFile.source).not.toContain(
+      'function getCanvasKeyboardCommandIntentRunner',
+    )
     expect(nudgeShortcutFile.source).toContain(
       'export function getCanvasKeyboardNudgeShortcutIntent',
     )
@@ -3059,16 +3074,28 @@ describe('Canvas module boundaries', () => {
       'export function isCanvasKeyboardSystemIntent',
     )
     expect(systemDispatchFile.source).toContain(
-      'CANVAS_KEYBOARD_SYSTEM_INTENT_RUNNERS',
+      "from './CanvasKeyboardIntentDispatchTable'",
     )
     expect(systemDispatchFile.source).toContain(
-      'getCanvasKeyboardSystemIntentRunner(intent.kind)',
+      'CANVAS_KEYBOARD_SYSTEM_INTENT_DISPATCH',
+    )
+    expect(systemDispatchFile.source).toContain(
+      'CANVAS_KEYBOARD_SYSTEM_INTENT_DISPATCH.run',
     )
     expect(systemDispatchFile.source).toContain('commitSelection([])')
     expect(systemDispatchFile.source).not.toContain(
       'CANVAS_KEYBOARD_SYSTEM_INTENT_KINDS',
     )
     expect(systemDispatchFile.source).not.toContain('switch (intent.kind)')
+    expect(systemDispatchFile.source).not.toContain(
+      'function defineCanvasKeyboardSystemIntentRunners',
+    )
+    expect(systemDispatchFile.source).not.toContain(
+      'function hasCanvasKeyboardSystemIntentRunner',
+    )
+    expect(systemDispatchFile.source).not.toContain(
+      'function getCanvasKeyboardSystemIntentRunner',
+    )
     expect(systemDispatchFile.source).toContain(
       'export function runCanvasKeyboardSystemKeyUp',
     )
@@ -3086,16 +3113,33 @@ describe('Canvas module boundaries', () => {
       'export function isCanvasKeyboardViewportIntent',
     )
     expect(viewportDispatchFile.source).toContain(
-      'CANVAS_KEYBOARD_VIEWPORT_INTENT_RUNNERS',
+      "from './CanvasKeyboardIntentDispatchTable'",
     )
     expect(viewportDispatchFile.source).toContain(
-      'getCanvasKeyboardViewportIntentRunner(intent.kind)',
+      'CANVAS_KEYBOARD_VIEWPORT_INTENT_DISPATCH',
+    )
+    expect(viewportDispatchFile.source).toContain(
+      'CANVAS_KEYBOARD_VIEWPORT_INTENT_DISPATCH.run',
     )
     expect(viewportDispatchFile.source).toContain('fitToItems(intent.ids)')
     expect(viewportDispatchFile.source).not.toContain(
       'CANVAS_KEYBOARD_VIEWPORT_INTENT_KINDS',
     )
     expect(viewportDispatchFile.source).not.toContain('switch (intent.kind)')
+    expect(viewportDispatchFile.source).not.toContain(
+      'function defineCanvasKeyboardViewportIntentRunners',
+    )
+    expect(viewportDispatchFile.source).not.toContain(
+      'function hasCanvasKeyboardViewportIntentRunner',
+    )
+    expect(viewportDispatchFile.source).not.toContain(
+      'function getCanvasKeyboardViewportIntentRunner',
+    )
+    expect(intentDispatchTableFile.source).toContain(
+      'export function createCanvasKeyboardIntentDispatchTable',
+    )
+    expect(intentDispatchTableFile.source).toContain('hasKind(kind: string)')
+    expect(intentDispatchTableFile.source).toContain('run({')
     expect(toolIntentFile.source).toContain(
       'export function getCanvasKeyboardToolShortcutIntent',
     )

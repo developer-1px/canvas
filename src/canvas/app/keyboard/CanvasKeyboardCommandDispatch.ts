@@ -2,6 +2,7 @@ import type {
   CanvasKeyboardCommandShortcutIntent,
   CanvasKeyboardReorderMode,
 } from './CanvasKeyboardCommandShortcutIntent'
+import { createCanvasKeyboardIntentDispatchTable } from './CanvasKeyboardIntentDispatchTable'
 import type { CanvasKeyboardShortcutIntent } from './CanvasKeyboardShortcutIntent'
 
 export type CanvasKeyboardCommandHandlers = {
@@ -21,27 +22,11 @@ export type CanvasKeyboardCommandHandlers = {
   unlockAll: () => void
 }
 
-type CanvasKeyboardCommandShortcutIntentKind =
-  CanvasKeyboardCommandShortcutIntent['kind']
-
-type CanvasKeyboardCommandIntentRunner<
-  TKind extends CanvasKeyboardCommandShortcutIntentKind,
-> = (args: {
-  handlers: CanvasKeyboardCommandHandlers
-  intent: Extract<CanvasKeyboardCommandShortcutIntent, { kind: TKind }>
-}) => void
-
-function defineCanvasKeyboardCommandIntentRunners<
-  const TRunners extends Partial<{
-    [TKind in CanvasKeyboardCommandShortcutIntentKind]:
-      CanvasKeyboardCommandIntentRunner<TKind>
-  }>,
->(runners: TRunners) {
-  return Object.freeze(runners)
-}
-
-const CANVAS_KEYBOARD_COMMAND_INTENT_RUNNERS =
-  defineCanvasKeyboardCommandIntentRunners({
+const CANVAS_KEYBOARD_COMMAND_INTENT_DISPATCH =
+  createCanvasKeyboardIntentDispatchTable<
+    CanvasKeyboardCommandShortcutIntent,
+    CanvasKeyboardCommandHandlers
+  >()({
     'copy-selection': ({ handlers }) => {
       handlers.copySelection()
     },
@@ -87,29 +72,9 @@ const CANVAS_KEYBOARD_COMMAND_INTENT_RUNNERS =
   })
 
 type CanvasKeyboardCommandIntentKind = Extract<
-  keyof typeof CANVAS_KEYBOARD_COMMAND_INTENT_RUNNERS,
-  CanvasKeyboardCommandShortcutIntentKind
+  keyof typeof CANVAS_KEYBOARD_COMMAND_INTENT_DISPATCH.runners,
+  CanvasKeyboardCommandShortcutIntent['kind']
 >
-
-type CanvasKeyboardAnyCommandIntentRunner =
-  CanvasKeyboardCommandIntentRunner<CanvasKeyboardCommandIntentKind>
-
-function hasCanvasKeyboardCommandIntentRunner(
-  kind: string,
-): kind is CanvasKeyboardCommandIntentKind {
-  return Object.prototype.hasOwnProperty.call(
-    CANVAS_KEYBOARD_COMMAND_INTENT_RUNNERS,
-    kind,
-  )
-}
-
-function getCanvasKeyboardCommandIntentRunner(
-  kind: CanvasKeyboardCommandIntentKind,
-): CanvasKeyboardAnyCommandIntentRunner {
-  return CANVAS_KEYBOARD_COMMAND_INTENT_RUNNERS[
-    kind
-  ] as CanvasKeyboardAnyCommandIntentRunner
-}
 
 export type CanvasKeyboardCommandIntent = Extract<
   CanvasKeyboardCommandShortcutIntent,
@@ -119,7 +84,7 @@ export type CanvasKeyboardCommandIntent = Extract<
 export function isCanvasKeyboardCommandIntent(
   intent: CanvasKeyboardShortcutIntent,
 ): intent is CanvasKeyboardCommandIntent {
-  return hasCanvasKeyboardCommandIntentRunner(intent.kind)
+  return CANVAS_KEYBOARD_COMMAND_INTENT_DISPATCH.hasKind(intent.kind)
 }
 
 export function runCanvasKeyboardCommandIntent({
@@ -129,6 +94,6 @@ export function runCanvasKeyboardCommandIntent({
   handlers: CanvasKeyboardCommandHandlers
   intent: CanvasKeyboardCommandIntent
 }) {
-  getCanvasKeyboardCommandIntentRunner(intent.kind)({ handlers, intent })
+  CANVAS_KEYBOARD_COMMAND_INTENT_DISPATCH.run({ handlers, intent })
   return true
 }

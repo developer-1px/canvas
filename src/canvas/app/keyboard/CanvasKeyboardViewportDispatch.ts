@@ -1,3 +1,4 @@
+import { createCanvasKeyboardIntentDispatchTable } from './CanvasKeyboardIntentDispatchTable'
 import type { CanvasKeyboardShortcutIntent } from './CanvasKeyboardShortcutIntent'
 
 export type CanvasKeyboardViewportHandlers = {
@@ -6,27 +7,11 @@ export type CanvasKeyboardViewportHandlers = {
   zoomBy: (multiplier: number) => void
 }
 
-type CanvasKeyboardViewportShortcutIntentKind =
-  CanvasKeyboardShortcutIntent['kind']
-
-type CanvasKeyboardViewportIntentRunner<
-  TKind extends CanvasKeyboardViewportShortcutIntentKind,
-> = (args: {
-  handlers: CanvasKeyboardViewportHandlers
-  intent: Extract<CanvasKeyboardShortcutIntent, { kind: TKind }>
-}) => void
-
-function defineCanvasKeyboardViewportIntentRunners<
-  const TRunners extends Partial<{
-    [TKind in CanvasKeyboardViewportShortcutIntentKind]:
-      CanvasKeyboardViewportIntentRunner<TKind>
-  }>,
->(runners: TRunners) {
-  return Object.freeze(runners)
-}
-
-const CANVAS_KEYBOARD_VIEWPORT_INTENT_RUNNERS =
-  defineCanvasKeyboardViewportIntentRunners({
+const CANVAS_KEYBOARD_VIEWPORT_INTENT_DISPATCH =
+  createCanvasKeyboardIntentDispatchTable<
+    CanvasKeyboardShortcutIntent,
+    CanvasKeyboardViewportHandlers
+  >()({
     'fit-all': ({ handlers }) => {
       handlers.fitToItems()
     },
@@ -42,29 +27,9 @@ const CANVAS_KEYBOARD_VIEWPORT_INTENT_RUNNERS =
   })
 
 type CanvasKeyboardViewportIntentKind = Extract<
-  keyof typeof CANVAS_KEYBOARD_VIEWPORT_INTENT_RUNNERS,
-  CanvasKeyboardViewportShortcutIntentKind
+  keyof typeof CANVAS_KEYBOARD_VIEWPORT_INTENT_DISPATCH.runners,
+  CanvasKeyboardShortcutIntent['kind']
 >
-
-type CanvasKeyboardAnyViewportIntentRunner =
-  CanvasKeyboardViewportIntentRunner<CanvasKeyboardViewportIntentKind>
-
-function hasCanvasKeyboardViewportIntentRunner(
-  kind: string,
-): kind is CanvasKeyboardViewportIntentKind {
-  return Object.prototype.hasOwnProperty.call(
-    CANVAS_KEYBOARD_VIEWPORT_INTENT_RUNNERS,
-    kind,
-  )
-}
-
-function getCanvasKeyboardViewportIntentRunner(
-  kind: CanvasKeyboardViewportIntentKind,
-): CanvasKeyboardAnyViewportIntentRunner {
-  return CANVAS_KEYBOARD_VIEWPORT_INTENT_RUNNERS[
-    kind
-  ] as CanvasKeyboardAnyViewportIntentRunner
-}
 
 export type CanvasKeyboardViewportIntent = Extract<
   CanvasKeyboardShortcutIntent,
@@ -74,7 +39,7 @@ export type CanvasKeyboardViewportIntent = Extract<
 export function isCanvasKeyboardViewportIntent(
   intent: CanvasKeyboardShortcutIntent,
 ): intent is CanvasKeyboardViewportIntent {
-  return hasCanvasKeyboardViewportIntentRunner(intent.kind)
+  return CANVAS_KEYBOARD_VIEWPORT_INTENT_DISPATCH.hasKind(intent.kind)
 }
 
 export function runCanvasKeyboardViewportIntent({
@@ -84,5 +49,5 @@ export function runCanvasKeyboardViewportIntent({
   handlers: CanvasKeyboardViewportHandlers
   intent: CanvasKeyboardViewportIntent
 }) {
-  getCanvasKeyboardViewportIntentRunner(intent.kind)({ handlers, intent })
+  CANVAS_KEYBOARD_VIEWPORT_INTENT_DISPATCH.run({ handlers, intent })
 }
