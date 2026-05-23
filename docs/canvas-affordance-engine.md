@@ -129,6 +129,7 @@ type CanvasAffordanceConfig = {
 - Canvas App Assembly의 component presentation renderer input은 기본 SVG presentation registry를 대체하지 않고 extension/override로 합성된다.
 - 제품별 business action은 Engine command union에 추가하지 않고 Canvas App Assembly의 custom command descriptor로 등록한다.
 - 제품별 creation tool은 내부 builtin tool list에 추가하지 않고 Canvas App Assembly의 custom creation tool descriptor로 등록한다.
+- Custom creation tool이 item 생성을 거부하거나 실패하거나 invalid item을 반환해도 pointer interaction cleanup은 계속 진행되고 문서 상태는 손상하지 않는다.
 - 제품별 item kind는 내부 `CanvasItem` variant를 추가하지 않고 Canvas App Custom Item Module로 묶어 등록한다.
 - Demo custom item module은 `src/demo/custom-items/<name>/index.ts`에서 default export하면 자동 수집된다.
 - Demo custom item module은 `src/canvas/app/workflow` public entry만 사용하고 app 내부 파일을 직접 import하지 않는다.

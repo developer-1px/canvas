@@ -46,10 +46,8 @@ import {
   createCanvasDraftStroke,
   getNextCanvasDrawingPoints,
 } from './CanvasPointerDrawing'
-import {
-  getCanvasAppCustomCreationTool,
-  type CanvasAppCustomCreationTool,
-} from '../tools/CanvasAppCustomCreationTools'
+import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
+import { commitCanvasCustomCreation } from './CanvasCustomCreationCommit'
 
 type UseCanvasPointerDragHandlersArgs = {
   commitSelection: CommitCanvasSelection
@@ -426,23 +424,16 @@ export function useCanvasPointerDragHandlers({
     }
 
     if (interaction.kind === 'create-custom') {
-      const customTool = getCanvasAppCustomCreationTool(
-        customCreationTools,
-        interaction.tool,
-      )
-      const nextItem = customTool?.createItem({
+      commitCanvasCustomCreation({
+        commitItemsChange,
         createId,
+        customCreationTools,
         currentWorld: interaction.currentWorld,
         moved: interaction.moved,
+        selection,
         startWorld: interaction.startWorld,
-      }) ?? null
-
-      if (nextItem) {
-        commitItemsChange({ type: 'add', items: [nextItem] }, {
-          before: selection,
-          after: [nextItem.id],
-        })
-      }
+        tool: interaction.tool,
+      })
     }
 
     if (interaction.kind === 'move' || interaction.kind === 'resize') {
