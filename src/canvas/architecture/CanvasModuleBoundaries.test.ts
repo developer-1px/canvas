@@ -439,6 +439,32 @@ describe('Canvas module boundaries', () => {
     expect(pointerModelFile.source).toContain('stageHandlers')
   })
 
+  it('keeps app keyboard handler wiring behind a named workflow module', () => {
+    const appModelFile = getSourceFile(
+      'src/canvas/app/workflow/useCanvasAppModel.ts',
+    )
+    const keyboardModelFile = getSourceFile(
+      'src/canvas/app/workflow/useCanvasAppKeyboardModel.ts',
+    )
+
+    expect(appModelFile.source).toContain(
+      "from './useCanvasAppKeyboardModel'",
+    )
+    expect(appModelFile.source).not.toContain(
+      "from '../keyboard/useCanvasKeyboardShortcuts'",
+    )
+    expect(appModelFile.source).not.toContain('useCanvasKeyboardShortcuts')
+    expect(keyboardModelFile.source).toContain(
+      "from '../keyboard/useCanvasKeyboardShortcuts'",
+    )
+    expect(keyboardModelFile.source).toContain(
+      'export function useCanvasAppKeyboardModel',
+    )
+    expect(keyboardModelFile.source).toContain('command.copySelection')
+    expect(keyboardModelFile.source).toContain('interaction.setSpaceDown')
+    expect(keyboardModelFile.source).toContain('viewport.zoomBy')
+  })
+
   it('keeps app item layer render input on the app pointer input interface', () => {
     const itemLayerAdapterFile = getSourceFile(
       'src/canvas/app/rendering/CanvasAppItemLayerAdapter.tsx',

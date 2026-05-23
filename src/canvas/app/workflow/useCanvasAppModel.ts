@@ -8,13 +8,13 @@ import {
 import { useCanvasCommands } from '../commands/useCanvasCommands'
 import { useCanvasComponentInsertion } from '../components/useCanvasComponentInsertion'
 import { useCanvasObjectInspector } from '../inspector/useCanvasObjectInspector'
-import { useCanvasKeyboardShortcuts } from '../keyboard/useCanvasKeyboardShortcuts'
 import { useCanvasAppStageElement } from '../stage/CanvasAppStageElement'
 import { useCanvasViewportControls } from '../viewport/useCanvasViewportControls'
 import { useCanvasWheelViewport } from '../viewport/useCanvasWheelViewport'
 import { getCanvasAppControlModel } from './CanvasAppControlModel'
 import { renderCanvasAppStageModel } from './CanvasAppStageModel'
 import { useCanvasAppExtensionModel } from './useCanvasAppExtensionModel'
+import { useCanvasAppKeyboardModel } from './useCanvasAppKeyboardModel'
 import { useCanvasAppPointerModel } from './useCanvasAppPointerModel'
 import { useCanvasFindReplaceModel } from './useCanvasFindReplaceModel'
 import { useCanvasInteractionModel } from './useCanvasInteractionModel'
@@ -191,38 +191,44 @@ export function useCanvasAppModel({
       stageElement,
     })
 
-  useCanvasKeyboardShortcuts({
+  useCanvasAppKeyboardModel({
+    command: {
+      commitSelection,
+      copySelection,
+      cutSelection,
+      deleteSelection,
+      duplicateSelection,
+      groupSelection,
+      lockSelection,
+      moveSelection,
+      pasteSelection,
+      redoHistory,
+      reorderSelection,
+      selectAll,
+      undoHistory,
+      ungroupSelection,
+      unlockAll,
+    },
     config: canvasAffordanceConfig,
-    copySelection,
     customCreationTools: customCreationToolStates,
-    cutSelection,
-    deleteSelection,
-    duplicateSelection,
-    fitToItems,
-    groupSelection,
-    lockSelection,
-    interactionRef,
-    moveSelection,
+    interaction: {
+      interactionRef,
+      setDraftArrow,
+      setDraftRect,
+      setDraftStroke,
+      setEditing,
+      setGesture,
+      setMarquee,
+      setSpaceDown,
+      setTool,
+    },
     openFindReplace,
-    pasteSelection,
-    redoHistory,
-    resetViewport,
-    reorderSelection,
-    selectAll,
     selection,
-    commitSelection,
-    setDraftRect,
-    setDraftArrow,
-    setDraftStroke,
-    setEditing,
-    setGesture,
-    setMarquee,
-    setSpaceDown,
-    setTool,
-    undoHistory,
-    ungroupSelection,
-    unlockAll,
-    zoomBy,
+    viewport: {
+      fitToItems,
+      resetViewport,
+      zoomBy,
+    },
   })
 
   const pointer = useCanvasAppPointerModel({
