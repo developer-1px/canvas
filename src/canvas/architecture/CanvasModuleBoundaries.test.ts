@@ -2682,6 +2682,13 @@ describe('Canvas module boundaries', () => {
     expect(effectPlanFile.source).toContain(
       'export function createCanvasStandardCommandEffectPlan',
     )
+    expect(effectPlanFile.source).toContain(
+      'CANVAS_STANDARD_COMMAND_EFFECT_PLANNERS',
+    )
+    expect(effectPlanFile.source).not.toContain('switch (command.kind)')
+    expect(effectPlanFile.source).not.toContain(
+      'assertUnhandledCanvasStandardCommand',
+    )
     expect(effectPlanFile.source).toContain('alignCanvasCommand')
     expect(effectPlanFile.source).toContain('deleteCanvasCommand')
     expect(effectPlanFile.source).toContain('groupCanvasCommand')

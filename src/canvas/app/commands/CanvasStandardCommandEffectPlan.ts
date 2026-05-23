@@ -52,6 +52,41 @@ export type CanvasStandardCommandEffectPlanContext = {
   selection: string[]
 }
 
+type CanvasStandardCommandEffectPlanner<
+  TKind extends CanvasStandardCommand['kind'],
+> = (args: {
+  command: Extract<CanvasStandardCommand, { kind: TKind }>
+  context: CanvasStandardCommandEffectPlanContext
+}) => CanvasStandardCommandDocumentEffect | null
+
+type CanvasStandardCommandEffectPlanners = {
+  [TKind in CanvasStandardCommand['kind']]:
+    CanvasStandardCommandEffectPlanner<TKind>
+}
+
+type CanvasStandardCommandAnyEffectPlanner = (args: {
+  command: CanvasStandardCommand
+  context: CanvasStandardCommandEffectPlanContext
+}) => CanvasStandardCommandDocumentEffect | null
+
+const CANVAS_STANDARD_COMMAND_EFFECT_PLANNERS = Object.freeze({
+  align: ({ command, context }) =>
+    planCanvasAlignCommand(command.mode, context),
+  delete: ({ context }) => planCanvasDeleteCommand(context),
+  distribute: ({ command, context }) =>
+    planCanvasDistributeCommand(command.mode, context),
+  group: ({ context }) => planCanvasGroupCommand(context),
+  lock: ({ context }) => planCanvasLockCommand(context),
+  nudge: ({ command, context }) => planCanvasNudgeCommand(command, context),
+  redo: ({ context }) => planCanvasRedoCommand(context),
+  reorder: ({ command, context }) =>
+    planCanvasReorderCommand(command.mode, context),
+  'select-all': ({ context }) => planCanvasSelectAllCommand(context),
+  undo: ({ context }) => planCanvasUndoCommand(context),
+  ungroup: ({ context }) => planCanvasUngroupCommand(context),
+  'unlock-all': ({ context }) => planCanvasUnlockAllCommand(context),
+} satisfies CanvasStandardCommandEffectPlanners)
+
 export function createCanvasStandardCommandEffectPlan({
   command,
   context,
@@ -59,34 +94,11 @@ export function createCanvasStandardCommandEffectPlan({
   command: CanvasStandardCommand
   context: CanvasStandardCommandEffectPlanContext
 }): CanvasStandardCommandDocumentEffect | null {
-  switch (command.kind) {
-    case 'align':
-      return planCanvasAlignCommand(command.mode, context)
-    case 'distribute':
-      return planCanvasDistributeCommand(command.mode, context)
-    case 'delete':
-      return planCanvasDeleteCommand(context)
-    case 'group':
-      return planCanvasGroupCommand(context)
-    case 'ungroup':
-      return planCanvasUngroupCommand(context)
-    case 'lock':
-      return planCanvasLockCommand(context)
-    case 'unlock-all':
-      return planCanvasUnlockAllCommand(context)
-    case 'undo':
-      return planCanvasUndoCommand(context)
-    case 'redo':
-      return planCanvasRedoCommand(context)
-    case 'nudge':
-      return planCanvasNudgeCommand(command, context)
-    case 'reorder':
-      return planCanvasReorderCommand(command.mode, context)
-    case 'select-all':
-      return planCanvasSelectAllCommand(context)
-  }
+  const planner = CANVAS_STANDARD_COMMAND_EFFECT_PLANNERS[
+    command.kind
+  ] as CanvasStandardCommandAnyEffectPlanner
 
-  return assertUnhandledCanvasStandardCommand(command)
+  return planner({ command, context })
 }
 
 function planCanvasAlignCommand(
@@ -283,10 +295,4 @@ function planCanvasSelectAllCommand(
   return nextSelection
     ? createCanvasStandardSelectAllResultEffect({ selection: nextSelection })
     : null
-}
-
-function assertUnhandledCanvasStandardCommand(
-  command: never,
-): never {
-  throw new Error(`Unhandled canvas standard command: ${String(command)}`)
 }

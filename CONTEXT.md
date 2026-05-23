@@ -50,7 +50,7 @@
 - Canvas App Descriptor Shape Contract: 제품별 descriptor가 외부 조립 seam을 통과하기 전에 필수 함수 slot을 갖췄는지 검증하는 외부 Interface 계약.
 - Canvas Standard Command Execution: 내부 canvas command grammar 실행을 effect plan 생성과 document effect 적용으로 조립하는 App-owned runtime Module.
 - Canvas Standard Command Handlers: toolbar/keyboard callback을 내부 standard command descriptor로 변환하는 App-owned handler grammar Module.
-- Canvas Standard Command Effect Plan: 내부 canvas command grammar와 Engine command 호출을 App document effect plan으로 변환하는 App-owned runtime Module.
+- Canvas Standard Command Effect Plan: 내부 canvas command grammar별 effect planner table과 Engine command 호출을 App document effect plan으로 변환하는 App-owned runtime Module.
 - Canvas Standard Command Result Effects: Engine standard command result shape를 App document effect descriptor로 변환하는 App-owned mapping Module.
 - Canvas Standard Command Document Effects: standard command document effect descriptor primitive 생성과 document commit fallback, selection commit, editing clear, history restore effect 반영을 소유하는 App-owned runtime Module.
 - Canvas Command Selection Rules: built-in command 실행과 availability가 공유하는 선택 개수 기준을 소유하는 Engine-owned Module.
