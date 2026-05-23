@@ -65,6 +65,7 @@
 - Canvas App Inspector Panel Contracts: inspector panel descriptor shape와 id registry contract를 검증하는 App-owned contract Module.
 - Canvas App Inspector Panel Execution: inspector panel visibility/render 호출과 실패 시 omit containment를 소유하는 App-owned execution Module.
 - Canvas Custom Item: 제품별 item kind를 내부 `CanvasItem` union 확장 없이 저장하기 위한 안정 envelope. `kind`, `presentation`, JSON `data`, bounds를 가진다.
+- Canvas Custom Item Validation: stable custom item storage envelope, JSON data contract, custom item validator key contract, recursive validator execution을 소유하는 Host-owned Module.
 - Canvas App Custom Item Module: 하나의 제품별 item kind에 필요한 presentation, renderer, validator, creation tool, inspector, command를 한 번에 등록하는 App-owned Module descriptor. Module `id`는 소유한 custom item kind다.
 - Canvas App Custom Item Module Contracts: custom item module descriptor, disabled module id, duplicate module id, assembled tool shortcut contract를 검증하는 App-owned contract Module.
 - Canvas App Custom Item Module Runtime: module-owned creation tool envelope 생성, item validation, renderer/validator registry 변환과 실패 containment를 소유하는 App-owned runtime Module.
@@ -182,6 +183,7 @@
 - Pointer drag hook은 DOM pointer routing과 preview 결과 적용을 맡고, pointer-move live preview 계산은 Canvas Pointer Interaction Preview가, 생성/드로잉 draft preview는 Canvas Pointer Creation Preview가, pointer-up/cancel 확정 규칙은 Canvas Pointer Interaction Lifecycle이 소유한다.
 - Canvas Pointer Interaction Lifecycle은 생성/드로잉 item commit 세부를 직접 알지 않고 Canvas Pointer Creation Commit에 위임한다.
 - 제품별 item kind는 내부 `CanvasItem` union에 새 variant를 추가하지 않고 Canvas App Custom Item Module로 등록한다.
+- Canvas Item Schema는 custom item envelope와 validator registry 세부를 직접 알지 않고 Canvas Custom Item Validation에 위임한다.
 - Canvas App Custom Item Module은 `id`, `presentation`, `renderItem`, `validateItem`을 외부 Interface로 받고, renderer registry와 validator registry는 내부에서 조립한다.
 - Canvas App Custom Item Module descriptor/assembly, contract validation, module-owned creation/validator runtime은 분리하고, validation은 Canvas App Custom Item Module Contracts가, runtime containment는 Canvas App Custom Item Module Runtime이 소유한다.
 - Canvas Custom Item Validator registry shape 검증은 Canvas App Custom Item Validator Contracts가 소유한다.

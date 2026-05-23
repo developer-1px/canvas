@@ -1161,6 +1161,38 @@ describe('Canvas module boundaries', () => {
     expect(drawingStyleConsumers).not.toContain('#334155')
   })
 
+  it('keeps Host custom item validation behind a named module', () => {
+    const itemSchemaFile = getSourceFile(
+      'src/canvas/host/document/CanvasItemSchema.ts',
+    )
+    const customValidationFile = getSourceFile(
+      'src/canvas/host/document/CanvasCustomItemValidation.ts',
+    )
+    const hostEntryFile = getSourceFile('src/canvas/host/index.ts')
+
+    expect(itemSchemaFile.source).toContain(
+      "from './CanvasCustomItemValidation'",
+    )
+    expect(itemSchemaFile.source).not.toContain('function isJsonRecord')
+    expect(itemSchemaFile.source).not.toContain('function isJsonValue')
+    expect(itemSchemaFile.source).not.toContain(
+      'Invalid custom canvas item',
+    )
+    expect(customValidationFile.source).toContain(
+      'export function isCanvasCustomItemStorageEnvelope',
+    )
+    expect(customValidationFile.source).toContain(
+      'export function assertCustomCanvasItems',
+    )
+    expect(customValidationFile.source).toContain('function isJsonRecord')
+    expect(customValidationFile.source).toContain(
+      'Invalid custom canvas item',
+    )
+    expect(hostEntryFile.source).toContain(
+      "from './document/CanvasCustomItemValidation'",
+    )
+  })
+
   it('keeps Host Component Library contracts behind a named module', () => {
     const libraryFile = getSourceFile(
       'src/canvas/host/component/CanvasComponentLibrary.ts',

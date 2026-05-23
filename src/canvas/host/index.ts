@@ -67,7 +67,9 @@ export {
 } from './document/CanvasDocumentController'
 export {
   validateCanvasItems as normalizeCanvasItems,
-  type CanvasCustomItemValidator,
-  type CanvasCustomItemValidators,
   type CanvasItemValidationOptions,
 } from './document/CanvasItemSchema'
+export type {
+  CanvasCustomItemValidator,
+  CanvasCustomItemValidators,
+} from './document/CanvasCustomItemValidation'
