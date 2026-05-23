@@ -2847,6 +2847,13 @@ describe('Canvas module boundaries', () => {
     expect(effectPlanFile.source).toContain(
       'export function createCanvasClipboardCommandEffectPlan',
     )
+    expect(effectPlanFile.source).toContain(
+      'CANVAS_CLIPBOARD_COMMAND_EFFECT_PLANNERS',
+    )
+    expect(effectPlanFile.source).not.toContain('switch (command.kind)')
+    expect(effectPlanFile.source).not.toContain(
+      'assertUnhandledCanvasClipboardCommand',
+    )
     expect(effectPlanFile.source).toContain('cloneCanvasCommandItems')
     expect(effectPlanFile.source).toContain('duplicateCanvasCommand')
     expect(effectPlanFile.source).toContain('deleteCanvasCommand')
