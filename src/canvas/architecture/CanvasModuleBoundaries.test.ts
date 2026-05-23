@@ -233,7 +233,7 @@ describe('Canvas module boundaries', () => {
 
   it('keeps raw stage DOM operations inside the app stage element module', () => {
     const rawStageDomTerms =
-      /\b(svgRef|RefObject<SVGSVGElement|stageElement\.current|getBoundingClientRect|setPointerCapture|releasePointerCapture|addEventListener\(['"]wheel['"])\b/
+      /\b(svgRef|RefObject<SVGSVGElement|stageElement\.current|getBoundingClientRect|hasPointerCapture|setPointerCapture|releasePointerCapture)\b|\b(?:addEventListener|removeEventListener)\(['"]wheel['"]/
     const violations = sourceFiles
       .filter((file) =>
         file.path.startsWith('src/canvas/app/') &&

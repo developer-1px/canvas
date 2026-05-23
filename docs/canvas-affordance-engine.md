@@ -35,7 +35,7 @@
 | `src/canvas/app/index.ts` | Canvas App Shell과 workflow 조립 계약을 노출하는 App public facade |
 | `src/canvas/app/extensions/CanvasAppExtensionIds.ts` | 제품별 descriptor와 registry key가 공유하는 lower-kebab 안정 id 계약을 검증한다 |
 | `src/canvas/app/extensions/CanvasAppExtensionRegistries.ts` | assembly 단계에서 extension entry와 record key 검증, 중복 실패 처리를 한 내부 계약으로 제공한다 |
-| `src/canvas/app/stage/CanvasAppStageElement.ts` | stage DOM element의 bounds, pointer capture, wheel listener를 한 Module 뒤에 숨긴다 |
+| `src/canvas/app/stage/CanvasAppStageElement.ts` | stage DOM element의 bounds, pointer capture, wheel listener를 caller Interface 뒤에 숨기고 mount ref bridge는 Controller로 분리한다 |
 | `src/canvas/app/rendering` | Demo `CanvasItem` tree를 SVG item layer로 바꾸는 App-owned Adapter |
 | `src/canvas/app/rendering/CanvasAppStageAdapter.tsx` | App Shell이 concrete Renderer Stage를 직접 import하지 않도록 stage ReactNode를 만드는 Adapter Interface와 기본 SVG Stage Adapter를 제공한다 |
 | `src/canvas/app/rendering/CanvasAppItemLayerAdapter.tsx` | App workflow가 concrete Demo SVG item layer 없이 stage children을 만들도록 하는 Adapter Interface와 기본 Demo SVG Adapter를 제공한다 |
