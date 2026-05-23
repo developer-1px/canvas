@@ -971,6 +971,12 @@ describe('Canvas module boundaries', () => {
     const viewportConsumerModelFile = getSourceFile(
       'src/canvas/app/workflow/CanvasAppViewportConsumerModel.ts',
     )
+    const viewportControlsHookFile = getSourceFile(
+      'src/canvas/app/viewport/useCanvasViewportControls.ts',
+    )
+    const viewportControlExecutionFile = getSourceFile(
+      'src/canvas/app/viewport/CanvasViewportControlExecution.ts',
+    )
 
     expect(appModelFile.source).toContain(
       "from './useCanvasAppViewportModel'",
@@ -1007,6 +1013,32 @@ describe('Canvas module boundaries', () => {
     expect(appModelFile.source).not.toContain('viewportControls.fitToItems')
     expect(appModelFile.source).not.toContain('viewportControls.resetViewport')
     expect(appModelFile.source).not.toContain('viewportControls.zoomBy')
+    expect(viewportControlsHookFile.source).toContain(
+      "from './CanvasViewportControlExecution'",
+    )
+    for (const hookImplementationDetail of [
+      'getAllIds',
+      'fitBoundsIntoViewport',
+      'INITIAL_VIEWPORT',
+      'zoomViewport',
+      'rect.width / 2',
+    ]) {
+      expect(viewportControlsHookFile.source).not.toContain(
+        hookImplementationDetail,
+      )
+      expect(viewportControlExecutionFile.source).toContain(
+        hookImplementationDetail,
+      )
+    }
+    expect(viewportControlExecutionFile.source).toContain(
+      'export function fitCanvasViewportToItems',
+    )
+    expect(viewportControlExecutionFile.source).toContain(
+      'export function resetCanvasViewport',
+    )
+    expect(viewportControlExecutionFile.source).toContain(
+      'export function zoomCanvasViewportBy',
+    )
   })
 
   it('keeps app text editor and find replace wiring behind a named workflow module', () => {

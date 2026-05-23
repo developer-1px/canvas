@@ -5,12 +5,12 @@ import {
 } from 'react'
 import type { Viewport } from '../../entities'
 import type { CanvasItemReadModel } from '../../host'
-import {
-  fitBoundsIntoViewport,
-  INITIAL_VIEWPORT,
-  zoomViewport,
-} from '../../core'
 import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
+import {
+  fitCanvasViewportToItems,
+  resetCanvasViewport,
+  zoomCanvasViewportBy,
+} from './CanvasViewportControlExecution'
 
 type UseCanvasViewportControlsArgs = {
   itemReadModel: CanvasItemReadModel
@@ -25,40 +25,27 @@ export function useCanvasViewportControls({
 }: UseCanvasViewportControlsArgs) {
   const fitToItems = useCallback(
     (ids?: string[]) => {
-      const targetIds =
-        ids && ids.length > 0
-          ? ids
-          : itemReadModel.getAllIds()
-      const bounds = itemReadModel.getSelectionBounds(targetIds)
-      const rect = stageElement.getRect()
-
-      if (!bounds || !rect) {
-        return
-      }
-
-      setViewport(fitBoundsIntoViewport(bounds, rect))
+      fitCanvasViewportToItems({
+        ids,
+        itemReadModel,
+        setViewport,
+        stageElement,
+      })
     },
     [itemReadModel, setViewport, stageElement],
   )
 
   const resetViewport = useCallback(() => {
-    setViewport(INITIAL_VIEWPORT)
+    resetCanvasViewport({ setViewport })
   }, [setViewport])
 
   const zoomBy = useCallback(
     (multiplier: number) => {
-      const rect = stageElement.getRect()
-
-      if (!rect) {
-        return
-      }
-
-      const point = {
-        x: rect.width / 2,
-        y: rect.height / 2,
-      }
-
-      setViewport((current) => zoomViewport(current, point, multiplier))
+      zoomCanvasViewportBy({
+        multiplier,
+        setViewport,
+        stageElement,
+      })
     },
     [setViewport, stageElement],
   )
