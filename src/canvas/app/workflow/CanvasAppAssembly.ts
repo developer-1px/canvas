@@ -22,6 +22,7 @@ import type { CanvasAppInspectorPanel } from '../inspector/CanvasAppInspectorPan
 import {
   createCanvasAppCustomItemModuleAssembly,
   type CanvasAppCustomItemModule,
+  type CanvasAppCustomItemModuleAssemblyOptions,
 } from '../modules/CanvasAppCustomItemModules'
 import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
 
@@ -45,6 +46,7 @@ export type CanvasAppAssembly = {
 
 export type CanvasAppAssemblyInput = Partial<CanvasAppAssembly> & {
   customItemModules?: readonly CanvasAppCustomItemModule[]
+  disabledCustomItemModuleIds?: CanvasAppCustomItemModuleAssemblyOptions['disabledModuleIds']
 }
 
 export const DEFAULT_CANVAS_APP_ASSEMBLY: CanvasAppAssembly = {
@@ -65,6 +67,7 @@ export function createCanvasAppAssembly(
 ): CanvasAppAssembly {
   const customItemModuleAssembly = createCanvasAppCustomItemModuleAssembly(
     input.customItemModules,
+    { disabledModuleIds: input.disabledCustomItemModuleIds },
   )
 
   return {

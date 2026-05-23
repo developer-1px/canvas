@@ -129,4 +129,29 @@ describe('CanvasAppAssembly', () => {
       }),
     ).toThrow('Duplicate canvas app assembly custom item validator: risk')
   })
+
+  it('can disable custom item modules at the app assembly seam', () => {
+    const riskModule = defineCanvasAppCustomItemModule({
+      id: 'risk',
+      customCreationTools: [
+        {
+          id: 'risk',
+          label: '!',
+          title: 'Risk',
+          createItem: () => null,
+        },
+      ],
+      customItemValidators: {
+        risk: () => true,
+      },
+    })
+
+    const assembly = createCanvasAppAssembly({
+      customItemModules: [riskModule],
+      disabledCustomItemModuleIds: ['risk'],
+    })
+
+    expect(assembly.customCreationTools).toEqual([])
+    expect(assembly.customItemValidators).toEqual({})
+  })
 })

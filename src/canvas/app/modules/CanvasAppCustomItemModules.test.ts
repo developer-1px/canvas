@@ -114,4 +114,38 @@ describe('CanvasAppCustomItemModules', () => {
       createCanvasAppCustomItemModuleAssembly([first, second]),
     ).toThrow('Duplicate canvas custom item module: risk')
   })
+
+  it('omits disabled modules from the assembled extension parts', () => {
+    const module = defineCanvasAppCustomItemModule({
+      id: 'risk',
+      customCreationTools: [
+        {
+          id: 'risk',
+          label: '!',
+          title: 'Risk',
+          createItem: () => null,
+        },
+      ],
+      customItemValidators: {
+        risk: () => true,
+      },
+    })
+
+    const assembly = createCanvasAppCustomItemModuleAssembly([module], {
+      disabledModuleIds: ['risk'],
+    })
+
+    expect(assembly.customCreationTools).toEqual([])
+    expect(assembly.customItemValidators).toEqual({})
+  })
+
+  it('rejects unknown disabled module ids', () => {
+    const module = defineCanvasAppCustomItemModule({ id: 'risk' })
+
+    expect(() =>
+      createCanvasAppCustomItemModuleAssembly([module], {
+        disabledModuleIds: ['unknown'],
+      }),
+    ).toThrow('Unknown disabled canvas custom item module: unknown')
+  })
 })

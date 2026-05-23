@@ -21,6 +21,10 @@ export type CanvasAppCustomItemModuleAssembly = {
   inspectorPanels: readonly CanvasAppInspectorPanel[]
 }
 
+export type CanvasAppCustomItemModuleAssemblyOptions = {
+  disabledModuleIds?: readonly string[]
+}
+
 export function defineCanvasAppCustomItemModule(
   module: CanvasAppCustomItemModule,
 ) {
@@ -29,10 +33,16 @@ export function defineCanvasAppCustomItemModule(
 
 export function createCanvasAppCustomItemModuleAssembly(
   modules: readonly CanvasAppCustomItemModule[] = [],
+  options: CanvasAppCustomItemModuleAssemblyOptions = {},
 ): CanvasAppCustomItemModuleAssembly {
   assertUniqueModuleIds(modules)
+  assertKnownDisabledModuleIds(modules, options.disabledModuleIds ?? [])
+  const disabledModuleIds = new Set(options.disabledModuleIds ?? [])
+  const enabledModules = modules.filter(
+    (module) => !disabledModuleIds.has(module.id),
+  )
 
-  return modules.reduce<CanvasAppCustomItemModuleAssembly>(
+  return enabledModules.reduce<CanvasAppCustomItemModuleAssembly>(
     (assembly, module) => ({
       customCommands: appendUniqueById({
         current: assembly.customCommands,
@@ -79,6 +89,19 @@ function assertUniqueModuleIds(modules: readonly CanvasAppCustomItemModule[]) {
     }
 
     ids.add(module.id)
+  }
+}
+
+function assertKnownDisabledModuleIds(
+  modules: readonly CanvasAppCustomItemModule[],
+  disabledModuleIds: readonly string[],
+) {
+  const ids = new Set(modules.map((module) => module.id))
+
+  for (const disabledModuleId of disabledModuleIds) {
+    if (!ids.has(disabledModuleId)) {
+      throw new Error(`Unknown disabled canvas custom item module: ${disabledModuleId}`)
+    }
   }
 }
 
