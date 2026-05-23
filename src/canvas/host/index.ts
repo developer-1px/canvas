@@ -43,3 +43,13 @@ export {
   commitCanvasItemsChange,
   type CanvasItemsChange,
 } from './document/CanvasDocumentChanges'
+export {
+  createCanvasDocumentController,
+  type CanvasDocumentClipboard,
+  type CanvasDocumentHistoryAvailability,
+  type CanvasDocumentSelectionHistory,
+  type CanvasDocumentTextSearch,
+} from './document/CanvasDocumentController'
+export {
+  validateCanvasItems as normalizeCanvasItems,
+} from './document/CanvasItemSchema'

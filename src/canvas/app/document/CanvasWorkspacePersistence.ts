@@ -6,8 +6,11 @@ import {
   MAX_SCALE,
   MIN_SCALE,
 } from '../../core'
-import { validateCanvasItems } from '../../host/document/CanvasItemSchema'
-import { flattenCanvasItems, pruneNestedSelection } from '../../host'
+import {
+  flattenCanvasItems,
+  normalizeCanvasItems,
+  pruneNestedSelection,
+} from '../../host'
 
 export const CANVAS_WORKSPACE_STORAGE_KEY =
   'interactive-os.canvas.workspace.v1'
@@ -101,7 +104,7 @@ export function createCanvasWorkspaceSnapshot({
   selection,
   viewport,
 }: CanvasWorkspacePersistenceArgs): CanvasWorkspaceSnapshot {
-  const normalizedItems = validateCanvasItems(items)
+  const normalizedItems = normalizeCanvasItems(items)
   const normalizedViewport = normalizeViewport(viewport)
 
   if (!normalizedViewport) {
@@ -143,7 +146,7 @@ function normalizeCanvasWorkspaceSnapshot(
     return null
   }
 
-  const items = validateCanvasItems(value.items)
+  const items = normalizeCanvasItems(value.items)
 
   return {
     items,

@@ -8,6 +8,7 @@
 - Host App: 엔진을 사용하는 실제 제품. 데이터 모델, 저장, 도메인 명령, 화면 구성을 소유한다.
 - Core Contract: 특정 Host App, Renderer, React 상태에 묶이지 않는 재사용 부품의 입력과 출력 계약.
 - Engine Public Facade: Host App, Demo App, UI, Renderer Adapter가 Engine을 사용할 때 import하는 안정된 Module 경계.
+- Host Document Controller: Demo `CanvasItem` 문서의 history, selection, clipboard, text search, item commit을 React와 zod-crud 세부 구현 없이 제공하는 Module.
 - Renderer Adapter: Affordance 상태를 SVG, Canvas, DOM, WebGL 등으로 그리는 Adapter.
 - Scene Adapter: Host App의 항목 트리, bounds, hit target, editable target을 엔진이 읽을 수 있게 맞추는 Adapter.
 
