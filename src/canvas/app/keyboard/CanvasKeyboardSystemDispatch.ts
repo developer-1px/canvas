@@ -6,6 +6,7 @@ import type {
 import type {
   CanvasDraftArrowOverlay,
   CanvasDraftStrokeOverlay,
+  CanvasAffordanceConfig,
 } from '../../engine'
 import type {
   Bounds,
@@ -15,6 +16,7 @@ import type {
 import type { Interaction } from '../pointer/CanvasInteractionState'
 import type { CommitCanvasSelection } from '../workflow/CanvasWorkflowContract'
 import type { CanvasKeyboardShortcutIntent } from './CanvasKeyboardShortcutIntent'
+import { shouldReleaseCanvasKeyboardTemporaryPan } from './CanvasKeyboardSystemShortcuts'
 
 export type CanvasKeyboardSystemHandlers = {
   commitSelection: CommitCanvasSelection
@@ -29,6 +31,11 @@ export type CanvasKeyboardSystemHandlers = {
   setSpaceDown: Dispatch<SetStateAction<boolean>>
   setTool: Dispatch<SetStateAction<Tool>>
 }
+
+export type CanvasKeyboardSystemReleaseHandlers = Pick<
+  CanvasKeyboardSystemHandlers,
+  'setSpaceDown'
+>
 
 type CanvasKeyboardSystemIntentKind =
   | 'escape'
@@ -82,6 +89,28 @@ export function runCanvasKeyboardSystemIntent({
   }
 
   return assertUnhandledCanvasKeyboardSystemIntent(intent)
+}
+
+export function runCanvasKeyboardSystemKeyUp({
+  config,
+  event,
+  handlers,
+}: {
+  config: CanvasAffordanceConfig
+  event: globalThis.KeyboardEvent
+  handlers: CanvasKeyboardSystemReleaseHandlers
+}) {
+  if (shouldReleaseCanvasKeyboardTemporaryPan({ config, event })) {
+    handlers.setSpaceDown(false)
+  }
+}
+
+export function runCanvasKeyboardSystemWindowBlur({
+  handlers,
+}: {
+  handlers: CanvasKeyboardSystemReleaseHandlers
+}) {
+  handlers.setSpaceDown(false)
 }
 
 function assertUnhandledCanvasKeyboardSystemIntent(

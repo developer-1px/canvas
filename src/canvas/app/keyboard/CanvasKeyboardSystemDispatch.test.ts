@@ -1,7 +1,10 @@
 import { describe, expect, it, vi } from 'vitest'
+import { createCanvasAffordanceConfig } from '../../engine'
 import {
   isCanvasKeyboardSystemIntent,
+  runCanvasKeyboardSystemKeyUp,
   runCanvasKeyboardSystemIntent,
+  runCanvasKeyboardSystemWindowBlur,
   type CanvasKeyboardSystemHandlers,
 } from './CanvasKeyboardSystemDispatch'
 
@@ -60,6 +63,34 @@ describe('CanvasKeyboardSystemDispatch', () => {
     expect(handlers.commitSelection).toHaveBeenCalledWith([])
     expect(handlers.setTool).toHaveBeenCalledWith('select')
   })
+
+  it('owns temporary pan release side effects', () => {
+    const handlers = createHandlers()
+
+    runCanvasKeyboardSystemKeyUp({
+      config: createCanvasAffordanceConfig(),
+      event: createKeyboardEvent({ code: 'Space', key: ' ' }),
+      handlers,
+    })
+    runCanvasKeyboardSystemWindowBlur({ handlers })
+
+    expect(handlers.setSpaceDown).toHaveBeenNthCalledWith(1, false)
+    expect(handlers.setSpaceDown).toHaveBeenNthCalledWith(2, false)
+  })
+
+  it('does not release temporary pan when the shortcut is disabled', () => {
+    const handlers = createHandlers()
+
+    runCanvasKeyboardSystemKeyUp({
+      config: createCanvasAffordanceConfig({
+        shortcuts: { temporaryPan: false },
+      }),
+      event: createKeyboardEvent({ code: 'Space', key: ' ' }),
+      handlers,
+    })
+
+    expect(handlers.setSpaceDown).not.toHaveBeenCalled()
+  })
 })
 
 function createHandlers(
@@ -79,4 +110,19 @@ function createHandlers(
     setTool: vi.fn(),
     ...overrides,
   }
+}
+
+function createKeyboardEvent(
+  overrides: Partial<KeyboardEvent> = {},
+): KeyboardEvent {
+  return {
+    altKey: false,
+    code: 'KeyA',
+    ctrlKey: false,
+    key: 'a',
+    metaKey: false,
+    shiftKey: false,
+    target: null,
+    ...overrides,
+  } as KeyboardEvent
 }

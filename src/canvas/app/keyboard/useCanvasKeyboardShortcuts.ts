@@ -3,7 +3,10 @@ import {
   handleCanvasKeyboardShortcut,
   type CanvasKeyboardShortcutHandlers,
 } from './CanvasKeyboardShortcutRouter'
-import { shouldReleaseCanvasKeyboardTemporaryPan } from './CanvasKeyboardSystemShortcuts'
+import {
+  runCanvasKeyboardSystemKeyUp,
+  runCanvasKeyboardSystemWindowBlur,
+} from './CanvasKeyboardSystemDispatch'
 
 export function useCanvasKeyboardShortcuts({
   commitSelection,
@@ -78,13 +81,11 @@ export function useCanvasKeyboardShortcuts({
     }
 
     function handleKeyUp(event: globalThis.KeyboardEvent) {
-      if (shouldReleaseCanvasKeyboardTemporaryPan({ config, event })) {
-        setSpaceDown(false)
-      }
+      runCanvasKeyboardSystemKeyUp({ config, event, handlers })
     }
 
     function handleWindowBlur() {
-      setSpaceDown(false)
+      runCanvasKeyboardSystemWindowBlur({ handlers })
     }
 
     window.addEventListener('keydown', handleKeyDown)

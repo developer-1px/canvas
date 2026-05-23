@@ -1981,6 +1981,9 @@ describe('Canvas module boundaries', () => {
     const routerFile = getSourceFile(
       'src/canvas/app/keyboard/CanvasKeyboardShortcutRouter.ts',
     )
+    const hookFile = getSourceFile(
+      'src/canvas/app/keyboard/useCanvasKeyboardShortcuts.ts',
+    )
     const intentFile = getSourceFile(
       'src/canvas/app/keyboard/CanvasKeyboardShortcutIntent.ts',
     )
@@ -2047,6 +2050,16 @@ describe('Canvas module boundaries', () => {
     expect(routerFile.source).not.toContain('handlers.fitToItems(')
     expect(routerFile.source).not.toContain("event.key.startsWith('Arrow')")
     expect(routerFile.source).not.toContain("key === 'z'")
+    expect(hookFile.source).toContain(
+      "from './CanvasKeyboardSystemDispatch'",
+    )
+    expect(hookFile.source).not.toContain(
+      "from './CanvasKeyboardSystemShortcuts'",
+    )
+    expect(hookFile.source).not.toContain(
+      'shouldReleaseCanvasKeyboardTemporaryPan',
+    )
+    expect(hookFile.source).not.toContain('setSpaceDown(false)')
     expect(intentFile.source).toContain(
       'export function getCanvasKeyboardShortcutIntent',
     )
@@ -2146,6 +2159,16 @@ describe('Canvas module boundaries', () => {
     )
     expect(systemDispatchFile.source).toContain("case 'escape'")
     expect(systemDispatchFile.source).toContain('commitSelection([])')
+    expect(systemDispatchFile.source).toContain(
+      'export function runCanvasKeyboardSystemKeyUp',
+    )
+    expect(systemDispatchFile.source).toContain(
+      'export function runCanvasKeyboardSystemWindowBlur',
+    )
+    expect(systemDispatchFile.source).toContain(
+      'shouldReleaseCanvasKeyboardTemporaryPan',
+    )
+    expect(systemDispatchFile.source).toContain('setSpaceDown(false)')
     expect(viewportDispatchFile.source).toContain(
       'export function runCanvasKeyboardViewportIntent',
     )
