@@ -138,6 +138,27 @@ describe('CanvasItemSchema drawing items', () => {
     ])
   })
 
+  it('normalizes built-in drawing bounds from internal geometry', () => {
+    expect(
+      validateCanvasItems([
+        {
+          ...markerItem,
+          x: 0,
+          y: 0,
+          w: 1,
+          h: 1,
+        },
+        {
+          ...arrowItem,
+          x: 0,
+          y: 0,
+          w: 1,
+          h: 1,
+        },
+      ]),
+    ).toEqual([markerItem, arrowItem])
+  })
+
   it('rejects drawing strokes without visible geometry', () => {
     expect(() =>
       validateCanvasItems([

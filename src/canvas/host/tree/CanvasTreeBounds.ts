@@ -1,8 +1,17 @@
-import type { Bounds } from '../../core'
+import {
+  normalizeBounds,
+  type Bounds,
+  type Point,
+} from '../../core'
 import type {
+  ArrowItem,
   CanvasItem,
-  GroupItem
+  GroupItem,
+  HighlightItem,
+  MarkerItem,
 } from '../model'
+
+const CANVAS_ARROW_BOUNDS_PAD = 12
 
 export function boundsIntersect(a: Bounds, b: Bounds) {
   return (
@@ -21,6 +30,14 @@ export function getItemBounds(item: CanvasItem): Bounds {
       w: item.w,
       h: item.h,
     }
+  }
+
+  if (item.type === 'marker' || item.type === 'highlight') {
+    return getDrawingItemBounds(item)
+  }
+
+  if (item.type === 'arrow') {
+    return getArrowItemBounds(item)
   }
 
   return {
@@ -64,15 +81,78 @@ export function syncGroupBounds(group: GroupItem): GroupItem {
   return bounds ? { ...group, ...bounds } : group
 }
 
+export function syncCanvasItemBounds<TItem extends CanvasItem>(
+  item: TItem,
+): TItem {
+  if (item.type === 'group') {
+    return syncGroupBounds(item) as TItem
+  }
+
+  if (
+    item.type === 'marker' ||
+    item.type === 'highlight' ||
+    item.type === 'arrow'
+  ) {
+    return {
+      ...item,
+      ...getItemBounds(item),
+    }
+  }
+
+  return item
+}
+
 export function syncCanvasItems(items: CanvasItem[]): CanvasItem[] {
   return items.map((item) => {
-    if (item.type !== 'group') {
-      return item
+    if (item.type === 'group') {
+      return syncCanvasItemBounds({
+        ...item,
+        children: syncCanvasItems(item.children),
+      })
     }
 
-    return syncGroupBounds({
-      ...item,
-      children: syncCanvasItems(item.children),
-    })
+    return syncCanvasItemBounds(item)
   })
+}
+
+function getDrawingItemBounds(item: MarkerItem | HighlightItem) {
+  return padBounds(getPointBounds(item.points), item.strokeWidth / 2)
+}
+
+function getArrowItemBounds(item: ArrowItem) {
+  return padBounds(
+    normalizeBounds(item.start, item.end),
+    CANVAS_ARROW_BOUNDS_PAD,
+  )
+}
+
+function getPointBounds(points: Point[]) {
+  const [first = { x: 0, y: 0 }] = points
+  let minX = first.x
+  let minY = first.y
+  let maxX = first.x
+  let maxY = first.y
+
+  for (const point of points.slice(1)) {
+    minX = Math.min(minX, point.x)
+    minY = Math.min(minY, point.y)
+    maxX = Math.max(maxX, point.x)
+    maxY = Math.max(maxY, point.y)
+  }
+
+  return {
+    x: minX,
+    y: minY,
+    w: maxX - minX,
+    h: maxY - minY,
+  }
+}
+
+function padBounds(bounds: Bounds, pad: number): Bounds {
+  return {
+    x: bounds.x - pad,
+    y: bounds.y - pad,
+    w: Math.max(bounds.w + pad * 2, pad * 2),
+    h: Math.max(bounds.h + pad * 2, pad * 2),
+  }
 }

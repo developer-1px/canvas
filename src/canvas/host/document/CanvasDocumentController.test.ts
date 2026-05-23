@@ -20,6 +20,31 @@ const markerItem: CanvasItem = {
 }
 
 describe('CanvasDocumentController mutation containment', () => {
+  it('normalizes built-in drawing bounds before committing item changes', () => {
+    const controller = createCanvasDocumentController([])
+
+    expect(
+      controller.commitItemsChange(
+        {
+          items: [{
+            ...markerItem,
+            h: 1,
+            w: 1,
+            x: 0,
+            y: 0,
+          }],
+          type: 'add',
+        },
+        [],
+        {
+          after: [markerItem.id],
+          before: [],
+        },
+      ),
+    ).toBe(true)
+    expect(controller.readItems()).toEqual([markerItem])
+  })
+
   it('returns false and preserves document items for invalid item commits', () => {
     const controller = createCanvasDocumentController(INITIAL_ITEMS)
 

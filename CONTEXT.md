@@ -29,7 +29,7 @@
 - Canvas Custom Item Renderer Registry: `Canvas Custom Item`의 presentation key를 SVG rendering strategy에 연결하는 외부 조립 가능한 registry.
 - Canvas Custom Item Validator: `Canvas Custom Item`의 `kind`별 domain-specific payload 규칙을 document validation에 주입하는 App-owned validator.
 - Canvas Component Presentation Registry: Demo component presentation key를 SVG rendering strategy에 연결하는 외부 조립 가능한 registry.
-- Drawing Item: Demo `CanvasItem` 중 하이라이터, 화살표처럼 캔버스 위에 빠르게 주석을 그리는 항목.
+- Drawing Item: Demo `CanvasItem` 중 marker, highlighter, arrow처럼 캔버스 위에 빠르게 주석을 그리는 항목. `points` 또는 `start/end`가 실제 geometry이고 `x/y/w/h`는 Host가 동기화하는 bounds cache다.
 - Canvas App Model: App Shell이 렌더링할 control별 view props를 만들고 command, pointer, keyboard, viewport, text editing wiring을 숨기는 workflow Module.
 - Canvas Interaction Model: tool, gesture, marquee, draft, snap guide, overlay state 생명주기를 App Shell에 숨기는 workflow Module.
 - Canvas Workspace Model: Demo workspace의 저장된 snapshot, document history, viewport, read model, id 생성을 App Shell에 숨기는 workflow Module.
@@ -48,6 +48,7 @@
 - 당연한 사회적 약속이 되어 있는 캔버스 기능은 내부 모듈이 관리하고, 제품별 커스텀 기능은 외부에서 조립식으로 등록할 수 있어야 한다.
 - marker, highlighter, arrow 같은 기본 드로잉 도구는 제품별 custom item module이 아니라 내부 Affordance로 관리한다.
 - 기본 드로잉 item은 저장 계약에서 최소 visible geometry, 양수 stroke width, 0보다 크고 1 이하인 opacity를 검증한다.
+- 기본 드로잉 item의 bounds는 caller 입력을 믿지 않고 Host tree/document가 `points` 또는 `start/end`에서 canonical하게 동기화한다.
 - 엔진은 Fabric.js 같은 완성형 객체 모델을 감싸기보다, 커스텀 가능한 Affordance 문법을 작은 Interface로 제공한다.
 - Demo `CanvasItem`과 SVG 렌더링 방식은 재사용 Core Contract에 포함하지 않는다.
 - Renderer Stage는 Demo `CanvasItem`, Host read model, component library를 import하지 않는다.

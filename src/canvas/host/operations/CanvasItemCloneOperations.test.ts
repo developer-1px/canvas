@@ -7,7 +7,7 @@ const arrow: CanvasItem = {
   type: 'arrow',
   x: 88,
   y: 88,
-  w: 144,
+  w: 124,
   h: 44,
   start: { x: 100, y: 100 },
   end: { x: 200, y: 120 },

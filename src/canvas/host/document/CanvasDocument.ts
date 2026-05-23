@@ -47,6 +47,14 @@ export function applyCanvasItemsPatch(
   patch: JSONPatchOperation[],
   validation?: CanvasItemValidationOptions,
 ) {
+  return previewCanvasItemsPatch(current, patch, validation).items
+}
+
+function previewCanvasItemsPatch(
+  current: CanvasItem[],
+  patch: JSONPatchOperation[],
+  validation?: CanvasItemValidationOptions,
+) {
   const document = createCanvasItemsDocument(current, {
     history: 0,
     ...validation,
@@ -55,7 +63,10 @@ export function applyCanvasItemsPatch(
 
   assertJSONResult(result)
 
-  return validateCanvasItems(document.value, validation)
+  return {
+    items: validateCanvasItems(document.value, validation),
+    rawItems: document.value,
+  }
 }
 
 export function createCanvasItemsDocument(
@@ -101,23 +112,31 @@ export function commitCanvasItemsPatch({
     return false
   }
 
-  const next = applyCanvasItemsPatch(document.value, patch, validation)
+  const next = previewCanvasItemsPatch(document.value, patch, validation)
 
-  if (canvasItemsEqual(document.value, next)) {
+  if (canvasItemsEqual(document.value, next.items)) {
     return false
   }
+
+  const committedPatch = canvasItemsEqual(next.rawItems, next.items)
+    ? patch
+    : [{
+        op: 'replace',
+        path: '',
+        value: next.items,
+      } satisfies JSONPatchOperation]
 
   if (selection) {
     restoreCanvasDocumentSelection(document, selection.before, document.value)
   }
 
   const result = document.commit(
-    patch,
+    committedPatch,
     selection
       ? {
           label: 'canvas items',
           origin: 'canvas',
-          selection: createCanvasSelectionSnapshot(next, selection.after),
+          selection: createCanvasSelectionSnapshot(next.items, selection.after),
         }
       : {
           label: 'canvas items',

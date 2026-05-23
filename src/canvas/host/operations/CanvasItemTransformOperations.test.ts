@@ -10,7 +10,7 @@ const arrow: CanvasItem = {
   type: 'arrow',
   x: 88,
   y: 88,
-  w: 144,
+  w: 124,
   h: 44,
   start: { x: 100, y: 100 },
   end: { x: 200, y: 120 },
@@ -47,15 +47,15 @@ describe('CanvasItemTransformOperations drawing items', () => {
       resizeCanvasItems(
         [arrow],
         ['arrow-1'],
-        { x: 88, y: 88, w: 144, h: 44 },
-        { x: 88, y: 88, w: 288, h: 88 },
+        { x: 88, y: 88, w: 124, h: 44 },
+        { x: 88, y: 88, w: 248, h: 88 },
       )[0],
     ).toEqual({
       ...arrow,
-      w: 288,
+      w: 248,
       h: 88,
-      start: { x: 112, y: 112 },
-      end: { x: 312, y: 152 },
+      start: { x: 100, y: 100 },
+      end: { x: 324, y: 164 },
     })
   })
 
@@ -80,7 +80,7 @@ describe('CanvasItemTransformOperations drawing items', () => {
       ...marker,
       w: 208,
       h: 48,
-      points: [{ x: 102, y: 102 }, { x: 302, y: 142 }],
+      points: [{ x: 100, y: 100 }, { x: 304, y: 144 }],
     })
   })
 })

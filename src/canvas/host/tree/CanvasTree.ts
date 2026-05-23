@@ -2,6 +2,7 @@ export {
   boundsIntersect,
   getItemBounds,
   getItemsBounds,
+  syncCanvasItemBounds,
   syncCanvasItems,
   syncGroupBounds,
 } from './CanvasTreeBounds'

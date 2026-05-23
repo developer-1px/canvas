@@ -6,6 +6,7 @@ import type {
 import {
   flattenCanvasItems,
   pruneNestedSelection,
+  syncCanvasItemBounds,
   syncGroupBounds,
 } from '../tree/CanvasTree'
 
@@ -67,24 +68,20 @@ function cloneCanvasItemWithNewId(
   }
 
   if (item.type === 'marker' || item.type === 'highlight') {
-    return {
+    return syncCanvasItemBounds({
       ...item,
       id: createId(item.type),
-      x: item.x + offset.x,
-      y: item.y + offset.y,
       points: item.points.map((point) => ({
         x: point.x + offset.x,
         y: point.y + offset.y,
       })),
-    }
+    })
   }
 
   if (item.type === 'arrow') {
-    return {
+    return syncCanvasItemBounds({
       ...item,
       id: createId(item.type),
-      x: item.x + offset.x,
-      y: item.y + offset.y,
       start: {
         x: item.start.x + offset.x,
         y: item.start.y + offset.y,
@@ -93,7 +90,7 @@ function cloneCanvasItemWithNewId(
         x: item.end.x + offset.x,
         y: item.end.y + offset.y,
       },
-    }
+    })
   }
 
   return {
