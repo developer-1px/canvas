@@ -1579,6 +1579,12 @@ describe('Canvas module boundaries', () => {
     const downHandlersFile = getSourceFile(
       'src/canvas/app/pointer/useCanvasPointerDownHandlers.ts',
     )
+    const gestureEngineFile = getSourceFile(
+      'src/canvas/engine/gesture/CanvasGestureEngine.ts',
+    )
+    const toolGestureRoutingFile = getSourceFile(
+      'src/canvas/engine/gesture/CanvasToolGestureRouting.ts',
+    )
     const startFile = getSourceFile(
       'src/canvas/app/pointer/CanvasPointerInteractionStart.ts',
     )
@@ -1614,6 +1620,25 @@ describe('Canvas module boundaries', () => {
       'getCanvasAppCustomCreationTool',
     )
     expect(startFile.source).not.toContain('createCanvasDraftStroke')
+    expect(gestureEngineFile.source).toContain(
+      "from './CanvasToolGestureRouting'",
+    )
+    expect(gestureEngineFile.source).not.toContain("tool === 'rect'")
+    expect(gestureEngineFile.source).not.toContain("tool === 'marker'")
+    expect(gestureEngineFile.source).not.toContain("tool === 'highlight'")
+    expect(gestureEngineFile.source).not.toContain("tool === 'arrow'")
+    expect(gestureEngineFile.source).not.toContain("tool === 'text'")
+    expect(gestureEngineFile.source).not.toContain("tool === 'pan'")
+    expect(toolGestureRoutingFile.source).toContain(
+      'CANVAS_TOOL_GESTURE_ROUTES',
+    )
+    expect(toolGestureRoutingFile.source).toContain("gesture: 'draw-marker'")
+    expect(toolGestureRoutingFile.source).toContain(
+      "gesture: 'draw-highlight'",
+    )
+    expect(toolGestureRoutingFile.source).toContain(
+      'routeItemPointerToCanvasGesture',
+    )
     expect(creationStartFile.source).toContain(
       'export function startCanvasPointerCreation',
     )

@@ -1,27 +1,17 @@
 import type { CanvasAffordanceConfig } from '../affordance/CanvasAffordances'
+import type { Tool } from '../../core'
 import {
-  isCanvasCustomToolId,
-  type Tool,
-} from '../../core'
+  getCanvasToolPointerGesture,
+  shouldRouteCanvasToolPointerToCanvasGesture,
+  shouldStartCanvasPanGesture,
+  type CanvasPointerGesture,
+  type CanvasPointerInput,
+} from './CanvasToolGestureRouting'
 
-export type CanvasPointerInput = {
-  altKey: boolean
-  button: number
-  ctrlKey: boolean
-  metaKey: boolean
-  shiftKey: boolean
-}
-
-export type CanvasPointerGesture =
-  | 'create-arrow'
-  | 'create-custom'
-  | 'create-rect'
-  | 'create-text'
-  | 'draw-highlight'
-  | 'draw-marker'
-  | 'marquee'
-  | 'none'
-  | 'pan'
+export type {
+  CanvasPointerGesture,
+  CanvasPointerInput,
+} from './CanvasToolGestureRouting'
 
 export type CanvasItemPointerIntent = {
   additive: boolean
@@ -44,35 +34,14 @@ export function getCanvasPointerGesture({
     return 'none'
   }
 
-  if (
-    config.gestures.pan &&
-    (input.button === 1 || spaceDown || tool === 'pan')
-  ) {
+  if (shouldStartCanvasPanGesture({ config, input, spaceDown, tool })) {
     return 'pan'
   }
 
-  if (tool === 'rect' && config.gestures.createRect) {
-    return 'create-rect'
-  }
+  const toolGesture = getCanvasToolPointerGesture({ config, tool })
 
-  if (tool === 'marker' && config.gestures.drawMarker) {
-    return 'draw-marker'
-  }
-
-  if (tool === 'highlight' && config.gestures.drawHighlight) {
-    return 'draw-highlight'
-  }
-
-  if (tool === 'arrow' && config.gestures.createArrow) {
-    return 'create-arrow'
-  }
-
-  if (isCanvasCustomToolId(tool) && config.gestures.createCustom) {
-    return 'create-custom'
-  }
-
-  if (tool === 'text' && config.gestures.createText) {
-    return 'create-text'
+  if (toolGesture) {
+    return toolGesture
   }
 
   return config.gestures.marquee ? 'marquee' : 'none'
@@ -85,16 +54,7 @@ export function shouldRouteCanvasItemPointerToCanvasGesture({
   spaceDown: boolean
   tool: Tool
 }) {
-  return (
-    spaceDown ||
-    tool === 'pan' ||
-    tool === 'rect' ||
-    tool === 'text' ||
-    tool === 'marker' ||
-    tool === 'highlight' ||
-    tool === 'arrow' ||
-    isCanvasCustomToolId(tool)
-  )
+  return shouldRouteCanvasToolPointerToCanvasGesture({ spaceDown, tool })
 }
 
 export function getCanvasItemPointerIntent({
