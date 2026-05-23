@@ -2618,6 +2618,9 @@ describe('Canvas module boundaries', () => {
     const itemRendererFile = getSourceFile(
       'src/canvas/app/rendering/CanvasDemoSvgItemRenderer.tsx',
     )
+    const itemRenderRoutingFile = getSourceFile(
+      'src/canvas/app/rendering/CanvasDemoSvgItemRenderRouting.tsx',
+    )
     const itemFrameFile = getSourceFile(
       'src/canvas/app/rendering/CanvasDemoSvgItemFrame.tsx',
     )
@@ -2630,6 +2633,16 @@ describe('Canvas module boundaries', () => {
     expect(itemRendererFile.source).toContain('CanvasDemoSvgItemFrame')
     expect(itemRendererFile.source).toContain(
       'export function renderCanvasDemoSvgItem',
+    )
+    expect(itemRendererFile.source).toContain(
+      "from './CanvasDemoSvgItemRenderRouting'",
+    )
+    expect(itemRendererFile.source).not.toContain("item.type === '")
+    expect(itemRenderRoutingFile.source).toContain(
+      'CANVAS_DEMO_SVG_ITEM_RENDER_STRATEGIES',
+    )
+    expect(itemRenderRoutingFile.source).toContain(
+      'export function getCanvasDemoSvgItemRenderRoute',
     )
     expect(itemLayerFile.source).not.toContain('data-locked')
     expect(itemLayerFile.source).not.toContain('data-selected')
@@ -2645,14 +2658,14 @@ describe('Canvas module boundaries', () => {
     const itemLayerFile = getSourceFile(
       'src/canvas/app/rendering/CanvasDemoSvgItemLayer.tsx',
     )
-    const itemRendererFile = getSourceFile(
-      'src/canvas/app/rendering/CanvasDemoSvgItemRenderer.tsx',
+    const itemRenderRoutingFile = getSourceFile(
+      'src/canvas/app/rendering/CanvasDemoSvgItemRenderRouting.tsx',
     )
     const drawingRendererFile = getSourceFile(
       'src/canvas/app/rendering/CanvasDemoSvgDrawingItemRenderer.tsx',
     )
 
-    expect(itemRendererFile.source).toContain(
+    expect(itemRenderRoutingFile.source).toContain(
       "from './CanvasDemoSvgDrawingItemRenderer'",
     )
     expect(itemLayerFile.source).not.toContain(
@@ -2675,14 +2688,14 @@ describe('Canvas module boundaries', () => {
     const itemLayerFile = getSourceFile(
       'src/canvas/app/rendering/CanvasDemoSvgItemLayer.tsx',
     )
-    const itemRendererFile = getSourceFile(
-      'src/canvas/app/rendering/CanvasDemoSvgItemRenderer.tsx',
+    const itemRenderRoutingFile = getSourceFile(
+      'src/canvas/app/rendering/CanvasDemoSvgItemRenderRouting.tsx',
     )
     const rectTextRendererFile = getSourceFile(
       'src/canvas/app/rendering/CanvasDemoSvgRectTextItemRenderer.tsx',
     )
 
-    expect(itemRendererFile.source).toContain(
+    expect(itemRenderRoutingFile.source).toContain(
       "from './CanvasDemoSvgRectTextItemRenderer'",
     )
     expect(itemLayerFile.source).not.toContain(
@@ -2794,8 +2807,8 @@ describe('Canvas module boundaries', () => {
     const itemLayerFile = getSourceFile(
       'src/canvas/app/rendering/CanvasDemoSvgItemLayer.tsx',
     )
-    const itemRendererFile = getSourceFile(
-      'src/canvas/app/rendering/CanvasDemoSvgItemRenderer.tsx',
+    const itemRenderRoutingFile = getSourceFile(
+      'src/canvas/app/rendering/CanvasDemoSvgItemRenderRouting.tsx',
     )
     const executionFile = getSourceFile(
       'src/canvas/app/rendering/CanvasDemoSvgCustomItemRendererExecution.tsx',
@@ -2807,7 +2820,7 @@ describe('Canvas module boundaries', () => {
       'src/canvas/app/rendering/CanvasDemoSvgCustomItemRenderFallback.tsx',
     )
 
-    expect(itemRendererFile.source).toContain(
+    expect(itemRenderRoutingFile.source).toContain(
       "from './CanvasDemoSvgCustomItemRendererExecution'",
     )
     expect(itemLayerFile.source).not.toContain(

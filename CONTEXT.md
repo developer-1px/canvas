@@ -98,7 +98,8 @@
 - Canvas App Custom Item Validator Contracts: custom item validator registry key와 validate strategy slot을 검증하는 App-owned contract Module.
 - Canvas Component Presentation Registry: Demo component presentation key를 SVG rendering strategy에 연결하는 외부 조립 가능한 registry.
 - Demo SVG Built-in Component Presentation Renderers: 기본 Demo component presentation key와 SVG renderer strategy mapping을 소유하는 App rendering Module.
-- Demo SVG Item Renderer: Demo `CanvasItem` type branch, recursive group rendering, Demo SVG Item Frame composition, shape renderer dispatch를 소유하는 App rendering Module.
+- Demo SVG Item Renderer: Demo SVG Item Frame composition과 selection/lock frame state를 소유하고 item type dispatch는 Demo SVG Item Render Routing에 위임하는 App rendering Module.
+- Demo SVG Item Render Routing: Demo `CanvasItem` type별 frame metadata, recursive group content, component/custom/drawing/rect-text renderer dispatch를 소유하는 App rendering Module.
 - Canvas App Renderer Registry Contracts: component/custom item renderer registry key와 render strategy slot 검증을 공유하는 App rendering contract Module.
 - Demo SVG Component Presentation Registry Contracts: component presentation renderer registry key와 render strategy slot을 검증하는 App rendering contract Module.
 - Demo SVG Component Renderer Execution: component presentation resolver 호출, renderer lookup, render 실행, throw 시 fallback containment를 소유하는 App rendering Module.
@@ -227,7 +228,7 @@
 - Demo item SVG 렌더링은 App의 Demo SVG Item Layer Adapter가 소유한다.
 - SVG drawing path data와 arrow marker id/IRI는 Canvas SVG Drawing Primitives가 소유한다.
 - Demo SVG item의 lock/selected/pointer/outline wrapper 문법은 Demo SVG Item Frame이 소유한다.
-- Demo SVG Item Layer Adapter는 item layer list injection을 맡고, recursive tree/frame orchestration과 item type dispatch는 Demo SVG Item Renderer가 소유한다. marker/highlighter/arrow shape 렌더링은 Demo SVG Drawing Item Renderer가 소유한다.
+- Demo SVG Item Layer Adapter는 item layer list injection을 맡고, frame orchestration은 Demo SVG Item Renderer가, recursive tree content와 item type dispatch는 Demo SVG Item Render Routing이 소유한다. marker/highlighter/arrow shape 렌더링은 Demo SVG Drawing Item Renderer가 소유한다.
 - Demo SVG Item Layer Adapter는 rect/text shape와 embedded text foreignObject 문법을 알지 않고 Demo SVG Rect/Text Item Renderer에 위임한다.
 - 안정 entity type은 `src/canvas/entities`에서 import한다. `entities` public facade는 type-only로 유지한다.
 - persisted kind와 registry key는 Canvas Stable Id 형식을 사용한다.
