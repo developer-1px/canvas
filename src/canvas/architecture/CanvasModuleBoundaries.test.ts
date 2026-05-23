@@ -555,6 +555,35 @@ describe('Canvas module boundaries', () => {
     expect(runtimeFile.source).toContain('catch')
   })
 
+  it('keeps App custom item module snapshot behavior behind a named module', () => {
+    const moduleFile = getSourceFile(
+      'src/canvas/app/modules/CanvasAppCustomItemModules.ts',
+    )
+    const snapshotFile = getSourceFile(
+      'src/canvas/app/modules/CanvasAppCustomItemModuleSnapshot.ts',
+    )
+
+    expect(moduleFile.source).toContain(
+      "from './CanvasAppCustomItemModuleSnapshot'",
+    )
+    expect(moduleFile.source).not.toContain(
+      'function snapshotCanvasAppCustomItemModuleAssembly',
+    )
+    expect(moduleFile.source).not.toContain(
+      'function snapshotCanvasAppCustomItemModule(',
+    )
+    expect(moduleFile.source).not.toContain('function freezeCanvasAppRecord')
+    expect(moduleFile.source).not.toContain('function freezeCanvasAppArray')
+    expect(snapshotFile.source).toContain(
+      'export function snapshotCanvasAppCustomItemModuleAssembly',
+    )
+    expect(snapshotFile.source).toContain(
+      'export function snapshotCanvasAppCustomItemModule(',
+    )
+    expect(snapshotFile.source).toContain('function freezeCanvasAppRecord')
+    expect(snapshotFile.source).toContain('function freezeCanvasAppArray')
+  })
+
   it('keeps App Assembly snapshot behavior behind a named module', () => {
     const assemblyFile = getSourceFile(
       'src/canvas/app/workflow/CanvasAppAssembly.ts',
@@ -574,6 +603,47 @@ describe('Canvas module boundaries', () => {
     expect(snapshotFile.source).toContain('deepFreezeCanvasAppValue')
     expect(snapshotFile.source).toContain('freezeCanvasAppRecord')
     expect(snapshotFile.source).toContain('freezeCanvasAppArray')
+  })
+
+  it('keeps App Assembly output contracts behind a named module', () => {
+    const assemblyFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppAssembly.ts',
+    )
+    const contractsFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppAssemblyContracts.ts',
+    )
+
+    expect(assemblyFile.source).toContain(
+      "from './CanvasAppAssemblyContracts'",
+    )
+    expect(assemblyFile.source).not.toContain(
+      'function assertCanvasAppAssembly',
+    )
+    expect(assemblyFile.source).not.toContain(
+      'function assertCanvasAppComponentLibrary',
+    )
+    expect(assemblyFile.source).not.toContain(
+      'function assertCanvasAppItemAdapters',
+    )
+    expect(assemblyFile.source).not.toContain(
+      'getPresentation mismatch',
+    )
+    expect(assemblyFile.source).not.toContain('getTemplate mismatch')
+    expect(assemblyFile.source).not.toContain('validate strategy')
+    expect(assemblyFile.source).not.toContain('command adapter')
+    expect(contractsFile.source).toContain(
+      'export function assertCanvasAppAssembly',
+    )
+    expect(contractsFile.source).toContain(
+      'function assertCanvasAppComponentLibrary',
+    )
+    expect(contractsFile.source).toContain(
+      'function assertCanvasAppItemAdapters',
+    )
+    expect(contractsFile.source).toContain('getPresentation mismatch')
+    expect(contractsFile.source).toContain('getTemplate mismatch')
+    expect(contractsFile.source).toContain('validate strategy')
+    expect(contractsFile.source).toContain('command adapter')
   })
 
   it('keeps app workflow hooks from recreating the workspace read model', () => {
