@@ -1083,6 +1083,12 @@ describe('Canvas module boundaries', () => {
     const textEditingModelFile = getSourceFile(
       'src/canvas/app/text/CanvasTextEditingModel.ts',
     )
+    const findReplaceHookFile = getSourceFile(
+      'src/canvas/app/workflow/useCanvasFindReplaceModel.ts',
+    )
+    const findReplaceModelFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasFindReplaceModel.ts',
+    )
 
     expect(appModelFile.source).toContain("from './useCanvasAppTextModel'")
     expect(appModelFile.source).not.toContain(
@@ -1150,6 +1156,25 @@ describe('Canvas module boundaries', () => {
     expect(textEditingModelFile.source).toContain("'Text'")
     expect(textEditingModelFile.source).toContain("type: 'set-text'")
     expect(textEditingModelFile.source).toContain('fontSize: 16')
+    expect(findReplaceHookFile.source).toContain(
+      "from './CanvasFindReplaceModel'",
+    )
+    for (const findReplaceImplementationDetail of [
+      'matches.reduce',
+      'replaceDocumentText(query, replacement)',
+      'enabled && open',
+      'setOpen(true)',
+    ]) {
+      expect(findReplaceHookFile.source).not.toContain(
+        findReplaceImplementationDetail,
+      )
+      expect(findReplaceModelFile.source).toContain(
+        findReplaceImplementationDetail,
+      )
+    }
+    expect(findReplaceModelFile.source).toContain(
+      'export function getCanvasFindReplaceModel',
+    )
   })
 
   it('keeps app interaction state routing behind the interaction model', () => {

@@ -118,6 +118,7 @@
 - Canvas App Text Model: App Model이 textarea ref, text editor, find/replace runtime wiring 세부를 직접 알지 않도록 숨기는 workflow Module.
 - Canvas App Text Consumer Model: Text editor/find-replace runtime을 command, component, extension, keyboard, pointer, stage, view consumer context로 변환하는 workflow Module.
 - Canvas Text Editing Model: text edit commit descriptor, empty text fallback, viewport-projected editor style을 소유하는 App-owned runtime Module.
+- Canvas Find Replace Model: find/replace open gate, document search match count, replace-all containment, panel view props를 소유하는 App-owned runtime Module.
 - Canvas App Viewport Model: App Model이 wheel viewport listener와 fit/reset/zoom hook 조립 세부를 직접 알지 않도록 숨기는 workflow Module.
 - Canvas App Viewport Consumer Model: Viewport runtime controls를 control, keyboard consumer별 viewport context로 변환하는 workflow Module.
 - Canvas Viewport Control Execution: fit-to-items target selection, missing geometry no-op, reset viewport, stage-center zoom 규칙을 소유하는 App-owned runtime Module.
@@ -261,6 +262,7 @@
 - App Model은 stage/item layer Adapter 입력 조립, 호출 순서, context menu 차단, text editor blur timing, render 실패 containment를 직접 알지 않고 Canvas App Stage Model에 위임한다.
 - App Model은 textarea ref, text editor, find/replace wiring, editing state fan-out 세부를 직접 알지 않고 Canvas App Text Model에서 consumer별 text context와 view props를 받는다. Text editor/find-replace runtime 생성은 Canvas App Text Model이, consumer별 text fan-out은 Canvas App Text Consumer Model이 소유한다.
 - Text editing hook은 textarea focus/blur DOM lifecycle만 맡고, commit descriptor, empty text fallback, editor style projection은 Canvas Text Editing Model이 소유한다.
+- Find/replace hook은 open/query/replacement state storage만 맡고, feature toggle gate, match count 계산, replace-all 실행 조건, panel props 구성은 Canvas Find Replace Model이 소유한다.
 - App Model은 wheel viewport listener, fit/reset/zoom control hook 조립, keyboard/control fan-out 세부를 직접 알지 않고 Canvas App Viewport Model에서 consumer별 viewport context를 받는다. Viewport listener/control runtime 생성은 Canvas App Viewport Model이, consumer별 viewport fan-out은 Canvas App Viewport Consumer Model이 소유한다.
 - Viewport control hook은 callback memoization만 맡고, fit target defaulting, missing bounds/rect no-op, reset, stage-center zoom 실행 규칙은 Canvas Viewport Control Execution이 소유한다.
 - Wheel viewport hook은 listener binding과 cleanup만 맡고, wheel event-to-engine adaptation, preventDefault timing, stage-local point projection, null-result viewport fallback은 Canvas Wheel Viewport Execution이 소유한다.

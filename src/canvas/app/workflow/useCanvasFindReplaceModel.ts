@@ -1,8 +1,6 @@
-import {
-  useCallback,
-  useState,
-} from 'react'
+import { useState } from 'react'
 import type { CanvasDocumentTextSearch } from './CanvasWorkflowContract'
+import { getCanvasFindReplaceModel } from './CanvasFindReplaceModel'
 
 type UseCanvasFindReplaceModelArgs = CanvasDocumentTextSearch & {
   enabled: boolean
@@ -16,33 +14,16 @@ export function useCanvasFindReplaceModel({
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
   const [replacement, setReplacement] = useState('')
-  const matches = findDocumentText(query)
-  const matchCount = matches.reduce(
-    (total, match) => total + match.occurrences,
-    0,
-  )
 
-  const openFindReplace = useCallback(() => {
-    if (enabled) {
-      setOpen(true)
-    }
-  }, [enabled])
-
-  const replaceAllText = useCallback(() => {
-    replaceDocumentText(query, replacement)
-  }, [query, replacement, replaceDocumentText])
-
-  return {
-    findReplace: {
-      matchCount,
-      open: enabled && open,
-      query,
-      replacement,
-      onClose: () => setOpen(false),
-      onQueryChange: setQuery,
-      onReplaceAll: replaceAllText,
-      onReplacementChange: setReplacement,
-    },
-    openFindReplace,
-  }
+  return getCanvasFindReplaceModel({
+    enabled,
+    findDocumentText,
+    open,
+    query,
+    replacement,
+    replaceDocumentText,
+    setOpen,
+    setQuery,
+    setReplacement,
+  })
 }
