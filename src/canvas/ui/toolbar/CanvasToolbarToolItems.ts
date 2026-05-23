@@ -1,4 +1,7 @@
-import type { CanvasAffordanceConfig } from '../../engine'
+import {
+  CANVAS_TOOL_AFFORDANCE_ORDER,
+  type CanvasAffordanceConfig,
+} from '../../engine'
 import type {
   CanvasBuiltinTool,
   CanvasCustomToolId,
@@ -33,23 +36,13 @@ export type CanvasToolbarToolItemsInput = {
   tool: Tool
 }
 
-const CANVAS_TOOLBAR_BUILTIN_TOOLS = [
-  'select',
-  'pan',
-  'rect',
-  'text',
-  'marker',
-  'highlight',
-  'arrow',
-] as const satisfies readonly CanvasBuiltinTool[]
-
 export function getCanvasToolbarToolItems({
   config,
   customTools,
   tool,
 }: CanvasToolbarToolItemsInput): CanvasToolbarToolItem[] {
   return [
-    ...CANVAS_TOOLBAR_BUILTIN_TOOLS
+    ...CANVAS_TOOL_AFFORDANCE_ORDER
       .filter((builtinTool) => config.tools[builtinTool])
       .map((builtinTool) => ({
         active: tool === builtinTool,

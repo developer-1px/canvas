@@ -2,15 +2,18 @@ export {
   CANVAS_COMMAND_AFFORDANCES,
   CANVAS_GESTURE_STATUS_LABELS,
   CANVAS_TOOL_AFFORDANCES,
+  CANVAS_TOOL_AFFORDANCE_ORDER,
   DEFAULT_CANVAS_AFFORDANCE_CONFIG,
   assertCanvasAffordanceConfig,
   createCanvasAffordanceConfig,
   type CanvasAffordanceConfig,
   type CanvasAffordanceConfigInput,
+  type CanvasCommandAffordance,
   type CanvasCommandId,
   type CanvasGestureId,
   type CanvasOverlayId,
   type CanvasShortcutId,
+  type CanvasToolAffordance,
 } from './affordance/CanvasAffordances'
 export {
   CANVAS_COMMAND_INSERT_OFFSET,

@@ -444,7 +444,8 @@ describe('Canvas module boundaries', () => {
     expect(toolItemsFile.source).toContain(
       'export function getCanvasToolbarToolItems',
     )
-    expect(toolItemsFile.source).toContain('CANVAS_TOOLBAR_BUILTIN_TOOLS')
+    expect(toolItemsFile.source).toContain('CANVAS_TOOL_AFFORDANCE_ORDER')
+    expect(toolItemsFile.source).not.toContain('CANVAS_TOOLBAR_BUILTIN_TOOLS')
     expect(toolItemsFile.source).toContain('config.tools[builtinTool]')
     expect(toolItemsFile.source).toContain('customTools.map')
   })
