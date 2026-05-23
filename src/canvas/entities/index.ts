@@ -11,7 +11,6 @@ export type {
   Tool,
   Viewport,
 } from '../core'
-export { isCanvasCustomToolId } from '../core'
 
 export type {
   CanvasComponentItem,

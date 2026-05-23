@@ -1,5 +1,9 @@
 import type { CanvasCreationAdapter } from '../../engine'
 import type { CanvasItem } from '../model'
+import {
+  getCanvasArrowStyle,
+  getCanvasDrawingStrokeStyle,
+} from '../drawing/CanvasDrawingItemStyles'
 import { syncCanvasItemBounds } from '../tree/CanvasTree'
 
 export const CANVAS_ITEM_CREATION_ADAPTER: CanvasCreationAdapter<CanvasItem> = {
@@ -13,8 +17,7 @@ export const CANVAS_ITEM_CREATION_ADAPTER: CanvasCreationAdapter<CanvasItem> = {
       h: 0,
       end,
       start,
-      stroke: '#334155',
-      strokeWidth: 3,
+      ...getCanvasArrowStyle(),
     }),
   createHighlight: ({ id, points }) =>
     syncCanvasItemBounds({
@@ -25,9 +28,7 @@ export const CANVAS_ITEM_CREATION_ADAPTER: CanvasCreationAdapter<CanvasItem> = {
       w: 0,
       h: 0,
       points,
-      stroke: '#fde047',
-      strokeWidth: 18,
-      opacity: 0.42,
+      ...getCanvasDrawingStrokeStyle('highlight'),
     }),
   createMarker: ({ id, points }) =>
     syncCanvasItemBounds({
@@ -38,9 +39,7 @@ export const CANVAS_ITEM_CREATION_ADAPTER: CanvasCreationAdapter<CanvasItem> = {
       w: 0,
       h: 0,
       points,
-      stroke: '#475569',
-      strokeWidth: 4,
-      opacity: 1,
+      ...getCanvasDrawingStrokeStyle('marker'),
     }),
   createRect: ({ bounds, id }) => ({
     id,

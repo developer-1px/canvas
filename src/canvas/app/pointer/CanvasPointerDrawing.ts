@@ -1,28 +1,22 @@
 import type { Point } from '../../entities'
 import { pointDistance } from '../../core'
 import type { CanvasDraftStrokeOverlay } from '../../engine'
+import {
+  getCanvasDrawingStrokeStyle,
+  type CanvasDrawingStrokeKind,
+} from '../../host'
 
 const DRAWING_POINT_DISTANCE = 2
 
 export function createCanvasDraftStroke(
-  kind: CanvasDraftStrokeOverlay['kind'],
+  kind: CanvasDrawingStrokeKind,
   points: Point[],
 ): CanvasDraftStrokeOverlay {
-  return kind === 'marker'
-    ? {
-        kind,
-        opacity: 1,
-        points,
-        stroke: '#475569',
-        strokeWidth: 4,
-      }
-    : {
-        kind,
-        opacity: 0.42,
-        points,
-        stroke: '#fde047',
-        strokeWidth: 18,
-      }
+  return {
+    kind,
+    points,
+    ...getCanvasDrawingStrokeStyle(kind),
+  }
 }
 
 export function getNextCanvasDrawingPoints({

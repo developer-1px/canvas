@@ -1,7 +1,9 @@
-import type { ReactNode } from 'react'
-import type { CanvasComponentItem } from '../../entities'
 import { assertCanvasAppDescriptorFunctionField } from '../extensions/CanvasAppDescriptorContracts'
 import { assertCanvasAppExtensionRecordKeys } from '../extensions/CanvasAppExtensionIds'
+import type {
+  CanvasAppComponentPresentationRenderers,
+  CanvasAppComponentRendererStrategy,
+} from './CanvasAppRenderingContracts'
 import {
   CanvasDemoSvgConnectorComponent,
   CanvasDemoSvgVoteComponent,
@@ -19,13 +21,11 @@ import {
   CanvasDemoSvgStickyComponent,
 } from './CanvasDemoSvgTextComponentRenderer'
 
-export type CanvasDemoSvgComponentRendererStrategy = (input: {
-  item: CanvasComponentItem
-}) => ReactNode
+export type CanvasDemoSvgComponentRendererStrategy =
+  CanvasAppComponentRendererStrategy
 
-export type CanvasDemoSvgComponentPresentationRenderers = Readonly<
-  Record<string, CanvasDemoSvgComponentRendererStrategy>
->
+export type CanvasDemoSvgComponentPresentationRenderers =
+  CanvasAppComponentPresentationRenderers
 
 export const DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS: CanvasDemoSvgComponentPresentationRenderers = {
   'accent-card': CanvasDemoSvgCardComponent,

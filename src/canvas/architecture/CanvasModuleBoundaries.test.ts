@@ -54,6 +54,23 @@ describe('Canvas module boundaries', () => {
     expect(violations).toEqual([])
   })
 
+  it('keeps stable entities as type-only public contracts', () => {
+    const entitiesEntry = getSourceFile('src/canvas/entities/index.ts')
+    const runtimeExports = entitiesEntry.source.match(/^export\s+\{/gm) ?? []
+    const internalEntityImports = getImportsFromOutside('src/canvas/entities/')
+      .filter((reference) =>
+        reference.target.startsWith('src/canvas/entities/') &&
+        reference.target !== 'src/canvas/entities',
+      )
+
+    expect(runtimeExports).toEqual([])
+    expect(entitiesEntry.source).not.toContain('isCanvasCustomToolId')
+    expect(internalEntityImports).toEqual([])
+    expect(getSourceFile('src/canvas/index.ts').source).not.toContain(
+      'CanvasEntities',
+    )
+  })
+
   it('keeps the engine independent from host, app, renderer, and ui modules', () => {
     const violations = getImportsFrom('src/canvas/engine/')
       .filter((reference) =>
@@ -297,6 +314,43 @@ describe('Canvas module boundaries', () => {
     expect(renderInput).toContain('CanvasAppPointerInput')
     expect(renderInput).not.toContain('PointerEvent<')
     expect(renderInput).not.toContain('SVGGElement')
+  })
+
+  it('keeps app rendering authoring contracts independent from Demo SVG registry names', () => {
+    const contractsFile = getSourceFile(
+      'src/canvas/app/rendering/CanvasAppRenderingContracts.ts',
+    )
+    const itemLayerAdapterFile = getSourceFile(
+      'src/canvas/app/rendering/CanvasAppItemLayerAdapter.tsx',
+    )
+
+    expect(contractsFile.source).toContain(
+      'CanvasAppComponentRendererStrategy',
+    )
+    expect(contractsFile.source).toContain(
+      'CanvasAppCustomItemRendererStrategy',
+    )
+    expect(contractsFile.source).not.toContain('CanvasDemoSvg')
+    expect(itemLayerAdapterFile.source).not.toMatch(
+      /CanvasDemoSvg(?:Component|Custom).*Renderer/,
+    )
+  })
+
+  it('keeps built-in drawing style defaults in the host drawing module', () => {
+    const drawingStyleModule = getSourceFile(
+      'src/canvas/host/drawing/CanvasDrawingItemStyles.ts',
+    )
+    const drawingStyleConsumers = [
+      getSourceFile('src/canvas/app/pointer/CanvasPointerDrawing.ts'),
+      getSourceFile('src/canvas/host/adapters/CanvasItemCreationAdapter.ts'),
+    ].map((file) => file.source).join('\n')
+
+    expect(drawingStyleModule.source).toContain('CANVAS_MARKER_STYLE')
+    expect(drawingStyleModule.source).toContain('CANVAS_HIGHLIGHT_STYLE')
+    expect(drawingStyleModule.source).toContain('CANVAS_ARROW_STYLE')
+    expect(drawingStyleConsumers).not.toContain('#475569')
+    expect(drawingStyleConsumers).not.toContain('#fde047')
+    expect(drawingStyleConsumers).not.toContain('#334155')
   })
 
   it('keeps app workflow hooks from recreating the workspace read model', () => {

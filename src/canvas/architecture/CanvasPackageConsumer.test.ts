@@ -2,12 +2,13 @@ import { describe, expect, it } from 'vitest'
 import {
   CanvasCore,
   CanvasEngine,
-  CanvasEntities,
   CanvasHost,
   CanvasRenderer,
   createCanvasAppAssembly,
   defineCanvasAppCustomItemModule,
+  type CanvasAppComponentRendererStrategy,
   type CanvasAppCustomItemModule,
+  type CanvasAppCustomItemRendererStrategy,
   type CanvasAppItemLayerAdapter,
   type CanvasAppPointerInput,
   type CanvasAppStageAdapter,
@@ -19,10 +20,11 @@ import {
   CanvasApp,
   createCanvasAppComponentPresentationRenderers,
   createCanvasAppAssembly as createCanvasAppAssemblyFromApp,
+  createCanvasAppCustomItemRenderers,
 } from 'canvas/app'
-import { normalizeBounds } from 'canvas/core'
+import { isCanvasCustomToolId, normalizeBounds } from 'canvas/core'
 import { createCanvasAffordanceConfig } from 'canvas/engine'
-import { isCanvasCustomToolId } from 'canvas/entities'
+import type { CanvasItem as CanvasEntityItem } from 'canvas/entities'
 import { createCanvasComponentLibrary } from 'canvas/host'
 import { CanvasSvgStage } from 'canvas/renderer'
 
@@ -57,6 +59,10 @@ describe('Canvas package consumer imports', () => {
         renderItem: ({ item }) => item.title,
         validateItem: (item) => item.data.severity === 'high',
       })
+    const renderComponent: CanvasAppComponentRendererStrategy = ({ item }) =>
+      item.title
+    const renderCustomItem: CanvasAppCustomItemRendererStrategy = ({ item }) =>
+      item.title
     const itemLayerAdapter: CanvasAppItemLayerAdapter = {
       renderItems: ({ items }) => items.length,
     }
@@ -87,6 +93,9 @@ describe('Canvas package consumer imports', () => {
     })
 
     expect(assembly.initialItems).toEqual([rect])
+    const entityItem: CanvasEntityItem = rect
+
+    expect(entityItem.id).toBe('rect-1')
     expect(assembly.itemLayerAdapter.renderItems({
       componentPresentationRenderers: {},
       customItemRenderers: {},
@@ -100,6 +109,12 @@ describe('Canvas package consumer imports', () => {
     expect(assembly.stageAdapter.renderStage).toBe(stageAdapter.renderStage)
     expect(stageMount.ref).toBeTypeOf('function')
     expect(pointerInput.pointerId).toBe(1)
+    expect(createCanvasAppComponentPresentationRenderers({
+      'smoke-card': renderComponent,
+    })['smoke-card']).toBe(renderComponent)
+    expect(createCanvasAppCustomItemRenderers({
+      'smoke-node': renderCustomItem,
+    })['smoke-node']).toBe(renderCustomItem)
     expect(assembly.customItemValidators.smoke(customItem)).toBe(true)
     expect(createCanvasAppAssemblyFromApp().initialItems.length).toBeGreaterThan(
       0,
@@ -123,7 +138,7 @@ describe('Canvas package consumer imports', () => {
       createCanvasAppComponentPresentationRenderers(),
     ).toBeTypeOf('object')
     expect(isCanvasCustomToolId('custom:smoke')).toBe(true)
-    expect(CanvasEntities.isCanvasCustomToolId('custom:smoke')).toBe(true)
+    expect(CanvasCore.isCanvasCustomToolId('custom:smoke')).toBe(true)
     expect(createCanvasComponentLibrary({
       templates: CanvasHost.DEFAULT_CANVAS_COMPONENT_TEMPLATES,
     }).templates.length).toBe(CanvasHost.DEFAULT_CANVAS_COMPONENT_TEMPLATES.length)

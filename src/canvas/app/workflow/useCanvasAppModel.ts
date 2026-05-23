@@ -9,8 +9,8 @@ import {
   DEFAULT_CANVAS_AFFORDANCE_CONFIG,
   getCanvasCommandAvailability,
 } from '../../engine'
+import { isCanvasCustomToolId } from '../../core'
 import {
-  isCanvasCustomToolId,
   type CanvasInteractionKind,
   type Tool,
 } from '../../entities'

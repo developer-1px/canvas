@@ -13,24 +13,16 @@ import {
 } from '../pointer/CanvasAppPointerInput'
 import { CanvasDemoSvgItemLayer } from './CanvasDemoSvgItemLayer'
 import type {
-  CanvasDemoSvgComponentPresentationRenderers,
-  CanvasDemoSvgComponentRendererStrategy,
-} from './CanvasDemoSvgComponentPresentationRegistry'
-import type {
-  CanvasDemoSvgCustomItemRendererStrategy,
-  CanvasDemoSvgCustomItemRenderers,
-} from './CanvasDemoSvgCustomItemRendererRegistry'
+  CanvasAppComponentPresentationRenderers,
+  CanvasAppCustomItemRenderers,
+} from './CanvasAppRenderingContracts'
 
-export type CanvasAppComponentRendererStrategy =
-  CanvasDemoSvgComponentRendererStrategy
-
-export type CanvasAppComponentPresentationRenderers =
-  CanvasDemoSvgComponentPresentationRenderers
-
-export type CanvasAppCustomItemRendererStrategy =
-  CanvasDemoSvgCustomItemRendererStrategy
-
-export type CanvasAppCustomItemRenderers = CanvasDemoSvgCustomItemRenderers
+export type {
+  CanvasAppComponentPresentationRenderers,
+  CanvasAppComponentRendererStrategy,
+  CanvasAppCustomItemRendererStrategy,
+  CanvasAppCustomItemRenderers,
+} from './CanvasAppRenderingContracts'
 
 export type CanvasAppItemLayerRenderInput = {
   componentPresentationRenderers: CanvasAppComponentPresentationRenderers

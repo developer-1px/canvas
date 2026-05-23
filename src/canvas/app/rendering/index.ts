@@ -7,13 +7,15 @@ export {
 } from './CanvasAppStageAdapter'
 export {
   DEFAULT_CANVAS_APP_ITEM_LAYER_ADAPTER,
-  type CanvasAppComponentPresentationRenderers,
-  type CanvasAppComponentRendererStrategy,
-  type CanvasAppCustomItemRendererStrategy,
-  type CanvasAppCustomItemRenderers,
   type CanvasAppItemLayerAdapter,
   type CanvasAppItemLayerRenderInput,
 } from './CanvasAppItemLayerAdapter'
+export type {
+  CanvasAppComponentPresentationRenderers,
+  CanvasAppComponentRendererStrategy,
+  CanvasAppCustomItemRendererStrategy,
+  CanvasAppCustomItemRenderers,
+} from './CanvasAppRenderingContracts'
 export type {
   CanvasAppEventInput,
   CanvasAppPointerInput,

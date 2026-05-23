@@ -1,16 +1,16 @@
-import type { ReactNode } from 'react'
 import type { CanvasCustomItem } from '../../entities'
 import { assertCanvasAppDescriptorFunctionField } from '../extensions/CanvasAppDescriptorContracts'
 import { assertCanvasAppExtensionRecordKeys } from '../extensions/CanvasAppExtensionIds'
+import type {
+  CanvasAppCustomItemRendererStrategy,
+  CanvasAppCustomItemRenderers,
+} from './CanvasAppRenderingContracts'
 import { CanvasDemoSvgUnknownCustomItem } from './CanvasDemoSvgUnknownCustomItem'
 
-export type CanvasDemoSvgCustomItemRendererStrategy = (input: {
-  item: CanvasCustomItem
-}) => ReactNode
+export type CanvasDemoSvgCustomItemRendererStrategy =
+  CanvasAppCustomItemRendererStrategy
 
-export type CanvasDemoSvgCustomItemRenderers = Readonly<
-  Record<string, CanvasDemoSvgCustomItemRendererStrategy>
->
+export type CanvasDemoSvgCustomItemRenderers = CanvasAppCustomItemRenderers
 
 export const DEFAULT_CANVAS_DEMO_SVG_CUSTOM_ITEM_RENDERERS: CanvasDemoSvgCustomItemRenderers = {}
 
