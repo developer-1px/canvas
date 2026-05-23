@@ -3,6 +3,7 @@ import {
   DEFAULT_CANVAS_AFFORDANCE_CONFIG,
 } from '../../engine'
 import { useCanvasAppStageElement } from '../stage/CanvasAppStageElement'
+import { getCanvasAppAssemblyModel } from './CanvasAppAssemblyModel'
 import { getCanvasAppControlModel } from './CanvasAppControlModel'
 import { renderCanvasAppStageModel } from './CanvasAppStageModel'
 import { useCanvasAppCommandModel } from './useCanvasAppCommandModel'
@@ -28,28 +29,12 @@ export function useCanvasAppModel({
 }: {
   assembly?: CanvasAppAssembly
 } = {}) {
-  const validatedAssembly = useMemo(
-    () => assertCanvasAppAssembly(assembly),
+  const appAssembly = useMemo(
+    () => getCanvasAppAssemblyModel(assertCanvasAppAssembly(assembly)),
     [assembly],
   )
-  const {
-    componentLibrary,
-    componentPresentationRenderers,
-    customCommands,
-    customCreationTools,
-    customItemRenderers,
-    customItemValidators,
-    inspectorPanels,
-    initialItems,
-    itemAdapters,
-    itemLayerAdapter,
-    stageAdapter,
-  } = validatedAssembly
   const stageElement = useCanvasAppStageElement()
-  const workspace = useCanvasWorkspaceModel({
-    customItemValidators,
-    initialItems,
-  })
+  const workspace = useCanvasWorkspaceModel(appAssembly.workspace)
   const interaction = useCanvasInteractionModel({
     config: canvasAffordanceConfig,
     ...workspace.interaction,
@@ -57,20 +42,19 @@ export function useCanvasAppModel({
 
   const inspector = useCanvasAppInspectorModel({
     ...workspace.inspector,
-    inspectorPanels,
+    ...appAssembly.inspector,
   })
 
   const text = useCanvasAppTextModel(workspace.text)
 
   const extension = useCanvasAppExtensionModel({
     ...workspace.extension,
-    customCommands,
-    customCreationTools,
+    ...appAssembly.extension,
     setEditing: text.setEditing,
   })
 
   const commands = useCanvasAppCommandModel({
-    commandAdapter: itemAdapters.command,
+    ...appAssembly.command,
     config: canvasAffordanceConfig,
     createId: workspace.command.createId,
     document: workspace.command.document,
@@ -91,7 +75,7 @@ export function useCanvasAppModel({
       ...commands.keyboard,
     },
     config: canvasAffordanceConfig,
-    customCreationTools: extension.keyboard.customCreationTools,
+    ...extension.keyboard,
     interaction: {
       ...interaction.keyboard,
       setEditing: text.setEditing,
@@ -108,12 +92,9 @@ export function useCanvasAppModel({
     },
     config: canvasAffordanceConfig,
     createId: workspace.pointer.createId,
-    customCreationTools: extension.pointer.customCreationTools,
+    ...extension.pointer,
     interaction: interaction.pointer,
-    itemAdapters: {
-      creation: itemAdapters.creation,
-      transform: itemAdapters.transform,
-    },
+    ...appAssembly.pointer,
     stageElement,
     workspace: {
       ...workspace.pointer.workspace,
@@ -123,7 +104,7 @@ export function useCanvasAppModel({
 
   const components = useCanvasAppComponentModel({
     command: workspace.component.command,
-    componentLibrary,
+    ...appAssembly.component,
     createId: workspace.component.createId,
     interaction: {
       ...interaction.component,
@@ -135,7 +116,7 @@ export function useCanvasAppModel({
 
   const controls = getCanvasAppControlModel({
     ...workspace.control,
-    components: componentLibrary.templates,
+    ...appAssembly.control,
     config: canvasAffordanceConfig,
     ...extension.control,
     gesture: interaction.control.gesture,
@@ -154,13 +135,7 @@ export function useCanvasAppModel({
       blurTextEditor: text.blurTextEditor,
       itemLayer: workspace.itemLayer,
       pointer,
-      rendering: {
-        componentPresentationRenderers,
-        customItemRenderers,
-        getComponentPresentation: componentLibrary.getPresentation,
-        itemLayerAdapter,
-        stageAdapter,
-      },
+      rendering: appAssembly.rendering,
       stage: {
         ...interaction.stage,
         stageElement: stageElement.mount,

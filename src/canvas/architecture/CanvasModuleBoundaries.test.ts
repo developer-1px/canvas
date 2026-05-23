@@ -151,6 +151,46 @@ describe('Canvas module boundaries', () => {
     expect(violations).toEqual([])
   })
 
+  it('keeps App Model from distributing Assembly output fields directly', () => {
+    const appModelFile = getSourceFile(
+      'src/canvas/app/workflow/useCanvasAppModel.ts',
+    )
+    const assemblyModelFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppAssemblyModel.ts',
+    )
+
+    expect(appModelFile.source).toContain(
+      "from './CanvasAppAssemblyModel'",
+    )
+    for (const assemblyOutputField of [
+      'componentLibrary',
+      'componentPresentationRenderers',
+      'customCommands',
+      'customCreationTools',
+      'customItemRenderers',
+      'customItemValidators',
+      'inspectorPanels',
+      'initialItems',
+      'itemAdapters',
+      'itemLayerAdapter',
+      'stageAdapter',
+    ]) {
+      expect(appModelFile.source).not.toContain(assemblyOutputField)
+    }
+    for (const consumerContext of [
+      'command: {',
+      'component: {',
+      'control: {',
+      'extension: {',
+      'inspector: {',
+      'pointer: {',
+      'rendering: {',
+      'workspace: {',
+    ]) {
+      expect(assemblyModelFile.source).toContain(consumerContext)
+    }
+  })
+
   it('keeps custom item registries as Assembly output, not input', () => {
     const assemblyFile = getSourceFile(
       'src/canvas/app/workflow/CanvasAppAssembly.ts',
