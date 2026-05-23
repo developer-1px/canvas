@@ -494,6 +494,38 @@ describe('Canvas module boundaries', () => {
     expect(keyboardModelFile.source).toContain('viewport.zoomBy')
   })
 
+  it('keeps app viewport handler wiring behind a named workflow module', () => {
+    const appModelFile = getSourceFile(
+      'src/canvas/app/workflow/useCanvasAppModel.ts',
+    )
+    const viewportModelFile = getSourceFile(
+      'src/canvas/app/workflow/useCanvasAppViewportModel.ts',
+    )
+
+    expect(appModelFile.source).toContain(
+      "from './useCanvasAppViewportModel'",
+    )
+    expect(appModelFile.source).not.toContain(
+      "from '../viewport/useCanvasWheelViewport'",
+    )
+    expect(appModelFile.source).not.toContain(
+      "from '../viewport/useCanvasViewportControls'",
+    )
+    expect(appModelFile.source).not.toContain('useCanvasWheelViewport')
+    expect(appModelFile.source).not.toContain('useCanvasViewportControls')
+    expect(viewportModelFile.source).toContain(
+      "from '../viewport/useCanvasWheelViewport'",
+    )
+    expect(viewportModelFile.source).toContain(
+      "from '../viewport/useCanvasViewportControls'",
+    )
+    expect(viewportModelFile.source).toContain(
+      'export function useCanvasAppViewportModel',
+    )
+    expect(viewportModelFile.source).toContain('useCanvasWheelViewport')
+    expect(viewportModelFile.source).toContain('useCanvasViewportControls')
+  })
+
   it('keeps app item layer render input on the app pointer input interface', () => {
     const itemLayerAdapterFile = getSourceFile(
       'src/canvas/app/rendering/CanvasAppItemLayerAdapter.tsx',

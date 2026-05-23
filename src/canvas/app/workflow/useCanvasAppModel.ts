@@ -8,8 +8,6 @@ import {
 import { useCanvasComponentInsertion } from '../components/useCanvasComponentInsertion'
 import { useCanvasObjectInspector } from '../inspector/useCanvasObjectInspector'
 import { useCanvasAppStageElement } from '../stage/CanvasAppStageElement'
-import { useCanvasViewportControls } from '../viewport/useCanvasViewportControls'
-import { useCanvasWheelViewport } from '../viewport/useCanvasWheelViewport'
 import { getCanvasAppControlModel } from './CanvasAppControlModel'
 import { renderCanvasAppStageModel } from './CanvasAppStageModel'
 import { useCanvasAppCommandModel } from './useCanvasAppCommandModel'
@@ -18,6 +16,7 @@ import { useCanvasAppKeyboardModel } from './useCanvasAppKeyboardModel'
 import { useCanvasAppPointerModel } from './useCanvasAppPointerModel'
 import { useCanvasFindReplaceModel } from './useCanvasFindReplaceModel'
 import { useCanvasInteractionModel } from './useCanvasInteractionModel'
+import { useCanvasAppViewportModel } from './useCanvasAppViewportModel'
 import { useCanvasWorkspaceModel } from './useCanvasWorkspaceModel'
 import { useCanvasTextEditorModel } from './useCanvasTextEditorModel'
 import {
@@ -108,12 +107,6 @@ export function useCanvasAppModel({
     selected,
     selection,
   })
-  useCanvasWheelViewport({
-    config: canvasAffordanceConfig,
-    setViewport,
-    stageElement,
-  })
-
   const {
     blurTextEditor,
     setEditing,
@@ -170,12 +163,12 @@ export function useCanvasAppModel({
     },
   })
 
-  const { fitToItems, resetViewport, zoomBy } =
-    useCanvasViewportControls({
-      itemReadModel,
-      setViewport,
-      stageElement,
-    })
+  const viewportControls = useCanvasAppViewportModel({
+    config: canvasAffordanceConfig,
+    itemReadModel,
+    setViewport,
+    stageElement,
+  })
 
   useCanvasAppKeyboardModel({
     command: {
@@ -211,9 +204,9 @@ export function useCanvasAppModel({
     openFindReplace,
     selection,
     viewport: {
-      fitToItems,
-      resetViewport,
-      zoomBy,
+      fitToItems: viewportControls.fitToItems,
+      resetViewport: viewportControls.resetViewport,
+      zoomBy: viewportControls.zoomBy,
     },
   })
 
@@ -284,7 +277,7 @@ export function useCanvasAppModel({
     onDelete: commands.deleteSelection,
     onDistribute: commands.distributeSelection,
     onDuplicate: commands.duplicateSelection,
-    onFitItems: fitToItems,
+    onFitItems: viewportControls.fitToItems,
     onGroup: commands.groupSelection,
     onInsertComponent: insertComponent,
     onLock: commands.lockSelection,
@@ -294,8 +287,8 @@ export function useCanvasAppModel({
     onUndo: commands.undoHistory,
     onUngroup: commands.ungroupSelection,
     onUnlockAll: commands.unlockAll,
-    onViewportReset: resetViewport,
-    onZoomBy: zoomBy,
+    onViewportReset: viewportControls.resetViewport,
+    onZoomBy: viewportControls.zoomBy,
   })
 
   return {
