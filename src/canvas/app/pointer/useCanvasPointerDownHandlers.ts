@@ -17,7 +17,6 @@ import type {
   CanvasEditableTextItem,
   CanvasItemReadModel,
 } from '../../host'
-import { screenPoint, screenToWorld } from './CanvasPointerGeometry'
 import {
   shouldRouteCanvasItemPointerToCanvasGesture,
   type CanvasAffordanceConfig,
@@ -50,6 +49,7 @@ import {
   applyCanvasResizePointerInteractionStartEffect,
   applyCanvasTextEditInteractionStartEffect,
 } from './CanvasPointerInteractionStartEffects'
+import { getCanvasPointerStartProjection } from './CanvasPointerStartSession'
 
 type UseCanvasPointerDownHandlersArgs = {
   cloneItems: (ids: string[], offset: Point) => CanvasItem[]
@@ -124,8 +124,11 @@ export function useCanvasPointerDownHandlers({
   }
 
   function handleCanvasPointerDown(event: CanvasAppPointerInput) {
-    const startScreen = screenPoint(stageElement, event)
-    const startWorld = screenToWorld(startScreen, viewport)
+    const projection = getCanvasPointerStartProjection({
+      event,
+      stageElement,
+      viewport,
+    })
     const start = startCanvasPointerInteraction({
       config,
       creationAdapter,
@@ -134,8 +137,8 @@ export function useCanvasPointerDownHandlers({
       input: event,
       selection,
       spaceDown,
-      startScreen,
-      startWorld,
+      startScreen: projection.startScreen,
+      startWorld: projection.startWorld,
       tool,
       viewport,
     })
@@ -161,16 +164,19 @@ export function useCanvasPointerDownHandlers({
       return
     }
 
-    const startScreen = screenPoint(stageElement, event)
+    const projection = getCanvasPointerStartProjection({
+      event,
+      stageElement,
+      viewport,
+    })
     const clickMemory = recordCanvasItemPointerClick({
       itemId,
       lastClick: lastClickRef.current,
-      point: startScreen,
+      point: projection.startScreen,
       time: performance.now(),
     })
 
     lastClickRef.current = clickMemory.nextClick
-    const startWorld = screenToWorld(startScreen, viewport)
     const start = startCanvasItemPointerInteraction({
       cloneItems,
       config,
@@ -181,8 +187,8 @@ export function useCanvasPointerDownHandlers({
       items,
       scene,
       selection,
-      startScreen,
-      startWorld,
+      startScreen: projection.startScreen,
+      startWorld: projection.startWorld,
     })
 
     applyCanvasItemPointerInteractionStartEffect({
@@ -199,8 +205,11 @@ export function useCanvasPointerDownHandlers({
     event: CanvasAppPointerInput,
     handle: ResizeHandle,
   ) {
-    const startScreen = screenPoint(stageElement, event)
-    const startWorld = screenToWorld(startScreen, viewport)
+    const projection = getCanvasPointerStartProjection({
+      event,
+      stageElement,
+      viewport,
+    })
     const start = startCanvasResizePointerInteraction({
       config,
       handle,
@@ -208,8 +217,8 @@ export function useCanvasPointerDownHandlers({
       items,
       selectedBounds,
       selection,
-      startScreen,
-      startWorld,
+      startScreen: projection.startScreen,
+      startWorld: projection.startWorld,
     })
 
     applyCanvasResizePointerInteractionStartEffect({

@@ -1790,6 +1790,9 @@ describe('Canvas module boundaries', () => {
     const downHandlersFile = getSourceFile(
       'src/canvas/app/pointer/useCanvasPointerDownHandlers.ts',
     )
+    const startSessionFile = getSourceFile(
+      'src/canvas/app/pointer/CanvasPointerStartSession.ts',
+    )
     const gestureEngineFile = getSourceFile(
       'src/canvas/engine/gesture/CanvasGestureEngine.ts',
     )
@@ -1833,6 +1836,16 @@ describe('Canvas module boundaries', () => {
     expect(downHandlersFile.source).not.toContain(
       'createCanvasDraftStroke',
     )
+    expect(downHandlersFile.source).not.toContain('screenPoint(')
+    expect(downHandlersFile.source).not.toContain('screenToWorld(')
+    expect(downHandlersFile.source).toContain(
+      "from './CanvasPointerStartSession'",
+    )
+    expect(startSessionFile.source).toContain(
+      'export function getCanvasPointerStartProjection',
+    )
+    expect(startSessionFile.source).toContain('screenPoint(')
+    expect(startSessionFile.source).toContain('screenToWorld(')
     expect(startFile.source).toContain(
       'export function startCanvasPointerInteraction',
     )

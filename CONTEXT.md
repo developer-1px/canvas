@@ -108,6 +108,7 @@
 - Drawing Item Style: built-in marker, highlighter, arrow의 stroke/opacity 기본값. Draft overlay와 Host item creation이 같은 Host-owned 계약을 쓴다.
 - Canvas Pointer Interaction Start: pointer-down 시 gesture routing, pan, marquee 시작을 active interaction으로 변환하고 생성 시작은 Canvas Pointer Creation Start에 위임하는 App-owned runtime Module.
 - Canvas Tool Gesture Routing: built-in tool과 custom tool을 pointer gesture, feature gate, item pointer rerouting rule로 변환하는 Engine-owned what 계약 Module.
+- Canvas Pointer Start Session: pointer-down 시 stage-local screen coordinate와 viewport-projected world coordinate를 start interaction Module들에 제공하는 App-owned start lifecycle Module.
 - Canvas Pointer Creation Grammar: shape creation, drawing creation, custom creation, text creation gesture와 active creation interaction kind set을 소유하는 App-owned what 계약 Module.
 - Canvas Pointer Creation Start: pointer-down 시 shape creation, drawing creation, custom creation, text creation 시작 상태를 각 creation lifecycle Module에 위임하는 App-owned runtime Module.
 - Canvas Pointer Shape Creation: built-in rect/arrow shape creation gesture, draft shape preview, enabled gate, item creation commit, post-create tool selection descriptor를 소유하는 App-owned shape lifecycle Module.
@@ -196,6 +197,7 @@
 - Pan gesture의 start state, enabled gate, viewport delta preview는 Canvas Pointer Pan Interaction Module이 소유한다.
 - Move/resize interaction의 commit selection history, non-moved edit entry, cancel live item restore 규칙은 Canvas Pointer Transform Interaction Module이 소유한다.
 - Pointer drag의 active pointer id guard와 screen/world 좌표 projection은 Canvas Pointer Drag Session Module이 소유하고, drag hook은 preview/commit/effect 조립만 맡는다.
+- Pointer down의 screen/world 좌표 projection은 Canvas Pointer Start Session Module이 소유하고, down hook은 canvas/item/resize/text start 조립만 맡는다.
 - Tool에서 pointer gesture와 item pointer rerouting으로 변환하는 규칙은 Canvas Tool Gesture Routing Module이 소유하고, Canvas Gesture Engine은 input button/pan precedence와 fallback orchestration만 맡는다.
 - 기본 드로잉 item은 저장 계약에서 최소 visible geometry, 양수 stroke width, 0보다 크고 1 이하인 opacity를 Host Drawing Item Validation Module에서 검증한다.
 - 기본 드로잉 item의 bounds는 caller 입력을 믿지 않고 Host tree/document가 `points` 또는 `start/end`에서 canonical하게 동기화한다.
