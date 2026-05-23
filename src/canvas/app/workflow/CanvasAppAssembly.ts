@@ -218,6 +218,31 @@ function assertCanvasAppComponentLibrary(
     'component library templates',
   )
   createCanvasComponentLibrary({ templates: componentLibrary.templates })
+  assertCanvasAppComponentLibraryResolvers(componentLibrary)
+}
+
+function assertCanvasAppComponentLibraryResolvers(
+  componentLibrary: CanvasComponentLibrary,
+) {
+  for (const template of componentLibrary.templates) {
+    const resolvedTemplate = componentLibrary.getTemplate(template.id)
+    const presentation = componentLibrary.getPresentation(template.id)
+
+    if (
+      resolvedTemplate.id !== template.id ||
+      resolvedTemplate.presentation !== template.presentation
+    ) {
+      throw new Error(
+        `Canvas app component library getTemplate mismatch: ${template.id}`,
+      )
+    }
+
+    if (presentation !== template.presentation) {
+      throw new Error(
+        `Canvas app component library getPresentation mismatch: ${template.id}`,
+      )
+    }
+  }
 }
 
 function assertCanvasAppCustomItemValidators(
@@ -313,7 +338,9 @@ function snapshotCanvasAppAssembly(
   )
 
   return Object.freeze({
-    componentLibrary: assembly.componentLibrary,
+    componentLibrary: snapshotCanvasAppComponentLibrary(
+      assembly.componentLibrary,
+    ),
     componentPresentationRenderers: freezeCanvasAppRecord(
       assembly.componentPresentationRenderers,
     ),
@@ -333,6 +360,24 @@ function snapshotCanvasAppAssembly(
       customItemValidators,
     ),
     itemAdapters: snapshotCanvasAppItemAdapters(assembly.itemAdapters),
+  })
+}
+
+function snapshotCanvasAppComponentLibrary(
+  componentLibrary: CanvasComponentLibrary,
+): CanvasComponentLibrary {
+  const templates = createCanvasComponentLibrary({
+    templates: componentLibrary.templates,
+  }).templates
+  const createItem = componentLibrary.createItem
+  const getPresentation = componentLibrary.getPresentation
+  const getTemplate = componentLibrary.getTemplate
+
+  return Object.freeze({
+    createItem,
+    getPresentation,
+    getTemplate,
+    templates,
   })
 }
 

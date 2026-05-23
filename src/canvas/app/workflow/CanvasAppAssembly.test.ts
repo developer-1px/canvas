@@ -294,6 +294,29 @@ describe('CanvasAppAssembly', () => {
     expect(() =>
       assertCanvasAppAssembly({
         ...assembly,
+        componentLibrary: {
+          ...assembly.componentLibrary,
+          getPresentation: () => 'mutated-card',
+        },
+      } as unknown as CanvasAppAssembly),
+    ).toThrow('Canvas app component library getPresentation mismatch: sticky')
+
+    expect(() =>
+      assertCanvasAppAssembly({
+        ...assembly,
+        componentLibrary: {
+          ...assembly.componentLibrary,
+          getTemplate: () => ({
+            ...assembly.componentLibrary.templates[0],
+            presentation: 'mutated-card',
+          }),
+        },
+      } as unknown as CanvasAppAssembly),
+    ).toThrow('Canvas app component library getTemplate mismatch: sticky')
+
+    expect(() =>
+      assertCanvasAppAssembly({
+        ...assembly,
         customItemValidators: {
           risk: undefined,
         },
@@ -322,6 +345,21 @@ describe('CanvasAppAssembly', () => {
     const componentPresentationRenderers = {
       'risk-card': renderRisk,
     }
+    const componentLibrary = createCanvasComponentLibrary({
+      templates: [
+        {
+          id: 'risk',
+          label: '!',
+          title: 'Risk',
+          w: 180,
+          h: 96,
+          fill: '#fff7ed',
+          stroke: '#fb923c',
+          accent: '#ea580c',
+          presentation: 'risk-card',
+        },
+      ],
+    })
     const customCommandRun = () => undefined
     const customCommand = {
       id: 'publish',
@@ -374,6 +412,7 @@ describe('CanvasAppAssembly', () => {
     })
 
     const assembly = createCanvasAppAssembly({
+      componentLibrary,
       componentPresentationRenderers,
       customCommands: [customCommand],
       customItemModules: [riskModule],
@@ -382,6 +421,11 @@ describe('CanvasAppAssembly', () => {
       itemAdapters,
     })
 
+    componentLibrary.getPresentation = () => 'mutated-card'
+    componentLibrary.getTemplate = () => ({
+      ...componentLibrary.templates[0],
+      title: 'Mutated risk',
+    })
     componentPresentationRenderers['risk-card'] = renderMutatedRisk
     customCommand.title = 'Mutated publish'
     customCommand.run = () => {
@@ -403,6 +447,11 @@ describe('CanvasAppAssembly', () => {
       data: { severity: 'high' },
     })
 
+    expect(assembly.componentLibrary.getPresentation('risk')).toBe('risk-card')
+    expect(assembly.componentLibrary.getTemplate('risk')).toMatchObject({
+      id: 'risk',
+      title: 'Risk',
+    })
     expect(assembly.componentPresentationRenderers['risk-card']).toBe(
       renderRisk,
     )
@@ -432,6 +481,9 @@ describe('CanvasAppAssembly', () => {
       title: 'Risk',
     })
     expect(Object.isFrozen(assembly)).toBe(true)
+    expect(Object.isFrozen(assembly.componentLibrary)).toBe(true)
+    expect(Object.isFrozen(assembly.componentLibrary.templates)).toBe(true)
+    expect(Object.isFrozen(assembly.componentLibrary.templates[0])).toBe(true)
     expect(Object.isFrozen(assembly.customCommands)).toBe(true)
     expect(Object.isFrozen(assembly.customCommands[0])).toBe(true)
     expect(Object.isFrozen(assembly.customCreationTools[0]?.shortcut)).toBe(true)
