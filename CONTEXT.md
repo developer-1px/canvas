@@ -87,6 +87,7 @@
 - Canvas App Inspector Panel Contracts: inspector panel descriptor shape와 id registry contract를 검증하는 App-owned contract Module.
 - Canvas App Inspector Panel Execution: inspector panel visibility/render 호출과 실패 시 omit containment를 소유하는 App-owned execution Module.
 - Canvas Object Inspector Model: selection label, disabled state, custom inspector panel context, bounds resize commit 규칙을 소유하는 App-owned inspector runtime Module.
+- Canvas Object Inspector Label: selection count와 item `title`/type fallback 기반 기본 inspector label 산출 규칙을 소유하는 App-owned inspector grammar Module.
 - Canvas Custom Item: 제품별 item kind를 내부 `CanvasItem` union 확장 없이 저장하기 위한 안정 envelope. `kind`, `presentation`, JSON `data`, bounds를 가진다.
 - Canvas Custom Item Validation: stable custom item storage envelope, JSON data contract, custom item validator key contract, recursive validator execution을 소유하는 Host-owned Module.
 - Canvas App Custom Item Module: 하나의 제품별 item kind에 필요한 presentation, renderer, validator, creation tool, inspector, command를 한 번에 등록하는 App-owned Module descriptor. Module `id`는 소유한 custom item kind다.
@@ -298,7 +299,7 @@
 - 제품별 renderer 스타일은 Canvas App Shell CSS에 두지 않고 Host App/Demo module이 소유한다.
 - 제품별 SVG renderer와 inspector panel 실행 실패는 캔버스 렌더를 깨지 않고 fallback/omit으로 containment 한다.
 - Canvas App Inspector Panel descriptor shape 검증과 visibility/render execution은 분리하고, validation은 Canvas App Inspector Panel Contracts가, 실행 실패 omit은 Canvas App Inspector Panel Execution이 소유한다.
-- Object Inspector hook은 read model 조회와 memoization만 맡고, selection label, disabled state, custom panel context, bounds resize commit 규칙은 Canvas Object Inspector Model이 소유한다.
+- Object Inspector hook은 read model 조회와 memoization만 맡고, selection label grammar는 Canvas Object Inspector Label이, disabled state, custom panel context, bounds resize commit 규칙은 Canvas Object Inspector Model이 소유한다.
 - Toolbar shell은 group layout만 맡고, Canvas Toolbar Item Renderer는 rendering entry만 제공하며 item kind별 button/icon/command dispatch wiring은 Canvas Toolbar Item Render Dispatch가 소유한다.
 - Custom item renderer lookup과 실행 실패 containment는 Demo SVG Custom Item Renderer Execution이 소유하고, fallback shape는 Demo SVG Custom Item Render Fallback이 소유한다.
 - App workflow는 Demo SVG Item Layer를 직접 생성하지 않고 Canvas App Item Layer Adapter를 통해 stage children을 만든다.

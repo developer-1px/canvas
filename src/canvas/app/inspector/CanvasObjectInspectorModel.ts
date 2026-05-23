@@ -5,6 +5,7 @@ import type {
 import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract'
 import { getCanvasAppInspectorPanelViews } from './CanvasAppInspectorPanelExecution'
 import type { CanvasAppInspectorPanel } from './CanvasAppInspectorPanels'
+import { getCanvasObjectInspectorLabel } from './CanvasObjectInspectorLabel'
 
 type GetCanvasObjectInspectorModelArgs = {
   bounds: Bounds | null
@@ -21,7 +22,10 @@ export function getCanvasObjectInspectorModel({
   selectedItems,
   selection,
 }: GetCanvasObjectInspectorModelArgs) {
-  const label = getInspectorLabel(selectedItems, selection.length)
+  const label = getCanvasObjectInspectorLabel({
+    selectedItems,
+    selectionLength: selection.length,
+  })
   const disabled = selectedItems.some((item) => item.locked === true)
 
   return {
@@ -58,30 +62,4 @@ export function getCanvasObjectInspectorModel({
       )
     },
   }
-}
-
-function getInspectorLabel(items: CanvasItem[], selectionLength: number) {
-  if (selectionLength === 0) {
-    return null
-  }
-
-  if (selectionLength > 1) {
-    return `${selectionLength} selected`
-  }
-
-  const [item] = items
-
-  if (!item) {
-    return null
-  }
-
-  if (item.type === 'component') {
-    return capitalize(item.component)
-  }
-
-  return capitalize(item.type)
-}
-
-function capitalize(value: string) {
-  return `${value.slice(0, 1).toUpperCase()}${value.slice(1)}`
 }

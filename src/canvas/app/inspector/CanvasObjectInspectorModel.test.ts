@@ -16,6 +16,10 @@ describe('CanvasObjectInspectorModel', () => {
       selectedItems: [createComponentItem()],
       selection: ['component-1'],
     }).label).toBe('Card')
+    expect(createModel({
+      selectedItems: [createCustomItem()],
+      selection: ['risk-1'],
+    }).label).toBe('Risk')
 
     const multiSelection = createModel({
       selectedItems: [
@@ -149,6 +153,21 @@ function createComponentItem(): CanvasItem {
     title: 'Card',
     type: 'component',
     w: 140,
+    x: 10,
+    y: 20,
+  }
+}
+
+function createCustomItem(): CanvasItem {
+  return {
+    data: { severity: 'High' },
+    h: 92,
+    id: 'risk-1',
+    kind: 'risk',
+    presentation: 'risk-node',
+    title: 'Risk',
+    type: 'custom',
+    w: 180,
     x: 10,
     y: 20,
   }

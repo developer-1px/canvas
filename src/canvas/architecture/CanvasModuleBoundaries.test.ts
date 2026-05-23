@@ -1060,6 +1060,9 @@ describe('Canvas module boundaries', () => {
     const objectInspectorModelFile = getSourceFile(
       'src/canvas/app/inspector/CanvasObjectInspectorModel.ts',
     )
+    const objectInspectorLabelFile = getSourceFile(
+      'src/canvas/app/inspector/CanvasObjectInspectorLabel.ts',
+    )
 
     expect(appModelFile.source).toContain(
       "from './useCanvasAppInspectorModel'",
@@ -1085,9 +1088,20 @@ describe('Canvas module boundaries', () => {
     expect(objectInspectorModelFile.source).toContain(
       'export function getCanvasObjectInspectorModel',
     )
+    expect(objectInspectorModelFile.source).toContain(
+      "from './CanvasObjectInspectorLabel'",
+    )
     expect(objectInspectorModelFile.source).toContain('resize-selection')
     expect(objectInspectorModelFile.source).toContain('item.locked')
-    expect(objectInspectorModelFile.source).toContain('capitalize(')
+    expect(objectInspectorModelFile.source).not.toContain('capitalize(')
+    expect(objectInspectorModelFile.source).not.toContain(
+      "item.type === 'component'",
+    )
+    expect(objectInspectorLabelFile.source).toContain(
+      'export function getCanvasObjectInspectorLabel',
+    )
+    expect(objectInspectorLabelFile.source).toContain("'title' in item")
+    expect(objectInspectorLabelFile.source).toContain('item.type')
   })
 
   it('keeps app pointer handler wiring behind a named workflow module', () => {
