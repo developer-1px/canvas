@@ -20,4 +20,9 @@ export default defineConfig({
   resolve: {
     dedupe: ['react', 'react-dom', 'zod'],
   },
+  server: {
+    host: '127.0.0.1',
+    port: 5173,
+    strictPort: true,
+  },
 })

@@ -12,6 +12,11 @@ type CanvasViteConfig = {
   resolve?: {
     dedupe?: string[]
   }
+  server?: {
+    host?: string
+    port?: number
+    strictPort?: boolean
+  }
 }
 
 const config = viteConfig as CanvasViteConfig
@@ -34,5 +39,13 @@ describe('Canvas build config', () => {
         '/workspace/src/main.tsx',
       ),
     ).toBeUndefined()
+  })
+
+  it('keeps the local dev server URL deterministic', () => {
+    expect(config.server).toMatchObject({
+      host: '127.0.0.1',
+      port: 5173,
+      strictPort: true,
+    })
   })
 })

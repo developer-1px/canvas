@@ -189,4 +189,5 @@
 - Keyboard shortcut router는 event preventDefault와 handler 실행을 맡고, command shortcut grammar는 Canvas Keyboard Shortcut Intent가, built-in/custom tool shortcut precedence는 Canvas Keyboard Tool Shortcut Intent가 소유한다.
 - Module seam import 규칙은 Canvas Module Boundary Guardrail로 검증한다.
 - Linked peer dependency는 앱 번들에 한 번만 들어가야 하며, Vite config에서 `react`, `react-dom`, `zod`를 dedupe한다.
+- Local dev server는 다른 Vite 앱과 포트/호스트가 섞이지 않도록 `127.0.0.1:5173` strict port로 고정한다.
 - Production build는 React runtime을 별도 chunk로 분리해 app chunk가 경고 임계값을 넘지 않게 유지한다.
