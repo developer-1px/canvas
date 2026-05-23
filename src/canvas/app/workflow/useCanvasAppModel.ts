@@ -62,11 +62,7 @@ export function useCanvasAppModel({
 
   const text = useCanvasAppTextModel(workspace.text)
 
-  const {
-    customCommandStates,
-    customCreationToolStates,
-    runCustomCommand,
-  } = useCanvasAppExtensionModel({
+  const extension = useCanvasAppExtensionModel({
     ...workspace.extension,
     customCommands,
     customCreationTools,
@@ -95,18 +91,14 @@ export function useCanvasAppModel({
       ...commands.keyboard,
     },
     config: canvasAffordanceConfig,
-    customCreationTools: customCreationToolStates,
+    customCreationTools: extension.keyboard.customCreationTools,
     interaction: {
       ...interaction.keyboard,
       setEditing: text.setEditing,
     },
     openFindReplace: text.openFindReplace,
     selection: workspace.keyboard.selection,
-    viewport: {
-      fitToItems: viewportControls.fitToItems,
-      resetViewport: viewportControls.resetViewport,
-      zoomBy: viewportControls.zoomBy,
-    },
+    viewport: viewportControls.keyboard,
   })
 
   const pointer = useCanvasAppPointerModel({
@@ -116,7 +108,7 @@ export function useCanvasAppModel({
     },
     config: canvasAffordanceConfig,
     createId: workspace.pointer.createId,
-    customCreationTools,
+    customCreationTools: extension.pointer.customCreationTools,
     interaction: interaction.pointer,
     itemAdapters: {
       creation: itemAdapters.creation,
@@ -145,17 +137,13 @@ export function useCanvasAppModel({
     ...workspace.control,
     components: componentLibrary.templates,
     config: canvasAffordanceConfig,
-    customCommands: customCommandStates,
-    customTools: customCreationToolStates,
+    ...extension.control,
     gesture: interaction.control.gesture,
     tool: interaction.control.tool,
     ...commands.control,
-    onFitItems: viewportControls.fitToItems,
-    onInsertComponent: components.insertComponent,
-    onRunCustomCommand: runCustomCommand,
+    ...viewportControls.control,
+    ...components.control,
     onToolChange: interaction.control.onToolChange,
-    onViewportReset: viewportControls.resetViewport,
-    onZoomBy: viewportControls.zoomBy,
   })
 
   return {

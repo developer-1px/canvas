@@ -467,6 +467,11 @@ describe('Canvas module boundaries', () => {
     )
     expect(componentModelFile.source).toContain('componentLibrary')
     expect(componentModelFile.source).toContain('selection: workspace.selection')
+    expect(componentModelFile.source).toContain('control: {')
+    expect(componentModelFile.source).toContain(
+      'onInsertComponent: insertComponent',
+    )
+    expect(appModelFile.source).not.toContain('components.insertComponent')
   })
 
   it('keeps app inspector wiring behind a named workflow module', () => {
@@ -579,6 +584,11 @@ describe('Canvas module boundaries', () => {
     )
     expect(viewportModelFile.source).toContain('useCanvasWheelViewport')
     expect(viewportModelFile.source).toContain('useCanvasViewportControls')
+    expect(viewportModelFile.source).toContain('control: {')
+    expect(viewportModelFile.source).toContain('keyboard: {')
+    expect(appModelFile.source).not.toContain('viewportControls.fitToItems')
+    expect(appModelFile.source).not.toContain('viewportControls.resetViewport')
+    expect(appModelFile.source).not.toContain('viewportControls.zoomBy')
   })
 
   it('keeps app text editor and find replace wiring behind a named workflow module', () => {
@@ -1254,12 +1264,18 @@ describe('Canvas module boundaries', () => {
     expect(extensionModelFile.source).toContain(
       "from '../commands/CanvasAppCustomCommandExecution'",
     )
+    expect(extensionModelFile.source).toContain('control: {')
+    expect(extensionModelFile.source).toContain('keyboard: {')
+    expect(extensionModelFile.source).toContain('pointer: {')
     expect(appModelFile.source).toContain(
       "from './useCanvasAppExtensionModel'",
     )
     expect(appModelFile.source).not.toContain(
       'CanvasAppCustomCommandExecution',
     )
+    expect(appModelFile.source).not.toContain('customCommandStates')
+    expect(appModelFile.source).not.toContain('customCreationToolStates')
+    expect(appModelFile.source).not.toContain('runCustomCommand')
   })
 
   it('keeps App standard command execution behind a named module', () => {

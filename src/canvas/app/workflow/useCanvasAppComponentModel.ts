@@ -55,6 +55,8 @@ export function useCanvasAppComponentModel({
   })
 
   return {
-    insertComponent,
+    control: {
+      onInsertComponent: insertComponent,
+    },
   }
 }

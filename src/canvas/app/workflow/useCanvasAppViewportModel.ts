@@ -28,9 +28,22 @@ export function useCanvasAppViewportModel({
     stageElement,
   })
 
-  return useCanvasViewportControls({
+  const viewportControls = useCanvasViewportControls({
     itemReadModel,
     setViewport,
     stageElement,
   })
+
+  return {
+    control: {
+      onFitItems: viewportControls.fitToItems,
+      onViewportReset: viewportControls.resetViewport,
+      onZoomBy: viewportControls.zoomBy,
+    },
+    keyboard: {
+      fitToItems: viewportControls.fitToItems,
+      resetViewport: viewportControls.resetViewport,
+      zoomBy: viewportControls.zoomBy,
+    },
+  }
 }

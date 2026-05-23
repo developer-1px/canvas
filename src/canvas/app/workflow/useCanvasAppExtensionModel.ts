@@ -41,9 +41,17 @@ type UseCanvasAppExtensionModelArgs = {
 }
 
 export type CanvasAppExtensionModel = {
-  customCommandStates: CanvasAppCustomCommandState[]
-  customCreationToolStates: CanvasAppCustomCreationToolState[]
-  runCustomCommand: (commandId: string) => boolean
+  control: {
+    customCommands: CanvasAppCustomCommandState[]
+    customTools: CanvasAppCustomCreationToolState[]
+    onRunCustomCommand: (commandId: string) => boolean
+  }
+  keyboard: {
+    customCreationTools: CanvasAppCustomCreationToolState[]
+  }
+  pointer: {
+    customCreationTools: readonly CanvasAppCustomCreationTool[]
+  }
 }
 
 export function useCanvasAppExtensionModel({
@@ -100,8 +108,16 @@ export function useCanvasAppExtensionModel({
   )
 
   return {
-    customCommandStates,
-    customCreationToolStates,
-    runCustomCommand,
+    control: {
+      customCommands: customCommandStates,
+      customTools: customCreationToolStates,
+      onRunCustomCommand: runCustomCommand,
+    },
+    keyboard: {
+      customCreationTools: customCreationToolStates,
+    },
+    pointer: {
+      customCreationTools,
+    },
   }
 }
