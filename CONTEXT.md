@@ -30,6 +30,7 @@
 - Canvas App Extension Registry: assembly 단계에서 extension entry와 record key를 검증하고 중복을 실패시키는 내부 merge 계약.
 - Canvas App Descriptor Shape Contract: 제품별 descriptor가 외부 조립 seam을 통과하기 전에 필수 함수 slot을 갖췄는지 검증하는 외부 Interface 계약.
 - Canvas Standard Command Execution: 내부 canvas command grammar를 Engine command 결과와 App document commit/selection/editing effect로 연결하는 App-owned runtime Module.
+- Canvas Standard Command Document Effects: standard command 결과를 document commit fallback, selection commit, editing clear, history restore effect로 반영하는 App-owned runtime Module.
 - Canvas Clipboard Command Execution: copy, cut, paste, duplicate, clone command를 Host clipboard, paste offset, document commit/selection/editing effect로 연결하는 App-owned runtime Module.
 - Canvas App Custom Command: 내부 command grammar를 수정하지 않고 제품별 business action을 toolbar action으로 등록하는 App-owned command descriptor.
 - Canvas App Custom Command Contracts: custom command descriptor shape와 id registry contract를 검증하는 App-owned contract Module.
@@ -166,7 +167,7 @@
 - App Shell은 workspace 저장, document history, read model 생성 방식을 직접 알지 않는다.
 - App workflow hook들은 Canvas Item Read Model을 직접 생성하지 않고 Canvas Workspace Model에서 주입받는다.
 - App workflow는 editor/search 상태를 각각의 workflow Module 뒤에 숨긴다.
-- Standard command hook은 toolbar/keyboard용 callback wiring을 맡고, Engine command 호출과 document commit/selection/editing effect routing은 Canvas Standard Command Execution이 소유한다.
+- Standard command hook은 toolbar/keyboard용 callback wiring을 맡고, Engine command 호출은 Canvas Standard Command Execution이, document commit/selection/editing/history effect routing은 Canvas Standard Command Document Effects가 소유한다.
 - Clipboard command hook은 paste index와 callback wiring을 맡고, copy/cut/paste/duplicate 실행과 Host clipboard/document effect routing은 Canvas Clipboard Command Execution이 소유한다.
 - UI controls는 Demo Host를 직접 import하지 않는다.
 - Canvas Toolbar는 item/button 렌더링과 click dispatch를 맡고, feature toggle 기반 toolbar 항목 grammar는 Canvas Toolbar Items가 소유한다.

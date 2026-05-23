@@ -901,6 +901,32 @@ describe('Canvas module boundaries', () => {
     expect(executionFile.source).toContain("type: 'group-selection'")
   })
 
+  it('keeps App standard command document effects behind a named module', () => {
+    const executionFile = getSourceFile(
+      'src/canvas/app/commands/CanvasStandardCommandExecution.ts',
+    )
+    const effectsFile = getSourceFile(
+      'src/canvas/app/commands/CanvasStandardCommandDocumentEffects.ts',
+    )
+
+    expect(executionFile.source).toContain(
+      "from './CanvasStandardCommandDocumentEffects'",
+    )
+    expect(executionFile.source).not.toContain('context.commitItemsChange(')
+    expect(executionFile.source).not.toContain('context.commitSelection(')
+    expect(executionFile.source).not.toContain('context.setEditing(null)')
+    expect(effectsFile.source).toContain(
+      'export function applyCanvasStandardItemsChangeEffect',
+    )
+    expect(effectsFile.source).toContain(
+      'export function applyCanvasStandardHistoryEffect',
+    )
+    expect(effectsFile.source).toContain('context.commitItemsChange(')
+    expect(effectsFile.source).toContain('context.commitSelection(')
+    expect(effectsFile.source).toContain('context.setEditing(null)')
+    expect(effectsFile.source).toContain('clearEditingIds.includes')
+  })
+
   it('keeps App clipboard command execution behind a named module', () => {
     const clipboardHookFile = getSourceFile(
       'src/canvas/app/commands/useCanvasClipboardCommands.ts',

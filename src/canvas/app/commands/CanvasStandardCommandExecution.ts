@@ -15,14 +15,15 @@ import {
   type CanvasDistributeMode,
   type CanvasReorderMode,
 } from '../../engine'
-import type {
-  CanvasItem,
-  EditingText,
-} from '../../entities'
-import type {
-  CommitCanvasItemsChange,
-  CommitCanvasSelection,
-} from '../workflow/CanvasWorkflowContract'
+import type { CanvasItem } from '../../entities'
+import {
+  applyCanvasStandardHistoryEffect,
+  applyCanvasStandardItemsChangeEffect,
+  applyCanvasStandardSelectionEffect,
+  type CanvasStandardCommandDocumentEffectContext,
+} from './CanvasStandardCommandDocumentEffects'
+
+export type { CanvasEditingUpdate } from './CanvasStandardCommandDocumentEffects'
 
 export type CanvasStandardCommand =
   | { kind: 'align'; mode: CanvasAlignMode }
@@ -38,24 +39,14 @@ export type CanvasStandardCommand =
   | { kind: 'reorder'; mode: CanvasReorderMode }
   | { kind: 'select-all' }
 
-export type CanvasEditingUpdate =
-  | EditingText
-  | null
-  | ((current: EditingText | null) => EditingText | null)
-
-export type CanvasStandardCommandExecutionContext = {
-  commandAdapter: CanvasCommandAdapter<CanvasItem>
-  commitItemsChange: CommitCanvasItemsChange
-  commitSelection: CommitCanvasSelection
-  config: CanvasAffordanceConfig
-  createId: (prefix: string) => string
-  items: CanvasItem[]
-  redo: () => string[] | undefined
-  selection: string[]
-  setEditing: (editing: CanvasEditingUpdate) => void
-  setSelection: (selection: string[]) => void
-  undo: () => string[] | undefined
-}
+export type CanvasStandardCommandExecutionContext =
+  CanvasStandardCommandDocumentEffectContext & {
+    commandAdapter: CanvasCommandAdapter<CanvasItem>
+    config: CanvasAffordanceConfig
+    createId: (prefix: string) => string
+    items: CanvasItem[]
+    selection: string[]
+  }
 
 export function executeCanvasStandardCommand({
   command,
@@ -110,11 +101,11 @@ function executeCanvasAlignCommand(
     return false
   }
 
-  context.commitItemsChange({ type: 'replace-changed', items: result.items }, {
-    before: context.selection,
-    after: result.selection,
+  return applyCanvasStandardItemsChangeEffect({
+    afterSelection: result.selection,
+    change: { type: 'replace-changed', items: result.items },
+    context,
   })
-  return true
 }
 
 function executeCanvasDistributeCommand(
@@ -133,11 +124,11 @@ function executeCanvasDistributeCommand(
     return false
   }
 
-  context.commitItemsChange({ type: 'replace-changed', items: result.items }, {
-    before: context.selection,
-    after: result.selection,
+  return applyCanvasStandardItemsChangeEffect({
+    afterSelection: result.selection,
+    change: { type: 'replace-changed', items: result.items },
+    context,
   })
-  return true
 }
 
 function executeCanvasDeleteCommand(
@@ -154,22 +145,13 @@ function executeCanvasDeleteCommand(
     return false
   }
 
-  const didCommit = context.commitItemsChange(
-    { type: 'remove-selection', selection: context.selection },
-    {
-      before: context.selection,
-      after: result.selection,
-    },
-  )
-
-  if (!didCommit) {
-    context.commitSelection(result.selection)
-  }
-
-  context.setEditing((current) =>
-    current && result.clearEditingIds.includes(current.id) ? null : current,
-  )
-  return true
+  return applyCanvasStandardItemsChangeEffect({
+    afterSelection: result.selection,
+    change: { type: 'remove-selection', selection: context.selection },
+    clearEditingIds: result.clearEditingIds,
+    context,
+    fallbackSelection: result.selection,
+  })
 }
 
 function executeCanvasGroupCommand(
@@ -188,19 +170,12 @@ function executeCanvasGroupCommand(
     return false
   }
 
-  const didCommit = context.commitItemsChange(
-    { type: 'group-selection', groupId, selection: context.selection },
-    {
-      before: context.selection,
-      after: result.selection,
-    },
-  )
-
-  if (!didCommit) {
-    context.commitSelection(result.selection)
-  }
-
-  return true
+  return applyCanvasStandardItemsChangeEffect({
+    afterSelection: result.selection,
+    change: { type: 'group-selection', groupId, selection: context.selection },
+    context,
+    fallbackSelection: result.selection,
+  })
 }
 
 function executeCanvasUngroupCommand(
@@ -217,19 +192,12 @@ function executeCanvasUngroupCommand(
     return false
   }
 
-  const didCommit = context.commitItemsChange(
-    { type: 'ungroup-selection', selection: context.selection },
-    {
-      before: context.selection,
-      after: result.selection,
-    },
-  )
-
-  if (!didCommit) {
-    context.commitSelection(result.selection)
-  }
-
-  return true
+  return applyCanvasStandardItemsChangeEffect({
+    afterSelection: result.selection,
+    change: { type: 'ungroup-selection', selection: context.selection },
+    context,
+    fallbackSelection: result.selection,
+  })
 }
 
 function executeCanvasLockCommand(
@@ -246,19 +214,12 @@ function executeCanvasLockCommand(
     return false
   }
 
-  const didCommit = context.commitItemsChange(
-    { type: 'replace-changed', items: result.items },
-    {
-      before: context.selection,
-      after: result.selection,
-    },
-  )
-
-  if (!didCommit) {
-    context.commitSelection(result.selection)
-  }
-
-  return true
+  return applyCanvasStandardItemsChangeEffect({
+    afterSelection: result.selection,
+    change: { type: 'replace-changed', items: result.items },
+    context,
+    fallbackSelection: result.selection,
+  })
 }
 
 function executeCanvasUnlockAllCommand(
@@ -275,19 +236,12 @@ function executeCanvasUnlockAllCommand(
     return false
   }
 
-  const didCommit = context.commitItemsChange(
-    { type: 'replace-changed', items: result.items },
-    {
-      before: context.selection,
-      after: result.selection,
-    },
-  )
-
-  if (!didCommit) {
-    context.commitSelection(result.selection)
-  }
-
-  return true
+  return applyCanvasStandardItemsChangeEffect({
+    afterSelection: result.selection,
+    change: { type: 'replace-changed', items: result.items },
+    context,
+    fallbackSelection: result.selection,
+  })
 }
 
 function executeCanvasUndoCommand(
@@ -297,14 +251,10 @@ function executeCanvasUndoCommand(
     return false
   }
 
-  const restoredSelection = context.undo()
-  context.setEditing(null)
-
-  if (restoredSelection) {
-    context.setSelection(restoredSelection)
-  }
-
-  return true
+  return applyCanvasStandardHistoryEffect({
+    context,
+    direction: 'undo',
+  })
 }
 
 function executeCanvasRedoCommand(
@@ -314,14 +264,10 @@ function executeCanvasRedoCommand(
     return false
   }
 
-  const restoredSelection = context.redo()
-  context.setEditing(null)
-
-  if (restoredSelection) {
-    context.setSelection(restoredSelection)
-  }
-
-  return true
+  return applyCanvasStandardHistoryEffect({
+    context,
+    direction: 'redo',
+  })
 }
 
 function executeCanvasNudgeCommand(
@@ -341,14 +287,10 @@ function executeCanvasNudgeCommand(
     return false
   }
 
-  context.commitItemsChange(
-    { type: 'replace-changed', items: result },
-    {
-      before: context.selection,
-      after: context.selection,
-    },
-  )
-  return true
+  return applyCanvasStandardItemsChangeEffect({
+    change: { type: 'replace-changed', items: result },
+    context,
+  })
 }
 
 function executeCanvasReorderCommand(
@@ -367,14 +309,11 @@ function executeCanvasReorderCommand(
     return false
   }
 
-  context.commitItemsChange(
-    { type: 'reorder-selection', mode, selection: context.selection },
-    {
-      before: context.selection,
-      after: result.selection,
-    },
-  )
-  return true
+  return applyCanvasStandardItemsChangeEffect({
+    afterSelection: result.selection,
+    change: { type: 'reorder-selection', mode, selection: context.selection },
+    context,
+  })
 }
 
 function executeCanvasSelectAllCommand(
@@ -390,8 +329,10 @@ function executeCanvasSelectAllCommand(
     return false
   }
 
-  context.commitSelection(nextSelection)
-  return true
+  return applyCanvasStandardSelectionEffect({
+    context,
+    selection: nextSelection,
+  })
 }
 
 function assertUnhandledCanvasStandardCommand(
