@@ -5,28 +5,26 @@ import {
   type SetStateAction,
 } from 'react'
 import type { Viewport } from '../../core'
-import type { CanvasItem } from '../../host'
+import type { CanvasItemReadModel } from '../../host'
 import {
   fitBoundsIntoViewport,
   INITIAL_VIEWPORT,
   zoomViewport,
 } from '../../core'
-import { createCanvasItemReadModel } from '../../host'
 
 type UseCanvasViewportControlsArgs = {
-  items: CanvasItem[]
+  itemReadModel: CanvasItemReadModel
   setViewport: Dispatch<SetStateAction<Viewport>>
   svgRef: RefObject<SVGSVGElement | null>
 }
 
 export function useCanvasViewportControls({
-  items,
+  itemReadModel,
   setViewport,
   svgRef,
 }: UseCanvasViewportControlsArgs) {
   const fitToItems = useCallback(
     (ids?: string[]) => {
-      const itemReadModel = createCanvasItemReadModel(items)
       const targetIds =
         ids && ids.length > 0
           ? ids
@@ -40,7 +38,7 @@ export function useCanvasViewportControls({
 
       setViewport(fitBoundsIntoViewport(bounds, rect))
     },
-    [items, setViewport, svgRef],
+    [itemReadModel, setViewport, svgRef],
   )
 
   const resetViewport = useCallback(() => {

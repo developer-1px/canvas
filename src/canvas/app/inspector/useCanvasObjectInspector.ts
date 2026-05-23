@@ -1,11 +1,13 @@
 import { useCallback, useMemo } from 'react'
 import type { Bounds } from '../../core'
-import type { CanvasItem } from '../../host'
-import { createCanvasItemReadModel } from '../../host'
+import type {
+  CanvasItem,
+  CanvasItemReadModel,
+} from '../../host'
 import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract'
 
 type UseCanvasObjectInspectorArgs = {
-  items: CanvasItem[]
+  itemReadModel: CanvasItemReadModel
   selected: Set<string>
   selection: string[]
   commitItemsChange: CommitCanvasItemsChange
@@ -13,11 +15,10 @@ type UseCanvasObjectInspectorArgs = {
 
 export function useCanvasObjectInspector({
   commitItemsChange,
-  items,
+  itemReadModel,
   selected,
   selection,
 }: UseCanvasObjectInspectorArgs) {
-  const itemReadModel = useMemo(() => createCanvasItemReadModel(items), [items])
   const bounds = useMemo(
     () => itemReadModel.getSelectionBounds(selected),
     [itemReadModel, selected],

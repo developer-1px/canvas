@@ -21,6 +21,7 @@ import {
 type CanvasSvgStageProps = {
   activeMode: Tool
   gesture: CanvasInteractionKind
+  getComponentPresentation: (component: string) => string
   items: CanvasItem[]
   overlays: CanvasOverlayState
   selected: Set<string>
@@ -45,6 +46,7 @@ type CanvasSvgStageProps = {
 export function CanvasSvgStage({
   activeMode,
   gesture,
+  getComponentPresentation,
   items,
   overlays,
   selected,
@@ -81,6 +83,7 @@ export function CanvasSvgStage({
         <CanvasSvgOverlayPlane overlays={overlays} />
 
         <CanvasSvgItemRenderer
+          getComponentPresentation={getComponentPresentation}
           items={items}
           onItemPointerDown={onItemPointerDown}
           onTextDoubleClick={onTextDoubleClick}

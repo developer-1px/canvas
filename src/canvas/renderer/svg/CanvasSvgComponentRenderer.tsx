@@ -1,8 +1,5 @@
 import type { ReactNode } from 'react'
-import {
-  CANVAS_COMPONENT_LIBRARY,
-  type CanvasComponentItem,
-} from '../../host'
+import type { CanvasComponentItem } from '../../host'
 import {
   CanvasSvgConnectorComponent,
   CanvasSvgVoteComponent,
@@ -41,11 +38,13 @@ const CANVAS_SVG_COMPONENT_PRESENTATION_RENDERERS: Record<
 }
 
 export function CanvasSvgComponentRenderer({
+  getComponentPresentation,
   item,
 }: {
+  getComponentPresentation: (component: string) => string
   item: CanvasComponentItem
 }) {
-  const presentation = CANVAS_COMPONENT_LIBRARY.getPresentation(item.component)
+  const presentation = getComponentPresentation(item.component)
   const renderComponent =
     CANVAS_SVG_COMPONENT_PRESENTATION_RENDERERS[presentation] ??
     CanvasSvgCardComponent

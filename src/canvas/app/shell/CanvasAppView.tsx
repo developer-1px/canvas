@@ -30,6 +30,7 @@ type CanvasAppViewProps = {
   editorStyle: TextEditorProps['style']
   fitToItems: (ids?: string[]) => void
   findReplace: FindReplaceProps
+  getComponentPresentation: StageProps['getComponentPresentation']
   gesture: StageProps['gesture']
   inspector: InspectorProps
   items: StageProps['items']
@@ -75,6 +76,7 @@ export function CanvasAppView({
   editorStyle,
   fitToItems,
   findReplace,
+  getComponentPresentation,
   gesture,
   inspector,
   items,
@@ -144,6 +146,7 @@ export function CanvasAppView({
       <CanvasSvgStage
         activeMode={activeMode}
         gesture={gesture}
+        getComponentPresentation={getComponentPresentation}
         items={items}
         overlays={overlays}
         selected={selected}

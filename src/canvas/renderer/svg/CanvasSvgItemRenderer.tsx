@@ -9,6 +9,7 @@ import { getCanvasItemBounds } from '../../host'
 import { CanvasSvgComponentRenderer } from './CanvasSvgComponentRenderer'
 
 type CanvasSvgItemRendererProps = {
+  getComponentPresentation: (component: string) => string
   items: CanvasItem[]
   outlineIds: Set<string>
   selected: Set<string>
@@ -20,6 +21,7 @@ type CanvasSvgItemRendererProps = {
 }
 
 export function CanvasSvgItemRenderer({
+  getComponentPresentation,
   items,
   onItemPointerDown,
   onTextDoubleClick,
@@ -30,6 +32,7 @@ export function CanvasSvgItemRenderer({
     <>
       {items.map((item) =>
         renderCanvasItem({
+          getComponentPresentation,
           item,
           locked: false,
           onItemPointerDown,
@@ -43,6 +46,7 @@ export function CanvasSvgItemRenderer({
 }
 
 type RenderCanvasItemArgs = {
+  getComponentPresentation: (component: string) => string
   item: CanvasItem
   locked: boolean
   outlineIds: Set<string>
@@ -55,6 +59,7 @@ type RenderCanvasItemArgs = {
 }
 
 function renderCanvasItem({
+  getComponentPresentation,
   item,
   locked,
   onItemPointerDown,
@@ -89,6 +94,7 @@ function renderCanvasItem({
         />
         {item.children.map((child) =>
           renderCanvasItem({
+            getComponentPresentation,
             item: child,
             locked: isLocked,
             onItemPointerDown,
@@ -118,7 +124,10 @@ function renderCanvasItem({
           isLocked ? undefined : (event) => onItemPointerDown(event, item.id)
         }
       >
-        <CanvasSvgComponentRenderer item={item} />
+        <CanvasSvgComponentRenderer
+          getComponentPresentation={getComponentPresentation}
+          item={item}
+        />
         {hasOutline ? <CanvasSvgSelectionOutline bounds={bounds} /> : null}
       </g>
     )

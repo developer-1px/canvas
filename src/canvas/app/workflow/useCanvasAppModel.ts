@@ -77,7 +77,7 @@ export function useCanvasAppModel() {
 
   const inspector = useCanvasObjectInspector({
     commitItemsChange,
-    items,
+    itemReadModel,
     selected,
     selection,
   })
@@ -173,11 +173,12 @@ export function useCanvasAppModel() {
     viewport,
   })
 
-  const { fitToItems, resetViewport, zoomBy } = useCanvasViewportControls({
-    items,
-    setViewport,
-    svgRef,
-  })
+  const { fitToItems, resetViewport, zoomBy } =
+    useCanvasViewportControls({
+      itemReadModel,
+      setViewport,
+      svgRef,
+    })
 
   const openFindReplace = useCallback(() => {
     setFindReplaceOpen(true)
@@ -231,6 +232,7 @@ export function useCanvasAppModel() {
     createId,
     commitItemsChange,
     interactionRef,
+    itemReadModel,
     items,
     scene,
     selectedBounds,
@@ -307,6 +309,7 @@ export function useCanvasAppModel() {
       onReplaceAll: replaceAllText,
       onReplacementChange: setFindReplacement,
     },
+    getComponentPresentation: CANVAS_COMPONENT_LIBRARY.getPresentation,
     gesture,
     inspector,
     items,

@@ -15,6 +15,7 @@ import type {
 } from '../../core'
 import type {
   CanvasItem,
+  CanvasItemReadModel,
   EditingText,
   RectItem,
   TextItem,
@@ -35,7 +36,6 @@ import {
   type CanvasCreationAdapter,
   type CanvasSceneAdapter,
 } from '../../engine'
-import { createCanvasItemReadModel } from '../../host'
 import type {
   CommitCanvasItemsChange,
   CommitCanvasSelection,
@@ -50,6 +50,7 @@ type UseCanvasPointerDownHandlersArgs = {
   creationAdapter: CanvasCreationAdapter<CanvasItem>
   createId: (prefix: string) => string
   interactionRef: MutableRefObject<Interaction>
+  itemReadModel: CanvasItemReadModel
   items: CanvasItem[]
   scene: CanvasSceneAdapter
   selectedBounds: Bounds | null
@@ -74,6 +75,7 @@ export function useCanvasPointerDownHandlers({
   creationAdapter,
   createId,
   interactionRef,
+  itemReadModel,
   items,
   scene,
   selectedBounds,
@@ -223,7 +225,7 @@ export function useCanvasPointerDownHandlers({
     })
     const editItem =
       itemIntent.textEdit
-        ? createCanvasItemReadModel(items).findEditableTextItem(itemId)
+        ? itemReadModel.findEditableTextItem(itemId)
         : null
     const itemSelection = getCanvasItemPointerSelection({
       additive: itemIntent.additive,
