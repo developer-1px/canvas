@@ -55,7 +55,7 @@ export function useCanvasAppCommandModel({
   stageElement,
   workspace,
 }: UseCanvasAppCommandModelArgs) {
-  return useCanvasCommands({
+  const commands = useCanvasCommands({
     commandAdapter,
     commitItemsChange: document.commitItemsChange,
     commitSelection: document.commitSelection,
@@ -73,4 +73,38 @@ export function useCanvasAppCommandModel({
     undo: document.undo,
     viewport: workspace.viewport,
   })
+
+  return {
+    control: {
+      onAlign: commands.alignSelection,
+      onDelete: commands.deleteSelection,
+      onDistribute: commands.distributeSelection,
+      onDuplicate: commands.duplicateSelection,
+      onGroup: commands.groupSelection,
+      onLock: commands.lockSelection,
+      onRedo: commands.redoHistory,
+      onUndo: commands.undoHistory,
+      onUngroup: commands.ungroupSelection,
+      onUnlockAll: commands.unlockAll,
+    },
+    keyboard: {
+      copySelection: commands.copySelection,
+      cutSelection: commands.cutSelection,
+      deleteSelection: commands.deleteSelection,
+      duplicateSelection: commands.duplicateSelection,
+      groupSelection: commands.groupSelection,
+      lockSelection: commands.lockSelection,
+      moveSelection: commands.moveSelection,
+      pasteSelection: commands.pasteSelection,
+      redoHistory: commands.redoHistory,
+      reorderSelection: commands.reorderSelection,
+      selectAll: commands.selectAll,
+      undoHistory: commands.undoHistory,
+      ungroupSelection: commands.ungroupSelection,
+      unlockAll: commands.unlockAll,
+    },
+    pointer: {
+      cloneItems: commands.cloneItems,
+    },
+  }
 }

@@ -46,122 +46,53 @@ export function useCanvasAppModel({
     stageAdapter,
   } = validatedAssembly
   const stageElement = useCanvasAppStageElement()
-  const {
-    canRedo,
-    canUndo,
-    commitSelection,
-    commitItemsChange,
-    copyItemsToClipboard,
-    createId,
-    getClipboardItems,
-    findDocumentText,
-    itemReadModel,
-    items,
-    redo,
-    replaceDocumentText,
-    scene,
-    selected,
-    selectedBounds,
-    selection,
-    setClipboardItems,
-    setLiveItems,
-    setSelection,
-    setViewport,
-    undo,
-    viewport,
-  } = useCanvasWorkspaceModel({
+  const workspace = useCanvasWorkspaceModel({
     customItemValidators,
     initialItems,
   })
   const interaction = useCanvasInteractionModel({
     config: canvasAffordanceConfig,
-    scene,
-    selection,
-    viewport,
+    ...workspace.interaction,
   })
 
   const inspector = useCanvasAppInspectorModel({
-    commitItemsChange,
+    ...workspace.inspector,
     inspectorPanels,
-    itemReadModel,
-    selected,
-    selection,
   })
 
-  const text = useCanvasAppTextModel({
-    document: {
-      commitItemsChange,
-      findDocumentText,
-      replaceDocumentText,
-    },
-    itemReadModel,
-    selection,
-    viewport,
-  })
+  const text = useCanvasAppTextModel(workspace.text)
 
   const {
     customCommandStates,
     customCreationToolStates,
     runCustomCommand,
   } = useCanvasAppExtensionModel({
-    commitItemsChange,
-    commitSelection,
-    createId,
+    ...workspace.extension,
     customCommands,
     customCreationTools,
-    items,
-    selection,
     setEditing: text.setEditing,
-    viewport,
   })
 
   const commands = useCanvasAppCommandModel({
     commandAdapter: itemAdapters.command,
     config: canvasAffordanceConfig,
-    createId,
-    document: {
-      commitItemsChange,
-      commitSelection,
-      copyItemsToClipboard,
-      getClipboardItems,
-      redo,
-      setClipboardItems,
-      undo,
-    },
+    createId: workspace.command.createId,
+    document: workspace.command.document,
     setEditing: text.setEditing,
     stageElement,
-    workspace: {
-      items,
-      selection,
-      setSelection,
-      viewport,
-    },
+    workspace: workspace.command.workspace,
   })
 
   const viewportControls = useCanvasAppViewportModel({
     config: canvasAffordanceConfig,
-    itemReadModel,
-    setViewport,
+    ...workspace.viewport,
     stageElement,
   })
 
   useCanvasAppKeyboardModel({
     command: {
-      commitSelection,
-      copySelection: commands.copySelection,
-      cutSelection: commands.cutSelection,
-      deleteSelection: commands.deleteSelection,
-      duplicateSelection: commands.duplicateSelection,
-      groupSelection: commands.groupSelection,
-      lockSelection: commands.lockSelection,
-      moveSelection: commands.moveSelection,
-      pasteSelection: commands.pasteSelection,
-      redoHistory: commands.redoHistory,
-      reorderSelection: commands.reorderSelection,
-      selectAll: commands.selectAll,
-      undoHistory: commands.undoHistory,
-      ungroupSelection: commands.ungroupSelection,
-      unlockAll: commands.unlockAll,
+      ...workspace.keyboard.command,
+      ...commands.keyboard,
     },
     config: canvasAffordanceConfig,
     customCreationTools: customCreationToolStates,
@@ -170,7 +101,7 @@ export function useCanvasAppModel({
       setEditing: text.setEditing,
     },
     openFindReplace: text.openFindReplace,
-    selection,
+    selection: workspace.keyboard.selection,
     viewport: {
       fitToItems: viewportControls.fitToItems,
       resetViewport: viewportControls.resetViewport,
@@ -180,12 +111,11 @@ export function useCanvasAppModel({
 
   const pointer = useCanvasAppPointerModel({
     command: {
-      cloneItems: commands.cloneItems,
-      commitItemsChange,
-      commitSelection,
+      ...commands.pointer,
+      ...workspace.pointer.command,
     },
     config: canvasAffordanceConfig,
-    createId,
+    createId: workspace.pointer.createId,
     customCreationTools,
     interaction: interaction.pointer,
     itemAdapters: {
@@ -194,62 +124,36 @@ export function useCanvasAppModel({
     },
     stageElement,
     workspace: {
-      itemReadModel,
-      items,
-      scene,
-      selectedBounds,
-      selection,
+      ...workspace.pointer.workspace,
       setEditing: text.setEditing,
-      setLiveItems,
-      setSelection,
-      setViewport,
-      viewport,
     },
   })
 
   const components = useCanvasAppComponentModel({
-    command: {
-      commitItemsChange,
-    },
+    command: workspace.component.command,
     componentLibrary,
-    createId,
+    createId: workspace.component.createId,
     interaction: {
       ...interaction.component,
       setEditing: text.setEditing,
     },
     stageElement,
-    workspace: {
-      selection,
-      viewport,
-    },
+    workspace: workspace.component.workspace,
   })
 
   const controls = getCanvasAppControlModel({
-    canRedo,
-    canUndo,
+    ...workspace.control,
     components: componentLibrary.templates,
     config: canvasAffordanceConfig,
     customCommands: customCommandStates,
     customTools: customCreationToolStates,
     gesture: interaction.control.gesture,
-    scene,
-    selection,
     tool: interaction.control.tool,
-    viewport,
-    onAlign: commands.alignSelection,
-    onDelete: commands.deleteSelection,
-    onDistribute: commands.distributeSelection,
-    onDuplicate: commands.duplicateSelection,
+    ...commands.control,
     onFitItems: viewportControls.fitToItems,
-    onGroup: commands.groupSelection,
     onInsertComponent: components.insertComponent,
-    onLock: commands.lockSelection,
-    onRedo: commands.redoHistory,
     onRunCustomCommand: runCustomCommand,
     onToolChange: interaction.control.onToolChange,
-    onUndo: commands.undoHistory,
-    onUngroup: commands.ungroupSelection,
-    onUnlockAll: commands.unlockAll,
     onViewportReset: viewportControls.resetViewport,
     onZoomBy: viewportControls.zoomBy,
   })
@@ -265,11 +169,11 @@ export function useCanvasAppModel({
         componentPresentationRenderers,
         customItemRenderers,
         getComponentPresentation: componentLibrary.getPresentation,
-        items,
+        items: workspace.itemLayer.items,
         onItemPointerDown: pointer.itemLayerHandlers.onItemPointerDown,
         onTextDoubleClick: pointer.itemLayerHandlers.onTextDoubleClick,
         outlineIds: interaction.stage.overlays.itemOutlineIds,
-        selected,
+        selected: workspace.itemLayer.selected,
       },
       stageAdapter,
       stageInput: {
@@ -277,7 +181,7 @@ export function useCanvasAppModel({
         gesture: interaction.stage.gesture,
         overlays: interaction.stage.overlays,
         stageElement: stageElement.mount,
-        viewport,
+        viewport: workspace.stage.viewport,
         onCanvasPointerDown: pointer.stageHandlers.onCanvasPointerDown,
         onPointerCancel: pointer.stageHandlers.onPointerCancel,
         onPointerMove: pointer.stageHandlers.onPointerMove,

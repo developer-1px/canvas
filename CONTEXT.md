@@ -77,7 +77,7 @@
 - Canvas Pointer Interaction Movement: drag threshold 기반 moved 판정을 pointer interaction preview/start/lifecycle Module들이 공유하는 App-owned runtime Module.
 - Canvas Pointer Interaction Lifecycle: pointer-up/cancel 시 active interaction을 문서 변경, selection 변경, edit 진입, cancel rollback으로 확정하거나 되돌리는 App-owned runtime Module.
 - Canvas App Model: App Shell이 렌더링할 control별 view props를 만들고 command, pointer, keyboard, viewport, text editing wiring을 숨기는 workflow Module.
-- Canvas App Command Model: App Model이 document, clipboard, history, stage context를 직접 모아 command hook을 조립하지 않도록 command handlers를 만드는 workflow Module.
+- Canvas App Command Model: App Model이 document, clipboard, history, stage context와 keyboard/toolbar/pointer command fan-out을 직접 알지 않도록 consumer별 command context를 만드는 workflow Module.
 - Canvas App Component Model: App Model이 component insertion의 component library, document commit, selection, stage, viewport wiring 세부를 직접 알지 않도록 component handlers를 만드는 workflow Module.
 - Canvas App Control Model: component palette, toolbar, status, zoom controls props를 만들고 command availability, status label, selected fit target 규칙을 숨기는 workflow Module.
 - Canvas App Extension Model: 외부 custom command/tool descriptor를 toolbar state, custom tool state, custom command run callback으로 바꾸는 workflow Module.
@@ -91,7 +91,7 @@
 - Canvas Keyboard Command Shortcut Intent: built-in command, viewport, nudge keyboard shortcut grammar를 feature toggle과 selection 기준으로 keyboard intent로 변환하는 App-owned runtime Module.
 - Canvas Keyboard Tool Shortcut Intent: built-in tool shortcut precedence와 custom creation tool shortcut matching을 소유하는 App-owned runtime Module.
 - Canvas Interaction Model: tool, gesture, marquee, draft, snap guide, overlay state 생명주기와 consumer별 interaction context를 App Shell에 숨기는 workflow Module.
-- Canvas Workspace Model: Demo workspace의 저장된 snapshot, document history, viewport, read model, id 생성을 App Shell에 숨기는 workflow Module.
+- Canvas Workspace Model: Demo workspace의 저장된 snapshot, document history, viewport, read model, id 생성과 consumer별 workspace context를 App Shell에 숨기는 workflow Module.
 - Canvas Workspace Snapshot: 저장된 workspace payload의 version, item validation, viewport normalization, selection sanitization, id seed contract를 소유하는 App-owned Module.
 - Canvas Workflow Contract: App workflow hook들이 공유하는 document commit, selection commit, clipboard 계약. 개별 hook이 `useCanvasDocument` 구현 파일을 직접 알지 않게 한다.
 - Canvas Toolbar Items: feature toggle, availability, built-in/custom tool, built-in/custom command 상태를 toolbar item group grammar로 변환하는 UI-owned Module.
@@ -205,7 +205,7 @@
 - App Model은 wheel viewport listener와 fit/reset/zoom control hook 조립 세부를 직접 알지 않고 Canvas App Viewport Model에서 viewport handlers를 받는다.
 - App Model은 draft, marquee, snap guide, temporary pan raw setter routing을 직접 알지 않고 Canvas Interaction Model의 consumer별 interaction context를 전달한다.
 - App Shell은 workspace 저장, document history, read model 생성 방식을 직접 알지 않는다.
-- App workflow hook들은 Canvas Item Read Model을 직접 생성하지 않고 Canvas Workspace Model에서 주입받는다.
+- App workflow hook들은 Canvas Item Read Model, document action, viewport setter를 직접 생성하지 않고 Canvas Workspace Model의 consumer별 workspace context로 주입받는다.
 - App workflow는 editor/search 상태를 각각의 workflow Module 뒤에 숨긴다.
 - Standard command hook은 toolbar/keyboard용 callback wiring을 맡고, Canvas Standard Command Execution은 plan 생성과 effect 적용만 조립한다. Engine command 호출과 document effect descriptor 생성은 Canvas Standard Command Effect Plan이, document commit/selection/editing/history effect routing은 Canvas Standard Command Document Effects가 소유한다.
 - Clipboard command hook은 paste index와 callback wiring을 맡고, Canvas Clipboard Command Execution은 plan 생성과 effect 적용만 조립한다. Clone/duplicate/paste/cut plan과 paste offset 계산은 Canvas Clipboard Command Effect Plan이, Host clipboard/document/editing effect routing은 Canvas Clipboard Command Effects가 소유한다.

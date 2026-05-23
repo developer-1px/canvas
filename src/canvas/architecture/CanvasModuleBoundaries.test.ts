@@ -437,6 +437,11 @@ describe('Canvas module boundaries', () => {
     expect(commandModelFile.source).toContain(
       'setSelection: workspace.setSelection',
     )
+    expect(commandModelFile.source).toContain('control: {')
+    expect(commandModelFile.source).toContain('keyboard: {')
+    expect(commandModelFile.source).toContain('pointer: {')
+    expect(appModelFile.source).not.toMatch(/commands\.\w+Selection/)
+    expect(appModelFile.source).not.toContain('commands.cloneItems')
   })
 
   it('keeps app component insertion wiring behind a named workflow module', () => {
@@ -1762,6 +1767,38 @@ describe('Canvas module boundaries', () => {
       )
 
     expect(violations).toEqual([])
+  })
+
+  it('keeps app workspace document fields behind consumer contexts', () => {
+    const appModelFile = getSourceFile(
+      'src/canvas/app/workflow/useCanvasAppModel.ts',
+    )
+    const workspaceModelFile = getSourceFile(
+      'src/canvas/app/workflow/useCanvasWorkspaceModel.ts',
+    )
+    const rawWorkspaceTerms =
+      /\b(canRedo|canUndo|commitSelection|commitItemsChange|copyItemsToClipboard|getClipboardItems|findDocumentText|itemReadModel|redo|replaceDocumentText|selectedBounds|setClipboardItems|setLiveItems|setSelection|setViewport|undo)\b/
+
+    expect(appModelFile.source).toContain(
+      "from './useCanvasWorkspaceModel'",
+    )
+    expect(appModelFile.source).not.toMatch(rawWorkspaceTerms)
+    for (const consumerContext of [
+      'command: {',
+      'component: {',
+      'control: {',
+      'extension: {',
+      'inspector: {',
+      'interaction: {',
+      'itemLayer: {',
+      'keyboard: {',
+      'pointer: {',
+      'stage: {',
+      'text: {',
+      'viewport: {',
+    ]) {
+      expect(workspaceModelFile.source).toContain(consumerContext)
+    }
   })
 
   it('keeps App workspace snapshot contracts behind a named module', () => {
