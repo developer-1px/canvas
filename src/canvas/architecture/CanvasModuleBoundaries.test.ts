@@ -807,6 +807,12 @@ describe('Canvas module boundaries', () => {
     const componentModelFile = getSourceFile(
       'src/canvas/app/workflow/useCanvasAppComponentModel.ts',
     )
+    const componentHookFile = getSourceFile(
+      'src/canvas/app/components/useCanvasComponentInsertion.ts',
+    )
+    const componentExecutionFile = getSourceFile(
+      'src/canvas/app/components/CanvasComponentInsertionExecution.ts',
+    )
 
     expect(appModelFile.source).toContain(
       "from './useCanvasAppComponentModel'",
@@ -827,6 +833,19 @@ describe('Canvas module boundaries', () => {
     expect(componentModelFile.source).toContain(
       'onInsertComponent: insertComponent',
     )
+    expect(componentHookFile.source).toContain(
+      "from './CanvasComponentInsertionExecution'",
+    )
+    expect(componentHookFile.source).toContain('insertCanvasComponent({')
+    expect(componentHookFile.source).not.toContain('x: 120')
+    expect(componentHookFile.source).not.toContain("type: 'add'")
+    expect(componentHookFile.source).not.toContain("setTool('select')")
+    expect(componentExecutionFile.source).toContain(
+      'export function insertCanvasComponent',
+    )
+    expect(componentExecutionFile.source).toContain('x: 120')
+    expect(componentExecutionFile.source).toContain("type: 'add'")
+    expect(componentExecutionFile.source).toContain("setTool('select')")
     expect(appModelFile.source).not.toContain('components.insertComponent')
   })
 

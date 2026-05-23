@@ -12,6 +12,7 @@ import type {
 import type { CanvasComponentLibrary } from '../../host'
 import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract'
 import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
+import { insertCanvasComponent } from './CanvasComponentInsertionExecution'
 
 type UseCanvasComponentInsertionArgs = {
   componentLibrary: CanvasComponentLibrary
@@ -36,22 +37,17 @@ export function useCanvasComponentInsertion({
 }: UseCanvasComponentInsertionArgs) {
   return useCallback(
     (component: CanvasComponentKind) => {
-      const point = stageElement.getViewportCenter(viewport) ?? {
-        x: 120,
-        y: 120,
-      }
-      const nextItem = componentLibrary.createItem({
-        id: createId('component'),
-        point,
-        templateId: component,
+      insertCanvasComponent({
+        commitItemsChange,
+        component,
+        componentLibrary,
+        createId,
+        selection,
+        setEditing,
+        setTool,
+        stageElement,
+        viewport,
       })
-
-      commitItemsChange({ type: 'add', items: [nextItem] }, {
-        before: selection,
-        after: [nextItem.id],
-      })
-      setEditing(null)
-      setTool('select')
     },
     [
       componentLibrary,
