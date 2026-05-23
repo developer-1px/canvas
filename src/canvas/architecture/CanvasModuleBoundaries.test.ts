@@ -1691,6 +1691,9 @@ describe('Canvas module boundaries', () => {
     const commandIntentFile = getSourceFile(
       'src/canvas/app/keyboard/CanvasKeyboardCommandShortcutIntent.ts',
     )
+    const commandShortcutFile = getSourceFile(
+      'src/canvas/app/keyboard/CanvasKeyboardCommandShortcuts.ts',
+    )
     const toolIntentFile = getSourceFile(
       'src/canvas/app/keyboard/CanvasKeyboardToolShortcutIntent.ts',
     )
@@ -1728,9 +1731,22 @@ describe('Canvas module boundaries', () => {
     expect(commandIntentFile.source).toContain(
       'export function getCanvasKeyboardCommandShortcutIntent',
     )
-    expect(commandIntentFile.source).toContain("event.key.startsWith('Arrow')")
-    expect(commandIntentFile.source).toContain("key === 'z'")
-    expect(commandIntentFile.source).toContain("kind: 'reorder-selection'")
+    expect(commandIntentFile.source).toContain(
+      "from './CanvasKeyboardCommandShortcuts'",
+    )
+    expect(commandIntentFile.source).not.toContain(
+      "event.key.startsWith('Arrow')",
+    )
+    expect(commandIntentFile.source).not.toContain("key === 'z'")
+    expect(commandShortcutFile.source).toContain(
+      'export function getCanvasKeyboardBuiltinCommandShortcutIntent',
+    )
+    expect(commandShortcutFile.source).toContain(
+      'export function getCanvasKeyboardReservedCommandShortcuts',
+    )
+    expect(commandShortcutFile.source).toContain("shortcutId: 'undo'")
+    expect(commandShortcutFile.source).toContain("shortcutId: 'nudge'")
+    expect(commandShortcutFile.source).toContain("kind: 'reorder-selection'")
     expect(toolIntentFile.source).toContain(
       'export function getCanvasKeyboardToolShortcutIntent',
     )
@@ -1756,8 +1772,11 @@ describe('Canvas module boundaries', () => {
     expect(reservedShortcutFile.source).toContain(
       'getCanvasKeyboardReservedToolShortcuts',
     )
+    expect(reservedShortcutFile.source).toContain(
+      'getCanvasKeyboardReservedCommandShortcuts',
+    )
     expect(reservedShortcutFile.source).toContain("'temporary pan'")
-    expect(reservedShortcutFile.source).toContain("'large nudge left'")
+    expect(reservedShortcutFile.source).not.toContain("'large nudge left'")
   })
 
   it('keeps App custom creation tool contracts behind a named module', () => {
