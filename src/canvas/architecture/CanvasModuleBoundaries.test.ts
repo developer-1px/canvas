@@ -771,11 +771,29 @@ describe('Canvas module boundaries', () => {
     const componentRendererFile = getSourceFile(
       'src/canvas/app/rendering/CanvasDemoSvgComponentRenderer.tsx',
     )
+    const executionFile = getSourceFile(
+      'src/canvas/app/rendering/CanvasDemoSvgComponentRendererExecution.tsx',
+    )
     const fallbackFile = getSourceFile(
       'src/canvas/app/rendering/CanvasDemoSvgComponentRenderFallback.tsx',
     )
 
     expect(componentRendererFile.source).toContain(
+      "from './CanvasDemoSvgComponentRendererExecution'",
+    )
+    expect(componentRendererFile.source).not.toContain(
+      'getCanvasDemoSvgComponentPresentationRenderer',
+    )
+    expect(componentRendererFile.source).not.toContain(
+      'renderCanvasDemoSvgComponentFallback',
+    )
+    expect(executionFile.source).toContain(
+      'export function renderCanvasDemoSvgComponentPresentation',
+    )
+    expect(executionFile.source).toContain(
+      'getCanvasDemoSvgComponentPresentationRenderer',
+    )
+    expect(executionFile.source).toContain(
       'renderCanvasDemoSvgComponentFallback',
     )
     expect(componentRendererFile.source).not.toMatch(

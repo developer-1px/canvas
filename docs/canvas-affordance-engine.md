@@ -47,7 +47,8 @@
 | `src/canvas/app/rendering/CanvasDemoSvgComponentPresentationRegistry.ts` | Demo component presentation key와 SVG rendering strategy를 외부 조립 가능한 registry로 연결한다 |
 | `src/canvas/app/rendering/CanvasDemoSvgBuiltInComponentPresentationRenderers.tsx` | 기본 Demo component presentation key와 SVG renderer strategy mapping을 소유한다 |
 | `src/canvas/app/rendering/CanvasDemoSvgComponentPresentationRegistryContracts.ts` | Component presentation renderer registry key와 render strategy slot을 검증한다 |
-| `src/canvas/app/rendering/CanvasDemoSvgComponentRenderFallback.tsx` | Component presentation resolver나 renderer 실행 실패를 기본 component card로 containment 한다 |
+| `src/canvas/app/rendering/CanvasDemoSvgComponentRendererExecution.tsx` | Component presentation resolver 호출, renderer lookup, render 실행, throw 시 fallback containment를 소유한다 |
+| `src/canvas/app/rendering/CanvasDemoSvgComponentRenderFallback.tsx` | Component presentation resolver/renderer 실패 때 쓰는 기본 component card fallback shape를 소유한다 |
 | `src/canvas/app/rendering/CanvasDemoSvgCustomItemRendererRegistry.tsx` | Custom item presentation key와 SVG rendering strategy를 외부 조립 가능한 registry로 연결한다 |
 | `src/canvas/app/rendering/CanvasDemoSvgCustomItemRendererRegistryContracts.ts` | Custom item renderer registry key와 render strategy slot을 검증한다 |
 | `src/canvas/app/rendering/CanvasDemoSvgCustomItemRendererExecution.tsx` | Custom item renderer lookup, render 실행, throw 시 fallback containment를 소유한다 |
@@ -193,7 +194,7 @@ type CanvasAffordanceConfig = {
 - Demo SVG Item Layer Adapter는 tree/frame orchestration을 맡고, marker/highlighter/arrow shape 렌더링은 Demo SVG Drawing Item Renderer가 소유한다.
 - Demo SVG Item Layer Adapter는 rect/text shape와 embedded text foreignObject 문법을 알지 않고 Demo SVG Rect/Text Item Renderer에 위임한다.
 - Demo SVG Built-in Component Presentation Renderers가 기본 component presentation renderer mapping을 소유하고, Demo SVG Component Presentation Registry Contracts가 외부 renderer registry shape를 검증한다.
-- Demo SVG Component Render Fallback이 component presentation resolver와 renderer 실행 실패를 기본 component card로 containment 한다.
+- Demo SVG Component Renderer Execution이 component presentation resolver와 renderer lookup/실행 실패 containment를 소유하고, Demo SVG Component Render Fallback이 기본 component card fallback shape를 소유한다.
 - Demo SVG Custom Item Renderer Registry Contracts가 외부 custom item renderer registry shape를 검증한다.
 - Demo SVG Custom Item Renderer Execution이 custom item renderer lookup과 실행 실패 containment를 소유하고, Demo SVG Custom Item Render Fallback이 unknown custom item card shape를 소유한다.
 - 새 Demo component kind가 기존 presentation을 재사용하면 Canvas Built-in Component Templates만 바꾼다. 제품별 component kind는 외부 조립된 `CanvasComponentLibrary`로 등록한다. 새 presentation은 Canvas App Assembly에 presentation renderer를 함께 등록한다.

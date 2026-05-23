@@ -54,8 +54,9 @@
 - Canvas Component Presentation Registry: Demo component presentation key를 SVG rendering strategy에 연결하는 외부 조립 가능한 registry.
 - Demo SVG Built-in Component Presentation Renderers: 기본 Demo component presentation key와 SVG renderer strategy mapping을 소유하는 App rendering Module.
 - Demo SVG Component Presentation Registry Contracts: component presentation renderer registry key와 render strategy slot을 검증하는 App rendering contract Module.
+- Demo SVG Component Renderer Execution: component presentation resolver 호출, renderer lookup, render 실행, throw 시 fallback containment를 소유하는 App rendering Module.
 - Canvas Component Library Contracts: component library input, component template descriptor shape, stable id/presentation, duplicate template id를 검증하는 Host-owned contract Module.
-- Demo SVG Component Render Fallback: component presentation resolver나 renderer 실행 실패를 기본 component card로 containment 하는 App rendering 내부 Module.
+- Demo SVG Component Render Fallback: component presentation resolver/renderer 실패 때 쓰는 기본 component card fallback shape를 소유하는 App rendering 내부 Module.
 - Demo SVG Custom Item Renderer Registry Contracts: custom item renderer registry key와 render strategy slot을 검증하는 App rendering contract Module.
 - Demo SVG Custom Item Renderer Execution: custom item renderer lookup, render 실행, throw 시 fallback containment를 소유하는 App rendering Module.
 - Demo SVG Custom Item Render Fallback: custom item renderer 누락/실패 때 쓰는 unknown custom item card fallback shape를 소유하는 App rendering 내부 Module.
@@ -122,7 +123,7 @@
 - Canvas App Assembly composition, output contract validation, output snapshot/freeze는 분리하고, validation은 Canvas App Assembly Contracts가, mutation 방어는 Canvas App Assembly Snapshot이 소유한다.
 - Canvas App Custom Item Module define, Canvas App Custom Item Module Assembly, Canvas App Assembly는 외부 descriptor/adapter/item mutation이 define/조립 후 동작을 바꾸지 않도록 snapshot을 보관한다.
 - Canvas App Assembly의 component presentation renderer input은 기본 registry를 대체하지 않고 extension/override로 합성한다.
-- Component presentation resolver와 renderer 실행 실패는 Demo SVG Component Render Fallback이 containment 하고, malformed component template/registry shape는 define/assembly 단계에서 실패해야 한다.
+- Component presentation resolver와 renderer lookup/실행 실패 containment는 Demo SVG Component Renderer Execution이 소유하고, fallback shape는 Demo SVG Component Render Fallback이 소유한다.
 - Canvas App Assembly의 initial items는 조립된 Canvas Custom Item Validator로 assembly 단계에서 검증한다.
 - Canvas App Assembly input은 custom item renderer/validator/creation registry를 직접 받지 않고 Canvas App Custom Item Module만 받는다.
 - 제품별 business action은 Engine command union에 넣지 않고 Canvas App Custom Command로 등록한다.
