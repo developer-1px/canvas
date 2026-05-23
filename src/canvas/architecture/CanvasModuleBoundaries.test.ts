@@ -952,6 +952,9 @@ describe('Canvas module boundaries', () => {
     const textModelFile = getSourceFile(
       'src/canvas/app/workflow/useCanvasAppTextModel.ts',
     )
+    const textConsumerModelFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppTextConsumerModel.ts',
+    )
 
     expect(appModelFile.source).toContain("from './useCanvasAppTextModel'")
     expect(appModelFile.source).not.toContain(
@@ -979,6 +982,9 @@ describe('Canvas module boundaries', () => {
       "from './useCanvasFindReplaceModel'",
     )
     expect(textModelFile.source).toContain(
+      "from './CanvasAppTextConsumerModel'",
+    )
+    expect(textModelFile.source).toContain(
       'useRef<HTMLTextAreaElement | null>',
     )
     expect(textModelFile.source).toContain(
@@ -993,8 +999,12 @@ describe('Canvas module boundaries', () => {
       'stage: {',
       'view: {',
     ]) {
-      expect(textModelFile.source).toContain(consumerContext)
+      expect(textModelFile.source).not.toContain(consumerContext)
+      expect(textConsumerModelFile.source).toContain(consumerContext)
     }
+    expect(textConsumerModelFile.source).toContain(
+      'export function getCanvasAppTextConsumerModel',
+    )
   })
 
   it('keeps app interaction state routing behind the interaction model', () => {

@@ -1,16 +1,14 @@
 import {
   useRef,
-  type Dispatch,
-  type SetStateAction,
 } from 'react'
 import type {
-  EditingText,
   Viewport,
 } from '../../entities'
 import type { CanvasAffordanceConfig } from '../../engine'
 import type { CanvasItemReadModel } from '../../host'
 import { useCanvasFindReplaceModel } from './useCanvasFindReplaceModel'
 import { useCanvasTextEditorModel } from './useCanvasTextEditorModel'
+import { getCanvasAppTextConsumerModel } from './CanvasAppTextConsumerModel'
 import type {
   CanvasDocumentTextSearch,
   CommitCanvasItemsChange,
@@ -30,45 +28,13 @@ type UseCanvasAppTextModelArgs = {
   viewport: Viewport
 }
 
-type CanvasAppTextModel = {
-  command: {
-    setEditing: Dispatch<SetStateAction<EditingText | null>>
-  }
-  component: {
-    interaction: {
-      setEditing: Dispatch<SetStateAction<EditingText | null>>
-    }
-  }
-  extension: {
-    setEditing: Dispatch<SetStateAction<EditingText | null>>
-  }
-  keyboard: {
-    interaction: {
-      setEditing: Dispatch<SetStateAction<EditingText | null>>
-    }
-    openFindReplace: ReturnType<typeof useCanvasFindReplaceModel>['openFindReplace']
-  }
-  pointer: {
-    workspace: {
-      setEditing: Dispatch<SetStateAction<EditingText | null>>
-    }
-  }
-  stage: {
-    blurTextEditor: () => void
-  }
-  view: {
-    findReplace: ReturnType<typeof useCanvasFindReplaceModel>['findReplace']
-    textEditor: ReturnType<typeof useCanvasTextEditorModel>['textEditor']
-  }
-}
-
 export function useCanvasAppTextModel({
   config,
   document,
   itemReadModel,
   selection,
   viewport,
-}: UseCanvasAppTextModelArgs): CanvasAppTextModel {
+}: UseCanvasAppTextModelArgs) {
   const editorRef = useRef<HTMLTextAreaElement | null>(null)
   const {
     blurTextEditor,
@@ -88,35 +54,11 @@ export function useCanvasAppTextModel({
     replaceDocumentText: document.replaceDocumentText,
   })
 
-  return {
-    command: {
-      setEditing,
-    },
-    component: {
-      interaction: {
-        setEditing,
-      },
-    },
-    extension: {
-      setEditing,
-    },
-    keyboard: {
-      interaction: {
-        setEditing,
-      },
-      openFindReplace,
-    },
-    pointer: {
-      workspace: {
-        setEditing,
-      },
-    },
-    stage: {
-      blurTextEditor,
-    },
-    view: {
-      findReplace,
-      textEditor,
-    },
-  }
+  return getCanvasAppTextConsumerModel({
+    blurTextEditor,
+    findReplace,
+    openFindReplace,
+    setEditing,
+    textEditor,
+  })
 }
