@@ -969,6 +969,9 @@ describe('Canvas module boundaries', () => {
     const creationPreviewFile = getSourceFile(
       'src/canvas/app/pointer/CanvasPointerCreationPreview.ts',
     )
+    const transformPreviewFile = getSourceFile(
+      'src/canvas/app/pointer/CanvasPointerTransformPreview.ts',
+    )
     const movementFile = getSourceFile(
       'src/canvas/app/pointer/CanvasPointerInteractionMovement.ts',
     )
@@ -985,10 +988,14 @@ describe('Canvas module boundaries', () => {
       "from './CanvasPointerCreationPreview'",
     )
     expect(previewFile.source).toContain(
+      "from './CanvasPointerTransformPreview'",
+    )
+    expect(previewFile.source).toContain(
       'export function previewCanvasPointerInteraction',
     )
-    expect(previewFile.source).toContain('getCanvasMoveSnap')
-    expect(previewFile.source).toContain('resizeCanvasSelection')
+    expect(previewFile.source).not.toContain('getCanvasMoveSnap')
+    expect(previewFile.source).not.toContain('resizeCanvasSelection')
+    expect(previewFile.source).not.toContain('moveCanvasSelection')
     expect(previewFile.source).toContain('getCanvasMarqueeSelection')
     expect(previewFile.source).not.toContain('getNextCanvasDrawingPoints')
     expect(previewFile.source).not.toContain('createCanvasDraftStroke')
@@ -998,6 +1005,13 @@ describe('Canvas module boundaries', () => {
     )
     expect(creationPreviewFile.source).toContain('getNextCanvasDrawingPoints')
     expect(creationPreviewFile.source).toContain('createCanvasDraftStroke')
+    expect(transformPreviewFile.source).toContain(
+      'export function previewCanvasPointerTransform',
+    )
+    expect(transformPreviewFile.source).toContain('getCanvasMoveSnap')
+    expect(transformPreviewFile.source).toContain('moveCanvasSelection')
+    expect(transformPreviewFile.source).toContain('resizeCanvasSelection')
+    expect(transformPreviewFile.source).toContain('snapCanvasPointToGrid')
     expect(movementFile.source).toContain(
       'export function hasCanvasInteractionMoved',
     )

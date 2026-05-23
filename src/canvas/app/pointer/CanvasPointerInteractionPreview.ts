@@ -10,10 +10,6 @@ import {
 import {
   EMPTY_CANVAS_SNAP_GUIDES,
   getCanvasMarqueeSelection,
-  getCanvasMoveSnap,
-  moveCanvasSelection,
-  resizeCanvasSelection,
-  snapCanvasPointToGrid,
   type CanvasAffordanceConfig,
   type CanvasDraftArrowOverlay,
   type CanvasDraftStrokeOverlay,
@@ -24,6 +20,7 @@ import {
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import type { Interaction } from './CanvasInteractionState'
 import { previewCanvasPointerCreation } from './CanvasPointerCreationPreview'
+import { previewCanvasPointerTransform } from './CanvasPointerTransformPreview'
 import { hasCanvasInteractionMoved } from './CanvasPointerInteractionMovement'
 
 export type CanvasPointerInteractionPreviewInput = {
@@ -82,98 +79,29 @@ export function previewCanvasPointerInteraction({
   }
 
   if (interaction.kind === 'move') {
-    if (!config.gestures.move) {
-      return { kind: 'none' }
-    }
-
-    const moved = hasCanvasInteractionMoved({
+    return previewCanvasPointerTransform({
+      config,
       currentScreen,
+      currentWorld,
+      input,
       interaction,
+      scene,
+      transformAdapter,
+      viewport,
     })
-
-    if (!moved) {
-      return { kind: 'none' }
-    }
-
-    const dx = currentWorld.x - interaction.startWorld.x
-    const dy = currentWorld.y - interaction.startWorld.y
-    const snap = interaction.bounds
-      ? getCanvasMoveSnap({
-          bounds: interaction.bounds,
-          config,
-          dx,
-          dy,
-          scene,
-          selection: interaction.ids,
-          viewport,
-        })
-      : {
-          ...EMPTY_CANVAS_SNAP_GUIDES,
-          dx,
-          dy,
-        }
-    const nextItems = moveCanvasSelection({
-      adapter: transformAdapter,
-      dx: snap.dx,
-      dy: snap.dy,
-      items: interaction.startItems,
-      selection: interaction.ids,
-    })
-
-    return {
-      interaction: {
-        ...interaction,
-        currentItems: nextItems,
-        moved: true,
-      },
-      kind: 'preview',
-      liveItems: nextItems,
-      snapGuides: {
-        alignmentGuides: snap.alignmentGuides,
-        spacingGuides: snap.spacingGuides,
-      },
-    }
   }
 
   if (interaction.kind === 'resize') {
-    if (!config.gestures.resize) {
-      return { kind: 'none' }
-    }
-
-    const moved = hasCanvasInteractionMoved({
-      currentScreen,
-      interaction,
-    })
-
-    if (!moved) {
-      return { kind: 'none' }
-    }
-
-    const snappedCurrentWorld = snapCanvasPointToGrid({
+    return previewCanvasPointerTransform({
       config,
-      point: currentWorld,
+      currentScreen,
+      currentWorld,
+      input,
+      interaction,
+      scene,
+      transformAdapter,
+      viewport,
     })
-    const nextItems = resizeCanvasSelection({
-      adapter: transformAdapter,
-      bounds: interaction.bounds,
-      handle: interaction.handle,
-      items: interaction.startItems,
-      point: snappedCurrentWorld,
-      preserveAspectRatio: input.shiftKey,
-      resizeFromCenter: input.altKey,
-      selection: interaction.ids,
-    })
-
-    return {
-      interaction: {
-        ...interaction,
-        currentItems: nextItems,
-        moved: true,
-      },
-      kind: 'preview',
-      liveItems: nextItems,
-      snapGuides: EMPTY_CANVAS_SNAP_GUIDES,
-    }
   }
 
   if (interaction.kind === 'marquee') {
