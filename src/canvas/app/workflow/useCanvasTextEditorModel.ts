@@ -11,6 +11,7 @@ import type {
 import type { CanvasAffordanceConfig } from '../../engine'
 import type { CanvasItemReadModel } from '../../host'
 import { useCanvasTextEditing } from '../text/useCanvasTextEditing'
+import type { CanvasTextEditorStyle } from '../text/CanvasTextEditingModel'
 import type { CommitCanvasItemsChange } from './CanvasWorkflowContract'
 
 type UseCanvasTextEditorModelArgs = {
@@ -28,7 +29,7 @@ type CanvasTextEditorModel = {
   textEditor: {
     editing: EditingText | null
     editorRef: RefObject<HTMLTextAreaElement | null>
-    style: ReturnType<typeof useCanvasTextEditing>['editorStyle']
+    style: CanvasTextEditorStyle | undefined
     visible: boolean
     onBlur: () => void
     onCancel: () => void

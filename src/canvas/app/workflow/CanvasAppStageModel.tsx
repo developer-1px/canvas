@@ -7,24 +7,12 @@ import type {
   CanvasAppStageRenderInput,
 } from '../rendering'
 import type { CanvasAppEventInput } from '../pointer/CanvasAppPointerInput'
+import type { CanvasAppPointerConsumerModel } from './CanvasAppPointerConsumerContracts'
 
 export type CanvasAppStageModelInput = {
   blurTextEditor: () => void
   itemLayer: Pick<CanvasAppItemLayerRenderInput, 'items' | 'selected'>
-  pointer: {
-    itemLayerHandlers: Pick<
-      CanvasAppItemLayerRenderInput,
-      'onItemPointerDown' | 'onTextDoubleClick'
-    >
-    stageHandlers: Pick<
-      CanvasAppStageRenderInput,
-      | 'onCanvasPointerDown'
-      | 'onPointerCancel'
-      | 'onPointerMove'
-      | 'onPointerUp'
-      | 'onResizePointerDown'
-    >
-  }
+  pointer: CanvasAppPointerConsumerModel
   rendering: Pick<
     CanvasAppItemLayerRenderInput,
     | 'componentPresentationRenderers'

@@ -144,6 +144,7 @@
 - Canvas App Inspector Model: App Model이 inspector panel list, read model, selection wiring 세부를 직접 알지 않도록 object inspector props를 만드는 workflow Module.
 - Canvas App Keyboard Model: App Model이 keyboard shortcut handler wiring 세부를 알지 않도록 command, interaction, viewport shortcut handlers를 조립하는 workflow Module.
 - Canvas App Pointer Model: App Model이 pointer down/drag hook 조립 세부를 알지 않도록 stage와 item layer pointer handlers를 만드는 workflow Module.
+- Canvas App Pointer Consumer Contracts: Pointer runtime을 item layer와 stage render consumer에 넘기는 handler bundle의 명시 Interface 계약을 소유하는 workflow Module.
 - Canvas App Pointer Consumer Model: Pointer runtime callbacks를 stage와 item layer consumer별 handler contract로 변환하는 workflow Module.
 - Canvas App Stage Model: stage와 item layer Adapter 입력 조립, 호출 순서, text editor blur, context menu 차단, render 실패 containment를 소유하는 workflow Module.
 - Canvas App Text Model: App Model이 textarea ref, text editor, find/replace runtime wiring 세부를 직접 알지 않도록 숨기는 workflow Module.
@@ -314,9 +315,11 @@
 - App Model은 inspector panel wiring 세부를 직접 알지 않고 Canvas App Inspector Model에서 object inspector props를 받는다.
 - App Model은 keyboard shortcut handler wiring 세부를 직접 알지 않고 Canvas App Keyboard Model에 위임한다.
 - App Model은 pointer down/drag hook 조립 세부를 직접 알지 않고 Canvas App Pointer Model에서 stage/item layer pointer handlers를 받는다. Pointer runtime 생성은 Canvas App Pointer Model이, consumer별 handler fan-out은 Canvas App Pointer Consumer Model이 소유한다.
+- Stage Model은 pointer handler shape를 rendering adapter input에서 역산하지 않고 Canvas App Pointer Consumer Contracts를 소비한다.
 - App Model은 stage/item layer Adapter 입력 조립, 호출 순서, context menu 차단, text editor blur timing, render 실패 containment를 직접 알지 않고 Canvas App Stage Model에 위임한다.
 - App Model은 textarea ref, text editor, find/replace wiring, editing state fan-out 세부를 직접 알지 않고 Canvas App Text Model에서 consumer별 text context와 view props를 받는다. Text editor/find-replace runtime 생성은 Canvas App Text Model이, consumer별 text fan-out은 Canvas App Text Consumer Model이 소유한다.
 - Text editing hook은 textarea focus/blur DOM lifecycle만 맡고, commit descriptor와 editor style projection은 Canvas Text Editing Model이 소유하며, editable item value 규칙은 Host Canvas Editable Text Item Module이 소유한다.
+- Text editor style은 hook return type에서 역산하지 않고 Canvas Text Editing Model의 `CanvasTextEditorStyle` 계약으로 소비한다.
 - Find/replace hook은 open/query/replacement state storage만 맡고, feature toggle gate, match count 계산, replace-all 실행 조건, panel props 구성은 Canvas Find Replace Model이 소유한다.
 - App Model은 wheel viewport listener, fit/reset/zoom control hook 조립, keyboard/control fan-out 세부를 직접 알지 않고 Canvas App Viewport Model에서 consumer별 viewport context를 받는다. Viewport listener/control runtime 생성은 Canvas App Viewport Model이, consumer별 viewport fan-out은 Canvas App Viewport Consumer Model이 소유한다.
 - Viewport control hook은 callback memoization만 맡고, fit target defaulting, missing bounds/rect no-op, reset, stage-center zoom 실행 규칙은 Canvas Viewport Control Execution이 소유한다.

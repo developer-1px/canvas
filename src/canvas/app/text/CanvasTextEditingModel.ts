@@ -18,7 +18,7 @@ type CommitCanvasTextEditingArgs = {
   setEditing: (nextEditing: EditingText | null) => void
 }
 
-type CanvasTextEditorStyle = {
+export type CanvasTextEditorStyle = {
   fontSize: number
   height: number
   left: number

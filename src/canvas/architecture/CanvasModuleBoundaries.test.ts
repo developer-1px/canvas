@@ -660,6 +660,9 @@ describe('Canvas module boundaries', () => {
     const stageModelFile = getSourceFile(
       'src/canvas/app/workflow/CanvasAppStageModel.tsx',
     )
+    const pointerConsumerContractsFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppPointerConsumerContracts.ts',
+    )
 
     expect(appModelFile.source).toContain("from './CanvasAppStageModel'")
     expect(appModelFile.source).not.toContain('adapter.renderStage(input)')
@@ -675,6 +678,27 @@ describe('Canvas module boundaries', () => {
     expect(appModelFile.source).not.toContain('onContextMenu')
     expect(stageModelFile.source).toContain(
       'export function renderCanvasAppStageModel',
+    )
+    expect(stageModelFile.source).toContain(
+      "from './CanvasAppPointerConsumerContracts'",
+    )
+    expect(stageModelFile.source).not.toContain(
+      "'onItemPointerDown' | 'onTextDoubleClick'",
+    )
+    expect(stageModelFile.source).not.toContain(
+      "| 'onCanvasPointerDown'",
+    )
+    expect(pointerConsumerContractsFile.source).toContain(
+      'export type CanvasAppPointerConsumerModel',
+    )
+    expect(pointerConsumerContractsFile.source).toContain(
+      'export type CanvasAppPointerItemLayerHandlers',
+    )
+    expect(pointerConsumerContractsFile.source).toContain(
+      'export type CanvasAppPointerStageHandlers',
+    )
+    expect(pointerConsumerContractsFile.source).not.toContain(
+      'getCanvasAppPointerConsumerModel',
     )
     expect(stageModelFile.source).toContain('adapter.renderStage(input)')
     expect(stageModelFile.source).toContain('adapter.renderItems(input)')
@@ -1021,6 +1045,9 @@ describe('Canvas module boundaries', () => {
     const pointerConsumerModelFile = getSourceFile(
       'src/canvas/app/workflow/CanvasAppPointerConsumerModel.ts',
     )
+    const pointerConsumerContractsFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppPointerConsumerContracts.ts',
+    )
 
     expect(appModelFile.source).toContain(
       "from './useCanvasAppPointerModel'",
@@ -1046,6 +1073,21 @@ describe('Canvas module boundaries', () => {
     expect(pointerModelFile.source).not.toContain('stageHandlers')
     expect(pointerConsumerModelFile.source).toContain(
       'export function getCanvasAppPointerConsumerModel',
+    )
+    expect(pointerConsumerModelFile.source).toContain(
+      "from './CanvasAppPointerConsumerContracts'",
+    )
+    expect(pointerConsumerModelFile.source).toContain(
+      '): CanvasAppPointerConsumerModel',
+    )
+    expect(pointerConsumerContractsFile.source).toContain(
+      'export type CanvasAppPointerConsumerModel',
+    )
+    expect(pointerConsumerContractsFile.source).toContain(
+      'onCanvasPointerDown',
+    )
+    expect(pointerConsumerContractsFile.source).not.toContain(
+      'downHandlers.handleCanvasPointerDown',
     )
     expect(pointerConsumerModelFile.source).toContain('itemLayerHandlers')
     expect(pointerConsumerModelFile.source).toContain('stageHandlers')
@@ -1287,6 +1329,9 @@ describe('Canvas module boundaries', () => {
     const textConsumerModelFile = getSourceFile(
       'src/canvas/app/workflow/CanvasAppTextConsumerModel.ts',
     )
+    const textEditorModelFile = getSourceFile(
+      'src/canvas/app/workflow/useCanvasTextEditorModel.ts',
+    )
     const textEditingHookFile = getSourceFile(
       'src/canvas/app/text/useCanvasTextEditing.ts',
     )
@@ -1357,11 +1402,19 @@ describe('Canvas module boundaries', () => {
     expect(textEditingHookFile.source).not.toContain("'Text'")
     expect(textEditingHookFile.source).not.toContain("type: 'set-text'")
     expect(textEditingHookFile.source).not.toContain('fontSize: 16')
+    expect(textEditorModelFile.source).toContain(
+      "from '../text/CanvasTextEditingModel'",
+    )
+    expect(textEditorModelFile.source).toContain('CanvasTextEditorStyle')
+    expect(textEditorModelFile.source).not.toContain('ReturnType<')
     expect(textEditingModelFile.source).toContain(
       'export function commitCanvasTextEditing',
     )
     expect(textEditingModelFile.source).toContain(
       'export function getCanvasTextEditorStyle',
+    )
+    expect(textEditingModelFile.source).toContain(
+      'export type CanvasTextEditorStyle',
     )
     expect(textEditingModelFile.source).toContain(
       'getCommittedCanvasEditableTextValue',

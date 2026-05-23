@@ -3,6 +3,7 @@ import type {
 } from '../../entities'
 import type { CanvasEditableTextItem } from '../../host'
 import type { CanvasAppPointerInput } from '../pointer/CanvasAppPointerInput'
+import type { CanvasAppPointerConsumerModel } from './CanvasAppPointerConsumerContracts'
 
 type CanvasAppPointerDownRuntime = {
   handleCanvasPointerDown: (event: CanvasAppPointerInput) => void
@@ -31,7 +32,7 @@ type GetCanvasAppPointerConsumerModelArgs = {
 export function getCanvasAppPointerConsumerModel({
   downHandlers,
   dragHandlers,
-}: GetCanvasAppPointerConsumerModelArgs) {
+}: GetCanvasAppPointerConsumerModelArgs): CanvasAppPointerConsumerModel {
   return {
     itemLayerHandlers: {
       onItemPointerDown: downHandlers.handleItemPointerDown,
