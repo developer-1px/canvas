@@ -36,6 +36,7 @@
 - Canvas App Custom Creation Tool Runtime: custom creation tool id 변환, toolbar state, lookup, shortcut matching을 소유하는 App-owned runtime Module.
 - Canvas App Custom Item Module Creation Tool: Module-owned creation descriptor. bounds/title/data만 반환하고 custom item `id`, `kind`, `presentation`, `type` envelope는 Module assembly가 만든다.
 - Canvas App Inspector Panel: 기본 bounds inspector를 수정하지 않고 제품별 선택 항목 정보를 렌더링하는 App-owned inspector descriptor.
+- Canvas App Inspector Panel Contracts: inspector panel descriptor shape와 id registry contract를 검증하는 App-owned contract Module.
 - Canvas App Inspector Panel Execution: inspector panel visibility/render 호출과 실패 시 omit containment를 소유하는 App-owned execution Module.
 - Canvas Custom Item: 제품별 item kind를 내부 `CanvasItem` union 확장 없이 저장하기 위한 안정 envelope. `kind`, `presentation`, JSON `data`, bounds를 가진다.
 - Canvas App Custom Item Module: 하나의 제품별 item kind에 필요한 presentation, renderer, validator, creation tool, inspector, command를 한 번에 등록하는 App-owned Module descriptor. Module `id`는 소유한 custom item kind다.
@@ -121,7 +122,7 @@
 - Canvas App Custom Creation Tool shortcut은 내부 canvas shortcut, shift-insensitive built-in shortcut, temporary pan, nudge shortcut, 다른 custom tool shortcut과 충돌하면 assembly 단계에서 실패해야 한다.
 - 제품별 renderer 스타일은 Canvas App Shell CSS에 두지 않고 Host App/Demo module이 소유한다.
 - 제품별 SVG renderer와 inspector panel 실행 실패는 캔버스 렌더를 깨지 않고 fallback/omit으로 containment 한다.
-- Canvas App Inspector Panel descriptor shape 검증과 visibility/render execution은 분리하고, 실행 실패 omit은 Canvas App Inspector Panel Execution이 소유한다.
+- Canvas App Inspector Panel descriptor shape 검증과 visibility/render execution은 분리하고, validation은 Canvas App Inspector Panel Contracts가, 실행 실패 omit은 Canvas App Inspector Panel Execution이 소유한다.
 - Custom item renderer 누락과 실행 실패는 Demo SVG Custom Item Render Fallback이 containment 한다.
 - App workflow는 Demo SVG Item Layer를 직접 생성하지 않고 Canvas App Item Layer Adapter를 통해 stage children을 만든다.
 - 제품별 inspector UI는 기본 Object Inspector를 수정하지 않고 Canvas App Inspector Panel로 등록한다.

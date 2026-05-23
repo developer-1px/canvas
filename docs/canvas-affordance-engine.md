@@ -50,6 +50,7 @@
 | `src/canvas/app/commands/CanvasAppCustomCommandContracts.ts` | Custom command descriptor shape와 id registry contract를 검증한다 |
 | `src/canvas/app/commands/CanvasAppCustomCommandExecution.ts` | Custom command toolbar state, availability, run 호출과 실패 containment를 소유한다 |
 | `src/canvas/app/inspector/CanvasAppInspectorPanels.ts` | 기본 bounds inspector를 수정하지 않고 제품별 선택 항목 패널을 등록하는 descriptor를 제공한다 |
+| `src/canvas/app/inspector/CanvasAppInspectorPanelContracts.ts` | Inspector panel descriptor shape와 id registry contract를 검증한다 |
 | `src/canvas/app/modules/CanvasAppCustomItemModules.ts` | 제품별 item kind에 필요한 creation tool, renderer, validator, inspector, command를 한 Module로 조립하고 registry/envelope를 내부에서 만든다 |
 | `src/canvas/app/modules/CanvasAppCustomItemModuleContracts.ts` | Custom item module descriptor, disabled module id, duplicate module id, assembled tool shortcut contract를 검증한다 |
 | `src/canvas/app/modules/CanvasAppCustomItemModuleRuntime.ts` | Module-owned creation tool envelope 생성, item validation, renderer/validator registry 변환과 실패 containment를 소유한다 |
@@ -184,7 +185,7 @@ type CanvasAffordanceConfig = {
 - Custom item authoring Interface는 `CanvasApp*Renderer*` 이름을 쓰고, `CanvasDemoSvg*` 구현명은 App rendering Adapter 내부에 둔다. Canvas App Rendering Contracts가 App-owned renderer type을 소유하고 Demo SVG registry type은 그 계약을 구현하는 내부 alias로 둔다.
 - Canvas App extension id와 registry key는 lower-kebab 안정 id만 허용한다. 잘못된 module id, command id, tool id, renderer key, validator key, inspector id는 define 또는 assembly 단계에서 실패한다.
 - Canvas App descriptor는 id뿐 아니라 필수 string/function/shortcut slot과 registry shape도 define 또는 assembly 단계에서 검증한다. malformed command, creation tool, inspector panel, renderer strategy는 등록 전에 실패하고, 실행 중 throw는 별도의 containment로 처리한다.
-- Canvas App Inspector Panel descriptor shape 검증과 visibility/render execution은 분리하고, 실행 실패 omit은 Canvas App Inspector Panel Execution이 소유한다.
+- Canvas App Inspector Panel descriptor shape 검증과 visibility/render execution은 분리하고, validation은 Canvas App Inspector Panel Contracts가, 실행 실패 omit은 Canvas App Inspector Panel Execution이 소유한다.
 - Custom item `kind`/`presentation`과 Component Template `id`/`presentation`도 같은 안정 id 계약을 따르며, 잘못된 persisted key는 Host validation 또는 component library 생성 단계에서 실패한다.
 - App workflow는 Demo SVG Item Layer를 직접 생성하지 않고 Canvas App Item Layer Adapter를 통해 stage children을 만든다.
 - App Shell은 concrete Renderer Stage를 직접 import하지 않고 Canvas App Stage Adapter가 만든 stage ReactNode를 배치한다.

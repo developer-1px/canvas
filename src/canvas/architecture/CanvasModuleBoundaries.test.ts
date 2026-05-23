@@ -465,6 +465,35 @@ describe('Canvas module boundaries', () => {
     )
   })
 
+  it('keeps App inspector panel contracts behind a named module', () => {
+    const descriptorFile = getSourceFile(
+      'src/canvas/app/inspector/CanvasAppInspectorPanels.ts',
+    )
+    const contractsFile = getSourceFile(
+      'src/canvas/app/inspector/CanvasAppInspectorPanelContracts.ts',
+    )
+
+    expect(descriptorFile.source).toContain(
+      "from './CanvasAppInspectorPanelContracts'",
+    )
+    expect(descriptorFile.source).not.toContain(
+      'function assertCanvasAppInspectorPanels',
+    )
+    expect(descriptorFile.source).not.toContain("field: 'render'")
+    expect(descriptorFile.source).not.toContain("field: 'isVisible'")
+    expect(descriptorFile.source).not.toContain(
+      'assertCanvasAppExtensionEntries',
+    )
+    expect(contractsFile.source).toContain(
+      'export function assertCanvasAppInspectorPanels',
+    )
+    expect(contractsFile.source).toContain("field: 'render'")
+    expect(contractsFile.source).toContain("field: 'isVisible'")
+    expect(contractsFile.source).toContain(
+      'assertCanvasAppExtensionEntries',
+    )
+  })
+
   it('keeps App custom command execution behind a named module', () => {
     const descriptorFile = getSourceFile(
       'src/canvas/app/commands/CanvasAppCustomCommands.ts',
