@@ -21,6 +21,10 @@ class MemoryStorage {
   setItem(key: string, value: string) {
     this.values.set(key, value)
   }
+
+  removeItem(key: string) {
+    this.values.delete(key)
+  }
 }
 
 describe('CanvasWorkspacePersistence', () => {
@@ -55,6 +59,15 @@ describe('CanvasWorkspacePersistence', () => {
         }),
       ),
     ).toBeNull()
+  })
+
+  test('removes invalid stored workspace snapshots after read', () => {
+    const storage = new MemoryStorage()
+
+    storage.setItem(CANVAS_WORKSPACE_STORAGE_KEY, '{')
+
+    expect(readStoredCanvasWorkspace(storage)).toBeNull()
+    expect(storage.getItem(CANVAS_WORKSPACE_STORAGE_KEY)).toBeNull()
   })
 
   test('writes and reads the workspace snapshot', () => {
@@ -99,14 +112,18 @@ describe('CanvasWorkspacePersistence', () => {
       version: 1,
       viewport: { scale: 1, x: 0, y: 0 },
     })
+    const storage = new MemoryStorage()
+
+    storage.setItem(CANVAS_WORKSPACE_STORAGE_KEY, storedValue)
 
     expect(
-      parseCanvasWorkspaceSnapshot(storedValue, {
+      readStoredCanvasWorkspace(storage, {
         customItemValidators: {
           risk: (item) => item.data.severity === 'low',
         },
       }),
     ).toBeNull()
+    expect(storage.getItem(CANVAS_WORKSPACE_STORAGE_KEY)).toBeNull()
     expect(
       parseCanvasWorkspaceSnapshot(storedValue, {
         customItemValidators: {

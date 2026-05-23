@@ -20,7 +20,8 @@ export const CANVAS_WORKSPACE_STORAGE_KEY =
 const CANVAS_WORKSPACE_VERSION = 1
 const SAVE_DELAY_MS = 120
 
-type CanvasWorkspaceStorage = Pick<Storage, 'getItem' | 'setItem'>
+type CanvasWorkspaceStorage = Pick<Storage, 'getItem' | 'setItem'> &
+  Partial<Pick<Storage, 'removeItem'>>
 
 export type CanvasWorkspaceSnapshot = {
   items: CanvasItem[]
@@ -64,11 +65,16 @@ export function readStoredCanvasWorkspace(
   }
 
   try {
-    return parseCanvasWorkspaceSnapshot(
-      storage.getItem(CANVAS_WORKSPACE_STORAGE_KEY),
-      validation,
-    )
+    const value = storage.getItem(CANVAS_WORKSPACE_STORAGE_KEY)
+    const snapshot = parseCanvasWorkspaceSnapshot(value, validation)
+
+    if (!snapshot && value !== null) {
+      removeStoredCanvasWorkspace(storage)
+    }
+
+    return snapshot
   } catch {
+    removeStoredCanvasWorkspace(storage)
     return null
   }
 }
@@ -88,6 +94,16 @@ export function writeStoredCanvasWorkspace(
     )
   } catch {
     // Storage can fail in private mode or when the quota is full.
+  }
+}
+
+export function removeStoredCanvasWorkspace(
+  storage: CanvasWorkspaceStorage | null = getCanvasWorkspaceStorage(),
+) {
+  try {
+    storage?.removeItem?.(CANVAS_WORKSPACE_STORAGE_KEY)
+  } catch {
+    // Storage can fail in private mode or when access is denied.
   }
 }
 
