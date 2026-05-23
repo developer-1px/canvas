@@ -7,6 +7,7 @@
 - Feature Toggle: Affordance를 켜거나 끄는 설정. 모든 Affordance는 기본적으로 toggle 뒤에 있어야 한다.
 - Host App: 엔진을 사용하는 실제 제품. 데이터 모델, 저장, 도메인 명령, 화면 구성을 소유한다.
 - Core Contract: 특정 Host App, Renderer, React 상태에 묶이지 않는 재사용 부품의 입력과 출력 계약.
+- Canvas Stable Id: persisted kind, presentation key, registry key에 쓰는 lower-kebab 문자열 계약.
 - Entities Contract: 런타임 구현 없이 Core geometry type과 Demo canvas item type을 노출하는 type-only 계약.
 - Engine Public Facade: Host App, Demo App, UI, Renderer Adapter가 Engine을 사용할 때 import하는 안정된 Module 경계.
 - Host Document Controller: Demo `CanvasItem` 문서의 history, selection, clipboard, text search, item commit을 React와 zod-crud 세부 구현 없이 제공하는 Module.
@@ -15,7 +16,9 @@
 - Canvas Component Library: Demo component template, presentation key, component item 생성을 함께 제공하는 Module.
 - Canvas Component Presentation: Demo component kind를 Renderer Adapter의 그리기 전략과 연결하는 key. 새 component kind는 기존 presentation을 재사용할 수 있다.
 - Canvas App Assembly: 내부 캔버스 문법은 유지하면서 Host item adapter, component library, initial items, SVG presentation registry 같은 제품별 의미를 외부에서 조립하는 composition Module.
+- Canvas App Assembly Input: Canvas App Assembly output을 `Partial`로 노출하지 않고 Host가 조립할 수 있는 필드만 명시한 외부 입력 계약.
 - Canvas App Extension Id: custom command, creation tool, item module, component presentation renderer key, custom item renderer key, validator key, inspector panel에서 공유하는 안정 lower-kebab 외부 계약.
+- Canvas App Extension Registry: assembly 단계에서 extension entry와 record key를 검증하고 중복을 실패시키는 내부 merge 계약.
 - Canvas App Custom Command: 내부 command grammar를 수정하지 않고 제품별 business action을 toolbar action으로 등록하는 App-owned command descriptor.
 - Canvas App Custom Creation Tool: 내부 tool grammar를 수정하지 않고 제품별 item 생성 도구를 toolbar, shortcut, pointer lifecycle에 등록하는 App-owned tool descriptor.
 - Canvas App Inspector Panel: 기본 bounds inspector를 수정하지 않고 제품별 선택 항목 정보를 렌더링하는 App-owned inspector descriptor.
@@ -46,15 +49,18 @@
 - Renderer Stage는 Demo `CanvasItem`, Host read model, component library를 import하지 않는다.
 - Demo item SVG 렌더링은 App의 Demo SVG Item Layer Adapter가 소유한다.
 - 안정 entity type은 `src/canvas/entities`에서 import한다.
+- persisted kind와 registry key는 Canvas Stable Id 형식을 사용한다.
 - 모든 기능은 on/off 가능해야 한다.
 - 새 Demo component kind가 기존 presentation을 재사용하면 Canvas Component Library만 수정한다.
 - 새 Demo component kind와 새 SVG presentation은 Canvas App Assembly에서 component library와 presentation registry를 조립해 붙인다.
+- Canvas App Assembly input은 output type을 부분 노출하지 않고 명시적 필드 계약으로 유지한다.
 - 제품별 business action은 Engine command union에 넣지 않고 Canvas App Custom Command로 등록한다.
 - 제품별 creation tool은 내부 Tool union에 구체 id를 넣지 않고 Canvas App Custom Creation Tool로 등록한다.
 - 제품별 item kind는 내부 `CanvasItem` union에 새 variant를 추가하지 않고 Canvas App Custom Item Module로 등록한다.
 - Demo custom item module은 `src/demo/custom-items/<name>/index.ts` convention으로 자동 수집한다.
 - Demo custom item module은 `src/canvas/app/workflow` public entry만 사용하고 app 내부 파일을 직접 import하지 않는다.
 - Canvas App extension id와 registry key는 lower-kebab 안정 id만 허용하고, 잘못된 id는 define/assembly 단계에서 실패해야 한다.
+- Canvas Custom Item의 `kind`와 `presentation`, Canvas Component Template의 `id`와 `presentation`도 같은 안정 id 계약을 따라야 한다.
 - Canvas App Custom Item Module과 직접 assembly input의 extension key가 겹치면 assembly 단계에서 실패해야 한다.
 - Canvas App Custom Item Module은 `disabledCustomItemModuleIds`로 Host App에서 끌 수 있어야 하며, 알 수 없는 id는 실패해야 한다.
 - Canvas App Custom Creation Tool shortcut은 내부 canvas shortcut, shift-insensitive built-in shortcut, temporary pan, nudge shortcut, 다른 custom tool shortcut과 충돌하면 assembly 단계에서 실패해야 한다.

@@ -1,10 +1,9 @@
-const CANVAS_APP_EXTENSION_ID_PATTERN = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/
+import {
+  isCanvasStableId,
+  type CanvasStableId,
+} from '../../core'
 
-declare const canvasAppExtensionIdBrand: unique symbol
-
-export type CanvasAppExtensionId = string & {
-  readonly [canvasAppExtensionIdBrand]: true
-}
+export type CanvasAppExtensionId = CanvasStableId
 
 export type CanvasAppExtensionEntry = {
   id: string
@@ -13,7 +12,7 @@ export type CanvasAppExtensionEntry = {
 export function isCanvasAppExtensionId(
   id: string,
 ): id is CanvasAppExtensionId {
-  return CANVAS_APP_EXTENSION_ID_PATTERN.test(id)
+  return isCanvasStableId(id)
 }
 
 export function assertCanvasAppExtensionId({

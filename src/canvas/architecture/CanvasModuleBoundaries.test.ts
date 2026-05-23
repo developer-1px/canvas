@@ -109,6 +109,20 @@ describe('Canvas module boundaries', () => {
     expect(violations).toEqual([])
   })
 
+  it('keeps Canvas App Assembly input explicit instead of mirroring output', () => {
+    const violations = sourceFiles
+      .filter((file) =>
+        file.path === 'src/canvas/app/workflow/CanvasAppAssembly.ts',
+      )
+      .flatMap((file) =>
+        file.source.includes('Partial<CanvasAppAssembly>')
+          ? [file.path]
+          : [],
+      )
+
+    expect(violations).toEqual([])
+  })
+
   it('keeps product-specific custom item ids outside canvas implementation', () => {
     const productCustomTerms =
       /\b(risk|risk-node|custom:risk|demo-risk-text)\b|kind:\s*['"]risk['"]/

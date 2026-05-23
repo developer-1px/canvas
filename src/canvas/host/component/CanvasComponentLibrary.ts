@@ -1,4 +1,7 @@
-import type { Point } from '../../core'
+import {
+  assertCanvasStableId,
+  type Point,
+} from '../../core'
 import type {
   CanvasComponentItem,
   CanvasComponentKind,
@@ -215,6 +218,8 @@ export function createCanvasComponentLibrary({
     throw new Error('Canvas component library requires at least one template')
   }
 
+  assertCanvasComponentTemplateContracts(templates)
+
   return {
     createItem: (input) => createCanvasComponentItem({ ...input, templates }),
     getPresentation: (id) =>
@@ -225,3 +230,26 @@ export function createCanvasComponentLibrary({
 }
 
 export const CANVAS_COMPONENT_LIBRARY = createCanvasComponentLibrary()
+
+function assertCanvasComponentTemplateContracts(
+  templates: readonly CanvasComponentTemplate[],
+) {
+  const templateIds = new Set<string>()
+
+  for (const template of templates) {
+    assertCanvasStableId({
+      id: template.id,
+      label: 'component template',
+    })
+    assertCanvasStableId({
+      id: template.presentation,
+      label: 'component presentation',
+    })
+
+    if (templateIds.has(template.id)) {
+      throw new Error(`Duplicate canvas component template: ${template.id}`)
+    }
+
+    templateIds.add(template.id)
+  }
+}

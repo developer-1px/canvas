@@ -18,10 +18,11 @@ import {
   type CanvasDemoSvgCustomItemRenderers,
 } from '../rendering'
 import type { CanvasAppCustomCommand } from '../commands/CanvasAppCustomCommands'
+import { assertCanvasAppExtensionRecordKeys } from '../extensions/CanvasAppExtensionIds'
 import {
-  assertCanvasAppExtensionEntries,
-  assertCanvasAppExtensionRecordKeys,
-} from '../extensions/CanvasAppExtensionIds'
+  appendUniqueCanvasAppExtensionEntries,
+  mergeUniqueCanvasAppExtensionRecord,
+} from '../extensions/CanvasAppExtensionRegistries'
 import type { CanvasAppInspectorPanel } from '../inspector/CanvasAppInspectorPanels'
 import {
   createCanvasAppCustomItemModuleAssembly,
@@ -51,9 +52,18 @@ export type CanvasAppAssembly = {
   itemAdapters: CanvasAppItemAdapters
 }
 
-export type CanvasAppAssemblyInput = Partial<CanvasAppAssembly> & {
+export type CanvasAppAssemblyInput = {
+  componentLibrary?: CanvasComponentLibrary
+  componentPresentationRenderers?: CanvasDemoSvgComponentPresentationRenderers
+  customCommands?: readonly CanvasAppCustomCommand[]
+  customCreationTools?: readonly CanvasAppCustomCreationTool[]
   customItemModules?: readonly CanvasAppCustomItemModule[]
+  customItemRenderers?: CanvasDemoSvgCustomItemRenderers
+  customItemValidators?: CanvasCustomItemValidators
   disabledCustomItemModuleIds?: CanvasAppCustomItemModuleAssemblyOptions['disabledModuleIds']
+  initialItems?: CanvasItem[]
+  inspectorPanels?: readonly CanvasAppInspectorPanel[]
+  itemAdapters?: CanvasAppItemAdapters
 }
 
 export const DEFAULT_CANVAS_APP_ASSEMBLY: CanvasAppAssembly = {
@@ -83,45 +93,50 @@ export function createCanvasAppAssembly(
     componentPresentationRenderers:
       input.componentPresentationRenderers ??
       DEFAULT_CANVAS_APP_ASSEMBLY.componentPresentationRenderers,
-    customCommands: appendUniqueById({
+    customCommands: appendUniqueCanvasAppExtensionEntries({
       current: [
         ...DEFAULT_CANVAS_APP_ASSEMBLY.customCommands,
         ...customItemModuleAssembly.customCommands,
       ],
       entries: input.customCommands ?? [],
       label: 'custom command',
+      owner: 'app assembly',
     }),
-    customCreationTools: appendUniqueById({
+    customCreationTools: appendUniqueCanvasAppExtensionEntries({
       current: [
         ...DEFAULT_CANVAS_APP_ASSEMBLY.customCreationTools,
         ...customItemModuleAssembly.customCreationTools,
       ],
       entries: input.customCreationTools ?? [],
       label: 'custom creation tool',
+      owner: 'app assembly',
     }),
-    customItemRenderers: mergeUniqueRecord({
+    customItemRenderers: mergeUniqueCanvasAppExtensionRecord({
       current: {
         ...DEFAULT_CANVAS_APP_ASSEMBLY.customItemRenderers,
         ...customItemModuleAssembly.customItemRenderers,
       },
       entries: input.customItemRenderers ?? {},
       label: 'custom item renderer',
+      owner: 'app assembly',
     }),
-    customItemValidators: mergeUniqueRecord({
+    customItemValidators: mergeUniqueCanvasAppExtensionRecord({
       current: {
         ...DEFAULT_CANVAS_APP_ASSEMBLY.customItemValidators,
         ...customItemModuleAssembly.customItemValidators,
       },
       entries: input.customItemValidators ?? {},
       label: 'custom item validator',
+      owner: 'app assembly',
     }),
-    inspectorPanels: appendUniqueById({
+    inspectorPanels: appendUniqueCanvasAppExtensionEntries({
       current: [
         ...DEFAULT_CANVAS_APP_ASSEMBLY.inspectorPanels,
         ...customItemModuleAssembly.inspectorPanels,
       ],
       entries: input.inspectorPanels ?? [],
       label: 'inspector panel',
+      owner: 'app assembly',
     }),
     initialItems: input.initialItems ?? DEFAULT_CANVAS_APP_ASSEMBLY.initialItems,
     itemAdapters: input.itemAdapters ?? DEFAULT_CANVAS_APP_ASSEMBLY.itemAdapters,
@@ -134,65 +149,4 @@ export function createCanvasAppAssembly(
   assertCanvasAppCustomCreationTools(assembly.customCreationTools)
 
   return assembly
-}
-
-function appendUniqueById<TEntry extends { id: string }>({
-  current,
-  entries,
-  label,
-}: {
-  current: readonly TEntry[]
-  entries: readonly TEntry[]
-  label: string
-}) {
-  assertCanvasAppExtensionEntries({
-    entries: current,
-    label,
-  })
-  assertCanvasAppExtensionEntries({
-    entries,
-    label,
-  })
-
-  const ids = new Set(current.map((entry) => entry.id))
-
-  for (const entry of entries) {
-    if (ids.has(entry.id)) {
-      throw new Error(`Duplicate canvas app assembly ${label}: ${entry.id}`)
-    }
-
-    ids.add(entry.id)
-  }
-
-  return [...current, ...entries]
-}
-
-function mergeUniqueRecord<TValue>({
-  current,
-  entries,
-  label,
-}: {
-  current: Readonly<Record<string, TValue>>
-  entries: Readonly<Record<string, TValue>>
-  label: string
-}) {
-  assertCanvasAppExtensionRecordKeys({
-    entries: current,
-    label,
-  })
-  assertCanvasAppExtensionRecordKeys({
-    entries,
-    label,
-  })
-
-  for (const key of Object.keys(entries)) {
-    if (Object.hasOwn(current, key)) {
-      throw new Error(`Duplicate canvas app assembly ${label}: ${key}`)
-    }
-  }
-
-  return {
-    ...current,
-    ...entries,
-  }
 }

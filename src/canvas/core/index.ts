@@ -12,6 +12,12 @@ export type {
 } from './CanvasCoreTypes'
 export { isCanvasCustomToolId } from './CanvasCoreTypes'
 export {
+  assertCanvasStableId,
+  assertCanvasStableIdRecordKeys,
+  isCanvasStableId,
+  type CanvasStableId,
+} from './CanvasStableIds'
+export {
   DRAG_THRESHOLD,
   INITIAL_VIEWPORT,
   MAX_SCALE,

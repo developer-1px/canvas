@@ -5,6 +5,10 @@ import {
   assertCanvasAppExtensionId,
   assertCanvasAppExtensionRecordKeys,
 } from '../extensions/CanvasAppExtensionIds'
+import {
+  appendUniqueCanvasAppExtensionEntries,
+  mergeUniqueCanvasAppExtensionRecord,
+} from '../extensions/CanvasAppExtensionRegistries'
 import type { CanvasAppInspectorPanel } from '../inspector/CanvasAppInspectorPanels'
 import type { CanvasDemoSvgCustomItemRenderers } from '../rendering'
 import {
@@ -65,30 +69,35 @@ export function createCanvasAppCustomItemModuleAssembly(
 
   const assembly = enabledModules.reduce<CanvasAppCustomItemModuleAssembly>(
     (assembly, module) => ({
-      customCommands: appendUniqueById({
+      customCommands: appendUniqueCanvasAppExtensionEntries({
         current: assembly.customCommands,
         entries: module.customCommands ?? [],
         label: 'custom command',
+        owner: 'custom item module',
       }),
-      customCreationTools: appendUniqueById({
+      customCreationTools: appendUniqueCanvasAppExtensionEntries({
         current: assembly.customCreationTools,
         entries: module.customCreationTools ?? [],
         label: 'custom creation tool',
+        owner: 'custom item module',
       }),
-      customItemRenderers: mergeUniqueRecord({
+      customItemRenderers: mergeUniqueCanvasAppExtensionRecord({
         current: assembly.customItemRenderers,
         entries: module.customItemRenderers ?? {},
         label: 'custom item renderer',
+        owner: 'custom item module',
       }),
-      customItemValidators: mergeUniqueRecord({
+      customItemValidators: mergeUniqueCanvasAppExtensionRecord({
         current: assembly.customItemValidators,
         entries: module.customItemValidators ?? {},
         label: 'custom item validator',
+        owner: 'custom item module',
       }),
-      inspectorPanels: appendUniqueById({
+      inspectorPanels: appendUniqueCanvasAppExtensionEntries({
         current: assembly.inspectorPanels,
         entries: module.inspectorPanels ?? [],
         label: 'inspector panel',
+        owner: 'custom item module',
       }),
     }),
     {
@@ -153,66 +162,5 @@ function assertKnownDisabledModuleIds(
     if (!ids.has(disabledModuleId)) {
       throw new Error(`Unknown disabled canvas custom item module: ${disabledModuleId}`)
     }
-  }
-}
-
-function appendUniqueById<TEntry extends { id: string }>({
-  current,
-  entries,
-  label,
-}: {
-  current: readonly TEntry[]
-  entries: readonly TEntry[]
-  label: string
-}) {
-  assertCanvasAppExtensionEntries({
-    entries: current,
-    label,
-  })
-  assertCanvasAppExtensionEntries({
-    entries,
-    label,
-  })
-
-  const ids = new Set(current.map((entry) => entry.id))
-
-  for (const entry of entries) {
-    if (ids.has(entry.id)) {
-      throw new Error(`Duplicate canvas custom item module ${label}: ${entry.id}`)
-    }
-
-    ids.add(entry.id)
-  }
-
-  return [...current, ...entries]
-}
-
-function mergeUniqueRecord<TValue>({
-  current,
-  entries,
-  label,
-}: {
-  current: Readonly<Record<string, TValue>>
-  entries: Readonly<Record<string, TValue>>
-  label: string
-}) {
-  assertCanvasAppExtensionRecordKeys({
-    entries: current,
-    label,
-  })
-  assertCanvasAppExtensionRecordKeys({
-    entries,
-    label,
-  })
-
-  for (const key of Object.keys(entries)) {
-    if (Object.hasOwn(current, key)) {
-      throw new Error(`Duplicate canvas custom item module ${label}: ${key}`)
-    }
-  }
-
-  return {
-    ...current,
-    ...entries,
   }
 }

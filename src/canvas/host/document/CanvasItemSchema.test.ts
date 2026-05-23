@@ -37,6 +37,36 @@ describe('CanvasItemSchema custom items', () => {
     ).toThrow()
   })
 
+  it('rejects custom item kind and presentation keys outside the stable id contract', () => {
+    expect(() =>
+      validateCanvasItems([
+        {
+          ...customItem,
+          kind: 'Risk',
+        },
+      ]),
+    ).toThrow()
+
+    expect(() =>
+      validateCanvasItems([
+        {
+          ...customItem,
+          presentation: 'Risk Node',
+        },
+      ]),
+    ).toThrow()
+  })
+
+  it('rejects custom item validator keys outside the stable id contract', () => {
+    expect(() =>
+      validateCanvasItems([customItem], {
+        customItemValidators: {
+          Risk: () => true,
+        },
+      }),
+    ).toThrow('Invalid canvas custom item validator id: Risk')
+  })
+
   it('runs product-owned custom item validators by kind', () => {
     expect(() =>
       validateCanvasItems([customItem], {

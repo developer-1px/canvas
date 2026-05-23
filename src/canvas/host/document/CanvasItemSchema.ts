@@ -1,4 +1,8 @@
 import * as z from 'zod'
+import {
+  assertCanvasStableIdRecordKeys,
+  isCanvasStableId,
+} from '../../core'
 import type {
   CanvasCustomItem,
   CanvasItem,
@@ -21,6 +25,13 @@ export function validateCanvasItems(
   items: CanvasItem[],
   options: CanvasItemValidationOptions = {},
 ) {
+  const customItemValidators = options.customItemValidators ?? {}
+
+  assertCanvasStableIdRecordKeys({
+    entries: customItemValidators,
+    label: 'custom item validator',
+  })
+
   const syncedItems = syncCanvasItems(items)
   const parsed = CanvasItemsSchema.safeParse(syncedItems)
 
@@ -28,7 +39,7 @@ export function validateCanvasItems(
     throw parsed.error
   }
 
-  assertCustomCanvasItems(parsed.data, options.customItemValidators ?? {})
+  assertCustomCanvasItems(parsed.data, customItemValidators)
 
   return parsed.data
 }
@@ -100,7 +111,9 @@ function isCanvasItem(value: unknown): value is CanvasItem {
   if (value.type === 'custom') {
     return (
       typeof value.kind === 'string' &&
+      isCanvasStableId(value.kind) &&
       typeof value.presentation === 'string' &&
+      isCanvasStableId(value.presentation) &&
       typeof value.title === 'string' &&
       isJsonRecord(value.data)
     )

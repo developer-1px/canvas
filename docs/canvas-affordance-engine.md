@@ -30,6 +30,7 @@
 | `src/canvas/architecture/CanvasModuleBoundaries.test.ts` | Module seam import 규칙을 회귀 테스트로 검증한다 |
 | `src/canvas/app/shell` | CanvasApp composition과 shell style |
 | `src/canvas/app/extensions/CanvasAppExtensionIds.ts` | 제품별 descriptor와 registry key가 공유하는 lower-kebab 안정 id 계약을 검증한다 |
+| `src/canvas/app/extensions/CanvasAppExtensionRegistries.ts` | assembly 단계에서 extension entry와 record key 검증, 중복 실패 처리를 한 내부 계약으로 제공한다 |
 | `src/canvas/app/rendering` | Demo `CanvasItem` tree를 SVG item layer로 바꾸는 App-owned Adapter |
 | `src/canvas/app/rendering/CanvasDemoSvgComponentPresentationRegistry.ts` | Demo component presentation key와 SVG rendering strategy를 외부 조립 가능한 registry로 연결한다 |
 | `src/canvas/app/rendering/CanvasDemoSvgCustomItemRendererRegistry.tsx` | Custom item presentation key와 SVG rendering strategy를 외부 조립 가능한 registry로 연결한다 |
@@ -48,6 +49,7 @@
 | `src/canvas/app/workflow/useCanvasWorkspaceModel.ts` | 저장된 workspace snapshot, document history, viewport, read model, id 생성을 App Shell에 숨긴다 |
 | `src/canvas/app/pointer/CanvasPointerGeometry.ts` | DOM/SVG pointer 좌표 변환 |
 | `src/canvas/core` | Host item과 renderer를 모르는 geometry, viewport, id, primitive math 같은 재사용 계약 |
+| `src/canvas/core/CanvasStableIds.ts` | persisted kind, presentation key, registry key에 쓰는 lower-kebab 안정 id 계약 |
 | `src/canvas/entities` | Core geometry와 Demo canvas item의 안정적인 type-only entity 계약 |
 | `src/canvas/engine` | Host item과 renderer를 모르는 조작 규칙. 외부 소비자는 `src/canvas/engine` public facade를 사용한다 |
 | `src/canvas/engine/snap` | Grid, alignment, spacing snap과 guide 계산 |
@@ -118,6 +120,7 @@ type CanvasAffordanceConfig = {
 - App Shell은 workspace 저장, initial item seed, read model 생성, id seed 계산을 직접 import하지 않는다. Canvas Workspace Model을 통해 사용한다.
 - App workflow는 `CANVAS_ITEM_ENGINE_ADAPTERS`를 통해 concrete item adapter를 주입한다.
 - App workflow는 Canvas App Assembly를 통해 concrete item adapter, component library, custom command, inspector panel, initial items, presentation registry를 주입받는다.
+- Canvas App Assembly input은 output type의 `Partial`이 아니라 Host가 조립할 수 있는 필드만 명시한 외부 입력 계약이다.
 - App과 UI는 Renderer Adapter 내부 파일을 import하지 않는다. SVG stage는 `src/canvas/renderer` public facade에서 사용한다.
 - Renderer Adapter는 `CanvasOverlayState`와 주입된 item layer를 받아 SVG로 배치하며, Engine은 SVG/DOM 구현을 모른다.
 - Renderer Stage는 Demo `CanvasItem`, Host read model, Canvas Component Library를 import하지 않는다.
@@ -129,6 +132,7 @@ type CanvasAffordanceConfig = {
 - Demo custom item module은 `src/demo/custom-items/<name>/index.ts`에서 default export하면 자동 수집된다.
 - Demo custom item module은 `src/canvas/app/workflow` public entry만 사용하고 app 내부 파일을 직접 import하지 않는다.
 - Canvas App extension id와 registry key는 lower-kebab 안정 id만 허용한다. 잘못된 module id, command id, tool id, renderer key, validator key, inspector id는 define 또는 assembly 단계에서 실패한다.
+- Custom item `kind`/`presentation`과 Component Template `id`/`presentation`도 같은 안정 id 계약을 따르며, 잘못된 persisted key는 Host validation 또는 component library 생성 단계에서 실패한다.
 - Custom Item Module 간 module id, tool id, renderer key, validator key, inspector id, command id가 겹치면 조용히 덮어쓰지 않고 assembly 단계에서 실패한다.
 - Custom Item Module과 직접 Canvas App Assembly input 간 extension key가 겹쳐도 assembly 단계에서 실패한다.
 - Host App은 `disabledCustomItemModuleIds`로 custom item module을 끌 수 있고, 알 수 없는 module id를 끄려고 하면 assembly 단계에서 실패한다.

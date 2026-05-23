@@ -89,4 +89,41 @@ describe('CANVAS_COMPONENT_LIBRARY', () => {
       y: 20,
     })
   })
+
+  it('rejects component template ids outside the stable id contract', () => {
+    expect(() =>
+      createCanvasComponentLibrary({
+        templates: [
+          {
+            ...CANVAS_COMPONENT_LIBRARY.templates[0],
+            id: 'Risk',
+          },
+        ],
+      }),
+    ).toThrow('Invalid canvas component template id: Risk')
+  })
+
+  it('rejects component presentation keys outside the stable id contract', () => {
+    expect(() =>
+      createCanvasComponentLibrary({
+        templates: [
+          {
+            ...CANVAS_COMPONENT_LIBRARY.templates[0],
+            presentation: 'Risk Card',
+          },
+        ],
+      }),
+    ).toThrow('Invalid canvas component presentation id: Risk Card')
+  })
+
+  it('rejects duplicate component template ids', () => {
+    expect(() =>
+      createCanvasComponentLibrary({
+        templates: [
+          CANVAS_COMPONENT_LIBRARY.templates[0],
+          CANVAS_COMPONENT_LIBRARY.templates[0],
+        ],
+      }),
+    ).toThrow('Duplicate canvas component template: sticky')
+  })
 })

@@ -27,7 +27,7 @@ The canvas code is intended to work as a reusable component factory, not as one 
 5. Host document behavior is exposed through the explicit `CanvasDocumentController` interface. zod-crud document, JSON Patch, selection snapshot, and clipboard internals stay inside `src/canvas/host/document`.
 6. Product-specific item kinds use the stable `custom` item storage envelope with JSON `data`, `kind`, and `presentation`. The SVG renderer resolves presentation through an injected custom item renderer registry, and the Host document controller runs injected validators by `kind`.
 7. `CanvasAppCustomItemModule` bundles the creation tool, renderer, validator, inspector panel, and commands for one product-specific item kind so adding a new kind has one definition unit. Each module has a stable `id`, can be disabled by Host App assembly, and duplicate or unknown extension keys fail at assembly time instead of being overwritten or ignored. Custom creation tool shortcuts also fail at assembly time when they conflict with internal canvas shortcuts or other custom tools.
-8. Canvas App extension ids and registry keys use a shared lower-kebab contract. Invalid module ids, command ids, tool ids, renderer keys, validator keys, and inspector panel ids fail at define or assembly time.
+8. Canvas App extension ids, registry keys, custom item `kind`/`presentation`, and component template `id`/`presentation` use a shared lower-kebab stable id contract. Invalid module ids, command ids, tool ids, renderer keys, validator keys, inspector panel ids, persisted custom item keys, and component template keys fail at define, validation, library creation, or assembly time.
 9. Architecture guardrails verify the seams with tests.
 
 ## Consequences
