@@ -1473,6 +1473,26 @@ describe('Canvas module boundaries', () => {
     expect(violations).toEqual([])
   })
 
+  it('keeps Host document change patch grammar behind a named module', () => {
+    const changesFile = getSourceFile(
+      'src/canvas/host/document/CanvasDocumentChanges.ts',
+    )
+    const changePatchFile = getSourceFile(
+      'src/canvas/host/document/CanvasDocumentChangePatch.ts',
+    )
+
+    expect(changesFile.source).toContain("from './CanvasDocumentChangePatch'")
+    expect(changesFile.source).not.toContain('switch (change.type)')
+    expect(changesFile.source).not.toContain('createRemoveCanvasItemsPatch')
+    expect(changesFile.source).not.toContain('createReorderCanvasItemsPatch')
+    expect(changePatchFile.source).toContain(
+      'export function createCanvasItemsChangePatch',
+    )
+    expect(changePatchFile.source).toContain('switch (change.type)')
+    expect(changePatchFile.source).toContain('createRemoveCanvasItemsPatch')
+    expect(changePatchFile.source).toContain('createReorderCanvasItemsPatch')
+  })
+
   it('keeps Host document reorder patch moves behind a named module', () => {
     const patchesFile = getSourceFile(
       'src/canvas/host/document/CanvasDocumentPatches.ts',
