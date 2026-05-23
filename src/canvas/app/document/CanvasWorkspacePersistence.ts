@@ -11,8 +11,11 @@ export const CANVAS_WORKSPACE_STORAGE_KEY =
 
 const SAVE_DELAY_MS = 120
 
-type CanvasWorkspaceStorage = Pick<Storage, 'getItem' | 'setItem'> &
-  Partial<Pick<Storage, 'removeItem'>>
+export type CanvasWorkspaceStorage = {
+  getItem: (key: string) => string | null
+  removeItem?: (key: string) => void
+  setItem: (key: string, value: string) => void
+}
 
 export function useCanvasWorkspacePersistence({
   items,

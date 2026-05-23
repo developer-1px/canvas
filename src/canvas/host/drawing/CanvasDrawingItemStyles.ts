@@ -1,18 +1,15 @@
-import type {
-  ArrowItem,
-  HighlightItem,
-  MarkerItem,
-} from '../model'
+export type CanvasDrawingStrokeKind = 'highlight' | 'marker'
 
-export type CanvasDrawingStrokeKind = MarkerItem['type'] | HighlightItem['type']
+export type CanvasDrawingStrokeStyle = Readonly<{
+  opacity: number
+  stroke: string
+  strokeWidth: number
+}>
 
-export type CanvasDrawingStrokeStyle = Readonly<
-  Pick<MarkerItem, 'opacity' | 'stroke' | 'strokeWidth'>
->
-
-export type CanvasArrowStyle = Readonly<
-  Pick<ArrowItem, 'stroke' | 'strokeWidth'>
->
+export type CanvasArrowStyle = Readonly<{
+  stroke: string
+  strokeWidth: number
+}>
 
 export const CANVAS_MARKER_STYLE = Object.freeze({
   opacity: 1,

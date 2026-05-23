@@ -110,7 +110,7 @@
 - Drawing Item: Demo `CanvasItem` 중 marker, highlighter, arrow처럼 캔버스 위에 빠르게 주석을 그리는 항목. `points` 또는 `start/end`가 실제 geometry이고 `x/y/w/h`는 Host가 동기화하는 bounds cache다.
 - Drawing Item Geometry: built-in marker, highlighter, arrow의 type guard, geometry bounds, translate/scale, bounds cache sync 규칙을 소유하는 Host-owned geometry Module.
 - Drawing Item Validation: built-in marker, highlighter, arrow의 visible geometry와 renderable style 저장 shape 검증을 소유하는 Host-owned validation Module.
-- Drawing Item Style: built-in marker, highlighter, arrow의 stroke/opacity 기본값. Draft overlay와 Host item creation이 같은 Host-owned 계약을 쓴다.
+- Drawing Item Style: built-in marker, highlighter, arrow의 stroke/opacity 기본값과 style field shape. Draft overlay와 Host item creation이 같은 Host-owned 계약을 쓴다.
 - Canvas Pointer Interaction Start: pointer-down 시 gesture routing, pan, marquee 시작을 active interaction으로 변환하고 생성 시작은 Canvas Pointer Creation Start에 위임하는 App-owned runtime Module.
 - Canvas Tool Gesture Routing: built-in tool과 custom tool을 pointer gesture, feature gate, item pointer rerouting rule로 변환하는 Engine-owned what 계약 Module.
 - Canvas Pointer Start Session: pointer-down 시 stage-local screen coordinate와 viewport-projected world coordinate를 start interaction Module들에 제공하는 App-owned start lifecycle Module.
@@ -167,6 +167,7 @@
 - Canvas Keyboard Intent Dispatch Table: Keyboard intent runner table의 define, supported kind 판정, run lookup mechanics를 소유하는 App keyboard helper Module.
 - Canvas Keyboard Command Dispatch: Keyboard document command intent runner entries를 소유하고, Canvas Keyboard Intent Dispatch Table로 지원 intent 판정과 command handler bundle 호출을 파생하는 App-owned Module.
 - Canvas Keyboard System Dispatch: Keyboard system intent runner entries를 소유하고, Canvas Keyboard Intent Dispatch Table로 지원 system intent 판정과 system handler bundle 호출을 파생하며 temporary pan release를 처리하는 App-owned Module.
+- Canvas Keyboard System Release Handlers: keyup/window blur temporary pan release가 필요한 `setSpaceDown` slot만 명시하는 App keyboard release Interface 계약.
 - Canvas Keyboard Viewport Dispatch: Keyboard viewport intent runner entries를 소유하고, Canvas Keyboard Intent Dispatch Table로 지원 viewport intent 판정과 viewport handler bundle 호출을 파생하는 App-owned Module.
 - Canvas Keyboard Shortcut Intent: keydown 입력, typing target suppression, temporary pan, escape, command/tool shortcut precedence를 실행 가능한 keyboard intent로 조립하는 App-owned runtime Module.
 - Canvas Keyboard Shortcut Listeners: DOM keydown/keyup/blur listener binding, cleanup, latest handler ref dispatch를 소유하는 App-owned runtime Module.
@@ -178,6 +179,7 @@
 - Canvas Workspace Runtime Model: stored workspace fallback, default selection, initial viewport, id generator seed, selected/read model/selected bounds derivation을 소유하는 workflow Module.
 - Canvas Workspace Consumer Model: Workspace document/read/viewport state를 command, component, control, extension, inspector, interaction, item layer, keyboard, pointer, stage, text, viewport consumer context로 변환하는 workflow Module.
 - Canvas Workspace Snapshot: 저장된 workspace payload의 version, item validation, viewport normalization, selection sanitization, id seed contract를 소유하는 App-owned Module.
+- Canvas Workspace Storage: App workspace persistence가 요구하는 `getItem`, `setItem`, optional `removeItem` slot만 명시하고 browser `Storage` 구현 shape를 숨기는 App-owned persistence Interface 계약.
 - Canvas Document Runtime: Host Document Controller mutation result를 App React state가 반영할 committed state로 변환하고 live item replacement, selection action resolution, text replace, history result application을 소유하는 App-owned runtime Module.
 - Canvas Document Runtime Contracts: App document runtime이 Host Document Controller와 주고받는 change, selection action, text search options, history result, committed state의 명시 Interface 계약을 소유하는 App-owned contract Module.
 - Canvas Workflow Contract: App workflow hook들이 공유하는 document commit, selection commit, clipboard 계약. 개별 hook이 `useCanvasDocument` 구현 파일을 직접 알지 않게 한다.

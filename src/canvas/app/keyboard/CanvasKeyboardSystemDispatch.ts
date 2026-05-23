@@ -33,10 +33,9 @@ export type CanvasKeyboardSystemHandlers = {
   setTool: Dispatch<SetStateAction<Tool>>
 }
 
-export type CanvasKeyboardSystemReleaseHandlers = Pick<
-  CanvasKeyboardSystemHandlers,
-  'setSpaceDown'
->
+export type CanvasKeyboardSystemReleaseHandlers = {
+  setSpaceDown: Dispatch<SetStateAction<boolean>>
+}
 
 const CANVAS_KEYBOARD_SYSTEM_INTENT_DISPATCH =
   createCanvasKeyboardIntentDispatchTable<

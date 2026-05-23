@@ -2303,6 +2303,14 @@ describe('Canvas module boundaries', () => {
     expect(drawingStyleModule.source).toContain('CANVAS_MARKER_STYLE')
     expect(drawingStyleModule.source).toContain('CANVAS_HIGHLIGHT_STYLE')
     expect(drawingStyleModule.source).toContain('CANVAS_ARROW_STYLE')
+    expect(drawingStyleModule.source).toContain(
+      'export type CanvasDrawingStrokeStyle',
+    )
+    expect(drawingStyleModule.source).toContain(
+      'export type CanvasArrowStyle',
+    )
+    expect(drawingStyleModule.source).not.toContain('Pick<')
+    expect(drawingStyleModule.source).not.toContain("from '../model'")
     expect(drawingStyleConsumers).not.toContain('#475569')
     expect(drawingStyleConsumers).not.toContain('#fde047')
     expect(drawingStyleConsumers).not.toContain('#334155')
@@ -3770,9 +3778,13 @@ describe('Canvas module boundaries', () => {
       'export function runCanvasKeyboardSystemWindowBlur',
     )
     expect(systemDispatchFile.source).toContain(
+      'export type CanvasKeyboardSystemReleaseHandlers',
+    )
+    expect(systemDispatchFile.source).toContain(
       'shouldReleaseCanvasKeyboardTemporaryPan',
     )
     expect(systemDispatchFile.source).toContain('setSpaceDown(false)')
+    expect(systemDispatchFile.source).not.toContain('Pick<')
     expect(viewportDispatchFile.source).toContain(
       'export function runCanvasKeyboardViewportIntent',
     )
@@ -4384,6 +4396,11 @@ describe('Canvas module boundaries', () => {
       'CANVAS_WORKSPACE_VERSION',
     )
     expect(persistenceFile.source).not.toContain('normalizeCanvasViewport')
+    expect(persistenceFile.source).toContain(
+      'export type CanvasWorkspaceStorage',
+    )
+    expect(persistenceFile.source).not.toContain('Pick<Storage')
+    expect(persistenceFile.source).not.toContain('Partial<Pick')
     expect(snapshotFile.source).toContain(
       'export function parseCanvasWorkspaceSnapshot',
     )
