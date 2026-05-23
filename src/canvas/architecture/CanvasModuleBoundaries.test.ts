@@ -721,6 +721,46 @@ describe('Canvas module boundaries', () => {
     expect(mainFile.source).not.toContain('createCanvasAppAssembly')
   })
 
+  it('keeps App authoring contracts behind a named public facade', () => {
+    const appFacadeFile = getSourceFile('src/canvas/app/index.ts')
+    const authoringFacadeFile = getSourceFile(
+      'src/canvas/app/authoring/index.ts',
+    )
+
+    expect(appFacadeFile.source).toContain("from './authoring'")
+    for (const authoringContract of [
+      'createCanvasAppAssembly',
+      'defineCanvasAppCustomItemModule',
+      'createCanvasAppComponentPresentationRenderers',
+      'createCanvasAppCustomItemRenderers',
+      'CanvasAppCustomCommand',
+      'CanvasAppCustomCreationTool',
+      'CanvasAppInspectorPanel',
+    ]) {
+      expect(authoringFacadeFile.source).toContain(authoringContract)
+      expect(appFacadeFile.source).toContain(authoringContract)
+    }
+    for (const runtimeHow of [
+      'useCanvasAppModel',
+      'DEFAULT_CANVAS_APP_ASSEMBLY',
+      'assertCanvasAppAssembly',
+      'assertCanvasAppExtensionRecordKeys',
+      'createCanvasAppCustomItemModuleAssembly',
+    ]) {
+      expect(authoringFacadeFile.source).not.toContain(runtimeHow)
+      expect(appFacadeFile.source).toContain(runtimeHow)
+    }
+    for (const implementationModule of [
+      '../commands/',
+      '../modules/',
+      '../tools/',
+      '../rendering',
+      '../extensions/',
+    ]) {
+      expect(appFacadeFile.source).not.toContain(implementationModule)
+    }
+  })
+
   it('keeps app stage rendering containment behind a named workflow module', () => {
     const appModelFile = getSourceFile(
       'src/canvas/app/workflow/useCanvasAppModel.ts',

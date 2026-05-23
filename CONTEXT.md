@@ -21,6 +21,7 @@
 - Host Public Facade: Demo Host model type, read model, component library, document controller를 외부 레이어에 노출하는 안정된 Module 경계.
 - Canvas Package Public Entry: 외부 조립자와 Demo가 사용하는 `src/canvas` 단일 entry. App Shell, assembly input, descriptor authoring contract, stable entity type, layer facade namespace를 노출하고 workflow hook, assembly default/validator, custom module assembly helper, layer별 function export 같은 runtime how는 직접 노출하지 않는다.
 - Canvas App Public Facade: Canvas App Shell, Canvas App Assembly Source, workflow 조립 계약과 고급 App runtime hook을 노출하는 `src/canvas/app` entry.
+- Canvas App Authoring Facade: 외부 조립자가 쓰는 assembly input, custom command/tool/item/inspector/renderer descriptor 계약을 모으고 runtime hook, default assembly, validator, custom module assembly output은 제외하는 App public authoring Module.
 - Canvas Item Read Model: Demo `CanvasItem` tree의 조회, bounds, selection 정규화, Scene Adapter 생성을 tree helper 세부 구현 없이 제공하고 `scene`을 Engine `CanvasSceneAdapter` contract로 노출하는 Module.
 - Canvas Component Library: Demo component template, presentation key, component item 생성을 함께 제공하는 Module.
 - Canvas Built-in Component Templates: Sticky, label, card 같은 기본 Demo component catalogue를 소유하는 Host-owned Module.
@@ -291,6 +292,7 @@
 - package public entry는 package manifest의 layer facade만 알고 app 내부 submodule을 직접 export target으로 삼지 않는다.
 - package public entry는 App Shell 조립과 descriptor authoring contract를 열고, layer별 세부 기능은 flat re-export가 아니라 `CanvasEngine`, `CanvasHost`, `CanvasRenderer`, `CanvasCore` namespace 또는 package subpath에서만 연다.
 - package public entry는 `useCanvasAppModel`, `DEFAULT_CANVAS_APP_ASSEMBLY`, `assertCanvasAppAssembly`, `createCanvasAppCustomItemModuleAssembly` 같은 App runtime how를 `canvas/app` subpath에서만 연다.
+- Canvas App Public Facade는 descriptor authoring contract를 Canvas App Authoring Facade에서 재노출하고, runtime hook/default/validator는 workflow public entry에서만 재노출한다.
 - package public entry와 subpath export는 `canvas` package self-import consumer smoke test로 검증한다.
 - package manifest는 CSS import가 bundler tree-shaking에서 제거되지 않도록 `sideEffects`에 CSS를 명시한다.
 - package manifest는 React, React DOM, Zod를 shared runtime peer dependency로 선언한다.

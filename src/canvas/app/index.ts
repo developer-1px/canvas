@@ -8,33 +8,30 @@ export type {
 export {
   DEFAULT_CANVAS_APP_ASSEMBLY,
   assertCanvasAppAssembly,
-  createCanvasAppAssembly,
-  type CanvasAppAssembly,
-  type CanvasAppAssemblyInput,
-  type CanvasAppComponentPresentationRenderers,
-  type CanvasAppItemAdapters,
-  useCanvasAppModel,
-} from './workflow'
-export type {
-  CanvasAppCustomCommand,
-  CanvasAppCustomCommandContext,
-  CanvasAppCustomCommandState,
-} from './workflow'
-export {
-  assertCanvasAppExtensionId,
   assertCanvasAppExtensionRecordKeys,
   createCanvasAppCustomItemModuleAssembly,
+  type CanvasAppCustomItemModuleAssembly,
+  type CanvasAppCustomItemModuleAssemblyOptions,
+  useCanvasAppModel,
+} from './workflow'
+export {
+  createCanvasAppAssembly,
+  assertCanvasAppExtensionId,
   createCanvasAppComponentPresentationRenderers,
   createCanvasAppCustomItemRenderers,
   defineCanvasAppCustomItemModule,
   isCanvasAppExtensionId,
+  type CanvasAppAssembly,
+  type CanvasAppAssemblyInput,
+  type CanvasAppComponentPresentationRenderers,
   type CanvasAppComponentRendererStrategy,
+  type CanvasAppCustomCommand,
+  type CanvasAppCustomCommandContext,
+  type CanvasAppCustomCommandState,
   type CanvasAppCustomCreationTool,
   type CanvasAppCustomCreationToolContext,
   type CanvasAppCustomCreationToolState,
   type CanvasAppCustomItemModule,
-  type CanvasAppCustomItemModuleAssembly,
-  type CanvasAppCustomItemModuleAssemblyOptions,
   type CanvasAppCustomItemModuleCreationItem,
   type CanvasAppCustomItemModuleCreationTool,
   type CanvasAppCustomToolShortcut,
@@ -46,9 +43,10 @@ export {
   type CanvasAppPointerInput,
   type CanvasAppCustomItemRendererStrategy,
   type CanvasAppCustomItemRenderers,
+  type CanvasAppItemAdapters,
   type CanvasAppItemLayerAdapter,
   type CanvasAppItemLayerRenderInput,
   type CanvasAppStageAdapter,
   type CanvasAppStageMount,
   type CanvasAppStageRenderInput,
-} from './workflow'
+} from './authoring'
