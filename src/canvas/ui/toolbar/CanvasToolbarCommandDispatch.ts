@@ -1,21 +1,5 @@
-import type {
-  CanvasAlignMode,
-  CanvasDistributeMode,
-} from '../../engine'
+import type { CanvasToolbarCommandHandlers } from './CanvasToolbarCommandContracts'
 import type { CanvasToolbarCommandAction } from './CanvasToolbarCommandItems'
-
-export type CanvasToolbarCommandHandlers = {
-  onAlign: (mode: CanvasAlignMode) => void
-  onDelete: () => void
-  onDistribute: (mode: CanvasDistributeMode) => void
-  onDuplicate: () => void
-  onGroup: () => void
-  onLock: () => void
-  onRedo: () => void
-  onUndo: () => void
-  onUngroup: () => void
-  onUnlockAll: () => void
-}
 
 type CanvasToolbarCommandActionRunner<
   TKind extends CanvasToolbarCommandAction['kind'],

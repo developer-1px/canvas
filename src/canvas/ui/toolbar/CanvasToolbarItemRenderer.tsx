@@ -38,10 +38,8 @@ import {
   CustomToolButton,
   ToolButton,
 } from './CanvasToolbarButtons'
-import {
-  runCanvasToolbarCommandAction,
-  type CanvasToolbarCommandHandlers,
-} from './CanvasToolbarCommandDispatch'
+import type { CanvasToolbarCommandHandlers } from './CanvasToolbarCommandContracts'
+import { runCanvasToolbarCommandAction } from './CanvasToolbarCommandDispatch'
 import type { CanvasToolbarItem } from './CanvasToolbarItems'
 
 export type CanvasToolbarItemRenderContext = {

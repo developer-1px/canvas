@@ -21,10 +21,8 @@ import type {
   CommitCanvasItemsChange,
   CommitCanvasSelection,
 } from '../workflow/CanvasWorkflowContract'
-import {
-  executeCanvasClipboardCommand,
-  type CanvasClipboardCommand,
-} from './CanvasClipboardCommandExecution'
+import type { CanvasClipboardCommand } from './CanvasClipboardCommandContracts'
+import { executeCanvasClipboardCommand } from './CanvasClipboardCommandExecution'
 import {
   cloneCanvasClipboardItems,
   copyCanvasClipboardSelection,

@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from 'vitest'
 import {
   runCanvasToolbarCommandAction,
-  type CanvasToolbarCommandHandlers,
 } from './CanvasToolbarCommandDispatch'
+import type { CanvasToolbarCommandHandlers } from './CanvasToolbarCommandContracts'
 
 describe('CanvasToolbarCommandDispatch', () => {
   it('routes payload command actions to the matching handler', () => {

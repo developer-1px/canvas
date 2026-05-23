@@ -1,8 +1,8 @@
 import {
   createCanvasClipboardCommandEffectPlan,
-  type CanvasClipboardCommand,
   type CanvasClipboardCommandEffectPlanContext,
 } from './CanvasClipboardCommandEffectPlan'
+import type { CanvasClipboardCommand } from './CanvasClipboardCommandContracts'
 import {
   EMPTY_CLIPBOARD_COMMAND_RESULT,
   applyCanvasClipboardCommandEffect,
@@ -14,7 +14,7 @@ export type {
   CanvasClipboardEditingUpdate,
   CanvasClipboardCommandExecutionResult,
 } from './CanvasClipboardCommandEffects'
-export type { CanvasClipboardCommand } from './CanvasClipboardCommandEffectPlan'
+export type { CanvasClipboardCommand } from './CanvasClipboardCommandContracts'
 
 export type CanvasClipboardCommandExecutionContext =
   CanvasClipboardCommandEffectPlanContext &

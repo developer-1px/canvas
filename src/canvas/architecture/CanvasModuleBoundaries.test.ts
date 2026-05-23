@@ -417,6 +417,9 @@ describe('Canvas module boundaries', () => {
     const commandCatalogFile = getSourceFile(
       'src/canvas/ui/toolbar/CanvasToolbarCommandCatalog.ts',
     )
+    const commandContractsFile = getSourceFile(
+      'src/canvas/ui/toolbar/CanvasToolbarCommandContracts.ts',
+    )
     const commandDispatchFile = getSourceFile(
       'src/canvas/ui/toolbar/CanvasToolbarCommandDispatch.ts',
     )
@@ -447,6 +450,9 @@ describe('Canvas module boundaries', () => {
     expect(itemRendererFile.source).toContain("item.kind === 'builtin-tool'")
     expect(itemRendererFile.source).toContain(
       'runCanvasToolbarCommandAction',
+    )
+    expect(itemRendererFile.source).toContain(
+      "from './CanvasToolbarCommandContracts'",
     )
     expect(itemsFile.source).toContain(
       'export function getCanvasToolbarGroups',
@@ -487,8 +493,21 @@ describe('Canvas module boundaries', () => {
     expect(commandDispatchFile.source).toContain(
       'export function runCanvasToolbarCommandAction',
     )
+    expect(commandContractsFile.source).toContain(
+      'export type CanvasToolbarCommandHandlers',
+    )
+    expect(commandContractsFile.source).toContain('onAlign:')
+    expect(commandContractsFile.source).not.toContain(
+      'runCanvasToolbarCommandAction',
+    )
+    expect(commandContractsFile.source).not.toContain(
+      'CANVAS_TOOLBAR_COMMAND_ACTION_RUNNERS',
+    )
     expect(commandDispatchFile.source).toContain(
-      'CanvasToolbarCommandHandlers',
+      "from './CanvasToolbarCommandContracts'",
+    )
+    expect(commandDispatchFile.source).not.toContain(
+      'export type CanvasToolbarCommandHandlers',
     )
     expect(commandDispatchFile.source).toContain(
       'CANVAS_TOOLBAR_COMMAND_ACTION_RUNNERS',
@@ -2952,6 +2971,9 @@ describe('Canvas module boundaries', () => {
     const executionFile = getSourceFile(
       'src/canvas/app/commands/CanvasClipboardCommandExecution.ts',
     )
+    const contractsFile = getSourceFile(
+      'src/canvas/app/commands/CanvasClipboardCommandContracts.ts',
+    )
     const effectPlanFile = getSourceFile(
       'src/canvas/app/commands/CanvasClipboardCommandEffectPlan.ts',
     )
@@ -3007,6 +3029,9 @@ describe('Canvas module boundaries', () => {
       "from './CanvasClipboardCommandEffectPlan'",
     )
     expect(executionFile.source).toContain(
+      "from './CanvasClipboardCommandContracts'",
+    )
+    expect(executionFile.source).toContain(
       "from './CanvasClipboardCommandEffects'",
     )
     expect(executionFile.source).toContain('applyCanvasClipboardCommandEffect')
@@ -3016,8 +3041,26 @@ describe('Canvas module boundaries', () => {
     expect(executionFile.source).not.toContain('getCanvasPasteOffset')
     expect(executionFile.source).not.toContain('copyItemsToClipboard(')
     expect(executionFile.source).not.toContain("type: 'remove-selection'")
+    expect(contractsFile.source).toContain(
+      'export type CanvasClipboardCommand',
+    )
+    expect(contractsFile.source).toContain("kind: 'clone'")
+    expect(contractsFile.source).toContain("kind: 'paste'")
+    expect(contractsFile.source).not.toContain('cloneCanvasCommandItems')
+    expect(contractsFile.source).not.toContain(
+      'createCanvasClipboardCommandEffectPlan',
+    )
+    expect(contractsFile.source).not.toContain(
+      'applyCanvasClipboardCommandEffect',
+    )
     expect(effectPlanFile.source).toContain(
       'export function createCanvasClipboardCommandEffectPlan',
+    )
+    expect(effectPlanFile.source).toContain(
+      "from './CanvasClipboardCommandContracts'",
+    )
+    expect(effectPlanFile.source).not.toContain(
+      'export type CanvasClipboardCommand =',
     )
     expect(effectPlanFile.source).toContain(
       'CANVAS_CLIPBOARD_COMMAND_EFFECT_PLANNERS',

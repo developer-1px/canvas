@@ -2,7 +2,7 @@ import type {
   CanvasItem,
   Point,
 } from '../../entities'
-import type { CanvasClipboardCommand } from './CanvasClipboardCommandExecution'
+import type { CanvasClipboardCommand } from './CanvasClipboardCommandContracts'
 
 export type RunCanvasClipboardCommand = (
   command: CanvasClipboardCommand,

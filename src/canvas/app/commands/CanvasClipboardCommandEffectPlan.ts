@@ -8,11 +8,11 @@ import {
 } from '../../engine'
 import type {
   CanvasItem,
-  Point,
   Viewport,
 } from '../../entities'
 import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
 import type { CanvasDocumentClipboard } from '../workflow/CanvasWorkflowContract'
+import type { CanvasClipboardCommand } from './CanvasClipboardCommandContracts'
 import type { CanvasClipboardCommandEffect } from './CanvasClipboardCommandEffects'
 import {
   createCanvasClipboardCloneResultEffect,
@@ -23,13 +23,6 @@ import {
   createCanvasClipboardPasteResultEffect,
 } from './CanvasClipboardCommandResultEffects'
 import { getCanvasPasteOffset } from './CanvasPastePosition'
-
-export type CanvasClipboardCommand =
-  | { ids: string[]; kind: 'clone'; offset: Point }
-  | { kind: 'duplicate'; offset?: Point; sourceIds?: string[] }
-  | { kind: 'copy'; pasteIndex: number }
-  | { kind: 'paste'; pasteIndex: number }
-  | { kind: 'cut'; pasteIndex: number }
 
 export type CanvasClipboardCommandEffectPlanContext = {
   commandAdapter: CanvasCommandAdapter<CanvasItem>
