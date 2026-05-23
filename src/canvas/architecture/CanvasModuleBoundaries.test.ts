@@ -2960,11 +2960,18 @@ describe('Canvas module boundaries', () => {
       'export function isCanvasKeyboardCommandIntent',
     )
     expect(commandDispatchFile.source).toContain(
-      "case 'delete-selection'",
+      'CANVAS_KEYBOARD_COMMAND_INTENT_RUNNERS',
     )
     expect(commandDispatchFile.source).toContain(
-      "case 'nudge-selection'",
+      'getCanvasKeyboardCommandIntentRunner(intent.kind)',
     )
+    expect(commandDispatchFile.source).toContain(
+      'handlers.moveSelection(intent.dx, intent.dy)',
+    )
+    expect(commandDispatchFile.source).not.toContain(
+      'CANVAS_KEYBOARD_COMMAND_INTENT_KINDS',
+    )
+    expect(commandDispatchFile.source).not.toContain('switch (intent.kind)')
     expect(nudgeShortcutFile.source).toContain(
       'export function getCanvasKeyboardNudgeShortcutIntent',
     )
