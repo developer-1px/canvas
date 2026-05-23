@@ -1333,6 +1333,29 @@ describe('Canvas module boundaries', () => {
     expect(violations).toEqual([])
   })
 
+  it('keeps Host document reorder patch moves behind a named module', () => {
+    const patchesFile = getSourceFile(
+      'src/canvas/host/document/CanvasDocumentPatches.ts',
+    )
+    const reorderPatchFile = getSourceFile(
+      'src/canvas/host/document/CanvasDocumentReorderPatch.ts',
+    )
+
+    expect(patchesFile.source).toContain(
+      "from './CanvasDocumentReorderPatch'",
+    )
+    expect(patchesFile.source).not.toContain('collectCanvasSiblingArrays')
+    expect(patchesFile.source).not.toContain('createReorderSiblingArrayPatch')
+    expect(patchesFile.source).not.toContain('canvasArrayItemPointer')
+    expect(reorderPatchFile.source).toContain(
+      'export function createReorderCanvasSiblingArraysPatch',
+    )
+    expect(reorderPatchFile.source).toContain('collectCanvasSiblingArrays')
+    expect(reorderPatchFile.source).toContain('createReorderSiblingArrayPatch')
+    expect(reorderPatchFile.source).toContain('canvasArrayItemPointer')
+    expect(reorderPatchFile.source).toContain("op: 'move'")
+  })
+
   it('keeps app document hooks behind the Host Document Controller', () => {
     const forbiddenDocumentInternals =
       /\b(createCanvasItemsDocument|commitCanvasItemsPatch|JSONPatchOperation|SelectionSnap)\b|\.history\b|\.clipboard\b/

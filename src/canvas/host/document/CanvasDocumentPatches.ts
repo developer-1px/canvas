@@ -16,6 +16,7 @@ import {
 } from '../tree/CanvasTree'
 import { isAncestorPath } from '../tree/CanvasTreePath'
 import { canvasItemPathToPointer } from './CanvasDocumentPointers'
+import { createReorderCanvasSiblingArraysPatch } from './CanvasDocumentReorderPatch'
 
 export function createRemoveCanvasItemsPatch(
   items: CanvasItem[],
@@ -146,22 +147,10 @@ export function createReorderCanvasItemsPatch(
     return []
   }
 
-  const afterArrays = new Map(
-    collectCanvasSiblingArrays(nextItems).map((entry) => [
-      entry.parentId,
-      entry.items.map((item) => item.id),
-    ]),
-  )
-
-  return collectCanvasSiblingArrays(items)
-    .sort((left, right) => right.parentPath.length - left.parentPath.length)
-    .flatMap((entry) =>
-      createReorderSiblingArrayPatch(
-        entry.arrayPointer,
-        entry.items.map((item) => item.id),
-        afterArrays.get(entry.parentId) ?? [],
-      ),
-    )
+  return createReorderCanvasSiblingArraysPatch({
+    afterItems: nextItems,
+    beforeItems: items,
+  })
 }
 
 export function createResizeCanvasItemsPatch(
@@ -233,82 +222,6 @@ export function createReplaceChangedCanvasItemsPatch(
     path: canvasItemPathToPointer(entry.path),
     value: entry.item,
   }))
-}
-
-type CanvasSiblingArrayEntry = {
-  arrayPointer: Pointer
-  items: CanvasItem[]
-  parentId: string
-  parentPath: number[]
-}
-
-function collectCanvasSiblingArrays(
-  items: CanvasItem[],
-): CanvasSiblingArrayEntry[] {
-  const entries: CanvasSiblingArrayEntry[] = []
-
-  function visit(nodes: CanvasItem[], parentPath: number[], parentId: string) {
-    entries.push({
-      arrayPointer:
-        parentPath.length === 0
-          ? ''
-          : `${canvasItemPathToPointer(parentPath)}/children` as Pointer,
-      items: nodes,
-      parentId,
-      parentPath,
-    })
-
-    nodes.forEach((item, index) => {
-      if (item.type === 'group') {
-        visit(item.children, [...parentPath, index], item.id)
-      }
-    })
-  }
-
-  visit(items, [], '__root__')
-  return entries
-}
-
-function createReorderSiblingArrayPatch(
-  arrayPointer: Pointer,
-  beforeIds: string[],
-  afterIds: string[],
-): JSONPatchOperation[] {
-  if (
-    beforeIds.length !== afterIds.length ||
-    beforeIds.every((id, index) => id === afterIds[index])
-  ) {
-    return []
-  }
-
-  const current = [...beforeIds]
-  const patch: JSONPatchOperation[] = []
-
-  afterIds.forEach((id, index) => {
-    if (current[index] === id) {
-      return
-    }
-
-    const fromIndex = current.indexOf(id)
-
-    if (fromIndex < 0) {
-      return
-    }
-
-    current.splice(fromIndex, 1)
-    current.splice(index, 0, id)
-    patch.push({
-      op: 'move',
-      from: canvasArrayItemPointer(arrayPointer, fromIndex),
-      path: canvasArrayItemPointer(arrayPointer, index),
-    })
-  })
-
-  return patch
-}
-
-function canvasArrayItemPointer(arrayPointer: Pointer, index: number): Pointer {
-  return `${arrayPointer}/${index}` as Pointer
 }
 
 function getTopmostEntries(entries: CanvasItemEntry[]) {
