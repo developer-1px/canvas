@@ -4,10 +4,8 @@ import type {
   Point,
 } from '../../entities'
 import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract'
-import {
-  getCanvasAppCustomCreationTool,
-  type CanvasAppCustomCreationTool,
-} from '../tools/CanvasAppCustomCreationTools'
+import { getCanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationToolRuntime'
+import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
 
 export type CanvasCustomCreationCommitInput = {
   commitItemsChange: CommitCanvasItemsChange

@@ -29,6 +29,7 @@
 - Canvas App Custom Command: 내부 command grammar를 수정하지 않고 제품별 business action을 toolbar action으로 등록하는 App-owned command descriptor.
 - Canvas App Custom Command Execution: custom command toolbar state, availability, run 호출과 실패 containment를 소유하는 App-owned execution Module.
 - Canvas App Custom Creation Tool: 내부 tool grammar를 수정하지 않고 제품별 item 생성 도구를 toolbar, shortcut, pointer lifecycle에 등록하는 App-owned tool descriptor.
+- Canvas App Custom Creation Tool Runtime: custom creation tool id 변환, toolbar state, lookup, shortcut matching을 소유하는 App-owned runtime Module.
 - Canvas App Custom Item Module Creation Tool: Module-owned creation descriptor. bounds/title/data만 반환하고 custom item `id`, `kind`, `presentation`, `type` envelope는 Module assembly가 만든다.
 - Canvas App Inspector Panel: 기본 bounds inspector를 수정하지 않고 제품별 선택 항목 정보를 렌더링하는 App-owned inspector descriptor.
 - Canvas App Inspector Panel Execution: inspector panel visibility/render 호출과 실패 시 omit containment를 소유하는 App-owned execution Module.
@@ -88,6 +89,7 @@
 - Canvas App Custom Command의 availability/run 실패는 내부 command loop를 깨지 않고 disabled/false로 containment 한다.
 - Canvas App Custom Command descriptor shape 검증과 toolbar state/run execution은 분리하고, 실행 실패 containment는 Canvas App Custom Command Execution이 소유한다.
 - 제품별 item creation tool은 내부 Tool union에 구체 id를 넣지 않고 Canvas App Custom Item Module에 등록한다.
+- Canvas App Custom Creation Tool descriptor shape/shortcut conflict 검증과 runtime state/lookup/shortcut matching은 분리하고, runtime behavior는 Canvas App Custom Creation Tool Runtime이 소유한다.
 - Canvas App Custom Creation Tool이 item 생성을 거부하거나 실패하거나 invalid item을 반환해도 pointer lifecycle을 깨지 않아야 한다.
 - 제품별 item kind는 내부 `CanvasItem` union에 새 variant를 추가하지 않고 Canvas App Custom Item Module로 등록한다.
 - Canvas App Custom Item Module은 `id`, `presentation`, `renderItem`, `validateItem`을 외부 Interface로 받고, renderer registry와 validator registry는 내부에서 조립한다.

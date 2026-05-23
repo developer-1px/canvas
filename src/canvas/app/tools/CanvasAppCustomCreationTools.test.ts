@@ -2,13 +2,15 @@ import { describe, expect, it } from 'vitest'
 import {
   assertCanvasAppCustomCreationTools,
   assertCanvasAppCustomCreationToolShortcuts,
-  getCanvasAppCustomCreationTool,
-  getCanvasAppCustomCreationToolStates,
-  getCanvasAppCustomToolShortcutKey,
-  getCanvasAppCustomToolId,
-  matchesCanvasAppCustomToolShortcut,
   type CanvasAppCustomCreationTool,
 } from './CanvasAppCustomCreationTools'
+import {
+  getCanvasAppCustomCreationTool,
+  getCanvasAppCustomCreationToolStates,
+  getCanvasAppCustomToolId,
+  getCanvasAppCustomToolShortcutKey,
+  matchesCanvasAppCustomToolShortcut,
+} from './CanvasAppCustomCreationToolRuntime'
 
 const tool: CanvasAppCustomCreationTool = {
   id: 'risk',

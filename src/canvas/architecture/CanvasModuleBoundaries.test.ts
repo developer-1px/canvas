@@ -490,6 +490,51 @@ describe('Canvas module boundaries', () => {
     )
   })
 
+  it('keeps App custom creation tool runtime behind a named module', () => {
+    const descriptorFile = getSourceFile(
+      'src/canvas/app/tools/CanvasAppCustomCreationTools.ts',
+    )
+    const runtimeFile = getSourceFile(
+      'src/canvas/app/tools/CanvasAppCustomCreationToolRuntime.ts',
+    )
+    const appModelFile = getSourceFile(
+      'src/canvas/app/workflow/useCanvasAppModel.ts',
+    )
+    const keyboardRouterFile = getSourceFile(
+      'src/canvas/app/keyboard/CanvasKeyboardShortcutRouter.ts',
+    )
+    const pointerCommitFile = getSourceFile(
+      'src/canvas/app/pointer/CanvasCustomCreationCommit.ts',
+    )
+
+    expect(descriptorFile.source).toContain(
+      "from './CanvasAppCustomCreationToolRuntime'",
+    )
+    expect(descriptorFile.source).not.toContain(
+      'export function getCanvasAppCustomCreationToolStates',
+    )
+    expect(descriptorFile.source).not.toContain(
+      'export function getCanvasAppCustomCreationTool(',
+    )
+    expect(descriptorFile.source).not.toContain(
+      'export function matchesCanvasAppCustomToolShortcut',
+    )
+    expect(runtimeFile.source).toContain(
+      'export function getCanvasAppCustomCreationToolStates',
+    )
+    expect(runtimeFile.source).toContain(
+      'export function getCanvasAppCustomCreationTool(',
+    )
+    expect(runtimeFile.source).toContain(
+      'export function matchesCanvasAppCustomToolShortcut',
+    )
+    for (const file of [appModelFile, keyboardRouterFile, pointerCommitFile]) {
+      expect(file.source).toContain(
+        'CanvasAppCustomCreationToolRuntime',
+      )
+    }
+  })
+
   it('keeps app workflow hooks from recreating the workspace read model', () => {
     const violations = sourceFiles
       .filter((file) =>

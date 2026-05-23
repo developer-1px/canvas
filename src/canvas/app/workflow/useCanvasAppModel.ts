@@ -32,7 +32,7 @@ import type {
 import {
   getCanvasAppCustomCreationToolStates,
   type CanvasAppCustomCreationToolState,
-} from '../tools/CanvasAppCustomCreationTools'
+} from '../tools/CanvasAppCustomCreationToolRuntime'
 import { useCanvasAppStageElement } from '../stage/CanvasAppStageElement'
 import { useCanvasViewportControls } from '../viewport/useCanvasViewportControls'
 import { useCanvasWheelViewport } from '../viewport/useCanvasWheelViewport'

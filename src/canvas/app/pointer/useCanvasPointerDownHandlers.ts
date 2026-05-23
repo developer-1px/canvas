@@ -43,10 +43,8 @@ import type {
 import type { Interaction } from './CanvasInteractionState'
 import { createCanvasDraftStroke } from './CanvasPointerDrawing'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
-import {
-  getCanvasAppCustomCreationTool,
-  type CanvasAppCustomCreationTool,
-} from '../tools/CanvasAppCustomCreationTools'
+import { getCanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationToolRuntime'
+import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
 import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
 
 type UseCanvasPointerDownHandlersArgs = {

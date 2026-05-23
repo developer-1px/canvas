@@ -18,7 +18,7 @@ import type { CommitCanvasSelection } from '../workflow/CanvasWorkflowContract'
 import {
   matchesCanvasAppCustomToolShortcut,
   type CanvasAppCustomCreationToolState,
-} from '../tools/CanvasAppCustomCreationTools'
+} from '../tools/CanvasAppCustomCreationToolRuntime'
 
 export type CanvasKeyboardShortcutHandlers = {
   commitSelection: CommitCanvasSelection
