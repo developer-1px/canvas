@@ -169,6 +169,39 @@ describe('CanvasAppAssembly', () => {
     ).toThrow('Invalid canvas app custom item validator id: Risk Item')
   })
 
+  it('validates initial items against assembled custom item validators', () => {
+    const riskItem = {
+      id: 'risk-1',
+      type: 'custom',
+      kind: 'risk',
+      presentation: 'risk-node',
+      title: 'Risk',
+      x: 0,
+      y: 0,
+      w: 120,
+      h: 80,
+      data: { severity: 'high' },
+    } as const
+
+    expect(
+      createCanvasAppAssembly({
+        customItemValidators: {
+          risk: (item) => item.data.severity === 'high',
+        },
+        initialItems: [riskItem],
+      }).initialItems,
+    ).toEqual([riskItem])
+
+    expect(() =>
+      createCanvasAppAssembly({
+        customItemValidators: {
+          risk: (item) => item.data.severity === 'low',
+        },
+        initialItems: [riskItem],
+      }),
+    ).toThrow('Invalid custom canvas item: risk')
+  })
+
   it('rejects direct component presentation renderer keys outside the app extension id contract', () => {
     expect(() =>
       createCanvasAppAssembly({

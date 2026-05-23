@@ -7,6 +7,7 @@ import {
   CANVAS_COMPONENT_LIBRARY,
   CANVAS_ITEM_ENGINE_ADAPTERS,
   INITIAL_ITEMS,
+  normalizeCanvasItems,
   type CanvasComponentLibrary,
   type CanvasCustomItemValidators,
   type CanvasItem,
@@ -87,6 +88,15 @@ export function createCanvasAppAssembly(
     input.customItemModules,
     { disabledModuleIds: input.disabledCustomItemModuleIds },
   )
+  const customItemValidators = mergeUniqueCanvasAppExtensionRecord({
+    current: {
+      ...DEFAULT_CANVAS_APP_ASSEMBLY.customItemValidators,
+      ...customItemModuleAssembly.customItemValidators,
+    },
+    entries: input.customItemValidators ?? {},
+    label: 'custom item validator',
+    owner: 'app assembly',
+  })
 
   const assembly: CanvasAppAssembly = {
     componentLibrary:
@@ -121,15 +131,7 @@ export function createCanvasAppAssembly(
       label: 'custom item renderer',
       owner: 'app assembly',
     }),
-    customItemValidators: mergeUniqueCanvasAppExtensionRecord({
-      current: {
-        ...DEFAULT_CANVAS_APP_ASSEMBLY.customItemValidators,
-        ...customItemModuleAssembly.customItemValidators,
-      },
-      entries: input.customItemValidators ?? {},
-      label: 'custom item validator',
-      owner: 'app assembly',
-    }),
+    customItemValidators,
     inspectorPanels: appendUniqueCanvasAppExtensionEntries({
       current: [
         ...DEFAULT_CANVAS_APP_ASSEMBLY.inspectorPanels,
@@ -139,7 +141,10 @@ export function createCanvasAppAssembly(
       label: 'inspector panel',
       owner: 'app assembly',
     }),
-    initialItems: input.initialItems ?? DEFAULT_CANVAS_APP_ASSEMBLY.initialItems,
+    initialItems: normalizeCanvasItems(
+      input.initialItems ?? DEFAULT_CANVAS_APP_ASSEMBLY.initialItems,
+      { customItemValidators },
+    ),
     itemAdapters: input.itemAdapters ?? DEFAULT_CANVAS_APP_ASSEMBLY.itemAdapters,
   }
 
