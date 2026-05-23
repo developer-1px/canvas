@@ -40,8 +40,9 @@
 | `src/canvas/host/operations` | Transform, text, clone, remove, group item operations |
 | `src/canvas/host/tree` | Bounds, traversal, selection tree helpers |
 | `src/canvas/host/adapters` | Demo host item을 engine interface에 맞추는 adapter |
+| `src/canvas/renderer` | Renderer public facade |
 | `src/canvas/renderer/svg` | SVG renderer adapter |
-| `src/canvas/ui` | Toolbar, palette, status, stage, editor controls |
+| `src/canvas/ui` | Toolbar, palette, status, editor controls |
 
 ## Feature Toggle Shape
 
@@ -89,6 +90,7 @@ type CanvasAffordanceConfig = {
 - App hook들은 `useCanvasDocument` 구현 파일에서 타입을 가져오지 않는다. document commit과 selection contract는 Canvas Workflow Contract를 통해 공유한다.
 - App workflow는 Host tree helper를 import하지 않는다. item 조회, bounds, selection 정규화, Scene Adapter 생성은 Canvas Item Read Model을 통해 사용한다.
 - App workflow는 `CANVAS_ITEM_ENGINE_ADAPTERS`를 통해 concrete item adapter를 주입한다.
+- App과 UI는 Renderer Adapter 내부 파일을 import하지 않는다. SVG stage는 `src/canvas/renderer` public facade에서 사용한다.
 - Renderer Adapter는 `CanvasOverlayState`를 받아 SVG로 그리며, Engine은 SVG/DOM 구현을 모른다.
 
 추출 순서는 동작 변경 없이 app workflow에서 Engine 책임을 하나씩 떼어내는 방식으로 진행한다.

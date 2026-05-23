@@ -2,23 +2,23 @@ import type { PointerEvent, RefObject } from 'react'
 import type {
   CanvasItem,
   RectItem,
-  TextItem
+  TextItem,
 } from '../../host'
 import type {
   CanvasInteractionKind,
   ResizeHandle,
   Tool,
-  Viewport
+  Viewport,
 } from '../../core'
 import type { CanvasOverlayState } from '../../engine'
-import { CanvasSvgItemRenderer } from '../../renderer/svg/CanvasSvgItemRenderer'
+import { CanvasSvgItemRenderer } from './CanvasSvgItemRenderer'
 import {
   CanvasSvgInteractionOverlays,
   CanvasSvgOverlayDefs,
   CanvasSvgOverlayPlane,
-} from '../../renderer/svg/CanvasSvgOverlayRenderer'
+} from './CanvasSvgOverlayRenderer'
 
-type CanvasStageProps = {
+type CanvasSvgStageProps = {
   activeMode: Tool
   gesture: CanvasInteractionKind
   items: CanvasItem[]
@@ -42,7 +42,7 @@ type CanvasStageProps = {
   onTextDoubleClick: (item: RectItem | TextItem) => void
 }
 
-export function CanvasStage({
+export function CanvasSvgStage({
   activeMode,
   gesture,
   items,
@@ -58,7 +58,7 @@ export function CanvasStage({
   onPointerUp,
   onResizePointerDown,
   onTextDoubleClick,
-}: CanvasStageProps) {
+}: CanvasSvgStageProps) {
   return (
     <svg
       ref={svgRef}

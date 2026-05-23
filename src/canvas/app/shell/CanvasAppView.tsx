@@ -1,5 +1,5 @@
 import type { ComponentProps } from 'react'
-import { CanvasStage } from '../../ui/stage/CanvasStage'
+import { CanvasSvgStage } from '../../renderer'
 import { CanvasComponentPalette } from '../../ui/palette/CanvasComponentPalette'
 import { CanvasObjectInspector } from '../../ui/inspector/CanvasObjectInspector'
 import { CanvasFindReplacePanel } from '../../ui/search/CanvasFindReplacePanel'
@@ -12,7 +12,7 @@ import type {
   CanvasCommandAvailability,
 } from '../../engine'
 
-type StageProps = ComponentProps<typeof CanvasStage>
+type StageProps = ComponentProps<typeof CanvasSvgStage>
 type ToolbarProps = ComponentProps<typeof CanvasToolbar>
 type TextEditorProps = ComponentProps<typeof CanvasTextEditor>
 type FindReplaceProps = ComponentProps<typeof CanvasFindReplacePanel>
@@ -141,7 +141,7 @@ export function CanvasAppView({
 
       <CanvasFindReplacePanel {...findReplace} />
 
-      <CanvasStage
+      <CanvasSvgStage
         activeMode={activeMode}
         gesture={gesture}
         items={items}
