@@ -3,35 +3,29 @@ import {
   type Dispatch,
   type SetStateAction,
 } from 'react'
-import {
-  alignCanvasCommand,
-  deleteCanvasCommand,
-  distributeCanvasCommand,
-  groupCanvasCommand,
-  lockCanvasCommand,
-  nudgeCanvasCommand,
-  reorderCanvasCommand,
-  selectAllCanvasCommand,
-  ungroupCanvasCommand,
-  unlockAllCanvasCommand,
-  type CanvasAffordanceConfig,
-  type CanvasAlignMode,
-  type CanvasCommandAdapter,
-  type CanvasDistributeMode,
-  type CanvasReorderMode,
+import type {
+  CanvasAffordanceConfig,
+  CanvasAlignMode,
+  CanvasCommandAdapter,
+  CanvasDistributeMode,
+  CanvasReorderMode,
 } from '../../engine'
 import type {
   CanvasItem,
   EditingText,
   Viewport,
 } from '../../entities'
-import { useCanvasClipboardCommands } from './useCanvasClipboardCommands'
 import type {
   CanvasDocumentClipboard,
   CommitCanvasItemsChange,
   CommitCanvasSelection,
 } from '../workflow/CanvasWorkflowContract'
 import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
+import {
+  executeCanvasStandardCommand,
+  type CanvasStandardCommand,
+} from './CanvasStandardCommandExecution'
+import { useCanvasClipboardCommands } from './useCanvasClipboardCommands'
 
 type UseCanvasCommandsArgs = {
   commandAdapter: CanvasCommandAdapter<CanvasItem>
@@ -92,282 +86,99 @@ export function useCanvasCommands({
     commitSelection,
   })
 
-  const alignSelection = useCallback(
-    (mode: CanvasAlignMode) => {
-      const result = alignCanvasCommand({
-        adapter: commandAdapter,
-        config,
-        items,
-        mode,
-        selection,
-      })
-
-      if (!result) {
-        return
-      }
-
-      commitItemsChange({ type: 'replace-changed', items: result.items }, {
-        before: selection,
-        after: result.selection,
+  const runStandardCommand = useCallback(
+    (command: CanvasStandardCommand) => {
+      executeCanvasStandardCommand({
+        command,
+        context: {
+          commandAdapter,
+          commitItemsChange,
+          commitSelection,
+          config,
+          createId,
+          items,
+          redo,
+          selection,
+          setEditing,
+          setSelection,
+          undo,
+        },
       })
     },
-    [commandAdapter, commitItemsChange, config, items, selection],
+    [
+      commandAdapter,
+      commitItemsChange,
+      commitSelection,
+      config,
+      createId,
+      items,
+      redo,
+      selection,
+      setEditing,
+      setSelection,
+      undo,
+    ],
+  )
+
+  const alignSelection = useCallback(
+    (mode: CanvasAlignMode) => {
+      runStandardCommand({ kind: 'align', mode })
+    },
+    [runStandardCommand],
   )
 
   const distributeSelection = useCallback(
     (mode: CanvasDistributeMode) => {
-      const result = distributeCanvasCommand({
-        adapter: commandAdapter,
-        config,
-        items,
-        mode,
-        selection,
-      })
-
-      if (!result) {
-        return
-      }
-
-      commitItemsChange({ type: 'replace-changed', items: result.items }, {
-        before: selection,
-        after: result.selection,
-      })
+      runStandardCommand({ kind: 'distribute', mode })
     },
-    [commandAdapter, commitItemsChange, config, items, selection],
+    [runStandardCommand],
   )
 
   const deleteSelection = useCallback(() => {
-    const result = deleteCanvasCommand({
-      adapter: commandAdapter,
-      config,
-      items,
-      selection,
-    })
-
-    if (!result) {
-      return
-    }
-
-    const didCommit = commitItemsChange(
-      { type: 'remove-selection', selection },
-      {
-        before: selection,
-        after: result.selection,
-      },
-    )
-
-    if (!didCommit) {
-      commitSelection(result.selection)
-    }
-
-    setEditing((current) =>
-      current && result.clearEditingIds.includes(current.id) ? null : current,
-    )
-  }, [
-    commandAdapter,
-    commitSelection,
-    commitItemsChange,
-    config,
-    items,
-    selection,
-    setEditing,
-  ])
+    runStandardCommand({ kind: 'delete' })
+  }, [runStandardCommand])
 
   const groupSelection = useCallback(() => {
-    const groupId = createId('group')
-    const result = groupCanvasCommand({
-      adapter: commandAdapter,
-      config,
-      createId: () => groupId,
-      items,
-      selection,
-    })
-
-    if (!result) {
-      return
-    }
-
-    const didCommit = commitItemsChange(
-      { type: 'group-selection', groupId, selection },
-      {
-        before: selection,
-        after: result.selection,
-      },
-    )
-
-    if (!didCommit) {
-      commitSelection(result.selection)
-    }
-  }, [
-    commandAdapter,
-    commitItemsChange,
-    commitSelection,
-    config,
-    createId,
-    items,
-    selection,
-  ])
+    runStandardCommand({ kind: 'group' })
+  }, [runStandardCommand])
 
   const ungroupSelection = useCallback(() => {
-    const result = ungroupCanvasCommand({
-      adapter: commandAdapter,
-      config,
-      items,
-      selection,
-    })
-
-    if (!result) {
-      return
-    }
-
-    const didCommit = commitItemsChange(
-      { type: 'ungroup-selection', selection },
-      {
-        before: selection,
-        after: result.selection,
-      },
-    )
-
-    if (!didCommit) {
-      commitSelection(result.selection)
-    }
-  }, [commandAdapter, commitItemsChange, commitSelection, config, items, selection])
+    runStandardCommand({ kind: 'ungroup' })
+  }, [runStandardCommand])
 
   const lockSelection = useCallback(() => {
-    const result = lockCanvasCommand({
-      adapter: commandAdapter,
-      config,
-      items,
-      selection,
-    })
-
-    if (!result) {
-      return
-    }
-
-    const didCommit = commitItemsChange(
-      { type: 'replace-changed', items: result.items },
-      {
-        before: selection,
-        after: result.selection,
-      },
-    )
-
-    if (!didCommit) {
-      commitSelection(result.selection)
-    }
-  }, [commandAdapter, commitItemsChange, commitSelection, config, items, selection])
+    runStandardCommand({ kind: 'lock' })
+  }, [runStandardCommand])
 
   const unlockAll = useCallback(() => {
-    const result = unlockAllCanvasCommand({
-      adapter: commandAdapter,
-      config,
-      items,
-      selection,
-    })
-
-    if (!result) {
-      return
-    }
-
-    const didCommit = commitItemsChange(
-      { type: 'replace-changed', items: result.items },
-      {
-        before: selection,
-        after: result.selection,
-      },
-    )
-
-    if (!didCommit) {
-      commitSelection(result.selection)
-    }
-  }, [commandAdapter, commitItemsChange, commitSelection, config, items, selection])
+    runStandardCommand({ kind: 'unlock-all' })
+  }, [runStandardCommand])
 
   const undoHistory = useCallback(() => {
-    if (!config.commands.undo) {
-      return
-    }
-
-    const restoredSelection = undo()
-    setEditing(null)
-    if (restoredSelection) {
-      setSelection(restoredSelection)
-    }
-  }, [config.commands.undo, setEditing, setSelection, undo])
+    runStandardCommand({ kind: 'undo' })
+  }, [runStandardCommand])
 
   const redoHistory = useCallback(() => {
-    if (!config.commands.redo) {
-      return
-    }
-
-    const restoredSelection = redo()
-    setEditing(null)
-    if (restoredSelection) {
-      setSelection(restoredSelection)
-    }
-  }, [config.commands.redo, redo, setEditing, setSelection])
+    runStandardCommand({ kind: 'redo' })
+  }, [runStandardCommand])
 
   const moveSelection = useCallback(
     (dx: number, dy: number) => {
-      const result = nudgeCanvasCommand({
-        adapter: commandAdapter,
-        config,
-        dx,
-        dy,
-        items,
-        selection,
-      })
-
-      if (!result) {
-        return
-      }
-
-      commitItemsChange(
-        { type: 'replace-changed', items: result },
-        {
-          before: selection,
-          after: selection,
-        },
-      )
+      runStandardCommand({ dx, dy, kind: 'nudge' })
     },
-    [commandAdapter, commitItemsChange, config, items, selection],
+    [runStandardCommand],
   )
 
   const reorderSelection = useCallback(
     (mode: CanvasReorderMode) => {
-      const result = reorderCanvasCommand({
-        adapter: commandAdapter,
-        config,
-        items,
-        mode,
-        selection,
-      })
-
-      if (!result) {
-        return
-      }
-
-      commitItemsChange({ type: 'reorder-selection', mode, selection }, {
-        before: selection,
-        after: result.selection,
-      })
+      runStandardCommand({ kind: 'reorder', mode })
     },
-    [commandAdapter, commitItemsChange, config, items, selection],
+    [runStandardCommand],
   )
 
   const selectAll = useCallback(() => {
-    const nextSelection = selectAllCanvasCommand({
-      adapter: commandAdapter,
-      config,
-      items,
-    })
-
-    if (!nextSelection) {
-      return
-    }
-
-    commitSelection(nextSelection)
-  }, [commandAdapter, commitSelection, config, items])
+    runStandardCommand({ kind: 'select-all' })
+  }, [runStandardCommand])
 
   return {
     alignSelection,

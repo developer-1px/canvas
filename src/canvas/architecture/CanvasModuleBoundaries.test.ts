@@ -781,6 +781,68 @@ describe('Canvas module boundaries', () => {
     )
   })
 
+  it('keeps App standard command execution behind a named module', () => {
+    const commandHookFile = getSourceFile(
+      'src/canvas/app/commands/useCanvasCommands.ts',
+    )
+    const executionFile = getSourceFile(
+      'src/canvas/app/commands/CanvasStandardCommandExecution.ts',
+    )
+
+    expect(commandHookFile.source).toContain(
+      "from './CanvasStandardCommandExecution'",
+    )
+    expect(commandHookFile.source).not.toContain('alignCanvasCommand')
+    expect(commandHookFile.source).not.toContain('deleteCanvasCommand')
+    expect(commandHookFile.source).not.toContain('groupCanvasCommand')
+    expect(commandHookFile.source).not.toContain('nudgeCanvasCommand')
+    expect(commandHookFile.source).not.toContain('selectAllCanvasCommand')
+    expect(commandHookFile.source).not.toContain("type: 'remove-selection'")
+    expect(commandHookFile.source).not.toContain("type: 'group-selection'")
+    expect(executionFile.source).toContain(
+      'export function executeCanvasStandardCommand',
+    )
+    expect(executionFile.source).toContain('alignCanvasCommand')
+    expect(executionFile.source).toContain('deleteCanvasCommand')
+    expect(executionFile.source).toContain('groupCanvasCommand')
+    expect(executionFile.source).toContain('nudgeCanvasCommand')
+    expect(executionFile.source).toContain('selectAllCanvasCommand')
+    expect(executionFile.source).toContain("type: 'remove-selection'")
+    expect(executionFile.source).toContain("type: 'group-selection'")
+  })
+
+  it('keeps App clipboard command execution behind a named module', () => {
+    const clipboardHookFile = getSourceFile(
+      'src/canvas/app/commands/useCanvasClipboardCommands.ts',
+    )
+    const executionFile = getSourceFile(
+      'src/canvas/app/commands/CanvasClipboardCommandExecution.ts',
+    )
+
+    expect(clipboardHookFile.source).toContain(
+      "from './CanvasClipboardCommandExecution'",
+    )
+    expect(clipboardHookFile.source).not.toContain(
+      'cloneCanvasCommandItems',
+    )
+    expect(clipboardHookFile.source).not.toContain(
+      'duplicateCanvasCommand',
+    )
+    expect(clipboardHookFile.source).not.toContain('deleteCanvasCommand')
+    expect(clipboardHookFile.source).not.toContain('getCanvasPasteOffset')
+    expect(clipboardHookFile.source).not.toContain('copyItemsToClipboard(')
+    expect(clipboardHookFile.source).not.toContain("type: 'remove-selection'")
+    expect(executionFile.source).toContain(
+      'export function executeCanvasClipboardCommand',
+    )
+    expect(executionFile.source).toContain('cloneCanvasCommandItems')
+    expect(executionFile.source).toContain('duplicateCanvasCommand')
+    expect(executionFile.source).toContain('deleteCanvasCommand')
+    expect(executionFile.source).toContain('getCanvasPasteOffset')
+    expect(executionFile.source).toContain('copyItemsToClipboard(')
+    expect(executionFile.source).toContain("type: 'remove-selection'")
+  })
+
   it('keeps App custom command contracts behind a named module', () => {
     const descriptorFile = getSourceFile(
       'src/canvas/app/commands/CanvasAppCustomCommands.ts',

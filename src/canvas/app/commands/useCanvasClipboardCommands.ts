@@ -4,13 +4,9 @@ import {
   type Dispatch,
   type SetStateAction,
 } from 'react'
-import {
-  CANVAS_COMMAND_INSERT_OFFSET,
-  cloneCanvasCommandItems,
-  deleteCanvasCommand,
-  duplicateCanvasCommand,
-  type CanvasAffordanceConfig,
-  type CanvasCommandAdapter,
+import type {
+  CanvasAffordanceConfig,
+  CanvasCommandAdapter,
 } from '../../engine'
 import type {
   CanvasItem,
@@ -18,13 +14,16 @@ import type {
   Point,
   Viewport,
 } from '../../entities'
-import { getCanvasPasteOffset } from './CanvasPastePosition'
+import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
 import type {
   CanvasDocumentClipboard,
   CommitCanvasItemsChange,
   CommitCanvasSelection,
 } from '../workflow/CanvasWorkflowContract'
-import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
+import {
+  executeCanvasClipboardCommand,
+  type CanvasClipboardCommand,
+} from './CanvasClipboardCommandExecution'
 
 type UseCanvasClipboardCommandsArgs = {
   commandAdapter: CanvasCommandAdapter<CanvasItem>
@@ -59,154 +58,82 @@ export function useCanvasClipboardCommands({
 }: UseCanvasClipboardCommandsArgs) {
   const pasteIndexRef = useRef(0)
 
-  const cloneItems = useCallback(
-    (ids: string[], offset: Point) =>
-      cloneCanvasCommandItems({
-        adapter: commandAdapter,
-        createId,
-        ids,
-        items,
-        offset,
-      }),
-    [commandAdapter, createId, items],
-  )
-
-  const duplicateSelection = useCallback(
-    (sourceIds = selection, offset: Point = CANVAS_COMMAND_INSERT_OFFSET) => {
-      const result = duplicateCanvasCommand({
-        adapter: commandAdapter,
-        config,
-        createId,
-        items,
-        offset,
-        selection,
-        sourceIds,
+  const runClipboardCommand = useCallback(
+    (command: CanvasClipboardCommand) => {
+      const result = executeCanvasClipboardCommand({
+        command,
+        context: {
+          commandAdapter,
+          commitItemsChange,
+          commitSelection,
+          config,
+          copyItemsToClipboard,
+          createId,
+          getClipboardItems,
+          items,
+          selection,
+          setClipboardItems,
+          setEditing,
+          stageElement,
+          viewport,
+        },
       })
 
-      if (!result) {
-        return []
+      if (result.nextPasteIndex !== undefined) {
+        pasteIndexRef.current = result.nextPasteIndex
       }
 
-      const didCommit = commitItemsChange({ type: 'add', items: result.clones }, {
-        before: selection,
-        after: result.selection,
-      })
-
-      if (!didCommit) {
-        return []
-      }
-
-      return result.clones
+      return result.clonedItems
     },
     [
       commandAdapter,
       commitItemsChange,
+      commitSelection,
       config,
+      copyItemsToClipboard,
       createId,
+      getClipboardItems,
       items,
       selection,
+      setClipboardItems,
+      setEditing,
+      stageElement,
+      viewport,
     ],
   )
 
-  const copySelection = useCallback(() => {
-    if (!config.commands.copy || !copyItemsToClipboard(selection)) {
-      return
-    }
+  const cloneItems = useCallback(
+    (ids: string[], offset: Point) =>
+      runClipboardCommand({ ids, kind: 'clone', offset }),
+    [runClipboardCommand],
+  )
 
-    pasteIndexRef.current = 0
-  }, [config.commands.copy, copyItemsToClipboard, selection])
+  const duplicateSelection = useCallback(
+    (sourceIds = selection, offset?: Point) =>
+      runClipboardCommand({ kind: 'duplicate', offset, sourceIds }),
+    [runClipboardCommand, selection],
+  )
+
+  const copySelection = useCallback(() => {
+    runClipboardCommand({
+      kind: 'copy',
+      pasteIndex: pasteIndexRef.current,
+    })
+  }, [runClipboardCommand])
 
   const pasteSelection = useCallback(() => {
-    if (!config.commands.paste) {
-      return
-    }
-
-    const clipboard = getClipboardItems()
-    const offset = getCanvasPasteOffset({
-      clipboard,
+    runClipboardCommand({
+      kind: 'paste',
       pasteIndex: pasteIndexRef.current,
-      viewportCenter: stageElement.getViewportCenter(viewport),
     })
-    const clones = commandAdapter.pasteItems({
-      clipboard,
-      createId,
-      offset,
-    })
-
-    if (clones.length === 0) {
-      return
-    }
-
-    const didCommit = commitItemsChange({ type: 'add', items: clones }, {
-      before: selection,
-      after: clones.map((item) => item.id),
-    })
-
-    if (!didCommit) {
-      return
-    }
-
-    setClipboardItems(clones)
-    pasteIndexRef.current += 1
-  }, [
-    commandAdapter,
-    commitItemsChange,
-    config.commands.paste,
-    createId,
-    getClipboardItems,
-    selection,
-    setClipboardItems,
-    stageElement,
-    viewport,
-  ])
+  }, [runClipboardCommand])
 
   const cutSelection = useCallback(() => {
-    if (!config.commands.cut) {
-      return
-    }
-
-    if (config.commands.copy && copyItemsToClipboard(selection)) {
-      pasteIndexRef.current = 0
-    }
-
-    const deletion = deleteCanvasCommand({
-      adapter: commandAdapter,
-      config,
-      items,
-      selection,
+    runClipboardCommand({
+      kind: 'cut',
+      pasteIndex: pasteIndexRef.current,
     })
-
-    if (!deletion) {
-      return
-    }
-
-    const didCommit = commitItemsChange(
-      { type: 'remove-selection', selection },
-      {
-        before: selection,
-        after: deletion.selection,
-      },
-    )
-
-    if (!didCommit) {
-      commitSelection(deletion.selection)
-    }
-
-    setEditing((current) =>
-      current && deletion.clearEditingIds.includes(current.id)
-        ? null
-        : current,
-    )
-  }, [
-    commandAdapter,
-    commitSelection,
-    commitItemsChange,
-    config,
-    copyItemsToClipboard,
-    items,
-    selection,
-    setEditing,
-  ])
+  }, [runClipboardCommand])
 
   return {
     cloneItems,
