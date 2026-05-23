@@ -1,23 +1,14 @@
-import type { RefObject } from 'react'
 import type {
   Point,
   Viewport
 } from '../../core'
+import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
 
 export function screenPoint(
-  svgRef: RefObject<SVGSVGElement | null>,
+  stageElement: CanvasAppStageElement,
   event: { clientX: number; clientY: number },
 ) {
-  const rect = svgRef.current?.getBoundingClientRect()
-
-  if (!rect) {
-    return { x: 0, y: 0 }
-  }
-
-  return {
-    x: event.clientX - rect.left,
-    y: event.clientY - rect.top,
-  }
+  return stageElement.getScreenPoint(event)
 }
 
 export function screenToWorld(point: Point, viewport: Viewport) {
@@ -28,23 +19,15 @@ export function screenToWorld(point: Point, viewport: Viewport) {
 }
 
 export function capturePointer(
-  svgRef: RefObject<SVGSVGElement | null>,
+  stageElement: CanvasAppStageElement,
   pointerId: number,
 ) {
-  const svg = svgRef.current
-
-  if (svg && !svg.hasPointerCapture(pointerId)) {
-    svg.setPointerCapture(pointerId)
-  }
+  stageElement.capturePointer(pointerId)
 }
 
 export function releasePointer(
-  svgRef: RefObject<SVGSVGElement | null>,
+  stageElement: CanvasAppStageElement,
   pointerId: number,
 ) {
-  const svg = svgRef.current
-
-  if (svg?.hasPointerCapture(pointerId)) {
-    svg.releasePointerCapture(pointerId)
-  }
+  stageElement.releasePointer(pointerId)
 }

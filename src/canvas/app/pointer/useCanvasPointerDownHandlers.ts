@@ -2,7 +2,6 @@ import type {
   Dispatch,
   MutableRefObject,
   PointerEvent,
-  RefObject,
   SetStateAction,
 } from 'react'
 import { useRef } from 'react'
@@ -48,6 +47,7 @@ import {
   getCanvasAppCustomCreationTool,
   type CanvasAppCustomCreationTool,
 } from '../tools/CanvasAppCustomCreationTools'
+import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
 
 type UseCanvasPointerDownHandlersArgs = {
   cloneItems: (ids: string[], offset: Point) => CanvasItem[]
@@ -72,7 +72,7 @@ type UseCanvasPointerDownHandlersArgs = {
   setSelection: Dispatch<SetStateAction<string[]>>
   setTool: Dispatch<SetStateAction<Tool>>
   spaceDown: boolean
-  svgRef: RefObject<SVGSVGElement | null>
+  stageElement: CanvasAppStageElement
   tool: Tool
   viewport: Viewport
 }
@@ -100,7 +100,7 @@ export function useCanvasPointerDownHandlers({
   setSelection,
   setTool,
   spaceDown,
-  svgRef,
+  stageElement,
   tool,
   viewport,
 }: UseCanvasPointerDownHandlersArgs) {
@@ -156,9 +156,9 @@ export function useCanvasPointerDownHandlers({
     }
 
     event.preventDefault()
-    capturePointer(svgRef, event.pointerId)
+    capturePointer(stageElement, event.pointerId)
 
-    const startScreen = screenPoint(svgRef, event)
+    const startScreen = screenPoint(stageElement, event)
     const startWorld = screenToWorld(startScreen, viewport)
 
     if (pointerGesture === 'pan') {
@@ -287,9 +287,9 @@ export function useCanvasPointerDownHandlers({
 
     event.preventDefault()
     event.stopPropagation()
-    capturePointer(svgRef, event.pointerId)
+    capturePointer(stageElement, event.pointerId)
 
-    const startScreen = screenPoint(svgRef, event)
+    const startScreen = screenPoint(stageElement, event)
     const lastClick = lastClickRef.current
     const now = performance.now()
     const isDoubleClick =
@@ -390,9 +390,9 @@ export function useCanvasPointerDownHandlers({
 
     event.preventDefault()
     event.stopPropagation()
-    capturePointer(svgRef, event.pointerId)
+    capturePointer(stageElement, event.pointerId)
 
-    const startScreen = screenPoint(svgRef, event)
+    const startScreen = screenPoint(stageElement, event)
     const startWorld = screenToWorld(startScreen, viewport)
 
     interactionRef.current = {

@@ -30,6 +30,7 @@ import {
   getCanvasAppCustomCreationToolStates,
   type CanvasAppCustomCreationToolState,
 } from '../tools/CanvasAppCustomCreationTools'
+import { useCanvasAppStageElement } from '../stage/CanvasAppStageElement'
 import { useCanvasViewportControls } from '../viewport/useCanvasViewportControls'
 import { useCanvasWheelViewport } from '../viewport/useCanvasWheelViewport'
 import { useCanvasFindReplaceModel } from './useCanvasFindReplaceModel'
@@ -66,11 +67,8 @@ export function useCanvasAppModel({
     itemLayerAdapter,
     stageAdapter,
   } = validatedAssembly
-  const svgRef = useRef<SVGSVGElement | null>(null)
+  const stageElement = useCanvasAppStageElement()
   const editorRef = useRef<HTMLTextAreaElement | null>(null)
-  const setStageElement = useCallback((element: SVGSVGElement | null) => {
-    svgRef.current = element
-  }, [])
   const {
     canRedo,
     canUndo,
@@ -141,7 +139,7 @@ export function useCanvasAppModel({
   useCanvasWheelViewport({
     config: canvasAffordanceConfig,
     setViewport,
-    svgRef,
+    stageElement,
   })
 
   const {
@@ -236,7 +234,7 @@ export function useCanvasAppModel({
     setEditing,
     setClipboardItems,
     setSelection,
-    svgRef,
+    stageElement,
     undo,
     viewport,
   })
@@ -245,7 +243,7 @@ export function useCanvasAppModel({
     useCanvasViewportControls({
       itemReadModel,
       setViewport,
-      svgRef,
+      stageElement,
     })
 
   useCanvasKeyboardShortcuts({
@@ -310,7 +308,7 @@ export function useCanvasAppModel({
     setSelection,
     setTool,
     spaceDown,
-    svgRef,
+    stageElement,
     tool,
     viewport,
   })
@@ -340,7 +338,7 @@ export function useCanvasAppModel({
     setSnapGuides,
     setTool,
     setViewport,
-    svgRef,
+    stageElement,
     transformAdapter: itemAdapters.transform,
     viewport,
   })
@@ -352,7 +350,7 @@ export function useCanvasAppModel({
     selection,
     setEditing,
     setTool,
-    svgRef,
+    stageElement,
     viewport,
   })
 
@@ -398,7 +396,7 @@ export function useCanvasAppModel({
         }),
         gesture,
         overlays,
-        onStageElement: setStageElement,
+        onStageElement: stageElement.setElement,
         viewport,
         onCanvasPointerDown: handleStageCanvasPointerDown,
         onContextMenu: (event: PointerEvent<SVGSVGElement>) =>

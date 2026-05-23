@@ -2,7 +2,6 @@ import {
   useCallback,
   useRef,
   type Dispatch,
-  type RefObject,
   type SetStateAction,
 } from 'react'
 import {
@@ -25,6 +24,7 @@ import type {
   CommitCanvasItemsChange,
   CommitCanvasSelection,
 } from '../workflow/CanvasWorkflowContract'
+import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
 
 type UseCanvasClipboardCommandsArgs = {
   commandAdapter: CanvasCommandAdapter<CanvasItem>
@@ -38,7 +38,7 @@ type UseCanvasClipboardCommandsArgs = {
   selection: string[]
   setEditing: Dispatch<SetStateAction<EditingText | null>>
   setClipboardItems: CanvasDocumentClipboard['setClipboardItems']
-  svgRef: RefObject<SVGSVGElement | null>
+  stageElement: CanvasAppStageElement
   viewport: Viewport
 }
 
@@ -54,7 +54,7 @@ export function useCanvasClipboardCommands({
   selection,
   setEditing,
   setClipboardItems,
-  svgRef,
+  stageElement,
   viewport,
 }: UseCanvasClipboardCommandsArgs) {
   const pasteIndexRef = useRef(0)
@@ -125,7 +125,7 @@ export function useCanvasClipboardCommands({
     const offset = getCanvasPasteOffset({
       clipboard,
       pasteIndex: pasteIndexRef.current,
-      viewportCenter: getViewportCenter(svgRef, viewport),
+      viewportCenter: stageElement.getViewportCenter(viewport),
     })
     const clones = commandAdapter.pasteItems({
       clipboard,
@@ -156,7 +156,7 @@ export function useCanvasClipboardCommands({
     getClipboardItems,
     selection,
     setClipboardItems,
-    svgRef,
+    stageElement,
     viewport,
   ])
 
@@ -214,21 +214,5 @@ export function useCanvasClipboardCommands({
     cutSelection,
     duplicateSelection,
     pasteSelection,
-  }
-}
-
-function getViewportCenter(
-  svgRef: RefObject<SVGSVGElement | null>,
-  viewport: Viewport,
-): Point | null {
-  const rect = svgRef.current?.getBoundingClientRect()
-
-  if (!rect) {
-    return null
-  }
-
-  return {
-    x: (rect.width / 2 - viewport.x) / viewport.scale,
-    y: (rect.height / 2 - viewport.y) / viewport.scale,
   }
 }

@@ -231,6 +231,23 @@ describe('Canvas module boundaries', () => {
     expect(violations).toEqual([])
   })
 
+  it('keeps raw stage DOM operations inside the app stage element module', () => {
+    const rawStageDomTerms =
+      /\b(svgRef|RefObject<SVGSVGElement|stageElement\.current|getBoundingClientRect|setPointerCapture|releasePointerCapture|addEventListener\(['"]wheel['"])\b/
+    const violations = sourceFiles
+      .filter((file) =>
+        file.path.startsWith('src/canvas/app/') &&
+        !file.path.startsWith('src/canvas/app/stage/') &&
+        !file.path.endsWith('.test.ts') &&
+        !file.path.endsWith('.test.tsx'),
+      )
+      .flatMap((file) =>
+        rawStageDomTerms.test(file.source) ? [file.path] : [],
+      )
+
+    expect(violations).toEqual([])
+  })
+
   it('keeps app workflow hooks from recreating the workspace read model', () => {
     const violations = sourceFiles
       .filter((file) =>

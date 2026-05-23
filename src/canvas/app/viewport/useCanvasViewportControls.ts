@@ -1,7 +1,6 @@
 import {
   useCallback,
   type Dispatch,
-  type RefObject,
   type SetStateAction,
 } from 'react'
 import type { Viewport } from '../../entities'
@@ -11,17 +10,18 @@ import {
   INITIAL_VIEWPORT,
   zoomViewport,
 } from '../../core'
+import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
 
 type UseCanvasViewportControlsArgs = {
   itemReadModel: CanvasItemReadModel
   setViewport: Dispatch<SetStateAction<Viewport>>
-  svgRef: RefObject<SVGSVGElement | null>
+  stageElement: CanvasAppStageElement
 }
 
 export function useCanvasViewportControls({
   itemReadModel,
   setViewport,
-  svgRef,
+  stageElement,
 }: UseCanvasViewportControlsArgs) {
   const fitToItems = useCallback(
     (ids?: string[]) => {
@@ -30,7 +30,7 @@ export function useCanvasViewportControls({
           ? ids
           : itemReadModel.getAllIds()
       const bounds = itemReadModel.getSelectionBounds(targetIds)
-      const rect = svgRef.current?.getBoundingClientRect()
+      const rect = stageElement.getRect()
 
       if (!bounds || !rect) {
         return
@@ -38,7 +38,7 @@ export function useCanvasViewportControls({
 
       setViewport(fitBoundsIntoViewport(bounds, rect))
     },
-    [itemReadModel, setViewport, svgRef],
+    [itemReadModel, setViewport, stageElement],
   )
 
   const resetViewport = useCallback(() => {
@@ -47,7 +47,7 @@ export function useCanvasViewportControls({
 
   const zoomBy = useCallback(
     (multiplier: number) => {
-      const rect = svgRef.current?.getBoundingClientRect()
+      const rect = stageElement.getRect()
 
       if (!rect) {
         return
@@ -60,7 +60,7 @@ export function useCanvasViewportControls({
 
       setViewport((current) => zoomViewport(current, point, multiplier))
     },
-    [setViewport, svgRef],
+    [setViewport, stageElement],
   )
 
   return {

@@ -1,7 +1,6 @@
 import {
   useEffect,
   type Dispatch,
-  type RefObject,
   type SetStateAction,
 } from 'react'
 import type { Viewport } from '../../entities'
@@ -11,28 +10,21 @@ import {
   type CanvasAffordanceConfig,
   type CanvasWheelInput,
 } from '../../engine'
+import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
 
 type UseCanvasWheelViewportArgs = {
   config: CanvasAffordanceConfig
   setViewport: Dispatch<SetStateAction<Viewport>>
-  svgRef: RefObject<SVGSVGElement | null>
+  stageElement: CanvasAppStageElement
 }
 
 export function useCanvasWheelViewport({
   config,
   setViewport,
-  svgRef,
+  stageElement,
 }: UseCanvasWheelViewportArgs) {
   useEffect(() => {
-    const svg = svgRef.current
-
-    if (!svg) {
-      return
-    }
-
-    const svgElement = svg
-
-    function handleNativeWheel(event: globalThis.WheelEvent) {
+    return stageElement.addWheelListener((event, rect) => {
       const input = getCanvasWheelInput(event)
 
       if (!shouldHandleCanvasWheelViewport({ config, input })) {
@@ -41,7 +33,6 @@ export function useCanvasWheelViewport({
 
       event.preventDefault()
 
-      const rect = svgElement.getBoundingClientRect()
       const point = {
         x: event.clientX - rect.left,
         y: event.clientY - rect.top,
@@ -56,14 +47,8 @@ export function useCanvasWheelViewport({
             viewport: current,
           }) ?? current,
       )
-    }
-
-    svgElement.addEventListener('wheel', handleNativeWheel, { passive: false })
-
-    return () => {
-      svgElement.removeEventListener('wheel', handleNativeWheel)
-    }
-  }, [config, setViewport, svgRef])
+    })
+  }, [config, setViewport, stageElement])
 }
 
 function getCanvasWheelInput(event: globalThis.WheelEvent): CanvasWheelInput {

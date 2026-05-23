@@ -1,7 +1,6 @@
 import {
   useCallback,
   type Dispatch,
-  type RefObject,
   type SetStateAction,
 } from 'react'
 import {
@@ -32,6 +31,7 @@ import type {
   CommitCanvasItemsChange,
   CommitCanvasSelection,
 } from '../workflow/CanvasWorkflowContract'
+import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
 
 type UseCanvasCommandsArgs = {
   commandAdapter: CanvasCommandAdapter<CanvasItem>
@@ -47,7 +47,7 @@ type UseCanvasCommandsArgs = {
   setEditing: Dispatch<SetStateAction<EditingText | null>>
   setClipboardItems: CanvasDocumentClipboard['setClipboardItems']
   setSelection: Dispatch<SetStateAction<string[]>>
-  svgRef: RefObject<SVGSVGElement | null>
+  stageElement: CanvasAppStageElement
   undo: () => string[] | undefined
   viewport: Viewport
 }
@@ -66,7 +66,7 @@ export function useCanvasCommands({
   setEditing,
   setClipboardItems,
   setSelection,
-  svgRef,
+  stageElement,
   undo,
   viewport,
 }: UseCanvasCommandsArgs) {
@@ -87,7 +87,7 @@ export function useCanvasCommands({
     selection,
     setEditing,
     setClipboardItems,
-    svgRef,
+    stageElement,
     viewport,
     commitSelection,
   })

@@ -2,7 +2,6 @@ import type {
   Dispatch,
   MutableRefObject,
   PointerEvent,
-  RefObject,
   SetStateAction,
 } from 'react'
 import type {
@@ -48,6 +47,7 @@ import {
 } from './CanvasPointerDrawing'
 import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
 import { commitCanvasCustomCreation } from './CanvasCustomCreationCommit'
+import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
 
 type UseCanvasPointerDragHandlersArgs = {
   commitSelection: CommitCanvasSelection
@@ -70,7 +70,7 @@ type UseCanvasPointerDragHandlersArgs = {
   setSnapGuides: Dispatch<SetStateAction<CanvasSnapGuides>>
   setTool: Dispatch<SetStateAction<Tool>>
   setViewport: Dispatch<SetStateAction<Viewport>>
-  svgRef: RefObject<SVGSVGElement | null>
+  stageElement: CanvasAppStageElement
   transformAdapter: CanvasTransformAdapter<CanvasItem>
   viewport: Viewport
 }
@@ -96,7 +96,7 @@ export function useCanvasPointerDragHandlers({
   setSnapGuides,
   setTool,
   setViewport,
-  svgRef,
+  stageElement,
   transformAdapter,
   viewport,
 }: UseCanvasPointerDragHandlersArgs) {
@@ -109,7 +109,7 @@ export function useCanvasPointerDragHandlers({
 
     event.preventDefault()
 
-    const currentScreen = screenPoint(svgRef, event)
+    const currentScreen = screenPoint(stageElement, event)
     const currentWorld = screenToWorld(currentScreen, viewport)
 
     if (interaction.kind === 'pan') {
@@ -364,7 +364,7 @@ export function useCanvasPointerDragHandlers({
     }
 
     event.preventDefault()
-    releasePointer(svgRef, event.pointerId)
+    releasePointer(stageElement, event.pointerId)
 
     if (interaction.kind === 'create-rect') {
       const nextItem = createCanvasRect({
@@ -497,7 +497,7 @@ export function useCanvasPointerDragHandlers({
       setSelection(interaction.baseSelection)
     }
 
-    releasePointer(svgRef, event.pointerId)
+    releasePointer(stageElement, event.pointerId)
     interactionRef.current = { kind: 'none' }
     setGesture('none')
     setMarquee(null)

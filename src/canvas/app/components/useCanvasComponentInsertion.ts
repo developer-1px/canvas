@@ -1,7 +1,6 @@
 import {
   useCallback,
   type Dispatch,
-  type RefObject,
   type SetStateAction,
 } from 'react'
 import type {
@@ -12,6 +11,7 @@ import type {
 } from '../../entities'
 import type { CanvasComponentLibrary } from '../../host'
 import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract'
+import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
 
 type UseCanvasComponentInsertionArgs = {
   componentLibrary: CanvasComponentLibrary
@@ -20,7 +20,7 @@ type UseCanvasComponentInsertionArgs = {
   selection: string[]
   setEditing: Dispatch<SetStateAction<EditingText | null>>
   setTool: Dispatch<SetStateAction<Tool>>
-  svgRef: RefObject<SVGSVGElement | null>
+  stageElement: CanvasAppStageElement
   viewport: Viewport
 }
 
@@ -31,18 +31,15 @@ export function useCanvasComponentInsertion({
   selection,
   setEditing,
   setTool,
-  svgRef,
+  stageElement,
   viewport,
 }: UseCanvasComponentInsertionArgs) {
   return useCallback(
     (component: CanvasComponentKind) => {
-      const rect = svgRef.current?.getBoundingClientRect()
-      const point = rect
-        ? {
-            x: (rect.width / 2 - viewport.x) / viewport.scale,
-            y: (rect.height / 2 - viewport.y) / viewport.scale,
-          }
-        : { x: 120, y: 120 }
+      const point = stageElement.getViewportCenter(viewport) ?? {
+        x: 120,
+        y: 120,
+      }
       const nextItem = componentLibrary.createItem({
         id: createId('component'),
         point,
@@ -63,7 +60,7 @@ export function useCanvasComponentInsertion({
       selection,
       setEditing,
       setTool,
-      svgRef,
+      stageElement,
       viewport,
     ],
   )
