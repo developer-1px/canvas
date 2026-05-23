@@ -9,6 +9,7 @@ describe('CanvasAppCustomItemModules', () => {
     const renderRisk = () => 'risk'
     const validateRisk = () => true
     const module = defineCanvasAppCustomItemModule({
+      id: 'risk',
       customCommands: [
         {
           id: 'publish-risk',
@@ -67,6 +68,7 @@ describe('CanvasAppCustomItemModules', () => {
 
   it('rejects duplicate module-owned extension keys', () => {
     const first = defineCanvasAppCustomItemModule({
+      id: 'risk',
       customCreationTools: [
         {
           id: 'risk',
@@ -88,6 +90,7 @@ describe('CanvasAppCustomItemModules', () => {
       ],
     })
     const second = defineCanvasAppCustomItemModule({
+      id: 'duplicate-risk',
       customCreationTools: [
         {
           id: 'risk',
@@ -101,5 +104,14 @@ describe('CanvasAppCustomItemModules', () => {
     expect(() =>
       createCanvasAppCustomItemModuleAssembly([first, second]),
     ).toThrow('Duplicate canvas custom item module custom creation tool: risk')
+  })
+
+  it('rejects duplicate module ids', () => {
+    const first = defineCanvasAppCustomItemModule({ id: 'risk' })
+    const second = defineCanvasAppCustomItemModule({ id: 'risk' })
+
+    expect(() =>
+      createCanvasAppCustomItemModuleAssembly([first, second]),
+    ).toThrow('Duplicate canvas custom item module: risk')
   })
 })

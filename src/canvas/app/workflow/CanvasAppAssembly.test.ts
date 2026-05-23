@@ -40,6 +40,7 @@ describe('CanvasAppAssembly', () => {
       'risk-node': renderRiskItem,
     })
     const riskModule = defineCanvasAppCustomItemModule({
+      id: 'risk',
       customCommands: [
         {
           id: 'publish',
@@ -109,5 +110,23 @@ describe('CanvasAppAssembly', () => {
       'risk-meta',
     ])
     expect(assembly.initialItems).toEqual([])
+  })
+
+  it('rejects duplicate extension keys across modules and direct input', () => {
+    const riskModule = defineCanvasAppCustomItemModule({
+      id: 'risk',
+      customItemValidators: {
+        risk: () => true,
+      },
+    })
+
+    expect(() =>
+      createCanvasAppAssembly({
+        customItemModules: [riskModule],
+        customItemValidators: {
+          risk: () => false,
+        },
+      }),
+    ).toThrow('Duplicate canvas app assembly custom item validator: risk')
   })
 })

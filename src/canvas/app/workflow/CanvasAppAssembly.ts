@@ -73,32 +73,90 @@ export function createCanvasAppAssembly(
     componentPresentationRenderers:
       input.componentPresentationRenderers ??
       DEFAULT_CANVAS_APP_ASSEMBLY.componentPresentationRenderers,
-    customCommands: [
-      ...DEFAULT_CANVAS_APP_ASSEMBLY.customCommands,
-      ...customItemModuleAssembly.customCommands,
-      ...(input.customCommands ?? []),
-    ],
-    customCreationTools: [
-      ...DEFAULT_CANVAS_APP_ASSEMBLY.customCreationTools,
-      ...customItemModuleAssembly.customCreationTools,
-      ...(input.customCreationTools ?? []),
-    ],
-    customItemRenderers: {
-      ...DEFAULT_CANVAS_APP_ASSEMBLY.customItemRenderers,
-      ...customItemModuleAssembly.customItemRenderers,
-      ...(input.customItemRenderers ?? {}),
-    },
-    customItemValidators: {
-      ...DEFAULT_CANVAS_APP_ASSEMBLY.customItemValidators,
-      ...customItemModuleAssembly.customItemValidators,
-      ...(input.customItemValidators ?? {}),
-    },
-    inspectorPanels: [
-      ...DEFAULT_CANVAS_APP_ASSEMBLY.inspectorPanels,
-      ...customItemModuleAssembly.inspectorPanels,
-      ...(input.inspectorPanels ?? []),
-    ],
+    customCommands: appendUniqueById({
+      current: [
+        ...DEFAULT_CANVAS_APP_ASSEMBLY.customCommands,
+        ...customItemModuleAssembly.customCommands,
+      ],
+      entries: input.customCommands ?? [],
+      label: 'custom command',
+    }),
+    customCreationTools: appendUniqueById({
+      current: [
+        ...DEFAULT_CANVAS_APP_ASSEMBLY.customCreationTools,
+        ...customItemModuleAssembly.customCreationTools,
+      ],
+      entries: input.customCreationTools ?? [],
+      label: 'custom creation tool',
+    }),
+    customItemRenderers: mergeUniqueRecord({
+      current: {
+        ...DEFAULT_CANVAS_APP_ASSEMBLY.customItemRenderers,
+        ...customItemModuleAssembly.customItemRenderers,
+      },
+      entries: input.customItemRenderers ?? {},
+      label: 'custom item renderer',
+    }),
+    customItemValidators: mergeUniqueRecord({
+      current: {
+        ...DEFAULT_CANVAS_APP_ASSEMBLY.customItemValidators,
+        ...customItemModuleAssembly.customItemValidators,
+      },
+      entries: input.customItemValidators ?? {},
+      label: 'custom item validator',
+    }),
+    inspectorPanels: appendUniqueById({
+      current: [
+        ...DEFAULT_CANVAS_APP_ASSEMBLY.inspectorPanels,
+        ...customItemModuleAssembly.inspectorPanels,
+      ],
+      entries: input.inspectorPanels ?? [],
+      label: 'inspector panel',
+    }),
     initialItems: input.initialItems ?? DEFAULT_CANVAS_APP_ASSEMBLY.initialItems,
     itemAdapters: input.itemAdapters ?? DEFAULT_CANVAS_APP_ASSEMBLY.itemAdapters,
+  }
+}
+
+function appendUniqueById<TEntry extends { id: string }>({
+  current,
+  entries,
+  label,
+}: {
+  current: readonly TEntry[]
+  entries: readonly TEntry[]
+  label: string
+}) {
+  const ids = new Set(current.map((entry) => entry.id))
+
+  for (const entry of entries) {
+    if (ids.has(entry.id)) {
+      throw new Error(`Duplicate canvas app assembly ${label}: ${entry.id}`)
+    }
+
+    ids.add(entry.id)
+  }
+
+  return [...current, ...entries]
+}
+
+function mergeUniqueRecord<TValue>({
+  current,
+  entries,
+  label,
+}: {
+  current: Readonly<Record<string, TValue>>
+  entries: Readonly<Record<string, TValue>>
+  label: string
+}) {
+  for (const key of Object.keys(entries)) {
+    if (Object.hasOwn(current, key)) {
+      throw new Error(`Duplicate canvas app assembly ${label}: ${key}`)
+    }
+  }
+
+  return {
+    ...current,
+    ...entries,
   }
 }

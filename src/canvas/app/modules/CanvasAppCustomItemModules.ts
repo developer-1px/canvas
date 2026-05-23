@@ -9,6 +9,7 @@ export type CanvasAppCustomItemModule = {
   customCreationTools?: readonly CanvasAppCustomCreationTool[]
   customItemRenderers?: CanvasDemoSvgCustomItemRenderers
   customItemValidators?: CanvasCustomItemValidators
+  id: string
   inspectorPanels?: readonly CanvasAppInspectorPanel[]
 }
 
@@ -29,6 +30,8 @@ export function defineCanvasAppCustomItemModule(
 export function createCanvasAppCustomItemModuleAssembly(
   modules: readonly CanvasAppCustomItemModule[] = [],
 ): CanvasAppCustomItemModuleAssembly {
+  assertUniqueModuleIds(modules)
+
   return modules.reduce<CanvasAppCustomItemModuleAssembly>(
     (assembly, module) => ({
       customCommands: appendUniqueById({
@@ -65,6 +68,18 @@ export function createCanvasAppCustomItemModuleAssembly(
       inspectorPanels: [],
     },
   )
+}
+
+function assertUniqueModuleIds(modules: readonly CanvasAppCustomItemModule[]) {
+  const ids = new Set<string>()
+
+  for (const module of modules) {
+    if (ids.has(module.id)) {
+      throw new Error(`Duplicate canvas custom item module: ${module.id}`)
+    }
+
+    ids.add(module.id)
+  }
 }
 
 function appendUniqueById<TEntry extends { id: string }>({

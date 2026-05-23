@@ -101,6 +101,7 @@ const riskInspectorPanel: CanvasAppInspectorPanel = {
 }
 
 const riskModule = defineCanvasAppCustomItemModule({
+  id: 'risk',
   customCreationTools: [riskTool],
   customItemRenderers: createCanvasDemoSvgCustomItemRenderers({
     'risk-node': riskItemRenderer,
