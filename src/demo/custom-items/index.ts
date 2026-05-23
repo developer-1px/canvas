@@ -1,4 +1,4 @@
-import type { CanvasAppCustomItemModule } from '../../canvas/app/workflow'
+import type { CanvasAppCustomItemModule } from '../../canvas'
 
 const modules = import.meta.glob<{ default: CanvasAppCustomItemModule }>(
   './*/index.ts',

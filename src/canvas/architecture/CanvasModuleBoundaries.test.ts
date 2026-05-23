@@ -23,6 +23,12 @@ const demoModules = import.meta.glob('../../demo/**/*.{ts,tsx,css}', {
   query: '?raw',
 }) as Record<string, string>
 
+const appEntryModules = import.meta.glob('../../main.tsx', {
+  eager: true,
+  import: 'default',
+  query: '?raw',
+}) as Record<string, string>
+
 const sourceFiles = [
   ...Object.entries(modules).map(([path, source]) => ({
     path: path.replace(/^\.\.\//, 'src/canvas/'),
@@ -30,6 +36,10 @@ const sourceFiles = [
   })),
   ...Object.entries(demoModules).map(([path, source]) => ({
     path: path.replace(/^\.\.\/\.\.\/demo\//, 'src/demo/'),
+    source,
+  })),
+  ...Object.entries(appEntryModules).map(([path, source]) => ({
+    path: path.replace(/^\.\.\/\.\.\//, 'src/'),
     source,
   })),
 ]
@@ -100,6 +110,7 @@ describe('Canvas module boundaries', () => {
         file.path.startsWith('src/canvas/app/') &&
         !file.path.endsWith('.test.ts') &&
         !file.path.endsWith('.test.tsx') &&
+        file.path !== 'src/canvas/app/index.ts' &&
         file.path !== 'src/canvas/app/workflow/CanvasAppAssembly.ts',
       )
       .flatMap((file) =>
@@ -156,16 +167,37 @@ describe('Canvas module boundaries', () => {
     expect(violations).toEqual([])
   })
 
-  it('keeps demo custom item modules behind the app workflow public entry', () => {
+  it('keeps demo app code behind the canvas package public entry', () => {
     const violations = sourceFiles
-      .filter((file) => file.path.startsWith('src/demo/'))
+      .filter((file) =>
+        file.path === 'src/main.tsx' || file.path.startsWith('src/demo/'),
+      )
       .flatMap(getImportReferences)
       .filter((reference) =>
-        reference.target.startsWith('src/canvas/app/') &&
-        reference.target !== 'src/canvas/app/workflow',
+        reference.target.startsWith('src/canvas/') &&
+        reference.target !== 'src/canvas',
       )
 
     expect(violations).toEqual([])
+  })
+
+  it('keeps the canvas package public entry on layer facades', () => {
+    const publicEntry = getSourceFile('src/canvas/index.ts')
+    const privateTargets = getImportReferences(publicEntry)
+      .filter((reference) =>
+        reference.target.startsWith('src/canvas/') &&
+        ![
+          'src/canvas/app',
+          'src/canvas/app/rendering',
+          'src/canvas/core',
+          'src/canvas/engine',
+          'src/canvas/entities',
+          'src/canvas/host',
+          'src/canvas/renderer',
+        ].includes(reference.target),
+      )
+
+    expect(privateTargets).toEqual([])
   })
 
   it('keeps renderer stage orchestration independent from demo canvas items', () => {

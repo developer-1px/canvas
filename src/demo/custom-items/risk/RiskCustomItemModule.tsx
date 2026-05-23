@@ -1,10 +1,10 @@
 import {
   defineCanvasAppCustomItemModule,
-  type CanvasAppInspectorPanel,
   type CanvasAppCustomItemModuleCreationTool,
+  type CanvasAppInspectorPanel,
+  type CanvasCustomItem,
   type CanvasDemoSvgCustomItemRendererStrategy,
-} from '../../../canvas/app/workflow'
-import type { CanvasCustomItem } from '../../../canvas/entities'
+} from '../../../canvas'
 import './RiskCustomItemModule.css'
 
 const riskItemRenderer: CanvasDemoSvgCustomItemRendererStrategy = ({ item }) => {

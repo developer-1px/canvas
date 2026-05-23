@@ -5,7 +5,7 @@ import {
 } from '../workflow'
 import './CanvasApp.css'
 
-type CanvasAppProps = {
+export type CanvasAppProps = {
   assembly?: CanvasAppAssembly
 }
 

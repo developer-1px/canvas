@@ -12,6 +12,8 @@
 - Engine Public Facade: Host App, Demo App, UI, Renderer Adapter가 Engine을 사용할 때 import하는 안정된 Module 경계.
 - Host Document Controller: Demo `CanvasItem` 문서의 history, selection, clipboard, text search, item commit을 React와 zod-crud 세부 구현 없이 제공하는 Module.
 - Host Public Facade: Demo Host model type, read model, component library, document controller를 외부 레이어에 노출하는 안정된 Module 경계.
+- Canvas Package Public Entry: 외부 조립자와 Demo가 사용하는 `src/canvas` 단일 entry. App, Engine, Host, Renderer, Entities facade를 다시 노출하고 내부 하위 경로를 숨긴다.
+- Canvas App Public Facade: Canvas App Shell과 workflow 조립 계약을 노출하는 `src/canvas/app` entry.
 - Canvas Item Read Model: Demo `CanvasItem` tree의 조회, bounds, selection 정규화, Scene Adapter 생성을 tree helper 세부 구현 없이 제공하는 Module.
 - Canvas Component Library: Demo component template, presentation key, component item 생성을 함께 제공하는 Module.
 - Canvas Component Presentation: Demo component kind를 Renderer Adapter의 그리기 전략과 연결하는 key. 새 component kind는 기존 presentation을 재사용할 수 있다.
@@ -76,7 +78,7 @@
 - Canvas App Custom Item Module Creation Tool은 bounds/title/data만 반환하고, `id`, `type`, `kind`, `presentation`은 Canvas App Custom Item Module이 주입한다.
 - Canvas App Custom Item Module Creation Tool의 실행/반환값은 Module assembly가 현재 item 저장 계약과 module validator로 검증하고, 실패하면 null/false로 containment 한다.
 - Demo custom item module은 `src/demo/custom-items/<name>/index.ts` convention으로 자동 수집한다.
-- Demo custom item module은 `src/canvas/app/workflow` public entry만 사용하고 app 내부 파일을 직접 import하지 않는다.
+- Demo와 Demo custom item module은 `src/canvas` package public entry만 사용하고 canvas 하위 구현 경로를 직접 import하지 않는다.
 - Canvas App extension id와 registry key는 lower-kebab 안정 id만 허용하고, 잘못된 id는 define/assembly 단계에서 실패해야 한다.
 - Canvas App descriptor는 id뿐 아니라 필수 string/function/shortcut slot과 registry shape도 define/assembly 단계에서 실패해야 한다. 실행 중 throw는 runtime containment로 처리하지만, malformed descriptor shape는 등록되지 않아야 한다.
 - Canvas Custom Item의 `kind`와 `presentation`, Canvas Component Template의 `id`와 `presentation`도 같은 안정 id 계약을 따라야 한다.
