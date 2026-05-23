@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { getCanvasAppCommandConsumerModel } from './CanvasAppCommandConsumerModel'
+import type { CanvasAppCommandRuntime } from './CanvasAppCommandConsumerContracts'
 
 describe('CanvasAppCommandConsumerModel', () => {
   it('builds toolbar command handlers from command runtime callbacks', () => {
@@ -63,7 +64,7 @@ describe('CanvasAppCommandConsumerModel', () => {
   })
 })
 
-function createCommands() {
+function createCommands(): CanvasAppCommandRuntime {
   return {
     alignSelection: vi.fn(),
     cloneItems: vi.fn(() => []),

@@ -152,12 +152,14 @@
 - Canvas App Model: App Shell이 렌더링할 control별 view props를 만들고 command, pointer, keyboard, viewport, text editing wiring을 숨기는 workflow Module.
 - Canvas App Command Model: App Model이 document, clipboard, history, stage context와 command runtime wiring을 직접 알지 않도록 숨기는 workflow Module.
 - Canvas App Command Consumer Model: Command runtime callbacks를 toolbar, keyboard, pointer consumer별 command context로 변환하는 workflow Module.
+- Canvas App Command Consumer Contracts: Built-in command runtime callback fan-out의 입력과 toolbar, keyboard, pointer 출력 Interface를 명시하고 command runtime shape를 mapping 구현과 분리하는 workflow type 계약.
 - Canvas App Control Command Contracts: App workflow에서 toolbar control에 넘기는 built-in command handler bundle의 what 계약을 소유하는 Module.
 - Canvas App Component Model: App Model이 component insertion의 component library, document commit, selection, stage, viewport wiring과 control fan-out 세부를 직접 알지 않도록 component control context를 만드는 workflow Module.
 - Canvas Component Insertion Execution: component insertion의 생성 위치, id prefix, document add commit, post-insert selection, editing/tool reset 규칙을 소유하는 App-owned runtime Module.
 - Canvas App Control Model: component palette, toolbar, status, zoom controls props를 만들고 command availability, status label, selected fit target 규칙을 숨기는 workflow Module.
 - Canvas App Extension Model: 외부 custom command/tool descriptor를 custom command/tool runtime state와 runner로 바꾸는 workflow Module.
 - Canvas App Extension Consumer Model: custom command/tool runtime state와 runner를 control, keyboard, pointer consumer별 extension context로 변환하는 workflow Module.
+- Canvas App Extension Consumer Contracts: custom command/tool runtime fan-out의 입력과 consumer별 출력 Interface를 명시하고, custom descriptor와 UI/runtime state 노출 범위를 분리하는 workflow type 계약.
 - Canvas App Inspector Model: App Model이 inspector panel list, read model, selection wiring 세부를 직접 알지 않도록 object inspector props를 만드는 workflow Module.
 - Canvas App Keyboard Model: App Model이 keyboard shortcut handler wiring 세부를 알지 않도록 command, interaction, viewport shortcut handlers를 조립하는 workflow Module.
 - Canvas App Keyboard Consumer Contracts: keyboard workflow가 command, interaction, viewport, text, extension consumer에서 받는 handler context의 명시 Interface 계약을 소유하는 workflow Module.

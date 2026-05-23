@@ -27,8 +27,8 @@ import type {
 } from './CanvasWorkflowContract'
 import {
   getCanvasAppExtensionConsumerModel,
-  type CanvasAppExtensionModel,
 } from './CanvasAppExtensionConsumerModel'
+import type { CanvasAppExtensionModel } from './CanvasAppExtensionConsumerContracts'
 
 type UseCanvasAppExtensionModelArgs = {
   commitItemsChange: CommitCanvasItemsChange

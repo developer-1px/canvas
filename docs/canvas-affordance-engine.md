@@ -96,7 +96,9 @@
 | `src/canvas/app/workflow/index.ts` | App Shell이 사용하는 workflow public entry |
 | `src/canvas/app/workflow/useCanvasAppModel.ts` | command, pointer, keyboard, viewport, text editing wiring과 control별 view props 조립을 App Shell에 숨긴다 |
 | `src/canvas/app/workflow/CanvasAppControlModel.ts` | component palette, toolbar, status, zoom controls props와 command availability/status/selected fit target 규칙을 만든다 |
+| `src/canvas/app/workflow/CanvasAppCommandConsumerContracts.ts` | Built-in command runtime callback fan-out의 입력과 toolbar/keyboard/pointer 출력 Interface를 명시한다 |
 | `src/canvas/app/workflow/useCanvasAppExtensionModel.ts` | 외부 custom command/tool descriptor를 toolbar state, custom tool state, custom command run callback으로 바꾼다 |
+| `src/canvas/app/workflow/CanvasAppExtensionConsumerContracts.ts` | Custom command/tool runtime fan-out의 입력과 consumer별 출력 Interface를 명시한다 |
 | `src/canvas/app/workflow/CanvasAppStageModel.tsx` | stage와 item layer Adapter 호출 순서, text editor blur, context menu 차단, render 실패 containment를 소유한다 |
 | `src/canvas/app/workflow/CanvasWorkflowContract.ts` | App workflow hook들이 공유하는 document commit, selection, clipboard contract |
 | `src/canvas/app/workflow/useCanvasFindReplaceModel.ts` | document text search 상태와 Find/Replace control props를 App Shell에 숨긴다 |

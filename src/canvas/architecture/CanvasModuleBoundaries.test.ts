@@ -1345,6 +1345,9 @@ describe('Canvas module boundaries', () => {
     const commandConsumerModelFile = getSourceFile(
       'src/canvas/app/workflow/CanvasAppCommandConsumerModel.ts',
     )
+    const commandConsumerContractsFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppCommandConsumerContracts.ts',
+    )
     const commandHookFile = getSourceFile(
       'src/canvas/app/commands/useCanvasCommands.ts',
     )
@@ -1384,11 +1387,35 @@ describe('Canvas module boundaries', () => {
       "from './CanvasAppControlCommandContracts'",
     )
     expect(commandConsumerModelFile.source).toContain(
+      "from './CanvasAppCommandConsumerContracts'",
+    )
+    expect(commandConsumerModelFile.source).toContain(
+      '): CanvasAppCommandConsumerModel',
+    )
+    expect(commandConsumerModelFile.source).toContain(
       'satisfies CanvasAppControlCommandHandlers',
     )
     expect(commandConsumerModelFile.source).not.toContain(
       'type CanvasAppCommandControlHandlers',
     )
+    expect(commandConsumerModelFile.source).not.toContain(
+      'type CanvasAppCommandRuntime',
+    )
+    expect(commandConsumerContractsFile.source).toContain(
+      'export type CanvasAppCommandRuntime',
+    )
+    expect(commandConsumerContractsFile.source).toContain(
+      'export type CanvasAppCommandConsumerModel',
+    )
+    for (const commandConsumerContract of [
+      'CanvasAppCommandControlContext',
+      'CanvasAppCommandKeyboardContext',
+      'CanvasAppCommandPointerContext',
+    ]) {
+      expect(commandConsumerContractsFile.source).toContain(
+        `export type ${commandConsumerContract}`,
+      )
+    }
     expect(commandConsumerModelFile.source).toContain('control: {')
     expect(commandConsumerModelFile.source).toContain('keyboard: {')
     expect(commandConsumerModelFile.source).toContain('pointer: {')
@@ -3561,6 +3588,9 @@ describe('Canvas module boundaries', () => {
     const extensionConsumerModelFile = getSourceFile(
       'src/canvas/app/workflow/CanvasAppExtensionConsumerModel.ts',
     )
+    const extensionConsumerContractsFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppExtensionConsumerContracts.ts',
+    )
     const appModelFile = getSourceFile(
       'src/canvas/app/workflow/useCanvasAppModel.ts',
     )
@@ -3580,19 +3610,40 @@ describe('Canvas module boundaries', () => {
     expect(extensionModelFile.source).toContain(
       "from './CanvasAppExtensionConsumerModel'",
     )
+    expect(extensionModelFile.source).toContain(
+      "from './CanvasAppExtensionConsumerContracts'",
+    )
     expect(extensionModelFile.source).not.toContain('control: {')
     expect(extensionModelFile.source).not.toContain('keyboard: {')
     expect(extensionModelFile.source).not.toContain('pointer: {')
     expect(extensionConsumerModelFile.source).toContain(
-      'export function getCanvasAppExtensionConsumerModel',
+      "from './CanvasAppExtensionConsumerContracts'",
     )
     expect(extensionConsumerModelFile.source).toContain(
+      'export function getCanvasAppExtensionConsumerModel',
+    )
+    expect(extensionConsumerModelFile.source).not.toContain(
       'export type CanvasAppExtensionModel',
     )
     expect(extensionConsumerModelFile.source).toContain(
       '): CanvasAppExtensionModel',
     )
     expect(extensionConsumerModelFile.source).not.toContain('ReturnType<')
+    expect(extensionConsumerContractsFile.source).toContain(
+      'export type CanvasAppExtensionRuntime',
+    )
+    expect(extensionConsumerContractsFile.source).toContain(
+      'export type CanvasAppExtensionModel',
+    )
+    for (const extensionConsumerContract of [
+      'CanvasAppExtensionControlContext',
+      'CanvasAppExtensionKeyboardContext',
+      'CanvasAppExtensionPointerContext',
+    ]) {
+      expect(extensionConsumerContractsFile.source).toContain(
+        `export type ${extensionConsumerContract}`,
+      )
+    }
     expect(extensionConsumerModelFile.source).toContain('control: {')
     expect(extensionConsumerModelFile.source).toContain('keyboard: {')
     expect(extensionConsumerModelFile.source).toContain('pointer: {')
