@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 type CanvasPackageJson = {
   exports?: Record<string, string>
   private?: boolean
+  sideEffects?: boolean | string[]
   types?: string
 }
 
@@ -30,6 +31,7 @@ const sourcePaths = new Set(
 describe('Canvas package manifest', () => {
   it('keeps the reusable canvas package entry explicit', () => {
     expect(packageJson.private).toBe(true)
+    expect(packageJson.sideEffects).toEqual(['**/*.css'])
     expect(packageJson.types).toBe('./src/canvas/index.ts')
     expect(packageJson.exports).toEqual({
       '.': './src/canvas/index.ts',

@@ -3,6 +3,9 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
   "types": "./src/canvas/index.ts",
   "exports": {
     ".": "./src/canvas/index.ts",
