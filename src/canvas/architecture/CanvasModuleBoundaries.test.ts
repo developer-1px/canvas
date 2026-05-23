@@ -856,6 +856,12 @@ describe('Canvas module boundaries', () => {
     const inspectorModelFile = getSourceFile(
       'src/canvas/app/workflow/useCanvasAppInspectorModel.ts',
     )
+    const objectInspectorHookFile = getSourceFile(
+      'src/canvas/app/inspector/useCanvasObjectInspector.ts',
+    )
+    const objectInspectorModelFile = getSourceFile(
+      'src/canvas/app/inspector/CanvasObjectInspectorModel.ts',
+    )
 
     expect(appModelFile.source).toContain(
       "from './useCanvasAppInspectorModel'",
@@ -872,6 +878,18 @@ describe('Canvas module boundaries', () => {
     )
     expect(inspectorModelFile.source).toContain('inspectorPanels')
     expect(inspectorModelFile.source).toContain('itemReadModel')
+    expect(objectInspectorHookFile.source).toContain(
+      "from './CanvasObjectInspectorModel'",
+    )
+    expect(objectInspectorHookFile.source).not.toContain('resize-selection')
+    expect(objectInspectorHookFile.source).not.toContain('item.locked')
+    expect(objectInspectorHookFile.source).not.toContain('capitalize(')
+    expect(objectInspectorModelFile.source).toContain(
+      'export function getCanvasObjectInspectorModel',
+    )
+    expect(objectInspectorModelFile.source).toContain('resize-selection')
+    expect(objectInspectorModelFile.source).toContain('item.locked')
+    expect(objectInspectorModelFile.source).toContain('capitalize(')
   })
 
   it('keeps app pointer handler wiring behind a named workflow module', () => {
@@ -1725,6 +1743,9 @@ describe('Canvas module boundaries', () => {
     const objectInspectorHook = getSourceFile(
       'src/canvas/app/inspector/useCanvasObjectInspector.ts',
     )
+    const objectInspectorModel = getSourceFile(
+      'src/canvas/app/inspector/CanvasObjectInspectorModel.ts',
+    )
 
     expect(descriptorFile.source).toContain(
       "from './CanvasAppInspectorPanelExecution'",
@@ -1735,7 +1756,10 @@ describe('Canvas module boundaries', () => {
     expect(executionFile.source).toContain('panel.render(context)')
     expect(executionFile.source).toContain('panel.isVisible(context)')
     expect(executionFile.source).toContain('catch')
-    expect(objectInspectorHook.source).toContain(
+    expect(objectInspectorHook.source).not.toContain(
+      "from './CanvasAppInspectorPanelExecution'",
+    )
+    expect(objectInspectorModel.source).toContain(
       "from './CanvasAppInspectorPanelExecution'",
     )
   })
