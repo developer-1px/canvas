@@ -51,4 +51,33 @@ describe('CanvasAppInspectorPanels', () => {
       },
     ])
   })
+
+  it('omits external inspector panels that fail visibility or rendering', () => {
+    const panels: CanvasAppInspectorPanel[] = [
+      {
+        id: 'bad-visibility',
+        isVisible: () => {
+          throw new Error('bad visibility')
+        },
+        render: () => 'bad',
+      },
+      {
+        id: 'bad-render',
+        render: () => {
+          throw new Error('bad render')
+        },
+      },
+      {
+        id: 'stable-panel',
+        render: ({ label }) => label,
+      },
+    ]
+
+    expect(getCanvasAppInspectorPanelViews({ context, panels })).toEqual([
+      {
+        content: 'Card',
+        id: 'stable-panel',
+      },
+    ])
+  })
 })

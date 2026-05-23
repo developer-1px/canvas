@@ -72,7 +72,75 @@ describe('CanvasDemoSvgItemLayer drawing items', () => {
   })
 })
 
-function renderItemLayer(items: CanvasItem[]) {
+describe('CanvasDemoSvgItemLayer external renderers', () => {
+  it('falls back when a component presentation renderer throws', () => {
+    const markup = renderItemLayer(
+      [
+        {
+          id: 'component-risk-1',
+          type: 'component',
+          component: 'risk',
+          x: 80,
+          y: 120,
+          w: 180,
+          h: 96,
+          title: 'Risk',
+          fill: '#fff7ed',
+          stroke: '#fb923c',
+          accent: '#ea580c',
+        },
+      ],
+      {
+        componentPresentationRenderers: {
+          'risk-card': () => {
+            throw new Error('bad component renderer')
+          },
+        },
+        getComponentPresentation: () => 'risk-card',
+      },
+    )
+
+    expect(markup).toContain('data-type="component"')
+    expect(markup).toContain('class="component-card"')
+    expect(markup).toContain('Risk')
+  })
+
+  it('falls back when a custom item renderer throws', () => {
+    const markup = renderItemLayer(
+      [
+        {
+          id: 'risk-1',
+          type: 'custom',
+          kind: 'risk',
+          presentation: 'risk-node',
+          title: 'Risk',
+          x: 80,
+          y: 120,
+          w: 180,
+          h: 96,
+          data: { severity: 'high' },
+        },
+      ],
+      {
+        customItemRenderers: {
+          'risk-node': () => {
+            throw new Error('bad custom renderer')
+          },
+        },
+      },
+    )
+
+    expect(markup).toContain('data-type="custom"')
+    expect(markup).toContain('data-custom-kind="risk"')
+    expect(markup).toContain('class="component-card"')
+    expect(markup).toContain('Risk')
+  })
+})
+
+function renderItemLayer(
+  items: CanvasItem[],
+  options: Partial<Parameters<typeof CanvasDemoSvgItemLayer>[0]> = {},
+) {
   return renderToStaticMarkup(
     <svg>
       <CanvasDemoSvgItemLayer
@@ -82,6 +150,7 @@ function renderItemLayer(items: CanvasItem[]) {
         selected={new Set()}
         onItemPointerDown={() => undefined}
         onTextDoubleClick={() => undefined}
+        {...options}
       />
     </svg>,
   )

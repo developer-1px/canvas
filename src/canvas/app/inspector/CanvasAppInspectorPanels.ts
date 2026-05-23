@@ -32,10 +32,18 @@ export function getCanvasAppInspectorPanelViews({
   context: CanvasAppInspectorPanelContext
   panels: readonly CanvasAppInspectorPanel[]
 }): CanvasAppInspectorPanelView[] {
-  return panels
-    .filter((panel) => panel.isVisible ? panel.isVisible(context) : true)
-    .map((panel) => ({
-      content: panel.render(context),
-      id: panel.id,
-    }))
+  return panels.flatMap((panel) => {
+    try {
+      if (panel.isVisible && !panel.isVisible(context)) {
+        return []
+      }
+
+      return [{
+        content: panel.render(context),
+        id: panel.id,
+      }]
+    } catch {
+      return []
+    }
+  })
 }

@@ -16,6 +16,7 @@ import {
   getCanvasDemoSvgCustomItemRenderer,
   type CanvasDemoSvgCustomItemRenderers,
 } from './CanvasDemoSvgCustomItemRendererRegistry'
+import { CanvasDemoSvgUnknownCustomItem } from './CanvasDemoSvgUnknownCustomItem'
 
 type CanvasDemoSvgItemLayerProps = {
   getComponentPresentation: (component: string) => string
@@ -175,7 +176,7 @@ function renderCanvasItem({
           isLocked ? undefined : (event) => onItemPointerDown(event, item.id)
         }
       >
-        {renderCustomItem({ item })}
+        {renderCanvasDemoSvgCustomItemSafely({ item, renderCustomItem })}
         {hasOutline ? <CanvasDemoSvgSelectionOutline bounds={bounds} /> : null}
       </g>
     )
@@ -290,6 +291,20 @@ function renderCanvasItem({
       {hasOutline ? <CanvasDemoSvgSelectionOutline bounds={bounds} /> : null}
     </g>
   )
+}
+
+function renderCanvasDemoSvgCustomItemSafely({
+  item,
+  renderCustomItem,
+}: {
+  item: Extract<CanvasItem, { type: 'custom' }>
+  renderCustomItem: ReturnType<typeof getCanvasDemoSvgCustomItemRenderer>
+}) {
+  try {
+    return renderCustomItem({ item })
+  } catch {
+    return <CanvasDemoSvgUnknownCustomItem item={item} />
+  }
 }
 
 function createSvgPathData(points: { x: number; y: number }[]) {

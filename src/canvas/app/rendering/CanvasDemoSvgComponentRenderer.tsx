@@ -20,5 +20,11 @@ export function CanvasDemoSvgComponentRenderer({
     renderers,
   })
 
-  return renderComponent({ item })
+  try {
+    return renderComponent({ item })
+  } catch {
+    return DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS['accent-card']({
+      item,
+    })
+  }
 }
