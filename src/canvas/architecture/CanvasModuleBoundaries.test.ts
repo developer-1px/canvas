@@ -465,6 +465,31 @@ describe('Canvas module boundaries', () => {
     )
   })
 
+  it('keeps App custom command execution behind a named module', () => {
+    const descriptorFile = getSourceFile(
+      'src/canvas/app/commands/CanvasAppCustomCommands.ts',
+    )
+    const executionFile = getSourceFile(
+      'src/canvas/app/commands/CanvasAppCustomCommandExecution.ts',
+    )
+    const appModelFile = getSourceFile(
+      'src/canvas/app/workflow/useCanvasAppModel.ts',
+    )
+
+    expect(descriptorFile.source).toContain(
+      "from './CanvasAppCustomCommandExecution'",
+    )
+    expect(descriptorFile.source).not.toContain('command.run(')
+    expect(descriptorFile.source).not.toContain('command.isEnabled(')
+    expect(descriptorFile.source).not.toContain('try {')
+    expect(executionFile.source).toContain('command.run(context)')
+    expect(executionFile.source).toContain('command.isEnabled(context)')
+    expect(executionFile.source).toContain('catch')
+    expect(appModelFile.source).toContain(
+      "from '../commands/CanvasAppCustomCommandExecution'",
+    )
+  })
+
   it('keeps app workflow hooks from recreating the workspace read model', () => {
     const violations = sourceFiles
       .filter((file) =>

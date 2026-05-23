@@ -1,9 +1,11 @@
 import { describe, expect, it, vi } from 'vitest'
+import {
+  getCanvasAppCustomCommandStates,
+  runCanvasAppCustomCommand,
+} from './CanvasAppCustomCommandExecution'
 import type { CanvasAppCustomCommandContext } from './CanvasAppCustomCommands'
 import {
   assertCanvasAppCustomCommands,
-  getCanvasAppCustomCommandStates,
-  runCanvasAppCustomCommand,
   type CanvasAppCustomCommand,
 } from './CanvasAppCustomCommands'
 

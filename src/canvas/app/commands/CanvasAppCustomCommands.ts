@@ -35,13 +35,11 @@ export type CanvasAppCustomCommand = {
   title: string
 }
 
-export type CanvasAppCustomCommandState = {
-  ariaLabel: string
-  disabled: boolean
-  id: string
-  label: string
-  title: string
-}
+export {
+  getCanvasAppCustomCommandStates,
+  runCanvasAppCustomCommand,
+  type CanvasAppCustomCommandState,
+} from './CanvasAppCustomCommandExecution'
 
 export function assertCanvasAppCustomCommands(
   commands: readonly CanvasAppCustomCommand[],
@@ -79,60 +77,5 @@ export function assertCanvasAppCustomCommands(
       owner,
       value: command.isEnabled,
     })
-  }
-}
-
-export function getCanvasAppCustomCommandStates({
-  commands,
-  context,
-}: {
-  commands: readonly CanvasAppCustomCommand[]
-  context: CanvasAppCustomCommandContext
-}): CanvasAppCustomCommandState[] {
-  return commands.map((command) => ({
-    ariaLabel: command.ariaLabel ?? command.title,
-    disabled: isCanvasAppCustomCommandDisabled(command, context),
-    id: command.id,
-    label: command.label,
-    title: command.title,
-  }))
-}
-
-export function runCanvasAppCustomCommand({
-  commandId,
-  commands,
-  context,
-}: {
-  commandId: string
-  commands: readonly CanvasAppCustomCommand[]
-  context: CanvasAppCustomCommandContext
-}) {
-  const command = commands.find((entry) => entry.id === commandId)
-
-  if (!command || isCanvasAppCustomCommandDisabled(command, context)) {
-    return false
-  }
-
-  try {
-    command.run(context)
-    return true
-  } catch {
-    // External commands must not tear down the app command loop.
-    return false
-  }
-}
-
-function isCanvasAppCustomCommandDisabled(
-  command: CanvasAppCustomCommand,
-  context: CanvasAppCustomCommandContext,
-) {
-  if (!command.isEnabled) {
-    return false
-  }
-
-  try {
-    return !command.isEnabled(context)
-  } catch {
-    return true
   }
 }

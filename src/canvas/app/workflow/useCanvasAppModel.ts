@@ -18,8 +18,8 @@ import { useCanvasCommands } from '../commands/useCanvasCommands'
 import {
   getCanvasAppCustomCommandStates,
   runCanvasAppCustomCommand,
-  type CanvasAppCustomCommandContext,
-} from '../commands/CanvasAppCustomCommands'
+} from '../commands/CanvasAppCustomCommandExecution'
+import type { CanvasAppCustomCommandContext } from '../commands/CanvasAppCustomCommands'
 import { useCanvasComponentInsertion } from '../components/useCanvasComponentInsertion'
 import { useCanvasObjectInspector } from '../inspector/useCanvasObjectInspector'
 import { useCanvasKeyboardShortcuts } from '../keyboard/useCanvasKeyboardShortcuts'
