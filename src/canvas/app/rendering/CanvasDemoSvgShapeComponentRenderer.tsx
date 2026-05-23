@@ -1,7 +1,7 @@
 import type { CanvasComponentItem } from '../../entities'
-import { CanvasSvgText } from './CanvasSvgComponentText'
+import { CanvasDemoSvgText } from './CanvasDemoSvgComponentText'
 
-export function CanvasSvgConnectorComponent({
+export function CanvasDemoSvgConnectorComponent({
   item,
 }: {
   item: CanvasComponentItem
@@ -40,7 +40,11 @@ export function CanvasSvgConnectorComponent({
   )
 }
 
-export function CanvasSvgVoteComponent({ item }: { item: CanvasComponentItem }) {
+export function CanvasDemoSvgVoteComponent({
+  item,
+}: {
+  item: CanvasComponentItem
+}) {
   return (
     <>
       <circle
@@ -57,7 +61,7 @@ export function CanvasSvgVoteComponent({ item }: { item: CanvasComponentItem }) 
         r="13"
         fill={item.accent}
       />
-      <CanvasSvgText
+      <CanvasDemoSvgText
         x={item.x + item.w / 2 - 9}
         y={item.y + item.h / 2 + 28}
         text={item.body ?? item.title}

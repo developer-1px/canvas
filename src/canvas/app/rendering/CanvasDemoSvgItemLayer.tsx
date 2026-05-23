@@ -1,14 +1,14 @@
 import type { PointerEvent } from 'react'
 import type {
+  Bounds,
   CanvasItem,
   RectItem,
-  TextItem
+  TextItem,
 } from '../../entities'
-import { CanvasSvgSelectionOutline } from './CanvasSvgOverlayRenderer'
 import { getCanvasItemBounds } from '../../host'
-import { CanvasSvgComponentRenderer } from './CanvasSvgComponentRenderer'
+import { CanvasDemoSvgComponentRenderer } from './CanvasDemoSvgComponentRenderer'
 
-type CanvasSvgItemRendererProps = {
+type CanvasDemoSvgItemLayerProps = {
   getComponentPresentation: (component: string) => string
   items: CanvasItem[]
   outlineIds: Set<string>
@@ -20,14 +20,14 @@ type CanvasSvgItemRendererProps = {
   onTextDoubleClick: (item: RectItem | TextItem) => void
 }
 
-export function CanvasSvgItemRenderer({
+export function CanvasDemoSvgItemLayer({
   getComponentPresentation,
   items,
   onItemPointerDown,
   onTextDoubleClick,
   outlineIds,
   selected,
-}: CanvasSvgItemRendererProps) {
+}: CanvasDemoSvgItemLayerProps) {
   return (
     <>
       {items.map((item) =>
@@ -104,7 +104,7 @@ function renderCanvasItem({
           }),
         )}
         {hasOutline ? (
-          <CanvasSvgSelectionOutline bounds={bounds} kind="group" />
+          <CanvasDemoSvgSelectionOutline bounds={bounds} kind="group" />
         ) : null}
       </g>
     )
@@ -124,11 +124,11 @@ function renderCanvasItem({
           isLocked ? undefined : (event) => onItemPointerDown(event, item.id)
         }
       >
-        <CanvasSvgComponentRenderer
+        <CanvasDemoSvgComponentRenderer
           getComponentPresentation={getComponentPresentation}
           item={item}
         />
-        {hasOutline ? <CanvasSvgSelectionOutline bounds={bounds} /> : null}
+        {hasOutline ? <CanvasDemoSvgSelectionOutline bounds={bounds} /> : null}
       </g>
     )
   }
@@ -171,7 +171,26 @@ function renderCanvasItem({
         </foreignObject>
       )}
 
-      {hasOutline ? <CanvasSvgSelectionOutline bounds={bounds} /> : null}
+      {hasOutline ? <CanvasDemoSvgSelectionOutline bounds={bounds} /> : null}
     </g>
+  )
+}
+
+function CanvasDemoSvgSelectionOutline({
+  bounds,
+  kind,
+}: {
+  bounds: Bounds
+  kind?: 'group'
+}) {
+  return (
+    <rect
+      className={kind === 'group' ? 'item-outline group-outline' : 'item-outline'}
+      x={bounds.x}
+      y={bounds.y}
+      width={bounds.w}
+      height={bounds.h}
+      vectorEffect="non-scaling-stroke"
+    />
   )
 }

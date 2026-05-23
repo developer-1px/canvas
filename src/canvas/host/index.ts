@@ -37,8 +37,10 @@ export {
 export type { CanvasItemsChange } from './document/CanvasDocumentChanges'
 export {
   createCanvasDocumentController,
+  type CanvasDocumentController,
   type CanvasDocumentClipboard,
   type CanvasDocumentHistoryAvailability,
+  type CanvasDocumentHistoryResult,
   type CanvasDocumentSelectionHistory,
   type CanvasDocumentTextSearch,
 } from './document/CanvasDocumentController'

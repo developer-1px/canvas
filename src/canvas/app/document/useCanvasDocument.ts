@@ -9,6 +9,7 @@ import {
 import type { CanvasItem } from '../../entities'
 import {
   createCanvasDocumentController,
+  type CanvasDocumentController,
 } from '../../host'
 import type {
   CommitCanvasItemsChange,
@@ -20,7 +21,7 @@ export function useCanvasDocument(
   initialItems: CanvasItem[],
   initialSelection: string[] = [],
 ) {
-  const [document] = useState(() =>
+  const [document] = useState<CanvasDocumentController>(() =>
     createCanvasDocumentController(initialItems, initialSelection),
   )
   const [items, setItemsState] = useState(() => document.readItems())

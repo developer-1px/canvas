@@ -1,18 +1,18 @@
 import type { CanvasComponentItem } from '../../entities'
 
-type CanvasSvgComponentTextProps = {
+type CanvasDemoSvgComponentTextProps = {
   compact?: boolean
   item: CanvasComponentItem
 }
 
-type CanvasSvgTextProps = {
+type CanvasDemoSvgTextProps = {
   strong?: boolean
   text: string
   x: number
   y: number
 }
 
-export function CanvasSvgComponentHeader({
+export function CanvasDemoSvgComponentHeader({
   item,
 }: {
   item: CanvasComponentItem
@@ -39,10 +39,10 @@ export function CanvasSvgComponentHeader({
   )
 }
 
-export function CanvasSvgComponentText({
+export function CanvasDemoSvgComponentText({
   compact,
   item,
-}: CanvasSvgComponentTextProps) {
+}: CanvasDemoSvgComponentTextProps) {
   return (
     <foreignObject x={item.x} y={item.y} width={item.w} height={item.h}>
       <div
@@ -59,12 +59,12 @@ export function CanvasSvgComponentText({
   )
 }
 
-export function CanvasSvgText({
+export function CanvasDemoSvgText({
   strong,
   text,
   x,
   y,
-}: CanvasSvgTextProps) {
+}: CanvasDemoSvgTextProps) {
   return (
     <text x={x} y={y} className={strong ? 'component-svg-title' : 'component-svg-text'}>
       {text}

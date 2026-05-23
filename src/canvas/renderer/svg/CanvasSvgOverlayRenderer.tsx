@@ -1,9 +1,6 @@
 import type { PointerEvent } from 'react'
 import type { CanvasOverlayState } from '../../engine'
-import type {
-  Bounds,
-  ResizeHandle
-} from '../../entities'
+import type { ResizeHandle } from '../../core'
 
 type CanvasSvgInteractionOverlaysProps = {
   overlays: CanvasOverlayState
@@ -147,24 +144,5 @@ export function CanvasSvgInteractionOverlays({
         />
       ) : null}
     </>
-  )
-}
-
-export function CanvasSvgSelectionOutline({
-  bounds,
-  kind,
-}: {
-  bounds: Bounds
-  kind?: 'group'
-}) {
-  return (
-    <rect
-      className={kind === 'group' ? 'item-outline group-outline' : 'item-outline'}
-      x={bounds.x}
-      y={bounds.y}
-      width={bounds.w}
-      height={bounds.h}
-      vectorEffect="non-scaling-stroke"
-    />
   )
 }

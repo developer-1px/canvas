@@ -1,0 +1,43 @@
+import {
+  useCallback,
+  useState,
+} from 'react'
+import type { CanvasDocumentTextSearch } from './CanvasWorkflowContract'
+
+type UseCanvasFindReplaceModelArgs = CanvasDocumentTextSearch
+
+export function useCanvasFindReplaceModel({
+  findDocumentText,
+  replaceDocumentText,
+}: UseCanvasFindReplaceModelArgs) {
+  const [open, setOpen] = useState(false)
+  const [query, setQuery] = useState('')
+  const [replacement, setReplacement] = useState('')
+  const matches = findDocumentText(query)
+  const matchCount = matches.reduce(
+    (total, match) => total + match.occurrences,
+    0,
+  )
+
+  const openFindReplace = useCallback(() => {
+    setOpen(true)
+  }, [])
+
+  const replaceAllText = useCallback(() => {
+    replaceDocumentText(query, replacement)
+  }, [query, replacement, replaceDocumentText])
+
+  return {
+    findReplace: {
+      matchCount,
+      open,
+      query,
+      replacement,
+      onClose: () => setOpen(false),
+      onQueryChange: setQuery,
+      onReplaceAll: replaceAllText,
+      onReplacementChange: setReplacement,
+    },
+    openFindReplace,
+  }
+}

@@ -1,15 +1,11 @@
-import type { PointerEvent, RefObject } from 'react'
+import type { PointerEvent, ReactNode, RefObject } from 'react'
 import type {
-  CanvasItem,
   CanvasInteractionKind,
-  RectItem,
   ResizeHandle,
-  TextItem,
   Tool,
   Viewport,
-} from '../../entities'
+} from '../../core'
 import type { CanvasOverlayState } from '../../engine'
-import { CanvasSvgItemRenderer } from './CanvasSvgItemRenderer'
 import {
   CanvasSvgInteractionOverlays,
   CanvasSvgOverlayDefs,
@@ -18,19 +14,13 @@ import {
 
 type CanvasSvgStageProps = {
   activeMode: Tool
+  children?: ReactNode
   gesture: CanvasInteractionKind
-  getComponentPresentation: (component: string) => string
-  items: CanvasItem[]
   overlays: CanvasOverlayState
-  selected: Set<string>
   svgRef: RefObject<SVGSVGElement | null>
   viewport: Viewport
   onCanvasPointerDown: (event: PointerEvent<SVGSVGElement>) => void
   onContextMenu: (event: PointerEvent<SVGSVGElement>) => void
-  onItemPointerDown: (
-    event: PointerEvent<SVGGElement>,
-    itemId: string,
-  ) => void
   onPointerCancel: (event: PointerEvent<SVGSVGElement>) => void
   onPointerMove: (event: PointerEvent<SVGSVGElement>) => void
   onPointerUp: (event: PointerEvent<SVGSVGElement>) => void
@@ -38,26 +28,21 @@ type CanvasSvgStageProps = {
     event: PointerEvent<SVGRectElement>,
     handle: ResizeHandle,
   ) => void
-  onTextDoubleClick: (item: RectItem | TextItem) => void
 }
 
 export function CanvasSvgStage({
   activeMode,
+  children,
   gesture,
-  getComponentPresentation,
-  items,
   overlays,
-  selected,
   svgRef,
   viewport,
   onCanvasPointerDown,
   onContextMenu,
-  onItemPointerDown,
   onPointerCancel,
   onPointerMove,
   onPointerUp,
   onResizePointerDown,
-  onTextDoubleClick,
 }: CanvasSvgStageProps) {
   return (
     <svg
@@ -80,14 +65,7 @@ export function CanvasSvgStage({
       >
         <CanvasSvgOverlayPlane overlays={overlays} />
 
-        <CanvasSvgItemRenderer
-          getComponentPresentation={getComponentPresentation}
-          items={items}
-          onItemPointerDown={onItemPointerDown}
-          onTextDoubleClick={onTextDoubleClick}
-          outlineIds={overlays.itemOutlineIds}
-          selected={selected}
-        />
+        {children}
 
         <CanvasSvgInteractionOverlays
           overlays={overlays}

@@ -1,7 +1,11 @@
 import type { CanvasComponentItem } from '../../entities'
-import { CanvasSvgComponentText } from './CanvasSvgComponentText'
+import { CanvasDemoSvgComponentText } from './CanvasDemoSvgComponentText'
 
-export function CanvasSvgCardComponent({ item }: { item: CanvasComponentItem }) {
+export function CanvasDemoSvgCardComponent({
+  item,
+}: {
+  item: CanvasComponentItem
+}) {
   return (
     <>
       <rect
@@ -23,12 +27,12 @@ export function CanvasSvgCardComponent({ item }: { item: CanvasComponentItem }) 
         rx="3"
         fill={item.accent}
       />
-      <CanvasSvgComponentText item={item} />
+      <CanvasDemoSvgComponentText item={item} />
     </>
   )
 }
 
-export function CanvasSvgStickyComponent({
+export function CanvasDemoSvgStickyComponent({
   item,
 }: {
   item: CanvasComponentItem
@@ -52,12 +56,12 @@ export function CanvasSvgStickyComponent({
         } L ${item.x + item.w} ${item.y + 28} Z`}
         fill="rgba(255, 255, 255, 0.45)"
       />
-      <CanvasSvgComponentText item={item} />
+      <CanvasDemoSvgComponentText item={item} />
     </>
   )
 }
 
-export function CanvasSvgLabelComponent({
+export function CanvasDemoSvgLabelComponent({
   item,
 }: {
   item: CanvasComponentItem
@@ -71,12 +75,12 @@ export function CanvasSvgLabelComponent({
         width={item.w}
         height={item.h}
       />
-      <CanvasSvgComponentText item={item} compact />
+      <CanvasDemoSvgComponentText item={item} compact />
     </>
   )
 }
 
-export function CanvasSvgSectionComponent({
+export function CanvasDemoSvgSectionComponent({
   item,
 }: {
   item: CanvasComponentItem
@@ -94,12 +98,12 @@ export function CanvasSvgSectionComponent({
         stroke={item.stroke}
         vectorEffect="non-scaling-stroke"
       />
-      <CanvasSvgComponentText item={item} compact />
+      <CanvasDemoSvgComponentText item={item} compact />
     </>
   )
 }
 
-export function CanvasSvgImageComponent({
+export function CanvasDemoSvgImageComponent({
   item,
 }: {
   item: CanvasComponentItem
@@ -129,7 +133,7 @@ export function CanvasSvgImageComponent({
         vectorEffect="non-scaling-stroke"
       />
       <circle cx={item.x + item.w - 42} cy={item.y + 36} r="10" fill={item.accent} />
-      <CanvasSvgComponentText item={item} compact />
+      <CanvasDemoSvgComponentText item={item} compact />
     </>
   )
 }

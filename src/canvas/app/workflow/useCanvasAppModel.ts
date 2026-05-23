@@ -1,21 +1,13 @@
 import {
+  createElement,
   useCallback,
   useMemo,
   useRef,
-  useState,
   type PointerEvent,
 } from 'react'
-import type {
-  Bounds,
-  EditingText,
-  Tool,
-} from '../../entities'
 import {
   DEFAULT_CANVAS_AFFORDANCE_CONFIG,
-  EMPTY_CANVAS_SNAP_GUIDES,
-  createCanvasOverlayState,
   getCanvasCommandAvailability,
-  type CanvasSnapGuides,
 } from '../../engine'
 import {
   CANVAS_COMPONENT_LIBRARY,
@@ -25,21 +17,21 @@ import { useCanvasCommands } from '../commands/useCanvasCommands'
 import { useCanvasComponentInsertion } from '../components/useCanvasComponentInsertion'
 import { useCanvasObjectInspector } from '../inspector/useCanvasObjectInspector'
 import { useCanvasKeyboardShortcuts } from '../keyboard/useCanvasKeyboardShortcuts'
-import type { Interaction } from '../pointer/CanvasInteractionState'
 import { useCanvasPointerDownHandlers } from '../pointer/useCanvasPointerDownHandlers'
 import { useCanvasPointerDragHandlers } from '../pointer/useCanvasPointerDragHandlers'
-import { useCanvasTextEditing } from '../text/useCanvasTextEditing'
+import { CanvasDemoSvgItemLayer } from '../rendering'
 import { useCanvasViewportControls } from '../viewport/useCanvasViewportControls'
 import { useCanvasWheelViewport } from '../viewport/useCanvasWheelViewport'
+import { useCanvasFindReplaceModel } from './useCanvasFindReplaceModel'
+import { useCanvasInteractionModel } from './useCanvasInteractionModel'
 import { useCanvasWorkspaceModel } from './useCanvasWorkspaceModel'
+import { useCanvasTextEditorModel } from './useCanvasTextEditorModel'
 
 const canvasAffordanceConfig = DEFAULT_CANVAS_AFFORDANCE_CONFIG
 
 export function useCanvasAppModel() {
   const svgRef = useRef<SVGSVGElement | null>(null)
   const editorRef = useRef<HTMLTextAreaElement | null>(null)
-  const interactionRef = useRef<Interaction>({ kind: 'none' })
-  const [tool, setTool] = useState<Tool>('select')
   const {
     canRedo,
     canUndo,
@@ -64,17 +56,25 @@ export function useCanvasAppModel() {
     undo,
     viewport,
   } = useCanvasWorkspaceModel()
-  const [spaceDown, setSpaceDown] = useState(false)
-  const [gesture, setGesture] = useState<Interaction['kind']>('none')
-  const [marquee, setMarquee] = useState<Bounds | null>(null)
-  const [draftRect, setDraftRect] = useState<Bounds | null>(null)
-  const [snapGuides, setSnapGuides] = useState<CanvasSnapGuides>(
-    EMPTY_CANVAS_SNAP_GUIDES,
-  )
-  const [editing, setEditing] = useState<EditingText | null>(null)
-  const [findReplaceOpen, setFindReplaceOpen] = useState(false)
-  const [findQuery, setFindQuery] = useState('')
-  const [findReplacement, setFindReplacement] = useState('')
+  const {
+    activeMode,
+    gesture,
+    interactionRef,
+    overlays,
+    setDraftRect,
+    setGesture,
+    setMarquee,
+    setSnapGuides,
+    setSpaceDown,
+    setTool,
+    spaceDown,
+    tool,
+  } = useCanvasInteractionModel({
+    config: canvasAffordanceConfig,
+    scene,
+    selection,
+    viewport,
+  })
 
   const inspector = useCanvasObjectInspector({
     commitItemsChange,
@@ -93,29 +93,6 @@ export function useCanvasAppModel() {
       }),
     [canRedo, canUndo, scene, selection],
   )
-  const overlays = useMemo(
-    () =>
-      createCanvasOverlayState({
-        config: canvasAffordanceConfig,
-        draftRect,
-        marquee,
-        scene,
-        selection,
-        snapGuides,
-        viewport,
-      }),
-    [draftRect, marquee, scene, selection, snapGuides, viewport],
-  )
-  const editingItem = editing
-    ? itemReadModel.findEditableTextItem(editing.id)
-    : null
-  const activeMode = spaceDown ? 'pan' : tool
-  const findMatches = findDocumentText(findQuery)
-  const findMatchCount = findMatches.reduce(
-    (total, match) => total + match.occurrences,
-    0,
-  )
-
   useCanvasWheelViewport({
     config: canvasAffordanceConfig,
     setViewport,
@@ -124,17 +101,19 @@ export function useCanvasAppModel() {
 
   const {
     blurTextEditor,
-    cancelTextEdit,
-    commitText,
-    editorStyle,
-  } = useCanvasTextEditing({
-    commitItemsChange,
-    editing,
-    editingItem,
-    editorRef,
-    selection,
     setEditing,
+    textEditor,
+  } = useCanvasTextEditorModel({
+    commitItemsChange,
+    editorRef,
+    itemReadModel,
+    selection,
     viewport,
+  })
+
+  const { findReplace, openFindReplace } = useCanvasFindReplaceModel({
+    findDocumentText,
+    replaceDocumentText,
   })
 
   const {
@@ -180,14 +159,6 @@ export function useCanvasAppModel() {
       setViewport,
       svgRef,
     })
-
-  const openFindReplace = useCallback(() => {
-    setFindReplaceOpen(true)
-  }, [])
-
-  const replaceAllText = useCallback(() => {
-    replaceDocumentText(findQuery, findReplacement)
-  }, [findQuery, findReplacement, replaceDocumentText])
 
   useCanvasKeyboardShortcuts({
     config: canvasAffordanceConfig,
@@ -287,49 +258,50 @@ export function useCanvasAppModel() {
     viewport,
   })
 
+  const handleStageCanvasPointerDown = useCallback(
+    (event: PointerEvent<SVGSVGElement>) => {
+      blurTextEditor()
+      handleCanvasPointerDown(event)
+    },
+    [blurTextEditor, handleCanvasPointerDown],
+  )
+
+  const handleStageItemPointerDown = useCallback(
+    (event: PointerEvent<SVGGElement>, itemId: string) => {
+      blurTextEditor()
+      handleItemPointerDown(event, itemId)
+    },
+    [blurTextEditor, handleItemPointerDown],
+  )
+
   return {
     componentPalette: {
       components: CANVAS_COMPONENT_LIBRARY.templates,
       onInsert: insertComponent,
     },
-    findReplace: {
-      matchCount: findMatchCount,
-      open: findReplaceOpen,
-      query: findQuery,
-      replacement: findReplacement,
-      onClose: () => setFindReplaceOpen(false),
-      onQueryChange: setFindQuery,
-      onReplaceAll: replaceAllText,
-      onReplacementChange: setFindReplacement,
-    },
+    findReplace,
     inspector,
     stage: {
       activeMode,
+      children: createElement(CanvasDemoSvgItemLayer, {
+        getComponentPresentation: CANVAS_COMPONENT_LIBRARY.getPresentation,
+        items,
+        onItemPointerDown: handleStageItemPointerDown,
+        onTextDoubleClick: handleTextDoubleClick,
+        outlineIds: overlays.itemOutlineIds,
+        selected,
+      }),
       gesture,
-      getComponentPresentation: CANVAS_COMPONENT_LIBRARY.getPresentation,
-      items,
       overlays,
-      selected,
       svgRef,
       viewport,
-      onCanvasPointerDown: (event: PointerEvent<SVGSVGElement>) => {
-        blurTextEditor()
-        handleCanvasPointerDown(event)
-      },
+      onCanvasPointerDown: handleStageCanvasPointerDown,
       onContextMenu: (event: PointerEvent<SVGSVGElement>) =>
         event.preventDefault(),
-      onItemPointerDown: (
-        event: PointerEvent<SVGGElement>,
-        itemId: string,
-      ) => {
-        blurTextEditor()
-        handleItemPointerDown(event, itemId)
-      },
       onPointerCancel: handlePointerCancel,
       onPointerMove: handlePointerMove,
       onPointerUp: handlePointerUp,
       onResizePointerDown: handleResizePointerDown,
-      onTextDoubleClick: handleTextDoubleClick,
     },
     status: {
       gesture,
@@ -338,15 +310,7 @@ export function useCanvasAppModel() {
       tool,
       visible: canvasAffordanceConfig.overlays.status,
     },
-    textEditor: {
-      editing,
-      editorRef,
-      style: editingItem ? editorStyle : undefined,
-      onBlur: commitText,
-      onCancel: cancelTextEdit,
-      onChange: setEditing,
-      onCommit: commitText,
-    },
+    textEditor,
     toolbar: {
       canAlign: selection.length > 1,
       canDelete: commandAvailability.delete,

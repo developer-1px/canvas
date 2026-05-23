@@ -50,10 +50,45 @@ export type CanvasDocumentClipboard = {
   setClipboardItems: (items: CanvasItem[]) => boolean
 }
 
+export type CanvasDocumentHistoryResult = {
+  items: CanvasItem[]
+  selection: CanvasSelectionIds
+}
+
+export type CanvasDocumentController = {
+  commitItemsChange: (
+    change: CanvasItemsChange,
+    currentItems: CanvasItem[],
+    selection?: CanvasDocumentSelectionHistory,
+  ) => boolean
+  commitSelection: (ids: CanvasSelectionIds) => boolean
+  copySelectionToClipboard: (
+    selection: CanvasSelectionIds,
+    items?: CanvasItem[],
+  ) => boolean
+  findText: CanvasDocumentTextSearch['findDocumentText']
+  readClipboardItems: () => CanvasItem[]
+  readHistoryAvailability: () => CanvasDocumentHistoryAvailability
+  readItems: () => CanvasItem[]
+  readSelection: () => CanvasSelectionIds
+  redo: (currentItems: CanvasItem[]) => CanvasDocumentHistoryResult | null
+  replaceItems: (currentItems: CanvasItem[], nextItems: CanvasItem[]) => CanvasItem[]
+  replaceText: (
+    searchText: string,
+    replacement: string,
+    selection: CanvasSelectionIds,
+    options?: CanvasTextSearchOptions,
+  ) => boolean
+  restoreSelection: (ids: CanvasSelectionIds, items?: CanvasItem[]) => void
+  subscribeSelection: (onChange: () => void) => (() => void) | undefined
+  undo: (currentItems: CanvasItem[]) => CanvasDocumentHistoryResult | null
+  writeClipboardItems: (items: CanvasItem[]) => boolean
+}
+
 export function createCanvasDocumentController(
   initialItems: CanvasItem[],
   initialSelection: CanvasSelectionIds = [],
-) {
+): CanvasDocumentController {
   const document = createCanvasItemsDocument(initialItems, {
     selection: initialSelection,
   })

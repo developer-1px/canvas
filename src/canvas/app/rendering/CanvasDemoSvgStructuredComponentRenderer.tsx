@@ -1,10 +1,10 @@
 import type { CanvasComponentItem } from '../../entities'
 import {
-  CanvasSvgComponentHeader,
-  CanvasSvgText,
-} from './CanvasSvgComponentText'
+  CanvasDemoSvgComponentHeader,
+  CanvasDemoSvgText,
+} from './CanvasDemoSvgComponentText'
 
-export function CanvasSvgChecklistComponent({
+export function CanvasDemoSvgChecklistComponent({
   item,
 }: {
   item: CanvasComponentItem
@@ -24,7 +24,7 @@ export function CanvasSvgChecklistComponent({
         stroke={item.stroke}
         vectorEffect="non-scaling-stroke"
       />
-      <CanvasSvgComponentHeader item={item} />
+      <CanvasDemoSvgComponentHeader item={item} />
       {rows.map((row, index) => {
         const y = item.y + 50 + index * 28
 
@@ -51,7 +51,7 @@ export function CanvasSvgChecklistComponent({
                 vectorEffect="non-scaling-stroke"
               />
             ) : null}
-            <CanvasSvgText x={item.x + 42} y={y + 12} text={row} />
+            <CanvasDemoSvgText x={item.x + 42} y={y + 12} text={row} />
           </g>
         )
       })}
@@ -59,7 +59,7 @@ export function CanvasSvgChecklistComponent({
   )
 }
 
-export function CanvasSvgKanbanComponent({
+export function CanvasDemoSvgKanbanComponent({
   item,
 }: {
   item: CanvasComponentItem
@@ -79,7 +79,7 @@ export function CanvasSvgKanbanComponent({
         stroke={item.stroke}
         vectorEffect="non-scaling-stroke"
       />
-      <CanvasSvgComponentHeader item={item} />
+      <CanvasDemoSvgComponentHeader item={item} />
       {rows.map((row, index) => (
         <g key={row}>
           <rect
@@ -92,14 +92,18 @@ export function CanvasSvgKanbanComponent({
             stroke="#e2e8f0"
             vectorEffect="non-scaling-stroke"
           />
-          <CanvasSvgText x={item.x + 26} y={item.y + 66 + index * 40} text={row} />
+          <CanvasDemoSvgText x={item.x + 26} y={item.y + 66 + index * 40} text={row} />
         </g>
       ))}
     </>
   )
 }
 
-export function CanvasSvgTableComponent({ item }: { item: CanvasComponentItem }) {
+export function CanvasDemoSvgTableComponent({
+  item,
+}: {
+  item: CanvasComponentItem
+}) {
   const cols = 3
   const rows = 3
   const cellW = item.w / cols
@@ -142,7 +146,7 @@ export function CanvasSvgTableComponent({ item }: { item: CanvasComponentItem })
         />
       ))}
       {(item.columns ?? []).map((column, index) => (
-        <CanvasSvgText
+        <CanvasDemoSvgText
           key={column}
           x={item.x + cellW * index + 12}
           y={item.y + 26}
@@ -151,7 +155,7 @@ export function CanvasSvgTableComponent({ item }: { item: CanvasComponentItem })
         />
       ))}
       {(item.items ?? []).map((cell, index) => (
-        <CanvasSvgText
+        <CanvasDemoSvgText
           key={`${cell}-${index}`}
           x={item.x + cellW * (index % 3) + 12}
           y={item.y + cellH * (Math.floor(index / 3) + 1) + 26}

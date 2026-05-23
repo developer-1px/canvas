@@ -76,6 +76,31 @@ describe('Canvas module boundaries', () => {
     expect(violations).toEqual([])
   })
 
+  it('keeps renderer stage orchestration independent from demo canvas items', () => {
+    const demoItemTerms =
+      /\b(CanvasItem|RectItem|TextItem|GroupItem|CanvasComponentItem|getCanvasItemBounds|getCanvasItemsBounds|CANVAS_COMPONENT_LIBRARY)\b/
+    const violations = sourceFiles
+      .filter((file) => file.path.startsWith('src/canvas/renderer/'))
+      .flatMap((file) => demoItemTerms.test(file.source) ? [file.path] : [])
+
+    expect(violations).toEqual([])
+  })
+
+  it('keeps app and ui imports behind the renderer public facade', () => {
+    const violations = sourceFiles
+      .filter((file) =>
+        file.path.startsWith('src/canvas/app/') ||
+        file.path.startsWith('src/canvas/ui/'),
+      )
+      .flatMap(getImportReferences)
+      .filter((reference) =>
+        reference.target.startsWith('src/canvas/renderer/') &&
+        reference.target !== 'src/canvas/renderer',
+      )
+
+    expect(violations).toEqual([])
+  })
+
   it('keeps app workflow hooks from recreating the workspace read model', () => {
     const violations = sourceFiles
       .filter((file) =>
@@ -85,6 +110,28 @@ describe('Canvas module boundaries', () => {
       )
       .flatMap((file) =>
         file.source.includes('createCanvasItemReadModel') ? [file.path] : [],
+      )
+
+    expect(violations).toEqual([])
+  })
+
+  it('keeps zod-crud document internals inside the host document layer', () => {
+    const violations = sourceFiles
+      .filter((file) => !file.path.startsWith('src/canvas/host/document/'))
+      .flatMap((file) =>
+        file.source.includes('zod-crud') ? [file.path] : [],
+      )
+
+    expect(violations).toEqual([])
+  })
+
+  it('keeps app document hooks behind the Host Document Controller', () => {
+    const forbiddenDocumentInternals =
+      /\b(createCanvasItemsDocument|commitCanvasItemsPatch|JSONPatchOperation|SelectionSnap)\b|\.history\b|\.clipboard\b/
+    const violations = sourceFiles
+      .filter((file) => file.path.startsWith('src/canvas/app/document/'))
+      .flatMap((file) =>
+        forbiddenDocumentInternals.test(file.source) ? [file.path] : [],
       )
 
     expect(violations).toEqual([])
