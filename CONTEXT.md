@@ -29,6 +29,7 @@
 - Canvas Editable Text Item: rect와 text item이 공유하는 editable target 판정, 저장 shape, edit initial value, commit fallback, patch operation을 소유하는 Host-owned text Module.
 - Canvas App Assembly: 내부 캔버스 문법은 유지하면서 affordance feature toggle, Host item adapter, component library, custom item module, initial items, SVG presentation registry 같은 제품별 의미를 외부에서 조립하는 composition Module.
 - Canvas App Assembly Input: Canvas App Assembly output을 `Partial`로 노출하지 않고 Host가 조립할 수 있는 필드만 명시한 외부 입력 계약.
+- Canvas App Assembly Child Contract: component assembly와 adapter bundle 같은 하위 조립 seam이 full Canvas App Assembly output에서 `Pick`으로 파생하지 않고 필요한 field만 명시하는 내부 Interface 계약.
 - Canvas App Assembly Source: App Shell이 prebuilt Canvas App Assembly와 Canvas App Assembly Input 중 하나를 받아 내부에서 조립/검증/snapshot 경로로 정규화하는 Module.
 - Canvas App Assembly Model: App Model이 assembly output field를 직접 해체하지 않고 affordance, command, component, control, extension, pointer, rendering, workspace context를 받도록 변환하는 workflow Module.
 - Canvas App Affordance Model: App Model이 default affordance config와 feature toggle config를 command, control, interaction, keyboard, pointer, viewport에 직접 fan-out하지 않도록 consumer별 affordance context를 만드는 workflow Module.
@@ -113,6 +114,7 @@
 - Canvas Pointer Interaction Start: pointer-down 시 gesture routing, pan, marquee 시작을 active interaction으로 변환하고 생성 시작은 Canvas Pointer Creation Start에 위임하는 App-owned runtime Module.
 - Canvas Tool Gesture Routing: built-in tool과 custom tool을 pointer gesture, feature gate, item pointer rerouting rule로 변환하는 Engine-owned what 계약 Module.
 - Canvas Pointer Start Session: pointer-down 시 stage-local screen coordinate와 viewport-projected world coordinate를 start interaction Module들에 제공하는 App-owned start lifecycle Module.
+- Canvas App Pointer Input: Renderer/DOM pointer event에서 App pointer grammar가 필요한 screen point, pointer id, modifier, cancellation 함수만 명시하는 App-owned event source Interface 계약.
 - Canvas Pointer Creation Grammar: shape creation, drawing creation, custom creation, text creation gesture와 active creation interaction kind set을 소유하는 App-owned what 계약 Module.
 - Canvas Pointer Creation Start: pointer-down 시 shape creation, drawing creation, custom creation, text creation 시작 상태를 각 creation lifecycle Module에 위임하는 App-owned runtime Module.
 - Canvas Pointer Shape Creation: built-in rect/arrow shape creation gesture, draft shape preview, enabled gate, item creation commit, post-create tool selection descriptor를 소유하는 App-owned shape lifecycle Module.

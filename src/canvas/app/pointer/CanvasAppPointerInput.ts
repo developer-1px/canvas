@@ -1,42 +1,41 @@
-import type {
-  MouseEvent,
-  PointerEvent,
-} from 'react'
-
 export type CanvasAppEventInput = {
   preventDefault: () => void
   stopPropagation: () => void
 }
 
-export type CanvasAppPointerInput = CanvasAppEventInput & {
-  altKey: boolean
-  button: number
+export type CanvasAppScreenPointInput = {
   clientX: number
   clientY: number
-  ctrlKey: boolean
-  metaKey: boolean
-  pointerId: number
-  shiftKey: boolean
 }
 
-type CanvasAppEventSource = Pick<
-  MouseEvent<Element>,
-  'preventDefault' | 'stopPropagation'
->
+export type CanvasAppPointerIdInput = {
+  pointerId: number
+}
 
-type CanvasAppPointerSource = Pick<
-  PointerEvent<Element>,
-  | 'altKey'
-  | 'button'
-  | 'clientX'
-  | 'clientY'
-  | 'ctrlKey'
-  | 'metaKey'
-  | 'pointerId'
-  | 'preventDefault'
-  | 'shiftKey'
-  | 'stopPropagation'
->
+export type CanvasAppPointerInput = CanvasAppEventInput &
+  CanvasAppScreenPointInput &
+  CanvasAppPointerIdInput & {
+    altKey: boolean
+    button: number
+    ctrlKey: boolean
+    metaKey: boolean
+    shiftKey: boolean
+  }
+
+export type CanvasAppPointerScreenInput =
+  CanvasAppScreenPointInput & CanvasAppPointerIdInput
+
+export type CanvasAppEventSource = CanvasAppEventInput
+
+export type CanvasAppPointerSource = CanvasAppEventInput &
+  CanvasAppScreenPointInput &
+  CanvasAppPointerIdInput & {
+    altKey: boolean
+    button: number
+    ctrlKey: boolean
+    metaKey: boolean
+    shiftKey: boolean
+  }
 
 export function createCanvasAppEventInput(
   event: CanvasAppEventSource,

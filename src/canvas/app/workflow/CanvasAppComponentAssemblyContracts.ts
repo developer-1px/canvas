@@ -7,18 +7,20 @@ import {
   assertCanvasAppDescriptorFunctionField,
   assertCanvasAppDescriptorObject,
 } from '../extensions/CanvasAppDescriptorContracts'
-import { assertCanvasAppComponentPresentationRenderers } from '../rendering'
-import type { CanvasAppAssembly } from './CanvasAppAssembly'
+import {
+  assertCanvasAppComponentPresentationRenderers,
+  type CanvasAppComponentPresentationRenderers,
+} from '../rendering'
 
-type CanvasAppComponentAssemblyContracts = Pick<
-  CanvasAppAssembly,
-  'componentLibrary' | 'componentPresentationRenderers'
->
+export type CanvasAppComponentAssemblyContract = {
+  componentLibrary: CanvasComponentLibrary
+  componentPresentationRenderers: CanvasAppComponentPresentationRenderers
+}
 
 export function assertCanvasAppComponentAssembly({
   componentLibrary,
   componentPresentationRenderers,
-}: CanvasAppComponentAssemblyContracts) {
+}: CanvasAppComponentAssemblyContract) {
   assertCanvasAppComponentLibrary(componentLibrary)
   assertCanvasAppComponentPresentationRenderers(componentPresentationRenderers)
   assertCanvasComponentPresentationRendererCoverage({
@@ -30,7 +32,7 @@ export function assertCanvasAppComponentAssembly({
 function assertCanvasComponentPresentationRendererCoverage({
   componentLibrary,
   componentPresentationRenderers,
-}: CanvasAppComponentAssemblyContracts) {
+}: CanvasAppComponentAssemblyContract) {
   for (const template of componentLibrary.templates) {
     if (!Object.hasOwn(componentPresentationRenderers, template.presentation)) {
       throw new Error(

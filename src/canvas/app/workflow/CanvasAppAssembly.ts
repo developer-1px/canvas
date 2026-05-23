@@ -3,9 +3,6 @@ import {
   createCanvasAffordanceConfig,
   type CanvasAffordanceConfig,
   type CanvasAffordanceConfigInput,
-  type CanvasCommandAdapter,
-  type CanvasCreationAdapter,
-  type CanvasTransformAdapter,
 } from '../../engine'
 import {
   CANVAS_COMPONENT_LIBRARY,
@@ -37,14 +34,10 @@ import { assertCanvasAppAssembly } from './CanvasAppAssemblyContracts'
 import { createCanvasAppComponentAssembly } from './CanvasAppComponentAssembly'
 import { createCanvasAppExtensionAssembly } from './CanvasAppExtensionAssembly'
 import { snapshotCanvasAppAssembly } from './CanvasAppAssemblySnapshot'
+import type { CanvasAppItemAdapters } from './CanvasAppAdapterContracts'
 
 export { assertCanvasAppAssembly } from './CanvasAppAssemblyContracts'
-
-export type CanvasAppItemAdapters = {
-  command: CanvasCommandAdapter<CanvasItem>
-  creation: CanvasCreationAdapter<CanvasItem>
-  transform: CanvasTransformAdapter<CanvasItem>
-}
+export type { CanvasAppItemAdapters } from './CanvasAppAdapterContracts'
 
 export type CanvasAppAssembly = {
   affordanceConfig: CanvasAffordanceConfig

@@ -41,6 +41,12 @@ export type CanvasPointerInteractionStartEffectContext = {
   stageElement: CanvasAppStageElement
 }
 
+export type CanvasTextEditInteractionStartEffectContext = {
+  commitSelection: CommitCanvasSelection
+  setEditing: Dispatch<SetStateAction<EditingText | null>>
+  setTool: Dispatch<SetStateAction<Tool>>
+}
+
 export function applyCanvasPointerInteractionStartEffect({
   context,
   event,
@@ -163,10 +169,7 @@ export function applyCanvasTextEditInteractionStartEffect({
   context,
   start,
 }: {
-  context: Pick<
-    CanvasPointerInteractionStartEffectContext,
-    'commitSelection' | 'setEditing' | 'setTool'
-  >
+  context: CanvasTextEditInteractionStartEffectContext
   start:
     | { kind: 'none' }
     | {

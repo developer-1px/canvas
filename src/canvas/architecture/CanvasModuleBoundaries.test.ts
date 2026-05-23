@@ -175,6 +175,11 @@ describe('Canvas module boundaries', () => {
     expect(componentAssemblyFile.source).toContain(
       'input.componentLibrary ?? defaults.componentLibrary',
     )
+    expect(componentAssemblyFile.source).not.toContain('Pick<')
+    expect(componentAssemblyFile.source).not.toContain('CanvasAppAssembly')
+    expect(componentAssemblyFile.source).toContain(
+      'CanvasAppComponentAssemblyContract',
+    )
   })
 
   it('keeps App extension composition behind a named Assembly module', () => {
@@ -1187,6 +1192,11 @@ describe('Canvas module boundaries', () => {
     expect(dragEffectsFile.source).toContain(
       'export function applyCanvasPointerInteractionCancelEffect',
     )
+    expect(dragSessionFile.source).not.toContain('Pick<')
+    expect(dragSessionFile.source).toContain('CanvasAppPointerIdInput')
+    expect(dragSessionFile.source).toContain('CanvasAppPointerScreenInput')
+    expect(dragEffectsFile.source).not.toContain('Pick<')
+    expect(dragEffectsFile.source).toContain('CanvasAppPointerIdInput')
   })
 
   it('keeps pointer click memory rules behind a named module', () => {
@@ -1563,6 +1573,25 @@ describe('Canvas module boundaries', () => {
     expect(renderInput).toContain('CanvasAppPointerInput')
     expect(renderInput).not.toContain('PointerEvent<')
     expect(renderInput).not.toContain('SVGGElement')
+  })
+
+  it('keeps app pointer input sources explicit instead of React event picks', () => {
+    const pointerInputFile = getSourceFile(
+      'src/canvas/app/pointer/CanvasAppPointerInput.ts',
+    )
+
+    expect(pointerInputFile.source).toContain(
+      'export type CanvasAppScreenPointInput',
+    )
+    expect(pointerInputFile.source).toContain(
+      'export type CanvasAppPointerIdInput',
+    )
+    expect(pointerInputFile.source).toContain(
+      'export type CanvasAppPointerSource',
+    )
+    expect(pointerInputFile.source).not.toContain('Pick<')
+    expect(pointerInputFile.source).not.toContain('PointerEvent<')
+    expect(pointerInputFile.source).not.toContain('MouseEvent<')
   })
 
   it('keeps pointer interaction commit and cancel lifecycle behind a named module', () => {
@@ -2010,6 +2039,8 @@ describe('Canvas module boundaries', () => {
     expect(startSessionFile.source).toContain(
       'export function getCanvasPointerStartProjection',
     )
+    expect(startSessionFile.source).not.toContain('Pick<')
+    expect(startSessionFile.source).toContain('CanvasAppScreenPointInput')
     expect(startSessionFile.source).toContain('screenPoint(')
     expect(startSessionFile.source).toContain('screenToWorld(')
     expect(startFile.source).toContain(
@@ -2113,6 +2144,10 @@ describe('Canvas module boundaries', () => {
     expect(effectsFile.source).toContain('capturePointer(')
     expect(effectsFile.source).toContain("commitItemsChange({ type: 'add'")
     expect(effectsFile.source).toContain("setTool('select')")
+    expect(effectsFile.source).toContain(
+      'export type CanvasTextEditInteractionStartEffectContext',
+    )
+    expect(effectsFile.source).not.toContain('Pick<')
   })
 
   it('keeps item pointer interaction start rules behind a named module', () => {
@@ -4074,6 +4109,13 @@ describe('Canvas module boundaries', () => {
     expect(adapterSnapshotFile.source).toContain(
       'stageAdapter: Object.freeze',
     )
+    expect(adapterSnapshotFile.source).not.toContain('Pick<')
+    expect(adapterSnapshotFile.source).not.toContain(
+      "from './CanvasAppAssembly'",
+    )
+    expect(adapterSnapshotFile.source).toContain(
+      'CanvasAppAssemblyAdapters',
+    )
   })
 
   it('keeps App Assembly output contracts behind a named module', () => {
@@ -4131,6 +4173,11 @@ describe('Canvas module boundaries', () => {
       'export function assertCanvasAppComponentAssembly',
     )
     expect(componentContractsFile.source).toContain(
+      'export type CanvasAppComponentAssemblyContract',
+    )
+    expect(componentContractsFile.source).not.toContain('Pick<')
+    expect(componentContractsFile.source).not.toContain('CanvasAppAssembly')
+    expect(componentContractsFile.source).toContain(
       'function assertCanvasAppComponentLibrary',
     )
     expect(componentContractsFile.source).toContain(
@@ -4143,6 +4190,16 @@ describe('Canvas module boundaries', () => {
     )
     expect(adapterContractsFile.source).toContain(
       'export function assertCanvasAppAssemblyAdapters',
+    )
+    expect(adapterContractsFile.source).toContain(
+      'export type CanvasAppAssemblyAdapters',
+    )
+    expect(adapterContractsFile.source).toContain(
+      'export type CanvasAppItemAdapters',
+    )
+    expect(adapterContractsFile.source).not.toContain('Pick<')
+    expect(adapterContractsFile.source).not.toContain(
+      "from './CanvasAppAssembly'",
     )
     expect(adapterContractsFile.source).toContain(
       'function assertCanvasAppItemAdapters',

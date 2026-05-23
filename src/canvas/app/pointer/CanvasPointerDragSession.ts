@@ -3,7 +3,10 @@ import type {
   Viewport,
 } from '../../entities'
 import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
-import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
+import type {
+  CanvasAppPointerIdInput,
+  CanvasAppPointerScreenInput,
+} from './CanvasAppPointerInput'
 import type { Interaction } from './CanvasInteractionState'
 import { screenPoint, screenToWorld } from './CanvasPointerGeometry'
 
@@ -25,7 +28,7 @@ export function getCanvasPointerDragSession({
   event,
   interaction,
 }: {
-  event: Pick<CanvasAppPointerInput, 'pointerId'>
+  event: CanvasAppPointerIdInput
   interaction: Interaction
 }): CanvasPointerDragSession | null {
   if (interaction.kind === 'none' || interaction.pointerId !== event.pointerId) {
@@ -41,7 +44,7 @@ export function getCanvasPointerDragProjection({
   stageElement,
   viewport,
 }: {
-  event: Pick<CanvasAppPointerInput, 'clientX' | 'clientY' | 'pointerId'>
+  event: CanvasAppPointerScreenInput
   interaction: Interaction
   stageElement: CanvasAppStageElement
   viewport: Viewport

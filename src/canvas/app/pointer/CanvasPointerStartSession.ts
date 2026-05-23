@@ -3,7 +3,7 @@ import type {
   Viewport,
 } from '../../entities'
 import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
-import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
+import type { CanvasAppScreenPointInput } from './CanvasAppPointerInput'
 import { screenPoint, screenToWorld } from './CanvasPointerGeometry'
 
 export type CanvasPointerStartProjection = {
@@ -16,7 +16,7 @@ export function getCanvasPointerStartProjection({
   stageElement,
   viewport,
 }: {
-  event: Pick<CanvasAppPointerInput, 'clientX' | 'clientY'>
+  event: CanvasAppScreenPointInput
   stageElement: CanvasAppStageElement
   viewport: Viewport
 }): CanvasPointerStartProjection {

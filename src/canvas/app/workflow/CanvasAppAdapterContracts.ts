@@ -2,21 +2,34 @@ import {
   assertCanvasAppDescriptorFunctionField,
   assertCanvasAppDescriptorObject,
 } from '../extensions/CanvasAppDescriptorContracts'
+import type { CanvasItem } from '../../host'
 import type {
-  CanvasAppAssembly,
-  CanvasAppItemAdapters,
-} from './CanvasAppAssembly'
+  CanvasCommandAdapter,
+  CanvasCreationAdapter,
+  CanvasTransformAdapter,
+} from '../../engine'
+import type {
+  CanvasAppItemLayerAdapter,
+  CanvasAppStageAdapter,
+} from '../rendering'
 
-type CanvasAppAssemblyAdapterContracts = Pick<
-  CanvasAppAssembly,
-  'itemAdapters' | 'itemLayerAdapter' | 'stageAdapter'
->
+export type CanvasAppItemAdapters = {
+  command: CanvasCommandAdapter<CanvasItem>
+  creation: CanvasCreationAdapter<CanvasItem>
+  transform: CanvasTransformAdapter<CanvasItem>
+}
+
+export type CanvasAppAssemblyAdapters = {
+  itemAdapters: CanvasAppItemAdapters
+  itemLayerAdapter: CanvasAppItemLayerAdapter
+  stageAdapter: CanvasAppStageAdapter
+}
 
 export function assertCanvasAppAssemblyAdapters({
   itemAdapters,
   itemLayerAdapter,
   stageAdapter,
-}: CanvasAppAssemblyAdapterContracts) {
+}: CanvasAppAssemblyAdapters) {
   assertCanvasAppItemAdapters(itemAdapters)
   assertCanvasAppItemLayerAdapter(itemLayerAdapter)
   assertCanvasAppStageAdapter(stageAdapter)
@@ -91,7 +104,7 @@ function assertCanvasAppTransformAdapter(
 }
 
 function assertCanvasAppItemLayerAdapter(
-  adapter: CanvasAppAssembly['itemLayerAdapter'],
+  adapter: CanvasAppItemLayerAdapter,
 ) {
   assertCanvasAppDescriptorObject(adapter, 'item layer adapter')
   assertCanvasAppDescriptorFunctionField({
@@ -102,7 +115,7 @@ function assertCanvasAppItemLayerAdapter(
 }
 
 function assertCanvasAppStageAdapter(
-  adapter: CanvasAppAssembly['stageAdapter'],
+  adapter: CanvasAppStageAdapter,
 ) {
   assertCanvasAppDescriptorObject(adapter, 'stage adapter')
   assertCanvasAppDescriptorFunctionField({

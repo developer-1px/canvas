@@ -15,7 +15,7 @@ import {
   type CanvasSnapGuides,
 } from '../../engine'
 import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
-import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
+import type { CanvasAppPointerIdInput } from './CanvasAppPointerInput'
 import type { Interaction } from './CanvasInteractionState'
 import { releasePointer } from './CanvasPointerGeometry'
 import { cancelCanvasPointerInteraction } from './CanvasPointerInteractionLifecycle'
@@ -90,7 +90,7 @@ export function applyCanvasPointerInteractionEndEffect({
   event,
 }: {
   context: CanvasPointerInteractionDragEffectContext
-  event: Pick<CanvasAppPointerInput, 'pointerId'>
+  event: CanvasAppPointerIdInput
 }) {
   releasePointer(context.stageElement, event.pointerId)
   resetCanvasPointerInteractionDragEffect(context)
@@ -102,7 +102,7 @@ export function applyCanvasPointerInteractionCancelEffect({
   interaction,
 }: {
   context: CanvasPointerInteractionDragEffectContext
-  event: Pick<CanvasAppPointerInput, 'pointerId'>
+  event: CanvasAppPointerIdInput
   interaction: Interaction
 }) {
   cancelCanvasPointerInteraction({

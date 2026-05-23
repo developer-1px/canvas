@@ -1,18 +1,13 @@
 import type {
-  CanvasAppAssembly,
+  CanvasAppAssemblyAdapters,
   CanvasAppItemAdapters,
-} from './CanvasAppAssembly'
-
-type CanvasAppAssemblyAdapterSnapshot = Pick<
-  CanvasAppAssembly,
-  'itemAdapters' | 'itemLayerAdapter' | 'stageAdapter'
->
+} from './CanvasAppAdapterContracts'
 
 export function snapshotCanvasAppAssemblyAdapters({
   itemAdapters,
   itemLayerAdapter,
   stageAdapter,
-}: CanvasAppAssemblyAdapterSnapshot): CanvasAppAssemblyAdapterSnapshot {
+}: CanvasAppAssemblyAdapters): CanvasAppAssemblyAdapters {
   return Object.freeze({
     itemAdapters: snapshotCanvasAppItemAdapters(itemAdapters),
     itemLayerAdapter: Object.freeze({ ...itemLayerAdapter }),
