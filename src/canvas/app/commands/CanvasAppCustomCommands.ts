@@ -45,7 +45,7 @@ export function getCanvasAppCustomCommandStates({
 }): CanvasAppCustomCommandState[] {
   return commands.map((command) => ({
     ariaLabel: command.ariaLabel ?? command.title,
-    disabled: command.isEnabled ? !command.isEnabled(context) : false,
+    disabled: isCanvasAppCustomCommandDisabled(command, context),
     id: command.id,
     label: command.label,
     title: command.title,
@@ -63,10 +63,30 @@ export function runCanvasAppCustomCommand({
 }) {
   const command = commands.find((entry) => entry.id === commandId)
 
-  if (!command || (command.isEnabled && !command.isEnabled(context))) {
+  if (!command || isCanvasAppCustomCommandDisabled(command, context)) {
     return false
   }
 
-  command.run(context)
-  return true
+  try {
+    command.run(context)
+    return true
+  } catch {
+    // External commands must not tear down the app command loop.
+    return false
+  }
+}
+
+function isCanvasAppCustomCommandDisabled(
+  command: CanvasAppCustomCommand,
+  context: CanvasAppCustomCommandContext,
+) {
+  if (!command.isEnabled) {
+    return false
+  }
+
+  try {
+    return !command.isEnabled(context)
+  } catch {
+    return true
+  }
 }

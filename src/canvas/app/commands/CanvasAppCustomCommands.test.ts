@@ -74,4 +74,60 @@ describe('CanvasAppCustomCommands', () => {
     ).toBe(false)
     expect(run).toHaveBeenCalledTimes(1)
   })
+
+  it('contains custom command availability and run failures', () => {
+    const throwingAvailability = vi.fn(() => {
+      throw new Error('bad custom availability')
+    })
+    const throwingRun = vi.fn(() => {
+      throw new Error('bad custom command')
+    })
+    const commands: CanvasAppCustomCommand[] = [
+      {
+        id: 'throwing-availability',
+        label: 'A',
+        title: 'Throwing availability',
+        isEnabled: throwingAvailability,
+        run: vi.fn(),
+      },
+      {
+        id: 'throwing-run',
+        label: 'R',
+        title: 'Throwing run',
+        run: throwingRun,
+      },
+    ]
+
+    expect(getCanvasAppCustomCommandStates({ commands, context })).toEqual([
+      {
+        ariaLabel: 'Throwing availability',
+        disabled: true,
+        id: 'throwing-availability',
+        label: 'A',
+        title: 'Throwing availability',
+      },
+      {
+        ariaLabel: 'Throwing run',
+        disabled: false,
+        id: 'throwing-run',
+        label: 'R',
+        title: 'Throwing run',
+      },
+    ])
+    expect(
+      runCanvasAppCustomCommand({
+        commandId: 'throwing-availability',
+        commands,
+        context,
+      }),
+    ).toBe(false)
+    expect(
+      runCanvasAppCustomCommand({
+        commandId: 'throwing-run',
+        commands,
+        context,
+      }),
+    ).toBe(false)
+    expect(throwingRun).toHaveBeenCalledTimes(1)
+  })
 })

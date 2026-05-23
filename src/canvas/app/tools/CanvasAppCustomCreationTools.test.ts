@@ -17,13 +17,15 @@ const tool: CanvasAppCustomCreationTool = {
   shortcut: { key: 'e', shiftKey: true },
   createItem: ({ createId, startWorld }) => ({
     id: createId('risk'),
-    type: 'rect',
+    type: 'custom',
+    kind: 'risk',
+    presentation: 'risk-node',
+    title: 'Risk',
     x: startWorld.x,
     y: startWorld.y,
     w: 120,
     h: 80,
-    fill: '#fff7ed',
-    stroke: '#fb923c',
+    data: { severity: 'high' },
   }),
 }
 

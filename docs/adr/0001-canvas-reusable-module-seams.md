@@ -39,7 +39,7 @@ The canvas code is intended to work as a reusable component factory, not as one 
 - App Shell stays a layout composition layer.
 - Internal document implementation can change without touching app document hooks.
 - Custom component kinds and SVG presentation strategies can be assembled outside the internal canvas grammar without editing Renderer Stage or App workflow.
-- Product-specific business actions can be registered as App custom commands without changing the internal Engine command grammar.
+- Product-specific business actions can be registered as App custom commands without changing the internal Engine command grammar, and custom command availability/run failures do not tear down the internal command loop.
 - Product-specific inspector panels can be registered without changing the default Object Inspector.
-- Product-specific creation tools can be registered without changing the internal builtin tool grammar.
+- Product-specific creation tools can be registered without changing the internal builtin tool grammar, but they can only create `CanvasCustomItem` envelopes rather than internal `CanvasItem` variants.
 - Product-specific item kinds can be stored, validated, rendered, created, inspected, and commanded through one App-owned module without adding a new `CanvasItem` variant or a new SVG renderer branch.

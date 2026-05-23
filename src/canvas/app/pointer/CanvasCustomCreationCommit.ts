@@ -1,6 +1,6 @@
 import type {
+  CanvasCustomItem,
   CanvasCustomToolId,
-  CanvasItem,
   Point,
 } from '../../entities'
 import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract'
@@ -47,7 +47,7 @@ export function commitCanvasCustomCreation({
       startWorld,
     })
 
-    return nextItem
+    return nextItem && isCanvasCustomCreationItem(nextItem)
       ? commitCanvasCustomItem({
           commitItemsChange,
           item: nextItem,
@@ -66,11 +66,20 @@ function commitCanvasCustomItem({
   selection,
 }: {
   commitItemsChange: CommitCanvasItemsChange
-  item: CanvasItem
+  item: CanvasCustomItem
   selection: string[]
 }) {
   return commitItemsChange({ type: 'add', items: [item] }, {
     before: selection,
     after: [item.id],
   })
+}
+
+function isCanvasCustomCreationItem(item: unknown): item is CanvasCustomItem {
+  return (
+    typeof item === 'object' &&
+    item !== null &&
+    'type' in item &&
+    item.type === 'custom'
+  )
 }

@@ -1,12 +1,12 @@
 import { describe, expect, it, vi } from 'vitest'
-import type { CanvasItem } from '../../entities'
+import type { CanvasCustomItem } from '../../entities'
 import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract'
 import {
   commitCanvasCustomCreation,
   type CanvasCustomCreationCommitInput,
 } from './CanvasCustomCreationCommit'
 
-const customItem: CanvasItem = {
+const customItem: CanvasCustomItem = {
   data: { severity: 'high' },
   h: 96,
   id: 'risk-1',
@@ -63,6 +63,37 @@ describe('commitCanvasCustomCreation', () => {
               label: '!',
               title: 'Risk',
               createItem: () => null,
+            },
+          ],
+        }),
+      ),
+    ).toBe(false)
+    expect(commitItemsChange).not.toHaveBeenCalled()
+  })
+
+  it('rejects non-custom items returned by custom creation tools', () => {
+    const commitItemsChange = vi.fn<CommitCanvasItemsChange>(() => true)
+    const rectItem = {
+      id: 'rect-1',
+      type: 'rect',
+      x: 80,
+      y: 120,
+      w: 120,
+      h: 80,
+      fill: '#ffffff',
+      stroke: '#111827',
+    } as unknown as CanvasCustomItem
+
+    expect(
+      commitCanvasCustomCreation(
+        createInput({
+          commitItemsChange,
+          customCreationTools: [
+            {
+              id: 'risk',
+              label: '!',
+              title: 'Risk',
+              createItem: () => rectItem,
             },
           ],
         }),

@@ -1,6 +1,6 @@
 import type {
+  CanvasCustomItem,
   CanvasCustomToolId,
-  CanvasItem,
   Point,
 } from '../../entities'
 import {
@@ -22,7 +22,9 @@ export type CanvasAppCustomCreationToolContext = {
 
 export type CanvasAppCustomCreationTool = {
   ariaLabel?: string
-  createItem: (context: CanvasAppCustomCreationToolContext) => CanvasItem | null
+  createItem: (
+    context: CanvasAppCustomCreationToolContext,
+  ) => CanvasCustomItem | null
   id: string
   label: string
   shortcut?: CanvasAppCustomToolShortcut
