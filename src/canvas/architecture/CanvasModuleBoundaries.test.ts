@@ -1019,6 +1019,12 @@ describe('Canvas module boundaries', () => {
     const textConsumerModelFile = getSourceFile(
       'src/canvas/app/workflow/CanvasAppTextConsumerModel.ts',
     )
+    const textEditingHookFile = getSourceFile(
+      'src/canvas/app/text/useCanvasTextEditing.ts',
+    )
+    const textEditingModelFile = getSourceFile(
+      'src/canvas/app/text/CanvasTextEditingModel.ts',
+    )
 
     expect(appModelFile.source).toContain("from './useCanvasAppTextModel'")
     expect(appModelFile.source).not.toContain(
@@ -1069,6 +1075,23 @@ describe('Canvas module boundaries', () => {
     expect(textConsumerModelFile.source).toContain(
       'export function getCanvasAppTextConsumerModel',
     )
+    expect(textEditingHookFile.source).toContain(
+      "from './CanvasTextEditingModel'",
+    )
+    expect(textEditingHookFile.source).toContain('commitCanvasTextEditing({')
+    expect(textEditingHookFile.source).toContain('getCanvasTextEditorStyle({')
+    expect(textEditingHookFile.source).not.toContain("'Text'")
+    expect(textEditingHookFile.source).not.toContain("type: 'set-text'")
+    expect(textEditingHookFile.source).not.toContain('fontSize: 16')
+    expect(textEditingModelFile.source).toContain(
+      'export function commitCanvasTextEditing',
+    )
+    expect(textEditingModelFile.source).toContain(
+      'export function getCanvasTextEditorStyle',
+    )
+    expect(textEditingModelFile.source).toContain("'Text'")
+    expect(textEditingModelFile.source).toContain("type: 'set-text'")
+    expect(textEditingModelFile.source).toContain('fontSize: 16')
   })
 
   it('keeps app interaction state routing behind the interaction model', () => {

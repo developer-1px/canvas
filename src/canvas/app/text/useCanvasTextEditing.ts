@@ -1,19 +1,19 @@
 import {
   useEffect,
-  type CSSProperties,
   type Dispatch,
   type RefObject,
   type SetStateAction,
 } from 'react'
 import type {
   EditingText,
-  RectItem,
-  TextItem,
   Viewport,
 } from '../../entities'
 import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract'
-
-type EditableCanvasTextItem = RectItem | TextItem
+import {
+  commitCanvasTextEditing,
+  getCanvasTextEditorStyle,
+  type EditableCanvasTextItem,
+} from './CanvasTextEditingModel'
 
 type UseCanvasTextEditingArgs = {
   commitItemsChange: CommitCanvasItemsChange
@@ -50,25 +50,13 @@ export function useCanvasTextEditing({
   }, [editingId, editorRef])
 
   function commitText() {
-    if (!editing) {
-      return
-    }
-
-    if (!editingItem) {
-      setEditing(null)
-      return
-    }
-
-    const value =
-      editingItem.type === 'text' && !editing.value.trim()
-        ? 'Text'
-        : editing.value
-
-    commitItemsChange({ type: 'set-text', id: editing.id, text: value }, {
-      before: selection,
-      after: selection,
+    commitCanvasTextEditing({
+      commitItemsChange,
+      editing,
+      editingItem,
+      selection,
+      setEditing,
     })
-    setEditing(null)
   }
 
   function cancelTextEdit() {
@@ -79,17 +67,11 @@ export function useCanvasTextEditing({
     editorRef.current?.blur()
   }
 
-  const editorStyle: CSSProperties | undefined =
-    editingItem && editing
-      ? {
-          left: viewport.x + editingItem.x * viewport.scale,
-          top: viewport.y + editingItem.y * viewport.scale,
-          width: editingItem.w * viewport.scale,
-          height: editingItem.h * viewport.scale,
-          minHeight: editingItem.h * viewport.scale,
-          fontSize: 16 * viewport.scale,
-        }
-      : undefined
+  const editorStyle = getCanvasTextEditorStyle({
+    editing,
+    editingItem,
+    viewport,
+  })
 
   return {
     blurTextEditor,

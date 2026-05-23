@@ -117,6 +117,7 @@
 - Canvas App Stage Model: stage와 item layer Adapter 입력 조립, 호출 순서, text editor blur, context menu 차단, render 실패 containment를 소유하는 workflow Module.
 - Canvas App Text Model: App Model이 textarea ref, text editor, find/replace runtime wiring 세부를 직접 알지 않도록 숨기는 workflow Module.
 - Canvas App Text Consumer Model: Text editor/find-replace runtime을 command, component, extension, keyboard, pointer, stage, view consumer context로 변환하는 workflow Module.
+- Canvas Text Editing Model: text edit commit descriptor, empty text fallback, viewport-projected editor style을 소유하는 App-owned runtime Module.
 - Canvas App Viewport Model: App Model이 wheel viewport listener와 fit/reset/zoom hook 조립 세부를 직접 알지 않도록 숨기는 workflow Module.
 - Canvas App Viewport Consumer Model: Viewport runtime controls를 control, keyboard consumer별 viewport context로 변환하는 workflow Module.
 - Canvas Toolbar Command Dispatch: Toolbar built-in command action을 command handler bundle 호출로 변환하는 UI-owned Module.
@@ -257,6 +258,7 @@
 - App Model은 pointer down/drag hook 조립 세부를 직접 알지 않고 Canvas App Pointer Model에서 stage/item layer pointer handlers를 받는다. Pointer runtime 생성은 Canvas App Pointer Model이, consumer별 handler fan-out은 Canvas App Pointer Consumer Model이 소유한다.
 - App Model은 stage/item layer Adapter 입력 조립, 호출 순서, context menu 차단, text editor blur timing, render 실패 containment를 직접 알지 않고 Canvas App Stage Model에 위임한다.
 - App Model은 textarea ref, text editor, find/replace wiring, editing state fan-out 세부를 직접 알지 않고 Canvas App Text Model에서 consumer별 text context와 view props를 받는다. Text editor/find-replace runtime 생성은 Canvas App Text Model이, consumer별 text fan-out은 Canvas App Text Consumer Model이 소유한다.
+- Text editing hook은 textarea focus/blur DOM lifecycle만 맡고, commit descriptor, empty text fallback, editor style projection은 Canvas Text Editing Model이 소유한다.
 - App Model은 wheel viewport listener, fit/reset/zoom control hook 조립, keyboard/control fan-out 세부를 직접 알지 않고 Canvas App Viewport Model에서 consumer별 viewport context를 받는다. Viewport listener/control runtime 생성은 Canvas App Viewport Model이, consumer별 viewport fan-out은 Canvas App Viewport Consumer Model이 소유한다.
 - App Model은 draft, marquee, snap guide, temporary pan raw setter routing을 직접 알지 않고 Canvas Interaction Model의 consumer별 interaction context를 전달한다.
 - App Shell은 workspace 저장, document history, read model 생성 방식을 직접 알지 않는다.
