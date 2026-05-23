@@ -61,7 +61,7 @@ describe('CanvasAppStageAdapter', () => {
 })
 
 function renderDefaultStage(input: CanvasAppStageRenderInput) {
-  const Stage = DEFAULT_CANVAS_APP_STAGE_ADAPTER.Stage as (
+  const renderStage = DEFAULT_CANVAS_APP_STAGE_ADAPTER.renderStage as (
     stageInput: CanvasAppStageRenderInput,
   ) => ReactElement<{
     onCanvasPointerDown: (event: ReturnType<typeof createPointerEventSource>) => void
@@ -69,7 +69,7 @@ function renderDefaultStage(input: CanvasAppStageRenderInput) {
     onStageElement?: unknown
     stageElement?: unknown
   }>
-  const rendered = Stage(input)
+  const rendered = renderStage(input)
 
   if (!isValidElement(rendered)) {
     throw new Error('Expected default canvas app stage adapter to render')

@@ -1,9 +1,7 @@
-import {
-  createElement,
-  type ComponentProps,
-  type ComponentType,
+import type {
+  ComponentProps,
+  ReactNode,
 } from 'react'
-import type { CanvasAppStageRenderInput } from '../workflow'
 import { CanvasComponentPalette } from '../../ui/palette/CanvasComponentPalette'
 import { CanvasObjectInspector } from '../../ui/inspector/CanvasObjectInspector'
 import { CanvasFindReplacePanel } from '../../ui/search/CanvasFindReplacePanel'
@@ -22,16 +20,12 @@ type StatusProps = ComponentProps<typeof CanvasStatus>
 type VisibleProps<TProps> = TProps & {
   visible: boolean
 }
-type StageView = {
-  Stage: ComponentType<CanvasAppStageRenderInput>
-  props: CanvasAppStageRenderInput
-}
 
 type CanvasAppViewProps = {
   componentPalette: PaletteProps
   findReplace: FindReplaceProps
   inspector: InspectorProps
-  stage: StageView
+  stage: ReactNode
   status: VisibleProps<StatusProps>
   textEditor: TextEditorProps
   toolbar: VisibleProps<ToolbarProps>
@@ -60,7 +54,7 @@ export function CanvasAppView({
 
       <CanvasFindReplacePanel {...findReplace} />
 
-      {createElement(stage.Stage, stage.props)}
+      {stage}
 
       <CanvasTextEditor {...textEditor} />
 

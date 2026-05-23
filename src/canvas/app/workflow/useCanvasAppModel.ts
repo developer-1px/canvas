@@ -380,9 +380,9 @@ export function useCanvasAppModel({
     },
     findReplace,
     inspector,
-    stage: {
-      Stage: stageAdapter.Stage,
-      props: {
+    stage: renderCanvasAppStage({
+      adapter: stageAdapter,
+      input: {
         activeMode,
         children: renderCanvasAppItemLayer({
           adapter: itemLayerAdapter,
@@ -408,7 +408,7 @@ export function useCanvasAppModel({
         onPointerUp: handlePointerUp,
         onResizePointerDown: handleResizePointerDown,
       },
-    },
+    }),
     status: {
       mode: getCanvasAppStatusMode({
         customCreationTools: customCreationToolStates,
@@ -469,6 +469,20 @@ function renderCanvasAppItemLayer({
 }) {
   try {
     return adapter.renderItems(input)
+  } catch {
+    return null
+  }
+}
+
+function renderCanvasAppStage({
+  adapter,
+  input,
+}: {
+  adapter: CanvasAppAssembly['stageAdapter']
+  input: Parameters<CanvasAppAssembly['stageAdapter']['renderStage']>[0]
+}) {
+  try {
+    return adapter.renderStage(input)
   } catch {
     return null
   }

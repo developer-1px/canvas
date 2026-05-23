@@ -183,7 +183,7 @@ describe('CanvasAppAssembly', () => {
       renderItems: ({ items }) => items.length,
     }
     const stageAdapter: CanvasAppStageAdapter = {
-      Stage: ({ children }) => children,
+      renderStage: ({ children }) => children,
     }
 
     const assembly = createCanvasAppAssembly({
@@ -194,7 +194,7 @@ describe('CanvasAppAssembly', () => {
     expect(assembly.itemLayerAdapter.renderItems(
       createItemLayerInput({ items: DEFAULT_CANVAS_APP_ASSEMBLY.initialItems }),
     )).toBe(DEFAULT_CANVAS_APP_ASSEMBLY.initialItems.length)
-    expect(assembly.stageAdapter.Stage).toBe(stageAdapter.Stage)
+    expect(assembly.stageAdapter.renderStage).toBe(stageAdapter.renderStage)
   })
 
   it('rejects direct extension ids outside the app extension id contract', () => {
@@ -301,7 +301,7 @@ describe('CanvasAppAssembly', () => {
       createCanvasAppAssembly({
         stageAdapter: {} as unknown as CanvasAppStageAdapter,
       }),
-    ).toThrow('Canvas app stage adapter requires Stage')
+    ).toThrow('Canvas app stage adapter requires renderStage')
   })
 
   it('validates assembled output before app runtime use', () => {
@@ -426,9 +426,10 @@ describe('CanvasAppAssembly', () => {
     const itemLayerAdapter: CanvasAppItemLayerAdapter = {
       renderItems: itemLayerRenderItems,
     }
-    const Stage: CanvasAppStageAdapter['Stage'] = ({ children }) => children
+    const renderStage: CanvasAppStageAdapter['renderStage'] = ({ children }) =>
+      children
     const stageAdapter: CanvasAppStageAdapter = {
-      Stage,
+      renderStage,
     }
     const moduleCreationTool: CanvasAppCustomItemModuleCreationTool = {
       id: 'risk',
@@ -482,7 +483,7 @@ describe('CanvasAppAssembly', () => {
     })
     itemAdapters.command.selectAll = () => ['mutated']
     itemLayerAdapter.renderItems = () => 'mutated'
-    stageAdapter.Stage = () => 'mutated'
+    stageAdapter.renderStage = () => 'mutated'
     moduleCreationTool.createItem = ({ startWorld }) => ({
       title: 'Mutated risk',
       x: startWorld.x,
@@ -520,7 +521,7 @@ describe('CanvasAppAssembly', () => {
       createItemLayerInput({ items: assembly.initialItems }),
     )).toBe(1)
     expect(assembly.itemLayerAdapter.renderItems).toBe(itemLayerRenderItems)
-    expect(assembly.stageAdapter.Stage).toBe(Stage)
+    expect(assembly.stageAdapter.renderStage).toBe(renderStage)
     expect(assembly.customCreationTools[0]?.createItem({
       createId: (prefix) => `${prefix}-1`,
       currentWorld: { x: 10, y: 20 },

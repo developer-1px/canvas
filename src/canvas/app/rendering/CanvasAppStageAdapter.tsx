@@ -1,5 +1,4 @@
 import type {
-  ComponentType,
   ReactNode,
   RefCallback,
 } from 'react'
@@ -41,12 +40,12 @@ export type CanvasAppStageRenderInput = {
 }
 
 export type CanvasAppStageAdapter = {
-  Stage: ComponentType<CanvasAppStageRenderInput>
+  renderStage: (input: CanvasAppStageRenderInput) => ReactNode
 }
 
 export const DEFAULT_CANVAS_APP_STAGE_ADAPTER: CanvasAppStageAdapter =
   Object.freeze({
-    Stage: renderCanvasAppSvgStage,
+    renderStage: renderCanvasAppSvgStage,
   })
 
 function renderCanvasAppSvgStage({

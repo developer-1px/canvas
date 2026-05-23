@@ -256,6 +256,10 @@ describe('Canvas module boundaries', () => {
       stageAdapterFile.source.match(
         /export type CanvasAppStageMount = \{[\s\S]*?\n\}/,
       )?.[0] ?? ''
+    const stageAdapter =
+      stageAdapterFile.source.match(
+        /export type CanvasAppStageAdapter = \{[\s\S]*?\n\}/,
+      )?.[0] ?? ''
     const renderInput =
       stageAdapterFile.source.match(
         /export type CanvasAppStageRenderInput = \{[\s\S]*?\n\}/,
@@ -263,11 +267,22 @@ describe('Canvas module boundaries', () => {
 
     expect(stageMount).toContain('ref: RefCallback<Element>')
     expect(stageMount).not.toContain('SVGSVGElement')
+    expect(stageAdapter).toContain('renderStage')
+    expect(stageAdapter).not.toMatch(/\n\s+Stage:/)
+    expect(stageAdapter).not.toContain('ComponentType')
     expect(renderInput).toContain('stageElement: CanvasAppStageMount')
     expect(renderInput).not.toContain('onStageElement')
     expect(renderInput).not.toContain('RefCallback<SVGSVGElement>')
     expect(renderInput).not.toContain('PointerEvent<')
     expect(renderInput).not.toContain('SVGSVGElement')
+  })
+
+  it('keeps app shell independent from stage adapter props', () => {
+    const shellFile = getSourceFile('src/canvas/app/shell/CanvasAppView.tsx')
+
+    expect(shellFile.source).not.toContain('CanvasAppStageRenderInput')
+    expect(shellFile.source).not.toContain('ComponentType')
+    expect(shellFile.source).not.toContain('createElement(stage.')
   })
 
   it('keeps app item layer render input on the app pointer input interface', () => {

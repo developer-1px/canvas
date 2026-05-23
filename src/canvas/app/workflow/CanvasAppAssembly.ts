@@ -359,9 +359,9 @@ function assertCanvasAppItemLayerAdapter(
 function assertCanvasAppStageAdapter(adapter: CanvasAppStageAdapter) {
   assertCanvasAppDescriptorObject(adapter, 'stage adapter')
   assertCanvasAppDescriptorFunctionField({
-    field: 'Stage',
+    field: 'renderStage',
     owner: 'stage adapter',
-    value: adapter.Stage,
+    value: adapter.renderStage,
   })
 }
 

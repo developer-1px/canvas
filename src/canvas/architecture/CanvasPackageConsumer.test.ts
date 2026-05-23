@@ -61,7 +61,7 @@ describe('Canvas package consumer imports', () => {
       renderItems: ({ items }) => items.length,
     }
     const stageAdapter: CanvasAppStageAdapter = {
-      Stage: () => 'stage',
+      renderStage: () => 'stage',
     }
     const stageMount: CanvasAppStageMount = {
       ref: () => undefined,
@@ -97,7 +97,7 @@ describe('Canvas package consumer imports', () => {
       outlineIds: new Set(),
       selected: new Set(),
     })).toBe(1)
-    expect(assembly.stageAdapter.Stage).toBe(stageAdapter.Stage)
+    expect(assembly.stageAdapter.renderStage).toBe(stageAdapter.renderStage)
     expect(stageMount.ref).toBeTypeOf('function')
     expect(pointerInput.pointerId).toBe(1)
     expect(assembly.customItemValidators.smoke(customItem)).toBe(true)
