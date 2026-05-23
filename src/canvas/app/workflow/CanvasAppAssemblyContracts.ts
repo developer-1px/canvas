@@ -7,7 +7,7 @@ import {
 } from '../extensions/CanvasAppDescriptorContracts'
 import { assertCanvasAppInspectorPanels } from '../inspector/CanvasAppInspectorPanels'
 import { assertCanvasAppCustomItemValidators } from '../modules/CanvasAppCustomItemValidatorContracts'
-import { assertCanvasAppCustomItemRenderers } from '../rendering'
+import { assertCanvasAppCustomItemRenderers } from '../rendering/CanvasAppRendererRegistries'
 import { assertCanvasAppCustomCreationTools } from '../tools/CanvasAppCustomCreationTools'
 import { assertCanvasAppAssemblyAdapters } from './CanvasAppAdapterContracts'
 import type { CanvasAppAssembly } from './CanvasAppAssembly'

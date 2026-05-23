@@ -37,12 +37,16 @@ export {
   type CanvasAppComponentRendererStrategy,
   type CanvasAppCustomItemRendererStrategy,
   type CanvasAppCustomItemRenderers,
-  type CanvasAppItemLayerAdapter,
-  type CanvasAppItemLayerRenderInput,
-  type CanvasAppStageAdapter,
-  type CanvasAppStageMount,
-  type CanvasAppStageRenderInput,
-} from '../rendering'
+} from '../rendering/CanvasAppRendererRegistries'
+export type {
+  CanvasAppItemLayerAdapter,
+  CanvasAppItemLayerRenderInput,
+} from '../rendering/CanvasAppItemLayerAdapter'
+export type {
+  CanvasAppStageAdapter,
+  CanvasAppStageMount,
+  CanvasAppStageRenderInput,
+} from '../rendering/CanvasAppStageAdapter'
 export {
   assertCanvasAppExtensionId,
   isCanvasAppExtensionId,

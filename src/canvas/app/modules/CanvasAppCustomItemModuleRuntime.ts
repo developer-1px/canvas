@@ -4,7 +4,7 @@ import type {
   CanvasCustomItemValidators,
 } from '../../host'
 import { normalizeCanvasItems } from '../../host'
-import type { CanvasAppCustomItemRenderers } from '../rendering'
+import type { CanvasAppCustomItemRenderers } from '../rendering/CanvasAppRendererRegistries'
 import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
 import type {
   CanvasAppCustomItemModule,

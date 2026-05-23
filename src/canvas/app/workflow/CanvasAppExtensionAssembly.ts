@@ -10,7 +10,7 @@ import {
   type CanvasAppCustomItemModule,
   type CanvasAppCustomItemModuleAssemblyOptions,
 } from '../modules/CanvasAppCustomItemModules'
-import type { CanvasAppCustomItemRenderers } from '../rendering'
+import type { CanvasAppCustomItemRenderers } from '../rendering/CanvasAppRendererRegistries'
 import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
 
 export type CanvasAppExtensionAssembly = {

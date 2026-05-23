@@ -15,7 +15,7 @@ import type { CanvasAppInspectorPanel } from '../inspector/CanvasAppInspectorPan
 import type {
   CanvasAppCustomItemRendererStrategy,
   CanvasAppCustomItemRenderers,
-} from '../rendering'
+} from '../rendering/CanvasAppRendererRegistries'
 import {
   type CanvasAppCustomCreationTool,
   type CanvasAppCustomCreationToolContext,

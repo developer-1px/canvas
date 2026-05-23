@@ -2,7 +2,7 @@ import type { CanvasComponentLibrary } from '../../host'
 import {
   createCanvasAppComponentPresentationRenderers,
   type CanvasAppComponentPresentationRenderers,
-} from '../rendering'
+} from '../rendering/CanvasAppRendererRegistries'
 import type { CanvasAppComponentAssemblyContract } from './CanvasAppComponentAssemblyContracts'
 
 export type CanvasAppComponentAssemblyInput = {

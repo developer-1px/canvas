@@ -2401,8 +2401,14 @@ describe('Canvas module boundaries', () => {
     const contractsFile = getSourceFile(
       'src/canvas/app/rendering/CanvasAppRenderingContracts.ts',
     )
+    const registriesFile = getSourceFile(
+      'src/canvas/app/rendering/CanvasAppRendererRegistries.ts',
+    )
     const itemLayerAdapterFile = getSourceFile(
       'src/canvas/app/rendering/CanvasAppItemLayerAdapter.tsx',
+    )
+    const authoringFacadeFile = getSourceFile(
+      'src/canvas/app/authoring/index.ts',
     )
 
     expect(contractsFile.source).toContain(
@@ -2412,9 +2418,38 @@ describe('Canvas module boundaries', () => {
       'CanvasAppCustomItemRendererStrategy',
     )
     expect(contractsFile.source).not.toContain('CanvasDemoSvg')
+    expect(registriesFile.source).toContain(
+      'export function createCanvasAppComponentPresentationRenderers',
+    )
+    expect(registriesFile.source).toContain(
+      'export function createCanvasAppCustomItemRenderers',
+    )
+    expect(registriesFile.source).toContain(
+      "from './CanvasDemoSvgComponentPresentationRegistry'",
+    )
+    expect(registriesFile.source).toContain(
+      "from './CanvasDemoSvgCustomItemRendererRegistry'",
+    )
+    expect(authoringFacadeFile.source).toContain(
+      "from '../rendering/CanvasAppRendererRegistries'",
+    )
+    expect(authoringFacadeFile.source).not.toContain("from '../rendering'")
     expect(itemLayerAdapterFile.source).not.toMatch(
       /CanvasDemoSvg(?:Component|Custom).*Renderer/,
     )
+  })
+
+  it('keeps app modules from depending on the broad rendering barrel', () => {
+    const violations = sourceFiles
+      .filter((file) =>
+        file.path.startsWith('src/canvas/app/') &&
+        !file.path.startsWith('src/canvas/app/rendering/'),
+      )
+      .flatMap((file) =>
+        /from ['"]\.\.\/rendering['"]/.test(file.source) ? [file.path] : [],
+      )
+
+    expect(violations).toEqual([])
   })
 
   it('keeps built-in drawing geometry in the host drawing module', () => {

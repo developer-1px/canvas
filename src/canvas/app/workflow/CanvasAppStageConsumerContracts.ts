@@ -8,10 +8,14 @@ import type { CanvasOverlayState } from '../../engine'
 import type {
   CanvasAppComponentPresentationRenderers,
   CanvasAppCustomItemRenderers,
+} from '../rendering/CanvasAppRendererRegistries'
+import type {
   CanvasAppItemLayerAdapter,
+} from '../rendering/CanvasAppItemLayerAdapter'
+import type {
   CanvasAppStageAdapter,
   CanvasAppStageMount,
-} from '../rendering'
+} from '../rendering/CanvasAppStageAdapter'
 import type { CanvasAppPointerConsumerModel } from './CanvasAppPointerConsumerContracts'
 
 export type CanvasAppStageItemLayerContext = {

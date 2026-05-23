@@ -10,7 +10,7 @@ import {
 import {
   assertCanvasAppComponentPresentationRenderers,
   type CanvasAppComponentPresentationRenderers,
-} from '../rendering'
+} from '../rendering/CanvasAppRendererRegistries'
 
 export type CanvasAppComponentAssemblyContract = {
   componentLibrary: CanvasComponentLibrary

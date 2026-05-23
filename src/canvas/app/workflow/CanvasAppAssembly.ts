@@ -16,13 +16,17 @@ import {
 import {
   DEFAULT_CANVAS_APP_CUSTOM_ITEM_RENDERERS,
   DEFAULT_CANVAS_APP_COMPONENT_PRESENTATION_RENDERERS,
-  DEFAULT_CANVAS_APP_ITEM_LAYER_ADAPTER,
-  DEFAULT_CANVAS_APP_STAGE_ADAPTER,
   type CanvasAppComponentPresentationRenderers,
   type CanvasAppCustomItemRenderers,
+} from '../rendering/CanvasAppRendererRegistries'
+import {
+  DEFAULT_CANVAS_APP_ITEM_LAYER_ADAPTER,
   type CanvasAppItemLayerAdapter,
+} from '../rendering/CanvasAppItemLayerAdapter'
+import {
+  DEFAULT_CANVAS_APP_STAGE_ADAPTER,
   type CanvasAppStageAdapter,
-} from '../rendering'
+} from '../rendering/CanvasAppStageAdapter'
 import type { CanvasAppCustomCommand } from '../commands/CanvasAppCustomCommands'
 import type { CanvasAppInspectorPanel } from '../inspector/CanvasAppInspectorPanels'
 import type {
