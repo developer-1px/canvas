@@ -535,6 +535,41 @@ describe('Canvas module boundaries', () => {
     }
   })
 
+  it('keeps App custom creation tool contracts behind a named module', () => {
+    const descriptorFile = getSourceFile(
+      'src/canvas/app/tools/CanvasAppCustomCreationTools.ts',
+    )
+    const contractsFile = getSourceFile(
+      'src/canvas/app/tools/CanvasAppCustomCreationToolContracts.ts',
+    )
+
+    expect(descriptorFile.source).toContain(
+      "from './CanvasAppCustomCreationToolContracts'",
+    )
+    expect(descriptorFile.source).not.toContain(
+      'function assertCanvasAppCustomCreationTools',
+    )
+    expect(descriptorFile.source).not.toContain(
+      'RESERVED_CANVAS_APP_CUSTOM_TOOL_SHORTCUTS',
+    )
+    expect(descriptorFile.source).not.toContain(
+      'shortcut conflicts with',
+    )
+    expect(descriptorFile.source).not.toContain(
+      'Duplicate canvas app custom creation tool shortcut',
+    )
+    expect(contractsFile.source).toContain(
+      'export function assertCanvasAppCustomCreationTools',
+    )
+    expect(contractsFile.source).toContain(
+      'RESERVED_CANVAS_APP_CUSTOM_TOOL_SHORTCUTS',
+    )
+    expect(contractsFile.source).toContain('shortcut conflicts with')
+    expect(contractsFile.source).toContain(
+      'Duplicate canvas app custom creation tool shortcut',
+    )
+  })
+
   it('keeps App custom item module runtime behind a named module', () => {
     const moduleFile = getSourceFile(
       'src/canvas/app/modules/CanvasAppCustomItemModules.ts',

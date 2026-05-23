@@ -54,6 +54,7 @@
 | `src/canvas/app/modules/CanvasAppCustomItemModuleRuntime.ts` | Module-owned creation tool envelope 생성, item validation, renderer/validator registry 변환과 실패 containment를 소유한다 |
 | `src/canvas/app/modules/CanvasAppCustomItemModuleSnapshot.ts` | Custom item module define/assembly 후 외부 descriptor mutation에서 module과 assembled extension parts를 보호한다 |
 | `src/canvas/app/tools/CanvasAppCustomCreationTools.ts` | 내부 Tool union에 구체 id를 추가하지 않고 제품별 생성 도구를 등록하는 descriptor를 제공한다 |
+| `src/canvas/app/tools/CanvasAppCustomCreationToolContracts.ts` | Custom creation tool descriptor shape와 reserved/duplicate shortcut conflict를 검증한다 |
 | `src/canvas/app/tools/CanvasAppCustomCreationToolRuntime.ts` | Custom creation tool id 변환, toolbar state, lookup, shortcut matching을 소유한다 |
 | `src/canvas/app/workflow/CanvasAppAssembly.ts` | Host item adapter, component library, custom command, custom item module, inspector panel, initial items, SVG presentation registry 같은 제품별 의미를 외부 조립 seam으로 제공한다 |
 | `src/canvas/app/workflow/CanvasAppAssemblyContracts.ts` | 조립된 assembly output의 component library resolver, renderer coverage, custom extension registry, initial item, adapter shape를 검증한다 |
@@ -164,7 +165,7 @@ type CanvasAffordanceConfig = {
 - Custom command의 availability/run 실패는 내부 command loop를 깨지 않고 disabled/false로 containment 된다.
 - Canvas App Custom Command descriptor shape 검증과 toolbar state/run execution은 분리하고, 실행 실패 containment는 Canvas App Custom Command Execution이 소유한다.
 - 제품별 item creation tool은 내부 builtin tool list에 추가하지 않고 Canvas App Custom Item Module에 등록한다.
-- Canvas App Custom Creation Tool descriptor shape/shortcut conflict 검증과 runtime state/lookup/shortcut matching은 분리하고, runtime behavior는 Canvas App Custom Creation Tool Runtime이 소유한다.
+- Canvas App Custom Creation Tool descriptor shape/shortcut conflict 검증과 runtime state/lookup/shortcut matching은 분리하고, validation은 Canvas App Custom Creation Tool Contracts가, runtime behavior는 Canvas App Custom Creation Tool Runtime이 소유한다.
 - Custom creation tool이 item 생성을 거부하거나 실패하거나 invalid item을 반환해도 pointer interaction cleanup은 계속 진행되고 문서 상태는 손상하지 않는다.
 - Marker, highlighter, arrow는 제품별 custom item이 아니라 내부 Drawing Item이다. Drawing Item의 `x/y/w/h`는 외부 입력이 아니라 `points` 또는 `start/end`에서 Host tree/document가 동기화하는 canonical bounds다. Drawing Item style 기본값은 Host Drawing Item Style Module이 소유하고 draft overlay와 item creation이 같은 값을 쓴다.
 - 제품별 item kind는 내부 `CanvasItem` variant를 추가하지 않고 Canvas App Custom Item Module로 묶어 등록한다.
