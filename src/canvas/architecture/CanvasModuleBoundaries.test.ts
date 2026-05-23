@@ -439,6 +439,31 @@ describe('Canvas module boundaries', () => {
     )
   })
 
+  it('keeps app inspector wiring behind a named workflow module', () => {
+    const appModelFile = getSourceFile(
+      'src/canvas/app/workflow/useCanvasAppModel.ts',
+    )
+    const inspectorModelFile = getSourceFile(
+      'src/canvas/app/workflow/useCanvasAppInspectorModel.ts',
+    )
+
+    expect(appModelFile.source).toContain(
+      "from './useCanvasAppInspectorModel'",
+    )
+    expect(appModelFile.source).not.toContain(
+      "from '../inspector/useCanvasObjectInspector'",
+    )
+    expect(appModelFile.source).not.toContain('useCanvasObjectInspector')
+    expect(inspectorModelFile.source).toContain(
+      "from '../inspector/useCanvasObjectInspector'",
+    )
+    expect(inspectorModelFile.source).toContain(
+      'export function useCanvasAppInspectorModel',
+    )
+    expect(inspectorModelFile.source).toContain('inspectorPanels')
+    expect(inspectorModelFile.source).toContain('itemReadModel')
+  })
+
   it('keeps app pointer handler wiring behind a named workflow module', () => {
     const appModelFile = getSourceFile(
       'src/canvas/app/workflow/useCanvasAppModel.ts',

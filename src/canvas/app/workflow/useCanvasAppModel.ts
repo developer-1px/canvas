@@ -6,12 +6,12 @@ import {
   DEFAULT_CANVAS_AFFORDANCE_CONFIG,
 } from '../../engine'
 import { useCanvasComponentInsertion } from '../components/useCanvasComponentInsertion'
-import { useCanvasObjectInspector } from '../inspector/useCanvasObjectInspector'
 import { useCanvasAppStageElement } from '../stage/CanvasAppStageElement'
 import { getCanvasAppControlModel } from './CanvasAppControlModel'
 import { renderCanvasAppStageModel } from './CanvasAppStageModel'
 import { useCanvasAppCommandModel } from './useCanvasAppCommandModel'
 import { useCanvasAppExtensionModel } from './useCanvasAppExtensionModel'
+import { useCanvasAppInspectorModel } from './useCanvasAppInspectorModel'
 import { useCanvasAppKeyboardModel } from './useCanvasAppKeyboardModel'
 import { useCanvasAppPointerModel } from './useCanvasAppPointerModel'
 import { useCanvasFindReplaceModel } from './useCanvasFindReplaceModel'
@@ -100,7 +100,7 @@ export function useCanvasAppModel({
     viewport,
   })
 
-  const inspector = useCanvasObjectInspector({
+  const inspector = useCanvasAppInspectorModel({
     commitItemsChange,
     inspectorPanels,
     itemReadModel,
