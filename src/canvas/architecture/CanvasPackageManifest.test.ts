@@ -39,6 +39,7 @@ describe('Canvas package manifest', () => {
     expect(packageJson.exports).toEqual({
       '.': './src/canvas/index.ts',
       './app': './src/canvas/app/index.ts',
+      './app/authoring': './src/canvas/app/authoring/index.ts',
       './core': './src/canvas/core/index.ts',
       './engine': './src/canvas/engine/index.ts',
       './entities': './src/canvas/entities/index.ts',
@@ -50,7 +51,7 @@ describe('Canvas package manifest', () => {
   it('points package exports only at existing canvas public facades', () => {
     const exportedPaths = Object.values(packageJson.exports ?? {})
 
-    expect(exportedPaths).toHaveLength(7)
+    expect(exportedPaths).toHaveLength(8)
     expect(exportedPaths.every((path) => sourcePaths.has(path))).toBe(true)
     expect(exportedPaths.every((path) => path.endsWith('/index.ts'))).toBe(true)
   })

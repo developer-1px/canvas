@@ -10,6 +10,7 @@
   "exports": {
     ".": "./src/canvas/index.ts",
     "./app": "./src/canvas/app/index.ts",
+    "./app/authoring": "./src/canvas/app/authoring/index.ts",
     "./core": "./src/canvas/core/index.ts",
     "./engine": "./src/canvas/engine/index.ts",
     "./entities": "./src/canvas/entities/index.ts",

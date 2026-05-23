@@ -89,7 +89,7 @@
 | `src/canvas/app/workflow/useCanvasInteractionModel.ts` | tool, gesture, marquee, draft, snap guide, overlay 상태 생명주기를 App Shell에 숨긴다 |
 | `src/canvas/app/workflow/useCanvasTextEditorModel.ts` | text editing state, editable item lookup, text editor props를 App Shell에 숨긴다 |
 | `src/canvas/app/workflow/useCanvasWorkspaceModel.ts` | 저장된 workspace snapshot, document history, viewport, read model, id 생성을 App Shell에 숨긴다 |
-| `src/canvas/app/authoring/index.ts` | 외부 조립자가 쓰는 assembly input과 custom descriptor 계약을 모으고 App runtime hook/default/validator를 제외한다 |
+| `src/canvas/app/authoring/index.ts` | `canvas/app/authoring` subpath로 외부 조립자가 쓰는 assembly input과 custom descriptor 계약을 모으고 App runtime hook/default/validator를 제외한다 |
 | `src/canvas/app/inspector/CanvasAppInspectorPanelExecution.ts` | Inspector panel visibility/render 호출과 실패 시 omit containment를 소유한다 |
 | `src/canvas/app/keyboard/CanvasKeyboardShortcutIntent.ts` | Keydown 입력, typing target suppression, temporary pan, escape, command/tool shortcut precedence를 실행 가능한 keyboard intent로 조립한다 |
 | `src/canvas/app/keyboard/CanvasKeyboardCommandShortcutIntent.ts` | Built-in command, viewport, nudge keyboard shortcut grammar를 feature toggle과 selection 기준으로 keyboard intent로 변환한다 |
@@ -233,11 +233,12 @@ type CanvasAffordanceConfig = {
 - Module-owned custom creation tool은 bounds/title/data만 반환하고, `id`, `type`, `kind`, `presentation`은 Canvas App Custom Item Module이 주입한다.
 - Demo custom item module은 `src/demo/custom-items/<name>/index.ts`에서 default export하면 자동 수집된다.
 - Demo와 Demo custom item module은 `src/canvas` package public entry만 사용하고 canvas 하위 구현 경로를 직접 import하지 않는다.
-- package manifest는 `canvas`, `canvas/app`, `canvas/core`, `canvas/engine`, `canvas/entities`, `canvas/host`, `canvas/renderer` export만 열고 각 export는 public facade `index.ts`를 가리킨다.
+- package manifest는 `canvas`, `canvas/app`, `canvas/app/authoring`, `canvas/core`, `canvas/engine`, `canvas/entities`, `canvas/host`, `canvas/renderer` export만 열고 각 export는 public facade `index.ts`를 가리킨다.
 - package public entry는 package manifest의 layer facade만 알고 app 내부 submodule을 직접 export target으로 삼지 않는다.
 - package public entry는 App Shell 조립과 descriptor authoring contract를 열고, layer별 세부 기능은 flat re-export가 아니라 `CanvasEngine`, `CanvasHost`, `CanvasRenderer`, `CanvasCore` namespace 또는 package subpath에서만 연다.
 - package public entry는 `useCanvasAppModel`, `DEFAULT_CANVAS_APP_ASSEMBLY`, `assertCanvasAppAssembly`, `createCanvasAppCustomItemModuleAssembly` 같은 App runtime how를 `canvas/app` subpath에서만 연다.
 - Canvas App Public Facade는 descriptor authoring contract를 Canvas App Authoring Facade에서 재노출하고, runtime hook/default/validator는 workflow public entry에서만 재노출한다.
+- `canvas/app/authoring` subpath는 descriptor what만 열고 `useCanvasAppModel`, default assembly, assertion, custom module assembly output 같은 runtime how를 열지 않는다.
 - package public entry와 subpath export는 `canvas` package self-import consumer smoke test로 검증한다.
 - package manifest는 CSS import가 bundler tree-shaking에서 제거되지 않도록 `sideEffects`에 CSS를 명시한다.
 - package manifest는 React, React DOM, Zod를 shared runtime peer dependency로 선언한다.

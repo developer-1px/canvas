@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import * as CanvasPackage from 'canvas'
+import * as CanvasAppAuthoring from 'canvas/app/authoring'
 import * as CanvasAppFacade from 'canvas/app'
 import {
   CanvasCore,
@@ -155,6 +156,9 @@ describe('Canvas package consumer imports', () => {
     expect(createCanvasAppCustomItemRenderers({
       'smoke-node': renderCustomItem,
     })['smoke-node']).toBe(renderCustomItem)
+    expect(CanvasAppAuthoring.createCanvasAppAssembly({
+      customItemModules: [module],
+    }).customItemValidators.smoke(customItem)).toBe(true)
     expect(assembly.customItemValidators.smoke(customItem)).toBe(true)
     expect(createCanvasAppAssemblyFromApp().initialItems.length).toBeGreaterThan(
       0,
@@ -182,6 +186,18 @@ describe('Canvas package consumer imports', () => {
     )
     expect(CanvasAppFacade.createCanvasAppCustomItemModuleAssembly)
       .toBeTypeOf('function')
+    expect(CanvasAppAuthoring.createCanvasAppAssembly).toBeTypeOf('function')
+    expect(CanvasAppAuthoring.defineCanvasAppCustomItemModule).toBeTypeOf(
+      'function',
+    )
+    expect(CanvasAppAuthoring.createCanvasAppComponentPresentationRenderers)
+      .toBeTypeOf('function')
+    expect('useCanvasAppModel' in CanvasAppAuthoring).toBe(false)
+    expect('DEFAULT_CANVAS_APP_ASSEMBLY' in CanvasAppAuthoring).toBe(false)
+    expect('assertCanvasAppAssembly' in CanvasAppAuthoring).toBe(false)
+    expect(
+      'createCanvasAppCustomItemModuleAssembly' in CanvasAppAuthoring,
+    ).toBe(false)
     expect(CanvasSvgStage).toBe(CanvasRenderer.CanvasSvgStage)
     expect(normalizeBounds({ x: 10, y: 20 }, { x: 2, y: 4 })).toEqual({
       h: 16,
