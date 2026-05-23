@@ -2028,6 +2028,9 @@ describe('Canvas module boundaries', () => {
     const contractsFile = getSourceFile(
       'src/canvas/app/workflow/CanvasAppAssemblyContracts.ts',
     )
+    const componentContractsFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppComponentAssemblyContracts.ts',
+    )
     const adapterContractsFile = getSourceFile(
       'src/canvas/app/workflow/CanvasAppAdapterContracts.ts',
     )
@@ -2054,6 +2057,9 @@ describe('Canvas module boundaries', () => {
       'export function assertCanvasAppAssembly',
     )
     expect(contractsFile.source).toContain(
+      'assertCanvasAppComponentAssembly',
+    )
+    expect(contractsFile.source).not.toContain(
       'function assertCanvasAppComponentLibrary',
     )
     expect(contractsFile.source).toContain(
@@ -2062,10 +2068,24 @@ describe('Canvas module boundaries', () => {
     expect(contractsFile.source).not.toContain(
       'function assertCanvasAppItemAdapters',
     )
-    expect(contractsFile.source).toContain('getPresentation mismatch')
-    expect(contractsFile.source).toContain('getTemplate mismatch')
+    expect(contractsFile.source).not.toContain('getPresentation mismatch')
+    expect(contractsFile.source).not.toContain('getTemplate mismatch')
     expect(contractsFile.source).not.toContain('validate strategy')
     expect(contractsFile.source).not.toContain('command adapter')
+    expect(componentContractsFile.source).toContain(
+      'export function assertCanvasAppComponentAssembly',
+    )
+    expect(componentContractsFile.source).toContain(
+      'function assertCanvasAppComponentLibrary',
+    )
+    expect(componentContractsFile.source).toContain(
+      'function assertCanvasComponentPresentationRendererCoverage',
+    )
+    expect(componentContractsFile.source).toContain('getPresentation mismatch')
+    expect(componentContractsFile.source).toContain('getTemplate mismatch')
+    expect(componentContractsFile.source).toContain(
+      'Missing canvas app component presentation renderer',
+    )
     expect(adapterContractsFile.source).toContain(
       'export function assertCanvasAppAssemblyAdapters',
     )
