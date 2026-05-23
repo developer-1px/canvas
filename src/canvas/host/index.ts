@@ -62,7 +62,9 @@ export {
 export {
   createCanvasItemReadModel,
   getCanvasItemBounds,
+  getCanvasItemIds,
   getCanvasItemsBounds,
+  getCanvasValidSelection,
   type CanvasItemReadModel,
 } from './read/CanvasItemReadModel'
 export {

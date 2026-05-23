@@ -79,6 +79,7 @@
 | `src/canvas/app/tools/CanvasAppCustomCreationToolRuntime.ts` | Custom creation tool id 변환, toolbar state, lookup, shortcut matching을 소유한다 |
 | `src/canvas/app/workflow/CanvasAppAssembly.ts` | Host item adapter, component library, custom command, custom item module, inspector panel, initial items, SVG presentation registry 같은 제품별 의미를 외부 조립 seam으로 제공한다 |
 | `src/canvas/app/workflow/CanvasAppAssemblyContracts.ts` | 조립된 assembly output의 component library resolver, renderer coverage, custom extension registry, initial item, adapter shape를 검증한다 |
+| `src/canvas/app/workflow/CanvasAppWorkspaceAssemblyContracts.ts` | Workspace 초기 items, 초기 selection, storage provider 계약을 검증하고, selection과 item tree 불일치를 runtime 진입 전에 차단한다 |
 | `src/canvas/app/workflow/CanvasAppAssemblySnapshot.ts` | 조립된 assembly output을 외부 mutation에서 보호하도록 component library, extension registry, initial item, adapter를 snapshot/freeze 한다 |
 | `src/canvas/app/workflow/index.ts` | App Shell이 사용하는 workflow public entry |
 | `src/canvas/app/workflow/useCanvasAppModel.ts` | command, pointer, keyboard, viewport, text editing wiring과 control별 view props 조립을 App Shell에 숨긴다 |
@@ -259,6 +260,7 @@ type CanvasAffordanceConfig = {
 - 저장된 workspace snapshot은 현재 custom item validator로 다시 검증한다. validator가 바뀌어 저장 payload가 더 이상 유효하지 않으면 저장 snapshot을 제거하고 앱 초기값으로 시작한다.
 - Canvas App Assembly는 `workspaceStorageProvider`를 받아 Workspace Persistence에 전달하고, App workflow가 browser `localStorage`를 직접 선택하지 않게 한다.
 - Canvas App Assembly는 `initialSelection`을 받아 Workspace Runtime에 전달하고, Demo 기본 선택 id는 default assembly에만 둔다. 제품별 `initialItems`가 있으면 명시 `initialSelection` 없이는 빈 selection으로 시작한다.
+- Canvas App Workspace Assembly Contracts는 initial selection이 assembled initial items에 맞지 않으면 App runtime 진입 전에 실패시킨다.
 - Custom Item Module 간 module id, tool id, renderer key, validator key, inspector id, command id가 겹치면 조용히 덮어쓰지 않고 assembly 단계에서 실패한다.
 - Host App은 `disabledCustomItemModuleIds`로 custom item module을 끌 수 있고, 알 수 없는 module id를 끄려고 하면 assembly 단계에서 실패한다.
 - Custom creation tool shortcut이 내부 canvas shortcut, shift-insensitive built-in shortcut, temporary pan, nudge shortcut, 다른 custom creation tool shortcut과 겹치면 assembly 단계에서 실패한다.

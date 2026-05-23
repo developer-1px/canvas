@@ -263,6 +263,24 @@ describe('CanvasAppAssembly', () => {
     }).initialSelection).toEqual(['rect-1'])
   })
 
+  it('rejects initial selection ids outside assembled initial items', () => {
+    expect(() =>
+      createCanvasAppAssembly({
+        initialItems: [{
+          fill: '#ffffff',
+          h: 40,
+          id: 'rect-1',
+          stroke: '#111111',
+          type: 'rect',
+          w: 80,
+          x: 0,
+          y: 0,
+        }],
+        initialSelection: ['missing'],
+      }),
+    ).toThrow('Invalid assembly initial selection: missing')
+  })
+
   it('rejects direct extension ids outside the app extension id contract', () => {
     expect(() =>
       createCanvasAppAssembly({
@@ -427,6 +445,13 @@ describe('CanvasAppAssembly', () => {
         },
       } as unknown as CanvasAppAssembly),
     ).toThrow('Canvas app custom item validator risk requires validate strategy')
+
+    expect(() =>
+      assertCanvasAppAssembly({
+        ...assembly,
+        initialSelection: ['missing'],
+      } as unknown as CanvasAppAssembly),
+    ).toThrow('Invalid assembly initial selection: missing')
 
     expect(() =>
       assertCanvasAppAssembly({

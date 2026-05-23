@@ -4529,6 +4529,52 @@ describe('Canvas module boundaries', () => {
     expect(adapterContractsFile.source).toContain('stage adapter')
   })
 
+  it('keeps App workspace assembly contracts behind a named module', () => {
+    const assemblyContractsFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppAssemblyContracts.ts',
+    )
+    const workspaceContractsFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppWorkspaceAssemblyContracts.ts',
+    )
+
+    expect(assemblyContractsFile.source).toContain(
+      "from './CanvasAppWorkspaceAssemblyContracts'",
+    )
+    expect(assemblyContractsFile.source).toContain(
+      'assertCanvasAppWorkspaceAssembly',
+    )
+    expect(assemblyContractsFile.source).not.toContain(
+      'normalizeCanvasItems',
+    )
+    expect(assemblyContractsFile.source).not.toContain(
+      'createCanvasItemReadModel',
+    )
+    expect(assemblyContractsFile.source).not.toContain(
+      'workspaceStorageProvider',
+    )
+    expect(assemblyContractsFile.source).not.toContain('initialSelection')
+    expect(workspaceContractsFile.source).toContain(
+      'export function assertCanvasAppWorkspaceAssembly',
+    )
+    expect(workspaceContractsFile.source).toContain(
+      'export type CanvasAppWorkspaceAssemblyContract',
+    )
+    expect(workspaceContractsFile.source).not.toContain('Pick<')
+    expect(workspaceContractsFile.source).not.toContain('CanvasAppAssembly')
+    expect(workspaceContractsFile.source).toContain('normalizeCanvasItems')
+    expect(workspaceContractsFile.source).toContain('getCanvasItemIds')
+    expect(workspaceContractsFile.source).toContain(
+      'getCanvasValidSelection',
+    )
+    expect(workspaceContractsFile.source).toContain(
+      'workspaceStorageProvider',
+    )
+    expect(workspaceContractsFile.source).toContain('initialSelection')
+    expect(workspaceContractsFile.source).toContain(
+      'Invalid assembly initial selection',
+    )
+  })
+
   it('keeps affordance config contracts in the Engine affordance module', () => {
     const assemblyContractsFile = getSourceFile(
       'src/canvas/app/workflow/CanvasAppAssemblyContracts.ts',
@@ -4617,6 +4663,12 @@ describe('Canvas module boundaries', () => {
     expect(readModelFile.source).toContain('CanvasSceneAdapter')
     expect(readModelFile.source).toContain(
       'scene: CanvasSceneAdapter',
+    )
+    expect(readModelFile.source).toContain(
+      'export function getCanvasItemIds',
+    )
+    expect(readModelFile.source).toContain(
+      'export function getCanvasValidSelection',
     )
     expect(readModelFile.source).not.toContain('ReturnType<')
   })

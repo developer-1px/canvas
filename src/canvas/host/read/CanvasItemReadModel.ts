@@ -36,16 +36,24 @@ export function createCanvasItemReadModel(
     scene: createCanvasItemScene(items),
     findEditableTextItem: (id) => findEditableTextItem(items, id),
     findItem: (id) => findCanvasItem(items, id),
-    getAllIds: () => flattenCanvasItems(items).map((entry) => entry.item.id),
+    getAllIds: () => getCanvasItemIds(items),
     getAllItems: () => flattenCanvasItems(items).map((entry) => entry.item),
     getItemBounds: (item) => getItemBounds(item),
-    getSelection: (ids) => pruneNestedSelection(items, ids),
+    getSelection: (ids) => getCanvasValidSelection(items, ids),
     getSelectionBounds: (ids) => unionBounds(items, new Set(ids)),
     getSelectedItems: (ids) =>
       ids
         .map((id) => findCanvasItem(items, id))
         .filter((item): item is CanvasItem => item !== undefined),
   }
+}
+
+export function getCanvasItemIds(items: CanvasItem[]) {
+  return flattenCanvasItems(items).map((entry) => entry.item.id)
+}
+
+export function getCanvasValidSelection(items: CanvasItem[], ids: string[]) {
+  return pruneNestedSelection(items, ids)
 }
 
 export function getCanvasItemBounds(item: CanvasItem) {
