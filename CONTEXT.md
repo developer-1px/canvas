@@ -38,7 +38,8 @@
 - Canvas App Rendering Contracts: 외부 조립자가 component/custom item renderer를 등록할 때 쓰는 App-owned authoring Interface. Demo SVG registry type name에 기대지 않는다.
 - Canvas App Stage Adapter: App Shell이 concrete Renderer Stage를 직접 import하지 않고 stage ReactNode를 받도록 만드는 Adapter Interface.
 - Canvas App Stage Element: stage DOM element의 bounds, pointer capture, wheel listener를 한 Module에 숨기는 App-owned element Adapter.
-- Canvas App Stage Element Model: App Model이 Stage Element Adapter를 command, component, pointer, viewport, stage render context에 직접 배분하지 않도록 consumer별 stage element context를 만드는 workflow Module.
+- Canvas App Stage Element Model: App Model이 Stage Element Adapter 생성 세부를 직접 알지 않도록 숨기는 workflow Module.
+- Canvas App Stage Element Consumer Model: Stage Element Adapter를 command, component, pointer, viewport, stage render consumer별 context로 변환하는 workflow Module.
 - Canvas App Item Layer Adapter: App workflow가 concrete Demo SVG item layer를 직접 알지 않고 items를 stage children으로 렌더링하도록 주입받는 Adapter Interface.
 - Canvas App Extension Id: custom command, creation tool, item module, component presentation renderer key, custom item renderer key, validator key, inspector panel에서 공유하는 안정 lower-kebab 외부 계약.
 - Canvas App Extension Registry: assembly 단계에서 extension entry와 record key를 검증하고 중복을 실패시키는 내부 merge 계약.
@@ -242,7 +243,7 @@
 - Canvas App Assembly Contracts는 component library/presentation renderer coverage 세부를 직접 검증하지 않고 Canvas App Component Assembly Contracts에 위임한다.
 - Canvas App Assembly Contracts는 Adapter 함수 slot 세부를 직접 검증하지 않고 Canvas App Adapter Contracts에 위임한다.
 - Canvas App Assembly Snapshot은 Adapter snapshot/freeze 세부를 직접 알지 않고 Canvas App Adapter Snapshot에 위임한다.
-- App Model은 Stage Element Adapter를 직접 fan-out하지 않고 Canvas App Stage Element Model에서 consumer별 stage element context를 받는다.
+- App Model은 Stage Element Adapter를 직접 fan-out하지 않고 Canvas App Stage Element Model에서 consumer별 stage element context를 받는다. Stage Element Adapter 생성은 Canvas App Stage Element Model이, consumer별 fan-out은 Canvas App Stage Element Consumer Model이 소유한다.
 - App View는 raw workflow state 대신 Canvas App Model이 조립한 control별 props만 받는다.
 - App Model은 command hook context wiring 세부를 직접 알지 않고 Canvas App Command Model에서 command handlers를 받는다. Command runtime 생성은 Canvas App Command Model이, consumer별 command fan-out은 Canvas App Command Consumer Model이 소유한다.
 - App Model은 component insertion hook context wiring과 control fan-out 세부를 직접 알지 않고 Canvas App Component Model에서 component control context를 받는다.

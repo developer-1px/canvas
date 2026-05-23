@@ -502,6 +502,9 @@ describe('Canvas module boundaries', () => {
     const stageElementModelFile = getSourceFile(
       'src/canvas/app/workflow/useCanvasAppStageElementModel.ts',
     )
+    const stageElementConsumerModelFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppStageElementConsumerModel.ts',
+    )
 
     expect(appModelFile.source).toContain(
       "from './useCanvasAppStageElementModel'",
@@ -513,6 +516,9 @@ describe('Canvas module boundaries', () => {
     expect(stageElementModelFile.source).toContain(
       "from '../stage/CanvasAppStageElement'",
     )
+    expect(stageElementModelFile.source).toContain(
+      "from './CanvasAppStageElementConsumerModel'",
+    )
     for (const consumerContext of [
       'command: {',
       'component: {',
@@ -520,8 +526,15 @@ describe('Canvas module boundaries', () => {
       'stage: {',
       'viewport: {',
     ]) {
-      expect(stageElementModelFile.source).toContain(consumerContext)
+      expect(stageElementModelFile.source).not.toContain(consumerContext)
+      expect(stageElementConsumerModelFile.source).toContain(consumerContext)
     }
+    expect(stageElementConsumerModelFile.source).toContain(
+      'export function getCanvasAppStageElementConsumerModel',
+    )
+    expect(stageElementConsumerModelFile.source).toContain(
+      'stageElement: stageElement.mount',
+    )
   })
 
   it('keeps app stage render input on the stage mount interface', () => {
