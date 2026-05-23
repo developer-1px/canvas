@@ -159,6 +159,44 @@ export function createCanvasStandardSelectionEffect({
   return { kind: 'selection', selection }
 }
 
+type CanvasStandardDocumentEffectApplier<
+  TKind extends CanvasStandardCommandDocumentEffect['kind'],
+> = (args: {
+  context: CanvasStandardCommandDocumentEffectContext
+  effect: Extract<CanvasStandardCommandDocumentEffect, { kind: TKind }>
+}) => boolean
+
+type CanvasStandardDocumentEffectAppliers = {
+  [TKind in CanvasStandardCommandDocumentEffect['kind']]:
+    CanvasStandardDocumentEffectApplier<TKind>
+}
+
+type CanvasStandardDocumentAnyEffectApplier = (args: {
+  context: CanvasStandardCommandDocumentEffectContext
+  effect: CanvasStandardCommandDocumentEffect
+}) => boolean
+
+const CANVAS_STANDARD_DOCUMENT_EFFECT_APPLIERS = Object.freeze({
+  history: ({ context, effect }) =>
+    applyCanvasStandardHistoryEffect({
+      context,
+      direction: effect.direction,
+    }),
+  'items-change': ({ context, effect }) =>
+    applyCanvasStandardItemsChangeEffect({
+      afterSelection: effect.afterSelection,
+      change: effect.change,
+      clearEditingIds: effect.clearEditingIds,
+      context,
+      fallbackSelection: effect.fallbackSelection,
+    }),
+  selection: ({ context, effect }) =>
+    applyCanvasStandardSelectionEffect({
+      context,
+      selection: effect.selection,
+    }),
+} satisfies CanvasStandardDocumentEffectAppliers)
+
 export function applyCanvasStandardDocumentEffect({
   context,
   effect,
@@ -166,28 +204,11 @@ export function applyCanvasStandardDocumentEffect({
   context: CanvasStandardCommandDocumentEffectContext
   effect: CanvasStandardCommandDocumentEffect
 }) {
-  switch (effect.kind) {
-    case 'items-change':
-      return applyCanvasStandardItemsChangeEffect({
-        afterSelection: effect.afterSelection,
-        change: effect.change,
-        clearEditingIds: effect.clearEditingIds,
-        context,
-        fallbackSelection: effect.fallbackSelection,
-      })
-    case 'history':
-      return applyCanvasStandardHistoryEffect({
-        context,
-        direction: effect.direction,
-      })
-    case 'selection':
-      return applyCanvasStandardSelectionEffect({
-        context,
-        selection: effect.selection,
-      })
-  }
+  const applier = CANVAS_STANDARD_DOCUMENT_EFFECT_APPLIERS[
+    effect.kind
+  ] as CanvasStandardDocumentAnyEffectApplier
 
-  return assertUnhandledCanvasStandardDocumentEffect(effect)
+  return applier({ context, effect })
 }
 
 export function applyCanvasStandardItemsChangeEffect({
@@ -220,12 +241,6 @@ export function applyCanvasStandardItemsChangeEffect({
   }
 
   return true
-}
-
-function assertUnhandledCanvasStandardDocumentEffect(
-  effect: never,
-): never {
-  throw new Error(`Unhandled canvas standard document effect: ${String(effect)}`)
 }
 
 export function applyCanvasStandardSelectionEffect({

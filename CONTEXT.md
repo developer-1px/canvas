@@ -52,7 +52,7 @@
 - Canvas Standard Command Handlers: toolbar/keyboard callback을 내부 standard command descriptor로 변환하는 App-owned handler grammar Module.
 - Canvas Standard Command Effect Plan: 내부 canvas command grammar별 effect planner table과 Engine command 호출을 App document effect plan으로 변환하는 App-owned runtime Module.
 - Canvas Standard Command Result Effects: Engine standard command result shape를 App document effect descriptor로 변환하는 App-owned mapping Module.
-- Canvas Standard Command Document Effects: standard command document effect descriptor primitive 생성과 document commit fallback, selection commit, editing clear, history restore effect 반영을 소유하는 App-owned runtime Module.
+- Canvas Standard Command Document Effects: standard command document effect descriptor primitive, effect applier table, document commit fallback, selection commit, editing clear, history restore effect 반영을 소유하는 App-owned runtime Module.
 - Canvas Command Selection Rules: built-in command 실행과 availability가 공유하는 선택 개수 기준을 소유하는 Engine-owned Module.
 - Canvas Command Availability Rules: built-in command id별 availability condition table과 feature toggle/state 결합을 소유하는 Engine-owned Module.
 - Canvas Clipboard Command Execution: clipboard command effect plan 생성과 clipboard/document effect 적용을 조립하는 App-owned runtime Module.

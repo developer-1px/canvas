@@ -2748,6 +2748,13 @@ describe('Canvas module boundaries', () => {
       'export function applyCanvasStandardDocumentEffect',
     )
     expect(effectsFile.source).toContain(
+      'CANVAS_STANDARD_DOCUMENT_EFFECT_APPLIERS',
+    )
+    expect(effectsFile.source).not.toContain('switch (effect.kind)')
+    expect(effectsFile.source).not.toContain(
+      'assertUnhandledCanvasStandardDocumentEffect',
+    )
+    expect(effectsFile.source).toContain(
       'export function createCanvasStandardReplaceChangedEffect',
     )
     expect(effectsFile.source).toContain(
