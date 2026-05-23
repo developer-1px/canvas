@@ -151,6 +151,32 @@ describe('Canvas module boundaries', () => {
     expect(violations).toEqual([])
   })
 
+  it('keeps App component composition behind a named Assembly module', () => {
+    const assemblyFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppAssembly.ts',
+    )
+    const componentAssemblyFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppComponentAssembly.ts',
+    )
+
+    expect(assemblyFile.source).toContain(
+      "from './CanvasAppComponentAssembly'",
+    )
+    expect(assemblyFile.source).not.toContain(
+      'createCanvasAppComponentPresentationRenderers',
+    )
+    expect(assemblyFile.source).not.toContain('input.componentLibrary ??')
+    expect(componentAssemblyFile.source).toContain(
+      'export function createCanvasAppComponentAssembly',
+    )
+    expect(componentAssemblyFile.source).toContain(
+      'createCanvasAppComponentPresentationRenderers',
+    )
+    expect(componentAssemblyFile.source).toContain(
+      'input.componentLibrary ?? defaults.componentLibrary',
+    )
+  })
+
   it('keeps App extension composition behind a named Assembly module', () => {
     const assemblyFile = getSourceFile(
       'src/canvas/app/workflow/CanvasAppAssembly.ts',

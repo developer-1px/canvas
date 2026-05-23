@@ -27,6 +27,7 @@
 - Canvas App Assembly Source: App Shell이 prebuilt Canvas App Assembly와 Canvas App Assembly Input 중 하나를 받아 내부에서 조립/검증/snapshot 경로로 정규화하는 Module.
 - Canvas App Assembly Model: App Model이 assembly output field를 직접 해체하지 않고 affordance, command, component, control, extension, pointer, rendering, workspace context를 받도록 변환하는 workflow Module.
 - Canvas App Affordance Model: App Model이 default affordance config와 feature toggle config를 command, control, interaction, keyboard, pointer, viewport에 직접 fan-out하지 않도록 consumer별 affordance context를 만드는 workflow Module.
+- Canvas App Component Assembly: component library defaulting과 component presentation renderer registry 합성을 Canvas App Assembly output으로 만드는 App-owned composition Module.
 - Canvas App Assembly Contracts: assembly output의 component library consistency, renderer coverage, extension registry, item adapter shape, initial item validity를 검증하는 App-owned contract Module.
 - Canvas App Component Assembly Contracts: Canvas App Assembly의 component library shape, resolver consistency, presentation renderer coverage를 검증하는 App-owned contract Module.
 - Canvas App Adapter Contracts: Host item adapter, item layer Adapter, stage Adapter의 필수 함수 slot을 검증하는 App-owned contract Module.
@@ -156,6 +157,7 @@
 - App UI surface는 Shell에서 항상 렌더링하지 않고 Canvas Affordance overlay toggle을 view prop으로 소비해 숨긴다.
 - App Model은 Canvas App Assembly output field를 직접 배분하지 않고 Canvas App Assembly Model에서 consumer별 assembly context를 받는다.
 - App Model은 Canvas Affordance config를 직접 fan-out하지 않고 Canvas App Affordance Model에서 consumer별 affordance context를 받는다.
+- Canvas App Assembly는 component library defaulting과 presentation renderer registry 합성 세부를 직접 알지 않고 Canvas App Component Assembly에 위임한다.
 - Canvas App Assembly는 제품별 extension bundle merge/duplicate/disabled module 조립 세부를 직접 알지 않고 Canvas App Extension Assembly에 위임한다.
 - Canvas App Assembly composition, output contract validation, output snapshot/freeze는 분리하고, validation은 Canvas App Assembly Contracts가, mutation 방어는 Canvas App Assembly Snapshot이 소유한다.
 - Canvas App Custom Item Module define, Canvas App Custom Item Module Assembly, Canvas App Assembly는 외부 descriptor/adapter/item mutation이 define/조립 후 동작을 바꾸지 않도록 snapshot을 보관한다.

@@ -21,7 +21,6 @@ import {
   DEFAULT_CANVAS_APP_COMPONENT_PRESENTATION_RENDERERS,
   DEFAULT_CANVAS_APP_ITEM_LAYER_ADAPTER,
   DEFAULT_CANVAS_APP_STAGE_ADAPTER,
-  createCanvasAppComponentPresentationRenderers,
   type CanvasAppComponentPresentationRenderers,
   type CanvasAppCustomItemRenderers,
   type CanvasAppItemLayerAdapter,
@@ -35,6 +34,7 @@ import type {
 } from '../modules/CanvasAppCustomItemModules'
 import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
 import { assertCanvasAppAssembly } from './CanvasAppAssemblyContracts'
+import { createCanvasAppComponentAssembly } from './CanvasAppComponentAssembly'
 import { createCanvasAppExtensionAssembly } from './CanvasAppExtensionAssembly'
 import { snapshotCanvasAppAssembly } from './CanvasAppAssemblySnapshot'
 
@@ -95,6 +95,10 @@ export const DEFAULT_CANVAS_APP_ASSEMBLY: CanvasAppAssembly =
 export function createCanvasAppAssembly(
   input: CanvasAppAssemblyInput = {},
 ): CanvasAppAssembly {
+  const componentAssembly = createCanvasAppComponentAssembly(
+    input,
+    DEFAULT_CANVAS_APP_ASSEMBLY,
+  )
   const extensionAssembly = createCanvasAppExtensionAssembly(
     input,
     DEFAULT_CANVAS_APP_ASSEMBLY,
@@ -104,11 +108,9 @@ export function createCanvasAppAssembly(
     affordanceConfig: input.affordanceConfig === undefined
       ? DEFAULT_CANVAS_APP_ASSEMBLY.affordanceConfig
       : createCanvasAffordanceConfig(input.affordanceConfig),
-    componentLibrary:
-      input.componentLibrary ?? DEFAULT_CANVAS_APP_ASSEMBLY.componentLibrary,
-    componentPresentationRenderers: createCanvasAppComponentPresentationRenderers(
-      input.componentPresentationRenderers,
-    ),
+    componentLibrary: componentAssembly.componentLibrary,
+    componentPresentationRenderers:
+      componentAssembly.componentPresentationRenderers,
     customCommands: extensionAssembly.customCommands,
     customCreationTools: extensionAssembly.customCreationTools,
     customItemRenderers: extensionAssembly.customItemRenderers,
