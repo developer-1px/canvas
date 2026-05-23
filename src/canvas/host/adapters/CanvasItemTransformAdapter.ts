@@ -1,4 +1,4 @@
-import type { CanvasTransformAdapter } from '../../engine/transform/CanvasTransformEngine'
+import type { CanvasTransformAdapter } from '../../engine'
 import type { CanvasItem } from '../model'
 import { resizeCanvasItems, translateCanvasItems } from '../operations/CanvasOperations'
 

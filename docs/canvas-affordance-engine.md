@@ -28,8 +28,8 @@
 | `src/canvas/app/shell` | CanvasApp composition과 shell style |
 | `src/canvas/app/workflow` | React state와 engine/host/renderer wiring |
 | `src/canvas/app/geometry` | DOM/SVG pointer 좌표 변환 |
-| `src/canvas/core` | Host item과 renderer를 모르는 geometry, viewport, id 같은 재사용 계약 |
-| `src/canvas/engine` | Host item과 renderer를 모르는 조작 규칙 |
+| `src/canvas/core` | Host item과 renderer를 모르는 geometry, viewport, id, primitive math 같은 재사용 계약 |
+| `src/canvas/engine` | Host item과 renderer를 모르는 조작 규칙. 외부 소비자는 `src/canvas/engine` public facade를 사용한다 |
 | `src/canvas/engine/snap` | Grid, alignment, spacing snap과 guide 계산 |
 | `src/canvas/host/model` | Demo canvas item model. Core 재사용 계약에 포함하지 않는다 |
 | `src/canvas/host` | Demo canvas item schema, document, document selection, initial data, catalog, factory |
@@ -79,6 +79,7 @@ type CanvasAffordanceConfig = {
 
 - Engine Module은 `core`, `CanvasAffordances`, `CanvasSceneAdapter` 같은 renderer-independent 입력만 사용한다.
 - Engine Module은 Demo `CanvasItem`, `CanvasOperations`, `CanvasTree`, SVG Renderer를 import하지 않는다.
+- Host domain Module은 Engine 구현 파일을 import하지 않는다. Engine Adapter 타입은 `src/canvas/engine` public facade에서 받는다.
 - App workflow는 `CANVAS_ITEM_COMMAND_ADAPTER`, `CANVAS_ITEM_CREATION_ADAPTER`, `CANVAS_ITEM_TRANSFORM_ADAPTER`, `createCanvasItemScene`을 주입한다.
 - Renderer Adapter는 `CanvasOverlayState`를 받아 SVG로 그리며, Engine은 SVG/DOM 구현을 모른다.
 

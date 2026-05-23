@@ -5,7 +5,7 @@ import {
   clamp,
   MAX_SCALE,
   MIN_SCALE,
-} from '../../engine/primitives/CanvasPrimitives'
+} from '../../core'
 import { validateCanvasItems } from '../../host/document/CanvasItemSchema'
 import { flattenCanvasItems, pruneNestedSelection } from '../../host'
 

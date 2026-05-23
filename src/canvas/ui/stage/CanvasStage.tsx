@@ -10,7 +10,7 @@ import type {
   Tool,
   Viewport
 } from '../../core'
-import type { CanvasOverlayState } from '../../engine/overlay/CanvasOverlayEngine'
+import type { CanvasOverlayState } from '../../engine'
 import { CanvasSvgItemRenderer } from '../../renderer/svg/CanvasSvgItemRenderer'
 import {
   CanvasSvgInteractionOverlays,

@@ -1,7 +1,7 @@
 import {
   CANVAS_GESTURE_STATUS_LABELS,
   CANVAS_TOOL_AFFORDANCES,
-} from '../../engine/affordance/CanvasAffordances'
+} from '../../engine'
 import type {
   CanvasInteractionKind,
   Tool

@@ -15,12 +15,12 @@ import {
   selectAllCanvasCommand,
   ungroupCanvasCommand,
   unlockAllCanvasCommand,
+  type CanvasAffordanceConfig,
   type CanvasAlignMode,
   type CanvasCommandAdapter,
   type CanvasDistributeMode,
   type CanvasReorderMode,
-} from '../../engine/command/CanvasCommandEngine'
-import type { CanvasAffordanceConfig } from '../../engine/affordance/CanvasAffordances'
+} from '../../engine'
 import type { Viewport } from '../../core'
 import type {
   CanvasItem,

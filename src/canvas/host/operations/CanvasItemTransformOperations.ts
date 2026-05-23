@@ -2,7 +2,7 @@ import type { Bounds } from '../../core'
 import type { CanvasItem } from '../model'
 import {
   scaleItemBounds,
-} from '../../engine/primitives/CanvasPrimitives'
+} from '../../core'
 import {
   getItemBounds,
   pruneNestedSelection,

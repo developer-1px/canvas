@@ -5,39 +5,35 @@ import type {
   RefObject,
   SetStateAction,
 } from 'react'
-import type { CanvasAffordanceConfig } from '../../engine/affordance/CanvasAffordances'
 import type {
   Bounds,
   Tool,
-  Viewport
+  Viewport,
 } from '../../core'
 import type {
   CanvasItem,
-  EditingText
+  EditingText,
 } from '../../host/model'
 import {
   DRAG_THRESHOLD,
   normalizeBounds,
   pointDistance,
-} from '../../engine/primitives/CanvasPrimitives'
-import {
-  createCanvasRect,
-  type CanvasCreationAdapter,
-} from '../../engine/creation/CanvasCreationEngine'
-import { releasePointer, screenPoint, screenToWorld } from './CanvasPointerGeometry'
-import { getCanvasMarqueeSelection } from '../../engine/selection/CanvasSelectionEngine'
-import type { CanvasSceneAdapter } from '../../engine/scene/CanvasSceneAdapter'
+} from '../../core'
 import {
   EMPTY_CANVAS_SNAP_GUIDES,
+  createCanvasRect,
+  getCanvasMarqueeSelection,
   getCanvasMoveSnap,
-  snapCanvasPointToGrid,
-  type CanvasSnapGuides,
-} from '../../engine/snap/CanvasSnapEngine'
-import {
   moveCanvasSelection,
   resizeCanvasSelection,
+  snapCanvasPointToGrid,
+  type CanvasAffordanceConfig,
+  type CanvasCreationAdapter,
+  type CanvasSceneAdapter,
+  type CanvasSnapGuides,
   type CanvasTransformAdapter,
-} from '../../engine/transform/CanvasTransformEngine'
+} from '../../engine'
+import { releasePointer, screenPoint, screenToWorld } from './CanvasPointerGeometry'
 import type {
   CommitCanvasItemsChange,
   CommitCanvasSelection,

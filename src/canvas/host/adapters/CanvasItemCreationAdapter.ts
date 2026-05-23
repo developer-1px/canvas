@@ -1,4 +1,4 @@
-import type { CanvasCreationAdapter } from '../../engine/creation/CanvasCreationEngine'
+import type { CanvasCreationAdapter } from '../../engine'
 import type { CanvasItem } from '../model'
 
 export const CANVAS_ITEM_CREATION_ADAPTER: CanvasCreationAdapter<CanvasItem> = {

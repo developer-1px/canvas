@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import {
   CANVAS_COMMAND_AFFORDANCES,
   CANVAS_TOOL_AFFORDANCES,
-} from '../../engine/affordance/CanvasAffordances'
+} from '../../engine'
 import type { Tool } from '../../core'
 
 type ToolButtonProps = {

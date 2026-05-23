@@ -3,7 +3,7 @@ import type {
   MutableRefObject,
   SetStateAction,
 } from 'react'
-import type { CanvasAffordanceConfig } from '../../engine/affordance/CanvasAffordances'
+import type { CanvasAffordanceConfig } from '../../engine'
 import type {
   Bounds,
   Tool

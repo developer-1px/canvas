@@ -6,7 +6,6 @@ import type {
   SetStateAction,
 } from 'react'
 import { useRef } from 'react'
-import type { CanvasAffordanceConfig } from '../../engine/affordance/CanvasAffordances'
 import type {
   Bounds,
   Point,
@@ -23,20 +22,19 @@ import type {
 import {
   normalizeBounds,
   pointDistance,
-} from '../../engine/primitives/CanvasPrimitives'
+} from '../../core'
 import { capturePointer, screenPoint, screenToWorld } from './CanvasPointerGeometry'
 import {
   createCanvasText,
-  type CanvasCreationAdapter,
-} from '../../engine/creation/CanvasCreationEngine'
-import {
   getCanvasItemPointerIntent,
+  getCanvasItemPointerSelection,
   getCanvasPointerGesture,
   isAdditivePointerInput,
-} from '../../engine/gesture/CanvasGestureEngine'
-import { getCanvasItemPointerSelection } from '../../engine/selection/CanvasSelectionEngine'
-import { snapCanvasPointToGrid } from '../../engine/snap/CanvasSnapEngine'
-import type { CanvasSceneAdapter } from '../../engine/scene/CanvasSceneAdapter'
+  snapCanvasPointToGrid,
+  type CanvasAffordanceConfig,
+  type CanvasCreationAdapter,
+  type CanvasSceneAdapter,
+} from '../../engine'
 import { findEditableTextItem } from '../../host'
 import type {
   CommitCanvasItemsChange,

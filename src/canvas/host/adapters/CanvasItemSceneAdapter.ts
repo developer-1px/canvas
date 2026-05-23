@@ -3,7 +3,7 @@ import {
   createCanvasSceneAdapter,
   type CanvasSceneAdapter,
   type CanvasSceneEntry,
-} from '../../engine/scene/CanvasSceneAdapter'
+} from '../../engine'
 import { flattenCanvasItems, getItemBounds } from '../tree/CanvasTree'
 
 export function createCanvasItemScene(items: CanvasItem[]): CanvasSceneAdapter {

@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import { resizeBounds } from './CanvasPrimitives'
+import { resizeBounds } from './CanvasCorePrimitives'
 
 const bounds = { x: 0, y: 0, w: 100, h: 50 }
 

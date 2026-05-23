@@ -10,7 +10,7 @@ import {
   fitBoundsIntoViewport,
   INITIAL_VIEWPORT,
   zoomViewport,
-} from '../../engine/primitives/CanvasPrimitives'
+} from '../../core'
 import { flattenCanvasItems, unionBounds } from '../../host'
 
 type UseCanvasViewportControlsArgs = {

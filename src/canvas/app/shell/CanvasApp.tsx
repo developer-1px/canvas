@@ -5,14 +5,20 @@ import {
   useState,
 } from 'react'
 import { CanvasAppView } from './CanvasAppView'
-import { DEFAULT_CANVAS_AFFORDANCE_CONFIG } from '../../engine/affordance/CanvasAffordances'
+import {
+  DEFAULT_CANVAS_AFFORDANCE_CONFIG,
+  EMPTY_CANVAS_SNAP_GUIDES,
+  createCanvasOverlayState,
+  getCanvasCommandAvailability,
+  type CanvasSnapGuides,
+} from '../../engine'
 import type {
   Bounds,
   Tool,
   Viewport,
 } from '../../core'
 import type { EditingText } from '../../host/model'
-import { INITIAL_VIEWPORT } from '../../engine/primitives/CanvasPrimitives'
+import { INITIAL_VIEWPORT } from '../../core'
 import {
   CANVAS_ITEM_ENGINE_ADAPTERS,
   INITIAL_ITEMS,
@@ -35,12 +41,6 @@ import {
   readStoredCanvasWorkspace,
   useCanvasWorkspacePersistence,
 } from '../document/CanvasWorkspacePersistence'
-import { createCanvasOverlayState } from '../../engine/overlay/CanvasOverlayEngine'
-import {
-  EMPTY_CANVAS_SNAP_GUIDES,
-  type CanvasSnapGuides,
-} from '../../engine/snap/CanvasSnapEngine'
-import { getCanvasCommandAvailability } from '../../engine/command/CanvasCommandEngine'
 import './CanvasApp.css'
 
 const canvasAffordanceConfig = DEFAULT_CANVAS_AFFORDANCE_CONFIG

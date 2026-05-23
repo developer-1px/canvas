@@ -1,0 +1,90 @@
+export {
+  CANVAS_COMMAND_AFFORDANCES,
+  CANVAS_GESTURE_STATUS_LABELS,
+  CANVAS_TOOL_AFFORDANCES,
+  DEFAULT_CANVAS_AFFORDANCE_CONFIG,
+  createCanvasAffordanceConfig,
+  type CanvasAffordanceConfig,
+  type CanvasAffordanceConfigInput,
+  type CanvasCommandId,
+  type CanvasGestureId,
+  type CanvasOverlayId,
+  type CanvasShortcutId,
+} from './affordance/CanvasAffordances'
+export {
+  CANVAS_COMMAND_INSERT_OFFSET,
+  alignCanvasCommand,
+  cloneCanvasCommandItems,
+  deleteCanvasCommand,
+  distributeCanvasCommand,
+  duplicateCanvasCommand,
+  getCanvasCommandAvailability,
+  groupCanvasCommand,
+  lockCanvasCommand,
+  nudgeCanvasCommand,
+  reorderCanvasCommand,
+  selectAllCanvasCommand,
+  ungroupCanvasCommand,
+  unlockAllCanvasCommand,
+  type CanvasAlignMode,
+  type CanvasCommandAdapter,
+  type CanvasCommandAvailability,
+  type CanvasCommandItem,
+  type CanvasCommandItemsResult,
+  type CanvasCommandOffset,
+  type CanvasDistributeMode,
+  type CanvasReorderMode,
+  type DeleteCanvasCommandResult,
+  type DuplicateCanvasCommandResult,
+} from './command/CanvasCommandEngine'
+export {
+  createCanvasRect,
+  createCanvasText,
+  getCanvasCreatedRectBounds,
+  type CanvasCreatedText,
+  type CanvasCreationAdapter,
+  type CanvasCreationItem,
+} from './creation/CanvasCreationEngine'
+export {
+  getCanvasItemPointerIntent,
+  getCanvasPointerGesture,
+  isAdditivePointerInput,
+  type CanvasItemPointerIntent,
+  type CanvasPointerGesture,
+  type CanvasPointerInput,
+} from './gesture/CanvasGestureEngine'
+export {
+  createCanvasOverlayState,
+  type CanvasOverlayState,
+  type CanvasResizeHandleOverlay,
+} from './overlay/CanvasOverlayEngine'
+export {
+  createCanvasSceneAdapter,
+  type CanvasSceneAdapter,
+  type CanvasSceneEntry,
+} from './scene/CanvasSceneAdapter'
+export {
+  getCanvasItemPointerSelection,
+  getCanvasMarqueeSelection,
+  type CanvasItemPointerSelection,
+} from './selection/CanvasSelectionEngine'
+export {
+  EMPTY_CANVAS_SNAP_GUIDES,
+  getCanvasMoveSnap,
+  snapCanvasPointToGrid,
+  type CanvasAlignmentGuide,
+  type CanvasMoveSnap,
+  type CanvasSnapGuides,
+  type CanvasSpacingGuide,
+} from './snap/CanvasSnapEngine'
+export {
+  moveCanvasSelection,
+  resizeCanvasSelection,
+  type CanvasTransformAdapter,
+  type CanvasTransformItem,
+} from './transform/CanvasTransformEngine'
+export {
+  getCanvasWheelViewport,
+  shouldHandleCanvasWheelViewport,
+  type CanvasWheelInput,
+} from './viewport/CanvasViewportEngine'

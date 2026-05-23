@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import { MAX_SCALE } from '../../engine/primitives/CanvasPrimitives'
+import { MAX_SCALE } from '../../core'
 import { INITIAL_ITEMS } from '../../host'
 import type { CanvasItem } from '../../host/model'
 import {

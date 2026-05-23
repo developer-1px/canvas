@@ -1,4 +1,4 @@
-import { unique } from '../../engine/primitives/CanvasPrimitives'
+import { unique } from '../../core'
 import type { CanvasItem } from '../model'
 import { getItemsBounds } from './CanvasTreeBounds'
 import { isAncestorPath, samePath } from './CanvasTreePath'

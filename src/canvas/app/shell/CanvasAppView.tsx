@@ -7,8 +7,10 @@ import { CanvasTextEditor } from '../../ui/text/CanvasTextEditor'
 import { CanvasToolbar } from '../../ui/toolbar/CanvasToolbar'
 import { CanvasStatus } from '../../ui/status/CanvasStatus'
 import { ZoomControls } from '../../ui/zoom/ZoomControls'
-import type { CanvasAffordanceConfig } from '../../engine/affordance/CanvasAffordances'
-import type { CanvasCommandAvailability } from '../../engine/command/CanvasCommandEngine'
+import type {
+  CanvasAffordanceConfig,
+  CanvasCommandAvailability,
+} from '../../engine'
 
 type StageProps = ComponentProps<typeof CanvasStage>
 type ToolbarProps = ComponentProps<typeof CanvasToolbar>

@@ -10,9 +10,9 @@ import {
   cloneCanvasCommandItems,
   deleteCanvasCommand,
   duplicateCanvasCommand,
+  type CanvasAffordanceConfig,
   type CanvasCommandAdapter,
-} from '../../engine/command/CanvasCommandEngine'
-import type { CanvasAffordanceConfig } from '../../engine/affordance/CanvasAffordances'
+} from '../../engine'
 import type {
   Point,
   Viewport,

@@ -1,11 +1,9 @@
-import type {
-  CanvasAlignMode,
-  CanvasDistributeMode,
-} from '../../engine/command/CanvasCommandEngine'
 import {
   CANVAS_TOOL_AFFORDANCES,
   type CanvasAffordanceConfig,
-} from '../../engine/affordance/CanvasAffordances'
+  type CanvasAlignMode,
+  type CanvasDistributeMode,
+} from '../../engine'
 import type { Tool } from '../../core'
 import {
   AlignBottomIcon,

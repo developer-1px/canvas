@@ -1,7 +1,7 @@
 import {
   CANVAS_COMMAND_INSERT_OFFSET,
   type CanvasCommandOffset,
-} from '../../engine/command/CanvasCommandEngine'
+} from '../../engine'
 import type { Point } from '../../core'
 import type { CanvasItem } from '../../host/model'
 import { getItemsBounds } from '../../host'

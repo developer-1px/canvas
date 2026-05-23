@@ -1,5 +1,5 @@
 import type { PointerEvent } from 'react'
-import type { CanvasOverlayState } from '../../engine/overlay/CanvasOverlayEngine'
+import type { CanvasOverlayState } from '../../engine'
 import type {
   Bounds,
   ResizeHandle

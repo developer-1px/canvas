@@ -8,3 +8,22 @@ export type {
   Tool,
   Viewport,
 } from './CanvasCoreTypes'
+export {
+  DRAG_THRESHOLD,
+  INITIAL_VIEWPORT,
+  MAX_SCALE,
+  MIN_ITEM_SIZE,
+  MIN_SCALE,
+  RESIZE_HANDLES,
+  clamp,
+  fitBoundsIntoViewport,
+  handlePoint,
+  normalizeBounds,
+  pointDistance,
+  resizeBounds,
+  scaleItemBounds,
+  unique,
+  zoomViewport,
+  type CanvasViewportRect,
+  type ResizeBoundsOptions,
+} from './CanvasCorePrimitives'

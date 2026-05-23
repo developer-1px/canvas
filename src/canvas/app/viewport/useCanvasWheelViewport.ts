@@ -4,13 +4,13 @@ import {
   type RefObject,
   type SetStateAction,
 } from 'react'
-import type { CanvasAffordanceConfig } from '../../engine/affordance/CanvasAffordances'
 import type { Viewport } from '../../core'
 import {
   getCanvasWheelViewport,
   shouldHandleCanvasWheelViewport,
+  type CanvasAffordanceConfig,
   type CanvasWheelInput,
-} from '../../engine/viewport/CanvasViewportEngine'
+} from '../../engine'
 
 type UseCanvasWheelViewportArgs = {
   config: CanvasAffordanceConfig

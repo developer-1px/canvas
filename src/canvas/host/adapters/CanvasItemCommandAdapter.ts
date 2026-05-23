@@ -1,4 +1,4 @@
-import type { CanvasCommandAdapter } from '../../engine/command/CanvasCommandEngine'
+import type { CanvasCommandAdapter } from '../../engine'
 import type { CanvasItem } from '../model'
 import {
   alignCanvasSelection,
