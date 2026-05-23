@@ -262,6 +262,7 @@
 - App Model은 Canvas Affordance config를 직접 fan-out하지 않고 Canvas App Affordance Model에서 consumer별 affordance context를 받는다.
 - Canvas App Assembly는 component library defaulting과 presentation renderer registry 합성 세부를 직접 알지 않고 Canvas App Component Assembly에 위임한다.
 - Canvas App Assembly는 제품별 extension bundle merge/duplicate/disabled module 조립 세부를 직접 알지 않고 Canvas App Extension Assembly에 위임한다.
+- Canvas App Default Assembly는 built-in app baseline과 Demo default initial selection을 소유하고, Canvas App Assembly는 default 상수 구성을 직접 알지 않는다.
 - Canvas App Assembly composition, output contract validation, output snapshot/freeze는 분리하고, validation은 Canvas App Assembly Contracts가, mutation 방어는 Canvas App Assembly Snapshot이 소유한다.
 - Canvas App Custom Item Module define, Canvas App Custom Item Module Assembly, Canvas App Assembly는 외부 descriptor/adapter/item mutation이 define/조립 후 동작을 바꾸지 않도록 snapshot을 보관한다.
 - Canvas App Assembly의 component presentation renderer input은 기본 registry를 대체하지 않고 extension/override로 합성한다.

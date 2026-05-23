@@ -1,33 +1,24 @@
-import {
-  DEFAULT_CANVAS_AFFORDANCE_CONFIG,
-  type CanvasAffordanceConfig,
-  type CanvasAffordanceConfigInput,
+import type {
+  CanvasAffordanceConfig,
+  CanvasAffordanceConfigInput,
 } from '../../engine'
 import {
-  CANVAS_COMPONENT_LIBRARY,
-  CANVAS_ITEM_ENGINE_ADAPTERS,
-  INITIAL_ITEMS,
   type CanvasComponentLibrary,
   type CanvasCustomItemValidators,
   type CanvasItem,
 } from '../../host'
-import {
-  DEFAULT_CANVAS_APP_CUSTOM_ITEM_RENDERERS,
-  DEFAULT_CANVAS_APP_COMPONENT_PRESENTATION_RENDERERS,
-  type CanvasAppComponentPresentationRenderers,
-  type CanvasAppCustomItemRenderers,
+import type {
+  CanvasAppComponentPresentationRenderers,
+  CanvasAppCustomItemRenderers,
 } from '../rendering/CanvasAppRendererRegistries'
 import {
-  DEFAULT_CANVAS_APP_ITEM_LAYER_ADAPTER,
   type CanvasAppItemLayerAdapter,
 } from '../rendering/CanvasAppItemLayerAdapter'
 import {
-  DEFAULT_CANVAS_APP_STAGE_ADAPTER,
   type CanvasAppStageAdapter,
 } from '../rendering/CanvasAppStageAdapter'
 import type { CanvasAppCustomCommand } from '../commands/CanvasAppCustomCommands'
 import {
-  DEFAULT_CANVAS_WORKSPACE_STORAGE_PROVIDER,
   type CanvasWorkspaceStorageProvider,
 } from '../document/CanvasWorkspacePersistence'
 import type { CanvasAppInspectorPanel } from '../inspector/CanvasAppInspectorPanels'
@@ -40,17 +31,14 @@ import { createCanvasAppAdapterAssembly } from './CanvasAppAdapterAssembly'
 import { createCanvasAppAffordanceAssembly } from './CanvasAppAffordanceAssembly'
 import { assertCanvasAppAssembly } from './CanvasAppAssemblyContracts'
 import { createCanvasAppComponentAssembly } from './CanvasAppComponentAssembly'
+import { DEFAULT_CANVAS_APP_ASSEMBLY } from './CanvasAppDefaultAssembly'
 import { createCanvasAppExtensionAssembly } from './CanvasAppExtensionAssembly'
 import { createCanvasAppWorkspaceAssembly } from './CanvasAppWorkspaceAssembly'
 import { snapshotCanvasAppAssembly } from './CanvasAppAssemblySnapshot'
 import type { CanvasAppItemAdapters } from './CanvasAppAdapterContracts'
 
-const DEFAULT_CANVAS_APP_INITIAL_SELECTION = [
-  'component-sticky',
-  'component-card',
-]
-
 export { assertCanvasAppAssembly } from './CanvasAppAssemblyContracts'
+export { DEFAULT_CANVAS_APP_ASSEMBLY } from './CanvasAppDefaultAssembly'
 export type { CanvasAppItemAdapters } from './CanvasAppAdapterContracts'
 
 export type CanvasAppAssembly = {
@@ -85,25 +73,6 @@ export type CanvasAppAssemblyInput = {
   stageAdapter?: CanvasAppStageAdapter
   workspaceStorageProvider?: CanvasWorkspaceStorageProvider
 }
-
-export const DEFAULT_CANVAS_APP_ASSEMBLY: CanvasAppAssembly =
-  snapshotCanvasAppAssembly({
-    affordanceConfig: DEFAULT_CANVAS_AFFORDANCE_CONFIG,
-    componentLibrary: CANVAS_COMPONENT_LIBRARY,
-    componentPresentationRenderers:
-      DEFAULT_CANVAS_APP_COMPONENT_PRESENTATION_RENDERERS,
-    customCommands: [],
-    customCreationTools: [],
-    customItemRenderers: DEFAULT_CANVAS_APP_CUSTOM_ITEM_RENDERERS,
-    customItemValidators: {},
-    inspectorPanels: [],
-    initialItems: INITIAL_ITEMS,
-    initialSelection: DEFAULT_CANVAS_APP_INITIAL_SELECTION,
-    itemAdapters: CANVAS_ITEM_ENGINE_ADAPTERS,
-    itemLayerAdapter: DEFAULT_CANVAS_APP_ITEM_LAYER_ADAPTER,
-    stageAdapter: DEFAULT_CANVAS_APP_STAGE_ADAPTER,
-    workspaceStorageProvider: DEFAULT_CANVAS_WORKSPACE_STORAGE_PROVIDER,
-  })
 
 export function createCanvasAppAssembly(
   input: CanvasAppAssemblyInput = {},

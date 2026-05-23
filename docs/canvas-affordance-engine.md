@@ -81,6 +81,7 @@
 | `src/canvas/app/workflow/CanvasAppAdapterAssembly.ts` | Item, item layer, stage adapter fallback을 조립한다 |
 | `src/canvas/app/workflow/CanvasAppAffordanceAssembly.ts` | 제품별 affordance feature toggle override와 default affordance config fallback을 조립한다 |
 | `src/canvas/app/workflow/CanvasAppAssemblyContracts.ts` | 조립된 assembly output의 component library resolver, renderer coverage, custom extension registry, initial item, adapter shape를 검증한다 |
+| `src/canvas/app/workflow/CanvasAppDefaultAssembly.ts` | Built-in app baseline과 Demo default initial selection을 소유한다 |
 | `src/canvas/app/workflow/CanvasAppWorkspaceAssembly.ts` | Workspace 초기 items normalization, Demo default selection fallback, storage provider fallback을 조립한다 |
 | `src/canvas/app/workflow/CanvasAppWorkspaceAssemblyContracts.ts` | Workspace 초기 items, 초기 selection, storage provider 계약을 검증하고, selection과 item tree 불일치를 runtime 진입 전에 차단한다 |
 | `src/canvas/app/workflow/CanvasAppAssemblySnapshot.ts` | 조립된 assembly output을 외부 mutation에서 보호하도록 component library, extension registry, initial item, adapter를 snapshot/freeze 한다 |
@@ -157,6 +158,7 @@ type CanvasAffordanceConfig = {
 - Toggle이 꺼져도 문서 상태는 손상하지 않는다.
 - Toggle 기본값은 모두 on이다. App workflow가 필요한 것만 끈다.
 - Canvas App Affordance Assembly는 제품별 feature toggle override와 default affordance config fallback 조립을 소유한다.
+- Canvas App Default Assembly는 built-in app baseline과 Demo default initial selection을 소유한다.
 
 ## Extraction State
 

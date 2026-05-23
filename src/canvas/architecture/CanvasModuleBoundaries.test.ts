@@ -128,7 +128,8 @@ describe('Canvas module boundaries', () => {
         !file.path.endsWith('.test.ts') &&
         !file.path.endsWith('.test.tsx') &&
         file.path !== 'src/canvas/app/index.ts' &&
-        file.path !== 'src/canvas/app/workflow/CanvasAppAssembly.ts',
+        file.path !==
+          'src/canvas/app/workflow/CanvasAppDefaultAssembly.ts',
       )
       .flatMap((file) =>
         assemblyTerms.test(file.source) ? [file.path] : [],
@@ -4482,6 +4483,41 @@ describe('Canvas module boundaries', () => {
     )
   })
 
+  it('keeps the default App assembly baseline behind a named module', () => {
+    const assemblyFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppAssembly.ts',
+    )
+    const defaultAssemblyFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppDefaultAssembly.ts',
+    )
+
+    expect(assemblyFile.source).toContain(
+      "from './CanvasAppDefaultAssembly'",
+    )
+    expect(assemblyFile.source).not.toContain(
+      'DEFAULT_CANVAS_APP_INITIAL_SELECTION',
+    )
+    expect(assemblyFile.source).not.toContain(
+      'DEFAULT_CANVAS_AFFORDANCE_CONFIG',
+    )
+    expect(assemblyFile.source).not.toContain('CANVAS_COMPONENT_LIBRARY')
+    expect(assemblyFile.source).not.toContain('CANVAS_ITEM_ENGINE_ADAPTERS')
+    expect(assemblyFile.source).not.toContain('INITIAL_ITEMS')
+    expect(defaultAssemblyFile.source).toContain(
+      'export const DEFAULT_CANVAS_APP_ASSEMBLY',
+    )
+    expect(defaultAssemblyFile.source).toContain(
+      'DEFAULT_CANVAS_APP_INITIAL_SELECTION',
+    )
+    expect(defaultAssemblyFile.source).toContain(
+      'DEFAULT_CANVAS_AFFORDANCE_CONFIG',
+    )
+    expect(defaultAssemblyFile.source).toContain('CANVAS_COMPONENT_LIBRARY')
+    expect(defaultAssemblyFile.source).toContain('CANVAS_ITEM_ENGINE_ADAPTERS')
+    expect(defaultAssemblyFile.source).toContain('INITIAL_ITEMS')
+    expect(defaultAssemblyFile.source).toContain('snapshotCanvasAppAssembly')
+  })
+
   it('keeps App Assembly output contracts behind a named module', () => {
     const assemblyFile = getSourceFile(
       'src/canvas/app/workflow/CanvasAppAssembly.ts',
@@ -4804,9 +4840,6 @@ describe('Canvas module boundaries', () => {
     const workspaceRuntimeModelFile = getSourceFile(
       'src/canvas/app/workflow/CanvasWorkspaceRuntimeModel.ts',
     )
-    const assemblyFile = getSourceFile(
-      'src/canvas/app/workflow/CanvasAppAssembly.ts',
-    )
     const rawWorkspaceTerms =
       /\b(canRedo|canUndo|commitSelection|commitItemsChange|copyItemsToClipboard|getClipboardItems|findDocumentText|itemReadModel|redo|replaceDocumentText|selectedBounds|setClipboardItems|setLiveItems|setSelection|setViewport|undo)\b/
 
@@ -4831,7 +4864,11 @@ describe('Canvas module boundaries', () => {
     expect(workspaceRuntimeModelFile.source).not.toContain(
       'component-card',
     )
-    expect(assemblyFile.source).toContain(
+    const defaultAssemblyFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppDefaultAssembly.ts',
+    )
+
+    expect(defaultAssemblyFile.source).toContain(
       'DEFAULT_CANVAS_APP_INITIAL_SELECTION',
     )
     for (const runtimeImplementationDetail of [
