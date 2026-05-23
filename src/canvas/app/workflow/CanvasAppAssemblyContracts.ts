@@ -3,6 +3,7 @@ import { normalizeCanvasItems } from '../../host'
 import { assertCanvasAppCustomCommands } from '../commands/CanvasAppCustomCommands'
 import {
   assertCanvasAppArray,
+  assertCanvasAppDescriptorFunctionField,
   assertCanvasAppDescriptorObject,
 } from '../extensions/CanvasAppDescriptorContracts'
 import { assertCanvasAppInspectorPanels } from '../inspector/CanvasAppInspectorPanels'
@@ -23,6 +24,11 @@ export function assertCanvasAppAssembly(assembly: CanvasAppAssembly) {
   assertCanvasAppCustomItemValidators(assembly.customItemValidators)
   assertCanvasAppInspectorPanels(assembly.inspectorPanels)
   assertCanvasAppArray(assembly.initialItems, 'assembly initial items')
+  assertCanvasAppDescriptorFunctionField({
+    field: 'workspaceStorageProvider',
+    owner: 'assembly',
+    value: assembly.workspaceStorageProvider,
+  })
   normalizeCanvasItems(assembly.initialItems, {
     customItemValidators: assembly.customItemValidators,
   })

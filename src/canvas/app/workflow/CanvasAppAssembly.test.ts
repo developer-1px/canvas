@@ -16,6 +16,7 @@ import {
   type CanvasAppInspectorPanel,
   type CanvasAppItemLayerAdapter,
   type CanvasAppStageAdapter,
+  type CanvasWorkspaceStorageProvider,
 } from './index'
 
 describe('CanvasAppAssembly', () => {
@@ -215,6 +216,26 @@ describe('CanvasAppAssembly', () => {
       createItemLayerInput({ items: DEFAULT_CANVAS_APP_ASSEMBLY.initialItems }),
     )).toBe(DEFAULT_CANVAS_APP_ASSEMBLY.initialItems.length)
     expect(assembly.stageAdapter.renderStage).toBe(stageAdapter.renderStage)
+  })
+
+  it('accepts workspace storage provider at the app assembly seam', () => {
+    const workspaceStorageProvider: CanvasWorkspaceStorageProvider = () => null
+
+    const assembly = createCanvasAppAssembly({
+      workspaceStorageProvider,
+    })
+
+    expect(assembly.workspaceStorageProvider).toBe(workspaceStorageProvider)
+    expect(DEFAULT_CANVAS_APP_ASSEMBLY.workspaceStorageProvider()).toBeNull()
+  })
+
+  it('rejects malformed workspace storage providers', () => {
+    expect(() =>
+      createCanvasAppAssembly({
+        workspaceStorageProvider:
+          {} as unknown as CanvasWorkspaceStorageProvider,
+      }),
+    ).toThrow('Canvas app assembly requires workspaceStorageProvider')
   })
 
   it('rejects direct extension ids outside the app extension id contract', () => {

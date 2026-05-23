@@ -46,6 +46,7 @@ export function snapshotCanvasAppAssembly(
     itemAdapters: adapterSnapshot.itemAdapters,
     itemLayerAdapter: adapterSnapshot.itemLayerAdapter,
     stageAdapter: adapterSnapshot.stageAdapter,
+    workspaceStorageProvider: assembly.workspaceStorageProvider,
   })
 }
 

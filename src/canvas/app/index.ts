@@ -35,6 +35,8 @@ export {
   type CanvasAppCustomItemModuleCreationItem,
   type CanvasAppCustomItemModuleCreationTool,
   type CanvasAppCustomToolShortcut,
+  type CanvasWorkspaceStorage,
+  type CanvasWorkspaceStorageProvider,
   type CanvasAppExtensionId,
   type CanvasAppInspectorPanel,
   type CanvasAppInspectorPanelContext,

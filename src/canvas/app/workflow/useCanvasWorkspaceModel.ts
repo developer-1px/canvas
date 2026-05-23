@@ -8,6 +8,7 @@ import {
 } from '../../host'
 import {
   readStoredCanvasWorkspace,
+  type CanvasWorkspaceStorageProvider,
   useCanvasWorkspacePersistence,
 } from '../document/CanvasWorkspacePersistence'
 import { useCanvasDocument } from '../document/useCanvasDocument'
@@ -21,17 +22,19 @@ import {
 export function useCanvasWorkspaceModel({
   customItemValidators,
   initialItems,
+  storageProvider,
 }: {
   customItemValidators?: CanvasCustomItemValidators
   initialItems: CanvasItem[]
+  storageProvider: CanvasWorkspaceStorageProvider
 }) {
   const validation = useMemo(
     () => ({ customItemValidators }),
     [customItemValidators],
   )
   const storedWorkspace = useMemo(
-    () => readStoredCanvasWorkspace(undefined, validation),
-    [validation],
+    () => readStoredCanvasWorkspace(storageProvider(), validation),
+    [storageProvider, validation],
   )
   const initialState = getCanvasWorkspaceInitialState({
     initialItems,
@@ -63,6 +66,7 @@ export function useCanvasWorkspaceModel({
   useCanvasWorkspacePersistence({
     items: document.items,
     selection: document.selection,
+    storageProvider,
     validation,
     viewport,
   })

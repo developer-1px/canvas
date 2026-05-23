@@ -1,6 +1,11 @@
 import type {
+  CanvasCustomItem,
+} from '../../entities'
+import type {
   CanvasAppComponentPresentationRenderers,
+  CanvasAppComponentRendererStrategy,
   CanvasAppCustomItemRenderers,
+  CanvasAppCustomItemRendererStrategy,
 } from './CanvasAppRenderingContracts'
 import {
   DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS,
@@ -59,15 +64,22 @@ export function getCanvasAppComponentPresentationRenderer({
 }: {
   presentation: string
   renderers: CanvasAppComponentPresentationRenderers
-}) {
+}): CanvasAppComponentRendererStrategy {
   return getCanvasDemoSvgComponentPresentationRenderer({
     presentation,
     renderers,
   })
 }
 
-export function getCanvasAppCustomItemRenderer(
-  input: Parameters<typeof getCanvasDemoSvgCustomItemRenderer>[0],
-) {
-  return getCanvasDemoSvgCustomItemRenderer(input)
+export function getCanvasAppCustomItemRenderer({
+  item,
+  renderers,
+}: {
+  item: CanvasCustomItem
+  renderers: CanvasAppCustomItemRenderers
+}): CanvasAppCustomItemRendererStrategy {
+  return getCanvasDemoSvgCustomItemRenderer({
+    item,
+    renderers,
+  })
 }

@@ -18,6 +18,7 @@ import {
   type CanvasAppPointerInput,
   type CanvasAppStageAdapter,
   type CanvasAppStageMount,
+  type CanvasWorkspaceStorageProvider,
   type CanvasCustomItem,
   type CanvasItem,
 } from 'canvas'
@@ -86,6 +87,7 @@ describe('Canvas package consumer imports', () => {
     const stageMount: CanvasAppStageMount = {
       ref: () => undefined,
     }
+    const workspaceStorageProvider: CanvasWorkspaceStorageProvider = () => null
     const pointerInput: CanvasAppPointerInput = {
       altKey: false,
       button: 0,
@@ -104,6 +106,7 @@ describe('Canvas package consumer imports', () => {
       initialItems: [rect],
       itemLayerAdapter,
       stageAdapter,
+      workspaceStorageProvider,
     })
     const shellInputProps = {
       assemblyInput: {
@@ -148,6 +151,7 @@ describe('Canvas package consumer imports', () => {
       selected: new Set(),
     })).toBe(1)
     expect(assembly.stageAdapter.renderStage).toBe(stageAdapter.renderStage)
+    expect(assembly.workspaceStorageProvider).toBe(workspaceStorageProvider)
     expect(stageMount.ref).toBeTypeOf('function')
     expect(pointerInput.pointerId).toBe(1)
     expect(createCanvasAppComponentPresentationRenderers({

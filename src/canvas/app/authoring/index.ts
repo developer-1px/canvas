@@ -30,6 +30,10 @@ export type {
   CanvasAppCustomCreationToolState,
   CanvasAppCustomToolShortcut,
 } from '../tools/CanvasAppCustomCreationTools'
+export type {
+  CanvasWorkspaceStorage,
+  CanvasWorkspaceStorageProvider,
+} from '../document/CanvasWorkspacePersistence'
 export {
   createCanvasAppComponentPresentationRenderers,
   createCanvasAppCustomItemRenderers,

@@ -187,6 +187,7 @@
 - Canvas Workspace Consumer Model: Workspace document/read/viewport state를 command, component, control, extension, inspector, interaction, item layer, keyboard, pointer, stage, text, viewport consumer context로 변환하는 workflow Module.
 - Canvas Workspace Snapshot: 저장된 workspace payload의 version, item validation, viewport normalization, selection sanitization, id seed contract를 소유하는 App-owned Module.
 - Canvas Workspace Storage: App workspace persistence가 요구하는 `getItem`, `setItem`, optional `removeItem` slot만 명시하고 browser `Storage` 구현 shape를 숨기는 App-owned persistence Interface 계약.
+- Canvas Workspace Storage Provider: Host가 workspace persistence storage를 조립하거나 비활성화할 수 있게 하는 App Assembly 입력 계약. 기본 provider만 browser `localStorage`를 선택한다.
 - Canvas Document Runtime: Host Document Controller mutation result를 App React state가 반영할 committed state로 변환하고 live item replacement, selection action resolution, text replace, history result application을 소유하는 App-owned runtime Module.
 - Canvas Document Runtime Contracts: App document runtime이 Host Document Controller와 주고받는 change, selection action, text search options, history result, committed state의 명시 Interface 계약을 소유하는 App-owned contract Module.
 - Canvas Workflow Contract: App workflow hook들이 공유하는 document commit, selection commit, clipboard 계약. 개별 hook이 `useCanvasDocument` 구현 파일을 직접 알지 않게 한다.
@@ -319,6 +320,7 @@
 - 제품별 저장 payload는 Canvas Custom Item의 JSON `data` 안에 두고, payload 의미 검증은 Canvas Custom Item Validator로 등록한다.
 - 저장된 workspace snapshot은 현재 Canvas Custom Item Validator로 다시 검증하고, 실패하면 앱 초기화 대신 저장 snapshot을 제거한 뒤 버려야 한다.
 - Canvas Workspace Persistence는 storage IO와 debounce만 맡고, 저장 payload contract는 Canvas Workspace Snapshot이 소유한다.
+- Canvas App Assembly는 `workspaceStorageProvider`를 받아 Workspace Persistence에 전달하고, App workflow가 browser `localStorage`를 직접 선택하지 않게 한다.
 - Clipboard payload는 Host Document Controller에서 현재 item 저장 계약으로 다시 검증하고, 실패하면 command loop로 throw하지 않고 빈 clipboard/false로 containment 한다.
 - Host Document Controller는 invalid item mutation을 App workflow로 throw하지 않고 false/current items로 containment 한다.
 - Canvas Document Changes는 document commit orchestration을 맡고, CanvasItemsChange별 JSON Patch factory 선택은 Canvas Document Change Patch가 소유한다.

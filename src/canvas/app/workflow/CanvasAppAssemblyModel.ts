@@ -13,6 +13,7 @@ export function getCanvasAppAssemblyModel({
   itemAdapters,
   itemLayerAdapter,
   stageAdapter,
+  workspaceStorageProvider,
 }: CanvasAppAssembly) {
   return {
     affordance: {
@@ -50,6 +51,7 @@ export function getCanvasAppAssemblyModel({
     workspace: {
       customItemValidators,
       initialItems,
+      storageProvider: workspaceStorageProvider,
     },
   }
 }

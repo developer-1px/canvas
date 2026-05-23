@@ -17,23 +17,34 @@ export type CanvasWorkspaceStorage = {
   setItem: (key: string, value: string) => void
 }
 
+export type CanvasWorkspaceStorageProvider = () => CanvasWorkspaceStorage | null
+
+export const DEFAULT_CANVAS_WORKSPACE_STORAGE_PROVIDER:
+  CanvasWorkspaceStorageProvider = getCanvasWorkspaceStorage
+
 export function useCanvasWorkspacePersistence({
   items,
   selection,
+  storageProvider = DEFAULT_CANVAS_WORKSPACE_STORAGE_PROVIDER,
   viewport,
   validation,
-}: CanvasWorkspaceSnapshotInput) {
+}: CanvasWorkspaceSnapshotInput & {
+  storageProvider?: CanvasWorkspaceStorageProvider
+}) {
   useEffect(() => {
     if (typeof window === 'undefined') {
       return undefined
     }
 
     const timeout = window.setTimeout(() => {
-      writeStoredCanvasWorkspace({ items, selection, validation, viewport })
+      writeStoredCanvasWorkspace(
+        { items, selection, validation, viewport },
+        storageProvider(),
+      )
     }, SAVE_DELAY_MS)
 
     return () => window.clearTimeout(timeout)
-  }, [items, selection, validation, viewport])
+  }, [items, selection, storageProvider, validation, viewport])
 }
 
 export function readStoredCanvasWorkspace(

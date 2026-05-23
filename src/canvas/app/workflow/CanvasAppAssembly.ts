@@ -28,6 +28,10 @@ import {
   type CanvasAppStageAdapter,
 } from '../rendering/CanvasAppStageAdapter'
 import type { CanvasAppCustomCommand } from '../commands/CanvasAppCustomCommands'
+import {
+  DEFAULT_CANVAS_WORKSPACE_STORAGE_PROVIDER,
+  type CanvasWorkspaceStorageProvider,
+} from '../document/CanvasWorkspacePersistence'
 import type { CanvasAppInspectorPanel } from '../inspector/CanvasAppInspectorPanels'
 import type {
   CanvasAppCustomItemModule,
@@ -56,6 +60,7 @@ export type CanvasAppAssembly = {
   itemAdapters: CanvasAppItemAdapters
   itemLayerAdapter: CanvasAppItemLayerAdapter
   stageAdapter: CanvasAppStageAdapter
+  workspaceStorageProvider: CanvasWorkspaceStorageProvider
 }
 
 export type CanvasAppAssemblyInput = {
@@ -70,6 +75,7 @@ export type CanvasAppAssemblyInput = {
   itemAdapters?: CanvasAppItemAdapters
   itemLayerAdapter?: CanvasAppItemLayerAdapter
   stageAdapter?: CanvasAppStageAdapter
+  workspaceStorageProvider?: CanvasWorkspaceStorageProvider
 }
 
 export const DEFAULT_CANVAS_APP_ASSEMBLY: CanvasAppAssembly =
@@ -87,6 +93,7 @@ export const DEFAULT_CANVAS_APP_ASSEMBLY: CanvasAppAssembly =
     itemAdapters: CANVAS_ITEM_ENGINE_ADAPTERS,
     itemLayerAdapter: DEFAULT_CANVAS_APP_ITEM_LAYER_ADAPTER,
     stageAdapter: DEFAULT_CANVAS_APP_STAGE_ADAPTER,
+    workspaceStorageProvider: DEFAULT_CANVAS_WORKSPACE_STORAGE_PROVIDER,
   })
 
 export function createCanvasAppAssembly(
@@ -121,6 +128,9 @@ export function createCanvasAppAssembly(
     itemLayerAdapter:
       input.itemLayerAdapter ?? DEFAULT_CANVAS_APP_ASSEMBLY.itemLayerAdapter,
     stageAdapter: input.stageAdapter ?? DEFAULT_CANVAS_APP_ASSEMBLY.stageAdapter,
+    workspaceStorageProvider:
+      input.workspaceStorageProvider ??
+      DEFAULT_CANVAS_APP_ASSEMBLY.workspaceStorageProvider,
   }
 
   assertCanvasAppAssembly(assembly)

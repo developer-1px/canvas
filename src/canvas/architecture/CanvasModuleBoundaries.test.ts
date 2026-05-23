@@ -241,6 +241,7 @@ describe('Canvas module boundaries', () => {
       'itemAdapters',
       'itemLayerAdapter',
       'stageAdapter',
+      'workspaceStorageProvider',
     ]) {
       expect(appModelFile.source).not.toContain(assemblyOutputField)
     }
@@ -746,6 +747,7 @@ describe('Canvas module boundaries', () => {
       'CanvasAppCustomCommand',
       'CanvasAppCustomCreationTool',
       'CanvasAppInspectorPanel',
+      'CanvasWorkspaceStorageProvider',
     ]) {
       expect(authoringFacadeFile.source).toContain(authoringContract)
       expect(appFacadeFile.source).toContain(authoringContract)
@@ -2430,6 +2432,7 @@ describe('Canvas module boundaries', () => {
     expect(registriesFile.source).toContain(
       "from './CanvasDemoSvgCustomItemRendererRegistry'",
     )
+    expect(registriesFile.source).not.toContain('Parameters<typeof')
     expect(authoringFacadeFile.source).toContain(
       "from '../rendering/CanvasAppRendererRegistries'",
     )
@@ -4643,6 +4646,11 @@ describe('Canvas module boundaries', () => {
     expect(workspaceModelFile.source).toContain(
       "from './CanvasWorkspaceRuntimeModel'",
     )
+    expect(workspaceModelFile.source).toContain('storageProvider()')
+    expect(workspaceModelFile.source).toContain('storageProvider,')
+    expect(workspaceRuntimeModelFile.source).not.toContain(
+      'CanvasWorkspaceStorage',
+    )
     for (const runtimeImplementationDetail of [
       'DEFAULT_CANVAS_WORKSPACE_SELECTION',
       'INITIAL_VIEWPORT',
@@ -4715,6 +4723,12 @@ describe('Canvas module boundaries', () => {
     expect(persistenceFile.source).toContain(
       'export type CanvasWorkspaceStorage',
     )
+    expect(persistenceFile.source).toContain(
+      'export type CanvasWorkspaceStorageProvider',
+    )
+    expect(persistenceFile.source).toContain(
+      'DEFAULT_CANVAS_WORKSPACE_STORAGE_PROVIDER',
+    )
     expect(persistenceFile.source).not.toContain('Pick<Storage')
     expect(persistenceFile.source).not.toContain('Partial<Pick')
     expect(snapshotFile.source).toContain(
@@ -4729,6 +4743,22 @@ describe('Canvas module boundaries', () => {
     expect(snapshotFile.source).toContain('normalizeCanvasItems')
     expect(snapshotFile.source).toContain('createCanvasItemReadModel')
     expect(snapshotFile.source).toContain('CANVAS_WORKSPACE_VERSION')
+  })
+
+  it('keeps browser workspace storage behind the persistence provider seam', () => {
+    const violations = sourceFiles
+      .filter((file) =>
+        file.path.startsWith('src/canvas/app/') &&
+        file.path !== 'src/canvas/app/document/CanvasWorkspacePersistence.ts' &&
+        file.path !== 'src/canvas/app/document/CanvasWorkspacePersistence.test.ts',
+      )
+      .flatMap((file) =>
+        /window\.localStorage|CANVAS_WORKSPACE_STORAGE_KEY/.test(file.source)
+          ? [file.path]
+          : [],
+      )
+
+    expect(violations).toEqual([])
   })
 
   it('keeps Demo SVG renderer names out of app authoring seams', () => {
