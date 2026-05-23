@@ -39,7 +39,7 @@ import { createCanvasItemReadModel } from '../../host'
 import type {
   CommitCanvasItemsChange,
   CommitCanvasSelection,
-} from '../document/useCanvasDocument'
+} from '../workflow/CanvasWorkflowContract'
 import type { Interaction } from './CanvasInteractionState'
 
 type UseCanvasPointerDownHandlersArgs = {

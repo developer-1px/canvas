@@ -13,7 +13,7 @@ import type {
   CanvasComponentKind,
   EditingText,
 } from '../../host/model'
-import type { CommitCanvasItemsChange } from '../document/useCanvasDocument'
+import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract'
 
 type UseCanvasComponentInsertionArgs = {
   commitItemsChange: CommitCanvasItemsChange

@@ -37,7 +37,7 @@ import { releasePointer, screenPoint, screenToWorld } from './CanvasPointerGeome
 import type {
   CommitCanvasItemsChange,
   CommitCanvasSelection,
-} from '../document/useCanvasDocument'
+} from '../workflow/CanvasWorkflowContract'
 import type { Interaction } from './CanvasInteractionState'
 
 type UseCanvasPointerDragHandlersArgs = {

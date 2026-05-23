@@ -9,26 +9,12 @@ import {
 import type { CanvasItem } from '../../host/model'
 import {
   createCanvasDocumentController,
-  type CanvasDocumentTextSearch,
-  type CanvasItemsChange,
 } from '../../host'
-
-type CanvasDocumentController = ReturnType<typeof createCanvasDocumentController>
-type SelectionHistory = Parameters<CanvasDocumentController['commitItemsChange']>[2]
-
-export type CommitCanvasItemsChange = (
-  change: CanvasItemsChange,
-  selection?: SelectionHistory,
-) => boolean
-
-export type CommitCanvasSelection = (
-  action: SetStateAction<string[]>,
-) => boolean
-
-export type {
-  CanvasDocumentClipboard,
+import type {
+  CommitCanvasItemsChange,
+  CommitCanvasSelection,
   CanvasDocumentTextSearch,
-} from '../../host'
+} from '../workflow/CanvasWorkflowContract'
 
 export function useCanvasDocument(
   initialItems: CanvasItem[],

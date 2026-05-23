@@ -11,7 +11,7 @@ import type {
   RectItem,
   TextItem,
 } from '../../host/model'
-import type { CommitCanvasItemsChange } from '../document/useCanvasDocument'
+import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract'
 
 type EditableCanvasTextItem = RectItem | TextItem
 

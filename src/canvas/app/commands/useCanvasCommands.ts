@@ -31,7 +31,7 @@ import type {
   CanvasDocumentClipboard,
   CommitCanvasItemsChange,
   CommitCanvasSelection,
-} from '../document/useCanvasDocument'
+} from '../workflow/CanvasWorkflowContract'
 
 type UseCanvasCommandsArgs = {
   commandAdapter: CanvasCommandAdapter<CanvasItem>
