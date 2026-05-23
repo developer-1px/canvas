@@ -32,6 +32,12 @@ type CanvasToolGestureRoute = Readonly<{
   routeItemPointerToCanvasGesture: boolean
 }>
 
+type CanvasToolGestureRouteInput = Readonly<{
+  gesture?: CanvasToolPointerGesture
+  isEnabled?: (config: CanvasAffordanceConfig) => boolean
+  routeItemPointerToCanvasGesture?: boolean
+}>
+
 export const CANVAS_TOOL_GESTURE_ROUTES = Object.freeze({
   arrow: createCanvasToolGestureRoute({
     gesture: 'create-arrow',
@@ -114,12 +120,7 @@ export function shouldRouteCanvasToolPointerToCanvasGesture({
 }
 
 function createCanvasToolGestureRoute(
-  route: Omit<
-    CanvasToolGestureRoute,
-    'routeItemPointerToCanvasGesture'
-  > & {
-    routeItemPointerToCanvasGesture?: boolean
-  },
+  route: CanvasToolGestureRouteInput,
 ): CanvasToolGestureRoute {
   return Object.freeze({
     routeItemPointerToCanvasGesture:

@@ -870,6 +870,9 @@ describe('Canvas module boundaries', () => {
       'CANVAS_COMMAND_AVAILABILITY_RULES',
     )
     expect(availabilityRulesFile.source).toContain(
+      'type CanvasCommandAvailabilityRuleStateInput',
+    )
+    expect(availabilityRulesFile.source).toContain(
       'export function canUseCanvasCommand',
     )
     expect(availabilityRulesFile.source).toContain(
@@ -881,6 +884,7 @@ describe('Canvas module boundaries', () => {
     expect(availabilityRulesFile.source).not.toContain(
       'selection.length > 2',
     )
+    expect(availabilityRulesFile.source).not.toContain('Omit<')
     expect(rulesFile.source).toContain(
       'CANVAS_COMMAND_SELECTION_MINIMUMS',
     )
@@ -2075,6 +2079,10 @@ describe('Canvas module boundaries', () => {
     expect(toolGestureRoutingFile.source).toContain(
       'CANVAS_TOOL_GESTURE_ROUTES',
     )
+    expect(toolGestureRoutingFile.source).toContain(
+      'type CanvasToolGestureRouteInput',
+    )
+    expect(toolGestureRoutingFile.source).not.toContain('Omit<')
     expect(toolGestureRoutingFile.source).toContain("gesture: 'draw-marker'")
     expect(toolGestureRoutingFile.source).toContain(
       "gesture: 'draw-highlight'",
@@ -4301,6 +4309,18 @@ describe('Canvas module boundaries', () => {
     expect(violations).toEqual([])
   })
 
+  it('keeps Host item read model scene on the Engine scene adapter contract', () => {
+    const readModelFile = getSourceFile(
+      'src/canvas/host/read/CanvasItemReadModel.ts',
+    )
+
+    expect(readModelFile.source).toContain('CanvasSceneAdapter')
+    expect(readModelFile.source).toContain(
+      'scene: CanvasSceneAdapter',
+    )
+    expect(readModelFile.source).not.toContain('ReturnType<')
+  })
+
   it('keeps app workspace document fields behind consumer contexts', () => {
     const appModelFile = getSourceFile(
       'src/canvas/app/workflow/useCanvasAppModel.ts',
@@ -4510,6 +4530,8 @@ describe('Canvas module boundaries', () => {
     expect(patchTreeDiffFile.source).toContain(
       'export function createCanvasDocumentPatchTreeDiff',
     )
+    expect(patchesFile.source).toContain('CanvasDocumentPatchTreeDiff')
+    expect(patchesFile.source).not.toContain('ReturnType<')
     expect(patchTreeDiffFile.source).toContain('flattenCanvasItems')
     expect(patchTreeDiffFile.source).toContain('isAncestorPath')
     expect(patchTreeDiffFile.source).toContain('removalEntries')

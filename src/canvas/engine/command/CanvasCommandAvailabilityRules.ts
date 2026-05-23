@@ -25,6 +25,13 @@ type CanvasCommandAvailabilityRuleState =
     hasSelectedGroup: boolean
   }>
 
+type CanvasCommandAvailabilityRuleStateInput = Readonly<{
+  canRedo: boolean
+  canUndo: boolean
+  hasSelectedGroup: boolean
+  selection: readonly string[]
+}>
+
 export type CanvasCommandAvailabilityInput = Readonly<{
   canRedo: boolean
   canUndo: boolean
@@ -135,7 +142,7 @@ function getCanvasCommandAvailabilityRuleState({
   canUndo,
   hasSelectedGroup,
   selection,
-}: Omit<CanvasCommandAvailabilityInput, 'config'>): CanvasCommandAvailabilityRuleState {
+}: CanvasCommandAvailabilityRuleStateInput): CanvasCommandAvailabilityRuleState {
   return {
     ...getCanvasCommandSelectionState({ selection }),
     always: true,

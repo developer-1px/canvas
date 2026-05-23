@@ -1,4 +1,5 @@
 import type { Bounds } from '../../core'
+import type { CanvasSceneAdapter } from '../../engine'
 import type {
   CanvasItem,
 } from '../model'
@@ -17,7 +18,7 @@ import {
 } from '../tree/CanvasTree'
 
 export type CanvasItemReadModel = {
-  scene: ReturnType<typeof createCanvasItemScene>
+  scene: CanvasSceneAdapter
   findEditableTextItem: (id: string) => CanvasEditableTextItem | null
   findItem: (id: string) => CanvasItem | undefined
   getAllIds: () => string[]

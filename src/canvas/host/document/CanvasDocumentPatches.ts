@@ -23,6 +23,7 @@ import {
   createCanvasDocumentPatchTreeDiff,
   getCanvasDocumentPatchEntries,
   getCanvasDocumentPatchRemovalEntries,
+  type CanvasDocumentPatchTreeDiff,
 } from './CanvasDocumentPatchTreeDiff'
 import { createReorderCanvasSiblingArraysPatch } from './CanvasDocumentReorderPatch'
 
@@ -219,7 +220,7 @@ export function createReplaceChangedCanvasItemsPatch(
 }
 
 function createReplaceChangedCanvasItemsPatchFromDiff(
-  diff: ReturnType<typeof createCanvasDocumentPatchTreeDiff>,
+  diff: CanvasDocumentPatchTreeDiff,
 ): JSONPatchOperation[] {
   return diff.changedTopmostEntries.map((entry) => ({
     op: 'replace',

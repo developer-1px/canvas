@@ -15,13 +15,13 @@
 - Engine Public Facade: Host App, Demo App, UI, Renderer Adapter가 Engine을 사용할 때 import하는 안정된 Module 경계.
 - Host Document Controller: Demo `CanvasItem` 문서의 history, selection, clipboard, text search, item commit을 React와 zod-crud 세부 구현 없이 제공하는 Module.
 - Canvas Document Change Patch: CanvasItemsChange별 patch builder table과 Host-owned JSON Patch factory 호출을 소유하는 change-to-patch grammar Module.
-- Canvas Document Patch Tree Diff: before/after Demo item tree를 patch factory가 쓰는 topmost changed entry, changed group entry, removal entry로 변환하는 Host-owned tree diff Module.
+- Canvas Document Patch Tree Diff: before/after Demo item tree를 patch factory가 쓰는 topmost changed entry, changed group entry, removal entry로 변환하고 patch applier가 명시 `CanvasDocumentPatchTreeDiff` contract를 소비하게 하는 Host-owned tree diff Module.
 - Canvas Document Reorder Patch: before/after Demo item tree의 sibling order 차이를 zod-crud JSON Patch `move` operation으로 변환하는 Host-owned patch Module.
 - Canvas Group Item: group item 판정과 recursive children 저장 shape를 소유하는 Host tree structural contract Module.
 - Host Public Facade: Demo Host model type, read model, component library, document controller를 외부 레이어에 노출하는 안정된 Module 경계.
 - Canvas Package Public Entry: 외부 조립자와 Demo가 사용하는 `src/canvas` 단일 entry. App, Engine, Host, Renderer, Entities facade를 다시 노출하고 내부 하위 경로를 숨긴다.
 - Canvas App Public Facade: Canvas App Shell, Canvas App Assembly Source, workflow 조립 계약을 노출하는 `src/canvas/app` entry.
-- Canvas Item Read Model: Demo `CanvasItem` tree의 조회, bounds, selection 정규화, Scene Adapter 생성을 tree helper 세부 구현 없이 제공하는 Module.
+- Canvas Item Read Model: Demo `CanvasItem` tree의 조회, bounds, selection 정규화, Scene Adapter 생성을 tree helper 세부 구현 없이 제공하고 `scene`을 Engine `CanvasSceneAdapter` contract로 노출하는 Module.
 - Canvas Component Library: Demo component template, presentation key, component item 생성을 함께 제공하는 Module.
 - Canvas Built-in Component Templates: Sticky, label, card 같은 기본 Demo component catalogue를 소유하는 Host-owned Module.
 - Canvas Component Presentation: Demo component kind를 Renderer Adapter의 그리기 전략과 연결하는 key. 새 component kind는 기존 presentation을 재사용할 수 있다.
@@ -56,7 +56,7 @@
 - Canvas Standard Command Document Effect Contracts: standard command document effect descriptor primitive와 effect context의 명시 Interface 계약을 소유하는 App-owned command contract Module.
 - Canvas Standard Command Document Effects: standard command document effect applier table, document commit fallback, selection commit, editing clear, history restore effect 반영을 소유하는 App-owned runtime Module.
 - Canvas Command Selection Rules: built-in command 실행과 availability가 공유하는 선택 개수 기준을 소유하는 Engine-owned Module.
-- Canvas Command Availability Rules: built-in command id별 availability condition table과 feature toggle/state 결합을 소유하는 Engine-owned Module.
+- Canvas Command Availability Rules: built-in command id별 availability condition table, rule state input contract, feature toggle/state 결합을 소유하는 Engine-owned Module.
 - Canvas Clipboard Command Execution: clipboard command effect plan 생성과 clipboard/document effect 적용을 조립하는 App-owned runtime Module.
 - Canvas Clipboard Command Handlers: clone, duplicate, copy, paste, cut callback을 clipboard command descriptor로 변환하고 전달된 paste index와 duplicate source selection default를 주입하는 App-owned handler grammar Module.
 - Canvas Clipboard Command Contracts: clone, duplicate, copy, paste, cut의 what union을 effect planning/execution how와 분리해 소유하는 App-owned command contract Module.
@@ -112,7 +112,7 @@
 - Drawing Item Validation: built-in marker, highlighter, arrow의 visible geometry와 renderable style 저장 shape 검증을 소유하는 Host-owned validation Module.
 - Drawing Item Style: built-in marker, highlighter, arrow의 stroke/opacity 기본값과 style field shape. Draft overlay와 Host item creation이 같은 Host-owned 계약을 쓴다.
 - Canvas Pointer Interaction Start: pointer-down 시 gesture routing, pan, marquee 시작을 active interaction으로 변환하고 생성 시작은 Canvas Pointer Creation Start에 위임하는 App-owned runtime Module.
-- Canvas Tool Gesture Routing: built-in tool과 custom tool을 pointer gesture, feature gate, item pointer rerouting rule로 변환하는 Engine-owned what 계약 Module.
+- Canvas Tool Gesture Routing: built-in tool과 custom tool을 pointer gesture, feature gate, item pointer rerouting rule로 변환하고 route input/defaulting contract를 소유하는 Engine-owned what 계약 Module.
 - Canvas Pointer Start Session: pointer-down 시 stage-local screen coordinate와 viewport-projected world coordinate를 start interaction Module들에 제공하는 App-owned start lifecycle Module.
 - Canvas App Pointer Input: Renderer/DOM pointer event에서 App pointer grammar가 필요한 screen point, pointer id, modifier, cancellation 함수만 명시하는 App-owned event source Interface 계약.
 - Canvas Pointer Creation Grammar: shape creation, drawing creation, custom creation, text creation gesture와 active creation interaction kind set을 소유하는 App-owned what 계약 Module.
