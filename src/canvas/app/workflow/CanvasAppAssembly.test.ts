@@ -144,6 +144,40 @@ describe('CanvasAppAssembly', () => {
     expect(assembly.componentPresentationRenderers['note-card']).toBeDefined()
   })
 
+  it('rejects component library presentations without renderers', () => {
+    const componentLibrary = createCanvasComponentLibrary({
+      templates: [
+        {
+          id: 'risk',
+          label: '!',
+          title: 'Risk',
+          w: 180,
+          h: 96,
+          fill: '#fff7ed',
+          stroke: '#fb923c',
+          accent: '#ea580c',
+          presentation: 'risk-card',
+        },
+      ],
+    })
+    const renderRisk: CanvasDemoSvgComponentRendererStrategy = ({ item }) =>
+      item.title
+
+    expect(() =>
+      createCanvasAppAssembly({
+        componentLibrary,
+      }),
+    ).toThrow('Missing canvas app component presentation renderer: risk-card')
+    expect(
+      createCanvasAppAssembly({
+        componentLibrary,
+        componentPresentationRenderers: {
+          'risk-card': renderRisk,
+        },
+      }).componentPresentationRenderers['risk-card'],
+    ).toBe(renderRisk)
+  })
+
   it('rejects direct extension ids outside the app extension id contract', () => {
     expect(() =>
       createCanvasAppAssembly({

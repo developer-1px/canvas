@@ -152,7 +152,21 @@ export function createCanvasAppAssembly(
     entries: assembly.componentPresentationRenderers,
     label: 'component presentation renderer',
   })
+  assertCanvasComponentPresentationRendererCoverage(assembly)
   assertCanvasAppCustomCreationTools(assembly.customCreationTools)
 
   return assembly
+}
+
+function assertCanvasComponentPresentationRendererCoverage({
+  componentLibrary,
+  componentPresentationRenderers,
+}: CanvasAppAssembly) {
+  for (const template of componentLibrary.templates) {
+    if (!Object.hasOwn(componentPresentationRenderers, template.presentation)) {
+      throw new Error(
+        `Missing canvas app component presentation renderer: ${template.presentation}`,
+      )
+    }
+  }
 }

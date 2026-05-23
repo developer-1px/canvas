@@ -23,11 +23,11 @@ The canvas code is intended to work as a reusable component factory, not as one 
 1. `src/canvas/renderer` owns SVG stage and overlay orchestration only. It accepts an injected item layer and does not import Demo `CanvasItem`, Host read helpers, or the Canvas Component Library.
 2. `src/canvas/app/rendering` owns the Demo SVG Item Layer Adapter. It converts Demo `CanvasItem` trees and component presentation keys into SVG children for the Renderer Adapter.
 3. `src/canvas/app/workflow` owns App Model modules. Workspace, interaction, text editor, and find/replace state are hidden behind workflow hooks before props reach the App Shell.
-4. `CanvasAppAssembly` is the composition seam for product-specific meaning: concrete Host item adapters, component library, custom commands, custom creation tools, custom item renderers, custom item validators, inspector panels, initial items, and SVG presentation registry are injected there instead of being hard-wired across workflow code.
+4. `CanvasAppAssembly` is the composition seam for product-specific meaning: concrete Host item adapters, component library, custom commands, custom creation tools, component presentation renderers, custom item renderers, custom item validators, inspector panels, initial items, and SVG presentation registry are injected there instead of being hard-wired across workflow code.
 5. Host document behavior is exposed through the explicit `CanvasDocumentController` interface. zod-crud document, JSON Patch, selection snapshot, and clipboard internals stay inside `src/canvas/host/document`.
 6. Product-specific item kinds use the stable `custom` item storage envelope with JSON `data`, `kind`, and `presentation`. The SVG renderer resolves presentation through an injected custom item renderer registry, and the Host document controller runs injected validators by `kind`.
 7. `CanvasAppCustomItemModule` bundles the creation tool, renderer, validator, inspector panel, and commands for one product-specific item kind so adding a new kind has one definition unit. Each module has a stable `id`, can be disabled by Host App assembly, and duplicate or unknown extension keys fail at assembly time instead of being overwritten or ignored. Custom creation tool shortcuts also fail at assembly time when they conflict with internal canvas shortcuts or other custom tools.
-8. Canvas App extension ids, registry keys, custom item `kind`/`presentation`, and component template `id`/`presentation` use a shared lower-kebab stable id contract. Invalid module ids, command ids, tool ids, renderer keys, validator keys, inspector panel ids, persisted custom item keys, and component template keys fail at define, validation, library creation, or assembly time.
+8. Canvas App extension ids, registry keys, custom item `kind`/`presentation`, and component template `id`/`presentation` use a shared lower-kebab stable id contract. Invalid module ids, command ids, tool ids, renderer keys, validator keys, inspector panel ids, persisted custom item keys, and component template keys fail at define, validation, library creation, or assembly time. Component library presentation keys without an assembled component presentation renderer fail at assembly time.
 9. Architecture guardrails verify the seams with tests.
 
 ## Consequences
@@ -35,6 +35,7 @@ The canvas code is intended to work as a reusable component factory, not as one 
 - A different Host item model can reuse `CanvasSvgStage` by supplying a different item layer.
 - Adding a Demo component kind that reuses an existing presentation remains a Canvas Component Library change.
 - Adding a new SVG presentation is assembled as a Canvas App Assembly extension or override, not as a Renderer Stage change.
+- A Canvas Component Library template cannot introduce a presentation key without an assembled renderer.
 - App Shell stays a layout composition layer.
 - Internal document implementation can change without touching app document hooks.
 - Custom component kinds and SVG presentation strategies can be assembled outside the internal canvas grammar without editing Renderer Stage or App workflow.
