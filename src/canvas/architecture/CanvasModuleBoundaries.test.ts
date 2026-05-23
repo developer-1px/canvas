@@ -2002,6 +2002,9 @@ describe('Canvas module boundaries', () => {
     const systemShortcutFile = getSourceFile(
       'src/canvas/app/keyboard/CanvasKeyboardSystemShortcuts.ts',
     )
+    const systemDispatchFile = getSourceFile(
+      'src/canvas/app/keyboard/CanvasKeyboardSystemDispatch.ts',
+    )
     const toolIntentFile = getSourceFile(
       'src/canvas/app/keyboard/CanvasKeyboardToolShortcutIntent.ts',
     )
@@ -2018,6 +2021,9 @@ describe('Canvas module boundaries', () => {
     expect(routerFile.source).toContain(
       "from './CanvasKeyboardCommandDispatch'",
     )
+    expect(routerFile.source).toContain(
+      "from './CanvasKeyboardSystemDispatch'",
+    )
     expect(routerFile.source).not.toContain('config.shortcuts.temporaryPan')
     expect(routerFile.source).not.toContain(
       'matchesCanvasAppCustomToolShortcut',
@@ -2027,6 +2033,9 @@ describe('Canvas module boundaries', () => {
     expect(routerFile.source).not.toContain(
       'handlers.reorderSelection(',
     )
+    expect(routerFile.source).not.toContain('handlers.openFindReplace()')
+    expect(routerFile.source).not.toContain('handlers.setSpaceDown(true)')
+    expect(routerFile.source).not.toContain('handlers.commitSelection([])')
     expect(routerFile.source).not.toContain("event.key.startsWith('Arrow')")
     expect(routerFile.source).not.toContain("key === 'z'")
     expect(intentFile.source).toContain(
@@ -2117,6 +2126,17 @@ describe('Canvas module boundaries', () => {
     expect(systemShortcutFile.source).toContain("shortcutId: 'findReplace'")
     expect(systemShortcutFile.source).toContain("shortcutId: 'temporaryPan'")
     expect(systemShortcutFile.source).toContain("shortcutId: 'escape'")
+    expect(systemDispatchFile.source).toContain(
+      'export function runCanvasKeyboardSystemIntent',
+    )
+    expect(systemDispatchFile.source).toContain(
+      'export function isCanvasKeyboardSystemIntent',
+    )
+    expect(systemDispatchFile.source).toContain(
+      "case 'open-find-replace'",
+    )
+    expect(systemDispatchFile.source).toContain("case 'escape'")
+    expect(systemDispatchFile.source).toContain('commitSelection([])')
     expect(toolIntentFile.source).toContain(
       'export function getCanvasKeyboardToolShortcutIntent',
     )

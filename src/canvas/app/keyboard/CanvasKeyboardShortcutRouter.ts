@@ -1,20 +1,4 @@
-import type {
-  Dispatch,
-  MutableRefObject,
-  SetStateAction,
-} from 'react'
-import type {
-  CanvasAffordanceConfig,
-  CanvasDraftArrowOverlay,
-  CanvasDraftStrokeOverlay,
-} from '../../engine'
-import type {
-  Bounds,
-  EditingText,
-  Tool,
-} from '../../entities'
-import type { Interaction } from '../pointer/CanvasInteractionState'
-import type { CommitCanvasSelection } from '../workflow/CanvasWorkflowContract'
+import type { CanvasAffordanceConfig } from '../../engine'
 import type { CanvasAppCustomCreationToolState } from '../tools/CanvasAppCustomCreationToolRuntime'
 import { getCanvasKeyboardShortcutIntent } from './CanvasKeyboardShortcutIntent'
 import {
@@ -22,26 +6,22 @@ import {
   runCanvasKeyboardCommandIntent,
   type CanvasKeyboardCommandHandlers,
 } from './CanvasKeyboardCommandDispatch'
+import {
+  isCanvasKeyboardSystemIntent,
+  runCanvasKeyboardSystemIntent,
+  type CanvasKeyboardSystemHandlers,
+} from './CanvasKeyboardSystemDispatch'
 
-export type CanvasKeyboardShortcutHandlers = CanvasKeyboardCommandHandlers & {
-  commitSelection: CommitCanvasSelection
-  config: CanvasAffordanceConfig
-  customCreationTools: readonly CanvasAppCustomCreationToolState[]
-  fitToItems: (ids?: string[]) => void
-  interactionRef: MutableRefObject<Interaction>
-  openFindReplace: () => void
-  resetViewport: () => void
-  selection: string[]
-  setDraftRect: Dispatch<SetStateAction<Bounds | null>>
-  setDraftArrow: Dispatch<SetStateAction<CanvasDraftArrowOverlay | null>>
-  setDraftStroke: Dispatch<SetStateAction<CanvasDraftStrokeOverlay | null>>
-  setEditing: Dispatch<SetStateAction<EditingText | null>>
-  setGesture: Dispatch<SetStateAction<Interaction['kind']>>
-  setMarquee: Dispatch<SetStateAction<Bounds | null>>
-  setSpaceDown: Dispatch<SetStateAction<boolean>>
-  setTool: Dispatch<SetStateAction<Tool>>
-  zoomBy: (multiplier: number) => void
-}
+export type CanvasKeyboardShortcutHandlers =
+  CanvasKeyboardCommandHandlers &
+  CanvasKeyboardSystemHandlers & {
+    config: CanvasAffordanceConfig
+    customCreationTools: readonly CanvasAppCustomCreationToolState[]
+    fitToItems: (ids?: string[]) => void
+    resetViewport: () => void
+    selection: string[]
+    zoomBy: (multiplier: number) => void
+  }
 
 export function handleCanvasKeyboardShortcut(
   event: globalThis.KeyboardEvent,
@@ -63,25 +43,13 @@ export function handleCanvasKeyboardShortcut(
     return
   }
 
+  if (isCanvasKeyboardSystemIntent(intent)) {
+    runCanvasKeyboardSystemIntent({ handlers, intent })
+    return
+  }
+
   switch (intent.kind) {
     case 'none':
-      return
-    case 'open-find-replace':
-      handlers.openFindReplace()
-      return
-    case 'temporary-pan':
-      handlers.setSpaceDown(true)
-      return
-    case 'escape':
-      handlers.interactionRef.current = { kind: 'none' }
-      handlers.setGesture('none')
-      handlers.setMarquee(null)
-      handlers.setDraftArrow(null)
-      handlers.setDraftRect(null)
-      handlers.setDraftStroke(null)
-      handlers.setEditing(null)
-      handlers.commitSelection([])
-      handlers.setTool('select')
       return
     case 'zoom-by':
       handlers.zoomBy(intent.multiplier)
