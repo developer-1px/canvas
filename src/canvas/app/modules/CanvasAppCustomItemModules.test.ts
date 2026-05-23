@@ -4,6 +4,7 @@ import {
   defineCanvasAppCustomItemModule,
   type CanvasAppCustomItemModule,
 } from './CanvasAppCustomItemModules'
+import type { CanvasAppCustomCreationToolContext } from '../tools/CanvasAppCustomCreationTools'
 
 const renderRisk = () => 'risk'
 const validateRisk = () => true
@@ -24,7 +25,7 @@ describe('CanvasAppCustomItemModules', () => {
           id: 'risk',
           label: '!',
           title: 'Risk',
-          createItem: ({ startWorld }) => ({
+          createItem: ({ startWorld }: CanvasAppCustomCreationToolContext) => ({
             title: 'Risk',
             x: startWorld.x,
             y: startWorld.y,
@@ -85,7 +86,7 @@ describe('CanvasAppCustomItemModules', () => {
           id: 'risk',
           label: '!',
           title: 'Risk',
-          createItem: ({ startWorld }) => ({
+          createItem: ({ startWorld }: CanvasAppCustomCreationToolContext) => ({
             title: 'Risk',
             x: startWorld.x,
             y: startWorld.y,
@@ -210,6 +211,61 @@ describe('CanvasAppCustomItemModules', () => {
     ).toThrow(
       'Duplicate canvas app custom creation tool shortcut: risk and dependency use Shift+E',
     )
+  })
+
+  it('contains invalid module-owned creation output before commit', () => {
+    const invalidJsonModule = defineRiskModule({
+      customCreationTools: [
+        {
+          id: 'risk',
+          label: '!',
+          title: 'Risk',
+          createItem: ({ startWorld }: CanvasAppCustomCreationToolContext) => ({
+            title: 'Risk',
+            x: startWorld.x,
+            y: startWorld.y,
+            w: 120,
+            h: 80,
+            data: {
+              run: () => undefined,
+            },
+          }),
+        },
+      ],
+    } as unknown as CanvasAppCustomItemModule)
+    const invalidDomainModule = defineRiskModule({
+      customCreationTools: [
+        {
+          id: 'risk',
+          label: '!',
+          title: 'Risk',
+          createItem: ({ startWorld }) => ({
+            title: 'Risk',
+            x: startWorld.x,
+            y: startWorld.y,
+            w: 120,
+            h: 80,
+            data: { severity: 'low' },
+          }),
+        },
+      ],
+      validateItem: (item) => item.data.severity === 'high',
+    })
+    const context = {
+      createId: (prefix: string) => `${prefix}-1`,
+      currentWorld: { x: 100, y: 140 },
+      moved: false,
+      startWorld: { x: 80, y: 120 },
+    }
+
+    expect(
+      createCanvasAppCustomItemModuleAssembly([invalidJsonModule])
+        .customCreationTools[0]?.createItem(context),
+    ).toBeNull()
+    expect(
+      createCanvasAppCustomItemModuleAssembly([invalidDomainModule])
+        .customCreationTools[0]?.createItem(context),
+    ).toBeNull()
   })
 })
 

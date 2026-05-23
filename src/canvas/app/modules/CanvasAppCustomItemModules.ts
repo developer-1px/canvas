@@ -2,9 +2,10 @@ import type {
   Bounds,
   CanvasJsonObject,
 } from '../../entities'
-import type {
-  CanvasCustomItemValidator,
-  CanvasCustomItemValidators,
+import {
+  normalizeCanvasItems,
+  type CanvasCustomItemValidator,
+  type CanvasCustomItemValidators,
 } from '../../host'
 import type { CanvasAppCustomCommand } from '../commands/CanvasAppCustomCommands'
 import {
@@ -206,21 +207,40 @@ function getCanvasAppCustomItemModuleCreationTools({
   customCreationTools = [],
   id,
   presentation,
+  validateItem,
 }: CanvasAppCustomItemModule): readonly CanvasAppCustomCreationTool[] {
   return customCreationTools.map((tool) => ({
     ...tool,
     createItem: (context) => {
       const item = tool.createItem(context)
 
-      return item
-        ? {
-            ...item,
-            id: context.createId(id),
-            kind: id,
-            presentation,
-            type: 'custom',
-          }
-        : null
+      if (!item) {
+        return null
+      }
+
+      const customItem = {
+        ...item,
+        id: context.createId(id),
+        kind: id,
+        presentation,
+        type: 'custom',
+      } as const
+
+      try {
+        normalizeCanvasItems([customItem], {
+          customItemValidators: {
+            [id]: getCanvasAppCustomItemModuleValidator({
+              id,
+              presentation,
+              validateItem,
+            }),
+          },
+        })
+
+        return customItem
+      } catch {
+        return null
+      }
     },
   }))
 }
@@ -240,11 +260,23 @@ function getCanvasAppCustomItemModuleValidators({
   validateItem,
 }: CanvasAppCustomItemModule): CanvasCustomItemValidators {
   return {
-    [id]: (item) =>
-      item.kind === id &&
-      item.presentation === presentation &&
-      validateItem(item),
+    [id]: getCanvasAppCustomItemModuleValidator({
+      id,
+      presentation,
+      validateItem,
+    }),
   }
+}
+
+function getCanvasAppCustomItemModuleValidator({
+  id,
+  presentation,
+  validateItem,
+}: Pick<CanvasAppCustomItemModule, 'id' | 'presentation' | 'validateItem'>) {
+  return (item: Parameters<CanvasCustomItemValidator>[0]) =>
+    item.kind === id &&
+    item.presentation === presentation &&
+    validateItem(item)
 }
 
 function assertUniqueModuleIds(modules: readonly CanvasAppCustomItemModule[]) {
