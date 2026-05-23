@@ -945,6 +945,9 @@ describe('Canvas module boundaries', () => {
     const stageElementConsumerModelFile = getSourceFile(
       'src/canvas/app/workflow/CanvasAppStageElementConsumerModel.ts',
     )
+    const stageElementConsumerContractsFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppStageElementConsumerContracts.ts',
+    )
 
     expect(appModelFile.source).toContain(
       "from './useCanvasAppStageElementModel'",
@@ -958,6 +961,24 @@ describe('Canvas module boundaries', () => {
     )
     expect(stageElementModelFile.source).toContain(
       "from './CanvasAppStageElementConsumerModel'",
+    )
+    expect(stageElementConsumerModelFile.source).toContain(
+      "from './CanvasAppStageElementConsumerContracts'",
+    )
+    expect(stageElementConsumerModelFile.source).toContain(
+      '): CanvasAppStageElementConsumerModel',
+    )
+    expect(stageElementConsumerModelFile.source).not.toContain(
+      'CanvasAppStageElementController',
+    )
+    expect(stageElementConsumerContractsFile.source).toContain(
+      'export type CanvasAppStageElementConsumerModelInput',
+    )
+    expect(stageElementConsumerContractsFile.source).toContain(
+      'export type CanvasAppStageElementConsumerModel',
+    )
+    expect(stageElementConsumerContractsFile.source).toContain(
+      "CanvasAppStageElementController['mount']",
     )
     for (const consumerContext of [
       'command: {',
@@ -1959,6 +1980,9 @@ describe('Canvas module boundaries', () => {
     const interactionConsumerModelFile = getSourceFile(
       'src/canvas/app/workflow/CanvasInteractionConsumerModel.ts',
     )
+    const interactionConsumerContractsFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasInteractionConsumerContracts.ts',
+    )
 
     expect(appModelFile.source).toContain(
       "from './useCanvasInteractionModel'",
@@ -1990,6 +2014,33 @@ describe('Canvas module boundaries', () => {
     expect(interactionModelFile.source).toContain(
       "from './CanvasInteractionConsumerModel'",
     )
+    expect(interactionConsumerModelFile.source).toContain(
+      "from './CanvasInteractionConsumerContracts'",
+    )
+    expect(interactionConsumerModelFile.source).toContain(
+      '): CanvasInteractionConsumerModel',
+    )
+    expect(interactionConsumerModelFile.source).not.toContain(
+      'export type CanvasInteractionConsumerModelInput',
+    )
+    expect(interactionConsumerModelFile.source).not.toContain('Dispatch')
+    expect(interactionConsumerContractsFile.source).toContain(
+      'export type CanvasInteractionConsumerModelInput',
+    )
+    expect(interactionConsumerContractsFile.source).toContain(
+      'export type CanvasInteractionConsumerModel',
+    )
+    for (const interactionConsumerContract of [
+      'CanvasInteractionComponentContext',
+      'CanvasInteractionControlContext',
+      'CanvasInteractionKeyboardContext',
+      'CanvasInteractionPointerContext',
+      'CanvasInteractionStageContext',
+    ]) {
+      expect(interactionConsumerContractsFile.source).toContain(
+        `export type ${interactionConsumerContract}`,
+      )
+    }
     expect(interactionConsumerModelFile.source).toContain(
       'export function getCanvasInteractionConsumerModel',
     )

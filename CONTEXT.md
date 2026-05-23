@@ -50,6 +50,7 @@
 - Canvas App Stage Element: stage DOM element의 bounds, pointer capture, wheel listener를 한 Module에 숨기는 App-owned element Adapter.
 - Canvas App Stage Element Model: App Model이 Stage Element Adapter 생성 세부를 직접 알지 않도록 숨기는 workflow Module.
 - Canvas App Stage Element Consumer Model: Stage Element Adapter를 command, component, pointer, viewport, stage render consumer별 context로 변환하는 workflow Module.
+- Canvas App Stage Element Consumer Contracts: Stage Element Controller fan-out의 입력과 consumer별 출력 Interface를 명시하고 stage render에는 mount Interface만 노출되도록 고정하는 workflow type 계약.
 - Canvas App Item Layer Adapter: App workflow가 concrete Demo SVG item layer를 직접 알지 않고 items를 stage children으로 렌더링하도록 주입받는 Adapter Interface.
 - Canvas App Extension Id: custom command, creation tool, item module, component presentation renderer key, custom item renderer key, validator key, inspector panel에서 공유하는 안정 lower-kebab 외부 계약.
 - Canvas App Extension Registry: assembly 단계에서 extension entry와 record key를 검증하고 중복을 실패시키는 내부 merge 계약.
@@ -189,6 +190,7 @@
 - Canvas Keyboard Tool Shortcut Intent: built-in tool shortcut precedence와 custom creation tool shortcut matching을 소유하는 App-owned runtime Module.
 - Canvas Interaction Model: tool, gesture, marquee, draft, snap guide, overlay state 생명주기와 consumer별 interaction context를 App Shell에 숨기는 workflow Module.
 - Canvas Interaction Consumer Model: Interaction runtime state와 setter를 component, control, keyboard, pointer, stage consumer별 context로 변환하는 workflow Module.
+- Canvas Interaction Consumer Contracts: Interaction runtime state fan-out의 입력과 consumer별 출력 Interface를 명시하고, mapping 구현에서 React setter/overlay shape를 분리하는 workflow type 계약.
 - Canvas Workspace Model: Demo workspace의 저장된 snapshot, document history, viewport, read model, id 생성, persistence wiring을 App Shell에 숨기는 workflow Module.
 - Canvas Workspace Runtime Model: stored workspace fallback, App Assembly가 넘긴 initial selection, initial viewport, id generator seed, selected/read model/selected bounds derivation을 소유하는 workflow Module.
 - Canvas Workspace Consumer Model: Workspace document/read/viewport state를 command, component, control, extension, inspector, interaction, item layer, keyboard, pointer, stage, text, viewport consumer context로 변환하는 workflow Module.

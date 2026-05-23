@@ -4,11 +4,13 @@ import {
   type CanvasAppStageElementController,
 } from '../stage/CanvasAppStageElement'
 import { getCanvasAppStageElementConsumerModel } from './CanvasAppStageElementConsumerModel'
+import type { CanvasAppStageElementConsumerModelInput } from './CanvasAppStageElementConsumerContracts'
 
 describe('CanvasAppStageElementConsumerModel', () => {
   it('routes the stage element controller to DOM-dependent consumers', () => {
-    const stageElement = createStageElement()
-    const model = getCanvasAppStageElementConsumerModel({ stageElement })
+    const input = createInput()
+    const stageElement = input.stageElement
+    const model = getCanvasAppStageElementConsumerModel(input)
 
     expect(model.command.stageElement).toBe(stageElement)
     expect(model.component.stageElement).toBe(stageElement)
@@ -17,8 +19,9 @@ describe('CanvasAppStageElementConsumerModel', () => {
   })
 
   it('keeps stage render mounting on the mount interface only', () => {
-    const stageElement = createStageElement()
-    const model = getCanvasAppStageElementConsumerModel({ stageElement })
+    const input = createInput()
+    const stageElement = input.stageElement
+    const model = getCanvasAppStageElementConsumerModel(input)
     const svgElement = {} as SVGSVGElement
 
     model.stage.stageElement.ref(svgElement)
@@ -40,5 +43,11 @@ function createStageElement(): CanvasAppStageElementController {
     mount: {
       ref: vi.fn(stageElement.mount.ref),
     },
+  }
+}
+
+function createInput(): CanvasAppStageElementConsumerModelInput {
+  return {
+    stageElement: createStageElement(),
   }
 }

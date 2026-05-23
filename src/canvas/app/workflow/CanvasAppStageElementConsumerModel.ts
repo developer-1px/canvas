@@ -1,12 +1,11 @@
-import type { CanvasAppStageElementController } from '../stage/CanvasAppStageElement'
-
-type GetCanvasAppStageElementConsumerModelArgs = {
-  stageElement: CanvasAppStageElementController
-}
+import type {
+  CanvasAppStageElementConsumerModel,
+  CanvasAppStageElementConsumerModelInput,
+} from './CanvasAppStageElementConsumerContracts'
 
 export function getCanvasAppStageElementConsumerModel({
   stageElement,
-}: GetCanvasAppStageElementConsumerModelArgs) {
+}: CanvasAppStageElementConsumerModelInput): CanvasAppStageElementConsumerModel {
   return {
     command: {
       stageElement,

@@ -11,6 +11,7 @@ import type {
 import type { Tool } from '../../entities'
 import type { Interaction } from '../pointer/CanvasInteractionState'
 import { getCanvasInteractionConsumerModel } from './CanvasInteractionConsumerModel'
+import type { CanvasInteractionConsumerModelInput } from './CanvasInteractionConsumerContracts'
 
 describe('CanvasInteractionConsumerModel', () => {
   it('routes tool state to component and control consumers', () => {
@@ -96,7 +97,7 @@ function createInteractionRuntime({
   overlays?: CanvasOverlayState
   spaceDown?: boolean
   tool?: Tool
-} = {}): Parameters<typeof getCanvasInteractionConsumerModel>[0] {
+} = {}): CanvasInteractionConsumerModelInput {
   return {
     draft: {
       setDraftArrow: vi.fn(),
