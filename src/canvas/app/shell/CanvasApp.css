@@ -107,7 +107,8 @@
 .arrow-hit {
   fill: none;
   stroke: transparent;
-  stroke-width: 18;
+  stroke-linecap: round;
+  stroke-width: 28;
   pointer-events: stroke;
 }
 

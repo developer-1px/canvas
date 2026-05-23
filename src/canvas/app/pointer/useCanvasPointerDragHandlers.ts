@@ -368,7 +368,6 @@ export function useCanvasPointerDragHandlers({
         before: selection,
         after: [nextItem.id],
       })
-      setTool('select')
     }
 
     if (interaction.kind === 'draw-highlight') {
@@ -383,7 +382,6 @@ export function useCanvasPointerDragHandlers({
         before: selection,
         after: [nextItem.id],
       })
-      setTool('select')
     }
 
     if (interaction.kind === 'create-arrow') {
@@ -398,7 +396,6 @@ export function useCanvasPointerDragHandlers({
         before: selection,
         after: [nextItem.id],
       })
-      setTool('select')
     }
 
     if (interaction.kind === 'move' || interaction.kind === 'resize') {
