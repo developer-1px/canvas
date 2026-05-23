@@ -14,7 +14,7 @@
 - Entities Contract: 런타임 구현 없이 Core geometry type과 Demo canvas item type을 노출하는 type-only 계약. Runtime helper는 Core/Host/App seam에 둔다.
 - Engine Public Facade: Host App, Demo App, UI, Renderer Adapter가 Engine을 사용할 때 import하는 안정된 Module 경계.
 - Host Document Controller: Demo `CanvasItem` 문서의 history, selection, clipboard, text search, item commit을 React와 zod-crud 세부 구현 없이 제공하는 Module.
-- Canvas Document Change Patch: high-level CanvasItemsChange를 Host-owned JSON Patch factory 호출로 변환하는 change-to-patch grammar Module.
+- Canvas Document Change Patch: CanvasItemsChange별 patch builder table과 Host-owned JSON Patch factory 호출을 소유하는 change-to-patch grammar Module.
 - Canvas Document Patch Tree Diff: before/after Demo item tree를 patch factory가 쓰는 topmost changed entry, changed group entry, removal entry로 변환하는 Host-owned tree diff Module.
 - Canvas Document Reorder Patch: before/after Demo item tree의 sibling order 차이를 zod-crud JSON Patch `move` operation으로 변환하는 Host-owned patch Module.
 - Canvas Group Item: group item 판정과 recursive children 저장 shape를 소유하는 Host tree structural contract Module.

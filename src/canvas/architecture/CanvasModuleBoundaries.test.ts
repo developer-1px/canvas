@@ -3979,7 +3979,10 @@ describe('Canvas module boundaries', () => {
     expect(changePatchFile.source).toContain(
       'export function createCanvasItemsChangePatch',
     )
-    expect(changePatchFile.source).toContain('switch (change.type)')
+    expect(changePatchFile.source).toContain(
+      'CANVAS_ITEMS_CHANGE_PATCH_BUILDERS',
+    )
+    expect(changePatchFile.source).not.toContain('switch (change.type)')
     expect(changePatchFile.source).toContain('createRemoveCanvasItemsPatch')
     expect(changePatchFile.source).toContain('createReorderCanvasItemsPatch')
   })
