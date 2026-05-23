@@ -14,6 +14,13 @@ import type {
 import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
 import type { CanvasDocumentClipboard } from '../workflow/CanvasWorkflowContract'
 import type { CanvasClipboardCommandEffect } from './CanvasClipboardCommandEffects'
+import {
+  createCanvasClipboardCloneResultEffect,
+  createCanvasClipboardCutCopyOnlyResultEffect,
+  createCanvasClipboardCutSelectionResultEffect,
+  createCanvasClipboardDuplicateResultEffect,
+  createCanvasClipboardPasteResultEffect,
+} from './CanvasClipboardCommandResultEffects'
 import { getCanvasPasteOffset } from './CanvasPastePosition'
 
 export type CanvasClipboardCommand =
@@ -61,7 +68,7 @@ function planCanvasCloneCommand(
   command: Extract<CanvasClipboardCommand, { kind: 'clone' }>,
   context: CanvasClipboardCommandEffectPlanContext,
 ): CanvasClipboardCommandEffect {
-  return {
+  return createCanvasClipboardCloneResultEffect({
     clonedItems: cloneCanvasCommandItems({
       adapter: context.commandAdapter,
       createId: context.createId,
@@ -69,8 +76,7 @@ function planCanvasCloneCommand(
       items: context.items,
       offset: command.offset,
     }),
-    kind: 'clone-result',
-  }
+  })
 }
 
 function planCanvasDuplicateCommand(
@@ -88,11 +94,7 @@ function planCanvasDuplicateCommand(
   })
 
   return result
-    ? {
-        afterSelection: result.selection,
-        items: result.clones,
-        kind: 'add-items',
-      }
+    ? createCanvasClipboardDuplicateResultEffect({ result })
     : null
 }
 
@@ -125,13 +127,7 @@ function planCanvasPasteCommand(
   })
 
   return clones.length > 0
-    ? {
-        afterSelection: clones.map((item) => item.id),
-        items: clones,
-        kind: 'add-items',
-        nextPasteIndex: pasteIndex + 1,
-        updateClipboardItems: clones,
-      }
+    ? createCanvasClipboardPasteResultEffect({ items: clones, pasteIndex })
     : null
 }
 
@@ -151,16 +147,11 @@ function planCanvasCutCommand(
   const copyBeforeDelete = context.config.commands.copy
 
   return deletion
-    ? {
-        clearEditingIds: deletion.clearEditingIds,
+    ? createCanvasClipboardCutSelectionResultEffect({
         copyBeforeDelete,
-        deletionSelection: deletion.selection,
-        kind: 'cut-selection',
-      }
-    : {
-        copyBeforeDelete,
-        kind: 'cut-copy-only',
-      }
+        deletion,
+      })
+    : createCanvasClipboardCutCopyOnlyResultEffect({ copyBeforeDelete })
 }
 
 function assertUnhandledCanvasClipboardCommand(
