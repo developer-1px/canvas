@@ -12,6 +12,7 @@ export {
 export type {
   CanvasCommandAffordance,
   CanvasToolAffordance,
+  CanvasToolKeyboardShortcut,
 } from './CanvasAffordanceMetadata'
 export type {
   CanvasAffordanceConfig,

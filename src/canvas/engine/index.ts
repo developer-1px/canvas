@@ -14,6 +14,7 @@ export {
   type CanvasOverlayId,
   type CanvasShortcutId,
   type CanvasToolAffordance,
+  type CanvasToolKeyboardShortcut,
 } from './affordance/CanvasAffordances'
 export {
   CANVAS_COMMAND_INSERT_OFFSET,

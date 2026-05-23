@@ -155,6 +155,7 @@ export {
   type CanvasTransformAdapter,
   type CanvasTransformItem,
   type CanvasToolAffordance,
+  type CanvasToolKeyboardShortcut,
   type CanvasWheelInput,
   type DeleteCanvasCommandResult,
   type DuplicateCanvasCommandResult,

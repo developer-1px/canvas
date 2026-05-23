@@ -2,13 +2,24 @@ import type {
   CanvasBuiltinTool,
   CanvasInteractionKind,
 } from '../../core'
-import type { CanvasCommandId } from './CanvasAffordanceTypes'
+import type {
+  CanvasCommandId,
+  CanvasShortcutId,
+} from './CanvasAffordanceTypes'
 
 export type CanvasToolAffordance = Readonly<{
   ariaLabel: string
+  keyboardShortcut: CanvasToolKeyboardShortcut
   shortcut: string
   statusLabel: string
   title: string
+}>
+
+export type CanvasToolKeyboardShortcut = Readonly<{
+  key: string
+  shiftInsensitive?: boolean
+  shiftKey?: boolean
+  shortcutId: CanvasShortcutId
 }>
 
 export type CanvasCommandAffordance = Readonly<{
@@ -29,42 +40,76 @@ export const CANVAS_TOOL_AFFORDANCE_ORDER = Object.freeze([
 export const CANVAS_TOOL_AFFORDANCES = Object.freeze({
   arrow: Object.freeze({
     ariaLabel: 'Arrow tool',
+    keyboardShortcut: Object.freeze({
+      key: 'l',
+      shiftInsensitive: true,
+      shortcutId: 'arrowTool',
+    }),
     shortcut: 'L',
     statusLabel: 'Arrow',
     title: 'Arrow (L)',
   }),
   highlight: Object.freeze({
     ariaLabel: 'Highlighter tool',
+    keyboardShortcut: Object.freeze({
+      key: 'm',
+      shiftKey: true,
+      shortcutId: 'highlighterTool',
+    }),
     shortcut: 'Shift+M',
     statusLabel: 'Highlight',
     title: 'Highlighter (Shift+M)',
   }),
   marker: Object.freeze({
     ariaLabel: 'Marker tool',
+    keyboardShortcut: Object.freeze({
+      key: 'm',
+      shortcutId: 'markerTool',
+    }),
     shortcut: 'M',
     statusLabel: 'Marker',
     title: 'Marker (M)',
   }),
   pan: Object.freeze({
     ariaLabel: 'Pan tool',
+    keyboardShortcut: Object.freeze({
+      key: 'h',
+      shiftInsensitive: true,
+      shortcutId: 'panTool',
+    }),
     shortcut: 'H',
     statusLabel: 'Pan',
     title: 'Pan (H)',
   }),
   rect: Object.freeze({
     ariaLabel: 'Rectangle tool',
+    keyboardShortcut: Object.freeze({
+      key: 'r',
+      shiftInsensitive: true,
+      shortcutId: 'rectTool',
+    }),
     shortcut: 'R',
     statusLabel: 'Rect',
     title: 'Rectangle (R)',
   }),
   select: Object.freeze({
     ariaLabel: 'Select tool',
+    keyboardShortcut: Object.freeze({
+      key: 'v',
+      shiftInsensitive: true,
+      shortcutId: 'selectTool',
+    }),
     shortcut: 'V',
     statusLabel: 'Select',
     title: 'Select (V)',
   }),
   text: Object.freeze({
     ariaLabel: 'Text tool',
+    keyboardShortcut: Object.freeze({
+      key: 't',
+      shiftInsensitive: true,
+      shortcutId: 'textTool',
+    }),
     shortcut: 'T',
     statusLabel: 'Text',
     title: 'Text (T)',

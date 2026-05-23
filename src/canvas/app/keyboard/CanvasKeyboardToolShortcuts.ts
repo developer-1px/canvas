@@ -1,6 +1,10 @@
 import type {
   CanvasAffordanceConfig,
-  CanvasShortcutId,
+  CanvasToolKeyboardShortcut,
+} from '../../engine'
+import {
+  CANVAS_TOOL_AFFORDANCE_ORDER,
+  CANVAS_TOOL_AFFORDANCES,
 } from '../../engine'
 import type {
   CanvasBuiltinTool,
@@ -15,61 +19,13 @@ import {
 
 type CanvasKeyboardToolShortcut = {
   label: string
-  shortcut: CanvasKeyboardShortcutChord
-  shortcutId: CanvasShortcutId
+  shortcut: CanvasToolKeyboardShortcut
   shiftInsensitive?: boolean
   tool: CanvasBuiltinTool
 }
 
-const CANVAS_KEYBOARD_TOOL_SHORTCUTS = [
-  {
-    label: 'select tool',
-    shortcut: { key: 'v' },
-    shortcutId: 'selectTool',
-    shiftInsensitive: true,
-    tool: 'select',
-  },
-  {
-    label: 'pan tool',
-    shortcut: { key: 'h' },
-    shortcutId: 'panTool',
-    shiftInsensitive: true,
-    tool: 'pan',
-  },
-  {
-    label: 'highlighter tool',
-    shortcut: { key: 'm', shiftKey: true },
-    shortcutId: 'highlighterTool',
-    tool: 'highlight',
-  },
-  {
-    label: 'marker tool',
-    shortcut: { key: 'm' },
-    shortcutId: 'markerTool',
-    tool: 'marker',
-  },
-  {
-    label: 'arrow tool',
-    shortcut: { key: 'l' },
-    shortcutId: 'arrowTool',
-    shiftInsensitive: true,
-    tool: 'arrow',
-  },
-  {
-    label: 'rectangle tool',
-    shortcut: { key: 'r' },
-    shortcutId: 'rectTool',
-    shiftInsensitive: true,
-    tool: 'rect',
-  },
-  {
-    label: 'text tool',
-    shortcut: { key: 't' },
-    shortcutId: 'textTool',
-    shiftInsensitive: true,
-    tool: 'text',
-  },
-] satisfies readonly CanvasKeyboardToolShortcut[]
+const CANVAS_KEYBOARD_TOOL_SHORTCUTS =
+  CANVAS_TOOL_AFFORDANCE_ORDER.map(getCanvasKeyboardToolShortcut)
 
 export function getCanvasKeyboardBuiltinToolShortcut({
   config,
@@ -90,10 +46,29 @@ export function getCanvasKeyboardBuiltinToolShortcut({
 export function getCanvasKeyboardReservedToolShortcuts():
   CanvasKeyboardReservedShortcut[] {
   return CANVAS_KEYBOARD_TOOL_SHORTCUTS.flatMap((shortcut) =>
-    reserveCanvasKeyboardShortcut(shortcut.label, shortcut.shortcut, {
-      shiftInsensitive: shortcut.shiftInsensitive,
-    }),
+    reserveCanvasKeyboardShortcut(
+      shortcut.label,
+      toCanvasKeyboardShortcutChord(shortcut.shortcut),
+      {
+        shiftInsensitive: shortcut.shiftInsensitive,
+      },
+    ),
   )
+}
+
+function getCanvasKeyboardToolShortcut(
+  tool: CanvasBuiltinTool,
+): CanvasKeyboardToolShortcut {
+  const affordance = CANVAS_TOOL_AFFORDANCES[tool]
+  const keyboardShortcut: CanvasToolKeyboardShortcut =
+    affordance.keyboardShortcut
+
+  return {
+    label: affordance.ariaLabel.toLowerCase(),
+    shortcut: keyboardShortcut,
+    shiftInsensitive: keyboardShortcut.shiftInsensitive,
+    tool,
+  }
 }
 
 function isCanvasKeyboardToolShortcutMatch({
@@ -107,7 +82,10 @@ function isCanvasKeyboardToolShortcutMatch({
   key: string
   shortcut: CanvasKeyboardToolShortcut
 }) {
-  if (!config.shortcuts[shortcut.shortcutId] || !config.tools[shortcut.tool]) {
+  if (
+    !config.shortcuts[shortcut.shortcut.shortcutId] ||
+    !config.tools[shortcut.tool]
+  ) {
     return false
   }
 
@@ -123,4 +101,12 @@ function isCanvasKeyboardToolShortcutMatch({
   }
 
   return event.shiftKey === (shortcut.shortcut.shiftKey ?? false)
+}
+
+function toCanvasKeyboardShortcutChord(
+  shortcut: CanvasToolKeyboardShortcut,
+): CanvasKeyboardShortcutChord {
+  return shortcut.shiftKey === undefined
+    ? { key: shortcut.key }
+    : { key: shortcut.key, shiftKey: shortcut.shiftKey }
 }

@@ -2079,8 +2079,13 @@ describe('Canvas module boundaries', () => {
     expect(toolShortcutFile.source).toContain(
       'export function getCanvasKeyboardReservedToolShortcuts',
     )
-    expect(toolShortcutFile.source).toContain("shortcutId: 'selectTool'")
-    expect(toolShortcutFile.source).toContain("shortcutId: 'markerTool'")
+    expect(toolShortcutFile.source).toContain('CANVAS_TOOL_AFFORDANCES')
+    expect(toolShortcutFile.source).toContain('CANVAS_TOOL_AFFORDANCE_ORDER')
+    expect(toolShortcutFile.source).not.toContain("shortcutId: 'selectTool'")
+    expect(toolShortcutFile.source).not.toContain("shortcutId: 'markerTool'")
+    expect(toolShortcutFile.source).not.toContain("tool: 'select'")
+    expect(toolShortcutFile.source).not.toContain("key: 'v'")
+    expect(toolShortcutFile.source).not.toContain("key: 'm'")
     expect(reservedShortcutFile.source).toContain(
       'export function getCanvasKeyboardReservedShortcuts',
     )
