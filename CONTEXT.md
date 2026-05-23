@@ -25,6 +25,7 @@
 - Canvas App Assembly: 내부 캔버스 문법은 유지하면서 Host item adapter, component library, custom item module, initial items, SVG presentation registry 같은 제품별 의미를 외부에서 조립하는 composition Module.
 - Canvas App Assembly Input: Canvas App Assembly output을 `Partial`로 노출하지 않고 Host가 조립할 수 있는 필드만 명시한 외부 입력 계약.
 - Canvas App Assembly Model: App Model이 assembly output field를 직접 해체하지 않고 command, component, control, extension, pointer, rendering, workspace context를 받도록 변환하는 workflow Module.
+- Canvas App Affordance Model: App Model이 default affordance config와 feature toggle config를 command, control, interaction, keyboard, pointer, viewport에 직접 fan-out하지 않도록 consumer별 affordance context를 만드는 workflow Module.
 - Canvas App Assembly Contracts: assembly output의 component library consistency, renderer coverage, extension registry, item adapter shape, initial item validity를 검증하는 App-owned contract Module.
 - Canvas App Assembly Snapshot: 조립된 assembly output을 외부 mutation에서 보호하기 위해 component library, extension registry, initial item, adapter를 snapshot/freeze 하는 App-owned Module.
 - Canvas App Rendering Contracts: 외부 조립자가 component/custom item renderer를 등록할 때 쓰는 App-owned authoring Interface. Demo SVG registry type name에 기대지 않는다.
@@ -140,6 +141,7 @@
 - Canvas App Assembly는 주입된 Canvas Component Library의 `templates`, `getTemplate`, `getPresentation` 결과가 일관되지 않으면 실패해야 한다.
 - Canvas App Assembly input은 output type을 부분 노출하지 않고 명시적 필드 계약으로 유지한다.
 - App Model은 Canvas App Assembly output field를 직접 배분하지 않고 Canvas App Assembly Model에서 consumer별 assembly context를 받는다.
+- App Model은 Canvas Affordance config를 직접 fan-out하지 않고 Canvas App Affordance Model에서 consumer별 affordance context를 받는다.
 - Canvas App Assembly composition, output contract validation, output snapshot/freeze는 분리하고, validation은 Canvas App Assembly Contracts가, mutation 방어는 Canvas App Assembly Snapshot이 소유한다.
 - Canvas App Custom Item Module define, Canvas App Custom Item Module Assembly, Canvas App Assembly는 외부 descriptor/adapter/item mutation이 define/조립 후 동작을 바꾸지 않도록 snapshot을 보관한다.
 - Canvas App Assembly의 component presentation renderer input은 기본 registry를 대체하지 않고 extension/override로 합성한다.

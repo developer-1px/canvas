@@ -1,7 +1,5 @@
 import { useMemo } from 'react'
-import {
-  DEFAULT_CANVAS_AFFORDANCE_CONFIG,
-} from '../../engine'
+import { getCanvasAppAffordanceModel } from './CanvasAppAffordanceModel'
 import { getCanvasAppAssemblyModel } from './CanvasAppAssemblyModel'
 import { getCanvasAppControlModel } from './CanvasAppControlModel'
 import { renderCanvasAppStageModel } from './CanvasAppStageModel'
@@ -22,13 +20,12 @@ import {
   type CanvasAppAssembly,
 } from './CanvasAppAssembly'
 
-const canvasAffordanceConfig = DEFAULT_CANVAS_AFFORDANCE_CONFIG
-
 export function useCanvasAppModel({
   assembly = DEFAULT_CANVAS_APP_ASSEMBLY,
 }: {
   assembly?: CanvasAppAssembly
 } = {}) {
+  const affordance = useMemo(() => getCanvasAppAffordanceModel(), [])
   const appAssembly = useMemo(
     () => getCanvasAppAssemblyModel(assertCanvasAppAssembly(assembly)),
     [assembly],
@@ -36,7 +33,7 @@ export function useCanvasAppModel({
   const stageElement = useCanvasAppStageElementModel()
   const workspace = useCanvasWorkspaceModel(appAssembly.workspace)
   const interaction = useCanvasInteractionModel({
-    config: canvasAffordanceConfig,
+    ...affordance.interaction,
     ...workspace.interaction,
   })
 
@@ -55,7 +52,7 @@ export function useCanvasAppModel({
 
   const commands = useCanvasAppCommandModel({
     ...appAssembly.command,
-    config: canvasAffordanceConfig,
+    ...affordance.command,
     createId: workspace.command.createId,
     document: workspace.command.document,
     ...text.command,
@@ -64,7 +61,7 @@ export function useCanvasAppModel({
   })
 
   const viewportControls = useCanvasAppViewportModel({
-    config: canvasAffordanceConfig,
+    ...affordance.viewport,
     ...workspace.viewport,
     ...stageElement.viewport,
   })
@@ -74,7 +71,7 @@ export function useCanvasAppModel({
       ...workspace.keyboard.command,
       ...commands.keyboard,
     },
-    config: canvasAffordanceConfig,
+    ...affordance.keyboard,
     ...extension.keyboard,
     ...text.keyboard,
     interaction: {
@@ -90,7 +87,7 @@ export function useCanvasAppModel({
       ...commands.pointer,
       ...workspace.pointer.command,
     },
-    config: canvasAffordanceConfig,
+    ...affordance.pointer,
     createId: workspace.pointer.createId,
     ...extension.pointer,
     interaction: interaction.pointer,
@@ -117,7 +114,7 @@ export function useCanvasAppModel({
   const controls = getCanvasAppControlModel({
     ...workspace.control,
     ...appAssembly.control,
-    config: canvasAffordanceConfig,
+    ...affordance.control,
     ...extension.control,
     gesture: interaction.control.gesture,
     tool: interaction.control.tool,

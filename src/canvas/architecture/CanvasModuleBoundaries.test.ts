@@ -191,6 +191,36 @@ describe('Canvas module boundaries', () => {
     }
   })
 
+  it('keeps App Model from distributing affordance config directly', () => {
+    const appModelFile = getSourceFile(
+      'src/canvas/app/workflow/useCanvasAppModel.ts',
+    )
+    const affordanceModelFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppAffordanceModel.ts',
+    )
+
+    expect(appModelFile.source).toContain(
+      "from './CanvasAppAffordanceModel'",
+    )
+    expect(appModelFile.source).not.toContain(
+      'DEFAULT_CANVAS_AFFORDANCE_CONFIG',
+    )
+    expect(appModelFile.source).not.toContain('canvasAffordanceConfig')
+    expect(affordanceModelFile.source).toContain(
+      'DEFAULT_CANVAS_AFFORDANCE_CONFIG',
+    )
+    for (const consumerContext of [
+      'command: {',
+      'control: {',
+      'interaction: {',
+      'keyboard: {',
+      'pointer: {',
+      'viewport: {',
+    ]) {
+      expect(affordanceModelFile.source).toContain(consumerContext)
+    }
+  })
+
   it('keeps custom item registries as Assembly output, not input', () => {
     const assemblyFile = getSourceFile(
       'src/canvas/app/workflow/CanvasAppAssembly.ts',
