@@ -1,15 +1,9 @@
 import type {
   CanvasAppAssemblyAdapters,
-  CanvasAppItemAdapters,
 } from './CanvasAppAdapterContracts'
-import type { CanvasAppItemLayerAdapter } from '../rendering/CanvasAppItemLayerAdapter'
-import type { CanvasAppStageAdapter } from '../rendering/CanvasAppStageAdapter'
+import type { CanvasAppAdapterAssemblyInput } from './CanvasAppAssemblyInputTypes'
 
-export type CanvasAppAdapterAssemblyInput = {
-  itemAdapters?: CanvasAppItemAdapters
-  itemLayerAdapter?: CanvasAppItemLayerAdapter
-  stageAdapter?: CanvasAppStageAdapter
-}
+export type { CanvasAppAdapterAssemblyInput } from './CanvasAppAssemblyInputTypes'
 
 export function createCanvasAppAdapterAssembly(
   input: CanvasAppAdapterAssemblyInput,

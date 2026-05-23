@@ -1,6 +1,5 @@
 import type {
   CanvasAffordanceConfig,
-  CanvasAffordanceConfigInput,
 } from '../../engine'
 import type {
   CanvasComponentLibrary,
@@ -14,6 +13,12 @@ import type {
 import type { CanvasAppItemLayerAdapter } from '../rendering/CanvasAppItemLayerAdapter'
 import type { CanvasAppStageAdapter } from '../rendering/CanvasAppStageAdapter'
 import type { CanvasAppItemAdapters } from './CanvasAppAdapterContracts'
+import type {
+  CanvasAppAdapterAssemblyInput,
+  CanvasAppAffordanceAssemblyInput,
+  CanvasAppComponentAssemblyInput,
+  CanvasAppWorkspaceAssemblyInput,
+} from './CanvasAppAssemblyInputTypes'
 import type { CanvasAppExtensionAssemblyInput } from './CanvasAppExtensionAssemblyTypes'
 
 export type CanvasAppAssembly = CanvasAppExtensionBundle & {
@@ -28,14 +33,9 @@ export type CanvasAppAssembly = CanvasAppExtensionBundle & {
   workspaceStorageProvider: CanvasWorkspaceStorageProvider
 }
 
-export type CanvasAppAssemblyInput = CanvasAppExtensionAssemblyInput & {
-  affordanceConfig?: CanvasAffordanceConfigInput
-  componentLibrary?: CanvasComponentLibrary
-  componentPresentationRenderers?: CanvasAppComponentPresentationRenderers
-  initialItems?: CanvasItem[]
-  initialSelection?: readonly string[]
-  itemAdapters?: CanvasAppItemAdapters
-  itemLayerAdapter?: CanvasAppItemLayerAdapter
-  stageAdapter?: CanvasAppStageAdapter
-  workspaceStorageProvider?: CanvasWorkspaceStorageProvider
-}
+export type CanvasAppAssemblyInput =
+  CanvasAppExtensionAssemblyInput &
+  CanvasAppAffordanceAssemblyInput &
+  CanvasAppComponentAssemblyInput &
+  CanvasAppAdapterAssemblyInput &
+  CanvasAppWorkspaceAssemblyInput

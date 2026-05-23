@@ -144,7 +144,10 @@ describe('Canvas module boundaries', () => {
     )
 
     expect(typeContractFile.source).toContain(
-      'export type CanvasAppAssemblyInput = CanvasAppExtensionAssemblyInput & {',
+      'export type CanvasAppAssemblyInput =',
+    )
+    expect(typeContractFile.source).toContain(
+      'CanvasAppExtensionAssemblyInput &',
     )
     expect(typeContractFile.source).not.toContain('Partial<CanvasAppAssembly>')
   })
@@ -186,7 +189,25 @@ describe('Canvas module boundaries', () => {
       "from './CanvasAppExtensionAssemblyTypes'",
     )
     expect(typeContractFile.source).toContain(
-      'export type CanvasAppAssemblyInput = CanvasAppExtensionAssemblyInput & {',
+      "from './CanvasAppAssemblyInputTypes'",
+    )
+    expect(typeContractFile.source).toContain(
+      'export type CanvasAppAssemblyInput =',
+    )
+    for (const assemblyInputContract of [
+      'CanvasAppExtensionAssemblyInput &',
+      'CanvasAppAffordanceAssemblyInput &',
+      'CanvasAppComponentAssemblyInput &',
+      'CanvasAppAdapterAssemblyInput &',
+      'CanvasAppWorkspaceAssemblyInput',
+    ]) {
+      expect(typeContractFile.source).toContain(assemblyInputContract)
+    }
+    expect(typeContractFile.source).not.toContain(
+      'affordanceConfig?: CanvasAffordanceConfigInput',
+    )
+    expect(typeContractFile.source).not.toContain(
+      'componentLibrary?: CanvasComponentLibrary',
     )
     expect(typeContractFile.source).not.toContain(
       'customCreationTools: readonly',
@@ -240,7 +261,9 @@ describe('Canvas module boundaries', () => {
       'input.componentLibrary ?? defaults.componentLibrary',
     )
     expect(componentAssemblyFile.source).not.toContain('Pick<')
-    expect(componentAssemblyFile.source).not.toContain('CanvasAppAssembly')
+    expect(componentAssemblyFile.source).not.toContain(
+      "from './CanvasAppAssembly'",
+    )
     expect(componentAssemblyFile.source).toContain(
       'CanvasAppComponentAssemblyContract',
     )
@@ -454,6 +477,9 @@ describe('Canvas module boundaries', () => {
     const typeContractFile = getSourceFile(
       'src/canvas/app/workflow/CanvasAppAssemblyTypes.ts',
     )
+    const inputContractFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppAssemblyInputTypes.ts',
+    )
     const extensionInputFile = getSourceFile(
       'src/canvas/app/workflow/CanvasAppExtensionAssemblyTypes.ts',
     )
@@ -464,7 +490,7 @@ describe('Canvas module boundaries', () => {
     expect(extensionInputFile.source).toContain(
       'customItemModules?: readonly CanvasAppCustomItemModule[]',
     )
-    expect(typeContractFile.source).toContain(
+    expect(inputContractFile.source).toContain(
       'affordanceConfig?: CanvasAffordanceConfigInput',
     )
     expect(typeContractFile.source).not.toMatch(
@@ -473,6 +499,61 @@ describe('Canvas module boundaries', () => {
     expect(extensionInputFile.source).not.toMatch(
       /\b(customCreationTools|customItemRenderers|customItemValidators)\?:/,
     )
+  })
+
+  it('keeps App Assembly child input contracts behind a named type module', () => {
+    const typeContractFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppAssemblyTypes.ts',
+    )
+    const inputContractFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppAssemblyInputTypes.ts',
+    )
+    const componentAssemblyFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppComponentAssembly.ts',
+    )
+    const adapterAssemblyFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppAdapterAssembly.ts',
+    )
+    const workspaceAssemblyFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppWorkspaceAssembly.ts',
+    )
+    const affordanceAssemblyFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppAffordanceAssembly.ts',
+    )
+
+    expect(typeContractFile.source).toContain(
+      "from './CanvasAppAssemblyInputTypes'",
+    )
+    for (const inputContract of [
+      'export type CanvasAppAffordanceAssemblyInput',
+      'export type CanvasAppComponentAssemblyInput',
+      'export type CanvasAppAdapterAssemblyInput',
+      'export type CanvasAppWorkspaceAssemblyInput',
+    ]) {
+      expect(inputContractFile.source).toContain(inputContract)
+    }
+    for (const assemblyFile of [
+      componentAssemblyFile,
+      adapterAssemblyFile,
+      workspaceAssemblyFile,
+      affordanceAssemblyFile,
+    ]) {
+      expect(assemblyFile.source).toContain(
+        "from './CanvasAppAssemblyInputTypes'",
+      )
+      expect(assemblyFile.source).not.toContain(
+        'export type CanvasAppComponentAssemblyInput = {',
+      )
+      expect(assemblyFile.source).not.toContain(
+        'export type CanvasAppAdapterAssemblyInput = {',
+      )
+      expect(assemblyFile.source).not.toContain(
+        'export type CanvasAppWorkspaceAssemblyInput = {',
+      )
+      expect(assemblyFile.source).not.toContain(
+        'export type CanvasAppAffordanceAssemblyInput = {',
+      )
+    }
   })
 
   it('keeps product-specific custom item ids outside canvas implementation', () => {
@@ -4670,7 +4751,13 @@ describe('Canvas module boundaries', () => {
       'export function createCanvasAppAdapterAssembly',
     )
     expect(adapterAssemblyFile.source).toContain(
-      'export type CanvasAppAdapterAssemblyInput',
+      "from './CanvasAppAssemblyInputTypes'",
+    )
+    expect(adapterAssemblyFile.source).toContain(
+      'export type { CanvasAppAdapterAssemblyInput }',
+    )
+    expect(adapterAssemblyFile.source).not.toContain(
+      'export type CanvasAppAdapterAssemblyInput = {',
     )
     expect(adapterAssemblyFile.source).not.toContain('Pick<')
     expect(adapterAssemblyFile.source).not.toContain(
@@ -4898,7 +4985,9 @@ describe('Canvas module boundaries', () => {
       'export type CanvasAppWorkspaceAssembly',
     )
     expect(workspaceAssemblyFile.source).not.toContain('Pick<')
-    expect(workspaceAssemblyFile.source).not.toContain('CanvasAppAssembly')
+    expect(workspaceAssemblyFile.source).not.toContain(
+      "from './CanvasAppAssembly'",
+    )
     expect(workspaceAssemblyFile.source).toContain('normalizeCanvasItems')
     expect(workspaceAssemblyFile.source).toContain(
       'input.initialItems === undefined',

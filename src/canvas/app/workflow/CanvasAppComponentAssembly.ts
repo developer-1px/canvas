@@ -1,14 +1,10 @@
-import type { CanvasComponentLibrary } from '../../host'
 import {
   createCanvasAppComponentPresentationRenderers,
-  type CanvasAppComponentPresentationRenderers,
 } from '../rendering/CanvasAppRendererRegistries'
+import type { CanvasAppComponentAssemblyInput } from './CanvasAppAssemblyInputTypes'
 import type { CanvasAppComponentAssemblyContract } from './CanvasAppComponentAssemblyContracts'
 
-export type CanvasAppComponentAssemblyInput = {
-  componentLibrary?: CanvasComponentLibrary
-  componentPresentationRenderers?: CanvasAppComponentPresentationRenderers
-}
+export type { CanvasAppComponentAssemblyInput } from './CanvasAppAssemblyInputTypes'
 
 export function createCanvasAppComponentAssembly(
   input: CanvasAppComponentAssemblyInput,

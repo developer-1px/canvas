@@ -4,17 +4,14 @@ import {
   type CanvasItem,
 } from '../../host'
 import type { CanvasWorkspaceStorageProvider } from '../document/CanvasWorkspacePersistence'
+import type { CanvasAppWorkspaceAssemblyInput } from './CanvasAppAssemblyInputTypes'
+
+export type { CanvasAppWorkspaceAssemblyInput } from './CanvasAppAssemblyInputTypes'
 
 export type CanvasAppWorkspaceAssembly = {
   initialItems: CanvasItem[]
   initialSelection: readonly string[]
   workspaceStorageProvider: CanvasWorkspaceStorageProvider
-}
-
-export type CanvasAppWorkspaceAssemblyInput = {
-  initialItems?: CanvasItem[]
-  initialSelection?: readonly string[]
-  workspaceStorageProvider?: CanvasWorkspaceStorageProvider
 }
 
 export type CanvasAppWorkspaceAssemblyOptions = {

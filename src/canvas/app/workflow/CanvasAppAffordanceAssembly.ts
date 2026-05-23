@@ -1,15 +1,13 @@
 import {
   createCanvasAffordanceConfig,
   type CanvasAffordanceConfig,
-  type CanvasAffordanceConfigInput,
 } from '../../engine'
+import type { CanvasAppAffordanceAssemblyInput } from './CanvasAppAssemblyInputTypes'
+
+export type { CanvasAppAffordanceAssemblyInput } from './CanvasAppAssemblyInputTypes'
 
 export type CanvasAppAffordanceAssembly = {
   affordanceConfig: CanvasAffordanceConfig
-}
-
-export type CanvasAppAffordanceAssemblyInput = {
-  affordanceConfig?: CanvasAffordanceConfigInput
 }
 
 export function createCanvasAppAffordanceAssembly(

@@ -29,6 +29,7 @@
 - Canvas Component Item Validation: component item의 stable component id, title/style string, optional text list 저장 shape 검증을 소유하는 Host-owned validation Module.
 - Canvas Editable Text Item: rect와 text item이 공유하는 editable target 판정, 저장 shape, edit initial value, commit fallback, patch operation을 소유하는 Host-owned text Module.
 - Canvas App Assembly: 내부 캔버스 문법은 유지하면서 affordance feature toggle, Host item adapter, component library, custom item module, initial items, SVG presentation registry 같은 제품별 의미를 외부에서 조립하는 composition Module.
+- Canvas App Assembly Input Types: affordance, component, adapter, workspace child assembly input field 계약을 runtime 조립 구현과 분리해 소유하고 Canvas App Assembly Input에 합성되는 App-owned type 계약.
 - Canvas App Assembly Types: public assembly input/output type 계약만 소유하고 runtime assembly/default/snapshot/contract Module은 이 type Module을 참조한다.
 - Canvas App Assembly Input: Canvas App Assembly output을 `Partial`로 노출하지 않고 Host가 조립할 수 있는 필드만 명시한 외부 입력 계약.
 - Canvas App Assembly Child Contract: component assembly와 adapter bundle 같은 하위 조립 seam이 full Canvas App Assembly output에서 `Pick`으로 파생하지 않고 필요한 field만 명시하는 내부 Interface 계약.
