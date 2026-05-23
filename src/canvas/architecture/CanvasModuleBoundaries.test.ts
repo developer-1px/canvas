@@ -2096,6 +2096,9 @@ describe('Canvas module boundaries', () => {
     const clipboardHookFile = getSourceFile(
       'src/canvas/app/commands/useCanvasClipboardCommands.ts',
     )
+    const clipboardHandlersFile = getSourceFile(
+      'src/canvas/app/commands/CanvasClipboardCommandHandlers.ts',
+    )
     const executionFile = getSourceFile(
       'src/canvas/app/commands/CanvasClipboardCommandExecution.ts',
     )
@@ -2108,6 +2111,24 @@ describe('Canvas module boundaries', () => {
 
     expect(clipboardHookFile.source).toContain(
       "from './CanvasClipboardCommandExecution'",
+    )
+    expect(clipboardHookFile.source).toContain(
+      "from './CanvasClipboardCommandHandlers'",
+    )
+    for (const clipboardHandlerDetail of [
+      "kind: 'clone'",
+      "kind: 'copy'",
+      "kind: 'cut'",
+      "kind: 'duplicate'",
+      "kind: 'paste'",
+      'sourceIds = selection',
+      'pasteIndex: getPasteIndex()',
+    ]) {
+      expect(clipboardHookFile.source).not.toContain(clipboardHandlerDetail)
+      expect(clipboardHandlersFile.source).toContain(clipboardHandlerDetail)
+    }
+    expect(clipboardHandlersFile.source).toContain(
+      'export function getCanvasClipboardCommandHandlers',
     )
     expect(clipboardHookFile.source).not.toContain(
       'cloneCanvasCommandItems',

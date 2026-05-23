@@ -1,5 +1,6 @@
 import {
   useCallback,
+  useMemo,
   useRef,
   type Dispatch,
   type SetStateAction,
@@ -11,7 +12,6 @@ import type {
 import type {
   CanvasItem,
   EditingText,
-  Point,
   Viewport,
 } from '../../entities'
 import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
@@ -24,6 +24,7 @@ import {
   executeCanvasClipboardCommand,
   type CanvasClipboardCommand,
 } from './CanvasClipboardCommandExecution'
+import { getCanvasClipboardCommandHandlers } from './CanvasClipboardCommandHandlers'
 
 type UseCanvasClipboardCommandsArgs = {
   commandAdapter: CanvasCommandAdapter<CanvasItem>
@@ -57,6 +58,7 @@ export function useCanvasClipboardCommands({
   viewport,
 }: UseCanvasClipboardCommandsArgs) {
   const pasteIndexRef = useRef(0)
+  const getPasteIndex = useCallback(() => pasteIndexRef.current, [])
 
   const runClipboardCommand = useCallback(
     (command: CanvasClipboardCommand) => {
@@ -102,44 +104,13 @@ export function useCanvasClipboardCommands({
     ],
   )
 
-  const cloneItems = useCallback(
-    (ids: string[], offset: Point) =>
-      runClipboardCommand({ ids, kind: 'clone', offset }),
-    [runClipboardCommand],
+  return useMemo(
+    () =>
+      getCanvasClipboardCommandHandlers({
+        getPasteIndex,
+        runClipboardCommand,
+        selection,
+      }),
+    [getPasteIndex, runClipboardCommand, selection],
   )
-
-  const duplicateSelection = useCallback(
-    (sourceIds = selection, offset?: Point) =>
-      runClipboardCommand({ kind: 'duplicate', offset, sourceIds }),
-    [runClipboardCommand, selection],
-  )
-
-  const copySelection = useCallback(() => {
-    runClipboardCommand({
-      kind: 'copy',
-      pasteIndex: pasteIndexRef.current,
-    })
-  }, [runClipboardCommand])
-
-  const pasteSelection = useCallback(() => {
-    runClipboardCommand({
-      kind: 'paste',
-      pasteIndex: pasteIndexRef.current,
-    })
-  }, [runClipboardCommand])
-
-  const cutSelection = useCallback(() => {
-    runClipboardCommand({
-      kind: 'cut',
-      pasteIndex: pasteIndexRef.current,
-    })
-  }, [runClipboardCommand])
-
-  return {
-    cloneItems,
-    copySelection,
-    cutSelection,
-    duplicateSelection,
-    pasteSelection,
-  }
 }
