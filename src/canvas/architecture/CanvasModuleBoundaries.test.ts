@@ -721,6 +721,52 @@ describe('Canvas module boundaries', () => {
     expect(itemFrameFile.source).toContain('item-outline')
   })
 
+  it('keeps Demo SVG drawing item rendering behind a named module', () => {
+    const itemLayerFile = getSourceFile(
+      'src/canvas/app/rendering/CanvasDemoSvgItemLayer.tsx',
+    )
+    const drawingRendererFile = getSourceFile(
+      'src/canvas/app/rendering/CanvasDemoSvgDrawingItemRenderer.tsx',
+    )
+
+    expect(itemLayerFile.source).toContain(
+      "from './CanvasDemoSvgDrawingItemRenderer'",
+    )
+    expect(itemLayerFile.source).not.toContain('createCanvasSvgPathData')
+    expect(itemLayerFile.source).not.toContain('CANVAS_SVG_ARROW_MARKER_IRI')
+    expect(itemLayerFile.source).not.toContain('className="arrow-item"')
+    expect(drawingRendererFile.source).toContain(
+      'export function renderCanvasDemoSvgDrawingItem',
+    )
+    expect(drawingRendererFile.source).toContain(
+      'export function isCanvasDemoSvgDrawingItem',
+    )
+    expect(drawingRendererFile.source).toContain('createCanvasSvgPathData')
+    expect(drawingRendererFile.source).toContain('CANVAS_SVG_ARROW_MARKER_IRI')
+  })
+
+  it('keeps Demo SVG rect and text item rendering behind a named module', () => {
+    const itemLayerFile = getSourceFile(
+      'src/canvas/app/rendering/CanvasDemoSvgItemLayer.tsx',
+    )
+    const rectTextRendererFile = getSourceFile(
+      'src/canvas/app/rendering/CanvasDemoSvgRectTextItemRenderer.tsx',
+    )
+
+    expect(itemLayerFile.source).toContain(
+      "from './CanvasDemoSvgRectTextItemRenderer'",
+    )
+    expect(itemLayerFile.source).not.toContain('className="rect-item"')
+    expect(itemLayerFile.source).not.toContain('canvas-rect-text')
+    expect(itemLayerFile.source).not.toContain('<foreignObject')
+    expect(rectTextRendererFile.source).toContain(
+      'export function renderCanvasDemoSvgRectTextItem',
+    )
+    expect(rectTextRendererFile.source).toContain('className="rect-item"')
+    expect(rectTextRendererFile.source).toContain('canvas-rect-text')
+    expect(rectTextRendererFile.source).toContain('<foreignObject')
+  })
+
   it('keeps Demo SVG component render fallback behind a named module', () => {
     const componentRendererFile = getSourceFile(
       'src/canvas/app/rendering/CanvasDemoSvgComponentRenderer.tsx',

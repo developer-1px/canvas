@@ -42,6 +42,8 @@
 | `src/canvas/app/rendering/CanvasAppStageAdapter.tsx` | App Shell이 stage props를 알지 않도록 stage ReactNode를 만드는 Adapter Interface를 제공하고, stage mount Interface를 기본 SVG Stage ref로 매핑한다 |
 | `src/canvas/app/rendering/CanvasAppItemLayerAdapter.tsx` | App workflow가 concrete Demo SVG item layer 없이 stage children을 만들도록 하는 Adapter Interface를 제공하고, SVG item pointer event를 App pointer Interface로 매핑한다 |
 | `src/canvas/app/rendering/CanvasDemoSvgItemFrame.tsx` | Demo SVG item의 lock, selected, pointer event, outline wrapper 문법을 item type별 shape rendering과 분리해 소유한다 |
+| `src/canvas/app/rendering/CanvasDemoSvgDrawingItemRenderer.tsx` | Marker, highlighter, arrow의 SVG path/line shape와 arrow marker 사용을 소유한다 |
+| `src/canvas/app/rendering/CanvasDemoSvgRectTextItemRenderer.tsx` | Rect와 text item의 SVG shape, embedded text foreignObject 문법을 소유한다 |
 | `src/canvas/app/rendering/CanvasDemoSvgComponentPresentationRegistry.ts` | Demo component presentation key와 SVG rendering strategy를 외부 조립 가능한 registry로 연결한다 |
 | `src/canvas/app/rendering/CanvasDemoSvgBuiltInComponentPresentationRenderers.tsx` | 기본 Demo component presentation key와 SVG renderer strategy mapping을 소유한다 |
 | `src/canvas/app/rendering/CanvasDemoSvgComponentPresentationRegistryContracts.ts` | Component presentation renderer registry key와 render strategy slot을 검증한다 |
@@ -187,6 +189,8 @@ type CanvasAffordanceConfig = {
 - Canvas SVG Drawing Primitives가 SVG path data와 arrow marker id/IRI를 소유해서 Renderer Stage defs와 App-owned item layer가 문자열 계약을 중복하지 않는다.
 - Demo SVG Item Layer Adapter는 App-owned Adapter로 Demo component presentation key resolver와 presentation registry를 받아 그리기 전략을 고른다.
 - Demo SVG Item Frame이 lock/selected/pointer/outline wrapper 문법을 소유해서 item type별 shape renderer branch가 공통 interaction frame을 복사하지 않는다.
+- Demo SVG Item Layer Adapter는 tree/frame orchestration을 맡고, marker/highlighter/arrow shape 렌더링은 Demo SVG Drawing Item Renderer가 소유한다.
+- Demo SVG Item Layer Adapter는 rect/text shape와 embedded text foreignObject 문법을 알지 않고 Demo SVG Rect/Text Item Renderer에 위임한다.
 - Demo SVG Built-in Component Presentation Renderers가 기본 component presentation renderer mapping을 소유하고, Demo SVG Component Presentation Registry Contracts가 외부 renderer registry shape를 검증한다.
 - Demo SVG Component Render Fallback이 component presentation resolver와 renderer 실행 실패를 기본 component card로 containment 한다.
 - Demo SVG Custom Item Renderer Registry Contracts가 외부 custom item renderer registry shape를 검증한다.

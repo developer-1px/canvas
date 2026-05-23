@@ -5,12 +5,13 @@ import type {
   TextItem,
 } from '../../entities'
 import { getCanvasItemBounds } from '../../host'
-import {
-  CANVAS_SVG_ARROW_MARKER_IRI,
-  createCanvasSvgPathData,
-} from '../../renderer'
 import { CanvasDemoSvgComponentRenderer } from './CanvasDemoSvgComponentRenderer'
+import {
+  isCanvasDemoSvgDrawingItem,
+  renderCanvasDemoSvgDrawingItem,
+} from './CanvasDemoSvgDrawingItemRenderer'
 import { CanvasDemoSvgItemFrame } from './CanvasDemoSvgItemFrame'
+import { renderCanvasDemoSvgRectTextItem } from './CanvasDemoSvgRectTextItemRenderer'
 import {
   DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS,
   type CanvasDemoSvgComponentPresentationRenderers,
@@ -180,7 +181,7 @@ function renderCanvasItem({
     )
   }
 
-  if (item.type === 'marker' || item.type === 'highlight') {
+  if (isCanvasDemoSvgDrawingItem(item)) {
     return (
       <CanvasDemoSvgItemFrame
         key={item.id}
@@ -192,54 +193,7 @@ function renderCanvasItem({
         selected={isSelected}
         onItemPointerDown={onItemPointerDown}
       >
-        <path
-          className={`${item.type}-hit`}
-          d={createCanvasSvgPathData(item.points)}
-          vectorEffect="non-scaling-stroke"
-        />
-        <path
-          className={`${item.type}-item`}
-          d={createCanvasSvgPathData(item.points)}
-          opacity={item.opacity}
-          stroke={item.stroke}
-          strokeWidth={item.strokeWidth}
-          vectorEffect="non-scaling-stroke"
-        />
-      </CanvasDemoSvgItemFrame>
-    )
-  }
-
-  if (item.type === 'arrow') {
-    return (
-      <CanvasDemoSvgItemFrame
-        key={item.id}
-        bounds={bounds}
-        itemId={item.id}
-        itemType={item.type}
-        locked={isLocked}
-        outlined={outlined}
-        selected={isSelected}
-        onItemPointerDown={onItemPointerDown}
-      >
-        <line
-          className="arrow-hit"
-          x1={item.start.x}
-          y1={item.start.y}
-          x2={item.end.x}
-          y2={item.end.y}
-          vectorEffect="non-scaling-stroke"
-        />
-        <line
-          className="arrow-item"
-          x1={item.start.x}
-          y1={item.start.y}
-          x2={item.end.x}
-          y2={item.end.y}
-          stroke={item.stroke}
-          strokeWidth={item.strokeWidth}
-          markerEnd={CANVAS_SVG_ARROW_MARKER_IRI}
-          vectorEffect="non-scaling-stroke"
-        />
+        {renderCanvasDemoSvgDrawingItem({ item })}
       </CanvasDemoSvgItemFrame>
     )
   }
@@ -256,30 +210,7 @@ function renderCanvasItem({
       onDoubleClick={() => onTextDoubleClick(item)}
       onItemPointerDown={onItemPointerDown}
     >
-      {item.type === 'rect' ? (
-        <>
-          <rect
-            className="rect-item"
-            x={item.x}
-            y={item.y}
-            width={item.w}
-            height={item.h}
-            rx="6"
-            fill={item.fill}
-            stroke={item.stroke}
-            vectorEffect="non-scaling-stroke"
-          />
-          {item.text ? (
-            <foreignObject x={item.x} y={item.y} width={item.w} height={item.h}>
-              <div className="canvas-text canvas-rect-text">{item.text}</div>
-            </foreignObject>
-          ) : null}
-        </>
-      ) : (
-        <foreignObject x={item.x} y={item.y} width={item.w} height={item.h}>
-          <div className="canvas-text">{item.text}</div>
-        </foreignObject>
-      )}
+      {renderCanvasDemoSvgRectTextItem({ item })}
     </CanvasDemoSvgItemFrame>
   )
 }
