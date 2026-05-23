@@ -11,16 +11,19 @@ import {
   runCanvasKeyboardSystemIntent,
   type CanvasKeyboardSystemHandlers,
 } from './CanvasKeyboardSystemDispatch'
+import {
+  isCanvasKeyboardViewportIntent,
+  runCanvasKeyboardViewportIntent,
+  type CanvasKeyboardViewportHandlers,
+} from './CanvasKeyboardViewportDispatch'
 
 export type CanvasKeyboardShortcutHandlers =
   CanvasKeyboardCommandHandlers &
-  CanvasKeyboardSystemHandlers & {
+  CanvasKeyboardSystemHandlers &
+  CanvasKeyboardViewportHandlers & {
     config: CanvasAffordanceConfig
     customCreationTools: readonly CanvasAppCustomCreationToolState[]
-    fitToItems: (ids?: string[]) => void
-    resetViewport: () => void
     selection: string[]
-    zoomBy: (multiplier: number) => void
   }
 
 export function handleCanvasKeyboardShortcut(
@@ -48,20 +51,13 @@ export function handleCanvasKeyboardShortcut(
     return
   }
 
+  if (isCanvasKeyboardViewportIntent(intent)) {
+    runCanvasKeyboardViewportIntent({ handlers, intent })
+    return
+  }
+
   switch (intent.kind) {
     case 'none':
-      return
-    case 'zoom-by':
-      handlers.zoomBy(intent.multiplier)
-      return
-    case 'reset-viewport':
-      handlers.resetViewport()
-      return
-    case 'fit-all':
-      handlers.fitToItems()
-      return
-    case 'fit-selection':
-      handlers.fitToItems(intent.ids)
       return
     case 'set-tool':
       handlers.setTool(intent.tool)

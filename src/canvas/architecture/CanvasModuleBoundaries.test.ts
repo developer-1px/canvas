@@ -2005,6 +2005,9 @@ describe('Canvas module boundaries', () => {
     const systemDispatchFile = getSourceFile(
       'src/canvas/app/keyboard/CanvasKeyboardSystemDispatch.ts',
     )
+    const viewportDispatchFile = getSourceFile(
+      'src/canvas/app/keyboard/CanvasKeyboardViewportDispatch.ts',
+    )
     const toolIntentFile = getSourceFile(
       'src/canvas/app/keyboard/CanvasKeyboardToolShortcutIntent.ts',
     )
@@ -2024,6 +2027,9 @@ describe('Canvas module boundaries', () => {
     expect(routerFile.source).toContain(
       "from './CanvasKeyboardSystemDispatch'",
     )
+    expect(routerFile.source).toContain(
+      "from './CanvasKeyboardViewportDispatch'",
+    )
     expect(routerFile.source).not.toContain('config.shortcuts.temporaryPan')
     expect(routerFile.source).not.toContain(
       'matchesCanvasAppCustomToolShortcut',
@@ -2036,6 +2042,9 @@ describe('Canvas module boundaries', () => {
     expect(routerFile.source).not.toContain('handlers.openFindReplace()')
     expect(routerFile.source).not.toContain('handlers.setSpaceDown(true)')
     expect(routerFile.source).not.toContain('handlers.commitSelection([])')
+    expect(routerFile.source).not.toContain('handlers.zoomBy(')
+    expect(routerFile.source).not.toContain('handlers.resetViewport()')
+    expect(routerFile.source).not.toContain('handlers.fitToItems(')
     expect(routerFile.source).not.toContain("event.key.startsWith('Arrow')")
     expect(routerFile.source).not.toContain("key === 'z'")
     expect(intentFile.source).toContain(
@@ -2137,6 +2146,15 @@ describe('Canvas module boundaries', () => {
     )
     expect(systemDispatchFile.source).toContain("case 'escape'")
     expect(systemDispatchFile.source).toContain('commitSelection([])')
+    expect(viewportDispatchFile.source).toContain(
+      'export function runCanvasKeyboardViewportIntent',
+    )
+    expect(viewportDispatchFile.source).toContain(
+      'export function isCanvasKeyboardViewportIntent',
+    )
+    expect(viewportDispatchFile.source).toContain("case 'zoom-by'")
+    expect(viewportDispatchFile.source).toContain("case 'fit-selection'")
+    expect(viewportDispatchFile.source).toContain('fitToItems(intent.ids)')
     expect(toolIntentFile.source).toContain(
       'export function getCanvasKeyboardToolShortcutIntent',
     )
