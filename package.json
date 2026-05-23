@@ -8,14 +8,46 @@
   ],
   "types": "./src/canvas/index.ts",
   "exports": {
-    ".": "./src/canvas/index.ts",
-    "./app": "./src/canvas/app/index.ts",
-    "./app/authoring": "./src/canvas/app/authoring/index.ts",
-    "./core": "./src/canvas/core/index.ts",
-    "./engine": "./src/canvas/engine/index.ts",
-    "./entities": "./src/canvas/entities/index.ts",
-    "./host": "./src/canvas/host/index.ts",
-    "./renderer": "./src/canvas/renderer/index.ts"
+    ".": {
+      "types": "./src/canvas/index.ts",
+      "import": "./src/canvas/index.ts",
+      "default": "./src/canvas/index.ts"
+    },
+    "./app": {
+      "types": "./src/canvas/app/index.ts",
+      "import": "./src/canvas/app/index.ts",
+      "default": "./src/canvas/app/index.ts"
+    },
+    "./app/authoring": {
+      "types": "./src/canvas/app/authoring/index.ts",
+      "import": "./src/canvas/app/authoring/index.ts",
+      "default": "./src/canvas/app/authoring/index.ts"
+    },
+    "./core": {
+      "types": "./src/canvas/core/index.ts",
+      "import": "./src/canvas/core/index.ts",
+      "default": "./src/canvas/core/index.ts"
+    },
+    "./engine": {
+      "types": "./src/canvas/engine/index.ts",
+      "import": "./src/canvas/engine/index.ts",
+      "default": "./src/canvas/engine/index.ts"
+    },
+    "./entities": {
+      "types": "./src/canvas/entities/index.ts",
+      "import": "./src/canvas/entities/index.ts",
+      "default": "./src/canvas/entities/index.ts"
+    },
+    "./host": {
+      "types": "./src/canvas/host/index.ts",
+      "import": "./src/canvas/host/index.ts",
+      "default": "./src/canvas/host/index.ts"
+    },
+    "./renderer": {
+      "types": "./src/canvas/renderer/index.ts",
+      "import": "./src/canvas/renderer/index.ts",
+      "default": "./src/canvas/renderer/index.ts"
+    }
   },
   "scripts": {
     "dev": "vite",

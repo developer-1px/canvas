@@ -234,6 +234,7 @@ type CanvasAffordanceConfig = {
 - Demo custom item module은 `src/demo/custom-items/<name>/index.ts`에서 default export하면 자동 수집된다.
 - Demo와 Demo custom item module은 `src/canvas` package public entry만 사용하고 canvas 하위 구현 경로를 직접 import하지 않는다.
 - package manifest는 `canvas`, `canvas/app`, `canvas/app/authoring`, `canvas/core`, `canvas/engine`, `canvas/entities`, `canvas/host`, `canvas/renderer` export만 열고 각 export는 public facade `index.ts`를 가리킨다.
+- package manifest의 각 export entry는 `types`, `import`, `default` target을 같은 public facade `index.ts`로 맞춘다.
 - package public entry는 package manifest의 layer facade만 알고 app 내부 submodule을 직접 export target으로 삼지 않는다.
 - package public entry는 App Shell 조립과 descriptor authoring contract를 열고, layer별 세부 기능은 flat re-export가 아니라 `CanvasEngine`, `CanvasHost`, `CanvasRenderer`, `CanvasCore` namespace 또는 package subpath에서만 연다.
 - package public entry는 App Shell과 App props/source만 `canvas/app` facade에서 가져오고, descriptor authoring contract는 `canvas/app/authoring` facade에서 가져온다.

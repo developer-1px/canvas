@@ -2,11 +2,17 @@ import { describe, expect, it } from 'vitest'
 
 type CanvasPackageJson = {
   dependencies?: Record<string, string>
-  exports?: Record<string, string>
+  exports?: Record<string, CanvasPackageExportEntry>
   peerDependencies?: Record<string, string>
   private?: boolean
   sideEffects?: boolean | string[]
   types?: string
+}
+
+type CanvasPackageExportEntry = {
+  default: string
+  import: string
+  types: string
 }
 
 const packageModules = import.meta.glob('../../../package.json', {
@@ -37,23 +43,36 @@ describe('Canvas package manifest', () => {
     expect(packageJson.sideEffects).toEqual(['**/*.css'])
     expect(packageJson.types).toBe('./src/canvas/index.ts')
     expect(packageJson.exports).toEqual({
-      '.': './src/canvas/index.ts',
-      './app': './src/canvas/app/index.ts',
-      './app/authoring': './src/canvas/app/authoring/index.ts',
-      './core': './src/canvas/core/index.ts',
-      './engine': './src/canvas/engine/index.ts',
-      './entities': './src/canvas/entities/index.ts',
-      './host': './src/canvas/host/index.ts',
-      './renderer': './src/canvas/renderer/index.ts',
+      '.': createPackageExportEntry('./src/canvas/index.ts'),
+      './app': createPackageExportEntry('./src/canvas/app/index.ts'),
+      './app/authoring': createPackageExportEntry(
+        './src/canvas/app/authoring/index.ts',
+      ),
+      './core': createPackageExportEntry('./src/canvas/core/index.ts'),
+      './engine': createPackageExportEntry('./src/canvas/engine/index.ts'),
+      './entities': createPackageExportEntry('./src/canvas/entities/index.ts'),
+      './host': createPackageExportEntry('./src/canvas/host/index.ts'),
+      './renderer': createPackageExportEntry('./src/canvas/renderer/index.ts'),
     })
   })
 
   it('points package exports only at existing canvas public facades', () => {
     const exportedPaths = Object.values(packageJson.exports ?? {})
+      .flatMap((entry) => [entry.types, entry.import, entry.default])
 
-    expect(exportedPaths).toHaveLength(8)
+    expect(exportedPaths).toHaveLength(24)
     expect(exportedPaths.every((path) => sourcePaths.has(path))).toBe(true)
     expect(exportedPaths.every((path) => path.endsWith('/index.ts'))).toBe(true)
+  })
+
+  it('keeps package export type and runtime targets aligned', () => {
+    const exportEntries = Object.entries(packageJson.exports ?? {})
+
+    expect(exportEntries).toHaveLength(8)
+    for (const [, entry] of exportEntries) {
+      expect(entry.types).toBe(entry.import)
+      expect(entry.types).toBe(entry.default)
+    }
   })
 
   it('declares shared runtimes as peer dependencies', () => {
@@ -72,3 +91,11 @@ describe('Canvas package manifest', () => {
     )
   })
 })
+
+function createPackageExportEntry(path: string): CanvasPackageExportEntry {
+  return {
+    types: path,
+    import: path,
+    default: path,
+  }
+}
