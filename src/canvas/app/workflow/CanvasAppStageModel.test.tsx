@@ -13,13 +13,16 @@ describe('CanvasAppStageModel', () => {
   it('renders item layer children through the stage adapter', () => {
     let stageInput: CanvasAppStageRenderInput | null = null
     const input = createStageModelInput({
-      itemLayerAdapter: {
-        renderItems: () => 'items',
-      },
-      stageAdapter: {
-        renderStage: (nextInput) => {
-          stageInput = nextInput
-          return 'stage'
+      rendering: {
+        ...createRenderingModel(),
+        itemLayerAdapter: {
+          renderItems: () => 'items',
+        },
+        stageAdapter: {
+          renderStage: (nextInput) => {
+            stageInput = nextInput
+            return 'stage'
+          },
         },
       },
     })
@@ -42,27 +45,34 @@ describe('CanvasAppStageModel', () => {
     const calls: string[] = []
     let itemLayerInput: CanvasAppItemLayerRenderInput | null = null
     let stageInput: CanvasAppStageRenderInput | null = null
+    const pointer = createPointerModel()
     const input = createStageModelInput({
       blurTextEditor: () => calls.push('blur'),
-      itemLayerAdapter: {
-        renderItems: (nextInput) => {
-          itemLayerInput = nextInput
-          return 'items'
+      pointer: {
+        itemLayerHandlers: {
+          ...pointer.itemLayerHandlers,
+          onItemPointerDown: (_event, itemId) =>
+            calls.push(`item:${itemId}`),
+        },
+        stageHandlers: {
+          ...pointer.stageHandlers,
+          onCanvasPointerDown: () => calls.push('canvas'),
         },
       },
-      itemLayerInput: {
-        ...createItemLayerInput(),
-        onItemPointerDown: (_event, itemId) => calls.push(`item:${itemId}`),
-      },
-      stageAdapter: {
-        renderStage: (nextInput) => {
-          stageInput = nextInput
-          return 'stage'
+      rendering: {
+        ...createRenderingModel(),
+        itemLayerAdapter: {
+          renderItems: (nextInput) => {
+            itemLayerInput = nextInput
+            return 'items'
+          },
         },
-      },
-      stageInput: {
-        ...createStageInput(),
-        onCanvasPointerDown: () => calls.push('canvas'),
+        stageAdapter: {
+          renderStage: (nextInput) => {
+            stageInput = nextInput
+            return 'stage'
+          },
+        },
       },
     })
 
@@ -79,15 +89,18 @@ describe('CanvasAppStageModel', () => {
   it('contains item layer adapter failures without dropping the stage', () => {
     let stageInput: CanvasAppStageRenderInput | null = null
     const input = createStageModelInput({
-      itemLayerAdapter: {
-        renderItems: () => {
-          throw new Error('item layer failed')
+      rendering: {
+        ...createRenderingModel(),
+        itemLayerAdapter: {
+          renderItems: () => {
+            throw new Error('item layer failed')
+          },
         },
-      },
-      stageAdapter: {
-        renderStage: (nextInput) => {
-          stageInput = nextInput
-          return 'stage'
+        stageAdapter: {
+          renderStage: (nextInput) => {
+            stageInput = nextInput
+            return 'stage'
+          },
         },
       },
     })
@@ -98,9 +111,12 @@ describe('CanvasAppStageModel', () => {
 
   it('contains stage adapter failures', () => {
     const input = createStageModelInput({
-      stageAdapter: {
-        renderStage: () => {
-          throw new Error('stage failed')
+      rendering: {
+        ...createRenderingModel(),
+        stageAdapter: {
+          renderStage: () => {
+            throw new Error('stage failed')
+          },
         },
       },
     })
@@ -114,36 +130,58 @@ function createStageModelInput(
 ): CanvasAppStageModelInput {
   return {
     blurTextEditor: vi.fn(),
-    itemLayerAdapter: {
-      renderItems: () => 'items',
-    },
-    itemLayerInput: createItemLayerInput(),
-    stageAdapter: {
-      renderStage: () => 'stage',
-    },
-    stageInput: createStageInput(),
+    itemLayer: createItemLayerModel(),
+    pointer: createPointerModel(),
+    rendering: createRenderingModel(),
+    stage: createStageModel(),
     ...overrides,
   }
 }
 
-function createItemLayerInput(): CanvasAppItemLayerRenderInput {
+function createItemLayerModel(): CanvasAppStageModelInput['itemLayer'] {
   return {
-    componentPresentationRenderers: {},
-    customItemRenderers: {},
-    getComponentPresentation: () => 'card',
     items: [],
-    onItemPointerDown: vi.fn(),
-    onTextDoubleClick: vi.fn(),
-    outlineIds: new Set(),
     selected: new Set(),
   }
 }
 
-function createStageInput(): CanvasAppStageModelInput['stageInput'] {
+function createPointerModel(): CanvasAppStageModelInput['pointer'] {
+  return {
+    itemLayerHandlers: {
+      onItemPointerDown: vi.fn(),
+      onTextDoubleClick: vi.fn(),
+    },
+    stageHandlers: {
+      onCanvasPointerDown: vi.fn(),
+      onPointerCancel: vi.fn(),
+      onPointerMove: vi.fn(),
+      onPointerUp: vi.fn(),
+      onResizePointerDown: vi.fn(),
+    },
+  }
+}
+
+function createRenderingModel(): CanvasAppStageModelInput['rendering'] {
+  return {
+    componentPresentationRenderers: {},
+    customItemRenderers: {},
+    getComponentPresentation: () => 'card',
+    itemLayerAdapter: {
+      renderItems: () => 'items',
+    },
+    stageAdapter: {
+      renderStage: () => 'stage',
+    },
+  }
+}
+
+function createStageModel(): CanvasAppStageModelInput['stage'] {
   return {
     activeMode: 'select',
     gesture: 'none',
-    overlays: {} as CanvasAppStageRenderInput['overlays'],
+    overlays: {
+      itemOutlineIds: new Set(),
+    } as CanvasAppStageRenderInput['overlays'],
     stageElement: {
       ref: vi.fn(),
     },
@@ -152,11 +190,6 @@ function createStageInput(): CanvasAppStageModelInput['stageInput'] {
       x: 0,
       y: 0,
     },
-    onCanvasPointerDown: vi.fn(),
-    onPointerCancel: vi.fn(),
-    onPointerMove: vi.fn(),
-    onPointerUp: vi.fn(),
-    onResizePointerDown: vi.fn(),
   }
 }
 

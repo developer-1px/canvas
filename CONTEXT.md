@@ -84,7 +84,7 @@
 - Canvas App Inspector Model: App Model이 inspector panel list, read model, selection wiring 세부를 직접 알지 않도록 object inspector props를 만드는 workflow Module.
 - Canvas App Keyboard Model: App Model이 keyboard shortcut handler wiring 세부를 알지 않도록 command, interaction, viewport shortcut handlers를 조립하는 workflow Module.
 - Canvas App Pointer Model: App Model이 pointer down/drag hook 조립 세부를 알지 않도록 stage와 item layer pointer handlers를 만드는 workflow Module.
-- Canvas App Stage Model: stage와 item layer Adapter 호출 순서, text editor blur, context menu 차단, render 실패 containment를 소유하는 workflow Module.
+- Canvas App Stage Model: stage와 item layer Adapter 입력 조립, 호출 순서, text editor blur, context menu 차단, render 실패 containment를 소유하는 workflow Module.
 - Canvas App Text Model: App Model이 textarea ref, text editor, find/replace wiring 세부를 직접 알지 않도록 text editor props와 search handlers를 만드는 workflow Module.
 - Canvas App Viewport Model: App Model이 wheel viewport listener, fit/reset/zoom hook 조립, keyboard/control fan-out 세부를 알지 않도록 consumer별 viewport context를 만드는 workflow Module.
 - Canvas Keyboard Shortcut Intent: keydown 입력, typing target suppression, temporary pan, escape, command/tool shortcut precedence를 실행 가능한 keyboard intent로 조립하는 App-owned runtime Module.
@@ -200,7 +200,7 @@
 - App Model은 inspector panel wiring 세부를 직접 알지 않고 Canvas App Inspector Model에서 object inspector props를 받는다.
 - App Model은 keyboard shortcut handler wiring 세부를 직접 알지 않고 Canvas App Keyboard Model에 위임한다.
 - App Model은 pointer down/drag hook 조립 세부를 직접 알지 않고 Canvas App Pointer Model에서 stage/item layer pointer handlers를 받는다.
-- App Model은 stage/item layer Adapter 호출, context menu 차단, text editor blur timing, render 실패 containment를 직접 알지 않고 Canvas App Stage Model에 위임한다.
+- App Model은 stage/item layer Adapter 입력 조립, 호출 순서, context menu 차단, text editor blur timing, render 실패 containment를 직접 알지 않고 Canvas App Stage Model에 위임한다.
 - App Model은 textarea ref, text editor, find/replace wiring 세부를 직접 알지 않고 Canvas App Text Model에서 text editor/search props를 받는다.
 - App Model은 wheel viewport listener, fit/reset/zoom control hook 조립, keyboard/control fan-out 세부를 직접 알지 않고 Canvas App Viewport Model에서 consumer별 viewport context를 받는다.
 - App Model은 draft, marquee, snap guide, temporary pan raw setter routing을 직접 알지 않고 Canvas Interaction Model의 consumer별 interaction context를 전달한다.

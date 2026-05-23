@@ -3,49 +3,84 @@ import type {
   CanvasAppItemLayerAdapter,
   CanvasAppItemLayerRenderInput,
   CanvasAppStageAdapter,
+  CanvasAppStageMount,
   CanvasAppStageRenderInput,
 } from '../rendering'
 import type { CanvasAppEventInput } from '../pointer/CanvasAppPointerInput'
 
 export type CanvasAppStageModelInput = {
   blurTextEditor: () => void
-  itemLayerAdapter: CanvasAppItemLayerAdapter
-  itemLayerInput: CanvasAppItemLayerRenderInput
-  stageAdapter: CanvasAppStageAdapter
-  stageInput: Omit<
+  itemLayer: Pick<CanvasAppItemLayerRenderInput, 'items' | 'selected'>
+  pointer: {
+    itemLayerHandlers: Pick<
+      CanvasAppItemLayerRenderInput,
+      'onItemPointerDown' | 'onTextDoubleClick'
+    >
+    stageHandlers: Pick<
+      CanvasAppStageRenderInput,
+      | 'onCanvasPointerDown'
+      | 'onPointerCancel'
+      | 'onPointerMove'
+      | 'onPointerUp'
+      | 'onResizePointerDown'
+    >
+  }
+  rendering: Pick<
+    CanvasAppItemLayerRenderInput,
+    | 'componentPresentationRenderers'
+    | 'customItemRenderers'
+    | 'getComponentPresentation'
+  > & {
+    itemLayerAdapter: CanvasAppItemLayerAdapter
+    stageAdapter: CanvasAppStageAdapter
+  }
+  stage: Pick<
     CanvasAppStageRenderInput,
-    'children' | 'onContextMenu'
-  >
+    'activeMode' | 'gesture' | 'overlays' | 'viewport'
+  > & {
+    stageElement: CanvasAppStageMount
+  }
 }
 
 export function renderCanvasAppStageModel({
   blurTextEditor,
-  itemLayerAdapter,
-  itemLayerInput,
-  stageAdapter,
-  stageInput,
+  itemLayer,
+  pointer,
+  rendering,
+  stage,
 }: CanvasAppStageModelInput) {
   const children = renderCanvasAppItemLayerSafely({
-    adapter: itemLayerAdapter,
+    adapter: rendering.itemLayerAdapter,
     input: {
-      ...itemLayerInput,
+      componentPresentationRenderers:
+        rendering.componentPresentationRenderers,
+      customItemRenderers: rendering.customItemRenderers,
+      getComponentPresentation: rendering.getComponentPresentation,
+      items: itemLayer.items,
+      outlineIds: stage.overlays.itemOutlineIds,
+      selected: itemLayer.selected,
+      onTextDoubleClick: pointer.itemLayerHandlers.onTextDoubleClick,
       onItemPointerDown: (event, itemId) => {
         blurTextEditor()
-        itemLayerInput.onItemPointerDown(event, itemId)
+        pointer.itemLayerHandlers.onItemPointerDown(event, itemId)
       },
     },
   })
 
   return renderCanvasAppStageSafely({
-    adapter: stageAdapter,
+    adapter: rendering.stageAdapter,
     input: {
-      ...stageInput,
+      ...stage,
       children,
       onCanvasPointerDown: (event) => {
         blurTextEditor()
-        stageInput.onCanvasPointerDown(event)
+        pointer.stageHandlers.onCanvasPointerDown(event)
       },
       onContextMenu: preventCanvasContextMenu,
+      onPointerCancel: pointer.stageHandlers.onPointerCancel,
+      onPointerMove: pointer.stageHandlers.onPointerMove,
+      onPointerUp: pointer.stageHandlers.onPointerUp,
+      onResizePointerDown: pointer.stageHandlers.onResizePointerDown,
     },
   })
 }

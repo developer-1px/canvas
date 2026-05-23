@@ -368,12 +368,26 @@ describe('Canvas module boundaries', () => {
     expect(appModelFile.source).toContain("from './CanvasAppStageModel'")
     expect(appModelFile.source).not.toContain('adapter.renderStage(input)')
     expect(appModelFile.source).not.toContain('adapter.renderItems(input)')
+    expect(appModelFile.source).not.toContain('itemLayerInput')
+    expect(appModelFile.source).not.toContain('stageInput')
+    expect(appModelFile.source).not.toContain('outlineIds')
+    expect(appModelFile.source).not.toContain('onCanvasPointerDown')
+    expect(appModelFile.source).not.toContain('onPointerCancel')
+    expect(appModelFile.source).not.toContain('onPointerMove')
+    expect(appModelFile.source).not.toContain('onPointerUp')
+    expect(appModelFile.source).not.toContain('onResizePointerDown')
     expect(appModelFile.source).not.toContain('onContextMenu')
     expect(stageModelFile.source).toContain(
       'export function renderCanvasAppStageModel',
     )
     expect(stageModelFile.source).toContain('adapter.renderStage(input)')
     expect(stageModelFile.source).toContain('adapter.renderItems(input)')
+    expect(stageModelFile.source).toContain(
+      'outlineIds: stage.overlays.itemOutlineIds',
+    )
+    expect(stageModelFile.source).toContain(
+      'pointer.stageHandlers.onCanvasPointerDown',
+    )
     expect(stageModelFile.source).toContain('blurTextEditor()')
     expect(stageModelFile.source).toContain('catch')
   })
