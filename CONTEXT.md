@@ -16,6 +16,7 @@
 - Canvas App Public Facade: Canvas App Shell과 workflow 조립 계약을 노출하는 `src/canvas/app` entry.
 - Canvas Item Read Model: Demo `CanvasItem` tree의 조회, bounds, selection 정규화, Scene Adapter 생성을 tree helper 세부 구현 없이 제공하는 Module.
 - Canvas Component Library: Demo component template, presentation key, component item 생성을 함께 제공하는 Module.
+- Canvas Built-in Component Templates: Sticky, label, card 같은 기본 Demo component catalogue를 소유하는 Host-owned Module.
 - Canvas Component Presentation: Demo component kind를 Renderer Adapter의 그리기 전략과 연결하는 key. 새 component kind는 기존 presentation을 재사용할 수 있다.
 - Canvas App Assembly: 내부 캔버스 문법은 유지하면서 Host item adapter, component library, custom item module, initial items, SVG presentation registry 같은 제품별 의미를 외부에서 조립하는 composition Module.
 - Canvas App Assembly Input: Canvas App Assembly output을 `Partial`로 노출하지 않고 Host가 조립할 수 있는 필드만 명시한 외부 입력 계약.
@@ -45,8 +46,13 @@
 - Canvas App Custom Item Module Snapshot: custom item module define/assembly 후 외부 descriptor mutation에서 module과 assembled extension parts를 보호하는 App-owned Module.
 - Canvas Custom Item Renderer Registry: `Canvas Custom Item`의 presentation key를 SVG rendering strategy에 연결하는 외부 조립 가능한 registry.
 - Canvas Custom Item Validator: `Canvas Custom Item`의 `kind`별 domain-specific payload 규칙을 document validation에 주입하는 App-owned validator.
+- Canvas App Custom Item Validator Contracts: custom item validator registry key와 validate strategy slot을 검증하는 App-owned contract Module.
 - Canvas Component Presentation Registry: Demo component presentation key를 SVG rendering strategy에 연결하는 외부 조립 가능한 registry.
+- Demo SVG Built-in Component Presentation Renderers: 기본 Demo component presentation key와 SVG renderer strategy mapping을 소유하는 App rendering Module.
+- Demo SVG Component Presentation Registry Contracts: component presentation renderer registry key와 render strategy slot을 검증하는 App rendering contract Module.
+- Canvas Component Library Contracts: component library input, component template descriptor shape, stable id/presentation, duplicate template id를 검증하는 Host-owned contract Module.
 - Demo SVG Component Render Fallback: component presentation resolver나 renderer 실행 실패를 기본 component card로 containment 하는 App rendering 내부 Module.
+- Demo SVG Custom Item Renderer Registry Contracts: custom item renderer registry key와 render strategy slot을 검증하는 App rendering contract Module.
 - Demo SVG Custom Item Render Fallback: custom item renderer 누락이나 실행 실패를 unknown custom item card로 containment 하는 App rendering 내부 Module.
 - Drawing Item: Demo `CanvasItem` 중 marker, highlighter, arrow처럼 캔버스 위에 빠르게 주석을 그리는 항목. `points` 또는 `start/end`가 실제 geometry이고 `x/y/w/h`는 Host가 동기화하는 bounds cache다.
 - Drawing Item Style: built-in marker, highlighter, arrow의 stroke/opacity 기본값. Draft overlay와 Host item creation이 같은 Host-owned 계약을 쓴다.
@@ -82,10 +88,12 @@
 - persisted kind와 registry key는 Canvas Stable Id 형식을 사용한다.
 - 알 수 없는 stable component kind는 fallback할 수 있지만, malformed component kind는 validation/lookup 단계에서 실패해야 한다.
 - 모든 기능은 on/off 가능해야 한다.
-- 새 Demo component kind가 기존 presentation을 재사용하면 Canvas Component Library만 수정한다.
+- 새 Demo component kind가 기존 presentation을 재사용하면 Canvas Built-in Component Templates만 수정한다.
 - 새 Demo component kind와 새 SVG presentation은 Canvas App Assembly에서 component library와 presentation registry를 조립해 붙인다.
 - Canvas Component Library의 모든 presentation은 Canvas App Assembly의 component presentation renderer registry에 있어야 한다.
-- Canvas Component Template은 id/presentation뿐 아니라 필수 label/title/style string, 양수 크기, optional string list shape도 library 생성 단계에서 실패해야 하며, 생성된 library는 외부 template mutation에 흔들리지 않는 snapshot을 보관한다.
+- 기본 component presentation renderer mapping은 Demo SVG Built-in Component Presentation Renderers가 소유하고, 제품별 renderer는 Canvas App Assembly에서 extension으로 조립한다.
+- 제품별 custom item renderer registry shape는 Demo SVG Custom Item Renderer Registry Contracts에서 검증한다.
+- Canvas Component Template은 id/presentation뿐 아니라 필수 label/title/style string, 양수 크기, optional string list shape도 Canvas Component Library Contracts에서 실패해야 하며, 생성된 library는 외부 template mutation에 흔들리지 않는 snapshot을 보관한다.
 - Canvas App Assembly는 주입된 Canvas Component Library의 `templates`, `getTemplate`, `getPresentation` 결과가 일관되지 않으면 실패해야 한다.
 - Canvas App Assembly input은 output type을 부분 노출하지 않고 명시적 필드 계약으로 유지한다.
 - Canvas App Assembly composition, output contract validation, output snapshot/freeze는 분리하고, validation은 Canvas App Assembly Contracts가, mutation 방어는 Canvas App Assembly Snapshot이 소유한다.
@@ -103,6 +111,7 @@
 - 제품별 item kind는 내부 `CanvasItem` union에 새 variant를 추가하지 않고 Canvas App Custom Item Module로 등록한다.
 - Canvas App Custom Item Module은 `id`, `presentation`, `renderItem`, `validateItem`을 외부 Interface로 받고, renderer registry와 validator registry는 내부에서 조립한다.
 - Canvas App Custom Item Module descriptor/assembly, contract validation, module-owned creation/validator runtime은 분리하고, validation은 Canvas App Custom Item Module Contracts가, runtime containment는 Canvas App Custom Item Module Runtime이 소유한다.
+- Canvas Custom Item Validator registry shape 검증은 Canvas App Custom Item Validator Contracts가 소유한다.
 - Canvas App Custom Item Module mutation 방어는 Canvas App Custom Item Module Snapshot이 소유한다.
 - Canvas App Custom Item Module Creation Tool은 bounds/title/data만 반환하고, `id`, `type`, `kind`, `presentation`은 Canvas App Custom Item Module이 주입한다.
 - Canvas App Custom Item Module Creation Tool의 실행/반환값은 Module assembly가 현재 item 저장 계약과 module validator로 검증하고, 실패하면 null/false로 containment 한다.

@@ -353,6 +353,59 @@ describe('Canvas module boundaries', () => {
     expect(drawingStyleConsumers).not.toContain('#334155')
   })
 
+  it('keeps Host Component Library contracts behind a named module', () => {
+    const libraryFile = getSourceFile(
+      'src/canvas/host/component/CanvasComponentLibrary.ts',
+    )
+    const contractsFile = getSourceFile(
+      'src/canvas/host/component/CanvasComponentLibraryContracts.ts',
+    )
+
+    expect(libraryFile.source).toContain(
+      "from './CanvasComponentLibraryContracts'",
+    )
+    expect(libraryFile.source).not.toContain(
+      'function assertCanvasComponentTemplateContracts',
+    )
+    expect(libraryFile.source).not.toContain(
+      'Canvas component template descriptor must be an object',
+    )
+    expect(libraryFile.source).not.toContain(
+      'Duplicate canvas component template',
+    )
+    expect(libraryFile.source).not.toContain('requires positive')
+    expect(contractsFile.source).toContain(
+      'export function assertCanvasComponentTemplateContracts',
+    )
+    expect(contractsFile.source).toContain(
+      'Canvas component template descriptor must be an object',
+    )
+    expect(contractsFile.source).toContain(
+      'Duplicate canvas component template',
+    )
+    expect(contractsFile.source).toContain('requires positive')
+  })
+
+  it('keeps built-in component templates in a host catalogue module', () => {
+    const libraryFile = getSourceFile(
+      'src/canvas/host/component/CanvasComponentLibrary.ts',
+    )
+    const catalogueFile = getSourceFile(
+      'src/canvas/host/component/CanvasBuiltInComponentTemplates.ts',
+    )
+
+    expect(libraryFile.source).toContain(
+      "from './CanvasBuiltInComponentTemplates'",
+    )
+    expect(libraryFile.source).not.toContain("id: 'sticky'")
+    expect(libraryFile.source).not.toContain("presentation: 'note-card'")
+    expect(catalogueFile.source).toContain(
+      'DEFAULT_CANVAS_COMPONENT_TEMPLATES',
+    )
+    expect(catalogueFile.source).toContain("id: 'sticky'")
+    expect(catalogueFile.source).toContain("presentation: 'note-card'")
+  })
+
   it('keeps shared svg drawing primitives in the renderer module', () => {
     const primitiveFile =
       getSourceFile('src/canvas/renderer/svg/CanvasSvgDrawingPrimitives.ts')
@@ -416,6 +469,43 @@ describe('Canvas module boundaries', () => {
     expect(fallbackFile.source).toContain('CanvasDemoSvgCardComponent')
   })
 
+  it('keeps Demo SVG component presentation defaults and contracts behind named modules', () => {
+    const registryFile = getSourceFile(
+      'src/canvas/app/rendering/CanvasDemoSvgComponentPresentationRegistry.ts',
+    )
+    const defaultsFile = getSourceFile(
+      'src/canvas/app/rendering/CanvasDemoSvgBuiltInComponentPresentationRenderers.tsx',
+    )
+    const contractsFile = getSourceFile(
+      'src/canvas/app/rendering/CanvasDemoSvgComponentPresentationRegistryContracts.ts',
+    )
+
+    expect(registryFile.source).toContain(
+      "from './CanvasDemoSvgBuiltInComponentPresentationRenderers'",
+    )
+    expect(registryFile.source).toContain(
+      "from './CanvasDemoSvgComponentPresentationRegistryContracts'",
+    )
+    expect(registryFile.source).not.toContain(
+      'CanvasDemoSvgChecklistComponent',
+    )
+    expect(registryFile.source).not.toContain(
+      'assertCanvasAppExtensionRecordKeys',
+    )
+    expect(defaultsFile.source).toContain(
+      'DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS',
+    )
+    expect(defaultsFile.source).toContain('CanvasDemoSvgChecklistComponent')
+    expect(defaultsFile.source).toContain("'note-card'")
+    expect(contractsFile.source).toContain(
+      'export function assertCanvasDemoSvgComponentPresentationRenderers',
+    )
+    expect(contractsFile.source).toContain(
+      'assertCanvasAppExtensionRecordKeys',
+    )
+    expect(contractsFile.source).toContain('render strategy')
+  })
+
   it('keeps Demo SVG custom item render fallback behind a named module', () => {
     const itemLayerFile = getSourceFile(
       'src/canvas/app/rendering/CanvasDemoSvgItemLayer.tsx',
@@ -438,6 +528,30 @@ describe('Canvas module boundaries', () => {
       'CanvasDemoSvgUnknownCustomItem',
     )
     expect(fallbackFile.source).toContain('CanvasDemoSvgUnknownCustomItem')
+  })
+
+  it('keeps Demo SVG custom item renderer contracts behind a named module', () => {
+    const registryFile = getSourceFile(
+      'src/canvas/app/rendering/CanvasDemoSvgCustomItemRendererRegistry.tsx',
+    )
+    const contractsFile = getSourceFile(
+      'src/canvas/app/rendering/CanvasDemoSvgCustomItemRendererRegistryContracts.ts',
+    )
+
+    expect(registryFile.source).toContain(
+      "from './CanvasDemoSvgCustomItemRendererRegistryContracts'",
+    )
+    expect(registryFile.source).not.toContain(
+      'assertCanvasAppExtensionRecordKeys',
+    )
+    expect(registryFile.source).not.toContain('render strategy')
+    expect(contractsFile.source).toContain(
+      'export function assertCanvasDemoSvgCustomItemRenderers',
+    )
+    expect(contractsFile.source).toContain(
+      'assertCanvasAppExtensionRecordKeys',
+    )
+    expect(contractsFile.source).toContain('render strategy')
   })
 
   it('keeps App inspector panel execution behind a named module', () => {
@@ -713,6 +827,30 @@ describe('Canvas module boundaries', () => {
     expect(snapshotFile.source).toContain('function freezeCanvasAppArray')
   })
 
+  it('keeps App custom item validator contracts behind a named module', () => {
+    const assemblyContractsFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppAssemblyContracts.ts',
+    )
+    const validatorContractsFile = getSourceFile(
+      'src/canvas/app/modules/CanvasAppCustomItemValidatorContracts.ts',
+    )
+
+    expect(assemblyContractsFile.source).toContain(
+      "from '../modules/CanvasAppCustomItemValidatorContracts'",
+    )
+    expect(assemblyContractsFile.source).not.toContain(
+      'custom item validator ${kind}',
+    )
+    expect(assemblyContractsFile.source).not.toContain('validate strategy')
+    expect(validatorContractsFile.source).toContain(
+      'export function assertCanvasAppCustomItemValidators',
+    )
+    expect(validatorContractsFile.source).toContain(
+      'custom item validator ${kind}',
+    )
+    expect(validatorContractsFile.source).toContain('validate strategy')
+  })
+
   it('keeps App Assembly snapshot behavior behind a named module', () => {
     const assemblyFile = getSourceFile(
       'src/canvas/app/workflow/CanvasAppAssembly.ts',
@@ -771,7 +909,7 @@ describe('Canvas module boundaries', () => {
     )
     expect(contractsFile.source).toContain('getPresentation mismatch')
     expect(contractsFile.source).toContain('getTemplate mismatch')
-    expect(contractsFile.source).toContain('validate strategy')
+    expect(contractsFile.source).not.toContain('validate strategy')
     expect(contractsFile.source).toContain('command adapter')
   })
 

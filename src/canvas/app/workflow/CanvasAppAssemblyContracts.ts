@@ -2,7 +2,6 @@ import {
   createCanvasComponentLibrary,
   normalizeCanvasItems,
   type CanvasComponentLibrary,
-  type CanvasCustomItemValidators,
 } from '../../host'
 import { assertCanvasAppCustomCommands } from '../commands/CanvasAppCustomCommands'
 import {
@@ -10,8 +9,8 @@ import {
   assertCanvasAppDescriptorFunctionField,
   assertCanvasAppDescriptorObject,
 } from '../extensions/CanvasAppDescriptorContracts'
-import { assertCanvasAppExtensionRecordKeys } from '../extensions/CanvasAppExtensionIds'
 import { assertCanvasAppInspectorPanels } from '../inspector/CanvasAppInspectorPanels'
+import { assertCanvasAppCustomItemValidators } from '../modules/CanvasAppCustomItemValidatorContracts'
 import {
   assertCanvasAppComponentPresentationRenderers,
   assertCanvasAppCustomItemRenderers,
@@ -108,23 +107,6 @@ function assertCanvasAppComponentLibraryResolvers(
         `Canvas app component library getPresentation mismatch: ${template.id}`,
       )
     }
-  }
-}
-
-function assertCanvasAppCustomItemValidators(
-  customItemValidators: CanvasCustomItemValidators,
-) {
-  assertCanvasAppExtensionRecordKeys({
-    entries: customItemValidators,
-    label: 'custom item validator',
-  })
-
-  for (const [kind, validator] of Object.entries(customItemValidators)) {
-    assertCanvasAppDescriptorFunctionField({
-      field: 'validate strategy',
-      owner: `custom item validator ${kind}`,
-      value: validator,
-    })
   }
 }
 
