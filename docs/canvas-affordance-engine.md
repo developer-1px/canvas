@@ -45,7 +45,7 @@
 | `src/canvas/app/rendering/CanvasAppRendererRegistries.ts` | App-named component/custom item renderer registry 생성, 검증, default를 소유하고 Demo SVG registry 구현명을 외부 authoring seam 뒤에 숨긴다 |
 | `src/canvas/app/rendering/CanvasAppStageAdapter.tsx` | App Shell이 stage props를 알지 않도록 stage ReactNode를 만드는 Adapter Interface를 제공하고, stage mount Interface를 기본 SVG Stage ref로 매핑한다 |
 | `src/canvas/app/rendering/CanvasAppItemLayerAdapter.tsx` | App workflow가 concrete Demo SVG item layer 없이 stage children을 만들도록 하는 Adapter Interface를 제공하고, SVG item pointer event를 App pointer Interface로 매핑한다 |
-| `src/canvas/app/workflow/CanvasAppStageElementConsumerContracts.ts` | Stage Element Controller fan-out의 입력과 consumer별 출력 Interface를 명시한다 |
+| `src/canvas/app/workflow/CanvasAppConsumerContracts.ts` | Command, extension, interaction, stage element runtime fan-out의 입력과 consumer별 출력 Interface를 한곳에 모은다 |
 | `src/canvas/app/rendering/CanvasDemoSvgItemFrame.tsx` | Demo SVG item의 lock, selected, pointer event, outline wrapper 문법을 item type별 shape rendering과 분리해 소유한다 |
 | `src/canvas/app/rendering/CanvasDemoSvgDrawingItemRenderer.tsx` | Marker, highlighter, arrow의 SVG path/line shape와 arrow marker 사용을 소유한다 |
 | `src/canvas/app/rendering/CanvasDemoSvgRectTextItemRenderer.tsx` | Rect와 text item의 SVG shape, embedded text foreignObject 문법을 소유한다 |
@@ -96,14 +96,11 @@
 | `src/canvas/app/workflow/index.ts` | App Shell이 사용하는 workflow public entry |
 | `src/canvas/app/workflow/useCanvasAppModel.ts` | command, pointer, keyboard, viewport, text editing wiring과 control별 view props 조립을 App Shell에 숨긴다 |
 | `src/canvas/app/workflow/CanvasAppControlModel.ts` | component palette, toolbar, status, zoom controls props와 command availability/status/selected fit target 규칙을 만든다 |
-| `src/canvas/app/workflow/CanvasAppCommandConsumerContracts.ts` | Built-in command runtime callback fan-out의 입력과 toolbar/keyboard/pointer 출력 Interface를 명시한다 |
 | `src/canvas/app/workflow/useCanvasAppExtensionModel.ts` | 외부 custom command/tool descriptor를 toolbar state, custom tool state, custom command run callback으로 바꾼다 |
-| `src/canvas/app/workflow/CanvasAppExtensionConsumerContracts.ts` | Custom command/tool runtime fan-out의 입력과 consumer별 출력 Interface를 명시한다 |
 | `src/canvas/app/workflow/CanvasAppStageModel.tsx` | stage와 item layer Adapter 호출 순서, text editor blur, context menu 차단, render 실패 containment를 소유한다 |
 | `src/canvas/app/workflow/CanvasWorkflowContract.ts` | App workflow hook들이 공유하는 document commit, selection, clipboard contract |
 | `src/canvas/app/workflow/useCanvasFindReplaceModel.ts` | document text search 상태와 Find/Replace control props를 App Shell에 숨긴다 |
 | `src/canvas/app/workflow/useCanvasInteractionModel.ts` | tool, gesture, marquee, draft, snap guide, overlay 상태 생명주기를 App Shell에 숨긴다 |
-| `src/canvas/app/workflow/CanvasInteractionConsumerContracts.ts` | Interaction runtime state fan-out의 입력과 consumer별 출력 Interface를 명시한다 |
 | `src/canvas/app/workflow/useCanvasTextEditorModel.ts` | text editing state, editable item lookup, text editor props를 App Shell에 숨긴다 |
 | `src/canvas/app/workflow/useCanvasWorkspaceModel.ts` | 저장된 workspace snapshot, document history, viewport, read model, id 생성을 App Shell에 숨긴다 |
 | `src/canvas/app/authoring/index.ts` | `canvas/app/authoring` subpath로 외부 조립자가 쓰는 assembly input과 custom descriptor 계약을 모으고 App runtime hook/default/validator를 제외한다 |

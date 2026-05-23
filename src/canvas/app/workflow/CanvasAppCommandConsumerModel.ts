@@ -2,7 +2,7 @@ import type { CanvasAppControlCommandHandlers } from './CanvasAppControlCommandC
 import type {
   CanvasAppCommandConsumerModel,
   CanvasAppCommandRuntime,
-} from './CanvasAppCommandConsumerContracts'
+} from './CanvasAppConsumerContracts'
 
 export function getCanvasAppCommandConsumerModel(
   commands: CanvasAppCommandRuntime,

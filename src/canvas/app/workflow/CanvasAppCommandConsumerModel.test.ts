@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { getCanvasAppCommandConsumerModel } from './CanvasAppCommandConsumerModel'
-import type { CanvasAppCommandRuntime } from './CanvasAppCommandConsumerContracts'
+import type { CanvasAppCommandRuntime } from './CanvasAppConsumerContracts'
 
 describe('CanvasAppCommandConsumerModel', () => {
   it('builds toolbar command handlers from command runtime callbacks', () => {

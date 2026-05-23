@@ -11,7 +11,7 @@ import type {
 import type { Tool } from '../../entities'
 import type { Interaction } from '../pointer/CanvasInteractionState'
 import { getCanvasInteractionConsumerModel } from './CanvasInteractionConsumerModel'
-import type { CanvasInteractionConsumerModelInput } from './CanvasInteractionConsumerContracts'
+import type { CanvasInteractionConsumerModelInput } from './CanvasAppConsumerContracts'
 
 describe('CanvasInteractionConsumerModel', () => {
   it('routes tool state to component and control consumers', () => {

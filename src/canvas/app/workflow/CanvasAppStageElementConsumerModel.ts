@@ -1,7 +1,7 @@
 import type {
   CanvasAppStageElementConsumerModel,
   CanvasAppStageElementConsumerModelInput,
-} from './CanvasAppStageElementConsumerContracts'
+} from './CanvasAppConsumerContracts'
 
 export function getCanvasAppStageElementConsumerModel({
   stageElement,

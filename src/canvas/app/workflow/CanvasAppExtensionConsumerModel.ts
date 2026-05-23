@@ -1,7 +1,7 @@
 import type {
   CanvasAppExtensionModel,
   CanvasAppExtensionRuntime,
-} from './CanvasAppExtensionConsumerContracts'
+} from './CanvasAppConsumerContracts'
 
 export function getCanvasAppExtensionConsumerModel({
   customCommandStates,

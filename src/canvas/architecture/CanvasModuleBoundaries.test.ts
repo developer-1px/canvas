@@ -946,7 +946,7 @@ describe('Canvas module boundaries', () => {
       'src/canvas/app/workflow/CanvasAppStageElementConsumerModel.ts',
     )
     const stageElementConsumerContractsFile = getSourceFile(
-      'src/canvas/app/workflow/CanvasAppStageElementConsumerContracts.ts',
+      'src/canvas/app/workflow/CanvasAppConsumerContracts.ts',
     )
 
     expect(appModelFile.source).toContain(
@@ -963,7 +963,7 @@ describe('Canvas module boundaries', () => {
       "from './CanvasAppStageElementConsumerModel'",
     )
     expect(stageElementConsumerModelFile.source).toContain(
-      "from './CanvasAppStageElementConsumerContracts'",
+      "from './CanvasAppConsumerContracts'",
     )
     expect(stageElementConsumerModelFile.source).toContain(
       '): CanvasAppStageElementConsumerModel',
@@ -1346,7 +1346,7 @@ describe('Canvas module boundaries', () => {
       'src/canvas/app/workflow/CanvasAppCommandConsumerModel.ts',
     )
     const commandConsumerContractsFile = getSourceFile(
-      'src/canvas/app/workflow/CanvasAppCommandConsumerContracts.ts',
+      'src/canvas/app/workflow/CanvasAppConsumerContracts.ts',
     )
     const commandHookFile = getSourceFile(
       'src/canvas/app/commands/useCanvasCommands.ts',
@@ -1387,7 +1387,7 @@ describe('Canvas module boundaries', () => {
       "from './CanvasAppControlCommandContracts'",
     )
     expect(commandConsumerModelFile.source).toContain(
-      "from './CanvasAppCommandConsumerContracts'",
+      "from './CanvasAppConsumerContracts'",
     )
     expect(commandConsumerModelFile.source).toContain(
       '): CanvasAppCommandConsumerModel',
@@ -2008,7 +2008,7 @@ describe('Canvas module boundaries', () => {
       'src/canvas/app/workflow/CanvasInteractionConsumerModel.ts',
     )
     const interactionConsumerContractsFile = getSourceFile(
-      'src/canvas/app/workflow/CanvasInteractionConsumerContracts.ts',
+      'src/canvas/app/workflow/CanvasAppConsumerContracts.ts',
     )
 
     expect(appModelFile.source).toContain(
@@ -2042,7 +2042,7 @@ describe('Canvas module boundaries', () => {
       "from './CanvasInteractionConsumerModel'",
     )
     expect(interactionConsumerModelFile.source).toContain(
-      "from './CanvasInteractionConsumerContracts'",
+      "from './CanvasAppConsumerContracts'",
     )
     expect(interactionConsumerModelFile.source).toContain(
       '): CanvasInteractionConsumerModel',
@@ -3589,7 +3589,7 @@ describe('Canvas module boundaries', () => {
       'src/canvas/app/workflow/CanvasAppExtensionConsumerModel.ts',
     )
     const extensionConsumerContractsFile = getSourceFile(
-      'src/canvas/app/workflow/CanvasAppExtensionConsumerContracts.ts',
+      'src/canvas/app/workflow/CanvasAppConsumerContracts.ts',
     )
     const appModelFile = getSourceFile(
       'src/canvas/app/workflow/useCanvasAppModel.ts',
@@ -3611,13 +3611,13 @@ describe('Canvas module boundaries', () => {
       "from './CanvasAppExtensionConsumerModel'",
     )
     expect(extensionModelFile.source).toContain(
-      "from './CanvasAppExtensionConsumerContracts'",
+      "from './CanvasAppConsumerContracts'",
     )
     expect(extensionModelFile.source).not.toContain('control: {')
     expect(extensionModelFile.source).not.toContain('keyboard: {')
     expect(extensionModelFile.source).not.toContain('pointer: {')
     expect(extensionConsumerModelFile.source).toContain(
-      "from './CanvasAppExtensionConsumerContracts'",
+      "from './CanvasAppConsumerContracts'",
     )
     expect(extensionConsumerModelFile.source).toContain(
       'export function getCanvasAppExtensionConsumerModel',
