@@ -1381,6 +1381,9 @@ describe('Canvas module boundaries', () => {
     const drawingCreationFile = getSourceFile(
       'src/canvas/app/pointer/CanvasPointerDrawingCreation.ts',
     )
+    const customCreationFile = getSourceFile(
+      'src/canvas/app/pointer/CanvasPointerCustomCreation.ts',
+    )
 
     expect(dragHandlersFile.source).toContain(
       "from './CanvasPointerInteractionLifecycle'",
@@ -1388,7 +1391,9 @@ describe('Canvas module boundaries', () => {
     expect(dragHandlersFile.source).not.toContain('createCanvasRect({')
     expect(dragHandlersFile.source).not.toContain('createCanvasMarker({')
     expect(dragHandlersFile.source).not.toContain('createCanvasArrow({')
-    expect(dragHandlersFile.source).not.toContain('commitCanvasCustomCreation')
+    expect(dragHandlersFile.source).not.toContain(
+      'commitCanvasPointerCustomCreation',
+    )
     expect(dragHandlersFile.source).not.toContain("type: 'transform'")
     expect(dragHandlersFile.source).not.toContain('setEditing(interaction.edit)')
     expect(lifecycleFile.source).toContain(
@@ -1403,7 +1408,9 @@ describe('Canvas module boundaries', () => {
     expect(lifecycleFile.source).not.toContain('createCanvasRect({')
     expect(lifecycleFile.source).not.toContain('createCanvasMarker({')
     expect(lifecycleFile.source).not.toContain('createCanvasArrow({')
-    expect(lifecycleFile.source).not.toContain('commitCanvasCustomCreation')
+    expect(lifecycleFile.source).not.toContain(
+      'commitCanvasPointerCustomCreation',
+    )
     expect(lifecycleFile.source).toContain("type: 'transform'")
     expect(lifecycleFile.source).toContain('setEditing(interaction.edit)')
     const shapeCreationFile = getSourceFile(
@@ -1417,13 +1424,25 @@ describe('Canvas module boundaries', () => {
       "from './CanvasPointerDrawingCreation'",
     )
     expect(creationCommitFile.source).toContain(
+      "from './CanvasPointerCustomCreation'",
+    )
+    expect(creationCommitFile.source).toContain(
       "from './CanvasPointerShapeCreation'",
     )
     expect(creationCommitFile.source).not.toContain('createCanvasRect({')
     expect(creationCommitFile.source).not.toContain('createCanvasArrow({')
     expect(creationCommitFile.source).not.toContain('createCanvasMarker({')
     expect(creationCommitFile.source).not.toContain('createCanvasHighlight({')
-    expect(creationCommitFile.source).toContain('commitCanvasCustomCreation')
+    expect(creationCommitFile.source).not.toContain('commitCanvasCustomCreation')
+    expect(creationCommitFile.source).toContain(
+      'commitCanvasPointerCustomCreation',
+    )
+    expect(customCreationFile.source).toContain(
+      'getCanvasAppCustomCreationTool',
+    )
+    expect(customCreationFile.source).toContain(
+      'export function commitCanvasPointerCustomCreation',
+    )
     expect(shapeCreationFile.source).toContain('createCanvasRect({')
     expect(shapeCreationFile.source).toContain('createCanvasArrow({')
     expect(drawingCreationFile.source).toContain('createCanvasMarker({')
@@ -1452,6 +1471,9 @@ describe('Canvas module boundaries', () => {
     const drawingCreationFile = getSourceFile(
       'src/canvas/app/pointer/CanvasPointerDrawingCreation.ts',
     )
+    const customCreationFile = getSourceFile(
+      'src/canvas/app/pointer/CanvasPointerCustomCreation.ts',
+    )
     const shapeCreationFile = getSourceFile(
       'src/canvas/app/pointer/CanvasPointerShapeCreation.ts',
     )
@@ -1466,6 +1488,9 @@ describe('Canvas module boundaries', () => {
       'CANVAS_POINTER_DRAWING_CREATION_KINDS',
     )
     expect(creationGrammarFile.source).toContain(
+      'CANVAS_POINTER_CUSTOM_CREATION_KINDS',
+    )
+    expect(creationGrammarFile.source).toContain(
       'CANVAS_POINTER_SHAPE_CREATION_KINDS',
     )
     expect(creationStartFile.source).toContain(
@@ -1475,6 +1500,9 @@ describe('Canvas module boundaries', () => {
       "from './CanvasPointerDrawingCreation'",
     )
     expect(creationStartFile.source).toContain(
+      "from './CanvasPointerCustomCreation'",
+    )
+    expect(creationStartFile.source).toContain(
       "from './CanvasPointerShapeCreation'",
     )
     expect(creationPreviewFile.source).toContain(
@@ -1484,6 +1512,9 @@ describe('Canvas module boundaries', () => {
       "from './CanvasPointerDrawingCreation'",
     )
     expect(creationPreviewFile.source).toContain(
+      "from './CanvasPointerCustomCreation'",
+    )
+    expect(creationPreviewFile.source).toContain(
       "from './CanvasPointerShapeCreation'",
     )
     expect(creationCommitFile.source).toContain(
@@ -1491,12 +1522,18 @@ describe('Canvas module boundaries', () => {
     )
     expect(creationCommitFile.source).toContain(
       "from './CanvasPointerDrawingCreation'",
+    )
+    expect(creationCommitFile.source).toContain(
+      "from './CanvasPointerCustomCreation'",
     )
     expect(creationCommitFile.source).toContain(
       "from './CanvasPointerShapeCreation'",
     )
     expect(drawingCreationFile.source).toContain(
       'CANVAS_POINTER_DRAWING_CREATION_DESCRIPTORS',
+    )
+    expect(customCreationFile.source).toContain(
+      'CANVAS_POINTER_CUSTOM_CREATION_KINDS',
     )
     expect(shapeCreationFile.source).toContain(
       'CANVAS_POINTER_SHAPE_CREATION_DESCRIPTORS',
@@ -1537,6 +1574,14 @@ describe('Canvas module boundaries', () => {
       expect(creationPreviewFile.source).not.toContain(shapeKindCheck)
       expect(creationCommitFile.source).not.toContain(shapeKindCheck)
     }
+    for (const customKindCheck of [
+      "interaction.kind === 'create-custom'",
+      "pointerGesture === 'create-custom'",
+    ]) {
+      expect(creationStartFile.source).not.toContain(customKindCheck)
+      expect(creationPreviewFile.source).not.toContain(customKindCheck)
+      expect(creationCommitFile.source).not.toContain(customKindCheck)
+    }
   })
 
   it('keeps pointer interaction preview rules behind a named module', () => {
@@ -1551,6 +1596,9 @@ describe('Canvas module boundaries', () => {
     )
     const drawingCreationFile = getSourceFile(
       'src/canvas/app/pointer/CanvasPointerDrawingCreation.ts',
+    )
+    const customCreationFile = getSourceFile(
+      'src/canvas/app/pointer/CanvasPointerCustomCreation.ts',
     )
     const shapeCreationFile = getSourceFile(
       'src/canvas/app/pointer/CanvasPointerShapeCreation.ts',
@@ -1593,6 +1641,9 @@ describe('Canvas module boundaries', () => {
       "from './CanvasPointerDrawingCreation'",
     )
     expect(creationPreviewFile.source).toContain(
+      "from './CanvasPointerCustomCreation'",
+    )
+    expect(creationPreviewFile.source).toContain(
       "from './CanvasPointerShapeCreation'",
     )
     expect(creationPreviewFile.source).not.toContain(
@@ -1607,6 +1658,8 @@ describe('Canvas module boundaries', () => {
     expect(drawingCreationFile.source).toContain('createCanvasDraftStroke')
     expect(shapeCreationFile.source).toContain('normalizeBounds')
     expect(shapeCreationFile.source).toContain('snapCanvasPointToGrid')
+    expect(customCreationFile.source).toContain('snapCanvasPointToGrid')
+    expect(customCreationFile.source).toContain('hasCanvasInteractionMoved')
     expect(transformPreviewFile.source).toContain(
       'export function previewCanvasPointerTransform',
     )
@@ -1638,6 +1691,9 @@ describe('Canvas module boundaries', () => {
     )
     const drawingCreationFile = getSourceFile(
       'src/canvas/app/pointer/CanvasPointerDrawingCreation.ts',
+    )
+    const customCreationFile = getSourceFile(
+      'src/canvas/app/pointer/CanvasPointerCustomCreation.ts',
     )
     const shapeCreationFile = getSourceFile(
       'src/canvas/app/pointer/CanvasPointerShapeCreation.ts',
@@ -1692,10 +1748,10 @@ describe('Canvas module boundaries', () => {
     )
     expect(creationStartFile.source).toContain('createCanvasText')
     expect(creationStartFile.source).toContain(
-      'getCanvasAppCustomCreationTool',
+      "from './CanvasPointerDrawingCreation'",
     )
     expect(creationStartFile.source).toContain(
-      "from './CanvasPointerDrawingCreation'",
+      "from './CanvasPointerCustomCreation'",
     )
     expect(creationStartFile.source).toContain(
       "from './CanvasPointerShapeCreation'",
@@ -1703,6 +1759,12 @@ describe('Canvas module boundaries', () => {
     expect(creationStartFile.source).not.toContain('createCanvasDraftStroke')
     expect(drawingCreationFile.source).toContain('createCanvasDraftStroke')
     expect(creationStartFile.source).not.toContain('normalizeBounds')
+    expect(creationStartFile.source).not.toContain(
+      'getCanvasAppCustomCreationTool',
+    )
+    expect(customCreationFile.source).toContain(
+      'getCanvasAppCustomCreationTool',
+    )
     expect(shapeCreationFile.source).toContain('normalizeBounds')
   })
 
@@ -2847,8 +2909,8 @@ describe('Canvas module boundaries', () => {
     const keyboardIntentFile = getSourceFile(
       'src/canvas/app/keyboard/CanvasKeyboardShortcutIntent.ts',
     )
-    const pointerCommitFile = getSourceFile(
-      'src/canvas/app/pointer/CanvasCustomCreationCommit.ts',
+    const pointerCustomCreationFile = getSourceFile(
+      'src/canvas/app/pointer/CanvasPointerCustomCreation.ts',
     )
 
     expect(descriptorFile.source).toContain(
@@ -2878,7 +2940,7 @@ describe('Canvas module boundaries', () => {
     for (const file of [
       extensionModelFile,
       keyboardIntentFile,
-      pointerCommitFile,
+      pointerCustomCreationFile,
     ]) {
       expect(file.source).toContain(
         'CanvasAppCustomCreationToolRuntime',

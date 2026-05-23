@@ -7,10 +7,13 @@ import {
 } from '../../engine'
 import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
 import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract'
-import { commitCanvasCustomCreation } from './CanvasCustomCreationCommit'
 import type {
   CanvasPointerCreationInteraction,
 } from './CanvasPointerCreationGrammar'
+import {
+  commitCanvasPointerCustomCreation,
+  isCanvasPointerCustomCreationInteraction,
+} from './CanvasPointerCustomCreation'
 import {
   commitCanvasPointerDrawingCreation,
   isCanvasPointerDrawingCreationInteraction,
@@ -62,14 +65,13 @@ export function commitCanvasPointerCreation({
     return
   }
 
-  commitCanvasCustomCreation({
-    commitItemsChange,
-    createId,
-    customCreationTools,
-    currentWorld: interaction.currentWorld,
-    moved: interaction.moved,
-    selection,
-    startWorld: interaction.startWorld,
-    tool: interaction.tool,
-  })
+  if (isCanvasPointerCustomCreationInteraction(interaction)) {
+    commitCanvasPointerCustomCreation({
+      commitItemsChange,
+      createId,
+      customCreationTools,
+      interaction,
+      selection,
+    })
+  }
 }

@@ -6,11 +6,7 @@ import type {
   Tool,
 } from '../../entities'
 import {
-  isCanvasCustomToolId,
-} from '../../core'
-import {
   createCanvasText,
-  snapCanvasPointToGrid,
   type CanvasAffordanceConfig,
   type CanvasCreationAdapter,
   type CanvasDraftArrowOverlay,
@@ -18,7 +14,6 @@ import {
   type CanvasPointerGesture,
 } from '../../engine'
 import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
-import { getCanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationToolRuntime'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import type { Interaction } from './CanvasInteractionState'
 import {
@@ -27,6 +22,9 @@ import {
 import {
   startCanvasPointerDrawingCreation,
 } from './CanvasPointerDrawingCreation'
+import {
+  startCanvasPointerCustomCreation,
+} from './CanvasPointerCustomCreation'
 import {
   startCanvasPointerShapeCreation,
 } from './CanvasPointerShapeCreation'
@@ -99,30 +97,18 @@ export function startCanvasPointerCreation({
     return drawingStart
   }
 
-  if (pointerGesture === 'create-custom' && isCanvasCustomToolId(tool)) {
-    if (!getCanvasAppCustomCreationTool(customCreationTools, tool)) {
-      return { kind: 'none' }
-    }
+  const customStart = startCanvasPointerCustomCreation({
+    config,
+    customCreationTools,
+    input,
+    pointerGesture,
+    startScreen,
+    startWorld,
+    tool,
+  })
 
-    const snappedStartWorld = snapCanvasPointToGrid({
-      config,
-      point: startWorld,
-    })
-
-    return {
-      kind: 'interaction',
-      capturePointer: true,
-      gesture: 'create-custom',
-      interaction: {
-        kind: 'create-custom',
-        pointerId: input.pointerId,
-        startScreen,
-        startWorld: snappedStartWorld,
-        currentWorld: snappedStartWorld,
-        tool,
-        moved: false,
-      },
-    }
+  if (customStart) {
+    return customStart
   }
 
   if (pointerGesture === 'create-text') {

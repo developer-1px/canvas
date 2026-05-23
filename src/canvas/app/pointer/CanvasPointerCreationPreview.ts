@@ -3,8 +3,6 @@ import type {
   Point,
 } from '../../entities'
 import {
-  EMPTY_CANVAS_SNAP_GUIDES,
-  snapCanvasPointToGrid,
   type CanvasAffordanceConfig,
   type CanvasDraftArrowOverlay,
   type CanvasDraftStrokeOverlay,
@@ -19,9 +17,11 @@ import {
   previewCanvasPointerDrawingCreation,
 } from './CanvasPointerDrawingCreation'
 import {
+  previewCanvasPointerCustomCreation,
+} from './CanvasPointerCustomCreation'
+import {
   previewCanvasPointerShapeCreation,
 } from './CanvasPointerShapeCreation'
-import { hasCanvasInteractionMoved } from './CanvasPointerInteractionMovement'
 
 type CanvasPointerCreationPreviewInput = {
   config: CanvasAffordanceConfig
@@ -72,29 +72,15 @@ export function previewCanvasPointerCreation({
     return drawingPreview
   }
 
-  if (interaction.kind === 'create-custom') {
-    if (!config.gestures.createCustom) {
-      return { kind: 'none' }
-    }
+  const customPreview = previewCanvasPointerCustomCreation({
+    config,
+    currentScreen,
+    currentWorld,
+    interaction,
+  })
 
-    const moved = hasCanvasInteractionMoved({
-      currentScreen,
-      interaction,
-    })
-    const snappedCurrentWorld = snapCanvasPointToGrid({
-      config,
-      point: currentWorld,
-    })
-
-    return {
-      interaction: {
-        ...interaction,
-        currentWorld: snappedCurrentWorld,
-        moved,
-      },
-      kind: 'preview',
-      snapGuides: EMPTY_CANVAS_SNAP_GUIDES,
-    }
+  if (customPreview) {
+    return customPreview
   }
 
   return { kind: 'none' }

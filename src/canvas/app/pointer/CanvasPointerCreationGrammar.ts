@@ -4,18 +4,21 @@ import {
   CANVAS_POINTER_DRAWING_CREATION_KINDS,
 } from './CanvasPointerDrawingCreation'
 import {
+  CANVAS_POINTER_CUSTOM_CREATION_KINDS,
+} from './CanvasPointerCustomCreation'
+import {
   CANVAS_POINTER_SHAPE_CREATION_KINDS,
 } from './CanvasPointerShapeCreation'
 
 const CANVAS_POINTER_CREATION_GESTURES = [
-  'create-custom',
   'create-text',
+  ...CANVAS_POINTER_CUSTOM_CREATION_KINDS,
   ...CANVAS_POINTER_DRAWING_CREATION_KINDS,
   ...CANVAS_POINTER_SHAPE_CREATION_KINDS,
 ] as const satisfies readonly CanvasPointerGesture[]
 
 const CANVAS_POINTER_CREATION_INTERACTION_KINDS = [
-  'create-custom',
+  ...CANVAS_POINTER_CUSTOM_CREATION_KINDS,
   ...CANVAS_POINTER_DRAWING_CREATION_KINDS,
   ...CANVAS_POINTER_SHAPE_CREATION_KINDS,
 ] as const satisfies readonly Interaction['kind'][]
