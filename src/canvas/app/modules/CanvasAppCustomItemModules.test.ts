@@ -79,6 +79,93 @@ describe('CanvasAppCustomItemModules', () => {
     ])
   })
 
+  it('snapshots assembled module parts against caller mutation', () => {
+    const command: NonNullable<
+      CanvasAppCustomItemModule['customCommands']
+    >[number] = {
+      id: 'publish-risk',
+      label: 'Pub',
+      title: 'Publish risk',
+      run: () => undefined,
+    }
+    const creationTool: NonNullable<
+      CanvasAppCustomItemModule['customCreationTools']
+    >[number] = {
+      id: 'risk',
+      label: '!',
+      title: 'Risk',
+      shortcut: { key: 'e', shiftKey: true },
+      createItem: ({ startWorld }) => ({
+        title: 'Risk',
+        x: startWorld.x,
+        y: startWorld.y,
+        w: 120,
+        h: 80,
+        data: { severity: 'high' },
+      }),
+    }
+    const inspectorPanel: NonNullable<
+      CanvasAppCustomItemModule['inspectorPanels']
+    >[number] = {
+      id: 'risk-meta',
+      render: ({ selection }) => selection.length,
+    }
+    const module = defineRiskModule({
+      customCommands: [command],
+      customCreationTools: [creationTool],
+      inspectorPanels: [inspectorPanel],
+    })
+
+    const assembly = createCanvasAppCustomItemModuleAssembly([module])
+
+    command.title = 'Mutated publish'
+    command.run = () => {
+      throw new Error('mutated command')
+    }
+    creationTool.createItem = ({ startWorld }) => ({
+      title: 'Mutated risk',
+      x: startWorld.x,
+      y: startWorld.y,
+      w: 120,
+      h: 80,
+      data: { severity: 'high' },
+    })
+    inspectorPanel.render = () => 'mutated'
+
+    expect(assembly.customCommands[0]).toMatchObject({
+      id: 'publish-risk',
+      title: 'Publish risk',
+    })
+    expect(assembly.customCreationTools[0]?.createItem({
+      createId: (prefix) => `${prefix}-1`,
+      currentWorld: { x: 100, y: 140 },
+      moved: false,
+      startWorld: { x: 80, y: 120 },
+    })).toMatchObject({
+      kind: 'risk',
+      title: 'Risk',
+    })
+    expect(assembly.inspectorPanels[0]?.render({
+      bounds: null,
+      commitItemsChange: () => false,
+      disabled: false,
+      label: null,
+      selectedItems: [],
+      selection: ['risk-1'],
+    })).toBe(1)
+    expect(Object.isFrozen(assembly)).toBe(true)
+    expect(Object.isFrozen(assembly.customCommands)).toBe(true)
+    expect(Object.isFrozen(assembly.customCommands[0])).toBe(true)
+    expect(Object.isFrozen(assembly.customCreationTools)).toBe(true)
+    expect(Object.isFrozen(assembly.customCreationTools[0])).toBe(true)
+    expect(Object.isFrozen(assembly.customCreationTools[0]?.shortcut)).toBe(
+      true,
+    )
+    expect(Object.isFrozen(assembly.customItemRenderers)).toBe(true)
+    expect(Object.isFrozen(assembly.customItemValidators)).toBe(true)
+    expect(Object.isFrozen(assembly.inspectorPanels[0])).toBe(true)
+  })
+
   it('rejects duplicate module-owned extension keys', () => {
     const first = defineRiskModule({
       customCreationTools: [

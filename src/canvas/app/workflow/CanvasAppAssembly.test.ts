@@ -13,6 +13,7 @@ import {
   defineCanvasAppCustomItemModule,
   type CanvasAppAssembly,
   type CanvasAppCustomCommand,
+  type CanvasAppCustomItemModuleCreationTool,
   type CanvasAppInspectorPanel,
 } from './index'
 
@@ -311,6 +312,134 @@ describe('CanvasAppAssembly', () => {
         },
       } as unknown as CanvasAppAssembly),
     ).toThrow('Canvas app command adapter requires selectAll')
+  })
+
+  it('snapshots assembled output against caller mutation', () => {
+    const renderRisk: CanvasDemoSvgComponentRendererStrategy = ({ item }) =>
+      item.title
+    const renderMutatedRisk: CanvasDemoSvgComponentRendererStrategy = () =>
+      'mutated'
+    const componentPresentationRenderers = {
+      'risk-card': renderRisk,
+    }
+    const customCommandRun = () => undefined
+    const customCommand = {
+      id: 'publish',
+      label: 'Pub',
+      title: 'Publish risk',
+      run: customCommandRun,
+    }
+    const customInspectorPanel: CanvasAppInspectorPanel = {
+      id: 'risk-meta',
+      render: ({ selection }) => selection.length,
+    }
+    const initialItems = [
+      {
+        id: 'rect-1',
+        type: 'rect',
+        x: 0,
+        y: 0,
+        w: 120,
+        h: 80,
+        fill: '#fff',
+        stroke: '#000',
+      },
+    ] satisfies CanvasAppAssembly['initialItems']
+    const itemAdapters = {
+      ...DEFAULT_CANVAS_APP_ASSEMBLY.itemAdapters,
+      command: {
+        ...DEFAULT_CANVAS_APP_ASSEMBLY.itemAdapters.command,
+      },
+    }
+    const moduleCreationTool: CanvasAppCustomItemModuleCreationTool = {
+      id: 'risk',
+      label: '!',
+      title: 'Risk',
+      shortcut: { key: 'e', shiftKey: true },
+      createItem: ({ startWorld }) => ({
+        title: 'Risk',
+        x: startWorld.x,
+        y: startWorld.y,
+        w: 120,
+        h: 80,
+        data: { severity: 'high' },
+      }),
+    }
+    const riskModule = defineCanvasAppCustomItemModule({
+      id: 'risk',
+      presentation: 'risk-node',
+      renderItem: ({ item }) => item.title,
+      validateItem: (item) => item.data.severity === 'high',
+      customCreationTools: [moduleCreationTool],
+    })
+
+    const assembly = createCanvasAppAssembly({
+      componentPresentationRenderers,
+      customCommands: [customCommand],
+      customItemModules: [riskModule],
+      initialItems,
+      inspectorPanels: [customInspectorPanel],
+      itemAdapters,
+    })
+
+    componentPresentationRenderers['risk-card'] = renderMutatedRisk
+    customCommand.title = 'Mutated publish'
+    customCommand.run = () => {
+      throw new Error('mutated command')
+    }
+    customInspectorPanel.render = () => 'mutated'
+    initialItems[0].x = 999
+    initialItems.push({
+      ...initialItems[0],
+      id: 'rect-2',
+    })
+    itemAdapters.command.selectAll = () => ['mutated']
+    moduleCreationTool.createItem = ({ startWorld }) => ({
+      title: 'Mutated risk',
+      x: startWorld.x,
+      y: startWorld.y,
+      w: 120,
+      h: 80,
+      data: { severity: 'high' },
+    })
+
+    expect(assembly.componentPresentationRenderers['risk-card']).toBe(
+      renderRisk,
+    )
+    expect(assembly.customCommands[0]).toMatchObject({
+      id: 'publish',
+      title: 'Publish risk',
+    })
+    expect(assembly.customCommands[0]?.run).toBe(customCommandRun)
+    expect(assembly.inspectorPanels[0]?.render({
+      bounds: null,
+      commitItemsChange: () => false,
+      disabled: false,
+      label: null,
+      selectedItems: [],
+      selection: ['risk-1'],
+    })).toBe(1)
+    expect(assembly.initialItems).toHaveLength(1)
+    expect(assembly.initialItems[0]).toMatchObject({ id: 'rect-1', x: 0 })
+    expect(assembly.itemAdapters.command.selectAll({ items: [] })).toEqual([])
+    expect(assembly.customCreationTools[0]?.createItem({
+      createId: (prefix) => `${prefix}-1`,
+      currentWorld: { x: 10, y: 20 },
+      moved: false,
+      startWorld: { x: 10, y: 20 },
+    })).toMatchObject({
+      kind: 'risk',
+      title: 'Risk',
+    })
+    expect(Object.isFrozen(assembly)).toBe(true)
+    expect(Object.isFrozen(assembly.customCommands)).toBe(true)
+    expect(Object.isFrozen(assembly.customCommands[0])).toBe(true)
+    expect(Object.isFrozen(assembly.customCreationTools[0]?.shortcut)).toBe(true)
+    expect(Object.isFrozen(assembly.componentPresentationRenderers)).toBe(true)
+    expect(Object.isFrozen(assembly.customItemValidators)).toBe(true)
+    expect(Object.isFrozen(assembly.initialItems)).toBe(true)
+    expect(Object.isFrozen(assembly.initialItems[0])).toBe(true)
+    expect(Object.isFrozen(assembly.itemAdapters.command)).toBe(true)
   })
 
   it('can disable custom item modules at the app assembly seam', () => {

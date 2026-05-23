@@ -79,18 +79,19 @@ export type CanvasAppAssemblyInput = {
   itemAdapters?: CanvasAppItemAdapters
 }
 
-export const DEFAULT_CANVAS_APP_ASSEMBLY: CanvasAppAssembly = {
-  componentLibrary: CANVAS_COMPONENT_LIBRARY,
-  componentPresentationRenderers:
-    DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS,
-  customCommands: [],
-  customCreationTools: [],
-  customItemRenderers: DEFAULT_CANVAS_DEMO_SVG_CUSTOM_ITEM_RENDERERS,
-  customItemValidators: {},
-  inspectorPanels: [],
-  initialItems: INITIAL_ITEMS,
-  itemAdapters: CANVAS_ITEM_ENGINE_ADAPTERS,
-}
+export const DEFAULT_CANVAS_APP_ASSEMBLY: CanvasAppAssembly =
+  snapshotCanvasAppAssembly({
+    componentLibrary: CANVAS_COMPONENT_LIBRARY,
+    componentPresentationRenderers:
+      DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS,
+    customCommands: [],
+    customCreationTools: [],
+    customItemRenderers: DEFAULT_CANVAS_DEMO_SVG_CUSTOM_ITEM_RENDERERS,
+    customItemValidators: {},
+    inspectorPanels: [],
+    initialItems: INITIAL_ITEMS,
+    itemAdapters: CANVAS_ITEM_ENGINE_ADAPTERS,
+  })
 
 export function createCanvasAppAssembly(
   input: CanvasAppAssemblyInput = {},
@@ -156,7 +157,7 @@ export function createCanvasAppAssembly(
   })
   assertCanvasAppAssembly(assembly)
 
-  return assembly
+  return snapshotCanvasAppAssembly(assembly)
 }
 
 export function assertCanvasAppAssembly(assembly: CanvasAppAssembly) {
@@ -302,4 +303,103 @@ function assertCanvasAppTransformAdapter(
       value: adapter[field],
     })
   }
+}
+
+function snapshotCanvasAppAssembly(
+  assembly: CanvasAppAssembly,
+): CanvasAppAssembly {
+  const customItemValidators = freezeCanvasAppRecord(
+    assembly.customItemValidators,
+  )
+
+  return Object.freeze({
+    componentLibrary: assembly.componentLibrary,
+    componentPresentationRenderers: freezeCanvasAppRecord(
+      assembly.componentPresentationRenderers,
+    ),
+    customCommands: freezeCanvasAppArray(
+      assembly.customCommands.map(snapshotCanvasAppCustomCommand),
+    ),
+    customCreationTools: freezeCanvasAppArray(
+      assembly.customCreationTools.map(snapshotCanvasAppCustomCreationTool),
+    ),
+    customItemRenderers: freezeCanvasAppRecord(assembly.customItemRenderers),
+    customItemValidators,
+    inspectorPanels: freezeCanvasAppArray(
+      assembly.inspectorPanels.map(snapshotCanvasAppInspectorPanel),
+    ),
+    initialItems: snapshotCanvasAppInitialItems(
+      assembly.initialItems,
+      customItemValidators,
+    ),
+    itemAdapters: snapshotCanvasAppItemAdapters(assembly.itemAdapters),
+  })
+}
+
+function snapshotCanvasAppCustomCommand(
+  command: CanvasAppCustomCommand,
+): CanvasAppCustomCommand {
+  return Object.freeze({ ...command })
+}
+
+function snapshotCanvasAppCustomCreationTool(
+  tool: CanvasAppCustomCreationTool,
+): CanvasAppCustomCreationTool {
+  const snapshot: CanvasAppCustomCreationTool = {
+    ...tool,
+  }
+
+  if (tool.shortcut) {
+    snapshot.shortcut = Object.freeze({ ...tool.shortcut })
+  }
+
+  return Object.freeze(snapshot)
+}
+
+function snapshotCanvasAppInspectorPanel(
+  panel: CanvasAppInspectorPanel,
+): CanvasAppInspectorPanel {
+  return Object.freeze({ ...panel })
+}
+
+function snapshotCanvasAppInitialItems(
+  items: CanvasItem[],
+  customItemValidators: CanvasCustomItemValidators,
+) {
+  return freezeCanvasAppArray(
+    normalizeCanvasItems(items, { customItemValidators })
+      .map((item) => deepFreezeCanvasAppValue(structuredClone(item))),
+  ) as CanvasItem[]
+}
+
+function snapshotCanvasAppItemAdapters(
+  itemAdapters: CanvasAppItemAdapters,
+): CanvasAppItemAdapters {
+  return Object.freeze({
+    command: Object.freeze({ ...itemAdapters.command }),
+    creation: Object.freeze({ ...itemAdapters.creation }),
+    transform: Object.freeze({ ...itemAdapters.transform }),
+  })
+}
+
+function freezeCanvasAppRecord<TValue>(
+  record: Readonly<Record<string, TValue>>,
+) {
+  return Object.freeze({ ...record })
+}
+
+function freezeCanvasAppArray<TValue>(items: readonly TValue[]) {
+  return Object.freeze([...items]) as readonly TValue[]
+}
+
+function deepFreezeCanvasAppValue<TValue>(value: TValue): TValue {
+  if (typeof value !== 'object' || value === null || Object.isFrozen(value)) {
+    return value
+  }
+
+  for (const nested of Object.values(value)) {
+    deepFreezeCanvasAppValue(nested)
+  }
+
+  return Object.freeze(value)
 }

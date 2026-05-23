@@ -151,7 +151,7 @@ export function createCanvasAppCustomItemModuleAssembly(
 
   assertCanvasAppCustomCreationTools(assembly.customCreationTools)
 
-  return assembly
+  return snapshotCanvasAppCustomItemModuleAssembly(assembly)
 }
 
 function assertCanvasAppCustomItemModuleContracts(
@@ -217,46 +217,50 @@ function getCanvasAppCustomItemModuleCreationTools({
   presentation,
   validateItem,
 }: CanvasAppCustomItemModule): readonly CanvasAppCustomCreationTool[] {
-  return customCreationTools.map((tool) => ({
-    ...tool,
-    createItem: (context) => {
-      let item: CanvasAppCustomItemModuleCreationItem | null
+  return customCreationTools.map((tool) => {
+    const createModuleItem = tool.createItem
 
-      try {
-        item = tool.createItem(context)
-      } catch {
-        return null
-      }
+    return {
+      ...tool,
+      createItem: (context) => {
+        let item: CanvasAppCustomItemModuleCreationItem | null
 
-      if (!item) {
-        return null
-      }
+        try {
+          item = createModuleItem(context)
+        } catch {
+          return null
+        }
 
-      const customItem = {
-        ...item,
-        id: context.createId(id),
-        kind: id,
-        presentation,
-        type: 'custom',
-      } as const
+        if (!item) {
+          return null
+        }
 
-      try {
-        normalizeCanvasItems([customItem], {
-          customItemValidators: {
-            [id]: getCanvasAppCustomItemModuleValidator({
-              id,
-              presentation,
-              validateItem,
-            }),
-          },
-        })
+        const customItem = {
+          ...item,
+          id: context.createId(id),
+          kind: id,
+          presentation,
+          type: 'custom',
+        } as const
 
-        return customItem
-      } catch {
-        return null
-      }
-    },
-  }))
+        try {
+          normalizeCanvasItems([customItem], {
+            customItemValidators: {
+              [id]: getCanvasAppCustomItemModuleValidator({
+                id,
+                presentation,
+                validateItem,
+              }),
+            },
+          })
+
+          return customItem
+        } catch {
+          return null
+        }
+      },
+    }
+  })
 }
 
 function getCanvasAppCustomItemModuleRenderers({
@@ -323,4 +327,44 @@ function assertKnownDisabledModuleIds(
       throw new Error(`Unknown disabled canvas custom item module: ${disabledModuleId}`)
     }
   }
+}
+
+function snapshotCanvasAppCustomItemModuleAssembly(
+  assembly: CanvasAppCustomItemModuleAssembly,
+): CanvasAppCustomItemModuleAssembly {
+  return Object.freeze({
+    customCommands: freezeCanvasAppArray(
+      assembly.customCommands.map((command) => Object.freeze({ ...command })),
+    ),
+    customCreationTools: freezeCanvasAppArray(
+      assembly.customCreationTools.map(snapshotCanvasAppCustomCreationTool),
+    ),
+    customItemRenderers: freezeCanvasAppRecord(assembly.customItemRenderers),
+    customItemValidators: freezeCanvasAppRecord(assembly.customItemValidators),
+    inspectorPanels: freezeCanvasAppArray(
+      assembly.inspectorPanels.map((panel) => Object.freeze({ ...panel })),
+    ),
+  })
+}
+
+function snapshotCanvasAppCustomCreationTool(
+  tool: CanvasAppCustomCreationTool,
+): CanvasAppCustomCreationTool {
+  const snapshot: CanvasAppCustomCreationTool = { ...tool }
+
+  if (tool.shortcut) {
+    snapshot.shortcut = Object.freeze({ ...tool.shortcut })
+  }
+
+  return Object.freeze(snapshot)
+}
+
+function freezeCanvasAppRecord<TValue>(
+  record: Readonly<Record<string, TValue>>,
+) {
+  return Object.freeze({ ...record })
+}
+
+function freezeCanvasAppArray<TValue>(items: readonly TValue[]) {
+  return Object.freeze([...items]) as readonly TValue[]
 }
