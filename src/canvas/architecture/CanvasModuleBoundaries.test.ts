@@ -375,6 +375,36 @@ describe('Canvas module boundaries', () => {
     expect(startFile.source).toContain('createCanvasDraftStroke')
   })
 
+  it('keeps item pointer interaction start rules behind a named module', () => {
+    const downHandlersFile = getSourceFile(
+      'src/canvas/app/pointer/useCanvasPointerDownHandlers.ts',
+    )
+    const itemStartFile = getSourceFile(
+      'src/canvas/app/pointer/CanvasItemPointerInteractionStart.ts',
+    )
+
+    expect(downHandlersFile.source).toContain(
+      "from './CanvasItemPointerInteractionStart'",
+    )
+    expect(downHandlersFile.source).not.toContain(
+      'getCanvasItemPointerIntent',
+    )
+    expect(downHandlersFile.source).not.toContain(
+      'getCanvasItemPointerSelection',
+    )
+    expect(downHandlersFile.source).not.toContain('findEditableTextItem')
+    expect(downHandlersFile.source).not.toContain('altDragDuplicate')
+    expect(downHandlersFile.source).not.toContain('historySelection')
+    expect(itemStartFile.source).toContain(
+      'export function startCanvasItemPointerInteraction',
+    )
+    expect(itemStartFile.source).toContain('getCanvasItemPointerIntent')
+    expect(itemStartFile.source).toContain('getCanvasItemPointerSelection')
+    expect(itemStartFile.source).toContain('findEditableTextItem')
+    expect(itemStartFile.source).toContain('altDragDuplicate')
+    expect(itemStartFile.source).toContain('historySelection')
+  })
+
   it('keeps app rendering authoring contracts independent from Demo SVG registry names', () => {
     const contractsFile = getSourceFile(
       'src/canvas/app/rendering/CanvasAppRenderingContracts.ts',

@@ -19,8 +19,6 @@ import type { CanvasItemReadModel } from '../../host'
 import { pointDistance } from '../../core'
 import { capturePointer, screenPoint, screenToWorld } from './CanvasPointerGeometry'
 import {
-  getCanvasItemPointerIntent,
-  getCanvasItemPointerSelection,
   shouldRouteCanvasItemPointerToCanvasGesture,
   type CanvasAffordanceConfig,
   type CanvasCreationAdapter,
@@ -37,6 +35,7 @@ import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
 import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
 import { startCanvasPointerInteraction } from './CanvasPointerInteractionStart'
+import { startCanvasItemPointerInteraction } from './CanvasItemPointerInteractionStart'
 
 type UseCanvasPointerDownHandlersArgs = {
   cloneItems: (ids: string[], offset: Point) => CanvasItem[]
@@ -171,10 +170,6 @@ export function useCanvasPointerDownHandlers({
       return
     }
 
-    event.preventDefault()
-    event.stopPropagation()
-    capturePointer(stageElement, event.pointerId)
-
     const startScreen = screenPoint(stageElement, event)
     const lastClick = lastClickRef.current
     const now = performance.now()
@@ -184,85 +179,48 @@ export function useCanvasPointerDownHandlers({
       pointDistance(startScreen, lastClick.point) < 6
 
     lastClickRef.current = { id: itemId, point: startScreen, time: now }
-
-    const itemIntent = getCanvasItemPointerIntent({
+    const startWorld = screenToWorld(startScreen, viewport)
+    const start = startCanvasItemPointerInteraction({
+      cloneItems,
       config,
       input: event,
       isDoubleClick,
-    })
-    const editItem =
-      itemIntent.textEdit
-        ? itemReadModel.findEditableTextItem(itemId)
-        : null
-    const itemSelection = getCanvasItemPointerSelection({
-      additive: itemIntent.additive,
       itemId,
+      itemReadModel,
+      items,
       scene,
       selection,
+      startScreen,
+      startWorld,
     })
-    let nextSelection = itemSelection.nextSelection
-    const historySelection = nextSelection
-    const moveBounds = scene.getBounds(nextSelection)
 
-    if (editItem) {
+    event.preventDefault()
+    event.stopPropagation()
+
+    if (start.clearLastClick) {
       lastClickRef.current = null
     }
 
-    if (itemIntent.additive) {
-      commitSelection(nextSelection)
-
-      if (itemSelection.alreadySelected) {
-        interactionRef.current = { kind: 'none' }
-        setGesture('none')
-        return
-      }
-    } else if (nextSelection !== selection) {
-      commitSelection(nextSelection)
+    if (start.commitSelection) {
+      commitSelection(start.commitSelection)
     }
 
-    let startItems = items
-    const historyItems = items
-
-    if (
-      itemIntent.altDragDuplicate
-    ) {
-      const clones = cloneItems(nextSelection, { x: 0, y: 0 })
-
-      if (clones.length > 0) {
-        nextSelection = clones.map((item) => item.id)
-        startItems = [...items, ...clones]
-        setLiveItems(startItems)
-        setSelection(nextSelection)
-      }
+    if (start.liveItems) {
+      setLiveItems(start.liveItems)
     }
 
-    if (!config.gestures.move) {
+    if (start.selection) {
+      setSelection(start.selection)
+    }
+
+    if (start.kind === 'none') {
       interactionRef.current = { kind: 'none' }
       setGesture('none')
       return
     }
 
-    const startWorld = screenToWorld(startScreen, viewport)
-
-    interactionRef.current = {
-      kind: 'move',
-      pointerId: event.pointerId,
-      startScreen,
-      startWorld,
-      ids: nextSelection,
-      bounds: moveBounds,
-      historySelection,
-      startItems,
-      currentItems: startItems,
-      historyItems,
-      edit: editItem
-        ? {
-            id: editItem.id,
-            value: editItem.type === 'rect' ? editItem.text ?? '' : editItem.text,
-          }
-        : undefined,
-      moved: false,
-    }
+    capturePointer(stageElement, event.pointerId)
+    interactionRef.current = start.interaction
     setGesture('move')
   }
 
