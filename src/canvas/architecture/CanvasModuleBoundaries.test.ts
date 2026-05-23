@@ -1793,6 +1793,9 @@ describe('Canvas module boundaries', () => {
     const commandShortcutFile = getSourceFile(
       'src/canvas/app/keyboard/CanvasKeyboardCommandShortcuts.ts',
     )
+    const nudgeShortcutFile = getSourceFile(
+      'src/canvas/app/keyboard/CanvasKeyboardNudgeShortcuts.ts',
+    )
     const systemShortcutFile = getSourceFile(
       'src/canvas/app/keyboard/CanvasKeyboardSystemShortcuts.ts',
     )
@@ -1852,9 +1855,21 @@ describe('Canvas module boundaries', () => {
     expect(commandShortcutFile.source).toContain(
       'export function getCanvasKeyboardReservedCommandShortcuts',
     )
+    expect(commandShortcutFile.source).toContain(
+      "from './CanvasKeyboardNudgeShortcuts'",
+    )
     expect(commandShortcutFile.source).toContain("shortcutId: 'undo'")
-    expect(commandShortcutFile.source).toContain("shortcutId: 'nudge'")
+    expect(commandShortcutFile.source).not.toContain("shortcutId: 'nudge'")
+    expect(commandShortcutFile.source).not.toContain("'large nudge left'")
     expect(commandShortcutFile.source).toContain("kind: 'reorder-selection'")
+    expect(nudgeShortcutFile.source).toContain(
+      'export function getCanvasKeyboardNudgeShortcutIntent',
+    )
+    expect(nudgeShortcutFile.source).toContain(
+      'export function getCanvasKeyboardReservedNudgeShortcuts',
+    )
+    expect(nudgeShortcutFile.source).toContain("'large nudge left'")
+    expect(nudgeShortcutFile.source).toContain("kind: 'nudge-selection'")
     expect(systemShortcutFile.source).toContain(
       'export function getCanvasKeyboardSystemShortcutIntent',
     )

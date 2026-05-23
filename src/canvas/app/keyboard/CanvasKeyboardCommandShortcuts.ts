@@ -8,6 +8,10 @@ import {
   type CanvasKeyboardReservedShortcut,
   type CanvasKeyboardShortcutChord,
 } from './CanvasKeyboardShortcutChords'
+import {
+  getCanvasKeyboardNudgeShortcutIntent,
+  getCanvasKeyboardReservedNudgeShortcuts,
+} from './CanvasKeyboardNudgeShortcuts'
 import type {
   CanvasKeyboardCommandShortcutIntent,
   CanvasKeyboardCommandShortcutIntentInput,
@@ -227,70 +231,6 @@ const CANVAS_KEYBOARD_COMMAND_SHORTCUTS = [
     shortcutId: 'ungroup',
   },
   {
-    commandId: 'nudge',
-    getIntent: getCanvasKeyboardNudgeIntent(-1, 0),
-    label: 'nudge left',
-    reserve: true,
-    shortcut: { key: 'ArrowLeft' },
-    shortcutId: 'nudge',
-  },
-  {
-    commandId: 'nudge',
-    getIntent: getCanvasKeyboardNudgeIntent(1, 0),
-    label: 'nudge right',
-    reserve: true,
-    shortcut: { key: 'ArrowRight' },
-    shortcutId: 'nudge',
-  },
-  {
-    commandId: 'nudge',
-    getIntent: getCanvasKeyboardNudgeIntent(0, -1),
-    label: 'nudge up',
-    reserve: true,
-    shortcut: { key: 'ArrowUp' },
-    shortcutId: 'nudge',
-  },
-  {
-    commandId: 'nudge',
-    getIntent: getCanvasKeyboardNudgeIntent(0, 1),
-    label: 'nudge down',
-    reserve: true,
-    shortcut: { key: 'ArrowDown' },
-    shortcutId: 'nudge',
-  },
-  {
-    commandId: 'nudge',
-    getIntent: getCanvasKeyboardNudgeIntent(-10, 0),
-    label: 'large nudge left',
-    reserve: true,
-    shortcut: { key: 'ArrowLeft', shiftKey: true },
-    shortcutId: 'nudge',
-  },
-  {
-    commandId: 'nudge',
-    getIntent: getCanvasKeyboardNudgeIntent(10, 0),
-    label: 'large nudge right',
-    reserve: true,
-    shortcut: { key: 'ArrowRight', shiftKey: true },
-    shortcutId: 'nudge',
-  },
-  {
-    commandId: 'nudge',
-    getIntent: getCanvasKeyboardNudgeIntent(0, -10),
-    label: 'large nudge up',
-    reserve: true,
-    shortcut: { key: 'ArrowUp', shiftKey: true },
-    shortcutId: 'nudge',
-  },
-  {
-    commandId: 'nudge',
-    getIntent: getCanvasKeyboardNudgeIntent(0, 10),
-    label: 'large nudge down',
-    reserve: true,
-    shortcut: { key: 'ArrowDown', shiftKey: true },
-    shortcutId: 'nudge',
-  },
-  {
     commandId: 'fitView',
     getIntent: () => ({ kind: 'fit-all', preventDefault: true }),
     label: 'fit all',
@@ -321,22 +261,26 @@ export function getCanvasKeyboardBuiltinCommandShortcutIntent(
     isCanvasKeyboardCommandShortcutMatch(input, shortcut),
   )
 
-  return commandShortcut?.getIntent(input) ?? null
+  return commandShortcut?.getIntent(input) ??
+    getCanvasKeyboardNudgeShortcutIntent(input)
 }
 
 export function getCanvasKeyboardReservedCommandShortcuts():
   CanvasKeyboardReservedShortcut[] {
-  return CANVAS_KEYBOARD_COMMAND_SHORTCUTS.flatMap((shortcut) => {
-    if (!shortcut.reserve) {
-      return []
-    }
+  return [
+    ...CANVAS_KEYBOARD_COMMAND_SHORTCUTS.flatMap((shortcut) => {
+      if (!shortcut.reserve) {
+        return []
+      }
 
-    return reserveCanvasKeyboardShortcut(
-      shortcut.label,
-      shortcut.shortcut,
-      typeof shortcut.reserve === 'object' ? shortcut.reserve : {},
-    )
-  })
+      return reserveCanvasKeyboardShortcut(
+        shortcut.label,
+        shortcut.shortcut,
+        typeof shortcut.reserve === 'object' ? shortcut.reserve : {},
+      )
+    }),
+    ...getCanvasKeyboardReservedNudgeShortcuts(),
+  ]
 }
 
 function isCanvasKeyboardCommandShortcutMatch(
@@ -385,14 +329,4 @@ function isCanvasKeyboardShortcutKeyMatch(
       normalizeCanvasKeyboardShortcutKey(shortcutKey).toLowerCase() ===
       normalizedKey,
   )
-}
-
-function getCanvasKeyboardNudgeIntent(dx: number, dy: number) {
-  return ({
-    selection,
-  }: CanvasKeyboardCommandShortcutIntentInput):
-    CanvasKeyboardCommandShortcutIntent =>
-    selection.length === 0
-      ? { kind: 'none', preventDefault: false }
-      : { dx, dy, kind: 'nudge-selection', preventDefault: true }
 }
