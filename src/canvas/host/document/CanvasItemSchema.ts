@@ -2,6 +2,7 @@ import * as z from 'zod'
 import { isCanvasComponentItemStorageShape } from '../component/CanvasComponentItemValidation'
 import { isCanvasDrawingItemStorageShape } from '../drawing/CanvasDrawingItemValidation'
 import type { CanvasItem } from '../model'
+import { isCanvasEditableTextItemStorageShape } from '../text/CanvasEditableTextItem'
 import { syncCanvasItems } from '../tree/CanvasTree'
 import {
   assertCanvasCustomItemValidators,
@@ -58,16 +59,8 @@ function isCanvasItem(value: unknown): value is CanvasItem {
     return false
   }
 
-  if (value.type === 'rect') {
-    return (
-      typeof value.fill === 'string' &&
-      typeof value.stroke === 'string' &&
-      (value.text === undefined || typeof value.text === 'string')
-    )
-  }
-
-  if (value.type === 'text') {
-    return typeof value.text === 'string'
+  if (isCanvasEditableTextItemStorageShape(value)) {
+    return true
   }
 
   if (isCanvasDrawingItemStorageShape(value)) {

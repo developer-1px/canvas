@@ -65,6 +65,14 @@ export {
   getCanvasItemsBounds,
   type CanvasItemReadModel,
 } from './read/CanvasItemReadModel'
+export {
+  getCanvasEditableTextValue,
+  getCommittedCanvasEditableTextValue,
+  isCanvasEditableTextItem,
+  isCanvasEditableTextItemStorageShape,
+  isCanvasTextItem,
+  type CanvasEditableTextItem,
+} from './text/CanvasEditableTextItem'
 
 export type { CanvasItemsChange } from './document/CanvasDocumentChanges'
 export {

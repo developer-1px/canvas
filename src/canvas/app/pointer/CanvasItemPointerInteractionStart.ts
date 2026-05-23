@@ -2,11 +2,13 @@ import type {
   CanvasItem,
   EditingText,
   Point,
-  RectItem,
-  TextItem,
   Tool,
 } from '../../entities'
-import type { CanvasItemReadModel } from '../../host'
+import {
+  getCanvasEditableTextValue,
+  type CanvasEditableTextItem,
+  type CanvasItemReadModel,
+} from '../../host'
 import {
   getCanvasItemPointerIntent,
   getCanvasItemPointerSelection,
@@ -51,7 +53,7 @@ export type CanvasItemPointerInteractionStartInput = {
 
 export type CanvasTextEditInteractionStartInput = {
   config: CanvasAffordanceConfig
-  item: RectItem | TextItem
+  item: CanvasEditableTextItem
 }
 
 export type CanvasTextEditInteractionStartResult =
@@ -177,10 +179,10 @@ export function startCanvasTextEditInteraction({
 }
 
 function createCanvasItemEditState(
-  item: RectItem | TextItem,
+  item: CanvasEditableTextItem,
 ): EditingText {
   return {
     id: item.id,
-    value: item.type === 'rect' ? item.text ?? '' : item.text,
+    value: getCanvasEditableTextValue(item),
   }
 }

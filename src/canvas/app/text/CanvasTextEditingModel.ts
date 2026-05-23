@@ -1,17 +1,19 @@
 import type {
   EditingText,
-  RectItem,
-  TextItem,
   Viewport,
 } from '../../entities'
+import {
+  getCommittedCanvasEditableTextValue,
+  type CanvasEditableTextItem,
+} from '../../host'
 import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract'
 
-export type EditableCanvasTextItem = RectItem | TextItem
+export type EditableCanvasTextItem = CanvasEditableTextItem
 
 type CommitCanvasTextEditingArgs = {
   commitItemsChange: CommitCanvasItemsChange
   editing: EditingText | null
-  editingItem: EditableCanvasTextItem | null
+  editingItem: CanvasEditableTextItem | null
   selection: string[]
   setEditing: (nextEditing: EditingText | null) => void
 }
@@ -56,7 +58,7 @@ export function getCanvasTextEditorStyle({
   viewport,
 }: {
   editing: EditingText | null
-  editingItem: EditableCanvasTextItem | null
+  editingItem: CanvasEditableTextItem | null
   viewport: Viewport
 }): CanvasTextEditorStyle | undefined {
   if (!editing || !editingItem) {
@@ -78,9 +80,10 @@ function getCommittedCanvasTextValue({
   editingItem,
 }: {
   editing: EditingText
-  editingItem: EditableCanvasTextItem
+  editingItem: CanvasEditableTextItem
 }) {
-  return editingItem.type === 'text' && !editing.value.trim()
-    ? 'Text'
-    : editing.value
+  return getCommittedCanvasEditableTextValue({
+    item: editingItem,
+    value: editing.value,
+  })
 }

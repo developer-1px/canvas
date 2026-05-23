@@ -1,9 +1,8 @@
 import type { Bounds } from '../../core'
 import type {
   CanvasItem,
-  RectItem,
-  TextItem,
 } from '../model'
+import type { CanvasEditableTextItem } from '../text/CanvasEditableTextItem'
 import {
   createCanvasItemScene,
 } from '../adapters/CanvasItemSceneAdapter'
@@ -19,7 +18,7 @@ import {
 
 export type CanvasItemReadModel = {
   scene: ReturnType<typeof createCanvasItemScene>
-  findEditableTextItem: (id: string) => RectItem | TextItem | null
+  findEditableTextItem: (id: string) => CanvasEditableTextItem | null
   findItem: (id: string) => CanvasItem | undefined
   getAllIds: () => string[]
   getAllItems: () => CanvasItem[]

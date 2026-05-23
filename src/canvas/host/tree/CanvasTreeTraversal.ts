@@ -1,8 +1,12 @@
 import type {
   CanvasItem,
-  RectItem,
   TextItem
 } from '../model'
+import {
+  isCanvasEditableTextItem,
+  isCanvasTextItem,
+  type CanvasEditableTextItem,
+} from '../text/CanvasEditableTextItem'
 import { samePath } from './CanvasTreePath'
 
 export type CanvasItemEntry = {
@@ -58,14 +62,14 @@ export function findParentGroupId(items: CanvasItem[], id: string) {
 export function findTextItem(items: CanvasItem[], id: string): TextItem | null {
   const item = findCanvasItem(items, id)
 
-  return item?.type === 'text' ? item : null
+  return item && isCanvasTextItem(item) ? item : null
 }
 
 export function findEditableTextItem(
   items: CanvasItem[],
   id: string,
-): RectItem | TextItem | null {
+): CanvasEditableTextItem | null {
   const item = findCanvasItem(items, id)
 
-  return item?.type === 'rect' || item?.type === 'text' ? item : null
+  return item && isCanvasEditableTextItem(item) ? item : null
 }
