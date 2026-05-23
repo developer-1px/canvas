@@ -2125,6 +2125,9 @@ describe('Canvas module boundaries', () => {
     const effectPlanFile = getSourceFile(
       'src/canvas/app/commands/CanvasStandardCommandEffectPlan.ts',
     )
+    const resultEffectsFile = getSourceFile(
+      'src/canvas/app/commands/CanvasStandardCommandResultEffects.ts',
+    )
 
     expect(commandHookFile.source).toContain(
       "from './CanvasStandardCommandExecution'",
@@ -2161,13 +2164,42 @@ describe('Canvas module boundaries', () => {
     expect(effectPlanFile.source).toContain('nudgeCanvasCommand')
     expect(effectPlanFile.source).toContain('selectAllCanvasCommand')
     expect(effectPlanFile.source).toContain(
-      'createCanvasStandardRemoveSelectionEffect',
+      "from './CanvasStandardCommandResultEffects'",
     )
     expect(effectPlanFile.source).toContain(
+      'createCanvasStandardRemoveSelectionResultEffect',
+    )
+    expect(effectPlanFile.source).toContain(
+      'createCanvasStandardGroupSelectionResultEffect',
+    )
+    expect(effectPlanFile.source).not.toContain(
+      'createCanvasStandardRemoveSelectionEffect',
+    )
+    expect(effectPlanFile.source).not.toContain(
       'createCanvasStandardGroupSelectionEffect',
+    )
+    expect(effectPlanFile.source).not.toContain(
+      'createCanvasStandardUngroupSelectionEffect',
     )
     expect(effectPlanFile.source).not.toContain("type: 'remove-selection'")
     expect(effectPlanFile.source).not.toContain("type: 'group-selection'")
+    expect(resultEffectsFile.source).toContain(
+      'export function createCanvasStandardRemoveSelectionResultEffect',
+    )
+    expect(resultEffectsFile.source).toContain(
+      'export function createCanvasStandardGroupSelectionResultEffect',
+    )
+    expect(resultEffectsFile.source).toContain(
+      'export function createCanvasStandardUngroupSelectionResultEffect',
+    )
+    expect(resultEffectsFile.source).toContain(
+      'createCanvasStandardRemoveSelectionEffect',
+    )
+    expect(resultEffectsFile.source).toContain(
+      'createCanvasStandardGroupSelectionEffect',
+    )
+    expect(resultEffectsFile.source).not.toContain('alignCanvasCommand')
+    expect(resultEffectsFile.source).not.toContain('deleteCanvasCommand')
   })
 
   it('keeps App standard command document effects behind a named module', () => {

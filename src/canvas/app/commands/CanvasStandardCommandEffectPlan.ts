@@ -17,15 +17,18 @@ import {
 } from '../../engine'
 import type { CanvasItem } from '../../entities'
 import {
-  createCanvasStandardGroupSelectionEffect,
   createCanvasStandardHistoryEffect,
-  createCanvasStandardRemoveSelectionEffect,
-  createCanvasStandardReorderSelectionEffect,
-  createCanvasStandardReplaceChangedEffect,
-  createCanvasStandardSelectionEffect,
-  createCanvasStandardUngroupSelectionEffect,
   type CanvasStandardCommandDocumentEffect,
 } from './CanvasStandardCommandDocumentEffects'
+import {
+  createCanvasStandardChangedItemsResultEffect,
+  createCanvasStandardGroupSelectionResultEffect,
+  createCanvasStandardNudgeResultEffect,
+  createCanvasStandardRemoveSelectionResultEffect,
+  createCanvasStandardReorderSelectionResultEffect,
+  createCanvasStandardSelectAllResultEffect,
+  createCanvasStandardUngroupSelectionResultEffect,
+} from './CanvasStandardCommandResultEffects'
 
 export type CanvasStandardCommand =
   | { kind: 'align'; mode: CanvasAlignMode }
@@ -99,10 +102,7 @@ function planCanvasAlignCommand(
   })
 
   return result
-    ? createCanvasStandardReplaceChangedEffect({
-        afterSelection: result.selection,
-        items: result.items,
-      })
+    ? createCanvasStandardChangedItemsResultEffect({ result })
     : null
 }
 
@@ -119,10 +119,7 @@ function planCanvasDistributeCommand(
   })
 
   return result
-    ? createCanvasStandardReplaceChangedEffect({
-        afterSelection: result.selection,
-        items: result.items,
-      })
+    ? createCanvasStandardChangedItemsResultEffect({ result })
     : null
 }
 
@@ -137,9 +134,8 @@ function planCanvasDeleteCommand(
   })
 
   return result
-    ? createCanvasStandardRemoveSelectionEffect({
-        afterSelection: result.selection,
-        clearEditingIds: result.clearEditingIds,
+    ? createCanvasStandardRemoveSelectionResultEffect({
+        result,
         selection: context.selection,
       })
     : null
@@ -158,9 +154,9 @@ function planCanvasGroupCommand(
   })
 
   return result
-    ? createCanvasStandardGroupSelectionEffect({
-        afterSelection: result.selection,
+    ? createCanvasStandardGroupSelectionResultEffect({
         groupId,
+        result,
         selection: context.selection,
       })
     : null
@@ -177,8 +173,8 @@ function planCanvasUngroupCommand(
   })
 
   return result
-    ? createCanvasStandardUngroupSelectionEffect({
-        afterSelection: result.selection,
+    ? createCanvasStandardUngroupSelectionResultEffect({
+        result,
         selection: context.selection,
       })
     : null
@@ -195,10 +191,9 @@ function planCanvasLockCommand(
   })
 
   return result
-    ? createCanvasStandardReplaceChangedEffect({
-        afterSelection: result.selection,
+    ? createCanvasStandardChangedItemsResultEffect({
         fallbackSelection: result.selection,
-        items: result.items,
+        result,
       })
     : null
 }
@@ -214,10 +209,9 @@ function planCanvasUnlockAllCommand(
   })
 
   return result
-    ? createCanvasStandardReplaceChangedEffect({
-        afterSelection: result.selection,
+    ? createCanvasStandardChangedItemsResultEffect({
         fallbackSelection: result.selection,
-        items: result.items,
+        result,
       })
     : null
 }
@@ -252,7 +246,7 @@ function planCanvasNudgeCommand(
   })
 
   return result
-    ? createCanvasStandardReplaceChangedEffect({ items: result })
+    ? createCanvasStandardNudgeResultEffect({ items: result })
     : null
 }
 
@@ -269,9 +263,9 @@ function planCanvasReorderCommand(
   })
 
   return result
-    ? createCanvasStandardReorderSelectionEffect({
-        afterSelection: result.selection,
+    ? createCanvasStandardReorderSelectionResultEffect({
         mode,
+        result,
         selection: context.selection,
       })
     : null
@@ -287,7 +281,7 @@ function planCanvasSelectAllCommand(
   })
 
   return nextSelection
-    ? createCanvasStandardSelectionEffect({ selection: nextSelection })
+    ? createCanvasStandardSelectAllResultEffect({ selection: nextSelection })
     : null
 }
 
