@@ -3585,6 +3585,9 @@ describe('Canvas module boundaries', () => {
     const commandDispatchFile = getSourceFile(
       'src/canvas/app/keyboard/CanvasKeyboardCommandDispatch.ts',
     )
+    const shortcutDispatchFile = getSourceFile(
+      'src/canvas/app/keyboard/CanvasKeyboardShortcutDispatch.ts',
+    )
     const intentDispatchTableFile = getSourceFile(
       'src/canvas/app/keyboard/CanvasKeyboardIntentDispatchTable.ts',
     )
@@ -3632,17 +3635,26 @@ describe('Canvas module boundaries', () => {
       "from './CanvasKeyboardShortcutIntent'",
     )
     expect(routerFile.source).toContain(
+      "from './CanvasKeyboardShortcutDispatch'",
+    )
+    expect(routerFile.source).not.toContain(
       "from './CanvasKeyboardCommandDispatch'",
     )
-    expect(routerFile.source).toContain(
+    expect(routerFile.source).not.toContain(
       "from './CanvasKeyboardSystemDispatch'",
     )
-    expect(routerFile.source).toContain(
+    expect(routerFile.source).not.toContain(
       "from './CanvasKeyboardViewportDispatch'",
     )
-    expect(routerFile.source).toContain(
+    expect(routerFile.source).not.toContain(
       "from './CanvasKeyboardToolDispatch'",
     )
+    expect(routerFile.source).toContain('runCanvasKeyboardShortcutIntent')
+    expect(routerFile.source).not.toContain('isCanvasKeyboardCommandIntent')
+    expect(routerFile.source).not.toContain('isCanvasKeyboardSystemIntent')
+    expect(routerFile.source).not.toContain('isCanvasKeyboardViewportIntent')
+    expect(routerFile.source).not.toContain('isCanvasKeyboardToolIntent')
+    expect(routerFile.source).not.toContain("intent.kind === 'none'")
     expect(routerFile.source).not.toContain('config.shortcuts.temporaryPan')
     expect(routerFile.source).not.toContain(
       'matchesCanvasAppCustomToolShortcut',
@@ -3797,6 +3809,32 @@ describe('Canvas module boundaries', () => {
     )
     expect(commandDispatchFile.source).not.toContain(
       'function getCanvasKeyboardCommandIntentRunner',
+    )
+    expect(shortcutDispatchFile.source).toContain(
+      'export function runCanvasKeyboardShortcutIntent',
+    )
+    expect(shortcutDispatchFile.source).toContain(
+      'export type CanvasKeyboardShortcutDispatchHandlers',
+    )
+    expect(shortcutDispatchFile.source).toContain(
+      "from './CanvasKeyboardCommandDispatch'",
+    )
+    expect(shortcutDispatchFile.source).toContain(
+      "from './CanvasKeyboardSystemDispatch'",
+    )
+    expect(shortcutDispatchFile.source).toContain(
+      "from './CanvasKeyboardViewportDispatch'",
+    )
+    expect(shortcutDispatchFile.source).toContain(
+      "from './CanvasKeyboardToolDispatch'",
+    )
+    expect(shortcutDispatchFile.source).toContain(
+      'isCanvasKeyboardCommandIntent(intent)',
+    )
+    expect(shortcutDispatchFile.source).toContain("intent.kind === 'none'")
+    expect(shortcutDispatchFile.source).not.toContain('event.preventDefault')
+    expect(shortcutDispatchFile.source).not.toContain(
+      'getCanvasKeyboardShortcutIntent',
     )
     expect(nudgeShortcutFile.source).toContain(
       'export function getCanvasKeyboardNudgeShortcutIntent',
