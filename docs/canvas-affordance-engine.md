@@ -128,7 +128,7 @@ type CanvasAffordanceConfig = {
 - Demo SVG Item Layer Adapter는 App-owned Adapter로 Demo component presentation key resolver와 presentation registry를 받아 그리기 전략을 고른다.
 - 새 Demo component kind가 기존 presentation을 재사용하면 외부 조립된 `CanvasComponentLibrary`만 바꾼다. 새 presentation은 Canvas App Assembly에 presentation renderer를 함께 등록한다.
 - Canvas Component Library의 presentation key가 component presentation renderer registry에 없으면 Canvas App Assembly가 실패한다.
-- Canvas Component Library는 외부 component template의 id/presentation, 필수 display/style string, 양수 크기, optional string list shape를 생성 단계에서 검증한다.
+- Canvas Component Library는 외부 component template의 id/presentation, 필수 display/style string, 양수 크기, optional string list shape를 생성 단계에서 검증하고, 생성 후 외부 template mutation에 흔들리지 않도록 snapshot을 보관한다.
 - Canvas App Assembly의 component presentation renderer input은 기본 SVG presentation registry를 대체하지 않고 extension/override로 합성된다.
 - 제품별 business action은 Engine command union에 추가하지 않고 Canvas App Assembly의 custom command descriptor로 등록한다.
 - Custom command의 availability/run 실패는 내부 command loop를 깨지 않고 disabled/false로 containment 된다.

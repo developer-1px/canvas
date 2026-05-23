@@ -104,6 +104,55 @@ describe('CANVAS_COMPONENT_LIBRARY', () => {
     })
   })
 
+  it('snapshots externally assembled templates after library creation', () => {
+    const templates: CanvasComponentTemplate[] = [
+      {
+        id: 'risk',
+        label: '!',
+        title: 'Risk',
+        body: 'Open issue',
+        w: 180,
+        h: 96,
+        fill: '#fff7ed',
+        stroke: '#fb923c',
+        accent: '#ea580c',
+        presentation: 'risk-card',
+        columns: ['Severity'],
+        items: ['High'],
+      },
+    ]
+    const library = createCanvasComponentLibrary({ templates })
+
+    templates.push({
+      ...templates[0],
+      id: 'mutated-risk',
+      presentation: 'mutated-risk-card',
+    })
+    templates[0].title = 'Mutated risk'
+    templates[0].items?.push('Mutated')
+    templates[0].columns?.push('Mutated')
+
+    expect(library.templates.map((template) => template.id)).toEqual(['risk'])
+    expect(library.getTemplate('risk')).toMatchObject({
+      columns: ['Severity'],
+      items: ['High'],
+      title: 'Risk',
+    })
+    expect(library.createItem({
+      id: 'component-risk',
+      point: { x: 0, y: 0 },
+      templateId: 'risk',
+    })).toMatchObject({
+      columns: ['Severity'],
+      items: ['High'],
+      title: 'Risk',
+    })
+    expect(Object.isFrozen(library.templates)).toBe(true)
+    expect(Object.isFrozen(library.templates[0])).toBe(true)
+    expect(Object.isFrozen(library.templates[0].items)).toBe(true)
+    expect(Object.isFrozen(library.templates[0].columns)).toBe(true)
+  })
+
   it('rejects component template ids outside the stable id contract', () => {
     expect(() =>
       createCanvasComponentLibrary({

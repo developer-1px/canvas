@@ -229,13 +229,15 @@ export function createCanvasComponentLibrary(
   }
 
   assertCanvasComponentTemplateContracts(templates)
+  const componentTemplates = cloneCanvasComponentTemplates(templates)
 
   return {
-    createItem: (input) => createCanvasComponentItem({ ...input, templates }),
+    createItem: (input) =>
+      createCanvasComponentItem({ ...input, templates: componentTemplates }),
     getPresentation: (id) =>
-      getCanvasComponentTemplate(templates, id).presentation,
-    getTemplate: (id) => getCanvasComponentTemplate(templates, id),
-    templates,
+      getCanvasComponentTemplate(componentTemplates, id).presentation,
+    getTemplate: (id) => getCanvasComponentTemplate(componentTemplates, id),
+    templates: componentTemplates,
   }
 }
 
@@ -279,6 +281,44 @@ function assertCanvasComponentTemplateContracts(
 
     templateIds.add(template.id)
   }
+}
+
+function cloneCanvasComponentTemplates(
+  templates: readonly CanvasComponentTemplate[],
+) {
+  return Object.freeze(
+    templates.map((template) =>
+      freezeCanvasComponentTemplate(cloneCanvasComponentTemplate(template)),
+    ),
+  )
+}
+
+function cloneCanvasComponentTemplate(template: CanvasComponentTemplate) {
+  const clone: CanvasComponentTemplate = { ...template }
+
+  if (template.columns) {
+    clone.columns = [...template.columns]
+  }
+
+  if (template.items) {
+    clone.items = [...template.items]
+  }
+
+  return clone
+}
+
+function freezeCanvasComponentTemplate(
+  template: CanvasComponentTemplate,
+) {
+  if (template.columns) {
+    Object.freeze(template.columns)
+  }
+
+  if (template.items) {
+    Object.freeze(template.items)
+  }
+
+  return Object.freeze(template)
 }
 
 function assertCanvasComponentTemplateShape(template: unknown) {
