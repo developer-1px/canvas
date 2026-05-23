@@ -35,6 +35,7 @@
 - Canvas Custom Item Renderer Registry: `Canvas Custom Item`의 presentation key를 SVG rendering strategy에 연결하는 외부 조립 가능한 registry.
 - Canvas Custom Item Validator: `Canvas Custom Item`의 `kind`별 domain-specific payload 규칙을 document validation에 주입하는 App-owned validator.
 - Canvas Component Presentation Registry: Demo component presentation key를 SVG rendering strategy에 연결하는 외부 조립 가능한 registry.
+- Demo SVG Component Render Fallback: component presentation resolver나 renderer 실행 실패를 기본 component card로 containment 하는 App rendering 내부 Module.
 - Drawing Item: Demo `CanvasItem` 중 marker, highlighter, arrow처럼 캔버스 위에 빠르게 주석을 그리는 항목. `points` 또는 `start/end`가 실제 geometry이고 `x/y/w/h`는 Host가 동기화하는 bounds cache다.
 - Drawing Item Style: built-in marker, highlighter, arrow의 stroke/opacity 기본값. Draft overlay와 Host item creation이 같은 Host-owned 계약을 쓴다.
 - Canvas App Model: App Shell이 렌더링할 control별 view props를 만들고 command, pointer, keyboard, viewport, text editing wiring을 숨기는 workflow Module.
@@ -77,6 +78,7 @@
 - Canvas App Assembly input은 output type을 부분 노출하지 않고 명시적 필드 계약으로 유지한다.
 - Canvas App Custom Item Module define, Canvas App Custom Item Module Assembly, Canvas App Assembly는 외부 descriptor/adapter/item mutation이 define/조립 후 동작을 바꾸지 않도록 snapshot을 보관한다.
 - Canvas App Assembly의 component presentation renderer input은 기본 registry를 대체하지 않고 extension/override로 합성한다.
+- Component presentation resolver와 renderer 실행 실패는 Demo SVG Component Render Fallback이 containment 하고, malformed component template/registry shape는 define/assembly 단계에서 실패해야 한다.
 - Canvas App Assembly의 initial items는 조립된 Canvas Custom Item Validator로 assembly 단계에서 검증한다.
 - Canvas App Assembly input은 custom item renderer/validator/creation registry를 직접 받지 않고 Canvas App Custom Item Module만 받는다.
 - 제품별 business action은 Engine command union에 넣지 않고 Canvas App Custom Command로 등록한다.

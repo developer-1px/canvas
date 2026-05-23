@@ -9,6 +9,10 @@ import {
   CanvasDemoSvgVoteComponent,
 } from './CanvasDemoSvgShapeComponentRenderer'
 import {
+  CANVAS_DEMO_SVG_COMPONENT_FALLBACK_PRESENTATION,
+  getCanvasDemoSvgComponentFallbackRenderer,
+} from './CanvasDemoSvgComponentRenderFallback'
+import {
   CanvasDemoSvgChecklistComponent,
   CanvasDemoSvgKanbanComponent,
   CanvasDemoSvgTableComponent,
@@ -28,7 +32,8 @@ export type CanvasDemoSvgComponentPresentationRenderers =
   CanvasAppComponentPresentationRenderers
 
 export const DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS: CanvasDemoSvgComponentPresentationRenderers = {
-  'accent-card': CanvasDemoSvgCardComponent,
+  [CANVAS_DEMO_SVG_COMPONENT_FALLBACK_PRESENTATION]:
+    CanvasDemoSvgCardComponent,
   'checklist-list': CanvasDemoSvgChecklistComponent,
   'image-frame': CanvasDemoSvgImageComponent,
   'inline-label': CanvasDemoSvgLabelComponent,
@@ -68,7 +73,7 @@ export function getCanvasDemoSvgComponentPresentationRenderer({
   presentation: string
   renderers: CanvasDemoSvgComponentPresentationRenderers
 }) {
-  return renderers[presentation] ?? CanvasDemoSvgCardComponent
+  return renderers[presentation] ?? getCanvasDemoSvgComponentFallbackRenderer()
 }
 
 function assertCanvasDemoSvgComponentPresentationRendererStrategies(

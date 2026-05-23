@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import {
+  CANVAS_DEMO_SVG_COMPONENT_FALLBACK_PRESENTATION,
+  getCanvasDemoSvgComponentFallbackRenderer,
+} from './CanvasDemoSvgComponentRenderFallback'
+import {
   createCanvasDemoSvgComponentPresentationRenderers,
+  DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS,
   getCanvasDemoSvgComponentPresentationRenderer,
   type CanvasDemoSvgComponentRendererStrategy,
   type CanvasDemoSvgComponentPresentationRenderers,
@@ -20,6 +25,21 @@ describe('CanvasDemoSvgComponentRenderer registry', () => {
         renderers,
       }),
     ).toBe(renderRisk)
+  })
+
+  it('uses the named fallback presentation renderer when a presentation is missing', () => {
+    expect(
+      DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS[
+        CANVAS_DEMO_SVG_COMPONENT_FALLBACK_PRESENTATION
+      ],
+    ).toBe(getCanvasDemoSvgComponentFallbackRenderer())
+    expect(
+      getCanvasDemoSvgComponentPresentationRenderer({
+        presentation: 'unknown-card',
+        renderers:
+          DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS,
+      }),
+    ).toBe(getCanvasDemoSvgComponentFallbackRenderer())
   })
 
   it('rejects presentation renderer keys outside the app extension id contract', () => {

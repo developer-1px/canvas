@@ -105,6 +105,35 @@ describe('CanvasDemoSvgItemLayer external renderers', () => {
     expect(markup).toContain('Risk')
   })
 
+  it('falls back when a component presentation resolver throws', () => {
+    const markup = renderItemLayer(
+      [
+        {
+          id: 'component-risk-1',
+          type: 'component',
+          component: 'risk',
+          x: 80,
+          y: 120,
+          w: 180,
+          h: 96,
+          title: 'Risk',
+          fill: '#fff7ed',
+          stroke: '#fb923c',
+          accent: '#ea580c',
+        },
+      ],
+      {
+        getComponentPresentation: () => {
+          throw new Error('bad component resolver')
+        },
+      },
+    )
+
+    expect(markup).toContain('data-type="component"')
+    expect(markup).toContain('class="component-card"')
+    expect(markup).toContain('Risk')
+  })
+
   it('falls back when a custom item renderer throws', () => {
     const markup = renderItemLayer(
       [

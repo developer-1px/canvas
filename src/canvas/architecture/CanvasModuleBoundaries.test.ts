@@ -393,6 +393,29 @@ describe('Canvas module boundaries', () => {
     expect(itemFrameFile.source).toContain('item-outline')
   })
 
+  it('keeps Demo SVG component render fallback behind a named module', () => {
+    const componentRendererFile = getSourceFile(
+      'src/canvas/app/rendering/CanvasDemoSvgComponentRenderer.tsx',
+    )
+    const fallbackFile = getSourceFile(
+      'src/canvas/app/rendering/CanvasDemoSvgComponentRenderFallback.tsx',
+    )
+
+    expect(componentRendererFile.source).toContain(
+      'renderCanvasDemoSvgComponentFallback',
+    )
+    expect(componentRendererFile.source).not.toMatch(
+      /DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS\[['"]/,
+    )
+    expect(componentRendererFile.source).not.toContain(
+      'CanvasDemoSvgCardComponent',
+    )
+    expect(fallbackFile.source).toContain(
+      'CANVAS_DEMO_SVG_COMPONENT_FALLBACK_PRESENTATION',
+    )
+    expect(fallbackFile.source).toContain('CanvasDemoSvgCardComponent')
+  })
+
   it('keeps app workflow hooks from recreating the workspace read model', () => {
     const violations = sourceFiles
       .filter((file) =>
