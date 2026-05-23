@@ -3,9 +3,7 @@ import type {
   EditingText,
   Tool,
 } from '../../entities'
-import { normalizeBounds } from '../../core'
 import {
-  getCanvasMarqueeSelection,
   type CanvasCreationAdapter,
   type CanvasSceneAdapter,
 } from '../../engine'
@@ -19,6 +17,10 @@ import { commitCanvasPointerCreation } from './CanvasPointerCreationCommit'
 import {
   isCanvasPointerCreationInteraction,
 } from './CanvasPointerCreationGrammar'
+import {
+  cancelCanvasPointerMarqueeInteraction,
+  commitCanvasPointerMarqueeInteraction,
+} from './CanvasPointerMarqueeInteraction'
 
 export type CanvasPointerInteractionCommitInput = {
   commitItemsChange: CommitCanvasItemsChange
@@ -83,23 +85,12 @@ export function commitCanvasPointerInteraction({
   }
 
   if (interaction.kind === 'marquee') {
-    if (interaction.moved) {
-      const nextSelection = getCanvasMarqueeSelection({
-        additive: interaction.additive,
-        baseSelection: interaction.baseSelection,
-        bounds: normalizeBounds(
-          interaction.startWorld,
-          interaction.currentWorld,
-        ),
-        scene,
-      })
-
-      setSelection(interaction.baseSelection)
-      commitSelection(nextSelection)
-    } else if (!interaction.additive) {
-      setSelection(interaction.baseSelection)
-      commitSelection([])
-    }
+    commitCanvasPointerMarqueeInteraction({
+      commitSelection,
+      interaction,
+      scene,
+      setSelection,
+    })
   }
 }
 
@@ -117,6 +108,9 @@ export function cancelCanvasPointerInteraction({
   if (interaction.kind === 'move' || interaction.kind === 'resize') {
     setLiveItems(interaction.historyItems)
   } else if (interaction.kind === 'marquee') {
-    setSelection(interaction.baseSelection)
+    cancelCanvasPointerMarqueeInteraction({
+      interaction,
+      setSelection,
+    })
   }
 }

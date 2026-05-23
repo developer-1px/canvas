@@ -6,7 +6,6 @@ import type {
   Tool,
   Viewport,
 } from '../../entities'
-import { isAdditivePointerInput } from '../../engine'
 import {
   getCanvasPointerGesture,
   type CanvasAffordanceConfig,
@@ -18,6 +17,8 @@ import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreati
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import type { Interaction } from './CanvasInteractionState'
 import { startCanvasPointerCreation } from './CanvasPointerCreationStart'
+import { startCanvasPointerMarqueeInteraction } from './CanvasPointerMarqueeInteraction'
+import { startCanvasPointerPanInteraction } from './CanvasPointerPanInteraction'
 
 export type CanvasPointerInteractionStartResult =
   | { kind: 'none' }
@@ -78,15 +79,12 @@ export function startCanvasPointerInteraction({
 
   if (pointerGesture === 'pan') {
     return {
-      kind: 'interaction',
-      capturePointer: true,
-      gesture: 'pan',
-      interaction: {
-        kind: 'pan',
-        pointerId: input.pointerId,
+      ...startCanvasPointerPanInteraction({
+        input,
         startScreen,
-        origin: viewport,
-      },
+        viewport,
+      }),
+      kind: 'interaction',
     }
   }
 
@@ -106,22 +104,15 @@ export function startCanvasPointerInteraction({
     return creationStart
   }
 
-  const additive = isAdditivePointerInput(input)
+  const marqueeStart = startCanvasPointerMarqueeInteraction({
+    input,
+    selection,
+    startScreen,
+    startWorld,
+  })
 
   return {
+    ...marqueeStart,
     kind: 'interaction',
-    capturePointer: true,
-    clearSelection: !additive,
-    gesture: 'marquee',
-    interaction: {
-      kind: 'marquee',
-      pointerId: input.pointerId,
-      startScreen,
-      startWorld,
-      currentWorld: startWorld,
-      additive,
-      baseSelection: selection,
-      moved: false,
-    },
   }
 }

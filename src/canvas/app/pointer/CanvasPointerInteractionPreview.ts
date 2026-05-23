@@ -5,11 +5,6 @@ import type {
   Viewport,
 } from '../../entities'
 import {
-  normalizeBounds,
-} from '../../core'
-import {
-  EMPTY_CANVAS_SNAP_GUIDES,
-  getCanvasMarqueeSelection,
   type CanvasAffordanceConfig,
   type CanvasDraftArrowOverlay,
   type CanvasDraftStrokeOverlay,
@@ -23,8 +18,9 @@ import {
   isCanvasPointerCreationInteraction,
 } from './CanvasPointerCreationGrammar'
 import { previewCanvasPointerCreation } from './CanvasPointerCreationPreview'
+import { previewCanvasPointerMarqueeInteraction } from './CanvasPointerMarqueeInteraction'
+import { previewCanvasPointerPanInteraction } from './CanvasPointerPanInteraction'
 import { previewCanvasPointerTransform } from './CanvasPointerTransformPreview'
-import { hasCanvasInteractionMoved } from './CanvasPointerInteractionMovement'
 
 export type CanvasPointerInteractionPreviewInput = {
   config: CanvasAffordanceConfig
@@ -63,22 +59,11 @@ export function previewCanvasPointerInteraction({
   viewport,
 }: CanvasPointerInteractionPreviewInput): CanvasPointerInteractionPreviewResult {
   if (interaction.kind === 'pan') {
-    if (!config.gestures.pan) {
-      return { kind: 'none' }
-    }
-
-    const dx = currentScreen.x - interaction.startScreen.x
-    const dy = currentScreen.y - interaction.startScreen.y
-
-    return {
-      kind: 'preview',
-      snapGuides: EMPTY_CANVAS_SNAP_GUIDES,
-      viewport: {
-        ...interaction.origin,
-        x: interaction.origin.x + dx,
-        y: interaction.origin.y + dy,
-      },
-    }
+    return previewCanvasPointerPanInteraction({
+      config,
+      currentScreen,
+      interaction,
+    })
   }
 
   if (interaction.kind === 'move') {
@@ -108,41 +93,13 @@ export function previewCanvasPointerInteraction({
   }
 
   if (interaction.kind === 'marquee') {
-    if (!config.gestures.marquee) {
-      return { kind: 'none' }
-    }
-
-    const moved = hasCanvasInteractionMoved({
+    return previewCanvasPointerMarqueeInteraction({
+      config,
       currentScreen,
-      interaction,
-    })
-    const bounds = normalizeBounds(interaction.startWorld, currentWorld)
-    const nextInteraction = {
-      ...interaction,
       currentWorld,
-      moved,
-    }
-
-    if (!moved) {
-      return {
-        interaction: nextInteraction,
-        kind: 'preview',
-        snapGuides: EMPTY_CANVAS_SNAP_GUIDES,
-      }
-    }
-
-    return {
-      interaction: nextInteraction,
-      kind: 'preview',
-      marquee: bounds,
-      selection: getCanvasMarqueeSelection({
-        additive: interaction.additive,
-        baseSelection: interaction.baseSelection,
-        bounds,
-        scene,
-      }),
-      snapGuides: EMPTY_CANVAS_SNAP_GUIDES,
-    }
+      interaction,
+      scene,
+    })
   }
 
   if (isCanvasPointerCreationInteraction(interaction)) {

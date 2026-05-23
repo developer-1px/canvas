@@ -1391,6 +1391,9 @@ describe('Canvas module boundaries', () => {
     const customCreationFile = getSourceFile(
       'src/canvas/app/pointer/CanvasPointerCustomCreation.ts',
     )
+    const marqueeInteractionFile = getSourceFile(
+      'src/canvas/app/pointer/CanvasPointerMarqueeInteraction.ts',
+    )
 
     expect(dragHandlersFile.source).toContain(
       "from './CanvasPointerInteractionLifecycle'",
@@ -1412,12 +1415,17 @@ describe('Canvas module boundaries', () => {
     expect(lifecycleFile.source).toContain(
       "from './CanvasPointerCreationCommit'",
     )
+    expect(lifecycleFile.source).toContain(
+      "from './CanvasPointerMarqueeInteraction'",
+    )
     expect(lifecycleFile.source).not.toContain('createCanvasRect({')
     expect(lifecycleFile.source).not.toContain('createCanvasMarker({')
     expect(lifecycleFile.source).not.toContain('createCanvasArrow({')
     expect(lifecycleFile.source).not.toContain(
       'commitCanvasPointerCustomCreation',
     )
+    expect(lifecycleFile.source).not.toContain('getCanvasMarqueeSelection')
+    expect(lifecycleFile.source).not.toContain('normalizeBounds')
     expect(lifecycleFile.source).toContain("type: 'transform'")
     expect(lifecycleFile.source).toContain('setEditing(interaction.edit)')
     const shapeCreationFile = getSourceFile(
@@ -1454,6 +1462,14 @@ describe('Canvas module boundaries', () => {
     expect(shapeCreationFile.source).toContain('createCanvasArrow({')
     expect(drawingCreationFile.source).toContain('createCanvasMarker({')
     expect(drawingCreationFile.source).toContain('createCanvasHighlight({')
+    expect(marqueeInteractionFile.source).toContain(
+      'export function commitCanvasPointerMarqueeInteraction',
+    )
+    expect(marqueeInteractionFile.source).toContain(
+      'export function cancelCanvasPointerMarqueeInteraction',
+    )
+    expect(marqueeInteractionFile.source).toContain('getCanvasMarqueeSelection')
+    expect(marqueeInteractionFile.source).toContain('normalizeBounds')
   })
 
   it('keeps pointer creation kind routing behind a named grammar module', () => {
@@ -1625,6 +1641,12 @@ describe('Canvas module boundaries', () => {
     const shapeCreationFile = getSourceFile(
       'src/canvas/app/pointer/CanvasPointerShapeCreation.ts',
     )
+    const marqueeInteractionFile = getSourceFile(
+      'src/canvas/app/pointer/CanvasPointerMarqueeInteraction.ts',
+    )
+    const panInteractionFile = getSourceFile(
+      'src/canvas/app/pointer/CanvasPointerPanInteraction.ts',
+    )
     const transformPreviewFile = getSourceFile(
       'src/canvas/app/pointer/CanvasPointerTransformPreview.ts',
     )
@@ -1647,12 +1669,21 @@ describe('Canvas module boundaries', () => {
       "from './CanvasPointerTransformPreview'",
     )
     expect(previewFile.source).toContain(
+      "from './CanvasPointerMarqueeInteraction'",
+    )
+    expect(previewFile.source).toContain(
+      "from './CanvasPointerPanInteraction'",
+    )
+    expect(previewFile.source).toContain(
       'export function previewCanvasPointerInteraction',
     )
+    expect(previewFile.source).not.toContain('EMPTY_CANVAS_SNAP_GUIDES')
+    expect(previewFile.source).not.toContain('config.gestures.pan')
+    expect(previewFile.source).not.toContain('interaction.origin.x + dx')
     expect(previewFile.source).not.toContain('getCanvasMoveSnap')
     expect(previewFile.source).not.toContain('resizeCanvasSelection')
     expect(previewFile.source).not.toContain('moveCanvasSelection')
-    expect(previewFile.source).toContain('getCanvasMarqueeSelection')
+    expect(previewFile.source).not.toContain('getCanvasMarqueeSelection')
     expect(previewFile.source).not.toContain('getNextCanvasDrawingPoints')
     expect(previewFile.source).not.toContain('createCanvasDraftStroke')
     expect(previewFile.source).not.toContain('DRAG_THRESHOLD')
@@ -1682,6 +1713,20 @@ describe('Canvas module boundaries', () => {
     expect(shapeCreationFile.source).toContain('snapCanvasPointToGrid')
     expect(customCreationFile.source).toContain('snapCanvasPointToGrid')
     expect(customCreationFile.source).toContain('hasCanvasInteractionMoved')
+    expect(marqueeInteractionFile.source).toContain(
+      'export function previewCanvasPointerMarqueeInteraction',
+    )
+    expect(marqueeInteractionFile.source).toContain('getCanvasMarqueeSelection')
+    expect(marqueeInteractionFile.source).toContain('normalizeBounds')
+    expect(marqueeInteractionFile.source).toContain(
+      'hasCanvasInteractionMoved',
+    )
+    expect(panInteractionFile.source).toContain(
+      'export function previewCanvasPointerPanInteraction',
+    )
+    expect(panInteractionFile.source).toContain('EMPTY_CANVAS_SNAP_GUIDES')
+    expect(panInteractionFile.source).toContain('config.gestures.pan')
+    expect(panInteractionFile.source).toContain('interaction.origin.x + dx')
     expect(transformPreviewFile.source).toContain(
       'export function previewCanvasPointerTransform',
     )
@@ -1723,6 +1768,12 @@ describe('Canvas module boundaries', () => {
     const textCreationFile = getSourceFile(
       'src/canvas/app/pointer/CanvasPointerTextCreation.ts',
     )
+    const marqueeInteractionFile = getSourceFile(
+      'src/canvas/app/pointer/CanvasPointerMarqueeInteraction.ts',
+    )
+    const panInteractionFile = getSourceFile(
+      'src/canvas/app/pointer/CanvasPointerPanInteraction.ts',
+    )
 
     expect(downHandlersFile.source).toContain(
       "from './CanvasPointerInteractionStart'",
@@ -1742,8 +1793,15 @@ describe('Canvas module boundaries', () => {
     expect(startFile.source).toContain(
       "from './CanvasPointerCreationStart'",
     )
+    expect(startFile.source).toContain(
+      "from './CanvasPointerMarqueeInteraction'",
+    )
+    expect(startFile.source).toContain(
+      "from './CanvasPointerPanInteraction'",
+    )
     expect(startFile.source).toContain('getCanvasPointerGesture')
-    expect(startFile.source).toContain('isAdditivePointerInput')
+    expect(startFile.source).not.toContain('isAdditivePointerInput')
+    expect(startFile.source).not.toContain('origin: viewport')
     expect(startFile.source).not.toContain('createCanvasText')
     expect(startFile.source).not.toContain(
       'getCanvasAppCustomCreationTool',
@@ -1795,6 +1853,14 @@ describe('Canvas module boundaries', () => {
     )
     expect(shapeCreationFile.source).toContain('normalizeBounds')
     expect(textCreationFile.source).toContain('createCanvasText')
+    expect(marqueeInteractionFile.source).toContain(
+      'export function startCanvasPointerMarqueeInteraction',
+    )
+    expect(marqueeInteractionFile.source).toContain('isAdditivePointerInput')
+    expect(panInteractionFile.source).toContain(
+      'export function startCanvasPointerPanInteraction',
+    )
+    expect(panInteractionFile.source).toContain('origin: viewport')
   })
 
   it('keeps pointer interaction start effects behind a named module', () => {
