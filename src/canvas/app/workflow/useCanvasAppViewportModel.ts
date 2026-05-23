@@ -8,6 +8,7 @@ import type { CanvasItemReadModel } from '../../host'
 import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
 import { useCanvasViewportControls } from '../viewport/useCanvasViewportControls'
 import { useCanvasWheelViewport } from '../viewport/useCanvasWheelViewport'
+import { getCanvasAppViewportConsumerModel } from './CanvasAppViewportConsumerModel'
 
 type UseCanvasAppViewportModelArgs = {
   config: CanvasAffordanceConfig
@@ -34,16 +35,5 @@ export function useCanvasAppViewportModel({
     stageElement,
   })
 
-  return {
-    control: {
-      onFitItems: viewportControls.fitToItems,
-      onViewportReset: viewportControls.resetViewport,
-      onZoomBy: viewportControls.zoomBy,
-    },
-    keyboard: {
-      fitToItems: viewportControls.fitToItems,
-      resetViewport: viewportControls.resetViewport,
-      zoomBy: viewportControls.zoomBy,
-    },
-  }
+  return getCanvasAppViewportConsumerModel(viewportControls)
 }

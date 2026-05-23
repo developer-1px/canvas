@@ -904,6 +904,9 @@ describe('Canvas module boundaries', () => {
     const viewportModelFile = getSourceFile(
       'src/canvas/app/workflow/useCanvasAppViewportModel.ts',
     )
+    const viewportConsumerModelFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppViewportConsumerModel.ts',
+    )
 
     expect(appModelFile.source).toContain(
       "from './useCanvasAppViewportModel'",
@@ -923,12 +926,20 @@ describe('Canvas module boundaries', () => {
       "from '../viewport/useCanvasViewportControls'",
     )
     expect(viewportModelFile.source).toContain(
+      "from './CanvasAppViewportConsumerModel'",
+    )
+    expect(viewportModelFile.source).toContain(
       'export function useCanvasAppViewportModel',
     )
     expect(viewportModelFile.source).toContain('useCanvasWheelViewport')
     expect(viewportModelFile.source).toContain('useCanvasViewportControls')
-    expect(viewportModelFile.source).toContain('control: {')
-    expect(viewportModelFile.source).toContain('keyboard: {')
+    expect(viewportModelFile.source).not.toContain('control: {')
+    expect(viewportModelFile.source).not.toContain('keyboard: {')
+    expect(viewportConsumerModelFile.source).toContain(
+      'export function getCanvasAppViewportConsumerModel',
+    )
+    expect(viewportConsumerModelFile.source).toContain('control: {')
+    expect(viewportConsumerModelFile.source).toContain('keyboard: {')
     expect(appModelFile.source).not.toContain('viewportControls.fitToItems')
     expect(appModelFile.source).not.toContain('viewportControls.resetViewport')
     expect(appModelFile.source).not.toContain('viewportControls.zoomBy')
