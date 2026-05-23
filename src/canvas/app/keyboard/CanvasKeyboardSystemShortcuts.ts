@@ -1,24 +1,20 @@
 import type {
   CanvasAffordanceConfig,
-  CanvasGestureId,
-  CanvasOverlayId,
-  CanvasShortcutId,
 } from '../../engine'
 import {
   normalizeCanvasKeyboardShortcutKey,
   reserveCanvasKeyboardShortcut,
   type CanvasKeyboardReservedShortcut,
-  type CanvasKeyboardShortcutChord,
 } from './CanvasKeyboardShortcutChords'
+import {
+  CANVAS_KEYBOARD_SYSTEM_SHORTCUTS,
+  CANVAS_KEYBOARD_TEMPORARY_PAN_SHORTCUT,
+  type CanvasKeyboardSystemShortcutDescriptor,
+  type CanvasKeyboardSystemShortcutIntent,
+  type CanvasKeyboardSystemShortcutPhase,
+} from './CanvasKeyboardSystemShortcutCatalog'
 
-export type CanvasKeyboardSystemShortcutIntent =
-  | { kind: 'open-find-replace'; preventDefault: true }
-  | { kind: 'temporary-pan'; preventDefault: true }
-  | { kind: 'escape'; preventDefault: false }
-
-type CanvasKeyboardSystemShortcutPhase =
-  | 'before-typing-target'
-  | 'after-typing-target'
+export type { CanvasKeyboardSystemShortcutIntent } from './CanvasKeyboardSystemShortcutCatalog'
 
 type CanvasKeyboardSystemShortcutInput = {
   config: CanvasAffordanceConfig
@@ -26,55 +22,6 @@ type CanvasKeyboardSystemShortcutInput = {
   key: string
   mod: boolean
 }
-
-type CanvasKeyboardSystemShortcutDescriptor = {
-  code?: string
-  gestureId?: CanvasGestureId
-  getIntent: () => CanvasKeyboardSystemShortcutIntent
-  ignoreKey?: boolean
-  label: string
-  modifier?: 'mod'
-  overlayId?: CanvasOverlayId
-  phase: CanvasKeyboardSystemShortcutPhase
-  reserve?: { shiftInsensitive?: boolean }
-  shiftInsensitive?: boolean
-  shortcut: CanvasKeyboardShortcutChord
-  shortcutId: CanvasShortcutId
-}
-
-const CANVAS_KEYBOARD_SYSTEM_SHORTCUTS = [
-  {
-    getIntent: () => ({ kind: 'open-find-replace', preventDefault: true }),
-    label: 'find replace',
-    modifier: 'mod',
-    overlayId: 'findReplace',
-    phase: 'before-typing-target',
-    shiftInsensitive: true,
-    shortcut: { key: 'f' },
-    shortcutId: 'findReplace',
-  },
-  {
-    code: 'Space',
-    gestureId: 'temporaryPan',
-    getIntent: () => ({ kind: 'temporary-pan', preventDefault: true }),
-    ignoreKey: true,
-    label: 'temporary pan',
-    phase: 'after-typing-target',
-    reserve: { shiftInsensitive: true },
-    shiftInsensitive: true,
-    shortcut: { key: 'Space' },
-    shortcutId: 'temporaryPan',
-  },
-  {
-    getIntent: () => ({ kind: 'escape', preventDefault: false }),
-    label: 'escape',
-    phase: 'after-typing-target',
-    reserve: { shiftInsensitive: true },
-    shiftInsensitive: true,
-    shortcut: { key: 'Escape' },
-    shortcutId: 'escape',
-  },
-] satisfies readonly CanvasKeyboardSystemShortcutDescriptor[]
 
 export function getCanvasKeyboardSystemShortcutIntent(
   input: CanvasKeyboardSystemShortcutInput & {
@@ -113,9 +60,9 @@ export function shouldReleaseCanvasKeyboardTemporaryPan({
   event: globalThis.KeyboardEvent
 }) {
   return (
-    config.shortcuts.temporaryPan &&
-    config.gestures.temporaryPan &&
-    event.code === 'Space'
+    config.shortcuts[CANVAS_KEYBOARD_TEMPORARY_PAN_SHORTCUT.shortcutId] &&
+    config.gestures[CANVAS_KEYBOARD_TEMPORARY_PAN_SHORTCUT.gestureId] &&
+    event.code === CANVAS_KEYBOARD_TEMPORARY_PAN_SHORTCUT.code
   )
 }
 

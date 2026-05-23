@@ -2399,6 +2399,9 @@ describe('Canvas module boundaries', () => {
     const nudgeShortcutFile = getSourceFile(
       'src/canvas/app/keyboard/CanvasKeyboardNudgeShortcuts.ts',
     )
+    const nudgeShortcutCatalogFile = getSourceFile(
+      'src/canvas/app/keyboard/CanvasKeyboardNudgeShortcutCatalog.ts',
+    )
     const viewportShortcutFile = getSourceFile(
       'src/canvas/app/keyboard/CanvasKeyboardViewportShortcuts.ts',
     )
@@ -2407,6 +2410,9 @@ describe('Canvas module boundaries', () => {
     )
     const systemShortcutFile = getSourceFile(
       'src/canvas/app/keyboard/CanvasKeyboardSystemShortcuts.ts',
+    )
+    const systemShortcutCatalogFile = getSourceFile(
+      'src/canvas/app/keyboard/CanvasKeyboardSystemShortcutCatalog.ts',
     )
     const systemDispatchFile = getSourceFile(
       'src/canvas/app/keyboard/CanvasKeyboardSystemDispatch.ts',
@@ -2576,8 +2582,18 @@ describe('Canvas module boundaries', () => {
     expect(nudgeShortcutFile.source).toContain(
       'export function getCanvasKeyboardReservedNudgeShortcuts',
     )
-    expect(nudgeShortcutFile.source).toContain("'large nudge left'")
+    expect(nudgeShortcutFile.source).toContain(
+      "from './CanvasKeyboardNudgeShortcutCatalog'",
+    )
+    expect(nudgeShortcutFile.source).not.toContain("'large nudge left'")
     expect(nudgeShortcutFile.source).toContain("kind: 'nudge-selection'")
+    expect(nudgeShortcutCatalogFile.source).toContain(
+      'CANVAS_KEYBOARD_NUDGE_SHORTCUTS',
+    )
+    expect(nudgeShortcutCatalogFile.source).toContain("'large nudge left'")
+    expect(nudgeShortcutCatalogFile.source).not.toContain(
+      "kind: 'nudge-selection'",
+    )
     expect(viewportShortcutFile.source).toContain(
       'export function getCanvasKeyboardViewportShortcutIntent',
     )
@@ -2616,9 +2632,30 @@ describe('Canvas module boundaries', () => {
     expect(systemShortcutFile.source).toContain(
       'export function getCanvasKeyboardReservedSystemShortcuts',
     )
-    expect(systemShortcutFile.source).toContain("shortcutId: 'findReplace'")
-    expect(systemShortcutFile.source).toContain("shortcutId: 'temporaryPan'")
-    expect(systemShortcutFile.source).toContain("shortcutId: 'escape'")
+    expect(systemShortcutFile.source).toContain(
+      "from './CanvasKeyboardSystemShortcutCatalog'",
+    )
+    expect(systemShortcutFile.source).not.toContain("shortcutId: 'findReplace'")
+    expect(systemShortcutFile.source).not.toContain(
+      "shortcutId: 'temporaryPan'",
+    )
+    expect(systemShortcutFile.source).not.toContain("shortcutId: 'escape'")
+    expect(systemShortcutCatalogFile.source).toContain(
+      'CANVAS_KEYBOARD_SYSTEM_SHORTCUTS',
+    )
+    expect(systemShortcutCatalogFile.source).toContain(
+      "shortcutId: 'findReplace'",
+    )
+    expect(systemShortcutCatalogFile.source).toContain(
+      "shortcutId: 'temporaryPan'",
+    )
+    expect(systemShortcutCatalogFile.source).toContain("shortcutId: 'escape'")
+    expect(systemShortcutCatalogFile.source).not.toContain(
+      "shortcutId: 'fitAll'",
+    )
+    expect(systemShortcutCatalogFile.source).not.toContain(
+      "'large nudge left'",
+    )
     expect(systemDispatchFile.source).toContain(
       'export function runCanvasKeyboardSystemIntent',
     )
