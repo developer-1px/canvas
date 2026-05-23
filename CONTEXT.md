@@ -101,7 +101,8 @@
 - Canvas Pointer Interaction Movement: drag threshold 기반 moved 판정을 pointer interaction preview/start/lifecycle Module들이 공유하는 App-owned runtime Module.
 - Canvas Pointer Interaction Lifecycle: pointer-up/cancel 시 active interaction을 문서 변경, selection 변경, edit 진입, cancel rollback으로 확정하거나 되돌리는 App-owned runtime Module.
 - Canvas App Model: App Shell이 렌더링할 control별 view props를 만들고 command, pointer, keyboard, viewport, text editing wiring을 숨기는 workflow Module.
-- Canvas App Command Model: App Model이 document, clipboard, history, stage context와 keyboard/toolbar/pointer command fan-out을 직접 알지 않도록 consumer별 command context를 만드는 workflow Module.
+- Canvas App Command Model: App Model이 document, clipboard, history, stage context와 command runtime wiring을 직접 알지 않도록 숨기는 workflow Module.
+- Canvas App Command Consumer Model: Command runtime callbacks를 toolbar, keyboard, pointer consumer별 command context로 변환하는 workflow Module.
 - Canvas App Component Model: App Model이 component insertion의 component library, document commit, selection, stage, viewport wiring과 control fan-out 세부를 직접 알지 않도록 component control context를 만드는 workflow Module.
 - Canvas App Control Model: component palette, toolbar, status, zoom controls props를 만들고 command availability, status label, selected fit target 규칙을 숨기는 workflow Module.
 - Canvas App Extension Model: 외부 custom command/tool descriptor를 control, keyboard, pointer가 쓰는 consumer별 extension context로 바꾸는 workflow Module.
@@ -239,7 +240,7 @@
 - Canvas App Assembly Snapshot은 Adapter snapshot/freeze 세부를 직접 알지 않고 Canvas App Adapter Snapshot에 위임한다.
 - App Model은 Stage Element Adapter를 직접 fan-out하지 않고 Canvas App Stage Element Model에서 consumer별 stage element context를 받는다.
 - App View는 raw workflow state 대신 Canvas App Model이 조립한 control별 props만 받는다.
-- App Model은 command hook context wiring 세부를 직접 알지 않고 Canvas App Command Model에서 command handlers를 받는다.
+- App Model은 command hook context wiring 세부를 직접 알지 않고 Canvas App Command Model에서 command handlers를 받는다. Command runtime 생성은 Canvas App Command Model이, consumer별 command fan-out은 Canvas App Command Consumer Model이 소유한다.
 - App Model은 component insertion hook context wiring과 control fan-out 세부를 직접 알지 않고 Canvas App Component Model에서 component control context를 받는다.
 - App Model은 control별 view props, command availability, status label, selected fit target 규칙을 직접 알지 않고 Canvas App Control Model에 위임한다.
 - App Model은 custom command/tool descriptor 실행과 toolbar/keyboard/pointer fan-out 세부를 직접 알지 않고 Canvas App Extension Model에서 consumer별 extension context를 받는다.

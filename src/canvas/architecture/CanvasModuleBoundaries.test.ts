@@ -748,6 +748,9 @@ describe('Canvas module boundaries', () => {
     const commandModelFile = getSourceFile(
       'src/canvas/app/workflow/useCanvasAppCommandModel.ts',
     )
+    const commandConsumerModelFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppCommandConsumerModel.ts',
+    )
 
     expect(appModelFile.source).toContain(
       "from './useCanvasAppCommandModel'",
@@ -760,6 +763,9 @@ describe('Canvas module boundaries', () => {
       "from '../commands/useCanvasCommands'",
     )
     expect(commandModelFile.source).toContain(
+      "from './CanvasAppCommandConsumerModel'",
+    )
+    expect(commandModelFile.source).toContain(
       'export function useCanvasAppCommandModel',
     )
     expect(commandModelFile.source).toContain(
@@ -768,9 +774,15 @@ describe('Canvas module boundaries', () => {
     expect(commandModelFile.source).toContain(
       'setSelection: workspace.setSelection',
     )
-    expect(commandModelFile.source).toContain('control: {')
-    expect(commandModelFile.source).toContain('keyboard: {')
-    expect(commandModelFile.source).toContain('pointer: {')
+    expect(commandModelFile.source).not.toContain('control: {')
+    expect(commandModelFile.source).not.toContain('keyboard: {')
+    expect(commandModelFile.source).not.toContain('pointer: {')
+    expect(commandConsumerModelFile.source).toContain(
+      'export function getCanvasAppCommandConsumerModel',
+    )
+    expect(commandConsumerModelFile.source).toContain('control: {')
+    expect(commandConsumerModelFile.source).toContain('keyboard: {')
+    expect(commandConsumerModelFile.source).toContain('pointer: {')
     expect(appModelFile.source).not.toMatch(/commands\.\w+Selection/)
     expect(appModelFile.source).not.toContain('commands.cloneItems')
   })
