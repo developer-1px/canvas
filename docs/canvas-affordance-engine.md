@@ -129,6 +129,7 @@ type CanvasAffordanceConfig = {
 - Custom Item Module 간 module id, tool id, renderer key, validator key, inspector id, command id가 겹치면 조용히 덮어쓰지 않고 assembly 단계에서 실패한다.
 - Custom Item Module과 직접 Canvas App Assembly input 간 extension key가 겹쳐도 assembly 단계에서 실패한다.
 - Host App은 `disabledCustomItemModuleIds`로 custom item module을 끌 수 있고, 알 수 없는 module id를 끄려고 하면 assembly 단계에서 실패한다.
+- Custom creation tool shortcut이 내부 canvas shortcut이나 다른 custom creation tool shortcut과 겹치면 assembly 단계에서 실패한다.
 - 제품별 renderer 세부 스타일은 canvas shell CSS에 두지 않고 Host App/Demo module 쪽에서 소유한다.
 - 제품별 inspector UI는 기본 Object Inspector 구현을 수정하지 않고 Canvas App Assembly의 inspector panel descriptor로 등록한다.
 - 위 import 경계는 `src/canvas/architecture/CanvasModuleBoundaries.test.ts`에서 검증한다.

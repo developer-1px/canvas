@@ -148,4 +148,37 @@ describe('CanvasAppCustomItemModules', () => {
       }),
     ).toThrow('Unknown disabled canvas custom item module: unknown')
   })
+
+  it('rejects custom creation tool shortcut conflicts across modules', () => {
+    const first = defineCanvasAppCustomItemModule({
+      id: 'risk',
+      customCreationTools: [
+        {
+          id: 'risk',
+          label: '!',
+          title: 'Risk',
+          shortcut: { key: 'e', shiftKey: true },
+          createItem: () => null,
+        },
+      ],
+    })
+    const second = defineCanvasAppCustomItemModule({
+      id: 'dependency',
+      customCreationTools: [
+        {
+          id: 'dependency',
+          label: 'D',
+          title: 'Dependency',
+          shortcut: { key: 'e', shiftKey: true },
+          createItem: () => null,
+        },
+      ],
+    })
+
+    expect(() =>
+      createCanvasAppCustomItemModuleAssembly([first, second]),
+    ).toThrow(
+      'Duplicate canvas app custom creation tool shortcut: risk and dependency use Shift+E',
+    )
+  })
 })

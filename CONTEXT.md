@@ -54,6 +54,7 @@
 - Demo custom item module은 `src/demo/custom-items/<name>/index.ts` convention으로 자동 수집한다.
 - Canvas App Custom Item Module과 직접 assembly input의 extension key가 겹치면 assembly 단계에서 실패해야 한다.
 - Canvas App Custom Item Module은 `disabledCustomItemModuleIds`로 Host App에서 끌 수 있어야 하며, 알 수 없는 id는 실패해야 한다.
+- Canvas App Custom Creation Tool shortcut은 내부 canvas shortcut이나 다른 custom tool shortcut과 충돌하면 assembly 단계에서 실패해야 한다.
 - 제품별 renderer 스타일은 Canvas App Shell CSS에 두지 않고 Host App/Demo module이 소유한다.
 - 제품별 inspector UI는 기본 Object Inspector를 수정하지 않고 Canvas App Inspector Panel로 등록한다.
 - 제품별 저장 payload는 Canvas Custom Item의 JSON `data` 안에 두고, payload 의미 검증은 Canvas Custom Item Validator로 등록한다.

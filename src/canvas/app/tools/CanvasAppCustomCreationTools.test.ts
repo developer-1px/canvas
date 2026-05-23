@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import {
+  assertCanvasAppCustomCreationToolShortcuts,
   getCanvasAppCustomCreationTool,
   getCanvasAppCustomCreationToolStates,
+  getCanvasAppCustomToolShortcutKey,
   getCanvasAppCustomToolId,
   matchesCanvasAppCustomToolShortcut,
   type CanvasAppCustomCreationTool,
@@ -57,5 +59,38 @@ describe('CanvasAppCustomCreationTools', () => {
         shortcut: { key: 'e', shiftKey: true },
       }),
     ).toBe(false)
+  })
+
+  it('normalizes custom tool shortcut keys', () => {
+    expect(getCanvasAppCustomToolShortcutKey({ key: 'E', shiftKey: true }))
+      .toBe('shift+e')
+    expect(getCanvasAppCustomToolShortcutKey({ key: 'e' })).toBe('e')
+  })
+
+  it('rejects duplicate custom tool shortcuts', () => {
+    expect(() =>
+      assertCanvasAppCustomCreationToolShortcuts([
+        tool,
+        {
+          ...tool,
+          id: 'dependency',
+        },
+      ]),
+    ).toThrow(
+      'Duplicate canvas app custom creation tool shortcut: risk and dependency use Shift+E',
+    )
+  })
+
+  it('rejects built-in canvas shortcut conflicts', () => {
+    expect(() =>
+      assertCanvasAppCustomCreationToolShortcuts([
+        {
+          ...tool,
+          shortcut: { key: 'r' },
+        },
+      ]),
+    ).toThrow(
+      'Canvas app custom creation tool shortcut conflicts with rectangle tool: risk uses R',
+    )
   })
 })

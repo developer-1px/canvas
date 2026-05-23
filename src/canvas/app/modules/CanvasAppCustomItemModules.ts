@@ -2,7 +2,10 @@ import type { CanvasCustomItemValidators } from '../../host'
 import type { CanvasAppCustomCommand } from '../commands/CanvasAppCustomCommands'
 import type { CanvasAppInspectorPanel } from '../inspector/CanvasAppInspectorPanels'
 import type { CanvasDemoSvgCustomItemRenderers } from '../rendering'
-import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
+import {
+  assertCanvasAppCustomCreationToolShortcuts,
+  type CanvasAppCustomCreationTool,
+} from '../tools/CanvasAppCustomCreationTools'
 
 export type CanvasAppCustomItemModule = {
   customCommands?: readonly CanvasAppCustomCommand[]
@@ -42,7 +45,7 @@ export function createCanvasAppCustomItemModuleAssembly(
     (module) => !disabledModuleIds.has(module.id),
   )
 
-  return enabledModules.reduce<CanvasAppCustomItemModuleAssembly>(
+  const assembly = enabledModules.reduce<CanvasAppCustomItemModuleAssembly>(
     (assembly, module) => ({
       customCommands: appendUniqueById({
         current: assembly.customCommands,
@@ -78,6 +81,10 @@ export function createCanvasAppCustomItemModuleAssembly(
       inspectorPanels: [],
     },
   )
+
+  assertCanvasAppCustomCreationToolShortcuts(assembly.customCreationTools)
+
+  return assembly
 }
 
 function assertUniqueModuleIds(modules: readonly CanvasAppCustomItemModule[]) {

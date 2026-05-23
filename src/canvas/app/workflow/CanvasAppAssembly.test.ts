@@ -154,4 +154,36 @@ describe('CanvasAppAssembly', () => {
     expect(assembly.customCreationTools).toEqual([])
     expect(assembly.customItemValidators).toEqual({})
   })
+
+  it('rejects custom creation tool shortcut conflicts across modules and direct input', () => {
+    const riskModule = defineCanvasAppCustomItemModule({
+      id: 'risk',
+      customCreationTools: [
+        {
+          id: 'risk',
+          label: '!',
+          title: 'Risk',
+          shortcut: { key: 'e', shiftKey: true },
+          createItem: () => null,
+        },
+      ],
+    })
+
+    expect(() =>
+      createCanvasAppAssembly({
+        customItemModules: [riskModule],
+        customCreationTools: [
+          {
+            id: 'dependency',
+            label: 'D',
+            title: 'Dependency',
+            shortcut: { key: 'e', shiftKey: true },
+            createItem: () => null,
+          },
+        ],
+      }),
+    ).toThrow(
+      'Duplicate canvas app custom creation tool shortcut: risk and dependency use Shift+E',
+    )
+  })
 })

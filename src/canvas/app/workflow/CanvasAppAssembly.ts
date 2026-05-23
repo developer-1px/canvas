@@ -24,7 +24,10 @@ import {
   type CanvasAppCustomItemModule,
   type CanvasAppCustomItemModuleAssemblyOptions,
 } from '../modules/CanvasAppCustomItemModules'
-import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
+import {
+  assertCanvasAppCustomCreationToolShortcuts,
+  type CanvasAppCustomCreationTool,
+} from '../tools/CanvasAppCustomCreationTools'
 
 export type CanvasAppItemAdapters = {
   command: CanvasCommandAdapter<CanvasItem>
@@ -70,7 +73,7 @@ export function createCanvasAppAssembly(
     { disabledModuleIds: input.disabledCustomItemModuleIds },
   )
 
-  return {
+  const assembly: CanvasAppAssembly = {
     componentLibrary:
       input.componentLibrary ?? DEFAULT_CANVAS_APP_ASSEMBLY.componentLibrary,
     componentPresentationRenderers:
@@ -119,6 +122,10 @@ export function createCanvasAppAssembly(
     initialItems: input.initialItems ?? DEFAULT_CANVAS_APP_ASSEMBLY.initialItems,
     itemAdapters: input.itemAdapters ?? DEFAULT_CANVAS_APP_ASSEMBLY.itemAdapters,
   }
+
+  assertCanvasAppCustomCreationToolShortcuts(assembly.customCreationTools)
+
+  return assembly
 }
 
 function appendUniqueById<TEntry extends { id: string }>({
