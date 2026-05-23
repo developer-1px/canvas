@@ -17,6 +17,7 @@
 - Canvas Document Change Patch: high-level CanvasItemsChange를 Host-owned JSON Patch factory 호출로 변환하는 change-to-patch grammar Module.
 - Canvas Document Patch Tree Diff: before/after Demo item tree를 patch factory가 쓰는 topmost changed entry, changed group entry, removal entry로 변환하는 Host-owned tree diff Module.
 - Canvas Document Reorder Patch: before/after Demo item tree의 sibling order 차이를 zod-crud JSON Patch `move` operation으로 변환하는 Host-owned patch Module.
+- Canvas Group Item: group item 판정과 recursive children 저장 shape를 소유하는 Host tree structural contract Module.
 - Host Public Facade: Demo Host model type, read model, component library, document controller를 외부 레이어에 노출하는 안정된 Module 경계.
 - Canvas Package Public Entry: 외부 조립자와 Demo가 사용하는 `src/canvas` 단일 entry. App, Engine, Host, Renderer, Entities facade를 다시 노출하고 내부 하위 경로를 숨긴다.
 - Canvas App Public Facade: Canvas App Shell, Canvas App Assembly Source, workflow 조립 계약을 노출하는 `src/canvas/app` entry.
@@ -25,6 +26,7 @@
 - Canvas Built-in Component Templates: Sticky, label, card 같은 기본 Demo component catalogue를 소유하는 Host-owned Module.
 - Canvas Component Presentation: Demo component kind를 Renderer Adapter의 그리기 전략과 연결하는 key. 새 component kind는 기존 presentation을 재사용할 수 있다.
 - Canvas Component Item Validation: component item의 stable component id, title/style string, optional text list 저장 shape 검증을 소유하는 Host-owned validation Module.
+- Canvas Editable Text Item: rect와 text item이 공유하는 editable target 판정, 저장 shape, edit initial value, commit fallback, patch operation을 소유하는 Host-owned text Module.
 - Canvas App Assembly: 내부 캔버스 문법은 유지하면서 affordance feature toggle, Host item adapter, component library, custom item module, initial items, SVG presentation registry 같은 제품별 의미를 외부에서 조립하는 composition Module.
 - Canvas App Assembly Input: Canvas App Assembly output을 `Partial`로 노출하지 않고 Host가 조립할 수 있는 필드만 명시한 외부 입력 계약.
 - Canvas App Assembly Source: App Shell이 prebuilt Canvas App Assembly와 Canvas App Assembly Input 중 하나를 받아 내부에서 조립/검증/snapshot 경로로 정규화하는 Module.
@@ -133,7 +135,7 @@
 - Canvas App Stage Model: stage와 item layer Adapter 입력 조립, 호출 순서, text editor blur, context menu 차단, render 실패 containment를 소유하는 workflow Module.
 - Canvas App Text Model: App Model이 textarea ref, text editor, find/replace runtime wiring 세부를 직접 알지 않도록 숨기는 workflow Module.
 - Canvas App Text Consumer Model: Text editor/find-replace runtime을 command, component, extension, keyboard, pointer, stage, view consumer context로 변환하는 workflow Module.
-- Canvas Text Editing Model: text edit commit descriptor, empty text fallback, viewport-projected editor style을 소유하는 App-owned runtime Module.
+- Canvas Text Editing Model: text edit commit descriptor와 viewport-projected editor style을 소유하고 editable item value 규칙은 Host Canvas Editable Text Item에 위임하는 App-owned runtime Module.
 - Canvas Find Replace Model: find/replace open gate, document search match count, replace-all containment, panel view props를 소유하는 App-owned runtime Module.
 - Canvas App Viewport Model: App Model이 wheel viewport listener와 fit/reset/zoom hook 조립 세부를 직접 알지 않도록 숨기는 workflow Module.
 - Canvas App Viewport Consumer Model: Viewport runtime controls를 control, keyboard consumer별 viewport context로 변환하는 workflow Module.
@@ -180,6 +182,8 @@
 - 기본 드로잉 item의 bounds는 caller 입력을 믿지 않고 Host tree/document가 `points` 또는 `start/end`에서 canonical하게 동기화한다.
 - 기본 드로잉 item의 geometry bounds, translate/scale, bounds cache sync 규칙은 Host Drawing Item Geometry Module이 소유하고 tree bounds, clone, transform, SVG drawing type guard가 재사용한다.
 - 기본 드로잉 item의 style 기본값은 Host Drawing Item Style Module이 소유하고 draft overlay와 item creation이 재사용한다.
+- Rect/text의 editable text 판정, 저장 shape 검증, initial edit value, empty text fallback, rect text add-patch 여부는 Host Canvas Editable Text Item Module이 소유한다.
+- Group item 판정과 recursive children 저장 shape는 Host Canvas Group Item Module이 소유하고 Host tree/document/operation Module은 named predicate를 호출한다.
 - 엔진은 Fabric.js 같은 완성형 객체 모델을 감싸기보다, 커스텀 가능한 Affordance 문법을 작은 Interface로 제공한다.
 - Demo `CanvasItem`과 SVG 렌더링 방식은 재사용 Core Contract에 포함하지 않는다.
 - Core primitive facade는 resize/handle/scale 규칙을 직접 구현하지 않고 Canvas Bounds Resize에 위임한다.
@@ -283,7 +287,7 @@
 - App Model은 pointer down/drag hook 조립 세부를 직접 알지 않고 Canvas App Pointer Model에서 stage/item layer pointer handlers를 받는다. Pointer runtime 생성은 Canvas App Pointer Model이, consumer별 handler fan-out은 Canvas App Pointer Consumer Model이 소유한다.
 - App Model은 stage/item layer Adapter 입력 조립, 호출 순서, context menu 차단, text editor blur timing, render 실패 containment를 직접 알지 않고 Canvas App Stage Model에 위임한다.
 - App Model은 textarea ref, text editor, find/replace wiring, editing state fan-out 세부를 직접 알지 않고 Canvas App Text Model에서 consumer별 text context와 view props를 받는다. Text editor/find-replace runtime 생성은 Canvas App Text Model이, consumer별 text fan-out은 Canvas App Text Consumer Model이 소유한다.
-- Text editing hook은 textarea focus/blur DOM lifecycle만 맡고, commit descriptor, empty text fallback, editor style projection은 Canvas Text Editing Model이 소유한다.
+- Text editing hook은 textarea focus/blur DOM lifecycle만 맡고, commit descriptor와 editor style projection은 Canvas Text Editing Model이 소유하며, editable item value 규칙은 Host Canvas Editable Text Item Module이 소유한다.
 - Find/replace hook은 open/query/replacement state storage만 맡고, feature toggle gate, match count 계산, replace-all 실행 조건, panel props 구성은 Canvas Find Replace Model이 소유한다.
 - App Model은 wheel viewport listener, fit/reset/zoom control hook 조립, keyboard/control fan-out 세부를 직접 알지 않고 Canvas App Viewport Model에서 consumer별 viewport context를 받는다. Viewport listener/control runtime 생성은 Canvas App Viewport Model이, consumer별 viewport fan-out은 Canvas App Viewport Consumer Model이 소유한다.
 - Viewport control hook은 callback memoization만 맡고, fit target defaulting, missing bounds/rect no-op, reset, stage-center zoom 실행 규칙은 Canvas Viewport Control Execution이 소유한다.

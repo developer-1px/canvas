@@ -42,7 +42,7 @@ describe('CanvasTextEditingModel', () => {
     })
     commitCanvasTextEditing({
       commitItemsChange: rectCommit,
-      editing: createEditing('   '),
+      editing: createEditing('   ', 'rect-1'),
       editingItem: createRectItem(),
       selection: ['rect-1'],
       setEditing: vi.fn(),
@@ -53,7 +53,7 @@ describe('CanvasTextEditingModel', () => {
       { before: ['text-1'], after: ['text-1'] },
     )
     expect(rectCommit).toHaveBeenCalledWith(
-      { type: 'set-text', id: 'text-1', text: '   ' },
+      { type: 'set-text', id: 'rect-1', text: '   ' },
       { before: ['rect-1'], after: ['rect-1'] },
     )
   })
@@ -122,9 +122,9 @@ describe('CanvasTextEditingModel', () => {
   })
 })
 
-function createEditing(value: string): EditingText {
+function createEditing(value: string, id = 'text-1'): EditingText {
   return {
-    id: 'text-1',
+    id,
     value,
   }
 }

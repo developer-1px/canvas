@@ -1,9 +1,6 @@
 import type { PointerEvent } from 'react'
-import type {
-  CanvasItem,
-  RectItem,
-  TextItem,
-} from '../../entities'
+import type { CanvasItem } from '../../entities'
+import type { CanvasEditableTextItem } from '../../host'
 import {
   DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS,
   type CanvasDemoSvgComponentPresentationRenderers,
@@ -25,7 +22,7 @@ type CanvasDemoSvgItemLayerProps = {
     event: PointerEvent<SVGGElement>,
     itemId: string,
   ) => void
-  onTextDoubleClick: (item: RectItem | TextItem) => void
+  onTextDoubleClick: (item: CanvasEditableTextItem) => void
 }
 
 export function CanvasDemoSvgItemLayer({

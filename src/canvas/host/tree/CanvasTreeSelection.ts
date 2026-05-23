@@ -1,6 +1,7 @@
 import { unique } from '../../core'
 import type { CanvasItem } from '../model'
 import { getItemsBounds } from './CanvasTreeBounds'
+import { isCanvasGroupItem } from './CanvasGroupItem'
 import { isAncestorPath, samePath } from './CanvasTreePath'
 import { flattenCanvasItems } from './CanvasTreeTraversal'
 
@@ -51,7 +52,7 @@ export function pruneNestedSelection(items: CanvasItem[], ids: string[]) {
 
     return !entries.some(
       (candidate) =>
-        candidate.item.type === 'group' &&
+        isCanvasGroupItem(candidate.item) &&
         selected.has(candidate.item.id) &&
         isAncestorPath(candidate.path, entry.path),
     )

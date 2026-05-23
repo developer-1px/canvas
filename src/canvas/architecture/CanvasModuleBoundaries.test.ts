@@ -1272,7 +1272,13 @@ describe('Canvas module boundaries', () => {
     expect(textEditingModelFile.source).toContain(
       'export function getCanvasTextEditorStyle',
     )
-    expect(textEditingModelFile.source).toContain("'Text'")
+    expect(textEditingModelFile.source).toContain(
+      'getCommittedCanvasEditableTextValue',
+    )
+    expect(textEditingModelFile.source).not.toContain("'Text'")
+    expect(textEditingModelFile.source).not.toContain(
+      "editingItem.type === 'text'",
+    )
     expect(textEditingModelFile.source).toContain("type: 'set-text'")
     expect(textEditingModelFile.source).toContain('fontSize: 16')
     expect(findReplaceHookFile.source).toContain(
@@ -1627,7 +1633,7 @@ describe('Canvas module boundaries', () => {
     expect(itemStartFile.source).toContain('altDragDuplicate')
     expect(itemStartFile.source).toContain('historySelection')
     expect(itemStartFile.source).toContain('config.gestures.textEdit')
-    expect(itemStartFile.source).toContain("item.type === 'rect'")
+    expect(itemStartFile.source).toContain('getCanvasEditableTextValue')
     expect(itemStartFile.source).toContain('selection: [item.id]')
   })
 
@@ -1803,6 +1809,132 @@ describe('Canvas module boundaries', () => {
     )
     expect(componentValidationFile.source).toContain('isCanvasStableId')
     expect(componentValidationFile.source).toContain('function isStringArray')
+  })
+
+  it('keeps editable text item rules in the host text module', () => {
+    const itemSchemaFile = getSourceFile(
+      'src/canvas/host/document/CanvasItemSchema.ts',
+    )
+    const treeTraversalFile = getSourceFile(
+      'src/canvas/host/tree/CanvasTreeTraversal.ts',
+    )
+    const documentPatchesFile = getSourceFile(
+      'src/canvas/host/document/CanvasDocumentPatches.ts',
+    )
+    const editableTextFile = getSourceFile(
+      'src/canvas/host/text/CanvasEditableTextItem.ts',
+    )
+    const itemStartFile = getSourceFile(
+      'src/canvas/app/pointer/CanvasItemPointerInteractionStart.ts',
+    )
+    const textEditingModelFile = getSourceFile(
+      'src/canvas/app/text/CanvasTextEditingModel.ts',
+    )
+
+    expect(itemSchemaFile.source).toContain(
+      "from '../text/CanvasEditableTextItem'",
+    )
+    expect(itemSchemaFile.source).toContain(
+      'isCanvasEditableTextItemStorageShape(value)',
+    )
+    expect(itemSchemaFile.source).not.toContain("value.type === 'rect'")
+    expect(itemSchemaFile.source).not.toContain("value.type === 'text'")
+    expect(treeTraversalFile.source).toContain('isCanvasTextItem(item)')
+    expect(treeTraversalFile.source).toContain(
+      'isCanvasEditableTextItem(item)',
+    )
+    expect(treeTraversalFile.source).not.toContain(
+      "item?.type === 'rect' || item?.type === 'text'",
+    )
+    expect(documentPatchesFile.source).toContain(
+      'isCanvasEditableTextItem(entry.item)',
+    )
+    expect(documentPatchesFile.source).toContain(
+      'getCanvasEditableTextPatchOperation(entry.item)',
+    )
+    expect(documentPatchesFile.source).not.toContain(
+      "entry.item.type !== 'rect'",
+    )
+    expect(documentPatchesFile.source).not.toContain(
+      "entry.item.type === 'rect' && entry.item.text === undefined",
+    )
+    expect(itemStartFile.source).toContain('getCanvasEditableTextValue(item)')
+    expect(itemStartFile.source).not.toContain(
+      "item.type === 'rect' ? item.text ?? '' : item.text",
+    )
+    expect(textEditingModelFile.source).toContain(
+      'getCommittedCanvasEditableTextValue',
+    )
+    expect(textEditingModelFile.source).not.toContain(
+      "editingItem.type === 'text'",
+    )
+    expect(editableTextFile.source).toContain(
+      'export type CanvasEditableTextItem',
+    )
+    expect(editableTextFile.source).toContain(
+      'export function isCanvasEditableTextItem',
+    )
+    expect(editableTextFile.source).toContain(
+      'export function getCanvasEditableTextValue',
+    )
+    expect(editableTextFile.source).toContain(
+      'export function getCommittedCanvasEditableTextValue',
+    )
+    expect(editableTextFile.source).toContain(
+      'export function getCanvasEditableTextPatchOperation',
+    )
+  })
+
+  it('keeps group item structure rules in the host tree module', () => {
+    const itemSchemaFile = getSourceFile(
+      'src/canvas/host/document/CanvasItemSchema.ts',
+    )
+    const groupItemFile = getSourceFile(
+      'src/canvas/host/tree/CanvasGroupItem.ts',
+    )
+    const hostEntryFile = getSourceFile('src/canvas/host/index.ts')
+    const groupPredicateConsumers = [
+      'src/canvas/host/adapters/CanvasItemSceneAdapter.ts',
+      'src/canvas/host/document/CanvasCustomItemValidation.ts',
+      'src/canvas/host/document/CanvasDocumentPatchTreeDiff.ts',
+      'src/canvas/host/document/CanvasDocumentPatches.ts',
+      'src/canvas/host/document/CanvasDocumentReorderPatch.ts',
+      'src/canvas/host/operations/CanvasItemAlignmentOperations.ts',
+      'src/canvas/host/operations/CanvasItemCloneOperations.ts',
+      'src/canvas/host/operations/CanvasItemGroupOperations.ts',
+      'src/canvas/host/operations/CanvasItemLockOperations.ts',
+      'src/canvas/host/operations/CanvasItemOperationTree.ts',
+      'src/canvas/host/operations/CanvasItemRemovalOperations.ts',
+      'src/canvas/host/operations/CanvasItemTransformOperations.ts',
+      'src/canvas/host/operations/CanvasItemZOrderOperations.ts',
+      'src/canvas/host/tree/CanvasTreeBounds.ts',
+      'src/canvas/host/tree/CanvasTreeSelection.ts',
+      'src/canvas/host/tree/CanvasTreeTraversal.ts',
+    ].map((path) => getSourceFile(path).source).join('\n')
+
+    expect(itemSchemaFile.source).toContain(
+      "from '../tree/CanvasGroupItem'",
+    )
+    expect(itemSchemaFile.source).toContain(
+      'isCanvasGroupItemStorageShape(value, isCanvasItem)',
+    )
+    expect(itemSchemaFile.source).not.toContain("value.type === 'group'")
+    expect(groupPredicateConsumers).toContain('isCanvasGroupItem(')
+    expect(groupPredicateConsumers).not.toContain("item.type === 'group'")
+    expect(groupPredicateConsumers).not.toContain("item.type !== 'group'")
+    expect(groupPredicateConsumers).not.toContain(
+      "entry.item.type === 'group'",
+    )
+    expect(groupPredicateConsumers).not.toContain(
+      "candidate.item.type === 'group'",
+    )
+    expect(groupItemFile.source).toContain(
+      'export function isCanvasGroupItem',
+    )
+    expect(groupItemFile.source).toContain(
+      'export function isCanvasGroupItemStorageShape',
+    )
+    expect(hostEntryFile.source).toContain('isCanvasGroupItem')
   })
 
   it('keeps Host custom item validation behind a named module', () => {

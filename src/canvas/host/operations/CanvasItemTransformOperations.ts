@@ -11,6 +11,7 @@ import {
   pruneNestedSelection,
   syncGroupBounds,
 } from '../tree/CanvasTree'
+import { isCanvasGroupItem } from '../tree/CanvasGroupItem'
 import { mapCanvasItems } from './CanvasItemOperationTree'
 import { isCanvasItemLocked } from './CanvasItemLockOperations'
 
@@ -45,7 +46,7 @@ export function resizeCanvasItems(
 }
 
 function translateCanvasItem(item: CanvasItem, dx: number, dy: number): CanvasItem {
-  if (item.type === 'group') {
+  if (isCanvasGroupItem(item)) {
     return syncGroupBounds({
       ...item,
       x: item.x + dx,
@@ -70,7 +71,7 @@ function translateCanvasItem(item: CanvasItem, dx: number, dy: number): CanvasIt
 }
 
 function scaleCanvasItem(item: CanvasItem, from: Bounds, to: Bounds): CanvasItem {
-  if (item.type === 'group') {
+  if (isCanvasGroupItem(item)) {
     return syncGroupBounds({
       ...item,
       ...scaleItemBounds(getItemBounds(item), from, to),

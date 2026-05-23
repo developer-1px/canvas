@@ -1,12 +1,13 @@
 import type {
   CanvasItem,
-  TextItem
+  TextItem,
 } from '../model'
 import {
   isCanvasEditableTextItem,
   isCanvasTextItem,
   type CanvasEditableTextItem,
 } from '../text/CanvasEditableTextItem'
+import { isCanvasGroupItem } from './CanvasGroupItem'
 import { samePath } from './CanvasTreePath'
 
 export type CanvasItemEntry = {
@@ -24,7 +25,7 @@ export function flattenCanvasItems(items: CanvasItem[]) {
       const path = [...parentPath, index]
       entries.push({ item, path, parentPath, index })
 
-      if (item.type === 'group') {
+      if (isCanvasGroupItem(item)) {
         visit(item.children, path)
       }
     })
@@ -53,7 +54,7 @@ export function findParentGroupId(items: CanvasItem[], id: string) {
   return (
     entries.find(
       (candidate) =>
-        candidate.item.type === 'group' &&
+        isCanvasGroupItem(candidate.item) &&
         samePath(candidate.path, entry.parentPath),
     )?.item.id ?? null
   )

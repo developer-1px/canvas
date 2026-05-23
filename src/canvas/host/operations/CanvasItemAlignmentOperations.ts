@@ -7,6 +7,7 @@ import {
   pruneNestedSelection,
   syncGroupBounds,
 } from '../tree/CanvasTree'
+import { isCanvasGroupItem } from '../tree/CanvasGroupItem'
 import {
   replaceCanvasChildrenAtPath,
   sameCanvasPath,
@@ -167,7 +168,7 @@ function translateCanvasItemByDelta(
     return item
   }
 
-  if (item.type === 'group') {
+  if (isCanvasGroupItem(item)) {
     return syncGroupBounds({
       ...item,
       children: item.children.map((child) =>

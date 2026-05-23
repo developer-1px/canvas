@@ -1,4 +1,5 @@
 import type { CanvasItem } from '../model'
+import { isCanvasGroupItem } from '../tree/CanvasGroupItem'
 import { syncGroupBounds } from '../tree/CanvasTree'
 
 export function mapCanvasItems(
@@ -6,13 +7,13 @@ export function mapCanvasItems(
   mapItem: (item: CanvasItem) => CanvasItem,
 ): CanvasItem[] {
   return items.map((item) => {
-    if (item.type !== 'group') {
+    if (!isCanvasGroupItem(item)) {
       return mapItem(item)
     }
 
     const mappedGroup = mapItem(item)
 
-    if (mappedGroup.type !== 'group' || mappedGroup !== item) {
+    if (!isCanvasGroupItem(mappedGroup) || mappedGroup !== item) {
       return mappedGroup
     }
 
@@ -35,7 +36,7 @@ export function replaceCanvasChildrenAtPath(
   const [head, ...tail] = path
 
   return items.map((item, index) => {
-    if (index !== head || item.type !== 'group') {
+    if (index !== head || !isCanvasGroupItem(item)) {
       return item
     }
 

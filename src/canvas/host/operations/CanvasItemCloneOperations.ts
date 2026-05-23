@@ -12,6 +12,7 @@ import {
   pruneNestedSelection,
   syncGroupBounds,
 } from '../tree/CanvasTree'
+import { isCanvasGroupItem } from '../tree/CanvasGroupItem'
 
 export function copyCanvasSelection(items: CanvasItem[], ids: string[]) {
   const selected = new Set(pruneNestedSelection(items, ids))
@@ -43,7 +44,7 @@ export function cloneCanvasItemsWithNewIds(
 }
 
 function cloneCanvasItemTree(item: CanvasItem): CanvasItem {
-  if (item.type === 'group') {
+  if (isCanvasGroupItem(item)) {
     return {
       ...item,
       children: item.children.map(cloneCanvasItemTree),
@@ -58,7 +59,7 @@ function cloneCanvasItemWithNewId(
   createId: (prefix: string) => string,
   offset: Point,
 ): CanvasItem {
-  if (item.type === 'group') {
+  if (isCanvasGroupItem(item)) {
     const group: GroupItem = {
       ...item,
       id: createId('group'),

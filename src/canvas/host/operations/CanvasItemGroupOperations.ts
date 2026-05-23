@@ -6,6 +6,7 @@ import {
   syncCanvasItems,
   syncGroupBounds,
 } from '../tree/CanvasTree'
+import { isCanvasGroupItem } from '../tree/CanvasGroupItem'
 import {
   replaceCanvasChildrenAtPath,
   sameCanvasPath,
@@ -64,12 +65,12 @@ export function ungroupCanvasSelection(items: CanvasItem[], ids: string[]) {
 
   function visit(nodes: CanvasItem[]): CanvasItem[] {
     return nodes.flatMap((item): CanvasItem[] => {
-      if (item.type === 'group' && selected.has(item.id)) {
+      if (isCanvasGroupItem(item) && selected.has(item.id)) {
         nextSelection.push(...item.children.map((child) => child.id))
         return item.children
       }
 
-      if (item.type !== 'group') {
+      if (!isCanvasGroupItem(item)) {
         return [item]
       }
 

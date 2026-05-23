@@ -8,6 +8,7 @@ import {
   isCanvasDrawingItem,
   syncCanvasDrawingItemBounds,
 } from '../drawing/CanvasDrawingItemGeometry'
+import { isCanvasGroupItem } from './CanvasGroupItem'
 
 export function boundsIntersect(a: Bounds, b: Bounds) {
   return (
@@ -19,7 +20,7 @@ export function boundsIntersect(a: Bounds, b: Bounds) {
 }
 
 export function getItemBounds(item: CanvasItem): Bounds {
-  if (item.type === 'group') {
+  if (isCanvasGroupItem(item)) {
     return getItemsBounds(item.children) ?? {
       x: item.x,
       y: item.y,
@@ -76,7 +77,7 @@ export function syncGroupBounds(group: GroupItem): GroupItem {
 export function syncCanvasItemBounds<TItem extends CanvasItem>(
   item: TItem,
 ): TItem {
-  if (item.type === 'group') {
+  if (isCanvasGroupItem(item)) {
     return syncGroupBounds(item) as TItem
   }
 
@@ -89,7 +90,7 @@ export function syncCanvasItemBounds<TItem extends CanvasItem>(
 
 export function syncCanvasItems(items: CanvasItem[]): CanvasItem[] {
   return items.map((item) => {
-    if (item.type === 'group') {
+    if (isCanvasGroupItem(item)) {
       return syncCanvasItemBounds({
         ...item,
         children: syncCanvasItems(item.children),

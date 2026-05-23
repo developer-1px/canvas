@@ -6,6 +6,7 @@ import type {
   CanvasCustomItem,
   CanvasItem,
 } from '../model'
+import { isCanvasGroupItem } from '../tree/CanvasTree'
 
 export type CanvasCustomItemValidator = (item: CanvasCustomItem) => boolean
 
@@ -43,7 +44,7 @@ export function assertCustomCanvasItems(
   assertCanvasCustomItemValidators(validators)
 
   for (const item of items) {
-    if (item.type === 'group') {
+    if (isCanvasGroupItem(item)) {
       assertCustomCanvasItems(item.children, validators)
       continue
     }

@@ -5,6 +5,7 @@ import {
   type CanvasSceneEntry,
 } from '../../engine'
 import { flattenCanvasItems, getItemBounds } from '../tree/CanvasTree'
+import { isCanvasGroupItem } from '../tree/CanvasGroupItem'
 
 export function createCanvasItemScene(items: CanvasItem[]): CanvasSceneAdapter {
   const treeEntries = flattenCanvasItems(items)
@@ -23,7 +24,7 @@ export function createCanvasItemScene(items: CanvasItem[]): CanvasSceneAdapter {
     .map((entry): CanvasSceneEntry => ({
       bounds: getItemBounds(entry.item),
       id: entry.item.id,
-      isGroup: entry.item.type === 'group',
+      isGroup: isCanvasGroupItem(entry.item),
       parentId:
         entry.parentPath.length === 0
           ? null

@@ -1,4 +1,5 @@
 import type { CanvasItem } from '../model'
+import { isCanvasGroupItem } from '../tree/CanvasGroupItem'
 import { syncGroupBounds } from '../tree/CanvasTree'
 import { isCanvasItemLocked } from './CanvasItemLockOperations'
 
@@ -14,7 +15,7 @@ export function removeCanvasItems(items: CanvasItem[], ids: string[]) {
       return []
     }
 
-    if (item.type !== 'group') {
+    if (!isCanvasGroupItem(item)) {
       return [item]
     }
 

@@ -10,12 +10,13 @@ import type {
   EditingText,
   Point,
   ResizeHandle,
-  RectItem,
-  TextItem,
   Tool,
   Viewport,
 } from '../../entities'
-import type { CanvasItemReadModel } from '../../host'
+import type {
+  CanvasEditableTextItem,
+  CanvasItemReadModel,
+} from '../../host'
 import { screenPoint, screenToWorld } from './CanvasPointerGeometry'
 import {
   shouldRouteCanvasItemPointerToCanvasGesture,
@@ -218,7 +219,7 @@ export function useCanvasPointerDownHandlers({
     })
   }
 
-  function handleTextDoubleClick(item: RectItem | TextItem) {
+  function handleTextDoubleClick(item: CanvasEditableTextItem) {
     const start = startCanvasTextEditInteraction({ config, item })
 
     applyCanvasTextEditInteractionStartEffect({

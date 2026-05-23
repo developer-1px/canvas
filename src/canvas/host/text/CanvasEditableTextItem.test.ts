@@ -5,6 +5,7 @@ import type {
   TextItem,
 } from '../model'
 import {
+  getCanvasEditableTextPatchOperation,
   getCanvasEditableTextValue,
   getCommittedCanvasEditableTextValue,
   isCanvasEditableTextItem,
@@ -76,6 +77,15 @@ describe('CanvasEditableTextItem', () => {
       item: rectItem,
       value: '   ',
     })).toBe('   ')
+  })
+
+  it('owns the patch operation for editable text storage', () => {
+    expect(getCanvasEditableTextPatchOperation({
+      ...rectItem,
+      text: undefined,
+    })).toBe('add')
+    expect(getCanvasEditableTextPatchOperation(rectItem)).toBe('replace')
+    expect(getCanvasEditableTextPatchOperation(textItem)).toBe('replace')
   })
 })
 

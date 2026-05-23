@@ -1,6 +1,7 @@
 import type { CanvasItem } from '../model'
 import {
   flattenCanvasItems,
+  isCanvasGroupItem,
   type CanvasItemEntry,
 } from '../tree/CanvasTree'
 import { isAncestorPath } from '../tree/CanvasTreePath'
@@ -43,7 +44,7 @@ export function createCanvasDocumentPatchTreeDiff({
       : false
   })
   const changedGroupEntries = changedEntries.filter(
-    (entry) => entry.item.type === 'group',
+    (entry) => isCanvasGroupItem(entry.item),
   )
 
   return {

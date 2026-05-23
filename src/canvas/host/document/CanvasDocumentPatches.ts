@@ -9,7 +9,14 @@ import {
   type CanvasZOrderMode,
   ungroupCanvasSelection,
 } from '../operations/CanvasOperations'
-import { findCanvasItemEntry } from '../tree/CanvasTree'
+import {
+  getCanvasEditableTextPatchOperation,
+  isCanvasEditableTextItem,
+} from '../text/CanvasEditableTextItem'
+import {
+  findCanvasItemEntry,
+  isCanvasGroupItem,
+} from '../tree/CanvasTree'
 import { canvasItemPathToPointer } from './CanvasDocumentPointers'
 import {
   areCanvasDocumentPatchItemsEqual,
@@ -105,11 +112,12 @@ export function createUngroupCanvasItemsPatch(
 
   return getCanvasDocumentPatchRemovalEntries(
     getCanvasDocumentPatchEntries(items).filter(
-      (entry) => entry.item.type === 'group' && selection.includes(entry.item.id),
+      (entry) =>
+        isCanvasGroupItem(entry.item) && selection.includes(entry.item.id),
     ),
   )
     .flatMap((entry): JSONPatchOperation[] => {
-      if (entry.item.type !== 'group') {
+      if (!isCanvasGroupItem(entry.item)) {
         return []
       }
 
@@ -185,16 +193,14 @@ export function createSetCanvasItemTextPatch(
 
   if (
     !entry ||
-    (entry.item.type !== 'rect' && entry.item.type !== 'text') ||
+    !isCanvasEditableTextItem(entry.item) ||
     entry.item.text === text
   ) {
     return []
   }
 
   return [{
-    op: entry.item.type === 'rect' && entry.item.text === undefined
-      ? 'add'
-      : 'replace',
+    op: getCanvasEditableTextPatchOperation(entry.item),
     path: `${canvasItemPathToPointer(entry.path)}/text` as Pointer,
     value: text,
   }]

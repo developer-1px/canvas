@@ -3,6 +3,7 @@ import type {
   Pointer,
 } from 'zod-crud'
 import type { CanvasItem } from '../model'
+import { isCanvasGroupItem } from '../tree/CanvasTree'
 import { canvasItemPathToPointer } from './CanvasDocumentPointers'
 
 type CanvasSiblingArrayEntry = {
@@ -54,7 +55,7 @@ function collectCanvasSiblingArrays(
     })
 
     nodes.forEach((item, index) => {
-      if (item.type === 'group') {
+      if (isCanvasGroupItem(item)) {
         visit(item.children, [...parentPath, index], item.id)
       }
     })

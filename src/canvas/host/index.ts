@@ -66,6 +66,11 @@ export {
   type CanvasItemReadModel,
 } from './read/CanvasItemReadModel'
 export {
+  isCanvasGroupItem,
+  type CanvasGroupItem,
+} from './tree/CanvasGroupItem'
+export {
+  getCanvasEditableTextPatchOperation,
   getCanvasEditableTextValue,
   getCommittedCanvasEditableTextValue,
   isCanvasEditableTextItem,

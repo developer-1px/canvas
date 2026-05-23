@@ -1,4 +1,5 @@
 import type { CanvasItem } from '../model'
+import { isCanvasGroupItem } from '../tree/CanvasGroupItem'
 import { pruneNestedSelection, syncGroupBounds } from '../tree/CanvasTree'
 import { mapCanvasItems } from './CanvasItemOperationTree'
 
@@ -21,7 +22,7 @@ export function unlockAllCanvasItems(items: CanvasItem[]): CanvasItem[] {
   return items.map((item) => {
     const unlocked = setCanvasItemLocked(item, false)
 
-    if (unlocked.type !== 'group') {
+    if (!isCanvasGroupItem(unlocked)) {
       return unlocked
     }
 

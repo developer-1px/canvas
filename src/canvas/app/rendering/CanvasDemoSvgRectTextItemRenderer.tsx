@@ -1,9 +1,6 @@
-import type {
-  RectItem,
-  TextItem,
-} from '../../entities'
+import type { CanvasEditableTextItem } from '../../host'
 
-export type CanvasDemoSvgRectTextItem = RectItem | TextItem
+export type CanvasDemoSvgRectTextItem = CanvasEditableTextItem
 
 export function renderCanvasDemoSvgRectTextItem({
   item,

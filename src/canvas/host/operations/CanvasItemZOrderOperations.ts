@@ -1,4 +1,5 @@
 import type { CanvasItem } from '../model'
+import { isCanvasGroupItem } from '../tree/CanvasGroupItem'
 import { pruneNestedSelection, syncGroupBounds } from '../tree/CanvasTree'
 
 export type CanvasZOrderMode =
@@ -27,7 +28,7 @@ function reorderCanvasItemTree(
   mode: CanvasZOrderMode,
 ): CanvasItem[] {
   return reorderCanvasSiblings(items, selected, mode).map((item) => {
-    if (item.type !== 'group') {
+    if (!isCanvasGroupItem(item)) {
       return item
     }
 

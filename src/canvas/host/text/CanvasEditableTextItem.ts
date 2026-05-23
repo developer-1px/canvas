@@ -43,6 +43,14 @@ export function getCommittedCanvasEditableTextValue({
     : value
 }
 
+export function getCanvasEditableTextPatchOperation(
+  item: CanvasEditableTextItem,
+) {
+  return item.type === 'rect' && item.text === undefined
+    ? 'add'
+    : 'replace'
+}
+
 function isCanvasRectItemStorageShape(
   value: Record<string, unknown>,
 ) {

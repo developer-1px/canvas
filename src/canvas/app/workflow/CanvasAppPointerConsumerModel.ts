@@ -1,8 +1,7 @@
 import type {
-  RectItem,
   ResizeHandle,
-  TextItem,
 } from '../../entities'
+import type { CanvasEditableTextItem } from '../../host'
 import type { CanvasAppPointerInput } from '../pointer/CanvasAppPointerInput'
 
 type CanvasAppPointerDownRuntime = {
@@ -15,7 +14,7 @@ type CanvasAppPointerDownRuntime = {
     event: CanvasAppPointerInput,
     handle: ResizeHandle,
   ) => void
-  handleTextDoubleClick: (item: RectItem | TextItem) => void
+  handleTextDoubleClick: (item: CanvasEditableTextItem) => void
 }
 
 type CanvasAppPointerDragRuntime = {

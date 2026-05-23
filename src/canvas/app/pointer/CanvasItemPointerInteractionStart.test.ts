@@ -4,7 +4,10 @@ import {
   createCanvasAffordanceConfig,
   createCanvasSceneAdapter,
 } from '../../engine'
-import type { CanvasItemReadModel } from '../../host'
+import {
+  isCanvasEditableTextItem,
+  type CanvasItemReadModel,
+} from '../../host'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import {
   startCanvasItemPointerInteraction,
@@ -191,7 +194,7 @@ function createTestCanvasItemReadModel(
     findEditableTextItem: (id) => {
       const item = items.find((item) => item.id === id)
 
-      return item?.type === 'rect' || item?.type === 'text' ? item : null
+      return item && isCanvasEditableTextItem(item) ? item : null
     },
     findItem: (id) => items.find((item) => item.id === id),
     getAllIds: () => items.map((item) => item.id),

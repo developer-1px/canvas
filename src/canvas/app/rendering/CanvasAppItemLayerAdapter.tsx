@@ -2,11 +2,8 @@ import {
   createElement,
   type ReactNode,
 } from 'react'
-import type {
-  CanvasItem,
-  RectItem,
-  TextItem,
-} from '../../entities'
+import type { CanvasItem } from '../../entities'
+import type { CanvasEditableTextItem } from '../../host'
 import {
   createCanvasAppPointerInput,
   type CanvasAppPointerInput,
@@ -32,7 +29,7 @@ export type CanvasAppItemLayerRenderInput = {
   outlineIds: Set<string>
   selected: Set<string>
   onItemPointerDown: (event: CanvasAppPointerInput, itemId: string) => void
-  onTextDoubleClick: (item: RectItem | TextItem) => void
+  onTextDoubleClick: (item: CanvasEditableTextItem) => void
 }
 
 export type CanvasAppItemLayerAdapter = {

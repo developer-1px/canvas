@@ -7,6 +7,11 @@ export {
   syncGroupBounds,
 } from './CanvasTreeBounds'
 export {
+  isCanvasGroupItem,
+  isCanvasGroupItemStorageShape,
+  type CanvasGroupItem,
+} from './CanvasGroupItem'
+export {
   findCanvasItem,
   findCanvasItemEntry,
   findEditableTextItem,
