@@ -1,0 +1,49 @@
+import type {
+  RectItem,
+  ResizeHandle,
+  TextItem,
+} from '../../entities'
+import type { CanvasAppPointerInput } from '../pointer/CanvasAppPointerInput'
+
+type CanvasAppPointerDownRuntime = {
+  handleCanvasPointerDown: (event: CanvasAppPointerInput) => void
+  handleItemPointerDown: (
+    event: CanvasAppPointerInput,
+    itemId: string,
+  ) => void
+  handleResizePointerDown: (
+    event: CanvasAppPointerInput,
+    handle: ResizeHandle,
+  ) => void
+  handleTextDoubleClick: (item: RectItem | TextItem) => void
+}
+
+type CanvasAppPointerDragRuntime = {
+  handlePointerCancel: (event: CanvasAppPointerInput) => void
+  handlePointerMove: (event: CanvasAppPointerInput) => void
+  handlePointerUp: (event: CanvasAppPointerInput) => void
+}
+
+type GetCanvasAppPointerConsumerModelArgs = {
+  downHandlers: CanvasAppPointerDownRuntime
+  dragHandlers: CanvasAppPointerDragRuntime
+}
+
+export function getCanvasAppPointerConsumerModel({
+  downHandlers,
+  dragHandlers,
+}: GetCanvasAppPointerConsumerModelArgs) {
+  return {
+    itemLayerHandlers: {
+      onItemPointerDown: downHandlers.handleItemPointerDown,
+      onTextDoubleClick: downHandlers.handleTextDoubleClick,
+    },
+    stageHandlers: {
+      onCanvasPointerDown: downHandlers.handleCanvasPointerDown,
+      onPointerCancel: dragHandlers.handlePointerCancel,
+      onPointerMove: dragHandlers.handlePointerMove,
+      onPointerUp: dragHandlers.handlePointerUp,
+      onResizePointerDown: downHandlers.handleResizePointerDown,
+    },
+  }
+}

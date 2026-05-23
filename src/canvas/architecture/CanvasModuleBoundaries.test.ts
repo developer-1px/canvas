@@ -849,6 +849,9 @@ describe('Canvas module boundaries', () => {
     const pointerModelFile = getSourceFile(
       'src/canvas/app/workflow/useCanvasAppPointerModel.ts',
     )
+    const pointerConsumerModelFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppPointerConsumerModel.ts',
+    )
 
     expect(appModelFile.source).toContain(
       "from './useCanvasAppPointerModel'",
@@ -867,8 +870,19 @@ describe('Canvas module boundaries', () => {
     expect(pointerModelFile.source).toContain(
       "from '../pointer/useCanvasPointerDragHandlers'",
     )
-    expect(pointerModelFile.source).toContain('itemLayerHandlers')
-    expect(pointerModelFile.source).toContain('stageHandlers')
+    expect(pointerModelFile.source).toContain(
+      "from './CanvasAppPointerConsumerModel'",
+    )
+    expect(pointerModelFile.source).not.toContain('itemLayerHandlers')
+    expect(pointerModelFile.source).not.toContain('stageHandlers')
+    expect(pointerConsumerModelFile.source).toContain(
+      'export function getCanvasAppPointerConsumerModel',
+    )
+    expect(pointerConsumerModelFile.source).toContain('itemLayerHandlers')
+    expect(pointerConsumerModelFile.source).toContain('stageHandlers')
+    expect(pointerConsumerModelFile.source).toContain(
+      'onCanvasPointerDown: downHandlers.handleCanvasPointerDown',
+    )
   })
 
   it('keeps app keyboard handler wiring behind a named workflow module', () => {

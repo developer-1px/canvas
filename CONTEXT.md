@@ -110,6 +110,7 @@
 - Canvas App Inspector Model: App Model이 inspector panel list, read model, selection wiring 세부를 직접 알지 않도록 object inspector props를 만드는 workflow Module.
 - Canvas App Keyboard Model: App Model이 keyboard shortcut handler wiring 세부를 알지 않도록 command, interaction, viewport shortcut handlers를 조립하는 workflow Module.
 - Canvas App Pointer Model: App Model이 pointer down/drag hook 조립 세부를 알지 않도록 stage와 item layer pointer handlers를 만드는 workflow Module.
+- Canvas App Pointer Consumer Model: Pointer runtime callbacks를 stage와 item layer consumer별 handler contract로 변환하는 workflow Module.
 - Canvas App Stage Model: stage와 item layer Adapter 입력 조립, 호출 순서, text editor blur, context menu 차단, render 실패 containment를 소유하는 workflow Module.
 - Canvas App Text Model: App Model이 textarea ref, text editor, find/replace runtime wiring 세부를 직접 알지 않도록 숨기는 workflow Module.
 - Canvas App Text Consumer Model: Text editor/find-replace runtime을 command, component, extension, keyboard, pointer, stage, view consumer context로 변환하는 workflow Module.
@@ -249,7 +250,7 @@
 - App Model은 custom command/tool descriptor 실행과 toolbar/keyboard/pointer fan-out 세부를 직접 알지 않고 Canvas App Extension Model에서 consumer별 extension context를 받는다. custom command/tool runtime 생성은 Canvas App Extension Model이, consumer별 extension fan-out은 Canvas App Extension Consumer Model이 소유한다.
 - App Model은 inspector panel wiring 세부를 직접 알지 않고 Canvas App Inspector Model에서 object inspector props를 받는다.
 - App Model은 keyboard shortcut handler wiring 세부를 직접 알지 않고 Canvas App Keyboard Model에 위임한다.
-- App Model은 pointer down/drag hook 조립 세부를 직접 알지 않고 Canvas App Pointer Model에서 stage/item layer pointer handlers를 받는다.
+- App Model은 pointer down/drag hook 조립 세부를 직접 알지 않고 Canvas App Pointer Model에서 stage/item layer pointer handlers를 받는다. Pointer runtime 생성은 Canvas App Pointer Model이, consumer별 handler fan-out은 Canvas App Pointer Consumer Model이 소유한다.
 - App Model은 stage/item layer Adapter 입력 조립, 호출 순서, context menu 차단, text editor blur timing, render 실패 containment를 직접 알지 않고 Canvas App Stage Model에 위임한다.
 - App Model은 textarea ref, text editor, find/replace wiring, editing state fan-out 세부를 직접 알지 않고 Canvas App Text Model에서 consumer별 text context와 view props를 받는다. Text editor/find-replace runtime 생성은 Canvas App Text Model이, consumer별 text fan-out은 Canvas App Text Consumer Model이 소유한다.
 - App Model은 wheel viewport listener, fit/reset/zoom control hook 조립, keyboard/control fan-out 세부를 직접 알지 않고 Canvas App Viewport Model에서 consumer별 viewport context를 받는다. Viewport listener/control runtime 생성은 Canvas App Viewport Model이, consumer별 viewport fan-out은 Canvas App Viewport Consumer Model이 소유한다.

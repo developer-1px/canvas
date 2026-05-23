@@ -30,6 +30,7 @@ import type {
   CommitCanvasItemsChange,
   CommitCanvasSelection,
 } from './CanvasWorkflowContract'
+import { getCanvasAppPointerConsumerModel } from './CanvasAppPointerConsumerModel'
 
 type CanvasAppPointerCommandModel = {
   cloneItems: (ids: string[], offset: Point) => CanvasItem[]
@@ -142,17 +143,8 @@ export function useCanvasAppPointerModel({
     viewport: workspace.viewport,
   })
 
-  return {
-    itemLayerHandlers: {
-      onItemPointerDown: downHandlers.handleItemPointerDown,
-      onTextDoubleClick: downHandlers.handleTextDoubleClick,
-    },
-    stageHandlers: {
-      onCanvasPointerDown: downHandlers.handleCanvasPointerDown,
-      onPointerCancel: dragHandlers.handlePointerCancel,
-      onPointerMove: dragHandlers.handlePointerMove,
-      onPointerUp: dragHandlers.handlePointerUp,
-      onResizePointerDown: downHandlers.handleResizePointerDown,
-    },
-  }
+  return getCanvasAppPointerConsumerModel({
+    downHandlers,
+    dragHandlers,
+  })
 }
