@@ -1750,6 +1750,37 @@ describe('Canvas module boundaries', () => {
     expect(drawingStyleConsumers).not.toContain('#334155')
   })
 
+  it('keeps built-in drawing item validation in the host drawing module', () => {
+    const itemSchemaFile = getSourceFile(
+      'src/canvas/host/document/CanvasItemSchema.ts',
+    )
+    const drawingValidationFile = getSourceFile(
+      'src/canvas/host/drawing/CanvasDrawingItemValidation.ts',
+    )
+
+    expect(itemSchemaFile.source).toContain(
+      "from '../drawing/CanvasDrawingItemValidation'",
+    )
+    expect(itemSchemaFile.source).toContain(
+      'isCanvasDrawingItemStorageShape(value)',
+    )
+    expect(itemSchemaFile.source).not.toContain('function isOpacity')
+    expect(itemSchemaFile.source).not.toContain('function isDrawingPointArray')
+    expect(itemSchemaFile.source).not.toContain('function isSamePoint')
+    expect(itemSchemaFile.source).not.toContain(
+      "value.type === 'marker' || value.type === 'highlight'",
+    )
+    expect(itemSchemaFile.source).not.toContain("value.type === 'arrow'")
+    expect(drawingValidationFile.source).toContain(
+      'export function isCanvasDrawingItemStorageShape',
+    )
+    expect(drawingValidationFile.source).toContain('function isOpacity')
+    expect(drawingValidationFile.source).toContain(
+      'function isDrawingPointArray',
+    )
+    expect(drawingValidationFile.source).toContain('function isSamePoint')
+  })
+
   it('keeps Host custom item validation behind a named module', () => {
     const itemSchemaFile = getSourceFile(
       'src/canvas/host/document/CanvasItemSchema.ts',
