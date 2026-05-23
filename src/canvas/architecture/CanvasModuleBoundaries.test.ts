@@ -410,6 +410,35 @@ describe('Canvas module boundaries', () => {
     expect(controlModelFile.source).toContain('selection.length > 2')
   })
 
+  it('keeps app pointer handler wiring behind a named workflow module', () => {
+    const appModelFile = getSourceFile(
+      'src/canvas/app/workflow/useCanvasAppModel.ts',
+    )
+    const pointerModelFile = getSourceFile(
+      'src/canvas/app/workflow/useCanvasAppPointerModel.ts',
+    )
+
+    expect(appModelFile.source).toContain(
+      "from './useCanvasAppPointerModel'",
+    )
+    expect(appModelFile.source).not.toContain(
+      "from '../pointer/useCanvasPointerDownHandlers'",
+    )
+    expect(appModelFile.source).not.toContain(
+      "from '../pointer/useCanvasPointerDragHandlers'",
+    )
+    expect(appModelFile.source).not.toContain('useCanvasPointerDownHandlers')
+    expect(appModelFile.source).not.toContain('useCanvasPointerDragHandlers')
+    expect(pointerModelFile.source).toContain(
+      "from '../pointer/useCanvasPointerDownHandlers'",
+    )
+    expect(pointerModelFile.source).toContain(
+      "from '../pointer/useCanvasPointerDragHandlers'",
+    )
+    expect(pointerModelFile.source).toContain('itemLayerHandlers')
+    expect(pointerModelFile.source).toContain('stageHandlers')
+  })
+
   it('keeps app item layer render input on the app pointer input interface', () => {
     const itemLayerAdapterFile = getSourceFile(
       'src/canvas/app/rendering/CanvasAppItemLayerAdapter.tsx',

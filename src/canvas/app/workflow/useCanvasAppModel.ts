@@ -9,14 +9,13 @@ import { useCanvasCommands } from '../commands/useCanvasCommands'
 import { useCanvasComponentInsertion } from '../components/useCanvasComponentInsertion'
 import { useCanvasObjectInspector } from '../inspector/useCanvasObjectInspector'
 import { useCanvasKeyboardShortcuts } from '../keyboard/useCanvasKeyboardShortcuts'
-import { useCanvasPointerDownHandlers } from '../pointer/useCanvasPointerDownHandlers'
-import { useCanvasPointerDragHandlers } from '../pointer/useCanvasPointerDragHandlers'
 import { useCanvasAppStageElement } from '../stage/CanvasAppStageElement'
 import { useCanvasViewportControls } from '../viewport/useCanvasViewportControls'
 import { useCanvasWheelViewport } from '../viewport/useCanvasWheelViewport'
 import { getCanvasAppControlModel } from './CanvasAppControlModel'
 import { renderCanvasAppStageModel } from './CanvasAppStageModel'
 import { useCanvasAppExtensionModel } from './useCanvasAppExtensionModel'
+import { useCanvasAppPointerModel } from './useCanvasAppPointerModel'
 import { useCanvasFindReplaceModel } from './useCanvasFindReplaceModel'
 import { useCanvasInteractionModel } from './useCanvasInteractionModel'
 import { useCanvasWorkspaceModel } from './useCanvasWorkspaceModel'
@@ -226,67 +225,44 @@ export function useCanvasAppModel({
     zoomBy,
   })
 
-  const {
-    handleCanvasPointerDown,
-    handleItemPointerDown,
-    handleResizePointerDown,
-    handleTextDoubleClick,
-  } = useCanvasPointerDownHandlers({
-    cloneItems,
-    commitSelection,
+  const pointer = useCanvasAppPointerModel({
+    command: {
+      cloneItems,
+      commitItemsChange,
+      commitSelection,
+    },
     config: canvasAffordanceConfig,
-    creationAdapter: itemAdapters.creation,
     createId,
     customCreationTools,
-    commitItemsChange,
-    interactionRef,
-    itemReadModel,
-    items,
-    scene,
-    selectedBounds,
-    selection,
-    setDraftRect,
-    setDraftArrow,
-    setDraftStroke,
-    setEditing,
-    setGesture,
-    setLiveItems,
-    setSelection,
-    setTool,
-    spaceDown,
+    interaction: {
+      interactionRef,
+      setDraftArrow,
+      setDraftRect,
+      setDraftStroke,
+      setGesture,
+      setMarquee,
+      setSnapGuides,
+      setTool,
+      spaceDown,
+      tool,
+    },
+    itemAdapters: {
+      creation: itemAdapters.creation,
+      transform: itemAdapters.transform,
+    },
     stageElement,
-    tool,
-    viewport,
-  })
-
-  const {
-    handlePointerCancel,
-    handlePointerMove,
-    handlePointerUp,
-  } = useCanvasPointerDragHandlers({
-    config: canvasAffordanceConfig,
-    creationAdapter: itemAdapters.creation,
-    commitItemsChange,
-    createId,
-    customCreationTools,
-    commitSelection,
-    interactionRef,
-    scene,
-    selection,
-    setDraftRect,
-    setDraftArrow,
-    setDraftStroke,
-    setEditing,
-    setGesture,
-    setLiveItems,
-    setMarquee,
-    setSelection,
-    setSnapGuides,
-    setTool,
-    setViewport,
-    stageElement,
-    transformAdapter: itemAdapters.transform,
-    viewport,
+    workspace: {
+      itemReadModel,
+      items,
+      scene,
+      selectedBounds,
+      selection,
+      setEditing,
+      setLiveItems,
+      setSelection,
+      setViewport,
+      viewport,
+    },
   })
 
   const insertComponent = useCanvasComponentInsertion({
@@ -342,8 +318,8 @@ export function useCanvasAppModel({
         customItemRenderers,
         getComponentPresentation: componentLibrary.getPresentation,
         items,
-        onItemPointerDown: handleItemPointerDown,
-        onTextDoubleClick: handleTextDoubleClick,
+        onItemPointerDown: pointer.itemLayerHandlers.onItemPointerDown,
+        onTextDoubleClick: pointer.itemLayerHandlers.onTextDoubleClick,
         outlineIds: overlays.itemOutlineIds,
         selected,
       },
@@ -354,11 +330,11 @@ export function useCanvasAppModel({
         overlays,
         stageElement: stageElement.mount,
         viewport,
-        onCanvasPointerDown: handleCanvasPointerDown,
-        onPointerCancel: handlePointerCancel,
-        onPointerMove: handlePointerMove,
-        onPointerUp: handlePointerUp,
-        onResizePointerDown: handleResizePointerDown,
+        onCanvasPointerDown: pointer.stageHandlers.onCanvasPointerDown,
+        onPointerCancel: pointer.stageHandlers.onPointerCancel,
+        onPointerMove: pointer.stageHandlers.onPointerMove,
+        onPointerUp: pointer.stageHandlers.onPointerUp,
+        onResizePointerDown: pointer.stageHandlers.onResizePointerDown,
       },
     }),
     status: controls.status,
