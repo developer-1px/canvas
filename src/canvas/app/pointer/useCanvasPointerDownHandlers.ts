@@ -21,6 +21,7 @@ import type { CanvasItemReadModel } from '../../host'
 import {
   normalizeBounds,
   pointDistance,
+  isCanvasCustomToolId,
 } from '../../core'
 import { capturePointer, screenPoint, screenToWorld } from './CanvasPointerGeometry'
 import {
@@ -43,6 +44,10 @@ import type {
 } from '../workflow/CanvasWorkflowContract'
 import type { Interaction } from './CanvasInteractionState'
 import { createCanvasDraftStroke } from './CanvasPointerDrawing'
+import {
+  getCanvasAppCustomCreationTool,
+  type CanvasAppCustomCreationTool,
+} from '../tools/CanvasAppCustomCreationTools'
 
 type UseCanvasPointerDownHandlersArgs = {
   cloneItems: (ids: string[], offset: Point) => CanvasItem[]
@@ -51,6 +56,7 @@ type UseCanvasPointerDownHandlersArgs = {
   config: CanvasAffordanceConfig
   creationAdapter: CanvasCreationAdapter<CanvasItem>
   createId: (prefix: string) => string
+  customCreationTools: readonly CanvasAppCustomCreationTool[]
   interactionRef: MutableRefObject<Interaction>
   itemReadModel: CanvasItemReadModel
   items: CanvasItem[]
@@ -78,6 +84,7 @@ export function useCanvasPointerDownHandlers({
   config,
   creationAdapter,
   createId,
+  customCreationTools,
   interactionRef,
   itemReadModel,
   items,
@@ -214,6 +221,29 @@ export function useCanvasPointerDownHandlers({
         start: snappedStartWorld,
       })
       setGesture('create-arrow')
+      return
+    }
+
+    if (pointerGesture === 'create-custom' && isCanvasCustomToolId(tool)) {
+      if (!getCanvasAppCustomCreationTool(customCreationTools, tool)) {
+        return
+      }
+
+      const snappedStartWorld = snapCanvasPointToGrid({
+        config,
+        point: startWorld,
+      })
+
+      interactionRef.current = {
+        kind: 'create-custom',
+        pointerId: event.pointerId,
+        startScreen,
+        startWorld: snappedStartWorld,
+        currentWorld: snappedStartWorld,
+        tool,
+        moved: false,
+      }
+      setGesture('create-custom')
       return
     }
 

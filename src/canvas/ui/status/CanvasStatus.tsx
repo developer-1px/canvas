@@ -1,28 +1,14 @@
-import {
-  CANVAS_GESTURE_STATUS_LABELS,
-  CANVAS_TOOL_AFFORDANCES,
-} from '../../engine'
-import type {
-  CanvasInteractionKind,
-  Tool
-} from '../../entities'
-
 type CanvasStatusProps = {
-  gesture: CanvasInteractionKind
+  mode: string
   scale: number
   selectionLength: number
-  tool: Tool
 }
 
 export function CanvasStatus({
-  gesture,
+  mode,
   scale,
   selectionLength,
-  tool,
 }: CanvasStatusProps) {
-  const mode =
-    CANVAS_GESTURE_STATUS_LABELS[gesture] ??
-    CANVAS_TOOL_AFFORDANCES[tool].statusLabel
   const selection =
     selectionLength === 0
       ? 'No selection'

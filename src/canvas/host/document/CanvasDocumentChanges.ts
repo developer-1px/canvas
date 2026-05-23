@@ -4,6 +4,7 @@ import {
   commitCanvasItemsPatch,
   type CanvasItemsDocument,
 } from './CanvasDocument'
+import type { CanvasItemValidationOptions } from './CanvasItemSchema'
 import {
   createAddCanvasItemsPatch,
   createGroupCanvasItemsPatch,
@@ -47,10 +48,12 @@ export function commitCanvasItemsChange({
   currentItems,
   document,
   selection,
+  validation,
 }: {
   change: CanvasItemsChange
   currentItems: CanvasItem[]
   document: CanvasItemsDocument
+  validation?: CanvasItemValidationOptions
   selection?: {
     after: CanvasSelectionIds
     before: CanvasSelectionIds
@@ -60,6 +63,7 @@ export function commitCanvasItemsChange({
     document,
     patch: createCanvasItemsChangePatch(currentItems, change),
     selection,
+    validation,
   })
 }
 

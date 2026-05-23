@@ -47,6 +47,7 @@ export function createCanvasAffordanceConfig(
       {
         altDragDuplicate: true,
         createArrow: true,
+        createCustom: true,
         drawHighlight: true,
         drawMarker: true,
         createRect: true,

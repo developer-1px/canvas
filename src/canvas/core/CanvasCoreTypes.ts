@@ -1,6 +1,6 @@
 export type CanvasItemId = string
 
-export type Tool =
+export type CanvasBuiltinTool =
   | 'select'
   | 'pan'
   | 'rect'
@@ -9,6 +9,10 @@ export type Tool =
   | 'highlight'
   | 'arrow'
 
+export type CanvasCustomToolId = `custom:${string}`
+
+export type Tool = CanvasBuiltinTool | CanvasCustomToolId
+
 export type CanvasInteractionKind =
   | 'none'
   | 'pan'
@@ -16,6 +20,7 @@ export type CanvasInteractionKind =
   | 'marquee'
   | 'create-rect'
   | 'create-arrow'
+  | 'create-custom'
   | 'draw-marker'
   | 'draw-highlight'
   | 'resize'
@@ -37,3 +42,7 @@ export type Bounds = Point & {
 export type ResizeHandle = 'nw' | 'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w'
 
 export type CanvasSelectionIds = CanvasItemId[]
+
+export function isCanvasCustomToolId(tool: Tool): tool is CanvasCustomToolId {
+  return tool.startsWith('custom:')
+}

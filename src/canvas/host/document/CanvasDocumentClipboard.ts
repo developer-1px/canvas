@@ -2,9 +2,11 @@ import type { CanvasItem } from '../model'
 import {
   findCanvasItemEntry,
   pruneNestedSelection,
-  syncCanvasItems,
 } from '../tree/CanvasTree'
-import { validateCanvasItems } from './CanvasItemSchema'
+import {
+  validateCanvasItems,
+  type CanvasItemValidationOptions,
+} from './CanvasItemSchema'
 import type { CanvasItemsDocument } from './CanvasDocument'
 import { canvasItemPathToPointer } from './CanvasDocumentPointers'
 
@@ -28,6 +30,7 @@ export function copyCanvasDocumentSelectionToClipboard(
 
 export function readCanvasDocumentClipboardItems(
   document: CanvasItemsDocument,
+  validation?: CanvasItemValidationOptions,
 ) {
   const read = document.clipboard.read()
 
@@ -36,14 +39,15 @@ export function readCanvasDocumentClipboardItems(
   }
 
   const payload = Array.isArray(read.payload) ? read.payload : [read.payload]
-  return validateCanvasItems(payload as CanvasItem[])
+  return validateCanvasItems(payload as CanvasItem[], validation)
 }
 
 export function writeCanvasDocumentClipboardItems(
   document: CanvasItemsDocument,
   items: CanvasItem[],
+  validation?: CanvasItemValidationOptions,
 ) {
-  const result = document.clipboard.write(syncCanvasItems(items))
+  const result = document.clipboard.write(validateCanvasItems(items, validation))
 
   return result.ok
 }

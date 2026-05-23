@@ -10,6 +10,7 @@ import type { CanvasItem } from '../../entities'
 import {
   createCanvasDocumentController,
   type CanvasDocumentController,
+  type CanvasItemValidationOptions,
 } from '../../host'
 import type {
   CommitCanvasItemsChange,
@@ -20,9 +21,10 @@ import type {
 export function useCanvasDocument(
   initialItems: CanvasItem[],
   initialSelection: string[] = [],
+  validation: CanvasItemValidationOptions = {},
 ) {
   const [document] = useState<CanvasDocumentController>(() =>
-    createCanvasDocumentController(initialItems, initialSelection),
+    createCanvasDocumentController(initialItems, initialSelection, validation),
   )
   const [items, setItemsState] = useState(() => document.readItems())
   const [selection, setSelectionState] = useState(() => document.readSelection())

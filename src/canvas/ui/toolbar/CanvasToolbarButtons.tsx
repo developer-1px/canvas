@@ -3,11 +3,11 @@ import {
   CANVAS_COMMAND_AFFORDANCES,
   CANVAS_TOOL_AFFORDANCES,
 } from '../../engine'
-import type { Tool } from '../../entities'
+import type { CanvasBuiltinTool } from '../../entities'
 
 type ToolButtonProps = {
   active: boolean
-  affordance: (typeof CANVAS_TOOL_AFFORDANCES)[Tool]
+  affordance: (typeof CANVAS_TOOL_AFFORDANCES)[CanvasBuiltinTool]
   children: ReactNode
   onClick: () => void
 }
@@ -29,6 +29,34 @@ export function ToolButton({
       onClick={onClick}
     >
       {children}
+    </button>
+  )
+}
+
+export function CustomToolButton({
+  active,
+  ariaLabel,
+  label,
+  onClick,
+  title,
+}: {
+  active: boolean
+  ariaLabel: string
+  label: string
+  onClick: () => void
+  title: string
+}) {
+  return (
+    <button
+      type="button"
+      className="tool-button custom-tool-button"
+      data-active={active}
+      aria-label={ariaLabel}
+      aria-pressed={active}
+      title={title}
+      onClick={onClick}
+    >
+      {label}
     </button>
   )
 }

@@ -15,6 +15,10 @@ import type {
 } from '../../entities'
 import type { Interaction } from '../pointer/CanvasInteractionState'
 import type { CommitCanvasSelection } from '../workflow/CanvasWorkflowContract'
+import {
+  matchesCanvasAppCustomToolShortcut,
+  type CanvasAppCustomCreationToolState,
+} from '../tools/CanvasAppCustomCreationTools'
 
 export type CanvasKeyboardShortcutHandlers = {
   commitSelection: CommitCanvasSelection
@@ -23,6 +27,7 @@ export type CanvasKeyboardShortcutHandlers = {
   cutSelection: () => void
   deleteSelection: () => void
   duplicateSelection: () => void
+  customCreationTools: readonly CanvasAppCustomCreationToolState[]
   fitToItems: (ids?: string[]) => void
   groupSelection: () => void
   interactionRef: MutableRefObject<Interaction>
@@ -75,6 +80,7 @@ export function handleCanvasKeyboardShortcut(
     cutSelection,
     deleteSelection,
     duplicateSelection,
+    customCreationTools,
     fitToItems,
     groupSelection,
     interactionRef,
@@ -339,6 +345,19 @@ export function handleCanvasKeyboardShortcut(
     setTool('rect')
   } else if (config.shortcuts.textTool && config.tools.text && key === 't') {
     setTool('text')
+  } else {
+    const customTool = customCreationTools.find(
+      (tool) =>
+        tool.shortcut &&
+        matchesCanvasAppCustomToolShortcut({
+          event,
+          shortcut: tool.shortcut,
+        }),
+    )
+
+    if (customTool) {
+      setTool(customTool.id)
+    }
   }
 }
 

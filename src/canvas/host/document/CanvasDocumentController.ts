@@ -4,6 +4,7 @@ import {
   commitCanvasItemsChange,
   type CanvasItemsChange,
 } from './CanvasDocumentChanges'
+import type { CanvasItemValidationOptions } from './CanvasItemSchema'
 import {
   commitCanvasDocumentSelection,
   commitCanvasItemsPatch,
@@ -88,9 +89,11 @@ export type CanvasDocumentController = {
 export function createCanvasDocumentController(
   initialItems: CanvasItem[],
   initialSelection: CanvasSelectionIds = [],
+  validation: CanvasItemValidationOptions = {},
 ): CanvasDocumentController {
   const document = createCanvasItemsDocument(initialItems, {
     selection: initialSelection,
+    ...validation,
   })
 
   return {
@@ -104,6 +107,7 @@ export function createCanvasDocumentController(
         currentItems,
         document,
         selection,
+        validation,
       })
     },
     commitSelection(ids: CanvasSelectionIds) {
@@ -119,7 +123,7 @@ export function createCanvasDocumentController(
       return findCanvasDocumentText(document, text, options)
     },
     readClipboardItems() {
-      return readCanvasDocumentClipboardItems(document)
+      return readCanvasDocumentClipboardItems(document, validation)
     },
     readHistoryAvailability(): CanvasDocumentHistoryAvailability {
       return {
@@ -139,12 +143,12 @@ export function createCanvasDocumentController(
       }
 
       return {
-        items: replaceCanvasItems(currentItems, document.value),
+        items: replaceCanvasItems(currentItems, document.value, validation),
         selection: getCanvasDocumentSelectionIds(document),
       }
     },
     replaceItems(currentItems: CanvasItem[], nextItems: CanvasItem[]) {
-      return replaceCanvasItems(currentItems, nextItems)
+      return replaceCanvasItems(currentItems, nextItems, validation)
     },
     replaceText(
       searchText: string,
@@ -164,6 +168,7 @@ export function createCanvasDocumentController(
           before: selection,
           after: selection,
         },
+        validation,
       })
     },
     restoreSelection(ids: CanvasSelectionIds, items: CanvasItem[] = document.value) {
@@ -178,12 +183,12 @@ export function createCanvasDocumentController(
       }
 
       return {
-        items: replaceCanvasItems(currentItems, document.value),
+        items: replaceCanvasItems(currentItems, document.value, validation),
         selection: getCanvasDocumentSelectionIds(document),
       }
     },
     writeClipboardItems(items: CanvasItem[]) {
-      return writeCanvasDocumentClipboardItems(document, items)
+      return writeCanvasDocumentClipboardItems(document, items, validation)
     },
   }
 }

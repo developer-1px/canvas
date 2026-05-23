@@ -1,5 +1,7 @@
 export type {
   Bounds,
+  CanvasBuiltinTool,
+  CanvasCustomToolId,
   CanvasInteractionKind,
   CanvasItemId,
   CanvasSelectionIds,
@@ -8,6 +10,7 @@ export type {
   Tool,
   Viewport,
 } from './CanvasCoreTypes'
+export { isCanvasCustomToolId } from './CanvasCoreTypes'
 export {
   DRAG_THRESHOLD,
   INITIAL_VIEWPORT,

@@ -6,9 +6,16 @@ import {
   type PointerEvent,
 } from 'react'
 import {
+  CANVAS_GESTURE_STATUS_LABELS,
+  CANVAS_TOOL_AFFORDANCES,
   DEFAULT_CANVAS_AFFORDANCE_CONFIG,
   getCanvasCommandAvailability,
 } from '../../engine'
+import {
+  isCanvasCustomToolId,
+  type CanvasInteractionKind,
+  type Tool,
+} from '../../entities'
 import { useCanvasCommands } from '../commands/useCanvasCommands'
 import {
   getCanvasAppCustomCommandStates,
@@ -21,6 +28,10 @@ import { useCanvasKeyboardShortcuts } from '../keyboard/useCanvasKeyboardShortcu
 import { useCanvasPointerDownHandlers } from '../pointer/useCanvasPointerDownHandlers'
 import { useCanvasPointerDragHandlers } from '../pointer/useCanvasPointerDragHandlers'
 import { CanvasDemoSvgItemLayer } from '../rendering'
+import {
+  getCanvasAppCustomCreationToolStates,
+  type CanvasAppCustomCreationToolState,
+} from '../tools/CanvasAppCustomCreationTools'
 import { useCanvasViewportControls } from '../viewport/useCanvasViewportControls'
 import { useCanvasWheelViewport } from '../viewport/useCanvasWheelViewport'
 import { useCanvasFindReplaceModel } from './useCanvasFindReplaceModel'
@@ -43,6 +54,9 @@ export function useCanvasAppModel({
     componentLibrary,
     componentPresentationRenderers,
     customCommands,
+    customCreationTools,
+    customItemRenderers,
+    customItemValidators,
     inspectorPanels,
     initialItems,
     itemAdapters,
@@ -72,7 +86,10 @@ export function useCanvasAppModel({
     setViewport,
     undo,
     viewport,
-  } = useCanvasWorkspaceModel({ initialItems })
+  } = useCanvasWorkspaceModel({
+    customItemValidators,
+    initialItems,
+  })
   const {
     activeMode,
     gesture,
@@ -164,6 +181,10 @@ export function useCanvasAppModel({
       }),
     [customCommandContext, customCommands],
   )
+  const customCreationToolStates = useMemo(
+    () => getCanvasAppCustomCreationToolStates(customCreationTools),
+    [customCreationTools],
+  )
   const runCustomCommand = useCallback(
     (commandId: string) => {
       runCanvasAppCustomCommand({
@@ -222,6 +243,7 @@ export function useCanvasAppModel({
   useCanvasKeyboardShortcuts({
     config: canvasAffordanceConfig,
     copySelection,
+    customCreationTools: customCreationToolStates,
     cutSelection,
     deleteSelection,
     duplicateSelection,
@@ -263,6 +285,7 @@ export function useCanvasAppModel({
     config: canvasAffordanceConfig,
     creationAdapter: itemAdapters.creation,
     createId,
+    customCreationTools,
     commitItemsChange,
     interactionRef,
     itemReadModel,
@@ -293,6 +316,7 @@ export function useCanvasAppModel({
     creationAdapter: itemAdapters.creation,
     commitItemsChange,
     createId,
+    customCreationTools,
     commitSelection,
     interactionRef,
     scene,
@@ -351,6 +375,7 @@ export function useCanvasAppModel({
       activeMode,
       children: createElement(CanvasDemoSvgItemLayer, {
         componentPresentationRenderers,
+        customItemRenderers,
         getComponentPresentation: componentLibrary.getPresentation,
         items,
         onItemPointerDown: handleStageItemPointerDown,
@@ -371,10 +396,13 @@ export function useCanvasAppModel({
       onResizePointerDown: handleResizePointerDown,
     },
     status: {
-      gesture,
+      mode: getCanvasAppStatusMode({
+        customCreationTools: customCreationToolStates,
+        gesture,
+        tool,
+      }),
       scale: viewport.scale,
       selectionLength: selection.length,
-      tool,
       visible: canvasAffordanceConfig.overlays.status,
     },
     textEditor,
@@ -390,6 +418,7 @@ export function useCanvasAppModel({
       canUngroup: commandAvailability.ungroup,
       config: canvasAffordanceConfig,
       customCommands: customCommandStates,
+      customTools: customCreationToolStates,
       tool,
       visible: canvasAffordanceConfig.overlays.toolbar,
       onAlign: alignSelection,
@@ -415,4 +444,29 @@ export function useCanvasAppModel({
       onZoomOut: () => zoomBy(0.8),
     },
   }
+}
+
+function getCanvasAppStatusMode({
+  customCreationTools,
+  gesture,
+  tool,
+}: {
+  customCreationTools: readonly CanvasAppCustomCreationToolState[]
+  gesture: CanvasInteractionKind
+  tool: Tool
+}) {
+  const gestureLabel = CANVAS_GESTURE_STATUS_LABELS[gesture]
+
+  if (gestureLabel) {
+    return gestureLabel
+  }
+
+  if (isCanvasCustomToolId(tool)) {
+    return (
+      customCreationTools.find((customTool) => customTool.id === tool)
+        ?.statusLabel ?? 'Canvas'
+    )
+  }
+
+  return CANVAS_TOOL_AFFORDANCES[tool].statusLabel
 }

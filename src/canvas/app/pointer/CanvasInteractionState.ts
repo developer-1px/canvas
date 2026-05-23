@@ -1,5 +1,6 @@
 import type {
   Bounds,
+  CanvasCustomToolId,
   CanvasItem,
   EditingText,
   Point,
@@ -71,6 +72,15 @@ export type Interaction =
       startScreen: Point
       startWorld: Point
       currentWorld: Point
+      moved: boolean
+    }
+  | {
+      kind: 'create-custom'
+      pointerId: number
+      startScreen: Point
+      startWorld: Point
+      currentWorld: Point
+      tool: CanvasCustomToolId
       moved: boolean
     }
   | {

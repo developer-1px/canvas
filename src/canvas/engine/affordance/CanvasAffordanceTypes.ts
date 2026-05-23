@@ -1,4 +1,4 @@
-import type { Tool } from '../../core'
+import type { CanvasBuiltinTool } from '../../core'
 
 export type CanvasCommandId =
   | 'alignBottom'
@@ -34,6 +34,7 @@ export type CanvasCommandId =
 export type CanvasGestureId =
   | 'altDragDuplicate'
   | 'createArrow'
+  | 'createCustom'
   | 'drawHighlight'
   | 'drawMarker'
   | 'createRect'
@@ -102,7 +103,7 @@ export type CanvasAffordanceConfig = {
   gestures: Record<CanvasGestureId, boolean>
   overlays: Record<CanvasOverlayId, boolean>
   shortcuts: Record<CanvasShortcutId, boolean>
-  tools: Record<Tool, boolean>
+  tools: Record<CanvasBuiltinTool, boolean>
 }
 
 export type CanvasAffordanceConfigInput = {
@@ -110,5 +111,5 @@ export type CanvasAffordanceConfigInput = {
   gestures?: Partial<Record<CanvasGestureId, boolean>>
   overlays?: Partial<Record<CanvasOverlayId, boolean>>
   shortcuts?: Partial<Record<CanvasShortcutId, boolean>>
-  tools?: Partial<Record<Tool, boolean>>
+  tools?: Partial<Record<CanvasBuiltinTool, boolean>>
 }

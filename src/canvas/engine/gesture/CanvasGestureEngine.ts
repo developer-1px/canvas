@@ -1,5 +1,8 @@
 import type { CanvasAffordanceConfig } from '../affordance/CanvasAffordances'
-import type { Tool } from '../../core'
+import {
+  isCanvasCustomToolId,
+  type Tool,
+} from '../../core'
 
 export type CanvasPointerInput = {
   altKey: boolean
@@ -11,6 +14,7 @@ export type CanvasPointerInput = {
 
 export type CanvasPointerGesture =
   | 'create-arrow'
+  | 'create-custom'
   | 'create-rect'
   | 'create-text'
   | 'draw-highlight'
@@ -63,6 +67,10 @@ export function getCanvasPointerGesture({
     return 'create-arrow'
   }
 
+  if (isCanvasCustomToolId(tool) && config.gestures.createCustom) {
+    return 'create-custom'
+  }
+
   if (tool === 'text' && config.gestures.createText) {
     return 'create-text'
   }
@@ -84,7 +92,8 @@ export function shouldRouteCanvasItemPointerToCanvasGesture({
     tool === 'text' ||
     tool === 'marker' ||
     tool === 'highlight' ||
-    tool === 'arrow'
+    tool === 'arrow' ||
+    isCanvasCustomToolId(tool)
   )
 }
 

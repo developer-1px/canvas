@@ -46,6 +46,10 @@ import {
   createCanvasDraftStroke,
   getNextCanvasDrawingPoints,
 } from './CanvasPointerDrawing'
+import {
+  getCanvasAppCustomCreationTool,
+  type CanvasAppCustomCreationTool,
+} from '../tools/CanvasAppCustomCreationTools'
 
 type UseCanvasPointerDragHandlersArgs = {
   commitSelection: CommitCanvasSelection
@@ -53,6 +57,7 @@ type UseCanvasPointerDragHandlersArgs = {
   config: CanvasAffordanceConfig
   creationAdapter: CanvasCreationAdapter<CanvasItem>
   createId: (prefix: string) => string
+  customCreationTools: readonly CanvasAppCustomCreationTool[]
   interactionRef: MutableRefObject<Interaction>
   scene: CanvasSceneAdapter
   selection: string[]
@@ -78,6 +83,7 @@ export function useCanvasPointerDragHandlers({
   config,
   creationAdapter,
   createId,
+  customCreationTools,
   interactionRef,
   scene,
   selection,
@@ -329,6 +335,27 @@ export function useCanvasPointerDragHandlers({
         start: interaction.startWorld,
       })
     }
+
+    if (interaction.kind === 'create-custom') {
+      if (!config.gestures.createCustom) {
+        return
+      }
+
+      const moved =
+        interaction.moved ||
+        pointDistance(currentScreen, interaction.startScreen) > DRAG_THRESHOLD
+      const snappedCurrentWorld = snapCanvasPointToGrid({
+        config,
+        point: currentWorld,
+      })
+
+      setSnapGuides(EMPTY_CANVAS_SNAP_GUIDES)
+      interactionRef.current = {
+        ...interaction,
+        currentWorld: snappedCurrentWorld,
+        moved,
+      }
+    }
   }
 
   function handlePointerUp(event: PointerEvent<SVGSVGElement>) {
@@ -396,6 +423,26 @@ export function useCanvasPointerDragHandlers({
         before: selection,
         after: [nextItem.id],
       })
+    }
+
+    if (interaction.kind === 'create-custom') {
+      const customTool = getCanvasAppCustomCreationTool(
+        customCreationTools,
+        interaction.tool,
+      )
+      const nextItem = customTool?.createItem({
+        createId,
+        currentWorld: interaction.currentWorld,
+        moved: interaction.moved,
+        startWorld: interaction.startWorld,
+      }) ?? null
+
+      if (nextItem) {
+        commitItemsChange({ type: 'add', items: [nextItem] }, {
+          before: selection,
+          after: [nextItem.id],
+        })
+      }
     }
 
     if (interaction.kind === 'move' || interaction.kind === 'resize') {

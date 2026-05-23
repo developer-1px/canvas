@@ -16,3 +16,14 @@ export type {
   CanvasAppInspectorPanelContext,
   CanvasAppInspectorPanelView,
 } from '../inspector/CanvasAppInspectorPanels'
+export type {
+  CanvasAppCustomCreationTool,
+  CanvasAppCustomCreationToolContext,
+  CanvasAppCustomCreationToolState,
+  CanvasAppCustomToolShortcut,
+} from '../tools/CanvasAppCustomCreationTools'
+export {
+  createCanvasDemoSvgCustomItemRenderers,
+  type CanvasDemoSvgCustomItemRendererStrategy,
+  type CanvasDemoSvgCustomItemRenderers,
+} from '../rendering'

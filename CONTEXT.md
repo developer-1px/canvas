@@ -16,7 +16,11 @@
 - Canvas Component Presentation: Demo component kind를 Renderer Adapter의 그리기 전략과 연결하는 key. 새 component kind는 기존 presentation을 재사용할 수 있다.
 - Canvas App Assembly: 내부 캔버스 문법은 유지하면서 Host item adapter, component library, initial items, SVG presentation registry 같은 제품별 의미를 외부에서 조립하는 composition Module.
 - Canvas App Custom Command: 내부 command grammar를 수정하지 않고 제품별 business action을 toolbar action으로 등록하는 App-owned command descriptor.
+- Canvas App Custom Creation Tool: 내부 tool grammar를 수정하지 않고 제품별 item 생성 도구를 toolbar, shortcut, pointer lifecycle에 등록하는 App-owned tool descriptor.
 - Canvas App Inspector Panel: 기본 bounds inspector를 수정하지 않고 제품별 선택 항목 정보를 렌더링하는 App-owned inspector descriptor.
+- Canvas Custom Item: 제품별 item kind를 내부 `CanvasItem` union 확장 없이 저장하기 위한 안정 envelope. `kind`, `presentation`, JSON `data`, bounds를 가진다.
+- Canvas Custom Item Renderer Registry: `Canvas Custom Item`의 presentation key를 SVG rendering strategy에 연결하는 외부 조립 가능한 registry.
+- Canvas Custom Item Validator: `Canvas Custom Item`의 `kind`별 domain-specific payload 규칙을 document validation에 주입하는 App-owned validator.
 - Canvas Component Presentation Registry: Demo component presentation key를 SVG rendering strategy에 연결하는 외부 조립 가능한 registry.
 - Drawing Item: Demo `CanvasItem` 중 하이라이터, 화살표처럼 캔버스 위에 빠르게 주석을 그리는 항목.
 - Canvas App Model: App Shell이 렌더링할 control별 view props를 만들고 command, pointer, keyboard, viewport, text editing wiring을 숨기는 workflow Module.
@@ -44,7 +48,10 @@
 - 새 Demo component kind가 기존 presentation을 재사용하면 Canvas Component Library만 수정한다.
 - 새 Demo component kind와 새 SVG presentation은 Canvas App Assembly에서 component library와 presentation registry를 조립해 붙인다.
 - 제품별 business action은 Engine command union에 넣지 않고 Canvas App Custom Command로 등록한다.
+- 제품별 creation tool은 내부 Tool union에 구체 id를 넣지 않고 Canvas App Custom Creation Tool로 등록한다.
+- 제품별 item kind는 내부 `CanvasItem` union에 새 variant를 추가하지 않고 Canvas Custom Item envelope와 Custom Item Renderer Registry로 등록한다.
 - 제품별 inspector UI는 기본 Object Inspector를 수정하지 않고 Canvas App Inspector Panel로 등록한다.
+- 제품별 저장 payload는 Canvas Custom Item의 JSON `data` 안에 두고, payload 의미 검증은 Canvas Custom Item Validator로 등록한다.
 - App Shell은 command, pointer, keyboard, viewport, text editing wiring을 직접 알지 않는다.
 - App View는 raw workflow state 대신 Canvas App Model이 조립한 control별 props만 받는다.
 - App Shell은 workspace 저장, document history, read model 생성 방식을 직접 알지 않는다.

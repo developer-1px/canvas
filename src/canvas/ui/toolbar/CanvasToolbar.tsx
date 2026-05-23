@@ -4,7 +4,10 @@ import {
   type CanvasAlignMode,
   type CanvasDistributeMode,
 } from '../../engine'
-import type { Tool } from '../../entities'
+import type {
+  CanvasCustomToolId,
+  Tool,
+} from '../../entities'
 import {
   AlignBottomIcon,
   AlignCenterIcon,
@@ -33,6 +36,7 @@ import {
 import {
   CommandButton,
   CustomCommandButton,
+  CustomToolButton,
   ToolbarDivider,
   ToolButton,
 } from './CanvasToolbarButtons'
@@ -41,6 +45,13 @@ type CanvasToolbarCustomCommand = {
   ariaLabel: string
   disabled: boolean
   id: string
+  label: string
+  title: string
+}
+
+type CanvasToolbarCustomTool = {
+  ariaLabel: string
+  id: CanvasCustomToolId
   label: string
   title: string
 }
@@ -57,6 +68,7 @@ type CanvasToolbarProps = {
   canUngroup: boolean
   config: CanvasAffordanceConfig
   customCommands: readonly CanvasToolbarCustomCommand[]
+  customTools: readonly CanvasToolbarCustomTool[]
   tool: Tool
   onAlign: (mode: CanvasAlignMode) => void
   onDelete: () => void
@@ -84,6 +96,7 @@ export function CanvasToolbar({
   canUngroup,
   config,
   customCommands,
+  customTools,
   tool,
   onAlign,
   onDelete,
@@ -178,6 +191,16 @@ export function CanvasToolbar({
           <ArrowIcon />
         </ToolButton>
       ) : null}
+      {customTools.map((customTool) => (
+        <CustomToolButton
+          key={customTool.id}
+          active={tool === customTool.id}
+          ariaLabel={customTool.ariaLabel}
+          label={customTool.label}
+          title={customTool.title}
+          onClick={() => onToolChange(customTool.id)}
+        />
+      ))}
 
       {hasHistoryCommands ? <ToolbarDivider /> : null}
       {config.commands.undo ? (

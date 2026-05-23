@@ -48,6 +48,7 @@ describe('CanvasGestureEngine drawing tools', () => {
     const disabled = createCanvasAffordanceConfig({
       gestures: {
         createArrow: false,
+        createCustom: false,
         drawHighlight: false,
         drawMarker: false,
       },
@@ -79,6 +80,26 @@ describe('CanvasGestureEngine drawing tools', () => {
         tool: 'arrow',
       }),
     ).toBe('marquee')
+
+    expect(
+      getCanvasPointerGesture({
+        config: disabled,
+        input: baseInput,
+        spaceDown: false,
+        tool: 'custom:risk',
+      }),
+    ).toBe('marquee')
+  })
+
+  test('routes custom creation tools through the generic custom gesture', () => {
+    expect(
+      getCanvasPointerGesture({
+        config,
+        input: baseInput,
+        spaceDown: false,
+        tool: 'custom:risk',
+      }),
+    ).toBe('create-custom')
   })
 
   test('routes item pointer events back to the stage for drawing and creation tools', () => {
@@ -98,6 +119,12 @@ describe('CanvasGestureEngine drawing tools', () => {
       shouldRouteCanvasItemPointerToCanvasGesture({
         spaceDown: false,
         tool: 'arrow',
+      }),
+    ).toBe(true)
+    expect(
+      shouldRouteCanvasItemPointerToCanvasGesture({
+        spaceDown: false,
+        tool: 'custom:risk',
       }),
     ).toBe(true)
     expect(

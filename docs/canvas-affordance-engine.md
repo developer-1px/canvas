@@ -31,10 +31,12 @@
 | `src/canvas/app/shell` | CanvasApp composition과 shell style |
 | `src/canvas/app/rendering` | Demo `CanvasItem` tree를 SVG item layer로 바꾸는 App-owned Adapter |
 | `src/canvas/app/rendering/CanvasDemoSvgComponentPresentationRegistry.ts` | Demo component presentation key와 SVG rendering strategy를 외부 조립 가능한 registry로 연결한다 |
+| `src/canvas/app/rendering/CanvasDemoSvgCustomItemRendererRegistry.tsx` | Custom item presentation key와 SVG rendering strategy를 외부 조립 가능한 registry로 연결한다 |
 | `src/canvas/app/workflow` | React state와 engine/host/renderer wiring |
 | `src/canvas/app/commands/CanvasAppCustomCommands.ts` | Engine command union을 수정하지 않고 제품별 business action을 toolbar command로 등록하는 descriptor를 제공한다 |
 | `src/canvas/app/inspector/CanvasAppInspectorPanels.ts` | 기본 bounds inspector를 수정하지 않고 제품별 선택 항목 패널을 등록하는 descriptor를 제공한다 |
-| `src/canvas/app/workflow/CanvasAppAssembly.ts` | Host item adapter, component library, custom command, inspector panel, initial items, SVG presentation registry 같은 제품별 의미를 외부 조립 seam으로 제공한다 |
+| `src/canvas/app/tools/CanvasAppCustomCreationTools.ts` | 내부 Tool union에 구체 id를 추가하지 않고 제품별 생성 도구를 등록하는 descriptor를 제공한다 |
+| `src/canvas/app/workflow/CanvasAppAssembly.ts` | Host item adapter, component library, custom command, custom creation tool, custom item renderer, custom item validator, inspector panel, initial items, SVG presentation registry 같은 제품별 의미를 외부 조립 seam으로 제공한다 |
 | `src/canvas/app/workflow/index.ts` | App Shell이 사용하는 workflow public entry |
 | `src/canvas/app/workflow/useCanvasAppModel.ts` | command, pointer, keyboard, viewport, text editing wiring과 control별 view props 조립을 App Shell에 숨긴다 |
 | `src/canvas/app/workflow/CanvasWorkflowContract.ts` | App workflow hook들이 공유하는 document commit, selection, clipboard contract |
@@ -58,6 +60,7 @@
 | `src/canvas/renderer` | Renderer public facade |
 | `src/canvas/renderer/svg` | Demo item을 모르는 SVG stage/overlay adapter |
 | `src/canvas/ui` | Toolbar, palette, status, editor controls |
+| `src/demo/CanvasDemoAssembly.tsx` | canvas Module 밖에서 demo-specific custom item, renderer, creation tool, inspector panel을 조립한다 |
 
 ## Feature Toggle Shape
 
@@ -118,6 +121,8 @@ type CanvasAffordanceConfig = {
 - Demo SVG Item Layer Adapter는 App-owned Adapter로 Demo component presentation key resolver와 presentation registry를 받아 그리기 전략을 고른다.
 - 새 Demo component kind가 기존 presentation을 재사용하면 외부 조립된 `CanvasComponentLibrary`만 바꾼다. 새 presentation은 Canvas App Assembly에 presentation renderer를 함께 등록한다.
 - 제품별 business action은 Engine command union에 추가하지 않고 Canvas App Assembly의 custom command descriptor로 등록한다.
+- 제품별 creation tool은 내부 builtin tool list에 추가하지 않고 Canvas App Assembly의 custom creation tool descriptor로 등록한다.
+- 제품별 item kind는 내부 `CanvasItem` variant를 추가하지 않고 `custom` storage envelope, custom item renderer registry, custom item validator로 등록한다.
 - 제품별 inspector UI는 기본 Object Inspector 구현을 수정하지 않고 Canvas App Assembly의 inspector panel descriptor로 등록한다.
 - 위 import 경계는 `src/canvas/architecture/CanvasModuleBoundaries.test.ts`에서 검증한다.
 

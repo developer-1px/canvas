@@ -1,6 +1,6 @@
 import type {
+  CanvasBuiltinTool,
   CanvasInteractionKind,
-  Tool
 } from '../../core'
 import type { CanvasCommandId } from './CanvasAffordanceTypes'
 
@@ -48,7 +48,7 @@ export const CANVAS_TOOL_AFFORDANCES = {
     title: 'Text (T)',
   },
 } satisfies Record<
-  Tool,
+  CanvasBuiltinTool,
   {
     ariaLabel: string
     shortcut: string
@@ -105,6 +105,7 @@ export const CANVAS_GESTURE_STATUS_LABELS: Partial<
   Record<CanvasInteractionKind, string>
 > = {
   'create-arrow': 'Drawing',
+  'create-custom': 'Creating',
   'create-rect': 'Drawing',
   'draw-highlight': 'Highlighting',
   'draw-marker': 'Drawing',

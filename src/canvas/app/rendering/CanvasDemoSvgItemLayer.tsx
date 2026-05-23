@@ -11,12 +11,18 @@ import {
   DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS,
   type CanvasDemoSvgComponentPresentationRenderers,
 } from './CanvasDemoSvgComponentPresentationRegistry'
+import {
+  DEFAULT_CANVAS_DEMO_SVG_CUSTOM_ITEM_RENDERERS,
+  getCanvasDemoSvgCustomItemRenderer,
+  type CanvasDemoSvgCustomItemRenderers,
+} from './CanvasDemoSvgCustomItemRendererRegistry'
 
 type CanvasDemoSvgItemLayerProps = {
   getComponentPresentation: (component: string) => string
   items: CanvasItem[]
   outlineIds: Set<string>
   componentPresentationRenderers?: CanvasDemoSvgComponentPresentationRenderers
+  customItemRenderers?: CanvasDemoSvgCustomItemRenderers
   selected: Set<string>
   onItemPointerDown: (
     event: PointerEvent<SVGGElement>,
@@ -28,6 +34,7 @@ type CanvasDemoSvgItemLayerProps = {
 export function CanvasDemoSvgItemLayer({
   componentPresentationRenderers =
     DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS,
+  customItemRenderers = DEFAULT_CANVAS_DEMO_SVG_CUSTOM_ITEM_RENDERERS,
   getComponentPresentation,
   items,
   onItemPointerDown,
@@ -43,6 +50,7 @@ export function CanvasDemoSvgItemLayer({
           item,
           locked: false,
           componentPresentationRenderers,
+          customItemRenderers,
           onItemPointerDown,
           onTextDoubleClick,
           outlineIds,
@@ -59,6 +67,7 @@ type RenderCanvasItemArgs = {
   locked: boolean
   outlineIds: Set<string>
   componentPresentationRenderers: CanvasDemoSvgComponentPresentationRenderers
+  customItemRenderers: CanvasDemoSvgCustomItemRenderers
   selected: Set<string>
   onItemPointerDown: (
     event: PointerEvent<SVGGElement>,
@@ -72,6 +81,7 @@ function renderCanvasItem({
   item,
   locked,
   componentPresentationRenderers,
+  customItemRenderers,
   onItemPointerDown,
   onTextDoubleClick,
   outlineIds,
@@ -108,6 +118,7 @@ function renderCanvasItem({
             item: child,
             locked: isLocked,
             componentPresentationRenderers,
+            customItemRenderers,
             onItemPointerDown,
             onTextDoubleClick,
             outlineIds,
@@ -140,6 +151,31 @@ function renderCanvasItem({
           item={item}
           renderers={componentPresentationRenderers}
         />
+        {hasOutline ? <CanvasDemoSvgSelectionOutline bounds={bounds} /> : null}
+      </g>
+    )
+  }
+
+  if (item.type === 'custom') {
+    const renderCustomItem = getCanvasDemoSvgCustomItemRenderer({
+      item,
+      renderers: customItemRenderers,
+    })
+
+    return (
+      <g
+        key={item.id}
+        className="canvas-item"
+        data-custom-kind={item.kind}
+        data-locked={isLocked || undefined}
+        data-selected={isSelected}
+        data-type={item.type}
+        pointerEvents={isLocked ? 'none' : undefined}
+        onPointerDown={
+          isLocked ? undefined : (event) => onItemPointerDown(event, item.id)
+        }
+      >
+        {renderCustomItem({ item })}
         {hasOutline ? <CanvasDemoSvgSelectionOutline bounds={bounds} /> : null}
       </g>
     )

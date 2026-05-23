@@ -6,7 +6,11 @@ import {
 } from 'zod-crud'
 import type { CanvasSelectionIds } from '../../core'
 import type { CanvasItem } from '../model'
-import { CanvasItemsSchema, validateCanvasItems } from './CanvasItemSchema'
+import {
+  CanvasItemsSchema,
+  validateCanvasItems,
+  type CanvasItemValidationOptions,
+} from './CanvasItemSchema'
 import { syncCanvasItems } from '../tree/CanvasTree'
 import {
   createCanvasSelectionSnapshot,
@@ -33,29 +37,38 @@ export type CanvasItemsDocument = JSONDocument<CanvasItem[]>
 export function replaceCanvasItems(
   _current: CanvasItem[],
   next: CanvasItem[],
+  validation?: CanvasItemValidationOptions,
 ) {
-  return validateCanvasItems(next)
+  return validateCanvasItems(next, validation)
 }
 
 export function applyCanvasItemsPatch(
   current: CanvasItem[],
   patch: JSONPatchOperation[],
+  validation?: CanvasItemValidationOptions,
 ) {
-  const document = createCanvasItemsDocument(current, { history: 0 })
+  const document = createCanvasItemsDocument(current, {
+    history: 0,
+    ...validation,
+  })
   const result = document.patch(patch)
 
   assertJSONResult(result)
 
-  return syncCanvasItems(document.value)
+  return validateCanvasItems(document.value, validation)
 }
 
 export function createCanvasItemsDocument(
   initialItems: CanvasItem[],
-  options: { history?: number; selection?: CanvasSelectionIds } = {},
+  options: {
+    history?: number
+    selection?: CanvasSelectionIds
+  } & CanvasItemValidationOptions = {},
 ): CanvasItemsDocument {
+  const items = validateCanvasItems(syncCanvasItems(initialItems), options)
   const document = createJSONDocument(
     CanvasItemsSchema as never,
-    syncCanvasItems(initialItems) as never,
+    items as never,
     {
       history: options.history ?? CANVAS_DOCUMENT_HISTORY_LIMIT,
       selection: { mode: 'multiple' },
@@ -74,9 +87,11 @@ export function commitCanvasItemsPatch({
   document,
   patch,
   selection,
+  validation,
 }: {
   document: CanvasItemsDocument
   patch: JSONPatchOperation[]
+  validation?: CanvasItemValidationOptions
   selection?: {
     after: CanvasSelectionIds
     before: CanvasSelectionIds
@@ -86,7 +101,7 @@ export function commitCanvasItemsPatch({
     return false
   }
 
-  const next = applyCanvasItemsPatch(document.value, patch)
+  const next = applyCanvasItemsPatch(document.value, patch, validation)
 
   if (canvasItemsEqual(document.value, next)) {
     return false

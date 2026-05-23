@@ -8,14 +8,18 @@ import {
   CANVAS_ITEM_ENGINE_ADAPTERS,
   INITIAL_ITEMS,
   type CanvasComponentLibrary,
+  type CanvasCustomItemValidators,
   type CanvasItem,
 } from '../../host'
 import {
+  DEFAULT_CANVAS_DEMO_SVG_CUSTOM_ITEM_RENDERERS,
   DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS,
   type CanvasDemoSvgComponentPresentationRenderers,
+  type CanvasDemoSvgCustomItemRenderers,
 } from '../rendering'
 import type { CanvasAppCustomCommand } from '../commands/CanvasAppCustomCommands'
 import type { CanvasAppInspectorPanel } from '../inspector/CanvasAppInspectorPanels'
+import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
 
 export type CanvasAppItemAdapters = {
   command: CanvasCommandAdapter<CanvasItem>
@@ -27,6 +31,9 @@ export type CanvasAppAssembly = {
   componentLibrary: CanvasComponentLibrary
   componentPresentationRenderers: CanvasDemoSvgComponentPresentationRenderers
   customCommands: readonly CanvasAppCustomCommand[]
+  customCreationTools: readonly CanvasAppCustomCreationTool[]
+  customItemRenderers: CanvasDemoSvgCustomItemRenderers
+  customItemValidators: CanvasCustomItemValidators
   inspectorPanels: readonly CanvasAppInspectorPanel[]
   initialItems: CanvasItem[]
   itemAdapters: CanvasAppItemAdapters
@@ -39,6 +46,9 @@ export const DEFAULT_CANVAS_APP_ASSEMBLY: CanvasAppAssembly = {
   componentPresentationRenderers:
     DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS,
   customCommands: [],
+  customCreationTools: [],
+  customItemRenderers: DEFAULT_CANVAS_DEMO_SVG_CUSTOM_ITEM_RENDERERS,
+  customItemValidators: {},
   inspectorPanels: [],
   initialItems: INITIAL_ITEMS,
   itemAdapters: CANVAS_ITEM_ENGINE_ADAPTERS,
@@ -55,6 +65,15 @@ export function createCanvasAppAssembly(
       DEFAULT_CANVAS_APP_ASSEMBLY.componentPresentationRenderers,
     customCommands:
       input.customCommands ?? DEFAULT_CANVAS_APP_ASSEMBLY.customCommands,
+    customCreationTools:
+      input.customCreationTools ??
+      DEFAULT_CANVAS_APP_ASSEMBLY.customCreationTools,
+    customItemRenderers:
+      input.customItemRenderers ??
+      DEFAULT_CANVAS_APP_ASSEMBLY.customItemRenderers,
+    customItemValidators:
+      input.customItemValidators ??
+      DEFAULT_CANVAS_APP_ASSEMBLY.customItemValidators,
     inspectorPanels:
       input.inspectorPanels ?? DEFAULT_CANVAS_APP_ASSEMBLY.inspectorPanels,
     initialItems: input.initialItems ?? DEFAULT_CANVAS_APP_ASSEMBLY.initialItems,

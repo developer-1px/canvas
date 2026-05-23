@@ -24,7 +24,8 @@
 .canvas-stage[data-mode='text'],
 .canvas-stage[data-mode='marker'],
 .canvas-stage[data-mode='highlight'],
-.canvas-stage[data-mode='arrow'] {
+.canvas-stage[data-mode='arrow'],
+.canvas-stage[data-mode^='custom:'] {
   cursor: crosshair;
 }
 
@@ -200,6 +201,20 @@
   white-space: pre-wrap;
   word-break: break-word;
   pointer-events: none;
+}
+
+.canvas-risk-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  padding: 0;
+  font-size: 13px;
+}
+
+.canvas-risk-text span {
+  color: #9a3412;
+  font-size: 12px;
 }
 
 .item-outline,
@@ -415,7 +430,8 @@
   width: 34px;
 }
 
-.custom-command-button {
+.custom-command-button,
+.custom-tool-button {
   width: auto;
   min-width: 34px;
   padding: 0 8px;

@@ -1,5 +1,7 @@
 export type {
   Bounds,
+  CanvasBuiltinTool,
+  CanvasCustomToolId,
   CanvasInteractionKind,
   CanvasItemId,
   CanvasSelectionIds,
@@ -8,13 +10,17 @@ export type {
   Tool,
   Viewport,
 } from '../core'
+export { isCanvasCustomToolId } from '../core'
 
 export type {
   CanvasComponentItem,
   CanvasComponentKind,
+  CanvasCustomItem,
   CanvasDrawingItemBase,
   CanvasItem,
   CanvasItemBase,
+  CanvasJsonObject,
+  CanvasJsonValue,
   EditingText,
   GroupItem,
   HighlightItem,

@@ -13,6 +13,7 @@ import type {
 } from '../../entities'
 import {
   createCanvasItemReadModel,
+  type CanvasCustomItemValidators,
 } from '../../host'
 import {
   getCanvasItemIdSeed,
@@ -24,8 +25,10 @@ import { useCanvasDocument } from '../document/useCanvasDocument'
 const DEFAULT_INITIAL_SELECTION = ['component-sticky', 'component-card']
 
 export function useCanvasWorkspaceModel({
+  customItemValidators,
   initialItems,
 }: {
+  customItemValidators?: CanvasCustomItemValidators
   initialItems: CanvasItem[]
 }) {
   const storedWorkspace = useMemo(() => readStoredCanvasWorkspace(), [])
@@ -34,6 +37,7 @@ export function useCanvasWorkspaceModel({
   const document = useCanvasDocument(
     workspaceInitialItems,
     storedWorkspace?.selection ?? [...DEFAULT_INITIAL_SELECTION],
+    { customItemValidators },
   )
   const [viewport, setViewport] = useState<Viewport>(
     () => storedWorkspace?.viewport ?? INITIAL_VIEWPORT,

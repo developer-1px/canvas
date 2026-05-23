@@ -5,9 +5,12 @@ import { CANVAS_ITEM_TRANSFORM_ADAPTER } from './adapters/CanvasItemTransformAda
 export type {
   CanvasComponentItem,
   CanvasComponentKind,
+  CanvasCustomItem,
   CanvasDrawingItemBase,
   CanvasItem,
   CanvasItemBase,
+  CanvasJsonObject,
+  CanvasJsonValue,
   EditingText,
   GroupItem,
   HighlightItem,
@@ -53,4 +56,7 @@ export {
 } from './document/CanvasDocumentController'
 export {
   validateCanvasItems as normalizeCanvasItems,
+  type CanvasCustomItemValidator,
+  type CanvasCustomItemValidators,
+  type CanvasItemValidationOptions,
 } from './document/CanvasItemSchema'

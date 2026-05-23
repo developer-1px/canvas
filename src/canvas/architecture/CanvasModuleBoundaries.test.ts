@@ -97,6 +97,21 @@ describe('Canvas module boundaries', () => {
     expect(violations).toEqual([])
   })
 
+  it('keeps product-specific custom item ids outside canvas implementation', () => {
+    const productCustomTerms = /\b(risk-node|custom:risk)\b|kind:\s*['"]risk['"]/
+    const violations = sourceFiles
+      .filter((file) =>
+        file.path.startsWith('src/canvas/') &&
+        !file.path.endsWith('.test.ts') &&
+        !file.path.endsWith('.test.tsx'),
+      )
+      .flatMap((file) =>
+        productCustomTerms.test(file.source) ? [file.path] : [],
+      )
+
+    expect(violations).toEqual([])
+  })
+
   it('keeps renderer stage orchestration independent from demo canvas items', () => {
     const demoItemTerms =
       /\b(CanvasItem|RectItem|TextItem|GroupItem|CanvasComponentItem|getCanvasItemBounds|getCanvasItemsBounds|CANVAS_COMPONENT_LIBRARY)\b/
