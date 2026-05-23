@@ -6,6 +6,7 @@ import {
   type CanvasDemoSvgCustomItemRendererStrategy,
 } from '../../../canvas/app/workflow'
 import type { CanvasCustomItem } from '../../../canvas/entities'
+import './RiskCustomItemModule.css'
 
 const riskItemRenderer: CanvasDemoSvgCustomItemRendererStrategy = ({ item }) => {
   const severity = String(item.data.severity ?? 'Risk')
@@ -99,7 +100,7 @@ const riskInspectorPanel: CanvasAppInspectorPanel = {
   },
 }
 
-export const RISK_CUSTOM_ITEM_MODULE = defineCanvasAppCustomItemModule({
+const RISK_CUSTOM_ITEM_MODULE = defineCanvasAppCustomItemModule({
   id: 'risk',
   customCreationTools: [riskTool],
   customItemRenderers: createCanvasDemoSvgCustomItemRenderers({
@@ -112,6 +113,8 @@ export const RISK_CUSTOM_ITEM_MODULE = defineCanvasAppCustomItemModule({
   },
   inspectorPanels: [riskInspectorPanel],
 })
+
+export default RISK_CUSTOM_ITEM_MODULE
 
 function isRiskItem(item: unknown): item is CanvasCustomItem {
   return (

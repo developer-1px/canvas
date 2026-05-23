@@ -1,6 +1,6 @@
 import { createCanvasAppAssembly } from '../canvas/app/workflow'
-import { RISK_CUSTOM_ITEM_MODULE } from './custom-items'
+import { DEMO_CUSTOM_ITEM_MODULES } from './custom-items'
 
 export const DEMO_CANVAS_APP_ASSEMBLY = createCanvasAppAssembly({
-  customItemModules: [RISK_CUSTOM_ITEM_MODULE],
+  customItemModules: DEMO_CUSTOM_ITEM_MODULES,
 })
