@@ -25,7 +25,9 @@ import type { Interaction } from './CanvasInteractionState'
 import {
   isCanvasPointerCreationGesture,
 } from './CanvasPointerCreationGrammar'
-import { createCanvasDraftStroke } from './CanvasPointerDrawing'
+import {
+  startCanvasPointerDrawingCreation,
+} from './CanvasPointerDrawingCreation'
 
 export type CanvasPointerCreationStartResult =
   | { kind: 'none' }
@@ -94,24 +96,15 @@ export function startCanvasPointerCreation({
     }
   }
 
-  if (pointerGesture === 'draw-marker' || pointerGesture === 'draw-highlight') {
-    const kind = pointerGesture === 'draw-marker' ? 'marker' : 'highlight'
+  const drawingStart = startCanvasPointerDrawingCreation({
+    input,
+    pointerGesture,
+    startScreen,
+    startWorld,
+  })
 
-    return {
-      kind: 'interaction',
-      capturePointer: true,
-      draftStroke: createCanvasDraftStroke(kind, [startWorld]),
-      gesture: pointerGesture,
-      interaction: {
-        kind: pointerGesture,
-        pointerId: input.pointerId,
-        startScreen,
-        startWorld,
-        currentWorld: startWorld,
-        points: [startWorld],
-        moved: false,
-      },
-    }
+  if (drawingStart) {
+    return drawingStart
   }
 
   if (pointerGesture === 'create-arrow') {

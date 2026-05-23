@@ -4,8 +4,6 @@ import type {
 } from '../../entities'
 import {
   createCanvasArrow,
-  createCanvasHighlight,
-  createCanvasMarker,
   createCanvasRect,
   type CanvasCreationAdapter,
 } from '../../engine'
@@ -15,6 +13,10 @@ import { commitCanvasCustomCreation } from './CanvasCustomCreationCommit'
 import type {
   CanvasPointerCreationInteraction,
 } from './CanvasPointerCreationGrammar'
+import {
+  commitCanvasPointerDrawingCreation,
+  isCanvasPointerDrawingCreationInteraction,
+} from './CanvasPointerDrawingCreation'
 
 export type CanvasPointerCreationCommitInput = {
   commitItemsChange: CommitCanvasItemsChange
@@ -48,27 +50,14 @@ export function commitCanvasPointerCreation({
     return
   }
 
-  if (interaction.kind === 'draw-marker') {
-    const nextItem = createCanvasMarker({
-      adapter: creationAdapter,
+  if (isCanvasPointerDrawingCreationInteraction(interaction)) {
+    commitCanvasPointerDrawingCreation({
+      commitItemsChange,
+      creationAdapter,
       createId,
-      points: interaction.points,
-      startWorld: interaction.startWorld,
+      interaction,
+      selection,
     })
-
-    commitCanvasCreatedItem({ commitItemsChange, item: nextItem, selection })
-    return
-  }
-
-  if (interaction.kind === 'draw-highlight') {
-    const nextItem = createCanvasHighlight({
-      adapter: creationAdapter,
-      createId,
-      points: interaction.points,
-      startWorld: interaction.startWorld,
-    })
-
-    commitCanvasCreatedItem({ commitItemsChange, item: nextItem, selection })
     return
   }
 

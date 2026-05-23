@@ -1,21 +1,22 @@
 import type { CanvasPointerGesture } from '../../engine'
 import type { Interaction } from './CanvasInteractionState'
+import {
+  CANVAS_POINTER_DRAWING_CREATION_KINDS,
+} from './CanvasPointerDrawingCreation'
 
 const CANVAS_POINTER_CREATION_GESTURES = [
   'create-arrow',
   'create-custom',
   'create-rect',
   'create-text',
-  'draw-highlight',
-  'draw-marker',
+  ...CANVAS_POINTER_DRAWING_CREATION_KINDS,
 ] as const satisfies readonly CanvasPointerGesture[]
 
 const CANVAS_POINTER_CREATION_INTERACTION_KINDS = [
   'create-arrow',
   'create-custom',
   'create-rect',
-  'draw-highlight',
-  'draw-marker',
+  ...CANVAS_POINTER_DRAWING_CREATION_KINDS,
 ] as const satisfies readonly Interaction['kind'][]
 
 export type CanvasPointerCreationGesture =

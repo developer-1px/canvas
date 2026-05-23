@@ -17,9 +17,8 @@ import type {
   CanvasPointerCreationInteraction,
 } from './CanvasPointerCreationGrammar'
 import {
-  createCanvasDraftStroke,
-  getNextCanvasDrawingPoints,
-} from './CanvasPointerDrawing'
+  previewCanvasPointerDrawingCreation,
+} from './CanvasPointerDrawingCreation'
 import { hasCanvasInteractionMoved } from './CanvasPointerInteractionMovement'
 
 type CanvasPointerCreationPreviewInput = {
@@ -74,43 +73,16 @@ export function previewCanvasPointerCreation({
     }
   }
 
-  if (
-    interaction.kind === 'draw-marker' ||
-    interaction.kind === 'draw-highlight'
-  ) {
-    const drawingKind =
-      interaction.kind === 'draw-marker' ? 'marker' : 'highlight'
-    const enabled =
-      drawingKind === 'marker'
-        ? config.gestures.drawMarker
-        : config.gestures.drawHighlight
+  const drawingPreview = previewCanvasPointerDrawingCreation({
+    config,
+    currentScreen,
+    currentWorld,
+    input,
+    interaction,
+  })
 
-    if (!enabled) {
-      return { kind: 'none' }
-    }
-
-    const moved = hasCanvasInteractionMoved({
-      currentScreen,
-      interaction,
-    })
-    const points = getNextCanvasDrawingPoints({
-      currentWorld,
-      points: interaction.points,
-      shiftKey: input.shiftKey,
-      startWorld: interaction.startWorld,
-    })
-
-    return {
-      draftStroke: createCanvasDraftStroke(drawingKind, points),
-      interaction: {
-        ...interaction,
-        currentWorld,
-        points,
-        moved,
-      },
-      kind: 'preview',
-      snapGuides: EMPTY_CANVAS_SNAP_GUIDES,
-    }
+  if (drawingPreview) {
+    return drawingPreview
   }
 
   if (interaction.kind === 'create-arrow') {
