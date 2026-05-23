@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
   createCanvasDemoSvgComponentPresentationRenderers,
-  createCanvasDemoSvgCustomItemRenderers,
   type CanvasDemoSvgComponentRendererStrategy,
   type CanvasDemoSvgCustomItemRendererStrategy,
 } from '../rendering'
@@ -36,11 +35,11 @@ describe('CanvasAppAssembly', () => {
       })
     const renderRiskItem: CanvasDemoSvgCustomItemRendererStrategy = ({ item }) =>
       item.title
-    const customItemRenderers = createCanvasDemoSvgCustomItemRenderers({
-      'risk-node': renderRiskItem,
-    })
     const riskModule = defineCanvasAppCustomItemModule({
       id: 'risk',
+      presentation: 'risk-node',
+      renderItem: renderRiskItem,
+      validateItem: (item) => item.data.severity === 'high',
       customCommands: [
         {
           id: 'publish',
@@ -68,10 +67,6 @@ describe('CanvasAppAssembly', () => {
           }),
         },
       ],
-      customItemRenderers,
-      customItemValidators: {
-        risk: (item) => item.presentation === 'risk-node',
-      },
       inspectorPanels: [
         {
           id: 'risk-meta',
@@ -100,7 +95,7 @@ describe('CanvasAppAssembly', () => {
       y: 0,
       w: 120,
       h: 80,
-      data: {},
+      data: { severity: 'high' },
     })).toBe(true)
     expect(assembly.customCommands.map((command) => command.id)).toEqual([
       'publish',
@@ -115,12 +110,7 @@ describe('CanvasAppAssembly', () => {
   })
 
   it('rejects duplicate extension keys across modules and direct input', () => {
-    const riskModule = defineCanvasAppCustomItemModule({
-      id: 'risk',
-      customItemValidators: {
-        risk: () => true,
-      },
-    })
+    const riskModule = defineRiskModule()
 
     expect(() =>
       createCanvasAppAssembly({
@@ -251,6 +241,9 @@ describe('CanvasAppAssembly', () => {
   it('can disable custom item modules at the app assembly seam', () => {
     const riskModule = defineCanvasAppCustomItemModule({
       id: 'risk',
+      presentation: 'risk-node',
+      renderItem: () => 'risk',
+      validateItem: () => true,
       customCreationTools: [
         {
           id: 'risk',
@@ -259,9 +252,6 @@ describe('CanvasAppAssembly', () => {
           createItem: () => null,
         },
       ],
-      customItemValidators: {
-        risk: () => true,
-      },
     })
 
     const assembly = createCanvasAppAssembly({
@@ -276,6 +266,9 @@ describe('CanvasAppAssembly', () => {
   it('rejects custom creation tool shortcut conflicts across modules and direct input', () => {
     const riskModule = defineCanvasAppCustomItemModule({
       id: 'risk',
+      presentation: 'risk-node',
+      renderItem: () => 'risk',
+      validateItem: () => true,
       customCreationTools: [
         {
           id: 'risk',
@@ -285,9 +278,6 @@ describe('CanvasAppAssembly', () => {
           createItem: () => null,
         },
       ],
-      customItemValidators: {
-        risk: () => true,
-      },
     })
 
     expect(() =>
@@ -308,3 +298,12 @@ describe('CanvasAppAssembly', () => {
     )
   })
 })
+
+function defineRiskModule() {
+  return defineCanvasAppCustomItemModule({
+    id: 'risk',
+    presentation: 'risk-node',
+    renderItem: () => 'risk',
+    validateItem: () => true,
+  })
+}

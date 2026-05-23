@@ -1,5 +1,4 @@
 import {
-  createCanvasDemoSvgCustomItemRenderers,
   defineCanvasAppCustomItemModule,
   type CanvasAppCustomCreationTool,
   type CanvasAppInspectorPanel,
@@ -102,15 +101,11 @@ const riskInspectorPanel: CanvasAppInspectorPanel = {
 
 const RISK_CUSTOM_ITEM_MODULE = defineCanvasAppCustomItemModule({
   id: 'risk',
+  presentation: 'risk-node',
+  renderItem: riskItemRenderer,
+  validateItem: (item) =>
+    typeof item.data.severity === 'string',
   customCreationTools: [riskTool],
-  customItemRenderers: createCanvasDemoSvgCustomItemRenderers({
-    'risk-node': riskItemRenderer,
-  }),
-  customItemValidators: {
-    risk: (item) =>
-      item.presentation === 'risk-node' &&
-      typeof item.data.severity === 'string',
-  },
   inspectorPanels: [riskInspectorPanel],
 })
 

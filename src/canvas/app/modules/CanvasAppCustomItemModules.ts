@@ -1,16 +1,21 @@
-import type { CanvasCustomItemValidators } from '../../host'
+import type {
+  CanvasCustomItemValidator,
+  CanvasCustomItemValidators,
+} from '../../host'
 import type { CanvasAppCustomCommand } from '../commands/CanvasAppCustomCommands'
 import {
   assertCanvasAppExtensionEntries,
   assertCanvasAppExtensionId,
-  assertCanvasAppExtensionRecordKeys,
 } from '../extensions/CanvasAppExtensionIds'
 import {
   appendUniqueCanvasAppExtensionEntries,
   mergeUniqueCanvasAppExtensionRecord,
 } from '../extensions/CanvasAppExtensionRegistries'
 import type { CanvasAppInspectorPanel } from '../inspector/CanvasAppInspectorPanels'
-import type { CanvasDemoSvgCustomItemRenderers } from '../rendering'
+import type {
+  CanvasDemoSvgCustomItemRendererStrategy,
+  CanvasDemoSvgCustomItemRenderers,
+} from '../rendering'
 import {
   assertCanvasAppCustomCreationTools,
   type CanvasAppCustomCreationTool,
@@ -19,10 +24,11 @@ import {
 export type CanvasAppCustomItemModule = {
   customCommands?: readonly CanvasAppCustomCommand[]
   customCreationTools?: readonly CanvasAppCustomCreationTool[]
-  customItemRenderers?: CanvasDemoSvgCustomItemRenderers
-  customItemValidators: CanvasCustomItemValidators
   id: string
   inspectorPanels?: readonly CanvasAppInspectorPanel[]
+  presentation: string
+  renderItem: CanvasDemoSvgCustomItemRendererStrategy
+  validateItem: CanvasCustomItemValidator
 }
 
 export type CanvasAppCustomItemModuleAssembly = {
@@ -83,13 +89,13 @@ export function createCanvasAppCustomItemModuleAssembly(
       }),
       customItemRenderers: mergeUniqueCanvasAppExtensionRecord({
         current: assembly.customItemRenderers,
-        entries: module.customItemRenderers ?? {},
+        entries: getCanvasAppCustomItemModuleRenderers(module),
         label: 'custom item renderer',
         owner: 'custom item module',
       }),
       customItemValidators: mergeUniqueCanvasAppExtensionRecord({
         current: assembly.customItemValidators,
-        entries: module.customItemValidators,
+        entries: getCanvasAppCustomItemModuleValidators(module),
         label: 'custom item validator',
         owner: 'custom item module',
       }),
@@ -126,38 +132,59 @@ function assertCanvasAppCustomItemModuleContracts(
     label: 'custom command',
   })
   assertCanvasAppCustomCreationTools(module.customCreationTools ?? [])
-  assertCanvasAppExtensionRecordKeys({
-    entries: module.customItemRenderers ?? {},
-    label: 'custom item renderer',
+  assertCanvasAppExtensionId({
+    id: module.presentation,
+    label: 'custom item presentation',
   })
-  assertCanvasAppExtensionRecordKeys({
-    entries: module.customItemValidators,
-    label: 'custom item validator',
+  assertCanvasAppCustomItemModuleFunction({
+    fn: module.renderItem,
+    label: 'renderer',
+    moduleId: module.id,
   })
-  assertCanvasAppCustomItemModuleValidatorCoverage(module)
+  assertCanvasAppCustomItemModuleFunction({
+    fn: module.validateItem,
+    label: 'validator',
+    moduleId: module.id,
+  })
   assertCanvasAppExtensionEntries({
     entries: module.inspectorPanels ?? [],
     label: 'inspector panel',
   })
 }
 
-function assertCanvasAppCustomItemModuleValidatorCoverage(
-  module: CanvasAppCustomItemModule,
-) {
-  const validatorKeys = Object.keys(module.customItemValidators)
-
-  for (const validatorKey of validatorKeys) {
-    if (validatorKey !== module.id) {
-      throw new Error(
-        `Canvas custom item module validator must match module id: ${module.id} owns ${validatorKey}`,
-      )
-    }
+function assertCanvasAppCustomItemModuleFunction({
+  fn,
+  label,
+  moduleId,
+}: {
+  fn: unknown
+  label: string
+  moduleId: string
+}) {
+  if (typeof fn !== 'function') {
+    throw new Error(`Canvas custom item module ${moduleId} requires ${label}`)
   }
+}
 
-  if (!Object.hasOwn(module.customItemValidators, module.id)) {
-    throw new Error(
-      `Canvas custom item module must register validator for its item kind: ${module.id}`,
-    )
+function getCanvasAppCustomItemModuleRenderers({
+  presentation,
+  renderItem,
+}: CanvasAppCustomItemModule): CanvasDemoSvgCustomItemRenderers {
+  return {
+    [presentation]: renderItem,
+  }
+}
+
+function getCanvasAppCustomItemModuleValidators({
+  id,
+  presentation,
+  validateItem,
+}: CanvasAppCustomItemModule): CanvasCustomItemValidators {
+  return {
+    [id]: (item) =>
+      item.kind === id &&
+      item.presentation === presentation &&
+      validateItem(item),
   }
 }
 

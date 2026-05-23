@@ -2,14 +2,15 @@ import { describe, expect, it } from 'vitest'
 import {
   createCanvasAppCustomItemModuleAssembly,
   defineCanvasAppCustomItemModule,
+  type CanvasAppCustomItemModule,
 } from './CanvasAppCustomItemModules'
+
+const renderRisk = () => 'risk'
+const validateRisk = () => true
 
 describe('CanvasAppCustomItemModules', () => {
   it('collects product-owned custom item parts behind one module seam', () => {
-    const renderRisk = () => 'risk'
-    const validateRisk = () => true
-    const module = defineCanvasAppCustomItemModule({
-      id: 'risk',
+    const module = defineRiskModule({
       customCommands: [
         {
           id: 'publish-risk',
@@ -37,12 +38,6 @@ describe('CanvasAppCustomItemModules', () => {
           }),
         },
       ],
-      customItemRenderers: {
-        'risk-node': renderRisk,
-      },
-      customItemValidators: {
-        risk: validateRisk,
-      },
       inspectorPanels: [
         {
           id: 'risk-meta',
@@ -60,15 +55,18 @@ describe('CanvasAppCustomItemModules', () => {
       'risk',
     ])
     expect(assembly.customItemRenderers['risk-node']).toBe(renderRisk)
-    expect(assembly.customItemValidators.risk).toBe(validateRisk)
+    expect(assembly.customItemValidators.risk(createRiskItem())).toBe(true)
+    expect(assembly.customItemValidators.risk({
+      ...createRiskItem(),
+      presentation: 'unknown-risk-node',
+    })).toBe(false)
     expect(assembly.inspectorPanels.map((panel) => panel.id)).toEqual([
       'risk-meta',
     ])
   })
 
   it('rejects duplicate module-owned extension keys', () => {
-    const first = defineCanvasAppCustomItemModule({
-      id: 'risk',
+    const first = defineRiskModule({
       customCreationTools: [
         {
           id: 'risk',
@@ -88,12 +86,8 @@ describe('CanvasAppCustomItemModules', () => {
           }),
         },
       ],
-      customItemValidators: {
-        risk: () => true,
-      },
     })
-    const second = defineCanvasAppCustomItemModule({
-      id: 'duplicate-risk',
+    const second = defineDependencyModule({
       customCreationTools: [
         {
           id: 'risk',
@@ -102,9 +96,6 @@ describe('CanvasAppCustomItemModules', () => {
           createItem: () => null,
         },
       ],
-      customItemValidators: {
-        'duplicate-risk': () => true,
-      },
     })
 
     expect(() =>
@@ -113,18 +104,8 @@ describe('CanvasAppCustomItemModules', () => {
   })
 
   it('rejects duplicate module ids', () => {
-    const first = defineCanvasAppCustomItemModule({
-      id: 'risk',
-      customItemValidators: {
-        risk: () => true,
-      },
-    })
-    const second = defineCanvasAppCustomItemModule({
-      id: 'risk',
-      customItemValidators: {
-        risk: () => true,
-      },
-    })
+    const first = defineRiskModule()
+    const second = defineRiskModule()
 
     expect(() =>
       createCanvasAppCustomItemModuleAssembly([first, second]),
@@ -133,58 +114,35 @@ describe('CanvasAppCustomItemModules', () => {
 
   it('rejects module ids outside the app extension id contract', () => {
     expect(() =>
-      defineCanvasAppCustomItemModule({
+      defineRiskModule({
         id: 'Risk Module',
-        customItemValidators: {
-          risk: () => true,
-        },
       }),
     ).toThrow('Invalid canvas app custom item module id: Risk Module')
   })
 
-  it('rejects modules without a validator for their item kind', () => {
+  it('rejects module presentations outside the app extension id contract', () => {
     expect(() =>
-      defineCanvasAppCustomItemModule({
-        id: 'risk',
-        customItemValidators: {},
+      defineRiskModule({
+        presentation: 'Risk Node',
       }),
-    ).toThrow(
-      'Canvas custom item module must register validator for its item kind: risk',
-    )
+    ).toThrow('Invalid canvas app custom item presentation id: Risk Node')
   })
 
-  it('rejects validators owned by a different item kind', () => {
+  it('rejects modules without renderer and validator functions', () => {
     expect(() =>
-      defineCanvasAppCustomItemModule({
-        id: 'risk',
-        customItemValidators: {
-          dependency: () => true,
-        },
-      }),
-    ).toThrow(
-      'Canvas custom item module validator must match module id: risk owns dependency',
-    )
-  })
-
-  it('rejects module-owned registry keys outside the app extension id contract', () => {
+      defineRiskModule({
+        renderItem: undefined,
+      } as unknown as Partial<CanvasAppCustomItemModule>),
+    ).toThrow('Canvas custom item module risk requires renderer')
     expect(() =>
-      createCanvasAppCustomItemModuleAssembly([
-        {
-          id: 'risk',
-          customItemRenderers: {
-            'Risk Node': () => null,
-          },
-          customItemValidators: {
-            risk: () => true,
-          },
-        },
-      ]),
-    ).toThrow('Invalid canvas app custom item renderer id: Risk Node')
+      defineRiskModule({
+        validateItem: undefined,
+      } as unknown as Partial<CanvasAppCustomItemModule>),
+    ).toThrow('Canvas custom item module risk requires validator')
   })
 
   it('omits disabled modules from the assembled extension parts', () => {
-    const module = defineCanvasAppCustomItemModule({
-      id: 'risk',
+    const module = defineRiskModule({
       customCreationTools: [
         {
           id: 'risk',
@@ -193,9 +151,6 @@ describe('CanvasAppCustomItemModules', () => {
           createItem: () => null,
         },
       ],
-      customItemValidators: {
-        risk: () => true,
-      },
     })
 
     const assembly = createCanvasAppCustomItemModuleAssembly([module], {
@@ -203,16 +158,12 @@ describe('CanvasAppCustomItemModules', () => {
     })
 
     expect(assembly.customCreationTools).toEqual([])
+    expect(assembly.customItemRenderers).toEqual({})
     expect(assembly.customItemValidators).toEqual({})
   })
 
   it('rejects unknown disabled module ids', () => {
-    const module = defineCanvasAppCustomItemModule({
-      id: 'risk',
-      customItemValidators: {
-        risk: () => true,
-      },
-    })
+    const module = defineRiskModule()
 
     expect(() =>
       createCanvasAppCustomItemModuleAssembly([module], {
@@ -222,8 +173,7 @@ describe('CanvasAppCustomItemModules', () => {
   })
 
   it('rejects custom creation tool shortcut conflicts across modules', () => {
-    const first = defineCanvasAppCustomItemModule({
-      id: 'risk',
+    const first = defineRiskModule({
       customCreationTools: [
         {
           id: 'risk',
@@ -233,12 +183,8 @@ describe('CanvasAppCustomItemModules', () => {
           createItem: () => null,
         },
       ],
-      customItemValidators: {
-        risk: () => true,
-      },
     })
-    const second = defineCanvasAppCustomItemModule({
-      id: 'dependency',
+    const second = defineDependencyModule({
       customCreationTools: [
         {
           id: 'dependency',
@@ -248,9 +194,6 @@ describe('CanvasAppCustomItemModules', () => {
           createItem: () => null,
         },
       ],
-      customItemValidators: {
-        dependency: () => true,
-      },
     })
 
     expect(() =>
@@ -260,3 +203,42 @@ describe('CanvasAppCustomItemModules', () => {
     )
   })
 })
+
+function defineRiskModule(
+  overrides: Partial<CanvasAppCustomItemModule> = {},
+) {
+  return defineCanvasAppCustomItemModule({
+    id: 'risk',
+    presentation: 'risk-node',
+    renderItem: renderRisk,
+    validateItem: validateRisk,
+    ...overrides,
+  })
+}
+
+function defineDependencyModule(
+  overrides: Partial<CanvasAppCustomItemModule> = {},
+) {
+  return defineCanvasAppCustomItemModule({
+    id: 'dependency',
+    presentation: 'dependency-node',
+    renderItem: () => 'dependency',
+    validateItem: () => true,
+    ...overrides,
+  })
+}
+
+function createRiskItem() {
+  return {
+    id: 'risk-1',
+    type: 'custom',
+    kind: 'risk',
+    presentation: 'risk-node',
+    title: 'Risk',
+    x: 0,
+    y: 0,
+    w: 120,
+    h: 80,
+    data: { severity: 'high' },
+  } as const
+}
