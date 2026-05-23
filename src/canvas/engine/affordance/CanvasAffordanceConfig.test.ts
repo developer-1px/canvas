@@ -7,6 +7,7 @@ import type {
   CanvasAffordanceConfig,
   CanvasAffordanceConfigInput,
 } from './CanvasAffordanceTypes'
+import { CANVAS_AFFORDANCE_CONFIG_DEFAULTS } from './CanvasAffordanceCatalog'
 
 describe('CanvasAffordanceConfig', () => {
   it('merges feature toggle overrides with complete defaults', () => {
@@ -41,6 +42,14 @@ describe('CanvasAffordanceConfig', () => {
     expect(Object.isFrozen(config)).toBe(true)
     expect(Object.isFrozen(config.commands)).toBe(true)
     expect(Object.isFrozen(config.tools)).toBe(true)
+  })
+
+  it('keeps the built-in affordance catalog immutable', () => {
+    expect(Object.isFrozen(CANVAS_AFFORDANCE_CONFIG_DEFAULTS)).toBe(true)
+    expect(Object.isFrozen(CANVAS_AFFORDANCE_CONFIG_DEFAULTS.commands)).toBe(
+      true,
+    )
+    expect(Object.isFrozen(CANVAS_AFFORDANCE_CONFIG_DEFAULTS.tools)).toBe(true)
   })
 
   it('rejects malformed config input at the engine seam', () => {

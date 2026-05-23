@@ -2382,8 +2382,14 @@ describe('Canvas module boundaries', () => {
     const assemblyContractsFile = getSourceFile(
       'src/canvas/app/workflow/CanvasAppAssemblyContracts.ts',
     )
+    const affordanceCatalogFile = getSourceFile(
+      'src/canvas/engine/affordance/CanvasAffordanceCatalog.ts',
+    )
     const affordanceConfigFile = getSourceFile(
       'src/canvas/engine/affordance/CanvasAffordanceConfig.ts',
+    )
+    const affordanceTypesFile = getSourceFile(
+      'src/canvas/engine/affordance/CanvasAffordanceTypes.ts',
     )
 
     expect(assemblyContractsFile.source).toContain(
@@ -2395,6 +2401,17 @@ describe('Canvas module boundaries', () => {
     expect(assemblyContractsFile.source).not.toContain(
       'Unknown canvas affordance config',
     )
+    expect(affordanceCatalogFile.source).toContain(
+      'CANVAS_AFFORDANCE_CONFIG_DEFAULTS',
+    )
+    expect(affordanceCatalogFile.source).toContain('alignBottom: true')
+    expect(affordanceTypesFile.source).toContain(
+      'typeof CANVAS_AFFORDANCE_CONFIG_DEFAULTS',
+    )
+    expect(affordanceConfigFile.source).toContain(
+      "from './CanvasAffordanceCatalog'",
+    )
+    expect(affordanceConfigFile.source).not.toContain('alignBottom: true')
     expect(affordanceConfigFile.source).toContain(
       'export function assertCanvasAffordanceConfig',
     )
