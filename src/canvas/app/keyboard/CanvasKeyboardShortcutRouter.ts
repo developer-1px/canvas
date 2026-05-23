@@ -12,6 +12,11 @@ import {
   type CanvasKeyboardSystemHandlers,
 } from './CanvasKeyboardSystemDispatch'
 import {
+  isCanvasKeyboardToolIntent,
+  runCanvasKeyboardToolIntent,
+  type CanvasKeyboardToolHandlers,
+} from './CanvasKeyboardToolDispatch'
+import {
   isCanvasKeyboardViewportIntent,
   runCanvasKeyboardViewportIntent,
   type CanvasKeyboardViewportHandlers,
@@ -20,6 +25,7 @@ import {
 export type CanvasKeyboardShortcutHandlers =
   CanvasKeyboardCommandHandlers &
   CanvasKeyboardSystemHandlers &
+  CanvasKeyboardToolHandlers &
   CanvasKeyboardViewportHandlers & {
     config: CanvasAffordanceConfig
     customCreationTools: readonly CanvasAppCustomCreationToolState[]
@@ -56,12 +62,13 @@ export function handleCanvasKeyboardShortcut(
     return
   }
 
-  switch (intent.kind) {
-    case 'none':
-      return
-    case 'set-tool':
-      handlers.setTool(intent.tool)
-      return
+  if (isCanvasKeyboardToolIntent(intent)) {
+    runCanvasKeyboardToolIntent({ handlers, intent })
+    return
+  }
+
+  if (intent.kind === 'none') {
+    return
   }
 
   return assertUnhandledCanvasKeyboardShortcutIntent(intent)

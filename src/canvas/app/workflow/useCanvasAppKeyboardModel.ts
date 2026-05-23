@@ -1,52 +1,5 @@
-import type { CanvasKeyboardShortcutHandlers } from '../keyboard/CanvasKeyboardShortcutRouter'
 import { useCanvasKeyboardShortcuts } from '../keyboard/useCanvasKeyboardShortcuts'
-
-type CanvasAppKeyboardCommandModel = Pick<
-  CanvasKeyboardShortcutHandlers,
-  | 'commitSelection'
-  | 'copySelection'
-  | 'cutSelection'
-  | 'deleteSelection'
-  | 'duplicateSelection'
-  | 'groupSelection'
-  | 'lockSelection'
-  | 'moveSelection'
-  | 'pasteSelection'
-  | 'redoHistory'
-  | 'reorderSelection'
-  | 'selectAll'
-  | 'undoHistory'
-  | 'ungroupSelection'
-  | 'unlockAll'
->
-
-type CanvasAppKeyboardInteractionModel = Pick<
-  CanvasKeyboardShortcutHandlers,
-  | 'interactionRef'
-  | 'setDraftArrow'
-  | 'setDraftRect'
-  | 'setDraftStroke'
-  | 'setEditing'
-  | 'setGesture'
-  | 'setMarquee'
-  | 'setSpaceDown'
-  | 'setTool'
->
-
-type CanvasAppKeyboardViewportModel = Pick<
-  CanvasKeyboardShortcutHandlers,
-  'fitToItems' | 'resetViewport' | 'zoomBy'
->
-
-type UseCanvasAppKeyboardModelArgs = {
-  command: CanvasAppKeyboardCommandModel
-  config: CanvasKeyboardShortcutHandlers['config']
-  customCreationTools: CanvasKeyboardShortcutHandlers['customCreationTools']
-  interaction: CanvasAppKeyboardInteractionModel
-  openFindReplace: CanvasKeyboardShortcutHandlers['openFindReplace']
-  selection: CanvasKeyboardShortcutHandlers['selection']
-  viewport: CanvasAppKeyboardViewportModel
-}
+import type { CanvasAppKeyboardModelInput } from './CanvasAppKeyboardConsumerContracts'
 
 export function useCanvasAppKeyboardModel({
   command,
@@ -56,7 +9,7 @@ export function useCanvasAppKeyboardModel({
   openFindReplace,
   selection,
   viewport,
-}: UseCanvasAppKeyboardModelArgs) {
+}: CanvasAppKeyboardModelInput) {
   useCanvasKeyboardShortcuts({
     commitSelection: command.commitSelection,
     config,

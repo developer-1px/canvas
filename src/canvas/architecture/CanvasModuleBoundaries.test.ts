@@ -1194,6 +1194,9 @@ describe('Canvas module boundaries', () => {
     const keyboardModelFile = getSourceFile(
       'src/canvas/app/workflow/useCanvasAppKeyboardModel.ts',
     )
+    const keyboardConsumerContractsFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppKeyboardConsumerContracts.ts',
+    )
 
     expect(appModelFile.source).toContain(
       "from './useCanvasAppKeyboardModel'",
@@ -1206,11 +1209,33 @@ describe('Canvas module boundaries', () => {
       "from '../keyboard/useCanvasKeyboardShortcuts'",
     )
     expect(keyboardModelFile.source).toContain(
+      "from './CanvasAppKeyboardConsumerContracts'",
+    )
+    expect(keyboardModelFile.source).toContain(
       'export function useCanvasAppKeyboardModel',
     )
+    expect(keyboardModelFile.source).not.toContain(
+      'CanvasKeyboardShortcutHandlers',
+    )
+    expect(keyboardModelFile.source).not.toContain('Pick<')
     expect(keyboardModelFile.source).toContain('command.copySelection')
     expect(keyboardModelFile.source).toContain('interaction.setSpaceDown')
     expect(keyboardModelFile.source).toContain('viewport.zoomBy')
+    expect(keyboardConsumerContractsFile.source).toContain(
+      'export type CanvasAppKeyboardModelInput',
+    )
+    expect(keyboardConsumerContractsFile.source).toContain(
+      'export type CanvasAppKeyboardCommandContext',
+    )
+    expect(keyboardConsumerContractsFile.source).toContain(
+      'export type CanvasAppKeyboardInteractionContext',
+    )
+    expect(keyboardConsumerContractsFile.source).toContain(
+      'export type CanvasAppKeyboardViewportContext',
+    )
+    expect(keyboardConsumerContractsFile.source).not.toContain(
+      'useCanvasKeyboardShortcuts',
+    )
   })
 
   it('keeps app viewport handler wiring behind a named workflow module', () => {
@@ -3356,6 +3381,9 @@ describe('Canvas module boundaries', () => {
     const viewportDispatchFile = getSourceFile(
       'src/canvas/app/keyboard/CanvasKeyboardViewportDispatch.ts',
     )
+    const toolDispatchFile = getSourceFile(
+      'src/canvas/app/keyboard/CanvasKeyboardToolDispatch.ts',
+    )
     const toolIntentFile = getSourceFile(
       'src/canvas/app/keyboard/CanvasKeyboardToolShortcutIntent.ts',
     )
@@ -3381,6 +3409,9 @@ describe('Canvas module boundaries', () => {
     expect(routerFile.source).toContain(
       "from './CanvasKeyboardViewportDispatch'",
     )
+    expect(routerFile.source).toContain(
+      "from './CanvasKeyboardToolDispatch'",
+    )
     expect(routerFile.source).not.toContain('config.shortcuts.temporaryPan')
     expect(routerFile.source).not.toContain(
       'matchesCanvasAppCustomToolShortcut',
@@ -3396,6 +3427,8 @@ describe('Canvas module boundaries', () => {
     expect(routerFile.source).not.toContain('handlers.zoomBy(')
     expect(routerFile.source).not.toContain('handlers.resetViewport()')
     expect(routerFile.source).not.toContain('handlers.fitToItems(')
+    expect(routerFile.source).not.toContain('handlers.setTool(')
+    expect(routerFile.source).not.toContain('switch (intent.kind)')
     expect(routerFile.source).not.toContain("event.key.startsWith('Arrow')")
     expect(routerFile.source).not.toContain("key === 'z'")
     expect(hookFile.source).toContain(
@@ -3681,6 +3714,32 @@ describe('Canvas module boundaries', () => {
     )
     expect(viewportDispatchFile.source).not.toContain(
       'function getCanvasKeyboardViewportIntentRunner',
+    )
+    expect(toolDispatchFile.source).toContain(
+      'export function runCanvasKeyboardToolIntent',
+    )
+    expect(toolDispatchFile.source).toContain(
+      'export function isCanvasKeyboardToolIntent',
+    )
+    expect(toolDispatchFile.source).toContain(
+      "from './CanvasKeyboardIntentDispatchTable'",
+    )
+    expect(toolDispatchFile.source).toContain(
+      'CANVAS_KEYBOARD_TOOL_INTENT_DISPATCH',
+    )
+    expect(toolDispatchFile.source).toContain(
+      'CANVAS_KEYBOARD_TOOL_INTENT_DISPATCH.run',
+    )
+    expect(toolDispatchFile.source).toContain('handlers.setTool(intent.tool)')
+    expect(toolDispatchFile.source).not.toContain('switch (intent.kind)')
+    expect(toolDispatchFile.source).not.toContain(
+      'function defineCanvasKeyboardToolIntentRunners',
+    )
+    expect(toolDispatchFile.source).not.toContain(
+      'function hasCanvasKeyboardToolIntentRunner',
+    )
+    expect(toolDispatchFile.source).not.toContain(
+      'function getCanvasKeyboardToolIntentRunner',
     )
     expect(intentDispatchTableFile.source).toContain(
       'export function createCanvasKeyboardIntentDispatchTable',
