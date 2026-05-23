@@ -19,7 +19,6 @@ import {
   type CanvasSnapGuides,
   type CanvasTransformAdapter,
 } from '../../engine'
-import { screenPoint, screenToWorld } from './CanvasPointerGeometry'
 import type {
   CommitCanvasItemsChange,
   CommitCanvasSelection,
@@ -37,6 +36,10 @@ import {
   applyCanvasPointerInteractionPreviewEffect,
 } from './CanvasPointerInteractionDragEffects'
 import { previewCanvasPointerInteraction } from './CanvasPointerInteractionPreview'
+import {
+  getCanvasPointerDragProjection,
+  getCanvasPointerDragSession,
+} from './CanvasPointerDragSession'
 
 type UseCanvasPointerDragHandlersArgs = {
   commitSelection: CommitCanvasSelection
@@ -104,22 +107,25 @@ export function useCanvasPointerDragHandlers({
   }
 
   function handlePointerMove(event: CanvasAppPointerInput) {
-    const interaction = interactionRef.current
+    const drag = getCanvasPointerDragProjection({
+      event,
+      interaction: interactionRef.current,
+      stageElement,
+      viewport,
+    })
 
-    if (interaction.kind === 'none' || interaction.pointerId !== event.pointerId) {
+    if (!drag) {
       return
     }
 
     event.preventDefault()
 
-    const currentScreen = screenPoint(stageElement, event)
-    const currentWorld = screenToWorld(currentScreen, viewport)
     const preview = previewCanvasPointerInteraction({
       config,
-      currentScreen,
-      currentWorld,
+      currentScreen: drag.currentScreen,
+      currentWorld: drag.currentWorld,
       input: event,
-      interaction,
+      interaction: drag.interaction,
       scene,
       transformAdapter,
       viewport,
@@ -132,9 +138,12 @@ export function useCanvasPointerDragHandlers({
   }
 
   function handlePointerUp(event: CanvasAppPointerInput) {
-    const interaction = interactionRef.current
+    const drag = getCanvasPointerDragSession({
+      event,
+      interaction: interactionRef.current,
+    })
 
-    if (interaction.kind === 'none' || interaction.pointerId !== event.pointerId) {
+    if (!drag) {
       return
     }
 
@@ -145,7 +154,7 @@ export function useCanvasPointerDragHandlers({
       creationAdapter,
       createId,
       customCreationTools,
-      interaction,
+      interaction: drag.interaction,
       scene,
       selection,
       setEditing,
@@ -160,12 +169,19 @@ export function useCanvasPointerDragHandlers({
   }
 
   function handlePointerCancel(event: CanvasAppPointerInput) {
-    const interaction = interactionRef.current
+    const drag = getCanvasPointerDragSession({
+      event,
+      interaction: interactionRef.current,
+    })
+
+    if (!drag) {
+      return
+    }
 
     applyCanvasPointerInteractionCancelEffect({
       context: dragEffectContext,
       event,
-      interaction,
+      interaction: drag.interaction,
     })
   }
 

@@ -1001,10 +1001,34 @@ describe('Canvas module boundaries', () => {
     const dragEffectsFile = getSourceFile(
       'src/canvas/app/pointer/CanvasPointerInteractionDragEffects.ts',
     )
+    const dragSessionFile = getSourceFile(
+      'src/canvas/app/pointer/CanvasPointerDragSession.ts',
+    )
 
     expect(dragHookFile.source).toContain(
       "from './CanvasPointerInteractionDragEffects'",
     )
+    expect(dragHookFile.source).toContain(
+      "from './CanvasPointerDragSession'",
+    )
+    expect(dragHookFile.source).not.toContain("interaction.kind === 'none'")
+    expect(dragHookFile.source).not.toContain(
+      'interaction.pointerId !== event.pointerId',
+    )
+    expect(dragHookFile.source).not.toContain('screenPoint(')
+    expect(dragHookFile.source).not.toContain('screenToWorld(')
+    expect(dragSessionFile.source).toContain(
+      'export function getCanvasPointerDragSession',
+    )
+    expect(dragSessionFile.source).toContain(
+      'export function getCanvasPointerDragProjection',
+    )
+    expect(dragSessionFile.source).toContain("interaction.kind === 'none'")
+    expect(dragSessionFile.source).toContain(
+      'interaction.pointerId !== event.pointerId',
+    )
+    expect(dragSessionFile.source).toContain('screenPoint(')
+    expect(dragSessionFile.source).toContain('screenToWorld(')
     for (const dragEffectDetail of [
       'setSnapGuides(preview.snapGuides)',
       'setViewport(preview.viewport)',
