@@ -50,7 +50,7 @@
 - Canvas App Item Layer Adapter: App workflow가 concrete Demo SVG item layer를 직접 알지 않고 items를 stage children으로 렌더링하도록 주입받는 Adapter Interface.
 - Canvas App Extension Id: custom command, creation tool, item module, component presentation renderer key, custom item renderer key, validator key, inspector panel에서 공유하는 안정 lower-kebab 외부 계약.
 - Canvas App Extension Registry: assembly 단계에서 extension entry와 record key를 검증하고 중복을 실패시키는 내부 merge 계약.
-- Canvas App Extension Bundle: custom command, custom creation tool, custom item renderer, custom item validator, inspector panel output slot과 slot별 중복 병합 규칙을 소유하는 App-owned extension output 계약.
+- Canvas App Extension Bundle: custom command, custom creation tool, custom item renderer, custom item validator, inspector panel output slot과 slot별 중복 병합/snapshot 규칙을 소유하는 App-owned extension output 계약.
 - Canvas App Descriptor Snapshot: 외부 등록 descriptor array, registry record, shortcut descriptor의 copy/freeze 규칙을 소유해 Assembly와 Custom Item Module snapshot이 같은 mutation 방어 계약을 쓰게 하는 App-owned Module.
 - Canvas App Extension Assembly: custom command, custom item module, custom creation tool, custom item renderer, validator, inspector panel을 App Assembly output bundle로 합성하는 App-owned composition Module.
 - Canvas App Descriptor Shape Contract: 제품별 descriptor가 외부 조립 seam을 통과하기 전에 필수 함수 slot을 갖췄는지 검증하는 외부 Interface 계약.

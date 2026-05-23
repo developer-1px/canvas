@@ -4,10 +4,9 @@ import {
 } from '../../host'
 import {
   snapshotCanvasAppArray,
-  snapshotCanvasAppDescriptorArray,
   snapshotCanvasAppRecord,
-  snapshotCanvasAppShortcutDescriptorArray,
 } from '../extensions/CanvasAppDescriptorSnapshot'
+import { snapshotCanvasAppExtensionBundle } from '../extensions/CanvasAppExtensionBundle'
 import type {
   CanvasAppAssembly,
 } from './CanvasAppAssemblyTypes'
@@ -16,9 +15,7 @@ import { snapshotCanvasAppAssemblyAdapters } from './CanvasAppAdapterSnapshot'
 export function snapshotCanvasAppAssembly(
   assembly: CanvasAppAssembly,
 ): CanvasAppAssembly {
-  const customItemValidators = snapshotCanvasAppRecord(
-    assembly.customItemValidators,
-  )
+  const extensionBundle = snapshotCanvasAppExtensionBundle(assembly)
   const adapterSnapshot = snapshotCanvasAppAssemblyAdapters(assembly)
 
   return Object.freeze({
@@ -31,16 +28,10 @@ export function snapshotCanvasAppAssembly(
     componentPresentationRenderers: snapshotCanvasAppRecord(
       assembly.componentPresentationRenderers,
     ),
-    customCommands: snapshotCanvasAppDescriptorArray(assembly.customCommands),
-    customCreationTools: snapshotCanvasAppShortcutDescriptorArray(
-      assembly.customCreationTools,
-    ),
-    customItemRenderers: snapshotCanvasAppRecord(assembly.customItemRenderers),
-    customItemValidators,
-    inspectorPanels: snapshotCanvasAppDescriptorArray(assembly.inspectorPanels),
+    ...extensionBundle,
     initialItems: snapshotCanvasAppInitialItems(
       assembly.initialItems,
-      customItemValidators,
+      extensionBundle.customItemValidators,
     ),
     initialSelection: snapshotCanvasAppArray(assembly.initialSelection),
     itemAdapters: adapterSnapshot.itemAdapters,

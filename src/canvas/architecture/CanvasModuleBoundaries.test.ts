@@ -325,6 +325,9 @@ describe('Canvas module boundaries', () => {
       'export function mergeCanvasAppExtensionBundle',
     )
     expect(extensionBundleFile.source).toContain(
+      'export function snapshotCanvasAppExtensionBundle',
+    )
+    expect(extensionBundleFile.source).toContain(
       'appendUniqueCanvasAppExtensionEntries',
     )
     expect(extensionBundleFile.source).toContain(
@@ -4459,6 +4462,9 @@ describe('Canvas module boundaries', () => {
     const descriptorSnapshotFile = getSourceFile(
       'src/canvas/app/extensions/CanvasAppDescriptorSnapshot.ts',
     )
+    const extensionBundleFile = getSourceFile(
+      'src/canvas/app/extensions/CanvasAppExtensionBundle.ts',
+    )
 
     expect(moduleFile.source).toContain(
       "from './CanvasAppCustomItemModuleSnapshot'",
@@ -4480,6 +4486,16 @@ describe('Canvas module boundaries', () => {
     expect(snapshotFile.source).toContain(
       "from '../extensions/CanvasAppDescriptorSnapshot'",
     )
+    expect(snapshotFile.source).toContain(
+      "from '../extensions/CanvasAppExtensionBundle'",
+    )
+    expect(snapshotFile.source).toContain('snapshotCanvasAppExtensionBundle')
+    expect(snapshotFile.source).not.toContain(
+      'customCommands: snapshotCanvasAppDescriptorArray(assembly.customCommands)',
+    )
+    expect(snapshotFile.source).not.toContain(
+      'customItemRenderers: snapshotCanvasAppRecord(assembly.customItemRenderers)',
+    )
     expect(snapshotFile.source).not.toContain('function freezeCanvasAppRecord')
     expect(snapshotFile.source).not.toContain('function freezeCanvasAppArray')
     expect(descriptorSnapshotFile.source).toContain(
@@ -4490,6 +4506,9 @@ describe('Canvas module boundaries', () => {
     )
     expect(descriptorSnapshotFile.source).toContain(
       'export function snapshotCanvasAppRecord',
+    )
+    expect(extensionBundleFile.source).toContain(
+      'export function snapshotCanvasAppExtensionBundle',
     )
   })
 
@@ -4540,8 +4559,21 @@ describe('Canvas module boundaries', () => {
     expect(snapshotFile.source).toContain(
       "from '../extensions/CanvasAppDescriptorSnapshot'",
     )
+    expect(snapshotFile.source).toContain(
+      "from '../extensions/CanvasAppExtensionBundle'",
+    )
+    expect(snapshotFile.source).toContain('snapshotCanvasAppExtensionBundle')
     expect(snapshotFile.source).toContain('snapshotCanvasAppRecord')
     expect(snapshotFile.source).toContain('snapshotCanvasAppArray')
+    expect(snapshotFile.source).not.toContain(
+      'customCommands: snapshotCanvasAppDescriptorArray',
+    )
+    expect(snapshotFile.source).not.toContain(
+      'customCreationTools: snapshotCanvasAppShortcutDescriptorArray',
+    )
+    expect(snapshotFile.source).not.toContain(
+      'inspectorPanels: snapshotCanvasAppDescriptorArray',
+    )
     expect(snapshotFile.source).toContain(
       "from './CanvasAppAdapterSnapshot'",
     )

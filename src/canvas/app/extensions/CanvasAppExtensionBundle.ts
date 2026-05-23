@@ -4,6 +4,11 @@ import type { CanvasAppInspectorPanel } from '../inspector/CanvasAppInspectorPan
 import type { CanvasAppCustomItemRenderers } from '../rendering/CanvasAppRendererRegistries'
 import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
 import {
+  snapshotCanvasAppDescriptorArray,
+  snapshotCanvasAppRecord,
+  snapshotCanvasAppShortcutDescriptorArray,
+} from './CanvasAppDescriptorSnapshot'
+import {
   appendUniqueCanvasAppExtensionEntries,
   type CanvasAppExtensionRegistryOwner,
   mergeUniqueCanvasAppExtensionRecord,
@@ -92,4 +97,18 @@ export function mergeCanvasAppExtensionBundle({
       owner,
     }),
   }
+}
+
+export function snapshotCanvasAppExtensionBundle(
+  bundle: CanvasAppExtensionBundle,
+): CanvasAppExtensionBundle {
+  return Object.freeze({
+    customCommands: snapshotCanvasAppDescriptorArray(bundle.customCommands),
+    customCreationTools: snapshotCanvasAppShortcutDescriptorArray(
+      bundle.customCreationTools,
+    ),
+    customItemRenderers: snapshotCanvasAppRecord(bundle.customItemRenderers),
+    customItemValidators: snapshotCanvasAppRecord(bundle.customItemValidators),
+    inspectorPanels: snapshotCanvasAppDescriptorArray(bundle.inspectorPanels),
+  })
 }

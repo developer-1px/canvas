@@ -1,8 +1,10 @@
 import {
   snapshotCanvasAppDescriptorArray,
-  snapshotCanvasAppRecord,
   snapshotCanvasAppShortcutDescriptorArray,
 } from '../extensions/CanvasAppDescriptorSnapshot'
+import {
+  snapshotCanvasAppExtensionBundle,
+} from '../extensions/CanvasAppExtensionBundle'
 import type {
   CanvasAppCustomItemModule,
   CanvasAppCustomItemModuleAssembly,
@@ -11,15 +13,7 @@ import type {
 export function snapshotCanvasAppCustomItemModuleAssembly(
   assembly: CanvasAppCustomItemModuleAssembly,
 ): CanvasAppCustomItemModuleAssembly {
-  return Object.freeze({
-    customCommands: snapshotCanvasAppDescriptorArray(assembly.customCommands),
-    customCreationTools: snapshotCanvasAppShortcutDescriptorArray(
-      assembly.customCreationTools,
-    ),
-    customItemRenderers: snapshotCanvasAppRecord(assembly.customItemRenderers),
-    customItemValidators: snapshotCanvasAppRecord(assembly.customItemValidators),
-    inspectorPanels: snapshotCanvasAppDescriptorArray(assembly.inspectorPanels),
-  })
+  return snapshotCanvasAppExtensionBundle(assembly)
 }
 
 export function snapshotCanvasAppCustomItemModule(

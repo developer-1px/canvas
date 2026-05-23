@@ -3,6 +3,7 @@ import {
   createCanvasAppExtensionBundle,
   createEmptyCanvasAppExtensionBundle,
   mergeCanvasAppExtensionBundle,
+  snapshotCanvasAppExtensionBundle,
 } from './CanvasAppExtensionBundle'
 
 describe('CanvasAppExtensionBundle', () => {
@@ -91,6 +92,47 @@ describe('CanvasAppExtensionBundle', () => {
       }),
     ).toThrow('Duplicate canvas app assembly custom item renderer: risk')
   })
+
+  it('snapshots extension bundle slots against later external mutation', () => {
+    const command = createCommand('publish')
+    const tool = createTool('risk')
+    tool.shortcut = { key: 'r' }
+    const renderRisk = () => null
+    const validateRisk = () => true
+    const panel = createPanel('risk-panel')
+    const bundle = createCanvasAppExtensionBundle({
+      customCommands: [command],
+      customCreationTools: [tool],
+      customItemRenderers: {
+        risk: renderRisk,
+      },
+      customItemValidators: {
+        risk: validateRisk,
+      },
+      inspectorPanels: [panel],
+    })
+
+    const snapshot = snapshotCanvasAppExtensionBundle(bundle)
+
+    command.title = 'Mutated'
+    tool.shortcut.key = 'x'
+    panel.id = 'mutated-panel'
+
+    expect(snapshot.customCommands[0]?.title).toBe('publish')
+    expect(snapshot.customCreationTools[0]?.shortcut).toEqual({ key: 'r' })
+    expect(snapshot.customItemRenderers.risk).toBe(renderRisk)
+    expect(snapshot.customItemValidators.risk).toBe(validateRisk)
+    expect(snapshot.inspectorPanels[0]?.id).toBe('risk-panel')
+    expect(Object.isFrozen(snapshot)).toBe(true)
+    expect(Object.isFrozen(snapshot.customCommands)).toBe(true)
+    expect(Object.isFrozen(snapshot.customCommands[0])).toBe(true)
+    expect(Object.isFrozen(snapshot.customCreationTools[0]?.shortcut)).toBe(
+      true,
+    )
+    expect(Object.isFrozen(snapshot.customItemRenderers)).toBe(true)
+    expect(Object.isFrozen(snapshot.customItemValidators)).toBe(true)
+    expect(Object.isFrozen(snapshot.inspectorPanels[0])).toBe(true)
+  })
 })
 
 function createCommand(id: string) {
@@ -107,6 +149,7 @@ function createTool(id: string) {
     createItem: () => null,
     id,
     label: id,
+    shortcut: undefined as { key: string } | undefined,
     title: id,
   }
 }
