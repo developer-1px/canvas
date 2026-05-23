@@ -96,6 +96,7 @@
 - Canvas Pointer Interaction Start: pointer-down 시 gesture routing, pan, marquee 시작을 active interaction으로 변환하고 생성 시작은 Canvas Pointer Creation Start에 위임하는 App-owned runtime Module.
 - Canvas Pointer Creation Start: pointer-down 시 create-rect, marker, highlighter, arrow, custom creation, text creation 시작 상태와 initial draft overlay, immediate text creation을 소유하는 App-owned runtime Module.
 - Canvas Pointer Interaction Start Effects: pointer-down start 결과를 pointer capture, document commit, selection/live item, draft overlay, editing/tool/gesture state로 적용하는 App-owned runtime Module.
+- Canvas Pointer Click Memory: item pointer-down double-click 판정을 위한 previous click memory, time threshold, distance threshold를 소유하는 App-owned pointer rule Module.
 - Canvas Item Pointer Interaction Start: item pointer-down/text double-click 시 selection, edit state, alt-drag duplicate, move interaction 시작 상태를 계산하는 App-owned runtime Module.
 - Canvas Resize Pointer Interaction Start: resize handle pointer-down 시 selected bounds, handle, selection, item snapshot을 resize interaction 시작 상태로 변환하는 App-owned runtime Module.
 - Canvas Pointer Interaction Preview: pointer-move 시 active interaction을 viewport, live item, marquee, selection, draft overlay, snap guide preview로 변환하는 App-owned runtime Module.
@@ -208,7 +209,7 @@
 - Canvas App Custom Creation Tool descriptor shape/shortcut conflict 검증과 runtime state/lookup/shortcut matching은 분리하고, validation은 Canvas App Custom Creation Tool Contracts가, runtime behavior는 Canvas App Custom Creation Tool Runtime이 소유한다.
 - Canvas App Custom Creation Tool이 item 생성을 거부하거나 실패하거나 invalid item을 반환해도 pointer lifecycle을 깨지 않아야 한다.
 - Pointer down hook은 DOM pointer routing과 coordinate 변환을 맡고, tool/gesture/config 기반 pan/marquee 시작 규칙은 Canvas Pointer Interaction Start가, 생성 도구 시작 규칙은 Canvas Pointer Creation Start가, 시작 결과 적용은 Canvas Pointer Interaction Start Effects가 소유한다.
-- Item pointer down hook은 DOM event routing과 시작 결과 적용을 맡고, selection/edit/duplicate/move 시작 규칙은 Canvas Item Pointer Interaction Start가 소유한다.
+- Item pointer down hook은 DOM event routing과 시작 결과 적용을 맡고, item double-click memory 규칙은 Canvas Pointer Click Memory가, selection/edit/duplicate/move 시작 규칙은 Canvas Item Pointer Interaction Start가 소유한다.
 - Resize pointer down hook은 DOM event routing과 시작 결과 적용을 맡고, resize handle/selected bounds/config 기반 시작 규칙은 Canvas Resize Pointer Interaction Start가 소유한다.
 - Text double-click hook은 시작 결과 적용을 맡고, text edit 가능 여부/selection/edit state/tool 전환 규칙은 Canvas Item Pointer Interaction Start가 소유한다.
 - Pointer drag hook은 DOM pointer routing과 coordinate 변환, preview/commit/cancel runtime 호출만 맡고, pointer-move preview orchestration은 Canvas Pointer Interaction Preview가, move/resize live item preview는 Canvas Pointer Transform Preview가, 생성/드로잉 draft preview는 Canvas Pointer Creation Preview가, pointer-up/cancel 확정 규칙은 Canvas Pointer Interaction Lifecycle이, preview result state 반영과 pointer-up/cancel cleanup/rollback effect는 Canvas Pointer Interaction Drag Effects가 소유한다.

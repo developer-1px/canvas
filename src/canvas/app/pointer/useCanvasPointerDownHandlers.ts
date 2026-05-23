@@ -16,7 +16,6 @@ import type {
   Viewport,
 } from '../../entities'
 import type { CanvasItemReadModel } from '../../host'
-import { pointDistance } from '../../core'
 import { screenPoint, screenToWorld } from './CanvasPointerGeometry'
 import {
   shouldRouteCanvasItemPointerToCanvasGesture,
@@ -40,6 +39,10 @@ import {
   startCanvasTextEditInteraction,
 } from './CanvasItemPointerInteractionStart'
 import { startCanvasResizePointerInteraction } from './CanvasResizePointerInteractionStart'
+import {
+  recordCanvasItemPointerClick,
+  type CanvasPointerClickMemory,
+} from './CanvasPointerClickMemory'
 import {
   applyCanvasItemPointerInteractionStartEffect,
   applyCanvasPointerInteractionStartEffect,
@@ -102,11 +105,7 @@ export function useCanvasPointerDownHandlers({
   tool,
   viewport,
 }: UseCanvasPointerDownHandlersArgs) {
-  const lastClickRef = useRef<{
-    id: string
-    point: Point
-    time: number
-  } | null>(null)
+  const lastClickRef = useRef<CanvasPointerClickMemory>(null)
   const startEffectContext = {
     commitItemsChange,
     commitSelection,
@@ -162,20 +161,20 @@ export function useCanvasPointerDownHandlers({
     }
 
     const startScreen = screenPoint(stageElement, event)
-    const lastClick = lastClickRef.current
-    const now = performance.now()
-    const isDoubleClick =
-      lastClick?.id === itemId &&
-      now - lastClick.time < 360 &&
-      pointDistance(startScreen, lastClick.point) < 6
+    const clickMemory = recordCanvasItemPointerClick({
+      itemId,
+      lastClick: lastClickRef.current,
+      point: startScreen,
+      time: performance.now(),
+    })
 
-    lastClickRef.current = { id: itemId, point: startScreen, time: now }
+    lastClickRef.current = clickMemory.nextClick
     const startWorld = screenToWorld(startScreen, viewport)
     const start = startCanvasItemPointerInteraction({
       cloneItems,
       config,
       input: event,
-      isDoubleClick,
+      isDoubleClick: clickMemory.isDoubleClick,
       itemId,
       itemReadModel,
       items,

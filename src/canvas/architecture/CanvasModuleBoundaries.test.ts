@@ -1009,6 +1009,32 @@ describe('Canvas module boundaries', () => {
     )
   })
 
+  it('keeps pointer click memory rules behind a named module', () => {
+    const pointerDownHookFile = getSourceFile(
+      'src/canvas/app/pointer/useCanvasPointerDownHandlers.ts',
+    )
+    const clickMemoryFile = getSourceFile(
+      'src/canvas/app/pointer/CanvasPointerClickMemory.ts',
+    )
+
+    expect(pointerDownHookFile.source).toContain(
+      "from './CanvasPointerClickMemory'",
+    )
+    for (const clickMemoryDetail of [
+      'pointDistance',
+      'CANVAS_POINTER_DOUBLE_CLICK_MAX_DELAY_MS',
+      'CANVAS_POINTER_DOUBLE_CLICK_MAX_DISTANCE',
+      'lastClick?.id === itemId',
+      'time - lastClick.time',
+    ]) {
+      expect(pointerDownHookFile.source).not.toContain(clickMemoryDetail)
+      expect(clickMemoryFile.source).toContain(clickMemoryDetail)
+    }
+    expect(clickMemoryFile.source).toContain(
+      'export function recordCanvasItemPointerClick',
+    )
+  })
+
   it('keeps app keyboard handler wiring behind a named workflow module', () => {
     const appModelFile = getSourceFile(
       'src/canvas/app/workflow/useCanvasAppModel.ts',
