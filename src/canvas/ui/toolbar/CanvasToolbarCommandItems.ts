@@ -1,6 +1,7 @@
 import type {
   CanvasAffordanceConfig,
   CanvasAlignMode,
+  CanvasCommandAvailability,
   CanvasCommandId,
   CanvasDistributeMode,
 } from '../../engine'
@@ -37,28 +38,12 @@ export type CanvasToolbarCommandGroup = {
 }
 
 export type CanvasToolbarCommandItemsInput = {
-  canAlign: boolean
-  canDelete: boolean
-  canDistribute: boolean
-  canDuplicate: boolean
-  canGroup: boolean
-  canLock: boolean
-  canRedo: boolean
-  canUndo: boolean
-  canUngroup: boolean
+  availability: CanvasCommandAvailability
   config: CanvasAffordanceConfig
 }
 
 export function getCanvasToolbarCommandGroups({
-  canAlign,
-  canDelete,
-  canDistribute,
-  canDuplicate,
-  canGroup,
-  canLock,
-  canRedo,
-  canUndo,
-  canUngroup,
+  availability,
   config,
 }: CanvasToolbarCommandItemsInput): CanvasToolbarCommandGroup[] {
   const groups: CanvasToolbarCommandGroup[] = []
@@ -70,14 +55,14 @@ export function getCanvasToolbarCommandGroups({
         ? getCanvasToolbarCommandItem({
             action: { kind: 'undo' },
             command: 'undo',
-            disabled: !canUndo,
+            disabled: !availability.undo,
           })
         : null,
       config.commands.redo
         ? getCanvasToolbarCommandItem({
             action: { kind: 'redo' },
             command: 'redo',
-            disabled: !canRedo,
+            disabled: !availability.redo,
           })
         : null,
     ],
@@ -90,14 +75,14 @@ export function getCanvasToolbarCommandGroups({
         ? getCanvasToolbarCommandItem({
             action: { kind: 'duplicate' },
             command: 'duplicate',
-            disabled: !canDuplicate,
+            disabled: !availability.duplicate,
           })
         : null,
       config.commands.delete
         ? getCanvasToolbarCommandItem({
             action: { kind: 'delete' },
             command: 'delete',
-            disabled: !canDelete,
+            disabled: !availability.delete,
           })
         : null,
     ],
@@ -110,14 +95,14 @@ export function getCanvasToolbarCommandGroups({
         ? getCanvasToolbarCommandItem({
             action: { kind: 'group' },
             command: 'group',
-            disabled: !canGroup,
+            disabled: !availability.group,
           })
         : null,
       config.commands.ungroup
         ? getCanvasToolbarCommandItem({
             action: { kind: 'ungroup' },
             command: 'ungroup',
-            disabled: !canUngroup,
+            disabled: !availability.ungroup,
           })
         : null,
     ],
@@ -126,20 +111,20 @@ export function getCanvasToolbarCommandGroups({
   pushCanvasToolbarCommandGroup(groups, {
     id: 'alignment',
     items: [
-      getCanvasToolbarAlignItem('alignLeft', canAlign, config),
-      getCanvasToolbarAlignItem('alignCenter', canAlign, config),
-      getCanvasToolbarAlignItem('alignRight', canAlign, config),
-      getCanvasToolbarAlignItem('alignTop', canAlign, config),
-      getCanvasToolbarAlignItem('alignMiddle', canAlign, config),
-      getCanvasToolbarAlignItem('alignBottom', canAlign, config),
+      getCanvasToolbarAlignItem('alignLeft', availability, config),
+      getCanvasToolbarAlignItem('alignCenter', availability, config),
+      getCanvasToolbarAlignItem('alignRight', availability, config),
+      getCanvasToolbarAlignItem('alignTop', availability, config),
+      getCanvasToolbarAlignItem('alignMiddle', availability, config),
+      getCanvasToolbarAlignItem('alignBottom', availability, config),
       getCanvasToolbarDistributeItem(
         'distributeHorizontal',
-        canDistribute,
+        availability,
         config,
       ),
       getCanvasToolbarDistributeItem(
         'distributeVertical',
-        canDistribute,
+        availability,
         config,
       ),
     ],
@@ -152,14 +137,14 @@ export function getCanvasToolbarCommandGroups({
         ? getCanvasToolbarCommandItem({
             action: { kind: 'lock' },
             command: 'lockSelection',
-            disabled: !canLock,
+            disabled: !availability.lockSelection,
           })
         : null,
       config.commands.unlockAll
         ? getCanvasToolbarCommandItem({
             action: { kind: 'unlock-all' },
             command: 'unlockAll',
-            disabled: false,
+            disabled: !availability.unlockAll,
           })
         : null,
     ],
@@ -203,28 +188,28 @@ function getCanvasToolbarCommandItem({
 
 function getCanvasToolbarAlignItem(
   command: CanvasAlignMode,
-  canAlign: boolean,
+  availability: CanvasCommandAvailability,
   config: CanvasAffordanceConfig,
 ) {
   return config.commands[command]
     ? getCanvasToolbarCommandItem({
         action: { kind: 'align', mode: command },
         command,
-        disabled: !canAlign,
+        disabled: !availability[command],
       })
     : null
 }
 
 function getCanvasToolbarDistributeItem(
   command: CanvasDistributeMode,
-  canDistribute: boolean,
+  availability: CanvasCommandAvailability,
   config: CanvasAffordanceConfig,
 ) {
   return config.commands[command]
     ? getCanvasToolbarCommandItem({
         action: { kind: 'distribute', mode: command },
         command,
-        disabled: !canDistribute,
+        disabled: !availability[command],
       })
     : null
 }

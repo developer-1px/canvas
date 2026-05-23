@@ -246,7 +246,7 @@
 - Built-in command의 선택 개수 기준은 Canvas Command Selection Rules가 소유하고, App control model과 command action/availability는 raw threshold를 반복하지 않는다.
 - Clipboard command hook은 paste index와 callback wiring을 맡고, Canvas Clipboard Command Execution은 plan 생성과 effect 적용만 조립한다. Clone/duplicate/paste/cut plan과 paste offset 계산은 Canvas Clipboard Command Effect Plan이, Host clipboard/document/editing effect routing은 Canvas Clipboard Command Effects가 소유한다.
 - UI controls는 Demo Host를 직접 import하지 않는다.
-- Canvas Toolbar는 item/button 렌더링과 click dispatch를 맡고, group composition은 Canvas Toolbar Items가, built-in/custom tool group grammar는 Canvas Toolbar Tool Items가, built-in command group grammar는 Canvas Toolbar Command Items가 소유한다.
+- Canvas Toolbar는 item/button 렌더링과 click dispatch를 맡고, group composition은 Canvas Toolbar Items가, built-in/custom tool group grammar는 Canvas Toolbar Tool Items가, built-in command group grammar와 Canvas Command Availability 소비는 Canvas Toolbar Command Items가 소유한다.
 - Keyboard shortcut router는 event preventDefault와 handler 실행을 맡고, keydown orchestration은 Canvas Keyboard Shortcut Intent가, built-in document command shortcut grammar와 reserved command shortcut 목록은 Canvas Keyboard Command Shortcuts가, viewport shortcut grammar와 reserved viewport shortcut 목록은 Canvas Keyboard Viewport Shortcuts가, nudge shortcut grammar와 reserved nudge shortcut 목록은 Canvas Keyboard Nudge Shortcuts가, global system shortcut grammar와 reserved system shortcut 목록은 Canvas Keyboard System Shortcuts가, built-in/custom tool shortcut precedence는 Canvas Keyboard Tool Shortcut Intent가 소유한다.
 - Module seam import 규칙은 Canvas Module Boundary Guardrail로 검증한다.
 - Linked peer dependency는 앱 번들에 한 번만 들어가야 하며, Vite config에서 `react`, `react-dom`, `zod`를 dedupe한다.

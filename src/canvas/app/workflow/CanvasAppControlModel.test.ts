@@ -41,13 +41,15 @@ describe('CanvasAppControlModel', () => {
       visible: true,
     })
     expect(model.toolbar).toMatchObject({
-      canAlign: true,
-      canDelete: true,
-      canDistribute: false,
-      canGroup: true,
-      canRedo: false,
-      canUndo: true,
-      canUngroup: true,
+      commandAvailability: expect.objectContaining({
+        alignLeft: true,
+        delete: true,
+        distributeHorizontal: false,
+        group: true,
+        redo: false,
+        undo: true,
+        ungroup: true,
+      }),
       customCommands,
       customTools,
       tool: 'custom:risk',

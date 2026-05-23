@@ -1,4 +1,7 @@
-import type { CanvasAffordanceConfig } from '../../engine'
+import type {
+  CanvasAffordanceConfig,
+  CanvasCommandAvailability,
+} from '../../engine'
 import type { Tool } from '../../entities'
 import {
   getCanvasToolbarCommandGroups,
@@ -45,15 +48,7 @@ export type CanvasToolbarGroup = {
 }
 
 export type CanvasToolbarItemsInput = {
-  canAlign: boolean
-  canDelete: boolean
-  canDistribute: boolean
-  canDuplicate: boolean
-  canGroup: boolean
-  canLock: boolean
-  canRedo: boolean
-  canUndo: boolean
-  canUngroup: boolean
+  commandAvailability: CanvasCommandAvailability
   config: CanvasAffordanceConfig
   customCommands: readonly CanvasToolbarCustomCommand[]
   customTools: readonly CanvasToolbarCustomTool[]
@@ -61,15 +56,7 @@ export type CanvasToolbarItemsInput = {
 }
 
 export function getCanvasToolbarGroups({
-  canAlign,
-  canDelete,
-  canDistribute,
-  canDuplicate,
-  canGroup,
-  canLock,
-  canRedo,
-  canUndo,
-  canUngroup,
+  commandAvailability,
   config,
   customCommands,
   customTools,
@@ -83,15 +70,7 @@ export function getCanvasToolbarGroups({
   })
 
   groups.push(...getCanvasToolbarCommandGroups({
-    canAlign,
-    canDelete,
-    canDistribute,
-    canDuplicate,
-    canGroup,
-    canLock,
-    canRedo,
-    canUndo,
-    canUngroup,
+    availability: commandAvailability,
     config,
   }))
 

@@ -1,12 +1,17 @@
 import { describe, expect, it } from 'vitest'
-import { createCanvasAffordanceConfig } from '../../engine'
+import {
+  createCanvasAffordanceConfig,
+  type CanvasCommandAvailability,
+} from '../../engine'
 import { getCanvasToolbarCommandGroups } from './CanvasToolbarCommandItems'
 
 describe('CanvasToolbarCommandItems', () => {
   it('omits disabled feature entries and carries availability as disabled state', () => {
     const groups = getCanvasToolbarCommandGroups(createInput({
-      canDuplicate: false,
-      canRedo: false,
+      availability: createCommandAvailability({
+        duplicate: false,
+        redo: false,
+      }),
       config: createCanvasAffordanceConfig({
         commands: {
           delete: false,
@@ -35,8 +40,13 @@ describe('CanvasToolbarCommandItems', () => {
 
   it('models alignment and distribution commands as action payloads', () => {
     const groups = getCanvasToolbarCommandGroups(createInput({
-      canAlign: false,
-      canDistribute: true,
+      availability: createCommandAvailability({
+        alignBottom: false,
+        alignLeft: false,
+        alignMiddle: false,
+        alignRight: false,
+        alignTop: false,
+      }),
       config: createCanvasAffordanceConfig({
         commands: {
           alignCenter: false,
@@ -90,16 +100,37 @@ function createInput(
   overrides: Partial<Parameters<typeof getCanvasToolbarCommandGroups>[0]> = {},
 ): Parameters<typeof getCanvasToolbarCommandGroups>[0] {
   return {
-    canAlign: true,
-    canDelete: true,
-    canDistribute: true,
-    canDuplicate: true,
-    canGroup: true,
-    canLock: true,
-    canRedo: true,
-    canUndo: true,
-    canUngroup: true,
+    availability: createCommandAvailability(),
     config: createCanvasAffordanceConfig(),
+    ...overrides,
+  }
+}
+
+function createCommandAvailability(
+  overrides: Partial<CanvasCommandAvailability> = {},
+): CanvasCommandAvailability {
+  return {
+    alignBottom: true,
+    alignCenter: true,
+    alignLeft: true,
+    alignMiddle: true,
+    alignRight: true,
+    alignTop: true,
+    bringForward: true,
+    bringToFront: true,
+    delete: true,
+    duplicate: true,
+    distributeHorizontal: true,
+    distributeVertical: true,
+    group: true,
+    lockSelection: true,
+    redo: true,
+    selectAll: true,
+    sendBackward: true,
+    sendToBack: true,
+    undo: true,
+    ungroup: true,
+    unlockAll: true,
     ...overrides,
   }
 }

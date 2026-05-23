@@ -1,6 +1,9 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
-import { createCanvasAffordanceConfig } from '../../engine'
+import {
+  createCanvasAffordanceConfig,
+  type CanvasCommandAvailability,
+} from '../../engine'
 import { CanvasAppView } from './CanvasAppView'
 
 describe('CanvasAppView', () => {
@@ -101,15 +104,19 @@ function createViewProps(
       onCommit: noop,
     },
     toolbar: {
-      canAlign: false,
-      canDelete: true,
-      canDistribute: false,
-      canDuplicate: true,
-      canGroup: false,
-      canLock: true,
-      canRedo: false,
-      canUndo: true,
-      canUngroup: false,
+      commandAvailability: createCommandAvailability({
+        alignBottom: false,
+        alignCenter: false,
+        alignLeft: false,
+        alignMiddle: false,
+        alignRight: false,
+        alignTop: false,
+        distributeHorizontal: false,
+        distributeVertical: false,
+        group: false,
+        redo: false,
+        ungroup: false,
+      }),
       config,
       customCommands: [],
       customTools: [],
@@ -137,5 +144,34 @@ function createViewProps(
       onZoomIn: noop,
       onZoomOut: noop,
     },
+  }
+}
+
+function createCommandAvailability(
+  overrides: Partial<CanvasCommandAvailability> = {},
+): CanvasCommandAvailability {
+  return {
+    alignBottom: true,
+    alignCenter: true,
+    alignLeft: true,
+    alignMiddle: true,
+    alignRight: true,
+    alignTop: true,
+    bringForward: true,
+    bringToFront: true,
+    delete: true,
+    duplicate: true,
+    distributeHorizontal: true,
+    distributeVertical: true,
+    group: true,
+    lockSelection: true,
+    redo: true,
+    selectAll: true,
+    sendBackward: true,
+    sendToBack: true,
+    undo: true,
+    ungroup: true,
+    unlockAll: true,
+    ...overrides,
   }
 }

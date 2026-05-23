@@ -625,13 +625,53 @@ describe('Canvas module boundaries', () => {
     expect(controlModelFile.source).toContain(
       'getCanvasCommandAvailability',
     )
-    expect(controlModelFile.source).toContain(
+    expect(controlModelFile.source).toContain('commandAvailability')
+    expect(controlModelFile.source).not.toContain(
       'getCanvasCommandSelectionState',
     )
     expect(controlModelFile.source).toContain(
       'CANVAS_GESTURE_STATUS_LABELS',
     )
     expect(controlModelFile.source).toContain('CANVAS_TOOL_AFFORDANCES')
+  })
+
+  it('passes command availability through toolbar command grammar as one contract', () => {
+    const toolbarFile = getSourceFile(
+      'src/canvas/ui/toolbar/CanvasToolbar.tsx',
+    )
+    const toolbarItemsFile = getSourceFile(
+      'src/canvas/ui/toolbar/CanvasToolbarItems.ts',
+    )
+    const toolbarCommandItemsFile = getSourceFile(
+      'src/canvas/ui/toolbar/CanvasToolbarCommandItems.ts',
+    )
+
+    for (const file of [
+      toolbarFile,
+      toolbarItemsFile,
+      toolbarCommandItemsFile,
+    ]) {
+      expect(file.source).not.toContain('canAlign: boolean')
+      expect(file.source).not.toContain('canDistribute: boolean')
+      expect(file.source).not.toContain('canDuplicate: boolean')
+      expect(file.source).not.toContain('canGroup: boolean')
+    }
+
+    expect(toolbarFile.source).toContain(
+      'commandAvailability: CanvasCommandAvailability',
+    )
+    expect(toolbarItemsFile.source).toContain(
+      'commandAvailability: CanvasCommandAvailability',
+    )
+    expect(toolbarCommandItemsFile.source).toContain(
+      'availability: CanvasCommandAvailability',
+    )
+    expect(toolbarCommandItemsFile.source).toContain(
+      'disabled: !availability.undo',
+    )
+    expect(toolbarCommandItemsFile.source).toContain(
+      'disabled: !availability[command]',
+    )
   })
 
   it('keeps built-in command selection thresholds in Engine command selection rules', () => {

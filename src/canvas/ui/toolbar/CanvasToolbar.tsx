@@ -6,6 +6,7 @@ import {
   CANVAS_TOOL_AFFORDANCES,
   type CanvasAffordanceConfig,
   type CanvasAlignMode,
+  type CanvasCommandAvailability,
   type CanvasCommandId,
   type CanvasDistributeMode,
 } from '../../engine'
@@ -54,15 +55,7 @@ import {
 } from './CanvasToolbarItems'
 
 type CanvasToolbarProps = {
-  canAlign: boolean
-  canDelete: boolean
-  canDistribute: boolean
-  canDuplicate: boolean
-  canGroup: boolean
-  canLock: boolean
-  canRedo: boolean
-  canUndo: boolean
-  canUngroup: boolean
+  commandAvailability: CanvasCommandAvailability
   config: CanvasAffordanceConfig
   customCommands: readonly CanvasToolbarCustomCommand[]
   customTools: readonly CanvasToolbarCustomTool[]
