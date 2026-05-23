@@ -535,6 +535,26 @@ describe('Canvas module boundaries', () => {
     }
   })
 
+  it('keeps App custom item module runtime behind a named module', () => {
+    const moduleFile = getSourceFile(
+      'src/canvas/app/modules/CanvasAppCustomItemModules.ts',
+    )
+    const runtimeFile = getSourceFile(
+      'src/canvas/app/modules/CanvasAppCustomItemModuleRuntime.ts',
+    )
+
+    expect(moduleFile.source).toContain(
+      "from './CanvasAppCustomItemModuleRuntime'",
+    )
+    expect(moduleFile.source).not.toContain('normalizeCanvasItems')
+    expect(moduleFile.source).not.toContain('createModuleItem(context)')
+    expect(moduleFile.source).not.toContain('validateItem(item)')
+    expect(runtimeFile.source).toContain('normalizeCanvasItems')
+    expect(runtimeFile.source).toContain('createModuleItem(context)')
+    expect(runtimeFile.source).toContain('validateItem(item)')
+    expect(runtimeFile.source).toContain('catch')
+  })
+
   it('keeps app workflow hooks from recreating the workspace read model', () => {
     const violations = sourceFiles
       .filter((file) =>

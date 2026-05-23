@@ -3,7 +3,6 @@ import type {
   CanvasJsonObject,
 } from '../../entities'
 import {
-  normalizeCanvasItems,
   type CanvasCustomItemValidator,
   type CanvasCustomItemValidators,
 } from '../../host'
@@ -33,6 +32,11 @@ import {
   type CanvasAppCustomCreationTool,
   type CanvasAppCustomCreationToolContext,
 } from '../tools/CanvasAppCustomCreationTools'
+import {
+  getCanvasAppCustomItemModuleCreationTools,
+  getCanvasAppCustomItemModuleRenderers,
+  getCanvasAppCustomItemModuleValidators,
+} from './CanvasAppCustomItemModuleRuntime'
 
 export type CanvasAppCustomItemModuleCreationItem = Bounds & {
   data: CanvasJsonObject
@@ -208,99 +212,6 @@ function assertCanvasAppCustomItemModuleCreationTools(
       label: `creation tool ${tool.id}`,
       moduleId: module.id,
     })
-  }
-}
-
-function getCanvasAppCustomItemModuleCreationTools({
-  customCreationTools = [],
-  id,
-  presentation,
-  validateItem,
-}: CanvasAppCustomItemModule): readonly CanvasAppCustomCreationTool[] {
-  return customCreationTools.map((tool) => {
-    const createModuleItem = tool.createItem
-
-    return {
-      ...tool,
-      createItem: (context) => {
-        let item: CanvasAppCustomItemModuleCreationItem | null
-
-        try {
-          item = createModuleItem(context)
-        } catch {
-          return null
-        }
-
-        if (!item) {
-          return null
-        }
-
-        const customItem = {
-          ...item,
-          id: context.createId(id),
-          kind: id,
-          presentation,
-          type: 'custom',
-        } as const
-
-        try {
-          normalizeCanvasItems([customItem], {
-            customItemValidators: {
-              [id]: getCanvasAppCustomItemModuleValidator({
-                id,
-                presentation,
-                validateItem,
-              }),
-            },
-          })
-
-          return customItem
-        } catch {
-          return null
-        }
-      },
-    }
-  })
-}
-
-function getCanvasAppCustomItemModuleRenderers({
-  presentation,
-  renderItem,
-}: CanvasAppCustomItemModule): CanvasAppCustomItemRenderers {
-  return {
-    [presentation]: renderItem,
-  }
-}
-
-function getCanvasAppCustomItemModuleValidators({
-  id,
-  presentation,
-  validateItem,
-}: CanvasAppCustomItemModule): CanvasCustomItemValidators {
-  return {
-    [id]: getCanvasAppCustomItemModuleValidator({
-      id,
-      presentation,
-      validateItem,
-    }),
-  }
-}
-
-function getCanvasAppCustomItemModuleValidator({
-  id,
-  presentation,
-  validateItem,
-}: Pick<CanvasAppCustomItemModule, 'id' | 'presentation' | 'validateItem'>) {
-  return (item: Parameters<CanvasCustomItemValidator>[0]) => {
-    if (item.kind !== id || item.presentation !== presentation) {
-      return false
-    }
-
-    try {
-      return validateItem(item)
-    } catch {
-      return false
-    }
   }
 }
 
