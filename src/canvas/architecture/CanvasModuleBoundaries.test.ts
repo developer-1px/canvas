@@ -1477,6 +1477,9 @@ describe('Canvas module boundaries', () => {
     const shapeCreationFile = getSourceFile(
       'src/canvas/app/pointer/CanvasPointerShapeCreation.ts',
     )
+    const textCreationFile = getSourceFile(
+      'src/canvas/app/pointer/CanvasPointerTextCreation.ts',
+    )
 
     expect(creationGrammarFile.source).toContain(
       'export function isCanvasPointerCreationGesture',
@@ -1493,6 +1496,9 @@ describe('Canvas module boundaries', () => {
     expect(creationGrammarFile.source).toContain(
       'CANVAS_POINTER_SHAPE_CREATION_KINDS',
     )
+    expect(creationGrammarFile.source).toContain(
+      'CANVAS_POINTER_TEXT_CREATION_KINDS',
+    )
     expect(creationStartFile.source).toContain(
       "from './CanvasPointerCreationGrammar'",
     )
@@ -1504,6 +1510,9 @@ describe('Canvas module boundaries', () => {
     )
     expect(creationStartFile.source).toContain(
       "from './CanvasPointerShapeCreation'",
+    )
+    expect(creationStartFile.source).toContain(
+      "from './CanvasPointerTextCreation'",
     )
     expect(creationPreviewFile.source).toContain(
       "from './CanvasPointerCreationGrammar'",
@@ -1537,6 +1546,9 @@ describe('Canvas module boundaries', () => {
     )
     expect(shapeCreationFile.source).toContain(
       'CANVAS_POINTER_SHAPE_CREATION_DESCRIPTORS',
+    )
+    expect(textCreationFile.source).toContain(
+      'CANVAS_POINTER_TEXT_CREATION_KINDS',
     )
     expect(interactionPreviewFile.source).toContain(
       'isCanvasPointerCreationInteraction(interaction)',
@@ -1582,6 +1594,9 @@ describe('Canvas module boundaries', () => {
       expect(creationPreviewFile.source).not.toContain(customKindCheck)
       expect(creationCommitFile.source).not.toContain(customKindCheck)
     }
+    expect(creationStartFile.source).not.toContain(
+      "pointerGesture === 'create-text'",
+    )
   })
 
   it('keeps pointer interaction preview rules behind a named module', () => {
@@ -1698,6 +1713,9 @@ describe('Canvas module boundaries', () => {
     const shapeCreationFile = getSourceFile(
       'src/canvas/app/pointer/CanvasPointerShapeCreation.ts',
     )
+    const textCreationFile = getSourceFile(
+      'src/canvas/app/pointer/CanvasPointerTextCreation.ts',
+    )
 
     expect(downHandlersFile.source).toContain(
       "from './CanvasPointerInteractionStart'",
@@ -1746,7 +1764,6 @@ describe('Canvas module boundaries', () => {
     expect(creationStartFile.source).toContain(
       'export function startCanvasPointerCreation',
     )
-    expect(creationStartFile.source).toContain('createCanvasText')
     expect(creationStartFile.source).toContain(
       "from './CanvasPointerDrawingCreation'",
     )
@@ -1756,6 +1773,10 @@ describe('Canvas module boundaries', () => {
     expect(creationStartFile.source).toContain(
       "from './CanvasPointerShapeCreation'",
     )
+    expect(creationStartFile.source).toContain(
+      "from './CanvasPointerTextCreation'",
+    )
+    expect(creationStartFile.source).not.toContain('createCanvasText')
     expect(creationStartFile.source).not.toContain('createCanvasDraftStroke')
     expect(drawingCreationFile.source).toContain('createCanvasDraftStroke')
     expect(creationStartFile.source).not.toContain('normalizeBounds')
@@ -1766,6 +1787,7 @@ describe('Canvas module boundaries', () => {
       'getCanvasAppCustomCreationTool',
     )
     expect(shapeCreationFile.source).toContain('normalizeBounds')
+    expect(textCreationFile.source).toContain('createCanvasText')
   })
 
   it('keeps pointer interaction start effects behind a named module', () => {

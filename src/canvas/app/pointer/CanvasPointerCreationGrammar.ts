@@ -9,12 +9,15 @@ import {
 import {
   CANVAS_POINTER_SHAPE_CREATION_KINDS,
 } from './CanvasPointerShapeCreation'
+import {
+  CANVAS_POINTER_TEXT_CREATION_KINDS,
+} from './CanvasPointerTextCreation'
 
 const CANVAS_POINTER_CREATION_GESTURES = [
-  'create-text',
   ...CANVAS_POINTER_CUSTOM_CREATION_KINDS,
   ...CANVAS_POINTER_DRAWING_CREATION_KINDS,
   ...CANVAS_POINTER_SHAPE_CREATION_KINDS,
+  ...CANVAS_POINTER_TEXT_CREATION_KINDS,
 ] as const satisfies readonly CanvasPointerGesture[]
 
 const CANVAS_POINTER_CREATION_INTERACTION_KINDS = [

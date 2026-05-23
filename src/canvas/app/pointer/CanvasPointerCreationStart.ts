@@ -6,7 +6,6 @@ import type {
   Tool,
 } from '../../entities'
 import {
-  createCanvasText,
   type CanvasAffordanceConfig,
   type CanvasCreationAdapter,
   type CanvasDraftArrowOverlay,
@@ -28,6 +27,9 @@ import {
 import {
   startCanvasPointerShapeCreation,
 } from './CanvasPointerShapeCreation'
+import {
+  startCanvasPointerTextCreation,
+} from './CanvasPointerTextCreation'
 
 export type CanvasPointerCreationStartResult =
   | { kind: 'none' }
@@ -111,23 +113,16 @@ export function startCanvasPointerCreation({
     return customStart
   }
 
-  if (pointerGesture === 'create-text') {
-    if (!config.gestures.createText) {
-      return { kind: 'none' }
-    }
+  const textStart = startCanvasPointerTextCreation({
+    config,
+    creationAdapter,
+    createId,
+    pointerGesture,
+    startWorld,
+  })
 
-    const created = createCanvasText({
-      adapter: creationAdapter,
-      createId,
-      point: startWorld,
-    })
-
-    return {
-      kind: 'created-text',
-      capturePointer: false,
-      edit: { id: created.item.id, value: created.editValue },
-      item: created.item,
-    }
+  if (textStart) {
+    return textStart
   }
 
   return { kind: 'none' }
