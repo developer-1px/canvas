@@ -212,7 +212,13 @@ function getCanvasAppCustomItemModuleCreationTools({
   return customCreationTools.map((tool) => ({
     ...tool,
     createItem: (context) => {
-      const item = tool.createItem(context)
+      let item: CanvasAppCustomItemModuleCreationItem | null
+
+      try {
+        item = tool.createItem(context)
+      } catch {
+        return null
+      }
 
       if (!item) {
         return null
@@ -273,10 +279,17 @@ function getCanvasAppCustomItemModuleValidator({
   presentation,
   validateItem,
 }: Pick<CanvasAppCustomItemModule, 'id' | 'presentation' | 'validateItem'>) {
-  return (item: Parameters<CanvasCustomItemValidator>[0]) =>
-    item.kind === id &&
-    item.presentation === presentation &&
-    validateItem(item)
+  return (item: Parameters<CanvasCustomItemValidator>[0]) => {
+    if (item.kind !== id || item.presentation !== presentation) {
+      return false
+    }
+
+    try {
+      return validateItem(item)
+    } catch {
+      return false
+    }
+  }
 }
 
 function assertUniqueModuleIds(modules: readonly CanvasAppCustomItemModule[]) {

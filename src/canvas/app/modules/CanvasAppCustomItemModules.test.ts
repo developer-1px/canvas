@@ -214,6 +214,18 @@ describe('CanvasAppCustomItemModules', () => {
   })
 
   it('contains invalid module-owned creation output before commit', () => {
+    const throwingCreationModule = defineRiskModule({
+      customCreationTools: [
+        {
+          id: 'risk',
+          label: '!',
+          title: 'Risk',
+          createItem: () => {
+            throw new Error('bad custom creation')
+          },
+        },
+      ],
+    })
     const invalidJsonModule = defineRiskModule({
       customCreationTools: [
         {
@@ -259,6 +271,10 @@ describe('CanvasAppCustomItemModules', () => {
     }
 
     expect(
+      createCanvasAppCustomItemModuleAssembly([throwingCreationModule])
+        .customCreationTools[0]?.createItem(context),
+    ).toBeNull()
+    expect(
       createCanvasAppCustomItemModuleAssembly([invalidJsonModule])
         .customCreationTools[0]?.createItem(context),
     ).toBeNull()
@@ -266,6 +282,19 @@ describe('CanvasAppCustomItemModules', () => {
       createCanvasAppCustomItemModuleAssembly([invalidDomainModule])
         .customCreationTools[0]?.createItem(context),
     ).toBeNull()
+  })
+
+  it('contains module-owned validator failures as invalid items', () => {
+    const throwingValidatorModule = defineRiskModule({
+      validateItem: () => {
+        throw new Error('bad custom validator')
+      },
+    })
+
+    expect(
+      createCanvasAppCustomItemModuleAssembly([throwingValidatorModule])
+        .customItemValidators.risk(createRiskItem()),
+    ).toBe(false)
   })
 })
 
