@@ -6,7 +6,6 @@ import {
   CanvasEngine,
   CanvasHost,
   CanvasRenderer,
-  assertCanvasAffordanceConfig,
   createCanvasAppAssembly,
   defineCanvasAppCustomItemModule,
   type CanvasAppAssemblySource,
@@ -165,7 +164,24 @@ describe('Canvas package consumer imports', () => {
   it('keeps package subpaths usable as public facades', () => {
     expect(CanvasApp).toBeTypeOf('function')
     expect('useCanvasAppModel' in CanvasPackage).toBe(false)
+    expect('DEFAULT_CANVAS_APP_ASSEMBLY' in CanvasPackage).toBe(false)
+    expect('assertCanvasAppAssembly' in CanvasPackage).toBe(false)
+    expect('assertCanvasAppExtensionRecordKeys' in CanvasPackage).toBe(false)
+    expect('createCanvasAppCustomItemModuleAssembly' in CanvasPackage).toBe(
+      false,
+    )
+    expect('assertCanvasAffordanceConfig' in CanvasPackage).toBe(false)
+    expect('createCanvasComponentLibrary' in CanvasPackage).toBe(false)
+    expect('CanvasSvgStage' in CanvasPackage).toBe(false)
+    expect('isCanvasCustomToolId' in CanvasPackage).toBe(false)
     expect(CanvasAppFacade.useCanvasAppModel).toBeTypeOf('function')
+    expect(CanvasAppFacade.DEFAULT_CANVAS_APP_ASSEMBLY).toBeTypeOf('object')
+    expect(CanvasAppFacade.assertCanvasAppAssembly).toBeTypeOf('function')
+    expect(CanvasAppFacade.assertCanvasAppExtensionRecordKeys).toBeTypeOf(
+      'function',
+    )
+    expect(CanvasAppFacade.createCanvasAppCustomItemModuleAssembly)
+      .toBeTypeOf('function')
     expect(CanvasSvgStage).toBe(CanvasRenderer.CanvasSvgStage)
     expect(normalizeBounds({ x: 10, y: 20 }, { x: 2, y: 4 })).toEqual({
       h: 16,
@@ -177,9 +193,6 @@ describe('Canvas package consumer imports', () => {
       .toEqual(normalizeBounds({ x: 10, y: 20 }, { x: 2, y: 4 }))
     const affordanceConfig = createCanvasAffordanceConfig()
     expect(affordanceConfig.tools.select).toBe(true)
-    expect(assertCanvasAffordanceConfig(affordanceConfig)).toBe(
-      affordanceConfig,
-    )
     expect(assertCanvasAffordanceConfigFromEngine(affordanceConfig)).toBe(
       affordanceConfig,
     )

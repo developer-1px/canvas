@@ -374,6 +374,38 @@ describe('Canvas module boundaries', () => {
     )
     expect(appFacadeFile.source).toContain('useCanvasAppModel')
     expect(packageFacadeFile.source).not.toContain('useCanvasAppModel')
+    expect(appFacadeFile.source).toContain('DEFAULT_CANVAS_APP_ASSEMBLY')
+    expect(packageFacadeFile.source).not.toContain(
+      'DEFAULT_CANVAS_APP_ASSEMBLY',
+    )
+    expect(appFacadeFile.source).toContain('assertCanvasAppAssembly')
+    expect(packageFacadeFile.source).not.toContain('assertCanvasAppAssembly')
+    expect(appFacadeFile.source).toContain(
+      'assertCanvasAppExtensionRecordKeys',
+    )
+    expect(packageFacadeFile.source).not.toContain(
+      'assertCanvasAppExtensionRecordKeys',
+    )
+    expect(appFacadeFile.source).toContain(
+      'createCanvasAppCustomItemModuleAssembly',
+    )
+    expect(packageFacadeFile.source).not.toContain(
+      'createCanvasAppCustomItemModuleAssembly',
+    )
+    expect(packageFacadeFile.source).not.toContain(
+      'CanvasAppCustomItemModuleAssembly',
+    )
+    for (const flatLayerExport of [
+      'CANVAS_COMPONENT_LIBRARY',
+      'createCanvasComponentLibrary',
+      'CANVAS_COMMAND_AFFORDANCES',
+      'createCanvasAffordanceConfig',
+      'assertCanvasAffordanceConfig',
+      'isCanvasCustomToolId',
+      'CanvasSvgStage',
+    ]) {
+      expect(packageFacadeFile.source).not.toContain(flatLayerExport)
+    }
   })
 
   it('keeps Core bounds resize rules behind a named module', () => {
