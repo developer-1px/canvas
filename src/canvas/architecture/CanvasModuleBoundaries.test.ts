@@ -2426,6 +2426,9 @@ describe('Canvas module boundaries', () => {
     const toolShortcutFile = getSourceFile(
       'src/canvas/app/keyboard/CanvasKeyboardToolShortcuts.ts',
     )
+    const toolShortcutCatalogFile = getSourceFile(
+      'src/canvas/app/keyboard/CanvasKeyboardToolShortcutCatalog.ts',
+    )
     const reservedShortcutFile = getSourceFile(
       'src/canvas/app/keyboard/CanvasKeyboardReservedShortcuts.ts',
     )
@@ -2703,13 +2706,39 @@ describe('Canvas module boundaries', () => {
     expect(toolShortcutFile.source).toContain(
       'export function getCanvasKeyboardReservedToolShortcuts',
     )
-    expect(toolShortcutFile.source).toContain('CANVAS_TOOL_AFFORDANCES')
-    expect(toolShortcutFile.source).toContain('CANVAS_TOOL_AFFORDANCE_ORDER')
+    expect(toolShortcutFile.source).toContain(
+      "from './CanvasKeyboardToolShortcutCatalog'",
+    )
+    expect(toolShortcutFile.source).not.toContain('CANVAS_TOOL_AFFORDANCES')
+    expect(toolShortcutFile.source).not.toContain('CANVAS_TOOL_AFFORDANCE_ORDER')
     expect(toolShortcutFile.source).not.toContain("shortcutId: 'selectTool'")
     expect(toolShortcutFile.source).not.toContain("shortcutId: 'markerTool'")
     expect(toolShortcutFile.source).not.toContain("tool: 'select'")
     expect(toolShortcutFile.source).not.toContain("key: 'v'")
     expect(toolShortcutFile.source).not.toContain("key: 'm'")
+    expect(toolShortcutCatalogFile.source).toContain(
+      'CANVAS_TOOL_AFFORDANCES',
+    )
+    expect(toolShortcutCatalogFile.source).toContain(
+      'CANVAS_TOOL_AFFORDANCE_ORDER',
+    )
+    expect(toolShortcutCatalogFile.source).toContain(
+      'CANVAS_TOOL_AFFORDANCE_ORDER.map',
+    )
+    expect(toolShortcutCatalogFile.source).toContain(
+      'keyboardShortcut.shortcutId',
+    )
+    expect(toolShortcutCatalogFile.source).toContain(
+      'affordance.ariaLabel.toLowerCase()',
+    )
+    expect(toolShortcutCatalogFile.source).not.toContain(
+      "shortcutId: 'selectTool'",
+    )
+    expect(toolShortcutCatalogFile.source).not.toContain("tool: 'select'")
+    expect(toolShortcutCatalogFile.source).not.toContain("key: 'v'")
+    expect(toolShortcutCatalogFile.source).not.toContain(
+      "kind: 'set-tool'",
+    )
     expect(reservedShortcutFile.source).toContain(
       'export function getCanvasKeyboardReservedShortcuts',
     )
