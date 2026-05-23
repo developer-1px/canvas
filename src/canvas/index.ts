@@ -38,7 +38,7 @@ export {
   type CanvasAppStageRenderInput,
   type CanvasAppCustomItemRendererStrategy,
   type CanvasAppCustomItemRenderers,
-} from './app'
+} from './app/authoring'
 export type {
   ArrowItem,
   Bounds,

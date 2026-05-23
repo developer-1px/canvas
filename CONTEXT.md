@@ -291,6 +291,7 @@
 - package manifest는 `canvas`, `canvas/app`, `canvas/app/authoring`, `canvas/core`, `canvas/engine`, `canvas/entities`, `canvas/host`, `canvas/renderer` export만 열고 각 export는 public facade `index.ts`를 가리킨다.
 - package public entry는 package manifest의 layer facade만 알고 app 내부 submodule을 직접 export target으로 삼지 않는다.
 - package public entry는 App Shell 조립과 descriptor authoring contract를 열고, layer별 세부 기능은 flat re-export가 아니라 `CanvasEngine`, `CanvasHost`, `CanvasRenderer`, `CanvasCore` namespace 또는 package subpath에서만 연다.
+- package public entry는 App Shell과 App props/source만 `canvas/app` facade에서 가져오고, descriptor authoring contract는 `canvas/app/authoring` facade에서 가져온다.
 - package public entry는 `useCanvasAppModel`, `DEFAULT_CANVAS_APP_ASSEMBLY`, `assertCanvasAppAssembly`, `createCanvasAppCustomItemModuleAssembly` 같은 App runtime how를 `canvas/app` subpath에서만 연다.
 - Canvas App Public Facade는 descriptor authoring contract를 Canvas App Authoring Facade에서 재노출하고, runtime hook/default/validator는 workflow public entry에서만 재노출한다.
 - `canvas/app/authoring` subpath는 descriptor what만 열고 `useCanvasAppModel`, default assembly, assertion, custom module assembly output 같은 runtime how를 열지 않는다.

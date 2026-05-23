@@ -352,6 +352,7 @@ describe('Canvas module boundaries', () => {
         reference.target.startsWith('src/canvas/') &&
         ![
           'src/canvas/app',
+          'src/canvas/app/authoring',
           'src/canvas/core',
           'src/canvas/engine',
           'src/canvas/entities',
@@ -365,11 +366,20 @@ describe('Canvas module boundaries', () => {
 
   it('keeps the canvas package public entry on authoring contracts, not workflow hooks', () => {
     const appFacadeFile = getSourceFile('src/canvas/app/index.ts')
+    const authoringFacadeFile = getSourceFile(
+      'src/canvas/app/authoring/index.ts',
+    )
     const packageFacadeFile = getSourceFile('src/canvas/index.ts')
 
+    expect(packageFacadeFile.source).toContain("from './app/authoring'")
+    expect(packageFacadeFile.source).toContain("from './app'")
     expect(packageFacadeFile.source).toContain('CanvasAppAssemblySource')
     expect(packageFacadeFile.source).toContain('createCanvasAppAssembly')
     expect(packageFacadeFile.source).toContain(
+      'defineCanvasAppCustomItemModule',
+    )
+    expect(authoringFacadeFile.source).toContain('createCanvasAppAssembly')
+    expect(authoringFacadeFile.source).toContain(
       'defineCanvasAppCustomItemModule',
     )
     expect(appFacadeFile.source).toContain('useCanvasAppModel')
