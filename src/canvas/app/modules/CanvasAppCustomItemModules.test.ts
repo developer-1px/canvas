@@ -115,6 +115,25 @@ describe('CanvasAppCustomItemModules', () => {
     ).toThrow('Duplicate canvas custom item module: risk')
   })
 
+  it('rejects module ids outside the app extension id contract', () => {
+    expect(() =>
+      defineCanvasAppCustomItemModule({ id: 'Risk Module' }),
+    ).toThrow('Invalid canvas app custom item module id: Risk Module')
+  })
+
+  it('rejects module-owned registry keys outside the app extension id contract', () => {
+    expect(() =>
+      createCanvasAppCustomItemModuleAssembly([
+        {
+          id: 'risk',
+          customItemRenderers: {
+            'Risk Node': () => null,
+          },
+        },
+      ]),
+    ).toThrow('Invalid canvas app custom item renderer id: Risk Node')
+  })
+
   it('omits disabled modules from the assembled extension parts', () => {
     const module = defineCanvasAppCustomItemModule({
       id: 'risk',

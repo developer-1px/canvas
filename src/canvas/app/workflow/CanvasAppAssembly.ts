@@ -18,6 +18,10 @@ import {
   type CanvasDemoSvgCustomItemRenderers,
 } from '../rendering'
 import type { CanvasAppCustomCommand } from '../commands/CanvasAppCustomCommands'
+import {
+  assertCanvasAppExtensionEntries,
+  assertCanvasAppExtensionRecordKeys,
+} from '../extensions/CanvasAppExtensionIds'
 import type { CanvasAppInspectorPanel } from '../inspector/CanvasAppInspectorPanels'
 import {
   createCanvasAppCustomItemModuleAssembly,
@@ -25,7 +29,7 @@ import {
   type CanvasAppCustomItemModuleAssemblyOptions,
 } from '../modules/CanvasAppCustomItemModules'
 import {
-  assertCanvasAppCustomCreationToolShortcuts,
+  assertCanvasAppCustomCreationTools,
   type CanvasAppCustomCreationTool,
 } from '../tools/CanvasAppCustomCreationTools'
 
@@ -123,7 +127,11 @@ export function createCanvasAppAssembly(
     itemAdapters: input.itemAdapters ?? DEFAULT_CANVAS_APP_ASSEMBLY.itemAdapters,
   }
 
-  assertCanvasAppCustomCreationToolShortcuts(assembly.customCreationTools)
+  assertCanvasAppExtensionRecordKeys({
+    entries: assembly.componentPresentationRenderers,
+    label: 'component presentation renderer',
+  })
+  assertCanvasAppCustomCreationTools(assembly.customCreationTools)
 
   return assembly
 }
@@ -137,6 +145,15 @@ function appendUniqueById<TEntry extends { id: string }>({
   entries: readonly TEntry[]
   label: string
 }) {
+  assertCanvasAppExtensionEntries({
+    entries: current,
+    label,
+  })
+  assertCanvasAppExtensionEntries({
+    entries,
+    label,
+  })
+
   const ids = new Set(current.map((entry) => entry.id))
 
   for (const entry of entries) {
@@ -159,6 +176,15 @@ function mergeUniqueRecord<TValue>({
   entries: Readonly<Record<string, TValue>>
   label: string
 }) {
+  assertCanvasAppExtensionRecordKeys({
+    entries: current,
+    label,
+  })
+  assertCanvasAppExtensionRecordKeys({
+    entries,
+    label,
+  })
+
   for (const key of Object.keys(entries)) {
     if (Object.hasOwn(current, key)) {
       throw new Error(`Duplicate canvas app assembly ${label}: ${key}`)

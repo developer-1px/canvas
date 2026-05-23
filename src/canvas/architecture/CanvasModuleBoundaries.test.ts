@@ -17,10 +17,22 @@ const modules = import.meta.glob('../**/*.{ts,tsx,css}', {
   query: '?raw',
 }) as Record<string, string>
 
-const sourceFiles = Object.entries(modules).map(([path, source]) => ({
-  path: path.replace(/^\.\.\//, 'src/canvas/'),
-  source,
-}))
+const demoModules = import.meta.glob('../../demo/**/*.{ts,tsx,css}', {
+  eager: true,
+  import: 'default',
+  query: '?raw',
+}) as Record<string, string>
+
+const sourceFiles = [
+  ...Object.entries(modules).map(([path, source]) => ({
+    path: path.replace(/^\.\.\//, 'src/canvas/'),
+    source,
+  })),
+  ...Object.entries(demoModules).map(([path, source]) => ({
+    path: path.replace(/^\.\.\/\.\.\/demo\//, 'src/demo/'),
+    source,
+  })),
+]
 
 describe('Canvas module boundaries', () => {
   it('keeps stable entities independent from implementation layers', () => {
@@ -108,6 +120,18 @@ describe('Canvas module boundaries', () => {
       )
       .flatMap((file) =>
         productCustomTerms.test(file.source) ? [file.path] : [],
+      )
+
+    expect(violations).toEqual([])
+  })
+
+  it('keeps demo custom item modules behind the app workflow public entry', () => {
+    const violations = sourceFiles
+      .filter((file) => file.path.startsWith('src/demo/'))
+      .flatMap(getImportReferences)
+      .filter((reference) =>
+        reference.target.startsWith('src/canvas/app/') &&
+        reference.target !== 'src/canvas/app/workflow',
       )
 
     expect(violations).toEqual([])

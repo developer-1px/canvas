@@ -1,9 +1,14 @@
 import type { CanvasCustomItemValidators } from '../../host'
 import type { CanvasAppCustomCommand } from '../commands/CanvasAppCustomCommands'
+import {
+  assertCanvasAppExtensionEntries,
+  assertCanvasAppExtensionId,
+  assertCanvasAppExtensionRecordKeys,
+} from '../extensions/CanvasAppExtensionIds'
 import type { CanvasAppInspectorPanel } from '../inspector/CanvasAppInspectorPanels'
 import type { CanvasDemoSvgCustomItemRenderers } from '../rendering'
 import {
-  assertCanvasAppCustomCreationToolShortcuts,
+  assertCanvasAppCustomCreationTools,
   type CanvasAppCustomCreationTool,
 } from '../tools/CanvasAppCustomCreationTools'
 
@@ -31,6 +36,8 @@ export type CanvasAppCustomItemModuleAssemblyOptions = {
 export function defineCanvasAppCustomItemModule(
   module: CanvasAppCustomItemModule,
 ) {
+  assertCanvasAppCustomItemModuleContracts(module)
+
   return module
 }
 
@@ -38,6 +45,17 @@ export function createCanvasAppCustomItemModuleAssembly(
   modules: readonly CanvasAppCustomItemModule[] = [],
   options: CanvasAppCustomItemModuleAssemblyOptions = {},
 ): CanvasAppCustomItemModuleAssembly {
+  for (const module of modules) {
+    assertCanvasAppCustomItemModuleContracts(module)
+  }
+
+  for (const disabledModuleId of options.disabledModuleIds ?? []) {
+    assertCanvasAppExtensionId({
+      id: disabledModuleId,
+      label: 'disabled custom item module',
+    })
+  }
+
   assertUniqueModuleIds(modules)
   assertKnownDisabledModuleIds(modules, options.disabledModuleIds ?? [])
   const disabledModuleIds = new Set(options.disabledModuleIds ?? [])
@@ -82,9 +100,35 @@ export function createCanvasAppCustomItemModuleAssembly(
     },
   )
 
-  assertCanvasAppCustomCreationToolShortcuts(assembly.customCreationTools)
+  assertCanvasAppCustomCreationTools(assembly.customCreationTools)
 
   return assembly
+}
+
+function assertCanvasAppCustomItemModuleContracts(
+  module: CanvasAppCustomItemModule,
+) {
+  assertCanvasAppExtensionId({
+    id: module.id,
+    label: 'custom item module',
+  })
+  assertCanvasAppExtensionEntries({
+    entries: module.customCommands ?? [],
+    label: 'custom command',
+  })
+  assertCanvasAppCustomCreationTools(module.customCreationTools ?? [])
+  assertCanvasAppExtensionRecordKeys({
+    entries: module.customItemRenderers ?? {},
+    label: 'custom item renderer',
+  })
+  assertCanvasAppExtensionRecordKeys({
+    entries: module.customItemValidators ?? {},
+    label: 'custom item validator',
+  })
+  assertCanvasAppExtensionEntries({
+    entries: module.inspectorPanels ?? [],
+    label: 'inspector panel',
+  })
 }
 
 function assertUniqueModuleIds(modules: readonly CanvasAppCustomItemModule[]) {
@@ -121,6 +165,15 @@ function appendUniqueById<TEntry extends { id: string }>({
   entries: readonly TEntry[]
   label: string
 }) {
+  assertCanvasAppExtensionEntries({
+    entries: current,
+    label,
+  })
+  assertCanvasAppExtensionEntries({
+    entries,
+    label,
+  })
+
   const ids = new Set(current.map((entry) => entry.id))
 
   for (const entry of entries) {
@@ -143,6 +196,15 @@ function mergeUniqueRecord<TValue>({
   entries: Readonly<Record<string, TValue>>
   label: string
 }) {
+  assertCanvasAppExtensionRecordKeys({
+    entries: current,
+    label,
+  })
+  assertCanvasAppExtensionRecordKeys({
+    entries,
+    label,
+  })
+
   for (const key of Object.keys(entries)) {
     if (Object.hasOwn(current, key)) {
       throw new Error(`Duplicate canvas custom item module ${label}: ${key}`)

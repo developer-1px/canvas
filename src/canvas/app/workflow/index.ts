@@ -34,3 +34,9 @@ export {
   type CanvasDemoSvgCustomItemRendererStrategy,
   type CanvasDemoSvgCustomItemRenderers,
 } from '../rendering'
+export {
+  assertCanvasAppExtensionId,
+  assertCanvasAppExtensionRecordKeys,
+  isCanvasAppExtensionId,
+  type CanvasAppExtensionId,
+} from '../extensions/CanvasAppExtensionIds'

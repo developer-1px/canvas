@@ -3,6 +3,10 @@ import type {
   CanvasItem,
   Point,
 } from '../../entities'
+import {
+  assertCanvasAppExtensionEntries,
+  assertCanvasAppExtensionId,
+} from '../extensions/CanvasAppExtensionIds'
 
 export type CanvasAppCustomToolShortcut = {
   key: string
@@ -35,29 +39,63 @@ export type CanvasAppCustomCreationToolState = {
   title: string
 }
 
+type ReservedCanvasAppCustomToolShortcut = {
+  label: string
+  shortcut: CanvasAppCustomToolShortcut
+}
+
+type CanvasAppCustomToolShortcutReservationOptions = {
+  shiftInsensitive?: boolean
+}
+
 const RESERVED_CANVAS_APP_CUSTOM_TOOL_SHORTCUTS = [
-  { label: 'select tool', shortcut: { key: 'v' } },
-  { label: 'pan tool', shortcut: { key: 'h' } },
-  { label: 'rectangle tool', shortcut: { key: 'r' } },
-  { label: 'text tool', shortcut: { key: 't' } },
+  ...reserveCanvasAppCustomToolShortcut('select tool', { key: 'v' }, {
+    shiftInsensitive: true,
+  }),
+  ...reserveCanvasAppCustomToolShortcut('pan tool', { key: 'h' }, {
+    shiftInsensitive: true,
+  }),
+  ...reserveCanvasAppCustomToolShortcut('rectangle tool', { key: 'r' }, {
+    shiftInsensitive: true,
+  }),
+  ...reserveCanvasAppCustomToolShortcut('text tool', { key: 't' }, {
+    shiftInsensitive: true,
+  }),
   { label: 'marker tool', shortcut: { key: 'm' } },
   { label: 'highlighter tool', shortcut: { key: 'm', shiftKey: true } },
-  { label: 'arrow tool', shortcut: { key: 'l' } },
+  ...reserveCanvasAppCustomToolShortcut('arrow tool', { key: 'l' }, {
+    shiftInsensitive: true,
+  }),
+  ...reserveCanvasAppCustomToolShortcut('temporary pan', { key: 'Space' }, {
+    shiftInsensitive: true,
+  }),
   { label: 'fit all', shortcut: { key: '0' } },
   { label: 'fit selection', shortcut: { key: '1' } },
-  { label: 'escape', shortcut: { key: 'Escape' } },
-  { label: 'delete', shortcut: { key: 'Delete' } },
-  { label: 'delete', shortcut: { key: 'Backspace' } },
+  ...reserveCanvasAppCustomToolShortcut('escape', { key: 'Escape' }, {
+    shiftInsensitive: true,
+  }),
+  ...reserveCanvasAppCustomToolShortcut('delete', { key: 'Delete' }, {
+    shiftInsensitive: true,
+  }),
+  ...reserveCanvasAppCustomToolShortcut('delete', { key: 'Backspace' }, {
+    shiftInsensitive: true,
+  }),
   { label: 'nudge left', shortcut: { key: 'ArrowLeft' } },
   { label: 'nudge right', shortcut: { key: 'ArrowRight' } },
   { label: 'nudge up', shortcut: { key: 'ArrowUp' } },
   { label: 'nudge down', shortcut: { key: 'ArrowDown' } },
-] satisfies readonly {
-  label: string
-  shortcut: CanvasAppCustomToolShortcut
-}[]
+  { label: 'large nudge left', shortcut: { key: 'ArrowLeft', shiftKey: true } },
+  { label: 'large nudge right', shortcut: { key: 'ArrowRight', shiftKey: true } },
+  { label: 'large nudge up', shortcut: { key: 'ArrowUp', shiftKey: true } },
+  { label: 'large nudge down', shortcut: { key: 'ArrowDown', shiftKey: true } },
+] satisfies readonly ReservedCanvasAppCustomToolShortcut[]
 
 export function getCanvasAppCustomToolId(id: string): CanvasCustomToolId {
+  assertCanvasAppExtensionId({
+    id,
+    label: 'custom creation tool',
+  })
+
   return `custom:${id}`
 }
 
@@ -97,7 +135,8 @@ export function matchesCanvasAppCustomToolShortcut({
   shortcut: CanvasAppCustomToolShortcut
 }) {
   return (
-    event.key.toLowerCase() === shortcut.key.toLowerCase() &&
+    normalizeCanvasAppCustomToolShortcutKey(event.key).toLowerCase() ===
+      normalizeCanvasAppCustomToolShortcutKey(shortcut.key).toLowerCase() &&
     event.shiftKey === (shortcut.shiftKey ?? false)
   )
 }
@@ -139,16 +178,65 @@ export function assertCanvasAppCustomCreationToolShortcuts(
   }
 }
 
+export function assertCanvasAppCustomCreationTools(
+  tools: readonly CanvasAppCustomCreationTool[],
+) {
+  assertCanvasAppExtensionEntries({
+    entries: tools,
+    label: 'custom creation tool',
+  })
+  assertCanvasAppCustomCreationToolShortcuts(tools)
+}
+
 export function getCanvasAppCustomToolShortcutKey(
   shortcut: CanvasAppCustomToolShortcut,
 ) {
-  return `${shortcut.shiftKey === true ? 'shift+' : ''}${shortcut.key.toLowerCase()}`
+  const key = normalizeCanvasAppCustomToolShortcutKey(
+    shortcut.key,
+  ).toLowerCase()
+
+  return `${shortcut.shiftKey === true ? 'shift+' : ''}${key}`
 }
 
 export function formatCanvasAppCustomToolShortcut(
   shortcut: CanvasAppCustomToolShortcut,
 ) {
-  return shortcut.shiftKey
-    ? `Shift+${shortcut.key.toUpperCase()}`
-    : shortcut.key.toUpperCase()
+  const key = formatCanvasAppCustomToolShortcutKey(shortcut.key)
+
+  return shortcut.shiftKey ? `Shift+${key}` : key
+}
+
+function reserveCanvasAppCustomToolShortcut(
+  label: string,
+  shortcut: CanvasAppCustomToolShortcut,
+  options: CanvasAppCustomToolShortcutReservationOptions = {},
+): ReservedCanvasAppCustomToolShortcut[] {
+  if (!options.shiftInsensitive) {
+    return [{ label, shortcut }]
+  }
+
+  return [
+    { label, shortcut },
+    { label, shortcut: { ...shortcut, shiftKey: true } },
+  ]
+}
+
+function normalizeCanvasAppCustomToolShortcutKey(key: string) {
+  return key === ' ' ? 'Space' : key
+}
+
+function formatCanvasAppCustomToolShortcutKey(key: string) {
+  const normalizedKey = normalizeCanvasAppCustomToolShortcutKey(key)
+
+  if (normalizedKey === 'Space') {
+    return 'Space'
+  }
+
+  if (normalizedKey.startsWith('Arrow')) {
+    return normalizedKey
+  }
+
+  return normalizedKey.length === 1
+    ? normalizedKey.toUpperCase()
+    : normalizedKey
 }

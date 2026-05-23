@@ -130,6 +130,41 @@ describe('CanvasAppAssembly', () => {
     ).toThrow('Duplicate canvas app assembly custom item validator: risk')
   })
 
+  it('rejects direct extension ids outside the app extension id contract', () => {
+    expect(() =>
+      createCanvasAppAssembly({
+        customCommands: [
+          {
+            id: 'Publish Risk',
+            label: 'Pub',
+            title: 'Publish risk',
+            run: () => undefined,
+          },
+        ],
+      }),
+    ).toThrow('Invalid canvas app custom command id: Publish Risk')
+  })
+
+  it('rejects direct registry keys outside the app extension id contract', () => {
+    expect(() =>
+      createCanvasAppAssembly({
+        customItemValidators: {
+          'Risk Item': () => true,
+        },
+      }),
+    ).toThrow('Invalid canvas app custom item validator id: Risk Item')
+  })
+
+  it('rejects direct component presentation renderer keys outside the app extension id contract', () => {
+    expect(() =>
+      createCanvasAppAssembly({
+        componentPresentationRenderers: {
+          'Risk Card': () => null,
+        },
+      }),
+    ).toThrow('Invalid canvas app component presentation renderer id: Risk Card')
+  })
+
   it('can disable custom item modules at the app assembly seam', () => {
     const riskModule = defineCanvasAppCustomItemModule({
       id: 'risk',

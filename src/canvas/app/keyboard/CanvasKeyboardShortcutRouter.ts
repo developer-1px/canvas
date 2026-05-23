@@ -363,8 +363,12 @@ export function handleCanvasKeyboardShortcut(
 
 function isTypingTarget(target: EventTarget | null) {
   return (
-    target instanceof HTMLInputElement ||
-    target instanceof HTMLTextAreaElement ||
-    (target instanceof HTMLElement && target.isContentEditable)
+    (typeof HTMLInputElement !== 'undefined' &&
+      target instanceof HTMLInputElement) ||
+    (typeof HTMLTextAreaElement !== 'undefined' &&
+      target instanceof HTMLTextAreaElement) ||
+    (typeof HTMLElement !== 'undefined' &&
+      target instanceof HTMLElement &&
+      target.isContentEditable)
   )
 }

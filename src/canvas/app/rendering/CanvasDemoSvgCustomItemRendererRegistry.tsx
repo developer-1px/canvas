@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import type { CanvasCustomItem } from '../../entities'
+import { assertCanvasAppExtensionRecordKeys } from '../extensions/CanvasAppExtensionIds'
 import { CanvasDemoSvgUnknownCustomItem } from './CanvasDemoSvgUnknownCustomItem'
 
 export type CanvasDemoSvgCustomItemRendererStrategy = (input: {
@@ -15,6 +16,11 @@ export const DEFAULT_CANVAS_DEMO_SVG_CUSTOM_ITEM_RENDERERS: CanvasDemoSvgCustomI
 export function createCanvasDemoSvgCustomItemRenderers(
   extensions: CanvasDemoSvgCustomItemRenderers = {},
 ): CanvasDemoSvgCustomItemRenderers {
+  assertCanvasAppExtensionRecordKeys({
+    entries: extensions,
+    label: 'custom item renderer',
+  })
+
   return { ...extensions }
 }
 

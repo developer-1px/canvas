@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  assertCanvasAppCustomCreationTools,
   assertCanvasAppCustomCreationToolShortcuts,
   getCanvasAppCustomCreationTool,
   getCanvasAppCustomCreationToolStates,
@@ -59,12 +60,19 @@ describe('CanvasAppCustomCreationTools', () => {
         shortcut: { key: 'e', shiftKey: true },
       }),
     ).toBe(false)
+    expect(
+      matchesCanvasAppCustomToolShortcut({
+        event: { key: ' ', shiftKey: false } as KeyboardEvent,
+        shortcut: { key: 'Space' },
+      }),
+    ).toBe(true)
   })
 
   it('normalizes custom tool shortcut keys', () => {
     expect(getCanvasAppCustomToolShortcutKey({ key: 'E', shiftKey: true }))
       .toBe('shift+e')
     expect(getCanvasAppCustomToolShortcutKey({ key: 'e' })).toBe('e')
+    expect(getCanvasAppCustomToolShortcutKey({ key: ' ' })).toBe('space')
   })
 
   it('rejects duplicate custom tool shortcuts', () => {
@@ -81,6 +89,19 @@ describe('CanvasAppCustomCreationTools', () => {
     )
   })
 
+  it('rejects custom creation tool ids outside the app extension id contract', () => {
+    expect(() =>
+      assertCanvasAppCustomCreationTools([
+        {
+          ...tool,
+          id: 'custom:risk',
+        },
+      ]),
+    ).toThrow(
+      'Invalid canvas app custom creation tool id: custom:risk',
+    )
+  })
+
   it('rejects built-in canvas shortcut conflicts', () => {
     expect(() =>
       assertCanvasAppCustomCreationToolShortcuts([
@@ -91,6 +112,43 @@ describe('CanvasAppCustomCreationTools', () => {
       ]),
     ).toThrow(
       'Canvas app custom creation tool shortcut conflicts with rectangle tool: risk uses R',
+    )
+  })
+
+  it('rejects shifted built-in shortcut conflicts consumed by the router', () => {
+    expect(() =>
+      assertCanvasAppCustomCreationToolShortcuts([
+        {
+          ...tool,
+          shortcut: { key: 'v', shiftKey: true },
+        },
+      ]),
+    ).toThrow(
+      'Canvas app custom creation tool shortcut conflicts with select tool: risk uses Shift+V',
+    )
+  })
+
+  it('rejects temporary pan and shifted nudge shortcut conflicts', () => {
+    expect(() =>
+      assertCanvasAppCustomCreationToolShortcuts([
+        {
+          ...tool,
+          shortcut: { key: 'Space' },
+        },
+      ]),
+    ).toThrow(
+      'Canvas app custom creation tool shortcut conflicts with temporary pan: risk uses Space',
+    )
+
+    expect(() =>
+      assertCanvasAppCustomCreationToolShortcuts([
+        {
+          ...tool,
+          shortcut: { key: 'ArrowLeft', shiftKey: true },
+        },
+      ]),
+    ).toThrow(
+      'Canvas app custom creation tool shortcut conflicts with large nudge left: risk uses Shift+ArrowLeft',
     )
   })
 })

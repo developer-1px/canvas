@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import type { CanvasComponentItem } from '../../entities'
+import { assertCanvasAppExtensionRecordKeys } from '../extensions/CanvasAppExtensionIds'
 import {
   CanvasDemoSvgConnectorComponent,
   CanvasDemoSvgVoteComponent,
@@ -41,6 +42,11 @@ export const DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS: CanvasDem
 export function createCanvasDemoSvgComponentPresentationRenderers(
   extensions: CanvasDemoSvgComponentPresentationRenderers = {},
 ): CanvasDemoSvgComponentPresentationRenderers {
+  assertCanvasAppExtensionRecordKeys({
+    entries: extensions,
+    label: 'component presentation renderer',
+  })
+
   return {
     ...DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS,
     ...extensions,
