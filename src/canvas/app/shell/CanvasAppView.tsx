@@ -7,10 +7,6 @@ import { CanvasTextEditor } from '../../ui/text/CanvasTextEditor'
 import { CanvasToolbar } from '../../ui/toolbar/CanvasToolbar'
 import { CanvasStatus } from '../../ui/status/CanvasStatus'
 import { ZoomControls } from '../../ui/zoom/ZoomControls'
-import type {
-  CanvasAffordanceConfig,
-  CanvasCommandAvailability,
-} from '../../engine'
 
 type StageProps = ComponentProps<typeof CanvasSvgStage>
 type ToolbarProps = ComponentProps<typeof CanvasToolbar>
@@ -18,187 +14,54 @@ type TextEditorProps = ComponentProps<typeof CanvasTextEditor>
 type FindReplaceProps = ComponentProps<typeof CanvasFindReplacePanel>
 type InspectorProps = ComponentProps<typeof CanvasObjectInspector>
 type PaletteProps = ComponentProps<typeof CanvasComponentPalette>
+type ZoomControlsProps = ComponentProps<typeof ZoomControls>
+type StatusProps = ComponentProps<typeof CanvasStatus>
+type VisibleProps<TProps> = TProps & {
+  visible: boolean
+}
 
 type CanvasAppViewProps = {
-  activeMode: StageProps['activeMode']
-  blurTextEditor: () => void
-  commandAvailability: CanvasCommandAvailability
   componentPalette: PaletteProps
-  config: CanvasAffordanceConfig
-  editing: TextEditorProps['editing']
-  editorRef: TextEditorProps['editorRef']
-  editorStyle: TextEditorProps['style']
-  fitToItems: (ids?: string[]) => void
   findReplace: FindReplaceProps
-  getComponentPresentation: StageProps['getComponentPresentation']
-  gesture: StageProps['gesture']
   inspector: InspectorProps
-  items: StageProps['items']
-  overlays: StageProps['overlays']
-  selected: StageProps['selected']
-  selection: string[]
-  svgRef: StageProps['svgRef']
-  tool: ToolbarProps['tool']
-  viewport: StageProps['viewport']
-  onAlign: ToolbarProps['onAlign']
-  onCancelTextEdit: TextEditorProps['onCancel']
-  onChangeEditing: TextEditorProps['onChange']
-  onCommitText: TextEditorProps['onCommit']
-  onDelete: ToolbarProps['onDelete']
-  onDistribute: ToolbarProps['onDistribute']
-  onDuplicate: ToolbarProps['onDuplicate']
-  onGroup: ToolbarProps['onGroup']
-  onItemPointerDown: StageProps['onItemPointerDown']
-  onLock: ToolbarProps['onLock']
-  onPointerCancel: StageProps['onPointerCancel']
-  onPointerDown: StageProps['onCanvasPointerDown']
-  onPointerMove: StageProps['onPointerMove']
-  onPointerUp: StageProps['onPointerUp']
-  onRedo: ToolbarProps['onRedo']
-  onResetViewport: () => void
-  onResizePointerDown: StageProps['onResizePointerDown']
-  onTextDoubleClick: StageProps['onTextDoubleClick']
-  onToolChange: ToolbarProps['onToolChange']
-  onUndo: ToolbarProps['onUndo']
-  onUngroup: ToolbarProps['onUngroup']
-  onUnlockAll: ToolbarProps['onUnlockAll']
-  onZoomBy: (multiplier: number) => void
+  stage: StageProps
+  status: VisibleProps<StatusProps>
+  textEditor: TextEditorProps
+  toolbar: VisibleProps<ToolbarProps>
+  zoomControls: VisibleProps<ZoomControlsProps>
 }
 
 export function CanvasAppView({
-  activeMode,
-  blurTextEditor,
-  commandAvailability,
   componentPalette,
-  config,
-  editing,
-  editorRef,
-  editorStyle,
-  fitToItems,
   findReplace,
-  getComponentPresentation,
-  gesture,
   inspector,
-  items,
-  overlays,
-  selected,
-  selection,
-  svgRef,
-  tool,
-  viewport,
-  onAlign,
-  onCancelTextEdit,
-  onChangeEditing,
-  onCommitText,
-  onDelete,
-  onDistribute,
-  onDuplicate,
-  onGroup,
-  onItemPointerDown,
-  onLock,
-  onPointerCancel,
-  onPointerDown,
-  onPointerMove,
-  onPointerUp,
-  onRedo,
-  onResetViewport,
-  onResizePointerDown,
-  onTextDoubleClick,
-  onToolChange,
-  onUndo,
-  onUngroup,
-  onUnlockAll,
-  onZoomBy,
+  stage,
+  status,
+  textEditor,
+  toolbar,
+  zoomControls,
 }: CanvasAppViewProps) {
+  const { visible: showToolbar, ...toolbarProps } = toolbar
+  const { visible: showZoomControls, ...zoomControlProps } = zoomControls
+  const { visible: showStatus, ...statusProps } = status
+
   return (
     <main className="canvas-app">
-      {config.overlays.toolbar ? (
-        <CanvasToolbar
-          canDelete={commandAvailability.delete}
-          canDuplicate={commandAvailability.duplicate}
-          canDistribute={selection.length > 2}
-          canGroup={commandAvailability.group}
-          canAlign={selection.length > 1}
-          canLock={commandAvailability.lockSelection}
-          canUngroup={commandAvailability.ungroup}
-          canRedo={commandAvailability.redo}
-          canUndo={commandAvailability.undo}
-          config={config}
-          tool={tool}
-          onDelete={onDelete}
-          onAlign={onAlign}
-          onDistribute={onDistribute}
-          onDuplicate={onDuplicate}
-          onGroup={onGroup}
-          onLock={onLock}
-          onRedo={onRedo}
-          onToolChange={onToolChange}
-          onUndo={onUndo}
-          onUngroup={onUngroup}
-          onUnlockAll={onUnlockAll}
-        />
-      ) : null}
+      {showToolbar ? <CanvasToolbar {...toolbarProps} /> : null}
 
       <CanvasComponentPalette {...componentPalette} />
 
       <CanvasFindReplacePanel {...findReplace} />
 
-      <CanvasSvgStage
-        activeMode={activeMode}
-        gesture={gesture}
-        getComponentPresentation={getComponentPresentation}
-        items={items}
-        overlays={overlays}
-        selected={selected}
-        svgRef={svgRef}
-        viewport={viewport}
-        onCanvasPointerDown={(event) => {
-          blurTextEditor()
-          onPointerDown(event)
-        }}
-        onContextMenu={(event) => event.preventDefault()}
-        onItemPointerDown={(event, itemId) => {
-          blurTextEditor()
-          onItemPointerDown(event, itemId)
-        }}
-        onPointerCancel={onPointerCancel}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        onResizePointerDown={onResizePointerDown}
-        onTextDoubleClick={onTextDoubleClick}
-      />
+      <CanvasSvgStage {...stage} />
 
-      <CanvasTextEditor
-        editing={editing}
-        editorRef={editorRef}
-        style={editorStyle}
-        onBlur={onCommitText}
-        onCancel={onCancelTextEdit}
-        onChange={onChangeEditing}
-        onCommit={onCommitText}
-      />
+      <CanvasTextEditor {...textEditor} />
 
-      {config.overlays.zoomControls ? (
-        <ZoomControls
-          config={config}
-          scale={viewport.scale}
-          onFit={() => fitToItems(selection.length > 0 ? selection : undefined)}
-          onReset={onResetViewport}
-          onZoomIn={() => onZoomBy(1.25)}
-          onZoomOut={() => onZoomBy(0.8)}
-        />
-      ) : null}
+      {showZoomControls ? <ZoomControls {...zoomControlProps} /> : null}
 
       <CanvasObjectInspector {...inspector} />
 
-      {config.overlays.status ? (
-        <CanvasStatus
-          gesture={gesture}
-          scale={viewport.scale}
-          selectionLength={selection.length}
-          tool={tool}
-        />
-      ) : null}
+      {showStatus ? <CanvasStatus {...statusProps} /> : null}
     </main>
   )
 }

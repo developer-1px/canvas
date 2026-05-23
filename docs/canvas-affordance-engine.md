@@ -29,7 +29,7 @@
 | `src/canvas/app/shell` | CanvasApp composition과 shell style |
 | `src/canvas/app/workflow` | React state와 engine/host/renderer wiring |
 | `src/canvas/app/workflow/index.ts` | App Shell이 사용하는 workflow public entry |
-| `src/canvas/app/workflow/useCanvasAppModel.ts` | command, pointer, keyboard, viewport, text editing wiring을 App Shell에 숨긴다 |
+| `src/canvas/app/workflow/useCanvasAppModel.ts` | command, pointer, keyboard, viewport, text editing wiring과 control별 view props 조립을 App Shell에 숨긴다 |
 | `src/canvas/app/workflow/CanvasWorkflowContract.ts` | App workflow hook들이 공유하는 document commit, selection, clipboard contract |
 | `src/canvas/app/workflow/useCanvasWorkspaceModel.ts` | 저장된 workspace snapshot, document history, viewport, read model, id 생성을 App Shell에 숨긴다 |
 | `src/canvas/app/geometry` | DOM/SVG pointer 좌표 변환 |
