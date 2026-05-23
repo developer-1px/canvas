@@ -8,10 +8,6 @@ import {
   type CanvasKeyboardReservedShortcut,
   type CanvasKeyboardShortcutChord,
 } from './CanvasKeyboardShortcutChords'
-import {
-  getCanvasKeyboardNudgeShortcutIntent,
-  getCanvasKeyboardReservedNudgeShortcuts,
-} from './CanvasKeyboardNudgeShortcuts'
 import type {
   CanvasKeyboardCommandShortcutIntent,
   CanvasKeyboardCommandShortcutIntentInput,
@@ -24,7 +20,6 @@ type CanvasKeyboardCommandShortcutDescriptor = {
   getIntent: (
     input: CanvasKeyboardCommandShortcutIntentInput,
   ) => CanvasKeyboardCommandShortcutIntent
-  keys?: readonly string[]
   label: string
   modifier?: 'mod'
   reserve?: boolean | { shiftInsensitive?: boolean }
@@ -33,7 +28,8 @@ type CanvasKeyboardCommandShortcutDescriptor = {
   shortcutId: CanvasShortcutId
 }
 
-const CANVAS_KEYBOARD_COMMAND_SHORTCUTS = [
+const CANVAS_KEYBOARD_COMMAND_SHORTCUTS:
+  readonly CanvasKeyboardCommandShortcutDescriptor[] = [
   {
     commandId: 'delete',
     getIntent: () => ({ kind: 'delete-selection', preventDefault: true }),
@@ -73,42 +69,6 @@ const CANVAS_KEYBOARD_COMMAND_SHORTCUTS = [
     shiftInsensitive: true,
     shortcut: { key: 'y' },
     shortcutId: 'redo',
-  },
-  {
-    commandId: 'zoomIn',
-    getIntent: () => ({
-      kind: 'zoom-by',
-      multiplier: 1.25,
-      preventDefault: true,
-    }),
-    keys: ['=', '+'],
-    label: 'zoom in',
-    modifier: 'mod',
-    shiftInsensitive: true,
-    shortcut: { key: '=' },
-    shortcutId: 'zoomIn',
-  },
-  {
-    commandId: 'zoomOut',
-    getIntent: () => ({
-      kind: 'zoom-by',
-      multiplier: 0.8,
-      preventDefault: true,
-    }),
-    label: 'zoom out',
-    modifier: 'mod',
-    shiftInsensitive: true,
-    shortcut: { key: '-' },
-    shortcutId: 'zoomOut',
-  },
-  {
-    commandId: 'zoomReset',
-    getIntent: () => ({ kind: 'reset-viewport', preventDefault: true }),
-    label: 'reset viewport',
-    modifier: 'mod',
-    shiftInsensitive: true,
-    shortcut: { key: '0' },
-    shortcutId: 'zoomReset',
   },
   {
     getIntent: () => ({ kind: 'copy-selection', preventDefault: true }),
@@ -230,29 +190,7 @@ const CANVAS_KEYBOARD_COMMAND_SHORTCUTS = [
     shortcut: { key: 'g', shiftKey: true },
     shortcutId: 'ungroup',
   },
-  {
-    commandId: 'fitView',
-    getIntent: () => ({ kind: 'fit-all', preventDefault: true }),
-    label: 'fit all',
-    reserve: true,
-    shiftInsensitive: true,
-    shortcut: { key: '0' },
-    shortcutId: 'fitAll',
-  },
-  {
-    commandId: 'fitView',
-    getIntent: ({ selection }) => ({
-      ids: selection.length > 0 ? [...selection] : undefined,
-      kind: 'fit-selection',
-      preventDefault: true,
-    }),
-    label: 'fit selection',
-    reserve: true,
-    shiftInsensitive: true,
-    shortcut: { key: '1' },
-    shortcutId: 'fitSelection',
-  },
-] satisfies readonly CanvasKeyboardCommandShortcutDescriptor[]
+]
 
 export function getCanvasKeyboardBuiltinCommandShortcutIntent(
   input: CanvasKeyboardCommandShortcutIntentInput,
@@ -261,26 +199,22 @@ export function getCanvasKeyboardBuiltinCommandShortcutIntent(
     isCanvasKeyboardCommandShortcutMatch(input, shortcut),
   )
 
-  return commandShortcut?.getIntent(input) ??
-    getCanvasKeyboardNudgeShortcutIntent(input)
+  return commandShortcut?.getIntent(input) ?? null
 }
 
 export function getCanvasKeyboardReservedCommandShortcuts():
   CanvasKeyboardReservedShortcut[] {
-  return [
-    ...CANVAS_KEYBOARD_COMMAND_SHORTCUTS.flatMap((shortcut) => {
-      if (!shortcut.reserve) {
-        return []
-      }
+  return CANVAS_KEYBOARD_COMMAND_SHORTCUTS.flatMap((shortcut) => {
+    if (!shortcut.reserve) {
+      return []
+    }
 
-      return reserveCanvasKeyboardShortcut(
-        shortcut.label,
-        shortcut.shortcut,
-        typeof shortcut.reserve === 'object' ? shortcut.reserve : {},
-      )
-    }),
-    ...getCanvasKeyboardReservedNudgeShortcuts(),
-  ]
+    return reserveCanvasKeyboardShortcut(
+      shortcut.label,
+      shortcut.shortcut,
+      typeof shortcut.reserve === 'object' ? shortcut.reserve : {},
+    )
+  })
 }
 
 function isCanvasKeyboardCommandShortcutMatch(
@@ -321,12 +255,8 @@ function isCanvasKeyboardShortcutKeyMatch(
   key: string,
   shortcut: CanvasKeyboardCommandShortcutDescriptor,
 ) {
-  const normalizedKey = normalizeCanvasKeyboardShortcutKey(key).toLowerCase()
-  const shortcutKeys = shortcut.keys ?? [shortcut.shortcut.key]
-
-  return shortcutKeys.some(
-    (shortcutKey) =>
-      normalizeCanvasKeyboardShortcutKey(shortcutKey).toLowerCase() ===
-      normalizedKey,
+  return (
+    normalizeCanvasKeyboardShortcutKey(key).toLowerCase() ===
+    normalizeCanvasKeyboardShortcutKey(shortcut.shortcut.key).toLowerCase()
   )
 }

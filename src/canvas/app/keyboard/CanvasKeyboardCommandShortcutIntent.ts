@@ -1,5 +1,7 @@
 import type { CanvasAffordanceConfig } from '../../engine'
 import { getCanvasKeyboardBuiltinCommandShortcutIntent } from './CanvasKeyboardCommandShortcuts'
+import { getCanvasKeyboardNudgeShortcutIntent } from './CanvasKeyboardNudgeShortcuts'
+import { getCanvasKeyboardViewportShortcutIntent } from './CanvasKeyboardViewportShortcuts'
 
 export type CanvasKeyboardReorderMode =
   | 'bringForward'
@@ -52,11 +54,15 @@ export function getCanvasKeyboardCommandShortcutIntent({
   selection,
 }: CanvasKeyboardCommandShortcutIntentInput):
   CanvasKeyboardCommandShortcutIntent | null {
-  return getCanvasKeyboardBuiltinCommandShortcutIntent({
+  const input = {
     config,
     event,
     key,
     mod,
     selection,
-  })
+  }
+
+  return getCanvasKeyboardBuiltinCommandShortcutIntent(input) ??
+    getCanvasKeyboardViewportShortcutIntent(input) ??
+    getCanvasKeyboardNudgeShortcutIntent(input)
 }

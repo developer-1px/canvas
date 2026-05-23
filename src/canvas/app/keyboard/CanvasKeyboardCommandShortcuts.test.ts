@@ -9,12 +9,11 @@ import type { CanvasKeyboardCommandShortcutIntentInput } from './CanvasKeyboardC
 describe('CanvasKeyboardCommandShortcuts', () => {
   it('resolves built-in command shortcuts from descriptors', () => {
     expect(getCanvasKeyboardBuiltinCommandShortcutIntent(createInput({
-      event: createKeyboardEvent({ key: '=', metaKey: true }),
-      key: '=',
+      event: createKeyboardEvent({ key: 'z', metaKey: true }),
+      key: 'z',
       mod: true,
     }))).toEqual({
-      kind: 'zoom-by',
-      multiplier: 1.25,
+      kind: 'undo-history',
       preventDefault: true,
     })
 
@@ -34,28 +33,11 @@ describe('CanvasKeyboardCommandShortcuts', () => {
     })
   })
 
-  it('keeps nudge ownership explicit even without selection', () => {
-    expect(getCanvasKeyboardBuiltinCommandShortcutIntent(createInput({
-      event: createKeyboardEvent({ key: 'ArrowLeft' }),
-      key: 'arrowleft',
-      selection: [],
-    }))).toEqual({
-      kind: 'none',
-      preventDefault: false,
-    })
-  })
-
   it('exports reserved command shortcuts for custom creation tool contracts', () => {
     expect(getCanvasKeyboardReservedCommandShortcuts()).toEqual(
       expect.arrayContaining([
-        { label: 'fit all', shortcut: { key: '0' } },
-        { label: 'fit selection', shortcut: { key: '1' } },
         { label: 'delete', shortcut: { key: 'Delete' } },
         { label: 'delete', shortcut: { key: 'Delete', shiftKey: true } },
-        {
-          label: 'large nudge left',
-          shortcut: { key: 'ArrowLeft', shiftKey: true },
-        },
       ]),
     )
   })
@@ -63,19 +45,10 @@ describe('CanvasKeyboardCommandShortcuts', () => {
   it('honors command shortcut feature toggles', () => {
     expect(getCanvasKeyboardBuiltinCommandShortcutIntent(createInput({
       config: createCanvasAffordanceConfig({
-        commands: { zoomIn: false },
+        commands: { delete: false },
       }),
-      event: createKeyboardEvent({ key: '=', metaKey: true }),
-      key: '=',
-      mod: true,
-    }))).toBeNull()
-
-    expect(getCanvasKeyboardBuiltinCommandShortcutIntent(createInput({
-      config: createCanvasAffordanceConfig({
-        shortcuts: { nudge: false },
-      }),
-      event: createKeyboardEvent({ key: 'ArrowLeft' }),
-      key: 'arrowleft',
+      event: createKeyboardEvent({ key: 'Delete' }),
+      key: 'delete',
     }))).toBeNull()
   })
 })

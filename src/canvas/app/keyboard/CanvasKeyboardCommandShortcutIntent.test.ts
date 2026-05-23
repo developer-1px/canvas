@@ -43,6 +43,17 @@ describe('CanvasKeyboardCommandShortcutIntent', () => {
     })
   })
 
+  it('maps viewport shortcuts through the command shortcut intent seam', () => {
+    expect(getCanvasKeyboardCommandShortcutIntent(createInput({
+      event: createKeyboardEvent({ key: '1' }),
+      key: '1',
+    }))).toEqual({
+      ids: ['item-1'],
+      kind: 'fit-selection',
+      preventDefault: true,
+    })
+  })
+
   it('keeps arrow keys owned by nudge even without selection', () => {
     expect(getCanvasKeyboardCommandShortcutIntent(createInput({
       event: createKeyboardEvent({ key: 'ArrowLeft' }),

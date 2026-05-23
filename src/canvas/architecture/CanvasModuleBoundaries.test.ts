@@ -1796,6 +1796,9 @@ describe('Canvas module boundaries', () => {
     const nudgeShortcutFile = getSourceFile(
       'src/canvas/app/keyboard/CanvasKeyboardNudgeShortcuts.ts',
     )
+    const viewportShortcutFile = getSourceFile(
+      'src/canvas/app/keyboard/CanvasKeyboardViewportShortcuts.ts',
+    )
     const systemShortcutFile = getSourceFile(
       'src/canvas/app/keyboard/CanvasKeyboardSystemShortcuts.ts',
     )
@@ -1845,6 +1848,12 @@ describe('Canvas module boundaries', () => {
     expect(commandIntentFile.source).toContain(
       "from './CanvasKeyboardCommandShortcuts'",
     )
+    expect(commandIntentFile.source).toContain(
+      "from './CanvasKeyboardViewportShortcuts'",
+    )
+    expect(commandIntentFile.source).toContain(
+      "from './CanvasKeyboardNudgeShortcuts'",
+    )
     expect(commandIntentFile.source).not.toContain(
       "event.key.startsWith('Arrow')",
     )
@@ -1855,10 +1864,9 @@ describe('Canvas module boundaries', () => {
     expect(commandShortcutFile.source).toContain(
       'export function getCanvasKeyboardReservedCommandShortcuts',
     )
-    expect(commandShortcutFile.source).toContain(
-      "from './CanvasKeyboardNudgeShortcuts'",
-    )
     expect(commandShortcutFile.source).toContain("shortcutId: 'undo'")
+    expect(commandShortcutFile.source).not.toContain("shortcutId: 'fitAll'")
+    expect(commandShortcutFile.source).not.toContain("shortcutId: 'zoomIn'")
     expect(commandShortcutFile.source).not.toContain("shortcutId: 'nudge'")
     expect(commandShortcutFile.source).not.toContain("'large nudge left'")
     expect(commandShortcutFile.source).toContain("kind: 'reorder-selection'")
@@ -1870,6 +1878,16 @@ describe('Canvas module boundaries', () => {
     )
     expect(nudgeShortcutFile.source).toContain("'large nudge left'")
     expect(nudgeShortcutFile.source).toContain("kind: 'nudge-selection'")
+    expect(viewportShortcutFile.source).toContain(
+      'export function getCanvasKeyboardViewportShortcutIntent',
+    )
+    expect(viewportShortcutFile.source).toContain(
+      'export function getCanvasKeyboardReservedViewportShortcuts',
+    )
+    expect(viewportShortcutFile.source).toContain("shortcutId: 'fitAll'")
+    expect(viewportShortcutFile.source).toContain("shortcutId: 'zoomIn'")
+    expect(viewportShortcutFile.source).toContain("kind: 'fit-selection'")
+    expect(viewportShortcutFile.source).toContain("kind: 'zoom-by'")
     expect(systemShortcutFile.source).toContain(
       'export function getCanvasKeyboardSystemShortcutIntent',
     )
@@ -1908,8 +1926,15 @@ describe('Canvas module boundaries', () => {
       'getCanvasKeyboardReservedCommandShortcuts',
     )
     expect(reservedShortcutFile.source).toContain(
+      'getCanvasKeyboardReservedViewportShortcuts',
+    )
+    expect(reservedShortcutFile.source).toContain(
+      'getCanvasKeyboardReservedNudgeShortcuts',
+    )
+    expect(reservedShortcutFile.source).toContain(
       'getCanvasKeyboardReservedSystemShortcuts',
     )
+    expect(reservedShortcutFile.source).not.toContain("'fit all'")
     expect(reservedShortcutFile.source).not.toContain("'temporary pan'")
     expect(reservedShortcutFile.source).not.toContain("'large nudge left'")
   })
