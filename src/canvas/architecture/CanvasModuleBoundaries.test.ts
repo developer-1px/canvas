@@ -1697,6 +1697,9 @@ describe('Canvas module boundaries', () => {
     const toolShortcutFile = getSourceFile(
       'src/canvas/app/keyboard/CanvasKeyboardToolShortcuts.ts',
     )
+    const reservedShortcutFile = getSourceFile(
+      'src/canvas/app/keyboard/CanvasKeyboardReservedShortcuts.ts',
+    )
 
     expect(routerFile.source).toContain(
       "from './CanvasKeyboardShortcutIntent'",
@@ -1747,6 +1750,14 @@ describe('Canvas module boundaries', () => {
     )
     expect(toolShortcutFile.source).toContain("shortcutId: 'selectTool'")
     expect(toolShortcutFile.source).toContain("shortcutId: 'markerTool'")
+    expect(reservedShortcutFile.source).toContain(
+      'export function getCanvasKeyboardReservedShortcuts',
+    )
+    expect(reservedShortcutFile.source).toContain(
+      'getCanvasKeyboardReservedToolShortcuts',
+    )
+    expect(reservedShortcutFile.source).toContain("'temporary pan'")
+    expect(reservedShortcutFile.source).toContain("'large nudge left'")
   })
 
   it('keeps App custom creation tool contracts behind a named module', () => {
@@ -1779,10 +1790,12 @@ describe('Canvas module boundaries', () => {
       'RESERVED_CANVAS_APP_CUSTOM_TOOL_SHORTCUTS',
     )
     expect(contractsFile.source).toContain(
-      'getCanvasKeyboardReservedToolShortcuts',
+      'getCanvasKeyboardReservedShortcuts',
     )
     expect(contractsFile.source).not.toContain("label: 'select tool'")
     expect(contractsFile.source).not.toContain("label: 'marker tool'")
+    expect(contractsFile.source).not.toContain("'temporary pan'")
+    expect(contractsFile.source).not.toContain("'large nudge left'")
     expect(contractsFile.source).toContain('shortcut conflicts with')
     expect(contractsFile.source).toContain(
       'Duplicate canvas app custom creation tool shortcut',

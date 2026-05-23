@@ -7,9 +7,8 @@ import {
 } from '../extensions/CanvasAppDescriptorContracts'
 import { assertCanvasAppExtensionEntries } from '../extensions/CanvasAppExtensionIds'
 import {
-  getCanvasKeyboardReservedToolShortcuts,
-} from '../keyboard/CanvasKeyboardToolShortcuts'
-import { reserveCanvasKeyboardShortcut } from '../keyboard/CanvasKeyboardShortcutChords'
+  getCanvasKeyboardReservedShortcuts,
+} from '../keyboard/CanvasKeyboardReservedShortcuts'
 import {
   formatCanvasAppCustomToolShortcut,
   getCanvasAppCustomToolShortcutKey,
@@ -24,31 +23,9 @@ type ReservedCanvasAppCustomToolShortcut = {
   shortcut: CanvasAppCustomToolShortcut
 }
 
-const RESERVED_CANVAS_APP_CUSTOM_TOOL_SHORTCUTS = [
-  ...getCanvasKeyboardReservedToolShortcuts(),
-  ...reserveCanvasKeyboardShortcut('temporary pan', { key: 'Space' }, {
-    shiftInsensitive: true,
-  }),
-  { label: 'fit all', shortcut: { key: '0' } },
-  { label: 'fit selection', shortcut: { key: '1' } },
-  ...reserveCanvasKeyboardShortcut('escape', { key: 'Escape' }, {
-    shiftInsensitive: true,
-  }),
-  ...reserveCanvasKeyboardShortcut('delete', { key: 'Delete' }, {
-    shiftInsensitive: true,
-  }),
-  ...reserveCanvasKeyboardShortcut('delete', { key: 'Backspace' }, {
-    shiftInsensitive: true,
-  }),
-  { label: 'nudge left', shortcut: { key: 'ArrowLeft' } },
-  { label: 'nudge right', shortcut: { key: 'ArrowRight' } },
-  { label: 'nudge up', shortcut: { key: 'ArrowUp' } },
-  { label: 'nudge down', shortcut: { key: 'ArrowDown' } },
-  { label: 'large nudge left', shortcut: { key: 'ArrowLeft', shiftKey: true } },
-  { label: 'large nudge right', shortcut: { key: 'ArrowRight', shiftKey: true } },
-  { label: 'large nudge up', shortcut: { key: 'ArrowUp', shiftKey: true } },
-  { label: 'large nudge down', shortcut: { key: 'ArrowDown', shiftKey: true } },
-] satisfies readonly ReservedCanvasAppCustomToolShortcut[]
+const RESERVED_CANVAS_APP_CUSTOM_TOOL_SHORTCUTS:
+  readonly ReservedCanvasAppCustomToolShortcut[] =
+    getCanvasKeyboardReservedShortcuts()
 
 export function assertCanvasAppCustomCreationTools(
   tools: readonly CanvasAppCustomCreationTool[],
