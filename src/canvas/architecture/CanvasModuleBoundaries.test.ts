@@ -576,6 +576,73 @@ describe('Canvas module boundaries', () => {
     expect(viewportModelFile.source).toContain('useCanvasViewportControls')
   })
 
+  it('keeps app text editor and find replace wiring behind a named workflow module', () => {
+    const appModelFile = getSourceFile(
+      'src/canvas/app/workflow/useCanvasAppModel.ts',
+    )
+    const textModelFile = getSourceFile(
+      'src/canvas/app/workflow/useCanvasAppTextModel.ts',
+    )
+
+    expect(appModelFile.source).toContain("from './useCanvasAppTextModel'")
+    expect(appModelFile.source).not.toContain(
+      "from './useCanvasTextEditorModel'",
+    )
+    expect(appModelFile.source).not.toContain(
+      "from './useCanvasFindReplaceModel'",
+    )
+    expect(appModelFile.source).not.toContain('useRef<')
+    expect(appModelFile.source).not.toContain('editorRef')
+    expect(textModelFile.source).toContain(
+      "from './useCanvasTextEditorModel'",
+    )
+    expect(textModelFile.source).toContain(
+      "from './useCanvasFindReplaceModel'",
+    )
+    expect(textModelFile.source).toContain(
+      'useRef<HTMLTextAreaElement | null>',
+    )
+    expect(textModelFile.source).toContain(
+      'export function useCanvasAppTextModel',
+    )
+  })
+
+  it('keeps app interaction state routing behind the interaction model', () => {
+    const appModelFile = getSourceFile(
+      'src/canvas/app/workflow/useCanvasAppModel.ts',
+    )
+    const interactionModelFile = getSourceFile(
+      'src/canvas/app/workflow/useCanvasInteractionModel.ts',
+    )
+
+    expect(appModelFile.source).toContain(
+      "from './useCanvasInteractionModel'",
+    )
+    for (const rawInteractionTerm of [
+      'interactionRef',
+      'setDraftArrow',
+      'setDraftRect',
+      'setDraftStroke',
+      'setGesture',
+      'setMarquee',
+      'setSnapGuides',
+      'setSpaceDown',
+      'setTool',
+      'spaceDown',
+    ]) {
+      expect(appModelFile.source).not.toContain(rawInteractionTerm)
+    }
+    for (const consumerContext of [
+      'component: {',
+      'control: {',
+      'keyboard: {',
+      'pointer: {',
+      'stage: {',
+    ]) {
+      expect(interactionModelFile.source).toContain(consumerContext)
+    }
+  })
+
   it('keeps app item layer render input on the app pointer input interface', () => {
     const itemLayerAdapterFile = getSourceFile(
       'src/canvas/app/rendering/CanvasAppItemLayerAdapter.tsx',

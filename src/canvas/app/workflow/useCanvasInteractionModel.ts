@@ -73,19 +73,40 @@ export function useCanvasInteractionModel({
   const activeMode = spaceDown ? 'pan' : tool
 
   return {
-    activeMode,
-    gesture,
-    interactionRef,
-    overlays,
-    setDraftArrow,
-    setDraftRect,
-    setDraftStroke,
-    setGesture,
-    setMarquee,
-    setSnapGuides,
-    setSpaceDown,
-    setTool,
-    spaceDown,
-    tool,
+    component: {
+      setTool,
+    },
+    control: {
+      gesture,
+      onToolChange: setTool,
+      tool,
+    },
+    keyboard: {
+      interactionRef,
+      setDraftArrow,
+      setDraftRect,
+      setDraftStroke,
+      setGesture,
+      setMarquee,
+      setSpaceDown,
+      setTool,
+    },
+    pointer: {
+      interactionRef,
+      setDraftArrow,
+      setDraftRect,
+      setDraftStroke,
+      setGesture,
+      setMarquee,
+      setSnapGuides,
+      setTool,
+      spaceDown,
+      tool,
+    },
+    stage: {
+      activeMode,
+      gesture,
+      overlays,
+    },
   }
 }

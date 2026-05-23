@@ -1,7 +1,4 @@
-import {
-  useMemo,
-  useRef,
-} from 'react'
+import { useMemo } from 'react'
 import {
   DEFAULT_CANVAS_AFFORDANCE_CONFIG,
 } from '../../engine'
@@ -14,11 +11,10 @@ import { useCanvasAppExtensionModel } from './useCanvasAppExtensionModel'
 import { useCanvasAppInspectorModel } from './useCanvasAppInspectorModel'
 import { useCanvasAppKeyboardModel } from './useCanvasAppKeyboardModel'
 import { useCanvasAppPointerModel } from './useCanvasAppPointerModel'
-import { useCanvasFindReplaceModel } from './useCanvasFindReplaceModel'
+import { useCanvasAppTextModel } from './useCanvasAppTextModel'
 import { useCanvasInteractionModel } from './useCanvasInteractionModel'
 import { useCanvasAppViewportModel } from './useCanvasAppViewportModel'
 import { useCanvasWorkspaceModel } from './useCanvasWorkspaceModel'
-import { useCanvasTextEditorModel } from './useCanvasTextEditorModel'
 import {
   DEFAULT_CANVAS_APP_ASSEMBLY,
   assertCanvasAppAssembly,
@@ -50,7 +46,6 @@ export function useCanvasAppModel({
     stageAdapter,
   } = validatedAssembly
   const stageElement = useCanvasAppStageElement()
-  const editorRef = useRef<HTMLTextAreaElement | null>(null)
   const {
     canRedo,
     canUndo,
@@ -78,22 +73,7 @@ export function useCanvasAppModel({
     customItemValidators,
     initialItems,
   })
-  const {
-    activeMode,
-    gesture,
-    interactionRef,
-    overlays,
-    setDraftArrow,
-    setDraftRect,
-    setDraftStroke,
-    setGesture,
-    setMarquee,
-    setSnapGuides,
-    setSpaceDown,
-    setTool,
-    spaceDown,
-    tool,
-  } = useCanvasInteractionModel({
+  const interaction = useCanvasInteractionModel({
     config: canvasAffordanceConfig,
     scene,
     selection,
@@ -107,21 +87,16 @@ export function useCanvasAppModel({
     selected,
     selection,
   })
-  const {
-    blurTextEditor,
-    setEditing,
-    textEditor,
-  } = useCanvasTextEditorModel({
-    commitItemsChange,
-    editorRef,
+
+  const text = useCanvasAppTextModel({
+    document: {
+      commitItemsChange,
+      findDocumentText,
+      replaceDocumentText,
+    },
     itemReadModel,
     selection,
     viewport,
-  })
-
-  const { findReplace, openFindReplace } = useCanvasFindReplaceModel({
-    findDocumentText,
-    replaceDocumentText,
   })
 
   const {
@@ -136,7 +111,7 @@ export function useCanvasAppModel({
     customCreationTools,
     items,
     selection,
-    setEditing,
+    setEditing: text.setEditing,
     viewport,
   })
 
@@ -153,7 +128,7 @@ export function useCanvasAppModel({
       setClipboardItems,
       undo,
     },
-    setEditing,
+    setEditing: text.setEditing,
     stageElement,
     workspace: {
       items,
@@ -191,17 +166,10 @@ export function useCanvasAppModel({
     config: canvasAffordanceConfig,
     customCreationTools: customCreationToolStates,
     interaction: {
-      interactionRef,
-      setDraftArrow,
-      setDraftRect,
-      setDraftStroke,
-      setEditing,
-      setGesture,
-      setMarquee,
-      setSpaceDown,
-      setTool,
+      ...interaction.keyboard,
+      setEditing: text.setEditing,
     },
-    openFindReplace,
+    openFindReplace: text.openFindReplace,
     selection,
     viewport: {
       fitToItems: viewportControls.fitToItems,
@@ -219,18 +187,7 @@ export function useCanvasAppModel({
     config: canvasAffordanceConfig,
     createId,
     customCreationTools,
-    interaction: {
-      interactionRef,
-      setDraftArrow,
-      setDraftRect,
-      setDraftStroke,
-      setGesture,
-      setMarquee,
-      setSnapGuides,
-      setTool,
-      spaceDown,
-      tool,
-    },
+    interaction: interaction.pointer,
     itemAdapters: {
       creation: itemAdapters.creation,
       transform: itemAdapters.transform,
@@ -242,7 +199,7 @@ export function useCanvasAppModel({
       scene,
       selectedBounds,
       selection,
-      setEditing,
+      setEditing: text.setEditing,
       setLiveItems,
       setSelection,
       setViewport,
@@ -257,8 +214,8 @@ export function useCanvasAppModel({
     componentLibrary,
     createId,
     interaction: {
-      setEditing,
-      setTool,
+      ...interaction.component,
+      setEditing: text.setEditing,
     },
     stageElement,
     workspace: {
@@ -274,10 +231,10 @@ export function useCanvasAppModel({
     config: canvasAffordanceConfig,
     customCommands: customCommandStates,
     customTools: customCreationToolStates,
-    gesture,
+    gesture: interaction.control.gesture,
     scene,
     selection,
-    tool,
+    tool: interaction.control.tool,
     viewport,
     onAlign: commands.alignSelection,
     onDelete: commands.deleteSelection,
@@ -289,7 +246,7 @@ export function useCanvasAppModel({
     onLock: commands.lockSelection,
     onRedo: commands.redoHistory,
     onRunCustomCommand: runCustomCommand,
-    onToolChange: setTool,
+    onToolChange: interaction.control.onToolChange,
     onUndo: commands.undoHistory,
     onUngroup: commands.ungroupSelection,
     onUnlockAll: commands.unlockAll,
@@ -299,10 +256,10 @@ export function useCanvasAppModel({
 
   return {
     componentPalette: controls.componentPalette,
-    findReplace,
+    findReplace: text.findReplace,
     inspector,
     stage: renderCanvasAppStageModel({
-      blurTextEditor,
+      blurTextEditor: text.blurTextEditor,
       itemLayerAdapter,
       itemLayerInput: {
         componentPresentationRenderers,
@@ -311,14 +268,14 @@ export function useCanvasAppModel({
         items,
         onItemPointerDown: pointer.itemLayerHandlers.onItemPointerDown,
         onTextDoubleClick: pointer.itemLayerHandlers.onTextDoubleClick,
-        outlineIds: overlays.itemOutlineIds,
+        outlineIds: interaction.stage.overlays.itemOutlineIds,
         selected,
       },
       stageAdapter,
       stageInput: {
-        activeMode,
-        gesture,
-        overlays,
+        activeMode: interaction.stage.activeMode,
+        gesture: interaction.stage.gesture,
+        overlays: interaction.stage.overlays,
         stageElement: stageElement.mount,
         viewport,
         onCanvasPointerDown: pointer.stageHandlers.onCanvasPointerDown,
@@ -329,7 +286,7 @@ export function useCanvasAppModel({
       },
     }),
     status: controls.status,
-    textEditor,
+    textEditor: text.textEditor,
     toolbar: controls.toolbar,
     zoomControls: controls.zoomControls,
   }

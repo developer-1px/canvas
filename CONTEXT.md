@@ -85,11 +85,12 @@
 - Canvas App Keyboard Model: App Model이 keyboard shortcut handler wiring 세부를 알지 않도록 command, interaction, viewport shortcut handlers를 조립하는 workflow Module.
 - Canvas App Pointer Model: App Model이 pointer down/drag hook 조립 세부를 알지 않도록 stage와 item layer pointer handlers를 만드는 workflow Module.
 - Canvas App Stage Model: stage와 item layer Adapter 호출 순서, text editor blur, context menu 차단, render 실패 containment를 소유하는 workflow Module.
+- Canvas App Text Model: App Model이 textarea ref, text editor, find/replace wiring 세부를 직접 알지 않도록 text editor props와 search handlers를 만드는 workflow Module.
 - Canvas App Viewport Model: App Model이 wheel viewport listener와 fit/reset/zoom control hook 조립 세부를 알지 않도록 viewport handlers를 만드는 workflow Module.
 - Canvas Keyboard Shortcut Intent: keydown 입력, typing target suppression, temporary pan, escape, command/tool shortcut precedence를 실행 가능한 keyboard intent로 조립하는 App-owned runtime Module.
 - Canvas Keyboard Command Shortcut Intent: built-in command, viewport, nudge keyboard shortcut grammar를 feature toggle과 selection 기준으로 keyboard intent로 변환하는 App-owned runtime Module.
 - Canvas Keyboard Tool Shortcut Intent: built-in tool shortcut precedence와 custom creation tool shortcut matching을 소유하는 App-owned runtime Module.
-- Canvas Interaction Model: tool, gesture, marquee, draft, snap guide, overlay state 생명주기를 App Shell에 숨기는 workflow Module.
+- Canvas Interaction Model: tool, gesture, marquee, draft, snap guide, overlay state 생명주기와 consumer별 interaction context를 App Shell에 숨기는 workflow Module.
 - Canvas Workspace Model: Demo workspace의 저장된 snapshot, document history, viewport, read model, id 생성을 App Shell에 숨기는 workflow Module.
 - Canvas Workspace Snapshot: 저장된 workspace payload의 version, item validation, viewport normalization, selection sanitization, id seed contract를 소유하는 App-owned Module.
 - Canvas Workflow Contract: App workflow hook들이 공유하는 document commit, selection commit, clipboard 계약. 개별 hook이 `useCanvasDocument` 구현 파일을 직접 알지 않게 한다.
@@ -200,7 +201,9 @@
 - App Model은 keyboard shortcut handler wiring 세부를 직접 알지 않고 Canvas App Keyboard Model에 위임한다.
 - App Model은 pointer down/drag hook 조립 세부를 직접 알지 않고 Canvas App Pointer Model에서 stage/item layer pointer handlers를 받는다.
 - App Model은 stage/item layer Adapter 호출, context menu 차단, text editor blur timing, render 실패 containment를 직접 알지 않고 Canvas App Stage Model에 위임한다.
+- App Model은 textarea ref, text editor, find/replace wiring 세부를 직접 알지 않고 Canvas App Text Model에서 text editor/search props를 받는다.
 - App Model은 wheel viewport listener와 fit/reset/zoom control hook 조립 세부를 직접 알지 않고 Canvas App Viewport Model에서 viewport handlers를 받는다.
+- App Model은 draft, marquee, snap guide, temporary pan raw setter routing을 직접 알지 않고 Canvas Interaction Model의 consumer별 interaction context를 전달한다.
 - App Shell은 workspace 저장, document history, read model 생성 방식을 직접 알지 않는다.
 - App workflow hook들은 Canvas Item Read Model을 직접 생성하지 않고 Canvas Workspace Model에서 주입받는다.
 - App workflow는 editor/search 상태를 각각의 workflow Module 뒤에 숨긴다.
