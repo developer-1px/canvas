@@ -1,16 +1,18 @@
 import type { CanvasAffordanceConfig } from '../../engine'
-import type {
-  CanvasBuiltinTool,
-  CanvasCustomToolId,
-  Tool,
-} from '../../entities'
+import type { Tool } from '../../entities'
 import {
   getCanvasToolbarCommandGroups,
   type CanvasToolbarCommandGroupId,
   type CanvasToolbarCommandItem,
 } from './CanvasToolbarCommandItems'
+import {
+  getCanvasToolbarToolItems,
+  type CanvasToolbarCustomTool,
+  type CanvasToolbarToolItem,
+} from './CanvasToolbarToolItems'
 
 export type { CanvasToolbarCommandAction } from './CanvasToolbarCommandItems'
+export type { CanvasToolbarCustomTool } from './CanvasToolbarToolItems'
 
 export type CanvasToolbarCustomCommand = {
   ariaLabel: string
@@ -20,27 +22,8 @@ export type CanvasToolbarCustomCommand = {
   title: string
 }
 
-export type CanvasToolbarCustomTool = {
-  ariaLabel: string
-  id: CanvasCustomToolId
-  label: string
-  title: string
-}
-
 export type CanvasToolbarItem =
-  | {
-      active: boolean
-      kind: 'builtin-tool'
-      tool: CanvasBuiltinTool
-    }
-  | {
-      active: boolean
-      ariaLabel: string
-      kind: 'custom-tool'
-      label: string
-      title: string
-      tool: CanvasCustomToolId
-    }
+  | CanvasToolbarToolItem
   | CanvasToolbarCommandItem
   | {
       ariaLabel: string
@@ -77,16 +60,6 @@ export type CanvasToolbarItemsInput = {
   tool: Tool
 }
 
-const CANVAS_TOOLBAR_BUILTIN_TOOLS = [
-  'select',
-  'pan',
-  'rect',
-  'text',
-  'marker',
-  'highlight',
-  'arrow',
-] as const satisfies readonly CanvasBuiltinTool[]
-
 export function getCanvasToolbarGroups({
   canAlign,
   canDelete,
@@ -106,23 +79,7 @@ export function getCanvasToolbarGroups({
 
   pushCanvasToolbarGroup(groups, {
     id: 'tools',
-    items: [
-      ...CANVAS_TOOLBAR_BUILTIN_TOOLS
-        .filter((builtinTool) => config.tools[builtinTool])
-        .map((builtinTool) => ({
-          active: tool === builtinTool,
-          kind: 'builtin-tool' as const,
-          tool: builtinTool,
-        })),
-      ...customTools.map((customTool) => ({
-        active: tool === customTool.id,
-        ariaLabel: customTool.ariaLabel,
-        kind: 'custom-tool' as const,
-        label: customTool.label,
-        title: customTool.title,
-        tool: customTool.id,
-      })),
-    ],
+    items: getCanvasToolbarToolItems({ config, customTools, tool }),
   })
 
   groups.push(...getCanvasToolbarCommandGroups({

@@ -411,6 +411,9 @@ describe('Canvas module boundaries', () => {
     const commandItemsFile = getSourceFile(
       'src/canvas/ui/toolbar/CanvasToolbarCommandItems.ts',
     )
+    const toolItemsFile = getSourceFile(
+      'src/canvas/ui/toolbar/CanvasToolbarToolItems.ts',
+    )
 
     expect(toolbarFile.source).toContain("from './CanvasToolbarItems'")
     expect(toolbarFile.source).not.toContain('config.commands.')
@@ -421,12 +424,14 @@ describe('Canvas module boundaries', () => {
     expect(itemsFile.source).toContain(
       'export function getCanvasToolbarGroups',
     )
+    expect(itemsFile.source).toContain("from './CanvasToolbarToolItems'")
     expect(itemsFile.source).toContain("from './CanvasToolbarCommandItems'")
     expect(itemsFile.source).not.toContain('getCanvasToolbarAlignItem')
     expect(itemsFile.source).not.toContain('getCanvasToolbarDistributeItem')
-    expect(itemsFile.source).toContain('config.tools[builtinTool]')
+    expect(itemsFile.source).not.toContain('config.tools[builtinTool]')
+    expect(itemsFile.source).not.toContain('CANVAS_TOOLBAR_BUILTIN_TOOLS')
     expect(itemsFile.source).toContain('customCommands.map')
-    expect(itemsFile.source).toContain('customTools.map')
+    expect(itemsFile.source).not.toContain('customTools.map')
     expect(commandItemsFile.source).toContain(
       'export function getCanvasToolbarCommandGroups',
     )
@@ -436,6 +441,12 @@ describe('Canvas module boundaries', () => {
     expect(commandItemsFile.source).toContain(
       "getCanvasToolbarDistributeItem(\n        'distributeHorizontal'",
     )
+    expect(toolItemsFile.source).toContain(
+      'export function getCanvasToolbarToolItems',
+    )
+    expect(toolItemsFile.source).toContain('CANVAS_TOOLBAR_BUILTIN_TOOLS')
+    expect(toolItemsFile.source).toContain('config.tools[builtinTool]')
+    expect(toolItemsFile.source).toContain('customTools.map')
   })
 
   it('keeps the app shell independent from concrete renderer stage modules', () => {

@@ -111,7 +111,8 @@
 - Canvas Workspace Model: Demo workspace의 저장된 snapshot, document history, viewport, read model, id 생성과 consumer별 workspace context를 App Shell에 숨기는 workflow Module.
 - Canvas Workspace Snapshot: 저장된 workspace payload의 version, item validation, viewport normalization, selection sanitization, id seed contract를 소유하는 App-owned Module.
 - Canvas Workflow Contract: App workflow hook들이 공유하는 document commit, selection commit, clipboard 계약. 개별 hook이 `useCanvasDocument` 구현 파일을 직접 알지 않게 한다.
-- Canvas Toolbar Items: feature toggle, availability, built-in/custom tool, built-in/custom command 상태를 toolbar item group grammar로 변환하는 UI-owned Module.
+- Canvas Toolbar Items: tool group, command group, custom command group을 toolbar item group grammar로 합성하는 UI-owned Module.
+- Canvas Toolbar Tool Items: built-in tool stable order, feature toggle, custom tool 상태를 tool item group grammar로 변환하는 UI-owned Module.
 - Canvas Toolbar Command Items: built-in toolbar command group, feature toggle, availability를 command item group grammar로 변환하는 UI-owned Module.
 - Renderer Adapter: Affordance 상태와 주입된 item layer를 SVG, Canvas, DOM, WebGL 등으로 배치하고 그리는 Adapter. Demo `CanvasItem`을 직접 알지 않는다.
 - Canvas SVG Drawing Primitives: SVG path data와 marker id/IRI처럼 Renderer Stage defs와 App-owned item layer가 공유해야 하는 SVG drawing primitive 계약.
@@ -240,7 +241,7 @@
 - Standard command hook은 toolbar/keyboard용 callback wiring을 맡고, Canvas Standard Command Execution은 plan 생성과 effect 적용만 조립한다. Engine command 호출과 document effect descriptor 생성은 Canvas Standard Command Effect Plan이, document commit/selection/editing/history effect routing은 Canvas Standard Command Document Effects가 소유한다.
 - Clipboard command hook은 paste index와 callback wiring을 맡고, Canvas Clipboard Command Execution은 plan 생성과 effect 적용만 조립한다. Clone/duplicate/paste/cut plan과 paste offset 계산은 Canvas Clipboard Command Effect Plan이, Host clipboard/document/editing effect routing은 Canvas Clipboard Command Effects가 소유한다.
 - UI controls는 Demo Host를 직접 import하지 않는다.
-- Canvas Toolbar는 item/button 렌더링과 click dispatch를 맡고, tool/custom command 항목 assembly는 Canvas Toolbar Items가, built-in command group grammar는 Canvas Toolbar Command Items가 소유한다.
+- Canvas Toolbar는 item/button 렌더링과 click dispatch를 맡고, group composition은 Canvas Toolbar Items가, built-in/custom tool group grammar는 Canvas Toolbar Tool Items가, built-in command group grammar는 Canvas Toolbar Command Items가 소유한다.
 - Keyboard shortcut router는 event preventDefault와 handler 실행을 맡고, keydown orchestration은 Canvas Keyboard Shortcut Intent가, built-in document command shortcut grammar와 reserved command shortcut 목록은 Canvas Keyboard Command Shortcuts가, viewport shortcut grammar와 reserved viewport shortcut 목록은 Canvas Keyboard Viewport Shortcuts가, nudge shortcut grammar와 reserved nudge shortcut 목록은 Canvas Keyboard Nudge Shortcuts가, global system shortcut grammar와 reserved system shortcut 목록은 Canvas Keyboard System Shortcuts가, built-in/custom tool shortcut precedence는 Canvas Keyboard Tool Shortcut Intent가 소유한다.
 - Module seam import 규칙은 Canvas Module Boundary Guardrail로 검증한다.
 - Linked peer dependency는 앱 번들에 한 번만 들어가야 하며, Vite config에서 `react`, `react-dom`, `zod`를 dedupe한다.

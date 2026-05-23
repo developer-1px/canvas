@@ -3,7 +3,7 @@ import { createCanvasAffordanceConfig } from '../../engine'
 import { getCanvasToolbarGroups } from './CanvasToolbarItems'
 
 describe('CanvasToolbarItems', () => {
-  it('builds builtin tool items in stable order and appends custom tools', () => {
+  it('composes tool groups from toolbar tool items', () => {
     const groups = getCanvasToolbarGroups(createInput({
       customTools: [
         {
@@ -18,14 +18,8 @@ describe('CanvasToolbarItems', () => {
 
     expect(groups[0]).toMatchObject({
       id: 'tools',
-      items: [
+      items: expect.arrayContaining([
         { active: false, kind: 'builtin-tool', tool: 'select' },
-        { active: false, kind: 'builtin-tool', tool: 'pan' },
-        { active: false, kind: 'builtin-tool', tool: 'rect' },
-        { active: false, kind: 'builtin-tool', tool: 'text' },
-        { active: false, kind: 'builtin-tool', tool: 'marker' },
-        { active: false, kind: 'builtin-tool', tool: 'highlight' },
-        { active: false, kind: 'builtin-tool', tool: 'arrow' },
         {
           active: true,
           ariaLabel: 'Risk tool',
@@ -34,7 +28,7 @@ describe('CanvasToolbarItems', () => {
           title: 'Risk',
           tool: 'custom:risk',
         },
-      ],
+      ]),
     })
   })
 
