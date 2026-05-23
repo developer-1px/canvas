@@ -28,18 +28,14 @@ import {
   type CanvasAppStageAdapter,
 } from '../rendering'
 import type { CanvasAppCustomCommand } from '../commands/CanvasAppCustomCommands'
-import {
-  appendUniqueCanvasAppExtensionEntries,
-  mergeUniqueCanvasAppExtensionRecord,
-} from '../extensions/CanvasAppExtensionRegistries'
 import type { CanvasAppInspectorPanel } from '../inspector/CanvasAppInspectorPanels'
-import {
-  createCanvasAppCustomItemModuleAssembly,
-  type CanvasAppCustomItemModule,
-  type CanvasAppCustomItemModuleAssemblyOptions,
+import type {
+  CanvasAppCustomItemModule,
+  CanvasAppCustomItemModuleAssemblyOptions,
 } from '../modules/CanvasAppCustomItemModules'
 import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
 import { assertCanvasAppAssembly } from './CanvasAppAssemblyContracts'
+import { createCanvasAppExtensionAssembly } from './CanvasAppExtensionAssembly'
 import { snapshotCanvasAppAssembly } from './CanvasAppAssemblySnapshot'
 
 export { assertCanvasAppAssembly } from './CanvasAppAssemblyContracts'
@@ -99,16 +95,10 @@ export const DEFAULT_CANVAS_APP_ASSEMBLY: CanvasAppAssembly =
 export function createCanvasAppAssembly(
   input: CanvasAppAssemblyInput = {},
 ): CanvasAppAssembly {
-  const customItemModuleAssembly = createCanvasAppCustomItemModuleAssembly(
-    input.customItemModules,
-    { disabledModuleIds: input.disabledCustomItemModuleIds },
+  const extensionAssembly = createCanvasAppExtensionAssembly(
+    input,
+    DEFAULT_CANVAS_APP_ASSEMBLY,
   )
-  const customItemValidators = mergeUniqueCanvasAppExtensionRecord({
-    current: DEFAULT_CANVAS_APP_ASSEMBLY.customItemValidators,
-    entries: customItemModuleAssembly.customItemValidators,
-    label: 'custom item validator',
-    owner: 'app assembly',
-  })
 
   const assembly: CanvasAppAssembly = {
     affordanceConfig: input.affordanceConfig === undefined
@@ -119,40 +109,14 @@ export function createCanvasAppAssembly(
     componentPresentationRenderers: createCanvasAppComponentPresentationRenderers(
       input.componentPresentationRenderers,
     ),
-    customCommands: appendUniqueCanvasAppExtensionEntries({
-      current: [
-        ...DEFAULT_CANVAS_APP_ASSEMBLY.customCommands,
-        ...customItemModuleAssembly.customCommands,
-      ],
-      entries: input.customCommands ?? [],
-      label: 'custom command',
-      owner: 'app assembly',
-    }),
-    customCreationTools: appendUniqueCanvasAppExtensionEntries({
-      current: DEFAULT_CANVAS_APP_ASSEMBLY.customCreationTools,
-      entries: customItemModuleAssembly.customCreationTools,
-      label: 'custom creation tool',
-      owner: 'app assembly',
-    }),
-    customItemRenderers: mergeUniqueCanvasAppExtensionRecord({
-      current: DEFAULT_CANVAS_APP_ASSEMBLY.customItemRenderers,
-      entries: customItemModuleAssembly.customItemRenderers,
-      label: 'custom item renderer',
-      owner: 'app assembly',
-    }),
-    customItemValidators,
-    inspectorPanels: appendUniqueCanvasAppExtensionEntries({
-      current: [
-        ...DEFAULT_CANVAS_APP_ASSEMBLY.inspectorPanels,
-        ...customItemModuleAssembly.inspectorPanels,
-      ],
-      entries: input.inspectorPanels ?? [],
-      label: 'inspector panel',
-      owner: 'app assembly',
-    }),
+    customCommands: extensionAssembly.customCommands,
+    customCreationTools: extensionAssembly.customCreationTools,
+    customItemRenderers: extensionAssembly.customItemRenderers,
+    customItemValidators: extensionAssembly.customItemValidators,
+    inspectorPanels: extensionAssembly.inspectorPanels,
     initialItems: normalizeCanvasItems(
       input.initialItems ?? DEFAULT_CANVAS_APP_ASSEMBLY.initialItems,
-      { customItemValidators },
+      { customItemValidators: extensionAssembly.customItemValidators },
     ),
     itemAdapters: input.itemAdapters ?? DEFAULT_CANVAS_APP_ASSEMBLY.itemAdapters,
     itemLayerAdapter:

@@ -151,6 +151,41 @@ describe('Canvas module boundaries', () => {
     expect(violations).toEqual([])
   })
 
+  it('keeps App extension composition behind a named Assembly module', () => {
+    const assemblyFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppAssembly.ts',
+    )
+    const extensionAssemblyFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppExtensionAssembly.ts',
+    )
+
+    expect(assemblyFile.source).toContain(
+      "from './CanvasAppExtensionAssembly'",
+    )
+    expect(assemblyFile.source).not.toContain(
+      'createCanvasAppCustomItemModuleAssembly',
+    )
+    expect(assemblyFile.source).not.toContain(
+      'appendUniqueCanvasAppExtensionEntries',
+    )
+    expect(assemblyFile.source).not.toContain(
+      'mergeUniqueCanvasAppExtensionRecord',
+    )
+    expect(extensionAssemblyFile.source).toContain(
+      'export function createCanvasAppExtensionAssembly',
+    )
+    expect(extensionAssemblyFile.source).toContain(
+      'createCanvasAppCustomItemModuleAssembly',
+    )
+    expect(extensionAssemblyFile.source).toContain(
+      'appendUniqueCanvasAppExtensionEntries',
+    )
+    expect(extensionAssemblyFile.source).toContain(
+      'mergeUniqueCanvasAppExtensionRecord',
+    )
+    expect(extensionAssemblyFile.source).toContain("owner: 'app assembly'")
+  })
+
   it('keeps App Model from distributing Assembly output fields directly', () => {
     const appModelFile = getSourceFile(
       'src/canvas/app/workflow/useCanvasAppModel.ts',

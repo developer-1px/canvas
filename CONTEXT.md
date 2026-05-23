@@ -39,6 +39,7 @@
 - Canvas App Item Layer Adapter: App workflow가 concrete Demo SVG item layer를 직접 알지 않고 items를 stage children으로 렌더링하도록 주입받는 Adapter Interface.
 - Canvas App Extension Id: custom command, creation tool, item module, component presentation renderer key, custom item renderer key, validator key, inspector panel에서 공유하는 안정 lower-kebab 외부 계약.
 - Canvas App Extension Registry: assembly 단계에서 extension entry와 record key를 검증하고 중복을 실패시키는 내부 merge 계약.
+- Canvas App Extension Assembly: custom command, custom item module, custom creation tool, custom item renderer, validator, inspector panel을 App Assembly output bundle로 합성하는 App-owned composition Module.
 - Canvas App Descriptor Shape Contract: 제품별 descriptor가 외부 조립 seam을 통과하기 전에 필수 함수 slot을 갖췄는지 검증하는 외부 Interface 계약.
 - Canvas Standard Command Execution: 내부 canvas command grammar 실행을 effect plan 생성과 document effect 적용으로 조립하는 App-owned runtime Module.
 - Canvas Standard Command Effect Plan: 내부 canvas command grammar와 Engine command 결과를 App document effect descriptor로 변환하는 App-owned runtime Module.
@@ -155,6 +156,7 @@
 - App UI surface는 Shell에서 항상 렌더링하지 않고 Canvas Affordance overlay toggle을 view prop으로 소비해 숨긴다.
 - App Model은 Canvas App Assembly output field를 직접 배분하지 않고 Canvas App Assembly Model에서 consumer별 assembly context를 받는다.
 - App Model은 Canvas Affordance config를 직접 fan-out하지 않고 Canvas App Affordance Model에서 consumer별 affordance context를 받는다.
+- Canvas App Assembly는 제품별 extension bundle merge/duplicate/disabled module 조립 세부를 직접 알지 않고 Canvas App Extension Assembly에 위임한다.
 - Canvas App Assembly composition, output contract validation, output snapshot/freeze는 분리하고, validation은 Canvas App Assembly Contracts가, mutation 방어는 Canvas App Assembly Snapshot이 소유한다.
 - Canvas App Custom Item Module define, Canvas App Custom Item Module Assembly, Canvas App Assembly는 외부 descriptor/adapter/item mutation이 define/조립 후 동작을 바꾸지 않도록 snapshot을 보관한다.
 - Canvas App Assembly의 component presentation renderer input은 기본 registry를 대체하지 않고 extension/override로 합성한다.
