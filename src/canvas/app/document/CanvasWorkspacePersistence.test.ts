@@ -79,6 +79,43 @@ describe('CanvasWorkspacePersistence', () => {
     })
   })
 
+  test('ignores stored custom items that fail current validators', () => {
+    const customItem: CanvasItem = {
+      data: { severity: 'high' },
+      h: 96,
+      id: 'custom-risk-1',
+      kind: 'risk',
+      presentation: 'risk-node',
+      title: 'Risk',
+      type: 'custom',
+      w: 180,
+      x: 80,
+      y: 120,
+    }
+
+    const storedValue = JSON.stringify({
+      items: [customItem],
+      selection: [customItem.id],
+      version: 1,
+      viewport: { scale: 1, x: 0, y: 0 },
+    })
+
+    expect(
+      parseCanvasWorkspaceSnapshot(storedValue, {
+        customItemValidators: {
+          risk: (item) => item.data.severity === 'low',
+        },
+      }),
+    ).toBeNull()
+    expect(
+      parseCanvasWorkspaceSnapshot(storedValue, {
+        customItemValidators: {
+          risk: (item) => item.data.severity === 'high',
+        },
+      })?.items,
+    ).toEqual([customItem])
+  })
+
   test('derives the next id seed from nested numeric suffixes', () => {
     const group: CanvasItem = {
       children: [

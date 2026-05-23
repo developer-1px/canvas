@@ -11,6 +11,7 @@ import {
 import {
   createCanvasItemReadModel,
   normalizeCanvasItems,
+  type CanvasItemValidationOptions,
 } from '../../host'
 
 export const CANVAS_WORKSPACE_STORAGE_KEY =
@@ -31,6 +32,7 @@ export type CanvasWorkspaceSnapshot = {
 type CanvasWorkspacePersistenceArgs = {
   items: CanvasItem[]
   selection: string[]
+  validation?: CanvasItemValidationOptions
   viewport: Viewport
 }
 
@@ -38,6 +40,7 @@ export function useCanvasWorkspacePersistence({
   items,
   selection,
   viewport,
+  validation,
 }: CanvasWorkspacePersistenceArgs) {
   useEffect(() => {
     if (typeof window === 'undefined') {
@@ -45,15 +48,16 @@ export function useCanvasWorkspacePersistence({
     }
 
     const timeout = window.setTimeout(() => {
-      writeStoredCanvasWorkspace({ items, selection, viewport })
+      writeStoredCanvasWorkspace({ items, selection, validation, viewport })
     }, SAVE_DELAY_MS)
 
     return () => window.clearTimeout(timeout)
-  }, [items, selection, viewport])
+  }, [items, selection, validation, viewport])
 }
 
 export function readStoredCanvasWorkspace(
   storage: CanvasWorkspaceStorage | null = getCanvasWorkspaceStorage(),
+  validation: CanvasItemValidationOptions = {},
 ) {
   if (!storage) {
     return null
@@ -62,6 +66,7 @@ export function readStoredCanvasWorkspace(
   try {
     return parseCanvasWorkspaceSnapshot(
       storage.getItem(CANVAS_WORKSPACE_STORAGE_KEY),
+      validation,
     )
   } catch {
     return null
@@ -88,13 +93,14 @@ export function writeStoredCanvasWorkspace(
 
 export function parseCanvasWorkspaceSnapshot(
   value: string | null,
+  validation: CanvasItemValidationOptions = {},
 ): CanvasWorkspaceSnapshot | null {
   if (!value) {
     return null
   }
 
   try {
-    return normalizeCanvasWorkspaceSnapshot(JSON.parse(value))
+    return normalizeCanvasWorkspaceSnapshot(JSON.parse(value), validation)
   } catch {
     return null
   }
@@ -104,8 +110,9 @@ export function createCanvasWorkspaceSnapshot({
   items,
   selection,
   viewport,
+  validation,
 }: CanvasWorkspacePersistenceArgs): CanvasWorkspaceSnapshot {
-  const normalizedItems = normalizeCanvasItems(items)
+  const normalizedItems = normalizeCanvasItems(items, validation)
   const normalizedViewport = normalizeViewport(viewport)
 
   if (!normalizedViewport) {
@@ -133,6 +140,7 @@ export function getCanvasItemIdSeed(items: CanvasItem[]) {
 
 function normalizeCanvasWorkspaceSnapshot(
   value: unknown,
+  validation: CanvasItemValidationOptions,
 ): CanvasWorkspaceSnapshot | null {
   if (!isRecord(value) || value.version !== CANVAS_WORKSPACE_VERSION) {
     return null
@@ -148,7 +156,7 @@ function normalizeCanvasWorkspaceSnapshot(
     return null
   }
 
-  const items = normalizeCanvasItems(value.items)
+  const items = normalizeCanvasItems(value.items, validation)
 
   return {
     items,

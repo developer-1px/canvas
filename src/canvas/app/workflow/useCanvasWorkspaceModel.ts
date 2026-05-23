@@ -31,13 +31,20 @@ export function useCanvasWorkspaceModel({
   customItemValidators?: CanvasCustomItemValidators
   initialItems: CanvasItem[]
 }) {
-  const storedWorkspace = useMemo(() => readStoredCanvasWorkspace(), [])
+  const validation = useMemo(
+    () => ({ customItemValidators }),
+    [customItemValidators],
+  )
+  const storedWorkspace = useMemo(
+    () => readStoredCanvasWorkspace(undefined, validation),
+    [validation],
+  )
   const workspaceInitialItems = storedWorkspace?.items ?? initialItems
   const idSeed = useRef(getCanvasItemIdSeed(workspaceInitialItems))
   const document = useCanvasDocument(
     workspaceInitialItems,
     storedWorkspace?.selection ?? [...DEFAULT_INITIAL_SELECTION],
-    { customItemValidators },
+    validation,
   )
   const [viewport, setViewport] = useState<Viewport>(
     () => storedWorkspace?.viewport ?? INITIAL_VIEWPORT,
@@ -59,6 +66,7 @@ export function useCanvasWorkspaceModel({
   useCanvasWorkspacePersistence({
     items: document.items,
     selection: document.selection,
+    validation,
     viewport,
   })
 
