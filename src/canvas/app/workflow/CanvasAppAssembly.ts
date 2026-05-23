@@ -14,6 +14,7 @@ import {
 import {
   DEFAULT_CANVAS_DEMO_SVG_CUSTOM_ITEM_RENDERERS,
   DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS,
+  createCanvasDemoSvgComponentPresentationRenderers,
   type CanvasDemoSvgComponentPresentationRenderers,
   type CanvasDemoSvgCustomItemRenderers,
 } from '../rendering'
@@ -90,9 +91,9 @@ export function createCanvasAppAssembly(
   const assembly: CanvasAppAssembly = {
     componentLibrary:
       input.componentLibrary ?? DEFAULT_CANVAS_APP_ASSEMBLY.componentLibrary,
-    componentPresentationRenderers:
-      input.componentPresentationRenderers ??
-      DEFAULT_CANVAS_APP_ASSEMBLY.componentPresentationRenderers,
+    componentPresentationRenderers: createCanvasDemoSvgComponentPresentationRenderers(
+      input.componentPresentationRenderers,
+    ),
     customCommands: appendUniqueCanvasAppExtensionEntries({
       current: [
         ...DEFAULT_CANVAS_APP_ASSEMBLY.customCommands,

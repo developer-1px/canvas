@@ -20,6 +20,26 @@ const customItem: CanvasCustomItem = {
 }
 
 describe('CanvasItemSchema custom items', () => {
+  it('rejects component item kinds outside the stable id contract', () => {
+    expect(() =>
+      validateCanvasItems([
+        {
+          id: 'component-risk-1',
+          type: 'component',
+          component: 'Risk',
+          title: 'Risk',
+          x: 80,
+          y: 120,
+          w: 180,
+          h: 96,
+          fill: '#fff7ed',
+          stroke: '#fb923c',
+          accent: '#ea580c',
+        },
+      ]),
+    ).toThrow()
+  })
+
   it('accepts the stable custom item storage envelope', () => {
     expect(validateCanvasItems([customItem])).toEqual([customItem])
   })

@@ -48,6 +48,19 @@ describe('CANVAS_COMPONENT_LIBRARY', () => {
     ).toBe(fallback.id)
   })
 
+  it('rejects malformed component lookup ids instead of silently falling back', () => {
+    expect(() => CANVAS_COMPONENT_LIBRARY.getTemplate('Unknown Kind')).toThrow(
+      'Invalid canvas component template id: Unknown Kind',
+    )
+    expect(() =>
+      CANVAS_COMPONENT_LIBRARY.createItem({
+        id: 'component-unknown',
+        point: { x: 0, y: 0 },
+        templateId: 'Unknown Kind',
+      }),
+    ).toThrow('Invalid canvas component template id: Unknown Kind')
+  })
+
   it('accepts externally assembled component templates', () => {
     const library = createCanvasComponentLibrary({
       templates: [

@@ -34,7 +34,7 @@ The canvas code is intended to work as a reusable component factory, not as one 
 
 - A different Host item model can reuse `CanvasSvgStage` by supplying a different item layer.
 - Adding a Demo component kind that reuses an existing presentation remains a Canvas Component Library change.
-- Adding a new SVG presentation changes the Demo SVG Item Layer Adapter, not Renderer Stage.
+- Adding a new SVG presentation is assembled as a Canvas App Assembly extension or override, not as a Renderer Stage change.
 - App Shell stays a layout composition layer.
 - Internal document implementation can change without touching app document hooks.
 - Custom component kinds and SVG presentation strategies can be assembled outside the internal canvas grammar without editing Renderer Stage or App workflow.

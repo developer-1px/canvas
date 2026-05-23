@@ -170,6 +170,11 @@ function getCanvasComponentTemplate(
   templates: readonly CanvasComponentTemplate[],
   id: CanvasComponentKind,
 ) {
+  assertCanvasStableId({
+    id,
+    label: 'component template',
+  })
+
   return templates.find((template) => template.id === id) ?? templates[0]
 }
 

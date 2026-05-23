@@ -130,6 +130,20 @@ describe('CanvasAppAssembly', () => {
     ).toThrow('Duplicate canvas app assembly custom item validator: risk')
   })
 
+  it('treats direct component presentation renderers as extensions', () => {
+    const renderRisk: CanvasDemoSvgComponentRendererStrategy = ({ item }) =>
+      item.title
+
+    const assembly = createCanvasAppAssembly({
+      componentPresentationRenderers: {
+        'risk-card': renderRisk,
+      },
+    })
+
+    expect(assembly.componentPresentationRenderers['risk-card']).toBe(renderRisk)
+    expect(assembly.componentPresentationRenderers['note-card']).toBeDefined()
+  })
+
   it('rejects direct extension ids outside the app extension id contract', () => {
     expect(() =>
       createCanvasAppAssembly({

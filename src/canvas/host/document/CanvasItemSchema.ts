@@ -98,6 +98,7 @@ function isCanvasItem(value: unknown): value is CanvasItem {
   if (value.type === 'component') {
     return (
       typeof value.component === 'string' &&
+      isCanvasStableId(value.component) &&
       typeof value.title === 'string' &&
       typeof value.fill === 'string' &&
       typeof value.stroke === 'string' &&

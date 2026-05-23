@@ -50,10 +50,12 @@
 - Demo item SVG 렌더링은 App의 Demo SVG Item Layer Adapter가 소유한다.
 - 안정 entity type은 `src/canvas/entities`에서 import한다.
 - persisted kind와 registry key는 Canvas Stable Id 형식을 사용한다.
+- 알 수 없는 stable component kind는 fallback할 수 있지만, malformed component kind는 validation/lookup 단계에서 실패해야 한다.
 - 모든 기능은 on/off 가능해야 한다.
 - 새 Demo component kind가 기존 presentation을 재사용하면 Canvas Component Library만 수정한다.
 - 새 Demo component kind와 새 SVG presentation은 Canvas App Assembly에서 component library와 presentation registry를 조립해 붙인다.
 - Canvas App Assembly input은 output type을 부분 노출하지 않고 명시적 필드 계약으로 유지한다.
+- Canvas App Assembly의 component presentation renderer input은 기본 registry를 대체하지 않고 extension/override로 합성한다.
 - 제품별 business action은 Engine command union에 넣지 않고 Canvas App Custom Command로 등록한다.
 - 제품별 creation tool은 내부 Tool union에 구체 id를 넣지 않고 Canvas App Custom Creation Tool로 등록한다.
 - 제품별 item kind는 내부 `CanvasItem` union에 새 variant를 추가하지 않고 Canvas App Custom Item Module로 등록한다.
