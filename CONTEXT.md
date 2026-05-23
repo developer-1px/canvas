@@ -322,6 +322,7 @@
 - Canvas Workspace Persistence는 storage IO와 debounce만 맡고, 저장 payload contract는 Canvas Workspace Snapshot이 소유한다.
 - Canvas App Assembly는 `workspaceStorageProvider`를 받아 Workspace Persistence에 전달하고, App workflow가 browser `localStorage`를 직접 선택하지 않게 한다.
 - Canvas App Assembly는 `initialSelection`을 받아 Workspace Runtime에 전달하고, Demo 기본 선택 id는 default assembly에만 둔다. 제품별 `initialItems`가 있으면 명시 `initialSelection` 없이는 빈 selection으로 시작한다.
+- Canvas App Workspace Assembly는 initial items normalization, Demo default selection fallback, workspace storage provider fallback을 소유한다.
 - Canvas App Workspace Assembly Contracts는 initial items, initial selection, storage provider 검증을 소유하고, initial selection이 assembled initial items에 맞지 않으면 App runtime 진입 전에 실패시킨다.
 - Clipboard payload는 Host Document Controller에서 현재 item 저장 계약으로 다시 검증하고, 실패하면 command loop로 throw하지 않고 빈 clipboard/false로 containment 한다.
 - Host Document Controller는 invalid item mutation을 App workflow로 throw하지 않고 false/current items로 containment 한다.

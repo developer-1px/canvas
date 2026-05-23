@@ -8,7 +8,6 @@ import {
   CANVAS_COMPONENT_LIBRARY,
   CANVAS_ITEM_ENGINE_ADAPTERS,
   INITIAL_ITEMS,
-  normalizeCanvasItems,
   type CanvasComponentLibrary,
   type CanvasCustomItemValidators,
   type CanvasItem,
@@ -41,6 +40,7 @@ import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreati
 import { assertCanvasAppAssembly } from './CanvasAppAssemblyContracts'
 import { createCanvasAppComponentAssembly } from './CanvasAppComponentAssembly'
 import { createCanvasAppExtensionAssembly } from './CanvasAppExtensionAssembly'
+import { createCanvasAppWorkspaceAssembly } from './CanvasAppWorkspaceAssembly'
 import { snapshotCanvasAppAssembly } from './CanvasAppAssemblySnapshot'
 import type { CanvasAppItemAdapters } from './CanvasAppAdapterContracts'
 
@@ -115,6 +115,11 @@ export function createCanvasAppAssembly(
     input,
     DEFAULT_CANVAS_APP_ASSEMBLY,
   )
+  const workspaceAssembly = createCanvasAppWorkspaceAssembly(
+    input,
+    DEFAULT_CANVAS_APP_ASSEMBLY,
+    { customItemValidators: extensionAssembly.customItemValidators },
+  )
 
   const assembly: CanvasAppAssembly = {
     affordanceConfig: input.affordanceConfig === undefined
@@ -128,23 +133,13 @@ export function createCanvasAppAssembly(
     customItemRenderers: extensionAssembly.customItemRenderers,
     customItemValidators: extensionAssembly.customItemValidators,
     inspectorPanels: extensionAssembly.inspectorPanels,
-    initialItems: normalizeCanvasItems(
-      input.initialItems ?? DEFAULT_CANVAS_APP_ASSEMBLY.initialItems,
-      { customItemValidators: extensionAssembly.customItemValidators },
-    ),
-    initialSelection: [
-      ...(input.initialSelection ??
-        (input.initialItems === undefined
-          ? DEFAULT_CANVAS_APP_ASSEMBLY.initialSelection
-          : [])),
-    ],
+    initialItems: workspaceAssembly.initialItems,
+    initialSelection: workspaceAssembly.initialSelection,
     itemAdapters: input.itemAdapters ?? DEFAULT_CANVAS_APP_ASSEMBLY.itemAdapters,
     itemLayerAdapter:
       input.itemLayerAdapter ?? DEFAULT_CANVAS_APP_ASSEMBLY.itemLayerAdapter,
     stageAdapter: input.stageAdapter ?? DEFAULT_CANVAS_APP_ASSEMBLY.stageAdapter,
-    workspaceStorageProvider:
-      input.workspaceStorageProvider ??
-      DEFAULT_CANVAS_APP_ASSEMBLY.workspaceStorageProvider,
+    workspaceStorageProvider: workspaceAssembly.workspaceStorageProvider,
   }
 
   assertCanvasAppAssembly(assembly)

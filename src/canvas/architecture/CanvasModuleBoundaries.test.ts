@@ -4575,6 +4575,44 @@ describe('Canvas module boundaries', () => {
     )
   })
 
+  it('keeps App workspace assembly creation behind a named module', () => {
+    const assemblyFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppAssembly.ts',
+    )
+    const workspaceAssemblyFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppWorkspaceAssembly.ts',
+    )
+
+    expect(assemblyFile.source).toContain(
+      "from './CanvasAppWorkspaceAssembly'",
+    )
+    expect(assemblyFile.source).toContain(
+      'createCanvasAppWorkspaceAssembly',
+    )
+    expect(assemblyFile.source).not.toContain('normalizeCanvasItems')
+    expect(assemblyFile.source).not.toContain(
+      'input.initialItems ?? DEFAULT_CANVAS_APP_ASSEMBLY.initialItems',
+    )
+    expect(assemblyFile.source).not.toContain(
+      'input.initialItems === undefined',
+    )
+    expect(workspaceAssemblyFile.source).toContain(
+      'export function createCanvasAppWorkspaceAssembly',
+    )
+    expect(workspaceAssemblyFile.source).toContain(
+      'export type CanvasAppWorkspaceAssembly',
+    )
+    expect(workspaceAssemblyFile.source).not.toContain('Pick<')
+    expect(workspaceAssemblyFile.source).not.toContain('CanvasAppAssembly')
+    expect(workspaceAssemblyFile.source).toContain('normalizeCanvasItems')
+    expect(workspaceAssemblyFile.source).toContain(
+      'input.initialItems === undefined',
+    )
+    expect(workspaceAssemblyFile.source).toContain(
+      'workspaceStorageProvider',
+    )
+  })
+
   it('keeps affordance config contracts in the Engine affordance module', () => {
     const assemblyContractsFile = getSourceFile(
       'src/canvas/app/workflow/CanvasAppAssemblyContracts.ts',
