@@ -15,14 +15,10 @@ import { assertCanvasAppCustomItemValidators } from '../modules/CanvasAppCustomI
 import {
   assertCanvasAppComponentPresentationRenderers,
   assertCanvasAppCustomItemRenderers,
-  type CanvasAppItemLayerAdapter,
-  type CanvasAppStageAdapter,
 } from '../rendering'
 import { assertCanvasAppCustomCreationTools } from '../tools/CanvasAppCustomCreationTools'
-import type {
-  CanvasAppAssembly,
-  CanvasAppItemAdapters,
-} from './CanvasAppAssembly'
+import { assertCanvasAppAssemblyAdapters } from './CanvasAppAdapterContracts'
+import type { CanvasAppAssembly } from './CanvasAppAssembly'
 
 export function assertCanvasAppAssembly(assembly: CanvasAppAssembly) {
   assertCanvasAppDescriptorObject(assembly, 'assembly')
@@ -41,9 +37,7 @@ export function assertCanvasAppAssembly(assembly: CanvasAppAssembly) {
   normalizeCanvasItems(assembly.initialItems, {
     customItemValidators: assembly.customItemValidators,
   })
-  assertCanvasAppItemAdapters(assembly.itemAdapters)
-  assertCanvasAppItemLayerAdapter(assembly.itemLayerAdapter)
-  assertCanvasAppStageAdapter(assembly.stageAdapter)
+  assertCanvasAppAssemblyAdapters(assembly)
 
   return assembly
 }
@@ -110,92 +104,4 @@ function assertCanvasAppComponentLibraryResolvers(
       )
     }
   }
-}
-
-function assertCanvasAppItemAdapters(itemAdapters: CanvasAppItemAdapters) {
-  assertCanvasAppDescriptorObject(itemAdapters, 'item adapters')
-  assertCanvasAppCommandAdapter(itemAdapters.command)
-  assertCanvasAppCreationAdapter(itemAdapters.creation)
-  assertCanvasAppTransformAdapter(itemAdapters.transform)
-}
-
-function assertCanvasAppCommandAdapter(
-  adapter: CanvasAppItemAdapters['command'],
-) {
-  assertCanvasAppDescriptorObject(adapter, 'command adapter')
-
-  for (const field of [
-    'alignSelection',
-    'cloneSelection',
-    'deleteSelection',
-    'distributeSelection',
-    'groupSelection',
-    'lockSelection',
-    'nudgeSelection',
-    'pasteItems',
-    'reorderSelection',
-    'selectAll',
-    'ungroupSelection',
-    'unlockAll',
-  ] as const) {
-    assertCanvasAppDescriptorFunctionField({
-      field,
-      owner: 'command adapter',
-      value: adapter[field],
-    })
-  }
-}
-
-function assertCanvasAppCreationAdapter(
-  adapter: CanvasAppItemAdapters['creation'],
-) {
-  assertCanvasAppDescriptorObject(adapter, 'creation adapter')
-
-  for (const field of [
-    'createArrow',
-    'createHighlight',
-    'createMarker',
-    'createRect',
-    'createText',
-  ] as const) {
-    assertCanvasAppDescriptorFunctionField({
-      field,
-      owner: 'creation adapter',
-      value: adapter[field],
-    })
-  }
-}
-
-function assertCanvasAppTransformAdapter(
-  adapter: CanvasAppItemAdapters['transform'],
-) {
-  assertCanvasAppDescriptorObject(adapter, 'transform adapter')
-
-  for (const field of ['resizeSelection', 'translateSelection'] as const) {
-    assertCanvasAppDescriptorFunctionField({
-      field,
-      owner: 'transform adapter',
-      value: adapter[field],
-    })
-  }
-}
-
-function assertCanvasAppItemLayerAdapter(
-  adapter: CanvasAppItemLayerAdapter,
-) {
-  assertCanvasAppDescriptorObject(adapter, 'item layer adapter')
-  assertCanvasAppDescriptorFunctionField({
-    field: 'renderItems',
-    owner: 'item layer adapter',
-    value: adapter.renderItems,
-  })
-}
-
-function assertCanvasAppStageAdapter(adapter: CanvasAppStageAdapter) {
-  assertCanvasAppDescriptorObject(adapter, 'stage adapter')
-  assertCanvasAppDescriptorFunctionField({
-    field: 'renderStage',
-    owner: 'stage adapter',
-    value: adapter.renderStage,
-  })
 }

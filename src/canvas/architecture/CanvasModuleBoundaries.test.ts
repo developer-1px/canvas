@@ -2001,6 +2001,9 @@ describe('Canvas module boundaries', () => {
     const contractsFile = getSourceFile(
       'src/canvas/app/workflow/CanvasAppAssemblyContracts.ts',
     )
+    const adapterContractsFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppAdapterContracts.ts',
+    )
 
     expect(assemblyFile.source).toContain(
       "from './CanvasAppAssemblyContracts'",
@@ -2027,12 +2030,24 @@ describe('Canvas module boundaries', () => {
       'function assertCanvasAppComponentLibrary',
     )
     expect(contractsFile.source).toContain(
+      'assertCanvasAppAssemblyAdapters',
+    )
+    expect(contractsFile.source).not.toContain(
       'function assertCanvasAppItemAdapters',
     )
     expect(contractsFile.source).toContain('getPresentation mismatch')
     expect(contractsFile.source).toContain('getTemplate mismatch')
     expect(contractsFile.source).not.toContain('validate strategy')
-    expect(contractsFile.source).toContain('command adapter')
+    expect(contractsFile.source).not.toContain('command adapter')
+    expect(adapterContractsFile.source).toContain(
+      'export function assertCanvasAppAssemblyAdapters',
+    )
+    expect(adapterContractsFile.source).toContain(
+      'function assertCanvasAppItemAdapters',
+    )
+    expect(adapterContractsFile.source).toContain('command adapter')
+    expect(adapterContractsFile.source).toContain('item layer adapter')
+    expect(adapterContractsFile.source).toContain('stage adapter')
   })
 
   it('keeps affordance config contracts in the Engine affordance module', () => {
