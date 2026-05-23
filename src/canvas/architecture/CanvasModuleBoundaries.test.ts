@@ -360,6 +360,35 @@ describe('Canvas module boundaries', () => {
     expect(violations).toEqual([])
   })
 
+  it('keeps app stage element fan-out behind a named workflow module', () => {
+    const appModelFile = getSourceFile(
+      'src/canvas/app/workflow/useCanvasAppModel.ts',
+    )
+    const stageElementModelFile = getSourceFile(
+      'src/canvas/app/workflow/useCanvasAppStageElementModel.ts',
+    )
+
+    expect(appModelFile.source).toContain(
+      "from './useCanvasAppStageElementModel'",
+    )
+    expect(appModelFile.source).not.toContain(
+      "from '../stage/CanvasAppStageElement'",
+    )
+    expect(appModelFile.source).not.toContain('stageElement.mount')
+    expect(stageElementModelFile.source).toContain(
+      "from '../stage/CanvasAppStageElement'",
+    )
+    for (const consumerContext of [
+      'command: {',
+      'component: {',
+      'pointer: {',
+      'stage: {',
+      'viewport: {',
+    ]) {
+      expect(stageElementModelFile.source).toContain(consumerContext)
+    }
+  })
+
   it('keeps app stage render input on the stage mount interface', () => {
     const stageAdapterFile = getSourceFile(
       'src/canvas/app/rendering/CanvasAppStageAdapter.tsx',

@@ -2,7 +2,6 @@ import { useMemo } from 'react'
 import {
   DEFAULT_CANVAS_AFFORDANCE_CONFIG,
 } from '../../engine'
-import { useCanvasAppStageElement } from '../stage/CanvasAppStageElement'
 import { getCanvasAppAssemblyModel } from './CanvasAppAssemblyModel'
 import { getCanvasAppControlModel } from './CanvasAppControlModel'
 import { renderCanvasAppStageModel } from './CanvasAppStageModel'
@@ -12,6 +11,7 @@ import { useCanvasAppExtensionModel } from './useCanvasAppExtensionModel'
 import { useCanvasAppInspectorModel } from './useCanvasAppInspectorModel'
 import { useCanvasAppKeyboardModel } from './useCanvasAppKeyboardModel'
 import { useCanvasAppPointerModel } from './useCanvasAppPointerModel'
+import { useCanvasAppStageElementModel } from './useCanvasAppStageElementModel'
 import { useCanvasAppTextModel } from './useCanvasAppTextModel'
 import { useCanvasInteractionModel } from './useCanvasInteractionModel'
 import { useCanvasAppViewportModel } from './useCanvasAppViewportModel'
@@ -33,7 +33,7 @@ export function useCanvasAppModel({
     () => getCanvasAppAssemblyModel(assertCanvasAppAssembly(assembly)),
     [assembly],
   )
-  const stageElement = useCanvasAppStageElement()
+  const stageElement = useCanvasAppStageElementModel()
   const workspace = useCanvasWorkspaceModel(appAssembly.workspace)
   const interaction = useCanvasInteractionModel({
     config: canvasAffordanceConfig,
@@ -59,14 +59,14 @@ export function useCanvasAppModel({
     createId: workspace.command.createId,
     document: workspace.command.document,
     ...text.command,
-    stageElement,
+    ...stageElement.command,
     workspace: workspace.command.workspace,
   })
 
   const viewportControls = useCanvasAppViewportModel({
     config: canvasAffordanceConfig,
     ...workspace.viewport,
-    stageElement,
+    ...stageElement.viewport,
   })
 
   useCanvasAppKeyboardModel({
@@ -95,7 +95,7 @@ export function useCanvasAppModel({
     ...extension.pointer,
     interaction: interaction.pointer,
     ...appAssembly.pointer,
-    stageElement,
+    ...stageElement.pointer,
     workspace: {
       ...workspace.pointer.workspace,
       ...text.pointer.workspace,
@@ -110,7 +110,7 @@ export function useCanvasAppModel({
       ...interaction.component,
       ...text.component.interaction,
     },
-    stageElement,
+    ...stageElement.component,
     workspace: workspace.component.workspace,
   })
 
@@ -138,7 +138,7 @@ export function useCanvasAppModel({
       rendering: appAssembly.rendering,
       stage: {
         ...interaction.stage,
-        stageElement: stageElement.mount,
+        ...stageElement.stage,
         ...workspace.stage,
       },
     }),

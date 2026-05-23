@@ -30,6 +30,7 @@
 - Canvas App Rendering Contracts: 외부 조립자가 component/custom item renderer를 등록할 때 쓰는 App-owned authoring Interface. Demo SVG registry type name에 기대지 않는다.
 - Canvas App Stage Adapter: App Shell이 concrete Renderer Stage를 직접 import하지 않고 stage ReactNode를 받도록 만드는 Adapter Interface.
 - Canvas App Stage Element: stage DOM element의 bounds, pointer capture, wheel listener를 한 Module에 숨기는 App-owned element Adapter.
+- Canvas App Stage Element Model: App Model이 Stage Element Adapter를 command, component, pointer, viewport, stage render context에 직접 배분하지 않도록 consumer별 stage element context를 만드는 workflow Module.
 - Canvas App Item Layer Adapter: App workflow가 concrete Demo SVG item layer를 직접 알지 않고 items를 stage children으로 렌더링하도록 주입받는 Adapter Interface.
 - Canvas App Extension Id: custom command, creation tool, item module, component presentation renderer key, custom item renderer key, validator key, inspector panel에서 공유하는 안정 lower-kebab 외부 계약.
 - Canvas App Extension Registry: assembly 단계에서 extension entry와 record key를 검증하고 중복을 실패시키는 내부 merge 계약.
@@ -194,6 +195,7 @@
 - App Shell은 command, pointer, keyboard, viewport, text editing wiring을 직접 알지 않는다.
 - App Shell은 concrete Renderer Stage를 직접 import하지 않고 Canvas App Stage Adapter가 만든 stage ReactNode를 배치한다.
 - App workflow와 command/pointer/viewport hook은 raw SVG ref를 직접 읽지 않고 Canvas App Stage Element를 통해 stage DOM 기능을 사용한다.
+- App Model은 Stage Element Adapter를 직접 fan-out하지 않고 Canvas App Stage Element Model에서 consumer별 stage element context를 받는다.
 - App View는 raw workflow state 대신 Canvas App Model이 조립한 control별 props만 받는다.
 - App Model은 command hook context wiring 세부를 직접 알지 않고 Canvas App Command Model에서 command handlers를 받는다.
 - App Model은 component insertion hook context wiring과 control fan-out 세부를 직접 알지 않고 Canvas App Component Model에서 component control context를 받는다.
