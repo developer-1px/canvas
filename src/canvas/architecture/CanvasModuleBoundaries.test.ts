@@ -555,6 +555,27 @@ describe('Canvas module boundaries', () => {
     expect(runtimeFile.source).toContain('catch')
   })
 
+  it('keeps App Assembly snapshot behavior behind a named module', () => {
+    const assemblyFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppAssembly.ts',
+    )
+    const snapshotFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppAssemblySnapshot.ts',
+    )
+
+    expect(assemblyFile.source).toContain(
+      "from './CanvasAppAssemblySnapshot'",
+    )
+    expect(assemblyFile.source).not.toContain('structuredClone')
+    expect(assemblyFile.source).not.toContain('deepFreezeCanvasAppValue')
+    expect(assemblyFile.source).not.toContain('freezeCanvasAppRecord')
+    expect(assemblyFile.source).not.toContain('freezeCanvasAppArray')
+    expect(snapshotFile.source).toContain('structuredClone')
+    expect(snapshotFile.source).toContain('deepFreezeCanvasAppValue')
+    expect(snapshotFile.source).toContain('freezeCanvasAppRecord')
+    expect(snapshotFile.source).toContain('freezeCanvasAppArray')
+  })
+
   it('keeps app workflow hooks from recreating the workspace read model', () => {
     const violations = sourceFiles
       .filter((file) =>

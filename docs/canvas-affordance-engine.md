@@ -54,6 +54,7 @@
 | `src/canvas/app/tools/CanvasAppCustomCreationTools.ts` | 내부 Tool union에 구체 id를 추가하지 않고 제품별 생성 도구를 등록하는 descriptor를 제공한다 |
 | `src/canvas/app/tools/CanvasAppCustomCreationToolRuntime.ts` | Custom creation tool id 변환, toolbar state, lookup, shortcut matching을 소유한다 |
 | `src/canvas/app/workflow/CanvasAppAssembly.ts` | Host item adapter, component library, custom command, custom item module, inspector panel, initial items, SVG presentation registry 같은 제품별 의미를 외부 조립 seam으로 제공한다 |
+| `src/canvas/app/workflow/CanvasAppAssemblySnapshot.ts` | 조립된 assembly output을 외부 mutation에서 보호하도록 component library, extension registry, initial item, adapter를 snapshot/freeze 한다 |
 | `src/canvas/app/workflow/index.ts` | App Shell이 사용하는 workflow public entry |
 | `src/canvas/app/workflow/useCanvasAppModel.ts` | command, pointer, keyboard, viewport, text editing wiring과 control별 view props 조립을 App Shell에 숨긴다 |
 | `src/canvas/app/workflow/CanvasWorkflowContract.ts` | App workflow hook들이 공유하는 document commit, selection, clipboard contract |
@@ -140,6 +141,7 @@ type CanvasAffordanceConfig = {
 - App workflow는 `CANVAS_ITEM_ENGINE_ADAPTERS`를 통해 concrete item adapter를 주입한다.
 - App workflow는 Canvas App Assembly를 통해 concrete item adapter, component library, custom command, custom item module, inspector panel, initial items, presentation registry를 주입받는다.
 - Canvas App Assembly input은 output type의 `Partial`이 아니라 Host가 조립할 수 있는 필드만 명시한 외부 입력 계약이다.
+- Canvas App Assembly composition/validation과 output snapshot/freeze는 분리하고, mutation 방어는 Canvas App Assembly Snapshot이 소유한다.
 - Canvas App Custom Item Module define, Custom Item Module Assembly output, Canvas App Assembly output은 define/조립 후 외부 descriptor, adapter, initial item mutation에 흔들리지 않도록 snapshot으로 보관한다.
 - Canvas App Assembly initial items는 조립된 custom item validator로 assembly 단계에서 검증되어 잘못된 Host seed가 React document 생성까지 넘어가지 않는다.
 - App과 UI는 Renderer Adapter 내부 파일을 import하지 않는다. SVG stage는 `src/canvas/renderer` public facade에서 사용한다.
