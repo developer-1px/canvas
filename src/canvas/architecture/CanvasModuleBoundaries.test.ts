@@ -1733,6 +1733,9 @@ describe('Canvas module boundaries', () => {
     const extensionModelFile = getSourceFile(
       'src/canvas/app/workflow/useCanvasAppExtensionModel.ts',
     )
+    const extensionConsumerModelFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppExtensionConsumerModel.ts',
+    )
     const appModelFile = getSourceFile(
       'src/canvas/app/workflow/useCanvasAppModel.ts',
     )
@@ -1749,9 +1752,18 @@ describe('Canvas module boundaries', () => {
     expect(extensionModelFile.source).toContain(
       "from '../commands/CanvasAppCustomCommandExecution'",
     )
-    expect(extensionModelFile.source).toContain('control: {')
-    expect(extensionModelFile.source).toContain('keyboard: {')
-    expect(extensionModelFile.source).toContain('pointer: {')
+    expect(extensionModelFile.source).toContain(
+      "from './CanvasAppExtensionConsumerModel'",
+    )
+    expect(extensionModelFile.source).not.toContain('control: {')
+    expect(extensionModelFile.source).not.toContain('keyboard: {')
+    expect(extensionModelFile.source).not.toContain('pointer: {')
+    expect(extensionConsumerModelFile.source).toContain(
+      'export function getCanvasAppExtensionConsumerModel',
+    )
+    expect(extensionConsumerModelFile.source).toContain('control: {')
+    expect(extensionConsumerModelFile.source).toContain('keyboard: {')
+    expect(extensionConsumerModelFile.source).toContain('pointer: {')
     expect(appModelFile.source).toContain(
       "from './useCanvasAppExtensionModel'",
     )

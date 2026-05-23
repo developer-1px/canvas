@@ -12,7 +12,6 @@ import type {
 import {
   getCanvasAppCustomCommandStates,
   runCanvasAppCustomCommand,
-  type CanvasAppCustomCommandState,
 } from '../commands/CanvasAppCustomCommandExecution'
 import type {
   CanvasAppCustomCommand,
@@ -21,12 +20,15 @@ import type {
 import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
 import {
   getCanvasAppCustomCreationToolStates,
-  type CanvasAppCustomCreationToolState,
 } from '../tools/CanvasAppCustomCreationToolRuntime'
 import type {
   CommitCanvasItemsChange,
   CommitCanvasSelection,
 } from './CanvasWorkflowContract'
+import {
+  getCanvasAppExtensionConsumerModel,
+  type CanvasAppExtensionModel,
+} from './CanvasAppExtensionConsumerModel'
 
 type UseCanvasAppExtensionModelArgs = {
   commitItemsChange: CommitCanvasItemsChange
@@ -38,20 +40,6 @@ type UseCanvasAppExtensionModelArgs = {
   selection: string[]
   setEditing: Dispatch<SetStateAction<EditingText | null>>
   viewport: Viewport
-}
-
-export type CanvasAppExtensionModel = {
-  control: {
-    customCommands: CanvasAppCustomCommandState[]
-    customTools: CanvasAppCustomCreationToolState[]
-    onRunCustomCommand: (commandId: string) => boolean
-  }
-  keyboard: {
-    customCreationTools: CanvasAppCustomCreationToolState[]
-  }
-  pointer: {
-    customCreationTools: readonly CanvasAppCustomCreationTool[]
-  }
 }
 
 export function useCanvasAppExtensionModel({
@@ -107,17 +95,10 @@ export function useCanvasAppExtensionModel({
     [customCommandContext, customCommands],
   )
 
-  return {
-    control: {
-      customCommands: customCommandStates,
-      customTools: customCreationToolStates,
-      onRunCustomCommand: runCustomCommand,
-    },
-    keyboard: {
-      customCreationTools: customCreationToolStates,
-    },
-    pointer: {
-      customCreationTools,
-    },
-  }
+  return getCanvasAppExtensionConsumerModel({
+    customCommandStates,
+    customCreationToolStates,
+    customCreationTools,
+    runCustomCommand,
+  })
 }

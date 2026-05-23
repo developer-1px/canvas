@@ -105,7 +105,8 @@
 - Canvas App Command Consumer Model: Command runtime callbacks를 toolbar, keyboard, pointer consumer별 command context로 변환하는 workflow Module.
 - Canvas App Component Model: App Model이 component insertion의 component library, document commit, selection, stage, viewport wiring과 control fan-out 세부를 직접 알지 않도록 component control context를 만드는 workflow Module.
 - Canvas App Control Model: component palette, toolbar, status, zoom controls props를 만들고 command availability, status label, selected fit target 규칙을 숨기는 workflow Module.
-- Canvas App Extension Model: 외부 custom command/tool descriptor를 control, keyboard, pointer가 쓰는 consumer별 extension context로 바꾸는 workflow Module.
+- Canvas App Extension Model: 외부 custom command/tool descriptor를 custom command/tool runtime state와 runner로 바꾸는 workflow Module.
+- Canvas App Extension Consumer Model: custom command/tool runtime state와 runner를 control, keyboard, pointer consumer별 extension context로 변환하는 workflow Module.
 - Canvas App Inspector Model: App Model이 inspector panel list, read model, selection wiring 세부를 직접 알지 않도록 object inspector props를 만드는 workflow Module.
 - Canvas App Keyboard Model: App Model이 keyboard shortcut handler wiring 세부를 알지 않도록 command, interaction, viewport shortcut handlers를 조립하는 workflow Module.
 - Canvas App Pointer Model: App Model이 pointer down/drag hook 조립 세부를 알지 않도록 stage와 item layer pointer handlers를 만드는 workflow Module.
@@ -245,7 +246,7 @@
 - App Model은 command hook context wiring 세부를 직접 알지 않고 Canvas App Command Model에서 command handlers를 받는다. Command runtime 생성은 Canvas App Command Model이, consumer별 command fan-out은 Canvas App Command Consumer Model이 소유한다.
 - App Model은 component insertion hook context wiring과 control fan-out 세부를 직접 알지 않고 Canvas App Component Model에서 component control context를 받는다.
 - App Model은 control별 view props, command availability, status label, selected fit target 규칙을 직접 알지 않고 Canvas App Control Model에 위임한다.
-- App Model은 custom command/tool descriptor 실행과 toolbar/keyboard/pointer fan-out 세부를 직접 알지 않고 Canvas App Extension Model에서 consumer별 extension context를 받는다.
+- App Model은 custom command/tool descriptor 실행과 toolbar/keyboard/pointer fan-out 세부를 직접 알지 않고 Canvas App Extension Model에서 consumer별 extension context를 받는다. custom command/tool runtime 생성은 Canvas App Extension Model이, consumer별 extension fan-out은 Canvas App Extension Consumer Model이 소유한다.
 - App Model은 inspector panel wiring 세부를 직접 알지 않고 Canvas App Inspector Model에서 object inspector props를 받는다.
 - App Model은 keyboard shortcut handler wiring 세부를 직접 알지 않고 Canvas App Keyboard Model에 위임한다.
 - App Model은 pointer down/drag hook 조립 세부를 직접 알지 않고 Canvas App Pointer Model에서 stage/item layer pointer handlers를 받는다.
