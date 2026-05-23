@@ -831,6 +831,9 @@ describe('Canvas module boundaries', () => {
     const itemLayerFile = getSourceFile(
       'src/canvas/app/rendering/CanvasDemoSvgItemLayer.tsx',
     )
+    const executionFile = getSourceFile(
+      'src/canvas/app/rendering/CanvasDemoSvgCustomItemRendererExecution.tsx',
+    )
     const customRegistryFile = getSourceFile(
       'src/canvas/app/rendering/CanvasDemoSvgCustomItemRendererRegistry.tsx',
     )
@@ -839,6 +842,19 @@ describe('Canvas module boundaries', () => {
     )
 
     expect(itemLayerFile.source).toContain(
+      "from './CanvasDemoSvgCustomItemRendererExecution'",
+    )
+    expect(itemLayerFile.source).not.toContain(
+      'getCanvasDemoSvgCustomItemRenderer',
+    )
+    expect(itemLayerFile.source).not.toContain(
+      'renderCanvasDemoSvgCustomItemFallback',
+    )
+    expect(executionFile.source).toContain(
+      'export function renderCanvasDemoSvgCustomItem',
+    )
+    expect(executionFile.source).toContain('getCanvasDemoSvgCustomItemRenderer')
+    expect(executionFile.source).toContain(
       'renderCanvasDemoSvgCustomItemFallback',
     )
     expect(customRegistryFile.source).toContain(

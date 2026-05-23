@@ -18,10 +18,9 @@ import {
 } from './CanvasDemoSvgComponentPresentationRegistry'
 import {
   DEFAULT_CANVAS_DEMO_SVG_CUSTOM_ITEM_RENDERERS,
-  getCanvasDemoSvgCustomItemRenderer,
   type CanvasDemoSvgCustomItemRenderers,
 } from './CanvasDemoSvgCustomItemRendererRegistry'
-import { renderCanvasDemoSvgCustomItemFallback } from './CanvasDemoSvgCustomItemRenderFallback'
+import { renderCanvasDemoSvgCustomItem } from './CanvasDemoSvgCustomItemRendererExecution'
 
 type CanvasDemoSvgItemLayerProps = {
   getComponentPresentation: (component: string) => string
@@ -159,11 +158,6 @@ function renderCanvasItem({
   }
 
   if (item.type === 'custom') {
-    const renderCustomItem = getCanvasDemoSvgCustomItemRenderer({
-      item,
-      renderers: customItemRenderers,
-    })
-
     return (
       <CanvasDemoSvgItemFrame
         key={item.id}
@@ -176,7 +170,10 @@ function renderCanvasItem({
         selected={isSelected}
         onItemPointerDown={onItemPointerDown}
       >
-        {renderCanvasDemoSvgCustomItemSafely({ item, renderCustomItem })}
+        {renderCanvasDemoSvgCustomItem({
+          item,
+          renderers: customItemRenderers,
+        })}
       </CanvasDemoSvgItemFrame>
     )
   }
@@ -213,18 +210,4 @@ function renderCanvasItem({
       {renderCanvasDemoSvgRectTextItem({ item })}
     </CanvasDemoSvgItemFrame>
   )
-}
-
-function renderCanvasDemoSvgCustomItemSafely({
-  item,
-  renderCustomItem,
-}: {
-  item: Extract<CanvasItem, { type: 'custom' }>
-  renderCustomItem: ReturnType<typeof getCanvasDemoSvgCustomItemRenderer>
-}) {
-  try {
-    return renderCustomItem({ item })
-  } catch {
-    return renderCanvasDemoSvgCustomItemFallback({ item })
-  }
 }

@@ -57,7 +57,8 @@
 - Canvas Component Library Contracts: component library input, component template descriptor shape, stable id/presentation, duplicate template id를 검증하는 Host-owned contract Module.
 - Demo SVG Component Render Fallback: component presentation resolver나 renderer 실행 실패를 기본 component card로 containment 하는 App rendering 내부 Module.
 - Demo SVG Custom Item Renderer Registry Contracts: custom item renderer registry key와 render strategy slot을 검증하는 App rendering contract Module.
-- Demo SVG Custom Item Render Fallback: custom item renderer 누락이나 실행 실패를 unknown custom item card로 containment 하는 App rendering 내부 Module.
+- Demo SVG Custom Item Renderer Execution: custom item renderer lookup, render 실행, throw 시 fallback containment를 소유하는 App rendering Module.
+- Demo SVG Custom Item Render Fallback: custom item renderer 누락/실패 때 쓰는 unknown custom item card fallback shape를 소유하는 App rendering 내부 Module.
 - Drawing Item: Demo `CanvasItem` 중 marker, highlighter, arrow처럼 캔버스 위에 빠르게 주석을 그리는 항목. `points` 또는 `start/end`가 실제 geometry이고 `x/y/w/h`는 Host가 동기화하는 bounds cache다.
 - Drawing Item Style: built-in marker, highlighter, arrow의 stroke/opacity 기본값. Draft overlay와 Host item creation이 같은 Host-owned 계약을 쓴다.
 - Canvas Pointer Interaction Start: pointer-down 시 tool/gesture/config/custom tool 상태를 active interaction, draft overlay, immediate text creation으로 변환하는 App-owned runtime Module.
@@ -159,7 +160,7 @@
 - 제품별 renderer 스타일은 Canvas App Shell CSS에 두지 않고 Host App/Demo module이 소유한다.
 - 제품별 SVG renderer와 inspector panel 실행 실패는 캔버스 렌더를 깨지 않고 fallback/omit으로 containment 한다.
 - Canvas App Inspector Panel descriptor shape 검증과 visibility/render execution은 분리하고, validation은 Canvas App Inspector Panel Contracts가, 실행 실패 omit은 Canvas App Inspector Panel Execution이 소유한다.
-- Custom item renderer 누락과 실행 실패는 Demo SVG Custom Item Render Fallback이 containment 한다.
+- Custom item renderer lookup과 실행 실패 containment는 Demo SVG Custom Item Renderer Execution이 소유하고, fallback shape는 Demo SVG Custom Item Render Fallback이 소유한다.
 - App workflow는 Demo SVG Item Layer를 직접 생성하지 않고 Canvas App Item Layer Adapter를 통해 stage children을 만든다.
 - 제품별 inspector UI는 기본 Object Inspector를 수정하지 않고 Canvas App Inspector Panel로 등록한다.
 - 제품별 저장 payload는 Canvas Custom Item의 JSON `data` 안에 두고, payload 의미 검증은 Canvas Custom Item Validator로 등록한다.

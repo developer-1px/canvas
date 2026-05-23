@@ -50,7 +50,8 @@
 | `src/canvas/app/rendering/CanvasDemoSvgComponentRenderFallback.tsx` | Component presentation resolver나 renderer 실행 실패를 기본 component card로 containment 한다 |
 | `src/canvas/app/rendering/CanvasDemoSvgCustomItemRendererRegistry.tsx` | Custom item presentation key와 SVG rendering strategy를 외부 조립 가능한 registry로 연결한다 |
 | `src/canvas/app/rendering/CanvasDemoSvgCustomItemRendererRegistryContracts.ts` | Custom item renderer registry key와 render strategy slot을 검증한다 |
-| `src/canvas/app/rendering/CanvasDemoSvgCustomItemRenderFallback.tsx` | Custom item renderer 누락이나 실행 실패를 unknown custom item card로 containment 한다 |
+| `src/canvas/app/rendering/CanvasDemoSvgCustomItemRendererExecution.tsx` | Custom item renderer lookup, render 실행, throw 시 fallback containment를 소유한다 |
+| `src/canvas/app/rendering/CanvasDemoSvgCustomItemRenderFallback.tsx` | Custom item renderer 누락/실패 때 쓰는 unknown custom item card fallback shape를 소유한다 |
 | `src/canvas/app/workflow` | React state와 engine/host/renderer wiring |
 | `src/canvas/app/commands/CanvasStandardCommandExecution.ts` | 내부 canvas command grammar를 Engine command 결과와 App document commit/selection/editing effect로 연결한다 |
 | `src/canvas/app/commands/CanvasStandardCommandDocumentEffects.ts` | Standard command 결과를 document commit fallback, selection commit, editing clear, history restore effect로 반영한다 |
@@ -194,7 +195,7 @@ type CanvasAffordanceConfig = {
 - Demo SVG Built-in Component Presentation Renderers가 기본 component presentation renderer mapping을 소유하고, Demo SVG Component Presentation Registry Contracts가 외부 renderer registry shape를 검증한다.
 - Demo SVG Component Render Fallback이 component presentation resolver와 renderer 실행 실패를 기본 component card로 containment 한다.
 - Demo SVG Custom Item Renderer Registry Contracts가 외부 custom item renderer registry shape를 검증한다.
-- Demo SVG Custom Item Render Fallback이 custom item renderer 누락과 실행 실패를 unknown custom item card로 containment 한다.
+- Demo SVG Custom Item Renderer Execution이 custom item renderer lookup과 실행 실패 containment를 소유하고, Demo SVG Custom Item Render Fallback이 unknown custom item card shape를 소유한다.
 - 새 Demo component kind가 기존 presentation을 재사용하면 Canvas Built-in Component Templates만 바꾼다. 제품별 component kind는 외부 조립된 `CanvasComponentLibrary`로 등록한다. 새 presentation은 Canvas App Assembly에 presentation renderer를 함께 등록한다.
 - Canvas Component Library의 presentation key가 component presentation renderer registry에 없으면 Canvas App Assembly가 실패한다.
 - Canvas Component Library Contracts는 외부 component template의 id/presentation, 필수 display/style string, 양수 크기, optional string list shape를 생성 단계에서 검증하고, Canvas Component Library는 생성 후 외부 template mutation에 흔들리지 않도록 snapshot을 보관한다.
