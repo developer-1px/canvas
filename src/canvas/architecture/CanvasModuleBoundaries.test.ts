@@ -478,6 +478,9 @@ describe('Canvas module boundaries', () => {
     const affordanceModelFile = getSourceFile(
       'src/canvas/app/workflow/CanvasAppAffordanceModel.ts',
     )
+    const affordanceModelContractsFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppAffordanceModelContracts.ts',
+    )
 
     expect(appModelFile.source).toContain(
       "from './CanvasAppAffordanceModel'",
@@ -493,6 +496,36 @@ describe('Canvas module boundaries', () => {
     expect(affordanceModelFile.source).toContain(
       'DEFAULT_CANVAS_AFFORDANCE_CONFIG',
     )
+    expect(affordanceModelFile.source).toContain(
+      "from './CanvasAppAffordanceModelContracts'",
+    )
+    expect(affordanceModelFile.source).toContain('): CanvasAppAffordanceModel')
+    expect(affordanceModelFile.source).not.toContain(
+      'export type CanvasAppAffordanceModel',
+    )
+    expect(affordanceModelContractsFile.source).toContain(
+      'export type CanvasAppAffordanceModel',
+    )
+    expect(affordanceModelContractsFile.source).toContain(
+      'export type CanvasAppAffordanceConfigContext',
+    )
+    expect(affordanceModelContractsFile.source).not.toContain(
+      'DEFAULT_CANVAS_AFFORDANCE_CONFIG',
+    )
+    for (const affordanceModelContract of [
+      'CanvasAppAffordanceCommandModel',
+      'CanvasAppAffordanceControlModel',
+      'CanvasAppAffordanceInteractionModel',
+      'CanvasAppAffordanceInspectorModel',
+      'CanvasAppAffordanceKeyboardModel',
+      'CanvasAppAffordancePointerModel',
+      'CanvasAppAffordanceTextModel',
+      'CanvasAppAffordanceViewportModel',
+    ]) {
+      expect(affordanceModelContractsFile.source).toContain(
+        `export type ${affordanceModelContract}`,
+      )
+    }
     for (const consumerContext of [
       'command: {',
       'control: {',
