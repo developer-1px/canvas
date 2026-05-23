@@ -76,7 +76,7 @@ export function defineCanvasAppCustomItemModule(
 ) {
   assertCanvasAppCustomItemModuleContracts(module)
 
-  return module
+  return snapshotCanvasAppCustomItemModule(module)
 }
 
 export function createCanvasAppCustomItemModuleAssembly(
@@ -345,6 +345,51 @@ function snapshotCanvasAppCustomItemModuleAssembly(
       assembly.inspectorPanels.map((panel) => Object.freeze({ ...panel })),
     ),
   })
+}
+
+function snapshotCanvasAppCustomItemModule(
+  module: CanvasAppCustomItemModule,
+): CanvasAppCustomItemModule {
+  const snapshot: CanvasAppCustomItemModule = {
+    id: module.id,
+    presentation: module.presentation,
+    renderItem: module.renderItem,
+    validateItem: module.validateItem,
+  }
+
+  if (module.customCommands) {
+    snapshot.customCommands = freezeCanvasAppArray(
+      module.customCommands.map((command) => Object.freeze({ ...command })),
+    )
+  }
+
+  if (module.customCreationTools) {
+    snapshot.customCreationTools = freezeCanvasAppArray(
+      module.customCreationTools.map(
+        snapshotCanvasAppCustomItemModuleCreationTool,
+      ),
+    )
+  }
+
+  if (module.inspectorPanels) {
+    snapshot.inspectorPanels = freezeCanvasAppArray(
+      module.inspectorPanels.map((panel) => Object.freeze({ ...panel })),
+    )
+  }
+
+  return Object.freeze(snapshot)
+}
+
+function snapshotCanvasAppCustomItemModuleCreationTool(
+  tool: CanvasAppCustomItemModuleCreationTool,
+): CanvasAppCustomItemModuleCreationTool {
+  const snapshot: CanvasAppCustomItemModuleCreationTool = { ...tool }
+
+  if (tool.shortcut) {
+    snapshot.shortcut = Object.freeze({ ...tool.shortcut })
+  }
+
+  return Object.freeze(snapshot)
 }
 
 function snapshotCanvasAppCustomCreationTool(

@@ -121,7 +121,7 @@ type CanvasAffordanceConfig = {
 - App workflow는 `CANVAS_ITEM_ENGINE_ADAPTERS`를 통해 concrete item adapter를 주입한다.
 - App workflow는 Canvas App Assembly를 통해 concrete item adapter, component library, custom command, custom item module, inspector panel, initial items, presentation registry를 주입받는다.
 - Canvas App Assembly input은 output type의 `Partial`이 아니라 Host가 조립할 수 있는 필드만 명시한 외부 입력 계약이다.
-- Canvas App Assembly와 Custom Item Module Assembly output은 조립 후 외부 descriptor, adapter, initial item mutation에 흔들리지 않도록 snapshot으로 보관한다.
+- Canvas App Custom Item Module define, Custom Item Module Assembly output, Canvas App Assembly output은 define/조립 후 외부 descriptor, adapter, initial item mutation에 흔들리지 않도록 snapshot으로 보관한다.
 - Canvas App Assembly initial items는 조립된 custom item validator로 assembly 단계에서 검증되어 잘못된 Host seed가 React document 생성까지 넘어가지 않는다.
 - App과 UI는 Renderer Adapter 내부 파일을 import하지 않는다. SVG stage는 `src/canvas/renderer` public facade에서 사용한다.
 - Renderer Adapter는 `CanvasOverlayState`와 주입된 item layer를 받아 SVG로 배치하며, Engine은 SVG/DOM 구현을 모른다.
