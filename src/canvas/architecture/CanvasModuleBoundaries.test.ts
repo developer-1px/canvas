@@ -345,6 +345,32 @@ describe('Canvas module boundaries', () => {
     expect(lifecycleFile.source).toContain('setEditing(interaction.edit)')
   })
 
+  it('keeps pointer interaction preview rules behind a named module', () => {
+    const dragHandlersFile = getSourceFile(
+      'src/canvas/app/pointer/useCanvasPointerDragHandlers.ts',
+    )
+    const previewFile = getSourceFile(
+      'src/canvas/app/pointer/CanvasPointerInteractionPreview.ts',
+    )
+
+    expect(dragHandlersFile.source).toContain(
+      "from './CanvasPointerInteractionPreview'",
+    )
+    expect(dragHandlersFile.source).not.toContain('getCanvasMoveSnap')
+    expect(dragHandlersFile.source).not.toContain('resizeCanvasSelection')
+    expect(dragHandlersFile.source).not.toContain('getCanvasMarqueeSelection')
+    expect(dragHandlersFile.source).not.toContain('getNextCanvasDrawingPoints')
+    expect(dragHandlersFile.source).not.toContain('DRAG_THRESHOLD')
+    expect(previewFile.source).toContain(
+      'export function previewCanvasPointerInteraction',
+    )
+    expect(previewFile.source).toContain('getCanvasMoveSnap')
+    expect(previewFile.source).toContain('resizeCanvasSelection')
+    expect(previewFile.source).toContain('getCanvasMarqueeSelection')
+    expect(previewFile.source).toContain('getNextCanvasDrawingPoints')
+    expect(previewFile.source).toContain('DRAG_THRESHOLD')
+  })
+
   it('keeps pointer interaction start rules behind a named module', () => {
     const downHandlersFile = getSourceFile(
       'src/canvas/app/pointer/useCanvasPointerDownHandlers.ts',

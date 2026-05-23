@@ -11,17 +11,7 @@ import type {
   Viewport,
 } from '../../entities'
 import {
-  DRAG_THRESHOLD,
-  normalizeBounds,
-  pointDistance,
-} from '../../core'
-import {
   EMPTY_CANVAS_SNAP_GUIDES,
-  getCanvasMarqueeSelection,
-  getCanvasMoveSnap,
-  moveCanvasSelection,
-  resizeCanvasSelection,
-  snapCanvasPointToGrid,
   type CanvasAffordanceConfig,
   type CanvasCreationAdapter,
   type CanvasDraftArrowOverlay,
@@ -36,10 +26,6 @@ import type {
   CommitCanvasSelection,
 } from '../workflow/CanvasWorkflowContract'
 import type { Interaction } from './CanvasInteractionState'
-import {
-  createCanvasDraftStroke,
-  getNextCanvasDrawingPoints,
-} from './CanvasPointerDrawing'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
 import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
@@ -47,6 +33,7 @@ import {
   cancelCanvasPointerInteraction,
   commitCanvasPointerInteraction,
 } from './CanvasPointerInteractionLifecycle'
+import { previewCanvasPointerInteraction } from './CanvasPointerInteractionPreview'
 
 type UseCanvasPointerDragHandlersArgs = {
   commitSelection: CommitCanvasSelection
@@ -110,248 +97,55 @@ export function useCanvasPointerDragHandlers({
 
     const currentScreen = screenPoint(stageElement, event)
     const currentWorld = screenToWorld(currentScreen, viewport)
+    const preview = previewCanvasPointerInteraction({
+      config,
+      currentScreen,
+      currentWorld,
+      input: event,
+      interaction,
+      scene,
+      transformAdapter,
+      viewport,
+    })
 
-    if (interaction.kind === 'pan') {
-      if (!config.gestures.pan) {
-        return
-      }
-
-      setSnapGuides(EMPTY_CANVAS_SNAP_GUIDES)
-      const dx = currentScreen.x - interaction.startScreen.x
-      const dy = currentScreen.y - interaction.startScreen.y
-      setViewport({
-        ...interaction.origin,
-        x: interaction.origin.x + dx,
-        y: interaction.origin.y + dy,
-      })
+    if (preview.kind === 'none') {
       return
     }
 
-    if (interaction.kind === 'move') {
-      if (!config.gestures.move) {
-        return
-      }
-
-      const moved =
-        interaction.moved ||
-        pointDistance(currentScreen, interaction.startScreen) > DRAG_THRESHOLD
-
-      if (!moved) {
-        return
-      }
-
-      const dx = currentWorld.x - interaction.startWorld.x
-      const dy = currentWorld.y - interaction.startWorld.y
-      const snap = interaction.bounds
-        ? getCanvasMoveSnap({
-            bounds: interaction.bounds,
-            config,
-            dx,
-            dy,
-            scene,
-            selection: interaction.ids,
-            viewport,
-          })
-        : {
-            ...EMPTY_CANVAS_SNAP_GUIDES,
-            dx,
-            dy,
-          }
-
-      const nextItems = moveCanvasSelection({
-        adapter: transformAdapter,
-        dx: snap.dx,
-        dy: snap.dy,
-        items: interaction.startItems,
-        selection: interaction.ids,
-      })
-
-      interactionRef.current = {
-        ...interaction,
-        currentItems: nextItems,
-        moved: true,
-      }
-      setSnapGuides({
-        alignmentGuides: snap.alignmentGuides,
-        spacingGuides: snap.spacingGuides,
-      })
-      setLiveItems(nextItems)
-      return
+    if (preview.snapGuides) {
+      setSnapGuides(preview.snapGuides)
     }
 
-    if (interaction.kind === 'resize') {
-      if (!config.gestures.resize) {
-        return
-      }
-
-      const moved =
-        interaction.moved ||
-        pointDistance(currentScreen, interaction.startScreen) > DRAG_THRESHOLD
-
-      if (!moved) {
-        return
-      }
-
-      setSnapGuides(EMPTY_CANVAS_SNAP_GUIDES)
-      const snappedCurrentWorld = snapCanvasPointToGrid({
-        config,
-        point: currentWorld,
-      })
-
-      const nextItems = resizeCanvasSelection({
-        adapter: transformAdapter,
-        bounds: interaction.bounds,
-        handle: interaction.handle,
-        items: interaction.startItems,
-        point: snappedCurrentWorld,
-        preserveAspectRatio: event.shiftKey,
-        resizeFromCenter: event.altKey,
-        selection: interaction.ids,
-      })
-
-      interactionRef.current = {
-        ...interaction,
-        currentItems: nextItems,
-        moved: true,
-      }
-      setLiveItems(nextItems)
-      return
+    if (preview.viewport) {
+      setViewport(preview.viewport)
     }
 
-    if (interaction.kind === 'marquee') {
-      if (!config.gestures.marquee) {
-        return
-      }
-
-      const moved =
-        interaction.moved ||
-        pointDistance(currentScreen, interaction.startScreen) > DRAG_THRESHOLD
-      const bounds = normalizeBounds(interaction.startWorld, currentWorld)
-
-      setSnapGuides(EMPTY_CANVAS_SNAP_GUIDES)
-      interactionRef.current = {
-        ...interaction,
-        currentWorld,
-        moved,
-      }
-
-      if (!moved) {
-        return
-      }
-
-      setMarquee(bounds)
-      setSelection(
-        getCanvasMarqueeSelection({
-          additive: interaction.additive,
-          baseSelection: interaction.baseSelection,
-          bounds,
-          scene,
-        }),
-      )
-      return
+    if (preview.interaction) {
+      interactionRef.current = preview.interaction
     }
 
-    if (interaction.kind === 'create-rect') {
-      if (!config.gestures.createRect) {
-        return
-      }
-
-      const moved =
-        interaction.moved ||
-        pointDistance(currentScreen, interaction.startScreen) > DRAG_THRESHOLD
-      const snappedCurrentWorld = snapCanvasPointToGrid({
-        config,
-        point: currentWorld,
-      })
-      const bounds = normalizeBounds(interaction.startWorld, snappedCurrentWorld)
-
-      setSnapGuides(EMPTY_CANVAS_SNAP_GUIDES)
-      interactionRef.current = {
-        ...interaction,
-        currentWorld: snappedCurrentWorld,
-        moved,
-      }
-      setDraftRect(bounds)
-      return
+    if (preview.liveItems) {
+      setLiveItems(preview.liveItems)
     }
 
-    if (
-      interaction.kind === 'draw-marker' ||
-      interaction.kind === 'draw-highlight'
-    ) {
-      const kind = interaction.kind === 'draw-marker' ? 'marker' : 'highlight'
-      const enabled =
-        kind === 'marker' ? config.gestures.drawMarker : config.gestures.drawHighlight
-
-      if (!enabled) {
-        return
-      }
-
-      const moved =
-        interaction.moved ||
-        pointDistance(currentScreen, interaction.startScreen) > DRAG_THRESHOLD
-      const points = getNextCanvasDrawingPoints({
-        currentWorld,
-        points: interaction.points,
-        shiftKey: event.shiftKey,
-        startWorld: interaction.startWorld,
-      })
-
-      setSnapGuides(EMPTY_CANVAS_SNAP_GUIDES)
-      interactionRef.current = {
-        ...interaction,
-        currentWorld,
-        points,
-        moved,
-      }
-      setDraftStroke(createCanvasDraftStroke(kind, points))
-      return
+    if (preview.marquee) {
+      setMarquee(preview.marquee)
     }
 
-    if (interaction.kind === 'create-arrow') {
-      if (!config.gestures.createArrow) {
-        return
-      }
-
-      const moved =
-        interaction.moved ||
-        pointDistance(currentScreen, interaction.startScreen) > DRAG_THRESHOLD
-      const snappedCurrentWorld = snapCanvasPointToGrid({
-        config,
-        point: currentWorld,
-      })
-
-      setSnapGuides(EMPTY_CANVAS_SNAP_GUIDES)
-      interactionRef.current = {
-        ...interaction,
-        currentWorld: snappedCurrentWorld,
-        moved,
-      }
-      setDraftArrow({
-        end: snappedCurrentWorld,
-        start: interaction.startWorld,
-      })
+    if (preview.selection) {
+      setSelection(preview.selection)
     }
 
-    if (interaction.kind === 'create-custom') {
-      if (!config.gestures.createCustom) {
-        return
-      }
+    if (preview.draftRect) {
+      setDraftRect(preview.draftRect)
+    }
 
-      const moved =
-        interaction.moved ||
-        pointDistance(currentScreen, interaction.startScreen) > DRAG_THRESHOLD
-      const snappedCurrentWorld = snapCanvasPointToGrid({
-        config,
-        point: currentWorld,
-      })
+    if (preview.draftStroke) {
+      setDraftStroke(preview.draftStroke)
+    }
 
-      setSnapGuides(EMPTY_CANVAS_SNAP_GUIDES)
-      interactionRef.current = {
-        ...interaction,
-        currentWorld: snappedCurrentWorld,
-        moved,
-      }
+    if (preview.draftArrow) {
+      setDraftArrow(preview.draftArrow)
     }
   }
 
