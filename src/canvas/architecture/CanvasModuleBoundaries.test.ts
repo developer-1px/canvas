@@ -3924,12 +3924,18 @@ describe('Canvas module boundaries', () => {
     expect(moduleFile.source).toContain(
       "from './CanvasAppCustomItemModuleRuntime'",
     )
+    expect(moduleFile.source).not.toContain('Omit<')
     expect(moduleFile.source).not.toContain('normalizeCanvasItems')
     expect(moduleFile.source).not.toContain('createModuleItem(context)')
     expect(moduleFile.source).not.toContain('validateItem(item)')
     expect(runtimeFile.source).toContain('normalizeCanvasItems')
     expect(runtimeFile.source).toContain('createModuleItem(context)')
     expect(runtimeFile.source).toContain('validateItem(item)')
+    expect(runtimeFile.source).toContain(
+      'type CanvasAppCustomItemModuleValidatorContext',
+    )
+    expect(runtimeFile.source).not.toContain('Pick<')
+    expect(runtimeFile.source).not.toContain('Parameters<')
     expect(runtimeFile.source).toContain('catch')
   })
 

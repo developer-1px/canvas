@@ -19,6 +19,7 @@ import type {
 import {
   type CanvasAppCustomCreationTool,
   type CanvasAppCustomCreationToolContext,
+  type CanvasAppCustomToolShortcut,
 } from '../tools/CanvasAppCustomCreationTools'
 import {
   assertCanvasAppCustomItemModule,
@@ -41,13 +42,16 @@ export type CanvasAppCustomItemModuleCreationItem = Bounds & {
   title: string
 }
 
-export type CanvasAppCustomItemModuleCreationTool = Omit<
-  CanvasAppCustomCreationTool,
-  'createItem'
-> & {
+export type CanvasAppCustomItemModuleCreationTool = {
+  ariaLabel?: string
   createItem: (
     context: CanvasAppCustomCreationToolContext,
   ) => CanvasAppCustomItemModuleCreationItem | null
+  id: string
+  label: string
+  shortcut?: CanvasAppCustomToolShortcut
+  statusLabel?: string
+  title: string
 }
 
 export type CanvasAppCustomItemModule = {

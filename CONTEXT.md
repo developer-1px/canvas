@@ -268,6 +268,7 @@
 - 제품별 item kind는 내부 `CanvasItem` union에 새 variant를 추가하지 않고 Canvas App Custom Item Module로 등록한다.
 - Canvas Item Schema는 custom item envelope와 validator registry 세부를 직접 알지 않고 Canvas Custom Item Validation에 위임한다.
 - Canvas App Custom Item Module은 `id`, `presentation`, `renderItem`, `validateItem`을 외부 Interface로 받고, renderer registry와 validator registry는 내부에서 조립한다.
+- Canvas App Custom Item Module Creation Tool은 custom creation tool runtime type에서 역산하지 않는 독립 authoring Interface로 정의한다.
 - Canvas App Custom Item Module descriptor/assembly, contract validation, module-owned creation/validator runtime은 분리하고, validation은 Canvas App Custom Item Module Contracts가, runtime containment는 Canvas App Custom Item Module Runtime이 소유한다.
 - Canvas Custom Item Validator registry shape 검증은 Canvas App Custom Item Validator Contracts가 소유한다.
 - Canvas App Custom Item Module mutation 방어는 Canvas App Custom Item Module Snapshot이 소유한다.

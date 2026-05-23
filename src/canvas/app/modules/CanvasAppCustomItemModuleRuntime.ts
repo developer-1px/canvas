@@ -1,4 +1,5 @@
 import type {
+  CanvasCustomItem,
   CanvasCustomItemValidator,
   CanvasCustomItemValidators,
 } from '../../host'
@@ -9,6 +10,12 @@ import type {
   CanvasAppCustomItemModule,
   CanvasAppCustomItemModuleCreationItem,
 } from './CanvasAppCustomItemModules'
+
+type CanvasAppCustomItemModuleValidatorContext = {
+  id: string
+  presentation: string
+  validateItem: CanvasCustomItemValidator
+}
 
 export function getCanvasAppCustomItemModuleCreationTools({
   customCreationTools = [],
@@ -89,8 +96,8 @@ export function getCanvasAppCustomItemModuleValidator({
   id,
   presentation,
   validateItem,
-}: Pick<CanvasAppCustomItemModule, 'id' | 'presentation' | 'validateItem'>) {
-  return (item: Parameters<CanvasCustomItemValidator>[0]) => {
+}: CanvasAppCustomItemModuleValidatorContext): CanvasCustomItemValidator {
+  return (item: CanvasCustomItem) => {
     if (item.kind !== id || item.presentation !== presentation) {
       return false
     }
