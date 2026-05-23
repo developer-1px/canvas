@@ -149,6 +149,7 @@
 - Canvas App Pointer Consumer Contracts: Pointer runtime을 item layer와 stage render consumer에 넘기는 handler bundle의 명시 Interface 계약을 소유하는 workflow Module.
 - Canvas App Pointer Consumer Model: Pointer runtime callbacks를 stage와 item layer consumer별 handler contract로 변환하는 workflow Module.
 - Canvas App Stage Model: stage와 item layer Adapter 입력 조립, 호출 순서, text editor blur, context menu 차단, render 실패 containment를 소유하는 workflow Module.
+- Canvas App Stage Consumer Contracts: Stage Model이 item layer, rendering, stage consumer에서 받는 render context의 명시 Interface 계약을 소유하는 workflow Module.
 - Canvas App Text Model: App Model이 textarea ref, text editor, find/replace runtime wiring 세부를 직접 알지 않도록 숨기는 workflow Module.
 - Canvas App Text Consumer Model: Text editor/find-replace runtime을 command, component, extension, keyboard, pointer, stage, view consumer context로 변환하는 workflow Module.
 - Canvas Text Editing Model: text edit commit descriptor와 viewport-projected editor style을 소유하고 editable item value 규칙은 Host Canvas Editable Text Item에 위임하는 App-owned runtime Module.
@@ -319,6 +320,7 @@
 - Keyboard Model은 keyboard router handler type에서 입력 shape를 역산하지 않고 Canvas App Keyboard Consumer Contracts를 소비한다.
 - App Model은 pointer down/drag hook 조립 세부를 직접 알지 않고 Canvas App Pointer Model에서 stage/item layer pointer handlers를 받는다. Pointer runtime 생성은 Canvas App Pointer Model이, consumer별 handler fan-out은 Canvas App Pointer Consumer Model이 소유한다.
 - Stage Model은 pointer handler shape를 rendering adapter input에서 역산하지 않고 Canvas App Pointer Consumer Contracts를 소비한다.
+- Stage Model은 item layer/rendering/stage context shape를 rendering adapter input에서 역산하지 않고 Canvas App Stage Consumer Contracts를 소비한다.
 - App Model은 stage/item layer Adapter 입력 조립, 호출 순서, context menu 차단, text editor blur timing, render 실패 containment를 직접 알지 않고 Canvas App Stage Model에 위임한다.
 - App Model은 textarea ref, text editor, find/replace wiring, editing state fan-out 세부를 직접 알지 않고 Canvas App Text Model에서 consumer별 text context와 view props를 받는다. Text editor/find-replace runtime 생성은 Canvas App Text Model이, consumer별 text fan-out은 Canvas App Text Consumer Model이 소유한다.
 - Text editing hook은 textarea focus/blur DOM lifecycle만 맡고, commit descriptor와 editor style projection은 Canvas Text Editing Model이 소유하며, editable item value 규칙은 Host Canvas Editable Text Item Module이 소유한다.

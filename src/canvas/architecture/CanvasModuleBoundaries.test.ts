@@ -660,6 +660,9 @@ describe('Canvas module boundaries', () => {
     const stageModelFile = getSourceFile(
       'src/canvas/app/workflow/CanvasAppStageModel.tsx',
     )
+    const stageConsumerContractsFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppStageConsumerContracts.ts',
+    )
     const pointerConsumerContractsFile = getSourceFile(
       'src/canvas/app/workflow/CanvasAppPointerConsumerContracts.ts',
     )
@@ -680,13 +683,38 @@ describe('Canvas module boundaries', () => {
       'export function renderCanvasAppStageModel',
     )
     expect(stageModelFile.source).toContain(
-      "from './CanvasAppPointerConsumerContracts'",
+      "from './CanvasAppStageConsumerContracts'",
     )
+    expect(stageModelFile.source).not.toContain('Pick<')
     expect(stageModelFile.source).not.toContain(
       "'onItemPointerDown' | 'onTextDoubleClick'",
     )
     expect(stageModelFile.source).not.toContain(
       "| 'onCanvasPointerDown'",
+    )
+    expect(stageConsumerContractsFile.source).toContain(
+      'export type CanvasAppStageModelInput',
+    )
+    expect(stageConsumerContractsFile.source).toContain(
+      'export type CanvasAppStageItemLayerContext',
+    )
+    expect(stageConsumerContractsFile.source).toContain(
+      'export type CanvasAppStageRenderingContext',
+    )
+    expect(stageConsumerContractsFile.source).toContain(
+      'export type CanvasAppStageContext',
+    )
+    expect(stageConsumerContractsFile.source).toContain(
+      "from './CanvasAppPointerConsumerContracts'",
+    )
+    expect(stageConsumerContractsFile.source).not.toContain(
+      'CanvasAppItemLayerRenderInput',
+    )
+    expect(stageConsumerContractsFile.source).not.toContain(
+      'CanvasAppStageRenderInput',
+    )
+    expect(stageConsumerContractsFile.source).not.toContain(
+      'renderCanvasAppStageModel',
     )
     expect(pointerConsumerContractsFile.source).toContain(
       'export type CanvasAppPointerConsumerModel',

@@ -3,32 +3,12 @@ import type {
   CanvasAppItemLayerAdapter,
   CanvasAppItemLayerRenderInput,
   CanvasAppStageAdapter,
-  CanvasAppStageMount,
   CanvasAppStageRenderInput,
 } from '../rendering'
 import type { CanvasAppEventInput } from '../pointer/CanvasAppPointerInput'
-import type { CanvasAppPointerConsumerModel } from './CanvasAppPointerConsumerContracts'
+import type { CanvasAppStageModelInput } from './CanvasAppStageConsumerContracts'
 
-export type CanvasAppStageModelInput = {
-  blurTextEditor: () => void
-  itemLayer: Pick<CanvasAppItemLayerRenderInput, 'items' | 'selected'>
-  pointer: CanvasAppPointerConsumerModel
-  rendering: Pick<
-    CanvasAppItemLayerRenderInput,
-    | 'componentPresentationRenderers'
-    | 'customItemRenderers'
-    | 'getComponentPresentation'
-  > & {
-    itemLayerAdapter: CanvasAppItemLayerAdapter
-    stageAdapter: CanvasAppStageAdapter
-  }
-  stage: Pick<
-    CanvasAppStageRenderInput,
-    'activeMode' | 'gesture' | 'overlays' | 'viewport'
-  > & {
-    stageElement: CanvasAppStageMount
-  }
-}
+export type { CanvasAppStageModelInput } from './CanvasAppStageConsumerContracts'
 
 export function renderCanvasAppStageModel({
   blurTextEditor,
