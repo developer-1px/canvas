@@ -17,13 +17,19 @@ export const DEFAULT_CANVAS_DEMO_SVG_CUSTOM_ITEM_RENDERERS: CanvasDemoSvgCustomI
 export function createCanvasDemoSvgCustomItemRenderers(
   extensions: CanvasDemoSvgCustomItemRenderers = {},
 ): CanvasDemoSvgCustomItemRenderers {
-  assertCanvasAppExtensionRecordKeys({
-    entries: extensions,
-    label: 'custom item renderer',
-  })
-  assertCanvasDemoSvgCustomItemRendererStrategies(extensions)
+  assertCanvasDemoSvgCustomItemRenderers(extensions)
 
   return { ...extensions }
+}
+
+export function assertCanvasDemoSvgCustomItemRenderers(
+  renderers: CanvasDemoSvgCustomItemRenderers,
+) {
+  assertCanvasAppExtensionRecordKeys({
+    entries: renderers,
+    label: 'custom item renderer',
+  })
+  assertCanvasDemoSvgCustomItemRendererStrategies(renderers)
 }
 
 export function getCanvasDemoSvgCustomItemRenderer({

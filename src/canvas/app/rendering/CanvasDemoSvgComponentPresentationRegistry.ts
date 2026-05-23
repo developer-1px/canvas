@@ -43,16 +43,22 @@ export const DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS: CanvasDem
 export function createCanvasDemoSvgComponentPresentationRenderers(
   extensions: CanvasDemoSvgComponentPresentationRenderers = {},
 ): CanvasDemoSvgComponentPresentationRenderers {
-  assertCanvasAppExtensionRecordKeys({
-    entries: extensions,
-    label: 'component presentation renderer',
-  })
-  assertCanvasDemoSvgComponentPresentationRendererStrategies(extensions)
+  assertCanvasDemoSvgComponentPresentationRenderers(extensions)
 
   return {
     ...DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS,
     ...extensions,
   }
+}
+
+export function assertCanvasDemoSvgComponentPresentationRenderers(
+  renderers: CanvasDemoSvgComponentPresentationRenderers,
+) {
+  assertCanvasAppExtensionRecordKeys({
+    entries: renderers,
+    label: 'component presentation renderer',
+  })
+  assertCanvasDemoSvgComponentPresentationRendererStrategies(renderers)
 }
 
 export function getCanvasDemoSvgComponentPresentationRenderer({

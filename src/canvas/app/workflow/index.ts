@@ -1,6 +1,7 @@
 export { useCanvasAppModel } from './useCanvasAppModel'
 export {
   DEFAULT_CANVAS_APP_ASSEMBLY,
+  assertCanvasAppAssembly,
   createCanvasAppAssembly,
   type CanvasAppAssembly,
   type CanvasAppAssemblyInput,

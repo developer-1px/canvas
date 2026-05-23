@@ -7,6 +7,7 @@ import {
   CANVAS_COMPONENT_LIBRARY,
   CANVAS_ITEM_ENGINE_ADAPTERS,
   INITIAL_ITEMS,
+  createCanvasComponentLibrary,
   normalizeCanvasItems,
   type CanvasComponentLibrary,
   type CanvasCustomItemValidators,
@@ -15,6 +16,8 @@ import {
 import {
   DEFAULT_CANVAS_DEMO_SVG_CUSTOM_ITEM_RENDERERS,
   DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS,
+  assertCanvasDemoSvgComponentPresentationRenderers,
+  assertCanvasDemoSvgCustomItemRenderers,
   createCanvasDemoSvgComponentPresentationRenderers,
   type CanvasDemoSvgComponentPresentationRenderers,
   type CanvasDemoSvgCustomItemRenderers,
@@ -41,6 +44,11 @@ import {
   assertCanvasAppCustomCreationTools,
   type CanvasAppCustomCreationTool,
 } from '../tools/CanvasAppCustomCreationTools'
+import {
+  assertCanvasAppArray,
+  assertCanvasAppDescriptorFunctionField,
+  assertCanvasAppDescriptorObject,
+} from '../extensions/CanvasAppDescriptorContracts'
 
 export type CanvasAppItemAdapters = {
   command: CanvasCommandAdapter<CanvasItem>
@@ -146,10 +154,28 @@ export function createCanvasAppAssembly(
     entries: assembly.componentPresentationRenderers,
     label: 'component presentation renderer',
   })
+  assertCanvasAppAssembly(assembly)
+
+  return assembly
+}
+
+export function assertCanvasAppAssembly(assembly: CanvasAppAssembly) {
+  assertCanvasAppDescriptorObject(assembly, 'assembly')
+  assertCanvasAppComponentLibrary(assembly.componentLibrary)
+  assertCanvasDemoSvgComponentPresentationRenderers(
+    assembly.componentPresentationRenderers,
+  )
   assertCanvasComponentPresentationRendererCoverage(assembly)
   assertCanvasAppCustomCommands(assembly.customCommands)
   assertCanvasAppCustomCreationTools(assembly.customCreationTools)
+  assertCanvasDemoSvgCustomItemRenderers(assembly.customItemRenderers)
+  assertCanvasAppCustomItemValidators(assembly.customItemValidators)
   assertCanvasAppInspectorPanels(assembly.inspectorPanels)
+  assertCanvasAppArray(assembly.initialItems, 'assembly initial items')
+  normalizeCanvasItems(assembly.initialItems, {
+    customItemValidators: assembly.customItemValidators,
+  })
+  assertCanvasAppItemAdapters(assembly.itemAdapters)
 
   return assembly
 }
@@ -164,5 +190,116 @@ function assertCanvasComponentPresentationRendererCoverage({
         `Missing canvas app component presentation renderer: ${template.presentation}`,
       )
     }
+  }
+}
+
+function assertCanvasAppComponentLibrary(
+  componentLibrary: CanvasComponentLibrary,
+) {
+  assertCanvasAppDescriptorObject(componentLibrary, 'component library')
+  assertCanvasAppDescriptorFunctionField({
+    field: 'createItem',
+    owner: 'component library',
+    value: componentLibrary.createItem,
+  })
+  assertCanvasAppDescriptorFunctionField({
+    field: 'getPresentation',
+    owner: 'component library',
+    value: componentLibrary.getPresentation,
+  })
+  assertCanvasAppDescriptorFunctionField({
+    field: 'getTemplate',
+    owner: 'component library',
+    value: componentLibrary.getTemplate,
+  })
+  assertCanvasAppArray(
+    componentLibrary.templates,
+    'component library templates',
+  )
+  createCanvasComponentLibrary({ templates: componentLibrary.templates })
+}
+
+function assertCanvasAppCustomItemValidators(
+  customItemValidators: CanvasCustomItemValidators,
+) {
+  assertCanvasAppExtensionRecordKeys({
+    entries: customItemValidators,
+    label: 'custom item validator',
+  })
+
+  for (const [kind, validator] of Object.entries(customItemValidators)) {
+    assertCanvasAppDescriptorFunctionField({
+      field: 'validate strategy',
+      owner: `custom item validator ${kind}`,
+      value: validator,
+    })
+  }
+}
+
+function assertCanvasAppItemAdapters(itemAdapters: CanvasAppItemAdapters) {
+  assertCanvasAppDescriptorObject(itemAdapters, 'item adapters')
+  assertCanvasAppCommandAdapter(itemAdapters.command)
+  assertCanvasAppCreationAdapter(itemAdapters.creation)
+  assertCanvasAppTransformAdapter(itemAdapters.transform)
+}
+
+function assertCanvasAppCommandAdapter(
+  adapter: CanvasAppItemAdapters['command'],
+) {
+  assertCanvasAppDescriptorObject(adapter, 'command adapter')
+
+  for (const field of [
+    'alignSelection',
+    'cloneSelection',
+    'deleteSelection',
+    'distributeSelection',
+    'groupSelection',
+    'lockSelection',
+    'nudgeSelection',
+    'pasteItems',
+    'reorderSelection',
+    'selectAll',
+    'ungroupSelection',
+    'unlockAll',
+  ] as const) {
+    assertCanvasAppDescriptorFunctionField({
+      field,
+      owner: 'command adapter',
+      value: adapter[field],
+    })
+  }
+}
+
+function assertCanvasAppCreationAdapter(
+  adapter: CanvasAppItemAdapters['creation'],
+) {
+  assertCanvasAppDescriptorObject(adapter, 'creation adapter')
+
+  for (const field of [
+    'createArrow',
+    'createHighlight',
+    'createMarker',
+    'createRect',
+    'createText',
+  ] as const) {
+    assertCanvasAppDescriptorFunctionField({
+      field,
+      owner: 'creation adapter',
+      value: adapter[field],
+    })
+  }
+}
+
+function assertCanvasAppTransformAdapter(
+  adapter: CanvasAppItemAdapters['transform'],
+) {
+  assertCanvasAppDescriptorObject(adapter, 'transform adapter')
+
+  for (const field of ['resizeSelection', 'translateSelection'] as const) {
+    assertCanvasAppDescriptorFunctionField({
+      field,
+      owner: 'transform adapter',
+      value: adapter[field],
+    })
   }
 }

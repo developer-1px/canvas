@@ -40,6 +40,7 @@ import { useCanvasWorkspaceModel } from './useCanvasWorkspaceModel'
 import { useCanvasTextEditorModel } from './useCanvasTextEditorModel'
 import {
   DEFAULT_CANVAS_APP_ASSEMBLY,
+  assertCanvasAppAssembly,
   type CanvasAppAssembly,
 } from './CanvasAppAssembly'
 
@@ -50,6 +51,10 @@ export function useCanvasAppModel({
 }: {
   assembly?: CanvasAppAssembly
 } = {}) {
+  const validatedAssembly = useMemo(
+    () => assertCanvasAppAssembly(assembly),
+    [assembly],
+  )
   const {
     componentLibrary,
     componentPresentationRenderers,
@@ -60,7 +65,7 @@ export function useCanvasAppModel({
     inspectorPanels,
     initialItems,
     itemAdapters,
-  } = assembly
+  } = validatedAssembly
   const svgRef = useRef<SVGSVGElement | null>(null)
   const editorRef = useRef<HTMLTextAreaElement | null>(null)
   const {

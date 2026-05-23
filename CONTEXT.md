@@ -93,3 +93,4 @@
 - UI controls는 Demo Host를 직접 import하지 않는다.
 - Module seam import 규칙은 Canvas Module Boundary Guardrail로 검증한다.
 - Linked peer dependency는 앱 번들에 한 번만 들어가야 하며, Vite config에서 `react`, `react-dom`, `zod`를 dedupe한다.
+- Production build는 React runtime을 별도 chunk로 분리해 app chunk가 경고 임계값을 넘지 않게 유지한다.

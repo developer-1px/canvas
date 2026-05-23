@@ -7,8 +7,11 @@ import {
 } from '../rendering'
 import { createCanvasComponentLibrary } from '../../host'
 import {
+  DEFAULT_CANVAS_APP_ASSEMBLY,
+  assertCanvasAppAssembly,
   createCanvasAppAssembly,
   defineCanvasAppCustomItemModule,
+  type CanvasAppAssembly,
   type CanvasAppCustomCommand,
   type CanvasAppInspectorPanel,
 } from './index'
@@ -267,6 +270,47 @@ describe('CanvasAppAssembly', () => {
     ).toThrow(
       'Canvas app component presentation renderer risk-card requires render strategy',
     )
+  })
+
+  it('validates assembled output before app runtime use', () => {
+    const assembly = createCanvasAppAssembly()
+
+    expect(assertCanvasAppAssembly(assembly)).toBe(assembly)
+    expect(assertCanvasAppAssembly(DEFAULT_CANVAS_APP_ASSEMBLY)).toBe(
+      DEFAULT_CANVAS_APP_ASSEMBLY,
+    )
+
+    expect(() =>
+      assertCanvasAppAssembly({
+        ...assembly,
+        componentLibrary: {
+          ...assembly.componentLibrary,
+          getPresentation: undefined,
+        },
+      } as unknown as CanvasAppAssembly),
+    ).toThrow('Canvas app component library requires getPresentation')
+
+    expect(() =>
+      assertCanvasAppAssembly({
+        ...assembly,
+        customItemValidators: {
+          risk: undefined,
+        },
+      } as unknown as CanvasAppAssembly),
+    ).toThrow('Canvas app custom item validator risk requires validate strategy')
+
+    expect(() =>
+      assertCanvasAppAssembly({
+        ...assembly,
+        itemAdapters: {
+          ...assembly.itemAdapters,
+          command: {
+            ...assembly.itemAdapters.command,
+            selectAll: undefined,
+          },
+        },
+      } as unknown as CanvasAppAssembly),
+    ).toThrow('Canvas app command adapter requires selectAll')
   })
 
   it('can disable custom item modules at the app assembly seam', () => {
