@@ -43,6 +43,15 @@ export function HighlighterIcon() {
   )
 }
 
+export function MarkerIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 20c3.5-5.5 5.8-8.3 9.6-13.1a2.4 2.4 0 0 1 3.7-.2l.1.1a2.4 2.4 0 0 1-.2 3.4C12.4 14 9.5 16.6 4 20z" />
+      <path d="M13.5 6.9l3.4 3.4" />
+    </svg>
+  )
+}
+
 export function ArrowIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">

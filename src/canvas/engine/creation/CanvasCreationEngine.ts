@@ -18,7 +18,8 @@ export type CanvasCreatedText<TItem extends CanvasCreationItem> = {
 
 export type CanvasCreationAdapter<TItem extends CanvasCreationItem> = {
   createArrow: (input: { end: Point; id: string; start: Point }) => TItem
-  createHighlight: (input: { bounds: Bounds; id: string }) => TItem
+  createHighlight: (input: { id: string; points: Point[] }) => TItem
+  createMarker: (input: { id: string; points: Point[] }) => TItem
   createRect: (input: { bounds: Bounds; id: string }) => TItem
   createText: (input: { id: string; point: Point }) => CanvasCreatedText<TItem>
 }
@@ -28,13 +29,13 @@ const DEFAULT_RECT_SIZE = {
   h: 112,
 }
 
-const DEFAULT_HIGHLIGHT_SIZE = {
-  w: 220,
-  h: 42,
-}
-
 const DEFAULT_ARROW_OFFSET = {
   x: 144,
+  y: 0,
+}
+
+const DEFAULT_DRAWING_OFFSET = {
+  x: 80,
   y: 0,
 }
 
@@ -58,24 +59,24 @@ export function getCanvasCreatedRectBounds({
   }
 }
 
-export function getCanvasCreatedHighlightBounds({
-  currentWorld,
+export function getCanvasCreatedDrawingPoints({
+  points,
   startWorld,
 }: {
-  currentWorld: Point
+  points: Point[]
   startWorld: Point
-}): Bounds {
-  const rawBounds = normalizeBounds(startWorld, currentWorld)
-
-  if (rawBounds.w > 6 && rawBounds.h > 6) {
-    return rawBounds
+}): Point[] {
+  if (points.length > 1) {
+    return points
   }
 
-  return {
-    x: startWorld.x,
-    y: startWorld.y,
-    ...DEFAULT_HIGHLIGHT_SIZE,
-  }
+  return [
+    startWorld,
+    {
+      x: startWorld.x + DEFAULT_DRAWING_OFFSET.x,
+      y: startWorld.y + DEFAULT_DRAWING_OFFSET.y,
+    },
+  ]
 }
 
 export function getCanvasCreatedArrowEnd({
@@ -115,17 +116,34 @@ export function createCanvasRect<TItem extends CanvasCreationItem>({
 export function createCanvasHighlight<TItem extends CanvasCreationItem>({
   adapter,
   createId,
-  currentWorld,
+  points,
   startWorld,
 }: {
   adapter: CanvasCreationAdapter<TItem>
   createId: (prefix: string) => string
-  currentWorld: Point
+  points: Point[]
   startWorld: Point
 }) {
   return adapter.createHighlight({
-    bounds: getCanvasCreatedHighlightBounds({ currentWorld, startWorld }),
     id: createId('highlight'),
+    points: getCanvasCreatedDrawingPoints({ points, startWorld }),
+  })
+}
+
+export function createCanvasMarker<TItem extends CanvasCreationItem>({
+  adapter,
+  createId,
+  points,
+  startWorld,
+}: {
+  adapter: CanvasCreationAdapter<TItem>
+  createId: (prefix: string) => string
+  points: Point[]
+  startWorld: Point
+}) {
+  return adapter.createMarker({
+    id: createId('marker'),
+    points: getCanvasCreatedDrawingPoints({ points, startWorld }),
   })
 }
 

@@ -1,6 +1,13 @@
 export type CanvasItemId = string
 
-export type Tool = 'select' | 'pan' | 'rect' | 'text' | 'highlight' | 'arrow'
+export type Tool =
+  | 'select'
+  | 'pan'
+  | 'rect'
+  | 'text'
+  | 'marker'
+  | 'highlight'
+  | 'arrow'
 
 export type CanvasInteractionKind =
   | 'none'
@@ -8,8 +15,9 @@ export type CanvasInteractionKind =
   | 'move'
   | 'marquee'
   | 'create-rect'
-  | 'create-highlight'
   | 'create-arrow'
+  | 'draw-marker'
+  | 'draw-highlight'
   | 'resize'
 
 export type Point = {

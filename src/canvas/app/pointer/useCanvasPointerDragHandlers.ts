@@ -21,6 +21,7 @@ import {
   EMPTY_CANVAS_SNAP_GUIDES,
   createCanvasArrow,
   createCanvasHighlight,
+  createCanvasMarker,
   createCanvasRect,
   getCanvasMarqueeSelection,
   getCanvasMoveSnap,
@@ -30,6 +31,7 @@ import {
   type CanvasAffordanceConfig,
   type CanvasCreationAdapter,
   type CanvasDraftArrowOverlay,
+  type CanvasDraftStrokeOverlay,
   type CanvasSceneAdapter,
   type CanvasSnapGuides,
   type CanvasTransformAdapter,
@@ -40,6 +42,10 @@ import type {
   CommitCanvasSelection,
 } from '../workflow/CanvasWorkflowContract'
 import type { Interaction } from './CanvasInteractionState'
+import {
+  createCanvasDraftStroke,
+  getNextCanvasDrawingPoints,
+} from './CanvasPointerDrawing'
 
 type UseCanvasPointerDragHandlersArgs = {
   commitSelection: CommitCanvasSelection
@@ -52,6 +58,7 @@ type UseCanvasPointerDragHandlersArgs = {
   selection: string[]
   setDraftArrow: Dispatch<SetStateAction<CanvasDraftArrowOverlay | null>>
   setDraftRect: Dispatch<SetStateAction<Bounds | null>>
+  setDraftStroke: Dispatch<SetStateAction<CanvasDraftStrokeOverlay | null>>
   setEditing: Dispatch<SetStateAction<EditingText | null>>
   setGesture: Dispatch<SetStateAction<Interaction['kind']>>
   setLiveItems: Dispatch<SetStateAction<CanvasItem[]>>
@@ -76,6 +83,7 @@ export function useCanvasPointerDragHandlers({
   selection,
   setDraftArrow,
   setDraftRect,
+  setDraftStroke,
   setEditing,
   setGesture,
   setLiveItems,
@@ -264,27 +272,36 @@ export function useCanvasPointerDragHandlers({
       return
     }
 
-    if (interaction.kind === 'create-highlight') {
-      if (!config.gestures.createHighlight) {
+    if (
+      interaction.kind === 'draw-marker' ||
+      interaction.kind === 'draw-highlight'
+    ) {
+      const kind = interaction.kind === 'draw-marker' ? 'marker' : 'highlight'
+      const enabled =
+        kind === 'marker' ? config.gestures.drawMarker : config.gestures.drawHighlight
+
+      if (!enabled) {
         return
       }
 
       const moved =
         interaction.moved ||
         pointDistance(currentScreen, interaction.startScreen) > DRAG_THRESHOLD
-      const snappedCurrentWorld = snapCanvasPointToGrid({
-        config,
-        point: currentWorld,
+      const points = getNextCanvasDrawingPoints({
+        currentWorld,
+        points: interaction.points,
+        shiftKey: event.shiftKey,
+        startWorld: interaction.startWorld,
       })
-      const bounds = normalizeBounds(interaction.startWorld, snappedCurrentWorld)
 
       setSnapGuides(EMPTY_CANVAS_SNAP_GUIDES)
       interactionRef.current = {
         ...interaction,
-        currentWorld: snappedCurrentWorld,
+        currentWorld,
+        points,
         moved,
       }
-      setDraftRect(bounds)
+      setDraftStroke(createCanvasDraftStroke(kind, points))
       return
     }
 
@@ -339,11 +356,26 @@ export function useCanvasPointerDragHandlers({
       setTool('select')
     }
 
-    if (interaction.kind === 'create-highlight') {
+    if (interaction.kind === 'draw-marker') {
+      const nextItem = createCanvasMarker({
+        adapter: creationAdapter,
+        createId,
+        points: interaction.points,
+        startWorld: interaction.startWorld,
+      })
+
+      commitItemsChange({ type: 'add', items: [nextItem] }, {
+        before: selection,
+        after: [nextItem.id],
+      })
+      setTool('select')
+    }
+
+    if (interaction.kind === 'draw-highlight') {
       const nextItem = createCanvasHighlight({
         adapter: creationAdapter,
         createId,
-        currentWorld: interaction.currentWorld,
+        points: interaction.points,
         startWorld: interaction.startWorld,
       })
 
@@ -417,6 +449,7 @@ export function useCanvasPointerDragHandlers({
     setMarquee(null)
     setDraftArrow(null)
     setDraftRect(null)
+    setDraftStroke(null)
     setSnapGuides(EMPTY_CANVAS_SNAP_GUIDES)
   }
 
@@ -435,6 +468,7 @@ export function useCanvasPointerDragHandlers({
     setMarquee(null)
     setDraftArrow(null)
     setDraftRect(null)
+    setDraftStroke(null)
     setSnapGuides(EMPTY_CANVAS_SNAP_GUIDES)
   }
 

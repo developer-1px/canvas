@@ -66,6 +66,19 @@ function cloneCanvasItemWithNewId(
     return syncGroupBounds(group)
   }
 
+  if (item.type === 'marker' || item.type === 'highlight') {
+    return {
+      ...item,
+      id: createId(item.type),
+      x: item.x + offset.x,
+      y: item.y + offset.y,
+      points: item.points.map((point) => ({
+        x: point.x + offset.x,
+        y: point.y + offset.y,
+      })),
+    }
+  }
+
   if (item.type === 'arrow') {
     return {
       ...item,

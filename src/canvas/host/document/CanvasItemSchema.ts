@@ -43,9 +43,11 @@ function isCanvasItem(value: unknown): value is CanvasItem {
     return typeof value.text === 'string'
   }
 
-  if (value.type === 'highlight') {
+  if (value.type === 'marker' || value.type === 'highlight') {
     return (
-      typeof value.fill === 'string' &&
+      isPointArray(value.points) &&
+      typeof value.stroke === 'string' &&
+      isFiniteNumber(value.strokeWidth) &&
       isFiniteNumber(value.opacity)
     )
   }
@@ -93,6 +95,10 @@ function isPoint(value: unknown) {
     isFiniteNumber(value.x) &&
     isFiniteNumber(value.y)
   )
+}
+
+function isPointArray(value: unknown) {
+  return Array.isArray(value) && value.every(isPoint)
 }
 
 function isStringArray(value: unknown) {

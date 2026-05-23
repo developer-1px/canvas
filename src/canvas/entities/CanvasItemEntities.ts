@@ -21,10 +21,19 @@ export type TextItem = CanvasItemBase & {
   text: string
 }
 
-export type HighlightItem = CanvasItemBase & {
-  type: 'highlight'
-  fill: string
+export type CanvasDrawingItemBase = CanvasItemBase & {
   opacity: number
+  points: Point[]
+  stroke: string
+  strokeWidth: number
+}
+
+export type MarkerItem = CanvasDrawingItemBase & {
+  type: 'marker'
+}
+
+export type HighlightItem = CanvasDrawingItemBase & {
+  type: 'highlight'
 }
 
 export type ArrowItem = CanvasItemBase & {
@@ -57,6 +66,7 @@ export type CanvasComponentItem = CanvasItemBase & {
 export type CanvasItem =
   | RectItem
   | TextItem
+  | MarkerItem
   | HighlightItem
   | ArrowItem
   | GroupItem

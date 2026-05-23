@@ -54,6 +54,15 @@ function translateCanvasItem(item: CanvasItem, dx: number, dy: number): CanvasIt
     })
   }
 
+  if (item.type === 'marker' || item.type === 'highlight') {
+    return {
+      ...item,
+      x: item.x + dx,
+      y: item.y + dy,
+      points: item.points.map((point) => translatePoint(point, dx, dy)),
+    }
+  }
+
   if (item.type === 'arrow') {
     return {
       ...item,
@@ -78,6 +87,14 @@ function scaleCanvasItem(item: CanvasItem, from: Bounds, to: Bounds): CanvasItem
       ...scaleItemBounds(getItemBounds(item), from, to),
       children: item.children.map((child) => scaleCanvasItem(child, from, to)),
     })
+  }
+
+  if (item.type === 'marker' || item.type === 'highlight') {
+    return {
+      ...item,
+      ...scaleItemBounds(getItemBounds(item), from, to),
+      points: item.points.map((point) => scalePoint(point, from, to)),
+    }
   }
 
   if (item.type === 'arrow') {

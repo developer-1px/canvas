@@ -20,6 +20,7 @@ import {
   GroupIcon,
   HighlighterIcon,
   LockIcon,
+  MarkerIcon,
   PanIcon,
   RedoIcon,
   RectIcon,
@@ -135,6 +136,15 @@ export function CanvasToolbar({
           onClick={() => onToolChange('text')}
         >
           <TextIcon />
+        </ToolButton>
+      ) : null}
+      {config.tools.marker ? (
+        <ToolButton
+          active={tool === 'marker'}
+          affordance={CANVAS_TOOL_AFFORDANCES.marker}
+          onClick={() => onToolChange('marker')}
+        >
+          <MarkerIcon />
         </ToolButton>
       ) : null}
       {config.tools.highlight ? (

@@ -87,6 +87,17 @@ export function CanvasSvgInteractionOverlays({
         />
       ) : null}
 
+      {overlays.draftStroke ? (
+        <path
+          className={`draft-stroke draft-${overlays.draftStroke.kind}`}
+          d={createSvgPathData(overlays.draftStroke.points)}
+          opacity={overlays.draftStroke.opacity}
+          stroke={overlays.draftStroke.stroke}
+          strokeWidth={overlays.draftStroke.strokeWidth}
+          vectorEffect="non-scaling-stroke"
+        />
+      ) : null}
+
       {overlays.alignmentGuides.length > 0 ? (
         <g className="alignment-guides">
           {overlays.alignmentGuides.map((guide, index) =>
@@ -179,4 +190,17 @@ export function CanvasSvgInteractionOverlays({
       ) : null}
     </>
   )
+}
+
+function createSvgPathData(points: { x: number; y: number }[]) {
+  const [first, ...rest] = points
+
+  if (!first) {
+    return ''
+  }
+
+  return [
+    `M ${first.x} ${first.y}`,
+    ...rest.map((point) => `L ${point.x} ${point.y}`),
+  ].join(' ')
 }

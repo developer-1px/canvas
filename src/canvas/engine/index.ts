@@ -40,10 +40,11 @@ export {
 export {
   createCanvasArrow,
   createCanvasHighlight,
+  createCanvasMarker,
   createCanvasRect,
   createCanvasText,
   getCanvasCreatedArrowEnd,
-  getCanvasCreatedHighlightBounds,
+  getCanvasCreatedDrawingPoints,
   getCanvasCreatedRectBounds,
   type CanvasCreatedText,
   type CanvasCreationAdapter,
@@ -60,6 +61,7 @@ export {
 export {
   createCanvasOverlayState,
   type CanvasDraftArrowOverlay,
+  type CanvasDraftStrokeOverlay,
   type CanvasOverlayState,
   type CanvasResizeHandleOverlay,
 } from './overlay/CanvasOverlayEngine'

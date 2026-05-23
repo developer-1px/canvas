@@ -13,6 +13,7 @@ import {
   createCanvasOverlayState,
   type CanvasAffordanceConfig,
   type CanvasDraftArrowOverlay,
+  type CanvasDraftStrokeOverlay,
   type CanvasSceneAdapter,
   type CanvasSnapGuides,
 } from '../../engine'
@@ -39,6 +40,8 @@ export function useCanvasInteractionModel({
   const [draftArrow, setDraftArrow] =
     useState<CanvasDraftArrowOverlay | null>(null)
   const [draftRect, setDraftRect] = useState<Bounds | null>(null)
+  const [draftStroke, setDraftStroke] =
+    useState<CanvasDraftStrokeOverlay | null>(null)
   const [snapGuides, setSnapGuides] = useState<CanvasSnapGuides>(
     EMPTY_CANVAS_SNAP_GUIDES,
   )
@@ -48,13 +51,24 @@ export function useCanvasInteractionModel({
         config,
         draftArrow,
         draftRect,
+        draftStroke,
         marquee,
         scene,
         selection,
         snapGuides,
         viewport,
       }),
-    [config, draftArrow, draftRect, marquee, scene, selection, snapGuides, viewport],
+    [
+      config,
+      draftArrow,
+      draftRect,
+      draftStroke,
+      marquee,
+      scene,
+      selection,
+      snapGuides,
+      viewport,
+    ],
   )
   const activeMode = spaceDown ? 'pan' : tool
 
@@ -65,6 +79,7 @@ export function useCanvasInteractionModel({
     overlays,
     setDraftArrow,
     setDraftRect,
+    setDraftStroke,
     setGesture,
     setMarquee,
     setSnapGuides,

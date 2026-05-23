@@ -5,11 +5,13 @@ import { CANVAS_ITEM_TRANSFORM_ADAPTER } from './adapters/CanvasItemTransformAda
 export type {
   CanvasComponentItem,
   CanvasComponentKind,
+  CanvasDrawingItemBase,
   CanvasItem,
   CanvasItemBase,
   EditingText,
   GroupItem,
   HighlightItem,
+  MarkerItem,
   ArrowItem,
   RectItem,
   TextItem,

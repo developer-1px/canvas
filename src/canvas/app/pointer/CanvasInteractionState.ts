@@ -48,11 +48,21 @@ export type Interaction =
       moved: boolean
     }
   | {
-      kind: 'create-highlight'
+      kind: 'draw-marker'
       pointerId: number
       startScreen: Point
       startWorld: Point
       currentWorld: Point
+      points: Point[]
+      moved: boolean
+    }
+  | {
+      kind: 'draw-highlight'
+      pointerId: number
+      startScreen: Point
+      startWorld: Point
+      currentWorld: Point
+      points: Point[]
       moved: boolean
     }
   | {

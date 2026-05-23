@@ -12,7 +12,16 @@ const baseInput = {
 }
 
 describe('CanvasGestureEngine drawing tools', () => {
-  test('routes highlighter and arrow tools to drawing gestures', () => {
+  test('routes marker, highlighter, and arrow tools to drawing gestures', () => {
+    expect(
+      getCanvasPointerGesture({
+        config,
+        input: baseInput,
+        spaceDown: false,
+        tool: 'marker',
+      }),
+    ).toBe('draw-marker')
+
     expect(
       getCanvasPointerGesture({
         config,
@@ -20,7 +29,7 @@ describe('CanvasGestureEngine drawing tools', () => {
         spaceDown: false,
         tool: 'highlight',
       }),
-    ).toBe('create-highlight')
+    ).toBe('draw-highlight')
 
     expect(
       getCanvasPointerGesture({
@@ -36,9 +45,19 @@ describe('CanvasGestureEngine drawing tools', () => {
     const disabled = createCanvasAffordanceConfig({
       gestures: {
         createArrow: false,
-        createHighlight: false,
+        drawHighlight: false,
+        drawMarker: false,
       },
     })
+
+    expect(
+      getCanvasPointerGesture({
+        config: disabled,
+        input: baseInput,
+        spaceDown: false,
+        tool: 'marker',
+      }),
+    ).toBe('marquee')
 
     expect(
       getCanvasPointerGesture({

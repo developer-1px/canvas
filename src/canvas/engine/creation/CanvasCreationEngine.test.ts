@@ -2,16 +2,17 @@ import { describe, expect, test } from 'vitest'
 import {
   createCanvasArrow,
   createCanvasHighlight,
+  createCanvasMarker,
   getCanvasCreatedArrowEnd,
-  getCanvasCreatedHighlightBounds,
+  getCanvasCreatedDrawingPoints,
   type CanvasCreationAdapter,
 } from './CanvasCreationEngine'
 
 type CreatedItem =
   | {
-      bounds: { h: number; w: number; x: number; y: number }
       id: string
-      type: 'highlight'
+      points: Array<{ x: number; y: number }>
+      type: 'highlight' | 'marker'
     }
   | {
       end: { x: number; y: number }
@@ -28,10 +29,15 @@ const adapter: CanvasCreationAdapter<CreatedItem> = {
     start,
     type: 'arrow',
   }),
-  createHighlight: ({ bounds, id }) => ({
-    bounds,
+  createHighlight: ({ id, points }) => ({
     id,
+    points,
     type: 'highlight',
+  }),
+  createMarker: ({ id, points }) => ({
+    id,
+    points,
+    type: 'marker',
   }),
   createRect: ({ id }) => ({ id, type: 'rect' }),
   createText: ({ id }) => ({
@@ -41,27 +47,42 @@ const adapter: CanvasCreationAdapter<CreatedItem> = {
 }
 
 describe('CanvasCreationEngine drawing tools', () => {
-  test('creates highlighter bounds from a drag gesture', () => {
+  test('keeps drawing points from a drag gesture', () => {
     expect(
-      getCanvasCreatedHighlightBounds({
-        currentWorld: { x: 40, y: 50 },
+      getCanvasCreatedDrawingPoints({
+        points: [{ x: 10, y: 20 }, { x: 40, y: 50 }],
         startWorld: { x: 10, y: 20 },
       }),
-    ).toEqual({ x: 10, y: 20, w: 30, h: 30 })
+    ).toEqual([{ x: 10, y: 20 }, { x: 40, y: 50 }])
   })
 
-  test('creates a default highlighter when the pointer barely moves', () => {
+  test('creates a default highlighter stroke when the pointer barely moves', () => {
     expect(
       createCanvasHighlight({
         adapter,
         createId: () => 'highlight-1',
-        currentWorld: { x: 12, y: 22 },
+        points: [{ x: 10, y: 20 }],
         startWorld: { x: 10, y: 20 },
       }),
     ).toEqual({
-      bounds: { x: 10, y: 20, w: 220, h: 42 },
       id: 'highlight-1',
+      points: [{ x: 10, y: 20 }, { x: 90, y: 20 }],
       type: 'highlight',
+    })
+  })
+
+  test('creates marker strokes with the FigJam marker flow', () => {
+    expect(
+      createCanvasMarker({
+        adapter,
+        createId: () => 'marker-1',
+        points: [{ x: 10, y: 20 }, { x: 16, y: 22 }],
+        startWorld: { x: 10, y: 20 },
+      }),
+    ).toEqual({
+      id: 'marker-1',
+      points: [{ x: 10, y: 20 }, { x: 16, y: 22 }],
+      type: 'marker',
     })
   })
 

@@ -18,6 +18,19 @@ const arrow: CanvasItem = {
   strokeWidth: 3,
 }
 
+const marker: CanvasItem = {
+  id: 'marker-1',
+  type: 'marker',
+  x: 98,
+  y: 98,
+  w: 104,
+  h: 24,
+  points: [{ x: 100, y: 100 }, { x: 200, y: 120 }],
+  stroke: '#475569',
+  strokeWidth: 4,
+  opacity: 1,
+}
+
 describe('CanvasItemTransformOperations drawing items', () => {
   test('translates arrow bounds and endpoints together', () => {
     expect(translateCanvasItems([arrow], ['arrow-1'], 10, -5)[0]).toEqual({
@@ -43,6 +56,31 @@ describe('CanvasItemTransformOperations drawing items', () => {
       h: 88,
       start: { x: 112, y: 112 },
       end: { x: 312, y: 152 },
+    })
+  })
+
+  test('translates marker bounds and points together', () => {
+    expect(translateCanvasItems([marker], ['marker-1'], 10, -5)[0]).toEqual({
+      ...marker,
+      x: 108,
+      y: 93,
+      points: [{ x: 110, y: 95 }, { x: 210, y: 115 }],
+    })
+  })
+
+  test('resizes marker bounds and points together', () => {
+    expect(
+      resizeCanvasItems(
+        [marker],
+        ['marker-1'],
+        { x: 98, y: 98, w: 104, h: 24 },
+        { x: 98, y: 98, w: 208, h: 48 },
+      )[0],
+    ).toEqual({
+      ...marker,
+      w: 208,
+      h: 48,
+      points: [{ x: 102, y: 102 }, { x: 302, y: 142 }],
     })
   })
 })

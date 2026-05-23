@@ -23,10 +23,19 @@ export type CanvasDraftArrowOverlay = {
   start: Point
 }
 
+export type CanvasDraftStrokeOverlay = {
+  kind: 'marker' | 'highlight'
+  opacity: number
+  points: Point[]
+  stroke: string
+  strokeWidth: number
+}
+
 export type CanvasOverlayState = {
   alignmentGuides: CanvasSnapGuides['alignmentGuides']
   draftArrow: CanvasDraftArrowOverlay | null
   draftRect: Bounds | null
+  draftStroke: CanvasDraftStrokeOverlay | null
   grid: boolean
   itemOutlineIds: Set<string>
   marquee: Bounds | null
@@ -39,6 +48,7 @@ export function createCanvasOverlayState({
   config,
   draftArrow,
   draftRect,
+  draftStroke,
   marquee,
   scene,
   selection,
@@ -48,6 +58,7 @@ export function createCanvasOverlayState({
   config: CanvasAffordanceConfig
   draftArrow: CanvasDraftArrowOverlay | null
   draftRect: Bounds | null
+  draftStroke: CanvasDraftStrokeOverlay | null
   marquee: Bounds | null
   scene: CanvasSceneAdapter
   selection: string[]
@@ -62,6 +73,7 @@ export function createCanvasOverlayState({
       : [],
     draftArrow: config.overlays.draftArrow ? draftArrow : null,
     draftRect: config.overlays.draftRect ? draftRect : null,
+    draftStroke: config.overlays.draftStroke ? draftStroke : null,
     grid: config.overlays.grid,
     itemOutlineIds: config.overlays.itemOutline
       ? new Set(selection)

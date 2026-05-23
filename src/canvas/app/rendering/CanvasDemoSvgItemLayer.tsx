@@ -133,7 +133,7 @@ function renderCanvasItem({
     )
   }
 
-  if (item.type === 'highlight') {
+  if (item.type === 'marker' || item.type === 'highlight') {
     return (
       <g
         key={item.id}
@@ -146,15 +146,17 @@ function renderCanvasItem({
           isLocked ? undefined : (event) => onItemPointerDown(event, item.id)
         }
       >
-        <rect
-          className="highlight-item"
-          x={item.x}
-          y={item.y}
-          width={item.w}
-          height={item.h}
-          rx="5"
-          fill={item.fill}
+        <path
+          className={`${item.type}-hit`}
+          d={createSvgPathData(item.points)}
+          vectorEffect="non-scaling-stroke"
+        />
+        <path
+          className={`${item.type}-item`}
+          d={createSvgPathData(item.points)}
           opacity={item.opacity}
+          stroke={item.stroke}
+          strokeWidth={item.strokeWidth}
           vectorEffect="non-scaling-stroke"
         />
         {hasOutline ? <CanvasDemoSvgSelectionOutline bounds={bounds} /> : null}
@@ -240,6 +242,19 @@ function renderCanvasItem({
       {hasOutline ? <CanvasDemoSvgSelectionOutline bounds={bounds} /> : null}
     </g>
   )
+}
+
+function createSvgPathData(points: { x: number; y: number }[]) {
+  const [first, ...rest] = points
+
+  if (!first) {
+    return ''
+  }
+
+  return [
+    `M ${first.x} ${first.y}`,
+    ...rest.map((point) => `L ${point.x} ${point.y}`),
+  ].join(' ')
 }
 
 function CanvasDemoSvgSelectionOutline({

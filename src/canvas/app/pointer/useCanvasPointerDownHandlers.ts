@@ -33,6 +33,7 @@ import {
   type CanvasAffordanceConfig,
   type CanvasCreationAdapter,
   type CanvasDraftArrowOverlay,
+  type CanvasDraftStrokeOverlay,
   type CanvasSceneAdapter,
 } from '../../engine'
 import type {
@@ -40,6 +41,7 @@ import type {
   CommitCanvasSelection,
 } from '../workflow/CanvasWorkflowContract'
 import type { Interaction } from './CanvasInteractionState'
+import { createCanvasDraftStroke } from './CanvasPointerDrawing'
 
 type UseCanvasPointerDownHandlersArgs = {
   cloneItems: (ids: string[], offset: Point) => CanvasItem[]
@@ -56,6 +58,7 @@ type UseCanvasPointerDownHandlersArgs = {
   selection: string[]
   setDraftArrow: Dispatch<SetStateAction<CanvasDraftArrowOverlay | null>>
   setDraftRect: Dispatch<SetStateAction<Bounds | null>>
+  setDraftStroke: Dispatch<SetStateAction<CanvasDraftStrokeOverlay | null>>
   setEditing: Dispatch<SetStateAction<EditingText | null>>
   setGesture: Dispatch<SetStateAction<Interaction['kind']>>
   setLiveItems: Dispatch<SetStateAction<CanvasItem[]>>
@@ -82,6 +85,7 @@ export function useCanvasPointerDownHandlers({
   selection,
   setDraftArrow,
   setDraftRect,
+  setDraftStroke,
   setEditing,
   setGesture,
   setLiveItems,
@@ -173,22 +177,20 @@ export function useCanvasPointerDownHandlers({
       return
     }
 
-    if (pointerGesture === 'create-highlight') {
-      const snappedStartWorld = snapCanvasPointToGrid({
-        config,
-        point: startWorld,
-      })
-
+    if (pointerGesture === 'draw-marker' || pointerGesture === 'draw-highlight') {
+      const kind =
+        pointerGesture === 'draw-marker' ? 'marker' : 'highlight'
       interactionRef.current = {
-        kind: 'create-highlight',
+        kind: pointerGesture,
         pointerId: event.pointerId,
         startScreen,
-        startWorld: snappedStartWorld,
-        currentWorld: snappedStartWorld,
+        startWorld,
+        currentWorld: startWorld,
+        points: [startWorld],
         moved: false,
       }
-      setDraftRect(normalizeBounds(snappedStartWorld, snappedStartWorld))
-      setGesture('create-highlight')
+      setDraftStroke(createCanvasDraftStroke(kind, [startWorld]))
+      setGesture(pointerGesture)
       return
     }
 

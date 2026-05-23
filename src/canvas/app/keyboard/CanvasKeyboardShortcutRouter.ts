@@ -6,6 +6,7 @@ import type {
 import type {
   CanvasAffordanceConfig,
   CanvasDraftArrowOverlay,
+  CanvasDraftStrokeOverlay,
 } from '../../engine'
 import type {
   Bounds,
@@ -38,6 +39,7 @@ export type CanvasKeyboardShortcutHandlers = {
   selection: string[]
   setDraftRect: Dispatch<SetStateAction<Bounds | null>>
   setDraftArrow: Dispatch<SetStateAction<CanvasDraftArrowOverlay | null>>
+  setDraftStroke: Dispatch<SetStateAction<CanvasDraftStrokeOverlay | null>>
   setEditing: Dispatch<SetStateAction<EditingText | null>>
   setGesture: Dispatch<SetStateAction<Interaction['kind']>>
   setMarquee: Dispatch<SetStateAction<Bounds | null>>
@@ -86,6 +88,7 @@ export function handleCanvasKeyboardShortcut(
     selection,
     setDraftRect,
     setDraftArrow,
+    setDraftStroke,
     setEditing,
     setGesture,
     setMarquee,
@@ -113,6 +116,7 @@ export function handleCanvasKeyboardShortcut(
     setMarquee(null)
     setDraftArrow(null)
     setDraftRect(null)
+    setDraftStroke(null)
     setEditing(null)
     commitSelection([])
     setTool('select')
@@ -316,12 +320,20 @@ export function handleCanvasKeyboardShortcut(
   } else if (config.shortcuts.panTool && config.tools.pan && key === 'h') {
     setTool('pan')
   } else if (
-    config.shortcuts.highlightTool &&
+    config.shortcuts.highlighterTool &&
     config.tools.highlight &&
-    key === 'k'
+    event.shiftKey &&
+    key === 'm'
   ) {
     setTool('highlight')
-  } else if (config.shortcuts.arrowTool && config.tools.arrow && key === 'a') {
+  } else if (
+    config.shortcuts.markerTool &&
+    config.tools.marker &&
+    !event.shiftKey &&
+    key === 'm'
+  ) {
+    setTool('marker')
+  } else if (config.shortcuts.arrowTool && config.tools.arrow && key === 'l') {
     setTool('arrow')
   } else if (config.shortcuts.rectTool && config.tools.rect && key === 'r') {
     setTool('rect')
