@@ -1,4 +1,5 @@
 import type { CanvasAppAssembly } from './CanvasAppAssemblyTypes'
+import type { CanvasAppAssemblyModel } from './CanvasAppAssemblyModelContracts'
 
 export function getCanvasAppAssemblyModel({
   affordanceConfig,
@@ -15,7 +16,7 @@ export function getCanvasAppAssemblyModel({
   itemLayerAdapter,
   stageAdapter,
   workspaceStorageProvider,
-}: CanvasAppAssembly) {
+}: CanvasAppAssembly): CanvasAppAssemblyModel {
   return {
     affordance: {
       config: affordanceConfig,

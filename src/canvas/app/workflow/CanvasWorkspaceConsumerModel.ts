@@ -1,51 +1,7 @@
 import type {
-  Dispatch,
-  SetStateAction,
-} from 'react'
-import type { CanvasSceneAdapter } from '../../engine'
-import type {
-  Bounds,
-  CanvasItem,
-  Viewport,
-} from '../../entities'
-import type {
-  CanvasDocumentClipboard,
-  CanvasDocumentTextSearch,
-  CanvasItemReadModel,
-} from '../../host'
-import type {
-  CommitCanvasItemsChange,
-  CommitCanvasSelection,
-} from './CanvasWorkflowContract'
-
-type CanvasWorkspaceDocumentModel = {
-  canRedo: boolean
-  canUndo: boolean
-  commitItemsChange: CommitCanvasItemsChange
-  commitSelection: CommitCanvasSelection
-  copyItemsToClipboard: CanvasDocumentClipboard['copyItemsToClipboard']
-  findDocumentText: CanvasDocumentTextSearch['findDocumentText']
-  getClipboardItems: CanvasDocumentClipboard['getClipboardItems']
-  items: CanvasItem[]
-  redo: () => string[] | undefined
-  replaceDocumentText: CanvasDocumentTextSearch['replaceDocumentText']
-  selection: string[]
-  setClipboardItems: CanvasDocumentClipboard['setClipboardItems']
-  setLiveItems: Dispatch<SetStateAction<CanvasItem[]>>
-  setSelection: Dispatch<SetStateAction<string[]>>
-  undo: () => string[] | undefined
-}
-
-export type CanvasWorkspaceConsumerModelInput = {
-  createId: (prefix: string) => string
-  document: CanvasWorkspaceDocumentModel
-  itemReadModel: CanvasItemReadModel
-  scene: CanvasSceneAdapter
-  selected: Set<string>
-  selectedBounds: Bounds | null
-  setViewport: Dispatch<SetStateAction<Viewport>>
-  viewport: Viewport
-}
+  CanvasWorkspaceConsumerModel,
+  CanvasWorkspaceConsumerModelInput,
+} from './CanvasWorkspaceConsumerContracts'
 
 export function getCanvasWorkspaceConsumerModel({
   createId,
@@ -56,7 +12,7 @@ export function getCanvasWorkspaceConsumerModel({
   selectedBounds,
   setViewport,
   viewport,
-}: CanvasWorkspaceConsumerModelInput) {
+}: CanvasWorkspaceConsumerModelInput): CanvasWorkspaceConsumerModel {
   const commandDocument = {
     commitItemsChange: document.commitItemsChange,
     commitSelection: document.commitSelection,

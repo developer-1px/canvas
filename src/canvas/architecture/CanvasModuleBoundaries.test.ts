@@ -400,10 +400,44 @@ describe('Canvas module boundaries', () => {
     const assemblyModelFile = getSourceFile(
       'src/canvas/app/workflow/CanvasAppAssemblyModel.ts',
     )
+    const assemblyModelContractsFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppAssemblyModelContracts.ts',
+    )
 
     expect(appModelFile.source).toContain(
       "from './CanvasAppAssemblyModel'",
     )
+    expect(assemblyModelFile.source).toContain(
+      "from './CanvasAppAssemblyModelContracts'",
+    )
+    expect(assemblyModelFile.source).toContain('): CanvasAppAssemblyModel')
+    expect(assemblyModelFile.source).not.toContain(
+      'export type CanvasAppAssemblyModel',
+    )
+    expect(assemblyModelContractsFile.source).toContain(
+      'export type CanvasAppAssemblyModel',
+    )
+    expect(assemblyModelContractsFile.source).not.toContain(
+      "from './CanvasAppAssemblyTypes'",
+    )
+    expect(assemblyModelContractsFile.source).not.toContain(
+      'CanvasAppAssembly[',
+    )
+    for (const assemblyModelContract of [
+      'CanvasAppAssemblyAffordanceModel',
+      'CanvasAppAssemblyCommandModel',
+      'CanvasAppAssemblyComponentModel',
+      'CanvasAppAssemblyControlModel',
+      'CanvasAppAssemblyExtensionModel',
+      'CanvasAppAssemblyInspectorModel',
+      'CanvasAppAssemblyPointerModel',
+      'CanvasAppAssemblyRenderingModel',
+      'CanvasAppAssemblyWorkspaceModel',
+    ]) {
+      expect(assemblyModelContractsFile.source).toContain(
+        `export type ${assemblyModelContract}`,
+      )
+    }
     for (const assemblyOutputField of [
       'affordanceConfig',
       'componentLibrary',
@@ -5141,6 +5175,9 @@ describe('Canvas module boundaries', () => {
     const workspaceConsumerModelFile = getSourceFile(
       'src/canvas/app/workflow/CanvasWorkspaceConsumerModel.ts',
     )
+    const workspaceConsumerContractsFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasWorkspaceConsumerContracts.ts',
+    )
     const workspaceRuntimeModelFile = getSourceFile(
       'src/canvas/app/workflow/CanvasWorkspaceRuntimeModel.ts',
     )
@@ -5153,6 +5190,27 @@ describe('Canvas module boundaries', () => {
     expect(appModelFile.source).not.toMatch(rawWorkspaceTerms)
     expect(workspaceModelFile.source).toContain(
       "from './CanvasWorkspaceConsumerModel'",
+    )
+    expect(workspaceConsumerModelFile.source).toContain(
+      "from './CanvasWorkspaceConsumerContracts'",
+    )
+    expect(workspaceConsumerModelFile.source).toContain(
+      '): CanvasWorkspaceConsumerModel',
+    )
+    expect(workspaceConsumerModelFile.source).not.toContain(
+      'export type CanvasWorkspaceConsumerModelInput',
+    )
+    expect(workspaceConsumerModelFile.source).not.toContain(
+      'CanvasDocumentClipboard',
+    )
+    expect(workspaceConsumerContractsFile.source).toContain(
+      'export type CanvasWorkspaceConsumerModelInput',
+    )
+    expect(workspaceConsumerContractsFile.source).toContain(
+      'export type CanvasWorkspaceConsumerModel',
+    )
+    expect(workspaceConsumerContractsFile.source).toContain(
+      'CanvasDocumentClipboard',
     )
     expect(workspaceModelFile.source).toContain(
       "from './CanvasWorkspaceRuntimeModel'",

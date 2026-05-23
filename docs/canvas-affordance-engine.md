@@ -90,6 +90,7 @@
 | `src/canvas/app/workflow/CanvasAppWorkspaceAssembly.ts` | Workspace 초기 items normalization, Demo default selection fallback, storage provider fallback을 조립한다 |
 | `src/canvas/app/workflow/CanvasAppWorkspaceAssemblyContracts.ts` | Workspace 초기 items, 초기 selection, storage provider 계약을 검증하고, selection과 item tree 불일치를 runtime 진입 전에 차단한다 |
 | `src/canvas/app/workflow/CanvasAppAssemblySnapshot.ts` | 조립된 assembly output을 외부 mutation에서 보호하도록 component library, extension registry, initial item, adapter를 snapshot/freeze 한다 |
+| `src/canvas/app/workflow/CanvasAppAssemblyModelContracts.ts` | Public Assembly output과 workflow 내부 consumer context를 분리하는 App Assembly Model type 계약을 소유한다 |
 | `src/canvas/app/workflow/index.ts` | App Shell이 사용하는 workflow public entry |
 | `src/canvas/app/workflow/useCanvasAppModel.ts` | command, pointer, keyboard, viewport, text editing wiring과 control별 view props 조립을 App Shell에 숨긴다 |
 | `src/canvas/app/workflow/CanvasAppControlModel.ts` | component palette, toolbar, status, zoom controls props와 command availability/status/selected fit target 규칙을 만든다 |
@@ -101,6 +102,7 @@
 | `src/canvas/app/workflow/useCanvasTextEditorModel.ts` | text editing state, editable item lookup, text editor props를 App Shell에 숨긴다 |
 | `src/canvas/app/workflow/useCanvasWorkspaceModel.ts` | 저장된 workspace snapshot, document history, viewport, read model, id 생성을 App Shell에 숨긴다 |
 | `src/canvas/app/authoring/index.ts` | `canvas/app/authoring` subpath로 외부 조립자가 쓰는 assembly input과 custom descriptor 계약을 모으고 App runtime hook/default/validator를 제외한다 |
+| `src/canvas/app/workflow/CanvasWorkspaceConsumerContracts.ts` | Workspace document/read/viewport fan-out의 입력과 consumer별 출력 Interface를 명시한다 |
 | `src/canvas/app/inspector/CanvasAppInspectorPanelExecution.ts` | Inspector panel visibility/render 호출과 실패 시 omit containment를 소유한다 |
 | `src/canvas/app/keyboard/CanvasKeyboardShortcutIntent.ts` | Keydown 입력, typing target suppression, temporary pan, escape, command/tool shortcut precedence를 실행 가능한 keyboard intent로 조립한다 |
 | `src/canvas/app/keyboard/CanvasKeyboardCommandShortcutIntent.ts` | Built-in command, viewport, nudge keyboard shortcut grammar를 feature toggle과 selection 기준으로 keyboard intent로 변환한다 |
