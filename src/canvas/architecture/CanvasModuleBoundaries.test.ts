@@ -501,6 +501,33 @@ describe('Canvas module boundaries', () => {
     expect(startFile.source).toContain('createCanvasDraftStroke')
   })
 
+  it('keeps pointer interaction start effects behind a named module', () => {
+    const downHandlersFile = getSourceFile(
+      'src/canvas/app/pointer/useCanvasPointerDownHandlers.ts',
+    )
+    const effectsFile = getSourceFile(
+      'src/canvas/app/pointer/CanvasPointerInteractionStartEffects.ts',
+    )
+
+    expect(downHandlersFile.source).toContain(
+      "from './CanvasPointerInteractionStartEffects'",
+    )
+    expect(downHandlersFile.source).not.toContain('capturePointer(')
+    expect(downHandlersFile.source).not.toContain(
+      "commitItemsChange({ type: 'add'",
+    )
+    expect(downHandlersFile.source).not.toContain("setTool('select')")
+    expect(effectsFile.source).toContain(
+      'export function applyCanvasPointerInteractionStartEffect',
+    )
+    expect(effectsFile.source).toContain(
+      'export function applyCanvasItemPointerInteractionStartEffect',
+    )
+    expect(effectsFile.source).toContain('capturePointer(')
+    expect(effectsFile.source).toContain("commitItemsChange({ type: 'add'")
+    expect(effectsFile.source).toContain("setTool('select')")
+  })
+
   it('keeps item pointer interaction start rules behind a named module', () => {
     const downHandlersFile = getSourceFile(
       'src/canvas/app/pointer/useCanvasPointerDownHandlers.ts',

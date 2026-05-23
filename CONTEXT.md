@@ -61,6 +61,7 @@
 - Drawing Item: Demo `CanvasItem` 중 marker, highlighter, arrow처럼 캔버스 위에 빠르게 주석을 그리는 항목. `points` 또는 `start/end`가 실제 geometry이고 `x/y/w/h`는 Host가 동기화하는 bounds cache다.
 - Drawing Item Style: built-in marker, highlighter, arrow의 stroke/opacity 기본값. Draft overlay와 Host item creation이 같은 Host-owned 계약을 쓴다.
 - Canvas Pointer Interaction Start: pointer-down 시 tool/gesture/config/custom tool 상태를 active interaction, draft overlay, immediate text creation으로 변환하는 App-owned runtime Module.
+- Canvas Pointer Interaction Start Effects: pointer-down start 결과를 pointer capture, document commit, selection/live item, draft overlay, editing/tool/gesture state로 적용하는 App-owned runtime Module.
 - Canvas Item Pointer Interaction Start: item pointer-down/text double-click 시 selection, edit state, alt-drag duplicate, move interaction 시작 상태를 계산하는 App-owned runtime Module.
 - Canvas Resize Pointer Interaction Start: resize handle pointer-down 시 selected bounds, handle, selection, item snapshot을 resize interaction 시작 상태로 변환하는 App-owned runtime Module.
 - Canvas Pointer Interaction Preview: pointer-move 시 active interaction을 viewport, live item, marquee, selection, draft overlay, snap guide preview로 변환하는 App-owned runtime Module.
@@ -124,7 +125,7 @@
 - 제품별 item creation tool은 내부 Tool union에 구체 id를 넣지 않고 Canvas App Custom Item Module에 등록한다.
 - Canvas App Custom Creation Tool descriptor shape/shortcut conflict 검증과 runtime state/lookup/shortcut matching은 분리하고, validation은 Canvas App Custom Creation Tool Contracts가, runtime behavior는 Canvas App Custom Creation Tool Runtime이 소유한다.
 - Canvas App Custom Creation Tool이 item 생성을 거부하거나 실패하거나 invalid item을 반환해도 pointer lifecycle을 깨지 않아야 한다.
-- Pointer down hook은 DOM pointer capture와 시작 결과 적용을 맡고, tool/gesture/config/custom tool 기반 interaction 시작 규칙은 Canvas Pointer Interaction Start가 소유한다.
+- Pointer down hook은 DOM pointer routing과 coordinate 변환을 맡고, tool/gesture/config/custom tool 기반 interaction 시작 규칙은 Canvas Pointer Interaction Start가, 시작 결과 적용은 Canvas Pointer Interaction Start Effects가 소유한다.
 - Item pointer down hook은 DOM event routing과 시작 결과 적용을 맡고, selection/edit/duplicate/move 시작 규칙은 Canvas Item Pointer Interaction Start가 소유한다.
 - Resize pointer down hook은 DOM event routing과 시작 결과 적용을 맡고, resize handle/selected bounds/config 기반 시작 규칙은 Canvas Resize Pointer Interaction Start가 소유한다.
 - Text double-click hook은 시작 결과 적용을 맡고, text edit 가능 여부/selection/edit state/tool 전환 규칙은 Canvas Item Pointer Interaction Start가 소유한다.

@@ -17,7 +17,7 @@ import type {
 } from '../../entities'
 import type { CanvasItemReadModel } from '../../host'
 import { pointDistance } from '../../core'
-import { capturePointer, screenPoint, screenToWorld } from './CanvasPointerGeometry'
+import { screenPoint, screenToWorld } from './CanvasPointerGeometry'
 import {
   shouldRouteCanvasItemPointerToCanvasGesture,
   type CanvasAffordanceConfig,
@@ -40,6 +40,12 @@ import {
   startCanvasTextEditInteraction,
 } from './CanvasItemPointerInteractionStart'
 import { startCanvasResizePointerInteraction } from './CanvasResizePointerInteractionStart'
+import {
+  applyCanvasItemPointerInteractionStartEffect,
+  applyCanvasPointerInteractionStartEffect,
+  applyCanvasResizePointerInteractionStartEffect,
+  applyCanvasTextEditInteractionStartEffect,
+} from './CanvasPointerInteractionStartEffects'
 
 type UseCanvasPointerDownHandlersArgs = {
   cloneItems: (ids: string[], offset: Point) => CanvasItem[]
@@ -101,6 +107,21 @@ export function useCanvasPointerDownHandlers({
     point: Point
     time: number
   } | null>(null)
+  const startEffectContext = {
+    commitItemsChange,
+    commitSelection,
+    interactionRef,
+    selection,
+    setDraftArrow,
+    setDraftRect,
+    setDraftStroke,
+    setEditing,
+    setGesture,
+    setLiveItems,
+    setSelection,
+    setTool,
+    stageElement,
+  }
 
   function handleCanvasPointerDown(event: CanvasAppPointerInput) {
     const startScreen = screenPoint(stageElement, event)
@@ -119,45 +140,11 @@ export function useCanvasPointerDownHandlers({
       viewport,
     })
 
-    if (start.kind === 'none') {
-      return
-    }
-
-    event.preventDefault()
-
-    if (start.capturePointer) {
-      capturePointer(stageElement, event.pointerId)
-    }
-
-    if (start.kind === 'created-text') {
-      commitItemsChange({ type: 'add', items: [start.item] }, {
-        before: selection,
-        after: [start.item.id],
-      })
-      setEditing(start.edit)
-      setTool('select')
-      return
-    }
-
-    if (start.clearSelection) {
-      setSelection([])
-    }
-
-    interactionRef.current = start.interaction
-
-    if (start.draftRect) {
-      setDraftRect(start.draftRect)
-    }
-
-    if (start.draftStroke) {
-      setDraftStroke(start.draftStroke)
-    }
-
-    if (start.draftArrow) {
-      setDraftArrow(start.draftArrow)
-    }
-
-    setGesture(start.gesture)
+    applyCanvasPointerInteractionStartEffect({
+      context: startEffectContext,
+      event,
+      start,
+    })
   }
 
   function handleItemPointerDown(
@@ -198,34 +185,14 @@ export function useCanvasPointerDownHandlers({
       startWorld,
     })
 
-    event.preventDefault()
-    event.stopPropagation()
-
-    if (start.clearLastClick) {
-      lastClickRef.current = null
-    }
-
-    if (start.commitSelection) {
-      commitSelection(start.commitSelection)
-    }
-
-    if (start.liveItems) {
-      setLiveItems(start.liveItems)
-    }
-
-    if (start.selection) {
-      setSelection(start.selection)
-    }
-
-    if (start.kind === 'none') {
-      interactionRef.current = { kind: 'none' }
-      setGesture('none')
-      return
-    }
-
-    capturePointer(stageElement, event.pointerId)
-    interactionRef.current = start.interaction
-    setGesture('move')
+    applyCanvasItemPointerInteractionStartEffect({
+      clearLastClick: () => {
+        lastClickRef.current = null
+      },
+      context: startEffectContext,
+      event,
+      start,
+    })
   }
 
   function handleResizePointerDown(
@@ -245,31 +212,20 @@ export function useCanvasPointerDownHandlers({
       startWorld,
     })
 
-    if (start.kind === 'none') {
-      return
-    }
-
-    event.preventDefault()
-    event.stopPropagation()
-
-    if (start.capturePointer) {
-      capturePointer(stageElement, event.pointerId)
-    }
-
-    interactionRef.current = start.interaction
-    setGesture(start.gesture)
+    applyCanvasResizePointerInteractionStartEffect({
+      context: startEffectContext,
+      event,
+      start,
+    })
   }
 
   function handleTextDoubleClick(item: RectItem | TextItem) {
     const start = startCanvasTextEditInteraction({ config, item })
 
-    if (start.kind === 'none') {
-      return
-    }
-
-    commitSelection(start.selection)
-    setEditing(start.editing)
-    setTool(start.tool)
+    applyCanvasTextEditInteractionStartEffect({
+      context: startEffectContext,
+      start,
+    })
   }
 
   return {
