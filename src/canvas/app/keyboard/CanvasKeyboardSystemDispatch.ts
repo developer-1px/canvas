@@ -37,45 +37,28 @@ export type CanvasKeyboardSystemReleaseHandlers = Pick<
   'setSpaceDown'
 >
 
-type CanvasKeyboardSystemIntentKind =
-  | 'escape'
-  | 'open-find-replace'
-  | 'temporary-pan'
+type CanvasKeyboardSystemShortcutIntentKind =
+  CanvasKeyboardShortcutIntent['kind']
 
-export type CanvasKeyboardSystemIntent = Extract<
-  CanvasKeyboardShortcutIntent,
-  { kind: CanvasKeyboardSystemIntentKind }
->
+type CanvasKeyboardSystemIntentRunner<
+  TKind extends CanvasKeyboardSystemShortcutIntentKind,
+> = (args: {
+  handlers: CanvasKeyboardSystemHandlers
+  intent: Extract<CanvasKeyboardShortcutIntent, { kind: TKind }>
+}) => void
 
-const CANVAS_KEYBOARD_SYSTEM_INTENT_KINDS = Object.freeze([
-  'escape',
-  'open-find-replace',
-  'temporary-pan',
-] satisfies readonly CanvasKeyboardSystemIntentKind[])
-
-export function isCanvasKeyboardSystemIntent(
-  intent: CanvasKeyboardShortcutIntent,
-): intent is CanvasKeyboardSystemIntent {
-  return CANVAS_KEYBOARD_SYSTEM_INTENT_KINDS.includes(
-    intent.kind as CanvasKeyboardSystemIntentKind,
-  )
+function defineCanvasKeyboardSystemIntentRunners<
+  const TRunners extends Partial<{
+    [TKind in CanvasKeyboardSystemShortcutIntentKind]:
+      CanvasKeyboardSystemIntentRunner<TKind>
+  }>,
+>(runners: TRunners) {
+  return Object.freeze(runners)
 }
 
-export function runCanvasKeyboardSystemIntent({
-  handlers,
-  intent,
-}: {
-  handlers: CanvasKeyboardSystemHandlers
-  intent: CanvasKeyboardSystemIntent
-}) {
-  switch (intent.kind) {
-    case 'open-find-replace':
-      handlers.openFindReplace()
-      return
-    case 'temporary-pan':
-      handlers.setSpaceDown(true)
-      return
-    case 'escape':
+const CANVAS_KEYBOARD_SYSTEM_INTENT_RUNNERS =
+  defineCanvasKeyboardSystemIntentRunners({
+    escape: ({ handlers }) => {
       handlers.interactionRef.current = { kind: 'none' }
       handlers.setGesture('none')
       handlers.setMarquee(null)
@@ -85,10 +68,59 @@ export function runCanvasKeyboardSystemIntent({
       handlers.setEditing(null)
       handlers.commitSelection([])
       handlers.setTool('select')
-      return
-  }
+    },
+    'open-find-replace': ({ handlers }) => {
+      handlers.openFindReplace()
+    },
+    'temporary-pan': ({ handlers }) => {
+      handlers.setSpaceDown(true)
+    },
+  })
 
-  return assertUnhandledCanvasKeyboardSystemIntent(intent)
+type CanvasKeyboardSystemIntentKind = Extract<
+  keyof typeof CANVAS_KEYBOARD_SYSTEM_INTENT_RUNNERS,
+  CanvasKeyboardSystemShortcutIntentKind
+>
+
+type CanvasKeyboardAnySystemIntentRunner =
+  CanvasKeyboardSystemIntentRunner<CanvasKeyboardSystemIntentKind>
+
+function hasCanvasKeyboardSystemIntentRunner(
+  kind: string,
+): kind is CanvasKeyboardSystemIntentKind {
+  return Object.prototype.hasOwnProperty.call(
+    CANVAS_KEYBOARD_SYSTEM_INTENT_RUNNERS,
+    kind,
+  )
+}
+
+function getCanvasKeyboardSystemIntentRunner(
+  kind: CanvasKeyboardSystemIntentKind,
+): CanvasKeyboardAnySystemIntentRunner {
+  return CANVAS_KEYBOARD_SYSTEM_INTENT_RUNNERS[
+    kind
+  ] as CanvasKeyboardAnySystemIntentRunner
+}
+
+export type CanvasKeyboardSystemIntent = Extract<
+  CanvasKeyboardShortcutIntent,
+  { kind: CanvasKeyboardSystemIntentKind }
+>
+
+export function isCanvasKeyboardSystemIntent(
+  intent: CanvasKeyboardShortcutIntent,
+): intent is CanvasKeyboardSystemIntent {
+  return hasCanvasKeyboardSystemIntentRunner(intent.kind)
+}
+
+export function runCanvasKeyboardSystemIntent({
+  handlers,
+  intent,
+}: {
+  handlers: CanvasKeyboardSystemHandlers
+  intent: CanvasKeyboardSystemIntent
+}) {
+  getCanvasKeyboardSystemIntentRunner(intent.kind)({ handlers, intent })
 }
 
 export function runCanvasKeyboardSystemKeyUp({
@@ -111,10 +143,4 @@ export function runCanvasKeyboardSystemWindowBlur({
   handlers: CanvasKeyboardSystemReleaseHandlers
 }) {
   handlers.setSpaceDown(false)
-}
-
-function assertUnhandledCanvasKeyboardSystemIntent(
-  intent: never,
-): never {
-  throw new Error(`Unhandled canvas keyboard system intent: ${String(intent)}`)
 }

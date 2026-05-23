@@ -3059,10 +3059,16 @@ describe('Canvas module boundaries', () => {
       'export function isCanvasKeyboardSystemIntent',
     )
     expect(systemDispatchFile.source).toContain(
-      "case 'open-find-replace'",
+      'CANVAS_KEYBOARD_SYSTEM_INTENT_RUNNERS',
     )
-    expect(systemDispatchFile.source).toContain("case 'escape'")
+    expect(systemDispatchFile.source).toContain(
+      'getCanvasKeyboardSystemIntentRunner(intent.kind)',
+    )
     expect(systemDispatchFile.source).toContain('commitSelection([])')
+    expect(systemDispatchFile.source).not.toContain(
+      'CANVAS_KEYBOARD_SYSTEM_INTENT_KINDS',
+    )
+    expect(systemDispatchFile.source).not.toContain('switch (intent.kind)')
     expect(systemDispatchFile.source).toContain(
       'export function runCanvasKeyboardSystemKeyUp',
     )
@@ -3079,9 +3085,17 @@ describe('Canvas module boundaries', () => {
     expect(viewportDispatchFile.source).toContain(
       'export function isCanvasKeyboardViewportIntent',
     )
-    expect(viewportDispatchFile.source).toContain("case 'zoom-by'")
-    expect(viewportDispatchFile.source).toContain("case 'fit-selection'")
+    expect(viewportDispatchFile.source).toContain(
+      'CANVAS_KEYBOARD_VIEWPORT_INTENT_RUNNERS',
+    )
+    expect(viewportDispatchFile.source).toContain(
+      'getCanvasKeyboardViewportIntentRunner(intent.kind)',
+    )
     expect(viewportDispatchFile.source).toContain('fitToItems(intent.ids)')
+    expect(viewportDispatchFile.source).not.toContain(
+      'CANVAS_KEYBOARD_VIEWPORT_INTENT_KINDS',
+    )
+    expect(viewportDispatchFile.source).not.toContain('switch (intent.kind)')
     expect(toolIntentFile.source).toContain(
       'export function getCanvasKeyboardToolShortcutIntent',
     )
