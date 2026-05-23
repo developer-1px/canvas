@@ -1,24 +1,19 @@
-import type {
-  ArrowItem,
-  CanvasItem,
-  HighlightItem,
-  MarkerItem,
-} from '../../entities'
+import type { CanvasItem } from '../../entities'
+import {
+  isCanvasDrawingItem,
+  type CanvasDrawingItem,
+} from '../../host'
 import {
   CANVAS_SVG_ARROW_MARKER_IRI,
   createCanvasSvgPathData,
 } from '../../renderer'
 
-export type CanvasDemoSvgDrawingItem = MarkerItem | HighlightItem | ArrowItem
+export type CanvasDemoSvgDrawingItem = CanvasDrawingItem
 
 export function isCanvasDemoSvgDrawingItem(
   item: CanvasItem,
 ): item is CanvasDemoSvgDrawingItem {
-  return (
-    item.type === 'marker' ||
-    item.type === 'highlight' ||
-    item.type === 'arrow'
-  )
+  return isCanvasDrawingItem(item)
 }
 
 export function renderCanvasDemoSvgDrawingItem({

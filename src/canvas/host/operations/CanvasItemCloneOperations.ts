@@ -1,12 +1,15 @@
 import type { Point } from '../../core'
 import type {
   CanvasItem,
-  GroupItem
+  GroupItem,
 } from '../model'
+import {
+  isCanvasDrawingItem,
+  translateCanvasDrawingItem,
+} from '../drawing/CanvasDrawingItemGeometry'
 import {
   flattenCanvasItems,
   pruneNestedSelection,
-  syncCanvasItemBounds,
   syncGroupBounds,
 } from '../tree/CanvasTree'
 
@@ -67,28 +70,13 @@ function cloneCanvasItemWithNewId(
     return syncGroupBounds(group)
   }
 
-  if (item.type === 'marker' || item.type === 'highlight') {
-    return syncCanvasItemBounds({
-      ...item,
-      id: createId(item.type),
-      points: item.points.map((point) => ({
-        x: point.x + offset.x,
-        y: point.y + offset.y,
-      })),
-    })
-  }
-
-  if (item.type === 'arrow') {
-    return syncCanvasItemBounds({
-      ...item,
-      id: createId(item.type),
-      start: {
-        x: item.start.x + offset.x,
-        y: item.start.y + offset.y,
-      },
-      end: {
-        x: item.end.x + offset.x,
-        y: item.end.y + offset.y,
+  if (isCanvasDrawingItem(item)) {
+    return translateCanvasDrawingItem({
+      dx: offset.x,
+      dy: offset.y,
+      item: {
+        ...item,
+        id: createId(item.type),
       },
     })
   }

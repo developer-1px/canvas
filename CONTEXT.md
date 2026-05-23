@@ -100,6 +100,7 @@
 - Demo SVG Custom Item Renderer Execution: custom item renderer lookup, render 실행, throw 시 fallback containment를 소유하는 App rendering Module.
 - Demo SVG Custom Item Render Fallback: custom item renderer 누락/실패 때 쓰는 unknown custom item card fallback shape를 소유하는 App rendering 내부 Module.
 - Drawing Item: Demo `CanvasItem` 중 marker, highlighter, arrow처럼 캔버스 위에 빠르게 주석을 그리는 항목. `points` 또는 `start/end`가 실제 geometry이고 `x/y/w/h`는 Host가 동기화하는 bounds cache다.
+- Drawing Item Geometry: built-in marker, highlighter, arrow의 type guard, geometry bounds, translate/scale, bounds cache sync 규칙을 소유하는 Host-owned geometry Module.
 - Drawing Item Style: built-in marker, highlighter, arrow의 stroke/opacity 기본값. Draft overlay와 Host item creation이 같은 Host-owned 계약을 쓴다.
 - Canvas Pointer Interaction Start: pointer-down 시 gesture routing, pan, marquee 시작을 active interaction으로 변환하고 생성 시작은 Canvas Pointer Creation Start에 위임하는 App-owned runtime Module.
 - Canvas Pointer Creation Grammar: create-rect, marker, highlighter, arrow, custom creation, text creation gesture와 active creation interaction kind set을 소유하는 App-owned what 계약 Module.
@@ -175,6 +176,7 @@
 - marker, highlighter, arrow 같은 기본 드로잉 도구는 제품별 custom item module이 아니라 내부 Affordance로 관리한다.
 - 기본 드로잉 item은 저장 계약에서 최소 visible geometry, 양수 stroke width, 0보다 크고 1 이하인 opacity를 검증한다.
 - 기본 드로잉 item의 bounds는 caller 입력을 믿지 않고 Host tree/document가 `points` 또는 `start/end`에서 canonical하게 동기화한다.
+- 기본 드로잉 item의 geometry bounds, translate/scale, bounds cache sync 규칙은 Host Drawing Item Geometry Module이 소유하고 tree bounds, clone, transform, SVG drawing type guard가 재사용한다.
 - 기본 드로잉 item의 style 기본값은 Host Drawing Item Style Module이 소유하고 draft overlay와 item creation이 재사용한다.
 - 엔진은 Fabric.js 같은 완성형 객체 모델을 감싸기보다, 커스텀 가능한 Affordance 문법을 작은 Interface로 제공한다.
 - Demo `CanvasItem`과 SVG 렌더링 방식은 재사용 Core Contract에 포함하지 않는다.

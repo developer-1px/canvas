@@ -1675,6 +1675,64 @@ describe('Canvas module boundaries', () => {
     )
   })
 
+  it('keeps built-in drawing geometry in the host drawing module', () => {
+    const drawingGeometryModule = getSourceFile(
+      'src/canvas/host/drawing/CanvasDrawingItemGeometry.ts',
+    )
+    const hostEntryFile = getSourceFile('src/canvas/host/index.ts')
+    const treeBoundsFile = getSourceFile(
+      'src/canvas/host/tree/CanvasTreeBounds.ts',
+    )
+    const cloneOperationsFile = getSourceFile(
+      'src/canvas/host/operations/CanvasItemCloneOperations.ts',
+    )
+    const transformOperationsFile = getSourceFile(
+      'src/canvas/host/operations/CanvasItemTransformOperations.ts',
+    )
+    const drawingRendererFile = getSourceFile(
+      'src/canvas/app/rendering/CanvasDemoSvgDrawingItemRenderer.tsx',
+    )
+
+    expect(drawingGeometryModule.source).toContain(
+      'export function isCanvasDrawingItem',
+    )
+    expect(drawingGeometryModule.source).toContain(
+      'export function getCanvasDrawingItemBounds',
+    )
+    expect(drawingGeometryModule.source).toContain(
+      'export function translateCanvasDrawingItem',
+    )
+    expect(drawingGeometryModule.source).toContain(
+      'export function scaleCanvasDrawingItem',
+    )
+    expect(hostEntryFile.source).toContain(
+      "from './drawing/CanvasDrawingItemGeometry'",
+    )
+    for (const hostConsumer of [
+      treeBoundsFile,
+      cloneOperationsFile,
+      transformOperationsFile,
+    ]) {
+      expect(hostConsumer.source).toContain(
+        "from '../drawing/CanvasDrawingItemGeometry'",
+      )
+      expect(hostConsumer.source).not.toContain(
+        "item.type === 'marker' || item.type === 'highlight'",
+      )
+      expect(hostConsumer.source).not.toContain("item.type === 'arrow'")
+    }
+    expect(treeBoundsFile.source).not.toContain('CANVAS_ARROW_BOUNDS_PAD')
+    expect(cloneOperationsFile.source).not.toContain('points: item.points.map')
+    expect(transformOperationsFile.source).not.toContain('scalePointsToBounds')
+    expect(drawingRendererFile.source).toContain(
+      "from '../../host'",
+    )
+    expect(drawingRendererFile.source).toContain('isCanvasDrawingItem(item)')
+    expect(drawingRendererFile.source).not.toContain(
+      "item.type === 'marker' ||",
+    )
+  })
+
   it('keeps built-in drawing style defaults in the host drawing module', () => {
     const drawingStyleModule = getSourceFile(
       'src/canvas/host/drawing/CanvasDrawingItemStyles.ts',

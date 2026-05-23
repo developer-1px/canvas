@@ -38,6 +38,17 @@ export {
 export { INITIAL_ITEMS } from './component/CanvasInitialItems'
 
 export {
+  getCanvasDrawingItemBounds,
+  isCanvasArrowDrawingItem,
+  isCanvasDrawingItem,
+  isCanvasStrokeDrawingItem,
+  scaleCanvasDrawingItem,
+  syncCanvasDrawingItemBounds,
+  translateCanvasDrawingItem,
+  type CanvasDrawingItem,
+  type CanvasStrokeDrawingItem,
+} from './drawing/CanvasDrawingItemGeometry'
+export {
   CANVAS_ARROW_STYLE,
   CANVAS_HIGHLIGHT_STYLE,
   CANVAS_MARKER_STYLE,
