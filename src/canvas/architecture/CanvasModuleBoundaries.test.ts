@@ -1394,6 +1394,9 @@ describe('Canvas module boundaries', () => {
     const marqueeInteractionFile = getSourceFile(
       'src/canvas/app/pointer/CanvasPointerMarqueeInteraction.ts',
     )
+    const transformInteractionFile = getSourceFile(
+      'src/canvas/app/pointer/CanvasPointerTransformInteraction.ts',
+    )
 
     expect(dragHandlersFile.source).toContain(
       "from './CanvasPointerInteractionLifecycle'",
@@ -1418,6 +1421,9 @@ describe('Canvas module boundaries', () => {
     expect(lifecycleFile.source).toContain(
       "from './CanvasPointerMarqueeInteraction'",
     )
+    expect(lifecycleFile.source).toContain(
+      "from './CanvasPointerTransformInteraction'",
+    )
     expect(lifecycleFile.source).not.toContain('createCanvasRect({')
     expect(lifecycleFile.source).not.toContain('createCanvasMarker({')
     expect(lifecycleFile.source).not.toContain('createCanvasArrow({')
@@ -1426,8 +1432,11 @@ describe('Canvas module boundaries', () => {
     )
     expect(lifecycleFile.source).not.toContain('getCanvasMarqueeSelection')
     expect(lifecycleFile.source).not.toContain('normalizeBounds')
-    expect(lifecycleFile.source).toContain("type: 'transform'")
-    expect(lifecycleFile.source).toContain('setEditing(interaction.edit)')
+    expect(lifecycleFile.source).not.toContain("type: 'transform'")
+    expect(lifecycleFile.source).not.toContain('setEditing(interaction.edit)')
+    expect(lifecycleFile.source).not.toContain(
+      'setLiveItems(interaction.historyItems)',
+    )
     const shapeCreationFile = getSourceFile(
       'src/canvas/app/pointer/CanvasPointerShapeCreation.ts',
     )
@@ -1470,6 +1479,19 @@ describe('Canvas module boundaries', () => {
     )
     expect(marqueeInteractionFile.source).toContain('getCanvasMarqueeSelection')
     expect(marqueeInteractionFile.source).toContain('normalizeBounds')
+    expect(transformInteractionFile.source).toContain(
+      'export function commitCanvasPointerTransformInteraction',
+    )
+    expect(transformInteractionFile.source).toContain(
+      'export function cancelCanvasPointerTransformInteraction',
+    )
+    expect(transformInteractionFile.source).toContain("type: 'transform'")
+    expect(transformInteractionFile.source).toContain(
+      'setEditing(interaction.edit)',
+    )
+    expect(transformInteractionFile.source).toContain(
+      'setLiveItems(interaction.historyItems)',
+    )
   })
 
   it('keeps pointer creation kind routing behind a named grammar module', () => {

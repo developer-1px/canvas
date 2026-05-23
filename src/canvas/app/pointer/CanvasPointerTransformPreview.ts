@@ -15,13 +15,8 @@ import {
   type CanvasTransformAdapter,
 } from '../../engine'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
-import type { Interaction } from './CanvasInteractionState'
 import { hasCanvasInteractionMoved } from './CanvasPointerInteractionMovement'
-
-type CanvasPointerTransformInteraction = Extract<
-  Interaction,
-  { kind: 'move' } | { kind: 'resize' }
->
+import type { CanvasPointerTransformInteraction } from './CanvasPointerTransformInteraction'
 
 type CanvasPointerTransformPreviewInput = {
   config: CanvasAffordanceConfig

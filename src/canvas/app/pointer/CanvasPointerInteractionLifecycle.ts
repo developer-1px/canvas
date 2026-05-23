@@ -21,6 +21,10 @@ import {
   cancelCanvasPointerMarqueeInteraction,
   commitCanvasPointerMarqueeInteraction,
 } from './CanvasPointerMarqueeInteraction'
+import {
+  cancelCanvasPointerTransformInteraction,
+  commitCanvasPointerTransformInteraction,
+} from './CanvasPointerTransformInteraction'
 
 export type CanvasPointerInteractionCommitInput = {
   commitItemsChange: CommitCanvasItemsChange
@@ -62,26 +66,13 @@ export function commitCanvasPointerInteraction({
   }
 
   if (interaction.kind === 'move' || interaction.kind === 'resize') {
-    commitItemsChange(
-      {
-        type: 'transform',
-        beforeItems: interaction.historyItems,
-        afterItems: interaction.currentItems,
-      },
-      {
-        before:
-          interaction.kind === 'move'
-            ? interaction.historySelection
-            : interaction.ids,
-        after: interaction.ids,
-      },
-    )
-  }
-
-  if (interaction.kind === 'move' && !interaction.moved && interaction.edit) {
-    commitSelection([interaction.edit.id])
-    setEditing(interaction.edit)
-    setTool('select')
+    commitCanvasPointerTransformInteraction({
+      commitItemsChange,
+      commitSelection,
+      interaction,
+      setEditing,
+      setTool,
+    })
   }
 
   if (interaction.kind === 'marquee') {
@@ -106,7 +97,10 @@ export function cancelCanvasPointerInteraction({
   setSelection,
 }: CanvasPointerInteractionCancelInput) {
   if (interaction.kind === 'move' || interaction.kind === 'resize') {
-    setLiveItems(interaction.historyItems)
+    cancelCanvasPointerTransformInteraction({
+      interaction,
+      setLiveItems,
+    })
   } else if (interaction.kind === 'marquee') {
     cancelCanvasPointerMarqueeInteraction({
       interaction,
