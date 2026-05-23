@@ -8,6 +8,7 @@ import {
   createCanvasAppAssembly,
   defineCanvasAppCustomItemModule,
   type CanvasAppCustomItemModule,
+  type CanvasAppItemLayerAdapter,
   type CanvasCustomItem,
   type CanvasItem,
 } from 'canvas'
@@ -53,13 +54,27 @@ describe('Canvas package consumer imports', () => {
         renderItem: ({ item }) => item.title,
         validateItem: (item) => item.data.severity === 'high',
       })
+    const itemLayerAdapter: CanvasAppItemLayerAdapter = {
+      renderItems: ({ items }) => items.length,
+    }
 
     const assembly = createCanvasAppAssembly({
       customItemModules: [module],
       initialItems: [rect],
+      itemLayerAdapter,
     })
 
     expect(assembly.initialItems).toEqual([rect])
+    expect(assembly.itemLayerAdapter.renderItems({
+      componentPresentationRenderers: {},
+      customItemRenderers: {},
+      getComponentPresentation: () => 'note-card',
+      items: assembly.initialItems,
+      onItemPointerDown: () => undefined,
+      onTextDoubleClick: () => undefined,
+      outlineIds: new Set(),
+      selected: new Set(),
+    })).toBe(1)
     expect(assembly.customItemValidators.smoke(customItem)).toBe(true)
     expect(createCanvasAppAssemblyFromApp().initialItems.length).toBeGreaterThan(
       0,

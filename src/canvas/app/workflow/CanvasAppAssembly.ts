@@ -16,11 +16,13 @@ import {
 import {
   DEFAULT_CANVAS_APP_CUSTOM_ITEM_RENDERERS,
   DEFAULT_CANVAS_APP_COMPONENT_PRESENTATION_RENDERERS,
+  DEFAULT_CANVAS_APP_ITEM_LAYER_ADAPTER,
   assertCanvasAppComponentPresentationRenderers,
   assertCanvasAppCustomItemRenderers,
   createCanvasAppComponentPresentationRenderers,
   type CanvasAppComponentPresentationRenderers,
   type CanvasAppCustomItemRenderers,
+  type CanvasAppItemLayerAdapter,
 } from '../rendering'
 import {
   assertCanvasAppCustomCommands,
@@ -66,6 +68,7 @@ export type CanvasAppAssembly = {
   inspectorPanels: readonly CanvasAppInspectorPanel[]
   initialItems: CanvasItem[]
   itemAdapters: CanvasAppItemAdapters
+  itemLayerAdapter: CanvasAppItemLayerAdapter
 }
 
 export type CanvasAppAssemblyInput = {
@@ -77,6 +80,7 @@ export type CanvasAppAssemblyInput = {
   initialItems?: CanvasItem[]
   inspectorPanels?: readonly CanvasAppInspectorPanel[]
   itemAdapters?: CanvasAppItemAdapters
+  itemLayerAdapter?: CanvasAppItemLayerAdapter
 }
 
 export const DEFAULT_CANVAS_APP_ASSEMBLY: CanvasAppAssembly =
@@ -91,6 +95,7 @@ export const DEFAULT_CANVAS_APP_ASSEMBLY: CanvasAppAssembly =
     inspectorPanels: [],
     initialItems: INITIAL_ITEMS,
     itemAdapters: CANVAS_ITEM_ENGINE_ADAPTERS,
+    itemLayerAdapter: DEFAULT_CANVAS_APP_ITEM_LAYER_ADAPTER,
   })
 
 export function createCanvasAppAssembly(
@@ -149,6 +154,8 @@ export function createCanvasAppAssembly(
       { customItemValidators },
     ),
     itemAdapters: input.itemAdapters ?? DEFAULT_CANVAS_APP_ASSEMBLY.itemAdapters,
+    itemLayerAdapter:
+      input.itemLayerAdapter ?? DEFAULT_CANVAS_APP_ASSEMBLY.itemLayerAdapter,
   }
 
   assertCanvasAppExtensionRecordKeys({
@@ -177,6 +184,7 @@ export function assertCanvasAppAssembly(assembly: CanvasAppAssembly) {
     customItemValidators: assembly.customItemValidators,
   })
   assertCanvasAppItemAdapters(assembly.itemAdapters)
+  assertCanvasAppItemLayerAdapter(assembly.itemLayerAdapter)
 
   return assembly
 }
@@ -330,6 +338,17 @@ function assertCanvasAppTransformAdapter(
   }
 }
 
+function assertCanvasAppItemLayerAdapter(
+  adapter: CanvasAppItemLayerAdapter,
+) {
+  assertCanvasAppDescriptorObject(adapter, 'item layer adapter')
+  assertCanvasAppDescriptorFunctionField({
+    field: 'renderItems',
+    owner: 'item layer adapter',
+    value: adapter.renderItems,
+  })
+}
+
 function snapshotCanvasAppAssembly(
   assembly: CanvasAppAssembly,
 ): CanvasAppAssembly {
@@ -360,6 +379,9 @@ function snapshotCanvasAppAssembly(
       customItemValidators,
     ),
     itemAdapters: snapshotCanvasAppItemAdapters(assembly.itemAdapters),
+    itemLayerAdapter: snapshotCanvasAppItemLayerAdapter(
+      assembly.itemLayerAdapter,
+    ),
   })
 }
 
@@ -425,6 +447,12 @@ function snapshotCanvasAppItemAdapters(
     creation: Object.freeze({ ...itemAdapters.creation }),
     transform: Object.freeze({ ...itemAdapters.transform }),
   })
+}
+
+function snapshotCanvasAppItemLayerAdapter(
+  adapter: CanvasAppItemLayerAdapter,
+): CanvasAppItemLayerAdapter {
+  return Object.freeze({ ...adapter })
 }
 
 function freezeCanvasAppRecord<TValue>(

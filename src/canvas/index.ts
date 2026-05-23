@@ -35,6 +35,8 @@ export {
   type CanvasAppInspectorPanelContext,
   type CanvasAppInspectorPanelView,
   type CanvasAppItemAdapters,
+  type CanvasAppItemLayerAdapter,
+  type CanvasAppItemLayerRenderInput,
   type CanvasAppCustomItemRendererStrategy,
   type CanvasAppCustomItemRenderers,
 } from './app'

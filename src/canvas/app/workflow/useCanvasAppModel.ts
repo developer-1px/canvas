@@ -1,5 +1,4 @@
 import {
-  createElement,
   useCallback,
   useMemo,
   useRef,
@@ -27,7 +26,6 @@ import { useCanvasObjectInspector } from '../inspector/useCanvasObjectInspector'
 import { useCanvasKeyboardShortcuts } from '../keyboard/useCanvasKeyboardShortcuts'
 import { useCanvasPointerDownHandlers } from '../pointer/useCanvasPointerDownHandlers'
 import { useCanvasPointerDragHandlers } from '../pointer/useCanvasPointerDragHandlers'
-import { CanvasDemoSvgItemLayer } from '../rendering'
 import {
   getCanvasAppCustomCreationToolStates,
   type CanvasAppCustomCreationToolState,
@@ -65,6 +63,7 @@ export function useCanvasAppModel({
     inspectorPanels,
     initialItems,
     itemAdapters,
+    itemLayerAdapter,
   } = validatedAssembly
   const svgRef = useRef<SVGSVGElement | null>(null)
   const editorRef = useRef<HTMLTextAreaElement | null>(null)
@@ -378,15 +377,18 @@ export function useCanvasAppModel({
     inspector,
     stage: {
       activeMode,
-      children: createElement(CanvasDemoSvgItemLayer, {
-        componentPresentationRenderers,
-        customItemRenderers,
-        getComponentPresentation: componentLibrary.getPresentation,
-        items,
-        onItemPointerDown: handleStageItemPointerDown,
-        onTextDoubleClick: handleTextDoubleClick,
-        outlineIds: overlays.itemOutlineIds,
-        selected,
+      children: renderCanvasAppItemLayer({
+        adapter: itemLayerAdapter,
+        input: {
+          componentPresentationRenderers,
+          customItemRenderers,
+          getComponentPresentation: componentLibrary.getPresentation,
+          items,
+          onItemPointerDown: handleStageItemPointerDown,
+          onTextDoubleClick: handleTextDoubleClick,
+          outlineIds: overlays.itemOutlineIds,
+          selected,
+        },
       }),
       gesture,
       overlays,
@@ -448,6 +450,20 @@ export function useCanvasAppModel({
       onZoomIn: () => zoomBy(1.25),
       onZoomOut: () => zoomBy(0.8),
     },
+  }
+}
+
+function renderCanvasAppItemLayer({
+  adapter,
+  input,
+}: {
+  adapter: CanvasAppAssembly['itemLayerAdapter']
+  input: Parameters<CanvasAppAssembly['itemLayerAdapter']['renderItems']>[0]
+}) {
+  try {
+    return adapter.renderItems(input)
+  } catch {
+    return null
   }
 }
 

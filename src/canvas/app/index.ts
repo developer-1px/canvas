@@ -41,4 +41,6 @@ export {
   type CanvasAppInspectorPanelView,
   type CanvasAppCustomItemRendererStrategy,
   type CanvasAppCustomItemRenderers,
+  type CanvasAppItemLayerAdapter,
+  type CanvasAppItemLayerRenderInput,
 } from './workflow'

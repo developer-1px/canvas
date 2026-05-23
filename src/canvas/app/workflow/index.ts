@@ -39,6 +39,8 @@ export {
   type CanvasAppComponentRendererStrategy,
   type CanvasAppCustomItemRendererStrategy,
   type CanvasAppCustomItemRenderers,
+  type CanvasAppItemLayerAdapter,
+  type CanvasAppItemLayerRenderInput,
 } from '../rendering'
 export {
   assertCanvasAppExtensionId,
