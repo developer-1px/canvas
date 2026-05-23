@@ -2831,7 +2831,9 @@ describe('Canvas module boundaries', () => {
       .filter((file) =>
         file.path.startsWith('src/canvas/app/') &&
         !file.path.startsWith('src/canvas/app/document/') &&
-        file.path !== 'src/canvas/app/workflow/useCanvasWorkspaceModel.ts',
+        file.path !== 'src/canvas/app/workflow/useCanvasWorkspaceModel.ts' &&
+        file.path !==
+          'src/canvas/app/workflow/CanvasWorkspaceRuntimeModel.ts',
       )
       .flatMap((file) =>
         file.source.includes('createCanvasItemReadModel') ? [file.path] : [],
@@ -2850,6 +2852,9 @@ describe('Canvas module boundaries', () => {
     const workspaceConsumerModelFile = getSourceFile(
       'src/canvas/app/workflow/CanvasWorkspaceConsumerModel.ts',
     )
+    const workspaceRuntimeModelFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasWorkspaceRuntimeModel.ts',
+    )
     const rawWorkspaceTerms =
       /\b(canRedo|canUndo|commitSelection|commitItemsChange|copyItemsToClipboard|getClipboardItems|findDocumentText|itemReadModel|redo|replaceDocumentText|selectedBounds|setClipboardItems|setLiveItems|setSelection|setViewport|undo)\b/
 
@@ -2860,6 +2865,24 @@ describe('Canvas module boundaries', () => {
     expect(workspaceModelFile.source).toContain(
       "from './CanvasWorkspaceConsumerModel'",
     )
+    expect(workspaceModelFile.source).toContain(
+      "from './CanvasWorkspaceRuntimeModel'",
+    )
+    for (const runtimeImplementationDetail of [
+      'DEFAULT_CANVAS_WORKSPACE_SELECTION',
+      'INITIAL_VIEWPORT',
+      'getCanvasItemIdSeed',
+      'createCanvasItemReadModel',
+      'new Set<string>',
+      'scene.getBounds',
+    ]) {
+      expect(workspaceModelFile.source).not.toContain(
+        runtimeImplementationDetail,
+      )
+      expect(workspaceRuntimeModelFile.source).toContain(
+        runtimeImplementationDetail,
+      )
+    }
     for (const consumerContext of [
       'command: {',
       'component: {',

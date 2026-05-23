@@ -2,26 +2,21 @@ import {
   useMemo,
   useState,
 } from 'react'
+import type { CanvasItem } from '../../entities'
 import {
-  INITIAL_VIEWPORT,
-} from '../../core'
-import type {
-  CanvasItem,
-  Viewport,
-} from '../../entities'
-import {
-  createCanvasItemReadModel,
   type CanvasCustomItemValidators,
 } from '../../host'
 import {
   readStoredCanvasWorkspace,
   useCanvasWorkspacePersistence,
 } from '../document/CanvasWorkspacePersistence'
-import { getCanvasItemIdSeed } from '../document/CanvasWorkspaceSnapshot'
 import { useCanvasDocument } from '../document/useCanvasDocument'
 import { getCanvasWorkspaceConsumerModel } from './CanvasWorkspaceConsumerModel'
-
-const DEFAULT_INITIAL_SELECTION = ['component-sticky', 'component-card']
+import {
+  createCanvasWorkspaceIdGenerator,
+  getCanvasWorkspaceInitialState,
+  getCanvasWorkspaceRuntimeModel,
+} from './CanvasWorkspaceRuntimeModel'
 
 export function useCanvasWorkspaceModel({
   customItemValidators,
@@ -38,35 +33,31 @@ export function useCanvasWorkspaceModel({
     () => readStoredCanvasWorkspace(undefined, validation),
     [validation],
   )
-  const workspaceInitialItems = storedWorkspace?.items ?? initialItems
+  const initialState = getCanvasWorkspaceInitialState({
+    initialItems,
+    storedWorkspace,
+  })
   const [createId] = useState(() => {
-    let idSeed = getCanvasItemIdSeed(workspaceInitialItems)
-
-    return (prefix: string) => {
-      idSeed += 1
-      return `${prefix}-${idSeed}`
-    }
+    return createCanvasWorkspaceIdGenerator(initialState.items)
   })
   const document = useCanvasDocument(
-    workspaceInitialItems,
-    storedWorkspace?.selection ?? [...DEFAULT_INITIAL_SELECTION],
+    initialState.items,
+    initialState.selection,
     validation,
   )
-  const [viewport, setViewport] = useState<Viewport>(
-    () => storedWorkspace?.viewport ?? INITIAL_VIEWPORT,
-  )
-  const selected = useMemo(
-    () => new Set<string>(document.selection),
-    [document.selection],
-  )
-  const itemReadModel = useMemo(
-    () => createCanvasItemReadModel(document.items),
-    [document.items],
-  )
-  const scene = itemReadModel.scene
-  const selectedBounds = useMemo(
-    () => scene.getBounds(document.selection),
-    [document.selection, scene],
+  const [viewport, setViewport] = useState(() => initialState.viewport)
+  const {
+    itemReadModel,
+    scene,
+    selected,
+    selectedBounds,
+  } = useMemo(
+    () =>
+      getCanvasWorkspaceRuntimeModel({
+        items: document.items,
+        selection: document.selection,
+      }),
+    [document.items, document.selection],
   )
 
   useCanvasWorkspacePersistence({
