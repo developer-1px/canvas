@@ -29,6 +29,7 @@
 | --- | --- |
 | `package.json` | Canvas package export map을 public facade entry로 고정한다 |
 | `src/canvas/architecture/CanvasModuleBoundaries.test.ts` | Module seam import 규칙을 회귀 테스트로 검증한다 |
+| `src/canvas/architecture/CanvasPackageConsumer.test.ts` | 외부 소비자처럼 `canvas`와 `canvas/*` export를 import해 public package surface를 검증한다 |
 | `src/canvas/architecture/CanvasPackageManifest.test.ts` | package manifest export map이 public facade만 가리키는지 검증한다 |
 | `src/canvas/app/shell` | CanvasApp composition과 shell style |
 | `src/canvas/app/index.ts` | Canvas App Shell과 workflow 조립 계약을 노출하는 App public facade |
@@ -147,6 +148,7 @@ type CanvasAffordanceConfig = {
 - Demo custom item module은 `src/demo/custom-items/<name>/index.ts`에서 default export하면 자동 수집된다.
 - Demo와 Demo custom item module은 `src/canvas` package public entry만 사용하고 canvas 하위 구현 경로를 직접 import하지 않는다.
 - package manifest는 `canvas`, `canvas/app`, `canvas/core`, `canvas/engine`, `canvas/entities`, `canvas/host`, `canvas/renderer` export만 열고 각 export는 public facade `index.ts`를 가리킨다.
+- package public entry와 subpath export는 `canvas` package self-import consumer smoke test로 검증한다.
 - Canvas App extension id와 registry key는 lower-kebab 안정 id만 허용한다. 잘못된 module id, command id, tool id, renderer key, validator key, inspector id는 define 또는 assembly 단계에서 실패한다.
 - Canvas App descriptor는 id뿐 아니라 필수 string/function/shortcut slot과 registry shape도 define 또는 assembly 단계에서 검증한다. malformed command, creation tool, inspector panel, renderer strategy는 등록 전에 실패하고, 실행 중 throw는 별도의 containment로 처리한다.
 - Custom item `kind`/`presentation`과 Component Template `id`/`presentation`도 같은 안정 id 계약을 따르며, 잘못된 persisted key는 Host validation 또는 component library 생성 단계에서 실패한다.
