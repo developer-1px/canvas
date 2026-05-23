@@ -1,4 +1,4 @@
-import type { CanvasAppAssembly } from './CanvasAppAssembly'
+import type { CanvasAppAssembly } from './CanvasAppAssemblyTypes'
 
 export function getCanvasAppAssemblyModel({
   affordanceConfig,

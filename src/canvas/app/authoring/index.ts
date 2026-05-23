@@ -1,9 +1,11 @@
 export {
   createCanvasAppAssembly,
-  type CanvasAppAssembly,
-  type CanvasAppAssemblyInput,
   type CanvasAppItemAdapters,
 } from '../workflow/CanvasAppAssembly'
+export type {
+  CanvasAppAssembly,
+  CanvasAppAssemblyInput,
+} from '../workflow/CanvasAppAssemblyTypes'
 export type {
   CanvasAppCustomCommand,
   CanvasAppCustomCommandContext,

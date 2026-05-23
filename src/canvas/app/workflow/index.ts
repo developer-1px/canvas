@@ -3,10 +3,12 @@ export {
   DEFAULT_CANVAS_APP_ASSEMBLY,
   assertCanvasAppAssembly,
   createCanvasAppAssembly,
-  type CanvasAppAssembly,
-  type CanvasAppAssemblyInput,
   type CanvasAppItemAdapters,
 } from './CanvasAppAssembly'
+export type {
+  CanvasAppAssembly,
+  CanvasAppAssemblyInput,
+} from './CanvasAppAssemblyTypes'
 export type {
   CanvasAppCustomCommand,
   CanvasAppCustomCommandContext,

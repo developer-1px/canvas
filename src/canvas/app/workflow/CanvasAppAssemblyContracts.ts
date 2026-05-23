@@ -6,7 +6,7 @@ import { assertCanvasAppCustomItemValidators } from '../modules/CanvasAppCustomI
 import { assertCanvasAppCustomItemRenderers } from '../rendering/CanvasAppRendererRegistries'
 import { assertCanvasAppCustomCreationTools } from '../tools/CanvasAppCustomCreationTools'
 import { assertCanvasAppAssemblyAdapters } from './CanvasAppAdapterContracts'
-import type { CanvasAppAssembly } from './CanvasAppAssembly'
+import type { CanvasAppAssembly } from './CanvasAppAssemblyTypes'
 import { assertCanvasAppComponentAssembly } from './CanvasAppComponentAssemblyContracts'
 import { assertCanvasAppWorkspaceAssembly } from './CanvasAppWorkspaceAssemblyContracts'
 

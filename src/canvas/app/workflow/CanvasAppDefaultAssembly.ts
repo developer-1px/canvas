@@ -11,7 +11,7 @@ import {
 import { DEFAULT_CANVAS_APP_ITEM_LAYER_ADAPTER } from '../rendering/CanvasAppItemLayerAdapter'
 import { DEFAULT_CANVAS_APP_STAGE_ADAPTER } from '../rendering/CanvasAppStageAdapter'
 import { DEFAULT_CANVAS_WORKSPACE_STORAGE_PROVIDER } from '../document/CanvasWorkspacePersistence'
-import type { CanvasAppAssembly } from './CanvasAppAssembly'
+import type { CanvasAppAssembly } from './CanvasAppAssemblyTypes'
 import { snapshotCanvasAppAssembly } from './CanvasAppAssemblySnapshot'
 
 const DEFAULT_CANVAS_APP_INITIAL_SELECTION = [

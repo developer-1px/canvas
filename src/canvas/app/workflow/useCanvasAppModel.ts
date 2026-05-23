@@ -17,8 +17,8 @@ import { useCanvasWorkspaceModel } from './useCanvasWorkspaceModel'
 import {
   DEFAULT_CANVAS_APP_ASSEMBLY,
   assertCanvasAppAssembly,
-  type CanvasAppAssembly,
 } from './CanvasAppAssembly'
+import type { CanvasAppAssembly } from './CanvasAppAssemblyTypes'
 
 export function useCanvasAppModel({
   assembly = DEFAULT_CANVAS_APP_ASSEMBLY,

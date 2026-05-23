@@ -7,7 +7,7 @@ import type { CanvasAppInspectorPanel } from '../inspector/CanvasAppInspectorPan
 import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
 import type {
   CanvasAppAssembly,
-} from './CanvasAppAssembly'
+} from './CanvasAppAssemblyTypes'
 import { snapshotCanvasAppAssemblyAdapters } from './CanvasAppAdapterSnapshot'
 
 export function snapshotCanvasAppAssembly(
