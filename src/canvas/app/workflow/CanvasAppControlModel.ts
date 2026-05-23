@@ -29,22 +29,26 @@ type CanvasAppControlModelInput = {
   selection: string[]
   tool: Tool
   viewport: Viewport
+  commandHandlers: CanvasAppControlCommandHandlers
+  onFitItems: (ids?: string[]) => void
+  onInsertComponent: (component: string) => void
+  onRunCustomCommand: (commandId: string) => void
+  onToolChange: (tool: Tool) => void
+  onViewportReset: () => void
+  onZoomBy: (multiplier: number) => void
+}
+
+type CanvasAppControlCommandHandlers = {
   onAlign: (mode: CanvasAlignMode) => void
   onDelete: () => void
   onDistribute: (mode: CanvasDistributeMode) => void
   onDuplicate: () => void
-  onFitItems: (ids?: string[]) => void
   onGroup: () => void
-  onInsertComponent: (component: string) => void
   onLock: () => void
   onRedo: () => void
-  onRunCustomCommand: (commandId: string) => void
-  onToolChange: (tool: Tool) => void
   onUndo: () => void
   onUngroup: () => void
   onUnlockAll: () => void
-  onViewportReset: () => void
-  onZoomBy: (multiplier: number) => void
 }
 
 export function getCanvasAppControlModel({
@@ -59,20 +63,11 @@ export function getCanvasAppControlModel({
   selection,
   tool,
   viewport,
-  onAlign,
-  onDelete,
-  onDistribute,
-  onDuplicate,
+  commandHandlers,
   onFitItems,
-  onGroup,
   onInsertComponent,
-  onLock,
-  onRedo,
   onRunCustomCommand,
   onToolChange,
-  onUndo,
-  onUngroup,
-  onUnlockAll,
   onViewportReset,
   onZoomBy,
 }: CanvasAppControlModelInput) {
@@ -104,20 +99,11 @@ export function getCanvasAppControlModel({
       config,
       customCommands,
       customTools,
+      commandHandlers,
       tool,
       visible: config.overlays.toolbar,
-      onAlign,
-      onDelete,
-      onDistribute,
-      onDuplicate,
-      onGroup,
-      onLock,
-      onRedo,
       onToolChange,
       onCustomCommand: onRunCustomCommand,
-      onUndo,
-      onUngroup,
-      onUnlockAll,
     },
     zoomControls: {
       config,

@@ -5,10 +5,8 @@ import {
 import {
   CANVAS_TOOL_AFFORDANCES,
   type CanvasAffordanceConfig,
-  type CanvasAlignMode,
   type CanvasCommandAvailability,
   type CanvasCommandId,
-  type CanvasDistributeMode,
 } from '../../engine'
 import type {
   CanvasBuiltinTool,
@@ -48,11 +46,14 @@ import {
 } from './CanvasToolbarButtons'
 import {
   getCanvasToolbarGroups,
-  type CanvasToolbarCommandAction,
   type CanvasToolbarCustomCommand,
   type CanvasToolbarCustomTool,
   type CanvasToolbarItem,
 } from './CanvasToolbarItems'
+import {
+  runCanvasToolbarCommandAction,
+  type CanvasToolbarCommandHandlers,
+} from './CanvasToolbarCommandDispatch'
 
 type CanvasToolbarProps = {
   commandAvailability: CanvasCommandAvailability
@@ -60,18 +61,9 @@ type CanvasToolbarProps = {
   customCommands: readonly CanvasToolbarCustomCommand[]
   customTools: readonly CanvasToolbarCustomTool[]
   tool: Tool
-  onAlign: (mode: CanvasAlignMode) => void
-  onDelete: () => void
-  onDistribute: (mode: CanvasDistributeMode) => void
-  onDuplicate: () => void
+  commandHandlers: CanvasToolbarCommandHandlers
   onCustomCommand: (commandId: string) => void
-  onGroup: () => void
-  onLock: () => void
-  onRedo: () => void
   onToolChange: (tool: Tool) => void
-  onUndo: () => void
-  onUngroup: () => void
-  onUnlockAll: () => void
 }
 
 const CANVAS_TOOLBAR_TOOL_ICONS = {
@@ -172,55 +164,13 @@ function renderCanvasToolbarItem(
       key={item.command}
       command={item.command}
       disabled={item.disabled}
-      onClick={() => runCanvasToolbarCommandAction(item.action, props)}
+      onClick={() =>
+        runCanvasToolbarCommandAction({
+          action: item.action,
+          handlers: props.commandHandlers,
+        })}
     >
       {Icon ? <Icon /> : null}
     </CommandButton>
   )
-}
-
-function runCanvasToolbarCommandAction(
-  action: CanvasToolbarCommandAction,
-  props: CanvasToolbarProps,
-) {
-  switch (action.kind) {
-    case 'align':
-      props.onAlign(action.mode)
-      return
-    case 'delete':
-      props.onDelete()
-      return
-    case 'distribute':
-      props.onDistribute(action.mode)
-      return
-    case 'duplicate':
-      props.onDuplicate()
-      return
-    case 'group':
-      props.onGroup()
-      return
-    case 'lock':
-      props.onLock()
-      return
-    case 'redo':
-      props.onRedo()
-      return
-    case 'undo':
-      props.onUndo()
-      return
-    case 'ungroup':
-      props.onUngroup()
-      return
-    case 'unlock-all':
-      props.onUnlockAll()
-      return
-  }
-
-  return assertUnhandledCanvasToolbarCommandAction(action)
-}
-
-function assertUnhandledCanvasToolbarCommandAction(
-  action: never,
-): never {
-  throw new Error(`Unhandled canvas toolbar command action: ${String(action)}`)
 }

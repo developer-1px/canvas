@@ -116,12 +116,12 @@ describe('CanvasAppControlModel', () => {
     const onRunCustomCommand = vi.fn()
     const onZoomBy = vi.fn()
     const model = getCanvasAppControlModel(createInput({
-      onAlign,
+      commandHandlers: createCommandHandlers({ onAlign }),
       onRunCustomCommand,
       onZoomBy,
     }))
 
-    model.toolbar.onAlign('alignLeft')
+    model.toolbar.commandHandlers.onAlign('alignLeft')
     model.toolbar.onCustomCommand('publish')
     model.zoomControls.onZoomIn()
     model.zoomControls.onZoomOut()
@@ -148,22 +148,31 @@ function createInput(
     selection: [],
     tool: 'select',
     viewport: { scale: 1, x: 0, y: 0 },
+    commandHandlers: createCommandHandlers(),
+    onFitItems: vi.fn(),
+    onInsertComponent: vi.fn(),
+    onRunCustomCommand: vi.fn(),
+    onToolChange: vi.fn(),
+    onViewportReset: vi.fn(),
+    onZoomBy: vi.fn(),
+    ...overrides,
+  }
+}
+
+function createCommandHandlers(
+  overrides: Partial<Parameters<typeof getCanvasAppControlModel>[0]['commandHandlers']> = {},
+): Parameters<typeof getCanvasAppControlModel>[0]['commandHandlers'] {
+  return {
     onAlign: vi.fn(),
     onDelete: vi.fn(),
     onDistribute: vi.fn(),
     onDuplicate: vi.fn(),
-    onFitItems: vi.fn(),
     onGroup: vi.fn(),
-    onInsertComponent: vi.fn(),
     onLock: vi.fn(),
     onRedo: vi.fn(),
-    onRunCustomCommand: vi.fn(),
-    onToolChange: vi.fn(),
     onUndo: vi.fn(),
     onUngroup: vi.fn(),
     onUnlockAll: vi.fn(),
-    onViewportReset: vi.fn(),
-    onZoomBy: vi.fn(),
     ...overrides,
   }
 }

@@ -411,16 +411,24 @@ describe('Canvas module boundaries', () => {
     const commandItemsFile = getSourceFile(
       'src/canvas/ui/toolbar/CanvasToolbarCommandItems.ts',
     )
+    const commandDispatchFile = getSourceFile(
+      'src/canvas/ui/toolbar/CanvasToolbarCommandDispatch.ts',
+    )
     const toolItemsFile = getSourceFile(
       'src/canvas/ui/toolbar/CanvasToolbarToolItems.ts',
     )
 
     expect(toolbarFile.source).toContain("from './CanvasToolbarItems'")
+    expect(toolbarFile.source).toContain(
+      "from './CanvasToolbarCommandDispatch'",
+    )
     expect(toolbarFile.source).not.toContain('config.commands.')
     expect(toolbarFile.source).not.toContain('config.tools.')
     expect(toolbarFile.source).not.toContain('customCommands.map')
     expect(toolbarFile.source).not.toContain('customTools.map')
     expect(toolbarFile.source).not.toContain('CANVAS_TOOL_AFFORDANCES.select')
+    expect(toolbarFile.source).not.toContain('switch (action.kind)')
+    expect(toolbarFile.source).not.toContain('onAlign:')
     expect(itemsFile.source).toContain(
       'export function getCanvasToolbarGroups',
     )
@@ -447,6 +455,12 @@ describe('Canvas module boundaries', () => {
     )
     expect(commandItemsFile.source).not.toContain(
       'getCanvasToolbarDistributeItem',
+    )
+    expect(commandDispatchFile.source).toContain(
+      'export function runCanvasToolbarCommandAction',
+    )
+    expect(commandDispatchFile.source).toContain(
+      'CanvasToolbarCommandHandlers',
     )
     expect(toolItemsFile.source).toContain(
       'export function getCanvasToolbarToolItems',

@@ -3,8 +3,10 @@ import type {
   SetStateAction,
 } from 'react'
 import type {
+  CanvasAlignMode,
   CanvasAffordanceConfig,
   CanvasCommandAdapter,
+  CanvasDistributeMode,
 } from '../../engine'
 import type {
   CanvasItem,
@@ -46,6 +48,19 @@ type UseCanvasAppCommandModelArgs = {
   workspace: CanvasAppCommandWorkspaceModel
 }
 
+type CanvasAppCommandControlHandlers = {
+  onAlign: (mode: CanvasAlignMode) => void
+  onDelete: () => void
+  onDistribute: (mode: CanvasDistributeMode) => void
+  onDuplicate: () => void
+  onGroup: () => void
+  onLock: () => void
+  onRedo: () => void
+  onUndo: () => void
+  onUngroup: () => void
+  onUnlockAll: () => void
+}
+
 export function useCanvasAppCommandModel({
   commandAdapter,
   config,
@@ -76,16 +91,18 @@ export function useCanvasAppCommandModel({
 
   return {
     control: {
-      onAlign: commands.alignSelection,
-      onDelete: commands.deleteSelection,
-      onDistribute: commands.distributeSelection,
-      onDuplicate: commands.duplicateSelection,
-      onGroup: commands.groupSelection,
-      onLock: commands.lockSelection,
-      onRedo: commands.redoHistory,
-      onUndo: commands.undoHistory,
-      onUngroup: commands.ungroupSelection,
-      onUnlockAll: commands.unlockAll,
+      commandHandlers: {
+        onAlign: commands.alignSelection,
+        onDelete: commands.deleteSelection,
+        onDistribute: commands.distributeSelection,
+        onDuplicate: commands.duplicateSelection,
+        onGroup: commands.groupSelection,
+        onLock: commands.lockSelection,
+        onRedo: commands.redoHistory,
+        onUndo: commands.undoHistory,
+        onUngroup: commands.ungroupSelection,
+        onUnlockAll: commands.unlockAll,
+      } satisfies CanvasAppCommandControlHandlers,
     },
     keyboard: {
       copySelection: commands.copySelection,
