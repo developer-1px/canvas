@@ -474,6 +474,13 @@ describe('Canvas module boundaries', () => {
     expect(commandDispatchFile.source).toContain(
       'CanvasToolbarCommandHandlers',
     )
+    expect(commandDispatchFile.source).toContain(
+      'CANVAS_TOOLBAR_COMMAND_ACTION_RUNNERS',
+    )
+    expect(commandDispatchFile.source).not.toContain('switch (action.kind)')
+    expect(commandDispatchFile.source).not.toContain(
+      'assertUnhandledCanvasToolbarCommandAction',
+    )
     expect(toolItemsFile.source).toContain(
       'export function getCanvasToolbarToolItems',
     )

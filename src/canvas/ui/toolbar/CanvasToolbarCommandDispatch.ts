@@ -17,6 +17,56 @@ export type CanvasToolbarCommandHandlers = {
   onUnlockAll: () => void
 }
 
+type CanvasToolbarCommandActionRunner<
+  TKind extends CanvasToolbarCommandAction['kind'],
+> = (args: {
+  action: Extract<CanvasToolbarCommandAction, { kind: TKind }>
+  handlers: CanvasToolbarCommandHandlers
+}) => void
+
+type CanvasToolbarCommandActionRunners = {
+  [TKind in CanvasToolbarCommandAction['kind']]:
+    CanvasToolbarCommandActionRunner<TKind>
+}
+
+type CanvasToolbarCommandAnyActionRunner = (args: {
+  action: CanvasToolbarCommandAction
+  handlers: CanvasToolbarCommandHandlers
+}) => void
+
+const CANVAS_TOOLBAR_COMMAND_ACTION_RUNNERS = Object.freeze({
+  align: ({ action, handlers }) => {
+    handlers.onAlign(action.mode)
+  },
+  delete: ({ handlers }) => {
+    handlers.onDelete()
+  },
+  distribute: ({ action, handlers }) => {
+    handlers.onDistribute(action.mode)
+  },
+  duplicate: ({ handlers }) => {
+    handlers.onDuplicate()
+  },
+  group: ({ handlers }) => {
+    handlers.onGroup()
+  },
+  lock: ({ handlers }) => {
+    handlers.onLock()
+  },
+  redo: ({ handlers }) => {
+    handlers.onRedo()
+  },
+  undo: ({ handlers }) => {
+    handlers.onUndo()
+  },
+  ungroup: ({ handlers }) => {
+    handlers.onUngroup()
+  },
+  'unlock-all': ({ handlers }) => {
+    handlers.onUnlockAll()
+  },
+} satisfies CanvasToolbarCommandActionRunners)
+
 export function runCanvasToolbarCommandAction({
   action,
   handlers,
@@ -24,44 +74,9 @@ export function runCanvasToolbarCommandAction({
   action: CanvasToolbarCommandAction
   handlers: CanvasToolbarCommandHandlers
 }) {
-  switch (action.kind) {
-    case 'align':
-      handlers.onAlign(action.mode)
-      return
-    case 'delete':
-      handlers.onDelete()
-      return
-    case 'distribute':
-      handlers.onDistribute(action.mode)
-      return
-    case 'duplicate':
-      handlers.onDuplicate()
-      return
-    case 'group':
-      handlers.onGroup()
-      return
-    case 'lock':
-      handlers.onLock()
-      return
-    case 'redo':
-      handlers.onRedo()
-      return
-    case 'undo':
-      handlers.onUndo()
-      return
-    case 'ungroup':
-      handlers.onUngroup()
-      return
-    case 'unlock-all':
-      handlers.onUnlockAll()
-      return
-  }
+  const runner = CANVAS_TOOLBAR_COMMAND_ACTION_RUNNERS[
+    action.kind
+  ] as CanvasToolbarCommandAnyActionRunner
 
-  return assertUnhandledCanvasToolbarCommandAction(action)
-}
-
-function assertUnhandledCanvasToolbarCommandAction(
-  action: never,
-): never {
-  throw new Error(`Unhandled canvas toolbar command action: ${String(action)}`)
+  runner({ action, handlers })
 }
