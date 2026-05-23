@@ -436,10 +436,17 @@ describe('Canvas module boundaries', () => {
       'export function getCanvasToolbarCommandGroups',
     )
     expect(commandItemsFile.source).toContain(
-      "getCanvasToolbarAlignItem('alignLeft'",
+      'CANVAS_TOOLBAR_COMMAND_GROUPS',
     )
+    expect(commandItemsFile.source).toContain("command: 'alignLeft'")
     expect(commandItemsFile.source).toContain(
-      "getCanvasToolbarDistributeItem(\n        'distributeHorizontal'",
+      "command: 'distributeHorizontal'",
+    )
+    expect(commandItemsFile.source).not.toContain(
+      'getCanvasToolbarAlignItem',
+    )
+    expect(commandItemsFile.source).not.toContain(
+      'getCanvasToolbarDistributeItem',
     )
     expect(toolItemsFile.source).toContain(
       'export function getCanvasToolbarToolItems',
@@ -668,10 +675,10 @@ describe('Canvas module boundaries', () => {
       'availability: CanvasCommandAvailability',
     )
     expect(toolbarCommandItemsFile.source).toContain(
-      'disabled: !availability.undo',
+      'keyof CanvasCommandAvailability & CanvasCommandId',
     )
     expect(toolbarCommandItemsFile.source).toContain(
-      'disabled: !availability[command]',
+      'disabled: !availability[descriptor.command]',
     )
   })
 
