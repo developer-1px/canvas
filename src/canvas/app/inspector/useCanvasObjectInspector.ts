@@ -5,10 +5,8 @@ import type {
 } from '../../entities'
 import type { CanvasItemReadModel } from '../../host'
 import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract'
-import {
-  getCanvasAppInspectorPanelViews,
-  type CanvasAppInspectorPanel,
-} from './CanvasAppInspectorPanels'
+import { getCanvasAppInspectorPanelViews } from './CanvasAppInspectorPanelExecution'
+import type { CanvasAppInspectorPanel } from './CanvasAppInspectorPanels'
 
 type UseCanvasObjectInspectorArgs = {
   itemReadModel: CanvasItemReadModel

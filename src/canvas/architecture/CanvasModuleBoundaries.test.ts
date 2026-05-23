@@ -440,6 +440,31 @@ describe('Canvas module boundaries', () => {
     expect(fallbackFile.source).toContain('CanvasDemoSvgUnknownCustomItem')
   })
 
+  it('keeps App inspector panel execution behind a named module', () => {
+    const descriptorFile = getSourceFile(
+      'src/canvas/app/inspector/CanvasAppInspectorPanels.ts',
+    )
+    const executionFile = getSourceFile(
+      'src/canvas/app/inspector/CanvasAppInspectorPanelExecution.ts',
+    )
+    const objectInspectorHook = getSourceFile(
+      'src/canvas/app/inspector/useCanvasObjectInspector.ts',
+    )
+
+    expect(descriptorFile.source).toContain(
+      "from './CanvasAppInspectorPanelExecution'",
+    )
+    expect(descriptorFile.source).not.toContain('panel.render(')
+    expect(descriptorFile.source).not.toContain('panel.isVisible(')
+    expect(descriptorFile.source).not.toContain('try {')
+    expect(executionFile.source).toContain('panel.render(context)')
+    expect(executionFile.source).toContain('panel.isVisible(context)')
+    expect(executionFile.source).toContain('catch')
+    expect(objectInspectorHook.source).toContain(
+      "from './CanvasAppInspectorPanelExecution'",
+    )
+  })
+
   it('keeps app workflow hooks from recreating the workspace read model', () => {
     const violations = sourceFiles
       .filter((file) =>

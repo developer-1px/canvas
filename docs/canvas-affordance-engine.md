@@ -58,6 +58,7 @@
 | `src/canvas/app/workflow/useCanvasInteractionModel.ts` | tool, gesture, marquee, draft, snap guide, overlay 상태 생명주기를 App Shell에 숨긴다 |
 | `src/canvas/app/workflow/useCanvasTextEditorModel.ts` | text editing state, editable item lookup, text editor props를 App Shell에 숨긴다 |
 | `src/canvas/app/workflow/useCanvasWorkspaceModel.ts` | 저장된 workspace snapshot, document history, viewport, read model, id 생성을 App Shell에 숨긴다 |
+| `src/canvas/app/inspector/CanvasAppInspectorPanelExecution.ts` | Inspector panel visibility/render 호출과 실패 시 omit containment를 소유한다 |
 | `src/canvas/app/pointer/CanvasAppPointerInput.ts` | React/SVG pointer event를 App workflow가 쓰는 최소 pointer/event Interface로 변환한다 |
 | `src/canvas/app/pointer/CanvasPointerGeometry.ts` | DOM/SVG pointer 좌표 변환 |
 | `src/canvas/core` | Host item과 renderer를 모르는 geometry, viewport, id, primitive math 같은 재사용 계약 |
@@ -169,6 +170,7 @@ type CanvasAffordanceConfig = {
 - Custom item authoring Interface는 `CanvasApp*Renderer*` 이름을 쓰고, `CanvasDemoSvg*` 구현명은 App rendering Adapter 내부에 둔다. Canvas App Rendering Contracts가 App-owned renderer type을 소유하고 Demo SVG registry type은 그 계약을 구현하는 내부 alias로 둔다.
 - Canvas App extension id와 registry key는 lower-kebab 안정 id만 허용한다. 잘못된 module id, command id, tool id, renderer key, validator key, inspector id는 define 또는 assembly 단계에서 실패한다.
 - Canvas App descriptor는 id뿐 아니라 필수 string/function/shortcut slot과 registry shape도 define 또는 assembly 단계에서 검증한다. malformed command, creation tool, inspector panel, renderer strategy는 등록 전에 실패하고, 실행 중 throw는 별도의 containment로 처리한다.
+- Canvas App Inspector Panel descriptor shape 검증과 visibility/render execution은 분리하고, 실행 실패 omit은 Canvas App Inspector Panel Execution이 소유한다.
 - Custom item `kind`/`presentation`과 Component Template `id`/`presentation`도 같은 안정 id 계약을 따르며, 잘못된 persisted key는 Host validation 또는 component library 생성 단계에서 실패한다.
 - App workflow는 Demo SVG Item Layer를 직접 생성하지 않고 Canvas App Item Layer Adapter를 통해 stage children을 만든다.
 - App Shell은 concrete Renderer Stage를 직접 import하지 않고 Canvas App Stage Adapter가 만든 stage ReactNode를 배치한다.

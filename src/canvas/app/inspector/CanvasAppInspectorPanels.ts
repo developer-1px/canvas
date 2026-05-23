@@ -30,6 +30,8 @@ export type CanvasAppInspectorPanelView = {
   id: string
 }
 
+export { getCanvasAppInspectorPanelViews } from './CanvasAppInspectorPanelExecution'
+
 export function assertCanvasAppInspectorPanels(
   panels: readonly CanvasAppInspectorPanel[],
 ) {
@@ -52,27 +54,4 @@ export function assertCanvasAppInspectorPanels(
       value: panel.isVisible,
     })
   }
-}
-
-export function getCanvasAppInspectorPanelViews({
-  context,
-  panels,
-}: {
-  context: CanvasAppInspectorPanelContext
-  panels: readonly CanvasAppInspectorPanel[]
-}): CanvasAppInspectorPanelView[] {
-  return panels.flatMap((panel) => {
-    try {
-      if (panel.isVisible && !panel.isVisible(context)) {
-        return []
-      }
-
-      return [{
-        content: panel.render(context),
-        id: panel.id,
-      }]
-    } catch {
-      return []
-    }
-  })
 }
