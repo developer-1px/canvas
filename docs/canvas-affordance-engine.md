@@ -81,7 +81,8 @@
 | `src/canvas/app/workflow/useCanvasTextEditorModel.ts` | text editing state, editable item lookup, text editor props를 App Shell에 숨긴다 |
 | `src/canvas/app/workflow/useCanvasWorkspaceModel.ts` | 저장된 workspace snapshot, document history, viewport, read model, id 생성을 App Shell에 숨긴다 |
 | `src/canvas/app/inspector/CanvasAppInspectorPanelExecution.ts` | Inspector panel visibility/render 호출과 실패 시 omit containment를 소유한다 |
-| `src/canvas/app/keyboard/CanvasKeyboardShortcutIntent.ts` | Keydown 입력, feature toggle, selection, custom creation tool shortcut을 실행 가능한 keyboard intent로 변환한다 |
+| `src/canvas/app/keyboard/CanvasKeyboardShortcutIntent.ts` | Keydown 입력, feature toggle, selection을 실행 가능한 keyboard intent로 변환하고 command shortcut precedence를 소유한다 |
+| `src/canvas/app/keyboard/CanvasKeyboardToolShortcutIntent.ts` | Built-in tool shortcut precedence와 custom creation tool shortcut matching을 소유한다 |
 | `src/canvas/app/keyboard/CanvasKeyboardShortcutRouter.ts` | Keyboard intent의 preventDefault와 handler 실행을 적용한다 |
 | `src/canvas/app/pointer/CanvasAppPointerInput.ts` | React/SVG pointer event를 App workflow가 쓰는 최소 pointer/event Interface로 변환한다 |
 | `src/canvas/app/pointer/CanvasPointerGeometry.ts` | DOM/SVG pointer 좌표 변환 |
@@ -173,8 +174,7 @@ type CanvasAffordanceConfig = {
 - Standard command hook은 toolbar/keyboard용 callback wiring을 맡고, Engine command 호출은 Canvas Standard Command Execution이, document commit/selection/editing/history effect routing은 Canvas Standard Command Document Effects가 소유한다.
 - Clipboard command hook은 paste index와 callback wiring을 맡고, copy/cut/paste/duplicate 실행과 Host clipboard/document effect routing은 Canvas Clipboard Command Execution이 소유한다.
 - Canvas Toolbar는 item/button 렌더링과 click dispatch를 맡고, feature toggle 기반 toolbar 항목 grammar는 Canvas Toolbar Items가 소유한다.
-- Keyboard shortcut router는 event preventDefault와 handler 실행을 맡고, shortcut grammar와 built-in/custom precedence는 Canvas Keyboard Shortcut Intent가 소유한다.
-- Pointer down hook은 DOM pointer capture/event routing과 시작 결과 적용을 맡고, canvas/item/resize/text edit 시작 규칙은 named pointer interaction start Module들이 소유한다.
+- Keyboard shortcut router는 event preventDefault와 handler 실행을 맡고, command shortcut grammar는 Canvas Keyboard Shortcut Intent가, built-in/custom tool shortcut precedence는 Canvas Keyboard Tool Shortcut Intent가 소유한다.
 - App workflow는 `CANVAS_ITEM_ENGINE_ADAPTERS`를 통해 concrete item adapter를 주입한다.
 - App workflow는 Canvas App Assembly를 통해 concrete item adapter, component library, custom command, custom item module, inspector panel, initial items, presentation registry를 주입받는다.
 - Canvas App Assembly input은 output type의 `Partial`이 아니라 Host가 조립할 수 있는 필드만 명시한 외부 입력 계약이다.

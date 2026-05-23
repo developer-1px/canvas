@@ -1105,6 +1105,9 @@ describe('Canvas module boundaries', () => {
     const intentFile = getSourceFile(
       'src/canvas/app/keyboard/CanvasKeyboardShortcutIntent.ts',
     )
+    const toolIntentFile = getSourceFile(
+      'src/canvas/app/keyboard/CanvasKeyboardToolShortcutIntent.ts',
+    )
 
     expect(routerFile.source).toContain(
       "from './CanvasKeyboardShortcutIntent'",
@@ -1118,12 +1121,23 @@ describe('Canvas module boundaries', () => {
     expect(intentFile.source).toContain(
       'export function getCanvasKeyboardShortcutIntent',
     )
-    expect(intentFile.source).toContain('config.shortcuts.temporaryPan')
     expect(intentFile.source).toContain(
+      "from './CanvasKeyboardToolShortcutIntent'",
+    )
+    expect(intentFile.source).toContain('config.shortcuts.temporaryPan')
+    expect(intentFile.source).not.toContain(
       'matchesCanvasAppCustomToolShortcut',
     )
     expect(intentFile.source).toContain("event.key.startsWith('Arrow')")
     expect(intentFile.source).toContain("key === 'z'")
+    expect(toolIntentFile.source).toContain(
+      'export function getCanvasKeyboardToolShortcutIntent',
+    )
+    expect(toolIntentFile.source).toContain(
+      'matchesCanvasAppCustomToolShortcut',
+    )
+    expect(toolIntentFile.source).toContain("key === 'v'")
+    expect(toolIntentFile.source).toContain("key === 'm'")
   })
 
   it('keeps App custom creation tool contracts behind a named module', () => {

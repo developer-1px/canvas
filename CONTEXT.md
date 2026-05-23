@@ -72,7 +72,8 @@
 - Canvas App Control Model: component palette, toolbar, status, zoom controls props를 만들고 command availability, status label, selected fit target 규칙을 숨기는 workflow Module.
 - Canvas App Extension Model: 외부 custom command/tool descriptor를 toolbar state, custom tool state, custom command run callback으로 바꾸는 workflow Module.
 - Canvas App Stage Model: stage와 item layer Adapter 호출 순서, text editor blur, context menu 차단, render 실패 containment를 소유하는 workflow Module.
-- Canvas Keyboard Shortcut Intent: keydown 입력, feature toggle, selection, custom creation tool shortcut을 실행 가능한 keyboard intent로 변환하는 App-owned runtime Module.
+- Canvas Keyboard Shortcut Intent: keydown 입력, feature toggle, selection을 실행 가능한 keyboard intent로 변환하고 command shortcut precedence를 소유하는 App-owned runtime Module.
+- Canvas Keyboard Tool Shortcut Intent: built-in tool shortcut precedence와 custom creation tool shortcut matching을 소유하는 App-owned runtime Module.
 - Canvas Interaction Model: tool, gesture, marquee, draft, snap guide, overlay state 생명주기를 App Shell에 숨기는 workflow Module.
 - Canvas Workspace Model: Demo workspace의 저장된 snapshot, document history, viewport, read model, id 생성을 App Shell에 숨기는 workflow Module.
 - Canvas Workflow Contract: App workflow hook들이 공유하는 document commit, selection commit, clipboard 계약. 개별 hook이 `useCanvasDocument` 구현 파일을 직접 알지 않게 한다.
@@ -176,7 +177,7 @@
 - Clipboard command hook은 paste index와 callback wiring을 맡고, copy/cut/paste/duplicate 실행과 Host clipboard/document effect routing은 Canvas Clipboard Command Execution이 소유한다.
 - UI controls는 Demo Host를 직접 import하지 않는다.
 - Canvas Toolbar는 item/button 렌더링과 click dispatch를 맡고, feature toggle 기반 toolbar 항목 grammar는 Canvas Toolbar Items가 소유한다.
-- Keyboard shortcut router는 event preventDefault와 handler 실행을 맡고, shortcut grammar와 built-in/custom precedence는 Canvas Keyboard Shortcut Intent가 소유한다.
+- Keyboard shortcut router는 event preventDefault와 handler 실행을 맡고, command shortcut grammar는 Canvas Keyboard Shortcut Intent가, built-in/custom tool shortcut precedence는 Canvas Keyboard Tool Shortcut Intent가 소유한다.
 - Module seam import 규칙은 Canvas Module Boundary Guardrail로 검증한다.
 - Linked peer dependency는 앱 번들에 한 번만 들어가야 하며, Vite config에서 `react`, `react-dom`, `zod`를 dedupe한다.
 - Production build는 React runtime을 별도 chunk로 분리해 app chunk가 경고 임계값을 넘지 않게 유지한다.
