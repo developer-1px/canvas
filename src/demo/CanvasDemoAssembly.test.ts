@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { DEMO_CANVAS_APP_ASSEMBLY } from './CanvasDemoAssembly'
+import {
+  DEMO_CANVAS_APP_ASSEMBLY,
+  DEMO_CANVAS_APP_ASSEMBLY_INPUT,
+} from './CanvasDemoAssembly'
 import { DEMO_CUSTOM_ITEM_MODULES } from './custom-items'
 
 const modules = import.meta.glob('./**/*.{ts,tsx,css}', {
@@ -24,6 +27,9 @@ describe('CanvasDemoAssembly', () => {
   })
 
   it('assembles demo custom item modules through the app seam', () => {
+    expect(DEMO_CANVAS_APP_ASSEMBLY_INPUT.customItemModules).toBe(
+      DEMO_CUSTOM_ITEM_MODULES,
+    )
     expect(
       DEMO_CANVAS_APP_ASSEMBLY.customCreationTools.map((tool) => tool.id),
     ).toEqual(['risk'])

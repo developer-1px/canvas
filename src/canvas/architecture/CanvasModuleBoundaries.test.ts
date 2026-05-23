@@ -464,6 +464,24 @@ describe('Canvas module boundaries', () => {
     expect(shellFile.source).not.toContain('createElement(stage.')
   })
 
+  it('keeps app shell open to assembly input without exposing assembly construction to consumers', () => {
+    const shellFile = getSourceFile('src/canvas/app/shell/CanvasApp.tsx')
+    const assemblySourceFile = getSourceFile(
+      'src/canvas/app/shell/CanvasAppAssemblySource.ts',
+    )
+    const mainFile = getSourceFile('src/main.tsx')
+
+    expect(shellFile.source).toContain('resolveCanvasAppAssemblySource')
+    expect(assemblySourceFile.source).toContain(
+      'assemblyInput?: CanvasAppAssemblyInput',
+    )
+    expect(assemblySourceFile.source).toContain(
+      'createCanvasAppAssembly(assemblyInput)',
+    )
+    expect(mainFile.source).toContain('assemblyInput=')
+    expect(mainFile.source).not.toContain('createCanvasAppAssembly')
+  })
+
   it('keeps app stage rendering containment behind a named workflow module', () => {
     const appModelFile = getSourceFile(
       'src/canvas/app/workflow/useCanvasAppModel.ts',

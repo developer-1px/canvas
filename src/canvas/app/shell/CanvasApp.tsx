@@ -1,16 +1,22 @@
+import { useMemo } from 'react'
 import { CanvasAppView } from './CanvasAppView'
 import {
   useCanvasAppModel,
-  type CanvasAppAssembly,
 } from '../workflow'
+import {
+  resolveCanvasAppAssemblySource,
+  type CanvasAppAssemblySource,
+} from './CanvasAppAssemblySource'
 import './CanvasApp.css'
 
-export type CanvasAppProps = {
-  assembly?: CanvasAppAssembly
-}
+export type CanvasAppProps = CanvasAppAssemblySource
 
-function CanvasApp({ assembly }: CanvasAppProps) {
-  const app = useCanvasAppModel({ assembly })
+function CanvasApp({ assembly, assemblyInput }: CanvasAppProps) {
+  const resolvedAssembly = useMemo(
+    () => resolveCanvasAppAssemblySource({ assembly, assemblyInput }),
+    [assembly, assemblyInput],
+  )
+  const app = useCanvasAppModel({ assembly: resolvedAssembly })
 
   return <CanvasAppView {...app} />
 }
