@@ -16,19 +16,11 @@ import type {
   Viewport,
 } from '../../entities'
 import type { CanvasItemReadModel } from '../../host'
-import {
-  normalizeBounds,
-  pointDistance,
-  isCanvasCustomToolId,
-} from '../../core'
+import { pointDistance } from '../../core'
 import { capturePointer, screenPoint, screenToWorld } from './CanvasPointerGeometry'
 import {
-  createCanvasText,
   getCanvasItemPointerIntent,
   getCanvasItemPointerSelection,
-  getCanvasPointerGesture,
-  isAdditivePointerInput,
-  snapCanvasPointToGrid,
   shouldRouteCanvasItemPointerToCanvasGesture,
   type CanvasAffordanceConfig,
   type CanvasCreationAdapter,
@@ -41,11 +33,10 @@ import type {
   CommitCanvasSelection,
 } from '../workflow/CanvasWorkflowContract'
 import type { Interaction } from './CanvasInteractionState'
-import { createCanvasDraftStroke } from './CanvasPointerDrawing'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
-import { getCanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationToolRuntime'
 import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
 import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
+import { startCanvasPointerInteraction } from './CanvasPointerInteractionStart'
 
 type UseCanvasPointerDownHandlersArgs = {
   cloneItems: (ids: string[], offset: Point) => CanvasItem[]
@@ -108,165 +99,62 @@ export function useCanvasPointerDownHandlers({
     time: number
   } | null>(null)
 
-  function beginPan(pointerId: number, point: Point) {
-    if (!config.gestures.pan) {
-      return
-    }
-
-    interactionRef.current = {
-      kind: 'pan',
-      pointerId,
-      startScreen: point,
-      origin: viewport,
-    }
-    setGesture('pan')
-  }
-
-  function beginCreateText(point: Point) {
-    if (!config.gestures.createText) {
-      return
-    }
-
-    const created = createCanvasText({
-      adapter: creationAdapter,
-      createId,
-      point,
-    })
-
-    commitItemsChange({ type: 'add', items: [created.item] }, {
-      before: selection,
-      after: [created.item.id],
-    })
-    setEditing({ id: created.item.id, value: created.editValue })
-    setTool('select')
-  }
-
   function handleCanvasPointerDown(event: CanvasAppPointerInput) {
-    const pointerGesture = getCanvasPointerGesture({
+    const startScreen = screenPoint(stageElement, event)
+    const startWorld = screenToWorld(startScreen, viewport)
+    const start = startCanvasPointerInteraction({
       config,
+      creationAdapter,
+      createId,
+      customCreationTools,
       input: event,
+      selection,
       spaceDown,
+      startScreen,
+      startWorld,
       tool,
+      viewport,
     })
 
-    if (pointerGesture === 'none') {
+    if (start.kind === 'none') {
       return
     }
 
     event.preventDefault()
-    capturePointer(stageElement, event.pointerId)
 
-    const startScreen = screenPoint(stageElement, event)
-    const startWorld = screenToWorld(startScreen, viewport)
-
-    if (pointerGesture === 'pan') {
-      beginPan(event.pointerId, startScreen)
-      return
+    if (start.capturePointer) {
+      capturePointer(stageElement, event.pointerId)
     }
 
-    if (pointerGesture === 'create-rect') {
-      const snappedStartWorld = snapCanvasPointToGrid({
-        config,
-        point: startWorld,
+    if (start.kind === 'created-text') {
+      commitItemsChange({ type: 'add', items: [start.item] }, {
+        before: selection,
+        after: [start.item.id],
       })
-
-      interactionRef.current = {
-        kind: 'create-rect',
-        pointerId: event.pointerId,
-        startScreen,
-        startWorld: snappedStartWorld,
-        currentWorld: snappedStartWorld,
-        moved: false,
-      }
-      setDraftRect(normalizeBounds(snappedStartWorld, snappedStartWorld))
-      setGesture('create-rect')
+      setEditing(start.edit)
+      setTool('select')
       return
     }
 
-    if (pointerGesture === 'draw-marker' || pointerGesture === 'draw-highlight') {
-      const kind =
-        pointerGesture === 'draw-marker' ? 'marker' : 'highlight'
-      interactionRef.current = {
-        kind: pointerGesture,
-        pointerId: event.pointerId,
-        startScreen,
-        startWorld,
-        currentWorld: startWorld,
-        points: [startWorld],
-        moved: false,
-      }
-      setDraftStroke(createCanvasDraftStroke(kind, [startWorld]))
-      setGesture(pointerGesture)
-      return
-    }
-
-    if (pointerGesture === 'create-arrow') {
-      const snappedStartWorld = snapCanvasPointToGrid({
-        config,
-        point: startWorld,
-      })
-
-      interactionRef.current = {
-        kind: 'create-arrow',
-        pointerId: event.pointerId,
-        startScreen,
-        startWorld: snappedStartWorld,
-        currentWorld: snappedStartWorld,
-        moved: false,
-      }
-      setDraftArrow({
-        end: snappedStartWorld,
-        start: snappedStartWorld,
-      })
-      setGesture('create-arrow')
-      return
-    }
-
-    if (pointerGesture === 'create-custom' && isCanvasCustomToolId(tool)) {
-      if (!getCanvasAppCustomCreationTool(customCreationTools, tool)) {
-        return
-      }
-
-      const snappedStartWorld = snapCanvasPointToGrid({
-        config,
-        point: startWorld,
-      })
-
-      interactionRef.current = {
-        kind: 'create-custom',
-        pointerId: event.pointerId,
-        startScreen,
-        startWorld: snappedStartWorld,
-        currentWorld: snappedStartWorld,
-        tool,
-        moved: false,
-      }
-      setGesture('create-custom')
-      return
-    }
-
-    if (pointerGesture === 'create-text') {
-      beginCreateText(startWorld)
-      return
-    }
-
-    const additive = isAdditivePointerInput(event)
-
-    if (!additive) {
+    if (start.clearSelection) {
       setSelection([])
     }
 
-    interactionRef.current = {
-      kind: 'marquee',
-      pointerId: event.pointerId,
-      startScreen,
-      startWorld,
-      currentWorld: startWorld,
-      additive,
-      baseSelection: selection,
-      moved: false,
+    interactionRef.current = start.interaction
+
+    if (start.draftRect) {
+      setDraftRect(start.draftRect)
     }
-    setGesture('marquee')
+
+    if (start.draftStroke) {
+      setDraftStroke(start.draftStroke)
+    }
+
+    if (start.draftArrow) {
+      setDraftArrow(start.draftArrow)
+    }
+
+    setGesture(start.gesture)
   }
 
   function handleItemPointerDown(

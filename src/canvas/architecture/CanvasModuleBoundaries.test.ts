@@ -345,6 +345,36 @@ describe('Canvas module boundaries', () => {
     expect(lifecycleFile.source).toContain('setEditing(interaction.edit)')
   })
 
+  it('keeps pointer interaction start rules behind a named module', () => {
+    const downHandlersFile = getSourceFile(
+      'src/canvas/app/pointer/useCanvasPointerDownHandlers.ts',
+    )
+    const startFile = getSourceFile(
+      'src/canvas/app/pointer/CanvasPointerInteractionStart.ts',
+    )
+
+    expect(downHandlersFile.source).toContain(
+      "from './CanvasPointerInteractionStart'",
+    )
+    expect(downHandlersFile.source).not.toContain('getCanvasPointerGesture')
+    expect(downHandlersFile.source).not.toContain('isAdditivePointerInput')
+    expect(downHandlersFile.source).not.toContain('createCanvasText')
+    expect(downHandlersFile.source).not.toContain(
+      'getCanvasAppCustomCreationTool',
+    )
+    expect(downHandlersFile.source).not.toContain(
+      'createCanvasDraftStroke',
+    )
+    expect(startFile.source).toContain(
+      'export function startCanvasPointerInteraction',
+    )
+    expect(startFile.source).toContain('getCanvasPointerGesture')
+    expect(startFile.source).toContain('isAdditivePointerInput')
+    expect(startFile.source).toContain('createCanvasText')
+    expect(startFile.source).toContain('getCanvasAppCustomCreationTool')
+    expect(startFile.source).toContain('createCanvasDraftStroke')
+  })
+
   it('keeps app rendering authoring contracts independent from Demo SVG registry names', () => {
     const contractsFile = getSourceFile(
       'src/canvas/app/rendering/CanvasAppRenderingContracts.ts',
