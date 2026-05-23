@@ -1,36 +1,25 @@
 import type {
   CanvasAffordanceConfig,
-  CanvasAlignMode,
   CanvasCommandAvailability,
-  CanvasCommandId,
-  CanvasDistributeMode,
 } from '../../engine'
+import {
+  CANVAS_TOOLBAR_COMMAND_GROUPS,
+  type CanvasToolbarCommandAction,
+  type CanvasToolbarCommandDescriptor,
+  type CanvasToolbarCommandGroupId,
+} from './CanvasToolbarCommandCatalog'
 
-export type CanvasToolbarCommandAction =
-  | { kind: 'align'; mode: CanvasAlignMode }
-  | { kind: 'delete' }
-  | { kind: 'distribute'; mode: CanvasDistributeMode }
-  | { kind: 'duplicate' }
-  | { kind: 'group' }
-  | { kind: 'lock' }
-  | { kind: 'redo' }
-  | { kind: 'undo' }
-  | { kind: 'ungroup' }
-  | { kind: 'unlock-all' }
+export type {
+  CanvasToolbarCommandAction,
+  CanvasToolbarCommandGroupId,
+} from './CanvasToolbarCommandCatalog'
 
 export type CanvasToolbarCommandItem = {
   action: CanvasToolbarCommandAction
-  command: CanvasCommandId
+  command: CanvasToolbarCommandDescriptor['command']
   disabled: boolean
   kind: 'command'
 }
-
-export type CanvasToolbarCommandGroupId =
-  | 'history'
-  | 'selection'
-  | 'grouping'
-  | 'alignment'
-  | 'lock'
 
 export type CanvasToolbarCommandGroup = {
   id: CanvasToolbarCommandGroupId
@@ -41,84 +30,6 @@ export type CanvasToolbarCommandItemsInput = {
   availability: CanvasCommandAvailability
   config: CanvasAffordanceConfig
 }
-
-type CanvasToolbarCommandDescriptor = {
-  action: CanvasToolbarCommandAction
-  command: CanvasToolbarAvailableCommandId
-}
-
-type CanvasToolbarAvailableCommandId =
-  keyof CanvasCommandAvailability & CanvasCommandId
-
-type CanvasToolbarCommandGroupDescriptor = {
-  commands: readonly CanvasToolbarCommandDescriptor[]
-  id: CanvasToolbarCommandGroupId
-}
-
-const CANVAS_TOOLBAR_COMMAND_GROUPS = [
-  {
-    id: 'history',
-    commands: [
-      { action: { kind: 'undo' }, command: 'undo' },
-      { action: { kind: 'redo' }, command: 'redo' },
-    ],
-  },
-  {
-    id: 'selection',
-    commands: [
-      { action: { kind: 'duplicate' }, command: 'duplicate' },
-      { action: { kind: 'delete' }, command: 'delete' },
-    ],
-  },
-  {
-    id: 'grouping',
-    commands: [
-      { action: { kind: 'group' }, command: 'group' },
-      { action: { kind: 'ungroup' }, command: 'ungroup' },
-    ],
-  },
-  {
-    id: 'alignment',
-    commands: [
-      {
-        action: { kind: 'align', mode: 'alignLeft' },
-        command: 'alignLeft',
-      },
-      {
-        action: { kind: 'align', mode: 'alignCenter' },
-        command: 'alignCenter',
-      },
-      {
-        action: { kind: 'align', mode: 'alignRight' },
-        command: 'alignRight',
-      },
-      { action: { kind: 'align', mode: 'alignTop' }, command: 'alignTop' },
-      {
-        action: { kind: 'align', mode: 'alignMiddle' },
-        command: 'alignMiddle',
-      },
-      {
-        action: { kind: 'align', mode: 'alignBottom' },
-        command: 'alignBottom',
-      },
-      {
-        action: { kind: 'distribute', mode: 'distributeHorizontal' },
-        command: 'distributeHorizontal',
-      },
-      {
-        action: { kind: 'distribute', mode: 'distributeVertical' },
-        command: 'distributeVertical',
-      },
-    ],
-  },
-  {
-    id: 'lock',
-    commands: [
-      { action: { kind: 'lock' }, command: 'lockSelection' },
-      { action: { kind: 'unlock-all' }, command: 'unlockAll' },
-    ],
-  },
-] as const satisfies readonly CanvasToolbarCommandGroupDescriptor[]
 
 export function getCanvasToolbarCommandGroups({
   availability,

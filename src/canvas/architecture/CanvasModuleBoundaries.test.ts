@@ -411,6 +411,9 @@ describe('Canvas module boundaries', () => {
     const commandItemsFile = getSourceFile(
       'src/canvas/ui/toolbar/CanvasToolbarCommandItems.ts',
     )
+    const commandCatalogFile = getSourceFile(
+      'src/canvas/ui/toolbar/CanvasToolbarCommandCatalog.ts',
+    )
     const commandDispatchFile = getSourceFile(
       'src/canvas/ui/toolbar/CanvasToolbarCommandDispatch.ts',
     )
@@ -444,10 +447,10 @@ describe('Canvas module boundaries', () => {
       'export function getCanvasToolbarCommandGroups',
     )
     expect(commandItemsFile.source).toContain(
-      'CANVAS_TOOLBAR_COMMAND_GROUPS',
+      "from './CanvasToolbarCommandCatalog'",
     )
-    expect(commandItemsFile.source).toContain("command: 'alignLeft'")
-    expect(commandItemsFile.source).toContain(
+    expect(commandItemsFile.source).not.toContain("command: 'alignLeft'")
+    expect(commandItemsFile.source).not.toContain(
       "command: 'distributeHorizontal'",
     )
     expect(commandItemsFile.source).not.toContain(
@@ -456,6 +459,15 @@ describe('Canvas module boundaries', () => {
     expect(commandItemsFile.source).not.toContain(
       'getCanvasToolbarDistributeItem',
     )
+    expect(commandCatalogFile.source).toContain(
+      'CANVAS_TOOLBAR_COMMAND_GROUPS',
+    )
+    expect(commandCatalogFile.source).toContain("command: 'alignLeft'")
+    expect(commandCatalogFile.source).toContain(
+      "command: 'distributeHorizontal'",
+    )
+    expect(commandCatalogFile.source).not.toContain('config.commands')
+    expect(commandCatalogFile.source).not.toContain('availability')
     expect(commandDispatchFile.source).toContain(
       'export function runCanvasToolbarCommandAction',
     )
@@ -680,11 +692,15 @@ describe('Canvas module boundaries', () => {
     const toolbarCommandItemsFile = getSourceFile(
       'src/canvas/ui/toolbar/CanvasToolbarCommandItems.ts',
     )
+    const toolbarCommandCatalogFile = getSourceFile(
+      'src/canvas/ui/toolbar/CanvasToolbarCommandCatalog.ts',
+    )
 
     for (const file of [
       toolbarFile,
       toolbarItemsFile,
       toolbarCommandItemsFile,
+      toolbarCommandCatalogFile,
     ]) {
       expect(file.source).not.toContain('canAlign: boolean')
       expect(file.source).not.toContain('canDistribute: boolean')
@@ -701,8 +717,11 @@ describe('Canvas module boundaries', () => {
     expect(toolbarCommandItemsFile.source).toContain(
       'availability: CanvasCommandAvailability',
     )
-    expect(toolbarCommandItemsFile.source).toContain(
+    expect(toolbarCommandCatalogFile.source).toContain(
       'keyof CanvasCommandAvailability & CanvasCommandId',
+    )
+    expect(toolbarCommandItemsFile.source).toContain(
+      "from './CanvasToolbarCommandCatalog'",
     )
     expect(toolbarCommandItemsFile.source).toContain(
       'disabled: !availability[descriptor.command]',
