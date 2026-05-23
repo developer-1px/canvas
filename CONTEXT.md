@@ -15,7 +15,7 @@
 - Canvas Item Read Model: Demo `CanvasItem` tree의 조회, bounds, selection 정규화, Scene Adapter 생성을 tree helper 세부 구현 없이 제공하는 Module.
 - Canvas Component Library: Demo component template, presentation key, component item 생성을 함께 제공하는 Module.
 - Canvas Component Presentation: Demo component kind를 Renderer Adapter의 그리기 전략과 연결하는 key. 새 component kind는 기존 presentation을 재사용할 수 있다.
-- Canvas App Assembly: 내부 캔버스 문법은 유지하면서 Host item adapter, component library, initial items, SVG presentation registry 같은 제품별 의미를 외부에서 조립하는 composition Module.
+- Canvas App Assembly: 내부 캔버스 문법은 유지하면서 Host item adapter, component library, custom item module, initial items, SVG presentation registry 같은 제품별 의미를 외부에서 조립하는 composition Module.
 - Canvas App Assembly Input: Canvas App Assembly output을 `Partial`로 노출하지 않고 Host가 조립할 수 있는 필드만 명시한 외부 입력 계약.
 - Canvas App Extension Id: custom command, creation tool, item module, component presentation renderer key, custom item renderer key, validator key, inspector panel에서 공유하는 안정 lower-kebab 외부 계약.
 - Canvas App Extension Registry: assembly 단계에서 extension entry와 record key를 검증하고 중복을 실패시키는 내부 merge 계약.
@@ -61,8 +61,7 @@
 - Canvas App Assembly의 initial items는 조립된 Canvas Custom Item Validator로 assembly 단계에서 검증한다.
 - 제품별 business action은 Engine command union에 넣지 않고 Canvas App Custom Command로 등록한다.
 - Canvas App Custom Command의 availability/run 실패는 내부 command loop를 깨지 않고 disabled/false로 containment 한다.
-- 제품별 creation tool은 내부 Tool union에 구체 id를 넣지 않고 Canvas App Custom Creation Tool로 등록한다.
-- Canvas App Custom Creation Tool은 내부 `CanvasItem` variant가 아니라 Canvas Custom Item envelope만 생성할 수 있다.
+- 제품별 item creation tool은 내부 Tool union에 구체 id를 넣지 않고 Canvas App Custom Item Module에 등록한다.
 - Canvas App Custom Creation Tool이 item 생성을 거부하거나 실패하거나 invalid item을 반환해도 pointer lifecycle을 깨지 않아야 한다.
 - 제품별 item kind는 내부 `CanvasItem` union에 새 variant를 추가하지 않고 Canvas App Custom Item Module로 등록한다.
 - Canvas App Custom Item Module은 `id`, `presentation`, `renderItem`, `validateItem`을 외부 Interface로 받고, renderer registry와 validator registry는 내부에서 조립한다.
@@ -71,7 +70,6 @@
 - Demo custom item module은 `src/canvas/app/workflow` public entry만 사용하고 app 내부 파일을 직접 import하지 않는다.
 - Canvas App extension id와 registry key는 lower-kebab 안정 id만 허용하고, 잘못된 id는 define/assembly 단계에서 실패해야 한다.
 - Canvas Custom Item의 `kind`와 `presentation`, Canvas Component Template의 `id`와 `presentation`도 같은 안정 id 계약을 따라야 한다.
-- Canvas App Custom Item Module과 직접 assembly input의 extension key가 겹치면 assembly 단계에서 실패해야 한다.
 - Canvas App Custom Item Module은 `disabledCustomItemModuleIds`로 Host App에서 끌 수 있어야 하며, 알 수 없는 id는 실패해야 한다.
 - Canvas App Custom Creation Tool shortcut은 내부 canvas shortcut, shift-insensitive built-in shortcut, temporary pan, nudge shortcut, 다른 custom tool shortcut과 충돌하면 assembly 단계에서 실패해야 한다.
 - 제품별 renderer 스타일은 Canvas App Shell CSS에 두지 않고 Host App/Demo module이 소유한다.

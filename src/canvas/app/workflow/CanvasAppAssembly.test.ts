@@ -105,17 +105,22 @@ describe('CanvasAppAssembly', () => {
     expect(assembly.initialItems).toEqual([])
   })
 
-  it('rejects duplicate extension keys across modules and direct input', () => {
+  it('rejects duplicate command ids across modules and direct input', () => {
     const riskModule = defineRiskModule()
 
     expect(() =>
       createCanvasAppAssembly({
         customItemModules: [riskModule],
-        customItemValidators: {
-          risk: () => false,
-        },
+        customCommands: [
+          {
+            id: 'publish',
+            label: 'Pub',
+            title: 'Publish risk',
+            run: () => undefined,
+          },
+        ],
       }),
-    ).toThrow('Duplicate canvas app assembly custom item validator: risk')
+    ).toThrow('Duplicate canvas app assembly custom command: publish')
   })
 
   it('treats direct component presentation renderers as extensions', () => {
@@ -181,16 +186,6 @@ describe('CanvasAppAssembly', () => {
     ).toThrow('Invalid canvas app custom command id: Publish Risk')
   })
 
-  it('rejects direct registry keys outside the app extension id contract', () => {
-    expect(() =>
-      createCanvasAppAssembly({
-        customItemValidators: {
-          'Risk Item': () => true,
-        },
-      }),
-    ).toThrow('Invalid canvas app custom item validator id: Risk Item')
-  })
-
   it('validates initial items against assembled custom item validators', () => {
     const riskItem = {
       id: 'risk-1',
@@ -207,18 +202,21 @@ describe('CanvasAppAssembly', () => {
 
     expect(
       createCanvasAppAssembly({
-        customItemValidators: {
-          risk: (item) => item.data.severity === 'high',
-        },
+        customItemModules: [defineRiskModule()],
         initialItems: [riskItem],
       }).initialItems,
     ).toEqual([riskItem])
 
     expect(() =>
       createCanvasAppAssembly({
-        customItemValidators: {
-          risk: (item) => item.data.severity === 'low',
-        },
+        customItemModules: [
+          defineCanvasAppCustomItemModule({
+            id: 'risk',
+            presentation: 'risk-node',
+            renderItem: () => 'risk',
+            validateItem: (item) => item.data.severity === 'low',
+          }),
+        ],
         initialItems: [riskItem],
       }),
     ).toThrow('Invalid custom canvas item: risk')
@@ -259,40 +257,6 @@ describe('CanvasAppAssembly', () => {
     expect(assembly.customItemValidators).toEqual({})
   })
 
-  it('rejects custom creation tool shortcut conflicts across modules and direct input', () => {
-    const riskModule = defineCanvasAppCustomItemModule({
-      id: 'risk',
-      presentation: 'risk-node',
-      renderItem: () => 'risk',
-      validateItem: () => true,
-      customCreationTools: [
-        {
-          id: 'risk',
-          label: '!',
-          title: 'Risk',
-          shortcut: { key: 'e', shiftKey: true },
-          createItem: () => null,
-        },
-      ],
-    })
-
-    expect(() =>
-      createCanvasAppAssembly({
-        customItemModules: [riskModule],
-        customCreationTools: [
-          {
-            id: 'dependency',
-            label: 'D',
-            title: 'Dependency',
-            shortcut: { key: 'e', shiftKey: true },
-            createItem: () => null,
-          },
-        ],
-      }),
-    ).toThrow(
-      'Duplicate canvas app custom creation tool shortcut: risk and dependency use Shift+E',
-    )
-  })
 })
 
 function defineRiskModule() {
@@ -301,5 +265,13 @@ function defineRiskModule() {
     presentation: 'risk-node',
     renderItem: () => 'risk',
     validateItem: () => true,
+    customCommands: [
+      {
+        id: 'publish',
+        label: 'Pub',
+        title: 'Publish risk',
+        run: () => undefined,
+      },
+    ],
   })
 }

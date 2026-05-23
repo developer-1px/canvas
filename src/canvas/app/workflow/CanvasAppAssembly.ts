@@ -58,10 +58,7 @@ export type CanvasAppAssemblyInput = {
   componentLibrary?: CanvasComponentLibrary
   componentPresentationRenderers?: CanvasDemoSvgComponentPresentationRenderers
   customCommands?: readonly CanvasAppCustomCommand[]
-  customCreationTools?: readonly CanvasAppCustomCreationTool[]
   customItemModules?: readonly CanvasAppCustomItemModule[]
-  customItemRenderers?: CanvasDemoSvgCustomItemRenderers
-  customItemValidators?: CanvasCustomItemValidators
   disabledCustomItemModuleIds?: CanvasAppCustomItemModuleAssemblyOptions['disabledModuleIds']
   initialItems?: CanvasItem[]
   inspectorPanels?: readonly CanvasAppInspectorPanel[]
@@ -89,11 +86,8 @@ export function createCanvasAppAssembly(
     { disabledModuleIds: input.disabledCustomItemModuleIds },
   )
   const customItemValidators = mergeUniqueCanvasAppExtensionRecord({
-    current: {
-      ...DEFAULT_CANVAS_APP_ASSEMBLY.customItemValidators,
-      ...customItemModuleAssembly.customItemValidators,
-    },
-    entries: input.customItemValidators ?? {},
+    current: DEFAULT_CANVAS_APP_ASSEMBLY.customItemValidators,
+    entries: customItemModuleAssembly.customItemValidators,
     label: 'custom item validator',
     owner: 'app assembly',
   })
@@ -114,20 +108,14 @@ export function createCanvasAppAssembly(
       owner: 'app assembly',
     }),
     customCreationTools: appendUniqueCanvasAppExtensionEntries({
-      current: [
-        ...DEFAULT_CANVAS_APP_ASSEMBLY.customCreationTools,
-        ...customItemModuleAssembly.customCreationTools,
-      ],
-      entries: input.customCreationTools ?? [],
+      current: DEFAULT_CANVAS_APP_ASSEMBLY.customCreationTools,
+      entries: customItemModuleAssembly.customCreationTools,
       label: 'custom creation tool',
       owner: 'app assembly',
     }),
     customItemRenderers: mergeUniqueCanvasAppExtensionRecord({
-      current: {
-        ...DEFAULT_CANVAS_APP_ASSEMBLY.customItemRenderers,
-        ...customItemModuleAssembly.customItemRenderers,
-      },
-      entries: input.customItemRenderers ?? {},
+      current: DEFAULT_CANVAS_APP_ASSEMBLY.customItemRenderers,
+      entries: customItemModuleAssembly.customItemRenderers,
       label: 'custom item renderer',
       owner: 'app assembly',
     }),
