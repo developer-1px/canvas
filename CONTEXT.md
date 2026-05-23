@@ -120,7 +120,8 @@
 - Canvas Keyboard Command Shortcut Intent: built-in command, viewport, nudge keyboard shortcut grammar를 feature toggle과 selection 기준으로 keyboard intent로 변환하는 App-owned runtime Module.
 - Canvas Keyboard Tool Shortcut Intent: built-in tool shortcut precedence와 custom creation tool shortcut matching을 소유하는 App-owned runtime Module.
 - Canvas Interaction Model: tool, gesture, marquee, draft, snap guide, overlay state 생명주기와 consumer별 interaction context를 App Shell에 숨기는 workflow Module.
-- Canvas Workspace Model: Demo workspace의 저장된 snapshot, document history, viewport, read model, id 생성과 consumer별 workspace context를 App Shell에 숨기는 workflow Module.
+- Canvas Workspace Model: Demo workspace의 저장된 snapshot, document history, viewport, read model, id 생성, persistence wiring을 App Shell에 숨기는 workflow Module.
+- Canvas Workspace Consumer Model: Workspace document/read/viewport state를 command, component, control, extension, inspector, interaction, item layer, keyboard, pointer, stage, text, viewport consumer context로 변환하는 workflow Module.
 - Canvas Workspace Snapshot: 저장된 workspace payload의 version, item validation, viewport normalization, selection sanitization, id seed contract를 소유하는 App-owned Module.
 - Canvas Workflow Contract: App workflow hook들이 공유하는 document commit, selection commit, clipboard 계약. 개별 hook이 `useCanvasDocument` 구현 파일을 직접 알지 않게 한다.
 - Canvas Toolbar Items: tool group, command group, custom command group을 toolbar item group grammar로 합성하는 UI-owned Module.
@@ -250,7 +251,7 @@
 - App Model은 wheel viewport listener, fit/reset/zoom control hook 조립, keyboard/control fan-out 세부를 직접 알지 않고 Canvas App Viewport Model에서 consumer별 viewport context를 받는다.
 - App Model은 draft, marquee, snap guide, temporary pan raw setter routing을 직접 알지 않고 Canvas Interaction Model의 consumer별 interaction context를 전달한다.
 - App Shell은 workspace 저장, document history, read model 생성 방식을 직접 알지 않는다.
-- App workflow hook들은 Canvas Item Read Model, document action, viewport setter를 직접 생성하지 않고 Canvas Workspace Model의 consumer별 workspace context로 주입받는다.
+- App workflow hook들은 Canvas Item Read Model, document action, viewport setter를 직접 생성하지 않고 Canvas Workspace Model의 consumer별 workspace context로 주입받는다. Workspace state/persistence wiring은 Canvas Workspace Model이, consumer별 context fan-out은 Canvas Workspace Consumer Model이 소유한다.
 - App workflow는 editor/search 상태를 각각의 workflow Module 뒤에 숨긴다.
 - Standard command hook은 toolbar/keyboard용 callback wiring을 맡고, Canvas Standard Command Execution은 plan 생성과 effect 적용만 조립한다. Engine command 호출은 Canvas Standard Command Effect Plan이, document effect descriptor 생성과 document commit/selection/editing/history effect routing은 Canvas Standard Command Document Effects가 소유한다.
 - Built-in command의 선택 개수 기준은 Canvas Command Selection Rules가 소유하고, App control model과 command action/availability는 raw threshold를 반복하지 않는다.

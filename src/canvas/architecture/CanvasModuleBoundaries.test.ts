@@ -2610,6 +2610,9 @@ describe('Canvas module boundaries', () => {
     const workspaceModelFile = getSourceFile(
       'src/canvas/app/workflow/useCanvasWorkspaceModel.ts',
     )
+    const workspaceConsumerModelFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasWorkspaceConsumerModel.ts',
+    )
     const rawWorkspaceTerms =
       /\b(canRedo|canUndo|commitSelection|commitItemsChange|copyItemsToClipboard|getClipboardItems|findDocumentText|itemReadModel|redo|replaceDocumentText|selectedBounds|setClipboardItems|setLiveItems|setSelection|setViewport|undo)\b/
 
@@ -2617,6 +2620,9 @@ describe('Canvas module boundaries', () => {
       "from './useCanvasWorkspaceModel'",
     )
     expect(appModelFile.source).not.toMatch(rawWorkspaceTerms)
+    expect(workspaceModelFile.source).toContain(
+      "from './CanvasWorkspaceConsumerModel'",
+    )
     for (const consumerContext of [
       'command: {',
       'component: {',
@@ -2631,7 +2637,23 @@ describe('Canvas module boundaries', () => {
       'text: {',
       'viewport: {',
     ]) {
-      expect(workspaceModelFile.source).toContain(consumerContext)
+      expect(workspaceModelFile.source).not.toContain(consumerContext)
+    }
+    for (const consumerContext of [
+      'command: {',
+      'component: {',
+      'control: {',
+      'extension: {',
+      'inspector: {',
+      'interaction: {',
+      'itemLayer: {',
+      'keyboard: {',
+      'pointer: {',
+      'stage: {',
+      'text: {',
+      'viewport: {',
+    ]) {
+      expect(workspaceConsumerModelFile.source).toContain(consumerContext)
     }
   })
 
