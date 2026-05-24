@@ -4,13 +4,13 @@ import {
 } from 'react'
 import type { CanvasItem } from '../../entities'
 import {
-  type CanvasCustomItemValidators,
-} from '../../host'
-import {
   readStoredCanvasWorkspace,
   type CanvasWorkspaceStorageProvider,
   useCanvasWorkspacePersistence,
 } from '../document/CanvasWorkspacePersistence'
+import type {
+  CanvasAppCustomItemValidators,
+} from '../modules/CanvasAppCustomItemValidatorContracts'
 import { useCanvasDocument } from '../document/useCanvasDocument'
 import { getCanvasWorkspaceConsumerModel } from './CanvasWorkspaceConsumerModel'
 import {
@@ -25,7 +25,7 @@ export function useCanvasWorkspaceModel({
   initialSelection,
   storageProvider,
 }: {
-  customItemValidators?: CanvasCustomItemValidators
+  customItemValidators?: CanvasAppCustomItemValidators
   initialItems: CanvasItem[]
   initialSelection: readonly string[]
   storageProvider: CanvasWorkspaceStorageProvider

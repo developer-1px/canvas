@@ -2,7 +2,6 @@ import {
   getCanvasItemIds,
   getCanvasValidSelection,
   normalizeCanvasItems,
-  type CanvasCustomItemValidators,
   type CanvasItem,
 } from '../../host'
 import type { CanvasWorkspaceStorageProvider } from '../document/CanvasWorkspacePersistence'
@@ -10,9 +9,12 @@ import {
   assertCanvasAppArray,
   assertCanvasAppDescriptorFunctionField,
 } from '../extensions/CanvasAppDescriptorContracts'
+import type {
+  CanvasAppCustomItemValidators,
+} from '../modules/CanvasAppCustomItemValidatorContracts'
 
 export type CanvasAppWorkspaceAssemblyContract = {
-  customItemValidators: CanvasCustomItemValidators
+  customItemValidators: CanvasAppCustomItemValidators
   initialItems: CanvasItem[]
   initialSelection: readonly string[]
   workspaceStorageProvider: CanvasWorkspaceStorageProvider

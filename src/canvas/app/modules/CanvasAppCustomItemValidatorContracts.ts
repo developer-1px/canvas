@@ -1,9 +1,17 @@
-import type { CanvasCustomItemValidators } from '../../host'
+import type { CanvasCustomItem } from '../../entities'
 import { assertCanvasAppDescriptorFunctionField } from '../extensions/CanvasAppDescriptorContracts'
 import { assertCanvasAppExtensionRecordKeys } from '../extensions/CanvasAppExtensionIds'
 
+export type CanvasAppCustomItemValidator = (
+  item: CanvasCustomItem,
+) => boolean
+
+export type CanvasAppCustomItemValidators = Readonly<
+  Record<string, CanvasAppCustomItemValidator>
+>
+
 export function assertCanvasAppCustomItemValidators(
-  customItemValidators: CanvasCustomItemValidators,
+  customItemValidators: CanvasAppCustomItemValidators,
 ) {
   assertCanvasAppExtensionRecordKeys({
     entries: customItemValidators,

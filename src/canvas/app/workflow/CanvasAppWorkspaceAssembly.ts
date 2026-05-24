@@ -1,9 +1,11 @@
 import {
   normalizeCanvasItems,
-  type CanvasCustomItemValidators,
   type CanvasItem,
 } from '../../host'
 import type { CanvasWorkspaceStorageProvider } from '../document/CanvasWorkspacePersistence'
+import type {
+  CanvasAppCustomItemValidators,
+} from '../modules/CanvasAppCustomItemValidatorContracts'
 import type { CanvasAppWorkspaceAssemblyInput } from './CanvasAppAssemblyInputTypes'
 
 export type { CanvasAppWorkspaceAssemblyInput } from './CanvasAppAssemblyInputTypes'
@@ -15,7 +17,7 @@ export type CanvasAppWorkspaceAssembly = {
 }
 
 export type CanvasAppWorkspaceAssemblyOptions = {
-  customItemValidators: CanvasCustomItemValidators
+  customItemValidators: CanvasAppCustomItemValidators
 }
 
 export function createCanvasAppWorkspaceAssembly(

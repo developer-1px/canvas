@@ -2,7 +2,6 @@ import type {
   Bounds,
   CanvasJsonObject,
 } from '../../entities'
-import { type CanvasCustomItemValidator } from '../../host'
 import type { CanvasAppCustomCommand } from '../commands/CanvasAppCustomCommands'
 import type { CanvasAppInspectorPanel } from '../inspector/CanvasAppInspectorPanels'
 import type {
@@ -15,6 +14,9 @@ import {
 import {
   assertCanvasAppCustomItemModule,
 } from './CanvasAppCustomItemModuleContracts'
+import type {
+  CanvasAppCustomItemValidator,
+} from './CanvasAppCustomItemValidatorContracts'
 import {
   snapshotCanvasAppCustomItemModule,
 } from './CanvasAppCustomItemModuleSnapshot'
@@ -44,7 +46,7 @@ export type CanvasAppCustomItemModule = {
   inspectorPanels?: readonly CanvasAppInspectorPanel[]
   presentation: string
   renderItem: CanvasAppCustomItemRendererStrategy
-  validateItem: CanvasCustomItemValidator
+  validateItem: CanvasAppCustomItemValidator
 }
 
 export function defineCanvasAppCustomItemModule(

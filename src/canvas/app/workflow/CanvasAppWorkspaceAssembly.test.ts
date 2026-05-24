@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import type {
-  CanvasCustomItemValidators,
   CanvasItem,
 } from '../../host'
 import type { CanvasWorkspaceStorageProvider } from '../document/CanvasWorkspacePersistence'
+import type {
+  CanvasAppCustomItemValidators,
+} from '../modules/CanvasAppCustomItemValidatorContracts'
 import { createCanvasAppWorkspaceAssembly } from './CanvasAppWorkspaceAssembly'
 
 describe('CanvasAppWorkspaceAssembly', () => {
@@ -33,7 +35,7 @@ describe('CanvasAppWorkspaceAssembly', () => {
 
   it('normalizes initial items with assembled custom item validators', () => {
     const riskItem = createRiskItem()
-    const validators: CanvasCustomItemValidators = {
+    const validators: CanvasAppCustomItemValidators = {
       risk: (item) => item.data.severity === 'high',
     }
 

@@ -31,6 +31,8 @@ export {
   type CanvasAppCustomItemModule,
   type CanvasAppCustomItemModuleCreationItem,
   type CanvasAppCustomItemModuleCreationTool,
+  type CanvasAppCustomItemValidator,
+  type CanvasAppCustomItemValidators,
   type CanvasAppCustomToolShortcut,
   type CanvasWorkspaceStorage,
   type CanvasWorkspaceStorageProvider,

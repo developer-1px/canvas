@@ -8,12 +8,14 @@ import type { CanvasItem } from '../../entities'
 import type {
   CanvasComponentLibrary,
   CanvasComponentTemplate,
-  CanvasCustomItemValidators,
 } from '../../host'
 import type {
   CanvasAppCustomCommand,
 } from '../commands/CanvasAppCustomCommands'
 import type { CanvasWorkspaceStorageProvider } from '../document/CanvasWorkspacePersistence'
+import type {
+  CanvasAppCustomItemValidators,
+} from '../modules/CanvasAppCustomItemValidatorContracts'
 import type {
   CanvasAppComponentPresentationRenderers,
   CanvasAppCustomItemRenderers,
@@ -66,7 +68,7 @@ export type CanvasAppAssemblyRenderingModel = {
 }
 
 export type CanvasAppAssemblyWorkspaceModel = {
-  customItemValidators: CanvasCustomItemValidators
+  customItemValidators: CanvasAppCustomItemValidators
   initialItems: CanvasItem[]
   initialSelection: readonly string[]
   storageProvider: CanvasWorkspaceStorageProvider

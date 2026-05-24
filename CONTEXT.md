@@ -110,8 +110,8 @@
 - Canvas App Custom Item Module Runtime: module-owned creation tool envelope 생성, item validation, renderer/validator registry 변환과 실패 containment를 소유하는 App-owned runtime Module.
 - Canvas App Custom Item Module Snapshot: custom item module define/assembly 후 외부 descriptor mutation에서 module과 assembled extension parts를 보호하는 App-owned Module.
 - Canvas Custom Item Renderer Registry: `Canvas Custom Item`의 presentation key를 SVG rendering strategy에 연결하는 외부 조립 가능한 registry.
-- Canvas Custom Item Validator: `Canvas Custom Item`의 `kind`별 domain-specific payload 규칙을 document validation에 주입하는 App-owned validator.
-- Canvas App Custom Item Validator Contracts: custom item validator registry key와 validate strategy slot을 검증하는 App-owned contract Module.
+- Canvas Custom Item Validator: `Canvas Custom Item`의 `kind`별 domain-specific payload 규칙을 document validation에 주입하는 App-owned validator. Host document validation은 같은 구조의 registry를 소비하지만 authoring type은 App contract가 소유한다.
+- Canvas App Custom Item Validator Contracts: custom item validator function type, registry type, registry key, validate strategy slot을 검증하는 App-owned contract Module.
 - Canvas Component Presentation Registry: Demo component presentation key를 SVG rendering strategy에 연결하는 외부 조립 가능한 registry.
 - Demo SVG Built-in Component Presentation Renderers: 기본 Demo component presentation key와 SVG renderer strategy mapping을 소유하는 App rendering Module.
 - Demo SVG Item Renderer: Demo SVG Item Frame composition과 selection/lock frame state를 소유하고 item type dispatch는 Demo SVG Item Render Routing에 위임하는 App rendering Module.
@@ -303,7 +303,7 @@
 - Canvas App Custom Item Module은 `id`, `presentation`, `renderItem`, `validateItem`을 외부 Interface로 받고, renderer registry와 validator registry는 내부에서 조립한다.
 - Canvas App Custom Item Module Creation Tool은 custom creation tool runtime type에서 역산하지 않는 독립 authoring Interface로 정의한다.
 - Canvas App Custom Item Module descriptor/assembly, contract validation, module-owned creation/validator runtime은 분리하고, assembly는 Canvas App Custom Item Module Assembly가, validation은 Canvas App Custom Item Module Contracts가, runtime containment는 Canvas App Custom Item Module Runtime이 소유한다.
-- Canvas Custom Item Validator registry shape 검증은 Canvas App Custom Item Validator Contracts가 소유한다.
+- Canvas Custom Item Validator function/registry authoring type과 registry shape 검증은 Canvas App Custom Item Validator Contracts가 소유한다.
 - Canvas App Custom Item Module mutation 방어는 Canvas App Custom Item Module Snapshot이 소유한다.
 - Canvas App Custom Item Module Creation Tool은 bounds/title/data만 반환하고, `id`, `type`, `kind`, `presentation`은 Canvas App Custom Item Module이 주입한다.
 - Canvas App Custom Item Module Creation Tool의 실행/반환값은 Module assembly가 현재 item 저장 계약과 module validator로 검증하고, 실패하면 null/false로 containment 한다.

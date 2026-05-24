@@ -1,6 +1,8 @@
-import type { CanvasCustomItemValidators } from '../../host'
 import type { CanvasAppCustomCommand } from '../commands/CanvasAppCustomCommands'
 import type { CanvasAppInspectorPanel } from '../inspector/CanvasAppInspectorPanels'
+import type {
+  CanvasAppCustomItemValidators,
+} from '../modules/CanvasAppCustomItemValidatorContracts'
 import type { CanvasAppCustomItemRenderers } from '../rendering/CanvasAppRenderingContracts'
 import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
 import {
@@ -18,7 +20,7 @@ export type CanvasAppExtensionBundle = {
   customCommands: readonly CanvasAppCustomCommand[]
   customCreationTools: readonly CanvasAppCustomCreationTool[]
   customItemRenderers: CanvasAppCustomItemRenderers
-  customItemValidators: CanvasCustomItemValidators
+  customItemValidators: CanvasAppCustomItemValidators
   inspectorPanels: readonly CanvasAppInspectorPanel[]
 }
 
@@ -26,7 +28,7 @@ export type CanvasAppExtensionBundleInput = {
   customCommands?: readonly CanvasAppCustomCommand[]
   customCreationTools?: readonly CanvasAppCustomCreationTool[]
   customItemRenderers?: CanvasAppCustomItemRenderers
-  customItemValidators?: CanvasCustomItemValidators
+  customItemValidators?: CanvasAppCustomItemValidators
   inspectorPanels?: readonly CanvasAppInspectorPanel[]
 }
 

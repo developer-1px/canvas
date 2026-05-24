@@ -1,8 +1,6 @@
 import type {
   CanvasCustomItem,
-  CanvasCustomItemValidator,
-  CanvasCustomItemValidators,
-} from '../../host'
+} from '../../entities'
 import { normalizeCanvasItems } from '../../host'
 import {
   createCanvasAppExtensionBundle,
@@ -14,11 +12,15 @@ import type {
   CanvasAppCustomItemModule,
   CanvasAppCustomItemModuleCreationItem,
 } from './CanvasAppCustomItemModules'
+import type {
+  CanvasAppCustomItemValidator,
+  CanvasAppCustomItemValidators,
+} from './CanvasAppCustomItemValidatorContracts'
 
 type CanvasAppCustomItemModuleValidatorContext = {
   id: string
   presentation: string
-  validateItem: CanvasCustomItemValidator
+  validateItem: CanvasAppCustomItemValidator
 }
 
 export function getCanvasAppCustomItemModuleCreationTools({
@@ -98,7 +100,7 @@ export function getCanvasAppCustomItemModuleValidators({
   id,
   presentation,
   validateItem,
-}: CanvasAppCustomItemModule): CanvasCustomItemValidators {
+}: CanvasAppCustomItemModule): CanvasAppCustomItemValidators {
   return {
     [id]: getCanvasAppCustomItemModuleValidator({
       id,
@@ -112,7 +114,7 @@ export function getCanvasAppCustomItemModuleValidator({
   id,
   presentation,
   validateItem,
-}: CanvasAppCustomItemModuleValidatorContext): CanvasCustomItemValidator {
+}: CanvasAppCustomItemModuleValidatorContext): CanvasAppCustomItemValidator {
   return (item: CanvasCustomItem) => {
     if (item.kind !== id || item.presentation !== presentation) {
       return false

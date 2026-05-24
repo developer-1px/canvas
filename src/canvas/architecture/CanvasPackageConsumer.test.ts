@@ -13,6 +13,7 @@ import {
   type CanvasAppComponentRendererStrategy,
   type CanvasAppCustomItemModule,
   type CanvasAppCustomItemRendererStrategy,
+  type CanvasAppCustomItemValidator,
   type CanvasAppItemLayerAdapter,
   type CanvasAppProps,
   type CanvasAppPointerInput,
@@ -69,12 +70,14 @@ describe('Canvas package consumer imports', () => {
       y: 20,
     }
     const editableItem: CanvasEditableTextItem = rect
+    const validateCustomItem: CanvasAppCustomItemValidator = (item) =>
+      item.data.severity === 'high'
     const module: CanvasAppCustomItemModule =
       defineCanvasAppCustomItemModule({
         id: 'smoke',
         presentation: 'smoke-node',
         renderItem: ({ item }) => item.title,
-        validateItem: (item) => item.data.severity === 'high',
+        validateItem: validateCustomItem,
       })
     const renderComponent: CanvasAppComponentRendererStrategy = ({ item }) =>
       item.title

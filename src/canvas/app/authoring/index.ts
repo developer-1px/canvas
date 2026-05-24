@@ -17,6 +17,10 @@ export {
   type CanvasAppCustomItemModuleCreationTool,
 } from '../modules/CanvasAppCustomItemModules'
 export type {
+  CanvasAppCustomItemValidator,
+  CanvasAppCustomItemValidators,
+} from '../modules/CanvasAppCustomItemValidatorContracts'
+export type {
   CanvasAppEventInput,
   CanvasAppPointerInput,
 } from '../pointer/CanvasAppPointerInput'

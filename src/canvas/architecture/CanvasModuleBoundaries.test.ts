@@ -5386,8 +5386,16 @@ describe('Canvas module boundaries', () => {
     )
     expect(assemblyContractsFile.source).not.toContain('validate strategy')
     expect(validatorContractsFile.source).toContain(
+      'export type CanvasAppCustomItemValidator',
+    )
+    expect(validatorContractsFile.source).toContain(
+      'export type CanvasAppCustomItemValidators',
+    )
+    expect(validatorContractsFile.source).toContain(
       'export function assertCanvasAppCustomItemValidators',
     )
+    expect(validatorContractsFile.source).toContain("from '../../entities'")
+    expect(validatorContractsFile.source).not.toContain("from '../../host'")
     expect(validatorContractsFile.source).toContain(
       'custom item validator ${kind}',
     )
