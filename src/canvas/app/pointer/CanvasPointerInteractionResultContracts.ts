@@ -2,6 +2,7 @@ import type {
   Bounds,
   CanvasItem,
   EditingText,
+  Tool,
   Viewport,
 } from '../../entities'
 import type {
@@ -25,6 +26,12 @@ export type CanvasPointerCreationStartResult =
       draftStroke?: CanvasDraftStrokeOverlay
       gesture: Interaction['kind']
       interaction: Interaction
+    }
+  | {
+      kind: 'created-item'
+      capturePointer: false
+      item: CanvasItem
+      toolAfterCreate?: Tool
     }
   | {
       kind: 'created-text'

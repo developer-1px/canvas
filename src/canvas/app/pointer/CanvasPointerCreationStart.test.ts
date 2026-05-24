@@ -76,6 +76,31 @@ describe('CanvasPointerCreationStart', () => {
     })
   })
 
+  it('creates comments immediately and carries item attachment context', () => {
+    const result = startCanvasPointerCreation(createInput({
+      createId: () => 'comment-1',
+      pointerGesture: 'create-comment',
+      startWorld: { x: 80, y: 120 },
+      targetItemId: 'rect-1',
+      tool: 'comment',
+    }))
+
+    expect(result).toEqual({
+      capturePointer: false,
+      item: {
+        attachedTo: 'rect-1',
+        body: 'Comment',
+        h: 36,
+        id: 'comment-1',
+        type: 'comment',
+        w: 36,
+        x: 62,
+        y: 102,
+      },
+      kind: 'created-item',
+    })
+  })
+
   it('does not start a missing custom creation tool', () => {
     const result = startCanvasPointerCreation(createInput({
       customCreationTools: [],

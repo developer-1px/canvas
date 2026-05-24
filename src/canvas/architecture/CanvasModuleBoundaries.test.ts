@@ -3346,9 +3346,15 @@ describe('Canvas module boundaries', () => {
     expect(drawingValidationFile.source).toContain('function isSamePoint')
   })
 
-  it('keeps built-in stamp attachment rules in the host stamp module', () => {
+  it('keeps built-in collaboration attachment rules behind host item modules', () => {
     const itemSchemaFile = getSourceFile(
       'src/canvas/host/document/CanvasItemSchema.ts',
+    )
+    const attachmentFile = getSourceFile(
+      'src/canvas/host/attachment/CanvasItemAttachment.ts',
+    )
+    const commentFile = getSourceFile(
+      'src/canvas/host/comment/CanvasCommentItem.ts',
     )
     const stampFile = getSourceFile('src/canvas/host/stamp/CanvasStampItem.ts')
     const transformOperationsFile = getSourceFile(
@@ -3362,7 +3368,22 @@ describe('Canvas module boundaries', () => {
       "from '../stamp/CanvasStampItem'",
     )
     expect(itemSchemaFile.source).toContain(
+      "from '../comment/CanvasCommentItem'",
+    )
+    expect(itemSchemaFile.source).toContain(
       'isCanvasStampItemStorageShape(value)',
+    )
+    expect(itemSchemaFile.source).toContain(
+      'isCanvasCommentItemStorageShape(value)',
+    )
+    expect(attachmentFile.source).toContain(
+      'export function isCanvasItemAttachedTo',
+    )
+    expect(commentFile.source).toContain(
+      'export function isCanvasCommentAttachedTo',
+    )
+    expect(commentFile.source).toContain(
+      'export function translateCanvasCommentItem',
     )
     expect(stampFile.source).toContain(
       'export function isCanvasStampAttachedTo',
@@ -3371,13 +3392,16 @@ describe('Canvas module boundaries', () => {
       'export function translateCanvasStampItem',
     )
     expect(transformOperationsFile.source).toContain(
-      "from '../stamp/CanvasStampItem'",
+      "from '../attachment/CanvasItemAttachment'",
     )
     expect(transformOperationsFile.source).toContain(
-      'isCanvasStampAttachedTo(item, movableSelected)',
+      'isCanvasItemAttachedTo(item, movableSelected)',
     )
     expect(transformOperationsFile.source).not.toContain(
       "item.type === 'stamp'",
+    )
+    expect(transformOperationsFile.source).not.toContain(
+      "item.type === 'comment'",
     )
     expect(stampInsertionFile.source).toContain('attachedTo: selection[0]')
   })

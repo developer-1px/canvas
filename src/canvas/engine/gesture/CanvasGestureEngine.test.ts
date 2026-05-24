@@ -42,12 +42,22 @@ describe('CanvasGestureEngine drawing tools', () => {
         tool: 'arrow',
       }),
     ).toBe('create-arrow')
+
+    expect(
+      getCanvasPointerGesture({
+        config,
+        input: baseInput,
+        spaceDown: false,
+        tool: 'comment',
+      }),
+    ).toBe('create-comment')
   })
 
   test('honors drawing gesture feature toggles', () => {
     const disabled = createCanvasAffordanceConfig({
       gestures: {
         createArrow: false,
+        createComment: false,
         createCustom: false,
         drawHighlight: false,
         drawMarker: false,
@@ -78,6 +88,15 @@ describe('CanvasGestureEngine drawing tools', () => {
         input: baseInput,
         spaceDown: false,
         tool: 'arrow',
+      }),
+    ).toBe('marquee')
+
+    expect(
+      getCanvasPointerGesture({
+        config: disabled,
+        input: baseInput,
+        spaceDown: false,
+        tool: 'comment',
       }),
     ).toBe('marquee')
 
@@ -119,6 +138,12 @@ describe('CanvasGestureEngine drawing tools', () => {
       shouldRouteCanvasItemPointerToCanvasGesture({
         spaceDown: false,
         tool: 'arrow',
+      }),
+    ).toBe(true)
+    expect(
+      shouldRouteCanvasItemPointerToCanvasGesture({
+        spaceDown: false,
+        tool: 'comment',
       }),
     ).toBe(true)
     expect(

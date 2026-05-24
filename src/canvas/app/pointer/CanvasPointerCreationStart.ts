@@ -13,6 +13,9 @@ import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import {
   isCanvasPointerCreationGesture,
 } from './CanvasPointerCreationGrammar'
+import {
+  startCanvasPointerCommentCreation,
+} from './CanvasPointerCommentCreation'
 import type {
   CanvasPointerCreationStartResult,
 } from './CanvasPointerInteractionResultContracts'
@@ -38,6 +41,7 @@ export type CanvasPointerCreationStartInput = {
   pointerGesture: CanvasPointerGesture
   startScreen: Point
   startWorld: Point
+  targetItemId?: string
   tool: Tool
 }
 
@@ -50,6 +54,7 @@ export function startCanvasPointerCreation({
   pointerGesture,
   startScreen,
   startWorld,
+  targetItemId,
   tool,
 }: CanvasPointerCreationStartInput): CanvasPointerCreationStartResult | null {
   if (!isCanvasPointerCreationGesture(pointerGesture)) {
@@ -77,6 +82,18 @@ export function startCanvasPointerCreation({
 
   if (drawingStart) {
     return drawingStart
+  }
+
+  const commentStart = startCanvasPointerCommentCreation({
+    config,
+    createId,
+    pointerGesture,
+    startWorld,
+    targetItemId,
+  })
+
+  if (commentStart) {
+    return commentStart
   }
 
   const customStart = startCanvasPointerCustomCreation({

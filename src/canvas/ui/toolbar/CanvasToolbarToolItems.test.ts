@@ -20,6 +20,7 @@ describe('CanvasToolbarToolItems', () => {
       { active: false, kind: 'builtin-tool', tool: 'pan' },
       { active: false, kind: 'builtin-tool', tool: 'rect' },
       { active: false, kind: 'builtin-tool', tool: 'text' },
+      { active: false, kind: 'builtin-tool', tool: 'comment' },
       { active: false, kind: 'builtin-tool', tool: 'marker' },
       { active: false, kind: 'builtin-tool', tool: 'highlight' },
       { active: false, kind: 'builtin-tool', tool: 'arrow' },
@@ -48,6 +49,7 @@ describe('CanvasToolbarToolItems', () => {
       { active: true, kind: 'builtin-tool', tool: 'select' },
       { active: false, kind: 'builtin-tool', tool: 'rect' },
       { active: false, kind: 'builtin-tool', tool: 'text' },
+      { active: false, kind: 'builtin-tool', tool: 'comment' },
       { active: false, kind: 'builtin-tool', tool: 'highlight' },
       { active: false, kind: 'builtin-tool', tool: 'arrow' },
     ])

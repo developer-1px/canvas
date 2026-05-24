@@ -54,6 +54,17 @@ const attachedStamp: CanvasItem = {
   y: -2,
 }
 
+const attachedComment: CanvasItem = {
+  attachedTo: 'rect-1',
+  body: 'Needs follow-up',
+  h: 36,
+  id: 'comment-1',
+  type: 'comment',
+  w: 36,
+  x: 112,
+  y: 8,
+}
+
 describe('CanvasItemTransformOperations drawing items', () => {
   test('translates arrow bounds and endpoints together', () => {
     expect(translateCanvasItems([arrow], ['arrow-1'], 10, -5)[0]).toEqual({
@@ -108,10 +119,10 @@ describe('CanvasItemTransformOperations drawing items', () => {
   })
 })
 
-describe('CanvasItemTransformOperations attached stamps', () => {
-  test('moves stamps attached to a selected object with that object', () => {
+describe('CanvasItemTransformOperations attached items', () => {
+  test('moves attached collaboration affordances with the selected object', () => {
     expect(translateCanvasItems(
-      [rect, attachedStamp],
+      [rect, attachedStamp, attachedComment],
       ['rect-1'],
       10,
       -5,
@@ -126,10 +137,15 @@ describe('CanvasItemTransformOperations attached stamps', () => {
         x: 118,
         y: -7,
       },
+      {
+        ...attachedComment,
+        x: 122,
+        y: 3,
+      },
     ])
   })
 
-  test('does not move attached stamps when the attached object is locked', () => {
+  test('does not move attached items when the attached object is locked', () => {
     expect(translateCanvasItems(
       [
         {
@@ -137,6 +153,7 @@ describe('CanvasItemTransformOperations attached stamps', () => {
           locked: true,
         },
         attachedStamp,
+        attachedComment,
       ],
       ['rect-1'],
       10,
@@ -147,6 +164,7 @@ describe('CanvasItemTransformOperations attached stamps', () => {
         locked: true,
       },
       attachedStamp,
+      attachedComment,
     ])
   })
 })

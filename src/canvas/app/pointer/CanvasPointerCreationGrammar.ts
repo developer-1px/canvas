@@ -8,6 +8,13 @@ export const CANVAS_POINTER_CUSTOM_CREATION_KINDS = Object.freeze([
 export type CanvasPointerCustomCreationKind =
   (typeof CANVAS_POINTER_CUSTOM_CREATION_KINDS)[number]
 
+export const CANVAS_POINTER_COMMENT_CREATION_KINDS = Object.freeze([
+  'create-comment',
+] as const satisfies readonly CanvasPointerGesture[])
+
+export type CanvasPointerCommentCreationKind =
+  (typeof CANVAS_POINTER_COMMENT_CREATION_KINDS)[number]
+
 export const CANVAS_POINTER_DRAWING_CREATION_KINDS = Object.freeze([
   'draw-highlight',
   'draw-marker',
@@ -32,6 +39,7 @@ export type CanvasPointerTextCreationKind =
   (typeof CANVAS_POINTER_TEXT_CREATION_KINDS)[number]
 
 const CANVAS_POINTER_CREATION_GESTURES = [
+  ...CANVAS_POINTER_COMMENT_CREATION_KINDS,
   ...CANVAS_POINTER_CUSTOM_CREATION_KINDS,
   ...CANVAS_POINTER_DRAWING_CREATION_KINDS,
   ...CANVAS_POINTER_SHAPE_CREATION_KINDS,

@@ -5,6 +5,7 @@ export type CanvasBuiltinTool =
   | 'pan'
   | 'rect'
   | 'text'
+  | 'comment'
   | 'marker'
   | 'highlight'
   | 'arrow'

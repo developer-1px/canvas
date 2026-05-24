@@ -15,6 +15,7 @@ export type CanvasPointerInput = {
 
 export type CanvasPointerGesture =
   | 'create-arrow'
+  | 'create-comment'
   | 'create-custom'
   | 'create-rect'
   | 'create-text'
@@ -42,6 +43,10 @@ export const CANVAS_TOOL_GESTURE_ROUTES = Object.freeze({
   arrow: createCanvasToolGestureRoute({
     gesture: 'create-arrow',
     isEnabled: (config) => config.gestures.createArrow,
+  }),
+  comment: createCanvasToolGestureRoute({
+    gesture: 'create-comment',
+    isEnabled: (config) => config.gestures.createComment,
   }),
   highlight: createCanvasToolGestureRoute({
     gesture: 'draw-highlight',

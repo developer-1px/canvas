@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import type {
   Bounds,
+  CanvasCommentItem,
   CanvasComponentItem,
   CanvasCustomItem,
   CanvasEditableTextItem,
@@ -17,6 +18,7 @@ import {
 import type { CanvasDemoSvgSelectionOutlineKind } from './CanvasDemoSvgItemFrame'
 import { renderCanvasDemoSvgRectTextItem } from './CanvasDemoSvgRectTextItemRenderer'
 import type { CanvasDemoSvgComponentPresentationRenderers } from './CanvasDemoSvgComponentPresentationRegistry'
+import { renderCanvasDemoSvgCommentItem } from './CanvasDemoSvgCommentItemRenderer'
 import type { CanvasDemoSvgCustomItemRenderers } from './CanvasDemoSvgCustomItemRendererRegistry'
 import { renderCanvasDemoSvgCustomItem } from './CanvasDemoSvgCustomItemRendererExecution'
 import { renderCanvasDemoSvgStampItem } from './CanvasDemoSvgStampItemRenderer'
@@ -55,6 +57,7 @@ type CanvasDemoSvgItemRenderStrategies = {
 
 const CANVAS_DEMO_SVG_ITEM_RENDER_STRATEGIES = Object.freeze({
   arrow: renderCanvasDemoSvgDrawingItemRoute,
+  comment: renderCanvasDemoSvgCommentItemRoute,
   component: renderCanvasDemoSvgComponentItemRoute,
   custom: renderCanvasDemoSvgCustomItemRoute,
   group: renderCanvasDemoSvgGroupItemRoute,
@@ -118,6 +121,16 @@ function renderCanvasDemoSvgComponentItemRoute({
       />
     ),
     component: item.component,
+  }
+}
+
+function renderCanvasDemoSvgCommentItemRoute({
+  item,
+}: CanvasDemoSvgItemRenderRouteInput & {
+  item: CanvasCommentItem
+}): CanvasDemoSvgItemRenderRoute {
+  return {
+    children: renderCanvasDemoSvgCommentItem({ item }),
   }
 }
 

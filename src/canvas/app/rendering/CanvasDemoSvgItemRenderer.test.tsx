@@ -130,6 +130,22 @@ describe('CanvasDemoSvgItemRenderer', () => {
     expect(markup).toContain('class="stamp-hit"')
     expect(markup).toContain('+1')
   })
+
+  it('renders comment items with a speech bubble and hit target', () => {
+    const markup = renderItem({
+      body: 'Needs follow-up',
+      h: 36,
+      id: 'comment-1',
+      type: 'comment',
+      w: 36,
+      x: 10,
+      y: 20,
+    })
+
+    expect(markup).toContain('data-type="comment"')
+    expect(markup).toContain('class="comment-item"')
+    expect(markup).toContain('class="comment-hit"')
+  })
 })
 
 function renderItem(item: CanvasItem) {

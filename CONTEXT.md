@@ -29,7 +29,9 @@
 - Canvas Component Item Validation: component item의 stable component id, title/style string, optional text list 저장 shape 검증을 소유하는 Host-owned validation Module.
 - Canvas Editable Text Item: `RectItem | TextItem` stable entity type은 Entities Contract가 소유하고, rect/text item이 공유하는 editable target 판정, 저장 shape, edit initial value, commit fallback, patch operation은 Host-owned text Module이 소유한다.
 - Canvas Image Item: 업로드/붙여넣기/다운로드 대상이 되는 persisted image item type은 Entities Contract가 소유하고, data URL, mime type, natural size, positive bounds 저장 shape 검증은 Host-owned image Module이 소유한다.
+- Canvas Comment Item: 공통 화이트보드 comment persisted item type은 Entities Contract가 소유하고, body, optional attached item id, resolved state, positive bounds 저장 shape 검증은 Host-owned comment Module이 소유한다.
 - Canvas Stamp Item: 공통 화이트보드 반응/스탬프 persisted item type은 Entities Contract가 소유하고, stable stamp id, optional attached item id, visible label, positive bounds 저장 shape 검증은 Host-owned stamp Module이 소유한다.
+- Canvas Item Attachment: comment와 stamp처럼 선택된 item에 붙는 collaboration affordance의 `attachedTo` 판정은 Host-owned attachment Module이 소유하고, transform operation은 item type별 분기 없이 attachment contract만 조회한다.
 - Canvas App Assembly: 내부 캔버스 문법은 유지하면서 affordance feature toggle, Host item adapter, component library, custom item module, initial items, SVG presentation registry 같은 제품별 의미를 외부에서 조립하는 composition Module.
 - Canvas App Assembly Input Types: affordance, component, adapter, workspace child assembly input field 계약을 runtime 조립 구현과 분리해 소유하고 Canvas App Assembly Input에 합성되는 App-owned type 계약.
 - Canvas App Assembly Types: public assembly input/output type 계약만 소유하고 runtime assembly/default/snapshot/contract Module은 이 type Module을 참조한다.
@@ -82,6 +84,7 @@
 - Canvas Image Insertion: imported image source, viewport/drop center, id generation, document add commit, post-insert selection을 Canvas Image Item 삽입 결과로 바꾸는 App-owned image Module.
 - Canvas Image Export: selection read model, 현재 Stage SVG snapshot, fallback image export SVG/PNG 변환, selected item composition download/copy 실행을 소유하는 App-owned image Module.
 - Canvas Image Controls: file upload, drag/drop upload, paste image, copy selected as image, download selected as image 버튼과 이벤트만 노출하고 browser file/clipboard/download how는 App image Module에 숨기는 UI surface.
+- Canvas Pointer Comment Creation: comment tool gesture, click point placement, clicked item attachment, id generation, immediate document add result를 Canvas Comment Item 생성 결과로 바꾸는 App-owned pointer creation Module.
 - Canvas Stamp Insertion: stamp definition, selected object attachment placement, selection-adjacent/viewport-center placement, id generation, document add commit, post-insert selection을 Canvas Stamp Item 삽입 결과로 바꾸는 App-owned stamp Module.
 - Canvas Stamp Controls: built-in stamp palette 버튼만 노출하고 placement/document commit how는 App stamp Module에 숨기는 UI surface.
 - Canvas App Custom Command: 내부 command grammar를 수정하지 않고 제품별 business action을 toolbar action으로 등록하는 App-owned command descriptor.
@@ -253,7 +256,9 @@
 - 기본 드로잉 item의 style 기본값은 Host Drawing Item Style Module이 소유하고 draft overlay와 item creation이 재사용한다.
 - Rect/text의 stable editable text item type은 Entities Contract가 소유하고, editable text 판정, 저장 shape 검증, initial edit value, empty text fallback, rect text add-patch 여부는 Host Canvas Editable Text Item Module이 소유한다.
 - Image의 stable item type은 Entities Contract가 소유하고, image data URL/mime/natural size/bounds 저장 shape 검증은 Host Canvas Image Item Module이 소유한다.
-- Stamp/reaction의 stable item type은 Entities Contract가 소유하고, stamp id/attached target/label/bounds 저장 shape 검증과 attached object 이동 판정은 Host Canvas Stamp Item Module이 소유한다.
+- Comment의 stable item type은 Entities Contract가 소유하고, body/attached target/resolved/bounds 저장 shape 검증은 Host Canvas Comment Item Module이 소유한다.
+- Stamp/reaction의 stable item type은 Entities Contract가 소유하고, stamp id/attached target/label/bounds 저장 shape 검증은 Host Canvas Stamp Item Module이 소유한다.
+- Attached object 이동 판정은 개별 stamp/comment module이 아니라 Host Canvas Item Attachment Module이 소유한다.
 - Group item 판정과 recursive children 저장 shape는 Host Canvas Group Item Module이 소유하고 Host tree/document/operation Module은 named predicate를 호출한다.
 - 엔진은 Fabric.js 같은 완성형 객체 모델을 감싸기보다, 커스텀 가능한 Affordance 문법을 작은 Interface로 제공한다.
 - Demo `CanvasItem`과 SVG 렌더링 방식은 재사용 Core Contract에 포함하지 않는다.

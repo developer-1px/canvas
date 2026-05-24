@@ -1,4 +1,5 @@
 import * as z from 'zod'
+import { isCanvasCommentItemStorageShape } from '../comment/CanvasCommentItem'
 import { isCanvasComponentItemStorageShape } from '../component/CanvasComponentItemValidation'
 import { isCanvasDrawingItemStorageShape } from '../drawing/CanvasDrawingItemValidation'
 import { isCanvasImageItemStorageShape } from '../image/CanvasImageItem'
@@ -67,6 +68,10 @@ function isCanvasItem(value: unknown): value is CanvasItem {
   }
 
   if (isCanvasImageItemStorageShape(value)) {
+    return true
+  }
+
+  if (isCanvasCommentItemStorageShape(value)) {
     return true
   }
 

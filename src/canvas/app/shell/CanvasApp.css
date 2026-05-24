@@ -22,6 +22,7 @@
 
 .canvas-stage[data-mode='rect'],
 .canvas-stage[data-mode='text'],
+.canvas-stage[data-mode='comment'],
 .canvas-stage[data-mode='marker'],
 .canvas-stage[data-mode='highlight'],
 .canvas-stage[data-mode='arrow'],
@@ -195,9 +196,29 @@
 }
 
 .image-hit,
+.comment-hit,
 .stamp-hit {
   fill: transparent;
   pointer-events: all;
+}
+
+.comment-item {
+  fill: #fff;
+  stroke: #2563eb;
+  stroke-width: 1.4;
+}
+
+.comment-tail {
+  fill: #fff;
+  stroke: #2563eb;
+  stroke-width: 1.4;
+}
+
+.comment-line {
+  stroke: #2563eb;
+  stroke-linecap: round;
+  stroke-width: 1.6;
+  pointer-events: none;
 }
 
 .stamp-item {

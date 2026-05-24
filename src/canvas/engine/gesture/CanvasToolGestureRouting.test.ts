@@ -49,6 +49,9 @@ describe('CanvasToolGestureRouting', () => {
     expect(getCanvasToolPointerGesture({ config, tool: 'text' })).toBe(
       'create-text',
     )
+    expect(getCanvasToolPointerGesture({ config, tool: 'comment' })).toBe(
+      'create-comment',
+    )
     expect(getCanvasToolPointerGesture({ config, tool: 'custom:risk' })).toBe(
       'create-custom',
     )
@@ -59,6 +62,7 @@ describe('CanvasToolGestureRouting', () => {
     const disabled = createCanvasAffordanceConfig({
       gestures: {
         createArrow: false,
+        createComment: false,
         createCustom: false,
         createRect: false,
         createText: false,
@@ -70,6 +74,8 @@ describe('CanvasToolGestureRouting', () => {
     expect(getCanvasToolPointerGesture({ config: disabled, tool: 'rect' }))
       .toBeNull()
     expect(getCanvasToolPointerGesture({ config: disabled, tool: 'marker' }))
+      .toBeNull()
+    expect(getCanvasToolPointerGesture({ config: disabled, tool: 'comment' }))
       .toBeNull()
     expect(
       getCanvasToolPointerGesture({ config: disabled, tool: 'custom:risk' }),

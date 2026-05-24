@@ -5,6 +5,7 @@ import { CANVAS_ITEM_TRANSFORM_ADAPTER } from './adapters/CanvasItemTransformAda
 export type {
   CanvasComponentItem,
   CanvasComponentKind,
+  CanvasCommentItem,
   CanvasCustomItem,
   CanvasDrawingItemBase,
   CanvasEditableTextItem,
@@ -68,6 +69,16 @@ export {
   isCanvasImageMimeType,
   type CreateCanvasImageItemInput,
 } from './image/CanvasImageItem'
+export {
+  CANVAS_COMMENT_BODY_MAX_LENGTH,
+  CANVAS_COMMENT_ITEM_SIZE,
+  createCanvasCommentItem,
+  isCanvasCommentAttachedTo,
+  isCanvasCommentItem,
+  isCanvasCommentItemStorageShape,
+  translateCanvasCommentItem,
+  type CreateCanvasCommentItemInput,
+} from './comment/CanvasCommentItem'
 export {
   CANVAS_STAMP_ITEM_SIZE,
   createCanvasStampItem,

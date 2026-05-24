@@ -32,6 +32,7 @@ export const CANVAS_TOOL_AFFORDANCE_ORDER = Object.freeze([
   'pan',
   'rect',
   'text',
+  'comment',
   'marker',
   'highlight',
   'arrow',
@@ -46,6 +47,15 @@ export const CANVAS_TOOL_AFFORDANCES = Object.freeze({
       shortcutId: 'arrowTool',
     },
     statusLabel: 'Arrow',
+  }),
+  comment: createCanvasToolAffordance({
+    ariaLabel: 'Comment tool',
+    keyboardShortcut: {
+      key: 'c',
+      shiftInsensitive: true,
+      shortcutId: 'commentTool',
+    },
+    statusLabel: 'Comment',
   }),
   highlight: createCanvasToolAffordance({
     ariaLabel: 'Highlighter tool',

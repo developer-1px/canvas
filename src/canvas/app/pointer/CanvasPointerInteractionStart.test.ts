@@ -73,6 +73,28 @@ describe('CanvasPointerInteractionStart', () => {
     })
   })
 
+  it('creates comments immediately through the comment tool', () => {
+    const result = startCanvasPointerInteraction(createInput({
+      createId: () => 'comment-1',
+      startWorld: { x: 80, y: 120 },
+      targetItemId: 'rect-1',
+      tool: 'comment',
+    }))
+
+    expect(result).toMatchObject({
+      capturePointer: false,
+      item: {
+        attachedTo: 'rect-1',
+        body: 'Comment',
+        id: 'comment-1',
+        type: 'comment',
+        x: 62,
+        y: 102,
+      },
+      kind: 'created-item',
+    })
+  })
+
   it('does not start a missing custom creation tool', () => {
     const result = startCanvasPointerInteraction(createInput({
       customCreationTools: [],

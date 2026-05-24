@@ -15,6 +15,7 @@ import {
   AlignRightIcon,
   AlignTopIcon,
   ArrowIcon,
+  CommentIcon,
   DeleteIcon,
   DistributeHorizontalIcon,
   DistributeVerticalIcon,
@@ -67,6 +68,7 @@ type CanvasToolbarAnyItemRenderStrategy = (args: {
 
 const CANVAS_TOOLBAR_TOOL_ICONS = {
   arrow: ArrowIcon,
+  comment: CommentIcon,
   highlight: HighlighterIcon,
   marker: MarkerIcon,
   pan: PanIcon,

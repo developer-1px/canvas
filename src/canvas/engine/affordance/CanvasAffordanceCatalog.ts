@@ -54,6 +54,7 @@ export const CANVAS_AFFORDANCE_CONFIG_DEFAULTS = Object.freeze({
   gestures: Object.freeze({
     altDragDuplicate: true,
     createArrow: true,
+    createComment: true,
     createCustom: true,
     drawHighlight: true,
     drawMarker: true,
@@ -93,6 +94,7 @@ export const CANVAS_AFFORDANCE_CONFIG_DEFAULTS = Object.freeze({
   }),
   shortcuts: Object.freeze({
     arrowTool: true,
+    commentTool: true,
     copy: true,
     bringForward: true,
     bringToFront: true,
@@ -127,6 +129,7 @@ export const CANVAS_AFFORDANCE_CONFIG_DEFAULTS = Object.freeze({
   }),
   tools: Object.freeze({
     arrow: true,
+    comment: true,
     highlight: true,
     marker: true,
     pan: true,

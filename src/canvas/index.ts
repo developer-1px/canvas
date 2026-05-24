@@ -60,6 +60,7 @@ export type {
   CanvasBuiltinTool,
   CanvasComponentItem,
   CanvasComponentKind,
+  CanvasCommentItem,
   CanvasCustomItem,
   CanvasCustomToolId,
   CanvasDrawingItemBase,

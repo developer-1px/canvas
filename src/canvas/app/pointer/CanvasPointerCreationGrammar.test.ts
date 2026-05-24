@@ -10,6 +10,7 @@ describe('CanvasPointerCreationGrammar', () => {
   it('recognizes pointer gestures that belong to creation', () => {
     const creationGestures: CanvasPointerGesture[] = [
       'create-arrow',
+      'create-comment',
       'create-custom',
       'create-rect',
       'create-text',

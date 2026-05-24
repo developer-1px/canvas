@@ -120,6 +120,7 @@
 | `src/canvas/app/pointer/CanvasResizePointerInteractionStart.ts` | Resize handle pointer-down 시 selected bounds, handle, selection, item snapshot을 resize interaction 시작 상태로 변환한다 |
 | `src/canvas/app/pointer/CanvasPointerInteractionPreview.ts` | Pointer-move 시 active interaction을 viewport, live item, marquee, selection, draft overlay, snap guide preview로 변환한다 |
 | `src/canvas/app/pointer/CanvasPointerCreationPreview.ts` | Create-rect, marker, highlighter, arrow, custom creation의 draft overlay와 currentWorld/moved preview를 소유한다 |
+| `src/canvas/app/pointer/CanvasPointerCommentCreation.ts` | Comment tool click을 Canvas Comment Item 생성과 optional clicked-item attachment로 변환한다 |
 | `src/canvas/app/pointer/CanvasPointerInteractionMovement.ts` | Drag threshold 기반 moved 판정을 pointer interaction Module들이 공유한다 |
 | `src/canvas/app/pointer/CanvasPointerInteractionLifecycle.ts` | Pointer-up/cancel 시 active interaction을 문서 변경, selection 변경, edit 진입, cancel rollback으로 확정하거나 되돌린다 |
 | `src/canvas/core` | Host item과 renderer를 모르는 geometry, viewport, id, primitive math 같은 재사용 계약 |
@@ -133,6 +134,8 @@
 | `src/canvas/host/component/CanvasBuiltInComponentTemplates.ts` | Sticky, label, card 같은 기본 Demo component catalogue를 소유한다 |
 | `src/canvas/host/component/CanvasComponentLibrary.ts` | Demo component template, presentation key, component item 생성을 함께 제공한다 |
 | `src/canvas/host/component/CanvasComponentLibraryContracts.ts` | Component library input, component template descriptor shape, stable id/presentation, duplicate template id를 검증한다 |
+| `src/canvas/host/attachment/CanvasItemAttachment.ts` | Comment/stamp 같은 collaboration affordance가 선택 item에 붙는 `attachedTo` 판정을 소유한다 |
+| `src/canvas/host/comment/CanvasCommentItem.ts` | Comment item 생성, 저장 shape 검증, attached target 판정, translate helper를 소유한다 |
 | `src/canvas/host/drawing/CanvasDrawingItemStyles.ts` | Built-in Drawing Item의 stroke/opacity 기본값을 소유하고 draft overlay와 item creation이 공유하게 한다 |
 | `src/canvas/host/document/CanvasDocumentController.ts` | App workflow가 사용하는 Host Document Controller. zod-crud, JSON Patch, selection snapshot, clipboard 구현을 숨긴다 |
 | `src/canvas/host/document/CanvasDocumentChangePatch.ts` | High-level CanvasItemsChange를 Host-owned JSON Patch factory 호출로 변환하는 change-to-patch grammar를 소유한다 |

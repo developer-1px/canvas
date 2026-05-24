@@ -1,6 +1,7 @@
 import type { Bounds } from '../../core'
 import type { CanvasItem } from '../model'
 import { scaleItemBounds } from '../../core'
+import { isCanvasItemAttachedTo } from '../attachment/CanvasItemAttachment'
 import {
   isCanvasDrawingItem,
   scaleCanvasDrawingItem,
@@ -12,11 +13,6 @@ import {
   pruneNestedSelection,
   syncGroupBounds,
 } from '../tree/CanvasTree'
-import {
-  isCanvasStampAttachedTo,
-  isCanvasStampItem,
-  translateCanvasStampItem,
-} from '../stamp/CanvasStampItem'
 import { isCanvasGroupItem } from '../tree/CanvasGroupItem'
 import { mapCanvasItems } from './CanvasItemOperationTree'
 import { isCanvasItemLocked } from './CanvasItemLockOperations'
@@ -70,14 +66,6 @@ function translateCanvasItem(item: CanvasItem, dx: number, dy: number): CanvasIt
     })
   }
 
-  if (isCanvasStampItem(item)) {
-    return translateCanvasStampItem({
-      dx,
-      dy,
-      item,
-    })
-  }
-
   return {
     ...item,
     x: item.x + dx,
@@ -103,7 +91,7 @@ function shouldTranslateCanvasItem(
   movableSelected: ReadonlySet<string>,
 ) {
   return movableSelected.has(item.id) ||
-    isCanvasStampAttachedTo(item, movableSelected)
+    isCanvasItemAttachedTo(item, movableSelected)
 }
 
 function scaleCanvasItem(item: CanvasItem, from: Bounds, to: Bounds): CanvasItem {

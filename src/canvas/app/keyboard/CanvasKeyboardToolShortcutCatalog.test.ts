@@ -33,6 +33,13 @@ describe('CanvasKeyboardToolShortcutCatalog', () => {
         tool: 'text',
       }),
       expect.objectContaining({
+        label: 'comment tool',
+        shiftInsensitive: true,
+        shortcut: { key: 'c' },
+        shortcutId: 'commentTool',
+        tool: 'comment',
+      }),
+      expect.objectContaining({
         label: 'marker tool',
         shortcut: { key: 'm' },
         shortcutId: 'markerTool',

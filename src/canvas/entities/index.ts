@@ -15,6 +15,7 @@ export type {
 export type {
   CanvasComponentItem,
   CanvasComponentKind,
+  CanvasCommentItem,
   CanvasCustomItem,
   CanvasDrawingItemBase,
   CanvasEditableTextItem,

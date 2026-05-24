@@ -1,5 +1,6 @@
 import type {
   Bounds,
+  CanvasCommentItem,
   CanvasComponentItem,
   CanvasCustomItem,
   CanvasImageItem,
@@ -285,6 +286,10 @@ function renderCanvasImageExportItem(item: CanvasItem): string {
     return renderCanvasImageItem(item)
   }
 
+  if (item.type === 'comment') {
+    return renderCanvasCommentExportItem(item)
+  }
+
   if (item.type === 'rect') {
     return [
       `<rect x="${formatNumber(item.x)}" y="${formatNumber(item.y)}" width="${formatNumber(item.w)}" height="${formatNumber(item.h)}" rx="4" fill="${escapeXmlAttribute(item.fill)}" stroke="${escapeXmlAttribute(item.stroke)}" stroke-width="1.25" />`,
@@ -329,6 +334,20 @@ function renderCanvasImageExportItem(item: CanvasItem): string {
 
 function renderCanvasImageItem(item: CanvasImageItem) {
   return `<image data-canvas-id="${escapeXmlAttribute(item.id)}" href="${escapeXmlAttribute(item.src)}" x="${formatNumber(item.x)}" y="${formatNumber(item.y)}" width="${formatNumber(item.w)}" height="${formatNumber(item.h)}" preserveAspectRatio="xMidYMid meet" />`
+}
+
+function renderCanvasCommentExportItem(item: CanvasCommentItem) {
+  const radius = Math.min(10, item.w / 3)
+  const tailStartX = item.x + item.w * 0.38
+  const tailStartY = item.y + item.h
+  const tailEndX = item.x + item.w * 0.22
+  const tailEndY = item.y + item.h + 7
+
+  return [
+    `<rect x="${formatNumber(item.x)}" y="${formatNumber(item.y)}" width="${formatNumber(item.w)}" height="${formatNumber(item.h)}" rx="${formatNumber(radius)}" fill="#ffffff" stroke="#2563eb" stroke-width="1.4" />`,
+    `<path d="M ${formatNumber(tailStartX)} ${formatNumber(tailStartY)} L ${formatNumber(tailEndX)} ${formatNumber(tailEndY)} L ${formatNumber(tailStartX + 7)} ${formatNumber(tailStartY)} Z" fill="#ffffff" stroke="#2563eb" stroke-width="1.4" />`,
+    `<path d="M ${formatNumber(item.x + 10)} ${formatNumber(item.y + 13)} H ${formatNumber(item.x + item.w - 10)} M ${formatNumber(item.x + 10)} ${formatNumber(item.y + 21)} H ${formatNumber(item.x + item.w - 14)}" fill="none" stroke="#2563eb" stroke-width="1.6" stroke-linecap="round" />`,
+  ].join('')
 }
 
 function renderCanvasComponentExportItem(item: CanvasComponentItem) {

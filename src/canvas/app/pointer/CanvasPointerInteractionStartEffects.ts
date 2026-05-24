@@ -43,6 +43,19 @@ export function applyCanvasPointerInteractionStartEffect({
     return true
   }
 
+  if (start.kind === 'created-item') {
+    context.commitItemsChange({ type: 'add', items: [start.item] }, {
+      before: context.selection,
+      after: [start.item.id],
+    })
+
+    if (start.toolAfterCreate) {
+      context.setTool(start.toolAfterCreate)
+    }
+
+    return true
+  }
+
   if (start.clearSelection) {
     context.setSelection([])
   }

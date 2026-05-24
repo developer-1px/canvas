@@ -28,6 +28,7 @@ export type CanvasPointerInteractionStartInput = {
   spaceDown: boolean
   startScreen: Point
   startWorld: Point
+  targetItemId?: string
   tool: Tool
   viewport: Viewport
 }
@@ -42,6 +43,7 @@ export function startCanvasPointerInteraction({
   spaceDown,
   startScreen,
   startWorld,
+  targetItemId,
   tool,
   viewport,
 }: CanvasPointerInteractionStartInput): CanvasPointerInteractionStartResult {
@@ -76,6 +78,7 @@ export function startCanvasPointerInteraction({
     pointerGesture,
     startScreen,
     startWorld,
+    targetItemId,
     tool,
   })
 

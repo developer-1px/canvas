@@ -28,6 +28,16 @@ const stampItem: CanvasItem = {
   y: 30,
 }
 
+const commentItem: CanvasItem = {
+  body: 'Needs follow-up',
+  h: 36,
+  id: 'comment-1',
+  type: 'comment',
+  w: 36,
+  x: 20,
+  y: 30,
+}
+
 describe('CanvasImageExport', () => {
   it('serializes selected image items into a downloadable SVG payload', () => {
     const payload = createCanvasItemsImageExport({
@@ -125,6 +135,17 @@ describe('CanvasImageExport', () => {
     expect(payload.svg).toContain('<text')
     expect(payload.svg).toContain('+1')
     expect(payload.svg).toContain('rx="22"')
+  })
+
+  it('serializes selected comment items in the data-rendered fallback', () => {
+    const payload = createCanvasItemsImageExport({
+      bounds: { h: 36, w: 36, x: 20, y: 30 },
+      items: [commentItem],
+    })
+
+    expect(payload.svg).toContain('<path')
+    expect(payload.svg).toContain('#2563eb')
+    expect(payload.svg).toContain('rx="10"')
   })
 
   it('does not export without a concrete selection', () => {

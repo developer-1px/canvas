@@ -14,6 +14,7 @@ describe('CanvasAffordanceMetadata', () => {
       'pan',
       'rect',
       'text',
+      'comment',
       'marker',
       'highlight',
       'arrow',
@@ -39,6 +40,11 @@ describe('CanvasAffordanceMetadata', () => {
       key: 'm',
       shiftKey: true,
       shortcutId: 'highlighterTool',
+    })
+    expect(CANVAS_TOOL_AFFORDANCES.comment.keyboardShortcut).toEqual({
+      key: 'c',
+      shiftInsensitive: true,
+      shortcutId: 'commentTool',
     })
     expect(CANVAS_TOOL_AFFORDANCES.highlight.shortcut).toBe('Shift+M')
     expect(CANVAS_TOOL_AFFORDANCES.highlight.title).toBe(

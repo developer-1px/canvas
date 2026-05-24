@@ -33,6 +33,15 @@ export function TextIcon() {
   )
 }
 
+export function CommentIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M6 6.5h12a2 2 0 0 1 2 2v6.2a2 2 0 0 1-2 2h-5.5L8 20v-3.3H6a2 2 0 0 1-2-2V8.5a2 2 0 0 1 2-2z" />
+      <path d="M8 10.5h8M8 13.5h5" />
+    </svg>
+  )
+}
+
 export function HighlighterIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">

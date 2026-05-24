@@ -123,7 +123,10 @@ export function useCanvasPointerDownHandlers({
     stageElement,
   }
 
-  function handleCanvasPointerDown(event: CanvasAppPointerInput) {
+  function handleCanvasPointerDown(
+    event: CanvasAppPointerInput,
+    targetItemId?: string,
+  ) {
     const projection = getCanvasPointerStartProjection({
       event,
       stageElement,
@@ -139,6 +142,7 @@ export function useCanvasPointerDownHandlers({
       spaceDown,
       startScreen: projection.startScreen,
       startWorld: projection.startWorld,
+      targetItemId,
       tool,
       viewport,
     })
@@ -160,7 +164,7 @@ export function useCanvasPointerDownHandlers({
 
     if (shouldRouteCanvasItemPointerToCanvasGesture({ spaceDown, tool })) {
       event.stopPropagation()
-      handleCanvasPointerDown(event)
+      handleCanvasPointerDown(event, itemId)
       return
     }
 

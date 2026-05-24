@@ -33,6 +33,13 @@ export type CanvasImageItem = CanvasItemBase & {
   src: string
 }
 
+export type CanvasCommentItem = CanvasItemBase & {
+  type: 'comment'
+  attachedTo?: CanvasItemId
+  body: string
+  resolved?: boolean
+}
+
 export type CanvasStampKind = string
 
 export type CanvasStampItem = CanvasItemBase & {
@@ -106,6 +113,7 @@ export type CanvasItem =
   | RectItem
   | TextItem
   | CanvasImageItem
+  | CanvasCommentItem
   | CanvasStampItem
   | MarkerItem
   | HighlightItem
