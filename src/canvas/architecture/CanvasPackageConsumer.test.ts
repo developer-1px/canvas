@@ -180,6 +180,7 @@ describe('Canvas package consumer imports', () => {
       componentPresentationRenderers: {},
       customItemRenderers: {},
       getComponentPresentation: () => 'note-card',
+      onArrowEndpointPointerDown: () => undefined,
       items: assembly.initialItems,
       onItemPointerDown: () => undefined,
       onTextDoubleClick: () => undefined,

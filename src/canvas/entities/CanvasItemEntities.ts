@@ -72,6 +72,8 @@ export type ArrowItem = CanvasItemBase & {
   strokeWidth: number
 }
 
+export type CanvasArrowEndpoint = 'end' | 'start'
+
 export type GroupItem = CanvasItemBase & {
   type: 'group'
   children: CanvasItem[]

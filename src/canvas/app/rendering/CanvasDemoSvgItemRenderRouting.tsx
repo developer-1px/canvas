@@ -1,6 +1,10 @@
-import type { ReactNode } from 'react'
+import type {
+  PointerEvent,
+  ReactNode,
+} from 'react'
 import type {
   Bounds,
+  CanvasArrowEndpoint,
   CanvasCommentItem,
   CanvasComponentItem,
   CanvasCustomItem,
@@ -24,7 +28,10 @@ import { renderCanvasDemoSvgCommentItem } from './CanvasDemoSvgCommentItemRender
 import type { CanvasDemoSvgCustomItemRenderers } from './CanvasDemoSvgCustomItemRendererRegistry'
 import { renderCanvasDemoSvgCustomItem } from './CanvasDemoSvgCustomItemRendererExecution'
 import { renderCanvasDemoSvgStampItem } from './CanvasDemoSvgStampItemRenderer'
-import { isCanvasEditableTextItem } from '../../host'
+import {
+  isCanvasArrowDrawingItem,
+  isCanvasEditableTextItem,
+} from '../../host'
 
 export type CanvasDemoSvgItemRenderRouteInput = {
   bounds: Bounds
@@ -33,8 +40,14 @@ export type CanvasDemoSvgItemRenderRouteInput = {
   getComponentPresentation: (component: string) => string
   item: CanvasItem
   locked: boolean
+  onArrowEndpointPointerDown: (
+    event: PointerEvent<SVGCircleElement>,
+    itemId: string,
+    endpoint: CanvasArrowEndpoint,
+  ) => void
   onTextDoubleClick: (item: CanvasEditableTextItem) => void
   renderChild: (item: CanvasItem, locked: boolean) => ReactNode
+  selected: boolean
 }
 
 export type CanvasDemoSvgItemRenderRoute = {
@@ -158,12 +171,58 @@ function renderCanvasDemoSvgCustomItemRoute({
 
 function renderCanvasDemoSvgDrawingItemRoute({
   item,
+  onArrowEndpointPointerDown,
+  selected,
 }: CanvasDemoSvgItemRenderRouteInput & {
   item: CanvasDemoSvgDrawingItem
 }): CanvasDemoSvgItemRenderRoute {
   return {
-    children: renderCanvasDemoSvgDrawingItem({ item }),
+    children: (
+      <>
+        {renderCanvasDemoSvgDrawingItem({ item })}
+        {selected && isCanvasArrowDrawingItem(item) ? (
+          renderCanvasDemoSvgArrowEndpointHandles({
+            item,
+            onArrowEndpointPointerDown,
+          })
+        ) : null}
+      </>
+    ),
   }
+}
+
+function renderCanvasDemoSvgArrowEndpointHandles({
+  item,
+  onArrowEndpointPointerDown,
+}: {
+  item: Extract<CanvasItem, { type: 'arrow' }>
+  onArrowEndpointPointerDown: (
+    event: PointerEvent<SVGCircleElement>,
+    itemId: string,
+    endpoint: CanvasArrowEndpoint,
+  ) => void
+}) {
+  return (
+    <g className="arrow-endpoint-handles">
+      {(['start', 'end'] satisfies CanvasArrowEndpoint[]).map((endpoint) => {
+        const point = item[endpoint]
+
+        return (
+          <circle
+            key={endpoint}
+            className="arrow-endpoint-handle"
+            data-endpoint={endpoint}
+            cx={point.x}
+            cy={point.y}
+            r="6"
+            vectorEffect="non-scaling-stroke"
+            onPointerDown={(event) =>
+              onArrowEndpointPointerDown(event, item.id, endpoint)}
+          />
+        )
+      })}
+    </g>
+  )
 }
 
 function renderCanvasDemoSvgImageItemRoute({

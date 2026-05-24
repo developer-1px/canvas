@@ -1,4 +1,6 @@
 import type {
+  CanvasArrowEndpoint,
+  ArrowItem,
   CanvasItem,
   Point,
   Viewport,
@@ -14,7 +16,15 @@ import {
   type CanvasSnapGuides,
   type CanvasTransformAdapter,
 } from '../../engine'
+import {
+  isCanvasArrowDrawingItem,
+  syncCanvasDrawingItemBounds,
+} from '../../host'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
+import {
+  findCanvasSceneTargetAtPoint,
+  resolveCanvasArrowEndpoints,
+} from './CanvasPointerArrowAnchors'
 import { hasCanvasInteractionMoved } from './CanvasPointerInteractionMovement'
 import type { CanvasPointerTransformInteraction } from './CanvasPointerTransformInteraction'
 
@@ -48,6 +58,45 @@ export function previewCanvasPointerTransform({
   transformAdapter,
   viewport,
 }: CanvasPointerTransformPreviewInput): CanvasPointerTransformPreviewResult {
+  if (interaction.kind === 'arrow-endpoint') {
+    if (!config.gestures.resize) {
+      return { kind: 'none' }
+    }
+
+    const moved = hasCanvasInteractionMoved({
+      currentScreen,
+      interaction,
+    })
+
+    if (!moved) {
+      return { kind: 'none' }
+    }
+
+    const snappedCurrentWorld = snapCanvasPointToGrid({
+      config,
+      point: currentWorld,
+    })
+    const nextItems = updateCanvasArrowEndpointItems({
+      arrowId: interaction.arrowId,
+      endpoint: interaction.endpoint,
+      items: interaction.startItems,
+      point: snappedCurrentWorld,
+      scene,
+    })
+
+    return {
+      interaction: {
+        ...interaction,
+        currentItems: nextItems,
+        currentWorld: snappedCurrentWorld,
+        moved: true,
+      },
+      kind: 'preview',
+      liveItems: nextItems,
+      snapGuides: EMPTY_CANVAS_SNAP_GUIDES,
+    }
+  }
+
   if (interaction.kind === 'move') {
     if (!config.gestures.move) {
       return { kind: 'none' }
@@ -140,4 +189,70 @@ export function previewCanvasPointerTransform({
     liveItems: nextItems,
     snapGuides: EMPTY_CANVAS_SNAP_GUIDES,
   }
+}
+
+function updateCanvasArrowEndpointItems({
+  arrowId,
+  endpoint,
+  items,
+  point,
+  scene,
+}: {
+  arrowId: string
+  endpoint: CanvasArrowEndpoint
+  items: CanvasItem[]
+  point: Point
+  scene: CanvasSceneAdapter
+}) {
+  return items.map((item) =>
+    item.id === arrowId && isCanvasArrowDrawingItem(item)
+      ? updateCanvasArrowEndpoint({
+          endpoint,
+          item,
+          point,
+          scene,
+        })
+      : item,
+  )
+}
+
+function updateCanvasArrowEndpoint({
+  endpoint,
+  item,
+  point,
+  scene,
+}: {
+  endpoint: CanvasArrowEndpoint
+  item: ArrowItem
+  point: Point
+  scene: CanvasSceneAdapter
+}) {
+  const otherAttachedTo = endpoint === 'start'
+    ? item.endAttachedTo
+    : item.startAttachedTo
+  const attachedTo = findCanvasSceneTargetAtPoint({
+    excludeIds: [
+      item.id,
+      ...(otherAttachedTo ? [otherAttachedTo] : []),
+    ],
+    point,
+    scene,
+  })
+  const resolved = resolveCanvasArrowEndpoints({
+    end: endpoint === 'end' ? point : item.end,
+    endAttachedTo: endpoint === 'end' ? attachedTo : item.endAttachedTo,
+    scene,
+    start: endpoint === 'start' ? point : item.start,
+    startAttachedTo: endpoint === 'start'
+      ? attachedTo
+      : item.startAttachedTo,
+  })
+
+  return syncCanvasDrawingItemBounds({
+    ...item,
+    end: resolved.end,
+    endAttachedTo: resolved.endAttachedTo,
+    start: resolved.start,
+    startAttachedTo: resolved.startAttachedTo,
+  })
 }

@@ -9,6 +9,8 @@ export function getCanvasAppPointerConsumerModel({
 }: CanvasAppPointerConsumerModelInput): CanvasAppPointerConsumerModel {
   return {
     itemLayerHandlers: {
+      onArrowEndpointPointerDown:
+        downHandlers.handleArrowEndpointPointerDown,
       onItemPointerDown: downHandlers.handleItemPointerDown,
       onTextDoubleClick: downHandlers.handleTextDoubleClick,
     },

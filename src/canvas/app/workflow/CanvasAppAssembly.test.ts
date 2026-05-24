@@ -698,6 +698,7 @@ function createItemLayerInput(
     customItemRenderers: {},
     getComponentPresentation: () => 'note-card',
     items: [],
+    onArrowEndpointPointerDown: () => undefined,
     onItemPointerDown: () => undefined,
     onTextDoubleClick: () => undefined,
     outlineIds: new Set(),

@@ -177,6 +177,7 @@ function renderItemLayer(
         items={items}
         outlineIds={new Set()}
         selected={new Set()}
+        onArrowEndpointPointerDown={() => undefined}
         onItemPointerDown={() => undefined}
         onTextDoubleClick={() => undefined}
         {...options}

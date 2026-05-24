@@ -119,6 +119,14 @@
   fill: #334155;
 }
 
+.arrow-endpoint-handle {
+  fill: #ffffff;
+  stroke: #2563eb;
+  stroke-width: 1.75;
+  cursor: crosshair;
+  pointer-events: all;
+}
+
 .draft-arrow-head {
   fill: #2563eb;
 }

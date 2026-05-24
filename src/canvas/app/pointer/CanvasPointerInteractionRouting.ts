@@ -24,6 +24,14 @@ export function routeCanvasPointerInteraction<TResult>(
     return resolveCanvasPointerInteractionRoute(route.pan, interaction, route)
   }
 
+  if (interaction.kind === 'arrow-endpoint') {
+    return resolveCanvasPointerInteractionRoute(
+      route.transform,
+      interaction,
+      route,
+    )
+  }
+
   if (interaction.kind === 'move' || interaction.kind === 'resize') {
     return resolveCanvasPointerInteractionRoute(
       route.transform,

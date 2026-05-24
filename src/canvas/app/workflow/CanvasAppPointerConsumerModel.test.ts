@@ -14,11 +14,17 @@ describe('CanvasAppPointerConsumerModel', () => {
     const item = createRectItem()
 
     model.itemLayerHandlers.onItemPointerDown(event, 'item-1')
+    model.itemLayerHandlers.onArrowEndpointPointerDown(event, 'arrow-1', 'end')
     model.itemLayerHandlers.onTextDoubleClick(item)
 
     expect(downHandlers.handleItemPointerDown).toHaveBeenCalledWith(
       event,
       'item-1',
+    )
+    expect(downHandlers.handleArrowEndpointPointerDown).toHaveBeenCalledWith(
+      event,
+      'arrow-1',
+      'end',
     )
     expect(downHandlers.handleTextDoubleClick).toHaveBeenCalledWith(item)
     expect(model.itemLayerHandlers).not.toHaveProperty('onPointerMove')
@@ -53,6 +59,7 @@ describe('CanvasAppPointerConsumerModel', () => {
 
 function createDownHandlers() {
   return {
+    handleArrowEndpointPointerDown: vi.fn(),
     handleCanvasPointerDown: vi.fn(),
     handleItemPointerDown: vi.fn(),
     handleResizePointerDown: vi.fn(),

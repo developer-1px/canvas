@@ -5,6 +5,7 @@ import { CANVAS_ITEM_TRANSFORM_ADAPTER } from './adapters/CanvasItemTransformAda
 export type {
   CanvasComponentItem,
   CanvasComponentKind,
+  CanvasArrowEndpoint,
   CanvasCommentItem,
   CanvasCustomItem,
   CanvasDrawingItemBase,

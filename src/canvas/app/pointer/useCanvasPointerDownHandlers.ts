@@ -6,6 +6,7 @@ import type {
 import { useRef } from 'react'
 import type {
   Bounds,
+  CanvasArrowEndpoint,
   CanvasEditableTextItem,
   CanvasItem,
   EditingText,
@@ -40,6 +41,9 @@ import {
   startCanvasTextEditInteraction,
 } from './CanvasItemPointerInteractionStart'
 import { startCanvasResizePointerInteraction } from './CanvasResizePointerInteractionStart'
+import {
+  startCanvasArrowEndpointPointerInteraction,
+} from './CanvasArrowEndpointPointerInteractionStart'
 import {
   recordCanvasItemPointerClick,
   type CanvasPointerClickMemory,
@@ -236,6 +240,33 @@ export function useCanvasPointerDownHandlers({
     })
   }
 
+  function handleArrowEndpointPointerDown(
+    event: CanvasAppPointerInput,
+    arrowId: string,
+    endpoint: CanvasArrowEndpoint,
+  ) {
+    const projection = getCanvasPointerStartProjection({
+      event,
+      stageElement,
+      viewport,
+    })
+    const start = startCanvasArrowEndpointPointerInteraction({
+      arrowId,
+      config,
+      endpoint,
+      input: event,
+      items,
+      startScreen: projection.startScreen,
+      startWorld: projection.startWorld,
+    })
+
+    applyCanvasResizePointerInteractionStartEffect({
+      context: startEffectContext,
+      event,
+      start,
+    })
+  }
+
   function handleTextDoubleClick(item: CanvasEditableTextItem) {
     const start = startCanvasTextEditInteraction({ config, item })
 
@@ -246,6 +277,7 @@ export function useCanvasPointerDownHandlers({
   }
 
   return {
+    handleArrowEndpointPointerDown,
     handleCanvasPointerDown,
     handleItemPointerDown,
     handleResizePointerDown,

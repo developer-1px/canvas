@@ -64,6 +64,33 @@ describe('CanvasPointerTransformInteraction', () => {
     )
   })
 
+  it('commits arrow endpoint edits with the arrow id as selection history', () => {
+    const beforeItem = createRectItem('arrow-1')
+    const afterItem = createRectItem('arrow-1', { x: 40 })
+    const commitItemsChange = vi.fn<CommitCanvasItemsChange>(() => true)
+
+    commitCanvasPointerTransformInteraction({
+      commitItemsChange,
+      commitSelection: () => true,
+      interaction: createArrowEndpointInteraction({
+        currentItems: [afterItem],
+        historyItems: [beforeItem],
+      }),
+      setEditing: () => undefined,
+      setTool: () => undefined,
+    })
+
+    expect(commitItemsChange).toHaveBeenCalledWith(
+      {
+        afterItems: [afterItem],
+        beforeItems: [beforeItem],
+        type: 'transform',
+      },
+      { after: ['arrow-1'], before: ['arrow-1'] },
+    )
+  })
+
+
   it('enters text editing after a non-moved move click', () => {
     const commitSelection = vi.fn<CommitCanvasSelection>(() => true)
     const edit: EditingText = { id: 'rect-1', value: 'Title' }
@@ -139,6 +166,29 @@ function createResizeInteraction(
     startItems: [item],
     startScreen: { x: 0, y: 0 },
     startWorld: { x: 80, y: 60 },
+    ...overrides,
+  }
+}
+
+function createArrowEndpointInteraction(
+  overrides: Partial<
+    Extract<CanvasPointerTransformInteraction, { kind: 'arrow-endpoint' }>
+  > = {},
+): Extract<CanvasPointerTransformInteraction, { kind: 'arrow-endpoint' }> {
+  const item = createRectItem('arrow-1')
+
+  return {
+    arrowId: 'arrow-1',
+    currentItems: [item],
+    currentWorld: { x: 0, y: 0 },
+    endpoint: 'end',
+    historyItems: [item],
+    kind: 'arrow-endpoint',
+    moved: true,
+    pointerId: 1,
+    startItems: [item],
+    startScreen: { x: 0, y: 0 },
+    startWorld: { x: 0, y: 0 },
     ...overrides,
   }
 }

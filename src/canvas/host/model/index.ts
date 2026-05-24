@@ -1,6 +1,7 @@
 export type {
   CanvasComponentItem,
   CanvasComponentKind,
+  CanvasArrowEndpoint,
   CanvasCommentItem,
   CanvasCustomItem,
   CanvasDrawingItemBase,

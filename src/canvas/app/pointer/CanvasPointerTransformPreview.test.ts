@@ -11,6 +11,7 @@ import {
 } from './CanvasPointerTransformPreview'
 
 const rectItem = createRectItem('rect-1')
+const arrowItem = createArrowItem('arrow-1')
 
 describe('CanvasPointerTransformPreview', () => {
   it('updates live items for move previews after the drag threshold', () => {
@@ -69,6 +70,61 @@ describe('CanvasPointerTransformPreview', () => {
       },
       kind: 'preview',
       liveItems: [createRectItem('rect-1', { h: 90, w: 100 })],
+    })
+  })
+
+  it('updates arrow endpoint handles and reanchors connected targets', () => {
+    expect(previewCanvasPointerTransform(createInput({
+      currentScreen: { x: 230, y: 50 },
+      currentWorld: { x: 230, y: 50 },
+      interaction: {
+        arrowId: 'arrow-1',
+        currentItems: [arrowItem, createRectItem('rect-1', {
+          h: 80,
+          w: 120,
+          x: 220,
+          y: 20,
+        })],
+        currentWorld: { x: 100, y: 50 },
+        endpoint: 'end',
+        historyItems: [arrowItem],
+        kind: 'arrow-endpoint',
+        moved: false,
+        pointerId: 1,
+        startItems: [arrowItem, createRectItem('rect-1', {
+          h: 80,
+          w: 120,
+          x: 220,
+          y: 20,
+        })],
+        startScreen: { x: 0, y: 0 },
+        startWorld: { x: 100, y: 50 },
+      },
+      scene: createCanvasSceneAdapter([
+        {
+          bounds: { h: 80, w: 120, x: 220, y: 20 },
+          id: 'rect-1',
+          isGroup: false,
+          parentId: null,
+          path: [1],
+        },
+      ]),
+    }))).toMatchObject({
+      interaction: {
+        currentItems: [
+          {
+            end: { x: 220, y: 56.666666666666664 },
+            endAttachedTo: 'rect-1',
+            id: 'arrow-1',
+            start: { x: 100, y: 50 },
+            type: 'arrow',
+          },
+          expect.objectContaining({ id: 'rect-1' }),
+        ],
+        kind: 'arrow-endpoint',
+        moved: true,
+      },
+      kind: 'preview',
     })
   })
 })
@@ -161,6 +217,25 @@ function createRectItem(
     w: 80,
     x: 0,
     y: 0,
+    ...overrides,
+  }
+}
+
+function createArrowItem(
+  id: string,
+  overrides: Partial<Extract<CanvasItem, { type: 'arrow' }>> = {},
+): Extract<CanvasItem, { type: 'arrow' }> {
+  return {
+    end: { x: 180, y: 50 },
+    h: 24,
+    id,
+    start: { x: 100, y: 50 },
+    stroke: '#334155',
+    strokeWidth: 3,
+    type: 'arrow',
+    w: 104,
+    x: 88,
+    y: 38,
     ...overrides,
   }
 }

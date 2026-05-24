@@ -1,5 +1,6 @@
 import type { PointerEvent } from 'react'
 import type {
+  CanvasArrowEndpoint,
   CanvasEditableTextItem,
   CanvasItem,
 } from '../../entities'
@@ -24,6 +25,11 @@ type CanvasDemoSvgItemLayerProps = {
     event: PointerEvent<SVGGElement>,
     itemId: string,
   ) => void
+  onArrowEndpointPointerDown: (
+    event: PointerEvent<SVGCircleElement>,
+    itemId: string,
+    endpoint: CanvasArrowEndpoint,
+  ) => void
   onTextDoubleClick: (item: CanvasEditableTextItem) => void
 }
 
@@ -33,6 +39,7 @@ export function CanvasDemoSvgItemLayer({
   customItemRenderers = DEFAULT_CANVAS_DEMO_SVG_CUSTOM_ITEM_RENDERERS,
   getComponentPresentation,
   items,
+  onArrowEndpointPointerDown,
   onItemPointerDown,
   onTextDoubleClick,
   outlineIds,
@@ -47,6 +54,7 @@ export function CanvasDemoSvgItemLayer({
           getComponentPresentation,
           item,
           locked: false,
+          onArrowEndpointPointerDown,
           onItemPointerDown,
           onTextDoubleClick,
           outlineIds,

@@ -189,11 +189,35 @@ describe('CanvasDemoSvgItemRenderer', () => {
     expect(markup).toContain('class="comment-item"')
     expect(markup).toContain('class="comment-hit"')
   })
+
+  it('renders selected arrow endpoint handles', () => {
+    const markup = renderItem({
+      end: { x: 240, y: 140 },
+      h: 44,
+      id: 'arrow-1',
+      start: { x: 100, y: 120 },
+      stroke: '#334155',
+      strokeWidth: 3,
+      type: 'arrow',
+      w: 164,
+      x: 88,
+      y: 108,
+    }, undefined, {
+      selected: new Set(['arrow-1']),
+    })
+
+    expect(markup).toContain('class="arrow-endpoint-handle"')
+    expect(markup).toContain('data-endpoint="start"')
+    expect(markup).toContain('data-endpoint="end"')
+  })
 })
 
 function renderItem(
   item: CanvasItem,
   getComponentPresentation = (component: string) => component,
+  options: {
+    selected?: Set<string>
+  } = {},
 ) {
   return renderToStaticMarkup(
     <svg>
@@ -204,10 +228,11 @@ function renderItem(
         getComponentPresentation,
         item,
         locked: false,
+        onArrowEndpointPointerDown: () => undefined,
         onItemPointerDown: () => undefined,
         onTextDoubleClick: () => undefined,
         outlineIds: new Set(),
-        selected: new Set(),
+        selected: options.selected ?? new Set(),
       })}
     </svg>,
   )

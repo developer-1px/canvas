@@ -8,6 +8,8 @@ describe('CanvasPointerInteractionRouting', () => {
     expect(route(createPanInteraction())).toBe('pan:pan')
     expect(route(createMoveInteraction())).toBe('transform:move')
     expect(route(createResizeInteraction())).toBe('transform:resize')
+    expect(route(createArrowEndpointInteraction()))
+      .toBe('transform:arrow-endpoint')
     expect(route(createMarqueeInteraction())).toBe('marquee:marquee')
     expect(route(createRectCreationInteraction())).toBe('creation:create-rect')
     expect(route({ kind: 'none' })).toBe('none:none')
@@ -71,6 +73,24 @@ function createResizeInteraction(): Interaction {
     historyItems: [item],
     ids: ['rect-1'],
     kind: 'resize',
+    moved: false,
+    pointerId: 1,
+    startItems: [item],
+    startScreen: { x: 0, y: 0 },
+    startWorld: { x: 0, y: 0 },
+  }
+}
+
+function createArrowEndpointInteraction(): Interaction {
+  const item = createRectItem()
+
+  return {
+    arrowId: 'arrow-1',
+    currentItems: [item],
+    currentWorld: { x: 0, y: 0 },
+    endpoint: 'end',
+    historyItems: [item],
+    kind: 'arrow-endpoint',
     moved: false,
     pointerId: 1,
     startItems: [item],

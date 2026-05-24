@@ -6,6 +6,7 @@ import type { CanvasOverlayState } from '../../engine'
 import type {
   CanvasComponentItem,
   CanvasCustomItem,
+  CanvasArrowEndpoint,
   CanvasInteractionKind,
   CanvasEditableTextItem,
   CanvasItem,
@@ -68,6 +69,11 @@ export type CanvasAppItemLayerRenderInput = {
   outlineIds: Set<string>
   selected: Set<string>
   onItemPointerDown: (event: CanvasAppPointerInput, itemId: string) => void
+  onArrowEndpointPointerDown: (
+    event: CanvasAppPointerInput,
+    itemId: string,
+    endpoint: CanvasArrowEndpoint,
+  ) => void
   onTextDoubleClick: (item: CanvasEditableTextItem) => void
 }
 

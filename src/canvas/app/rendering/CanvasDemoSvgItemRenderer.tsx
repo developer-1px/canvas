@@ -1,7 +1,8 @@
 import type { PointerEvent } from 'react'
-import {
-  type CanvasEditableTextItem,
-  type CanvasItem,
+import type {
+  CanvasArrowEndpoint,
+  CanvasEditableTextItem,
+  CanvasItem,
 } from '../../entities'
 import {
   getCanvasItemBounds,
@@ -21,6 +22,11 @@ export type CanvasDemoSvgItemRenderArgs = {
     event: PointerEvent<SVGGElement>,
     itemId: string,
   ) => void
+  onArrowEndpointPointerDown: (
+    event: PointerEvent<SVGCircleElement>,
+    itemId: string,
+    endpoint: CanvasArrowEndpoint,
+  ) => void
   onTextDoubleClick: (item: CanvasEditableTextItem) => void
   outlineIds: Set<string>
   selected: Set<string>
@@ -32,6 +38,7 @@ export function renderCanvasDemoSvgItem({
   getComponentPresentation,
   item,
   locked,
+  onArrowEndpointPointerDown,
   onItemPointerDown,
   onTextDoubleClick,
   outlineIds,
@@ -48,7 +55,9 @@ export function renderCanvasDemoSvgItem({
     getComponentPresentation,
     item,
     locked: isLocked,
+    onArrowEndpointPointerDown,
     onTextDoubleClick,
+    selected: isSelected,
     renderChild: (child, childLocked) =>
       renderCanvasDemoSvgItem({
         componentPresentationRenderers,
@@ -56,6 +65,7 @@ export function renderCanvasDemoSvgItem({
         getComponentPresentation,
         item: child,
         locked: childLocked,
+        onArrowEndpointPointerDown,
         onItemPointerDown,
         onTextDoubleClick,
         outlineIds,

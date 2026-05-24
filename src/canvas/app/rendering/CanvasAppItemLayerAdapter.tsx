@@ -23,6 +23,12 @@ export const DEFAULT_CANVAS_APP_ITEM_LAYER_ADAPTER: CanvasAppItemLayerAdapter =
     renderItems: (input) =>
       createElement(CanvasDemoSvgItemLayer, {
         ...input,
+        onArrowEndpointPointerDown: (event, itemId, endpoint) =>
+          input.onArrowEndpointPointerDown(
+            createCanvasAppPointerInput(event),
+            itemId,
+            endpoint,
+          ),
         onItemPointerDown: (event, itemId) =>
           input.onItemPointerDown(createCanvasAppPointerInput(event), itemId),
       }),

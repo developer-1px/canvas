@@ -19,6 +19,7 @@ import type {
 } from '../../engine'
 import type {
   Bounds,
+  CanvasArrowEndpoint,
   CanvasComponentKind,
   CanvasEditableTextItem,
   CanvasInteractionKind,
@@ -425,6 +426,11 @@ export type CanvasInteractionConsumerModel = {
 }
 
 export type CanvasAppPointerItemLayerHandlers = {
+  onArrowEndpointPointerDown: (
+    event: CanvasAppPointerInput,
+    itemId: string,
+    endpoint: CanvasArrowEndpoint,
+  ) => void
   onItemPointerDown: (
     event: CanvasAppPointerInput,
     itemId: string,
@@ -449,6 +455,11 @@ export type CanvasAppPointerConsumerModel = {
 }
 
 export type CanvasAppPointerDownRuntime = {
+  handleArrowEndpointPointerDown: (
+    event: CanvasAppPointerInput,
+    itemId: string,
+    endpoint: CanvasArrowEndpoint,
+  ) => void
   handleCanvasPointerDown: (event: CanvasAppPointerInput) => void
   handleItemPointerDown: (
     event: CanvasAppPointerInput,

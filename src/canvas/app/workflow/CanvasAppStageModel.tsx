@@ -27,6 +27,14 @@ export function renderCanvasAppStageModel({
       items: itemLayer.items,
       outlineIds: stage.overlays.itemOutlineIds,
       selected: itemLayer.selected,
+      onArrowEndpointPointerDown: (event, itemId, endpoint) => {
+        blurTextEditor()
+        pointer.itemLayerHandlers.onArrowEndpointPointerDown(
+          event,
+          itemId,
+          endpoint,
+        )
+      },
       onTextDoubleClick: pointer.itemLayerHandlers.onTextDoubleClick,
       onItemPointerDown: (event, itemId) => {
         blurTextEditor()

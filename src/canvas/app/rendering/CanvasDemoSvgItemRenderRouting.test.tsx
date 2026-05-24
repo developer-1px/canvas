@@ -37,8 +37,10 @@ function createInput(item: CanvasComponentItem) {
     getComponentPresentation: (component: string) => component,
     item,
     locked: false,
+    onArrowEndpointPointerDown: () => undefined,
     onTextDoubleClick: () => undefined,
     renderChild: () => null,
+    selected: false,
   }
 }
 

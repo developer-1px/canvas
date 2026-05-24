@@ -51,6 +51,8 @@ describe('CanvasAppStageModel', () => {
       pointer: {
         itemLayerHandlers: {
           ...pointer.itemLayerHandlers,
+          onArrowEndpointPointerDown: (_event, itemId, endpoint) =>
+            calls.push(`arrow:${itemId}:${endpoint}`),
           onItemPointerDown: (_event, itemId) =>
             calls.push(`item:${itemId}`),
         },
@@ -82,8 +84,20 @@ describe('CanvasAppStageModel', () => {
       createPointerInput(),
       'rect-1',
     )
+    expectItemLayerInput(itemLayerInput).onArrowEndpointPointerDown(
+      createPointerInput(),
+      'arrow-1',
+      'end',
+    )
 
-    expect(calls).toEqual(['blur', 'canvas', 'blur', 'item:rect-1'])
+    expect(calls).toEqual([
+      'blur',
+      'canvas',
+      'blur',
+      'item:rect-1',
+      'blur',
+      'arrow:arrow-1:end',
+    ])
   })
 
   it('contains item layer adapter failures without dropping the stage', () => {
@@ -148,6 +162,7 @@ function createItemLayerModel(): CanvasAppStageModelInput['itemLayer'] {
 function createPointerModel(): CanvasAppStageModelInput['pointer'] {
   return {
     itemLayerHandlers: {
+      onArrowEndpointPointerDown: vi.fn(),
       onItemPointerDown: vi.fn(),
       onTextDoubleClick: vi.fn(),
     },

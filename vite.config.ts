@@ -1,5 +1,10 @@
+import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+
+const zodCrudEntry = fileURLToPath(
+  new URL('../zod-crud/packages/zod-crud/dist/index.js', import.meta.url),
+)
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -18,6 +23,9 @@ export default defineConfig({
   },
   plugins: [react()],
   resolve: {
+    alias: {
+      'zod-crud': zodCrudEntry,
+    },
     dedupe: ['react', 'react-dom', 'zod'],
   },
   server: {

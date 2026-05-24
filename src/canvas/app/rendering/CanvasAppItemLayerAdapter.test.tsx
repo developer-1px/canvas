@@ -9,11 +9,13 @@ import { DEFAULT_CANVAS_APP_ITEM_LAYER_ADAPTER } from './CanvasAppItemLayerAdapt
 describe('CanvasAppItemLayerAdapter', () => {
   it('maps SVG item pointer events into the app pointer interface', () => {
     const onItemPointerDown = vi.fn()
+    const onArrowEndpointPointerDown = vi.fn()
     const rendered = DEFAULT_CANVAS_APP_ITEM_LAYER_ADAPTER.renderItems({
       componentPresentationRenderers: {},
       customItemRenderers: {},
       getComponentPresentation: () => 'note-card',
       items: [],
+      onArrowEndpointPointerDown,
       onItemPointerDown,
       onTextDoubleClick: () => undefined,
       outlineIds: new Set(),
@@ -32,6 +34,21 @@ describe('CanvasAppItemLayerAdapter', () => {
       }),
       'rect-1',
     )
+
+    element.props.onArrowEndpointPointerDown(
+      createPointerEventSource(),
+      'arrow-1',
+      'end',
+    )
+
+    expect(onArrowEndpointPointerDown).toHaveBeenCalledWith(
+      expect.objectContaining({
+        clientX: 12,
+        clientY: 34,
+      }),
+      'arrow-1',
+      'end',
+    )
   })
 })
 
@@ -41,6 +58,11 @@ function assertElement(rendered: ReactNode) {
   }
 
   return rendered as ReactElement<{
+    onArrowEndpointPointerDown: (
+      event: ReturnType<typeof createPointerEventSource>,
+      itemId: string,
+      endpoint: 'end',
+    ) => void
     onItemPointerDown: (
       event: ReturnType<typeof createPointerEventSource>,
       itemId: string,

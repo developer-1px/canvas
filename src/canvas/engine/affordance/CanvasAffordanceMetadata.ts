@@ -234,6 +234,7 @@ export const CANVAS_GESTURE_STATUS_LABELS: Partial<
   'create-rect': 'Drawing',
   'draw-highlight': 'Highlighting',
   'draw-marker': 'Drawing',
+  'arrow-endpoint': 'Connecting',
   marquee: 'Selecting',
   move: 'Moving',
   pan: 'Panning',

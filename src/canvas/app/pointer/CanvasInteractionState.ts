@@ -1,6 +1,7 @@
 import type {
   Bounds,
   CanvasCustomToolId,
+  CanvasArrowEndpoint,
   CanvasItem,
   EditingText,
   Point,
@@ -83,6 +84,19 @@ export type Interaction =
       startWorld: Point
       currentWorld: Point
       tool: CanvasCustomToolId
+      moved: boolean
+    }
+  | {
+      kind: 'arrow-endpoint'
+      pointerId: number
+      arrowId: string
+      endpoint: CanvasArrowEndpoint
+      startScreen: Point
+      startWorld: Point
+      currentWorld: Point
+      startItems: CanvasItem[]
+      currentItems: CanvasItem[]
+      historyItems: CanvasItem[]
       moved: boolean
     }
   | {

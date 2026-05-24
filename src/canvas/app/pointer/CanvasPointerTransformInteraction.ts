@@ -11,7 +11,7 @@ import type { Interaction } from './CanvasInteractionState'
 
 export type CanvasPointerTransformInteraction = Extract<
   Interaction,
-  { kind: 'move' } | { kind: 'resize' }
+  { kind: 'arrow-endpoint' } | { kind: 'move' } | { kind: 'resize' }
 >
 
 export function commitCanvasPointerTransformInteraction({
@@ -35,7 +35,7 @@ export function commitCanvasPointerTransformInteraction({
     },
     {
       before: getCanvasPointerTransformHistorySelection(interaction),
-      after: interaction.ids,
+      after: getCanvasPointerTransformSelection(interaction),
     },
   )
 
@@ -61,5 +61,13 @@ function getCanvasPointerTransformHistorySelection(
 ) {
   return interaction.kind === 'move'
     ? interaction.historySelection
+    : getCanvasPointerTransformSelection(interaction)
+}
+
+function getCanvasPointerTransformSelection(
+  interaction: CanvasPointerTransformInteraction,
+) {
+  return interaction.kind === 'arrow-endpoint'
+    ? [interaction.arrowId]
     : interaction.ids
 }

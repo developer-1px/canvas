@@ -26,6 +26,10 @@ import type { Interaction } from './CanvasInteractionState'
 import type {
   CanvasPointerShapeCreationKind,
 } from './CanvasPointerCreationGrammar'
+import {
+  findCanvasSceneTargetAtPoint,
+  resolveCanvasArrowEndpoints,
+} from './CanvasPointerArrowAnchors'
 import { hasCanvasInteractionMoved } from './CanvasPointerInteractionMovement'
 
 export type CanvasPointerShapeCreationInteraction = Extract<
@@ -296,26 +300,6 @@ function attachCanvasPointerShapeCreationEnd({
   return resolveCanvasPointerShapeCreationArrowAnchors({ interaction, scene })
 }
 
-function findCanvasSceneTargetAtPoint({
-  excludeId,
-  point,
-  scene,
-}: {
-  excludeId?: string
-  point: Point
-  scene: CanvasSceneAdapter
-}) {
-  return [...scene.entries]
-    .reverse()
-    .find((entry) =>
-      entry.id !== excludeId &&
-      point.x >= entry.bounds.x &&
-      point.x <= entry.bounds.x + entry.bounds.w &&
-      point.y >= entry.bounds.y &&
-      point.y <= entry.bounds.y + entry.bounds.h,
-    )?.id
-}
-
 function resolveCanvasPointerShapeCreationArrowAnchors({
   interaction,
   scene,
@@ -328,88 +312,25 @@ function resolveCanvasPointerShapeCreationArrowAnchors({
   }
 
   const endAttachedTo = findCanvasSceneTargetAtPoint({
-    excludeId: interaction.startAttachedTo,
+    excludeIds: interaction.startAttachedTo
+      ? [interaction.startAttachedTo]
+      : [],
     point: interaction.currentWorld,
     scene,
   })
-  const startBounds = getCanvasSceneTargetBounds({
-    id: interaction.startAttachedTo,
+  const resolved = resolveCanvasArrowEndpoints({
+    end: interaction.currentWorld,
+    endAttachedTo,
     scene,
+    start: interaction.startWorld,
+    startAttachedTo: interaction.startAttachedTo,
   })
-  const endBounds = getCanvasSceneTargetBounds({
-    id: endAttachedTo,
-    scene,
-  })
-  const startTarget = startBounds
-    ? getCanvasBoundsCenter(startBounds)
-    : interaction.startWorld
-  const endTarget = endBounds
-    ? getCanvasBoundsCenter(endBounds)
-    : interaction.currentWorld
 
   return {
     ...interaction,
-    currentWorld: endBounds
-      ? getCanvasBoundsAnchorPoint({
-          bounds: endBounds,
-          toward: startTarget,
-        })
-      : interaction.currentWorld,
-    endAttachedTo,
-    startWorld: startBounds
-      ? getCanvasBoundsAnchorPoint({
-          bounds: startBounds,
-          toward: endTarget,
-        })
-      : interaction.startWorld,
-  }
-}
-
-function getCanvasSceneTargetBounds({
-  id,
-  scene,
-}: {
-  id?: string
-  scene: CanvasSceneAdapter
-}) {
-  if (!id) {
-    return null
-  }
-
-  return scene.getBounds([id]) ??
-    scene.entries.find((entry) => entry.id === id)?.bounds ??
-    null
-}
-
-function getCanvasBoundsCenter(bounds: Bounds): Point {
-  return {
-    x: bounds.x + bounds.w / 2,
-    y: bounds.y + bounds.h / 2,
-  }
-}
-
-function getCanvasBoundsAnchorPoint({
-  bounds,
-  toward,
-}: {
-  bounds: Bounds
-  toward: Point
-}): Point {
-  const center = getCanvasBoundsCenter(bounds)
-  const dx = toward.x - center.x
-  const dy = toward.y - center.y
-
-  if (dx === 0 && dy === 0) {
-    return center
-  }
-
-  const scaleX = dx === 0 ? Number.POSITIVE_INFINITY : (bounds.w / 2) / Math.abs(dx)
-  const scaleY = dy === 0 ? Number.POSITIVE_INFINITY : (bounds.h / 2) / Math.abs(dy)
-  const scale = Math.min(scaleX, scaleY)
-
-  return {
-    x: center.x + dx * scale,
-    y: center.y + dy * scale,
+    currentWorld: resolved.end,
+    endAttachedTo: resolved.endAttachedTo,
+    startWorld: resolved.start,
   }
 }
 

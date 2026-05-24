@@ -13,6 +13,9 @@ import type {
   CanvasPointerInteractionStartResult,
 } from './CanvasPointerInteractionResultContracts'
 import type { CanvasResizePointerInteractionStartResult } from './CanvasResizePointerInteractionStart'
+import type {
+  CanvasArrowEndpointPointerInteractionStartResult,
+} from './CanvasArrowEndpointPointerInteractionStart'
 
 export function applyCanvasPointerInteractionStartEffect({
   context,
@@ -131,7 +134,9 @@ export function applyCanvasResizePointerInteractionStartEffect({
 }: {
   context: CanvasPointerInteractionStartEffectContext
   event: CanvasAppPointerInput
-  start: CanvasResizePointerInteractionStartResult
+  start:
+    | CanvasArrowEndpointPointerInteractionStartResult
+    | CanvasResizePointerInteractionStartResult
 }) {
   if (start.kind === 'none') {
     return false

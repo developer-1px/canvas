@@ -25,6 +25,7 @@ export type CanvasInteractionKind =
   | 'create-custom'
   | 'draw-marker'
   | 'draw-highlight'
+  | 'arrow-endpoint'
   | 'resize'
 
 export type Point = {
