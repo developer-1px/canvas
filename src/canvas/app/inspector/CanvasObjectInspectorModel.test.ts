@@ -82,6 +82,40 @@ describe('CanvasObjectInspectorModel', () => {
     )
   })
 
+  it('builds selected object style controls through the inspector model', () => {
+    const commitItemsChange = vi.fn()
+    const model = createModel({
+      commitItemsChange,
+      selectedItems: [createRectItem()],
+      selection: ['rect-1'],
+    })
+
+    expect(model.styleControls.map((control) => control.id)).toEqual([
+      'fill',
+      'stroke',
+    ])
+
+    model.styleControls
+      .find((control) => control.id === 'fill')
+      ?.onSelect('#C2E5FF')
+
+    expect(commitItemsChange).toHaveBeenCalledWith(
+      {
+        type: 'replace-changed',
+        items: [
+          {
+            ...createRectItem(),
+            fill: '#C2E5FF',
+          },
+        ],
+      },
+      {
+        before: ['rect-1'],
+        after: ['rect-1'],
+      },
+    )
+  })
+
   it('ignores bounds changes when there is no committed selection bounds', () => {
     const emptySelectionCommit = vi.fn()
     const missingBoundsCommit = vi.fn()

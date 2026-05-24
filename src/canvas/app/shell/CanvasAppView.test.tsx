@@ -91,6 +91,7 @@ function createViewProps(
       customPanels: [],
       disabled: false,
       label: 'Rect',
+      styleControls: [],
       visible: visible.inspector ?? true,
       onChangeBounds: noop,
     },

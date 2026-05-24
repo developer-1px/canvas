@@ -6,6 +6,7 @@ import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract
 import { getCanvasAppInspectorPanelViews } from './CanvasAppInspectorPanelExecution'
 import type { CanvasAppInspectorPanel } from './CanvasAppInspectorPanels'
 import { getCanvasObjectInspectorLabel } from './CanvasObjectInspectorLabel'
+import { getCanvasObjectStyleControls } from './CanvasObjectStyleInspector'
 
 type GetCanvasObjectInspectorModelArgs = {
   bounds: Bounds | null
@@ -43,6 +44,12 @@ export function getCanvasObjectInspectorModel({
     }),
     disabled,
     label,
+    styleControls: getCanvasObjectStyleControls({
+      commitItemsChange,
+      disabled,
+      selectedItems,
+      selection,
+    }),
     onChangeBounds: (nextBounds: Bounds) => {
       if (selection.length === 0 || !bounds) {
         return

@@ -10,11 +10,25 @@ type CanvasObjectInspectorPanel = {
   id: string
 }
 
+type CanvasObjectInspectorStyleControl = {
+  disabled: boolean
+  id: string
+  label: string
+  swatches: readonly CanvasObjectInspectorStyleSwatch[]
+  onSelect: (color: string) => void
+}
+
+type CanvasObjectInspectorStyleSwatch = {
+  color: string
+  selected: boolean
+}
+
 type CanvasObjectInspectorProps = {
   bounds: Bounds | null
   customPanels: readonly CanvasObjectInspectorPanel[]
   disabled: boolean
   label: string | null
+  styleControls: readonly CanvasObjectInspectorStyleControl[]
   onChangeBounds: (bounds: Bounds) => void
 }
 
@@ -32,9 +46,10 @@ export function CanvasObjectInspector({
   customPanels,
   disabled,
   label,
+  styleControls,
   onChangeBounds,
 }: CanvasObjectInspectorProps) {
-  if ((!bounds || !label) && customPanels.length === 0) {
+  if ((!bounds || !label) && customPanels.length === 0 && styleControls.length === 0) {
     return null
   }
 
@@ -103,6 +118,30 @@ export function CanvasObjectInspector({
             ))}
           </div>
         </>
+      ) : null}
+      {styleControls.length > 0 ? (
+        <div className="inspector-style-controls">
+          {styleControls.map((control) => (
+            <div className="inspector-style-control" key={control.id}>
+              <div className="inspector-style-label">{control.label}</div>
+              <div className="inspector-swatches">
+                {control.swatches.map((swatch) => (
+                  <button
+                    key={swatch.color}
+                    type="button"
+                    className="inspector-swatch"
+                    aria-label={`${control.label} ${swatch.color}`}
+                    aria-pressed={swatch.selected}
+                    disabled={disabled || control.disabled}
+                    title={swatch.color}
+                    style={{ backgroundColor: swatch.color }}
+                    onClick={() => control.onSelect(swatch.color)}
+                  />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
       ) : null}
       {customPanels.map((panel) => (
         <div className="inspector-custom-panel" key={panel.id}>
