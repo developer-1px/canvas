@@ -31,6 +31,7 @@ import type {
   CanvasEditableTextItem,
   CanvasItemReadModel,
 } from '../../host'
+import type { CanvasAppCustomCommand } from '../commands/CanvasAppCustomCommands'
 import type {
   CanvasAppCustomCommandState,
   CanvasAppCustomCreationToolState,
@@ -143,6 +144,18 @@ export type CanvasAppExtensionRuntime = {
   customCreationToolStates: CanvasAppCustomCreationToolState[]
   customCreationTools: readonly CanvasAppCustomCreationTool[]
   runCustomCommand: (commandId: string) => boolean
+}
+
+export type CanvasAppExtensionModelInput = {
+  commitItemsChange: CommitCanvasItemsChange
+  commitSelection: CommitCanvasSelection
+  createId: (prefix: string) => string
+  customCommands: readonly CanvasAppCustomCommand[]
+  customCreationTools: readonly CanvasAppCustomCreationTool[]
+  items: CanvasItem[]
+  selection: string[]
+  setEditing: Dispatch<SetStateAction<EditingText | null>>
+  viewport: Viewport
 }
 
 export type CanvasAppExtensionControlContext = {

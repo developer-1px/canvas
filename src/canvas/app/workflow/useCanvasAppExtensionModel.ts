@@ -1,46 +1,24 @@
 import {
   useCallback,
   useMemo,
-  type Dispatch,
-  type SetStateAction,
 } from 'react'
-import type {
-  CanvasItem,
-  EditingText,
-  Viewport,
-} from '../../entities'
 import {
   getCanvasAppCustomCommandStates,
   runCanvasAppCustomCommand,
 } from '../commands/CanvasAppCustomCommandExecution'
 import type {
-  CanvasAppCustomCommand,
   CanvasAppCustomCommandContext,
 } from '../commands/CanvasAppCustomCommands'
-import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
 import {
   getCanvasAppCustomCreationToolStates,
 } from '../tools/CanvasAppCustomCreationToolRuntime'
-import type {
-  CommitCanvasItemsChange,
-  CommitCanvasSelection,
-} from './CanvasWorkflowContract'
 import {
   getCanvasAppExtensionConsumerModel,
 } from './CanvasAppExtensionConsumerModel'
-import type { CanvasAppExtensionModel } from './CanvasAppConsumerContracts'
-
-type UseCanvasAppExtensionModelArgs = {
-  commitItemsChange: CommitCanvasItemsChange
-  commitSelection: CommitCanvasSelection
-  createId: (prefix: string) => string
-  customCommands: readonly CanvasAppCustomCommand[]
-  customCreationTools: readonly CanvasAppCustomCreationTool[]
-  items: CanvasItem[]
-  selection: string[]
-  setEditing: Dispatch<SetStateAction<EditingText | null>>
-  viewport: Viewport
-}
+import type {
+  CanvasAppExtensionModel,
+  CanvasAppExtensionModelInput,
+} from './CanvasAppConsumerContracts'
 
 export function useCanvasAppExtensionModel({
   commitItemsChange,
@@ -52,7 +30,7 @@ export function useCanvasAppExtensionModel({
   selection,
   setEditing,
   viewport,
-}: UseCanvasAppExtensionModelArgs): CanvasAppExtensionModel {
+}: CanvasAppExtensionModelInput): CanvasAppExtensionModel {
   const customCommandContext = useMemo<CanvasAppCustomCommandContext>(
     () => ({
       commitItemsChange,

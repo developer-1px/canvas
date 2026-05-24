@@ -3850,6 +3850,12 @@ describe('Canvas module boundaries', () => {
     expect(extensionModelFile.source).toContain(
       "from './CanvasAppConsumerContracts'",
     )
+    expect(extensionModelFile.source).toContain(
+      'CanvasAppExtensionModelInput',
+    )
+    expect(extensionModelFile.source).not.toContain(
+      'type UseCanvasAppExtensionModelArgs',
+    )
     expect(extensionModelFile.source).not.toContain('control: {')
     expect(extensionModelFile.source).not.toContain('keyboard: {')
     expect(extensionModelFile.source).not.toContain('pointer: {')
@@ -3870,7 +3876,13 @@ describe('Canvas module boundaries', () => {
       'export type CanvasAppExtensionRuntime',
     )
     expect(extensionConsumerContractsFile.source).toContain(
+      'export type CanvasAppExtensionModelInput',
+    )
+    expect(extensionConsumerContractsFile.source).toContain(
       "from '../extensions/CanvasAppExtensionStateContracts'",
+    )
+    expect(extensionConsumerContractsFile.source).toContain(
+      "from '../commands/CanvasAppCustomCommands'",
     )
     expect(extensionConsumerContractsFile.source).not.toContain(
       'CanvasAppCustomCommandExecution',
