@@ -42,6 +42,7 @@
 | `src/canvas/app/extensions/CanvasAppDescriptorSnapshot.ts` | 외부 등록 descriptor의 copy/freeze 규칙을 Assembly와 Custom Item Module snapshot이 공유하게 한다 |
 | `src/canvas/app/cursor/useCanvasCursorChatModel.ts` | 문서 item을 만들지 않는 cursor chat open/point/value 생명주기를 App transient state로 숨긴다 |
 | `src/canvas/app/facilitation/useCanvasSessionTimerModel.ts` | 회의 진행용 session timer 상태와 countdown 생명주기를 문서 item 밖의 App transient state로 숨긴다 |
+| `src/canvas/app/facilitation/useCanvasSpotlightModel.ts` | 회의 진행용 spotlight start/stop과 follower count 표시를 문서 item 밖의 App transient state로 숨긴다 |
 | `src/canvas/app/facilitation/useCanvasVotingSessionModel.ts` | 회의 진행용 voting session prompt/status/quota를 문서 item 밖의 App transient state로 숨긴다 |
 | `src/canvas/app/stage/CanvasAppStageElement.ts` | stage DOM element의 bounds, pointer capture, wheel listener를 caller Interface 뒤에 숨기고 mount ref bridge는 Controller로 분리한다 |
 | `src/canvas/app/rendering` | Demo `CanvasItem` tree를 SVG item layer로 바꾸는 App-owned Adapter |
@@ -161,6 +162,7 @@
 | `src/canvas/ui` | Toolbar, palette, status, editor controls |
 | `src/canvas/ui/cursor/CanvasCursorChat.tsx` | cursor 위치에 붙는 transient chat textarea를 순수 view props로 렌더링한다 |
 | `src/canvas/ui/facilitation/CanvasSessionTimer.tsx` | session timer 표시와 preset/control 버튼을 순수 view props로 렌더링한다 |
+| `src/canvas/ui/facilitation/CanvasSpotlight.tsx` | spotlight entry, follower count, stop control을 순수 view props로 렌더링한다 |
 | `src/canvas/ui/facilitation/CanvasVotingSession.tsx` | voting session prompt, quota, status controls를 순수 view props로 렌더링한다 |
 | `src/canvas/ui/drawing/CanvasDrawingControls.tsx` | Drawing style controls를 순수 view props로 렌더링한다 |
 | `src/canvas/ui/stamp/CanvasStampControls.tsx` | Stamp reaction controls를 순수 view props와 optional anchor로 렌더링한다 |

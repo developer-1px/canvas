@@ -176,3 +176,5 @@
 172. Voting session은 문서 item을 만들지 않는 built-in facilitation affordance로 제공된다.
 173. Voting session은 prompt와 1인당 vote limit을 설정하고 start/end/clear 상태를 관리한다.
 174. Active voting session에서는 stamp insertion이 local vote quota를 소모하고 quota가 끝나면 stamp controls를 비활성화한다.
+175. Spotlight는 문서 item을 만들지 않는 built-in facilitation affordance로 제공된다.
+176. Spotlight는 현재 board collaborator presence 수를 follower count로 표시하고 stop 상태를 App transient state로 관리한다.

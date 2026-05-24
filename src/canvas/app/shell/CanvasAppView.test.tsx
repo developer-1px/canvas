@@ -17,6 +17,7 @@ describe('CanvasAppView', () => {
           imageControls: false,
           inspector: false,
           sessionTimer: false,
+          spotlight: false,
           stampControls: false,
           stickyQuickCreate: false,
           status: false,
@@ -34,6 +35,7 @@ describe('CanvasAppView', () => {
     expect(markup).not.toContain('image-controls')
     expect(markup).not.toContain('object-inspector')
     expect(markup).not.toContain('session-timer')
+    expect(markup).not.toContain('spotlight')
     expect(markup).not.toContain('stamp-controls')
     expect(markup).not.toContain('sticky-quick-create')
     expect(markup).not.toContain('canvas-status')
@@ -53,6 +55,7 @@ describe('CanvasAppView', () => {
     expect(markup).toContain('image-controls')
     expect(markup).toContain('object-inspector')
     expect(markup).toContain('session-timer')
+    expect(markup).toContain('spotlight')
     expect(markup).toContain('stamp-controls')
     expect(markup).toContain('data-anchored="true"')
     expect(markup).toContain('sticky-quick-create')
@@ -72,6 +75,7 @@ function createViewProps(
     imageControls?: boolean
     inspector?: boolean
     sessionTimer?: boolean
+    spotlight?: boolean
     stampControls?: boolean
     stickyQuickCreate?: boolean
     status?: boolean
@@ -165,6 +169,13 @@ function createViewProps(
       onResume: noop,
       onSetDuration: noop,
       onStart: noop,
+    },
+    spotlight: {
+      active: false,
+      followerCount: 0,
+      visible: visible.spotlight ?? true,
+      onStart: noop,
+      onStop: noop,
     },
     stampControls: {
       anchor: { x: 320, y: 140 },

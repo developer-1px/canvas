@@ -453,6 +453,7 @@
 .find-replace-panel,
 .image-controls,
 .session-timer,
+.spotlight,
 .stamp-controls,
 .voting-session,
 .zoom-controls,
@@ -520,6 +521,29 @@
   right: 14px;
   align-items: center;
   gap: 6px;
+}
+
+.spotlight {
+  z-index: 5;
+  top: 14px;
+  left: 50%;
+  align-items: center;
+  gap: 6px;
+  transform: translateX(-50%);
+}
+
+.spotlight[data-active='true'] {
+  border-style: dashed;
+  border-color: #2563eb;
+}
+
+.spotlight-count {
+  min-width: 22px;
+  padding: 0 6px;
+  color: #1d4ed8;
+  font: 750 12px/1 var(--sans);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
 }
 
 .session-timer-display {
@@ -793,6 +817,7 @@
 .image-controls button,
 .stamp-button,
 .session-timer button,
+.spotlight button,
 .voting-session button,
 .find-replace-panel button {
   display: inline-grid;
@@ -827,6 +852,11 @@
 .session-timer button {
   min-width: 34px;
   padding: 0 8px;
+}
+
+.spotlight button {
+  min-width: 34px;
+  padding: 0 10px;
 }
 
 .voting-session button {
@@ -901,6 +931,7 @@
 .image-controls button:hover,
 .stamp-button:hover,
 .session-timer button:hover,
+.spotlight button:hover,
 .voting-session button:hover,
 .sticky-quick-create:hover,
 .find-replace-panel button:hover,
@@ -913,6 +944,7 @@
 .image-controls button:disabled,
 .stamp-button:disabled,
 .session-timer button:disabled,
+.spotlight button:disabled,
 .voting-session button:disabled,
 .find-replace-panel button:disabled {
   color: #9ca3af;
@@ -923,6 +955,7 @@
 .image-controls button:disabled:hover,
 .stamp-button:disabled:hover,
 .session-timer button:disabled:hover,
+.spotlight button:disabled:hover,
 .voting-session button:disabled:hover,
 .find-replace-panel button:disabled:hover {
   background: transparent;
@@ -944,6 +977,7 @@
 .image-controls button:focus-visible,
 .stamp-button:focus-visible,
 .session-timer button:focus-visible,
+.spotlight button:focus-visible,
 .voting-session input:focus-visible,
 .voting-session button:focus-visible,
 .sticky-quick-create:focus-visible,
@@ -995,6 +1029,14 @@
     right: 10px;
     max-width: calc(100vw - 20px);
     flex-wrap: wrap;
+  }
+
+  .spotlight {
+    top: auto;
+    right: 10px;
+    bottom: 10px;
+    left: auto;
+    transform: none;
   }
 
   .voting-session {

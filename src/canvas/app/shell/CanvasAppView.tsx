@@ -6,6 +6,7 @@ import { CanvasComponentPalette } from '../../ui/palette/CanvasComponentPalette'
 import { CanvasCursorChat } from '../../ui/cursor/CanvasCursorChat'
 import { CanvasDrawingControls } from '../../ui/drawing/CanvasDrawingControls'
 import { CanvasSessionTimer } from '../../ui/facilitation/CanvasSessionTimer'
+import { CanvasSpotlight } from '../../ui/facilitation/CanvasSpotlight'
 import { CanvasVotingSession } from '../../ui/facilitation/CanvasVotingSession'
 import { CanvasObjectInspector } from '../../ui/inspector/CanvasObjectInspector'
 import { CanvasFindReplacePanel } from '../../ui/search/CanvasFindReplacePanel'
@@ -20,6 +21,7 @@ import { ZoomControls } from '../../ui/zoom/ZoomControls'
 type ToolbarProps = ComponentProps<typeof CanvasToolbar>
 type CursorChatProps = ComponentProps<typeof CanvasCursorChat>
 type SessionTimerProps = ComponentProps<typeof CanvasSessionTimer>
+type SpotlightProps = ComponentProps<typeof CanvasSpotlight>
 type VotingSessionProps = ComponentProps<typeof CanvasVotingSession>
 type TextEditorProps = ComponentProps<typeof CanvasTextEditor>
 type DrawingControlsProps = ComponentProps<typeof CanvasDrawingControls>
@@ -44,6 +46,7 @@ type CanvasAppViewProps = {
   imageControls: VisibleProps<ImageControlsProps>
   inspector: VisibleProps<InspectorProps>
   sessionTimer: SessionTimerProps
+  spotlight: SpotlightProps
   stage: ReactNode
   stampControls: VisibleProps<StampControlsProps>
   stickyQuickCreate: VisibleProps<StickyQuickCreateProps>
@@ -62,6 +65,7 @@ export function CanvasAppView({
   imageControls,
   inspector,
   sessionTimer,
+  spotlight,
   stage,
   stampControls,
   stickyQuickCreate,
@@ -92,6 +96,8 @@ export function CanvasAppView({
       {showToolbar ? <CanvasToolbar {...toolbarProps} /> : null}
 
       <CanvasSessionTimer {...sessionTimer} />
+
+      <CanvasSpotlight {...spotlight} />
 
       <CanvasVotingSession {...votingSession} />
 

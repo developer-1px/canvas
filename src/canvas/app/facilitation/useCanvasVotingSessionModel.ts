@@ -26,7 +26,7 @@ export function useCanvasVotingSessionModel({
 }) {
   const sessionRef = useRef(createCanvasVotingSessionState())
   const [session, setSessionState] = useState<CanvasVotingSessionState>(
-    sessionRef.current,
+    createCanvasVotingSessionState,
   )
   const updateSession = useCallback((
     updater: (state: CanvasVotingSessionState) => CanvasVotingSessionState,
