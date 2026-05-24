@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import {
   createCanvasAppCustomItemModuleAssembly,
+} from './CanvasAppCustomItemModuleAssembly'
+import {
   defineCanvasAppCustomItemModule,
   type CanvasAppCustomItemModule,
   type CanvasAppCustomItemModuleCreationTool,

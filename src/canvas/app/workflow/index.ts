@@ -21,10 +21,12 @@ export type {
 } from '../commands/CanvasAppCustomCommandExecution'
 export {
   createCanvasAppCustomItemModuleAssembly,
-  defineCanvasAppCustomItemModule,
-  type CanvasAppCustomItemModule,
   type CanvasAppCustomItemModuleAssembly,
   type CanvasAppCustomItemModuleAssemblyOptions,
+} from '../modules/CanvasAppCustomItemModuleAssembly'
+export {
+  defineCanvasAppCustomItemModule,
+  type CanvasAppCustomItemModule,
   type CanvasAppCustomItemModuleCreationItem,
   type CanvasAppCustomItemModuleCreationTool,
 } from '../modules/CanvasAppCustomItemModules'

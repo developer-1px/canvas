@@ -5,7 +5,7 @@ import {
 } from '../extensions/CanvasAppExtensionBundle'
 import {
   createCanvasAppCustomItemModuleAssembly,
-} from '../modules/CanvasAppCustomItemModules'
+} from '../modules/CanvasAppCustomItemModuleAssembly'
 import type { CanvasAppExtensionAssemblyInput } from './CanvasAppExtensionAssemblyTypes'
 
 export type CanvasAppExtensionAssembly = CanvasAppExtensionBundle

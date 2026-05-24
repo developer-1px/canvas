@@ -5,10 +5,8 @@ import {
 import {
   snapshotCanvasAppExtensionBundle,
 } from '../extensions/CanvasAppExtensionBundle'
-import type {
-  CanvasAppCustomItemModule,
-  CanvasAppCustomItemModuleAssembly,
-} from './CanvasAppCustomItemModules'
+import type { CanvasAppCustomItemModuleAssembly } from './CanvasAppCustomItemModuleAssembly'
+import type { CanvasAppCustomItemModule } from './CanvasAppCustomItemModules'
 
 export function snapshotCanvasAppCustomItemModuleAssembly(
   assembly: CanvasAppCustomItemModuleAssembly,

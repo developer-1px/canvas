@@ -7,9 +7,9 @@ import { assertCanvasAppExtensionId } from '../extensions/CanvasAppExtensionIds'
 import { assertCanvasAppInspectorPanels } from '../inspector/CanvasAppInspectorPanels'
 import { assertCanvasAppCustomCreationTools } from '../tools/CanvasAppCustomCreationTools'
 import { getCanvasAppCustomItemModuleCreationTools } from './CanvasAppCustomItemModuleRuntime'
+import type { CanvasAppCustomItemModuleAssembly } from './CanvasAppCustomItemModuleAssembly'
 import type {
   CanvasAppCustomItemModule,
-  CanvasAppCustomItemModuleAssembly,
 } from './CanvasAppCustomItemModules'
 
 export function assertCanvasAppCustomItemModuleAssemblyInput({

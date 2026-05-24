@@ -72,7 +72,8 @@
 | `src/canvas/ui/toolbar/CanvasToolbarCommandItems.ts` | Built-in toolbar command group, feature toggle, availability를 command item group grammar로 변환한다 |
 | `src/canvas/app/inspector/CanvasAppInspectorPanels.ts` | 기본 bounds inspector를 수정하지 않고 제품별 선택 항목 패널을 등록하는 descriptor를 제공한다 |
 | `src/canvas/app/inspector/CanvasAppInspectorPanelContracts.ts` | Inspector panel descriptor shape와 id registry contract를 검증한다 |
-| `src/canvas/app/modules/CanvasAppCustomItemModules.ts` | 제품별 item kind에 필요한 creation tool, renderer, validator, inspector, command를 한 Module로 조립하고 registry/envelope를 내부에서 만든다 |
+| `src/canvas/app/modules/CanvasAppCustomItemModules.ts` | 제품별 item kind에 필요한 creation tool, renderer, validator, inspector, command descriptor와 define 계약을 소유한다 |
+| `src/canvas/app/modules/CanvasAppCustomItemModuleAssembly.ts` | Custom item module descriptor list와 disabled module ids를 Extension Bundle output으로 조립하고 duplicate/unknown/snapshot 규칙을 적용한다 |
 | `src/canvas/app/modules/CanvasAppCustomItemModuleContracts.ts` | Custom item module descriptor, disabled module id, duplicate module id, assembled tool shortcut contract를 검증한다 |
 | `src/canvas/app/modules/CanvasAppCustomItemValidatorContracts.ts` | Custom item validator registry key와 validate strategy slot을 검증한다 |
 | `src/canvas/app/modules/CanvasAppCustomItemModuleRuntime.ts` | Module-owned creation tool envelope 생성, item validation, renderer/validator registry 변환과 실패 containment를 소유한다 |
@@ -245,7 +246,7 @@ type CanvasAffordanceConfig = {
 - Core primitive facade는 resize/handle/scale 규칙을 직접 구현하지 않고 Canvas Bounds Resize에 위임한다.
 - 제품별 item kind는 내부 `CanvasItem` variant를 추가하지 않고 Canvas App Custom Item Module로 묶어 등록한다.
 - Canvas App Custom Item Module의 `id`는 소유한 custom item kind이며, module은 `presentation`, `renderItem`, `validateItem`을 받아 renderer registry와 validator registry를 내부에서 조립한다.
-- Canvas App Custom Item Module descriptor/assembly, contract validation, module-owned creation/validator runtime은 분리하고, validation은 Canvas App Custom Item Module Contracts가, runtime containment는 Canvas App Custom Item Module Runtime이 소유한다.
+- Canvas App Custom Item Module descriptor/assembly, contract validation, module-owned creation/validator runtime은 분리하고, assembly는 Canvas App Custom Item Module Assembly가, validation은 Canvas App Custom Item Module Contracts가, runtime containment는 Canvas App Custom Item Module Runtime이 소유한다.
 - Canvas Custom Item Validator registry shape 검증은 Canvas App Custom Item Validator Contracts가 소유한다.
 - Canvas App Custom Item Module mutation 방어는 Canvas App Custom Item Module Snapshot이 소유한다.
 - Module-owned custom creation tool은 bounds/title/data만 반환하고, `id`, `type`, `kind`, `presentation`은 Canvas App Custom Item Module이 주입한다.

@@ -332,6 +332,9 @@ describe('Canvas module boundaries', () => {
     const customItemModuleFile = getSourceFile(
       'src/canvas/app/modules/CanvasAppCustomItemModules.ts',
     )
+    const customItemModuleAssemblyFile = getSourceFile(
+      'src/canvas/app/modules/CanvasAppCustomItemModuleAssembly.ts',
+    )
     const customItemModuleRuntimeFile = getSourceFile(
       'src/canvas/app/modules/CanvasAppCustomItemModuleRuntime.ts',
     )
@@ -342,7 +345,10 @@ describe('Canvas module boundaries', () => {
     expect(extensionAssemblyFile.source).toContain(
       "from '../extensions/CanvasAppExtensionBundle'",
     )
-    expect(customItemModuleFile.source).toContain(
+    expect(customItemModuleAssemblyFile.source).toContain(
+      "from '../extensions/CanvasAppExtensionBundle'",
+    )
+    expect(customItemModuleFile.source).not.toContain(
       "from '../extensions/CanvasAppExtensionBundle'",
     )
     expect(customItemModuleRuntimeFile.source).toContain(
@@ -353,7 +359,7 @@ describe('Canvas module boundaries', () => {
     )
     for (const consumerFile of [
       extensionAssemblyFile,
-      customItemModuleFile,
+      customItemModuleAssemblyFile,
     ]) {
       expect(consumerFile.source).not.toContain(
         'appendUniqueCanvasAppExtensionEntries',
@@ -4707,11 +4713,17 @@ describe('Canvas module boundaries', () => {
     const moduleFile = getSourceFile(
       'src/canvas/app/modules/CanvasAppCustomItemModules.ts',
     )
+    const assemblyFile = getSourceFile(
+      'src/canvas/app/modules/CanvasAppCustomItemModuleAssembly.ts',
+    )
     const runtimeFile = getSourceFile(
       'src/canvas/app/modules/CanvasAppCustomItemModuleRuntime.ts',
     )
 
-    expect(moduleFile.source).toContain(
+    expect(moduleFile.source).not.toContain(
+      "from './CanvasAppCustomItemModuleRuntime'",
+    )
+    expect(assemblyFile.source).toContain(
       "from './CanvasAppCustomItemModuleRuntime'",
     )
     expect(moduleFile.source).not.toContain('Omit<')
@@ -4769,6 +4781,9 @@ describe('Canvas module boundaries', () => {
     const moduleFile = getSourceFile(
       'src/canvas/app/modules/CanvasAppCustomItemModules.ts',
     )
+    const assemblyFile = getSourceFile(
+      'src/canvas/app/modules/CanvasAppCustomItemModuleAssembly.ts',
+    )
     const snapshotFile = getSourceFile(
       'src/canvas/app/modules/CanvasAppCustomItemModuleSnapshot.ts',
     )
@@ -4780,6 +4795,9 @@ describe('Canvas module boundaries', () => {
     )
 
     expect(moduleFile.source).toContain(
+      "from './CanvasAppCustomItemModuleSnapshot'",
+    )
+    expect(assemblyFile.source).toContain(
       "from './CanvasAppCustomItemModuleSnapshot'",
     )
     expect(moduleFile.source).not.toContain(
