@@ -14,6 +14,7 @@ describe('CanvasAppView', () => {
           componentPalette: false,
           imageControls: false,
           inspector: false,
+          stampControls: false,
           status: false,
           textEditor: false,
           toolbar: false,
@@ -25,6 +26,7 @@ describe('CanvasAppView', () => {
     expect(markup).not.toContain('component-palette')
     expect(markup).not.toContain('image-controls')
     expect(markup).not.toContain('object-inspector')
+    expect(markup).not.toContain('stamp-controls')
     expect(markup).not.toContain('canvas-status')
     expect(markup).not.toContain('text-editor')
     expect(markup).not.toContain('toolbar')
@@ -38,6 +40,7 @@ describe('CanvasAppView', () => {
     expect(markup).toContain('component-palette')
     expect(markup).toContain('image-controls')
     expect(markup).toContain('object-inspector')
+    expect(markup).toContain('stamp-controls')
     expect(markup).toContain('canvas-status')
     expect(markup).toContain('text-editor')
     expect(markup).toContain('toolbar')
@@ -50,6 +53,7 @@ function createViewProps(
     componentPalette?: boolean
     imageControls?: boolean
     inspector?: boolean
+    stampControls?: boolean
     status?: boolean
     textEditor?: boolean
     toolbar?: boolean
@@ -102,6 +106,16 @@ function createViewProps(
       onUploadFiles: noop,
     },
     stage: <div className="canvas-stage" />,
+    stampControls: {
+      canInsertStamp: true,
+      stamps: [{
+        label: '+1',
+        stamp: 'thumbs-up',
+        title: 'Thumbs up',
+      }],
+      visible: visible.stampControls ?? true,
+      onInsertStamp: noop,
+    },
     status: {
       mode: 'Select',
       scale: 1,

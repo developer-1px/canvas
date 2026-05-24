@@ -6,6 +6,7 @@ import { CanvasComponentPalette } from '../../ui/palette/CanvasComponentPalette'
 import { CanvasObjectInspector } from '../../ui/inspector/CanvasObjectInspector'
 import { CanvasFindReplacePanel } from '../../ui/search/CanvasFindReplacePanel'
 import { CanvasImageControls } from '../../ui/image/CanvasImageControls'
+import { CanvasStampControls } from '../../ui/stamp/CanvasStampControls'
 import { CanvasTextEditor } from '../../ui/text/CanvasTextEditor'
 import { CanvasToolbar } from '../../ui/toolbar/CanvasToolbar'
 import { CanvasStatus } from '../../ui/status/CanvasStatus'
@@ -15,6 +16,7 @@ type ToolbarProps = ComponentProps<typeof CanvasToolbar>
 type TextEditorProps = ComponentProps<typeof CanvasTextEditor>
 type FindReplaceProps = ComponentProps<typeof CanvasFindReplacePanel>
 type ImageControlsProps = ComponentProps<typeof CanvasImageControls>
+type StampControlsProps = ComponentProps<typeof CanvasStampControls>
 type InspectorProps = ComponentProps<typeof CanvasObjectInspector>
 type PaletteProps = ComponentProps<typeof CanvasComponentPalette>
 type ZoomControlsProps = ComponentProps<typeof ZoomControls>
@@ -29,6 +31,7 @@ type CanvasAppViewProps = {
   imageControls: VisibleProps<ImageControlsProps>
   inspector: VisibleProps<InspectorProps>
   stage: ReactNode
+  stampControls: VisibleProps<StampControlsProps>
   status: VisibleProps<StatusProps>
   textEditor: VisibleProps<TextEditorProps>
   toolbar: VisibleProps<ToolbarProps>
@@ -41,6 +44,7 @@ export function CanvasAppView({
   imageControls,
   inspector,
   stage,
+  stampControls,
   status,
   textEditor,
   toolbar,
@@ -52,6 +56,7 @@ export function CanvasAppView({
   } = componentPalette
   const { visible: showInspector, ...inspectorProps } = inspector
   const { visible: showImageControls, ...imageControlProps } = imageControls
+  const { visible: showStampControls, ...stampControlProps } = stampControls
   const { visible: showTextEditor, ...textEditorProps } = textEditor
   const { visible: showToolbar, ...toolbarProps } = toolbar
   const { visible: showZoomControls, ...zoomControlProps } = zoomControls
@@ -68,6 +73,8 @@ export function CanvasAppView({
       <CanvasFindReplacePanel {...findReplace} />
 
       {showImageControls ? <CanvasImageControls {...imageControlProps} /> : null}
+
+      {showStampControls ? <CanvasStampControls {...stampControlProps} /> : null}
 
       {stage}
 

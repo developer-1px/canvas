@@ -22,6 +22,9 @@ export function getCanvasAppStageElementConsumerModel({
     stage: {
       stageElement: stageElement.mount,
     },
+    stamp: {
+      stageElement,
+    },
     viewport: {
       stageElement,
     },

@@ -10,6 +10,7 @@ import { useCanvasAppInspectorModel } from './useCanvasAppInspectorModel'
 import { useCanvasAppImageModel } from './useCanvasAppImageModel'
 import { useCanvasAppKeyboardModel } from './useCanvasAppKeyboardModel'
 import { useCanvasAppPointerModel } from './useCanvasAppPointerModel'
+import { useCanvasAppStampModel } from './useCanvasAppStampModel'
 import { useCanvasAppStageElementModel } from './useCanvasAppStageElementModel'
 import { useCanvasAppTextModel } from './useCanvasAppTextModel'
 import { useCanvasInteractionModel } from './useCanvasInteractionModel'
@@ -51,6 +52,12 @@ export function useCanvasAppModel({
     ...affordance.image,
     ...workspace.image,
     ...stageElement.image,
+  })
+
+  const stampControls = useCanvasAppStampModel({
+    ...affordance.stamp,
+    ...workspace.stamp,
+    ...stageElement.stamp,
   })
 
   const text = useCanvasAppTextModel({
@@ -154,6 +161,7 @@ export function useCanvasAppModel({
         ...workspace.stage,
       },
     }),
+    stampControls,
     status: controls.status,
     toolbar: controls.toolbar,
     zoomControls: controls.zoomControls,

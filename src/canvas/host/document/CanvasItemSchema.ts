@@ -3,6 +3,7 @@ import { isCanvasComponentItemStorageShape } from '../component/CanvasComponentI
 import { isCanvasDrawingItemStorageShape } from '../drawing/CanvasDrawingItemValidation'
 import { isCanvasImageItemStorageShape } from '../image/CanvasImageItem'
 import type { CanvasItem } from '../model'
+import { isCanvasStampItemStorageShape } from '../stamp/CanvasStampItem'
 import { isCanvasEditableTextItemStorageShape } from '../text/CanvasEditableTextItem'
 import { isCanvasGroupItemStorageShape } from '../tree/CanvasGroupItem'
 import { syncCanvasItems } from '../tree/CanvasTree'
@@ -66,6 +67,10 @@ function isCanvasItem(value: unknown): value is CanvasItem {
   }
 
   if (isCanvasImageItemStorageShape(value)) {
+    return true
+  }
+
+  if (isCanvasStampItemStorageShape(value)) {
     return true
   }
 

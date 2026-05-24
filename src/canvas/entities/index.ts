@@ -23,6 +23,8 @@ export type {
   CanvasItemBase,
   CanvasJsonObject,
   CanvasJsonValue,
+  CanvasStampItem,
+  CanvasStampKind,
   EditingText,
   GroupItem,
   HighlightItem,

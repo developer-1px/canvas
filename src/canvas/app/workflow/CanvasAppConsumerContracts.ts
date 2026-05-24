@@ -250,6 +250,16 @@ export type CanvasAppImageModelInput = {
   viewport: Viewport
 }
 
+export type CanvasAppStampModelInput = {
+  commitItemsChange: CommitCanvasItemsChange
+  config: CanvasAffordanceConfig
+  createId: (prefix: string) => string
+  itemReadModel: CanvasAppItemReadModel
+  selection: string[]
+  stageElement: CanvasAppStageElement
+  viewport: Viewport
+}
+
 export type CanvasAppKeyboardCommandContext = {
   commitSelection: CommitCanvasSelection
   copySelection: () => void
@@ -550,5 +560,6 @@ export type CanvasAppStageElementConsumerModel = {
   image: CanvasAppStageElementControllerContext
   pointer: CanvasAppStageElementControllerContext
   stage: CanvasAppStageElementStageContext
+  stamp: CanvasAppStageElementControllerContext
   viewport: CanvasAppStageElementControllerContext
 }

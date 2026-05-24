@@ -13,6 +13,8 @@ export type {
   CanvasItemBase,
   CanvasJsonObject,
   CanvasJsonValue,
+  CanvasStampItem,
+  CanvasStampKind,
   EditingText,
   GroupItem,
   HighlightItem,
@@ -66,6 +68,12 @@ export {
   isCanvasImageMimeType,
   type CreateCanvasImageItemInput,
 } from './image/CanvasImageItem'
+export {
+  CANVAS_STAMP_ITEM_SIZE,
+  createCanvasStampItem,
+  isCanvasStampItemStorageShape,
+  type CreateCanvasStampItemInput,
+} from './stamp/CanvasStampItem'
 
 export {
   createCanvasItemReadModel,

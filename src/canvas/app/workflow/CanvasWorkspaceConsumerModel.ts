@@ -69,6 +69,12 @@ export function getCanvasWorkspaceConsumerModel({
       itemReadModel,
       ...selectionContext,
     },
+    stamp: {
+      commitItemsChange: document.commitItemsChange,
+      createId,
+      itemReadModel,
+      ...selectionContext,
+    },
     interaction: {
       scene,
       ...selectionContext,

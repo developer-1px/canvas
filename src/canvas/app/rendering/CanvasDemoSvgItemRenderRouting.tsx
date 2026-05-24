@@ -6,6 +6,7 @@ import type {
   CanvasEditableTextItem,
   CanvasImageItem,
   CanvasItem,
+  CanvasStampItem,
   GroupItem,
 } from '../../entities'
 import { CanvasDemoSvgComponentRenderer } from './CanvasDemoSvgComponentRenderer'
@@ -18,6 +19,7 @@ import { renderCanvasDemoSvgRectTextItem } from './CanvasDemoSvgRectTextItemRend
 import type { CanvasDemoSvgComponentPresentationRenderers } from './CanvasDemoSvgComponentPresentationRegistry'
 import type { CanvasDemoSvgCustomItemRenderers } from './CanvasDemoSvgCustomItemRendererRegistry'
 import { renderCanvasDemoSvgCustomItem } from './CanvasDemoSvgCustomItemRendererExecution'
+import { renderCanvasDemoSvgStampItem } from './CanvasDemoSvgStampItemRenderer'
 
 export type CanvasDemoSvgItemRenderRouteInput = {
   bounds: Bounds
@@ -60,6 +62,7 @@ const CANVAS_DEMO_SVG_ITEM_RENDER_STRATEGIES = Object.freeze({
   image: renderCanvasDemoSvgImageItemRoute,
   marker: renderCanvasDemoSvgDrawingItemRoute,
   rect: renderCanvasDemoSvgRectTextItemRoute,
+  stamp: renderCanvasDemoSvgStampItemRoute,
   text: renderCanvasDemoSvgRectTextItemRoute,
 } satisfies CanvasDemoSvgItemRenderStrategies)
 
@@ -169,6 +172,16 @@ function renderCanvasDemoSvgImageItemRoute({
         />
       </>
     ),
+  }
+}
+
+function renderCanvasDemoSvgStampItemRoute({
+  item,
+}: CanvasDemoSvgItemRenderRouteInput & {
+  item: CanvasStampItem
+}): CanvasDemoSvgItemRenderRoute {
+  return {
+    children: renderCanvasDemoSvgStampItem({ item }),
   }
 }
 

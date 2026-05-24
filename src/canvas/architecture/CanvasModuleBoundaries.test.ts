@@ -526,6 +526,7 @@ describe('Canvas module boundaries', () => {
       'CanvasAppAffordanceInspectorModel',
       'CanvasAppAffordanceKeyboardModel',
       'CanvasAppAffordancePointerModel',
+      'CanvasAppAffordanceStampModel',
       'CanvasAppAffordanceTextModel',
       'CanvasAppAffordanceViewportModel',
     ]) {
@@ -541,6 +542,7 @@ describe('Canvas module boundaries', () => {
       'inspector: {',
       'keyboard: {',
       'pointer: {',
+      'stamp: {',
       'text: {',
       'viewport: {',
     ]) {
@@ -1008,6 +1010,7 @@ describe('Canvas module boundaries', () => {
       'image: {',
       'pointer: {',
       'stage: {',
+      'stamp: {',
       'viewport: {',
     ]) {
       expect(stageElementModelFile.source).not.toContain(consumerContext)

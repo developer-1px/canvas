@@ -112,6 +112,24 @@ describe('CanvasDemoSvgItemRenderer', () => {
     expect(markup).toContain('class="image-hit"')
     expect(markup).toContain('href="data:image/png;base64,aW1hZ2U="')
   })
+
+  it('renders stamp items with a readable label and hit target', () => {
+    const markup = renderItem({
+      h: 44,
+      id: 'stamp-1',
+      label: '+1',
+      stamp: 'thumbs-up',
+      type: 'stamp',
+      w: 44,
+      x: 10,
+      y: 20,
+    })
+
+    expect(markup).toContain('data-type="stamp"')
+    expect(markup).toContain('class="stamp-item"')
+    expect(markup).toContain('class="stamp-hit"')
+    expect(markup).toContain('+1')
+  })
 })
 
 function renderItem(item: CanvasItem) {

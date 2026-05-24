@@ -130,6 +130,17 @@ const arrowItem: CanvasItem = {
   strokeWidth: 3,
 }
 
+const stampItem: CanvasItem = {
+  h: 44,
+  id: 'stamp-1',
+  label: '+1',
+  stamp: 'thumbs-up',
+  type: 'stamp',
+  w: 44,
+  x: 40,
+  y: 60,
+}
+
 describe('CanvasItemSchema drawing items', () => {
   it('accepts built-in drawing item storage envelopes', () => {
     expect(validateCanvasItems([markerItem, arrowItem])).toEqual([
@@ -203,6 +214,23 @@ describe('CanvasItemSchema drawing items', () => {
         {
           ...markerItem,
           opacity: 2,
+        },
+      ]),
+    ).toThrow()
+  })
+})
+
+describe('CanvasItemSchema stamp items', () => {
+  it('accepts the built-in stamp storage envelope', () => {
+    expect(validateCanvasItems([stampItem])).toEqual([stampItem])
+  })
+
+  it('rejects stamp ids outside the stable id contract', () => {
+    expect(() =>
+      validateCanvasItems([
+        {
+          ...stampItem,
+          stamp: 'Thumbs Up',
         },
       ]),
     ).toThrow()

@@ -4,6 +4,7 @@ import type {
   CanvasCustomItem,
   CanvasImageItem,
   CanvasItem,
+  CanvasStampItem,
   Point,
 } from '../../entities'
 import { writeCanvasImageBlobToClipboard } from './CanvasImageClipboard'
@@ -319,6 +320,10 @@ function renderCanvasImageExportItem(item: CanvasItem): string {
     return renderCanvasComponentExportItem(item)
   }
 
+  if (item.type === 'stamp') {
+    return renderCanvasStampExportItem(item)
+  }
+
   return renderCanvasCustomExportItem(item)
 }
 
@@ -337,6 +342,15 @@ function renderCanvasComponentExportItem(item: CanvasComponentItem) {
       x: item.x + 14,
       y: item.y + 24,
     }),
+  ].join('')
+}
+
+function renderCanvasStampExportItem(item: CanvasStampItem) {
+  const radius = Math.min(item.w, item.h) / 2
+
+  return [
+    `<rect x="${formatNumber(item.x)}" y="${formatNumber(item.y)}" width="${formatNumber(item.w)}" height="${formatNumber(item.h)}" rx="${formatNumber(radius)}" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.25" />`,
+    `<text x="${formatNumber(item.x + item.w / 2)}" y="${formatNumber(item.y + item.h / 2)}" fill="#111827" font-family="Arial, sans-serif" font-size="18" font-weight="700" text-anchor="middle" dominant-baseline="central">${escapeXmlText(item.label)}</text>`,
   ].join('')
 }
 

@@ -29,6 +29,9 @@ export function getCanvasAppAffordanceModel(
     pointer: {
       config,
     },
+    stamp: {
+      config,
+    },
     text: {
       config,
     },

@@ -33,6 +33,14 @@ export type CanvasImageItem = CanvasItemBase & {
   src: string
 }
 
+export type CanvasStampKind = string
+
+export type CanvasStampItem = CanvasItemBase & {
+  type: 'stamp'
+  label: string
+  stamp: CanvasStampKind
+}
+
 export type CanvasDrawingItemBase = CanvasItemBase & {
   opacity: number
   points: Point[]
@@ -97,6 +105,7 @@ export type CanvasItem =
   | RectItem
   | TextItem
   | CanvasImageItem
+  | CanvasStampItem
   | MarkerItem
   | HighlightItem
   | ArrowItem

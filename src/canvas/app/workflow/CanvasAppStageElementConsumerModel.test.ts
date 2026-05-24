@@ -16,6 +16,7 @@ describe('CanvasAppStageElementConsumerModel', () => {
     expect(model.component.stageElement).toBe(stageElement)
     expect(model.image.stageElement).toBe(stageElement)
     expect(model.pointer.stageElement).toBe(stageElement)
+    expect(model.stamp.stageElement).toBe(stageElement)
     expect(model.viewport.stageElement).toBe(stageElement)
   })
 

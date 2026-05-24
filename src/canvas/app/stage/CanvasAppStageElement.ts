@@ -191,7 +191,10 @@ const CANVAS_STAGE_SNAPSHOT_STYLE = `
 .component-svg-text{fill:#334155;font-size:13px;font-weight:550}
 .image-item{pointer-events:none}
 .image-hit{fill:transparent;pointer-events:all}
-`
+.stamp-item{fill:#fff;stroke:#cbd5e1;stroke-width:1.25}
+.stamp-label{fill:#111827;font:750 18px/1 sans-serif;pointer-events:none;text-anchor:middle}
+.stamp-hit{fill:transparent;pointer-events:all}
+	`
 
 function createCanvasSelectionSvgSnapshot(
   element: SVGSVGElement,
@@ -266,7 +269,7 @@ function cloneCanvasSelectionSnapshotNode(node: Element) {
   clone.removeAttribute('data-selected')
 
   for (const transientNode of clone.querySelectorAll(
-    '.item-outline,.image-hit',
+    '.item-outline,.image-hit,.stamp-hit',
   )) {
     transientNode.remove()
   }

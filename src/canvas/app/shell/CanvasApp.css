@@ -194,9 +194,23 @@
   pointer-events: none;
 }
 
-.image-hit {
+.image-hit,
+.stamp-hit {
   fill: transparent;
   pointer-events: all;
+}
+
+.stamp-item {
+  fill: #ffffff;
+  stroke: #cbd5e1;
+  stroke-width: 1.25;
+}
+
+.stamp-label {
+  fill: #111827;
+  font: 750 18px/1 var(--sans);
+  pointer-events: none;
+  text-anchor: middle;
 }
 
 .canvas-text {
@@ -292,6 +306,7 @@
 .component-palette,
 .find-replace-panel,
 .image-controls,
+.stamp-controls,
 .zoom-controls,
 .object-inspector,
 .canvas-status {
@@ -334,6 +349,12 @@
   align-items: center;
 }
 
+.stamp-controls {
+  top: 104px;
+  right: 14px;
+  align-items: center;
+}
+
 .image-file-input {
   display: none;
 }
@@ -345,7 +366,7 @@
 }
 
 .object-inspector {
-  top: 104px;
+  top: 156px;
   right: 14px;
   display: grid;
   width: 188px;
@@ -422,6 +443,7 @@
 .component-button,
 .zoom-value,
 .image-controls button,
+.stamp-button,
 .find-replace-panel button {
   display: inline-grid;
   place-items: center;
@@ -446,6 +468,14 @@
 
 .component-button {
   width: 34px;
+}
+
+.stamp-button {
+  width: 34px;
+}
+
+.stamp-button-label {
+  font: 750 14px/1 var(--sans);
 }
 
 .component-button-mark {
@@ -504,6 +534,7 @@
 .component-button:hover,
 .zoom-value:hover,
 .image-controls button:hover,
+.stamp-button:hover,
 .find-replace-panel button:hover,
 .tool-button[data-active='true'] {
   background: #e5edff;
@@ -512,6 +543,7 @@
 
 .tool-button:disabled,
 .image-controls button:disabled,
+.stamp-button:disabled,
 .find-replace-panel button:disabled {
   color: #9ca3af;
   cursor: not-allowed;
@@ -519,6 +551,7 @@
 
 .tool-button:disabled:hover,
 .image-controls button:disabled:hover,
+.stamp-button:disabled:hover,
 .find-replace-panel button:disabled:hover {
   background: transparent;
   color: #9ca3af;
@@ -534,6 +567,7 @@
 .component-button:focus-visible,
 .zoom-value:focus-visible,
 .image-controls button:focus-visible,
+.stamp-button:focus-visible,
 .find-replace-panel input:focus-visible,
 .find-replace-panel button:focus-visible,
 .inspector-field input:focus-visible,
@@ -569,7 +603,7 @@
   }
 
   .component-palette {
-    top: 54px;
+    top: 138px;
     left: 10px;
     right: auto;
     grid-template-columns: repeat(10, 30px);
@@ -577,11 +611,22 @@
   }
 
   .find-replace-panel {
-    top: 96px;
+    top: 294px;
     right: 10px;
     bottom: auto;
     left: 10px;
     transform: none;
+  }
+
+  .image-controls {
+    top: 190px;
+    left: 10px;
+  }
+
+  .stamp-controls {
+    top: 242px;
+    right: auto;
+    left: 10px;
   }
 
   .find-replace-panel input {

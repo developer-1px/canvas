@@ -105,6 +105,13 @@ export type CanvasWorkspaceImageContext =
     itemReadModel: CanvasAppItemReadModel
   }
 
+export type CanvasWorkspaceStampContext =
+  CanvasWorkspaceSelectionContext & {
+    commitItemsChange: CommitCanvasItemsChange
+    createId: (prefix: string) => string
+    itemReadModel: CanvasAppItemReadModel
+  }
+
 export type CanvasWorkspaceInteractionContext =
   CanvasWorkspaceSelectionContext & {
     scene: CanvasSceneAdapter
@@ -174,6 +181,7 @@ export type CanvasWorkspaceConsumerModel = {
   keyboard: CanvasWorkspaceKeyboardContext
   pointer: CanvasWorkspacePointerContext
   stage: CanvasWorkspaceStageContext
+  stamp: CanvasWorkspaceStampContext
   text: CanvasWorkspaceTextContext
   viewport: CanvasWorkspaceViewportContext
 }

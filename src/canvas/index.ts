@@ -73,6 +73,8 @@ export type {
   CanvasJsonValue,
   CanvasSelectionIds,
   CanvasStableId,
+  CanvasStampItem,
+  CanvasStampKind,
   EditingText,
   GroupItem,
   HighlightItem,

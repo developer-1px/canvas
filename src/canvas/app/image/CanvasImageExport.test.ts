@@ -17,6 +17,17 @@ const imageItem: CanvasItem = {
   y: 20,
 }
 
+const stampItem: CanvasItem = {
+  h: 44,
+  id: 'stamp-1',
+  label: '+1',
+  stamp: 'thumbs-up',
+  type: 'stamp',
+  w: 44,
+  x: 20,
+  y: 30,
+}
+
 describe('CanvasImageExport', () => {
   it('serializes selected image items into a downloadable SVG payload', () => {
     const payload = createCanvasItemsImageExport({
@@ -103,6 +114,17 @@ describe('CanvasImageExport', () => {
     expect(candidates[0]?.svg).toBe('<svg><foreignObject /></svg>')
     expect(candidates[1]?.svg).toContain('<image')
     expect(candidates[1]?.svg).toContain('data:image/png;base64,aW1hZ2U=')
+  })
+
+  it('serializes selected stamp items in the data-rendered fallback', () => {
+    const payload = createCanvasItemsImageExport({
+      bounds: { h: 44, w: 44, x: 20, y: 30 },
+      items: [stampItem],
+    })
+
+    expect(payload.svg).toContain('<text')
+    expect(payload.svg).toContain('+1')
+    expect(payload.svg).toContain('rx="22"')
   })
 
   it('does not export without a concrete selection', () => {

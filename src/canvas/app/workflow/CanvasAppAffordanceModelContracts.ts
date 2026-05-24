@@ -19,6 +19,9 @@ export type CanvasAppAffordanceInspectorModel =
 export type CanvasAppAffordanceImageModel =
   CanvasAppAffordanceConfigContext
 
+export type CanvasAppAffordanceStampModel =
+  CanvasAppAffordanceConfigContext
+
 export type CanvasAppAffordanceKeyboardModel =
   CanvasAppAffordanceConfigContext
 
@@ -39,6 +42,7 @@ export type CanvasAppAffordanceModel = {
   inspector: CanvasAppAffordanceInspectorModel
   keyboard: CanvasAppAffordanceKeyboardModel
   pointer: CanvasAppAffordancePointerModel
+  stamp: CanvasAppAffordanceStampModel
   text: CanvasAppAffordanceTextModel
   viewport: CanvasAppAffordanceViewportModel
 }
