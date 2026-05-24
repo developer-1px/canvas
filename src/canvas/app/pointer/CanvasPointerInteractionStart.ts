@@ -9,6 +9,7 @@ import {
   type CanvasAffordanceConfig,
   type CanvasCreationAdapter,
 } from '../../engine'
+import type { CanvasAppComponentLibrary } from '../workflow/CanvasAppComponentAssemblyContracts'
 import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import { startCanvasPointerCreation } from './CanvasPointerCreationStart'
@@ -19,6 +20,7 @@ import { startCanvasPointerMarqueeInteraction } from './CanvasPointerMarqueeInte
 import { startCanvasPointerPanInteraction } from './CanvasPointerPanInteraction'
 
 export type CanvasPointerInteractionStartInput = {
+  componentLibrary: CanvasAppComponentLibrary
   config: CanvasAffordanceConfig
   creationAdapter: CanvasCreationAdapter<CanvasItem>
   createId: (prefix: string) => string
@@ -34,6 +36,7 @@ export type CanvasPointerInteractionStartInput = {
 }
 
 export function startCanvasPointerInteraction({
+  componentLibrary,
   config,
   creationAdapter,
   createId,
@@ -70,6 +73,7 @@ export function startCanvasPointerInteraction({
   }
 
   const creationStart = startCanvasPointerCreation({
+    componentLibrary,
     config,
     creationAdapter,
     createId,

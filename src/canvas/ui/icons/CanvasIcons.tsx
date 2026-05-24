@@ -42,6 +42,16 @@ export function CommentIcon() {
   )
 }
 
+export function StickyNoteIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M6.5 4.5h11A1.5 1.5 0 0 1 19 6v8.8L14.8 19H6.5A1.5 1.5 0 0 1 5 17.5V6a1.5 1.5 0 0 1 1.5-1.5z" />
+      <path d="M14.7 19v-3.1a1.1 1.1 0 0 1 1.1-1.1H19" />
+      <path d="M8 9h7M8 12h5" />
+    </svg>
+  )
+}
+
 export function HighlighterIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">

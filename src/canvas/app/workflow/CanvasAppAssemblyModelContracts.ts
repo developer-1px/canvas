@@ -56,6 +56,7 @@ export type CanvasAppAssemblyPointerItemAdapters = {
 }
 
 export type CanvasAppAssemblyPointerModel = {
+  componentLibrary: CanvasAppComponentLibrary
   itemAdapters: CanvasAppAssemblyPointerItemAdapters
 }
 

@@ -61,9 +61,9 @@ describe('CanvasAffordanceConfig', () => {
 
     expect(() =>
       createCanvasAffordanceConfig({
-        tools: { sticky: false },
+        tools: { laser: false },
       } as unknown as CanvasAffordanceConfigInput),
-    ).toThrow('Unknown canvas affordance config tools: sticky')
+    ).toThrow('Unknown canvas affordance config tools: laser')
 
     expect(() =>
       createCanvasAffordanceConfig({

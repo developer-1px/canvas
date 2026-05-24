@@ -30,6 +30,7 @@ export type CanvasCommandAffordance = Readonly<{
 export const CANVAS_TOOL_AFFORDANCE_ORDER = Object.freeze([
   'select',
   'pan',
+  'sticky',
   'rect',
   'text',
   'comment',
@@ -100,6 +101,15 @@ export const CANVAS_TOOL_AFFORDANCES = Object.freeze({
       shortcutId: 'selectTool',
     },
     statusLabel: 'Select',
+  }),
+  sticky: createCanvasToolAffordance({
+    ariaLabel: 'Sticky note tool',
+    keyboardShortcut: {
+      key: 's',
+      shiftInsensitive: true,
+      shortcutId: 'stickyTool',
+    },
+    statusLabel: 'Sticky',
   }),
   text: createCanvasToolAffordance({
     ariaLabel: 'Text tool',

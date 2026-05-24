@@ -504,6 +504,7 @@ export type CanvasAppPointerWorkspaceModel = {
 
 export type CanvasAppPointerModelInput = {
   command: CanvasAppPointerCommandModel
+  componentLibrary: CanvasAppComponentLibrary
   config: CanvasAffordanceConfig
   createId: (prefix: string) => string
   customCreationTools: readonly CanvasAppCustomCreationTool[]

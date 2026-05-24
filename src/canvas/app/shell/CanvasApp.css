@@ -21,6 +21,7 @@
 }
 
 .canvas-stage[data-mode='rect'],
+.canvas-stage[data-mode='sticky'],
 .canvas-stage[data-mode='text'],
 .canvas-stage[data-mode='comment'],
 .canvas-stage[data-mode='marker'],

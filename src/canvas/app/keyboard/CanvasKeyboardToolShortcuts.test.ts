@@ -23,6 +23,12 @@ describe('CanvasKeyboardToolShortcuts', () => {
   it('keeps shift-insensitive built-in tool shortcuts explicit', () => {
     expect(getCanvasKeyboardBuiltinToolShortcut({
       config: createCanvasAffordanceConfig(),
+      event: createKeyboardEvent({ key: 'S', shiftKey: true }),
+      key: 's',
+    })).toBe('sticky')
+
+    expect(getCanvasKeyboardBuiltinToolShortcut({
+      config: createCanvasAffordanceConfig(),
       event: createKeyboardEvent({ key: 'V', shiftKey: true }),
       key: 'v',
     })).toBe('select')

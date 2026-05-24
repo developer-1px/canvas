@@ -12,6 +12,7 @@ describe('CanvasAffordanceMetadata', () => {
     expect(CANVAS_TOOL_AFFORDANCE_ORDER).toEqual([
       'select',
       'pan',
+      'sticky',
       'rect',
       'text',
       'comment',
@@ -45,6 +46,11 @@ describe('CanvasAffordanceMetadata', () => {
       key: 'c',
       shiftInsensitive: true,
       shortcutId: 'commentTool',
+    })
+    expect(CANVAS_TOOL_AFFORDANCES.sticky.keyboardShortcut).toEqual({
+      key: 's',
+      shiftInsensitive: true,
+      shortcutId: 'stickyTool',
     })
     expect(CANVAS_TOOL_AFFORDANCES.highlight.shortcut).toBe('Shift+M')
     expect(CANVAS_TOOL_AFFORDANCES.highlight.title).toBe(

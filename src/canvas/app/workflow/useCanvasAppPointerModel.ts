@@ -5,6 +5,7 @@ import type { CanvasAppPointerModelInput } from './CanvasAppConsumerContracts'
 
 export function useCanvasAppPointerModel({
   command,
+  componentLibrary,
   config,
   createId,
   customCreationTools,
@@ -15,6 +16,7 @@ export function useCanvasAppPointerModel({
 }: CanvasAppPointerModelInput) {
   const downHandlers = useCanvasPointerDownHandlers({
     cloneItems: command.cloneItems,
+    componentLibrary,
     commitItemsChange: command.commitItemsChange,
     commitSelection: command.commitSelection,
     config,

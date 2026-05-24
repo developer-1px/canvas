@@ -13,6 +13,7 @@ describe('CanvasPointerCreationGrammar', () => {
       'create-comment',
       'create-custom',
       'create-rect',
+      'create-sticky',
       'create-text',
       'draw-highlight',
       'draw-marker',

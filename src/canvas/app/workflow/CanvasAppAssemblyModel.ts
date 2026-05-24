@@ -38,6 +38,7 @@ export function getCanvasAppAssemblyModel({
       inspectorPanels,
     },
     pointer: {
+      componentLibrary,
       itemAdapters: {
         creation: itemAdapters.creation,
         transform: itemAdapters.transform,

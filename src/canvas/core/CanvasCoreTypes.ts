@@ -3,6 +3,7 @@ export type CanvasItemId = string
 export type CanvasBuiltinTool =
   | 'select'
   | 'pan'
+  | 'sticky'
   | 'rect'
   | 'text'
   | 'comment'

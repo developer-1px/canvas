@@ -28,6 +28,7 @@ import {
   RectIcon,
   RedoIcon,
   SelectIcon,
+  StickyNoteIcon,
   TextIcon,
   UndoIcon,
   UngroupIcon,
@@ -74,6 +75,7 @@ const CANVAS_TOOLBAR_TOOL_ICONS = {
   pan: PanIcon,
   rect: RectIcon,
   select: SelectIcon,
+  sticky: StickyNoteIcon,
   text: TextIcon,
 } satisfies Record<CanvasBuiltinTool, () => ReactNode>
 

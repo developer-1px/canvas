@@ -4,6 +4,7 @@ import {
   createCanvasAffordanceConfig,
   type CanvasCreationAdapter,
 } from '../../engine'
+import { createCanvasComponentLibrary } from '../../host'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import { startCanvasPointerInteraction } from './CanvasPointerInteractionStart'
 
@@ -95,6 +96,27 @@ describe('CanvasPointerInteractionStart', () => {
     })
   })
 
+  it('creates sticky notes immediately through the sticky tool', () => {
+    const result = startCanvasPointerInteraction(createInput({
+      createId: () => 'component-1',
+      startWorld: { x: 200, y: 300 },
+      tool: 'sticky',
+    }))
+
+    expect(result).toMatchObject({
+      capturePointer: false,
+      item: {
+        component: 'sticky',
+        id: 'component-1',
+        title: 'Sticky',
+        type: 'component',
+        x: 106,
+        y: 226,
+      },
+      kind: 'created-item',
+    })
+  })
+
   it('does not start a missing custom creation tool', () => {
     const result = startCanvasPointerInteraction(createInput({
       customCreationTools: [],
@@ -142,6 +164,7 @@ function createInput(
   overrides: Partial<Parameters<typeof startCanvasPointerInteraction>[0]> = {},
 ): Parameters<typeof startCanvasPointerInteraction>[0] {
   return {
+    componentLibrary: createCanvasComponentLibrary(),
     config,
     creationAdapter,
     createId: (prefix) => `${prefix}-1`,

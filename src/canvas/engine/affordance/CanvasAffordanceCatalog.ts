@@ -56,6 +56,7 @@ export const CANVAS_AFFORDANCE_CONFIG_DEFAULTS = Object.freeze({
     createArrow: true,
     createComment: true,
     createCustom: true,
+    createSticky: true,
     drawHighlight: true,
     drawMarker: true,
     createRect: true,
@@ -118,6 +119,7 @@ export const CANVAS_AFFORDANCE_CONFIG_DEFAULTS = Object.freeze({
     selectTool: true,
     sendBackward: true,
     sendToBack: true,
+    stickyTool: true,
     temporaryPan: true,
     textTool: true,
     undo: true,
@@ -135,6 +137,7 @@ export const CANVAS_AFFORDANCE_CONFIG_DEFAULTS = Object.freeze({
     pan: true,
     rect: true,
     select: true,
+    sticky: true,
     text: true,
   }),
 } satisfies CanvasAffordanceConfigCatalog)

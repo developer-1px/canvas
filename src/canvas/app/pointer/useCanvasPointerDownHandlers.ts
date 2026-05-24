@@ -28,6 +28,7 @@ import type {
   CommitCanvasItemsChange,
   CommitCanvasSelection,
 } from '../workflow/CanvasWorkflowContract'
+import type { CanvasAppComponentLibrary } from '../workflow/CanvasAppComponentAssemblyContracts'
 import type { CanvasAppItemReadModel } from '../workflow/CanvasAppItemReadModelContracts'
 import type { Interaction } from './CanvasInteractionState'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
@@ -53,6 +54,7 @@ import { getCanvasPointerStartProjection } from './CanvasPointerStartSession'
 
 type UseCanvasPointerDownHandlersArgs = {
   cloneItems: (ids: string[], offset: Point) => CanvasItem[]
+  componentLibrary: CanvasAppComponentLibrary
   commitSelection: CommitCanvasSelection
   commitItemsChange: CommitCanvasItemsChange
   config: CanvasAffordanceConfig
@@ -81,6 +83,7 @@ type UseCanvasPointerDownHandlersArgs = {
 
 export function useCanvasPointerDownHandlers({
   cloneItems,
+  componentLibrary,
   commitSelection,
   commitItemsChange,
   config,
@@ -133,6 +136,7 @@ export function useCanvasPointerDownHandlers({
       viewport,
     })
     const start = startCanvasPointerInteraction({
+      componentLibrary,
       config,
       creationAdapter,
       createId,

@@ -48,6 +48,15 @@ describe('CanvasGestureEngine drawing tools', () => {
         config,
         input: baseInput,
         spaceDown: false,
+        tool: 'sticky',
+      }),
+    ).toBe('create-sticky')
+
+    expect(
+      getCanvasPointerGesture({
+        config,
+        input: baseInput,
+        spaceDown: false,
         tool: 'comment',
       }),
     ).toBe('create-comment')
@@ -59,6 +68,7 @@ describe('CanvasGestureEngine drawing tools', () => {
         createArrow: false,
         createComment: false,
         createCustom: false,
+        createSticky: false,
         drawHighlight: false,
         drawMarker: false,
       },
@@ -88,6 +98,15 @@ describe('CanvasGestureEngine drawing tools', () => {
         input: baseInput,
         spaceDown: false,
         tool: 'arrow',
+      }),
+    ).toBe('marquee')
+
+    expect(
+      getCanvasPointerGesture({
+        config: disabled,
+        input: baseInput,
+        spaceDown: false,
+        tool: 'sticky',
       }),
     ).toBe('marquee')
 
@@ -138,6 +157,12 @@ describe('CanvasGestureEngine drawing tools', () => {
       shouldRouteCanvasItemPointerToCanvasGesture({
         spaceDown: false,
         tool: 'arrow',
+      }),
+    ).toBe(true)
+    expect(
+      shouldRouteCanvasItemPointerToCanvasGesture({
+        spaceDown: false,
+        tool: 'sticky',
       }),
     ).toBe(true)
     expect(

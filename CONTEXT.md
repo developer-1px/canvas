@@ -85,6 +85,7 @@
 - Canvas Image Export: selection read model, 현재 Stage SVG snapshot, fallback image export SVG/PNG 변환, selected item composition download/copy 실행을 소유하는 App-owned image Module.
 - Canvas Image Controls: file upload, drag/drop upload, paste image, copy selected as image, download selected as image 버튼과 이벤트만 노출하고 browser file/clipboard/download how는 App image Module에 숨기는 UI surface.
 - Canvas Pointer Comment Creation: comment tool gesture, click point placement, clicked item attachment, id generation, immediate document add result를 Canvas Comment Item 생성 결과로 바꾸는 App-owned pointer creation Module.
+- Canvas Pointer Component Creation: sticky note처럼 사회적 약속이 된 component-backed built-in tool gesture를 Canvas Component Library template과 click point placement로 변환하는 App-owned pointer creation Module.
 - Canvas Stamp Insertion: stamp definition, selected object attachment placement, selection-adjacent/viewport-center placement, id generation, document add commit, post-insert selection을 Canvas Stamp Item 삽입 결과로 바꾸는 App-owned stamp Module.
 - Canvas Stamp Controls: built-in stamp palette 버튼만 노출하고 placement/document commit how는 App stamp Module에 숨기는 UI surface.
 - Canvas App Custom Command: 내부 command grammar를 수정하지 않고 제품별 business action을 toolbar action으로 등록하는 App-owned command descriptor.
@@ -144,11 +145,12 @@
 - Canvas Tool Gesture Routing: built-in tool과 custom tool을 pointer gesture, feature gate, item pointer rerouting rule로 변환하고 route input/defaulting contract를 소유하는 Engine-owned what 계약 Module.
 - Canvas Pointer Start Session: pointer-down 시 stage-local screen coordinate와 viewport-projected world coordinate를 start interaction Module들에 제공하는 App-owned start lifecycle Module.
 - Canvas App Pointer Input: Renderer/DOM pointer event에서 App pointer grammar가 필요한 screen point, pointer id, modifier, cancellation 함수만 명시하는 App-owned event source Interface 계약.
-- Canvas Pointer Creation Grammar: shape creation, drawing creation, custom creation, text creation gesture와 active creation interaction kind set을 소유하고 lifecycle runtime Module들이 소비하는 App-owned what 계약 Module.
+- Canvas Pointer Creation Grammar: shape creation, drawing creation, component-backed creation, custom creation, text creation gesture와 active creation interaction kind set을 소유하고 lifecycle runtime Module들이 소비하는 App-owned what 계약 Module.
 - Canvas Pointer Interaction Routing: active interaction kind를 pan, transform, marquee, creation, none handler로 분류하는 App-owned internal grammar Module.
-- Canvas Pointer Creation Start: pointer-down 시 shape creation, drawing creation, custom creation, text creation 시작 상태를 각 creation lifecycle Module에 위임하는 App-owned runtime Module.
+- Canvas Pointer Creation Start: pointer-down 시 shape creation, drawing creation, component-backed creation, custom creation, text creation 시작 상태를 각 creation lifecycle Module에 위임하는 App-owned runtime Module.
 - Canvas Pointer Shape Creation: built-in rect/arrow shape creation gesture, draft shape preview, enabled gate, item creation commit, post-create tool selection descriptor를 소유하는 App-owned shape lifecycle Module.
 - Canvas Pointer Drawing Creation: built-in marker/highlighter stroke drawing gesture, draft stroke preview, enabled gate, item creation commit descriptor를 소유하는 App-owned drawing lifecycle Module.
+- Canvas Pointer Component Creation: built-in sticky note gesture, enabled gate, component template lookup, centered placement, immediate component item creation을 소유하는 App-owned component-backed lifecycle Module.
 - Canvas Pointer Custom Creation: 제품별 custom creation tool lookup, start/preview, item creation commit, external failure containment를 소유하는 App-owned custom lifecycle Module.
 - Canvas Pointer Text Creation: built-in text creation gesture, enabled gate, immediate text item creation, edit entry descriptor를 소유하는 App-owned text lifecycle Module.
 - Canvas Pointer Marquee Interaction: select tool의 marquee start, additive selection, preview bounds/selection, commit clear/selection, cancel restore 규칙을 소유하는 App-owned interaction Module.
@@ -239,9 +241,11 @@
 - Demo 설명과 장식은 최소화한다.
 - 이 프로젝트는 단일 서비스 앱보다 재사용 가능한 캔버스 부품공장을 우선한다.
 - 당연한 사회적 약속이 되어 있는 캔버스 기능은 내부 모듈이 관리하고, 제품별 커스텀 기능은 외부에서 조립식으로 등록할 수 있어야 한다.
-- marker, highlighter, arrow 같은 기본 드로잉 도구는 제품별 custom item module이 아니라 내부 Affordance로 관리한다.
+- sticky note, marker, highlighter, arrow, comment 같은 기본 화이트보드 도구는 제품별 custom item module이 아니라 내부 Affordance로 관리한다.
+- Sticky note tool은 별도 stable entity를 만들지 않고 Canvas Component Library의 `sticky` template을 사용해 component item을 생성한다.
 - marker/highlighter stroke drawing lifecycle의 gesture kind, draft stroke, enabled gate, item commit은 Canvas Pointer Drawing Creation Module이 소유한다.
 - rect/arrow shape creation lifecycle의 gesture kind, draft shape, enabled gate, item commit, post-create tool selection은 Canvas Pointer Shape Creation Module이 소유한다.
+- sticky note creation lifecycle의 gesture kind, component template lookup, enabled gate, immediate item creation은 Canvas Pointer Component Creation Module이 소유한다.
 - Custom creation tool의 pointer lifecycle, lookup, commit, external failure containment는 Canvas Pointer Custom Creation Module이 소유한다.
 - Text creation lifecycle의 gesture kind, enabled gate, immediate item creation, edit entry는 Canvas Pointer Text Creation Module이 소유한다.
 - Marquee selection의 additive 판정, preview selection, commit clear/selection, cancel restore 규칙은 Canvas Pointer Marquee Interaction Module이 소유한다.
@@ -315,7 +319,7 @@
 - Resize pointer down hook은 DOM event routing과 시작 결과 적용을 맡고, resize handle/selected bounds/config 기반 시작 규칙은 Canvas Resize Pointer Interaction Start가 소유한다.
 - Text double-click hook은 시작 결과 적용을 맡고, text edit 가능 여부/selection/edit state/tool 전환 규칙은 Canvas Item Pointer Interaction Start가 소유한다.
 - Pointer drag hook은 DOM pointer routing과 coordinate 변환, preview/commit/cancel runtime 호출만 맡고, active interaction kind 분류는 Canvas Pointer Interaction Routing이, pointer-move preview orchestration은 Canvas Pointer Interaction Preview가, preview result descriptor shape는 Canvas Pointer Interaction Result Contracts가, effect context shape는 Canvas Pointer Interaction Effect Contracts가, creation interaction kind set은 Canvas Pointer Creation Grammar가, move/resize live item preview는 Canvas Pointer Transform Preview가, 생성/드로잉 draft preview는 Canvas Pointer Creation Preview가, pointer-up/cancel 확정 규칙은 Canvas Pointer Interaction Lifecycle이, preview result state 반영과 pointer-up/cancel cleanup/rollback effect는 Canvas Pointer Interaction Drag Effects가 소유한다.
-- Canvas Pointer Creation Grammar는 lifecycle runtime Module에서 kind 목록을 역수입하지 않고, shape/drawing/custom/text creation runtime Module이 Grammar의 kind 계약을 소비한다.
+- Canvas Pointer Creation Grammar는 lifecycle runtime Module에서 kind 목록을 역수입하지 않고, shape/drawing/component-backed/custom/text creation runtime Module이 Grammar의 kind 계약을 소비한다.
 - Canvas Pointer Interaction Lifecycle은 생성/드로잉 item commit 세부를 직접 알지 않고 Canvas Pointer Creation Commit에 위임한다.
 - 제품별 item kind는 내부 `CanvasItem` union에 새 variant를 추가하지 않고 Canvas App Custom Item Module로 등록한다.
 - Canvas Item Schema는 custom item envelope와 validator registry 세부를 직접 알지 않고 Canvas Custom Item Validation에 위임한다.

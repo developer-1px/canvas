@@ -16,9 +16,13 @@ import {
 import {
   startCanvasPointerCommentCreation,
 } from './CanvasPointerCommentCreation'
+import {
+  startCanvasPointerComponentCreation,
+} from './CanvasPointerComponentCreation'
 import type {
   CanvasPointerCreationStartResult,
 } from './CanvasPointerInteractionResultContracts'
+import type { CanvasAppComponentLibrary } from '../workflow/CanvasAppComponentAssemblyContracts'
 import {
   startCanvasPointerDrawingCreation,
 } from './CanvasPointerDrawingCreation'
@@ -33,6 +37,7 @@ import {
 } from './CanvasPointerTextCreation'
 
 export type CanvasPointerCreationStartInput = {
+  componentLibrary: CanvasAppComponentLibrary
   config: CanvasAffordanceConfig
   creationAdapter: CanvasCreationAdapter<CanvasItem>
   createId: (prefix: string) => string
@@ -46,6 +51,7 @@ export type CanvasPointerCreationStartInput = {
 }
 
 export function startCanvasPointerCreation({
+  componentLibrary,
   config,
   creationAdapter,
   createId,
@@ -94,6 +100,18 @@ export function startCanvasPointerCreation({
 
   if (commentStart) {
     return commentStart
+  }
+
+  const componentStart = startCanvasPointerComponentCreation({
+    componentLibrary,
+    config,
+    createId,
+    pointerGesture,
+    startWorld,
+  })
+
+  if (componentStart) {
+    return componentStart
   }
 
   const customStart = startCanvasPointerCustomCreation({
