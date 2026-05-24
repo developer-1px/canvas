@@ -1,9 +1,9 @@
 import { describe, expect, it, vi } from 'vitest'
 import { getCanvasAppInspectorPanelViews } from './CanvasAppInspectorPanelExecution'
-import type { CanvasAppInspectorPanelContext } from './CanvasAppInspectorPanels'
-import {
-  assertCanvasAppInspectorPanels,
-  type CanvasAppInspectorPanel,
+import { assertCanvasAppInspectorPanels } from './CanvasAppInspectorPanelContracts'
+import type {
+  CanvasAppInspectorPanel,
+  CanvasAppInspectorPanelContext,
 } from './CanvasAppInspectorPanels'
 
 const context: CanvasAppInspectorPanelContext = {

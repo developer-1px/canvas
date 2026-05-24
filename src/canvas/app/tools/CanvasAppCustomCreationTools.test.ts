@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest'
 import {
   assertCanvasAppCustomCreationTools,
   assertCanvasAppCustomCreationToolShortcuts,
-  type CanvasAppCustomCreationTool,
-} from './CanvasAppCustomCreationTools'
+} from './CanvasAppCustomCreationToolContracts'
+import type { CanvasAppCustomCreationTool } from './CanvasAppCustomCreationTools'
 import {
   getCanvasAppCustomCreationTool,
   getCanvasAppCustomCreationToolStates,

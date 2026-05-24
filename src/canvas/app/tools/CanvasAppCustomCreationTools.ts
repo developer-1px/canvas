@@ -26,8 +26,3 @@ export type CanvasAppCustomCreationTool = {
   statusLabel?: string
   title: string
 }
-
-export {
-  assertCanvasAppCustomCreationToolShortcuts,
-  assertCanvasAppCustomCreationTools,
-} from './CanvasAppCustomCreationToolContracts'

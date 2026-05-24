@@ -32,7 +32,3 @@ export type CanvasAppInspectorPanelView = {
   content: ReactNode
   id: string
 }
-
-export { assertCanvasAppInspectorPanels } from './CanvasAppInspectorPanelContracts'
-
-export { getCanvasAppInspectorPanelViews } from './CanvasAppInspectorPanelExecution'

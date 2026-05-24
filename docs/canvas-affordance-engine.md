@@ -236,10 +236,10 @@ type CanvasAffordanceConfig = {
 - 제품별 business action은 Engine command union에 추가하지 않고 Canvas App Assembly의 custom command descriptor로 등록한다.
 - Canvas App Custom Command Context는 내부 Canvas Workflow Contract를 외부 authoring Interface로 노출하지 않고 필요한 commit/document slot을 자체 public context 계약으로 명시한다.
 - Custom command의 availability/run 실패는 내부 command loop를 깨지 않고 disabled/false로 containment 된다.
-- Canvas App Custom Command descriptor shape 검증과 toolbar state/run execution은 분리하고, validation은 Canvas App Custom Command Contracts가, 실행 실패 containment는 Canvas App Custom Command Execution이 소유한다. Descriptor Module은 runtime state/run helper를 재노출하지 않는다.
+- Canvas App Custom Command descriptor shape 검증과 toolbar state/run execution은 분리하고, validation은 Canvas App Custom Command Contracts가, 실행 실패 containment는 Canvas App Custom Command Execution이 소유한다. Descriptor Module은 validation/execution helper를 재노출하지 않는다.
 - Canvas App Custom Command State와 Canvas App Custom Creation Tool State shape는 Canvas App Extension State Contracts가 소유하고, execution/runtime Module은 state 생성과 실행 mechanics만 소유한다.
 - 제품별 item creation tool은 내부 builtin tool list에 추가하지 않고 Canvas App Custom Item Module에 등록한다.
-- Canvas App Custom Creation Tool descriptor shape/shortcut conflict 검증과 runtime state/lookup/shortcut matching은 분리하고, validation은 Canvas App Custom Creation Tool Contracts가, runtime behavior는 Canvas App Custom Creation Tool Runtime이 소유한다. Descriptor Module은 runtime state/lookup helper를 재노출하지 않는다.
+- Canvas App Custom Creation Tool descriptor shape/shortcut conflict 검증과 runtime state/lookup/shortcut matching은 분리하고, validation은 Canvas App Custom Creation Tool Contracts가, runtime behavior는 Canvas App Custom Creation Tool Runtime이 소유한다. Descriptor Module은 validation/runtime helper를 재노출하지 않는다.
 - Canvas App Custom Creation Tool Contracts와 Canvas App Custom Item Module Contracts는 Runtime Module을 import하지 않고 raw descriptor shape와 shortcut conflict를 검증한다.
 - Custom creation tool이 item 생성을 거부하거나 실패하거나 invalid item을 반환해도 pointer interaction cleanup은 계속 진행되고 문서 상태는 손상하지 않는다.
 - Pointer down hook은 DOM pointer routing과 coordinate 변환을 맡고, tool/gesture/config/custom tool 기반 interaction 시작 규칙은 Canvas Pointer Interaction Start가, 시작 결과 적용은 Canvas Pointer Interaction Start Effects가 소유한다.
@@ -271,7 +271,7 @@ type CanvasAffordanceConfig = {
 - App authoring/workflow module은 renderer registry what을 `CanvasAppRendererRegistries` named seam에서 가져오고 `../rendering` barrel에 직접 기대지 않는다.
 - Canvas App extension id와 registry key는 lower-kebab 안정 id만 허용한다. 잘못된 module id, command id, tool id, renderer key, validator key, inspector id는 define 또는 assembly 단계에서 실패한다.
 - Canvas App descriptor는 id뿐 아니라 필수 string/function/shortcut slot과 registry shape도 define 또는 assembly 단계에서 검증한다. malformed command, creation tool, inspector panel, renderer strategy는 등록 전에 실패하고, 실행 중 throw는 별도의 containment로 처리한다.
-- Canvas App Inspector Panel descriptor shape 검증과 visibility/render execution은 분리하고, validation은 Canvas App Inspector Panel Contracts가, 실행 실패 omit은 Canvas App Inspector Panel Execution이 소유한다.
+- Canvas App Inspector Panel descriptor shape 검증과 visibility/render execution은 분리하고, validation은 Canvas App Inspector Panel Contracts가, 실행 실패 omit은 Canvas App Inspector Panel Execution이 소유한다. Descriptor Module은 validation/execution helper를 재노출하지 않는다.
 - Custom item `kind`/`presentation`과 Component Template `id`/`presentation`도 같은 안정 id 계약을 따르며, 잘못된 persisted key는 Host validation 또는 component library 생성 단계에서 실패한다.
 - App workflow는 Demo SVG Item Layer를 직접 생성하지 않고 Canvas App Item Layer Adapter를 통해 stage children을 만든다.
 - App Shell은 concrete Renderer Stage를 직접 import하지 않고 Canvas App Stage Adapter가 만든 stage ReactNode를 배치한다.

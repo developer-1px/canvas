@@ -36,5 +36,3 @@ export type CanvasAppCustomCommand = {
   run: (context: CanvasAppCustomCommandContext) => void
   title: string
 }
-
-export { assertCanvasAppCustomCommands } from './CanvasAppCustomCommandContracts'

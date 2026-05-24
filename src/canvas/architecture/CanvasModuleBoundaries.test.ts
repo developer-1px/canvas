@@ -3551,7 +3551,7 @@ describe('Canvas module boundaries', () => {
       'src/canvas/app/inspector/CanvasObjectInspectorModel.ts',
     )
 
-    expect(descriptorFile.source).toContain(
+    expect(descriptorFile.source).not.toContain(
       "from './CanvasAppInspectorPanelExecution'",
     )
     expect(descriptorFile.source).not.toContain('CanvasWorkflowContract')
@@ -3580,8 +3580,11 @@ describe('Canvas module boundaries', () => {
       'src/canvas/app/inspector/CanvasAppInspectorPanelContracts.ts',
     )
 
-    expect(descriptorFile.source).toContain(
+    expect(descriptorFile.source).not.toContain(
       "from './CanvasAppInspectorPanelContracts'",
+    )
+    expect(descriptorFile.source).not.toContain(
+      "from './CanvasAppInspectorPanelExecution'",
     )
     expect(descriptorFile.source).not.toContain(
       'function assertCanvasAppInspectorPanels',
@@ -4068,7 +4071,7 @@ describe('Canvas module boundaries', () => {
       'src/canvas/app/commands/CanvasAppCustomCommandContracts.ts',
     )
 
-    expect(descriptorFile.source).toContain(
+    expect(descriptorFile.source).not.toContain(
       "from './CanvasAppCustomCommandContracts'",
     )
     expect(descriptorFile.source).not.toContain(
@@ -4723,7 +4726,7 @@ describe('Canvas module boundaries', () => {
       'src/canvas/app/tools/CanvasAppCustomCreationToolContracts.ts',
     )
 
-    expect(descriptorFile.source).toContain(
+    expect(descriptorFile.source).not.toContain(
       "from './CanvasAppCustomCreationToolContracts'",
     )
     expect(descriptorFile.source).not.toContain(

@@ -3,10 +3,10 @@ import {
   getCanvasAppCustomCommandStates,
   runCanvasAppCustomCommand,
 } from './CanvasAppCustomCommandExecution'
-import type { CanvasAppCustomCommandContext } from './CanvasAppCustomCommands'
-import {
-  assertCanvasAppCustomCommands,
-  type CanvasAppCustomCommand,
+import { assertCanvasAppCustomCommands } from './CanvasAppCustomCommandContracts'
+import type {
+  CanvasAppCustomCommand,
+  CanvasAppCustomCommandContext,
 } from './CanvasAppCustomCommands'
 
 const context: CanvasAppCustomCommandContext = {
