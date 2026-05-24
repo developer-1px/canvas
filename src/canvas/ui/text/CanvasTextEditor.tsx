@@ -11,6 +11,7 @@ type CanvasTextEditorValue = {
 }
 
 type CanvasTextEditorProps = {
+  commitOnEnter?: boolean
   editing: CanvasTextEditorValue | null
   editorRef: RefObject<HTMLTextAreaElement | null>
   style: CSSProperties | undefined
@@ -21,6 +22,7 @@ type CanvasTextEditorProps = {
 }
 
 export function CanvasTextEditor({
+  commitOnEnter = true,
   editing,
   editorRef,
   style,
@@ -40,7 +42,12 @@ export function CanvasTextEditor({
   function handleKeyDown(event: ReactKeyboardEvent<HTMLTextAreaElement>) {
     const shortcutModifier = event.metaKey || event.ctrlKey
 
-    if (event.key === 'Enter' && !event.shiftKey && !shortcutModifier) {
+    if (
+      commitOnEnter &&
+      event.key === 'Enter' &&
+      !event.shiftKey &&
+      !shortcutModifier
+    ) {
       event.preventDefault()
       onCommit()
     }

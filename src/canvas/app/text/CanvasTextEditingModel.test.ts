@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import type {
+  ArrowItem,
   CanvasComponentItem,
   EditingText,
   RectItem,
@@ -71,6 +72,23 @@ describe('CanvasTextEditingModel', () => {
     )
   })
 
+  it('allows empty connector labels to stay empty', () => {
+    const commitItemsChange = vi.fn()
+
+    commitCanvasTextEditing({
+      commitItemsChange,
+      editing: createEditing('', 'arrow-1'),
+      editingItem: createArrowItem(),
+      selection: ['arrow-1'],
+      setEditing: vi.fn(),
+    })
+
+    expect(commitItemsChange).toHaveBeenCalledWith(
+      { type: 'set-text', id: 'arrow-1', text: '' },
+      { before: ['arrow-1'], after: ['arrow-1'] },
+    )
+  })
+
   it('clears editing without document changes when the edited item disappeared', () => {
     const commitItemsChange = vi.fn()
     const setEditing = vi.fn()
@@ -133,6 +151,21 @@ describe('CanvasTextEditingModel', () => {
       viewport: { scale: 1, x: 0, y: 0 },
     })).toBeUndefined()
   })
+
+  it('projects connector label bounds instead of the full arrow bounds', () => {
+    expect(getCanvasTextEditorStyle({
+      editing: createEditing('Route', 'arrow-1'),
+      editingItem: createArrowItem(),
+      viewport: { scale: 2, x: 5, y: 7 },
+    })).toEqual({
+      fontSize: 32,
+      height: 64,
+      left: 229,
+      minHeight: 64,
+      top: 215,
+      width: 192,
+    })
+  })
 })
 
 function createEditing(value: string, id = 'text-1'): EditingText {
@@ -186,6 +219,23 @@ function createStickyItem(
     w: 188,
     x: 10,
     y: 20,
+    ...overrides,
+  }
+}
+
+function createArrowItem(overrides: Partial<ArrowItem> = {}): ArrowItem {
+  return {
+    end: { x: 240, y: 120 },
+    h: 24,
+    id: 'arrow-1',
+    start: { x: 80, y: 120 },
+    stroke: '#334155',
+    strokeWidth: 3,
+    text: 'Route',
+    type: 'arrow',
+    w: 184,
+    x: 68,
+    y: 108,
     ...overrides,
   }
 }

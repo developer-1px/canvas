@@ -179,6 +179,9 @@ const CANVAS_STAGE_SNAPSHOT_STYLE = `
 .highlight-item{mix-blend-mode:multiply}
 .arrow-item{fill:none;stroke-linecap:round;stroke-linejoin:round}
 .arrow-head{fill:#334155}
+.arrow-label{pointer-events:none}
+.arrow-label-bg{fill:#fff;stroke:#cbd5e1;stroke-width:1}
+.arrow-label-text{box-sizing:border-box;display:grid;width:100%;height:100%;align-items:center;justify-items:center;overflow:hidden;padding:4px 10px;color:#111827;font:600 13px/1.2 sans-serif;text-align:center;white-space:pre-wrap;word-break:break-word}
 .component-hit,.group-hit{fill:transparent}
 .canvas-text{box-sizing:border-box;width:100%;height:100%;overflow:hidden;padding:6px 8px;color:#111827;font:500 16px/1.35 sans-serif;white-space:pre-wrap;word-break:break-word}
 .component-text{box-sizing:border-box;width:100%;height:100%;padding:18px;color:#111827;font-family:sans-serif}

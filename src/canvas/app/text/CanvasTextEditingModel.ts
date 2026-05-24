@@ -4,6 +4,7 @@ import type {
   Viewport,
 } from '../../entities'
 import {
+  getCanvasEditableTextBounds,
   getCommittedCanvasEditableTextValue,
 } from '../../host'
 import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract'
@@ -64,13 +65,14 @@ export function getCanvasTextEditorStyle({
   if (!editing || !editingItem) {
     return undefined
   }
+  const bounds = getCanvasEditableTextBounds(editingItem)
 
   return {
-    left: viewport.x + editingItem.x * viewport.scale,
-    top: viewport.y + editingItem.y * viewport.scale,
-    width: editingItem.w * viewport.scale,
-    height: editingItem.h * viewport.scale,
-    minHeight: editingItem.h * viewport.scale,
+    left: viewport.x + bounds.x * viewport.scale,
+    top: viewport.y + bounds.y * viewport.scale,
+    width: bounds.w * viewport.scale,
+    height: bounds.h * viewport.scale,
+    minHeight: bounds.h * viewport.scale,
     fontSize: 16 * viewport.scale,
   }
 }

@@ -55,6 +55,7 @@ export {
   isCanvasStrokeDrawingItem,
   scaleCanvasDrawingItem,
   syncCanvasDrawingItemBounds,
+  getCanvasArrowLabelBounds,
   translateCanvasArrowAttachedEndpoints,
   translateCanvasDrawingItem,
   type CanvasDrawingItem,
@@ -111,11 +112,13 @@ export {
 export {
   getCanvasEditableTextPatchOperation,
   getCanvasEditableTextPatchField,
+  getCanvasEditableTextBounds,
   getCanvasEditableTextValue,
   getCommittedCanvasEditableTextValue,
   isCanvasEditableTextItem,
   isCanvasEditableTextItemStorageShape,
   isCanvasTextItem,
+  shouldCommitCanvasEditableTextOnEnter,
 } from './text/CanvasEditableTextItem'
 
 export type { CanvasItemsChange } from './document/CanvasDocumentChanges'

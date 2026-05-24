@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { CanvasItem } from '../model'
 import {
+  getCanvasArrowLabelBounds,
   getCanvasDrawingItemBounds,
   isCanvasDrawingItem,
   scaleCanvasDrawingItem,
@@ -62,6 +63,28 @@ describe('CanvasDrawingItemGeometry', () => {
       w: 104,
       x: 8,
       y: 28,
+    })
+  })
+
+  it('includes visible connector labels in arrow bounds', () => {
+    const labeledArrow = {
+      ...arrow,
+      end: { x: 240, y: 120 },
+      start: { x: 80, y: 120 },
+      text: 'A long connector label',
+    }
+
+    expect(getCanvasArrowLabelBounds(labeledArrow)).toEqual({
+      h: 32,
+      w: 182,
+      x: 69,
+      y: 104,
+    })
+    expect(getCanvasDrawingItemBounds(labeledArrow)).toEqual({
+      h: 32,
+      w: 184,
+      x: 68,
+      y: 104,
     })
   })
 

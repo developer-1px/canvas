@@ -1,5 +1,9 @@
 import { describe, expect, it, vi } from 'vitest'
-import type { CanvasComponentItem } from '../../entities'
+import type {
+  ArrowItem,
+  CanvasComponentItem,
+  CanvasItem,
+} from '../../entities'
 import { getCanvasDemoSvgItemRenderRoute } from './CanvasDemoSvgItemRenderRouting'
 import { DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS } from './CanvasDemoSvgComponentPresentationRegistry'
 import { DEFAULT_CANVAS_DEMO_SVG_CUSTOM_ITEM_RENDERERS } from './CanvasDemoSvgCustomItemRendererRegistry'
@@ -26,9 +30,23 @@ describe('CanvasDemoSvgItemRenderRouting', () => {
     expect(onTextDoubleClick).toHaveBeenCalledWith(sticky)
     expect(cardRoute.onDoubleClick).toBeUndefined()
   })
+
+  it('routes arrow double-clicks into connector label editing', () => {
+    const onTextDoubleClick = vi.fn()
+    const arrow = createArrowItem()
+
+    const route = getCanvasDemoSvgItemRenderRoute({
+      ...createInput(arrow),
+      onTextDoubleClick,
+    })
+
+    route.onDoubleClick?.()
+
+    expect(onTextDoubleClick).toHaveBeenCalledWith(arrow)
+  })
 })
 
-function createInput(item: CanvasComponentItem) {
+function createInput(item: CanvasItem) {
   return {
     bounds: item,
     componentPresentationRenderers:
@@ -41,6 +59,23 @@ function createInput(item: CanvasComponentItem) {
     onTextDoubleClick: () => undefined,
     renderChild: () => null,
     selected: false,
+  }
+}
+
+function createArrowItem(overrides: Partial<ArrowItem> = {}): ArrowItem {
+  return {
+    end: { x: 240, y: 120 },
+    h: 24,
+    id: 'arrow-1',
+    start: { x: 80, y: 120 },
+    stroke: '#334155',
+    strokeWidth: 3,
+    text: 'Flow',
+    type: 'arrow',
+    w: 184,
+    x: 68,
+    y: 108,
+    ...overrides,
   }
 }
 

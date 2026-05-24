@@ -36,7 +36,8 @@ function isCanvasArrowDrawingItemStorageShape(
     isOptionalStableItemId(value.startAttachedTo) &&
     isOptionalStableItemId(value.endAttachedTo) &&
     typeof value.stroke === 'string' &&
-    isPositiveFiniteNumber(value.strokeWidth)
+    isPositiveFiniteNumber(value.strokeWidth) &&
+    (value.text === undefined || typeof value.text === 'string')
   )
 }
 

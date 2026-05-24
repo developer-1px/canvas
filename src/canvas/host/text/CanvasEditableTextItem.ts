@@ -3,7 +3,13 @@ import type {
   CanvasItem,
   TextItem,
 } from '../model'
+import type { Bounds } from '../../core'
 import { isCanvasStickyComponentItem } from '../component/CanvasStickyComponent'
+import {
+  getCanvasArrowLabelBounds,
+  isCanvasArrowDrawingItem,
+} from '../drawing/CanvasDrawingItemGeometry'
+import { isCanvasDrawingItemStorageShape } from '../drawing/CanvasDrawingItemValidation'
 
 export type { CanvasEditableTextItem } from '../model'
 
@@ -17,6 +23,7 @@ export function isCanvasEditableTextItem(
   return (
     item.type === 'rect' ||
     isCanvasTextItem(item) ||
+    isCanvasArrowDrawingItem(item) ||
     isCanvasStickyComponentItem(item)
   )
 }
@@ -26,7 +33,8 @@ export function isCanvasEditableTextItemStorageShape(
 ): value is CanvasEditableTextItem {
   return (
     isCanvasRectItemStorageShape(value) ||
-    isCanvasTextItemStorageShape(value)
+    isCanvasTextItemStorageShape(value) ||
+    isCanvasArrowTextItemStorageShape(value)
   )
 }
 
@@ -37,7 +45,7 @@ export function getCanvasEditableTextValue(
     return item.body ?? ''
   }
 
-  return item.type === 'rect' ? item.text ?? '' : item.text
+  return item.text ?? ''
 }
 
 export function getCommittedCanvasEditableTextValue({
@@ -66,12 +74,32 @@ export function getCanvasEditableTextPatchField(
   return item.type === 'component' ? 'body' : 'text'
 }
 
+export function getCanvasEditableTextBounds(
+  item: CanvasEditableTextItem,
+): Bounds {
+  return isCanvasArrowDrawingItem(item)
+    ? getCanvasArrowLabelBounds(item)
+    : {
+        x: item.x,
+        y: item.y,
+        w: item.w,
+        h: item.h,
+      }
+}
+
+export function shouldCommitCanvasEditableTextOnEnter(
+  item: CanvasEditableTextItem,
+) {
+  return !isCanvasArrowDrawingItem(item)
+}
+
 function isCanvasEditableTextPatchFieldMissing(
   item: CanvasEditableTextItem,
 ) {
   return (
     (item.type === 'rect' && item.text === undefined) ||
-    (item.type === 'component' && item.body === undefined)
+    (item.type === 'component' && item.body === undefined) ||
+    (item.type === 'arrow' && item.text === undefined)
   )
 }
 
@@ -90,4 +118,10 @@ function isCanvasTextItemStorageShape(
   value: Record<string, unknown>,
 ) {
   return value.type === 'text' && typeof value.text === 'string'
+}
+
+function isCanvasArrowTextItemStorageShape(
+  value: Record<string, unknown>,
+) {
+  return value.type === 'arrow' && isCanvasDrawingItemStorageShape(value)
 }

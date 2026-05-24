@@ -89,6 +89,7 @@ describe('CanvasDemoSvgDrawingItemRenderer', () => {
         end: { x: 240, y: 140 },
         stroke: '#334155',
         strokeWidth: 3,
+        text: 'Next',
       },
     ])
 
@@ -98,6 +99,8 @@ describe('CanvasDemoSvgDrawingItemRenderer', () => {
     expect(markup).toContain('x2="240"')
     expect(markup).toContain('y2="140"')
     expect(markup).toContain('marker-end="url(#canvas-arrow-head)"')
+    expect(markup).toContain('class="arrow-label"')
+    expect(markup).toContain('Next')
   })
 })
 

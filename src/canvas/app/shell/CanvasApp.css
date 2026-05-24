@@ -127,6 +127,32 @@
   pointer-events: all;
 }
 
+.arrow-label {
+  pointer-events: none;
+}
+
+.arrow-label-bg {
+  fill: #ffffff;
+  stroke: #cbd5e1;
+  stroke-width: 1;
+}
+
+.arrow-label-text {
+  box-sizing: border-box;
+  display: grid;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-items: center;
+  overflow: hidden;
+  padding: 4px 10px;
+  color: #111827;
+  font: 600 13px/1.2 var(--sans);
+  text-align: center;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
 .draft-arrow-head {
   fill: #2563eb;
 }

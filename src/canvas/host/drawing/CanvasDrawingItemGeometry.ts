@@ -12,6 +12,11 @@ import type {
 } from '../model'
 
 const CANVAS_ARROW_BOUNDS_PAD = 12
+const CANVAS_ARROW_LABEL_HEIGHT = 32
+const CANVAS_ARROW_LABEL_MAX_WIDTH = 220
+const CANVAS_ARROW_LABEL_MIN_WIDTH = 96
+const CANVAS_ARROW_LABEL_PADDING_X = 28
+const CANVAS_ARROW_LABEL_TEXT_WIDTH = 7
 
 export type CanvasStrokeDrawingItem = MarkerItem | HighlightItem
 export type CanvasDrawingItem = CanvasStrokeDrawingItem | ArrowItem
@@ -103,6 +108,21 @@ export function translateCanvasArrowAttachedEndpoints({
     : item
 }
 
+export function getCanvasArrowLabelBounds(item: ArrowItem): Bounds {
+  const width = getCanvasArrowLabelWidth(item.text ?? '')
+  const midpoint = {
+    x: (item.start.x + item.end.x) / 2,
+    y: (item.start.y + item.end.y) / 2,
+  }
+
+  return {
+    x: midpoint.x - width / 2,
+    y: midpoint.y - CANVAS_ARROW_LABEL_HEIGHT / 2,
+    w: width,
+    h: CANVAS_ARROW_LABEL_HEIGHT,
+  }
+}
+
 export function scaleCanvasDrawingItem<TItem extends CanvasDrawingItem>({
   from,
   item,
@@ -149,10 +169,14 @@ function getCanvasStrokeDrawingItemBounds(
 }
 
 function getCanvasArrowDrawingItemBounds(item: ArrowItem) {
-  return padBounds(
+  const arrowBounds = padBounds(
     normalizeBounds(item.start, item.end),
     CANVAS_ARROW_BOUNDS_PAD,
   )
+
+  return item.text?.trim()
+    ? unionBounds(arrowBounds, getCanvasArrowLabelBounds(item))
+    : arrowBounds
 }
 
 function getPointBounds(points: Point[]) {
@@ -234,4 +258,33 @@ function getUniformBoundsPad(outer: Bounds, inner: Bounds) {
     (outer.h - inner.h) / 2,
     0,
   )
+}
+
+function getCanvasArrowLabelWidth(text: string) {
+  const longestLine = text
+    .split('\n')
+    .reduce((length, line) => Math.max(length, line.length), 0)
+
+  return Math.min(
+    Math.max(
+      longestLine * CANVAS_ARROW_LABEL_TEXT_WIDTH +
+        CANVAS_ARROW_LABEL_PADDING_X,
+      CANVAS_ARROW_LABEL_MIN_WIDTH,
+    ),
+    CANVAS_ARROW_LABEL_MAX_WIDTH,
+  )
+}
+
+function unionBounds(left: Bounds, right: Bounds): Bounds {
+  const minX = Math.min(left.x, right.x)
+  const minY = Math.min(left.y, right.y)
+  const maxX = Math.max(left.x + left.w, right.x + right.w)
+  const maxY = Math.max(left.y + left.h, right.y + right.h)
+
+  return {
+    x: minX,
+    y: minY,
+    w: maxX - minX,
+    h: maxY - minY,
+  }
 }

@@ -9,6 +9,7 @@ import type {
   Viewport,
 } from '../../entities'
 import type { CanvasAffordanceConfig } from '../../engine'
+import { shouldCommitCanvasEditableTextOnEnter } from '../../host'
 import { useCanvasTextEditing } from '../text/useCanvasTextEditing'
 import type { CanvasTextEditorStyle } from '../text/CanvasTextEditingModel'
 import type { CanvasAppItemReadModel } from './CanvasAppItemReadModelContracts'
@@ -29,6 +30,7 @@ type CanvasTextEditorModel = {
   textEditor: {
     editing: EditingText | null
     editorRef: RefObject<HTMLTextAreaElement | null>
+    commitOnEnter: boolean
     style: CanvasTextEditorStyle | undefined
     visible: boolean
     onBlur: () => void
@@ -72,6 +74,9 @@ export function useCanvasTextEditorModel({
     textEditor: {
       editing,
       editorRef,
+      commitOnEnter: editingItem
+        ? shouldCommitCanvasEditableTextOnEnter(editingItem)
+        : true,
       style: editingItem ? editorStyle : undefined,
       visible: config.overlays.textEditor,
       onBlur: commitText,

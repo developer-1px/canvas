@@ -47,14 +47,34 @@ describe('CanvasTextEditor', () => {
     expect(preventDefault).toHaveBeenCalledTimes(1)
     expect(onCommit).toHaveBeenCalledTimes(1)
   })
+
+  it('can leave plain Enter to the textarea for connector labels', () => {
+    const onCommit = vi.fn()
+    const preventDefault = vi.fn()
+    const editor = renderTextEditor({ commitOnEnter: false, onCommit })
+
+    editor.props.onKeyDown({
+      ctrlKey: false,
+      key: 'Enter',
+      metaKey: false,
+      preventDefault,
+      shiftKey: false,
+    })
+
+    expect(preventDefault).not.toHaveBeenCalled()
+    expect(onCommit).not.toHaveBeenCalled()
+  })
 })
 
 function renderTextEditor({
+  commitOnEnter,
   onCommit,
 }: {
+  commitOnEnter?: boolean
   onCommit: () => void
 }) {
   const rendered = CanvasTextEditor({
+    commitOnEnter,
     editing: { id: 'sticky-1', value: 'Text' },
     editorRef: createRef<HTMLTextAreaElement>(),
     onBlur: () => undefined,

@@ -70,6 +70,7 @@ export type ArrowItem = CanvasItemBase & {
   startAttachedTo?: CanvasItemId
   stroke: string
   strokeWidth: number
+  text?: string
 }
 
 export type CanvasArrowEndpoint = 'end' | 'start'
@@ -94,6 +95,7 @@ export type CanvasComponentItem = CanvasItemBase & {
 }
 
 export type CanvasEditableTextItem =
+  | ArrowItem
   | RectItem
   | TextItem
   | CanvasComponentItem

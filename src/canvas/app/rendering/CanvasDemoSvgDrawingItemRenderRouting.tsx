@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import {
+  getCanvasArrowLabelBounds,
   isCanvasArrowDrawingItem,
   type ArrowItem,
   type CanvasDrawingItem,
@@ -62,7 +63,38 @@ function renderCanvasDemoSvgArrowDrawingItem({
         markerEnd={CANVAS_SVG_ARROW_MARKER_IRI}
         vectorEffect="non-scaling-stroke"
       />
+      {item.text?.trim() ? renderCanvasDemoSvgArrowLabel({ item }) : null}
     </>
+  )
+}
+
+function renderCanvasDemoSvgArrowLabel({
+  item,
+}: {
+  item: ArrowItem
+}) {
+  const bounds = getCanvasArrowLabelBounds(item)
+
+  return (
+    <g className="arrow-label">
+      <rect
+        className="arrow-label-bg"
+        x={bounds.x}
+        y={bounds.y}
+        width={bounds.w}
+        height={bounds.h}
+        rx="6"
+        vectorEffect="non-scaling-stroke"
+      />
+      <foreignObject
+        x={bounds.x}
+        y={bounds.y}
+        width={bounds.w}
+        height={bounds.h}
+      >
+        <div className="arrow-label-text">{item.text}</div>
+      </foreignObject>
+    </g>
   )
 }
 

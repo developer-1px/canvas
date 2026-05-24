@@ -172,10 +172,13 @@ function renderCanvasDemoSvgCustomItemRoute({
 function renderCanvasDemoSvgDrawingItemRoute({
   item,
   onArrowEndpointPointerDown,
+  onTextDoubleClick,
   selected,
 }: CanvasDemoSvgItemRenderRouteInput & {
   item: CanvasDemoSvgDrawingItem
 }): CanvasDemoSvgItemRenderRoute {
+  const editable = isCanvasEditableTextItem(item)
+
   return {
     children: (
       <>
@@ -188,6 +191,7 @@ function renderCanvasDemoSvgDrawingItemRoute({
         ) : null}
       </>
     ),
+    onDoubleClick: editable ? () => onTextDoubleClick(item) : undefined,
   }
 }
 

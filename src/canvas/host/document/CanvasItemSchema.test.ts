@@ -128,6 +128,7 @@ const arrowItem: CanvasItem = {
   end: { x: 240, y: 140 },
   stroke: '#334155',
   strokeWidth: 3,
+  text: 'Flow',
 }
 
 const stampItem: CanvasItem = {
@@ -216,6 +217,17 @@ describe('CanvasItemSchema drawing items', () => {
           ...markerItem,
           opacity: 2,
         },
+      ]),
+    ).toThrow()
+  })
+
+  it('rejects connector labels outside string storage', () => {
+    expect(() =>
+      validateCanvasItems([
+        {
+          ...arrowItem,
+          text: 1,
+        } as unknown as CanvasItem,
       ]),
     ).toThrow()
   })
