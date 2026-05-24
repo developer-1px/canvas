@@ -9,13 +9,10 @@ import {
   type CanvasCreationAdapter,
   type CanvasPointerGesture,
 } from '../../engine'
-
-export const CANVAS_POINTER_TEXT_CREATION_KINDS = Object.freeze([
-  'create-text',
-] as const satisfies readonly CanvasPointerGesture[])
-
-export type CanvasPointerTextCreationKind =
-  (typeof CANVAS_POINTER_TEXT_CREATION_KINDS)[number]
+import {
+  CANVAS_POINTER_TEXT_CREATION_KINDS,
+  type CanvasPointerTextCreationKind,
+} from './CanvasPointerCreationGrammar'
 
 export type CanvasPointerTextCreationStartResult =
   | { kind: 'none' }

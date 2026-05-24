@@ -16,14 +16,11 @@ import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreati
 import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import type { Interaction } from './CanvasInteractionState'
+import {
+  CANVAS_POINTER_CUSTOM_CREATION_KINDS,
+  type CanvasPointerCustomCreationKind,
+} from './CanvasPointerCreationGrammar'
 import { hasCanvasInteractionMoved } from './CanvasPointerInteractionMovement'
-
-export const CANVAS_POINTER_CUSTOM_CREATION_KINDS = Object.freeze([
-  'create-custom',
-] as const satisfies readonly CanvasPointerGesture[])
-
-export type CanvasPointerCustomCreationKind =
-  (typeof CANVAS_POINTER_CUSTOM_CREATION_KINDS)[number]
 
 export type CanvasPointerCustomCreationInteraction = Extract<
   Interaction,

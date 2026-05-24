@@ -2348,6 +2348,24 @@ describe('Canvas module boundaries', () => {
     expect(creationGrammarFile.source).toContain(
       'CANVAS_POINTER_TEXT_CREATION_KINDS',
     )
+    for (const creationRuntimeImport of [
+      "from './CanvasPointerDrawingCreation'",
+      "from './CanvasPointerCustomCreation'",
+      "from './CanvasPointerShapeCreation'",
+      "from './CanvasPointerTextCreation'",
+    ]) {
+      expect(creationGrammarFile.source).not.toContain(creationRuntimeImport)
+    }
+    for (const creationRuntimeFile of [
+      drawingCreationFile,
+      customCreationFile,
+      shapeCreationFile,
+      textCreationFile,
+    ]) {
+      expect(creationRuntimeFile.source).toContain(
+        "from './CanvasPointerCreationGrammar'",
+      )
+    }
     expect(creationStartFile.source).toContain(
       "from './CanvasPointerCreationGrammar'",
     )

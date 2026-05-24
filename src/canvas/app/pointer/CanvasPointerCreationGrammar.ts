@@ -1,17 +1,35 @@
 import type { CanvasPointerGesture } from '../../engine'
 import type { Interaction } from './CanvasInteractionState'
-import {
-  CANVAS_POINTER_DRAWING_CREATION_KINDS,
-} from './CanvasPointerDrawingCreation'
-import {
-  CANVAS_POINTER_CUSTOM_CREATION_KINDS,
-} from './CanvasPointerCustomCreation'
-import {
-  CANVAS_POINTER_SHAPE_CREATION_KINDS,
-} from './CanvasPointerShapeCreation'
-import {
-  CANVAS_POINTER_TEXT_CREATION_KINDS,
-} from './CanvasPointerTextCreation'
+
+export const CANVAS_POINTER_CUSTOM_CREATION_KINDS = Object.freeze([
+  'create-custom',
+] as const satisfies readonly CanvasPointerGesture[])
+
+export type CanvasPointerCustomCreationKind =
+  (typeof CANVAS_POINTER_CUSTOM_CREATION_KINDS)[number]
+
+export const CANVAS_POINTER_DRAWING_CREATION_KINDS = Object.freeze([
+  'draw-highlight',
+  'draw-marker',
+] as const satisfies readonly CanvasPointerGesture[])
+
+export type CanvasPointerDrawingCreationKind =
+  (typeof CANVAS_POINTER_DRAWING_CREATION_KINDS)[number]
+
+export const CANVAS_POINTER_SHAPE_CREATION_KINDS = Object.freeze([
+  'create-arrow',
+  'create-rect',
+] as const satisfies readonly CanvasPointerGesture[])
+
+export type CanvasPointerShapeCreationKind =
+  (typeof CANVAS_POINTER_SHAPE_CREATION_KINDS)[number]
+
+export const CANVAS_POINTER_TEXT_CREATION_KINDS = Object.freeze([
+  'create-text',
+] as const satisfies readonly CanvasPointerGesture[])
+
+export type CanvasPointerTextCreationKind =
+  (typeof CANVAS_POINTER_TEXT_CREATION_KINDS)[number]
 
 const CANVAS_POINTER_CREATION_GESTURES = [
   ...CANVAS_POINTER_CUSTOM_CREATION_KINDS,

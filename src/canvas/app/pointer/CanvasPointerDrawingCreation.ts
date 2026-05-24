@@ -17,19 +17,14 @@ import type { CanvasDrawingStrokeKind } from '../../host'
 import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import type { Interaction } from './CanvasInteractionState'
+import type {
+  CanvasPointerDrawingCreationKind,
+} from './CanvasPointerCreationGrammar'
 import {
   createCanvasDraftStroke,
   getNextCanvasDrawingPoints,
 } from './CanvasPointerDrawing'
 import { hasCanvasInteractionMoved } from './CanvasPointerInteractionMovement'
-
-export const CANVAS_POINTER_DRAWING_CREATION_KINDS = Object.freeze([
-  'draw-highlight',
-  'draw-marker',
-] as const satisfies readonly CanvasPointerGesture[])
-
-export type CanvasPointerDrawingCreationKind =
-  (typeof CANVAS_POINTER_DRAWING_CREATION_KINDS)[number]
 
 export type CanvasPointerDrawingCreationInteraction = Extract<
   Interaction,

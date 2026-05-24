@@ -22,15 +22,10 @@ import {
 import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import type { Interaction } from './CanvasInteractionState'
+import type {
+  CanvasPointerShapeCreationKind,
+} from './CanvasPointerCreationGrammar'
 import { hasCanvasInteractionMoved } from './CanvasPointerInteractionMovement'
-
-export const CANVAS_POINTER_SHAPE_CREATION_KINDS = Object.freeze([
-  'create-arrow',
-  'create-rect',
-] as const satisfies readonly CanvasPointerGesture[])
-
-export type CanvasPointerShapeCreationKind =
-  (typeof CANVAS_POINTER_SHAPE_CREATION_KINDS)[number]
 
 export type CanvasPointerShapeCreationInteraction = Extract<
   Interaction,
