@@ -3,6 +3,7 @@ import { pointDistance } from '../../core'
 import type { CanvasDraftStrokeOverlay } from '../../engine'
 import {
   getCanvasDrawingStrokeStyle,
+  type CanvasDrawingStrokeStyle,
   type CanvasDrawingStrokeKind,
 } from '../../host'
 
@@ -11,11 +12,12 @@ const DRAWING_POINT_DISTANCE = 2
 export function createCanvasDraftStroke(
   kind: CanvasDrawingStrokeKind,
   points: Point[],
+  style: CanvasDrawingStrokeStyle = getCanvasDrawingStrokeStyle(kind),
 ): CanvasDraftStrokeOverlay {
   return {
     kind,
     points,
-    ...getCanvasDrawingStrokeStyle(kind),
+    ...style,
   }
 }
 

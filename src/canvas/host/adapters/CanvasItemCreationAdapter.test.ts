@@ -22,6 +22,20 @@ describe('CanvasItemCreationAdapter', () => {
       ...CANVAS_HIGHLIGHT_STYLE,
       type: 'highlight',
     })
+    expect(CANVAS_ITEM_CREATION_ADAPTER.createMarker({
+      id: 'marker-custom',
+      points: [{ x: 10, y: 20 }, { x: 30, y: 40 }],
+      style: {
+        opacity: 0.7,
+        stroke: '#111827',
+        strokeWidth: 8,
+      },
+    })).toMatchObject({
+      opacity: 0.7,
+      stroke: '#111827',
+      strokeWidth: 8,
+      type: 'marker',
+    })
     expect(CANVAS_ITEM_CREATION_ADAPTER.createArrow({
       end: { x: 30, y: 40 },
       endAttachedTo: 'component-2',

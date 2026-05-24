@@ -10,6 +10,9 @@ export type CanvasAppAffordanceCommandModel =
 export type CanvasAppAffordanceControlModel =
   CanvasAppAffordanceConfigContext
 
+export type CanvasAppAffordanceDrawingModel =
+  CanvasAppAffordanceConfigContext
+
 export type CanvasAppAffordanceInteractionModel =
   CanvasAppAffordanceConfigContext
 
@@ -37,6 +40,7 @@ export type CanvasAppAffordanceViewportModel =
 export type CanvasAppAffordanceModel = {
   command: CanvasAppAffordanceCommandModel
   control: CanvasAppAffordanceControlModel
+  drawing: CanvasAppAffordanceDrawingModel
   image: CanvasAppAffordanceImageModel
   interaction: CanvasAppAffordanceInteractionModel
   inspector: CanvasAppAffordanceInspectorModel

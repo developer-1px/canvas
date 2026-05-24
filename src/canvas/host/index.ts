@@ -69,13 +69,16 @@ export {
 } from './drawing/CanvasDrawingItemGeometry'
 export {
   CANVAS_ARROW_STYLE,
+  CANVAS_DRAWING_STROKE_STYLE_DEFAULTS,
   CANVAS_HIGHLIGHT_STYLE,
   CANVAS_MARKER_STYLE,
+  createCanvasDrawingStrokeStyleSet,
   getCanvasArrowStyle,
   getCanvasDrawingStrokeStyle,
   type CanvasArrowStyle,
   type CanvasDrawingStrokeKind,
   type CanvasDrawingStrokeStyle,
+  type CanvasDrawingStrokeStyleSet,
 } from './drawing/CanvasDrawingItemStyles'
 export {
   createCanvasImageItem,

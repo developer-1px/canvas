@@ -4,6 +4,7 @@ import {
   createCanvasAffordanceConfig,
   type CanvasCreationAdapter,
 } from '../../engine'
+import { createCanvasDrawingStrokeStyleSet } from '../../host'
 import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import {
@@ -13,14 +14,20 @@ import {
 } from './CanvasPointerDrawingCreation'
 
 describe('CanvasPointerDrawingCreation', () => {
+  const drawingStyles = createCanvasDrawingStrokeStyleSet({
+    marker: { stroke: '#111827', strokeWidth: 8 },
+  })
+
   it('starts marker and highlighter gestures from the same drawing contract', () => {
     const marker = startCanvasPointerDrawingCreation({
+      drawingStyles,
       input: createPointerInput(),
       pointerGesture: 'draw-marker',
       startScreen: { x: 8, y: 12 },
       startWorld: { x: 80, y: 120 },
     })
     const highlight = startCanvasPointerDrawingCreation({
+      drawingStyles,
       input: createPointerInput(),
       pointerGesture: 'draw-highlight',
       startScreen: { x: 8, y: 12 },
@@ -31,6 +38,8 @@ describe('CanvasPointerDrawingCreation', () => {
       draftStroke: {
         kind: 'marker',
         points: [{ x: 80, y: 120 }],
+        stroke: '#111827',
+        strokeWidth: 8,
       },
       gesture: 'draw-marker',
       interaction: {
@@ -60,6 +69,7 @@ describe('CanvasPointerDrawingCreation', () => {
         points: [{ x: 0, y: 0 }],
         startScreen: { x: 0, y: 0 },
         startWorld: { x: 0, y: 0 },
+        style: drawingStyles.highlight,
       },
     })
     const disabled = previewCanvasPointerDrawingCreation({
@@ -77,6 +87,7 @@ describe('CanvasPointerDrawingCreation', () => {
         points: [{ x: 0, y: 0 }],
         startScreen: { x: 0, y: 0 },
         startWorld: { x: 0, y: 0 },
+        style: drawingStyles.marker,
       },
     })
 
@@ -84,6 +95,7 @@ describe('CanvasPointerDrawingCreation', () => {
       draftStroke: {
         kind: 'highlight',
         points: [{ x: 0, y: 0 }, { x: 40, y: 20 }],
+        stroke: '#fde047',
       },
       interaction: {
         kind: 'draw-highlight',
@@ -110,6 +122,7 @@ describe('CanvasPointerDrawingCreation', () => {
         points: [{ x: 10, y: 20 }, { x: 40, y: 50 }],
         startScreen: { x: 0, y: 0 },
         startWorld: { x: 10, y: 20 },
+        style: drawingStyles.marker,
       },
       selection: ['selected-1'],
     })
@@ -120,6 +133,8 @@ describe('CanvasPointerDrawingCreation', () => {
         items: [
           expect.objectContaining({
             id: 'marker-1',
+            stroke: '#111827',
+            strokeWidth: 8,
             type: 'marker',
           }),
         ],
@@ -161,7 +176,7 @@ const creationAdapter: CanvasCreationAdapter<CanvasItem> = {
     x: Math.min(start.x, end.x),
     y: Math.min(start.y, end.y),
   }),
-  createHighlight: ({ id, points }) => ({
+  createHighlight: ({ id, points, style }) => ({
     h: 0,
     id,
     opacity: 0.4,
@@ -172,8 +187,9 @@ const creationAdapter: CanvasCreationAdapter<CanvasItem> = {
     w: 0,
     x: 0,
     y: 0,
+    ...style,
   }),
-  createMarker: ({ id, points }) => ({
+  createMarker: ({ id, points, style }) => ({
     h: 0,
     id,
     opacity: 1,
@@ -184,6 +200,7 @@ const creationAdapter: CanvasCreationAdapter<CanvasItem> = {
     w: 0,
     x: 0,
     y: 0,
+    ...style,
   }),
   createRect: ({ bounds, id }) => ({
     fill: '#ffffff',

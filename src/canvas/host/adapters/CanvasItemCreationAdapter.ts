@@ -29,7 +29,7 @@ export const CANVAS_ITEM_CREATION_ADAPTER: CanvasCreationAdapter<CanvasItem> = {
       startAttachedTo,
       ...getCanvasArrowStyle(),
     }),
-  createHighlight: ({ id, points }) =>
+  createHighlight: ({ id, points, style }) =>
     syncCanvasItemBounds({
       id,
       type: 'highlight',
@@ -39,8 +39,9 @@ export const CANVAS_ITEM_CREATION_ADAPTER: CanvasCreationAdapter<CanvasItem> = {
       h: 0,
       points,
       ...getCanvasDrawingStrokeStyle('highlight'),
+      ...style,
     }),
-  createMarker: ({ id, points }) =>
+  createMarker: ({ id, points, style }) =>
     syncCanvasItemBounds({
       id,
       type: 'marker',
@@ -50,6 +51,7 @@ export const CANVAS_ITEM_CREATION_ADAPTER: CanvasCreationAdapter<CanvasItem> = {
       h: 0,
       points,
       ...getCanvasDrawingStrokeStyle('marker'),
+      ...style,
     }),
   createRect: ({ bounds, id }) => ({
     id,

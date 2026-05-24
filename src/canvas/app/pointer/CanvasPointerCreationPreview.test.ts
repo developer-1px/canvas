@@ -3,6 +3,7 @@ import {
   createCanvasAffordanceConfig,
   type CanvasSceneAdapter,
 } from '../../engine'
+import { getCanvasDrawingStrokeStyle } from '../../host'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import { previewCanvasPointerCreation } from './CanvasPointerCreationPreview'
 
@@ -49,6 +50,7 @@ describe('CanvasPointerCreationPreview', () => {
         moved: false,
         pointerId: 1,
         points: [{ x: 0, y: 0 }],
+        style: getCanvasDrawingStrokeStyle('highlight'),
         startScreen: { x: 0, y: 0 },
         startWorld: { x: 0, y: 0 },
       },

@@ -13,7 +13,11 @@ import {
   type CanvasPointerGesture,
   type CanvasSnapGuides,
 } from '../../engine'
-import type { CanvasDrawingStrokeKind } from '../../host'
+import type {
+  CanvasDrawingStrokeKind,
+  CanvasDrawingStrokeStyle,
+  CanvasDrawingStrokeStyleSet,
+} from '../../host'
 import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import type { Interaction } from './CanvasInteractionState'
@@ -36,6 +40,7 @@ type CanvasPointerDrawingCreationDescriptor = Readonly<{
     adapter: CanvasCreationAdapter<TItem>
     createId: (prefix: string) => string
     interaction: CanvasPointerDrawingCreationInteraction
+    style: CanvasDrawingStrokeStyle
   }) => TItem
   isEnabled: (config: CanvasAffordanceConfig) => boolean
   strokeKind: CanvasDrawingStrokeKind
@@ -47,16 +52,19 @@ const CANVAS_POINTER_DRAWING_CREATION_DESCRIPTORS = Object.freeze({
       adapter,
       createId,
       interaction,
+      style,
     }: {
       adapter: CanvasCreationAdapter<TItem>
       createId: (prefix: string) => string
       interaction: CanvasPointerDrawingCreationInteraction
+      style: CanvasDrawingStrokeStyle
     }) =>
       createCanvasHighlight({
         adapter,
         createId,
         points: interaction.points,
         startWorld: interaction.startWorld,
+        style,
       }),
     isEnabled: (config: CanvasAffordanceConfig) =>
       config.gestures.drawHighlight,
@@ -67,16 +75,19 @@ const CANVAS_POINTER_DRAWING_CREATION_DESCRIPTORS = Object.freeze({
       adapter,
       createId,
       interaction,
+      style,
     }: {
       adapter: CanvasCreationAdapter<TItem>
       createId: (prefix: string) => string
       interaction: CanvasPointerDrawingCreationInteraction
+      style: CanvasDrawingStrokeStyle
     }) =>
       createCanvasMarker({
         adapter,
         createId,
         points: interaction.points,
         startWorld: interaction.startWorld,
+        style,
       }),
     isEnabled: (config: CanvasAffordanceConfig) =>
       config.gestures.drawMarker,
@@ -117,11 +128,13 @@ export function isCanvasPointerDrawingCreationInteraction(
 
 export function startCanvasPointerDrawingCreation({
   input,
+  drawingStyles,
   pointerGesture,
   startScreen,
   startWorld,
 }: {
   input: CanvasAppPointerInput
+  drawingStyles: CanvasDrawingStrokeStyleSet
   pointerGesture: CanvasPointerGesture
   startScreen: Point
   startWorld: Point
@@ -131,6 +144,7 @@ export function startCanvasPointerDrawingCreation({
   }
 
   const descriptor = getCanvasPointerDrawingCreationDescriptor(pointerGesture)
+  const style = drawingStyles[descriptor.strokeKind]
   const interaction = {
     currentWorld: startWorld,
     kind: pointerGesture,
@@ -139,11 +153,16 @@ export function startCanvasPointerDrawingCreation({
     points: [startWorld],
     startScreen,
     startWorld,
+    style,
   } satisfies CanvasPointerDrawingCreationInteraction
 
   return {
     capturePointer: true,
-    draftStroke: createCanvasDraftStroke(descriptor.strokeKind, [startWorld]),
+    draftStroke: createCanvasDraftStroke(
+      descriptor.strokeKind,
+      [startWorld],
+      style,
+    ),
     gesture: pointerGesture,
     interaction,
     kind: 'interaction',
@@ -187,7 +206,11 @@ export function previewCanvasPointerDrawingCreation({
   })
 
   return {
-    draftStroke: createCanvasDraftStroke(descriptor.strokeKind, points),
+    draftStroke: createCanvasDraftStroke(
+      descriptor.strokeKind,
+      points,
+      interaction.style,
+    ),
     interaction: {
       ...interaction,
       currentWorld,
@@ -219,6 +242,7 @@ export function commitCanvasPointerDrawingCreation({
     adapter: creationAdapter,
     createId,
     interaction,
+    style: interaction.style,
   })
 
   commitItemsChange({ type: 'add', items: [item] }, {

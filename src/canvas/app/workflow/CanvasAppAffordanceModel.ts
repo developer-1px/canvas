@@ -14,6 +14,9 @@ export function getCanvasAppAffordanceModel(
     control: {
       config,
     },
+    drawing: {
+      config,
+    },
     interaction: {
       config,
     },

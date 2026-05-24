@@ -5,6 +5,7 @@ import {
   createCanvasSceneAdapter,
   type CanvasTransformAdapter,
 } from '../../engine'
+import { getCanvasDrawingStrokeStyle } from '../../host'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import {
   previewCanvasPointerInteraction,
@@ -130,6 +131,7 @@ describe('CanvasPointerInteractionPreview', () => {
         moved: false,
         pointerId: 1,
         points: [{ x: 0, y: 0 }],
+        style: getCanvasDrawingStrokeStyle('marker'),
         startScreen: { x: 0, y: 0 },
         startWorld: { x: 0, y: 0 },
       },

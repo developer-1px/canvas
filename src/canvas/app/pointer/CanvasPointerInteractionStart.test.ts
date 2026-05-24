@@ -4,11 +4,15 @@ import {
   createCanvasAffordanceConfig,
   type CanvasCreationAdapter,
 } from '../../engine'
-import { createCanvasComponentLibrary } from '../../host'
+import {
+  createCanvasComponentLibrary,
+  createCanvasDrawingStrokeStyleSet,
+} from '../../host'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import { startCanvasPointerInteraction } from './CanvasPointerInteractionStart'
 
 const config = createCanvasAffordanceConfig()
+const drawingStyles = createCanvasDrawingStrokeStyleSet()
 
 describe('CanvasPointerInteractionStart', () => {
   it('starts rect creation with an initial draft rect', () => {
@@ -172,6 +176,7 @@ function createInput(
     config,
     creationAdapter,
     createId: (prefix) => `${prefix}-1`,
+    drawingStyles,
     customCreationTools: [
       {
         id: 'risk',

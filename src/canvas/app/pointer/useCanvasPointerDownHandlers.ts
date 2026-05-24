@@ -34,6 +34,7 @@ import type { CanvasAppItemReadModel } from '../workflow/CanvasAppItemReadModelC
 import type { Interaction } from './CanvasInteractionState'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
+import type { CanvasDrawingStrokeStyleSet } from '../../host'
 import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
 import { startCanvasPointerInteraction } from './CanvasPointerInteractionStart'
 import {
@@ -65,6 +66,7 @@ type UseCanvasPointerDownHandlersArgs = {
   creationAdapter: CanvasCreationAdapter<CanvasItem>
   createId: (prefix: string) => string
   customCreationTools: readonly CanvasAppCustomCreationTool[]
+  drawingStyles: CanvasDrawingStrokeStyleSet
   interactionRef: MutableRefObject<Interaction>
   itemReadModel: CanvasAppItemReadModel
   items: CanvasItem[]
@@ -94,6 +96,7 @@ export function useCanvasPointerDownHandlers({
   creationAdapter,
   createId,
   customCreationTools,
+  drawingStyles,
   interactionRef,
   itemReadModel,
   items,
@@ -145,6 +148,7 @@ export function useCanvasPointerDownHandlers({
       creationAdapter,
       createId,
       customCreationTools,
+      drawingStyles,
       input: event,
       selection,
       spaceDown,

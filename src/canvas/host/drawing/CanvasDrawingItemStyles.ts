@@ -6,6 +6,10 @@ export type CanvasDrawingStrokeStyle = Readonly<{
   strokeWidth: number
 }>
 
+export type CanvasDrawingStrokeStyleSet = Readonly<
+  Record<CanvasDrawingStrokeKind, CanvasDrawingStrokeStyle>
+>
+
 export type CanvasArrowStyle = Readonly<{
   stroke: string
   strokeWidth: number
@@ -28,12 +32,41 @@ export const CANVAS_ARROW_STYLE = Object.freeze({
   strokeWidth: 3,
 }) satisfies CanvasArrowStyle
 
+export const CANVAS_DRAWING_STROKE_STYLE_DEFAULTS = Object.freeze({
+  highlight: CANVAS_HIGHLIGHT_STYLE,
+  marker: CANVAS_MARKER_STYLE,
+}) satisfies CanvasDrawingStrokeStyleSet
+
 export function getCanvasDrawingStrokeStyle(
   kind: CanvasDrawingStrokeKind,
 ): CanvasDrawingStrokeStyle {
-  return kind === 'marker' ? CANVAS_MARKER_STYLE : CANVAS_HIGHLIGHT_STYLE
+  return CANVAS_DRAWING_STROKE_STYLE_DEFAULTS[kind]
+}
+
+export function createCanvasDrawingStrokeStyleSet(
+  overrides: Partial<Record<
+    CanvasDrawingStrokeKind,
+    Partial<CanvasDrawingStrokeStyle>
+  >> = {},
+): CanvasDrawingStrokeStyleSet {
+  return Object.freeze({
+    highlight: freezeCanvasDrawingStrokeStyle({
+      ...CANVAS_HIGHLIGHT_STYLE,
+      ...overrides.highlight,
+    }),
+    marker: freezeCanvasDrawingStrokeStyle({
+      ...CANVAS_MARKER_STYLE,
+      ...overrides.marker,
+    }),
+  })
 }
 
 export function getCanvasArrowStyle(): CanvasArrowStyle {
   return CANVAS_ARROW_STYLE
+}
+
+function freezeCanvasDrawingStrokeStyle(
+  style: CanvasDrawingStrokeStyle,
+): CanvasDrawingStrokeStyle {
+  return Object.freeze({ ...style })
 }

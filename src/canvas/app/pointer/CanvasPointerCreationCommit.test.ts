@@ -4,7 +4,10 @@ import type {
   CanvasCreationAdapter,
   CanvasSceneAdapter,
 } from '../../engine'
-import { createCanvasComponentLibrary } from '../../host'
+import {
+  createCanvasComponentLibrary,
+  getCanvasDrawingStrokeStyle,
+} from '../../host'
 import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract'
 import {
   commitCanvasPointerCreation,
@@ -63,6 +66,7 @@ describe('CanvasPointerCreationCommit', () => {
         startWorld: { x: 10, y: 20 },
         currentWorld: { x: 40, y: 50 },
         points: [{ x: 10, y: 20 }, { x: 40, y: 50 }],
+        style: getCanvasDrawingStrokeStyle('marker'),
         moved: true,
       },
       setTool,

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { CanvasPointerGesture } from '../../engine'
+import { getCanvasDrawingStrokeStyle } from '../../host'
 import type { Interaction } from './CanvasInteractionState'
 import {
   isCanvasPointerCreationGesture,
@@ -45,6 +46,7 @@ describe('CanvasPointerCreationGrammar', () => {
         moved: false,
         pointerId: 1,
         points: [{ x: 0, y: 0 }],
+        style: getCanvasDrawingStrokeStyle('marker'),
         startScreen: { x: 0, y: 0 },
         startWorld: { x: 0, y: 0 },
       },

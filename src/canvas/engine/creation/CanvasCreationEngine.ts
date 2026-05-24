@@ -18,6 +18,12 @@ export type CanvasCreatedText<TItem extends CanvasCreationItem> = {
 
 export type CanvasCreatedArrowRouting = 'elbow' | 'straight'
 
+export type CanvasCreatedDrawingStyle = Readonly<{
+  opacity: number
+  stroke: string
+  strokeWidth: number
+}>
+
 export type CanvasCreationAdapter<TItem extends CanvasCreationItem> = {
   createArrow: (input: {
     end: Point
@@ -27,8 +33,16 @@ export type CanvasCreationAdapter<TItem extends CanvasCreationItem> = {
     start: Point
     startAttachedTo?: string
   }) => TItem
-  createHighlight: (input: { id: string; points: Point[] }) => TItem
-  createMarker: (input: { id: string; points: Point[] }) => TItem
+  createHighlight: (input: {
+    id: string
+    points: Point[]
+    style?: CanvasCreatedDrawingStyle
+  }) => TItem
+  createMarker: (input: {
+    id: string
+    points: Point[]
+    style?: CanvasCreatedDrawingStyle
+  }) => TItem
   createRect: (input: { bounds: Bounds; id: string }) => TItem
   createText: (input: { id: string; point: Point }) => CanvasCreatedText<TItem>
 }
@@ -127,15 +141,18 @@ export function createCanvasHighlight<TItem extends CanvasCreationItem>({
   createId,
   points,
   startWorld,
+  style,
 }: {
   adapter: CanvasCreationAdapter<TItem>
   createId: (prefix: string) => string
   points: Point[]
   startWorld: Point
+  style?: CanvasCreatedDrawingStyle
 }) {
   return adapter.createHighlight({
     id: createId('highlight'),
     points: getCanvasCreatedDrawingPoints({ points, startWorld }),
+    style,
   })
 }
 
@@ -144,15 +161,18 @@ export function createCanvasMarker<TItem extends CanvasCreationItem>({
   createId,
   points,
   startWorld,
+  style,
 }: {
   adapter: CanvasCreationAdapter<TItem>
   createId: (prefix: string) => string
   points: Point[]
   startWorld: Point
+  style?: CanvasCreatedDrawingStyle
 }) {
   return adapter.createMarker({
     id: createId('marker'),
     points: getCanvasCreatedDrawingPoints({ points, startWorld }),
+    style,
   })
 }
 

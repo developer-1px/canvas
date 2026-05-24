@@ -5,6 +5,7 @@ import { getCanvasAppControlModel } from './CanvasAppControlModel'
 import { renderCanvasAppStageModel } from './CanvasAppStageModel'
 import { useCanvasAppCommandModel } from './useCanvasAppCommandModel'
 import { useCanvasAppComponentModel } from './useCanvasAppComponentModel'
+import { useCanvasAppDrawingModel } from './useCanvasAppDrawingModel'
 import { useCanvasAppExtensionModel } from './useCanvasAppExtensionModel'
 import { useCanvasAppInspectorModel } from './useCanvasAppInspectorModel'
 import { useCanvasAppImageModel } from './useCanvasAppImageModel'
@@ -91,6 +92,11 @@ export function useCanvasAppModel({
     ...stageElement.viewport,
   })
 
+  const drawing = useCanvasAppDrawingModel({
+    ...affordance.drawing,
+    tool: interaction.control.tool,
+  })
+
   const components = useCanvasAppComponentModel({
     command: workspace.component.command,
     ...appAssembly.component,
@@ -127,6 +133,7 @@ export function useCanvasAppModel({
     },
     ...affordance.pointer,
     createId: workspace.pointer.createId,
+    ...drawing.pointer,
     ...extension.pointer,
     interaction: interaction.pointer,
     ...appAssembly.pointer,
@@ -153,6 +160,7 @@ export function useCanvasAppModel({
   return {
     ...text.view,
     componentPalette: controls.componentPalette,
+    drawingControls: drawing.control,
     imageControls,
     inspector,
     stage: renderCanvasAppStageModel({

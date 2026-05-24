@@ -430,6 +430,7 @@
 
 .toolbar,
 .component-palette,
+.drawing-controls,
 .find-replace-panel,
 .image-controls,
 .stamp-controls,
@@ -460,6 +461,12 @@
   right: 14px;
   display: grid;
   grid-template-columns: repeat(5, 34px);
+}
+
+.drawing-controls {
+  top: 62px;
+  left: 188px;
+  align-items: center;
 }
 
 .find-replace-panel {
@@ -542,6 +549,49 @@
   border: 1px solid #cbd5e1;
   border-radius: 4px;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.42);
+}
+
+.drawing-swatches,
+.drawing-widths {
+  display: flex;
+  gap: 4px;
+}
+
+.drawing-swatch,
+.drawing-width-button {
+  display: inline-grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 1px solid #cbd5e1;
+  border-radius: 5px;
+}
+
+.drawing-swatch {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.42);
+}
+
+.drawing-width-button {
+  background: #ffffff;
+}
+
+.drawing-width-mark {
+  display: block;
+  width: 18px;
+  border-radius: 999px;
+  background: #334155;
+}
+
+.drawing-swatch[aria-pressed='true'],
+.drawing-width-button[aria-pressed='true'] {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+.drawing-opacity {
+  width: 74px;
+  accent-color: #2563eb;
 }
 
 .inspector-swatch[aria-pressed='true'] {
@@ -731,6 +781,9 @@
 
 .tool-button:focus-visible,
 .component-button:focus-visible,
+.drawing-swatch:focus-visible,
+.drawing-width-button:focus-visible,
+.drawing-opacity:focus-visible,
 .zoom-value:focus-visible,
 .image-controls button:focus-visible,
 .stamp-button:focus-visible,
@@ -775,6 +828,13 @@
     right: auto;
     grid-template-columns: repeat(10, 30px);
     max-width: calc(100vw - 20px);
+  }
+
+  .drawing-controls {
+    top: 190px;
+    right: 10px;
+    left: 170px;
+    flex-wrap: wrap;
   }
 
   .find-replace-panel {

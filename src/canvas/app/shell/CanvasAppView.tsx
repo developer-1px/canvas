@@ -3,6 +3,7 @@ import type {
   ReactNode,
 } from 'react'
 import { CanvasComponentPalette } from '../../ui/palette/CanvasComponentPalette'
+import { CanvasDrawingControls } from '../../ui/drawing/CanvasDrawingControls'
 import { CanvasObjectInspector } from '../../ui/inspector/CanvasObjectInspector'
 import { CanvasFindReplacePanel } from '../../ui/search/CanvasFindReplacePanel'
 import { CanvasImageControls } from '../../ui/image/CanvasImageControls'
@@ -14,6 +15,7 @@ import { ZoomControls } from '../../ui/zoom/ZoomControls'
 
 type ToolbarProps = ComponentProps<typeof CanvasToolbar>
 type TextEditorProps = ComponentProps<typeof CanvasTextEditor>
+type DrawingControlsProps = ComponentProps<typeof CanvasDrawingControls>
 type FindReplaceProps = ComponentProps<typeof CanvasFindReplacePanel>
 type ImageControlsProps = ComponentProps<typeof CanvasImageControls>
 type StampControlsProps = ComponentProps<typeof CanvasStampControls>
@@ -27,6 +29,7 @@ type VisibleProps<TProps> = TProps & {
 
 type CanvasAppViewProps = {
   componentPalette: VisibleProps<PaletteProps>
+  drawingControls: VisibleProps<DrawingControlsProps>
   findReplace: FindReplaceProps
   imageControls: VisibleProps<ImageControlsProps>
   inspector: VisibleProps<InspectorProps>
@@ -40,6 +43,7 @@ type CanvasAppViewProps = {
 
 export function CanvasAppView({
   componentPalette,
+  drawingControls,
   findReplace,
   imageControls,
   inspector,
@@ -54,6 +58,8 @@ export function CanvasAppView({
     visible: showComponentPalette,
     ...componentPaletteProps
   } = componentPalette
+  const { visible: showDrawingControls, ...drawingControlProps } =
+    drawingControls
   const { visible: showInspector, ...inspectorProps } = inspector
   const { visible: showImageControls, ...imageControlProps } = imageControls
   const { visible: showStampControls, ...stampControlProps } = stampControls
@@ -68,6 +74,10 @@ export function CanvasAppView({
 
       {showComponentPalette ? (
         <CanvasComponentPalette {...componentPaletteProps} />
+      ) : null}
+
+      {showDrawingControls ? (
+        <CanvasDrawingControls {...drawingControlProps} />
       ) : null}
 
       <CanvasFindReplacePanel {...findReplace} />

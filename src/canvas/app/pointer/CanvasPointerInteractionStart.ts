@@ -11,6 +11,7 @@ import {
 } from '../../engine'
 import type { CanvasAppComponentLibrary } from '../workflow/CanvasAppComponentAssemblyContracts'
 import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
+import type { CanvasDrawingStrokeStyleSet } from '../../host'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import { startCanvasPointerCreation } from './CanvasPointerCreationStart'
 import type {
@@ -25,6 +26,7 @@ export type CanvasPointerInteractionStartInput = {
   creationAdapter: CanvasCreationAdapter<CanvasItem>
   createId: (prefix: string) => string
   customCreationTools: readonly CanvasAppCustomCreationTool[]
+  drawingStyles: CanvasDrawingStrokeStyleSet
   input: CanvasAppPointerInput
   selection: string[]
   spaceDown: boolean
@@ -41,6 +43,7 @@ export function startCanvasPointerInteraction({
   creationAdapter,
   createId,
   customCreationTools,
+  drawingStyles,
   input,
   selection,
   spaceDown,
@@ -78,6 +81,7 @@ export function startCanvasPointerInteraction({
     creationAdapter,
     createId,
     customCreationTools,
+    drawingStyles,
     input,
     pointerGesture,
     startScreen,

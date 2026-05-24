@@ -79,6 +79,7 @@ export const CANVAS_AFFORDANCE_CONFIG_DEFAULTS = Object.freeze({
     draftArrow: true,
     draftRect: true,
     draftStroke: true,
+    drawingControls: true,
     findReplace: true,
     grid: true,
     imageControls: true,

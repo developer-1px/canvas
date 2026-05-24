@@ -9,6 +9,7 @@ import {
   type CanvasPointerGesture,
 } from '../../engine'
 import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
+import type { CanvasDrawingStrokeStyleSet } from '../../host'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import {
   isCanvasPointerCreationGesture,
@@ -42,6 +43,7 @@ export type CanvasPointerCreationStartInput = {
   creationAdapter: CanvasCreationAdapter<CanvasItem>
   createId: (prefix: string) => string
   customCreationTools: readonly CanvasAppCustomCreationTool[]
+  drawingStyles: CanvasDrawingStrokeStyleSet
   input: CanvasAppPointerInput
   pointerGesture: CanvasPointerGesture
   startScreen: Point
@@ -56,6 +58,7 @@ export function startCanvasPointerCreation({
   creationAdapter,
   createId,
   customCreationTools,
+  drawingStyles,
   input,
   pointerGesture,
   startScreen,
@@ -81,6 +84,7 @@ export function startCanvasPointerCreation({
   }
 
   const drawingStart = startCanvasPointerDrawingCreation({
+    drawingStyles,
     input,
     pointerGesture,
     startScreen,

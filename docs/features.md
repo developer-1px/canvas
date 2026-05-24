@@ -153,3 +153,5 @@
 149. Marker/highlighter freehand stroke는 connector용 직선 path와 분리된 SVG smoothing path로 렌더링한다.
 150. Draft stroke preview와 커밋된 drawing stroke는 같은 smoothing primitive를 사용한다.
 151. Marker/highlighter stroke 생성은 현재 선택을 훔치지 않아 연속 드로잉 흐름을 유지한다.
+152. Marker/highlighter tool은 color, width, opacity drawing controls를 표시한다.
+153. Drawing controls의 style 변경은 draft stroke preview와 커밋된 drawing stroke에 같이 적용된다.

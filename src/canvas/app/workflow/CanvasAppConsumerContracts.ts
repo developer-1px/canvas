@@ -40,6 +40,7 @@ import type {
   CanvasAppCustomCommandState,
   CanvasAppCustomCreationToolState,
 } from '../extensions/CanvasAppExtensionStateContracts'
+import type { CanvasDrawingStrokeStyleSet } from '../../host'
 import type { CanvasAppInspectorPanel } from '../inspector/CanvasAppInspectorPanels'
 import type { CanvasAppPointerInput } from '../pointer/CanvasAppPointerInput'
 import type {
@@ -526,6 +527,7 @@ export type CanvasAppPointerModelInput = {
   config: CanvasAffordanceConfig
   createId: (prefix: string) => string
   customCreationTools: readonly CanvasAppCustomCreationTool[]
+  drawingStyles: CanvasDrawingStrokeStyleSet
   interaction: CanvasAppPointerInteractionModel
   itemAdapters: CanvasAppPointerItemAdapters
   stageElement: CanvasAppStageElement

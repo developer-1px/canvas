@@ -12,6 +12,7 @@ describe('CanvasAppView', () => {
       <CanvasAppView
         {...createViewProps({
           componentPalette: false,
+          drawingControls: false,
           imageControls: false,
           inspector: false,
           stampControls: false,
@@ -24,6 +25,7 @@ describe('CanvasAppView', () => {
     )
 
     expect(markup).not.toContain('component-palette')
+    expect(markup).not.toContain('drawing-controls')
     expect(markup).not.toContain('image-controls')
     expect(markup).not.toContain('object-inspector')
     expect(markup).not.toContain('stamp-controls')
@@ -38,6 +40,7 @@ describe('CanvasAppView', () => {
     const markup = renderToStaticMarkup(<CanvasAppView {...createViewProps()} />)
 
     expect(markup).toContain('component-palette')
+    expect(markup).toContain('drawing-controls')
     expect(markup).toContain('image-controls')
     expect(markup).toContain('object-inspector')
     expect(markup).toContain('stamp-controls')
@@ -51,6 +54,7 @@ describe('CanvasAppView', () => {
 function createViewProps(
   visible: {
     componentPalette?: boolean
+    drawingControls?: boolean
     imageControls?: boolean
     inspector?: boolean
     stampControls?: boolean
@@ -75,6 +79,23 @@ function createViewProps(
       }],
       visible: visible.componentPalette ?? true,
       onInsert: noop,
+    },
+    drawingControls: {
+      colorOptions: ['#111827'],
+      opacityMax: 1,
+      opacityMin: 0.18,
+      opacityStep: 0.01,
+      style: {
+        opacity: 1,
+        stroke: '#111827',
+        strokeWidth: 4,
+      },
+      toolLabel: 'Marker',
+      visible: visible.drawingControls ?? true,
+      widthOptions: [4],
+      onOpacityChange: noop,
+      onStrokeChange: noop,
+      onStrokeWidthChange: noop,
     },
     findReplace: {
       matchCount: 0,

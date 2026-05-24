@@ -12,6 +12,11 @@ type CreatedItem =
   | {
       id: string
       points: Array<{ x: number; y: number }>
+      style?: {
+        opacity: number
+        stroke: string
+        strokeWidth: number
+      }
       type: 'highlight' | 'marker'
     }
   | {
@@ -31,14 +36,16 @@ const adapter: CanvasCreationAdapter<CreatedItem> = {
     start,
     type: 'arrow',
   }),
-  createHighlight: ({ id, points }) => ({
+  createHighlight: ({ id, points, style }) => ({
     id,
     points,
+    style,
     type: 'highlight',
   }),
-  createMarker: ({ id, points }) => ({
+  createMarker: ({ id, points, style }) => ({
     id,
     points,
+    style,
     type: 'marker',
   }),
   createRect: ({ id }) => ({ id, type: 'rect' }),
@@ -80,10 +87,20 @@ describe('CanvasCreationEngine drawing tools', () => {
         createId: () => 'marker-1',
         points: [{ x: 10, y: 20 }, { x: 16, y: 22 }],
         startWorld: { x: 10, y: 20 },
+        style: {
+          opacity: 1,
+          stroke: '#111827',
+          strokeWidth: 8,
+        },
       }),
     ).toEqual({
       id: 'marker-1',
       points: [{ x: 10, y: 20 }, { x: 16, y: 22 }],
+      style: {
+        opacity: 1,
+        stroke: '#111827',
+        strokeWidth: 8,
+      },
       type: 'marker',
     })
   })

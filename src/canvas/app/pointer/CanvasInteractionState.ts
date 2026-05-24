@@ -8,6 +8,7 @@ import type {
   ResizeHandle,
   Viewport
 } from '../../entities'
+import type { CanvasDrawingStrokeStyle } from '../../host'
 
 export type Interaction =
   | { kind: 'none' }
@@ -64,6 +65,7 @@ export type Interaction =
       startWorld: Point
       currentWorld: Point
       points: Point[]
+      style: CanvasDrawingStrokeStyle
       moved: boolean
     }
   | {
@@ -73,6 +75,7 @@ export type Interaction =
       startWorld: Point
       currentWorld: Point
       points: Point[]
+      style: CanvasDrawingStrokeStyle
       moved: boolean
     }
   | {
