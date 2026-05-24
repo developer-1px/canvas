@@ -3,6 +3,7 @@ import type { CanvasComponentItem } from '../model'
 import {
   CANVAS_STICKY_COMPONENT_KIND,
   applyCanvasStickyComponentCreationDefaults,
+  getCanvasStickyComponentTextHeight,
   isCanvasStickyComponentItem,
 } from './CanvasStickyComponent'
 
@@ -23,9 +24,28 @@ describe('CanvasStickyComponent', () => {
       component: CANVAS_STICKY_COMPONENT_KIND,
     })
   })
+
+  it('keeps sticky height stable until wrapped text needs vertical growth', () => {
+    const item = createComponentItem(CANVAS_STICKY_COMPONENT_KIND, {
+      h: 148,
+      w: 188,
+    })
+
+    expect(getCanvasStickyComponentTextHeight({
+      item,
+      text: 'Short note',
+    })).toBe(148)
+    expect(getCanvasStickyComponentTextHeight({
+      item,
+      text: 'x'.repeat(180),
+    })).toBe(302)
+  })
 })
 
-function createComponentItem(component: string): CanvasComponentItem {
+function createComponentItem(
+  component: string,
+  overrides: Partial<CanvasComponentItem> = {},
+): CanvasComponentItem {
   return {
     accent: '#111111',
     component,
@@ -38,5 +58,6 @@ function createComponentItem(component: string): CanvasComponentItem {
     w: 120,
     x: 10,
     y: 20,
+    ...overrides,
   }
 }

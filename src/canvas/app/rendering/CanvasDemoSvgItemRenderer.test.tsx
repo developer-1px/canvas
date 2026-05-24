@@ -188,6 +188,24 @@ describe('CanvasDemoSvgItemRenderer', () => {
     expect(markup).toContain('data-type="comment"')
     expect(markup).toContain('class="comment-item"')
     expect(markup).toContain('class="comment-hit"')
+    expect(markup).not.toContain('comment-body-card')
+  })
+
+  it('renders selected comment body cards', () => {
+    const markup = renderItem({
+      body: 'Needs follow-up',
+      h: 36,
+      id: 'comment-1',
+      type: 'comment',
+      w: 36,
+      x: 10,
+      y: 20,
+    }, undefined, {
+      selected: new Set(['comment-1']),
+    })
+
+    expect(markup).toContain('comment-body-card')
+    expect(markup).toContain('Needs follow-up')
   })
 
   it('renders selected arrow endpoint handles', () => {

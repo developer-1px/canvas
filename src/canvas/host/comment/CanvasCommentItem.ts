@@ -1,3 +1,4 @@
+import type { Bounds } from '../../core'
 import type {
   CanvasCommentItem,
   CanvasItem,
@@ -5,6 +6,10 @@ import type {
 
 export const CANVAS_COMMENT_ITEM_SIZE = 36
 export const CANVAS_COMMENT_BODY_MAX_LENGTH = 240
+export const CANVAS_COMMENT_DEFAULT_BODY = 'Comment'
+const CANVAS_COMMENT_BODY_CARD_GAP = 10
+const CANVAS_COMMENT_BODY_CARD_HEIGHT = 88
+const CANVAS_COMMENT_BODY_CARD_WIDTH = 220
 
 export type CreateCanvasCommentItemInput = {
   attachedTo?: string
@@ -48,6 +53,17 @@ export function isCanvasCommentItem(
   item: CanvasItem,
 ): item is CanvasCommentItem {
   return item.type === 'comment'
+}
+
+export function getCanvasCommentBodyBounds(
+  item: CanvasCommentItem,
+): Bounds {
+  return {
+    h: CANVAS_COMMENT_BODY_CARD_HEIGHT,
+    w: CANVAS_COMMENT_BODY_CARD_WIDTH,
+    x: item.x + item.w + CANVAS_COMMENT_BODY_CARD_GAP,
+    y: item.y,
+  }
 }
 
 export function isCanvasCommentAttachedTo(

@@ -3469,10 +3469,16 @@ describe('Canvas module boundaries', () => {
       'isCanvasEditableTextItem(entry.item)',
     )
     expect(documentPatchesFile.source).toContain(
+      'getCanvasEditableTextPatchUpdates(entry.item, text)',
+    )
+    expect(documentPatchesFile.source).not.toContain(
       'getCanvasEditableTextPatchOperation(entry.item)',
     )
-    expect(documentPatchesFile.source).toContain(
+    expect(documentPatchesFile.source).not.toContain(
       'getCanvasEditableTextPatchField(entry.item)',
+    )
+    expect(documentPatchesFile.source).toContain(
+      'update.field',
     )
     expect(documentPatchesFile.source).not.toContain(
       "entry.item.type !== 'rect'",
@@ -3517,6 +3523,9 @@ describe('Canvas module boundaries', () => {
     )
     expect(editableTextFile.source).toContain(
       'export function getCanvasEditableTextPatchField',
+    )
+    expect(editableTextFile.source).toContain(
+      'export function getCanvasEditableTextPatchUpdates',
     )
   })
 

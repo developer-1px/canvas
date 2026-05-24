@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import type {
   ArrowItem,
+  CanvasCommentItem,
   CanvasComponentItem,
   CanvasItem,
 } from '../../entities'
@@ -51,6 +52,20 @@ describe('CanvasDemoSvgItemRenderRouting', () => {
 
     expect(onTextDoubleClick).toHaveBeenCalledWith(arrow)
   })
+
+  it('routes comment double-clicks into body editing', () => {
+    const onTextDoubleClick = vi.fn()
+    const comment = createCommentItem()
+
+    const route = getCanvasDemoSvgItemRenderRoute({
+      ...createInput(comment),
+      onTextDoubleClick,
+    })
+
+    route.onDoubleClick?.()
+
+    expect(onTextDoubleClick).toHaveBeenCalledWith(comment)
+  })
 })
 
 function createInput(item: CanvasItem) {
@@ -100,6 +115,21 @@ function createComponentItem(
     title: 'Sticky',
     type: 'component',
     w: 188,
+    x: 10,
+    y: 20,
+    ...overrides,
+  }
+}
+
+function createCommentItem(
+  overrides: Partial<CanvasCommentItem> = {},
+): CanvasCommentItem {
+  return {
+    body: 'Question',
+    h: 36,
+    id: 'comment-1',
+    type: 'comment',
+    w: 36,
     x: 10,
     y: 20,
     ...overrides,

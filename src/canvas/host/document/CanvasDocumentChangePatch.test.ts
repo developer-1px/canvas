@@ -44,6 +44,29 @@ describe('CanvasDocumentChangePatch', () => {
     ])
   })
 
+  it('maps long sticky set-text changes to body and auto-height patches', () => {
+    const longText = 'x'.repeat(180)
+
+    expect(
+      createCanvasItemsChangePatch(createItems(), {
+        id: 'component-sticky',
+        text: longText,
+        type: 'set-text',
+      }),
+    ).toEqual([
+      {
+        op: 'replace',
+        path: '/2/body',
+        value: longText,
+      },
+      {
+        op: 'replace',
+        path: '/2/h',
+        value: 302,
+      },
+    ])
+  })
+
   it('maps section set-text changes to title patches', () => {
     expect(
       createCanvasItemsChangePatch([
@@ -96,6 +119,25 @@ describe('CanvasDocumentChangePatch', () => {
         op: 'add',
         path: '/3/text',
         value: 'Next',
+      },
+    ])
+  })
+
+  it('maps comment set-text changes to body patches', () => {
+    expect(
+      createCanvasItemsChangePatch([
+        ...createItems(),
+        createCommentItem('comment-1'),
+      ], {
+        id: 'comment-1',
+        text: 'Looks good',
+        type: 'set-text',
+      }),
+    ).toEqual([
+      {
+        op: 'replace',
+        path: '/4/body',
+        value: 'Looks good',
       },
     ])
   })
@@ -195,6 +237,22 @@ function createArrowItem(
     w: 124,
     x: 248,
     y: 28,
+    ...overrides,
+  }
+}
+
+function createCommentItem(
+  id: string,
+  overrides: Partial<Extract<CanvasItem, { type: 'comment' }>> = {},
+): Extract<CanvasItem, { type: 'comment' }> {
+  return {
+    body: 'Comment',
+    h: 36,
+    id,
+    type: 'comment',
+    w: 36,
+    x: 80,
+    y: 80,
     ...overrides,
   }
 }

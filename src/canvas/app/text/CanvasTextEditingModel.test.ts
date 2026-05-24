@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import type {
   ArrowItem,
+  CanvasCommentItem,
   CanvasComponentItem,
   EditingText,
   RectItem,
@@ -35,6 +36,7 @@ describe('CanvasTextEditingModel', () => {
     const textCommit = vi.fn()
     const rectCommit = vi.fn()
     const stickyCommit = vi.fn()
+    const commentCommit = vi.fn()
 
     commitCanvasTextEditing({
       commitItemsChange: textCommit,
@@ -57,6 +59,13 @@ describe('CanvasTextEditingModel', () => {
       selection: ['component-sticky'],
       setEditing: vi.fn(),
     })
+    commitCanvasTextEditing({
+      commitItemsChange: commentCommit,
+      editing: createEditing('', 'comment-1'),
+      editingItem: createCommentItem(),
+      selection: ['comment-1'],
+      setEditing: vi.fn(),
+    })
 
     expect(textCommit).toHaveBeenCalledWith(
       { type: 'set-text', id: 'text-1', text: 'Text' },
@@ -69,6 +78,10 @@ describe('CanvasTextEditingModel', () => {
     expect(stickyCommit).toHaveBeenCalledWith(
       { type: 'set-text', id: 'component-sticky', text: '' },
       { before: ['component-sticky'], after: ['component-sticky'] },
+    )
+    expect(commentCommit).toHaveBeenCalledWith(
+      { type: 'set-text', id: 'comment-1', text: 'Comment' },
+      { before: ['comment-1'], after: ['comment-1'] },
     )
   })
 
@@ -236,6 +249,21 @@ function createArrowItem(overrides: Partial<ArrowItem> = {}): ArrowItem {
     w: 184,
     x: 68,
     y: 108,
+    ...overrides,
+  }
+}
+
+function createCommentItem(
+  overrides: Partial<CanvasCommentItem> = {},
+): CanvasCommentItem {
+  return {
+    body: 'Question',
+    h: 36,
+    id: 'comment-1',
+    type: 'comment',
+    w: 36,
+    x: 10,
+    y: 20,
     ...overrides,
   }
 }

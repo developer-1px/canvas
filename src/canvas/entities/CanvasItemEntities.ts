@@ -98,6 +98,7 @@ export type CanvasComponentItem = CanvasItemBase & {
 
 export type CanvasEditableTextItem =
   | ArrowItem
+  | CanvasCommentItem
   | RectItem
   | TextItem
   | CanvasComponentItem

@@ -146,11 +146,16 @@ function renderCanvasDemoSvgComponentItemRoute({
 
 function renderCanvasDemoSvgCommentItemRoute({
   item,
+  onTextDoubleClick,
+  selected,
 }: CanvasDemoSvgItemRenderRouteInput & {
   item: CanvasCommentItem
 }): CanvasDemoSvgItemRenderRoute {
+  const editable = isCanvasEditableTextItem(item)
+
   return {
-    children: renderCanvasDemoSvgCommentItem({ item }),
+    children: renderCanvasDemoSvgCommentItem({ item, selected }),
+    onDoubleClick: editable ? () => onTextDoubleClick(item) : undefined,
   }
 }
 

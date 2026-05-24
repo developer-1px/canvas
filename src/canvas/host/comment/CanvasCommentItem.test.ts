@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import {
   CANVAS_COMMENT_BODY_MAX_LENGTH,
+  CANVAS_COMMENT_DEFAULT_BODY,
   CANVAS_COMMENT_ITEM_SIZE,
   createCanvasCommentItem,
+  getCanvasCommentBodyBounds,
   isCanvasCommentItemStorageShape,
 } from './CanvasCommentItem'
 
@@ -22,6 +24,21 @@ describe('CanvasCommentItem', () => {
       type: 'comment',
       w: CANVAS_COMMENT_ITEM_SIZE,
       x: 10,
+      y: 20,
+    })
+    expect(CANVAS_COMMENT_DEFAULT_BODY).toBe('Comment')
+  })
+
+  it('places the editable body card beside the comment pin', () => {
+    expect(getCanvasCommentBodyBounds(createCanvasCommentItem({
+      body: 'Needs follow-up',
+      id: 'comment-1',
+      x: 10,
+      y: 20,
+    }))).toEqual({
+      h: 88,
+      w: 220,
+      x: 56,
       y: 20,
     })
   })

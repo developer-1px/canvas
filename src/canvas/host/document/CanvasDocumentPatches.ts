@@ -10,8 +10,7 @@ import {
   ungroupCanvasSelection,
 } from '../operations/CanvasOperations'
 import {
-  getCanvasEditableTextPatchOperation,
-  getCanvasEditableTextPatchField,
+  getCanvasEditableTextPatchUpdates,
   getCanvasEditableTextValue,
   isCanvasEditableTextItem,
 } from '../text/CanvasEditableTextItem'
@@ -201,13 +200,12 @@ export function createSetCanvasItemTextPatch(
   ) {
     return []
   }
-  const field = getCanvasEditableTextPatchField(entry.item)
-
-  return [{
-    op: getCanvasEditableTextPatchOperation(entry.item),
-    path: `${canvasItemPathToPointer(entry.path)}/${field}` as Pointer,
-    value: text,
-  }]
+  return getCanvasEditableTextPatchUpdates(entry.item, text)
+    .map((update): JSONPatchOperation => ({
+      op: update.operation,
+      path: `${canvasItemPathToPointer(entry.path)}/${update.field}` as Pointer,
+      value: update.value,
+    }))
 }
 
 export function createReplaceChangedCanvasItemsPatch(

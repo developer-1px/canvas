@@ -1,15 +1,19 @@
 import type { CanvasCommentItem } from '../../entities'
+import { getCanvasCommentBodyBounds } from '../../host'
 
 export function renderCanvasDemoSvgCommentItem({
   item,
+  selected,
 }: {
   item: CanvasCommentItem
+  selected: boolean
 }) {
   const radius = Math.min(10, item.w / 3)
   const tailStartX = item.x + item.w * 0.38
   const tailStartY = item.y + item.h
   const tailEndX = item.x + item.w * 0.22
   const tailEndY = item.y + item.h + 7
+  const bodyBounds = getCanvasCommentBodyBounds(item)
 
   return (
     <>
@@ -37,6 +41,16 @@ export function renderCanvasDemoSvgCommentItem({
         height={item.h + 7}
         rx={radius}
       />
+      {selected ? (
+        <foreignObject
+          x={bodyBounds.x}
+          y={bodyBounds.y}
+          width={bodyBounds.w}
+          height={bodyBounds.h}
+        >
+          <div className="comment-body-card">{item.body}</div>
+        </foreignObject>
+      ) : null}
     </>
   )
 }

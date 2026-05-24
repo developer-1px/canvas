@@ -84,9 +84,11 @@ export {
   type CreateCanvasImageItemInput,
 } from './image/CanvasImageItem'
 export {
+  CANVAS_COMMENT_DEFAULT_BODY,
   CANVAS_COMMENT_BODY_MAX_LENGTH,
   CANVAS_COMMENT_ITEM_SIZE,
   createCanvasCommentItem,
+  getCanvasCommentBodyBounds,
   isCanvasCommentAttachedTo,
   isCanvasCommentItem,
   isCanvasCommentItemStorageShape,

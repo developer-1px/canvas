@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type {
   ArrowItem,
+  CanvasCommentItem,
   CanvasComponentItem,
   RectItem,
   TextItem,
@@ -9,6 +10,7 @@ import {
   getCanvasEditableTextBounds,
   getCanvasEditableTextPatchOperation,
   getCanvasEditableTextPatchField,
+  getCanvasEditableTextPatchUpdates,
   getCanvasEditableTextValue,
   getCommittedCanvasEditableTextValue,
   isCanvasEditableTextItem,
@@ -53,6 +55,16 @@ const arrowItem: ArrowItem = {
   y: 108,
 }
 
+const commentItem: CanvasCommentItem = {
+  body: 'Question',
+  h: 36,
+  id: 'comment-1',
+  type: 'comment',
+  w: 36,
+  x: 40,
+  y: 56,
+}
+
 describe('CanvasEditableTextItem', () => {
   it('recognizes items editable by the text editor', () => {
     expect(isCanvasEditableTextItem(rectItem)).toBe(true)
@@ -60,6 +72,7 @@ describe('CanvasEditableTextItem', () => {
     expect(isCanvasTextItem(textItem)).toBe(true)
     expect(isCanvasTextItem(rectItem)).toBe(false)
     expect(isCanvasEditableTextItem(arrowItem)).toBe(true)
+    expect(isCanvasEditableTextItem(commentItem)).toBe(true)
     expect(isCanvasEditableTextItem(createComponentItem('sticky'))).toBe(true)
     expect(isCanvasEditableTextItem(createComponentItem('section'))).toBe(true)
     expect(isCanvasEditableTextItem(createComponentItem('status-card')))
@@ -96,6 +109,7 @@ describe('CanvasEditableTextItem', () => {
       'Status',
     )
     expect(getCanvasEditableTextValue(arrowItem)).toBe('Next step')
+    expect(getCanvasEditableTextValue(commentItem)).toBe('Question')
     expect(getCanvasEditableTextValue({
       ...arrowItem,
       text: undefined,
@@ -127,6 +141,10 @@ describe('CanvasEditableTextItem', () => {
       item: arrowItem,
       value: '',
     })).toBe('')
+    expect(getCommittedCanvasEditableTextValue({
+      item: commentItem,
+      value: '',
+    })).toBe('Comment')
   })
 
   it('owns the patch operation for editable text storage', () => {
@@ -145,6 +163,7 @@ describe('CanvasEditableTextItem', () => {
       text: undefined,
     })).toBe('add')
     expect(getCanvasEditableTextPatchOperation(arrowItem)).toBe('replace')
+    expect(getCanvasEditableTextPatchOperation(commentItem)).toBe('replace')
     expect(getCanvasEditableTextPatchOperation(createComponentItem('sticky')))
       .toBe('replace')
     expect(getCanvasEditableTextPatchOperation(createComponentItem('section')))
@@ -153,6 +172,42 @@ describe('CanvasEditableTextItem', () => {
       .toBe('body')
     expect(getCanvasEditableTextPatchField(createComponentItem('section')))
       .toBe('title')
+    expect(getCanvasEditableTextPatchField(commentItem)).toBe('body')
+  })
+
+  it('adds sticky height updates when committed text needs more room', () => {
+    expect(getCanvasEditableTextPatchUpdates(
+      createComponentItem('sticky', {
+        h: 148,
+        w: 188,
+      }),
+      'x'.repeat(180),
+    )).toEqual([
+      {
+        field: 'body',
+        operation: 'replace',
+        value: 'x'.repeat(180),
+      },
+      {
+        field: 'h',
+        operation: 'replace',
+        value: 302,
+      },
+    ])
+
+    expect(getCanvasEditableTextPatchUpdates(
+      createComponentItem('sticky', {
+        h: 148,
+        w: 188,
+      }),
+      'Short note',
+    )).toEqual([
+      {
+        field: 'body',
+        operation: 'replace',
+        value: 'Short note',
+      },
+    ])
   })
 
   it('derives connector label editing bounds from arrow geometry', () => {
@@ -173,13 +228,25 @@ describe('CanvasEditableTextItem', () => {
     })
   })
 
+  it('derives comment body editing bounds beside the comment pin', () => {
+    expect(getCanvasEditableTextBounds(commentItem)).toEqual({
+      h: 88,
+      w: 220,
+      x: 86,
+      y: 56,
+    })
+  })
+
   it('keeps connector Enter available for multiline labels', () => {
     expect(shouldCommitCanvasEditableTextOnEnter(textItem)).toBe(true)
     expect(shouldCommitCanvasEditableTextOnEnter(arrowItem)).toBe(false)
   })
 })
 
-function createComponentItem(component: string): CanvasComponentItem {
+function createComponentItem(
+  component: string,
+  overrides: Partial<CanvasComponentItem> = {},
+): CanvasComponentItem {
   return {
     accent: '#2563eb',
     body: 'Decision note',
@@ -193,5 +260,6 @@ function createComponentItem(component: string): CanvasComponentItem {
     w: 180,
     x: 80,
     y: 120,
+    ...overrides,
   }
 }

@@ -7,6 +7,7 @@ import {
   type CanvasPointerGesture,
 } from '../../engine'
 import {
+  CANVAS_COMMENT_DEFAULT_BODY,
   CANVAS_COMMENT_ITEM_SIZE,
   createCanvasCommentItem,
 } from '../../host'
@@ -14,8 +15,6 @@ import {
   CANVAS_POINTER_COMMENT_CREATION_KINDS,
   type CanvasPointerCommentCreationKind,
 } from './CanvasPointerCreationGrammar'
-
-const CANVAS_DEFAULT_COMMENT_BODY = 'Comment'
 
 export type CanvasPointerCommentCreationStartResult =
   | { kind: 'none' }
@@ -60,7 +59,7 @@ export function startCanvasPointerCommentCreation({
     capturePointer: false,
     item: createCanvasCommentItem({
       attachedTo: targetItemId,
-      body: CANVAS_DEFAULT_COMMENT_BODY,
+      body: CANVAS_COMMENT_DEFAULT_BODY,
       id: createId('comment'),
       x: startWorld.x - offset,
       y: startWorld.y - offset,

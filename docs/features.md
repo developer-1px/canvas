@@ -135,3 +135,11 @@
 131. 선택한 section을 이동하면 section bounds 안에 완전히 포함된 항목도 함께 이동한다.
 132. Section-contained 이동은 연결된 stamp/comment와 connector도 같은 Host transform 규칙으로 함께 처리한다.
 133. Locked item과 section 밖으로 일부라도 벗어난 항목은 section-contained 이동에 포함하지 않는다.
+134. Section title은 더블클릭으로 인라인 편집할 수 있다.
+135. Section title 편집은 component `title` field를 patch한다.
+136. Section title editor는 section 전체가 아니라 title 영역에 맞춰 열린다.
+137. Sticky note는 커밋된 텍스트가 현재 높이에 들어가지 않으면 세로로 자동 확장된다.
+138. Sticky auto-grow는 `body` patch와 `h` patch를 같은 document history change로 기록한다.
+139. Comment는 선택 시 body card를 표시한다.
+140. Comment는 더블클릭으로 body를 인라인 편집할 수 있다.
+141. 빈 comment body 커밋은 저장 가능한 기본 `Comment` 값으로 복원한다.
