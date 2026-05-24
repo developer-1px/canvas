@@ -30,6 +30,7 @@ export type CanvasPointerCreationStartResult =
   | {
       kind: 'created-item'
       capturePointer: false
+      edit?: EditingText
       item: CanvasItem
       toolAfterCreate?: Tool
     }

@@ -1,10 +1,15 @@
 import type {
+  CanvasComponentItem,
   CanvasEditableTextItem,
   CanvasItem,
   TextItem,
 } from '../model'
 
 export type { CanvasEditableTextItem } from '../model'
+
+const CANVAS_EDITABLE_COMPONENT_KINDS = Object.freeze([
+  'sticky',
+] as const)
 
 export function isCanvasTextItem(item: CanvasItem): item is TextItem {
   return item.type === 'text'
@@ -13,7 +18,11 @@ export function isCanvasTextItem(item: CanvasItem): item is TextItem {
 export function isCanvasEditableTextItem(
   item: CanvasItem,
 ): item is CanvasEditableTextItem {
-  return item.type === 'rect' || isCanvasTextItem(item)
+  return (
+    item.type === 'rect' ||
+    isCanvasTextItem(item) ||
+    isCanvasEditableComponentTextItem(item)
+  )
 }
 
 export function isCanvasEditableTextItemStorageShape(
@@ -28,6 +37,10 @@ export function isCanvasEditableTextItemStorageShape(
 export function getCanvasEditableTextValue(
   item: CanvasEditableTextItem,
 ) {
+  if (item.type === 'component') {
+    return item.body ?? ''
+  }
+
   return item.type === 'rect' ? item.text ?? '' : item.text
 }
 
@@ -46,9 +59,35 @@ export function getCommittedCanvasEditableTextValue({
 export function getCanvasEditableTextPatchOperation(
   item: CanvasEditableTextItem,
 ) {
-  return item.type === 'rect' && item.text === undefined
+  return isCanvasEditableTextPatchFieldMissing(item)
     ? 'add'
     : 'replace'
+}
+
+export function getCanvasEditableTextPatchField(
+  item: CanvasEditableTextItem,
+) {
+  return item.type === 'component' ? 'body' : 'text'
+}
+
+function isCanvasEditableComponentTextItem(
+  item: CanvasItem,
+): item is CanvasComponentItem {
+  return (
+    item.type === 'component' &&
+    CANVAS_EDITABLE_COMPONENT_KINDS.includes(
+      item.component as (typeof CANVAS_EDITABLE_COMPONENT_KINDS)[number],
+    )
+  )
+}
+
+function isCanvasEditableTextPatchFieldMissing(
+  item: CanvasEditableTextItem,
+) {
+  return (
+    (item.type === 'rect' && item.text === undefined) ||
+    (item.type === 'component' && item.body === undefined)
+  )
 }
 
 function isCanvasRectItemStorageShape(

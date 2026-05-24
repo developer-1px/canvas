@@ -508,6 +508,50 @@ describe('CanvasDocument history', () => {
     expect(getCanvasDocumentSelectionIds(document)).toEqual(['text-1'])
   })
 
+  test('commits sticky text editing as a zod-crud body replace patch', () => {
+    const items: CanvasItem[] = [{
+      accent: '#ca8a04',
+      body: 'Draft idea',
+      component: 'sticky',
+      fill: '#fef3c7',
+      h: 148,
+      id: 'component-sticky',
+      stroke: '#eab308',
+      title: 'Sticky',
+      type: 'component',
+      w: 188,
+      x: 10,
+      y: 20,
+    }]
+    const document = createCanvasItemsDocument(items, {
+      selection: ['component-sticky'],
+    })
+    const patch = createSetCanvasItemTextPatch(
+      items,
+      'component-sticky',
+      'Final idea',
+    )
+
+    expect(patch).toEqual([{
+      op: 'replace',
+      path: '/0/body',
+      value: 'Final idea',
+    }])
+    expect(
+      commitCanvasItemsPatch({
+        document,
+        patch,
+        selection: {
+          before: ['component-sticky'],
+          after: ['component-sticky'],
+        },
+      }),
+    ).toBe(true)
+
+    expect(document.lastPatch).toEqual(patch)
+    expect(document.value[0]).toMatchObject({ body: 'Final idea' })
+  })
+
   test('commits empty rect text editing as a zod-crud add patch', () => {
     const items: CanvasItem[] = [{
       fill: '#ffffff',

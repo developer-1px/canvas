@@ -49,6 +49,10 @@ export function applyCanvasPointerInteractionStartEffect({
       after: [start.item.id],
     })
 
+    if (start.edit) {
+      context.setEditing(start.edit)
+    }
+
     if (start.toolAfterCreate) {
       context.setTool(start.toolAfterCreate)
     }

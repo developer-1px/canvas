@@ -9,6 +9,8 @@ import type {
   CanvasItem,
   CanvasStampItem,
   GroupItem,
+  RectItem,
+  TextItem,
 } from '../../entities'
 import { CanvasDemoSvgComponentRenderer } from './CanvasDemoSvgComponentRenderer'
 import {
@@ -22,6 +24,7 @@ import { renderCanvasDemoSvgCommentItem } from './CanvasDemoSvgCommentItemRender
 import type { CanvasDemoSvgCustomItemRenderers } from './CanvasDemoSvgCustomItemRendererRegistry'
 import { renderCanvasDemoSvgCustomItem } from './CanvasDemoSvgCustomItemRendererExecution'
 import { renderCanvasDemoSvgStampItem } from './CanvasDemoSvgStampItemRenderer'
+import { isCanvasEditableTextItem } from '../../host'
 
 export type CanvasDemoSvgItemRenderRouteInput = {
   bounds: Bounds
@@ -109,9 +112,12 @@ function renderCanvasDemoSvgComponentItemRoute({
   componentPresentationRenderers,
   getComponentPresentation,
   item,
+  onTextDoubleClick,
 }: CanvasDemoSvgItemRenderRouteInput & {
   item: CanvasComponentItem
 }): CanvasDemoSvgItemRenderRoute {
+  const editable = isCanvasEditableTextItem(item)
+
   return {
     children: (
       <CanvasDemoSvgComponentRenderer
@@ -121,6 +127,7 @@ function renderCanvasDemoSvgComponentItemRoute({
       />
     ),
     component: item.component,
+    onDoubleClick: editable ? () => onTextDoubleClick(item) : undefined,
   }
 }
 
@@ -202,7 +209,7 @@ function renderCanvasDemoSvgRectTextItemRoute({
   item,
   onTextDoubleClick,
 }: CanvasDemoSvgItemRenderRouteInput & {
-  item: CanvasEditableTextItem
+  item: RectItem | TextItem
 }): CanvasDemoSvgItemRenderRoute {
   return {
     children: renderCanvasDemoSvgRectTextItem({ item }),

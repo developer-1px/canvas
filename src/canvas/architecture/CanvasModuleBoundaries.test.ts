@@ -3471,6 +3471,9 @@ describe('Canvas module boundaries', () => {
     expect(documentPatchesFile.source).toContain(
       'getCanvasEditableTextPatchOperation(entry.item)',
     )
+    expect(documentPatchesFile.source).toContain(
+      'getCanvasEditableTextPatchField(entry.item)',
+    )
     expect(documentPatchesFile.source).not.toContain(
       "entry.item.type !== 'rect'",
     )
@@ -3494,7 +3497,9 @@ describe('Canvas module boundaries', () => {
       'export type CanvasEditableTextItem =',
     )
     expect(getSourceFile('src/canvas/entities/CanvasItemEntities.ts').source)
-      .toContain('export type CanvasEditableTextItem = RectItem | TextItem')
+      .toContain('export type CanvasEditableTextItem =')
+    expect(getSourceFile('src/canvas/entities/CanvasItemEntities.ts').source)
+      .toContain('| CanvasComponentItem')
     expect(getSourceFile('src/canvas/entities/index.ts').source).toContain(
       'CanvasEditableTextItem',
     )
@@ -3509,6 +3514,9 @@ describe('Canvas module boundaries', () => {
     )
     expect(editableTextFile.source).toContain(
       'export function getCanvasEditableTextPatchOperation',
+    )
+    expect(editableTextFile.source).toContain(
+      'export function getCanvasEditableTextPatchField',
     )
   })
 

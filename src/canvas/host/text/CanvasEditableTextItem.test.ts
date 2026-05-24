@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type {
-  CanvasItem,
+  CanvasComponentItem,
   RectItem,
   TextItem,
 } from '../model'
@@ -41,7 +41,9 @@ describe('CanvasEditableTextItem', () => {
     expect(isCanvasEditableTextItem(textItem)).toBe(true)
     expect(isCanvasTextItem(textItem)).toBe(true)
     expect(isCanvasTextItem(rectItem)).toBe(false)
-    expect(isCanvasEditableTextItem(createComponentItem())).toBe(false)
+    expect(isCanvasEditableTextItem(createComponentItem('sticky'))).toBe(true)
+    expect(isCanvasEditableTextItem(createComponentItem('status-card')))
+      .toBe(false)
   })
 
   it('owns rect and text item storage shapes', () => {
@@ -66,9 +68,16 @@ describe('CanvasEditableTextItem', () => {
     expect(getCanvasEditableTextValue({ ...rectItem, text: undefined }))
       .toBe('')
     expect(getCanvasEditableTextValue(textItem)).toBe('Label')
+    expect(getCanvasEditableTextValue(createComponentItem('sticky'))).toBe(
+      'Decision note',
+    )
+    expect(getCanvasEditableTextValue({
+      ...createComponentItem('sticky'),
+      body: undefined,
+    })).toBe('')
   })
 
-  it('keeps empty text items visible while allowing empty rect text', () => {
+  it('keeps empty text items visible while allowing empty rect and sticky text', () => {
     expect(getCommittedCanvasEditableTextValue({
       item: textItem,
       value: '   ',
@@ -77,6 +86,10 @@ describe('CanvasEditableTextItem', () => {
       item: rectItem,
       value: '   ',
     })).toBe('   ')
+    expect(getCommittedCanvasEditableTextValue({
+      item: createComponentItem('sticky'),
+      value: '',
+    })).toBe('')
   })
 
   it('owns the patch operation for editable text storage', () => {
@@ -84,15 +97,22 @@ describe('CanvasEditableTextItem', () => {
       ...rectItem,
       text: undefined,
     })).toBe('add')
+    expect(getCanvasEditableTextPatchOperation({
+      ...createComponentItem('sticky'),
+      body: undefined,
+    })).toBe('add')
     expect(getCanvasEditableTextPatchOperation(rectItem)).toBe('replace')
     expect(getCanvasEditableTextPatchOperation(textItem)).toBe('replace')
+    expect(getCanvasEditableTextPatchOperation(createComponentItem('sticky')))
+      .toBe('replace')
   })
 })
 
-function createComponentItem(): CanvasItem {
+function createComponentItem(component: string): CanvasComponentItem {
   return {
     accent: '#2563eb',
-    component: 'status-card',
+    body: 'Decision note',
+    component,
     fill: '#eff6ff',
     h: 96,
     id: 'component-1',

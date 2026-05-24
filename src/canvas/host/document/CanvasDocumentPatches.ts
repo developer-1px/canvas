@@ -11,6 +11,8 @@ import {
 } from '../operations/CanvasOperations'
 import {
   getCanvasEditableTextPatchOperation,
+  getCanvasEditableTextPatchField,
+  getCanvasEditableTextValue,
   isCanvasEditableTextItem,
 } from '../text/CanvasEditableTextItem'
 import {
@@ -195,14 +197,15 @@ export function createSetCanvasItemTextPatch(
   if (
     !entry ||
     !isCanvasEditableTextItem(entry.item) ||
-    entry.item.text === text
+    getCanvasEditableTextValue(entry.item) === text
   ) {
     return []
   }
+  const field = getCanvasEditableTextPatchField(entry.item)
 
   return [{
     op: getCanvasEditableTextPatchOperation(entry.item),
-    path: `${canvasItemPathToPointer(entry.path)}/text` as Pointer,
+    path: `${canvasItemPathToPointer(entry.path)}/${field}` as Pointer,
     value: text,
   }]
 }

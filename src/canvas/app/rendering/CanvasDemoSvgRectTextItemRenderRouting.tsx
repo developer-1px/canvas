@@ -1,13 +1,14 @@
 import type { ReactNode } from 'react'
 import type {
-  CanvasEditableTextItem,
   RectItem,
   TextItem,
 } from '../../entities'
 import { isCanvasTextItem } from '../../host'
 
+type CanvasDemoSvgRectTextItem = RectItem | TextItem
+
 type CanvasDemoSvgRectTextItemRenderStrategy<
-  TItem extends CanvasEditableTextItem,
+  TItem extends CanvasDemoSvgRectTextItem,
 > = {
   render: (input: { item: TItem }) => ReactNode
 }
@@ -27,7 +28,7 @@ export const CANVAS_DEMO_SVG_RECT_TEXT_ITEM_RENDER_STRATEGIES = {
 export function renderCanvasDemoSvgRectTextItemByRoute({
   item,
 }: {
-  item: CanvasEditableTextItem
+  item: CanvasDemoSvgRectTextItem
 }) {
   return isCanvasTextItem(item)
     ? CANVAS_DEMO_SVG_RECT_TEXT_ITEM_RENDER_STRATEGIES.text.render({ item })

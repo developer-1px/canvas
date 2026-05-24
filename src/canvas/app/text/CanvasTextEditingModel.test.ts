@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import type {
+  CanvasComponentItem,
   EditingText,
   RectItem,
   TextItem,
@@ -32,6 +33,7 @@ describe('CanvasTextEditingModel', () => {
   it('uses the default text placeholder only for empty text items', () => {
     const textCommit = vi.fn()
     const rectCommit = vi.fn()
+    const stickyCommit = vi.fn()
 
     commitCanvasTextEditing({
       commitItemsChange: textCommit,
@@ -47,6 +49,13 @@ describe('CanvasTextEditingModel', () => {
       selection: ['rect-1'],
       setEditing: vi.fn(),
     })
+    commitCanvasTextEditing({
+      commitItemsChange: stickyCommit,
+      editing: createEditing('', 'component-sticky'),
+      editingItem: createStickyItem(),
+      selection: ['component-sticky'],
+      setEditing: vi.fn(),
+    })
 
     expect(textCommit).toHaveBeenCalledWith(
       { type: 'set-text', id: 'text-1', text: 'Text' },
@@ -55,6 +64,10 @@ describe('CanvasTextEditingModel', () => {
     expect(rectCommit).toHaveBeenCalledWith(
       { type: 'set-text', id: 'rect-1', text: '   ' },
       { before: ['rect-1'], after: ['rect-1'] },
+    )
+    expect(stickyCommit).toHaveBeenCalledWith(
+      { type: 'set-text', id: 'component-sticky', text: '' },
+      { before: ['component-sticky'], after: ['component-sticky'] },
     )
   })
 
@@ -151,6 +164,26 @@ function createRectItem(overrides: Partial<RectItem> = {}): RectItem {
     text: 'Label',
     type: 'rect',
     w: 120,
+    x: 10,
+    y: 20,
+    ...overrides,
+  }
+}
+
+function createStickyItem(
+  overrides: Partial<CanvasComponentItem> = {},
+): CanvasComponentItem {
+  return {
+    accent: '#ca8a04',
+    body: 'Decision note',
+    component: 'sticky',
+    fill: '#fef3c7',
+    h: 148,
+    id: 'component-sticky',
+    stroke: '#eab308',
+    title: 'Sticky',
+    type: 'component',
+    w: 188,
     x: 10,
     y: 20,
     ...overrides,

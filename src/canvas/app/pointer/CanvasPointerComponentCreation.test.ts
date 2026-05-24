@@ -34,9 +34,10 @@ describe('CanvasPointerComponentCreation', () => {
     })
     expect(result).toEqual({
       capturePointer: false,
+      edit: { id: 'component-1', value: '' },
       item: {
         accent: '#ca8a04',
-        body: 'Decision note',
+        body: '',
         component: 'sticky',
         fill: '#fef3c7',
         h: 148,

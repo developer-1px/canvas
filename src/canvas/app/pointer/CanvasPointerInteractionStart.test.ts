@@ -105,7 +105,9 @@ describe('CanvasPointerInteractionStart', () => {
 
     expect(result).toMatchObject({
       capturePointer: false,
+      edit: { id: 'component-1', value: '' },
       item: {
+        body: '',
         component: 'sticky',
         id: 'component-1',
         title: 'Sticky',

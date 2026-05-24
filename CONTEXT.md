@@ -27,7 +27,7 @@
 - Canvas Built-in Component Templates: Sticky, label, card 같은 기본 Demo component catalogue를 소유하는 Host-owned Module.
 - Canvas Component Presentation: Demo component kind를 Renderer Adapter의 그리기 전략과 연결하는 key. 새 component kind는 기존 presentation을 재사용할 수 있다.
 - Canvas Component Item Validation: component item의 stable component id, title/style string, optional text list 저장 shape 검증을 소유하는 Host-owned validation Module.
-- Canvas Editable Text Item: `RectItem | TextItem` stable entity type은 Entities Contract가 소유하고, rect/text item이 공유하는 editable target 판정, 저장 shape, edit initial value, commit fallback, patch operation은 Host-owned text Module이 소유한다.
+- Canvas Editable Text Item: `RectItem | TextItem | CanvasComponentItem` stable entity type은 Entities Contract가 소유하고, rect/text/sticky component body가 공유하는 editable target 판정, 저장 shape, edit initial value, commit fallback, patch field/operation은 Host-owned text Module이 소유한다.
 - Canvas Image Item: 업로드/붙여넣기/다운로드 대상이 되는 persisted image item type은 Entities Contract가 소유하고, data URL, mime type, natural size, positive bounds 저장 shape 검증은 Host-owned image Module이 소유한다.
 - Canvas Comment Item: 공통 화이트보드 comment persisted item type은 Entities Contract가 소유하고, body, optional attached item id, resolved state, positive bounds 저장 shape 검증은 Host-owned comment Module이 소유한다.
 - Canvas Stamp Item: 공통 화이트보드 반응/스탬프 persisted item type은 Entities Contract가 소유하고, stable stamp id, optional attached item id, visible label, positive bounds 저장 shape 검증은 Host-owned stamp Module이 소유한다.
@@ -85,7 +85,7 @@
 - Canvas Image Export: selection read model, 현재 Stage SVG snapshot, fallback image export SVG/PNG 변환, selected item composition download/copy 실행을 소유하는 App-owned image Module.
 - Canvas Image Controls: file upload, drag/drop upload, paste image, copy selected as image, download selected as image 버튼과 이벤트만 노출하고 browser file/clipboard/download how는 App image Module에 숨기는 UI surface.
 - Canvas Pointer Comment Creation: comment tool gesture, click point placement, clicked item attachment, id generation, immediate document add result를 Canvas Comment Item 생성 결과로 바꾸는 App-owned pointer creation Module.
-- Canvas Pointer Component Creation: sticky note처럼 사회적 약속이 된 component-backed built-in tool gesture를 Canvas Component Library template과 click point placement로 변환하는 App-owned pointer creation Module.
+- Canvas Pointer Component Creation: sticky note처럼 사회적 약속이 된 component-backed built-in tool gesture를 Canvas Component Library template, click point placement, 생성 직후 text edit 진입으로 변환하는 App-owned pointer creation Module.
 - Canvas Stamp Insertion: stamp definition, selected object attachment placement, selection-adjacent/viewport-center placement, id generation, document add commit, post-insert selection을 Canvas Stamp Item 삽입 결과로 바꾸는 App-owned stamp Module.
 - Canvas Stamp Controls: built-in stamp palette 버튼만 노출하고 placement/document commit how는 App stamp Module에 숨기는 UI surface.
 - Canvas App Custom Command: 내부 command grammar를 수정하지 않고 제품별 business action을 toolbar action으로 등록하는 App-owned command descriptor.
@@ -150,7 +150,7 @@
 - Canvas Pointer Creation Start: pointer-down 시 shape creation, drawing creation, component-backed creation, custom creation, text creation 시작 상태를 각 creation lifecycle Module에 위임하는 App-owned runtime Module.
 - Canvas Pointer Shape Creation: built-in rect/arrow shape creation gesture, draft shape preview, enabled gate, item creation commit, post-create tool selection descriptor를 소유하는 App-owned shape lifecycle Module.
 - Canvas Pointer Drawing Creation: built-in marker/highlighter stroke drawing gesture, draft stroke preview, enabled gate, item creation commit descriptor를 소유하는 App-owned drawing lifecycle Module.
-- Canvas Pointer Component Creation: built-in sticky note gesture, enabled gate, component template lookup, centered placement, immediate component item creation을 소유하는 App-owned component-backed lifecycle Module.
+- Canvas Pointer Component Creation: built-in sticky note gesture, enabled gate, component template lookup, centered placement, immediate component item creation과 edit entry descriptor를 소유하는 App-owned component-backed lifecycle Module.
 - Canvas Pointer Custom Creation: 제품별 custom creation tool lookup, start/preview, item creation commit, external failure containment를 소유하는 App-owned custom lifecycle Module.
 - Canvas Pointer Text Creation: built-in text creation gesture, enabled gate, immediate text item creation, edit entry descriptor를 소유하는 App-owned text lifecycle Module.
 - Canvas Pointer Marquee Interaction: select tool의 marquee start, additive selection, preview bounds/selection, commit clear/selection, cancel restore 규칙을 소유하는 App-owned interaction Module.
@@ -245,7 +245,7 @@
 - Sticky note tool은 별도 stable entity를 만들지 않고 Canvas Component Library의 `sticky` template을 사용해 component item을 생성한다.
 - marker/highlighter stroke drawing lifecycle의 gesture kind, draft stroke, enabled gate, item commit은 Canvas Pointer Drawing Creation Module이 소유한다.
 - rect/arrow shape creation lifecycle의 gesture kind, draft shape, enabled gate, item commit, post-create tool selection은 Canvas Pointer Shape Creation Module이 소유한다.
-- sticky note creation lifecycle의 gesture kind, component template lookup, enabled gate, immediate item creation은 Canvas Pointer Component Creation Module이 소유한다.
+- sticky note creation lifecycle의 gesture kind, component template lookup, enabled gate, immediate item creation, 생성 직후 edit entry는 Canvas Pointer Component Creation Module이 소유한다.
 - Custom creation tool의 pointer lifecycle, lookup, commit, external failure containment는 Canvas Pointer Custom Creation Module이 소유한다.
 - Text creation lifecycle의 gesture kind, enabled gate, immediate item creation, edit entry는 Canvas Pointer Text Creation Module이 소유한다.
 - Marquee selection의 additive 판정, preview selection, commit clear/selection, cancel restore 규칙은 Canvas Pointer Marquee Interaction Module이 소유한다.
@@ -258,7 +258,7 @@
 - 기본 드로잉 item의 bounds는 caller 입력을 믿지 않고 Host tree/document가 `points` 또는 `start/end`에서 canonical하게 동기화한다.
 - 기본 드로잉 item의 geometry bounds, translate/scale, bounds cache sync 규칙은 Host Drawing Item Geometry Module이 소유하고 tree bounds, clone, transform, SVG drawing type guard가 재사용한다.
 - 기본 드로잉 item의 style 기본값은 Host Drawing Item Style Module이 소유하고 draft overlay와 item creation이 재사용한다.
-- Rect/text의 stable editable text item type은 Entities Contract가 소유하고, editable text 판정, 저장 shape 검증, initial edit value, empty text fallback, rect text add-patch 여부는 Host Canvas Editable Text Item Module이 소유한다.
+- Rect/text/sticky component body의 stable editable text item type은 Entities Contract가 소유하고, editable text 판정, 저장 shape 검증, initial edit value, empty text fallback, field별 add/replace patch 여부는 Host Canvas Editable Text Item Module이 소유한다.
 - Image의 stable item type은 Entities Contract가 소유하고, image data URL/mime/natural size/bounds 저장 shape 검증은 Host Canvas Image Item Module이 소유한다.
 - Comment의 stable item type은 Entities Contract가 소유하고, body/attached target/resolved/bounds 저장 shape 검증은 Host Canvas Comment Item Module이 소유한다.
 - Stamp/reaction의 stable item type은 Entities Contract가 소유하고, stamp id/attached target/label/bounds 저장 shape 검증은 Host Canvas Stamp Item Module이 소유한다.

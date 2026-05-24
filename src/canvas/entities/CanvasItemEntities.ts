@@ -21,8 +21,6 @@ export type TextItem = CanvasItemBase & {
   text: string
 }
 
-export type CanvasEditableTextItem = RectItem | TextItem
-
 export type CanvasImageItem = CanvasItemBase & {
   type: 'image'
   alt?: string
@@ -90,6 +88,11 @@ export type CanvasComponentItem = CanvasItemBase & {
   stroke: string
   title: string
 }
+
+export type CanvasEditableTextItem =
+  | RectItem
+  | TextItem
+  | CanvasComponentItem
 
 export type CanvasJsonValue =
   | null

@@ -74,6 +74,37 @@ describe('CanvasPointerInteractionStartEffects', () => {
     expect(context.setTool).not.toHaveBeenCalled()
   })
 
+  it('commits immediately created items and enters editing when requested', () => {
+    const context = createContext()
+    const event = createPointerInput()
+    const item = rect('component-1')
+
+    const applied = applyCanvasPointerInteractionStartEffect({
+      context,
+      event,
+      start: {
+        capturePointer: false,
+        edit: { id: 'component-1', value: '' },
+        item,
+        kind: 'created-item',
+      },
+    })
+
+    expect(applied).toBe(true)
+    expect(context.commitItemsChange).toHaveBeenCalledWith(
+      { type: 'add', items: [item] },
+      {
+        before: ['rect-1'],
+        after: ['component-1'],
+      },
+    )
+    expect(context.setEditing).toHaveBeenCalledWith({
+      id: 'component-1',
+      value: '',
+    })
+    expect(context.setTool).not.toHaveBeenCalled()
+  })
+
   it('applies item pointer start state and clears double-click memory', () => {
     const context = createContext()
     const event = createPointerInput()
