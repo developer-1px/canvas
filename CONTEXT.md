@@ -78,8 +78,8 @@
 - Canvas Clipboard Command Result Effects: clipboard Engine/Adapter result shape를 clone result/add item/copy/cut effect descriptor로 변환하는 App-owned mapping Module.
 - Canvas Clipboard Command Effects: clipboard command effect applier table과 Host clipboard, document commit/selection/editing update, 실행 결과 반영을 소유하는 App-owned runtime Module.
 - Canvas Image Import: file upload, pasted image file, Clipboard API image blob을 Canvas Image Item 생성 source로 정규화하고 viewport 중심 삽입 크기를 정하는 App-owned image Module.
-- Canvas Image Export: selection read model과 image export SVG/PNG 변환, selected item composition download/copy 실행을 소유하는 App-owned image Module.
-- Canvas Image Controls: 업로드, paste image, copy selected as image, download selected as image 버튼만 노출하고 browser file/clipboard/download how는 App image Module에 숨기는 UI surface.
+- Canvas Image Export: selection read model, 현재 Stage SVG snapshot, fallback image export SVG/PNG 변환, selected item composition download/copy 실행을 소유하는 App-owned image Module.
+- Canvas Image Controls: file upload, drag/drop upload, paste image, copy selected as image, download selected as image 버튼과 이벤트만 노출하고 browser file/clipboard/download how는 App image Module에 숨기는 UI surface.
 - Canvas App Custom Command: 내부 command grammar를 수정하지 않고 제품별 business action을 toolbar action으로 등록하는 App-owned command descriptor.
 - Canvas App Custom Command Contracts: custom command descriptor shape와 id registry contract를 검증하는 App-owned contract Module.
 - Canvas App Custom Command Execution: custom command toolbar state, availability, run 호출과 실패 containment를 소유하는 App-owned execution Module.
@@ -402,7 +402,7 @@
 - Built-in command의 availability condition table은 Canvas Command Availability Rules가 소유하고, Engine command availability facade와 selection-gated Engine command action guard는 같은 rule table에 위임한다.
 - Clipboard command hook은 paste index ref/current read, execution context, runner memoization을 맡고, clone/duplicate/copy/paste/cut callback grammar와 supplied paste index descriptor injection은 Canvas Clipboard Command Handlers가 소유한다. Canvas Clipboard Command Execution은 plan 생성과 effect 적용만 조립한다. Clone/duplicate/paste/cut command 호출과 paste offset 계산은 Canvas Clipboard Command Effect Plan이, clipboard result-to-effect descriptor mapping은 Canvas Clipboard Command Result Effects가, Host clipboard/document/editing effect routing은 Canvas Clipboard Command Effects가 소유한다.
 - Clipboard command의 what union은 Canvas Clipboard Command Contracts가, clipboard effect/result/context what은 Canvas Clipboard Command Effect Contracts가 소유하고, Effect Plan/Execution/Handlers/Effects는 그 계약을 소비해 각자의 how만 구현한다.
-- 이미지 업로드, Clipboard API paste image, selected composition copy/download는 App Model이나 UI가 직접 FileReader, ClipboardItem, SVG serialization, canvas `toBlob`, anchor download how를 알지 않고 Canvas Image Import/Export/Controls Module 뒤에서 처리한다.
+- 이미지 업로드, drag/drop upload, Clipboard API paste image, selected composition copy/download는 App Model이나 UI가 직접 FileReader, ClipboardItem, SVG serialization, canvas `toBlob`, anchor download how를 알지 않고 Canvas Image Import/Export/Controls Module 뒤에서 처리한다. Selection export는 현재 Stage SVG snapshot을 우선 사용하고 snapshot이 없을 때 item data fallback을 쓴다.
 - UI controls는 Demo Host를 직접 import하지 않는다.
 - Canvas Toolbar는 item render entry 호출만 맡고, group composition은 Canvas Toolbar Items가, built-in/custom tool group grammar는 Canvas Toolbar Tool Items가, built-in command group descriptor 목록은 Canvas Toolbar Command Catalog가, command group feature toggle과 Canvas Command Availability 소비는 Canvas Toolbar Command Items가, item kind별 button render dispatch는 Canvas Toolbar Item Render Dispatch가, command action runner table과 handler routing은 Canvas Toolbar Command Dispatch가 소유한다.
 - Toolbar command handler bundle의 what 계약은 Canvas Toolbar Command Contracts가 소유하고, Dispatch와 Item Renderer는 그 계약을 소비한다.

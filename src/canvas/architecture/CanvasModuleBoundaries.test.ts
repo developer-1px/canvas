@@ -4502,6 +4502,52 @@ describe('Canvas module boundaries', () => {
     expect(effectsFile.source).toContain('clearEditingIds.includes')
   })
 
+  it('keeps browser image IO behind App image modules', () => {
+    const appModelFile = getSourceFile(
+      'src/canvas/app/workflow/useCanvasAppModel.ts',
+    )
+    const imageModelFile = getSourceFile(
+      'src/canvas/app/workflow/useCanvasAppImageModel.ts',
+    )
+    const imageControlsFile = getSourceFile(
+      'src/canvas/ui/image/CanvasImageControls.tsx',
+    )
+    const imageImportFile = getSourceFile(
+      'src/canvas/app/image/CanvasImageImport.ts',
+    )
+    const imageClipboardFile = getSourceFile(
+      'src/canvas/app/image/CanvasImageClipboard.ts',
+    )
+    const imageExportFile = getSourceFile(
+      'src/canvas/app/image/CanvasImageExport.ts',
+    )
+    const stageElementFile = getSourceFile(
+      'src/canvas/app/stage/CanvasAppStageElement.ts',
+    )
+    const browserImageHow =
+      /\b(FileReader|ClipboardItem|XMLSerializer|toBlob|readAsDataURL|createObjectURL|navigator\.clipboard)\b/
+
+    expect(appModelFile.source).toContain(
+      "from './useCanvasAppImageModel'",
+    )
+    expect(appModelFile.source).not.toMatch(browserImageHow)
+    expect(imageModelFile.source).toContain(
+      "from '../image/useCanvasImageControls'",
+    )
+    expect(imageControlsFile.source).not.toMatch(browserImageHow)
+    expect(imageImportFile.source).toContain('FileReader')
+    expect(imageImportFile.source).toContain('readAsDataURL')
+    expect(imageClipboardFile.source).toContain('navigator.clipboard')
+    expect(imageClipboardFile.source).toContain('ClipboardItem')
+    expect(imageExportFile.source).toContain('getSelectionSvgSnapshot')
+    expect(imageExportFile.source).toContain('toBlob')
+    expect(imageExportFile.source).toContain('createObjectURL')
+    expect(stageElementFile.source).toContain('getSelectionSvgSnapshot')
+    expect(stageElementFile.source).toContain('XMLSerializer')
+    expect(stageElementFile.source).not.toContain('toBlob')
+    expect(stageElementFile.source).not.toContain('ClipboardItem')
+  })
+
   it('keeps App custom command contracts behind a named module', () => {
     const descriptorFile = getSourceFile(
       'src/canvas/app/commands/CanvasAppCustomCommands.ts',

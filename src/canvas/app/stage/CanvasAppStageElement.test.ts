@@ -26,6 +26,10 @@ describe('CanvasAppStageElement', () => {
     expect(
       stageElement.getViewportCenter({ scale: 2, x: 10, y: 20 }),
     ).toBeNull()
+    expect(stageElement.getSelectionSvgSnapshot?.({
+      bounds: { h: 1, w: 1, x: 0, y: 0 },
+      ids: ['item-1'],
+    })).toBeNull()
 
     expect(() => stageElement.capturePointer(1)).not.toThrow()
     expect(() => stageElement.releasePointer(1)).not.toThrow()

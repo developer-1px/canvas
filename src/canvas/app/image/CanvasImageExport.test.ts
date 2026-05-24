@@ -47,6 +47,38 @@ describe('CanvasImageExport', () => {
     expect(payload?.svg).toContain('image-1')
   })
 
+  it('prefers the current stage SVG snapshot when it is available', () => {
+    const readModel = {
+      getSelectedItems: vi.fn(() => [imageItem]),
+      getSelectionBounds: vi.fn(() => ({ h: 80, w: 120, x: 10, y: 20 })),
+    }
+    const stageElement = {
+      getSelectionSvgSnapshot: vi.fn(() => ({
+        height: 128,
+        svg: '<svg><g data-canvas-item-id="image-1"></g></svg>',
+        width: 168,
+      })),
+    }
+
+    const payload = createCanvasSelectionImageExport({
+      itemReadModel: readModel,
+      selection: ['image-1'],
+      stageElement,
+    })
+
+    expect(stageElement.getSelectionSvgSnapshot).toHaveBeenCalledWith({
+      bounds: { h: 80, w: 120, x: 10, y: 20 },
+      ids: ['image-1'],
+    })
+    expect(readModel.getSelectedItems).not.toHaveBeenCalled()
+    expect(payload).toEqual({
+      filename: 'canvas-selection.png',
+      height: 128,
+      svg: '<svg><g data-canvas-item-id="image-1"></g></svg>',
+      width: 168,
+    })
+  })
+
   it('does not export without a concrete selection', () => {
     expect(createCanvasSelectionImageExport({
       itemReadModel: {

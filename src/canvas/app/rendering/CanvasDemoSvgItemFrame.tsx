@@ -47,6 +47,7 @@ export function CanvasDemoSvgItemFrame({
     <g
       className={className}
       data-component={component}
+      data-canvas-item-id={itemId}
       data-custom-kind={customKind}
       data-locked={locked || undefined}
       data-selected={selected}

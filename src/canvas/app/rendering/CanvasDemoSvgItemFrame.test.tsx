@@ -23,6 +23,7 @@ describe('CanvasDemoSvgItemFrame', () => {
     )
 
     expect(markup).toContain('class="canvas-item canvas-group"')
+    expect(markup).toContain('data-canvas-item-id="group-1"')
     expect(markup).toContain('data-locked="true"')
     expect(markup).toContain('data-selected="true"')
     expect(markup).toContain('data-type="group"')

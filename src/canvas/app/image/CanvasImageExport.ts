@@ -13,6 +13,13 @@ export type CanvasImageExportReadModel = {
   getSelectionBounds: (ids: Iterable<string>) => Bounds | null
 }
 
+export type CanvasImageExportStageSnapshot = {
+  getSelectionSvgSnapshot?: (input: {
+    bounds: Bounds
+    ids: readonly string[]
+  }) => Omit<CanvasImageExportPayload, 'filename'> | null
+}
+
 export type CanvasImageExportPayload = {
   filename: string
   height: number
@@ -26,18 +33,37 @@ const EXPORT_BACKGROUND = '#ffffff'
 export function createCanvasSelectionImageExport({
   itemReadModel,
   selection,
+  stageElement,
 }: {
   itemReadModel: CanvasImageExportReadModel
   selection: string[]
+  stageElement?: CanvasImageExportStageSnapshot
 }): CanvasImageExportPayload | null {
   if (selection.length === 0) {
     return null
   }
 
   const bounds = itemReadModel.getSelectionBounds(selection)
+
+  if (!bounds) {
+    return null
+  }
+
+  const snapshot = stageElement?.getSelectionSvgSnapshot?.({
+    bounds,
+    ids: selection,
+  })
+
+  if (snapshot) {
+    return {
+      ...snapshot,
+      filename: 'canvas-selection.png',
+    }
+  }
+
   const items = itemReadModel.getSelectedItems(selection)
 
-  if (!bounds || items.length === 0) {
+  if (items.length === 0) {
     return null
   }
 
@@ -77,44 +103,58 @@ export function createCanvasItemsImageExport({
 export async function downloadCanvasSelectionImage({
   itemReadModel,
   selection,
+  stageElement,
 }: {
   itemReadModel: CanvasImageExportReadModel
   selection: string[]
+  stageElement?: CanvasImageExportStageSnapshot
 }) {
   const exportPayload = createCanvasSelectionImageExport({
     itemReadModel,
     selection,
+    stageElement,
   })
 
   if (!exportPayload) {
     return false
   }
 
-  const blob = await renderCanvasImageExportPngBlob(exportPayload)
+  try {
+    const blob = await renderCanvasImageExportPngBlob(exportPayload)
 
-  downloadCanvasImageBlob(blob, exportPayload.filename)
-  return true
+    downloadCanvasImageBlob(blob, exportPayload.filename)
+    return true
+  } catch {
+    return false
+  }
 }
 
 export async function copyCanvasSelectionImageToClipboard({
   itemReadModel,
   selection,
+  stageElement,
 }: {
   itemReadModel: CanvasImageExportReadModel
   selection: string[]
+  stageElement?: CanvasImageExportStageSnapshot
 }) {
   const exportPayload = createCanvasSelectionImageExport({
     itemReadModel,
     selection,
+    stageElement,
   })
 
   if (!exportPayload) {
     return false
   }
 
-  return writeCanvasImageBlobToClipboard(
-    await renderCanvasImageExportPngBlob(exportPayload),
-  )
+  try {
+    return writeCanvasImageBlobToClipboard(
+      await renderCanvasImageExportPngBlob(exportPayload),
+    )
+  } catch {
+    return false
+  }
 }
 
 async function renderCanvasImageExportPngBlob({
@@ -175,7 +215,7 @@ function downloadCanvasImageBlob(blob: Blob, filename: string) {
   anchor.href = url
   anchor.download = filename
   anchor.click()
-  URL.revokeObjectURL(url)
+  window.setTimeout(() => URL.revokeObjectURL(url), 0)
 }
 
 function renderCanvasImageExportItem(item: CanvasItem): string {
