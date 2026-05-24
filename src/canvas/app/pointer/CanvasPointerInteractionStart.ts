@@ -1,7 +1,5 @@
 import type {
-  Bounds,
   CanvasItem,
-  EditingText,
   Point,
   Tool,
   Viewport,
@@ -10,34 +8,15 @@ import {
   getCanvasPointerGesture,
   type CanvasAffordanceConfig,
   type CanvasCreationAdapter,
-  type CanvasDraftArrowOverlay,
-  type CanvasDraftStrokeOverlay,
 } from '../../engine'
 import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
-import type { Interaction } from './CanvasInteractionState'
 import { startCanvasPointerCreation } from './CanvasPointerCreationStart'
+import type {
+  CanvasPointerInteractionStartResult,
+} from './CanvasPointerInteractionResultContracts'
 import { startCanvasPointerMarqueeInteraction } from './CanvasPointerMarqueeInteraction'
 import { startCanvasPointerPanInteraction } from './CanvasPointerPanInteraction'
-
-export type CanvasPointerInteractionStartResult =
-  | { kind: 'none' }
-  | {
-      kind: 'interaction'
-      capturePointer: true
-      clearSelection?: boolean
-      draftArrow?: CanvasDraftArrowOverlay
-      draftRect?: Bounds
-      draftStroke?: CanvasDraftStrokeOverlay
-      gesture: Interaction['kind']
-      interaction: Interaction
-    }
-  | {
-      kind: 'created-text'
-      capturePointer: false
-      edit: EditingText
-      item: CanvasItem
-    }
 
 export type CanvasPointerInteractionStartInput = {
   config: CanvasAffordanceConfig

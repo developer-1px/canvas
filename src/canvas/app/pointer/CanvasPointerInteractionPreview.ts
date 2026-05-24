@@ -1,20 +1,19 @@
 import type {
-  Bounds,
   CanvasItem,
   Point,
   Viewport,
 } from '../../entities'
 import {
   type CanvasAffordanceConfig,
-  type CanvasDraftArrowOverlay,
-  type CanvasDraftStrokeOverlay,
   type CanvasSceneAdapter,
-  type CanvasSnapGuides,
   type CanvasTransformAdapter,
 } from '../../engine'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import type { Interaction } from './CanvasInteractionState'
 import { previewCanvasPointerCreation } from './CanvasPointerCreationPreview'
+import type {
+  CanvasPointerInteractionPreviewResult,
+} from './CanvasPointerInteractionResultContracts'
 import { previewCanvasPointerMarqueeInteraction } from './CanvasPointerMarqueeInteraction'
 import { previewCanvasPointerPanInteraction } from './CanvasPointerPanInteraction'
 import { routeCanvasPointerInteraction } from './CanvasPointerInteractionRouting'
@@ -31,21 +30,6 @@ export type CanvasPointerInteractionPreviewInput = {
   viewport: Viewport
 }
 
-export type CanvasPointerInteractionPreviewResult =
-  | { kind: 'none' }
-  | {
-      draftArrow?: CanvasDraftArrowOverlay
-      draftRect?: Bounds
-      draftStroke?: CanvasDraftStrokeOverlay
-      interaction?: Interaction
-      kind: 'preview'
-      liveItems?: CanvasItem[]
-      marquee?: Bounds
-      selection?: string[]
-      snapGuides?: CanvasSnapGuides
-      viewport?: Viewport
-    }
-
 export function previewCanvasPointerInteraction({
   config,
   currentScreen,
@@ -56,40 +40,43 @@ export function previewCanvasPointerInteraction({
   transformAdapter,
   viewport,
 }: CanvasPointerInteractionPreviewInput): CanvasPointerInteractionPreviewResult {
-  return routeCanvasPointerInteraction(interaction, {
-    creation: (interaction) =>
-      previewCanvasPointerCreation({
-        config,
-        currentScreen,
-        currentWorld,
-        input,
-        interaction,
-      }),
-    fallback: () => ({ kind: 'none' }),
-    marquee: (interaction) =>
-      previewCanvasPointerMarqueeInteraction({
-        config,
-        currentScreen,
-        currentWorld,
-        interaction,
-        scene,
-      }),
-    pan: (interaction) =>
-      previewCanvasPointerPanInteraction({
-        config,
-        currentScreen,
-        interaction,
-      }),
-    transform: (interaction) =>
-      previewCanvasPointerTransform({
-        config,
-        currentScreen,
-        currentWorld,
-        input,
-        interaction,
-        scene,
-        transformAdapter,
-        viewport,
-      }),
-  })
+  return routeCanvasPointerInteraction<CanvasPointerInteractionPreviewResult>(
+    interaction,
+    {
+      creation: (interaction) =>
+        previewCanvasPointerCreation({
+          config,
+          currentScreen,
+          currentWorld,
+          input,
+          interaction,
+        }),
+      fallback: () => ({ kind: 'none' }),
+      marquee: (interaction) =>
+        previewCanvasPointerMarqueeInteraction({
+          config,
+          currentScreen,
+          currentWorld,
+          interaction,
+          scene,
+        }),
+      pan: (interaction) =>
+        previewCanvasPointerPanInteraction({
+          config,
+          currentScreen,
+          interaction,
+        }),
+      transform: (interaction) =>
+        previewCanvasPointerTransform({
+          config,
+          currentScreen,
+          currentWorld,
+          input,
+          interaction,
+          scene,
+          transformAdapter,
+          viewport,
+        }),
+    },
+  )
 }

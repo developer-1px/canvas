@@ -1,18 +1,16 @@
 import type {
-  Bounds,
   Point,
 } from '../../entities'
 import {
   type CanvasAffordanceConfig,
-  type CanvasDraftArrowOverlay,
-  type CanvasDraftStrokeOverlay,
-  type CanvasSnapGuides,
 } from '../../engine'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
-import type { Interaction } from './CanvasInteractionState'
 import type {
   CanvasPointerCreationInteraction,
 } from './CanvasPointerCreationGrammar'
+import type {
+  CanvasPointerCreationPreviewResult,
+} from './CanvasPointerInteractionResultContracts'
 import {
   previewCanvasPointerDrawingCreation,
 } from './CanvasPointerDrawingCreation'
@@ -30,17 +28,6 @@ type CanvasPointerCreationPreviewInput = {
   input: CanvasAppPointerInput
   interaction: CanvasPointerCreationInteraction
 }
-
-export type CanvasPointerCreationPreviewResult =
-  | { kind: 'none' }
-  | {
-      draftArrow?: CanvasDraftArrowOverlay
-      draftRect?: Bounds
-      draftStroke?: CanvasDraftStrokeOverlay
-      interaction?: Interaction
-      kind: 'preview'
-      snapGuides?: CanvasSnapGuides
-    }
 
 export function previewCanvasPointerCreation({
   config,

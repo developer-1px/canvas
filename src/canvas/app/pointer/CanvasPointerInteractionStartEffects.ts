@@ -22,7 +22,9 @@ import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import type { Interaction } from './CanvasInteractionState'
 import { capturePointer } from './CanvasPointerGeometry'
 import type { CanvasItemPointerInteractionStartResult } from './CanvasItemPointerInteractionStart'
-import type { CanvasPointerInteractionStartResult } from './CanvasPointerInteractionStart'
+import type {
+  CanvasPointerInteractionStartResult,
+} from './CanvasPointerInteractionResultContracts'
 import type { CanvasResizePointerInteractionStartResult } from './CanvasResizePointerInteractionStart'
 
 export type CanvasPointerInteractionStartEffectContext = {

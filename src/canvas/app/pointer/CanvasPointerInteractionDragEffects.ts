@@ -19,7 +19,9 @@ import type { CanvasAppPointerIdInput } from './CanvasAppPointerInput'
 import type { Interaction } from './CanvasInteractionState'
 import { releasePointer } from './CanvasPointerGeometry'
 import { cancelCanvasPointerInteraction } from './CanvasPointerInteractionLifecycle'
-import type { CanvasPointerInteractionPreviewResult } from './CanvasPointerInteractionPreview'
+import type {
+  CanvasPointerInteractionPreviewResult,
+} from './CanvasPointerInteractionResultContracts'
 
 export type CanvasPointerInteractionDragEffectContext = {
   interactionRef: MutableRefObject<Interaction>
