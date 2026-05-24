@@ -16,7 +16,9 @@ import type {
 import type { Interaction } from '../pointer/CanvasInteractionState'
 import type { CommitCanvasSelection } from '../workflow/CanvasWorkflowContract'
 import { createCanvasKeyboardIntentDispatchTable } from './CanvasKeyboardIntentDispatchTable'
-import type { CanvasKeyboardShortcutIntent } from './CanvasKeyboardShortcutIntent'
+import type {
+  CanvasKeyboardShortcutIntent,
+} from './CanvasKeyboardShortcutIntentContracts'
 import { shouldReleaseCanvasKeyboardTemporaryPan } from './CanvasKeyboardSystemShortcuts'
 
 export type CanvasKeyboardSystemHandlers = {

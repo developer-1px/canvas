@@ -1,26 +1,17 @@
 import type { CanvasAffordanceConfig } from '../../engine'
-import type { Tool } from '../../entities'
 import type {
   CanvasAppCustomCreationToolState,
 } from '../extensions/CanvasAppExtensionStateContracts'
+import type {
+  CanvasKeyboardShortcutIntent,
+} from './CanvasKeyboardShortcutIntentContracts'
 import {
   getCanvasKeyboardCommandShortcutIntent,
-  type CanvasKeyboardCommandShortcutIntent,
-  type CanvasKeyboardReorderMode,
 } from './CanvasKeyboardCommandShortcutIntent'
 import {
   getCanvasKeyboardSystemShortcutIntent,
-  type CanvasKeyboardSystemShortcutIntent,
 } from './CanvasKeyboardSystemShortcuts'
 import { getCanvasKeyboardToolShortcutIntent } from './CanvasKeyboardToolShortcutIntent'
-
-export type { CanvasKeyboardReorderMode }
-
-export type CanvasKeyboardShortcutIntent =
-  | { kind: 'none'; preventDefault: false }
-  | CanvasKeyboardSystemShortcutIntent
-  | CanvasKeyboardCommandShortcutIntent
-  | { kind: 'set-tool'; preventDefault: false; tool: Tool }
 
 export type CanvasKeyboardShortcutIntentInput = {
   config: CanvasAffordanceConfig

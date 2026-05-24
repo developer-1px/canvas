@@ -1,6 +1,8 @@
 import type { Tool } from '../../entities'
 import { createCanvasKeyboardIntentDispatchTable } from './CanvasKeyboardIntentDispatchTable'
-import type { CanvasKeyboardShortcutIntent } from './CanvasKeyboardShortcutIntent'
+import type {
+  CanvasKeyboardShortcutIntent,
+} from './CanvasKeyboardShortcutIntentContracts'
 
 export type CanvasKeyboardToolHandlers = {
   setTool: (tool: Tool) => void

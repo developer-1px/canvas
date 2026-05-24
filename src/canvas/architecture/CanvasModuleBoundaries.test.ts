@@ -4288,6 +4288,9 @@ describe('Canvas module boundaries', () => {
     const intentFile = getSourceFile(
       'src/canvas/app/keyboard/CanvasKeyboardShortcutIntent.ts',
     )
+    const intentContractsFile = getSourceFile(
+      'src/canvas/app/keyboard/CanvasKeyboardShortcutIntentContracts.ts',
+    )
     const commandIntentFile = getSourceFile(
       'src/canvas/app/keyboard/CanvasKeyboardCommandShortcutIntent.ts',
     )
@@ -4425,6 +4428,9 @@ describe('Canvas module boundaries', () => {
       'export function getCanvasKeyboardShortcutIntent',
     )
     expect(intentFile.source).toContain(
+      "from './CanvasKeyboardShortcutIntentContracts'",
+    )
+    expect(intentFile.source).toContain(
       "from './CanvasKeyboardToolShortcutIntent'",
     )
     expect(intentFile.source).toContain(
@@ -4440,8 +4446,34 @@ describe('Canvas module boundaries', () => {
     expect(intentFile.source).not.toContain(
       'matchesCanvasAppCustomToolShortcut',
     )
+    expect(intentFile.source).not.toContain(
+      'export type CanvasKeyboardShortcutIntent =',
+    )
+    expect(intentFile.source).not.toContain(
+      'export type { CanvasKeyboardReorderMode }',
+    )
     expect(intentFile.source).not.toContain("event.key.startsWith('Arrow')")
     expect(intentFile.source).not.toContain("key === 'z'")
+    expect(intentContractsFile.source).toContain(
+      'export type CanvasKeyboardShortcutIntent =',
+    )
+    expect(intentContractsFile.source).toContain(
+      'export type { CanvasKeyboardReorderMode }',
+    )
+    for (const dispatchFile of [
+      commandDispatchFile,
+      shortcutDispatchFile,
+      systemDispatchFile,
+      viewportDispatchFile,
+      toolDispatchFile,
+    ]) {
+      expect(dispatchFile.source).toContain(
+        "from './CanvasKeyboardShortcutIntentContracts'",
+      )
+      expect(dispatchFile.source).not.toContain(
+        "from './CanvasKeyboardShortcutIntent'",
+      )
+    }
     expect(commandIntentFile.source).toContain(
       'export function getCanvasKeyboardCommandShortcutIntent',
     )

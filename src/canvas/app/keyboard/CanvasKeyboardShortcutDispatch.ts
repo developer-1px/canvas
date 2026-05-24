@@ -3,7 +3,9 @@ import {
   runCanvasKeyboardCommandIntent,
   type CanvasKeyboardCommandHandlers,
 } from './CanvasKeyboardCommandDispatch'
-import type { CanvasKeyboardShortcutIntent } from './CanvasKeyboardShortcutIntent'
+import type {
+  CanvasKeyboardShortcutIntent,
+} from './CanvasKeyboardShortcutIntentContracts'
 import {
   isCanvasKeyboardSystemIntent,
   runCanvasKeyboardSystemIntent,

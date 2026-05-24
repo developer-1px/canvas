@@ -1,5 +1,7 @@
 import { createCanvasKeyboardIntentDispatchTable } from './CanvasKeyboardIntentDispatchTable'
-import type { CanvasKeyboardShortcutIntent } from './CanvasKeyboardShortcutIntent'
+import type {
+  CanvasKeyboardShortcutIntent,
+} from './CanvasKeyboardShortcutIntentContracts'
 
 export type CanvasKeyboardViewportHandlers = {
   fitToItems: (ids?: string[]) => void

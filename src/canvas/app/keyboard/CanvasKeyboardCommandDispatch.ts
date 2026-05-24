@@ -1,9 +1,11 @@
 import type {
   CanvasKeyboardCommandShortcutIntent,
-  CanvasKeyboardReorderMode,
 } from './CanvasKeyboardCommandShortcutIntent'
 import { createCanvasKeyboardIntentDispatchTable } from './CanvasKeyboardIntentDispatchTable'
-import type { CanvasKeyboardShortcutIntent } from './CanvasKeyboardShortcutIntent'
+import type {
+  CanvasKeyboardReorderMode,
+  CanvasKeyboardShortcutIntent,
+} from './CanvasKeyboardShortcutIntentContracts'
 
 export type CanvasKeyboardCommandHandlers = {
   copySelection: () => void
