@@ -1220,6 +1220,9 @@ describe('Canvas module boundaries', () => {
     const controlCommandContractsFile = getSourceFile(
       'src/canvas/app/workflow/CanvasAppControlCommandContracts.ts',
     )
+    const consumerContractsFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppConsumerContracts.ts',
+    )
 
     expect(appModelFile.source).toContain("from './CanvasAppControlModel'")
     expect(appModelFile.source).not.toContain(
@@ -1237,10 +1240,20 @@ describe('Canvas module boundaries', () => {
       'export function getCanvasAppControlModel',
     )
     expect(controlModelFile.source).toContain(
-      "from './CanvasAppControlCommandContracts'",
+      "from './CanvasAppConsumerContracts'",
+    )
+    expect(controlModelFile.source).toContain('CanvasAppControlModelInput')
+    expect(controlModelFile.source).not.toContain(
+      'type CanvasAppControlModelInput',
     )
     expect(controlModelFile.source).not.toContain(
       'type CanvasAppControlCommandHandlers',
+    )
+    expect(consumerContractsFile.source).toContain(
+      'export type CanvasAppControlModelInput',
+    )
+    expect(consumerContractsFile.source).toContain(
+      "from './CanvasAppControlCommandContracts'",
     )
     expect(controlCommandContractsFile.source).toContain(
       'export type CanvasAppControlCommandHandlers',

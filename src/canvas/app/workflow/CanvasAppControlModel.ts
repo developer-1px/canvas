@@ -3,41 +3,15 @@ import {
   CANVAS_GESTURE_STATUS_LABELS,
   CANVAS_TOOL_AFFORDANCES,
   getCanvasCommandAvailability,
-  type CanvasAffordanceConfig,
-  type CanvasSceneAdapter,
 } from '../../engine'
 import type {
   CanvasInteractionKind,
   Tool,
-  Viewport,
 } from '../../entities'
-import type { CanvasComponentTemplate } from '../../host'
 import type {
-  CanvasAppCustomCommandState,
   CanvasAppCustomCreationToolState,
 } from '../extensions/CanvasAppExtensionStateContracts'
-import type { CanvasAppControlCommandHandlers } from './CanvasAppControlCommandContracts'
-
-type CanvasAppControlModelInput = {
-  canRedo: boolean
-  canUndo: boolean
-  components: readonly CanvasComponentTemplate[]
-  config: CanvasAffordanceConfig
-  customCommands: readonly CanvasAppCustomCommandState[]
-  customTools: readonly CanvasAppCustomCreationToolState[]
-  gesture: CanvasInteractionKind
-  scene: CanvasSceneAdapter
-  selection: string[]
-  tool: Tool
-  viewport: Viewport
-  commandHandlers: CanvasAppControlCommandHandlers
-  onFitItems: (ids?: string[]) => void
-  onInsertComponent: (component: string) => void
-  onRunCustomCommand: (commandId: string) => void
-  onToolChange: (tool: Tool) => void
-  onViewportReset: () => void
-  onZoomBy: (multiplier: number) => void
-}
+import type { CanvasAppControlModelInput } from './CanvasAppConsumerContracts'
 
 export function getCanvasAppControlModel({
   canRedo,

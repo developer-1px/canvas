@@ -30,6 +30,7 @@ import type {
 } from '../../entities'
 import type {
   CanvasComponentLibrary,
+  CanvasComponentTemplate,
   CanvasEditableTextItem,
   CanvasItemReadModel,
 } from '../../host'
@@ -172,6 +173,27 @@ export type CanvasAppComponentControlContext = {
 
 export type CanvasAppComponentModel = {
   control: CanvasAppComponentControlContext
+}
+
+export type CanvasAppControlModelInput = {
+  canRedo: boolean
+  canUndo: boolean
+  commandHandlers: CanvasAppControlCommandHandlers
+  components: readonly CanvasComponentTemplate[]
+  config: CanvasAffordanceConfig
+  customCommands: readonly CanvasAppCustomCommandState[]
+  customTools: readonly CanvasAppCustomCreationToolState[]
+  gesture: CanvasInteractionKind
+  onFitItems: (ids?: string[]) => void
+  onInsertComponent: (component: CanvasComponentKind) => void
+  onRunCustomCommand: (commandId: string) => void
+  onToolChange: (tool: Tool) => void
+  onViewportReset: () => void
+  onZoomBy: (multiplier: number) => void
+  scene: CanvasSceneAdapter
+  selection: string[]
+  tool: Tool
+  viewport: Viewport
 }
 
 export type CanvasAppExtensionRuntime = {
