@@ -9,7 +9,6 @@ export type {
 export type {
   CanvasAppCustomCommand,
   CanvasAppCustomCommandContext,
-  CanvasAppCustomCommandState,
 } from '../commands/CanvasAppCustomCommands'
 export {
   defineCanvasAppCustomItemModule,
@@ -27,9 +26,7 @@ export type {
   CanvasAppInspectorPanelView,
 } from '../inspector/CanvasAppInspectorPanels'
 export type {
-  CanvasAppCustomCreationTool,
   CanvasAppCustomCreationToolContext,
-  CanvasAppCustomCreationToolState,
   CanvasAppCustomToolShortcut,
 } from '../tools/CanvasAppCustomCreationTools'
 export type {

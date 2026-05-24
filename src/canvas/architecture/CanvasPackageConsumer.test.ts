@@ -180,6 +180,9 @@ describe('Canvas package consumer imports', () => {
     expect('createCanvasAppCustomItemModuleAssembly' in CanvasPackage).toBe(
       false,
     )
+    expect('CanvasAppCustomCommandState' in CanvasPackage).toBe(false)
+    expect('CanvasAppCustomCreationTool' in CanvasPackage).toBe(false)
+    expect('CanvasAppCustomCreationToolState' in CanvasPackage).toBe(false)
     expect('assertCanvasAffordanceConfig' in CanvasPackage).toBe(false)
     expect('createCanvasComponentLibrary' in CanvasPackage).toBe(false)
     expect('CanvasSvgStage' in CanvasPackage).toBe(false)
@@ -204,6 +207,9 @@ describe('Canvas package consumer imports', () => {
     expect(
       'createCanvasAppCustomItemModuleAssembly' in CanvasAppAuthoring,
     ).toBe(false)
+    expect('CanvasAppCustomCommandState' in CanvasAppAuthoring).toBe(false)
+    expect('CanvasAppCustomCreationTool' in CanvasAppAuthoring).toBe(false)
+    expect('CanvasAppCustomCreationToolState' in CanvasAppAuthoring).toBe(false)
     expect(CanvasSvgStage).toBe(CanvasRenderer.CanvasSvgStage)
     expect(normalizeBounds({ x: 10, y: 20 }, { x: 2, y: 4 })).toEqual({
       h: 16,

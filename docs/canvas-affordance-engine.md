@@ -257,7 +257,7 @@ type CanvasAffordanceConfig = {
 - package public entry는 App Shell과 App props/source만 `canvas/app` facade에서 가져오고, descriptor authoring contract는 `canvas/app/authoring` facade에서 가져온다.
 - package public entry는 `useCanvasAppModel`, `DEFAULT_CANVAS_APP_ASSEMBLY`, `assertCanvasAppAssembly`, `createCanvasAppCustomItemModuleAssembly` 같은 App runtime how를 `canvas/app` subpath에서만 연다.
 - Canvas App Public Facade는 descriptor authoring contract를 Canvas App Authoring Facade에서 재노출하고, runtime hook/default/validator는 workflow public entry에서만 재노출한다.
-- `canvas/app/authoring` subpath는 descriptor what만 열고 `useCanvasAppModel`, default assembly, assertion, custom module assembly output 같은 runtime how를 열지 않는다.
+- `canvas/app/authoring` subpath는 descriptor what만 열고 `useCanvasAppModel`, default assembly, assertion, assembled custom tool/state, custom module assembly output 같은 runtime how를 열지 않는다.
 - package public entry와 subpath export는 `canvas` package self-import consumer smoke test로 검증한다.
 - package manifest는 CSS import가 bundler tree-shaking에서 제거되지 않도록 `sideEffects`에 CSS를 명시한다.
 - package manifest는 React, React DOM, Zod를 shared runtime peer dependency로 선언한다.

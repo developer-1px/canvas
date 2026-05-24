@@ -710,6 +710,14 @@ describe('Canvas module boundaries', () => {
     expect(packageFacadeFile.source).not.toContain(
       'createCanvasAppCustomItemModuleAssembly',
     )
+    for (const runtimeContract of [
+      'CanvasAppCustomCommandState',
+      'CanvasAppCustomCreationTool,',
+      'CanvasAppCustomCreationToolState',
+    ]) {
+      expect(packageFacadeFile.source).not.toContain(runtimeContract)
+      expect(authoringFacadeFile.source).not.toContain(runtimeContract)
+    }
     expect(packageFacadeFile.source).not.toContain(
       'CanvasAppCustomItemModuleAssembly',
     )
@@ -1073,12 +1081,20 @@ describe('Canvas module boundaries', () => {
       'createCanvasAppComponentPresentationRenderers',
       'createCanvasAppCustomItemRenderers',
       'CanvasAppCustomCommand',
-      'CanvasAppCustomCreationTool',
+      'CanvasAppCustomItemModuleCreationTool',
       'CanvasAppInspectorPanel',
       'CanvasWorkspaceStorageProvider',
     ]) {
       expect(authoringFacadeFile.source).toContain(authoringContract)
       expect(appFacadeFile.source).toContain(authoringContract)
+    }
+    for (const runtimeContract of [
+      'CanvasAppCustomCommandState',
+      'CanvasAppCustomCreationTool,',
+      'CanvasAppCustomCreationToolState',
+    ]) {
+      expect(authoringFacadeFile.source).not.toContain(runtimeContract)
+      expect(appFacadeFile.source).not.toContain(runtimeContract)
     }
     for (const runtimeHow of [
       'useCanvasAppModel',
