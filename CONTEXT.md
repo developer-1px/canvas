@@ -78,6 +78,7 @@
 - Canvas Clipboard Command Result Effects: clipboard Engine/Adapter result shape를 clone result/add item/copy/cut effect descriptor로 변환하는 App-owned mapping Module.
 - Canvas Clipboard Command Effects: clipboard command effect applier table과 Host clipboard, document commit/selection/editing update, 실행 결과 반영을 소유하는 App-owned runtime Module.
 - Canvas Image Import: file upload, pasted image file, Clipboard API image blob을 Canvas Image Item 생성 source로 정규화하고 viewport 중심 삽입 크기를 정하는 App-owned image Module.
+- Canvas Image Insertion: imported image source, viewport/drop center, id generation, document add commit, post-insert selection을 Canvas Image Item 삽입 결과로 바꾸는 App-owned image Module.
 - Canvas Image Export: selection read model, 현재 Stage SVG snapshot, fallback image export SVG/PNG 변환, selected item composition download/copy 실행을 소유하는 App-owned image Module.
 - Canvas Image Controls: file upload, drag/drop upload, paste image, copy selected as image, download selected as image 버튼과 이벤트만 노출하고 browser file/clipboard/download how는 App image Module에 숨기는 UI surface.
 - Canvas App Custom Command: 내부 command grammar를 수정하지 않고 제품별 business action을 toolbar action으로 등록하는 App-owned command descriptor.

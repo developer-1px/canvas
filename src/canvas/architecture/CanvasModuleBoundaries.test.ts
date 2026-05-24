@@ -4512,6 +4512,9 @@ describe('Canvas module boundaries', () => {
     const imageControlsFile = getSourceFile(
       'src/canvas/ui/image/CanvasImageControls.tsx',
     )
+    const imageInsertionFile = getSourceFile(
+      'src/canvas/app/image/CanvasImageInsertion.ts',
+    )
     const imageImportFile = getSourceFile(
       'src/canvas/app/image/CanvasImageImport.ts',
     )
@@ -4535,6 +4538,12 @@ describe('Canvas module boundaries', () => {
       "from '../image/useCanvasImageControls'",
     )
     expect(imageControlsFile.source).not.toMatch(browserImageHow)
+    expect(imageInsertionFile.source).toContain(
+      'export function insertCanvasImageSource',
+    )
+    expect(imageInsertionFile.source).toContain(
+      'export function getCanvasImageInsertCenter',
+    )
     expect(imageImportFile.source).toContain('FileReader')
     expect(imageImportFile.source).toContain('readAsDataURL')
     expect(imageClipboardFile.source).toContain('navigator.clipboard')

@@ -4,10 +4,7 @@ import {
   useMemo,
 } from 'react'
 import type { CanvasAffordanceConfig } from '../../engine'
-import type {
-  Point,
-  Viewport,
-} from '../../entities'
+import type { Viewport } from '../../entities'
 import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
 import type { CanvasAppItemReadModel } from '../workflow/CanvasAppItemReadModelContracts'
 import type {
@@ -19,12 +16,15 @@ import {
   downloadCanvasSelectionImage,
 } from './CanvasImageExport'
 import {
-  createCanvasImportedImageItem,
   getCanvasImageFileFromDataTransfer,
   getCanvasImageFileFromList,
   readCanvasImageFileSource,
   type CanvasImageImportSource,
 } from './CanvasImageImport'
+import {
+  getCanvasImageInsertCenter,
+  insertCanvasImageSource,
+} from './CanvasImageInsertion'
 
 export type CanvasImageControlsModel = {
   canCopyImage: boolean
@@ -63,46 +63,35 @@ export function useCanvasImageControls({
   const canPasteImage = visible && config.commands.paste
   const canUploadImage = visible
 
-  const getImageInsertCenter = useCallback(
-    (event?: { clientX: number; clientY: number }): Point => {
-      if (event) {
-        const point = stageElement.getScreenPoint(event)
-
-        return {
-          x: (point.x - viewport.x) / viewport.scale,
-          y: (point.y - viewport.y) / viewport.scale,
-        }
-      }
-
-      return stageElement.getViewportCenter(viewport) ?? { x: 0, y: 0 }
-    },
-    [stageElement, viewport],
-  )
-
   const insertImageSource = useCallback(
-    (source: CanvasImageImportSource, center?: Point) => {
-      const item = createCanvasImportedImageItem({
-        center: center ?? getImageInsertCenter(),
-        createId,
-        source,
-      })
-
-      return commitItemsChange(
-        { type: 'add', items: [item] },
-        {
-          before: selection,
-          after: [item.id],
+    (
+      source: CanvasImageImportSource,
+      event?: { clientX: number; clientY: number },
+    ) =>
+      insertCanvasImageSource({
+        center: getCanvasImageInsertCenter({
+          event,
+          stageElement,
+          viewport,
+        }),
+        context: {
+          commitItemsChange,
+          createId,
+          selection,
         },
-      )
-    },
-    [commitItemsChange, createId, getImageInsertCenter, selection],
+        source,
+      }),
+    [commitItemsChange, createId, selection, stageElement, viewport],
   )
 
   const insertImageFile = useCallback(
-    async (file: Blob & { name?: string }, center?: Point) => {
+    async (
+      file: Blob & { name?: string },
+      event?: { clientX: number; clientY: number },
+    ) => {
       const source = await readCanvasImageFileSource(file)
 
-      return source ? insertImageSource(source, center) : false
+      return source ? insertImageSource(source, event) : false
     },
     [insertImageSource],
   )
@@ -184,7 +173,7 @@ export function useCanvasImageControls({
       }
 
       event.preventDefault()
-      void insertImageFile(file, getImageInsertCenter(event))
+      void insertImageFile(file, event)
     }
 
     window.addEventListener('dragover', handleDragOver)
@@ -194,7 +183,7 @@ export function useCanvasImageControls({
       window.removeEventListener('dragover', handleDragOver)
       window.removeEventListener('drop', handleDrop)
     }
-  }, [canUploadImage, getImageInsertCenter, insertImageFile])
+  }, [canUploadImage, insertImageFile])
 
   return useMemo(
     () => ({

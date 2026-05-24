@@ -16,7 +16,10 @@ import type {
   Viewport,
 } from '../../entities'
 import { readCanvasClipboardImageSource } from '../image/CanvasImageClipboard'
-import { createCanvasImportedImageItem } from '../image/CanvasImageImport'
+import {
+  getCanvasImageInsertCenter,
+  insertCanvasImageSource,
+} from '../image/CanvasImageInsertion'
 import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
 import type {
   CanvasDocumentClipboard,
@@ -156,19 +159,15 @@ export function useCanvasClipboardCommands({
       return false
     }
 
-    const item = createCanvasImportedImageItem({
-      center: stageElement.getViewportCenter(viewport) ?? { x: 0, y: 0 },
-      createId,
+    return insertCanvasImageSource({
+      center: getCanvasImageInsertCenter({ stageElement, viewport }),
+      context: {
+        commitItemsChange,
+        createId,
+        selection,
+      },
       source,
     })
-
-    return commitItemsChange(
-      { type: 'add', items: [item] },
-      {
-        before: selection,
-        after: [item.id],
-      },
-    )
   }, [
     commitItemsChange,
     config.commands.paste,
