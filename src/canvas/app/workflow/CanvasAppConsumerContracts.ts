@@ -6,12 +6,15 @@ import type {
 import type {
   CanvasAffordanceConfig,
   CanvasAlignMode,
+  CanvasCreationAdapter,
   CanvasDistributeMode,
   CanvasDraftArrowOverlay,
   CanvasDraftStrokeOverlay,
   CanvasOverlayState,
   CanvasReorderMode,
+  CanvasSceneAdapter,
   CanvasSnapGuides,
+  CanvasTransformAdapter,
 } from '../../engine'
 import type {
   Bounds,
@@ -23,13 +26,19 @@ import type {
   Tool,
   Viewport,
 } from '../../entities'
-import type { CanvasEditableTextItem } from '../../host'
+import type {
+  CanvasEditableTextItem,
+  CanvasItemReadModel,
+} from '../../host'
 import type {
   CanvasAppCustomCommandState,
   CanvasAppCustomCreationToolState,
 } from '../extensions/CanvasAppExtensionStateContracts'
 import type { CanvasAppPointerInput } from '../pointer/CanvasAppPointerInput'
-import type { CanvasAppStageElementController } from '../stage/CanvasAppStageElement'
+import type {
+  CanvasAppStageElement,
+  CanvasAppStageElementController,
+} from '../stage/CanvasAppStageElement'
 import type {
   CanvasAppItemLayerAdapter,
 } from '../rendering/CanvasAppItemLayerAdapter'
@@ -44,7 +53,10 @@ import type {
 import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
 import type { Interaction } from '../pointer/CanvasInteractionState'
 import type { CanvasAppControlCommandHandlers } from './CanvasAppControlCommandContracts'
-import type { CommitCanvasSelection } from './CanvasWorkflowContract'
+import type {
+  CommitCanvasItemsChange,
+  CommitCanvasSelection,
+} from './CanvasWorkflowContract'
 
 export type CanvasAppCommandRuntime = {
   alignSelection: (mode: CanvasAlignMode) => void
@@ -257,6 +269,78 @@ export type CanvasAppPointerStageHandlers = {
 export type CanvasAppPointerConsumerModel = {
   itemLayerHandlers: CanvasAppPointerItemLayerHandlers
   stageHandlers: CanvasAppPointerStageHandlers
+}
+
+export type CanvasAppPointerDownRuntime = {
+  handleCanvasPointerDown: (event: CanvasAppPointerInput) => void
+  handleItemPointerDown: (
+    event: CanvasAppPointerInput,
+    itemId: string,
+  ) => void
+  handleResizePointerDown: (
+    event: CanvasAppPointerInput,
+    handle: ResizeHandle,
+  ) => void
+  handleTextDoubleClick: (item: CanvasEditableTextItem) => void
+}
+
+export type CanvasAppPointerDragRuntime = {
+  handlePointerCancel: (event: CanvasAppPointerInput) => void
+  handlePointerMove: (event: CanvasAppPointerInput) => void
+  handlePointerUp: (event: CanvasAppPointerInput) => void
+}
+
+export type CanvasAppPointerConsumerModelInput = {
+  downHandlers: CanvasAppPointerDownRuntime
+  dragHandlers: CanvasAppPointerDragRuntime
+}
+
+export type CanvasAppPointerCommandModel = {
+  cloneItems: (ids: string[], offset: Point) => CanvasItem[]
+  commitItemsChange: CommitCanvasItemsChange
+  commitSelection: CommitCanvasSelection
+}
+
+export type CanvasAppPointerInteractionModel = {
+  interactionRef: MutableRefObject<Interaction>
+  setDraftArrow: Dispatch<SetStateAction<CanvasDraftArrowOverlay | null>>
+  setDraftRect: Dispatch<SetStateAction<Bounds | null>>
+  setDraftStroke: Dispatch<SetStateAction<CanvasDraftStrokeOverlay | null>>
+  setGesture: Dispatch<SetStateAction<Interaction['kind']>>
+  setMarquee: Dispatch<SetStateAction<Bounds | null>>
+  setSnapGuides: Dispatch<SetStateAction<CanvasSnapGuides>>
+  setTool: Dispatch<SetStateAction<Tool>>
+  spaceDown: boolean
+  tool: Tool
+}
+
+export type CanvasAppPointerItemAdapters = {
+  creation: CanvasCreationAdapter<CanvasItem>
+  transform: CanvasTransformAdapter<CanvasItem>
+}
+
+export type CanvasAppPointerWorkspaceModel = {
+  itemReadModel: CanvasItemReadModel
+  items: CanvasItem[]
+  scene: CanvasSceneAdapter
+  selectedBounds: Bounds | null
+  selection: string[]
+  setEditing: Dispatch<SetStateAction<EditingText | null>>
+  setLiveItems: Dispatch<SetStateAction<CanvasItem[]>>
+  setSelection: Dispatch<SetStateAction<string[]>>
+  setViewport: Dispatch<SetStateAction<Viewport>>
+  viewport: Viewport
+}
+
+export type CanvasAppPointerModelInput = {
+  command: CanvasAppPointerCommandModel
+  config: CanvasAffordanceConfig
+  createId: (prefix: string) => string
+  customCreationTools: readonly CanvasAppCustomCreationTool[]
+  interaction: CanvasAppPointerInteractionModel
+  itemAdapters: CanvasAppPointerItemAdapters
+  stageElement: CanvasAppStageElement
+  workspace: CanvasAppPointerWorkspaceModel
 }
 
 export type CanvasAppStageItemLayerContext = {

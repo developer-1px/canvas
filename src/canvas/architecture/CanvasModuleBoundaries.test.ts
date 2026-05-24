@@ -1621,8 +1621,27 @@ describe('Canvas module boundaries', () => {
     expect(pointerModelFile.source).toContain(
       "from './CanvasAppPointerConsumerModel'",
     )
+    expect(pointerModelFile.source).toContain(
+      "from './CanvasAppConsumerContracts'",
+    )
+    expect(pointerModelFile.source).toContain('CanvasAppPointerModelInput')
+    expect(pointerModelFile.source).not.toContain(
+      'type CanvasAppPointerCommandModel',
+    )
+    expect(pointerModelFile.source).not.toContain(
+      'type CanvasAppPointerInteractionModel',
+    )
+    expect(pointerModelFile.source).not.toContain(
+      'type CanvasAppPointerWorkspaceModel',
+    )
     expect(pointerModelFile.source).not.toContain('itemLayerHandlers')
     expect(pointerModelFile.source).not.toContain('stageHandlers')
+    expect(pointerConsumerModelFile.source).not.toContain(
+      'type CanvasAppPointerDownRuntime',
+    )
+    expect(pointerConsumerModelFile.source).not.toContain(
+      'type CanvasAppPointerDragRuntime',
+    )
     expect(pointerConsumerModelFile.source).toContain(
       'export function getCanvasAppPointerConsumerModel',
     )
@@ -1634,6 +1653,18 @@ describe('Canvas module boundaries', () => {
     )
     expect(pointerConsumerContractsFile.source).toContain(
       'export type CanvasAppPointerConsumerModel',
+    )
+    expect(pointerConsumerContractsFile.source).toContain(
+      'export type CanvasAppPointerModelInput',
+    )
+    expect(pointerConsumerContractsFile.source).toContain(
+      'export type CanvasAppPointerDownRuntime',
+    )
+    expect(pointerConsumerContractsFile.source).toContain(
+      'export type CanvasAppPointerDragRuntime',
+    )
+    expect(pointerConsumerContractsFile.source).toContain(
+      'export type CanvasAppPointerConsumerModelInput',
     )
     expect(pointerConsumerContractsFile.source).toContain(
       'onCanvasPointerDown',
