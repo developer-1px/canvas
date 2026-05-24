@@ -182,3 +182,6 @@
 178. Emote controls 또는 `Shift`+canvas click은 마지막 pointer 위치에 viewport scale 보정된 transient reaction burst를 표시한다.
 179. Shape tool군은 FigJam 기본 shape affordance로 제공되며 rectangle, ellipse, diamond를 같은 `create-shape` pointer grammar와 bounded `shape` 저장 계약으로 생성한다.
 180. Ellipse tool은 `O` shortcut을 제공하고, Diamond tool은 toolbar에서 SVG diamond path로 렌더링된다.
+181. CSV/TSV tabular text는 FigJam식 built-in table import affordance로 처리한다.
+182. `.csv` 파일 drop은 drop 위치에 matrix table component를 생성하고, spreadsheet clipboard paste는 viewport 중심에 table을 생성한다.
+183. Table component 렌더러는 고정 3x3이 아니라 저장된 `columns`와 `items` 계약에서 동적 행/열 grid를 계산한다.

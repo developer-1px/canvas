@@ -53,6 +53,16 @@ export {
   applyCanvasStickyComponentCreationDefaults,
   isCanvasStickyComponentItem,
 } from './component/CanvasStickyComponent'
+export {
+  CANVAS_TABLE_COMPONENT_KIND,
+  createCanvasTableComponentItem,
+  getCanvasTableGrid,
+  isCanvasTableComponentItem,
+  normalizeCanvasTableRows,
+  type CanvasTableComponentRows,
+  type CanvasTableGrid,
+  type CreateCanvasTableComponentItemInput,
+} from './component/CanvasTableComponent'
 export { INITIAL_ITEMS } from './component/CanvasInitialItems'
 
 export {

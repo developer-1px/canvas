@@ -41,6 +41,9 @@ export function getCanvasAppAffordanceModel(
     stamp: {
       config,
     },
+    table: {
+      config,
+    },
     text: {
       config,
     },

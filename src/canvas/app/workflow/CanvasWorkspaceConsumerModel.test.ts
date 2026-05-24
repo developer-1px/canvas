@@ -56,6 +56,12 @@ describe('CanvasWorkspaceConsumerModel', () => {
       selection: input.document.selection,
       viewport: input.viewport,
     })
+    expect(model.table).toMatchObject({
+      commitItemsChange: input.document.commitItemsChange,
+      createId: input.createId,
+      selection: input.document.selection,
+      viewport: input.viewport,
+    })
   })
 
   it('keeps read model and live editing fields on the consumers that need them', () => {

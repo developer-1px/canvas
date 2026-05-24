@@ -138,6 +138,31 @@ describe('CanvasDemoSvgItemRenderer', () => {
     expect(markup).not.toContain('Sticky')
   })
 
+  it('renders table components from their dynamic column and row data', () => {
+    const markup = renderItem({
+      accent: '#0891b2',
+      columns: ['Name', 'Owner'],
+      component: 'table',
+      fill: '#ffffff',
+      h: 132,
+      id: 'component-table',
+      items: ['Import CSV', 'Mina', 'Review', 'Ari'],
+      stroke: '#cbd5e1',
+      title: 'Roadmap',
+      type: 'component',
+      w: 224,
+      x: 0,
+      y: 0,
+    }, () => 'matrix-table')
+
+    expect(markup).toContain('Name')
+    expect(markup).toContain('Owner')
+    expect(markup).toContain('Import CSV')
+    expect(markup).toContain('Review')
+    expect(markup).toContain('x2="112"')
+    expect(markup).toContain('y2="88"')
+  })
+
   it('renders image items with a separate selection hit target', () => {
     const markup = renderItem({
       h: 80,

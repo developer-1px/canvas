@@ -527,6 +527,7 @@ describe('Canvas module boundaries', () => {
       'CanvasAppAffordanceKeyboardModel',
       'CanvasAppAffordancePointerModel',
       'CanvasAppAffordanceStampModel',
+      'CanvasAppAffordanceTableModel',
       'CanvasAppAffordanceTextModel',
       'CanvasAppAffordanceViewportModel',
     ]) {
@@ -543,6 +544,7 @@ describe('Canvas module boundaries', () => {
       'keyboard: {',
       'pointer: {',
       'stamp: {',
+      'table: {',
       'text: {',
       'viewport: {',
     ]) {
@@ -1011,6 +1013,7 @@ describe('Canvas module boundaries', () => {
       'pointer: {',
       'stage: {',
       'stamp: {',
+      'table: {',
       'viewport: {',
     ]) {
       expect(stageElementModelFile.source).not.toContain(consumerContext)
@@ -4644,6 +4647,44 @@ describe('Canvas module boundaries', () => {
     expect(stageElementFile.source).not.toContain('ClipboardItem')
   })
 
+  it('keeps browser table import IO behind App table modules', () => {
+    const appModelFile = getSourceFile(
+      'src/canvas/app/workflow/useCanvasAppModel.ts',
+    )
+    const tableModelFile = getSourceFile(
+      'src/canvas/app/workflow/useCanvasAppTableImportModel.ts',
+    )
+    const tableImportHookFile = getSourceFile(
+      'src/canvas/app/table/useCanvasTableImport.ts',
+    )
+    const tableImportFile = getSourceFile(
+      'src/canvas/app/table/CanvasTableImport.ts',
+    )
+    const hostTableFile = getSourceFile(
+      'src/canvas/host/component/CanvasTableComponent.ts',
+    )
+    const browserTableHow =
+      /\b(FileReader|DataTransfer|ClipboardEvent|DragEvent|window\.addEventListener)\b/
+
+    expect(appModelFile.source).toContain(
+      "from './useCanvasAppTableImportModel'",
+    )
+    expect(appModelFile.source).not.toMatch(browserTableHow)
+    expect(tableModelFile.source).toContain(
+      "from '../table/useCanvasTableImport'",
+    )
+    expect(tableImportHookFile.source).toContain('window.addEventListener')
+    expect(tableImportHookFile.source).toContain('ClipboardEvent')
+    expect(tableImportHookFile.source).toContain('DragEvent')
+    expect(tableImportFile.source).toContain('FileReader')
+    expect(tableImportFile.source).toContain('readAsText')
+    expect(tableImportFile.source).toContain('createCanvasTableComponentItem')
+    expect(hostTableFile.source).toContain(
+      'export function createCanvasTableComponentItem',
+    )
+    expect(hostTableFile.source).not.toMatch(browserTableHow)
+  })
+
   it('keeps App custom command contracts behind a named module', () => {
     const descriptorFile = getSourceFile(
       'src/canvas/app/commands/CanvasAppCustomCommands.ts',
@@ -6183,6 +6224,7 @@ describe('Canvas module boundaries', () => {
       'pointer: {',
       'stage: {',
       'text: {',
+      'table: {',
       'viewport: {',
     ]) {
       expect(workspaceModelFile.source).not.toContain(consumerContext)
@@ -6200,6 +6242,7 @@ describe('Canvas module boundaries', () => {
       'pointer: {',
       'stage: {',
       'text: {',
+      'table: {',
       'viewport: {',
     ]) {
       expect(workspaceConsumerModelFile.source).toContain(consumerContext)

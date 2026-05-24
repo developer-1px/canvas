@@ -1,4 +1,5 @@
 import type { CanvasComponentItem } from '../../entities'
+import { getCanvasTableGrid } from '../../host'
 import {
   CanvasDemoSvgComponentHeader,
   CanvasDemoSvgText,
@@ -104,8 +105,9 @@ export function CanvasDemoSvgTableComponent({
 }: {
   item: CanvasComponentItem
 }) {
-  const cols = 3
-  const rows = 3
+  const table = getCanvasTableGrid(item)
+  const cols = table.columns.length
+  const rows = 1 + table.bodyRows.length
   const cellW = item.w / cols
   const cellH = item.h / rows
 
@@ -123,7 +125,7 @@ export function CanvasDemoSvgTableComponent({
         vectorEffect="non-scaling-stroke"
       />
       <rect x={item.x} y={item.y} width={item.w} height={cellH} fill="#ecfeff" />
-      {[1, 2].map((index) => (
+      {Array.from({ length: cols - 1 }, (_, index) => index + 1).map((index) => (
         <line
           key={`col-${index}`}
           x1={item.x + cellW * index}
@@ -134,7 +136,7 @@ export function CanvasDemoSvgTableComponent({
           vectorEffect="non-scaling-stroke"
         />
       ))}
-      {[1, 2].map((index) => (
+      {Array.from({ length: rows - 1 }, (_, index) => index + 1).map((index) => (
         <line
           key={`row-${index}`}
           x1={item.x}
@@ -145,7 +147,7 @@ export function CanvasDemoSvgTableComponent({
           vectorEffect="non-scaling-stroke"
         />
       ))}
-      {(item.columns ?? []).map((column, index) => (
+      {table.columns.map((column, index) => (
         <CanvasDemoSvgText
           key={column}
           x={item.x + cellW * index + 12}
@@ -154,14 +156,16 @@ export function CanvasDemoSvgTableComponent({
           strong
         />
       ))}
-      {(item.items ?? []).map((cell, index) => (
-        <CanvasDemoSvgText
-          key={`${cell}-${index}`}
-          x={item.x + cellW * (index % 3) + 12}
-          y={item.y + cellH * (Math.floor(index / 3) + 1) + 26}
-          text={cell}
-        />
-      ))}
+      {table.bodyRows.map((row, rowIndex) =>
+        row.map((cell, columnIndex) => (
+          <CanvasDemoSvgText
+            key={`${rowIndex}-${columnIndex}-${cell}`}
+            x={item.x + cellW * columnIndex + 12}
+            y={item.y + cellH * (rowIndex + 1) + 26}
+            text={cell}
+          />
+        )),
+      )}
     </>
   )
 }

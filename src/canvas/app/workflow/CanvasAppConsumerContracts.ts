@@ -274,6 +274,15 @@ export type CanvasAppImageModelInput = {
   viewport: Viewport
 }
 
+export type CanvasAppTableImportModelInput = {
+  commitItemsChange: CommitCanvasItemsChange
+  config: CanvasAffordanceConfig
+  createId: (prefix: string) => string
+  selection: string[]
+  stageElement: CanvasAppStageElement
+  viewport: Viewport
+}
+
 export type CanvasAppStampModelInput = {
   commitItemsChange: CommitCanvasItemsChange
   config: CanvasAffordanceConfig
@@ -634,5 +643,6 @@ export type CanvasAppStageElementConsumerModel = {
   pointer: CanvasAppStageElementControllerContext
   stage: CanvasAppStageElementStageContext
   stamp: CanvasAppStageElementControllerContext
+  table: CanvasAppStageElementControllerContext
   viewport: CanvasAppStageElementControllerContext
 }

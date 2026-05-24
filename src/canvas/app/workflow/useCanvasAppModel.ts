@@ -18,6 +18,7 @@ import { useCanvasAppKeyboardModel } from './useCanvasAppKeyboardModel'
 import { useCanvasAppPointerModel } from './useCanvasAppPointerModel'
 import { useCanvasAppStampModel } from './useCanvasAppStampModel'
 import { useCanvasAppStageElementModel } from './useCanvasAppStageElementModel'
+import { useCanvasAppTableImportModel } from './useCanvasAppTableImportModel'
 import { useCanvasAppTextModel } from './useCanvasAppTextModel'
 import { useCanvasInteractionModel } from './useCanvasInteractionModel'
 import { useCanvasAppViewportModel } from './useCanvasAppViewportModel'
@@ -85,6 +86,12 @@ export function useCanvasAppModel({
     votingSession: votingSession.stamp,
     ...workspace.stamp,
     ...stageElement.stamp,
+  })
+
+  useCanvasAppTableImportModel({
+    ...affordance.table,
+    ...workspace.table,
+    ...stageElement.table,
   })
 
   const text = useCanvasAppTextModel({

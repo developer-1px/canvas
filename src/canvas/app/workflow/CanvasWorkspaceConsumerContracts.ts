@@ -107,6 +107,12 @@ export type CanvasWorkspaceImageContext =
     itemReadModel: CanvasAppItemReadModel
   }
 
+export type CanvasWorkspaceTableContext =
+  CanvasWorkspaceSelectionContext & {
+    commitItemsChange: CommitCanvasItemsChange
+    createId: (prefix: string) => string
+  }
+
 export type CanvasWorkspaceStampContext =
   CanvasWorkspaceSelectionContext & {
     commitItemsChange: CommitCanvasItemsChange
@@ -184,6 +190,7 @@ export type CanvasWorkspaceConsumerModel = {
   pointer: CanvasWorkspacePointerContext
   stage: CanvasWorkspaceStageContext
   stamp: CanvasWorkspaceStampContext
+  table: CanvasWorkspaceTableContext
   text: CanvasWorkspaceTextContext
   viewport: CanvasWorkspaceViewportContext
 }
