@@ -50,6 +50,7 @@ export function previewCanvasPointerInteraction({
           currentWorld,
           input,
           interaction,
+          scene,
         }),
       fallback: () => ({ kind: 'none' }),
       marquee: (interaction) =>

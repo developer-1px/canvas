@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import {
   createCanvasAffordanceConfig,
+  type CanvasSceneAdapter,
 } from '../../engine'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import { previewCanvasPointerCreation } from './CanvasPointerCreationPreview'
@@ -22,6 +23,7 @@ describe('CanvasPointerCreationPreview', () => {
         startScreen: { x: 0, y: 0 },
         startWorld: { x: 0, y: 0 },
       },
+      scene: createSceneAdapter(),
     })
 
     expect(result).toMatchObject({
@@ -50,6 +52,7 @@ describe('CanvasPointerCreationPreview', () => {
         startScreen: { x: 0, y: 0 },
         startWorld: { x: 0, y: 0 },
       },
+      scene: createSceneAdapter(),
     })
 
     expect(result).toMatchObject({
@@ -80,6 +83,7 @@ describe('CanvasPointerCreationPreview', () => {
         startScreen: { x: 0, y: 0 },
         startWorld: { x: 0, y: 0 },
       },
+      scene: createSceneAdapter(),
     })
     const custom = previewCanvasPointerCreation({
       config,
@@ -95,6 +99,7 @@ describe('CanvasPointerCreationPreview', () => {
         startWorld: { x: 0, y: 0 },
         tool: 'custom:risk',
       },
+      scene: createSceneAdapter(),
     })
 
     expect(arrow).toMatchObject({
@@ -131,6 +136,7 @@ describe('CanvasPointerCreationPreview', () => {
           startScreen: { x: 0, y: 0 },
           startWorld: { x: 0, y: 0 },
         },
+        scene: createSceneAdapter(),
       }),
     ).toEqual({ kind: 'none' })
   })
@@ -151,5 +157,15 @@ function createPointerInput(
     shiftKey: false,
     stopPropagation: vi.fn(),
     ...overrides,
+  }
+}
+
+function createSceneAdapter(): CanvasSceneAdapter {
+  return {
+    entries: [],
+    getBounds: vi.fn(() => null),
+    getParentId: vi.fn(() => null),
+    getSelectedAncestorId: vi.fn(() => null),
+    isGroup: vi.fn(() => false),
   }
 }

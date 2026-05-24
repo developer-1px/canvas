@@ -3,6 +3,7 @@ import type {
 } from '../../entities'
 import {
   type CanvasAffordanceConfig,
+  type CanvasSceneAdapter,
 } from '../../engine'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import type {
@@ -27,6 +28,7 @@ type CanvasPointerCreationPreviewInput = {
   currentWorld: Point
   input: CanvasAppPointerInput
   interaction: CanvasPointerCreationInteraction
+  scene: CanvasSceneAdapter
 }
 
 export function previewCanvasPointerCreation({
@@ -35,12 +37,14 @@ export function previewCanvasPointerCreation({
   currentWorld,
   input,
   interaction,
+  scene,
 }: CanvasPointerCreationPreviewInput): CanvasPointerCreationPreviewResult {
   const shapePreview = previewCanvasPointerShapeCreation({
     config,
     currentScreen,
     currentWorld,
     interaction,
+    scene,
   })
 
   if (shapePreview) {

@@ -71,6 +71,7 @@ describe('CanvasPointerShapeCreation', () => {
         startScreen: { x: 0, y: 0 },
         startWorld: { x: 0, y: 0 },
       },
+      scene: createSceneAdapter(),
     })
     const disabled = previewCanvasPointerShapeCreation({
       config: createCanvasAffordanceConfig({
@@ -86,6 +87,7 @@ describe('CanvasPointerShapeCreation', () => {
         startScreen: { x: 0, y: 0 },
         startWorld: { x: 0, y: 0 },
       },
+      scene: createSceneAdapter(),
     })
 
     expect(preview).toMatchObject({
@@ -162,8 +164,10 @@ describe('CanvasPointerShapeCreation', () => {
         type: 'add',
         items: [
           expect.objectContaining({
+            end: { x: 160, y: 90 },
             endAttachedTo: 'component-end',
             id: 'arrow-1',
+            start: { x: 120, y: 70 },
             startAttachedTo: 'component-start',
             type: 'arrow',
           }),
@@ -171,6 +175,68 @@ describe('CanvasPointerShapeCreation', () => {
       },
       { before: [], after: ['arrow-1'] },
     )
+  })
+
+  it('previews attached arrows from the source edge to the hovered target edge', () => {
+    const preview = previewCanvasPointerShapeCreation({
+      config,
+      currentScreen: { x: 190, y: 100 },
+      currentWorld: { x: 190, y: 100 },
+      interaction: {
+        currentWorld: { x: 10, y: 20 },
+        kind: 'create-arrow',
+        moved: false,
+        pointerId: 1,
+        startAttachedTo: 'component-start',
+        startScreen: { x: 0, y: 0 },
+        startWorld: { x: 10, y: 20 },
+      },
+      scene: createSceneAdapter(),
+    })
+
+    expect(preview).toMatchObject({
+      draftArrow: {
+        end: { x: 160, y: 90 },
+        start: { x: 120, y: 70 },
+      },
+      interaction: {
+        currentWorld: { x: 160, y: 90 },
+        endAttachedTo: 'component-end',
+        startWorld: { x: 120, y: 70 },
+      },
+      kind: 'preview',
+    })
+  })
+
+  it('anchors only the source endpoint while drawing toward empty canvas', () => {
+    const preview = previewCanvasPointerShapeCreation({
+      config,
+      currentScreen: { x: 300, y: 40 },
+      currentWorld: { x: 300, y: 40 },
+      interaction: {
+        currentWorld: { x: 10, y: 20 },
+        kind: 'create-arrow',
+        moved: false,
+        pointerId: 1,
+        startAttachedTo: 'component-start',
+        startScreen: { x: 0, y: 0 },
+        startWorld: { x: 10, y: 20 },
+      },
+      scene: createSceneAdapter(),
+    })
+
+    expect(preview).toMatchObject({
+      draftArrow: {
+        end: { x: 320, y: 40 },
+        start: { x: 120, y: 40 },
+      },
+      interaction: {
+        currentWorld: { x: 320, y: 40 },
+        endAttachedTo: undefined,
+        startWorld: { x: 120, y: 40 },
+      },
+      kind: 'preview',
+    })
   })
 })
 

@@ -194,11 +194,13 @@ export function previewCanvasPointerShapeCreation({
   currentScreen,
   currentWorld,
   interaction,
+  scene,
 }: {
   config: CanvasAffordanceConfig
   currentScreen: Point
   currentWorld: Point
   interaction: Interaction
+  scene: CanvasSceneAdapter
 }): CanvasPointerShapeCreationPreviewResult | null {
   if (!isCanvasPointerShapeCreationInteraction(interaction)) {
     return null
@@ -220,17 +222,21 @@ export function previewCanvasPointerShapeCreation({
     config,
     point: currentWorld,
   })
-
-  return {
-    ...descriptor.createDraft({
-      currentWorld: snappedCurrentWorld,
-      startWorld: interaction.startWorld,
-    }),
+  const nextInteraction = resolveCanvasPointerShapeCreationArrowAnchors({
     interaction: {
       ...interaction,
       currentWorld: snappedCurrentWorld,
       moved,
     },
+    scene,
+  })
+
+  return {
+    ...descriptor.createDraft({
+      currentWorld: nextInteraction.currentWorld,
+      startWorld: nextInteraction.startWorld,
+    }),
+    interaction: nextInteraction,
     kind: 'preview',
     snapGuides: EMPTY_CANVAS_SNAP_GUIDES,
   }
@@ -287,14 +293,7 @@ function attachCanvasPointerShapeCreationEnd({
     return interaction
   }
 
-  return {
-    ...interaction,
-    endAttachedTo: findCanvasSceneTargetAtPoint({
-      excludeId: interaction.startAttachedTo,
-      point: interaction.currentWorld,
-      scene,
-    }),
-  }
+  return resolveCanvasPointerShapeCreationArrowAnchors({ interaction, scene })
 }
 
 function findCanvasSceneTargetAtPoint({
@@ -315,6 +314,103 @@ function findCanvasSceneTargetAtPoint({
       point.y >= entry.bounds.y &&
       point.y <= entry.bounds.y + entry.bounds.h,
     )?.id
+}
+
+function resolveCanvasPointerShapeCreationArrowAnchors({
+  interaction,
+  scene,
+}: {
+  interaction: CanvasPointerShapeCreationInteraction
+  scene: CanvasSceneAdapter
+}): CanvasPointerShapeCreationInteraction {
+  if (interaction.kind !== 'create-arrow') {
+    return interaction
+  }
+
+  const endAttachedTo = findCanvasSceneTargetAtPoint({
+    excludeId: interaction.startAttachedTo,
+    point: interaction.currentWorld,
+    scene,
+  })
+  const startBounds = getCanvasSceneTargetBounds({
+    id: interaction.startAttachedTo,
+    scene,
+  })
+  const endBounds = getCanvasSceneTargetBounds({
+    id: endAttachedTo,
+    scene,
+  })
+  const startTarget = startBounds
+    ? getCanvasBoundsCenter(startBounds)
+    : interaction.startWorld
+  const endTarget = endBounds
+    ? getCanvasBoundsCenter(endBounds)
+    : interaction.currentWorld
+
+  return {
+    ...interaction,
+    currentWorld: endBounds
+      ? getCanvasBoundsAnchorPoint({
+          bounds: endBounds,
+          toward: startTarget,
+        })
+      : interaction.currentWorld,
+    endAttachedTo,
+    startWorld: startBounds
+      ? getCanvasBoundsAnchorPoint({
+          bounds: startBounds,
+          toward: endTarget,
+        })
+      : interaction.startWorld,
+  }
+}
+
+function getCanvasSceneTargetBounds({
+  id,
+  scene,
+}: {
+  id?: string
+  scene: CanvasSceneAdapter
+}) {
+  if (!id) {
+    return null
+  }
+
+  return scene.getBounds([id]) ??
+    scene.entries.find((entry) => entry.id === id)?.bounds ??
+    null
+}
+
+function getCanvasBoundsCenter(bounds: Bounds): Point {
+  return {
+    x: bounds.x + bounds.w / 2,
+    y: bounds.y + bounds.h / 2,
+  }
+}
+
+function getCanvasBoundsAnchorPoint({
+  bounds,
+  toward,
+}: {
+  bounds: Bounds
+  toward: Point
+}): Point {
+  const center = getCanvasBoundsCenter(bounds)
+  const dx = toward.x - center.x
+  const dy = toward.y - center.y
+
+  if (dx === 0 && dy === 0) {
+    return center
+  }
+
+  const scaleX = dx === 0 ? Number.POSITIVE_INFINITY : (bounds.w / 2) / Math.abs(dx)
+  const scaleY = dy === 0 ? Number.POSITIVE_INFINITY : (bounds.h / 2) / Math.abs(dy)
+  const scale = Math.min(scaleX, scaleY)
+
+  return {
+    x: center.x + dx * scale,
+    y: center.y + dy * scale,
+  }
 }
 
 function getCanvasPointerShapeCreationDescriptor(
