@@ -8,10 +8,10 @@ import type {
   EditingText,
 } from '../../entities'
 import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
-import {
-  executeCanvasClipboardCommand,
-  type CanvasClipboardEditingUpdate,
-} from './CanvasClipboardCommandExecution'
+import type {
+  CanvasClipboardEditingUpdate,
+} from './CanvasClipboardCommandEffectContracts'
+import { executeCanvasClipboardCommand } from './CanvasClipboardCommandExecution'
 
 const rect1 = createRectItem('rect-1')
 const rect2 = createRectItem('rect-2', { x: 120 })

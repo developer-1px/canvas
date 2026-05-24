@@ -71,6 +71,7 @@
 - Canvas Clipboard Command Execution: clipboard command effect plan 생성과 clipboard/document effect 적용을 조립하는 App-owned runtime Module.
 - Canvas Clipboard Command Handlers: clone, duplicate, copy, paste, cut callback을 clipboard command descriptor로 변환하고 전달된 paste index와 duplicate source selection default를 주입하는 App-owned handler grammar Module.
 - Canvas Clipboard Command Contracts: clone, duplicate, copy, paste, cut의 what union을 effect planning/execution how와 분리해 소유하는 App-owned command contract Module.
+- Canvas Clipboard Command Effect Contracts: clipboard command effect descriptor, effect context, execution result의 what 계약을 effect applier how와 분리해 소유하는 App-owned command contract Module.
 - Canvas Clipboard Command Effect Plan: clipboard command별 effect planner table과 copy, cut, paste, duplicate, clone Engine/Adapter 호출 및 paste offset 계산을 clipboard effect plan으로 변환하는 App-owned runtime Module.
 - Canvas Clipboard Command Result Effects: clipboard Engine/Adapter result shape를 clone result/add item/copy/cut effect descriptor로 변환하는 App-owned mapping Module.
 - Canvas Clipboard Command Effects: clipboard command effect applier table과 Host clipboard, document commit/selection/editing update, 실행 결과 반영을 소유하는 App-owned runtime Module.
@@ -386,7 +387,7 @@
 - Built-in command의 선택 개수 기준은 Canvas Command Selection Rules가 소유하고, App control model과 command action/availability는 raw threshold를 반복하지 않는다.
 - Built-in command의 availability condition table은 Canvas Command Availability Rules가 소유하고, Engine command availability facade와 selection-gated Engine command action guard는 같은 rule table에 위임한다.
 - Clipboard command hook은 paste index ref/current read, execution context, runner memoization을 맡고, clone/duplicate/copy/paste/cut callback grammar와 supplied paste index descriptor injection은 Canvas Clipboard Command Handlers가 소유한다. Canvas Clipboard Command Execution은 plan 생성과 effect 적용만 조립한다. Clone/duplicate/paste/cut command 호출과 paste offset 계산은 Canvas Clipboard Command Effect Plan이, clipboard result-to-effect descriptor mapping은 Canvas Clipboard Command Result Effects가, Host clipboard/document/editing effect routing은 Canvas Clipboard Command Effects가 소유한다.
-- Clipboard command의 what union은 Canvas Clipboard Command Contracts가 소유하고, Effect Plan/Execution/Handlers는 그 command 계약을 소비해 각자의 how만 구현한다.
+- Clipboard command의 what union은 Canvas Clipboard Command Contracts가, clipboard effect/result/context what은 Canvas Clipboard Command Effect Contracts가 소유하고, Effect Plan/Execution/Handlers/Effects는 그 계약을 소비해 각자의 how만 구현한다.
 - UI controls는 Demo Host를 직접 import하지 않는다.
 - Canvas Toolbar는 item render entry 호출만 맡고, group composition은 Canvas Toolbar Items가, built-in/custom tool group grammar는 Canvas Toolbar Tool Items가, built-in command group descriptor 목록은 Canvas Toolbar Command Catalog가, command group feature toggle과 Canvas Command Availability 소비는 Canvas Toolbar Command Items가, item kind별 button render dispatch는 Canvas Toolbar Item Render Dispatch가, command action runner table과 handler routing은 Canvas Toolbar Command Dispatch가 소유한다.
 - Toolbar command handler bundle의 what 계약은 Canvas Toolbar Command Contracts가 소유하고, Dispatch와 Item Renderer는 그 계약을 소비한다.

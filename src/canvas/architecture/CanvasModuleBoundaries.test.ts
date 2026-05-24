@@ -3955,6 +3955,9 @@ describe('Canvas module boundaries', () => {
     const effectPlanFile = getSourceFile(
       'src/canvas/app/commands/CanvasClipboardCommandEffectPlan.ts',
     )
+    const effectContractsFile = getSourceFile(
+      'src/canvas/app/commands/CanvasClipboardCommandEffectContracts.ts',
+    )
     const resultEffectsFile = getSourceFile(
       'src/canvas/app/commands/CanvasClipboardCommandResultEffects.ts',
     )
@@ -4012,6 +4015,12 @@ describe('Canvas module boundaries', () => {
     expect(executionFile.source).toContain(
       "from './CanvasClipboardCommandEffects'",
     )
+    expect(executionFile.source).toContain(
+      "from './CanvasClipboardCommandEffectContracts'",
+    )
+    expect(executionFile.source).not.toContain(
+      'export type { CanvasClipboardCommand',
+    )
     expect(executionFile.source).toContain('applyCanvasClipboardCommandEffect')
     expect(executionFile.source).not.toContain('cloneCanvasCommandItems')
     expect(executionFile.source).not.toContain('duplicateCanvasCommand')
@@ -4036,6 +4045,9 @@ describe('Canvas module boundaries', () => {
     )
     expect(effectPlanFile.source).toContain(
       "from './CanvasClipboardCommandContracts'",
+    )
+    expect(effectPlanFile.source).toContain(
+      "from './CanvasClipboardCommandEffectContracts'",
     )
     expect(effectPlanFile.source).not.toContain(
       'export type CanvasClipboardCommand =',
@@ -4079,6 +4091,9 @@ describe('Canvas module boundaries', () => {
     expect(resultEffectsFile.source).toContain(
       'export function createCanvasClipboardCutSelectionResultEffect',
     )
+    expect(resultEffectsFile.source).toContain(
+      "from './CanvasClipboardCommandEffectContracts'",
+    )
     expect(resultEffectsFile.source).toContain("kind: 'clone-result'")
     expect(resultEffectsFile.source).toContain("kind: 'copy-selection'")
     expect(resultEffectsFile.source).toContain("kind: 'add-items'")
@@ -4087,9 +4102,28 @@ describe('Canvas module boundaries', () => {
     expect(resultEffectsFile.source).not.toContain('duplicateCanvasCommand')
     expect(resultEffectsFile.source).not.toContain('deleteCanvasCommand')
     expect(resultEffectsFile.source).not.toContain('getCanvasPasteOffset')
+    expect(effectContractsFile.source).toContain(
+      'export type CanvasClipboardCommandEffect',
+    )
+    expect(effectContractsFile.source).toContain(
+      'export type CanvasClipboardCommandExecutionResult',
+    )
+    expect(effectContractsFile.source).toContain(
+      'export type CanvasClipboardCommandEffectContext',
+    )
+    expect(effectContractsFile.source).not.toContain(
+      'applyCanvasClipboardCommandEffect',
+    )
+    expect(effectContractsFile.source).not.toContain(
+      'createCanvasClipboardCommandEffectPlan',
+    )
     expect(effectsFile.source).toContain(
       'export function applyCanvasClipboardCommandEffect',
     )
+    expect(effectsFile.source).toContain(
+      "from './CanvasClipboardCommandEffectContracts'",
+    )
+    expect(effectsFile.source).not.toContain('export type {')
     expect(effectsFile.source).toContain(
       'CANVAS_CLIPBOARD_COMMAND_EFFECT_APPLIERS',
     )

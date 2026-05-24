@@ -1,5 +1,7 @@
 import type { CanvasItem } from '../../entities'
-import type { CanvasClipboardCommandEffect } from './CanvasClipboardCommandEffects'
+import type {
+  CanvasClipboardCommandEffect,
+} from './CanvasClipboardCommandEffectContracts'
 
 export type CanvasClipboardDuplicateResult = {
   clones: CanvasItem[]

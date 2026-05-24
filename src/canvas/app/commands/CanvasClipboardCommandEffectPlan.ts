@@ -13,7 +13,9 @@ import type {
 import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
 import type { CanvasDocumentClipboard } from '../workflow/CanvasWorkflowContract'
 import type { CanvasClipboardCommand } from './CanvasClipboardCommandContracts'
-import type { CanvasClipboardCommandEffect } from './CanvasClipboardCommandEffects'
+import type {
+  CanvasClipboardCommandEffect,
+} from './CanvasClipboardCommandEffectContracts'
 import {
   createCanvasClipboardCloneResultEffect,
   createCanvasClipboardCopySelectionEffect,
