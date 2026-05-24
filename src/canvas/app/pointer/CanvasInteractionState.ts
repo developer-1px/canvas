@@ -42,6 +42,14 @@ export type Interaction =
       moved: boolean
     }
   | {
+      kind: 'create-section'
+      pointerId: number
+      startScreen: Point
+      startWorld: Point
+      currentWorld: Point
+      moved: boolean
+    }
+  | {
       kind: 'create-rect'
       pointerId: number
       startScreen: Point

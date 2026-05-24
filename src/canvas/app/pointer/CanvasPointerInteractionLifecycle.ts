@@ -12,6 +12,7 @@ import type {
   CommitCanvasSelection,
 } from '../workflow/CanvasWorkflowContract'
 import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
+import type { CanvasAppComponentLibrary } from '../workflow/CanvasAppComponentAssemblyContracts'
 import type { Interaction } from './CanvasInteractionState'
 import { commitCanvasPointerCreation } from './CanvasPointerCreationCommit'
 import {
@@ -25,6 +26,7 @@ import {
 } from './CanvasPointerTransformInteraction'
 
 export type CanvasPointerInteractionCommitInput = {
+  componentLibrary: CanvasAppComponentLibrary
   commitItemsChange: CommitCanvasItemsChange
   commitSelection: CommitCanvasSelection
   creationAdapter: CanvasCreationAdapter<CanvasItem>
@@ -39,6 +41,7 @@ export type CanvasPointerInteractionCommitInput = {
 }
 
 export function commitCanvasPointerInteraction({
+  componentLibrary,
   commitItemsChange,
   commitSelection,
   creationAdapter,
@@ -54,6 +57,7 @@ export function commitCanvasPointerInteraction({
   routeCanvasPointerInteraction(interaction, {
     creation: (interaction) =>
       commitCanvasPointerCreation({
+        componentLibrary,
         commitItemsChange,
         creationAdapter,
         createId,

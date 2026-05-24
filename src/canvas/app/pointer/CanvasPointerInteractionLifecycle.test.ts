@@ -4,6 +4,7 @@ import {
   createCanvasSceneAdapter,
   type CanvasCreationAdapter,
 } from '../../engine'
+import { createCanvasComponentLibrary } from '../../host'
 import type {
   CommitCanvasItemsChange,
   CommitCanvasSelection,
@@ -163,6 +164,7 @@ function createCommitInput(
   overrides: Partial<CanvasPointerInteractionCommitInput> = {},
 ): CanvasPointerInteractionCommitInput {
   return {
+    componentLibrary: createCanvasComponentLibrary(),
     commitItemsChange: () => true,
     commitSelection: () => true,
     creationAdapter,

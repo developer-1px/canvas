@@ -4,6 +4,7 @@ import type {
   CanvasCreationAdapter,
   CanvasSceneAdapter,
 } from '../../engine'
+import { createCanvasComponentLibrary } from '../../host'
 import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract'
 import {
   commitCanvasPointerCreation,
@@ -131,12 +132,51 @@ describe('CanvasPointerCreationCommit', () => {
       { before: ['selected-1'], after: ['risk-1'] },
     )
   })
+
+  it('commits drag-sized section components and returns to select', () => {
+    const commitItemsChange = vi.fn<CommitCanvasItemsChange>(() => true)
+    const setTool = vi.fn()
+
+    commitCanvasPointerCreation(createInput({
+      commitItemsChange,
+      interaction: {
+        currentWorld: { x: 420, y: 360 },
+        kind: 'create-section',
+        moved: true,
+        pointerId: 1,
+        startScreen: { x: 0, y: 0 },
+        startWorld: { x: 120, y: 80 },
+      },
+      setTool,
+    }))
+
+    expect(commitItemsChange).toHaveBeenCalledWith(
+      {
+        type: 'add',
+        items: [
+          expect.objectContaining({
+            component: 'section',
+            h: 280,
+            id: 'component-1',
+            title: 'Section',
+            type: 'component',
+            w: 300,
+            x: 120,
+            y: 80,
+          }),
+        ],
+      },
+      { before: ['selected-1'], after: ['component-1'] },
+    )
+    expect(setTool).toHaveBeenCalledWith('select')
+  })
 })
 
 function createInput(
   overrides: Partial<CanvasPointerCreationCommitInput> = {},
 ): CanvasPointerCreationCommitInput {
   return {
+    componentLibrary: createCanvasComponentLibrary(),
     commitItemsChange: () => true,
     creationAdapter,
     createId: (prefix) => `${prefix}-1`,

@@ -43,6 +43,9 @@ describe('CanvasToolGestureRouting', () => {
     expect(getCanvasToolPointerGesture({ config, tool: 'sticky' })).toBe(
       'create-sticky',
     )
+    expect(getCanvasToolPointerGesture({ config, tool: 'section' })).toBe(
+      'create-section',
+    )
     expect(getCanvasToolPointerGesture({ config, tool: 'highlight' })).toBe(
       'draw-highlight',
     )
@@ -67,6 +70,7 @@ describe('CanvasToolGestureRouting', () => {
         createArrow: false,
         createComment: false,
         createCustom: false,
+        createSection: false,
         createRect: false,
         createSticky: false,
         createText: false,
@@ -82,6 +86,8 @@ describe('CanvasToolGestureRouting', () => {
     expect(getCanvasToolPointerGesture({ config: disabled, tool: 'comment' }))
       .toBeNull()
     expect(getCanvasToolPointerGesture({ config: disabled, tool: 'sticky' }))
+      .toBeNull()
+    expect(getCanvasToolPointerGesture({ config: disabled, tool: 'section' }))
       .toBeNull()
     expect(
       getCanvasToolPointerGesture({ config: disabled, tool: 'custom:risk' }),
@@ -121,6 +127,12 @@ describe('CanvasToolGestureRouting', () => {
       shouldRouteCanvasToolPointerToCanvasGesture({
         spaceDown: false,
         tool: 'sticky',
+      }),
+    ).toBe(true)
+    expect(
+      shouldRouteCanvasToolPointerToCanvasGesture({
+        spaceDown: false,
+        tool: 'section',
       }),
     ).toBe(true)
     expect(

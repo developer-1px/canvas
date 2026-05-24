@@ -31,6 +31,7 @@ export const CANVAS_TOOL_AFFORDANCE_ORDER = Object.freeze([
   'select',
   'pan',
   'sticky',
+  'section',
   'rect',
   'text',
   'comment',
@@ -102,11 +103,19 @@ export const CANVAS_TOOL_AFFORDANCES = Object.freeze({
     },
     statusLabel: 'Select',
   }),
+  section: createCanvasToolAffordance({
+    ariaLabel: 'Section tool',
+    keyboardShortcut: {
+      key: 's',
+      shiftKey: true,
+      shortcutId: 'sectionTool',
+    },
+    statusLabel: 'Section',
+  }),
   sticky: createCanvasToolAffordance({
     ariaLabel: 'Sticky note tool',
     keyboardShortcut: {
       key: 's',
-      shiftInsensitive: true,
       shortcutId: 'stickyTool',
     },
     statusLabel: 'Sticky',

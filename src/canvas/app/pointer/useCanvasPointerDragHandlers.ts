@@ -27,6 +27,7 @@ import type { Interaction } from './CanvasInteractionState'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
 import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
+import type { CanvasAppComponentLibrary } from '../workflow/CanvasAppComponentAssemblyContracts'
 import {
   commitCanvasPointerInteraction,
 } from './CanvasPointerInteractionLifecycle'
@@ -42,6 +43,7 @@ import {
 } from './CanvasPointerDragSession'
 
 type UseCanvasPointerDragHandlersArgs = {
+  componentLibrary: CanvasAppComponentLibrary
   commitSelection: CommitCanvasSelection
   commitItemsChange: CommitCanvasItemsChange
   config: CanvasAffordanceConfig
@@ -68,6 +70,7 @@ type UseCanvasPointerDragHandlersArgs = {
 }
 
 export function useCanvasPointerDragHandlers({
+  componentLibrary,
   commitSelection,
   commitItemsChange,
   config,
@@ -149,6 +152,7 @@ export function useCanvasPointerDragHandlers({
 
     event.preventDefault()
     commitCanvasPointerInteraction({
+      componentLibrary,
       commitItemsChange,
       commitSelection,
       creationAdapter,

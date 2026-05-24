@@ -19,6 +19,7 @@ describe('CanvasToolbarToolItems', () => {
       { active: false, kind: 'builtin-tool', tool: 'select' },
       { active: false, kind: 'builtin-tool', tool: 'pan' },
       { active: false, kind: 'builtin-tool', tool: 'sticky' },
+      { active: false, kind: 'builtin-tool', tool: 'section' },
       { active: false, kind: 'builtin-tool', tool: 'rect' },
       { active: false, kind: 'builtin-tool', tool: 'text' },
       { active: false, kind: 'builtin-tool', tool: 'comment' },
@@ -49,6 +50,7 @@ describe('CanvasToolbarToolItems', () => {
     })).toEqual([
       { active: true, kind: 'builtin-tool', tool: 'select' },
       { active: false, kind: 'builtin-tool', tool: 'sticky' },
+      { active: false, kind: 'builtin-tool', tool: 'section' },
       { active: false, kind: 'builtin-tool', tool: 'rect' },
       { active: false, kind: 'builtin-tool', tool: 'text' },
       { active: false, kind: 'builtin-tool', tool: 'comment' },

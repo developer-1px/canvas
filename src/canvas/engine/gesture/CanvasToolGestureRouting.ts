@@ -18,6 +18,7 @@ export type CanvasPointerGesture =
   | 'create-comment'
   | 'create-custom'
   | 'create-rect'
+  | 'create-section'
   | 'create-sticky'
   | 'create-text'
   | 'draw-highlight'
@@ -67,6 +68,10 @@ export const CANVAS_TOOL_GESTURE_ROUTES = Object.freeze({
   }),
   select: createCanvasToolGestureRoute({
     routeItemPointerToCanvasGesture: false,
+  }),
+  section: createCanvasToolGestureRoute({
+    gesture: 'create-section',
+    isEnabled: (config) => config.gestures.createSection,
   }),
   sticky: createCanvasToolGestureRoute({
     gesture: 'create-sticky',

@@ -128,6 +128,27 @@ describe('CanvasPointerCreationStart', () => {
     })
   })
 
+  it('starts section creation through the component-backed built-in tool', () => {
+    const result = startCanvasPointerCreation(createInput({
+      pointerGesture: 'create-section',
+      startScreen: { x: 200, y: 300 },
+      startWorld: { x: 200, y: 300 },
+      tool: 'section',
+    }))
+
+    expect(result).toMatchObject({
+      capturePointer: true,
+      draftRect: { h: 340, w: 340, x: 30, y: 150 },
+      gesture: 'create-section',
+      interaction: {
+        currentWorld: { x: 200, y: 320 },
+        kind: 'create-section',
+        startWorld: { x: 200, y: 320 },
+      },
+      kind: 'interaction',
+    })
+  })
+
   it('does not start a missing custom creation tool', () => {
     const result = startCanvasPointerCreation(createInput({
       customCreationTools: [],

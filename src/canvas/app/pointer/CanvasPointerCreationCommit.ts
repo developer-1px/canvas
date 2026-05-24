@@ -7,10 +7,15 @@ import {
   type CanvasCreationAdapter,
 } from '../../engine'
 import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
+import type { CanvasAppComponentLibrary } from '../workflow/CanvasAppComponentAssemblyContracts'
 import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract'
 import type {
   CanvasPointerCreationInteraction,
 } from './CanvasPointerCreationGrammar'
+import {
+  commitCanvasPointerComponentCreation,
+  isCanvasPointerComponentCreationInteraction,
+} from './CanvasPointerComponentCreation'
 import {
   commitCanvasPointerCustomCreation,
   isCanvasPointerCustomCreationInteraction,
@@ -25,6 +30,7 @@ import {
 } from './CanvasPointerShapeCreation'
 
 export type CanvasPointerCreationCommitInput = {
+  componentLibrary: CanvasAppComponentLibrary
   commitItemsChange: CommitCanvasItemsChange
   creationAdapter: CanvasCreationAdapter<CanvasItem>
   createId: (prefix: string) => string
@@ -36,6 +42,7 @@ export type CanvasPointerCreationCommitInput = {
 }
 
 export function commitCanvasPointerCreation({
+  componentLibrary,
   commitItemsChange,
   creationAdapter,
   createId,
@@ -45,6 +52,18 @@ export function commitCanvasPointerCreation({
   selection,
   setTool,
 }: CanvasPointerCreationCommitInput) {
+  if (isCanvasPointerComponentCreationInteraction(interaction)) {
+    commitCanvasPointerComponentCreation({
+      commitItemsChange,
+      componentLibrary,
+      createId,
+      interaction,
+      selection,
+      setTool,
+    })
+    return
+  }
+
   if (isCanvasPointerShapeCreationInteraction(interaction)) {
     commitCanvasPointerShapeCreation({
       commitItemsChange,

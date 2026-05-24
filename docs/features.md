@@ -125,3 +125,10 @@
 121. connector 라벨 편집 중 plain `Enter`는 줄바꿈으로 남기고, 블러 시 값을 커밋한다.
 122. 새로 생성하는 connector는 FigJam식 bent/elbow 경로로 생성된다.
 123. 기존 straight connector 저장 데이터는 그대로 렌더링하고, connector 저장 shape는 `straight`와 `elbow` routing만 허용한다.
+124. 선택 객체 인스펙터는 FigJam식 fill/stroke 색상 swatch를 제공한다.
+125. Fill swatch는 사각형과 component 기반 항목에 적용된다.
+126. Stroke swatch는 사각형, component, connector, marker, highlighter에 적용된다.
+127. 색상 변경은 선택 상태를 유지한 채 document history에 기록된다.
+128. Section은 내부 built-in tool로 제공된다.
+129. `Shift+S`는 Section tool을 활성화하고, `S` sticky note shortcut과 충돌하지 않는다.
+130. Section tool은 클릭 시 기본 section을 만들고, 드래그 시 custom size section을 만든 뒤 선택 도구로 돌아간다.

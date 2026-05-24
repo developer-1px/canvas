@@ -13,6 +13,9 @@ import type {
   CanvasPointerCreationPreviewResult,
 } from './CanvasPointerInteractionResultContracts'
 import {
+  previewCanvasPointerComponentCreation,
+} from './CanvasPointerComponentCreation'
+import {
   previewCanvasPointerDrawingCreation,
 } from './CanvasPointerDrawingCreation'
 import {
@@ -61,6 +64,17 @@ export function previewCanvasPointerCreation({
 
   if (drawingPreview) {
     return drawingPreview
+  }
+
+  const componentPreview = previewCanvasPointerComponentCreation({
+    config,
+    currentScreen,
+    currentWorld,
+    interaction,
+  })
+
+  if (componentPreview) {
+    return componentPreview
   }
 
   const customPreview = previewCanvasPointerCustomCreation({

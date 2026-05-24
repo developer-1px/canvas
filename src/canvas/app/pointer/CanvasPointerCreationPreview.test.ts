@@ -119,6 +119,34 @@ describe('CanvasPointerCreationPreview', () => {
     })
   })
 
+  it('previews section creation with drag-sized draft bounds', () => {
+    const result = previewCanvasPointerCreation({
+      config,
+      currentScreen: { x: 250, y: 270 },
+      currentWorld: { x: 250, y: 270 },
+      input: createPointerInput(),
+      interaction: {
+        currentWorld: { x: 200, y: 200 },
+        kind: 'create-section',
+        moved: false,
+        pointerId: 1,
+        startScreen: { x: 200, y: 200 },
+        startWorld: { x: 200, y: 200 },
+      },
+      scene: createSceneAdapter(),
+    })
+
+    expect(result).toMatchObject({
+      draftRect: { h: 80, w: 40, x: 200, y: 200 },
+      interaction: {
+        currentWorld: { x: 240, y: 280 },
+        kind: 'create-section',
+        moved: true,
+      },
+      kind: 'preview',
+    })
+  })
+
   it('does not preview disabled creation gestures', () => {
     expect(
       previewCanvasPointerCreation({

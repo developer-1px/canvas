@@ -52,6 +52,16 @@ export function StickyNoteIcon() {
   )
 }
 
+export function SectionIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="4.5" y="5" width="15" height="14" rx="1.5" />
+      <path d="M7.5 9h9M7.5 12h5" />
+      <path d="M7.5 16h9" />
+    </svg>
+  )
+}
+
 export function HighlighterIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">

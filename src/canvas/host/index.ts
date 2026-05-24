@@ -43,6 +43,10 @@ export {
   type CreateCanvasComponentLibraryInput,
 } from './component/CanvasComponentLibrary'
 export {
+  CANVAS_SECTION_COMPONENT_KIND,
+  CANVAS_SECTION_DEFAULT_SIZE,
+} from './component/CanvasSectionComponent'
+export {
   CANVAS_STICKY_COMPONENT_KIND,
   applyCanvasStickyComponentCreationDefaults,
   isCanvasStickyComponentItem,

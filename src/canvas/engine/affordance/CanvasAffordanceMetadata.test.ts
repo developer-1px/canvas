@@ -13,6 +13,7 @@ describe('CanvasAffordanceMetadata', () => {
       'select',
       'pan',
       'sticky',
+      'section',
       'rect',
       'text',
       'comment',
@@ -49,10 +50,15 @@ describe('CanvasAffordanceMetadata', () => {
     })
     expect(CANVAS_TOOL_AFFORDANCES.sticky.keyboardShortcut).toEqual({
       key: 's',
-      shiftInsensitive: true,
       shortcutId: 'stickyTool',
     })
+    expect(CANVAS_TOOL_AFFORDANCES.section.keyboardShortcut).toEqual({
+      key: 's',
+      shiftKey: true,
+      shortcutId: 'sectionTool',
+    })
     expect(CANVAS_TOOL_AFFORDANCES.highlight.shortcut).toBe('Shift+M')
+    expect(CANVAS_TOOL_AFFORDANCES.section.shortcut).toBe('Shift+S')
     expect(CANVAS_TOOL_AFFORDANCES.highlight.title).toBe(
       'Highlighter (Shift+M)',
     )

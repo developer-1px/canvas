@@ -20,13 +20,21 @@ describe('CanvasKeyboardToolShortcuts', () => {
     })).toBe('highlight')
   })
 
-  it('keeps shift-insensitive built-in tool shortcuts explicit', () => {
+  it('keeps shifted section distinct from sticky', () => {
+    expect(getCanvasKeyboardBuiltinToolShortcut({
+      config: createCanvasAffordanceConfig(),
+      event: createKeyboardEvent({ key: 's' }),
+      key: 's',
+    })).toBe('sticky')
+
     expect(getCanvasKeyboardBuiltinToolShortcut({
       config: createCanvasAffordanceConfig(),
       event: createKeyboardEvent({ key: 'S', shiftKey: true }),
       key: 's',
-    })).toBe('sticky')
+    })).toBe('section')
+  })
 
+  it('keeps shift-insensitive built-in tool shortcuts explicit', () => {
     expect(getCanvasKeyboardBuiltinToolShortcut({
       config: createCanvasAffordanceConfig(),
       event: createKeyboardEvent({ key: 'V', shiftKey: true }),
@@ -57,6 +65,8 @@ describe('CanvasKeyboardToolShortcuts', () => {
       expect.arrayContaining([
         { label: 'select tool', shortcut: { key: 'v' } },
         { label: 'select tool', shortcut: { key: 'v', shiftKey: true } },
+        { label: 'sticky note tool', shortcut: { key: 's' } },
+        { label: 'section tool', shortcut: { key: 's', shiftKey: true } },
         { label: 'marker tool', shortcut: { key: 'm' } },
         {
           label: 'highlighter tool',

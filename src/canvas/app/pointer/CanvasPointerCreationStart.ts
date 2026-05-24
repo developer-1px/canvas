@@ -107,7 +107,9 @@ export function startCanvasPointerCreation({
     componentLibrary,
     config,
     createId,
+    input,
     pointerGesture,
+    startScreen,
     startWorld,
   })
 

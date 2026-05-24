@@ -41,6 +41,17 @@ describe('CanvasKeyboardToolShortcutIntent', () => {
 
     expect(tool).toBeNull()
   })
+
+  it('keeps sticky and section shortcuts distinct', () => {
+    expect(getCanvasKeyboardToolShortcutIntent(createInput({
+      event: createKeyboardEvent({ key: 's' }),
+      key: 's',
+    }))).toBe('sticky')
+    expect(getCanvasKeyboardToolShortcutIntent(createInput({
+      event: createKeyboardEvent({ key: 'S', shiftKey: true }),
+      key: 's',
+    }))).toBe('section')
+  })
 })
 
 function createInput(
