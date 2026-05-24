@@ -33,8 +33,7 @@ export type CanvasPointerDrawingCreationKind =
 
 export const CANVAS_POINTER_SHAPE_CREATION_KINDS = Object.freeze([
   'create-arrow',
-  'create-ellipse',
-  'create-rect',
+  'create-shape',
 ] as const satisfies readonly CanvasPointerGesture[])
 
 export type CanvasPointerShapeCreationKind =

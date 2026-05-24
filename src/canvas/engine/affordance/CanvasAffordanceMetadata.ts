@@ -9,8 +9,8 @@ import type {
 
 export type CanvasToolAffordance = Readonly<{
   ariaLabel: string
-  keyboardShortcut: CanvasToolKeyboardShortcut
-  shortcut: string
+  keyboardShortcut?: CanvasToolKeyboardShortcut
+  shortcut?: string
   statusLabel: string
   title: string
 }>
@@ -34,6 +34,7 @@ export const CANVAS_TOOL_AFFORDANCE_ORDER = Object.freeze([
   'section',
   'rect',
   'ellipse',
+  'diamond',
   'text',
   'comment',
   'marker',
@@ -79,6 +80,10 @@ export const CANVAS_TOOL_AFFORDANCES = Object.freeze({
       shortcutId: 'eraserTool',
     },
     statusLabel: 'Eraser',
+  }),
+  diamond: createCanvasToolAffordance({
+    ariaLabel: 'Diamond tool',
+    statusLabel: 'Diamond',
   }),
   ellipse: createCanvasToolAffordance({
     ariaLabel: 'Ellipse tool',
@@ -167,18 +172,26 @@ function createCanvasToolAffordance({
   statusLabel,
 }: {
   ariaLabel: string
-  keyboardShortcut: CanvasToolKeyboardShortcut
+  keyboardShortcut?: CanvasToolKeyboardShortcut
   statusLabel: string
 }): CanvasToolAffordance {
-  const frozenKeyboardShortcut = Object.freeze({ ...keyboardShortcut })
-  const shortcut = formatCanvasToolKeyboardShortcut(keyboardShortcut)
+  const frozenKeyboardShortcut = keyboardShortcut
+    ? Object.freeze({ ...keyboardShortcut })
+    : undefined
+  const shortcut = keyboardShortcut
+    ? formatCanvasToolKeyboardShortcut(keyboardShortcut)
+    : undefined
 
   return Object.freeze({
     ariaLabel,
-    keyboardShortcut: frozenKeyboardShortcut,
-    shortcut,
+    ...(frozenKeyboardShortcut ? {
+      keyboardShortcut: frozenKeyboardShortcut,
+      shortcut,
+    } : {}),
     statusLabel,
-    title: `${getCanvasToolAffordanceTitleLabel(ariaLabel)} (${shortcut})`,
+    title: shortcut
+      ? `${getCanvasToolAffordanceTitleLabel(ariaLabel)} (${shortcut})`
+      : getCanvasToolAffordanceTitleLabel(ariaLabel),
   })
 }
 
@@ -270,8 +283,7 @@ export const CANVAS_GESTURE_STATUS_LABELS: Partial<
 > = Object.freeze({
   'create-arrow': 'Drawing',
   'create-custom': 'Creating',
-  'create-ellipse': 'Drawing',
-  'create-rect': 'Drawing',
+  'create-shape': 'Drawing',
   'draw-highlight': 'Highlighting',
   'draw-marker': 'Drawing',
   erase: 'Erasing',

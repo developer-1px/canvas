@@ -50,7 +50,7 @@ describe('CanvasPointerTextCreation', () => {
       config,
       creationAdapter,
       createId: () => 'rect-1',
-      pointerGesture: 'create-rect',
+      pointerGesture: 'create-shape',
       startWorld: { x: 80, y: 120 },
     })
 

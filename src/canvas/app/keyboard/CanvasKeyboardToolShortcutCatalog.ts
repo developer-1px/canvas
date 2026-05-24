@@ -16,13 +16,21 @@ export type CanvasKeyboardToolShortcutDescriptor = {
 
 export const CANVAS_KEYBOARD_TOOL_SHORTCUTS:
   readonly CanvasKeyboardToolShortcutDescriptor[] =
-  CANVAS_TOOL_AFFORDANCE_ORDER.map(getCanvasKeyboardToolShortcut)
+  CANVAS_TOOL_AFFORDANCE_ORDER.flatMap((tool) => {
+    const shortcut = getCanvasKeyboardToolShortcut(tool)
+
+    return shortcut ? [shortcut] : []
+  })
 
 function getCanvasKeyboardToolShortcut(
   tool: CanvasBuiltinTool,
-): CanvasKeyboardToolShortcutDescriptor {
+): CanvasKeyboardToolShortcutDescriptor | null {
   const affordance = CANVAS_TOOL_AFFORDANCES[tool]
   const keyboardShortcut = affordance.keyboardShortcut
+
+  if (!keyboardShortcut) {
+    return null
+  }
 
   return {
     label: affordance.ariaLabel.toLowerCase(),

@@ -17,18 +17,19 @@ const drawingStyles = createCanvasDrawingStrokeStyleSet()
 describe('CanvasPointerCreationStart', () => {
   it('starts rect creation with an initial draft rect', () => {
     const result = startCanvasPointerCreation(createInput({
-      pointerGesture: 'create-rect',
+      pointerGesture: 'create-shape',
       startWorld: { x: 80, y: 120 },
       tool: 'rect',
     }))
 
     expect(result).toMatchObject({
       capturePointer: true,
-      draftRect: { h: 0, w: 0, x: 80, y: 120 },
-      gesture: 'create-rect',
+      draftRect: { h: 0, shape: 'rect', w: 0, x: 80, y: 120 },
+      gesture: 'create-shape',
       interaction: {
         currentWorld: { x: 80, y: 120 },
-        kind: 'create-rect',
+        kind: 'create-shape',
+        shape: 'rect',
         startWorld: { x: 80, y: 120 },
       },
       kind: 'interaction',
@@ -190,7 +191,7 @@ function createInput(
       },
     ],
     input: createPointerInput(),
-    pointerGesture: 'create-rect',
+    pointerGesture: 'create-shape',
     startScreen: { x: 80, y: 120 },
     startWorld: { x: 80, y: 120 },
     tool: 'rect',

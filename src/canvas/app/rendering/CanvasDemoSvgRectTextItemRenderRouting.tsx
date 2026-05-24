@@ -4,8 +4,9 @@ import type {
   TextItem,
 } from '../../entities'
 import {
-  getCanvasShapeKind,
+  getCanvasItemSvgShapeGeometry,
   isCanvasTextItem,
+  type CanvasSvgShapeGeometry,
 } from '../../host'
 
 type CanvasDemoSvgRectTextItem = RectItem | TextItem
@@ -60,16 +61,46 @@ function renderCanvasDemoSvgShapeItem({
 }: {
   item: RectItem
 }) {
-  if (getCanvasShapeKind(item) === 'ellipse') {
+  const geometry = getCanvasItemSvgShapeGeometry(item)
+
+  return renderCanvasDemoSvgShapeGeometry({
+    fill: item.fill,
+    geometry,
+    stroke: item.stroke,
+  })
+}
+
+function renderCanvasDemoSvgShapeGeometry({
+  fill,
+  geometry,
+  stroke,
+}: {
+  fill: string
+  geometry: CanvasSvgShapeGeometry
+  stroke: string
+}) {
+  if (geometry.kind === 'ellipse') {
     return (
       <ellipse
         className="rect-item"
-        cx={item.x + item.w / 2}
-        cy={item.y + item.h / 2}
-        rx={item.w / 2}
-        ry={item.h / 2}
-        fill={item.fill}
-        stroke={item.stroke}
+        cx={geometry.cx}
+        cy={geometry.cy}
+        rx={geometry.rx}
+        ry={geometry.ry}
+        fill={fill}
+        stroke={stroke}
+        vectorEffect="non-scaling-stroke"
+      />
+    )
+  }
+
+  if (geometry.kind === 'path') {
+    return (
+      <path
+        className="rect-item"
+        d={geometry.d}
+        fill={fill}
+        stroke={stroke}
         vectorEffect="non-scaling-stroke"
       />
     )
@@ -78,13 +109,13 @@ function renderCanvasDemoSvgShapeItem({
   return (
     <rect
       className="rect-item"
-      x={item.x}
-      y={item.y}
-      width={item.w}
-      height={item.h}
-      rx="6"
-      fill={item.fill}
-      stroke={item.stroke}
+      x={geometry.x}
+      y={geometry.y}
+      width={geometry.width}
+      height={geometry.height}
+      rx={geometry.rx}
+      fill={fill}
+      stroke={stroke}
       vectorEffect="non-scaling-stroke"
     />
   )

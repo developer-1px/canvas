@@ -116,9 +116,10 @@ describe('CanvasPointerInteractionPreview', () => {
       currentWorld: { x: 90, y: 90 },
       interaction: {
         currentWorld: { x: 0, y: 0 },
-        kind: 'create-rect',
+        kind: 'create-shape',
         moved: false,
         pointerId: 1,
+        shape: 'rect',
         startScreen: { x: 0, y: 0 },
         startWorld: { x: 0, y: 0 },
       },
@@ -139,10 +140,10 @@ describe('CanvasPointerInteractionPreview', () => {
     }))
 
     expect(rectResult).toMatchObject({
-      draftRect: { h: 80, w: 80, x: 0, y: 0 },
+      draftRect: { h: 80, shape: 'rect', w: 80, x: 0, y: 0 },
       interaction: {
         currentWorld: { x: 80, y: 80 },
-        kind: 'create-rect',
+        kind: 'create-shape',
         moved: true,
       },
       kind: 'preview',

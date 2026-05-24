@@ -17,7 +17,7 @@ export type RectItem = CanvasItemBase & {
   text?: string
 }
 
-export type CanvasShapeKind = 'ellipse' | 'rect'
+export type CanvasShapeKind = 'diamond' | 'ellipse' | 'rect'
 
 export type TextItem = CanvasItemBase & {
   type: 'text'

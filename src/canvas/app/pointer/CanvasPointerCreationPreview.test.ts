@@ -18,9 +18,10 @@ describe('CanvasPointerCreationPreview', () => {
       input: createPointerInput(),
       interaction: {
         currentWorld: { x: 0, y: 0 },
-        kind: 'create-rect',
+        kind: 'create-shape',
         moved: false,
         pointerId: 1,
+        shape: 'rect',
         startScreen: { x: 0, y: 0 },
         startWorld: { x: 0, y: 0 },
       },
@@ -28,10 +29,10 @@ describe('CanvasPointerCreationPreview', () => {
     })
 
     expect(result).toMatchObject({
-      draftRect: { h: 80, w: 80, x: 0, y: 0 },
+      draftRect: { h: 80, shape: 'rect', w: 80, x: 0, y: 0 },
       interaction: {
         currentWorld: { x: 80, y: 80 },
-        kind: 'create-rect',
+        kind: 'create-shape',
         moved: true,
       },
       kind: 'preview',
@@ -153,16 +154,17 @@ describe('CanvasPointerCreationPreview', () => {
     expect(
       previewCanvasPointerCreation({
         config: createCanvasAffordanceConfig({
-          gestures: { createRect: false },
+          gestures: { createShape: false },
         }),
         currentScreen: { x: 90, y: 90 },
         currentWorld: { x: 90, y: 90 },
         input: createPointerInput(),
         interaction: {
           currentWorld: { x: 0, y: 0 },
-          kind: 'create-rect',
+          kind: 'create-shape',
           moved: false,
           pointerId: 1,
+          shape: 'rect',
           startScreen: { x: 0, y: 0 },
           startWorld: { x: 0, y: 0 },
         },

@@ -23,8 +23,9 @@ describe('CanvasPointerInteractionLifecycle', () => {
     commitCanvasPointerInteraction(createCommitInput({
       commitItemsChange,
       interaction: {
-        kind: 'create-rect',
+        kind: 'create-shape',
         pointerId: 1,
+        shape: 'rect',
         startScreen: { x: 0, y: 0 },
         startWorld: { x: 10, y: 20 },
         currentWorld: { x: 90, y: 100 },

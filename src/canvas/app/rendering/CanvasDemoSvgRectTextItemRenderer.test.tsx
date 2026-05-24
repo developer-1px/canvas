@@ -68,6 +68,28 @@ describe('CanvasDemoSvgRectTextItemRenderer', () => {
     expect(markup).toContain('ry="40"')
     expect(markup).toContain('Loop')
   })
+
+  it('renders diamond shapes with the same embedded text contract', () => {
+    const markup = renderRectTextItems([
+      {
+        fill: '#ecfdf5',
+        h: 80,
+        id: 'diamond-1',
+        shape: 'diamond',
+        stroke: '#047857',
+        text: 'Decision',
+        type: 'rect',
+        w: 120,
+        x: 20,
+        y: 30,
+      },
+    ])
+
+    expect(markup).toContain('<path')
+    expect(markup).toContain('class="rect-item"')
+    expect(markup).toContain('M 80 30 L 140 70 L 80 110 L 20 70 Z')
+    expect(markup).toContain('Decision')
+  })
 })
 
 function renderRectTextItems(items: CanvasDemoSvgRectTextItem[]) {

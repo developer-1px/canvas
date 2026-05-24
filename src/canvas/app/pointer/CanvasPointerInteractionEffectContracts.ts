@@ -12,6 +12,7 @@ import type {
 } from '../../entities'
 import type {
   CanvasDraftArrowOverlay,
+  CanvasDraftShapeOverlay,
   CanvasLaserTrailOverlay,
   CanvasDraftStrokeOverlay,
   CanvasSnapGuides,
@@ -29,7 +30,7 @@ export type CanvasPointerInteractionStartEffectContext = {
   interactionRef: MutableRefObject<Interaction>
   selection: string[]
   setDraftArrow: Dispatch<SetStateAction<CanvasDraftArrowOverlay | null>>
-  setDraftRect: Dispatch<SetStateAction<Bounds | null>>
+  setDraftRect: Dispatch<SetStateAction<CanvasDraftShapeOverlay | null>>
   setDraftStroke: Dispatch<SetStateAction<CanvasDraftStrokeOverlay | null>>
   setLaserTrail: Dispatch<SetStateAction<CanvasLaserTrailOverlay | null>>
   setEditing: Dispatch<SetStateAction<EditingText | null>>
@@ -49,7 +50,7 @@ export type CanvasTextEditInteractionStartEffectContext = {
 export type CanvasPointerInteractionDragEffectContext = {
   interactionRef: MutableRefObject<Interaction>
   setDraftArrow: Dispatch<SetStateAction<CanvasDraftArrowOverlay | null>>
-  setDraftRect: Dispatch<SetStateAction<Bounds | null>>
+  setDraftRect: Dispatch<SetStateAction<CanvasDraftShapeOverlay | null>>
   setDraftStroke: Dispatch<SetStateAction<CanvasDraftStrokeOverlay | null>>
   setLaserTrail: Dispatch<SetStateAction<CanvasLaserTrailOverlay | null>>
   setGesture: Dispatch<SetStateAction<Interaction['kind']>>

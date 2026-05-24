@@ -3,6 +3,7 @@ import type {
   CanvasCustomToolId,
   CanvasArrowEndpoint,
   CanvasItem,
+  CanvasShapeKind,
   EditingText,
   Point,
   ResizeHandle,
@@ -51,16 +52,9 @@ export type Interaction =
       moved: boolean
     }
   | {
-      kind: 'create-rect'
+      kind: 'create-shape'
       pointerId: number
-      startScreen: Point
-      startWorld: Point
-      currentWorld: Point
-      moved: boolean
-    }
-  | {
-      kind: 'create-ellipse'
-      pointerId: number
+      shape: CanvasShapeKind
       startScreen: Point
       startWorld: Point
       currentWorld: Point

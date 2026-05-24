@@ -2,6 +2,7 @@ import type {
   Bounds,
   Point
 } from '../../core'
+import type { CanvasShapeKind } from '../../entities'
 import {
   normalizeBounds,
   pointDistance,
@@ -18,7 +19,7 @@ export type CanvasCreatedText<TItem extends CanvasCreationItem> = {
 
 export type CanvasCreatedArrowRouting = 'elbow' | 'straight'
 
-export type CanvasCreatedShapeKind = 'ellipse' | 'rect'
+export type CanvasCreatedShapeKind = CanvasShapeKind
 
 export type CanvasCreatedDrawingStyle = Readonly<{
   opacity: number
@@ -140,7 +141,7 @@ export function createCanvasRect<TItem extends CanvasCreationItem>({
 }) {
   return adapter.createRect({
     bounds: getCanvasCreatedRectBounds({ currentWorld, startWorld }),
-    id: createId(shape === 'ellipse' ? 'ellipse' : 'rect'),
+    id: createId(shape ?? 'rect'),
     shape,
   })
 }

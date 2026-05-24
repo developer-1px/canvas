@@ -1,5 +1,6 @@
 export type {
   Bounds,
+  CanvasBuiltinShapeTool,
   CanvasBuiltinTool,
   CanvasCustomToolId,
   CanvasInteractionKind,
@@ -11,7 +12,11 @@ export type {
   Tool,
   Viewport,
 } from './CanvasCoreTypes'
-export { isCanvasCustomToolId } from './CanvasCoreTypes'
+export {
+  CANVAS_BUILTIN_SHAPE_TOOLS,
+  isCanvasBuiltinShapeTool,
+  isCanvasCustomToolId,
+} from './CanvasCoreTypes'
 export {
   assertCanvasStableId,
   assertCanvasStableIdRecordKeys,

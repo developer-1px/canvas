@@ -27,7 +27,11 @@ type CreatedItem =
       start: { x: number; y: number }
       type: 'arrow'
     }
-  | { id: string; shape?: 'ellipse' | 'rect'; type: 'rect' | 'text' }
+  | {
+      id: string
+      shape?: 'diamond' | 'ellipse' | 'rect'
+      type: 'rect' | 'text'
+    }
 
 const adapter: CanvasCreationAdapter<CreatedItem> = {
   createArrow: ({ end, id, routing, start }) => ({
@@ -144,6 +148,22 @@ describe('CanvasCreationEngine drawing tools', () => {
     ).toEqual({
       id: 'ellipse-1',
       shape: 'ellipse',
+      type: 'rect',
+    })
+  })
+
+  test('creates diamond shapes through the rectangle creation adapter seam', () => {
+    expect(
+      createCanvasRect({
+        adapter,
+        createId: (prefix) => `${prefix}-1`,
+        currentWorld: { x: 90, y: 100 },
+        shape: 'diamond',
+        startWorld: { x: 10, y: 20 },
+      }),
+    ).toEqual({
+      id: 'diamond-1',
+      shape: 'diamond',
       type: 'rect',
     })
   })

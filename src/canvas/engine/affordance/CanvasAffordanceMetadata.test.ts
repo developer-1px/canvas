@@ -16,6 +16,7 @@ describe('CanvasAffordanceMetadata', () => {
       'section',
       'rect',
       'ellipse',
+      'diamond',
       'text',
       'comment',
       'marker',
@@ -31,9 +32,13 @@ describe('CanvasAffordanceMetadata', () => {
     for (const tool of CANVAS_TOOL_AFFORDANCE_ORDER) {
       expect(CANVAS_AFFORDANCE_CONFIG_DEFAULTS.tools).toHaveProperty(tool)
       expect(CANVAS_TOOL_AFFORDANCES).toHaveProperty(tool)
-      expect(CANVAS_AFFORDANCE_CONFIG_DEFAULTS.shortcuts).toHaveProperty(
-        CANVAS_TOOL_AFFORDANCES[tool].keyboardShortcut.shortcutId,
-      )
+      const { keyboardShortcut } = CANVAS_TOOL_AFFORDANCES[tool]
+
+      if (keyboardShortcut) {
+        expect(CANVAS_AFFORDANCE_CONFIG_DEFAULTS.shortcuts).toHaveProperty(
+          keyboardShortcut.shortcutId,
+        )
+      }
     }
 
     expect(CANVAS_TOOL_AFFORDANCES.select.keyboardShortcut).toEqual({
@@ -75,6 +80,8 @@ describe('CanvasAffordanceMetadata', () => {
       shiftInsensitive: true,
       shortcutId: 'ellipseTool',
     })
+    expect(CANVAS_TOOL_AFFORDANCES.diamond.keyboardShortcut).toBeUndefined()
+    expect(CANVAS_TOOL_AFFORDANCES.diamond.title).toBe('Diamond')
     expect(CANVAS_TOOL_AFFORDANCES.highlight.shortcut).toBe('Shift+M')
     expect(CANVAS_TOOL_AFFORDANCES.section.shortcut).toBe('Shift+S')
     expect(CANVAS_TOOL_AFFORDANCES.highlight.title).toBe(

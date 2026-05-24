@@ -27,10 +27,6 @@ describe('CanvasToolGestureRouting', () => {
       gesture: 'draw-highlight',
       routeItemPointerToCanvasGesture: true,
     })
-    expect(CANVAS_TOOL_GESTURE_ROUTES.ellipse).toMatchObject({
-      gesture: 'create-ellipse',
-      routeItemPointerToCanvasGesture: true,
-    })
     expect(CANVAS_TOOL_GESTURE_ROUTES.eraser).toMatchObject({
       gesture: 'erase',
       routeItemPointerToCanvasGesture: true,
@@ -42,15 +38,21 @@ describe('CanvasToolGestureRouting', () => {
     expect(CANVAS_TOOL_GESTURE_ROUTES.select).toMatchObject({
       routeItemPointerToCanvasGesture: false,
     })
+    expect(CANVAS_TOOL_GESTURE_ROUTES).not.toHaveProperty('diamond')
+    expect(CANVAS_TOOL_GESTURE_ROUTES).not.toHaveProperty('ellipse')
+    expect(CANVAS_TOOL_GESTURE_ROUTES).not.toHaveProperty('rect')
     expect(Object.isFrozen(CANVAS_TOOL_GESTURE_ROUTES.marker)).toBe(true)
   })
 
   it('projects built-in and custom tools to pointer gestures through one route lookup', () => {
     expect(getCanvasToolPointerGesture({ config, tool: 'rect' })).toBe(
-      'create-rect',
+      'create-shape',
     )
     expect(getCanvasToolPointerGesture({ config, tool: 'ellipse' })).toBe(
-      'create-ellipse',
+      'create-shape',
+    )
+    expect(getCanvasToolPointerGesture({ config, tool: 'diamond' })).toBe(
+      'create-shape',
     )
     expect(getCanvasToolPointerGesture({ config, tool: 'marker' })).toBe(
       'draw-marker',
@@ -91,9 +93,8 @@ describe('CanvasToolGestureRouting', () => {
         createArrow: false,
         createComment: false,
         createCustom: false,
-        createEllipse: false,
+        createShape: false,
         createSection: false,
-        createRect: false,
         createSticky: false,
         createText: false,
         drawHighlight: false,
@@ -106,6 +107,8 @@ describe('CanvasToolGestureRouting', () => {
     expect(getCanvasToolPointerGesture({ config: disabled, tool: 'rect' }))
       .toBeNull()
     expect(getCanvasToolPointerGesture({ config: disabled, tool: 'ellipse' }))
+      .toBeNull()
+    expect(getCanvasToolPointerGesture({ config: disabled, tool: 'diamond' }))
       .toBeNull()
     expect(getCanvasToolPointerGesture({ config: disabled, tool: 'marker' }))
       .toBeNull()
@@ -147,6 +150,12 @@ describe('CanvasToolGestureRouting', () => {
         tool: 'select',
       }),
     ).toBe(false)
+    expect(
+      shouldRouteCanvasToolPointerToCanvasGesture({
+        spaceDown: false,
+        tool: 'diamond',
+      }),
+    ).toBe(true)
     expect(
       shouldRouteCanvasToolPointerToCanvasGesture({
         spaceDown: false,

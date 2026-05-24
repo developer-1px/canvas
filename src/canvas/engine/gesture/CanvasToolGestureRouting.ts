@@ -1,5 +1,7 @@
 import {
+  isCanvasBuiltinShapeTool,
   isCanvasCustomToolId,
+  type CanvasBuiltinShapeTool,
   type CanvasBuiltinTool,
   type Tool,
 } from '../../core'
@@ -17,8 +19,7 @@ export type CanvasPointerGesture =
   | 'create-arrow'
   | 'create-comment'
   | 'create-custom'
-  | 'create-ellipse'
-  | 'create-rect'
+  | 'create-shape'
   | 'create-section'
   | 'create-sticky'
   | 'create-text'
@@ -44,6 +45,16 @@ type CanvasToolGestureRouteInput = Readonly<{
   routeItemPointerToCanvasGesture?: boolean
 }>
 
+type CanvasNonShapeBuiltinTool = Exclude<
+  CanvasBuiltinTool,
+  CanvasBuiltinShapeTool
+>
+
+const CANVAS_SHAPE_TOOL_GESTURE_ROUTE = createCanvasToolGestureRoute({
+  gesture: 'create-shape',
+  isEnabled: (config) => config.gestures.createShape,
+})
+
 export const CANVAS_TOOL_GESTURE_ROUTES = Object.freeze({
   arrow: createCanvasToolGestureRoute({
     gesture: 'create-arrow',
@@ -65,10 +76,6 @@ export const CANVAS_TOOL_GESTURE_ROUTES = Object.freeze({
     gesture: 'erase',
     isEnabled: (config) => config.gestures.eraseDrawing,
   }),
-  ellipse: createCanvasToolGestureRoute({
-    gesture: 'create-ellipse',
-    isEnabled: (config) => config.gestures.createEllipse,
-  }),
   laser: createCanvasToolGestureRoute({
     gesture: 'laser',
     isEnabled: (config) => config.gestures.laserPointer,
@@ -76,10 +83,6 @@ export const CANVAS_TOOL_GESTURE_ROUTES = Object.freeze({
   pan: createCanvasToolGestureRoute({
     gesture: 'pan',
     isEnabled: (config) => config.gestures.pan,
-  }),
-  rect: createCanvasToolGestureRoute({
-    gesture: 'create-rect',
-    isEnabled: (config) => config.gestures.createRect,
   }),
   select: createCanvasToolGestureRoute({
     routeItemPointerToCanvasGesture: false,
@@ -96,7 +99,7 @@ export const CANVAS_TOOL_GESTURE_ROUTES = Object.freeze({
     gesture: 'create-text',
     isEnabled: (config) => config.gestures.createText,
   }),
-} satisfies Readonly<Record<CanvasBuiltinTool, CanvasToolGestureRoute>>)
+} satisfies Readonly<Record<CanvasNonShapeBuiltinTool, CanvasToolGestureRoute>>)
 
 export function shouldStartCanvasPanGesture({
   config,
@@ -126,7 +129,7 @@ export function getCanvasToolPointerGesture({
     return config.gestures.createCustom ? 'create-custom' : null
   }
 
-  const route = CANVAS_TOOL_GESTURE_ROUTES[tool]
+  const route = getCanvasBuiltinToolGestureRoute(tool)
 
   if (!route.gesture || !route.isEnabled?.(config)) {
     return null
@@ -146,7 +149,7 @@ export function shouldRouteCanvasToolPointerToCanvasGesture({
     return true
   }
 
-  return CANVAS_TOOL_GESTURE_ROUTES[tool].routeItemPointerToCanvasGesture
+  return getCanvasBuiltinToolGestureRoute(tool).routeItemPointerToCanvasGesture
 }
 
 function createCanvasToolGestureRoute(
@@ -164,5 +167,13 @@ function getCanvasToolGesture(tool: Tool) {
     return null
   }
 
-  return CANVAS_TOOL_GESTURE_ROUTES[tool].gesture ?? null
+  return getCanvasBuiltinToolGestureRoute(tool).gesture ?? null
+}
+
+function getCanvasBuiltinToolGestureRoute(
+  tool: CanvasBuiltinTool,
+): CanvasToolGestureRoute {
+  return isCanvasBuiltinShapeTool(tool)
+    ? CANVAS_SHAPE_TOOL_GESTURE_ROUTE
+    : CANVAS_TOOL_GESTURE_ROUTES[tool]
 }

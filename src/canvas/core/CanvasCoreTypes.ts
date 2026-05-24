@@ -7,6 +7,7 @@ export type CanvasBuiltinTool =
   | 'section'
   | 'rect'
   | 'ellipse'
+  | 'diamond'
   | 'text'
   | 'comment'
   | 'marker'
@@ -14,6 +15,15 @@ export type CanvasBuiltinTool =
   | 'eraser'
   | 'laser'
   | 'arrow'
+
+export const CANVAS_BUILTIN_SHAPE_TOOLS = Object.freeze([
+  'diamond',
+  'ellipse',
+  'rect',
+] as const satisfies readonly CanvasBuiltinTool[])
+
+export type CanvasBuiltinShapeTool =
+  (typeof CANVAS_BUILTIN_SHAPE_TOOLS)[number]
 
 export type CanvasCustomToolId = `custom:${string}`
 
@@ -25,8 +35,7 @@ export type CanvasInteractionKind =
   | 'move'
   | 'marquee'
   | 'create-section'
-  | 'create-rect'
-  | 'create-ellipse'
+  | 'create-shape'
   | 'create-arrow'
   | 'create-custom'
   | 'draw-marker'
@@ -58,4 +67,10 @@ export type CanvasSelectionIds = CanvasItemId[]
 
 export function isCanvasCustomToolId(tool: Tool): tool is CanvasCustomToolId {
   return tool.startsWith('custom:')
+}
+
+export function isCanvasBuiltinShapeTool(
+  tool: Tool,
+): tool is CanvasBuiltinShapeTool {
+  return CANVAS_BUILTIN_SHAPE_TOOLS.includes(tool as CanvasBuiltinShapeTool)
 }

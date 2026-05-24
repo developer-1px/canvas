@@ -5,6 +5,7 @@ import type {
 } from 'react'
 import type {
   CanvasDraftArrowOverlay,
+  CanvasDraftShapeOverlay,
   CanvasLaserTrailOverlay,
   CanvasDraftStrokeOverlay,
   CanvasAffordanceConfig,
@@ -29,7 +30,7 @@ export type CanvasKeyboardSystemHandlers = {
   openCursorChat: () => void
   openFindReplace: () => void
   setDraftArrow: Dispatch<SetStateAction<CanvasDraftArrowOverlay | null>>
-  setDraftRect: Dispatch<SetStateAction<Bounds | null>>
+  setDraftRect: Dispatch<SetStateAction<CanvasDraftShapeOverlay | null>>
   setDraftStroke: Dispatch<SetStateAction<CanvasDraftStrokeOverlay | null>>
   setLaserTrail: Dispatch<SetStateAction<CanvasLaserTrailOverlay | null>>
   setEditing: Dispatch<SetStateAction<EditingText | null>>

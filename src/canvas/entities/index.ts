@@ -1,5 +1,6 @@
 export type {
   Bounds,
+  CanvasBuiltinShapeTool,
   CanvasBuiltinTool,
   CanvasCustomToolId,
   CanvasInteractionKind,

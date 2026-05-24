@@ -54,7 +54,7 @@
 | `src/canvas/app/workflow/CanvasAppConsumerContracts.ts` | Command, extension, interaction, keyboard, pointer, stage, stage element runtime fan-out의 입력과 consumer별 출력 Interface를 한곳에 모은다 |
 | `src/canvas/app/rendering/CanvasDemoSvgItemFrame.tsx` | Demo SVG item의 lock, selected, pointer event, outline wrapper 문법을 item type별 shape rendering과 분리해 소유한다 |
 | `src/canvas/app/rendering/CanvasDemoSvgDrawingItemRenderer.tsx` | Marker, highlighter, arrow의 SVG path/line shape와 arrow marker 사용을 소유한다 |
-| `src/canvas/app/rendering/CanvasDemoSvgRectTextItemRenderer.tsx` | Rect와 text item의 SVG shape, embedded text foreignObject 문법을 소유한다 |
+| `src/canvas/app/rendering/CanvasDemoSvgRectTextItemRenderer.tsx` | Rect와 text item의 embedded text foreignObject 문법을 소유하고, bounded shape SVG geometry는 Host shape 계약에 위임한다 |
 | `src/canvas/app/rendering/CanvasDemoSvgComponentPresentationRegistry.ts` | Demo component presentation key와 SVG rendering strategy를 외부 조립 가능한 registry로 연결한다 |
 | `src/canvas/app/rendering/CanvasDemoSvgBuiltInComponentPresentationRenderers.tsx` | 기본 Demo component presentation key와 SVG renderer strategy mapping을 소유한다 |
 | `src/canvas/app/rendering/CanvasDemoSvgComponentPresentationRegistryContracts.ts` | Component presentation renderer registry key와 render strategy slot을 검증한다 |
@@ -125,7 +125,7 @@
 | `src/canvas/app/pointer/CanvasItemPointerInteractionStart.ts` | Item pointer-down/text double-click 시 selection, edit state, alt-drag duplicate, move interaction 시작 상태를 계산한다 |
 | `src/canvas/app/pointer/CanvasResizePointerInteractionStart.ts` | Resize handle pointer-down 시 selected bounds, handle, selection, item snapshot을 resize interaction 시작 상태로 변환한다 |
 | `src/canvas/app/pointer/CanvasPointerInteractionPreview.ts` | Pointer-move 시 active interaction을 viewport, live item, marquee, selection, draft overlay, snap guide preview로 변환한다 |
-| `src/canvas/app/pointer/CanvasPointerCreationPreview.ts` | Create-rect, marker, highlighter, arrow, custom creation의 draft overlay와 currentWorld/moved preview를 소유한다 |
+| `src/canvas/app/pointer/CanvasPointerCreationPreview.ts` | Create-shape, marker, highlighter, arrow, custom creation의 draft overlay와 currentWorld/moved preview를 소유한다 |
 | `src/canvas/app/pointer/CanvasPointerEraser.ts` | Built-in eraser gesture의 freehand stroke hit-test와 whole-stroke document removal을 소유한다 |
 | `src/canvas/app/pointer/CanvasPointerLaser.ts` | Built-in laser pointer gesture의 document-free transient trail interaction을 소유한다 |
 | `src/canvas/app/pointer/CanvasPointerCommentCreation.ts` | Comment tool click을 Canvas Comment Item 생성과 optional clicked-item attachment로 변환한다 |
@@ -148,7 +148,8 @@
 | `src/canvas/host/attachment/CanvasItemAttachment.ts` | Comment/stamp 같은 collaboration affordance가 선택 item에 붙는 `attachedTo` 판정을 소유한다 |
 | `src/canvas/host/comment/CanvasCommentItem.ts` | Comment item 생성, 저장 shape 검증, attached target 판정, translate helper를 소유한다 |
 | `src/canvas/host/drawing/CanvasDrawingItemStyles.ts` | Built-in Drawing Item의 stroke/opacity 기본값과 style set factory를 소유하고 draft overlay와 item creation이 공유하게 한다 |
-| `src/canvas/host/shape/CanvasShapeItem.ts` | Bounded shape item의 stable shape kind 기본값과 저장 shape 검증을 소유한다 |
+| `src/canvas/host/shape/CanvasShapeItem.ts` | Bounded shape item의 stable shape kind 기본값, tool-to-shape mapping, 저장 shape 검증을 소유한다 |
+| `src/canvas/host/shape/CanvasShapeGeometry.ts` | Bounded shape kind를 SVG primitive geometry로 변환하는 descriptor를 소유해 renderer가 concrete shape kind 분기를 반복하지 않게 한다 |
 | `src/canvas/host/document/CanvasDocumentController.ts` | App workflow가 사용하는 Host Document Controller. zod-crud, JSON Patch, selection snapshot, clipboard 구현을 숨긴다 |
 | `src/canvas/host/document/CanvasDocumentChangePatch.ts` | High-level CanvasItemsChange를 Host-owned JSON Patch factory 호출로 변환하는 change-to-patch grammar를 소유한다 |
 | `src/canvas/host/document/CanvasDocumentPatchTreeDiff.ts` | before/after Demo item tree를 patch factory용 topmost changed entry, changed group entry, removal entry로 변환한다 |
@@ -247,6 +248,7 @@ type CanvasAffordanceConfig = {
 - Demo SVG Item Frame이 lock/selected/pointer/outline wrapper 문법을 소유해서 item type별 shape renderer branch가 공통 interaction frame을 복사하지 않는다.
 - Demo SVG Item Layer Adapter는 tree/frame orchestration을 맡고, marker/highlighter/arrow shape 렌더링은 Demo SVG Drawing Item Renderer가 소유한다.
 - Demo SVG Item Layer Adapter는 rect/text shape와 embedded text foreignObject 문법을 알지 않고 Demo SVG Rect/Text Item Renderer에 위임한다.
+- Demo SVG Rect/Text Item Renderer와 SVG Overlay Renderer는 concrete bounded shape kind를 알지 않고 Host Shape Geometry가 제공하는 SVG primitive geometry만 렌더링한다.
 - Demo SVG Built-in Component Presentation Renderers가 기본 component presentation renderer mapping을 소유하고, Demo SVG Component Presentation Registry Contracts가 외부 renderer registry shape를 검증한다.
 - Demo SVG Component Renderer Execution이 component presentation resolver와 renderer lookup/실행 실패 containment를 소유하고, Demo SVG Component Render Fallback이 기본 component card fallback shape를 소유한다.
 - Demo SVG Custom Item Renderer Registry Contracts가 외부 custom item renderer registry shape를 검증한다.
@@ -268,7 +270,7 @@ type CanvasAffordanceConfig = {
 - Pointer down hook은 DOM pointer routing과 coordinate 변환을 맡고, tool/gesture/config/custom tool 기반 interaction 시작 규칙은 Canvas Pointer Interaction Start가, built-in sticky/component-backed creation은 Canvas Pointer Component Creation이, 시작 결과 적용은 Canvas Pointer Interaction Start Effects가 소유한다.
 - Item pointer down hook은 DOM event routing과 시작 결과 적용을 맡고, selection/edit/duplicate/move 시작 규칙은 Canvas Item Pointer Interaction Start가 소유한다.
 - Pointer drag hook은 DOM pointer routing과 preview 결과 적용을 맡고, pointer-move live preview 계산은 Canvas Pointer Interaction Preview가, 생성/드로잉 draft preview는 Canvas Pointer Creation Preview가, pointer-up/cancel 확정 규칙은 Canvas Pointer Interaction Lifecycle이 소유한다.
-- Sticky note, marker, highlighter, eraser, arrow, ellipse shape, comment, reaction stamp, laser pointer, cursor chat, emote burst, session timer, voting session은 제품별 custom item이 아니라 내부 Affordance다. Sticky note는 별도 entity 없이 Component Library의 `sticky` template을 component item으로 생성하고, sticky body 편집, quick-create, 텍스트 기반 세로 auto-grow는 Host sticky/editable text contract를 재사용한다. Ellipse는 기존 bounded shape item의 `shape` 계약으로 저장해 rect 문서 호환성을 유지한다. Comment body 표시와 편집도 Host comment/editable text contract가 소유한다. Reaction stamp는 선택 객체에 붙어도 선택을 훔치지 않고, 같은 target의 stamp끼리 겹치지 않게 App stamp insertion이 배치한다. Active voting session은 stamp insertion에 quota만 주입하고 vote session 자체는 document item으로 저장하지 않는다. Laser pointer는 document item을 만들지 않고 App pointer interaction과 Engine overlay state로만 유지된다. Cursor chat, emote burst, session timer, voting session은 문서 item을 만들지 않고 App UI transient state로만 유지된다. Drawing Item의 `x/y/w/h`는 외부 입력이 아니라 `points` 또는 `start/end`에서 Host tree/document가 동기화하는 canonical bounds다. Arrow connector endpoint attachment는 Host Drawing Item Geometry가 start/end 단위로 이동시킨다. Drawing Item style 기본값은 Host Drawing Item Style Module이 소유하고 draft overlay와 item creation이 같은 값을 쓴다. Marker/highlighter 렌더링은 connector path와 분리된 freehand smoothing primitive를 쓰고, eraser는 freehand stroke를 whole-stroke document removal로 처리한다.
+- Sticky note, marker, highlighter, eraser, arrow, bounded shapes(rectangle/ellipse/diamond), comment, reaction stamp, laser pointer, cursor chat, emote burst, session timer, voting session은 제품별 custom item이 아니라 내부 Affordance다. Sticky note는 별도 entity 없이 Component Library의 `sticky` template을 component item으로 생성하고, sticky body 편집, quick-create, 텍스트 기반 세로 auto-grow는 Host sticky/editable text contract를 재사용한다. Bounded shapes는 `create-shape` pointer grammar와 기존 bounded shape item의 `shape` 계약으로 저장해 rect 문서 호환성을 유지한다. Comment body 표시와 편집도 Host comment/editable text contract가 소유한다. Reaction stamp는 선택 객체에 붙어도 선택을 훔치지 않고, 같은 target의 stamp끼리 겹치지 않게 App stamp insertion이 배치한다. Active voting session은 stamp insertion에 quota만 주입하고 vote session 자체는 document item으로 저장하지 않는다. Laser pointer는 document item을 만들지 않고 App pointer interaction과 Engine overlay state로만 유지된다. Cursor chat, emote burst, session timer, voting session은 문서 item을 만들지 않고 App UI transient state로만 유지된다. Drawing Item의 `x/y/w/h`는 외부 입력이 아니라 `points` 또는 `start/end`에서 Host tree/document가 동기화하는 canonical bounds다. Arrow connector endpoint attachment는 Host Drawing Item Geometry가 start/end 단위로 이동시킨다. Drawing Item style 기본값은 Host Drawing Item Style Module이 소유하고 draft overlay와 item creation이 같은 값을 쓴다. Marker/highlighter 렌더링은 connector path와 분리된 freehand smoothing primitive를 쓰고, eraser는 freehand stroke를 whole-stroke document removal로 처리한다.
 - Core primitive facade는 resize/handle/scale 규칙을 직접 구현하지 않고 Canvas Bounds Resize에 위임한다.
 - 제품별 item kind는 내부 `CanvasItem` variant를 추가하지 않고 Canvas App Custom Item Module로 묶어 등록한다.
 - Canvas App Custom Item Module의 `id`는 소유한 custom item kind이며, module은 `presentation`, `renderItem`, `validateItem`을 받아 renderer registry와 validator registry를 내부에서 조립한다.

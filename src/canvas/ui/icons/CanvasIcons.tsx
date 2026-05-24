@@ -33,6 +33,14 @@ export function EllipseIcon() {
   )
 }
 
+export function DiamondIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 4.5 19.5 12 12 19.5 4.5 12 12 4.5z" />
+    </svg>
+  )
+}
+
 export function TextIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">

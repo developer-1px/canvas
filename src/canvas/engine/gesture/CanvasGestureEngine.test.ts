@@ -68,7 +68,16 @@ describe('CanvasGestureEngine drawing tools', () => {
         spaceDown: false,
         tool: 'ellipse',
       }),
-    ).toBe('create-ellipse')
+    ).toBe('create-shape')
+
+    expect(
+      getCanvasPointerGesture({
+        config,
+        input: baseInput,
+        spaceDown: false,
+        tool: 'diamond',
+      }),
+    ).toBe('create-shape')
 
     expect(
       getCanvasPointerGesture({
@@ -104,7 +113,7 @@ describe('CanvasGestureEngine drawing tools', () => {
         createArrow: false,
         createComment: false,
         createCustom: false,
-        createEllipse: false,
+        createShape: false,
         createSection: false,
         createSticky: false,
         drawHighlight: false,
@@ -165,6 +174,15 @@ describe('CanvasGestureEngine drawing tools', () => {
         input: baseInput,
         spaceDown: false,
         tool: 'ellipse',
+      }),
+    ).toBe('marquee')
+
+    expect(
+      getCanvasPointerGesture({
+        config: disabled,
+        input: baseInput,
+        spaceDown: false,
+        tool: 'diamond',
       }),
     ).toBe('marquee')
 
@@ -251,6 +269,12 @@ describe('CanvasGestureEngine drawing tools', () => {
       shouldRouteCanvasItemPointerToCanvasGesture({
         spaceDown: false,
         tool: 'ellipse',
+      }),
+    ).toBe(true)
+    expect(
+      shouldRouteCanvasItemPointerToCanvasGesture({
+        spaceDown: false,
+        tool: 'diamond',
       }),
     ).toBe(true)
     expect(

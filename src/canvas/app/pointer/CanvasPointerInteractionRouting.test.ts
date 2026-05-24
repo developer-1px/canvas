@@ -12,9 +12,9 @@ describe('CanvasPointerInteractionRouting', () => {
       .toBe('transform:arrow-endpoint')
     expect(route(createMarqueeInteraction())).toBe('marquee:marquee')
     expect(route(createLaserInteraction())).toBe('laser:laser')
-    expect(route(createRectCreationInteraction())).toBe('creation:create-rect')
-    expect(route(createEllipseCreationInteraction()))
-      .toBe('creation:create-ellipse')
+    expect(route(createShapeCreationInteraction())).toBe(
+      'creation:create-shape',
+    )
     expect(route({ kind: 'none' })).toBe('none:none')
   })
 
@@ -128,23 +128,13 @@ function createLaserInteraction(): Interaction {
   }
 }
 
-function createRectCreationInteraction(): Interaction {
+function createShapeCreationInteraction(): Interaction {
   return {
     currentWorld: { x: 0, y: 0 },
-    kind: 'create-rect',
+    kind: 'create-shape',
     moved: false,
     pointerId: 1,
-    startScreen: { x: 0, y: 0 },
-    startWorld: { x: 0, y: 0 },
-  }
-}
-
-function createEllipseCreationInteraction(): Interaction {
-  return {
-    currentWorld: { x: 0, y: 0 },
-    kind: 'create-ellipse',
-    moved: false,
-    pointerId: 1,
+    shape: 'rect',
     startScreen: { x: 0, y: 0 },
     startWorld: { x: 0, y: 0 },
   }

@@ -77,6 +77,7 @@ export function startCanvasPointerCreation({
     startScreen,
     startWorld,
     targetItemId,
+    tool,
   })
 
   if (shapeStart) {

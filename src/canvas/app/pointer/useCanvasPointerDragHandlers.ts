@@ -14,6 +14,7 @@ import {
   type CanvasAffordanceConfig,
   type CanvasCreationAdapter,
   type CanvasDraftArrowOverlay,
+  type CanvasDraftShapeOverlay,
   type CanvasLaserTrailOverlay,
   type CanvasDraftStrokeOverlay,
   type CanvasSceneAdapter,
@@ -57,7 +58,7 @@ type UseCanvasPointerDragHandlersArgs = {
   scene: CanvasSceneAdapter
   selection: string[]
   setDraftArrow: Dispatch<SetStateAction<CanvasDraftArrowOverlay | null>>
-  setDraftRect: Dispatch<SetStateAction<Bounds | null>>
+  setDraftRect: Dispatch<SetStateAction<CanvasDraftShapeOverlay | null>>
   setDraftStroke: Dispatch<SetStateAction<CanvasDraftStrokeOverlay | null>>
   setLaserTrail: Dispatch<SetStateAction<CanvasLaserTrailOverlay | null>>
   setEditing: Dispatch<SetStateAction<EditingText | null>>

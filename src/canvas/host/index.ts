@@ -112,8 +112,16 @@ export {
 export {
   CANVAS_DEFAULT_SHAPE_KIND,
   getCanvasShapeKind,
+  getCanvasToolShapeKind,
+  isCanvasShapeTool,
   isCanvasShapeKind,
+  type CanvasShapeTool,
 } from './shape/CanvasShapeItem'
+export {
+  getCanvasItemSvgShapeGeometry,
+  getCanvasSvgShapeGeometry,
+  type CanvasSvgShapeGeometry,
+} from './shape/CanvasShapeGeometry'
 
 export {
   createCanvasItemReadModel,

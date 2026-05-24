@@ -2646,7 +2646,7 @@ describe('Canvas module boundaries', () => {
     for (const creationKindCheck of [
       "interaction.kind === 'create-arrow'",
       "interaction.kind === 'create-custom'",
-      "interaction.kind === 'create-rect'",
+      "interaction.kind === 'create-shape'",
       "interaction.kind === 'draw-highlight'",
       "interaction.kind === 'draw-marker'",
     ]) {
@@ -2666,9 +2666,9 @@ describe('Canvas module boundaries', () => {
     }
     for (const shapeKindCheck of [
       "interaction.kind === 'create-arrow'",
-      "interaction.kind === 'create-rect'",
+      "interaction.kind === 'create-shape'",
       "pointerGesture === 'create-arrow'",
-      "pointerGesture === 'create-rect'",
+      "pointerGesture === 'create-shape'",
     ]) {
       expect(creationStartFile.source).not.toContain(shapeKindCheck)
       expect(creationPreviewFile.source).not.toContain(shapeKindCheck)
@@ -5306,7 +5306,7 @@ describe('Canvas module boundaries', () => {
       'CANVAS_TOOL_AFFORDANCE_ORDER',
     )
     expect(toolShortcutCatalogFile.source).toContain(
-      'CANVAS_TOOL_AFFORDANCE_ORDER.map',
+      'CANVAS_TOOL_AFFORDANCE_ORDER.flatMap',
     )
     expect(toolShortcutCatalogFile.source).toContain(
       'keyboardShortcut.shortcutId',

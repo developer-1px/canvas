@@ -10,6 +10,7 @@ import type {
   CanvasCreationAdapter,
   CanvasDistributeMode,
   CanvasDraftArrowOverlay,
+  CanvasDraftShapeOverlay,
   CanvasLaserTrailOverlay,
   CanvasDraftStrokeOverlay,
   CanvasOverlayState,
@@ -318,7 +319,7 @@ export type CanvasAppKeyboardCursorChatContext = {
 export type CanvasAppKeyboardInteractionContext = {
   interactionRef: MutableRefObject<Interaction>
   setDraftArrow: Dispatch<SetStateAction<CanvasDraftArrowOverlay | null>>
-  setDraftRect: Dispatch<SetStateAction<Bounds | null>>
+  setDraftRect: Dispatch<SetStateAction<CanvasDraftShapeOverlay | null>>
   setDraftStroke: Dispatch<SetStateAction<CanvasDraftStrokeOverlay | null>>
   setLaserTrail: Dispatch<SetStateAction<CanvasLaserTrailOverlay | null>>
   setEditing: Dispatch<SetStateAction<EditingText | null>>
@@ -394,7 +395,7 @@ export type CanvasAppTextRuntime<TFindReplace, TTextEditor> = {
 
 export type CanvasInteractionDraftWriters = {
   setDraftArrow: Dispatch<SetStateAction<CanvasDraftArrowOverlay | null>>
-  setDraftRect: Dispatch<SetStateAction<Bounds | null>>
+  setDraftRect: Dispatch<SetStateAction<CanvasDraftShapeOverlay | null>>
   setDraftStroke: Dispatch<SetStateAction<CanvasDraftStrokeOverlay | null>>
 }
 
@@ -531,7 +532,7 @@ export type CanvasAppPointerCommandModel = {
 export type CanvasAppPointerInteractionModel = {
   interactionRef: MutableRefObject<Interaction>
   setDraftArrow: Dispatch<SetStateAction<CanvasDraftArrowOverlay | null>>
-  setDraftRect: Dispatch<SetStateAction<Bounds | null>>
+  setDraftRect: Dispatch<SetStateAction<CanvasDraftShapeOverlay | null>>
   setDraftStroke: Dispatch<SetStateAction<CanvasDraftStrokeOverlay | null>>
   setLaserTrail: Dispatch<SetStateAction<CanvasLaserTrailOverlay | null>>
   setGesture: Dispatch<SetStateAction<Interaction['kind']>>

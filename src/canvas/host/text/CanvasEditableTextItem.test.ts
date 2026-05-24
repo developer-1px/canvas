@@ -89,6 +89,10 @@ describe('CanvasEditableTextItem', () => {
       ...rectItem,
       shape: 'ellipse',
     })).toBe(true)
+    expect(isCanvasEditableTextItemStorageShape({
+      ...rectItem,
+      shape: 'diamond',
+    })).toBe(true)
     expect(isCanvasEditableTextItemStorageShape(textItem)).toBe(true)
     expect(isCanvasEditableTextItemStorageShape({
       ...rectItem,

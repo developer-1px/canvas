@@ -109,6 +109,31 @@ describe('CanvasSvgOverlayRenderer', () => {
     expect(markup).toContain('cx="70"')
     expect(markup).toContain('ry="30"')
   })
+
+  it('renders diamond draft shapes through the shared draft overlay', () => {
+    const markup = renderToStaticMarkup(
+      <svg>
+        <CanvasSvgInteractionOverlays
+          overlays={{
+            ...createOverlayState(),
+            draftRect: {
+              h: 60,
+              shape: 'diamond',
+              w: 100,
+              x: 20,
+              y: 30,
+            },
+          }}
+          viewport={{ scale: 1, x: 0, y: 0 }}
+          onResizePointerDown={vi.fn()}
+        />
+      </svg>,
+    )
+
+    expect(markup).toContain('<path')
+    expect(markup).toContain('class="draft-rect"')
+    expect(markup).toContain('M 70 30 L 120 60 L 70 90 L 20 60 Z')
+  })
 })
 
 function createOverlayState(): CanvasOverlayState {

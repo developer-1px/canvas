@@ -22,6 +22,7 @@
 
 .canvas-stage[data-mode='rect'],
 .canvas-stage[data-mode='ellipse'],
+.canvas-stage[data-mode='diamond'],
 .canvas-stage[data-mode='sticky'],
 .canvas-stage[data-mode='section'],
 .canvas-stage[data-mode='text'],

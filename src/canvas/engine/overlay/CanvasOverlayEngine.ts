@@ -5,6 +5,7 @@ import type {
   ResizeHandle,
   Viewport
 } from '../../core'
+import type { CanvasShapeKind } from '../../entities'
 import {
   handlePoint,
   RESIZE_HANDLES,
@@ -25,7 +26,7 @@ export type CanvasDraftArrowOverlay = {
 }
 
 export type CanvasDraftShapeOverlay = Bounds & {
-  shape?: 'ellipse' | 'rect'
+  shape?: CanvasShapeKind
 }
 
 export type CanvasDraftStrokeOverlay = {

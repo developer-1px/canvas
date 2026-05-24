@@ -20,6 +20,7 @@ import {
   type CanvasPointerGesture,
   type CanvasSnapGuides,
 } from '../../engine'
+import { getCanvasToolShapeKind } from '../../host'
 import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import type { Interaction } from './CanvasInteractionState'
@@ -45,6 +46,7 @@ type CanvasPointerShapeCreationDraft = Readonly<{
 type CanvasPointerShapeCreationDescriptor = Readonly<{
   createDraft: (input: {
     currentWorld: Point
+    interaction: CanvasPointerShapeCreationInteraction
     startWorld: Point
   }) => CanvasPointerShapeCreationDraft
   createItem: <TItem extends CanvasCreationItem>(input: {
@@ -90,11 +92,13 @@ const CANVAS_POINTER_SHAPE_CREATION_DESCRIPTORS = Object.freeze({
       config.gestures.createArrow,
     selectAfterCommit: false,
   }),
-  'create-ellipse': Object.freeze({
-    createDraft: ({ currentWorld, startWorld }) => ({
+  'create-shape': Object.freeze({
+    createDraft: ({ currentWorld, interaction, startWorld }) => ({
       draftRect: {
         ...normalizeBounds(startWorld, currentWorld),
-        shape: 'ellipse',
+        shape: interaction.kind === 'create-shape'
+          ? interaction.shape
+          : undefined,
       },
     }),
     createItem: <TItem extends CanvasCreationItem>({
@@ -110,34 +114,13 @@ const CANVAS_POINTER_SHAPE_CREATION_DESCRIPTORS = Object.freeze({
         adapter,
         createId,
         currentWorld: interaction.currentWorld,
-        shape: 'ellipse',
+        shape: interaction.kind === 'create-shape'
+          ? interaction.shape
+          : undefined,
         startWorld: interaction.startWorld,
       }),
     isEnabled: (config: CanvasAffordanceConfig) =>
-      config.gestures.createEllipse,
-    selectAfterCommit: true,
-  }),
-  'create-rect': Object.freeze({
-    createDraft: ({ currentWorld, startWorld }) => ({
-      draftRect: normalizeBounds(startWorld, currentWorld),
-    }),
-    createItem: <TItem extends CanvasCreationItem>({
-      adapter,
-      createId,
-      interaction,
-    }: {
-      adapter: CanvasCreationAdapter<TItem>
-      createId: (prefix: string) => string
-      interaction: CanvasPointerShapeCreationInteraction
-    }) =>
-      createCanvasRect({
-        adapter,
-        createId,
-        currentWorld: interaction.currentWorld,
-        startWorld: interaction.startWorld,
-      }),
-    isEnabled: (config: CanvasAffordanceConfig) =>
-      config.gestures.createRect,
+      config.gestures.createShape,
     selectAfterCommit: true,
   }),
 } satisfies Readonly<
@@ -180,6 +163,7 @@ export function startCanvasPointerShapeCreation({
   startScreen,
   startWorld,
   targetItemId,
+  tool,
 }: {
   config: CanvasAffordanceConfig
   input: CanvasAppPointerInput
@@ -187,6 +171,7 @@ export function startCanvasPointerShapeCreation({
   startScreen: Point
   startWorld: Point
   targetItemId?: string
+  tool: Tool
 }): CanvasPointerShapeCreationStartResult | null {
   if (!isCanvasPointerShapeCreationGesture(pointerGesture)) {
     return null
@@ -197,21 +182,40 @@ export function startCanvasPointerShapeCreation({
     config,
     point: startWorld,
   })
-  const interaction = {
-    currentWorld: snappedStartWorld,
-    kind: pointerGesture,
-    moved: false,
-    pointerId: input.pointerId,
-    startAttachedTo: pointerGesture === 'create-arrow'
-      ? targetItemId
-      : undefined,
-    startScreen,
-    startWorld: snappedStartWorld,
-  } satisfies CanvasPointerShapeCreationInteraction
+  let interaction: CanvasPointerShapeCreationInteraction
+
+  if (pointerGesture === 'create-arrow') {
+    interaction = {
+      currentWorld: snappedStartWorld,
+      kind: 'create-arrow',
+      moved: false,
+      pointerId: input.pointerId,
+      startAttachedTo: targetItemId,
+      startScreen,
+      startWorld: snappedStartWorld,
+    }
+  } else {
+    const shape = getCanvasToolShapeKind(tool)
+
+    if (!shape) {
+      return null
+    }
+
+    interaction = {
+      currentWorld: snappedStartWorld,
+      kind: 'create-shape',
+      moved: false,
+      pointerId: input.pointerId,
+      shape,
+      startScreen,
+      startWorld: snappedStartWorld,
+    }
+  }
 
   return {
     ...descriptor.createDraft({
       currentWorld: snappedStartWorld,
+      interaction,
       startWorld: snappedStartWorld,
     }),
     capturePointer: true,
@@ -266,6 +270,7 @@ export function previewCanvasPointerShapeCreation({
   return {
     ...descriptor.createDraft({
       currentWorld: nextInteraction.currentWorld,
+      interaction: nextInteraction,
       startWorld: nextInteraction.startWorld,
     }),
     interaction: nextInteraction,

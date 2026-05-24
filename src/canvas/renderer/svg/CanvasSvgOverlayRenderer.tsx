@@ -1,5 +1,9 @@
 import type { PointerEvent } from 'react'
 import type { CanvasOverlayState } from '../../engine'
+import {
+  getCanvasSvgShapeGeometry,
+  type CanvasSvgShapeGeometry,
+} from '../../host'
 import type {
   Bounds,
   ResizeHandle,
@@ -77,27 +81,9 @@ export function CanvasSvgInteractionOverlays({
 }: CanvasSvgInteractionOverlaysProps) {
   return (
     <>
-      {overlays.draftRect ? (
-        overlays.draftRect.shape === 'ellipse' ? (
-          <ellipse
-            className="draft-rect"
-            cx={overlays.draftRect.x + overlays.draftRect.w / 2}
-            cy={overlays.draftRect.y + overlays.draftRect.h / 2}
-            rx={overlays.draftRect.w / 2}
-            ry={overlays.draftRect.h / 2}
-            vectorEffect="non-scaling-stroke"
-          />
-        ) : (
-          <rect
-            className="draft-rect"
-            x={overlays.draftRect.x}
-            y={overlays.draftRect.y}
-            width={overlays.draftRect.w}
-            height={overlays.draftRect.h}
-            vectorEffect="non-scaling-stroke"
-          />
-        )
-      ) : null}
+      {overlays.draftRect
+        ? renderCanvasSvgDraftShapeOverlay(overlays.draftRect)
+        : null}
 
       {overlays.draftArrow ? (
         <path
@@ -285,6 +271,55 @@ function CanvasSvgEmoteBurst({
         </text>
       ))}
     </g>
+  )
+}
+
+function renderCanvasSvgDraftShapeOverlay(
+  draftRect: NonNullable<CanvasOverlayState['draftRect']>,
+) {
+  const geometry = getCanvasSvgShapeGeometry({
+    bounds: draftRect,
+    shape: draftRect.shape ?? 'rect',
+  })
+
+  return renderCanvasSvgDraftShapeGeometry(geometry)
+}
+
+function renderCanvasSvgDraftShapeGeometry(
+  geometry: CanvasSvgShapeGeometry,
+) {
+  if (geometry.kind === 'ellipse') {
+    return (
+      <ellipse
+        className="draft-rect"
+        cx={geometry.cx}
+        cy={geometry.cy}
+        rx={geometry.rx}
+        ry={geometry.ry}
+        vectorEffect="non-scaling-stroke"
+      />
+    )
+  }
+
+  if (geometry.kind === 'path') {
+    return (
+      <path
+        className="draft-rect"
+        d={geometry.d}
+        vectorEffect="non-scaling-stroke"
+      />
+    )
+  }
+
+  return (
+    <rect
+      className="draft-rect"
+      x={geometry.x}
+      y={geometry.y}
+      width={geometry.width}
+      height={geometry.height}
+      vectorEffect="non-scaling-stroke"
+    />
   )
 }
 
