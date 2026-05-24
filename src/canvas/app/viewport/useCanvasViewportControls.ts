@@ -4,8 +4,8 @@ import {
   type SetStateAction,
 } from 'react'
 import type { Viewport } from '../../entities'
-import type { CanvasItemReadModel } from '../../host'
 import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
+import type { CanvasAppItemReadModel } from '../workflow/CanvasAppItemReadModelContracts'
 import {
   fitCanvasViewportToItems,
   resetCanvasViewport,
@@ -13,7 +13,7 @@ import {
 } from './CanvasViewportControlExecution'
 
 type UseCanvasViewportControlsArgs = {
-  itemReadModel: CanvasItemReadModel
+  itemReadModel: CanvasAppItemReadModel
   setViewport: Dispatch<SetStateAction<Viewport>>
   stageElement: CanvasAppStageElement
 }

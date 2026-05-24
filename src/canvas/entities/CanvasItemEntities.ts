@@ -23,6 +23,16 @@ export type TextItem = CanvasItemBase & {
 
 export type CanvasEditableTextItem = RectItem | TextItem
 
+export type CanvasImageItem = CanvasItemBase & {
+  type: 'image'
+  alt?: string
+  mimeType: string
+  name?: string
+  naturalHeight?: number
+  naturalWidth?: number
+  src: string
+}
+
 export type CanvasDrawingItemBase = CanvasItemBase & {
   opacity: number
   points: Point[]
@@ -86,6 +96,7 @@ export type CanvasCustomItem = CanvasItemBase & {
 export type CanvasItem =
   | RectItem
   | TextItem
+  | CanvasImageItem
   | MarkerItem
   | HighlightItem
   | ArrowItem

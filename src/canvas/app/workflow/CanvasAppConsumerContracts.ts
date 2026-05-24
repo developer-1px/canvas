@@ -30,12 +30,10 @@ import type {
   Viewport,
 } from '../../entities'
 import type {
-  CanvasItemReadModel,
-} from '../../host'
-import type {
   CanvasAppComponentLibrary,
   CanvasAppComponentTemplate,
 } from './CanvasAppComponentAssemblyContracts'
+import type { CanvasAppItemReadModel } from './CanvasAppItemReadModelContracts'
 import type { CanvasAppCustomCommand } from '../commands/CanvasAppCustomCommands'
 import type {
   CanvasAppCustomCommandState,
@@ -237,9 +235,19 @@ export type CanvasAppInspectorModelInput = {
   commitItemsChange: CommitCanvasItemsChange
   config: CanvasAffordanceConfig
   inspectorPanels: readonly CanvasAppInspectorPanel[]
-  itemReadModel: CanvasItemReadModel
+  itemReadModel: CanvasAppItemReadModel
   selected: Set<string>
   selection: string[]
+}
+
+export type CanvasAppImageModelInput = {
+  commitItemsChange: CommitCanvasItemsChange
+  config: CanvasAffordanceConfig
+  createId: (prefix: string) => string
+  itemReadModel: CanvasAppItemReadModel
+  selection: string[]
+  stageElement: CanvasAppStageElement
+  viewport: Viewport
 }
 
 export type CanvasAppKeyboardCommandContext = {
@@ -280,7 +288,7 @@ export type CanvasAppKeyboardViewportContext = {
 
 export type CanvasAppViewportModelInput = {
   config: CanvasAffordanceConfig
-  itemReadModel: CanvasItemReadModel
+  itemReadModel: CanvasAppItemReadModel
   setViewport: Dispatch<SetStateAction<Viewport>>
   stageElement: CanvasAppStageElement
 }
@@ -321,7 +329,7 @@ export type CanvasAppTextDocumentModel = {
 export type CanvasAppTextModelInput = {
   config: CanvasAffordanceConfig
   document: CanvasAppTextDocumentModel
-  itemReadModel: CanvasItemReadModel
+  itemReadModel: CanvasAppItemReadModel
   selection: string[]
   viewport: Viewport
 }
@@ -472,7 +480,7 @@ export type CanvasAppPointerItemAdapters = {
 }
 
 export type CanvasAppPointerWorkspaceModel = {
-  itemReadModel: CanvasItemReadModel
+  itemReadModel: CanvasAppItemReadModel
   items: CanvasItem[]
   scene: CanvasSceneAdapter
   selectedBounds: Bounds | null
@@ -539,6 +547,7 @@ export type CanvasAppStageElementStageContext = {
 export type CanvasAppStageElementConsumerModel = {
   command: CanvasAppStageElementControllerContext
   component: CanvasAppStageElementControllerContext
+  image: CanvasAppStageElementControllerContext
   pointer: CanvasAppStageElementControllerContext
   stage: CanvasAppStageElementStageContext
   viewport: CanvasAppStageElementControllerContext

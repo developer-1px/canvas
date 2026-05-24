@@ -521,6 +521,7 @@ describe('Canvas module boundaries', () => {
     for (const affordanceModelContract of [
       'CanvasAppAffordanceCommandModel',
       'CanvasAppAffordanceControlModel',
+      'CanvasAppAffordanceImageModel',
       'CanvasAppAffordanceInteractionModel',
       'CanvasAppAffordanceInspectorModel',
       'CanvasAppAffordanceKeyboardModel',
@@ -535,6 +536,7 @@ describe('Canvas module boundaries', () => {
     for (const consumerContext of [
       'command: {',
       'control: {',
+      'image: {',
       'interaction: {',
       'inspector: {',
       'keyboard: {',
@@ -1003,6 +1005,7 @@ describe('Canvas module boundaries', () => {
     for (const consumerContext of [
       'command: {',
       'component: {',
+      'image: {',
       'pointer: {',
       'stage: {',
       'viewport: {',
@@ -5909,6 +5912,40 @@ describe('Canvas module boundaries', () => {
     expect(readModelFile.source).not.toContain('ReturnType<')
   })
 
+  it('keeps App item read model consumers behind an App-owned contract', () => {
+    const appReadModelContractsFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppItemReadModelContracts.ts',
+    )
+    const appConsumerContractsFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppConsumerContracts.ts',
+    )
+    const workspaceConsumerContractsFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasWorkspaceConsumerContracts.ts',
+    )
+
+    expect(appReadModelContractsFile.source).toContain(
+      'export type CanvasAppItemReadModel',
+    )
+    expect(appReadModelContractsFile.source).toContain(
+      "from '../../entities'",
+    )
+    expect(appReadModelContractsFile.source).not.toContain(
+      "from '../../host'",
+    )
+    expect(appConsumerContractsFile.source).toContain(
+      'CanvasAppItemReadModel',
+    )
+    expect(workspaceConsumerContractsFile.source).toContain(
+      'CanvasAppItemReadModel',
+    )
+    expect(appConsumerContractsFile.source).not.toContain(
+      'CanvasItemReadModel',
+    )
+    expect(workspaceConsumerContractsFile.source).not.toContain(
+      'CanvasItemReadModel',
+    )
+  })
+
   it('keeps app workspace document fields behind consumer contexts', () => {
     const appModelFile = getSourceFile(
       'src/canvas/app/workflow/useCanvasAppModel.ts',
@@ -5996,6 +6033,7 @@ describe('Canvas module boundaries', () => {
       'component: {',
       'control: {',
       'extension: {',
+      'image: {',
       'inspector: {',
       'interaction: {',
       'itemLayer: {',
@@ -6012,6 +6050,7 @@ describe('Canvas module boundaries', () => {
       'component: {',
       'control: {',
       'extension: {',
+      'image: {',
       'inspector: {',
       'interaction: {',
       'itemLayer: {',

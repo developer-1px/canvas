@@ -11,8 +11,8 @@ import type {
 import type {
   CanvasDocumentClipboard,
   CanvasDocumentTextSearch,
-  CanvasItemReadModel,
 } from '../../host'
+import type { CanvasAppItemReadModel } from './CanvasAppItemReadModelContracts'
 import type {
   CommitCanvasItemsChange,
   CommitCanvasSelection,
@@ -39,7 +39,7 @@ export type CanvasWorkspaceDocumentModel = {
 export type CanvasWorkspaceConsumerModelInput = {
   createId: (prefix: string) => string
   document: CanvasWorkspaceDocumentModel
-  itemReadModel: CanvasItemReadModel
+  itemReadModel: CanvasAppItemReadModel
   scene: CanvasSceneAdapter
   selected: Set<string>
   selectedBounds: Bounds | null
@@ -93,10 +93,17 @@ export type CanvasWorkspaceExtensionContext =
 
 export type CanvasWorkspaceInspectorContext = {
   commitItemsChange: CommitCanvasItemsChange
-  itemReadModel: CanvasItemReadModel
+  itemReadModel: CanvasAppItemReadModel
   selected: Set<string>
   selection: string[]
 }
+
+export type CanvasWorkspaceImageContext =
+  CanvasWorkspaceSelectionContext & {
+    commitItemsChange: CommitCanvasItemsChange
+    createId: (prefix: string) => string
+    itemReadModel: CanvasAppItemReadModel
+  }
 
 export type CanvasWorkspaceInteractionContext =
   CanvasWorkspaceSelectionContext & {
@@ -122,7 +129,7 @@ export type CanvasWorkspacePointerContext = {
   }
   createId: (prefix: string) => string
   workspace: CanvasWorkspaceSelectionContext & {
-    itemReadModel: CanvasItemReadModel
+    itemReadModel: CanvasAppItemReadModel
     items: CanvasItem[]
     scene: CanvasSceneAdapter
     selectedBounds: Bounds | null
@@ -143,11 +150,11 @@ export type CanvasWorkspaceTextContext =
       findDocumentText: CanvasDocumentTextSearch['findDocumentText']
       replaceDocumentText: CanvasDocumentTextSearch['replaceDocumentText']
     }
-    itemReadModel: CanvasItemReadModel
+    itemReadModel: CanvasAppItemReadModel
   }
 
 export type CanvasWorkspaceViewportContext = {
-  itemReadModel: CanvasItemReadModel
+  itemReadModel: CanvasAppItemReadModel
   setViewport: Dispatch<SetStateAction<Viewport>>
 }
 
@@ -160,6 +167,7 @@ export type CanvasWorkspaceConsumerModel = {
   component: CanvasWorkspaceComponentContext
   control: CanvasWorkspaceControlContext
   extension: CanvasWorkspaceExtensionContext
+  image: CanvasWorkspaceImageContext
   inspector: CanvasWorkspaceInspectorContext
   interaction: CanvasWorkspaceInteractionContext
   itemLayer: CanvasWorkspaceItemLayerContext

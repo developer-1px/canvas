@@ -190,6 +190,10 @@
   pointer-events: all;
 }
 
+.image-item {
+  pointer-events: none;
+}
+
 .canvas-text {
   box-sizing: border-box;
   width: 100%;
@@ -282,6 +286,7 @@
 .toolbar,
 .component-palette,
 .find-replace-panel,
+.image-controls,
 .zoom-controls,
 .object-inspector,
 .canvas-status {
@@ -316,6 +321,16 @@
   left: 50%;
   align-items: center;
   transform: translateX(-50%);
+}
+
+.image-controls {
+  top: 62px;
+  left: 14px;
+  align-items: center;
+}
+
+.image-file-input {
+  display: none;
 }
 
 .zoom-controls {
@@ -401,6 +416,7 @@
 .tool-button,
 .component-button,
 .zoom-value,
+.image-controls button,
 .find-replace-panel button {
   display: inline-grid;
   place-items: center;
@@ -482,6 +498,7 @@
 .tool-button:hover,
 .component-button:hover,
 .zoom-value:hover,
+.image-controls button:hover,
 .find-replace-panel button:hover,
 .tool-button[data-active='true'] {
   background: #e5edff;
@@ -489,12 +506,14 @@
 }
 
 .tool-button:disabled,
+.image-controls button:disabled,
 .find-replace-panel button:disabled {
   color: #9ca3af;
   cursor: not-allowed;
 }
 
 .tool-button:disabled:hover,
+.image-controls button:disabled:hover,
 .find-replace-panel button:disabled:hover {
   background: transparent;
   color: #9ca3af;
@@ -509,6 +528,7 @@
 .tool-button:focus-visible,
 .component-button:focus-visible,
 .zoom-value:focus-visible,
+.image-controls button:focus-visible,
 .find-replace-panel input:focus-visible,
 .find-replace-panel button:focus-visible,
 .inspector-field input:focus-visible,

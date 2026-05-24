@@ -6,15 +6,15 @@ import type {
   Tool,
 } from '../../entities'
 import {
-  getCanvasEditableTextValue,
-  type CanvasItemReadModel,
-} from '../../host'
-import {
   getCanvasItemPointerIntent,
   getCanvasItemPointerSelection,
   type CanvasAffordanceConfig,
   type CanvasSceneAdapter,
 } from '../../engine'
+import {
+  getCanvasEditableTextValue,
+} from '../../host'
+import type { CanvasAppItemReadModel } from '../workflow/CanvasAppItemReadModelContracts'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import type { Interaction } from './CanvasInteractionState'
 
@@ -43,7 +43,7 @@ export type CanvasItemPointerInteractionStartInput = {
   input: CanvasAppPointerInput
   isDoubleClick: boolean
   itemId: string
-  itemReadModel: CanvasItemReadModel
+  itemReadModel: CanvasAppItemReadModel
   items: CanvasItem[]
   scene: CanvasSceneAdapter
   selection: string[]

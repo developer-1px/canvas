@@ -18,6 +18,7 @@ export type {
   CanvasCustomItem,
   CanvasDrawingItemBase,
   CanvasEditableTextItem,
+  CanvasImageItem,
   CanvasItem,
   CanvasItemBase,
   CanvasJsonObject,

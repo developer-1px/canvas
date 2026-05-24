@@ -28,6 +28,7 @@
 - Canvas Component Presentation: Demo component kind를 Renderer Adapter의 그리기 전략과 연결하는 key. 새 component kind는 기존 presentation을 재사용할 수 있다.
 - Canvas Component Item Validation: component item의 stable component id, title/style string, optional text list 저장 shape 검증을 소유하는 Host-owned validation Module.
 - Canvas Editable Text Item: `RectItem | TextItem` stable entity type은 Entities Contract가 소유하고, rect/text item이 공유하는 editable target 판정, 저장 shape, edit initial value, commit fallback, patch operation은 Host-owned text Module이 소유한다.
+- Canvas Image Item: 업로드/붙여넣기/다운로드 대상이 되는 persisted image item type은 Entities Contract가 소유하고, data URL, mime type, natural size, positive bounds 저장 shape 검증은 Host-owned image Module이 소유한다.
 - Canvas App Assembly: 내부 캔버스 문법은 유지하면서 affordance feature toggle, Host item adapter, component library, custom item module, initial items, SVG presentation registry 같은 제품별 의미를 외부에서 조립하는 composition Module.
 - Canvas App Assembly Input Types: affordance, component, adapter, workspace child assembly input field 계약을 runtime 조립 구현과 분리해 소유하고 Canvas App Assembly Input에 합성되는 App-owned type 계약.
 - Canvas App Assembly Types: public assembly input/output type 계약만 소유하고 runtime assembly/default/snapshot/contract Module은 이 type Module을 참조한다.
@@ -51,6 +52,7 @@
 - Canvas App Stage Element Model: App Model이 Stage Element Adapter 생성 세부를 직접 알지 않도록 숨기는 workflow Module.
 - Canvas App Stage Element Consumer Model: Stage Element Adapter를 command, component, pointer, viewport, stage render consumer별 context로 변환하는 workflow Module.
 - Canvas App Consumer Contracts: command, component, control, extension, inspector, interaction, keyboard, pointer, stage, stage element, text, viewport 같은 workflow runtime fan-out의 입력, command/extension/pointer/text/viewport runtime callback, consumer별 출력 Interface를 한곳에 모아 구현 mapping과 분리하고, 외부 등록 descriptor와 내부 runtime state의 노출 범위를 고정하는 App-owned type 계약.
+- Canvas App Item Read Model Contracts: App workflow/inspector/viewport/text/pointer가 요구하는 item read slot을 Host Canvas Item Read Model concrete 타입 없이 명시하는 App-owned Interface 계약. Host Canvas Item Read Model은 이 Interface를 만족하는 Adapter다.
 - Canvas App Item Layer Adapter: App workflow가 concrete Demo SVG item layer를 직접 알지 않고 items를 stage children으로 렌더링하도록 주입받는 Adapter. Interface는 Canvas App Rendering Contracts가 소유하고 default Demo SVG 구현은 별도 파일에 둔다.
 - Canvas App Extension Id: custom command, creation tool, item module, component presentation renderer key, custom item renderer key, validator key, inspector panel에서 공유하는 안정 lower-kebab 외부 계약.
 - Canvas App Extension Registry: assembly 단계에서 extension entry와 record key를 검증하고 중복을 실패시키는 내부 merge 계약.
@@ -75,6 +77,9 @@
 - Canvas Clipboard Command Effect Plan: clipboard command별 effect planner table과 copy, cut, paste, duplicate, clone Engine/Adapter 호출 및 paste offset 계산을 clipboard effect plan으로 변환하는 App-owned runtime Module.
 - Canvas Clipboard Command Result Effects: clipboard Engine/Adapter result shape를 clone result/add item/copy/cut effect descriptor로 변환하는 App-owned mapping Module.
 - Canvas Clipboard Command Effects: clipboard command effect applier table과 Host clipboard, document commit/selection/editing update, 실행 결과 반영을 소유하는 App-owned runtime Module.
+- Canvas Image Import: file upload, pasted image file, Clipboard API image blob을 Canvas Image Item 생성 source로 정규화하고 viewport 중심 삽입 크기를 정하는 App-owned image Module.
+- Canvas Image Export: selection read model과 image export SVG/PNG 변환, selected item composition download/copy 실행을 소유하는 App-owned image Module.
+- Canvas Image Controls: 업로드, paste image, copy selected as image, download selected as image 버튼만 노출하고 browser file/clipboard/download how는 App image Module에 숨기는 UI surface.
 - Canvas App Custom Command: 내부 command grammar를 수정하지 않고 제품별 business action을 toolbar action으로 등록하는 App-owned command descriptor.
 - Canvas App Custom Command Contracts: custom command descriptor shape와 id registry contract를 검증하는 App-owned contract Module.
 - Canvas App Custom Command Execution: custom command toolbar state, availability, run 호출과 실패 containment를 소유하는 App-owned execution Module.
@@ -243,6 +248,7 @@
 - 기본 드로잉 item의 geometry bounds, translate/scale, bounds cache sync 규칙은 Host Drawing Item Geometry Module이 소유하고 tree bounds, clone, transform, SVG drawing type guard가 재사용한다.
 - 기본 드로잉 item의 style 기본값은 Host Drawing Item Style Module이 소유하고 draft overlay와 item creation이 재사용한다.
 - Rect/text의 stable editable text item type은 Entities Contract가 소유하고, editable text 판정, 저장 shape 검증, initial edit value, empty text fallback, rect text add-patch 여부는 Host Canvas Editable Text Item Module이 소유한다.
+- Image의 stable item type은 Entities Contract가 소유하고, image data URL/mime/natural size/bounds 저장 shape 검증은 Host Canvas Image Item Module이 소유한다.
 - Group item 판정과 recursive children 저장 shape는 Host Canvas Group Item Module이 소유하고 Host tree/document/operation Module은 named predicate를 호출한다.
 - 엔진은 Fabric.js 같은 완성형 객체 모델을 감싸기보다, 커스텀 가능한 Affordance 문법을 작은 Interface로 제공한다.
 - Demo `CanvasItem`과 SVG 렌더링 방식은 재사용 Core Contract에 포함하지 않는다.
@@ -384,6 +390,7 @@
 - Canvas Interaction Model은 state storage와 overlay creation을 맡고, consumer별 interaction fan-out과 temporary pan active mode precedence는 Canvas Interaction Consumer Model이 소유한다.
 - App Shell은 workspace 저장, document history, read model 생성 방식을 직접 알지 않는다.
 - App workflow hook들은 Canvas Item Read Model, document action, viewport setter를 직접 생성하지 않고 Canvas Workspace Model의 consumer별 workspace context로 주입받는다. Workspace state/persistence wiring은 Canvas Workspace Model이, consumer별 context fan-out은 Canvas Workspace Consumer Model이 소유한다.
+- App consumer contracts는 Host Canvas Item Read Model concrete 타입을 직접 노출하지 않고 Canvas App Item Read Model Contracts를 소비한다.
 - Canvas Workspace Model hook은 React state/persistence wiring을 맡고, stored/default initial state, id generator seed, selected/read model/selected bounds derivation은 Canvas Workspace Runtime Model이 소유한다.
 - Canvas Document hook은 controller 생성, React state/ref bridge, subscription binding을 맡고, document mutation result interpretation은 Canvas Document Runtime이 소유한다.
 - Canvas Document Runtime은 workflow callback 또는 Host Controller method signature에서 args/result shape를 역산하지 않고 Canvas Document Runtime Contracts를 소비하며, runtime Module은 contract type을 재노출하지 않는다.
@@ -395,6 +402,7 @@
 - Built-in command의 availability condition table은 Canvas Command Availability Rules가 소유하고, Engine command availability facade와 selection-gated Engine command action guard는 같은 rule table에 위임한다.
 - Clipboard command hook은 paste index ref/current read, execution context, runner memoization을 맡고, clone/duplicate/copy/paste/cut callback grammar와 supplied paste index descriptor injection은 Canvas Clipboard Command Handlers가 소유한다. Canvas Clipboard Command Execution은 plan 생성과 effect 적용만 조립한다. Clone/duplicate/paste/cut command 호출과 paste offset 계산은 Canvas Clipboard Command Effect Plan이, clipboard result-to-effect descriptor mapping은 Canvas Clipboard Command Result Effects가, Host clipboard/document/editing effect routing은 Canvas Clipboard Command Effects가 소유한다.
 - Clipboard command의 what union은 Canvas Clipboard Command Contracts가, clipboard effect/result/context what은 Canvas Clipboard Command Effect Contracts가 소유하고, Effect Plan/Execution/Handlers/Effects는 그 계약을 소비해 각자의 how만 구현한다.
+- 이미지 업로드, Clipboard API paste image, selected composition copy/download는 App Model이나 UI가 직접 FileReader, ClipboardItem, SVG serialization, canvas `toBlob`, anchor download how를 알지 않고 Canvas Image Import/Export/Controls Module 뒤에서 처리한다.
 - UI controls는 Demo Host를 직접 import하지 않는다.
 - Canvas Toolbar는 item render entry 호출만 맡고, group composition은 Canvas Toolbar Items가, built-in/custom tool group grammar는 Canvas Toolbar Tool Items가, built-in command group descriptor 목록은 Canvas Toolbar Command Catalog가, command group feature toggle과 Canvas Command Availability 소비는 Canvas Toolbar Command Items가, item kind별 button render dispatch는 Canvas Toolbar Item Render Dispatch가, command action runner table과 handler routing은 Canvas Toolbar Command Dispatch가 소유한다.
 - Toolbar command handler bundle의 what 계약은 Canvas Toolbar Command Contracts가 소유하고, Dispatch와 Item Renderer는 그 계약을 소비한다.

@@ -16,6 +16,7 @@ describe('CanvasAppAffordanceModel', () => {
 
     expect(model.command.config).toBe(config)
     expect(model.control.config).toBe(config)
+    expect(model.image.config).toBe(config)
     expect(model.interaction.config).toBe(config)
     expect(model.inspector.config).toBe(config)
     expect(model.keyboard.config).toBe(config)
@@ -28,6 +29,7 @@ describe('CanvasAppAffordanceModel', () => {
     const model = getCanvasAppAffordanceModel()
 
     expect(model.command.config).toBe(DEFAULT_CANVAS_AFFORDANCE_CONFIG)
+    expect(model.image.config).toBe(DEFAULT_CANVAS_AFFORDANCE_CONFIG)
     expect(model.pointer.config).toBe(DEFAULT_CANVAS_AFFORDANCE_CONFIG)
     expect(model.viewport.config).toBe(DEFAULT_CANVAS_AFFORDANCE_CONFIG)
   })

@@ -16,6 +16,9 @@ export type CanvasAppAffordanceInteractionModel =
 export type CanvasAppAffordanceInspectorModel =
   CanvasAppAffordanceConfigContext
 
+export type CanvasAppAffordanceImageModel =
+  CanvasAppAffordanceConfigContext
+
 export type CanvasAppAffordanceKeyboardModel =
   CanvasAppAffordanceConfigContext
 
@@ -31,6 +34,7 @@ export type CanvasAppAffordanceViewportModel =
 export type CanvasAppAffordanceModel = {
   command: CanvasAppAffordanceCommandModel
   control: CanvasAppAffordanceControlModel
+  image: CanvasAppAffordanceImageModel
   interaction: CanvasAppAffordanceInteractionModel
   inspector: CanvasAppAffordanceInspectorModel
   keyboard: CanvasAppAffordanceKeyboardModel

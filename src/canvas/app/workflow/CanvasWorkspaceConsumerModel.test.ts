@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import type { CanvasSceneAdapter } from '../../engine'
 import type { CanvasItem } from '../../entities'
-import type { CanvasItemReadModel } from '../../host'
+import type { CanvasAppItemReadModel } from './CanvasAppItemReadModelContracts'
 import { getCanvasWorkspaceConsumerModel } from './CanvasWorkspaceConsumerModel'
 
 describe('CanvasWorkspaceConsumerModel', () => {
@@ -37,6 +37,13 @@ describe('CanvasWorkspaceConsumerModel', () => {
     expect(model.keyboard.command.commitSelection).toBe(
       input.document.commitSelection,
     )
+    expect(model.image).toMatchObject({
+      commitItemsChange: input.document.commitItemsChange,
+      createId: input.createId,
+      itemReadModel: input.itemReadModel,
+      selection: input.document.selection,
+      viewport: input.viewport,
+    })
   })
 
   it('keeps read model and live editing fields on the consumers that need them', () => {
@@ -103,7 +110,7 @@ function createInput(
   }]
   const selection = ['rect-1']
   const scene = createSceneAdapter()
-  const itemReadModel = createItemReadModel({ items, scene })
+  const itemReadModel = createItemReadModel({ items })
   const selectedBounds = { h: 40, w: 80, x: 10, y: 20 }
 
   return {
@@ -147,11 +154,9 @@ function createSceneAdapter(): CanvasSceneAdapter {
 
 function createItemReadModel({
   items,
-  scene,
 }: {
   items: CanvasItem[]
-  scene: CanvasSceneAdapter
-}): CanvasItemReadModel {
+}): CanvasAppItemReadModel {
   return {
     findEditableTextItem: vi.fn(() => null),
     findItem: vi.fn((id: string) => items.find((item) => item.id === id)),
@@ -161,6 +166,5 @@ function createItemReadModel({
     getSelectedItems: vi.fn(() => items),
     getSelection: vi.fn((ids: string[]) => ids),
     getSelectionBounds: vi.fn(() => ({ h: 40, w: 80, x: 10, y: 20 })),
-    scene,
   }
 }

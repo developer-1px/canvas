@@ -12,6 +12,7 @@ describe('CanvasAppView', () => {
       <CanvasAppView
         {...createViewProps({
           componentPalette: false,
+          imageControls: false,
           inspector: false,
           status: false,
           textEditor: false,
@@ -22,6 +23,7 @@ describe('CanvasAppView', () => {
     )
 
     expect(markup).not.toContain('component-palette')
+    expect(markup).not.toContain('image-controls')
     expect(markup).not.toContain('object-inspector')
     expect(markup).not.toContain('canvas-status')
     expect(markup).not.toContain('text-editor')
@@ -34,6 +36,7 @@ describe('CanvasAppView', () => {
     const markup = renderToStaticMarkup(<CanvasAppView {...createViewProps()} />)
 
     expect(markup).toContain('component-palette')
+    expect(markup).toContain('image-controls')
     expect(markup).toContain('object-inspector')
     expect(markup).toContain('canvas-status')
     expect(markup).toContain('text-editor')
@@ -45,6 +48,7 @@ describe('CanvasAppView', () => {
 function createViewProps(
   visible: {
     componentPalette?: boolean
+    imageControls?: boolean
     inspector?: boolean
     status?: boolean
     textEditor?: boolean
@@ -85,6 +89,17 @@ function createViewProps(
       label: 'Rect',
       visible: visible.inspector ?? true,
       onChangeBounds: noop,
+    },
+    imageControls: {
+      canCopyImage: true,
+      canDownloadImage: true,
+      canPasteImage: true,
+      canUploadImage: true,
+      visible: visible.imageControls ?? true,
+      onCopyImage: noop,
+      onDownloadImage: noop,
+      onPasteImage: noop,
+      onUploadFiles: noop,
     },
     stage: <div className="canvas-stage" />,
     status: {

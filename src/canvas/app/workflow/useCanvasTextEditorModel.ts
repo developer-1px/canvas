@@ -9,16 +9,16 @@ import type {
   Viewport,
 } from '../../entities'
 import type { CanvasAffordanceConfig } from '../../engine'
-import type { CanvasItemReadModel } from '../../host'
 import { useCanvasTextEditing } from '../text/useCanvasTextEditing'
 import type { CanvasTextEditorStyle } from '../text/CanvasTextEditingModel'
+import type { CanvasAppItemReadModel } from './CanvasAppItemReadModelContracts'
 import type { CommitCanvasItemsChange } from './CanvasWorkflowContract'
 
 type UseCanvasTextEditorModelArgs = {
   commitItemsChange: CommitCanvasItemsChange
   config: CanvasAffordanceConfig
   editorRef: RefObject<HTMLTextAreaElement | null>
-  itemReadModel: CanvasItemReadModel
+  itemReadModel: CanvasAppItemReadModel
   selection: string[]
   viewport: Viewport
 }

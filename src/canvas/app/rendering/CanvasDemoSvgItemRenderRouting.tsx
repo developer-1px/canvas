@@ -4,6 +4,7 @@ import type {
   CanvasComponentItem,
   CanvasCustomItem,
   CanvasEditableTextItem,
+  CanvasImageItem,
   CanvasItem,
   GroupItem,
 } from '../../entities'
@@ -56,6 +57,7 @@ const CANVAS_DEMO_SVG_ITEM_RENDER_STRATEGIES = Object.freeze({
   custom: renderCanvasDemoSvgCustomItemRoute,
   group: renderCanvasDemoSvgGroupItemRoute,
   highlight: renderCanvasDemoSvgDrawingItemRoute,
+  image: renderCanvasDemoSvgImageItemRoute,
   marker: renderCanvasDemoSvgDrawingItemRoute,
   rect: renderCanvasDemoSvgRectTextItemRoute,
   text: renderCanvasDemoSvgRectTextItemRoute,
@@ -138,6 +140,26 @@ function renderCanvasDemoSvgDrawingItemRoute({
 }): CanvasDemoSvgItemRenderRoute {
   return {
     children: renderCanvasDemoSvgDrawingItem({ item }),
+  }
+}
+
+function renderCanvasDemoSvgImageItemRoute({
+  item,
+}: CanvasDemoSvgItemRenderRouteInput & {
+  item: CanvasImageItem
+}): CanvasDemoSvgItemRenderRoute {
+  return {
+    children: (
+      <image
+        className="image-item"
+        href={item.src}
+        x={item.x}
+        y={item.y}
+        width={item.w}
+        height={item.h}
+        preserveAspectRatio="xMidYMid meet"
+      />
+    ),
   }
 }
 

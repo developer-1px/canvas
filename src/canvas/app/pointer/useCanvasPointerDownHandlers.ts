@@ -14,21 +14,21 @@ import type {
   Tool,
   Viewport,
 } from '../../entities'
-import type {
-  CanvasItemReadModel,
-} from '../../host'
 import {
   shouldRouteCanvasItemPointerToCanvasGesture,
-  type CanvasAffordanceConfig,
-  type CanvasCreationAdapter,
-  type CanvasDraftArrowOverlay,
-  type CanvasDraftStrokeOverlay,
-  type CanvasSceneAdapter,
+} from '../../engine'
+import type {
+  CanvasAffordanceConfig,
+  CanvasCreationAdapter,
+  CanvasDraftArrowOverlay,
+  CanvasDraftStrokeOverlay,
+  CanvasSceneAdapter,
 } from '../../engine'
 import type {
   CommitCanvasItemsChange,
   CommitCanvasSelection,
 } from '../workflow/CanvasWorkflowContract'
+import type { CanvasAppItemReadModel } from '../workflow/CanvasAppItemReadModelContracts'
 import type { Interaction } from './CanvasInteractionState'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
@@ -60,7 +60,7 @@ type UseCanvasPointerDownHandlersArgs = {
   createId: (prefix: string) => string
   customCreationTools: readonly CanvasAppCustomCreationTool[]
   interactionRef: MutableRefObject<Interaction>
-  itemReadModel: CanvasItemReadModel
+  itemReadModel: CanvasAppItemReadModel
   items: CanvasItem[]
   scene: CanvasSceneAdapter
   selectedBounds: Bounds | null

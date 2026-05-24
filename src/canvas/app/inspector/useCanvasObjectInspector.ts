@@ -1,11 +1,11 @@
 import { useMemo } from 'react'
-import type { CanvasItemReadModel } from '../../host'
 import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract'
+import type { CanvasAppItemReadModel } from '../workflow/CanvasAppItemReadModelContracts'
 import type { CanvasAppInspectorPanel } from './CanvasAppInspectorPanels'
 import { getCanvasObjectInspectorModel } from './CanvasObjectInspectorModel'
 
 type UseCanvasObjectInspectorArgs = {
-  itemReadModel: CanvasItemReadModel
+  itemReadModel: CanvasAppItemReadModel
   inspectorPanels: readonly CanvasAppInspectorPanel[]
   selected: Set<string>
   selection: string[]

@@ -5,6 +5,7 @@ import type {
 import { CanvasComponentPalette } from '../../ui/palette/CanvasComponentPalette'
 import { CanvasObjectInspector } from '../../ui/inspector/CanvasObjectInspector'
 import { CanvasFindReplacePanel } from '../../ui/search/CanvasFindReplacePanel'
+import { CanvasImageControls } from '../../ui/image/CanvasImageControls'
 import { CanvasTextEditor } from '../../ui/text/CanvasTextEditor'
 import { CanvasToolbar } from '../../ui/toolbar/CanvasToolbar'
 import { CanvasStatus } from '../../ui/status/CanvasStatus'
@@ -13,6 +14,7 @@ import { ZoomControls } from '../../ui/zoom/ZoomControls'
 type ToolbarProps = ComponentProps<typeof CanvasToolbar>
 type TextEditorProps = ComponentProps<typeof CanvasTextEditor>
 type FindReplaceProps = ComponentProps<typeof CanvasFindReplacePanel>
+type ImageControlsProps = ComponentProps<typeof CanvasImageControls>
 type InspectorProps = ComponentProps<typeof CanvasObjectInspector>
 type PaletteProps = ComponentProps<typeof CanvasComponentPalette>
 type ZoomControlsProps = ComponentProps<typeof ZoomControls>
@@ -24,6 +26,7 @@ type VisibleProps<TProps> = TProps & {
 type CanvasAppViewProps = {
   componentPalette: VisibleProps<PaletteProps>
   findReplace: FindReplaceProps
+  imageControls: VisibleProps<ImageControlsProps>
   inspector: VisibleProps<InspectorProps>
   stage: ReactNode
   status: VisibleProps<StatusProps>
@@ -35,6 +38,7 @@ type CanvasAppViewProps = {
 export function CanvasAppView({
   componentPalette,
   findReplace,
+  imageControls,
   inspector,
   stage,
   status,
@@ -47,6 +51,7 @@ export function CanvasAppView({
     ...componentPaletteProps
   } = componentPalette
   const { visible: showInspector, ...inspectorProps } = inspector
+  const { visible: showImageControls, ...imageControlProps } = imageControls
   const { visible: showTextEditor, ...textEditorProps } = textEditor
   const { visible: showToolbar, ...toolbarProps } = toolbar
   const { visible: showZoomControls, ...zoomControlProps } = zoomControls
@@ -61,6 +66,8 @@ export function CanvasAppView({
       ) : null}
 
       <CanvasFindReplacePanel {...findReplace} />
+
+      {showImageControls ? <CanvasImageControls {...imageControlProps} /> : null}
 
       {stage}
 

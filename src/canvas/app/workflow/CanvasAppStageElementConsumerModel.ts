@@ -13,6 +13,9 @@ export function getCanvasAppStageElementConsumerModel({
     component: {
       stageElement,
     },
+    image: {
+      stageElement,
+    },
     pointer: {
       stageElement,
     },

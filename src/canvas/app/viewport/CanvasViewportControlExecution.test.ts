@@ -9,11 +9,11 @@ import {
   INITIAL_VIEWPORT,
   zoomViewport,
 } from '../../core'
-import type { CanvasItemReadModel } from '../../host'
 import type {
   CanvasAppStageElement,
   CanvasAppStageRect,
 } from '../stage/CanvasAppStageElement'
+import type { CanvasAppItemReadModel } from '../workflow/CanvasAppItemReadModelContracts'
 import {
   fitCanvasViewportToItems,
   resetCanvasViewport,
@@ -149,12 +149,12 @@ function createItemReadModel({
   bounds,
 }: {
   allIds: string[]
-  bounds: ReturnType<CanvasItemReadModel['getSelectionBounds']>
-}): CanvasItemReadModel {
+  bounds: ReturnType<CanvasAppItemReadModel['getSelectionBounds']>
+}): CanvasAppItemReadModel {
   return {
     getAllIds: vi.fn(() => allIds),
     getSelectionBounds: vi.fn(() => bounds),
-  } as unknown as CanvasItemReadModel
+  } as unknown as CanvasAppItemReadModel
 }
 
 function createRect(): CanvasAppStageRect {

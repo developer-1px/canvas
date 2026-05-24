@@ -8,6 +8,7 @@ export type {
   CanvasCustomItem,
   CanvasDrawingItemBase,
   CanvasEditableTextItem,
+  CanvasImageItem,
   CanvasItem,
   CanvasItemBase,
   CanvasJsonObject,
@@ -59,6 +60,12 @@ export {
   type CanvasDrawingStrokeKind,
   type CanvasDrawingStrokeStyle,
 } from './drawing/CanvasDrawingItemStyles'
+export {
+  createCanvasImageItem,
+  isCanvasImageItemStorageShape,
+  isCanvasImageMimeType,
+  type CreateCanvasImageItemInput,
+} from './image/CanvasImageItem'
 
 export {
   createCanvasItemReadModel,

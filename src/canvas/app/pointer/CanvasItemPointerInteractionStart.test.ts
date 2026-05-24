@@ -4,10 +4,8 @@ import {
   createCanvasAffordanceConfig,
   createCanvasSceneAdapter,
 } from '../../engine'
-import {
-  isCanvasEditableTextItem,
-  type CanvasItemReadModel,
-} from '../../host'
+import { isCanvasEditableTextItem } from '../../host'
+import type { CanvasAppItemReadModel } from '../workflow/CanvasAppItemReadModelContracts'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import {
   startCanvasItemPointerInteraction,
@@ -188,9 +186,8 @@ function createTestCanvasScene(items: CanvasItem[]) {
 function createTestCanvasItemReadModel(
   items: CanvasItem[],
   scene: ReturnType<typeof createTestCanvasScene>,
-): CanvasItemReadModel {
+): CanvasAppItemReadModel {
   return {
-    scene,
     findEditableTextItem: (id) => {
       const item = items.find((item) => item.id === id)
 

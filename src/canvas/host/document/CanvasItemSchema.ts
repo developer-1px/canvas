@@ -1,6 +1,7 @@
 import * as z from 'zod'
 import { isCanvasComponentItemStorageShape } from '../component/CanvasComponentItemValidation'
 import { isCanvasDrawingItemStorageShape } from '../drawing/CanvasDrawingItemValidation'
+import { isCanvasImageItemStorageShape } from '../image/CanvasImageItem'
 import type { CanvasItem } from '../model'
 import { isCanvasEditableTextItemStorageShape } from '../text/CanvasEditableTextItem'
 import { isCanvasGroupItemStorageShape } from '../tree/CanvasGroupItem'
@@ -61,6 +62,10 @@ function isCanvasItem(value: unknown): value is CanvasItem {
   }
 
   if (isCanvasEditableTextItemStorageShape(value)) {
+    return true
+  }
+
+  if (isCanvasImageItemStorageShape(value)) {
     return true
   }
 

@@ -4,8 +4,8 @@ import {
   zoomViewport,
 } from '../../core'
 import type { Viewport } from '../../entities'
-import type { CanvasItemReadModel } from '../../host'
 import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
+import type { CanvasAppItemReadModel } from '../workflow/CanvasAppItemReadModelContracts'
 
 export type CanvasViewportSetter = (
   next: Viewport | ((current: Viewport) => Viewport),
@@ -13,7 +13,7 @@ export type CanvasViewportSetter = (
 
 type FitCanvasViewportToItemsArgs = {
   ids?: string[]
-  itemReadModel: CanvasItemReadModel
+  itemReadModel: CanvasAppItemReadModel
   setViewport: CanvasViewportSetter
   stageElement: CanvasAppStageElement
 }

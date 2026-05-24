@@ -20,6 +20,9 @@ export function getCanvasAppAffordanceModel(
     inspector: {
       config,
     },
+    image: {
+      config,
+    },
     keyboard: {
       config,
     },

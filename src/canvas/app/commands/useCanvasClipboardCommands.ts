@@ -15,6 +15,8 @@ import type {
   Point,
   Viewport,
 } from '../../entities'
+import { readCanvasClipboardImageSource } from '../image/CanvasImageClipboard'
+import { createCanvasImportedImageItem } from '../image/CanvasImageImport'
 import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
 import type {
   CanvasDocumentClipboard,
@@ -143,12 +145,49 @@ export function useCanvasClipboardCommands({
     [runClipboardCommand, selection],
   )
 
-  const pasteSelection = useCallback(() => {
-    pasteCanvasClipboardSelection({
-      pasteIndex: pasteIndexRef.current,
-      runClipboardCommand,
+  const pasteClipboardImage = useCallback(async () => {
+    if (!config.commands.paste) {
+      return false
+    }
+
+    const source = await readCanvasClipboardImageSource()
+
+    if (!source) {
+      return false
+    }
+
+    const item = createCanvasImportedImageItem({
+      center: stageElement.getViewportCenter(viewport) ?? { x: 0, y: 0 },
+      createId,
+      source,
     })
-  }, [runClipboardCommand])
+
+    return commitItemsChange(
+      { type: 'add', items: [item] },
+      {
+        before: selection,
+        after: [item.id],
+      },
+    )
+  }, [
+    commitItemsChange,
+    config.commands.paste,
+    createId,
+    selection,
+    stageElement,
+    viewport,
+  ])
+
+  const pasteSelection = useCallback(() => {
+    void pasteClipboardImage().then((pastedImage) => {
+      if (!pastedImage) {
+        pasteCanvasClipboardSelection({
+          pasteIndex: pasteIndexRef.current,
+          runClipboardCommand,
+        })
+      }
+    })
+  }, [pasteClipboardImage, runClipboardCommand])
 
   return useMemo(
     () => ({

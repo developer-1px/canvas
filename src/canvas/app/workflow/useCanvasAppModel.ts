@@ -7,6 +7,7 @@ import { useCanvasAppCommandModel } from './useCanvasAppCommandModel'
 import { useCanvasAppComponentModel } from './useCanvasAppComponentModel'
 import { useCanvasAppExtensionModel } from './useCanvasAppExtensionModel'
 import { useCanvasAppInspectorModel } from './useCanvasAppInspectorModel'
+import { useCanvasAppImageModel } from './useCanvasAppImageModel'
 import { useCanvasAppKeyboardModel } from './useCanvasAppKeyboardModel'
 import { useCanvasAppPointerModel } from './useCanvasAppPointerModel'
 import { useCanvasAppStageElementModel } from './useCanvasAppStageElementModel'
@@ -44,6 +45,12 @@ export function useCanvasAppModel({
     ...affordance.inspector,
     ...workspace.inspector,
     ...appAssembly.inspector,
+  })
+
+  const imageControls = useCanvasAppImageModel({
+    ...affordance.image,
+    ...workspace.image,
+    ...stageElement.image,
   })
 
   const text = useCanvasAppTextModel({
@@ -134,6 +141,7 @@ export function useCanvasAppModel({
   return {
     ...text.view,
     componentPalette: controls.componentPalette,
+    imageControls,
     inspector,
     stage: renderCanvasAppStageModel({
       ...text.stage,
