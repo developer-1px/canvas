@@ -1,10 +1,15 @@
 import type {
+  CanvasItem,
   CanvasComponentKind,
   EditingText,
   Point,
   Tool,
   Viewport,
 } from '../../entities'
+import {
+  createCanvasArrow,
+  type CanvasCreationAdapter,
+} from '../../engine'
 import {
   CANVAS_STICKY_COMPONENT_KIND,
   applyCanvasStickyComponentCreationDefaults,
@@ -30,6 +35,7 @@ type InsertCanvasComponentArgs = {
 type QuickCreateCanvasStickyArgs = {
   componentLibrary: CanvasAppComponentLibrary
   commitItemsChange: CommitCanvasItemsChange
+  creationAdapter: CanvasCreationAdapter<CanvasItem>
   createId: (prefix: string) => string
   itemReadModel: CanvasAppItemReadModel
   selection: string[]
@@ -81,6 +87,7 @@ export function insertCanvasComponent({
 export function quickCreateCanvasSticky({
   componentLibrary,
   commitItemsChange,
+  creationAdapter,
   createId,
   itemReadModel,
   selection,
@@ -107,7 +114,15 @@ export function quickCreateCanvasSticky({
       templateId: CANVAS_STICKY_COMPONENT_KIND,
     }),
   )
-  const didCommit = commitItemsChange({ type: 'add', items: [item] }, {
+  const connector = createCanvasStickyQuickCreateConnector({
+    creationAdapter,
+    createId,
+    sourceId: source.id,
+    sourceBounds,
+    targetId: item.id,
+    targetBounds: item,
+  })
+  const didCommit = commitItemsChange({ type: 'add', items: [connector, item] }, {
     before: selection,
     after: [item.id],
   })
@@ -158,4 +173,35 @@ export function getCanvasStickyQuickCreateSource({
     .filter(isCanvasStickyComponentItem)
 
   return stickyItems.length === 1 ? stickyItems[0] : null
+}
+
+function createCanvasStickyQuickCreateConnector({
+  creationAdapter,
+  createId,
+  sourceBounds,
+  sourceId,
+  targetBounds,
+  targetId,
+}: {
+  creationAdapter: CanvasCreationAdapter<CanvasItem>
+  createId: (prefix: string) => string
+  sourceBounds: { h: number; w: number; x: number; y: number }
+  sourceId: string
+  targetBounds: { h: number; x: number; y: number }
+  targetId: string
+}) {
+  return createCanvasArrow({
+    adapter: creationAdapter,
+    createId,
+    currentWorld: {
+      x: targetBounds.x,
+      y: targetBounds.y + targetBounds.h / 2,
+    },
+    endAttachedTo: targetId,
+    startAttachedTo: sourceId,
+    startWorld: {
+      x: sourceBounds.x + sourceBounds.w,
+      y: sourceBounds.y + sourceBounds.h / 2,
+    },
+  })
 }

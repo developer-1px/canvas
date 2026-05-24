@@ -161,6 +161,7 @@ export type CanvasAppComponentModelInput = {
   command: CanvasAppComponentCommandModel
   componentLibrary: CanvasAppComponentLibrary
   config: CanvasAffordanceConfig
+  creationAdapter: CanvasCreationAdapter<CanvasItem>
   createId: (prefix: string) => string
   interaction: CanvasAppComponentInteractionModel
   stageElement: CanvasAppStageElement

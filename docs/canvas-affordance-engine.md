@@ -123,7 +123,7 @@
 | `src/canvas/app/pointer/CanvasPointerCreationPreview.ts` | Create-rect, marker, highlighter, arrow, custom creation의 draft overlay와 currentWorld/moved preview를 소유한다 |
 | `src/canvas/app/pointer/CanvasPointerCommentCreation.ts` | Comment tool click을 Canvas Comment Item 생성과 optional clicked-item attachment로 변환한다 |
 | `src/canvas/app/pointer/CanvasPointerComponentCreation.ts` | Sticky note tool click을 Component Library `sticky` template 기반 component item 생성과 생성 직후 text edit 진입으로 변환한다 |
-| `src/canvas/app/components/CanvasComponentInsertionExecution.ts` | Component palette insertion과 sticky quick-create 실행/컨트롤 위치 계산을 소유한다 |
+| `src/canvas/app/components/CanvasComponentInsertionExecution.ts` | Component palette insertion과 sticky quick-create의 연결 sticky 생성, connector 생성, 컨트롤 위치 계산을 소유한다 |
 | `src/canvas/app/pointer/CanvasPointerInteractionMovement.ts` | Drag threshold 기반 moved 판정을 pointer interaction Module들이 공유한다 |
 | `src/canvas/app/pointer/CanvasPointerInteractionLifecycle.ts` | Pointer-up/cancel 시 active interaction을 문서 변경, selection 변경, edit 진입, cancel rollback으로 확정하거나 되돌린다 |
 | `src/canvas/core` | Host item과 renderer를 모르는 geometry, viewport, id, primitive math 같은 재사용 계약 |

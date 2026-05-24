@@ -3,6 +3,7 @@ import type {
   CanvasComponentItem,
   CanvasItem,
 } from '../../entities'
+import type { CanvasCreationAdapter } from '../../engine'
 import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
 import type { CanvasAppComponentLibrary } from '../workflow/CanvasAppComponentAssemblyContracts'
 import type { CanvasAppItemReadModel } from '../workflow/CanvasAppItemReadModelContracts'
@@ -68,6 +69,7 @@ describe('CanvasComponentInsertionExecution', () => {
 
   it('quick-creates a blank sticky next to the selected sticky', () => {
     const source = createComponentItem({
+      h: 148,
       id: 'component-source',
       w: 188,
       x: 40,
@@ -75,19 +77,26 @@ describe('CanvasComponentInsertionExecution', () => {
     })
     const next = createComponentItem({
       body: 'Template body',
+      h: 148,
       id: 'component-next',
+      w: 188,
       x: 252,
       y: 60,
     })
+    const connector = createArrowItem()
     const componentLibrary = createComponentLibrary(next)
     const commitItemsChange = vi.fn(() => true)
+    const creationAdapter = createCreationAdapter(connector)
     const setEditing = vi.fn()
     const setTool = vi.fn()
 
     const result = quickCreateCanvasSticky({
       commitItemsChange,
       componentLibrary,
-      createId: vi.fn(() => 'component-next'),
+      creationAdapter,
+      createId: vi.fn((prefix) =>
+        prefix === 'arrow' ? 'arrow-next' : 'component-next',
+      ),
       itemReadModel: createItemReadModel([
         source,
         createComponentItem({
@@ -101,6 +110,14 @@ describe('CanvasComponentInsertionExecution', () => {
     })
 
     expect(result).toBe(true)
+    expect(creationAdapter.createArrow).toHaveBeenCalledWith({
+      end: { x: 252, y: 134 },
+      endAttachedTo: 'component-next',
+      id: 'arrow-next',
+      routing: 'elbow',
+      start: { x: 228, y: 134 },
+      startAttachedTo: 'component-source',
+    })
     expect(componentLibrary.createItem).toHaveBeenCalledWith({
       id: 'component-next',
       point: { x: 252, y: 60 },
@@ -109,10 +126,13 @@ describe('CanvasComponentInsertionExecution', () => {
     expect(commitItemsChange).toHaveBeenCalledWith(
       {
         type: 'add',
-        items: [{
-          ...next,
-          body: '',
-        }],
+        items: [
+          connector,
+          {
+            ...next,
+            body: '',
+          },
+        ],
       },
       {
         before: ['component-source', 'component-card'],
@@ -133,7 +153,8 @@ describe('CanvasComponentInsertionExecution', () => {
     expect(quickCreateCanvasSticky({
       commitItemsChange,
       componentLibrary,
-      createId: vi.fn(() => 'component-next'),
+      creationAdapter: createCreationAdapter(),
+      createId: vi.fn((prefix) => `${prefix}-next`),
       itemReadModel: createItemReadModel([createComponentItem({
         component: 'card',
       })]),
@@ -201,6 +222,39 @@ function createComponentItem(
     y: 50,
     ...overrides,
   }
+}
+
+function createArrowItem(
+  overrides: Partial<Extract<CanvasItem, { type: 'arrow' }>> = {},
+): Extract<CanvasItem, { type: 'arrow' }> {
+  return {
+    end: { x: 252, y: 134 },
+    endAttachedTo: 'component-next',
+    h: 24,
+    id: 'arrow-next',
+    routing: 'elbow',
+    start: { x: 228, y: 134 },
+    startAttachedTo: 'component-source',
+    stroke: '#334155',
+    strokeWidth: 3,
+    type: 'arrow',
+    w: 48,
+    x: 216,
+    y: 122,
+    ...overrides,
+  }
+}
+
+function createCreationAdapter(
+  arrow: CanvasItem = createArrowItem(),
+): CanvasCreationAdapter<CanvasItem> {
+  return {
+    createArrow: vi.fn(() => arrow),
+    createHighlight: vi.fn(),
+    createMarker: vi.fn(),
+    createRect: vi.fn(),
+    createText: vi.fn(),
+  } as unknown as CanvasCreationAdapter<CanvasItem>
 }
 
 function createItemReadModel(items: CanvasItem[]): CanvasAppItemReadModel {

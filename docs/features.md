@@ -157,3 +157,4 @@
 153. Drawing controls의 style 변경은 draft stroke preview와 커밋된 drawing stroke에 같이 적용된다.
 154. Sticky note 하나를 선택하면 오른쪽에 `+` quick-create control을 표시한다.
 155. Sticky quick-create control은 선택된 sticky 오른쪽에 빈 sticky note를 만들고 바로 body editor를 연다.
+156. Sticky quick-create는 원본 sticky와 새 sticky 사이에 elbow connector를 같은 history change로 만든다.

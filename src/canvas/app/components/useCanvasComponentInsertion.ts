@@ -4,11 +4,13 @@ import {
   type SetStateAction,
 } from 'react'
 import type {
+  CanvasItem,
   CanvasComponentKind,
   EditingText,
   Tool,
   Viewport,
 } from '../../entities'
+import type { CanvasCreationAdapter } from '../../engine'
 import type { CanvasAppComponentLibrary } from '../workflow/CanvasAppComponentAssemblyContracts'
 import type { CanvasAppItemReadModel } from '../workflow/CanvasAppItemReadModelContracts'
 import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract'
@@ -22,6 +24,7 @@ import {
 type UseCanvasComponentInsertionArgs = {
   componentLibrary: CanvasAppComponentLibrary
   commitItemsChange: CommitCanvasItemsChange
+  creationAdapter: CanvasCreationAdapter<CanvasItem>
   createId: (prefix: string) => string
   itemReadModel: CanvasAppItemReadModel
   selection: string[]
@@ -71,6 +74,7 @@ export function useCanvasComponentInsertion({
 export function useCanvasStickyQuickCreate({
   componentLibrary,
   commitItemsChange,
+  creationAdapter,
   createId,
   itemReadModel,
   selection,
@@ -82,6 +86,7 @@ export function useCanvasStickyQuickCreate({
       quickCreateCanvasSticky({
         commitItemsChange,
         componentLibrary,
+        creationAdapter,
         createId,
         itemReadModel,
         selection,
@@ -91,6 +96,7 @@ export function useCanvasStickyQuickCreate({
     [
       componentLibrary,
       commitItemsChange,
+      creationAdapter,
       createId,
       itemReadModel,
       selection,

@@ -26,6 +26,7 @@ export function getCanvasAppAssemblyModel({
     },
     component: {
       componentLibrary,
+      creationAdapter: itemAdapters.creation,
     },
     control: {
       components: componentLibrary.templates,

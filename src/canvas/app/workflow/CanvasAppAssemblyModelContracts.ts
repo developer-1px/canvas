@@ -35,6 +35,7 @@ export type CanvasAppAssemblyCommandModel = {
 
 export type CanvasAppAssemblyComponentModel = {
   componentLibrary: CanvasAppComponentLibrary
+  creationAdapter: CanvasCreationAdapter<CanvasItem>
 }
 
 export type CanvasAppAssemblyControlModel = {

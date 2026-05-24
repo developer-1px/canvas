@@ -12,6 +12,7 @@ export function useCanvasAppComponentModel({
   command,
   componentLibrary,
   config,
+  creationAdapter,
   createId,
   interaction,
   stageElement,
@@ -20,6 +21,7 @@ export function useCanvasAppComponentModel({
   const insertComponent = useCanvasComponentInsertion({
     commitItemsChange: command.commitItemsChange,
     componentLibrary,
+    creationAdapter,
     createId,
     itemReadModel: workspace.itemReadModel,
     selection: workspace.selection,
@@ -31,6 +33,7 @@ export function useCanvasAppComponentModel({
   const quickCreateSticky = useCanvasStickyQuickCreate({
     commitItemsChange: command.commitItemsChange,
     componentLibrary,
+    creationAdapter,
     createId,
     itemReadModel: workspace.itemReadModel,
     selection: workspace.selection,
