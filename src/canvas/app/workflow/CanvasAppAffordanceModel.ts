@@ -11,6 +11,9 @@ export function getCanvasAppAffordanceModel(
     command: {
       config,
     },
+    component: {
+      config,
+    },
     control: {
       config,
     },

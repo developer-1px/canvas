@@ -160,14 +160,22 @@ export type CanvasAppComponentWorkspaceModel = {
 export type CanvasAppComponentModelInput = {
   command: CanvasAppComponentCommandModel
   componentLibrary: CanvasAppComponentLibrary
+  config: CanvasAffordanceConfig
   createId: (prefix: string) => string
   interaction: CanvasAppComponentInteractionModel
   stageElement: CanvasAppStageElement
   workspace: CanvasAppComponentWorkspaceModel
 }
 
+export type CanvasAppStickyQuickCreateControlContext = {
+  point: Point | null
+  visible: boolean
+  onQuickCreate: () => boolean
+}
+
 export type CanvasAppComponentControlContext = {
   onInsertComponent: (component: CanvasComponentKind) => void
+  stickyQuickCreate: CanvasAppStickyQuickCreateControlContext
 }
 
 export type CanvasAppComponentKeyboardContext = {

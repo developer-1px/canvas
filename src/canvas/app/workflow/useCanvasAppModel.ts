@@ -99,6 +99,7 @@ export function useCanvasAppModel({
 
   const components = useCanvasAppComponentModel({
     command: workspace.component.command,
+    ...affordance.component,
     ...appAssembly.component,
     createId: workspace.component.createId,
     interaction: {
@@ -175,6 +176,7 @@ export function useCanvasAppModel({
       },
     }),
     stampControls,
+    stickyQuickCreate: components.control.stickyQuickCreate,
     status: controls.status,
     toolbar: controls.toolbar,
     zoomControls: controls.zoomControls,

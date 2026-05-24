@@ -1,6 +1,7 @@
 import type {
   CanvasComponentKind,
   EditingText,
+  Point,
   Tool,
   Viewport,
 } from '../../entities'
@@ -34,6 +35,12 @@ type QuickCreateCanvasStickyArgs = {
   selection: string[]
   setEditing: (nextEditing: EditingText | null) => void
   setTool: (nextTool: Tool) => void
+}
+
+export type CanvasStickyQuickCreateControlPointInput = {
+  itemReadModel: CanvasAppItemReadModel
+  selection: string[]
+  viewport: Viewport
 }
 
 const CANVAS_COMPONENT_INSERTION_FALLBACK_POINT = {
@@ -115,7 +122,31 @@ export function quickCreateCanvasSticky({
   return true
 }
 
-function getCanvasStickyQuickCreateSource({
+export function getCanvasStickyQuickCreateControlPoint({
+  itemReadModel,
+  selection,
+  viewport,
+}: CanvasStickyQuickCreateControlPointInput): Point | null {
+  const source = getCanvasStickyQuickCreateSource({
+    itemReadModel,
+    selection,
+  })
+
+  if (!source) {
+    return null
+  }
+
+  const bounds = itemReadModel.getItemBounds(source)
+
+  return {
+    x: viewport.x + (
+      bounds.x + bounds.w + CANVAS_STICKY_QUICK_CREATE_GAP / 2
+    ) * viewport.scale,
+    y: viewport.y + (bounds.y + bounds.h / 2) * viewport.scale,
+  }
+}
+
+export function getCanvasStickyQuickCreateSource({
   itemReadModel,
   selection,
 }: {

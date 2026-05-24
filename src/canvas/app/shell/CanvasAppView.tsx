@@ -8,6 +8,7 @@ import { CanvasObjectInspector } from '../../ui/inspector/CanvasObjectInspector'
 import { CanvasFindReplacePanel } from '../../ui/search/CanvasFindReplacePanel'
 import { CanvasImageControls } from '../../ui/image/CanvasImageControls'
 import { CanvasStampControls } from '../../ui/stamp/CanvasStampControls'
+import { CanvasStickyQuickCreateControl } from '../../ui/sticky/CanvasStickyQuickCreateControl'
 import { CanvasTextEditor } from '../../ui/text/CanvasTextEditor'
 import { CanvasToolbar } from '../../ui/toolbar/CanvasToolbar'
 import { CanvasStatus } from '../../ui/status/CanvasStatus'
@@ -19,6 +20,8 @@ type DrawingControlsProps = ComponentProps<typeof CanvasDrawingControls>
 type FindReplaceProps = ComponentProps<typeof CanvasFindReplacePanel>
 type ImageControlsProps = ComponentProps<typeof CanvasImageControls>
 type StampControlsProps = ComponentProps<typeof CanvasStampControls>
+type StickyQuickCreateProps =
+  ComponentProps<typeof CanvasStickyQuickCreateControl>
 type InspectorProps = ComponentProps<typeof CanvasObjectInspector>
 type PaletteProps = ComponentProps<typeof CanvasComponentPalette>
 type ZoomControlsProps = ComponentProps<typeof ZoomControls>
@@ -35,6 +38,7 @@ type CanvasAppViewProps = {
   inspector: VisibleProps<InspectorProps>
   stage: ReactNode
   stampControls: VisibleProps<StampControlsProps>
+  stickyQuickCreate: VisibleProps<StickyQuickCreateProps>
   status: VisibleProps<StatusProps>
   textEditor: VisibleProps<TextEditorProps>
   toolbar: VisibleProps<ToolbarProps>
@@ -49,6 +53,7 @@ export function CanvasAppView({
   inspector,
   stage,
   stampControls,
+  stickyQuickCreate,
   status,
   textEditor,
   toolbar,
@@ -63,6 +68,8 @@ export function CanvasAppView({
   const { visible: showInspector, ...inspectorProps } = inspector
   const { visible: showImageControls, ...imageControlProps } = imageControls
   const { visible: showStampControls, ...stampControlProps } = stampControls
+  const { visible: showStickyQuickCreate, ...stickyQuickCreateProps } =
+    stickyQuickCreate
   const { visible: showTextEditor, ...textEditorProps } = textEditor
   const { visible: showToolbar, ...toolbarProps } = toolbar
   const { visible: showZoomControls, ...zoomControlProps } = zoomControls
@@ -87,6 +94,10 @@ export function CanvasAppView({
       {showStampControls ? <CanvasStampControls {...stampControlProps} /> : null}
 
       {stage}
+
+      {showStickyQuickCreate ? (
+        <CanvasStickyQuickCreateControl {...stickyQuickCreateProps} />
+      ) : null}
 
       {showTextEditor ? <CanvasTextEditor {...textEditorProps} /> : null}
 

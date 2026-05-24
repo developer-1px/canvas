@@ -7,6 +7,7 @@ import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
 import type { CanvasAppComponentLibrary } from '../workflow/CanvasAppComponentAssemblyContracts'
 import type { CanvasAppItemReadModel } from '../workflow/CanvasAppItemReadModelContracts'
 import {
+  getCanvasStickyQuickCreateControlPoint,
   insertCanvasComponent,
   quickCreateCanvasSticky,
 } from './CanvasComponentInsertionExecution'
@@ -143,6 +144,32 @@ describe('CanvasComponentInsertionExecution', () => {
 
     expect(componentLibrary.createItem).not.toHaveBeenCalled()
     expect(commitItemsChange).not.toHaveBeenCalled()
+  })
+
+  it('positions the sticky quick-create control next to one selected sticky', () => {
+    const sticky = createComponentItem({
+      h: 148,
+      id: 'component-sticky',
+      w: 188,
+      x: 40,
+      y: 60,
+    })
+    const itemReadModel = createItemReadModel([sticky])
+
+    expect(getCanvasStickyQuickCreateControlPoint({
+      itemReadModel,
+      selection: ['component-sticky'],
+      viewport: { scale: 2, x: 10, y: 20 },
+    })).toEqual({ x: 490, y: 288 })
+
+    expect(getCanvasStickyQuickCreateControlPoint({
+      itemReadModel: createItemReadModel([createComponentItem({
+        component: 'card',
+        id: 'component-card',
+      })]),
+      selection: ['component-card'],
+      viewport: { scale: 2, x: 10, y: 20 },
+    })).toBeNull()
   })
 })
 

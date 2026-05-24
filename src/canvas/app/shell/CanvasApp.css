@@ -488,6 +488,23 @@
   align-items: center;
 }
 
+.sticky-quick-create {
+  position: absolute;
+  z-index: 4;
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid #d1d5db;
+  border-radius: 50%;
+  color: #1f2937;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.14);
+  font: 800 18px/1 var(--sans);
+  transform: translate(-50%, -50%);
+}
+
 .image-file-input {
   display: none;
 }
@@ -751,6 +768,7 @@
 .zoom-value:hover,
 .image-controls button:hover,
 .stamp-button:hover,
+.sticky-quick-create:hover,
 .find-replace-panel button:hover,
 .tool-button[data-active='true'] {
   background: #e5edff;
@@ -787,6 +805,7 @@
 .zoom-value:focus-visible,
 .image-controls button:focus-visible,
 .stamp-button:focus-visible,
+.sticky-quick-create:focus-visible,
 .find-replace-panel input:focus-visible,
 .find-replace-panel button:focus-visible,
 .inspector-field input:focus-visible,

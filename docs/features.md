@@ -155,3 +155,5 @@
 151. Marker/highlighter stroke 생성은 현재 선택을 훔치지 않아 연속 드로잉 흐름을 유지한다.
 152. Marker/highlighter tool은 color, width, opacity drawing controls를 표시한다.
 153. Drawing controls의 style 변경은 draft stroke preview와 커밋된 drawing stroke에 같이 적용된다.
+154. Sticky note 하나를 선택하면 오른쪽에 `+` quick-create control을 표시한다.
+155. Sticky quick-create control은 선택된 sticky 오른쪽에 빈 sticky note를 만들고 바로 body editor를 연다.

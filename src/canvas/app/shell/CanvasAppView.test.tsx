@@ -16,6 +16,7 @@ describe('CanvasAppView', () => {
           imageControls: false,
           inspector: false,
           stampControls: false,
+          stickyQuickCreate: false,
           status: false,
           textEditor: false,
           toolbar: false,
@@ -29,6 +30,7 @@ describe('CanvasAppView', () => {
     expect(markup).not.toContain('image-controls')
     expect(markup).not.toContain('object-inspector')
     expect(markup).not.toContain('stamp-controls')
+    expect(markup).not.toContain('sticky-quick-create')
     expect(markup).not.toContain('canvas-status')
     expect(markup).not.toContain('text-editor')
     expect(markup).not.toContain('toolbar')
@@ -44,6 +46,7 @@ describe('CanvasAppView', () => {
     expect(markup).toContain('image-controls')
     expect(markup).toContain('object-inspector')
     expect(markup).toContain('stamp-controls')
+    expect(markup).toContain('sticky-quick-create')
     expect(markup).toContain('canvas-status')
     expect(markup).toContain('text-editor')
     expect(markup).toContain('toolbar')
@@ -58,6 +61,7 @@ function createViewProps(
     imageControls?: boolean
     inspector?: boolean
     stampControls?: boolean
+    stickyQuickCreate?: boolean
     status?: boolean
     textEditor?: boolean
     toolbar?: boolean
@@ -137,6 +141,11 @@ function createViewProps(
       }],
       visible: visible.stampControls ?? true,
       onInsertStamp: noop,
+    },
+    stickyQuickCreate: {
+      point: { x: 200, y: 120 },
+      visible: visible.stickyQuickCreate ?? true,
+      onQuickCreate: noop,
     },
     status: {
       mode: 'Select',

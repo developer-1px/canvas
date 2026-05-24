@@ -15,6 +15,7 @@ describe('CanvasAppAffordanceModel', () => {
     const model = getCanvasAppAffordanceModel(config)
 
     expect(model.command.config).toBe(config)
+    expect(model.component.config).toBe(config)
     expect(model.control.config).toBe(config)
     expect(model.drawing.config).toBe(config)
     expect(model.image.config).toBe(config)
@@ -31,6 +32,7 @@ describe('CanvasAppAffordanceModel', () => {
     const model = getCanvasAppAffordanceModel()
 
     expect(model.command.config).toBe(DEFAULT_CANVAS_AFFORDANCE_CONFIG)
+    expect(model.component.config).toBe(DEFAULT_CANVAS_AFFORDANCE_CONFIG)
     expect(model.drawing.config).toBe(DEFAULT_CANVAS_AFFORDANCE_CONFIG)
     expect(model.image.config).toBe(DEFAULT_CANVAS_AFFORDANCE_CONFIG)
     expect(model.pointer.config).toBe(DEFAULT_CANVAS_AFFORDANCE_CONFIG)
