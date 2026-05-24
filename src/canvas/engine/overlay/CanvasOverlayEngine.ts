@@ -32,6 +32,13 @@ export type CanvasDraftStrokeOverlay = {
   strokeWidth: number
 }
 
+export type CanvasPresenceOverlay = {
+  color: string
+  id: string
+  label: string
+  point: Point
+}
+
 export type CanvasOverlayState = {
   alignmentGuides: CanvasSnapGuides['alignmentGuides']
   draftArrow: CanvasDraftArrowOverlay | null
@@ -40,6 +47,7 @@ export type CanvasOverlayState = {
   grid: boolean
   itemOutlineIds: Set<string>
   marquee: Bounds | null
+  presence?: readonly CanvasPresenceOverlay[]
   resizeHandles: CanvasResizeHandleOverlay[]
   selectionBounds: Bounds | null
   spacingGuides: CanvasSnapGuides['spacingGuides']
@@ -51,6 +59,7 @@ export function createCanvasOverlayState({
   draftRect,
   draftStroke,
   marquee,
+  presence = [],
   scene,
   selection,
   snapGuides,
@@ -61,6 +70,7 @@ export function createCanvasOverlayState({
   draftRect: Bounds | null
   draftStroke: CanvasDraftStrokeOverlay | null
   marquee: Bounds | null
+  presence?: readonly CanvasPresenceOverlay[]
   scene: CanvasSceneAdapter
   selection: string[]
   snapGuides: CanvasSnapGuides
@@ -80,6 +90,7 @@ export function createCanvasOverlayState({
       ? new Set(selection)
       : new Set(),
     marquee: config.overlays.marquee ? marquee : null,
+    presence: config.overlays.presence ? [...presence] : [],
     resizeHandles:
       config.overlays.resizeHandles && selectedBounds
         ? RESIZE_HANDLES.map((handle) => ({

@@ -55,6 +55,9 @@ export {
   type CanvasAppCustomItemRenderers,
 } from './app/authoring'
 export type {
+  CanvasPresenceOverlay,
+} from './engine'
+export type {
   ArrowItem,
   Bounds,
   CanvasBuiltinTool,

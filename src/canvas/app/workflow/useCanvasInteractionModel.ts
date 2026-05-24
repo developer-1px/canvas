@@ -14,6 +14,7 @@ import {
   type CanvasAffordanceConfig,
   type CanvasDraftArrowOverlay,
   type CanvasDraftStrokeOverlay,
+  type CanvasPresenceOverlay,
   type CanvasSceneAdapter,
   type CanvasSnapGuides,
 } from '../../engine'
@@ -22,6 +23,7 @@ import { getCanvasInteractionConsumerModel } from './CanvasInteractionConsumerMo
 
 type UseCanvasInteractionModelArgs = {
   config: CanvasAffordanceConfig
+  presence?: readonly CanvasPresenceOverlay[]
   scene: CanvasSceneAdapter
   selection: string[]
   viewport: Viewport
@@ -29,6 +31,7 @@ type UseCanvasInteractionModelArgs = {
 
 export function useCanvasInteractionModel({
   config,
+  presence,
   scene,
   selection,
   viewport,
@@ -54,6 +57,7 @@ export function useCanvasInteractionModel({
         draftRect,
         draftStroke,
         marquee,
+        presence,
         scene,
         selection,
         snapGuides,
@@ -65,6 +69,7 @@ export function useCanvasInteractionModel({
       draftRect,
       draftStroke,
       marquee,
+      presence,
       scene,
       selection,
       snapGuides,

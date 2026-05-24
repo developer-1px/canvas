@@ -72,6 +72,7 @@ export {
   type CanvasDraftArrowOverlay,
   type CanvasDraftStrokeOverlay,
   type CanvasOverlayState,
+  type CanvasPresenceOverlay,
   type CanvasResizeHandleOverlay,
 } from './overlay/CanvasOverlayEngine'
 export {

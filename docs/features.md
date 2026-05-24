@@ -143,3 +143,6 @@
 139. Comment는 선택 시 body card를 표시한다.
 140. Comment는 더블클릭으로 body를 인라인 편집할 수 있다.
 141. 빈 comment body 커밋은 저장 가능한 기본 `Comment` 값으로 복원한다.
+142. Canvas App은 외부에서 collaborator presence cursor 목록을 runtime prop으로 받을 수 있다.
+143. Demo는 두 명의 collaborator cursor를 canvas overlay에 표시한다.
+144. Presence cursor는 줌 배율과 무관하게 화면상 크기를 유지한다.

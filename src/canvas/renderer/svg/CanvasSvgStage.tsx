@@ -69,6 +69,7 @@ export function CanvasSvgStage({
 
         <CanvasSvgInteractionOverlays
           overlays={overlays}
+          viewport={viewport}
           onResizePointerDown={onResizePointerDown}
         />
       </g>

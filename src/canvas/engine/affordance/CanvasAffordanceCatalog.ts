@@ -85,6 +85,7 @@ export const CANVAS_AFFORDANCE_CONFIG_DEFAULTS = Object.freeze({
     inspector: true,
     itemOutline: true,
     marquee: true,
+    presence: true,
     resizeHandles: true,
     selectionBounds: true,
     spacingGuides: true,

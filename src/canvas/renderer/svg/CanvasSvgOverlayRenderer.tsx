@@ -1,6 +1,9 @@
 import type { PointerEvent } from 'react'
 import type { CanvasOverlayState } from '../../engine'
-import type { ResizeHandle } from '../../core'
+import type {
+  ResizeHandle,
+  Viewport,
+} from '../../core'
 import {
   CANVAS_SVG_ARROW_MARKER_ID,
   CANVAS_SVG_DRAFT_ARROW_MARKER_ID,
@@ -11,6 +14,7 @@ import {
 
 type CanvasSvgInteractionOverlaysProps = {
   overlays: CanvasOverlayState
+  viewport: Viewport
   onResizePointerDown: (
     event: PointerEvent<SVGRectElement>,
     handle: ResizeHandle,
@@ -67,6 +71,7 @@ export function CanvasSvgOverlayPlane({
 
 export function CanvasSvgInteractionOverlays({
   overlays,
+  viewport,
   onResizePointerDown,
 }: CanvasSvgInteractionOverlaysProps) {
   return (
@@ -192,6 +197,62 @@ export function CanvasSvgInteractionOverlays({
           vectorEffect="non-scaling-stroke"
         />
       ) : null}
+
+      {overlays.presence && overlays.presence.length > 0 ? (
+        <g className="presence-overlays">
+          {overlays.presence.map((presence) => (
+            <CanvasSvgPresenceCursor
+              key={presence.id}
+              color={presence.color}
+              label={presence.label}
+              scale={1 / viewport.scale}
+              x={presence.point.x}
+              y={presence.point.y}
+            />
+          ))}
+        </g>
+      ) : null}
     </>
+  )
+}
+
+function CanvasSvgPresenceCursor({
+  color,
+  label,
+  scale,
+  x,
+  y,
+}: {
+  color: string
+  label: string
+  scale: number
+  x: number
+  y: number
+}) {
+  const labelWidth = Math.max(36, label.length * 7 + 18)
+
+  return (
+    <g
+      className="presence-cursor"
+      transform={`translate(${x} ${y}) scale(${scale})`}
+    >
+      <path
+        className="presence-cursor-pointer"
+        d="M 0 0 L 0 22 L 6 16 L 10 26 L 15 24 L 10 14 L 19 14 Z"
+        fill={color}
+      />
+      <g transform="translate(12 18)">
+        <rect
+          className="presence-label-bg"
+          width={labelWidth}
+          height="22"
+          rx="5"
+          fill={color}
+        />
+        <text className="presence-label-text" x="9" y="15">
+          {label}
+        </text>
+      </g>
+    </g>
   )
 }

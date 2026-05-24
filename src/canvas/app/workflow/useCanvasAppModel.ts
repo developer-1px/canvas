@@ -21,11 +21,14 @@ import {
   assertCanvasAppAssembly,
 } from './CanvasAppAssembly'
 import type { CanvasAppAssembly } from './CanvasAppAssemblyTypes'
+import type { CanvasPresenceOverlay } from '../../engine'
 
 export function useCanvasAppModel({
   assembly = DEFAULT_CANVAS_APP_ASSEMBLY,
+  presence,
 }: {
   assembly?: CanvasAppAssembly
+  presence?: readonly CanvasPresenceOverlay[]
 } = {}) {
   const appAssembly = useMemo(
     () => getCanvasAppAssemblyModel(assertCanvasAppAssembly(assembly)),
@@ -39,6 +42,7 @@ export function useCanvasAppModel({
   const workspace = useCanvasWorkspaceModel(appAssembly.workspace)
   const interaction = useCanvasInteractionModel({
     ...affordance.interaction,
+    presence,
     ...workspace.interaction,
   })
 
