@@ -1,39 +1,8 @@
-import type {
-  Dispatch,
-  SetStateAction,
-} from 'react'
-import type {
-  EditingText,
-  Tool,
-  Viewport,
-} from '../../entities'
-import type { CanvasComponentLibrary } from '../../host'
 import { useCanvasComponentInsertion } from '../components/useCanvasComponentInsertion'
-import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
-import type { CommitCanvasItemsChange } from './CanvasWorkflowContract'
-
-type CanvasAppComponentCommandModel = {
-  commitItemsChange: CommitCanvasItemsChange
-}
-
-type CanvasAppComponentInteractionModel = {
-  setEditing: Dispatch<SetStateAction<EditingText | null>>
-  setTool: Dispatch<SetStateAction<Tool>>
-}
-
-type CanvasAppComponentWorkspaceModel = {
-  selection: string[]
-  viewport: Viewport
-}
-
-type UseCanvasAppComponentModelArgs = {
-  command: CanvasAppComponentCommandModel
-  componentLibrary: CanvasComponentLibrary
-  createId: (prefix: string) => string
-  interaction: CanvasAppComponentInteractionModel
-  stageElement: CanvasAppStageElement
-  workspace: CanvasAppComponentWorkspaceModel
-}
+import type {
+  CanvasAppComponentModel,
+  CanvasAppComponentModelInput,
+} from './CanvasAppConsumerContracts'
 
 export function useCanvasAppComponentModel({
   command,
@@ -42,7 +11,7 @@ export function useCanvasAppComponentModel({
   interaction,
   stageElement,
   workspace,
-}: UseCanvasAppComponentModelArgs) {
+}: CanvasAppComponentModelInput): CanvasAppComponentModel {
   const insertComponent = useCanvasComponentInsertion({
     commitItemsChange: command.commitItemsChange,
     componentLibrary,

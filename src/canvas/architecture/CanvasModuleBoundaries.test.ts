@@ -1525,6 +1525,25 @@ describe('Canvas module boundaries', () => {
       "from '../components/useCanvasComponentInsertion'",
     )
     expect(componentModelFile.source).toContain(
+      "from './CanvasAppConsumerContracts'",
+    )
+    expect(componentModelFile.source).toContain(
+      'CanvasAppComponentModelInput',
+    )
+    expect(componentModelFile.source).toContain('CanvasAppComponentModel')
+    expect(componentModelFile.source).not.toContain(
+      'type CanvasAppComponentCommandModel',
+    )
+    expect(componentModelFile.source).not.toContain(
+      'type CanvasAppComponentInteractionModel',
+    )
+    expect(componentModelFile.source).not.toContain(
+      'type CanvasAppComponentWorkspaceModel',
+    )
+    expect(componentModelFile.source).not.toContain(
+      'type UseCanvasAppComponentModelArgs',
+    )
+    expect(componentModelFile.source).toContain(
       'export function useCanvasAppComponentModel',
     )
     expect(componentModelFile.source).toContain('componentLibrary')
@@ -1533,6 +1552,21 @@ describe('Canvas module boundaries', () => {
     expect(componentModelFile.source).toContain(
       'onInsertComponent: insertComponent',
     )
+    const consumerContractsFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppConsumerContracts.ts',
+    )
+    for (const componentContract of [
+      'CanvasAppComponentModelInput',
+      'CanvasAppComponentCommandModel',
+      'CanvasAppComponentInteractionModel',
+      'CanvasAppComponentWorkspaceModel',
+      'CanvasAppComponentControlContext',
+      'CanvasAppComponentModel',
+    ]) {
+      expect(consumerContractsFile.source).toContain(
+        `export type ${componentContract}`,
+      )
+    }
     expect(componentHookFile.source).toContain(
       "from './CanvasComponentInsertionExecution'",
     )

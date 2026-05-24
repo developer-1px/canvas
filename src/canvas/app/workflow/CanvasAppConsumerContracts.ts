@@ -19,6 +19,7 @@ import type {
 } from '../../engine'
 import type {
   Bounds,
+  CanvasComponentKind,
   CanvasInteractionKind,
   CanvasItem,
   EditingText,
@@ -28,6 +29,7 @@ import type {
   Viewport,
 } from '../../entities'
 import type {
+  CanvasComponentLibrary,
   CanvasEditableTextItem,
   CanvasItemReadModel,
 } from '../../host'
@@ -138,6 +140,37 @@ export type CanvasAppCommandModelInput = {
   setEditing: Dispatch<SetStateAction<EditingText | null>>
   stageElement: CanvasAppStageElement
   workspace: CanvasAppCommandWorkspaceModel
+}
+
+export type CanvasAppComponentCommandModel = {
+  commitItemsChange: CommitCanvasItemsChange
+}
+
+export type CanvasAppComponentInteractionModel = {
+  setEditing: Dispatch<SetStateAction<EditingText | null>>
+  setTool: Dispatch<SetStateAction<Tool>>
+}
+
+export type CanvasAppComponentWorkspaceModel = {
+  selection: string[]
+  viewport: Viewport
+}
+
+export type CanvasAppComponentModelInput = {
+  command: CanvasAppComponentCommandModel
+  componentLibrary: CanvasComponentLibrary
+  createId: (prefix: string) => string
+  interaction: CanvasAppComponentInteractionModel
+  stageElement: CanvasAppStageElement
+  workspace: CanvasAppComponentWorkspaceModel
+}
+
+export type CanvasAppComponentControlContext = {
+  onInsertComponent: (component: CanvasComponentKind) => void
+}
+
+export type CanvasAppComponentModel = {
+  control: CanvasAppComponentControlContext
 }
 
 export type CanvasAppExtensionRuntime = {
