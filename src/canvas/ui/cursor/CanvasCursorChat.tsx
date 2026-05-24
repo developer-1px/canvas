@@ -57,7 +57,7 @@ export function CanvasCursorChat({
   }
 
   function handleBlur(event: FocusEvent<HTMLFormElement>) {
-    if (!event.currentTarget.contains(event.relatedTarget)) {
+    if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
       onCancel()
     }
   }

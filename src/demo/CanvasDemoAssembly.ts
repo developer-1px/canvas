@@ -7,6 +7,7 @@ import { DEMO_CUSTOM_ITEM_MODULES } from './custom-items'
 
 export const DEMO_CANVAS_APP_ASSEMBLY_INPUT = {
   customItemModules: DEMO_CUSTOM_ITEM_MODULES,
+  initialSelection: [],
 } satisfies CanvasAppAssemblyInput
 
 export const DEMO_CANVAS_APP_ASSEMBLY = createCanvasAppAssembly(

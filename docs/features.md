@@ -166,3 +166,7 @@
 162. Laser pointer는 문서 item을 만들지 않는 built-in transient tool로 제공된다.
 163. Laser pointer drag는 SVG overlay trail과 현재 점을 표시하고 pointer 종료 시 사라진다.
 164. `P` shortcut은 Laser pointer tool을 활성화한다.
+165. Cursor chat은 `/` shortcut으로 열리는 built-in transient UI로 제공된다.
+166. Cursor chat은 pointer 위치에 붙어 움직이며 Escape 또는 canvas pointer down으로 닫힌다.
+167. Cursor chat은 문서 item을 만들지 않고 App UI 상태로만 유지된다.
+168. Demo canvas는 초기 선택 없이 열려 inspector와 reaction bar를 필요할 때만 표시한다.

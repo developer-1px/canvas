@@ -45,11 +45,10 @@ export function useCanvasStampControls({
   stageElement,
   viewport,
 }: CanvasStampControlsInput): CanvasStampControlsModel {
-  const visible = config.overlays.stampControls
-  const canInsertStamp = visible
+  const canInsertStamp = config.overlays.stampControls
   const anchor = useMemo(
     () =>
-      visible
+      canInsertStamp
         ? getCanvasStampControlsAnchor({
             itemReadModel,
             selection,
@@ -60,9 +59,10 @@ export function useCanvasStampControls({
       itemReadModel,
       selection,
       viewport,
-      visible,
+      canInsertStamp,
     ],
   )
+  const visible = canInsertStamp && anchor !== null
 
   const onInsertStamp = useCallback(
     (stamp: CanvasStampDefinition) => {
