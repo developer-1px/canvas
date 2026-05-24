@@ -5807,6 +5807,7 @@ describe('Canvas module boundaries', () => {
     )
     expect(documentRuntimeFile.source).not.toContain('Parameters<')
     expect(documentRuntimeFile.source).not.toContain('ReturnType<')
+    expect(documentRuntimeFile.source).not.toContain('export type {')
     expect(documentRuntimeContractsFile.source).toContain(
       'export type CanvasDocumentCommittedState',
     )

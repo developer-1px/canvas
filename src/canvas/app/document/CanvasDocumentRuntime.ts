@@ -13,11 +13,6 @@ import type {
   RestoreCanvasDocumentSelectionArgs,
 } from './CanvasDocumentRuntimeContracts'
 
-export type {
-  CanvasDocumentCommittedState,
-  CanvasDocumentStateAction,
-} from './CanvasDocumentRuntimeContracts'
-
 export function replaceCanvasDocumentLiveItems({
   action,
   currentItems,
