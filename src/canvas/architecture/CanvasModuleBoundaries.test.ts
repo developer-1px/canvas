@@ -3615,7 +3615,7 @@ describe('Canvas module boundaries', () => {
       'src/canvas/app/workflow/useCanvasAppModel.ts',
     )
 
-    expect(descriptorFile.source).toContain(
+    expect(descriptorFile.source).not.toContain(
       "from './CanvasAppCustomCommandExecution'",
     )
     expect(descriptorFile.source).not.toContain('CanvasWorkflowContract')
@@ -4088,7 +4088,7 @@ describe('Canvas module boundaries', () => {
       'src/canvas/app/pointer/CanvasPointerCustomCreation.ts',
     )
 
-    expect(descriptorFile.source).toContain(
+    expect(descriptorFile.source).not.toContain(
       "from './CanvasAppCustomCreationToolRuntime'",
     )
     expect(descriptorFile.source).not.toContain(
