@@ -282,6 +282,7 @@
 - Canvas App Custom Command descriptor shape 검증과 toolbar state/run execution은 분리하고, validation은 Canvas App Custom Command Contracts가, 실행 실패 containment는 Canvas App Custom Command Execution이 소유한다. Descriptor Module은 runtime state/run helper를 재노출하지 않는다.
 - 제품별 item creation tool은 내부 Tool union에 구체 id를 넣지 않고 Canvas App Custom Item Module에 등록한다.
 - Canvas App Custom Creation Tool descriptor shape/shortcut conflict 검증과 runtime state/lookup/shortcut matching은 분리하고, validation은 Canvas App Custom Creation Tool Contracts가, runtime behavior는 Canvas App Custom Creation Tool Runtime이 소유한다. Descriptor Module은 runtime state/lookup helper를 재노출하지 않는다.
+- Canvas App Custom Creation Tool Contracts와 Canvas App Custom Item Module Contracts는 Runtime Module을 import하지 않고 raw descriptor shape와 shortcut conflict를 검증한다.
 - Canvas App Custom Creation Tool이 item 생성을 거부하거나 실패하거나 invalid item을 반환해도 pointer lifecycle을 깨지 않아야 한다.
 - Pointer down hook은 DOM pointer routing과 coordinate 변환을 맡고, tool/gesture/config 기반 pan/marquee 시작 규칙은 Canvas Pointer Interaction Start가, 생성 도구 시작 규칙은 Canvas Pointer Creation Start가, 시작 결과 적용은 Canvas Pointer Interaction Start Effects가 소유한다.
 - Item pointer down hook은 DOM event routing과 시작 결과 적용을 맡고, item double-click memory 규칙은 Canvas Pointer Click Memory가, selection/edit/duplicate/move 시작 규칙은 Canvas Item Pointer Interaction Start가 소유한다.

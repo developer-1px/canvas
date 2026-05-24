@@ -6,7 +6,6 @@ import {
 import { assertCanvasAppExtensionId } from '../extensions/CanvasAppExtensionIds'
 import { assertCanvasAppInspectorPanels } from '../inspector/CanvasAppInspectorPanels'
 import { assertCanvasAppCustomCreationTools } from '../tools/CanvasAppCustomCreationTools'
-import { getCanvasAppCustomItemModuleCreationTools } from './CanvasAppCustomItemModuleRuntime'
 import type { CanvasAppCustomItemModuleAssembly } from './CanvasAppCustomItemModuleAssembly'
 import type {
   CanvasAppCustomItemModule,
@@ -89,9 +88,7 @@ function assertCanvasAppCustomItemModuleFunction({
 function assertCanvasAppCustomItemModuleCreationTools(
   module: CanvasAppCustomItemModule,
 ) {
-  assertCanvasAppCustomCreationTools(
-    getCanvasAppCustomItemModuleCreationTools(module),
-  )
+  assertCanvasAppCustomCreationTools(module.customCreationTools ?? [])
 
   for (const tool of module.customCreationTools ?? []) {
     assertCanvasAppCustomItemModuleFunction({

@@ -4075,6 +4075,9 @@ describe('Canvas module boundaries', () => {
     const descriptorFile = getSourceFile(
       'src/canvas/app/tools/CanvasAppCustomCreationTools.ts',
     )
+    const contractsFile = getSourceFile(
+      'src/canvas/app/tools/CanvasAppCustomCreationToolContracts.ts',
+    )
     const runtimeFile = getSourceFile(
       'src/canvas/app/tools/CanvasAppCustomCreationToolRuntime.ts',
     )
@@ -4096,6 +4099,12 @@ describe('Canvas module boundaries', () => {
 
     expect(descriptorFile.source).not.toContain(
       "from './CanvasAppCustomCreationToolRuntime'",
+    )
+    expect(contractsFile.source).not.toContain(
+      "from './CanvasAppCustomCreationToolRuntime'",
+    )
+    expect(contractsFile.source).toContain(
+      "from '../keyboard/CanvasKeyboardShortcutChords'",
     )
     expect(descriptorFile.source).not.toContain(
       'export function getCanvasAppCustomCreationToolStates',
@@ -4716,11 +4725,17 @@ describe('Canvas module boundaries', () => {
     const assemblyFile = getSourceFile(
       'src/canvas/app/modules/CanvasAppCustomItemModuleAssembly.ts',
     )
+    const contractsFile = getSourceFile(
+      'src/canvas/app/modules/CanvasAppCustomItemModuleContracts.ts',
+    )
     const runtimeFile = getSourceFile(
       'src/canvas/app/modules/CanvasAppCustomItemModuleRuntime.ts',
     )
 
     expect(moduleFile.source).not.toContain(
+      "from './CanvasAppCustomItemModuleRuntime'",
+    )
+    expect(contractsFile.source).not.toContain(
       "from './CanvasAppCustomItemModuleRuntime'",
     )
     expect(assemblyFile.source).toContain(

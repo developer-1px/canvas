@@ -10,13 +10,25 @@ import {
   getCanvasKeyboardReservedShortcuts,
 } from '../keyboard/CanvasKeyboardReservedShortcuts'
 import {
-  formatCanvasAppCustomToolShortcut,
-  getCanvasAppCustomToolShortcutKey,
-} from './CanvasAppCustomCreationToolRuntime'
+  formatCanvasKeyboardShortcutChord,
+  getCanvasKeyboardShortcutChordKey,
+} from '../keyboard/CanvasKeyboardShortcutChords'
 import type {
   CanvasAppCustomCreationTool,
   CanvasAppCustomToolShortcut,
 } from './CanvasAppCustomCreationTools'
+
+type CanvasAppCustomCreationToolDescriptor = Omit<
+  CanvasAppCustomCreationTool,
+  'createItem'
+> & {
+  createItem: unknown
+}
+
+type CanvasAppCustomCreationToolShortcutDescriptor = Pick<
+  CanvasAppCustomCreationToolDescriptor,
+  'id' | 'shortcut'
+>
 
 type ReservedCanvasAppCustomToolShortcut = {
   label: string
@@ -28,7 +40,7 @@ const RESERVED_CANVAS_APP_CUSTOM_TOOL_SHORTCUTS:
     getCanvasKeyboardReservedShortcuts()
 
 export function assertCanvasAppCustomCreationTools(
-  tools: readonly CanvasAppCustomCreationTool[],
+  tools: readonly CanvasAppCustomCreationToolDescriptor[],
 ) {
   assertCanvasAppExtensionEntries({
     entries: tools,
@@ -43,11 +55,11 @@ export function assertCanvasAppCustomCreationTools(
 }
 
 export function assertCanvasAppCustomCreationToolShortcuts(
-  tools: readonly CanvasAppCustomCreationTool[],
+  tools: readonly CanvasAppCustomCreationToolShortcutDescriptor[],
 ) {
   const reserved = new Map(
     RESERVED_CANVAS_APP_CUSTOM_TOOL_SHORTCUTS.map((entry) => [
-      getCanvasAppCustomToolShortcutKey(entry.shortcut),
+      getCanvasKeyboardShortcutChordKey(entry.shortcut),
       entry.label,
     ]),
   )
@@ -58,8 +70,8 @@ export function assertCanvasAppCustomCreationToolShortcuts(
       continue
     }
 
-    const key = getCanvasAppCustomToolShortcutKey(tool.shortcut)
-    const label = formatCanvasAppCustomToolShortcut(tool.shortcut)
+    const key = getCanvasKeyboardShortcutChordKey(tool.shortcut)
+    const label = formatCanvasKeyboardShortcutChord(tool.shortcut)
     const reservedLabel = reserved.get(key)
     const existingTool = seen.get(key)
 
@@ -80,7 +92,7 @@ export function assertCanvasAppCustomCreationToolShortcuts(
 }
 
 function assertCanvasAppCustomCreationToolDescriptor(
-  tool: CanvasAppCustomCreationTool,
+  tool: CanvasAppCustomCreationToolDescriptor,
 ) {
   const owner = `custom creation tool ${tool.id}`
 
