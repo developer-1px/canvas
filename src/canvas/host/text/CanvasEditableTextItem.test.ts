@@ -8,6 +8,7 @@ import type {
 import {
   getCanvasEditableTextBounds,
   getCanvasEditableTextPatchOperation,
+  getCanvasEditableTextPatchField,
   getCanvasEditableTextValue,
   getCommittedCanvasEditableTextValue,
   isCanvasEditableTextItem,
@@ -60,6 +61,7 @@ describe('CanvasEditableTextItem', () => {
     expect(isCanvasTextItem(rectItem)).toBe(false)
     expect(isCanvasEditableTextItem(arrowItem)).toBe(true)
     expect(isCanvasEditableTextItem(createComponentItem('sticky'))).toBe(true)
+    expect(isCanvasEditableTextItem(createComponentItem('section'))).toBe(true)
     expect(isCanvasEditableTextItem(createComponentItem('status-card')))
       .toBe(false)
   })
@@ -90,6 +92,9 @@ describe('CanvasEditableTextItem', () => {
     expect(getCanvasEditableTextValue(createComponentItem('sticky'))).toBe(
       'Decision note',
     )
+    expect(getCanvasEditableTextValue(createComponentItem('section'))).toBe(
+      'Status',
+    )
     expect(getCanvasEditableTextValue(arrowItem)).toBe('Next step')
     expect(getCanvasEditableTextValue({
       ...arrowItem,
@@ -112,6 +117,10 @@ describe('CanvasEditableTextItem', () => {
     })).toBe('   ')
     expect(getCommittedCanvasEditableTextValue({
       item: createComponentItem('sticky'),
+      value: '',
+    })).toBe('')
+    expect(getCommittedCanvasEditableTextValue({
+      item: createComponentItem('section'),
       value: '',
     })).toBe('')
     expect(getCommittedCanvasEditableTextValue({
@@ -138,6 +147,12 @@ describe('CanvasEditableTextItem', () => {
     expect(getCanvasEditableTextPatchOperation(arrowItem)).toBe('replace')
     expect(getCanvasEditableTextPatchOperation(createComponentItem('sticky')))
       .toBe('replace')
+    expect(getCanvasEditableTextPatchOperation(createComponentItem('section')))
+      .toBe('replace')
+    expect(getCanvasEditableTextPatchField(createComponentItem('sticky')))
+      .toBe('body')
+    expect(getCanvasEditableTextPatchField(createComponentItem('section')))
+      .toBe('title')
   })
 
   it('derives connector label editing bounds from arrow geometry', () => {
@@ -146,6 +161,15 @@ describe('CanvasEditableTextItem', () => {
       w: 96,
       x: 112,
       y: 104,
+    })
+  })
+
+  it('derives section title editing bounds from the title area', () => {
+    expect(getCanvasEditableTextBounds(createComponentItem('section'))).toEqual({
+      h: 32,
+      w: 156,
+      x: 92,
+      y: 128,
     })
   })
 

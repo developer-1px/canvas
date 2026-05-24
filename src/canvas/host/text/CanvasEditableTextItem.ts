@@ -4,6 +4,10 @@ import type {
   TextItem,
 } from '../model'
 import type { Bounds } from '../../core'
+import {
+  CANVAS_SECTION_COMPONENT_KIND,
+  isCanvasSectionComponentItem,
+} from '../component/CanvasSectionComponent'
 import { isCanvasStickyComponentItem } from '../component/CanvasStickyComponent'
 import {
   getCanvasArrowLabelBounds,
@@ -24,6 +28,7 @@ export function isCanvasEditableTextItem(
     item.type === 'rect' ||
     isCanvasTextItem(item) ||
     isCanvasArrowDrawingItem(item) ||
+    isCanvasSectionComponentItem(item) ||
     isCanvasStickyComponentItem(item)
   )
 }
@@ -42,7 +47,9 @@ export function getCanvasEditableTextValue(
   item: CanvasEditableTextItem,
 ) {
   if (item.type === 'component') {
-    return item.body ?? ''
+    return item.component === CANVAS_SECTION_COMPONENT_KIND
+      ? item.title
+      : item.body ?? ''
   }
 
   return item.text ?? ''
@@ -71,20 +78,35 @@ export function getCanvasEditableTextPatchOperation(
 export function getCanvasEditableTextPatchField(
   item: CanvasEditableTextItem,
 ) {
-  return item.type === 'component' ? 'body' : 'text'
+  if (item.type === 'component') {
+    return item.component === CANVAS_SECTION_COMPONENT_KIND ? 'title' : 'body'
+  }
+
+  return 'text'
 }
 
 export function getCanvasEditableTextBounds(
   item: CanvasEditableTextItem,
 ): Bounds {
-  return isCanvasArrowDrawingItem(item)
-    ? getCanvasArrowLabelBounds(item)
-    : {
-        x: item.x,
-        y: item.y,
-        w: item.w,
-        h: item.h,
-      }
+  if (isCanvasArrowDrawingItem(item)) {
+    return getCanvasArrowLabelBounds(item)
+  }
+
+  if (isCanvasSectionComponentItem(item)) {
+    return {
+      h: 32,
+      w: Math.max(80, item.w - 24),
+      x: item.x + 12,
+      y: item.y + 8,
+    }
+  }
+
+  return {
+    x: item.x,
+    y: item.y,
+    w: item.w,
+    h: item.h,
+  }
 }
 
 export function shouldCommitCanvasEditableTextOnEnter(
@@ -98,7 +120,9 @@ function isCanvasEditableTextPatchFieldMissing(
 ) {
   return (
     (item.type === 'rect' && item.text === undefined) ||
-    (item.type === 'component' && item.body === undefined) ||
+    (item.type === 'component' &&
+      item.component !== CANVAS_SECTION_COMPONENT_KIND &&
+      item.body === undefined) ||
     (item.type === 'arrow' && item.text === undefined)
   )
 }

@@ -44,6 +44,29 @@ describe('CanvasDocumentChangePatch', () => {
     ])
   })
 
+  it('maps section set-text changes to title patches', () => {
+    expect(
+      createCanvasItemsChangePatch([
+        ...createItems(),
+        createStickyItem('component-section', {
+          body: 'Workspace',
+          component: 'section',
+          title: 'Section',
+        }),
+      ], {
+        id: 'component-section',
+        text: 'Workshop plan',
+        type: 'set-text',
+      }),
+    ).toEqual([
+      {
+        op: 'replace',
+        path: '/4/title',
+        value: 'Workshop plan',
+      },
+    ])
+  })
+
   it('maps connector set-text changes to label patches', () => {
     expect(
       createCanvasItemsChangePatch(createItems(), {

@@ -9,9 +9,10 @@ import { DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS } from './Canv
 import { DEFAULT_CANVAS_DEMO_SVG_CUSTOM_ITEM_RENDERERS } from './CanvasDemoSvgCustomItemRendererRegistry'
 
 describe('CanvasDemoSvgItemRenderRouting', () => {
-  it('routes sticky component double-clicks into text editing', () => {
+  it('routes built-in editable component double-clicks into text editing', () => {
     const onTextDoubleClick = vi.fn()
     const sticky = createComponentItem({ component: 'sticky' })
+    const section = createComponentItem({ component: 'section' })
     const card = createComponentItem({ component: 'card' })
 
     const stickyRoute = getCanvasDemoSvgItemRenderRoute({
@@ -22,12 +23,18 @@ describe('CanvasDemoSvgItemRenderRouting', () => {
       ...createInput(card),
       onTextDoubleClick,
     })
+    const sectionRoute = getCanvasDemoSvgItemRenderRoute({
+      ...createInput(section),
+      onTextDoubleClick,
+    })
 
     stickyRoute.onDoubleClick?.()
+    sectionRoute.onDoubleClick?.()
     cardRoute.onDoubleClick?.()
 
-    expect(onTextDoubleClick).toHaveBeenCalledOnce()
+    expect(onTextDoubleClick).toHaveBeenCalledTimes(2)
     expect(onTextDoubleClick).toHaveBeenCalledWith(sticky)
+    expect(onTextDoubleClick).toHaveBeenCalledWith(section)
     expect(cardRoute.onDoubleClick).toBeUndefined()
   })
 
