@@ -57,6 +57,7 @@ import type { Interaction } from '../pointer/CanvasInteractionState'
 import type { CanvasAppControlCommandHandlers } from './CanvasAppControlCommandContracts'
 import type {
   CanvasDocumentClipboard,
+  CanvasDocumentTextSearch,
   CommitCanvasItemsChange,
   CommitCanvasSelection,
 } from './CanvasWorkflowContract'
@@ -222,6 +223,28 @@ export type CanvasAppKeyboardModelInput = {
   openFindReplace: () => void
   selection: string[]
   viewport: CanvasAppKeyboardViewportContext
+}
+
+export type CanvasAppTextDocumentModel = {
+  commitItemsChange: CommitCanvasItemsChange
+  findDocumentText: CanvasDocumentTextSearch['findDocumentText']
+  replaceDocumentText: CanvasDocumentTextSearch['replaceDocumentText']
+}
+
+export type CanvasAppTextModelInput = {
+  config: CanvasAffordanceConfig
+  document: CanvasAppTextDocumentModel
+  itemReadModel: CanvasItemReadModel
+  selection: string[]
+  viewport: Viewport
+}
+
+export type CanvasAppTextRuntime<TFindReplace, TTextEditor> = {
+  blurTextEditor: () => void
+  findReplace: TFindReplace
+  openFindReplace: () => void
+  setEditing: Dispatch<SetStateAction<EditingText | null>>
+  textEditor: TTextEditor
 }
 
 export type CanvasInteractionDraftWriters = {

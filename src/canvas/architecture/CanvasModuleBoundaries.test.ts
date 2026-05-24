@@ -2030,6 +2030,16 @@ describe('Canvas module boundaries', () => {
       "from './CanvasAppTextConsumerModel'",
     )
     expect(textModelFile.source).toContain(
+      "from './CanvasAppConsumerContracts'",
+    )
+    expect(textModelFile.source).toContain('CanvasAppTextModelInput')
+    expect(textModelFile.source).not.toContain(
+      'type CanvasAppTextDocumentModel',
+    )
+    expect(textModelFile.source).not.toContain(
+      'type UseCanvasAppTextModelArgs',
+    )
+    expect(textModelFile.source).toContain(
       'useRef<HTMLTextAreaElement | null>',
     )
     expect(textModelFile.source).toContain(
@@ -2049,6 +2059,24 @@ describe('Canvas module boundaries', () => {
     }
     expect(textConsumerModelFile.source).toContain(
       'export function getCanvasAppTextConsumerModel',
+    )
+    expect(textConsumerModelFile.source).toContain(
+      "from './CanvasAppConsumerContracts'",
+    )
+    expect(textConsumerModelFile.source).not.toContain(
+      'type CanvasAppTextRuntime',
+    )
+    const textConsumerContractsFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppConsumerContracts.ts',
+    )
+    expect(textConsumerContractsFile.source).toContain(
+      'export type CanvasAppTextModelInput',
+    )
+    expect(textConsumerContractsFile.source).toContain(
+      'export type CanvasAppTextDocumentModel',
+    )
+    expect(textConsumerContractsFile.source).toContain(
+      'export type CanvasAppTextRuntime',
     )
     expect(textEditingHookFile.source).toContain(
       "from './CanvasTextEditingModel'",

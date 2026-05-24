@@ -1,16 +1,4 @@
-import type {
-  Dispatch,
-  SetStateAction,
-} from 'react'
-import type { EditingText } from '../../entities'
-
-type CanvasAppTextRuntime<TFindReplace, TTextEditor> = {
-  blurTextEditor: () => void
-  findReplace: TFindReplace
-  openFindReplace: () => void
-  setEditing: Dispatch<SetStateAction<EditingText | null>>
-  textEditor: TTextEditor
-}
+import type { CanvasAppTextRuntime } from './CanvasAppConsumerContracts'
 
 export function getCanvasAppTextConsumerModel<TFindReplace, TTextEditor>({
   blurTextEditor,
