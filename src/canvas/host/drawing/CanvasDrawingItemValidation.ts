@@ -2,7 +2,10 @@ import {
   isCanvasStableId,
   type Point,
 } from '../../core'
-import type { CanvasDrawingItem } from './CanvasDrawingItemGeometry'
+import {
+  isCanvasArrowRouting,
+  type CanvasDrawingItem,
+} from './CanvasDrawingItemGeometry'
 
 export function isCanvasDrawingItemStorageShape(
   value: Record<string, unknown>,
@@ -64,7 +67,7 @@ function isOptionalStableItemId(value: unknown) {
 }
 
 function isOptionalArrowRouting(value: unknown) {
-  return value === undefined || value === 'elbow' || value === 'straight'
+  return value === undefined || isCanvasArrowRouting(value)
 }
 
 function isPoint(value: unknown): value is Point {

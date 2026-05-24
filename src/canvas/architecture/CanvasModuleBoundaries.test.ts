@@ -3255,6 +3255,12 @@ describe('Canvas module boundaries', () => {
     const drawingRendererFile = getSourceFile(
       'src/canvas/app/rendering/CanvasDemoSvgDrawingItemRenderer.tsx',
     )
+    const arrowRoutingInspectorFile = getSourceFile(
+      'src/canvas/app/drawing/CanvasArrowRoutingInspectorPanel.tsx',
+    )
+    const defaultAssemblyFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppDefaultAssembly.ts',
+    )
 
     expect(drawingGeometryModule.source).toContain(
       'export function isCanvasDrawingItem',
@@ -3268,8 +3274,21 @@ describe('Canvas module boundaries', () => {
     expect(drawingGeometryModule.source).toContain(
       'export function scaleCanvasDrawingItem',
     )
+    expect(drawingGeometryModule.source).toContain(
+      'export function replaceCanvasArrowRoutings',
+    )
     expect(hostEntryFile.source).toContain(
       "from './drawing/CanvasDrawingItemGeometry'",
+    )
+    expect(hostEntryFile.source).toContain('replaceCanvasArrowRoutings')
+    expect(arrowRoutingInspectorFile.source).toContain(
+      'replaceCanvasArrowRoutings',
+    )
+    expect(defaultAssemblyFile.source).toContain(
+      "from '../drawing/CanvasArrowRoutingInspectorPanel'",
+    )
+    expect(defaultAssemblyFile.source).toContain(
+      'CANVAS_ARROW_ROUTING_INSPECTOR_PANEL',
     )
     for (const hostConsumer of [
       treeBoundsFile,

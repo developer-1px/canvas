@@ -4,7 +4,10 @@ import {
   getCanvasArrowLabelBounds,
   getCanvasDrawingItemBounds,
   isCanvasDrawingItem,
+  normalizeCanvasArrowRouting,
+  replaceCanvasArrowRoutings,
   scaleCanvasDrawingItem,
+  setCanvasArrowRouting,
   translateCanvasArrowAttachedEndpoints,
   translateCanvasDrawingItem,
 } from './CanvasDrawingItemGeometry'
@@ -64,6 +67,39 @@ describe('CanvasDrawingItemGeometry', () => {
       x: 8,
       y: 28,
     })
+  })
+
+  it('normalizes connector routing values', () => {
+    expect(normalizeCanvasArrowRouting('straight')).toBe('straight')
+    expect(normalizeCanvasArrowRouting('elbow')).toBe('elbow')
+    expect(normalizeCanvasArrowRouting(undefined)).toBe('elbow')
+  })
+
+  it('sets selected connector routing without changing geometry', () => {
+    expect(setCanvasArrowRouting(arrow, 'straight')).toEqual({
+      ...arrow,
+      routing: 'straight',
+    })
+    expect(replaceCanvasArrowRoutings(
+      [
+        arrow,
+        {
+          ...marker,
+          id: 'marker-2',
+        },
+      ],
+      ['arrow-1'],
+      'elbow',
+    )).toEqual([
+      {
+        ...arrow,
+        routing: 'elbow',
+      },
+      {
+        ...marker,
+        id: 'marker-2',
+      },
+    ])
   })
 
   it('includes visible connector labels in arrow bounds', () => {

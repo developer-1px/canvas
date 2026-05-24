@@ -1,6 +1,6 @@
 # Feature 제공 목록
 
-기준: 로컬 실행 `http://127.0.0.1:5173/` 사용 및 코드 확인.
+기준: 로컬 Vite 실행 URL 사용 및 코드 확인.
 
 1. 전체 브라우저 뷰포트를 캔버스 작업 영역으로 사용한다.
 2. 캔버스 배경에 40px 간격 그리드를 표시한다.
@@ -190,3 +190,4 @@
 186. Link preview component는 `url`을 title/body와 분리해 저장하고, renderer는 component library template 없이 built-in `link-preview-card` presentation으로 표시한다.
 187. 선택한 link preview는 Inspector의 built-in action으로 원본 URL text item으로 되돌릴 수 있다.
 188. 선택한 static link preview는 Inspector action으로 horizontal/vertical 표시 방향을 전환할 수 있다.
+189. 선택한 connector는 Inspector action으로 elbow/straight routing을 전환할 수 있다.

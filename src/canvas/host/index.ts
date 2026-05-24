@@ -85,9 +85,13 @@ export { INITIAL_ITEMS } from './component/CanvasInitialItems'
 export {
   getCanvasDrawingItemBounds,
   isCanvasArrowDrawingItem,
+  isCanvasArrowRouting,
   isCanvasDrawingItem,
   isCanvasStrokeDrawingItem,
+  normalizeCanvasArrowRouting,
+  replaceCanvasArrowRoutings,
   scaleCanvasDrawingItem,
+  setCanvasArrowRouting,
   syncCanvasDrawingItemBounds,
   getCanvasArrowLabelBounds,
   translateCanvasArrowAttachedEndpoints,
