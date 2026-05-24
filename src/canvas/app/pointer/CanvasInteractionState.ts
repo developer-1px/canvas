@@ -79,6 +79,16 @@ export type Interaction =
       moved: boolean
     }
   | {
+      kind: 'erase'
+      pointerId: number
+      startScreen: Point
+      startWorld: Point
+      currentWorld: Point
+      erasedIds: string[]
+      points: Point[]
+      moved: boolean
+    }
+  | {
       kind: 'create-arrow'
       pointerId: number
       startScreen: Point

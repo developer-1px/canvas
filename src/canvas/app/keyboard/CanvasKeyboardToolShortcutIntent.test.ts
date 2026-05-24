@@ -23,8 +23,8 @@ describe('CanvasKeyboardToolShortcutIntent', () => {
 
   it('resolves custom creation tool shortcuts after built-in tools', () => {
     const tool = getCanvasKeyboardToolShortcutIntent(createInput({
-      event: createKeyboardEvent({ key: 'E', shiftKey: true }),
-      key: 'e',
+      event: createKeyboardEvent({ key: 'K', shiftKey: true }),
+      key: 'k',
     }))
 
     expect(tool).toBe('custom:risk')
@@ -61,7 +61,7 @@ function createInput(
     config: DEFAULT_CANVAS_AFFORDANCE_CONFIG,
     customCreationTools: [createCustomTool()],
     event: createKeyboardEvent(),
-    key: 'e',
+    key: 'k',
     ...overrides,
   }
 }
@@ -73,7 +73,7 @@ function createCustomTool(
     ariaLabel: 'Risk tool',
     id: 'custom:risk',
     label: '!',
-    shortcut: { key: 'e', shiftKey: true },
+    shortcut: { key: 'k', shiftKey: true },
     statusLabel: 'Risk',
     title: 'Risk',
     ...overrides,
@@ -85,9 +85,9 @@ function createKeyboardEvent(
 ): KeyboardEvent {
   return {
     altKey: false,
-    code: 'KeyE',
+    code: 'KeyK',
     ctrlKey: false,
-    key: 'e',
+    key: 'k',
     metaKey: false,
     shiftKey: false,
     target: null,

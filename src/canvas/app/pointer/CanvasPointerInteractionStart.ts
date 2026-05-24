@@ -8,12 +8,15 @@ import {
   getCanvasPointerGesture,
   type CanvasAffordanceConfig,
   type CanvasCreationAdapter,
+  type CanvasSceneAdapter,
 } from '../../engine'
 import type { CanvasAppComponentLibrary } from '../workflow/CanvasAppComponentAssemblyContracts'
+import type { CanvasAppItemReadModel } from '../workflow/CanvasAppItemReadModelContracts'
 import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
 import type { CanvasDrawingStrokeStyleSet } from '../../host'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import { startCanvasPointerCreation } from './CanvasPointerCreationStart'
+import { startCanvasPointerEraserInteraction } from './CanvasPointerEraser'
 import type {
   CanvasPointerInteractionStartResult,
 } from './CanvasPointerInteractionResultContracts'
@@ -28,6 +31,8 @@ export type CanvasPointerInteractionStartInput = {
   customCreationTools: readonly CanvasAppCustomCreationTool[]
   drawingStyles: CanvasDrawingStrokeStyleSet
   input: CanvasAppPointerInput
+  itemReadModel: CanvasAppItemReadModel
+  scene: CanvasSceneAdapter
   selection: string[]
   spaceDown: boolean
   startScreen: Point
@@ -45,6 +50,8 @@ export function startCanvasPointerInteraction({
   customCreationTools,
   drawingStyles,
   input,
+  itemReadModel,
+  scene,
   selection,
   spaceDown,
   startScreen,
@@ -73,6 +80,21 @@ export function startCanvasPointerInteraction({
       }),
       kind: 'interaction',
     }
+  }
+
+  const eraserStart = startCanvasPointerEraserInteraction({
+    config,
+    input,
+    itemReadModel,
+    pointerGesture,
+    scene,
+    startScreen,
+    startWorld,
+    targetItemId,
+  })
+
+  if (eraserStart) {
+    return eraserStart
   }
 
   const creationStart = startCanvasPointerCreation({

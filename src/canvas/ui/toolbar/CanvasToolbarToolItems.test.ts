@@ -25,6 +25,7 @@ describe('CanvasToolbarToolItems', () => {
       { active: false, kind: 'builtin-tool', tool: 'comment' },
       { active: false, kind: 'builtin-tool', tool: 'marker' },
       { active: false, kind: 'builtin-tool', tool: 'highlight' },
+      { active: false, kind: 'builtin-tool', tool: 'eraser' },
       { active: false, kind: 'builtin-tool', tool: 'arrow' },
       {
         active: true,
@@ -55,6 +56,7 @@ describe('CanvasToolbarToolItems', () => {
       { active: false, kind: 'builtin-tool', tool: 'text' },
       { active: false, kind: 'builtin-tool', tool: 'comment' },
       { active: false, kind: 'builtin-tool', tool: 'highlight' },
+      { active: false, kind: 'builtin-tool', tool: 'eraser' },
       { active: false, kind: 'builtin-tool', tool: 'arrow' },
     ])
   })

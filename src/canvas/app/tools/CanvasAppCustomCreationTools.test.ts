@@ -16,7 +16,7 @@ const tool: CanvasAppCustomCreationTool = {
   id: 'risk',
   label: '!',
   title: 'Risk',
-  shortcut: { key: 'e', shiftKey: true },
+  shortcut: { key: 'k', shiftKey: true },
   createItem: ({ createId, startWorld }) => ({
     id: createId('risk'),
     type: 'custom',
@@ -38,9 +38,9 @@ describe('CanvasAppCustomCreationTools', () => {
         ariaLabel: 'Risk tool',
         id: 'custom:risk',
         label: '!',
-        shortcut: { key: 'e', shiftKey: true },
+        shortcut: { key: 'k', shiftKey: true },
         statusLabel: 'Risk',
-        title: 'Risk (Shift+E)',
+        title: 'Risk (Shift+K)',
       },
     ])
   })
@@ -54,14 +54,14 @@ describe('CanvasAppCustomCreationTools', () => {
   it('matches custom tool keyboard shortcuts exactly', () => {
     expect(
       matchesCanvasAppCustomToolShortcut({
-        event: { key: 'E', shiftKey: true } as KeyboardEvent,
-        shortcut: { key: 'e', shiftKey: true },
+        event: { key: 'K', shiftKey: true } as KeyboardEvent,
+        shortcut: { key: 'k', shiftKey: true },
       }),
     ).toBe(true)
     expect(
       matchesCanvasAppCustomToolShortcut({
-        event: { key: 'e', shiftKey: false } as KeyboardEvent,
-        shortcut: { key: 'e', shiftKey: true },
+        event: { key: 'k', shiftKey: false } as KeyboardEvent,
+        shortcut: { key: 'k', shiftKey: true },
       }),
     ).toBe(false)
     expect(
@@ -73,9 +73,9 @@ describe('CanvasAppCustomCreationTools', () => {
   })
 
   it('normalizes custom tool shortcut keys', () => {
-    expect(getCanvasAppCustomToolShortcutKey({ key: 'E', shiftKey: true }))
-      .toBe('shift+e')
-    expect(getCanvasAppCustomToolShortcutKey({ key: 'e' })).toBe('e')
+    expect(getCanvasAppCustomToolShortcutKey({ key: 'K', shiftKey: true }))
+      .toBe('shift+k')
+    expect(getCanvasAppCustomToolShortcutKey({ key: 'k' })).toBe('k')
     expect(getCanvasAppCustomToolShortcutKey({ key: ' ' })).toBe('space')
   })
 
@@ -89,7 +89,7 @@ describe('CanvasAppCustomCreationTools', () => {
         },
       ]),
     ).toThrow(
-      'Duplicate canvas app custom creation tool shortcut: risk and dependency use Shift+E',
+      'Duplicate canvas app custom creation tool shortcut: risk and dependency use Shift+K',
     )
   })
 
@@ -160,7 +160,7 @@ describe('CanvasAppCustomCreationTools', () => {
       assertCanvasAppCustomCreationTools([
         {
           ...tool,
-          shortcut: { key: 'e', shiftKey: 'yes' },
+          shortcut: { key: 'k', shiftKey: 'yes' },
         } as unknown as CanvasAppCustomCreationTool,
       ]),
     ).toThrow('Canvas app custom creation tool risk requires shortcut.shiftKey')

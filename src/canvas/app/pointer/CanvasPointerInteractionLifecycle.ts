@@ -15,6 +15,7 @@ import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreati
 import type { CanvasAppComponentLibrary } from '../workflow/CanvasAppComponentAssemblyContracts'
 import type { Interaction } from './CanvasInteractionState'
 import { commitCanvasPointerCreation } from './CanvasPointerCreationCommit'
+import { commitCanvasPointerEraserInteraction } from './CanvasPointerEraser'
 import {
   cancelCanvasPointerMarqueeInteraction,
   commitCanvasPointerMarqueeInteraction,
@@ -68,6 +69,12 @@ export function commitCanvasPointerInteraction({
         setTool,
       }),
     fallback: () => undefined,
+    eraser: (interaction) =>
+      commitCanvasPointerEraserInteraction({
+        commitItemsChange,
+        interaction,
+        selection,
+      }),
     marquee: (interaction) =>
       commitCanvasPointerMarqueeInteraction({
         commitSelection,

@@ -95,7 +95,7 @@ describe('CanvasAppCustomItemModules', () => {
       id: 'risk',
       label: '!',
       title: 'Risk',
-      shortcut: { key: 'e', shiftKey: true },
+      shortcut: { key: 'k', shiftKey: true },
       createItem: ({ startWorld }) => ({
         title: 'Risk',
         x: startWorld.x,
@@ -196,7 +196,7 @@ describe('CanvasAppCustomItemModules', () => {
       id: 'risk',
       label: '!',
       title: 'Risk',
-      shortcut: { key: 'e', shiftKey: true },
+      shortcut: { key: 'k', shiftKey: true },
       createItem: ({ startWorld }) => ({
         title: 'Risk',
         x: startWorld.x,
@@ -420,7 +420,7 @@ describe('CanvasAppCustomItemModules', () => {
           id: 'risk',
           label: '!',
           title: 'Risk',
-          shortcut: { key: 'e', shiftKey: true },
+          shortcut: { key: 'k', shiftKey: true },
           createItem: () => null,
         },
       ],
@@ -431,7 +431,7 @@ describe('CanvasAppCustomItemModules', () => {
           id: 'dependency',
           label: 'D',
           title: 'Dependency',
-          shortcut: { key: 'e', shiftKey: true },
+          shortcut: { key: 'k', shiftKey: true },
           createItem: () => null,
         },
       ],
@@ -440,7 +440,7 @@ describe('CanvasAppCustomItemModules', () => {
     expect(() =>
       createCanvasAppCustomItemModuleAssembly([first, second]),
     ).toThrow(
-      'Duplicate canvas app custom creation tool shortcut: risk and dependency use Shift+E',
+      'Duplicate canvas app custom creation tool shortcut: risk and dependency use Shift+K',
     )
   })
 

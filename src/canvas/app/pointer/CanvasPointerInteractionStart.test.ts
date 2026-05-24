@@ -2,12 +2,14 @@ import { describe, expect, it, vi } from 'vitest'
 import type { CanvasItem } from '../../entities'
 import {
   createCanvasAffordanceConfig,
+  createCanvasSceneAdapter,
   type CanvasCreationAdapter,
 } from '../../engine'
 import {
   createCanvasComponentLibrary,
   createCanvasDrawingStrokeStyleSet,
 } from '../../host'
+import type { CanvasAppItemReadModel } from '../workflow/CanvasAppItemReadModelContracts'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import { startCanvasPointerInteraction } from './CanvasPointerInteractionStart'
 
@@ -186,6 +188,8 @@ function createInput(
       },
     ],
     input: createPointerInput(),
+    itemReadModel: emptyItemReadModel,
+    scene: createCanvasSceneAdapter([]),
     selection: [],
     spaceDown: false,
     startScreen: { x: 80, y: 120 },
@@ -271,4 +275,15 @@ const creationAdapter: CanvasCreationAdapter<CanvasItem> = {
       y: point.y,
     },
   }),
+}
+
+const emptyItemReadModel: CanvasAppItemReadModel = {
+  findEditableTextItem: () => null,
+  findItem: () => undefined,
+  getAllIds: () => [],
+  getAllItems: () => [],
+  getItemBounds: (item) => item,
+  getSelection: () => [],
+  getSelectionBounds: () => null,
+  getSelectedItems: () => [],
 }

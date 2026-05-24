@@ -19,6 +19,7 @@ describe('CanvasAffordanceMetadata', () => {
       'comment',
       'marker',
       'highlight',
+      'eraser',
       'arrow',
     ])
     expect(new Set(CANVAS_TOOL_AFFORDANCE_ORDER).size).toBe(
@@ -48,6 +49,11 @@ describe('CanvasAffordanceMetadata', () => {
       shiftInsensitive: true,
       shortcutId: 'commentTool',
     })
+    expect(CANVAS_TOOL_AFFORDANCES.eraser.keyboardShortcut).toEqual({
+      key: 'e',
+      shiftInsensitive: true,
+      shortcutId: 'eraserTool',
+    })
     expect(CANVAS_TOOL_AFFORDANCES.sticky.keyboardShortcut).toEqual({
       key: 's',
       shortcutId: 'stickyTool',
@@ -63,6 +69,7 @@ describe('CanvasAffordanceMetadata', () => {
       'Highlighter (Shift+M)',
     )
     expect(CANVAS_TOOL_AFFORDANCES.select.shortcut).toBe('V')
+    expect(CANVAS_TOOL_AFFORDANCES.eraser.shortcut).toBe('E')
     expect(CANVAS_TOOL_AFFORDANCES.select.title).toBe('Select (V)')
   })
 

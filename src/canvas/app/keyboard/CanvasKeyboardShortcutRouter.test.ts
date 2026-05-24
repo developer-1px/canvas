@@ -9,7 +9,7 @@ describe('CanvasKeyboardShortcutRouter', () => {
   it('routes custom creation tool shortcuts through the external tool seam', () => {
     const setTool = vi.fn()
     const handlers = createHandlers({ setTool })
-    const event = createKeyboardEvent({ key: 'E', shiftKey: true })
+    const event = createKeyboardEvent({ key: 'K', shiftKey: true })
 
     handleCanvasKeyboardShortcut(event, handlers)
 
@@ -103,7 +103,7 @@ function createHandlers(
         ariaLabel: 'Risk tool',
         id: 'custom:risk',
         label: '!',
-        shortcut: { key: 'e', shiftKey: true },
+        shortcut: { key: 'k', shiftKey: true },
         statusLabel: 'Risk',
         title: 'Risk',
       },
@@ -145,9 +145,9 @@ function createKeyboardEvent(
 ): KeyboardEvent & { preventDefault: ReturnType<typeof vi.fn> } {
   return {
     altKey: false,
-    code: 'KeyE',
+    code: 'KeyK',
     ctrlKey: false,
-    key: 'e',
+    key: 'k',
     metaKey: false,
     preventDefault: vi.fn(),
     shiftKey: false,

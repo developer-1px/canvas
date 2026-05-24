@@ -6,6 +6,7 @@ import {
   type CanvasTransformAdapter,
 } from '../../engine'
 import { getCanvasDrawingStrokeStyle } from '../../host'
+import type { CanvasAppItemReadModel } from '../workflow/CanvasAppItemReadModelContracts'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import {
   previewCanvasPointerInteraction,
@@ -170,6 +171,7 @@ function createInput(
     currentWorld: { x: 0, y: 0 },
     input: createPointerInput(),
     interaction: { kind: 'none' },
+    itemReadModel: emptyItemReadModel,
     scene: createCanvasSceneAdapter([]),
     transformAdapter,
     viewport: { x: 0, y: 0, scale: 1 },
@@ -232,4 +234,15 @@ function createRectItem(
     y: 0,
     ...overrides,
   }
+}
+
+const emptyItemReadModel: CanvasAppItemReadModel = {
+  findEditableTextItem: () => null,
+  findItem: () => undefined,
+  getAllIds: () => [],
+  getAllItems: () => [],
+  getItemBounds: (item) => item,
+  getSelection: () => [],
+  getSelectionBounds: () => null,
+  getSelectedItems: () => [],
 }

@@ -37,6 +37,7 @@ export const CANVAS_TOOL_AFFORDANCE_ORDER = Object.freeze([
   'comment',
   'marker',
   'highlight',
+  'eraser',
   'arrow',
 ] as const satisfies readonly CanvasBuiltinTool[])
 
@@ -67,6 +68,15 @@ export const CANVAS_TOOL_AFFORDANCES = Object.freeze({
       shortcutId: 'highlighterTool',
     },
     statusLabel: 'Highlight',
+  }),
+  eraser: createCanvasToolAffordance({
+    ariaLabel: 'Eraser tool',
+    keyboardShortcut: {
+      key: 'e',
+      shiftInsensitive: true,
+      shortcutId: 'eraserTool',
+    },
+    statusLabel: 'Eraser',
   }),
   marker: createCanvasToolAffordance({
     ariaLabel: 'Marker tool',
@@ -243,6 +253,7 @@ export const CANVAS_GESTURE_STATUS_LABELS: Partial<
   'create-rect': 'Drawing',
   'draw-highlight': 'Highlighting',
   'draw-marker': 'Drawing',
+  erase: 'Erasing',
   'arrow-endpoint': 'Connecting',
   marquee: 'Selecting',
   move: 'Moving',

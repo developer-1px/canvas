@@ -53,6 +53,7 @@ export function useCanvasAppPointerModel({
     creationAdapter: itemAdapters.creation,
     customCreationTools,
     interactionRef: interaction.interactionRef,
+    itemReadModel: workspace.itemReadModel,
     scene: workspace.scene,
     selection: workspace.selection,
     setDraftArrow: interaction.setDraftArrow,

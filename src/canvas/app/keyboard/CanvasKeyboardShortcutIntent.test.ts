@@ -11,7 +11,7 @@ import { getCanvasKeyboardShortcutIntent } from './CanvasKeyboardShortcutIntent'
 describe('CanvasKeyboardShortcutIntent', () => {
   it('resolves custom creation tool shortcuts through the external tool seam', () => {
     const intent = getCanvasKeyboardShortcutIntent(createInput({
-      event: createKeyboardEvent({ key: 'E', shiftKey: true }),
+      event: createKeyboardEvent({ key: 'K', shiftKey: true }),
     }))
 
     expect(intent).toEqual({
@@ -144,7 +144,7 @@ function createCustomTool(
     ariaLabel: 'Risk tool',
     id: 'custom:risk',
     label: '!',
-    shortcut: { key: 'e', shiftKey: true },
+    shortcut: { key: 'k', shiftKey: true },
     statusLabel: 'Risk',
     title: 'Risk',
     ...overrides,
@@ -156,9 +156,9 @@ function createKeyboardEvent(
 ): KeyboardEvent {
   return {
     altKey: false,
-    code: 'KeyE',
+    code: 'KeyK',
     ctrlKey: false,
-    key: 'e',
+    key: 'k',
     metaKey: false,
     shiftKey: false,
     target: null,

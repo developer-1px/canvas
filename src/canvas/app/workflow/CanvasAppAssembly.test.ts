@@ -540,7 +540,7 @@ describe('CanvasAppAssembly', () => {
       id: 'risk',
       label: '!',
       title: 'Risk',
-      shortcut: { key: 'e', shiftKey: true },
+      shortcut: { key: 'k', shiftKey: true },
       createItem: ({ startWorld }) => ({
         title: 'Risk',
         x: startWorld.x,

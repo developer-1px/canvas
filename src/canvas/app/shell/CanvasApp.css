@@ -27,6 +27,7 @@
 .canvas-stage[data-mode='comment'],
 .canvas-stage[data-mode='marker'],
 .canvas-stage[data-mode='highlight'],
+.canvas-stage[data-mode='eraser'],
 .canvas-stage[data-mode='arrow'],
 .canvas-stage[data-mode^='custom:'] {
   cursor: crosshair;
@@ -450,6 +451,7 @@
 }
 
 .toolbar {
+  z-index: 5;
   top: 14px;
   left: 14px;
   max-width: calc(100vw - 28px);

@@ -81,6 +81,16 @@ export function MarkerIcon() {
   )
 }
 
+export function EraserIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4.8 15.8 13.5 7a2.2 2.2 0 0 1 3.1 0l2.4 2.4a2.2 2.2 0 0 1 0 3.1l-6.6 6.7H7.6l-2.8-2.8a.9.9 0 0 1 0-1.3z" />
+      <path d="M11.2 9.3 16.7 14.8" />
+      <path d="M12.4 19.2H20" />
+    </svg>
+  )
+}
+
 export function ArrowIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">

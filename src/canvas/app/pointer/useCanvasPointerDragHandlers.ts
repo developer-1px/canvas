@@ -28,6 +28,7 @@ import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
 import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
 import type { CanvasAppComponentLibrary } from '../workflow/CanvasAppComponentAssemblyContracts'
+import type { CanvasAppItemReadModel } from '../workflow/CanvasAppItemReadModelContracts'
 import {
   commitCanvasPointerInteraction,
 } from './CanvasPointerInteractionLifecycle'
@@ -51,6 +52,7 @@ type UseCanvasPointerDragHandlersArgs = {
   createId: (prefix: string) => string
   customCreationTools: readonly CanvasAppCustomCreationTool[]
   interactionRef: MutableRefObject<Interaction>
+  itemReadModel: CanvasAppItemReadModel
   scene: CanvasSceneAdapter
   selection: string[]
   setDraftArrow: Dispatch<SetStateAction<CanvasDraftArrowOverlay | null>>
@@ -78,6 +80,7 @@ export function useCanvasPointerDragHandlers({
   createId,
   customCreationTools,
   interactionRef,
+  itemReadModel,
   scene,
   selection,
   setDraftArrow,
@@ -129,6 +132,7 @@ export function useCanvasPointerDragHandlers({
       currentWorld: drag.currentWorld,
       input: event,
       interaction: drag.interaction,
+      itemReadModel,
       scene,
       transformAdapter,
       viewport,

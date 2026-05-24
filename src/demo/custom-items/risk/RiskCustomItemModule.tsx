@@ -53,7 +53,7 @@ const riskTool: CanvasAppCustomItemModuleCreationTool = {
   id: 'risk',
   label: '!',
   title: 'Risk',
-  shortcut: { key: 'e', shiftKey: true },
+  shortcut: { key: 'k', shiftKey: true },
   createItem: ({ currentWorld, moved, startWorld }) => {
     const bounds = moved
       ? {

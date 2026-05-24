@@ -10,6 +10,7 @@ export type CanvasBuiltinTool =
   | 'comment'
   | 'marker'
   | 'highlight'
+  | 'eraser'
   | 'arrow'
 
 export type CanvasCustomToolId = `custom:${string}`
@@ -27,6 +28,7 @@ export type CanvasInteractionKind =
   | 'create-custom'
   | 'draw-marker'
   | 'draw-highlight'
+  | 'erase'
   | 'arrow-endpoint'
   | 'resize'
 

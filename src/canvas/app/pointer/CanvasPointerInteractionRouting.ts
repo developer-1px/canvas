@@ -3,12 +3,14 @@ import {
   isCanvasPointerCreationInteraction,
   type CanvasPointerCreationInteraction,
 } from './CanvasPointerCreationGrammar'
+import type { CanvasPointerEraserInteraction } from './CanvasPointerEraser'
 import type { CanvasPointerMarqueeInteraction } from './CanvasPointerMarqueeInteraction'
 import type { CanvasPointerPanInteraction } from './CanvasPointerPanInteraction'
 import type { CanvasPointerTransformInteraction } from './CanvasPointerTransformInteraction'
 
 type CanvasPointerInteractionRoute<TResult> = {
   creation?: (interaction: CanvasPointerCreationInteraction) => TResult
+  eraser?: (interaction: CanvasPointerEraserInteraction) => TResult
   fallback: () => TResult
   marquee?: (interaction: CanvasPointerMarqueeInteraction) => TResult
   none?: (interaction: Extract<Interaction, { kind: 'none' }>) => TResult
@@ -43,6 +45,14 @@ export function routeCanvasPointerInteraction<TResult>(
   if (interaction.kind === 'marquee') {
     return resolveCanvasPointerInteractionRoute(
       route.marquee,
+      interaction,
+      route,
+    )
+  }
+
+  if (interaction.kind === 'erase') {
+    return resolveCanvasPointerInteractionRoute(
+      route.eraser,
       interaction,
       route,
     )

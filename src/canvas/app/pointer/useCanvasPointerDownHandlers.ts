@@ -150,6 +150,8 @@ export function useCanvasPointerDownHandlers({
       customCreationTools,
       drawingStyles,
       input: event,
+      itemReadModel,
+      scene,
       selection,
       spaceDown,
       startScreen: projection.startScreen,

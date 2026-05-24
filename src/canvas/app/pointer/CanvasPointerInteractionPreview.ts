@@ -8,9 +8,11 @@ import {
   type CanvasSceneAdapter,
   type CanvasTransformAdapter,
 } from '../../engine'
+import type { CanvasAppItemReadModel } from '../workflow/CanvasAppItemReadModelContracts'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import type { Interaction } from './CanvasInteractionState'
 import { previewCanvasPointerCreation } from './CanvasPointerCreationPreview'
+import { previewCanvasPointerEraserInteraction } from './CanvasPointerEraser'
 import type {
   CanvasPointerInteractionPreviewResult,
 } from './CanvasPointerInteractionResultContracts'
@@ -25,6 +27,7 @@ export type CanvasPointerInteractionPreviewInput = {
   currentWorld: Point
   input: CanvasAppPointerInput
   interaction: Interaction
+  itemReadModel: CanvasAppItemReadModel
   scene: CanvasSceneAdapter
   transformAdapter: CanvasTransformAdapter<CanvasItem>
   viewport: Viewport
@@ -36,6 +39,7 @@ export function previewCanvasPointerInteraction({
   currentWorld,
   input,
   interaction,
+  itemReadModel,
   scene,
   transformAdapter,
   viewport,
@@ -53,6 +57,15 @@ export function previewCanvasPointerInteraction({
           scene,
         }),
       fallback: () => ({ kind: 'none' }),
+      eraser: (interaction) =>
+        previewCanvasPointerEraserInteraction({
+          config,
+          currentScreen,
+          currentWorld,
+          interaction,
+          itemReadModel,
+          scene,
+        }) ?? { kind: 'none' },
       marquee: (interaction) =>
         previewCanvasPointerMarqueeInteraction({
           config,
