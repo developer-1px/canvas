@@ -232,6 +232,7 @@ type CanvasAffordanceConfig = {
 - Canvas App Assembly는 주입된 Canvas Component Library의 template 목록과 `getTemplate`, `getPresentation` resolver 결과가 어긋나면 실패한다.
 - Canvas App Assembly의 component presentation renderer input은 기본 SVG presentation registry를 대체하지 않고 extension/override로 합성된다.
 - 제품별 business action은 Engine command union에 추가하지 않고 Canvas App Assembly의 custom command descriptor로 등록한다.
+- Canvas App Custom Command Context는 내부 Canvas Workflow Contract를 외부 authoring Interface로 노출하지 않고 필요한 commit/document slot을 자체 public context 계약으로 명시한다.
 - Custom command의 availability/run 실패는 내부 command loop를 깨지 않고 disabled/false로 containment 된다.
 - Canvas App Custom Command descriptor shape 검증과 toolbar state/run execution은 분리하고, validation은 Canvas App Custom Command Contracts가, 실행 실패 containment는 Canvas App Custom Command Execution이 소유한다.
 - 제품별 item creation tool은 내부 builtin tool list에 추가하지 않고 Canvas App Custom Item Module에 등록한다.
@@ -258,6 +259,7 @@ type CanvasAffordanceConfig = {
 - package public entry는 `useCanvasAppModel`, `DEFAULT_CANVAS_APP_ASSEMBLY`, `assertCanvasAppAssembly`, `createCanvasAppCustomItemModuleAssembly` 같은 App runtime how를 `canvas/app` subpath에서만 연다.
 - Canvas App Public Facade는 descriptor authoring contract를 Canvas App Authoring Facade에서 재노출하고, runtime hook/default/validator는 workflow public entry에서만 재노출한다.
 - `canvas/app/authoring` subpath는 descriptor what만 열고 `useCanvasAppModel`, default assembly, assertion, assembled custom tool/state, custom module assembly output 같은 runtime how를 열지 않는다.
+- Canvas App Inspector Panel Context는 내부 Canvas Workflow Contract를 외부 authoring Interface로 노출하지 않고 필요한 commit/document slot을 자체 public context 계약으로 명시한다.
 - package public entry와 subpath export는 `canvas` package self-import consumer smoke test로 검증한다.
 - package manifest는 CSS import가 bundler tree-shaking에서 제거되지 않도록 `sideEffects`에 CSS를 명시한다.
 - package manifest는 React, React DOM, Zod를 shared runtime peer dependency로 선언한다.

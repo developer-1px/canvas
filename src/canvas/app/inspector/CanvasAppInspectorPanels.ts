@@ -3,11 +3,19 @@ import type {
   Bounds,
   CanvasItem,
 } from '../../entities'
-import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract'
+import type {
+  CanvasDocumentSelectionHistory,
+  CanvasItemsChange,
+} from '../../host'
+
+export type CanvasAppInspectorPanelCommitItemsChange = (
+  change: CanvasItemsChange,
+  selection?: CanvasDocumentSelectionHistory,
+) => boolean
 
 export type CanvasAppInspectorPanelContext = {
   bounds: Bounds | null
-  commitItemsChange: CommitCanvasItemsChange
+  commitItemsChange: CanvasAppInspectorPanelCommitItemsChange
   disabled: boolean
   label: string | null
   selectedItems: CanvasItem[]

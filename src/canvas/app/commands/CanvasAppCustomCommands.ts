@@ -5,13 +5,22 @@ import type {
   Viewport,
 } from '../../entities'
 import type {
-  CommitCanvasItemsChange,
-  CommitCanvasSelection,
-} from '../workflow/CanvasWorkflowContract'
+  CanvasDocumentSelectionHistory,
+  CanvasItemsChange,
+} from '../../host'
+
+export type CanvasAppCustomCommandCommitItemsChange = (
+  change: CanvasItemsChange,
+  selection?: CanvasDocumentSelectionHistory,
+) => boolean
+
+export type CanvasAppCustomCommandCommitSelection = (
+  action: SetStateAction<string[]>,
+) => boolean
 
 export type CanvasAppCustomCommandContext = {
-  commitItemsChange: CommitCanvasItemsChange
-  commitSelection: CommitCanvasSelection
+  commitItemsChange: CanvasAppCustomCommandCommitItemsChange
+  commitSelection: CanvasAppCustomCommandCommitSelection
   createId: (prefix: string) => string
   items: CanvasItem[]
   selection: string[]

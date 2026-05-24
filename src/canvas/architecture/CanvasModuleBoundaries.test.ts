@@ -3548,6 +3548,10 @@ describe('Canvas module boundaries', () => {
     expect(descriptorFile.source).toContain(
       "from './CanvasAppInspectorPanelExecution'",
     )
+    expect(descriptorFile.source).not.toContain('CanvasWorkflowContract')
+    expect(descriptorFile.source).toContain(
+      'export type CanvasAppInspectorPanelCommitItemsChange',
+    )
     expect(descriptorFile.source).not.toContain('panel.render(')
     expect(descriptorFile.source).not.toContain('panel.isVisible(')
     expect(descriptorFile.source).not.toContain('try {')
@@ -3613,6 +3617,13 @@ describe('Canvas module boundaries', () => {
 
     expect(descriptorFile.source).toContain(
       "from './CanvasAppCustomCommandExecution'",
+    )
+    expect(descriptorFile.source).not.toContain('CanvasWorkflowContract')
+    expect(descriptorFile.source).toContain(
+      'export type CanvasAppCustomCommandCommitItemsChange',
+    )
+    expect(descriptorFile.source).toContain(
+      'export type CanvasAppCustomCommandCommitSelection',
     )
     expect(descriptorFile.source).not.toContain('command.run(')
     expect(descriptorFile.source).not.toContain('command.isEnabled(')

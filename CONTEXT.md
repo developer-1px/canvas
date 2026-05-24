@@ -276,6 +276,7 @@
 - Canvas App Assembly의 initial items는 조립된 Canvas Custom Item Validator로 assembly 단계에서 검증한다.
 - Canvas App Assembly input은 custom item renderer/validator/creation registry를 직접 받지 않고 Canvas App Custom Item Module만 받는다.
 - 제품별 business action은 Engine command union에 넣지 않고 Canvas App Custom Command로 등록한다.
+- Canvas App Custom Command Context는 내부 Canvas Workflow Contract를 외부 authoring Interface로 노출하지 않고 필요한 commit/document slot을 자체 public context 계약으로 명시한다.
 - Canvas App Custom Command의 availability/run 실패는 내부 command loop를 깨지 않고 disabled/false로 containment 한다.
 - Canvas App Custom Command descriptor shape 검증과 toolbar state/run execution은 분리하고, validation은 Canvas App Custom Command Contracts가, 실행 실패 containment는 Canvas App Custom Command Execution이 소유한다.
 - 제품별 item creation tool은 내부 Tool union에 구체 id를 넣지 않고 Canvas App Custom Item Module에 등록한다.
@@ -296,6 +297,7 @@
 - Canvas App Custom Item Module mutation 방어는 Canvas App Custom Item Module Snapshot이 소유한다.
 - Canvas App Custom Item Module Creation Tool은 bounds/title/data만 반환하고, `id`, `type`, `kind`, `presentation`은 Canvas App Custom Item Module이 주입한다.
 - Canvas App Custom Item Module Creation Tool의 실행/반환값은 Module assembly가 현재 item 저장 계약과 module validator로 검증하고, 실패하면 null/false로 containment 한다.
+- Canvas App Inspector Panel Context는 내부 Canvas Workflow Contract를 외부 authoring Interface로 노출하지 않고 필요한 commit/document slot을 자체 public context 계약으로 명시한다.
 - Demo custom item module은 `src/demo/custom-items/<name>/index.ts` convention으로 자동 수집한다.
 - Demo와 Demo custom item module은 `src/canvas` package public entry만 사용하고 canvas 하위 구현 경로를 직접 import하지 않는다.
 - package manifest는 `canvas`, `canvas/app`, `canvas/app/authoring`, `canvas/core`, `canvas/engine`, `canvas/entities`, `canvas/host`, `canvas/renderer` export만 열고 각 export는 public facade `index.ts`를 가리킨다.
