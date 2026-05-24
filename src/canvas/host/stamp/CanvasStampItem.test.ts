@@ -8,6 +8,7 @@ import {
 describe('CanvasStampItem', () => {
   it('creates the persisted stamp item shape', () => {
     expect(createCanvasStampItem({
+      attachedTo: 'rect-1',
       id: 'stamp-1',
       label: '+1',
       stamp: 'thumbs-up',
@@ -15,6 +16,7 @@ describe('CanvasStampItem', () => {
       y: 20,
     })).toEqual({
       h: CANVAS_STAMP_ITEM_SIZE,
+      attachedTo: 'rect-1',
       id: 'stamp-1',
       label: '+1',
       stamp: 'thumbs-up',
@@ -30,12 +32,24 @@ describe('CanvasStampItem', () => {
       h: CANVAS_STAMP_ITEM_SIZE,
       id: 'stamp-1',
       label: '+1',
+      attachedTo: 'rect-1',
       stamp: 'thumbs-up',
       type: 'stamp',
       w: CANVAS_STAMP_ITEM_SIZE,
       x: 10,
       y: 20,
     })).toBe(true)
+    expect(isCanvasStampItemStorageShape({
+      h: CANVAS_STAMP_ITEM_SIZE,
+      attachedTo: 12,
+      id: 'stamp-1',
+      label: '+1',
+      stamp: 'thumbs-up',
+      type: 'stamp',
+      w: CANVAS_STAMP_ITEM_SIZE,
+      x: 10,
+      y: 20,
+    })).toBe(false)
     expect(isCanvasStampItemStorageShape({
       h: CANVAS_STAMP_ITEM_SIZE,
       id: 'stamp-1',

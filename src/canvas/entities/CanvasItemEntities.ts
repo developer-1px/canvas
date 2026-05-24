@@ -37,6 +37,7 @@ export type CanvasStampKind = string
 
 export type CanvasStampItem = CanvasItemBase & {
   type: 'stamp'
+  attachedTo?: CanvasItemId
   label: string
   stamp: CanvasStampKind
 }

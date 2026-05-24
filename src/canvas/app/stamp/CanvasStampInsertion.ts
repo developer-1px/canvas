@@ -1,5 +1,4 @@
 import type {
-  Point,
   Viewport,
 } from '../../entities'
 import {
@@ -13,13 +12,19 @@ import type { CanvasStampDefinition } from './CanvasStampCatalog'
 
 const CANVAS_STAMP_SELECTION_GAP = 12
 
+export type CanvasStampInsertPlacement = {
+  attachedTo?: string
+  x: number
+  y: number
+}
+
 export type CanvasStampInsertionContext = {
   commitItemsChange: CommitCanvasItemsChange
   createId: (prefix: string) => string
   selection: string[]
 }
 
-export type CanvasStampInsertCenterInput = {
+export type CanvasStampInsertPlacementInput = {
   itemReadModel: CanvasAppItemReadModel
   selection: string[]
   stageElement: CanvasAppStageElement
@@ -27,20 +32,21 @@ export type CanvasStampInsertCenterInput = {
 }
 
 export function insertCanvasStamp({
-  center,
   context,
+  placement,
   stamp,
 }: {
-  center: Point
   context: CanvasStampInsertionContext
+  placement: CanvasStampInsertPlacement
   stamp: CanvasStampDefinition
 }) {
   const item = createCanvasStampItem({
+    attachedTo: placement.attachedTo,
     id: context.createId('stamp'),
     label: stamp.label,
     stamp: stamp.stamp,
-    x: center.x - CANVAS_STAMP_ITEM_SIZE / 2,
-    y: center.y - CANVAS_STAMP_ITEM_SIZE / 2,
+    x: placement.x,
+    y: placement.y,
   })
 
   return context.commitItemsChange(
@@ -52,23 +58,36 @@ export function insertCanvasStamp({
   )
 }
 
-export function getCanvasStampInsertCenter({
+export function getCanvasStampInsertPlacement({
   itemReadModel,
   selection,
   stageElement,
   viewport,
-}: CanvasStampInsertCenterInput): Point {
+}: CanvasStampInsertPlacementInput): CanvasStampInsertPlacement {
   const selectedBounds = selection.length > 0
     ? itemReadModel.getSelectionBounds(selection)
     : null
 
   if (selectedBounds) {
+    if (selection.length === 1) {
+      return {
+        attachedTo: selection[0],
+        x: selectedBounds.x + selectedBounds.w - CANVAS_STAMP_ITEM_SIZE / 2,
+        y: selectedBounds.y - CANVAS_STAMP_ITEM_SIZE / 2,
+      }
+    }
+
     return {
-      x: selectedBounds.x + selectedBounds.w +
-        CANVAS_STAMP_SELECTION_GAP + CANVAS_STAMP_ITEM_SIZE / 2,
-      y: selectedBounds.y + selectedBounds.h / 2,
+      x: selectedBounds.x + selectedBounds.w + CANVAS_STAMP_SELECTION_GAP,
+      y: selectedBounds.y + selectedBounds.h / 2 -
+        CANVAS_STAMP_ITEM_SIZE / 2,
     }
   }
 
-  return stageElement.getViewportCenter(viewport) ?? { x: 0, y: 0 }
+  const center = stageElement.getViewportCenter(viewport) ?? { x: 0, y: 0 }
+
+  return {
+    x: center.x - CANVAS_STAMP_ITEM_SIZE / 2,
+    y: center.y - CANVAS_STAMP_ITEM_SIZE / 2,
+  }
 }

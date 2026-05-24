@@ -131,6 +131,7 @@ const arrowItem: CanvasItem = {
 }
 
 const stampItem: CanvasItem = {
+  attachedTo: 'component-sticky',
   h: 44,
   id: 'stamp-1',
   label: '+1',

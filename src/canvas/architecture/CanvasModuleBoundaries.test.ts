@@ -3346,6 +3346,42 @@ describe('Canvas module boundaries', () => {
     expect(drawingValidationFile.source).toContain('function isSamePoint')
   })
 
+  it('keeps built-in stamp attachment rules in the host stamp module', () => {
+    const itemSchemaFile = getSourceFile(
+      'src/canvas/host/document/CanvasItemSchema.ts',
+    )
+    const stampFile = getSourceFile('src/canvas/host/stamp/CanvasStampItem.ts')
+    const transformOperationsFile = getSourceFile(
+      'src/canvas/host/operations/CanvasItemTransformOperations.ts',
+    )
+    const stampInsertionFile = getSourceFile(
+      'src/canvas/app/stamp/CanvasStampInsertion.ts',
+    )
+
+    expect(itemSchemaFile.source).toContain(
+      "from '../stamp/CanvasStampItem'",
+    )
+    expect(itemSchemaFile.source).toContain(
+      'isCanvasStampItemStorageShape(value)',
+    )
+    expect(stampFile.source).toContain(
+      'export function isCanvasStampAttachedTo',
+    )
+    expect(stampFile.source).toContain(
+      'export function translateCanvasStampItem',
+    )
+    expect(transformOperationsFile.source).toContain(
+      "from '../stamp/CanvasStampItem'",
+    )
+    expect(transformOperationsFile.source).toContain(
+      'isCanvasStampAttachedTo(item, movableSelected)',
+    )
+    expect(transformOperationsFile.source).not.toContain(
+      "item.type === 'stamp'",
+    )
+    expect(stampInsertionFile.source).toContain('attachedTo: selection[0]')
+  })
+
   it('keeps component item validation in the host component module', () => {
     const itemSchemaFile = getSourceFile(
       'src/canvas/host/document/CanvasItemSchema.ts',

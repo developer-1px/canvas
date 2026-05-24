@@ -31,6 +31,29 @@ const marker: CanvasItem = {
   opacity: 1,
 }
 
+const rect: CanvasItem = {
+  fill: '#ffffff',
+  h: 80,
+  id: 'rect-1',
+  stroke: '#111827',
+  type: 'rect',
+  w: 120,
+  x: 10,
+  y: 20,
+}
+
+const attachedStamp: CanvasItem = {
+  attachedTo: 'rect-1',
+  h: 44,
+  id: 'stamp-1',
+  label: '+1',
+  stamp: 'thumbs-up',
+  type: 'stamp',
+  w: 44,
+  x: 108,
+  y: -2,
+}
+
 describe('CanvasItemTransformOperations drawing items', () => {
   test('translates arrow bounds and endpoints together', () => {
     expect(translateCanvasItems([arrow], ['arrow-1'], 10, -5)[0]).toEqual({
@@ -82,5 +105,48 @@ describe('CanvasItemTransformOperations drawing items', () => {
       h: 48,
       points: [{ x: 100, y: 100 }, { x: 304, y: 144 }],
     })
+  })
+})
+
+describe('CanvasItemTransformOperations attached stamps', () => {
+  test('moves stamps attached to a selected object with that object', () => {
+    expect(translateCanvasItems(
+      [rect, attachedStamp],
+      ['rect-1'],
+      10,
+      -5,
+    )).toEqual([
+      {
+        ...rect,
+        x: 20,
+        y: 15,
+      },
+      {
+        ...attachedStamp,
+        x: 118,
+        y: -7,
+      },
+    ])
+  })
+
+  test('does not move attached stamps when the attached object is locked', () => {
+    expect(translateCanvasItems(
+      [
+        {
+          ...rect,
+          locked: true,
+        },
+        attachedStamp,
+      ],
+      ['rect-1'],
+      10,
+      -5,
+    )).toEqual([
+      {
+        ...rect,
+        locked: true,
+      },
+      attachedStamp,
+    ])
   })
 })

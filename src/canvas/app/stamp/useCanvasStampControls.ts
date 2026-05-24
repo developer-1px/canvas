@@ -12,7 +12,7 @@ import {
   type CanvasStampDefinition,
 } from './CanvasStampCatalog'
 import {
-  getCanvasStampInsertCenter,
+  getCanvasStampInsertPlacement,
   insertCanvasStamp,
 } from './CanvasStampInsertion'
 
@@ -52,7 +52,7 @@ export function useCanvasStampControls({
       }
 
       return insertCanvasStamp({
-        center: getCanvasStampInsertCenter({
+        placement: getCanvasStampInsertPlacement({
           itemReadModel,
           selection,
           stageElement,

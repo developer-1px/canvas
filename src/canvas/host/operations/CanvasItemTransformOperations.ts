@@ -8,9 +8,15 @@ import {
 } from '../drawing/CanvasDrawingItemGeometry'
 import {
   getItemBounds,
+  flattenCanvasItems,
   pruneNestedSelection,
   syncGroupBounds,
 } from '../tree/CanvasTree'
+import {
+  isCanvasStampAttachedTo,
+  isCanvasStampItem,
+  translateCanvasStampItem,
+} from '../stamp/CanvasStampItem'
 import { isCanvasGroupItem } from '../tree/CanvasGroupItem'
 import { mapCanvasItems } from './CanvasItemOperationTree'
 import { isCanvasItemLocked } from './CanvasItemLockOperations'
@@ -22,9 +28,10 @@ export function translateCanvasItems(
   dy: number,
 ) {
   const selected = new Set(pruneNestedSelection(items, ids))
+  const movableSelected = getMovableSelectedCanvasItemIds(items, selected)
 
   return mapCanvasItems(items, (item) =>
-    selected.has(item.id) && !isCanvasItemLocked(item)
+    shouldTranslateCanvasItem(item, movableSelected) && !isCanvasItemLocked(item)
       ? translateCanvasItem(item, dx, dy)
       : item,
   )
@@ -63,11 +70,40 @@ function translateCanvasItem(item: CanvasItem, dx: number, dy: number): CanvasIt
     })
   }
 
+  if (isCanvasStampItem(item)) {
+    return translateCanvasStampItem({
+      dx,
+      dy,
+      item,
+    })
+  }
+
   return {
     ...item,
     x: item.x + dx,
     y: item.y + dy,
   }
+}
+
+function getMovableSelectedCanvasItemIds(
+  items: CanvasItem[],
+  selected: ReadonlySet<string>,
+) {
+  return new Set(
+    flattenCanvasItems(items)
+      .filter((entry) =>
+        selected.has(entry.item.id) && !isCanvasItemLocked(entry.item),
+      )
+      .map((entry) => entry.item.id),
+  )
+}
+
+function shouldTranslateCanvasItem(
+  item: CanvasItem,
+  movableSelected: ReadonlySet<string>,
+) {
+  return movableSelected.has(item.id) ||
+    isCanvasStampAttachedTo(item, movableSelected)
 }
 
 function scaleCanvasItem(item: CanvasItem, from: Bounds, to: Bounds): CanvasItem {
