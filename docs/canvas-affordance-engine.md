@@ -147,7 +147,7 @@
 | `src/canvas/host/tree` | Bounds, traversal, selection tree helpers |
 | `src/canvas/host/adapters` | Demo host item을 engine interface에 맞추는 adapter |
 | `src/canvas/renderer` | Renderer public facade |
-| `src/canvas/renderer/svg/CanvasSvgDrawingPrimitives.ts` | SVG path data와 arrow marker id/IRI를 Renderer-owned drawing primitive 계약으로 제공한다 |
+| `src/canvas/renderer/svg/CanvasSvgDrawingPrimitives.ts` | SVG freehand/connector path data와 arrow marker id/IRI를 Renderer-owned drawing primitive 계약으로 제공한다 |
 | `src/canvas/renderer/svg` | Demo item을 모르는 SVG stage/overlay adapter |
 | `src/canvas/index.ts` | 외부 조립자와 Demo가 사용하는 Canvas package public entry |
 | `src/canvas/ui` | Toolbar, palette, status, editor controls |
@@ -223,7 +223,7 @@ type CanvasAffordanceConfig = {
 - App과 UI는 Renderer Adapter 내부 파일을 import하지 않는다. SVG stage는 `src/canvas/renderer` public facade에서 사용한다.
 - Renderer Adapter는 `CanvasOverlayState`와 주입된 item layer를 받아 SVG로 배치하며, Engine은 SVG/DOM 구현을 모른다.
 - Renderer Stage는 Demo `CanvasItem`, Host read model, Canvas Component Library를 import하지 않는다.
-- Canvas SVG Drawing Primitives가 SVG path data와 arrow marker id/IRI를 소유해서 Renderer Stage defs와 App-owned item layer가 문자열 계약을 중복하지 않는다.
+- Canvas SVG Drawing Primitives가 freehand smoothing path, connector path data, arrow marker id/IRI를 소유해서 Renderer Stage defs와 App-owned item layer가 문자열 계약을 중복하지 않는다.
 - Demo SVG Item Layer Adapter는 App-owned Adapter로 Demo component presentation key resolver와 presentation registry를 받아 그리기 전략을 고른다.
 - Demo SVG Item Frame이 lock/selected/pointer/outline wrapper 문법을 소유해서 item type별 shape renderer branch가 공통 interaction frame을 복사하지 않는다.
 - Demo SVG Item Layer Adapter는 tree/frame orchestration을 맡고, marker/highlighter/arrow shape 렌더링은 Demo SVG Drawing Item Renderer가 소유한다.
@@ -249,7 +249,7 @@ type CanvasAffordanceConfig = {
 - Pointer down hook은 DOM pointer routing과 coordinate 변환을 맡고, tool/gesture/config/custom tool 기반 interaction 시작 규칙은 Canvas Pointer Interaction Start가, built-in sticky/component-backed creation은 Canvas Pointer Component Creation이, 시작 결과 적용은 Canvas Pointer Interaction Start Effects가 소유한다.
 - Item pointer down hook은 DOM event routing과 시작 결과 적용을 맡고, selection/edit/duplicate/move 시작 규칙은 Canvas Item Pointer Interaction Start가 소유한다.
 - Pointer drag hook은 DOM pointer routing과 preview 결과 적용을 맡고, pointer-move live preview 계산은 Canvas Pointer Interaction Preview가, 생성/드로잉 draft preview는 Canvas Pointer Creation Preview가, pointer-up/cancel 확정 규칙은 Canvas Pointer Interaction Lifecycle이 소유한다.
-- Sticky note, marker, highlighter, arrow, comment는 제품별 custom item이 아니라 내부 Affordance다. Sticky note는 별도 entity 없이 Component Library의 `sticky` template을 component item으로 생성하고, sticky body 편집, quick-create, 텍스트 기반 세로 auto-grow는 Host sticky/editable text contract를 재사용한다. Comment body 표시와 편집도 Host comment/editable text contract가 소유한다. Drawing Item의 `x/y/w/h`는 외부 입력이 아니라 `points` 또는 `start/end`에서 Host tree/document가 동기화하는 canonical bounds다. Arrow connector endpoint attachment는 Host Drawing Item Geometry가 start/end 단위로 이동시킨다. Drawing Item style 기본값은 Host Drawing Item Style Module이 소유하고 draft overlay와 item creation이 같은 값을 쓴다.
+- Sticky note, marker, highlighter, arrow, comment는 제품별 custom item이 아니라 내부 Affordance다. Sticky note는 별도 entity 없이 Component Library의 `sticky` template을 component item으로 생성하고, sticky body 편집, quick-create, 텍스트 기반 세로 auto-grow는 Host sticky/editable text contract를 재사용한다. Comment body 표시와 편집도 Host comment/editable text contract가 소유한다. Drawing Item의 `x/y/w/h`는 외부 입력이 아니라 `points` 또는 `start/end`에서 Host tree/document가 동기화하는 canonical bounds다. Arrow connector endpoint attachment는 Host Drawing Item Geometry가 start/end 단위로 이동시킨다. Drawing Item style 기본값은 Host Drawing Item Style Module이 소유하고 draft overlay와 item creation이 같은 값을 쓴다. Marker/highlighter 렌더링은 connector path와 분리된 freehand smoothing primitive를 쓴다.
 - Core primitive facade는 resize/handle/scale 규칙을 직접 구현하지 않고 Canvas Bounds Resize에 위임한다.
 - 제품별 item kind는 내부 `CanvasItem` variant를 추가하지 않고 Canvas App Custom Item Module로 묶어 등록한다.
 - Canvas App Custom Item Module의 `id`는 소유한 custom item kind이며, module은 `presentation`, `renderItem`, `validateItem`을 받아 renderer registry와 validator registry를 내부에서 조립한다.

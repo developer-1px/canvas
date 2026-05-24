@@ -3,6 +3,7 @@ import {
   CANVAS_SVG_ARROW_MARKER_IRI,
   CANVAS_SVG_DRAFT_ARROW_MARKER_IRI,
   createCanvasSvgArrowPathData,
+  createCanvasSvgFreehandPathData,
   createCanvasSvgPathData,
 } from './CanvasSvgDrawingPrimitives'
 
@@ -20,6 +21,20 @@ describe('CanvasSvgDrawingPrimitives', () => {
       { x: 30, y: 40 },
       { x: 50, y: 60 },
     ])).toBe('M 10 20 L 30 40 L 50 60')
+  })
+
+  it('creates smoothed path data for freehand strokes', () => {
+    expect(createCanvasSvgFreehandPathData([])).toBe('')
+    expect(createCanvasSvgFreehandPathData([
+      { x: 10, y: 20 },
+      { x: 30, y: 40 },
+    ])).toBe('M 10 20 L 30 40')
+    expect(createCanvasSvgFreehandPathData([
+      { x: 10, y: 20 },
+      { x: 30, y: 40 },
+      { x: 50, y: 60 },
+      { x: 70, y: 40 },
+    ])).toBe('M 10 20 Q 30 40 40 50 Q 50 60 60 50 L 70 40')
   })
 
   it('creates straight and elbow connector paths', () => {

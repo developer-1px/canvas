@@ -50,7 +50,7 @@ describe('CanvasPointerCreationCommit', () => {
     expect(setTool).toHaveBeenCalledWith('select')
   })
 
-  it('commits drawing items without changing the active tool', () => {
+  it('commits drawing items without changing tool or selection', () => {
     const commitItemsChange = vi.fn<CommitCanvasItemsChange>(() => true)
     const setTool = vi.fn()
 
@@ -78,7 +78,7 @@ describe('CanvasPointerCreationCommit', () => {
           }),
         ],
       },
-      { before: ['selected-1'], after: ['marker-1'] },
+      { before: ['selected-1'], after: ['selected-1'] },
     )
     expect(setTool).not.toHaveBeenCalled()
   })

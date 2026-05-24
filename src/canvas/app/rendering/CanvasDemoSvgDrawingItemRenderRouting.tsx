@@ -9,7 +9,7 @@ import {
 import {
   CANVAS_SVG_ARROW_MARKER_IRI,
   createCanvasSvgArrowPathData,
-  createCanvasSvgPathData,
+  createCanvasSvgFreehandPathData,
 } from '../../renderer'
 
 type CanvasDemoSvgDrawingItemRenderStrategy<TItem extends CanvasDrawingItem> = {
@@ -104,7 +104,7 @@ function renderCanvasDemoSvgStrokeDrawingItem({
 }: {
   item: CanvasStrokeDrawingItem
 }) {
-  const pathData = createCanvasSvgPathData(item.points)
+  const pathData = createCanvasSvgFreehandPathData(item.points)
 
   return (
     <>

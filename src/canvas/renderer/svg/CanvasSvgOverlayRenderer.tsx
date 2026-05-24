@@ -10,7 +10,7 @@ import {
   CANVAS_SVG_DRAFT_ARROW_MARKER_ID,
   CANVAS_SVG_DRAFT_ARROW_MARKER_IRI,
   createCanvasSvgArrowPathData,
-  createCanvasSvgPathData,
+  createCanvasSvgFreehandPathData,
 } from './CanvasSvgDrawingPrimitives'
 
 type CanvasSvgInteractionOverlaysProps = {
@@ -100,7 +100,7 @@ export function CanvasSvgInteractionOverlays({
       {overlays.draftStroke ? (
         <path
           className={`draft-stroke draft-${overlays.draftStroke.kind}`}
-          d={createCanvasSvgPathData(overlays.draftStroke.points)}
+          d={createCanvasSvgFreehandPathData(overlays.draftStroke.points)}
           opacity={overlays.draftStroke.opacity}
           stroke={overlays.draftStroke.stroke}
           strokeWidth={overlays.draftStroke.strokeWidth}

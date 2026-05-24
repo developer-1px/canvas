@@ -46,6 +46,7 @@ import { createCanvasComponentLibrary } from 'canvas/host'
 import {
   CANVAS_SVG_ARROW_MARKER_IRI,
   CanvasSvgStage,
+  createCanvasSvgFreehandPathData,
   createCanvasSvgPathData,
 } from 'canvas/renderer'
 
@@ -275,7 +276,21 @@ describe('Canvas package consumer imports', () => {
     expect(CANVAS_SVG_ARROW_MARKER_IRI).toBe('url(#canvas-arrow-head)')
     expect(createCanvasSvgPathData([{ x: 1, y: 2 }, { x: 3, y: 4 }]))
       .toBe('M 1 2 L 3 4')
+    expect(createCanvasSvgFreehandPathData([
+      { x: 1, y: 2 },
+      { x: 3, y: 4 },
+      { x: 5, y: 2 },
+    ])).toBe('M 1 2 Q 3 4 4 3 L 5 2')
     expect(CanvasRenderer.CANVAS_SVG_ARROW_MARKER_IRI)
       .toBe(CANVAS_SVG_ARROW_MARKER_IRI)
+    expect(CanvasRenderer.createCanvasSvgFreehandPathData([
+      { x: 1, y: 2 },
+      { x: 3, y: 4 },
+      { x: 5, y: 2 },
+    ])).toBe(createCanvasSvgFreehandPathData([
+      { x: 1, y: 2 },
+      { x: 3, y: 4 },
+      { x: 5, y: 2 },
+    ]))
   })
 })

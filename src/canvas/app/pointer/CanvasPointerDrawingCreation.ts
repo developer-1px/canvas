@@ -223,7 +223,7 @@ export function commitCanvasPointerDrawingCreation({
 
   commitItemsChange({ type: 'add', items: [item] }, {
     before: selection,
-    after: [item.id],
+    after: selection,
   })
 }
 

@@ -150,3 +150,6 @@
 146. Comment 생성 직후 active tool은 select로 돌아간다.
 147. Collaborator presence는 cursor와 함께 remote selection bounds를 표시할 수 있다.
 148. Demo collaborator presence는 각 collaborator가 선택 중인 객체를 colored outline으로 표시한다.
+149. Marker/highlighter freehand stroke는 connector용 직선 path와 분리된 SVG smoothing path로 렌더링한다.
+150. Draft stroke preview와 커밋된 drawing stroke는 같은 smoothing primitive를 사용한다.
+151. Marker/highlighter stroke 생성은 현재 선택을 훔치지 않아 연속 드로잉 흐름을 유지한다.

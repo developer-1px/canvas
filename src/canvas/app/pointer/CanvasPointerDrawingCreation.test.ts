@@ -95,7 +95,7 @@ describe('CanvasPointerDrawingCreation', () => {
     expect(disabled).toEqual({ kind: 'none' })
   })
 
-  it('commits drawing interactions through the drawing descriptor table', () => {
+  it('commits drawing interactions without stealing the current selection', () => {
     const commitItemsChange = vi.fn<CommitCanvasItemsChange>(() => true)
 
     commitCanvasPointerDrawingCreation({
@@ -124,7 +124,7 @@ describe('CanvasPointerDrawingCreation', () => {
           }),
         ],
       },
-      { before: ['selected-1'], after: ['marker-1'] },
+      { before: ['selected-1'], after: ['selected-1'] },
     )
   })
 })

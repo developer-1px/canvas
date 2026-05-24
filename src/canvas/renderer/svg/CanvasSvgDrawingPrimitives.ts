@@ -22,6 +22,33 @@ export function createCanvasSvgPathData(points: readonly Point[]) {
   ].join(' ')
 }
 
+export function createCanvasSvgFreehandPathData(points: readonly Point[]) {
+  const [first, second, ...rest] = points
+
+  if (!first) {
+    return ''
+  }
+
+  if (!second) {
+    return `M ${first.x} ${first.y}`
+  }
+
+  if (rest.length === 0) {
+    return createCanvasSvgPathData(points)
+  }
+
+  return [
+    `M ${first.x} ${first.y}`,
+    `Q ${second.x} ${second.y} ${getCanvasSvgPointMidpoint(second, rest[0])}`,
+    ...rest.slice(1).map((point, index) => {
+      const control = rest[index]
+
+      return `Q ${control.x} ${control.y} ${getCanvasSvgPointMidpoint(control, point)}`
+    }),
+    `L ${rest[rest.length - 1].x} ${rest[rest.length - 1].y}`,
+  ].join(' ')
+}
+
 export function createCanvasSvgArrowPathData({
   end,
   routing,
@@ -51,6 +78,10 @@ export function createCanvasSvgArrowPathData({
 
 function getCanvasSvgMarkerIri(id: string) {
   return `url(#${id})`
+}
+
+function getCanvasSvgPointMidpoint(left: Point, right: Point) {
+  return `${(left.x + right.x) / 2} ${(left.y + right.y) / 2}`
 }
 
 function removeRepeatedCanvasSvgPoints(points: readonly Point[]) {
