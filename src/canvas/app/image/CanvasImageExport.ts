@@ -29,6 +29,7 @@ export type CanvasImageExportPayload = {
 
 const EXPORT_PADDING = 24
 const EXPORT_BACKGROUND = '#ffffff'
+const EXPORT_IMAGE_LOAD_TIMEOUT_MS = 3000
 
 export function createCanvasSelectionImageExport({
   itemReadModel,
@@ -70,6 +71,46 @@ export function createCanvasSelectionImageExport({
   return createCanvasItemsImageExport({ bounds, items })
 }
 
+export function createCanvasSelectionImageExportCandidates({
+  itemReadModel,
+  selection,
+  stageElement,
+}: {
+  itemReadModel: CanvasImageExportReadModel
+  selection: string[]
+  stageElement?: CanvasImageExportStageSnapshot
+}): CanvasImageExportPayload[] {
+  if (selection.length === 0) {
+    return []
+  }
+
+  const bounds = itemReadModel.getSelectionBounds(selection)
+
+  if (!bounds) {
+    return []
+  }
+
+  const snapshot = stageElement?.getSelectionSvgSnapshot?.({
+    bounds,
+    ids: selection,
+  })
+  const items = itemReadModel.getSelectedItems(selection)
+  const candidates: CanvasImageExportPayload[] = []
+
+  if (snapshot) {
+    candidates.push({
+      ...snapshot,
+      filename: 'canvas-selection.png',
+    })
+  }
+
+  if (items.length > 0) {
+    candidates.push(createCanvasItemsImageExport({ bounds, items }))
+  }
+
+  return candidates
+}
+
 export function createCanvasItemsImageExport({
   bounds,
   items,
@@ -109,24 +150,20 @@ export async function downloadCanvasSelectionImage({
   selection: string[]
   stageElement?: CanvasImageExportStageSnapshot
 }) {
-  const exportPayload = createCanvasSelectionImageExport({
-    itemReadModel,
-    selection,
-    stageElement,
-  })
+  const exportPayload = await renderCanvasImageExportCandidatePngBlob(
+    createCanvasSelectionImageExportCandidates({
+      itemReadModel,
+      selection,
+      stageElement,
+    }),
+  )
 
   if (!exportPayload) {
     return false
   }
 
-  try {
-    const blob = await renderCanvasImageExportPngBlob(exportPayload)
-
-    downloadCanvasImageBlob(blob, exportPayload.filename)
-    return true
-  } catch {
-    return false
-  }
+  downloadCanvasImageBlob(exportPayload.blob, exportPayload.filename)
+  return true
 }
 
 export async function copyCanvasSelectionImageToClipboard({
@@ -138,23 +175,34 @@ export async function copyCanvasSelectionImageToClipboard({
   selection: string[]
   stageElement?: CanvasImageExportStageSnapshot
 }) {
-  const exportPayload = createCanvasSelectionImageExport({
-    itemReadModel,
-    selection,
-    stageElement,
-  })
+  const exportPayload = await renderCanvasImageExportCandidatePngBlob(
+    createCanvasSelectionImageExportCandidates({
+      itemReadModel,
+      selection,
+      stageElement,
+    }),
+  )
 
-  if (!exportPayload) {
-    return false
+  return exportPayload
+    ? writeCanvasImageBlobToClipboard(exportPayload.blob)
+    : false
+}
+
+async function renderCanvasImageExportCandidatePngBlob(
+  candidates: CanvasImageExportPayload[],
+) {
+  for (const candidate of candidates) {
+    try {
+      return {
+        blob: await renderCanvasImageExportPngBlob(candidate),
+        filename: candidate.filename,
+      }
+    } catch {
+      // Try the next representation; browser SVG rasterization support varies.
+    }
   }
 
-  try {
-    return writeCanvasImageBlobToClipboard(
-      await renderCanvasImageExportPngBlob(exportPayload),
-    )
-  } catch {
-    return false
-  }
+  return null
 }
 
 async function renderCanvasImageExportPngBlob({
@@ -196,12 +244,21 @@ function loadCanvasImageFromSvg(svg: string) {
   const image = new Image()
 
   return new Promise<HTMLImageElement>((resolve, reject) => {
-    image.addEventListener('load', () => {
+    const timeout = window.setTimeout(() => {
+      cleanup()
+      reject(new Error('Canvas image export timed out'))
+    }, EXPORT_IMAGE_LOAD_TIMEOUT_MS)
+    const cleanup = () => {
+      window.clearTimeout(timeout)
       URL.revokeObjectURL(url)
+    }
+
+    image.addEventListener('load', () => {
+      cleanup()
       resolve(image)
     }, { once: true })
     image.addEventListener('error', () => {
-      URL.revokeObjectURL(url)
+      cleanup()
       reject(new Error('Canvas image export failed'))
     }, { once: true })
     image.src = url

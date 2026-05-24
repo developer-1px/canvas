@@ -194,6 +194,11 @@
   pointer-events: none;
 }
 
+.image-hit {
+  fill: transparent;
+  pointer-events: all;
+}
+
 .canvas-text {
   box-sizing: border-box;
   width: 100%;

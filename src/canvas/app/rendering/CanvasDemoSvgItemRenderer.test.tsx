@@ -94,6 +94,24 @@ describe('CanvasDemoSvgItemRenderer', () => {
     expect(rect).toContain('data-type="rect"')
     expect(rect).toContain('canvas-rect-text')
   })
+
+  it('renders image items with a separate selection hit target', () => {
+    const markup = renderItem({
+      h: 80,
+      id: 'image-1',
+      mimeType: 'image/png',
+      src: 'data:image/png;base64,aW1hZ2U=',
+      type: 'image',
+      w: 120,
+      x: 10,
+      y: 20,
+    })
+
+    expect(markup).toContain('data-type="image"')
+    expect(markup).toContain('class="image-item"')
+    expect(markup).toContain('class="image-hit"')
+    expect(markup).toContain('href="data:image/png;base64,aW1hZ2U="')
+  })
 })
 
 function renderItem(item: CanvasItem) {

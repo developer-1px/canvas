@@ -3,6 +3,7 @@ import type { CanvasItem } from '../../entities'
 import {
   createCanvasItemsImageExport,
   createCanvasSelectionImageExport,
+  createCanvasSelectionImageExportCandidates,
 } from './CanvasImageExport'
 
 const imageItem: CanvasItem = {
@@ -77,6 +78,31 @@ describe('CanvasImageExport', () => {
       svg: '<svg><g data-canvas-item-id="image-1"></g></svg>',
       width: 168,
     })
+  })
+
+  it('keeps a data-rendered fallback behind the stage SVG snapshot', () => {
+    const readModel = {
+      getSelectedItems: vi.fn(() => [imageItem]),
+      getSelectionBounds: vi.fn(() => ({ h: 80, w: 120, x: 10, y: 20 })),
+    }
+    const stageElement = {
+      getSelectionSvgSnapshot: vi.fn(() => ({
+        height: 128,
+        svg: '<svg><foreignObject /></svg>',
+        width: 168,
+      })),
+    }
+
+    const candidates = createCanvasSelectionImageExportCandidates({
+      itemReadModel: readModel,
+      selection: ['image-1'],
+      stageElement,
+    })
+
+    expect(candidates).toHaveLength(2)
+    expect(candidates[0]?.svg).toBe('<svg><foreignObject /></svg>')
+    expect(candidates[1]?.svg).toContain('<image')
+    expect(candidates[1]?.svg).toContain('data:image/png;base64,aW1hZ2U=')
   })
 
   it('does not export without a concrete selection', () => {

@@ -190,6 +190,7 @@ const CANVAS_STAGE_SNAPSHOT_STYLE = `
 .component-svg-title-invert{fill:#fff}
 .component-svg-text{fill:#334155;font-size:13px;font-weight:550}
 .image-item{pointer-events:none}
+.image-hit{fill:transparent;pointer-events:all}
 `
 
 function createCanvasSelectionSvgSnapshot(
@@ -249,7 +250,7 @@ function createCanvasSelectionSvgSnapshot(
   snapshot.append(background)
 
   for (const node of selectedNodes) {
-    snapshot.append(node.cloneNode(true))
+    snapshot.append(cloneCanvasSelectionSnapshotNode(node))
   }
 
   return {
@@ -257,6 +258,20 @@ function createCanvasSelectionSvgSnapshot(
     svg: new XMLSerializer().serializeToString(snapshot),
     width: Math.ceil(viewBox.w),
   }
+}
+
+function cloneCanvasSelectionSnapshotNode(node: Element) {
+  const clone = node.cloneNode(true) as Element
+
+  clone.removeAttribute('data-selected')
+
+  for (const transientNode of clone.querySelectorAll(
+    '.item-outline,.image-hit',
+  )) {
+    transientNode.remove()
+  }
+
+  return clone
 }
 
 function getStageElementRect(

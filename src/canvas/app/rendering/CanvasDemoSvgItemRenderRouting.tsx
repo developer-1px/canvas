@@ -150,15 +150,24 @@ function renderCanvasDemoSvgImageItemRoute({
 }): CanvasDemoSvgItemRenderRoute {
   return {
     children: (
-      <image
-        className="image-item"
-        href={item.src}
-        x={item.x}
-        y={item.y}
-        width={item.w}
-        height={item.h}
-        preserveAspectRatio="xMidYMid meet"
-      />
+      <>
+        <image
+          className="image-item"
+          href={item.src}
+          x={item.x}
+          y={item.y}
+          width={item.w}
+          height={item.h}
+          preserveAspectRatio="xMidYMid meet"
+        />
+        <rect
+          className="image-hit"
+          x={item.x}
+          y={item.y}
+          width={item.w}
+          height={item.h}
+        />
+      </>
     ),
   }
 }
