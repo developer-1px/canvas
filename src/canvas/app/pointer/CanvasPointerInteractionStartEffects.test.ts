@@ -6,8 +6,10 @@ import {
   applyCanvasPointerInteractionStartEffect,
   applyCanvasResizePointerInteractionStartEffect,
   applyCanvasTextEditInteractionStartEffect,
-  type CanvasPointerInteractionStartEffectContext,
 } from './CanvasPointerInteractionStartEffects'
+import type {
+  CanvasPointerInteractionStartEffectContext,
+} from './CanvasPointerInteractionEffectContracts'
 
 describe('CanvasPointerInteractionStartEffects', () => {
   it('commits created text and enters editing without pointer capture', () => {

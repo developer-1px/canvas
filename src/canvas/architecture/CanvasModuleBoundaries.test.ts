@@ -1655,6 +1655,9 @@ describe('Canvas module boundaries', () => {
     const dragEffectsFile = getSourceFile(
       'src/canvas/app/pointer/CanvasPointerInteractionDragEffects.ts',
     )
+    const effectContractsFile = getSourceFile(
+      'src/canvas/app/pointer/CanvasPointerInteractionEffectContracts.ts',
+    )
     const resultContractsFile = getSourceFile(
       'src/canvas/app/pointer/CanvasPointerInteractionResultContracts.ts',
     )
@@ -1717,8 +1720,17 @@ describe('Canvas module boundaries', () => {
     expect(dragEffectsFile.source).toContain(
       "from './CanvasPointerInteractionResultContracts'",
     )
+    expect(dragEffectsFile.source).toContain(
+      "from './CanvasPointerInteractionEffectContracts'",
+    )
     expect(dragEffectsFile.source).not.toContain(
       "from './CanvasPointerInteractionPreview'",
+    )
+    expect(dragEffectsFile.source).not.toContain(
+      'export type CanvasPointerInteractionDragEffectContext',
+    )
+    expect(effectContractsFile.source).toContain(
+      'export type CanvasPointerInteractionDragEffectContext',
     )
     expect(resultContractsFile.source).toContain(
       'export type CanvasPointerInteractionPreviewResult',
@@ -2800,6 +2812,9 @@ describe('Canvas module boundaries', () => {
     const effectsFile = getSourceFile(
       'src/canvas/app/pointer/CanvasPointerInteractionStartEffects.ts',
     )
+    const effectContractsFile = getSourceFile(
+      'src/canvas/app/pointer/CanvasPointerInteractionEffectContracts.ts',
+    )
     const resultContractsFile = getSourceFile(
       'src/canvas/app/pointer/CanvasPointerInteractionResultContracts.ts',
     )
@@ -2818,11 +2833,23 @@ describe('Canvas module boundaries', () => {
     expect(effectsFile.source).toContain(
       "from './CanvasPointerInteractionResultContracts'",
     )
+    expect(effectsFile.source).toContain(
+      "from './CanvasPointerInteractionEffectContracts'",
+    )
     expect(effectsFile.source).not.toContain(
       "from './CanvasPointerInteractionStart'",
     )
+    expect(effectsFile.source).not.toContain(
+      'export type CanvasPointerInteractionStartEffectContext',
+    )
     expect(resultContractsFile.source).toContain(
       'export type CanvasPointerInteractionStartResult',
+    )
+    expect(effectContractsFile.source).toContain(
+      'export type CanvasPointerInteractionStartEffectContext',
+    )
+    expect(effectContractsFile.source).toContain(
+      'export type CanvasTextEditInteractionStartEffectContext',
     )
     expect(effectsFile.source).toContain(
       'export function applyCanvasItemPointerInteractionStartEffect',
@@ -2830,9 +2857,6 @@ describe('Canvas module boundaries', () => {
     expect(effectsFile.source).toContain('capturePointer(')
     expect(effectsFile.source).toContain("commitItemsChange({ type: 'add'")
     expect(effectsFile.source).toContain("setTool('select')")
-    expect(effectsFile.source).toContain(
-      'export type CanvasTextEditInteractionStartEffectContext',
-    )
     expect(effectsFile.source).not.toContain('Pick<')
   })
 

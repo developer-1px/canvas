@@ -8,8 +8,10 @@ import {
   applyCanvasPointerInteractionCancelEffect,
   applyCanvasPointerInteractionEndEffect,
   applyCanvasPointerInteractionPreviewEffect,
-  type CanvasPointerInteractionDragEffectContext,
 } from './CanvasPointerInteractionDragEffects'
+import type {
+  CanvasPointerInteractionDragEffectContext,
+} from './CanvasPointerInteractionEffectContracts'
 
 describe('CanvasPointerInteractionDragEffects', () => {
   it('applies preview descriptors to drag state', () => {

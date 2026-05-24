@@ -1,53 +1,18 @@
 import type {
-  Dispatch,
-  MutableRefObject,
-  SetStateAction,
-} from 'react'
-import type {
-  Bounds,
-  CanvasItem,
   EditingText,
   Tool,
 } from '../../entities'
-import type {
-  CanvasDraftArrowOverlay,
-  CanvasDraftStrokeOverlay,
-} from '../../engine'
-import type {
-  CommitCanvasItemsChange,
-  CommitCanvasSelection,
-} from '../workflow/CanvasWorkflowContract'
-import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
-import type { Interaction } from './CanvasInteractionState'
 import { capturePointer } from './CanvasPointerGeometry'
+import type {
+  CanvasPointerInteractionStartEffectContext,
+  CanvasTextEditInteractionStartEffectContext,
+} from './CanvasPointerInteractionEffectContracts'
 import type { CanvasItemPointerInteractionStartResult } from './CanvasItemPointerInteractionStart'
 import type {
   CanvasPointerInteractionStartResult,
 } from './CanvasPointerInteractionResultContracts'
 import type { CanvasResizePointerInteractionStartResult } from './CanvasResizePointerInteractionStart'
-
-export type CanvasPointerInteractionStartEffectContext = {
-  commitItemsChange: CommitCanvasItemsChange
-  commitSelection: CommitCanvasSelection
-  interactionRef: MutableRefObject<Interaction>
-  selection: string[]
-  setDraftArrow: Dispatch<SetStateAction<CanvasDraftArrowOverlay | null>>
-  setDraftRect: Dispatch<SetStateAction<Bounds | null>>
-  setDraftStroke: Dispatch<SetStateAction<CanvasDraftStrokeOverlay | null>>
-  setEditing: Dispatch<SetStateAction<EditingText | null>>
-  setGesture: Dispatch<SetStateAction<Interaction['kind']>>
-  setLiveItems: Dispatch<SetStateAction<CanvasItem[]>>
-  setSelection: Dispatch<SetStateAction<string[]>>
-  setTool: Dispatch<SetStateAction<Tool>>
-  stageElement: CanvasAppStageElement
-}
-
-export type CanvasTextEditInteractionStartEffectContext = {
-  commitSelection: CommitCanvasSelection
-  setEditing: Dispatch<SetStateAction<EditingText | null>>
-  setTool: Dispatch<SetStateAction<Tool>>
-}
 
 export function applyCanvasPointerInteractionStartEffect({
   context,

@@ -1,41 +1,16 @@
-import type {
-  Dispatch,
-  MutableRefObject,
-  SetStateAction,
-} from 'react'
-import type {
-  Bounds,
-  CanvasItem,
-  Viewport,
-} from '../../entities'
 import {
   EMPTY_CANVAS_SNAP_GUIDES,
-  type CanvasDraftArrowOverlay,
-  type CanvasDraftStrokeOverlay,
-  type CanvasSnapGuides,
 } from '../../engine'
-import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
 import type { CanvasAppPointerIdInput } from './CanvasAppPointerInput'
 import type { Interaction } from './CanvasInteractionState'
 import { releasePointer } from './CanvasPointerGeometry'
+import type {
+  CanvasPointerInteractionDragEffectContext,
+} from './CanvasPointerInteractionEffectContracts'
 import { cancelCanvasPointerInteraction } from './CanvasPointerInteractionLifecycle'
 import type {
   CanvasPointerInteractionPreviewResult,
 } from './CanvasPointerInteractionResultContracts'
-
-export type CanvasPointerInteractionDragEffectContext = {
-  interactionRef: MutableRefObject<Interaction>
-  setDraftArrow: Dispatch<SetStateAction<CanvasDraftArrowOverlay | null>>
-  setDraftRect: Dispatch<SetStateAction<Bounds | null>>
-  setDraftStroke: Dispatch<SetStateAction<CanvasDraftStrokeOverlay | null>>
-  setGesture: Dispatch<SetStateAction<Interaction['kind']>>
-  setLiveItems: Dispatch<SetStateAction<CanvasItem[]>>
-  setMarquee: Dispatch<SetStateAction<Bounds | null>>
-  setSelection: Dispatch<SetStateAction<string[]>>
-  setSnapGuides: Dispatch<SetStateAction<CanvasSnapGuides>>
-  setViewport: Dispatch<SetStateAction<Viewport>>
-  stageElement: CanvasAppStageElement
-}
 
 export function applyCanvasPointerInteractionPreviewEffect({
   context,
