@@ -6,6 +6,7 @@ import type {
 import type {
   CanvasAffordanceConfig,
   CanvasAlignMode,
+  CanvasCommandAdapter,
   CanvasCreationAdapter,
   CanvasDistributeMode,
   CanvasDraftArrowOverlay,
@@ -54,6 +55,7 @@ import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreati
 import type { Interaction } from '../pointer/CanvasInteractionState'
 import type { CanvasAppControlCommandHandlers } from './CanvasAppControlCommandContracts'
 import type {
+  CanvasDocumentClipboard,
   CommitCanvasItemsChange,
   CommitCanvasSelection,
 } from './CanvasWorkflowContract'
@@ -107,6 +109,33 @@ export type CanvasAppCommandConsumerModel = {
   control: CanvasAppCommandControlContext
   keyboard: CanvasAppCommandKeyboardContext
   pointer: CanvasAppCommandPointerContext
+}
+
+export type CanvasAppCommandDocumentModel = {
+  commitItemsChange: CommitCanvasItemsChange
+  commitSelection: CommitCanvasSelection
+  copyItemsToClipboard: CanvasDocumentClipboard['copyItemsToClipboard']
+  getClipboardItems: CanvasDocumentClipboard['getClipboardItems']
+  redo: () => string[] | undefined
+  setClipboardItems: CanvasDocumentClipboard['setClipboardItems']
+  undo: () => string[] | undefined
+}
+
+export type CanvasAppCommandWorkspaceModel = {
+  items: CanvasItem[]
+  selection: string[]
+  setSelection: Dispatch<SetStateAction<string[]>>
+  viewport: Viewport
+}
+
+export type CanvasAppCommandModelInput = {
+  commandAdapter: CanvasCommandAdapter<CanvasItem>
+  config: CanvasAffordanceConfig
+  createId: (prefix: string) => string
+  document: CanvasAppCommandDocumentModel
+  setEditing: Dispatch<SetStateAction<EditingText | null>>
+  stageElement: CanvasAppStageElement
+  workspace: CanvasAppCommandWorkspaceModel
 }
 
 export type CanvasAppExtensionRuntime = {

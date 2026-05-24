@@ -1391,6 +1391,16 @@ describe('Canvas module boundaries', () => {
       "from './CanvasAppCommandConsumerModel'",
     )
     expect(commandModelFile.source).toContain(
+      "from './CanvasAppConsumerContracts'",
+    )
+    expect(commandModelFile.source).toContain('CanvasAppCommandModelInput')
+    expect(commandModelFile.source).not.toContain(
+      'type CanvasAppCommandDocumentModel',
+    )
+    expect(commandModelFile.source).not.toContain(
+      'type CanvasAppCommandWorkspaceModel',
+    )
+    expect(commandModelFile.source).toContain(
       'export function useCanvasAppCommandModel',
     )
     expect(commandModelFile.source).toContain(
@@ -1425,6 +1435,15 @@ describe('Canvas module boundaries', () => {
     )
     expect(commandConsumerContractsFile.source).toContain(
       'export type CanvasAppCommandRuntime',
+    )
+    expect(commandConsumerContractsFile.source).toContain(
+      'export type CanvasAppCommandModelInput',
+    )
+    expect(commandConsumerContractsFile.source).toContain(
+      'export type CanvasAppCommandDocumentModel',
+    )
+    expect(commandConsumerContractsFile.source).toContain(
+      'export type CanvasAppCommandWorkspaceModel',
     )
     expect(commandConsumerContractsFile.source).toContain(
       'export type CanvasAppCommandConsumerModel',
