@@ -13,6 +13,7 @@ describe('CanvasPointerCreationGrammar', () => {
       'create-arrow',
       'create-comment',
       'create-custom',
+      'create-ellipse',
       'create-rect',
       'create-section',
       'create-sticky',
@@ -35,6 +36,14 @@ describe('CanvasPointerCreationGrammar', () => {
       {
         currentWorld: { x: 0, y: 0 },
         kind: 'create-rect',
+        moved: false,
+        pointerId: 1,
+        startScreen: { x: 0, y: 0 },
+        startWorld: { x: 0, y: 0 },
+      },
+      {
+        currentWorld: { x: 0, y: 0 },
+        kind: 'create-ellipse',
         moved: false,
         pointerId: 1,
         startScreen: { x: 0, y: 0 },

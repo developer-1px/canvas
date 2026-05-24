@@ -3,7 +3,10 @@ import type {
   RectItem,
   TextItem,
 } from '../../entities'
-import { isCanvasTextItem } from '../../host'
+import {
+  getCanvasShapeKind,
+  isCanvasTextItem,
+} from '../../host'
 
 type CanvasDemoSvgRectTextItem = RectItem | TextItem
 
@@ -42,23 +45,48 @@ function renderCanvasDemoSvgRectItem({
 }) {
   return (
     <>
-      <rect
-        className="rect-item"
-        x={item.x}
-        y={item.y}
-        width={item.w}
-        height={item.h}
-        rx="6"
-        fill={item.fill}
-        stroke={item.stroke}
-        vectorEffect="non-scaling-stroke"
-      />
+      {renderCanvasDemoSvgShapeItem({ item })}
       {item.text ? (
         <foreignObject x={item.x} y={item.y} width={item.w} height={item.h}>
           <div className="canvas-text canvas-rect-text">{item.text}</div>
         </foreignObject>
       ) : null}
     </>
+  )
+}
+
+function renderCanvasDemoSvgShapeItem({
+  item,
+}: {
+  item: RectItem
+}) {
+  if (getCanvasShapeKind(item) === 'ellipse') {
+    return (
+      <ellipse
+        className="rect-item"
+        cx={item.x + item.w / 2}
+        cy={item.y + item.h / 2}
+        rx={item.w / 2}
+        ry={item.h / 2}
+        fill={item.fill}
+        stroke={item.stroke}
+        vectorEffect="non-scaling-stroke"
+      />
+    )
+  }
+
+  return (
+    <rect
+      className="rect-item"
+      x={item.x}
+      y={item.y}
+      width={item.w}
+      height={item.h}
+      rx="6"
+      fill={item.fill}
+      stroke={item.stroke}
+      vectorEffect="non-scaling-stroke"
+    />
   )
 }
 

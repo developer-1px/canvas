@@ -25,6 +25,14 @@ export function RectIcon() {
   )
 }
 
+export function EllipseIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <ellipse cx="12" cy="12" rx="7" ry="5.8" />
+    </svg>
+  )
+}
+
 export function TextIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">

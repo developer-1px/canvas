@@ -59,6 +59,14 @@ export type Interaction =
       moved: boolean
     }
   | {
+      kind: 'create-ellipse'
+      pointerId: number
+      startScreen: Point
+      startWorld: Point
+      currentWorld: Point
+      moved: boolean
+    }
+  | {
       kind: 'draw-marker'
       pointerId: number
       startScreen: Point

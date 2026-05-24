@@ -18,6 +18,8 @@ export type CanvasCreatedText<TItem extends CanvasCreationItem> = {
 
 export type CanvasCreatedArrowRouting = 'elbow' | 'straight'
 
+export type CanvasCreatedShapeKind = 'ellipse' | 'rect'
+
 export type CanvasCreatedDrawingStyle = Readonly<{
   opacity: number
   stroke: string
@@ -43,7 +45,11 @@ export type CanvasCreationAdapter<TItem extends CanvasCreationItem> = {
     points: Point[]
     style?: CanvasCreatedDrawingStyle
   }) => TItem
-  createRect: (input: { bounds: Bounds; id: string }) => TItem
+  createRect: (input: {
+    bounds: Bounds
+    id: string
+    shape?: CanvasCreatedShapeKind
+  }) => TItem
   createText: (input: { id: string; point: Point }) => CanvasCreatedText<TItem>
 }
 
@@ -123,16 +129,19 @@ export function createCanvasRect<TItem extends CanvasCreationItem>({
   adapter,
   createId,
   currentWorld,
+  shape,
   startWorld,
 }: {
   adapter: CanvasCreationAdapter<TItem>
   createId: (prefix: string) => string
   currentWorld: Point
+  shape?: CanvasCreatedShapeKind
   startWorld: Point
 }) {
   return adapter.createRect({
     bounds: getCanvasCreatedRectBounds({ currentWorld, startWorld }),
-    id: createId('rect'),
+    id: createId(shape === 'ellipse' ? 'ellipse' : 'rect'),
+    shape,
   })
 }
 

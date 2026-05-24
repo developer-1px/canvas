@@ -15,7 +15,7 @@ const baseInput = {
 }
 
 describe('CanvasGestureEngine drawing tools', () => {
-  test('routes marker, highlighter, eraser, laser, and arrow tools to drawing gestures', () => {
+  test('routes marker, highlighter, eraser, laser, arrow, and shape tools to gestures', () => {
     expect(
       getCanvasPointerGesture({
         config,
@@ -66,6 +66,15 @@ describe('CanvasGestureEngine drawing tools', () => {
         config,
         input: baseInput,
         spaceDown: false,
+        tool: 'ellipse',
+      }),
+    ).toBe('create-ellipse')
+
+    expect(
+      getCanvasPointerGesture({
+        config,
+        input: baseInput,
+        spaceDown: false,
         tool: 'sticky',
       }),
     ).toBe('create-sticky')
@@ -95,6 +104,7 @@ describe('CanvasGestureEngine drawing tools', () => {
         createArrow: false,
         createComment: false,
         createCustom: false,
+        createEllipse: false,
         createSection: false,
         createSticky: false,
         drawHighlight: false,
@@ -146,6 +156,15 @@ describe('CanvasGestureEngine drawing tools', () => {
         input: baseInput,
         spaceDown: false,
         tool: 'arrow',
+      }),
+    ).toBe('marquee')
+
+    expect(
+      getCanvasPointerGesture({
+        config: disabled,
+        input: baseInput,
+        spaceDown: false,
+        tool: 'ellipse',
       }),
     ).toBe('marquee')
 
@@ -226,6 +245,12 @@ describe('CanvasGestureEngine drawing tools', () => {
       shouldRouteCanvasItemPointerToCanvasGesture({
         spaceDown: false,
         tool: 'arrow',
+      }),
+    ).toBe(true)
+    expect(
+      shouldRouteCanvasItemPointerToCanvasGesture({
+        spaceDown: false,
+        tool: 'ellipse',
       }),
     ).toBe(true)
     expect(

@@ -17,6 +17,7 @@ export type CanvasPointerGesture =
   | 'create-arrow'
   | 'create-comment'
   | 'create-custom'
+  | 'create-ellipse'
   | 'create-rect'
   | 'create-section'
   | 'create-sticky'
@@ -63,6 +64,10 @@ export const CANVAS_TOOL_GESTURE_ROUTES = Object.freeze({
   eraser: createCanvasToolGestureRoute({
     gesture: 'erase',
     isEnabled: (config) => config.gestures.eraseDrawing,
+  }),
+  ellipse: createCanvasToolGestureRoute({
+    gesture: 'create-ellipse',
+    isEnabled: (config) => config.gestures.createEllipse,
   }),
   laser: createCanvasToolGestureRoute({
     gesture: 'laser',

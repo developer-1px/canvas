@@ -15,6 +15,7 @@ describe('CanvasAffordanceMetadata', () => {
       'sticky',
       'section',
       'rect',
+      'ellipse',
       'text',
       'comment',
       'marker',
@@ -69,6 +70,11 @@ describe('CanvasAffordanceMetadata', () => {
       shiftKey: true,
       shortcutId: 'sectionTool',
     })
+    expect(CANVAS_TOOL_AFFORDANCES.ellipse.keyboardShortcut).toEqual({
+      key: 'o',
+      shiftInsensitive: true,
+      shortcutId: 'ellipseTool',
+    })
     expect(CANVAS_TOOL_AFFORDANCES.highlight.shortcut).toBe('Shift+M')
     expect(CANVAS_TOOL_AFFORDANCES.section.shortcut).toBe('Shift+S')
     expect(CANVAS_TOOL_AFFORDANCES.highlight.title).toBe(
@@ -77,6 +83,7 @@ describe('CanvasAffordanceMetadata', () => {
     expect(CANVAS_TOOL_AFFORDANCES.select.shortcut).toBe('V')
     expect(CANVAS_TOOL_AFFORDANCES.eraser.shortcut).toBe('E')
     expect(CANVAS_TOOL_AFFORDANCES.laser.shortcut).toBe('P')
+    expect(CANVAS_TOOL_AFFORDANCES.ellipse.shortcut).toBe('O')
     expect(CANVAS_TOOL_AFFORDANCES.select.title).toBe('Select (V)')
   })
 

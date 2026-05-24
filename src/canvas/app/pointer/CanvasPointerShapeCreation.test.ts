@@ -16,11 +16,18 @@ import {
 const config = createCanvasAffordanceConfig()
 
 describe('CanvasPointerShapeCreation', () => {
-  it('starts rect and arrow creation through one shape descriptor contract', () => {
+  it('starts rect, ellipse, and arrow creation through one shape descriptor contract', () => {
     const rect = startCanvasPointerShapeCreation({
       config,
       input: createPointerInput(),
       pointerGesture: 'create-rect',
+      startScreen: { x: 8, y: 12 },
+      startWorld: { x: 80, y: 120 },
+    })
+    const ellipse = startCanvasPointerShapeCreation({
+      config,
+      input: createPointerInput(),
+      pointerGesture: 'create-ellipse',
       startScreen: { x: 8, y: 12 },
       startWorld: { x: 80, y: 120 },
     })
@@ -39,6 +46,16 @@ describe('CanvasPointerShapeCreation', () => {
       interaction: {
         currentWorld: { x: 80, y: 120 },
         kind: 'create-rect',
+        startWorld: { x: 80, y: 120 },
+      },
+      kind: 'interaction',
+    })
+    expect(ellipse).toMatchObject({
+      draftRect: { h: 0, shape: 'ellipse', w: 0, x: 80, y: 120 },
+      gesture: 'create-ellipse',
+      interaction: {
+        currentWorld: { x: 80, y: 120 },
+        kind: 'create-ellipse',
         startWorld: { x: 80, y: 120 },
       },
       kind: 'interaction',
@@ -74,15 +91,29 @@ describe('CanvasPointerShapeCreation', () => {
       },
       scene: createSceneAdapter(),
     })
+    const ellipsePreview = previewCanvasPointerShapeCreation({
+      config,
+      currentScreen: { x: 90, y: 90 },
+      currentWorld: { x: 90, y: 90 },
+      interaction: {
+        currentWorld: { x: 0, y: 0 },
+        kind: 'create-ellipse',
+        moved: false,
+        pointerId: 1,
+        startScreen: { x: 0, y: 0 },
+        startWorld: { x: 0, y: 0 },
+      },
+      scene: createSceneAdapter(),
+    })
     const disabled = previewCanvasPointerShapeCreation({
       config: createCanvasAffordanceConfig({
-        gestures: { createArrow: false },
+        gestures: { createEllipse: false },
       }),
       currentScreen: { x: 90, y: 90 },
       currentWorld: { x: 90, y: 90 },
       interaction: {
         currentWorld: { x: 0, y: 0 },
-        kind: 'create-arrow',
+        kind: 'create-ellipse',
         moved: false,
         pointerId: 1,
         startScreen: { x: 0, y: 0 },
@@ -96,6 +127,15 @@ describe('CanvasPointerShapeCreation', () => {
       interaction: {
         currentWorld: { x: 80, y: 80 },
         kind: 'create-rect',
+        moved: true,
+      },
+      kind: 'preview',
+    })
+    expect(ellipsePreview).toMatchObject({
+      draftRect: { h: 80, shape: 'ellipse', w: 80, x: 0, y: 0 },
+      interaction: {
+        currentWorld: { x: 80, y: 80 },
+        kind: 'create-ellipse',
         moved: true,
       },
       kind: 'preview',
@@ -135,6 +175,43 @@ describe('CanvasPointerShapeCreation', () => {
         ],
       },
       { before: ['selected-1'], after: ['rect-1'] },
+    )
+    expect(setTool).toHaveBeenCalledWith('select')
+  })
+
+  it('commits ellipse creation through the shape creation descriptor', () => {
+    const commitItemsChange = vi.fn<CommitCanvasItemsChange>(() => true)
+    const setTool = vi.fn()
+
+    commitCanvasPointerShapeCreation({
+      commitItemsChange,
+      creationAdapter,
+      createId: (prefix) => `${prefix}-1`,
+      interaction: {
+        currentWorld: { x: 90, y: 100 },
+        kind: 'create-ellipse',
+        moved: true,
+        pointerId: 1,
+        startScreen: { x: 0, y: 0 },
+        startWorld: { x: 10, y: 20 },
+      },
+      scene: createSceneAdapter(),
+      selection: ['selected-1'],
+      setTool,
+    })
+
+    expect(commitItemsChange).toHaveBeenCalledWith(
+      {
+        type: 'add',
+        items: [
+          expect.objectContaining({
+            id: 'ellipse-1',
+            shape: 'ellipse',
+            type: 'rect',
+          }),
+        ],
+      },
+      { before: ['selected-1'], after: ['ellipse-1'] },
     )
     expect(setTool).toHaveBeenCalledWith('select')
   })
@@ -335,9 +412,10 @@ const creationAdapter: CanvasCreationAdapter<CanvasItem> = {
     x: 0,
     y: 0,
   }),
-  createRect: ({ bounds, id }) => ({
+  createRect: ({ bounds, id, shape }) => ({
     fill: '#ffffff',
     id,
+    ...(shape && shape !== 'rect' ? { shape } : {}),
     stroke: '#111827',
     type: 'rect',
     ...bounds,

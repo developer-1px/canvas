@@ -1,5 +1,4 @@
 import type {
-  Bounds,
   CanvasItem,
   Point,
   Tool,
@@ -17,6 +16,7 @@ import {
   type CanvasCreationAdapter,
   type CanvasCreationItem,
   type CanvasDraftArrowOverlay,
+  type CanvasDraftShapeOverlay,
   type CanvasPointerGesture,
   type CanvasSnapGuides,
 } from '../../engine'
@@ -39,7 +39,7 @@ export type CanvasPointerShapeCreationInteraction = Extract<
 
 type CanvasPointerShapeCreationDraft = Readonly<{
   draftArrow?: CanvasDraftArrowOverlay
-  draftRect?: Bounds
+  draftRect?: CanvasDraftShapeOverlay
 }>
 
 type CanvasPointerShapeCreationDescriptor = Readonly<{
@@ -90,6 +90,33 @@ const CANVAS_POINTER_SHAPE_CREATION_DESCRIPTORS = Object.freeze({
       config.gestures.createArrow,
     selectAfterCommit: false,
   }),
+  'create-ellipse': Object.freeze({
+    createDraft: ({ currentWorld, startWorld }) => ({
+      draftRect: {
+        ...normalizeBounds(startWorld, currentWorld),
+        shape: 'ellipse',
+      },
+    }),
+    createItem: <TItem extends CanvasCreationItem>({
+      adapter,
+      createId,
+      interaction,
+    }: {
+      adapter: CanvasCreationAdapter<TItem>
+      createId: (prefix: string) => string
+      interaction: CanvasPointerShapeCreationInteraction
+    }) =>
+      createCanvasRect({
+        adapter,
+        createId,
+        currentWorld: interaction.currentWorld,
+        shape: 'ellipse',
+        startWorld: interaction.startWorld,
+      }),
+    isEnabled: (config: CanvasAffordanceConfig) =>
+      config.gestures.createEllipse,
+    selectAfterCommit: true,
+  }),
   'create-rect': Object.freeze({
     createDraft: ({ currentWorld, startWorld }) => ({
       draftRect: normalizeBounds(startWorld, currentWorld),
@@ -120,7 +147,7 @@ const CANVAS_POINTER_SHAPE_CREATION_DESCRIPTORS = Object.freeze({
 export type CanvasPointerShapeCreationStartResult = {
   capturePointer: true
   draftArrow?: CanvasDraftArrowOverlay
-  draftRect?: Bounds
+  draftRect?: CanvasDraftShapeOverlay
   gesture: CanvasPointerShapeCreationKind
   interaction: CanvasPointerShapeCreationInteraction
   kind: 'interaction'

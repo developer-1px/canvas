@@ -54,6 +54,7 @@ export {
   getCanvasCreatedDrawingPoints,
   getCanvasCreatedRectBounds,
   type CanvasCreatedArrowRouting,
+  type CanvasCreatedShapeKind,
   type CanvasCreatedText,
   type CanvasCreationAdapter,
   type CanvasCreationItem,
@@ -70,6 +71,7 @@ export {
 export {
   createCanvasOverlayState,
   type CanvasDraftArrowOverlay,
+  type CanvasDraftShapeOverlay,
   type CanvasDraftStrokeOverlay,
   type CanvasEmoteBurstOverlay,
   type CanvasEmoteBurstParticle,

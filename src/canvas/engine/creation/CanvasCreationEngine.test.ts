@@ -3,6 +3,7 @@ import {
   createCanvasArrow,
   createCanvasHighlight,
   createCanvasMarker,
+  createCanvasRect,
   getCanvasCreatedArrowEnd,
   getCanvasCreatedDrawingPoints,
   type CanvasCreationAdapter,
@@ -26,7 +27,7 @@ type CreatedItem =
       start: { x: number; y: number }
       type: 'arrow'
     }
-  | { id: string; type: 'rect' | 'text' }
+  | { id: string; shape?: 'ellipse' | 'rect'; type: 'rect' | 'text' }
 
 const adapter: CanvasCreationAdapter<CreatedItem> = {
   createArrow: ({ end, id, routing, start }) => ({
@@ -48,7 +49,7 @@ const adapter: CanvasCreationAdapter<CreatedItem> = {
     style,
     type: 'marker',
   }),
-  createRect: ({ id }) => ({ id, type: 'rect' }),
+  createRect: ({ id, shape }) => ({ id, shape, type: 'rect' }),
   createText: ({ id }) => ({
     editValue: 'Text',
     item: { id, type: 'text' },
@@ -129,5 +130,21 @@ describe('CanvasCreationEngine drawing tools', () => {
         startWorld: { x: 10, y: 20 },
       }),
     ).toEqual({ x: 154, y: 20 })
+  })
+
+  test('creates ellipse shapes through the rectangle creation adapter seam', () => {
+    expect(
+      createCanvasRect({
+        adapter,
+        createId: (prefix) => `${prefix}-1`,
+        currentWorld: { x: 90, y: 100 },
+        shape: 'ellipse',
+        startWorld: { x: 10, y: 20 },
+      }),
+    ).toEqual({
+      id: 'ellipse-1',
+      shape: 'ellipse',
+      type: 'rect',
+    })
   })
 })

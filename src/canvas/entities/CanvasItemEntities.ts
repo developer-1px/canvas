@@ -12,9 +12,12 @@ export type CanvasItemBase = Bounds & {
 export type RectItem = CanvasItemBase & {
   type: 'rect'
   fill: string
+  shape?: CanvasShapeKind
   stroke: string
   text?: string
 }
+
+export type CanvasShapeKind = 'ellipse' | 'rect'
 
 export type TextItem = CanvasItemBase & {
   type: 'text'

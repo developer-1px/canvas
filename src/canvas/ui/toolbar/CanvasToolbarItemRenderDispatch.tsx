@@ -19,6 +19,7 @@ import {
   DeleteIcon,
   DistributeHorizontalIcon,
   DistributeVerticalIcon,
+  EllipseIcon,
   DuplicateIcon,
   EraserIcon,
   GroupIcon,
@@ -73,6 +74,7 @@ type CanvasToolbarAnyItemRenderStrategy = (args: {
 const CANVAS_TOOLBAR_TOOL_ICONS = {
   arrow: ArrowIcon,
   comment: CommentIcon,
+  ellipse: EllipseIcon,
   highlight: HighlighterIcon,
   marker: MarkerIcon,
   eraser: EraserIcon,

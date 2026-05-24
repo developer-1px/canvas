@@ -45,6 +45,29 @@ describe('CanvasDemoSvgRectTextItemRenderer', () => {
     expect(markup).toContain('class="canvas-text"')
     expect(markup).toContain('Label')
   })
+
+  it('renders ellipse shapes with the same embedded text contract', () => {
+    const markup = renderRectTextItems([
+      {
+        fill: '#fef3c7',
+        h: 80,
+        id: 'ellipse-1',
+        shape: 'ellipse',
+        stroke: '#d97706',
+        text: 'Loop',
+        type: 'rect',
+        w: 120,
+        x: 20,
+        y: 30,
+      },
+    ])
+
+    expect(markup).toContain('<ellipse')
+    expect(markup).toContain('class="rect-item"')
+    expect(markup).toContain('cx="80"')
+    expect(markup).toContain('ry="40"')
+    expect(markup).toContain('Loop')
+  })
 })
 
 function renderRectTextItems(items: CanvasDemoSvgRectTextItem[]) {

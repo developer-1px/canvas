@@ -7,6 +7,7 @@ import type {
 } from '../../entities'
 import type {
   CanvasDraftArrowOverlay,
+  CanvasDraftShapeOverlay,
   CanvasLaserTrailOverlay,
   CanvasDraftStrokeOverlay,
   CanvasSnapGuides,
@@ -23,7 +24,7 @@ export type CanvasPointerCreationStartResult =
       capturePointer: true
       clearSelection?: boolean
       draftArrow?: CanvasDraftArrowOverlay
-      draftRect?: Bounds
+      draftRect?: CanvasDraftShapeOverlay
       draftStroke?: CanvasDraftStrokeOverlay
       gesture: Interaction['kind']
       interaction: Interaction
@@ -50,7 +51,7 @@ export type CanvasPointerInteractionStartResult =
       capturePointer: true
       clearSelection?: boolean
       draftArrow?: CanvasDraftArrowOverlay
-      draftRect?: Bounds
+      draftRect?: CanvasDraftShapeOverlay
       draftStroke?: CanvasDraftStrokeOverlay
       gesture: Interaction['kind']
       interaction: Interaction
@@ -61,7 +62,7 @@ export type CanvasPointerCreationPreviewResult =
   | { kind: 'none' }
   | {
       draftArrow?: CanvasDraftArrowOverlay
-      draftRect?: Bounds
+      draftRect?: CanvasDraftShapeOverlay
       draftStroke?: CanvasDraftStrokeOverlay
       interaction?: CanvasPointerCreationInteraction
       kind: 'preview'
@@ -72,7 +73,7 @@ export type CanvasPointerInteractionPreviewResult =
   | { kind: 'none' }
   | {
       draftArrow?: CanvasDraftArrowOverlay
-      draftRect?: Bounds
+      draftRect?: CanvasDraftShapeOverlay
       draftStroke?: CanvasDraftStrokeOverlay
       interaction?: Interaction
       kind: 'preview'

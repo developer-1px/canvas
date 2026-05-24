@@ -16,6 +16,7 @@ export type {
   CanvasItemBase,
   CanvasJsonObject,
   CanvasJsonValue,
+  CanvasShapeKind,
   CanvasStampItem,
   CanvasStampKind,
   EditingText,
@@ -107,6 +108,12 @@ export {
   translateCanvasStampItem,
   type CreateCanvasStampItemInput,
 } from './stamp/CanvasStampItem'
+
+export {
+  CANVAS_DEFAULT_SHAPE_KIND,
+  getCanvasShapeKind,
+  isCanvasShapeKind,
+} from './shape/CanvasShapeItem'
 
 export {
   createCanvasItemReadModel,

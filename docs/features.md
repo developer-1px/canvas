@@ -180,3 +180,4 @@
 176. Spotlight는 현재 board collaborator presence 수를 follower count로 표시하고 stop 상태를 App transient state로 관리한다.
 177. Emote burst는 문서 item을 만들지 않는 built-in live reaction affordance로 제공된다.
 178. Emote controls 또는 `Shift`+canvas click은 마지막 pointer 위치에 viewport scale 보정된 transient reaction burst를 표시한다.
+179. Ellipse tool은 FigJam 기본 shape affordance로 제공되며 `O` shortcut과 SVG ellipse 렌더링을 사용한다.

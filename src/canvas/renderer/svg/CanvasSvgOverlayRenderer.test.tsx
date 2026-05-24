@@ -83,6 +83,32 @@ describe('CanvasSvgOverlayRenderer', () => {
     expect(markup).toContain('translate(100 120) scale(0.5)')
     expect(markup).toContain('+1')
   })
+
+  it('renders ellipse draft shapes through the shared draft overlay', () => {
+    const markup = renderToStaticMarkup(
+      <svg>
+        <CanvasSvgInteractionOverlays
+          overlays={{
+            ...createOverlayState(),
+            draftRect: {
+              h: 60,
+              shape: 'ellipse',
+              w: 100,
+              x: 20,
+              y: 30,
+            },
+          }}
+          viewport={{ scale: 1, x: 0, y: 0 }}
+          onResizePointerDown={vi.fn()}
+        />
+      </svg>,
+    )
+
+    expect(markup).toContain('<ellipse')
+    expect(markup).toContain('class="draft-rect"')
+    expect(markup).toContain('cx="70"')
+    expect(markup).toContain('ry="30"')
+  })
 })
 
 function createOverlayState(): CanvasOverlayState {

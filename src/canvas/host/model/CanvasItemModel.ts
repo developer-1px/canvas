@@ -12,6 +12,7 @@ export type {
   CanvasItemBase,
   CanvasJsonObject,
   CanvasJsonValue,
+  CanvasShapeKind,
   CanvasStampItem,
   CanvasStampKind,
   EditingText,

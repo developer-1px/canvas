@@ -24,6 +24,10 @@ export type CanvasDraftArrowOverlay = {
   start: Point
 }
 
+export type CanvasDraftShapeOverlay = Bounds & {
+  shape?: 'ellipse' | 'rect'
+}
+
 export type CanvasDraftStrokeOverlay = {
   kind: 'marker' | 'highlight'
   opacity: number
@@ -60,7 +64,7 @@ export type CanvasPresenceOverlay = {
 export type CanvasOverlayState = {
   alignmentGuides: CanvasSnapGuides['alignmentGuides']
   draftArrow: CanvasDraftArrowOverlay | null
-  draftRect: Bounds | null
+  draftRect: CanvasDraftShapeOverlay | null
   draftStroke: CanvasDraftStrokeOverlay | null
   emoteBursts: readonly CanvasEmoteBurstOverlay[]
   grid: boolean
@@ -89,7 +93,7 @@ export function createCanvasOverlayState({
 }: {
   config: CanvasAffordanceConfig
   draftArrow: CanvasDraftArrowOverlay | null
-  draftRect: Bounds | null
+  draftRect: CanvasDraftShapeOverlay | null
   draftStroke: CanvasDraftStrokeOverlay | null
   emoteBursts?: readonly CanvasEmoteBurstOverlay[]
   laserTrail: CanvasLaserTrailOverlay | null

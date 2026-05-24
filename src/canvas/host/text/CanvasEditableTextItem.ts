@@ -22,6 +22,7 @@ import {
   isCanvasArrowDrawingItem,
 } from '../drawing/CanvasDrawingItemGeometry'
 import { isCanvasDrawingItemStorageShape } from '../drawing/CanvasDrawingItemValidation'
+import { isCanvasShapeKind } from '../shape/CanvasShapeItem'
 
 export type { CanvasEditableTextItem } from '../model'
 
@@ -198,6 +199,7 @@ function isCanvasRectItemStorageShape(
     value.type === 'rect' &&
     typeof value.fill === 'string' &&
     typeof value.stroke === 'string' &&
+    (value.shape === undefined || isCanvasShapeKind(value.shape)) &&
     (value.text === undefined || typeof value.text === 'string')
   )
 }

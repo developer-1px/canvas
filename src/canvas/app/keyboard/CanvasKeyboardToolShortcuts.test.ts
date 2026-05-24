@@ -18,6 +18,12 @@ describe('CanvasKeyboardToolShortcuts', () => {
       event: createKeyboardEvent({ key: 'M', shiftKey: true }),
       key: 'm',
     })).toBe('highlight')
+
+    expect(getCanvasKeyboardBuiltinToolShortcut({
+      config: createCanvasAffordanceConfig(),
+      event: createKeyboardEvent({ key: 'O' }),
+      key: 'o',
+    })).toBe('ellipse')
   })
 
   it('keeps shifted section distinct from sticky', () => {
@@ -67,6 +73,8 @@ describe('CanvasKeyboardToolShortcuts', () => {
         { label: 'select tool', shortcut: { key: 'v', shiftKey: true } },
         { label: 'sticky note tool', shortcut: { key: 's' } },
         { label: 'section tool', shortcut: { key: 's', shiftKey: true } },
+        { label: 'ellipse tool', shortcut: { key: 'o' } },
+        { label: 'ellipse tool', shortcut: { key: 'o', shiftKey: true } },
         { label: 'marker tool', shortcut: { key: 'm' } },
         {
           label: 'highlighter tool',

@@ -58,7 +58,7 @@ export function useCanvasAppModel({
   const votingSession = useCanvasVotingSessionModel(affordance.facilitation)
   const emotes = useCanvasEmoteModel({
     ...affordance.interaction,
-    stageElement,
+    stageElement: stageElement.pointer.stageElement,
     viewport: workspace.stage.viewport,
   })
   const interaction = useCanvasInteractionModel({

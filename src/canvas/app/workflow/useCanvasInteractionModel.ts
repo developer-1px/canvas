@@ -13,6 +13,7 @@ import {
   createCanvasOverlayState,
   type CanvasAffordanceConfig,
   type CanvasDraftArrowOverlay,
+  type CanvasDraftShapeOverlay,
   type CanvasEmoteBurstOverlay,
   type CanvasLaserTrailOverlay,
   type CanvasDraftStrokeOverlay,
@@ -47,7 +48,8 @@ export function useCanvasInteractionModel({
   const [marquee, setMarquee] = useState<Bounds | null>(null)
   const [draftArrow, setDraftArrow] =
     useState<CanvasDraftArrowOverlay | null>(null)
-  const [draftRect, setDraftRect] = useState<Bounds | null>(null)
+  const [draftRect, setDraftRect] =
+    useState<CanvasDraftShapeOverlay | null>(null)
   const [draftStroke, setDraftStroke] =
     useState<CanvasDraftStrokeOverlay | null>(null)
   const [laserTrail, setLaserTrail] =

@@ -33,6 +33,7 @@ export const CANVAS_TOOL_AFFORDANCE_ORDER = Object.freeze([
   'sticky',
   'section',
   'rect',
+  'ellipse',
   'text',
   'comment',
   'marker',
@@ -78,6 +79,15 @@ export const CANVAS_TOOL_AFFORDANCES = Object.freeze({
       shortcutId: 'eraserTool',
     },
     statusLabel: 'Eraser',
+  }),
+  ellipse: createCanvasToolAffordance({
+    ariaLabel: 'Ellipse tool',
+    keyboardShortcut: {
+      key: 'o',
+      shiftInsensitive: true,
+      shortcutId: 'ellipseTool',
+    },
+    statusLabel: 'Ellipse',
   }),
   laser: createCanvasToolAffordance({
     ariaLabel: 'Laser pointer tool',
@@ -260,6 +270,7 @@ export const CANVAS_GESTURE_STATUS_LABELS: Partial<
 > = Object.freeze({
   'create-arrow': 'Drawing',
   'create-custom': 'Creating',
+  'create-ellipse': 'Drawing',
   'create-rect': 'Drawing',
   'draw-highlight': 'Highlighting',
   'draw-marker': 'Drawing',

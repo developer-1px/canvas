@@ -56,6 +56,7 @@ export const CANVAS_AFFORDANCE_CONFIG_DEFAULTS = Object.freeze({
     createArrow: true,
     createComment: true,
     createCustom: true,
+    createEllipse: true,
     createSection: true,
     createSticky: true,
     drawHighlight: true,
@@ -117,6 +118,7 @@ export const CANVAS_AFFORDANCE_CONFIG_DEFAULTS = Object.freeze({
     cut: true,
     delete: true,
     duplicate: true,
+    ellipseTool: true,
     escape: true,
     fitAll: true,
     fitSelection: true,
@@ -151,6 +153,7 @@ export const CANVAS_AFFORDANCE_CONFIG_DEFAULTS = Object.freeze({
   tools: Object.freeze({
     arrow: true,
     comment: true,
+    ellipse: true,
     highlight: true,
     marker: true,
     eraser: true,

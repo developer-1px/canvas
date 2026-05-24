@@ -78,14 +78,25 @@ export function CanvasSvgInteractionOverlays({
   return (
     <>
       {overlays.draftRect ? (
-        <rect
-          className="draft-rect"
-          x={overlays.draftRect.x}
-          y={overlays.draftRect.y}
-          width={overlays.draftRect.w}
-          height={overlays.draftRect.h}
-          vectorEffect="non-scaling-stroke"
-        />
+        overlays.draftRect.shape === 'ellipse' ? (
+          <ellipse
+            className="draft-rect"
+            cx={overlays.draftRect.x + overlays.draftRect.w / 2}
+            cy={overlays.draftRect.y + overlays.draftRect.h / 2}
+            rx={overlays.draftRect.w / 2}
+            ry={overlays.draftRect.h / 2}
+            vectorEffect="non-scaling-stroke"
+          />
+        ) : (
+          <rect
+            className="draft-rect"
+            x={overlays.draftRect.x}
+            y={overlays.draftRect.y}
+            width={overlays.draftRect.w}
+            height={overlays.draftRect.h}
+            vectorEffect="non-scaling-stroke"
+          />
+        )
       ) : null}
 
       {overlays.draftArrow ? (
