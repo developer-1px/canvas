@@ -6,9 +6,9 @@ import type {
 } from '../../engine'
 import type { CanvasItem } from '../../entities'
 import type {
-  CanvasComponentLibrary,
-  CanvasComponentTemplate,
-} from '../../host'
+  CanvasAppComponentLibrary,
+  CanvasAppComponentTemplate,
+} from './CanvasAppComponentAssemblyContracts'
 import type {
   CanvasAppCustomCommand,
 } from '../commands/CanvasAppCustomCommands'
@@ -34,11 +34,11 @@ export type CanvasAppAssemblyCommandModel = {
 }
 
 export type CanvasAppAssemblyComponentModel = {
-  componentLibrary: CanvasComponentLibrary
+  componentLibrary: CanvasAppComponentLibrary
 }
 
 export type CanvasAppAssemblyControlModel = {
-  components: readonly CanvasComponentTemplate[]
+  components: readonly CanvasAppComponentTemplate[]
 }
 
 export type CanvasAppAssemblyExtensionModel = {
@@ -62,7 +62,7 @@ export type CanvasAppAssemblyPointerModel = {
 export type CanvasAppAssemblyRenderingModel = {
   componentPresentationRenderers: CanvasAppComponentPresentationRenderers
   customItemRenderers: CanvasAppCustomItemRenderers
-  getComponentPresentation: CanvasComponentLibrary['getPresentation']
+  getComponentPresentation: CanvasAppComponentLibrary['getPresentation']
   itemLayerAdapter: CanvasAppItemLayerAdapter
   stageAdapter: CanvasAppStageAdapter
 }

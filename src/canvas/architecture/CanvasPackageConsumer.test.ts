@@ -10,6 +10,9 @@ import {
   createCanvasAppAssembly,
   defineCanvasAppCustomItemModule,
   type CanvasAppAssemblySource,
+  type CanvasAppCommitItemsChange,
+  type CanvasAppComponentLibrary,
+  type CanvasAppComponentTemplate,
   type CanvasAppComponentRendererStrategy,
   type CanvasAppCustomItemModule,
   type CanvasAppCustomItemRendererStrategy,
@@ -19,6 +22,7 @@ import {
   type CanvasAppPointerInput,
   type CanvasAppStageAdapter,
   type CanvasAppStageMount,
+  type CanvasAppItemsChange,
   type CanvasWorkspaceStorageProvider,
   type CanvasCustomItem,
   type CanvasEditableTextItem,
@@ -70,6 +74,11 @@ describe('Canvas package consumer imports', () => {
       y: 20,
     }
     const editableItem: CanvasEditableTextItem = rect
+    const appItemsChange: CanvasAppItemsChange = {
+      items: [rect],
+      type: 'add',
+    }
+    const commitAppItemsChange: CanvasAppCommitItemsChange = () => true
     const validateCustomItem: CanvasAppCustomItemValidator = (item) =>
       item.data.severity === 'high'
     const module: CanvasAppCustomItemModule =
@@ -81,6 +90,21 @@ describe('Canvas package consumer imports', () => {
       })
     const renderComponent: CanvasAppComponentRendererStrategy = ({ item }) =>
       item.title
+    const componentTemplate: CanvasAppComponentTemplate = {
+      accent: '#111111',
+      fill: '#ffffff',
+      h: 120,
+      id: 'smoke-card',
+      label: 'S',
+      presentation: 'smoke-card',
+      stroke: '#cccccc',
+      title: 'Smoke card',
+      w: 160,
+    }
+    const componentLibrary: CanvasAppComponentLibrary =
+      createCanvasComponentLibrary({
+        templates: [componentTemplate],
+      })
     const renderCustomItem: CanvasAppCustomItemRendererStrategy = ({ item }) =>
       item.title
     const itemLayerAdapter: CanvasAppItemLayerAdapter = {
@@ -107,6 +131,10 @@ describe('Canvas package consumer imports', () => {
     }
 
     const assembly = createCanvasAppAssembly({
+      componentLibrary,
+      componentPresentationRenderers: createCanvasAppComponentPresentationRenderers({
+        'smoke-card': renderComponent,
+      }),
       customItemModules: [module],
       initialItems: [rect],
       initialSelection: [rect.id],
@@ -136,6 +164,7 @@ describe('Canvas package consumer imports', () => {
     } satisfies CanvasAppProps
 
     expect(assembly.initialItems).toEqual([rect])
+    expect(commitAppItemsChange(appItemsChange)).toBe(true)
     expect(assembly.initialSelection).toEqual([rect.id])
     expect(
       shellInputSource.assemblyInput.affordanceConfig?.overlays?.toolbar,

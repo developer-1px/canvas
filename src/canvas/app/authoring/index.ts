@@ -7,6 +7,12 @@ export type {
   CanvasAppAssemblyInput,
 } from '../workflow/CanvasAppAssemblyTypes'
 export type {
+  CanvasAppComponentLibrary,
+  CanvasAppComponentPresentation,
+  CanvasAppComponentTemplate,
+  CanvasAppCreateComponentItemInput,
+} from '../workflow/CanvasAppComponentAssemblyContracts'
+export type {
   CanvasAppCustomCommand,
   CanvasAppCustomCommandContext,
 } from '../commands/CanvasAppCustomCommands'
@@ -33,6 +39,12 @@ export type {
   CanvasAppCustomCreationToolContext,
   CanvasAppCustomToolShortcut,
 } from '../tools/CanvasAppCustomCreationTools'
+export type {
+  CanvasAppCommitItemsChange,
+  CanvasAppCommitSelection,
+  CanvasAppDocumentSelectionHistory,
+  CanvasAppItemsChange,
+} from '../document/CanvasAppDocumentContracts'
 export type {
   CanvasWorkspaceStorage,
   CanvasWorkspaceStorageProvider,

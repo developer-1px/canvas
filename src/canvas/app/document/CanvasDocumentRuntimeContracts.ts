@@ -1,12 +1,14 @@
 import type {
-  CanvasItem,
   CanvasDocumentController,
   CanvasDocumentHistoryAvailability,
   CanvasDocumentHistoryResult,
-  CanvasDocumentSelectionHistory,
-  CanvasItemsChange,
   CanvasTextSearchOptions,
 } from '../../host'
+import type { CanvasItem } from '../../entities'
+import type {
+  CanvasAppDocumentSelectionHistory,
+  CanvasAppItemsChange,
+} from './CanvasAppDocumentContracts'
 
 export type CanvasDocumentStateAction<T> = T | ((current: T) => T)
 
@@ -31,10 +33,10 @@ export type ReplaceCanvasDocumentLiveItemsArgs = {
 }
 
 export type CommitCanvasDocumentItemsChangeArgs = {
-  change: CanvasItemsChange
+  change: CanvasAppItemsChange
   currentItems: CanvasItem[]
   document: CanvasDocumentController
-  selection?: CanvasDocumentSelectionHistory
+  selection?: CanvasAppDocumentSelectionHistory
 }
 
 export type RestoreCanvasDocumentSelectionArgs = {

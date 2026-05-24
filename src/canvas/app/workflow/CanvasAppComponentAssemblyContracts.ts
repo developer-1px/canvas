@@ -1,7 +1,11 @@
 import {
   createCanvasComponentLibrary,
-  type CanvasComponentLibrary,
 } from '../../host'
+import type {
+  CanvasComponentItem,
+  CanvasComponentKind,
+  Point,
+} from '../../entities'
 import {
   assertCanvasAppArray,
   assertCanvasAppDescriptorFunctionField,
@@ -15,8 +19,42 @@ import type {
 } from '../rendering/CanvasAppRenderingContracts'
 
 export type CanvasAppComponentAssemblyContract = {
-  componentLibrary: CanvasComponentLibrary
+  componentLibrary: CanvasAppComponentLibrary
   componentPresentationRenderers: CanvasAppComponentPresentationRenderers
+}
+
+export type CanvasAppComponentPresentation = string
+
+export type CanvasAppComponentTemplate = {
+  accent: string
+  body?: string
+  columns?: string[]
+  fill: string
+  h: number
+  id: CanvasComponentKind
+  items?: string[]
+  label: string
+  presentation: CanvasAppComponentPresentation
+  stroke: string
+  title: string
+  w: number
+}
+
+export type CanvasAppCreateComponentItemInput = {
+  id: string
+  point: Point
+  templateId: CanvasComponentKind
+}
+
+export type CanvasAppComponentLibrary = {
+  createItem: (
+    input: CanvasAppCreateComponentItemInput,
+  ) => CanvasComponentItem
+  getPresentation: (
+    id: CanvasComponentKind,
+  ) => CanvasAppComponentPresentation
+  getTemplate: (id: CanvasComponentKind) => CanvasAppComponentTemplate
+  templates: readonly CanvasAppComponentTemplate[]
 }
 
 export function assertCanvasAppComponentAssembly({
@@ -45,7 +83,7 @@ function assertCanvasComponentPresentationRendererCoverage({
 }
 
 function assertCanvasAppComponentLibrary(
-  componentLibrary: CanvasComponentLibrary,
+  componentLibrary: CanvasAppComponentLibrary,
 ) {
   assertCanvasAppDescriptorObject(componentLibrary, 'component library')
   assertCanvasAppDescriptorFunctionField({
@@ -72,7 +110,7 @@ function assertCanvasAppComponentLibrary(
 }
 
 function assertCanvasAppComponentLibraryResolvers(
-  componentLibrary: CanvasComponentLibrary,
+  componentLibrary: CanvasAppComponentLibrary,
 ) {
   for (const template of componentLibrary.templates) {
     const resolvedTemplate = componentLibrary.getTemplate(template.id)

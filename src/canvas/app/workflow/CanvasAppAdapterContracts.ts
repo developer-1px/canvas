@@ -2,7 +2,7 @@ import {
   assertCanvasAppDescriptorFunctionField,
   assertCanvasAppDescriptorObject,
 } from '../extensions/CanvasAppDescriptorContracts'
-import type { CanvasItem } from '../../host'
+import type { CanvasItem } from '../../entities'
 import type {
   CanvasCommandAdapter,
   CanvasCreationAdapter,

@@ -1,10 +1,7 @@
 import type {
   CanvasAffordanceConfigInput,
 } from '../../engine'
-import type {
-  CanvasComponentLibrary,
-  CanvasItem,
-} from '../../host'
+import type { CanvasItem } from '../../entities'
 import type { CanvasWorkspaceStorageProvider } from '../document/CanvasWorkspacePersistence'
 import type {
   CanvasAppComponentPresentationRenderers,
@@ -12,13 +9,14 @@ import type {
   CanvasAppStageAdapter,
 } from '../rendering/CanvasAppRenderingContracts'
 import type { CanvasAppItemAdapters } from './CanvasAppAdapterContracts'
+import type { CanvasAppComponentLibrary } from './CanvasAppComponentAssemblyContracts'
 
 export type CanvasAppAffordanceAssemblyInput = {
   affordanceConfig?: CanvasAffordanceConfigInput
 }
 
 export type CanvasAppComponentAssemblyInput = {
-  componentLibrary?: CanvasComponentLibrary
+  componentLibrary?: CanvasAppComponentLibrary
   componentPresentationRenderers?: CanvasAppComponentPresentationRenderers
 }
 

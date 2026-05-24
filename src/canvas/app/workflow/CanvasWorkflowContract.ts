@@ -1,21 +1,15 @@
-import type { SetStateAction } from 'react'
 import type {
-  CanvasDocumentClipboard,
-  CanvasDocumentSelectionHistory,
-  CanvasDocumentTextSearch,
-  CanvasItemsChange,
-} from '../../host'
+  CanvasAppCommitItemsChange,
+  CanvasAppCommitSelection,
+  CanvasAppDocumentClipboard,
+  CanvasAppDocumentTextSearch,
+} from '../document/CanvasAppDocumentContracts'
 
-export type CommitCanvasItemsChange = (
-  change: CanvasItemsChange,
-  selection?: CanvasDocumentSelectionHistory,
-) => boolean
+export type CommitCanvasItemsChange = CanvasAppCommitItemsChange
 
-export type CommitCanvasSelection = (
-  action: SetStateAction<string[]>,
-) => boolean
+export type CommitCanvasSelection = CanvasAppCommitSelection
 
 export type {
-  CanvasDocumentClipboard,
-  CanvasDocumentTextSearch,
+  CanvasAppDocumentClipboard as CanvasDocumentClipboard,
+  CanvasAppDocumentTextSearch as CanvasDocumentTextSearch,
 }

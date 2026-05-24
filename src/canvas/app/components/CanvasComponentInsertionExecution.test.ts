@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import type { CanvasComponentItem } from '../../entities'
-import type { CanvasComponentLibrary } from '../../host'
 import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
+import type { CanvasAppComponentLibrary } from '../workflow/CanvasAppComponentAssemblyContracts'
 import { insertCanvasComponent } from './CanvasComponentInsertionExecution'
 
 describe('CanvasComponentInsertionExecution', () => {
@@ -59,13 +59,13 @@ describe('CanvasComponentInsertionExecution', () => {
   })
 })
 
-function createComponentLibrary(): CanvasComponentLibrary {
+function createComponentLibrary(): CanvasAppComponentLibrary {
   return {
     createItem: vi.fn(createComponentItem),
     getPresentation: vi.fn(() => 'note-card'),
     getTemplate: vi.fn(),
     templates: [],
-  } as unknown as CanvasComponentLibrary
+  } as unknown as CanvasAppComponentLibrary
 }
 
 function createComponentItem(): CanvasComponentItem {

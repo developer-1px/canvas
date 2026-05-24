@@ -1,10 +1,7 @@
 import type {
   CanvasAffordanceConfig,
 } from '../../engine'
-import type {
-  CanvasComponentLibrary,
-  CanvasItem,
-} from '../../host'
+import type { CanvasItem } from '../../entities'
 import type { CanvasWorkspaceStorageProvider } from '../document/CanvasWorkspacePersistence'
 import type { CanvasAppExtensionBundle } from '../extensions/CanvasAppExtensionBundle'
 import type {
@@ -13,6 +10,7 @@ import type {
   CanvasAppStageAdapter,
 } from '../rendering/CanvasAppRenderingContracts'
 import type { CanvasAppItemAdapters } from './CanvasAppAdapterContracts'
+import type { CanvasAppComponentLibrary } from './CanvasAppComponentAssemblyContracts'
 import type {
   CanvasAppAdapterAssemblyInput,
   CanvasAppAffordanceAssemblyInput,
@@ -23,7 +21,7 @@ import type { CanvasAppExtensionAssemblyInput } from './CanvasAppExtensionAssemb
 
 export type CanvasAppAssembly = CanvasAppExtensionBundle & {
   affordanceConfig: CanvasAffordanceConfig
-  componentLibrary: CanvasComponentLibrary
+  componentLibrary: CanvasAppComponentLibrary
   componentPresentationRenderers: CanvasAppComponentPresentationRenderers
   initialItems: CanvasItem[]
   initialSelection: readonly string[]

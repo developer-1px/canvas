@@ -23,7 +23,7 @@
 - Canvas App Public Facade: Canvas App Shell, Canvas App Assembly Source, workflow 조립 계약과 고급 App runtime hook을 노출하는 `src/canvas/app` entry.
 - Canvas App Authoring Facade: `canvas/app/authoring` subpath로 외부 조립자가 쓰는 assembly input, custom command, custom item module, module-owned creation tool, inspector, renderer descriptor 계약을 모으고 runtime hook, default assembly, assembled tool/state, validator, custom module assembly output은 제외하는 App public authoring Module.
 - Canvas Item Read Model: Demo `CanvasItem` tree의 조회, bounds, selection 정규화, Scene Adapter 생성을 tree helper 세부 구현 없이 제공하고 `scene`을 Engine `CanvasSceneAdapter` contract로 노출하는 Module.
-- Canvas Component Library: Demo component template, presentation key, component item 생성을 함께 제공하는 Module.
+- Canvas Component Library: Demo component template, presentation key, component item 생성 how를 함께 제공하는 Host-owned concrete Module. App 공개 조립 계약은 이 concrete 타입 대신 Canvas App Component Library Interface를 소비한다.
 - Canvas Built-in Component Templates: Sticky, label, card 같은 기본 Demo component catalogue를 소유하는 Host-owned Module.
 - Canvas Component Presentation: Demo component kind를 Renderer Adapter의 그리기 전략과 연결하는 key. 새 component kind는 기존 presentation을 재사용할 수 있다.
 - Canvas Component Item Validation: component item의 stable component id, title/style string, optional text list 저장 shape 검증을 소유하는 Host-owned validation Module.
@@ -40,7 +40,7 @@
 - Canvas App Affordance Model Contracts: Canvas Affordance Config를 command, control, interaction, inspector, keyboard, pointer, text, viewport consumer context로 전달하는 내부 Interface를 명시하고 defaulting/mapping 구현과 분리하는 workflow type 계약.
 - Canvas App Component Assembly: component library defaulting과 component presentation renderer registry 합성을 Canvas App Assembly output으로 만드는 App-owned composition Module.
 - Canvas App Assembly Contracts: assembly output의 component library consistency, renderer coverage, extension registry, item adapter shape, initial item validity를 검증하는 App-owned contract Module.
-- Canvas App Component Assembly Contracts: Canvas App Assembly의 component library shape, resolver consistency, presentation renderer coverage를 검증하는 App-owned contract Module.
+- Canvas App Component Assembly Contracts: Canvas App Assembly의 App-owned component library Interface, template shape, resolver consistency, presentation renderer coverage를 검증하는 App-owned contract Module. Host Component Library는 이 Interface를 만족하는 Adapter일 뿐 App 공개 조립 타입의 소유자가 아니다.
 - Canvas App Adapter Contracts: Host item adapter, item layer Adapter, stage Adapter의 필수 함수 slot을 검증하는 App-owned contract Module.
 - Canvas App Assembly Snapshot: 조립된 assembly output을 외부 mutation에서 보호하기 위해 component library, extension registry, initial item, adapter를 snapshot/freeze 하는 App-owned Module.
 - Canvas App Adapter Snapshot: Host item adapter, item layer Adapter, stage Adapter의 snapshot/freeze 규칙을 소유하는 App-owned Module.
@@ -201,6 +201,7 @@
 - Canvas Workspace Snapshot: 저장된 workspace payload의 version, item validation, viewport normalization, selection sanitization, id seed contract를 소유하는 App-owned Module.
 - Canvas Workspace Storage: App workspace persistence가 요구하는 `getItem`, `setItem`, optional `removeItem` slot만 명시하고 browser `Storage` 구현 shape를 숨기는 App-owned persistence Interface 계약.
 - Canvas Workspace Storage Provider: Host가 workspace persistence storage를 조립하거나 비활성화할 수 있게 하는 App Assembly 입력 계약. 기본 provider만 browser `localStorage`를 선택한다.
+- Canvas App Document Contracts: custom command, inspector panel, workflow가 공유하는 document item change, selection history, clipboard, text search communication Interface를 App-owned 이름으로 고정해 외부 descriptor가 Host document concrete 타입을 직접 import하지 않게 하는 계약 Module.
 - Canvas Document Runtime: Host Document Controller mutation result를 App React state가 반영할 committed state로 변환하고 live item replacement, selection action resolution, text replace, history result application을 소유하는 App-owned runtime Module.
 - Canvas Document Runtime Contracts: App document runtime이 Host Document Controller와 주고받는 change, selection action, text search options, history result, committed state의 명시 Interface 계약을 소유하는 App-owned contract Module.
 - Canvas Workflow Contract: App workflow hook들이 공유하는 document commit, selection commit, clipboard 계약. 개별 hook이 `useCanvasDocument` 구현 파일을 직접 알지 않게 한다.
@@ -216,7 +217,7 @@
 - Demo SVG Drawing Item Render Routing: marker/highlighter stroke path rendering과 arrow line/marker rendering strategy를 소유하는 App rendering Module.
 - Demo SVG Rect/Text Item Renderer: editable text item public render entry를 소유하고 rect/text SVG shape dispatch는 Demo SVG Rect/Text Item Render Routing에 위임하는 App rendering Module.
 - Demo SVG Rect/Text Item Render Routing: rect geometry, embedded rect text, standalone text foreignObject rendering strategy를 소유하는 App rendering Module.
-- Renderer Component Presentation Resolver: Demo component kind를 Renderer Adapter가 이해하는 presentation key로 바꾸는 함수. App workflow가 Host의 Canvas Component Library에서 꺼내 Renderer Adapter에 주입한다.
+- Renderer Component Presentation Resolver: Demo component kind를 Renderer Adapter가 이해하는 presentation key로 바꾸는 함수. App workflow는 Canvas App Component Library Interface의 `getPresentation` slot을 Renderer Adapter에 주입한다.
 - Renderer Public Facade: App과 UI가 Renderer Adapter를 사용할 때 import하는 안정된 Module 경계. SVG 내부 파일 구조를 숨긴다.
 - Scene Adapter: Host App의 항목 트리, bounds, hit target, editable target을 엔진이 읽을 수 있게 맞추는 Adapter.
 - Canvas Module Boundary Guardrail: Engine, Host, App Shell, UI, Renderer seam import 규칙을 고정하는 architecture test.
@@ -261,6 +262,7 @@
 - 새 Demo component kind가 기존 presentation을 재사용하면 Canvas Built-in Component Templates만 수정한다.
 - 새 Demo component kind와 새 SVG presentation은 Canvas App Assembly에서 component library와 presentation registry를 조립해 붙인다.
 - Canvas Component Library의 모든 presentation은 Canvas App Assembly의 component presentation renderer registry에 있어야 한다.
+- 외부 조립자는 Host concrete `CanvasComponentLibrary` 타입을 알 필요 없이 Canvas App Component Library Interface를 만족하는 Adapter를 넘긴다. Host `createCanvasComponentLibrary`는 기본 Adapter 구현이다.
 - 기본 component presentation renderer mapping은 Demo SVG Built-in Component Presentation Renderers가 소유하고, 제품별 renderer는 Canvas App Assembly에서 extension으로 조립한다.
 - 제품별 renderer registry shape는 Canvas App Renderer Registry Contracts에서 공통 검증하고, Demo SVG Component Presentation Registry Contracts와 Demo SVG Custom Item Renderer Registry Contracts는 registry 종류만 지정한다.
 - Canvas Component Template은 id/presentation뿐 아니라 필수 label/title/style string, 양수 크기, optional string list shape도 Canvas Component Library Contracts에서 실패해야 하며, 생성된 library는 외부 template mutation에 흔들리지 않는 snapshot을 보관한다.
@@ -268,6 +270,7 @@
 - Canvas App Assembly는 주입된 Canvas Component Library의 `templates`, `getTemplate`, `getPresentation` 결과가 일관되지 않으면 실패해야 한다.
 - Canvas App Assembly input은 output type을 부분 노출하지 않고 명시적 필드 계약으로 유지한다.
 - Canvas App Assembly는 내부 표준 Affordance 문법을 외부 구현으로 넘기지 않고, 제품별 feature toggle config만 명시 입력 계약으로 조립한다.
+- 외부 custom command와 inspector panel descriptor는 Host document 타입을 직접 import하지 않고 Canvas App Document Contracts의 App-owned communication Interface를 소비한다.
 - Canvas App Affordance Assembly는 제품별 affordance feature toggle override와 default affordance config fallback 조립을 소유한다.
 - Canvas App Shell은 일반 소비자에게 `assemblyInput`을 열고, prebuilt `assembly`는 고급 Host seam으로만 남긴다.
 - App UI surface는 Shell에서 항상 렌더링하지 않고 Canvas Affordance overlay toggle을 view prop으로 소비해 숨긴다.

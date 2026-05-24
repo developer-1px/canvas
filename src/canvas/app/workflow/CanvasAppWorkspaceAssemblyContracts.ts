@@ -2,8 +2,8 @@ import {
   getCanvasItemIds,
   getCanvasValidSelection,
   normalizeCanvasItems,
-  type CanvasItem,
 } from '../../host'
+import type { CanvasItem } from '../../entities'
 import type { CanvasWorkspaceStorageProvider } from '../document/CanvasWorkspacePersistence'
 import {
   assertCanvasAppArray,

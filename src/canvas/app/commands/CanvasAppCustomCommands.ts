@@ -5,18 +5,15 @@ import type {
   Viewport,
 } from '../../entities'
 import type {
-  CanvasDocumentSelectionHistory,
-  CanvasItemsChange,
-} from '../../host'
+  CanvasAppCommitItemsChange,
+  CanvasAppCommitSelection,
+} from '../document/CanvasAppDocumentContracts'
 
-export type CanvasAppCustomCommandCommitItemsChange = (
-  change: CanvasItemsChange,
-  selection?: CanvasDocumentSelectionHistory,
-) => boolean
+export type CanvasAppCustomCommandCommitItemsChange =
+  CanvasAppCommitItemsChange
 
-export type CanvasAppCustomCommandCommitSelection = (
-  action: SetStateAction<string[]>,
-) => boolean
+export type CanvasAppCustomCommandCommitSelection =
+  CanvasAppCommitSelection
 
 export type CanvasAppCustomCommandContext = {
   commitItemsChange: CanvasAppCustomCommandCommitItemsChange

@@ -9,13 +9,13 @@ import type {
   Tool,
   Viewport,
 } from '../../entities'
-import type { CanvasComponentLibrary } from '../../host'
+import type { CanvasAppComponentLibrary } from '../workflow/CanvasAppComponentAssemblyContracts'
 import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract'
 import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
 import { insertCanvasComponent } from './CanvasComponentInsertionExecution'
 
 type UseCanvasComponentInsertionArgs = {
-  componentLibrary: CanvasComponentLibrary
+  componentLibrary: CanvasAppComponentLibrary
   commitItemsChange: CommitCanvasItemsChange
   createId: (prefix: string) => string
   selection: string[]

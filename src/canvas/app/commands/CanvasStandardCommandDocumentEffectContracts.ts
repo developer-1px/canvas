@@ -1,5 +1,5 @@
 import type { EditingText } from '../../entities'
-import type { CanvasItemsChange } from '../../host'
+import type { CanvasAppItemsChange } from '../document/CanvasAppDocumentContracts'
 import type {
   CommitCanvasItemsChange,
   CommitCanvasSelection,
@@ -20,7 +20,7 @@ export type CanvasStandardCommandDocumentEffectContext = {
   undo: () => string[] | undefined
 }
 
-export type CanvasStandardCommandItemsChange = CanvasItemsChange
+export type CanvasStandardCommandItemsChange = CanvasAppItemsChange
 
 export type CanvasStandardCommandDocumentEffect =
   | {

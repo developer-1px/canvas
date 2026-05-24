@@ -30,10 +30,12 @@ import type {
   Viewport,
 } from '../../entities'
 import type {
-  CanvasComponentLibrary,
-  CanvasComponentTemplate,
   CanvasItemReadModel,
 } from '../../host'
+import type {
+  CanvasAppComponentLibrary,
+  CanvasAppComponentTemplate,
+} from './CanvasAppComponentAssemblyContracts'
 import type { CanvasAppCustomCommand } from '../commands/CanvasAppCustomCommands'
 import type {
   CanvasAppCustomCommandState,
@@ -156,7 +158,7 @@ export type CanvasAppComponentWorkspaceModel = {
 
 export type CanvasAppComponentModelInput = {
   command: CanvasAppComponentCommandModel
-  componentLibrary: CanvasComponentLibrary
+  componentLibrary: CanvasAppComponentLibrary
   createId: (prefix: string) => string
   interaction: CanvasAppComponentInteractionModel
   stageElement: CanvasAppStageElement
@@ -175,7 +177,7 @@ export type CanvasAppControlModelInput = {
   canRedo: boolean
   canUndo: boolean
   commandHandlers: CanvasAppControlCommandHandlers
-  components: readonly CanvasComponentTemplate[]
+  components: readonly CanvasAppComponentTemplate[]
   config: CanvasAffordanceConfig
   customCommands: readonly CanvasAppCustomCommandState[]
   customTools: readonly CanvasAppCustomCreationToolState[]

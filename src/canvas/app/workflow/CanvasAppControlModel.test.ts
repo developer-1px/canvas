@@ -3,10 +3,10 @@ import {
   createCanvasAffordanceConfig,
   type CanvasSceneAdapter,
 } from '../../engine'
-import type { CanvasComponentTemplate } from '../../host'
 import type {
   CanvasAppCustomCreationToolState,
 } from '../extensions/CanvasAppExtensionStateContracts'
+import type { CanvasAppComponentTemplate } from './CanvasAppComponentAssemblyContracts'
 import { getCanvasAppControlModel } from './CanvasAppControlModel'
 
 describe('CanvasAppControlModel', () => {
@@ -179,7 +179,7 @@ function createCommandHandlers(
   }
 }
 
-function createComponentTemplate(): CanvasComponentTemplate {
+function createComponentTemplate(): CanvasAppComponentTemplate {
   return {
     accent: '#111111',
     fill: '#ffffff',

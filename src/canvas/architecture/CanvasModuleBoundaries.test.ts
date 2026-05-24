@@ -566,6 +566,12 @@ describe('Canvas module boundaries', () => {
     expect(inputContractFile.source).toContain(
       'affordanceConfig?: CanvasAffordanceConfigInput',
     )
+    expect(inputContractFile.source).toContain(
+      'componentLibrary?: CanvasAppComponentLibrary',
+    )
+    expect(inputContractFile.source).not.toContain(
+      'componentLibrary?: CanvasComponentLibrary',
+    )
     expect(typeContractFile.source).not.toMatch(
       /\b(customCreationTools|customItemRenderers|customItemValidators)\?:/,
     )
@@ -1095,7 +1101,11 @@ describe('Canvas module boundaries', () => {
       'defineCanvasAppCustomItemModule',
       'createCanvasAppComponentPresentationRenderers',
       'createCanvasAppCustomItemRenderers',
+      'CanvasAppCommitItemsChange',
+      'CanvasAppComponentLibrary',
+      'CanvasAppComponentTemplate',
       'CanvasAppCustomCommand',
+      'CanvasAppItemsChange',
       'CanvasAppCustomItemModuleCreationTool',
       'CanvasAppInspectorPanel',
       'CanvasWorkspaceStorageProvider',
@@ -3917,6 +3927,10 @@ describe('Canvas module boundaries', () => {
       "from './CanvasAppInspectorPanelExecution'",
     )
     expect(descriptorFile.source).not.toContain('CanvasWorkflowContract')
+    expect(descriptorFile.source).not.toContain("from '../../host'")
+    expect(descriptorFile.source).toContain(
+      "from '../document/CanvasAppDocumentContracts'",
+    )
     expect(descriptorFile.source).toContain(
       'export type CanvasAppInspectorPanelCommitItemsChange',
     )
@@ -3993,6 +4007,10 @@ describe('Canvas module boundaries', () => {
       "from './CanvasAppCustomCommandExecution'",
     )
     expect(descriptorFile.source).not.toContain('CanvasWorkflowContract')
+    expect(descriptorFile.source).not.toContain("from '../../host'")
+    expect(descriptorFile.source).toContain(
+      "from '../document/CanvasAppDocumentContracts'",
+    )
     expect(descriptorFile.source).toContain(
       'export type CanvasAppCustomCommandCommitItemsChange',
     )
@@ -5626,6 +5644,15 @@ describe('Canvas module boundaries', () => {
     expect(componentContractsFile.source).toContain(
       'export type CanvasAppComponentAssemblyContract',
     )
+    expect(componentContractsFile.source).toContain(
+      'export type CanvasAppComponentLibrary',
+    )
+    expect(componentContractsFile.source).toContain(
+      'export type CanvasAppComponentTemplate',
+    )
+    expect(componentContractsFile.source).not.toContain(
+      'type CanvasComponentLibrary,',
+    )
     expect(componentContractsFile.source).not.toContain('Pick<')
     expect(componentContractsFile.source).not.toContain('CanvasAppAssembly')
     expect(componentContractsFile.source).toContain(
@@ -5648,6 +5675,7 @@ describe('Canvas module boundaries', () => {
     expect(adapterContractsFile.source).toContain(
       'export type CanvasAppItemAdapters',
     )
+    expect(adapterContractsFile.source).toContain("from '../../entities'")
     expect(adapterContractsFile.source).not.toContain('Pick<')
     expect(adapterContractsFile.source).not.toContain(
       "from './CanvasAppAssembly'",
@@ -5690,6 +5718,7 @@ describe('Canvas module boundaries', () => {
     expect(workspaceContractsFile.source).toContain(
       'export type CanvasAppWorkspaceAssemblyContract',
     )
+    expect(workspaceContractsFile.source).toContain("from '../../entities'")
     expect(workspaceContractsFile.source).not.toContain('Pick<')
     expect(workspaceContractsFile.source).not.toContain('CanvasAppAssembly')
     expect(workspaceContractsFile.source).toContain('normalizeCanvasItems')
@@ -6193,6 +6222,9 @@ describe('Canvas module boundaries', () => {
     expect(documentRuntimeFile.source).not.toContain('export type {')
     expect(documentRuntimeContractsFile.source).toContain(
       'export type CanvasDocumentCommittedState',
+    )
+    expect(documentRuntimeContractsFile.source).toContain(
+      "from '../../entities'",
     )
     expect(documentRuntimeContractsFile.source).toContain(
       'export type CanvasDocumentHistoryState',

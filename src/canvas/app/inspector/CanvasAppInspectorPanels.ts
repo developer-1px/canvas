@@ -4,14 +4,11 @@ import type {
   CanvasItem,
 } from '../../entities'
 import type {
-  CanvasDocumentSelectionHistory,
-  CanvasItemsChange,
-} from '../../host'
+  CanvasAppCommitItemsChange,
+} from '../document/CanvasAppDocumentContracts'
 
-export type CanvasAppInspectorPanelCommitItemsChange = (
-  change: CanvasItemsChange,
-  selection?: CanvasDocumentSelectionHistory,
-) => boolean
+export type CanvasAppInspectorPanelCommitItemsChange =
+  CanvasAppCommitItemsChange
 
 export type CanvasAppInspectorPanelContext = {
   bounds: Bounds | null
