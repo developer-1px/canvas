@@ -49,6 +49,12 @@ describe('CanvasWorkspaceConsumerModel', () => {
       selection: input.document.selection,
       viewport: input.viewport,
     })
+    expect(model.linkPreview).toMatchObject({
+      commitItemsChange: input.document.commitItemsChange,
+      createId: input.createId,
+      selection: input.document.selection,
+      viewport: input.viewport,
+    })
     expect(model.stamp).toMatchObject({
       commitItemsChange: input.document.commitItemsChange,
       createId: input.createId,

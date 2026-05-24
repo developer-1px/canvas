@@ -525,6 +525,7 @@ describe('Canvas module boundaries', () => {
       'CanvasAppAffordanceInteractionModel',
       'CanvasAppAffordanceInspectorModel',
       'CanvasAppAffordanceKeyboardModel',
+      'CanvasAppAffordanceLinkPreviewModel',
       'CanvasAppAffordancePointerModel',
       'CanvasAppAffordanceStampModel',
       'CanvasAppAffordanceTableModel',
@@ -542,6 +543,7 @@ describe('Canvas module boundaries', () => {
       'interaction: {',
       'inspector: {',
       'keyboard: {',
+      'linkPreview: {',
       'pointer: {',
       'stamp: {',
       'table: {',
@@ -1010,6 +1012,7 @@ describe('Canvas module boundaries', () => {
       'command: {',
       'component: {',
       'image: {',
+      'linkPreview: {',
       'pointer: {',
       'stage: {',
       'stamp: {',
@@ -4685,6 +4688,46 @@ describe('Canvas module boundaries', () => {
     expect(hostTableFile.source).not.toMatch(browserTableHow)
   })
 
+  it('keeps browser link preview import IO behind App link modules', () => {
+    const appModelFile = getSourceFile(
+      'src/canvas/app/workflow/useCanvasAppModel.ts',
+    )
+    const linkPreviewModelFile = getSourceFile(
+      'src/canvas/app/workflow/useCanvasAppLinkPreviewImportModel.ts',
+    )
+    const linkPreviewImportHookFile = getSourceFile(
+      'src/canvas/app/link/useCanvasLinkPreviewImport.ts',
+    )
+    const linkPreviewImportFile = getSourceFile(
+      'src/canvas/app/link/CanvasLinkPreviewImport.ts',
+    )
+    const hostLinkPreviewFile = getSourceFile(
+      'src/canvas/host/component/CanvasLinkPreviewComponent.ts',
+    )
+    const browserLinkPreviewHow =
+      /\b(DataTransfer|ClipboardEvent|DragEvent|window\.addEventListener)\b/
+
+    expect(appModelFile.source).toContain(
+      "from './useCanvasAppLinkPreviewImportModel'",
+    )
+    expect(appModelFile.source).not.toMatch(browserLinkPreviewHow)
+    expect(linkPreviewModelFile.source).toContain(
+      "from '../link/useCanvasLinkPreviewImport'",
+    )
+    expect(linkPreviewImportHookFile.source).toContain(
+      'window.addEventListener',
+    )
+    expect(linkPreviewImportHookFile.source).toContain('ClipboardEvent')
+    expect(linkPreviewImportHookFile.source).toContain('DragEvent')
+    expect(linkPreviewImportFile.source).toContain(
+      'createCanvasLinkPreviewComponentItem',
+    )
+    expect(hostLinkPreviewFile.source).toContain(
+      'export function createCanvasLinkPreviewComponentItem',
+    )
+    expect(hostLinkPreviewFile.source).not.toMatch(browserLinkPreviewHow)
+  })
+
   it('keeps App custom command contracts behind a named module', () => {
     const descriptorFile = getSourceFile(
       'src/canvas/app/commands/CanvasAppCustomCommands.ts',
@@ -6221,6 +6264,7 @@ describe('Canvas module boundaries', () => {
       'interaction: {',
       'itemLayer: {',
       'keyboard: {',
+      'linkPreview: {',
       'pointer: {',
       'stage: {',
       'text: {',
@@ -6239,6 +6283,7 @@ describe('Canvas module boundaries', () => {
       'interaction: {',
       'itemLayer: {',
       'keyboard: {',
+      'linkPreview: {',
       'pointer: {',
       'stage: {',
       'text: {',

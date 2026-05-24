@@ -185,3 +185,6 @@
 181. CSV/TSV tabular text는 FigJam식 built-in table import affordance로 처리한다.
 182. `.csv` 파일 drop은 drop 위치에 matrix table component를 생성하고, spreadsheet clipboard paste는 viewport 중심에 table을 생성한다.
 183. Table component 렌더러는 고정 3x3이 아니라 저장된 `columns`와 `items` 계약에서 동적 행/열 grid를 계산한다.
+184. HTTP/HTTPS URL 또는 embed snippet paste는 FigJam식 built-in link preview import affordance로 처리한다.
+185. URL drop은 drop 위치에 link preview component를 생성하고, URL paste는 viewport 중심에 link preview component를 생성한다.
+186. Link preview component는 `url`을 title/body와 분리해 저장하고, renderer는 component library template 없이 built-in `link-preview-card` presentation으로 표시한다.

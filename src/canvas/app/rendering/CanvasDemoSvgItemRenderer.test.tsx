@@ -163,6 +163,29 @@ describe('CanvasDemoSvgItemRenderer', () => {
     expect(markup).toContain('y2="88"')
   })
 
+  it('renders link preview components through their built-in presentation', () => {
+    const markup = renderItem({
+      accent: '#2563eb',
+      body: 'https://www.figma.com/figjam/',
+      component: 'link-preview',
+      fill: '#ffffff',
+      h: 148,
+      id: 'component-link-preview',
+      stroke: '#cbd5e1',
+      title: 'figma.com',
+      type: 'component',
+      url: 'https://www.figma.com/figjam/',
+      w: 320,
+      x: 0,
+      y: 0,
+    }, () => 'missing-presentation')
+
+    expect(markup).toContain('component-link-preview')
+    expect(markup).toContain('component-link-preview-domain')
+    expect(markup).toContain('figma.com')
+    expect(markup).toContain('https://www.figma.com/figjam/')
+  })
+
   it('renders image items with a separate selection hit target', () => {
     const markup = renderItem({
       h: 80,

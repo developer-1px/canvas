@@ -62,6 +62,33 @@ describe('CanvasDemoSvgComponentRendererExecution', () => {
     expect(markup).toContain('class="component-card"')
     expect(markup).toContain('Risk')
   })
+
+  it('uses the built-in link preview presentation without the component resolver', () => {
+    const markup = renderToStaticMarkup(
+      <svg>
+        {renderCanvasDemoSvgComponentPresentation({
+          getComponentPresentation: () => {
+            throw new Error('link preview should not resolve through library')
+          },
+          item: {
+            ...componentItem,
+            body: 'https://www.figma.com/figjam/',
+            component: 'link-preview',
+            h: 148,
+            id: 'component-link-preview',
+            title: 'figma.com',
+            url: 'https://www.figma.com/figjam/',
+            w: 320,
+          },
+          renderers: DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS,
+        })}
+      </svg>,
+    )
+
+    expect(markup).toContain('component-link-preview')
+    expect(markup).toContain('figma.com')
+    expect(markup).toContain('https://www.figma.com/figjam/')
+  })
 })
 
 function renderComponent({
