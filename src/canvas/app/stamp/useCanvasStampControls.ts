@@ -6,6 +6,7 @@ import type { CanvasAffordanceConfig } from '../../engine'
 import type { Viewport } from '../../entities'
 import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
 import type { CanvasAppItemReadModel } from '../workflow/CanvasAppItemReadModelContracts'
+import type { CanvasAppStampVotingSessionContext } from '../workflow/CanvasAppConsumerContracts'
 import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract'
 import {
   CANVAS_STAMP_DEFINITIONS,
@@ -34,6 +35,7 @@ export type CanvasStampControlsInput = {
   selection: string[]
   stageElement: CanvasAppStageElement
   viewport: Viewport
+  votingSession?: CanvasAppStampVotingSessionContext
 }
 
 export function useCanvasStampControls({
@@ -44,8 +46,10 @@ export function useCanvasStampControls({
   selection,
   stageElement,
   viewport,
+  votingSession,
 }: CanvasStampControlsInput): CanvasStampControlsModel {
-  const canInsertStamp = config.overlays.stampControls
+  const canInsertStamp = config.overlays.stampControls &&
+    (votingSession?.active !== true || votingSession.canCastVote)
   const anchor = useMemo(
     () =>
       canInsertStamp
@@ -62,7 +66,8 @@ export function useCanvasStampControls({
       canInsertStamp,
     ],
   )
-  const visible = canInsertStamp && anchor !== null
+  const visible = config.overlays.stampControls &&
+    (anchor !== null || votingSession?.active === true)
 
   const onInsertStamp = useCallback(
     (stamp: CanvasStampDefinition) => {
@@ -70,7 +75,7 @@ export function useCanvasStampControls({
         return false
       }
 
-      return insertCanvasStamp({
+      const inserted = insertCanvasStamp({
         placement: getCanvasStampInsertPlacement({
           itemReadModel,
           selection,
@@ -84,6 +89,12 @@ export function useCanvasStampControls({
         },
         stamp,
       })
+
+      if (inserted && votingSession?.active === true) {
+        return votingSession.onVoteCast()
+      }
+
+      return inserted
     },
     [
       canInsertStamp,
@@ -93,6 +104,7 @@ export function useCanvasStampControls({
       selection,
       stageElement,
       viewport,
+      votingSession,
     ],
   )
 

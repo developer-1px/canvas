@@ -22,6 +22,7 @@ describe('CanvasAppView', () => {
           status: false,
           textEditor: false,
           toolbar: false,
+          votingSession: false,
           zoomControls: false,
         })}
       />,
@@ -38,6 +39,7 @@ describe('CanvasAppView', () => {
     expect(markup).not.toContain('canvas-status')
     expect(markup).not.toContain('text-editor')
     expect(markup).not.toContain('toolbar')
+    expect(markup).not.toContain('voting-session')
     expect(markup).not.toContain('zoom-controls')
     expect(markup).toContain('canvas-stage')
   })
@@ -57,6 +59,7 @@ describe('CanvasAppView', () => {
     expect(markup).toContain('canvas-status')
     expect(markup).toContain('text-editor')
     expect(markup).toContain('toolbar')
+    expect(markup).toContain('voting-session')
     expect(markup).toContain('zoom-controls')
   })
 })
@@ -74,6 +77,7 @@ function createViewProps(
     status?: boolean
     textEditor?: boolean
     toolbar?: boolean
+    votingSession?: boolean
     zoomControls?: boolean
   } = {},
 ): Parameters<typeof CanvasAppView>[0] {
@@ -231,6 +235,19 @@ function createViewProps(
       visible: visible.toolbar ?? true,
       onCustomCommand: noop,
       onToolChange: noop,
+    },
+    votingSession: {
+      canCastVote: true,
+      prompt: 'Pick favorites',
+      status: 'idle',
+      visible: visible.votingSession ?? true,
+      votesCast: 0,
+      votesPerParticipant: 3,
+      onEnd: noop,
+      onPromptChange: noop,
+      onReset: noop,
+      onStart: noop,
+      onVotesPerParticipantChange: noop,
     },
     zoomControls: {
       config,

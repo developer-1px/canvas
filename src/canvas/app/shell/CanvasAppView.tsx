@@ -6,6 +6,7 @@ import { CanvasComponentPalette } from '../../ui/palette/CanvasComponentPalette'
 import { CanvasCursorChat } from '../../ui/cursor/CanvasCursorChat'
 import { CanvasDrawingControls } from '../../ui/drawing/CanvasDrawingControls'
 import { CanvasSessionTimer } from '../../ui/facilitation/CanvasSessionTimer'
+import { CanvasVotingSession } from '../../ui/facilitation/CanvasVotingSession'
 import { CanvasObjectInspector } from '../../ui/inspector/CanvasObjectInspector'
 import { CanvasFindReplacePanel } from '../../ui/search/CanvasFindReplacePanel'
 import { CanvasImageControls } from '../../ui/image/CanvasImageControls'
@@ -19,6 +20,7 @@ import { ZoomControls } from '../../ui/zoom/ZoomControls'
 type ToolbarProps = ComponentProps<typeof CanvasToolbar>
 type CursorChatProps = ComponentProps<typeof CanvasCursorChat>
 type SessionTimerProps = ComponentProps<typeof CanvasSessionTimer>
+type VotingSessionProps = ComponentProps<typeof CanvasVotingSession>
 type TextEditorProps = ComponentProps<typeof CanvasTextEditor>
 type DrawingControlsProps = ComponentProps<typeof CanvasDrawingControls>
 type FindReplaceProps = ComponentProps<typeof CanvasFindReplacePanel>
@@ -48,6 +50,7 @@ type CanvasAppViewProps = {
   status: VisibleProps<StatusProps>
   textEditor: VisibleProps<TextEditorProps>
   toolbar: VisibleProps<ToolbarProps>
+  votingSession: VotingSessionProps
   zoomControls: VisibleProps<ZoomControlsProps>
 }
 
@@ -65,6 +68,7 @@ export function CanvasAppView({
   status,
   textEditor,
   toolbar,
+  votingSession,
   zoomControls,
 }: CanvasAppViewProps) {
   const {
@@ -88,6 +92,8 @@ export function CanvasAppView({
       {showToolbar ? <CanvasToolbar {...toolbarProps} /> : null}
 
       <CanvasSessionTimer {...sessionTimer} />
+
+      <CanvasVotingSession {...votingSession} />
 
       {showComponentPalette ? (
         <CanvasComponentPalette {...componentPaletteProps} />

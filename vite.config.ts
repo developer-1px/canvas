@@ -29,7 +29,7 @@ export default defineConfig({
   resolve: {
     alias: [
       {
-        find: /^zod-crud$/,
+        find: 'zod-crud',
         replacement: zodCrudEntry,
       },
     ],

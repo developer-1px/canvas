@@ -9,6 +9,7 @@ import { useCanvasCursorChatModel } from '../cursor/useCanvasCursorChatModel'
 import { useCanvasAppDrawingModel } from './useCanvasAppDrawingModel'
 import { useCanvasAppExtensionModel } from './useCanvasAppExtensionModel'
 import { useCanvasSessionTimerModel } from '../facilitation/useCanvasSessionTimerModel'
+import { useCanvasVotingSessionModel } from '../facilitation/useCanvasVotingSessionModel'
 import { useCanvasAppInspectorModel } from './useCanvasAppInspectorModel'
 import { useCanvasAppImageModel } from './useCanvasAppImageModel'
 import { useCanvasAppKeyboardModel } from './useCanvasAppKeyboardModel'
@@ -48,6 +49,7 @@ export function useCanvasAppModel({
     ...stageElement.pointer,
   })
   const sessionTimer = useCanvasSessionTimerModel(affordance.facilitation)
+  const votingSession = useCanvasVotingSessionModel(affordance.facilitation)
   const interaction = useCanvasInteractionModel({
     ...affordance.interaction,
     presence,
@@ -68,6 +70,7 @@ export function useCanvasAppModel({
 
   const stampControls = useCanvasAppStampModel({
     ...affordance.stamp,
+    votingSession: votingSession.stamp,
     ...workspace.stamp,
     ...stageElement.stamp,
   })
@@ -190,6 +193,7 @@ export function useCanvasAppModel({
     stickyQuickCreate: components.control.stickyQuickCreate,
     status: controls.status,
     toolbar: controls.toolbar,
+    votingSession: votingSession.view,
     zoomControls: controls.zoomControls,
   }
 }

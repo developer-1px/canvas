@@ -281,6 +281,15 @@ export type CanvasAppStampModelInput = {
   selection: string[]
   stageElement: CanvasAppStageElement
   viewport: Viewport
+  votingSession?: CanvasAppStampVotingSessionContext
+}
+
+export type CanvasAppStampVotingSessionContext = {
+  active: boolean
+  canCastVote: boolean
+  votesCast: number
+  votesPerParticipant: number
+  onVoteCast: () => boolean
 }
 
 export type CanvasAppKeyboardCommandContext = {

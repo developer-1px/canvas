@@ -454,6 +454,7 @@
 .image-controls,
 .session-timer,
 .stamp-controls,
+.voting-session,
 .zoom-controls,
 .object-inspector,
 .canvas-status {
@@ -507,7 +508,7 @@
 }
 
 .component-palette {
-  top: 62px;
+  top: 116px;
   right: 14px;
   display: grid;
   grid-template-columns: repeat(5, 34px);
@@ -533,6 +534,43 @@
 .session-timer-presets {
   display: flex;
   gap: 2px;
+}
+
+.voting-session {
+  top: 62px;
+  right: 14px;
+  align-items: center;
+  gap: 6px;
+  max-width: calc(100vw - 28px);
+}
+
+.voting-session input {
+  box-sizing: border-box;
+  width: 128px;
+  height: 34px;
+  min-width: 0;
+  padding: 0 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 5px;
+  color: #111827;
+  background: #ffffff;
+  font: 600 12px/1 var(--sans);
+}
+
+.voting-session-stepper {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.voting-session-stepper span,
+.voting-session-count,
+.voting-session-done {
+  min-width: 28px;
+  color: #374151;
+  font: 750 12px/1 var(--sans);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
 }
 
 .drawing-controls {
@@ -755,6 +793,7 @@
 .image-controls button,
 .stamp-button,
 .session-timer button,
+.voting-session button,
 .find-replace-panel button {
   display: inline-grid;
   place-items: center;
@@ -787,6 +826,11 @@
 
 .session-timer button {
   min-width: 34px;
+  padding: 0 8px;
+}
+
+.voting-session button {
+  min-width: 30px;
   padding: 0 8px;
 }
 
@@ -857,6 +901,7 @@
 .image-controls button:hover,
 .stamp-button:hover,
 .session-timer button:hover,
+.voting-session button:hover,
 .sticky-quick-create:hover,
 .find-replace-panel button:hover,
 .tool-button[data-active='true'] {
@@ -868,6 +913,7 @@
 .image-controls button:disabled,
 .stamp-button:disabled,
 .session-timer button:disabled,
+.voting-session button:disabled,
 .find-replace-panel button:disabled {
   color: #9ca3af;
   cursor: not-allowed;
@@ -877,6 +923,7 @@
 .image-controls button:disabled:hover,
 .stamp-button:disabled:hover,
 .session-timer button:disabled:hover,
+.voting-session button:disabled:hover,
 .find-replace-panel button:disabled:hover {
   background: transparent;
   color: #9ca3af;
@@ -897,6 +944,8 @@
 .image-controls button:focus-visible,
 .stamp-button:focus-visible,
 .session-timer button:focus-visible,
+.voting-session input:focus-visible,
+.voting-session button:focus-visible,
 .sticky-quick-create:focus-visible,
 .find-replace-panel input:focus-visible,
 .find-replace-panel button:focus-visible,
@@ -934,7 +983,7 @@
   }
 
   .component-palette {
-    top: 138px;
+    top: 190px;
     left: 10px;
     right: auto;
     grid-template-columns: repeat(10, 30px);
@@ -948,8 +997,21 @@
     flex-wrap: wrap;
   }
 
+  .voting-session {
+    top: 138px;
+    right: 10px;
+    left: 10px;
+    max-width: calc(100vw - 20px);
+    flex-wrap: wrap;
+  }
+
+  .voting-session input {
+    flex: 1 1 120px;
+    width: auto;
+  }
+
   .drawing-controls {
-    top: 190px;
+    top: 242px;
     right: 10px;
     left: 170px;
     flex-wrap: wrap;
@@ -964,12 +1026,12 @@
   }
 
   .image-controls {
-    top: 190px;
+    top: 242px;
     left: 10px;
   }
 
   .stamp-controls {
-    top: 242px;
+    top: 294px;
     right: auto;
     left: 10px;
   }

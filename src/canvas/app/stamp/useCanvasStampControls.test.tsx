@@ -29,26 +29,75 @@ describe('useCanvasStampControls', () => {
     expect(model.visible).toBe(true)
     expect(model.anchor).toEqual({ x: 70, y: 176 })
   })
+
+  it('shows stamp controls during active voting even without selection', () => {
+    const model = renderStampControlsModel({
+      itemReadModel: createReadModel(null),
+      selection: [],
+      votingSession: createVotingSessionContext(),
+    })
+
+    expect(model.visible).toBe(true)
+    expect(model.anchor).toBeNull()
+    expect(model.canInsertStamp).toBe(true)
+  })
+
+  it('blocks stamps when the active voting quota is spent', () => {
+    const model = renderStampControlsModel({
+      itemReadModel: createReadModel(null),
+      selection: [],
+      votingSession: createVotingSessionContext({ canCastVote: false }),
+    })
+
+    expect(model.visible).toBe(true)
+    expect(model.canInsertStamp).toBe(false)
+  })
+
+  it('counts a vote only after stamp insertion succeeds', () => {
+    const commitItemsChange = vi.fn(() => true)
+    const onVoteCast = vi.fn(() => true)
+    const model = renderStampControlsModel({
+      commitItemsChange,
+      itemReadModel: createReadModel(null),
+      selection: [],
+      votingSession: createVotingSessionContext({ onVoteCast }),
+    })
+
+    expect(model.onInsertStamp({
+      label: '+1',
+      stamp: 'thumbs-up',
+      title: 'Thumbs up',
+    })).toBe(true)
+    expect(commitItemsChange).toHaveBeenCalledTimes(1)
+    expect(onVoteCast).toHaveBeenCalledTimes(1)
+  })
 })
 
 function renderStampControlsModel({
+  commitItemsChange = vi.fn(() => true),
   itemReadModel,
   selection,
+  votingSession,
 }: {
+  commitItemsChange?: Parameters<
+    typeof useCanvasStampControls
+  >[0]['commitItemsChange']
   itemReadModel: CanvasAppItemReadModel
   selection: string[]
+  votingSession?: Parameters<typeof useCanvasStampControls>[0]['votingSession']
 }) {
   let model: CanvasStampControlsModel | null = null
 
   function Harness() {
     model = useCanvasStampControls({
-      commitItemsChange: vi.fn(),
+      commitItemsChange,
       config: createCanvasAffordanceConfig(),
       createId: vi.fn(() => 'stamp-1'),
       itemReadModel,
       selection,
       stageElement: createStageElement(),
       viewport: { scale: 1, x: 0, y: 0 },
+      votingSession,
     })
 
     return null
@@ -63,6 +112,21 @@ function renderStampControlsModel({
   }
 
   return renderedModel
+}
+
+function createVotingSessionContext(
+  overrides: Partial<NonNullable<
+    Parameters<typeof useCanvasStampControls>[0]['votingSession']
+  >> = {},
+): NonNullable<Parameters<typeof useCanvasStampControls>[0]['votingSession']> {
+  return {
+    active: true,
+    canCastVote: true,
+    votesCast: 0,
+    votesPerParticipant: 3,
+    onVoteCast: vi.fn(() => true),
+    ...overrides,
+  }
 }
 
 function createReadModel(

@@ -100,6 +100,7 @@ export const CANVAS_AFFORDANCE_CONFIG_DEFAULTS = Object.freeze({
     status: true,
     textEditor: true,
     toolbar: true,
+    votingSession: true,
     zoomControls: true,
   }),
   shortcuts: Object.freeze({

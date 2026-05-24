@@ -173,3 +173,6 @@
 169. Session timer는 문서 item을 만들지 않는 built-in facilitation affordance로 제공된다.
 170. Session timer는 5/10/15분 preset, start, pause, resume, +1m, reset을 지원한다.
 171. Running session timer는 시간을 줄이지 않고 남은 시간을 추가하는 방식으로만 조정한다.
+172. Voting session은 문서 item을 만들지 않는 built-in facilitation affordance로 제공된다.
+173. Voting session은 prompt와 1인당 vote limit을 설정하고 start/end/clear 상태를 관리한다.
+174. Active voting session에서는 stamp insertion이 local vote quota를 소모하고 quota가 끝나면 stamp controls를 비활성화한다.
