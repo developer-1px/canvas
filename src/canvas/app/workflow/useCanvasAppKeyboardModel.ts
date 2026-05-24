@@ -3,6 +3,7 @@ import type { CanvasAppKeyboardModelInput } from './CanvasAppConsumerContracts'
 
 export function useCanvasAppKeyboardModel({
   command,
+  component,
   config,
   customCreationTools,
   interaction,
@@ -25,6 +26,7 @@ export function useCanvasAppKeyboardModel({
     moveSelection: command.moveSelection,
     openFindReplace,
     pasteSelection: command.pasteSelection,
+    quickCreateSticky: component.quickCreateSticky,
     redoHistory: command.redoHistory,
     reorderSelection: command.reorderSelection,
     resetViewport: viewport.resetViewport,

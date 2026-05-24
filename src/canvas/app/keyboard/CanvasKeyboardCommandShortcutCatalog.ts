@@ -4,6 +4,7 @@ import type {
 } from '../../engine'
 import type { CanvasKeyboardShortcutChord } from './CanvasKeyboardShortcutChords'
 import type {
+  CanvasKeyboardCommandShortcutPhase,
   CanvasKeyboardCommandShortcutIntent,
   CanvasKeyboardCommandShortcutIntentInput,
 } from './CanvasKeyboardCommandShortcutIntent'
@@ -17,6 +18,7 @@ export type CanvasKeyboardCommandShortcutDescriptor = {
   ) => CanvasKeyboardCommandShortcutIntent
   label: string
   modifier?: 'mod'
+  phase?: CanvasKeyboardCommandShortcutPhase
   reserve?: boolean | { shiftInsensitive?: boolean }
   shiftInsensitive?: boolean
   shortcut: CanvasKeyboardShortcutChord
@@ -25,6 +27,17 @@ export type CanvasKeyboardCommandShortcutDescriptor = {
 
 export const CANVAS_KEYBOARD_COMMAND_SHORTCUTS:
   readonly CanvasKeyboardCommandShortcutDescriptor[] = [
+  {
+    getIntent: ({ selection }) =>
+      selection.length > 0
+        ? { kind: 'quick-create-sticky', preventDefault: true }
+        : { kind: 'none', preventDefault: false },
+    label: 'quick create sticky',
+    modifier: 'mod',
+    phase: 'before-typing-target',
+    shortcut: { key: 'Enter' },
+    shortcutId: 'quickCreateSticky',
+  },
   {
     commandId: 'delete',
     getIntent: () => ({ kind: 'delete-selection', preventDefault: true }),

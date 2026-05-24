@@ -91,6 +91,23 @@ describe('CanvasKeyboardShortcutIntent', () => {
     })
   })
 
+  it('keeps sticky quick create available from text editing targets', () => {
+    withTextAreaTarget((target) => {
+      const intent = getCanvasKeyboardShortcutIntent(createInput({
+        event: createKeyboardEvent({
+          key: 'Enter',
+          metaKey: true,
+          target,
+        }),
+      }))
+
+      expect(intent).toEqual({
+        kind: 'quick-create-sticky',
+        preventDefault: true,
+      })
+    })
+  })
+
   it('honors find/replace shortcut and overlay toggles', () => {
     expect(getCanvasKeyboardShortcutIntent(createInput({
       config: createCanvasAffordanceConfig({
@@ -147,4 +164,19 @@ function createKeyboardEvent(
     target: null,
     ...overrides,
   } as KeyboardEvent
+}
+
+function withTextAreaTarget(run: (target: EventTarget) => void) {
+  const previous = globalThis.HTMLTextAreaElement
+
+  class TestTextArea extends EventTarget {}
+
+  globalThis.HTMLTextAreaElement =
+    TestTextArea as unknown as typeof HTMLTextAreaElement
+
+  try {
+    run(new TestTextArea())
+  } finally {
+    globalThis.HTMLTextAreaElement = previous
+  }
 }

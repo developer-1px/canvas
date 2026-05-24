@@ -14,6 +14,8 @@ import type {
   CanvasAppComponentTemplate,
 } from '../workflow/CanvasAppComponentAssemblyContracts'
 import {
+  CANVAS_STICKY_COMPONENT_KIND,
+  applyCanvasStickyComponentCreationDefaults,
   getCanvasEditableTextValue,
 } from '../../host'
 import {
@@ -22,19 +24,19 @@ import {
 } from './CanvasPointerCreationGrammar'
 
 type CanvasPointerComponentCreationDescriptor = Readonly<{
+  applyDefaults?: (item: CanvasComponentItem) => CanvasComponentItem
   enterTextEdit?: boolean
-  initialBody?: string
   isEnabled: (config: CanvasAffordanceConfig) => boolean
   templateId: CanvasComponentKind
 }>
 
 export const CANVAS_POINTER_COMPONENT_CREATION_DESCRIPTORS = Object.freeze({
   'create-sticky': Object.freeze({
+    applyDefaults: applyCanvasStickyComponentCreationDefaults,
     enterTextEdit: true,
-    initialBody: '',
     isEnabled: (config: CanvasAffordanceConfig) =>
       config.gestures.createSticky,
-    templateId: 'sticky',
+    templateId: CANVAS_STICKY_COMPONENT_KIND,
   }),
 } satisfies Readonly<
   Record<
@@ -93,14 +95,12 @@ export function startCanvasPointerComponentCreation({
     return { kind: 'none' }
   }
 
-  const item = applyCanvasPointerComponentCreationDefaults({
-    descriptor,
-    item: componentLibrary.createItem({
-      id: createId('component'),
-      point: centerCanvasComponentTemplateAtPoint(template, startWorld),
-      templateId: descriptor.templateId,
-    }),
+  const createdItem = componentLibrary.createItem({
+    id: createId('component'),
+    point: centerCanvasComponentTemplateAtPoint(template, startWorld),
+    templateId: descriptor.templateId,
   })
+  const item = descriptor.applyDefaults?.(createdItem) ?? createdItem
 
   return {
     capturePointer: false,
@@ -140,16 +140,4 @@ function centerCanvasComponentTemplateAtPoint(
     x: point.x - template.w / 2,
     y: point.y - template.h / 2,
   }
-}
-
-function applyCanvasPointerComponentCreationDefaults({
-  descriptor,
-  item,
-}: {
-  descriptor: CanvasPointerComponentCreationDescriptor
-  item: CanvasComponentItem
-}): CanvasComponentItem {
-  return descriptor.initialBody === undefined
-    ? item
-    : { ...item, body: descriptor.initialBody }
 }

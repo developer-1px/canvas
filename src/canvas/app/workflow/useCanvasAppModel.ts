@@ -87,11 +87,24 @@ export function useCanvasAppModel({
     ...stageElement.viewport,
   })
 
+  const components = useCanvasAppComponentModel({
+    command: workspace.component.command,
+    ...appAssembly.component,
+    createId: workspace.component.createId,
+    interaction: {
+      ...interaction.component,
+      ...text.component.interaction,
+    },
+    ...stageElement.component,
+    workspace: workspace.component.workspace,
+  })
+
   useCanvasAppKeyboardModel({
     command: {
       ...workspace.keyboard.command,
       ...commands.keyboard,
     },
+    component: components.keyboard,
     ...affordance.keyboard,
     ...extension.keyboard,
     ...text.keyboard,
@@ -118,18 +131,6 @@ export function useCanvasAppModel({
       ...workspace.pointer.workspace,
       ...text.pointer.workspace,
     },
-  })
-
-  const components = useCanvasAppComponentModel({
-    command: workspace.component.command,
-    ...appAssembly.component,
-    createId: workspace.component.createId,
-    interaction: {
-      ...interaction.component,
-      ...text.component.interaction,
-    },
-    ...stageElement.component,
-    workspace: workspace.component.workspace,
   })
 
   const controls = getCanvasAppControlModel({

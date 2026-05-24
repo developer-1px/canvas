@@ -113,6 +113,7 @@ export const CANVAS_AFFORDANCE_CONFIG_DEFAULTS = Object.freeze({
     nudge: true,
     panTool: true,
     paste: true,
+    quickCreateSticky: true,
     rectTool: true,
     redo: true,
     selectAll: true,

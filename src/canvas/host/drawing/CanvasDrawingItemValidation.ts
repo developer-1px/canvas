@@ -1,4 +1,7 @@
-import type { Point } from '../../core'
+import {
+  isCanvasStableId,
+  type Point,
+} from '../../core'
 import type { CanvasDrawingItem } from './CanvasDrawingItemGeometry'
 
 export function isCanvasDrawingItemStorageShape(
@@ -30,6 +33,8 @@ function isCanvasArrowDrawingItemStorageShape(
     isPoint(value.start) &&
     isPoint(value.end) &&
     !isSamePoint(value.start, value.end) &&
+    isOptionalStableItemId(value.startAttachedTo) &&
+    isOptionalStableItemId(value.endAttachedTo) &&
     typeof value.stroke === 'string' &&
     isPositiveFiniteNumber(value.strokeWidth)
   )
@@ -49,6 +54,11 @@ function isPositiveFiniteNumber(value: unknown): value is number {
 
 function isOpacity(value: unknown): value is number {
   return isFiniteNumber(value) && value > 0 && value <= 1
+}
+
+function isOptionalStableItemId(value: unknown) {
+  return value === undefined ||
+    (typeof value === 'string' && isCanvasStableId(value))
 }
 
 function isPoint(value: unknown): value is Point {

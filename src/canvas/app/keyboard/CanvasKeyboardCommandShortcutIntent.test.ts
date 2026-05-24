@@ -54,6 +54,37 @@ describe('CanvasKeyboardCommandShortcutIntent', () => {
     })
   })
 
+  it('maps sticky quick create before typing-target suppression', () => {
+    expect(getCanvasKeyboardCommandShortcutIntent(createInput({
+      event: createKeyboardEvent({ key: 'Enter', metaKey: true }),
+      key: 'enter',
+      mod: true,
+      phase: 'before-typing-target',
+    }))).toEqual({
+      kind: 'quick-create-sticky',
+      preventDefault: true,
+    })
+
+    expect(getCanvasKeyboardCommandShortcutIntent(createInput({
+      event: createKeyboardEvent({ key: 'Enter', metaKey: true }),
+      key: 'enter',
+      mod: true,
+      phase: 'before-typing-target',
+      selection: ['component-sticky', 'component-card'],
+    }))).toEqual({
+      kind: 'quick-create-sticky',
+      preventDefault: true,
+    })
+
+    expect(getCanvasKeyboardCommandShortcutIntent(createInput({
+      event: createKeyboardEvent({ key: 'Enter', metaKey: true }),
+      key: 'enter',
+      mod: true,
+      phase: 'before-typing-target',
+      selection: [],
+    }))).toEqual({ kind: 'none', preventDefault: false })
+  })
+
   it('keeps arrow keys owned by nudge even without selection', () => {
     expect(getCanvasKeyboardCommandShortcutIntent(createInput({
       event: createKeyboardEvent({ key: 'ArrowLeft' }),

@@ -3,8 +3,10 @@ import type { CanvasItem } from '../model'
 import { scaleItemBounds } from '../../core'
 import { isCanvasItemAttachedTo } from '../attachment/CanvasItemAttachment'
 import {
+  isCanvasArrowDrawingItem,
   isCanvasDrawingItem,
   scaleCanvasDrawingItem,
+  translateCanvasArrowAttachedEndpoints,
   translateCanvasDrawingItem,
 } from '../drawing/CanvasDrawingItemGeometry'
 import {
@@ -27,9 +29,12 @@ export function translateCanvasItems(
   const movableSelected = getMovableSelectedCanvasItemIds(items, selected)
 
   return mapCanvasItems(items, (item) =>
-    shouldTranslateCanvasItem(item, movableSelected) && !isCanvasItemLocked(item)
-      ? translateCanvasItem(item, dx, dy)
-      : item,
+    translateCanvasItemForSelection({
+      dx,
+      dy,
+      item,
+      movableSelected,
+    }),
   )
 }
 
@@ -73,6 +78,40 @@ function translateCanvasItem(item: CanvasItem, dx: number, dy: number): CanvasIt
   }
 }
 
+function translateCanvasItemForSelection({
+  dx,
+  dy,
+  item,
+  movableSelected,
+}: {
+  dx: number
+  dy: number
+  item: CanvasItem
+  movableSelected: ReadonlySet<string>
+}) {
+  if (isCanvasItemLocked(item)) {
+    return item
+  }
+
+  if (
+    movableSelected.has(item.id) ||
+    isCanvasItemAttachedTo(item, movableSelected)
+  ) {
+    return translateCanvasItem(item, dx, dy)
+  }
+
+  if (isCanvasArrowDrawingItem(item)) {
+    return translateCanvasArrowAttachedEndpoints({
+      attachedIds: movableSelected,
+      dx,
+      dy,
+      item,
+    })
+  }
+
+  return item
+}
+
 function getMovableSelectedCanvasItemIds(
   items: CanvasItem[],
   selected: ReadonlySet<string>,
@@ -84,14 +123,6 @@ function getMovableSelectedCanvasItemIds(
       )
       .map((entry) => entry.item.id),
   )
-}
-
-function shouldTranslateCanvasItem(
-  item: CanvasItem,
-  movableSelected: ReadonlySet<string>,
-) {
-  return movableSelected.has(item.id) ||
-    isCanvasItemAttachedTo(item, movableSelected)
 }
 
 function scaleCanvasItem(item: CanvasItem, from: Bounds, to: Bounds): CanvasItem {

@@ -41,6 +41,19 @@ export function getCanvasKeyboardShortcutIntent({
     return preTypingSystemIntent
   }
 
+  const preTypingCommandIntent = getCanvasKeyboardCommandShortcutIntent({
+    config,
+    event,
+    key,
+    mod,
+    phase: 'before-typing-target',
+    selection,
+  })
+
+  if (preTypingCommandIntent) {
+    return preTypingCommandIntent
+  }
+
   if (isCanvasKeyboardTypingTarget(event.target)) {
     return { kind: 'none', preventDefault: false }
   }

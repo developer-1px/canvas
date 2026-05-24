@@ -1,4 +1,7 @@
-import { useCanvasComponentInsertion } from '../components/useCanvasComponentInsertion'
+import {
+  useCanvasComponentInsertion,
+  useCanvasStickyQuickCreate,
+} from '../components/useCanvasComponentInsertion'
 import type {
   CanvasAppComponentModel,
   CanvasAppComponentModelInput,
@@ -16,6 +19,18 @@ export function useCanvasAppComponentModel({
     commitItemsChange: command.commitItemsChange,
     componentLibrary,
     createId,
+    itemReadModel: workspace.itemReadModel,
+    selection: workspace.selection,
+    setEditing: interaction.setEditing,
+    setTool: interaction.setTool,
+    stageElement,
+    viewport: workspace.viewport,
+  })
+  const quickCreateSticky = useCanvasStickyQuickCreate({
+    commitItemsChange: command.commitItemsChange,
+    componentLibrary,
+    createId,
+    itemReadModel: workspace.itemReadModel,
     selection: workspace.selection,
     setEditing: interaction.setEditing,
     setTool: interaction.setTool,
@@ -26,6 +41,9 @@ export function useCanvasAppComponentModel({
   return {
     control: {
       onInsertComponent: insertComponent,
+    },
+    keyboard: {
+      quickCreateSticky,
     },
   }
 }

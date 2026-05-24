@@ -1,8 +1,15 @@
 import { describe, expect, it, vi } from 'vitest'
-import type { CanvasComponentItem } from '../../entities'
+import type {
+  CanvasComponentItem,
+  CanvasItem,
+} from '../../entities'
 import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
 import type { CanvasAppComponentLibrary } from '../workflow/CanvasAppComponentAssemblyContracts'
-import { insertCanvasComponent } from './CanvasComponentInsertionExecution'
+import type { CanvasAppItemReadModel } from '../workflow/CanvasAppItemReadModelContracts'
+import {
+  insertCanvasComponent,
+  quickCreateCanvasSticky,
+} from './CanvasComponentInsertionExecution'
 
 describe('CanvasComponentInsertionExecution', () => {
   it('creates the component at the stage viewport center and selects it', () => {
@@ -57,18 +64,102 @@ describe('CanvasComponentInsertionExecution', () => {
       templateId: 'card',
     })
   })
+
+  it('quick-creates a blank sticky next to the selected sticky', () => {
+    const source = createComponentItem({
+      id: 'component-source',
+      w: 188,
+      x: 40,
+      y: 60,
+    })
+    const next = createComponentItem({
+      body: 'Template body',
+      id: 'component-next',
+      x: 252,
+      y: 60,
+    })
+    const componentLibrary = createComponentLibrary(next)
+    const commitItemsChange = vi.fn(() => true)
+    const setEditing = vi.fn()
+    const setTool = vi.fn()
+
+    const result = quickCreateCanvasSticky({
+      commitItemsChange,
+      componentLibrary,
+      createId: vi.fn(() => 'component-next'),
+      itemReadModel: createItemReadModel([
+        source,
+        createComponentItem({
+          component: 'card',
+          id: 'component-card',
+        }),
+      ]),
+      selection: ['component-source', 'component-card'],
+      setEditing,
+      setTool,
+    })
+
+    expect(result).toBe(true)
+    expect(componentLibrary.createItem).toHaveBeenCalledWith({
+      id: 'component-next',
+      point: { x: 252, y: 60 },
+      templateId: 'sticky',
+    })
+    expect(commitItemsChange).toHaveBeenCalledWith(
+      {
+        type: 'add',
+        items: [{
+          ...next,
+          body: '',
+        }],
+      },
+      {
+        before: ['component-source', 'component-card'],
+        after: ['component-next'],
+      },
+    )
+    expect(setEditing).toHaveBeenCalledWith({
+      id: 'component-next',
+      value: '',
+    })
+    expect(setTool).toHaveBeenCalledWith('select')
+  })
+
+  it('ignores quick-create when selection is not one sticky', () => {
+    const componentLibrary = createComponentLibrary()
+    const commitItemsChange = vi.fn()
+
+    expect(quickCreateCanvasSticky({
+      commitItemsChange,
+      componentLibrary,
+      createId: vi.fn(() => 'component-next'),
+      itemReadModel: createItemReadModel([createComponentItem({
+        component: 'card',
+      })]),
+      selection: ['component-card'],
+      setEditing: vi.fn(),
+      setTool: vi.fn(),
+    })).toBe(false)
+
+    expect(componentLibrary.createItem).not.toHaveBeenCalled()
+    expect(commitItemsChange).not.toHaveBeenCalled()
+  })
 })
 
-function createComponentLibrary(): CanvasAppComponentLibrary {
+function createComponentLibrary(
+  item: CanvasComponentItem = createComponentItem(),
+): CanvasAppComponentLibrary {
   return {
-    createItem: vi.fn(createComponentItem),
+    createItem: vi.fn(() => item),
     getPresentation: vi.fn(() => 'note-card'),
     getTemplate: vi.fn(),
     templates: [],
   } as unknown as CanvasAppComponentLibrary
 }
 
-function createComponentItem(): CanvasComponentItem {
+function createComponentItem(
+  overrides: Partial<CanvasComponentItem> = {},
+): CanvasComponentItem {
   return {
     accent: '#111111',
     component: 'sticky',
@@ -81,6 +172,29 @@ function createComponentItem(): CanvasComponentItem {
     w: 120,
     x: 40,
     y: 50,
+    ...overrides,
+  }
+}
+
+function createItemReadModel(items: CanvasItem[]): CanvasAppItemReadModel {
+  return {
+    findEditableTextItem: vi.fn(() => null),
+    findItem: vi.fn((id: string) => items.find((item) => item.id === id)),
+    getAllIds: vi.fn(() => items.map((item) => item.id)),
+    getAllItems: vi.fn(() => items),
+    getItemBounds: vi.fn((item: CanvasItem) => ({
+      h: item.h,
+      w: item.w,
+      x: item.x,
+      y: item.y,
+    })),
+    getSelectedItems: vi.fn((ids: string[]) =>
+      ids
+        .map((id) => items.find((item) => item.id === id))
+        .filter((item): item is CanvasItem => item !== undefined),
+    ),
+    getSelection: vi.fn((ids: string[]) => ids),
+    getSelectionBounds: vi.fn(() => null),
   }
 }
 

@@ -40,6 +40,11 @@ export {
   type CanvasComponentTemplate,
   type CreateCanvasComponentLibraryInput,
 } from './component/CanvasComponentLibrary'
+export {
+  CANVAS_STICKY_COMPONENT_KIND,
+  applyCanvasStickyComponentCreationDefaults,
+  isCanvasStickyComponentItem,
+} from './component/CanvasStickyComponent'
 export { INITIAL_ITEMS } from './component/CanvasInitialItems'
 
 export {
@@ -49,6 +54,7 @@ export {
   isCanvasStrokeDrawingItem,
   scaleCanvasDrawingItem,
   syncCanvasDrawingItemBounds,
+  translateCanvasArrowAttachedEndpoints,
   translateCanvasDrawingItem,
   type CanvasDrawingItem,
   type CanvasStrokeDrawingItem,
@@ -103,6 +109,7 @@ export {
 } from './tree/CanvasGroupItem'
 export {
   getCanvasEditableTextPatchOperation,
+  getCanvasEditableTextPatchField,
   getCanvasEditableTextValue,
   getCommittedCanvasEditableTextValue,
   isCanvasEditableTextItem,

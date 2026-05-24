@@ -37,6 +37,11 @@ describe('CanvasWorkspaceConsumerModel', () => {
     expect(model.keyboard.command.commitSelection).toBe(
       input.document.commitSelection,
     )
+    expect(model.component.workspace).toMatchObject({
+      itemReadModel: input.itemReadModel,
+      selection: input.document.selection,
+      viewport: input.viewport,
+    })
     expect(model.image).toMatchObject({
       commitItemsChange: input.document.commitItemsChange,
       createId: input.createId,

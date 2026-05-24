@@ -45,6 +45,13 @@ function isCanvasKeyboardCommandShortcutMatch(
     return false
   }
 
+  if (
+    (shortcut.phase ?? 'after-typing-target') !==
+    (input.phase ?? 'after-typing-target')
+  ) {
+    return false
+  }
+
   if (shortcut.commandId && !input.config.commands[shortcut.commandId]) {
     return false
   }

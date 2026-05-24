@@ -52,6 +52,18 @@ describe('CanvasDrawingItemValidation', () => {
     })).toBe(false)
   })
 
+  it('accepts stable arrow endpoint attachment ids', () => {
+    expect(isCanvasDrawingItemStorageShape({
+      ...arrowItem,
+      endAttachedTo: 'component-end',
+      startAttachedTo: 'component-start',
+    })).toBe(true)
+    expect(isCanvasDrawingItemStorageShape({
+      ...arrowItem,
+      startAttachedTo: 'Component Start',
+    })).toBe(false)
+  })
+
   it('rejects drawing styles that cannot render predictably', () => {
     expect(isCanvasDrawingItemStorageShape({
       ...markerItem,

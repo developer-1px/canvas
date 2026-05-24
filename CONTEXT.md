@@ -151,6 +151,7 @@
 - Canvas Pointer Shape Creation: built-in rect/arrow shape creation gesture, draft shape preview, enabled gate, item creation commit, post-create tool selection descriptor를 소유하는 App-owned shape lifecycle Module.
 - Canvas Pointer Drawing Creation: built-in marker/highlighter stroke drawing gesture, draft stroke preview, enabled gate, item creation commit descriptor를 소유하는 App-owned drawing lifecycle Module.
 - Canvas Pointer Component Creation: built-in sticky note gesture, enabled gate, component template lookup, centered placement, immediate component item creation과 edit entry descriptor를 소유하는 App-owned component-backed lifecycle Module.
+- Canvas Sticky Component: built-in sticky component kind 판정과 blank body creation default를 소유하는 Host-owned component Module. Pointer creation과 keyboard quick-create가 같은 sticky 계약을 쓴다.
 - Canvas Pointer Custom Creation: 제품별 custom creation tool lookup, start/preview, item creation commit, external failure containment를 소유하는 App-owned custom lifecycle Module.
 - Canvas Pointer Text Creation: built-in text creation gesture, enabled gate, immediate text item creation, edit entry descriptor를 소유하는 App-owned text lifecycle Module.
 - Canvas Pointer Marquee Interaction: select tool의 marquee start, additive selection, preview bounds/selection, commit clear/selection, cancel restore 규칙을 소유하는 App-owned interaction Module.
@@ -256,13 +257,13 @@
 - Tool에서 pointer gesture와 item pointer rerouting으로 변환하는 규칙은 Canvas Tool Gesture Routing Module이 소유하고, Canvas Gesture Engine은 input button/pan precedence와 fallback orchestration만 맡는다.
 - 기본 드로잉 item은 저장 계약에서 최소 visible geometry, 양수 stroke width, 0보다 크고 1 이하인 opacity를 Host Drawing Item Validation Module에서 검증한다.
 - 기본 드로잉 item의 bounds는 caller 입력을 믿지 않고 Host tree/document가 `points` 또는 `start/end`에서 canonical하게 동기화한다.
-- 기본 드로잉 item의 geometry bounds, translate/scale, bounds cache sync 규칙은 Host Drawing Item Geometry Module이 소유하고 tree bounds, clone, transform, SVG drawing type guard가 재사용한다.
+- 기본 드로잉 item의 geometry bounds, translate/scale, arrow endpoint attachment 이동, bounds cache sync 규칙은 Host Drawing Item Geometry Module이 소유하고 tree bounds, clone, transform, SVG drawing type guard가 재사용한다.
 - 기본 드로잉 item의 style 기본값은 Host Drawing Item Style Module이 소유하고 draft overlay와 item creation이 재사용한다.
 - Rect/text/sticky component body의 stable editable text item type은 Entities Contract가 소유하고, editable text 판정, 저장 shape 검증, initial edit value, empty text fallback, field별 add/replace patch 여부는 Host Canvas Editable Text Item Module이 소유한다.
 - Image의 stable item type은 Entities Contract가 소유하고, image data URL/mime/natural size/bounds 저장 shape 검증은 Host Canvas Image Item Module이 소유한다.
 - Comment의 stable item type은 Entities Contract가 소유하고, body/attached target/resolved/bounds 저장 shape 검증은 Host Canvas Comment Item Module이 소유한다.
 - Stamp/reaction의 stable item type은 Entities Contract가 소유하고, stamp id/attached target/label/bounds 저장 shape 검증은 Host Canvas Stamp Item Module이 소유한다.
-- Attached object 이동 판정은 개별 stamp/comment module이 아니라 Host Canvas Item Attachment Module이 소유한다.
+- Attached object 이동 판정은 개별 stamp/comment module이 아니라 Host Canvas Item Attachment Module이 소유한다. Arrow connector endpoint attachment는 whole-item attachment와 구분해 Host Drawing Item Geometry가 start/end endpoint 단위로 관리한다.
 - Group item 판정과 recursive children 저장 shape는 Host Canvas Group Item Module이 소유하고 Host tree/document/operation Module은 named predicate를 호출한다.
 - 엔진은 Fabric.js 같은 완성형 객체 모델을 감싸기보다, 커스텀 가능한 Affordance 문법을 작은 Interface로 제공한다.
 - Demo `CanvasItem`과 SVG 렌더링 방식은 재사용 Core Contract에 포함하지 않는다.

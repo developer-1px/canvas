@@ -1,15 +1,11 @@
 import type {
-  CanvasComponentItem,
   CanvasEditableTextItem,
   CanvasItem,
   TextItem,
 } from '../model'
+import { isCanvasStickyComponentItem } from '../component/CanvasStickyComponent'
 
 export type { CanvasEditableTextItem } from '../model'
-
-const CANVAS_EDITABLE_COMPONENT_KINDS = Object.freeze([
-  'sticky',
-] as const)
 
 export function isCanvasTextItem(item: CanvasItem): item is TextItem {
   return item.type === 'text'
@@ -21,7 +17,7 @@ export function isCanvasEditableTextItem(
   return (
     item.type === 'rect' ||
     isCanvasTextItem(item) ||
-    isCanvasEditableComponentTextItem(item)
+    isCanvasStickyComponentItem(item)
   )
 }
 
@@ -68,17 +64,6 @@ export function getCanvasEditableTextPatchField(
   item: CanvasEditableTextItem,
 ) {
   return item.type === 'component' ? 'body' : 'text'
-}
-
-function isCanvasEditableComponentTextItem(
-  item: CanvasItem,
-): item is CanvasComponentItem {
-  return (
-    item.type === 'component' &&
-    CANVAS_EDITABLE_COMPONENT_KINDS.includes(
-      item.component as (typeof CANVAS_EDITABLE_COMPONENT_KINDS)[number],
-    )
-  )
 }
 
 function isCanvasEditableTextPatchFieldMissing(

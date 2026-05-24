@@ -19,6 +19,7 @@ export type CanvasKeyboardCommandShortcutIntent =
   | { kind: 'copy-selection'; preventDefault: true }
   | { kind: 'cut-selection'; preventDefault: true }
   | { kind: 'paste-selection'; preventDefault: true }
+  | { kind: 'quick-create-sticky'; preventDefault: true }
   | { kind: 'select-all'; preventDefault: true }
   | { kind: 'duplicate-selection'; preventDefault: true }
   | { kind: 'lock-selection'; preventDefault: true }
@@ -43,14 +44,20 @@ export type CanvasKeyboardCommandShortcutIntentInput = {
   event: globalThis.KeyboardEvent
   key: string
   mod: boolean
+  phase?: CanvasKeyboardCommandShortcutPhase
   selection: readonly string[]
 }
+
+export type CanvasKeyboardCommandShortcutPhase =
+  | 'after-typing-target'
+  | 'before-typing-target'
 
 export function getCanvasKeyboardCommandShortcutIntent({
   config,
   event,
   key,
   mod,
+  phase = 'after-typing-target',
   selection,
 }: CanvasKeyboardCommandShortcutIntentInput):
   CanvasKeyboardCommandShortcutIntent | null {
@@ -59,7 +66,12 @@ export function getCanvasKeyboardCommandShortcutIntent({
     event,
     key,
     mod,
+    phase,
     selection,
+  }
+
+  if (phase === 'before-typing-target') {
+    return getCanvasKeyboardBuiltinCommandShortcutIntent(input)
   }
 
   return getCanvasKeyboardBuiltinCommandShortcutIntent(input) ??

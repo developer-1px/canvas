@@ -7,7 +7,7 @@ import {
 import { syncCanvasItemBounds } from '../tree/CanvasTree'
 
 export const CANVAS_ITEM_CREATION_ADAPTER: CanvasCreationAdapter<CanvasItem> = {
-  createArrow: ({ end, id, start }) =>
+  createArrow: ({ end, endAttachedTo, id, start, startAttachedTo }) =>
     syncCanvasItemBounds({
       id,
       type: 'arrow',
@@ -16,7 +16,9 @@ export const CANVAS_ITEM_CREATION_ADAPTER: CanvasCreationAdapter<CanvasItem> = {
       w: 0,
       h: 0,
       end,
+      endAttachedTo,
       start,
+      startAttachedTo,
       ...getCanvasArrowStyle(),
     }),
   createHighlight: ({ id, points }) =>

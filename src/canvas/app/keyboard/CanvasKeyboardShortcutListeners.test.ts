@@ -106,6 +106,7 @@ function createHandlers(
     moveSelection: vi.fn(),
     openFindReplace: vi.fn(),
     pasteSelection: vi.fn(),
+    quickCreateSticky: vi.fn(),
     redoHistory: vi.fn(),
     reorderSelection: vi.fn(),
     resetViewport: vi.fn(),

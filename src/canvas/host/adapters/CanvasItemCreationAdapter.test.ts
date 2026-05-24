@@ -24,10 +24,14 @@ describe('CanvasItemCreationAdapter', () => {
     })
     expect(CANVAS_ITEM_CREATION_ADAPTER.createArrow({
       end: { x: 30, y: 40 },
+      endAttachedTo: 'component-2',
       id: 'arrow-1',
       start: { x: 10, y: 20 },
+      startAttachedTo: 'component-1',
     })).toMatchObject({
       ...CANVAS_ARROW_STYLE,
+      endAttachedTo: 'component-2',
+      startAttachedTo: 'component-1',
       type: 'arrow',
     })
   })

@@ -42,7 +42,10 @@ export function getCanvasWorkspaceConsumerModel({
         commitItemsChange: document.commitItemsChange,
       },
       createId,
-      workspace: selectionContext,
+      workspace: {
+        itemReadModel,
+        ...selectionContext,
+      },
     },
     control: {
       canRedo: document.canRedo,

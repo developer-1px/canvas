@@ -59,6 +59,7 @@ export function commitCanvasPointerInteraction({
         createId,
         customCreationTools,
         interaction,
+        scene,
         selection,
         setTool,
       }),

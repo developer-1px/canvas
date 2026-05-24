@@ -51,6 +51,24 @@ describe('CanvasKeyboardCommandShortcuts', () => {
       key: 'delete',
     }))).toBeNull()
   })
+
+  it('keeps quick create sticky on the before-typing shortcut phase', () => {
+    expect(getCanvasKeyboardBuiltinCommandShortcutIntent(createInput({
+      event: createKeyboardEvent({ key: 'Enter', metaKey: true }),
+      key: 'enter',
+      mod: true,
+      phase: 'before-typing-target',
+    }))).toEqual({
+      kind: 'quick-create-sticky',
+      preventDefault: true,
+    })
+
+    expect(getCanvasKeyboardBuiltinCommandShortcutIntent(createInput({
+      event: createKeyboardEvent({ key: 'Enter', metaKey: true }),
+      key: 'enter',
+      mod: true,
+    }))).toBeNull()
+  })
 })
 
 function createInput(

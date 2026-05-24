@@ -10,14 +10,19 @@ import type {
   Viewport,
 } from '../../entities'
 import type { CanvasAppComponentLibrary } from '../workflow/CanvasAppComponentAssemblyContracts'
+import type { CanvasAppItemReadModel } from '../workflow/CanvasAppItemReadModelContracts'
 import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract'
 import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
-import { insertCanvasComponent } from './CanvasComponentInsertionExecution'
+import {
+  insertCanvasComponent,
+  quickCreateCanvasSticky,
+} from './CanvasComponentInsertionExecution'
 
 type UseCanvasComponentInsertionArgs = {
   componentLibrary: CanvasAppComponentLibrary
   commitItemsChange: CommitCanvasItemsChange
   createId: (prefix: string) => string
+  itemReadModel: CanvasAppItemReadModel
   selection: string[]
   setEditing: Dispatch<SetStateAction<EditingText | null>>
   setTool: Dispatch<SetStateAction<Tool>>
@@ -58,6 +63,38 @@ export function useCanvasComponentInsertion({
       setTool,
       stageElement,
       viewport,
+    ],
+  )
+}
+
+export function useCanvasStickyQuickCreate({
+  componentLibrary,
+  commitItemsChange,
+  createId,
+  itemReadModel,
+  selection,
+  setEditing,
+  setTool,
+}: UseCanvasComponentInsertionArgs) {
+  return useCallback(
+    () =>
+      quickCreateCanvasSticky({
+        commitItemsChange,
+        componentLibrary,
+        createId,
+        itemReadModel,
+        selection,
+        setEditing,
+        setTool,
+      }),
+    [
+      componentLibrary,
+      commitItemsChange,
+      createId,
+      itemReadModel,
+      selection,
+      setEditing,
+      setTool,
     ],
   )
 }

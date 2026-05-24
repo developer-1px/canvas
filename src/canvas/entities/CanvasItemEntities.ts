@@ -65,7 +65,9 @@ export type HighlightItem = CanvasDrawingItemBase & {
 export type ArrowItem = CanvasItemBase & {
   type: 'arrow'
   end: Point
+  endAttachedTo?: CanvasItemId
   start: Point
+  startAttachedTo?: CanvasItemId
   stroke: string
   strokeWidth: number
 }

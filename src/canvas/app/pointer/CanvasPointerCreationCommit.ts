@@ -3,6 +3,7 @@ import type {
   Tool,
 } from '../../entities'
 import {
+  type CanvasSceneAdapter,
   type CanvasCreationAdapter,
 } from '../../engine'
 import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
@@ -29,6 +30,7 @@ export type CanvasPointerCreationCommitInput = {
   createId: (prefix: string) => string
   customCreationTools: readonly CanvasAppCustomCreationTool[]
   interaction: CanvasPointerCreationInteraction
+  scene: CanvasSceneAdapter
   selection: string[]
   setTool: (tool: Tool) => void
 }
@@ -39,6 +41,7 @@ export function commitCanvasPointerCreation({
   createId,
   customCreationTools,
   interaction,
+  scene,
   selection,
   setTool,
 }: CanvasPointerCreationCommitInput) {
@@ -48,6 +51,7 @@ export function commitCanvasPointerCreation({
       creationAdapter,
       createId,
       interaction,
+      scene,
       selection,
       setTool,
     })

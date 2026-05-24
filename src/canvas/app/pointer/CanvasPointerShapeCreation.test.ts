@@ -3,6 +3,7 @@ import type { CanvasItem } from '../../entities'
 import {
   createCanvasAffordanceConfig,
   type CanvasCreationAdapter,
+  type CanvasSceneAdapter,
 } from '../../engine'
 import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
@@ -29,6 +30,7 @@ describe('CanvasPointerShapeCreation', () => {
       pointerGesture: 'create-arrow',
       startScreen: { x: 8, y: 12 },
       startWorld: { x: 80, y: 120 },
+      targetItemId: 'component-start',
     })
 
     expect(rect).toMatchObject({
@@ -50,6 +52,7 @@ describe('CanvasPointerShapeCreation', () => {
       interaction: {
         currentWorld: { x: 80, y: 120 },
         kind: 'create-arrow',
+        startAttachedTo: 'component-start',
       },
       kind: 'interaction',
     })
@@ -113,6 +116,7 @@ describe('CanvasPointerShapeCreation', () => {
         startScreen: { x: 0, y: 0 },
         startWorld: { x: 10, y: 20 },
       },
+      scene: createSceneAdapter(),
       selection: ['selected-1'],
       setTool,
     })
@@ -130,6 +134,43 @@ describe('CanvasPointerShapeCreation', () => {
       { before: ['selected-1'], after: ['rect-1'] },
     )
     expect(setTool).toHaveBeenCalledWith('select')
+  })
+
+  it('commits arrow creation with endpoint attachments', () => {
+    const commitItemsChange = vi.fn<CommitCanvasItemsChange>(() => true)
+
+    commitCanvasPointerShapeCreation({
+      commitItemsChange,
+      creationAdapter,
+      createId: (prefix) => `${prefix}-1`,
+      interaction: {
+        currentWorld: { x: 190, y: 100 },
+        kind: 'create-arrow',
+        moved: true,
+        pointerId: 1,
+        startAttachedTo: 'component-start',
+        startScreen: { x: 0, y: 0 },
+        startWorld: { x: 10, y: 20 },
+      },
+      scene: createSceneAdapter(),
+      selection: [],
+      setTool: vi.fn(),
+    })
+
+    expect(commitItemsChange).toHaveBeenCalledWith(
+      {
+        type: 'add',
+        items: [
+          expect.objectContaining({
+            endAttachedTo: 'component-end',
+            id: 'arrow-1',
+            startAttachedTo: 'component-start',
+            type: 'arrow',
+          }),
+        ],
+      },
+      { before: [], after: ['arrow-1'] },
+    )
   })
 })
 
@@ -151,13 +192,40 @@ function createPointerInput(
   }
 }
 
+function createSceneAdapter(): CanvasSceneAdapter {
+  return {
+    entries: [
+      {
+        bounds: { h: 80, w: 120, x: 0, y: 0 },
+        id: 'component-start',
+        isGroup: false,
+        parentId: null,
+        path: [0],
+      },
+      {
+        bounds: { h: 80, w: 120, x: 160, y: 80 },
+        id: 'component-end',
+        isGroup: false,
+        parentId: null,
+        path: [1],
+      },
+    ],
+    getBounds: vi.fn(() => null),
+    getParentId: vi.fn(() => null),
+    getSelectedAncestorId: vi.fn(() => null),
+    isGroup: vi.fn(() => false),
+  }
+}
+
 const creationAdapter: CanvasCreationAdapter<CanvasItem> = {
-  createArrow: ({ end, id, start }) => ({
+  createArrow: ({ end, endAttachedTo, id, start, startAttachedTo }) => ({
     end,
+    endAttachedTo,
     h: Math.abs(end.y - start.y),
     id,
     opacity: 1,
     start,
+    startAttachedTo,
     stroke: '#111827',
     strokeWidth: 2,
     type: 'arrow',

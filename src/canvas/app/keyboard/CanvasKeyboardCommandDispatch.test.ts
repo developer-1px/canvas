@@ -30,6 +30,7 @@ describe('CanvasKeyboardCommandDispatch', () => {
       { kind: 'group-selection', preventDefault: true },
       { kind: 'lock-selection', preventDefault: true },
       { kind: 'paste-selection', preventDefault: true },
+      { kind: 'quick-create-sticky', preventDefault: true },
       { kind: 'redo-history', preventDefault: true },
       { kind: 'select-all', preventDefault: true },
       { kind: 'undo-history', preventDefault: true },
@@ -46,6 +47,7 @@ describe('CanvasKeyboardCommandDispatch', () => {
     expect(handlers.groupSelection).toHaveBeenCalledTimes(1)
     expect(handlers.lockSelection).toHaveBeenCalledTimes(1)
     expect(handlers.pasteSelection).toHaveBeenCalledTimes(1)
+    expect(handlers.quickCreateSticky).toHaveBeenCalledTimes(1)
     expect(handlers.redoHistory).toHaveBeenCalledTimes(1)
     expect(handlers.selectAll).toHaveBeenCalledTimes(1)
     expect(handlers.undoHistory).toHaveBeenCalledTimes(1)
@@ -89,6 +91,7 @@ function createHandlers(): CanvasKeyboardCommandHandlers {
     lockSelection: vi.fn(),
     moveSelection: vi.fn(),
     pasteSelection: vi.fn(),
+    quickCreateSticky: vi.fn(),
     redoHistory: vi.fn(),
     reorderSelection: vi.fn(),
     selectAll: vi.fn(),

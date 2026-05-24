@@ -17,7 +17,13 @@ export type CanvasCreatedText<TItem extends CanvasCreationItem> = {
 }
 
 export type CanvasCreationAdapter<TItem extends CanvasCreationItem> = {
-  createArrow: (input: { end: Point; id: string; start: Point }) => TItem
+  createArrow: (input: {
+    end: Point
+    endAttachedTo?: string
+    id: string
+    start: Point
+    startAttachedTo?: string
+  }) => TItem
   createHighlight: (input: { id: string; points: Point[] }) => TItem
   createMarker: (input: { id: string; points: Point[] }) => TItem
   createRect: (input: { bounds: Bounds; id: string }) => TItem
@@ -151,17 +157,23 @@ export function createCanvasArrow<TItem extends CanvasCreationItem>({
   adapter,
   createId,
   currentWorld,
+  endAttachedTo,
+  startAttachedTo,
   startWorld,
 }: {
   adapter: CanvasCreationAdapter<TItem>
   createId: (prefix: string) => string
   currentWorld: Point
+  endAttachedTo?: string
+  startAttachedTo?: string
   startWorld: Point
 }) {
   return adapter.createArrow({
     end: getCanvasCreatedArrowEnd({ currentWorld, startWorld }),
+    endAttachedTo,
     id: createId('arrow'),
     start: startWorld,
+    startAttachedTo,
   })
 }
 

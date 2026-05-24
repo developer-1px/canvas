@@ -102,6 +102,38 @@ describe('CanvasItemTransformOperations drawing items', () => {
     })
   })
 
+  test('moves only arrow endpoints attached to the selected object', () => {
+    expect(translateCanvasItems(
+      [
+        rect,
+        {
+          ...arrow,
+          endAttachedTo: 'rect-2',
+          startAttachedTo: 'rect-1',
+        },
+      ],
+      ['rect-1'],
+      10,
+      -5,
+    )).toEqual([
+      {
+        ...rect,
+        x: 20,
+        y: 15,
+      },
+      {
+        ...arrow,
+        endAttachedTo: 'rect-2',
+        h: 49,
+        start: { x: 110, y: 95 },
+        startAttachedTo: 'rect-1',
+        w: 114,
+        x: 98,
+        y: 83,
+      },
+    ])
+  })
+
   test('resizes marker bounds and points together', () => {
     expect(
       resizeCanvasItems(

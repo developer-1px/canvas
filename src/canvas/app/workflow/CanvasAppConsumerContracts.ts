@@ -150,6 +150,7 @@ export type CanvasAppComponentInteractionModel = {
 }
 
 export type CanvasAppComponentWorkspaceModel = {
+  itemReadModel: CanvasAppItemReadModel
   selection: string[]
   viewport: Viewport
 }
@@ -167,8 +168,13 @@ export type CanvasAppComponentControlContext = {
   onInsertComponent: (component: CanvasComponentKind) => void
 }
 
+export type CanvasAppComponentKeyboardContext = {
+  quickCreateSticky: () => boolean
+}
+
 export type CanvasAppComponentModel = {
   control: CanvasAppComponentControlContext
+  keyboard: CanvasAppComponentKeyboardContext
 }
 
 export type CanvasAppControlModelInput = {
@@ -322,6 +328,7 @@ export type CanvasAppViewportConsumerModel = {
 
 export type CanvasAppKeyboardModelInput = {
   command: CanvasAppKeyboardCommandContext
+  component: CanvasAppComponentKeyboardContext
   config: CanvasAffordanceConfig
   customCreationTools: readonly CanvasAppCustomCreationToolState[]
   interaction: CanvasAppKeyboardInteractionContext

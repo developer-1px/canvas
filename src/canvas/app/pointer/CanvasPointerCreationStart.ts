@@ -73,6 +73,7 @@ export function startCanvasPointerCreation({
     pointerGesture,
     startScreen,
     startWorld,
+    targetItemId,
   })
 
   if (shapeStart) {

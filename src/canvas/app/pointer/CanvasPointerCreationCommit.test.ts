@@ -1,6 +1,9 @@
 import { describe, expect, it, vi } from 'vitest'
 import type { CanvasItem } from '../../entities'
-import type { CanvasCreationAdapter } from '../../engine'
+import type {
+  CanvasCreationAdapter,
+  CanvasSceneAdapter,
+} from '../../engine'
 import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract'
 import {
   commitCanvasPointerCreation,
@@ -147,13 +150,14 @@ function createInput(
       moved: true,
     },
     selection: ['selected-1'],
+    scene: createSceneAdapter(),
     setTool: () => undefined,
     ...overrides,
   }
 }
 
 const creationAdapter: CanvasCreationAdapter<CanvasItem> = {
-  createArrow: ({ end, id, start }) => ({
+  createArrow: ({ end, endAttachedTo, id, start, startAttachedTo }) => ({
     id,
     type: 'arrow',
     x: Math.min(start.x, end.x),
@@ -161,7 +165,9 @@ const creationAdapter: CanvasCreationAdapter<CanvasItem> = {
     w: Math.abs(end.x - start.x),
     h: Math.abs(end.y - start.y),
     end,
+    endAttachedTo,
     start,
+    startAttachedTo,
     stroke: '#111827',
     strokeWidth: 2,
     opacity: 1,
@@ -209,4 +215,14 @@ const creationAdapter: CanvasCreationAdapter<CanvasItem> = {
     },
     editValue: 'Text',
   }),
+}
+
+function createSceneAdapter(): CanvasSceneAdapter {
+  return {
+    entries: [],
+    getBounds: vi.fn(() => null),
+    getParentId: vi.fn(() => null),
+    getSelectedAncestorId: vi.fn(() => null),
+    isGroup: vi.fn(() => false),
+  }
 }

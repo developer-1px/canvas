@@ -16,6 +16,7 @@ export type CanvasKeyboardCommandHandlers = {
   lockSelection: () => void
   moveSelection: (dx: number, dy: number) => void
   pasteSelection: () => void
+  quickCreateSticky: () => void
   redoHistory: () => void
   reorderSelection: (mode: CanvasKeyboardReorderMode) => void
   selectAll: () => void
@@ -52,6 +53,9 @@ const CANVAS_KEYBOARD_COMMAND_INTENT_DISPATCH =
     },
     'paste-selection': ({ handlers }) => {
       handlers.pasteSelection()
+    },
+    'quick-create-sticky': ({ handlers }) => {
+      handlers.quickCreateSticky()
     },
     'redo-history': ({ handlers }) => {
       handlers.redoHistory()

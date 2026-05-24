@@ -4,6 +4,7 @@ import {
   getCanvasDrawingItemBounds,
   isCanvasDrawingItem,
   scaleCanvasDrawingItem,
+  translateCanvasArrowAttachedEndpoints,
   translateCanvasDrawingItem,
 } from './CanvasDrawingItemGeometry'
 
@@ -85,6 +86,28 @@ describe('CanvasDrawingItemGeometry', () => {
       start: { x: 30, y: 35 },
       x: 18,
       y: 23,
+    })
+  })
+
+  it('translates only arrow endpoints attached to moved items', () => {
+    expect(translateCanvasArrowAttachedEndpoints({
+      attachedIds: new Set(['component-start']),
+      dx: 20,
+      dy: 10,
+      item: {
+        ...arrow,
+        endAttachedTo: 'component-end',
+        startAttachedTo: 'component-start',
+      },
+    })).toEqual({
+      ...arrow,
+      endAttachedTo: 'component-end',
+      h: 64,
+      start: { x: 40, y: 50 },
+      startAttachedTo: 'component-start',
+      w: 84,
+      x: 28,
+      y: 38,
     })
   })
 

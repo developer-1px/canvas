@@ -9,6 +9,7 @@ import {
 } from '../../core'
 import {
   EMPTY_CANVAS_SNAP_GUIDES,
+  type CanvasSceneAdapter,
   createCanvasArrow,
   createCanvasRect,
   snapCanvasPointToGrid,
@@ -67,13 +68,19 @@ const CANVAS_POINTER_SHAPE_CREATION_DESCRIPTORS = Object.freeze({
       adapter: CanvasCreationAdapter<TItem>
       createId: (prefix: string) => string
       interaction: CanvasPointerShapeCreationInteraction
-    }) =>
-      createCanvasArrow({
+    }) => {
+      const arrowInteraction =
+        interaction.kind === 'create-arrow' ? interaction : null
+
+      return createCanvasArrow({
         adapter,
         createId,
         currentWorld: interaction.currentWorld,
+        endAttachedTo: arrowInteraction?.endAttachedTo,
+        startAttachedTo: arrowInteraction?.startAttachedTo,
         startWorld: interaction.startWorld,
-      }),
+      })
+    },
     isEnabled: (config: CanvasAffordanceConfig) =>
       config.gestures.createArrow,
     selectAfterCommit: false,
@@ -140,12 +147,14 @@ export function startCanvasPointerShapeCreation({
   pointerGesture,
   startScreen,
   startWorld,
+  targetItemId,
 }: {
   config: CanvasAffordanceConfig
   input: CanvasAppPointerInput
   pointerGesture: CanvasPointerGesture
   startScreen: Point
   startWorld: Point
+  targetItemId?: string
 }): CanvasPointerShapeCreationStartResult | null {
   if (!isCanvasPointerShapeCreationGesture(pointerGesture)) {
     return null
@@ -161,6 +170,9 @@ export function startCanvasPointerShapeCreation({
     kind: pointerGesture,
     moved: false,
     pointerId: input.pointerId,
+    startAttachedTo: pointerGesture === 'create-arrow'
+      ? targetItemId
+      : undefined,
     startScreen,
     startWorld: snappedStartWorld,
   } satisfies CanvasPointerShapeCreationInteraction
@@ -229,6 +241,7 @@ export function commitCanvasPointerShapeCreation({
   creationAdapter,
   createId,
   interaction,
+  scene,
   selection,
   setTool,
 }: {
@@ -236,16 +249,21 @@ export function commitCanvasPointerShapeCreation({
   creationAdapter: CanvasCreationAdapter<CanvasItem>
   createId: (prefix: string) => string
   interaction: CanvasPointerShapeCreationInteraction
+  scene: CanvasSceneAdapter
   selection: string[]
   setTool: (tool: Tool) => void
 }) {
   const descriptor = getCanvasPointerShapeCreationDescriptor(
     interaction.kind,
   )
+  const resolvedInteraction = attachCanvasPointerShapeCreationEnd({
+    interaction,
+    scene,
+  })
   const item = descriptor.createItem({
     adapter: creationAdapter,
     createId,
-    interaction,
+    interaction: resolvedInteraction,
   })
 
   commitItemsChange({ type: 'add', items: [item] }, {
@@ -256,6 +274,47 @@ export function commitCanvasPointerShapeCreation({
   if (descriptor.selectAfterCommit) {
     setTool('select')
   }
+}
+
+function attachCanvasPointerShapeCreationEnd({
+  interaction,
+  scene,
+}: {
+  interaction: CanvasPointerShapeCreationInteraction
+  scene: CanvasSceneAdapter
+}): CanvasPointerShapeCreationInteraction {
+  if (interaction.kind !== 'create-arrow') {
+    return interaction
+  }
+
+  return {
+    ...interaction,
+    endAttachedTo: findCanvasSceneTargetAtPoint({
+      excludeId: interaction.startAttachedTo,
+      point: interaction.currentWorld,
+      scene,
+    }),
+  }
+}
+
+function findCanvasSceneTargetAtPoint({
+  excludeId,
+  point,
+  scene,
+}: {
+  excludeId?: string
+  point: Point
+  scene: CanvasSceneAdapter
+}) {
+  return [...scene.entries]
+    .reverse()
+    .find((entry) =>
+      entry.id !== excludeId &&
+      point.x >= entry.bounds.x &&
+      point.x <= entry.bounds.x + entry.bounds.w &&
+      point.y >= entry.bounds.y &&
+      point.y <= entry.bounds.y + entry.bounds.h,
+    )?.id
 }
 
 function getCanvasPointerShapeCreationDescriptor(

@@ -73,7 +73,9 @@ export type CanvasWorkspaceComponentContext = {
     commitItemsChange: CommitCanvasItemsChange
   }
   createId: (prefix: string) => string
-  workspace: CanvasWorkspaceSelectionContext
+  workspace: CanvasWorkspaceSelectionContext & {
+    itemReadModel: CanvasAppItemReadModel
+  }
 }
 
 export type CanvasWorkspaceControlContext =

@@ -74,6 +74,35 @@ export function translateCanvasDrawingItem<TItem extends CanvasDrawingItem>({
   ) as TItem
 }
 
+export function translateCanvasArrowAttachedEndpoints({
+  attachedIds,
+  dx,
+  dy,
+  item,
+}: {
+  attachedIds: ReadonlySet<string>
+  dx: number
+  dy: number
+  item: ArrowItem
+}): ArrowItem {
+  const shouldTranslateStart =
+    item.startAttachedTo !== undefined && attachedIds.has(item.startAttachedTo)
+  const shouldTranslateEnd =
+    item.endAttachedTo !== undefined && attachedIds.has(item.endAttachedTo)
+
+  return shouldTranslateStart || shouldTranslateEnd
+    ? syncCanvasDrawingItemBounds({
+        ...item,
+        end: shouldTranslateEnd
+          ? translatePoint(item.end, dx, dy)
+          : item.end,
+        start: shouldTranslateStart
+          ? translatePoint(item.start, dx, dy)
+          : item.start,
+      })
+    : item
+}
+
 export function scaleCanvasDrawingItem<TItem extends CanvasDrawingItem>({
   from,
   item,

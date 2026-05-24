@@ -21,6 +21,12 @@ describe('CanvasKeyboardShortcutDispatch', () => {
     expect(
       runCanvasKeyboardShortcutIntent({
         handlers,
+        intent: { kind: 'quick-create-sticky', preventDefault: true },
+      }),
+    ).toBe(true)
+    expect(
+      runCanvasKeyboardShortcutIntent({
+        handlers,
         intent: {
           kind: 'zoom-by',
           multiplier: 1.25,
@@ -42,6 +48,7 @@ describe('CanvasKeyboardShortcutDispatch', () => {
     ).toBe(true)
 
     expect(handlers.deleteSelection).toHaveBeenCalledTimes(1)
+    expect(handlers.quickCreateSticky).toHaveBeenCalledTimes(1)
     expect(handlers.zoomBy).toHaveBeenCalledWith(1.25)
     expect(handlers.setTool).toHaveBeenCalledWith('text')
     expect(handlers.setSpaceDown).toHaveBeenCalledWith(true)
@@ -62,6 +69,7 @@ function createHandlers(): CanvasKeyboardShortcutDispatchHandlers {
     moveSelection: vi.fn(),
     openFindReplace: vi.fn(),
     pasteSelection: vi.fn(),
+    quickCreateSticky: vi.fn(),
     redoHistory: vi.fn(),
     reorderSelection: vi.fn(),
     resetViewport: vi.fn(),

@@ -72,6 +72,8 @@ export type Interaction =
       startScreen: Point
       startWorld: Point
       currentWorld: Point
+      endAttachedTo?: string
+      startAttachedTo?: string
       moved: boolean
     }
   | {
