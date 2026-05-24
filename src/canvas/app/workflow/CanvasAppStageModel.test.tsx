@@ -1,10 +1,8 @@
 import { describe, expect, it, vi } from 'vitest'
 import type {
   CanvasAppItemLayerRenderInput,
-} from '../rendering/CanvasAppItemLayerAdapter'
-import type {
   CanvasAppStageRenderInput,
-} from '../rendering/CanvasAppStageAdapter'
+} from '../rendering/CanvasAppRenderingContracts'
 import type { CanvasAppPointerInput } from '../pointer/CanvasAppPointerInput'
 import {
   renderCanvasAppStageModel,

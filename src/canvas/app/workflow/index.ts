@@ -55,19 +55,15 @@ export {
 } from '../rendering/CanvasAppRendererRegistries'
 export type {
   CanvasAppComponentPresentationRenderers,
+  CanvasAppItemLayerAdapter,
+  CanvasAppItemLayerRenderInput,
   CanvasAppComponentRendererStrategy,
   CanvasAppCustomItemRendererStrategy,
   CanvasAppCustomItemRenderers,
-} from '../rendering/CanvasAppRenderingContracts'
-export type {
-  CanvasAppItemLayerAdapter,
-  CanvasAppItemLayerRenderInput,
-} from '../rendering/CanvasAppItemLayerAdapter'
-export type {
   CanvasAppStageAdapter,
   CanvasAppStageMount,
   CanvasAppStageRenderInput,
-} from '../rendering/CanvasAppStageAdapter'
+} from '../rendering/CanvasAppRenderingContracts'
 export {
   assertCanvasAppExtensionId,
   assertCanvasAppExtensionRecordKeys,

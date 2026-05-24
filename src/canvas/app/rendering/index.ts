@@ -1,14 +1,9 @@
 export { CanvasDemoSvgItemLayer } from './CanvasDemoSvgItemLayer'
 export {
   DEFAULT_CANVAS_APP_STAGE_ADAPTER,
-  type CanvasAppStageAdapter,
-  type CanvasAppStageMount,
-  type CanvasAppStageRenderInput,
 } from './CanvasAppStageAdapter'
 export {
   DEFAULT_CANVAS_APP_ITEM_LAYER_ADAPTER,
-  type CanvasAppItemLayerAdapter,
-  type CanvasAppItemLayerRenderInput,
 } from './CanvasAppItemLayerAdapter'
 export {
   DEFAULT_CANVAS_APP_COMPONENT_PRESENTATION_RENDERERS,
@@ -23,8 +18,13 @@ export {
 export type {
   CanvasAppComponentPresentationRenderers,
   CanvasAppComponentRendererStrategy,
+  CanvasAppItemLayerAdapter,
+  CanvasAppItemLayerRenderInput,
   CanvasAppCustomItemRendererStrategy,
   CanvasAppCustomItemRenderers,
+  CanvasAppStageAdapter,
+  CanvasAppStageMount,
+  CanvasAppStageRenderInput,
 } from './CanvasAppRenderingContracts'
 export type {
   CanvasAppEventInput,

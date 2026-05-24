@@ -1012,23 +1012,32 @@ describe('Canvas module boundaries', () => {
     )
   })
 
-  it('keeps app stage render input on the stage mount interface', () => {
+  it('keeps app stage render input on the rendering contract seam', () => {
+    const renderingContractsFile = getSourceFile(
+      'src/canvas/app/rendering/CanvasAppRenderingContracts.ts',
+    )
     const stageAdapterFile = getSourceFile(
       'src/canvas/app/rendering/CanvasAppStageAdapter.tsx',
     )
     const stageMount =
-      stageAdapterFile.source.match(
+      renderingContractsFile.source.match(
         /export type CanvasAppStageMount = \{[\s\S]*?\n\}/,
       )?.[0] ?? ''
     const stageAdapter =
-      stageAdapterFile.source.match(
+      renderingContractsFile.source.match(
         /export type CanvasAppStageAdapter = \{[\s\S]*?\n\}/,
       )?.[0] ?? ''
     const renderInput =
-      stageAdapterFile.source.match(
+      renderingContractsFile.source.match(
         /export type CanvasAppStageRenderInput = \{[\s\S]*?\n\}/,
       )?.[0] ?? ''
 
+    expect(stageAdapterFile.source).toContain(
+      "from './CanvasAppRenderingContracts'",
+    )
+    expect(stageAdapterFile.source).not.toContain(
+      'export type CanvasAppStageRenderInput = {',
+    )
     expect(stageMount).toContain('ref: RefCallback<Element>')
     expect(stageMount).not.toContain('SVGSVGElement')
     expect(stageAdapter).toContain('renderStage')
@@ -2308,15 +2317,24 @@ describe('Canvas module boundaries', () => {
     )
   })
 
-  it('keeps app item layer render input on the app pointer input interface', () => {
+  it('keeps app item layer render input on the rendering contract seam', () => {
+    const renderingContractsFile = getSourceFile(
+      'src/canvas/app/rendering/CanvasAppRenderingContracts.ts',
+    )
     const itemLayerAdapterFile = getSourceFile(
       'src/canvas/app/rendering/CanvasAppItemLayerAdapter.tsx',
     )
     const renderInput =
-      itemLayerAdapterFile.source.match(
+      renderingContractsFile.source.match(
         /export type CanvasAppItemLayerRenderInput = \{[\s\S]*?\n\}/,
       )?.[0] ?? ''
 
+    expect(itemLayerAdapterFile.source).toContain(
+      "from './CanvasAppRenderingContracts'",
+    )
+    expect(itemLayerAdapterFile.source).not.toContain(
+      'export type CanvasAppItemLayerRenderInput = {',
+    )
     expect(renderInput).toContain('CanvasAppPointerInput')
     expect(renderInput).not.toContain('PointerEvent<')
     expect(renderInput).not.toContain('SVGGElement')
@@ -3123,6 +3141,16 @@ describe('Canvas module boundaries', () => {
     expect(contractsFile.source).toContain(
       'CanvasAppCustomItemRendererStrategy',
     )
+    expect(contractsFile.source).toContain('CanvasAppStageRenderInput')
+    expect(contractsFile.source).toContain(
+      'CanvasAppItemLayerRenderInput',
+    )
+    expect(contractsFile.source).toContain(
+      'renderStage: (input: CanvasAppStageRenderInput)',
+    )
+    expect(contractsFile.source).toContain(
+      'renderItems: (input: CanvasAppItemLayerRenderInput)',
+    )
     expect(contractsFile.source).not.toContain('CanvasDemoSvg')
     expect(registriesFile.source).toContain(
       'export function createCanvasAppComponentPresentationRenderers',
@@ -3144,11 +3172,23 @@ describe('Canvas module boundaries', () => {
     expect(authoringFacadeFile.source).toContain(
       "from '../rendering/CanvasAppRenderingContracts'",
     )
+    expect(authoringFacadeFile.source).not.toContain(
+      "from '../rendering/CanvasAppStageAdapter'",
+    )
+    expect(authoringFacadeFile.source).not.toContain(
+      "from '../rendering/CanvasAppItemLayerAdapter'",
+    )
     expect(workflowFacadeFile.source).toContain(
       "from '../rendering/CanvasAppRendererRegistries'",
     )
     expect(workflowFacadeFile.source).toContain(
       "from '../rendering/CanvasAppRenderingContracts'",
+    )
+    expect(workflowFacadeFile.source).not.toContain(
+      "from '../rendering/CanvasAppStageAdapter'",
+    )
+    expect(workflowFacadeFile.source).not.toContain(
+      "from '../rendering/CanvasAppItemLayerAdapter'",
     )
     expect(renderingFacadeFile.source).toContain(
       "from './CanvasAppRendererRegistries'",

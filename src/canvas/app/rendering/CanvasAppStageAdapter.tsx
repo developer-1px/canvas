@@ -1,47 +1,18 @@
-import type {
-  ReactNode,
-  RefCallback,
-} from 'react'
-import type {
-  CanvasInteractionKind,
-  ResizeHandle,
-  Tool,
-  Viewport,
-} from '../../core'
-import type { CanvasOverlayState } from '../../engine'
 import { CanvasSvgStage } from '../../renderer'
 import {
   createCanvasAppEventInput,
   createCanvasAppPointerInput,
-  type CanvasAppEventInput,
-  type CanvasAppPointerInput,
 } from '../pointer/CanvasAppPointerInput'
+import type {
+  CanvasAppStageAdapter,
+  CanvasAppStageRenderInput,
+} from './CanvasAppRenderingContracts'
 
-export type CanvasAppStageMount = {
-  ref: RefCallback<Element>
-}
-
-export type CanvasAppStageRenderInput = {
-  activeMode: Tool
-  children?: ReactNode
-  gesture: CanvasInteractionKind
-  overlays: CanvasOverlayState
-  stageElement: CanvasAppStageMount
-  viewport: Viewport
-  onCanvasPointerDown: (event: CanvasAppPointerInput) => void
-  onContextMenu: (event: CanvasAppEventInput) => void
-  onPointerCancel: (event: CanvasAppPointerInput) => void
-  onPointerMove: (event: CanvasAppPointerInput) => void
-  onPointerUp: (event: CanvasAppPointerInput) => void
-  onResizePointerDown: (
-    event: CanvasAppPointerInput,
-    handle: ResizeHandle,
-  ) => void
-}
-
-export type CanvasAppStageAdapter = {
-  renderStage: (input: CanvasAppStageRenderInput) => ReactNode
-}
+export type {
+  CanvasAppStageAdapter,
+  CanvasAppStageMount,
+  CanvasAppStageRenderInput,
+} from './CanvasAppRenderingContracts'
 
 export const DEFAULT_CANVAS_APP_STAGE_ADAPTER: CanvasAppStageAdapter =
   Object.freeze({

@@ -46,16 +46,12 @@ import type {
   CanvasAppStageElementController,
 } from '../stage/CanvasAppStageElement'
 import type {
-  CanvasAppItemLayerAdapter,
-} from '../rendering/CanvasAppItemLayerAdapter'
-import type {
   CanvasAppComponentPresentationRenderers,
   CanvasAppCustomItemRenderers,
-} from '../rendering/CanvasAppRenderingContracts'
-import type {
+  CanvasAppItemLayerAdapter,
   CanvasAppStageAdapter,
   CanvasAppStageMount,
-} from '../rendering/CanvasAppStageAdapter'
+} from '../rendering/CanvasAppRenderingContracts'
 import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
 import type { Interaction } from '../pointer/CanvasInteractionState'
 import type { CanvasAppControlCommandHandlers } from './CanvasAppControlCommandContracts'

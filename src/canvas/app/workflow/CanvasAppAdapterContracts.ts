@@ -10,10 +10,8 @@ import type {
 } from '../../engine'
 import type {
   CanvasAppItemLayerAdapter,
-} from '../rendering/CanvasAppItemLayerAdapter'
-import type {
   CanvasAppStageAdapter,
-} from '../rendering/CanvasAppStageAdapter'
+} from '../rendering/CanvasAppRenderingContracts'
 
 export type CanvasAppItemAdapters = {
   command: CanvasCommandAdapter<CanvasItem>

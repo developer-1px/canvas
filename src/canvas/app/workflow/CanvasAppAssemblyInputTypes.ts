@@ -8,9 +8,9 @@ import type {
 import type { CanvasWorkspaceStorageProvider } from '../document/CanvasWorkspacePersistence'
 import type {
   CanvasAppComponentPresentationRenderers,
+  CanvasAppItemLayerAdapter,
+  CanvasAppStageAdapter,
 } from '../rendering/CanvasAppRenderingContracts'
-import type { CanvasAppItemLayerAdapter } from '../rendering/CanvasAppItemLayerAdapter'
-import type { CanvasAppStageAdapter } from '../rendering/CanvasAppStageAdapter'
 import type { CanvasAppItemAdapters } from './CanvasAppAdapterContracts'
 
 export type CanvasAppAffordanceAssemblyInput = {

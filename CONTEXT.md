@@ -44,14 +44,14 @@
 - Canvas App Adapter Contracts: Host item adapter, item layer Adapter, stage Adapter의 필수 함수 slot을 검증하는 App-owned contract Module.
 - Canvas App Assembly Snapshot: 조립된 assembly output을 외부 mutation에서 보호하기 위해 component library, extension registry, initial item, adapter를 snapshot/freeze 하는 App-owned Module.
 - Canvas App Adapter Snapshot: Host item adapter, item layer Adapter, stage Adapter의 snapshot/freeze 규칙을 소유하는 App-owned Module.
-- Canvas App Rendering Contracts: 외부 조립자가 component/custom item renderer를 등록할 때 쓰는 App-owned authoring Interface. Demo SVG registry type name에 기대지 않는다.
+- Canvas App Rendering Contracts: 외부 조립자가 component/custom item renderer, stage Adapter, item layer Adapter를 등록할 때 쓰는 App-owned authoring Interface. Default SVG Adapter 구현 파일에 기대지 않는다.
 - Canvas App Renderer Registries: App-named component/custom item renderer registry 생성, 검증, default를 소유하고 Demo SVG registry 구현명을 외부 authoring seam 뒤에 숨기는 Module.
-- Canvas App Stage Adapter: App Shell이 concrete Renderer Stage를 직접 import하지 않고 stage ReactNode를 받도록 만드는 Adapter Interface.
+- Canvas App Stage Adapter: App Shell이 concrete Renderer Stage를 직접 import하지 않고 stage ReactNode를 받도록 만드는 Adapter. Interface는 Canvas App Rendering Contracts가 소유하고 default SVG 구현은 별도 파일에 둔다.
 - Canvas App Stage Element: stage DOM element의 bounds, pointer capture, wheel listener를 한 Module에 숨기는 App-owned element Adapter.
 - Canvas App Stage Element Model: App Model이 Stage Element Adapter 생성 세부를 직접 알지 않도록 숨기는 workflow Module.
 - Canvas App Stage Element Consumer Model: Stage Element Adapter를 command, component, pointer, viewport, stage render consumer별 context로 변환하는 workflow Module.
 - Canvas App Consumer Contracts: command, component, control, extension, inspector, interaction, keyboard, pointer, stage, stage element, text, viewport 같은 workflow runtime fan-out의 입력, command/extension/pointer/text/viewport runtime callback, consumer별 출력 Interface를 한곳에 모아 구현 mapping과 분리하고, 외부 등록 descriptor와 내부 runtime state의 노출 범위를 고정하는 App-owned type 계약.
-- Canvas App Item Layer Adapter: App workflow가 concrete Demo SVG item layer를 직접 알지 않고 items를 stage children으로 렌더링하도록 주입받는 Adapter Interface.
+- Canvas App Item Layer Adapter: App workflow가 concrete Demo SVG item layer를 직접 알지 않고 items를 stage children으로 렌더링하도록 주입받는 Adapter. Interface는 Canvas App Rendering Contracts가 소유하고 default Demo SVG 구현은 별도 파일에 둔다.
 - Canvas App Extension Id: custom command, creation tool, item module, component presentation renderer key, custom item renderer key, validator key, inspector panel에서 공유하는 안정 lower-kebab 외부 계약.
 - Canvas App Extension Registry: assembly 단계에서 extension entry와 record key를 검증하고 중복을 실패시키는 내부 merge 계약.
 - Canvas App Extension Bundle: custom command, custom creation tool, custom item renderer, custom item validator, inspector panel output slot과 slot별 중복 병합/snapshot/defaulting 규칙을 소유하고 Canvas App Assembly output 계약에 합성되는 App-owned extension output 계약.

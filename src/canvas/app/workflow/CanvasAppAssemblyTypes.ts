@@ -9,9 +9,9 @@ import type { CanvasWorkspaceStorageProvider } from '../document/CanvasWorkspace
 import type { CanvasAppExtensionBundle } from '../extensions/CanvasAppExtensionBundle'
 import type {
   CanvasAppComponentPresentationRenderers,
+  CanvasAppItemLayerAdapter,
+  CanvasAppStageAdapter,
 } from '../rendering/CanvasAppRenderingContracts'
-import type { CanvasAppItemLayerAdapter } from '../rendering/CanvasAppItemLayerAdapter'
-import type { CanvasAppStageAdapter } from '../rendering/CanvasAppStageAdapter'
 import type { CanvasAppItemAdapters } from './CanvasAppAdapterContracts'
 import type {
   CanvasAppAdapterAssemblyInput,

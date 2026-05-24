@@ -17,9 +17,9 @@ import type { CanvasWorkspaceStorageProvider } from '../document/CanvasWorkspace
 import type {
   CanvasAppComponentPresentationRenderers,
   CanvasAppCustomItemRenderers,
+  CanvasAppItemLayerAdapter,
+  CanvasAppStageAdapter,
 } from '../rendering/CanvasAppRenderingContracts'
-import type { CanvasAppItemLayerAdapter } from '../rendering/CanvasAppItemLayerAdapter'
-import type { CanvasAppStageAdapter } from '../rendering/CanvasAppStageAdapter'
 import type { CanvasAppInspectorPanel } from '../inspector/CanvasAppInspectorPanels'
 import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
 

@@ -3,10 +3,10 @@ import {
   type ReactElement,
 } from 'react'
 import { describe, expect, it, vi } from 'vitest'
-import {
-  DEFAULT_CANVAS_APP_STAGE_ADAPTER,
-  type CanvasAppStageRenderInput,
-} from './CanvasAppStageAdapter'
+import { DEFAULT_CANVAS_APP_STAGE_ADAPTER } from './CanvasAppStageAdapter'
+import type {
+  CanvasAppStageRenderInput,
+} from './CanvasAppRenderingContracts'
 
 describe('CanvasAppStageAdapter', () => {
   it('maps the app stage mount interface to the default SVG stage ref', () => {

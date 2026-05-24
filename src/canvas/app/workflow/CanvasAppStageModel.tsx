@@ -2,11 +2,9 @@ import type { ReactNode } from 'react'
 import type {
   CanvasAppItemLayerAdapter,
   CanvasAppItemLayerRenderInput,
-} from '../rendering/CanvasAppItemLayerAdapter'
-import type {
   CanvasAppStageAdapter,
   CanvasAppStageRenderInput,
-} from '../rendering/CanvasAppStageAdapter'
+} from '../rendering/CanvasAppRenderingContracts'
 import type { CanvasAppEventInput } from '../pointer/CanvasAppPointerInput'
 import type { CanvasAppStageModelInput } from './CanvasAppConsumerContracts'
 
