@@ -452,6 +452,7 @@
 .drawing-controls,
 .find-replace-panel,
 .image-controls,
+.session-timer,
 .stamp-controls,
 .zoom-controls,
 .object-inspector,
@@ -506,10 +507,32 @@
 }
 
 .component-palette {
-  top: 14px;
+  top: 62px;
   right: 14px;
   display: grid;
   grid-template-columns: repeat(5, 34px);
+}
+
+.session-timer {
+  z-index: 5;
+  top: 14px;
+  right: 14px;
+  align-items: center;
+  gap: 6px;
+}
+
+.session-timer-display {
+  min-width: 54px;
+  padding: 0 6px;
+  color: #111827;
+  font: 750 13px/1 var(--sans);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.session-timer-presets {
+  display: flex;
+  gap: 2px;
 }
 
 .drawing-controls {
@@ -731,6 +754,7 @@
 .zoom-value,
 .image-controls button,
 .stamp-button,
+.session-timer button,
 .find-replace-panel button {
   display: inline-grid;
   place-items: center;
@@ -759,6 +783,16 @@
 
 .stamp-button {
   width: 34px;
+}
+
+.session-timer button {
+  min-width: 34px;
+  padding: 0 8px;
+}
+
+.session-timer button[aria-pressed='true'] {
+  background: #e5edff;
+  color: #1d4ed8;
 }
 
 .stamp-button-label {
@@ -822,6 +856,7 @@
 .zoom-value:hover,
 .image-controls button:hover,
 .stamp-button:hover,
+.session-timer button:hover,
 .sticky-quick-create:hover,
 .find-replace-panel button:hover,
 .tool-button[data-active='true'] {
@@ -832,6 +867,7 @@
 .tool-button:disabled,
 .image-controls button:disabled,
 .stamp-button:disabled,
+.session-timer button:disabled,
 .find-replace-panel button:disabled {
   color: #9ca3af;
   cursor: not-allowed;
@@ -840,6 +876,7 @@
 .tool-button:disabled:hover,
 .image-controls button:disabled:hover,
 .stamp-button:disabled:hover,
+.session-timer button:disabled:hover,
 .find-replace-panel button:disabled:hover {
   background: transparent;
   color: #9ca3af;
@@ -859,6 +896,7 @@
 .zoom-value:focus-visible,
 .image-controls button:focus-visible,
 .stamp-button:focus-visible,
+.session-timer button:focus-visible,
 .sticky-quick-create:focus-visible,
 .find-replace-panel input:focus-visible,
 .find-replace-panel button:focus-visible,
@@ -901,6 +939,13 @@
     right: auto;
     grid-template-columns: repeat(10, 30px);
     max-width: calc(100vw - 20px);
+  }
+
+  .session-timer {
+    top: 86px;
+    right: 10px;
+    max-width: calc(100vw - 20px);
+    flex-wrap: wrap;
   }
 
   .drawing-controls {

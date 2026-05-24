@@ -16,6 +16,9 @@ export type CanvasAppAffordanceControlModel =
 export type CanvasAppAffordanceDrawingModel =
   CanvasAppAffordanceConfigContext
 
+export type CanvasAppAffordanceFacilitationModel =
+  CanvasAppAffordanceConfigContext
+
 export type CanvasAppAffordanceInteractionModel =
   CanvasAppAffordanceConfigContext
 
@@ -45,6 +48,7 @@ export type CanvasAppAffordanceModel = {
   component: CanvasAppAffordanceComponentModel
   control: CanvasAppAffordanceControlModel
   drawing: CanvasAppAffordanceDrawingModel
+  facilitation: CanvasAppAffordanceFacilitationModel
   image: CanvasAppAffordanceImageModel
   interaction: CanvasAppAffordanceInteractionModel
   inspector: CanvasAppAffordanceInspectorModel

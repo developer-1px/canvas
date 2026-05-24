@@ -5,6 +5,7 @@ import type {
 import { CanvasComponentPalette } from '../../ui/palette/CanvasComponentPalette'
 import { CanvasCursorChat } from '../../ui/cursor/CanvasCursorChat'
 import { CanvasDrawingControls } from '../../ui/drawing/CanvasDrawingControls'
+import { CanvasSessionTimer } from '../../ui/facilitation/CanvasSessionTimer'
 import { CanvasObjectInspector } from '../../ui/inspector/CanvasObjectInspector'
 import { CanvasFindReplacePanel } from '../../ui/search/CanvasFindReplacePanel'
 import { CanvasImageControls } from '../../ui/image/CanvasImageControls'
@@ -17,6 +18,7 @@ import { ZoomControls } from '../../ui/zoom/ZoomControls'
 
 type ToolbarProps = ComponentProps<typeof CanvasToolbar>
 type CursorChatProps = ComponentProps<typeof CanvasCursorChat>
+type SessionTimerProps = ComponentProps<typeof CanvasSessionTimer>
 type TextEditorProps = ComponentProps<typeof CanvasTextEditor>
 type DrawingControlsProps = ComponentProps<typeof CanvasDrawingControls>
 type FindReplaceProps = ComponentProps<typeof CanvasFindReplacePanel>
@@ -39,6 +41,7 @@ type CanvasAppViewProps = {
   findReplace: FindReplaceProps
   imageControls: VisibleProps<ImageControlsProps>
   inspector: VisibleProps<InspectorProps>
+  sessionTimer: SessionTimerProps
   stage: ReactNode
   stampControls: VisibleProps<StampControlsProps>
   stickyQuickCreate: VisibleProps<StickyQuickCreateProps>
@@ -55,6 +58,7 @@ export function CanvasAppView({
   findReplace,
   imageControls,
   inspector,
+  sessionTimer,
   stage,
   stampControls,
   stickyQuickCreate,
@@ -82,6 +86,8 @@ export function CanvasAppView({
   return (
     <main className="canvas-app">
       {showToolbar ? <CanvasToolbar {...toolbarProps} /> : null}
+
+      <CanvasSessionTimer {...sessionTimer} />
 
       {showComponentPalette ? (
         <CanvasComponentPalette {...componentPaletteProps} />

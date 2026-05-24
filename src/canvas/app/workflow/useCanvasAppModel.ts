@@ -8,6 +8,7 @@ import { useCanvasAppComponentModel } from './useCanvasAppComponentModel'
 import { useCanvasCursorChatModel } from '../cursor/useCanvasCursorChatModel'
 import { useCanvasAppDrawingModel } from './useCanvasAppDrawingModel'
 import { useCanvasAppExtensionModel } from './useCanvasAppExtensionModel'
+import { useCanvasSessionTimerModel } from '../facilitation/useCanvasSessionTimerModel'
 import { useCanvasAppInspectorModel } from './useCanvasAppInspectorModel'
 import { useCanvasAppImageModel } from './useCanvasAppImageModel'
 import { useCanvasAppKeyboardModel } from './useCanvasAppKeyboardModel'
@@ -46,6 +47,7 @@ export function useCanvasAppModel({
     ...affordance.keyboard,
     ...stageElement.pointer,
   })
+  const sessionTimer = useCanvasSessionTimerModel(affordance.facilitation)
   const interaction = useCanvasInteractionModel({
     ...affordance.interaction,
     presence,
@@ -183,6 +185,7 @@ export function useCanvasAppModel({
       },
     }),
     cursorChat: cursorChat.view,
+    sessionTimer: sessionTimer.view,
     stampControls,
     stickyQuickCreate: components.control.stickyQuickCreate,
     status: controls.status,

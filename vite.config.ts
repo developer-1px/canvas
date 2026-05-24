@@ -27,9 +27,12 @@ export default defineConfig({
   },
   plugins: [react()],
   resolve: {
-    alias: {
-      'zod-crud': zodCrudEntry,
-    },
+    alias: [
+      {
+        find: /^zod-crud$/,
+        replacement: zodCrudEntry,
+      },
+    ],
     dedupe: ['react', 'react-dom', 'zod'],
   },
   server: {

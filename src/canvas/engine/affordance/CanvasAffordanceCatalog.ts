@@ -93,6 +93,7 @@ export const CANVAS_AFFORDANCE_CONFIG_DEFAULTS = Object.freeze({
     presence: true,
     resizeHandles: true,
     selectionBounds: true,
+    sessionTimer: true,
     spacingGuides: true,
     stampControls: true,
     stickyQuickCreate: true,

@@ -16,6 +16,7 @@ describe('CanvasAppView', () => {
           drawingControls: false,
           imageControls: false,
           inspector: false,
+          sessionTimer: false,
           stampControls: false,
           stickyQuickCreate: false,
           status: false,
@@ -31,6 +32,7 @@ describe('CanvasAppView', () => {
     expect(markup).not.toContain('drawing-controls')
     expect(markup).not.toContain('image-controls')
     expect(markup).not.toContain('object-inspector')
+    expect(markup).not.toContain('session-timer')
     expect(markup).not.toContain('stamp-controls')
     expect(markup).not.toContain('sticky-quick-create')
     expect(markup).not.toContain('canvas-status')
@@ -48,6 +50,7 @@ describe('CanvasAppView', () => {
     expect(markup).toContain('drawing-controls')
     expect(markup).toContain('image-controls')
     expect(markup).toContain('object-inspector')
+    expect(markup).toContain('session-timer')
     expect(markup).toContain('stamp-controls')
     expect(markup).toContain('data-anchored="true"')
     expect(markup).toContain('sticky-quick-create')
@@ -65,6 +68,7 @@ function createViewProps(
     drawingControls?: boolean
     imageControls?: boolean
     inspector?: boolean
+    sessionTimer?: boolean
     stampControls?: boolean
     stickyQuickCreate?: boolean
     status?: boolean
@@ -145,6 +149,19 @@ function createViewProps(
       onUploadFiles: noop,
     },
     stage: <div className="canvas-stage" />,
+    sessionTimer: {
+      presetSeconds: [300, 600, 900],
+      secondsRemaining: 300,
+      selectedPresetSeconds: 300,
+      status: 'idle',
+      visible: visible.sessionTimer ?? true,
+      onAddMinute: noop,
+      onPause: noop,
+      onReset: noop,
+      onResume: noop,
+      onSetDuration: noop,
+      onStart: noop,
+    },
     stampControls: {
       anchor: { x: 320, y: 140 },
       canInsertStamp: true,

@@ -170,3 +170,6 @@
 166. Cursor chat은 pointer 위치에 붙어 움직이며 Escape 또는 canvas pointer down으로 닫힌다.
 167. Cursor chat은 문서 item을 만들지 않고 App UI 상태로만 유지된다.
 168. Demo canvas는 초기 선택 없이 열려 inspector와 reaction bar를 필요할 때만 표시한다.
+169. Session timer는 문서 item을 만들지 않는 built-in facilitation affordance로 제공된다.
+170. Session timer는 5/10/15분 preset, start, pause, resume, +1m, reset을 지원한다.
+171. Running session timer는 시간을 줄이지 않고 남은 시간을 추가하는 방식으로만 조정한다.
