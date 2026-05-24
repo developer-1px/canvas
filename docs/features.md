@@ -148,3 +148,5 @@
 144. Presence cursor는 줌 배율과 무관하게 화면상 크기를 유지한다.
 145. Comment tool로 새 comment를 만들면 생성 직후 body editor가 열린다.
 146. Comment 생성 직후 active tool은 select로 돌아간다.
+147. Collaborator presence는 cursor와 함께 remote selection bounds를 표시할 수 있다.
+148. Demo collaborator presence는 각 collaborator가 선택 중인 객체를 colored outline으로 표시한다.

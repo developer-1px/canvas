@@ -19,11 +19,13 @@ export const DEMO_CANVAS_PRESENCE = Object.freeze([
     id: 'mia',
     label: 'Mia',
     point: { x: 456, y: 252 },
+    selectionBounds: { h: 148, w: 188, x: 92, y: 88 },
   }),
   Object.freeze({
     color: '#dc2626',
     id: 'owen',
     label: 'Owen',
     point: { x: 920, y: 228 },
+    selectionBounds: { h: 190, w: 214, x: 760, y: 292 },
   }),
 ] satisfies readonly CanvasPresenceOverlay[])

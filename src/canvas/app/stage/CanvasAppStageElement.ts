@@ -201,6 +201,8 @@ const CANVAS_STAGE_SNAPSHOT_STYLE = `
 .stamp-label{fill:#111827;font:750 18px/1 sans-serif;pointer-events:none;text-anchor:middle}
 .stamp-hit{fill:transparent;pointer-events:all}
 .presence-cursor{pointer-events:none}
+.presence-selection{pointer-events:none}
+.presence-selection-rect{fill:rgba(255,255,255,.08);stroke-width:1.75}
 .presence-cursor-pointer{stroke:#fff;stroke-width:1.5}
 .presence-label-text{fill:#fff;font:700 12px/1 sans-serif;pointer-events:none}
 	`

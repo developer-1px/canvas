@@ -1,6 +1,7 @@
 import type { PointerEvent } from 'react'
 import type { CanvasOverlayState } from '../../engine'
 import type {
+  Bounds,
   ResizeHandle,
   Viewport,
 } from '../../core'
@@ -200,6 +201,17 @@ export function CanvasSvgInteractionOverlays({
 
       {overlays.presence && overlays.presence.length > 0 ? (
         <g className="presence-overlays">
+          {overlays.presence.map((presence) =>
+            presence.selectionBounds ? (
+              <CanvasSvgPresenceSelection
+                key={`${presence.id}-selection`}
+                bounds={presence.selectionBounds}
+                color={presence.color}
+                label={presence.label}
+                scale={1 / viewport.scale}
+              />
+            ) : null,
+          )}
           {overlays.presence.map((presence) => (
             <CanvasSvgPresenceCursor
               key={presence.id}
@@ -213,6 +225,43 @@ export function CanvasSvgInteractionOverlays({
         </g>
       ) : null}
     </>
+  )
+}
+
+function CanvasSvgPresenceSelection({
+  bounds,
+  color,
+  label,
+  scale,
+}: {
+  bounds: Bounds
+  color: string
+  label: string
+  scale: number
+}) {
+  const labelWidth = Math.max(36, label.length * 7 + 18)
+
+  return (
+    <g className="presence-selection">
+      <rect
+        className="presence-selection-rect"
+        x={bounds.x}
+        y={bounds.y}
+        width={bounds.w}
+        height={bounds.h}
+        stroke={color}
+        vectorEffect="non-scaling-stroke"
+      />
+      <g
+        className="presence-selection-label"
+        transform={`translate(${bounds.x} ${bounds.y}) scale(${scale})`}
+      >
+        <rect width={labelWidth} height="22" rx="5" fill={color} />
+        <text className="presence-label-text" x="9" y="15">
+          {label}
+        </text>
+      </g>
+    </g>
   )
 }
 

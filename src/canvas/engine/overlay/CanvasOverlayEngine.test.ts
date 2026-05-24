@@ -9,6 +9,7 @@ describe('CanvasOverlayEngine', () => {
       id: 'mia',
       label: 'Mia',
       point: { x: 120, y: 80 },
+      selectionBounds: { h: 40, w: 80, x: 32, y: 48 },
     }]
 
     expect(createOverlay({ presence }).presence).toEqual(presence)

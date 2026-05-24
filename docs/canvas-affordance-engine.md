@@ -282,7 +282,7 @@ type CanvasAffordanceConfig = {
 - Canvas App Adapter Assembly는 item, item layer, stage adapter fallback 조립을 소유하고, Canvas App Assembly는 adapter 선택 규칙을 직접 알지 않는다.
 - App workflow와 command/pointer/viewport hook은 raw SVG ref를 직접 읽지 않고 Canvas App Stage Element를 통해 stage DOM 기능을 사용한다.
 - App rendering Adapter의 public render input은 React/SVG pointer event를 직접 요구하지 않고 Canvas App Pointer Input을 사용한다.
-- Collaborator presence는 document item이 아니라 runtime overlay state다. Host App은 `CanvasApp` presence prop으로 현재 collaborator cursor를 주입하고, Renderer는 viewport scale을 보정해 화면상 cursor 크기를 유지한다.
+- Collaborator presence는 document item이 아니라 runtime overlay state다. Host App은 `CanvasApp` presence prop으로 현재 collaborator cursor와 remote selection bounds를 주입하고, Renderer는 viewport scale을 보정해 화면상 cursor와 label 크기를 유지한다.
 - 알 수 없는 stable component kind는 forward compatibility를 위해 기본 template로 fallback할 수 있지만, malformed component kind는 schema validation 또는 component lookup 단계에서 실패한다.
 - 저장된 workspace snapshot은 현재 custom item validator로 다시 검증한다. validator가 바뀌어 저장 payload가 더 이상 유효하지 않으면 저장 snapshot을 제거하고 앱 초기값으로 시작한다.
 - Canvas App Assembly는 `workspaceStorageProvider`를 받아 Workspace Persistence에 전달하고, App workflow가 browser `localStorage`를 직접 선택하지 않게 한다.

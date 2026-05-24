@@ -37,6 +37,7 @@ export type CanvasPresenceOverlay = {
   id: string
   label: string
   point: Point
+  selectionBounds?: Bounds
 }
 
 export type CanvasOverlayState = {

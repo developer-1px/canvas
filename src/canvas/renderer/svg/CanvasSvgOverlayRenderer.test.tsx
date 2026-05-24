@@ -15,6 +15,7 @@ describe('CanvasSvgOverlayRenderer', () => {
               id: 'mia',
               label: 'Mia',
               point: { x: 120, y: 80 },
+              selectionBounds: { h: 40, w: 80, x: 32, y: 48 },
             }],
           }}
           viewport={{ scale: 2, x: 0, y: 0 }}
@@ -24,6 +25,10 @@ describe('CanvasSvgOverlayRenderer', () => {
     )
 
     expect(markup).toContain('presence-overlays')
+    expect(markup).toContain('presence-selection')
+    expect(markup).toContain('presence-selection-rect')
+    expect(markup).toContain('x="32"')
+    expect(markup).toContain('width="80"')
     expect(markup).toContain('presence-cursor')
     expect(markup).toContain('translate(120 80) scale(0.5)')
     expect(markup).toContain('fill="#2563eb"')
