@@ -38,6 +38,7 @@ import type {
   CanvasAppCustomCommandState,
   CanvasAppCustomCreationToolState,
 } from '../extensions/CanvasAppExtensionStateContracts'
+import type { CanvasAppInspectorPanel } from '../inspector/CanvasAppInspectorPanels'
 import type { CanvasAppPointerInput } from '../pointer/CanvasAppPointerInput'
 import type {
   CanvasAppStageElement,
@@ -210,6 +211,15 @@ export type CanvasAppExtensionModel = {
   control: CanvasAppExtensionControlContext
   keyboard: CanvasAppExtensionKeyboardContext
   pointer: CanvasAppExtensionPointerContext
+}
+
+export type CanvasAppInspectorModelInput = {
+  commitItemsChange: CommitCanvasItemsChange
+  config: CanvasAffordanceConfig
+  inspectorPanels: readonly CanvasAppInspectorPanel[]
+  itemReadModel: CanvasItemReadModel
+  selected: Set<string>
+  selection: string[]
 }
 
 export type CanvasAppKeyboardCommandContext = {

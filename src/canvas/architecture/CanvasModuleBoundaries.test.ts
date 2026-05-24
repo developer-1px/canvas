@@ -1611,10 +1611,28 @@ describe('Canvas module boundaries', () => {
       "from '../inspector/useCanvasObjectInspector'",
     )
     expect(inspectorModelFile.source).toContain(
+      "from './CanvasAppConsumerContracts'",
+    )
+    expect(inspectorModelFile.source).toContain(
+      'CanvasAppInspectorModelInput',
+    )
+    expect(inspectorModelFile.source).not.toContain(
+      'type UseCanvasAppInspectorModelArgs',
+    )
+    expect(inspectorModelFile.source).toContain(
       'export function useCanvasAppInspectorModel',
     )
     expect(inspectorModelFile.source).toContain('inspectorPanels')
     expect(inspectorModelFile.source).toContain('itemReadModel')
+    const consumerContractsFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppConsumerContracts.ts',
+    )
+    expect(consumerContractsFile.source).toContain(
+      'export type CanvasAppInspectorModelInput',
+    )
+    expect(consumerContractsFile.source).toContain(
+      "from '../inspector/CanvasAppInspectorPanels'",
+    )
     expect(objectInspectorHookFile.source).toContain(
       "from './CanvasObjectInspectorModel'",
     )

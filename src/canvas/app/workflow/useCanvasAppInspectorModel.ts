@@ -1,17 +1,5 @@
-import type { CanvasAffordanceConfig } from '../../engine'
-import type { CanvasItemReadModel } from '../../host'
 import { useCanvasObjectInspector } from '../inspector/useCanvasObjectInspector'
-import type { CanvasAppInspectorPanel } from '../inspector/CanvasAppInspectorPanels'
-import type { CommitCanvasItemsChange } from './CanvasWorkflowContract'
-
-type UseCanvasAppInspectorModelArgs = {
-  commitItemsChange: CommitCanvasItemsChange
-  config: CanvasAffordanceConfig
-  inspectorPanels: readonly CanvasAppInspectorPanel[]
-  itemReadModel: CanvasItemReadModel
-  selected: Set<string>
-  selection: string[]
-}
+import type { CanvasAppInspectorModelInput } from './CanvasAppConsumerContracts'
 
 export function useCanvasAppInspectorModel({
   commitItemsChange,
@@ -20,7 +8,7 @@ export function useCanvasAppInspectorModel({
   itemReadModel,
   selected,
   selection,
-}: UseCanvasAppInspectorModelArgs) {
+}: CanvasAppInspectorModelInput) {
   return {
     ...useCanvasObjectInspector({
       commitItemsChange,
