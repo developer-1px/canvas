@@ -2,22 +2,24 @@ import type {
   CSSProperties,
   PointerEvent,
 } from 'react'
+import type { CanvasSide } from '../../entities'
 
 export type CanvasStickyQuickCreateControlPoint = Readonly<{
+  direction: CanvasSide
   x: number
   y: number
 }>
 
 export type CanvasStickyQuickCreateControlProps = {
-  point: CanvasStickyQuickCreateControlPoint | null
-  onQuickCreate: () => boolean
+  controls: readonly CanvasStickyQuickCreateControlPoint[]
+  onQuickCreate: (direction: CanvasSide) => boolean
 }
 
 export function CanvasStickyQuickCreateControl({
-  point,
+  controls,
   onQuickCreate,
 }: CanvasStickyQuickCreateControlProps) {
-  if (!point) {
+  if (controls.length === 0) {
     return null
   }
 
@@ -26,17 +28,23 @@ export function CanvasStickyQuickCreateControl({
   }
 
   return (
-    <button
-      type="button"
-      className="sticky-quick-create"
-      aria-label="Create sticky note"
-      title="Create sticky note"
-      style={getCanvasStickyQuickCreateStyle(point)}
-      onClick={onQuickCreate}
-      onPointerDown={stopPointer}
-    >
-      +
-    </button>
+    <>
+      {controls.map((control) => (
+        <button
+          key={control.direction}
+          type="button"
+          className="sticky-quick-create"
+          data-direction={control.direction}
+          aria-label={`Create sticky note ${control.direction}`}
+          title="Create sticky note"
+          style={getCanvasStickyQuickCreateStyle(control)}
+          onClick={() => onQuickCreate(control.direction)}
+          onPointerDown={stopPointer}
+        >
+          +
+        </button>
+      ))}
+    </>
   )
 }
 

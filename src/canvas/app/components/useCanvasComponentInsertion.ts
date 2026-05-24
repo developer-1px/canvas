@@ -6,6 +6,7 @@ import {
 import type {
   CanvasItem,
   CanvasComponentKind,
+  CanvasSide,
   EditingText,
   Tool,
   Viewport,
@@ -16,7 +17,7 @@ import type { CanvasAppItemReadModel } from '../workflow/CanvasAppItemReadModelC
 import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract'
 import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
 import {
-  getCanvasStickyQuickCreateControlPoint,
+  getCanvasStickyQuickCreateControlPoints,
   insertCanvasComponent,
   quickCreateCanvasSticky,
 } from './CanvasComponentInsertionExecution'
@@ -82,12 +83,13 @@ export function useCanvasStickyQuickCreate({
   setTool,
 }: UseCanvasComponentInsertionArgs) {
   return useCallback(
-    () =>
+    (direction: CanvasSide = 'right') =>
       quickCreateCanvasSticky({
         commitItemsChange,
         componentLibrary,
         creationAdapter,
         createId,
+        direction,
         itemReadModel,
         selection,
         setEditing,
@@ -106,7 +108,7 @@ export function useCanvasStickyQuickCreate({
   )
 }
 
-export function useCanvasStickyQuickCreateControlPoint({
+export function useCanvasStickyQuickCreateControlPoints({
   itemReadModel,
   selection,
   viewport,
@@ -114,7 +116,7 @@ export function useCanvasStickyQuickCreateControlPoint({
   UseCanvasComponentInsertionArgs,
   'itemReadModel' | 'selection' | 'viewport'
 >) {
-  return getCanvasStickyQuickCreateControlPoint({
+  return getCanvasStickyQuickCreateControlPoints({
     itemReadModel,
     selection,
     viewport,

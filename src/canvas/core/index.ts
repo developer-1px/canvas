@@ -5,6 +5,7 @@ export type {
   CanvasInteractionKind,
   CanvasItemId,
   CanvasSelectionIds,
+  CanvasSide,
   Point,
   ResizeHandle,
   Tool,

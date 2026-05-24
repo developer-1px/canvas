@@ -1,7 +1,7 @@
 import {
   useCanvasComponentInsertion,
   useCanvasStickyQuickCreate,
-  useCanvasStickyQuickCreateControlPoint,
+  useCanvasStickyQuickCreateControlPoints,
 } from '../components/useCanvasComponentInsertion'
 import type {
   CanvasAppComponentModel,
@@ -42,7 +42,7 @@ export function useCanvasAppComponentModel({
     stageElement,
     viewport: workspace.viewport,
   })
-  const quickCreatePoint = useCanvasStickyQuickCreateControlPoint({
+  const quickCreateControls = useCanvasStickyQuickCreateControlPoints({
     itemReadModel: workspace.itemReadModel,
     selection: workspace.selection,
     viewport: workspace.viewport,
@@ -52,8 +52,9 @@ export function useCanvasAppComponentModel({
     control: {
       onInsertComponent: insertComponent,
       stickyQuickCreate: {
-        point: quickCreatePoint,
-        visible: config.overlays.stickyQuickCreate && quickCreatePoint !== null,
+        controls: quickCreateControls,
+        visible:
+          config.overlays.stickyQuickCreate && quickCreateControls.length > 0,
         onQuickCreate: quickCreateSticky,
       },
     },

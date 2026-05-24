@@ -143,7 +143,11 @@ function createViewProps(
       onInsertStamp: noop,
     },
     stickyQuickCreate: {
-      point: { x: 200, y: 120 },
+      controls: [{
+        direction: 'right',
+        x: 200,
+        y: 120,
+      }],
       visible: visible.stickyQuickCreate ?? true,
       onQuickCreate: noop,
     },

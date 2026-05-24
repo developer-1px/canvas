@@ -24,6 +24,7 @@ import type {
   CanvasEditableTextItem,
   CanvasInteractionKind,
   CanvasItem,
+  CanvasSide,
   EditingText,
   Point,
   ResizeHandle,
@@ -169,9 +170,13 @@ export type CanvasAppComponentModelInput = {
 }
 
 export type CanvasAppStickyQuickCreateControlContext = {
-  point: Point | null
+  controls: readonly CanvasAppStickyQuickCreateControlPoint[]
   visible: boolean
-  onQuickCreate: () => boolean
+  onQuickCreate: (direction: CanvasSide) => boolean
+}
+
+export type CanvasAppStickyQuickCreateControlPoint = Point & {
+  direction: CanvasSide
 }
 
 export type CanvasAppComponentControlContext = {

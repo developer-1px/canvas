@@ -8,7 +8,7 @@ import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
 import type { CanvasAppComponentLibrary } from '../workflow/CanvasAppComponentAssemblyContracts'
 import type { CanvasAppItemReadModel } from '../workflow/CanvasAppItemReadModelContracts'
 import {
-  getCanvasStickyQuickCreateControlPoint,
+  getCanvasStickyQuickCreateControlPoints,
   insertCanvasComponent,
   quickCreateCanvasSticky,
 } from './CanvasComponentInsertionExecution'
@@ -104,7 +104,7 @@ describe('CanvasComponentInsertionExecution', () => {
           id: 'component-card',
         }),
       ]),
-      selection: ['component-source', 'component-card'],
+      selection: ['component-source'],
       setEditing,
       setTool,
     })
@@ -135,7 +135,7 @@ describe('CanvasComponentInsertionExecution', () => {
         ],
       },
       {
-        before: ['component-source', 'component-card'],
+        before: ['component-source'],
         after: ['component-next'],
       },
     )
@@ -144,6 +144,76 @@ describe('CanvasComponentInsertionExecution', () => {
       value: '',
     })
     expect(setTool).toHaveBeenCalledWith('select')
+  })
+
+  it.each([
+    {
+      direction: 'left' as const,
+      point: { x: -172, y: 60 },
+      connectorEnd: { x: 16, y: 134 },
+      connectorStart: { x: 40, y: 134 },
+    },
+    {
+      direction: 'top' as const,
+      point: { x: 40, y: -112 },
+      connectorEnd: { x: 134, y: 36 },
+      connectorStart: { x: 134, y: 60 },
+    },
+    {
+      direction: 'bottom' as const,
+      point: { x: 40, y: 232 },
+      connectorEnd: { x: 134, y: 232 },
+      connectorStart: { x: 134, y: 208 },
+    },
+  ])('quick-creates a connected sticky to the $direction', ({
+    connectorEnd,
+    connectorStart,
+    direction,
+    point,
+  }) => {
+    const source = createComponentItem({
+      h: 148,
+      id: 'component-source',
+      w: 188,
+      x: 40,
+      y: 60,
+    })
+    const next = createComponentItem({
+      h: 148,
+      id: 'component-next',
+      w: 188,
+      ...point,
+    })
+    const componentLibrary = createComponentLibrary(next)
+    const creationAdapter = createCreationAdapter()
+
+    expect(quickCreateCanvasSticky({
+      commitItemsChange: vi.fn(() => true),
+      componentLibrary,
+      creationAdapter,
+      createId: vi.fn((prefix) =>
+        prefix === 'arrow' ? 'arrow-next' : 'component-next',
+      ),
+      direction,
+      itemReadModel: createItemReadModel([source]),
+      selection: ['component-source'],
+      setEditing: vi.fn(),
+      setTool: vi.fn(),
+    })).toBe(true)
+
+    expect(componentLibrary.createItem).toHaveBeenCalledWith({
+      id: 'component-next',
+      point,
+      templateId: 'sticky',
+    })
+    expect(creationAdapter.createArrow).toHaveBeenCalledWith({
+      end: connectorEnd,
+      endAttachedTo: 'component-next',
+      id: 'arrow-next',
+      routing: 'elbow',
+      start: connectorStart,
+      startAttachedTo: 'component-source',
+    })
   })
 
   it('ignores quick-create when selection is not one sticky', () => {
@@ -163,11 +233,28 @@ describe('CanvasComponentInsertionExecution', () => {
       setTool: vi.fn(),
     })).toBe(false)
 
+    expect(quickCreateCanvasSticky({
+      commitItemsChange,
+      componentLibrary,
+      creationAdapter: createCreationAdapter(),
+      createId: vi.fn((prefix) => `${prefix}-next`),
+      itemReadModel: createItemReadModel([
+        createComponentItem({ id: 'component-sticky' }),
+        createComponentItem({
+          component: 'card',
+          id: 'component-card',
+        }),
+      ]),
+      selection: ['component-sticky', 'component-card'],
+      setEditing: vi.fn(),
+      setTool: vi.fn(),
+    })).toBe(false)
+
     expect(componentLibrary.createItem).not.toHaveBeenCalled()
     expect(commitItemsChange).not.toHaveBeenCalled()
   })
 
-  it('positions the sticky quick-create control next to one selected sticky', () => {
+  it('positions the sticky quick-create controls around one selected sticky', () => {
     const sticky = createComponentItem({
       h: 148,
       id: 'component-sticky',
@@ -177,20 +264,25 @@ describe('CanvasComponentInsertionExecution', () => {
     })
     const itemReadModel = createItemReadModel([sticky])
 
-    expect(getCanvasStickyQuickCreateControlPoint({
+    expect(getCanvasStickyQuickCreateControlPoints({
       itemReadModel,
       selection: ['component-sticky'],
       viewport: { scale: 2, x: 10, y: 20 },
-    })).toEqual({ x: 490, y: 288 })
+    })).toEqual([
+      { direction: 'right', x: 490, y: 288 },
+      { direction: 'bottom', x: 278, y: 460 },
+      { direction: 'left', x: 66, y: 288 },
+      { direction: 'top', x: 278, y: 116 },
+    ])
 
-    expect(getCanvasStickyQuickCreateControlPoint({
+    expect(getCanvasStickyQuickCreateControlPoints({
       itemReadModel: createItemReadModel([createComponentItem({
         component: 'card',
         id: 'component-card',
       })]),
       selection: ['component-card'],
       viewport: { scale: 2, x: 10, y: 20 },
-    })).toBeNull()
+    })).toEqual([])
   })
 })
 
@@ -200,7 +292,17 @@ function createComponentLibrary(
   return {
     createItem: vi.fn(() => item),
     getPresentation: vi.fn(() => 'note-card'),
-    getTemplate: vi.fn(),
+    getTemplate: vi.fn(() => ({
+      accent: item.accent,
+      fill: item.fill,
+      h: item.h,
+      id: item.component,
+      label: 'N',
+      presentation: 'note-card',
+      stroke: item.stroke,
+      title: item.title,
+      w: item.w,
+    })),
     templates: [],
   } as unknown as CanvasAppComponentLibrary
 }

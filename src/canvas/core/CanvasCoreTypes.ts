@@ -44,6 +44,8 @@ export type Bounds = Point & {
   h: number
 }
 
+export type CanvasSide = 'bottom' | 'left' | 'right' | 'top'
+
 export type ResizeHandle = 'nw' | 'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w'
 
 export type CanvasSelectionIds = CanvasItemId[]

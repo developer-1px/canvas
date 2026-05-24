@@ -154,7 +154,7 @@
 | `src/canvas/index.ts` | 외부 조립자와 Demo가 사용하는 Canvas package public entry |
 | `src/canvas/ui` | Toolbar, palette, status, editor controls |
 | `src/canvas/ui/drawing/CanvasDrawingControls.tsx` | Drawing style controls를 순수 view props로 렌더링한다 |
-| `src/canvas/ui/sticky/CanvasStickyQuickCreateControl.tsx` | Selected sticky 옆 quick-create control을 순수 view props로 렌더링한다 |
+| `src/canvas/ui/sticky/CanvasStickyQuickCreateControl.tsx` | Selected sticky 주변의 방향별 quick-create control을 순수 view props로 렌더링한다 |
 | `src/demo/CanvasDemoAssembly.ts` | canvas Module 밖에서 demo-specific custom item modules를 조립한다 |
 | `src/demo/custom-items` | demo-specific custom item module 구현과 해당 표현 스타일. `<name>/index.ts` convention으로 자동 수집한다 |
 
