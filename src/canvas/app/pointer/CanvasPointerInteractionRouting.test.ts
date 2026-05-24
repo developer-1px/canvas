@@ -11,6 +11,7 @@ describe('CanvasPointerInteractionRouting', () => {
     expect(route(createArrowEndpointInteraction()))
       .toBe('transform:arrow-endpoint')
     expect(route(createMarqueeInteraction())).toBe('marquee:marquee')
+    expect(route(createLaserInteraction())).toBe('laser:laser')
     expect(route(createRectCreationInteraction())).toBe('creation:create-rect')
     expect(route({ kind: 'none' })).toBe('none:none')
   })
@@ -29,6 +30,7 @@ function route(interaction: Interaction) {
   return routeCanvasPointerInteraction(interaction, {
     creation: (interaction) => `creation:${interaction.kind}`,
     fallback: () => 'fallback',
+    laser: (interaction) => `laser:${interaction.kind}`,
     marquee: (interaction) => `marquee:${interaction.kind}`,
     none: (interaction) => `none:${interaction.kind}`,
     pan: (interaction) => `pan:${interaction.kind}`,
@@ -107,6 +109,18 @@ function createMarqueeInteraction(): Interaction {
     kind: 'marquee',
     moved: false,
     pointerId: 1,
+    startScreen: { x: 0, y: 0 },
+    startWorld: { x: 0, y: 0 },
+  }
+}
+
+function createLaserInteraction(): Interaction {
+  return {
+    currentWorld: { x: 0, y: 0 },
+    kind: 'laser',
+    moved: false,
+    pointerId: 1,
+    points: [{ x: 0, y: 0 }],
     startScreen: { x: 0, y: 0 },
     startWorld: { x: 0, y: 0 },
   }

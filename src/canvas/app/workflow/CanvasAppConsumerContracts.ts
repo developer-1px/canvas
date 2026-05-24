@@ -10,6 +10,7 @@ import type {
   CanvasCreationAdapter,
   CanvasDistributeMode,
   CanvasDraftArrowOverlay,
+  CanvasLaserTrailOverlay,
   CanvasDraftStrokeOverlay,
   CanvasOverlayState,
   CanvasReorderMode,
@@ -305,6 +306,7 @@ export type CanvasAppKeyboardInteractionContext = {
   setDraftArrow: Dispatch<SetStateAction<CanvasDraftArrowOverlay | null>>
   setDraftRect: Dispatch<SetStateAction<Bounds | null>>
   setDraftStroke: Dispatch<SetStateAction<CanvasDraftStrokeOverlay | null>>
+  setLaserTrail: Dispatch<SetStateAction<CanvasLaserTrailOverlay | null>>
   setEditing: Dispatch<SetStateAction<EditingText | null>>
   setGesture: Dispatch<SetStateAction<Interaction['kind']>>
   setMarquee: Dispatch<SetStateAction<Bounds | null>>
@@ -381,6 +383,10 @@ export type CanvasInteractionDraftWriters = {
   setDraftStroke: Dispatch<SetStateAction<CanvasDraftStrokeOverlay | null>>
 }
 
+export type CanvasInteractionLaserWriters = {
+  setLaserTrail: Dispatch<SetStateAction<CanvasLaserTrailOverlay | null>>
+}
+
 export type CanvasInteractionMarqueeWriters = {
   setMarquee: Dispatch<SetStateAction<Bounds | null>>
 }
@@ -388,6 +394,7 @@ export type CanvasInteractionMarqueeWriters = {
 export type CanvasInteractionConsumerModelInput = {
   draft: CanvasInteractionDraftWriters
   gesture: Interaction['kind']
+  laser: CanvasInteractionLaserWriters
   marquee: CanvasInteractionMarqueeWriters
   overlays: CanvasOverlayState
   setGesture: Dispatch<SetStateAction<Interaction['kind']>>
@@ -410,6 +417,7 @@ export type CanvasInteractionControlContext = {
 
 export type CanvasInteractionKeyboardContext =
   CanvasInteractionDraftWriters &
+  CanvasInteractionLaserWriters &
   CanvasInteractionMarqueeWriters & {
     setGesture: Dispatch<SetStateAction<Interaction['kind']>>
     setSpaceDown: Dispatch<SetStateAction<boolean>>
@@ -418,6 +426,7 @@ export type CanvasInteractionKeyboardContext =
 
 export type CanvasInteractionPointerContext =
   CanvasInteractionDraftWriters &
+  CanvasInteractionLaserWriters &
   CanvasInteractionMarqueeWriters & {
     setGesture: Dispatch<SetStateAction<Interaction['kind']>>
     setSnapGuides: Dispatch<SetStateAction<CanvasSnapGuides>>
@@ -509,6 +518,7 @@ export type CanvasAppPointerInteractionModel = {
   setDraftArrow: Dispatch<SetStateAction<CanvasDraftArrowOverlay | null>>
   setDraftRect: Dispatch<SetStateAction<Bounds | null>>
   setDraftStroke: Dispatch<SetStateAction<CanvasDraftStrokeOverlay | null>>
+  setLaserTrail: Dispatch<SetStateAction<CanvasLaserTrailOverlay | null>>
   setGesture: Dispatch<SetStateAction<Interaction['kind']>>
   setMarquee: Dispatch<SetStateAction<Bounds | null>>
   setSnapGuides: Dispatch<SetStateAction<CanvasSnapGuides>>

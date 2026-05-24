@@ -13,6 +13,7 @@ import {
   createCanvasOverlayState,
   type CanvasAffordanceConfig,
   type CanvasDraftArrowOverlay,
+  type CanvasLaserTrailOverlay,
   type CanvasDraftStrokeOverlay,
   type CanvasPresenceOverlay,
   type CanvasSceneAdapter,
@@ -46,6 +47,8 @@ export function useCanvasInteractionModel({
   const [draftRect, setDraftRect] = useState<Bounds | null>(null)
   const [draftStroke, setDraftStroke] =
     useState<CanvasDraftStrokeOverlay | null>(null)
+  const [laserTrail, setLaserTrail] =
+    useState<CanvasLaserTrailOverlay | null>(null)
   const [snapGuides, setSnapGuides] = useState<CanvasSnapGuides>(
     EMPTY_CANVAS_SNAP_GUIDES,
   )
@@ -56,6 +59,7 @@ export function useCanvasInteractionModel({
         draftArrow,
         draftRect,
         draftStroke,
+        laserTrail,
         marquee,
         presence,
         scene,
@@ -68,6 +72,7 @@ export function useCanvasInteractionModel({
       draftArrow,
       draftRect,
       draftStroke,
+      laserTrail,
       marquee,
       presence,
       scene,
@@ -85,6 +90,9 @@ export function useCanvasInteractionModel({
     gesture,
     marquee: {
       setMarquee,
+    },
+    laser: {
+      setLaserTrail,
     },
     overlays,
     setGesture,

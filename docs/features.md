@@ -163,3 +163,6 @@
 159. 선택 객체에 reaction stamp를 추가해도 선택은 원래 객체에 남아 연속 반응을 붙일 수 있다.
 160. 같은 객체 또는 같은 selection bounds에 추가한 reaction stamp는 기존 stamp와 겹치지 않도록 간격을 두고 배치된다.
 161. Contextual reaction bar는 상단 객체 선택 시 toolbar 아래로 내려와 버튼 클릭을 방해받지 않는다.
+162. Laser pointer는 문서 item을 만들지 않는 built-in transient tool로 제공된다.
+163. Laser pointer drag는 SVG overlay trail과 현재 점을 표시하고 pointer 종료 시 사라진다.
+164. `P` shortcut은 Laser pointer tool을 활성화한다.

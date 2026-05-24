@@ -91,6 +91,16 @@ export function EraserIcon() {
   )
 }
 
+export function LaserIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M5 19 19 5" />
+      <path d="M14.5 4.5h5v5" />
+      <path d="M4.5 7.5 7 5M8.5 3.5l1-2M3.5 12l-2 1" />
+    </svg>
+  )
+}
+
 export function ArrowIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">

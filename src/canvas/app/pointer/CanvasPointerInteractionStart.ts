@@ -17,6 +17,7 @@ import type { CanvasDrawingStrokeStyleSet } from '../../host'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import { startCanvasPointerCreation } from './CanvasPointerCreationStart'
 import { startCanvasPointerEraserInteraction } from './CanvasPointerEraser'
+import { startCanvasPointerLaserInteraction } from './CanvasPointerLaser'
 import type {
   CanvasPointerInteractionStartResult,
 } from './CanvasPointerInteractionResultContracts'
@@ -95,6 +96,18 @@ export function startCanvasPointerInteraction({
 
   if (eraserStart) {
     return eraserStart
+  }
+
+  const laserStart = startCanvasPointerLaserInteraction({
+    config,
+    input,
+    pointerGesture,
+    startScreen,
+    startWorld,
+  })
+
+  if (laserStart) {
+    return laserStart
   }
 
   const creationStart = startCanvasPointerCreation({

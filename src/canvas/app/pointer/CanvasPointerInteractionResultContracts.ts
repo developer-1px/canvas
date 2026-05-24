@@ -7,6 +7,7 @@ import type {
 } from '../../entities'
 import type {
   CanvasDraftArrowOverlay,
+  CanvasLaserTrailOverlay,
   CanvasDraftStrokeOverlay,
   CanvasSnapGuides,
 } from '../../engine'
@@ -26,6 +27,7 @@ export type CanvasPointerCreationStartResult =
       draftStroke?: CanvasDraftStrokeOverlay
       gesture: Interaction['kind']
       interaction: Interaction
+      laserTrail?: CanvasLaserTrailOverlay
     }
   | {
       kind: 'created-item'
@@ -52,6 +54,7 @@ export type CanvasPointerInteractionStartResult =
       draftStroke?: CanvasDraftStrokeOverlay
       gesture: Interaction['kind']
       interaction: Interaction
+      laserTrail?: CanvasLaserTrailOverlay
     }
 
 export type CanvasPointerCreationPreviewResult =
@@ -73,6 +76,7 @@ export type CanvasPointerInteractionPreviewResult =
       draftStroke?: CanvasDraftStrokeOverlay
       interaction?: Interaction
       kind: 'preview'
+      laserTrail?: CanvasLaserTrailOverlay
       liveItems?: CanvasItem[]
       marquee?: Bounds
       selection?: string[]

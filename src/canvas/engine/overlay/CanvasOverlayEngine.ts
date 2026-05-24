@@ -32,6 +32,10 @@ export type CanvasDraftStrokeOverlay = {
   strokeWidth: number
 }
 
+export type CanvasLaserTrailOverlay = {
+  points: Point[]
+}
+
 export type CanvasPresenceOverlay = {
   color: string
   id: string
@@ -47,6 +51,7 @@ export type CanvasOverlayState = {
   draftStroke: CanvasDraftStrokeOverlay | null
   grid: boolean
   itemOutlineIds: Set<string>
+  laserTrail: CanvasLaserTrailOverlay | null
   marquee: Bounds | null
   presence?: readonly CanvasPresenceOverlay[]
   resizeHandles: CanvasResizeHandleOverlay[]
@@ -59,6 +64,7 @@ export function createCanvasOverlayState({
   draftArrow,
   draftRect,
   draftStroke,
+  laserTrail,
   marquee,
   presence = [],
   scene,
@@ -70,6 +76,7 @@ export function createCanvasOverlayState({
   draftArrow: CanvasDraftArrowOverlay | null
   draftRect: Bounds | null
   draftStroke: CanvasDraftStrokeOverlay | null
+  laserTrail: CanvasLaserTrailOverlay | null
   marquee: Bounds | null
   presence?: readonly CanvasPresenceOverlay[]
   scene: CanvasSceneAdapter
@@ -90,6 +97,7 @@ export function createCanvasOverlayState({
     itemOutlineIds: config.overlays.itemOutline
       ? new Set(selection)
       : new Set(),
+    laserTrail: config.overlays.laserTrail ? laserTrail : null,
     marquee: config.overlays.marquee ? marquee : null,
     presence: config.overlays.presence ? [...presence] : [],
     resizeHandles:

@@ -89,6 +89,15 @@ export type Interaction =
       moved: boolean
     }
   | {
+      kind: 'laser'
+      pointerId: number
+      startScreen: Point
+      startWorld: Point
+      currentWorld: Point
+      points: Point[]
+      moved: boolean
+    }
+  | {
       kind: 'create-arrow'
       pointerId: number
       startScreen: Point

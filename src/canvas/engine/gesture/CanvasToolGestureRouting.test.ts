@@ -31,6 +31,10 @@ describe('CanvasToolGestureRouting', () => {
       gesture: 'erase',
       routeItemPointerToCanvasGesture: true,
     })
+    expect(CANVAS_TOOL_GESTURE_ROUTES.laser).toMatchObject({
+      gesture: 'laser',
+      routeItemPointerToCanvasGesture: true,
+    })
     expect(CANVAS_TOOL_GESTURE_ROUTES.select).toMatchObject({
       routeItemPointerToCanvasGesture: false,
     })
@@ -55,6 +59,9 @@ describe('CanvasToolGestureRouting', () => {
     )
     expect(getCanvasToolPointerGesture({ config, tool: 'eraser' })).toBe(
       'erase',
+    )
+    expect(getCanvasToolPointerGesture({ config, tool: 'laser' })).toBe(
+      'laser',
     )
     expect(getCanvasToolPointerGesture({ config, tool: 'arrow' })).toBe(
       'create-arrow',
@@ -84,6 +91,7 @@ describe('CanvasToolGestureRouting', () => {
         drawHighlight: false,
         drawMarker: false,
         eraseDrawing: false,
+        laserPointer: false,
       },
     })
 
@@ -92,6 +100,8 @@ describe('CanvasToolGestureRouting', () => {
     expect(getCanvasToolPointerGesture({ config: disabled, tool: 'marker' }))
       .toBeNull()
     expect(getCanvasToolPointerGesture({ config: disabled, tool: 'eraser' }))
+      .toBeNull()
+    expect(getCanvasToolPointerGesture({ config: disabled, tool: 'laser' }))
       .toBeNull()
     expect(getCanvasToolPointerGesture({ config: disabled, tool: 'comment' }))
       .toBeNull()
@@ -143,6 +153,12 @@ describe('CanvasToolGestureRouting', () => {
       shouldRouteCanvasToolPointerToCanvasGesture({
         spaceDown: false,
         tool: 'section',
+      }),
+    ).toBe(true)
+    expect(
+      shouldRouteCanvasToolPointerToCanvasGesture({
+        spaceDown: false,
+        tool: 'laser',
       }),
     ).toBe(true)
     expect(

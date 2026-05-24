@@ -59,6 +59,10 @@ export function applyCanvasPointerInteractionPreviewEffect({
     context.setDraftArrow(preview.draftArrow)
   }
 
+  if (preview.laserTrail) {
+    context.setLaserTrail(preview.laserTrail)
+  }
+
   return true
 }
 
@@ -100,5 +104,6 @@ function resetCanvasPointerInteractionDragEffect(
   context.setDraftArrow(null)
   context.setDraftRect(null)
   context.setDraftStroke(null)
+  context.setLaserTrail(null)
   context.setSnapGuides(EMPTY_CANVAS_SNAP_GUIDES)
 }

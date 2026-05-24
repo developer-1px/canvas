@@ -13,6 +13,7 @@ import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import type { Interaction } from './CanvasInteractionState'
 import { previewCanvasPointerCreation } from './CanvasPointerCreationPreview'
 import { previewCanvasPointerEraserInteraction } from './CanvasPointerEraser'
+import { previewCanvasPointerLaserInteraction } from './CanvasPointerLaser'
 import type {
   CanvasPointerInteractionPreviewResult,
 } from './CanvasPointerInteractionResultContracts'
@@ -65,6 +66,13 @@ export function previewCanvasPointerInteraction({
           interaction,
           itemReadModel,
           scene,
+        }) ?? { kind: 'none' },
+      laser: (interaction) =>
+        previewCanvasPointerLaserInteraction({
+          config,
+          currentScreen,
+          currentWorld,
+          interaction,
         }) ?? { kind: 'none' },
       marquee: (interaction) =>
         previewCanvasPointerMarqueeInteraction({

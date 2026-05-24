@@ -28,6 +28,7 @@
 .canvas-stage[data-mode='marker'],
 .canvas-stage[data-mode='highlight'],
 .canvas-stage[data-mode='eraser'],
+.canvas-stage[data-mode='laser'],
 .canvas-stage[data-mode='arrow'],
 .canvas-stage[data-mode^='custom:'] {
   cursor: crosshair;
@@ -100,6 +101,22 @@
 .highlight-item,
 .draft-highlight {
   mix-blend-mode: multiply;
+}
+
+.laser-trail {
+  fill: none;
+  stroke: #e11d48;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 4;
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+.laser-point {
+  fill: #e11d48;
+  stroke: #ffffff;
+  stroke-width: 1.5;
 }
 
 .arrow-item,

@@ -12,6 +12,7 @@ import type {
 } from '../../entities'
 import type {
   CanvasDraftArrowOverlay,
+  CanvasLaserTrailOverlay,
   CanvasDraftStrokeOverlay,
   CanvasSnapGuides,
 } from '../../engine'
@@ -30,6 +31,7 @@ export type CanvasPointerInteractionStartEffectContext = {
   setDraftArrow: Dispatch<SetStateAction<CanvasDraftArrowOverlay | null>>
   setDraftRect: Dispatch<SetStateAction<Bounds | null>>
   setDraftStroke: Dispatch<SetStateAction<CanvasDraftStrokeOverlay | null>>
+  setLaserTrail: Dispatch<SetStateAction<CanvasLaserTrailOverlay | null>>
   setEditing: Dispatch<SetStateAction<EditingText | null>>
   setGesture: Dispatch<SetStateAction<Interaction['kind']>>
   setLiveItems: Dispatch<SetStateAction<CanvasItem[]>>
@@ -49,6 +51,7 @@ export type CanvasPointerInteractionDragEffectContext = {
   setDraftArrow: Dispatch<SetStateAction<CanvasDraftArrowOverlay | null>>
   setDraftRect: Dispatch<SetStateAction<Bounds | null>>
   setDraftStroke: Dispatch<SetStateAction<CanvasDraftStrokeOverlay | null>>
+  setLaserTrail: Dispatch<SetStateAction<CanvasLaserTrailOverlay | null>>
   setGesture: Dispatch<SetStateAction<Interaction['kind']>>
   setLiveItems: Dispatch<SetStateAction<CanvasItem[]>>
   setMarquee: Dispatch<SetStateAction<Bounds | null>>

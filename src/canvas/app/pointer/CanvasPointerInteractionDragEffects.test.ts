@@ -38,6 +38,9 @@ describe('CanvasPointerInteractionDragEffects', () => {
         },
         interaction,
         kind: 'preview',
+        laserTrail: {
+          points: [{ x: 5, y: 6 }],
+        },
         liveItems: [rect('rect-2')],
         marquee: { h: 20, w: 20, x: 0, y: 0 },
         selection: ['rect-2'],
@@ -108,6 +111,9 @@ describe('CanvasPointerInteractionDragEffects', () => {
     })
     expect(context.setDraftStroke).toHaveBeenCalled()
     expect(context.setDraftArrow).toHaveBeenCalled()
+    expect(context.setLaserTrail).toHaveBeenCalledWith({
+      points: [{ x: 5, y: 6 }],
+    })
   })
 
   it('ignores none preview descriptors', () => {
@@ -142,6 +148,7 @@ describe('CanvasPointerInteractionDragEffects', () => {
     expect(context.setDraftArrow).toHaveBeenCalledWith(null)
     expect(context.setDraftRect).toHaveBeenCalledWith(null)
     expect(context.setDraftStroke).toHaveBeenCalledWith(null)
+    expect(context.setLaserTrail).toHaveBeenCalledWith(null)
     expect(context.setSnapGuides).toHaveBeenCalledWith(
       EMPTY_CANVAS_SNAP_GUIDES,
     )
@@ -178,6 +185,7 @@ function createContext(
     setDraftArrow: vi.fn(),
     setDraftRect: vi.fn(),
     setDraftStroke: vi.fn(),
+    setLaserTrail: vi.fn(),
     setGesture: vi.fn(),
     setLiveItems: vi.fn(),
     setMarquee: vi.fn(),

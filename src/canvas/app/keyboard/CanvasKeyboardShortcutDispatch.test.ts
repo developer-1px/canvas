@@ -77,6 +77,7 @@ function createHandlers(): CanvasKeyboardShortcutDispatchHandlers {
     setDraftArrow: vi.fn(),
     setDraftRect: vi.fn(),
     setDraftStroke: vi.fn(),
+    setLaserTrail: vi.fn(),
     setEditing: vi.fn(),
     setGesture: vi.fn(),
     setMarquee: vi.fn(),

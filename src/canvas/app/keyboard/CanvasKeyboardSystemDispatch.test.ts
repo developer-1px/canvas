@@ -59,6 +59,7 @@ describe('CanvasKeyboardSystemDispatch', () => {
     expect(handlers.setDraftArrow).toHaveBeenCalledWith(null)
     expect(handlers.setDraftRect).toHaveBeenCalledWith(null)
     expect(handlers.setDraftStroke).toHaveBeenCalledWith(null)
+    expect(handlers.setLaserTrail).toHaveBeenCalledWith(null)
     expect(handlers.setEditing).toHaveBeenCalledWith(null)
     expect(handlers.commitSelection).toHaveBeenCalledWith([])
     expect(handlers.setTool).toHaveBeenCalledWith('select')
@@ -103,6 +104,7 @@ function createHandlers(
     setDraftArrow: vi.fn(),
     setDraftRect: vi.fn(),
     setDraftStroke: vi.fn(),
+    setLaserTrail: vi.fn(),
     setEditing: vi.fn(),
     setGesture: vi.fn(),
     setMarquee: vi.fn(),

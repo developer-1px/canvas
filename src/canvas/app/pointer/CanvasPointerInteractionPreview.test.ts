@@ -160,6 +160,34 @@ describe('CanvasPointerInteractionPreview', () => {
       kind: 'preview',
     })
   })
+
+  it('previews laser pointer trails as transient overlays', () => {
+    const result = previewCanvasPointerInteraction(createInput({
+      currentScreen: { x: 40, y: 20 },
+      currentWorld: { x: 40, y: 20 },
+      interaction: {
+        currentWorld: { x: 0, y: 0 },
+        kind: 'laser',
+        moved: false,
+        pointerId: 1,
+        points: [{ x: 0, y: 0 }],
+        startScreen: { x: 0, y: 0 },
+        startWorld: { x: 0, y: 0 },
+      },
+    }))
+
+    expect(result).toMatchObject({
+      interaction: {
+        kind: 'laser',
+        moved: true,
+        points: [{ x: 0, y: 0 }, { x: 40, y: 20 }],
+      },
+      kind: 'preview',
+      laserTrail: {
+        points: [{ x: 0, y: 0 }, { x: 40, y: 20 }],
+      },
+    })
+  })
 })
 
 function createInput(

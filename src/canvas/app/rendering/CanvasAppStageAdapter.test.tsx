@@ -23,6 +23,7 @@ describe('CanvasAppStageAdapter', () => {
         draftStroke: null,
         grid: true,
         itemOutlineIds: new Set(),
+        laserTrail: null,
         marquee: null,
         resizeHandles: [],
         selectionBounds: null,

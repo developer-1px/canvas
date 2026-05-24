@@ -11,6 +11,7 @@ export type CanvasBuiltinTool =
   | 'marker'
   | 'highlight'
   | 'eraser'
+  | 'laser'
   | 'arrow'
 
 export type CanvasCustomToolId = `custom:${string}`
@@ -29,6 +30,7 @@ export type CanvasInteractionKind =
   | 'draw-marker'
   | 'draw-highlight'
   | 'erase'
+  | 'laser'
   | 'arrow-endpoint'
   | 'resize'
 

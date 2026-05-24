@@ -37,6 +37,7 @@ describe('CanvasInteractionConsumerModel', () => {
 
     model.keyboard.setDraftRect({ h: 40, w: 30, x: 10, y: 20 })
     model.keyboard.setMarquee(null)
+    model.keyboard.setLaserTrail({ points: [{ x: 1, y: 2 }] })
     model.keyboard.setSpaceDown(false)
     model.pointer.setSnapGuides(nextGuides)
     model.pointer.setGesture('pan')
@@ -48,6 +49,9 @@ describe('CanvasInteractionConsumerModel', () => {
       y: 20,
     })
     expect(runtime.marquee.setMarquee).toHaveBeenCalledWith(null)
+    expect(runtime.laser.setLaserTrail).toHaveBeenCalledWith({
+      points: [{ x: 1, y: 2 }],
+    })
     expect(runtime.setSpaceDown).toHaveBeenCalledWith(false)
     expect(runtime.setSnapGuides).toHaveBeenCalledWith(nextGuides)
     expect(runtime.setGesture).toHaveBeenCalledWith('pan')
@@ -108,6 +112,9 @@ function createInteractionRuntime({
     marquee: {
       setMarquee: vi.fn(),
     },
+    laser: {
+      setLaserTrail: vi.fn(),
+    },
     overlays,
     setGesture: vi.fn(),
     setSnapGuides: vi.fn(),
@@ -126,6 +133,7 @@ function createOverlays(): CanvasOverlayState {
     draftStroke: null,
     grid: true,
     itemOutlineIds: new Set(['item-1']),
+    laserTrail: null,
     marquee: null,
     resizeHandles: [],
     selectionBounds: null,

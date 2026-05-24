@@ -5,6 +5,7 @@ import type {
 } from 'react'
 import type {
   CanvasDraftArrowOverlay,
+  CanvasLaserTrailOverlay,
   CanvasDraftStrokeOverlay,
   CanvasAffordanceConfig,
 } from '../../engine'
@@ -28,6 +29,7 @@ export type CanvasKeyboardSystemHandlers = {
   setDraftArrow: Dispatch<SetStateAction<CanvasDraftArrowOverlay | null>>
   setDraftRect: Dispatch<SetStateAction<Bounds | null>>
   setDraftStroke: Dispatch<SetStateAction<CanvasDraftStrokeOverlay | null>>
+  setLaserTrail: Dispatch<SetStateAction<CanvasLaserTrailOverlay | null>>
   setEditing: Dispatch<SetStateAction<EditingText | null>>
   setGesture: Dispatch<SetStateAction<Interaction['kind']>>
   setMarquee: Dispatch<SetStateAction<Bounds | null>>
@@ -51,6 +53,7 @@ const CANVAS_KEYBOARD_SYSTEM_INTENT_DISPATCH =
       handlers.setDraftArrow(null)
       handlers.setDraftRect(null)
       handlers.setDraftStroke(null)
+      handlers.setLaserTrail(null)
       handlers.setEditing(null)
       handlers.commitSelection([])
       handlers.setTool('select')

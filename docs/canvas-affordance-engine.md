@@ -103,7 +103,7 @@
 | `src/canvas/app/workflow/CanvasAppStageModel.tsx` | stage와 item layer Adapter 호출 순서, text editor blur, context menu 차단, render 실패 containment를 소유한다 |
 | `src/canvas/app/workflow/CanvasWorkflowContract.ts` | App workflow hook들이 공유하는 document commit, selection, clipboard contract |
 | `src/canvas/app/workflow/useCanvasFindReplaceModel.ts` | document text search 상태와 Find/Replace control props를 App Shell에 숨긴다 |
-| `src/canvas/app/workflow/useCanvasInteractionModel.ts` | tool, gesture, marquee, draft, snap guide, overlay 상태 생명주기를 App Shell에 숨긴다 |
+| `src/canvas/app/workflow/useCanvasInteractionModel.ts` | tool, gesture, marquee, draft, laser trail, snap guide, overlay 상태 생명주기를 App Shell에 숨긴다 |
 | `src/canvas/app/workflow/useCanvasTextEditorModel.ts` | text editing state, editable item lookup, text editor props를 App Shell에 숨긴다 |
 | `src/canvas/app/workflow/useCanvasWorkspaceModel.ts` | 저장된 workspace snapshot, document history, viewport, read model, id 생성을 App Shell에 숨긴다 |
 | `src/canvas/app/authoring/index.ts` | `canvas/app/authoring` subpath로 외부 조립자가 쓰는 assembly input과 custom descriptor 계약을 모으고 App runtime hook/default/validator를 제외한다 |
@@ -122,6 +122,7 @@
 | `src/canvas/app/pointer/CanvasPointerInteractionPreview.ts` | Pointer-move 시 active interaction을 viewport, live item, marquee, selection, draft overlay, snap guide preview로 변환한다 |
 | `src/canvas/app/pointer/CanvasPointerCreationPreview.ts` | Create-rect, marker, highlighter, arrow, custom creation의 draft overlay와 currentWorld/moved preview를 소유한다 |
 | `src/canvas/app/pointer/CanvasPointerEraser.ts` | Built-in eraser gesture의 freehand stroke hit-test와 whole-stroke document removal을 소유한다 |
+| `src/canvas/app/pointer/CanvasPointerLaser.ts` | Built-in laser pointer gesture의 document-free transient trail interaction을 소유한다 |
 | `src/canvas/app/pointer/CanvasPointerCommentCreation.ts` | Comment tool click을 Canvas Comment Item 생성과 optional clicked-item attachment로 변환한다 |
 | `src/canvas/app/pointer/CanvasPointerComponentCreation.ts` | Sticky note tool click을 Component Library `sticky` template 기반 component item 생성과 생성 직후 text edit 진입으로 변환한다 |
 | `src/canvas/app/components/CanvasComponentInsertionExecution.ts` | Component palette insertion과 sticky quick-create의 연결 sticky 생성, connector 생성, 컨트롤 위치 계산을 소유한다 |
@@ -256,7 +257,7 @@ type CanvasAffordanceConfig = {
 - Pointer down hook은 DOM pointer routing과 coordinate 변환을 맡고, tool/gesture/config/custom tool 기반 interaction 시작 규칙은 Canvas Pointer Interaction Start가, built-in sticky/component-backed creation은 Canvas Pointer Component Creation이, 시작 결과 적용은 Canvas Pointer Interaction Start Effects가 소유한다.
 - Item pointer down hook은 DOM event routing과 시작 결과 적용을 맡고, selection/edit/duplicate/move 시작 규칙은 Canvas Item Pointer Interaction Start가 소유한다.
 - Pointer drag hook은 DOM pointer routing과 preview 결과 적용을 맡고, pointer-move live preview 계산은 Canvas Pointer Interaction Preview가, 생성/드로잉 draft preview는 Canvas Pointer Creation Preview가, pointer-up/cancel 확정 규칙은 Canvas Pointer Interaction Lifecycle이 소유한다.
-- Sticky note, marker, highlighter, eraser, arrow, comment, reaction stamp는 제품별 custom item이 아니라 내부 Affordance다. Sticky note는 별도 entity 없이 Component Library의 `sticky` template을 component item으로 생성하고, sticky body 편집, quick-create, 텍스트 기반 세로 auto-grow는 Host sticky/editable text contract를 재사용한다. Comment body 표시와 편집도 Host comment/editable text contract가 소유한다. Reaction stamp는 선택 객체에 붙어도 선택을 훔치지 않고, 같은 target의 stamp끼리 겹치지 않게 App stamp insertion이 배치한다. Drawing Item의 `x/y/w/h`는 외부 입력이 아니라 `points` 또는 `start/end`에서 Host tree/document가 동기화하는 canonical bounds다. Arrow connector endpoint attachment는 Host Drawing Item Geometry가 start/end 단위로 이동시킨다. Drawing Item style 기본값은 Host Drawing Item Style Module이 소유하고 draft overlay와 item creation이 같은 값을 쓴다. Marker/highlighter 렌더링은 connector path와 분리된 freehand smoothing primitive를 쓰고, eraser는 freehand stroke를 whole-stroke document removal로 처리한다.
+- Sticky note, marker, highlighter, eraser, arrow, comment, reaction stamp, laser pointer는 제품별 custom item이 아니라 내부 Affordance다. Sticky note는 별도 entity 없이 Component Library의 `sticky` template을 component item으로 생성하고, sticky body 편집, quick-create, 텍스트 기반 세로 auto-grow는 Host sticky/editable text contract를 재사용한다. Comment body 표시와 편집도 Host comment/editable text contract가 소유한다. Reaction stamp는 선택 객체에 붙어도 선택을 훔치지 않고, 같은 target의 stamp끼리 겹치지 않게 App stamp insertion이 배치한다. Laser pointer는 document item을 만들지 않고 App pointer interaction과 Engine overlay state로만 유지된다. Drawing Item의 `x/y/w/h`는 외부 입력이 아니라 `points` 또는 `start/end`에서 Host tree/document가 동기화하는 canonical bounds다. Arrow connector endpoint attachment는 Host Drawing Item Geometry가 start/end 단위로 이동시킨다. Drawing Item style 기본값은 Host Drawing Item Style Module이 소유하고 draft overlay와 item creation이 같은 값을 쓴다. Marker/highlighter 렌더링은 connector path와 분리된 freehand smoothing primitive를 쓰고, eraser는 freehand stroke를 whole-stroke document removal로 처리한다.
 - Core primitive facade는 resize/handle/scale 규칙을 직접 구현하지 않고 Canvas Bounds Resize에 위임한다.
 - 제품별 item kind는 내부 `CanvasItem` variant를 추가하지 않고 Canvas App Custom Item Module로 묶어 등록한다.
 - Canvas App Custom Item Module의 `id`는 소유한 custom item kind이며, module은 `presentation`, `renderItem`, `validateItem`을 받아 renderer registry와 validator registry를 내부에서 조립한다.
@@ -289,7 +290,7 @@ type CanvasAffordanceConfig = {
 - Canvas App Adapter Assembly는 item, item layer, stage adapter fallback 조립을 소유하고, Canvas App Assembly는 adapter 선택 규칙을 직접 알지 않는다.
 - App workflow와 command/pointer/viewport hook은 raw SVG ref를 직접 읽지 않고 Canvas App Stage Element를 통해 stage DOM 기능을 사용한다.
 - App rendering Adapter의 public render input은 React/SVG pointer event를 직접 요구하지 않고 Canvas App Pointer Input을 사용한다.
-- Collaborator presence는 document item이 아니라 runtime overlay state다. Host App은 `CanvasApp` presence prop으로 현재 collaborator cursor와 remote selection bounds를 주입하고, Renderer는 viewport scale을 보정해 화면상 cursor와 label 크기를 유지한다.
+- Collaborator presence와 laser trail은 document item이 아니라 runtime overlay state다. Host App은 `CanvasApp` presence prop으로 현재 collaborator cursor와 remote selection bounds를 주입하고, Renderer는 viewport scale을 보정해 화면상 cursor와 label 크기를 유지한다.
 - 알 수 없는 stable component kind는 forward compatibility를 위해 기본 template로 fallback할 수 있지만, malformed component kind는 schema validation 또는 component lookup 단계에서 실패한다.
 - 저장된 workspace snapshot은 현재 custom item validator로 다시 검증한다. validator가 바뀌어 저장 payload가 더 이상 유효하지 않으면 저장 snapshot을 제거하고 앱 초기값으로 시작한다.
 - Canvas App Assembly는 `workspaceStorageProvider`를 받아 Workspace Persistence에 전달하고, App workflow가 browser `localStorage`를 직접 선택하지 않게 한다.
@@ -301,7 +302,7 @@ type CanvasAffordanceConfig = {
 - Custom creation tool shortcut이 내부 canvas shortcut, shift-insensitive built-in shortcut, temporary pan, nudge shortcut, 다른 custom creation tool shortcut과 겹치면 assembly 단계에서 실패한다.
 - 제품별 renderer 세부 스타일은 canvas shell CSS에 두지 않고 Host App/Demo module 쪽에서 소유한다.
 - 제품별 inspector UI는 기본 Object Inspector 구현을 수정하지 않고 Canvas App Assembly의 inspector panel descriptor로 등록한다.
-- Linked peer dependency는 앱 번들에 한 번만 들어가야 한다. Package manifest는 React, React DOM, Zod를 peer dependency로 열고, Vite config는 `zod-crud` 같은 linked package가 `react`, `react-dom`, `zod`를 중복 번들링하지 않도록 dedupe하고, local dev server를 `127.0.0.1:5173` strict port로 고정하며, production build에서 React runtime을 별도 chunk로 분리한다.
+- Linked peer dependency는 앱 번들에 한 번만 들어가야 한다. Package manifest는 React, React DOM, Zod를 peer dependency로 열고, Vite config는 `zod-crud` 같은 linked package가 `react`, `react-dom`, `zod`를 중복 번들링하지 않도록 dedupe하고, linked dist 경로를 dev server fs allowlist에 넣으며, local dev server를 loopback host `:5173` strict port로 고정하고, production build에서 React runtime을 별도 chunk로 분리한다.
 - 위 import 경계는 `src/canvas/architecture/CanvasModuleBoundaries.test.ts`에서 검증한다.
 
 추출 순서는 동작 변경 없이 app workflow에서 Engine 책임을 하나씩 떼어내는 방식으로 진행한다.

@@ -20,6 +20,7 @@ describe('CanvasAffordanceMetadata', () => {
       'marker',
       'highlight',
       'eraser',
+      'laser',
       'arrow',
     ])
     expect(new Set(CANVAS_TOOL_AFFORDANCE_ORDER).size).toBe(
@@ -54,6 +55,11 @@ describe('CanvasAffordanceMetadata', () => {
       shiftInsensitive: true,
       shortcutId: 'eraserTool',
     })
+    expect(CANVAS_TOOL_AFFORDANCES.laser.keyboardShortcut).toEqual({
+      key: 'p',
+      shiftInsensitive: true,
+      shortcutId: 'laserTool',
+    })
     expect(CANVAS_TOOL_AFFORDANCES.sticky.keyboardShortcut).toEqual({
       key: 's',
       shortcutId: 'stickyTool',
@@ -70,6 +76,7 @@ describe('CanvasAffordanceMetadata', () => {
     )
     expect(CANVAS_TOOL_AFFORDANCES.select.shortcut).toBe('V')
     expect(CANVAS_TOOL_AFFORDANCES.eraser.shortcut).toBe('E')
+    expect(CANVAS_TOOL_AFFORDANCES.laser.shortcut).toBe('P')
     expect(CANVAS_TOOL_AFFORDANCES.select.title).toBe('Select (V)')
   })
 

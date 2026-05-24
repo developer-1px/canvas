@@ -35,6 +35,7 @@ export function useCanvasAppKeyboardModel({
     setDraftArrow: interaction.setDraftArrow,
     setDraftRect: interaction.setDraftRect,
     setDraftStroke: interaction.setDraftStroke,
+    setLaserTrail: interaction.setLaserTrail,
     setEditing: interaction.setEditing,
     setGesture: interaction.setGesture,
     setMarquee: interaction.setMarquee,

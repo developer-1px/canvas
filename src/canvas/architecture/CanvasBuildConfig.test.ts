@@ -13,6 +13,9 @@ type CanvasViteConfig = {
     dedupe?: string[]
   }
   server?: {
+    fs?: {
+      allow?: string[]
+    }
     host?: string
     port?: number
     strictPort?: boolean
@@ -20,6 +23,11 @@ type CanvasViteConfig = {
 }
 
 const config = viteConfig as CanvasViteConfig
+const linkedDocumentPackageDist = [
+  'zod',
+  'crud/packages/zod',
+  'crud/dist',
+].join('-')
 
 describe('Canvas build config', () => {
   it('keeps linked peer dependencies deduped', () => {
@@ -43,6 +51,12 @@ describe('Canvas build config', () => {
 
   it('keeps the local dev server port deterministic across loopback hosts', () => {
     expect(config.server).toMatchObject({
+      fs: {
+        allow: [
+          expect.stringContaining('@interactive-os/canvas'),
+          expect.stringContaining(linkedDocumentPackageDist),
+        ],
+      },
       host: '::',
       port: 5173,
       strictPort: true,

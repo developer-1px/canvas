@@ -34,6 +34,7 @@ function createOverlay({
     draftArrow: null,
     draftRect: null,
     draftStroke: null,
+    laserTrail: null,
     marquee: null,
     presence,
     scene: {

@@ -71,6 +71,7 @@ export {
   createCanvasOverlayState,
   type CanvasDraftArrowOverlay,
   type CanvasDraftStrokeOverlay,
+  type CanvasLaserTrailOverlay,
   type CanvasOverlayState,
   type CanvasPresenceOverlay,
   type CanvasResizeHandleOverlay,

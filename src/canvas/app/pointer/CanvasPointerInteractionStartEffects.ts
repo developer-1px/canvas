@@ -81,6 +81,10 @@ export function applyCanvasPointerInteractionStartEffect({
     context.setDraftArrow(start.draftArrow)
   }
 
+  if (start.laserTrail) {
+    context.setLaserTrail(start.laserTrail)
+  }
+
   context.setGesture(start.gesture)
   return true
 }

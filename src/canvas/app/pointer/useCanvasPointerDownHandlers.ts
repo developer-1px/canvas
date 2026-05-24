@@ -22,6 +22,7 @@ import type {
   CanvasAffordanceConfig,
   CanvasCreationAdapter,
   CanvasDraftArrowOverlay,
+  CanvasLaserTrailOverlay,
   CanvasDraftStrokeOverlay,
   CanvasSceneAdapter,
 } from '../../engine'
@@ -76,6 +77,7 @@ type UseCanvasPointerDownHandlersArgs = {
   setDraftArrow: Dispatch<SetStateAction<CanvasDraftArrowOverlay | null>>
   setDraftRect: Dispatch<SetStateAction<Bounds | null>>
   setDraftStroke: Dispatch<SetStateAction<CanvasDraftStrokeOverlay | null>>
+  setLaserTrail: Dispatch<SetStateAction<CanvasLaserTrailOverlay | null>>
   setEditing: Dispatch<SetStateAction<EditingText | null>>
   setGesture: Dispatch<SetStateAction<Interaction['kind']>>
   setLiveItems: Dispatch<SetStateAction<CanvasItem[]>>
@@ -106,6 +108,7 @@ export function useCanvasPointerDownHandlers({
   setDraftArrow,
   setDraftRect,
   setDraftStroke,
+  setLaserTrail,
   setEditing,
   setGesture,
   setLiveItems,
@@ -125,6 +128,7 @@ export function useCanvasPointerDownHandlers({
     setDraftArrow,
     setDraftRect,
     setDraftStroke,
+    setLaserTrail,
     setEditing,
     setGesture,
     setLiveItems,

@@ -220,6 +220,39 @@ describe('CanvasPointerInteractionStartEffects', () => {
     })
     expect(context.setTool).toHaveBeenCalledWith('select')
   })
+
+  it('applies transient laser trail start state', () => {
+    const context = createContext()
+    const event = createPointerInput()
+
+    applyCanvasPointerInteractionStartEffect({
+      context,
+      event,
+      start: {
+        capturePointer: true,
+        gesture: 'laser',
+        interaction: {
+          currentWorld: { x: 10, y: 12 },
+          kind: 'laser',
+          moved: false,
+          pointerId: 1,
+          points: [{ x: 10, y: 12 }],
+          startScreen: { x: 10, y: 12 },
+          startWorld: { x: 10, y: 12 },
+        },
+        kind: 'interaction',
+        laserTrail: {
+          points: [{ x: 10, y: 12 }],
+        },
+      },
+    })
+
+    expect(context.interactionRef.current.kind).toBe('laser')
+    expect(context.setLaserTrail).toHaveBeenCalledWith({
+      points: [{ x: 10, y: 12 }],
+    })
+    expect(context.setGesture).toHaveBeenCalledWith('laser')
+  })
 })
 
 function createContext(): CanvasPointerInteractionStartEffectContext {
@@ -231,6 +264,7 @@ function createContext(): CanvasPointerInteractionStartEffectContext {
     setDraftArrow: vi.fn(),
     setDraftRect: vi.fn(),
     setDraftStroke: vi.fn(),
+    setLaserTrail: vi.fn(),
     setEditing: vi.fn(),
     setGesture: vi.fn(),
     setLiveItems: vi.fn(),

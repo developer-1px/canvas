@@ -57,6 +57,27 @@ describe('CanvasPointerInteractionStart', () => {
     })
   })
 
+  it('starts laser pointer gestures with a transient trail overlay', () => {
+    const result = startCanvasPointerInteraction(createInput({
+      startScreen: { x: 40, y: 60 },
+      startWorld: { x: 80, y: 120 },
+      tool: 'laser',
+    }))
+
+    expect(result).toMatchObject({
+      capturePointer: true,
+      gesture: 'laser',
+      interaction: {
+        kind: 'laser',
+        points: [{ x: 80, y: 120 }],
+      },
+      kind: 'interaction',
+      laserTrail: {
+        points: [{ x: 80, y: 120 }],
+      },
+    })
+  })
+
   it('creates text immediately without starting pointer capture', () => {
     const result = startCanvasPointerInteraction(createInput({
       createId: () => 'text-1',

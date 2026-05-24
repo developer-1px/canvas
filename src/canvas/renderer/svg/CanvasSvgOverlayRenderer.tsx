@@ -108,6 +108,16 @@ export function CanvasSvgInteractionOverlays({
         />
       ) : null}
 
+      {overlays.laserTrail ? (
+        <g className="laser-trail">
+          <path
+            d={createCanvasSvgFreehandPathData(overlays.laserTrail.points)}
+            vectorEffect="non-scaling-stroke"
+          />
+          <CanvasSvgLaserPoint points={overlays.laserTrail.points} />
+        </g>
+      ) : null}
+
       {overlays.alignmentGuides.length > 0 ? (
         <g className="alignment-guides">
           {overlays.alignmentGuides.map((guide, index) =>
@@ -226,6 +236,24 @@ export function CanvasSvgInteractionOverlays({
       ) : null}
     </>
   )
+}
+
+function CanvasSvgLaserPoint({
+  points,
+}: {
+  points: readonly { x: number; y: number }[]
+}) {
+  const point = points[points.length - 1]
+
+  return point ? (
+    <circle
+      className="laser-point"
+      cx={point.x}
+      cy={point.y}
+      r="4"
+      vectorEffect="non-scaling-stroke"
+    />
+  ) : null
 }
 
 function CanvasSvgPresenceSelection({
