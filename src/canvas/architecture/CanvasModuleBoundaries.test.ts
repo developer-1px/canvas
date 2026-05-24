@@ -6250,8 +6250,17 @@ describe('Canvas module boundaries', () => {
     expect(documentRuntimeContractsFile.source).toContain(
       'export type CanvasDocumentCommittedState',
     )
+    expect(documentRuntimeContractsFile.source).not.toContain(
+      "from '../../host'",
+    )
+    expect(documentRuntimeContractsFile.source).toContain(
+      "from '../../core'",
+    )
     expect(documentRuntimeContractsFile.source).toContain(
       "from '../../entities'",
+    )
+    expect(documentRuntimeContractsFile.source).toContain(
+      'export type CanvasDocumentRuntimeController',
     )
     expect(documentRuntimeContractsFile.source).toContain(
       'export type CanvasDocumentHistoryState',

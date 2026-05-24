@@ -6,9 +6,9 @@ import {
 } from 'vitest'
 import type { CanvasItem } from '../../entities'
 import type {
-  CanvasDocumentController,
-  CanvasDocumentHistoryAvailability,
-} from '../../host'
+  CanvasDocumentRuntimeController,
+  CanvasDocumentRuntimeHistoryAvailability,
+} from './CanvasDocumentRuntimeContracts'
 import {
   applyCanvasDocumentHistoryResult,
   commitCanvasDocumentItemsChange,
@@ -209,15 +209,13 @@ describe('CanvasDocumentRuntime', () => {
 })
 
 function createDocument(
-  overrides: Partial<CanvasDocumentController> = {},
-): CanvasDocumentController {
+  overrides: Partial<CanvasDocumentRuntimeController> = {},
+): CanvasDocumentRuntimeController {
   return {
     commitItemsChange: vi.fn(() => true),
     commitSelection: vi.fn(() => true),
-    copySelectionToClipboard: vi.fn(() => true),
     findText: vi.fn(() => []),
-    readClipboardItems: vi.fn(() => []),
-    readHistoryAvailability: vi.fn<() => CanvasDocumentHistoryAvailability>(
+    readHistoryAvailability: vi.fn<() => CanvasDocumentRuntimeHistoryAvailability>(
       () => ({ canRedo: false, canUndo: false }),
     ),
     readItems: vi.fn(() => []),
@@ -226,9 +224,7 @@ function createDocument(
     replaceItems: vi.fn((currentItems) => currentItems),
     replaceText: vi.fn(() => true),
     restoreSelection: vi.fn(),
-    subscribeSelection: vi.fn(),
     undo: vi.fn(() => null),
-    writeClipboardItems: vi.fn(() => true),
     ...overrides,
   }
 }
