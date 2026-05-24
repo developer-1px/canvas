@@ -7,10 +7,10 @@ import type {
   CanvasItem,
   EditingText,
 } from '../../entities'
-import {
-  executeCanvasStandardCommand,
-  type CanvasEditingUpdate,
-} from './CanvasStandardCommandExecution'
+import { executeCanvasStandardCommand } from './CanvasStandardCommandExecution'
+import type {
+  CanvasEditingUpdate,
+} from './CanvasStandardCommandDocumentEffectContracts'
 
 const rect1 = createRectItem('rect-1')
 const rect2 = createRectItem('rect-2', { x: 120 })

@@ -4,12 +4,6 @@ import type {
   CanvasStandardCommandItemsChange,
 } from './CanvasStandardCommandDocumentEffectContracts'
 
-export type {
-  CanvasEditingUpdate,
-  CanvasStandardCommandDocumentEffect,
-  CanvasStandardCommandDocumentEffectContext,
-} from './CanvasStandardCommandDocumentEffectContracts'
-
 type CanvasStandardReplaceChangedChange = Extract<
   CanvasStandardCommandItemsChange,
   { type: 'replace-changed' }

@@ -3,7 +3,7 @@ import type {
   CanvasDistributeMode,
   CanvasReorderMode,
 } from '../../engine'
-import type { CanvasStandardCommand } from './CanvasStandardCommandExecution'
+import type { CanvasStandardCommand } from './CanvasStandardCommandContracts'
 
 export type RunCanvasStandardCommand = (command: CanvasStandardCommand) => void
 

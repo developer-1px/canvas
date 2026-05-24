@@ -7,8 +7,10 @@ import {
   createCanvasStandardReplaceChangedEffect,
   createCanvasStandardSelectionEffect,
   createCanvasStandardUngroupSelectionEffect,
-  type CanvasStandardCommandDocumentEffect,
 } from './CanvasStandardCommandDocumentEffects'
+import type {
+  CanvasStandardCommandDocumentEffect,
+} from './CanvasStandardCommandDocumentEffectContracts'
 
 export type CanvasStandardChangedItemsResult = {
   items: CanvasItem[]

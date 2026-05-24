@@ -1,15 +1,14 @@
 import {
   applyCanvasStandardDocumentEffect,
-  type CanvasStandardCommandDocumentEffectContext,
 } from './CanvasStandardCommandDocumentEffects'
+import type {
+  CanvasStandardCommandDocumentEffectContext,
+} from './CanvasStandardCommandDocumentEffectContracts'
 import {
   createCanvasStandardCommandEffectPlan,
   type CanvasStandardCommandEffectPlanContext,
 } from './CanvasStandardCommandEffectPlan'
 import type { CanvasStandardCommand } from './CanvasStandardCommandContracts'
-
-export type { CanvasEditingUpdate } from './CanvasStandardCommandDocumentEffects'
-export type { CanvasStandardCommand } from './CanvasStandardCommandContracts'
 
 export type CanvasStandardCommandExecutionContext =
   CanvasStandardCommandDocumentEffectContext &

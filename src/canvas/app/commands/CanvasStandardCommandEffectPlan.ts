@@ -17,10 +17,10 @@ import {
 } from '../../engine'
 import type { CanvasItem } from '../../entities'
 import type { CanvasStandardCommand } from './CanvasStandardCommandContracts'
-import {
-  createCanvasStandardHistoryEffect,
-  type CanvasStandardCommandDocumentEffect,
-} from './CanvasStandardCommandDocumentEffects'
+import type {
+  CanvasStandardCommandDocumentEffect,
+} from './CanvasStandardCommandDocumentEffectContracts'
+import { createCanvasStandardHistoryEffect } from './CanvasStandardCommandDocumentEffects'
 import {
   createCanvasStandardChangedItemsResultEffect,
   createCanvasStandardGroupSelectionResultEffect,

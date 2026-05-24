@@ -19,10 +19,8 @@ import type {
   CommitCanvasSelection,
 } from '../workflow/CanvasWorkflowContract'
 import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
-import {
-  executeCanvasStandardCommand,
-  type CanvasStandardCommand,
-} from './CanvasStandardCommandExecution'
+import type { CanvasStandardCommand } from './CanvasStandardCommandContracts'
+import { executeCanvasStandardCommand } from './CanvasStandardCommandExecution'
 import { getCanvasStandardCommandHandlers } from './CanvasStandardCommandHandlers'
 import { useCanvasClipboardCommands } from './useCanvasClipboardCommands'
 

@@ -1446,6 +1446,15 @@ describe('Canvas module boundaries', () => {
     expect(commandHookFile.source).toContain(
       "from './CanvasStandardCommandHandlers'",
     )
+    expect(commandHookFile.source).toContain(
+      "from './CanvasStandardCommandContracts'",
+    )
+    expect(standardCommandHandlersFile.source).toContain(
+      "from './CanvasStandardCommandContracts'",
+    )
+    expect(standardCommandHandlersFile.source).not.toContain(
+      "from './CanvasStandardCommandExecution'",
+    )
     for (const standardCommandHandlerDetail of [
       "kind: 'align'",
       "kind: 'delete'",
@@ -3770,6 +3779,9 @@ describe('Canvas module boundaries', () => {
     expect(executionFile.source).toContain(
       "from './CanvasStandardCommandContracts'",
     )
+    expect(executionFile.source).not.toContain(
+      'export type { CanvasStandardCommand',
+    )
     expect(executionFile.source).toContain(
       'applyCanvasStandardDocumentEffect',
     )
@@ -3797,6 +3809,9 @@ describe('Canvas module boundaries', () => {
     )
     expect(effectPlanFile.source).toContain(
       "from './CanvasStandardCommandContracts'",
+    )
+    expect(effectPlanFile.source).toContain(
+      "from './CanvasStandardCommandDocumentEffectContracts'",
     )
     expect(effectPlanFile.source).not.toContain(
       'export type CanvasStandardCommand =',
@@ -3870,10 +3885,14 @@ describe('Canvas module boundaries', () => {
     expect(executionFile.source).toContain(
       "from './CanvasStandardCommandDocumentEffects'",
     )
+    expect(executionFile.source).toContain(
+      "from './CanvasStandardCommandDocumentEffectContracts'",
+    )
     expect(effectsFile.source).toContain(
       "from './CanvasStandardCommandDocumentEffectContracts'",
     )
     expect(effectsFile.source).not.toContain('Parameters<')
+    expect(effectsFile.source).not.toContain('export type {')
     expect(effectContractsFile.source).toContain(
       'export type CanvasStandardCommandDocumentEffect',
     )

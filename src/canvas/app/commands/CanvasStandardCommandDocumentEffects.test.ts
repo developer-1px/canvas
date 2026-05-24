@@ -7,9 +7,11 @@ import {
   createCanvasStandardGroupSelectionEffect,
   createCanvasStandardRemoveSelectionEffect,
   createCanvasStandardReplaceChangedEffect,
-  type CanvasEditingUpdate,
-  type CanvasStandardCommandDocumentEffectContext,
 } from './CanvasStandardCommandDocumentEffects'
+import type {
+  CanvasEditingUpdate,
+  CanvasStandardCommandDocumentEffectContext,
+} from './CanvasStandardCommandDocumentEffectContracts'
 
 describe('CanvasStandardCommandDocumentEffects', () => {
   it('creates standard item change effect descriptors', () => {
