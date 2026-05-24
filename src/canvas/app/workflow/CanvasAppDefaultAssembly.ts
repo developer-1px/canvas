@@ -16,6 +16,9 @@ import {
   CANVAS_ARROW_ROUTING_INSPECTOR_PANEL,
 } from '../drawing/CanvasArrowRoutingInspectorPanel'
 import {
+  CANVAS_KANBAN_INSPECTOR_PANEL,
+} from '../kanban/CanvasKanbanInspectorPanel'
+import {
   CANVAS_LINK_PREVIEW_INSPECTOR_PANEL,
 } from '../link/CanvasLinkPreviewInspectorPanel'
 import { DEFAULT_CANVAS_APP_ITEM_LAYER_ADAPTER } from '../rendering/CanvasAppItemLayerAdapter'
@@ -37,6 +40,7 @@ export const DEFAULT_CANVAS_APP_ASSEMBLY: CanvasAppAssembly =
         CANVAS_LINK_PREVIEW_INSPECTOR_PANEL,
         CANVAS_ARROW_ROUTING_INSPECTOR_PANEL,
         CANVAS_CHECKLIST_INSPECTOR_PANEL,
+        CANVAS_KANBAN_INSPECTOR_PANEL,
       ],
     }),
     affordanceConfig: DEFAULT_CANVAS_AFFORDANCE_CONFIG,

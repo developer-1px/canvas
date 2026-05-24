@@ -60,6 +60,21 @@ export {
   type CanvasChecklistComponentItem,
 } from './component/CanvasChecklistComponent'
 export {
+  CANVAS_KANBAN_COMPONENT_KIND,
+  addCanvasKanbanCard,
+  getCanvasKanbanCards,
+  isCanvasKanbanComponentItem,
+  moveCanvasKanbanCard,
+  removeCanvasKanbanCard,
+  replaceCanvasKanbanComponentCardText,
+  replaceCanvasKanbanComponentsWithAddedCard,
+  replaceCanvasKanbanComponentsWithMovedCard,
+  replaceCanvasKanbanComponentsWithoutCard,
+  setCanvasKanbanCardText,
+  type CanvasKanbanCardMoveDirection,
+  type CanvasKanbanComponentItem,
+} from './component/CanvasKanbanComponent'
+export {
   CANVAS_SECTION_COMPONENT_KIND,
   CANVAS_SECTION_DEFAULT_SIZE,
   isCanvasSectionComponentItem,

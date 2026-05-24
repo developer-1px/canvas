@@ -187,6 +187,28 @@ describe('CanvasDemoSvgItemRenderer', () => {
     expect(markup).not.toContain('M 21 57 L 25 61 L 31 53')
   })
 
+  it('renders kanban cards from normalized component data', () => {
+    const markup = renderItem({
+      accent: '#7c3aed',
+      component: 'kanban',
+      fill: '#f8fafc',
+      h: 190,
+      id: 'component-kanban',
+      items: ['', '  Doing  '],
+      stroke: '#cbd5e1',
+      title: 'Queue',
+      type: 'component',
+      w: 214,
+      x: 0,
+      y: 0,
+    }, () => 'kanban-stack')
+
+    expect(markup).toContain('Queue')
+    expect(markup).toContain('New card')
+    expect(markup).toContain('Doing')
+    expect(markup).toContain('width="186"')
+  })
+
   it('renders link preview components through their built-in presentation', () => {
     const markup = renderItem({
       accent: '#2563eb',

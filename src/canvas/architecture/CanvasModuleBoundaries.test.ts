@@ -4754,6 +4754,50 @@ describe('Canvas module boundaries', () => {
     expect(hostChecklistFile.source).not.toMatch(browserChecklistHow)
   })
 
+  it('keeps kanban component editing behind Host and App kanban modules', () => {
+    const structuredRendererFile = getSourceFile(
+      'src/canvas/app/rendering/CanvasDemoSvgStructuredComponentRenderer.tsx',
+    )
+    const kanbanInspectorPanelFile = getSourceFile(
+      'src/canvas/app/kanban/CanvasKanbanInspectorPanel.tsx',
+    )
+    const defaultAssemblyFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppDefaultAssembly.ts',
+    )
+    const hostKanbanFile = getSourceFile(
+      'src/canvas/host/component/CanvasKanbanComponent.ts',
+    )
+    const browserKanbanHow =
+      /\b(DataTransfer|ClipboardEvent|DragEvent|window\.addEventListener)\b/
+
+    expect(structuredRendererFile.source).toContain('getCanvasKanbanCards')
+    expect(kanbanInspectorPanelFile.source).toContain(
+      'replaceCanvasKanbanComponentCardText',
+    )
+    expect(kanbanInspectorPanelFile.source).toContain(
+      'replaceCanvasKanbanComponentsWithAddedCard',
+    )
+    expect(kanbanInspectorPanelFile.source).toContain(
+      'replaceCanvasKanbanComponentsWithoutCard',
+    )
+    expect(kanbanInspectorPanelFile.source).toContain(
+      'replaceCanvasKanbanComponentsWithMovedCard',
+    )
+    expect(defaultAssemblyFile.source).toContain(
+      "from '../kanban/CanvasKanbanInspectorPanel'",
+    )
+    expect(defaultAssemblyFile.source).toContain(
+      'CANVAS_KANBAN_INSPECTOR_PANEL',
+    )
+    expect(hostKanbanFile.source).toContain(
+      'export function replaceCanvasKanbanComponentCardText',
+    )
+    expect(hostKanbanFile.source).toContain(
+      'export function replaceCanvasKanbanComponentsWithMovedCard',
+    )
+    expect(hostKanbanFile.source).not.toMatch(browserKanbanHow)
+  })
+
   it('keeps browser link preview import IO behind App link modules', () => {
     const appModelFile = getSourceFile(
       'src/canvas/app/workflow/useCanvasAppModel.ts',

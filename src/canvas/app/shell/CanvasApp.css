@@ -863,7 +863,8 @@
   font: 600 12px/1.3 var(--sans);
 }
 
-.checklist-inspector {
+.checklist-inspector,
+.kanban-inspector {
   display: grid;
   gap: 6px;
 }
@@ -882,7 +883,15 @@
   accent-color: #16a34a;
 }
 
-.checklist-inspector-row input[type='text'] {
+.kanban-inspector-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 28px 28px 28px;
+  align-items: center;
+  gap: 5px;
+}
+
+.checklist-inspector-row input[type='text'],
+.kanban-inspector-row input[type='text'] {
   width: 100%;
   height: 28px;
   min-width: 0;
@@ -1150,6 +1159,7 @@
 .find-replace-panel input:focus-visible,
 .find-replace-panel button:focus-visible,
 .checklist-inspector-row input:focus-visible,
+.kanban-inspector-row input:focus-visible,
 .inspector-field input:focus-visible,
 .inspector-swatch:focus-visible,
 .inspector-action-button:focus-visible,

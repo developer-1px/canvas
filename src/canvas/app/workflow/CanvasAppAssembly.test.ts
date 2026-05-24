@@ -131,6 +131,7 @@ describe('CanvasAppAssembly', () => {
       'link-preview-actions',
       'arrow-routing-actions',
       'checklist-actions',
+      'kanban-actions',
       'risk-meta',
     ])
     expect(assembly.initialItems).toEqual([])

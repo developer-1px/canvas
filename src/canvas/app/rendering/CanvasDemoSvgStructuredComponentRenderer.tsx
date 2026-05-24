@@ -1,6 +1,7 @@
 import type { CanvasComponentItem } from '../../entities'
 import {
   getCanvasChecklistItems,
+  getCanvasKanbanCards,
   getCanvasTableGrid,
   isCanvasChecklistItemChecked,
 } from '../../host'
@@ -70,7 +71,7 @@ export function CanvasDemoSvgKanbanComponent({
 }: {
   item: CanvasComponentItem
 }) {
-  const rows = item.items ?? []
+  const rows = getCanvasKanbanCards(item)
 
   return (
     <>
@@ -87,7 +88,7 @@ export function CanvasDemoSvgKanbanComponent({
       />
       <CanvasDemoSvgComponentHeader item={item} />
       {rows.map((row, index) => (
-        <g key={row}>
+        <g key={`${index}-${row}`}>
           <rect
             x={item.x + 14}
             y={item.y + 48 + index * 40}
@@ -98,7 +99,11 @@ export function CanvasDemoSvgKanbanComponent({
             stroke="#e2e8f0"
             vectorEffect="non-scaling-stroke"
           />
-          <CanvasDemoSvgText x={item.x + 26} y={item.y + 66 + index * 40} text={row} />
+          <CanvasDemoSvgText
+            x={item.x + 26}
+            y={item.y + 66 + index * 40}
+            text={row}
+          />
         </g>
       ))}
     </>
