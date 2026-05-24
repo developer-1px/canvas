@@ -1,12 +1,11 @@
-type CanvasAppViewportRuntime = {
-  fitToItems: (ids?: string[]) => void
-  resetViewport: () => void
-  zoomBy: (multiplier: number) => void
-}
+import type {
+  CanvasAppViewportConsumerModel,
+  CanvasAppViewportRuntime,
+} from './CanvasAppConsumerContracts'
 
 export function getCanvasAppViewportConsumerModel(
   viewportControls: CanvasAppViewportRuntime,
-) {
+): CanvasAppViewportConsumerModel {
   return {
     control: {
       onFitItems: viewportControls.fitToItems,

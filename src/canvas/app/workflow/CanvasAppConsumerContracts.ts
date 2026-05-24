@@ -248,6 +248,30 @@ export type CanvasAppKeyboardViewportContext = {
   zoomBy: (multiplier: number) => void
 }
 
+export type CanvasAppViewportModelInput = {
+  config: CanvasAffordanceConfig
+  itemReadModel: CanvasItemReadModel
+  setViewport: Dispatch<SetStateAction<Viewport>>
+  stageElement: CanvasAppStageElement
+}
+
+export type CanvasAppViewportRuntime = {
+  fitToItems: (ids?: string[]) => void
+  resetViewport: () => void
+  zoomBy: (multiplier: number) => void
+}
+
+export type CanvasAppViewportControlContext = {
+  onFitItems: (ids?: string[]) => void
+  onViewportReset: () => void
+  onZoomBy: (multiplier: number) => void
+}
+
+export type CanvasAppViewportConsumerModel = {
+  control: CanvasAppViewportControlContext
+  keyboard: CanvasAppKeyboardViewportContext
+}
+
 export type CanvasAppKeyboardModelInput = {
   command: CanvasAppKeyboardCommandContext
   config: CanvasAffordanceConfig

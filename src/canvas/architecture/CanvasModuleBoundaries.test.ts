@@ -1947,6 +1947,15 @@ describe('Canvas module boundaries', () => {
       "from './CanvasAppViewportConsumerModel'",
     )
     expect(viewportModelFile.source).toContain(
+      "from './CanvasAppConsumerContracts'",
+    )
+    expect(viewportModelFile.source).toContain(
+      'CanvasAppViewportModelInput',
+    )
+    expect(viewportModelFile.source).not.toContain(
+      'type UseCanvasAppViewportModelArgs',
+    )
+    expect(viewportModelFile.source).toContain(
       'export function useCanvasAppViewportModel',
     )
     expect(viewportModelFile.source).toContain('useCanvasWheelViewport')
@@ -1956,6 +1965,28 @@ describe('Canvas module boundaries', () => {
     expect(viewportConsumerModelFile.source).toContain(
       'export function getCanvasAppViewportConsumerModel',
     )
+    expect(viewportConsumerModelFile.source).toContain(
+      "from './CanvasAppConsumerContracts'",
+    )
+    expect(viewportConsumerModelFile.source).toContain(
+      '): CanvasAppViewportConsumerModel',
+    )
+    expect(viewportConsumerModelFile.source).not.toContain(
+      'type CanvasAppViewportRuntime',
+    )
+    const viewportConsumerContractsFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppConsumerContracts.ts',
+    )
+    for (const viewportContract of [
+      'CanvasAppViewportModelInput',
+      'CanvasAppViewportRuntime',
+      'CanvasAppViewportControlContext',
+      'CanvasAppViewportConsumerModel',
+    ]) {
+      expect(viewportConsumerContractsFile.source).toContain(
+        `export type ${viewportContract}`,
+      )
+    }
     expect(viewportConsumerModelFile.source).toContain('control: {')
     expect(viewportConsumerModelFile.source).toContain('keyboard: {')
     expect(appModelFile.source).not.toContain('viewportControls.fitToItems')
