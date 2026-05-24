@@ -88,6 +88,7 @@ describe('CanvasPointerCreationStart', () => {
 
     expect(result).toEqual({
       capturePointer: false,
+      edit: { id: 'comment-1', value: 'Comment' },
       item: {
         attachedTo: 'rect-1',
         body: 'Comment',
@@ -99,6 +100,7 @@ describe('CanvasPointerCreationStart', () => {
         y: 102,
       },
       kind: 'created-item',
+      toolAfterCreate: 'select',
     })
   })
 

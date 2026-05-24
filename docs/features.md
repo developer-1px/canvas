@@ -146,3 +146,5 @@
 142. Canvas App은 외부에서 collaborator presence cursor 목록을 runtime prop으로 받을 수 있다.
 143. Demo는 두 명의 collaborator cursor를 canvas overlay에 표시한다.
 144. Presence cursor는 줌 배율과 무관하게 화면상 크기를 유지한다.
+145. Comment tool로 새 comment를 만들면 생성 직후 body editor가 열린다.
+146. Comment 생성 직후 active tool은 select로 돌아간다.

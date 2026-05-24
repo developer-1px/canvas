@@ -1,6 +1,8 @@
 import type {
   CanvasItem,
+  EditingText,
   Point,
+  Tool,
 } from '../../entities'
 import {
   type CanvasAffordanceConfig,
@@ -20,8 +22,10 @@ export type CanvasPointerCommentCreationStartResult =
   | { kind: 'none' }
   | {
       capturePointer: false
+      edit: EditingText
       item: CanvasItem
       kind: 'created-item'
+      toolAfterCreate: Extract<Tool, 'select'>
     }
 
 export function isCanvasPointerCommentCreationGesture(
@@ -54,16 +58,19 @@ export function startCanvasPointerCommentCreation({
   }
 
   const offset = CANVAS_COMMENT_ITEM_SIZE / 2
+  const item = createCanvasCommentItem({
+    attachedTo: targetItemId,
+    body: CANVAS_COMMENT_DEFAULT_BODY,
+    id: createId('comment'),
+    x: startWorld.x - offset,
+    y: startWorld.y - offset,
+  })
 
   return {
     capturePointer: false,
-    item: createCanvasCommentItem({
-      attachedTo: targetItemId,
-      body: CANVAS_COMMENT_DEFAULT_BODY,
-      id: createId('comment'),
-      x: startWorld.x - offset,
-      y: startWorld.y - offset,
-    }),
+    edit: { id: item.id, value: item.body },
+    item,
     kind: 'created-item',
+    toolAfterCreate: 'select',
   }
 }
