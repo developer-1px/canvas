@@ -93,7 +93,7 @@
 - Canvas Keyboard System Shortcuts: global system shortcut matching, temporary pan release check, custom creation tool 예약 system shortcut projection을 함께 제공하는 App keyboard contract Module.
 - Canvas Keyboard Reserved Shortcuts: built-in tool, command, system shortcut을 custom creation tool shortcut과 충돌하지 않게 예약하는 App keyboard contract Module.
 - Canvas Keyboard Tool Dispatch: set-tool keyboard intent와 tool handler 호출 mechanics를 소유하는 App keyboard dispatch Module.
-- Canvas App Custom Creation Tool Contracts: custom creation tool descriptor shape와 reserved/duplicate shortcut conflict를 검증하는 App-owned contract Module.
+- Canvas App Custom Creation Tool Contracts: custom creation tool descriptor shape, custom tool id projection, shortcut matching/formatting, reserved/duplicate shortcut conflict를 검증하는 App-owned contract Module.
 - Canvas App Custom Creation Tool Runtime: custom creation tool id 변환, toolbar state, lookup, shortcut matching을 소유하는 App-owned runtime Module.
 - Canvas App Custom Item Module Creation Tool: Module-owned creation descriptor. bounds/title/data만 반환하고 custom item `id`, `kind`, `presentation`, `type` envelope는 Module assembly가 만든다.
 - Canvas App Inspector Panel: 기본 bounds inspector를 수정하지 않고 제품별 선택 항목 정보를 렌더링하는 App-owned inspector descriptor.
@@ -285,7 +285,7 @@
 - Canvas App Custom Command descriptor shape 검증과 toolbar state/run execution은 분리하고, validation은 Canvas App Custom Command Contracts가, 실행 실패 containment는 Canvas App Custom Command Execution이 소유한다. Descriptor Module은 validation/execution helper를 재노출하지 않는다.
 - Canvas App Custom Command State와 Canvas App Custom Creation Tool State shape는 Canvas App Extension State Contracts가 소유하고, execution/runtime Module은 state 생성과 실행 mechanics만 소유한다.
 - 제품별 item creation tool은 내부 Tool union에 구체 id를 넣지 않고 Canvas App Custom Item Module에 등록한다.
-- Canvas App Custom Creation Tool descriptor shape/shortcut conflict 검증과 runtime state/lookup/shortcut matching은 분리하고, validation은 Canvas App Custom Creation Tool Contracts가, runtime behavior는 Canvas App Custom Creation Tool Runtime이 소유한다. Descriptor Module은 validation/runtime helper를 재노출하지 않는다.
+- Canvas App Custom Creation Tool descriptor shape/shortcut conflict 검증, custom tool id projection, shortcut matching/formatting은 Canvas App Custom Creation Tool Contracts가 소유하고, runtime state/lookup은 Canvas App Custom Creation Tool Runtime이 소유한다. Descriptor Module은 validation/runtime helper를 재노출하지 않는다.
 - Canvas App Custom Creation Tool Contracts와 Canvas App Custom Item Module Contracts는 Runtime Module을 import하지 않고 raw descriptor shape와 shortcut conflict를 검증한다.
 - Canvas App Custom Creation Tool이 item 생성을 거부하거나 실패하거나 invalid item을 반환해도 pointer lifecycle을 깨지 않아야 한다.
 - Pointer down hook은 DOM pointer routing과 coordinate 변환을 맡고, tool/gesture/config 기반 pan/marquee 시작 규칙은 Canvas Pointer Interaction Start가, 생성 도구 시작 규칙은 Canvas Pointer Creation Start가, 시작 결과 적용은 Canvas Pointer Interaction Start Effects가 소유한다.

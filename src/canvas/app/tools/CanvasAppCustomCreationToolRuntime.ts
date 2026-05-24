@@ -1,30 +1,15 @@
 import type { CanvasCustomToolId } from '../../entities'
-import { assertCanvasAppExtensionId } from '../extensions/CanvasAppExtensionIds'
 import {
-  formatCanvasKeyboardShortcutChord,
-  getCanvasKeyboardShortcutChordKey,
-  matchesCanvasKeyboardShortcutChord,
-} from '../keyboard/CanvasKeyboardShortcutChords'
+  formatCanvasAppCustomToolShortcut,
+  getCanvasAppCustomToolId,
+  getCanvasAppCustomToolRawId,
+} from './CanvasAppCustomCreationToolContracts'
 import type {
   CanvasAppCustomCreationTool,
-  CanvasAppCustomToolShortcut,
 } from './CanvasAppCustomCreationTools'
 import type {
   CanvasAppCustomCreationToolState,
 } from '../extensions/CanvasAppExtensionStateContracts'
-
-export function getCanvasAppCustomToolId(id: string): CanvasCustomToolId {
-  assertCanvasAppExtensionId({
-    id,
-    label: 'custom creation tool',
-  })
-
-  return `custom:${id}`
-}
-
-export function getCanvasAppCustomToolRawId(toolId: CanvasCustomToolId) {
-  return toolId.slice('custom:'.length)
-}
 
 export function getCanvasAppCustomCreationToolStates(
   tools: readonly CanvasAppCustomCreationTool[],
@@ -48,26 +33,4 @@ export function getCanvasAppCustomCreationTool(
   const rawId = getCanvasAppCustomToolRawId(toolId)
 
   return tools.find((tool) => tool.id === rawId) ?? null
-}
-
-export function matchesCanvasAppCustomToolShortcut({
-  event,
-  shortcut,
-}: {
-  event: KeyboardEvent
-  shortcut: CanvasAppCustomToolShortcut
-}) {
-  return matchesCanvasKeyboardShortcutChord({ event, shortcut })
-}
-
-export function getCanvasAppCustomToolShortcutKey(
-  shortcut: CanvasAppCustomToolShortcut,
-) {
-  return getCanvasKeyboardShortcutChordKey(shortcut)
-}
-
-export function formatCanvasAppCustomToolShortcut(
-  shortcut: CanvasAppCustomToolShortcut,
-) {
-  return formatCanvasKeyboardShortcutChord(shortcut)
 }

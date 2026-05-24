@@ -6,7 +6,7 @@ import type {
 import { getCanvasKeyboardBuiltinToolShortcut } from './CanvasKeyboardToolShortcuts'
 import {
   matchesCanvasAppCustomToolShortcut,
-} from '../tools/CanvasAppCustomCreationToolRuntime'
+} from '../tools/CanvasAppCustomCreationToolContracts'
 
 export type CanvasKeyboardToolShortcutIntentInput = {
   config: CanvasAffordanceConfig

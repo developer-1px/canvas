@@ -4232,21 +4232,35 @@ describe('Canvas module boundaries', () => {
     expect(runtimeFile.source).toContain(
       'export function getCanvasAppCustomCreationTool(',
     )
-    expect(runtimeFile.source).toContain(
+    expect(runtimeFile.source).not.toContain(
       'export function matchesCanvasAppCustomToolShortcut',
+    )
+    expect(runtimeFile.source).not.toContain(
+      'export function getCanvasAppCustomToolId',
+    )
+    expect(contractsFile.source).toContain(
+      'export function matchesCanvasAppCustomToolShortcut',
+    )
+    expect(contractsFile.source).toContain(
+      'export function getCanvasAppCustomToolId',
     )
     expect(keyboardRouterFile.source).toContain(
       "from './CanvasKeyboardShortcutIntent'",
     )
     for (const file of [
       extensionModelFile,
-      keyboardToolIntentFile,
       pointerCustomCreationFile,
     ]) {
       expect(file.source).toContain(
         'CanvasAppCustomCreationToolRuntime',
       )
     }
+    expect(keyboardToolIntentFile.source).toContain(
+      'CanvasAppCustomCreationToolContracts',
+    )
+    expect(keyboardToolIntentFile.source).not.toContain(
+      'CanvasAppCustomCreationToolRuntime',
+    )
     expect(keyboardRouterFile.source).not.toContain(
       'CanvasAppCustomCreationToolRuntime',
     )
@@ -4818,6 +4832,12 @@ describe('Canvas module boundaries', () => {
     )
     expect(contractsFile.source).toContain(
       'export function assertCanvasAppCustomCreationTools',
+    )
+    expect(contractsFile.source).toContain(
+      'export function getCanvasAppCustomToolId',
+    )
+    expect(contractsFile.source).toContain(
+      'export function matchesCanvasAppCustomToolShortcut',
     )
     expect(contractsFile.source).toContain(
       'RESERVED_CANVAS_APP_CUSTOM_TOOL_SHORTCUTS',

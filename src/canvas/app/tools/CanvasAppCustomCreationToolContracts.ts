@@ -1,3 +1,4 @@
+import type { CanvasCustomToolId } from '../../entities'
 import {
   assertCanvasAppDescriptorFunctionField,
   assertCanvasAppDescriptorObject,
@@ -5,13 +6,17 @@ import {
   assertCanvasAppOptionalDescriptorBooleanField,
   assertCanvasAppOptionalDescriptorStringField,
 } from '../extensions/CanvasAppDescriptorContracts'
-import { assertCanvasAppExtensionEntries } from '../extensions/CanvasAppExtensionIds'
+import {
+  assertCanvasAppExtensionEntries,
+  assertCanvasAppExtensionId,
+} from '../extensions/CanvasAppExtensionIds'
 import {
   getCanvasKeyboardReservedShortcuts,
 } from '../keyboard/CanvasKeyboardReservedShortcuts'
 import {
   formatCanvasKeyboardShortcutChord,
   getCanvasKeyboardShortcutChordKey,
+  matchesCanvasKeyboardShortcutChord,
 } from '../keyboard/CanvasKeyboardShortcutChords'
 import type {
   CanvasAppCustomCreationTool,
@@ -89,6 +94,41 @@ export function assertCanvasAppCustomCreationToolShortcuts(
 
     seen.set(key, tool.id)
   }
+}
+
+export function getCanvasAppCustomToolId(id: string): CanvasCustomToolId {
+  assertCanvasAppExtensionId({
+    id,
+    label: 'custom creation tool',
+  })
+
+  return `custom:${id}`
+}
+
+export function getCanvasAppCustomToolRawId(toolId: CanvasCustomToolId) {
+  return toolId.slice('custom:'.length)
+}
+
+export function matchesCanvasAppCustomToolShortcut({
+  event,
+  shortcut,
+}: {
+  event: KeyboardEvent
+  shortcut: CanvasAppCustomToolShortcut
+}) {
+  return matchesCanvasKeyboardShortcutChord({ event, shortcut })
+}
+
+export function getCanvasAppCustomToolShortcutKey(
+  shortcut: CanvasAppCustomToolShortcut,
+) {
+  return getCanvasKeyboardShortcutChordKey(shortcut)
+}
+
+export function formatCanvasAppCustomToolShortcut(
+  shortcut: CanvasAppCustomToolShortcut,
+) {
+  return formatCanvasKeyboardShortcutChord(shortcut)
 }
 
 function assertCanvasAppCustomCreationToolDescriptor(
