@@ -36,7 +36,7 @@ import type {
 import type {
   CanvasAppComponentPresentationRenderers,
   CanvasAppCustomItemRenderers,
-} from '../rendering/CanvasAppRendererRegistries'
+} from '../rendering/CanvasAppRenderingContracts'
 import type {
   CanvasAppStageAdapter,
   CanvasAppStageMount,

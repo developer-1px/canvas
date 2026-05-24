@@ -2819,6 +2819,12 @@ describe('Canvas module boundaries', () => {
     const authoringFacadeFile = getSourceFile(
       'src/canvas/app/authoring/index.ts',
     )
+    const workflowFacadeFile = getSourceFile(
+      'src/canvas/app/workflow/index.ts',
+    )
+    const renderingFacadeFile = getSourceFile(
+      'src/canvas/app/rendering/index.ts',
+    )
 
     expect(contractsFile.source).toContain(
       'CanvasAppComponentRendererStrategy',
@@ -2840,8 +2846,24 @@ describe('Canvas module boundaries', () => {
       "from './CanvasDemoSvgCustomItemRendererRegistry'",
     )
     expect(registriesFile.source).not.toContain('Parameters<typeof')
+    expect(registriesFile.source).not.toContain('export type {')
     expect(authoringFacadeFile.source).toContain(
       "from '../rendering/CanvasAppRendererRegistries'",
+    )
+    expect(authoringFacadeFile.source).toContain(
+      "from '../rendering/CanvasAppRenderingContracts'",
+    )
+    expect(workflowFacadeFile.source).toContain(
+      "from '../rendering/CanvasAppRendererRegistries'",
+    )
+    expect(workflowFacadeFile.source).toContain(
+      "from '../rendering/CanvasAppRenderingContracts'",
+    )
+    expect(renderingFacadeFile.source).toContain(
+      "from './CanvasAppRendererRegistries'",
+    )
+    expect(renderingFacadeFile.source).toContain(
+      "from './CanvasAppRenderingContracts'",
     )
     expect(authoringFacadeFile.source).not.toContain("from '../rendering'")
     expect(itemLayerAdapterFile.source).not.toMatch(

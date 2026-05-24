@@ -20,13 +20,6 @@ import {
   getCanvasDemoSvgCustomItemRenderer,
 } from './CanvasDemoSvgCustomItemRendererRegistry'
 
-export type {
-  CanvasAppComponentPresentationRenderers,
-  CanvasAppComponentRendererStrategy,
-  CanvasAppCustomItemRendererStrategy,
-  CanvasAppCustomItemRenderers,
-} from './CanvasAppRenderingContracts'
-
 export const DEFAULT_CANVAS_APP_COMPONENT_PRESENTATION_RENDERERS:
   CanvasAppComponentPresentationRenderers =
     DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS

@@ -8,7 +8,7 @@ import {
   createCanvasAppExtensionBundle,
   type CanvasAppExtensionBundle,
 } from '../extensions/CanvasAppExtensionBundle'
-import type { CanvasAppCustomItemRenderers } from '../rendering/CanvasAppRendererRegistries'
+import type { CanvasAppCustomItemRenderers } from '../rendering/CanvasAppRenderingContracts'
 import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
 import type {
   CanvasAppCustomItemModule,

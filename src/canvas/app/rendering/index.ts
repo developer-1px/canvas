@@ -15,15 +15,17 @@ export {
   DEFAULT_CANVAS_APP_CUSTOM_ITEM_RENDERERS,
   assertCanvasAppComponentPresentationRenderers,
   assertCanvasAppCustomItemRenderers,
-  type CanvasAppComponentPresentationRenderers,
-  type CanvasAppComponentRendererStrategy,
   createCanvasAppComponentPresentationRenderers,
   createCanvasAppCustomItemRenderers,
-  type CanvasAppCustomItemRendererStrategy,
-  type CanvasAppCustomItemRenderers,
   getCanvasAppComponentPresentationRenderer,
   getCanvasAppCustomItemRenderer,
 } from './CanvasAppRendererRegistries'
+export type {
+  CanvasAppComponentPresentationRenderers,
+  CanvasAppComponentRendererStrategy,
+  CanvasAppCustomItemRendererStrategy,
+  CanvasAppCustomItemRenderers,
+} from './CanvasAppRenderingContracts'
 export type {
   CanvasAppEventInput,
   CanvasAppPointerInput,

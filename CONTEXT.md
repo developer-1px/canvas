@@ -317,7 +317,7 @@
 - package manifest는 React, React DOM, Zod를 shared runtime peer dependency로 선언한다.
 - Custom item authoring Interface는 `CanvasApp*Renderer*` 이름을 쓰고, `CanvasDemoSvg*` 구현명은 App rendering Adapter 내부에 둔다.
 - Canvas App Rendering Contracts는 App-owned `CanvasApp*Renderer*` type을 소유하고, Demo SVG registry type은 그 계약을 구현하는 내부 alias로 둔다.
-- App authoring/workflow module은 renderer registry what을 `CanvasAppRendererRegistries` named seam에서 가져오고 `../rendering` barrel에 직접 기대지 않는다.
+- App authoring/workflow module은 renderer what type을 Canvas App Rendering Contracts에서 가져오고, registry default/create/assert/get how만 `CanvasAppRendererRegistries` named seam에서 가져오며 `../rendering` barrel에 직접 기대지 않는다.
 - Canvas App extension id와 registry key는 lower-kebab 안정 id만 허용하고, 잘못된 id는 define/assembly 단계에서 실패해야 한다.
 - Canvas App descriptor는 id뿐 아니라 필수 string/function/shortcut slot과 registry shape도 define/assembly 단계에서 실패해야 한다. 실행 중 throw는 runtime containment로 처리하지만, malformed descriptor shape는 등록되지 않아야 한다.
 - Canvas Custom Item의 `kind`와 `presentation`, Canvas Component Template의 `id`와 `presentation`도 같은 안정 id 계약을 따라야 한다.

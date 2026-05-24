@@ -1,7 +1,7 @@
 import type { CanvasCustomItemValidators } from '../../host'
 import type { CanvasAppCustomCommand } from '../commands/CanvasAppCustomCommands'
 import type { CanvasAppInspectorPanel } from '../inspector/CanvasAppInspectorPanels'
-import type { CanvasAppCustomItemRenderers } from '../rendering/CanvasAppRendererRegistries'
+import type { CanvasAppCustomItemRenderers } from '../rendering/CanvasAppRenderingContracts'
 import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
 import {
   snapshotCanvasAppDescriptorArray,

@@ -36,11 +36,13 @@ export type {
 export {
   createCanvasAppComponentPresentationRenderers,
   createCanvasAppCustomItemRenderers,
-  type CanvasAppComponentPresentationRenderers,
-  type CanvasAppComponentRendererStrategy,
-  type CanvasAppCustomItemRendererStrategy,
-  type CanvasAppCustomItemRenderers,
 } from '../rendering/CanvasAppRendererRegistries'
+export type {
+  CanvasAppComponentPresentationRenderers,
+  CanvasAppComponentRendererStrategy,
+  CanvasAppCustomItemRendererStrategy,
+  CanvasAppCustomItemRenderers,
+} from '../rendering/CanvasAppRenderingContracts'
 export type {
   CanvasAppItemLayerAdapter,
   CanvasAppItemLayerRenderInput,

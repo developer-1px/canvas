@@ -7,7 +7,7 @@ import type { CanvasAppCustomCommand } from '../commands/CanvasAppCustomCommands
 import type { CanvasAppInspectorPanel } from '../inspector/CanvasAppInspectorPanels'
 import type {
   CanvasAppCustomItemRendererStrategy,
-} from '../rendering/CanvasAppRendererRegistries'
+} from '../rendering/CanvasAppRenderingContracts'
 import {
   type CanvasAppCustomCreationToolContext,
   type CanvasAppCustomToolShortcut,
