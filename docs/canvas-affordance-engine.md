@@ -38,6 +38,7 @@
 | `src/canvas/app/extensions/CanvasAppExtensionIds.ts` | 제품별 descriptor와 registry key가 공유하는 lower-kebab 안정 id 계약을 검증한다 |
 | `src/canvas/app/extensions/CanvasAppExtensionRegistries.ts` | assembly 단계에서 extension entry와 record key 검증, 중복 실패 처리를 한 내부 계약으로 제공한다 |
 | `src/canvas/app/extensions/CanvasAppExtensionBundle.ts` | Custom command/tool/item renderer/validator/inspector output slot과 slot별 중복 병합/snapshot/defaulting 규칙을 소유하고 Assembly output 계약에 합성된다 |
+| `src/canvas/app/extensions/CanvasAppExtensionStateContracts.ts` | Custom command state와 custom creation tool state의 consumer-facing shape를 execution/runtime helper와 분리한다 |
 | `src/canvas/app/extensions/CanvasAppDescriptorSnapshot.ts` | 외부 등록 descriptor의 copy/freeze 규칙을 Assembly와 Custom Item Module snapshot이 공유하게 한다 |
 | `src/canvas/app/stage/CanvasAppStageElement.ts` | stage DOM element의 bounds, pointer capture, wheel listener를 caller Interface 뒤에 숨기고 mount ref bridge는 Controller로 분리한다 |
 | `src/canvas/app/rendering` | Demo `CanvasItem` tree를 SVG item layer로 바꾸는 App-owned Adapter |
@@ -236,6 +237,7 @@ type CanvasAffordanceConfig = {
 - Canvas App Custom Command Context는 내부 Canvas Workflow Contract를 외부 authoring Interface로 노출하지 않고 필요한 commit/document slot을 자체 public context 계약으로 명시한다.
 - Custom command의 availability/run 실패는 내부 command loop를 깨지 않고 disabled/false로 containment 된다.
 - Canvas App Custom Command descriptor shape 검증과 toolbar state/run execution은 분리하고, validation은 Canvas App Custom Command Contracts가, 실행 실패 containment는 Canvas App Custom Command Execution이 소유한다. Descriptor Module은 runtime state/run helper를 재노출하지 않는다.
+- Canvas App Custom Command State와 Canvas App Custom Creation Tool State shape는 Canvas App Extension State Contracts가 소유하고, execution/runtime Module은 state 생성과 실행 mechanics만 소유한다.
 - 제품별 item creation tool은 내부 builtin tool list에 추가하지 않고 Canvas App Custom Item Module에 등록한다.
 - Canvas App Custom Creation Tool descriptor shape/shortcut conflict 검증과 runtime state/lookup/shortcut matching은 분리하고, validation은 Canvas App Custom Creation Tool Contracts가, runtime behavior는 Canvas App Custom Creation Tool Runtime이 소유한다. Descriptor Module은 runtime state/lookup helper를 재노출하지 않는다.
 - Canvas App Custom Creation Tool Contracts와 Canvas App Custom Item Module Contracts는 Runtime Module을 import하지 않고 raw descriptor shape와 shortcut conflict를 검증한다.

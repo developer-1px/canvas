@@ -9,15 +9,9 @@ import type {
   CanvasAppCustomCreationTool,
   CanvasAppCustomToolShortcut,
 } from './CanvasAppCustomCreationTools'
-
-export type CanvasAppCustomCreationToolState = {
-  ariaLabel: string
-  id: CanvasCustomToolId
-  label: string
-  shortcut?: CanvasAppCustomToolShortcut
-  statusLabel: string
-  title: string
-}
+import type {
+  CanvasAppCustomCreationToolState,
+} from '../extensions/CanvasAppExtensionStateContracts'
 
 export function getCanvasAppCustomToolId(id: string): CanvasCustomToolId {
   assertCanvasAppExtensionId({

@@ -3608,6 +3608,9 @@ describe('Canvas module boundaries', () => {
     const executionFile = getSourceFile(
       'src/canvas/app/commands/CanvasAppCustomCommandExecution.ts',
     )
+    const extensionStateContractsFile = getSourceFile(
+      'src/canvas/app/extensions/CanvasAppExtensionStateContracts.ts',
+    )
     const extensionModelFile = getSourceFile(
       'src/canvas/app/workflow/useCanvasAppExtensionModel.ts',
     )
@@ -3637,6 +3640,15 @@ describe('Canvas module boundaries', () => {
     expect(executionFile.source).toContain('command.run(context)')
     expect(executionFile.source).toContain('command.isEnabled(context)')
     expect(executionFile.source).toContain('catch')
+    expect(executionFile.source).not.toContain(
+      'export type CanvasAppCustomCommandState',
+    )
+    expect(executionFile.source).toContain(
+      "from '../extensions/CanvasAppExtensionStateContracts'",
+    )
+    expect(extensionStateContractsFile.source).toContain(
+      'export type CanvasAppCustomCommandState',
+    )
     expect(extensionModelFile.source).toContain(
       "from '../commands/CanvasAppCustomCommandExecution'",
     )
@@ -3664,6 +3676,12 @@ describe('Canvas module boundaries', () => {
     expect(extensionConsumerModelFile.source).not.toContain('ReturnType<')
     expect(extensionConsumerContractsFile.source).toContain(
       'export type CanvasAppExtensionRuntime',
+    )
+    expect(extensionConsumerContractsFile.source).toContain(
+      "from '../extensions/CanvasAppExtensionStateContracts'",
+    )
+    expect(extensionConsumerContractsFile.source).not.toContain(
+      'CanvasAppCustomCommandExecution',
     )
     expect(extensionConsumerContractsFile.source).toContain(
       'export type CanvasAppExtensionModel',
@@ -4081,6 +4099,9 @@ describe('Canvas module boundaries', () => {
     const runtimeFile = getSourceFile(
       'src/canvas/app/tools/CanvasAppCustomCreationToolRuntime.ts',
     )
+    const extensionStateContractsFile = getSourceFile(
+      'src/canvas/app/extensions/CanvasAppExtensionStateContracts.ts',
+    )
     const extensionModelFile = getSourceFile(
       'src/canvas/app/workflow/useCanvasAppExtensionModel.ts',
     )
@@ -4092,6 +4113,9 @@ describe('Canvas module boundaries', () => {
     )
     const keyboardIntentFile = getSourceFile(
       'src/canvas/app/keyboard/CanvasKeyboardShortcutIntent.ts',
+    )
+    const keyboardToolIntentFile = getSourceFile(
+      'src/canvas/app/keyboard/CanvasKeyboardToolShortcutIntent.ts',
     )
     const pointerCustomCreationFile = getSourceFile(
       'src/canvas/app/pointer/CanvasPointerCustomCreation.ts',
@@ -4118,6 +4142,15 @@ describe('Canvas module boundaries', () => {
     expect(runtimeFile.source).toContain(
       'export function getCanvasAppCustomCreationToolStates',
     )
+    expect(runtimeFile.source).not.toContain(
+      'export type CanvasAppCustomCreationToolState',
+    )
+    expect(runtimeFile.source).toContain(
+      "from '../extensions/CanvasAppExtensionStateContracts'",
+    )
+    expect(extensionStateContractsFile.source).toContain(
+      'export type CanvasAppCustomCreationToolState',
+    )
     expect(runtimeFile.source).toContain(
       'export function getCanvasAppCustomCreationTool(',
     )
@@ -4129,13 +4162,19 @@ describe('Canvas module boundaries', () => {
     )
     for (const file of [
       extensionModelFile,
-      keyboardIntentFile,
+      keyboardToolIntentFile,
       pointerCustomCreationFile,
     ]) {
       expect(file.source).toContain(
         'CanvasAppCustomCreationToolRuntime',
       )
     }
+    expect(keyboardRouterFile.source).not.toContain(
+      'CanvasAppCustomCreationToolRuntime',
+    )
+    expect(keyboardIntentFile.source).not.toContain(
+      'CanvasAppCustomCreationToolRuntime',
+    )
     expect(appModelFile.source).toContain(
       "from './useCanvasAppExtensionModel'",
     )

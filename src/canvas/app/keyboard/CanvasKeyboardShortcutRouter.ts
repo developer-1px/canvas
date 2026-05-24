@@ -1,5 +1,7 @@
 import type { CanvasAffordanceConfig } from '../../engine'
-import type { CanvasAppCustomCreationToolState } from '../tools/CanvasAppCustomCreationToolRuntime'
+import type {
+  CanvasAppCustomCreationToolState,
+} from '../extensions/CanvasAppExtensionStateContracts'
 import {
   runCanvasKeyboardShortcutIntent,
   type CanvasKeyboardShortcutDispatchHandlers,

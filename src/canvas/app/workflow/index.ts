@@ -18,7 +18,8 @@ export type {
 } from '../commands/CanvasAppCustomCommands'
 export type {
   CanvasAppCustomCommandState,
-} from '../commands/CanvasAppCustomCommandExecution'
+  CanvasAppCustomCreationToolState,
+} from '../extensions/CanvasAppExtensionStateContracts'
 export {
   createCanvasAppCustomItemModuleAssembly,
   type CanvasAppCustomItemModuleAssembly,
@@ -44,9 +45,6 @@ export type {
   CanvasAppCustomCreationToolContext,
   CanvasAppCustomToolShortcut,
 } from '../tools/CanvasAppCustomCreationTools'
-export type {
-  CanvasAppCustomCreationToolState,
-} from '../tools/CanvasAppCustomCreationToolRuntime'
 export type {
   CanvasWorkspaceStorage,
   CanvasWorkspaceStorageProvider,

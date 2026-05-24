@@ -4,7 +4,9 @@ import {
   type CanvasSceneAdapter,
 } from '../../engine'
 import type { CanvasComponentTemplate } from '../../host'
-import type { CanvasAppCustomCreationToolState } from '../tools/CanvasAppCustomCreationToolRuntime'
+import type {
+  CanvasAppCustomCreationToolState,
+} from '../extensions/CanvasAppExtensionStateContracts'
 import { getCanvasAppControlModel } from './CanvasAppControlModel'
 
 describe('CanvasAppControlModel', () => {

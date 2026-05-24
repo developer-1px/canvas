@@ -3,7 +3,9 @@ import {
   DEFAULT_CANVAS_AFFORDANCE_CONFIG,
   createCanvasAffordanceConfig,
 } from '../../engine'
-import type { CanvasAppCustomCreationToolState } from '../tools/CanvasAppCustomCreationToolRuntime'
+import type {
+  CanvasAppCustomCreationToolState,
+} from '../extensions/CanvasAppExtensionStateContracts'
 import { getCanvasKeyboardShortcutIntent } from './CanvasKeyboardShortcutIntent'
 
 describe('CanvasKeyboardShortcutIntent', () => {

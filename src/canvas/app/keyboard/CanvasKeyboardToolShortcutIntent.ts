@@ -1,9 +1,11 @@
 import type { CanvasAffordanceConfig } from '../../engine'
 import type { Tool } from '../../entities'
+import type {
+  CanvasAppCustomCreationToolState,
+} from '../extensions/CanvasAppExtensionStateContracts'
 import { getCanvasKeyboardBuiltinToolShortcut } from './CanvasKeyboardToolShortcuts'
 import {
   matchesCanvasAppCustomToolShortcut,
-  type CanvasAppCustomCreationToolState,
 } from '../tools/CanvasAppCustomCreationToolRuntime'
 
 export type CanvasKeyboardToolShortcutIntentInput = {

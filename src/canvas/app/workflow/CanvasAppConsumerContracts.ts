@@ -24,7 +24,10 @@ import type {
   Viewport,
 } from '../../entities'
 import type { CanvasEditableTextItem } from '../../host'
-import type { CanvasAppCustomCommandState } from '../commands/CanvasAppCustomCommandExecution'
+import type {
+  CanvasAppCustomCommandState,
+  CanvasAppCustomCreationToolState,
+} from '../extensions/CanvasAppExtensionStateContracts'
 import type { CanvasAppPointerInput } from '../pointer/CanvasAppPointerInput'
 import type { CanvasAppStageElementController } from '../stage/CanvasAppStageElement'
 import type {
@@ -39,7 +42,6 @@ import type {
   CanvasAppStageMount,
 } from '../rendering/CanvasAppStageAdapter'
 import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
-import type { CanvasAppCustomCreationToolState } from '../tools/CanvasAppCustomCreationToolRuntime'
 import type { Interaction } from '../pointer/CanvasInteractionState'
 import type { CanvasAppControlCommandHandlers } from './CanvasAppControlCommandContracts'
 import type { CommitCanvasSelection } from './CanvasWorkflowContract'

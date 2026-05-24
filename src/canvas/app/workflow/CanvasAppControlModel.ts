@@ -12,8 +12,10 @@ import type {
   Viewport,
 } from '../../entities'
 import type { CanvasComponentTemplate } from '../../host'
-import type { CanvasAppCustomCommandState } from '../commands/CanvasAppCustomCommandExecution'
-import type { CanvasAppCustomCreationToolState } from '../tools/CanvasAppCustomCreationToolRuntime'
+import type {
+  CanvasAppCustomCommandState,
+  CanvasAppCustomCreationToolState,
+} from '../extensions/CanvasAppExtensionStateContracts'
 import type { CanvasAppControlCommandHandlers } from './CanvasAppControlCommandContracts'
 
 type CanvasAppControlModelInput = {

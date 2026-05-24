@@ -2,14 +2,9 @@ import type {
   CanvasAppCustomCommand,
   CanvasAppCustomCommandContext,
 } from './CanvasAppCustomCommands'
-
-export type CanvasAppCustomCommandState = {
-  ariaLabel: string
-  disabled: boolean
-  id: string
-  label: string
-  title: string
-}
+import type {
+  CanvasAppCustomCommandState,
+} from '../extensions/CanvasAppExtensionStateContracts'
 
 export function getCanvasAppCustomCommandStates({
   commands,
