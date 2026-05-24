@@ -5,6 +5,7 @@ import type {
 import { CanvasComponentPalette } from '../../ui/palette/CanvasComponentPalette'
 import { CanvasCursorChat } from '../../ui/cursor/CanvasCursorChat'
 import { CanvasDrawingControls } from '../../ui/drawing/CanvasDrawingControls'
+import { CanvasEmoteControls } from '../../ui/emote/CanvasEmoteControls'
 import { CanvasSessionTimer } from '../../ui/facilitation/CanvasSessionTimer'
 import { CanvasSpotlight } from '../../ui/facilitation/CanvasSpotlight'
 import { CanvasVotingSession } from '../../ui/facilitation/CanvasVotingSession'
@@ -20,6 +21,7 @@ import { ZoomControls } from '../../ui/zoom/ZoomControls'
 
 type ToolbarProps = ComponentProps<typeof CanvasToolbar>
 type CursorChatProps = ComponentProps<typeof CanvasCursorChat>
+type EmoteControlsProps = ComponentProps<typeof CanvasEmoteControls>
 type SessionTimerProps = ComponentProps<typeof CanvasSessionTimer>
 type SpotlightProps = ComponentProps<typeof CanvasSpotlight>
 type VotingSessionProps = ComponentProps<typeof CanvasVotingSession>
@@ -42,6 +44,7 @@ type CanvasAppViewProps = {
   componentPalette: VisibleProps<PaletteProps>
   cursorChat: CursorChatProps
   drawingControls: VisibleProps<DrawingControlsProps>
+  emoteControls: EmoteControlsProps
   findReplace: FindReplaceProps
   imageControls: VisibleProps<ImageControlsProps>
   inspector: VisibleProps<InspectorProps>
@@ -61,6 +64,7 @@ export function CanvasAppView({
   componentPalette,
   cursorChat,
   drawingControls,
+  emoteControls,
   findReplace,
   imageControls,
   inspector,
@@ -108,6 +112,8 @@ export function CanvasAppView({
       {showDrawingControls ? (
         <CanvasDrawingControls {...drawingControlProps} />
       ) : null}
+
+      <CanvasEmoteControls {...emoteControls} />
 
       <CanvasFindReplacePanel {...findReplace} />
 

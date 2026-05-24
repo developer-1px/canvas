@@ -20,13 +20,33 @@ describe('CanvasOverlayEngine', () => {
       presence,
     }).presence).toEqual([])
   })
+
+  it('passes transient emote bursts through the overlay feature toggle', () => {
+    const emoteBursts = [{
+      emote: 'thumbs-up',
+      id: 'emote-1',
+      label: '+1',
+      particles: [{ dx: 0, dy: 0 }],
+      point: { x: 120, y: 80 },
+    }]
+
+    expect(createOverlay({ emoteBursts }).emoteBursts).toEqual(emoteBursts)
+    expect(createOverlay({
+      config: createCanvasAffordanceConfig({
+        overlays: { emoteBursts: false },
+      }),
+      emoteBursts,
+    }).emoteBursts).toEqual([])
+  })
 })
 
 function createOverlay({
   config = createCanvasAffordanceConfig(),
+  emoteBursts = [],
   presence = [],
 }: {
   config?: ReturnType<typeof createCanvasAffordanceConfig>
+  emoteBursts?: Parameters<typeof createCanvasOverlayState>[0]['emoteBursts']
   presence?: Parameters<typeof createCanvasOverlayState>[0]['presence']
 } = {}) {
   return createCanvasOverlayState({
@@ -34,6 +54,7 @@ function createOverlay({
     draftArrow: null,
     draftRect: null,
     draftStroke: null,
+    emoteBursts,
     laserTrail: null,
     marquee: null,
     presence,

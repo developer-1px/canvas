@@ -131,6 +131,7 @@ function createOverlays(): CanvasOverlayState {
     draftArrow: null,
     draftRect: null,
     draftStroke: null,
+    emoteBursts: [],
     grid: true,
     itemOutlineIds: new Set(['item-1']),
     laserTrail: null,

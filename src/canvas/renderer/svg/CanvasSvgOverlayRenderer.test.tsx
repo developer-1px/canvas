@@ -56,6 +56,33 @@ describe('CanvasSvgOverlayRenderer', () => {
     expect(markup).toContain('class="laser-point"')
     expect(markup).toContain('cx="24"')
   })
+
+  it('renders transient emote bursts at viewport-stable scale', () => {
+    const markup = renderToStaticMarkup(
+      <svg>
+        <CanvasSvgInteractionOverlays
+          overlays={{
+            ...createOverlayState(),
+            emoteBursts: [{
+              emote: 'thumbs-up',
+              id: 'emote-1',
+              label: '+1',
+              particles: [{ dx: -12, dy: -24 }],
+              point: { x: 100, y: 120 },
+            }],
+          }}
+          viewport={{ scale: 2, x: 0, y: 0 }}
+          onResizePointerDown={vi.fn()}
+        />
+      </svg>,
+    )
+
+    expect(markup).toContain('emote-bursts')
+    expect(markup).toContain('class="emote-burst"')
+    expect(markup).toContain('data-emote="thumbs-up"')
+    expect(markup).toContain('translate(100 120) scale(0.5)')
+    expect(markup).toContain('+1')
+  })
 })
 
 function createOverlayState(): CanvasOverlayState {
@@ -64,6 +91,7 @@ function createOverlayState(): CanvasOverlayState {
     draftArrow: null,
     draftRect: null,
     draftStroke: null,
+    emoteBursts: [],
     grid: true,
     itemOutlineIds: new Set(),
     laserTrail: null,

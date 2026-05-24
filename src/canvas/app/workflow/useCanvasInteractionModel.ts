@@ -13,6 +13,7 @@ import {
   createCanvasOverlayState,
   type CanvasAffordanceConfig,
   type CanvasDraftArrowOverlay,
+  type CanvasEmoteBurstOverlay,
   type CanvasLaserTrailOverlay,
   type CanvasDraftStrokeOverlay,
   type CanvasPresenceOverlay,
@@ -24,6 +25,7 @@ import { getCanvasInteractionConsumerModel } from './CanvasInteractionConsumerMo
 
 type UseCanvasInteractionModelArgs = {
   config: CanvasAffordanceConfig
+  emoteBursts?: readonly CanvasEmoteBurstOverlay[]
   presence?: readonly CanvasPresenceOverlay[]
   scene: CanvasSceneAdapter
   selection: string[]
@@ -32,6 +34,7 @@ type UseCanvasInteractionModelArgs = {
 
 export function useCanvasInteractionModel({
   config,
+  emoteBursts,
   presence,
   scene,
   selection,
@@ -59,6 +62,7 @@ export function useCanvasInteractionModel({
         draftArrow,
         draftRect,
         draftStroke,
+        emoteBursts,
         laserTrail,
         marquee,
         presence,
@@ -72,6 +76,7 @@ export function useCanvasInteractionModel({
       draftArrow,
       draftRect,
       draftStroke,
+      emoteBursts,
       laserTrail,
       marquee,
       presence,

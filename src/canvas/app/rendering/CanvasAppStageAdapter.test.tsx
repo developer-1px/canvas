@@ -21,6 +21,7 @@ describe('CanvasAppStageAdapter', () => {
         draftArrow: null,
         draftRect: null,
         draftStroke: null,
+        emoteBursts: [],
         grid: true,
         itemOutlineIds: new Set(),
         laserTrail: null,

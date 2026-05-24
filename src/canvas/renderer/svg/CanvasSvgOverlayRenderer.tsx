@@ -118,6 +118,18 @@ export function CanvasSvgInteractionOverlays({
         </g>
       ) : null}
 
+      {overlays.emoteBursts.length > 0 ? (
+        <g className="emote-bursts">
+          {overlays.emoteBursts.map((burst) => (
+            <CanvasSvgEmoteBurst
+              key={burst.id}
+              burst={burst}
+              scale={1 / viewport.scale}
+            />
+          ))}
+        </g>
+      ) : null}
+
       {overlays.alignmentGuides.length > 0 ? (
         <g className="alignment-guides">
           {overlays.alignmentGuides.map((guide, index) =>
@@ -235,6 +247,33 @@ export function CanvasSvgInteractionOverlays({
         </g>
       ) : null}
     </>
+  )
+}
+
+function CanvasSvgEmoteBurst({
+  burst,
+  scale,
+}: {
+  burst: NonNullable<CanvasOverlayState['emoteBursts']>[number]
+  scale: number
+}) {
+  return (
+    <g
+      className="emote-burst"
+      data-emote={burst.emote}
+      transform={`translate(${burst.point.x} ${burst.point.y}) scale(${scale})`}
+    >
+      {burst.particles.map((particle, index) => (
+        <text
+          key={index}
+          className="emote-burst-particle"
+          x={particle.dx}
+          y={particle.dy}
+        >
+          {burst.label}
+        </text>
+      ))}
+    </g>
   )
 }
 

@@ -119,6 +119,37 @@
   stroke-width: 1.5;
 }
 
+.emote-burst {
+  pointer-events: none;
+}
+
+.emote-burst-particle {
+  fill: #111827;
+  stroke: #ffffff;
+  stroke-width: 3;
+  paint-order: stroke;
+  font: 800 18px/1 var(--sans);
+  text-anchor: middle;
+  dominant-baseline: middle;
+  animation: emote-burst 900ms ease-out both;
+}
+
+@keyframes emote-burst {
+  0% {
+    opacity: 0;
+    transform: translateY(8px) scale(0.75);
+  }
+
+  18% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-18px) scale(1.15);
+  }
+}
+
 .arrow-item,
 .draft-arrow {
   fill: none;
@@ -450,6 +481,7 @@
 .component-palette,
 .cursor-chat,
 .drawing-controls,
+.emote-controls,
 .find-replace-panel,
 .image-controls,
 .session-timer,
@@ -601,6 +633,13 @@
   top: 62px;
   left: 188px;
   align-items: center;
+}
+
+.emote-controls {
+  bottom: 14px;
+  left: 50%;
+  align-items: center;
+  transform: translateX(-50%);
 }
 
 .find-replace-panel {
@@ -816,6 +855,7 @@
 .zoom-value,
 .image-controls button,
 .stamp-button,
+.emote-button,
 .session-timer button,
 .spotlight button,
 .voting-session button,
@@ -849,6 +889,10 @@
   width: 34px;
 }
 
+.emote-button {
+  width: 34px;
+}
+
 .session-timer button {
   min-width: 34px;
   padding: 0 8px;
@@ -871,6 +915,10 @@
 
 .stamp-button-label {
   font: 750 14px/1 var(--sans);
+}
+
+.emote-button-label {
+  font: 800 13px/1 var(--sans);
 }
 
 .component-button-mark {
@@ -930,6 +978,7 @@
 .zoom-value:hover,
 .image-controls button:hover,
 .stamp-button:hover,
+.emote-button:hover,
 .session-timer button:hover,
 .spotlight button:hover,
 .voting-session button:hover,
@@ -943,6 +992,7 @@
 .tool-button:disabled,
 .image-controls button:disabled,
 .stamp-button:disabled,
+.emote-button:disabled,
 .session-timer button:disabled,
 .spotlight button:disabled,
 .voting-session button:disabled,
@@ -954,6 +1004,7 @@
 .tool-button:disabled:hover,
 .image-controls button:disabled:hover,
 .stamp-button:disabled:hover,
+.emote-button:disabled:hover,
 .session-timer button:disabled:hover,
 .spotlight button:disabled:hover,
 .voting-session button:disabled:hover,
@@ -976,6 +1027,7 @@
 .zoom-value:focus-visible,
 .image-controls button:focus-visible,
 .stamp-button:focus-visible,
+.emote-button:focus-visible,
 .session-timer button:focus-visible,
 .spotlight button:focus-visible,
 .voting-session input:focus-visible,
@@ -1064,6 +1116,13 @@
     right: 10px;
     bottom: auto;
     left: 10px;
+    transform: none;
+  }
+
+  .emote-controls {
+    right: 10px;
+    bottom: 58px;
+    left: auto;
     transform: none;
   }
 

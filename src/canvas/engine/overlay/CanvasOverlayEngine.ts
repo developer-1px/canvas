@@ -36,6 +36,19 @@ export type CanvasLaserTrailOverlay = {
   points: Point[]
 }
 
+export type CanvasEmoteBurstOverlay = {
+  emote: string
+  id: string
+  label: string
+  particles: readonly CanvasEmoteBurstParticle[]
+  point: Point
+}
+
+export type CanvasEmoteBurstParticle = {
+  dx: number
+  dy: number
+}
+
 export type CanvasPresenceOverlay = {
   color: string
   id: string
@@ -49,6 +62,7 @@ export type CanvasOverlayState = {
   draftArrow: CanvasDraftArrowOverlay | null
   draftRect: Bounds | null
   draftStroke: CanvasDraftStrokeOverlay | null
+  emoteBursts: readonly CanvasEmoteBurstOverlay[]
   grid: boolean
   itemOutlineIds: Set<string>
   laserTrail: CanvasLaserTrailOverlay | null
@@ -64,6 +78,7 @@ export function createCanvasOverlayState({
   draftArrow,
   draftRect,
   draftStroke,
+  emoteBursts = [],
   laserTrail,
   marquee,
   presence = [],
@@ -76,6 +91,7 @@ export function createCanvasOverlayState({
   draftArrow: CanvasDraftArrowOverlay | null
   draftRect: Bounds | null
   draftStroke: CanvasDraftStrokeOverlay | null
+  emoteBursts?: readonly CanvasEmoteBurstOverlay[]
   laserTrail: CanvasLaserTrailOverlay | null
   marquee: Bounds | null
   presence?: readonly CanvasPresenceOverlay[]
@@ -93,6 +109,7 @@ export function createCanvasOverlayState({
     draftArrow: config.overlays.draftArrow ? draftArrow : null,
     draftRect: config.overlays.draftRect ? draftRect : null,
     draftStroke: config.overlays.draftStroke ? draftStroke : null,
+    emoteBursts: config.overlays.emoteBursts ? [...emoteBursts] : [],
     grid: config.overlays.grid,
     itemOutlineIds: config.overlays.itemOutline
       ? new Set(selection)

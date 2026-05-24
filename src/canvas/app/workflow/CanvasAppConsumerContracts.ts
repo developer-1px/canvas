@@ -597,6 +597,7 @@ export type CanvasAppStageContext = {
 export type CanvasAppStageModelInput = {
   blurTextEditor: () => void
   cursorChat: CanvasAppStageCursorChatContext
+  emote: CanvasAppStageEmoteContext
   itemLayer: CanvasAppStageItemLayerContext
   pointer: CanvasAppPointerConsumerModel
   rendering: CanvasAppStageRenderingContext
@@ -605,6 +606,11 @@ export type CanvasAppStageModelInput = {
 
 export type CanvasAppStageCursorChatContext = {
   onPointerDown: (event: CanvasAppPointerInput) => void
+  onPointerMove: (event: CanvasAppPointerInput) => void
+}
+
+export type CanvasAppStageEmoteContext = {
+  onPointerDown: (event: CanvasAppPointerInput) => boolean
   onPointerMove: (event: CanvasAppPointerInput) => void
 }
 

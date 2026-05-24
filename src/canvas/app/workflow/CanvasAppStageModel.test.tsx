@@ -50,9 +50,17 @@ describe('CanvasAppStageModel', () => {
       onPointerDown: () => calls.push('cursor-down'),
       onPointerMove: () => calls.push('cursor-move'),
     })
+    const emote = createEmoteModel({
+      onPointerDown: () => {
+        calls.push('emote-down')
+        return false
+      },
+      onPointerMove: () => calls.push('emote-move'),
+    })
     const input = createStageModelInput({
       blurTextEditor: () => calls.push('blur'),
       cursorChat,
+      emote,
       pointer: {
         itemLayerHandlers: {
           ...pointer.itemLayerHandlers,
@@ -98,7 +106,9 @@ describe('CanvasAppStageModel', () => {
 
     expect(calls).toEqual([
       'cursor-move',
+      'emote-move',
       'cursor-down',
+      'emote-down',
       'blur',
       'canvas',
       'cursor-down',
@@ -108,6 +118,41 @@ describe('CanvasAppStageModel', () => {
       'blur',
       'arrow:arrow-1:end',
     ])
+  })
+
+  it('lets transient emotes consume canvas pointer down before document handlers', () => {
+    const calls: string[] = []
+    let stageInput: CanvasAppStageRenderInput | null = null
+    const input = createStageModelInput({
+      blurTextEditor: () => calls.push('blur'),
+      emote: createEmoteModel({
+        onPointerDown: () => {
+          calls.push('emote-down')
+          return true
+        },
+      }),
+      pointer: {
+        ...createPointerModel(),
+        stageHandlers: {
+          ...createPointerModel().stageHandlers,
+          onCanvasPointerDown: () => calls.push('canvas'),
+        },
+      },
+      rendering: {
+        ...createRenderingModel(),
+        stageAdapter: {
+          renderStage: (nextInput) => {
+            stageInput = nextInput
+            return 'stage'
+          },
+        },
+      },
+    })
+
+    renderCanvasAppStageModel(input)
+    expectStageInput(stageInput).onCanvasPointerDown(createPointerInput())
+
+    expect(calls).toEqual(['emote-down', 'blur'])
   })
 
   it('contains item layer adapter failures without dropping the stage', () => {
@@ -155,6 +200,7 @@ function createStageModelInput(
   return {
     blurTextEditor: vi.fn(),
     cursorChat: createCursorChatModel(),
+    emote: createEmoteModel(),
     itemLayer: createItemLayerModel(),
     pointer: createPointerModel(),
     rendering: createRenderingModel(),
@@ -168,6 +214,16 @@ function createCursorChatModel(
 ): CanvasAppStageModelInput['cursorChat'] {
   return {
     onPointerDown: vi.fn(),
+    onPointerMove: vi.fn(),
+    ...overrides,
+  }
+}
+
+function createEmoteModel(
+  overrides: Partial<CanvasAppStageModelInput['emote']> = {},
+): CanvasAppStageModelInput['emote'] {
+  return {
+    onPointerDown: vi.fn(() => false),
     onPointerMove: vi.fn(),
     ...overrides,
   }

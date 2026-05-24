@@ -14,6 +14,7 @@ describe('CanvasAppView', () => {
           componentPalette: false,
           cursorChat: false,
           drawingControls: false,
+          emoteControls: false,
           imageControls: false,
           inspector: false,
           sessionTimer: false,
@@ -32,6 +33,7 @@ describe('CanvasAppView', () => {
     expect(markup).not.toContain('component-palette')
     expect(markup).not.toContain('cursor-chat')
     expect(markup).not.toContain('drawing-controls')
+    expect(markup).not.toContain('emote-controls')
     expect(markup).not.toContain('image-controls')
     expect(markup).not.toContain('object-inspector')
     expect(markup).not.toContain('session-timer')
@@ -52,6 +54,7 @@ describe('CanvasAppView', () => {
     expect(markup).toContain('component-palette')
     expect(markup).toContain('cursor-chat')
     expect(markup).toContain('drawing-controls')
+    expect(markup).toContain('emote-controls')
     expect(markup).toContain('image-controls')
     expect(markup).toContain('object-inspector')
     expect(markup).toContain('session-timer')
@@ -72,6 +75,7 @@ function createViewProps(
     componentPalette?: boolean
     cursorChat?: boolean
     drawingControls?: boolean
+    emoteControls?: boolean
     imageControls?: boolean
     inspector?: boolean
     sessionTimer?: boolean
@@ -125,6 +129,15 @@ function createViewProps(
       onOpacityChange: noop,
       onStrokeChange: noop,
       onStrokeWidthChange: noop,
+    },
+    emoteControls: {
+      emotes: [{
+        emote: 'thumbs-up',
+        label: '+1',
+        title: 'Thumbs up emote',
+      }],
+      visible: visible.emoteControls ?? true,
+      onReleaseEmote: noop,
     },
     findReplace: {
       matchCount: 0,

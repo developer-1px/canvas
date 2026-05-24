@@ -13,6 +13,7 @@ export type { CanvasAppStageModelInput } from './CanvasAppConsumerContracts'
 export function renderCanvasAppStageModel({
   blurTextEditor,
   cursorChat,
+  emote,
   itemLayer,
   pointer,
   rendering,
@@ -53,6 +54,11 @@ export function renderCanvasAppStageModel({
       children,
       onCanvasPointerDown: (event) => {
         cursorChat.onPointerDown(event)
+        if (emote.onPointerDown(event)) {
+          blurTextEditor()
+          return
+        }
+
         blurTextEditor()
         pointer.stageHandlers.onCanvasPointerDown(event)
       },
@@ -60,6 +66,7 @@ export function renderCanvasAppStageModel({
       onPointerCancel: pointer.stageHandlers.onPointerCancel,
       onPointerMove: (event) => {
         cursorChat.onPointerMove(event)
+        emote.onPointerMove(event)
         pointer.stageHandlers.onPointerMove(event)
       },
       onPointerUp: pointer.stageHandlers.onPointerUp,

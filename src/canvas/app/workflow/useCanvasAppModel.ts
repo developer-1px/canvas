@@ -7,6 +7,7 @@ import { useCanvasAppCommandModel } from './useCanvasAppCommandModel'
 import { useCanvasAppComponentModel } from './useCanvasAppComponentModel'
 import { useCanvasCursorChatModel } from '../cursor/useCanvasCursorChatModel'
 import { useCanvasAppDrawingModel } from './useCanvasAppDrawingModel'
+import { useCanvasEmoteModel } from '../emote/useCanvasEmoteModel'
 import { useCanvasAppExtensionModel } from './useCanvasAppExtensionModel'
 import { useCanvasSessionTimerModel } from '../facilitation/useCanvasSessionTimerModel'
 import { useCanvasSpotlightModel } from '../facilitation/useCanvasSpotlightModel'
@@ -55,8 +56,14 @@ export function useCanvasAppModel({
     followerCount: presence?.length ?? 0,
   })
   const votingSession = useCanvasVotingSessionModel(affordance.facilitation)
+  const emotes = useCanvasEmoteModel({
+    ...affordance.interaction,
+    stageElement,
+    viewport: workspace.stage.viewport,
+  })
   const interaction = useCanvasInteractionModel({
     ...affordance.interaction,
+    emoteBursts: emotes.overlay.bursts,
     presence,
     ...workspace.interaction,
   })
@@ -182,6 +189,7 @@ export function useCanvasAppModel({
     inspector,
     stage: renderCanvasAppStageModel({
       cursorChat: cursorChat.stage,
+      emote: emotes.stage,
       ...text.stage,
       itemLayer: workspace.itemLayer,
       pointer,
@@ -193,6 +201,7 @@ export function useCanvasAppModel({
       },
     }),
     cursorChat: cursorChat.view,
+    emoteControls: emotes.view,
     sessionTimer: sessionTimer.view,
     spotlight: spotlight.view,
     stampControls,
