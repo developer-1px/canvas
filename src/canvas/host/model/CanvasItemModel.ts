@@ -3,6 +3,7 @@ export type {
   CanvasComponentKind,
   CanvasCustomItem,
   CanvasDrawingItemBase,
+  CanvasEditableTextItem,
   CanvasItem,
   CanvasItemBase,
   CanvasJsonObject,

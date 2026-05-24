@@ -1,4 +1,5 @@
 import type {
+  CanvasEditableTextItem,
   CanvasItem,
   EditingText,
   Point,
@@ -6,7 +7,6 @@ import type {
 } from '../../entities'
 import {
   getCanvasEditableTextValue,
-  type CanvasEditableTextItem,
   type CanvasItemReadModel,
 } from '../../host'
 import {

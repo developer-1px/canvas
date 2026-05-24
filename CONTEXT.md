@@ -11,7 +11,7 @@
 - Core Contract: 특정 Host App, Renderer, React 상태에 묶이지 않는 재사용 부품의 입력과 출력 계약.
 - Canvas Bounds Resize: bounds resize, aspect ratio lock, center resize, handle point, item bounds scaling을 제공하는 Core geometry Module.
 - Canvas Stable Id: persisted kind, presentation key, registry key에 쓰는 lower-kebab 문자열 계약.
-- Entities Contract: 런타임 구현 없이 Core geometry type과 Demo canvas item type을 노출하는 type-only 계약. Runtime helper는 Core/Host/App seam에 둔다.
+- Entities Contract: 런타임 구현 없이 Core geometry type, Demo canvas item type, stable item subtype alias를 노출하는 type-only 계약. Runtime helper는 Core/Host/App seam에 둔다.
 - Engine Public Facade: Host App, Demo App, UI, Renderer Adapter가 Engine을 사용할 때 import하는 안정된 Module 경계.
 - Host Document Controller: Demo `CanvasItem` 문서의 history, selection, clipboard, text search, item commit을 React와 zod-crud 세부 구현 없이 제공하는 Module.
 - Canvas Document Change Patch: CanvasItemsChange별 patch builder table과 Host-owned JSON Patch factory 호출을 소유하는 change-to-patch grammar Module.
@@ -27,7 +27,7 @@
 - Canvas Built-in Component Templates: Sticky, label, card 같은 기본 Demo component catalogue를 소유하는 Host-owned Module.
 - Canvas Component Presentation: Demo component kind를 Renderer Adapter의 그리기 전략과 연결하는 key. 새 component kind는 기존 presentation을 재사용할 수 있다.
 - Canvas Component Item Validation: component item의 stable component id, title/style string, optional text list 저장 shape 검증을 소유하는 Host-owned validation Module.
-- Canvas Editable Text Item: rect와 text item이 공유하는 editable target 판정, 저장 shape, edit initial value, commit fallback, patch operation을 소유하는 Host-owned text Module.
+- Canvas Editable Text Item: `RectItem | TextItem` stable entity type은 Entities Contract가 소유하고, rect/text item이 공유하는 editable target 판정, 저장 shape, edit initial value, commit fallback, patch operation은 Host-owned text Module이 소유한다.
 - Canvas App Assembly: 내부 캔버스 문법은 유지하면서 affordance feature toggle, Host item adapter, component library, custom item module, initial items, SVG presentation registry 같은 제품별 의미를 외부에서 조립하는 composition Module.
 - Canvas App Assembly Input Types: affordance, component, adapter, workspace child assembly input field 계약을 runtime 조립 구현과 분리해 소유하고 Canvas App Assembly Input에 합성되는 App-owned type 계약.
 - Canvas App Assembly Types: public assembly input/output type 계약만 소유하고 runtime assembly/default/snapshot/contract Module은 이 type Module을 참조한다.
@@ -241,7 +241,7 @@
 - 기본 드로잉 item의 bounds는 caller 입력을 믿지 않고 Host tree/document가 `points` 또는 `start/end`에서 canonical하게 동기화한다.
 - 기본 드로잉 item의 geometry bounds, translate/scale, bounds cache sync 규칙은 Host Drawing Item Geometry Module이 소유하고 tree bounds, clone, transform, SVG drawing type guard가 재사용한다.
 - 기본 드로잉 item의 style 기본값은 Host Drawing Item Style Module이 소유하고 draft overlay와 item creation이 재사용한다.
-- Rect/text의 editable text 판정, 저장 shape 검증, initial edit value, empty text fallback, rect text add-patch 여부는 Host Canvas Editable Text Item Module이 소유한다.
+- Rect/text의 stable editable text item type은 Entities Contract가 소유하고, editable text 판정, 저장 shape 검증, initial edit value, empty text fallback, rect text add-patch 여부는 Host Canvas Editable Text Item Module이 소유한다.
 - Group item 판정과 recursive children 저장 shape는 Host Canvas Group Item Module이 소유하고 Host tree/document/operation Module은 named predicate를 호출한다.
 - 엔진은 Fabric.js 같은 완성형 객체 모델을 감싸기보다, 커스텀 가능한 Affordance 문법을 작은 Interface로 제공한다.
 - Demo `CanvasItem`과 SVG 렌더링 방식은 재사용 Core Contract에 포함하지 않는다.

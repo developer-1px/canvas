@@ -1,4 +1,4 @@
-import type { CanvasEditableTextItem } from '../../host'
+import type { CanvasEditableTextItem } from '../../entities'
 import { renderCanvasDemoSvgRectTextItemByRoute } from './CanvasDemoSvgRectTextItemRenderRouting'
 
 export type CanvasDemoSvgRectTextItem = CanvasEditableTextItem

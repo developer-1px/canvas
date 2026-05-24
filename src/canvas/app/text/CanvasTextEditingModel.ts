@@ -1,10 +1,10 @@
 import type {
+  CanvasEditableTextItem,
   EditingText,
   Viewport,
 } from '../../entities'
 import {
   getCommittedCanvasEditableTextValue,
-  type CanvasEditableTextItem,
 } from '../../host'
 import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract'
 

@@ -1,8 +1,10 @@
 import type { PointerEvent } from 'react'
-import type { CanvasItem } from '../../entities'
+import {
+  type CanvasEditableTextItem,
+  type CanvasItem,
+} from '../../entities'
 import {
   getCanvasItemBounds,
-  type CanvasEditableTextItem,
 } from '../../host'
 import { CanvasDemoSvgItemFrame } from './CanvasDemoSvgItemFrame'
 import { getCanvasDemoSvgItemRenderRoute } from './CanvasDemoSvgItemRenderRouting'

@@ -21,6 +21,8 @@ export type TextItem = CanvasItemBase & {
   text: string
 }
 
+export type CanvasEditableTextItem = RectItem | TextItem
+
 export type CanvasDrawingItemBase = CanvasItemBase & {
   opacity: number
   points: Point[]

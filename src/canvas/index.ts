@@ -47,6 +47,7 @@ export type {
   CanvasCustomItem,
   CanvasCustomToolId,
   CanvasDrawingItemBase,
+  CanvasEditableTextItem,
   CanvasInteractionKind,
   CanvasItem,
   CanvasItemBase,

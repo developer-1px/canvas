@@ -1,10 +1,10 @@
 import type { ReactNode } from 'react'
-import {
-  isCanvasTextItem,
-  type CanvasEditableTextItem,
-  type RectItem,
-  type TextItem,
-} from '../../host'
+import type {
+  CanvasEditableTextItem,
+  RectItem,
+  TextItem,
+} from '../../entities'
+import { isCanvasTextItem } from '../../host'
 
 type CanvasDemoSvgRectTextItemRenderStrategy<
   TItem extends CanvasEditableTextItem,

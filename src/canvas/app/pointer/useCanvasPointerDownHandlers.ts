@@ -6,6 +6,7 @@ import type {
 import { useRef } from 'react'
 import type {
   Bounds,
+  CanvasEditableTextItem,
   CanvasItem,
   EditingText,
   Point,
@@ -14,7 +15,6 @@ import type {
   Viewport,
 } from '../../entities'
 import type {
-  CanvasEditableTextItem,
   CanvasItemReadModel,
 } from '../../host'
 import {

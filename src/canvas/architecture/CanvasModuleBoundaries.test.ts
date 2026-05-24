@@ -3152,6 +3152,7 @@ describe('Canvas module boundaries', () => {
       'renderItems: (input: CanvasAppItemLayerRenderInput)',
     )
     expect(contractsFile.source).not.toContain('CanvasDemoSvg')
+    expect(contractsFile.source).not.toContain("from '../../host'")
     expect(registriesFile.source).toContain(
       'export function createCanvasAppComponentPresentationRenderers',
     )
@@ -3411,7 +3412,15 @@ describe('Canvas module boundaries', () => {
       "editingItem.type === 'text'",
     )
     expect(editableTextFile.source).toContain(
-      'export type CanvasEditableTextItem',
+      'export type { CanvasEditableTextItem }',
+    )
+    expect(editableTextFile.source).not.toContain(
+      'export type CanvasEditableTextItem =',
+    )
+    expect(getSourceFile('src/canvas/entities/CanvasItemEntities.ts').source)
+      .toContain('export type CanvasEditableTextItem = RectItem | TextItem')
+    expect(getSourceFile('src/canvas/entities/index.ts').source).toContain(
+      'CanvasEditableTextItem',
     )
     expect(editableTextFile.source).toContain(
       'export function isCanvasEditableTextItem',

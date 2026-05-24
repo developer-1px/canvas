@@ -20,6 +20,7 @@ import type {
 import type {
   Bounds,
   CanvasComponentKind,
+  CanvasEditableTextItem,
   CanvasInteractionKind,
   CanvasItem,
   EditingText,
@@ -31,7 +32,6 @@ import type {
 import type {
   CanvasComponentLibrary,
   CanvasComponentTemplate,
-  CanvasEditableTextItem,
   CanvasItemReadModel,
 } from '../../host'
 import type { CanvasAppCustomCommand } from '../commands/CanvasAppCustomCommands'

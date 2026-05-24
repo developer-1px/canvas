@@ -1,10 +1,10 @@
 import type {
+  CanvasEditableTextItem,
   CanvasItem,
-  RectItem,
   TextItem,
 } from '../model'
 
-export type CanvasEditableTextItem = RectItem | TextItem
+export type { CanvasEditableTextItem } from '../model'
 
 export function isCanvasTextItem(item: CanvasItem): item is TextItem {
   return item.type === 'text'

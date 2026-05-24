@@ -1,6 +1,8 @@
 import type { PointerEvent } from 'react'
-import type { CanvasItem } from '../../entities'
-import type { CanvasEditableTextItem } from '../../host'
+import type {
+  CanvasEditableTextItem,
+  CanvasItem,
+} from '../../entities'
 import {
   DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS,
   type CanvasDemoSvgComponentPresentationRenderers,

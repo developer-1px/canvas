@@ -3,10 +3,10 @@ import type {
   Bounds,
   CanvasComponentItem,
   CanvasCustomItem,
+  CanvasEditableTextItem,
   CanvasItem,
   GroupItem,
 } from '../../entities'
-import type { CanvasEditableTextItem } from '../../host'
 import { CanvasDemoSvgComponentRenderer } from './CanvasDemoSvgComponentRenderer'
 import {
   renderCanvasDemoSvgDrawingItem,

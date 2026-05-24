@@ -7,6 +7,7 @@ export type {
   CanvasComponentKind,
   CanvasCustomItem,
   CanvasDrawingItemBase,
+  CanvasEditableTextItem,
   CanvasItem,
   CanvasItemBase,
   CanvasJsonObject,
@@ -78,7 +79,6 @@ export {
   isCanvasEditableTextItem,
   isCanvasEditableTextItemStorageShape,
   isCanvasTextItem,
-  type CanvasEditableTextItem,
 } from './text/CanvasEditableTextItem'
 
 export type { CanvasItemsChange } from './document/CanvasDocumentChanges'

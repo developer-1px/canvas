@@ -20,6 +20,7 @@ import {
   type CanvasAppStageMount,
   type CanvasWorkspaceStorageProvider,
   type CanvasCustomItem,
+  type CanvasEditableTextItem,
   type CanvasItem,
 } from 'canvas'
 import {
@@ -67,6 +68,7 @@ describe('Canvas package consumer imports', () => {
       x: 10,
       y: 20,
     }
+    const editableItem: CanvasEditableTextItem = rect
     const module: CanvasAppCustomItemModule =
       defineCanvasAppCustomItemModule({
         id: 'smoke',
@@ -152,6 +154,7 @@ describe('Canvas package consumer imports', () => {
       outlineIds: new Set(),
       selected: new Set(),
     })).toBe(1)
+    expect(editableItem.id).toBe(rect.id)
     expect(assembly.stageAdapter.renderStage).toBe(stageAdapter.renderStage)
     expect(assembly.workspaceStorageProvider).toBe(workspaceStorageProvider)
     expect(stageMount.ref).toBeTypeOf('function')

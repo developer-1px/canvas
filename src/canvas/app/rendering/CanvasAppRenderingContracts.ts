@@ -7,12 +7,12 @@ import type {
   CanvasComponentItem,
   CanvasCustomItem,
   CanvasInteractionKind,
+  CanvasEditableTextItem,
   CanvasItem,
   ResizeHandle,
   Tool,
   Viewport,
 } from '../../entities'
-import type { CanvasEditableTextItem } from '../../host'
 import type {
   CanvasAppEventInput,
   CanvasAppPointerInput,
