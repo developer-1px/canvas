@@ -65,6 +65,21 @@ const attachedComment: CanvasItem = {
   y: 8,
 }
 
+const section: CanvasItem = {
+  accent: '#64748b',
+  body: 'Workspace',
+  component: 'section',
+  fill: 'rgba(241, 245, 249, 0.42)',
+  h: 220,
+  id: 'section-1',
+  stroke: '#94a3b8',
+  title: 'Section',
+  type: 'component',
+  w: 340,
+  x: 0,
+  y: 0,
+}
+
 describe('CanvasItemTransformOperations drawing items', () => {
   test('translates arrow bounds and endpoints together', () => {
     expect(translateCanvasItems([arrow], ['arrow-1'], 10, -5)[0]).toEqual({
@@ -148,6 +163,128 @@ describe('CanvasItemTransformOperations drawing items', () => {
       h: 48,
       points: [{ x: 100, y: 100 }, { x: 304, y: 144 }],
     })
+  })
+})
+
+describe('CanvasItemTransformOperations section contents', () => {
+  test('moves items contained by a selected section', () => {
+    const containedRect = {
+      ...rect,
+      id: 'rect-contained',
+      x: 40,
+      y: 60,
+    }
+    const outsideRect = {
+      ...rect,
+      id: 'rect-outside',
+      x: 360,
+      y: 60,
+    }
+
+    expect(translateCanvasItems(
+      [section, containedRect, outsideRect],
+      ['section-1'],
+      16,
+      24,
+    )).toEqual([
+      {
+        ...section,
+        x: 16,
+        y: 24,
+      },
+      {
+        ...containedRect,
+        x: 56,
+        y: 84,
+      },
+      outsideRect,
+    ])
+  })
+
+  test('moves section-contained attachments and connectors', () => {
+    const containedRect = {
+      ...rect,
+      id: 'rect-contained',
+      x: 40,
+      y: 60,
+    }
+    const attachedToContained = {
+      ...attachedStamp,
+      attachedTo: 'rect-contained',
+      id: 'stamp-contained',
+      x: 150,
+      y: 40,
+    }
+    const attachedArrow = {
+      ...arrow,
+      endAttachedTo: 'rect-outside',
+      id: 'arrow-contained',
+      start: { x: 60, y: 80 },
+      startAttachedTo: 'rect-contained',
+    }
+
+    expect(translateCanvasItems(
+      [section, containedRect, attachedToContained, attachedArrow],
+      ['section-1'],
+      10,
+      20,
+    )).toEqual([
+      {
+        ...section,
+        x: 10,
+        y: 20,
+      },
+      {
+        ...containedRect,
+        x: 50,
+        y: 80,
+      },
+      {
+        ...attachedToContained,
+        x: 160,
+        y: 60,
+      },
+      {
+        ...attachedArrow,
+        end: { x: 210, y: 140 },
+        h: 64,
+        start: { x: 70, y: 100 },
+        w: 164,
+        x: 58,
+        y: 88,
+      },
+    ])
+  })
+
+  test('does not move locked or partially-contained items with a section', () => {
+    const lockedInside = {
+      ...rect,
+      id: 'rect-locked',
+      locked: true,
+      x: 40,
+      y: 60,
+    }
+    const partiallyOutside = {
+      ...rect,
+      id: 'rect-partial',
+      x: 300,
+      y: 60,
+    }
+
+    expect(translateCanvasItems(
+      [section, lockedInside, partiallyOutside],
+      ['section-1'],
+      10,
+      20,
+    )).toEqual([
+      {
+        ...section,
+        x: 10,
+        y: 20,
+      },
+      lockedInside,
+      partiallyOutside,
+    ])
   })
 })
 

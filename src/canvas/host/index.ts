@@ -45,6 +45,7 @@ export {
 export {
   CANVAS_SECTION_COMPONENT_KIND,
   CANVAS_SECTION_DEFAULT_SIZE,
+  isCanvasSectionComponentItem,
 } from './component/CanvasSectionComponent'
 export {
   CANVAS_STICKY_COMPONENT_KIND,

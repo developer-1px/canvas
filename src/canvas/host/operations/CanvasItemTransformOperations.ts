@@ -2,6 +2,7 @@ import type { Bounds } from '../../core'
 import type { CanvasItem } from '../model'
 import { scaleItemBounds } from '../../core'
 import { isCanvasItemAttachedTo } from '../attachment/CanvasItemAttachment'
+import { isCanvasSectionComponentItem } from '../component/CanvasSectionComponent'
 import {
   isCanvasArrowDrawingItem,
   isCanvasDrawingItem,
@@ -27,13 +28,17 @@ export function translateCanvasItems(
 ) {
   const selected = new Set(pruneNestedSelection(items, ids))
   const movableSelected = getMovableSelectedCanvasItemIds(items, selected)
+  const movableWithSectionContents = getMovableCanvasItemIdsWithSectionContents({
+    items,
+    selected: movableSelected,
+  })
 
   return mapCanvasItems(items, (item) =>
     translateCanvasItemForSelection({
       dx,
       dy,
       item,
-      movableSelected,
+      movableSelected: movableWithSectionContents,
     }),
   )
 }
@@ -122,6 +127,62 @@ function getMovableSelectedCanvasItemIds(
         selected.has(entry.item.id) && !isCanvasItemLocked(entry.item),
       )
       .map((entry) => entry.item.id),
+  )
+}
+
+function getMovableCanvasItemIdsWithSectionContents({
+  items,
+  selected,
+}: {
+  items: CanvasItem[]
+  selected: ReadonlySet<string>
+}) {
+  const movableIds = new Set(selected)
+  const entries = flattenCanvasItems(items)
+  const sectionBounds = entries
+    .filter((entry) =>
+      selected.has(entry.item.id) &&
+      isCanvasSectionComponentItem(entry.item) &&
+      !isCanvasItemLocked(entry.item),
+    )
+    .map((entry) => getItemBounds(entry.item))
+
+  if (sectionBounds.length === 0) {
+    return movableIds
+  }
+
+  for (const entry of entries) {
+    if (
+      movableIds.has(entry.item.id) ||
+      isCanvasItemLocked(entry.item) ||
+      !isContainedByAnyCanvasSection(entry.item, sectionBounds)
+    ) {
+      continue
+    }
+
+    movableIds.add(entry.item.id)
+  }
+
+  return movableIds
+}
+
+function isContainedByAnyCanvasSection(
+  item: CanvasItem,
+  sectionBounds: readonly Bounds[],
+) {
+  const bounds = getItemBounds(item)
+
+  return sectionBounds.some((section) =>
+    isCanvasBoundsInsideBounds(bounds, section),
+  )
+}
+
+function isCanvasBoundsInsideBounds(bounds: Bounds, container: Bounds) {
+  return (
+    bounds.x >= container.x &&
+    bounds.y >= container.y &&
+    bounds.x + bounds.w <= container.x + container.w &&
+    bounds.y + bounds.h <= container.y + container.h
   )
 }
 

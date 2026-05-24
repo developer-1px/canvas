@@ -132,3 +132,6 @@
 128. Section은 내부 built-in tool로 제공된다.
 129. `Shift+S`는 Section tool을 활성화하고, `S` sticky note shortcut과 충돌하지 않는다.
 130. Section tool은 클릭 시 기본 section을 만들고, 드래그 시 custom size section을 만든 뒤 선택 도구로 돌아간다.
+131. 선택한 section을 이동하면 section bounds 안에 완전히 포함된 항목도 함께 이동한다.
+132. Section-contained 이동은 연결된 stamp/comment와 connector도 같은 Host transform 규칙으로 함께 처리한다.
+133. Locked item과 section 밖으로 일부라도 벗어난 항목은 section-contained 이동에 포함하지 않는다.
