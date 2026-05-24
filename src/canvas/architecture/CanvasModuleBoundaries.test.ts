@@ -4701,6 +4701,12 @@ describe('Canvas module boundaries', () => {
     const linkPreviewImportFile = getSourceFile(
       'src/canvas/app/link/CanvasLinkPreviewImport.ts',
     )
+    const linkPreviewInspectorPanelFile = getSourceFile(
+      'src/canvas/app/link/CanvasLinkPreviewInspectorPanel.tsx',
+    )
+    const defaultAssemblyFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppDefaultAssembly.ts',
+    )
     const hostLinkPreviewFile = getSourceFile(
       'src/canvas/host/component/CanvasLinkPreviewComponent.ts',
     )
@@ -4722,8 +4728,20 @@ describe('Canvas module boundaries', () => {
     expect(linkPreviewImportFile.source).toContain(
       'createCanvasLinkPreviewComponentItem',
     )
+    expect(linkPreviewInspectorPanelFile.source).toContain(
+      'replaceCanvasLinkPreviewComponentsWithSourceText',
+    )
+    expect(defaultAssemblyFile.source).toContain(
+      "from '../link/CanvasLinkPreviewInspectorPanel'",
+    )
+    expect(defaultAssemblyFile.source).toContain(
+      'CANVAS_LINK_PREVIEW_INSPECTOR_PANEL',
+    )
     expect(hostLinkPreviewFile.source).toContain(
       'export function createCanvasLinkPreviewComponentItem',
+    )
+    expect(hostLinkPreviewFile.source).toContain(
+      'export function replaceCanvasLinkPreviewComponentsWithSourceText',
     )
     expect(hostLinkPreviewFile.source).not.toMatch(browserLinkPreviewHow)
   })

@@ -27,12 +27,17 @@ export function useCanvasObjectInspector({
     () => itemReadModel.getSelectedItems(selection),
     [itemReadModel, selection],
   )
+  const items = useMemo(
+    () => itemReadModel.getAllItems(),
+    [itemReadModel],
+  )
   const inspectorModel = useMemo(
     () =>
       getCanvasObjectInspectorModel({
         bounds,
         commitItemsChange,
         inspectorPanels,
+        items,
         selectedItems,
         selection,
       }),
@@ -40,6 +45,7 @@ export function useCanvasObjectInspector({
       bounds,
       commitItemsChange,
       inspectorPanels,
+      items,
       selectedItems,
       selection,
     ],

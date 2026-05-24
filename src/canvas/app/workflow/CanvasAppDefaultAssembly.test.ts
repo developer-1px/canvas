@@ -12,6 +12,9 @@ import {
 import { DEFAULT_CANVAS_APP_ITEM_LAYER_ADAPTER } from '../rendering/CanvasAppItemLayerAdapter'
 import { DEFAULT_CANVAS_APP_STAGE_ADAPTER } from '../rendering/CanvasAppStageAdapter'
 import { DEFAULT_CANVAS_WORKSPACE_STORAGE_PROVIDER } from '../document/CanvasWorkspacePersistence'
+import {
+  CANVAS_LINK_PREVIEW_INSPECTOR_PANEL,
+} from '../link/CanvasLinkPreviewInspectorPanel'
 import { DEFAULT_CANVAS_APP_ASSEMBLY } from './CanvasAppDefaultAssembly'
 
 describe('CanvasAppDefaultAssembly', () => {
@@ -28,6 +31,9 @@ describe('CanvasAppDefaultAssembly', () => {
     expect(DEFAULT_CANVAS_APP_ASSEMBLY.customItemRenderers).toEqual(
       DEFAULT_CANVAS_APP_CUSTOM_ITEM_RENDERERS,
     )
+    expect(DEFAULT_CANVAS_APP_ASSEMBLY.inspectorPanels).toEqual([
+      CANVAS_LINK_PREVIEW_INSPECTOR_PANEL,
+    ])
     expect(DEFAULT_CANVAS_APP_ASSEMBLY.initialItems).toEqual(INITIAL_ITEMS)
     expect(DEFAULT_CANVAS_APP_ASSEMBLY.initialSelection).toEqual([
       'component-sticky',

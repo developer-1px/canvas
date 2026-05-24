@@ -14,6 +14,7 @@ export type CanvasAppInspectorPanelContext = {
   bounds: Bounds | null
   commitItemsChange: CanvasAppInspectorPanelCommitItemsChange
   disabled: boolean
+  items?: CanvasItem[]
   label: string | null
   selectedItems: CanvasItem[]
   selection: string[]

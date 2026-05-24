@@ -188,3 +188,4 @@
 184. HTTP/HTTPS URL 또는 embed snippet paste는 FigJam식 built-in link preview import affordance로 처리한다.
 185. URL drop은 drop 위치에 link preview component를 생성하고, URL paste는 viewport 중심에 link preview component를 생성한다.
 186. Link preview component는 `url`을 title/body와 분리해 저장하고, renderer는 component library template 없이 built-in `link-preview-card` presentation으로 표시한다.
+187. 선택한 link preview는 Inspector의 built-in action으로 원본 URL text item으로 되돌릴 수 있다.

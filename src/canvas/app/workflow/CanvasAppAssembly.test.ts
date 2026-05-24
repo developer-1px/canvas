@@ -128,6 +128,7 @@ describe('CanvasAppAssembly', () => {
       'risk',
     ])
     expect(assembly.inspectorPanels.map((panel) => panel.id)).toEqual([
+      'link-preview-actions',
       'risk-meta',
     ])
     expect(assembly.initialItems).toEqual([])
@@ -615,7 +616,9 @@ describe('CanvasAppAssembly', () => {
       title: 'Publish risk',
     })
     expect(assembly.customCommands[0]?.run).toBe(customCommandRun)
-    expect(assembly.inspectorPanels[0]?.render({
+    expect(assembly.inspectorPanels.find((panel) =>
+      panel.id === 'risk-meta'
+    )?.render({
       bounds: null,
       commitItemsChange: () => false,
       disabled: false,

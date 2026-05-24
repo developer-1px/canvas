@@ -2,7 +2,11 @@ import type { Point } from '../../core'
 import type {
   CanvasComponentItem,
   CanvasItem,
+  TextItem,
+  GroupItem,
 } from '../model'
+import { isCanvasGroupItem } from '../tree/CanvasGroupItem'
+import { syncGroupBounds } from '../tree/CanvasTreeBounds'
 
 export const CANVAS_LINK_PREVIEW_COMPONENT_KIND = 'link-preview'
 export const CANVAS_LINK_PREVIEW_COMPONENT_PRESENTATION =
@@ -62,6 +66,32 @@ export function isCanvasLinkPreviewComponentItem(
     item.component === CANVAS_LINK_PREVIEW_COMPONENT_KIND
 }
 
+export function createCanvasLinkPreviewSourceTextItem(
+  item: CanvasLinkPreviewComponentItem,
+): TextItem {
+  return {
+    h: 42,
+    id: item.id,
+    ...(item.locked === undefined ? {} : { locked: item.locked }),
+    text: item.url,
+    type: 'text',
+    w: item.w,
+    x: item.x,
+    y: item.y,
+  }
+}
+
+export function replaceCanvasLinkPreviewComponentsWithSourceText(
+  items: readonly CanvasItem[],
+  selection: readonly string[],
+): CanvasItem[] {
+  const selected = new Set(selection)
+
+  return items.map((item) =>
+    replaceCanvasLinkPreviewItemWithSourceText(item, selected),
+  )
+}
+
 export function isCanvasLinkPreviewUrl(value: string) {
   return normalizeCanvasLinkPreviewUrl(value) !== null
 }
@@ -90,4 +120,32 @@ export function getCanvasLinkPreviewDomain(url: string) {
   } catch {
     return url
   }
+}
+
+function replaceCanvasLinkPreviewItemWithSourceText(
+  item: CanvasItem,
+  selected: Set<string>,
+): CanvasItem {
+  if (isCanvasLinkPreviewComponentItem(item) && selected.has(item.id)) {
+    return createCanvasLinkPreviewSourceTextItem(item)
+  }
+
+  if (isCanvasGroupItem(item)) {
+    return replaceCanvasLinkPreviewChildrenWithSourceText(item, selected)
+  }
+
+  return item
+}
+
+function replaceCanvasLinkPreviewChildrenWithSourceText(
+  item: GroupItem,
+  selected: Set<string>,
+): GroupItem {
+  const nextChildren = item.children.map((child) =>
+    replaceCanvasLinkPreviewItemWithSourceText(child, selected),
+  )
+
+  return nextChildren.every((child, index) => child === item.children[index])
+    ? item
+    : syncGroupBounds({ ...item, children: nextChildren })
 }

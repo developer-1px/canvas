@@ -12,6 +12,7 @@ type GetCanvasObjectInspectorModelArgs = {
   bounds: Bounds | null
   commitItemsChange: CommitCanvasItemsChange
   inspectorPanels: readonly CanvasAppInspectorPanel[]
+  items?: CanvasItem[]
   selectedItems: CanvasItem[]
   selection: string[]
 }
@@ -20,6 +21,7 @@ export function getCanvasObjectInspectorModel({
   bounds,
   commitItemsChange,
   inspectorPanels,
+  items,
   selectedItems,
   selection,
 }: GetCanvasObjectInspectorModelArgs) {
@@ -36,6 +38,7 @@ export function getCanvasObjectInspectorModel({
         bounds,
         commitItemsChange,
         disabled,
+        items: items ?? selectedItems,
         label,
         selectedItems,
         selection,

@@ -52,10 +52,12 @@ export {
   CANVAS_LINK_PREVIEW_COMPONENT_KIND,
   CANVAS_LINK_PREVIEW_COMPONENT_PRESENTATION,
   createCanvasLinkPreviewComponentItem,
+  createCanvasLinkPreviewSourceTextItem,
   getCanvasLinkPreviewDomain,
   isCanvasLinkPreviewComponentItem,
   isCanvasLinkPreviewUrl,
   normalizeCanvasLinkPreviewUrl,
+  replaceCanvasLinkPreviewComponentsWithSourceText,
   type CreateCanvasLinkPreviewComponentItemInput,
 } from './component/CanvasLinkPreviewComponent'
 export {

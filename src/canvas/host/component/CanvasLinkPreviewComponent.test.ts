@@ -3,10 +3,12 @@ import {
   CANVAS_LINK_PREVIEW_COMPONENT_KIND,
   CANVAS_LINK_PREVIEW_COMPONENT_PRESENTATION,
   createCanvasLinkPreviewComponentItem,
+  createCanvasLinkPreviewSourceTextItem,
   getCanvasLinkPreviewDomain,
   isCanvasLinkPreviewComponentItem,
   isCanvasLinkPreviewUrl,
   normalizeCanvasLinkPreviewUrl,
+  replaceCanvasLinkPreviewComponentsWithSourceText,
 } from './CanvasLinkPreviewComponent'
 
 describe('CanvasLinkPreviewComponent', () => {
@@ -60,5 +62,56 @@ describe('CanvasLinkPreviewComponent', () => {
     )
     expect(isCanvasLinkPreviewComponentItem(item)).toBe(true)
     expect(getCanvasLinkPreviewDomain(item.url ?? '')).toBe('docs.example.com')
+  })
+
+  it('creates a source URL text item from a link preview', () => {
+    const item = createCanvasLinkPreviewComponentItem({
+      id: 'component-link-1',
+      point: { x: 10, y: 20 },
+      url: 'https://docs.example.com/reference',
+    })
+
+    expect(createCanvasLinkPreviewSourceTextItem(item)).toEqual({
+      h: 42,
+      id: 'component-link-1',
+      text: 'https://docs.example.com/reference',
+      type: 'text',
+      w: 320,
+      x: 10,
+      y: 20,
+    })
+  })
+
+  it('replaces selected link previews inside an item tree with source text', () => {
+    const item = createCanvasLinkPreviewComponentItem({
+      id: 'component-link-1',
+      point: { x: 10, y: 20 },
+      url: 'https://docs.example.com/reference',
+    })
+    const nextItems = replaceCanvasLinkPreviewComponentsWithSourceText([
+      {
+        children: [item],
+        h: 148,
+        id: 'group-1',
+        type: 'group',
+        w: 320,
+        x: 10,
+        y: 20,
+      },
+    ], ['component-link-1'])
+
+    expect(nextItems).toMatchObject([
+      {
+        children: [
+          {
+            id: 'component-link-1',
+            text: 'https://docs.example.com/reference',
+            type: 'text',
+          },
+        ],
+        id: 'group-1',
+        type: 'group',
+      },
+    ])
   })
 })
