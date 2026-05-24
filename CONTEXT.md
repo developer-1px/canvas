@@ -201,7 +201,7 @@
 - Canvas Workspace Snapshot: 저장된 workspace payload의 version, item validation, viewport normalization, selection sanitization, id seed contract를 소유하는 App-owned Module.
 - Canvas Workspace Storage: App workspace persistence가 요구하는 `getItem`, `setItem`, optional `removeItem` slot만 명시하고 browser `Storage` 구현 shape를 숨기는 App-owned persistence Interface 계약.
 - Canvas Workspace Storage Provider: Host가 workspace persistence storage를 조립하거나 비활성화할 수 있게 하는 App Assembly 입력 계약. 기본 provider만 browser `localStorage`를 선택한다.
-- Canvas App Document Contracts: custom command, inspector panel, workflow가 공유하는 document item change, selection history, clipboard, text search communication Interface를 App-owned 이름으로 고정해 외부 descriptor가 Host document concrete 타입을 직접 import하지 않게 하는 계약 Module.
+- Canvas App Document Contracts: custom command, inspector panel, workflow가 공유하는 document item change, selection history, clipboard, text search communication Interface를 App-owned shape로 직접 명시해 외부 descriptor가 Host document concrete 타입이나 Host-owned alias를 직접 import하지 않게 하는 계약 Module.
 - Canvas Document Runtime: Host Document Controller mutation result를 App React state가 반영할 committed state로 변환하고 live item replacement, selection action resolution, text replace, history result application을 소유하는 App-owned runtime Module.
 - Canvas Document Runtime Contracts: App document runtime이 Host Document Controller와 주고받는 change, selection action, text search options, history result, committed state의 명시 Interface 계약을 소유하는 App-owned contract Module.
 - Canvas Workflow Contract: App workflow hook들이 공유하는 document commit, selection commit, clipboard 계약. 개별 hook이 `useCanvasDocument` 구현 파일을 직접 알지 않게 한다.

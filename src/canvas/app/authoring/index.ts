@@ -42,8 +42,14 @@ export type {
 export type {
   CanvasAppCommitItemsChange,
   CanvasAppCommitSelection,
+  CanvasAppDocumentClipboard,
   CanvasAppDocumentSelectionHistory,
+  CanvasAppDocumentTextSearch,
   CanvasAppItemsChange,
+  CanvasAppItemsReorderMode,
+  CanvasAppTextSearchField,
+  CanvasAppTextSearchMatch,
+  CanvasAppTextSearchOptions,
 } from '../document/CanvasAppDocumentContracts'
 export type {
   CanvasWorkspaceStorage,

@@ -2,12 +2,12 @@ import type {
   CanvasDocumentController,
   CanvasDocumentHistoryAvailability,
   CanvasDocumentHistoryResult,
-  CanvasTextSearchOptions,
 } from '../../host'
 import type { CanvasItem } from '../../entities'
 import type {
   CanvasAppDocumentSelectionHistory,
   CanvasAppItemsChange,
+  CanvasAppTextSearchOptions,
 } from './CanvasAppDocumentContracts'
 
 export type CanvasDocumentStateAction<T> = T | ((current: T) => T)
@@ -52,7 +52,7 @@ export type CommitCanvasDocumentSelectionArgs = {
 
 export type ReplaceCanvasDocumentTextArgs = {
   document: CanvasDocumentController
-  options?: CanvasTextSearchOptions
+  options?: CanvasAppTextSearchOptions
   replacement: string
   searchText: string
 }

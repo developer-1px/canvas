@@ -6200,6 +6200,33 @@ describe('Canvas module boundaries', () => {
     expect(violations).toEqual([])
   })
 
+  it('keeps App document communication contracts independent from Host document aliases', () => {
+    const contractsFile = getSourceFile(
+      'src/canvas/app/document/CanvasAppDocumentContracts.ts',
+    )
+
+    expect(contractsFile.source).not.toContain("from '../../host'")
+    expect(contractsFile.source).toContain("from '../../entities'")
+    expect(contractsFile.source).toContain("from '../../core'")
+    expect(contractsFile.source).toContain('export type CanvasAppItemsChange')
+    expect(contractsFile.source).toContain(
+      'export type CanvasAppDocumentSelectionHistory',
+    )
+    expect(contractsFile.source).toContain(
+      'export type CanvasAppDocumentClipboard',
+    )
+    expect(contractsFile.source).toContain(
+      'export type CanvasAppDocumentTextSearch',
+    )
+    expect(contractsFile.source).toContain('CanvasAppTextSearchMatch')
+    expect(contractsFile.source).not.toContain('CanvasItemsChange')
+    expect(contractsFile.source).not.toContain(
+      'CanvasDocumentSelectionHistory',
+    )
+    expect(contractsFile.source).not.toContain('CanvasDocumentClipboard')
+    expect(contractsFile.source).not.toContain('CanvasDocumentTextSearch')
+  })
+
   it('keeps app document runtime rules out of the React document hook', () => {
     const documentHookFile = getSourceFile(
       'src/canvas/app/document/useCanvasDocument.ts',
