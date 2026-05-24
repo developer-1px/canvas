@@ -158,3 +158,4 @@
 154. Sticky note 하나를 선택하면 상/하/좌/우에 `+` quick-create control을 표시한다.
 155. Sticky quick-create control은 선택한 방향에 빈 sticky note를 만들고 바로 body editor를 연다.
 156. Sticky quick-create는 원본 sticky와 새 sticky 사이에 elbow connector를 같은 history change로 만든다.
+157. Stamp controls는 선택 객체가 있으면 선택 경계 위에 contextual reaction bar로 표시된다.

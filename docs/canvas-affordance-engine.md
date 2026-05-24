@@ -124,6 +124,7 @@
 | `src/canvas/app/pointer/CanvasPointerCommentCreation.ts` | Comment tool click을 Canvas Comment Item 생성과 optional clicked-item attachment로 변환한다 |
 | `src/canvas/app/pointer/CanvasPointerComponentCreation.ts` | Sticky note tool click을 Component Library `sticky` template 기반 component item 생성과 생성 직후 text edit 진입으로 변환한다 |
 | `src/canvas/app/components/CanvasComponentInsertionExecution.ts` | Component palette insertion과 sticky quick-create의 연결 sticky 생성, connector 생성, 컨트롤 위치 계산을 소유한다 |
+| `src/canvas/app/stamp/CanvasStampInsertion.ts` | Stamp 삽입 위치와 선택 경계 기반 contextual reaction bar anchor 계산을 소유한다 |
 | `src/canvas/app/pointer/CanvasPointerInteractionMovement.ts` | Drag threshold 기반 moved 판정을 pointer interaction Module들이 공유한다 |
 | `src/canvas/app/pointer/CanvasPointerInteractionLifecycle.ts` | Pointer-up/cancel 시 active interaction을 문서 변경, selection 변경, edit 진입, cancel rollback으로 확정하거나 되돌린다 |
 | `src/canvas/core` | Host item과 renderer를 모르는 geometry, viewport, id, primitive math 같은 재사용 계약 |
@@ -154,6 +155,7 @@
 | `src/canvas/index.ts` | 외부 조립자와 Demo가 사용하는 Canvas package public entry |
 | `src/canvas/ui` | Toolbar, palette, status, editor controls |
 | `src/canvas/ui/drawing/CanvasDrawingControls.tsx` | Drawing style controls를 순수 view props로 렌더링한다 |
+| `src/canvas/ui/stamp/CanvasStampControls.tsx` | Stamp reaction controls를 순수 view props와 optional anchor로 렌더링한다 |
 | `src/canvas/ui/sticky/CanvasStickyQuickCreateControl.tsx` | Selected sticky 주변의 방향별 quick-create control을 순수 view props로 렌더링한다 |
 | `src/demo/CanvasDemoAssembly.ts` | canvas Module 밖에서 demo-specific custom item modules를 조립한다 |
 | `src/demo/custom-items` | demo-specific custom item module 구현과 해당 표현 스타일. `<name>/index.ts` convention으로 자동 수집한다 |

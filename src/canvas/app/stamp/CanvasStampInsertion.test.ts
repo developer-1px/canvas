@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import type { Bounds } from '../../entities'
 import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
 import {
+  getCanvasStampControlsAnchor,
   getCanvasStampInsertPlacement,
   insertCanvasStamp,
 } from './CanvasStampInsertion'
@@ -76,6 +77,26 @@ describe('CanvasStampInsertion', () => {
       stageElement,
       viewport: { scale: 2, x: 10, y: 20 },
     })).toEqual({ x: 58, y: 38 })
+  })
+
+  it('anchors stamp controls above the current selection', () => {
+    expect(getCanvasStampControlsAnchor({
+      itemReadModel: createReadModel(),
+      selection: ['rect-1'],
+      viewport: { scale: 2, x: 10, y: 20 },
+    })).toEqual({ x: 150, y: 60 })
+
+    expect(getCanvasStampControlsAnchor({
+      itemReadModel: createReadModel(),
+      selection: ['rect-1', 'rect-2'],
+      viewport: { scale: 2, x: 10, y: 20 },
+    })).toEqual({ x: 150, y: 60 })
+
+    expect(getCanvasStampControlsAnchor({
+      itemReadModel: createReadModel(null),
+      selection: [],
+      viewport: { scale: 2, x: 10, y: 20 },
+    })).toBeNull()
   })
 })
 

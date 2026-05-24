@@ -46,6 +46,7 @@ describe('CanvasAppView', () => {
     expect(markup).toContain('image-controls')
     expect(markup).toContain('object-inspector')
     expect(markup).toContain('stamp-controls')
+    expect(markup).toContain('data-anchored="true"')
     expect(markup).toContain('sticky-quick-create')
     expect(markup).toContain('canvas-status')
     expect(markup).toContain('text-editor')
@@ -133,6 +134,7 @@ function createViewProps(
     },
     stage: <div className="canvas-stage" />,
     stampControls: {
+      anchor: { x: 320, y: 140 },
       canInsertStamp: true,
       stamps: [{
         label: '+1',

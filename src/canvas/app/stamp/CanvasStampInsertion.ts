@@ -1,4 +1,5 @@
 import type {
+  Point,
   Viewport,
 } from '../../entities'
 import {
@@ -17,6 +18,8 @@ export type CanvasStampInsertPlacement = {
   x: number
   y: number
 }
+
+export type CanvasStampControlsAnchor = Point
 
 export type CanvasStampInsertionContext = {
   commitItemsChange: CommitCanvasItemsChange
@@ -90,4 +93,28 @@ export function getCanvasStampInsertPlacement({
     x: center.x - CANVAS_STAMP_ITEM_SIZE / 2,
     y: center.y - CANVAS_STAMP_ITEM_SIZE / 2,
   }
+}
+
+export function getCanvasStampControlsAnchor({
+  itemReadModel,
+  selection,
+  viewport,
+}: Pick<
+  CanvasStampInsertPlacementInput,
+  'itemReadModel' | 'selection' | 'viewport'
+>): CanvasStampControlsAnchor | null {
+  if (selection.length === 0) {
+    return null
+  }
+
+  const selectedBounds = itemReadModel.getSelectionBounds(selection)
+
+  return selectedBounds
+    ? {
+        x: viewport.x + (
+          selectedBounds.x + selectedBounds.w / 2
+        ) * viewport.scale,
+        y: viewport.y + selectedBounds.y * viewport.scale,
+      }
+    : null
 }

@@ -488,6 +488,11 @@
   align-items: center;
 }
 
+.stamp-controls[data-anchored='true'] {
+  right: auto;
+  transform: translate(-50%, calc(-100% - 10px));
+}
+
 .sticky-quick-create {
   position: absolute;
   z-index: 4;
