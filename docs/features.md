@@ -160,3 +160,6 @@
 156. Sticky quick-create는 원본 sticky와 새 sticky 사이에 elbow connector를 같은 history change로 만든다.
 157. Stamp controls는 선택 객체가 있으면 선택 경계 위에 contextual reaction bar로 표시된다.
 158. Eraser tool은 marker/highlighter freehand stroke를 whole-stroke 단위로 지운다.
+159. 선택 객체에 reaction stamp를 추가해도 선택은 원래 객체에 남아 연속 반응을 붙일 수 있다.
+160. 같은 객체 또는 같은 selection bounds에 추가한 reaction stamp는 기존 stamp와 겹치지 않도록 간격을 두고 배치된다.
+161. Contextual reaction bar는 상단 객체 선택 시 toolbar 아래로 내려와 버튼 클릭을 방해받지 않는다.

@@ -5,6 +5,7 @@ import type {
 import {
   CANVAS_STAMP_ITEM_SIZE,
   createCanvasStampItem,
+  isCanvasStampItem,
 } from '../../host'
 import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
 import type { CanvasAppItemReadModel } from '../workflow/CanvasAppItemReadModelContracts'
@@ -12,6 +13,8 @@ import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract
 import type { CanvasStampDefinition } from './CanvasStampCatalog'
 
 const CANVAS_STAMP_SELECTION_GAP = 12
+const CANVAS_STAMP_ATTACHED_GAP = 6
+const CANVAS_STAMP_CONTROLS_MIN_SCREEN_Y = 176
 
 export type CanvasStampInsertPlacement = {
   attachedTo?: string
@@ -56,7 +59,7 @@ export function insertCanvasStamp({
     { type: 'add', items: [item] },
     {
       before: context.selection,
-      after: [item.id],
+      after: context.selection.length > 0 ? context.selection : [item.id],
     },
   )
 }
@@ -73,17 +76,32 @@ export function getCanvasStampInsertPlacement({
 
   if (selectedBounds) {
     if (selection.length === 1) {
+      const attachedStampCount = getCanvasAttachedStampCount({
+        attachedTo: selection[0],
+        itemReadModel,
+      })
+
       return {
         attachedTo: selection[0],
-        x: selectedBounds.x + selectedBounds.w - CANVAS_STAMP_ITEM_SIZE / 2,
+        x: selectedBounds.x + selectedBounds.w - CANVAS_STAMP_ITEM_SIZE / 2 -
+          attachedStampCount *
+            (CANVAS_STAMP_ITEM_SIZE + CANVAS_STAMP_ATTACHED_GAP),
         y: selectedBounds.y - CANVAS_STAMP_ITEM_SIZE / 2,
       }
     }
 
+    const y = selectedBounds.y + selectedBounds.h / 2 -
+      CANVAS_STAMP_ITEM_SIZE / 2
+    const detachedStampCount = getCanvasDetachedStampCountAtRow({
+      itemReadModel,
+      y,
+    })
+
     return {
-      x: selectedBounds.x + selectedBounds.w + CANVAS_STAMP_SELECTION_GAP,
-      y: selectedBounds.y + selectedBounds.h / 2 -
-        CANVAS_STAMP_ITEM_SIZE / 2,
+      x: selectedBounds.x + selectedBounds.w + CANVAS_STAMP_SELECTION_GAP +
+        detachedStampCount *
+          (CANVAS_STAMP_ITEM_SIZE + CANVAS_STAMP_ATTACHED_GAP),
+      y,
     }
   }
 
@@ -93,6 +111,38 @@ export function getCanvasStampInsertPlacement({
     x: center.x - CANVAS_STAMP_ITEM_SIZE / 2,
     y: center.y - CANVAS_STAMP_ITEM_SIZE / 2,
   }
+}
+
+function getCanvasAttachedStampCount({
+  attachedTo,
+  itemReadModel,
+}: {
+  attachedTo: string
+  itemReadModel: CanvasAppItemReadModel
+}) {
+  return itemReadModel
+    .getAllItems()
+    .filter((item) =>
+      isCanvasStampItem(item) && item.attachedTo === attachedTo,
+    )
+    .length
+}
+
+function getCanvasDetachedStampCountAtRow({
+  itemReadModel,
+  y,
+}: {
+  itemReadModel: CanvasAppItemReadModel
+  y: number
+}) {
+  return itemReadModel
+    .getAllItems()
+    .filter((item) =>
+      isCanvasStampItem(item) &&
+      item.attachedTo === undefined &&
+      Math.abs(item.y - y) < 0.5,
+    )
+    .length
 }
 
 export function getCanvasStampControlsAnchor({
@@ -114,7 +164,10 @@ export function getCanvasStampControlsAnchor({
         x: viewport.x + (
           selectedBounds.x + selectedBounds.w / 2
         ) * viewport.scale,
-        y: viewport.y + selectedBounds.y * viewport.scale,
+        y: Math.max(
+          CANVAS_STAMP_CONTROLS_MIN_SCREEN_Y,
+          viewport.y + selectedBounds.y * viewport.scale,
+        ),
       }
     : null
 }
