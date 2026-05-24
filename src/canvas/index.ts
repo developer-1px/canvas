@@ -58,6 +58,7 @@ export type {
   ArrowItem,
   Bounds,
   CanvasBuiltinTool,
+  CanvasArrowRouting,
   CanvasComponentItem,
   CanvasComponentKind,
   CanvasCommentItem,

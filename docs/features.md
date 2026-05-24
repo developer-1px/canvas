@@ -123,3 +123,5 @@
 119. connector 라벨은 더블클릭으로 인라인 텍스트 편집을 시작한다.
 120. connector 라벨 편집기는 선 전체 경계가 아니라 라벨 위치에 맞춰 열린다.
 121. connector 라벨 편집 중 plain `Enter`는 줄바꿈으로 남기고, 블러 시 값을 커밋한다.
+122. 새로 생성하는 connector는 FigJam식 bent/elbow 경로로 생성된다.
+123. 기존 straight connector 저장 데이터는 그대로 렌더링하고, connector 저장 shape는 `straight`와 `elbow` routing만 허용한다.

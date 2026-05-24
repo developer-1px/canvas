@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   CANVAS_SVG_ARROW_MARKER_IRI,
   CANVAS_SVG_DRAFT_ARROW_MARKER_IRI,
+  createCanvasSvgArrowPathData,
   createCanvasSvgPathData,
 } from './CanvasSvgDrawingPrimitives'
 
@@ -19,5 +20,17 @@ describe('CanvasSvgDrawingPrimitives', () => {
       { x: 30, y: 40 },
       { x: 50, y: 60 },
     ])).toBe('M 10 20 L 30 40 L 50 60')
+  })
+
+  it('creates straight and elbow connector paths', () => {
+    expect(createCanvasSvgArrowPathData({
+      end: { x: 90, y: 60 },
+      start: { x: 10, y: 20 },
+    })).toBe('M 10 20 L 90 60')
+    expect(createCanvasSvgArrowPathData({
+      end: { x: 90, y: 60 },
+      routing: 'elbow',
+      start: { x: 10, y: 20 },
+    })).toBe('M 10 20 L 50 20 L 50 60 L 90 60')
   })
 })

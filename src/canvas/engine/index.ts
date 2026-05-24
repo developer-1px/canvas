@@ -53,6 +53,7 @@ export {
   getCanvasCreatedArrowEnd,
   getCanvasCreatedDrawingPoints,
   getCanvasCreatedRectBounds,
+  type CanvasCreatedArrowRouting,
   type CanvasCreatedText,
   type CanvasCreationAdapter,
   type CanvasCreationItem,

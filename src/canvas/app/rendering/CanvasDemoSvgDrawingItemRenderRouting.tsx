@@ -8,6 +8,7 @@ import {
 } from '../../host'
 import {
   CANVAS_SVG_ARROW_MARKER_IRI,
+  createCanvasSvgArrowPathData,
   createCanvasSvgPathData,
 } from '../../renderer'
 
@@ -42,22 +43,22 @@ function renderCanvasDemoSvgArrowDrawingItem({
 }: {
   item: ArrowItem
 }) {
+  const pathData = createCanvasSvgArrowPathData({
+    end: item.end,
+    routing: item.routing,
+    start: item.start,
+  })
+
   return (
     <>
-      <line
+      <path
         className="arrow-hit"
-        x1={item.start.x}
-        y1={item.start.y}
-        x2={item.end.x}
-        y2={item.end.y}
+        d={pathData}
         vectorEffect="non-scaling-stroke"
       />
-      <line
+      <path
         className="arrow-item"
-        x1={item.start.x}
-        y1={item.start.y}
-        x2={item.end.x}
-        y2={item.end.y}
+        d={pathData}
         stroke={item.stroke}
         strokeWidth={item.strokeWidth}
         markerEnd={CANVAS_SVG_ARROW_MARKER_IRI}

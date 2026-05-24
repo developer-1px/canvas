@@ -16,11 +16,14 @@ export type CanvasCreatedText<TItem extends CanvasCreationItem> = {
   editValue: string
 }
 
+export type CanvasCreatedArrowRouting = 'elbow' | 'straight'
+
 export type CanvasCreationAdapter<TItem extends CanvasCreationItem> = {
   createArrow: (input: {
     end: Point
     endAttachedTo?: string
     id: string
+    routing?: CanvasCreatedArrowRouting
     start: Point
     startAttachedTo?: string
   }) => TItem
@@ -172,6 +175,7 @@ export function createCanvasArrow<TItem extends CanvasCreationItem>({
     end: getCanvasCreatedArrowEnd({ currentWorld, startWorld }),
     endAttachedTo,
     id: createId('arrow'),
+    routing: 'elbow',
     start: startWorld,
     startAttachedTo,
   })

@@ -76,7 +76,7 @@ describe('CanvasDemoSvgDrawingItemRenderer', () => {
     expect(markup).toContain('d="M 42 60 L 94 68"')
   })
 
-  it('renders arrow items as SVG lines with an arrow head marker', () => {
+  it('renders arrow items as SVG paths with an arrow head marker', () => {
     const markup = renderDrawingItems([
       {
         id: 'arrow-1',
@@ -87,6 +87,7 @@ describe('CanvasDemoSvgDrawingItemRenderer', () => {
         h: 44,
         start: { x: 100, y: 120 },
         end: { x: 240, y: 140 },
+        routing: 'elbow',
         stroke: '#334155',
         strokeWidth: 3,
         text: 'Next',
@@ -94,10 +95,7 @@ describe('CanvasDemoSvgDrawingItemRenderer', () => {
     ])
 
     expect(markup).toContain('class="arrow-item"')
-    expect(markup).toContain('x1="100"')
-    expect(markup).toContain('y1="120"')
-    expect(markup).toContain('x2="240"')
-    expect(markup).toContain('y2="140"')
+    expect(markup).toContain('d="M 100 120 L 170 120 L 170 140 L 240 140"')
     expect(markup).toContain('marker-end="url(#canvas-arrow-head)"')
     expect(markup).toContain('class="arrow-label"')
     expect(markup).toContain('Next')

@@ -22,6 +22,41 @@ export function createCanvasSvgPathData(points: readonly Point[]) {
   ].join(' ')
 }
 
+export function createCanvasSvgArrowPathData({
+  end,
+  routing,
+  start,
+}: {
+  end: Point
+  routing?: 'elbow' | 'straight'
+  start: Point
+}) {
+  return createCanvasSvgPathData(
+    routing === 'elbow'
+      ? removeRepeatedCanvasSvgPoints([
+          start,
+          {
+            x: start.x + (end.x - start.x) / 2,
+            y: start.y,
+          },
+          {
+            x: start.x + (end.x - start.x) / 2,
+            y: end.y,
+          },
+          end,
+        ])
+      : [start, end],
+  )
+}
+
 function getCanvasSvgMarkerIri(id: string) {
   return `url(#${id})`
+}
+
+function removeRepeatedCanvasSvgPoints(points: readonly Point[]) {
+  return points.filter((point, index) => {
+    const previous = points[index - 1]
+
+    return !previous || previous.x !== point.x || previous.y !== point.y
+  })
 }

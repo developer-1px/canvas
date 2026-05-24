@@ -5,6 +5,7 @@ import {
   CANVAS_SVG_ARROW_MARKER_ID,
   CANVAS_SVG_DRAFT_ARROW_MARKER_ID,
   CANVAS_SVG_DRAFT_ARROW_MARKER_IRI,
+  createCanvasSvgArrowPathData,
   createCanvasSvgPathData,
 } from './CanvasSvgDrawingPrimitives'
 
@@ -82,12 +83,9 @@ export function CanvasSvgInteractionOverlays({
       ) : null}
 
       {overlays.draftArrow ? (
-        <line
+        <path
           className="draft-arrow"
-          x1={overlays.draftArrow.start.x}
-          y1={overlays.draftArrow.start.y}
-          x2={overlays.draftArrow.end.x}
-          y2={overlays.draftArrow.end.y}
+          d={createCanvasSvgArrowPathData(overlays.draftArrow)}
           markerEnd={CANVAS_SVG_DRAFT_ARROW_MARKER_IRI}
           vectorEffect="non-scaling-stroke"
         />

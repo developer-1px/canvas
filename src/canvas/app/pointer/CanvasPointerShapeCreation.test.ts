@@ -46,6 +46,7 @@ describe('CanvasPointerShapeCreation', () => {
     expect(arrow).toMatchObject({
       draftArrow: {
         end: { x: 80, y: 120 },
+        routing: 'elbow',
         start: { x: 80, y: 120 },
       },
       gesture: 'create-arrow',
@@ -167,6 +168,7 @@ describe('CanvasPointerShapeCreation', () => {
             end: { x: 160, y: 90 },
             endAttachedTo: 'component-end',
             id: 'arrow-1',
+            routing: 'elbow',
             start: { x: 120, y: 70 },
             startAttachedTo: 'component-start',
             type: 'arrow',
@@ -197,6 +199,7 @@ describe('CanvasPointerShapeCreation', () => {
     expect(preview).toMatchObject({
       draftArrow: {
         end: { x: 160, y: 90 },
+        routing: 'elbow',
         start: { x: 120, y: 70 },
       },
       interaction: {
@@ -228,6 +231,7 @@ describe('CanvasPointerShapeCreation', () => {
     expect(preview).toMatchObject({
       draftArrow: {
         end: { x: 320, y: 40 },
+        routing: 'elbow',
         start: { x: 120, y: 40 },
       },
       interaction: {
@@ -284,12 +288,20 @@ function createSceneAdapter(): CanvasSceneAdapter {
 }
 
 const creationAdapter: CanvasCreationAdapter<CanvasItem> = {
-  createArrow: ({ end, endAttachedTo, id, start, startAttachedTo }) => ({
+  createArrow: ({
+    end,
+    endAttachedTo,
+    id,
+    routing,
+    start,
+    startAttachedTo,
+  }) => ({
     end,
     endAttachedTo,
     h: Math.abs(end.y - start.y),
     id,
     opacity: 1,
+    routing,
     start,
     startAttachedTo,
     stroke: '#111827',

@@ -17,15 +17,17 @@ type CreatedItem =
   | {
       end: { x: number; y: number }
       id: string
+      routing?: 'elbow' | 'straight'
       start: { x: number; y: number }
       type: 'arrow'
     }
   | { id: string; type: 'rect' | 'text' }
 
 const adapter: CanvasCreationAdapter<CreatedItem> = {
-  createArrow: ({ end, id, start }) => ({
+  createArrow: ({ end, id, routing, start }) => ({
     end,
     id,
+    routing,
     start,
     type: 'arrow',
   }),
@@ -97,6 +99,7 @@ describe('CanvasCreationEngine drawing tools', () => {
     ).toEqual({
       end: { x: 80, y: 90 },
       id: 'arrow-1',
+      routing: 'elbow',
       start: { x: 10, y: 20 },
       type: 'arrow',
     })

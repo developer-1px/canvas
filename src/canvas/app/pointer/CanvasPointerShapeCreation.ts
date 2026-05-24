@@ -61,6 +61,7 @@ const CANVAS_POINTER_SHAPE_CREATION_DESCRIPTORS = Object.freeze({
     createDraft: ({ currentWorld, startWorld }) => ({
       draftArrow: {
         end: currentWorld,
+        routing: 'elbow',
         start: startWorld,
       },
     }),

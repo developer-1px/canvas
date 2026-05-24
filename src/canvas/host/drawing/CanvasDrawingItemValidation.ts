@@ -33,6 +33,7 @@ function isCanvasArrowDrawingItemStorageShape(
     isPoint(value.start) &&
     isPoint(value.end) &&
     !isSamePoint(value.start, value.end) &&
+    isOptionalArrowRouting(value.routing) &&
     isOptionalStableItemId(value.startAttachedTo) &&
     isOptionalStableItemId(value.endAttachedTo) &&
     typeof value.stroke === 'string' &&
@@ -60,6 +61,10 @@ function isOpacity(value: unknown): value is number {
 function isOptionalStableItemId(value: unknown) {
   return value === undefined ||
     (typeof value === 'string' && isCanvasStableId(value))
+}
+
+function isOptionalArrowRouting(value: unknown) {
+  return value === undefined || value === 'elbow' || value === 'straight'
 }
 
 function isPoint(value: unknown): value is Point {

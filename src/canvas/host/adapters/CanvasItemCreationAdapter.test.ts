@@ -26,11 +26,13 @@ describe('CanvasItemCreationAdapter', () => {
       end: { x: 30, y: 40 },
       endAttachedTo: 'component-2',
       id: 'arrow-1',
+      routing: 'elbow',
       start: { x: 10, y: 20 },
       startAttachedTo: 'component-1',
     })).toMatchObject({
       ...CANVAS_ARROW_STYLE,
       endAttachedTo: 'component-2',
+      routing: 'elbow',
       startAttachedTo: 'component-1',
       type: 'arrow',
     })

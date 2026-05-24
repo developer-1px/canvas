@@ -20,6 +20,7 @@ export type CanvasResizeHandleOverlay = {
 
 export type CanvasDraftArrowOverlay = {
   end: Point
+  routing?: 'elbow' | 'straight'
   start: Point
 }
 

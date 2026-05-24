@@ -66,6 +66,7 @@ export type ArrowItem = CanvasItemBase & {
   type: 'arrow'
   end: Point
   endAttachedTo?: CanvasItemId
+  routing?: CanvasArrowRouting
   start: Point
   startAttachedTo?: CanvasItemId
   stroke: string
@@ -74,6 +75,7 @@ export type ArrowItem = CanvasItemBase & {
 }
 
 export type CanvasArrowEndpoint = 'end' | 'start'
+export type CanvasArrowRouting = 'elbow' | 'straight'
 
 export type GroupItem = CanvasItemBase & {
   type: 'group'

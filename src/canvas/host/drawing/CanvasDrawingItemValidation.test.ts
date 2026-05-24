@@ -64,6 +64,21 @@ describe('CanvasDrawingItemValidation', () => {
     })).toBe(false)
   })
 
+  it('accepts only known connector routing values', () => {
+    expect(isCanvasDrawingItemStorageShape({
+      ...arrowItem,
+      routing: 'elbow',
+    })).toBe(true)
+    expect(isCanvasDrawingItemStorageShape({
+      ...arrowItem,
+      routing: 'straight',
+    })).toBe(true)
+    expect(isCanvasDrawingItemStorageShape({
+      ...arrowItem,
+      routing: 'zigzag',
+    })).toBe(false)
+  })
+
   it('rejects drawing styles that cannot render predictably', () => {
     expect(isCanvasDrawingItemStorageShape({
       ...markerItem,
