@@ -3,7 +3,7 @@ import type {
 } from '../../entities'
 import type { CanvasEditableTextItem } from '../../host'
 import type { CanvasAppPointerInput } from '../pointer/CanvasAppPointerInput'
-import type { CanvasAppPointerConsumerModel } from './CanvasAppPointerConsumerContracts'
+import type { CanvasAppPointerConsumerModel } from './CanvasAppConsumerContracts'
 
 type CanvasAppPointerDownRuntime = {
   handleCanvasPointerDown: (event: CanvasAppPointerInput) => void

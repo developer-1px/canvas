@@ -1109,10 +1109,10 @@ describe('Canvas module boundaries', () => {
       'src/canvas/app/workflow/CanvasAppStageModel.tsx',
     )
     const stageConsumerContractsFile = getSourceFile(
-      'src/canvas/app/workflow/CanvasAppStageConsumerContracts.ts',
+      'src/canvas/app/workflow/CanvasAppConsumerContracts.ts',
     )
     const pointerConsumerContractsFile = getSourceFile(
-      'src/canvas/app/workflow/CanvasAppPointerConsumerContracts.ts',
+      'src/canvas/app/workflow/CanvasAppConsumerContracts.ts',
     )
 
     expect(appModelFile.source).toContain("from './CanvasAppStageModel'")
@@ -1131,7 +1131,7 @@ describe('Canvas module boundaries', () => {
       'export function renderCanvasAppStageModel',
     )
     expect(stageModelFile.source).toContain(
-      "from './CanvasAppStageConsumerContracts'",
+      "from './CanvasAppConsumerContracts'",
     )
     expect(stageModelFile.source).not.toContain('Pick<')
     expect(stageModelFile.source).not.toContain(
@@ -1153,7 +1153,7 @@ describe('Canvas module boundaries', () => {
       'export type CanvasAppStageContext',
     )
     expect(stageConsumerContractsFile.source).toContain(
-      "from './CanvasAppPointerConsumerContracts'",
+      'export type CanvasAppPointerConsumerModel',
     )
     expect(stageConsumerContractsFile.source).not.toContain(
       'CanvasAppItemLayerRenderInput',
@@ -1567,7 +1567,7 @@ describe('Canvas module boundaries', () => {
       'src/canvas/app/workflow/CanvasAppPointerConsumerModel.ts',
     )
     const pointerConsumerContractsFile = getSourceFile(
-      'src/canvas/app/workflow/CanvasAppPointerConsumerContracts.ts',
+      'src/canvas/app/workflow/CanvasAppConsumerContracts.ts',
     )
 
     expect(appModelFile.source).toContain(
@@ -1596,7 +1596,7 @@ describe('Canvas module boundaries', () => {
       'export function getCanvasAppPointerConsumerModel',
     )
     expect(pointerConsumerModelFile.source).toContain(
-      "from './CanvasAppPointerConsumerContracts'",
+      "from './CanvasAppConsumerContracts'",
     )
     expect(pointerConsumerModelFile.source).toContain(
       '): CanvasAppPointerConsumerModel',
@@ -1721,7 +1721,7 @@ describe('Canvas module boundaries', () => {
       'src/canvas/app/workflow/useCanvasAppKeyboardModel.ts',
     )
     const keyboardConsumerContractsFile = getSourceFile(
-      'src/canvas/app/workflow/CanvasAppKeyboardConsumerContracts.ts',
+      'src/canvas/app/workflow/CanvasAppConsumerContracts.ts',
     )
 
     expect(appModelFile.source).toContain(
@@ -1735,7 +1735,7 @@ describe('Canvas module boundaries', () => {
       "from '../keyboard/useCanvasKeyboardShortcuts'",
     )
     expect(keyboardModelFile.source).toContain(
-      "from './CanvasAppKeyboardConsumerContracts'",
+      "from './CanvasAppConsumerContracts'",
     )
     expect(keyboardModelFile.source).toContain(
       'export function useCanvasAppKeyboardModel',

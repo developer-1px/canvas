@@ -8,9 +8,9 @@ import type {
   CanvasAppStageRenderInput,
 } from '../rendering/CanvasAppStageAdapter'
 import type { CanvasAppEventInput } from '../pointer/CanvasAppPointerInput'
-import type { CanvasAppStageModelInput } from './CanvasAppStageConsumerContracts'
+import type { CanvasAppStageModelInput } from './CanvasAppConsumerContracts'
 
-export type { CanvasAppStageModelInput } from './CanvasAppStageConsumerContracts'
+export type { CanvasAppStageModelInput } from './CanvasAppConsumerContracts'
 
 export function renderCanvasAppStageModel({
   blurTextEditor,

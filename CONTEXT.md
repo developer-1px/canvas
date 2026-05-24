@@ -50,7 +50,7 @@
 - Canvas App Stage Element: stage DOM element의 bounds, pointer capture, wheel listener를 한 Module에 숨기는 App-owned element Adapter.
 - Canvas App Stage Element Model: App Model이 Stage Element Adapter 생성 세부를 직접 알지 않도록 숨기는 workflow Module.
 - Canvas App Stage Element Consumer Model: Stage Element Adapter를 command, component, pointer, viewport, stage render consumer별 context로 변환하는 workflow Module.
-- Canvas App Consumer Contracts: command, extension, interaction, stage element 같은 workflow runtime fan-out의 입력과 consumer별 출력 Interface를 한곳에 모아 구현 mapping과 분리하고, 외부 등록 descriptor와 내부 runtime state의 노출 범위를 고정하는 App-owned type 계약.
+- Canvas App Consumer Contracts: command, extension, interaction, keyboard, pointer, stage, stage element 같은 workflow runtime fan-out의 입력과 consumer별 출력 Interface를 한곳에 모아 구현 mapping과 분리하고, 외부 등록 descriptor와 내부 runtime state의 노출 범위를 고정하는 App-owned type 계약.
 - Canvas App Item Layer Adapter: App workflow가 concrete Demo SVG item layer를 직접 알지 않고 items를 stage children으로 렌더링하도록 주입받는 Adapter Interface.
 - Canvas App Extension Id: custom command, creation tool, item module, component presentation renderer key, custom item renderer key, validator key, inspector panel에서 공유하는 안정 lower-kebab 외부 계약.
 - Canvas App Extension Registry: assembly 단계에서 extension entry와 record key를 검증하고 중복을 실패시키는 내부 merge 계약.
@@ -160,12 +160,9 @@
 - Canvas App Extension Consumer Model: custom command/tool runtime state와 runner를 control, keyboard, pointer consumer별 extension context로 변환하는 workflow Module.
 - Canvas App Inspector Model: App Model이 inspector panel list, read model, selection wiring 세부를 직접 알지 않도록 object inspector props를 만드는 workflow Module.
 - Canvas App Keyboard Model: App Model이 keyboard shortcut handler wiring 세부를 알지 않도록 command, interaction, viewport shortcut handlers를 조립하는 workflow Module.
-- Canvas App Keyboard Consumer Contracts: keyboard workflow가 command, interaction, viewport, text, extension consumer에서 받는 handler context의 명시 Interface 계약을 소유하는 workflow Module.
 - Canvas App Pointer Model: App Model이 pointer down/drag hook 조립 세부를 알지 않도록 stage와 item layer pointer handlers를 만드는 workflow Module.
-- Canvas App Pointer Consumer Contracts: Pointer runtime을 item layer와 stage render consumer에 넘기는 handler bundle의 명시 Interface 계약을 소유하는 workflow Module.
 - Canvas App Pointer Consumer Model: Pointer runtime callbacks를 stage와 item layer consumer별 handler contract로 변환하는 workflow Module.
 - Canvas App Stage Model: stage와 item layer Adapter 입력 조립, 호출 순서, text editor blur, context menu 차단, render 실패 containment를 소유하는 workflow Module.
-- Canvas App Stage Consumer Contracts: Stage Model이 item layer, rendering, stage consumer에서 받는 render context의 명시 Interface 계약을 소유하는 workflow Module.
 - Canvas App Text Model: App Model이 textarea ref, text editor, find/replace runtime wiring 세부를 직접 알지 않도록 숨기는 workflow Module.
 - Canvas App Text Consumer Model: Text editor/find-replace runtime을 command, component, extension, keyboard, pointer, stage, view consumer context로 변환하는 workflow Module.
 - Canvas Text Editing Model: text edit commit descriptor와 viewport-projected editor style을 소유하고 editable item value 규칙은 Host Canvas Editable Text Item에 위임하는 App-owned runtime Module.
@@ -357,10 +354,9 @@
 - Canvas App Extension Consumer Model은 반환 Interface를 implementation `ReturnType`에서 역산하지 않고 명시적인 consumer별 extension context 계약으로 고정한다.
 - App Model은 inspector panel wiring 세부를 직접 알지 않고 Canvas App Inspector Model에서 object inspector props를 받는다.
 - App Model은 keyboard shortcut handler wiring 세부를 직접 알지 않고 Canvas App Keyboard Model에 위임한다.
-- Keyboard Model은 keyboard router handler type에서 입력 shape를 역산하지 않고 Canvas App Keyboard Consumer Contracts를 소비한다.
+- Keyboard Model은 keyboard router handler type에서 입력 shape를 역산하지 않고 Canvas App Consumer Contracts를 소비한다.
 - App Model은 pointer down/drag hook 조립 세부를 직접 알지 않고 Canvas App Pointer Model에서 stage/item layer pointer handlers를 받는다. Pointer runtime 생성은 Canvas App Pointer Model이, consumer별 handler fan-out은 Canvas App Pointer Consumer Model이 소유한다.
-- Stage Model은 pointer handler shape를 rendering adapter input에서 역산하지 않고 Canvas App Pointer Consumer Contracts를 소비한다.
-- Stage Model은 item layer/rendering/stage context shape를 rendering adapter input에서 역산하지 않고 Canvas App Stage Consumer Contracts를 소비한다.
+- Stage Model은 pointer handler shape와 item layer/rendering/stage context shape를 rendering adapter input에서 역산하지 않고 Canvas App Consumer Contracts를 소비한다.
 - App Model은 stage/item layer Adapter 입력 조립, 호출 순서, context menu 차단, text editor blur timing, render 실패 containment를 직접 알지 않고 Canvas App Stage Model에 위임한다.
 - App Model은 textarea ref, text editor, find/replace wiring, editing state fan-out 세부를 직접 알지 않고 Canvas App Text Model에서 consumer별 text context와 view props를 받는다. Text editor/find-replace runtime 생성은 Canvas App Text Model이, consumer별 text fan-out은 Canvas App Text Consumer Model이 소유한다.
 - Text editing hook은 textarea focus/blur DOM lifecycle만 맡고, commit descriptor와 editor style projection은 Canvas Text Editing Model이 소유하며, editable item value 규칙은 Host Canvas Editable Text Item Module이 소유한다.

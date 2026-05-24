@@ -1,8 +1,10 @@
 import type {
   Dispatch,
+  MutableRefObject,
   SetStateAction,
 } from 'react'
 import type {
+  CanvasAffordanceConfig,
   CanvasAlignMode,
   CanvasDistributeMode,
   CanvasDraftArrowOverlay,
@@ -13,16 +15,34 @@ import type {
 } from '../../engine'
 import type {
   Bounds,
+  CanvasInteractionKind,
   CanvasItem,
+  EditingText,
   Point,
+  ResizeHandle,
   Tool,
+  Viewport,
 } from '../../entities'
+import type { CanvasEditableTextItem } from '../../host'
 import type { CanvasAppCustomCommandState } from '../commands/CanvasAppCustomCommandExecution'
+import type { CanvasAppPointerInput } from '../pointer/CanvasAppPointerInput'
 import type { CanvasAppStageElementController } from '../stage/CanvasAppStageElement'
+import type {
+  CanvasAppItemLayerAdapter,
+} from '../rendering/CanvasAppItemLayerAdapter'
+import type {
+  CanvasAppComponentPresentationRenderers,
+  CanvasAppCustomItemRenderers,
+} from '../rendering/CanvasAppRendererRegistries'
+import type {
+  CanvasAppStageAdapter,
+  CanvasAppStageMount,
+} from '../rendering/CanvasAppStageAdapter'
 import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
 import type { CanvasAppCustomCreationToolState } from '../tools/CanvasAppCustomCreationToolRuntime'
 import type { Interaction } from '../pointer/CanvasInteractionState'
 import type { CanvasAppControlCommandHandlers } from './CanvasAppControlCommandContracts'
+import type { CommitCanvasSelection } from './CanvasWorkflowContract'
 
 export type CanvasAppCommandRuntime = {
   alignSelection: (mode: CanvasAlignMode) => void
@@ -102,6 +122,52 @@ export type CanvasAppExtensionModel = {
   pointer: CanvasAppExtensionPointerContext
 }
 
+export type CanvasAppKeyboardCommandContext = {
+  commitSelection: CommitCanvasSelection
+  copySelection: () => void
+  cutSelection: () => void
+  deleteSelection: () => void
+  duplicateSelection: () => void
+  groupSelection: () => void
+  lockSelection: () => void
+  moveSelection: (dx: number, dy: number) => void
+  pasteSelection: () => void
+  redoHistory: () => void
+  reorderSelection: (mode: CanvasReorderMode) => void
+  selectAll: () => void
+  undoHistory: () => void
+  ungroupSelection: () => void
+  unlockAll: () => void
+}
+
+export type CanvasAppKeyboardInteractionContext = {
+  interactionRef: MutableRefObject<Interaction>
+  setDraftArrow: Dispatch<SetStateAction<CanvasDraftArrowOverlay | null>>
+  setDraftRect: Dispatch<SetStateAction<Bounds | null>>
+  setDraftStroke: Dispatch<SetStateAction<CanvasDraftStrokeOverlay | null>>
+  setEditing: Dispatch<SetStateAction<EditingText | null>>
+  setGesture: Dispatch<SetStateAction<Interaction['kind']>>
+  setMarquee: Dispatch<SetStateAction<Bounds | null>>
+  setSpaceDown: Dispatch<SetStateAction<boolean>>
+  setTool: Dispatch<SetStateAction<Tool>>
+}
+
+export type CanvasAppKeyboardViewportContext = {
+  fitToItems: (ids?: string[]) => void
+  resetViewport: () => void
+  zoomBy: (multiplier: number) => void
+}
+
+export type CanvasAppKeyboardModelInput = {
+  command: CanvasAppKeyboardCommandContext
+  config: CanvasAffordanceConfig
+  customCreationTools: readonly CanvasAppCustomCreationToolState[]
+  interaction: CanvasAppKeyboardInteractionContext
+  openFindReplace: () => void
+  selection: string[]
+  viewport: CanvasAppKeyboardViewportContext
+}
+
 export type CanvasInteractionDraftWriters = {
   setDraftArrow: Dispatch<SetStateAction<CanvasDraftArrowOverlay | null>>
   setDraftRect: Dispatch<SetStateAction<Bounds | null>>
@@ -165,6 +231,59 @@ export type CanvasInteractionConsumerModel = {
   keyboard: CanvasInteractionKeyboardContext
   pointer: CanvasInteractionPointerContext
   stage: CanvasInteractionStageContext
+}
+
+export type CanvasAppPointerItemLayerHandlers = {
+  onItemPointerDown: (
+    event: CanvasAppPointerInput,
+    itemId: string,
+  ) => void
+  onTextDoubleClick: (item: CanvasEditableTextItem) => void
+}
+
+export type CanvasAppPointerStageHandlers = {
+  onCanvasPointerDown: (event: CanvasAppPointerInput) => void
+  onPointerCancel: (event: CanvasAppPointerInput) => void
+  onPointerMove: (event: CanvasAppPointerInput) => void
+  onPointerUp: (event: CanvasAppPointerInput) => void
+  onResizePointerDown: (
+    event: CanvasAppPointerInput,
+    handle: ResizeHandle,
+  ) => void
+}
+
+export type CanvasAppPointerConsumerModel = {
+  itemLayerHandlers: CanvasAppPointerItemLayerHandlers
+  stageHandlers: CanvasAppPointerStageHandlers
+}
+
+export type CanvasAppStageItemLayerContext = {
+  items: CanvasItem[]
+  selected: Set<string>
+}
+
+export type CanvasAppStageRenderingContext = {
+  componentPresentationRenderers: CanvasAppComponentPresentationRenderers
+  customItemRenderers: CanvasAppCustomItemRenderers
+  getComponentPresentation: (component: string) => string
+  itemLayerAdapter: CanvasAppItemLayerAdapter
+  stageAdapter: CanvasAppStageAdapter
+}
+
+export type CanvasAppStageContext = {
+  activeMode: Tool
+  gesture: CanvasInteractionKind
+  overlays: CanvasOverlayState
+  stageElement: CanvasAppStageMount
+  viewport: Viewport
+}
+
+export type CanvasAppStageModelInput = {
+  blurTextEditor: () => void
+  itemLayer: CanvasAppStageItemLayerContext
+  pointer: CanvasAppPointerConsumerModel
+  rendering: CanvasAppStageRenderingContext
+  stage: CanvasAppStageContext
 }
 
 export type CanvasAppStageElementConsumerModelInput = {
