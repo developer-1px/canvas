@@ -5,6 +5,7 @@ export function useCanvasAppKeyboardModel({
   command,
   component,
   config,
+  cursorChat,
   customCreationTools,
   interaction,
   openFindReplace,
@@ -14,6 +15,7 @@ export function useCanvasAppKeyboardModel({
   useCanvasKeyboardShortcuts({
     commitSelection: command.commitSelection,
     config,
+    closeCursorChat: cursorChat.closeCursorChat,
     copySelection: command.copySelection,
     customCreationTools,
     cutSelection: command.cutSelection,
@@ -24,6 +26,7 @@ export function useCanvasAppKeyboardModel({
     interactionRef: interaction.interactionRef,
     lockSelection: command.lockSelection,
     moveSelection: command.moveSelection,
+    openCursorChat: cursorChat.openCursorChat,
     openFindReplace,
     pasteSelection: command.pasteSelection,
     quickCreateSticky: component.quickCreateSticky,

@@ -29,9 +29,14 @@ describe('CanvasKeyboardSystemDispatch', () => {
     })
     runCanvasKeyboardSystemIntent({
       handlers,
+      intent: { kind: 'open-cursor-chat', preventDefault: true },
+    })
+    runCanvasKeyboardSystemIntent({
+      handlers,
       intent: { kind: 'temporary-pan', preventDefault: true },
     })
 
+    expect(handlers.openCursorChat).toHaveBeenCalledTimes(1)
     expect(handlers.openFindReplace).toHaveBeenCalledTimes(1)
     expect(handlers.setSpaceDown).toHaveBeenCalledWith(true)
   })
@@ -61,6 +66,7 @@ describe('CanvasKeyboardSystemDispatch', () => {
     expect(handlers.setDraftStroke).toHaveBeenCalledWith(null)
     expect(handlers.setLaserTrail).toHaveBeenCalledWith(null)
     expect(handlers.setEditing).toHaveBeenCalledWith(null)
+    expect(handlers.closeCursorChat).toHaveBeenCalledTimes(1)
     expect(handlers.commitSelection).toHaveBeenCalledWith([])
     expect(handlers.setTool).toHaveBeenCalledWith('select')
   })
@@ -98,8 +104,10 @@ function createHandlers(
   overrides: Partial<CanvasKeyboardSystemHandlers> = {},
 ): CanvasKeyboardSystemHandlers {
   return {
+    closeCursorChat: vi.fn(),
     commitSelection: vi.fn(() => true),
     interactionRef: { current: { kind: 'none' } },
+    openCursorChat: vi.fn(),
     openFindReplace: vi.fn(),
     setDraftArrow: vi.fn(),
     setDraftRect: vi.fn(),

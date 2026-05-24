@@ -448,6 +448,7 @@
 
 .toolbar,
 .component-palette,
+.cursor-chat,
 .drawing-controls,
 .find-replace-panel,
 .image-controls,
@@ -465,6 +466,34 @@
   background: rgba(255, 255, 255, 0.94);
   box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
   backdrop-filter: blur(10px);
+}
+
+.cursor-chat {
+  z-index: 6;
+  min-width: 176px;
+  max-width: min(220px, calc(100vw - 28px));
+  padding: 6px;
+  transform: translate(12px, calc(-100% - 12px));
+}
+
+.cursor-chat textarea {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  min-height: 42px;
+  resize: none;
+  overflow: hidden;
+  padding: 7px 9px;
+  border: 0;
+  border-radius: 5px;
+  color: #111827;
+  background: #ffffff;
+  font: 650 13px/1.25 var(--sans);
+  white-space: pre-wrap;
+}
+
+.cursor-chat textarea:focus {
+  outline: none;
 }
 
 .toolbar {

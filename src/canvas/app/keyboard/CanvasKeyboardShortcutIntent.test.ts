@@ -123,6 +123,21 @@ describe('CanvasKeyboardShortcutIntent', () => {
       event: createKeyboardEvent({ ctrlKey: true, key: 'f' }),
     }))).toEqual({ kind: 'none', preventDefault: false })
   })
+
+  it('opens cursor chat only outside typing targets', () => {
+    expect(getCanvasKeyboardShortcutIntent(createInput({
+      event: createKeyboardEvent({ key: '/' }),
+    }))).toEqual({
+      kind: 'open-cursor-chat',
+      preventDefault: true,
+    })
+
+    withTextAreaTarget((target) => {
+      expect(getCanvasKeyboardShortcutIntent(createInput({
+        event: createKeyboardEvent({ key: '/', target }),
+      }))).toEqual({ kind: 'none', preventDefault: false })
+    })
+  })
 })
 
 function createInput(

@@ -5,6 +5,7 @@ import { getCanvasAppControlModel } from './CanvasAppControlModel'
 import { renderCanvasAppStageModel } from './CanvasAppStageModel'
 import { useCanvasAppCommandModel } from './useCanvasAppCommandModel'
 import { useCanvasAppComponentModel } from './useCanvasAppComponentModel'
+import { useCanvasCursorChatModel } from '../cursor/useCanvasCursorChatModel'
 import { useCanvasAppDrawingModel } from './useCanvasAppDrawingModel'
 import { useCanvasAppExtensionModel } from './useCanvasAppExtensionModel'
 import { useCanvasAppInspectorModel } from './useCanvasAppInspectorModel'
@@ -41,6 +42,10 @@ export function useCanvasAppModel({
   )
   const stageElement = useCanvasAppStageElementModel()
   const workspace = useCanvasWorkspaceModel(appAssembly.workspace)
+  const cursorChat = useCanvasCursorChatModel({
+    ...affordance.keyboard,
+    ...stageElement.pointer,
+  })
   const interaction = useCanvasInteractionModel({
     ...affordance.interaction,
     presence,
@@ -116,6 +121,7 @@ export function useCanvasAppModel({
       ...commands.keyboard,
     },
     component: components.keyboard,
+    cursorChat: cursorChat.keyboard,
     ...affordance.keyboard,
     ...extension.keyboard,
     ...text.keyboard,
@@ -165,6 +171,7 @@ export function useCanvasAppModel({
     imageControls,
     inspector,
     stage: renderCanvasAppStageModel({
+      cursorChat: cursorChat.stage,
       ...text.stage,
       itemLayer: workspace.itemLayer,
       pointer,
@@ -175,6 +182,7 @@ export function useCanvasAppModel({
         ...workspace.stage,
       },
     }),
+    cursorChat: cursorChat.view,
     stampControls,
     stickyQuickCreate: components.control.stickyQuickCreate,
     status: controls.status,

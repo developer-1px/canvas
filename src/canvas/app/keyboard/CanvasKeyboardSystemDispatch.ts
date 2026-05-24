@@ -23,8 +23,10 @@ import type {
 import { shouldReleaseCanvasKeyboardTemporaryPan } from './CanvasKeyboardSystemShortcuts'
 
 export type CanvasKeyboardSystemHandlers = {
+  closeCursorChat: () => void
   commitSelection: CommitCanvasSelection
   interactionRef: MutableRefObject<Interaction>
+  openCursorChat: () => void
   openFindReplace: () => void
   setDraftArrow: Dispatch<SetStateAction<CanvasDraftArrowOverlay | null>>
   setDraftRect: Dispatch<SetStateAction<Bounds | null>>
@@ -55,8 +57,12 @@ const CANVAS_KEYBOARD_SYSTEM_INTENT_DISPATCH =
       handlers.setDraftStroke(null)
       handlers.setLaserTrail(null)
       handlers.setEditing(null)
+      handlers.closeCursorChat()
       handlers.commitSelection([])
       handlers.setTool('select')
+    },
+    'open-cursor-chat': ({ handlers }) => {
+      handlers.openCursorChat()
     },
     'open-find-replace': ({ handlers }) => {
       handlers.openFindReplace()

@@ -42,6 +42,29 @@ describe('CanvasKeyboardSystemShortcuts', () => {
     })).toBeNull()
   })
 
+  it('resolves cursor chat after typing-target suppression', () => {
+    expect(getCanvasKeyboardSystemShortcutIntent({
+      config: createCanvasAffordanceConfig(),
+      event: createKeyboardEvent({ key: '/' }),
+      key: '/',
+      mod: false,
+      phase: 'after-typing-target',
+    })).toEqual({
+      kind: 'open-cursor-chat',
+      preventDefault: true,
+    })
+
+    expect(getCanvasKeyboardSystemShortcutIntent({
+      config: createCanvasAffordanceConfig({
+        overlays: { cursorChat: false },
+      }),
+      event: createKeyboardEvent({ key: '/' }),
+      key: '/',
+      mod: false,
+      phase: 'after-typing-target',
+    })).toBeNull()
+  })
+
   it('exports reserved system shortcuts for custom creation tool contracts', () => {
     expect(getCanvasKeyboardReservedSystemShortcuts()).toEqual(
       expect.arrayContaining([
@@ -52,6 +75,7 @@ describe('CanvasKeyboardSystemShortcuts', () => {
         },
         { label: 'escape', shortcut: { key: 'Escape' } },
         { label: 'escape', shortcut: { key: 'Escape', shiftKey: true } },
+        { label: 'cursor chat', shortcut: { key: '/' } },
       ]),
     )
   })

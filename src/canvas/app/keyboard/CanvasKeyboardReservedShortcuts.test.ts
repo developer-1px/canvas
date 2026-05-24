@@ -14,6 +14,7 @@ describe('CanvasKeyboardReservedShortcuts', () => {
         },
         { label: 'fit all', shortcut: { key: '0' } },
         { label: 'fit selection', shortcut: { key: '1' } },
+        { label: 'cursor chat', shortcut: { key: '/' } },
         { label: 'delete', shortcut: { key: 'Delete' } },
         {
           label: 'large nudge left',

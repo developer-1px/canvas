@@ -116,6 +116,8 @@ function createHandlers(
     interactionRef: { current: { kind: 'none' } },
     lockSelection: vi.fn(),
     moveSelection: vi.fn(),
+    closeCursorChat: vi.fn(),
+    openCursorChat: vi.fn(),
     openFindReplace: vi.fn(),
     pasteSelection: vi.fn(),
     quickCreateSticky: vi.fn(),

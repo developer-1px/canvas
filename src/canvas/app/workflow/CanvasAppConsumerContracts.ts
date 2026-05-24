@@ -301,6 +301,11 @@ export type CanvasAppKeyboardCommandContext = {
   unlockAll: () => void
 }
 
+export type CanvasAppKeyboardCursorChatContext = {
+  closeCursorChat: () => void
+  openCursorChat: () => void
+}
+
 export type CanvasAppKeyboardInteractionContext = {
   interactionRef: MutableRefObject<Interaction>
   setDraftArrow: Dispatch<SetStateAction<CanvasDraftArrowOverlay | null>>
@@ -348,6 +353,7 @@ export type CanvasAppKeyboardModelInput = {
   command: CanvasAppKeyboardCommandContext
   component: CanvasAppComponentKeyboardContext
   config: CanvasAffordanceConfig
+  cursorChat: CanvasAppKeyboardCursorChatContext
   customCreationTools: readonly CanvasAppCustomCreationToolState[]
   interaction: CanvasAppKeyboardInteractionContext
   openFindReplace: () => void
@@ -581,10 +587,16 @@ export type CanvasAppStageContext = {
 
 export type CanvasAppStageModelInput = {
   blurTextEditor: () => void
+  cursorChat: CanvasAppStageCursorChatContext
   itemLayer: CanvasAppStageItemLayerContext
   pointer: CanvasAppPointerConsumerModel
   rendering: CanvasAppStageRenderingContext
   stage: CanvasAppStageContext
+}
+
+export type CanvasAppStageCursorChatContext = {
+  onPointerDown: (event: CanvasAppPointerInput) => void
+  onPointerMove: (event: CanvasAppPointerInput) => void
 }
 
 export type CanvasAppStageElementConsumerModelInput = {

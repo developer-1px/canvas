@@ -215,4 +215,17 @@ describe('CanvasAppCustomCreationTools', () => {
       'Canvas app custom creation tool shortcut conflicts with large nudge left: risk uses Shift+ArrowLeft',
     )
   })
+
+  it('rejects cursor chat shortcut conflicts', () => {
+    expect(() =>
+      assertCanvasAppCustomCreationToolShortcuts([
+        {
+          ...tool,
+          shortcut: { key: '/' },
+        },
+      ]),
+    ).toThrow(
+      'Canvas app custom creation tool shortcut conflicts with cursor chat: risk uses /',
+    )
+  })
 })

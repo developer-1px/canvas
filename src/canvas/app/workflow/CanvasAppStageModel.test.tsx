@@ -46,8 +46,13 @@ describe('CanvasAppStageModel', () => {
     let itemLayerInput: CanvasAppItemLayerRenderInput | null = null
     let stageInput: CanvasAppStageRenderInput | null = null
     const pointer = createPointerModel()
+    const cursorChat = createCursorChatModel({
+      onPointerDown: () => calls.push('cursor-down'),
+      onPointerMove: () => calls.push('cursor-move'),
+    })
     const input = createStageModelInput({
       blurTextEditor: () => calls.push('blur'),
+      cursorChat,
       pointer: {
         itemLayerHandlers: {
           ...pointer.itemLayerHandlers,
@@ -79,6 +84,7 @@ describe('CanvasAppStageModel', () => {
     })
 
     renderCanvasAppStageModel(input)
+    expectStageInput(stageInput).onPointerMove(createPointerInput())
     expectStageInput(stageInput).onCanvasPointerDown(createPointerInput())
     expectItemLayerInput(itemLayerInput).onItemPointerDown(
       createPointerInput(),
@@ -91,10 +97,14 @@ describe('CanvasAppStageModel', () => {
     )
 
     expect(calls).toEqual([
+      'cursor-move',
+      'cursor-down',
       'blur',
       'canvas',
+      'cursor-down',
       'blur',
       'item:rect-1',
+      'cursor-down',
       'blur',
       'arrow:arrow-1:end',
     ])
@@ -144,10 +154,21 @@ function createStageModelInput(
 ): CanvasAppStageModelInput {
   return {
     blurTextEditor: vi.fn(),
+    cursorChat: createCursorChatModel(),
     itemLayer: createItemLayerModel(),
     pointer: createPointerModel(),
     rendering: createRenderingModel(),
     stage: createStageModel(),
+    ...overrides,
+  }
+}
+
+function createCursorChatModel(
+  overrides: Partial<CanvasAppStageModelInput['cursorChat']> = {},
+): CanvasAppStageModelInput['cursorChat'] {
+  return {
+    onPointerDown: vi.fn(),
+    onPointerMove: vi.fn(),
     ...overrides,
   }
 }

@@ -3,6 +3,7 @@ import type {
   ReactNode,
 } from 'react'
 import { CanvasComponentPalette } from '../../ui/palette/CanvasComponentPalette'
+import { CanvasCursorChat } from '../../ui/cursor/CanvasCursorChat'
 import { CanvasDrawingControls } from '../../ui/drawing/CanvasDrawingControls'
 import { CanvasObjectInspector } from '../../ui/inspector/CanvasObjectInspector'
 import { CanvasFindReplacePanel } from '../../ui/search/CanvasFindReplacePanel'
@@ -15,6 +16,7 @@ import { CanvasStatus } from '../../ui/status/CanvasStatus'
 import { ZoomControls } from '../../ui/zoom/ZoomControls'
 
 type ToolbarProps = ComponentProps<typeof CanvasToolbar>
+type CursorChatProps = ComponentProps<typeof CanvasCursorChat>
 type TextEditorProps = ComponentProps<typeof CanvasTextEditor>
 type DrawingControlsProps = ComponentProps<typeof CanvasDrawingControls>
 type FindReplaceProps = ComponentProps<typeof CanvasFindReplacePanel>
@@ -32,6 +34,7 @@ type VisibleProps<TProps> = TProps & {
 
 type CanvasAppViewProps = {
   componentPalette: VisibleProps<PaletteProps>
+  cursorChat: CursorChatProps
   drawingControls: VisibleProps<DrawingControlsProps>
   findReplace: FindReplaceProps
   imageControls: VisibleProps<ImageControlsProps>
@@ -47,6 +50,7 @@ type CanvasAppViewProps = {
 
 export function CanvasAppView({
   componentPalette,
+  cursorChat,
   drawingControls,
   findReplace,
   imageControls,
@@ -94,6 +98,8 @@ export function CanvasAppView({
       {showStampControls ? <CanvasStampControls {...stampControlProps} /> : null}
 
       {stage}
+
+      <CanvasCursorChat {...cursorChat} />
 
       {showStickyQuickCreate ? (
         <CanvasStickyQuickCreateControl {...stickyQuickCreateProps} />

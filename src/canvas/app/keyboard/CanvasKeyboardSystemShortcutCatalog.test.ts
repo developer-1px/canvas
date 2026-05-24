@@ -17,6 +17,13 @@ describe('CanvasKeyboardSystemShortcutCatalog', () => {
           shortcutId: 'findReplace',
         }),
         expect.objectContaining({
+          label: 'cursor chat',
+          overlayId: 'cursorChat',
+          phase: 'after-typing-target',
+          shortcut: { key: '/' },
+          shortcutId: 'cursorChat',
+        }),
+        expect.objectContaining({
           label: 'escape',
           phase: 'after-typing-target',
           shortcut: { key: 'Escape' },
@@ -38,6 +45,11 @@ describe('CanvasKeyboardSystemShortcutCatalog', () => {
 
     expect(CANVAS_KEYBOARD_SYSTEM_SHORTCUTS).toEqual(
       expect.arrayContaining([
+        expect.objectContaining({
+          label: 'cursor chat',
+          reserve: {},
+          shortcut: { key: '/' },
+        }),
         expect.objectContaining({
           label: 'escape',
           reserve: { shiftInsensitive: true },

@@ -12,6 +12,7 @@ export type { CanvasAppStageModelInput } from './CanvasAppConsumerContracts'
 
 export function renderCanvasAppStageModel({
   blurTextEditor,
+  cursorChat,
   itemLayer,
   pointer,
   rendering,
@@ -28,6 +29,7 @@ export function renderCanvasAppStageModel({
       outlineIds: stage.overlays.itemOutlineIds,
       selected: itemLayer.selected,
       onArrowEndpointPointerDown: (event, itemId, endpoint) => {
+        cursorChat.onPointerDown(event)
         blurTextEditor()
         pointer.itemLayerHandlers.onArrowEndpointPointerDown(
           event,
@@ -37,6 +39,7 @@ export function renderCanvasAppStageModel({
       },
       onTextDoubleClick: pointer.itemLayerHandlers.onTextDoubleClick,
       onItemPointerDown: (event, itemId) => {
+        cursorChat.onPointerDown(event)
         blurTextEditor()
         pointer.itemLayerHandlers.onItemPointerDown(event, itemId)
       },
@@ -49,12 +52,16 @@ export function renderCanvasAppStageModel({
       ...stage,
       children,
       onCanvasPointerDown: (event) => {
+        cursorChat.onPointerDown(event)
         blurTextEditor()
         pointer.stageHandlers.onCanvasPointerDown(event)
       },
       onContextMenu: preventCanvasContextMenu,
       onPointerCancel: pointer.stageHandlers.onPointerCancel,
-      onPointerMove: pointer.stageHandlers.onPointerMove,
+      onPointerMove: (event) => {
+        cursorChat.onPointerMove(event)
+        pointer.stageHandlers.onPointerMove(event)
+      },
       onPointerUp: pointer.stageHandlers.onPointerUp,
       onResizePointerDown: pointer.stageHandlers.onResizePointerDown,
     },

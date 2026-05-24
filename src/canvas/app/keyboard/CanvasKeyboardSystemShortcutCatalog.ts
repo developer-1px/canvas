@@ -6,6 +6,7 @@ import type {
 import type { CanvasKeyboardShortcutChord } from './CanvasKeyboardShortcutChords'
 
 export type CanvasKeyboardSystemShortcutIntent =
+  | { kind: 'open-cursor-chat'; preventDefault: true }
   | { kind: 'open-find-replace'; preventDefault: true }
   | { kind: 'temporary-pan'; preventDefault: true }
   | { kind: 'escape'; preventDefault: false }
@@ -40,6 +41,16 @@ const CANVAS_KEYBOARD_FIND_REPLACE_SHORTCUT = {
   shortcutId: 'findReplace',
 } satisfies CanvasKeyboardSystemShortcutDescriptor
 
+const CANVAS_KEYBOARD_CURSOR_CHAT_SHORTCUT = {
+  getIntent: () => ({ kind: 'open-cursor-chat', preventDefault: true }),
+  label: 'cursor chat',
+  overlayId: 'cursorChat',
+  phase: 'after-typing-target',
+  reserve: {},
+  shortcut: { key: '/' },
+  shortcutId: 'cursorChat',
+} satisfies CanvasKeyboardSystemShortcutDescriptor
+
 export const CANVAS_KEYBOARD_TEMPORARY_PAN_SHORTCUT = {
   code: 'Space',
   gestureId: 'temporaryPan',
@@ -66,6 +77,7 @@ const CANVAS_KEYBOARD_ESCAPE_SHORTCUT = {
 export const CANVAS_KEYBOARD_SYSTEM_SHORTCUTS:
   readonly CanvasKeyboardSystemShortcutDescriptor[] = [
   CANVAS_KEYBOARD_FIND_REPLACE_SHORTCUT,
+  CANVAS_KEYBOARD_CURSOR_CHAT_SHORTCUT,
   CANVAS_KEYBOARD_TEMPORARY_PAN_SHORTCUT,
   CANVAS_KEYBOARD_ESCAPE_SHORTCUT,
 ]
