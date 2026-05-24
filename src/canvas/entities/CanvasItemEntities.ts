@@ -97,6 +97,7 @@ export type CanvasComponentItem = CanvasItemBase & {
   items?: string[]
   stroke: string
   title: string
+  url?: string
 }
 
 export type CanvasEditableTextItem =

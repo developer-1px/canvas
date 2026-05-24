@@ -35,6 +35,9 @@ export function getCanvasAppAffordanceModel(
     keyboard: {
       config,
     },
+    linkPreview: {
+      config,
+    },
     pointer: {
       config,
     },

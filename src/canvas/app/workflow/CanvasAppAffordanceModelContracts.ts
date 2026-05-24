@@ -28,6 +28,9 @@ export type CanvasAppAffordanceInspectorModel =
 export type CanvasAppAffordanceImageModel =
   CanvasAppAffordanceConfigContext
 
+export type CanvasAppAffordanceLinkPreviewModel =
+  CanvasAppAffordanceConfigContext
+
 export type CanvasAppAffordanceTableModel =
   CanvasAppAffordanceConfigContext
 
@@ -56,6 +59,7 @@ export type CanvasAppAffordanceModel = {
   interaction: CanvasAppAffordanceInteractionModel
   inspector: CanvasAppAffordanceInspectorModel
   keyboard: CanvasAppAffordanceKeyboardModel
+  linkPreview: CanvasAppAffordanceLinkPreviewModel
   pointer: CanvasAppAffordancePointerModel
   stamp: CanvasAppAffordanceStampModel
   table: CanvasAppAffordanceTableModel

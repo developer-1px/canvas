@@ -1,4 +1,8 @@
 import type { CanvasComponentItem } from '../../entities'
+import {
+  CANVAS_LINK_PREVIEW_COMPONENT_PRESENTATION,
+  isCanvasLinkPreviewComponentItem,
+} from '../../host'
 import type { CanvasAppComponentRendererStrategy } from './CanvasAppRenderingContracts'
 import {
   getCanvasDemoSvgComponentFallbackRenderer,
@@ -41,7 +45,9 @@ function getCanvasDemoSvgComponentRendererSafely({
   renderers: CanvasDemoSvgComponentPresentationRenderers
 }): CanvasAppComponentRendererStrategy {
   try {
-    const presentation = getComponentPresentation(item.component)
+    const presentation = isCanvasLinkPreviewComponentItem(item)
+      ? CANVAS_LINK_PREVIEW_COMPONENT_PRESENTATION
+      : getComponentPresentation(item.component)
 
     return getCanvasDemoSvgComponentPresentationRenderer({
       presentation,

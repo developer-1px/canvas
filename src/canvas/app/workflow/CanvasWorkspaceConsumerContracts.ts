@@ -107,6 +107,12 @@ export type CanvasWorkspaceImageContext =
     itemReadModel: CanvasAppItemReadModel
   }
 
+export type CanvasWorkspaceLinkPreviewContext =
+  CanvasWorkspaceSelectionContext & {
+    commitItemsChange: CommitCanvasItemsChange
+    createId: (prefix: string) => string
+  }
+
 export type CanvasWorkspaceTableContext =
   CanvasWorkspaceSelectionContext & {
     commitItemsChange: CommitCanvasItemsChange
@@ -187,6 +193,7 @@ export type CanvasWorkspaceConsumerModel = {
   interaction: CanvasWorkspaceInteractionContext
   itemLayer: CanvasWorkspaceItemLayerContext
   keyboard: CanvasWorkspaceKeyboardContext
+  linkPreview: CanvasWorkspaceLinkPreviewContext
   pointer: CanvasWorkspacePointerContext
   stage: CanvasWorkspaceStageContext
   stamp: CanvasWorkspaceStampContext

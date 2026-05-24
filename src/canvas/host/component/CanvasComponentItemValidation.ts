@@ -1,5 +1,6 @@
 import { isCanvasStableId } from '../../core'
 import type { CanvasComponentItem } from '../model'
+import { isCanvasLinkPreviewUrl } from './CanvasLinkPreviewComponent'
 
 export function isCanvasComponentItemStorageShape(
   value: Record<string, unknown>,
@@ -14,7 +15,9 @@ export function isCanvasComponentItemStorageShape(
     typeof value.accent === 'string' &&
     (value.body === undefined || typeof value.body === 'string') &&
     (value.items === undefined || isStringArray(value.items)) &&
-    (value.columns === undefined || isStringArray(value.columns))
+    (value.columns === undefined || isStringArray(value.columns)) &&
+    (value.url === undefined ||
+      (typeof value.url === 'string' && isCanvasLinkPreviewUrl(value.url)))
   )
 }
 

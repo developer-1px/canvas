@@ -16,6 +16,9 @@ export function getCanvasAppStageElementConsumerModel({
     image: {
       stageElement,
     },
+    linkPreview: {
+      stageElement,
+    },
     pointer: {
       stageElement,
     },

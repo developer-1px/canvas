@@ -1,4 +1,5 @@
 import type { CanvasComponentItem } from '../../entities'
+import { getCanvasLinkPreviewDomain } from '../../host'
 import {
   CanvasDemoSvgComponentText,
   CanvasDemoSvgStickyText,
@@ -131,6 +132,54 @@ export function CanvasDemoSvgImageComponent({
       />
       <circle cx={item.x + item.w - 42} cy={item.y + 36} r="10" fill={item.accent} />
       <CanvasDemoSvgComponentText item={item} compact />
+    </>
+  )
+}
+
+export function CanvasDemoSvgLinkPreviewComponent({
+  item,
+}: {
+  item: CanvasComponentItem
+}) {
+  const url = item.url ?? item.body ?? ''
+  const domain = url ? getCanvasLinkPreviewDomain(url) : item.title
+
+  return (
+    <>
+      <rect
+        className="component-card component-link-preview-card"
+        x={item.x}
+        y={item.y}
+        width={item.w}
+        height={item.h}
+        rx="8"
+        fill={item.fill}
+        stroke={item.stroke}
+        vectorEffect="non-scaling-stroke"
+      />
+      <rect
+        x={item.x}
+        y={item.y}
+        width={item.w}
+        height="38"
+        rx="8"
+        fill="#eff6ff"
+      />
+      <rect
+        x={item.x}
+        y={item.y + 28}
+        width={item.w}
+        height="10"
+        fill="#eff6ff"
+      />
+      <circle cx={item.x + 23} cy={item.y + 19} r="7" fill={item.accent} />
+      <foreignObject x={item.x} y={item.y} width={item.w} height={item.h}>
+        <div className="component-link-preview">
+          <div className="component-link-preview-domain">{domain}</div>
+          <div className="component-link-preview-title">{item.title}</div>
+          <div className="component-link-preview-url">{url}</div>
+        </div>
+      </foreignObject>
     </>
   )
 }

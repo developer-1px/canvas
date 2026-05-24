@@ -28,6 +28,10 @@ describe('CanvasComponentItemValidation', () => {
       columns: undefined,
       items: undefined,
     })).toBe(true)
+    expect(isCanvasComponentItemStorageShape({
+      ...componentItem,
+      url: 'https://example.com/reference',
+    })).toBe(true)
   })
 
   it('rejects component ids outside the stable id contract', () => {
@@ -53,6 +57,10 @@ describe('CanvasComponentItemValidation', () => {
     expect(isCanvasComponentItemStorageShape({
       ...componentItem,
       columns: 'Owner',
+    })).toBe(false)
+    expect(isCanvasComponentItemStorageShape({
+      ...componentItem,
+      url: 'mailto:team@example.com',
     })).toBe(false)
   })
 })

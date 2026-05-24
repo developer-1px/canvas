@@ -49,6 +49,16 @@ export {
   isCanvasSectionComponentItem,
 } from './component/CanvasSectionComponent'
 export {
+  CANVAS_LINK_PREVIEW_COMPONENT_KIND,
+  CANVAS_LINK_PREVIEW_COMPONENT_PRESENTATION,
+  createCanvasLinkPreviewComponentItem,
+  getCanvasLinkPreviewDomain,
+  isCanvasLinkPreviewComponentItem,
+  isCanvasLinkPreviewUrl,
+  normalizeCanvasLinkPreviewUrl,
+  type CreateCanvasLinkPreviewComponentItemInput,
+} from './component/CanvasLinkPreviewComponent'
+export {
   CANVAS_STICKY_COMPONENT_KIND,
   applyCanvasStickyComponentCreationDefaults,
   isCanvasStickyComponentItem,

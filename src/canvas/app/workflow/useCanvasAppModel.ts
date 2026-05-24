@@ -15,6 +15,7 @@ import { useCanvasVotingSessionModel } from '../facilitation/useCanvasVotingSess
 import { useCanvasAppInspectorModel } from './useCanvasAppInspectorModel'
 import { useCanvasAppImageModel } from './useCanvasAppImageModel'
 import { useCanvasAppKeyboardModel } from './useCanvasAppKeyboardModel'
+import { useCanvasAppLinkPreviewImportModel } from './useCanvasAppLinkPreviewImportModel'
 import { useCanvasAppPointerModel } from './useCanvasAppPointerModel'
 import { useCanvasAppStampModel } from './useCanvasAppStampModel'
 import { useCanvasAppStageElementModel } from './useCanvasAppStageElementModel'
@@ -92,6 +93,12 @@ export function useCanvasAppModel({
     ...affordance.table,
     ...workspace.table,
     ...stageElement.table,
+  })
+
+  useCanvasAppLinkPreviewImportModel({
+    ...affordance.linkPreview,
+    ...workspace.linkPreview,
+    ...stageElement.linkPreview,
   })
 
   const text = useCanvasAppTextModel({

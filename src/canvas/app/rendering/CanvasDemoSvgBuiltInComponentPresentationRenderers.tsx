@@ -11,6 +11,7 @@ import {
   CanvasDemoSvgCardComponent,
   CanvasDemoSvgImageComponent,
   CanvasDemoSvgLabelComponent,
+  CanvasDemoSvgLinkPreviewComponent,
   CanvasDemoSvgSectionComponent,
   CanvasDemoSvgStickyComponent,
 } from './CanvasDemoSvgTextComponentRenderer'
@@ -26,6 +27,7 @@ export const DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS: CanvasApp
   'image-frame': CanvasDemoSvgImageComponent,
   'inline-label': CanvasDemoSvgLabelComponent,
   'kanban-stack': CanvasDemoSvgKanbanComponent,
+  'link-preview-card': CanvasDemoSvgLinkPreviewComponent,
   'line-connector': CanvasDemoSvgConnectorComponent,
   'matrix-table': CanvasDemoSvgTableComponent,
   'note-card': CanvasDemoSvgStickyComponent,
