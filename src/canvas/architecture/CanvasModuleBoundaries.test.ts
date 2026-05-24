@@ -4731,6 +4731,9 @@ describe('Canvas module boundaries', () => {
     expect(linkPreviewInspectorPanelFile.source).toContain(
       'replaceCanvasLinkPreviewComponentsWithSourceText',
     )
+    expect(linkPreviewInspectorPanelFile.source).toContain(
+      'replaceCanvasLinkPreviewComponentsOrientation',
+    )
     expect(defaultAssemblyFile.source).toContain(
       "from '../link/CanvasLinkPreviewInspectorPanel'",
     )
@@ -4742,6 +4745,9 @@ describe('Canvas module boundaries', () => {
     )
     expect(hostLinkPreviewFile.source).toContain(
       'export function replaceCanvasLinkPreviewComponentsWithSourceText',
+    )
+    expect(hostLinkPreviewFile.source).toContain(
+      'export function replaceCanvasLinkPreviewComponentsOrientation',
     )
     expect(hostLinkPreviewFile.source).not.toMatch(browserLinkPreviewHow)
   })

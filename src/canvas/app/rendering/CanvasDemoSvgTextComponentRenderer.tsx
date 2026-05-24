@@ -1,5 +1,8 @@
 import type { CanvasComponentItem } from '../../entities'
-import { getCanvasLinkPreviewDomain } from '../../host'
+import {
+  getCanvasLinkPreviewDomain,
+  normalizeCanvasLinkPreviewOrientation,
+} from '../../host'
 import {
   CanvasDemoSvgComponentText,
   CanvasDemoSvgStickyText,
@@ -143,11 +146,14 @@ export function CanvasDemoSvgLinkPreviewComponent({
 }) {
   const url = item.url ?? item.body ?? ''
   const domain = url ? getCanvasLinkPreviewDomain(url) : item.title
+  const orientation = normalizeCanvasLinkPreviewOrientation(item.orientation)
+  const isVertical = orientation === 'vertical'
+  const mediaHeight = isVertical ? 116 : 38
 
   return (
     <>
       <rect
-        className="component-card component-link-preview-card"
+        className={`component-card component-link-preview-card component-link-preview-card-${orientation}`}
         x={item.x}
         y={item.y}
         width={item.w}
@@ -161,20 +167,25 @@ export function CanvasDemoSvgLinkPreviewComponent({
         x={item.x}
         y={item.y}
         width={item.w}
-        height="38"
+        height={mediaHeight}
         rx="8"
         fill="#eff6ff"
       />
       <rect
         x={item.x}
-        y={item.y + 28}
+        y={item.y + mediaHeight - 10}
         width={item.w}
         height="10"
         fill="#eff6ff"
       />
-      <circle cx={item.x + 23} cy={item.y + 19} r="7" fill={item.accent} />
+      <circle
+        cx={item.x + (isVertical ? item.w - 24 : 23)}
+        cy={item.y + (isVertical ? mediaHeight - 24 : 19)}
+        r={isVertical ? 11 : 7}
+        fill={item.accent}
+      />
       <foreignObject x={item.x} y={item.y} width={item.w} height={item.h}>
-        <div className="component-link-preview">
+        <div className={`component-link-preview component-link-preview-${orientation}`}>
           <div className="component-link-preview-domain">{domain}</div>
           <div className="component-link-preview-title">{item.title}</div>
           <div className="component-link-preview-url">{url}</div>

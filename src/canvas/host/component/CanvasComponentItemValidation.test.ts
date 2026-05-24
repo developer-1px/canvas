@@ -30,6 +30,7 @@ describe('CanvasComponentItemValidation', () => {
     })).toBe(true)
     expect(isCanvasComponentItemStorageShape({
       ...componentItem,
+      orientation: 'vertical',
       url: 'https://example.com/reference',
     })).toBe(true)
   })
@@ -57,6 +58,10 @@ describe('CanvasComponentItemValidation', () => {
     expect(isCanvasComponentItemStorageShape({
       ...componentItem,
       columns: 'Owner',
+    })).toBe(false)
+    expect(isCanvasComponentItemStorageShape({
+      ...componentItem,
+      orientation: 'diagonal',
     })).toBe(false)
     expect(isCanvasComponentItemStorageShape({
       ...componentItem,

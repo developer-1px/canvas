@@ -55,9 +55,14 @@ export {
   createCanvasLinkPreviewSourceTextItem,
   getCanvasLinkPreviewDomain,
   isCanvasLinkPreviewComponentItem,
+  isCanvasLinkPreviewOrientation,
   isCanvasLinkPreviewUrl,
+  normalizeCanvasLinkPreviewOrientation,
   normalizeCanvasLinkPreviewUrl,
   replaceCanvasLinkPreviewComponentsWithSourceText,
+  replaceCanvasLinkPreviewComponentsOrientation,
+  setCanvasLinkPreviewComponentOrientation,
+  type CanvasLinkPreviewOrientation,
   type CreateCanvasLinkPreviewComponentItemInput,
 } from './component/CanvasLinkPreviewComponent'
 export {

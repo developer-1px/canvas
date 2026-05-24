@@ -263,12 +263,20 @@
   pointer-events: none;
 }
 
+.component-link-preview-vertical {
+  padding-top: 126px;
+}
+
 .component-link-preview-domain {
   margin-left: 20px;
   color: #1d4ed8;
   font-size: 12px;
   font-weight: 750;
   line-height: 1.35;
+}
+
+.component-link-preview-vertical .component-link-preview-domain {
+  margin-left: 0;
 }
 
 .component-link-preview-title {
@@ -279,6 +287,11 @@
   line-height: 1.2;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.component-link-preview-vertical .component-link-preview-title {
+  margin-top: 8px;
+  white-space: normal;
 }
 
 .component-link-preview-url {

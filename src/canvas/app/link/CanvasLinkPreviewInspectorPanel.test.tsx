@@ -7,6 +7,7 @@ import type { CanvasAppInspectorPanelContext } from '../inspector/CanvasAppInspe
 import {
   CANVAS_LINK_PREVIEW_INSPECTOR_PANEL,
   changeCanvasLinkPreviewBackToText,
+  changeCanvasLinkPreviewOrientation,
 } from './CanvasLinkPreviewInspectorPanel'
 
 describe('CanvasLinkPreviewInspectorPanel', () => {
@@ -18,6 +19,8 @@ describe('CanvasLinkPreviewInspectorPanel', () => {
 
     expect(CANVAS_LINK_PREVIEW_INSPECTOR_PANEL.isVisible?.(context)).toBe(true)
     expect(markup).toContain('href="https://www.figma.com/figjam/"')
+    expect(markup).toContain('Display horizontal')
+    expect(markup).toContain('Display vertical')
     expect(markup).toContain('Open')
     expect(markup).toContain('Text')
   })
@@ -36,6 +39,31 @@ describe('CanvasLinkPreviewInspectorPanel', () => {
             id: 'component-link-1',
             text: 'https://www.figma.com/figjam/',
             type: 'text',
+          }),
+        ],
+      },
+      {
+        before: ['component-link-1'],
+        after: ['component-link-1'],
+      },
+    )
+  })
+
+  it('changes the selected link preview orientation', () => {
+    const commitItemsChange = vi.fn(() => true)
+    const context = createContext({ commitItemsChange })
+
+    expect(changeCanvasLinkPreviewOrientation(context, 'vertical')).toBe(true)
+    expect(commitItemsChange).toHaveBeenCalledWith(
+      {
+        type: 'replace-changed',
+        items: [
+          expect.objectContaining({ id: 'rect-1', type: 'rect' }),
+          expect.objectContaining({
+            h: 260,
+            id: 'component-link-1',
+            orientation: 'vertical',
+            w: 220,
           }),
         ],
       },

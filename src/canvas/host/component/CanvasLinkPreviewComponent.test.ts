@@ -6,9 +6,13 @@ import {
   createCanvasLinkPreviewSourceTextItem,
   getCanvasLinkPreviewDomain,
   isCanvasLinkPreviewComponentItem,
+  isCanvasLinkPreviewOrientation,
   isCanvasLinkPreviewUrl,
+  normalizeCanvasLinkPreviewOrientation,
   normalizeCanvasLinkPreviewUrl,
+  replaceCanvasLinkPreviewComponentsOrientation,
   replaceCanvasLinkPreviewComponentsWithSourceText,
+  setCanvasLinkPreviewComponentOrientation,
 } from './CanvasLinkPreviewComponent'
 
 describe('CanvasLinkPreviewComponent', () => {
@@ -24,6 +28,7 @@ describe('CanvasLinkPreviewComponent', () => {
       fill: '#ffffff',
       h: 148,
       id: 'component-link-1',
+      orientation: 'horizontal',
       stroke: '#cbd5e1',
       title: 'figma.com',
       type: 'component',
@@ -48,6 +53,16 @@ describe('CanvasLinkPreviewComponent', () => {
         url: 'example.com',
       }),
     ).toThrow('Canvas link preview requires an http or https URL')
+  })
+
+  it('normalizes link preview orientations', () => {
+    expect(normalizeCanvasLinkPreviewOrientation('vertical')).toBe('vertical')
+    expect(normalizeCanvasLinkPreviewOrientation('horizontal')).toBe(
+      'horizontal',
+    )
+    expect(normalizeCanvasLinkPreviewOrientation(undefined)).toBe('horizontal')
+    expect(isCanvasLinkPreviewOrientation('vertical')).toBe(true)
+    expect(isCanvasLinkPreviewOrientation('diagonal')).toBe(false)
   })
 
   it('identifies the built-in link preview kind and presentation', () => {
@@ -80,6 +95,33 @@ describe('CanvasLinkPreviewComponent', () => {
       x: 10,
       y: 20,
     })
+  })
+
+  it('sets selected link preview orientation and default size', () => {
+    const item = createCanvasLinkPreviewComponentItem({
+      id: 'component-link-1',
+      point: { x: 10, y: 20 },
+      url: 'https://docs.example.com/reference',
+    })
+
+    expect(setCanvasLinkPreviewComponentOrientation(item, 'vertical'))
+      .toMatchObject({
+        h: 260,
+        id: 'component-link-1',
+        orientation: 'vertical',
+        w: 220,
+      })
+    expect(replaceCanvasLinkPreviewComponentsOrientation(
+      [item],
+      ['component-link-1'],
+      'vertical',
+    )).toEqual([
+      expect.objectContaining({
+        h: 260,
+        orientation: 'vertical',
+        w: 220,
+      }),
+    ])
   })
 
   it('replaces selected link previews inside an item tree with source text', () => {
