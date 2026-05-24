@@ -59,6 +59,20 @@ export function CanvasDemoSvgComponentText({
   )
 }
 
+export function CanvasDemoSvgStickyText({
+  item,
+}: {
+  item: CanvasComponentItem
+}) {
+  return (
+    <foreignObject x={item.x} y={item.y} width={item.w} height={item.h}>
+      <div className="component-sticky-text">
+        {item.body ?? ''}
+      </div>
+    </foreignObject>
+  )
+}
+
 export function CanvasDemoSvgText({
   strong,
   text,

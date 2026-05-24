@@ -95,6 +95,49 @@ describe('CanvasDemoSvgItemRenderer', () => {
     expect(rect).toContain('canvas-rect-text')
   })
 
+  it('renders sticky notes as a single editable note body', () => {
+    const markup = renderItem({
+      accent: '#ca8a04',
+      body: 'Decision note',
+      component: 'sticky',
+      fill: '#fef3c7',
+      h: 148,
+      id: 'component-sticky',
+      stroke: '#eab308',
+      title: 'Sticky',
+      type: 'component',
+      w: 188,
+      x: 92,
+      y: 88,
+    }, () => 'note-card')
+
+    expect(markup).toContain('component-sticky-note')
+    expect(markup).toContain('component-sticky-text')
+    expect(markup).toContain('Decision note')
+    expect(markup).not.toContain('component-title')
+    expect(markup).not.toContain('Sticky')
+  })
+
+  it('keeps blank quick-created sticky notes visually blank', () => {
+    const markup = renderItem({
+      accent: '#ca8a04',
+      body: '',
+      component: 'sticky',
+      fill: '#fef3c7',
+      h: 148,
+      id: 'component-sticky',
+      stroke: '#eab308',
+      title: 'Sticky',
+      type: 'component',
+      w: 188,
+      x: 92,
+      y: 88,
+    }, () => 'note-card')
+
+    expect(markup).toContain('component-sticky-text')
+    expect(markup).not.toContain('Sticky')
+  })
+
   it('renders image items with a separate selection hit target', () => {
     const markup = renderItem({
       h: 80,
@@ -148,14 +191,17 @@ describe('CanvasDemoSvgItemRenderer', () => {
   })
 })
 
-function renderItem(item: CanvasItem) {
+function renderItem(
+  item: CanvasItem,
+  getComponentPresentation = (component: string) => component,
+) {
   return renderToStaticMarkup(
     <svg>
       {renderCanvasDemoSvgItem({
         componentPresentationRenderers:
           DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS,
         customItemRenderers: DEFAULT_CANVAS_DEMO_SVG_CUSTOM_ITEM_RENDERERS,
-        getComponentPresentation: (component) => component,
+        getComponentPresentation,
         item,
         locked: false,
         onItemPointerDown: () => undefined,

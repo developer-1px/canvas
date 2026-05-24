@@ -38,7 +38,9 @@ export function CanvasTextEditor({
   }
 
   function handleKeyDown(event: ReactKeyboardEvent<HTMLTextAreaElement>) {
-    if (event.key === 'Enter' && !event.shiftKey) {
+    const shortcutModifier = event.metaKey || event.ctrlKey
+
+    if (event.key === 'Enter' && !event.shiftKey && !shortcutModifier) {
       event.preventDefault()
       onCommit()
     }

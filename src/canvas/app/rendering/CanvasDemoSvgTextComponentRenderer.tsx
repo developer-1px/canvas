@@ -1,5 +1,8 @@
 import type { CanvasComponentItem } from '../../entities'
-import { CanvasDemoSvgComponentText } from './CanvasDemoSvgComponentText'
+import {
+  CanvasDemoSvgComponentText,
+  CanvasDemoSvgStickyText,
+} from './CanvasDemoSvgComponentText'
 
 export function CanvasDemoSvgCardComponent({
   item,
@@ -40,23 +43,17 @@ export function CanvasDemoSvgStickyComponent({
   return (
     <>
       <rect
-        className="component-card"
+        className="component-sticky-note"
         x={item.x}
         y={item.y}
         width={item.w}
         height={item.h}
-        rx="3"
+        rx="2"
         fill={item.fill}
         stroke={item.stroke}
         vectorEffect="non-scaling-stroke"
       />
-      <path
-        d={`M ${item.x + item.w - 28} ${item.y} L ${item.x + item.w} ${
-          item.y
-        } L ${item.x + item.w} ${item.y + 28} Z`}
-        fill="rgba(255, 255, 255, 0.45)"
-      />
-      <CanvasDemoSvgComponentText item={item} />
+      <CanvasDemoSvgStickyText item={item} />
     </>
   )
 }

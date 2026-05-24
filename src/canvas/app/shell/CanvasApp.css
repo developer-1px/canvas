@@ -124,7 +124,8 @@
 }
 
 .component-card,
-.component-section {
+.component-section,
+.component-sticky-note {
   stroke-width: 1.4;
 }
 
@@ -163,6 +164,24 @@
   font-size: 14px;
   font-weight: 550;
   line-height: 1.35;
+}
+
+.component-sticky-text {
+  box-sizing: border-box;
+  display: grid;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  overflow: hidden;
+  padding: 16px;
+  color: #111827;
+  font-family: var(--sans);
+  font-size: 18px;
+  font-weight: 650;
+  line-height: 1.25;
+  white-space: pre-wrap;
+  word-break: break-word;
+  pointer-events: none;
 }
 
 .component-svg-title,
