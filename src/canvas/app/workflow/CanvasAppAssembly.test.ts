@@ -130,6 +130,7 @@ describe('CanvasAppAssembly', () => {
     expect(assembly.inspectorPanels.map((panel) => panel.id)).toEqual([
       'link-preview-actions',
       'arrow-routing-actions',
+      'checklist-actions',
       'risk-meta',
     ])
     expect(assembly.initialItems).toEqual([])

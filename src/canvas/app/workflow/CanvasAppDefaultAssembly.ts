@@ -10,6 +10,9 @@ import {
 } from '../rendering/CanvasAppRendererRegistries'
 import { createCanvasAppExtensionBundle } from '../extensions/CanvasAppExtensionBundle'
 import {
+  CANVAS_CHECKLIST_INSPECTOR_PANEL,
+} from '../checklist/CanvasChecklistInspectorPanel'
+import {
   CANVAS_ARROW_ROUTING_INSPECTOR_PANEL,
 } from '../drawing/CanvasArrowRoutingInspectorPanel'
 import {
@@ -33,6 +36,7 @@ export const DEFAULT_CANVAS_APP_ASSEMBLY: CanvasAppAssembly =
       inspectorPanels: [
         CANVAS_LINK_PREVIEW_INSPECTOR_PANEL,
         CANVAS_ARROW_ROUTING_INSPECTOR_PANEL,
+        CANVAS_CHECKLIST_INSPECTOR_PANEL,
       ],
     }),
     affordanceConfig: DEFAULT_CANVAS_AFFORDANCE_CONFIG,

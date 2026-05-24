@@ -117,6 +117,7 @@ describe('CANVAS_COMPONENT_LIBRARY', () => {
         stroke: '#fb923c',
         accent: '#ea580c',
         presentation: 'risk-card',
+        checkedItems: [0],
         columns: ['Severity'],
         items: ['High'],
       },
@@ -129,11 +130,13 @@ describe('CANVAS_COMPONENT_LIBRARY', () => {
       presentation: 'mutated-risk-card',
     })
     templates[0].title = 'Mutated risk'
+    templates[0].checkedItems?.push(1)
     templates[0].items?.push('Mutated')
     templates[0].columns?.push('Mutated')
 
     expect(library.templates.map((template) => template.id)).toEqual(['risk'])
     expect(library.getTemplate('risk')).toMatchObject({
+      checkedItems: [0],
       columns: ['Severity'],
       items: ['High'],
       title: 'Risk',
@@ -143,12 +146,14 @@ describe('CANVAS_COMPONENT_LIBRARY', () => {
       point: { x: 0, y: 0 },
       templateId: 'risk',
     })).toMatchObject({
+      checkedItems: [0],
       columns: ['Severity'],
       items: ['High'],
       title: 'Risk',
     })
     expect(Object.isFrozen(library.templates)).toBe(true)
     expect(Object.isFrozen(library.templates[0])).toBe(true)
+    expect(Object.isFrozen(library.templates[0].checkedItems)).toBe(true)
     expect(Object.isFrozen(library.templates[0].items)).toBe(true)
     expect(Object.isFrozen(library.templates[0].columns)).toBe(true)
   })
@@ -208,6 +213,17 @@ describe('CANVAS_COMPONENT_LIBRARY', () => {
         ],
       }),
     ).toThrow('Canvas component template sticky requires positive w')
+
+    expect(() =>
+      createCanvasComponentLibrary({
+        templates: [
+          {
+            ...template,
+            checkedItems: [0.5],
+          } as unknown as CanvasComponentTemplate,
+        ],
+      }),
+    ).toThrow('Canvas component template sticky requires checkedItems')
 
     expect(() =>
       createCanvasComponentLibrary({

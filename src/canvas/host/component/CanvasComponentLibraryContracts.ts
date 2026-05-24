@@ -96,6 +96,11 @@ function assertCanvasComponentTemplateShape(template: unknown) {
     owner,
     value: template.items,
   })
+  assertCanvasComponentTemplateOptionalNonNegativeIntegerArrayField({
+    field: 'checkedItems',
+    owner,
+    value: template.checkedItems,
+  })
   assertCanvasComponentTemplateOptionalStringArrayField({
     field: 'columns',
     owner,
@@ -161,6 +166,29 @@ function assertCanvasComponentTemplateOptionalStringArrayField({
   if (
     !Array.isArray(value) ||
     value.some((entry) => typeof entry !== 'string')
+  ) {
+    throw new Error(`Canvas ${owner} requires ${field}`)
+  }
+}
+
+function assertCanvasComponentTemplateOptionalNonNegativeIntegerArrayField({
+  field,
+  owner,
+  value,
+}: {
+  field: string
+  owner: string
+  value: unknown
+}) {
+  if (value === undefined) {
+    return
+  }
+
+  if (
+    !Array.isArray(value) ||
+    value.some((entry) =>
+      typeof entry !== 'number' || !Number.isInteger(entry) || entry < 0,
+    )
   ) {
     throw new Error(`Canvas ${owner} requires ${field}`)
   }

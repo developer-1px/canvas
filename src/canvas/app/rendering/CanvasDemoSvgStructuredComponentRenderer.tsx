@@ -1,5 +1,9 @@
 import type { CanvasComponentItem } from '../../entities'
-import { getCanvasTableGrid } from '../../host'
+import {
+  getCanvasChecklistItems,
+  getCanvasTableGrid,
+  isCanvasChecklistItemChecked,
+} from '../../host'
 import {
   CanvasDemoSvgComponentHeader,
   CanvasDemoSvgText,
@@ -10,7 +14,7 @@ export function CanvasDemoSvgChecklistComponent({
 }: {
   item: CanvasComponentItem
 }) {
-  const rows = item.items ?? []
+  const rows = getCanvasChecklistItems(item)
 
   return (
     <>
@@ -28,9 +32,10 @@ export function CanvasDemoSvgChecklistComponent({
       <CanvasDemoSvgComponentHeader item={item} />
       {rows.map((row, index) => {
         const y = item.y + 50 + index * 28
+        const checked = isCanvasChecklistItemChecked(item, index)
 
         return (
-          <g key={row}>
+          <g key={`${index}-${row}`}>
             <rect
               x={item.x + 18}
               y={y}
@@ -41,7 +46,7 @@ export function CanvasDemoSvgChecklistComponent({
               stroke={item.accent}
               vectorEffect="non-scaling-stroke"
             />
-            {index === 0 ? (
+            {checked ? (
               <path
                 d={`M ${item.x + 21} ${y + 7} L ${item.x + 25} ${y + 11} L ${
                   item.x + 31

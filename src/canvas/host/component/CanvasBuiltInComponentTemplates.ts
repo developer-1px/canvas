@@ -64,6 +64,7 @@ export const DEFAULT_CANVAS_COMPONENT_TEMPLATES = [
     id: 'checklist',
     label: '✓',
     title: 'Checklist',
+    checkedItems: [0],
     items: ['Scope', 'Owner', 'Next'],
     w: 224,
     h: 156,

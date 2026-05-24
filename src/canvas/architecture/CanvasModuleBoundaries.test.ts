@@ -4707,6 +4707,53 @@ describe('Canvas module boundaries', () => {
     expect(hostTableFile.source).not.toMatch(browserTableHow)
   })
 
+  it('keeps checklist component editing behind Host and App checklist modules', () => {
+    const structuredRendererFile = getSourceFile(
+      'src/canvas/app/rendering/CanvasDemoSvgStructuredComponentRenderer.tsx',
+    )
+    const checklistInspectorPanelFile = getSourceFile(
+      'src/canvas/app/checklist/CanvasChecklistInspectorPanel.tsx',
+    )
+    const defaultAssemblyFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppDefaultAssembly.ts',
+    )
+    const hostChecklistFile = getSourceFile(
+      'src/canvas/host/component/CanvasChecklistComponent.ts',
+    )
+    const browserChecklistHow =
+      /\b(DataTransfer|ClipboardEvent|DragEvent|window\.addEventListener)\b/
+
+    expect(structuredRendererFile.source).toContain('getCanvasChecklistItems')
+    expect(structuredRendererFile.source).toContain(
+      'isCanvasChecklistItemChecked',
+    )
+    expect(checklistInspectorPanelFile.source).toContain(
+      'replaceCanvasChecklistComponentItemChecked',
+    )
+    expect(checklistInspectorPanelFile.source).toContain(
+      'replaceCanvasChecklistComponentItemText',
+    )
+    expect(checklistInspectorPanelFile.source).toContain(
+      'replaceCanvasChecklistComponentsWithAddedItem',
+    )
+    expect(checklistInspectorPanelFile.source).toContain(
+      'replaceCanvasChecklistComponentsWithoutItem',
+    )
+    expect(defaultAssemblyFile.source).toContain(
+      "from '../checklist/CanvasChecklistInspectorPanel'",
+    )
+    expect(defaultAssemblyFile.source).toContain(
+      'CANVAS_CHECKLIST_INSPECTOR_PANEL',
+    )
+    expect(hostChecklistFile.source).toContain(
+      'export function replaceCanvasChecklistComponentItemChecked',
+    )
+    expect(hostChecklistFile.source).toContain(
+      'export function replaceCanvasChecklistComponentsWithAddedItem',
+    )
+    expect(hostChecklistFile.source).not.toMatch(browserChecklistHow)
+  })
+
   it('keeps browser link preview import IO behind App link modules', () => {
     const appModelFile = getSourceFile(
       'src/canvas/app/workflow/useCanvasAppModel.ts',

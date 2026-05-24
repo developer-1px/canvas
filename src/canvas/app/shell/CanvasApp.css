@@ -863,6 +863,38 @@
   font: 600 12px/1.3 var(--sans);
 }
 
+.checklist-inspector {
+  display: grid;
+  gap: 6px;
+}
+
+.checklist-inspector-row {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr) 28px;
+  align-items: center;
+  gap: 5px;
+}
+
+.checklist-inspector-row input[type='checkbox'] {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  accent-color: #16a34a;
+}
+
+.checklist-inspector-row input[type='text'] {
+  width: 100%;
+  height: 28px;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 0 6px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  color: #111827;
+  background: #ffffff;
+  font: 650 12px/1 var(--sans);
+}
+
 .inspector-action-grid,
 .link-preview-inspector-actions {
   display: grid;
@@ -1117,6 +1149,7 @@
 .sticky-quick-create:focus-visible,
 .find-replace-panel input:focus-visible,
 .find-replace-panel button:focus-visible,
+.checklist-inspector-row input:focus-visible,
 .inspector-field input:focus-visible,
 .inspector-swatch:focus-visible,
 .inspector-action-button:focus-visible,

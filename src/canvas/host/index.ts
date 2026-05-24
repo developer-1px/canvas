@@ -44,6 +44,22 @@ export {
   type CreateCanvasComponentLibraryInput,
 } from './component/CanvasComponentLibrary'
 export {
+  CANVAS_CHECKLIST_COMPONENT_KIND,
+  addCanvasChecklistItem,
+  getCanvasChecklistCheckedItems,
+  getCanvasChecklistItems,
+  isCanvasChecklistComponentItem,
+  isCanvasChecklistItemChecked,
+  removeCanvasChecklistItem,
+  replaceCanvasChecklistComponentItemChecked,
+  replaceCanvasChecklistComponentItemText,
+  replaceCanvasChecklistComponentsWithAddedItem,
+  replaceCanvasChecklistComponentsWithoutItem,
+  setCanvasChecklistItemChecked,
+  setCanvasChecklistItemText,
+  type CanvasChecklistComponentItem,
+} from './component/CanvasChecklistComponent'
+export {
   CANVAS_SECTION_COMPONENT_KIND,
   CANVAS_SECTION_DEFAULT_SIZE,
   isCanvasSectionComponentItem,

@@ -20,6 +20,7 @@ export type CanvasComponentPresentation = string
 export type CanvasComponentTemplate = {
   accent: string
   body?: string
+  checkedItems?: number[]
   columns?: string[]
   fill: string
   h: number
@@ -94,6 +95,10 @@ function createCanvasComponentItem({
     item.items = [...template.items]
   }
 
+  if (template.checkedItems) {
+    item.checkedItems = [...template.checkedItems]
+  }
+
   if (template.columns) {
     item.columns = [...template.columns]
   }
@@ -149,6 +154,10 @@ function cloneCanvasComponentTemplate(template: CanvasComponentTemplate) {
     clone.items = [...template.items]
   }
 
+  if (template.checkedItems) {
+    clone.checkedItems = [...template.checkedItems]
+  }
+
   return clone
 }
 
@@ -161,6 +170,10 @@ function freezeCanvasComponentTemplate(
 
   if (template.items) {
     Object.freeze(template.items)
+  }
+
+  if (template.checkedItems) {
+    Object.freeze(template.checkedItems)
   }
 
   return Object.freeze(template)

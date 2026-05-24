@@ -5,6 +5,7 @@ import { isCanvasComponentItemStorageShape } from './CanvasComponentItemValidati
 const componentItem: CanvasComponentItem = {
   accent: '#2563eb',
   body: 'Track the release',
+  checkedItems: [0],
   columns: ['Owner', 'Status'],
   component: 'status-card',
   fill: '#eff6ff',
@@ -50,6 +51,14 @@ describe('CanvasComponentItemValidation', () => {
     expect(isCanvasComponentItemStorageShape({
       ...componentItem,
       fill: null,
+    })).toBe(false)
+    expect(isCanvasComponentItemStorageShape({
+      ...componentItem,
+      checkedItems: [-1],
+    })).toBe(false)
+    expect(isCanvasComponentItemStorageShape({
+      ...componentItem,
+      checkedItems: [0.5],
     })).toBe(false)
     expect(isCanvasComponentItemStorageShape({
       ...componentItem,

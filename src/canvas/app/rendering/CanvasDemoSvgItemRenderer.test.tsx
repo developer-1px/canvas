@@ -163,6 +163,30 @@ describe('CanvasDemoSvgItemRenderer', () => {
     expect(markup).toContain('y2="88"')
   })
 
+  it('renders checklist checked state from component data', () => {
+    const markup = renderItem({
+      accent: '#16a34a',
+      checkedItems: [1],
+      component: 'checklist',
+      fill: '#ffffff',
+      h: 156,
+      id: 'component-checklist',
+      items: ['Scope', 'Owner', 'Next'],
+      stroke: '#cbd5e1',
+      title: 'Checklist',
+      type: 'component',
+      w: 224,
+      x: 0,
+      y: 0,
+    }, () => 'checklist-list')
+
+    expect(markup).toContain('Scope')
+    expect(markup).toContain('Owner')
+    expect(markup).toContain('Next')
+    expect(markup).toContain('M 21 85 L 25 89 L 31 81')
+    expect(markup).not.toContain('M 21 57 L 25 61 L 31 53')
+  })
+
   it('renders link preview components through their built-in presentation', () => {
     const markup = renderItem({
       accent: '#2563eb',

@@ -191,3 +191,4 @@
 187. 선택한 link preview는 Inspector의 built-in action으로 원본 URL text item으로 되돌릴 수 있다.
 188. 선택한 static link preview는 Inspector action으로 horizontal/vertical 표시 방향을 전환할 수 있다.
 189. 선택한 connector는 Inspector action으로 elbow/straight routing을 전환할 수 있다.
+190. 선택한 checklist component는 Inspector에서 항목 체크, 텍스트 수정, 항목 추가와 삭제를 할 수 있다.

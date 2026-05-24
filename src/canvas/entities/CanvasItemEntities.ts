@@ -91,6 +91,7 @@ export type CanvasComponentItem = CanvasItemBase & {
   type: 'component'
   accent: string
   body?: string
+  checkedItems?: number[]
   columns?: string[]
   component: CanvasComponentKind
   fill: string

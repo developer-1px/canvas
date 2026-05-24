@@ -16,6 +16,9 @@ import {
   CANVAS_ARROW_ROUTING_INSPECTOR_PANEL,
 } from '../drawing/CanvasArrowRoutingInspectorPanel'
 import {
+  CANVAS_CHECKLIST_INSPECTOR_PANEL,
+} from '../checklist/CanvasChecklistInspectorPanel'
+import {
   CANVAS_LINK_PREVIEW_INSPECTOR_PANEL,
 } from '../link/CanvasLinkPreviewInspectorPanel'
 import { DEFAULT_CANVAS_APP_ASSEMBLY } from './CanvasAppDefaultAssembly'
@@ -37,6 +40,7 @@ describe('CanvasAppDefaultAssembly', () => {
     expect(DEFAULT_CANVAS_APP_ASSEMBLY.inspectorPanels).toEqual([
       CANVAS_LINK_PREVIEW_INSPECTOR_PANEL,
       CANVAS_ARROW_ROUTING_INSPECTOR_PANEL,
+      CANVAS_CHECKLIST_INSPECTOR_PANEL,
     ])
     expect(DEFAULT_CANVAS_APP_ASSEMBLY.initialItems).toEqual(INITIAL_ITEMS)
     expect(DEFAULT_CANVAS_APP_ASSEMBLY.initialSelection).toEqual([
