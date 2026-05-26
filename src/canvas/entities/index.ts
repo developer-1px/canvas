@@ -38,4 +38,4 @@ export type {
   ArrowItem,
   RectItem,
   TextItem,
-} from './CanvasItemEntities'
+} from './items'

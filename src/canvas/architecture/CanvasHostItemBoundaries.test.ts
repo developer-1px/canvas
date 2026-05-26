@@ -102,9 +102,9 @@ describe('Canvas host item boundaries', () => {
     expect(editableTextFile.source).not.toContain(
       'export type CanvasEditableTextItem =',
     )
-    expect(getSourceFile('src/canvas/entities/CanvasItemEntities.ts').source)
+    expect(getSourceFile('src/canvas/entities/items/CanvasTextItems.ts').source)
       .toContain('export type CanvasEditableTextItem =')
-    expect(getSourceFile('src/canvas/entities/CanvasItemEntities.ts').source)
+    expect(getSourceFile('src/canvas/entities/items/CanvasTextItems.ts').source)
       .toContain('| CanvasComponentItem')
     expect(getSourceFile('src/canvas/entities/index.ts').source).toContain(
       'CanvasEditableTextItem',
