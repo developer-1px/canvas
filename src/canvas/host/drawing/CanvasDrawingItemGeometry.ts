@@ -6,13 +6,10 @@ import {
 } from '../../core'
 import type {
   ArrowItem,
-  CanvasArrowRouting,
   CanvasItem,
-  GroupItem,
   HighlightItem,
   MarkerItem,
 } from '../model'
-import { isCanvasGroupItem } from '../tree/CanvasGroupItem'
 
 const CANVAS_ARROW_BOUNDS_PAD = 12
 const CANVAS_ARROW_LABEL_HEIGHT = 32
@@ -36,18 +33,6 @@ export function isCanvasArrowDrawingItem(
   return item.type === 'arrow'
 }
 
-export function isCanvasArrowRouting(
-  value: unknown,
-): value is CanvasArrowRouting {
-  return value === 'elbow' || value === 'straight'
-}
-
-export function normalizeCanvasArrowRouting(
-  value: unknown,
-): CanvasArrowRouting {
-  return value === 'straight' ? 'straight' : 'elbow'
-}
-
 export function isCanvasDrawingItem(
   item: CanvasItem,
 ): item is CanvasDrawingItem {
@@ -69,28 +54,6 @@ export function syncCanvasDrawingItemBounds<TItem extends CanvasDrawingItem>(
     ...item,
     ...getCanvasDrawingItemBounds(item),
   }
-}
-
-export function setCanvasArrowRouting(
-  item: ArrowItem,
-  routing: CanvasArrowRouting,
-): ArrowItem {
-  return {
-    ...item,
-    routing,
-  }
-}
-
-export function replaceCanvasArrowRoutings(
-  items: readonly CanvasItem[],
-  selection: readonly string[],
-  routing: CanvasArrowRouting,
-): CanvasItem[] {
-  const selected = new Set(selection)
-
-  return items.map((item) =>
-    replaceCanvasArrowItemRouting(item, selected, routing),
-  )
 }
 
 export function translateCanvasDrawingItem<TItem extends CanvasDrawingItem>({
@@ -203,36 +166,6 @@ function getCanvasStrokeDrawingItemBounds(
   item: CanvasStrokeDrawingItem,
 ) {
   return padBounds(getPointBounds(item.points), item.strokeWidth / 2)
-}
-
-function replaceCanvasArrowItemRouting(
-  item: CanvasItem,
-  selected: Set<string>,
-  routing: CanvasArrowRouting,
-): CanvasItem {
-  if (isCanvasArrowDrawingItem(item) && selected.has(item.id)) {
-    return setCanvasArrowRouting(item, routing)
-  }
-
-  if (isCanvasGroupItem(item)) {
-    return replaceCanvasArrowChildrenRouting(item, selected, routing)
-  }
-
-  return item
-}
-
-function replaceCanvasArrowChildrenRouting(
-  item: GroupItem,
-  selected: Set<string>,
-  routing: CanvasArrowRouting,
-): GroupItem {
-  const nextChildren = item.children.map((child) =>
-    replaceCanvasArrowItemRouting(child, selected, routing),
-  )
-
-  return nextChildren.every((child, index) => child === item.children[index])
-    ? item
-    : { ...item, children: nextChildren }
 }
 
 function getCanvasArrowDrawingItemBounds(item: ArrowItem) {

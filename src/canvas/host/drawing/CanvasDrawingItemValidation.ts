@@ -3,9 +3,9 @@ import {
   type Point,
 } from '../../core'
 import {
-  isCanvasArrowRouting,
   type CanvasDrawingItem,
 } from './CanvasDrawingItemGeometry'
+import { isCanvasArrowRouting } from './CanvasArrowRouting'
 
 export function isCanvasDrawingItemStorageShape(
   value: Record<string, unknown>,

@@ -4,13 +4,15 @@ import {
   getCanvasArrowLabelBounds,
   getCanvasDrawingItemBounds,
   isCanvasDrawingItem,
-  normalizeCanvasArrowRouting,
-  replaceCanvasArrowRoutings,
   scaleCanvasDrawingItem,
-  setCanvasArrowRouting,
   translateCanvasArrowAttachedEndpoints,
   translateCanvasDrawingItem,
 } from './CanvasDrawingItemGeometry'
+import {
+  normalizeCanvasArrowRouting,
+  replaceCanvasArrowRoutings,
+  setCanvasArrowRouting,
+} from './CanvasArrowRouting'
 
 const arrow: CanvasItem = {
   end: { x: 100, y: 90 },

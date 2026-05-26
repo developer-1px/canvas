@@ -1,7 +1,6 @@
 import type {
   Bounds,
   CanvasComponentKind,
-  CanvasComponentItem,
   EditingText,
   CanvasItem,
   Point,
@@ -22,10 +21,6 @@ import type {
   CanvasAppComponentTemplate,
 } from '../workflow/CanvasAppComponentAssemblyContracts'
 import {
-  CANVAS_SECTION_COMPONENT_KIND,
-  CANVAS_SECTION_DEFAULT_SIZE,
-  CANVAS_STICKY_COMPONENT_KIND,
-  applyCanvasStickyComponentCreationDefaults,
   getCanvasEditableTextValue,
 } from '../../host'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
@@ -34,39 +29,11 @@ import {
   CANVAS_POINTER_COMPONENT_CREATION_KINDS,
   type CanvasPointerComponentCreationKind,
 } from './CanvasPointerCreationGrammar'
+import {
+  getCanvasPointerComponentCreationDescriptor,
+  type CanvasPointerComponentCreationDescriptor,
+} from './CanvasPointerComponentCreationDescriptors'
 import { hasCanvasInteractionMoved } from './CanvasPointerInteractionMovement'
-
-type CanvasPointerComponentCreationDescriptor = Readonly<{
-  applyDefaults?: (item: CanvasComponentItem) => CanvasComponentItem
-  defaultSize?: Pick<Bounds, 'h' | 'w'>
-  enterTextEdit?: boolean
-  isEnabled: (config: CanvasAffordanceConfig) => boolean
-  mode: 'drag' | 'immediate'
-  templateId: CanvasComponentKind
-}>
-
-export const CANVAS_POINTER_COMPONENT_CREATION_DESCRIPTORS = Object.freeze({
-  'create-section': Object.freeze({
-    defaultSize: CANVAS_SECTION_DEFAULT_SIZE,
-    isEnabled: (config: CanvasAffordanceConfig) =>
-      config.gestures.createSection,
-    mode: 'drag',
-    templateId: CANVAS_SECTION_COMPONENT_KIND,
-  }),
-  'create-sticky': Object.freeze({
-    applyDefaults: applyCanvasStickyComponentCreationDefaults,
-    enterTextEdit: true,
-    isEnabled: (config: CanvasAffordanceConfig) =>
-      config.gestures.createSticky,
-    mode: 'immediate',
-    templateId: CANVAS_STICKY_COMPONENT_KIND,
-  }),
-} satisfies Readonly<
-  Record<
-    CanvasPointerComponentCreationKind,
-    CanvasPointerComponentCreationDescriptor
-  >
->)
 
 export type CanvasPointerComponentCreationInteraction = Extract<
   Interaction,
@@ -129,12 +96,12 @@ export function startCanvasPointerComponentCreation({
   startScreen: Point
   startWorld: Point
 }): CanvasPointerComponentCreationStartResult | null {
-  const descriptor =
-    getCanvasPointerComponentCreationDescriptor(pointerGesture)
-
-  if (!descriptor) {
+  if (!isCanvasPointerComponentCreationGesture(pointerGesture)) {
     return null
   }
+
+  const descriptor =
+    getCanvasPointerComponentCreationDescriptor(pointerGesture)
 
   if (!descriptor.isEnabled(config)) {
     return { kind: 'none' }
@@ -220,7 +187,7 @@ export function previewCanvasPointerComponentCreation({
     interaction.kind,
   )
 
-  if (!descriptor?.isEnabled(config)) {
+  if (!descriptor.isEnabled(config)) {
     return { kind: 'none' }
   }
 
@@ -269,14 +236,12 @@ export function commitCanvasPointerComponentCreation({
   const descriptor = getCanvasPointerComponentCreationDescriptor(
     interaction.kind,
   )
-  const template = descriptor
-    ? getCanvasPointerComponentCreationTemplate({
-        componentLibrary,
-        templateId: descriptor.templateId,
-      })
-    : null
+  const template = getCanvasPointerComponentCreationTemplate({
+    componentLibrary,
+    templateId: descriptor.templateId,
+  })
 
-  if (!descriptor || !template) {
+  if (!template) {
     return
   }
 
@@ -304,14 +269,6 @@ export function commitCanvasPointerComponentCreation({
     after: [resizedItem.id],
   })
   setTool('select')
-}
-
-function getCanvasPointerComponentCreationDescriptor(
-  gesture: CanvasPointerGesture,
-) {
-  return isCanvasPointerComponentCreationGesture(gesture)
-    ? CANVAS_POINTER_COMPONENT_CREATION_DESCRIPTORS[gesture]
-    : null
 }
 
 function getCanvasComponentCreationDefaultSize({

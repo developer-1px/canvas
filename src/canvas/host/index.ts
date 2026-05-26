@@ -116,13 +116,9 @@ export { INITIAL_ITEMS } from './component/CanvasInitialItems'
 export {
   getCanvasDrawingItemBounds,
   isCanvasArrowDrawingItem,
-  isCanvasArrowRouting,
   isCanvasDrawingItem,
   isCanvasStrokeDrawingItem,
-  normalizeCanvasArrowRouting,
-  replaceCanvasArrowRoutings,
   scaleCanvasDrawingItem,
-  setCanvasArrowRouting,
   syncCanvasDrawingItemBounds,
   getCanvasArrowLabelBounds,
   translateCanvasArrowAttachedEndpoints,
@@ -130,6 +126,12 @@ export {
   type CanvasDrawingItem,
   type CanvasStrokeDrawingItem,
 } from './drawing/CanvasDrawingItemGeometry'
+export {
+  isCanvasArrowRouting,
+  normalizeCanvasArrowRouting,
+  replaceCanvasArrowRoutings,
+  setCanvasArrowRouting,
+} from './drawing/CanvasArrowRouting'
 export {
   CANVAS_ARROW_STYLE,
   CANVAS_DRAWING_STROKE_STYLE_DEFAULTS,

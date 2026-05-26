@@ -7,9 +7,9 @@ import {
 import type { CanvasAppItemReadModel } from '../workflow/CanvasAppItemReadModelContracts'
 import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
+import { getCanvasEraserHitItemIds } from './CanvasEraserHitTesting'
 import {
   commitCanvasPointerEraserInteraction,
-  getCanvasEraserHitItemIds,
   previewCanvasPointerEraserInteraction,
   startCanvasPointerEraserInteraction,
 } from './CanvasPointerEraser'

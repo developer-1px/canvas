@@ -16,11 +16,11 @@ import type { CanvasAppComponentLibrary } from '../workflow/CanvasAppComponentAs
 import type { CanvasAppItemReadModel } from '../workflow/CanvasAppItemReadModelContracts'
 import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract'
 import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
+import { insertCanvasComponent } from './CanvasComponentInsertionExecution'
 import {
   getCanvasStickyQuickCreateControlPoints,
-  insertCanvasComponent,
   quickCreateCanvasSticky,
-} from './CanvasComponentInsertionExecution'
+} from './CanvasStickyQuickCreateExecution'
 
 type UseCanvasComponentInsertionArgs = {
   componentLibrary: CanvasAppComponentLibrary
