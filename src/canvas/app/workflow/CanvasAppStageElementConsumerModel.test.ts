@@ -4,7 +4,7 @@ import {
   type CanvasAppStageElementController,
 } from '../stage/CanvasAppStageElement'
 import { getCanvasAppStageElementConsumerModel } from './CanvasAppStageElementConsumerModel'
-import type { CanvasAppStageElementConsumerModelInput } from './CanvasAppConsumerContracts'
+import type { CanvasAppStageElementConsumerModelInput } from './CanvasAppStageElementConsumerContracts'
 
 describe('CanvasAppStageElementConsumerModel', () => {
   it('routes the stage element controller to DOM-dependent consumers', () => {

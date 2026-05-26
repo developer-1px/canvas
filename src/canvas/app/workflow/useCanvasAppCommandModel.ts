@@ -1,6 +1,6 @@
 import { useCanvasCommands } from '../commands/useCanvasCommands'
 import { getCanvasAppCommandConsumerModel } from './CanvasAppCommandConsumerModel'
-import type { CanvasAppCommandModelInput } from './CanvasAppConsumerContracts'
+import type { CanvasAppCommandModelInput } from './CanvasAppCommandConsumerContracts'
 
 export function useCanvasAppCommandModel({
   commandAdapter,

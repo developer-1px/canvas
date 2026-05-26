@@ -4,7 +4,7 @@ import {
 import { useCanvasFindReplaceModel } from './useCanvasFindReplaceModel'
 import { useCanvasTextEditorModel } from './useCanvasTextEditorModel'
 import { getCanvasAppTextConsumerModel } from './CanvasAppTextConsumerModel'
-import type { CanvasAppTextModelInput } from './CanvasAppConsumerContracts'
+import type { CanvasAppTextModelInput } from './CanvasAppTextConsumerContracts'
 
 export function useCanvasAppTextModel({
   config,

@@ -13,7 +13,7 @@ import type {
 import type {
   CanvasAppCustomCreationToolState,
 } from '../extensions/CanvasAppExtensionStateContracts'
-import type { CanvasAppControlModelInput } from './CanvasAppConsumerContracts'
+import type { CanvasAppControlModelInput } from './CanvasAppControlConsumerContracts'
 
 type CanvasSelectionCommandAnchor = {
   placement: 'above' | 'below'

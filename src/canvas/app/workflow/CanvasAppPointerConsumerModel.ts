@@ -1,7 +1,7 @@
 import type {
   CanvasAppPointerConsumerModel,
   CanvasAppPointerConsumerModelInput,
-} from './CanvasAppConsumerContracts'
+} from './CanvasAppPointerConsumerContracts'
 
 export function getCanvasAppPointerConsumerModel({
   downHandlers,

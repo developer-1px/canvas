@@ -6,7 +6,7 @@ import {
 import type {
   CanvasAppComponentModel,
   CanvasAppComponentModelInput,
-} from './CanvasAppConsumerContracts'
+} from './CanvasAppComponentConsumerContracts'
 
 export function useCanvasAppComponentModel({
   command,

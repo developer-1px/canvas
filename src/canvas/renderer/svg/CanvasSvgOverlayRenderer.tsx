@@ -1,11 +1,6 @@
 import type { PointerEvent } from 'react'
 import type { CanvasOverlayState } from '../../engine'
-import {
-  getCanvasSvgShapeGeometry,
-  type CanvasSvgShapeGeometry,
-} from '../../host'
 import type {
-  Bounds,
   ResizeHandle,
   Viewport,
 } from '../../core'
@@ -16,6 +11,12 @@ import {
   createCanvasSvgArrowPathData,
   createCanvasSvgFreehandPathData,
 } from './CanvasSvgDrawingPrimitives'
+import { CanvasSvgDraftShapeOverlay } from './CanvasSvgDraftShapeOverlay'
+import { CanvasSvgPresenceOverlays } from './CanvasSvgPresenceOverlays'
+import {
+  CanvasSvgEmoteBurst,
+  CanvasSvgLaserTrail,
+} from './CanvasSvgTransientOverlays'
 
 type CanvasSvgInteractionOverlaysProps = {
   overlays: CanvasOverlayState
@@ -82,7 +83,7 @@ export function CanvasSvgInteractionOverlays({
   return (
     <>
       {overlays.draftRect
-        ? renderCanvasSvgDraftShapeOverlay(overlays.draftRect)
+        ? <CanvasSvgDraftShapeOverlay draftRect={overlays.draftRect} />
         : null}
 
       {overlays.draftArrow ? (
@@ -105,15 +106,9 @@ export function CanvasSvgInteractionOverlays({
         />
       ) : null}
 
-      {overlays.laserTrail ? (
-        <g className="laser-trail">
-          <path
-            d={createCanvasSvgFreehandPathData(overlays.laserTrail.points)}
-            vectorEffect="non-scaling-stroke"
-          />
-          <CanvasSvgLaserPoint points={overlays.laserTrail.points} />
-        </g>
-      ) : null}
+      {overlays.laserTrail
+        ? <CanvasSvgLaserTrail laserTrail={overlays.laserTrail} />
+        : null}
 
       {overlays.emoteBursts.length > 0 ? (
         <g className="emote-bursts">
@@ -219,202 +214,11 @@ export function CanvasSvgInteractionOverlays({
       ) : null}
 
       {overlays.presence && overlays.presence.length > 0 ? (
-        <g className="presence-overlays">
-          {overlays.presence.map((presence) =>
-            presence.selectionBounds ? (
-              <CanvasSvgPresenceSelection
-                key={`${presence.id}-selection`}
-                bounds={presence.selectionBounds}
-                color={presence.color}
-                label={presence.label}
-                scale={1 / viewport.scale}
-              />
-            ) : null,
-          )}
-          {overlays.presence.map((presence) => (
-            <CanvasSvgPresenceCursor
-              key={presence.id}
-              color={presence.color}
-              label={presence.label}
-              scale={1 / viewport.scale}
-              x={presence.point.x}
-              y={presence.point.y}
-            />
-          ))}
-        </g>
+        <CanvasSvgPresenceOverlays
+          presence={overlays.presence}
+          scale={1 / viewport.scale}
+        />
       ) : null}
     </>
-  )
-}
-
-function CanvasSvgEmoteBurst({
-  burst,
-  scale,
-}: {
-  burst: NonNullable<CanvasOverlayState['emoteBursts']>[number]
-  scale: number
-}) {
-  return (
-    <g
-      className="emote-burst"
-      data-emote={burst.emote}
-      transform={`translate(${burst.point.x} ${burst.point.y}) scale(${scale})`}
-    >
-      {burst.particles.map((particle, index) => (
-        <text
-          key={index}
-          className="emote-burst-particle"
-          x={particle.dx}
-          y={particle.dy}
-        >
-          {burst.label}
-        </text>
-      ))}
-    </g>
-  )
-}
-
-function renderCanvasSvgDraftShapeOverlay(
-  draftRect: NonNullable<CanvasOverlayState['draftRect']>,
-) {
-  const geometry = getCanvasSvgShapeGeometry({
-    bounds: draftRect,
-    shape: draftRect.shape ?? 'rect',
-  })
-
-  return renderCanvasSvgDraftShapeGeometry(geometry)
-}
-
-function renderCanvasSvgDraftShapeGeometry(
-  geometry: CanvasSvgShapeGeometry,
-) {
-  if (geometry.kind === 'ellipse') {
-    return (
-      <ellipse
-        className="draft-rect"
-        cx={geometry.cx}
-        cy={geometry.cy}
-        rx={geometry.rx}
-        ry={geometry.ry}
-        vectorEffect="non-scaling-stroke"
-      />
-    )
-  }
-
-  if (geometry.kind === 'path') {
-    return (
-      <path
-        className="draft-rect"
-        d={geometry.d}
-        vectorEffect="non-scaling-stroke"
-      />
-    )
-  }
-
-  return (
-    <rect
-      className="draft-rect"
-      x={geometry.x}
-      y={geometry.y}
-      width={geometry.width}
-      height={geometry.height}
-      vectorEffect="non-scaling-stroke"
-    />
-  )
-}
-
-function CanvasSvgLaserPoint({
-  points,
-}: {
-  points: readonly { x: number; y: number }[]
-}) {
-  const point = points[points.length - 1]
-
-  return point ? (
-    <circle
-      className="laser-point"
-      cx={point.x}
-      cy={point.y}
-      r="4"
-      vectorEffect="non-scaling-stroke"
-    />
-  ) : null
-}
-
-function CanvasSvgPresenceSelection({
-  bounds,
-  color,
-  label,
-  scale,
-}: {
-  bounds: Bounds
-  color: string
-  label: string
-  scale: number
-}) {
-  const labelWidth = Math.max(36, label.length * 7 + 18)
-
-  return (
-    <g className="presence-selection">
-      <rect
-        className="presence-selection-rect"
-        x={bounds.x}
-        y={bounds.y}
-        width={bounds.w}
-        height={bounds.h}
-        stroke={color}
-        vectorEffect="non-scaling-stroke"
-      />
-      <g
-        className="presence-selection-label"
-        transform={`translate(${bounds.x} ${bounds.y}) scale(${scale})`}
-      >
-        <rect width={labelWidth} height="22" rx="5" fill={color} />
-        <text className="presence-label-text" x="9" y="15">
-          {label}
-        </text>
-      </g>
-    </g>
-  )
-}
-
-function CanvasSvgPresenceCursor({
-  color,
-  label,
-  scale,
-  x,
-  y,
-}: {
-  color: string
-  label: string
-  scale: number
-  x: number
-  y: number
-}) {
-  const labelWidth = Math.max(36, label.length * 7 + 18)
-
-  return (
-    <g
-      className="presence-cursor"
-      transform={`translate(${x} ${y}) scale(${scale})`}
-    >
-      <path
-        className="presence-cursor-pointer"
-        d="M 0 0 L 0 22 L 6 16 L 10 26 L 15 24 L 10 14 L 19 14 Z"
-        fill={color}
-      />
-      <g transform="translate(12 18)">
-        <rect
-          className="presence-label-bg"
-          width={labelWidth}
-          height="22"
-          rx="5"
-          fill={color}
-        />
-        <text className="presence-label-text" x="9" y="15">
-          {label}
-        </text>
-      </g>
-    </g>
   )
 }

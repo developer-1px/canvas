@@ -1,4 +1,4 @@
-import type { CanvasAppTextRuntime } from './CanvasAppConsumerContracts'
+import type { CanvasAppTextRuntime } from './CanvasAppTextConsumerContracts'
 
 export function getCanvasAppTextConsumerModel<TFindReplace, TTextEditor>({
   blurTextEditor,

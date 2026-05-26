@@ -1,7 +1,7 @@
 import type {
   CanvasAppViewportConsumerModel,
   CanvasAppViewportRuntime,
-} from './CanvasAppConsumerContracts'
+} from './CanvasAppViewportConsumerContracts'
 
 export function getCanvasAppViewportConsumerModel(
   viewportControls: CanvasAppViewportRuntime,

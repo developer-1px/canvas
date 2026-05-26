@@ -1,7 +1,7 @@
 import { useCanvasLinkPreviewImport } from '../link/useCanvasLinkPreviewImport'
 import type {
   CanvasAppLinkPreviewImportModelInput,
-} from './CanvasAppConsumerContracts'
+} from './CanvasAppIoConsumerContracts'
 
 export function useCanvasAppLinkPreviewImportModel(
   input: CanvasAppLinkPreviewImportModelInput,

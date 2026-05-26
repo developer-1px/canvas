@@ -1,5 +1,5 @@
 import { useCanvasObjectInspector } from '../inspector/useCanvasObjectInspector'
-import type { CanvasAppInspectorModelInput } from './CanvasAppConsumerContracts'
+import type { CanvasAppInspectorModelInput } from './CanvasAppInspectorConsumerContracts'
 
 export function useCanvasAppInspectorModel({
   commitItemsChange,

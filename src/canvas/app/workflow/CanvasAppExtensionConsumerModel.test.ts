@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { getCanvasAppExtensionConsumerModel } from './CanvasAppExtensionConsumerModel'
-import type { CanvasAppExtensionRuntime } from './CanvasAppConsumerContracts'
+import type { CanvasAppExtensionRuntime } from './CanvasAppExtensionConsumerContracts'
 
 describe('CanvasAppExtensionConsumerModel', () => {
   it('builds control extension context from custom command and tool state', () => {

@@ -1,7 +1,7 @@
 import type {
   CanvasInteractionConsumerModel,
   CanvasInteractionConsumerModelInput,
-} from './CanvasAppConsumerContracts'
+} from './CanvasInteractionConsumerContracts'
 
 export function getCanvasInteractionConsumerModel({
   draft,

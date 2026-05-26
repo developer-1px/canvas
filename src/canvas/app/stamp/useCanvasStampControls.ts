@@ -6,7 +6,7 @@ import type { CanvasAffordanceConfig } from '../../engine'
 import type { Viewport } from '../../entities'
 import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
 import type { CanvasAppItemReadModel } from '../workflow/CanvasAppItemReadModelContracts'
-import type { CanvasAppStampVotingSessionContext } from '../workflow/CanvasAppConsumerContracts'
+import type { CanvasAppStampVotingSessionContext } from '../workflow/CanvasAppStampConsumerContracts'
 import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract'
 import {
   CANVAS_STAMP_DEFINITIONS,

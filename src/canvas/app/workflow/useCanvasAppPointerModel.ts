@@ -1,7 +1,7 @@
 import { useCanvasPointerDownHandlers } from '../pointer/useCanvasPointerDownHandlers'
 import { useCanvasPointerDragHandlers } from '../pointer/useCanvasPointerDragHandlers'
 import { getCanvasAppPointerConsumerModel } from './CanvasAppPointerConsumerModel'
-import type { CanvasAppPointerModelInput } from './CanvasAppConsumerContracts'
+import type { CanvasAppPointerModelInput } from './CanvasAppPointerConsumerContracts'
 
 export function useCanvasAppPointerModel({
   command,

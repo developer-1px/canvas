@@ -18,7 +18,7 @@ import {
 import type {
   CanvasAppExtensionModel,
   CanvasAppExtensionModelInput,
-} from './CanvasAppConsumerContracts'
+} from './CanvasAppExtensionConsumerContracts'
 
 export function useCanvasAppExtensionModel({
   commitItemsChange,
