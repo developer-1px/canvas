@@ -536,6 +536,8 @@
 }
 
 .toolbar,
+.selection-floating-bar,
+.context-command-menu,
 .component-palette,
 .cursor-chat,
 .drawing-controls,
@@ -595,6 +597,39 @@
   top: 14px;
   left: 14px;
   max-width: calc(100vw - 28px);
+  flex-wrap: wrap;
+}
+
+.selection-floating-bar {
+  z-index: 6;
+  top: var(--canvas-selection-command-y);
+  left: min(
+    max(14px, var(--canvas-selection-command-x)),
+    calc(100vw - 14px)
+  );
+  max-width: calc(100vw - 28px);
+  flex-wrap: wrap;
+}
+
+.selection-floating-bar[data-placement='above'] {
+  transform: translate(-50%, calc(-100% - 10px));
+}
+
+.selection-floating-bar[data-placement='below'] {
+  transform: translate(-50%, 10px);
+}
+
+.context-command-menu {
+  z-index: 7;
+  top: max(
+    10px,
+    min(var(--canvas-context-menu-y), calc(100vh - 86px))
+  );
+  left: max(
+    10px,
+    min(var(--canvas-context-menu-x), calc(100vw - 260px))
+  );
+  max-width: min(250px, calc(100vw - 20px));
   flex-wrap: wrap;
 }
 

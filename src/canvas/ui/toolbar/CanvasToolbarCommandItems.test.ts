@@ -102,6 +102,7 @@ function createInput(
   return {
     availability: createCommandAvailability(),
     config: createCanvasAffordanceConfig(),
+    surface: 'context-menu',
     ...overrides,
   }
 }

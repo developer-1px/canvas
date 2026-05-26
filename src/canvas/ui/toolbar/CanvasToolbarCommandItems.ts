@@ -4,12 +4,14 @@ import type {
 } from '../../engine'
 import {
   CANVAS_TOOLBAR_COMMAND_GROUPS,
+  type CanvasFeatureCommandSurface,
   type CanvasToolbarCommandAction,
   type CanvasToolbarCommandDescriptor,
   type CanvasToolbarCommandGroupId,
 } from './CanvasToolbarCommandCatalog'
 
 export type {
+  CanvasFeatureCommandSurface,
   CanvasToolbarCommandAction,
   CanvasToolbarCommandGroupId,
 } from './CanvasToolbarCommandCatalog'
@@ -29,11 +31,15 @@ export type CanvasToolbarCommandGroup = {
 export type CanvasToolbarCommandItemsInput = {
   availability: CanvasCommandAvailability
   config: CanvasAffordanceConfig
+  includeDisabled?: boolean
+  surface: CanvasFeatureCommandSurface
 }
 
 export function getCanvasToolbarCommandGroups({
   availability,
   config,
+  includeDisabled = true,
+  surface,
 }: CanvasToolbarCommandItemsInput): CanvasToolbarCommandGroup[] {
   const groups: CanvasToolbarCommandGroup[] = []
 
@@ -41,7 +47,13 @@ export function getCanvasToolbarCommandGroups({
     pushCanvasToolbarCommandGroup(groups, {
       id: group.id,
       items: group.commands.map((command) =>
-        getCanvasToolbarCommandItem({ availability, command, config }),
+        getCanvasToolbarCommandItem({
+          availability,
+          command,
+          config,
+          includeDisabled,
+          surface,
+        }),
       ),
     })
   }
@@ -69,19 +81,29 @@ function getCanvasToolbarCommandItem({
   availability,
   command: descriptor,
   config,
+  includeDisabled,
+  surface,
 }: {
   availability: CanvasCommandAvailability
   command: CanvasToolbarCommandDescriptor
   config: CanvasAffordanceConfig
+  includeDisabled: boolean
+  surface: CanvasFeatureCommandSurface
 }): CanvasToolbarCommandItem | null {
-  if (!config.commands[descriptor.command]) {
+  if (!descriptor.surfaces.includes(surface) || !config.commands[descriptor.command]) {
+    return null
+  }
+
+  const disabled = !availability[descriptor.command]
+
+  if (disabled && !includeDisabled) {
     return null
   }
 
   return {
     action: descriptor.action,
     command: descriptor.command,
-    disabled: !availability[descriptor.command],
+    disabled,
     kind: 'command',
   }
 }

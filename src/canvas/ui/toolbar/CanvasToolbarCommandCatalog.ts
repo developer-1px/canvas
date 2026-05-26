@@ -17,6 +17,11 @@ export type CanvasToolbarCommandAction =
   | { kind: 'ungroup' }
   | { kind: 'unlock-all' }
 
+export type CanvasFeatureCommandSurface =
+  | 'context-menu'
+  | 'selection-floating-bar'
+  | 'toolbar'
+
 export type CanvasToolbarCommandGroupId =
   | 'history'
   | 'selection'
@@ -30,6 +35,7 @@ export type CanvasToolbarAvailableCommandId =
 export type CanvasToolbarCommandDescriptor = {
   action: CanvasToolbarCommandAction
   command: CanvasToolbarAvailableCommandId
+  surfaces: readonly CanvasFeatureCommandSurface[]
 }
 
 export type CanvasToolbarCommandGroupDescriptor = {
@@ -41,22 +47,46 @@ export const CANVAS_TOOLBAR_COMMAND_GROUPS = [
   {
     id: 'history',
     commands: [
-      { action: { kind: 'undo' }, command: 'undo' },
-      { action: { kind: 'redo' }, command: 'redo' },
+      {
+        action: { kind: 'undo' },
+        command: 'undo',
+        surfaces: ['context-menu'],
+      },
+      {
+        action: { kind: 'redo' },
+        command: 'redo',
+        surfaces: ['context-menu'],
+      },
     ],
   },
   {
     id: 'selection',
     commands: [
-      { action: { kind: 'duplicate' }, command: 'duplicate' },
-      { action: { kind: 'delete' }, command: 'delete' },
+      {
+        action: { kind: 'duplicate' },
+        command: 'duplicate',
+        surfaces: ['selection-floating-bar', 'context-menu'],
+      },
+      {
+        action: { kind: 'delete' },
+        command: 'delete',
+        surfaces: ['selection-floating-bar', 'context-menu'],
+      },
     ],
   },
   {
     id: 'grouping',
     commands: [
-      { action: { kind: 'group' }, command: 'group' },
-      { action: { kind: 'ungroup' }, command: 'ungroup' },
+      {
+        action: { kind: 'group' },
+        command: 'group',
+        surfaces: ['selection-floating-bar', 'context-menu'],
+      },
+      {
+        action: { kind: 'ungroup' },
+        command: 'ungroup',
+        surfaces: ['selection-floating-bar', 'context-menu'],
+      },
     ],
   },
   {
@@ -65,39 +95,58 @@ export const CANVAS_TOOLBAR_COMMAND_GROUPS = [
       {
         action: { kind: 'align', mode: 'alignLeft' },
         command: 'alignLeft',
+        surfaces: ['selection-floating-bar', 'context-menu'],
       },
       {
         action: { kind: 'align', mode: 'alignCenter' },
         command: 'alignCenter',
+        surfaces: ['selection-floating-bar', 'context-menu'],
       },
       {
         action: { kind: 'align', mode: 'alignRight' },
         command: 'alignRight',
+        surfaces: ['selection-floating-bar', 'context-menu'],
       },
-      { action: { kind: 'align', mode: 'alignTop' }, command: 'alignTop' },
+      {
+        action: { kind: 'align', mode: 'alignTop' },
+        command: 'alignTop',
+        surfaces: ['selection-floating-bar', 'context-menu'],
+      },
       {
         action: { kind: 'align', mode: 'alignMiddle' },
         command: 'alignMiddle',
+        surfaces: ['selection-floating-bar', 'context-menu'],
       },
       {
         action: { kind: 'align', mode: 'alignBottom' },
         command: 'alignBottom',
+        surfaces: ['selection-floating-bar', 'context-menu'],
       },
       {
         action: { kind: 'distribute', mode: 'distributeHorizontal' },
         command: 'distributeHorizontal',
+        surfaces: ['selection-floating-bar', 'context-menu'],
       },
       {
         action: { kind: 'distribute', mode: 'distributeVertical' },
         command: 'distributeVertical',
+        surfaces: ['selection-floating-bar', 'context-menu'],
       },
     ],
   },
   {
     id: 'lock',
     commands: [
-      { action: { kind: 'lock' }, command: 'lockSelection' },
-      { action: { kind: 'unlock-all' }, command: 'unlockAll' },
+      {
+        action: { kind: 'lock' },
+        command: 'lockSelection',
+        surfaces: ['selection-floating-bar', 'context-menu'],
+      },
+      {
+        action: { kind: 'unlock-all' },
+        command: 'unlockAll',
+        surfaces: ['context-menu'],
+      },
     ],
   },
 ] as const satisfies readonly CanvasToolbarCommandGroupDescriptor[]

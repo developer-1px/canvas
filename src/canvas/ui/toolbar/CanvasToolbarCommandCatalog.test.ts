@@ -2,73 +2,41 @@ import { describe, expect, it } from 'vitest'
 import { CANVAS_TOOLBAR_COMMAND_GROUPS } from './CanvasToolbarCommandCatalog'
 
 describe('CanvasToolbarCommandCatalog', () => {
-  it('owns built-in toolbar command group descriptors', () => {
-    expect(CANVAS_TOOLBAR_COMMAND_GROUPS).toEqual([
-      {
-        id: 'history',
-        commands: [
-          { action: { kind: 'undo' }, command: 'undo' },
-          { action: { kind: 'redo' }, command: 'redo' },
-        ],
-      },
-      {
-        id: 'selection',
-        commands: [
-          { action: { kind: 'duplicate' }, command: 'duplicate' },
-          { action: { kind: 'delete' }, command: 'delete' },
-        ],
-      },
-      {
-        id: 'grouping',
-        commands: [
-          { action: { kind: 'group' }, command: 'group' },
-          { action: { kind: 'ungroup' }, command: 'ungroup' },
-        ],
-      },
-      {
-        id: 'alignment',
-        commands: [
-          {
-            action: { kind: 'align', mode: 'alignLeft' },
-            command: 'alignLeft',
-          },
-          {
-            action: { kind: 'align', mode: 'alignCenter' },
-            command: 'alignCenter',
-          },
-          {
-            action: { kind: 'align', mode: 'alignRight' },
-            command: 'alignRight',
-          },
-          {
-            action: { kind: 'align', mode: 'alignTop' },
-            command: 'alignTop',
-          },
-          {
-            action: { kind: 'align', mode: 'alignMiddle' },
-            command: 'alignMiddle',
-          },
-          {
-            action: { kind: 'align', mode: 'alignBottom' },
-            command: 'alignBottom',
-          },
-          {
-            action: { kind: 'distribute', mode: 'distributeHorizontal' },
-            command: 'distributeHorizontal',
-          },
-          {
-            action: { kind: 'distribute', mode: 'distributeVertical' },
-            command: 'distributeVertical',
-          },
-        ],
-      },
-      {
-        id: 'lock',
-        commands: [
-          { action: { kind: 'lock' }, command: 'lockSelection' },
-          { action: { kind: 'unlock-all' }, command: 'unlockAll' },
-        ],
-      },
+  it('owns built-in command descriptors and their UI surfaces', () => {
+    expect(CANVAS_TOOLBAR_COMMAND_GROUPS.map((group) => group.id)).toEqual([
+      'history',
+      'selection',
+      'grouping',
+      'alignment',
+      'lock',
     ])
+    expect(getCommand('undo')).toMatchObject({
+      action: { kind: 'undo' },
+      surfaces: ['context-menu'],
+    })
+    expect(getCommand('duplicate')).toMatchObject({
+      action: { kind: 'duplicate' },
+      surfaces: ['selection-floating-bar', 'context-menu'],
+    })
+    expect(getCommand('alignLeft')).toMatchObject({
+      action: { kind: 'align', mode: 'alignLeft' },
+      surfaces: ['selection-floating-bar', 'context-menu'],
+    })
+    expect(getCommand('unlockAll')).toMatchObject({
+      action: { kind: 'unlock-all' },
+      surfaces: ['context-menu'],
+    })
   })
 })
+
+function getCommand(command: string) {
+  for (const group of CANVAS_TOOLBAR_COMMAND_GROUPS) {
+    for (const descriptor of group.commands) {
+      if (descriptor.command === command) {
+        return descriptor
+      }
+    }
+  }
+
+  return undefined
+}

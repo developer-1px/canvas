@@ -877,7 +877,7 @@ describe('Canvas module boundaries', () => {
     expect(itemsFile.source).not.toContain('getCanvasToolbarDistributeItem')
     expect(itemsFile.source).not.toContain('config.tools[builtinTool]')
     expect(itemsFile.source).not.toContain('CANVAS_TOOLBAR_BUILTIN_TOOLS')
-    expect(itemsFile.source).toContain('customCommands.map')
+    expect(itemsFile.source).toContain('customCommands.flatMap')
     expect(itemsFile.source).not.toContain('customTools.map')
     expect(commandItemsFile.source).toContain(
       'export function getCanvasToolbarCommandGroups',
@@ -1348,7 +1348,7 @@ describe('Canvas module boundaries', () => {
       "from './CanvasToolbarCommandCatalog'",
     )
     expect(toolbarCommandItemsFile.source).toContain(
-      'disabled: !availability[descriptor.command]',
+      'const disabled = !availability[descriptor.command]',
     )
   })
 

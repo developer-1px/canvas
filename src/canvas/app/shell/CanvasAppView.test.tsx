@@ -256,6 +256,7 @@ function createViewProps(
         onUnlockAll: noop,
       },
       tool: 'select',
+      selectionCommandAnchor: { placement: 'above', x: 120, y: 120 },
       visible: visible.toolbar ?? true,
       onCustomCommand: noop,
       onToolChange: noop,

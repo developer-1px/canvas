@@ -6,12 +6,20 @@ import {
 } from '../../engine'
 import type {
   CanvasInteractionKind,
+  Bounds,
   Tool,
+  Viewport,
 } from '../../entities'
 import type {
   CanvasAppCustomCreationToolState,
 } from '../extensions/CanvasAppExtensionStateContracts'
 import type { CanvasAppControlModelInput } from './CanvasAppConsumerContracts'
+
+type CanvasSelectionCommandAnchor = {
+  placement: 'above' | 'below'
+  x: number
+  y: number
+}
 
 export function getCanvasAppControlModel({
   canRedo,
@@ -62,6 +70,10 @@ export function getCanvasAppControlModel({
       customCommands,
       customTools,
       commandHandlers,
+      selectionCommandAnchor: getCanvasSelectionCommandAnchor({
+        bounds: scene.getBounds(selection),
+        viewport,
+      }),
       tool,
       visible: config.overlays.toolbar,
       onToolChange,
@@ -77,6 +89,28 @@ export function getCanvasAppControlModel({
       onZoomIn: () => onZoomBy(1.25),
       onZoomOut: () => onZoomBy(0.8),
     },
+  }
+}
+
+function getCanvasSelectionCommandAnchor({
+  bounds,
+  viewport,
+}: {
+  bounds: Bounds | null
+  viewport: Viewport
+}): CanvasSelectionCommandAnchor | null {
+  if (!bounds) {
+    return null
+  }
+
+  const top = viewport.y + bounds.y * viewport.scale
+  const bottom = viewport.y + (bounds.y + bounds.h) * viewport.scale
+  const placement = top < 128 ? 'below' : 'above'
+
+  return {
+    x: viewport.x + (bounds.x + bounds.w / 2) * viewport.scale,
+    y: placement === 'below' ? bottom : top,
+    placement,
   }
 }
 

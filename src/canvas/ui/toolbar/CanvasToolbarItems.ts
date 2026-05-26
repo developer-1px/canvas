@@ -5,6 +5,7 @@ import type {
 import type { Tool } from '../../entities'
 import {
   getCanvasToolbarCommandGroups,
+  type CanvasFeatureCommandSurface,
   type CanvasToolbarCommandGroupId,
   type CanvasToolbarCommandItem,
 } from './CanvasToolbarCommandItems'
@@ -16,6 +17,7 @@ import {
 
 export type { CanvasToolbarCommandAction } from './CanvasToolbarCommandItems'
 export type { CanvasToolbarCustomTool } from './CanvasToolbarToolItems'
+export type { CanvasFeatureCommandSurface } from './CanvasToolbarCommandItems'
 
 export type CanvasToolbarCustomCommand = {
   ariaLabel: string
@@ -69,21 +71,55 @@ export function getCanvasToolbarGroups({
     items: getCanvasToolbarToolItems({ config, customTools, tool }),
   })
 
+  groups.push(...getCanvasCommandSurfaceGroups({
+    commandAvailability,
+    config,
+    customCommands,
+    includeDisabled: true,
+    surface: 'toolbar',
+  }))
+
+  return groups
+}
+
+export function getCanvasCommandSurfaceGroups({
+  commandAvailability,
+  config,
+  customCommands,
+  includeDisabled = false,
+  surface,
+}: Pick<
+  CanvasToolbarItemsInput,
+  'commandAvailability' | 'config' | 'customCommands'
+> & {
+  includeDisabled?: boolean
+  surface: CanvasFeatureCommandSurface
+}): CanvasToolbarGroup[] {
+  const groups: CanvasToolbarGroup[] = []
+
   groups.push(...getCanvasToolbarCommandGroups({
     availability: commandAvailability,
     config,
+    includeDisabled,
+    surface,
   }))
 
   pushCanvasToolbarGroup(groups, {
     id: 'custom-commands',
-    items: customCommands.map((command) => ({
-      ariaLabel: command.ariaLabel,
-      disabled: command.disabled,
-      id: command.id,
-      kind: 'custom-command',
-      label: command.label,
-      title: command.title,
-    })),
+    items: surface === 'toolbar'
+      ? []
+      : customCommands.flatMap((command) =>
+          command.disabled && !includeDisabled
+            ? []
+            : [{
+                ariaLabel: command.ariaLabel,
+                disabled: command.disabled,
+                id: command.id,
+                kind: 'custom-command' as const,
+                label: command.label,
+                title: command.title,
+              }],
+        ),
   })
 
   return groups

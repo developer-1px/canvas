@@ -1,6 +1,11 @@
 import type {
   ComponentProps,
+  MouseEvent,
   ReactNode,
+} from 'react'
+import {
+  useCallback,
+  useState,
 } from 'react'
 import { CanvasComponentPalette } from '../../ui/palette/CanvasComponentPalette'
 import { CanvasCursorChat } from '../../ui/cursor/CanvasCursorChat'
@@ -16,10 +21,18 @@ import { CanvasStampControls } from '../../ui/stamp/CanvasStampControls'
 import { CanvasStickyQuickCreateControl } from '../../ui/sticky/CanvasStickyQuickCreateControl'
 import { CanvasTextEditor } from '../../ui/text/CanvasTextEditor'
 import { CanvasToolbar } from '../../ui/toolbar/CanvasToolbar'
+import {
+  CanvasContextCommandMenu,
+  type CanvasContextCommandMenuState,
+} from '../../ui/toolbar/CanvasContextCommandMenu'
+import { CanvasSelectionFloatingBar } from '../../ui/toolbar/CanvasSelectionFloatingBar'
 import { CanvasStatus } from '../../ui/status/CanvasStatus'
 import { ZoomControls } from '../../ui/zoom/ZoomControls'
 
 type ToolbarProps = ComponentProps<typeof CanvasToolbar>
+type SelectionFloatingBarProps = ComponentProps<
+  typeof CanvasSelectionFloatingBar
+>
 type CursorChatProps = ComponentProps<typeof CanvasCursorChat>
 type EmoteControlsProps = ComponentProps<typeof CanvasEmoteControls>
 type SessionTimerProps = ComponentProps<typeof CanvasSessionTimer>
@@ -39,6 +52,9 @@ type StatusProps = ComponentProps<typeof CanvasStatus>
 type VisibleProps<TProps> = TProps & {
   visible: boolean
 }
+type ToolbarViewProps = VisibleProps<ToolbarProps> & {
+  selectionCommandAnchor: SelectionFloatingBarProps['anchor']
+}
 
 type CanvasAppViewProps = {
   componentPalette: VisibleProps<PaletteProps>
@@ -55,7 +71,7 @@ type CanvasAppViewProps = {
   stickyQuickCreate: VisibleProps<StickyQuickCreateProps>
   status: VisibleProps<StatusProps>
   textEditor: VisibleProps<TextEditorProps>
-  toolbar: VisibleProps<ToolbarProps>
+  toolbar: ToolbarViewProps
   votingSession: VotingSessionProps
   zoomControls: VisibleProps<ZoomControlsProps>
 }
@@ -91,12 +107,29 @@ export function CanvasAppView({
   const { visible: showStickyQuickCreate, ...stickyQuickCreateProps } =
     stickyQuickCreate
   const { visible: showTextEditor, ...textEditorProps } = textEditor
-  const { visible: showToolbar, ...toolbarProps } = toolbar
+  const {
+    visible: showToolbar,
+    selectionCommandAnchor,
+    ...toolbarProps
+  } = toolbar
   const { visible: showZoomControls, ...zoomControlProps } = zoomControls
   const { visible: showStatus, ...statusProps } = status
+  const [contextMenu, setContextMenu] =
+    useState<CanvasContextCommandMenuState | null>(null)
+  const closeContextMenu = useCallback(() => {
+    setContextMenu(null)
+  }, [])
+  const openContextMenu = useCallback((event: MouseEvent<HTMLElement>) => {
+    if (isAppControlTarget(event.target)) {
+      return
+    }
+
+    event.preventDefault()
+    setContextMenu({ x: event.clientX, y: event.clientY })
+  }, [])
 
   return (
-    <main className="canvas-app">
+    <main className="canvas-app" onContextMenuCapture={openContextMenu}>
       {showToolbar ? <CanvasToolbar {...toolbarProps} /> : null}
 
       <CanvasSessionTimer {...sessionTimer} />
@@ -123,6 +156,30 @@ export function CanvasAppView({
 
       {stage}
 
+      {showToolbar ? (
+        <CanvasSelectionFloatingBar
+          anchor={selectionCommandAnchor}
+          commandAvailability={toolbarProps.commandAvailability}
+          config={toolbarProps.config}
+          customCommands={toolbarProps.customCommands}
+          commandHandlers={toolbarProps.commandHandlers}
+          visible={statusProps.selectionLength > 0}
+          onCustomCommand={toolbarProps.onCustomCommand}
+        />
+      ) : null}
+
+      {showToolbar ? (
+        <CanvasContextCommandMenu
+          commandAvailability={toolbarProps.commandAvailability}
+          config={toolbarProps.config}
+          customCommands={toolbarProps.customCommands}
+          commandHandlers={toolbarProps.commandHandlers}
+          menu={contextMenu}
+          onClose={closeContextMenu}
+          onCustomCommand={toolbarProps.onCustomCommand}
+        />
+      ) : null}
+
       <CanvasCursorChat {...cursorChat} />
 
       {showStickyQuickCreate ? (
@@ -138,4 +195,24 @@ export function CanvasAppView({
       {showStatus ? <CanvasStatus {...statusProps} /> : null}
     </main>
   )
+}
+
+function isAppControlTarget(target: EventTarget) {
+  return target instanceof Element &&
+    target.closest(
+      [
+        'a',
+        'button',
+        'input',
+        'select',
+        'textarea',
+        '[role="toolbar"]',
+        '.canvas-status',
+        '.component-palette',
+        '.cursor-chat',
+        '.find-replace-panel',
+        '.object-inspector',
+        '.text-editor',
+      ].join(','),
+    ) !== null
 }

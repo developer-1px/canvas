@@ -1,17 +1,15 @@
-import { Fragment } from 'react'
 import {
   type CanvasAffordanceConfig,
   type CanvasCommandAvailability,
 } from '../../engine'
 import type { Tool } from '../../entities'
-import { ToolbarDivider } from './CanvasToolbarButtons'
+import { CanvasCommandSurface } from './CanvasCommandSurface'
 import {
   getCanvasToolbarGroups,
   type CanvasToolbarCustomCommand,
   type CanvasToolbarCustomTool,
 } from './CanvasToolbarItems'
 import {
-  renderCanvasToolbarItem,
   type CanvasToolbarItemRenderContext,
 } from './CanvasToolbarItemRenderer'
 
@@ -35,15 +33,11 @@ export function CanvasToolbar(props: CanvasToolbarProps) {
   }
 
   return (
-    <div className="toolbar" role="toolbar" aria-label="Tools">
-      {groups.map((group, index) => (
-        <Fragment key={group.id}>
-          {index > 0 ? <ToolbarDivider /> : null}
-          {group.items.map((item) =>
-            renderCanvasToolbarItem({ context: renderContext, item }),
-          )}
-        </Fragment>
-      ))}
-    </div>
+    <CanvasCommandSurface
+      ariaLabel="Tools"
+      className="toolbar"
+      context={renderContext}
+      groups={groups}
+    />
   )
 }

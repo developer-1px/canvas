@@ -3,7 +3,10 @@ import {
   createCanvasAffordanceConfig,
   type CanvasCommandAvailability,
 } from '../../engine'
-import { getCanvasToolbarGroups } from './CanvasToolbarItems'
+import {
+  getCanvasCommandSurfaceGroups,
+  getCanvasToolbarGroups,
+} from './CanvasToolbarItems'
 
 describe('CanvasToolbarItems', () => {
   it('composes tool groups from toolbar tool items', () => {
@@ -36,7 +39,7 @@ describe('CanvasToolbarItems', () => {
   })
 
   it('omits disabled feature entries and carries availability as disabled state', () => {
-    const groups = getCanvasToolbarGroups(createInput({
+    const groups = getCanvasCommandSurfaceGroups(createSurfaceInput({
       commandAvailability: createCommandAvailability({
         duplicate: false,
         redo: false,
@@ -47,6 +50,8 @@ describe('CanvasToolbarItems', () => {
           undo: false,
         },
       }),
+      includeDisabled: true,
+      surface: 'context-menu',
     }))
 
     expect(getGroup(groups, 'history')?.items).toEqual([
@@ -68,7 +73,7 @@ describe('CanvasToolbarItems', () => {
   })
 
   it('models alignment and distribution commands as action payloads', () => {
-    const groups = getCanvasToolbarGroups(createInput({
+    const groups = getCanvasCommandSurfaceGroups(createSurfaceInput({
       commandAvailability: createCommandAvailability({
         alignBottom: false,
         alignLeft: false,
@@ -82,6 +87,8 @@ describe('CanvasToolbarItems', () => {
           distributeVertical: false,
         },
       }),
+      includeDisabled: true,
+      surface: 'selection-floating-bar',
     }))
 
     expect(getGroup(groups, 'alignment')?.items).toEqual([
@@ -125,7 +132,7 @@ describe('CanvasToolbarItems', () => {
   })
 
   it('adds custom command items as their own group', () => {
-    const groups = getCanvasToolbarGroups(createInput({
+    const groups = getCanvasCommandSurfaceGroups(createSurfaceInput({
       customCommands: [
         {
           ariaLabel: 'Publish',
@@ -135,6 +142,8 @@ describe('CanvasToolbarItems', () => {
           title: 'Publish',
         },
       ],
+      includeDisabled: true,
+      surface: 'context-menu',
     }))
 
     expect(getGroup(groups, 'custom-commands')?.items).toEqual([
@@ -159,6 +168,18 @@ function createInput(
     customCommands: [],
     customTools: [],
     tool: 'select',
+    ...overrides,
+  }
+}
+
+function createSurfaceInput(
+  overrides: Partial<Parameters<typeof getCanvasCommandSurfaceGroups>[0]> = {},
+): Parameters<typeof getCanvasCommandSurfaceGroups>[0] {
+  return {
+    commandAvailability: createCommandAvailability(),
+    config: createCanvasAffordanceConfig(),
+    customCommands: [],
+    surface: 'context-menu',
     ...overrides,
   }
 }
