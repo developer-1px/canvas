@@ -10,7 +10,7 @@ describe('Canvas App workspace boundaries', () => {
     const violations = sourceFiles
       .filter((file) =>
         file.path.startsWith('src/canvas/app/') &&
-        !file.path.startsWith('src/canvas/app/document/') &&
+        !file.path.startsWith('src/canvas/app/workspace/document/') &&
         file.path !== 'src/canvas/app/workflow/useCanvasWorkspaceModel.ts' &&
         file.path !==
           'src/canvas/app/workflow/CanvasWorkspaceRuntimeModel.ts',
@@ -148,10 +148,10 @@ describe('Canvas App workspace boundaries', () => {
 
   it('keeps App workspace snapshot contracts behind a named module', () => {
     const persistenceFile = getSourceFile(
-      'src/canvas/app/document/CanvasWorkspacePersistence.ts',
+      'src/canvas/app/workspace/document/CanvasWorkspacePersistence.ts',
     )
     const snapshotFile = getSourceFile(
-      'src/canvas/app/document/CanvasWorkspaceSnapshot.ts',
+      'src/canvas/app/workspace/document/CanvasWorkspaceSnapshot.ts',
     )
 
     expect(persistenceFile.source).toContain(

@@ -7,7 +7,7 @@ import type {
 import type {
   CanvasAppCommitItemsChange,
   CanvasAppCommitSelection,
-} from '../document/CanvasAppDocumentContracts'
+} from '../workspace/document/CanvasAppDocumentContracts'
 
 export type CanvasAppCustomCommandCommitItemsChange =
   CanvasAppCommitItemsChange

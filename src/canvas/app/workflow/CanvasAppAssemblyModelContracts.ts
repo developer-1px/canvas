@@ -12,7 +12,7 @@ import type {
 import type {
   CanvasAppCustomCommand,
 } from '../commands/CanvasAppCustomCommands'
-import type { CanvasWorkspaceStorageProvider } from '../document/CanvasWorkspacePersistence'
+import type { CanvasWorkspaceStorageProvider } from '../workspace/document/CanvasWorkspacePersistence'
 import type {
   CanvasAppCustomItemValidators,
 } from '../modules/CanvasAppCustomItemValidatorContracts'

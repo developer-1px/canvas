@@ -82,7 +82,7 @@ describe('Canvas document boundaries', () => {
     const forbiddenDocumentInternals =
       /\b(createCanvasItemsDocument|commitCanvasItemsPatch|JSONPatchOperation|SelectionSnap)\b|\.history\b|\.clipboard\b/
     const violations = sourceFiles
-      .filter((file) => file.path.startsWith('src/canvas/app/document/'))
+      .filter((file) => file.path.startsWith('src/canvas/app/workspace/document/'))
       .flatMap((file) =>
         forbiddenDocumentInternals.test(file.source) ? [file.path] : [],
       )
@@ -93,12 +93,12 @@ describe('Canvas document boundaries', () => {
 
   it('keeps App document communication contracts independent from Host document aliases', () => {
     const contractsFile = getSourceFile(
-      'src/canvas/app/document/CanvasAppDocumentContracts.ts',
+      'src/canvas/app/workspace/document/CanvasAppDocumentContracts.ts',
     )
 
     expect(contractsFile.source).not.toContain("from '../../host'")
-    expect(contractsFile.source).toContain("from '../../entities'")
-    expect(contractsFile.source).toContain("from '../../core'")
+    expect(contractsFile.source).toContain("from '../../../entities'")
+    expect(contractsFile.source).toContain("from '../../../core'")
     expect(contractsFile.source).toContain('export type CanvasAppItemsChange')
     expect(contractsFile.source).toContain(
       'export type CanvasAppDocumentSelectionHistory',
@@ -121,13 +121,13 @@ describe('Canvas document boundaries', () => {
 
   it('keeps app document runtime rules out of the React document hook', () => {
     const documentHookFile = getSourceFile(
-      'src/canvas/app/document/useCanvasDocument.ts',
+      'src/canvas/app/workspace/document/useCanvasDocument.ts',
     )
     const documentRuntimeFile = getSourceFile(
-      'src/canvas/app/document/CanvasDocumentRuntime.ts',
+      'src/canvas/app/workspace/document/CanvasDocumentRuntime.ts',
     )
     const documentRuntimeContractsFile = getSourceFile(
-      'src/canvas/app/document/CanvasDocumentRuntimeContracts.ts',
+      'src/canvas/app/workspace/document/CanvasDocumentRuntimeContracts.ts',
     )
 
     expect(documentHookFile.source).toContain(
@@ -146,10 +146,10 @@ describe('Canvas document boundaries', () => {
       "from '../../host'",
     )
     expect(documentRuntimeContractsFile.source).toContain(
-      "from '../../core'",
+      "from '../../../core'",
     )
     expect(documentRuntimeContractsFile.source).toContain(
-      "from '../../entities'",
+      "from '../../../entities'",
     )
     expect(documentRuntimeContractsFile.source).toContain(
       'export type CanvasDocumentRuntimeController',

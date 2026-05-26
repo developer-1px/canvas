@@ -23,18 +23,18 @@ describe('Canvas App pointer workflow boundaries', () => {
       "from './useCanvasAppPointerModel'",
     )
     expect(appModelFile.source).not.toContain(
-      "from '../pointer/useCanvasPointerDownHandlers'",
+      "from '../interaction/pointer/useCanvasPointerDownHandlers'",
     )
     expect(appModelFile.source).not.toContain(
-      "from '../pointer/useCanvasPointerDragHandlers'",
+      "from '../interaction/pointer/useCanvasPointerDragHandlers'",
     )
     expect(appModelFile.source).not.toContain('useCanvasPointerDownHandlers')
     expect(appModelFile.source).not.toContain('useCanvasPointerDragHandlers')
     expect(pointerModelFile.source).toContain(
-      "from '../pointer/useCanvasPointerDownHandlers'",
+      "from '../interaction/pointer/useCanvasPointerDownHandlers'",
     )
     expect(pointerModelFile.source).toContain(
-      "from '../pointer/useCanvasPointerDragHandlers'",
+      "from '../interaction/pointer/useCanvasPointerDragHandlers'",
     )
     expect(pointerModelFile.source).toContain(
       "from './CanvasAppPointerConsumerModel'",
@@ -100,7 +100,7 @@ describe('Canvas App pointer workflow boundaries', () => {
 
   it('keeps app pointer input sources explicit instead of React event picks', () => {
     const pointerInputFile = getSourceFile(
-      'src/canvas/app/pointer/CanvasAppPointerInput.ts',
+      'src/canvas/app/interaction/pointer/CanvasAppPointerInput.ts',
     )
 
     expect(pointerInputFile.source).toContain(

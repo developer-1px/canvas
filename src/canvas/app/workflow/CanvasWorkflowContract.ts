@@ -3,7 +3,7 @@ import type {
   CanvasAppCommitSelection,
   CanvasAppDocumentClipboard,
   CanvasAppDocumentTextSearch,
-} from '../document/CanvasAppDocumentContracts'
+} from '../workspace/document/CanvasAppDocumentContracts'
 
 export type CommitCanvasItemsChange = CanvasAppCommitItemsChange
 

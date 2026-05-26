@@ -5,7 +5,7 @@ import {
 } from 'vitest'
 import { INITIAL_VIEWPORT } from '../../core'
 import type { CanvasItem } from '../../entities'
-import type { CanvasWorkspaceSnapshot } from '../document/CanvasWorkspaceSnapshot'
+import type { CanvasWorkspaceSnapshot } from '../workspace/document/CanvasWorkspaceSnapshot'
 import {
   createCanvasWorkspaceIdGenerator,
   getCanvasWorkspaceInitialState,

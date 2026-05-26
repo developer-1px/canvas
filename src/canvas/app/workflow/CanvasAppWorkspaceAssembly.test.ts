@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import type {
   CanvasItem,
 } from '../../host'
-import type { CanvasWorkspaceStorageProvider } from '../document/CanvasWorkspacePersistence'
+import type { CanvasWorkspaceStorageProvider } from '../workspace/document/CanvasWorkspacePersistence'
 import type {
   CanvasAppCustomItemValidators,
 } from '../modules/CanvasAppCustomItemValidatorContracts'

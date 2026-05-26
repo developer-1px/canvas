@@ -16,34 +16,34 @@ describe('Canvas App viewport workflow boundaries', () => {
       'src/canvas/app/workflow/CanvasAppViewportConsumerModel.ts',
     )
     const viewportControlsHookFile = getSourceFile(
-      'src/canvas/app/viewport/useCanvasViewportControls.ts',
+      'src/canvas/app/interaction/viewport/useCanvasViewportControls.ts',
     )
     const viewportControlExecutionFile = getSourceFile(
-      'src/canvas/app/viewport/CanvasViewportControlExecution.ts',
+      'src/canvas/app/interaction/viewport/CanvasViewportControlExecution.ts',
     )
     const wheelViewportHookFile = getSourceFile(
-      'src/canvas/app/viewport/useCanvasWheelViewport.ts',
+      'src/canvas/app/interaction/viewport/useCanvasWheelViewport.ts',
     )
     const wheelViewportExecutionFile = getSourceFile(
-      'src/canvas/app/viewport/CanvasWheelViewportExecution.ts',
+      'src/canvas/app/interaction/viewport/CanvasWheelViewportExecution.ts',
     )
 
     expect(appModelFile.source).toContain(
       "from './useCanvasAppViewportModel'",
     )
     expect(appModelFile.source).not.toContain(
-      "from '../viewport/useCanvasWheelViewport'",
+      "from '../interaction/viewport/useCanvasWheelViewport'",
     )
     expect(appModelFile.source).not.toContain(
-      "from '../viewport/useCanvasViewportControls'",
+      "from '../interaction/viewport/useCanvasViewportControls'",
     )
     expect(appModelFile.source).not.toContain('useCanvasWheelViewport')
     expect(appModelFile.source).not.toContain('useCanvasViewportControls')
     expect(viewportModelFile.source).toContain(
-      "from '../viewport/useCanvasWheelViewport'",
+      "from '../interaction/viewport/useCanvasWheelViewport'",
     )
     expect(viewportModelFile.source).toContain(
-      "from '../viewport/useCanvasViewportControls'",
+      "from '../interaction/viewport/useCanvasViewportControls'",
     )
     expect(viewportModelFile.source).toContain(
       "from './CanvasAppViewportConsumerModel'",

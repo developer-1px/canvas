@@ -9,7 +9,7 @@ import type {
   CanvasSnapGuides,
 } from '../../engine'
 import type { Tool } from '../../entities'
-import type { Interaction } from '../pointer/CanvasInteractionState'
+import type { Interaction } from '../interaction/pointer/CanvasInteractionState'
 import { getCanvasInteractionConsumerModel } from './CanvasInteractionConsumerModel'
 import type { CanvasInteractionConsumerModelInput } from './CanvasInteractionConsumerContracts'
 

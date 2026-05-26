@@ -4,7 +4,7 @@ import {
   normalizeCanvasItems,
 } from '../../host'
 import type { CanvasItem } from '../../entities'
-import type { CanvasWorkspaceStorageProvider } from '../document/CanvasWorkspacePersistence'
+import type { CanvasWorkspaceStorageProvider } from '../workspace/document/CanvasWorkspacePersistence'
 import {
   assertCanvasAppArray,
   assertCanvasAppDescriptorFunctionField,

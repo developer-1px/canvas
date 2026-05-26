@@ -12,12 +12,12 @@ import {
 } from '../extensions/CanvasAppExtensionIds'
 import {
   getCanvasKeyboardReservedShortcuts,
-} from '../keyboard/CanvasKeyboardReservedShortcuts'
+} from '../interaction/keyboard/CanvasKeyboardReservedShortcuts'
 import {
   formatCanvasKeyboardShortcutChord,
   getCanvasKeyboardShortcutChordKey,
   matchesCanvasKeyboardShortcutChord,
-} from '../keyboard/CanvasKeyboardShortcutChords'
+} from '../interaction/keyboard/CanvasKeyboardShortcutChords'
 import type {
   CanvasAppCustomCreationTool,
   CanvasAppCustomToolShortcut,

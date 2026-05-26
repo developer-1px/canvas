@@ -7,7 +7,7 @@ import { createCanvasItemReadModel } from '../../host'
 import {
   getCanvasItemIdSeed,
   type CanvasWorkspaceSnapshot,
-} from '../document/CanvasWorkspaceSnapshot'
+} from '../workspace/document/CanvasWorkspaceSnapshot'
 
 type CanvasWorkspaceInitialStateArgs = {
   initialItems: CanvasItem[]

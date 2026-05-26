@@ -7,11 +7,11 @@ import {
   readStoredCanvasWorkspace,
   type CanvasWorkspaceStorageProvider,
   useCanvasWorkspacePersistence,
-} from '../document/CanvasWorkspacePersistence'
+} from '../workspace/document/CanvasWorkspacePersistence'
 import type {
   CanvasAppCustomItemValidators,
 } from '../modules/CanvasAppCustomItemValidatorContracts'
-import { useCanvasDocument } from '../document/useCanvasDocument'
+import { useCanvasDocument } from '../workspace/document/useCanvasDocument'
 import { getCanvasWorkspaceConsumerModel } from './CanvasWorkspaceConsumerModel'
 import {
   createCanvasWorkspaceIdGenerator,

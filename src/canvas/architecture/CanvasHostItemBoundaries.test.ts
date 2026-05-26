@@ -44,7 +44,7 @@ describe('Canvas host item boundaries', () => {
       'src/canvas/host/text/CanvasEditableTextItem.ts',
     )
     const itemStartFile = getSourceFile(
-      'src/canvas/app/pointer/CanvasItemPointerInteractionStart.ts',
+      'src/canvas/app/interaction/pointer/CanvasItemPointerInteractionStart.ts',
     )
     const textEditingModelFile = getSourceFile(
       'src/canvas/app/text/CanvasTextEditingModel.ts',

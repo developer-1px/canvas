@@ -1,4 +1,4 @@
-import { useCanvasTableImport } from '../table/useCanvasTableImport'
+import { useCanvasTableImport } from '../io/table/useCanvasTableImport'
 import type { CanvasAppTableImportModelInput } from './CanvasAppIoConsumerContracts'
 
 export function useCanvasAppTableImportModel(

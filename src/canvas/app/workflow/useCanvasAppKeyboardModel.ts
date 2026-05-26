@@ -1,4 +1,4 @@
-import { useCanvasKeyboardShortcuts } from '../keyboard/useCanvasKeyboardShortcuts'
+import { useCanvasKeyboardShortcuts } from '../interaction/keyboard/useCanvasKeyboardShortcuts'
 import type { CanvasAppKeyboardModelInput } from './CanvasAppKeyboardConsumerContracts'
 
 export function useCanvasAppKeyboardModel({

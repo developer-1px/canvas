@@ -15,11 +15,11 @@ import type {
   Point,
   Viewport,
 } from '../../entities'
-import { readCanvasClipboardImageSource } from '../image/CanvasImageClipboard'
+import { readCanvasClipboardImageSource } from '../io/image/CanvasImageClipboard'
 import {
   getCanvasImageInsertCenter,
   insertCanvasImageSource,
-} from '../image/CanvasImageInsertion'
+} from '../io/image/CanvasImageInsertion'
 import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
 import type {
   CanvasDocumentClipboard,

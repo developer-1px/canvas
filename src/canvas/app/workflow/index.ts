@@ -34,7 +34,7 @@ export {
 export type {
   CanvasAppEventInput,
   CanvasAppPointerInput,
-} from '../pointer/CanvasAppPointerInput'
+} from '../interaction/pointer/CanvasAppPointerInput'
 export type {
   CanvasAppInspectorPanel,
   CanvasAppInspectorPanelContext,
@@ -48,7 +48,7 @@ export type {
 export type {
   CanvasWorkspaceStorage,
   CanvasWorkspaceStorageProvider,
-} from '../document/CanvasWorkspacePersistence'
+} from '../workspace/document/CanvasWorkspacePersistence'
 export {
   createCanvasAppComponentPresentationRenderers,
   createCanvasAppCustomItemRenderers,

@@ -2,7 +2,7 @@ import type {
   CanvasAffordanceConfig,
 } from '../../engine'
 import type { CanvasItem } from '../../entities'
-import type { CanvasWorkspaceStorageProvider } from '../document/CanvasWorkspacePersistence'
+import type { CanvasWorkspaceStorageProvider } from '../workspace/document/CanvasWorkspacePersistence'
 import type { CanvasAppExtensionBundle } from '../extensions/CanvasAppExtensionBundle'
 import type {
   CanvasAppComponentPresentationRenderers,

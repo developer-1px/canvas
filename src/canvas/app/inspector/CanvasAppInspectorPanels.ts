@@ -5,7 +5,7 @@ import type {
 } from '../../entities'
 import type {
   CanvasAppCommitItemsChange,
-} from '../document/CanvasAppDocumentContracts'
+} from '../workspace/document/CanvasAppDocumentContracts'
 
 export type CanvasAppInspectorPanelCommitItemsChange =
   CanvasAppCommitItemsChange

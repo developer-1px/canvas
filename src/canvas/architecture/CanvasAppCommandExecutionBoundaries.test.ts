@@ -34,7 +34,7 @@ describe('Canvas App command execution boundaries', () => {
     expect(descriptorFile.source).not.toContain('CanvasWorkflowContract')
     expect(descriptorFile.source).not.toContain("from '../../host'")
     expect(descriptorFile.source).toContain(
-      "from '../document/CanvasAppDocumentContracts'",
+      "from '../workspace/document/CanvasAppDocumentContracts'",
     )
     expect(descriptorFile.source).toContain(
       'export type CanvasAppCustomCommandCommitItemsChange',

@@ -7,10 +7,10 @@ import {
 describe('Canvas pointer start boundaries', () => {
   it('keeps pointer interaction start rules behind a named module', () => {
     const downHandlersFile = getSourceFile(
-      'src/canvas/app/pointer/useCanvasPointerDownHandlers.ts',
+      'src/canvas/app/interaction/pointer/useCanvasPointerDownHandlers.ts',
     )
     const startSessionFile = getSourceFile(
-      'src/canvas/app/pointer/CanvasPointerStartSession.ts',
+      'src/canvas/app/interaction/pointer/CanvasPointerStartSession.ts',
     )
     const gestureEngineFile = getSourceFile(
       'src/canvas/engine/gesture/CanvasGestureEngine.ts',
@@ -19,31 +19,31 @@ describe('Canvas pointer start boundaries', () => {
       'src/canvas/engine/gesture/CanvasToolGestureRouting.ts',
     )
     const startFile = getSourceFile(
-      'src/canvas/app/pointer/CanvasPointerInteractionStart.ts',
+      'src/canvas/app/interaction/pointer/CanvasPointerInteractionStart.ts',
     )
     const resultContractsFile = getSourceFile(
-      'src/canvas/app/pointer/CanvasPointerInteractionResultContracts.ts',
+      'src/canvas/app/interaction/pointer/CanvasPointerInteractionResultContracts.ts',
     )
     const creationStartFile = getSourceFile(
-      'src/canvas/app/pointer/CanvasPointerCreationStart.ts',
+      'src/canvas/app/interaction/pointer/CanvasPointerCreationStart.ts',
     )
     const drawingCreationFile = getSourceFile(
-      'src/canvas/app/pointer/CanvasPointerDrawingCreation.ts',
+      'src/canvas/app/interaction/pointer/CanvasPointerDrawingCreation.ts',
     )
     const customCreationFile = getSourceFile(
-      'src/canvas/app/pointer/CanvasPointerCustomCreation.ts',
+      'src/canvas/app/interaction/pointer/CanvasPointerCustomCreation.ts',
     )
     const shapeCreationDescriptorsFile = getSourceFile(
-      'src/canvas/app/pointer/CanvasPointerShapeCreationDescriptors.ts',
+      'src/canvas/app/interaction/pointer/CanvasPointerShapeCreationDescriptors.ts',
     )
     const textCreationFile = getSourceFile(
-      'src/canvas/app/pointer/CanvasPointerTextCreation.ts',
+      'src/canvas/app/interaction/pointer/CanvasPointerTextCreation.ts',
     )
     const marqueeInteractionFile = getSourceFile(
-      'src/canvas/app/pointer/CanvasPointerMarqueeInteraction.ts',
+      'src/canvas/app/interaction/pointer/CanvasPointerMarqueeInteraction.ts',
     )
     const panInteractionFile = getSourceFile(
-      'src/canvas/app/pointer/CanvasPointerPanInteraction.ts',
+      'src/canvas/app/interaction/pointer/CanvasPointerPanInteraction.ts',
     )
 
     expect(downHandlersFile.source).toContain(
@@ -171,10 +171,10 @@ describe('Canvas pointer start boundaries', () => {
 
   it('keeps item pointer interaction start rules behind a named module', () => {
     const downHandlersFile = getSourceFile(
-      'src/canvas/app/pointer/useCanvasPointerDownHandlers.ts',
+      'src/canvas/app/interaction/pointer/useCanvasPointerDownHandlers.ts',
     )
     const itemStartFile = getSourceFile(
-      'src/canvas/app/pointer/CanvasItemPointerInteractionStart.ts',
+      'src/canvas/app/interaction/pointer/CanvasItemPointerInteractionStart.ts',
     )
 
     expect(downHandlersFile.source).toContain(
@@ -211,10 +211,10 @@ describe('Canvas pointer start boundaries', () => {
 
   it('keeps resize pointer interaction start rules behind a named module', () => {
     const downHandlersFile = getSourceFile(
-      'src/canvas/app/pointer/useCanvasPointerDownHandlers.ts',
+      'src/canvas/app/interaction/pointer/useCanvasPointerDownHandlers.ts',
     )
     const resizeStartFile = getSourceFile(
-      'src/canvas/app/pointer/CanvasResizePointerInteractionStart.ts',
+      'src/canvas/app/interaction/pointer/CanvasResizePointerInteractionStart.ts',
     )
 
     expect(downHandlersFile.source).toContain(

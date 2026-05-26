@@ -25,16 +25,16 @@ describe('Canvas App custom tool boundaries', () => {
       'src/canvas/app/workflow/useCanvasAppModel.ts',
     )
     const keyboardRouterFile = getSourceFile(
-      'src/canvas/app/keyboard/CanvasKeyboardShortcutRouter.ts',
+      'src/canvas/app/interaction/keyboard/CanvasKeyboardShortcutRouter.ts',
     )
     const keyboardIntentFile = getSourceFile(
-      'src/canvas/app/keyboard/CanvasKeyboardShortcutIntent.ts',
+      'src/canvas/app/interaction/keyboard/CanvasKeyboardShortcutIntent.ts',
     )
     const keyboardToolIntentFile = getSourceFile(
-      'src/canvas/app/keyboard/CanvasKeyboardToolShortcutIntent.ts',
+      'src/canvas/app/interaction/keyboard/CanvasKeyboardToolShortcutIntent.ts',
     )
     const pointerCustomCreationFile = getSourceFile(
-      'src/canvas/app/pointer/CanvasPointerCustomCreation.ts',
+      'src/canvas/app/interaction/pointer/CanvasPointerCustomCreation.ts',
     )
 
     expect(descriptorFile.source).not.toContain(
@@ -44,7 +44,7 @@ describe('Canvas App custom tool boundaries', () => {
       "from './CanvasAppCustomCreationToolRuntime'",
     )
     expect(contractsFile.source).toContain(
-      "from '../keyboard/CanvasKeyboardShortcutChords'",
+      "from '../interaction/keyboard/CanvasKeyboardShortcutChords'",
     )
     expect(descriptorFile.source).not.toContain(
       'export function getCanvasAppCustomCreationToolStates',

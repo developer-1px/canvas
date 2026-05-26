@@ -14,7 +14,7 @@ import type {
   Bounds,
   Tool,
 } from '../../entities'
-import type { Interaction } from '../pointer/CanvasInteractionState'
+import type { Interaction } from '../interaction/pointer/CanvasInteractionState'
 
 export type CanvasInteractionDraftWriters = {
   setDraftArrow: Dispatch<SetStateAction<CanvasDraftArrowOverlay | null>>

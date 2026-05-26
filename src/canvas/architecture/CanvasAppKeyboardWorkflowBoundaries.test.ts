@@ -20,11 +20,11 @@ describe('Canvas App keyboard workflow boundaries', () => {
       "from './useCanvasAppKeyboardModel'",
     )
     expect(appModelFile.source).not.toContain(
-      "from '../keyboard/useCanvasKeyboardShortcuts'",
+      "from '../interaction/keyboard/useCanvasKeyboardShortcuts'",
     )
     expect(appModelFile.source).not.toContain('useCanvasKeyboardShortcuts')
     expect(keyboardModelFile.source).toContain(
-      "from '../keyboard/useCanvasKeyboardShortcuts'",
+      "from '../interaction/keyboard/useCanvasKeyboardShortcuts'",
     )
     expect(keyboardModelFile.source).toContain(
       "from './CanvasAppKeyboardConsumerContracts'",

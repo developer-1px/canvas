@@ -11,7 +11,7 @@ import type {
   Point,
   Viewport,
 } from '../../entities'
-import type { CanvasAppPointerInput } from '../pointer/CanvasAppPointerInput'
+import type { CanvasAppPointerInput } from '../interaction/pointer/CanvasAppPointerInput'
 import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
 import {
   CANVAS_DEFAULT_EMOTE,

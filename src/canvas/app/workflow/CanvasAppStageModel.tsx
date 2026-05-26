@@ -5,7 +5,7 @@ import type {
   CanvasAppStageAdapter,
   CanvasAppStageRenderInput,
 } from '../rendering/CanvasAppRenderingContracts'
-import type { CanvasAppEventInput } from '../pointer/CanvasAppPointerInput'
+import type { CanvasAppEventInput } from '../interaction/pointer/CanvasAppPointerInput'
 import type { CanvasAppStageModelInput } from './CanvasAppStageConsumerContracts'
 
 export type { CanvasAppStageModelInput } from './CanvasAppStageConsumerContracts'

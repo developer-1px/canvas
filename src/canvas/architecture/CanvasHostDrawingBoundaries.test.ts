@@ -97,7 +97,7 @@ describe('Canvas host drawing boundaries', () => {
       'src/canvas/host/drawing/CanvasDrawingItemStyles.ts',
     )
     const drawingStyleConsumers = [
-      getSourceFile('src/canvas/app/pointer/CanvasPointerDrawing.ts'),
+      getSourceFile('src/canvas/app/interaction/pointer/CanvasPointerDrawing.ts'),
       getSourceFile('src/canvas/host/adapters/CanvasItemCreationAdapter.ts'),
     ].map((file) => file.source).join('\n')
 

@@ -21,7 +21,7 @@ import {
   type CanvasSceneAdapter,
   type CanvasSnapGuides,
 } from '../../engine'
-import type { Interaction } from '../pointer/CanvasInteractionState'
+import type { Interaction } from '../interaction/pointer/CanvasInteractionState'
 import { getCanvasInteractionConsumerModel } from './CanvasInteractionConsumerModel'
 
 type UseCanvasInteractionModelArgs = {

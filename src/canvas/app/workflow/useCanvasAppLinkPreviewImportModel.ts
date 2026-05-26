@@ -1,4 +1,4 @@
-import { useCanvasLinkPreviewImport } from '../link/useCanvasLinkPreviewImport'
+import { useCanvasLinkPreviewImport } from '../io/link-preview/useCanvasLinkPreviewImport'
 import type {
   CanvasAppLinkPreviewImportModelInput,
 } from './CanvasAppIoConsumerContracts'

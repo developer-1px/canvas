@@ -1,5 +1,5 @@
 import type { EditingText } from '../../entities'
-import type { CanvasAppItemsChange } from '../document/CanvasAppDocumentContracts'
+import type { CanvasAppItemsChange } from '../workspace/document/CanvasAppDocumentContracts'
 import type {
   CommitCanvasItemsChange,
   CommitCanvasSelection,

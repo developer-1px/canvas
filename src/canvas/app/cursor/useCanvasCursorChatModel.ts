@@ -5,7 +5,7 @@ import {
 } from 'react'
 import type { CanvasAffordanceConfig } from '../../engine'
 import type { Point } from '../../entities'
-import type { CanvasAppPointerInput } from '../pointer/CanvasAppPointerInput'
+import type { CanvasAppPointerInput } from '../interaction/pointer/CanvasAppPointerInput'
 import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
 
 export const CANVAS_CURSOR_CHAT_MAX_LENGTH = 52
