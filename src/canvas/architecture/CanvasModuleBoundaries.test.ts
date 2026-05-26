@@ -3371,7 +3371,7 @@ describe('Canvas module boundaries', () => {
     expect(drawingValidationFile.source).toContain('function isSamePoint')
   })
 
-  it('keeps built-in collaboration attachment rules behind host item modules', () => {
+  it('keeps built-in collaboration and stamp item rules behind host modules', () => {
     const itemSchemaFile = getSourceFile(
       'src/canvas/host/document/CanvasItemSchema.ts',
     )
@@ -3410,7 +3410,7 @@ describe('Canvas module boundaries', () => {
     expect(commentFile.source).toContain(
       'export function translateCanvasCommentItem',
     )
-    expect(stampFile.source).toContain(
+    expect(stampFile.source).not.toContain(
       'export function isCanvasStampAttachedTo',
     )
     expect(stampFile.source).toContain(
@@ -3428,7 +3428,8 @@ describe('Canvas module boundaries', () => {
     expect(transformOperationsFile.source).not.toContain(
       "item.type === 'comment'",
     )
-    expect(stampInsertionFile.source).toContain('attachedTo: selection[0]')
+    expect(stampInsertionFile.source).not.toContain('attachedTo')
+    expect(stampInsertionFile.source).toContain('after: [item.id]')
   })
 
   it('keeps component item validation in the host component module', () => {

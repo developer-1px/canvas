@@ -115,10 +115,6 @@ export function CanvasAppView({
   } = toolbar
   const { visible: showZoomControls, ...zoomControlProps } = zoomControls
   const { visible: showStatus, ...statusProps } = status
-  const showAnchoredStampControls = showStampControls &&
-    stampControlProps.anchor !== null
-  const showStandaloneStampControls = showStampControls &&
-    stampControlProps.anchor === null
   const [contextMenu, setContextMenu] =
     useState<CanvasContextCommandMenuState | null>(null)
   const closeContextMenu = useCallback(() => {
@@ -142,14 +138,12 @@ export function CanvasAppView({
     'find-replace-panel': findReplace.open,
     'image-controls': showImageControls,
     'object-inspector': showInspector,
-    'selection-floating-bar': (
-      (showToolbar && statusProps.selectionLength > 0) ||
-      showAnchoredStampControls
-    ) &&
+    'selection-floating-bar': showToolbar &&
+      statusProps.selectionLength > 0 &&
       selectionCommandAnchor !== null,
     'session-timer': sessionTimer.visible,
     'spotlight': spotlight.visible,
-    'stamp-controls': showStandaloneStampControls,
+    'stamp-controls': showStampControls,
     'sticky-quick-create': showStickyQuickCreate,
     'text-editor': showTextEditor,
     'toolbar': showToolbar,
@@ -201,16 +195,9 @@ export function CanvasAppView({
         <CanvasSelectionFloatingBar
           anchor={selectionCommandAnchor}
           commandAvailability={toolbarProps.commandAvailability}
-          commandsVisible={showToolbar && statusProps.selectionLength > 0}
           config={toolbarProps.config}
           customCommands={toolbarProps.customCommands}
           commandHandlers={toolbarProps.commandHandlers}
-          stampControls={{
-            canInsertStamp: stampControlProps.canInsertStamp,
-            stamps: stampControlProps.stamps,
-            visible: showAnchoredStampControls,
-            onInsertStamp: stampControlProps.onInsertStamp,
-          }}
           visible={true}
           onCustomCommand={toolbarProps.onCustomCommand}
         />

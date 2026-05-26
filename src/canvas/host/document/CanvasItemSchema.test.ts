@@ -132,7 +132,6 @@ const arrowItem: CanvasItem = {
 }
 
 const stampItem: CanvasItem = {
-  attachedTo: 'component-sticky',
   h: 44,
   id: 'stamp-1',
   label: '+1',
@@ -246,6 +245,17 @@ describe('CanvasItemSchema stamp items', () => {
           stamp: 'Thumbs Up',
         },
       ]),
+    ).toThrow()
+  })
+
+  it('rejects stamp attachment fields', () => {
+    expect(() =>
+      validateCanvasItems([
+        {
+          ...stampItem,
+          attachedTo: 'component-sticky',
+        },
+      ] as unknown as CanvasItem[]),
     ).toThrow()
   })
 })

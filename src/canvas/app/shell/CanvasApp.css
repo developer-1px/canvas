@@ -619,11 +619,6 @@
   transform: translate(-50%, 10px);
 }
 
-.selection-stamp-group {
-  display: flex;
-  gap: 4px;
-}
-
 .context-command-menu {
   z-index: 7;
   top: max(

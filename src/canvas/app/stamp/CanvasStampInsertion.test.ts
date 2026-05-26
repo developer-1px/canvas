@@ -2,7 +2,6 @@ import { describe, expect, it, vi } from 'vitest'
 import type { Bounds } from '../../entities'
 import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
 import {
-  getCanvasStampControlsAnchor,
   getCanvasStampInsertPlacement,
   insertCanvasStamp,
 } from './CanvasStampInsertion'
@@ -14,7 +13,7 @@ const stamp = {
 }
 
 describe('CanvasStampInsertion', () => {
-  it('commits a selected stamp item at the chosen placement', () => {
+  it('commits an independent selected stamp item at the chosen placement', () => {
     const commitItemsChange = vi.fn(() => true)
 
     expect(insertCanvasStamp({
@@ -24,7 +23,6 @@ describe('CanvasStampInsertion', () => {
         selection: ['rect-1'],
       },
       placement: {
-        attachedTo: 'rect-1',
         x: 278,
         y: 178,
       },
@@ -35,7 +33,6 @@ describe('CanvasStampInsertion', () => {
         type: 'add',
         items: [{
           h: 44,
-          attachedTo: 'rect-1',
           id: 'stamp-1',
           label: '+1',
           stamp: 'thumbs-up',
@@ -47,7 +44,7 @@ describe('CanvasStampInsertion', () => {
       },
       {
         before: ['rect-1'],
-        after: ['rect-1'],
+        after: ['stamp-1'],
       },
     )
   })
@@ -74,96 +71,44 @@ describe('CanvasStampInsertion', () => {
     )
   })
 
-  it('attaches to single selection or falls back to viewport center', () => {
+  it('places standalone stamps from viewport center and stacks same-row stamps', () => {
     const stageElement = createStageElement()
 
     expect(getCanvasStampInsertPlacement({
       itemReadModel: createReadModel(),
-      selection: ['rect-1'],
-      stageElement,
-      viewport: { scale: 2, x: 10, y: 20 },
-    })).toEqual({
-      attachedTo: 'rect-1',
-      x: 108,
-      y: -2,
-    })
-    expect(getCanvasStampInsertPlacement({
-      itemReadModel: createReadModel(
-        { h: 80, w: 120, x: 10, y: 20 },
-        2,
-      ),
-      selection: ['rect-1'],
-      stageElement,
-      viewport: { scale: 2, x: 10, y: 20 },
-    })).toEqual({
-      attachedTo: 'rect-1',
-      x: 8,
-      y: -2,
-    })
-    expect(getCanvasStampInsertPlacement({
-      itemReadModel: createReadModel(),
-      selection: ['rect-1', 'rect-2'],
-      stageElement,
-      viewport: { scale: 2, x: 10, y: 20 },
-    })).toEqual({ x: 142, y: 38 })
-    expect(getCanvasStampInsertPlacement({
-      itemReadModel: createReadModel(
-        { h: 80, w: 120, x: 10, y: 20 },
-        0,
-        2,
-      ),
-      selection: ['rect-1', 'rect-2'],
-      stageElement,
-      viewport: { scale: 2, x: 10, y: 20 },
-    })).toEqual({ x: 242, y: 38 })
-    expect(getCanvasStampInsertPlacement({
-      itemReadModel: createReadModel(null),
-      selection: [],
       stageElement,
       viewport: { scale: 2, x: 10, y: 20 },
     })).toEqual({ x: 58, y: 38 })
-  })
-
-  it('anchors stamp controls above the current selection', () => {
-    expect(getCanvasStampControlsAnchor({
-      itemReadModel: createReadModel(),
-      selection: ['rect-1'],
+    expect(getCanvasStampInsertPlacement({
+      itemReadModel: createReadModel(
+        { h: 80, w: 120, x: 10, y: 20 },
+      ),
+      stageElement,
       viewport: { scale: 2, x: 10, y: 20 },
-    })).toEqual({ x: 150, y: 176 })
-
-    expect(getCanvasStampControlsAnchor({
-      itemReadModel: createReadModel({ h: 80, w: 120, x: 10, y: 120 }),
-      selection: ['rect-1', 'rect-2'],
+    })).toEqual({ x: 58, y: 38 })
+    expect(getCanvasStampInsertPlacement({
+      itemReadModel: createReadModel(
+        { h: 80, w: 120, x: 10, y: 20 },
+        2,
+      ),
+      stageElement,
       viewport: { scale: 2, x: 10, y: 20 },
-    })).toEqual({ x: 150, y: 260 })
-
-    expect(getCanvasStampControlsAnchor({
+    })).toEqual({ x: 158, y: 38 })
+    expect(getCanvasStampInsertPlacement({
       itemReadModel: createReadModel(null),
-      selection: [],
+      stageElement,
       viewport: { scale: 2, x: 10, y: 20 },
-    })).toBeNull()
+    })).toEqual({ x: 58, y: 38 })
   })
 })
 
 function createReadModel(
   bounds: Bounds | null = { h: 80, w: 120, x: 10, y: 20 },
-  attachedStampCount = 0,
   detachedStampCount = 0,
 ) {
   return {
     getAllItems: vi.fn(() =>
       [
-        ...Array.from({ length: attachedStampCount }, (_, index) => ({
-          attachedTo: 'rect-1',
-          h: 44,
-          id: `stamp-${index + 1}`,
-          label: '+1',
-          stamp: 'thumbs-up',
-          type: 'stamp',
-          w: 44,
-          x: 0,
-          y: 0,
-        })),
         ...Array.from({ length: detachedStampCount }, (_, index) => ({
           h: 44,
           id: `detached-stamp-${index + 1}`,

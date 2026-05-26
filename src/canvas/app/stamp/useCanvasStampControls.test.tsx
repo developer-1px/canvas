@@ -9,7 +9,7 @@ import {
 } from './useCanvasStampControls'
 
 describe('useCanvasStampControls', () => {
-  it('keeps contextual reaction controls hidden without a selection anchor', () => {
+  it('keeps optional stamp controls hidden by default', () => {
     const model = renderStampControlsModel({
       itemReadModel: createReadModel(null),
       selection: [],
@@ -17,17 +17,21 @@ describe('useCanvasStampControls', () => {
 
     expect(model.visible).toBe(false)
     expect(model.anchor).toBeNull()
-    expect(model.canInsertStamp).toBe(true)
+    expect(model.canInsertStamp).toBe(false)
   })
 
-  it('shows contextual reaction controls when the selection has bounds', () => {
+  it('shows independent stamp controls when the affordance is enabled', () => {
     const model = renderStampControlsModel({
+      config: createCanvasAffordanceConfig({
+        overlays: { stampControls: true },
+      }),
       itemReadModel: createReadModel({ h: 80, w: 120, x: 10, y: 20 }),
       selection: ['rect-1'],
     })
 
     expect(model.visible).toBe(true)
-    expect(model.anchor).toEqual({ x: 70, y: 176 })
+    expect(model.anchor).toBeNull()
+    expect(model.canInsertStamp).toBe(true)
   })
 
   it('shows stamp controls during active voting even without selection', () => {
@@ -75,10 +79,12 @@ describe('useCanvasStampControls', () => {
 
 function renderStampControlsModel({
   commitItemsChange = vi.fn(() => true),
+  config = createCanvasAffordanceConfig(),
   itemReadModel,
   selection,
   votingSession,
 }: {
+  config?: Parameters<typeof useCanvasStampControls>[0]['config']
   commitItemsChange?: Parameters<
     typeof useCanvasStampControls
   >[0]['commitItemsChange']
@@ -91,7 +97,7 @@ function renderStampControlsModel({
   function Harness() {
     model = useCanvasStampControls({
       commitItemsChange,
-      config: createCanvasAffordanceConfig(),
+      config,
       createId: vi.fn(() => 'stamp-1'),
       itemReadModel,
       selection,

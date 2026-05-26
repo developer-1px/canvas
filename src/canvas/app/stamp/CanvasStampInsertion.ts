@@ -1,7 +1,4 @@
-import type {
-  Point,
-  Viewport,
-} from '../../entities'
+import type { Viewport } from '../../entities'
 import {
   CANVAS_STAMP_ITEM_SIZE,
   createCanvasStampItem,
@@ -12,17 +9,12 @@ import type { CanvasAppItemReadModel } from '../workflow/CanvasAppItemReadModelC
 import type { CommitCanvasItemsChange } from '../workflow/CanvasWorkflowContract'
 import type { CanvasStampDefinition } from './CanvasStampCatalog'
 
-const CANVAS_STAMP_SELECTION_GAP = 12
-const CANVAS_STAMP_ATTACHED_GAP = 6
-const CANVAS_STAMP_CONTROLS_MIN_SCREEN_Y = 176
+const CANVAS_STAMP_STACK_GAP = 6
 
 export type CanvasStampInsertPlacement = {
-  attachedTo?: string
   x: number
   y: number
 }
-
-export type CanvasStampControlsAnchor = Point
 
 export type CanvasStampInsertionContext = {
   commitItemsChange: CommitCanvasItemsChange
@@ -32,7 +24,6 @@ export type CanvasStampInsertionContext = {
 
 export type CanvasStampInsertPlacementInput = {
   itemReadModel: CanvasAppItemReadModel
-  selection: string[]
   stageElement: CanvasAppStageElement
   viewport: Viewport
 }
@@ -47,7 +38,6 @@ export function insertCanvasStamp({
   stamp: CanvasStampDefinition
 }) {
   const item = createCanvasStampItem({
-    attachedTo: placement.attachedTo,
     id: context.createId('stamp'),
     label: stamp.label,
     stamp: stamp.stamp,
@@ -59,73 +49,29 @@ export function insertCanvasStamp({
     { type: 'add', items: [item] },
     {
       before: context.selection,
-      after: context.selection.length > 0 ? context.selection : [item.id],
+      after: [item.id],
     },
   )
 }
 
 export function getCanvasStampInsertPlacement({
   itemReadModel,
-  selection,
   stageElement,
   viewport,
 }: CanvasStampInsertPlacementInput): CanvasStampInsertPlacement {
-  const selectedBounds = selection.length > 0
-    ? itemReadModel.getSelectionBounds(selection)
-    : null
-
-  if (selectedBounds) {
-    if (selection.length === 1) {
-      const attachedStampCount = getCanvasAttachedStampCount({
-        attachedTo: selection[0],
-        itemReadModel,
-      })
-
-      return {
-        attachedTo: selection[0],
-        x: selectedBounds.x + selectedBounds.w - CANVAS_STAMP_ITEM_SIZE / 2 -
-          attachedStampCount *
-            (CANVAS_STAMP_ITEM_SIZE + CANVAS_STAMP_ATTACHED_GAP),
-        y: selectedBounds.y - CANVAS_STAMP_ITEM_SIZE / 2,
-      }
-    }
-
-    const y = selectedBounds.y + selectedBounds.h / 2 -
-      CANVAS_STAMP_ITEM_SIZE / 2
-    const detachedStampCount = getCanvasDetachedStampCountAtRow({
-      itemReadModel,
-      y,
-    })
-
-    return {
-      x: selectedBounds.x + selectedBounds.w + CANVAS_STAMP_SELECTION_GAP +
-        detachedStampCount *
-          (CANVAS_STAMP_ITEM_SIZE + CANVAS_STAMP_ATTACHED_GAP),
-      y,
-    }
-  }
-
   const center = stageElement.getViewportCenter(viewport) ?? { x: 0, y: 0 }
+  const y = center.y - CANVAS_STAMP_ITEM_SIZE / 2
+  const detachedStampCount = getCanvasDetachedStampCountAtRow({
+    itemReadModel,
+    y,
+  })
 
   return {
-    x: center.x - CANVAS_STAMP_ITEM_SIZE / 2,
-    y: center.y - CANVAS_STAMP_ITEM_SIZE / 2,
+    x: center.x - CANVAS_STAMP_ITEM_SIZE / 2 +
+      detachedStampCount *
+        (CANVAS_STAMP_ITEM_SIZE + CANVAS_STAMP_STACK_GAP),
+    y,
   }
-}
-
-function getCanvasAttachedStampCount({
-  attachedTo,
-  itemReadModel,
-}: {
-  attachedTo: string
-  itemReadModel: CanvasAppItemReadModel
-}) {
-  return itemReadModel
-    .getAllItems()
-    .filter((item) =>
-      isCanvasStampItem(item) && item.attachedTo === attachedTo,
-    )
-    .length
 }
 
 function getCanvasDetachedStampCountAtRow({
@@ -139,35 +85,7 @@ function getCanvasDetachedStampCountAtRow({
     .getAllItems()
     .filter((item) =>
       isCanvasStampItem(item) &&
-      item.attachedTo === undefined &&
       Math.abs(item.y - y) < 0.5,
     )
     .length
-}
-
-export function getCanvasStampControlsAnchor({
-  itemReadModel,
-  selection,
-  viewport,
-}: Pick<
-  CanvasStampInsertPlacementInput,
-  'itemReadModel' | 'selection' | 'viewport'
->): CanvasStampControlsAnchor | null {
-  if (selection.length === 0) {
-    return null
-  }
-
-  const selectedBounds = itemReadModel.getSelectionBounds(selection)
-
-  return selectedBounds
-    ? {
-        x: viewport.x + (
-          selectedBounds.x + selectedBounds.w / 2
-        ) * viewport.scale,
-        y: Math.max(
-          CANVAS_STAMP_CONTROLS_MIN_SCREEN_Y,
-          viewport.y + selectedBounds.y * viewport.scale,
-        ),
-      }
-    : null
 }

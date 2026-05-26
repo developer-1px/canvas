@@ -13,14 +13,12 @@ import {
   type CanvasStampDefinition,
 } from './CanvasStampCatalog'
 import {
-  getCanvasStampControlsAnchor,
   getCanvasStampInsertPlacement,
   insertCanvasStamp,
-  type CanvasStampControlsAnchor,
 } from './CanvasStampInsertion'
 
 export type CanvasStampControlsModel = {
-  anchor: CanvasStampControlsAnchor | null
+  anchor: null
   canInsertStamp: boolean
   stamps: readonly CanvasStampDefinition[]
   visible: boolean
@@ -48,26 +46,11 @@ export function useCanvasStampControls({
   viewport,
   votingSession,
 }: CanvasStampControlsInput): CanvasStampControlsModel {
-  const canInsertStamp = config.overlays.stampControls &&
+  const visible = config.overlays.stampControls ||
+    votingSession?.active === true
+  const canInsertStamp = visible &&
     (votingSession?.active !== true || votingSession.canCastVote)
-  const anchor = useMemo(
-    () =>
-      canInsertStamp
-        ? getCanvasStampControlsAnchor({
-            itemReadModel,
-            selection,
-            viewport,
-          })
-        : null,
-    [
-      itemReadModel,
-      selection,
-      viewport,
-      canInsertStamp,
-    ],
-  )
-  const visible = config.overlays.stampControls &&
-    (anchor !== null || votingSession?.active === true)
+  const anchor = null
 
   const onInsertStamp = useCallback(
     (stamp: CanvasStampDefinition) => {
@@ -78,7 +61,6 @@ export function useCanvasStampControls({
       const inserted = insertCanvasStamp({
         placement: getCanvasStampInsertPlacement({
           itemReadModel,
-          selection,
           stageElement,
           viewport,
         }),

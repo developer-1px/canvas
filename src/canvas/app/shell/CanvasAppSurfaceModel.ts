@@ -125,7 +125,7 @@ export const CANVAS_APP_SURFACE_DEFINITIONS: readonly CanvasAppSurfaceDefinition
     region: 'top-left',
   },
   {
-    concept: 'facilitation',
+    concept: 'authoring',
     id: 'stamp-controls',
     priority: 0,
     region: 'top-right',

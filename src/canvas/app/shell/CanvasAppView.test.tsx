@@ -60,8 +60,9 @@ describe('CanvasAppView', () => {
     expect(markup).toContain('image-controls')
     expect(markup).toContain('session-timer')
     expect(markup).toContain('spotlight')
-    expect(markup).toContain('selection-stamp-group')
-    expect(markup).not.toContain('stamp-controls')
+    expect(markup).toContain('selection-floating-bar')
+    expect(markup).toContain('stamp-controls')
+    expect(markup).not.toContain('selection-stamp-group')
     expect(markup).toContain('sticky-quick-create')
     expect(markup).toContain('canvas-status')
     expect(markup).toContain('text-editor')
@@ -70,11 +71,10 @@ describe('CanvasAppView', () => {
     expect(markup).toContain('zoom-controls')
   })
 
-  it('keeps unanchored stamp controls as their own session surface', () => {
+  it('keeps stamp controls as their own independent surface', () => {
     const props = createViewProps()
     props.status.selectionLength = 0
     props.toolbar.selectionCommandAnchor = null
-    props.stampControls.anchor = null
 
     const markup = renderToStaticMarkup(<CanvasAppView {...props} />)
 
@@ -221,7 +221,7 @@ function createViewProps(
       onStop: noop,
     },
     stampControls: {
-      anchor: { x: 320, y: 140 },
+      anchor: null,
       canInsertStamp: true,
       stamps: [{
         label: '+1',

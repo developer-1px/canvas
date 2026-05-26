@@ -42,8 +42,7 @@ const rect: CanvasItem = {
   y: 20,
 }
 
-const attachedStamp: CanvasItem = {
-  attachedTo: 'rect-1',
+const stamp: CanvasItem = {
   h: 44,
   id: 'stamp-1',
   label: '+1',
@@ -209,9 +208,9 @@ describe('CanvasItemTransformOperations section contents', () => {
       y: 60,
     }
     const attachedToContained = {
-      ...attachedStamp,
+      ...attachedComment,
       attachedTo: 'rect-contained',
-      id: 'stamp-contained',
+      id: 'comment-contained',
       x: 150,
       y: 40,
     }
@@ -289,9 +288,9 @@ describe('CanvasItemTransformOperations section contents', () => {
 })
 
 describe('CanvasItemTransformOperations attached items', () => {
-  test('moves attached collaboration affordances with the selected object', () => {
+  test('moves attached comments but leaves independent stamps in place', () => {
     expect(translateCanvasItems(
-      [rect, attachedStamp, attachedComment],
+      [rect, stamp, attachedComment],
       ['rect-1'],
       10,
       -5,
@@ -302,9 +301,7 @@ describe('CanvasItemTransformOperations attached items', () => {
         y: 15,
       },
       {
-        ...attachedStamp,
-        x: 118,
-        y: -7,
+        ...stamp,
       },
       {
         ...attachedComment,
@@ -321,7 +318,7 @@ describe('CanvasItemTransformOperations attached items', () => {
           ...rect,
           locked: true,
         },
-        attachedStamp,
+        stamp,
         attachedComment,
       ],
       ['rect-1'],
@@ -332,7 +329,7 @@ describe('CanvasItemTransformOperations attached items', () => {
         ...rect,
         locked: true,
       },
-      attachedStamp,
+      stamp,
       attachedComment,
     ])
   })

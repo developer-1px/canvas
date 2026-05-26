@@ -8,7 +8,6 @@ import type {
 export const CANVAS_STAMP_ITEM_SIZE = 44
 
 export type CreateCanvasStampItemInput = {
-  attachedTo?: string
   id: string
   label: string
   stamp: CanvasStampKind
@@ -17,7 +16,6 @@ export type CreateCanvasStampItemInput = {
 }
 
 export function createCanvasStampItem({
-  attachedTo,
   id,
   label,
   stamp,
@@ -35,24 +33,11 @@ export function createCanvasStampItem({
     y,
   }
 
-  if (attachedTo !== undefined) {
-    item.attachedTo = attachedTo
-  }
-
   return item
 }
 
 export function isCanvasStampItem(item: CanvasItem): item is CanvasStampItem {
   return item.type === 'stamp'
-}
-
-export function isCanvasStampAttachedTo(
-  item: CanvasItem,
-  attachedIds: ReadonlySet<string>,
-): item is CanvasStampItem {
-  return isCanvasStampItem(item) &&
-    item.attachedTo !== undefined &&
-    attachedIds.has(item.attachedTo)
 }
 
 export function translateCanvasStampItem<TItem extends CanvasStampItem>({
@@ -80,7 +65,7 @@ export function isCanvasStampItemStorageShape(
     typeof value.label === 'string' &&
     value.label.trim().length > 0 &&
     value.label.length <= 16 &&
-    (value.attachedTo === undefined || typeof value.attachedTo === 'string') &&
+    value.attachedTo === undefined &&
     isPositiveFiniteNumber(value.w) &&
     isPositiveFiniteNumber(value.h)
   )

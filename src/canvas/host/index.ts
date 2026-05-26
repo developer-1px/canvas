@@ -164,7 +164,6 @@ export {
 export {
   CANVAS_STAMP_ITEM_SIZE,
   createCanvasStampItem,
-  isCanvasStampAttachedTo,
   isCanvasStampItem,
   isCanvasStampItemStorageShape,
   translateCanvasStampItem,
