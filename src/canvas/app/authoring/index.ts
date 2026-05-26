@@ -21,11 +21,11 @@ export {
   type CanvasAppCustomItemModule,
   type CanvasAppCustomItemModuleCreationItem,
   type CanvasAppCustomItemModuleCreationTool,
-} from '../modules/CanvasAppCustomItemModules'
+} from '../extensions/custom-item-modules/CanvasAppCustomItemModules'
 export type {
   CanvasAppCustomItemValidator,
   CanvasAppCustomItemValidators,
-} from '../modules/CanvasAppCustomItemValidatorContracts'
+} from '../extensions/custom-item-modules/CanvasAppCustomItemValidatorContracts'
 export type {
   CanvasAppEventInput,
   CanvasAppPointerInput,
@@ -34,11 +34,11 @@ export type {
   CanvasAppInspectorPanel,
   CanvasAppInspectorPanelContext,
   CanvasAppInspectorPanelView,
-} from '../inspector/CanvasAppInspectorPanels'
+} from '../editing/inspector/CanvasAppInspectorPanels'
 export type {
   CanvasAppCustomCreationToolContext,
   CanvasAppCustomToolShortcut,
-} from '../tools/CanvasAppCustomCreationTools'
+} from '../extensions/custom-tools/CanvasAppCustomCreationTools'
 export type {
   CanvasAppCommitItemsChange,
   CanvasAppCommitSelection,

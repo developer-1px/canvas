@@ -18,7 +18,7 @@ import type {
   CommitCanvasItemsChange,
   CommitCanvasSelection,
 } from '../workflow/CanvasWorkflowContract'
-import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
+import type { CanvasAppStageElement } from '../rendering/stage/CanvasAppStageElement'
 import type { CanvasStandardCommand } from './CanvasStandardCommandContracts'
 import { executeCanvasStandardCommand } from './CanvasStandardCommandExecution'
 import { getCanvasStandardCommandHandlers } from './CanvasStandardCommandHandlers'

@@ -6,7 +6,7 @@ import {
   type CanvasSceneAdapter,
   type CanvasCreationAdapter,
 } from '../../../engine'
-import type { CanvasAppCustomCreationTool } from '../../tools/CanvasAppCustomCreationTools'
+import type { CanvasAppCustomCreationTool } from '../../extensions/custom-tools/CanvasAppCustomCreationTools'
 import type { CanvasAppComponentLibrary } from '../../workflow/CanvasAppComponentAssemblyContracts'
 import type { CommitCanvasItemsChange } from '../../workflow/CanvasWorkflowContract'
 import type {

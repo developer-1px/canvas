@@ -1,4 +1,4 @@
-import type { CanvasAppStageElementController } from '../stage/CanvasAppStageElement'
+import type { CanvasAppStageElementController } from '../rendering/stage/CanvasAppStageElement'
 
 export type CanvasAppStageElementConsumerModelInput = {
   stageElement: CanvasAppStageElementController

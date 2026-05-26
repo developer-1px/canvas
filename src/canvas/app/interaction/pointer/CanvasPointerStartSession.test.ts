@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import type { CanvasAppStageElement } from '../../stage/CanvasAppStageElement'
+import type { CanvasAppStageElement } from '../../rendering/stage/CanvasAppStageElement'
 import { getCanvasPointerStartProjection } from './CanvasPointerStartSession'
 
 describe('CanvasPointerStartSession', () => {

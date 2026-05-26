@@ -7,16 +7,16 @@ import {
 describe('Canvas App custom item module boundaries', () => {
   it('keeps App custom item module runtime behind a named module', () => {
     const moduleFile = getSourceFile(
-      'src/canvas/app/modules/CanvasAppCustomItemModules.ts',
+      'src/canvas/app/extensions/custom-item-modules/CanvasAppCustomItemModules.ts',
     )
     const assemblyFile = getSourceFile(
-      'src/canvas/app/modules/CanvasAppCustomItemModuleAssembly.ts',
+      'src/canvas/app/extensions/custom-item-modules/CanvasAppCustomItemModuleAssembly.ts',
     )
     const contractsFile = getSourceFile(
-      'src/canvas/app/modules/CanvasAppCustomItemModuleContracts.ts',
+      'src/canvas/app/extensions/custom-item-modules/CanvasAppCustomItemModuleContracts.ts',
     )
     const runtimeFile = getSourceFile(
-      'src/canvas/app/modules/CanvasAppCustomItemModuleRuntime.ts',
+      'src/canvas/app/extensions/custom-item-modules/CanvasAppCustomItemModuleRuntime.ts',
     )
 
     expect(moduleFile.source).not.toContain(
@@ -46,10 +46,10 @@ describe('Canvas App custom item module boundaries', () => {
 
   it('keeps App custom item module contracts behind a named module', () => {
     const moduleFile = getSourceFile(
-      'src/canvas/app/modules/CanvasAppCustomItemModules.ts',
+      'src/canvas/app/extensions/custom-item-modules/CanvasAppCustomItemModules.ts',
     )
     const contractsFile = getSourceFile(
-      'src/canvas/app/modules/CanvasAppCustomItemModuleContracts.ts',
+      'src/canvas/app/extensions/custom-item-modules/CanvasAppCustomItemModuleContracts.ts',
     )
 
     expect(moduleFile.source).toContain(
@@ -83,13 +83,13 @@ describe('Canvas App custom item module boundaries', () => {
 
   it('keeps App custom item module snapshot behavior behind a named module', () => {
     const moduleFile = getSourceFile(
-      'src/canvas/app/modules/CanvasAppCustomItemModules.ts',
+      'src/canvas/app/extensions/custom-item-modules/CanvasAppCustomItemModules.ts',
     )
     const assemblyFile = getSourceFile(
-      'src/canvas/app/modules/CanvasAppCustomItemModuleAssembly.ts',
+      'src/canvas/app/extensions/custom-item-modules/CanvasAppCustomItemModuleAssembly.ts',
     )
     const snapshotFile = getSourceFile(
-      'src/canvas/app/modules/CanvasAppCustomItemModuleSnapshot.ts',
+      'src/canvas/app/extensions/custom-item-modules/CanvasAppCustomItemModuleSnapshot.ts',
     )
     const descriptorSnapshotFile = getSourceFile(
       'src/canvas/app/extensions/CanvasAppDescriptorSnapshot.ts',
@@ -119,10 +119,10 @@ describe('Canvas App custom item module boundaries', () => {
       'export function snapshotCanvasAppCustomItemModule(',
     )
     expect(snapshotFile.source).toContain(
-      "from '../extensions/CanvasAppDescriptorSnapshot'",
+      "from '../CanvasAppDescriptorSnapshot'",
     )
     expect(snapshotFile.source).toContain(
-      "from '../extensions/CanvasAppExtensionBundle'",
+      "from '../CanvasAppExtensionBundle'",
     )
     expect(snapshotFile.source).toContain('snapshotCanvasAppExtensionBundle')
     expect(snapshotFile.source).not.toContain(
@@ -153,11 +153,11 @@ describe('Canvas App custom item module boundaries', () => {
       'src/canvas/app/workflow/CanvasAppAssemblyContracts.ts',
     )
     const validatorContractsFile = getSourceFile(
-      'src/canvas/app/modules/CanvasAppCustomItemValidatorContracts.ts',
+      'src/canvas/app/extensions/custom-item-modules/CanvasAppCustomItemValidatorContracts.ts',
     )
 
     expect(assemblyContractsFile.source).toContain(
-      "from '../modules/CanvasAppCustomItemValidatorContracts'",
+      "from '../extensions/custom-item-modules/CanvasAppCustomItemValidatorContracts'",
     )
     expect(assemblyContractsFile.source).not.toContain(
       'custom item validator ${kind}',
@@ -172,7 +172,7 @@ describe('Canvas App custom item module boundaries', () => {
     expect(validatorContractsFile.source).toContain(
       'export function assertCanvasAppCustomItemValidators',
     )
-    expect(validatorContractsFile.source).toContain("from '../../entities'")
+    expect(validatorContractsFile.source).toContain("from '../../../entities'")
     expect(validatorContractsFile.source).not.toContain("from '../../host'")
     expect(validatorContractsFile.source).toContain(
       'custom item validator ${kind}',

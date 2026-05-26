@@ -11,13 +11,13 @@ import {
 import { createCanvasAppExtensionBundle } from '../extensions/CanvasAppExtensionBundle'
 import {
   CANVAS_CHECKLIST_INSPECTOR_PANEL,
-} from '../checklist/CanvasChecklistInspectorPanel'
+} from '../editing/component-panels/checklist/CanvasChecklistInspectorPanel'
 import {
   CANVAS_ARROW_ROUTING_INSPECTOR_PANEL,
-} from '../drawing/CanvasArrowRoutingInspectorPanel'
+} from '../editing/arrow-routing/CanvasArrowRoutingInspectorPanel'
 import {
   CANVAS_KANBAN_INSPECTOR_PANEL,
-} from '../kanban/CanvasKanbanInspectorPanel'
+} from '../editing/component-panels/kanban/CanvasKanbanInspectorPanel'
 import {
   CANVAS_LINK_PREVIEW_INSPECTOR_PANEL,
 } from '../io/link-preview/CanvasLinkPreviewInspectorPanel'

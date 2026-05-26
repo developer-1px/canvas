@@ -8,7 +8,7 @@ import {
 import type {
   CanvasAppInspectorPanel,
   CanvasAppInspectorPanelContext,
-} from '../../inspector/CanvasAppInspectorPanels'
+} from '../../editing/inspector/CanvasAppInspectorPanels'
 
 export const CANVAS_LINK_PREVIEW_INSPECTOR_PANEL: CanvasAppInspectorPanel = {
   id: 'link-preview-actions',

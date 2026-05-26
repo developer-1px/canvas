@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import type { CanvasItem } from '../../../entities'
-import type { CanvasAppStageElement } from '../../stage/CanvasAppStageElement'
+import type { CanvasAppStageElement } from '../../rendering/stage/CanvasAppStageElement'
 import {
   getCanvasPointerDragProjection,
   getCanvasPointerDragSession,

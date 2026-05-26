@@ -10,7 +10,7 @@ import type {
   CanvasItem,
   Viewport,
 } from '../../entities'
-import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
+import type { CanvasAppStageElement } from '../rendering/stage/CanvasAppStageElement'
 import type { CanvasDocumentClipboard } from '../workflow/CanvasWorkflowContract'
 import type { CanvasClipboardCommand } from './CanvasClipboardCommandContracts'
 import type {

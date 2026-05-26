@@ -11,8 +11,8 @@ import {
   type CanvasPointerGesture,
   type CanvasSnapGuides,
 } from '../../../engine'
-import { getCanvasAppCustomCreationTool } from '../../tools/CanvasAppCustomCreationToolRuntime'
-import type { CanvasAppCustomCreationTool } from '../../tools/CanvasAppCustomCreationTools'
+import { getCanvasAppCustomCreationTool } from '../../extensions/custom-tools/CanvasAppCustomCreationToolRuntime'
+import type { CanvasAppCustomCreationTool } from '../../extensions/custom-tools/CanvasAppCustomCreationTools'
 import type { CommitCanvasItemsChange } from '../../workflow/CanvasWorkflowContract'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import type { Interaction } from './CanvasInteractionState'

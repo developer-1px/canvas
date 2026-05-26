@@ -10,7 +10,7 @@ import {
 } from '../workspace/document/CanvasWorkspacePersistence'
 import type {
   CanvasAppCustomItemValidators,
-} from '../modules/CanvasAppCustomItemValidatorContracts'
+} from '../extensions/custom-item-modules/CanvasAppCustomItemValidatorContracts'
 import { useCanvasDocument } from '../workspace/document/useCanvasDocument'
 import { getCanvasWorkspaceConsumerModel } from './CanvasWorkspaceConsumerModel'
 import {

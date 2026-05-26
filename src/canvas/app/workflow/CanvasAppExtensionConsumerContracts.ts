@@ -12,7 +12,7 @@ import type {
   CanvasAppCustomCommandState,
   CanvasAppCustomCreationToolState,
 } from '../extensions/CanvasAppExtensionStateContracts'
-import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
+import type { CanvasAppCustomCreationTool } from '../extensions/custom-tools/CanvasAppCustomCreationTools'
 import type {
   CommitCanvasItemsChange,
   CommitCanvasSelection,

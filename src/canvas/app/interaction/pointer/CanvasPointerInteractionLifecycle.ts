@@ -11,7 +11,7 @@ import type {
   CommitCanvasItemsChange,
   CommitCanvasSelection,
 } from '../../workflow/CanvasWorkflowContract'
-import type { CanvasAppCustomCreationTool } from '../../tools/CanvasAppCustomCreationTools'
+import type { CanvasAppCustomCreationTool } from '../../extensions/custom-tools/CanvasAppCustomCreationTools'
 import type { CanvasAppComponentLibrary } from '../../workflow/CanvasAppComponentAssemblyContracts'
 import type { Interaction } from './CanvasInteractionState'
 import { commitCanvasPointerCreation } from './CanvasPointerCreationCommit'

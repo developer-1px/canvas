@@ -8,7 +8,7 @@ import {
   type CanvasCreationAdapter,
   type CanvasPointerGesture,
 } from '../../../engine'
-import type { CanvasAppCustomCreationTool } from '../../tools/CanvasAppCustomCreationTools'
+import type { CanvasAppCustomCreationTool } from '../../extensions/custom-tools/CanvasAppCustomCreationTools'
 import type { CanvasDrawingStrokeStyleSet } from '../../../host'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import {

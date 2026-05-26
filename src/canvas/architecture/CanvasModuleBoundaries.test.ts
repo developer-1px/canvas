@@ -56,7 +56,7 @@ describe('Canvas module layer boundaries', () => {
   })
 
 
-  it('keeps ui controls independent from app workflow and the demo host', () => {
+  it('keeps shared ui primitives independent from app workflow and the demo host', () => {
     const violations = getImportsFrom('src/canvas/ui/')
       .filter((reference) =>
         reference.target === 'src/canvas/host' ||
@@ -68,12 +68,22 @@ describe('Canvas module layer boundaries', () => {
   })
 
 
-  it('keeps the app shell behind the workflow public entry', () => {
+  it('keeps the app shell imports limited to workflow and feature views', () => {
+    const viewPrefixes = [
+      'src/canvas/app/authoring/component/',
+      'src/canvas/app/authoring/stamp/',
+      'src/canvas/app/controls/',
+      'src/canvas/app/editing/inspector/',
+      'src/canvas/app/editing/search/',
+      'src/canvas/app/editing/text-editor/',
+      'src/canvas/app/io/image/',
+    ]
     const violations = getImportsFrom('src/canvas/app/shell/')
       .filter((reference) =>
         reference.target.startsWith('src/canvas/app/') &&
         !reference.target.startsWith('src/canvas/app/shell') &&
-        reference.target !== 'src/canvas/app/workflow',
+        reference.target !== 'src/canvas/app/workflow' &&
+        !viewPrefixes.some((prefix) => reference.target.startsWith(prefix)),
       )
 
     expect(violations).toEqual([])

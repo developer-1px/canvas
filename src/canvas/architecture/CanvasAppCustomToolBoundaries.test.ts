@@ -7,13 +7,13 @@ import {
 describe('Canvas App custom tool boundaries', () => {
   it('keeps App custom creation tool runtime behind a named module', () => {
     const descriptorFile = getSourceFile(
-      'src/canvas/app/tools/CanvasAppCustomCreationTools.ts',
+      'src/canvas/app/extensions/custom-tools/CanvasAppCustomCreationTools.ts',
     )
     const contractsFile = getSourceFile(
-      'src/canvas/app/tools/CanvasAppCustomCreationToolContracts.ts',
+      'src/canvas/app/extensions/custom-tools/CanvasAppCustomCreationToolContracts.ts',
     )
     const runtimeFile = getSourceFile(
-      'src/canvas/app/tools/CanvasAppCustomCreationToolRuntime.ts',
+      'src/canvas/app/extensions/custom-tools/CanvasAppCustomCreationToolRuntime.ts',
     )
     const extensionStateContractsFile = getSourceFile(
       'src/canvas/app/extensions/CanvasAppExtensionStateContracts.ts',
@@ -44,7 +44,7 @@ describe('Canvas App custom tool boundaries', () => {
       "from './CanvasAppCustomCreationToolRuntime'",
     )
     expect(contractsFile.source).toContain(
-      "from '../interaction/keyboard/CanvasKeyboardShortcutChords'",
+      "from '../../interaction/keyboard/CanvasKeyboardShortcutChords'",
     )
     expect(descriptorFile.source).not.toContain(
       'export function getCanvasAppCustomCreationToolStates',
@@ -62,7 +62,7 @@ describe('Canvas App custom tool boundaries', () => {
       'export type CanvasAppCustomCreationToolState',
     )
     expect(runtimeFile.source).toContain(
-      "from '../extensions/CanvasAppExtensionStateContracts'",
+      "from '../CanvasAppExtensionStateContracts'",
     )
     expect(extensionStateContractsFile.source).toContain(
       'export type CanvasAppCustomCreationToolState',
@@ -116,10 +116,10 @@ describe('Canvas App custom tool boundaries', () => {
 
   it('keeps App custom creation tool contracts behind a named module', () => {
     const descriptorFile = getSourceFile(
-      'src/canvas/app/tools/CanvasAppCustomCreationTools.ts',
+      'src/canvas/app/extensions/custom-tools/CanvasAppCustomCreationTools.ts',
     )
     const contractsFile = getSourceFile(
-      'src/canvas/app/tools/CanvasAppCustomCreationToolContracts.ts',
+      'src/canvas/app/extensions/custom-tools/CanvasAppCustomCreationToolContracts.ts',
     )
 
     expect(descriptorFile.source).not.toContain(

@@ -5,7 +5,7 @@ import {
   type CanvasWheelInput,
 } from '../../../engine'
 import type { Viewport } from '../../../entities'
-import type { CanvasAppStageRect } from '../../stage/CanvasAppStageElement'
+import type { CanvasAppStageRect } from '../../rendering/stage/CanvasAppStageElement'
 
 export type CanvasWheelViewportSetter = (
   next: Viewport | ((current: Viewport) => Viewport),

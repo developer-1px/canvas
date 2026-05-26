@@ -20,7 +20,7 @@ import {
   getCanvasImageInsertCenter,
   insertCanvasImageSource,
 } from '../io/image/CanvasImageInsertion'
-import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
+import type { CanvasAppStageElement } from '../rendering/stage/CanvasAppStageElement'
 import type {
   CanvasDocumentClipboard,
   CommitCanvasItemsChange,

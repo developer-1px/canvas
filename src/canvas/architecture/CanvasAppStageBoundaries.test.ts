@@ -12,7 +12,7 @@ describe('Canvas App stage boundaries', () => {
     const violations = sourceFiles
       .filter((file) =>
         file.path.startsWith('src/canvas/app/') &&
-        !file.path.startsWith('src/canvas/app/stage/') &&
+        !file.path.startsWith('src/canvas/app/rendering/stage/') &&
         !file.path.endsWith('.test.ts') &&
         !file.path.endsWith('.test.tsx'),
       )
@@ -42,11 +42,11 @@ describe('Canvas App stage boundaries', () => {
       "from './useCanvasAppStageElementModel'",
     )
     expect(appModelFile.source).not.toContain(
-      "from '../stage/CanvasAppStageElement'",
+      "from '../rendering/stage/CanvasAppStageElement'",
     )
     expect(appModelFile.source).not.toContain('stageElement.mount')
     expect(stageElementModelFile.source).toContain(
-      "from '../stage/CanvasAppStageElement'",
+      "from '../rendering/stage/CanvasAppStageElement'",
     )
     expect(stageElementModelFile.source).toContain(
       "from './CanvasAppStageElementConsumerModel'",

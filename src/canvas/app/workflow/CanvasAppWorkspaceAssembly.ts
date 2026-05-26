@@ -5,7 +5,7 @@ import {
 import type { CanvasWorkspaceStorageProvider } from '../workspace/document/CanvasWorkspacePersistence'
 import type {
   CanvasAppCustomItemValidators,
-} from '../modules/CanvasAppCustomItemValidatorContracts'
+} from '../extensions/custom-item-modules/CanvasAppCustomItemValidatorContracts'
 import type { CanvasAppWorkspaceAssemblyInput } from './CanvasAppAssemblyInputTypes'
 
 export type { CanvasAppWorkspaceAssemblyInput } from './CanvasAppAssemblyInputTypes'

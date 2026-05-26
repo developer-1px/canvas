@@ -13,21 +13,21 @@ describe('Canvas App component workflow boundaries', () => {
       'src/canvas/app/workflow/useCanvasAppComponentModel.ts',
     )
     const componentHookFile = getSourceFile(
-      'src/canvas/app/components/useCanvasComponentInsertion.ts',
+      'src/canvas/app/authoring/component/useCanvasComponentInsertion.ts',
     )
     const componentExecutionFile = getSourceFile(
-      'src/canvas/app/components/CanvasComponentInsertionExecution.ts',
+      'src/canvas/app/authoring/component/CanvasComponentInsertionExecution.ts',
     )
 
     expect(appModelFile.source).toContain(
       "from './useCanvasAppComponentModel'",
     )
     expect(appModelFile.source).not.toContain(
-      "from '../components/useCanvasComponentInsertion'",
+      "from '../authoring/component/useCanvasComponentInsertion'",
     )
     expect(appModelFile.source).not.toContain('useCanvasComponentInsertion')
     expect(componentModelFile.source).toContain(
-      "from '../components/useCanvasComponentInsertion'",
+      "from '../authoring/component/useCanvasComponentInsertion'",
     )
     expect(componentModelFile.source).toContain(
       "from './CanvasAppComponentConsumerContracts'",
@@ -94,7 +94,7 @@ describe('Canvas App component workflow boundaries', () => {
       'src/canvas/app/rendering/CanvasDemoSvgStructuredComponentRenderer.tsx',
     )
     const checklistInspectorPanelFile = getSourceFile(
-      'src/canvas/app/checklist/CanvasChecklistInspectorPanel.tsx',
+      'src/canvas/app/editing/component-panels/checklist/CanvasChecklistInspectorPanel.tsx',
     )
     const defaultAssemblyFile = getSourceFile(
       'src/canvas/app/workflow/CanvasAppDefaultAssembly.ts',
@@ -122,7 +122,7 @@ describe('Canvas App component workflow boundaries', () => {
       'replaceCanvasChecklistComponentsWithoutItem',
     )
     expect(defaultAssemblyFile.source).toContain(
-      "from '../checklist/CanvasChecklistInspectorPanel'",
+      "from '../editing/component-panels/checklist/CanvasChecklistInspectorPanel'",
     )
     expect(defaultAssemblyFile.source).toContain(
       'CANVAS_CHECKLIST_INSPECTOR_PANEL',
@@ -142,7 +142,7 @@ describe('Canvas App component workflow boundaries', () => {
       'src/canvas/app/rendering/CanvasDemoSvgStructuredComponentRenderer.tsx',
     )
     const kanbanInspectorPanelFile = getSourceFile(
-      'src/canvas/app/kanban/CanvasKanbanInspectorPanel.tsx',
+      'src/canvas/app/editing/component-panels/kanban/CanvasKanbanInspectorPanel.tsx',
     )
     const defaultAssemblyFile = getSourceFile(
       'src/canvas/app/workflow/CanvasAppDefaultAssembly.ts',
@@ -167,7 +167,7 @@ describe('Canvas App component workflow boundaries', () => {
       'replaceCanvasKanbanComponentsWithMovedCard',
     )
     expect(defaultAssemblyFile.source).toContain(
-      "from '../kanban/CanvasKanbanInspectorPanel'",
+      "from '../editing/component-panels/kanban/CanvasKanbanInspectorPanel'",
     )
     expect(defaultAssemblyFile.source).toContain(
       'CANVAS_KANBAN_INSPECTOR_PANEL',

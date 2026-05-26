@@ -1,9 +1,9 @@
 import type { CanvasAppCustomCommand } from '../commands/CanvasAppCustomCommands'
-import type { CanvasAppInspectorPanel } from '../inspector/CanvasAppInspectorPanels'
+import type { CanvasAppInspectorPanel } from '../editing/inspector/CanvasAppInspectorPanels'
 import type {
   CanvasAppCustomItemModuleAssemblyOptions,
-} from '../modules/CanvasAppCustomItemModuleAssembly'
-import type { CanvasAppCustomItemModule } from '../modules/CanvasAppCustomItemModules'
+} from '../extensions/custom-item-modules/CanvasAppCustomItemModuleAssembly'
+import type { CanvasAppCustomItemModule } from '../extensions/custom-item-modules/CanvasAppCustomItemModules'
 
 export type CanvasAppExtensionAssemblyInput = {
   customCommands?: readonly CanvasAppCustomCommand[]

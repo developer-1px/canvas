@@ -11,7 +11,7 @@ import {
 } from '../extensions/CanvasAppDescriptorContracts'
 import type {
   CanvasAppCustomItemValidators,
-} from '../modules/CanvasAppCustomItemValidatorContracts'
+} from '../extensions/custom-item-modules/CanvasAppCustomItemValidatorContracts'
 
 export type CanvasAppWorkspaceAssemblyContract = {
   customItemValidators: CanvasAppCustomItemValidators

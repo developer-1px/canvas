@@ -35,9 +35,9 @@ import type { CanvasAppComponentLibrary } from '../../workflow/CanvasAppComponen
 import type { CanvasAppItemReadModel } from '../../workflow/CanvasAppItemReadModelContracts'
 import type { Interaction } from './CanvasInteractionState'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
-import type { CanvasAppCustomCreationTool } from '../../tools/CanvasAppCustomCreationTools'
+import type { CanvasAppCustomCreationTool } from '../../extensions/custom-tools/CanvasAppCustomCreationTools'
 import type { CanvasDrawingStrokeStyleSet } from '../../../host'
-import type { CanvasAppStageElement } from '../../stage/CanvasAppStageElement'
+import type { CanvasAppStageElement } from '../../rendering/stage/CanvasAppStageElement'
 import { startCanvasPointerInteraction } from './CanvasPointerInteractionStart'
 import {
   startCanvasItemPointerInteraction,

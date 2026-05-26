@@ -17,7 +17,7 @@ import type {
   CanvasDraftStrokeOverlay,
   CanvasSnapGuides,
 } from '../../../engine'
-import type { CanvasAppStageElement } from '../../stage/CanvasAppStageElement'
+import type { CanvasAppStageElement } from '../../rendering/stage/CanvasAppStageElement'
 import type {
   CommitCanvasItemsChange,
   CommitCanvasSelection,

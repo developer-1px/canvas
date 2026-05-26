@@ -15,15 +15,15 @@ import type {
 import type { CanvasWorkspaceStorageProvider } from '../workspace/document/CanvasWorkspacePersistence'
 import type {
   CanvasAppCustomItemValidators,
-} from '../modules/CanvasAppCustomItemValidatorContracts'
+} from '../extensions/custom-item-modules/CanvasAppCustomItemValidatorContracts'
 import type {
   CanvasAppComponentPresentationRenderers,
   CanvasAppCustomItemRenderers,
   CanvasAppItemLayerAdapter,
   CanvasAppStageAdapter,
 } from '../rendering/CanvasAppRenderingContracts'
-import type { CanvasAppInspectorPanel } from '../inspector/CanvasAppInspectorPanels'
-import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
+import type { CanvasAppInspectorPanel } from '../editing/inspector/CanvasAppInspectorPanels'
+import type { CanvasAppCustomCreationTool } from '../extensions/custom-tools/CanvasAppCustomCreationTools'
 
 export type CanvasAppAssemblyAffordanceModel = {
   config: CanvasAffordanceConfig

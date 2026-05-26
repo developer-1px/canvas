@@ -17,7 +17,7 @@ import type {
 } from '../../entities'
 import type { CanvasAppComponentLibrary } from './CanvasAppComponentAssemblyContracts'
 import type { CanvasAppItemReadModel } from './CanvasAppItemReadModelContracts'
-import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
+import type { CanvasAppStageElement } from '../rendering/stage/CanvasAppStageElement'
 import type { CommitCanvasItemsChange } from './CanvasWorkflowContract'
 
 export type CanvasAppComponentCommandModel = {

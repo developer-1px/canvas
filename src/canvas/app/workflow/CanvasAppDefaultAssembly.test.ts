@@ -14,13 +14,13 @@ import { DEFAULT_CANVAS_APP_STAGE_ADAPTER } from '../rendering/CanvasAppStageAda
 import { DEFAULT_CANVAS_WORKSPACE_STORAGE_PROVIDER } from '../workspace/document/CanvasWorkspacePersistence'
 import {
   CANVAS_ARROW_ROUTING_INSPECTOR_PANEL,
-} from '../drawing/CanvasArrowRoutingInspectorPanel'
+} from '../editing/arrow-routing/CanvasArrowRoutingInspectorPanel'
 import {
   CANVAS_CHECKLIST_INSPECTOR_PANEL,
-} from '../checklist/CanvasChecklistInspectorPanel'
+} from '../editing/component-panels/checklist/CanvasChecklistInspectorPanel'
 import {
   CANVAS_KANBAN_INSPECTOR_PANEL,
-} from '../kanban/CanvasKanbanInspectorPanel'
+} from '../editing/component-panels/kanban/CanvasKanbanInspectorPanel'
 import {
   CANVAS_LINK_PREVIEW_INSPECTOR_PANEL,
 } from '../io/link-preview/CanvasLinkPreviewInspectorPanel'

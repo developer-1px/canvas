@@ -19,10 +19,10 @@ describe('Canvas App text interaction workflow boundaries', () => {
       'src/canvas/app/workflow/useCanvasTextEditorModel.ts',
     )
     const textEditingHookFile = getSourceFile(
-      'src/canvas/app/text/useCanvasTextEditing.ts',
+      'src/canvas/app/editing/text-editor/useCanvasTextEditing.ts',
     )
     const textEditingModelFile = getSourceFile(
-      'src/canvas/app/text/CanvasTextEditingModel.ts',
+      'src/canvas/app/editing/text-editor/CanvasTextEditingModel.ts',
     )
     const findReplaceHookFile = getSourceFile(
       'src/canvas/app/workflow/useCanvasFindReplaceModel.ts',
@@ -117,7 +117,7 @@ describe('Canvas App text interaction workflow boundaries', () => {
     expect(textEditingHookFile.source).not.toContain("type: 'set-text'")
     expect(textEditingHookFile.source).not.toContain('fontSize: 16')
     expect(textEditorModelFile.source).toContain(
-      "from '../text/CanvasTextEditingModel'",
+      "from '../editing/text-editor/CanvasTextEditingModel'",
     )
     expect(textEditorModelFile.source).toContain('CanvasTextEditorStyle')
     expect(textEditorModelFile.source).not.toContain('ReturnType<')

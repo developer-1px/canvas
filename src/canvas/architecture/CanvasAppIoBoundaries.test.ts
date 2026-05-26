@@ -14,7 +14,7 @@ describe('Canvas App IO boundaries', () => {
       'src/canvas/app/workflow/useCanvasAppImageModel.ts',
     )
     const imageControlsFile = getSourceFile(
-      'src/canvas/ui/image/CanvasImageControls.tsx',
+      'src/canvas/app/io/image/CanvasImageControls.tsx',
     )
     const imageInsertionFile = getSourceFile(
       'src/canvas/app/io/image/CanvasImageInsertion.ts',
@@ -29,7 +29,7 @@ describe('Canvas App IO boundaries', () => {
       'src/canvas/app/io/image/CanvasImageExport.ts',
     )
     const stageElementFile = getSourceFile(
-      'src/canvas/app/stage/CanvasAppStageElement.ts',
+      'src/canvas/app/rendering/stage/CanvasAppStageElement.ts',
     )
     const browserImageHow =
       /\b(FileReader|ClipboardItem|XMLSerializer|toBlob|readAsDataURL|createObjectURL|navigator\.clipboard)\b/

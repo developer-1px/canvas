@@ -24,13 +24,13 @@ export {
   createCanvasAppCustomItemModuleAssembly,
   type CanvasAppCustomItemModuleAssembly,
   type CanvasAppCustomItemModuleAssemblyOptions,
-} from '../modules/CanvasAppCustomItemModuleAssembly'
+} from '../extensions/custom-item-modules/CanvasAppCustomItemModuleAssembly'
 export {
   defineCanvasAppCustomItemModule,
   type CanvasAppCustomItemModule,
   type CanvasAppCustomItemModuleCreationItem,
   type CanvasAppCustomItemModuleCreationTool,
-} from '../modules/CanvasAppCustomItemModules'
+} from '../extensions/custom-item-modules/CanvasAppCustomItemModules'
 export type {
   CanvasAppEventInput,
   CanvasAppPointerInput,
@@ -39,12 +39,12 @@ export type {
   CanvasAppInspectorPanel,
   CanvasAppInspectorPanelContext,
   CanvasAppInspectorPanelView,
-} from '../inspector/CanvasAppInspectorPanels'
+} from '../editing/inspector/CanvasAppInspectorPanels'
 export type {
   CanvasAppCustomCreationTool,
   CanvasAppCustomCreationToolContext,
   CanvasAppCustomToolShortcut,
-} from '../tools/CanvasAppCustomCreationTools'
+} from '../extensions/custom-tools/CanvasAppCustomCreationTools'
 export type {
   CanvasWorkspaceStorage,
   CanvasWorkspaceStorageProvider,

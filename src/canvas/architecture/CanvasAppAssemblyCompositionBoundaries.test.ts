@@ -101,13 +101,13 @@ describe('Canvas App Assembly composition boundaries', () => {
       'src/canvas/app/workflow/CanvasAppExtensionAssembly.ts',
     )
     const customItemModuleFile = getSourceFile(
-      'src/canvas/app/modules/CanvasAppCustomItemModules.ts',
+      'src/canvas/app/extensions/custom-item-modules/CanvasAppCustomItemModules.ts',
     )
     const customItemModuleAssemblyFile = getSourceFile(
-      'src/canvas/app/modules/CanvasAppCustomItemModuleAssembly.ts',
+      'src/canvas/app/extensions/custom-item-modules/CanvasAppCustomItemModuleAssembly.ts',
     )
     const customItemModuleRuntimeFile = getSourceFile(
-      'src/canvas/app/modules/CanvasAppCustomItemModuleRuntime.ts',
+      'src/canvas/app/extensions/custom-item-modules/CanvasAppCustomItemModuleRuntime.ts',
     )
     const extensionBundleFile = getSourceFile(
       'src/canvas/app/extensions/CanvasAppExtensionBundle.ts',
@@ -117,7 +117,7 @@ describe('Canvas App Assembly composition boundaries', () => {
       "from '../extensions/CanvasAppExtensionBundle'",
     )
     expect(customItemModuleAssemblyFile.source).toContain(
-      "from '../extensions/CanvasAppExtensionBundle'",
+      "from '../CanvasAppExtensionBundle'",
     )
     expect(customItemModuleFile.source).not.toContain(
       "from '../extensions/CanvasAppExtensionBundle'",

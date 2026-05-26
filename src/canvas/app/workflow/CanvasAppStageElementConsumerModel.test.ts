@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import {
   createCanvasAppStageElement,
   type CanvasAppStageElementController,
-} from '../stage/CanvasAppStageElement'
+} from '../rendering/stage/CanvasAppStageElement'
 import { getCanvasAppStageElementConsumerModel } from './CanvasAppStageElementConsumerModel'
 import type { CanvasAppStageElementConsumerModelInput } from './CanvasAppStageElementConsumerContracts'
 

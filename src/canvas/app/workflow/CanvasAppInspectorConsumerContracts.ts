@@ -1,6 +1,6 @@
 import type { CanvasAffordanceConfig } from '../../engine'
 import type { CanvasAppItemReadModel } from './CanvasAppItemReadModelContracts'
-import type { CanvasAppInspectorPanel } from '../inspector/CanvasAppInspectorPanels'
+import type { CanvasAppInspectorPanel } from '../editing/inspector/CanvasAppInspectorPanels'
 import type { CommitCanvasItemsChange } from './CanvasWorkflowContract'
 
 export type CanvasAppInspectorModelInput = {

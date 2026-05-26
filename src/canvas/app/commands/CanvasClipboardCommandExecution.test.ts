@@ -7,7 +7,7 @@ import type {
   CanvasItem,
   EditingText,
 } from '../../entities'
-import type { CanvasAppStageElement } from '../stage/CanvasAppStageElement'
+import type { CanvasAppStageElement } from '../rendering/stage/CanvasAppStageElement'
 import type {
   CanvasClipboardEditingUpdate,
 } from './CanvasClipboardCommandEffectContracts'

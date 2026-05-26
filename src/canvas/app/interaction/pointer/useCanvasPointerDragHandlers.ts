@@ -27,8 +27,8 @@ import type {
 } from '../../workflow/CanvasWorkflowContract'
 import type { Interaction } from './CanvasInteractionState'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
-import type { CanvasAppCustomCreationTool } from '../../tools/CanvasAppCustomCreationTools'
-import type { CanvasAppStageElement } from '../../stage/CanvasAppStageElement'
+import type { CanvasAppCustomCreationTool } from '../../extensions/custom-tools/CanvasAppCustomCreationTools'
+import type { CanvasAppStageElement } from '../../rendering/stage/CanvasAppStageElement'
 import type { CanvasAppComponentLibrary } from '../../workflow/CanvasAppComponentAssemblyContracts'
 import type { CanvasAppItemReadModel } from '../../workflow/CanvasAppItemReadModelContracts'
 import {

@@ -12,7 +12,7 @@ import {
 } from '../../../engine'
 import type { CanvasAppComponentLibrary } from '../../workflow/CanvasAppComponentAssemblyContracts'
 import type { CanvasAppItemReadModel } from '../../workflow/CanvasAppItemReadModelContracts'
-import type { CanvasAppCustomCreationTool } from '../../tools/CanvasAppCustomCreationTools'
+import type { CanvasAppCustomCreationTool } from '../../extensions/custom-tools/CanvasAppCustomCreationTools'
 import type { CanvasDrawingStrokeStyleSet } from '../../../host'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import { startCanvasPointerCreation } from './CanvasPointerCreationStart'

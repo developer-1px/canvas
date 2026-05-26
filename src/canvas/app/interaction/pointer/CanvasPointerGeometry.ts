@@ -2,7 +2,7 @@ import type {
   Point,
   Viewport
 } from '../../../core'
-import type { CanvasAppStageElement } from '../../stage/CanvasAppStageElement'
+import type { CanvasAppStageElement } from '../../rendering/stage/CanvasAppStageElement'
 
 export function screenPoint(
   stageElement: CanvasAppStageElement,

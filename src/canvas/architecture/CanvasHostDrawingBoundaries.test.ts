@@ -26,7 +26,7 @@ describe('Canvas host drawing boundaries', () => {
       'src/canvas/app/rendering/CanvasDemoSvgDrawingItemRenderer.tsx',
     )
     const arrowRoutingInspectorFile = getSourceFile(
-      'src/canvas/app/drawing/CanvasArrowRoutingInspectorPanel.tsx',
+      'src/canvas/app/editing/arrow-routing/CanvasArrowRoutingInspectorPanel.tsx',
     )
     const defaultAssemblyFile = getSourceFile(
       'src/canvas/app/workflow/CanvasAppDefaultAssembly.ts',
@@ -61,7 +61,7 @@ describe('Canvas host drawing boundaries', () => {
       'replaceCanvasArrowRoutings',
     )
     expect(defaultAssemblyFile.source).toContain(
-      "from '../drawing/CanvasArrowRoutingInspectorPanel'",
+      "from '../editing/arrow-routing/CanvasArrowRoutingInspectorPanel'",
     )
     expect(defaultAssemblyFile.source).toContain(
       'CANVAS_ARROW_ROUTING_INSPECTOR_PANEL',
@@ -165,7 +165,7 @@ describe('Canvas host drawing boundaries', () => {
       'src/canvas/host/operations/CanvasItemTransformOperations.ts',
     )
     const stampInsertionFile = getSourceFile(
-      'src/canvas/app/stamp/CanvasStampInsertion.ts',
+      'src/canvas/app/authoring/stamp/CanvasStampInsertion.ts',
     )
 
     expect(itemSchemaFile.source).toContain(

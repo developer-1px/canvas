@@ -1,7 +1,7 @@
 import type { CanvasCustomToolId } from '../../entities'
 import type {
   CanvasAppCustomToolShortcut,
-} from '../tools/CanvasAppCustomCreationTools'
+} from './custom-tools/CanvasAppCustomCreationTools'
 
 export type CanvasAppCustomCommandState = {
   ariaLabel: string

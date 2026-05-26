@@ -5,7 +5,7 @@ import {
 } from 'react'
 import type { CanvasAffordanceConfig } from '../../../engine'
 import type { Viewport } from '../../../entities'
-import type { CanvasAppStageElement } from '../../stage/CanvasAppStageElement'
+import type { CanvasAppStageElement } from '../../rendering/stage/CanvasAppStageElement'
 import { runCanvasWheelViewport } from './CanvasWheelViewportExecution'
 
 type UseCanvasWheelViewportArgs = {

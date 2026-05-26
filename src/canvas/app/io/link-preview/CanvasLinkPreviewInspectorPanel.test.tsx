@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 import {
   createCanvasLinkPreviewComponentItem,
 } from '../../../host'
-import type { CanvasAppInspectorPanelContext } from '../../inspector/CanvasAppInspectorPanels'
+import type { CanvasAppInspectorPanelContext } from '../../editing/inspector/CanvasAppInspectorPanels'
 import {
   CANVAS_LINK_PREVIEW_INSPECTOR_PANEL,
   changeCanvasLinkPreviewBackToText,

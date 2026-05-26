@@ -10,7 +10,7 @@ import {
   type CanvasWheelInput,
 } from '../../../engine'
 import type { Viewport } from '../../../entities'
-import type { CanvasAppStageRect } from '../../stage/CanvasAppStageElement'
+import type { CanvasAppStageRect } from '../../rendering/stage/CanvasAppStageElement'
 import {
   runCanvasWheelViewport,
   type CanvasWheelViewportEvent,

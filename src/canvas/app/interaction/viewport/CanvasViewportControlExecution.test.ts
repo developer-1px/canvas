@@ -12,7 +12,7 @@ import {
 import type {
   CanvasAppStageElement,
   CanvasAppStageRect,
-} from '../../stage/CanvasAppStageElement'
+} from '../../rendering/stage/CanvasAppStageElement'
 import type { CanvasAppItemReadModel } from '../../workflow/CanvasAppItemReadModelContracts'
 import {
   fitCanvasViewportToItems,

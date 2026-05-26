@@ -1,10 +1,10 @@
 import type { CanvasAppCustomCommand } from '../commands/CanvasAppCustomCommands'
-import type { CanvasAppInspectorPanel } from '../inspector/CanvasAppInspectorPanels'
+import type { CanvasAppInspectorPanel } from '../editing/inspector/CanvasAppInspectorPanels'
 import type {
   CanvasAppCustomItemValidators,
-} from '../modules/CanvasAppCustomItemValidatorContracts'
+} from './custom-item-modules/CanvasAppCustomItemValidatorContracts'
 import type { CanvasAppCustomItemRenderers } from '../rendering/CanvasAppRenderingContracts'
-import type { CanvasAppCustomCreationTool } from '../tools/CanvasAppCustomCreationTools'
+import type { CanvasAppCustomCreationTool } from './custom-tools/CanvasAppCustomCreationTools'
 import {
   snapshotCanvasAppDescriptorArray,
   snapshotCanvasAppRecord,

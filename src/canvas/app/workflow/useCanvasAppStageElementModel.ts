@@ -1,4 +1,4 @@
-import { useCanvasAppStageElement } from '../stage/CanvasAppStageElement'
+import { useCanvasAppStageElement } from '../rendering/stage/CanvasAppStageElement'
 import { getCanvasAppStageElementConsumerModel } from './CanvasAppStageElementConsumerModel'
 
 export function useCanvasAppStageElementModel() {

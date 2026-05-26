@@ -3,7 +3,7 @@ import type {
   Viewport,
 } from '../../../entities'
 import { createCanvasTableComponentItem } from '../../../host'
-import type { CanvasAppStageElement } from '../../stage/CanvasAppStageElement'
+import type { CanvasAppStageElement } from '../../rendering/stage/CanvasAppStageElement'
 import type { CommitCanvasItemsChange } from '../../workflow/CanvasWorkflowContract'
 
 export type CanvasTableImportSource = {

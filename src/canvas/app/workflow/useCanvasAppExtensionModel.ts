@@ -11,7 +11,7 @@ import type {
 } from '../commands/CanvasAppCustomCommands'
 import {
   getCanvasAppCustomCreationToolStates,
-} from '../tools/CanvasAppCustomCreationToolRuntime'
+} from '../extensions/custom-tools/CanvasAppCustomCreationToolRuntime'
 import {
   getCanvasAppExtensionConsumerModel,
 } from './CanvasAppExtensionConsumerModel'

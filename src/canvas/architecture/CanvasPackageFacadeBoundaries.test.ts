@@ -166,7 +166,7 @@ describe('Canvas package facade boundaries', () => {
       'src/canvas/app/workflow/index.ts',
       'src/canvas/app/workflow/CanvasAppAssembly.ts',
       'src/canvas/app/workflow/useCanvasAppModel.ts',
-      'src/canvas/app/modules/CanvasAppCustomItemModules.ts',
+      'src/canvas/app/extensions/custom-item-modules/CanvasAppCustomItemModules.ts',
     ])
     const violations = sourceFiles
       .filter((file) =>
