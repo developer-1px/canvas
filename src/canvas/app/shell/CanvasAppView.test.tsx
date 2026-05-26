@@ -60,14 +60,26 @@ describe('CanvasAppView', () => {
     expect(markup).toContain('image-controls')
     expect(markup).toContain('session-timer')
     expect(markup).toContain('spotlight')
-    expect(markup).toContain('stamp-controls')
-    expect(markup).toContain('data-anchored="true"')
+    expect(markup).toContain('selection-stamp-group')
+    expect(markup).not.toContain('stamp-controls')
     expect(markup).toContain('sticky-quick-create')
     expect(markup).toContain('canvas-status')
     expect(markup).toContain('text-editor')
     expect(markup).toContain('toolbar')
     expect(markup).toContain('voting-session')
     expect(markup).toContain('zoom-controls')
+  })
+
+  it('keeps unanchored stamp controls as their own session surface', () => {
+    const props = createViewProps()
+    props.status.selectionLength = 0
+    props.toolbar.selectionCommandAnchor = null
+    props.stampControls.anchor = null
+
+    const markup = renderToStaticMarkup(<CanvasAppView {...props} />)
+
+    expect(markup).toContain('stamp-controls')
+    expect(markup).not.toContain('selection-stamp-group')
   })
 
   it('renders only one right-rail panel at a time', () => {

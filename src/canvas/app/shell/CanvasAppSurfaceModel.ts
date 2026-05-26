@@ -125,10 +125,10 @@ export const CANVAS_APP_SURFACE_DEFINITIONS: readonly CanvasAppSurfaceDefinition
     region: 'top-left',
   },
   {
-    concept: 'object-adjacent-action',
+    concept: 'facilitation',
     id: 'stamp-controls',
     priority: 0,
-    region: 'object-adjacent',
+    region: 'top-right',
   },
   {
     concept: 'contextual-command',

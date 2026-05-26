@@ -1,6 +1,8 @@
 import {
+  Children,
   Fragment,
   type CSSProperties,
+  type ReactNode,
 } from 'react'
 import { ToolbarDivider } from './CanvasToolbarButtons'
 import {
@@ -13,6 +15,7 @@ type CanvasCommandSurfaceProps = {
   ariaLabel: string
   className: string
   context: CanvasToolbarItemRenderContext
+  children?: ReactNode
   dataPlacement?: string
   groups: readonly CanvasToolbarGroup[]
   onClick?: () => void
@@ -21,6 +24,7 @@ type CanvasCommandSurfaceProps = {
 
 export function CanvasCommandSurface({
   ariaLabel,
+  children,
   className,
   context,
   dataPlacement,
@@ -28,7 +32,7 @@ export function CanvasCommandSurface({
   onClick,
   style,
 }: CanvasCommandSurfaceProps) {
-  if (groups.length === 0) {
+  if (groups.length === 0 && Children.count(children) === 0) {
     return null
   }
 
@@ -49,6 +53,7 @@ export function CanvasCommandSurface({
           )}
         </Fragment>
       ))}
+      {children}
     </div>
   )
 }
