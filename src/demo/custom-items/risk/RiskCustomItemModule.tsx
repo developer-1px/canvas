@@ -18,16 +18,16 @@ const riskItemRenderer: CanvasAppCustomItemRendererStrategy = ({ item }) => {
         y={item.y}
         width={item.w}
         height={item.h}
-        rx="8"
-        fill="#fff7ed"
-        stroke="#fb923c"
+        rx="7"
+        fill="#fff4d6"
+        stroke="#17202a"
         vectorEffect="non-scaling-stroke"
       />
-      <circle cx={item.x + 24} cy={item.y + 24} r="11" fill="#ea580c" />
+      <circle cx={item.x + 24} cy={item.y + 24} r="11" fill="#d94b45" />
       <text
         x={item.x + 24}
         y={item.y + 29}
-        fill="#ffffff"
+        fill="#fffef8"
         fontSize="16"
         fontWeight="700"
         textAnchor="middle"

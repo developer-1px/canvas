@@ -7,12 +7,12 @@
   justify-content: center;
   gap: 2px;
   overflow: hidden;
-  color: #111827;
+  color: var(--canvas-ink);
   font: 500 13px/1.35 var(--sans);
   pointer-events: none;
 }
 
 .demo-risk-text span {
-  color: #9a3412;
+  color: #8b4a10;
   font-size: 12px;
 }

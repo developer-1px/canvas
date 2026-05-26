@@ -18,22 +18,22 @@ type DecisionStatus = (typeof DECISION_STATUSES)[number]
 
 const DECISION_STATUS_STYLES = Object.freeze({
   proposed: Object.freeze({
-    accent: '#2563eb',
-    fill: '#eff6ff',
+    accent: '#2f6fed',
+    fill: '#fff8cf',
     label: 'Proposed',
-    stroke: '#60a5fa',
+    stroke: '#17202a',
   }),
   decided: Object.freeze({
-    accent: '#059669',
-    fill: '#ecfdf5',
+    accent: '#0f8f63',
+    fill: '#e8f8eb',
     label: 'Decided',
-    stroke: '#34d399',
+    stroke: '#17202a',
   }),
   blocked: Object.freeze({
-    accent: '#dc2626',
-    fill: '#fef2f2',
+    accent: '#d94b45',
+    fill: '#fff0ed',
     label: 'Blocked',
-    stroke: '#f87171',
+    stroke: '#17202a',
   }),
 } satisfies Record<
   DecisionStatus,
@@ -58,7 +58,7 @@ const decisionItemRenderer: CanvasAppCustomItemRendererStrategy = ({ item }) => 
         y={item.y}
         width={item.w}
         height={item.h}
-        rx="8"
+        rx="7"
         fill={style.fill}
         stroke={style.stroke}
         vectorEffect="non-scaling-stroke"
@@ -68,7 +68,7 @@ const decisionItemRenderer: CanvasAppCustomItemRendererStrategy = ({ item }) => 
         y={item.y}
         width="8"
         height={item.h}
-        rx="4"
+        rx="3"
         fill={style.accent}
       />
       <foreignObject
