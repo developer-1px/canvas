@@ -1,0 +1,66 @@
+.demo-decision-node-text {
+  box-sizing: border-box;
+  display: grid;
+  width: 100%;
+  height: 100%;
+  grid-template-rows: auto auto 1fr;
+  gap: 4px;
+  overflow: hidden;
+  padding: 12px 14px;
+  color: #111827;
+  font: 600 13px/1.25 var(--sans);
+  pointer-events: none;
+}
+
+.demo-decision-node-text strong,
+.demo-decision-node-text small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.demo-decision-node-text span {
+  width: fit-content;
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: #ffffff;
+  font: 750 10px/1 var(--sans);
+  text-transform: uppercase;
+}
+
+.demo-decision-node-text small {
+  align-self: end;
+  color: #475569;
+  font: 600 12px/1.25 var(--sans);
+}
+
+.demo-decision-inspector {
+  display: grid;
+  gap: 6px;
+}
+
+.demo-decision-inspector label {
+  display: grid;
+  gap: 4px;
+  color: #4b5563;
+  font: 700 11px/1 var(--sans);
+}
+
+.demo-decision-inspector input,
+.demo-decision-inspector select {
+  width: 100%;
+  height: 28px;
+  min-width: 0;
+  padding: 0 6px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  color: #111827;
+  background: #ffffff;
+  font: 650 12px/1 var(--sans);
+}
+
+.demo-decision-inspector input:focus-visible,
+.demo-decision-inspector select:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}

@@ -645,7 +645,7 @@ describe('Canvas module boundaries', () => {
 
   it('keeps product-specific custom item ids outside canvas implementation', () => {
     const productCustomTerms =
-      /\b(risk|risk-node|custom:risk|demo-risk-text)\b|kind:\s*['"]risk['"]/
+      /\b(risk|risk-node|custom:risk|demo-risk-text|decision|decision-node|custom:decision|demo-decision)\b|kind:\s*['"](risk|decision)['"]/
     const violations = sourceFiles
       .filter((file) =>
         file.path.startsWith('src/canvas/') &&

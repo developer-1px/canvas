@@ -193,3 +193,4 @@
 189. 선택한 connector는 Inspector action으로 elbow/straight routing을 전환할 수 있다.
 190. 선택한 checklist component는 Inspector에서 항목 체크, 텍스트 수정, 항목 추가와 삭제를 할 수 있다.
 191. 선택한 Queue/Kanban component는 Inspector에서 카드 텍스트 수정, 카드 추가/삭제와 순서 이동을 할 수 있다.
+192. Demo는 외부 custom item module만으로 Decision Map node의 tool, renderer, validator, inspector, command를 조립한다.
