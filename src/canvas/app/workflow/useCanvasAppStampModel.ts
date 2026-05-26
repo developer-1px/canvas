@@ -1,4 +1,4 @@
-import { useCanvasStampControls } from '../authoring/stamp/useCanvasStampControls'
+import { useCanvasStampControls } from '../affordances/authoring/stamp/useCanvasStampControls'
 import type { CanvasAppStampModelInput } from './CanvasAppStampConsumerContracts'
 
 export function useCanvasAppStampModel(input: CanvasAppStampModelInput) {

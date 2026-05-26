@@ -1,5 +1,5 @@
-import { useCanvasPointerDownHandlers } from '../interaction/pointer/useCanvasPointerDownHandlers'
-import { useCanvasPointerDragHandlers } from '../interaction/pointer/useCanvasPointerDragHandlers'
+import { useCanvasPointerDownHandlers } from '../affordances/interaction/pointer/useCanvasPointerDownHandlers'
+import { useCanvasPointerDragHandlers } from '../affordances/interaction/pointer/useCanvasPointerDragHandlers'
 import { getCanvasAppPointerConsumerModel } from './CanvasAppPointerConsumerModel'
 import type { CanvasAppPointerModelInput } from './CanvasAppPointerConsumerContracts'
 

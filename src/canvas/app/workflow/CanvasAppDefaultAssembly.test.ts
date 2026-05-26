@@ -14,16 +14,16 @@ import { DEFAULT_CANVAS_APP_STAGE_ADAPTER } from '../rendering/CanvasAppStageAda
 import { DEFAULT_CANVAS_WORKSPACE_STORAGE_PROVIDER } from '../workspace/document/CanvasWorkspacePersistence'
 import {
   CANVAS_ARROW_ROUTING_INSPECTOR_PANEL,
-} from '../editing/arrow-routing/CanvasArrowRoutingInspectorPanel'
+} from '../affordances/editing/arrow-routing/CanvasArrowRoutingInspectorPanel'
 import {
   CANVAS_CHECKLIST_INSPECTOR_PANEL,
-} from '../editing/component-panels/checklist/CanvasChecklistInspectorPanel'
+} from '../affordances/editing/component-panels/checklist/CanvasChecklistInspectorPanel'
 import {
   CANVAS_KANBAN_INSPECTOR_PANEL,
-} from '../editing/component-panels/kanban/CanvasKanbanInspectorPanel'
+} from '../affordances/editing/component-panels/kanban/CanvasKanbanInspectorPanel'
 import {
   CANVAS_LINK_PREVIEW_INSPECTOR_PANEL,
-} from '../io/link-preview/CanvasLinkPreviewInspectorPanel'
+} from '../affordances/io/link-preview/CanvasLinkPreviewInspectorPanel'
 import { DEFAULT_CANVAS_APP_ASSEMBLY } from './CanvasAppDefaultAssembly'
 
 describe('CanvasAppDefaultAssembly', () => {

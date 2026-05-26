@@ -3,7 +3,7 @@ import {
 } from 'react'
 import {
   createCanvasAppPointerInput,
-} from '../interaction/pointer/CanvasAppPointerInput'
+} from '../affordances/interaction/pointer/CanvasAppPointerInput'
 import { CanvasDemoSvgItemLayer } from './CanvasDemoSvgItemLayer'
 import type {
   CanvasAppItemLayerAdapter,

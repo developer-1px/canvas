@@ -11,7 +11,7 @@ import type {
 } from './CanvasAppComponentAssemblyContracts'
 import type {
   CanvasAppCustomCommand,
-} from '../commands/CanvasAppCustomCommands'
+} from '../affordances/commands/CanvasAppCustomCommands'
 import type { CanvasWorkspaceStorageProvider } from '../workspace/document/CanvasWorkspacePersistence'
 import type {
   CanvasAppCustomItemValidators,
@@ -22,7 +22,7 @@ import type {
   CanvasAppItemLayerAdapter,
   CanvasAppStageAdapter,
 } from '../rendering/CanvasAppRenderingContracts'
-import type { CanvasAppInspectorPanel } from '../editing/inspector/CanvasAppInspectorPanels'
+import type { CanvasAppInspectorPanel } from '../affordances/editing/inspector/CanvasAppInspectorPanels'
 import type { CanvasAppCustomCreationTool } from '../extensions/custom-tools/CanvasAppCustomCreationTools'
 
 export type CanvasAppAssemblyAffordanceModel = {

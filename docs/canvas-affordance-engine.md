@@ -65,28 +65,28 @@
 | `src/canvas/app/rendering/CanvasDemoSvgCustomItemRendererExecution.tsx` | Custom item renderer lookup, render 실행, throw 시 fallback containment를 소유한다 |
 | `src/canvas/app/rendering/CanvasDemoSvgCustomItemRenderFallback.tsx` | Custom item renderer 누락/실패 때 쓰는 unknown custom item card fallback shape를 소유한다 |
 | `src/canvas/app/workflow` | React state와 engine/host/renderer wiring |
-| `src/canvas/app/commands/CanvasStandardCommandExecution.ts` | 내부 canvas command grammar 실행을 effect plan 생성과 document effect 적용으로 조립한다 |
-| `src/canvas/app/commands/CanvasStandardCommandEffectPlan.ts` | 내부 canvas command grammar와 Engine command 결과를 App document effect descriptor로 변환한다 |
-| `src/canvas/app/commands/CanvasStandardCommandDocumentEffects.ts` | Standard command 결과를 document commit fallback, selection commit, editing clear, history restore effect로 반영한다 |
-| `src/canvas/app/commands/CanvasClipboardCommandExecution.ts` | Clipboard command effect plan 생성과 clipboard/document effect 적용을 조립한다 |
-| `src/canvas/app/commands/CanvasClipboardCommandEffectPlan.ts` | Copy, cut, paste, duplicate, clone command를 clone result/add item/copy/cut effect descriptor로 변환하고 paste offset 계산을 소유한다 |
-| `src/canvas/app/commands/CanvasClipboardCommandEffects.ts` | Clipboard command effect descriptor를 Host clipboard, document commit/selection/editing update와 실행 결과로 적용한다 |
-| `src/canvas/app/commands/CanvasAppCustomCommands.ts` | Engine command union을 수정하지 않고 제품별 business action을 toolbar command로 등록하는 descriptor를 제공한다 |
-| `src/canvas/app/commands/CanvasAppCustomCommandContracts.ts` | Custom command descriptor shape와 id registry contract를 검증한다 |
-| `src/canvas/app/commands/CanvasAppCustomCommandExecution.ts` | Custom command toolbar state, availability, run 호출과 실패 containment를 소유한다 |
-| `src/canvas/ui/toolbar/CanvasToolbarItems.ts` | Feature toggle, availability, built-in/custom tool, built-in/custom command 상태를 toolbar item group grammar로 변환한다 |
-| `src/canvas/ui/toolbar/CanvasToolbarCommandItems.ts` | Built-in toolbar command group, feature toggle, availability를 command item group grammar로 변환한다 |
-| `src/canvas/app/inspector/CanvasAppInspectorPanels.ts` | 기본 bounds inspector를 수정하지 않고 제품별 선택 항목 패널을 등록하는 descriptor를 제공한다 |
-| `src/canvas/app/inspector/CanvasAppInspectorPanelContracts.ts` | Inspector panel descriptor shape와 id registry contract를 검증한다 |
-| `src/canvas/app/modules/CanvasAppCustomItemModules.ts` | 제품별 item kind에 필요한 creation tool, renderer, validator, inspector, command descriptor와 define 계약을 소유한다 |
-| `src/canvas/app/modules/CanvasAppCustomItemModuleAssembly.ts` | Custom item module descriptor list와 disabled module ids를 Extension Bundle output으로 조립하고 duplicate/unknown/snapshot 규칙을 적용한다 |
-| `src/canvas/app/modules/CanvasAppCustomItemModuleContracts.ts` | Custom item module descriptor, disabled module id, duplicate module id, assembled tool shortcut contract를 검증한다 |
-| `src/canvas/app/modules/CanvasAppCustomItemValidatorContracts.ts` | Custom item validator registry key와 validate strategy slot을 검증한다 |
-| `src/canvas/app/modules/CanvasAppCustomItemModuleRuntime.ts` | Module-owned creation tool envelope 생성, item validation, renderer/validator registry 변환과 실패 containment를 소유한다 |
-| `src/canvas/app/modules/CanvasAppCustomItemModuleSnapshot.ts` | Custom item module define/assembly 후 외부 descriptor mutation에서 module과 assembled extension parts를 보호한다 |
-| `src/canvas/app/tools/CanvasAppCustomCreationTools.ts` | 내부 Tool union에 구체 id를 추가하지 않고 제품별 생성 도구를 등록하는 descriptor를 제공한다 |
-| `src/canvas/app/tools/CanvasAppCustomCreationToolContracts.ts` | Custom creation tool descriptor shape와 reserved/duplicate shortcut conflict를 검증한다 |
-| `src/canvas/app/tools/CanvasAppCustomCreationToolRuntime.ts` | Custom creation tool id 변환, toolbar state, lookup, shortcut matching을 소유한다 |
+| `src/canvas/app/affordances/commands/CanvasStandardCommandExecution.ts` | 내부 canvas command grammar 실행을 effect plan 생성과 document effect 적용으로 조립한다 |
+| `src/canvas/app/affordances/commands/CanvasStandardCommandEffectPlan.ts` | 내부 canvas command grammar와 Engine command 결과를 App document effect descriptor로 변환한다 |
+| `src/canvas/app/affordances/commands/CanvasStandardCommandDocumentEffects.ts` | Standard command 결과를 document commit fallback, selection commit, editing clear, history restore effect로 반영한다 |
+| `src/canvas/app/affordances/commands/CanvasClipboardCommandExecution.ts` | Clipboard command effect plan 생성과 clipboard/document effect 적용을 조립한다 |
+| `src/canvas/app/affordances/commands/CanvasClipboardCommandEffectPlan.ts` | Copy, cut, paste, duplicate, clone command를 clone result/add item/copy/cut effect descriptor로 변환하고 paste offset 계산을 소유한다 |
+| `src/canvas/app/affordances/commands/CanvasClipboardCommandEffects.ts` | Clipboard command effect descriptor를 Host clipboard, document commit/selection/editing update와 실행 결과로 적용한다 |
+| `src/canvas/app/affordances/commands/CanvasAppCustomCommands.ts` | Engine command union을 수정하지 않고 제품별 business action을 toolbar command로 등록하는 descriptor를 제공한다 |
+| `src/canvas/app/affordances/commands/CanvasAppCustomCommandContracts.ts` | Custom command descriptor shape와 id registry contract를 검증한다 |
+| `src/canvas/app/affordances/commands/CanvasAppCustomCommandExecution.ts` | Custom command toolbar state, availability, run 호출과 실패 containment를 소유한다 |
+| `src/canvas/app/affordances/controls/toolbar/CanvasToolbarItems.ts` | Feature toggle, availability, built-in/custom tool, built-in/custom command 상태를 toolbar item group grammar로 변환한다 |
+| `src/canvas/app/affordances/controls/toolbar/CanvasToolbarCommandItems.ts` | Built-in toolbar command group, feature toggle, availability를 command item group grammar로 변환한다 |
+| `src/canvas/app/affordances/editing/inspector/CanvasAppInspectorPanels.ts` | 기본 bounds inspector를 수정하지 않고 제품별 선택 항목 패널을 등록하는 descriptor를 제공한다 |
+| `src/canvas/app/affordances/editing/inspector/CanvasAppInspectorPanelContracts.ts` | Inspector panel descriptor shape와 id registry contract를 검증한다 |
+| `src/canvas/app/extensions/custom-item-modules/CanvasAppCustomItemModules.ts` | 제품별 item kind에 필요한 creation tool, renderer, validator, inspector, command descriptor와 define 계약을 소유한다 |
+| `src/canvas/app/extensions/custom-item-modules/CanvasAppCustomItemModuleAssembly.ts` | Custom item module descriptor list와 disabled module ids를 Extension Bundle output으로 조립하고 duplicate/unknown/snapshot 규칙을 적용한다 |
+| `src/canvas/app/extensions/custom-item-modules/CanvasAppCustomItemModuleContracts.ts` | Custom item module descriptor, disabled module id, duplicate module id, assembled tool shortcut contract를 검증한다 |
+| `src/canvas/app/extensions/custom-item-modules/CanvasAppCustomItemValidatorContracts.ts` | Custom item validator registry key와 validate strategy slot을 검증한다 |
+| `src/canvas/app/extensions/custom-item-modules/CanvasAppCustomItemModuleRuntime.ts` | Module-owned creation tool envelope 생성, item validation, renderer/validator registry 변환과 실패 containment를 소유한다 |
+| `src/canvas/app/extensions/custom-item-modules/CanvasAppCustomItemModuleSnapshot.ts` | Custom item module define/assembly 후 외부 descriptor mutation에서 module과 assembled extension parts를 보호한다 |
+| `src/canvas/app/extensions/custom-tools/CanvasAppCustomCreationTools.ts` | 내부 Tool union에 구체 id를 추가하지 않고 제품별 생성 도구를 등록하는 descriptor를 제공한다 |
+| `src/canvas/app/extensions/custom-tools/CanvasAppCustomCreationToolContracts.ts` | Custom creation tool descriptor shape와 reserved/duplicate shortcut conflict를 검증한다 |
+| `src/canvas/app/extensions/custom-tools/CanvasAppCustomCreationToolRuntime.ts` | Custom creation tool id 변환, toolbar state, lookup, shortcut matching을 소유한다 |
 | `src/canvas/app/workflow/CanvasAppAssembly.ts` | Host item adapter, component library, custom command, custom item module, inspector panel, initial items, SVG presentation registry 같은 제품별 의미를 외부 조립 seam으로 제공한다 |
 | `src/canvas/app/workflow/CanvasAppAssemblyTypes.ts` | App Assembly input/output type 계약을 runtime 조립 구현과 분리해 소유한다 |
 | `src/canvas/app/workflow/CanvasAppAssemblyInputTypes.ts` | Affordance/component/adapter/workspace child assembly input field 계약을 runtime 조립 구현과 분리해 소유한다 |
@@ -121,7 +121,7 @@
 | `src/canvas/app/workflow/useCanvasWorkspaceModel.ts` | 저장된 workspace snapshot, document history, viewport, read model, id 생성을 App Shell에 숨긴다 |
 | `src/canvas/app/authoring/index.ts` | `canvas/app/authoring` subpath로 외부 조립자가 쓰는 assembly input과 custom descriptor 계약을 모으고 App runtime hook/default/validator를 제외한다 |
 | `src/canvas/app/workflow/CanvasWorkspaceConsumerContracts.ts` | Workspace document/read/viewport fan-out의 입력과 consumer별 출력 Interface를 명시한다 |
-| `src/canvas/app/inspector/CanvasAppInspectorPanelExecution.ts` | Inspector panel visibility/render 호출과 실패 시 omit containment를 소유한다 |
+| `src/canvas/app/affordances/editing/inspector/CanvasAppInspectorPanelExecution.ts` | Inspector panel visibility/render 호출과 실패 시 omit containment를 소유한다 |
 | `src/canvas/app/keyboard/CanvasKeyboardShortcutIntent.ts` | Keydown 입력, typing target suppression, temporary pan, escape, command/tool shortcut precedence를 실행 가능한 keyboard intent로 조립한다 |
 | `src/canvas/app/keyboard/CanvasKeyboardCommandShortcutIntent.ts` | Built-in command, viewport, nudge keyboard shortcut grammar를 feature toggle과 selection 기준으로 keyboard intent로 변환한다 |
 | `src/canvas/app/keyboard/CanvasKeyboardToolShortcutIntent.ts` | Built-in tool shortcut precedence와 custom creation tool shortcut matching을 소유한다 |
@@ -175,14 +175,14 @@
 | `src/canvas/renderer/svg` | Demo item을 모르는 SVG stage/overlay adapter |
 | `src/canvas/index.ts` | 외부 조립자와 Demo가 사용하는 Canvas package public entry |
 | `src/canvas/ui` | Toolbar, palette, status, editor controls |
-| `src/canvas/ui/cursor/CanvasCursorChat.tsx` | cursor 위치에 붙는 transient chat textarea를 순수 view props로 렌더링한다 |
-| `src/canvas/ui/emote/CanvasEmoteControls.tsx` | live reaction emote buttons를 순수 view props로 렌더링한다 |
-| `src/canvas/ui/facilitation/CanvasSessionTimer.tsx` | session timer 표시와 preset/control 버튼을 순수 view props로 렌더링한다 |
-| `src/canvas/ui/facilitation/CanvasSpotlight.tsx` | spotlight entry, follower count, stop control을 순수 view props로 렌더링한다 |
-| `src/canvas/ui/facilitation/CanvasVotingSession.tsx` | voting session prompt, quota, status controls를 순수 view props로 렌더링한다 |
-| `src/canvas/ui/drawing/CanvasDrawingControls.tsx` | Drawing style controls를 순수 view props로 렌더링한다 |
-| `src/canvas/ui/stamp/CanvasStampControls.tsx` | Stamp reaction controls를 순수 view props와 optional anchor로 렌더링한다 |
-| `src/canvas/ui/sticky/CanvasStickyQuickCreateControl.tsx` | Selected sticky 주변의 방향별 quick-create control을 순수 view props로 렌더링한다 |
+| `src/canvas/app/affordances/controls/cursor-chat/CanvasCursorChat.tsx` | cursor 위치에 붙는 transient chat textarea를 순수 view props로 렌더링한다 |
+| `src/canvas/app/affordances/controls/emote/CanvasEmoteControls.tsx` | live reaction emote buttons를 순수 view props로 렌더링한다 |
+| `src/canvas/app/affordances/controls/facilitation/CanvasSessionTimer.tsx` | session timer 표시와 preset/control 버튼을 순수 view props로 렌더링한다 |
+| `src/canvas/app/affordances/controls/facilitation/CanvasSpotlight.tsx` | spotlight entry, follower count, stop control을 순수 view props로 렌더링한다 |
+| `src/canvas/app/affordances/controls/facilitation/CanvasVotingSession.tsx` | voting session prompt, quota, status controls를 순수 view props로 렌더링한다 |
+| `src/canvas/app/affordances/controls/drawing/CanvasDrawingControls.tsx` | Drawing style controls를 순수 view props로 렌더링한다 |
+| `src/canvas/app/affordances/authoring/stamp/CanvasStampControls.tsx` | Stamp reaction controls를 순수 view props와 optional anchor로 렌더링한다 |
+| `src/canvas/app/affordances/authoring/component/CanvasStickyQuickCreateControl.tsx` | Selected sticky 주변의 방향별 quick-create control을 순수 view props로 렌더링한다 |
 | `src/demo/CanvasDemoAssembly.ts` | canvas Module 밖에서 demo-specific custom item modules와 demo entry 초기 선택 상태를 조립한다 |
 | `src/demo/custom-items` | demo-specific custom item module 구현과 해당 표현 스타일. `<name>/index.ts` convention으로 자동 수집한다 |
 

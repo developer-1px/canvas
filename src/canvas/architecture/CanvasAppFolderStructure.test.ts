@@ -15,17 +15,37 @@ describe('Canvas App folder structure', () => {
     ).sort()
 
     expect(appTopLevelFolders).toEqual([
+      'affordances',
       'authoring',
-      'commands',
-      'controls',
-      'editing',
       'extensions',
-      'interaction',
-      'io',
       'rendering',
       'shell',
       'workflow',
       'workspace',
+    ])
+  })
+
+
+  it('keeps learned App affordances grouped under the internal affordance module', () => {
+    const affordanceFolders = Array.from(
+      new Set(
+        sourceFiles
+          .filter((file) =>
+            file.path.startsWith('src/canvas/app/affordances/'),
+          )
+          .filter((file) => file.path.split('/').length > 5)
+          .map((file) => file.path.split('/')[4])
+          .filter((folder): folder is string => folder !== undefined),
+      ),
+    ).sort()
+
+    expect(affordanceFolders).toEqual([
+      'authoring',
+      'commands',
+      'controls',
+      'editing',
+      'interaction',
+      'io',
     ])
   })
 })

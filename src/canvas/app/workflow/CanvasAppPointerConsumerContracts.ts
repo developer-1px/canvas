@@ -28,10 +28,10 @@ import type {
 import type { CanvasAppComponentLibrary } from './CanvasAppComponentAssemblyContracts'
 import type { CanvasAppItemReadModel } from './CanvasAppItemReadModelContracts'
 import type { CanvasDrawingStrokeStyleSet } from '../../host'
-import type { CanvasAppPointerInput } from '../interaction/pointer/CanvasAppPointerInput'
+import type { CanvasAppPointerInput } from '../affordances/interaction/pointer/CanvasAppPointerInput'
 import type { CanvasAppStageElement } from '../rendering/stage/CanvasAppStageElement'
 import type { CanvasAppCustomCreationTool } from '../extensions/custom-tools/CanvasAppCustomCreationTools'
-import type { Interaction } from '../interaction/pointer/CanvasInteractionState'
+import type { Interaction } from '../affordances/interaction/pointer/CanvasInteractionState'
 import type {
   CommitCanvasItemsChange,
   CommitCanvasSelection,

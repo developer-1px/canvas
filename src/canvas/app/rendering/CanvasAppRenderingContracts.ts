@@ -17,7 +17,7 @@ import type {
 import type {
   CanvasAppEventInput,
   CanvasAppPointerInput,
-} from '../interaction/pointer/CanvasAppPointerInput'
+} from '../affordances/interaction/pointer/CanvasAppPointerInput'
 
 export type CanvasAppComponentRendererStrategy = (input: {
   item: CanvasComponentItem

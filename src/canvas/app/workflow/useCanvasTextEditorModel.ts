@@ -10,8 +10,8 @@ import type {
 } from '../../entities'
 import type { CanvasAffordanceConfig } from '../../engine'
 import { shouldCommitCanvasEditableTextOnEnter } from '../../host'
-import { useCanvasTextEditing } from '../editing/text-editor/useCanvasTextEditing'
-import type { CanvasTextEditorStyle } from '../editing/text-editor/CanvasTextEditingModel'
+import { useCanvasTextEditing } from '../affordances/editing/text-editor/useCanvasTextEditing'
+import type { CanvasTextEditorStyle } from '../affordances/editing/text-editor/CanvasTextEditingModel'
 import type { CanvasAppItemReadModel } from './CanvasAppItemReadModelContracts'
 import type { CommitCanvasItemsChange } from './CanvasWorkflowContract'
 

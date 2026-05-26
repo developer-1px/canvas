@@ -7,13 +7,13 @@ import {
 describe('Canvas App command effect boundaries', () => {
   it('keeps App standard command document effects behind a named module', () => {
     const executionFile = getSourceFile(
-      'src/canvas/app/commands/CanvasStandardCommandExecution.ts',
+      'src/canvas/app/affordances/commands/CanvasStandardCommandExecution.ts',
     )
     const effectsFile = getSourceFile(
-      'src/canvas/app/commands/CanvasStandardCommandDocumentEffects.ts',
+      'src/canvas/app/affordances/commands/CanvasStandardCommandDocumentEffects.ts',
     )
     const effectContractsFile = getSourceFile(
-      'src/canvas/app/commands/CanvasStandardCommandDocumentEffectContracts.ts',
+      'src/canvas/app/affordances/commands/CanvasStandardCommandDocumentEffectContracts.ts',
     )
 
     expect(executionFile.source).toContain(
@@ -76,28 +76,28 @@ describe('Canvas App command effect boundaries', () => {
 
   it('keeps App clipboard command execution behind a named module', () => {
     const clipboardHookFile = getSourceFile(
-      'src/canvas/app/commands/useCanvasClipboardCommands.ts',
+      'src/canvas/app/affordances/commands/useCanvasClipboardCommands.ts',
     )
     const clipboardHandlersFile = getSourceFile(
-      'src/canvas/app/commands/CanvasClipboardCommandHandlers.ts',
+      'src/canvas/app/affordances/commands/CanvasClipboardCommandHandlers.ts',
     )
     const executionFile = getSourceFile(
-      'src/canvas/app/commands/CanvasClipboardCommandExecution.ts',
+      'src/canvas/app/affordances/commands/CanvasClipboardCommandExecution.ts',
     )
     const contractsFile = getSourceFile(
-      'src/canvas/app/commands/CanvasClipboardCommandContracts.ts',
+      'src/canvas/app/affordances/commands/CanvasClipboardCommandContracts.ts',
     )
     const effectPlanFile = getSourceFile(
-      'src/canvas/app/commands/CanvasClipboardCommandEffectPlan.ts',
+      'src/canvas/app/affordances/commands/CanvasClipboardCommandEffectPlan.ts',
     )
     const effectContractsFile = getSourceFile(
-      'src/canvas/app/commands/CanvasClipboardCommandEffectContracts.ts',
+      'src/canvas/app/affordances/commands/CanvasClipboardCommandEffectContracts.ts',
     )
     const resultEffectsFile = getSourceFile(
-      'src/canvas/app/commands/CanvasClipboardCommandResultEffects.ts',
+      'src/canvas/app/affordances/commands/CanvasClipboardCommandResultEffects.ts',
     )
     const effectsFile = getSourceFile(
-      'src/canvas/app/commands/CanvasClipboardCommandEffects.ts',
+      'src/canvas/app/affordances/commands/CanvasClipboardCommandEffects.ts',
     )
 
     expect(clipboardHookFile.source).toContain(

@@ -1,10 +1,10 @@
-import { assertCanvasAppCustomCommands } from '../../commands/CanvasAppCustomCommandContracts'
+import { assertCanvasAppCustomCommands } from '../../affordances/commands/CanvasAppCustomCommandContracts'
 import {
   assertCanvasAppArray,
   assertCanvasAppDescriptorObject,
 } from '../CanvasAppDescriptorContracts'
 import { assertCanvasAppExtensionId } from '../CanvasAppExtensionIds'
-import { assertCanvasAppInspectorPanels } from '../../editing/inspector/CanvasAppInspectorPanelContracts'
+import { assertCanvasAppInspectorPanels } from '../../affordances/editing/inspector/CanvasAppInspectorPanelContracts'
 import { assertCanvasAppCustomCreationTools } from '../custom-tools/CanvasAppCustomCreationToolContracts'
 import type { CanvasAppCustomItemModuleAssembly } from './CanvasAppCustomItemModuleAssembly'
 import type {

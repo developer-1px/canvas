@@ -2,8 +2,8 @@ import type {
   Bounds,
   CanvasJsonObject,
 } from '../../../entities'
-import type { CanvasAppCustomCommand } from '../../commands/CanvasAppCustomCommands'
-import type { CanvasAppInspectorPanel } from '../../editing/inspector/CanvasAppInspectorPanels'
+import type { CanvasAppCustomCommand } from '../../affordances/commands/CanvasAppCustomCommands'
+import type { CanvasAppInspectorPanel } from '../../affordances/editing/inspector/CanvasAppInspectorPanels'
 import type {
   CanvasAppCustomItemRendererStrategy,
 } from '../../rendering/CanvasAppRenderingContracts'

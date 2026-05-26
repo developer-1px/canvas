@@ -17,7 +17,7 @@ import type {
   Tool,
 } from '../../entities'
 import type { CanvasAppCustomCreationToolState } from '../extensions/CanvasAppExtensionStateContracts'
-import type { Interaction } from '../interaction/pointer/CanvasInteractionState'
+import type { Interaction } from '../affordances/interaction/pointer/CanvasInteractionState'
 import type { CommitCanvasSelection } from './CanvasWorkflowContract'
 import type { CanvasAppComponentKeyboardContext } from './CanvasAppComponentConsumerContracts'
 

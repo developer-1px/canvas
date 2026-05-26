@@ -1,4 +1,4 @@
-import { useCanvasObjectInspector } from '../editing/inspector/useCanvasObjectInspector'
+import { useCanvasObjectInspector } from '../affordances/editing/inspector/useCanvasObjectInspector'
 import type { CanvasAppInspectorModelInput } from './CanvasAppInspectorConsumerContracts'
 
 export function useCanvasAppInspectorModel({

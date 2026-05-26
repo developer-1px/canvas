@@ -7,31 +7,31 @@ import {
 describe('Canvas toolbar boundaries', () => {
   it('keeps toolbar item grammar behind a named module', () => {
     const toolbarFile = getSourceFile(
-      'src/canvas/app/controls/toolbar/CanvasToolbar.tsx',
+      'src/canvas/app/affordances/controls/toolbar/CanvasToolbar.tsx',
     )
     const itemRendererFile = getSourceFile(
-      'src/canvas/app/controls/toolbar/CanvasToolbarItemRenderer.tsx',
+      'src/canvas/app/affordances/controls/toolbar/CanvasToolbarItemRenderer.tsx',
     )
     const itemRenderDispatchFile = getSourceFile(
-      'src/canvas/app/controls/toolbar/CanvasToolbarItemRenderDispatch.tsx',
+      'src/canvas/app/affordances/controls/toolbar/CanvasToolbarItemRenderDispatch.tsx',
     )
     const itemsFile = getSourceFile(
-      'src/canvas/app/controls/toolbar/CanvasToolbarItems.ts',
+      'src/canvas/app/affordances/controls/toolbar/CanvasToolbarItems.ts',
     )
     const commandItemsFile = getSourceFile(
-      'src/canvas/app/controls/toolbar/CanvasToolbarCommandItems.ts',
+      'src/canvas/app/affordances/controls/toolbar/CanvasToolbarCommandItems.ts',
     )
     const commandCatalogFile = getSourceFile(
-      'src/canvas/app/controls/toolbar/CanvasToolbarCommandCatalog.ts',
+      'src/canvas/app/affordances/controls/toolbar/CanvasToolbarCommandCatalog.ts',
     )
     const commandContractsFile = getSourceFile(
-      'src/canvas/app/controls/toolbar/CanvasToolbarCommandContracts.ts',
+      'src/canvas/app/affordances/controls/toolbar/CanvasToolbarCommandContracts.ts',
     )
     const commandDispatchFile = getSourceFile(
-      'src/canvas/app/controls/toolbar/CanvasToolbarCommandDispatch.ts',
+      'src/canvas/app/affordances/controls/toolbar/CanvasToolbarCommandDispatch.ts',
     )
     const toolItemsFile = getSourceFile(
-      'src/canvas/app/controls/toolbar/CanvasToolbarToolItems.ts',
+      'src/canvas/app/affordances/controls/toolbar/CanvasToolbarToolItems.ts',
     )
 
     expect(toolbarFile.source).toContain("from './CanvasToolbarItems'")
@@ -150,16 +150,16 @@ describe('Canvas toolbar boundaries', () => {
 
   it('passes command availability through toolbar command grammar as one contract', () => {
     const toolbarFile = getSourceFile(
-      'src/canvas/app/controls/toolbar/CanvasToolbar.tsx',
+      'src/canvas/app/affordances/controls/toolbar/CanvasToolbar.tsx',
     )
     const toolbarItemsFile = getSourceFile(
-      'src/canvas/app/controls/toolbar/CanvasToolbarItems.ts',
+      'src/canvas/app/affordances/controls/toolbar/CanvasToolbarItems.ts',
     )
     const toolbarCommandItemsFile = getSourceFile(
-      'src/canvas/app/controls/toolbar/CanvasToolbarCommandItems.ts',
+      'src/canvas/app/affordances/controls/toolbar/CanvasToolbarCommandItems.ts',
     )
     const toolbarCommandCatalogFile = getSourceFile(
-      'src/canvas/app/controls/toolbar/CanvasToolbarCommandCatalog.ts',
+      'src/canvas/app/affordances/controls/toolbar/CanvasToolbarCommandCatalog.ts',
     )
 
     for (const file of [

@@ -14,19 +14,19 @@ describe('Canvas App IO boundaries', () => {
       'src/canvas/app/workflow/useCanvasAppImageModel.ts',
     )
     const imageControlsFile = getSourceFile(
-      'src/canvas/app/io/image/CanvasImageControls.tsx',
+      'src/canvas/app/affordances/io/image/CanvasImageControls.tsx',
     )
     const imageInsertionFile = getSourceFile(
-      'src/canvas/app/io/image/CanvasImageInsertion.ts',
+      'src/canvas/app/affordances/io/image/CanvasImageInsertion.ts',
     )
     const imageImportFile = getSourceFile(
-      'src/canvas/app/io/image/CanvasImageImport.ts',
+      'src/canvas/app/affordances/io/image/CanvasImageImport.ts',
     )
     const imageClipboardFile = getSourceFile(
-      'src/canvas/app/io/image/CanvasImageClipboard.ts',
+      'src/canvas/app/affordances/io/image/CanvasImageClipboard.ts',
     )
     const imageExportFile = getSourceFile(
-      'src/canvas/app/io/image/CanvasImageExport.ts',
+      'src/canvas/app/affordances/io/image/CanvasImageExport.ts',
     )
     const stageElementFile = getSourceFile(
       'src/canvas/app/rendering/stage/CanvasAppStageElement.ts',
@@ -39,7 +39,7 @@ describe('Canvas App IO boundaries', () => {
     )
     expect(appModelFile.source).not.toMatch(browserImageHow)
     expect(imageModelFile.source).toContain(
-      "from '../io/image/useCanvasImageControls'",
+      "from '../affordances/io/image/useCanvasImageControls'",
     )
     expect(imageControlsFile.source).not.toMatch(browserImageHow)
     expect(imageInsertionFile.source).toContain(
@@ -70,10 +70,10 @@ describe('Canvas App IO boundaries', () => {
       'src/canvas/app/workflow/useCanvasAppTableImportModel.ts',
     )
     const tableImportHookFile = getSourceFile(
-      'src/canvas/app/io/table/useCanvasTableImport.ts',
+      'src/canvas/app/affordances/io/table/useCanvasTableImport.ts',
     )
     const tableImportFile = getSourceFile(
-      'src/canvas/app/io/table/CanvasTableImport.ts',
+      'src/canvas/app/affordances/io/table/CanvasTableImport.ts',
     )
     const hostTableFile = getSourceFile(
       'src/canvas/host/component/CanvasTableComponent.ts',
@@ -86,7 +86,7 @@ describe('Canvas App IO boundaries', () => {
     )
     expect(appModelFile.source).not.toMatch(browserTableHow)
     expect(tableModelFile.source).toContain(
-      "from '../io/table/useCanvasTableImport'",
+      "from '../affordances/io/table/useCanvasTableImport'",
     )
     expect(tableImportHookFile.source).toContain('window.addEventListener')
     expect(tableImportHookFile.source).toContain('ClipboardEvent')
@@ -109,13 +109,13 @@ describe('Canvas App IO boundaries', () => {
       'src/canvas/app/workflow/useCanvasAppLinkPreviewImportModel.ts',
     )
     const linkPreviewImportHookFile = getSourceFile(
-      'src/canvas/app/io/link-preview/useCanvasLinkPreviewImport.ts',
+      'src/canvas/app/affordances/io/link-preview/useCanvasLinkPreviewImport.ts',
     )
     const linkPreviewImportFile = getSourceFile(
-      'src/canvas/app/io/link-preview/CanvasLinkPreviewImport.ts',
+      'src/canvas/app/affordances/io/link-preview/CanvasLinkPreviewImport.ts',
     )
     const linkPreviewInspectorPanelFile = getSourceFile(
-      'src/canvas/app/io/link-preview/CanvasLinkPreviewInspectorPanel.tsx',
+      'src/canvas/app/affordances/io/link-preview/CanvasLinkPreviewInspectorPanel.tsx',
     )
     const defaultAssemblyFile = getSourceFile(
       'src/canvas/app/workflow/CanvasAppDefaultAssembly.ts',
@@ -131,7 +131,7 @@ describe('Canvas App IO boundaries', () => {
     )
     expect(appModelFile.source).not.toMatch(browserLinkPreviewHow)
     expect(linkPreviewModelFile.source).toContain(
-      "from '../io/link-preview/useCanvasLinkPreviewImport'",
+      "from '../affordances/io/link-preview/useCanvasLinkPreviewImport'",
     )
     expect(linkPreviewImportHookFile.source).toContain(
       'window.addEventListener',
@@ -148,7 +148,7 @@ describe('Canvas App IO boundaries', () => {
       'replaceCanvasLinkPreviewComponentsOrientation',
     )
     expect(defaultAssemblyFile.source).toContain(
-      "from '../io/link-preview/CanvasLinkPreviewInspectorPanel'",
+      "from '../affordances/io/link-preview/CanvasLinkPreviewInspectorPanel'",
     )
     expect(defaultAssemblyFile.source).toContain(
       'CANVAS_LINK_PREVIEW_INSPECTOR_PANEL',

@@ -7,10 +7,10 @@ import {
 describe('Canvas App custom command boundaries', () => {
   it('keeps App custom command contracts behind a named module', () => {
     const descriptorFile = getSourceFile(
-      'src/canvas/app/commands/CanvasAppCustomCommands.ts',
+      'src/canvas/app/affordances/commands/CanvasAppCustomCommands.ts',
     )
     const contractsFile = getSourceFile(
-      'src/canvas/app/commands/CanvasAppCustomCommandContracts.ts',
+      'src/canvas/app/affordances/commands/CanvasAppCustomCommandContracts.ts',
     )
 
     expect(descriptorFile.source).not.toContain(

@@ -1,5 +1,5 @@
-import { useCanvasViewportControls } from '../interaction/viewport/useCanvasViewportControls'
-import { useCanvasWheelViewport } from '../interaction/viewport/useCanvasWheelViewport'
+import { useCanvasViewportControls } from '../affordances/interaction/viewport/useCanvasViewportControls'
+import { useCanvasWheelViewport } from '../affordances/interaction/viewport/useCanvasWheelViewport'
 import { getCanvasAppViewportConsumerModel } from './CanvasAppViewportConsumerModel'
 import type { CanvasAppViewportModelInput } from './CanvasAppViewportConsumerContracts'
 

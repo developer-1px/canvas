@@ -69,21 +69,21 @@ describe('Canvas App command workflow boundaries', () => {
       'src/canvas/app/workflow/CanvasAppCommandConsumerContracts.ts',
     )
     const commandHookFile = getSourceFile(
-      'src/canvas/app/commands/useCanvasCommands.ts',
+      'src/canvas/app/affordances/commands/useCanvasCommands.ts',
     )
     const standardCommandHandlersFile = getSourceFile(
-      'src/canvas/app/commands/CanvasStandardCommandHandlers.ts',
+      'src/canvas/app/affordances/commands/CanvasStandardCommandHandlers.ts',
     )
 
     expect(appModelFile.source).toContain(
       "from './useCanvasAppCommandModel'",
     )
     expect(appModelFile.source).not.toContain(
-      "from '../commands/useCanvasCommands'",
+      "from '../affordances/commands/useCanvasCommands'",
     )
     expect(appModelFile.source).not.toContain('useCanvasCommands({')
     expect(commandModelFile.source).toContain(
-      "from '../commands/useCanvasCommands'",
+      "from '../affordances/commands/useCanvasCommands'",
     )
     expect(commandModelFile.source).toContain(
       "from './CanvasAppCommandConsumerModel'",

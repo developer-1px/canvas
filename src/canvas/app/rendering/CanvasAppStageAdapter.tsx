@@ -2,7 +2,7 @@ import { CanvasSvgStage } from '../../renderer'
 import {
   createCanvasAppEventInput,
   createCanvasAppPointerInput,
-} from '../interaction/pointer/CanvasAppPointerInput'
+} from '../affordances/interaction/pointer/CanvasAppPointerInput'
 import type {
   CanvasAppStageAdapter,
   CanvasAppStageRenderInput,

@@ -7,43 +7,43 @@ import {
 describe('Canvas pointer preview boundaries', () => {
   it('keeps pointer interaction preview rules behind a named module', () => {
     const dragHandlersFile = getSourceFile(
-      'src/canvas/app/interaction/pointer/useCanvasPointerDragHandlers.ts',
+      'src/canvas/app/affordances/interaction/pointer/useCanvasPointerDragHandlers.ts',
     )
     const previewFile = getSourceFile(
-      'src/canvas/app/interaction/pointer/CanvasPointerInteractionPreview.ts',
+      'src/canvas/app/affordances/interaction/pointer/CanvasPointerInteractionPreview.ts',
     )
     const resultContractsFile = getSourceFile(
-      'src/canvas/app/interaction/pointer/CanvasPointerInteractionResultContracts.ts',
+      'src/canvas/app/affordances/interaction/pointer/CanvasPointerInteractionResultContracts.ts',
     )
     const interactionRoutingFile = getSourceFile(
-      'src/canvas/app/interaction/pointer/CanvasPointerInteractionRouting.ts',
+      'src/canvas/app/affordances/interaction/pointer/CanvasPointerInteractionRouting.ts',
     )
     const creationPreviewFile = getSourceFile(
-      'src/canvas/app/interaction/pointer/CanvasPointerCreationPreview.ts',
+      'src/canvas/app/affordances/interaction/pointer/CanvasPointerCreationPreview.ts',
     )
     const drawingCreationFile = getSourceFile(
-      'src/canvas/app/interaction/pointer/CanvasPointerDrawingCreation.ts',
+      'src/canvas/app/affordances/interaction/pointer/CanvasPointerDrawingCreation.ts',
     )
     const customCreationFile = getSourceFile(
-      'src/canvas/app/interaction/pointer/CanvasPointerCustomCreation.ts',
+      'src/canvas/app/affordances/interaction/pointer/CanvasPointerCustomCreation.ts',
     )
     const shapeCreationFile = getSourceFile(
-      'src/canvas/app/interaction/pointer/CanvasPointerShapeCreation.ts',
+      'src/canvas/app/affordances/interaction/pointer/CanvasPointerShapeCreation.ts',
     )
     const shapeCreationDescriptorsFile = getSourceFile(
-      'src/canvas/app/interaction/pointer/CanvasPointerShapeCreationDescriptors.ts',
+      'src/canvas/app/affordances/interaction/pointer/CanvasPointerShapeCreationDescriptors.ts',
     )
     const marqueeInteractionFile = getSourceFile(
-      'src/canvas/app/interaction/pointer/CanvasPointerMarqueeInteraction.ts',
+      'src/canvas/app/affordances/interaction/pointer/CanvasPointerMarqueeInteraction.ts',
     )
     const panInteractionFile = getSourceFile(
-      'src/canvas/app/interaction/pointer/CanvasPointerPanInteraction.ts',
+      'src/canvas/app/affordances/interaction/pointer/CanvasPointerPanInteraction.ts',
     )
     const transformPreviewFile = getSourceFile(
-      'src/canvas/app/interaction/pointer/CanvasPointerTransformPreview.ts',
+      'src/canvas/app/affordances/interaction/pointer/CanvasPointerTransformPreview.ts',
     )
     const movementFile = getSourceFile(
-      'src/canvas/app/interaction/pointer/CanvasPointerInteractionMovement.ts',
+      'src/canvas/app/affordances/interaction/pointer/CanvasPointerInteractionMovement.ts',
     )
 
     expect(dragHandlersFile.source).toContain(

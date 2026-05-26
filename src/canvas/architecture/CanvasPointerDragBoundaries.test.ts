@@ -7,19 +7,19 @@ import {
 describe('Canvas pointer drag boundaries', () => {
   it('keeps pointer drag effect application behind a named module', () => {
     const dragHookFile = getSourceFile(
-      'src/canvas/app/interaction/pointer/useCanvasPointerDragHandlers.ts',
+      'src/canvas/app/affordances/interaction/pointer/useCanvasPointerDragHandlers.ts',
     )
     const dragEffectsFile = getSourceFile(
-      'src/canvas/app/interaction/pointer/CanvasPointerInteractionDragEffects.ts',
+      'src/canvas/app/affordances/interaction/pointer/CanvasPointerInteractionDragEffects.ts',
     )
     const effectContractsFile = getSourceFile(
-      'src/canvas/app/interaction/pointer/CanvasPointerInteractionEffectContracts.ts',
+      'src/canvas/app/affordances/interaction/pointer/CanvasPointerInteractionEffectContracts.ts',
     )
     const resultContractsFile = getSourceFile(
-      'src/canvas/app/interaction/pointer/CanvasPointerInteractionResultContracts.ts',
+      'src/canvas/app/affordances/interaction/pointer/CanvasPointerInteractionResultContracts.ts',
     )
     const dragSessionFile = getSourceFile(
-      'src/canvas/app/interaction/pointer/CanvasPointerDragSession.ts',
+      'src/canvas/app/affordances/interaction/pointer/CanvasPointerDragSession.ts',
     )
 
     expect(dragHookFile.source).toContain(
@@ -102,10 +102,10 @@ describe('Canvas pointer drag boundaries', () => {
 
   it('keeps pointer click memory rules behind a named module', () => {
     const pointerDownHookFile = getSourceFile(
-      'src/canvas/app/interaction/pointer/useCanvasPointerDownHandlers.ts',
+      'src/canvas/app/affordances/interaction/pointer/useCanvasPointerDownHandlers.ts',
     )
     const clickMemoryFile = getSourceFile(
-      'src/canvas/app/interaction/pointer/CanvasPointerClickMemory.ts',
+      'src/canvas/app/affordances/interaction/pointer/CanvasPointerClickMemory.ts',
     )
 
     expect(pointerDownHookFile.source).toContain(
@@ -129,28 +129,28 @@ describe('Canvas pointer drag boundaries', () => {
 
   it('keeps pointer interaction commit and cancel lifecycle behind a named module', () => {
     const dragHandlersFile = getSourceFile(
-      'src/canvas/app/interaction/pointer/useCanvasPointerDragHandlers.ts',
+      'src/canvas/app/affordances/interaction/pointer/useCanvasPointerDragHandlers.ts',
     )
     const lifecycleFile = getSourceFile(
-      'src/canvas/app/interaction/pointer/CanvasPointerInteractionLifecycle.ts',
+      'src/canvas/app/affordances/interaction/pointer/CanvasPointerInteractionLifecycle.ts',
     )
     const creationCommitFile = getSourceFile(
-      'src/canvas/app/interaction/pointer/CanvasPointerCreationCommit.ts',
+      'src/canvas/app/affordances/interaction/pointer/CanvasPointerCreationCommit.ts',
     )
     const drawingCreationFile = getSourceFile(
-      'src/canvas/app/interaction/pointer/CanvasPointerDrawingCreation.ts',
+      'src/canvas/app/affordances/interaction/pointer/CanvasPointerDrawingCreation.ts',
     )
     const customCreationFile = getSourceFile(
-      'src/canvas/app/interaction/pointer/CanvasPointerCustomCreation.ts',
+      'src/canvas/app/affordances/interaction/pointer/CanvasPointerCustomCreation.ts',
     )
     const marqueeInteractionFile = getSourceFile(
-      'src/canvas/app/interaction/pointer/CanvasPointerMarqueeInteraction.ts',
+      'src/canvas/app/affordances/interaction/pointer/CanvasPointerMarqueeInteraction.ts',
     )
     const transformInteractionFile = getSourceFile(
-      'src/canvas/app/interaction/pointer/CanvasPointerTransformInteraction.ts',
+      'src/canvas/app/affordances/interaction/pointer/CanvasPointerTransformInteraction.ts',
     )
     const interactionRoutingFile = getSourceFile(
-      'src/canvas/app/interaction/pointer/CanvasPointerInteractionRouting.ts',
+      'src/canvas/app/affordances/interaction/pointer/CanvasPointerInteractionRouting.ts',
     )
 
     expect(dragHandlersFile.source).toContain(
@@ -211,10 +211,10 @@ describe('Canvas pointer drag boundaries', () => {
       "interaction.kind === 'move' || interaction.kind === 'resize'",
     )
     const shapeCreationFile = getSourceFile(
-      'src/canvas/app/interaction/pointer/CanvasPointerShapeCreation.ts',
+      'src/canvas/app/affordances/interaction/pointer/CanvasPointerShapeCreation.ts',
     )
     const shapeCreationDescriptorsFile = getSourceFile(
-      'src/canvas/app/interaction/pointer/CanvasPointerShapeCreationDescriptors.ts',
+      'src/canvas/app/affordances/interaction/pointer/CanvasPointerShapeCreationDescriptors.ts',
     )
 
     expect(creationCommitFile.source).toContain(

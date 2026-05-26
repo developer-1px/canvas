@@ -29,7 +29,7 @@ export type {
 export type {
   CanvasAppEventInput,
   CanvasAppPointerInput,
-} from '../interaction/pointer/CanvasAppPointerInput'
+} from '../affordances/interaction/pointer/CanvasAppPointerInput'
 export {
   DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS,
   assertCanvasDemoSvgComponentPresentationRenderers,

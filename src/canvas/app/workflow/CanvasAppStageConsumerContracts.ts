@@ -5,7 +5,7 @@ import type {
   Tool,
   Viewport,
 } from '../../entities'
-import type { CanvasAppPointerInput } from '../interaction/pointer/CanvasAppPointerInput'
+import type { CanvasAppPointerInput } from '../affordances/interaction/pointer/CanvasAppPointerInput'
 import type {
   CanvasAppComponentPresentationRenderers,
   CanvasAppCustomItemRenderers,

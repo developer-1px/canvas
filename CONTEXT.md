@@ -22,6 +22,7 @@
 - Canvas Package Public Entry: 외부 조립자와 Demo가 사용하는 `src/canvas` 단일 entry. App Shell, assembly input, descriptor authoring contract, stable entity type, layer facade namespace를 노출하고 workflow hook, assembly default/validator, custom module assembly helper, layer별 function export 같은 runtime how는 직접 노출하지 않는다.
 - Canvas App Public Facade: Canvas App Shell, Canvas App Assembly Source, workflow 조립 계약과 고급 App runtime hook을 노출하는 `src/canvas/app` entry.
 - Canvas App Authoring Facade: `canvas/app/authoring` subpath로 외부 조립자가 쓰는 assembly input, custom command, custom item module, module-owned creation tool, inspector, renderer descriptor 계약을 모으고 runtime hook, default assembly, assembled tool/state, validator, custom module assembly output은 제외하는 App public authoring Module.
+- Canvas App Affordances: 사용자가 이미 학습한 canvas 조작과 built-in whiteboard affordance의 App-owned implementation Module 집합. 외부 조립자는 이 Module을 재구현하지 않고 Canvas App Assembly의 feature toggle, adapter, extension seam으로만 조정한다.
 - Canvas Item Read Model: Demo `CanvasItem` tree의 조회, bounds, selection 정규화, Scene Adapter 생성을 tree helper 세부 구현 없이 제공하고 `scene`을 Engine `CanvasSceneAdapter` contract로 노출하는 Module.
 - Canvas Component Library: Demo component template, presentation key, component item 생성 how를 함께 제공하는 Host-owned concrete Module. App 공개 조립 계약은 이 concrete 타입 대신 Canvas App Component Library Interface를 소비한다.
 - Canvas Built-in Component Templates: Sticky, label, card 같은 기본 Demo component catalogue를 소유하는 Host-owned Module.

@@ -5,10 +5,10 @@ import {
 import {
   getCanvasAppCustomCommandStates,
   runCanvasAppCustomCommand,
-} from '../commands/CanvasAppCustomCommandExecution'
+} from '../affordances/commands/CanvasAppCustomCommandExecution'
 import type {
   CanvasAppCustomCommandContext,
-} from '../commands/CanvasAppCustomCommands'
+} from '../affordances/commands/CanvasAppCustomCommands'
 import {
   getCanvasAppCustomCreationToolStates,
 } from '../extensions/custom-tools/CanvasAppCustomCreationToolRuntime'

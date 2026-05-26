@@ -1,5 +1,5 @@
-import type { CanvasAppCustomCommand } from '../commands/CanvasAppCustomCommands'
-import type { CanvasAppInspectorPanel } from '../editing/inspector/CanvasAppInspectorPanels'
+import type { CanvasAppCustomCommand } from '../affordances/commands/CanvasAppCustomCommands'
+import type { CanvasAppInspectorPanel } from '../affordances/editing/inspector/CanvasAppInspectorPanels'
 import type {
   CanvasAppCustomItemModuleAssemblyOptions,
 } from '../extensions/custom-item-modules/CanvasAppCustomItemModuleAssembly'

@@ -15,7 +15,7 @@ export type {
 export type {
   CanvasAppCustomCommand,
   CanvasAppCustomCommandContext,
-} from '../commands/CanvasAppCustomCommands'
+} from '../affordances/commands/CanvasAppCustomCommands'
 export {
   defineCanvasAppCustomItemModule,
   type CanvasAppCustomItemModule,
@@ -29,12 +29,12 @@ export type {
 export type {
   CanvasAppEventInput,
   CanvasAppPointerInput,
-} from '../interaction/pointer/CanvasAppPointerInput'
+} from '../affordances/interaction/pointer/CanvasAppPointerInput'
 export type {
   CanvasAppInspectorPanel,
   CanvasAppInspectorPanelContext,
   CanvasAppInspectorPanelView,
-} from '../editing/inspector/CanvasAppInspectorPanels'
+} from '../affordances/editing/inspector/CanvasAppInspectorPanels'
 export type {
   CanvasAppCustomCreationToolContext,
   CanvasAppCustomToolShortcut,

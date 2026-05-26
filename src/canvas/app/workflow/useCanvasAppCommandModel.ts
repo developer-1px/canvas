@@ -1,4 +1,4 @@
-import { useCanvasCommands } from '../commands/useCanvasCommands'
+import { useCanvasCommands } from '../affordances/commands/useCanvasCommands'
 import { getCanvasAppCommandConsumerModel } from './CanvasAppCommandConsumerModel'
 import type { CanvasAppCommandModelInput } from './CanvasAppCommandConsumerContracts'
 

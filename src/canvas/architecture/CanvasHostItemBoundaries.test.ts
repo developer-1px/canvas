@@ -44,10 +44,10 @@ describe('Canvas host item boundaries', () => {
       'src/canvas/host/text/CanvasEditableTextItem.ts',
     )
     const itemStartFile = getSourceFile(
-      'src/canvas/app/interaction/pointer/CanvasItemPointerInteractionStart.ts',
+      'src/canvas/app/affordances/interaction/pointer/CanvasItemPointerInteractionStart.ts',
     )
     const textEditingModelFile = getSourceFile(
-      'src/canvas/app/editing/text-editor/CanvasTextEditingModel.ts',
+      'src/canvas/app/affordances/editing/text-editor/CanvasTextEditingModel.ts',
     )
 
     expect(itemSchemaFile.source).toContain(

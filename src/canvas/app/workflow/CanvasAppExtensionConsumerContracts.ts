@@ -7,7 +7,7 @@ import type {
   EditingText,
   Viewport,
 } from '../../entities'
-import type { CanvasAppCustomCommand } from '../commands/CanvasAppCustomCommands'
+import type { CanvasAppCustomCommand } from '../affordances/commands/CanvasAppCustomCommands'
 import type {
   CanvasAppCustomCommandState,
   CanvasAppCustomCreationToolState,

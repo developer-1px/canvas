@@ -3,7 +3,7 @@ import type {
   CanvasAppItemLayerRenderInput,
   CanvasAppStageRenderInput,
 } from '../rendering/CanvasAppRenderingContracts'
-import type { CanvasAppPointerInput } from '../interaction/pointer/CanvasAppPointerInput'
+import type { CanvasAppPointerInput } from '../affordances/interaction/pointer/CanvasAppPointerInput'
 import {
   renderCanvasAppStageModel,
   type CanvasAppStageModelInput,

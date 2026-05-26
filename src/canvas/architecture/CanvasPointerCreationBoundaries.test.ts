@@ -7,40 +7,40 @@ import {
 describe('Canvas pointer creation boundaries', () => {
   it('keeps pointer creation kind routing behind a named grammar module', () => {
     const lifecycleFile = getSourceFile(
-      'src/canvas/app/interaction/pointer/CanvasPointerInteractionLifecycle.ts',
+      'src/canvas/app/affordances/interaction/pointer/CanvasPointerInteractionLifecycle.ts',
     )
     const interactionPreviewFile = getSourceFile(
-      'src/canvas/app/interaction/pointer/CanvasPointerInteractionPreview.ts',
+      'src/canvas/app/affordances/interaction/pointer/CanvasPointerInteractionPreview.ts',
     )
     const creationStartFile = getSourceFile(
-      'src/canvas/app/interaction/pointer/CanvasPointerCreationStart.ts',
+      'src/canvas/app/affordances/interaction/pointer/CanvasPointerCreationStart.ts',
     )
     const creationPreviewFile = getSourceFile(
-      'src/canvas/app/interaction/pointer/CanvasPointerCreationPreview.ts',
+      'src/canvas/app/affordances/interaction/pointer/CanvasPointerCreationPreview.ts',
     )
     const creationCommitFile = getSourceFile(
-      'src/canvas/app/interaction/pointer/CanvasPointerCreationCommit.ts',
+      'src/canvas/app/affordances/interaction/pointer/CanvasPointerCreationCommit.ts',
     )
     const creationGrammarFile = getSourceFile(
-      'src/canvas/app/interaction/pointer/CanvasPointerCreationGrammar.ts',
+      'src/canvas/app/affordances/interaction/pointer/CanvasPointerCreationGrammar.ts',
     )
     const interactionRoutingFile = getSourceFile(
-      'src/canvas/app/interaction/pointer/CanvasPointerInteractionRouting.ts',
+      'src/canvas/app/affordances/interaction/pointer/CanvasPointerInteractionRouting.ts',
     )
     const drawingCreationFile = getSourceFile(
-      'src/canvas/app/interaction/pointer/CanvasPointerDrawingCreation.ts',
+      'src/canvas/app/affordances/interaction/pointer/CanvasPointerDrawingCreation.ts',
     )
     const customCreationFile = getSourceFile(
-      'src/canvas/app/interaction/pointer/CanvasPointerCustomCreation.ts',
+      'src/canvas/app/affordances/interaction/pointer/CanvasPointerCustomCreation.ts',
     )
     const shapeCreationFile = getSourceFile(
-      'src/canvas/app/interaction/pointer/CanvasPointerShapeCreation.ts',
+      'src/canvas/app/affordances/interaction/pointer/CanvasPointerShapeCreation.ts',
     )
     const shapeCreationDescriptorsFile = getSourceFile(
-      'src/canvas/app/interaction/pointer/CanvasPointerShapeCreationDescriptors.ts',
+      'src/canvas/app/affordances/interaction/pointer/CanvasPointerShapeCreationDescriptors.ts',
     )
     const textCreationFile = getSourceFile(
-      'src/canvas/app/interaction/pointer/CanvasPointerTextCreation.ts',
+      'src/canvas/app/affordances/interaction/pointer/CanvasPointerTextCreation.ts',
     )
 
     expect(creationGrammarFile.source).toContain(
@@ -184,16 +184,16 @@ describe('Canvas pointer creation boundaries', () => {
 
   it('keeps pointer interaction start effects behind a named module', () => {
     const downHandlersFile = getSourceFile(
-      'src/canvas/app/interaction/pointer/useCanvasPointerDownHandlers.ts',
+      'src/canvas/app/affordances/interaction/pointer/useCanvasPointerDownHandlers.ts',
     )
     const effectsFile = getSourceFile(
-      'src/canvas/app/interaction/pointer/CanvasPointerInteractionStartEffects.ts',
+      'src/canvas/app/affordances/interaction/pointer/CanvasPointerInteractionStartEffects.ts',
     )
     const effectContractsFile = getSourceFile(
-      'src/canvas/app/interaction/pointer/CanvasPointerInteractionEffectContracts.ts',
+      'src/canvas/app/affordances/interaction/pointer/CanvasPointerInteractionEffectContracts.ts',
     )
     const resultContractsFile = getSourceFile(
-      'src/canvas/app/interaction/pointer/CanvasPointerInteractionResultContracts.ts',
+      'src/canvas/app/affordances/interaction/pointer/CanvasPointerInteractionResultContracts.ts',
     )
 
     expect(downHandlersFile.source).toContain(

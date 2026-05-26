@@ -70,13 +70,13 @@ describe('Canvas module layer boundaries', () => {
 
   it('keeps the app shell imports limited to workflow and feature views', () => {
     const viewPrefixes = [
-      'src/canvas/app/authoring/component/',
-      'src/canvas/app/authoring/stamp/',
-      'src/canvas/app/controls/',
-      'src/canvas/app/editing/inspector/',
-      'src/canvas/app/editing/search/',
-      'src/canvas/app/editing/text-editor/',
-      'src/canvas/app/io/image/',
+      'src/canvas/app/affordances/authoring/component/',
+      'src/canvas/app/affordances/authoring/stamp/',
+      'src/canvas/app/affordances/controls/',
+      'src/canvas/app/affordances/editing/inspector/',
+      'src/canvas/app/affordances/editing/search/',
+      'src/canvas/app/affordances/editing/text-editor/',
+      'src/canvas/app/affordances/io/image/',
     ]
     const violations = getImportsFrom('src/canvas/app/shell/')
       .filter((reference) =>
