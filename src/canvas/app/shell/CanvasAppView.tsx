@@ -28,6 +28,7 @@ import {
 import { CanvasSelectionFloatingBar } from '../../ui/toolbar/CanvasSelectionFloatingBar'
 import { CanvasStatus } from '../../ui/status/CanvasStatus'
 import { ZoomControls } from '../../ui/zoom/ZoomControls'
+import { getCanvasAppSurfaceVisibility } from './CanvasAppSurfaceModel'
 
 type ToolbarProps = ComponentProps<typeof CanvasToolbar>
 type SelectionFloatingBarProps = ComponentProps<
@@ -127,48 +128,82 @@ export function CanvasAppView({
     event.preventDefault()
     setContextMenu({ x: event.clientX, y: event.clientY })
   }, [])
+  const surfaces = getCanvasAppSurfaceVisibility({
+    'canvas-status': showStatus,
+    'component-palette': showComponentPalette,
+    'context-command-menu': showToolbar && contextMenu !== null,
+    'cursor-chat': cursorChat.visible,
+    'drawing-controls': showDrawingControls,
+    'emote-controls': emoteControls.visible,
+    'find-replace-panel': findReplace.open,
+    'image-controls': showImageControls,
+    'object-inspector': showInspector,
+    'selection-floating-bar': showToolbar &&
+      statusProps.selectionLength > 0 &&
+      selectionCommandAnchor !== null,
+    'session-timer': sessionTimer.visible,
+    'spotlight': spotlight.visible,
+    'stamp-controls': showStampControls,
+    'sticky-quick-create': showStickyQuickCreate,
+    'text-editor': showTextEditor,
+    'toolbar': showToolbar,
+    'voting-session': votingSession.visible,
+    'zoom-controls': showZoomControls,
+  })
 
   return (
     <main className="canvas-app" onContextMenuCapture={openContextMenu}>
-      {showToolbar ? <CanvasToolbar {...toolbarProps} /> : null}
+      {surfaces.toolbar ? <CanvasToolbar {...toolbarProps} /> : null}
 
-      <CanvasSessionTimer {...sessionTimer} />
+      {surfaces['session-timer'] ? (
+        <CanvasSessionTimer {...sessionTimer} />
+      ) : null}
 
-      <CanvasSpotlight {...spotlight} />
+      {surfaces.spotlight ? <CanvasSpotlight {...spotlight} /> : null}
 
-      <CanvasVotingSession {...votingSession} />
+      {surfaces['voting-session'] ? (
+        <CanvasVotingSession {...votingSession} />
+      ) : null}
 
-      {showComponentPalette ? (
+      {surfaces['component-palette'] ? (
         <CanvasComponentPalette {...componentPaletteProps} />
       ) : null}
 
-      {showDrawingControls ? (
+      {surfaces['drawing-controls'] ? (
         <CanvasDrawingControls {...drawingControlProps} />
       ) : null}
 
-      <CanvasEmoteControls {...emoteControls} />
+      {surfaces['emote-controls'] ? (
+        <CanvasEmoteControls {...emoteControls} />
+      ) : null}
 
-      <CanvasFindReplacePanel {...findReplace} />
+      {surfaces['find-replace-panel'] ? (
+        <CanvasFindReplacePanel {...findReplace} />
+      ) : null}
 
-      {showImageControls ? <CanvasImageControls {...imageControlProps} /> : null}
+      {surfaces['image-controls'] ? (
+        <CanvasImageControls {...imageControlProps} />
+      ) : null}
 
-      {showStampControls ? <CanvasStampControls {...stampControlProps} /> : null}
+      {surfaces['stamp-controls'] ? (
+        <CanvasStampControls {...stampControlProps} />
+      ) : null}
 
       {stage}
 
-      {showToolbar ? (
+      {surfaces['selection-floating-bar'] ? (
         <CanvasSelectionFloatingBar
           anchor={selectionCommandAnchor}
           commandAvailability={toolbarProps.commandAvailability}
           config={toolbarProps.config}
           customCommands={toolbarProps.customCommands}
           commandHandlers={toolbarProps.commandHandlers}
-          visible={statusProps.selectionLength > 0}
+          visible={true}
           onCustomCommand={toolbarProps.onCustomCommand}
         />
       ) : null}
 
-      {showToolbar ? (
+      {surfaces['context-command-menu'] ? (
         <CanvasContextCommandMenu
           commandAvailability={toolbarProps.commandAvailability}
           config={toolbarProps.config}
@@ -180,19 +215,21 @@ export function CanvasAppView({
         />
       ) : null}
 
-      <CanvasCursorChat {...cursorChat} />
+      {surfaces['cursor-chat'] ? <CanvasCursorChat {...cursorChat} /> : null}
 
-      {showStickyQuickCreate ? (
+      {surfaces['sticky-quick-create'] ? (
         <CanvasStickyQuickCreateControl {...stickyQuickCreateProps} />
       ) : null}
 
-      {showTextEditor ? <CanvasTextEditor {...textEditorProps} /> : null}
+      {surfaces['text-editor'] ? <CanvasTextEditor {...textEditorProps} /> : null}
 
-      {showZoomControls ? <ZoomControls {...zoomControlProps} /> : null}
+      {surfaces['zoom-controls'] ? <ZoomControls {...zoomControlProps} /> : null}
 
-      {showInspector ? <CanvasObjectInspector {...inspectorProps} /> : null}
+      {surfaces['object-inspector'] ? (
+        <CanvasObjectInspector {...inspectorProps} />
+      ) : null}
 
-      {showStatus ? <CanvasStatus {...statusProps} /> : null}
+      {surfaces['canvas-status'] ? <CanvasStatus {...statusProps} /> : null}
     </main>
   )
 }

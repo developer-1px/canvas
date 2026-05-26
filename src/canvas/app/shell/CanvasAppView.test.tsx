@@ -49,14 +49,15 @@ describe('CanvasAppView', () => {
   })
 
   it('renders enabled app UI surfaces', () => {
-    const markup = renderToStaticMarkup(<CanvasAppView {...createViewProps()} />)
+    const markup = renderToStaticMarkup(
+      <CanvasAppView {...createViewProps({ inspector: false })} />,
+    )
 
     expect(markup).toContain('component-palette')
     expect(markup).toContain('cursor-chat')
     expect(markup).toContain('drawing-controls')
     expect(markup).toContain('emote-controls')
     expect(markup).toContain('image-controls')
-    expect(markup).toContain('object-inspector')
     expect(markup).toContain('session-timer')
     expect(markup).toContain('spotlight')
     expect(markup).toContain('stamp-controls')
@@ -67,6 +68,23 @@ describe('CanvasAppView', () => {
     expect(markup).toContain('toolbar')
     expect(markup).toContain('voting-session')
     expect(markup).toContain('zoom-controls')
+  })
+
+  it('renders only one right-rail panel at a time', () => {
+    const markup = renderToStaticMarkup(<CanvasAppView {...createViewProps()} />)
+
+    expect(markup).toContain('object-inspector')
+    expect(markup).not.toContain('component-palette')
+  })
+
+  it('renders only one bottom-center transient surface at a time', () => {
+    const props = createViewProps()
+    props.findReplace.open = true
+
+    const markup = renderToStaticMarkup(<CanvasAppView {...props} />)
+
+    expect(markup).toContain('find-replace-panel')
+    expect(markup).not.toContain('emote-controls')
   })
 })
 
