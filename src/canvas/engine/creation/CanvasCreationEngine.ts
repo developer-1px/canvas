@@ -46,7 +46,12 @@ export type CanvasCreationAdapter<TItem extends CanvasCreationItem> = {
     points: Point[]
     style?: CanvasCreatedDrawingStyle
   }) => TItem
-  createRect: (input: {
+  createShape?: (input: {
+    bounds: Bounds
+    id: string
+    shapeType: CanvasCreatedShapeKind
+  }) => TItem
+  createRect?: (input: {
     bounds: Bounds
     id: string
     shape?: CanvasCreatedShapeKind
@@ -126,23 +131,49 @@ export function getCanvasCreatedArrowEnd({
   }
 }
 
-export function createCanvasRect<TItem extends CanvasCreationItem>({
+export function createCanvasShape<TItem extends CanvasCreationItem>({
   adapter,
   createId,
   currentWorld,
-  shape,
+  shapeType = 'rect',
   startWorld,
 }: {
   adapter: CanvasCreationAdapter<TItem>
   createId: (prefix: string) => string
   currentWorld: Point
-  shape?: CanvasCreatedShapeKind
+  shapeType?: CanvasCreatedShapeKind
   startWorld: Point
 }) {
-  return adapter.createRect({
-    bounds: getCanvasCreatedRectBounds({ currentWorld, startWorld }),
-    id: createId(shape ?? 'rect'),
-    shape,
+  const bounds = getCanvasCreatedRectBounds({ currentWorld, startWorld })
+
+  if (adapter.createShape) {
+    return adapter.createShape({
+      bounds,
+      id: createId(shapeType),
+      shapeType,
+    })
+  }
+
+  if (adapter.createRect) {
+    return adapter.createRect({
+      bounds,
+      id: createId(shapeType),
+      shape: shapeType === 'rect' ? undefined : shapeType,
+    })
+  }
+
+  throw new Error('Canvas creation adapter requires createShape')
+}
+
+export function createCanvasRect<TItem extends CanvasCreationItem>({
+  shape,
+  ...input
+}: Omit<Parameters<typeof createCanvasShape<TItem>>[0], 'shapeType'> & {
+  shape?: CanvasCreatedShapeKind
+}) {
+  return createCanvasShape({
+    ...input,
+    shapeType: shape,
   })
 }
 

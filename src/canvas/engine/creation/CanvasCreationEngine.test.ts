@@ -4,6 +4,7 @@ import {
   createCanvasHighlight,
   createCanvasMarker,
   createCanvasRect,
+  createCanvasShape,
   getCanvasCreatedArrowEnd,
   getCanvasCreatedDrawingPoints,
   type CanvasCreationAdapter,
@@ -30,7 +31,8 @@ type CreatedItem =
   | {
       id: string
       shape?: 'diamond' | 'ellipse' | 'rect'
-      type: 'rect' | 'text'
+      shapeType?: 'diamond' | 'ellipse' | 'rect'
+      type: 'rect' | 'shape' | 'text'
     }
 
 const adapter: CanvasCreationAdapter<CreatedItem> = {
@@ -53,7 +55,7 @@ const adapter: CanvasCreationAdapter<CreatedItem> = {
     style,
     type: 'marker',
   }),
-  createRect: ({ id, shape }) => ({ id, shape, type: 'rect' }),
+  createShape: ({ id, shapeType }) => ({ id, shapeType, type: 'shape' }),
   createText: ({ id }) => ({
     editValue: 'Text',
     item: { id, type: 'text' },
@@ -136,23 +138,23 @@ describe('CanvasCreationEngine drawing tools', () => {
     ).toEqual({ x: 154, y: 20 })
   })
 
-  test('creates ellipse shapes through the rectangle creation adapter seam', () => {
+  test('creates ellipse shapes through the shape creation adapter seam', () => {
     expect(
-      createCanvasRect({
+      createCanvasShape({
         adapter,
         createId: (prefix) => `${prefix}-1`,
         currentWorld: { x: 90, y: 100 },
-        shape: 'ellipse',
+        shapeType: 'ellipse',
         startWorld: { x: 10, y: 20 },
       }),
     ).toEqual({
       id: 'ellipse-1',
-      shape: 'ellipse',
-      type: 'rect',
+      shapeType: 'ellipse',
+      type: 'shape',
     })
   })
 
-  test('creates diamond shapes through the rectangle creation adapter seam', () => {
+  test('keeps createCanvasRect as a compatibility wrapper', () => {
     expect(
       createCanvasRect({
         adapter,
@@ -163,8 +165,8 @@ describe('CanvasCreationEngine drawing tools', () => {
       }),
     ).toEqual({
       id: 'diamond-1',
-      shape: 'diamond',
-      type: 'rect',
+      shapeType: 'diamond',
+      type: 'shape',
     })
   })
 })

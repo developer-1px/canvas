@@ -8,11 +8,15 @@ import type {
 } from './CanvasDrawingItems'
 import type { GroupItem } from './CanvasGroupItems'
 import type { CanvasImageItem } from './CanvasImageItems'
-import type { RectItem } from './CanvasShapeItems'
+import type {
+  CanvasShapeItem,
+  RectItem,
+} from './CanvasShapeItems'
 import type { CanvasStampItem } from './CanvasStampItems'
 import type { TextItem } from './CanvasTextItems'
 
 export type CanvasItem =
+  | CanvasShapeItem
   | RectItem
   | TextItem
   | CanvasImageItem

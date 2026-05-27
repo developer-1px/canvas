@@ -1,4 +1,5 @@
 import type { CanvasItem } from '../../../../entities'
+import { isCanvasShapeItem } from '../../../../host'
 import type { CommitCanvasItemsChange } from '../../../workflow/CanvasWorkflowContract'
 
 export type CanvasObjectStyleChannel = 'fill' | 'stroke'
@@ -16,11 +17,14 @@ export type CanvasObjectStyleControl = {
   onSelect: (color: string) => void
 }
 
-type CanvasFillStyleItem = Extract<CanvasItem, { type: 'component' | 'rect' }>
+type CanvasFillStyleItem = Extract<
+  CanvasItem,
+  { type: 'component' | 'rect' | 'shape' }
+>
 
 type CanvasStrokeStyleItem = Extract<
   CanvasItem,
-  { type: 'arrow' | 'component' | 'highlight' | 'marker' | 'rect' }
+  { type: 'arrow' | 'component' | 'highlight' | 'marker' | 'rect' | 'shape' }
 >
 
 const CANVAS_OBJECT_FILL_COLORS = [
@@ -187,7 +191,7 @@ function applyCanvasObjectStyle(
 }
 
 function hasCanvasObjectFill(item: CanvasItem): item is CanvasFillStyleItem {
-  return item.type === 'component' || item.type === 'rect'
+  return item.type === 'component' || isCanvasShapeItem(item)
 }
 
 function hasCanvasObjectStroke(item: CanvasItem): item is CanvasStrokeStyleItem {
@@ -196,6 +200,6 @@ function hasCanvasObjectStroke(item: CanvasItem): item is CanvasStrokeStyleItem 
     item.type === 'component' ||
     item.type === 'highlight' ||
     item.type === 'marker' ||
-    item.type === 'rect'
+    isCanvasShapeItem(item)
   )
 }

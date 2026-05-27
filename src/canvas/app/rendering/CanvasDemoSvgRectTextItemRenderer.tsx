@@ -1,10 +1,11 @@
 import type {
+  CanvasShapeItem,
   RectItem,
   TextItem,
 } from '../../entities'
 import { renderCanvasDemoSvgRectTextItemByRoute } from './CanvasDemoSvgRectTextItemRenderRouting'
 
-export type CanvasDemoSvgRectTextItem = RectItem | TextItem
+export type CanvasDemoSvgRectTextItem = CanvasShapeItem | RectItem | TextItem
 
 export function renderCanvasDemoSvgRectTextItem({
   item,

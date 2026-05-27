@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import type {
+  CanvasShapeItem,
   RectItem,
   TextItem,
 } from '../../entities'
@@ -9,7 +10,7 @@ import {
   type CanvasSvgShapeGeometry,
 } from '../../host'
 
-type CanvasDemoSvgRectTextItem = RectItem | TextItem
+type CanvasDemoSvgRectTextItem = CanvasShapeItem | RectItem | TextItem
 
 type CanvasDemoSvgRectTextItemRenderStrategy<
   TItem extends CanvasDemoSvgRectTextItem,
@@ -19,13 +20,17 @@ type CanvasDemoSvgRectTextItemRenderStrategy<
 
 export const CANVAS_DEMO_SVG_RECT_TEXT_ITEM_RENDER_STRATEGIES = {
   rect: {
-    render: renderCanvasDemoSvgRectItem,
+    render: renderCanvasDemoSvgShapeItem,
+  },
+  shape: {
+    render: renderCanvasDemoSvgShapeItem,
   },
   text: {
     render: renderCanvasDemoSvgTextItem,
   },
 } satisfies {
   rect: CanvasDemoSvgRectTextItemRenderStrategy<RectItem>
+  shape: CanvasDemoSvgRectTextItemRenderStrategy<CanvasShapeItem>
   text: CanvasDemoSvgRectTextItemRenderStrategy<TextItem>
 }
 
@@ -34,32 +39,38 @@ export function renderCanvasDemoSvgRectTextItemByRoute({
 }: {
   item: CanvasDemoSvgRectTextItem
 }) {
-  return isCanvasTextItem(item)
-    ? CANVAS_DEMO_SVG_RECT_TEXT_ITEM_RENDER_STRATEGIES.text.render({ item })
+  if (isCanvasTextItem(item)) {
+    return CANVAS_DEMO_SVG_RECT_TEXT_ITEM_RENDER_STRATEGIES.text.render({
+      item,
+    })
+  }
+
+  return item.type === 'shape'
+    ? CANVAS_DEMO_SVG_RECT_TEXT_ITEM_RENDER_STRATEGIES.shape.render({ item })
     : CANVAS_DEMO_SVG_RECT_TEXT_ITEM_RENDER_STRATEGIES.rect.render({ item })
 }
 
-function renderCanvasDemoSvgRectItem({
+function renderCanvasDemoSvgShapeItem({
   item,
 }: {
-  item: RectItem
+  item: CanvasShapeItem | RectItem
 }) {
   return (
     <>
-      {renderCanvasDemoSvgShapeItem({ item })}
+      {renderCanvasDemoSvgShapeNode({ item })}
       {item.text ? (
         <foreignObject x={item.x} y={item.y} width={item.w} height={item.h}>
-          <div className="canvas-text canvas-rect-text">{item.text}</div>
+          <div className="canvas-text canvas-shape-text">{item.text}</div>
         </foreignObject>
       ) : null}
     </>
   )
 }
 
-function renderCanvasDemoSvgShapeItem({
+function renderCanvasDemoSvgShapeNode({
   item,
 }: {
-  item: RectItem
+  item: CanvasShapeItem | RectItem
 }) {
   const geometry = getCanvasItemSvgShapeGeometry(item)
 
@@ -82,7 +93,7 @@ function renderCanvasDemoSvgShapeGeometry({
   if (geometry.kind === 'ellipse') {
     return (
       <ellipse
-        className="rect-item"
+        className="shape-item"
         cx={geometry.cx}
         cy={geometry.cy}
         rx={geometry.rx}
@@ -97,7 +108,7 @@ function renderCanvasDemoSvgShapeGeometry({
   if (geometry.kind === 'path') {
     return (
       <path
-        className="rect-item"
+        className="shape-item"
         d={geometry.d}
         fill={fill}
         stroke={stroke}
@@ -108,7 +119,7 @@ function renderCanvasDemoSvgShapeGeometry({
 
   return (
     <rect
-      className="rect-item"
+      className="shape-item"
       x={geometry.x}
       y={geometry.y}
       width={geometry.width}

@@ -80,8 +80,8 @@ describe('Canvas rendering item boundaries', () => {
     expect(itemLayerFile.source).not.toContain(
       "from './CanvasDemoSvgRectTextItemRenderer'",
     )
-    expect(itemLayerFile.source).not.toContain('className="rect-item"')
-    expect(itemLayerFile.source).not.toContain('canvas-rect-text')
+    expect(itemLayerFile.source).not.toContain('className="shape-item"')
+    expect(itemLayerFile.source).not.toContain('canvas-shape-text')
     expect(itemLayerFile.source).not.toContain('<foreignObject')
     expect(rectTextRendererFile.source).toContain(
       'export function renderCanvasDemoSvgRectTextItem',
@@ -90,8 +90,8 @@ describe('Canvas rendering item boundaries', () => {
       "from './CanvasDemoSvgRectTextItemRenderRouting'",
     )
     expect(rectTextRendererFile.source).not.toContain("item.type === 'rect'")
-    expect(rectTextRendererFile.source).not.toContain('className="rect-item"')
-    expect(rectTextRendererFile.source).not.toContain('canvas-rect-text')
+    expect(rectTextRendererFile.source).not.toContain('className="shape-item"')
+    expect(rectTextRendererFile.source).not.toContain('canvas-shape-text')
     expect(rectTextRendererFile.source).not.toContain('<foreignObject')
     expect(rectTextRoutingFile.source).toContain(
       'CANVAS_DEMO_SVG_RECT_TEXT_ITEM_RENDER_STRATEGIES',
@@ -100,8 +100,8 @@ describe('Canvas rendering item boundaries', () => {
       'export function renderCanvasDemoSvgRectTextItemByRoute',
     )
     expect(rectTextRoutingFile.source).toContain('isCanvasTextItem')
-    expect(rectTextRoutingFile.source).toContain('className="rect-item"')
-    expect(rectTextRoutingFile.source).toContain('canvas-rect-text')
+    expect(rectTextRoutingFile.source).toContain('className="shape-item"')
+    expect(rectTextRoutingFile.source).toContain('canvas-shape-text')
     expect(rectTextRoutingFile.source).toContain('<foreignObject')
   })
 

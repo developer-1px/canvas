@@ -54,7 +54,7 @@ export type Interaction =
   | {
       kind: 'create-shape'
       pointerId: number
-      shape: CanvasShapeKind
+      shapeType: CanvasShapeKind
       startScreen: Point
       startWorld: Point
       currentWorld: Point

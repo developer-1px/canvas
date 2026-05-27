@@ -25,7 +25,7 @@ describe('CanvasPointerInteractionLifecycle', () => {
       interaction: {
         kind: 'create-shape',
         pointerId: 1,
-        shape: 'rect',
+        shapeType: 'rect',
         startScreen: { x: 0, y: 0 },
         startWorld: { x: 10, y: 20 },
         currentWorld: { x: 90, y: 100 },

@@ -2,7 +2,10 @@ export type {
   CanvasItemBase,
 } from './CanvasItemBase'
 export type {
+  CanvasShapeItem,
   CanvasShapeKind,
+  CanvasShapeLikeItem,
+  CanvasShapeType,
   RectItem,
 } from './CanvasShapeItems'
 export type {

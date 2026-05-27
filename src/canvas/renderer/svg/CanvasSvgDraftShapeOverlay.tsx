@@ -11,7 +11,7 @@ export function CanvasSvgDraftShapeOverlay({
 }) {
   const geometry = getCanvasSvgShapeGeometry({
     bounds: draftRect,
-    shape: draftRect.shape ?? 'rect',
+    shapeType: draftRect.shapeType ?? 'rect',
   })
 
   return renderCanvasSvgDraftShapeGeometry(geometry)

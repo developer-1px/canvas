@@ -22,7 +22,10 @@ import {
   isCanvasArrowDrawingItem,
 } from '../drawing/CanvasDrawingItemGeometry'
 import { isCanvasDrawingItemStorageShape } from '../drawing/CanvasDrawingItemValidation'
-import { isCanvasShapeKind } from '../shape/CanvasShapeItem'
+import {
+  isCanvasShapeItem,
+  isCanvasShapeItemStorageShape,
+} from '../shape/CanvasShapeItem'
 
 export type { CanvasEditableTextItem } from '../model'
 
@@ -40,7 +43,7 @@ export function isCanvasEditableTextItem(
   item: CanvasItem,
 ): item is CanvasEditableTextItem {
   return (
-    item.type === 'rect' ||
+    isCanvasShapeItem(item) ||
     isCanvasCommentItem(item) ||
     isCanvasTextItem(item) ||
     isCanvasArrowDrawingItem(item) ||
@@ -53,7 +56,7 @@ export function isCanvasEditableTextItemStorageShape(
   value: Record<string, unknown>,
 ): value is CanvasEditableTextItem {
   return (
-    isCanvasRectItemStorageShape(value) ||
+    isCanvasShapeItemStorageShape(value) ||
     isCanvasTextItemStorageShape(value) ||
     isCanvasArrowTextItemStorageShape(value)
   )
@@ -173,7 +176,7 @@ function isCanvasEditableTextPatchFieldMissing(
   item: CanvasEditableTextItem,
 ) {
   return (
-    (item.type === 'rect' && item.text === undefined) ||
+    (isCanvasShapeItem(item) && item.text === undefined) ||
     (item.type === 'component' &&
       item.component !== CANVAS_SECTION_COMPONENT_KIND &&
       item.body === undefined) ||
@@ -190,18 +193,6 @@ function getCanvasEditableTextAutoHeight(
   }
 
   return getCanvasStickyComponentTextHeight({ item, text })
-}
-
-function isCanvasRectItemStorageShape(
-  value: Record<string, unknown>,
-) {
-  return (
-    value.type === 'rect' &&
-    typeof value.fill === 'string' &&
-    typeof value.stroke === 'string' &&
-    (value.shape === undefined || isCanvasShapeKind(value.shape)) &&
-    (value.text === undefined || typeof value.text === 'string')
-  )
 }
 
 function isCanvasTextItemStorageShape(

@@ -1,5 +1,8 @@
 import type {
+  CanvasShapeItem,
   CanvasShapeKind,
+  CanvasShapeLikeItem,
+  CanvasShapeType,
   RectItem,
 } from '../model'
 import {
@@ -8,7 +11,9 @@ import {
   type Tool,
 } from '../../core'
 
-export const CANVAS_DEFAULT_SHAPE_KIND: CanvasShapeKind = 'rect'
+export const CANVAS_DEFAULT_SHAPE_TYPE: CanvasShapeType = 'rect'
+export const CANVAS_DEFAULT_SHAPE_KIND: CanvasShapeKind =
+  CANVAS_DEFAULT_SHAPE_TYPE
 
 const CANVAS_SHAPE_KINDS = Object.freeze([
   ...CANVAS_BUILTIN_SHAPE_TOOLS,
@@ -22,7 +27,18 @@ const CANVAS_TOOL_SHAPE_KINDS = Object.freeze(
 
 export type CanvasShapeTool = CanvasBuiltinShapeTool
 
-export function getCanvasShapeKind(item: Pick<RectItem, 'shape'>) {
+export function getCanvasShapeType(item: Pick<CanvasShapeItem, 'shapeType'>) {
+  return item.shapeType
+}
+
+export function getCanvasShapeKind(
+  item: Partial<Pick<CanvasShapeItem, 'shapeType'>> &
+    Partial<Pick<RectItem, 'shape'>>,
+) {
+  return item.shapeType ?? item.shape ?? CANVAS_DEFAULT_SHAPE_TYPE
+}
+
+export function getCanvasLegacyShapeKind(item: Pick<RectItem, 'shape'>) {
   return item.shape ?? CANVAS_DEFAULT_SHAPE_KIND
 }
 
@@ -37,4 +53,41 @@ export function isCanvasShapeTool(tool: Tool): tool is CanvasShapeTool {
 export function isCanvasShapeKind(value: unknown): value is CanvasShapeKind {
   return typeof value === 'string' &&
     CANVAS_SHAPE_KINDS.includes(value as CanvasShapeKind)
+}
+
+export function isCanvasShapeItem(
+  item: { type: string },
+): item is CanvasShapeLikeItem {
+  return item.type === 'shape' || item.type === 'rect'
+}
+
+export function isCanvasShapeItemStorageShape(
+  value: Record<string, unknown>,
+): value is CanvasShapeLikeItem {
+  return isCanvasShapeStorageShape(value) ||
+    isLegacyCanvasRectStorageShape(value)
+}
+
+function isCanvasShapeStorageShape(
+  value: Record<string, unknown>,
+): value is CanvasShapeItem {
+  return (
+    value.type === 'shape' &&
+    typeof value.fill === 'string' &&
+    typeof value.stroke === 'string' &&
+    isCanvasShapeKind(value.shapeType) &&
+    (value.text === undefined || typeof value.text === 'string')
+  )
+}
+
+function isLegacyCanvasRectStorageShape(
+  value: Record<string, unknown>,
+): value is RectItem {
+  return (
+    value.type === 'rect' &&
+    typeof value.fill === 'string' &&
+    typeof value.stroke === 'string' &&
+    (value.shape === undefined || isCanvasShapeKind(value.shape)) &&
+    (value.text === undefined || typeof value.text === 'string')
+  )
 }

@@ -4,25 +4,26 @@ import type { CanvasDemoSvgRectTextItem } from './CanvasDemoSvgRectTextItemRende
 import { renderCanvasDemoSvgRectTextItem } from './CanvasDemoSvgRectTextItemRenderer'
 
 describe('CanvasDemoSvgRectTextItemRenderer', () => {
-  it('renders rect geometry and embedded text', () => {
+  it('renders shape geometry and embedded text', () => {
     const markup = renderRectTextItems([
       {
-        id: 'rect-1',
-        type: 'rect',
-        x: 20,
-        y: 30,
-        w: 120,
-        h: 80,
         fill: '#f8fafc',
+        h: 80,
+        id: 'rect-1',
+        shapeType: 'rect',
         stroke: '#334155',
         text: 'Frame',
+        type: 'shape',
+        w: 120,
+        x: 20,
+        y: 30,
       },
     ])
 
-    expect(markup).toContain('class="rect-item"')
+    expect(markup).toContain('class="shape-item"')
     expect(markup).toContain('x="20"')
     expect(markup).toContain('width="120"')
-    expect(markup).toContain('class="canvas-text canvas-rect-text"')
+    expect(markup).toContain('class="canvas-text canvas-shape-text"')
     expect(markup).toContain('Frame')
   })
 
@@ -52,10 +53,10 @@ describe('CanvasDemoSvgRectTextItemRenderer', () => {
         fill: '#fef3c7',
         h: 80,
         id: 'ellipse-1',
-        shape: 'ellipse',
+        shapeType: 'ellipse',
         stroke: '#d97706',
         text: 'Loop',
-        type: 'rect',
+        type: 'shape',
         w: 120,
         x: 20,
         y: 30,
@@ -63,7 +64,7 @@ describe('CanvasDemoSvgRectTextItemRenderer', () => {
     ])
 
     expect(markup).toContain('<ellipse')
-    expect(markup).toContain('class="rect-item"')
+    expect(markup).toContain('class="shape-item"')
     expect(markup).toContain('cx="80"')
     expect(markup).toContain('ry="40"')
     expect(markup).toContain('Loop')
@@ -75,10 +76,10 @@ describe('CanvasDemoSvgRectTextItemRenderer', () => {
         fill: '#ecfdf5',
         h: 80,
         id: 'diamond-1',
-        shape: 'diamond',
+        shapeType: 'diamond',
         stroke: '#047857',
         text: 'Decision',
-        type: 'rect',
+        type: 'shape',
         w: 120,
         x: 20,
         y: 30,
@@ -86,7 +87,7 @@ describe('CanvasDemoSvgRectTextItemRenderer', () => {
     ])
 
     expect(markup).toContain('<path')
-    expect(markup).toContain('class="rect-item"')
+    expect(markup).toContain('class="shape-item"')
     expect(markup).toContain('M 80 30 L 140 70 L 80 110 L 20 70 Z')
     expect(markup).toContain('Decision')
   })

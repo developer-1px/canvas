@@ -4,7 +4,10 @@ import type { ArrowItem } from './CanvasArrowItems'
 import type { CanvasCommentItem } from './CanvasCommentItems'
 import type { CanvasComponentItem } from './CanvasComponentItems'
 import type { CanvasItemBase } from './CanvasItemBase'
-import type { RectItem } from './CanvasShapeItems'
+import type {
+  CanvasShapeItem,
+  RectItem,
+} from './CanvasShapeItems'
 
 export type TextItem = CanvasItemBase & {
   type: 'text'
@@ -14,6 +17,7 @@ export type TextItem = CanvasItemBase & {
 export type CanvasEditableTextItem =
   | ArrowItem
   | CanvasCommentItem
+  | CanvasShapeItem
   | RectItem
   | TextItem
   | CanvasComponentItem

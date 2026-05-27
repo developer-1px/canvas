@@ -16,7 +16,10 @@ export type {
   CanvasItemBase,
   CanvasJsonObject,
   CanvasJsonValue,
+  CanvasShapeItem,
   CanvasShapeKind,
+  CanvasShapeLikeItem,
+  CanvasShapeType,
   CanvasStampItem,
   CanvasStampKind,
   EditingText,
@@ -173,9 +176,14 @@ export {
 } from './stamp/CanvasStampItem'
 
 export {
+  CANVAS_DEFAULT_SHAPE_TYPE,
   CANVAS_DEFAULT_SHAPE_KIND,
+  getCanvasShapeType,
   getCanvasShapeKind,
+  getCanvasLegacyShapeKind,
   getCanvasToolShapeKind,
+  isCanvasShapeItem,
+  isCanvasShapeItemStorageShape,
   isCanvasShapeTool,
   isCanvasShapeKind,
   type CanvasShapeTool,

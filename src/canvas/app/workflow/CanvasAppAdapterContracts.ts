@@ -78,7 +78,7 @@ function assertCanvasAppCreationAdapter(
     'createArrow',
     'createHighlight',
     'createMarker',
-    'createRect',
+    'createShape',
     'createText',
   ] as const) {
     assertCanvasAppDescriptorFunctionField({

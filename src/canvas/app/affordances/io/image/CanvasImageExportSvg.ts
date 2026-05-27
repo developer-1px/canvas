@@ -5,9 +5,11 @@ import type {
   CanvasCustomItem,
   CanvasImageItem,
   CanvasItem,
+  CanvasShapeLikeItem,
   CanvasStampItem,
   Point,
 } from '../../../../entities'
+import { getCanvasItemSvgShapeGeometry } from '../../../../host'
 
 export type CanvasImageExportPayload = {
   filename: string
@@ -62,18 +64,8 @@ function renderCanvasImageExportItem(item: CanvasItem): string {
     return renderCanvasCommentExportItem(item)
   }
 
-  if (item.type === 'rect') {
-    return [
-      `<rect x="${formatNumber(item.x)}" y="${formatNumber(item.y)}" width="${formatNumber(item.w)}" height="${formatNumber(item.h)}" rx="4" fill="${escapeXmlAttribute(item.fill)}" stroke="${escapeXmlAttribute(item.stroke)}" stroke-width="1.25" />`,
-      item.text
-        ? renderCanvasSvgText({
-            fontSize: 16,
-            text: item.text,
-            x: item.x + 8,
-            y: item.y + 24,
-          })
-        : '',
-    ].join('')
+  if (item.type === 'shape' || item.type === 'rect') {
+    return renderCanvasShapeExportItem(item)
   }
 
   if (item.type === 'text') {
@@ -102,6 +94,47 @@ function renderCanvasImageExportItem(item: CanvasItem): string {
   }
 
   return renderCanvasCustomExportItem(item)
+}
+
+function renderCanvasShapeExportItem(item: CanvasShapeLikeItem) {
+  const geometry = getCanvasItemSvgShapeGeometry(item)
+  const shapeMarkup = renderCanvasShapeGeometry({
+    fill: item.fill,
+    geometry,
+    stroke: item.stroke,
+  })
+
+  return [
+    shapeMarkup,
+    item.text
+      ? renderCanvasSvgText({
+          fontSize: 16,
+          text: item.text,
+          x: item.x + 8,
+          y: item.y + 24,
+        })
+      : '',
+  ].join('')
+}
+
+function renderCanvasShapeGeometry({
+  fill,
+  geometry,
+  stroke,
+}: {
+  fill: string
+  geometry: ReturnType<typeof getCanvasItemSvgShapeGeometry>
+  stroke: string
+}) {
+  if (geometry.kind === 'ellipse') {
+    return `<ellipse cx="${formatNumber(geometry.cx)}" cy="${formatNumber(geometry.cy)}" rx="${formatNumber(geometry.rx)}" ry="${formatNumber(geometry.ry)}" fill="${escapeXmlAttribute(fill)}" stroke="${escapeXmlAttribute(stroke)}" stroke-width="1.25" />`
+  }
+
+  if (geometry.kind === 'path') {
+    return `<path d="${escapeXmlAttribute(geometry.d)}" fill="${escapeXmlAttribute(fill)}" stroke="${escapeXmlAttribute(stroke)}" stroke-width="1.25" />`
+  }
+
+  return `<rect x="${formatNumber(geometry.x)}" y="${formatNumber(geometry.y)}" width="${formatNumber(geometry.width)}" height="${formatNumber(geometry.height)}" rx="${formatNumber(geometry.rx)}" fill="${escapeXmlAttribute(fill)}" stroke="${escapeXmlAttribute(stroke)}" stroke-width="1.25" />`
 }
 
 function renderCanvasImageItem(item: CanvasImageItem) {

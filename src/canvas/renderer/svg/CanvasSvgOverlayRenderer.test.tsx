@@ -92,7 +92,7 @@ describe('CanvasSvgOverlayRenderer', () => {
             ...createOverlayState(),
             draftRect: {
               h: 60,
-              shape: 'ellipse',
+              shapeType: 'ellipse',
               w: 100,
               x: 20,
               y: 30,
@@ -118,7 +118,7 @@ describe('CanvasSvgOverlayRenderer', () => {
             ...createOverlayState(),
             draftRect: {
               h: 60,
-              shape: 'diamond',
+              shapeType: 'diamond',
               w: 100,
               x: 20,
               y: 30,

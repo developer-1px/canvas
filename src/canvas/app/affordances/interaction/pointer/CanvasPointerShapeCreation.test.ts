@@ -46,34 +46,34 @@ describe('CanvasPointerShapeCreation start and preview', () => {
     })
 
     expect(rect).toMatchObject({
-      draftRect: { h: 0, shape: 'rect', w: 0, x: 80, y: 120 },
+      draftRect: { h: 0, shapeType: 'rect', w: 0, x: 80, y: 120 },
       gesture: 'create-shape',
       interaction: {
         currentWorld: { x: 80, y: 120 },
         kind: 'create-shape',
-        shape: 'rect',
+        shapeType: 'rect',
         startWorld: { x: 80, y: 120 },
       },
       kind: 'interaction',
     })
     expect(ellipse).toMatchObject({
-      draftRect: { h: 0, shape: 'ellipse', w: 0, x: 80, y: 120 },
+      draftRect: { h: 0, shapeType: 'ellipse', w: 0, x: 80, y: 120 },
       gesture: 'create-shape',
       interaction: {
         currentWorld: { x: 80, y: 120 },
         kind: 'create-shape',
-        shape: 'ellipse',
+        shapeType: 'ellipse',
         startWorld: { x: 80, y: 120 },
       },
       kind: 'interaction',
     })
     expect(diamond).toMatchObject({
-      draftRect: { h: 0, shape: 'diamond', w: 0, x: 80, y: 120 },
+      draftRect: { h: 0, shapeType: 'diamond', w: 0, x: 80, y: 120 },
       gesture: 'create-shape',
       interaction: {
         currentWorld: { x: 80, y: 120 },
         kind: 'create-shape',
-        shape: 'diamond',
+        shapeType: 'diamond',
         startWorld: { x: 80, y: 120 },
       },
       kind: 'interaction',
@@ -105,7 +105,7 @@ describe('CanvasPointerShapeCreation start and preview', () => {
         kind: 'create-shape',
         moved: false,
         pointerId: 1,
-        shape: 'rect',
+        shapeType: 'rect',
         startScreen: { x: 0, y: 0 },
         startWorld: { x: 0, y: 0 },
       },
@@ -120,7 +120,7 @@ describe('CanvasPointerShapeCreation start and preview', () => {
         kind: 'create-shape',
         moved: false,
         pointerId: 1,
-        shape: 'ellipse',
+        shapeType: 'ellipse',
         startScreen: { x: 0, y: 0 },
         startWorld: { x: 0, y: 0 },
       },
@@ -137,7 +137,7 @@ describe('CanvasPointerShapeCreation start and preview', () => {
         kind: 'create-shape',
         moved: false,
         pointerId: 1,
-        shape: 'ellipse',
+        shapeType: 'ellipse',
         startScreen: { x: 0, y: 0 },
         startWorld: { x: 0, y: 0 },
       },
@@ -145,7 +145,7 @@ describe('CanvasPointerShapeCreation start and preview', () => {
     })
 
     expect(preview).toMatchObject({
-      draftRect: { h: 80, shape: 'rect', w: 80, x: 0, y: 0 },
+      draftRect: { h: 80, shapeType: 'rect', w: 80, x: 0, y: 0 },
       interaction: {
         currentWorld: { x: 80, y: 80 },
         kind: 'create-shape',
@@ -154,7 +154,7 @@ describe('CanvasPointerShapeCreation start and preview', () => {
       kind: 'preview',
     })
     expect(ellipsePreview).toMatchObject({
-      draftRect: { h: 80, shape: 'ellipse', w: 80, x: 0, y: 0 },
+      draftRect: { h: 80, shapeType: 'ellipse', w: 80, x: 0, y: 0 },
       interaction: {
         currentWorld: { x: 80, y: 80 },
         kind: 'create-shape',

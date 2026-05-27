@@ -1,7 +1,6 @@
 import type { Bounds } from '../../core'
 import type {
   CanvasShapeKind,
-  RectItem,
 } from '../model'
 import { getCanvasShapeKind } from './CanvasShapeItem'
 
@@ -43,22 +42,33 @@ const CANVAS_SHAPE_GEOMETRY_DESCRIPTORS = Object.freeze({
 } satisfies Readonly<Record<CanvasShapeKind, CanvasShapeGeometryDescriptor>>)
 
 export function getCanvasItemSvgShapeGeometry(
-  item: Pick<RectItem, 'h' | 'shape' | 'w' | 'x' | 'y'>,
+  item: {
+    h: number
+    shape?: CanvasShapeKind
+    shapeType?: CanvasShapeKind
+    w: number
+    x: number
+    y: number
+  },
 ) {
   return getCanvasSvgShapeGeometry({
     bounds: item,
-    shape: getCanvasShapeKind(item),
+    shapeType: getCanvasShapeKind(item),
   })
 }
 
 export function getCanvasSvgShapeGeometry({
   bounds,
   shape,
+  shapeType,
 }: {
   bounds: Bounds
-  shape: CanvasShapeKind
+  shape?: CanvasShapeKind
+  shapeType?: CanvasShapeKind
 }) {
-  return CANVAS_SHAPE_GEOMETRY_DESCRIPTORS[shape].getSvgGeometry(bounds)
+  return CANVAS_SHAPE_GEOMETRY_DESCRIPTORS[
+    shapeType ?? shape ?? 'rect'
+  ].getSvgGeometry(bounds)
 }
 
 function getCanvasDiamondSvgShapeGeometry({

@@ -15,7 +15,7 @@ import {
 } from './CanvasPointerCreationCommit'
 
 describe('CanvasPointerCreationCommit', () => {
-  it('commits rect creation and returns to the select tool', () => {
+  it('commits shape creation and returns to the select tool', () => {
     const commitItemsChange = vi.fn<CommitCanvasItemsChange>(() => true)
     const setTool = vi.fn()
 
@@ -24,7 +24,7 @@ describe('CanvasPointerCreationCommit', () => {
       interaction: {
         kind: 'create-shape',
         pointerId: 1,
-        shape: 'rect',
+        shapeType: 'rect',
         startScreen: { x: 0, y: 0 },
         startWorld: { x: 10, y: 20 },
         currentWorld: { x: 90, y: 100 },
@@ -41,8 +41,9 @@ describe('CanvasPointerCreationCommit', () => {
             fill: '#ffffff',
             h: 80,
             id: 'rect-1',
+            shapeType: 'rect',
             stroke: '#111827',
-            type: 'rect',
+            type: 'shape',
             w: 80,
             x: 10,
             y: 20,
@@ -241,11 +242,12 @@ const creationAdapter: CanvasCreationAdapter<CanvasItem> = {
     stroke: '#475569',
     strokeWidth: 3,
   }),
-  createRect: ({ bounds, id }) => ({
+  createShape: ({ bounds, id, shapeType }) => ({
     id,
-    type: 'rect',
+    type: 'shape',
     ...bounds,
     fill: '#ffffff',
+    shapeType,
     stroke: '#111827',
   }),
   createText: ({ id, point }) => ({

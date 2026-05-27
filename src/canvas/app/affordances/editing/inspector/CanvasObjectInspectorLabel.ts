@@ -1,4 +1,5 @@
 import type { CanvasItem } from '../../../../entities'
+import { isCanvasShapeItem } from '../../../../host'
 
 export function getCanvasObjectInspectorLabel({
   selectedItems,
@@ -27,6 +28,10 @@ export function getCanvasObjectInspectorLabel({
 function getCanvasObjectInspectorItemLabel(item: CanvasItem) {
   if ('title' in item && item.title.trim().length > 0) {
     return item.title
+  }
+
+  if (isCanvasShapeItem(item)) {
+    return 'Shape'
   }
 
   return capitalizeCanvasObjectInspectorLabel(item.type)

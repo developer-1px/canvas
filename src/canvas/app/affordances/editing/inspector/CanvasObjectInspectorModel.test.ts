@@ -11,7 +11,7 @@ describe('CanvasObjectInspectorModel', () => {
     expect(createModel({
       selectedItems: [createRectItem()],
       selection: ['rect-1'],
-    }).label).toBe('Rect')
+    }).label).toBe('Shape')
     expect(createModel({
       selectedItems: [createComponentItem()],
       selection: ['component-1'],

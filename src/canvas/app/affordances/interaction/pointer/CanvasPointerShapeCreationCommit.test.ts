@@ -21,7 +21,7 @@ describe('CanvasPointerShapeCreation commits', () => {
         kind: 'create-shape',
         moved: true,
         pointerId: 1,
-        shape: 'rect',
+        shapeType: 'rect',
         startScreen: { x: 0, y: 0 },
         startWorld: { x: 10, y: 20 },
       },
@@ -36,7 +36,8 @@ describe('CanvasPointerShapeCreation commits', () => {
         items: [
           expect.objectContaining({
             id: 'rect-1',
-            type: 'rect',
+            shapeType: 'rect',
+            type: 'shape',
           }),
         ],
       },
@@ -59,7 +60,7 @@ describe('CanvasPointerShapeCreation commits', () => {
         kind: 'create-shape',
         moved: true,
         pointerId: 1,
-        shape: 'ellipse',
+        shapeType: 'ellipse',
         startScreen: { x: 0, y: 0 },
         startWorld: { x: 10, y: 20 },
       },
@@ -74,8 +75,8 @@ describe('CanvasPointerShapeCreation commits', () => {
         items: [
           expect.objectContaining({
             id: 'ellipse-1',
-            shape: 'ellipse',
-            type: 'rect',
+            shapeType: 'ellipse',
+            type: 'shape',
           }),
         ],
       },
@@ -200,12 +201,12 @@ const creationAdapter: CanvasCreationAdapter<CanvasItem> = {
     x: 0,
     y: 0,
   }),
-  createRect: ({ bounds, id, shape }) => ({
+  createShape: ({ bounds, id, shapeType }) => ({
     fill: '#ffffff',
     id,
-    ...(shape && shape !== 'rect' ? { shape } : {}),
+    shapeType,
     stroke: '#111827',
-    type: 'rect',
+    type: 'shape',
     ...bounds,
   }),
   createText: ({ id, point }) => ({

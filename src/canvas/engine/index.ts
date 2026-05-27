@@ -49,6 +49,7 @@ export {
   createCanvasHighlight,
   createCanvasMarker,
   createCanvasRect,
+  createCanvasShape,
   createCanvasText,
   getCanvasCreatedArrowEnd,
   getCanvasCreatedDrawingPoints,

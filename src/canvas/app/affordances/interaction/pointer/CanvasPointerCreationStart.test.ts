@@ -24,12 +24,12 @@ describe('CanvasPointerCreationStart', () => {
 
     expect(result).toMatchObject({
       capturePointer: true,
-      draftRect: { h: 0, shape: 'rect', w: 0, x: 80, y: 120 },
+      draftRect: { h: 0, shapeType: 'rect', w: 0, x: 80, y: 120 },
       gesture: 'create-shape',
       interaction: {
         currentWorld: { x: 80, y: 120 },
         kind: 'create-shape',
-        shape: 'rect',
+        shapeType: 'rect',
         startWorld: { x: 80, y: 120 },
       },
       kind: 'interaction',

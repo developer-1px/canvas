@@ -174,7 +174,7 @@ export function createCanvasAppStageElement({
 
 const CANVAS_STAGE_SNAPSHOT_PADDING = 24
 const CANVAS_STAGE_SNAPSHOT_STYLE = `
-.rect-item,.component-card,.component-section{stroke-width:1.4}
+.shape-item,.component-card,.component-section{stroke-width:1.4}
 .marker-item,.highlight-item{fill:none;stroke-linecap:round;stroke-linejoin:round}
 .highlight-item{mix-blend-mode:multiply}
 .arrow-item{fill:none;stroke-linecap:round;stroke-linejoin:round}

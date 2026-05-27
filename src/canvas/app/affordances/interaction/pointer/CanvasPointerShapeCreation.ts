@@ -105,9 +105,9 @@ export function startCanvasPointerShapeCreation({
       startWorld: snappedStartWorld,
     }
   } else {
-    const shape = getCanvasToolShapeKind(tool)
+    const shapeType = getCanvasToolShapeKind(tool)
 
-    if (!shape) {
+    if (!shapeType) {
       return null
     }
 
@@ -116,7 +116,7 @@ export function startCanvasPointerShapeCreation({
       kind: 'create-shape',
       moved: false,
       pointerId: input.pointerId,
-      shape,
+      shapeType,
       startScreen,
       startWorld: snappedStartWorld,
     }

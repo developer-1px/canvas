@@ -11,6 +11,7 @@ import type {
   CanvasEditableTextItem,
   CanvasImageItem,
   CanvasItem,
+  CanvasShapeItem,
   CanvasStampItem,
   GroupItem,
   RectItem,
@@ -81,6 +82,7 @@ const CANVAS_DEMO_SVG_ITEM_RENDER_STRATEGIES = Object.freeze({
   image: renderCanvasDemoSvgImageItemRoute,
   marker: renderCanvasDemoSvgDrawingItemRoute,
   rect: renderCanvasDemoSvgRectTextItemRoute,
+  shape: renderCanvasDemoSvgRectTextItemRoute,
   stamp: renderCanvasDemoSvgStampItemRoute,
   text: renderCanvasDemoSvgRectTextItemRoute,
 } satisfies CanvasDemoSvgItemRenderStrategies)
@@ -277,7 +279,7 @@ function renderCanvasDemoSvgRectTextItemRoute({
   item,
   onTextDoubleClick,
 }: CanvasDemoSvgItemRenderRouteInput & {
-  item: RectItem | TextItem
+  item: CanvasShapeItem | RectItem | TextItem
 }): CanvasDemoSvgItemRenderRoute {
   return {
     children: renderCanvasDemoSvgRectTextItem({ item }),

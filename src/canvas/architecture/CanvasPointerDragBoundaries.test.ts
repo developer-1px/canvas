@@ -156,7 +156,7 @@ describe('Canvas pointer drag boundaries', () => {
     expect(dragHandlersFile.source).toContain(
       "from './CanvasPointerInteractionLifecycle'",
     )
-    expect(dragHandlersFile.source).not.toContain('createCanvasRect({')
+    expect(dragHandlersFile.source).not.toContain('createCanvasShape({')
     expect(dragHandlersFile.source).not.toContain('createCanvasMarker({')
     expect(dragHandlersFile.source).not.toContain('createCanvasArrow({')
     expect(dragHandlersFile.source).not.toContain(
@@ -182,7 +182,7 @@ describe('Canvas pointer drag boundaries', () => {
     expect(lifecycleFile.source).toContain(
       "from './CanvasPointerInteractionRouting'",
     )
-    expect(lifecycleFile.source).not.toContain('createCanvasRect({')
+    expect(lifecycleFile.source).not.toContain('createCanvasShape({')
     expect(lifecycleFile.source).not.toContain('createCanvasMarker({')
     expect(lifecycleFile.source).not.toContain('createCanvasArrow({')
     expect(lifecycleFile.source).not.toContain(
@@ -229,7 +229,7 @@ describe('Canvas pointer drag boundaries', () => {
     expect(creationCommitFile.source).toContain(
       "from './CanvasPointerShapeCreation'",
     )
-    expect(creationCommitFile.source).not.toContain('createCanvasRect({')
+    expect(creationCommitFile.source).not.toContain('createCanvasShape({')
     expect(creationCommitFile.source).not.toContain('createCanvasArrow({')
     expect(creationCommitFile.source).not.toContain('createCanvasMarker({')
     expect(creationCommitFile.source).not.toContain('createCanvasHighlight({')
@@ -243,9 +243,9 @@ describe('Canvas pointer drag boundaries', () => {
     expect(customCreationFile.source).toContain(
       'export function commitCanvasPointerCustomCreation',
     )
-    expect(shapeCreationFile.source).not.toContain('createCanvasRect({')
+    expect(shapeCreationFile.source).not.toContain('createCanvasShape({')
     expect(shapeCreationFile.source).not.toContain('createCanvasArrow({')
-    expect(shapeCreationDescriptorsFile.source).toContain('createCanvasRect({')
+    expect(shapeCreationDescriptorsFile.source).toContain('createCanvasShape({')
     expect(shapeCreationDescriptorsFile.source).toContain('createCanvasArrow({')
     expect(drawingCreationFile.source).toContain('createCanvasMarker({')
     expect(drawingCreationFile.source).toContain('createCanvasHighlight({')

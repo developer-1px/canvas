@@ -13,8 +13,9 @@ describe('CanvasDemoSvgItemRenderer', () => {
           fill: '#ffffff',
           h: 40,
           id: 'rect-1',
+          shapeType: 'rect',
           stroke: '#111827',
-          type: 'rect',
+          type: 'shape',
           w: 80,
           x: 10,
           y: 20,
@@ -32,11 +33,11 @@ describe('CanvasDemoSvgItemRenderer', () => {
     expect(markup).toContain('data-type="group"')
     expect(markup).toContain('class="group-hit"')
     expect(markup).toContain('data-locked="true"')
-    expect(markup).toContain('data-type="rect"')
+    expect(markup).toContain('data-type="shape"')
   })
 
 
-  it('routes component custom drawing and rect text items through framed renderers', () => {
+  it('routes component custom drawing and shape text items through framed renderers', () => {
     const component = renderItem({
       accent: '#0f766e',
       component: 'sticky',
@@ -78,9 +79,10 @@ describe('CanvasDemoSvgItemRenderer', () => {
       fill: '#ffffff',
       h: 40,
       id: 'rect-1',
+      shapeType: 'rect',
       stroke: '#111827',
       text: 'Rect',
-      type: 'rect',
+      type: 'shape',
       w: 80,
       x: 10,
       y: 20,
@@ -92,8 +94,8 @@ describe('CanvasDemoSvgItemRenderer', () => {
     expect(custom).toContain('data-custom-kind="risk"')
     expect(drawing).toContain('data-type="marker"')
     expect(drawing).toContain('class="marker-item"')
-    expect(rect).toContain('data-type="rect"')
-    expect(rect).toContain('canvas-rect-text')
+    expect(rect).toContain('data-type="shape"')
+    expect(rect).toContain('canvas-shape-text')
   })
 
 
@@ -218,4 +220,3 @@ function renderItem(
     </svg>,
   )
 }
-

@@ -53,12 +53,12 @@ export const CANVAS_ITEM_CREATION_ADAPTER: CanvasCreationAdapter<CanvasItem> = {
       ...getCanvasDrawingStrokeStyle('marker'),
       ...style,
     }),
-  createRect: ({ bounds, id, shape }) => ({
+  createShape: ({ bounds, id, shapeType }) => ({
     id,
-    type: 'rect',
+    type: 'shape',
     ...bounds,
     fill: '#fef3c7',
-    ...(shape && shape !== 'rect' ? { shape } : {}),
+    shapeType,
     stroke: '#d97706',
   }),
   createText: ({ id, point }) => ({

@@ -2,7 +2,7 @@ import { normalizeBounds } from '../../../../core'
 import type { Point } from '../../../../entities'
 import {
   createCanvasArrow,
-  createCanvasRect,
+  createCanvasShape,
   type CanvasAffordanceConfig,
   type CanvasCreationAdapter,
   type CanvasCreationItem,
@@ -74,8 +74,8 @@ const CANVAS_POINTER_SHAPE_CREATION_DESCRIPTORS = Object.freeze({
     createDraft: ({ currentWorld, interaction, startWorld }) => ({
       draftRect: {
         ...normalizeBounds(startWorld, currentWorld),
-        shape: interaction.kind === 'create-shape'
-          ? interaction.shape
+        shapeType: interaction.kind === 'create-shape'
+          ? interaction.shapeType
           : undefined,
       },
     }),
@@ -88,12 +88,12 @@ const CANVAS_POINTER_SHAPE_CREATION_DESCRIPTORS = Object.freeze({
       createId: (prefix: string) => string
       interaction: CanvasPointerShapeCreationInteraction
     }) =>
-      createCanvasRect({
+      createCanvasShape({
         adapter,
         createId,
         currentWorld: interaction.currentWorld,
-        shape: interaction.kind === 'create-shape'
-          ? interaction.shape
+        shapeType: interaction.kind === 'create-shape'
+          ? interaction.shapeType
           : undefined,
         startWorld: interaction.startWorld,
       }),

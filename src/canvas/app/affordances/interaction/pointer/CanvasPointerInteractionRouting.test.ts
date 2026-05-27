@@ -134,7 +134,7 @@ function createShapeCreationInteraction(): Interaction {
     kind: 'create-shape',
     moved: false,
     pointerId: 1,
-    shape: 'rect',
+    shapeType: 'rect',
     startScreen: { x: 0, y: 0 },
     startWorld: { x: 0, y: 0 },
   }

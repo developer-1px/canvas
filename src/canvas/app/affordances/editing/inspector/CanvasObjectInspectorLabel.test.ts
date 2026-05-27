@@ -4,7 +4,7 @@ import { getCanvasObjectInspectorLabel } from './CanvasObjectInspectorLabel'
 
 describe('CanvasObjectInspectorLabel', () => {
   it('uses the stable item title contract before falling back to item type', () => {
-    expect(labelFor([createRectItem()], 1)).toBe('Rect')
+    expect(labelFor([createRectItem()], 1)).toBe('Shape')
     expect(labelFor([createComponentItem()], 1)).toBe('Decision Card')
     expect(labelFor([createCustomItem()], 1)).toBe('Risk')
   })
