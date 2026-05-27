@@ -580,7 +580,8 @@
 .canvas-floating-zone-top-left {
   top: var(--canvas-floating-edge);
   left: var(--canvas-floating-edge);
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: auto auto;
   align-items: flex-start;
 }
 
@@ -701,8 +702,9 @@
   z-index: 5;
   top: 14px;
   left: 14px;
-  max-width: calc(100vw - 28px);
-  flex-wrap: wrap;
+  flex-direction: column;
+  max-height: calc(100vh - (var(--canvas-floating-edge) * 2));
+  flex-wrap: nowrap;
 }
 
 .selection-floating-bar {
@@ -1115,6 +1117,12 @@
   border-left: 1.5px solid var(--canvas-line);
 }
 
+.toolbar .custom-command-button,
+.toolbar .custom-tool-button {
+  width: 34px;
+  padding: 0;
+}
+
 .tool-button,
 .component-button,
 .zoom-value,
@@ -1323,6 +1331,12 @@
   width: 1px;
   margin: 5px 2px;
   background: var(--canvas-line);
+}
+
+.toolbar .toolbar-divider {
+  width: auto;
+  height: 1px;
+  margin: 2px 5px;
 }
 
 .tool-button:focus-visible,

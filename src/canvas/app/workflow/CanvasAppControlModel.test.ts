@@ -38,7 +38,6 @@ describe('CanvasAppControlModel', () => {
     expect(model.componentPalette.visible).toBe(true)
     expect(model.status).toMatchObject({
       mode: 'Risk',
-      scale: 1.5,
       selectionLength: 2,
       visible: true,
     })

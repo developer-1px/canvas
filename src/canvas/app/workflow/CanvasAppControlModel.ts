@@ -60,7 +60,6 @@ export function getCanvasAppControlModel({
         gesture,
         tool,
       }),
-      scale: viewport.scale,
       selectionLength: selection.length,
       visible: config.overlays.status,
     },

@@ -1,12 +1,10 @@
 type CanvasStatusProps = {
   mode: string
-  scale: number
   selectionLength: number
 }
 
 export function CanvasStatus({
   mode,
-  scale,
   selectionLength,
 }: CanvasStatusProps) {
   const selection =
@@ -20,7 +18,6 @@ export function CanvasStatus({
     <div className="canvas-status" aria-live="polite">
       <span>{mode}</span>
       <span>{selection}</span>
-      <span>{Math.round(scale * 100)}%</span>
     </div>
   )
 }

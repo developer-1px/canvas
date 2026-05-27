@@ -147,7 +147,6 @@ export function createViewProps(
     },
     status: {
       mode: 'Select',
-      scale: 1,
       selectionLength: 1,
       visible: visible.status ?? true,
     },
@@ -249,4 +248,3 @@ function createCommandAvailability(
     ...overrides,
   }
 }
-
