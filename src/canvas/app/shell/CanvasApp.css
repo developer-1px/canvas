@@ -1,4 +1,24 @@
 .canvas-app {
+  --canvas-floating-edge: 16px;
+  --canvas-floating-gap: 8px;
+  --canvas-floating-surface: color-mix(
+    in srgb,
+    var(--canvas-panel) 92%,
+    transparent
+  );
+  --canvas-floating-border: color-mix(
+    in srgb,
+    var(--canvas-line) 76%,
+    transparent
+  );
+  --canvas-floating-shadow:
+    0 18px 40px rgba(15, 23, 42, 0.12),
+    0 2px 6px rgba(15, 23, 42, 0.08);
+  --canvas-control-hover: color-mix(
+    in srgb,
+    var(--canvas-blue-soft) 68%,
+    var(--canvas-panel)
+  );
   position: relative;
   width: 100vw;
   height: 100svh;
@@ -535,6 +555,71 @@
   pointer-events: none;
 }
 
+.canvas-floating-zone {
+  position: absolute;
+  z-index: 5;
+  display: flex;
+  gap: var(--canvas-floating-gap);
+  max-width: calc(100vw - (var(--canvas-floating-edge) * 2));
+  pointer-events: none;
+}
+
+.canvas-floating-zone > *,
+.canvas-floating-row > * {
+  pointer-events: auto;
+}
+
+.canvas-floating-row {
+  display: flex;
+  gap: var(--canvas-floating-gap);
+  max-width: 100%;
+  flex-wrap: wrap;
+  pointer-events: none;
+}
+
+.canvas-floating-zone-top-left {
+  top: var(--canvas-floating-edge);
+  left: var(--canvas-floating-edge);
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.canvas-floating-zone-top-center {
+  top: var(--canvas-floating-edge);
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.canvas-floating-zone-top-right {
+  top: var(--canvas-floating-edge);
+  right: var(--canvas-floating-edge);
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.canvas-floating-zone-right-rail {
+  top: 168px;
+  right: var(--canvas-floating-edge);
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.canvas-floating-zone-bottom-left {
+  bottom: var(--canvas-floating-edge);
+  left: var(--canvas-floating-edge);
+}
+
+.canvas-floating-zone-bottom-center {
+  bottom: var(--canvas-floating-edge);
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.canvas-floating-zone-bottom-right {
+  right: var(--canvas-floating-edge);
+  bottom: var(--canvas-floating-edge);
+}
+
 .toolbar,
 .selection-floating-bar,
 .context-command-menu,
@@ -556,11 +641,31 @@
   display: flex;
   gap: 4px;
   padding: 4px;
-  border: 1.5px solid var(--canvas-ink);
-  border-radius: 7px;
-  background: color-mix(in srgb, var(--canvas-panel) 94%, transparent);
-  box-shadow: 3px 3px 0 var(--canvas-shadow);
-  backdrop-filter: none;
+  border: 1px solid var(--canvas-floating-border);
+  border-radius: 8px;
+  background: var(--canvas-floating-surface);
+  box-shadow: var(--canvas-floating-shadow);
+  backdrop-filter: blur(14px) saturate(1.12);
+}
+
+.canvas-floating-zone .toolbar,
+.canvas-floating-zone .component-palette,
+.canvas-floating-zone .drawing-controls,
+.canvas-floating-zone .emote-controls,
+.canvas-floating-zone .find-replace-panel,
+.canvas-floating-zone .image-controls,
+.canvas-floating-zone .session-timer,
+.canvas-floating-zone .spotlight,
+.canvas-floating-zone .stamp-controls,
+.canvas-floating-zone .voting-session,
+.canvas-floating-zone .zoom-controls,
+.canvas-floating-zone .object-inspector,
+.canvas-floating-zone .canvas-status {
+  position: static;
+  inset: auto;
+  z-index: auto;
+  max-width: 100%;
+  transform: none;
 }
 
 .cursor-chat {
@@ -767,13 +872,14 @@
   width: 30px;
   height: 30px;
   padding: 0;
-  border: 1.5px solid var(--canvas-ink);
+  border: 1px solid var(--canvas-floating-border);
   border-radius: 50%;
   color: var(--canvas-ink);
-  background: var(--canvas-panel);
-  box-shadow: 3px 3px 0 var(--canvas-shadow);
+  background: var(--canvas-floating-surface);
+  box-shadow: var(--canvas-floating-shadow);
   font: 800 18px/1 var(--sans);
   transform: translate(-50%, -50%);
+  backdrop-filter: blur(14px) saturate(1.12);
 }
 
 .image-file-input {
@@ -1022,11 +1128,16 @@
   display: inline-grid;
   place-items: center;
   height: 34px;
-  border: 1.5px solid transparent;
-  border-radius: 5px;
+  border: 1px solid transparent;
+  border-radius: 6px;
   color: var(--canvas-ink);
   background: transparent;
   font: 600 12px/1 var(--sans);
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease,
+    color 120ms ease,
+    box-shadow 120ms ease;
 }
 
 .tool-button {
@@ -1171,10 +1282,16 @@
 .sticky-quick-create:hover,
 .find-replace-panel button:hover,
 .tool-button[data-active='true'] {
-  border-color: var(--canvas-ink);
-  background: var(--canvas-yellow);
+  border-color: color-mix(in srgb, var(--canvas-blue) 36%, transparent);
+  background: var(--canvas-control-hover);
   color: var(--canvas-ink);
-  box-shadow: 2px 2px 0 var(--canvas-shadow);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+}
+
+.tool-button[data-active='true'] {
+  border-color: var(--canvas-ink);
+  background: var(--canvas-ink);
+  color: var(--canvas-panel);
 }
 
 .tool-button:disabled,

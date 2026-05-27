@@ -150,46 +150,102 @@ export function CanvasAppView({
     'voting-session': votingSession.visible,
     'zoom-controls': showZoomControls,
   })
+  const hasTopLeftZone = surfaces.toolbar ||
+    surfaces['image-controls'] ||
+    surfaces['drawing-controls']
+  const hasTopRightZone = surfaces['session-timer'] ||
+    surfaces['voting-session'] ||
+    (surfaces['stamp-controls'] && stampControlProps.anchor === null)
+  const hasRightRailZone = surfaces['component-palette'] ||
+    surfaces['object-inspector']
+  const hasBottomLeftZone = surfaces['zoom-controls']
+  const hasBottomCenterZone = surfaces['emote-controls'] ||
+    surfaces['find-replace-panel']
+  const hasBottomRightZone = surfaces['canvas-status']
 
   return (
     <main className="canvas-app" onContextMenuCapture={openContextMenu}>
-      {surfaces.toolbar ? <CanvasToolbar {...toolbarProps} /> : null}
+      {stage}
 
-      {surfaces['session-timer'] ? (
-        <CanvasSessionTimer {...sessionTimer} />
+      {hasTopLeftZone ? (
+        <div className="canvas-floating-zone canvas-floating-zone-top-left">
+          {surfaces.toolbar ? <CanvasToolbar {...toolbarProps} /> : null}
+
+          {surfaces['image-controls'] || surfaces['drawing-controls'] ? (
+            <div className="canvas-floating-row canvas-floating-row-authoring">
+              {surfaces['image-controls'] ? (
+                <CanvasImageControls {...imageControlProps} />
+              ) : null}
+
+              {surfaces['drawing-controls'] ? (
+                <CanvasDrawingControls {...drawingControlProps} />
+              ) : null}
+            </div>
+          ) : null}
+        </div>
       ) : null}
 
-      {surfaces.spotlight ? <CanvasSpotlight {...spotlight} /> : null}
-
-      {surfaces['voting-session'] ? (
-        <CanvasVotingSession {...votingSession} />
+      {surfaces.spotlight ? (
+        <div className="canvas-floating-zone canvas-floating-zone-top-center">
+          <CanvasSpotlight {...spotlight} />
+        </div>
       ) : null}
 
-      {surfaces['component-palette'] ? (
-        <CanvasComponentPalette {...componentPaletteProps} />
+      {hasTopRightZone ? (
+        <div className="canvas-floating-zone canvas-floating-zone-top-right">
+          {surfaces['session-timer'] ? (
+            <CanvasSessionTimer {...sessionTimer} />
+          ) : null}
+
+          {surfaces['voting-session'] ? (
+            <CanvasVotingSession {...votingSession} />
+          ) : null}
+
+          {surfaces['stamp-controls'] && stampControlProps.anchor === null ? (
+            <CanvasStampControls {...stampControlProps} />
+          ) : null}
+        </div>
       ) : null}
 
-      {surfaces['drawing-controls'] ? (
-        <CanvasDrawingControls {...drawingControlProps} />
+      {hasRightRailZone ? (
+        <div className="canvas-floating-zone canvas-floating-zone-right-rail">
+          {surfaces['object-inspector'] ? (
+            <CanvasObjectInspector {...inspectorProps} />
+          ) : null}
+
+          {surfaces['component-palette'] ? (
+            <CanvasComponentPalette {...componentPaletteProps} />
+          ) : null}
+        </div>
       ) : null}
 
-      {surfaces['emote-controls'] ? (
-        <CanvasEmoteControls {...emoteControls} />
+      {hasBottomLeftZone ? (
+        <div className="canvas-floating-zone canvas-floating-zone-bottom-left">
+          <ZoomControls {...zoomControlProps} />
+        </div>
       ) : null}
 
-      {surfaces['find-replace-panel'] ? (
-        <CanvasFindReplacePanel {...findReplace} />
+      {hasBottomCenterZone ? (
+        <div className="canvas-floating-zone canvas-floating-zone-bottom-center">
+          {surfaces['emote-controls'] ? (
+            <CanvasEmoteControls {...emoteControls} />
+          ) : null}
+
+          {surfaces['find-replace-panel'] ? (
+            <CanvasFindReplacePanel {...findReplace} />
+          ) : null}
+        </div>
       ) : null}
 
-      {surfaces['image-controls'] ? (
-        <CanvasImageControls {...imageControlProps} />
+      {hasBottomRightZone ? (
+        <div className="canvas-floating-zone canvas-floating-zone-bottom-right">
+          <CanvasStatus {...statusProps} />
+        </div>
       ) : null}
 
-      {surfaces['stamp-controls'] ? (
+      {surfaces['stamp-controls'] && stampControlProps.anchor !== null ? (
         <CanvasStampControls {...stampControlProps} />
       ) : null}
-
-      {stage}
 
       {surfaces['selection-floating-bar'] ? (
         <CanvasSelectionFloatingBar
@@ -222,14 +278,6 @@ export function CanvasAppView({
       ) : null}
 
       {surfaces['text-editor'] ? <CanvasTextEditor {...textEditorProps} /> : null}
-
-      {surfaces['zoom-controls'] ? <ZoomControls {...zoomControlProps} /> : null}
-
-      {surfaces['object-inspector'] ? (
-        <CanvasObjectInspector {...inspectorProps} />
-      ) : null}
-
-      {surfaces['canvas-status'] ? <CanvasStatus {...statusProps} /> : null}
     </main>
   )
 }

@@ -68,6 +68,18 @@ describe('CanvasAppView', () => {
     expect(markup).toContain('zoom-controls')
   })
 
+  it('groups desktop chrome in floating zones', () => {
+    const markup = renderToStaticMarkup(<CanvasAppView {...createViewProps()} />)
+
+    expect(markup).toContain('canvas-floating-zone-top-left')
+    expect(markup).toContain('canvas-floating-zone-top-center')
+    expect(markup).toContain('canvas-floating-zone-top-right')
+    expect(markup).toContain('canvas-floating-zone-right-rail')
+    expect(markup).toContain('canvas-floating-zone-bottom-left')
+    expect(markup).toContain('canvas-floating-zone-bottom-center')
+    expect(markup).toContain('canvas-floating-zone-bottom-right')
+  })
+
   it('keeps stamp controls as their own independent surface', () => {
     const props = createViewProps()
     props.status.selectionLength = 0
