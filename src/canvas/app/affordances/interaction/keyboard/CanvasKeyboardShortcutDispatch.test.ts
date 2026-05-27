@@ -43,6 +43,12 @@ describe('CanvasKeyboardShortcutDispatch', () => {
     expect(
       runCanvasKeyboardShortcutIntent({
         handlers,
+        intent: { kind: 'open-command-palette', preventDefault: true },
+      }),
+    ).toBe(true)
+    expect(
+      runCanvasKeyboardShortcutIntent({
+        handlers,
         intent: { kind: 'open-cursor-chat', preventDefault: true },
       }),
     ).toBe(true)
@@ -56,6 +62,7 @@ describe('CanvasKeyboardShortcutDispatch', () => {
     expect(handlers.deleteSelection).toHaveBeenCalledTimes(1)
     expect(handlers.quickCreateSticky).toHaveBeenCalledTimes(1)
     expect(handlers.zoomBy).toHaveBeenCalledWith(1.25)
+    expect(handlers.openCommandPalette).toHaveBeenCalledTimes(1)
     expect(handlers.openCursorChat).toHaveBeenCalledTimes(1)
     expect(handlers.setTool).toHaveBeenCalledWith('text')
     expect(handlers.setSpaceDown).toHaveBeenCalledWith(true)
@@ -75,6 +82,7 @@ function createHandlers(): CanvasKeyboardShortcutDispatchHandlers {
     interactionRef: { current: { kind: 'none' } },
     lockSelection: vi.fn(),
     moveSelection: vi.fn(),
+    openCommandPalette: vi.fn(),
     openCursorChat: vi.fn(),
     openFindReplace: vi.fn(),
     pasteSelection: vi.fn(),

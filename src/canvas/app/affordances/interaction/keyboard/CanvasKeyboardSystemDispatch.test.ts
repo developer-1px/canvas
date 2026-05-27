@@ -29,6 +29,10 @@ describe('CanvasKeyboardSystemDispatch', () => {
     })
     runCanvasKeyboardSystemIntent({
       handlers,
+      intent: { kind: 'open-command-palette', preventDefault: true },
+    })
+    runCanvasKeyboardSystemIntent({
+      handlers,
       intent: { kind: 'open-cursor-chat', preventDefault: true },
     })
     runCanvasKeyboardSystemIntent({
@@ -36,6 +40,7 @@ describe('CanvasKeyboardSystemDispatch', () => {
       intent: { kind: 'temporary-pan', preventDefault: true },
     })
 
+    expect(handlers.openCommandPalette).toHaveBeenCalledTimes(1)
     expect(handlers.openCursorChat).toHaveBeenCalledTimes(1)
     expect(handlers.openFindReplace).toHaveBeenCalledTimes(1)
     expect(handlers.setSpaceDown).toHaveBeenCalledWith(true)
@@ -107,6 +112,7 @@ function createHandlers(
     closeCursorChat: vi.fn(),
     commitSelection: vi.fn(() => true),
     interactionRef: { current: { kind: 'none' } },
+    openCommandPalette: vi.fn(),
     openCursorChat: vi.fn(),
     openFindReplace: vi.fn(),
     setDraftArrow: vi.fn(),

@@ -105,6 +105,7 @@ function createHandlers(
     lockSelection: vi.fn(),
     moveSelection: vi.fn(),
     closeCursorChat: vi.fn(),
+    openCommandPalette: vi.fn(),
     openCursorChat: vi.fn(),
     openFindReplace: vi.fn(),
     pasteSelection: vi.fn(),

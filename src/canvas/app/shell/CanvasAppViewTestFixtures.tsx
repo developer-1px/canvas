@@ -7,6 +7,7 @@ import { CanvasAppView } from './CanvasAppView'
 
 export function createViewProps(
   visible: {
+    commandPalette?: boolean
     componentPalette?: boolean
     cursorChat?: boolean
     drawingControls?: boolean
@@ -28,6 +29,17 @@ export function createViewProps(
   const noop = vi.fn()
 
   return {
+    commandPalette: {
+      items: [{
+        id: 'tool:select',
+        section: 'Tools',
+        shortcut: 'V',
+        title: 'Select',
+        onSelect: noop,
+      }],
+      open: visible.commandPalette ?? false,
+      onClose: noop,
+    },
     componentPalette: {
       components: [{
         accent: '#111111',

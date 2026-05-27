@@ -10,6 +10,17 @@ describe('CanvasKeyboardSystemShortcuts', () => {
   it('resolves find replace before typing-target suppression', () => {
     expect(getCanvasKeyboardSystemShortcutIntent({
       config: createCanvasAffordanceConfig(),
+      event: createKeyboardEvent({ key: 'k', metaKey: true }),
+      key: 'k',
+      mod: true,
+      phase: 'before-typing-target',
+    })).toEqual({
+      kind: 'open-command-palette',
+      preventDefault: true,
+    })
+
+    expect(getCanvasKeyboardSystemShortcutIntent({
+      config: createCanvasAffordanceConfig(),
       event: createKeyboardEvent({ key: 'f', metaKey: true }),
       key: 'f',
       mod: true,
@@ -21,6 +32,16 @@ describe('CanvasKeyboardSystemShortcuts', () => {
   })
 
   it('honors system shortcut feature toggles', () => {
+    expect(getCanvasKeyboardSystemShortcutIntent({
+      config: createCanvasAffordanceConfig({
+        overlays: { commandPalette: false },
+      }),
+      event: createKeyboardEvent({ key: 'k', metaKey: true }),
+      key: 'k',
+      mod: true,
+      phase: 'before-typing-target',
+    })).toBeNull()
+
     expect(getCanvasKeyboardSystemShortcutIntent({
       config: createCanvasAffordanceConfig({
         shortcuts: { findReplace: false },

@@ -78,6 +78,7 @@ export const CANVAS_AFFORDANCE_CONFIG_DEFAULTS = Object.freeze({
   }),
   overlays: Object.freeze({
     alignmentGuides: true,
+    commandPalette: true,
     componentPalette: true,
     draftArrow: true,
     draftRect: true,
@@ -110,6 +111,7 @@ export const CANVAS_AFFORDANCE_CONFIG_DEFAULTS = Object.freeze({
   shortcuts: Object.freeze({
     arrowTool: true,
     commentTool: true,
+    commandPalette: true,
     copy: true,
     bringForward: true,
     bringToFront: true,

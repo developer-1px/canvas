@@ -13,6 +13,9 @@ import type {
 import type {
   CanvasAppCustomCreationToolState,
 } from '../extensions/CanvasAppExtensionStateContracts'
+import {
+  getCanvasCommandPaletteItems,
+} from '../affordances/controls/command-palette/CanvasCommandPaletteItems'
 import type { CanvasAppControlModelInput } from './CanvasAppControlConsumerContracts'
 
 type CanvasSelectionCommandAnchor = {
@@ -53,6 +56,24 @@ export function getCanvasAppControlModel({
       components,
       visible: config.overlays.componentPalette,
       onInsert: onInsertComponent,
+    },
+    commandPalette: {
+      items: getCanvasCommandPaletteItems({
+        commandAvailability,
+        commandHandlers,
+        components,
+        config,
+        customCommands,
+        customTools,
+        onCustomCommand: onRunCustomCommand,
+        onFitItems,
+        onInsertComponent,
+        onToolChange,
+        onViewportReset,
+        onZoomBy,
+        selection,
+      }),
+      visible: config.overlays.commandPalette,
     },
     status: {
       mode: getCanvasAppStatusMode({

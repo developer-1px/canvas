@@ -9,6 +9,7 @@ describe('CanvasAppView', () => {
       <CanvasAppView
         {...createViewProps({
           componentPalette: false,
+          commandPalette: false,
           cursorChat: false,
           drawingControls: false,
           emoteControls: false,
@@ -27,6 +28,7 @@ describe('CanvasAppView', () => {
       />,
     )
 
+    expect(markup).not.toContain('command-palette')
     expect(markup).not.toContain('component-palette')
     expect(markup).not.toContain('cursor-chat')
     expect(markup).not.toContain('drawing-controls')
@@ -66,6 +68,16 @@ describe('CanvasAppView', () => {
     expect(markup).toContain('toolbar')
     expect(markup).toContain('voting-session')
     expect(markup).toContain('zoom-controls')
+  })
+
+  it('renders the command palette as a modal surface when open', () => {
+    const markup = renderToStaticMarkup(
+      <CanvasAppView {...createViewProps({ commandPalette: true })} />,
+    )
+
+    expect(markup).toContain('command-palette')
+    expect(markup).toContain('Search commands')
+    expect(markup).toContain('Select')
   })
 
   it('groups desktop chrome in floating zones', () => {

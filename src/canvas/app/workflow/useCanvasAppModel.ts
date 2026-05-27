@@ -1,4 +1,8 @@
-import { useMemo } from 'react'
+import {
+  useCallback,
+  useMemo,
+  useState,
+} from 'react'
 import { getCanvasAppAffordanceModel } from './CanvasAppAffordanceModel'
 import { getCanvasAppAssemblyModel } from './CanvasAppAssemblyModel'
 import { getCanvasAppControlModel } from './CanvasAppControlModel'
@@ -42,6 +46,13 @@ export function useCanvasAppModel({
     () => getCanvasAppAssemblyModel(assertCanvasAppAssembly(assembly)),
     [assembly],
   )
+  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false)
+  const openCommandPalette = useCallback(() => {
+    setCommandPaletteOpen(true)
+  }, [])
+  const closeCommandPalette = useCallback(() => {
+    setCommandPaletteOpen(false)
+  }, [])
   const affordance = useMemo(
     () => getCanvasAppAffordanceModel(appAssembly.affordance.config),
     [appAssembly],
@@ -156,6 +167,7 @@ export function useCanvasAppModel({
     ...affordance.keyboard,
     ...extension.keyboard,
     ...text.keyboard,
+    openCommandPalette,
     interaction: {
       ...interaction.keyboard,
       ...text.keyboard.interaction,
@@ -197,6 +209,11 @@ export function useCanvasAppModel({
 
   return {
     ...text.view,
+    commandPalette: {
+      items: controls.commandPalette.items,
+      open: commandPaletteOpen && controls.commandPalette.visible,
+      onClose: closeCommandPalette,
+    },
     componentPalette: controls.componentPalette,
     drawingControls: drawing.control,
     imageControls,

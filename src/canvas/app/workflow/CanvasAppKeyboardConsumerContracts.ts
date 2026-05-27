@@ -70,6 +70,7 @@ export type CanvasAppKeyboardModelInput = {
   cursorChat: CanvasAppKeyboardCursorChatContext
   customCreationTools: readonly CanvasAppCustomCreationToolState[]
   interaction: CanvasAppKeyboardInteractionContext
+  openCommandPalette: () => void
   openFindReplace: () => void
   selection: string[]
   viewport: CanvasAppKeyboardViewportContext

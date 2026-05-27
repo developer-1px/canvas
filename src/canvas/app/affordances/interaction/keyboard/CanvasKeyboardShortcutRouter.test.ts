@@ -64,6 +64,22 @@ describe('CanvasKeyboardShortcutRouter', () => {
     expect(setTool).not.toHaveBeenCalled()
   })
 
+  it('routes command palette before custom tool shortcuts', () => {
+    const openCommandPalette = vi.fn()
+    const setTool = vi.fn()
+    const handlers = createHandlers({
+      openCommandPalette,
+      setTool,
+    })
+    const event = createKeyboardEvent({ key: 'k', metaKey: true })
+
+    handleCanvasKeyboardShortcut(event, handlers)
+
+    expect(event.preventDefault).toHaveBeenCalled()
+    expect(openCommandPalette).toHaveBeenCalledTimes(1)
+    expect(setTool).not.toHaveBeenCalled()
+  })
+
   it('keeps shifted nudge ahead of custom arrow shortcuts', () => {
     const moveSelection = vi.fn()
     const setTool = vi.fn()
@@ -117,6 +133,7 @@ function createHandlers(
     lockSelection: vi.fn(),
     moveSelection: vi.fn(),
     closeCursorChat: vi.fn(),
+    openCommandPalette: vi.fn(),
     openCursorChat: vi.fn(),
     openFindReplace: vi.fn(),
     pasteSelection: vi.fn(),

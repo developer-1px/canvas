@@ -740,6 +740,114 @@
   flex-wrap: wrap;
 }
 
+.command-palette-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 72px 14px 14px;
+  background: rgba(15, 23, 42, 0.08);
+  pointer-events: auto;
+}
+
+.command-palette {
+  display: grid;
+  width: min(560px, calc(100vw - 28px));
+  overflow: hidden;
+  border: 1px solid var(--canvas-floating-border);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--canvas-panel) 96%, transparent);
+  box-shadow: var(--canvas-floating-shadow);
+  backdrop-filter: blur(16px) saturate(1.14);
+}
+
+.command-palette-input {
+  width: 100%;
+  height: 44px;
+  min-width: 0;
+  padding: 0 14px;
+  border: 0;
+  border-bottom: 1px solid var(--canvas-soft-line);
+  color: var(--canvas-ink);
+  background: transparent;
+  font: 700 14px/1 var(--sans);
+}
+
+.command-palette-input:focus {
+  outline: none;
+}
+
+.command-palette-list {
+  display: grid;
+  gap: 2px;
+  max-height: min(420px, calc(100vh - 154px));
+  overflow: auto;
+  padding: 6px;
+}
+
+.command-palette-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 42px;
+  padding: 6px 8px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: var(--canvas-ink);
+  background: transparent;
+  text-align: left;
+}
+
+.command-palette-item[aria-selected='true'] {
+  border-color: color-mix(in srgb, var(--canvas-blue) 32%, transparent);
+  background: var(--canvas-control-hover);
+}
+
+.command-palette-item:disabled {
+  color: var(--canvas-muted);
+  cursor: not-allowed;
+  opacity: 0.52;
+}
+
+.command-palette-item-main {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
+.command-palette-item-title {
+  overflow: hidden;
+  font: 750 13px/1.15 var(--sans);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.command-palette-item-section {
+  color: var(--canvas-muted);
+  font: 700 11px/1 var(--sans);
+}
+
+.command-palette-shortcut {
+  min-width: 22px;
+  padding: 4px 6px;
+  border: 1px solid var(--canvas-soft-line);
+  border-radius: 5px;
+  color: var(--canvas-muted);
+  background: var(--canvas-paper);
+  font: 750 11px/1 var(--sans);
+  text-align: center;
+}
+
+.command-palette-empty {
+  min-height: 42px;
+  padding: 13px 10px;
+  color: var(--canvas-muted);
+  font: 700 12px/1.2 var(--sans);
+}
+
 .component-palette {
   top: 116px;
   right: 14px;
@@ -1340,6 +1448,7 @@
 }
 
 .tool-button:focus-visible,
+.command-palette-item:focus-visible,
 .component-button:focus-visible,
 .drawing-swatch:focus-visible,
 .drawing-width-button:focus-visible,

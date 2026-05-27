@@ -8,6 +8,7 @@ import {
   useState,
 } from 'react'
 import { CanvasComponentPalette } from '../affordances/authoring/component/CanvasComponentPalette'
+import { CanvasCommandPalette } from '../affordances/controls/command-palette/CanvasCommandPalette'
 import { CanvasCursorChat } from '../affordances/controls/cursor-chat/CanvasCursorChat'
 import { CanvasDrawingControls } from '../affordances/controls/drawing/CanvasDrawingControls'
 import { CanvasEmoteControls } from '../affordances/controls/emote/CanvasEmoteControls'
@@ -31,6 +32,7 @@ import { ZoomControls } from '../affordances/controls/zoom/ZoomControls'
 import { getCanvasAppSurfaceVisibility } from './CanvasAppSurfaceModel'
 
 type ToolbarProps = ComponentProps<typeof CanvasToolbar>
+type CommandPaletteProps = ComponentProps<typeof CanvasCommandPalette>
 type SelectionFloatingBarProps = ComponentProps<
   typeof CanvasSelectionFloatingBar
 >
@@ -58,6 +60,7 @@ type ToolbarViewProps = VisibleProps<ToolbarProps> & {
 }
 
 type CanvasAppViewProps = {
+  commandPalette: CommandPaletteProps
   componentPalette: VisibleProps<PaletteProps>
   cursorChat: CursorChatProps
   drawingControls: VisibleProps<DrawingControlsProps>
@@ -78,6 +81,7 @@ type CanvasAppViewProps = {
 }
 
 export function CanvasAppView({
+  commandPalette,
   componentPalette,
   cursorChat,
   drawingControls,
@@ -130,6 +134,7 @@ export function CanvasAppView({
   }, [])
   const surfaces = getCanvasAppSurfaceVisibility({
     'canvas-status': showStatus,
+    'command-palette': commandPalette.open,
     'component-palette': showComponentPalette,
     'context-command-menu': showToolbar && contextMenu !== null,
     'cursor-chat': cursorChat.visible,
@@ -271,6 +276,10 @@ export function CanvasAppView({
         />
       ) : null}
 
+      {surfaces['command-palette'] ? (
+        <CanvasCommandPalette {...commandPalette} />
+      ) : null}
+
       {surfaces['cursor-chat'] ? <CanvasCursorChat {...cursorChat} /> : null}
 
       {surfaces['sticky-quick-create'] ? (
@@ -293,6 +302,7 @@ function isAppControlTarget(target: EventTarget) {
         'textarea',
         '[role="toolbar"]',
         '.canvas-status',
+        '.command-palette',
         '.component-palette',
         '.cursor-chat',
         '.find-replace-panel',

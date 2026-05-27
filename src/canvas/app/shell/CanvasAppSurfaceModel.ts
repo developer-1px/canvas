@@ -1,5 +1,6 @@
 export const CANVAS_APP_SURFACE_IDS = [
   'toolbar',
+  'command-palette',
   'session-timer',
   'spotlight',
   'voting-session',
@@ -27,6 +28,7 @@ export type CanvasAppSurfaceRegion =
   | 'bottom-right'
   | 'cursor-adjacent'
   | 'inline-editing'
+  | 'modal'
   | 'object-adjacent'
   | 'pointer'
   | 'right-rail'
@@ -39,6 +41,7 @@ export type CanvasAppSurfaceConcept =
   | 'authoring'
   | 'bottom-center-transient'
   | 'canvas-status'
+  | 'command-palette'
   | 'contextual-command'
   | 'facilitation'
   | 'inline-editor'
@@ -72,6 +75,12 @@ export const CANVAS_APP_SURFACE_DEFINITIONS: readonly CanvasAppSurfaceDefinition
     id: 'toolbar',
     priority: 0,
     region: 'top-left',
+  },
+  {
+    concept: 'command-palette',
+    id: 'command-palette',
+    priority: 0,
+    region: 'modal',
   },
   {
     concept: 'facilitation',

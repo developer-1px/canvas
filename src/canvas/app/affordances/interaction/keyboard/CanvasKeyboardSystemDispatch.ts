@@ -27,6 +27,7 @@ export type CanvasKeyboardSystemHandlers = {
   closeCursorChat: () => void
   commitSelection: CommitCanvasSelection
   interactionRef: MutableRefObject<Interaction>
+  openCommandPalette: () => void
   openCursorChat: () => void
   openFindReplace: () => void
   setDraftArrow: Dispatch<SetStateAction<CanvasDraftArrowOverlay | null>>
@@ -64,6 +65,9 @@ const CANVAS_KEYBOARD_SYSTEM_INTENT_DISPATCH =
     },
     'open-cursor-chat': ({ handlers }) => {
       handlers.openCursorChat()
+    },
+    'open-command-palette': ({ handlers }) => {
+      handlers.openCommandPalette()
     },
     'open-find-replace': ({ handlers }) => {
       handlers.openFindReplace()

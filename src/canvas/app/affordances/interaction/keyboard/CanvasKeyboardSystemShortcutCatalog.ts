@@ -6,6 +6,7 @@ import type {
 import type { CanvasKeyboardShortcutChord } from './CanvasKeyboardShortcutChords'
 
 export type CanvasKeyboardSystemShortcutIntent =
+  | { kind: 'open-command-palette'; preventDefault: true }
   | { kind: 'open-cursor-chat'; preventDefault: true }
   | { kind: 'open-find-replace'; preventDefault: true }
   | { kind: 'temporary-pan'; preventDefault: true }
@@ -39,6 +40,17 @@ const CANVAS_KEYBOARD_FIND_REPLACE_SHORTCUT = {
   shiftInsensitive: true,
   shortcut: { key: 'f' },
   shortcutId: 'findReplace',
+} satisfies CanvasKeyboardSystemShortcutDescriptor
+
+const CANVAS_KEYBOARD_COMMAND_PALETTE_SHORTCUT = {
+  getIntent: () => ({ kind: 'open-command-palette', preventDefault: true }),
+  label: 'command palette',
+  modifier: 'mod',
+  overlayId: 'commandPalette',
+  phase: 'before-typing-target',
+  shiftInsensitive: true,
+  shortcut: { key: 'k' },
+  shortcutId: 'commandPalette',
 } satisfies CanvasKeyboardSystemShortcutDescriptor
 
 const CANVAS_KEYBOARD_CURSOR_CHAT_SHORTCUT = {
@@ -76,6 +88,7 @@ const CANVAS_KEYBOARD_ESCAPE_SHORTCUT = {
 
 export const CANVAS_KEYBOARD_SYSTEM_SHORTCUTS:
   readonly CanvasKeyboardSystemShortcutDescriptor[] = [
+  CANVAS_KEYBOARD_COMMAND_PALETTE_SHORTCUT,
   CANVAS_KEYBOARD_FIND_REPLACE_SHORTCUT,
   CANVAS_KEYBOARD_CURSOR_CHAT_SHORTCUT,
   CANVAS_KEYBOARD_TEMPORARY_PAN_SHORTCUT,

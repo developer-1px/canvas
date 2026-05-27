@@ -36,6 +36,17 @@ describe('CanvasAppControlModel', () => {
 
     expect(model.componentPalette.components).toBe(components)
     expect(model.componentPalette.visible).toBe(true)
+    expect(model.commandPalette.visible).toBe(true)
+    expect(model.commandPalette.items.map((item) => item.title)).toEqual(
+      expect.arrayContaining([
+        'Select',
+        'Risk',
+        'Add Card',
+        'Delete',
+        'Publish',
+        'Fit view',
+      ]),
+    )
     expect(model.status).toMatchObject({
       mode: 'Risk',
       selectionLength: 2,
@@ -87,6 +98,7 @@ describe('CanvasAppControlModel', () => {
       config: createCanvasAffordanceConfig({
         overlays: {
           componentPalette: false,
+          commandPalette: false,
           status: false,
           toolbar: false,
           zoomControls: false,
@@ -100,6 +112,7 @@ describe('CanvasAppControlModel', () => {
 
     expect(onFitItems).toHaveBeenLastCalledWith(['rect-1'])
     expect(selectedModel.componentPalette.visible).toBe(false)
+    expect(selectedModel.commandPalette.visible).toBe(false)
     expect(selectedModel.status.visible).toBe(false)
     expect(selectedModel.toolbar.visible).toBe(false)
     expect(selectedModel.zoomControls.visible).toBe(false)
@@ -118,19 +131,38 @@ describe('CanvasAppControlModel', () => {
     const onZoomBy = vi.fn()
     const model = getCanvasAppControlModel(createInput({
       commandHandlers: createCommandHandlers({ onAlign }),
+      customCommands: [{
+        ariaLabel: 'Publish',
+        disabled: false,
+        id: 'publish',
+        label: 'P',
+        title: 'Publish',
+      }],
       onRunCustomCommand,
       onZoomBy,
     }))
 
     model.toolbar.commandHandlers.onAlign('alignLeft')
+    model.commandPalette.items
+      .find((item) => item.id === 'command:alignLeft')
+      ?.onSelect()
     model.toolbar.onCustomCommand('publish')
+    model.commandPalette.items
+      .find((item) => item.id === 'custom-command:publish')
+      ?.onSelect()
     model.zoomControls.onZoomIn()
+    model.commandPalette.items
+      .find((item) => item.id === 'viewport:zoom-out')
+      ?.onSelect()
     model.zoomControls.onZoomOut()
 
-    expect(onAlign).toHaveBeenCalledWith('alignLeft')
-    expect(onRunCustomCommand).toHaveBeenCalledWith('publish')
+    expect(onAlign).toHaveBeenCalledTimes(2)
+    expect(onAlign).toHaveBeenLastCalledWith('alignLeft')
+    expect(onRunCustomCommand).toHaveBeenCalledTimes(2)
+    expect(onRunCustomCommand).toHaveBeenLastCalledWith('publish')
     expect(onZoomBy).toHaveBeenNthCalledWith(1, 1.25)
     expect(onZoomBy).toHaveBeenNthCalledWith(2, 0.8)
+    expect(onZoomBy).toHaveBeenNthCalledWith(3, 0.8)
   })
 })
 
