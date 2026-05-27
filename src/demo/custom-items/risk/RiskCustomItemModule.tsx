@@ -86,8 +86,6 @@ const riskInspectorPanel: CanvasAppInspectorPanel = {
 
     return risk ? (
       <>
-        <dt>Kind</dt>
-        <dd>{risk.kind}</dd>
         <dt>Severity</dt>
         <dd>{String(risk.data.severity ?? '')}</dd>
       </>
