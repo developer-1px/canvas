@@ -9,7 +9,7 @@ export const decisionItemRenderer: CanvasAppCustomItemRendererStrategy = ({
   item,
 }) => {
   const status = getDecisionStatus(item.data.status)
-  const style = DECISION_STATUS_STYLES[status]
+  const statusLabel = DECISION_STATUS_STYLES[status].label
   const option = getDecisionText(item.data.option, 'Option A')
 
   return (
@@ -20,30 +20,20 @@ export const decisionItemRenderer: CanvasAppCustomItemRendererStrategy = ({
         y={item.y}
         width={item.w}
         height={item.h}
-        rx="7"
-        fill={style.fill}
-        stroke={style.stroke}
+        rx="5"
+        fill="#ffffff"
+        stroke="#e3e8ef"
         vectorEffect="non-scaling-stroke"
       />
-      <rect
+      <foreignObject
         x={item.x}
         y={item.y}
-        width="8"
-        height={item.h}
-        rx="3"
-        fill={style.accent}
-      />
-      <foreignObject
-        x={item.x + 10}
-        y={item.y}
-        width={Math.max(0, item.w - 10)}
+        width={item.w}
         height={item.h}
       >
         <div className="demo-decision-node-text">
           <strong>{item.title}</strong>
-          <span style={{ backgroundColor: style.accent }}>
-            {style.label}
-          </span>
+          <span>{statusLabel}</span>
           <small>{option}</small>
         </div>
       </foreignObject>

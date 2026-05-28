@@ -3,11 +3,11 @@ import * as z from 'zod'
 export const CANVAS_STORY_EVENT_VERSION = 1
 
 export const CANVAS_STORY_LANES = [
-  'architecture',
+  'intake',
   'generation',
-  'workflow',
-  'extension',
-  'quality',
+  'review',
+  'governance',
+  'delivery',
 ] as const
 
 export const CANVAS_STORY_CARD_ROLES = [
@@ -49,6 +49,22 @@ const CanvasStoryCardRoleSchema = z
 const CanvasStoryRelationSchema = z
   .enum(CANVAS_STORY_RELATIONS)
   .describe('Semantic relationship rendered as a connector.')
+
+const CanvasStoryScorecardMetricSchema = z
+  .object({
+    detail: CanvasStoryTextSchema,
+    label: CanvasStoryTextSchema,
+    value: CanvasStoryTextSchema,
+  })
+  .strict()
+
+const CanvasStoryEvidenceRowSchema = z
+  .object({
+    signal: CanvasStoryTextSchema,
+    source: CanvasStoryTextSchema,
+    state: CanvasStoryTextSchema,
+  })
+  .strict()
 
 const CanvasStoryEventBaseSchema = {
   id: CanvasStoryStableIdSchema,
@@ -119,6 +135,53 @@ export const CanvasStoryTableEventSchema = z
   .strict()
   .describe('Creates a matrix table component inside a section.')
 
+export const CanvasStoryScorecardEventSchema = z
+  .object({
+    ...CanvasStoryEventBaseSchema,
+    metrics: z.array(CanvasStoryScorecardMetricSchema),
+    sectionId: CanvasStoryStableIdSchema,
+    summary: CanvasStoryTextSchema,
+    title: CanvasStoryTextSchema,
+    type: z.literal('scorecard'),
+  })
+  .strict()
+  .describe('Creates a KPI summary strip inside a section.')
+
+export const CanvasStoryTimelineEventSchema = z
+  .object({
+    ...CanvasStoryEventBaseSchema,
+    completed: z.number().int().nonnegative(),
+    sectionId: CanvasStoryStableIdSchema,
+    steps: z.array(CanvasStoryTextSchema),
+    title: CanvasStoryTextSchema,
+    type: z.literal('timeline'),
+  })
+  .strict()
+  .describe('Creates a temporal progress component inside a section.')
+
+export const CanvasStoryQueueEventSchema = z
+  .object({
+    ...CanvasStoryEventBaseSchema,
+    done: z.array(CanvasStoryTextSchema),
+    items: z.array(CanvasStoryTextSchema),
+    sectionId: CanvasStoryStableIdSchema,
+    title: CanvasStoryTextSchema,
+    type: z.literal('queue'),
+  })
+  .strict()
+  .describe('Creates an action review queue inside a section.')
+
+export const CanvasStoryEvidenceEventSchema = z
+  .object({
+    ...CanvasStoryEventBaseSchema,
+    rows: z.array(CanvasStoryEvidenceRowSchema),
+    sectionId: CanvasStoryStableIdSchema,
+    title: CanvasStoryTextSchema,
+    type: z.literal('evidence'),
+  })
+  .strict()
+  .describe('Creates a source evidence ledger inside a section.')
+
 export const CanvasStoryDecisionEventSchema = z
   .object({
     ...CanvasStoryEventBaseSchema,
@@ -160,6 +223,10 @@ export const CanvasStoryEventSchema = z.discriminatedUnion('type', [
   CanvasStoryNoteEventSchema,
   CanvasStoryChecklistEventSchema,
   CanvasStoryTableEventSchema,
+  CanvasStoryScorecardEventSchema,
+  CanvasStoryTimelineEventSchema,
+  CanvasStoryQueueEventSchema,
+  CanvasStoryEvidenceEventSchema,
   CanvasStoryDecisionEventSchema,
   CanvasStoryRiskEventSchema,
   CanvasStoryEdgeEventSchema,

@@ -35,14 +35,14 @@ export function CanvasSvgOverlayDefs() {
       </pattern>
       <marker
         id={CANVAS_SVG_ARROW_MARKER_ID}
-        markerHeight="8"
-        markerWidth="8"
+        markerHeight="6"
+        markerWidth="6"
         orient="auto"
-        refX="7"
-        refY="4"
-        viewBox="0 0 8 8"
+        refX="5"
+        refY="3"
+        viewBox="0 0 6 6"
       >
-        <path d="M 0 0 L 8 4 L 0 8 z" className="arrow-head" />
+        <path d="M 0 0 L 6 3 L 0 6 z" className="arrow-head" />
       </marker>
       <marker
         id={CANVAS_SVG_DRAFT_ARROW_MARKER_ID}

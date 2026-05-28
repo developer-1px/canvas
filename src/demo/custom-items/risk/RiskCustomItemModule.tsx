@@ -9,35 +9,25 @@ import './RiskCustomItemModule.css'
 
 const riskItemRenderer: CanvasAppCustomItemRendererStrategy = ({ item }) => {
   const severity = String(item.data.severity ?? 'Risk')
+  const tone = getRiskTone(severity)
 
   return (
-    <>
+    <g className="demo-risk-node" data-risk-severity={tone}>
       <rect
-        className="component-card"
+        className="component-card demo-risk-card"
         x={item.x}
         y={item.y}
         width={item.w}
         height={item.h}
-        rx="7"
-        fill="#fff4d6"
-        stroke="#17202a"
+        rx="5"
+        fill="#ffffff"
+        stroke="#e3e8ef"
         vectorEffect="non-scaling-stroke"
       />
-      <circle cx={item.x + 24} cy={item.y + 24} r="11" fill="#d94b45" />
-      <text
-        x={item.x + 24}
-        y={item.y + 29}
-        fill="#fffef8"
-        fontSize="16"
-        fontWeight="700"
-        textAnchor="middle"
-      >
-        !
-      </text>
       <foreignObject
-        x={item.x + 48}
+        x={item.x + 16}
         y={item.y + 14}
-        width={item.w - 64}
+        width={item.w - 32}
         height="56"
       >
         <div className="demo-risk-text">
@@ -45,7 +35,7 @@ const riskItemRenderer: CanvasAppCustomItemRendererStrategy = ({ item }) => {
           <span>{severity}</span>
         </div>
       </foreignObject>
-    </>
+    </g>
   )
 }
 
@@ -114,4 +104,18 @@ function isRiskItem(item: unknown): item is CanvasCustomItem {
     'kind' in item &&
     item.kind === 'risk'
   )
+}
+
+function getRiskTone(severity: string) {
+  const normalizedSeverity = severity.toLowerCase()
+
+  if (normalizedSeverity.includes('high')) {
+    return 'high'
+  }
+
+  if (normalizedSeverity.includes('medium')) {
+    return 'medium'
+  }
+
+  return 'low'
 }

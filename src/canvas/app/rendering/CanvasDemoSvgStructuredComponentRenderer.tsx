@@ -25,14 +25,14 @@ export function CanvasDemoSvgChecklistComponent({
         y={item.y}
         width={item.w}
         height={item.h}
-        rx="8"
+        rx="5"
         fill={item.fill}
         stroke={item.stroke}
         vectorEffect="non-scaling-stroke"
       />
       <CanvasDemoSvgComponentHeader item={item} />
       {rows.map((row, index) => {
-        const y = item.y + 50 + index * 28
+        const y = item.y + 48 + index * 24
         const checked = isCanvasChecklistItemChecked(item, index)
 
         return (
@@ -40,8 +40,8 @@ export function CanvasDemoSvgChecklistComponent({
             <rect
               x={item.x + 18}
               y={y}
-              width="14"
-              height="14"
+              width="13"
+              height="13"
               rx="3"
               fill="none"
               stroke={item.accent}
@@ -50,7 +50,7 @@ export function CanvasDemoSvgChecklistComponent({
             {checked ? (
               <path
                 d={`M ${item.x + 21} ${y + 7} L ${item.x + 25} ${y + 11} L ${
-                  item.x + 31
+                  item.x + 30
                 } ${y + 3}`}
                 fill="none"
                 stroke={item.accent}
@@ -58,7 +58,7 @@ export function CanvasDemoSvgChecklistComponent({
                 vectorEffect="non-scaling-stroke"
               />
             ) : null}
-            <CanvasDemoSvgText x={item.x + 42} y={y + 12} text={row} />
+            <CanvasDemoSvgText x={item.x + 40} y={y + 11} text={row} />
           </g>
         )
       })}
@@ -81,7 +81,7 @@ export function CanvasDemoSvgKanbanComponent({
         y={item.y}
         width={item.w}
         height={item.h}
-        rx="8"
+        rx="5"
         fill={item.fill}
         stroke={item.stroke}
         vectorEffect="non-scaling-stroke"
@@ -95,8 +95,8 @@ export function CanvasDemoSvgKanbanComponent({
             width={item.w - 28}
             height="28"
             rx="5"
-            fill="#ffffff"
-            stroke="#e2e8f0"
+            fill="#fcfdff"
+            stroke="#e7ecf3"
             vectorEffect="non-scaling-stroke"
           />
           <CanvasDemoSvgText
@@ -129,23 +129,12 @@ export function CanvasDemoSvgTableComponent({
         y={item.y}
         width={item.w}
         height={item.h}
-        rx="6"
+        rx="5"
         fill={item.fill}
         stroke={item.stroke}
         vectorEffect="non-scaling-stroke"
       />
-      <rect x={item.x} y={item.y} width={item.w} height={cellH} fill="#ecfeff" />
-      {Array.from({ length: cols - 1 }, (_, index) => index + 1).map((index) => (
-        <line
-          key={`col-${index}`}
-          x1={item.x + cellW * index}
-          y1={item.y}
-          x2={item.x + cellW * index}
-          y2={item.y + item.h}
-          stroke="#cbd5e1"
-          vectorEffect="non-scaling-stroke"
-        />
-      ))}
+      <rect x={item.x} y={item.y} width={item.w} height={cellH} fill="#fcfdff" />
       {Array.from({ length: rows - 1 }, (_, index) => index + 1).map((index) => (
         <line
           key={`row-${index}`}
@@ -153,7 +142,7 @@ export function CanvasDemoSvgTableComponent({
           y1={item.y + cellH * index}
           x2={item.x + item.w}
           y2={item.y + cellH * index}
-          stroke="#cbd5e1"
+          stroke="#eef3f8"
           vectorEffect="non-scaling-stroke"
         />
       ))}

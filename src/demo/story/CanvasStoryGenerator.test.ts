@@ -14,11 +14,11 @@ describe('CanvasStoryGenerator', () => {
     const itemIds = new Set(normalizedItems.map((item) => item.id))
 
     expect(normalizedItems.length).toBe(DEMO_REPO_STORY_EVENTS.length)
-    expect(itemIds.has('engine')).toBe(true)
-    expect(itemIds.has('event-not-item')).toBe(true)
-    expect(itemIds.has('decision-module')).toBe(true)
-    expect(itemIds.has('partial-json-risk')).toBe(true)
-    expect(itemIds.has('stream-feeds-generator')).toBe(true)
+    expect(itemIds.has('mission-brief')).toBe(true)
+    expect(itemIds.has('generated-board')).toBe(true)
+    expect(itemIds.has('publish-decision')).toBe(true)
+    expect(itemIds.has('unsupported-claim-risk')).toBe(true)
+    expect(itemIds.has('quality-guards-publish')).toBe(true)
   })
 
   it('keeps LLM events free from generated geometry details', () => {
@@ -33,6 +33,37 @@ describe('CanvasStoryGenerator', () => {
 
     expect(bounds.w).toBeGreaterThan(1800)
     expect(bounds.h).toBeGreaterThan(900)
+  })
+
+  it('promotes key demo regions into distinct product surfaces', () => {
+    const items = createCanvasStoryItems(DEMO_REPO_STORY_EVENTS)
+    const byId = new Map(items.map((item) => [item.id, item]))
+
+    expect(byId.get('operating-summary')).toMatchObject({
+      component: 'command-center',
+      h: 210,
+      w: 560,
+    })
+    expect(byId.get('claim-evidence')).toMatchObject({
+      component: 'evidence-map',
+      items: [
+        'Ticket #8142',
+        'Security blocker',
+        'linked',
+        'AE note',
+        'Upsell timing',
+        'linked',
+        'Call clip',
+        'Admin pain',
+        'linked',
+      ],
+    })
+    expect(byId.get('review-status')).toMatchObject({
+      component: 'review-board',
+    })
+    expect(byId.get('qa-results')).toMatchObject({
+      component: 'gate-strip',
+    })
   })
 
   it('fails when a content event references an unknown section', () => {
@@ -57,7 +88,7 @@ describe('CanvasStoryGenerator', () => {
         v: 1,
         type: 'section',
         id: 'engine',
-        lane: 'architecture',
+        lane: 'intake',
         purpose: 'Renderer-free behavior',
         title: 'Engine',
       },
@@ -65,7 +96,7 @@ describe('CanvasStoryGenerator', () => {
         v: 1,
         type: 'section',
         id: 'engine',
-        lane: 'generation',
+        lane: 'review',
         purpose: 'Duplicate id',
         title: 'Engine again',
       },

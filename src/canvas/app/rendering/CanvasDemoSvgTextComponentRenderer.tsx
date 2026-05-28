@@ -5,6 +5,7 @@ import {
 } from '../../host'
 import {
   CanvasDemoSvgComponentText,
+  CanvasDemoSvgSectionText,
   CanvasDemoSvgStickyText,
 } from './CanvasDemoSvgComponentText'
 
@@ -16,23 +17,15 @@ export function CanvasDemoSvgCardComponent({
   return (
     <>
       <rect
-        className="component-card"
+        className="component-card component-concept-card"
         x={item.x}
         y={item.y}
         width={item.w}
         height={item.h}
-        rx="8"
+        rx="5"
         fill={item.fill}
         stroke={item.stroke}
         vectorEffect="non-scaling-stroke"
-      />
-      <rect
-        x={item.x}
-        y={item.y}
-        width="6"
-        height={item.h}
-        rx="3"
-        fill={item.accent}
       />
       <CanvasDemoSvgComponentText item={item} />
     </>
@@ -52,7 +45,7 @@ export function CanvasDemoSvgStickyComponent({
         y={item.y}
         width={item.w}
         height={item.h}
-        rx="2"
+        rx="4"
         fill={item.fill}
         stroke={item.stroke}
         vectorEffect="non-scaling-stroke"
@@ -90,16 +83,36 @@ export function CanvasDemoSvgSectionComponent({
     <>
       <rect
         className="component-section"
+        data-section-id={item.id}
         x={item.x}
         y={item.y}
         width={item.w}
         height={item.h}
-        rx="8"
+        rx="5"
         fill={item.fill}
         stroke={item.stroke}
         vectorEffect="non-scaling-stroke"
       />
-      <CanvasDemoSvgComponentText item={item} compact />
+      <line
+        className="component-section-spine"
+        data-section-id={item.id}
+        x1={item.x}
+        y1={item.y + 12}
+        x2={item.x}
+        y2={item.y + item.h - 12}
+        stroke={item.accent}
+        vectorEffect="non-scaling-stroke"
+      />
+      <line
+        className="component-section-rule"
+        data-section-id={item.id}
+        x1={item.x + 16}
+        y1={item.y + 44}
+        x2={item.x + item.w - 16}
+        y2={item.y + 44}
+        vectorEffect="non-scaling-stroke"
+      />
+      <CanvasDemoSvgSectionText item={item} />
     </>
   )
 }
@@ -117,7 +130,7 @@ export function CanvasDemoSvgImageComponent({
         y={item.y}
         width={item.w}
         height={item.h}
-        rx="8"
+        rx="5"
         fill={item.fill}
         stroke={item.stroke}
         vectorEffect="non-scaling-stroke"
@@ -158,7 +171,7 @@ export function CanvasDemoSvgLinkPreviewComponent({
         y={item.y}
         width={item.w}
         height={item.h}
-        rx="8"
+        rx="5"
         fill={item.fill}
         stroke={item.stroke}
         vectorEffect="non-scaling-stroke"
@@ -168,7 +181,7 @@ export function CanvasDemoSvgLinkPreviewComponent({
         y={item.y}
         width={item.w}
         height={mediaHeight}
-        rx="8"
+        rx="5"
         fill="#eff6ff"
       />
       <rect

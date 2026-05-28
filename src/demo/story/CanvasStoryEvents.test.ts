@@ -16,14 +16,14 @@ describe('CanvasStoryEvents', () => {
       parseCanvasStoryEvent({
         v: 1,
         type: 'card',
-        id: 'engine-intent',
-        sectionId: 'engine',
+        id: 'account-context',
+        sectionId: 'mission-brief',
         role: 'module',
-        title: 'Intent grammar',
-        points: ['tool input', 'gesture state'],
+        title: 'Account context',
+        points: ['Tier-1 bank', 'EMEA rollout'],
       }),
     ).toMatchObject({
-      id: 'engine-intent',
+      id: 'account-context',
       type: 'card',
     })
   })
@@ -33,10 +33,10 @@ describe('CanvasStoryEvents', () => {
       parseCanvasStoryEvent({
         v: 1,
         type: 'section',
-        id: 'engine',
-        lane: 'architecture',
-        purpose: 'Renderer-free behavior',
-        title: 'Engine',
+        id: 'mission-brief',
+        lane: 'intake',
+        purpose: 'Enterprise onboarding workspace',
+        title: 'Mission Brief',
         x: 100,
       }),
     ).toThrow()
@@ -58,10 +58,10 @@ describe('CanvasStoryEvents', () => {
     const event = parseCanvasStoryEvent({
       v: 1,
       type: 'section',
-      id: 'engine',
-      lane: 'architecture',
-      purpose: 'Renderer-free behavior',
-      title: 'Engine',
+      id: 'mission-brief',
+      lane: 'intake',
+      purpose: 'Enterprise onboarding workspace',
+      title: 'Mission Brief',
     })
     const sse = encodeCanvasStorySseDelta(event)
     const data = sse

@@ -126,6 +126,23 @@ describe('CanvasDrawingItemGeometry', () => {
     })
   })
 
+  it('places elbow connector labels away from the routed line', () => {
+    const labeledArrow = {
+      ...arrow,
+      end: { x: 240, y: 120 },
+      routing: 'elbow' as const,
+      start: { x: 80, y: 120 },
+      text: 'A long connector label',
+    }
+
+    expect(getCanvasArrowLabelBounds(labeledArrow)).toEqual({
+      h: 32,
+      w: 182,
+      x: 29,
+      y: 80,
+    })
+  })
+
   it('translates drawing geometry and syncs cached bounds', () => {
     expect(translateCanvasDrawingItem({
       dx: 10,

@@ -38,44 +38,45 @@ type CanvasStorySectionLayout = {
 type CanvasStoryLane = (typeof CANVAS_STORY_LANES)[number]
 
 const CANVAS_STORY_START_X = 72
-const CANVAS_STORY_START_Y = 96
-const CANVAS_STORY_SECTION_GAP = 56
-const CANVAS_STORY_LANE_GAP = 104
-const CANVAS_STORY_SECTION_PADDING = 28
-const CANVAS_STORY_SECTION_HEADER = 82
-const CANVAS_STORY_CONTENT_GAP = 18
-const CANVAS_STORY_COLUMN_WIDTH = 288
-const CANVAS_STORY_TABLE_WIDTH = 384
-const CANVAS_STORY_MAX_COLUMNS = 3
+const CANVAS_STORY_START_Y = 88
+const CANVAS_STORY_SECTION_GAP = 24
+const CANVAS_STORY_SECTION_ROW_GAP = 32
+const CANVAS_STORY_LANE_GAP = 72
+const CANVAS_STORY_SECTION_PADDING = 22
+const CANVAS_STORY_SECTION_HEADER = 68
+const CANVAS_STORY_CONTENT_GAP = 14
+const CANVAS_STORY_LANE_MAX_WIDTH = 3300
+const CANVAS_STORY_TABLE_WIDTH = 352
+const CANVAS_STORY_MAX_COLUMNS = 2
 
 const LANE_STYLE: Record<
   CanvasStoryLane,
   Pick<CanvasComponentItem, 'accent' | 'fill' | 'stroke'>
 > = {
-  architecture: {
-    accent: '#2563eb',
-    fill: 'rgba(239, 246, 255, 0.42)',
-    stroke: '#93c5fd',
-  },
-  extension: {
-    accent: '#7c3aed',
-    fill: 'rgba(245, 243, 255, 0.42)',
-    stroke: '#c4b5fd',
+  delivery: {
+    accent: '#7fb7ff',
+    fill: 'rgba(255, 255, 255, 0.36)',
+    stroke: 'rgba(127, 183, 255, 0.18)',
   },
   generation: {
-    accent: '#0891b2',
-    fill: 'rgba(236, 254, 255, 0.42)',
-    stroke: '#67e8f9',
+    accent: '#0f8f63',
+    fill: 'rgba(255, 255, 255, 0.36)',
+    stroke: 'rgba(15, 143, 99, 0.18)',
   },
-  quality: {
-    accent: '#475569',
-    fill: 'rgba(248, 250, 252, 0.62)',
-    stroke: '#94a3b8',
+  governance: {
+    accent: '#7c5c84',
+    fill: 'rgba(255, 255, 255, 0.36)',
+    stroke: 'rgba(124, 92, 132, 0.2)',
   },
-  workflow: {
-    accent: '#16a34a',
-    fill: 'rgba(240, 253, 244, 0.42)',
-    stroke: '#86efac',
+  intake: {
+    accent: '#ff8a4c',
+    fill: 'rgba(255, 255, 255, 0.36)',
+    stroke: 'rgba(255, 138, 76, 0.18)',
+  },
+  review: {
+    accent: '#7fb7ff',
+    fill: 'rgba(255, 255, 255, 0.36)',
+    stroke: 'rgba(127, 183, 255, 0.2)',
   },
 }
 
@@ -83,22 +84,22 @@ const ROLE_ACCENTS: Record<
   Extract<CanvasStoryContentEvent, { type: 'card' }>['role'],
   string
 > = {
-  contract: '#2563eb',
-  control: '#0f766e',
-  guardrail: '#475569',
-  module: '#7c3aed',
-  principle: '#ca8a04',
-  workflow: '#16a34a',
+  contract: '#7fb7ff',
+  control: '#0f8f63',
+  guardrail: '#7c5c84',
+  module: '#231729',
+  principle: '#ff8a4c',
+  workflow: '#b7d654',
 }
 
 const RELATION_STROKES: Record<CanvasStoryEdgeEvent['relation'], string> = {
-  extends: '#7c3aed',
-  feeds: '#2563eb',
-  generates: '#0891b2',
-  guards: '#475569',
-  owns: '#16a34a',
-  renders: '#0f766e',
-  validates: '#ca8a04',
+  extends: '#7c5c84',
+  feeds: '#7fb7ff',
+  generates: '#0f8f63',
+  guards: '#231729',
+  owns: '#0f8f63',
+  renders: '#7fb7ff',
+  validates: '#ff8a4c',
 }
 
 export function createCanvasStoryItems(
@@ -172,10 +173,22 @@ function createCanvasStoryLayouts({
       continue
     }
 
+    let laneOffsetY = 0
+    let rowHeight = 0
     let sectionX = CANVAS_STORY_START_X
-    let maxLaneHeight = 0
 
     for (const draft of laneDrafts) {
+      if (
+        sectionX > CANVAS_STORY_START_X &&
+        sectionX + draft.w > CANVAS_STORY_START_X + CANVAS_STORY_LANE_MAX_WIDTH
+      ) {
+        sectionX = CANVAS_STORY_START_X
+        laneOffsetY += rowHeight + CANVAS_STORY_SECTION_ROW_GAP
+        rowHeight = 0
+      }
+
+      const sectionY = laneY + laneOffsetY
+
       layouts.push({
         ...draft,
         content: draft.content.map((placement) => ({
@@ -183,17 +196,17 @@ function createCanvasStoryLayouts({
           bounds: {
             ...placement.bounds,
             x: sectionX + placement.bounds.x,
-            y: laneY + placement.bounds.y,
+            y: sectionY + placement.bounds.y,
           },
         })),
         x: sectionX,
-        y: laneY,
+        y: sectionY,
       })
       sectionX += draft.w + CANVAS_STORY_SECTION_GAP
-      maxLaneHeight = Math.max(maxLaneHeight, draft.h)
+      rowHeight = Math.max(rowHeight, draft.h)
     }
 
-    laneY += maxLaneHeight + CANVAS_STORY_LANE_GAP
+    laneY += laneOffsetY + rowHeight + CANVAS_STORY_LANE_GAP
   }
 
   return layouts
@@ -241,9 +254,8 @@ function createCanvasStorySectionLayoutDraft({
     content,
   })
   const sectionWidth =
-    CANVAS_STORY_SECTION_PADDING * 2 +
-    columns * CANVAS_STORY_COLUMN_WIDTH +
-    (columns - 1) * CANVAS_STORY_CONTENT_GAP
+    CANVAS_STORY_SECTION_PADDING +
+    getCanvasStoryContentWidth(placements)
   const sectionHeight =
     CANVAS_STORY_SECTION_HEADER +
     CANVAS_STORY_SECTION_PADDING +
@@ -265,18 +277,18 @@ function createCanvasStoryContentPlacements({
   content: CanvasStoryContentEvent[]
 }) {
   const rows: CanvasStoryContentPlacement[][] = []
+  const columnWidths = Array.from({ length: columns }, () => 0)
 
   content.forEach((event, index) => {
     const rowIndex = Math.floor(index / columns)
     const columnIndex = index % columns
     const size = getCanvasStoryContentSize(event)
+    columnWidths[columnIndex] = Math.max(columnWidths[columnIndex], size.w)
     const placement: CanvasStoryContentPlacement = {
       bounds: {
         h: size.h,
         w: size.w,
-        x:
-          CANVAS_STORY_SECTION_PADDING +
-          columnIndex * (CANVAS_STORY_COLUMN_WIDTH + CANVAS_STORY_CONTENT_GAP),
+        x: 0,
         y: 0,
       },
       event,
@@ -292,10 +304,15 @@ function createCanvasStoryContentPlacements({
     const rowHeight = Math.max(...row.map((placement) => placement.bounds.h))
 
     for (const placement of row) {
+      const columnIndex = row.indexOf(placement)
+
       placements.push({
         ...placement,
         bounds: {
           ...placement.bounds,
+          x:
+            CANVAS_STORY_SECTION_PADDING +
+            getCanvasStoryColumnOffset(columnWidths, columnIndex),
           y: rowY,
         },
       })
@@ -305,6 +322,23 @@ function createCanvasStoryContentPlacements({
   }
 
   return placements
+}
+
+function getCanvasStoryColumnOffset(columnWidths: number[], columnIndex: number) {
+  return columnWidths.slice(0, columnIndex).reduce(
+    (offset, width) => offset + width + CANVAS_STORY_CONTENT_GAP,
+    0,
+  )
+}
+
+function getCanvasStoryContentWidth(placements: CanvasStoryContentPlacement[]) {
+  if (placements.length === 0) {
+    return 0
+  }
+
+  return Math.max(
+    ...placements.map((placement) => placement.bounds.x + placement.bounds.w),
+  )
 }
 
 function getCanvasStoryContentRowsHeight(
@@ -324,42 +358,98 @@ function getCanvasStoryContentSize(
 ): Pick<CanvasStoryBounds, 'h' | 'w'> {
   if (event.type === 'table') {
     return {
-      h: Math.max(132, 42 * (event.rows.length + 1)),
+      h: Math.max(108, 34 * (event.rows.length + 1)),
       w: CANVAS_STORY_TABLE_WIDTH,
+    }
+  }
+
+  if (event.type === 'scorecard') {
+    if (event.id === 'operating-summary') {
+      return {
+        h: 210,
+        w: 560,
+      }
+    }
+
+    if (event.id === 'qa-results') {
+      return {
+        h: 150,
+        w: 430,
+      }
+    }
+
+    return {
+      h: 164,
+      w: 430,
+    }
+  }
+
+  if (event.type === 'timeline') {
+    return {
+      h: 126,
+      w: 430,
+    }
+  }
+
+  if (event.type === 'queue') {
+    if (event.id === 'review-status') {
+      return {
+        h: Math.max(152, 62 + event.items.length * 26),
+        w: 430,
+      }
+    }
+
+    return {
+      h: Math.max(126, 58 + event.items.length * 28),
+      w: 286,
+    }
+  }
+
+  if (event.type === 'evidence') {
+    if (event.id === 'claim-evidence') {
+      return {
+        h: Math.max(152, 60 + event.rows.length * 38),
+        w: 430,
+      }
+    }
+
+    return {
+      h: Math.max(126, 50 + event.rows.length * 34),
+      w: 430,
     }
   }
 
   if (event.type === 'checklist') {
     return {
-      h: Math.max(144, 50 + event.items.length * 28),
-      w: 268,
+      h: Math.max(112, 44 + event.items.length * 22),
+      w: 286,
     }
   }
 
   if (event.type === 'decision') {
     return {
-      h: 122,
-      w: 260,
+      h: 100,
+      w: 286,
     }
   }
 
   if (event.type === 'risk') {
     return {
-      h: 96,
-      w: 220,
+      h: 80,
+      w: 250,
     }
   }
 
   if (event.type === 'note') {
     return {
-      h: 132,
-      w: 220,
+      h: 108,
+      w: 252,
     }
   }
 
   return {
-    h: Math.max(126, 82 + event.points.length * 22),
-    w: 268,
+    h: Math.max(92, 50 + event.points.length * 14),
+    w: 286,
   }
 }
 
@@ -401,6 +491,22 @@ function createCanvasStoryContentItem(
 
   if (event.type === 'table') {
     return createCanvasStoryTableItem({ bounds, event })
+  }
+
+  if (event.type === 'scorecard') {
+    return createCanvasStoryScorecardItem({ bounds, event })
+  }
+
+  if (event.type === 'timeline') {
+    return createCanvasStoryTimelineItem({ bounds, event })
+  }
+
+  if (event.type === 'queue') {
+    return createCanvasStoryQueueItem({ bounds, event })
+  }
+
+  if (event.type === 'evidence') {
+    return createCanvasStoryEvidenceItem({ bounds, event })
   }
 
   if (event.type === 'decision') {
@@ -445,9 +551,9 @@ function createCanvasStoryCardItem({
     accent,
     body: event.points.join(' · '),
     component: 'card',
-    fill: '#ffffff',
+    fill: 'rgba(255, 255, 255, 0.74)',
     id: event.id,
-    stroke: '#cbd5e1',
+    stroke: '#e1e7ef',
     title: event.title,
     type: 'component',
   }
@@ -462,12 +568,12 @@ function createCanvasStoryNoteItem({
 }): CanvasComponentItem {
   return {
     ...bounds,
-    accent: '#ca8a04',
-    body: `${event.title}\n${event.body}`,
+    accent: '#ff8a4c',
+    body: event.body,
     component: 'sticky',
-    fill: '#fef3c7',
+    fill: 'rgba(255, 255, 255, 0.74)',
     id: event.id,
-    stroke: '#eab308',
+    stroke: 'rgba(255, 138, 76, 0.24)',
     title: event.title,
     type: 'component',
   }
@@ -482,7 +588,7 @@ function createCanvasStoryChecklistItem({
 }): CanvasComponentItem {
   return {
     ...bounds,
-    accent: '#16a34a',
+    accent: '#0f8f63',
     checkedItems: event.items.flatMap((item, index) =>
       event.checked.includes(item) ? [index] : [],
     ),
@@ -490,7 +596,7 @@ function createCanvasStoryChecklistItem({
     fill: '#ffffff',
     id: event.id,
     items: event.items,
-    stroke: '#cbd5e1',
+    stroke: '#dfe5ee',
     title: event.title,
     type: 'component',
   }
@@ -505,13 +611,167 @@ function createCanvasStoryTableItem({
 }): CanvasComponentItem {
   return {
     ...bounds,
-    accent: '#0891b2',
+    accent: '#0f8f63',
     columns: event.columns,
     component: 'table',
     fill: '#ffffff',
     id: event.id,
     items: event.rows.flatMap((row) => row),
-    stroke: '#cbd5e1',
+    stroke: '#dfe5ee',
+    title: event.title,
+    type: 'component',
+  }
+}
+
+function createCanvasStoryScorecardItem({
+  bounds,
+  event,
+}: {
+  bounds: CanvasStoryBounds
+  event: Extract<CanvasStoryContentEvent, { type: 'scorecard' }>
+}): CanvasComponentItem {
+  if (event.id === 'operating-summary') {
+    return {
+      ...bounds,
+      accent: '#ff8a4c',
+      body: event.summary,
+      columns: event.metrics.map((metric) => metric.label),
+      component: 'command-center',
+      fill: '#ffffff',
+      id: event.id,
+      items: event.metrics.flatMap((metric) => [metric.value, metric.detail]),
+      stroke: '#dfe5ee',
+      title: event.title,
+      type: 'component',
+    }
+  }
+
+  if (event.id === 'qa-results') {
+    return {
+      ...bounds,
+      accent: '#ff8a4c',
+      body: event.summary,
+      columns: event.metrics.map((metric) => metric.label),
+      component: 'gate-strip',
+      fill: '#ffffff',
+      id: event.id,
+      items: event.metrics.flatMap((metric) => [metric.value, metric.detail]),
+      stroke: '#dfe5ee',
+      title: event.title,
+      type: 'component',
+    }
+  }
+
+  return {
+    ...bounds,
+    accent: '#7fb7ff',
+    body: event.summary,
+    columns: event.metrics.map((metric) => metric.label),
+    component: 'scorecard',
+    fill: '#ffffff',
+    id: event.id,
+    items: event.metrics.flatMap((metric) => [metric.value, metric.detail]),
+    stroke: '#dfe5ee',
+    title: event.title,
+    type: 'component',
+  }
+}
+
+function createCanvasStoryTimelineItem({
+  bounds,
+  event,
+}: {
+  bounds: CanvasStoryBounds
+  event: Extract<CanvasStoryContentEvent, { type: 'timeline' }>
+}): CanvasComponentItem {
+  return {
+    ...bounds,
+    accent: '#0f8f63',
+    checkedItems: Array.from(
+      { length: Math.min(event.completed, event.steps.length) },
+      (_, index) => index,
+    ),
+    component: 'timeline',
+    fill: '#ffffff',
+    id: event.id,
+    items: event.steps,
+    stroke: '#dfe5ee',
+    title: event.title,
+    type: 'component',
+  }
+}
+
+function createCanvasStoryQueueItem({
+  bounds,
+  event,
+}: {
+  bounds: CanvasStoryBounds
+  event: Extract<CanvasStoryContentEvent, { type: 'queue' }>
+}): CanvasComponentItem {
+  if (event.id === 'review-status') {
+    return {
+      ...bounds,
+      accent: '#7fb7ff',
+      checkedItems: event.items.flatMap((item, index) =>
+        event.done.includes(item) ? [index] : [],
+      ),
+      component: 'review-board',
+      fill: '#ffffff',
+      id: event.id,
+      items: event.items,
+      stroke: '#dfe5ee',
+      title: event.title,
+      type: 'component',
+    }
+  }
+
+  return {
+    ...bounds,
+    accent: '#7fb7ff',
+    checkedItems: event.items.flatMap((item, index) =>
+      event.done.includes(item) ? [index] : [],
+    ),
+    component: 'queue',
+    fill: '#ffffff',
+    id: event.id,
+    items: event.items,
+    stroke: '#dfe5ee',
+    title: event.title,
+    type: 'component',
+  }
+}
+
+function createCanvasStoryEvidenceItem({
+  bounds,
+  event,
+}: {
+  bounds: CanvasStoryBounds
+  event: Extract<CanvasStoryContentEvent, { type: 'evidence' }>
+}): CanvasComponentItem {
+  if (event.id === 'claim-evidence') {
+    return {
+      ...bounds,
+      accent: '#0f8f63',
+      columns: ['Source', 'Signal', 'State'],
+      component: 'evidence-map',
+      fill: '#ffffff',
+      id: event.id,
+      items: event.rows.flatMap((row) => [row.source, row.signal, row.state]),
+      stroke: '#dfe5ee',
+      title: event.title,
+      type: 'component',
+    }
+  }
+
+  return {
+    ...bounds,
+    accent: '#0f8f63',
+    columns: ['Source', 'Signal', 'State'],
+    component: 'evidence',
+    fill: '#ffffff',
+    id: event.id,
+    items: event.rows.flatMap((row) => [row.source, row.signal, row.state]),
+    stroke: '#dfe5ee',
     title: event.title,
     type: 'component',
   }
@@ -548,7 +808,7 @@ function createCanvasStoryEdgeItem({
     start,
     startAttachedTo: edge.from,
     stroke: RELATION_STROKES[edge.relation],
-    strokeWidth: 3,
+    strokeWidth: 1.4,
     text: edge.label,
     type: 'arrow',
     w: Math.max(24, Math.abs(end.x - start.x)),

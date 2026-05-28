@@ -62,6 +62,7 @@ function renderCanvasDemoSvgArrowDrawingItem({
         stroke={item.stroke}
         strokeWidth={item.strokeWidth}
         markerEnd={CANVAS_SVG_ARROW_MARKER_IRI}
+        opacity="0.15"
         vectorEffect="non-scaling-stroke"
       />
       {item.text?.trim() ? renderCanvasDemoSvgArrowLabel({ item }) : null}
