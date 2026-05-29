@@ -111,6 +111,42 @@ describe('HtmlSpecimenVisualCssEdit', () => {
     expect(result.specimen.css).toContain('border-radius: 12px;')
   })
 
+  it('reports only nodes whose winning declaration is patched', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `.button {
+  color: #334155;
+}
+.danger {
+  color: #ef4444;
+}`,
+    }
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '#111827',
+        nodeId: 'primary',
+        property: 'color',
+      },
+      nodes: createButtonNodes(),
+      specimen,
+    })
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) {
+      throw new Error(result.reason)
+    }
+
+    expect(result.source).toMatchObject({
+      affectedNodeIds: ['primary', 'secondary'],
+      property: 'color',
+      selector: '.button',
+      value: '#111827',
+    })
+    expect(result.specimen.css).toContain('color: #111827;')
+    expect(result.specimen.css).toContain('color: #ef4444;')
+  })
+
   it('patches the later winning declaration without changing earlier matches', () => {
     const specimen = {
       ...createButtonSpecimenData(),

@@ -125,6 +125,12 @@ type CssRuleMatch = {
   specificity: [number, number, number]
 }
 
+type CssDeclarationMatch = {
+  declaration: CssDeclaration
+  rule: CssRule
+  specificity: [number, number, number]
+}
+
 type CssScannerState = {
   bracketDepth: number
   comment: boolean
@@ -287,13 +293,48 @@ export function resolveHtmlSpecimenCssDeclarationSource({
     return null
   }
 
+  const winner = resolveHtmlSpecimenCssDeclarationMatch({
+    css,
+    node,
+    nodes,
+    property,
+  })
+
+  if (!winner) {
+    return null
+  }
+
+  return {
+    affectedNodeIds: getAffectedNodeIdsForDeclarationMatch({
+      css,
+      match: winner,
+      nodes,
+      property,
+    }),
+    declarationIndex: winner.declaration.declarationIndex,
+    important: winner.declaration.important,
+    property: winner.declaration.property,
+    ruleIndex: winner.rule.ruleIndex,
+    selector: winner.rule.selector,
+    specificity: winner.specificity,
+    value: winner.declaration.value,
+  }
+}
+
+function resolveHtmlSpecimenCssDeclarationMatch({
+  css,
+  node,
+  nodes,
+  property,
+}: {
+  css: string
+  node: HtmlSpecimenVisualCssNode
+  nodes: readonly HtmlSpecimenVisualCssNode[]
+  property: string
+}): CssDeclarationMatch | null {
   const matchedProperties = new Set(getCssDeclarationSourceProperties(property))
   const rules = parseCssRules(css)
-  let winner: {
-    declaration: CssDeclaration
-    rule: CssRule
-    specificity: [number, number, number]
-  } | null = null
+  let winner: CssDeclarationMatch | null = null
 
   for (const rule of rules) {
     const specificity = matchHtmlSpecimenCssSelectorList(rule.selector, node, nodes)
@@ -333,23 +374,42 @@ export function resolveHtmlSpecimenCssDeclarationSource({
     }
   }
 
-  if (!winner) {
-    return null
-  }
+  return winner
+}
 
-  return {
-    affectedNodeIds: nodes
-      .filter((candidate) =>
-        matchHtmlSpecimenCssSelectorList(winner.rule.selector, candidate, nodes))
-      .map((candidate) => candidate.id),
-    declarationIndex: winner.declaration.declarationIndex,
-    important: winner.declaration.important,
-    property: winner.declaration.property,
-    ruleIndex: winner.rule.ruleIndex,
-    selector: winner.rule.selector,
-    specificity: winner.specificity,
-    value: winner.declaration.value,
-  }
+function getAffectedNodeIdsForDeclarationMatch({
+  css,
+  match,
+  nodes,
+  property,
+}: {
+  css: string
+  match: CssDeclarationMatch
+  nodes: readonly HtmlSpecimenVisualCssNode[]
+  property: string
+}) {
+  return nodes
+    .filter((candidate) => {
+      const candidateMatch = resolveHtmlSpecimenCssDeclarationMatch({
+        css,
+        node: candidate,
+        nodes,
+        property,
+      })
+
+      return candidateMatch !== null &&
+        isSameCssDeclarationMatch(candidateMatch, match)
+    })
+    .map((candidate) => candidate.id)
+}
+
+function isSameCssDeclarationMatch(
+  left: CssDeclarationMatch,
+  right: CssDeclarationMatch,
+) {
+  return left.rule.ruleIndex === right.rule.ruleIndex &&
+    left.declaration.declarationIndex === right.declaration.declarationIndex &&
+    left.declaration.property === right.declaration.property
 }
 
 export function resolveHtmlSpecimenCssRuleSource({
