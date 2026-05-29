@@ -1,5 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { isHtmlSpecimenCssSupportedValue } from './HtmlSpecimenCssValueSupport'
+import {
+  isHtmlSpecimenCssSupportedValue,
+  shouldValidateHtmlSpecimenCssValue,
+} from './HtmlSpecimenCssValueSupport'
 
 describe('isHtmlSpecimenCssSupportedValue', () => {
   afterEach(() => {
@@ -58,5 +61,10 @@ describe('isHtmlSpecimenCssSupportedValue', () => {
       value: 'lab(50% 0 0)',
     })).toBe(true)
     expect(supports).toHaveBeenCalledWith('color', 'lab(50% 0 0)')
+  })
+
+  it('keeps value validation scoped to known visual edit properties', () => {
+    expect(shouldValidateHtmlSpecimenCssValue('font-size')).toBe(true)
+    expect(shouldValidateHtmlSpecimenCssValue('box-shadow')).toBe(false)
   })
 })

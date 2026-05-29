@@ -137,6 +137,26 @@ describe('HtmlSpecimenVisualCssEdit', () => {
     expect(result.specimen.css).toContain('border-radius: 12px;')
   })
 
+  it('blocks unsupported CSS values before patching the stylesheet', () => {
+    const specimen = createButtonSpecimenData()
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: 'not-a-size',
+        nodeId: 'primary',
+        property: 'font-size',
+      },
+      nodes: createButtonNodes(),
+      specimen,
+    })
+
+    expect(result).toEqual({
+      affectedNodeIds: [],
+      ok: false,
+      reason: 'unsupported-value',
+      specimen,
+    })
+  })
+
   it('reports only nodes whose winning declaration is patched', () => {
     const specimen = {
       ...createButtonSpecimenData(),

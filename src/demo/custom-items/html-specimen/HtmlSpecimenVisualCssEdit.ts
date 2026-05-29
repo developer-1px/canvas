@@ -4,6 +4,10 @@ import {
   matchHtmlSpecimenCssSelectorList,
   splitHtmlSpecimenCssSelectorList,
 } from './HtmlSpecimenCssSelectorMatcher'
+import {
+  isHtmlSpecimenCssSupportedValue,
+  shouldValidateHtmlSpecimenCssValue,
+} from './HtmlSpecimenCssValueSupport'
 
 export type HtmlSpecimenVisualCssNode = {
   attributes: Readonly<Record<string, string>>
@@ -104,6 +108,7 @@ export type HtmlSpecimenVisualCssEditResult =
         | 'scoped-rule'
         | 'shorthand-conflict'
         | 'token-value'
+        | 'unsupported-value'
         | 'verification-failed'
       specimen: HtmlSpecimenData
     }
@@ -193,6 +198,21 @@ export function applyHtmlSpecimenVisualCssEdit({
       affectedNodeIds: [],
       ok: false,
       reason: 'node-not-found',
+      specimen,
+    }
+  }
+
+  if (
+    shouldValidateHtmlSpecimenCssValue(intent.property) &&
+    !isHtmlSpecimenCssSupportedValue({
+      property: intent.property,
+      value: intent.nextValue,
+    })
+  ) {
+    return {
+      affectedNodeIds: [],
+      ok: false,
+      reason: 'unsupported-value',
       specimen,
     }
   }

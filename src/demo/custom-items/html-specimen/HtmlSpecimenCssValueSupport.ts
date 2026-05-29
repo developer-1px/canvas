@@ -1,6 +1,7 @@
 import { isHtmlSpecimenCssLengthUnit } from './HtmlSpecimenCssLengthValue'
 
 const HTML_SPECIMEN_COLOR_CSS_PROPERTIES = new Set([
+  'background',
   'background-color',
   'border-color',
   'color',
@@ -13,6 +14,12 @@ const HTML_SPECIMEN_LENGTH_CSS_PROPERTIES = new Set([
 ])
 
 const HTML_SPECIMEN_MARGIN_CSS_PROPERTIES = new Set(['margin'])
+
+const HTML_SPECIMEN_VALIDATED_CSS_PROPERTIES = new Set([
+  ...HTML_SPECIMEN_COLOR_CSS_PROPERTIES,
+  ...HTML_SPECIMEN_LENGTH_CSS_PROPERTIES,
+  ...HTML_SPECIMEN_MARGIN_CSS_PROPERTIES,
+])
 
 const HTML_SPECIMEN_CSS_WIDE_KEYWORDS = new Set([
   'inherit',
@@ -90,6 +97,12 @@ export function isHtmlSpecimenCssSupportedValue({
   }
 
   return false
+}
+
+export function shouldValidateHtmlSpecimenCssValue(property: string) {
+  return HTML_SPECIMEN_VALIDATED_CSS_PROPERTIES.has(
+    property.trim().toLowerCase(),
+  )
 }
 
 function getBrowserCssSupport(property: string, value: string) {
