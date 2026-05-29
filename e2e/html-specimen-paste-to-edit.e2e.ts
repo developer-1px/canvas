@@ -1678,7 +1678,7 @@ test('matches nth-of-type pseudo class selector rules', async ({
   ).not.toBe('rgb(17, 24, 39)')
 })
 
-test('keeps token-backed preview CSS read-only in the inspector', async ({
+test('edits safe token-backed preview CSS through custom properties', async ({
   page,
 }) => {
   await page.goto('/')
@@ -1732,12 +1732,21 @@ test('keeps token-backed preview CSS read-only in the inspector', async ({
     .filter({ hasText: 'Font' })
   const fontInput = fontField.locator('input')
 
-  await expect(backgroundField.getByText('Token .primary / 1 node')).toBeVisible()
-  await expect(backgroundInput).toHaveValue('var(--brand)')
-  await expect(backgroundInput).toBeDisabled()
+  await expect(backgroundField.getByText('Token :root / 1 node')).toBeVisible()
+  await expect(backgroundInput).toHaveValue('#2563eb')
+  await backgroundInput.fill('#111827')
+  await backgroundInput.blur()
+  await expect.poll(async () =>
+    preview.locator('button#primary').evaluate((button) =>
+      getComputedStyle(button).backgroundColor),
+  ).toBe('rgb(17, 24, 39)')
   await expect(fontField.getByText('Token .primary / 1 node')).toBeVisible()
   await expect(fontInput).toHaveValue('var(--control-font)')
   await expect(fontInput).toBeDisabled()
+  await expect.poll(async () =>
+    preview.evaluate((host) =>
+      host.shadowRoot?.querySelector('style')?.textContent ?? ''),
+  ).toContain('--brand: #111827;')
   await expect.poll(async () =>
     preview.evaluate((host) =>
       host.shadowRoot?.querySelector('style')?.textContent ?? ''),

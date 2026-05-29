@@ -227,8 +227,17 @@ export function applyHtmlSpecimenVisualCssEdit({
     nodes,
     property: intent.property,
   })
+  const tokenDefinitionSource = tokenSource
+    ? resolveHtmlSpecimenCssTokenDefinitionSource({
+        css: specimen.css,
+        mediaContext,
+        nodeId: intent.nodeId,
+        nodes,
+        property: intent.property,
+      })
+    : null
 
-  if (tokenSource) {
+  if (tokenSource && !tokenDefinitionSource) {
     return {
       affectedNodeIds: tokenSource.affectedNodeIds,
       ok: false,
@@ -237,14 +246,15 @@ export function applyHtmlSpecimenVisualCssEdit({
     }
   }
 
-  const shorthandConflictSource =
-    resolveHtmlSpecimenCssShorthandConflictSource({
-      css: specimen.css,
-      mediaContext,
-      nodeId: intent.nodeId,
-      nodes,
-      property: intent.property,
-    })
+  const shorthandConflictSource = tokenDefinitionSource
+    ? null
+    : resolveHtmlSpecimenCssShorthandConflictSource({
+        css: specimen.css,
+        mediaContext,
+        nodeId: intent.nodeId,
+        nodes,
+        property: intent.property,
+      })
 
   if (shorthandConflictSource) {
     return {
@@ -255,12 +265,13 @@ export function applyHtmlSpecimenVisualCssEdit({
     }
   }
 
-  const patch = previousSource
+  const patchSource = tokenDefinitionSource ?? previousSource
+  const patch = patchSource
     ? planExistingDeclarationPatch({
         css: specimen.css,
         mediaContext,
         nextValue: intent.nextValue,
-        source: previousSource,
+        source: patchSource,
       })
     : planNewDeclarationPatch({
         css: specimen.css,
@@ -285,18 +296,28 @@ export function applyHtmlSpecimenVisualCssEdit({
     ...specimen,
     css: patchedCss,
   }
-  const source = resolveHtmlSpecimenCssDeclarationSource({
-    css: patchedCss,
-    mediaContext,
-    nodeId: intent.nodeId,
-    nodes,
-    property: intent.property,
-  })
+  const source = tokenDefinitionSource
+    ? resolveHtmlSpecimenCssTokenDefinitionSource({
+        css: patchedCss,
+        mediaContext,
+        nodeId: intent.nodeId,
+        nodes,
+        property: intent.property,
+      })
+    : resolveHtmlSpecimenCssDeclarationSource({
+        css: patchedCss,
+        mediaContext,
+        nodeId: intent.nodeId,
+        nodes,
+        property: intent.property,
+      })
   const verification = {
     actualValue: source?.value ?? null,
     expectedValue: intent.nextValue,
     passed: source?.value === intent.nextValue,
-    property: normalizeProperty(intent.property),
+    property: tokenDefinitionSource
+      ? source?.property ?? normalizeProperty(intent.property)
+      : normalizeProperty(intent.property),
   }
 
   if (!source || !verification.passed) {
@@ -312,7 +333,7 @@ export function applyHtmlSpecimenVisualCssEdit({
     affectedNodeIds: source.affectedNodeIds,
     ok: true,
     patch,
-    previousSource,
+    previousSource: patchSource,
     serializedCss: patchedCss,
     source,
     specimen: nextSpecimen,
@@ -705,6 +726,240 @@ export function resolveHtmlSpecimenCssTokenSource({
     selector: winner.rule.selector,
     specificity: winner.specificity,
     value: winner.declaration.value,
+  }
+}
+
+export function resolveHtmlSpecimenCssTokenDefinitionSource({
+  css,
+  mediaContext,
+  nodeId,
+  nodes,
+  property,
+}: {
+  css: string
+  mediaContext?: HtmlSpecimenCssMediaContext
+  nodeId: string
+  nodes: readonly HtmlSpecimenVisualCssNode[]
+  property: string
+}): HtmlSpecimenCssDeclarationSource | null {
+  const tokenSource = resolveHtmlSpecimenCssTokenSource({
+    css,
+    mediaContext,
+    nodeId,
+    nodes,
+    property,
+  })
+
+  if (
+    !tokenSource ||
+    !canPatchHtmlSpecimenCssTokenSource(property, tokenSource.property)
+  ) {
+    return null
+  }
+
+  const tokenName = readSingleCssVarReference(tokenSource.value)
+
+  if (!tokenName) {
+    return null
+  }
+
+  const match = resolveHtmlSpecimenCssCustomPropertyDeclarationMatch({
+    css,
+    mediaContext,
+    property: tokenName,
+  })
+
+  if (!match) {
+    return null
+  }
+
+  return {
+    affectedNodeIds: tokenSource.affectedNodeIds,
+    ...(match.rule.atRule ? { atRule: match.rule.atRule } : {}),
+    declarationIndex: match.declaration.declarationIndex,
+    important: match.declaration.important,
+    ...(match.rule.layer ? { layer: match.rule.layer } : {}),
+    property: match.declaration.property,
+    ruleIndex: match.rule.ruleIndex,
+    selector: match.rule.selector,
+    specificity: match.specificity,
+    value: match.declaration.value,
+  }
+}
+
+export function createHtmlSpecimenShadowPreviewCss({
+  css,
+  mediaContext,
+}: {
+  css: string
+  mediaContext?: HtmlSpecimenCssMediaContext
+}) {
+  const properties = resolveHtmlSpecimenCssRootCustomProperties({
+    css,
+    mediaContext,
+  })
+
+  if (properties.length === 0) {
+    return css
+  }
+
+  return [
+    css,
+    ':host, [data-preview-surface-root] {',
+    ...properties.map((property) =>
+      `  ${property.property}: ${property.value}${
+        property.important ? ' !important' : ''
+      };`),
+    '}',
+  ].join('\n')
+}
+
+function resolveHtmlSpecimenCssRootCustomProperties({
+  css,
+  mediaContext,
+}: {
+  css: string
+  mediaContext?: HtmlSpecimenCssMediaContext
+}) {
+  const winners = new Map<string, CssDeclarationMatch>()
+
+  for (const rule of parseCssRules(css, mediaContext)) {
+    const specificity = getHtmlSpecimenCssRootSelectorSpecificity(rule.selector)
+
+    if (!specificity) {
+      continue
+    }
+
+    for (const declaration of rule.declarations) {
+      if (!declaration.property.startsWith('--')) {
+        continue
+      }
+
+      const previous = winners.get(declaration.property)
+
+      if (
+        !previous ||
+        compareCssSource(
+          {
+            declarationIndex: declaration.declarationIndex,
+            important: declaration.important,
+            layer: rule.layer,
+            ruleIndex: rule.ruleIndex,
+            specificity,
+          },
+          {
+            declarationIndex: previous.declaration.declarationIndex,
+            important: previous.declaration.important,
+            layer: previous.rule.layer,
+            ruleIndex: previous.rule.ruleIndex,
+            specificity: previous.specificity,
+          },
+        ) > 0
+      ) {
+        winners.set(declaration.property, {
+          declaration,
+          rule,
+          specificity,
+        })
+      }
+    }
+  }
+
+  return [...winners.values()]
+    .map((match) => ({
+      important: match.declaration.important,
+      property: match.declaration.property,
+      value: match.declaration.value,
+    }))
+    .sort((left, right) => left.property.localeCompare(right.property))
+}
+
+function canPatchHtmlSpecimenCssTokenSource(
+  targetProperty: string,
+  tokenSourceProperty: string,
+) {
+  const patchableProperties = new Set(
+    getCssDeclarationSourceProperties(targetProperty),
+  )
+
+  return patchableProperties.has(normalizeProperty(tokenSourceProperty))
+}
+
+function readSingleCssVarReference(value: string) {
+  const match = /^var\s*\(\s*(--[-_a-z0-9]+)\s*\)$/i.exec(
+    stripCssComments(value).trim(),
+  )
+
+  return match ? normalizeProperty(match[1] ?? '') : null
+}
+
+function resolveHtmlSpecimenCssCustomPropertyDeclarationMatch({
+  css,
+  mediaContext,
+  property,
+}: {
+  css: string
+  mediaContext?: HtmlSpecimenCssMediaContext
+  property: string
+}): CssDeclarationMatch | null {
+  const normalizedProperty = normalizeProperty(property)
+  let winner: CssDeclarationMatch | null = null
+
+  for (const rule of parseCssRules(css, mediaContext)) {
+    const specificity = getHtmlSpecimenCssRootSelectorSpecificity(rule.selector)
+
+    if (!specificity) {
+      continue
+    }
+
+    for (const declaration of rule.declarations) {
+      if (declaration.property !== normalizedProperty) {
+        continue
+      }
+
+      if (
+        !winner ||
+        compareCssSource(
+          {
+            declarationIndex: declaration.declarationIndex,
+            important: declaration.important,
+            layer: rule.layer,
+            ruleIndex: rule.ruleIndex,
+            specificity,
+          },
+          {
+            declarationIndex: winner.declaration.declarationIndex,
+            important: winner.declaration.important,
+            layer: winner.rule.layer,
+            ruleIndex: winner.rule.ruleIndex,
+            specificity: winner.specificity,
+          },
+        ) > 0
+      ) {
+        winner = {
+          declaration,
+          rule,
+          specificity,
+        }
+      }
+    }
+  }
+
+  return winner
+}
+
+function getHtmlSpecimenCssRootSelectorSpecificity(
+  selector: string,
+): [number, number, number] | null {
+  const normalizedSelector = stripCssComments(selector).replace(/\s+/g, ' ').trim()
+
+  switch (normalizedSelector) {
+    case ':root':
+      return [0, 1, 0]
+    case 'html':
+      return [0, 0, 1]
+    default:
+      return null
   }
 }
 

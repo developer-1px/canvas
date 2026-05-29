@@ -14,6 +14,7 @@ import {
   resolveHtmlSpecimenCssInlineStyleSource,
   resolveHtmlSpecimenCssRuleSource,
   resolveHtmlSpecimenCssShorthandConflictSource,
+  resolveHtmlSpecimenCssTokenDefinitionSource,
   resolveHtmlSpecimenCssTokenSource,
   type HtmlSpecimenCssDeclarationSource,
   type HtmlSpecimenCssInlineStyleSource,
@@ -48,6 +49,7 @@ type HtmlSpecimenCssControlModel = {
   inlineSource: HtmlSpecimenCssInlineStyleSource | null
   source: HtmlSpecimenCssDeclarationSource | null
   ruleSource: HtmlSpecimenCssRuleSource | null
+  tokenDefinitionSource: HtmlSpecimenCssDeclarationSource | null
   tokenSource: HtmlSpecimenCssDeclarationSource | null
   value: string
 }
@@ -293,7 +295,16 @@ function getHtmlSpecimenCssControlModel({
     nodes: target.nodes,
     property: control.property,
   })
-  const conflictSource = tokenSource
+  const tokenDefinitionSource = tokenSource
+    ? resolveHtmlSpecimenCssTokenDefinitionSource({
+        css: specimen.css,
+        mediaContext,
+        nodeId: target.node.id,
+        nodes: target.nodes,
+        property: control.property,
+      })
+    : null
+  const conflictSource = tokenSource || tokenDefinitionSource
     ? null
     : resolveHtmlSpecimenCssShorthandConflictSource({
         css: specimen.css,
@@ -304,7 +315,7 @@ function getHtmlSpecimenCssControlModel({
       })
   const blockedReason = inlineSource
     ? 'inline-style'
-    : tokenSource
+    : tokenSource && !tokenDefinitionSource
       ? 'token-value'
       : conflictSource
         ? 'shorthand-conflict'
@@ -313,13 +324,19 @@ function getHtmlSpecimenCssControlModel({
   return {
     blockedReason,
     conflictSource,
-    editable: blockedReason === null && (source !== null || ruleSource !== null),
+    editable: blockedReason === null && (
+      source !== null ||
+      ruleSource !== null ||
+      tokenDefinitionSource !== null
+    ),
     inlineSource,
     ruleSource,
     source,
+    tokenDefinitionSource,
     tokenSource,
     value:
       inlineSource?.value ??
+      tokenDefinitionSource?.value ??
       tokenSource?.value ??
       source?.value ??
       target.node.computedStyle?.[control.computedStyleKey] ??
@@ -373,6 +390,10 @@ function formatHtmlSpecimenCssControlSource(
     return formatHtmlSpecimenCssInlineSource(model.inlineSource)
   }
 
+  if (model.tokenDefinitionSource) {
+    return formatHtmlSpecimenCssSource('Token', model.tokenDefinitionSource)
+  }
+
   if (model.blockedReason === 'token-value' && model.tokenSource) {
     return formatHtmlSpecimenCssSource('Token', model.tokenSource)
   }
@@ -396,6 +417,7 @@ function getHtmlSpecimenCssControlSourceSelector(
 ) {
   const source = (
     model.inlineSource ??
+    model.tokenDefinitionSource ??
     model.source ??
     model.ruleSource ??
     model.tokenSource ??

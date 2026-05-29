@@ -5,6 +5,7 @@ import {
 } from './HtmlSpecimenCustomItemModel'
 import {
   applyHtmlSpecimenVisualCssEdit,
+  createHtmlSpecimenShadowPreviewCss,
   resolveHtmlSpecimenCssDeclarationSource,
   resolveHtmlSpecimenCssRuleSource,
   resolveHtmlSpecimenCssScopedRuleSource,
@@ -452,7 +453,7 @@ describe('HtmlSpecimenVisualCssEdit', () => {
     expect(result.specimen.css).toContain('content: "semi; brace }";')
   })
 
-  it('blocks raw edits to token-backed stylesheet declarations', () => {
+  it('patches single-var token definitions instead of raw token-backed declarations', () => {
     const specimen = {
       ...createButtonSpecimenData(),
       css: `:root {
@@ -472,15 +473,27 @@ describe('HtmlSpecimenVisualCssEdit', () => {
       specimen,
     })
 
-    expect(result).toEqual({
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) {
+      throw new Error(result.reason)
+    }
+
+    expect(result.source).toMatchObject({
       affectedNodeIds: ['primary'],
-      ok: false,
-      reason: 'token-value',
-      specimen,
+      property: '--brand',
+      selector: ':root',
+      value: '#111827',
     })
+    expect(result.previousSource).toMatchObject({
+      property: '--brand',
+      value: '#2563eb',
+    })
+    expect(result.specimen.css).toContain('--brand: #111827;')
+    expect(result.specimen.css).toContain('background: var(--brand);')
   })
 
-  it('blocks raw edits that would bypass token-backed shorthand declarations', () => {
+  it('patches single-var tokens used by safe shorthand declarations', () => {
     const specimen = {
       ...createButtonSpecimenData(),
       css: `:root {
@@ -500,12 +513,48 @@ describe('HtmlSpecimenVisualCssEdit', () => {
       specimen,
     })
 
-    expect(result).toEqual({
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) {
+      throw new Error(result.reason)
+    }
+
+    expect(result.source).toMatchObject({
       affectedNodeIds: ['primary'],
-      ok: false,
-      reason: 'token-value',
-      specimen,
+      property: '--brand',
+      selector: ':root',
+      value: '#111827',
     })
+    expect(result.specimen.css).toContain('--brand: #111827;')
+    expect(result.specimen.css).toContain('background: var(--brand);')
+  })
+
+  it('bridges root custom properties into the Shadow DOM preview surface', () => {
+    const css = [
+      ':root {',
+      '  --brand: #2563eb;',
+      '}',
+      '@media (max-width: 400px) {',
+      '  html {',
+      '    --brand: #0f172a;',
+      '  }',
+      '}',
+      '.primary {',
+      '  background: var(--brand);',
+      '}',
+    ].join('\n')
+
+    expect(createHtmlSpecimenShadowPreviewCss({
+      css,
+      mediaContext: {
+        viewportHeight: 240,
+        viewportWidth: 800,
+      },
+    })).toContain([
+      ':host, [data-preview-surface-root] {',
+      '  --brand: #2563eb;',
+      '}',
+    ].join('\n'))
   })
 
   it('blocks raw stroke edits that would bypass token-backed border declarations', () => {

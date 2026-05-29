@@ -94,7 +94,7 @@ describe('HtmlSpecimenCssInspectorPanel', () => {
     )
   })
 
-  it('shows token-backed declarations as non-editable', () => {
+  it('edits safe token-backed declarations through the token definition', () => {
     const commitItemsChange = vi.fn(() => true)
     const context = createContext({
       commitItemsChange,
@@ -112,15 +112,29 @@ describe('HtmlSpecimenCssInspectorPanel', () => {
       <>{HTML_SPECIMEN_CSS_INSPECTOR_PANEL.render(context)}</>,
     )
 
-    expect(markup).toContain('var(--brand)')
-    expect(markup).toContain('Token .primary / 1 node')
-    expect(markup).toContain('disabled=""')
+    expect(markup).toContain('#2563eb')
+    expect(markup).toContain('Token :root / 1 node')
     expect(changeHtmlSpecimenPreviewTargetCss({
       context,
       nextValue: '#111827',
       property: 'background-color',
-    })).toBe(false)
-    expect(commitItemsChange).not.toHaveBeenCalled()
+    })).toBe(true)
+    expect(commitItemsChange).toHaveBeenCalledWith(
+      {
+        items: [
+          expect.objectContaining({
+            data: expect.objectContaining({
+              css: expect.stringContaining('--brand: #111827;'),
+            }),
+          }),
+        ],
+        type: 'replace-changed',
+      },
+      {
+        after: ['html-specimen-1'],
+        before: ['html-specimen-1'],
+      },
+    )
   })
 
   it('shows shorthand conflicts as non-editable', () => {

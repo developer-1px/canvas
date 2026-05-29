@@ -34,6 +34,7 @@ import {
   reconcileHtmlSpecimenPreviewTarget,
   type HtmlSpecimenPreviewTarget,
 } from './HtmlSpecimenPreviewTarget'
+import { createHtmlSpecimenShadowPreviewCss } from './HtmlSpecimenVisualCssEdit'
 
 const HTML_SPECIMEN_PREVIEW_TARGET_EVENT = 'html-specimen-preview:target'
 
@@ -62,7 +63,13 @@ export function HtmlSpecimenShadowPreview({
     const root = getOrCreatePreviewSurfaceRoot(host)
 
     renderHtmlPreviewSurface(root, {
-      css: specimen.css,
+      css: createHtmlSpecimenShadowPreviewCss({
+        css: specimen.css,
+        mediaContext: {
+          viewportHeight: specimen.viewportHeight,
+          viewportWidth: specimen.viewportWidth,
+        },
+      }),
       html: specimen.html,
     })
     ensureHtmlSpecimenPreviewToolStyle(root)
@@ -207,7 +214,13 @@ export function HtmlSpecimenShadowPreview({
       root.removeEventListener('pointerleave', handlePointerLeave)
       root.removeEventListener('pointerdown', handlePointerDown)
     }
-  }, [itemId, specimen.css, specimen.html])
+  }, [
+    itemId,
+    specimen.css,
+    specimen.html,
+    specimen.viewportHeight,
+    specimen.viewportWidth,
+  ])
 
   return (
     <div
