@@ -150,6 +150,48 @@ describe('HtmlSpecimenVisualCssEdit', () => {
     )
   })
 
+  it('patches important declarations before later non-important declarations', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `.primary {
+  color: #334155 !important;
+}
+.primary {
+  color: #ffffff;
+}`,
+    }
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '#111827',
+        nodeId: 'primary',
+        property: 'color',
+      },
+      nodes: createButtonNodes(),
+      specimen,
+    })
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) {
+      throw new Error(result.reason)
+    }
+
+    expect(result.source).toMatchObject({
+      important: true,
+      property: 'color',
+      selector: '.primary',
+      value: '#111827',
+    })
+    expect(result.patch).toMatchObject({
+      kind: 'replace-declaration-value',
+      previousValue: '#334155',
+      ruleIndex: 0,
+      selector: '.primary',
+    })
+    expect(result.specimen.css).toContain('color: #111827 !important;')
+    expect(result.specimen.css).toContain('color: #ffffff;')
+  })
+
   it('patches spacing declarations and reports the affected nodes', () => {
     const specimen = {
       ...createButtonSpecimenData(),

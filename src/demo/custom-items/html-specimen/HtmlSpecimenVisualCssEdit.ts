@@ -21,6 +21,7 @@ export type HtmlSpecimenVisualCssEditIntent = {
 export type HtmlSpecimenCssDeclarationSource = {
   affectedNodeIds: string[]
   declarationIndex: number
+  important: boolean
   property: string
   ruleIndex: number
   selector: string
@@ -39,6 +40,7 @@ export type HtmlSpecimenCssScopedRuleSource = {
   affectedNodeIds: string[]
   atRule: string
   declarationIndex: number
+  important: boolean
   property: string
   ruleIndex: number
   selector: string
@@ -111,6 +113,7 @@ type CssRule = {
 
 type CssDeclaration = {
   declarationIndex: number
+  important: boolean
   property: string
   value: string
   valueEnd: number
@@ -309,11 +312,13 @@ export function resolveHtmlSpecimenCssDeclarationSource({
         compareCssSource(
           {
             declarationIndex: declaration.declarationIndex,
+            important: declaration.important,
             ruleIndex: rule.ruleIndex,
             specificity,
           },
           {
             declarationIndex: winner.declaration.declarationIndex,
+            important: winner.declaration.important,
             ruleIndex: winner.rule.ruleIndex,
             specificity: winner.specificity,
           },
@@ -338,6 +343,7 @@ export function resolveHtmlSpecimenCssDeclarationSource({
         matchHtmlSpecimenCssSelectorList(winner.rule.selector, candidate, nodes))
       .map((candidate) => candidate.id),
     declarationIndex: winner.declaration.declarationIndex,
+    important: winner.declaration.important,
     property: winner.declaration.property,
     ruleIndex: winner.rule.ruleIndex,
     selector: winner.rule.selector,
@@ -500,11 +506,13 @@ export function resolveHtmlSpecimenCssScopedRuleSource({
         compareCssSource(
           {
             declarationIndex: declaration.declarationIndex,
+            important: declaration.important,
             ruleIndex: scopedRule.rule.ruleIndex,
             specificity,
           },
           {
             declarationIndex: winner.declaration.declarationIndex,
+            important: winner.declaration.important,
             ruleIndex: winner.rule.ruleIndex,
             specificity: winner.specificity,
           },
@@ -531,6 +539,7 @@ export function resolveHtmlSpecimenCssScopedRuleSource({
       .map((candidate) => candidate.id),
     atRule: winner.atRule,
     declarationIndex: winner.declaration.declarationIndex,
+    important: winner.declaration.important,
     property: winner.declaration.property,
     ruleIndex: winner.rule.ruleIndex,
     selector: winner.rule.selector,
@@ -863,11 +872,23 @@ function parseCssDeclarations({
       const property = normalizeProperty(rawProperty)
 
       if (property.length > 0 && valueStart <= valueEnd) {
+        const importantStart = findCssTrailingImportant({
+          css,
+          end: valueEnd,
+          start: valueStart,
+        })
+        const declarationValueEnd = importantStart === null
+          ? valueEnd
+          : importantStart - countTrailingWhitespace(
+              css.slice(valueStart, importantStart),
+            )
+
         declarations.push({
           declarationIndex: declarations.length,
+          important: importantStart !== null,
           property,
-          value: css.slice(valueStart, valueEnd),
-          valueEnd,
+          value: css.slice(valueStart, declarationValueEnd),
+          valueEnd: declarationValueEnd,
           valueStart,
         })
       }
@@ -960,6 +981,37 @@ function findCssDeclarationPropertyStart({
   return index
 }
 
+function findCssTrailingImportant({
+  css,
+  end,
+  start,
+}: {
+  css: string
+  end: number
+  start: number
+}) {
+  const scanner = createCssScannerState()
+  let importantStart: number | null = null
+  let index = start
+
+  while (index < end) {
+    if (css[index] === '!' && isCssScannerTopLevel(scanner)) {
+      importantStart = index
+    }
+
+    index = advanceCssScannerState(css, index, scanner)
+  }
+
+  if (
+    importantStart === null ||
+    css.slice(importantStart + 1, end).trim().toLowerCase() !== 'important'
+  ) {
+    return null
+  }
+
+  return importantStart
+}
+
 function createCssScannerState(): CssScannerState {
   return {
     bracketDepth: 0,
@@ -1034,15 +1086,21 @@ function isCssScannerTopLevel(state: CssScannerState) {
 function compareCssSource(
   left: {
     declarationIndex: number
+    important?: boolean
     ruleIndex: number
     specificity: [number, number, number]
   },
   right: {
     declarationIndex: number
+    important?: boolean
     ruleIndex: number
     specificity: [number, number, number]
   },
 ) {
+  if (Boolean(left.important) !== Boolean(right.important)) {
+    return left.important ? 1 : -1
+  }
+
   const specificity = compareHtmlSpecimenCssSpecificity(
     left.specificity,
     right.specificity,

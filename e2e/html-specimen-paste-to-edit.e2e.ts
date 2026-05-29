@@ -594,6 +594,78 @@ test('patches the later winning declaration without being overwritten', async ({
   ).toBe(true)
 })
 
+test('patches important declarations before later non-important declarations', async ({
+  page,
+}) => {
+  await page.goto('/')
+
+  const pasteWasHandled = await page.evaluate((text) => {
+    const data = new DataTransfer()
+
+    data.setData('text/plain', text)
+
+    const event = new ClipboardEvent('paste', {
+      bubbles: true,
+      cancelable: true,
+      clipboardData: data,
+    })
+
+    window.dispatchEvent(event)
+
+    return event.defaultPrevented
+  }, JSON.stringify({
+    css: [
+      '.primary {',
+      '  color: #334155 !important;',
+      '}',
+      '.primary {',
+      '  color: #ffffff;',
+      '}',
+    ].join('\n'),
+    html: [
+      '<main>',
+      '<button id="primary" class="primary">Save</button>',
+      '</main>',
+    ].join(''),
+  }))
+
+  expect(pasteWasHandled).toBe(true)
+
+  const preview = page.locator('.demo-html-specimen-preview').last()
+
+  await expect(preview).toBeVisible()
+  await preview.locator('button#primary').click()
+
+  const textField = page
+    .locator('.html-specimen-css-field')
+    .filter({ hasText: 'Text' })
+  const textInput = textField.locator('input')
+
+  await expect(textField.getByText('Rule .primary / 1 node')).toBeVisible()
+  await expect(textInput).toHaveValue('#334155')
+  await expect.poll(async () =>
+    preview.locator('button#primary').evaluate((button) =>
+      getComputedStyle(button).color),
+  ).toBe('rgb(51, 65, 85)')
+
+  await textInput.fill('#111827')
+  await textInput.blur()
+
+  await expect.poll(async () =>
+    preview.evaluate((host) => {
+      const css = host.shadowRoot?.querySelector('style')?.textContent ?? ''
+
+      return css.includes('color: #111827 !important;') &&
+        css.includes('color: #ffffff;') &&
+        css.indexOf('color: #111827 !important;') < css.indexOf('color: #ffffff;')
+    }),
+  ).toBe(true)
+  await expect.poll(async () =>
+    preview.locator('button#primary').evaluate((button) =>
+      getComputedStyle(button).color),
+  ).toBe('rgb(17, 24, 39)')
+})
+
 test('matches descendant selector rules against DOM ancestry', async ({
   page,
 }) => {
