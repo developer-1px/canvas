@@ -14,8 +14,15 @@ type CssSelectorSegment = {
 
 type CssAttributeSelector =
   | {
+      caseInsensitive: boolean
       name: string
-      operator: 'equals'
+      operator:
+        | 'dash-match'
+        | 'equals'
+        | 'includes'
+        | 'prefix'
+        | 'substring'
+        | 'suffix'
       value: string
     }
   | {
@@ -394,35 +401,63 @@ function parseCssAttributeSelector(
   content: string,
 ): CssAttributeSelector | null {
   const source = content.trim()
-  const equalsIndex = source.indexOf('=')
+  const match = source.match(
+    /^([_a-zA-Z][\w:-]*)(?:\s*([~|^$*]?=)\s*(.+))?$/,
+  )
 
-  if (equalsIndex < 0) {
-    return isCssAttributeName(source)
+  if (!match) {
+    return null
+  }
+
+  const [, name, rawOperator, rawValue] = match
+
+  if (!name || !isCssAttributeName(name)) {
+    return null
+  }
+
+  if (!rawOperator) {
+    return rawValue === undefined
       ? {
-          name: source,
+          name,
           operator: 'exists',
         }
       : null
   }
 
-  const rawName = source.slice(0, equalsIndex).trim()
-
-  if (
-    /[~|^$*]$/.test(rawName) ||
-    !isCssAttributeName(rawName)
-  ) {
+  if (rawValue === undefined) {
     return null
   }
 
-  const value = parseCssAttributeSelectorValue(source.slice(equalsIndex + 1))
+  const value = parseCssAttributeSelectorValue(rawValue)
+  const operator = parseCssAttributeSelectorOperator(rawOperator)
 
-  return value === null
+  return !operator || !value
     ? null
     : {
-        name: rawName,
-        operator: 'equals',
-        value,
+        caseInsensitive: value.caseInsensitive,
+        name,
+        operator,
+        value: value.value,
       }
+}
+
+function parseCssAttributeSelectorOperator(operator: string) {
+  switch (operator) {
+    case '=':
+      return 'equals'
+    case '~=':
+      return 'includes'
+    case '|=':
+      return 'dash-match'
+    case '^=':
+      return 'prefix'
+    case '$=':
+      return 'suffix'
+    case '*=':
+      return 'substring'
+    default:
+      return null
+  }
 }
 
 function parseCssAttributeSelectorValue(value: string) {
@@ -451,7 +486,16 @@ function parseCssAttributeSelectorValue(value: string) {
       }
 
       if (char === quote) {
-        return source.slice(index + 1).trim().length === 0 ? result : null
+        const modifier = parseCssAttributeSelectorModifier(
+          source.slice(index + 1).trim(),
+        )
+
+        return modifier
+          ? {
+              caseInsensitive: modifier === 'i',
+              value: result,
+            }
+          : null
       }
 
       result += char
@@ -461,7 +505,23 @@ function parseCssAttributeSelectorValue(value: string) {
     return null
   }
 
-  return source.length > 0 && !/\s/.test(source) ? source : null
+  const [rawValue, rawModifier, ...rest] = source.split(/\s+/)
+  const modifier = parseCssAttributeSelectorModifier(rawModifier ?? '')
+
+  return rawValue && rest.length === 0 && modifier
+    ? {
+        caseInsensitive: modifier === 'i',
+        value: rawValue,
+      }
+    : null
+}
+
+function parseCssAttributeSelectorModifier(modifier: string) {
+  if (modifier.length === 0 || modifier.toLowerCase() === 's') {
+    return 's'
+  }
+
+  return modifier.toLowerCase() === 'i' ? 'i' : null
 }
 
 function isCssAttributeName(name: string) {
@@ -478,7 +538,29 @@ function matchesCssAttributeSelector(
     return value !== undefined
   }
 
-  return value === selector.value
+  if (value === undefined) {
+    return false
+  }
+
+  const candidate = selector.caseInsensitive ? value.toLowerCase() : value
+  const expected = selector.caseInsensitive
+    ? selector.value.toLowerCase()
+    : selector.value
+
+  switch (selector.operator) {
+    case 'dash-match':
+      return candidate === expected || candidate.startsWith(`${expected}-`)
+    case 'equals':
+      return candidate === expected
+    case 'includes':
+      return candidate.split(/\s+/).includes(expected)
+    case 'prefix':
+      return candidate.startsWith(expected)
+    case 'substring':
+      return candidate.includes(expected)
+    case 'suffix':
+      return candidate.endsWith(expected)
+  }
 }
 
 function readCssNodeAttribute(

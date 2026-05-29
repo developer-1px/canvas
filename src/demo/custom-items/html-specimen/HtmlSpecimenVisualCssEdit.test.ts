@@ -833,6 +833,66 @@ describe('HtmlSpecimenVisualCssEdit', () => {
     })
   })
 
+  it('matches space-separated attribute selector values against indexed node attributes', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `.button[data-state~="active"] {
+  color: #334155;
+}`,
+    }
+    const nodes = [
+      createNode({
+        attributes: { 'data-state': 'primary active' },
+        className: 'button',
+        id: 'active',
+        path: [0],
+        tagName: 'button',
+      }),
+      createNode({
+        attributes: { 'data-state': 'inactive' },
+        className: 'button',
+        id: 'idle',
+        path: [1],
+        tagName: 'button',
+      }),
+    ]
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '#111827',
+        nodeId: 'active',
+        property: 'color',
+      },
+      nodes,
+      specimen,
+    })
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) {
+      throw new Error(result.reason)
+    }
+
+    expect(result.source).toMatchObject({
+      affectedNodeIds: ['active'],
+      selector: '.button[data-state~="active"]',
+      value: '#111827',
+    })
+    expect(applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '#111827',
+        nodeId: 'idle',
+        property: 'color',
+      },
+      nodes,
+      specimen,
+    })).toEqual({
+      affectedNodeIds: [],
+      ok: false,
+      reason: 'rule-not-found',
+      specimen,
+    })
+  })
+
   it('does not read class selectors from attribute values', () => {
     const specimen = {
       ...createButtonSpecimenData(),
