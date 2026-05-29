@@ -498,6 +498,102 @@ test('adds missing CSS declarations to the most specific matching rule', async (
   expect(previewHtml).not.toContain('style=')
 })
 
+test('patches the later winning declaration without being overwritten', async ({
+  page,
+}) => {
+  await page.goto('/')
+  await page.evaluate(() => {
+    window.addEventListener('html-specimen-css:export', (event) => {
+      const targetWindow = window as Window & {
+        __htmlSpecimenExportedCss?: string
+      }
+      const detail = (event as CustomEvent<{ css?: unknown }>).detail
+
+      targetWindow.__htmlSpecimenExportedCss =
+        typeof detail.css === 'string' ? detail.css : ''
+    })
+  })
+
+  const pasteWasHandled = await page.evaluate((text) => {
+    const data = new DataTransfer()
+
+    data.setData('text/plain', text)
+
+    const event = new ClipboardEvent('paste', {
+      bubbles: true,
+      cancelable: true,
+      clipboardData: data,
+    })
+
+    window.dispatchEvent(event)
+
+    return event.defaultPrevented
+  }, JSON.stringify({
+    css: [
+      '.primary {',
+      '  color: #ffffff;',
+      '}',
+      '.primary {',
+      '  color: #334155;',
+      '}',
+    ].join('\n'),
+    html: [
+      '<main>',
+      '<button id="primary" class="primary">Save</button>',
+      '</main>',
+    ].join(''),
+  }))
+
+  expect(pasteWasHandled).toBe(true)
+
+  const specimenShell = page.locator('.demo-html-specimen-shell').last()
+  const preview = page.locator('.demo-html-specimen-preview').last()
+
+  await expect(preview).toBeVisible()
+  await preview.locator('button#primary').click()
+
+  const textField = page
+    .locator('.html-specimen-css-field')
+    .filter({ hasText: 'Text' })
+  const textInput = textField.locator('input')
+
+  await expect(textField.getByText('Rule .primary / 1 node')).toBeVisible()
+  await expect(textInput).toHaveValue('#334155')
+  await expect.poll(async () =>
+    preview.locator('button#primary').evaluate((button) =>
+      getComputedStyle(button).color),
+  ).toBe('rgb(51, 65, 85)')
+
+  await textInput.fill('#111827')
+  await textInput.blur()
+
+  await expect.poll(async () =>
+    preview.evaluate((host) => {
+      const css = host.shadowRoot?.querySelector('style')?.textContent ?? ''
+
+      return css.includes('color: #ffffff;') &&
+        css.includes('color: #111827;') &&
+        css.indexOf('color: #ffffff;') < css.indexOf('color: #111827;')
+    }),
+  ).toBe(true)
+  await expect.poll(async () =>
+    preview.locator('button#primary').evaluate((button) =>
+      getComputedStyle(button).color),
+  ).toBe('rgb(17, 24, 39)')
+  await specimenShell.getByRole('button', { name: 'Copy CSS' }).click()
+  await expect.poll(async () =>
+    page.evaluate(() => {
+      const css = (window as Window & {
+        __htmlSpecimenExportedCss?: string
+      }).__htmlSpecimenExportedCss ?? ''
+
+      return css.includes('color: #ffffff;') &&
+        css.includes('color: #111827;') &&
+        css.indexOf('color: #ffffff;') < css.indexOf('color: #111827;')
+    }),
+  ).toBe(true)
+})
+
 test('keeps token-backed preview CSS read-only in the inspector', async ({
   page,
 }) => {

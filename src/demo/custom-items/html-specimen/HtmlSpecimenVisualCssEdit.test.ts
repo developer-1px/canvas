@@ -111,6 +111,45 @@ describe('HtmlSpecimenVisualCssEdit', () => {
     expect(result.specimen.css).toContain('border-radius: 12px;')
   })
 
+  it('patches the later winning declaration without changing earlier matches', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `.primary {
+  color: #ffffff;
+}
+.primary {
+  color: #334155;
+}`,
+    }
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '#111827',
+        nodeId: 'primary',
+        property: 'color',
+      },
+      nodes: createButtonNodes(),
+      specimen,
+    })
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) {
+      throw new Error(result.reason)
+    }
+
+    expect(result.patch).toMatchObject({
+      kind: 'replace-declaration-value',
+      previousValue: '#334155',
+      ruleIndex: 1,
+      selector: '.primary',
+    })
+    expect(result.specimen.css).toContain('color: #ffffff;')
+    expect(result.specimen.css).toContain('color: #111827;')
+    expect(result.specimen.css.indexOf('color: #ffffff;')).toBeLessThan(
+      result.specimen.css.indexOf('color: #111827;'),
+    )
+  })
+
   it('patches spacing declarations and reports the affected nodes', () => {
     const specimen = {
       ...createButtonSpecimenData(),
