@@ -68,6 +68,7 @@ describe('HtmlSpecimenCustomItemModule', () => {
 
     expect(markup).toContain('class="demo-html-specimen-node"')
     expect(markup).toContain('class="demo-html-specimen-preview"')
+    expect(markup).toContain('aria-label="Copy CSS"')
     expect(markup).not.toContain('<iframe')
     expect(markup).not.toContain('srcDoc=')
     expect(markup).toContain('Button specimen')

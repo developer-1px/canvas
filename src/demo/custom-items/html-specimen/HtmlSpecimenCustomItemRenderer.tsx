@@ -1,3 +1,4 @@
+import { Copy } from 'lucide-react'
 import type { CanvasAppCustomItemRendererStrategy } from '../../../canvas'
 import {
   getHtmlSpecimenData,
@@ -26,9 +27,31 @@ export const htmlSpecimenItemRenderer: CanvasAppCustomItemRendererStrategy = ({
         <div className="demo-html-specimen-shell">
           <div className="demo-html-specimen-bar">
             <strong>{item.title}</strong>
-            <span>
-              {specimen.viewportWidth}x{specimen.viewportHeight}
-            </span>
+            <div className="demo-html-specimen-bar-actions">
+              <span>
+                {specimen.viewportWidth}x{specimen.viewportHeight}
+              </span>
+              <button
+                aria-label="Copy CSS"
+                className="demo-html-specimen-copy-css"
+                onClick={(event) => {
+                  if (event.detail === 0) {
+                    exportHtmlSpecimenCss(event.currentTarget, specimen.css)
+                    void copyHtmlSpecimenCss(specimen.css)
+                  }
+                }}
+                onPointerDown={(event) => {
+                  event.preventDefault()
+                  event.stopPropagation()
+                  exportHtmlSpecimenCss(event.currentTarget, specimen.css)
+                  void copyHtmlSpecimenCss(specimen.css)
+                }}
+                title="Copy CSS"
+                type="button"
+              >
+                <Copy aria-hidden="true" size={14} strokeWidth={1.8} />
+              </button>
+            </div>
           </div>
           <HtmlSpecimenShadowPreview
             itemId={item.id}
@@ -47,4 +70,23 @@ export const htmlSpecimenItemRenderer: CanvasAppCustomItemRendererStrategy = ({
       />
     </g>
   )
+}
+
+function exportHtmlSpecimenCss(target: HTMLElement, css: string) {
+  target.dispatchEvent(new CustomEvent('html-specimen-css:export', {
+    bubbles: true,
+    detail: { css },
+  }))
+}
+
+async function copyHtmlSpecimenCss(css: string) {
+  if (typeof navigator === 'undefined' || !navigator.clipboard) {
+    return
+  }
+
+  try {
+    await navigator.clipboard.writeText(css)
+  } catch {
+    // Export event above remains available when clipboard permission is denied.
+  }
 }

@@ -4,6 +4,17 @@ test('pastes HTML/CSS and edits preview target CSS through the inspector', async
   page,
 }) => {
   await page.goto('/')
+  await page.evaluate(() => {
+    window.addEventListener('html-specimen-css:export', (event) => {
+      const targetWindow = window as Window & {
+        __htmlSpecimenExportedCss?: string
+      }
+      const detail = (event as CustomEvent<{ css?: unknown }>).detail
+
+      targetWindow.__htmlSpecimenExportedCss =
+        typeof detail.css === 'string' ? detail.css : ''
+    })
+  })
 
   const pasteWasHandled = await page.evaluate((text) => {
     const data = new DataTransfer()
@@ -43,6 +54,7 @@ test('pastes HTML/CSS and edits preview target CSS through the inspector', async
 
   expect(pasteWasHandled).toBe(true)
 
+  const specimenShell = page.locator('.demo-html-specimen-shell').last()
   const preview = page.locator('.demo-html-specimen-preview').last()
 
   await expect(preview).toBeVisible()
@@ -187,6 +199,19 @@ test('pastes HTML/CSS and edits preview target CSS through the inspector', async
       )
     }),
   ).toBe(true)
+  await specimenShell.getByRole('button', { name: 'Copy CSS' }).click()
+  await expect.poll(async () =>
+    page.evaluate(() =>
+      (window as Window & {
+        __htmlSpecimenExportedCss?: string
+      }).__htmlSpecimenExportedCss ?? ''),
+  ).toContain('background-color: #111827;')
+  await expect.poll(async () =>
+    page.evaluate(() =>
+      (window as Window & {
+        __htmlSpecimenExportedCss?: string
+      }).__htmlSpecimenExportedCss ?? ''),
+  ).toContain('margin: 4px;')
 
   const previewHtml = await preview.evaluate((host) =>
     host.shadowRoot?.querySelector('[data-preview-surface-root]')
