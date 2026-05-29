@@ -127,6 +127,67 @@ describe('HtmlSpecimenCssSelectorMatcher', () => {
     )).toEqual([0, 2, 0])
   })
 
+  it('matches structural child pseudo classes against indexed DOM paths', () => {
+    const nodes = [
+      createNode({
+        className: 'item first',
+        id: 'first',
+        path: [0, 0],
+      }),
+      createNode({
+        className: 'item middle',
+        id: 'middle',
+        path: [0, 1],
+      }),
+      createNode({
+        className: 'item last',
+        id: 'last',
+        path: [0, 2],
+      }),
+      createNode({
+        className: 'item only',
+        id: 'only',
+        path: [1, 0],
+      }),
+    ]
+
+    expect(matchHtmlSpecimenCssSelectorList(
+      '.item:first-child',
+      nodes[0]!,
+      nodes,
+    )).toEqual([0, 2, 0])
+    expect(matchHtmlSpecimenCssSelectorList(
+      '.item:first-child',
+      nodes[1]!,
+      nodes,
+    )).toBeNull()
+    expect(matchHtmlSpecimenCssSelectorList(
+      '.item:last-child',
+      nodes[2]!,
+      nodes,
+    )).toEqual([0, 2, 0])
+    expect(matchHtmlSpecimenCssSelectorList(
+      '.item:only-child',
+      nodes[3]!,
+      nodes,
+    )).toEqual([0, 2, 0])
+    expect(matchHtmlSpecimenCssSelectorList(
+      '.item:only-child',
+      nodes[0]!,
+      nodes,
+    )).toBeNull()
+    expect(matchHtmlSpecimenCssSelectorList(
+      '.item:nth-child(1)',
+      nodes[0]!,
+      nodes,
+    )).toBeNull()
+    expect(matchHtmlSpecimenCssSelectorList(
+      '.item:first-child-of-type',
+      nodes[0]!,
+      nodes,
+    )).toBeNull()
+  })
+
   it('matches has pseudo function selectors against indexed relations', () => {
     const nodes = [
       createNode({

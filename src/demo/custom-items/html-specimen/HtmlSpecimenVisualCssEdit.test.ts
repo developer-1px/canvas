@@ -1743,6 +1743,50 @@ describe('HtmlSpecimenVisualCssEdit', () => {
     })
   })
 
+  it('matches structural child pseudo classes against indexed nodes', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `.table-row:first-child {
+  color: #334155;
+}`,
+    }
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '#111827',
+        nodeId: 'first',
+        property: 'color',
+      },
+      nodes: [
+        createNode({
+          className: 'table-row',
+          id: 'first',
+          path: [0, 0],
+          tagName: 'div',
+        }),
+        createNode({
+          className: 'table-row',
+          id: 'second',
+          path: [0, 1],
+          tagName: 'div',
+        }),
+      ],
+      specimen,
+    })
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) {
+      throw new Error(result.reason)
+    }
+
+    expect(result.source).toMatchObject({
+      affectedNodeIds: ['first'],
+      selector: '.table-row:first-child',
+      specificity: [0, 2, 0],
+      value: '#111827',
+    })
+  })
+
   it('does not match negated pseudo function selectors when the node is excluded', () => {
     const specimen = {
       ...createButtonSpecimenData(),

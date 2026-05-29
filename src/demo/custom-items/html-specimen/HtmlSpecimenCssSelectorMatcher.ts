@@ -41,6 +41,22 @@ type CssPseudoFunctionSelector = {
   start: number
 }
 
+type CssSimplePseudoClassSelector = {
+  end: number
+  name: 'first-child' | 'last-child' | 'only-child'
+  start: number
+}
+
+type CssPseudoSelectorRange = {
+  end: number
+  start: number
+}
+
+type CssPseudoSelectors = {
+  functions: CssPseudoFunctionSelector[]
+  simpleClasses: CssSimplePseudoClassSelector[]
+}
+
 type CssHasRelativeSelector = {
   compound: string
   relation: CssSelectorRelation
@@ -240,13 +256,13 @@ function matchesCompoundSelector(
   node: HtmlSpecimenCssSelectorNode,
   nodes: readonly HtmlSpecimenCssSelectorNode[],
 ) {
-  const pseudoFunctions = readCssPseudoFunctionSelectors(compound)
+  const pseudoSelectors = readCssPseudoSelectors(compound)
 
-  if (!pseudoFunctions) {
+  if (!pseudoSelectors) {
     return false
   }
 
-  for (const pseudoFunction of pseudoFunctions) {
+  for (const pseudoFunction of pseudoSelectors.functions) {
     if (!canMatchCssPseudoFunctionSelector(pseudoFunction)) {
       return false
     }
@@ -275,9 +291,17 @@ function matchesCompoundSelector(
     }
   }
 
-  const compoundWithoutPseudos = removeCssPseudoFunctionSelectors(
+  if (!pseudoSelectors.simpleClasses.every((pseudoClass) =>
+    matchesCssSimplePseudoClassSelector(pseudoClass, node, nodes))) {
+    return false
+  }
+
+  const compoundWithoutPseudos = removeCssPseudoSelectors(
     compound,
-    pseudoFunctions,
+    [
+      ...pseudoSelectors.functions,
+      ...pseudoSelectors.simpleClasses,
+    ],
   )
 
   if (hasUnsupportedCssPseudoSelector(compoundWithoutPseudos)) {
@@ -423,6 +447,21 @@ function matchesCssHasRelation({
       return isNodeAncestor(node, candidate)
     case 'subsequent-sibling':
       return isSubsequentNodeSibling({ candidate, node })
+  }
+}
+
+function matchesCssSimplePseudoClassSelector(
+  pseudoClass: CssSimplePseudoClassSelector,
+  node: HtmlSpecimenCssSelectorNode,
+  nodes: readonly HtmlSpecimenCssSelectorNode[],
+) {
+  switch (pseudoClass.name) {
+    case 'first-child':
+      return isFirstNodeChild(node)
+    case 'last-child':
+      return isLastNodeChild(node, nodes)
+    case 'only-child':
+      return isFirstNodeChild(node) && isLastNodeChild(node, nodes)
   }
 }
 
@@ -642,6 +681,13 @@ function hasUnsupportedCssPseudoSelector(selector: string) {
         continue
       }
 
+      const pseudoClass = readCssSimplePseudoClassSelector(selector, index)
+
+      if (pseudoClass) {
+        index = pseudoClass.end
+        continue
+      }
+
       return true
     }
 
@@ -651,8 +697,9 @@ function hasUnsupportedCssPseudoSelector(selector: string) {
   return false
 }
 
-function readCssPseudoFunctionSelectors(source: string) {
-  const pseudoFunctions: CssPseudoFunctionSelector[] = []
+function readCssPseudoSelectors(source: string): CssPseudoSelectors | null {
+  const functions: CssPseudoFunctionSelector[] = []
+  const simpleClasses: CssSimplePseudoClassSelector[] = []
   let bracketDepth = 0
   let escaped = false
   let quote: '"' | "'" | null = null
@@ -703,19 +750,36 @@ function readCssPseudoFunctionSelectors(source: string) {
     if (bracketDepth === 0 && char === ':') {
       const pseudoFunction = readCssPseudoFunctionSelector(source, index)
 
-      if (!pseudoFunction) {
+      if (pseudoFunction) {
+        functions.push(pseudoFunction)
+        index = pseudoFunction.end
+        continue
+      }
+
+      const pseudoClass = readCssSimplePseudoClassSelector(source, index)
+
+      if (!pseudoClass) {
         return null
       }
 
-      pseudoFunctions.push(pseudoFunction)
-      index = pseudoFunction.end
+      simpleClasses.push(pseudoClass)
+      index = pseudoClass.end
       continue
     }
 
     index += 1
   }
 
-  return bracketDepth === 0 && quote === null ? pseudoFunctions : null
+  return bracketDepth === 0 && quote === null
+    ? {
+        functions,
+        simpleClasses,
+      }
+    : null
+}
+
+function readCssPseudoFunctionSelectors(source: string) {
+  return readCssPseudoSelectors(source)?.functions ?? null
 }
 
 function readCssPseudoFunctionSelector(
@@ -753,6 +817,38 @@ function readCssPseudoFunctionSelector(
   return {
     args: source.slice(openParen + 1, closeParen),
     end: closeParen + 1,
+    name,
+    start,
+  }
+}
+
+function readCssSimplePseudoClassSelector(
+  source: string,
+  start: number,
+): CssSimplePseudoClassSelector | null {
+  if (source[start] !== ':' || source[start + 1] === ':') {
+    return null
+  }
+
+  const match = /^(first-child|last-child|only-child)(?![-_a-zA-Z0-9(])/i
+    .exec(source.slice(start + 1))
+
+  if (!match) {
+    return null
+  }
+
+  const name = match[1]?.toLowerCase()
+
+  if (
+    name !== 'first-child' &&
+    name !== 'last-child' &&
+    name !== 'only-child'
+  ) {
+    return null
+  }
+
+  return {
+    end: start + 1 + name.length,
     name,
     start,
   }
@@ -827,20 +923,21 @@ function findCssFunctionEnd(source: string, openParen: number) {
   return null
 }
 
-function removeCssPseudoFunctionSelectors(
+function removeCssPseudoSelectors(
   source: string,
-  pseudoFunctions: readonly CssPseudoFunctionSelector[],
+  pseudoSelectors: readonly CssPseudoSelectorRange[],
 ) {
-  if (pseudoFunctions.length === 0) {
+  if (pseudoSelectors.length === 0) {
     return source
   }
 
   let result = ''
   let cursor = 0
 
-  for (const pseudoFunction of pseudoFunctions) {
-    result += source.slice(cursor, pseudoFunction.start)
-    cursor = pseudoFunction.end
+  for (const pseudoSelector of [...pseudoSelectors].sort((left, right) =>
+    left.start - right.start)) {
+    result += source.slice(cursor, pseudoSelector.start)
+    cursor = pseudoSelector.end
   }
 
   return result + source.slice(cursor)
@@ -1253,6 +1350,38 @@ function isNodeParent(
   )
 }
 
+function isFirstNodeChild(node: HtmlSpecimenCssSelectorNode) {
+  return node.path !== undefined &&
+    node.path.length > 0 &&
+    node.path.at(-1) === 0
+}
+
+function isLastNodeChild(
+  node: HtmlSpecimenCssSelectorNode,
+  nodes: readonly HtmlSpecimenCssSelectorNode[],
+) {
+  const nodePath = node.path
+
+  if (!nodePath || nodePath.length === 0) {
+    return false
+  }
+
+  const nodeSiblingIndex = nodePath.at(-1)
+
+  return nodeSiblingIndex !== undefined &&
+    !nodes.some((candidate) => {
+      if (!candidate.path || candidate === node) {
+        return false
+      }
+
+      const candidateSiblingIndex = candidate.path.at(-1)
+
+      return candidateSiblingIndex !== undefined &&
+        candidateSiblingIndex > nodeSiblingIndex &&
+        hasSameParentPath(candidate.path, nodePath)
+    })
+}
+
 function isNodeAncestor(
   candidate: HtmlSpecimenCssSelectorNode,
   node: HtmlSpecimenCssSelectorNode,
@@ -1374,9 +1503,16 @@ function getNodeClassSet(node: HtmlSpecimenCssSelectorNode) {
 function calculateSpecificity(selector: string): [number, number, number] {
   const pseudoFunctionSpecificity =
     calculateCssPseudoFunctionSpecificity(selector)
-  const selectorWithoutPseudos = removeCssPseudoFunctionSelectors(
+  const pseudoSelectors = readCssPseudoSelectors(selector) ?? {
+    functions: [],
+    simpleClasses: [],
+  }
+  const selectorWithoutPseudos = removeCssPseudoSelectors(
     selector,
-    readCssPseudoFunctionSelectors(selector) ?? [],
+    [
+      ...pseudoSelectors.functions,
+      ...pseudoSelectors.simpleClasses,
+    ],
   )
   const selectorWithoutAttributes =
     removeCssAttributeSelectors(selectorWithoutPseudos)
@@ -1388,7 +1524,8 @@ function calculateSpecificity(selector: string): [number, number, number] {
   ).length
   const classCount = (
     readCssSimpleSelectorNames(selectorWithoutAttributes, '.').length +
-    attributeCount
+    attributeCount +
+    pseudoSelectors.simpleClasses.length
   )
   const tagCount = selectorWithoutAttributes
     .split(/[\s>+~]+/)

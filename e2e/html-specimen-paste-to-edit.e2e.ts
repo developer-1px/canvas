@@ -1494,6 +1494,67 @@ test('keeps unsupported pseudo-class selector CSS read-only', async ({
   ).toContain('.primary:nth-child(1)')
 })
 
+test('matches structural child pseudo class selector rules', async ({
+  page,
+}) => {
+  await page.goto('/')
+
+  const pasteWasHandled = await page.evaluate((text) => {
+    const data = new DataTransfer()
+
+    data.setData('text/plain', text)
+
+    const event = new ClipboardEvent('paste', {
+      bubbles: true,
+      cancelable: true,
+      clipboardData: data,
+    })
+
+    window.dispatchEvent(event)
+
+    return event.defaultPrevented
+  }, JSON.stringify({
+    css: [
+      '.table-row:first-child {',
+      '  color: #334155;',
+      '}',
+    ].join('\n'),
+    html: [
+      '<main>',
+      '<div id="first" class="table-row">One</div>',
+      '<div id="second" class="table-row">Two</div>',
+      '</main>',
+    ].join(''),
+  }))
+
+  expect(pasteWasHandled).toBe(true)
+
+  const preview = page.locator('.demo-html-specimen-preview').last()
+
+  await expect(preview).toBeVisible()
+  await preview.locator('div#first').click()
+
+  const textField = page
+    .locator('.html-specimen-css-field')
+    .filter({ hasText: 'Text' })
+  const textInput = textField.locator('input')
+
+  await expect(textField
+    .getByText('Rule .table-row:first-child / 1 node'),
+  ).toBeVisible()
+  await expect(textInput).toHaveValue('#334155')
+  await textInput.fill('#111827')
+  await textInput.blur()
+  await expect.poll(async () =>
+    preview.locator('div#first').evaluate((row) =>
+      getComputedStyle(row).color),
+  ).toBe('rgb(17, 24, 39)')
+  await expect.poll(async () =>
+    preview.locator('div#second').evaluate((row) =>
+      getComputedStyle(row).color),
+  ).not.toBe('rgb(17, 24, 39)')
+})
+
 test('keeps token-backed preview CSS read-only in the inspector', async ({
   page,
 }) => {
