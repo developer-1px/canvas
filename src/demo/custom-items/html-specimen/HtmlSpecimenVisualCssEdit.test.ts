@@ -160,6 +160,34 @@ describe('HtmlSpecimenVisualCssEdit', () => {
     })
   })
 
+  it('blocks raw stroke edits that would bypass token-backed border declarations', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `:root {
+  --stroke: 1px solid #2563eb;
+}
+.primary {
+  border: var(--stroke);
+}`,
+    }
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '#111827',
+        nodeId: 'primary',
+        property: 'border-color',
+      },
+      nodes: createButtonNodes(),
+      specimen,
+    })
+
+    expect(result).toEqual({
+      affectedNodeIds: ['primary'],
+      ok: false,
+      reason: 'token-value',
+      specimen,
+    })
+  })
+
   it('blocks shorthand edits when related longhand declarations exist', () => {
     const specimen = {
       ...createButtonSpecimenData(),
@@ -172,6 +200,31 @@ describe('HtmlSpecimenVisualCssEdit', () => {
         nextValue: '8px',
         nodeId: 'primary',
         property: 'margin',
+      },
+      nodes: createButtonNodes(),
+      specimen,
+    })
+
+    expect(result).toEqual({
+      affectedNodeIds: ['primary'],
+      ok: false,
+      reason: 'shorthand-conflict',
+      specimen,
+    })
+  })
+
+  it('blocks border-color edits when side color declarations exist', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `.primary {
+  border-top-color: #2563eb;
+}`,
+    }
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '#111827',
+        nodeId: 'primary',
+        property: 'border-color',
       },
       nodes: createButtonNodes(),
       specimen,

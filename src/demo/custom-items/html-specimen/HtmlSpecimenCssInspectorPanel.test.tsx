@@ -23,6 +23,7 @@ describe('HtmlSpecimenCssInspectorPanel', () => {
     expect(markup).toContain('button.primary')
     expect(markup).toContain('Text')
     expect(markup).toContain('#ffffff')
+    expect(markup).toContain('Stroke')
     expect(markup).toContain('Font')
     expect(markup).toContain('14px')
     expect(markup).toContain('Radius')
@@ -246,6 +247,7 @@ function createContext({
     computedStyle: {
       color: '#ffffff',
       backgroundColor: '#2563eb',
+      borderColor: 'transparent',
       borderRadius: '6px',
       fontSize: '14px',
       margin: '0px',

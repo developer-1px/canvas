@@ -33,6 +33,8 @@ test('pastes HTML/CSS and edits preview target CSS through the inspector', async
   }, JSON.stringify({
     css: [
       '.button {',
+      '  border: 1px solid transparent;',
+      '  border-color: transparent;',
       '  border-radius: 6px;',
       '  font-size: 14px;',
       '  margin: 0;',
@@ -157,6 +159,28 @@ test('pastes HTML/CSS and edits preview target CSS through the inspector', async
     .filter({ hasText: 'Bg' })
     .getByText('Rule .primary / 1 node')).toBeVisible()
 
+  const strokeInput = page
+    .locator('.html-specimen-css-field')
+    .filter({ hasText: 'Stroke' })
+    .locator('input')
+
+  await expect(strokeInput).toBeVisible()
+  await strokeInput.fill('#f97316')
+  await strokeInput.blur()
+
+  await expect.poll(async () =>
+    preview.evaluate((host) =>
+      host.shadowRoot?.querySelector('style')?.textContent ?? ''),
+  ).toContain('border-color: #f97316;')
+  await expect.poll(async () =>
+    preview.locator('button#primary').evaluate((button) =>
+      getComputedStyle(button).borderTopColor),
+  ).toBe('rgb(249, 115, 22)')
+  await expect(page
+    .locator('.html-specimen-css-field')
+    .filter({ hasText: 'Stroke' })
+    .getByText('Rule .button / 2 nodes')).toBeVisible()
+
   const marginInput = page
     .locator('.html-specimen-css-field')
     .filter({ hasText: 'Margin' })
@@ -212,6 +236,12 @@ test('pastes HTML/CSS and edits preview target CSS through the inspector', async
         __htmlSpecimenExportedCss?: string
       }).__htmlSpecimenExportedCss ?? ''),
   ).toContain('margin: 4px;')
+  await expect.poll(async () =>
+    page.evaluate(() =>
+      (window as Window & {
+        __htmlSpecimenExportedCss?: string
+      }).__htmlSpecimenExportedCss ?? ''),
+  ).toContain('border-color: #f97316;')
 
   const previewHtml = await preview.evaluate((host) =>
     host.shadowRoot?.querySelector('[data-preview-surface-root]')

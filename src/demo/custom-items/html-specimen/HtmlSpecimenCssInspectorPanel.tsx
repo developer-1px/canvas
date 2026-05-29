@@ -24,6 +24,7 @@ import {
 type HtmlSpecimenCssControl = {
   computedStyleKey:
     | 'backgroundColor'
+    | 'borderColor'
     | 'borderRadius'
     | 'color'
     | 'fontSize'
@@ -61,6 +62,11 @@ const HTML_SPECIMEN_CSS_CONTROLS: readonly HtmlSpecimenCssControl[] = [
     computedStyleKey: 'backgroundColor',
     label: 'Bg',
     property: 'background-color',
+  },
+  {
+    computedStyleKey: 'borderColor',
+    label: 'Stroke',
+    property: 'border-color',
   },
   {
     computedStyleKey: 'fontSize',

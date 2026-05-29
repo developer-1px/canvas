@@ -1101,6 +1101,14 @@ function getCssTokenGuardProperties(property: string) {
   switch (normalizeProperty(property)) {
     case 'background-color':
       return ['background']
+    case 'border-color':
+      return [
+        'border',
+        'border-bottom-color',
+        'border-left-color',
+        'border-right-color',
+        'border-top-color',
+      ]
     case 'border-radius':
       return [
         'border-bottom-left-radius',
@@ -1119,6 +1127,13 @@ function getCssTokenGuardProperties(property: string) {
 
 function getCssShorthandConflictProperties(property: string) {
   switch (normalizeProperty(property)) {
+    case 'border-color':
+      return [
+        'border-bottom-color',
+        'border-left-color',
+        'border-right-color',
+        'border-top-color',
+      ]
     case 'border-radius':
     case 'margin':
     case 'padding':
