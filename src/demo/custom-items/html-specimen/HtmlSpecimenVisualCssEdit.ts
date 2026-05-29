@@ -131,6 +131,10 @@ type CssDeclarationMatch = {
   specificity: [number, number, number]
 }
 
+type CssScopedDeclarationMatch = CssDeclarationMatch & {
+  atRule: string
+}
+
 type CssScannerState = {
   bracketDepth: number
   comment: boolean
@@ -587,16 +591,51 @@ export function resolveHtmlSpecimenCssScopedRuleSource({
     return null
   }
 
+  const winner = resolveHtmlSpecimenCssScopedDeclarationMatch({
+    css,
+    node,
+    nodes,
+    property,
+  })
+
+  if (!winner) {
+    return null
+  }
+
+  return {
+    affectedNodeIds: getAffectedNodeIdsForScopedDeclarationMatch({
+      css,
+      match: winner,
+      nodes,
+      property,
+    }),
+    atRule: winner.atRule,
+    declarationIndex: winner.declaration.declarationIndex,
+    important: winner.declaration.important,
+    property: winner.declaration.property,
+    ruleIndex: winner.rule.ruleIndex,
+    selector: winner.rule.selector,
+    specificity: winner.specificity,
+    value: winner.declaration.value,
+  }
+}
+
+function resolveHtmlSpecimenCssScopedDeclarationMatch({
+  css,
+  node,
+  nodes,
+  property,
+}: {
+  css: string
+  node: HtmlSpecimenVisualCssNode
+  nodes: readonly HtmlSpecimenVisualCssNode[]
+  property: string
+}): CssScopedDeclarationMatch | null {
   const properties = new Set([
     normalizeProperty(property),
     ...getCssTokenGuardProperties(property),
   ])
-  let winner: {
-    atRule: string
-    declaration: CssDeclaration
-    rule: CssRule
-    specificity: [number, number, number]
-  } | null = null
+  let winner: CssScopedDeclarationMatch | null = null
 
   for (const scopedRule of parseScopedCssRules(css)) {
     const specificity = matchHtmlSpecimenCssSelectorList(
@@ -641,24 +680,41 @@ export function resolveHtmlSpecimenCssScopedRuleSource({
     }
   }
 
-  if (!winner) {
-    return null
-  }
+  return winner
+}
 
-  return {
-    affectedNodeIds: nodes
-      .filter((candidate) =>
-        matchHtmlSpecimenCssSelectorList(winner.rule.selector, candidate, nodes))
-      .map((candidate) => candidate.id),
-    atRule: winner.atRule,
-    declarationIndex: winner.declaration.declarationIndex,
-    important: winner.declaration.important,
-    property: winner.declaration.property,
-    ruleIndex: winner.rule.ruleIndex,
-    selector: winner.rule.selector,
-    specificity: winner.specificity,
-    value: winner.declaration.value,
-  }
+function getAffectedNodeIdsForScopedDeclarationMatch({
+  css,
+  match,
+  nodes,
+  property,
+}: {
+  css: string
+  match: CssScopedDeclarationMatch
+  nodes: readonly HtmlSpecimenVisualCssNode[]
+  property: string
+}) {
+  return nodes
+    .filter((candidate) => {
+      const candidateMatch = resolveHtmlSpecimenCssScopedDeclarationMatch({
+        css,
+        node: candidate,
+        nodes,
+        property,
+      })
+
+      return candidateMatch !== null &&
+        isSameCssScopedDeclarationMatch(candidateMatch, match)
+    })
+    .map((candidate) => candidate.id)
+}
+
+function isSameCssScopedDeclarationMatch(
+  left: CssScopedDeclarationMatch,
+  right: CssScopedDeclarationMatch,
+) {
+  return left.atRule === right.atRule &&
+    isSameCssDeclarationMatch(left, right)
 }
 
 export function isHtmlSpecimenCssTokenValue(value: string) {

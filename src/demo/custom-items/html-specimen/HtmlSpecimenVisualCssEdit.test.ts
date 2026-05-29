@@ -949,6 +949,28 @@ describe('HtmlSpecimenVisualCssEdit', () => {
     })
   })
 
+  it('reports only nodes whose scoped declaration wins', () => {
+    expect(resolveHtmlSpecimenCssScopedRuleSource({
+      css: `@media (min-width: 1px) {
+  .button {
+    color: #ffffff;
+  }
+  .danger {
+    color: #ef4444;
+  }
+}`,
+      nodeId: 'primary',
+      nodes: createButtonNodes(),
+      property: 'color',
+    })).toMatchObject({
+      affectedNodeIds: ['primary', 'secondary'],
+      atRule: '@media (min-width: 1px)',
+      property: 'color',
+      selector: '.button',
+      value: '#ffffff',
+    })
+  })
+
   it('returns an unresolved result when no stylesheet rule matches', () => {
     const specimen = createButtonSpecimenData()
     const result = applyHtmlSpecimenVisualCssEdit({

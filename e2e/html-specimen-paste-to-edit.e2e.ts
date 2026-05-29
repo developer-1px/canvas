@@ -1267,14 +1267,18 @@ test('keeps scoped at-rule CSS read-only in the inspector', async ({
   }, JSON.stringify({
     css: [
       '@media (min-width: 1px) {',
-      '  .primary {',
+      '  .button {',
       '    color: #ffffff;',
+      '  }',
+      '  .danger {',
+      '    color: #ef4444;',
       '  }',
       '}',
     ].join('\n'),
     html: [
       '<main>',
-      '<button id="primary" class="primary">Save</button>',
+      '<button id="primary" class="button">Save</button>',
+      '<button id="danger" class="button danger">Delete</button>',
       '</main>',
     ].join(''),
   }))
@@ -1292,10 +1296,14 @@ test('keeps scoped at-rule CSS read-only in the inspector', async ({
   const textInput = textField.locator('input')
 
   await expect(textField
-    .getByText('Scoped @media (min-width: 1px) / .primary / 1 node'),
+    .getByText('Scoped @media (min-width: 1px) / .button / 1 node'),
   ).toBeVisible()
   await expect(textInput).toHaveValue('#ffffff')
   await expect(textInput).toBeDisabled()
+  await expect.poll(async () =>
+    preview.locator('button#danger').evaluate((button) =>
+      getComputedStyle(button).color),
+  ).toBe('rgb(239, 68, 68)')
   await expect.poll(async () =>
     preview.evaluate((host) =>
       host.shadowRoot?.querySelector('style')?.textContent ?? ''),
