@@ -11,6 +11,56 @@ const HTML_SPECIMEN_ZERO_LENGTH_CSS_PROPERTIES = new Set([
   'padding',
 ])
 
+const HTML_SPECIMEN_ZERO_LENGTH_UNITS = new Set([
+  '',
+  '%',
+  'cap',
+  'ch',
+  'cm',
+  'cqb',
+  'cqh',
+  'cqi',
+  'cqmax',
+  'cqmin',
+  'cqw',
+  'dvb',
+  'dvh',
+  'dvi',
+  'dvmax',
+  'dvmin',
+  'dvw',
+  'em',
+  'ex',
+  'ic',
+  'in',
+  'lh',
+  'lvb',
+  'lvh',
+  'lvi',
+  'lvmax',
+  'lvmin',
+  'lvw',
+  'mm',
+  'pc',
+  'pt',
+  'px',
+  'q',
+  'rem',
+  'rlh',
+  'svb',
+  'svh',
+  'svi',
+  'svmax',
+  'svmin',
+  'svw',
+  'vb',
+  'vh',
+  'vi',
+  'vmax',
+  'vmin',
+  'vw',
+])
+
 export function isHtmlSpecimenCssComputedValueNoOp({
   computedValue,
   property,
@@ -154,13 +204,17 @@ function normalizeHtmlSpecimenCssZeroLengthList(value: string) {
 }
 
 function normalizeHtmlSpecimenCssZeroLengthToken(value: string) {
-  const match = /^([+-]?(?:\d+|\d*\.\d+))(?:[a-z%]+)?$/.exec(value)
+  const match = /^([+-]?(?:\d+|\d*\.\d+))([a-z%]*)$/.exec(value)
 
   if (!match) {
     return value
   }
 
-  return Number(match[1]) === 0 ? '0' : value
+  const unit = match[2]
+
+  return Number(match[1]) === 0 && HTML_SPECIMEN_ZERO_LENGTH_UNITS.has(unit)
+    ? '0'
+    : value
 }
 
 function formatHtmlSpecimenCssColor(
