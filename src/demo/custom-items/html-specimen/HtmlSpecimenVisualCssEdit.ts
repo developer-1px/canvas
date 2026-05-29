@@ -23,6 +23,13 @@ export type HtmlSpecimenCssDeclarationSource = {
   value: string
 }
 
+export type HtmlSpecimenCssRuleSource = {
+  affectedNodeIds: string[]
+  ruleIndex: number
+  selector: string
+  specificity: [number, number, number]
+}
+
 export type HtmlSpecimenVisualCssEditResult =
   | {
       affectedNodeIds: string[]
@@ -226,6 +233,35 @@ export function resolveHtmlSpecimenCssDeclarationSource({
   }
 }
 
+export function resolveHtmlSpecimenCssRuleSource({
+  css,
+  nodeId,
+  nodes,
+}: {
+  css: string
+  nodeId: string
+  nodes: readonly HtmlSpecimenVisualCssNode[]
+}): HtmlSpecimenCssRuleSource | null {
+  const node = findNode(nodes, nodeId)
+
+  if (!node) {
+    return null
+  }
+
+  const match = resolveBestMatchingRuleMatch({ css, node })
+
+  return match
+    ? {
+        affectedNodeIds: nodes
+          .filter((candidate) => matchSelectorList(match.rule.selector, candidate))
+          .map((candidate) => candidate.id),
+        ruleIndex: match.rule.ruleIndex,
+        selector: match.rule.selector,
+        specificity: match.specificity,
+      }
+    : null
+}
+
 function patchExistingDeclaration({
   css,
   nextValue,
@@ -260,15 +296,16 @@ function patchNewDeclaration({
   node: HtmlSpecimenVisualCssNode
   property: string
 }) {
-  const rule = resolveBestMatchingRule({
+  const match = resolveBestMatchingRuleMatch({
     css,
     node,
   })
 
-  if (!rule) {
+  if (!match) {
     return null
   }
 
+  const rule = match.rule
   const indent = inferDeclarationIndent(rule)
   const needsLeadingNewline = css[rule.blockEnd - 1] !== '\n'
   const insertion = [
@@ -283,7 +320,7 @@ function patchNewDeclaration({
   ].join('')
 }
 
-function resolveBestMatchingRule({
+function resolveBestMatchingRuleMatch({
   css,
   node,
 }: {
@@ -317,7 +354,7 @@ function resolveBestMatchingRule({
     }
   }
 
-  return best?.rule ?? null
+  return best
 }
 
 function parseCssRules(css: string): CssRule[] {

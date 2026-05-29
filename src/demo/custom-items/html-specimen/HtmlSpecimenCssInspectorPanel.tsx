@@ -11,7 +11,9 @@ import {
 import {
   applyHtmlSpecimenVisualCssEdit,
   resolveHtmlSpecimenCssDeclarationSource,
+  resolveHtmlSpecimenCssRuleSource,
   type HtmlSpecimenCssDeclarationSource,
+  type HtmlSpecimenCssRuleSource,
   type HtmlSpecimenVisualCssNode,
 } from './HtmlSpecimenVisualCssEdit'
 
@@ -32,6 +34,13 @@ type HtmlSpecimenPreviewFocusData = {
     computedStyle?: Partial<Record<HtmlSpecimenCssControl['computedStyleKey'], string>>
   }
   nodes: readonly HtmlSpecimenVisualCssNode[]
+}
+
+type HtmlSpecimenCssControlModel = {
+  editable: boolean
+  source: HtmlSpecimenCssDeclarationSource | null
+  ruleSource: HtmlSpecimenCssRuleSource | null
+  value: string
 }
 
 const HTML_SPECIMEN_CSS_CONTROLS: readonly HtmlSpecimenCssControl[] = [
@@ -146,14 +155,18 @@ function renderHtmlSpecimenCssInspector({
         const model = getHtmlSpecimenCssControlModel({ control, target })
 
         return (
-          <label className="html-specimen-css-field" key={control.property}>
+          <label
+            className="html-specimen-css-field"
+            data-editable={model.editable}
+            key={control.property}
+          >
             <span className="html-specimen-css-field-label">
               {control.label}
             </span>
             <input
               key={`${target.node.id}:${control.property}:${model.value}`}
               defaultValue={model.value}
-              disabled={context.disabled}
+              disabled={context.disabled || !model.editable}
               onBlur={(event) =>
                 changeHtmlSpecimenPreviewTargetCss({
                   context,
@@ -165,14 +178,18 @@ function renderHtmlSpecimenCssInspector({
               spellCheck={false}
               type="text"
             />
-            {model.source ? (
+            {model.source || model.ruleSource ? (
               <span
                 className="html-specimen-css-source"
-                title={model.source.selector}
+                title={(model.source ?? model.ruleSource)?.selector}
               >
-                {formatHtmlSpecimenCssSource(model.source)}
+                {formatHtmlSpecimenCssControlSource(model)}
               </span>
-            ) : null}
+            ) : (
+              <span className="html-specimen-css-source">
+                No matching rule
+              </span>
+            )}
           </label>
         )
       })}
@@ -225,15 +242,24 @@ function getHtmlSpecimenCssControlModel({
 }: {
   control: HtmlSpecimenCssControl
   target: HtmlSpecimenCssInspectorTarget
-}) {
+}): HtmlSpecimenCssControlModel {
   const source = resolveHtmlSpecimenCssDeclarationSource({
     css: getHtmlSpecimenData(target.item).css,
     nodeId: target.node.id,
     nodes: target.nodes,
     property: control.property,
   })
+  const ruleSource = source
+    ? null
+    : resolveHtmlSpecimenCssRuleSource({
+        css: getHtmlSpecimenData(target.item).css,
+        nodeId: target.node.id,
+        nodes: target.nodes,
+      })
 
   return {
+    editable: source !== null || ruleSource !== null,
+    ruleSource,
     source,
     value:
       source?.value ??
@@ -281,12 +307,23 @@ function formatHtmlSpecimenCssTargetLabel(
   return `${node.tagName}${classes}`
 }
 
+function formatHtmlSpecimenCssControlSource(
+  model: HtmlSpecimenCssControlModel,
+) {
+  return model.source
+    ? formatHtmlSpecimenCssSource('Rule', model.source)
+    : model.ruleSource
+      ? formatHtmlSpecimenCssSource('Add', model.ruleSource)
+      : ''
+}
+
 function formatHtmlSpecimenCssSource(
-  source: HtmlSpecimenCssDeclarationSource,
+  prefix: 'Add' | 'Rule',
+  source: HtmlSpecimenCssDeclarationSource | HtmlSpecimenCssRuleSource,
 ) {
   const count = source.affectedNodeIds.length
 
-  return `Rule ${formatHtmlSpecimenCssSelector(source.selector)} / ${count} ${
+  return `${prefix} ${formatHtmlSpecimenCssSelector(source.selector)} / ${count} ${
     count === 1 ? 'node' : 'nodes'
   }`
 }

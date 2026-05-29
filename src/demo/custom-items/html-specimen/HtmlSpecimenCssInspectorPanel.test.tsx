@@ -30,6 +30,7 @@ describe('HtmlSpecimenCssInspectorPanel', () => {
     expect(markup).toContain('0px')
     expect(markup).toContain('Rule .button / 3 nodes')
     expect(markup).toContain('Rule .primary / 1 node')
+    expect(markup).toContain('Add .primary / 1 node')
   })
 
   it('patches stylesheet text for the focused preview node', () => {
@@ -102,6 +103,46 @@ describe('HtmlSpecimenCssInspectorPanel', () => {
         },
       }),
     )).toBe(false)
+  })
+
+  it('shows unresolved controls when the focused node has no matching rule', () => {
+    const commitItemsChange = vi.fn(() => true)
+    const orphanNode = {
+      attributes: {
+        class: 'orphan',
+        id: 'orphan',
+      },
+      classList: ['orphan'],
+      computedStyle: {
+        color: '#111111',
+      },
+      id: 'dom:orphan',
+      tagName: 'div',
+    }
+    const context = createContext({
+      commitItemsChange,
+      customFocus: {
+        data: {
+          node: orphanNode,
+          nodes: [orphanNode],
+        },
+        itemId: 'html-specimen-1',
+        ownerId: 'html-specimen',
+        targetId: 'dom:orphan',
+      },
+    })
+    const markup = renderToStaticMarkup(
+      <>{HTML_SPECIMEN_CSS_INSPECTOR_PANEL.render(context)}</>,
+    )
+
+    expect(markup).toContain('No matching rule')
+    expect(markup).toContain('disabled=""')
+    expect(changeHtmlSpecimenPreviewTargetCss({
+      context,
+      nextValue: '#222222',
+      property: 'color',
+    })).toBe(false)
+    expect(commitItemsChange).not.toHaveBeenCalled()
   })
 })
 

@@ -92,3 +92,8 @@
   background: var(--canvas-panel);
   font: 650 12px/1 var(--sans);
 }
+
+.html-specimen-css-field[data-editable="false"] input {
+  color: var(--canvas-muted);
+  background: #f1f5f9;
+}

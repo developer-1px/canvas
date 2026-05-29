@@ -6,6 +6,7 @@ import {
 import {
   applyHtmlSpecimenVisualCssEdit,
   resolveHtmlSpecimenCssDeclarationSource,
+  resolveHtmlSpecimenCssRuleSource,
   type HtmlSpecimenVisualCssNode,
 } from './HtmlSpecimenVisualCssEdit'
 
@@ -106,6 +107,24 @@ describe('HtmlSpecimenVisualCssEdit', () => {
       selector: '.toolbar,\n.panel',
       value: '8px',
     })
+  })
+
+  it('resolves the best matching rule when a declaration is missing', () => {
+    expect(resolveHtmlSpecimenCssRuleSource({
+      css: createButtonSpecimenData().css,
+      nodeId: 'primary',
+      nodes: createButtonNodes(),
+    })).toMatchObject({
+      affectedNodeIds: ['primary'],
+      ruleIndex: 2,
+      selector: '.primary',
+      specificity: [0, 1, 0],
+    })
+    expect(resolveHtmlSpecimenCssRuleSource({
+      css: '.card { color: red; }',
+      nodeId: 'primary',
+      nodes: createButtonNodes(),
+    })).toBeNull()
   })
 
   it('returns an unresolved result when no stylesheet rule matches', () => {

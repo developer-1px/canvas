@@ -36,6 +36,7 @@ test('pastes HTML/CSS and edits preview target CSS through the inspector', async
       '<main>',
       '<button id="primary" class="button primary">Save</button>',
       '<button id="secondary" class="button secondary">Cancel</button>',
+      '<span id="orphan">Loose</span>',
       '</main>',
     ].join(''),
   }))
@@ -103,4 +104,18 @@ test('pastes HTML/CSS and edits preview target CSS through the inspector', async
       ?.innerHTML ?? '')
 
   expect(previewHtml).not.toContain('style=')
+
+  await preview.locator('span#orphan').click()
+
+  const unresolvedTextInput = page
+    .locator('.html-specimen-css-field')
+    .filter({ hasText: 'Text' })
+    .locator('input')
+
+  await expect(page.locator('.html-specimen-css-target')).toHaveText('span')
+  await expect(page
+    .locator('.html-specimen-css-field')
+    .filter({ hasText: 'Text' })
+    .getByText('No matching rule')).toBeVisible()
+  await expect(unresolvedTextInput).toBeDisabled()
 })
