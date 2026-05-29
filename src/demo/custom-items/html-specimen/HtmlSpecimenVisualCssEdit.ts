@@ -1979,7 +1979,16 @@ function isCssAtRuleActive(
     return matchesCssSupportsRule(source) ?? true
   }
 
+  if (isCssAtRuleKeyword(source, '@container')) {
+    return false
+  }
+
   return true
+}
+
+function isCssAtRuleKeyword(source: string, keyword: string) {
+  return source.slice(0, keyword.length).toLowerCase() === keyword &&
+    !isCssIdentifierChar(source[keyword.length] ?? '')
 }
 
 function splitCssMediaQueryList(queryList: string) {

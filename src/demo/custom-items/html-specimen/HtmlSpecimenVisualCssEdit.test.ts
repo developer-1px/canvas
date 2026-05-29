@@ -1054,6 +1054,47 @@ describe('HtmlSpecimenVisualCssEdit', () => {
     expect(result.specimen.css).toContain('color: #ffffff;')
   })
 
+  it('ignores unsupported container declarations when choosing the patch source', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `.primary {
+  color: #334155;
+}
+@container (min-width: 99999px) {
+  .primary {
+    color: #ffffff;
+  }
+}`,
+    }
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '#111827',
+        nodeId: 'primary',
+        property: 'color',
+      },
+      nodes: createButtonNodes(),
+      specimen,
+    })
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) {
+      throw new Error(result.reason)
+    }
+
+    expect(result.source).toMatchObject({
+      affectedNodeIds: ['primary'],
+      property: 'color',
+      selector: '.primary',
+      value: '#111827',
+    })
+    expect(result.source.atRule).toBeUndefined()
+    expect(result.specimen.css).toContain(`.primary {
+  color: #111827;
+}`)
+    expect(result.specimen.css).toContain('color: #ffffff;')
+  })
+
   it('patches the active rule when inactive media declarations come first', () => {
     const specimen = {
       ...createButtonSpecimenData(),
@@ -2324,6 +2365,34 @@ describe('HtmlSpecimenVisualCssEdit', () => {
     expect(resolveHtmlSpecimenCssScopedRuleSource({
       css,
       mediaContext,
+      nodeId: 'primary',
+      nodes: createButtonNodes(),
+      property: 'color',
+    })).toBeNull()
+  })
+
+  it('filters unsupported container rules when resolving sources', () => {
+    const css = `.primary {
+  color: #334155;
+}
+@container (min-width: 99999px) {
+  .primary {
+    color: #ffffff;
+  }
+}`
+
+    expect(resolveHtmlSpecimenCssDeclarationSource({
+      css,
+      nodeId: 'primary',
+      nodes: createButtonNodes(),
+      property: 'color',
+    })).toMatchObject({
+      property: 'color',
+      selector: '.primary',
+      value: '#334155',
+    })
+    expect(resolveHtmlSpecimenCssScopedRuleSource({
+      css,
       nodeId: 'primary',
       nodes: createButtonNodes(),
       property: 'color',
