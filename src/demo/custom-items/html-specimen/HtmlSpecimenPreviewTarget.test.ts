@@ -3,6 +3,7 @@ import type { PreviewSurfaceNode } from '@interactive-os/preview-surface'
 import {
   createHtmlSpecimenPreviewTarget,
   findHtmlSpecimenPreviewNodeByPath,
+  reconcileHtmlSpecimenPreviewTarget,
 } from './HtmlSpecimenPreviewTarget'
 
 describe('HtmlSpecimenPreviewTarget', () => {
@@ -41,6 +42,29 @@ describe('HtmlSpecimenPreviewTarget', () => {
     expect(findHtmlSpecimenPreviewNodeByPath({
       nodes: [button],
       path: [1, 0],
+    })).toBeNull()
+  })
+
+  it('keeps a preview target when the same node id survives re-indexing', () => {
+    const nextButton = createNode({
+      id: 'dom:button:0/1',
+      path: [0, 1],
+      tagName: 'button',
+    })
+
+    expect(reconcileHtmlSpecimenPreviewTarget({
+      itemId: 'html-specimen-1',
+      nodes: [nextButton],
+      previousNodeId: 'dom:button:0/1',
+    })).toEqual({
+      itemId: 'html-specimen-1',
+      node: nextButton,
+      nodeId: 'dom:button:0/1',
+    })
+    expect(reconcileHtmlSpecimenPreviewTarget({
+      itemId: 'html-specimen-1',
+      nodes: [nextButton],
+      previousNodeId: 'missing',
     })).toBeNull()
   })
 })

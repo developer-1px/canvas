@@ -16,6 +16,8 @@ import type { HtmlSpecimenData } from './HtmlSpecimenCustomItemModel'
 import {
   createHtmlSpecimenPreviewTarget,
   findHtmlSpecimenPreviewNodeByPath,
+  reconcileHtmlSpecimenPreviewTarget,
+  type HtmlSpecimenPreviewTarget,
 } from './HtmlSpecimenPreviewTarget'
 
 const HTML_SPECIMEN_PREVIEW_TARGET_EVENT = 'html-specimen-preview:target'
@@ -34,6 +36,7 @@ export function HtmlSpecimenShadowPreview({
   title: string
 }) {
   const hostRef = useRef<HTMLDivElement | null>(null)
+  const targetNodeIdRef = useRef<string | null>(null)
   const [targetNodeId, setTargetNodeId] = useState<string | null>(null)
 
   useEffect(() => {
@@ -52,9 +55,30 @@ export function HtmlSpecimenShadowPreview({
     ensureHtmlSpecimenPreviewToolStyle(root)
 
     const nodes = indexPreviewSurface(root)
-    setTargetNodeId(null)
+    const retainedTarget = reconcileHtmlSpecimenPreviewTarget({
+      itemId,
+      nodes,
+      previousNodeId: targetNodeIdRef.current,
+    })
+
+    setHtmlSpecimenPreviewTargetState({
+      host,
+      nodeId: retainedTarget?.nodeId ?? null,
+      setTargetNodeId,
+      targetNodeIdRef,
+    })
     host.dataset.previewNodeCount = String(nodes.length)
-    delete host.dataset.previewTargetNodeId
+    if (retainedTarget) {
+      markHtmlSpecimenPreviewTargetElement(root, retainedTarget.node.path)
+      publishHtmlSpecimenPreviewTarget({
+        host,
+        itemId,
+        nodes,
+        target: retainedTarget,
+      })
+    } else {
+      delete host.dataset.previewTargetNodeId
+    }
     host.dispatchEvent(new CustomEvent('preview-surface:indexed', {
       bubbles: true,
       detail: { nodes },
@@ -72,26 +96,19 @@ export function HtmlSpecimenShadowPreview({
         return
       }
 
-      setTargetNodeId(target.nodeId)
-      host.dataset.previewTargetNodeId = target.nodeId
-      markHtmlSpecimenPreviewTargetElement(root, target.node.path)
-      dispatchCanvasAppCustomFocus(host, {
-        data: {
-          node: target.node,
-          nodes,
-        },
-        itemId,
-        ownerId: 'html-specimen',
-        targetId: target.nodeId,
+      setHtmlSpecimenPreviewTargetState({
+        host,
+        nodeId: target.nodeId,
+        setTargetNodeId,
+        targetNodeIdRef,
       })
-      host.dispatchEvent(new CustomEvent(HTML_SPECIMEN_PREVIEW_TARGET_EVENT, {
-        bubbles: true,
-        composed: true,
-        detail: {
-          ...target,
-          nodes,
-        },
-      }))
+      markHtmlSpecimenPreviewTargetElement(root, target.node.path)
+      publishHtmlSpecimenPreviewTarget({
+        host,
+        itemId,
+        nodes,
+        target,
+      })
     }
 
     root.addEventListener('pointerdown', handlePointerDown)
@@ -110,6 +127,57 @@ export function HtmlSpecimenShadowPreview({
       title={title}
     />
   )
+}
+
+function setHtmlSpecimenPreviewTargetState({
+  host,
+  nodeId,
+  setTargetNodeId,
+  targetNodeIdRef,
+}: {
+  host: HTMLElement
+  nodeId: string | null
+  setTargetNodeId: (nodeId: string | null) => void
+  targetNodeIdRef: { current: string | null }
+}) {
+  targetNodeIdRef.current = nodeId
+  setTargetNodeId(nodeId)
+
+  if (nodeId) {
+    host.dataset.previewTargetNodeId = nodeId
+  } else {
+    delete host.dataset.previewTargetNodeId
+  }
+}
+
+function publishHtmlSpecimenPreviewTarget({
+  host,
+  itemId,
+  nodes,
+  target,
+}: {
+  host: HTMLElement
+  itemId: string
+  nodes: readonly PreviewSurfaceNode[]
+  target: HtmlSpecimenPreviewTarget
+}) {
+  dispatchCanvasAppCustomFocus(host, {
+    data: {
+      node: target.node,
+      nodes,
+    },
+    itemId,
+    ownerId: 'html-specimen',
+    targetId: target.nodeId,
+  })
+  host.dispatchEvent(new CustomEvent(HTML_SPECIMEN_PREVIEW_TARGET_EVENT, {
+    bubbles: true,
+    composed: true,
+    detail: {
+      ...target,
+      nodes,
+    },
+  }))
 }
 
 function getHtmlSpecimenPreviewTargetFromEvent({

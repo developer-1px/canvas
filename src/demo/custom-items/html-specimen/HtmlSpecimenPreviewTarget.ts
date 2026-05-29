@@ -26,6 +26,24 @@ export function createHtmlSpecimenPreviewTarget({
     : null
 }
 
+export function reconcileHtmlSpecimenPreviewTarget({
+  itemId,
+  nodes,
+  previousNodeId,
+}: {
+  itemId: string
+  nodes: readonly PreviewSurfaceNode[]
+  previousNodeId: string | null
+}) {
+  return previousNodeId
+    ? createHtmlSpecimenPreviewTarget({
+        itemId,
+        nodeId: previousNodeId,
+        nodes,
+      })
+    : null
+}
+
 export function findHtmlSpecimenPreviewNodeByPath({
   nodes,
   path,
