@@ -21,8 +21,8 @@ importers:
         specifier: link:../zod-crud/labs/extensions/layer-order
         version: link:../zod-crud/labs/extensions/layer-order
       '@zod-crud/patch-preview':
-        specifier: link:../zod-crud/labs/extensions/patch-preview
-        version: link:../zod-crud/labs/extensions/patch-preview
+        specifier: link:../zod-crud/packages/patch-preview
+        version: link:../zod-crud/packages/patch-preview
       '@zod-crud/search-replace':
         specifier: link:../zod-crud/labs/extensions/search-replace
         version: link:../zod-crud/labs/extensions/search-replace

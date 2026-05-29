@@ -1,4 +1,5 @@
 import { isHtmlSpecimenCssLengthUnit } from './HtmlSpecimenCssLengthValue'
+import { getHtmlSpecimenCssNamedColor } from './HtmlSpecimenCssNamedColor'
 
 const HTML_SPECIMEN_COLOR_CSS_PROPERTIES = new Set([
   'background-color',
@@ -66,6 +67,12 @@ function normalizeHtmlSpecimenCssColor(value: string) {
 
   if (normalizedValue === 'transparent') {
     return formatHtmlSpecimenCssColor(0, 0, 0, 0)
+  }
+
+  const namedColor = getHtmlSpecimenCssNamedColor(normalizedValue)
+
+  if (namedColor) {
+    return formatHtmlSpecimenCssColor(...namedColor)
   }
 
   return normalizeHtmlSpecimenHexColor(normalizedValue) ??

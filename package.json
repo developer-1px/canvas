@@ -62,7 +62,7 @@
     "@interactive-os/preview-surface": "link:../preview-surface/packages/preview-surface",
     "@zod-crud/grouping": "link:../zod-crud/labs/extensions/grouping",
     "@zod-crud/layer-order": "link:../zod-crud/labs/extensions/layer-order",
-    "@zod-crud/patch-preview": "link:../zod-crud/labs/extensions/patch-preview",
+    "@zod-crud/patch-preview": "link:../zod-crud/packages/patch-preview",
     "@zod-crud/search-replace": "link:../zod-crud/labs/extensions/search-replace",
     "lucide-react": "^1.16.0",
     "react": "^19.2.6",
