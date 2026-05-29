@@ -935,6 +935,40 @@ describe('HtmlSpecimenVisualCssEdit', () => {
     expect(result.specimen.css).toContain('color: #111827 !important;')
   })
 
+  it('blocks stylesheet edits when an important inline declaration wins', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `.primary {
+  color: #334155 !important;
+}`,
+    }
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '#111827',
+        nodeId: 'primary',
+        property: 'color',
+      },
+      nodes: [
+        createNode({
+          attributes: {
+            style: 'color: #ef4444 !important; color: #334155;',
+          },
+          className: 'primary',
+          id: 'primary',
+          tagName: 'button',
+        }),
+      ],
+      specimen,
+    })
+
+    expect(result).toEqual({
+      affectedNodeIds: ['primary'],
+      ok: false,
+      reason: 'inline-style',
+      specimen,
+    })
+  })
+
   it('adds missing declarations to the most specific matching rule', () => {
     const result = applyHtmlSpecimenVisualCssEdit({
       intent: {

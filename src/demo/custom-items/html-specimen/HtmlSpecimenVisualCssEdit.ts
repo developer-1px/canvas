@@ -784,7 +784,9 @@ function resolveHtmlSpecimenInlineDeclaration({
       continue
     }
 
-    winner = declaration
+    if (!winner || compareCssInlineDeclaration(declaration, winner) > 0) {
+      winner = declaration
+    }
   }
 
   return winner
@@ -1774,6 +1776,17 @@ function compareCssSource(
 
   if (left.ruleIndex !== right.ruleIndex) {
     return left.ruleIndex - right.ruleIndex
+  }
+
+  return left.declarationIndex - right.declarationIndex
+}
+
+function compareCssInlineDeclaration(
+  left: CssDeclaration,
+  right: CssDeclaration,
+) {
+  if (left.important !== right.important) {
+    return left.important ? 1 : -1
   }
 
   return left.declarationIndex - right.declarationIndex
