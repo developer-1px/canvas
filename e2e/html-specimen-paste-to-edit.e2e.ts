@@ -498,6 +498,64 @@ test('adds missing CSS declarations to the most specific matching rule', async (
   expect(previewHtml).not.toContain('style=')
 })
 
+test('keeps unsupported CSS values out of stylesheet patches', async ({
+  page,
+}) => {
+  await page.goto('/')
+
+  const pasteWasHandled = await page.evaluate((text) => {
+    const data = new DataTransfer()
+
+    data.setData('text/plain', text)
+
+    const event = new ClipboardEvent('paste', {
+      bubbles: true,
+      cancelable: true,
+      clipboardData: data,
+    })
+
+    window.dispatchEvent(event)
+
+    return event.defaultPrevented
+  }, JSON.stringify({
+    css: [
+      '.button {',
+      '  color: #334155;',
+      '}',
+      '.primary {',
+      '  background: #2563eb;',
+      '}',
+    ].join('\n'),
+    html: [
+      '<main>',
+      '<button id="primary" class="button primary">Save</button>',
+      '</main>',
+    ].join(''),
+  }))
+
+  expect(pasteWasHandled).toBe(true)
+
+  const preview = page.locator('.demo-html-specimen-preview').last()
+
+  await expect(preview).toBeVisible()
+  await preview.locator('button#primary').click()
+
+  const fontField = page
+    .locator('.html-specimen-css-field')
+    .filter({ hasText: 'Font' })
+  const fontInput = fontField.locator('input')
+
+  await expect(fontField.getByText('Add .primary / 1 node')).toBeVisible()
+  await fontInput.fill('not-a-size')
+  await fontInput.blur()
+
+  await expect.poll(async () =>
+    preview.evaluate((host) =>
+      host.shadowRoot?.querySelector('style')?.textContent ?? ''),
+  ).not.toContain('font-size: not-a-size;')
+  await expect(fontField.getByText('Add .primary / 1 node')).toBeVisible()
+})
+
 test('shows add-rule affected nodes after later overrides are excluded', async ({
   page,
 }) => {

@@ -9,6 +9,7 @@ import {
   isHtmlSpecimenItem,
 } from './HtmlSpecimenCustomItemModel'
 import { isHtmlSpecimenCssComputedValueNoOp } from './HtmlSpecimenCssValueNoOp'
+import { isHtmlSpecimenCssSupportedValue } from './HtmlSpecimenCssValueSupport'
 import {
   applyHtmlSpecimenVisualCssEdit,
   resolveHtmlSpecimenCssDeclarationSource,
@@ -124,6 +125,13 @@ export function changeHtmlSpecimenPreviewTargetCss({
     return false
   }
 
+  if (!isHtmlSpecimenCssEditableValue({
+    property,
+    value,
+  })) {
+    return false
+  }
+
   if (isHtmlSpecimenCssComputedNoOp({
     property,
     target,
@@ -162,6 +170,23 @@ export function changeHtmlSpecimenPreviewTargetCss({
     after: context.selection,
     before: context.selection,
   })
+}
+
+function isHtmlSpecimenCssEditableValue({
+  property,
+  value,
+}: {
+  property: string
+  value: string
+}) {
+  const control = getHtmlSpecimenCssControlByProperty(property)
+
+  return control
+    ? isHtmlSpecimenCssSupportedValue({
+        property: control.property,
+        value,
+      })
+    : false
 }
 
 function isHtmlSpecimenCssComputedNoOp({

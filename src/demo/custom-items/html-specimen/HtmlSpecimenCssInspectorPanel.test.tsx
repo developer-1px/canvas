@@ -94,6 +94,18 @@ describe('HtmlSpecimenCssInspectorPanel', () => {
     )
   })
 
+  it('skips stylesheet patches for unsupported CSS values', () => {
+    const commitItemsChange = vi.fn(() => true)
+    const context = createContext({ commitItemsChange })
+
+    expect(changeHtmlSpecimenPreviewTargetCss({
+      context,
+      nextValue: 'not-a-size',
+      property: 'font-size',
+    })).toBe(false)
+    expect(commitItemsChange).not.toHaveBeenCalled()
+  })
+
   it('edits safe token-backed declarations through the token definition', () => {
     const commitItemsChange = vi.fn(() => true)
     const context = createContext({
