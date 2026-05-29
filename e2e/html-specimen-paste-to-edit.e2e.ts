@@ -405,6 +405,99 @@ test('pastes HTML/CSS and edits preview target CSS through the inspector', async
   await expect(unresolvedTextInput).toBeDisabled()
 })
 
+test('adds missing CSS declarations to the most specific matching rule', async ({
+  page,
+}) => {
+  await page.goto('/')
+  await page.evaluate(() => {
+    window.addEventListener('html-specimen-css:export', (event) => {
+      const targetWindow = window as Window & {
+        __htmlSpecimenExportedCss?: string
+      }
+      const detail = (event as CustomEvent<{ css?: unknown }>).detail
+
+      targetWindow.__htmlSpecimenExportedCss =
+        typeof detail.css === 'string' ? detail.css : ''
+    })
+  })
+
+  const pasteWasHandled = await page.evaluate((text) => {
+    const data = new DataTransfer()
+
+    data.setData('text/plain', text)
+
+    const event = new ClipboardEvent('paste', {
+      bubbles: true,
+      cancelable: true,
+      clipboardData: data,
+    })
+
+    window.dispatchEvent(event)
+
+    return event.defaultPrevented
+  }, JSON.stringify({
+    css: [
+      '.button {',
+      '  color: #334155;',
+      '}',
+      '.primary {',
+      '  background: #2563eb;',
+      '}',
+      '.button.primary {',
+      '  border-radius: 6px;',
+      '}',
+    ].join('\n'),
+    html: [
+      '<main>',
+      '<button id="primary" class="button primary">Save</button>',
+      '<button id="secondary" class="button secondary">Cancel</button>',
+      '</main>',
+    ].join(''),
+  }))
+
+  expect(pasteWasHandled).toBe(true)
+
+  const specimenShell = page.locator('.demo-html-specimen-shell').last()
+  const preview = page.locator('.demo-html-specimen-preview').last()
+
+  await expect(preview).toBeVisible()
+  await preview.locator('button#primary').click()
+
+  const fontField = page
+    .locator('.html-specimen-css-field')
+    .filter({ hasText: 'Font' })
+  const fontInput = fontField.locator('input')
+
+  await expect(fontField.getByText('Add .button.primary / 1 node')).toBeVisible()
+  await expect(fontInput).toBeVisible()
+  await fontInput.fill('18px')
+  await fontInput.blur()
+
+  await expect.poll(async () =>
+    preview.evaluate((host) =>
+      host.shadowRoot?.querySelector('style')?.textContent ?? ''),
+  ).toContain('font-size: 18px;')
+  await expect.poll(async () =>
+    preview.locator('button#primary').evaluate((button) =>
+      getComputedStyle(button).fontSize),
+  ).toBe('18px')
+  await expect(fontField.getByText('Rule .button.primary / 1 node')).toBeVisible()
+
+  await specimenShell.getByRole('button', { name: 'Copy CSS' }).click()
+  await expect.poll(async () =>
+    page.evaluate(() =>
+      (window as Window & {
+        __htmlSpecimenExportedCss?: string
+      }).__htmlSpecimenExportedCss ?? ''),
+  ).toContain('font-size: 18px;')
+
+  const previewHtml = await preview.evaluate((host) =>
+    host.shadowRoot?.querySelector('[data-preview-surface-root]')
+      ?.innerHTML ?? '')
+
+  expect(previewHtml).not.toContain('style=')
+})
+
 test('keeps token-backed preview CSS read-only in the inspector', async ({
   page,
 }) => {
