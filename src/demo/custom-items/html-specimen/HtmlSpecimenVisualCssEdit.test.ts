@@ -569,6 +569,69 @@ describe('HtmlSpecimenVisualCssEdit', () => {
     expect(result.specimen.css).toContain('background: var(--brand);')
   })
 
+  it('patches existing token definitions when var has a fallback', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `:root {
+  --brand: #2563eb;
+}
+.primary {
+  background: var(--brand, rgb(37, 99, 235));
+}`,
+    }
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '#111827',
+        nodeId: 'primary',
+        property: 'background-color',
+      },
+      nodes: createButtonNodes(),
+      specimen,
+    })
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) {
+      throw new Error(result.reason)
+    }
+
+    expect(result.source).toMatchObject({
+      affectedNodeIds: ['primary'],
+      property: '--brand',
+      selector: ':root',
+      value: '#111827',
+    })
+    expect(result.specimen.css).toContain('--brand: #111827;')
+    expect(result.specimen.css).toContain(
+      'background: var(--brand, rgb(37, 99, 235));',
+    )
+  })
+
+  it('keeps fallback vars read-only when the token definition is missing', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `.primary {
+  background: var(--brand, #2563eb);
+}`,
+    }
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '#111827',
+        nodeId: 'primary',
+        property: 'background-color',
+      },
+      nodes: createButtonNodes(),
+      specimen,
+    })
+
+    expect(result).toEqual({
+      affectedNodeIds: ['primary'],
+      ok: false,
+      reason: 'token-value',
+      specimen,
+    })
+  })
+
   it('bridges root custom properties into the Shadow DOM preview surface', () => {
     const css = [
       ':root, html {',

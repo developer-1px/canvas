@@ -1705,7 +1705,7 @@ test('edits safe token-backed preview CSS through custom properties', async ({
       '}',
       '.primary {',
       '  color: #ffffff;',
-      '  background: var(--brand);',
+      '  background: var(--brand, #0f172a);',
       '  font: var(--control-font);',
       '}',
     ].join('\n'),
@@ -1750,7 +1750,7 @@ test('edits safe token-backed preview CSS through custom properties', async ({
   await expect.poll(async () =>
     preview.evaluate((host) =>
       host.shadowRoot?.querySelector('style')?.textContent ?? ''),
-  ).toContain('background: var(--brand);')
+  ).toContain('background: var(--brand, #0f172a);')
   await expect.poll(async () =>
     preview.evaluate((host) =>
       host.shadowRoot?.querySelector('style')?.textContent ?? ''),

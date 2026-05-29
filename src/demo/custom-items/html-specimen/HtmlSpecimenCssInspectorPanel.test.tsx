@@ -104,7 +104,7 @@ describe('HtmlSpecimenCssInspectorPanel', () => {
   --brand: #2563eb;
 }
 .primary {
-  background: var(--brand);
+  background: var(--brand, #0f172a);
 }`,
       }),
     })
