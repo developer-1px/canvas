@@ -12,6 +12,7 @@ import {
   applyHtmlSpecimenVisualCssEdit,
   resolveHtmlSpecimenCssDeclarationSource,
   resolveHtmlSpecimenCssRuleSource,
+  resolveHtmlSpecimenCssShorthandConflictSource,
   resolveHtmlSpecimenCssTokenSource,
   type HtmlSpecimenCssDeclarationSource,
   type HtmlSpecimenCssRuleSource,
@@ -38,7 +39,8 @@ type HtmlSpecimenPreviewFocusData = {
 }
 
 type HtmlSpecimenCssControlModel = {
-  blockedReason: 'token-value' | null
+  blockedReason: 'shorthand-conflict' | 'token-value' | null
+  conflictSource: HtmlSpecimenCssDeclarationSource | null
   editable: boolean
   source: HtmlSpecimenCssDeclarationSource | null
   ruleSource: HtmlSpecimenCssRuleSource | null
@@ -156,6 +158,7 @@ function renderHtmlSpecimenCssInspector({
       </div>
       {HTML_SPECIMEN_CSS_CONTROLS.map((control) => {
         const model = getHtmlSpecimenCssControlModel({ control, target })
+        const sourceSelector = getHtmlSpecimenCssControlSourceSelector(model)
 
         return (
           <label
@@ -181,13 +184,10 @@ function renderHtmlSpecimenCssInspector({
               spellCheck={false}
               type="text"
             />
-            {model.source || model.ruleSource || model.tokenSource ? (
+            {sourceSelector ? (
               <span
                 className="html-specimen-css-source"
-                title={
-                  (model.source ?? model.ruleSource ?? model.tokenSource)
-                    ?.selector
-                }
+                title={sourceSelector}
               >
                 {formatHtmlSpecimenCssControlSource(model)}
               </span>
@@ -269,12 +269,23 @@ function getHtmlSpecimenCssControlModel({
     nodes: target.nodes,
     property: control.property,
   })
+  const conflictSource = tokenSource
+    ? null
+    : resolveHtmlSpecimenCssShorthandConflictSource({
+        css: specimen.css,
+        nodeId: target.node.id,
+        nodes: target.nodes,
+        property: control.property,
+      })
   const blockedReason = tokenSource
     ? 'token-value'
-    : null
+    : conflictSource
+      ? 'shorthand-conflict'
+      : null
 
   return {
     blockedReason,
+    conflictSource,
     editable: blockedReason === null && (source !== null || ruleSource !== null),
     ruleSource,
     source,
@@ -333,6 +344,13 @@ function formatHtmlSpecimenCssControlSource(
     return formatHtmlSpecimenCssSource('Token', model.tokenSource)
   }
 
+  if (
+    model.blockedReason === 'shorthand-conflict' &&
+    model.conflictSource
+  ) {
+    return formatHtmlSpecimenCssSource('Conflict', model.conflictSource)
+  }
+
   return model.source
     ? formatHtmlSpecimenCssSource('Rule', model.source)
     : model.ruleSource
@@ -340,8 +358,19 @@ function formatHtmlSpecimenCssControlSource(
       : ''
 }
 
+function getHtmlSpecimenCssControlSourceSelector(
+  model: HtmlSpecimenCssControlModel,
+) {
+  return (
+    model.source ??
+    model.ruleSource ??
+    model.tokenSource ??
+    model.conflictSource
+  )?.selector ?? ''
+}
+
 function formatHtmlSpecimenCssSource(
-  prefix: 'Add' | 'Rule' | 'Token',
+  prefix: 'Add' | 'Conflict' | 'Rule' | 'Token',
   source: HtmlSpecimenCssDeclarationSource | HtmlSpecimenCssRuleSource,
 ) {
   const count = source.affectedNodeIds.length

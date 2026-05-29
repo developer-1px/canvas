@@ -119,6 +119,31 @@ describe('HtmlSpecimenVisualCssEdit', () => {
     })
   })
 
+  it('blocks shorthand edits when related longhand declarations exist', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `.primary {
+  margin-top: 4px;
+}`,
+    }
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '8px',
+        nodeId: 'primary',
+        property: 'margin',
+      },
+      nodes: createButtonNodes(),
+      specimen,
+    })
+
+    expect(result).toEqual({
+      affectedNodeIds: ['primary'],
+      ok: false,
+      reason: 'shorthand-conflict',
+      specimen,
+    })
+  })
+
   it('adds missing declarations to the most specific matching rule', () => {
     const result = applyHtmlSpecimenVisualCssEdit({
       intent: {

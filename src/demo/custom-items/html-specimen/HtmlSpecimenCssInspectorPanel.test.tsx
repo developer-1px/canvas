@@ -122,6 +122,31 @@ describe('HtmlSpecimenCssInspectorPanel', () => {
     expect(commitItemsChange).not.toHaveBeenCalled()
   })
 
+  it('shows shorthand conflicts as non-editable', () => {
+    const commitItemsChange = vi.fn(() => true)
+    const context = createContext({
+      commitItemsChange,
+      item: createHtmlSpecimenItem({
+        ...createButtonSpecimenData(),
+        css: `.primary {
+  margin-top: 4px;
+}`,
+      }),
+    })
+    const markup = renderToStaticMarkup(
+      <>{HTML_SPECIMEN_CSS_INSPECTOR_PANEL.render(context)}</>,
+    )
+
+    expect(markup).toContain('Conflict .primary / 1 node')
+    expect(markup).toContain('disabled=""')
+    expect(changeHtmlSpecimenPreviewTargetCss({
+      context,
+      nextValue: '8px',
+      property: 'margin',
+    })).toBe(false)
+    expect(commitItemsChange).not.toHaveBeenCalled()
+  })
+
   it('stays hidden when custom focus belongs to another item', () => {
     expect(HTML_SPECIMEN_CSS_INSPECTOR_PANEL.isVisible?.(
       createContext({

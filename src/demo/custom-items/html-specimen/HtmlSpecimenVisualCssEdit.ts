@@ -37,6 +37,7 @@ export type HtmlSpecimenVisualCssEditResult =
       reason:
         | 'node-not-found'
         | 'rule-not-found'
+        | 'shorthand-conflict'
         | 'token-value'
         | 'verification-failed'
       specimen: HtmlSpecimenData
@@ -113,6 +114,23 @@ export function applyHtmlSpecimenVisualCssEdit({
       affectedNodeIds: tokenSource.affectedNodeIds,
       ok: false,
       reason: 'token-value',
+      specimen,
+    }
+  }
+
+  const shorthandConflictSource =
+    resolveHtmlSpecimenCssShorthandConflictSource({
+      css: specimen.css,
+      nodeId: intent.nodeId,
+      nodes,
+      property: intent.property,
+    })
+
+  if (shorthandConflictSource) {
+    return {
+      affectedNodeIds: shorthandConflictSource.affectedNodeIds,
+      ok: false,
+      reason: 'shorthand-conflict',
       specimen,
     }
   }
@@ -310,6 +328,41 @@ export function resolveHtmlSpecimenCssTokenSource({
     if (
       source &&
       isHtmlSpecimenCssTokenValue(source.value) &&
+      (
+        !winner ||
+        compareCssSource(source, winner) > 0
+      )
+    ) {
+      winner = source
+    }
+  }
+
+  return winner
+}
+
+export function resolveHtmlSpecimenCssShorthandConflictSource({
+  css,
+  nodeId,
+  nodes,
+  property,
+}: {
+  css: string
+  nodeId: string
+  nodes: readonly HtmlSpecimenVisualCssNode[]
+  property: string
+}): HtmlSpecimenCssDeclarationSource | null {
+  let winner: HtmlSpecimenCssDeclarationSource | null = null
+
+  for (const candidateProperty of getCssShorthandConflictProperties(property)) {
+    const source = resolveHtmlSpecimenCssDeclarationSource({
+      css,
+      nodeId,
+      nodes,
+      property: candidateProperty,
+    })
+
+    if (
+      source &&
       (
         !winner ||
         compareCssSource(source, winner) > 0
@@ -691,6 +744,17 @@ function getCssTokenGuardProperties(property: string) {
       return ['margin-bottom', 'margin-left', 'margin-right', 'margin-top']
     case 'padding':
       return ['padding-bottom', 'padding-left', 'padding-right', 'padding-top']
+    default:
+      return []
+  }
+}
+
+function getCssShorthandConflictProperties(property: string) {
+  switch (normalizeProperty(property)) {
+    case 'border-radius':
+    case 'margin':
+    case 'padding':
+      return getCssTokenGuardProperties(property)
     default:
       return []
   }
