@@ -1650,13 +1650,13 @@ test('ignores inactive media rules in the inspector', async ({
     return event.defaultPrevented
   }, JSON.stringify({
     css: [
-      '.primary {',
-      '  color: #334155;',
-      '}',
       '@media (min-width: 99999px) {',
       '  .primary {',
       '    color: #ffffff;',
       '  }',
+      '}',
+      '.primary {',
+      '  color: #334155;',
       '}',
     ].join('\n'),
     html: [

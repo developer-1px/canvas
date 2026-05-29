@@ -242,6 +242,7 @@ export function applyHtmlSpecimenVisualCssEdit({
   const patch = previousSource
     ? planExistingDeclarationPatch({
         css: specimen.css,
+        mediaContext,
         nextValue: intent.nextValue,
         source: previousSource,
       })
@@ -1083,14 +1084,16 @@ export function serializeHtmlSpecimenCssPatch(
 
 function planExistingDeclarationPatch({
   css,
+  mediaContext,
   nextValue,
   source,
 }: {
   css: string
+  mediaContext?: HtmlSpecimenCssMediaContext
   nextValue: string
   source: HtmlSpecimenCssDeclarationSource
 }) {
-  const rule = parseCssRules(css)[source.ruleIndex]
+  const rule = parseCssRules(css, mediaContext)[source.ruleIndex]
   const declaration = rule?.declarations[source.declarationIndex]
 
   if (!declaration) {

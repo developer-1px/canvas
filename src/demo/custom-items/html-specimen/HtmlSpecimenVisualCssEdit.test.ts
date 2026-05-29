@@ -818,6 +818,48 @@ describe('HtmlSpecimenVisualCssEdit', () => {
     expect(result.specimen.css).toContain('color: #ffffff;')
   })
 
+  it('patches the active rule when inactive media declarations come first', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `@media (min-width: 1000px) {
+  .primary {
+    color: #ffffff;
+  }
+}
+.primary {
+  color: #334155;
+}`,
+      viewportWidth: 360,
+    }
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '#111827',
+        nodeId: 'primary',
+        property: 'color',
+      },
+      nodes: createButtonNodes(),
+      specimen,
+    })
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) {
+      throw new Error(result.reason)
+    }
+
+    expect(result.source).toMatchObject({
+      affectedNodeIds: ['primary'],
+      property: 'color',
+      selector: '.primary',
+      value: '#111827',
+    })
+    expect(result.source.atRule).toBeUndefined()
+    expect(result.specimen.css).toContain('color: #ffffff;')
+    expect(result.specimen.css).toContain(`.primary {
+  color: #111827;
+}`)
+  })
+
   it('blocks stylesheet edits when an inline style wins the property', () => {
     const specimen = {
       ...createButtonSpecimenData(),
