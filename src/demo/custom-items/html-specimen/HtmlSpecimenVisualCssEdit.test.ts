@@ -893,6 +893,43 @@ describe('HtmlSpecimenVisualCssEdit', () => {
     })
   })
 
+  it('matches escaped utility class selectors against indexed node classes', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `.w-\\[12px\\] {
+  color: #334155;
+}`,
+    }
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '#111827',
+        nodeId: 'utility',
+        property: 'color',
+      },
+      nodes: [
+        createNode({
+          className: 'w-[12px]',
+          id: 'utility',
+          path: [0],
+          tagName: 'button',
+        }),
+      ],
+      specimen,
+    })
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) {
+      throw new Error(result.reason)
+    }
+
+    expect(result.source).toMatchObject({
+      affectedNodeIds: ['utility'],
+      selector: '.w-\\[12px\\]',
+      value: '#111827',
+    })
+  })
+
   it('does not read class selectors from attribute values', () => {
     const specimen = {
       ...createButtonSpecimenData(),
