@@ -10,6 +10,14 @@ describe('isHtmlSpecimenCssComputedValueNoOp', () => {
     })).toBe(true)
   })
 
+  it('treats transparent and computed transparent rgba as no-op values', () => {
+    expect(isHtmlSpecimenCssComputedValueNoOp({
+      computedValue: 'rgba(0, 0, 0, 0)',
+      property: 'background-color',
+      value: 'transparent',
+    })).toBe(true)
+  })
+
   it('treats zero length units as no-op values', () => {
     expect(isHtmlSpecimenCssComputedValueNoOp({
       computedValue: '0px',

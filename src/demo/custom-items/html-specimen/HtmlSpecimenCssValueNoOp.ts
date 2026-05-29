@@ -64,6 +64,10 @@ function isHtmlSpecimenCssZeroLengthProperty(property: string) {
 function normalizeHtmlSpecimenCssColor(value: string) {
   const normalizedValue = value.trim().toLowerCase()
 
+  if (normalizedValue === 'transparent') {
+    return formatHtmlSpecimenCssColor(0, 0, 0, 0)
+  }
+
   return normalizeHtmlSpecimenHexColor(normalizedValue) ??
     normalizeHtmlSpecimenRgbColor(normalizedValue)
 }
