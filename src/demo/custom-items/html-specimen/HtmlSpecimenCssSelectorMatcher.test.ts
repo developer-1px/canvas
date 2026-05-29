@@ -177,7 +177,37 @@ describe('HtmlSpecimenCssSelectorMatcher', () => {
       nodes,
     )).toBeNull()
     expect(matchHtmlSpecimenCssSelectorList(
-      '.item:nth-child(1)',
+      '.item:nth-child(2)',
+      nodes[1]!,
+      nodes,
+    )).toEqual([0, 2, 0])
+    expect(matchHtmlSpecimenCssSelectorList(
+      '.item:nth-child(odd)',
+      nodes[2]!,
+      nodes,
+    )).toEqual([0, 2, 0])
+    expect(matchHtmlSpecimenCssSelectorList(
+      '.item:nth-child(2n + 1)',
+      nodes[0]!,
+      nodes,
+    )).toEqual([0, 2, 0])
+    expect(matchHtmlSpecimenCssSelectorList(
+      '.item:nth-child(-n + 2)',
+      nodes[1]!,
+      nodes,
+    )).toEqual([0, 2, 0])
+    expect(matchHtmlSpecimenCssSelectorList(
+      '.item:nth-last-child(1)',
+      nodes[2]!,
+      nodes,
+    )).toEqual([0, 2, 0])
+    expect(matchHtmlSpecimenCssSelectorList(
+      '.item:nth-child(2)',
+      nodes[0]!,
+      nodes,
+    )).toBeNull()
+    expect(matchHtmlSpecimenCssSelectorList(
+      '.item:nth-child(foo)',
       nodes[0]!,
       nodes,
     )).toBeNull()

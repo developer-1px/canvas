@@ -41,11 +41,23 @@ type CssPseudoFunctionSelector = {
   start: number
 }
 
-type CssSimplePseudoClassSelector = {
-  end: number
-  name: 'first-child' | 'last-child' | 'only-child'
-  start: number
+type CssNthFormula = {
+  a: number
+  b: number
 }
+
+type CssStructuralPseudoClassSelector =
+  | {
+      end: number
+      name: 'first-child' | 'last-child' | 'only-child'
+      start: number
+    }
+  | {
+      end: number
+      formula: CssNthFormula
+      name: 'nth-child' | 'nth-last-child'
+      start: number
+    }
 
 type CssPseudoSelectorRange = {
   end: number
@@ -54,7 +66,7 @@ type CssPseudoSelectorRange = {
 
 type CssPseudoSelectors = {
   functions: CssPseudoFunctionSelector[]
-  simpleClasses: CssSimplePseudoClassSelector[]
+  structuralClasses: CssStructuralPseudoClassSelector[]
 }
 
 type CssHasRelativeSelector = {
@@ -291,8 +303,8 @@ function matchesCompoundSelector(
     }
   }
 
-  if (!pseudoSelectors.simpleClasses.every((pseudoClass) =>
-    matchesCssSimplePseudoClassSelector(pseudoClass, node, nodes))) {
+  if (!pseudoSelectors.structuralClasses.every((pseudoClass) =>
+    matchesCssStructuralPseudoClassSelector(pseudoClass, node, nodes))) {
     return false
   }
 
@@ -300,7 +312,7 @@ function matchesCompoundSelector(
     compound,
     [
       ...pseudoSelectors.functions,
-      ...pseudoSelectors.simpleClasses,
+      ...pseudoSelectors.structuralClasses,
     ],
   )
 
@@ -450,8 +462,8 @@ function matchesCssHasRelation({
   }
 }
 
-function matchesCssSimplePseudoClassSelector(
-  pseudoClass: CssSimplePseudoClassSelector,
+function matchesCssStructuralPseudoClassSelector(
+  pseudoClass: CssStructuralPseudoClassSelector,
   node: HtmlSpecimenCssSelectorNode,
   nodes: readonly HtmlSpecimenCssSelectorNode[],
 ) {
@@ -460,6 +472,16 @@ function matchesCssSimplePseudoClassSelector(
       return isFirstNodeChild(node)
     case 'last-child':
       return isLastNodeChild(node, nodes)
+    case 'nth-child':
+      return matchesCssNthFormula(
+        getNodeChildPosition(node),
+        pseudoClass.formula,
+      )
+    case 'nth-last-child':
+      return matchesCssNthFormula(
+        getNodeLastChildPosition(node, nodes),
+        pseudoClass.formula,
+      )
     case 'only-child':
       return isFirstNodeChild(node) && isLastNodeChild(node, nodes)
   }
@@ -681,7 +703,7 @@ function hasUnsupportedCssPseudoSelector(selector: string) {
         continue
       }
 
-      const pseudoClass = readCssSimplePseudoClassSelector(selector, index)
+      const pseudoClass = readCssStructuralPseudoClassSelector(selector, index)
 
       if (pseudoClass) {
         index = pseudoClass.end
@@ -699,7 +721,7 @@ function hasUnsupportedCssPseudoSelector(selector: string) {
 
 function readCssPseudoSelectors(source: string): CssPseudoSelectors | null {
   const functions: CssPseudoFunctionSelector[] = []
-  const simpleClasses: CssSimplePseudoClassSelector[] = []
+  const structuralClasses: CssStructuralPseudoClassSelector[] = []
   let bracketDepth = 0
   let escaped = false
   let quote: '"' | "'" | null = null
@@ -756,13 +778,13 @@ function readCssPseudoSelectors(source: string): CssPseudoSelectors | null {
         continue
       }
 
-      const pseudoClass = readCssSimplePseudoClassSelector(source, index)
+      const pseudoClass = readCssStructuralPseudoClassSelector(source, index)
 
       if (!pseudoClass) {
         return null
       }
 
-      simpleClasses.push(pseudoClass)
+      structuralClasses.push(pseudoClass)
       index = pseudoClass.end
       continue
     }
@@ -773,7 +795,7 @@ function readCssPseudoSelectors(source: string): CssPseudoSelectors | null {
   return bracketDepth === 0 && quote === null
     ? {
         functions,
-        simpleClasses,
+        structuralClasses,
       }
     : null
 }
@@ -822,36 +844,113 @@ function readCssPseudoFunctionSelector(
   }
 }
 
-function readCssSimplePseudoClassSelector(
+function readCssStructuralPseudoClassSelector(
   source: string,
   start: number,
-): CssSimplePseudoClassSelector | null {
+): CssStructuralPseudoClassSelector | null {
   if (source[start] !== ':' || source[start + 1] === ':') {
     return null
   }
 
-  const match = /^(first-child|last-child|only-child)(?![-_a-zA-Z0-9(])/i
+  const staticMatch = /^(first-child|last-child|only-child)(?![-_a-zA-Z0-9(])/i
     .exec(source.slice(start + 1))
+
+  const staticName = staticMatch?.[1]?.toLowerCase()
+
+  if (
+    staticName === 'first-child' ||
+    staticName === 'last-child' ||
+    staticName === 'only-child'
+  ) {
+    return {
+      end: start + 1 + staticName.length,
+      name: staticName,
+      start,
+    }
+  }
+
+  const nthMatch = /^(nth-child|nth-last-child)\(/i
+    .exec(source.slice(start + 1))
+  const nthName = nthMatch?.[1]?.toLowerCase()
+
+  if (nthName !== 'nth-child' && nthName !== 'nth-last-child') {
+    return null
+  }
+
+  const openParen = start + 1 + nthName.length
+  const closeParen = findCssFunctionEnd(source, openParen)
+
+  if (closeParen === null) {
+    return null
+  }
+
+  const formula = parseCssNthFormula(source.slice(openParen + 1, closeParen))
+
+  if (!formula) {
+    return null
+  }
+
+  return {
+    end: closeParen + 1,
+    formula,
+    name: nthName,
+    start,
+  }
+}
+
+function parseCssNthFormula(source: string): CssNthFormula | null {
+  const formula = source.toLowerCase().replace(/\s+/g, '')
+
+  if (formula.length === 0) {
+    return null
+  }
+
+  if (formula === 'odd') {
+    return { a: 2, b: 1 }
+  }
+
+  if (formula === 'even') {
+    return { a: 2, b: 0 }
+  }
+
+  if (/^[+-]?\d+$/.test(formula)) {
+    return { a: 0, b: Number(formula) }
+  }
+
+  const match = /^([+-]?\d*)n([+-]\d+)?$/.exec(formula)
 
   if (!match) {
     return null
   }
 
-  const name = match[1]?.toLowerCase()
+  const coefficient = match[1] ?? ''
+  const a = coefficient === '' || coefficient === '+'
+    ? 1
+    : coefficient === '-'
+      ? -1
+      : Number(coefficient)
+  const b = match[2] ? Number(match[2]) : 0
 
-  if (
-    name !== 'first-child' &&
-    name !== 'last-child' &&
-    name !== 'only-child'
-  ) {
-    return null
+  return Number.isSafeInteger(a) && Number.isSafeInteger(b)
+    ? { a, b }
+    : null
+}
+
+function matchesCssNthFormula(
+  position: number | null,
+  formula: CssNthFormula,
+) {
+  if (position === null || position < 1) {
+    return false
   }
 
-  return {
-    end: start + 1 + name.length,
-    name,
-    start,
+  if (formula.a === 0) {
+    return position === formula.b
   }
+
+  const step = (position - formula.b) / formula.a
+
+  return Number.isInteger(step) && step >= 0
 }
 
 function findCssFunctionEnd(source: string, openParen: number) {
@@ -1351,35 +1450,72 @@ function isNodeParent(
 }
 
 function isFirstNodeChild(node: HtmlSpecimenCssSelectorNode) {
-  return node.path !== undefined &&
-    node.path.length > 0 &&
-    node.path.at(-1) === 0
+  return getNodeSiblingIndex(node) === 0
 }
 
 function isLastNodeChild(
   node: HtmlSpecimenCssSelectorNode,
   nodes: readonly HtmlSpecimenCssSelectorNode[],
 ) {
-  const nodePath = node.path
+  const siblingIndex = getNodeSiblingIndex(node)
+  const lastSiblingIndex = getLastNodeSiblingIndex(node, nodes)
 
-  if (!nodePath || nodePath.length === 0) {
-    return false
+  return siblingIndex !== null && siblingIndex === lastSiblingIndex
+}
+
+function getNodeChildPosition(node: HtmlSpecimenCssSelectorNode) {
+  const siblingIndex = getNodeSiblingIndex(node)
+
+  return siblingIndex === null ? null : siblingIndex + 1
+}
+
+function getNodeLastChildPosition(
+  node: HtmlSpecimenCssSelectorNode,
+  nodes: readonly HtmlSpecimenCssSelectorNode[],
+) {
+  const siblingIndex = getNodeSiblingIndex(node)
+  const lastSiblingIndex = getLastNodeSiblingIndex(node, nodes)
+
+  return siblingIndex === null || lastSiblingIndex === null
+    ? null
+    : lastSiblingIndex - siblingIndex + 1
+}
+
+function getNodeSiblingIndex(node: HtmlSpecimenCssSelectorNode) {
+  if (!node.path || node.path.length === 0) {
+    return null
   }
 
-  const nodeSiblingIndex = nodePath.at(-1)
+  return node.path.at(-1) ?? null
+}
 
-  return nodeSiblingIndex !== undefined &&
-    !nodes.some((candidate) => {
-      if (!candidate.path || candidate === node) {
-        return false
-      }
+function getLastNodeSiblingIndex(
+  node: HtmlSpecimenCssSelectorNode,
+  nodes: readonly HtmlSpecimenCssSelectorNode[],
+) {
+  const nodePath = node.path
+  let lastSiblingIndex = getNodeSiblingIndex(node)
 
-      const candidateSiblingIndex = candidate.path.at(-1)
+  if (!nodePath || lastSiblingIndex === null) {
+    return null
+  }
 
-      return candidateSiblingIndex !== undefined &&
-        candidateSiblingIndex > nodeSiblingIndex &&
-        hasSameParentPath(candidate.path, nodePath)
-    })
+  for (const candidate of nodes) {
+    if (!candidate.path || !hasSameParentPath(candidate.path, nodePath)) {
+      continue
+    }
+
+    const candidateSiblingIndex = candidate.path.at(-1)
+
+    if (
+      candidateSiblingIndex !== undefined &&
+      candidateSiblingIndex > lastSiblingIndex
+    ) {
+      lastSiblingIndex = candidateSiblingIndex
+    }
+  }
+
+  return lastSiblingIndex
 }
 
 function isNodeAncestor(
@@ -1505,13 +1641,13 @@ function calculateSpecificity(selector: string): [number, number, number] {
     calculateCssPseudoFunctionSpecificity(selector)
   const pseudoSelectors = readCssPseudoSelectors(selector) ?? {
     functions: [],
-    simpleClasses: [],
+    structuralClasses: [],
   }
   const selectorWithoutPseudos = removeCssPseudoSelectors(
     selector,
     [
       ...pseudoSelectors.functions,
-      ...pseudoSelectors.simpleClasses,
+      ...pseudoSelectors.structuralClasses,
     ],
   )
   const selectorWithoutAttributes =
@@ -1525,7 +1661,7 @@ function calculateSpecificity(selector: string): [number, number, number] {
   const classCount = (
     readCssSimpleSelectorNames(selectorWithoutAttributes, '.').length +
     attributeCount +
-    pseudoSelectors.simpleClasses.length
+    pseudoSelectors.structuralClasses.length
   )
   const tagCount = selectorWithoutAttributes
     .split(/[\s>+~]+/)

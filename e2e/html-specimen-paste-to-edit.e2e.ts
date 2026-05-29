@@ -1463,7 +1463,7 @@ test('keeps unsupported pseudo-class selector CSS read-only', async ({
     return event.defaultPrevented
   }, JSON.stringify({
     css: [
-      '.primary:nth-child(1) {',
+      '.primary:first-child-of-type {',
       '  color: #334155;',
       '}',
     ].join('\n'),
@@ -1491,7 +1491,7 @@ test('keeps unsupported pseudo-class selector CSS read-only', async ({
   await expect.poll(async () =>
     preview.evaluate((host) =>
       host.shadowRoot?.querySelector('style')?.textContent ?? ''),
-  ).toContain('.primary:nth-child(1)')
+  ).toContain('.primary:first-child-of-type')
 })
 
 test('matches structural child pseudo class selector rules', async ({
@@ -1551,6 +1551,67 @@ test('matches structural child pseudo class selector rules', async ({
   ).toBe('rgb(17, 24, 39)')
   await expect.poll(async () =>
     preview.locator('div#second').evaluate((row) =>
+      getComputedStyle(row).color),
+  ).not.toBe('rgb(17, 24, 39)')
+})
+
+test('matches nth-child pseudo class selector rules', async ({
+  page,
+}) => {
+  await page.goto('/')
+
+  const pasteWasHandled = await page.evaluate((text) => {
+    const data = new DataTransfer()
+
+    data.setData('text/plain', text)
+
+    const event = new ClipboardEvent('paste', {
+      bubbles: true,
+      cancelable: true,
+      clipboardData: data,
+    })
+
+    window.dispatchEvent(event)
+
+    return event.defaultPrevented
+  }, JSON.stringify({
+    css: [
+      '.table-row:nth-child(2) {',
+      '  color: #334155;',
+      '}',
+    ].join('\n'),
+    html: [
+      '<main>',
+      '<div id="first" class="table-row">One</div>',
+      '<div id="second" class="table-row">Two</div>',
+      '</main>',
+    ].join(''),
+  }))
+
+  expect(pasteWasHandled).toBe(true)
+
+  const preview = page.locator('.demo-html-specimen-preview').last()
+
+  await expect(preview).toBeVisible()
+  await preview.locator('div#second').click()
+
+  const textField = page
+    .locator('.html-specimen-css-field')
+    .filter({ hasText: 'Text' })
+  const textInput = textField.locator('input')
+
+  await expect(textField
+    .getByText('Rule .table-row:nth-child(2) / 1 node'),
+  ).toBeVisible()
+  await expect(textInput).toHaveValue('#334155')
+  await textInput.fill('#111827')
+  await textInput.blur()
+  await expect.poll(async () =>
+    preview.locator('div#second').evaluate((row) =>
+      getComputedStyle(row).color),
+  ).toBe('rgb(17, 24, 39)')
+  await expect.poll(async () =>
+    preview.locator('div#first').evaluate((row) =>
       getComputedStyle(row).color),
   ).not.toBe('rgb(17, 24, 39)')
 })
