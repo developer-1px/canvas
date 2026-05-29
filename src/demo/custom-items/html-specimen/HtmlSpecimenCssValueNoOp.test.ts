@@ -8,6 +8,16 @@ describe('isHtmlSpecimenCssComputedValueNoOp', () => {
       property: 'background-color',
       value: '#2563eb',
     })).toBe(true)
+    expect(isHtmlSpecimenCssComputedValueNoOp({
+      computedValue: 'rgb(255, 0, 0)',
+      property: 'color',
+      value: 'rgb(100% 0% 0%)',
+    })).toBe(true)
+    expect(isHtmlSpecimenCssComputedValueNoOp({
+      computedValue: 'rgba(255, 0, 0, 0.5)',
+      property: 'color',
+      value: 'rgba(255 0 0 / 50%)',
+    })).toBe(true)
   })
 
   it('treats transparent and computed transparent rgba as no-op values', () => {

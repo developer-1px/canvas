@@ -123,7 +123,19 @@ function normalizeHtmlSpecimenRgbColor(value: string) {
 }
 
 function parseHtmlSpecimenCssRgbChannel(value: string | undefined) {
-  if (!value || !/^\d+$/.test(value)) {
+  if (!value) {
+    return null
+  }
+
+  if (value.endsWith('%')) {
+    const percentage = parseHtmlSpecimenCssPercentage(value)
+
+    return percentage === null
+      ? null
+      : Math.round(percentage * 255)
+  }
+
+  if (!/^\d+$/.test(value)) {
     return null
   }
 
@@ -135,6 +147,14 @@ function parseHtmlSpecimenCssRgbChannel(value: string | undefined) {
 }
 
 function parseHtmlSpecimenCssAlphaChannel(value: string) {
+  if (value.endsWith('%')) {
+    const percentage = parseHtmlSpecimenCssPercentage(value)
+
+    return percentage === null
+      ? null
+      : Math.round(percentage * 255)
+  }
+
   if (!/^(?:0|1|0?\.\d+)$/.test(value)) {
     return null
   }
@@ -143,6 +163,20 @@ function parseHtmlSpecimenCssAlphaChannel(value: string) {
 
   return alpha >= 0 && alpha <= 1
     ? Math.round(alpha * 255)
+    : null
+}
+
+function parseHtmlSpecimenCssPercentage(value: string) {
+  const match = /^(\d+|\d*\.\d+)%$/.exec(value)
+
+  if (!match) {
+    return null
+  }
+
+  const percentage = Number(match[1])
+
+  return percentage >= 0 && percentage <= 100
+    ? percentage / 100
     : null
 }
 
