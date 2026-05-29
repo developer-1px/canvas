@@ -1506,6 +1506,78 @@ test('matches enabled pseudo-class selector rules', async ({
   ).not.toBe('rgb(17, 24, 39)')
 })
 
+test('matches fieldset-inherited disabled pseudo-class selector rules', async ({
+  page,
+}) => {
+  await page.goto('/')
+
+  const pasteWasHandled = await page.evaluate((text) => {
+    const data = new DataTransfer()
+
+    data.setData('text/plain', text)
+
+    const event = new ClipboardEvent('paste', {
+      bubbles: true,
+      cancelable: true,
+      clipboardData: data,
+    })
+
+    window.dispatchEvent(event)
+
+    return event.defaultPrevented
+  }, JSON.stringify({
+    css: [
+      '.primary:disabled {',
+      '  color: #334155;',
+      '}',
+    ].join('\n'),
+    html: [
+      '<main>',
+      '<fieldset disabled>',
+      '<button id="primary" class="primary">Save</button>',
+      '</fieldset>',
+      '<button id="secondary" class="primary">Other</button>',
+      '</main>',
+    ].join(''),
+  }))
+
+  expect(pasteWasHandled).toBe(true)
+
+  const preview = page.locator('.demo-html-specimen-preview').last()
+
+  await expect(preview).toBeVisible()
+  await preview.locator('button#primary').evaluate((button) => {
+    button.dispatchEvent(new PointerEvent('pointerdown', {
+      bubbles: true,
+      composed: false,
+      pointerId: 1,
+    }))
+  })
+
+  const textField = page
+    .locator('.html-specimen-css-field')
+    .filter({ hasText: 'Text' })
+  const textInput = textField.locator('input')
+
+  await expect(textField.getByText('Rule .primary:disabled / 1 node'))
+    .toBeVisible()
+  await expect(textInput).toHaveValue('#334155')
+  await textInput.fill('#111827')
+  await textInput.blur()
+  await expect.poll(async () =>
+    preview.evaluate((host) =>
+      host.shadowRoot?.querySelector('style')?.textContent ?? ''),
+  ).toContain('color: #111827;')
+  await expect.poll(async () =>
+    preview.locator('button#primary').evaluate((button) =>
+      getComputedStyle(button).color),
+  ).toBe('rgb(17, 24, 39)')
+  await expect.poll(async () =>
+    preview.locator('button#secondary').evaluate((button) =>
+      getComputedStyle(button).color),
+  ).not.toBe('rgb(17, 24, 39)')
+})
+
 test('keeps unsupported pseudo-class selector CSS read-only', async ({
   page,
 }) => {

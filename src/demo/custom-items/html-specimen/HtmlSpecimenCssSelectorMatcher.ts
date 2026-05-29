@@ -326,7 +326,7 @@ function matchesCompoundSelector(
   }
 
   if (!pseudoSelectors.stateClasses.every((pseudoClass) =>
-    matchesCssStatePseudoClassSelector(pseudoClass, node))) {
+    matchesCssStatePseudoClassSelector(pseudoClass, node, nodes))) {
     return false
   }
 
@@ -530,12 +530,14 @@ function matchesCssStructuralPseudoClassSelector(
 function matchesCssStatePseudoClassSelector(
   pseudoClass: CssStatePseudoClassSelector,
   node: HtmlSpecimenCssSelectorNode,
+  nodes: readonly HtmlSpecimenCssSelectorNode[],
 ) {
   switch (pseudoClass.name) {
     case 'disabled':
-      return isDisabledCssFormControl(node)
+      return isDisabledCssFormControl(node, nodes)
     case 'enabled':
-      return isEnableableCssFormControl(node) && !isDisabledCssFormControl(node)
+      return isEnableableCssFormControl(node) &&
+        !isDisabledCssFormControl(node, nodes)
   }
 }
 
@@ -1817,9 +1819,77 @@ function isEnableableCssFormControl(node: HtmlSpecimenCssSelectorNode) {
   return CSS_ENABLEABLE_FORM_CONTROL_TAGS.has(node.tagName.toLowerCase())
 }
 
-function isDisabledCssFormControl(node: HtmlSpecimenCssSelectorNode) {
-  return isEnableableCssFormControl(node) &&
-    readCssNodeAttribute(node, 'disabled') !== undefined
+function isDisabledCssFormControl(
+  node: HtmlSpecimenCssSelectorNode,
+  nodes: readonly HtmlSpecimenCssSelectorNode[],
+) {
+  if (!isEnableableCssFormControl(node)) {
+    return false
+  }
+
+  if (readCssNodeAttribute(node, 'disabled') !== undefined) {
+    return true
+  }
+
+  if (node.tagName.toLowerCase() === 'option' && isInsideDisabledOptgroup(
+    node,
+    nodes,
+  )) {
+    return true
+  }
+
+  return isInsideDisabledFieldset(node, nodes)
+}
+
+function isInsideDisabledOptgroup(
+  node: HtmlSpecimenCssSelectorNode,
+  nodes: readonly HtmlSpecimenCssSelectorNode[],
+) {
+  return getNodeAncestors({ node, nodes }).some((ancestor) =>
+    ancestor.tagName.toLowerCase() === 'optgroup' &&
+    readCssNodeAttribute(ancestor, 'disabled') !== undefined)
+}
+
+function isInsideDisabledFieldset(
+  node: HtmlSpecimenCssSelectorNode,
+  nodes: readonly HtmlSpecimenCssSelectorNode[],
+) {
+  return getNodeAncestors({ node, nodes }).some((ancestor) =>
+    ancestor.tagName.toLowerCase() === 'fieldset' &&
+    readCssNodeAttribute(ancestor, 'disabled') !== undefined &&
+    !isInsideFirstFieldsetLegend({
+      fieldset: ancestor,
+      node,
+      nodes,
+    }))
+}
+
+function isInsideFirstFieldsetLegend({
+  fieldset,
+  node,
+  nodes,
+}: {
+  fieldset: HtmlSpecimenCssSelectorNode
+  node: HtmlSpecimenCssSelectorNode
+  nodes: readonly HtmlSpecimenCssSelectorNode[]
+}) {
+  const firstLegend = getFirstFieldsetLegendChild(fieldset, nodes)
+
+  return firstLegend !== null && isNodeAncestor(firstLegend, node)
+}
+
+function getFirstFieldsetLegendChild(
+  fieldset: HtmlSpecimenCssSelectorNode,
+  nodes: readonly HtmlSpecimenCssSelectorNode[],
+) {
+  const legends = nodes
+    .filter((candidate) =>
+      candidate.tagName.toLowerCase() === 'legend' &&
+      isNodeParent(fieldset, candidate))
+    .sort((left, right) =>
+      (left.path?.at(-1) ?? 0) - (right.path?.at(-1) ?? 0))
+
+  return legends[0] ?? null
 }
 
 function calculateSpecificity(selector: string): [number, number, number] {

@@ -172,6 +172,81 @@ describe('HtmlSpecimenCssSelectorMatcher', () => {
     )).toBeNull()
   })
 
+  it('matches inherited disabled form state against DOM ancestry', () => {
+    const disabledFieldset = createNode({
+      attributes: { disabled: '' },
+      className: 'group',
+      id: 'group',
+      path: [0],
+      tagName: 'fieldset',
+    })
+    const disabledButton = createNode({
+      className: 'primary',
+      id: 'disabled',
+      path: [0, 1],
+      tagName: 'button',
+    })
+    const legend = createNode({
+      className: 'label',
+      id: 'legend',
+      path: [0, 0],
+      tagName: 'legend',
+    })
+    const legendInput = createNode({
+      className: 'primary',
+      id: 'legend-input',
+      path: [0, 0, 0],
+      tagName: 'input',
+    })
+    const optgroup = createNode({
+      attributes: { disabled: '' },
+      className: 'group',
+      id: 'options',
+      path: [1],
+      tagName: 'optgroup',
+    })
+    const option = createNode({
+      className: 'primary',
+      id: 'option',
+      path: [1, 0],
+      tagName: 'option',
+    })
+    const nodes = [
+      disabledFieldset,
+      disabledButton,
+      legend,
+      legendInput,
+      optgroup,
+      option,
+    ]
+
+    expect(matchHtmlSpecimenCssSelectorList(
+      '.primary:disabled',
+      disabledButton,
+      nodes,
+    )).toEqual([0, 2, 0])
+    expect(matchHtmlSpecimenCssSelectorList(
+      '.primary:enabled',
+      disabledButton,
+      nodes,
+    )).toBeNull()
+    expect(matchHtmlSpecimenCssSelectorList(
+      '.primary:enabled',
+      legendInput,
+      nodes,
+    )).toEqual([0, 2, 0])
+    expect(matchHtmlSpecimenCssSelectorList(
+      '.primary:disabled',
+      legendInput,
+      nodes,
+    )).toBeNull()
+    expect(matchHtmlSpecimenCssSelectorList(
+      '.primary:disabled',
+      option,
+      nodes,
+    )).toEqual([0, 2, 0])
+  })
+
   it('matches structural child pseudo classes against indexed DOM paths', () => {
     const nodes = [
       createNode({
