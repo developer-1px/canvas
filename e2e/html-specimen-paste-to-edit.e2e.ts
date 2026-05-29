@@ -146,7 +146,7 @@ test('keeps token-backed preview CSS read-only in the inspector', async ({
       '}',
       '.primary {',
       '  color: #ffffff;',
-      '  background-color: var(--brand);',
+      '  background: var(--brand);',
       '}',
     ].join('\n'),
     html: [
@@ -174,5 +174,5 @@ test('keeps token-backed preview CSS read-only in the inspector', async ({
   await expect.poll(async () =>
     preview.evaluate((host) =>
       host.shadowRoot?.querySelector('style')?.textContent ?? ''),
-  ).toContain('background-color: var(--brand);')
+  ).toContain('background: var(--brand);')
 })

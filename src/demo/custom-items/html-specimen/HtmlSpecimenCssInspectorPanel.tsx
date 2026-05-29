@@ -10,9 +10,9 @@ import {
 } from './HtmlSpecimenCustomItemModel'
 import {
   applyHtmlSpecimenVisualCssEdit,
-  isHtmlSpecimenCssTokenValue,
   resolveHtmlSpecimenCssDeclarationSource,
   resolveHtmlSpecimenCssRuleSource,
+  resolveHtmlSpecimenCssTokenSource,
   type HtmlSpecimenCssDeclarationSource,
   type HtmlSpecimenCssRuleSource,
   type HtmlSpecimenVisualCssNode,
@@ -42,6 +42,7 @@ type HtmlSpecimenCssControlModel = {
   editable: boolean
   source: HtmlSpecimenCssDeclarationSource | null
   ruleSource: HtmlSpecimenCssRuleSource | null
+  tokenSource: HtmlSpecimenCssDeclarationSource | null
   value: string
 }
 
@@ -180,10 +181,13 @@ function renderHtmlSpecimenCssInspector({
               spellCheck={false}
               type="text"
             />
-            {model.source || model.ruleSource ? (
+            {model.source || model.ruleSource || model.tokenSource ? (
               <span
                 className="html-specimen-css-source"
-                title={(model.source ?? model.ruleSource)?.selector}
+                title={
+                  (model.source ?? model.ruleSource ?? model.tokenSource)
+                    ?.selector
+                }
               >
                 {formatHtmlSpecimenCssControlSource(model)}
               </span>
@@ -245,8 +249,9 @@ function getHtmlSpecimenCssControlModel({
   control: HtmlSpecimenCssControl
   target: HtmlSpecimenCssInspectorTarget
 }): HtmlSpecimenCssControlModel {
+  const specimen = getHtmlSpecimenData(target.item)
   const source = resolveHtmlSpecimenCssDeclarationSource({
-    css: getHtmlSpecimenData(target.item).css,
+    css: specimen.css,
     nodeId: target.node.id,
     nodes: target.nodes,
     property: control.property,
@@ -254,11 +259,17 @@ function getHtmlSpecimenCssControlModel({
   const ruleSource = source
     ? null
     : resolveHtmlSpecimenCssRuleSource({
-        css: getHtmlSpecimenData(target.item).css,
+        css: specimen.css,
         nodeId: target.node.id,
         nodes: target.nodes,
       })
-  const blockedReason = source && isHtmlSpecimenCssTokenValue(source.value)
+  const tokenSource = resolveHtmlSpecimenCssTokenSource({
+    css: specimen.css,
+    nodeId: target.node.id,
+    nodes: target.nodes,
+    property: control.property,
+  })
+  const blockedReason = tokenSource
     ? 'token-value'
     : null
 
@@ -267,7 +278,9 @@ function getHtmlSpecimenCssControlModel({
     editable: blockedReason === null && (source !== null || ruleSource !== null),
     ruleSource,
     source,
+    tokenSource,
     value:
+      tokenSource?.value ??
       source?.value ??
       target.node.computedStyle?.[control.computedStyleKey] ??
       '',
@@ -316,8 +329,8 @@ function formatHtmlSpecimenCssTargetLabel(
 function formatHtmlSpecimenCssControlSource(
   model: HtmlSpecimenCssControlModel,
 ) {
-  if (model.blockedReason === 'token-value' && model.source) {
-    return formatHtmlSpecimenCssSource('Token', model.source)
+  if (model.blockedReason === 'token-value' && model.tokenSource) {
+    return formatHtmlSpecimenCssSource('Token', model.tokenSource)
   }
 
   return model.source

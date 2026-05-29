@@ -101,10 +101,16 @@ export function applyHtmlSpecimenVisualCssEdit({
     nodes,
     property: intent.property,
   })
+  const tokenSource = resolveHtmlSpecimenCssTokenSource({
+    css: specimen.css,
+    nodeId: intent.nodeId,
+    nodes,
+    property: intent.property,
+  })
 
-  if (previousSource && isHtmlSpecimenCssTokenValue(previousSource.value)) {
+  if (tokenSource) {
     return {
-      affectedNodeIds: previousSource.affectedNodeIds,
+      affectedNodeIds: tokenSource.affectedNodeIds,
       ok: false,
       reason: 'token-value',
       specimen,
@@ -274,6 +280,46 @@ export function resolveHtmlSpecimenCssRuleSource({
         specificity: match.specificity,
       }
     : null
+}
+
+export function resolveHtmlSpecimenCssTokenSource({
+  css,
+  nodeId,
+  nodes,
+  property,
+}: {
+  css: string
+  nodeId: string
+  nodes: readonly HtmlSpecimenVisualCssNode[]
+  property: string
+}): HtmlSpecimenCssDeclarationSource | null {
+  const properties = new Set([
+    normalizeProperty(property),
+    ...getCssTokenGuardProperties(property),
+  ])
+  let winner: HtmlSpecimenCssDeclarationSource | null = null
+
+  for (const candidateProperty of properties) {
+    const source = resolveHtmlSpecimenCssDeclarationSource({
+      css,
+      nodeId,
+      nodes,
+      property: candidateProperty,
+    })
+
+    if (
+      source &&
+      isHtmlSpecimenCssTokenValue(source.value) &&
+      (
+        !winner ||
+        compareCssSource(source, winner) > 0
+      )
+    ) {
+      winner = source
+    }
+  }
+
+  return winner
 }
 
 export function isHtmlSpecimenCssTokenValue(value: string) {
@@ -628,6 +674,26 @@ function findNode(
 
 function normalizeProperty(property: string) {
   return property.trim().toLowerCase()
+}
+
+function getCssTokenGuardProperties(property: string) {
+  switch (normalizeProperty(property)) {
+    case 'background-color':
+      return ['background']
+    case 'border-radius':
+      return [
+        'border-bottom-left-radius',
+        'border-bottom-right-radius',
+        'border-top-left-radius',
+        'border-top-right-radius',
+      ]
+    case 'margin':
+      return ['margin-bottom', 'margin-left', 'margin-right', 'margin-top']
+    case 'padding':
+      return ['padding-bottom', 'padding-left', 'padding-right', 'padding-top']
+    default:
+      return []
+  }
 }
 
 function countLeadingWhitespace(value: string) {
