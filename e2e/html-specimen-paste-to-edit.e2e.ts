@@ -149,7 +149,11 @@ test('pastes HTML/CSS and edits preview target CSS through the inspector', async
   await expect.poll(async () =>
     preview.evaluate((host) =>
       host.shadowRoot?.querySelector('style')?.textContent ?? ''),
-  ).toContain('background-color: #111827;')
+  ).toContain('background: #111827;')
+  await expect.poll(async () =>
+    preview.evaluate((host) =>
+      host.shadowRoot?.querySelector('style')?.textContent ?? ''),
+  ).not.toContain('background-color: #111827;')
   await expect.poll(async () =>
     preview.locator('button#primary').evaluate((button) =>
       getComputedStyle(button).backgroundColor),
@@ -229,7 +233,13 @@ test('pastes HTML/CSS and edits preview target CSS through the inspector', async
       (window as Window & {
         __htmlSpecimenExportedCss?: string
       }).__htmlSpecimenExportedCss ?? ''),
-  ).toContain('background-color: #111827;')
+  ).toContain('background: #111827;')
+  await expect.poll(async () =>
+    page.evaluate(() =>
+      (window as Window & {
+        __htmlSpecimenExportedCss?: string
+      }).__htmlSpecimenExportedCss ?? ''),
+  ).not.toContain('background-color: #111827;')
   await expect.poll(async () =>
     page.evaluate(() =>
       (window as Window & {

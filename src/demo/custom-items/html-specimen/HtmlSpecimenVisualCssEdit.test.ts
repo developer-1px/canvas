@@ -50,6 +50,45 @@ describe('HtmlSpecimenVisualCssEdit', () => {
     })
   })
 
+  it('patches the winning background shorthand for visual fill edits', () => {
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '#111827',
+        nodeId: 'primary',
+        property: 'background-color',
+      },
+      nodes: createButtonNodes(),
+      specimen: createButtonSpecimenData(),
+    })
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) {
+      throw new Error(result.reason)
+    }
+
+    expect(result.source).toMatchObject({
+      property: 'background',
+      selector: '.primary',
+      value: '#111827',
+    })
+    expect(result.patch).toMatchObject({
+      kind: 'replace-declaration-value',
+      nextValue: '#111827',
+      previousValue: '#2563eb',
+      property: 'background',
+      selector: '.primary',
+    })
+    expect(result.specimen.css).toContain('background: #111827;')
+    expect(result.specimen.css).not.toContain('background-color: #111827;')
+    expect(result.verification).toEqual({
+      actualValue: '#111827',
+      expectedValue: '#111827',
+      passed: true,
+      property: 'background-color',
+    })
+  })
+
   it('patches shared CSS rules and reports the affected nodes', () => {
     const result = applyHtmlSpecimenVisualCssEdit({
       intent: {

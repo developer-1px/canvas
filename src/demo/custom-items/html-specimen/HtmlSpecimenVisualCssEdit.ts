@@ -278,7 +278,7 @@ export function resolveHtmlSpecimenCssDeclarationSource({
     return null
   }
 
-  const normalizedProperty = normalizeProperty(property)
+  const matchedProperties = new Set(getCssDeclarationSourceProperties(property))
   const rules = parseCssRules(css)
   let winner: {
     declaration: CssDeclaration
@@ -294,7 +294,7 @@ export function resolveHtmlSpecimenCssDeclarationSource({
     }
 
     for (const declaration of rule.declarations) {
-      if (declaration.property !== normalizedProperty) {
+      if (!matchedProperties.has(declaration.property)) {
         continue
       }
 
@@ -1095,6 +1095,17 @@ function findNode(
 
 function normalizeProperty(property: string) {
   return property.trim().toLowerCase()
+}
+
+function getCssDeclarationSourceProperties(property: string) {
+  const normalizedProperty = normalizeProperty(property)
+
+  switch (normalizedProperty) {
+    case 'background-color':
+      return [normalizedProperty, 'background']
+    default:
+      return [normalizedProperty]
+  }
 }
 
 function getCssTokenGuardProperties(property: string) {

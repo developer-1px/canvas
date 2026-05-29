@@ -74,7 +74,8 @@ describe('HtmlSpecimen paste-to-edit flow', () => {
 
     expect(patchedItem?.data.html).toBe(item.data.html)
     expect(JSON.stringify(patchedItem?.data.html)).not.toContain('style=')
-    expect(patchedItem?.data.css).toContain('background-color: #111827;')
+    expect(patchedItem?.data.css).toContain('background: #111827;')
+    expect(patchedItem?.data.css).not.toContain('background-color: #111827;')
     expect(commitItemsChange).toHaveBeenCalledWith(
       expect.objectContaining({
         type: 'replace-changed',
