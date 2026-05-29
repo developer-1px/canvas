@@ -1757,6 +1757,72 @@ test('edits safe token-backed preview CSS through custom properties', async ({
   ).toContain('font: var(--control-font);')
 })
 
+test('edits inherited token-backed preview CSS through ancestor custom properties', async ({
+  page,
+}) => {
+  await page.goto('/')
+
+  const pasteWasHandled = await page.evaluate((text) => {
+    const data = new DataTransfer()
+
+    data.setData('text/plain', text)
+
+    const event = new ClipboardEvent('paste', {
+      bubbles: true,
+      cancelable: true,
+      clipboardData: data,
+    })
+
+    window.dispatchEvent(event)
+
+    return event.defaultPrevented
+  }, JSON.stringify({
+    css: [
+      '.theme {',
+      '  --brand: #2563eb;',
+      '}',
+      '.primary {',
+      '  color: #ffffff;',
+      '  background: var(--brand);',
+      '}',
+    ].join('\n'),
+    html: [
+      '<main class="theme">',
+      '<button id="primary" class="primary">Save</button>',
+      '</main>',
+    ].join(''),
+  }))
+
+  expect(pasteWasHandled).toBe(true)
+
+  const preview = page.locator('.demo-html-specimen-preview').last()
+
+  await expect(preview).toBeVisible()
+  await preview.locator('button#primary').click()
+
+  const backgroundField = page
+    .locator('.html-specimen-css-field')
+    .filter({ hasText: 'Bg' })
+  const backgroundInput = backgroundField.locator('input')
+
+  await expect(backgroundField.getByText('Token .theme / 1 node')).toBeVisible()
+  await expect(backgroundInput).toHaveValue('#2563eb')
+  await backgroundInput.fill('#111827')
+  await backgroundInput.blur()
+  await expect.poll(async () =>
+    preview.locator('button#primary').evaluate((button) =>
+      getComputedStyle(button).backgroundColor),
+  ).toBe('rgb(17, 24, 39)')
+  await expect.poll(async () =>
+    preview.evaluate((host) =>
+      host.shadowRoot?.querySelector('style')?.textContent ?? ''),
+  ).toContain('--brand: #111827;')
+  await expect.poll(async () =>
+    preview.evaluate((host) =>
+      host.shadowRoot?.querySelector('style')?.textContent ?? ''),
+  ).toContain('background: var(--brand);')
+})
+
 test('keeps complex background shorthand fill edits read-only', async ({
   page,
 }) => {

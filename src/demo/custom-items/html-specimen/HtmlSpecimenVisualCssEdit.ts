@@ -743,6 +743,7 @@ export function resolveHtmlSpecimenCssTokenDefinitionSource({
   nodes: readonly HtmlSpecimenVisualCssNode[]
   property: string
 }): HtmlSpecimenCssDeclarationSource | null {
+  const node = findNode(nodes, nodeId)
   const tokenSource = resolveHtmlSpecimenCssTokenSource({
     css,
     mediaContext,
@@ -767,6 +768,8 @@ export function resolveHtmlSpecimenCssTokenDefinitionSource({
   const match = resolveHtmlSpecimenCssCustomPropertyDeclarationMatch({
     css,
     mediaContext,
+    node,
+    nodes,
     property: tokenName,
   })
 
@@ -775,7 +778,14 @@ export function resolveHtmlSpecimenCssTokenDefinitionSource({
   }
 
   return {
-    affectedNodeIds: tokenSource.affectedNodeIds,
+    affectedNodeIds: getAffectedNodeIdsForTokenDefinitionMatch({
+      css,
+      match,
+      mediaContext,
+      nodes,
+      property: tokenName,
+      tokenSource,
+    }),
     ...(match.rule.atRule ? { atRule: match.rule.atRule } : {}),
     declarationIndex: match.declaration.declarationIndex,
     important: match.declaration.important,
@@ -786,6 +796,41 @@ export function resolveHtmlSpecimenCssTokenDefinitionSource({
     specificity: match.specificity,
     value: match.declaration.value,
   }
+}
+
+function getAffectedNodeIdsForTokenDefinitionMatch({
+  css,
+  match,
+  mediaContext,
+  nodes,
+  property,
+  tokenSource,
+}: {
+  css: string
+  match: CssDeclarationMatch
+  mediaContext?: HtmlSpecimenCssMediaContext
+  nodes: readonly HtmlSpecimenVisualCssNode[]
+  property: string
+  tokenSource: HtmlSpecimenCssDeclarationSource
+}) {
+  return tokenSource.affectedNodeIds.filter((nodeId) => {
+    const node = findNode(nodes, nodeId)
+
+    if (!node) {
+      return false
+    }
+
+    const candidateMatch = resolveHtmlSpecimenCssCustomPropertyDeclarationMatch({
+      css,
+      mediaContext,
+      node,
+      nodes,
+      property,
+    })
+
+    return candidateMatch !== null &&
+      isSameCssDeclarationMatch(candidateMatch, match)
+  })
 }
 
 export function createHtmlSpecimenShadowPreviewCss({
@@ -932,6 +977,45 @@ function findTopLevelCssComma(source: string) {
 function resolveHtmlSpecimenCssCustomPropertyDeclarationMatch({
   css,
   mediaContext,
+  node,
+  nodes,
+  property,
+}: {
+  css: string
+  mediaContext?: HtmlSpecimenCssMediaContext
+  node: HtmlSpecimenVisualCssNode | null
+  nodes: readonly HtmlSpecimenVisualCssNode[]
+  property: string
+}): CssDeclarationMatch | null {
+  if (node) {
+    for (const inheritedNode of getHtmlSpecimenNodeInheritanceChain({
+      node,
+      nodes,
+    })) {
+      const match = resolveHtmlSpecimenCssDeclarationMatchForProperties({
+        css,
+        mediaContext,
+        node: inheritedNode,
+        nodes,
+        properties: [property],
+      })
+
+      if (match) {
+        return match
+      }
+    }
+  }
+
+  return resolveHtmlSpecimenCssRootCustomPropertyDeclarationMatch({
+    css,
+    mediaContext,
+    property,
+  })
+}
+
+function resolveHtmlSpecimenCssRootCustomPropertyDeclarationMatch({
+  css,
+  mediaContext,
   property,
 }: {
   css: string
@@ -982,6 +1066,41 @@ function resolveHtmlSpecimenCssCustomPropertyDeclarationMatch({
   }
 
   return winner
+}
+
+function getHtmlSpecimenNodeInheritanceChain({
+  node,
+  nodes,
+}: {
+  node: HtmlSpecimenVisualCssNode
+  nodes: readonly HtmlSpecimenVisualCssNode[]
+}) {
+  const chain = [node]
+
+  if (!node.path) {
+    return chain
+  }
+
+  for (let depth = node.path.length - 1; depth > 0; depth -= 1) {
+    const ancestorPath = node.path.slice(0, depth)
+    const ancestor = nodes.find((candidate) =>
+      areHtmlSpecimenNodePathsEqual(candidate.path, ancestorPath))
+
+    if (ancestor) {
+      chain.push(ancestor)
+    }
+  }
+
+  return chain
+}
+
+function areHtmlSpecimenNodePathsEqual(
+  left: readonly number[] | undefined,
+  right: readonly number[],
+) {
+  return left !== undefined &&
+    left.length === right.length &&
+    left.every((part, index) => part === right[index])
 }
 
 function getHtmlSpecimenCssRootSelectorSpecificity(
