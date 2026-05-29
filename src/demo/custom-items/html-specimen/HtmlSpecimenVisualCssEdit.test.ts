@@ -500,6 +500,105 @@ describe('HtmlSpecimenVisualCssEdit', () => {
     })
   })
 
+  it('matches exact attribute selectors against indexed node attributes', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `.button[data-state="active"] {
+  color: #334155;
+}`,
+    }
+    const nodes = [
+      createNode({
+        attributes: { 'data-state': 'active' },
+        className: 'button',
+        id: 'active',
+        path: [0],
+        tagName: 'button',
+      }),
+      createNode({
+        attributes: { 'data-state': 'idle' },
+        className: 'button',
+        id: 'idle',
+        path: [1],
+        tagName: 'button',
+      }),
+    ]
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '#111827',
+        nodeId: 'active',
+        property: 'color',
+      },
+      nodes,
+      specimen,
+    })
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) {
+      throw new Error(result.reason)
+    }
+
+    expect(result.source).toMatchObject({
+      affectedNodeIds: ['active'],
+      selector: '.button[data-state="active"]',
+      value: '#111827',
+    })
+    expect(applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '#111827',
+        nodeId: 'idle',
+        property: 'color',
+      },
+      nodes,
+      specimen,
+    })).toEqual({
+      affectedNodeIds: [],
+      ok: false,
+      reason: 'rule-not-found',
+      specimen,
+    })
+  })
+
+  it('does not read class selectors from attribute values', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `.button[data-kind=".primary"] {
+  color: #334155;
+}`,
+    }
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '#111827',
+        nodeId: 'primary-kind',
+        property: 'color',
+      },
+      nodes: [
+        createNode({
+          attributes: { 'data-kind': '.primary' },
+          className: 'button',
+          id: 'primary-kind',
+          path: [0],
+          tagName: 'button',
+        }),
+      ],
+      specimen,
+    })
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) {
+      throw new Error(result.reason)
+    }
+
+    expect(result.source).toMatchObject({
+      affectedNodeIds: ['primary-kind'],
+      selector: '.button[data-kind=".primary"]',
+      specificity: [0, 2, 0],
+      value: '#111827',
+    })
+  })
+
   it('does not simplify unsupported pseudo-class selectors into patchable matches', () => {
     const specimen = {
       ...createButtonSpecimenData(),
@@ -647,18 +746,24 @@ function createButtonNodes(): HtmlSpecimenVisualCssNode[] {
 }
 
 function createNode({
+  attributes = {},
   className,
   id,
   path,
   tagName,
 }: {
+  attributes?: Readonly<Record<string, string>>
   className: string
   id: string
   path?: readonly number[]
   tagName: string
 }): HtmlSpecimenVisualCssNode {
   return {
-    attributes: { class: className },
+    attributes: {
+      ...attributes,
+      class: className,
+      id,
+    },
     classList: className.split(' '),
     id,
     path,

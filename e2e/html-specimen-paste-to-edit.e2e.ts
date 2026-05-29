@@ -683,6 +683,73 @@ test('matches descendant selector rules against DOM ancestry', async ({
   await expect(looseTextInput).toBeDisabled()
 })
 
+test('matches attribute selector rules against DOM attributes', async ({
+  page,
+}) => {
+  await page.goto('/')
+
+  const pasteWasHandled = await page.evaluate((text) => {
+    const data = new DataTransfer()
+
+    data.setData('text/plain', text)
+
+    const event = new ClipboardEvent('paste', {
+      bubbles: true,
+      cancelable: true,
+      clipboardData: data,
+    })
+
+    window.dispatchEvent(event)
+
+    return event.defaultPrevented
+  }, JSON.stringify({
+    css: [
+      '.button[data-state="active"] {',
+      '  color: #334155;',
+      '}',
+    ].join('\n'),
+    html: [
+      '<main>',
+      '<button id="active" class="button" data-state="active">Active</button>',
+      '<button id="idle" class="button" data-state="idle">Idle</button>',
+      '</main>',
+    ].join(''),
+  }))
+
+  expect(pasteWasHandled).toBe(true)
+
+  const preview = page.locator('.demo-html-specimen-preview').last()
+
+  await expect(preview).toBeVisible()
+  await preview.locator('button#active').click()
+
+  const textField = page
+    .locator('.html-specimen-css-field')
+    .filter({ hasText: 'Text' })
+  const textInput = textField.locator('input')
+
+  await expect(textField
+    .getByText('Rule .button[data-state="active"] / 1 node'),
+  ).toBeVisible()
+  await expect(textInput).toHaveValue('#334155')
+  await textInput.fill('#111827')
+  await textInput.blur()
+  await expect.poll(async () =>
+    preview.locator('button#active').evaluate((button) =>
+      getComputedStyle(button).color),
+  ).toBe('rgb(17, 24, 39)')
+
+  await preview.locator('button#idle').click()
+
+  const idleTextField = page
+    .locator('.html-specimen-css-field')
+    .filter({ hasText: 'Text' })
+  const idleTextInput = idleTextField.locator('input')
+
+  await expect(idleTextField.getByText('No matching rule')).toBeVisible()
+  await expect(idleTextInput).toBeDisabled()
+})
+
 test('keeps unsupported pseudo-class selector CSS read-only', async ({
   page,
 }) => {
