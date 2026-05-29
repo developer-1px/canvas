@@ -106,7 +106,10 @@ describe('HtmlSpecimenCssSelectorMatcher', () => {
     expect(matches('.button:where([data-state="active"])', node)).toBe(true)
     expect(matches(':is(button, a).primary', node)).toBe(true)
     expect(matches(':is(a, .secondary).primary', node)).toBe(false)
-    expect(matches('.primary:not(.disabled)', node)).toBe(false)
+    expect(matches('.primary:not(.disabled)', node)).toBe(true)
+    expect(matches('.primary:not(.button)', node)).toBe(false)
+    expect(matches('.primary:not(:hover)', node)).toBe(false)
+    expect(matches('.primary:hover', node)).toBe(false)
     expect(matchHtmlSpecimenCssSelectorList(
       ':where(.button).primary',
       node,
@@ -114,6 +117,11 @@ describe('HtmlSpecimenCssSelectorMatcher', () => {
     )).toEqual([0, 1, 0])
     expect(matchHtmlSpecimenCssSelectorList(
       ':is(button, .button).primary',
+      node,
+      [node],
+    )).toEqual([0, 2, 0])
+    expect(matchHtmlSpecimenCssSelectorList(
+      '.primary:not(.disabled)',
       node,
       [node],
     )).toEqual([0, 2, 0])

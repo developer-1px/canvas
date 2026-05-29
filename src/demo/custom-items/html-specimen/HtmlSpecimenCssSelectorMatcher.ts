@@ -37,7 +37,7 @@ type CssAttributeSelector =
 type CssPseudoFunctionSelector = {
   args: string
   end: number
-  name: 'is' | 'where'
+  name: 'is' | 'not' | 'where'
   start: number
 }
 
@@ -242,7 +242,22 @@ function matchesCompoundSelector(
   }
 
   for (const pseudoFunction of pseudoFunctions) {
-    if (!matchHtmlSpecimenCssSelectorList(pseudoFunction.args, node, nodes)) {
+    if (!canMatchCssPseudoFunctionSelector(pseudoFunction)) {
+      return false
+    }
+
+    const matchesPseudoArgs =
+      matchHtmlSpecimenCssSelectorList(pseudoFunction.args, node, nodes) !== null
+
+    if (pseudoFunction.name === 'not') {
+      if (matchesPseudoArgs) {
+        return false
+      }
+
+      continue
+    }
+
+    if (!matchesPseudoArgs) {
       return false
     }
   }
@@ -291,6 +306,20 @@ function matchesCompoundSelector(
   const tagName = getSelectorTagName(simpleCompound)
 
   return tagName === null || tagName === node.tagName.toLowerCase()
+}
+
+function canMatchCssPseudoFunctionSelector(
+  pseudoFunction: CssPseudoFunctionSelector,
+) {
+  const selectors = splitCssSelectorList(pseudoFunction.args)
+
+  return selectors.length > 0 &&
+    selectors.every((selector) => {
+      const selectorPart = selector.trim()
+
+      return selectorPart.length > 0 &&
+        parseCssSelectorSegments(selectorPart) !== null
+    })
 }
 
 function parseCssSelectorSegments(selector: string): CssSelectorSegment[] | null {
@@ -593,7 +622,7 @@ function readCssPseudoFunctionSelector(
     return null
   }
 
-  const match = /^(is|where)\(/i.exec(source.slice(start + 1))
+  const match = /^(is|not|where)\(/i.exec(source.slice(start + 1))
 
   if (!match) {
     return null
@@ -601,7 +630,7 @@ function readCssPseudoFunctionSelector(
 
   const name = match[1]?.toLowerCase()
 
-  if (name !== 'is' && name !== 'where') {
+  if (name !== 'is' && name !== 'not' && name !== 'where') {
     return null
   }
 

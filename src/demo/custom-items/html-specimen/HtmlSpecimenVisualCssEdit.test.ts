@@ -1507,7 +1507,51 @@ describe('HtmlSpecimenVisualCssEdit', () => {
     })
   })
 
-  it('does not simplify unsupported pseudo-class selectors into patchable matches', () => {
+  it('matches not pseudo function selectors against indexed nodes', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `.primary:not(.disabled) {
+  color: #334155;
+}`,
+    }
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '#111827',
+        nodeId: 'primary',
+        property: 'color',
+      },
+      nodes: [
+        createNode({
+          className: 'primary',
+          id: 'primary',
+          path: [0],
+          tagName: 'button',
+        }),
+        createNode({
+          className: 'primary disabled',
+          id: 'disabled',
+          path: [1],
+          tagName: 'button',
+        }),
+      ],
+      specimen,
+    })
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) {
+      throw new Error(result.reason)
+    }
+
+    expect(result.source).toMatchObject({
+      affectedNodeIds: ['primary'],
+      selector: '.primary:not(.disabled)',
+      specificity: [0, 2, 0],
+      value: '#111827',
+    })
+  })
+
+  it('does not match negated pseudo function selectors when the node is excluded', () => {
     const specimen = {
       ...createButtonSpecimenData(),
       css: `.primary:not(.disabled) {
@@ -1524,6 +1568,37 @@ describe('HtmlSpecimenVisualCssEdit', () => {
       nodes: [
         createNode({
           className: 'primary disabled',
+          id: 'primary',
+          path: [0],
+          tagName: 'button',
+        }),
+      ],
+      specimen,
+    })).toEqual({
+      affectedNodeIds: [],
+      ok: false,
+      reason: 'rule-not-found',
+      specimen,
+    })
+  })
+
+  it('does not simplify unsupported pseudo-class selectors into patchable matches', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `.primary:nth-child(1) {
+  color: #334155;
+}`,
+    }
+
+    expect(applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '#111827',
+        nodeId: 'primary',
+        property: 'color',
+      },
+      nodes: [
+        createNode({
+          className: 'primary',
           id: 'primary',
           path: [0],
           tagName: 'button',
