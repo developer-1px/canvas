@@ -529,9 +529,49 @@ describe('HtmlSpecimenVisualCssEdit', () => {
     expect(result.specimen.css).toContain('background: var(--brand);')
   })
 
+  it('patches token definitions declared in a root selector list', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `:root, html {
+  --brand: #2563eb;
+}
+.primary {
+  background: var(--brand);
+}`,
+    }
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '#111827',
+        nodeId: 'primary',
+        property: 'background-color',
+      },
+      nodes: createButtonNodes(),
+      specimen,
+    })
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) {
+      throw new Error(result.reason)
+    }
+
+    expect(result.source).toMatchObject({
+      affectedNodeIds: ['primary'],
+      property: '--brand',
+      selector: ':root, html',
+      value: '#111827',
+    })
+    expect(result.previousSource).toMatchObject({
+      property: '--brand',
+      value: '#2563eb',
+    })
+    expect(result.specimen.css).toContain('--brand: #111827;')
+    expect(result.specimen.css).toContain('background: var(--brand);')
+  })
+
   it('bridges root custom properties into the Shadow DOM preview surface', () => {
     const css = [
-      ':root {',
+      ':root, html {',
       '  --brand: #2563eb;',
       '}',
       '@media (max-width: 400px) {',

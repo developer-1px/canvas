@@ -91,7 +91,7 @@ export function matchHtmlSpecimenCssSelectorList(
 ): [number, number, number] | null {
   let best: [number, number, number] | null = null
 
-  for (const candidate of splitCssSelectorList(selector)) {
+  for (const candidate of splitHtmlSpecimenCssSelectorList(selector)) {
     const selectorPart = candidate.trim()
 
     if (!matchesSelector(selectorPart, node, nodes)) {
@@ -108,7 +108,7 @@ export function matchHtmlSpecimenCssSelectorList(
   return best
 }
 
-function splitCssSelectorList(selector: string) {
+export function splitHtmlSpecimenCssSelectorList(selector: string) {
   const selectors: string[] = []
   let bracketDepth = 0
   let parenDepth = 0
@@ -374,7 +374,7 @@ function canMatchCssPseudoFunctionSelector(
     return parseCssHasRelativeSelectors(pseudoFunction.args) !== null
   }
 
-  const selectors = splitCssSelectorList(pseudoFunction.args)
+  const selectors = splitHtmlSpecimenCssSelectorList(pseudoFunction.args)
 
   return selectors.length > 0 &&
     selectors.every((selector) => {
@@ -411,7 +411,7 @@ function parseCssHasRelativeSelectors(
 ): CssHasRelativeSelector[] | null {
   const relatives: CssHasRelativeSelector[] = []
 
-  for (const selector of splitCssSelectorList(args)) {
+  for (const selector of splitHtmlSpecimenCssSelectorList(args)) {
     const relative = parseCssHasRelativeSelector(selector)
 
     if (!relative) {
@@ -1804,7 +1804,7 @@ function calculateSingleCssPseudoFunctionSpecificity(
 
   let specificity: [number, number, number] = [0, 0, 0]
 
-  for (const selector of splitCssSelectorList(pseudoFunction.args)) {
+  for (const selector of splitHtmlSpecimenCssSelectorList(pseudoFunction.args)) {
     const selectorPart = selector.trim()
 
     if (

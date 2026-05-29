@@ -100,7 +100,7 @@ describe('HtmlSpecimenCssInspectorPanel', () => {
       commitItemsChange,
       item: createHtmlSpecimenItem({
         ...createButtonSpecimenData(),
-        css: `:root {
+        css: `:root, html {
   --brand: #2563eb;
 }
 .primary {
@@ -113,7 +113,7 @@ describe('HtmlSpecimenCssInspectorPanel', () => {
     )
 
     expect(markup).toContain('#2563eb')
-    expect(markup).toContain('Token :root / 1 node')
+    expect(markup).toContain('Token :root, html / 1 node')
     expect(changeHtmlSpecimenPreviewTargetCss({
       context,
       nextValue: '#111827',

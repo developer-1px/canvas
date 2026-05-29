@@ -1699,7 +1699,7 @@ test('edits safe token-backed preview CSS through custom properties', async ({
     return event.defaultPrevented
   }, JSON.stringify({
     css: [
-      ':root {',
+      ':root, html {',
       '  --brand: #2563eb;',
       '  --control-font: 700 14px/1 system-ui;',
       '}',
@@ -1732,7 +1732,7 @@ test('edits safe token-backed preview CSS through custom properties', async ({
     .filter({ hasText: 'Font' })
   const fontInput = fontField.locator('input')
 
-  await expect(backgroundField.getByText('Token :root / 1 node')).toBeVisible()
+  await expect(backgroundField.getByText('Token :root, html / 1 node')).toBeVisible()
   await expect(backgroundInput).toHaveValue('#2563eb')
   await backgroundInput.fill('#111827')
   await backgroundInput.blur()

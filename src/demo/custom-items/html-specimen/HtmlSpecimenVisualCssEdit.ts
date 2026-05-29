@@ -2,6 +2,7 @@ import type { HtmlSpecimenData } from './HtmlSpecimenCustomItemModel'
 import {
   compareHtmlSpecimenCssSpecificity,
   matchHtmlSpecimenCssSelectorList,
+  splitHtmlSpecimenCssSelectorList,
 } from './HtmlSpecimenCssSelectorMatcher'
 
 export type HtmlSpecimenVisualCssNode = {
@@ -951,9 +952,30 @@ function resolveHtmlSpecimenCssCustomPropertyDeclarationMatch({
 function getHtmlSpecimenCssRootSelectorSpecificity(
   selector: string,
 ): [number, number, number] | null {
-  const normalizedSelector = stripCssComments(selector).replace(/\s+/g, ' ').trim()
+  let best: [number, number, number] | null = null
 
-  switch (normalizedSelector) {
+  for (const selectorPart of splitHtmlSpecimenCssSelectorList(
+    stripCssComments(selector),
+  )) {
+    const specificity = getHtmlSpecimenCssRootSelectorPartSpecificity(
+      selectorPart,
+    )
+
+    if (
+      specificity &&
+      (!best || compareHtmlSpecimenCssSpecificity(specificity, best) > 0)
+    ) {
+      best = specificity
+    }
+  }
+
+  return best
+}
+
+function getHtmlSpecimenCssRootSelectorPartSpecificity(
+  selector: string,
+): [number, number, number] | null {
+  switch (selector.replace(/\s+/g, ' ').trim()) {
     case ':root':
       return [0, 1, 0]
     case 'html':
