@@ -1975,7 +1975,7 @@ function isCssAtRuleActive(
   }
 
   if (isCssAtRuleKeyword(source, '@supports')) {
-    return matchesCssSupportsRule(source) ?? true
+    return matchesCssSupportsRule(source) ?? false
   }
 
   if (isCssLayerAtRule(source)) {

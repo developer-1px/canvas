@@ -2551,6 +2551,74 @@ test('ignores inactive supports rules in the inspector', async ({
   ).toBe('rgb(17, 24, 39)')
 })
 
+test('ignores unknown supports rules in the inspector', async ({
+  page,
+}) => {
+  await page.goto('/')
+
+  const pasteWasHandled = await page.evaluate((text) => {
+    const data = new DataTransfer()
+
+    data.setData('text/plain', text)
+
+    const event = new ClipboardEvent('paste', {
+      bubbles: true,
+      cancelable: true,
+      clipboardData: data,
+    })
+
+    window.dispatchEvent(event)
+
+    return event.defaultPrevented
+  }, JSON.stringify({
+    css: [
+      '.primary {',
+      '  color: #334155;',
+      '}',
+      '@supports (unknown-preview-editor-property: enabled) {',
+      '  .primary {',
+      '    color: #ffffff;',
+      '  }',
+      '}',
+    ].join('\n'),
+    html: [
+      '<main>',
+      '<button id="primary" class="primary">Save</button>',
+      '</main>',
+    ].join(''),
+  }))
+
+  expect(pasteWasHandled).toBe(true)
+
+  const preview = page.locator('.demo-html-specimen-preview').last()
+
+  await expect(preview).toBeVisible()
+  await preview.locator('button#primary').click()
+
+  const textField = page
+    .locator('.html-specimen-css-field')
+    .filter({ hasText: 'Text' })
+  const textInput = textField.locator('input')
+
+  await expect(textField.getByText('Rule .primary / 1 node')).toBeVisible()
+  await expect(textField.getByText('Scoped @supports')).not.toBeVisible()
+  await expect(textInput).toHaveValue('#334155')
+  await textInput.fill('#111827')
+  await textInput.blur()
+  await expect.poll(async () =>
+    preview.evaluate((host) =>
+      host.shadowRoot?.querySelector('style')?.textContent ?? ''),
+  ).toContain('color: #111827;')
+  await expect.poll(async () =>
+    preview.evaluate((host) =>
+      host.shadowRoot?.querySelector('style')?.textContent ?? ''),
+  ).toContain('color: #ffffff;')
+  await expect.poll(async () =>
+    preview.locator('button#primary').evaluate((button) =>
+      getComputedStyle(button).color),
+  ).toBe('rgb(17, 24, 39)')
+})
+
 test('keeps unlayered declarations above later normal layer rules', async ({
   page,
 }) => {

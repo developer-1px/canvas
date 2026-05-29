@@ -1416,6 +1416,82 @@ describe('HtmlSpecimenVisualCssEdit', () => {
     expect(result.specimen.css).toContain('color: #ffffff;')
   })
 
+  it('ignores unknown supports declarations when choosing the patch source', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `.primary {
+  color: #334155;
+}
+@supports (unknown-preview-editor-property: enabled) {
+  .primary {
+    color: #ffffff;
+  }
+}`,
+    }
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '#111827',
+        nodeId: 'primary',
+        property: 'color',
+      },
+      nodes: createButtonNodes(),
+      specimen,
+    })
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) {
+      throw new Error(result.reason)
+    }
+
+    expect(result.source).toMatchObject({
+      affectedNodeIds: ['primary'],
+      property: 'color',
+      selector: '.primary',
+      value: '#111827',
+    })
+    expect(result.source.atRule).toBeUndefined()
+    expect(result.specimen.css).toContain(`.primary {
+  color: #111827;
+}`)
+    expect(result.specimen.css).toContain('color: #ffffff;')
+  })
+
+  it('patches active known supports declarations', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `@supports (display: grid) {
+  .primary {
+    color: #ffffff;
+  }
+}`,
+    }
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '#111827',
+        nodeId: 'primary',
+        property: 'color',
+      },
+      nodes: createButtonNodes(),
+      specimen,
+    })
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) {
+      throw new Error(result.reason)
+    }
+
+    expect(result.source).toMatchObject({
+      affectedNodeIds: ['primary'],
+      atRule: '@supports (display: grid)',
+      property: 'color',
+      selector: '.primary',
+      value: '#111827',
+    })
+    expect(result.specimen.css).toContain('color: #111827;')
+  })
+
   it('lets unlayered normal declarations beat later layered declarations', () => {
     const specimen = {
       ...createButtonSpecimenData(),
@@ -2637,6 +2713,34 @@ describe('HtmlSpecimenVisualCssEdit', () => {
     expect(resolveHtmlSpecimenCssScopedRuleSource({
       css,
       mediaContext,
+      nodeId: 'primary',
+      nodes: createButtonNodes(),
+      property: 'color',
+    })).toBeNull()
+  })
+
+  it('filters unknown supports rules when resolving sources', () => {
+    const css = `.primary {
+  color: #334155;
+}
+@supports (unknown-preview-editor-property: enabled) {
+  .primary {
+    color: #ffffff;
+  }
+}`
+
+    expect(resolveHtmlSpecimenCssDeclarationSource({
+      css,
+      nodeId: 'primary',
+      nodes: createButtonNodes(),
+      property: 'color',
+    })).toMatchObject({
+      property: 'color',
+      selector: '.primary',
+      value: '#334155',
+    })
+    expect(resolveHtmlSpecimenCssScopedRuleSource({
+      css,
       nodeId: 'primary',
       nodes: createButtonNodes(),
       property: 'color',
