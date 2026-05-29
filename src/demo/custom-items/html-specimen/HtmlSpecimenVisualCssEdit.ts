@@ -451,6 +451,16 @@ function getAffectedNodeIdsForDeclarationMatch({
 }) {
   return nodes
     .filter((candidate) => {
+      if (hasHtmlSpecimenWinningInlineStyleSource({
+        css,
+        mediaContext,
+        node: candidate,
+        nodes,
+        properties: [property],
+      })) {
+        return false
+      }
+
       const candidateMatch = resolveHtmlSpecimenCssDeclarationMatch({
         css,
         mediaContext,
@@ -478,14 +488,26 @@ function getAffectedNodeIdsForRelatedDeclarationMatch({
   nodes: readonly HtmlSpecimenVisualCssNode[]
   properties: Iterable<string>
 }) {
+  const sourceProperties = [...properties]
+
   return nodes
     .filter((candidate) => {
+      if (hasHtmlSpecimenWinningInlineStyleSource({
+        css,
+        mediaContext,
+        node: candidate,
+        nodes,
+        properties: sourceProperties,
+      })) {
+        return false
+      }
+
       const candidateMatch = resolveHtmlSpecimenCssDeclarationMatchForProperties({
         css,
         mediaContext,
         node: candidate,
         nodes,
-        properties,
+        properties: sourceProperties,
       })
 
       return candidateMatch !== null &&
@@ -561,6 +583,16 @@ function getAffectedNodeIdsForRuleInsertion({
 }) {
   return nodes
     .filter((candidate) => {
+      if (hasHtmlSpecimenWinningInlineStyleSource({
+        css,
+        mediaContext,
+        node: candidate,
+        nodes,
+        properties: [property],
+      })) {
+        return false
+      }
+
       const specificity = matchHtmlSpecimenCssSelectorList(
         match.rule.selector,
         candidate,
@@ -700,6 +732,29 @@ export function resolveHtmlSpecimenCssInlineStyleSource({
     property: inlineDeclaration.property,
     value: inlineDeclaration.value,
   }
+}
+
+function hasHtmlSpecimenWinningInlineStyleSource({
+  css,
+  mediaContext,
+  node,
+  nodes,
+  properties,
+}: {
+  css: string
+  mediaContext?: HtmlSpecimenCssMediaContext
+  node: HtmlSpecimenVisualCssNode
+  nodes: readonly HtmlSpecimenVisualCssNode[]
+  properties: Iterable<string>
+}) {
+  return Array.from(properties).some((property) =>
+    resolveHtmlSpecimenCssInlineStyleSource({
+      css,
+      mediaContext,
+      nodeId: node.id,
+      nodes,
+      property,
+    }) !== null)
 }
 
 function resolveHtmlSpecimenInlineDeclaration({
@@ -932,6 +987,16 @@ function getAffectedNodeIdsForScopedDeclarationMatch({
 }) {
   return nodes
     .filter((candidate) => {
+      if (hasHtmlSpecimenWinningInlineStyleSource({
+        css,
+        mediaContext,
+        node: candidate,
+        nodes,
+        properties: [property],
+      })) {
+        return false
+      }
+
       const candidateMatch = resolveHtmlSpecimenCssScopedDeclarationMatch({
         css,
         mediaContext,
