@@ -137,6 +137,28 @@ test('pastes HTML/CSS and edits preview target CSS through the inspector', async
     .filter({ hasText: 'Font' })
     .locator('input')).toHaveValue('14px')
 
+  const textInput = page
+    .locator('.html-specimen-css-field')
+    .filter({ hasText: 'Text' })
+    .locator('input')
+
+  await expect(textInput).toBeVisible()
+  await textInput.fill('#facc15')
+  await textInput.blur()
+
+  await expect.poll(async () =>
+    preview.evaluate((host) =>
+      host.shadowRoot?.querySelector('style')?.textContent ?? ''),
+  ).toContain('color: #facc15;')
+  await expect.poll(async () =>
+    preview.locator('button#primary').evaluate((button) =>
+      getComputedStyle(button).color),
+  ).toBe('rgb(250, 204, 21)')
+  await expect(page
+    .locator('.html-specimen-css-field')
+    .filter({ hasText: 'Text' })
+    .getByText('Rule .primary / 1 node')).toBeVisible()
+
   const backgroundInput = page
     .locator('.html-specimen-css-field')
     .filter({ hasText: 'Bg' })
@@ -183,6 +205,50 @@ test('pastes HTML/CSS and edits preview target CSS through the inspector', async
   await expect(page
     .locator('.html-specimen-css-field')
     .filter({ hasText: 'Stroke' })
+    .getByText('Rule .button / 2 nodes')).toBeVisible()
+
+  const fontInput = page
+    .locator('.html-specimen-css-field')
+    .filter({ hasText: 'Font' })
+    .locator('input')
+
+  await expect(fontInput).toBeVisible()
+  await fontInput.fill('18px')
+  await fontInput.blur()
+
+  await expect.poll(async () =>
+    preview.evaluate((host) =>
+      host.shadowRoot?.querySelector('style')?.textContent ?? ''),
+  ).toContain('font-size: 18px;')
+  await expect.poll(async () =>
+    preview.locator('button#primary').evaluate((button) =>
+      getComputedStyle(button).fontSize),
+  ).toBe('18px')
+  await expect(page
+    .locator('.html-specimen-css-field')
+    .filter({ hasText: 'Font' })
+    .getByText('Rule .button / 2 nodes')).toBeVisible()
+
+  const radiusInput = page
+    .locator('.html-specimen-css-field')
+    .filter({ hasText: 'Radius' })
+    .locator('input')
+
+  await expect(radiusInput).toBeVisible()
+  await radiusInput.fill('12px')
+  await radiusInput.blur()
+
+  await expect.poll(async () =>
+    preview.evaluate((host) =>
+      host.shadowRoot?.querySelector('style')?.textContent ?? ''),
+  ).toContain('border-radius: 12px;')
+  await expect.poll(async () =>
+    preview.locator('button#primary').evaluate((button) =>
+      getComputedStyle(button).borderTopLeftRadius),
+  ).toBe('12px')
+  await expect(page
+    .locator('.html-specimen-css-field')
+    .filter({ hasText: 'Radius' })
     .getByText('Rule .button / 2 nodes')).toBeVisible()
 
   const paddingInput = page
@@ -281,6 +347,24 @@ test('pastes HTML/CSS and edits preview target CSS through the inspector', async
         __htmlSpecimenExportedCss?: string
       }).__htmlSpecimenExportedCss ?? ''),
   ).not.toContain('background-color: #111827;')
+  await expect.poll(async () =>
+    page.evaluate(() =>
+      (window as Window & {
+        __htmlSpecimenExportedCss?: string
+      }).__htmlSpecimenExportedCss ?? ''),
+  ).toContain('color: #facc15;')
+  await expect.poll(async () =>
+    page.evaluate(() =>
+      (window as Window & {
+        __htmlSpecimenExportedCss?: string
+      }).__htmlSpecimenExportedCss ?? ''),
+  ).toContain('font-size: 18px;')
+  await expect.poll(async () =>
+    page.evaluate(() =>
+      (window as Window & {
+        __htmlSpecimenExportedCss?: string
+      }).__htmlSpecimenExportedCss ?? ''),
+  ).toContain('border-radius: 12px;')
   await expect.poll(async () =>
     page.evaluate(() =>
       (window as Window & {
