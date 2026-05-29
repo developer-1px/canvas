@@ -148,7 +148,7 @@ describe('HtmlSpecimenCssInspectorPanel', () => {
     expect(commitItemsChange).not.toHaveBeenCalled()
   })
 
-  it('shows scoped at-rule declarations as non-editable', () => {
+  it('edits scoped at-rule declarations through the shared patch path', () => {
     const commitItemsChange = vi.fn(() => true)
     const context = createContext({
       commitItemsChange,
@@ -167,13 +167,28 @@ describe('HtmlSpecimenCssInspectorPanel', () => {
 
     expect(markup).toContain('#ffffff')
     expect(markup).toContain('Scoped @media (min-width: 1px) / .primary / 1 node')
-    expect(markup).toContain('disabled=""')
     expect(changeHtmlSpecimenPreviewTargetCss({
       context,
       nextValue: '#111827',
       property: 'color',
-    })).toBe(false)
-    expect(commitItemsChange).not.toHaveBeenCalled()
+    })).toBe(true)
+    expect(commitItemsChange).toHaveBeenCalledWith(
+      {
+        items: [
+          expect.objectContaining({
+            id: 'html-specimen-1',
+            data: expect.objectContaining({
+              css: expect.stringContaining('color: #111827;'),
+            }),
+          }),
+        ],
+        type: 'replace-changed',
+      },
+      {
+        after: ['html-specimen-1'],
+        before: ['html-specimen-1'],
+      },
+    )
   })
 
   it('stays hidden when custom focus belongs to another item', () => {

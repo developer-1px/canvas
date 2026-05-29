@@ -649,7 +649,7 @@ describe('HtmlSpecimenVisualCssEdit', () => {
     })
   })
 
-  it('blocks edits to scoped at-rule declarations', () => {
+  it('patches scoped at-rule declarations', () => {
     const specimen = {
       ...createButtonSpecimenData(),
       css: `@media (min-width: 1px) {
@@ -668,12 +668,20 @@ describe('HtmlSpecimenVisualCssEdit', () => {
       specimen,
     })
 
-    expect(result).toEqual({
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) {
+      throw new Error(result.reason)
+    }
+
+    expect(result.source).toMatchObject({
       affectedNodeIds: ['primary'],
-      ok: false,
-      reason: 'scoped-rule',
-      specimen,
+      atRule: '@media (min-width: 1px)',
+      property: 'color',
+      selector: '.primary',
+      value: '#111827',
     })
+    expect(result.specimen.css).toContain('color: #111827;')
   })
 
   it('adds missing declarations to the most specific matching rule', () => {
@@ -1171,7 +1179,7 @@ describe('HtmlSpecimenVisualCssEdit', () => {
     })
   })
 
-  it('resolves scoped at-rule declarations without treating them as patchable rules', () => {
+  it('resolves scoped at-rule declarations as declaration sources', () => {
     expect(resolveHtmlSpecimenCssDeclarationSource({
       css: `@media (min-width: 1px) {
   .primary {
@@ -1181,7 +1189,13 @@ describe('HtmlSpecimenVisualCssEdit', () => {
       nodeId: 'primary',
       nodes: createButtonNodes(),
       property: 'background-color',
-    })).toBeNull()
+    })).toMatchObject({
+      affectedNodeIds: ['primary'],
+      atRule: '@media (min-width: 1px)',
+      property: 'background',
+      selector: '.primary',
+      value: '#2563eb',
+    })
     expect(resolveHtmlSpecimenCssScopedRuleSource({
       css: `@media (min-width: 1px) {
   .primary {
@@ -1197,6 +1211,26 @@ describe('HtmlSpecimenVisualCssEdit', () => {
       property: 'background',
       selector: '.primary',
       value: '#2563eb',
+    })
+  })
+
+  it('respects source order between scoped and top-level rules', () => {
+    expect(resolveHtmlSpecimenCssDeclarationSource({
+      css: `@media (min-width: 1px) {
+  .primary {
+    color: #ffffff;
+  }
+}
+.primary {
+  color: #334155;
+}`,
+      nodeId: 'primary',
+      nodes: createButtonNodes(),
+      property: 'color',
+    })).toMatchObject({
+      property: 'color',
+      selector: '.primary',
+      value: '#334155',
     })
   })
 

@@ -20,6 +20,7 @@ export type HtmlSpecimenVisualCssEditIntent = {
 
 export type HtmlSpecimenCssDeclarationSource = {
   affectedNodeIds: string[]
+  atRule?: string
   declarationIndex: number
   important: boolean
   property: string
@@ -31,6 +32,7 @@ export type HtmlSpecimenCssDeclarationSource = {
 
 export type HtmlSpecimenCssRuleSource = {
   affectedNodeIds: string[]
+  atRule?: string
   ruleIndex: number
   selector: string
   specificity: [number, number, number]
@@ -105,6 +107,7 @@ export type HtmlSpecimenVisualCssEditResult =
     }
 
 type CssRule = {
+  atRule: string | null
   blockEnd: number
   declarations: CssDeclaration[]
   ruleIndex: number
@@ -198,22 +201,6 @@ export function applyHtmlSpecimenVisualCssEdit({
       affectedNodeIds: shorthandConflictSource.affectedNodeIds,
       ok: false,
       reason: 'shorthand-conflict',
-      specimen,
-    }
-  }
-
-  const scopedSource = resolveHtmlSpecimenCssScopedRuleSource({
-    css: specimen.css,
-    nodeId: intent.nodeId,
-    nodes,
-    property: intent.property,
-  })
-
-  if (scopedSource) {
-    return {
-      affectedNodeIds: scopedSource.affectedNodeIds,
-      ok: false,
-      reason: 'scoped-rule',
       specimen,
     }
   }
@@ -315,6 +302,7 @@ export function resolveHtmlSpecimenCssDeclarationSource({
       nodes,
       property,
     }),
+    ...(winner.rule.atRule ? { atRule: winner.rule.atRule } : {}),
     declarationIndex: winner.declaration.declarationIndex,
     important: winner.declaration.important,
     property: winner.declaration.property,
@@ -491,6 +479,7 @@ export function resolveHtmlSpecimenCssRuleSource({
           nodes,
           property,
         }),
+        ...(match.rule.atRule ? { atRule: match.rule.atRule } : {}),
         ruleIndex: match.rule.ruleIndex,
         selector: match.rule.selector,
         specificity: match.specificity,
@@ -586,6 +575,7 @@ export function resolveHtmlSpecimenCssTokenSource({
       nodes,
       properties,
     }),
+    ...(winner.rule.atRule ? { atRule: winner.rule.atRule } : {}),
     declarationIndex: winner.declaration.declarationIndex,
     important: winner.declaration.important,
     property: winner.declaration.property,
@@ -982,16 +972,41 @@ function resolveBestMatchingRuleMatch({
 
 function parseCssRules(css: string): CssRule[] {
   const rules: CssRule[] = []
-  let cursor = 0
 
-  while (cursor < css.length) {
-    const blockStart = findNextCssBlockStart(css, cursor)
+  collectCssRules({
+    atRule: null,
+    css,
+    end: css.length,
+    rules,
+    start: 0,
+  })
+
+  return rules
+}
+
+function collectCssRules({
+  atRule,
+  css,
+  end,
+  rules,
+  start,
+}: {
+  atRule: string | null
+  css: string
+  end: number
+  rules: CssRule[]
+  start: number
+}) {
+  let cursor = start
+
+  while (cursor < end) {
+    const blockStart = findNextCssBlockStart(css, cursor, end)
 
     if (blockStart < 0) {
       break
     }
 
-    const blockEnd = findMatchingBrace(css, blockStart)
+    const blockEnd = findMatchingBrace(css, blockStart, end)
 
     if (blockEnd < 0) {
       break
@@ -999,8 +1014,17 @@ function parseCssRules(css: string): CssRule[] {
 
     const selector = stripCssComments(css.slice(cursor, blockStart)).trim()
 
-    if (selector.length > 0 && !selector.startsWith('@')) {
+    if (selector.startsWith('@')) {
+      collectCssRules({
+        atRule: formatNestedCssAtRule(atRule, selector),
+        css,
+        end: blockEnd,
+        rules,
+        start: blockStart + 1,
+      })
+    } else if (selector.length > 0) {
       rules.push({
+        atRule,
         blockEnd,
         declarations: parseCssDeclarations({
           blockEnd,
@@ -1014,55 +1038,30 @@ function parseCssRules(css: string): CssRule[] {
 
     cursor = blockEnd + 1
   }
+}
 
-  return rules
+function formatNestedCssAtRule(parent: string | null, atRule: string) {
+  return parent ? `${parent} / ${atRule}` : atRule
 }
 
 function parseScopedCssRules(css: string) {
-  const scopedRules: {
-    atRule: string
-    rule: CssRule
-  }[] = []
-  let cursor = 0
-
-  while (cursor < css.length) {
-    const blockStart = findNextCssBlockStart(css, cursor)
-
-    if (blockStart < 0) {
-      break
-    }
-
-    const blockEnd = findMatchingBrace(css, blockStart)
-
-    if (blockEnd < 0) {
-      break
-    }
-
-    const selector = stripCssComments(css.slice(cursor, blockStart)).trim()
-
-    if (selector.startsWith('@')) {
-      for (const rule of parseCssRules(css.slice(blockStart + 1, blockEnd))) {
-        scopedRules.push({
-          atRule: selector,
-          rule: {
-            ...rule,
-            ruleIndex: scopedRules.length,
-          },
-        })
-      }
-    }
-
-    cursor = blockEnd + 1
-  }
-
-  return scopedRules
+  return parseCssRules(css)
+    .filter((rule) => rule.atRule !== null)
+    .map((rule) => ({
+      atRule: rule.atRule ?? '',
+      rule,
+    }))
 }
 
-function findNextCssBlockStart(css: string, cursor: number) {
+function findNextCssBlockStart(
+  css: string,
+  cursor: number,
+  end = css.length,
+) {
   const scanner = createCssScannerState()
   let index = cursor
 
-  while (index < css.length) {
+  while (index < end) {
     if (css[index] === '{' && isCssScannerTopLevel(scanner)) {
       return index
     }
@@ -1200,12 +1199,16 @@ function parseCssDeclarations({
   return declarations
 }
 
-function findMatchingBrace(css: string, blockStart: number) {
+function findMatchingBrace(
+  css: string,
+  blockStart: number,
+  end = css.length,
+) {
   let depth = 0
   let index = blockStart
   const scanner = createCssScannerState()
 
-  while (index < css.length) {
+  while (index < end) {
     if (css[index] === '{' && isCssScannerTopLevel(scanner)) {
       depth += 1
     } else if (css[index] === '}' && isCssScannerTopLevel(scanner)) {

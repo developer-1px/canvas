@@ -1554,7 +1554,7 @@ test('edits a shorthand that already beats earlier longhands', async ({
   ).toBe('12px')
 })
 
-test('keeps scoped at-rule CSS read-only in the inspector', async ({
+test('edits scoped at-rule CSS in the inspector', async ({
   page,
 }) => {
   await page.goto('/')
@@ -1608,7 +1608,17 @@ test('keeps scoped at-rule CSS read-only in the inspector', async ({
     .getByText('Scoped @media (min-width: 1px) / .button / 1 node'),
   ).toBeVisible()
   await expect(textInput).toHaveValue('#ffffff')
-  await expect(textInput).toBeDisabled()
+  await expect(textInput).toBeEnabled()
+  await textInput.fill('#111827')
+  await textInput.blur()
+  await expect.poll(async () =>
+    preview.evaluate((host) =>
+      host.shadowRoot?.querySelector('style')?.textContent ?? ''),
+  ).toContain('color: #111827;')
+  await expect.poll(async () =>
+    preview.locator('button#primary').evaluate((button) =>
+      getComputedStyle(button).color),
+  ).toBe('rgb(17, 24, 39)')
   await expect.poll(async () =>
     preview.locator('button#danger').evaluate((button) =>
       getComputedStyle(button).color),

@@ -12,12 +12,10 @@ import {
   applyHtmlSpecimenVisualCssEdit,
   resolveHtmlSpecimenCssDeclarationSource,
   resolveHtmlSpecimenCssRuleSource,
-  resolveHtmlSpecimenCssScopedRuleSource,
   resolveHtmlSpecimenCssShorthandConflictSource,
   resolveHtmlSpecimenCssTokenSource,
   type HtmlSpecimenCssDeclarationSource,
   type HtmlSpecimenCssRuleSource,
-  type HtmlSpecimenCssScopedRuleSource,
   type HtmlSpecimenVisualCssNode,
 } from './HtmlSpecimenVisualCssEdit'
 
@@ -42,10 +40,9 @@ type HtmlSpecimenPreviewFocusData = {
 }
 
 type HtmlSpecimenCssControlModel = {
-  blockedReason: 'scoped-rule' | 'shorthand-conflict' | 'token-value' | null
+  blockedReason: 'shorthand-conflict' | 'token-value' | null
   conflictSource: HtmlSpecimenCssDeclarationSource | null
   editable: boolean
-  scopedSource: HtmlSpecimenCssScopedRuleSource | null
   source: HtmlSpecimenCssDeclarationSource | null
   ruleSource: HtmlSpecimenCssRuleSource | null
   tokenSource: HtmlSpecimenCssDeclarationSource | null
@@ -287,33 +284,21 @@ function getHtmlSpecimenCssControlModel({
         nodes: target.nodes,
         property: control.property,
       })
-  const scopedSource = tokenSource || conflictSource
-    ? null
-    : resolveHtmlSpecimenCssScopedRuleSource({
-        css: specimen.css,
-        nodeId: target.node.id,
-        nodes: target.nodes,
-        property: control.property,
-      })
   const blockedReason = tokenSource
     ? 'token-value'
     : conflictSource
       ? 'shorthand-conflict'
-      : scopedSource
-        ? 'scoped-rule'
-        : null
+      : null
 
   return {
     blockedReason,
     conflictSource,
     editable: blockedReason === null && (source !== null || ruleSource !== null),
     ruleSource,
-    scopedSource,
     source,
     tokenSource,
     value:
       tokenSource?.value ??
-      scopedSource?.value ??
       source?.value ??
       target.node.computedStyle?.[control.computedStyleKey] ??
       '',
@@ -373,10 +358,6 @@ function formatHtmlSpecimenCssControlSource(
     return formatHtmlSpecimenCssSource('Conflict', model.conflictSource)
   }
 
-  if (model.blockedReason === 'scoped-rule' && model.scopedSource) {
-    return formatHtmlSpecimenCssScopedSource(model.scopedSource)
-  }
-
   return model.source
     ? formatHtmlSpecimenCssSource('Rule', model.source)
     : model.ruleSource
@@ -387,13 +368,20 @@ function formatHtmlSpecimenCssControlSource(
 function getHtmlSpecimenCssControlSourceSelector(
   model: HtmlSpecimenCssControlModel,
 ) {
-  return (
+  const source = (
     model.source ??
     model.ruleSource ??
     model.tokenSource ??
-    model.conflictSource ??
-    model.scopedSource
-  )?.selector ?? ''
+    model.conflictSource
+  )
+
+  if (!source) {
+    return ''
+  }
+
+  return source.atRule
+    ? `${source.atRule} / ${source.selector}`
+    : source.selector
 }
 
 function formatHtmlSpecimenCssSource(
@@ -401,20 +389,16 @@ function formatHtmlSpecimenCssSource(
   source: HtmlSpecimenCssDeclarationSource | HtmlSpecimenCssRuleSource,
 ) {
   const count = source.affectedNodeIds.length
+  const sourceLabel = source.atRule
+    ? `${formatHtmlSpecimenCssSelector(source.atRule)} / ${
+        formatHtmlSpecimenCssSelector(source.selector)
+      }`
+    : formatHtmlSpecimenCssSelector(source.selector)
+  const labelPrefix = prefix === 'Rule' && source.atRule ? 'Scoped' : prefix
 
-  return `${prefix} ${formatHtmlSpecimenCssSelector(source.selector)} / ${count} ${
+  return `${labelPrefix} ${sourceLabel} / ${count} ${
     count === 1 ? 'node' : 'nodes'
   }`
-}
-
-function formatHtmlSpecimenCssScopedSource(
-  source: HtmlSpecimenCssScopedRuleSource,
-) {
-  const count = source.affectedNodeIds.length
-
-  return `Scoped ${formatHtmlSpecimenCssSelector(source.atRule)} / ${
-    formatHtmlSpecimenCssSelector(source.selector)
-  } / ${count} ${count === 1 ? 'node' : 'nodes'}`
 }
 
 function formatHtmlSpecimenCssSelector(selector: string) {
