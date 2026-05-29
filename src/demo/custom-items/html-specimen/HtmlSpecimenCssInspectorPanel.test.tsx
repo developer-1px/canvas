@@ -299,6 +299,31 @@ describe('HtmlSpecimenCssInspectorPanel', () => {
     expect(commitItemsChange).not.toHaveBeenCalled()
   })
 
+  it('keeps CSS-wide background shorthand fill edits non-editable', () => {
+    const commitItemsChange = vi.fn(() => true)
+    const context = createContext({
+      commitItemsChange,
+      item: createHtmlSpecimenItem({
+        ...createButtonSpecimenData(),
+        css: `.primary {
+  background: inherit;
+}`,
+      }),
+    })
+    const markup = renderToStaticMarkup(
+      <>{HTML_SPECIMEN_CSS_INSPECTOR_PANEL.render(context)}</>,
+    )
+
+    expect(markup).toContain('Conflict .primary / 1 node')
+    expect(markup).toContain('disabled=""')
+    expect(changeHtmlSpecimenPreviewTargetCss({
+      context,
+      nextValue: '#111827',
+      property: 'background-color',
+    })).toBe(false)
+    expect(commitItemsChange).not.toHaveBeenCalled()
+  })
+
   it('edits scoped at-rule declarations through the shared patch path', () => {
     const commitItemsChange = vi.fn(() => true)
     const context = createContext({

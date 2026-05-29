@@ -181,6 +181,14 @@ type CssLayerRegistry = {
   getOrCreateLayer(name: string): CssCascadeLayer
 }
 
+const CSS_WIDE_KEYWORDS = new Set([
+  'inherit',
+  'initial',
+  'revert',
+  'revert-layer',
+  'unset',
+])
+
 export function applyHtmlSpecimenVisualCssEdit({
   intent,
   nodes,
@@ -1505,6 +1513,10 @@ export function isHtmlSpecimenCssTokenValue(value: string) {
 
 function isPlainBackgroundColorValue(value: string) {
   const normalizedValue = stripCssComments(value).trim().toLowerCase()
+
+  if (CSS_WIDE_KEYWORDS.has(normalizedValue)) {
+    return false
+  }
 
   if (/^#[\da-f]{3,8}$/i.test(normalizedValue)) {
     return true
