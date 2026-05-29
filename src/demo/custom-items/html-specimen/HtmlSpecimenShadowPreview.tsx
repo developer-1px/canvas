@@ -5,6 +5,9 @@ import {
   renderHtmlPreviewSurface,
 } from '@interactive-os/preview-surface'
 import {
+  dispatchCanvasAppCustomFocus,
+} from '../../../canvas'
+import {
   useEffect,
   useRef,
   useState,
@@ -72,10 +75,22 @@ export function HtmlSpecimenShadowPreview({
       setTargetNodeId(target.nodeId)
       host.dataset.previewTargetNodeId = target.nodeId
       markHtmlSpecimenPreviewTargetElement(root, target.node.path)
+      dispatchCanvasAppCustomFocus(host, {
+        data: {
+          node: target.node,
+          nodes,
+        },
+        itemId,
+        ownerId: 'html-specimen',
+        targetId: target.nodeId,
+      })
       host.dispatchEvent(new CustomEvent(HTML_SPECIMEN_PREVIEW_TARGET_EVENT, {
         bubbles: true,
         composed: true,
-        detail: target,
+        detail: {
+          ...target,
+          nodes,
+        },
       }))
     }
 

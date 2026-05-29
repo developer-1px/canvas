@@ -12,6 +12,12 @@ describe('Canvas App inspector workflow boundaries', () => {
     const inspectorModelFile = getSourceFile(
       'src/canvas/app/workflow/useCanvasAppInspectorModel.ts',
     )
+    const customFocusModelFile = getSourceFile(
+      'src/canvas/app/workflow/useCanvasAppCustomFocusModel.ts',
+    )
+    const customFocusHookFile = getSourceFile(
+      'src/canvas/app/affordances/interaction/focus/useCanvasAppCustomFocus.ts',
+    )
     const objectInspectorHookFile = getSourceFile(
       'src/canvas/app/affordances/editing/inspector/useCanvasObjectInspector.ts',
     )
@@ -25,10 +31,15 @@ describe('Canvas App inspector workflow boundaries', () => {
     expect(appModelFile.source).toContain(
       "from './useCanvasAppInspectorModel'",
     )
+    expect(appModelFile.source).toContain(
+      "from './useCanvasAppCustomFocusModel'",
+    )
     expect(appModelFile.source).not.toContain(
       "from '../affordances/editing/inspector/useCanvasObjectInspector'",
     )
     expect(appModelFile.source).not.toContain('useCanvasObjectInspector')
+    expect(appModelFile.source).not.toContain('CANVAS_APP_CUSTOM_FOCUS_EVENT')
+    expect(appModelFile.source).not.toContain('addEventListener')
     expect(inspectorModelFile.source).toContain(
       "from '../affordances/editing/inspector/useCanvasObjectInspector'",
     )
@@ -46,6 +57,14 @@ describe('Canvas App inspector workflow boundaries', () => {
     )
     expect(inspectorModelFile.source).toContain('inspectorPanels')
     expect(inspectorModelFile.source).toContain('itemReadModel')
+    expect(customFocusModelFile.source).toContain(
+      "from '../affordances/interaction/focus/useCanvasAppCustomFocus'",
+    )
+    expect(customFocusModelFile.source).toContain('customFocus')
+    expect(customFocusHookFile.source).toContain(
+      'CANVAS_APP_CUSTOM_FOCUS_EVENT',
+    )
+    expect(customFocusHookFile.source).toContain('window.addEventListener')
     const consumerContractsFile = getSourceFile(
       'src/canvas/app/workflow/CanvasAppInspectorConsumerContracts.ts',
     )

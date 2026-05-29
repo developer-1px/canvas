@@ -4,6 +4,7 @@ import type { CanvasAppInspectorModelInput } from './CanvasAppInspectorConsumerC
 export function useCanvasAppInspectorModel({
   commitItemsChange,
   config,
+  customFocus,
   inspectorPanels,
   itemReadModel,
   selected,
@@ -12,6 +13,7 @@ export function useCanvasAppInspectorModel({
   return {
     ...useCanvasObjectInspector({
       commitItemsChange,
+      customFocus,
       inspectorPanels,
       itemReadModel,
       selected,

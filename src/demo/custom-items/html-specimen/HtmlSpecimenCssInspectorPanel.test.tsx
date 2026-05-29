@@ -1,0 +1,129 @@
+import { renderToStaticMarkup } from 'react-dom/server'
+import { describe, expect, it, vi } from 'vitest'
+import type {
+  CanvasAppInspectorPanelContext,
+  CanvasCustomItem,
+} from '../../../canvas'
+import {
+  HTML_SPECIMEN_CSS_INSPECTOR_PANEL,
+  changeHtmlSpecimenPreviewTargetCss,
+} from './HtmlSpecimenCssInspectorPanel'
+import { createButtonSpecimenData } from './HtmlSpecimenCustomItemModel'
+
+describe('HtmlSpecimenCssInspectorPanel', () => {
+  it('renders compact CSS controls for the focused preview node', () => {
+    const context = createContext()
+
+    expect(HTML_SPECIMEN_CSS_INSPECTOR_PANEL.isVisible?.(context)).toBe(true)
+
+    const markup = renderToStaticMarkup(
+      <>{HTML_SPECIMEN_CSS_INSPECTOR_PANEL.render(context)}</>,
+    )
+
+    expect(markup).toContain('button.primary')
+    expect(markup).toContain('Text')
+    expect(markup).toContain('#ffffff')
+    expect(markup).toContain('Radius')
+  })
+
+  it('patches stylesheet text for the focused preview node', () => {
+    const commitItemsChange = vi.fn(() => true)
+    const context = createContext({ commitItemsChange })
+
+    expect(changeHtmlSpecimenPreviewTargetCss({
+      context,
+      nextValue: '#111111',
+      property: 'color',
+    })).toBe(true)
+
+    expect(commitItemsChange).toHaveBeenCalledWith(
+      {
+        items: [
+          expect.objectContaining({
+            id: 'html-specimen-1',
+            data: expect.objectContaining({
+              css: expect.stringContaining('color: #111111;'),
+              html: createButtonSpecimenData().html,
+            }),
+          }),
+        ],
+        type: 'replace-changed',
+      },
+      {
+        after: ['html-specimen-1'],
+        before: ['html-specimen-1'],
+      },
+    )
+  })
+
+  it('stays hidden when custom focus belongs to another item', () => {
+    expect(HTML_SPECIMEN_CSS_INSPECTOR_PANEL.isVisible?.(
+      createContext({
+        customFocus: {
+          itemId: 'other',
+          ownerId: 'html-specimen',
+          targetId: 'dom:primary',
+        },
+      }),
+    )).toBe(false)
+  })
+})
+
+function createContext({
+  commitItemsChange = vi.fn(() => true),
+  customFocus,
+}: {
+  commitItemsChange?: CanvasAppInspectorPanelContext['commitItemsChange']
+  customFocus?: CanvasAppInspectorPanelContext['customFocus']
+} = {}): CanvasAppInspectorPanelContext {
+  const item = createHtmlSpecimenItem()
+  const node = {
+    attributes: {
+      class: 'button primary',
+      id: 'primary',
+    },
+    classList: ['button', 'primary'],
+    computedStyle: {
+      color: '#ffffff',
+      backgroundColor: '#2563eb',
+      borderRadius: '6px',
+      padding: '0px',
+    },
+    id: 'dom:primary',
+    tagName: 'button',
+  }
+
+  return {
+    bounds: item,
+    commitItemsChange,
+    customFocus: customFocus ?? {
+      data: {
+        node,
+        nodes: [node],
+      },
+      itemId: 'html-specimen-1',
+      ownerId: 'html-specimen',
+      targetId: 'dom:primary',
+    },
+    disabled: false,
+    items: [item],
+    label: 'HTML specimen',
+    selectedItems: [item],
+    selection: ['html-specimen-1'],
+  }
+}
+
+function createHtmlSpecimenItem(): CanvasCustomItem {
+  return {
+    data: createButtonSpecimenData(),
+    h: 250,
+    id: 'html-specimen-1',
+    kind: 'html-specimen',
+    presentation: 'html-specimen',
+    title: 'Button specimen',
+    type: 'custom',
+    w: 380,
+    x: 80,
+    y: 120,
+  }
+}

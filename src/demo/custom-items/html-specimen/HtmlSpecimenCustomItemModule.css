@@ -45,3 +45,41 @@
 .demo-html-specimen-hit {
   pointer-events: none;
 }
+
+.html-specimen-css-inspector {
+  display: grid;
+  gap: 6px;
+}
+
+.html-specimen-css-target {
+  overflow: hidden;
+  color: var(--canvas-ink);
+  font: 750 11px/1.2 var(--sans);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.html-specimen-css-field {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  align-items: center;
+  gap: 5px;
+}
+
+.html-specimen-css-field span {
+  color: var(--canvas-muted);
+  font: 700 11px/1 var(--sans);
+}
+
+.html-specimen-css-field input {
+  width: 100%;
+  min-width: 0;
+  height: 28px;
+  box-sizing: border-box;
+  padding: 0 6px;
+  border: 1.5px solid var(--canvas-line);
+  border-radius: 4px;
+  color: var(--canvas-ink);
+  background: var(--canvas-panel);
+  font: 650 12px/1 var(--sans);
+}

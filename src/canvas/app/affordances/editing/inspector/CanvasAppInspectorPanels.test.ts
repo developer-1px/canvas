@@ -9,6 +9,7 @@ import type {
 const context: CanvasAppInspectorPanelContext = {
   bounds: { x: 0, y: 0, w: 100, h: 80 },
   commitItemsChange: vi.fn(),
+  customFocus: null,
   disabled: false,
   label: 'Card',
   selectedItems: [

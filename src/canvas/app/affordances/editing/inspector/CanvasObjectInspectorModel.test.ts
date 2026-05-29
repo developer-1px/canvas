@@ -39,17 +39,24 @@ describe('CanvasObjectInspectorModel', () => {
       inspectorPanels: [
         {
           id: 'meta',
-          render: ({ bounds, disabled, label, selection }) =>
-            `${label}:${disabled}:${selection.join(',')}:${bounds?.w}`,
+          render: ({ bounds, customFocus, disabled, label, selection }) =>
+            `${label}:${disabled}:${selection.join(',')}:${bounds?.w}:${
+              customFocus?.targetId ?? 'none'
+            }`,
         },
       ],
+      customFocus: {
+        itemId: 'component-1',
+        ownerId: 'component',
+        targetId: 'field:title',
+      },
       selectedItems: [createComponentItem()],
       selection: ['component-1'],
     })
 
     expect(model.customPanels).toEqual([
       {
-        content: 'Card:false:component-1:30',
+        content: 'Card:false:component-1:30:field:title',
         id: 'meta',
       },
     ])
@@ -140,6 +147,7 @@ describe('CanvasObjectInspectorModel', () => {
 function createModel({
   bounds = null,
   commitItemsChange = vi.fn(),
+  customFocus = null,
   inspectorPanels = [],
   selectedItems = [],
   selection = [],
@@ -148,6 +156,9 @@ function createModel({
   commitItemsChange?: Parameters<
     typeof getCanvasObjectInspectorModel
   >[0]['commitItemsChange']
+  customFocus?: Parameters<
+    typeof getCanvasObjectInspectorModel
+  >[0]['customFocus']
   inspectorPanels?: Parameters<
     typeof getCanvasObjectInspectorModel
   >[0]['inspectorPanels']
@@ -157,6 +168,7 @@ function createModel({
   return getCanvasObjectInspectorModel({
     bounds,
     commitItemsChange,
+    customFocus,
     inspectorPanels,
     selectedItems,
     selection,

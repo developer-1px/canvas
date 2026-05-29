@@ -7,6 +7,9 @@ import {
 } from './HtmlSpecimenCustomItemModel'
 import { createHtmlSpecimenPasteCommand } from './HtmlSpecimenPasteCommand'
 import {
+  HTML_SPECIMEN_CSS_INSPECTOR_PANEL,
+} from './HtmlSpecimenCssInspectorPanel'
+import {
   htmlSpecimenTextPasteImporter,
 } from './HtmlSpecimenTextPasteImporter'
 import { htmlSpecimenTool } from './HtmlSpecimenCustomItemTool'
@@ -19,6 +22,7 @@ const HTML_SPECIMEN_CUSTOM_ITEM_MODULE = defineCanvasAppCustomItemModule({
   validateItem: (item) => isHtmlSpecimenData(item.data),
   customCommands: [createHtmlSpecimenPasteCommand()],
   customCreationTools: [htmlSpecimenTool],
+  inspectorPanels: [HTML_SPECIMEN_CSS_INSPECTOR_PANEL],
   textPasteImporters: [htmlSpecimenTextPasteImporter],
 })
 

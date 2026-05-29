@@ -3,6 +3,7 @@ import type {
   CanvasItem,
 } from '../../../../entities'
 import type { CommitCanvasItemsChange } from '../../../workflow/CanvasWorkflowContract'
+import type { CanvasAppCustomFocus } from '../../interaction/focus/CanvasAppCustomFocus'
 import { getCanvasAppInspectorPanelViews } from './CanvasAppInspectorPanelExecution'
 import type { CanvasAppInspectorPanel } from './CanvasAppInspectorPanels'
 import { getCanvasObjectInspectorLabel } from './CanvasObjectInspectorLabel'
@@ -11,6 +12,7 @@ import { getCanvasObjectStyleControls } from './CanvasObjectStyleInspector'
 type GetCanvasObjectInspectorModelArgs = {
   bounds: Bounds | null
   commitItemsChange: CommitCanvasItemsChange
+  customFocus: CanvasAppCustomFocus | null
   inspectorPanels: readonly CanvasAppInspectorPanel[]
   items?: CanvasItem[]
   selectedItems: CanvasItem[]
@@ -20,6 +22,7 @@ type GetCanvasObjectInspectorModelArgs = {
 export function getCanvasObjectInspectorModel({
   bounds,
   commitItemsChange,
+  customFocus,
   inspectorPanels,
   items,
   selectedItems,
@@ -37,6 +40,7 @@ export function getCanvasObjectInspectorModel({
       context: {
         bounds,
         commitItemsChange,
+        customFocus,
         disabled,
         items: items ?? selectedItems,
         label,

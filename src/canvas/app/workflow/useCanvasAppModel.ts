@@ -9,6 +9,7 @@ import { getCanvasAppControlModel } from './CanvasAppControlModel'
 import { renderCanvasAppStageModel } from './CanvasAppStageModel'
 import { useCanvasAppCommandModel } from './useCanvasAppCommandModel'
 import { useCanvasAppComponentModel } from './useCanvasAppComponentModel'
+import { useCanvasAppCustomFocusModel } from './useCanvasAppCustomFocusModel'
 import { useCanvasCursorChatModel } from '../affordances/controls/cursor-chat/useCanvasCursorChatModel'
 import { useCanvasAppDrawingModel } from './useCanvasAppDrawingModel'
 import { useCanvasEmoteModel } from '../affordances/controls/emote/useCanvasEmoteModel'
@@ -81,9 +82,13 @@ export function useCanvasAppModel({
     presence,
     ...workspace.interaction,
   })
+  const customFocus = useCanvasAppCustomFocusModel({
+    selection: workspace.inspector.selection,
+  })
 
   const inspector = useCanvasAppInspectorModel({
     ...affordance.inspector,
+    ...customFocus,
     ...workspace.inspector,
     ...appAssembly.inspector,
   })

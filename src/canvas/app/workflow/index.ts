@@ -36,6 +36,12 @@ export type {
   CanvasAppPointerInput,
 } from '../affordances/interaction/pointer/CanvasAppPointerInput'
 export type {
+  CanvasAppCustomFocus,
+} from '../affordances/interaction/focus/CanvasAppCustomFocus'
+export {
+  dispatchCanvasAppCustomFocus,
+} from '../affordances/interaction/focus/CanvasAppCustomFocus'
+export type {
   CanvasAppInspectorPanel,
   CanvasAppInspectorPanelContext,
   CanvasAppInspectorPanelView,

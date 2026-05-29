@@ -32,6 +32,9 @@ describe('HtmlSpecimenCustomItemModule', () => {
     expect(assembly.textPasteImporters.map((importer) => importer.id)).toEqual([
       'html-specimen',
     ])
+    expect(assembly.inspectorPanels.map((panel) => panel.id)).toContain(
+      'html-specimen-css',
+    )
     expect(created).toMatchObject({
       id: 'html-specimen-1',
       type: 'custom',

@@ -6,6 +6,9 @@ import type {
 import type {
   CanvasAppCommitItemsChange,
 } from '../../../workspace/document/CanvasAppDocumentContracts'
+import type {
+  CanvasAppCustomFocus,
+} from '../../interaction/focus/CanvasAppCustomFocus'
 
 export type CanvasAppInspectorPanelCommitItemsChange =
   CanvasAppCommitItemsChange
@@ -13,6 +16,7 @@ export type CanvasAppInspectorPanelCommitItemsChange =
 export type CanvasAppInspectorPanelContext = {
   bounds: Bounds | null
   commitItemsChange: CanvasAppInspectorPanelCommitItemsChange
+  customFocus?: CanvasAppCustomFocus | null
   disabled: boolean
   items?: CanvasItem[]
   label: string | null
