@@ -122,7 +122,6 @@ function isSupportedColorValue(value: string) {
   return /^(?:#[0-9a-f]{3}|#[0-9a-f]{4}|#[0-9a-f]{6}|#[0-9a-f]{8})$/.test(value) ||
     isSupportedRgbColorValue(value) ||
     isSupportedHslColorValue(value) ||
-    /^(?:hwb|lab|lch|oklab|oklch|color)\s*\(.+\)$/.test(value) ||
     value === 'currentcolor' ||
     isHtmlSpecimenCssNamedColor(value) ||
     value === 'transparent'

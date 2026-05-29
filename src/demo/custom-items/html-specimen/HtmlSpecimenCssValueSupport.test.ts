@@ -57,6 +57,14 @@ describe('isHtmlSpecimenCssSupportedValue', () => {
       property: 'color',
       value: 'hsl(nope)',
     })).toBe(false)
+    expect(isHtmlSpecimenCssSupportedValue({
+      property: 'color',
+      value: 'lab(nope)',
+    })).toBe(false)
+    expect(isHtmlSpecimenCssSupportedValue({
+      property: 'color',
+      value: 'color(nope)',
+    })).toBe(false)
   })
 
   it('allows margin auto without allowing padding auto', () => {
