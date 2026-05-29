@@ -147,6 +147,47 @@ describe('HtmlSpecimenVisualCssEdit', () => {
     expect(result.specimen.css).toContain('color: #ef4444;')
   })
 
+  it('reports only nodes where a new declaration would win', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `.button {
+  color: #334155;
+}
+.danger {
+  font-size: 13px;
+}`,
+    }
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '18px',
+        nodeId: 'primary',
+        property: 'font-size',
+      },
+      nodes: createButtonNodes(),
+      specimen,
+    })
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) {
+      throw new Error(result.reason)
+    }
+
+    expect(result.source).toMatchObject({
+      affectedNodeIds: ['primary', 'secondary'],
+      property: 'font-size',
+      selector: '.button',
+      value: '18px',
+    })
+    expect(result.patch).toMatchObject({
+      kind: 'insert-declaration',
+      property: 'font-size',
+      selector: '.button',
+    })
+    expect(result.specimen.css).toContain('font-size: 18px;')
+    expect(result.specimen.css).toContain('font-size: 13px;')
+  })
+
   it('patches the later winning declaration without changing earlier matches', () => {
     const specimen = {
       ...createButtonSpecimenData(),
@@ -845,6 +886,7 @@ describe('HtmlSpecimenVisualCssEdit', () => {
       css: createButtonSpecimenData().css,
       nodeId: 'primary',
       nodes: createButtonNodes(),
+      property: 'box-shadow',
     })).toMatchObject({
       affectedNodeIds: ['primary'],
       ruleIndex: 2,
@@ -855,7 +897,27 @@ describe('HtmlSpecimenVisualCssEdit', () => {
       css: '.card { color: red; }',
       nodeId: 'primary',
       nodes: createButtonNodes(),
+      property: 'box-shadow',
     })).toBeNull()
+  })
+
+  it('resolves add-rule affected nodes by cascade winner', () => {
+    expect(resolveHtmlSpecimenCssRuleSource({
+      css: `.button {
+  color: #334155;
+}
+.danger {
+  font-size: 13px;
+}`,
+      nodeId: 'primary',
+      nodes: createButtonNodes(),
+      property: 'font-size',
+    })).toMatchObject({
+      affectedNodeIds: ['primary', 'secondary'],
+      ruleIndex: 0,
+      selector: '.button',
+      specificity: [0, 1, 0],
+    })
   })
 
   it('resolves scoped at-rule declarations without treating them as patchable rules', () => {

@@ -416,10 +416,12 @@ export function resolveHtmlSpecimenCssRuleSource({
   css,
   nodeId,
   nodes,
+  property,
 }: {
   css: string
   nodeId: string
   nodes: readonly HtmlSpecimenVisualCssNode[]
+  property: string
 }): HtmlSpecimenCssRuleSource | null {
   const node = findNode(nodes, nodeId)
 
@@ -431,15 +433,66 @@ export function resolveHtmlSpecimenCssRuleSource({
 
   return match
     ? {
-        affectedNodeIds: nodes
-          .filter((candidate) =>
-            matchHtmlSpecimenCssSelectorList(match.rule.selector, candidate, nodes))
-          .map((candidate) => candidate.id),
+        affectedNodeIds: getAffectedNodeIdsForRuleInsertion({
+          css,
+          match,
+          nodes,
+          property,
+        }),
         ruleIndex: match.rule.ruleIndex,
         selector: match.rule.selector,
         specificity: match.specificity,
       }
     : null
+}
+
+function getAffectedNodeIdsForRuleInsertion({
+  css,
+  match,
+  nodes,
+  property,
+}: {
+  css: string
+  match: CssRuleMatch
+  nodes: readonly HtmlSpecimenVisualCssNode[]
+  property: string
+}) {
+  return nodes
+    .filter((candidate) => {
+      const specificity = matchHtmlSpecimenCssSelectorList(
+        match.rule.selector,
+        candidate,
+        nodes,
+      )
+
+      if (!specificity) {
+        return false
+      }
+
+      const currentMatch = resolveHtmlSpecimenCssDeclarationMatch({
+        css,
+        node: candidate,
+        nodes,
+        property,
+      })
+
+      return currentMatch === null ||
+        compareCssSource(
+          {
+            declarationIndex: match.rule.declarations.length,
+            important: false,
+            ruleIndex: match.rule.ruleIndex,
+            specificity,
+          },
+          {
+            declarationIndex: currentMatch.declaration.declarationIndex,
+            important: currentMatch.declaration.important,
+            ruleIndex: currentMatch.rule.ruleIndex,
+            specificity: currentMatch.specificity,
+          },
+        ) > 0
+    })
+    .map((candidate) => candidate.id)
 }
 
 export function resolveHtmlSpecimenCssTokenSource({

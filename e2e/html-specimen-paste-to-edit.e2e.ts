@@ -498,6 +498,74 @@ test('adds missing CSS declarations to the most specific matching rule', async (
   expect(previewHtml).not.toContain('style=')
 })
 
+test('shows add-rule affected nodes after later overrides are excluded', async ({
+  page,
+}) => {
+  await page.goto('/')
+
+  const pasteWasHandled = await page.evaluate((text) => {
+    const data = new DataTransfer()
+
+    data.setData('text/plain', text)
+
+    const event = new ClipboardEvent('paste', {
+      bubbles: true,
+      cancelable: true,
+      clipboardData: data,
+    })
+
+    window.dispatchEvent(event)
+
+    return event.defaultPrevented
+  }, JSON.stringify({
+    css: [
+      '.button {',
+      '  color: #334155;',
+      '}',
+      '.danger {',
+      '  font-size: 13px;',
+      '}',
+    ].join('\n'),
+    html: [
+      '<main>',
+      '<button id="primary" class="button">Save</button>',
+      '<button id="danger" class="button danger">Delete</button>',
+      '</main>',
+    ].join(''),
+  }))
+
+  expect(pasteWasHandled).toBe(true)
+
+  const preview = page.locator('.demo-html-specimen-preview').last()
+
+  await expect(preview).toBeVisible()
+  await preview.locator('button#primary').click()
+
+  const fontField = page
+    .locator('.html-specimen-css-field')
+    .filter({ hasText: 'Font' })
+  const fontInput = fontField.locator('input')
+
+  await expect(fontField.getByText('Add .button / 1 node')).toBeVisible()
+  await expect(fontInput).toBeVisible()
+  await fontInput.fill('18px')
+  await fontInput.blur()
+
+  await expect.poll(async () =>
+    preview.evaluate((host) =>
+      host.shadowRoot?.querySelector('style')?.textContent ?? ''),
+  ).toContain('font-size: 18px;')
+  await expect.poll(async () =>
+    preview.locator('button#primary').evaluate((button) =>
+      getComputedStyle(button).fontSize),
+  ).toBe('18px')
+  await expect.poll(async () =>
+    preview.locator('button#danger').evaluate((button) =>
+      getComputedStyle(button).fontSize),
+  ).toBe('13px')
+  await expect(fontField.getByText('Rule .button / 1 node')).toBeVisible()
+})
+
 test('patches the later winning declaration without being overwritten', async ({
   page,
 }) => {

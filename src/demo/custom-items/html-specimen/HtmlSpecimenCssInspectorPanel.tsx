@@ -271,6 +271,7 @@ function getHtmlSpecimenCssControlModel({
         css: specimen.css,
         nodeId: target.node.id,
         nodes: target.nodes,
+        property: control.property,
       })
   const tokenSource = resolveHtmlSpecimenCssTokenSource({
     css: specimen.css,
