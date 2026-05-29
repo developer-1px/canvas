@@ -159,6 +159,8 @@ type CssScannerState = {
   quote: '"' | "'" | null
 }
 
+type CssSupportsEvaluation = boolean | null
+
 export function applyHtmlSpecimenVisualCssEdit({
   intent,
   nodes,
@@ -1294,19 +1296,24 @@ function isCssAtRuleActive(
   mediaContext: HtmlSpecimenCssMediaContext | undefined,
 ) {
   const source = stripCssComments(atRule).trim()
+  const lowerSource = source.toLowerCase()
 
-  if (!source.toLowerCase().startsWith('@media')) {
-    return true
+  if (lowerSource.startsWith('@media')) {
+    if (!mediaContext) {
+      return true
+    }
+
+    const queryList = source.slice('@media'.length).trim()
+
+    return splitCssMediaQueryList(queryList).some((query) =>
+      matchesCssMediaQuery(query, mediaContext))
   }
 
-  if (!mediaContext) {
-    return true
+  if (lowerSource.startsWith('@supports')) {
+    return matchesCssSupportsRule(source) ?? true
   }
 
-  const queryList = source.slice('@media'.length).trim()
-
-  return splitCssMediaQueryList(queryList).some((query) =>
-    matchesCssMediaQuery(query, mediaContext))
+  return true
 }
 
 function splitCssMediaQueryList(queryList: string) {
@@ -1402,6 +1409,246 @@ function parseCssMediaLengthPx(value: string | undefined, unit: string) {
   const parsed = Number.parseFloat(value ?? '0')
 
   return unit === 'em' || unit === 'rem' ? parsed * 16 : parsed
+}
+
+function matchesCssSupportsRule(atRule: string): CssSupportsEvaluation {
+  return evaluateCssSupportsCondition(
+    atRule.slice('@supports'.length).trim(),
+  )
+}
+
+function evaluateCssSupportsCondition(
+  condition: string,
+): CssSupportsEvaluation {
+  const source = unwrapCssSupportsOuterParens(condition)
+
+  if (source.length === 0) {
+    return null
+  }
+
+  const orParts = splitCssSupportsConditionByOperator(source, 'or')
+
+  if (orParts.length > 1) {
+    let hasUnknown = false
+
+    for (const part of orParts) {
+      const result = evaluateCssSupportsCondition(part)
+
+      if (result === true) {
+        return true
+      }
+
+      hasUnknown = hasUnknown || result === null
+    }
+
+    return hasUnknown ? null : false
+  }
+
+  const andParts = splitCssSupportsConditionByOperator(source, 'and')
+
+  if (andParts.length > 1) {
+    let hasUnknown = false
+
+    for (const part of andParts) {
+      const result = evaluateCssSupportsCondition(part)
+
+      if (result === false) {
+        return false
+      }
+
+      hasUnknown = hasUnknown || result === null
+    }
+
+    return hasUnknown ? null : true
+  }
+
+  const notCondition = readCssSupportsNotCondition(source)
+
+  if (notCondition !== null) {
+    const result = evaluateCssSupportsCondition(notCondition)
+
+    return result === null ? null : !result
+  }
+
+  const declaration = parseCssSupportsDeclaration(source)
+
+  return declaration
+    ? evaluateCssSupportsDeclaration(declaration)
+    : null
+}
+
+function unwrapCssSupportsOuterParens(condition: string) {
+  let source = condition.trim()
+
+  while (
+    source.startsWith('(') &&
+    findMatchingCssParenthesis(source, 0) === source.length - 1
+  ) {
+    source = source.slice(1, -1).trim()
+  }
+
+  return source
+}
+
+function splitCssSupportsConditionByOperator(
+  condition: string,
+  operator: 'and' | 'or',
+) {
+  const parts: string[] = []
+  const scanner = createCssScannerState()
+  let start = 0
+  let index = 0
+
+  while (index < condition.length) {
+    if (
+      isCssScannerTopLevel(scanner) &&
+      isCssKeywordAt(condition, index, operator)
+    ) {
+      parts.push(condition.slice(start, index).trim())
+      index += operator.length
+      start = index
+      continue
+    }
+
+    index = advanceCssScannerState(condition, index, scanner)
+  }
+
+  parts.push(condition.slice(start).trim())
+
+  return parts.filter((part) => part.length > 0)
+}
+
+function readCssSupportsNotCondition(condition: string) {
+  const source = condition.trim()
+
+  return isCssKeywordAt(source, 0, 'not')
+    ? source.slice('not'.length).trim()
+    : null
+}
+
+function parseCssSupportsDeclaration(condition: string) {
+  const colonIndex = findCssDeclarationColon({
+    css: condition,
+    end: condition.length,
+    start: 0,
+  })
+
+  if (colonIndex <= 0) {
+    return null
+  }
+
+  const property = normalizeProperty(condition.slice(0, colonIndex))
+  const value = stripCssComments(condition.slice(colonIndex + 1)).trim()
+
+  return property.length > 0 && value.length > 0
+    ? { property, value }
+    : null
+}
+
+function evaluateCssSupportsDeclaration({
+  property,
+  value,
+}: {
+  property: string
+  value: string
+}): CssSupportsEvaluation {
+  const normalizedValue = value.trim().toLowerCase()
+
+  switch (property) {
+    case 'display':
+      return new Set([
+        'block',
+        'contents',
+        'flex',
+        'flow-root',
+        'grid',
+        'inline',
+        'inline-block',
+        'inline-flex',
+        'inline-grid',
+        'none',
+      ]).has(normalizedValue)
+    default:
+      return null
+  }
+}
+
+function findMatchingCssParenthesis(source: string, start: number) {
+  let comment = false
+  let depth = 0
+  let escaped = false
+  let index = start
+  let quote: '"' | "'" | null = null
+
+  while (index < source.length) {
+    const char = source[index] ?? ''
+    const next = source[index + 1] ?? ''
+
+    if (comment) {
+      if (char === '*' && next === '/') {
+        comment = false
+        index += 2
+        continue
+      }
+
+      index += 1
+      continue
+    }
+
+    if (quote) {
+      if (escaped) {
+        escaped = false
+      } else if (char === '\\') {
+        escaped = true
+      } else if (char === quote) {
+        quote = null
+      }
+
+      index += 1
+      continue
+    }
+
+    if (char === '/' && next === '*') {
+      comment = true
+      index += 2
+      continue
+    }
+
+    if (char === '"' || char === "'") {
+      quote = char
+      index += 1
+      continue
+    }
+
+    if (char === '(') {
+      depth += 1
+    } else if (char === ')') {
+      depth -= 1
+
+      if (depth === 0) {
+        return index
+      }
+    }
+
+    index += 1
+  }
+
+  return -1
+}
+
+function isCssKeywordAt(source: string, index: number, keyword: string) {
+  if (source.slice(index, index + keyword.length).toLowerCase() !== keyword) {
+    return false
+  }
+
+  const before = source[index - 1] ?? ''
+  const after = source[index + keyword.length] ?? ''
+
+  return !isCssIdentifierChar(before) && !isCssIdentifierChar(after)
+}
+
+function isCssIdentifierChar(char: string) {
+  return /[a-z0-9_-]/i.test(char)
 }
 
 function parseScopedCssRules(

@@ -860,6 +860,47 @@ describe('HtmlSpecimenVisualCssEdit', () => {
 }`)
   })
 
+  it('ignores inactive supports declarations when choosing the patch source', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `.primary {
+  color: #334155;
+}
+@supports not (display: block) {
+  .primary {
+    color: #ffffff;
+  }
+}`,
+    }
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '#111827',
+        nodeId: 'primary',
+        property: 'color',
+      },
+      nodes: createButtonNodes(),
+      specimen,
+    })
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) {
+      throw new Error(result.reason)
+    }
+
+    expect(result.source).toMatchObject({
+      affectedNodeIds: ['primary'],
+      property: 'color',
+      selector: '.primary',
+      value: '#111827',
+    })
+    expect(result.source.atRule).toBeUndefined()
+    expect(result.specimen.css).toContain(`.primary {
+  color: #111827;
+}`)
+    expect(result.specimen.css).toContain('color: #ffffff;')
+  })
+
   it('blocks stylesheet edits when an inline style wins the property', () => {
     const specimen = {
       ...createButtonSpecimenData(),
