@@ -32,6 +32,14 @@ describe('HtmlSpecimenVisualCssEdit', () => {
 
     expect(result.source.selector).toBe('.primary')
     expect(result.affectedNodeIds).toEqual(['primary'])
+    expect(result.patch).toMatchObject({
+      kind: 'replace-declaration-value',
+      nextValue: '#111827',
+      previousValue: '#2563eb',
+      property: 'background',
+      selector: '.primary',
+    })
+    expect(result.serializedCss).toBe(result.specimen.css)
     expect(result.specimen.css).toContain('background: #111827;')
     expect(result.specimen.html).not.toContain('style=')
     expect(result.verification).toEqual({
@@ -224,6 +232,16 @@ describe('HtmlSpecimenVisualCssEdit', () => {
     expect(result.source.selector).toBe('.primary')
     expect(result.source.value).toBe('0 0 0 1px #111827')
     expect(result.affectedNodeIds).toEqual(['primary'])
+    expect(result.patch).toMatchObject({
+      kind: 'insert-declaration',
+      nextValue: '0 0 0 1px #111827',
+      property: 'box-shadow',
+      selector: '.primary',
+    })
+    expect(result.patch.kind === 'insert-declaration'
+      ? result.patch.replacement
+      : '').toBe('  box-shadow: 0 0 0 1px #111827;\n')
+    expect(result.serializedCss).toBe(result.specimen.css)
     expect(result.specimen.css).toContain('box-shadow: 0 0 0 1px #111827;')
   })
 

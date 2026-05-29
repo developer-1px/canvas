@@ -41,6 +41,33 @@ export type HtmlSpecimenCssScopedRuleSource = {
   value: string
 }
 
+export type HtmlSpecimenCssPatchPlan =
+  | {
+      declarationIndex: number
+      kind: 'replace-declaration-value'
+      nextValue: string
+      previousValue: string
+      property: string
+      range: {
+        end: number
+        start: number
+      }
+      ruleIndex: number
+      selector: string
+    }
+  | {
+      kind: 'insert-declaration'
+      nextValue: string
+      property: string
+      range: {
+        end: number
+        start: number
+      }
+      replacement: string
+      ruleIndex: number
+      selector: string
+    }
+
 export type HtmlSpecimenVisualCssEditResult =
   | {
       affectedNodeIds: string[]
@@ -57,7 +84,9 @@ export type HtmlSpecimenVisualCssEditResult =
   | {
       affectedNodeIds: string[]
       ok: true
+      patch: HtmlSpecimenCssPatchPlan
       previousSource: HtmlSpecimenCssDeclarationSource | null
+      serializedCss: string
       source: HtmlSpecimenCssDeclarationSource
       specimen: HtmlSpecimenData
       verification: {
@@ -171,20 +200,20 @@ export function applyHtmlSpecimenVisualCssEdit({
     }
   }
 
-  const patchedCss = previousSource
-    ? patchExistingDeclaration({
+  const patch = previousSource
+    ? planExistingDeclarationPatch({
         css: specimen.css,
         nextValue: intent.nextValue,
         source: previousSource,
       })
-    : patchNewDeclaration({
+    : planNewDeclarationPatch({
         css: specimen.css,
         nextValue: intent.nextValue,
         node,
         property: intent.property,
       })
 
-  if (!patchedCss) {
+  if (!patch) {
     return {
       affectedNodeIds: [],
       ok: false,
@@ -193,6 +222,7 @@ export function applyHtmlSpecimenVisualCssEdit({
     }
   }
 
+  const patchedCss = serializeHtmlSpecimenCssPatch(specimen.css, patch)
   const nextSpecimen = {
     ...specimen,
     css: patchedCss,
@@ -222,7 +252,9 @@ export function applyHtmlSpecimenVisualCssEdit({
   return {
     affectedNodeIds: source.affectedNodeIds,
     ok: true,
+    patch,
     previousSource,
+    serializedCss: patchedCss,
     source,
     specimen: nextSpecimen,
     verification,
@@ -498,7 +530,22 @@ export function isHtmlSpecimenCssTokenValue(value: string) {
   return /\bvar\s*\(/i.test(value)
 }
 
-function patchExistingDeclaration({
+export function serializeHtmlSpecimenCssPatch(
+  css: string,
+  patch: HtmlSpecimenCssPatchPlan,
+) {
+  const replacement = patch.kind === 'insert-declaration'
+    ? patch.replacement
+    : patch.nextValue
+
+  return [
+    css.slice(0, patch.range.start),
+    replacement,
+    css.slice(patch.range.end),
+  ].join('')
+}
+
+function planExistingDeclarationPatch({
   css,
   nextValue,
   source,
@@ -514,14 +561,22 @@ function patchExistingDeclaration({
     return null
   }
 
-  return [
-    css.slice(0, declaration.valueStart),
+  return {
+    declarationIndex: source.declarationIndex,
+    kind: 'replace-declaration-value',
     nextValue,
-    css.slice(declaration.valueEnd),
-  ].join('')
+    previousValue: declaration.value,
+    property: source.property,
+    range: {
+      end: declaration.valueEnd,
+      start: declaration.valueStart,
+    },
+    ruleIndex: source.ruleIndex,
+    selector: source.selector,
+  } satisfies HtmlSpecimenCssPatchPlan
 }
 
-function patchNewDeclaration({
+function planNewDeclarationPatch({
   css,
   nextValue,
   node,
@@ -549,11 +604,18 @@ function patchNewDeclaration({
     `${indent}${normalizeProperty(property)}: ${nextValue};\n`,
   ].join('')
 
-  return [
-    css.slice(0, rule.blockEnd),
-    insertion,
-    css.slice(rule.blockEnd),
-  ].join('')
+  return {
+    kind: 'insert-declaration',
+    nextValue,
+    property: normalizeProperty(property),
+    range: {
+      end: rule.blockEnd,
+      start: rule.blockEnd,
+    },
+    replacement: insertion,
+    ruleIndex: rule.ruleIndex,
+    selector: rule.selector,
+  } satisfies HtmlSpecimenCssPatchPlan
 }
 
 function resolveBestMatchingRuleMatch({
