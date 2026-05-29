@@ -194,6 +194,40 @@ describe('HtmlSpecimenCssInspectorPanel', () => {
     expect(commitItemsChange).not.toHaveBeenCalled()
   })
 
+  it('skips zero length patches when requested value is equivalent to computed style', () => {
+    const commitItemsChange = vi.fn(() => true)
+    const node = createFocusNode({
+      computedStyle: {
+        borderRadius: '0px',
+      },
+    })
+    const context = createContext({
+      commitItemsChange,
+      customFocus: {
+        data: {
+          node,
+          nodes: [node],
+        },
+        itemId: 'html-specimen-1',
+        ownerId: 'html-specimen',
+        targetId: 'dom:primary',
+      },
+      item: createHtmlSpecimenItem({
+        ...createButtonSpecimenData(),
+        css: `.primary {
+  border-radius: 0;
+}`,
+      }),
+    })
+
+    expect(changeHtmlSpecimenPreviewTargetCss({
+      context,
+      nextValue: '0',
+      property: 'border-radius',
+    })).toBe(false)
+    expect(commitItemsChange).not.toHaveBeenCalled()
+  })
+
   it('shows shorthand conflicts as non-editable', () => {
     const commitItemsChange = vi.fn(() => true)
     const context = createContext({
