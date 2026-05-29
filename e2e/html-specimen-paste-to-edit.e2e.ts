@@ -30,7 +30,12 @@ test('pastes HTML/CSS and edits preview target CSS through the inspector', async
       '  background: #2563eb;',
       '}',
     ].join('\n'),
-    html: '<main><button id="primary" class="button primary">Save</button></main>',
+    html: [
+      '<main>',
+      '<button id="primary" class="button primary">Save</button>',
+      '<button id="secondary" class="button secondary">Cancel</button>',
+      '</main>',
+    ].join(''),
   }))
 
   expect(pasteWasHandled).toBe(true)
@@ -42,6 +47,10 @@ test('pastes HTML/CSS and edits preview target CSS through the inspector', async
   await preview.locator('button#primary').click()
 
   await expect(preview).toHaveAttribute('data-preview-target-node-id', /dom:/)
+  await expect(page
+    .locator('.html-specimen-css-field')
+    .filter({ hasText: 'Radius' })
+    .getByText('Rule .button / 2 nodes')).toBeVisible()
 
   const backgroundInput = page
     .locator('.html-specimen-css-field')
@@ -56,6 +65,10 @@ test('pastes HTML/CSS and edits preview target CSS through the inspector', async
     preview.evaluate((host) =>
       host.shadowRoot?.querySelector('style')?.textContent ?? ''),
   ).toContain('background-color: #111827;')
+  await expect(page
+    .locator('.html-specimen-css-field')
+    .filter({ hasText: 'Bg' })
+    .getByText('Rule .primary / 1 node')).toBeVisible()
 
   const previewHtml = await preview.evaluate((host) =>
     host.shadowRoot?.querySelector('[data-preview-surface-root]')

@@ -11,6 +11,7 @@ import {
 import {
   applyHtmlSpecimenVisualCssEdit,
   resolveHtmlSpecimenCssDeclarationSource,
+  type HtmlSpecimenCssDeclarationSource,
   type HtmlSpecimenVisualCssNode,
 } from './HtmlSpecimenVisualCssEdit'
 
@@ -126,14 +127,16 @@ function renderHtmlSpecimenCssInspector({
         {formatHtmlSpecimenCssTargetLabel(target.node)}
       </div>
       {HTML_SPECIMEN_CSS_CONTROLS.map((control) => {
-        const value = getHtmlSpecimenCssControlValue({ control, target })
+        const model = getHtmlSpecimenCssControlModel({ control, target })
 
         return (
           <label className="html-specimen-css-field" key={control.property}>
-            <span>{control.label}</span>
+            <span className="html-specimen-css-field-label">
+              {control.label}
+            </span>
             <input
-              key={`${target.node.id}:${control.property}:${value}`}
-              defaultValue={value}
+              key={`${target.node.id}:${control.property}:${model.value}`}
+              defaultValue={model.value}
               disabled={context.disabled}
               onBlur={(event) =>
                 changeHtmlSpecimenPreviewTargetCss({
@@ -142,10 +145,18 @@ function renderHtmlSpecimenCssInspector({
                   property: control.property,
                 })}
               onKeyDown={(event) =>
-                handleHtmlSpecimenCssFieldKeyDown(event, value)}
+                handleHtmlSpecimenCssFieldKeyDown(event, model.value)}
               spellCheck={false}
               type="text"
             />
+            {model.source ? (
+              <span
+                className="html-specimen-css-source"
+                title={model.source.selector}
+              >
+                {formatHtmlSpecimenCssSource(model.source)}
+              </span>
+            ) : null}
           </label>
         )
       })}
@@ -192,7 +203,7 @@ type HtmlSpecimenCssInspectorTarget = {
   nodes: readonly HtmlSpecimenVisualCssNode[]
 }
 
-function getHtmlSpecimenCssControlValue({
+function getHtmlSpecimenCssControlModel({
   control,
   target,
 }: {
@@ -206,11 +217,13 @@ function getHtmlSpecimenCssControlValue({
     property: control.property,
   })
 
-  return (
-    source?.value ??
-    target.node.computedStyle?.[control.computedStyleKey] ??
-    ''
-  )
+  return {
+    source,
+    value:
+      source?.value ??
+      target.node.computedStyle?.[control.computedStyleKey] ??
+      '',
+  }
 }
 
 function readHtmlSpecimenPreviewFocusData(
@@ -250,6 +263,20 @@ function formatHtmlSpecimenCssTargetLabel(
     : ''
 
   return `${node.tagName}${classes}`
+}
+
+function formatHtmlSpecimenCssSource(
+  source: HtmlSpecimenCssDeclarationSource,
+) {
+  const count = source.affectedNodeIds.length
+
+  return `Rule ${formatHtmlSpecimenCssSelector(source.selector)} / ${count} ${
+    count === 1 ? 'node' : 'nodes'
+  }`
+}
+
+function formatHtmlSpecimenCssSelector(selector: string) {
+  return selector.replace(/\s+/g, ' ').trim()
 }
 
 function handleHtmlSpecimenCssFieldKeyDown(

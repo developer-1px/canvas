@@ -24,6 +24,8 @@ describe('HtmlSpecimenCssInspectorPanel', () => {
     expect(markup).toContain('Text')
     expect(markup).toContain('#ffffff')
     expect(markup).toContain('Radius')
+    expect(markup).toContain('Rule .button / 3 nodes')
+    expect(markup).toContain('Rule .primary / 1 node')
   })
 
   it('patches stylesheet text for the focused preview node', () => {
@@ -99,7 +101,27 @@ function createContext({
     customFocus: customFocus ?? {
       data: {
         node,
-        nodes: [node],
+        nodes: [
+          node,
+          {
+            ...node,
+            attributes: {
+              class: 'button secondary',
+              id: 'secondary',
+            },
+            classList: ['button', 'secondary'],
+            id: 'dom:secondary',
+          },
+          {
+            ...node,
+            attributes: {
+              class: 'button danger',
+              id: 'danger',
+            },
+            classList: ['button', 'danger'],
+            id: 'dom:danger',
+          },
+        ],
       },
       itemId: 'html-specimen-1',
       ownerId: 'html-specimen',
