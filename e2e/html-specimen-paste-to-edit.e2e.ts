@@ -1314,6 +1314,68 @@ test('keeps shorthand controls read-only when longhand declarations exist', asyn
   ).toContain('margin-top: 4px;')
 })
 
+test('edits a shorthand that already beats earlier longhands', async ({
+  page,
+}) => {
+  await page.goto('/')
+
+  const pasteWasHandled = await page.evaluate((text) => {
+    const data = new DataTransfer()
+
+    data.setData('text/plain', text)
+
+    const event = new ClipboardEvent('paste', {
+      bubbles: true,
+      cancelable: true,
+      clipboardData: data,
+    })
+
+    window.dispatchEvent(event)
+
+    return event.defaultPrevented
+  }, JSON.stringify({
+    css: [
+      '.primary {',
+      '  color: #ffffff;',
+      '  margin-top: 4px;',
+      '  margin: 8px;',
+      '}',
+    ].join('\n'),
+    html: [
+      '<main>',
+      '<button id="primary" class="primary">Save</button>',
+      '</main>',
+    ].join(''),
+  }))
+
+  expect(pasteWasHandled).toBe(true)
+
+  const preview = page.locator('.demo-html-specimen-preview').last()
+
+  await expect(preview).toBeVisible()
+  await preview.locator('button#primary').click()
+
+  const marginField = page
+    .locator('.html-specimen-css-field')
+    .filter({ hasText: 'Margin' })
+  const marginInput = marginField.locator('input')
+
+  await expect(marginField.getByText('Rule .primary / 1 node')).toBeVisible()
+  await expect(marginInput).toHaveValue('8px')
+  await expect(marginInput).toBeEnabled()
+  await marginInput.fill('12px')
+  await marginInput.blur()
+
+  await expect.poll(async () =>
+    preview.evaluate((host) =>
+      host.shadowRoot?.querySelector('style')?.textContent ?? ''),
+  ).toContain('margin: 12px;')
+  await expect.poll(async () =>
+    preview.locator('button#primary').evaluate((button) =>
+      getComputedStyle(button).marginTop),
+  ).toBe('12px')
+})
+
 test('keeps scoped at-rule CSS read-only in the inspector', async ({
   page,
 }) => {

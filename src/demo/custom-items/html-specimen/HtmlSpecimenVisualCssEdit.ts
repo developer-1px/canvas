@@ -607,6 +607,12 @@ export function resolveHtmlSpecimenCssShorthandConflictSource({
   nodes: readonly HtmlSpecimenVisualCssNode[]
   property: string
 }): HtmlSpecimenCssDeclarationSource | null {
+  const shorthandSource = resolveHtmlSpecimenCssDeclarationSource({
+    css,
+    nodeId,
+    nodes,
+    property,
+  })
   let winner: HtmlSpecimenCssDeclarationSource | null = null
 
   for (const candidateProperty of getCssShorthandConflictProperties(property)) {
@@ -619,6 +625,10 @@ export function resolveHtmlSpecimenCssShorthandConflictSource({
 
     if (
       source &&
+      (
+        !shorthandSource ||
+        compareCssSource(source, shorthandSource) > 0
+      ) &&
       (
         !winner ||
         compareCssSource(source, winner) > 0

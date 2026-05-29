@@ -539,6 +539,66 @@ describe('HtmlSpecimenVisualCssEdit', () => {
     })
   })
 
+  it('allows shorthand edits when the shorthand beats earlier longhands', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `.primary {
+  margin-top: 4px;
+  margin: 8px;
+}`,
+    }
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '12px',
+        nodeId: 'primary',
+        property: 'margin',
+      },
+      nodes: createButtonNodes(),
+      specimen,
+    })
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) {
+      throw new Error(result.reason)
+    }
+
+    expect(result.source).toMatchObject({
+      affectedNodeIds: ['primary'],
+      property: 'margin',
+      selector: '.primary',
+      value: '12px',
+    })
+    expect(result.specimen.css).toContain('margin-top: 4px;')
+    expect(result.specimen.css).toContain('margin: 12px;')
+  })
+
+  it('blocks shorthand edits when a later longhand beats the shorthand', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `.primary {
+  margin: 8px;
+  margin-top: 4px;
+}`,
+    }
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '12px',
+        nodeId: 'primary',
+        property: 'margin',
+      },
+      nodes: createButtonNodes(),
+      specimen,
+    })
+
+    expect(result).toEqual({
+      affectedNodeIds: ['primary'],
+      ok: false,
+      reason: 'shorthand-conflict',
+      specimen,
+    })
+  })
+
   it('blocks border-color edits when side color declarations exist', () => {
     const specimen = {
       ...createButtonSpecimenData(),
