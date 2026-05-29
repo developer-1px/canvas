@@ -22,6 +22,8 @@ import {
 } from './HtmlSpecimenPreviewTarget'
 
 const HTML_SPECIMEN_PREVIEW_TARGET_EVENT = 'html-specimen-preview:target'
+const HTML_SPECIMEN_PREVIEW_HOVER_ATTRIBUTE =
+  'data-html-specimen-preview-hover'
 const HTML_SPECIMEN_PREVIEW_TARGET_ATTRIBUTE =
   'data-html-specimen-preview-target'
 const HTML_SPECIMEN_PREVIEW_TOOL_STYLE_ATTRIBUTE =
@@ -37,7 +39,9 @@ export function HtmlSpecimenShadowPreview({
   title: string
 }) {
   const hostRef = useRef<HTMLDivElement | null>(null)
+  const hoverNodeIdRef = useRef<string | null>(null)
   const targetNodeIdRef = useRef<string | null>(null)
+  const [hoverNodeId, setHoverNodeId] = useState<string | null>(null)
   const [targetNodeId, setTargetNodeId] = useState<string | null>(null)
 
   useEffect(() => {
@@ -64,6 +68,12 @@ export function HtmlSpecimenShadowPreview({
     })
 
     host.dataset.previewNodeCount = String(nodes.length)
+    clearHtmlSpecimenPreviewHoverState({
+      host,
+      hoverNodeIdRef,
+      root,
+      setHoverNodeId,
+    })
     if (retainedTarget) {
       setHtmlSpecimenPreviewTargetState({
         host,
@@ -119,9 +129,49 @@ export function HtmlSpecimenShadowPreview({
       })
     }
 
+    const handlePointerMove: EventListener = (event) => {
+      const target = getHtmlSpecimenPreviewTargetFromEvent({
+        eventTarget: event.target,
+        itemId,
+        nodes,
+        root,
+      })
+
+      if (!target) {
+        clearHtmlSpecimenPreviewHoverState({
+          host,
+          hoverNodeIdRef,
+          root,
+          setHoverNodeId,
+        })
+        return
+      }
+
+      setHtmlSpecimenPreviewHoverState({
+        host,
+        hoverNodeIdRef,
+        nodeId: target.nodeId,
+        setHoverNodeId,
+      })
+      markHtmlSpecimenPreviewHoverElement(root, target.node.path)
+    }
+
+    const handlePointerLeave = () => {
+      clearHtmlSpecimenPreviewHoverState({
+        host,
+        hoverNodeIdRef,
+        root,
+        setHoverNodeId,
+      })
+    }
+
+    root.addEventListener('pointermove', handlePointerMove)
+    root.addEventListener('pointerleave', handlePointerLeave)
     root.addEventListener('pointerdown', handlePointerDown)
 
     return () => {
+      root.removeEventListener('pointermove', handlePointerMove)
+      root.removeEventListener('pointerleave', handlePointerLeave)
       root.removeEventListener('pointerdown', handlePointerDown)
     }
   }, [itemId, specimen.css, specimen.html])
@@ -131,6 +181,7 @@ export function HtmlSpecimenShadowPreview({
       ref={hostRef}
       className="demo-html-specimen-preview"
       data-html-specimen-item-id={itemId}
+      data-preview-hover-node-id={hoverNodeId ?? undefined}
       data-preview-target-node-id={targetNodeId ?? undefined}
       title={title}
     />
@@ -184,6 +235,50 @@ function setHtmlSpecimenPreviewTargetState({
     host.dataset.previewTargetNodeId = nodeId
   } else {
     delete host.dataset.previewTargetNodeId
+  }
+}
+
+function clearHtmlSpecimenPreviewHoverState({
+  host,
+  hoverNodeIdRef,
+  root,
+  setHoverNodeId,
+}: {
+  host: HTMLElement
+  hoverNodeIdRef: { current: string | null }
+  root: ShadowRoot
+  setHoverNodeId: (nodeId: string | null) => void
+}) {
+  setHtmlSpecimenPreviewHoverState({
+    host,
+    hoverNodeIdRef,
+    nodeId: null,
+    setHoverNodeId,
+  })
+  clearHtmlSpecimenPreviewMarkedElement(
+    root,
+    HTML_SPECIMEN_PREVIEW_HOVER_ATTRIBUTE,
+  )
+}
+
+function setHtmlSpecimenPreviewHoverState({
+  host,
+  hoverNodeIdRef,
+  nodeId,
+  setHoverNodeId,
+}: {
+  host: HTMLElement
+  hoverNodeIdRef: { current: string | null }
+  nodeId: string | null
+  setHoverNodeId: (nodeId: string | null) => void
+}) {
+  hoverNodeIdRef.current = nodeId
+  setHoverNodeId(nodeId)
+
+  if (nodeId) {
+    host.dataset.previewHoverNodeId = nodeId
+  } else {
+    delete host.dataset.previewHoverNodeId
   }
 }
 
@@ -281,16 +376,47 @@ function markHtmlSpecimenPreviewTargetElement(
   root: ShadowRoot,
   path: readonly number[],
 ) {
-  for (const element of root.querySelectorAll(
-    `[${HTML_SPECIMEN_PREVIEW_TARGET_ATTRIBUTE}]`,
-  )) {
-    element.removeAttribute(HTML_SPECIMEN_PREVIEW_TARGET_ATTRIBUTE)
-  }
+  markHtmlSpecimenPreviewElement({
+    attribute: HTML_SPECIMEN_PREVIEW_TARGET_ATTRIBUTE,
+    path,
+    root,
+  })
+}
 
+function markHtmlSpecimenPreviewHoverElement(
+  root: ShadowRoot,
+  path: readonly number[],
+) {
+  markHtmlSpecimenPreviewElement({
+    attribute: HTML_SPECIMEN_PREVIEW_HOVER_ATTRIBUTE,
+    path,
+    root,
+  })
+}
+
+function markHtmlSpecimenPreviewElement({
+  attribute,
+  path,
+  root,
+}: {
+  attribute: string
+  path: readonly number[]
+  root: ShadowRoot
+}) {
+  clearHtmlSpecimenPreviewMarkedElement(root, attribute)
   findHtmlSpecimenPreviewElementByPath(root, path)?.setAttribute(
-    HTML_SPECIMEN_PREVIEW_TARGET_ATTRIBUTE,
+    attribute,
     'true',
   )
+}
+
+function clearHtmlSpecimenPreviewMarkedElement(
+  root: ShadowRoot,
+  attribute: string,
+) {
+  for (const element of root.querySelectorAll(`[${attribute}]`)) {
+    element.removeAttribute(attribute)
+  }
 }
 
 function findHtmlSpecimenPreviewElementByPath(
@@ -320,7 +446,11 @@ function ensureHtmlSpecimenPreviewToolStyle(root: ShadowRoot) {
   const style = root.ownerDocument.createElement('style')
 
   style.setAttribute(HTML_SPECIMEN_PREVIEW_TOOL_STYLE_ATTRIBUTE, '')
-  style.textContent = `[${HTML_SPECIMEN_PREVIEW_TARGET_ATTRIBUTE}] {
+  style.textContent = `[${HTML_SPECIMEN_PREVIEW_HOVER_ATTRIBUTE}] {
+  outline: 1px solid #38bdf8 !important;
+  outline-offset: 1px !important;
+}
+[${HTML_SPECIMEN_PREVIEW_TARGET_ATTRIBUTE}] {
   outline: 2px solid #0f766e !important;
   outline-offset: 2px !important;
 }`

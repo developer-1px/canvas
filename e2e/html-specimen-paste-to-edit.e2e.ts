@@ -46,6 +46,17 @@ test('pastes HTML/CSS and edits preview target CSS through the inspector', async
   const preview = page.locator('.demo-html-specimen-preview').last()
 
   await expect(preview).toBeVisible()
+  await preview.locator('button#primary').hover()
+
+  await expect(preview).toHaveAttribute('data-preview-hover-node-id', /dom:/)
+  await expect.poll(async () =>
+    preview.evaluate((host) => {
+      const hovered = host.shadowRoot
+        ?.querySelector('[data-html-specimen-preview-hover]')
+
+      return hovered instanceof HTMLElement ? hovered.id : ''
+    }),
+  ).toBe('primary')
 
   await preview.locator('button#primary').click()
 
