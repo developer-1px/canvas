@@ -191,6 +191,54 @@ describe('HtmlSpecimenCssInspectorPanel', () => {
     )
   })
 
+  it('ignores inactive media declarations in inspector source labels', () => {
+    const commitItemsChange = vi.fn(() => true)
+    const context = createContext({
+      commitItemsChange,
+      item: createHtmlSpecimenItem({
+        ...createButtonSpecimenData(),
+        css: `.primary {
+  color: #334155;
+}
+@media (min-width: 1000px) {
+  .primary {
+    color: #ffffff;
+  }
+}`,
+        viewportWidth: 360,
+      }),
+    })
+    const markup = renderToStaticMarkup(
+      <>{HTML_SPECIMEN_CSS_INSPECTOR_PANEL.render(context)}</>,
+    )
+
+    expect(markup).toContain('#334155')
+    expect(markup).toContain('Rule .primary / 1 node')
+    expect(markup).not.toContain('Scoped @media (min-width: 1000px)')
+    expect(changeHtmlSpecimenPreviewTargetCss({
+      context,
+      nextValue: '#111827',
+      property: 'color',
+    })).toBe(true)
+    expect(commitItemsChange).toHaveBeenCalledWith(
+      {
+        items: [
+          expect.objectContaining({
+            id: 'html-specimen-1',
+            data: expect.objectContaining({
+              css: expect.stringContaining('color: #111827;'),
+            }),
+          }),
+        ],
+        type: 'replace-changed',
+      },
+      {
+        after: ['html-specimen-1'],
+        before: ['html-specimen-1'],
+      },
+    )
+  })
+
   it('stays hidden when custom focus belongs to another item', () => {
     expect(HTML_SPECIMEN_CSS_INSPECTOR_PANEL.isVisible?.(
       createContext({

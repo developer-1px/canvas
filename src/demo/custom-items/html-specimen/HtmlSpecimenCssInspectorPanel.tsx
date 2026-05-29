@@ -256,8 +256,13 @@ function getHtmlSpecimenCssControlModel({
   target: HtmlSpecimenCssInspectorTarget
 }): HtmlSpecimenCssControlModel {
   const specimen = getHtmlSpecimenData(target.item)
+  const mediaContext = {
+    viewportHeight: specimen.viewportHeight,
+    viewportWidth: specimen.viewportWidth,
+  }
   const source = resolveHtmlSpecimenCssDeclarationSource({
     css: specimen.css,
+    mediaContext,
     nodeId: target.node.id,
     nodes: target.nodes,
     property: control.property,
@@ -266,12 +271,14 @@ function getHtmlSpecimenCssControlModel({
     ? null
     : resolveHtmlSpecimenCssRuleSource({
         css: specimen.css,
+        mediaContext,
         nodeId: target.node.id,
         nodes: target.nodes,
         property: control.property,
       })
   const tokenSource = resolveHtmlSpecimenCssTokenSource({
     css: specimen.css,
+    mediaContext,
     nodeId: target.node.id,
     nodes: target.nodes,
     property: control.property,
@@ -280,6 +287,7 @@ function getHtmlSpecimenCssControlModel({
     ? null
     : resolveHtmlSpecimenCssShorthandConflictSource({
         css: specimen.css,
+        mediaContext,
         nodeId: target.node.id,
         nodes: target.nodes,
         property: control.property,

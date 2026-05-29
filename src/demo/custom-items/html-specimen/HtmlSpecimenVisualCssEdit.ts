@@ -12,6 +12,11 @@ export type HtmlSpecimenVisualCssNode = {
   tagName: string
 }
 
+export type HtmlSpecimenCssMediaContext = {
+  viewportHeight: number
+  viewportWidth: number
+}
+
 export type HtmlSpecimenVisualCssEditIntent = {
   nextValue: string
   nodeId: string
@@ -156,6 +161,7 @@ export function applyHtmlSpecimenVisualCssEdit({
   specimen: HtmlSpecimenData
 }): HtmlSpecimenVisualCssEditResult {
   const node = findNode(nodes, intent.nodeId)
+  const mediaContext = getHtmlSpecimenCssMediaContext(specimen)
 
   if (!node) {
     return {
@@ -168,12 +174,14 @@ export function applyHtmlSpecimenVisualCssEdit({
 
   const previousSource = resolveHtmlSpecimenCssDeclarationSource({
     css: specimen.css,
+    mediaContext,
     nodeId: intent.nodeId,
     nodes,
     property: intent.property,
   })
   const tokenSource = resolveHtmlSpecimenCssTokenSource({
     css: specimen.css,
+    mediaContext,
     nodeId: intent.nodeId,
     nodes,
     property: intent.property,
@@ -191,6 +199,7 @@ export function applyHtmlSpecimenVisualCssEdit({
   const shorthandConflictSource =
     resolveHtmlSpecimenCssShorthandConflictSource({
       css: specimen.css,
+      mediaContext,
       nodeId: intent.nodeId,
       nodes,
       property: intent.property,
@@ -213,6 +222,7 @@ export function applyHtmlSpecimenVisualCssEdit({
       })
     : planNewDeclarationPatch({
         css: specimen.css,
+        mediaContext,
         nextValue: intent.nextValue,
         node,
         nodes,
@@ -235,6 +245,7 @@ export function applyHtmlSpecimenVisualCssEdit({
   }
   const source = resolveHtmlSpecimenCssDeclarationSource({
     css: patchedCss,
+    mediaContext,
     nodeId: intent.nodeId,
     nodes,
     property: intent.property,
@@ -269,11 +280,13 @@ export function applyHtmlSpecimenVisualCssEdit({
 
 export function resolveHtmlSpecimenCssDeclarationSource({
   css,
+  mediaContext,
   nodeId,
   nodes,
   property,
 }: {
   css: string
+  mediaContext?: HtmlSpecimenCssMediaContext
   nodeId: string
   nodes: readonly HtmlSpecimenVisualCssNode[]
   property: string
@@ -286,6 +299,7 @@ export function resolveHtmlSpecimenCssDeclarationSource({
 
   const winner = resolveHtmlSpecimenCssDeclarationMatch({
     css,
+    mediaContext,
     node,
     nodes,
     property,
@@ -299,6 +313,7 @@ export function resolveHtmlSpecimenCssDeclarationSource({
     affectedNodeIds: getAffectedNodeIdsForDeclarationMatch({
       css,
       match: winner,
+      mediaContext,
       nodes,
       property,
     }),
@@ -315,17 +330,20 @@ export function resolveHtmlSpecimenCssDeclarationSource({
 
 function resolveHtmlSpecimenCssDeclarationMatch({
   css,
+  mediaContext,
   node,
   nodes,
   property,
 }: {
   css: string
+  mediaContext?: HtmlSpecimenCssMediaContext
   node: HtmlSpecimenVisualCssNode
   nodes: readonly HtmlSpecimenVisualCssNode[]
   property: string
 }): CssDeclarationMatch | null {
   return resolveHtmlSpecimenCssDeclarationMatchForProperties({
     css,
+    mediaContext,
     node,
     nodes,
     properties: getCssDeclarationSourceProperties(property),
@@ -334,11 +352,13 @@ function resolveHtmlSpecimenCssDeclarationMatch({
 
 function resolveHtmlSpecimenCssDeclarationMatchForProperties({
   css,
+  mediaContext,
   node,
   nodes,
   properties,
 }: {
   css: string
+  mediaContext?: HtmlSpecimenCssMediaContext
   node: HtmlSpecimenVisualCssNode
   nodes: readonly HtmlSpecimenVisualCssNode[]
   properties: Iterable<string>
@@ -347,7 +367,7 @@ function resolveHtmlSpecimenCssDeclarationMatchForProperties({
     Array.from(properties, (candidateProperty) =>
       normalizeProperty(candidateProperty)),
   )
-  const rules = parseCssRules(css)
+  const rules = parseCssRules(css, mediaContext)
   let winner: CssDeclarationMatch | null = null
 
   for (const rule of rules) {
@@ -394,11 +414,13 @@ function resolveHtmlSpecimenCssDeclarationMatchForProperties({
 function getAffectedNodeIdsForDeclarationMatch({
   css,
   match,
+  mediaContext,
   nodes,
   property,
 }: {
   css: string
   match: CssDeclarationMatch
+  mediaContext?: HtmlSpecimenCssMediaContext
   nodes: readonly HtmlSpecimenVisualCssNode[]
   property: string
 }) {
@@ -406,6 +428,7 @@ function getAffectedNodeIdsForDeclarationMatch({
     .filter((candidate) => {
       const candidateMatch = resolveHtmlSpecimenCssDeclarationMatch({
         css,
+        mediaContext,
         node: candidate,
         nodes,
         property,
@@ -420,11 +443,13 @@ function getAffectedNodeIdsForDeclarationMatch({
 function getAffectedNodeIdsForRelatedDeclarationMatch({
   css,
   match,
+  mediaContext,
   nodes,
   properties,
 }: {
   css: string
   match: CssDeclarationMatch
+  mediaContext?: HtmlSpecimenCssMediaContext
   nodes: readonly HtmlSpecimenVisualCssNode[]
   properties: Iterable<string>
 }) {
@@ -432,6 +457,7 @@ function getAffectedNodeIdsForRelatedDeclarationMatch({
     .filter((candidate) => {
       const candidateMatch = resolveHtmlSpecimenCssDeclarationMatchForProperties({
         css,
+        mediaContext,
         node: candidate,
         nodes,
         properties,
@@ -454,11 +480,13 @@ function isSameCssDeclarationMatch(
 
 export function resolveHtmlSpecimenCssRuleSource({
   css,
+  mediaContext,
   nodeId,
   nodes,
   property,
 }: {
   css: string
+  mediaContext?: HtmlSpecimenCssMediaContext
   nodeId: string
   nodes: readonly HtmlSpecimenVisualCssNode[]
   property: string
@@ -469,13 +497,19 @@ export function resolveHtmlSpecimenCssRuleSource({
     return null
   }
 
-  const match = resolveBestMatchingRuleMatch({ css, node, nodes })
+  const match = resolveBestMatchingRuleMatch({
+    css,
+    mediaContext,
+    node,
+    nodes,
+  })
 
   return match
     ? {
         affectedNodeIds: getAffectedNodeIdsForRuleInsertion({
           css,
           match,
+          mediaContext,
           nodes,
           property,
         }),
@@ -490,11 +524,13 @@ export function resolveHtmlSpecimenCssRuleSource({
 function getAffectedNodeIdsForRuleInsertion({
   css,
   match,
+  mediaContext,
   nodes,
   property,
 }: {
   css: string
   match: CssRuleMatch
+  mediaContext?: HtmlSpecimenCssMediaContext
   nodes: readonly HtmlSpecimenVisualCssNode[]
   property: string
 }) {
@@ -512,6 +548,7 @@ function getAffectedNodeIdsForRuleInsertion({
 
       const currentMatch = resolveHtmlSpecimenCssDeclarationMatch({
         css,
+        mediaContext,
         node: candidate,
         nodes,
         property,
@@ -538,11 +575,13 @@ function getAffectedNodeIdsForRuleInsertion({
 
 export function resolveHtmlSpecimenCssTokenSource({
   css,
+  mediaContext,
   nodeId,
   nodes,
   property,
 }: {
   css: string
+  mediaContext?: HtmlSpecimenCssMediaContext
   nodeId: string
   nodes: readonly HtmlSpecimenVisualCssNode[]
   property: string
@@ -559,6 +598,7 @@ export function resolveHtmlSpecimenCssTokenSource({
   ]
   const winner = resolveHtmlSpecimenCssDeclarationMatchForProperties({
     css,
+    mediaContext,
     node,
     nodes,
     properties,
@@ -572,6 +612,7 @@ export function resolveHtmlSpecimenCssTokenSource({
     affectedNodeIds: getAffectedNodeIdsForRelatedDeclarationMatch({
       css,
       match: winner,
+      mediaContext,
       nodes,
       properties,
     }),
@@ -588,17 +629,20 @@ export function resolveHtmlSpecimenCssTokenSource({
 
 export function resolveHtmlSpecimenCssShorthandConflictSource({
   css,
+  mediaContext,
   nodeId,
   nodes,
   property,
 }: {
   css: string
+  mediaContext?: HtmlSpecimenCssMediaContext
   nodeId: string
   nodes: readonly HtmlSpecimenVisualCssNode[]
   property: string
 }): HtmlSpecimenCssDeclarationSource | null {
   const shorthandSource = resolveHtmlSpecimenCssDeclarationSource({
     css,
+    mediaContext,
     nodeId,
     nodes,
     property,
@@ -615,6 +659,7 @@ export function resolveHtmlSpecimenCssShorthandConflictSource({
   for (const candidateProperty of getCssShorthandConflictProperties(property)) {
     const source = resolveHtmlSpecimenCssDeclarationSource({
       css,
+      mediaContext,
       nodeId,
       nodes,
       property: candidateProperty,
@@ -652,11 +697,13 @@ function isComplexBackgroundShorthandColorSource({
 
 export function resolveHtmlSpecimenCssScopedRuleSource({
   css,
+  mediaContext,
   nodeId,
   nodes,
   property,
 }: {
   css: string
+  mediaContext?: HtmlSpecimenCssMediaContext
   nodeId: string
   nodes: readonly HtmlSpecimenVisualCssNode[]
   property: string
@@ -669,6 +716,7 @@ export function resolveHtmlSpecimenCssScopedRuleSource({
 
   const winner = resolveHtmlSpecimenCssScopedDeclarationMatch({
     css,
+    mediaContext,
     node,
     nodes,
     property,
@@ -682,6 +730,7 @@ export function resolveHtmlSpecimenCssScopedRuleSource({
     affectedNodeIds: getAffectedNodeIdsForScopedDeclarationMatch({
       css,
       match: winner,
+      mediaContext,
       nodes,
       property,
     }),
@@ -698,11 +747,13 @@ export function resolveHtmlSpecimenCssScopedRuleSource({
 
 function resolveHtmlSpecimenCssScopedDeclarationMatch({
   css,
+  mediaContext,
   node,
   nodes,
   property,
 }: {
   css: string
+  mediaContext?: HtmlSpecimenCssMediaContext
   node: HtmlSpecimenVisualCssNode
   nodes: readonly HtmlSpecimenVisualCssNode[]
   property: string
@@ -713,7 +764,7 @@ function resolveHtmlSpecimenCssScopedDeclarationMatch({
   ])
   let winner: CssScopedDeclarationMatch | null = null
 
-  for (const scopedRule of parseScopedCssRules(css)) {
+  for (const scopedRule of parseScopedCssRules(css, mediaContext)) {
     const specificity = matchHtmlSpecimenCssSelectorList(
       scopedRule.rule.selector,
       node,
@@ -762,11 +813,13 @@ function resolveHtmlSpecimenCssScopedDeclarationMatch({
 function getAffectedNodeIdsForScopedDeclarationMatch({
   css,
   match,
+  mediaContext,
   nodes,
   property,
 }: {
   css: string
   match: CssScopedDeclarationMatch
+  mediaContext?: HtmlSpecimenCssMediaContext
   nodes: readonly HtmlSpecimenVisualCssNode[]
   property: string
 }) {
@@ -774,6 +827,7 @@ function getAffectedNodeIdsForScopedDeclarationMatch({
     .filter((candidate) => {
       const candidateMatch = resolveHtmlSpecimenCssScopedDeclarationMatch({
         css,
+        mediaContext,
         node: candidate,
         nodes,
         property,
@@ -888,12 +942,14 @@ function planExistingDeclarationPatch({
 
 function planNewDeclarationPatch({
   css,
+  mediaContext,
   nextValue,
   node,
   nodes,
   property,
 }: {
   css: string
+  mediaContext?: HtmlSpecimenCssMediaContext
   nextValue: string
   node: HtmlSpecimenVisualCssNode
   nodes: readonly HtmlSpecimenVisualCssNode[]
@@ -901,6 +957,7 @@ function planNewDeclarationPatch({
 }) {
   const match = resolveBestMatchingRuleMatch({
     css,
+    mediaContext,
     node,
     nodes,
   })
@@ -933,16 +990,18 @@ function planNewDeclarationPatch({
 
 function resolveBestMatchingRuleMatch({
   css,
+  mediaContext,
   node,
   nodes,
 }: {
   css: string
+  mediaContext?: HtmlSpecimenCssMediaContext
   node: HtmlSpecimenVisualCssNode
   nodes: readonly HtmlSpecimenVisualCssNode[]
 }) {
   let best: CssRuleMatch | null = null
 
-  for (const rule of parseCssRules(css)) {
+  for (const rule of parseCssRules(css, mediaContext)) {
     const specificity = matchHtmlSpecimenCssSelectorList(rule.selector, node, nodes)
 
     if (
@@ -970,13 +1029,17 @@ function resolveBestMatchingRuleMatch({
   return best
 }
 
-function parseCssRules(css: string): CssRule[] {
+function parseCssRules(
+  css: string,
+  mediaContext?: HtmlSpecimenCssMediaContext,
+): CssRule[] {
   const rules: CssRule[] = []
 
   collectCssRules({
     atRule: null,
     css,
     end: css.length,
+    mediaContext,
     rules,
     start: 0,
   })
@@ -988,12 +1051,14 @@ function collectCssRules({
   atRule,
   css,
   end,
+  mediaContext,
   rules,
   start,
 }: {
   atRule: string | null
   css: string
   end: number
+  mediaContext?: HtmlSpecimenCssMediaContext
   rules: CssRule[]
   start: number
 }) {
@@ -1015,13 +1080,16 @@ function collectCssRules({
     const selector = stripCssComments(css.slice(cursor, blockStart)).trim()
 
     if (selector.startsWith('@')) {
-      collectCssRules({
-        atRule: formatNestedCssAtRule(atRule, selector),
-        css,
-        end: blockEnd,
-        rules,
-        start: blockStart + 1,
-      })
+      if (isCssAtRuleActive(selector, mediaContext)) {
+        collectCssRules({
+          atRule: formatNestedCssAtRule(atRule, selector),
+          css,
+          end: blockEnd,
+          mediaContext,
+          rules,
+          start: blockStart + 1,
+        })
+      }
     } else if (selector.length > 0) {
       rules.push({
         atRule,
@@ -1044,8 +1112,126 @@ function formatNestedCssAtRule(parent: string | null, atRule: string) {
   return parent ? `${parent} / ${atRule}` : atRule
 }
 
-function parseScopedCssRules(css: string) {
-  return parseCssRules(css)
+function isCssAtRuleActive(
+  atRule: string,
+  mediaContext: HtmlSpecimenCssMediaContext | undefined,
+) {
+  const source = stripCssComments(atRule).trim()
+
+  if (!source.toLowerCase().startsWith('@media')) {
+    return true
+  }
+
+  if (!mediaContext) {
+    return true
+  }
+
+  const queryList = source.slice('@media'.length).trim()
+
+  return splitCssMediaQueryList(queryList).some((query) =>
+    matchesCssMediaQuery(query, mediaContext))
+}
+
+function splitCssMediaQueryList(queryList: string) {
+  const queries: string[] = []
+  const scanner = createCssScannerState()
+  let start = 0
+  let index = 0
+
+  while (index < queryList.length) {
+    if (queryList[index] === ',' && isCssScannerTopLevel(scanner)) {
+      queries.push(queryList.slice(start, index).trim())
+      start = index + 1
+      index += 1
+      continue
+    }
+
+    index = advanceCssScannerState(queryList, index, scanner)
+  }
+
+  queries.push(queryList.slice(start).trim())
+
+  return queries.filter((query) => query.length > 0)
+}
+
+function matchesCssMediaQuery(
+  query: string,
+  mediaContext: HtmlSpecimenCssMediaContext,
+) {
+  let source = query.trim().toLowerCase()
+  let negated = false
+
+  if (source.startsWith('not ')) {
+    negated = true
+    source = source.slice('not '.length).trim()
+  }
+
+  if (source.startsWith('only ')) {
+    source = source.slice('only '.length).trim()
+  }
+
+  let active = matchesCssMediaType(source)
+
+  for (const match of source.matchAll(
+    /\(\s*(min|max)-(width|height)\s*:\s*([0-9]*\.?[0-9]+)(px|rem|em)?\s*\)/g,
+  )) {
+    const [, range, axis, rawValue, unit = 'px'] = match
+    const expected = parseCssMediaLengthPx(rawValue, unit)
+    const actual = axis === 'height'
+      ? mediaContext.viewportHeight
+      : mediaContext.viewportWidth
+
+    active = active && (
+      range === 'min'
+        ? actual >= expected
+        : actual <= expected
+    )
+  }
+
+  for (const match of source.matchAll(
+    /\(\s*orientation\s*:\s*(landscape|portrait)\s*\)/g,
+  )) {
+    const [, orientation] = match
+    const actual = mediaContext.viewportWidth >= mediaContext.viewportHeight
+      ? 'landscape'
+      : 'portrait'
+
+    active = active && orientation === actual
+  }
+
+  return negated ? !active : active
+}
+
+function matchesCssMediaType(query: string) {
+  const beforeFeature = query.split('(')[0]
+  const mediaTypes = beforeFeature
+    .split(/\s+/)
+    .map((token) => token.trim())
+    .filter((token) =>
+      token.length > 0 &&
+      token !== 'and' &&
+      token !== 'not' &&
+      token !== 'only')
+
+  if (mediaTypes.length === 0) {
+    return true
+  }
+
+  return mediaTypes.some((mediaType) =>
+    mediaType === 'all' || mediaType === 'screen')
+}
+
+function parseCssMediaLengthPx(value: string | undefined, unit: string) {
+  const parsed = Number.parseFloat(value ?? '0')
+
+  return unit === 'em' || unit === 'rem' ? parsed * 16 : parsed
+}
+
+function parseScopedCssRules(
+  css: string,
+  mediaContext?: HtmlSpecimenCssMediaContext,
+) {
+  return parseCssRules(css, mediaContext)
     .filter((rule) => rule.atRule !== null)
     .map((rule) => ({
       atRule: rule.atRule ?? '',
@@ -1427,6 +1613,15 @@ function findNode(
   nodeId: string,
 ) {
   return nodes.find((node) => node.id === nodeId) ?? null
+}
+
+function getHtmlSpecimenCssMediaContext(
+  specimen: HtmlSpecimenData,
+): HtmlSpecimenCssMediaContext {
+  return {
+    viewportHeight: specimen.viewportHeight,
+    viewportWidth: specimen.viewportWidth,
+  }
 }
 
 function normalizeProperty(property: string) {
