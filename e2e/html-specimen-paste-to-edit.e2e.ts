@@ -1192,6 +1192,75 @@ test('keeps token-backed preview CSS read-only in the inspector', async ({
   ).toContain('font: var(--control-font);')
 })
 
+test('allows longhand edits after token-backed shorthand is overridden', async ({
+  page,
+}) => {
+  await page.goto('/')
+
+  const pasteWasHandled = await page.evaluate((text) => {
+    const data = new DataTransfer()
+
+    data.setData('text/plain', text)
+
+    const event = new ClipboardEvent('paste', {
+      bubbles: true,
+      cancelable: true,
+      clipboardData: data,
+    })
+
+    window.dispatchEvent(event)
+
+    return event.defaultPrevented
+  }, JSON.stringify({
+    css: [
+      ':root {',
+      '  --control-font: 700 14px/1 system-ui;',
+      '}',
+      '.button {',
+      '  font: var(--control-font);',
+      '}',
+      '.danger {',
+      '  font-size: 13px;',
+      '}',
+    ].join('\n'),
+    html: [
+      '<main>',
+      '<button id="primary" class="button">Save</button>',
+      '<button id="danger" class="button danger">Delete</button>',
+      '</main>',
+    ].join(''),
+  }))
+
+  expect(pasteWasHandled).toBe(true)
+
+  const preview = page.locator('.demo-html-specimen-preview').last()
+
+  await expect(preview).toBeVisible()
+  await preview.locator('button#danger').click()
+  const primaryFontSize = await preview.locator('button#primary')
+    .evaluate((button) => getComputedStyle(button).fontSize)
+
+  const fontField = page
+    .locator('.html-specimen-css-field')
+    .filter({ hasText: 'Font' })
+  const fontInput = fontField.locator('input')
+
+  await expect(fontField.getByText('Rule .danger / 1 node')).toBeVisible()
+  await expect(fontInput).toHaveValue('13px')
+  await expect(fontInput).toBeEnabled()
+  await fontInput.fill('18px')
+  await fontInput.blur()
+
+  await expect.poll(async () =>
+    preview.locator('button#danger').evaluate((button) =>
+      getComputedStyle(button).fontSize),
+  ).toBe('18px')
+  await expect.poll(async () =>
+    preview.locator('button#primary').evaluate((button) =>
+      getComputedStyle(button).fontSize),
+  ).toBe(primaryFontSize)
+})
+
 test('keeps shorthand controls read-only when longhand declarations exist', async ({
   page,
 }) => {

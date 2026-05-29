@@ -336,7 +336,29 @@ function resolveHtmlSpecimenCssDeclarationMatch({
   nodes: readonly HtmlSpecimenVisualCssNode[]
   property: string
 }): CssDeclarationMatch | null {
-  const matchedProperties = new Set(getCssDeclarationSourceProperties(property))
+  return resolveHtmlSpecimenCssDeclarationMatchForProperties({
+    css,
+    node,
+    nodes,
+    properties: getCssDeclarationSourceProperties(property),
+  })
+}
+
+function resolveHtmlSpecimenCssDeclarationMatchForProperties({
+  css,
+  node,
+  nodes,
+  properties,
+}: {
+  css: string
+  node: HtmlSpecimenVisualCssNode
+  nodes: readonly HtmlSpecimenVisualCssNode[]
+  properties: Iterable<string>
+}): CssDeclarationMatch | null {
+  const matchedProperties = new Set(
+    Array.from(properties, (candidateProperty) =>
+      normalizeProperty(candidateProperty)),
+  )
   const rules = parseCssRules(css)
   let winner: CssDeclarationMatch | null = null
 
@@ -399,6 +421,32 @@ function getAffectedNodeIdsForDeclarationMatch({
         node: candidate,
         nodes,
         property,
+      })
+
+      return candidateMatch !== null &&
+        isSameCssDeclarationMatch(candidateMatch, match)
+    })
+    .map((candidate) => candidate.id)
+}
+
+function getAffectedNodeIdsForRelatedDeclarationMatch({
+  css,
+  match,
+  nodes,
+  properties,
+}: {
+  css: string
+  match: CssDeclarationMatch
+  nodes: readonly HtmlSpecimenVisualCssNode[]
+  properties: Iterable<string>
+}) {
+  return nodes
+    .filter((candidate) => {
+      const candidateMatch = resolveHtmlSpecimenCssDeclarationMatchForProperties({
+        css,
+        node: candidate,
+        nodes,
+        properties,
       })
 
       return candidateMatch !== null &&
@@ -510,33 +558,42 @@ export function resolveHtmlSpecimenCssTokenSource({
   nodes: readonly HtmlSpecimenVisualCssNode[]
   property: string
 }): HtmlSpecimenCssDeclarationSource | null {
-  const properties = new Set([
-    normalizeProperty(property),
-    ...getCssTokenGuardProperties(property),
-  ])
-  let winner: HtmlSpecimenCssDeclarationSource | null = null
+  const node = findNode(nodes, nodeId)
 
-  for (const candidateProperty of properties) {
-    const source = resolveHtmlSpecimenCssDeclarationSource({
-      css,
-      nodeId,
-      nodes,
-      property: candidateProperty,
-    })
-
-    if (
-      source &&
-      isHtmlSpecimenCssTokenValue(source.value) &&
-      (
-        !winner ||
-        compareCssSource(source, winner) > 0
-      )
-    ) {
-      winner = source
-    }
+  if (!node) {
+    return null
   }
 
-  return winner
+  const properties = [
+    normalizeProperty(property),
+    ...getCssTokenGuardProperties(property),
+  ]
+  const winner = resolveHtmlSpecimenCssDeclarationMatchForProperties({
+    css,
+    node,
+    nodes,
+    properties,
+  })
+
+  if (!winner || !isHtmlSpecimenCssTokenValue(winner.declaration.value)) {
+    return null
+  }
+
+  return {
+    affectedNodeIds: getAffectedNodeIdsForRelatedDeclarationMatch({
+      css,
+      match: winner,
+      nodes,
+      properties,
+    }),
+    declarationIndex: winner.declaration.declarationIndex,
+    important: winner.declaration.important,
+    property: winner.declaration.property,
+    ruleIndex: winner.rule.ruleIndex,
+    selector: winner.rule.selector,
+    specificity: winner.specificity,
+    value: winner.declaration.value,
+  }
 }
 
 export function resolveHtmlSpecimenCssShorthandConflictSource({

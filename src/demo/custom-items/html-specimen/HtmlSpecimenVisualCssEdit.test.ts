@@ -445,6 +445,75 @@ describe('HtmlSpecimenVisualCssEdit', () => {
     })
   })
 
+  it('does not block font-size edits when a longhand beats a token font', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `:root {
+  --control-font: 700 14px/1 system-ui;
+}
+.button {
+  font: var(--control-font);
+}
+.danger {
+  font-size: 13px;
+}`,
+    }
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '18px',
+        nodeId: 'danger',
+        property: 'font-size',
+      },
+      nodes: createButtonNodes(),
+      specimen,
+    })
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) {
+      throw new Error(result.reason)
+    }
+
+    expect(result.source).toMatchObject({
+      affectedNodeIds: ['danger'],
+      property: 'font-size',
+      selector: '.danger',
+      value: '18px',
+    })
+    expect(result.specimen.css).toContain('font-size: 18px;')
+  })
+
+  it('reports token affected nodes by related property winner', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `:root {
+  --control-font: 700 14px/1 system-ui;
+}
+.button {
+  font: var(--control-font);
+}
+.danger {
+  font-size: 13px;
+}`,
+    }
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '18px',
+        nodeId: 'primary',
+        property: 'font-size',
+      },
+      nodes: createButtonNodes(),
+      specimen,
+    })
+
+    expect(result).toEqual({
+      affectedNodeIds: ['primary', 'secondary'],
+      ok: false,
+      reason: 'token-value',
+      specimen,
+    })
+  })
+
   it('blocks shorthand edits when related longhand declarations exist', () => {
     const specimen = {
       ...createButtonSpecimenData(),
