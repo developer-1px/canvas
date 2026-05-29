@@ -19,6 +19,14 @@ describe('isHtmlSpecimenCssSupportedValue', () => {
       value: 'red',
     })).toBe(true)
     expect(isHtmlSpecimenCssSupportedValue({
+      property: 'color',
+      value: 'rgb(37 99 235 / 50%)',
+    })).toBe(true)
+    expect(isHtmlSpecimenCssSupportedValue({
+      property: 'color',
+      value: 'hsl(221 83% 53%)',
+    })).toBe(true)
+    expect(isHtmlSpecimenCssSupportedValue({
       property: 'font-size',
       value: '16px',
     })).toBe(true)
@@ -40,6 +48,14 @@ describe('isHtmlSpecimenCssSupportedValue', () => {
     expect(isHtmlSpecimenCssSupportedValue({
       property: 'padding',
       value: 'auto',
+    })).toBe(false)
+    expect(isHtmlSpecimenCssSupportedValue({
+      property: 'color',
+      value: 'rgb(nope)',
+    })).toBe(false)
+    expect(isHtmlSpecimenCssSupportedValue({
+      property: 'color',
+      value: 'hsl(nope)',
     })).toBe(false)
   })
 

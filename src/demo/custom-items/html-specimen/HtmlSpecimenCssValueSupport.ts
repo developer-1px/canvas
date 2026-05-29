@@ -270,10 +270,114 @@ function isCssVarValue(value: string) {
 
 function isSupportedColorValue(value: string) {
   return /^(?:#[0-9a-f]{3}|#[0-9a-f]{4}|#[0-9a-f]{6}|#[0-9a-f]{8})$/.test(value) ||
-    /^(?:rgb|rgba|hsl|hsla|hwb|lab|lch|oklab|oklch|color)\s*\(.+\)$/.test(value) ||
+    isSupportedRgbColorValue(value) ||
+    isSupportedHslColorValue(value) ||
+    /^(?:hwb|lab|lch|oklab|oklch|color)\s*\(.+\)$/.test(value) ||
     value === 'currentcolor' ||
     HTML_SPECIMEN_COLOR_KEYWORDS.has(value) ||
     value === 'transparent'
+}
+
+function isSupportedRgbColorValue(value: string) {
+  const match = /^rgba?\s*\((.+)\)$/.exec(value)
+
+  if (!match) {
+    return false
+  }
+
+  const components = splitCssColorFunctionComponents(match[1])
+
+  return components !== null &&
+    components.channels.length === 3 &&
+    components.channels.every(isSupportedRgbChannel) &&
+    (components.alpha === null || isSupportedAlphaValue(components.alpha))
+}
+
+function isSupportedHslColorValue(value: string) {
+  const match = /^hsla?\s*\((.+)\)$/.exec(value)
+
+  if (!match) {
+    return false
+  }
+
+  const components = splitCssColorFunctionComponents(match[1])
+
+  return components !== null &&
+    components.channels.length === 3 &&
+    isSupportedHueValue(components.channels[0]) &&
+    isSupportedPercentageValue(components.channels[1]) &&
+    isSupportedPercentageValue(components.channels[2]) &&
+    (components.alpha === null || isSupportedAlphaValue(components.alpha))
+}
+
+function splitCssColorFunctionComponents(value: string) {
+  const normalizedValue = value.trim()
+
+  if (normalizedValue.length === 0) {
+    return null
+  }
+
+  if (normalizedValue.includes(',')) {
+    const parts = normalizedValue.split(',').map((part) => part.trim())
+
+    return parts.length === 3 || parts.length === 4
+      ? {
+          alpha: parts[3] ?? null,
+          channels: parts.slice(0, 3),
+        }
+      : null
+  }
+
+  const slashParts = normalizedValue.split('/').map((part) => part.trim())
+
+  if (slashParts.length > 2) {
+    return null
+  }
+
+  return {
+    alpha: slashParts[1] ?? null,
+    channels: slashParts[0].split(/\s+/).filter(Boolean),
+  }
+}
+
+function isSupportedRgbChannel(value: string) {
+  return value.endsWith('%')
+    ? isSupportedPercentageValue(value)
+    : isSupportedNumberRangeValue(value, 0, 255)
+}
+
+function isSupportedHueValue(value: string) {
+  const match = /^([+-]?(?:\d+|\d*\.\d+))(deg|grad|rad|turn)?$/.exec(value)
+
+  return match !== null
+}
+
+function isSupportedAlphaValue(value: string) {
+  return value.endsWith('%')
+    ? isSupportedPercentageValue(value)
+    : isSupportedNumberRangeValue(value, 0, 1)
+}
+
+function isSupportedPercentageValue(value: string) {
+  const match = /^([+-]?(?:\d+|\d*\.\d+))%$/.exec(value)
+
+  return match !== null &&
+    Number(match[1]) >= 0 &&
+    Number(match[1]) <= 100
+}
+
+function isSupportedNumberRangeValue(
+  value: string,
+  min: number,
+  max: number,
+) {
+  if (!/^[+-]?(?:\d+|\d*\.\d+)$/.test(value)) {
+    return false
+  }
+
+  const numberValue = Number(value)
+
+  return numberValue >= min && numberValue <= max
 }
 
 function isSupportedLengthList(
