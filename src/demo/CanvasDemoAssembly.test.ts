@@ -40,7 +40,7 @@ describe('CanvasDemoAssembly', () => {
     ).toEqual(['decision', 'html-specimen', 'risk'])
     expect(
       DEMO_CANVAS_APP_ASSEMBLY.customCommands.map((command) => command.id),
-    ).toEqual(['decide-decision'])
+    ).toEqual(['decide-decision', 'paste-html-specimen'])
     expect(
       DEMO_CANVAS_APP_ASSEMBLY.customItemRenderers['decision-node'],
     ).toBeTypeOf('function')
