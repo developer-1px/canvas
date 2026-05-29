@@ -138,6 +138,7 @@ describe('HtmlSpecimenCssSelectorMatcher', () => {
         className: 'item middle',
         id: 'middle',
         path: [0, 1],
+        tagName: 'a',
       }),
       createNode({
         className: 'item last',
@@ -202,17 +203,42 @@ describe('HtmlSpecimenCssSelectorMatcher', () => {
       nodes,
     )).toEqual([0, 2, 0])
     expect(matchHtmlSpecimenCssSelectorList(
+      '.item:first-of-type',
+      nodes[0]!,
+      nodes,
+    )).toEqual([0, 2, 0])
+    expect(matchHtmlSpecimenCssSelectorList(
+      '.item:first-of-type',
+      nodes[2]!,
+      nodes,
+    )).toBeNull()
+    expect(matchHtmlSpecimenCssSelectorList(
+      '.item:last-of-type',
+      nodes[2]!,
+      nodes,
+    )).toEqual([0, 2, 0])
+    expect(matchHtmlSpecimenCssSelectorList(
+      '.item:only-of-type',
+      nodes[1]!,
+      nodes,
+    )).toEqual([0, 2, 0])
+    expect(matchHtmlSpecimenCssSelectorList(
+      '.item:nth-of-type(2)',
+      nodes[2]!,
+      nodes,
+    )).toEqual([0, 2, 0])
+    expect(matchHtmlSpecimenCssSelectorList(
+      '.item:nth-last-of-type(1)',
+      nodes[2]!,
+      nodes,
+    )).toEqual([0, 2, 0])
+    expect(matchHtmlSpecimenCssSelectorList(
       '.item:nth-child(2)',
       nodes[0]!,
       nodes,
     )).toBeNull()
     expect(matchHtmlSpecimenCssSelectorList(
       '.item:nth-child(foo)',
-      nodes[0]!,
-      nodes,
-    )).toBeNull()
-    expect(matchHtmlSpecimenCssSelectorList(
-      '.item:first-child-of-type',
       nodes[0]!,
       nodes,
     )).toBeNull()

@@ -49,13 +49,23 @@ type CssNthFormula = {
 type CssStructuralPseudoClassSelector =
   | {
       end: number
-      name: 'first-child' | 'last-child' | 'only-child'
+      name:
+        | 'first-child'
+        | 'first-of-type'
+        | 'last-child'
+        | 'last-of-type'
+        | 'only-child'
+        | 'only-of-type'
       start: number
     }
   | {
       end: number
       formula: CssNthFormula
-      name: 'nth-child' | 'nth-last-child'
+      name:
+        | 'nth-child'
+        | 'nth-last-child'
+        | 'nth-last-of-type'
+        | 'nth-of-type'
       start: number
     }
 
@@ -470,8 +480,12 @@ function matchesCssStructuralPseudoClassSelector(
   switch (pseudoClass.name) {
     case 'first-child':
       return isFirstNodeChild(node)
+    case 'first-of-type':
+      return getNodeOfTypePosition(node, nodes) === 1
     case 'last-child':
       return isLastNodeChild(node, nodes)
+    case 'last-of-type':
+      return getNodeLastOfTypePosition(node, nodes) === 1
     case 'nth-child':
       return matchesCssNthFormula(
         getNodeChildPosition(node),
@@ -482,8 +496,21 @@ function matchesCssStructuralPseudoClassSelector(
         getNodeLastChildPosition(node, nodes),
         pseudoClass.formula,
       )
+    case 'nth-last-of-type':
+      return matchesCssNthFormula(
+        getNodeLastOfTypePosition(node, nodes),
+        pseudoClass.formula,
+      )
+    case 'nth-of-type':
+      return matchesCssNthFormula(
+        getNodeOfTypePosition(node, nodes),
+        pseudoClass.formula,
+      )
     case 'only-child':
       return isFirstNodeChild(node) && isLastNodeChild(node, nodes)
+    case 'only-of-type':
+      return getNodeOfTypePosition(node, nodes) === 1 &&
+        getNodeLastOfTypePosition(node, nodes) === 1
   }
 }
 
@@ -852,15 +879,19 @@ function readCssStructuralPseudoClassSelector(
     return null
   }
 
-  const staticMatch = /^(first-child|last-child|only-child)(?![-_a-zA-Z0-9(])/i
-    .exec(source.slice(start + 1))
+  const staticMatch =
+    /^(first-child|first-of-type|last-child|last-of-type|only-child|only-of-type)(?![-_a-zA-Z0-9(])/i
+      .exec(source.slice(start + 1))
 
   const staticName = staticMatch?.[1]?.toLowerCase()
 
   if (
     staticName === 'first-child' ||
+    staticName === 'first-of-type' ||
     staticName === 'last-child' ||
-    staticName === 'only-child'
+    staticName === 'last-of-type' ||
+    staticName === 'only-child' ||
+    staticName === 'only-of-type'
   ) {
     return {
       end: start + 1 + staticName.length,
@@ -869,11 +900,16 @@ function readCssStructuralPseudoClassSelector(
     }
   }
 
-  const nthMatch = /^(nth-child|nth-last-child)\(/i
+  const nthMatch = /^(nth-child|nth-last-child|nth-of-type|nth-last-of-type)\(/i
     .exec(source.slice(start + 1))
   const nthName = nthMatch?.[1]?.toLowerCase()
 
-  if (nthName !== 'nth-child' && nthName !== 'nth-last-child') {
+  if (
+    nthName !== 'nth-child' &&
+    nthName !== 'nth-last-child' &&
+    nthName !== 'nth-last-of-type' &&
+    nthName !== 'nth-of-type'
+  ) {
     return null
   }
 
@@ -1479,6 +1515,72 @@ function getNodeLastChildPosition(
   return siblingIndex === null || lastSiblingIndex === null
     ? null
     : lastSiblingIndex - siblingIndex + 1
+}
+
+function getNodeOfTypePosition(
+  node: HtmlSpecimenCssSelectorNode,
+  nodes: readonly HtmlSpecimenCssSelectorNode[],
+) {
+  const siblingIndex = getNodeSiblingIndex(node)
+  const nodePath = node.path
+
+  if (!nodePath || siblingIndex === null) {
+    return null
+  }
+
+  let position = 0
+
+  for (const candidate of nodes) {
+    const candidateSiblingIndex = candidate.path?.at(-1)
+
+    if (
+      candidateSiblingIndex !== undefined &&
+      candidateSiblingIndex <= siblingIndex &&
+      isSameNodeTypeSibling(candidate, node, nodePath)
+    ) {
+      position += 1
+    }
+  }
+
+  return position
+}
+
+function getNodeLastOfTypePosition(
+  node: HtmlSpecimenCssSelectorNode,
+  nodes: readonly HtmlSpecimenCssSelectorNode[],
+) {
+  const siblingIndex = getNodeSiblingIndex(node)
+  const nodePath = node.path
+
+  if (!nodePath || siblingIndex === null) {
+    return null
+  }
+
+  let position = 0
+
+  for (const candidate of nodes) {
+    const candidateSiblingIndex = candidate.path?.at(-1)
+
+    if (
+      candidateSiblingIndex !== undefined &&
+      candidateSiblingIndex >= siblingIndex &&
+      isSameNodeTypeSibling(candidate, node, nodePath)
+    ) {
+      position += 1
+    }
+  }
+
+  return position
+}
+
+function isSameNodeTypeSibling(
+  candidate: HtmlSpecimenCssSelectorNode,
+  node: HtmlSpecimenCssSelectorNode,
+  nodePath: readonly number[],
+) {
+  return candidate.path !== undefined &&
+    candidate.tagName.toLowerCase() === node.tagName.toLowerCase() &&
+    hasSameParentPath(candidate.path, nodePath)
 }
 
 function getNodeSiblingIndex(node: HtmlSpecimenCssSelectorNode) {

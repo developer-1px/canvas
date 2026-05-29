@@ -1831,6 +1831,56 @@ describe('HtmlSpecimenVisualCssEdit', () => {
     })
   })
 
+  it('matches nth-of-type pseudo classes against indexed nodes', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `.table-row:nth-of-type(2) {
+  color: #334155;
+}`,
+    }
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '#111827',
+        nodeId: 'second',
+        property: 'color',
+      },
+      nodes: [
+        createNode({
+          className: 'table-row',
+          id: 'first',
+          path: [0, 0],
+          tagName: 'div',
+        }),
+        createNode({
+          className: 'gap',
+          id: 'gap',
+          path: [0, 1],
+          tagName: 'button',
+        }),
+        createNode({
+          className: 'table-row',
+          id: 'second',
+          path: [0, 2],
+          tagName: 'div',
+        }),
+      ],
+      specimen,
+    })
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) {
+      throw new Error(result.reason)
+    }
+
+    expect(result.source).toMatchObject({
+      affectedNodeIds: ['second'],
+      selector: '.table-row:nth-of-type(2)',
+      specificity: [0, 2, 0],
+      value: '#111827',
+    })
+  })
+
   it('does not match negated pseudo function selectors when the node is excluded', () => {
     const specimen = {
       ...createButtonSpecimenData(),
@@ -1865,7 +1915,7 @@ describe('HtmlSpecimenVisualCssEdit', () => {
   it('does not simplify unsupported pseudo-class selectors into patchable matches', () => {
     const specimen = {
       ...createButtonSpecimenData(),
-      css: `.primary:first-child-of-type {
+      css: `.primary:enabled {
   color: #334155;
 }`,
     }
