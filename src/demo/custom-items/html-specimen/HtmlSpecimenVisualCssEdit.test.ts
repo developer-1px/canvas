@@ -298,6 +298,34 @@ describe('HtmlSpecimenVisualCssEdit', () => {
     })
   })
 
+  it('blocks raw font-size edits that would bypass token-backed font declarations', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `:root {
+  --control-font: 700 14px/1 system-ui;
+}
+.primary {
+  font: var(--control-font);
+}`,
+    }
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '18px',
+        nodeId: 'primary',
+        property: 'font-size',
+      },
+      nodes: createButtonNodes(),
+      specimen,
+    })
+
+    expect(result).toEqual({
+      affectedNodeIds: ['primary'],
+      ok: false,
+      reason: 'token-value',
+      specimen,
+    })
+  })
+
   it('blocks shorthand edits when related longhand declarations exist', () => {
     const specimen = {
       ...createButtonSpecimenData(),

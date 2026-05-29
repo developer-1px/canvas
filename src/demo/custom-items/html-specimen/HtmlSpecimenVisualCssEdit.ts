@@ -1127,6 +1127,8 @@ function getCssTokenGuardProperties(property: string) {
         'border-top-left-radius',
         'border-top-right-radius',
       ]
+    case 'font-size':
+      return ['font']
     case 'margin':
       return ['margin-bottom', 'margin-left', 'margin-right', 'margin-top']
     case 'padding':

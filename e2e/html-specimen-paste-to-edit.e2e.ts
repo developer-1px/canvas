@@ -617,10 +617,12 @@ test('keeps token-backed preview CSS read-only in the inspector', async ({
     css: [
       ':root {',
       '  --brand: #2563eb;',
+      '  --control-font: 700 14px/1 system-ui;',
       '}',
       '.primary {',
       '  color: #ffffff;',
       '  background: var(--brand);',
+      '  font: var(--control-font);',
       '}',
     ].join('\n'),
     html: [
@@ -641,14 +643,25 @@ test('keeps token-backed preview CSS read-only in the inspector', async ({
     .locator('.html-specimen-css-field')
     .filter({ hasText: 'Bg' })
   const backgroundInput = backgroundField.locator('input')
+  const fontField = page
+    .locator('.html-specimen-css-field')
+    .filter({ hasText: 'Font' })
+  const fontInput = fontField.locator('input')
 
   await expect(backgroundField.getByText('Token .primary / 1 node')).toBeVisible()
   await expect(backgroundInput).toHaveValue('var(--brand)')
   await expect(backgroundInput).toBeDisabled()
+  await expect(fontField.getByText('Token .primary / 1 node')).toBeVisible()
+  await expect(fontInput).toHaveValue('var(--control-font)')
+  await expect(fontInput).toBeDisabled()
   await expect.poll(async () =>
     preview.evaluate((host) =>
       host.shadowRoot?.querySelector('style')?.textContent ?? ''),
   ).toContain('background: var(--brand);')
+  await expect.poll(async () =>
+    preview.evaluate((host) =>
+      host.shadowRoot?.querySelector('style')?.textContent ?? ''),
+  ).toContain('font: var(--control-font);')
 })
 
 test('keeps shorthand controls read-only when longhand declarations exist', async ({
