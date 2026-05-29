@@ -34,7 +34,11 @@ export type HtmlSpecimenVisualCssEditResult =
   | {
       affectedNodeIds: string[]
       ok: false
-      reason: 'node-not-found' | 'rule-not-found' | 'verification-failed'
+      reason:
+        | 'node-not-found'
+        | 'rule-not-found'
+        | 'token-value'
+        | 'verification-failed'
       specimen: HtmlSpecimenData
     }
   | {
@@ -97,6 +101,16 @@ export function applyHtmlSpecimenVisualCssEdit({
     nodes,
     property: intent.property,
   })
+
+  if (previousSource && isHtmlSpecimenCssTokenValue(previousSource.value)) {
+    return {
+      affectedNodeIds: previousSource.affectedNodeIds,
+      ok: false,
+      reason: 'token-value',
+      specimen,
+    }
+  }
+
   const patchedCss = previousSource
     ? patchExistingDeclaration({
         css: specimen.css,
@@ -260,6 +274,10 @@ export function resolveHtmlSpecimenCssRuleSource({
         specificity: match.specificity,
       }
     : null
+}
+
+export function isHtmlSpecimenCssTokenValue(value: string) {
+  return /\bvar\s*\(/i.test(value)
 }
 
 function patchExistingDeclaration({

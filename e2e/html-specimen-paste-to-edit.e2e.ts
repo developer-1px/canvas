@@ -119,3 +119,60 @@ test('pastes HTML/CSS and edits preview target CSS through the inspector', async
     .getByText('No matching rule')).toBeVisible()
   await expect(unresolvedTextInput).toBeDisabled()
 })
+
+test('keeps token-backed preview CSS read-only in the inspector', async ({
+  page,
+}) => {
+  await page.goto('/')
+
+  const pasteWasHandled = await page.evaluate((text) => {
+    const data = new DataTransfer()
+
+    data.setData('text/plain', text)
+
+    const event = new ClipboardEvent('paste', {
+      bubbles: true,
+      cancelable: true,
+      clipboardData: data,
+    })
+
+    window.dispatchEvent(event)
+
+    return event.defaultPrevented
+  }, JSON.stringify({
+    css: [
+      ':root {',
+      '  --brand: #2563eb;',
+      '}',
+      '.primary {',
+      '  color: #ffffff;',
+      '  background-color: var(--brand);',
+      '}',
+    ].join('\n'),
+    html: [
+      '<main>',
+      '<button id="primary" class="primary">Save</button>',
+      '</main>',
+    ].join(''),
+  }))
+
+  expect(pasteWasHandled).toBe(true)
+
+  const preview = page.locator('.demo-html-specimen-preview').last()
+
+  await expect(preview).toBeVisible()
+  await preview.locator('button#primary').click()
+
+  const backgroundField = page
+    .locator('.html-specimen-css-field')
+    .filter({ hasText: 'Bg' })
+  const backgroundInput = backgroundField.locator('input')
+
+  await expect(backgroundField.getByText('Token .primary / 1 node')).toBeVisible()
+  await expect(backgroundInput).toHaveValue('var(--brand)')
+  await expect(backgroundInput).toBeDisabled()
+  await expect.poll(async () =>
+    preview.evaluate((host) =>
+      host.shadowRoot?.querySelector('style')?.textContent ?? ''),
+  ).toContain('background-color: var(--brand);')
+})

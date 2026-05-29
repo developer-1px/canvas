@@ -63,6 +63,34 @@ describe('HtmlSpecimenVisualCssEdit', () => {
     expect(result.specimen.css).toContain('border-radius: 12px;')
   })
 
+  it('blocks raw edits to token-backed stylesheet declarations', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `:root {
+  --brand: #2563eb;
+}
+.primary {
+  background: var(--brand);
+}`,
+    }
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '#111827',
+        nodeId: 'primary',
+        property: 'background',
+      },
+      nodes: createButtonNodes(),
+      specimen,
+    })
+
+    expect(result).toEqual({
+      affectedNodeIds: ['primary'],
+      ok: false,
+      reason: 'token-value',
+      specimen,
+    })
+  })
+
   it('adds missing declarations to the most specific matching rule', () => {
     const result = applyHtmlSpecimenVisualCssEdit({
       intent: {

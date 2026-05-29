@@ -93,6 +93,35 @@ describe('HtmlSpecimenCssInspectorPanel', () => {
     )
   })
 
+  it('shows token-backed declarations as non-editable', () => {
+    const commitItemsChange = vi.fn(() => true)
+    const context = createContext({
+      commitItemsChange,
+      item: createHtmlSpecimenItem({
+        ...createButtonSpecimenData(),
+        css: `:root {
+  --brand: #2563eb;
+}
+.primary {
+  background-color: var(--brand);
+}`,
+      }),
+    })
+    const markup = renderToStaticMarkup(
+      <>{HTML_SPECIMEN_CSS_INSPECTOR_PANEL.render(context)}</>,
+    )
+
+    expect(markup).toContain('var(--brand)')
+    expect(markup).toContain('Token .primary / 1 node')
+    expect(markup).toContain('disabled=""')
+    expect(changeHtmlSpecimenPreviewTargetCss({
+      context,
+      nextValue: '#111827',
+      property: 'background-color',
+    })).toBe(false)
+    expect(commitItemsChange).not.toHaveBeenCalled()
+  })
+
   it('stays hidden when custom focus belongs to another item', () => {
     expect(HTML_SPECIMEN_CSS_INSPECTOR_PANEL.isVisible?.(
       createContext({
@@ -149,11 +178,12 @@ describe('HtmlSpecimenCssInspectorPanel', () => {
 function createContext({
   commitItemsChange = vi.fn(() => true),
   customFocus,
+  item = createHtmlSpecimenItem(),
 }: {
   commitItemsChange?: CanvasAppInspectorPanelContext['commitItemsChange']
   customFocus?: CanvasAppInspectorPanelContext['customFocus']
+  item?: CanvasCustomItem
 } = {}): CanvasAppInspectorPanelContext {
-  const item = createHtmlSpecimenItem()
   const node = {
     attributes: {
       class: 'button primary',
@@ -212,9 +242,11 @@ function createContext({
   }
 }
 
-function createHtmlSpecimenItem(): CanvasCustomItem {
+function createHtmlSpecimenItem(
+  data = createButtonSpecimenData(),
+): CanvasCustomItem {
   return {
-    data: createButtonSpecimenData(),
+    data,
     h: 250,
     id: 'html-specimen-1',
     kind: 'html-specimen',

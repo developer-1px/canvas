@@ -10,6 +10,7 @@ import {
 } from './HtmlSpecimenCustomItemModel'
 import {
   applyHtmlSpecimenVisualCssEdit,
+  isHtmlSpecimenCssTokenValue,
   resolveHtmlSpecimenCssDeclarationSource,
   resolveHtmlSpecimenCssRuleSource,
   type HtmlSpecimenCssDeclarationSource,
@@ -37,6 +38,7 @@ type HtmlSpecimenPreviewFocusData = {
 }
 
 type HtmlSpecimenCssControlModel = {
+  blockedReason: 'token-value' | null
   editable: boolean
   source: HtmlSpecimenCssDeclarationSource | null
   ruleSource: HtmlSpecimenCssRuleSource | null
@@ -256,9 +258,13 @@ function getHtmlSpecimenCssControlModel({
         nodeId: target.node.id,
         nodes: target.nodes,
       })
+  const blockedReason = source && isHtmlSpecimenCssTokenValue(source.value)
+    ? 'token-value'
+    : null
 
   return {
-    editable: source !== null || ruleSource !== null,
+    blockedReason,
+    editable: blockedReason === null && (source !== null || ruleSource !== null),
     ruleSource,
     source,
     value:
@@ -310,6 +316,10 @@ function formatHtmlSpecimenCssTargetLabel(
 function formatHtmlSpecimenCssControlSource(
   model: HtmlSpecimenCssControlModel,
 ) {
+  if (model.blockedReason === 'token-value' && model.source) {
+    return formatHtmlSpecimenCssSource('Token', model.source)
+  }
+
   return model.source
     ? formatHtmlSpecimenCssSource('Rule', model.source)
     : model.ruleSource
@@ -318,7 +328,7 @@ function formatHtmlSpecimenCssControlSource(
 }
 
 function formatHtmlSpecimenCssSource(
-  prefix: 'Add' | 'Rule',
+  prefix: 'Add' | 'Rule' | 'Token',
   source: HtmlSpecimenCssDeclarationSource | HtmlSpecimenCssRuleSource,
 ) {
   const count = source.affectedNodeIds.length
