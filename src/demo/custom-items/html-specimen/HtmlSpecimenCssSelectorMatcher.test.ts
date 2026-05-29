@@ -172,6 +172,83 @@ describe('HtmlSpecimenCssSelectorMatcher', () => {
     )).toBeNull()
   })
 
+  it('matches checked form state pseudo classes against DOM attributes', () => {
+    const checkedInput = createNode({
+      attributes: { checked: '', type: 'checkbox' },
+      className: 'control',
+      id: 'checked',
+      path: [0, 0],
+      tagName: 'input',
+    })
+    const checkedLabel = createNode({
+      className: 'label',
+      id: 'checked-label',
+      path: [0, 1],
+      tagName: 'span',
+    })
+    const uncheckedInput = createNode({
+      attributes: { type: 'checkbox' },
+      className: 'control',
+      id: 'unchecked',
+      path: [0, 2],
+      tagName: 'input',
+    })
+    const uncheckedLabel = createNode({
+      className: 'label',
+      id: 'unchecked-label',
+      path: [0, 3],
+      tagName: 'span',
+    })
+    const selectedOption = createNode({
+      attributes: { selected: '' },
+      className: 'choice',
+      id: 'selected',
+      path: [1, 0],
+      tagName: 'option',
+    })
+    const checkedDiv = createNode({
+      attributes: { checked: '' },
+      className: 'control',
+      id: 'div',
+      path: [2],
+      tagName: 'div',
+    })
+    const nodes = [
+      checkedInput,
+      checkedLabel,
+      uncheckedInput,
+      uncheckedLabel,
+      selectedOption,
+      checkedDiv,
+    ]
+
+    expect(matchHtmlSpecimenCssSelectorList(
+      '.control:checked',
+      checkedInput,
+      nodes,
+    )).toEqual([0, 2, 0])
+    expect(matchHtmlSpecimenCssSelectorList(
+      '.control:checked + .label',
+      checkedLabel,
+      nodes,
+    )).toEqual([0, 3, 0])
+    expect(matchHtmlSpecimenCssSelectorList(
+      '.control:checked + .label',
+      uncheckedLabel,
+      nodes,
+    )).toBeNull()
+    expect(matchHtmlSpecimenCssSelectorList(
+      '.choice:checked',
+      selectedOption,
+      nodes,
+    )).toEqual([0, 2, 0])
+    expect(matchHtmlSpecimenCssSelectorList(
+      '.control:checked',
+      checkedDiv,
+      nodes,
+    )).toBeNull()
+  })
+
   it('matches inherited disabled form state against DOM ancestry', () => {
     const disabledFieldset = createNode({
       attributes: { disabled: '' },

@@ -71,7 +71,7 @@ type CssStructuralPseudoClassSelector =
 
 type CssStatePseudoClassSelector = {
   end: number
-  name: 'disabled' | 'enabled'
+  name: 'checked' | 'disabled' | 'enabled'
   start: number
 }
 
@@ -533,6 +533,8 @@ function matchesCssStatePseudoClassSelector(
   nodes: readonly HtmlSpecimenCssSelectorNode[],
 ) {
   switch (pseudoClass.name) {
+    case 'checked':
+      return isCheckedCssFormControl(node)
     case 'disabled':
       return isDisabledCssFormControl(node, nodes)
     case 'enabled':
@@ -986,11 +988,11 @@ function readCssStatePseudoClassSelector(
     return null
   }
 
-  const match = /^(disabled|enabled)(?![-_a-zA-Z0-9(])/i
+  const match = /^(checked|disabled|enabled)(?![-_a-zA-Z0-9(])/i
     .exec(source.slice(start + 1))
   const name = match?.[1]?.toLowerCase()
 
-  if (name !== 'disabled' && name !== 'enabled') {
+  if (name !== 'checked' && name !== 'disabled' && name !== 'enabled') {
     return null
   }
 
@@ -1817,6 +1819,23 @@ const CSS_ENABLEABLE_FORM_CONTROL_TAGS = new Set([
 
 function isEnableableCssFormControl(node: HtmlSpecimenCssSelectorNode) {
   return CSS_ENABLEABLE_FORM_CONTROL_TAGS.has(node.tagName.toLowerCase())
+}
+
+function isCheckedCssFormControl(node: HtmlSpecimenCssSelectorNode) {
+  const tagName = node.tagName.toLowerCase()
+
+  if (tagName === 'option') {
+    return readCssNodeAttribute(node, 'selected') !== undefined
+  }
+
+  if (tagName !== 'input') {
+    return false
+  }
+
+  const type = readCssNodeAttribute(node, 'type')?.toLowerCase()
+
+  return (type === 'checkbox' || type === 'radio') &&
+    readCssNodeAttribute(node, 'checked') !== undefined
 }
 
 function isDisabledCssFormControl(

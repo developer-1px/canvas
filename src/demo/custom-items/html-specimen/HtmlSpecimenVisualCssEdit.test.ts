@@ -2633,6 +2633,65 @@ describe('HtmlSpecimenVisualCssEdit', () => {
     })
   })
 
+  it('matches checked pseudo-class selectors against form state', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `.control:checked + .label {
+  color: #334155;
+}`,
+    }
+    const nodes = [
+      createNode({
+        attributes: { checked: '', type: 'checkbox' },
+        className: 'control',
+        id: 'checked',
+        path: [0, 0],
+        tagName: 'input',
+      }),
+      createNode({
+        className: 'label',
+        id: 'checked-label',
+        path: [0, 1],
+        tagName: 'span',
+      }),
+      createNode({
+        attributes: { type: 'checkbox' },
+        className: 'control',
+        id: 'unchecked',
+        path: [0, 2],
+        tagName: 'input',
+      }),
+      createNode({
+        className: 'label',
+        id: 'unchecked-label',
+        path: [0, 3],
+        tagName: 'span',
+      }),
+    ]
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '#111827',
+        nodeId: 'checked-label',
+        property: 'color',
+      },
+      nodes,
+      specimen,
+    })
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) {
+      throw new Error(result.reason)
+    }
+
+    expect(result.source).toMatchObject({
+      affectedNodeIds: ['checked-label'],
+      selector: '.control:checked + .label',
+      specificity: [0, 3, 0],
+      value: '#111827',
+    })
+  })
+
   it('does not simplify unsupported pseudo-class selectors into patchable matches', () => {
     const specimen = {
       ...createButtonSpecimenData(),
