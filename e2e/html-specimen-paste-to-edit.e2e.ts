@@ -57,10 +57,38 @@ test('pastes HTML/CSS and edits preview target CSS through the inspector', async
       return hovered instanceof HTMLElement ? hovered.id : ''
     }),
   ).toBe('primary')
+  await expect.poll(async () =>
+    preview.evaluate((host) => {
+      const overlay = host.shadowRoot
+        ?.querySelector('[data-html-specimen-preview-overlay="hover"]')
+
+      return overlay instanceof HTMLElement
+        ? {
+            height: Number.parseFloat(overlay.style.height),
+            nodeId: overlay.dataset.previewNodeId ?? '',
+            width: Number.parseFloat(overlay.style.width),
+          }
+        : null
+    }),
+  ).toMatchObject({
+    height: expect.any(Number),
+    nodeId: expect.stringMatching(/^dom:/),
+    width: expect.any(Number),
+  })
 
   await preview.locator('button#primary').click()
 
   await expect(preview).toHaveAttribute('data-preview-target-node-id', /dom:/)
+  await expect.poll(async () =>
+    preview.evaluate((host) => {
+      const overlay = host.shadowRoot
+        ?.querySelector('[data-html-specimen-preview-overlay="target"]')
+
+      return overlay instanceof HTMLElement
+        ? overlay.dataset.previewNodeId ?? ''
+        : ''
+    }),
+  ).toMatch(/^dom:/)
   await expect(page
     .locator('.html-specimen-css-field')
     .filter({ hasText: 'Radius' })

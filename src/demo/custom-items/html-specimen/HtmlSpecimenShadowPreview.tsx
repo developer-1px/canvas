@@ -26,6 +26,10 @@ const HTML_SPECIMEN_PREVIEW_HOVER_ATTRIBUTE =
   'data-html-specimen-preview-hover'
 const HTML_SPECIMEN_PREVIEW_TARGET_ATTRIBUTE =
   'data-html-specimen-preview-target'
+const HTML_SPECIMEN_PREVIEW_OVERLAY_ATTRIBUTE =
+  'data-html-specimen-preview-overlay'
+const HTML_SPECIMEN_PREVIEW_OVERLAY_LAYER_ATTRIBUTE =
+  'data-html-specimen-preview-overlay-layer'
 const HTML_SPECIMEN_PREVIEW_TOOL_STYLE_ATTRIBUTE =
   'data-html-specimen-preview-tool-style'
 
@@ -58,6 +62,7 @@ export function HtmlSpecimenShadowPreview({
       html: specimen.html,
     })
     ensureHtmlSpecimenPreviewToolStyle(root)
+    ensureHtmlSpecimenPreviewOverlayLayer(root)
 
     const nodes = indexPreviewSurface(root)
     const previousNodeId = targetNodeIdRef.current
@@ -82,6 +87,11 @@ export function HtmlSpecimenShadowPreview({
         targetNodeIdRef,
       })
       markHtmlSpecimenPreviewTargetElement(root, retainedTarget.node.path)
+      updateHtmlSpecimenPreviewBoundsOverlay({
+        kind: 'target',
+        node: retainedTarget.node,
+        root,
+      })
       publishHtmlSpecimenPreviewTarget({
         host,
         itemId,
@@ -93,6 +103,7 @@ export function HtmlSpecimenShadowPreview({
         host,
         itemId,
         previousNodeId,
+        root,
         setTargetNodeId,
         targetNodeIdRef,
       })
@@ -121,6 +132,11 @@ export function HtmlSpecimenShadowPreview({
         targetNodeIdRef,
       })
       markHtmlSpecimenPreviewTargetElement(root, target.node.path)
+      updateHtmlSpecimenPreviewBoundsOverlay({
+        kind: 'target',
+        node: target.node,
+        root,
+      })
       publishHtmlSpecimenPreviewTarget({
         host,
         itemId,
@@ -154,6 +170,11 @@ export function HtmlSpecimenShadowPreview({
         setHoverNodeId,
       })
       markHtmlSpecimenPreviewHoverElement(root, target.node.path)
+      updateHtmlSpecimenPreviewBoundsOverlay({
+        kind: 'hover',
+        node: target.node,
+        root,
+      })
     }
 
     const handlePointerLeave = () => {
@@ -192,12 +213,14 @@ function clearHtmlSpecimenPreviewTargetState({
   host,
   itemId,
   previousNodeId,
+  root,
   setTargetNodeId,
   targetNodeIdRef,
 }: {
   host: HTMLElement
   itemId: string
   previousNodeId: string | null
+  root: ShadowRoot
   setTargetNodeId: (nodeId: string | null) => void
   targetNodeIdRef: { current: string | null }
 }) {
@@ -207,6 +230,11 @@ function clearHtmlSpecimenPreviewTargetState({
     setTargetNodeId,
     targetNodeIdRef,
   })
+  clearHtmlSpecimenPreviewMarkedElement(
+    root,
+    HTML_SPECIMEN_PREVIEW_TARGET_ATTRIBUTE,
+  )
+  clearHtmlSpecimenPreviewBoundsOverlay(root, 'target')
 
   if (previousNodeId) {
     dispatchCanvasAppCustomFocusClear(host, {
@@ -259,6 +287,7 @@ function clearHtmlSpecimenPreviewHoverState({
     root,
     HTML_SPECIMEN_PREVIEW_HOVER_ATTRIBUTE,
   )
+  clearHtmlSpecimenPreviewBoundsOverlay(root, 'hover')
 }
 
 function setHtmlSpecimenPreviewHoverState({
@@ -419,6 +448,78 @@ function clearHtmlSpecimenPreviewMarkedElement(
   }
 }
 
+function ensureHtmlSpecimenPreviewOverlayLayer(root: ShadowRoot) {
+  const layer = root.querySelector(
+    `[${HTML_SPECIMEN_PREVIEW_OVERLAY_LAYER_ATTRIBUTE}]`,
+  )
+
+  if (layer instanceof HTMLDivElement) {
+    return layer
+  }
+
+  const nextLayer = root.ownerDocument.createElement('div')
+
+  nextLayer.setAttribute(
+    HTML_SPECIMEN_PREVIEW_OVERLAY_LAYER_ATTRIBUTE,
+    '',
+  )
+  root.append(nextLayer)
+
+  return nextLayer
+}
+
+function updateHtmlSpecimenPreviewBoundsOverlay({
+  kind,
+  node,
+  root,
+}: {
+  kind: 'hover' | 'target'
+  node: PreviewSurfaceNode
+  root: ShadowRoot
+}) {
+  const layer = ensureHtmlSpecimenPreviewOverlayLayer(root)
+  const box = getOrCreateHtmlSpecimenPreviewBoundsOverlayBox({
+    kind,
+    layer,
+  })
+
+  box.dataset.previewNodeId = node.id
+  box.style.transform = `translate(${node.bounds.x}px, ${node.bounds.y}px)`
+  box.style.width = `${Math.max(0, node.bounds.width)}px`
+  box.style.height = `${Math.max(0, node.bounds.height)}px`
+}
+
+function getOrCreateHtmlSpecimenPreviewBoundsOverlayBox({
+  kind,
+  layer,
+}: {
+  kind: 'hover' | 'target'
+  layer: HTMLDivElement
+}) {
+  const selector = `[${HTML_SPECIMEN_PREVIEW_OVERLAY_ATTRIBUTE}="${kind}"]`
+  const existing = layer.querySelector(selector)
+
+  if (existing instanceof HTMLDivElement) {
+    return existing
+  }
+
+  const box = layer.ownerDocument.createElement('div')
+
+  box.setAttribute(HTML_SPECIMEN_PREVIEW_OVERLAY_ATTRIBUTE, kind)
+  layer.append(box)
+
+  return box
+}
+
+function clearHtmlSpecimenPreviewBoundsOverlay(
+  root: ShadowRoot,
+  kind: 'hover' | 'target',
+) {
+  root
+    .querySelector(`[${HTML_SPECIMEN_PREVIEW_OVERLAY_ATTRIBUTE}="${kind}"]`)
+    ?.remove()
+}
+
 function findHtmlSpecimenPreviewElementByPath(
   root: ShadowRoot,
   path: readonly number[],
@@ -446,7 +547,29 @@ function ensureHtmlSpecimenPreviewToolStyle(root: ShadowRoot) {
   const style = root.ownerDocument.createElement('style')
 
   style.setAttribute(HTML_SPECIMEN_PREVIEW_TOOL_STYLE_ATTRIBUTE, '')
-  style.textContent = `[${HTML_SPECIMEN_PREVIEW_HOVER_ATTRIBUTE}] {
+  style.textContent = `:host {
+  position: relative;
+}
+[${HTML_SPECIMEN_PREVIEW_OVERLAY_LAYER_ATTRIBUTE}] {
+  position: absolute;
+  inset: 0;
+  z-index: 2147483647;
+  pointer-events: none;
+}
+[${HTML_SPECIMEN_PREVIEW_OVERLAY_ATTRIBUTE}] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+[${HTML_SPECIMEN_PREVIEW_OVERLAY_ATTRIBUTE}="hover"] {
+  border: 1px solid #38bdf8;
+}
+[${HTML_SPECIMEN_PREVIEW_OVERLAY_ATTRIBUTE}="target"] {
+  border: 2px solid #0f766e;
+}
+[${HTML_SPECIMEN_PREVIEW_HOVER_ATTRIBUTE}] {
   outline: 1px solid #38bdf8 !important;
   outline-offset: 1px !important;
 }
