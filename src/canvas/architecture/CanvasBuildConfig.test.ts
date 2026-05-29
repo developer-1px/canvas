@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import viteConfig from '../../../vite.config'
+import playwrightConfig from '../../../playwright.config'
 
 type CanvasViteConfig = {
   build?: {
@@ -23,6 +24,13 @@ type CanvasViteConfig = {
 }
 
 const config = viteConfig as CanvasViteConfig
+const e2eConfig = playwrightConfig as {
+  webServer?: {
+    command?: string
+    reuseExistingServer?: boolean
+    url?: string
+  }
+}
 const linkedDocumentPackageDist = [
   'zod',
   'crud/packages/zod',
@@ -60,6 +68,14 @@ describe('Canvas build config', () => {
       host: '::',
       port: 5173,
       strictPort: true,
+    })
+  })
+
+  it('forces e2e dev server dependency optimization for linked packages', () => {
+    expect(e2eConfig.webServer).toMatchObject({
+      command: expect.stringContaining('--force'),
+      reuseExistingServer: false,
+      url: 'http://127.0.0.1:53173',
     })
   })
 })

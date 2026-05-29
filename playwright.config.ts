@@ -19,7 +19,7 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
   webServer: {
-    command: 'pnpm exec vite --host 127.0.0.1 --port 53173',
+    command: 'pnpm exec vite --force --host 127.0.0.1 --port 53173',
     reuseExistingServer: false,
     url: 'http://127.0.0.1:53173',
   },
