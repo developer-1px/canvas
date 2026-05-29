@@ -59,6 +59,16 @@ describe('isHtmlSpecimenCssComputedValueNoOp', () => {
       property: 'border-radius',
       value: '0rem',
     })).toBe(true)
+    expect(isHtmlSpecimenCssComputedValueNoOp({
+      computedValue: '0px',
+      property: 'margin',
+      value: '0 0 0 0',
+    })).toBe(true)
+    expect(isHtmlSpecimenCssComputedValueNoOp({
+      computedValue: '0px 0px 0px 0px',
+      property: 'padding',
+      value: '0',
+    })).toBe(true)
   })
 
   it('keeps non-zero unit conversion out of no-op checks', () => {
@@ -74,6 +84,11 @@ describe('isHtmlSpecimenCssComputedValueNoOp', () => {
       computedValue: '0px',
       property: 'border-radius',
       value: '0deg',
+    })).toBe(false)
+    expect(isHtmlSpecimenCssComputedValueNoOp({
+      computedValue: '0px',
+      property: 'font-size',
+      value: '0 0',
     })).toBe(false)
   })
 })

@@ -7,11 +7,11 @@ const HTML_SPECIMEN_COLOR_CSS_PROPERTIES = new Set([
   'color',
 ])
 
-const HTML_SPECIMEN_ZERO_LENGTH_CSS_PROPERTIES = new Set([
-  'border-radius',
-  'font-size',
-  'margin',
-  'padding',
+const HTML_SPECIMEN_ZERO_LENGTH_CSS_PROPERTY_MAX_VALUES = new Map([
+  ['border-radius', 4],
+  ['font-size', 1],
+  ['margin', 4],
+  ['padding', 4],
 ])
 
 export function isHtmlSpecimenCssComputedValueNoOp({
@@ -45,10 +45,14 @@ export function isHtmlSpecimenCssComputedValueNoOp({
   if (isHtmlSpecimenCssZeroLengthProperty(normalizedProperty)) {
     const computedLength = normalizeHtmlSpecimenCssZeroLengthList(
       normalizedComputedValue,
+      normalizedProperty,
     )
 
     return computedLength !== null &&
-      computedLength === normalizeHtmlSpecimenCssZeroLengthList(normalizedValue)
+      computedLength === normalizeHtmlSpecimenCssZeroLengthList(
+        normalizedValue,
+        normalizedProperty,
+      )
   }
 
   return false
@@ -59,7 +63,7 @@ function isHtmlSpecimenCssColorProperty(property: string) {
 }
 
 function isHtmlSpecimenCssZeroLengthProperty(property: string) {
-  return HTML_SPECIMEN_ZERO_LENGTH_CSS_PROPERTIES.has(property)
+  return HTML_SPECIMEN_ZERO_LENGTH_CSS_PROPERTY_MAX_VALUES.has(property)
 }
 
 function normalizeHtmlSpecimenCssColor(value: string) {
@@ -316,17 +320,29 @@ function parseHtmlSpecimenCssPercentage(value: string) {
     : null
 }
 
-function normalizeHtmlSpecimenCssZeroLengthList(value: string) {
+function normalizeHtmlSpecimenCssZeroLengthList(value: string, property: string) {
   const normalizedValue = value.trim().toLowerCase()
+  const maxValues = HTML_SPECIMEN_ZERO_LENGTH_CSS_PROPERTY_MAX_VALUES.get(property)
 
-  if (normalizedValue.length === 0 || /[(),/]/.test(normalizedValue)) {
+  if (
+    maxValues === undefined ||
+    normalizedValue.length === 0 ||
+    /[(),/]/.test(normalizedValue)
+  ) {
     return null
   }
 
-  return normalizedValue
-    .split(/\s+/)
-    .map(normalizeHtmlSpecimenCssZeroLengthToken)
-    .join(' ')
+  const parts = normalizedValue.split(/\s+/)
+
+  if (parts.length > maxValues) {
+    return null
+  }
+
+  const normalizedParts = parts.map(normalizeHtmlSpecimenCssZeroLengthToken)
+
+  return normalizedParts.every((part) => part === '0')
+    ? '0'
+    : normalizedParts.join(' ')
 }
 
 function normalizeHtmlSpecimenCssZeroLengthToken(value: string) {

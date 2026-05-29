@@ -240,6 +240,40 @@ describe('HtmlSpecimenCssInspectorPanel', () => {
     expect(commitItemsChange).not.toHaveBeenCalled()
   })
 
+  it('skips zero length shorthand patches with equivalent arity', () => {
+    const commitItemsChange = vi.fn(() => true)
+    const node = createFocusNode({
+      computedStyle: {
+        margin: '0px',
+      },
+    })
+    const context = createContext({
+      commitItemsChange,
+      customFocus: {
+        data: {
+          node,
+          nodes: [node],
+        },
+        itemId: 'html-specimen-1',
+        ownerId: 'html-specimen',
+        targetId: 'dom:primary',
+      },
+      item: createHtmlSpecimenItem({
+        ...createButtonSpecimenData(),
+        css: `.primary {
+  margin: 0;
+}`,
+      }),
+    })
+
+    expect(changeHtmlSpecimenPreviewTargetCss({
+      context,
+      nextValue: '0 0 0 0',
+      property: 'margin',
+    })).toBe(false)
+    expect(commitItemsChange).not.toHaveBeenCalled()
+  })
+
   it('shows shorthand conflicts as non-editable', () => {
     const commitItemsChange = vi.fn(() => true)
     const context = createContext({
