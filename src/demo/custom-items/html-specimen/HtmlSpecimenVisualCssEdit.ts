@@ -55,6 +55,13 @@ export type HtmlSpecimenCssScopedRuleSource = {
   value: string
 }
 
+export type HtmlSpecimenCssInlineStyleSource = {
+  affectedNodeIds: string[]
+  important: boolean
+  property: string
+  value: string
+}
+
 export type HtmlSpecimenCssPatchPlan =
   | {
       declarationIndex: number
@@ -88,6 +95,7 @@ export type HtmlSpecimenVisualCssEditResult =
       ok: false
       reason:
         | 'node-not-found'
+        | 'inline-style'
         | 'rule-not-found'
         | 'scoped-rule'
         | 'shorthand-conflict'
@@ -179,6 +187,23 @@ export function applyHtmlSpecimenVisualCssEdit({
     nodes,
     property: intent.property,
   })
+  const inlineSource = resolveHtmlSpecimenCssInlineStyleSource({
+    css: specimen.css,
+    mediaContext,
+    nodeId: intent.nodeId,
+    nodes,
+    property: intent.property,
+  })
+
+  if (inlineSource) {
+    return {
+      affectedNodeIds: inlineSource.affectedNodeIds,
+      ok: false,
+      reason: 'inline-style',
+      specimen,
+    }
+  }
+
   const tokenSource = resolveHtmlSpecimenCssTokenSource({
     css: specimen.css,
     mediaContext,
@@ -625,6 +650,88 @@ export function resolveHtmlSpecimenCssTokenSource({
     specificity: winner.specificity,
     value: winner.declaration.value,
   }
+}
+
+export function resolveHtmlSpecimenCssInlineStyleSource({
+  css,
+  mediaContext,
+  nodeId,
+  nodes,
+  property,
+}: {
+  css: string
+  mediaContext?: HtmlSpecimenCssMediaContext
+  nodeId: string
+  nodes: readonly HtmlSpecimenVisualCssNode[]
+  property: string
+}): HtmlSpecimenCssInlineStyleSource | null {
+  const node = findNode(nodes, nodeId)
+
+  if (!node) {
+    return null
+  }
+
+  const inlineDeclaration = resolveHtmlSpecimenInlineDeclaration({
+    node,
+    property,
+  })
+
+  if (!inlineDeclaration) {
+    return null
+  }
+
+  if (!inlineDeclaration.important) {
+    const stylesheetSource = resolveHtmlSpecimenCssDeclarationMatch({
+      css,
+      mediaContext,
+      node,
+      nodes,
+      property,
+    })
+
+    if (stylesheetSource?.declaration.important) {
+      return null
+    }
+  }
+
+  return {
+    affectedNodeIds: [node.id],
+    important: inlineDeclaration.important,
+    property: inlineDeclaration.property,
+    value: inlineDeclaration.value,
+  }
+}
+
+function resolveHtmlSpecimenInlineDeclaration({
+  node,
+  property,
+}: {
+  node: HtmlSpecimenVisualCssNode
+  property: string
+}) {
+  const style = node.attributes.style
+
+  if (!style) {
+    return null
+  }
+
+  const declarations = parseCssDeclarations({
+    blockEnd: style.length + 1,
+    blockStart: 1,
+    css: `{${style}}`,
+  })
+  const properties = new Set(getCssInlineStyleSourceProperties(property))
+  let winner: CssDeclaration | null = null
+
+  for (const declaration of declarations) {
+    if (!properties.has(declaration.property)) {
+      continue
+    }
+
+    winner = declaration
+  }
+
+  return winner
 }
 
 export function resolveHtmlSpecimenCssShorthandConflictSource({
@@ -1667,6 +1774,15 @@ function getCssTokenGuardProperties(property: string) {
     default:
       return []
   }
+}
+
+function getCssInlineStyleSourceProperties(property: string) {
+  return [
+    normalizeProperty(property),
+    ...getCssDeclarationSourceProperties(property),
+    ...getCssTokenGuardProperties(property),
+    ...getCssShorthandConflictProperties(property),
+  ]
 }
 
 function getCssShorthandConflictProperties(property: string) {
