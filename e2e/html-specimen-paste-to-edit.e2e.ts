@@ -594,6 +594,95 @@ test('patches the later winning declaration without being overwritten', async ({
   ).toBe(true)
 })
 
+test('matches descendant selector rules against DOM ancestry', async ({
+  page,
+}) => {
+  await page.goto('/')
+  await page.evaluate(() => {
+    window.addEventListener('html-specimen-css:export', (event) => {
+      const targetWindow = window as Window & {
+        __htmlSpecimenExportedCss?: string
+      }
+      const detail = (event as CustomEvent<{ css?: unknown }>).detail
+
+      targetWindow.__htmlSpecimenExportedCss =
+        typeof detail.css === 'string' ? detail.css : ''
+    })
+  })
+
+  const pasteWasHandled = await page.evaluate((text) => {
+    const data = new DataTransfer()
+
+    data.setData('text/plain', text)
+
+    const event = new ClipboardEvent('paste', {
+      bubbles: true,
+      cancelable: true,
+      clipboardData: data,
+    })
+
+    window.dispatchEvent(event)
+
+    return event.defaultPrevented
+  }, JSON.stringify({
+    css: [
+      '.toolbar .primary {',
+      '  color: #334155;',
+      '}',
+    ].join('\n'),
+    html: [
+      '<main>',
+      '<section class="toolbar">',
+      '<button id="primary" class="primary">Save</button>',
+      '</section>',
+      '<button id="loose" class="primary">Loose</button>',
+      '</main>',
+    ].join(''),
+  }))
+
+  expect(pasteWasHandled).toBe(true)
+
+  const specimenShell = page.locator('.demo-html-specimen-shell').last()
+  const preview = page.locator('.demo-html-specimen-preview').last()
+
+  await expect(preview).toBeVisible()
+  await preview.locator('button#primary').click()
+
+  const textField = page
+    .locator('.html-specimen-css-field')
+    .filter({ hasText: 'Text' })
+  const textInput = textField.locator('input')
+
+  await expect(textField
+    .getByText('Rule .toolbar .primary / 1 node'),
+  ).toBeVisible()
+  await expect(textInput).toHaveValue('#334155')
+  await textInput.fill('#111827')
+  await textInput.blur()
+  await expect.poll(async () =>
+    preview.locator('button#primary').evaluate((button) =>
+      getComputedStyle(button).color),
+  ).toBe('rgb(17, 24, 39)')
+
+  await specimenShell.getByRole('button', { name: 'Copy CSS' }).click()
+  await expect.poll(async () =>
+    page.evaluate(() =>
+      (window as Window & {
+        __htmlSpecimenExportedCss?: string
+      }).__htmlSpecimenExportedCss ?? ''),
+  ).toContain('color: #111827;')
+
+  await preview.locator('button#loose').click()
+
+  const looseTextField = page
+    .locator('.html-specimen-css-field')
+    .filter({ hasText: 'Text' })
+  const looseTextInput = looseTextField.locator('input')
+
+  await expect(looseTextField.getByText('No matching rule')).toBeVisible()
+  await expect(looseTextInput).toBeDisabled()
+})
+
 test('keeps token-backed preview CSS read-only in the inspector', async ({
   page,
 }) => {

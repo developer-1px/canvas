@@ -4,6 +4,7 @@ export type HtmlSpecimenVisualCssNode = {
   attributes: Readonly<Record<string, string>>
   classList: readonly string[]
   id: string
+  path?: readonly number[]
   tagName: string
 }
 
@@ -117,6 +118,13 @@ type CssRuleMatch = {
   specificity: [number, number, number]
 }
 
+type CssSelectorRelation = 'child' | 'descendant'
+
+type CssSelectorSegment = {
+  compound: string
+  relationToPrevious: CssSelectorRelation
+}
+
 type CssScannerState = {
   bracketDepth: number
   comment: boolean
@@ -210,6 +218,7 @@ export function applyHtmlSpecimenVisualCssEdit({
         css: specimen.css,
         nextValue: intent.nextValue,
         node,
+        nodes,
         property: intent.property,
       })
 
@@ -287,7 +296,7 @@ export function resolveHtmlSpecimenCssDeclarationSource({
   } | null = null
 
   for (const rule of rules) {
-    const specificity = matchSelectorList(rule.selector, node)
+    const specificity = matchSelectorList(rule.selector, node, nodes)
 
     if (!specificity) {
       continue
@@ -328,7 +337,8 @@ export function resolveHtmlSpecimenCssDeclarationSource({
 
   return {
     affectedNodeIds: nodes
-      .filter((candidate) => matchSelectorList(winner.rule.selector, candidate))
+      .filter((candidate) =>
+        matchSelectorList(winner.rule.selector, candidate, nodes))
       .map((candidate) => candidate.id),
     declarationIndex: winner.declaration.declarationIndex,
     property: winner.declaration.property,
@@ -354,12 +364,13 @@ export function resolveHtmlSpecimenCssRuleSource({
     return null
   }
 
-  const match = resolveBestMatchingRuleMatch({ css, node })
+  const match = resolveBestMatchingRuleMatch({ css, node, nodes })
 
   return match
     ? {
         affectedNodeIds: nodes
-          .filter((candidate) => matchSelectorList(match.rule.selector, candidate))
+          .filter((candidate) =>
+            matchSelectorList(match.rule.selector, candidate, nodes))
           .map((candidate) => candidate.id),
         ruleIndex: match.rule.ruleIndex,
         selector: match.rule.selector,
@@ -472,7 +483,7 @@ export function resolveHtmlSpecimenCssScopedRuleSource({
   } | null = null
 
   for (const scopedRule of parseScopedCssRules(css)) {
-    const specificity = matchSelectorList(scopedRule.rule.selector, node)
+    const specificity = matchSelectorList(scopedRule.rule.selector, node, nodes)
 
     if (!specificity) {
       continue
@@ -514,7 +525,8 @@ export function resolveHtmlSpecimenCssScopedRuleSource({
 
   return {
     affectedNodeIds: nodes
-      .filter((candidate) => matchSelectorList(winner.rule.selector, candidate))
+      .filter((candidate) =>
+        matchSelectorList(winner.rule.selector, candidate, nodes))
       .map((candidate) => candidate.id),
     atRule: winner.atRule,
     declarationIndex: winner.declaration.declarationIndex,
@@ -580,16 +592,19 @@ function planNewDeclarationPatch({
   css,
   nextValue,
   node,
+  nodes,
   property,
 }: {
   css: string
   nextValue: string
   node: HtmlSpecimenVisualCssNode
+  nodes: readonly HtmlSpecimenVisualCssNode[]
   property: string
 }) {
   const match = resolveBestMatchingRuleMatch({
     css,
     node,
+    nodes,
   })
 
   if (!match) {
@@ -621,14 +636,16 @@ function planNewDeclarationPatch({
 function resolveBestMatchingRuleMatch({
   css,
   node,
+  nodes,
 }: {
   css: string
   node: HtmlSpecimenVisualCssNode
+  nodes: readonly HtmlSpecimenVisualCssNode[]
 }) {
   let best: CssRuleMatch | null = null
 
   for (const rule of parseCssRules(css)) {
-    const specificity = matchSelectorList(rule.selector, node)
+    const specificity = matchSelectorList(rule.selector, node, nodes)
 
     if (
       specificity &&
@@ -947,13 +964,14 @@ function isCssScannerTopLevel(state: CssScannerState) {
 function matchSelectorList(
   selector: string,
   node: HtmlSpecimenVisualCssNode,
+  nodes: readonly HtmlSpecimenVisualCssNode[],
 ): [number, number, number] | null {
   let best: [number, number, number] | null = null
 
   for (const candidate of selector.split(',')) {
     const selectorPart = candidate.trim()
 
-    if (!matchesSelector(selectorPart, node)) {
+    if (!matchesSelector(selectorPart, node, nodes)) {
       continue
     }
 
@@ -970,9 +988,74 @@ function matchSelectorList(
 function matchesSelector(
   selector: string,
   node: HtmlSpecimenVisualCssNode,
+  nodes: readonly HtmlSpecimenVisualCssNode[],
 ) {
-  const compound = getRightmostCompoundSelector(selector)
+  const segments = parseCssSelectorSegments(selector)
 
+  return segments !== null &&
+    segments.length > 0 &&
+    matchesCssSelectorSegment({
+      index: segments.length - 1,
+      node,
+      nodes,
+      segments,
+    })
+}
+
+function matchesCssSelectorSegment({
+  index,
+  node,
+  nodes,
+  segments,
+}: {
+  index: number
+  node: HtmlSpecimenVisualCssNode
+  nodes: readonly HtmlSpecimenVisualCssNode[]
+  segments: readonly CssSelectorSegment[]
+}): boolean {
+  const segment = segments[index]
+
+  if (!segment || !matchesCompoundSelector(segment.compound, node)) {
+    return false
+  }
+
+  if (index === 0) {
+    return true
+  }
+
+  const ancestors = getNodeAncestors({ node, nodes })
+
+  if (segment.relationToPrevious === 'child') {
+    const parent = ancestors.at(-1)
+
+    return parent
+      ? matchesCssSelectorSegment({
+          index: index - 1,
+          node: parent,
+          nodes,
+          segments,
+        })
+      : false
+  }
+
+  for (let ancestorIndex = ancestors.length - 1; ancestorIndex >= 0; ancestorIndex -= 1) {
+    if (matchesCssSelectorSegment({
+      index: index - 1,
+      node: ancestors[ancestorIndex],
+      nodes,
+      segments,
+    })) {
+      return true
+    }
+  }
+
+  return false
+}
+
+function matchesCompoundSelector(
+  compound: string,
+  node: HtmlSpecimenVisualCssNode,
+) {
   if (compound.length === 0 || compound === '*') {
     return true
   }
@@ -999,14 +1082,122 @@ function matchesSelector(
   return tagName === null || tagName === node.tagName.toLowerCase()
 }
 
-function getRightmostCompoundSelector(selector: string) {
-  const withoutPseudo = selector.replace(/:{1,2}[_a-zA-Z][\w-]*(\([^)]*\))?/g, '')
-  const parts = withoutPseudo
-    .trim()
-    .split(/[\s>+~]+/)
-    .filter((part) => part.length > 0)
+function parseCssSelectorSegments(selector: string): CssSelectorSegment[] | null {
+  const withoutPseudo = stripCssPseudoSelectors(selector).trim()
+  const segments: CssSelectorSegment[] = []
+  let bracketDepth = 0
+  let buffer = ''
+  let relationToNext: CssSelectorRelation = 'descendant'
+  let index = 0
 
-  return parts.at(-1) ?? ''
+  while (index < withoutPseudo.length) {
+    const char = withoutPseudo[index] ?? ''
+
+    if (char === '[') {
+      bracketDepth += 1
+      buffer += char
+      index += 1
+      continue
+    }
+
+    if (char === ']') {
+      bracketDepth = Math.max(0, bracketDepth - 1)
+      buffer += char
+      index += 1
+      continue
+    }
+
+    if (bracketDepth === 0 && (char === '+' || char === '~')) {
+      return null
+    }
+
+    if (bracketDepth === 0 && char === '>') {
+      appendCssSelectorSegment({
+        buffer,
+        relationToPrevious: relationToNext,
+        segments,
+      })
+      buffer = ''
+      relationToNext = 'child'
+      index += 1
+      continue
+    }
+
+    if (bracketDepth === 0 && /\s/.test(char)) {
+      if (buffer.trim().length > 0) {
+        appendCssSelectorSegment({
+          buffer,
+          relationToPrevious: relationToNext,
+          segments,
+        })
+        buffer = ''
+        relationToNext = 'descendant'
+      }
+      index += 1
+      continue
+    }
+
+    buffer += char
+    index += 1
+  }
+
+  appendCssSelectorSegment({
+    buffer,
+    relationToPrevious: relationToNext,
+    segments,
+  })
+
+  return segments
+}
+
+function appendCssSelectorSegment({
+  buffer,
+  relationToPrevious,
+  segments,
+}: {
+  buffer: string
+  relationToPrevious: CssSelectorRelation
+  segments: CssSelectorSegment[]
+}) {
+  const compound = buffer.trim()
+
+  if (compound.length === 0) {
+    return
+  }
+
+  segments.push({
+    compound,
+    relationToPrevious: segments.length === 0
+      ? 'descendant'
+      : relationToPrevious,
+  })
+}
+
+function stripCssPseudoSelectors(selector: string) {
+  return selector.replace(/:{1,2}[_a-zA-Z][\w-]*(\([^)]*\))?/g, '')
+}
+
+function getNodeAncestors({
+  node,
+  nodes,
+}: {
+  node: HtmlSpecimenVisualCssNode
+  nodes: readonly HtmlSpecimenVisualCssNode[]
+}) {
+  return nodes
+    .filter((candidate) => isNodeAncestor(candidate, node))
+    .sort((left, right) => (left.path?.length ?? 0) - (right.path?.length ?? 0))
+}
+
+function isNodeAncestor(
+  candidate: HtmlSpecimenVisualCssNode,
+  node: HtmlSpecimenVisualCssNode,
+) {
+  if (!candidate.path || !node.path || candidate.path.length >= node.path.length) {
+    return false
+  }
+
+  return candidate.path.every((part, index) => part === node.path?.[index])
 }
 
 function getSelectorTagName(compound: string) {

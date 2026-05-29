@@ -436,6 +436,70 @@ describe('HtmlSpecimenVisualCssEdit', () => {
     expect(result.specimen.css).toContain('box-shadow: 0 0 0 1px #111827;')
   })
 
+  it('matches descendant selectors against the indexed DOM ancestry', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `.toolbar .primary {
+  color: #334155;
+}`,
+    }
+    const nodes = [
+      createNode({
+        className: 'toolbar',
+        id: 'toolbar',
+        path: [0],
+        tagName: 'section',
+      }),
+      createNode({
+        className: 'primary',
+        id: 'primary',
+        path: [0, 0],
+        tagName: 'button',
+      }),
+      createNode({
+        className: 'primary',
+        id: 'loose',
+        path: [1],
+        tagName: 'button',
+      }),
+    ]
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '#111827',
+        nodeId: 'primary',
+        property: 'color',
+      },
+      nodes,
+      specimen,
+    })
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) {
+      throw new Error(result.reason)
+    }
+
+    expect(result.source).toMatchObject({
+      affectedNodeIds: ['primary'],
+      selector: '.toolbar .primary',
+      value: '#111827',
+    })
+    expect(applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '#111827',
+        nodeId: 'loose',
+        property: 'color',
+      },
+      nodes,
+      specimen,
+    })).toEqual({
+      affectedNodeIds: [],
+      ok: false,
+      reason: 'rule-not-found',
+      specimen,
+    })
+  })
+
   it('resolves grouped selector declarations from the rendered node', () => {
     const source = resolveHtmlSpecimenCssDeclarationSource({
       css: createDesignSystemSpecimenData().css,
@@ -554,16 +618,19 @@ function createButtonNodes(): HtmlSpecimenVisualCssNode[] {
 function createNode({
   className,
   id,
+  path,
   tagName,
 }: {
   className: string
   id: string
+  path?: readonly number[]
   tagName: string
 }): HtmlSpecimenVisualCssNode {
   return {
     attributes: { class: className },
     classList: className.split(' '),
     id,
+    path,
     tagName,
   }
 }
