@@ -71,6 +71,10 @@ test('pastes HTML/CSS and edits preview target CSS through the inspector', async
     preview.evaluate((host) =>
       host.shadowRoot?.querySelector('style')?.textContent ?? ''),
   ).toContain('background-color: #111827;')
+  await expect.poll(async () =>
+    preview.locator('button#primary').evaluate((button) =>
+      getComputedStyle(button).backgroundColor),
+  ).toBe('rgb(17, 24, 39)')
   await expect(page
     .locator('.html-specimen-css-field')
     .filter({ hasText: 'Bg' })
@@ -89,6 +93,10 @@ test('pastes HTML/CSS and edits preview target CSS through the inspector', async
     preview.evaluate((host) =>
       host.shadowRoot?.querySelector('style')?.textContent ?? ''),
   ).toContain('margin: 4px;')
+  await expect.poll(async () =>
+    preview.locator('button#primary').evaluate((button) =>
+      getComputedStyle(button).marginTop),
+  ).toBe('4px')
 
   const previewHtml = await preview.evaluate((host) =>
     host.shadowRoot?.querySelector('[data-preview-surface-root]')
