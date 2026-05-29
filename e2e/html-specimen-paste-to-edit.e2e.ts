@@ -1959,6 +1959,76 @@ test('edits safe token-backed preview CSS through custom properties', async ({
   ).toContain('font: var(--control-font);')
 })
 
+test('skips token patches when requested fill already matches computed style', async ({
+  page,
+}) => {
+  await page.goto('/')
+
+  const pasteWasHandled = await page.evaluate((text) => {
+    const data = new DataTransfer()
+
+    data.setData('text/plain', text)
+
+    const event = new ClipboardEvent('paste', {
+      bubbles: true,
+      cancelable: true,
+      clipboardData: data,
+    })
+
+    window.dispatchEvent(event)
+
+    return event.defaultPrevented
+  }, JSON.stringify({
+    css: [
+      ':root {',
+      '  --brand: #2563eb;',
+      '}',
+      '.primary {',
+      '  background: var(--brand);',
+      '}',
+    ].join('\n'),
+    html: [
+      '<main>',
+      '<button id="primary" class="primary">Save</button>',
+      '</main>',
+    ].join(''),
+  }))
+
+  expect(pasteWasHandled).toBe(true)
+
+  const preview = page.locator('.demo-html-specimen-preview').last()
+
+  await expect(preview).toBeVisible()
+  await preview.locator('button#primary').click()
+
+  const backgroundField = page
+    .locator('.html-specimen-css-field')
+    .filter({ hasText: 'Bg' })
+  const backgroundInput = backgroundField.locator('input')
+  const computedBackground = await preview
+    .locator('button#primary')
+    .evaluate((button) => getComputedStyle(button).backgroundColor)
+
+  await expect(backgroundField.getByText('Token :root / 1 node')).toBeVisible()
+  await expect(backgroundInput).toHaveValue('#2563eb')
+  expect(computedBackground).toBe('rgb(37, 99, 235)')
+  await backgroundInput.fill(computedBackground)
+  await backgroundInput.blur()
+
+  await expect.poll(async () =>
+    preview.evaluate((host) =>
+      host.shadowRoot?.querySelector('style')?.textContent ?? ''),
+  ).toContain('--brand: #2563eb;')
+  await expect.poll(async () =>
+    preview.evaluate((host) =>
+      host.shadowRoot?.querySelector('style')?.textContent ?? ''),
+  ).not.toContain('--brand: rgb(37, 99, 235);')
+  await expect.poll(async () =>
+    preview.evaluate((host) =>
+      host.shadowRoot?.querySelector('style')?.textContent ?? ''),
+  ).toContain('background: var(--brand);')
+})
+
 test('edits inherited token-backed preview CSS through ancestor custom properties', async ({
   page,
 }) => {

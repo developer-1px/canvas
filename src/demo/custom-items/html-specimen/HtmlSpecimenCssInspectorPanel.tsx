@@ -123,6 +123,14 @@ export function changeHtmlSpecimenPreviewTargetCss({
     return false
   }
 
+  if (isHtmlSpecimenCssComputedNoOp({
+    property,
+    target,
+    value,
+  })) {
+    return false
+  }
+
   const result = applyHtmlSpecimenVisualCssEdit({
     intent: {
       nextValue: value,
@@ -153,6 +161,30 @@ export function changeHtmlSpecimenPreviewTargetCss({
     after: context.selection,
     before: context.selection,
   })
+}
+
+function isHtmlSpecimenCssComputedNoOp({
+  property,
+  target,
+  value,
+}: {
+  property: string
+  target: HtmlSpecimenCssInspectorTarget
+  value: string
+}) {
+  const control = getHtmlSpecimenCssControlByProperty(property)
+  const computedValue = control
+    ? target.node.computedStyle?.[control.computedStyleKey]?.trim()
+    : undefined
+
+  return computedValue === value
+}
+
+function getHtmlSpecimenCssControlByProperty(property: string) {
+  const normalizedProperty = property.trim().toLowerCase()
+
+  return HTML_SPECIMEN_CSS_CONTROLS.find((control) =>
+    control.property === normalizedProperty) ?? null
 }
 
 function renderHtmlSpecimenCssInspector({

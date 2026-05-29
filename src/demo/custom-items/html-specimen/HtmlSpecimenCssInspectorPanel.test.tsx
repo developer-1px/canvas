@@ -137,6 +137,29 @@ describe('HtmlSpecimenCssInspectorPanel', () => {
     )
   })
 
+  it('skips stylesheet patches when the requested value already matches computed style', () => {
+    const commitItemsChange = vi.fn(() => true)
+    const context = createContext({
+      commitItemsChange,
+      item: createHtmlSpecimenItem({
+        ...createButtonSpecimenData(),
+        css: `:root {
+  --brand: #2563eb;
+}
+.primary {
+  background: var(--brand);
+}`,
+      }),
+    })
+
+    expect(changeHtmlSpecimenPreviewTargetCss({
+      context,
+      nextValue: '#2563eb',
+      property: 'background-color',
+    })).toBe(false)
+    expect(commitItemsChange).not.toHaveBeenCalled()
+  })
+
   it('shows shorthand conflicts as non-editable', () => {
     const commitItemsChange = vi.fn(() => true)
     const context = createContext({
