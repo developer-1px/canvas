@@ -35,6 +35,7 @@ export type {
 } from '../affordances/interaction/focus/CanvasAppCustomFocus'
 export {
   dispatchCanvasAppCustomFocus,
+  dispatchCanvasAppCustomFocusClear,
 } from '../affordances/interaction/focus/CanvasAppCustomFocus'
 export type {
   CanvasAppInspectorPanel,

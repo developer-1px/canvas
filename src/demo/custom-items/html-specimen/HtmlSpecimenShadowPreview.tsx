@@ -6,6 +6,7 @@ import {
 } from '@interactive-os/preview-surface'
 import {
   dispatchCanvasAppCustomFocus,
+  dispatchCanvasAppCustomFocusClear,
 } from '../../../canvas'
 import {
   useEffect,
@@ -55,20 +56,21 @@ export function HtmlSpecimenShadowPreview({
     ensureHtmlSpecimenPreviewToolStyle(root)
 
     const nodes = indexPreviewSurface(root)
+    const previousNodeId = targetNodeIdRef.current
     const retainedTarget = reconcileHtmlSpecimenPreviewTarget({
       itemId,
       nodes,
-      previousNodeId: targetNodeIdRef.current,
+      previousNodeId,
     })
 
-    setHtmlSpecimenPreviewTargetState({
-      host,
-      nodeId: retainedTarget?.nodeId ?? null,
-      setTargetNodeId,
-      targetNodeIdRef,
-    })
     host.dataset.previewNodeCount = String(nodes.length)
     if (retainedTarget) {
+      setHtmlSpecimenPreviewTargetState({
+        host,
+        nodeId: retainedTarget.nodeId,
+        setTargetNodeId,
+        targetNodeIdRef,
+      })
       markHtmlSpecimenPreviewTargetElement(root, retainedTarget.node.path)
       publishHtmlSpecimenPreviewTarget({
         host,
@@ -77,7 +79,13 @@ export function HtmlSpecimenShadowPreview({
         target: retainedTarget,
       })
     } else {
-      delete host.dataset.previewTargetNodeId
+      clearHtmlSpecimenPreviewTargetState({
+        host,
+        itemId,
+        previousNodeId,
+        setTargetNodeId,
+        targetNodeIdRef,
+      })
     }
     host.dispatchEvent(new CustomEvent('preview-surface:indexed', {
       bubbles: true,
@@ -127,6 +135,35 @@ export function HtmlSpecimenShadowPreview({
       title={title}
     />
   )
+}
+
+function clearHtmlSpecimenPreviewTargetState({
+  host,
+  itemId,
+  previousNodeId,
+  setTargetNodeId,
+  targetNodeIdRef,
+}: {
+  host: HTMLElement
+  itemId: string
+  previousNodeId: string | null
+  setTargetNodeId: (nodeId: string | null) => void
+  targetNodeIdRef: { current: string | null }
+}) {
+  setHtmlSpecimenPreviewTargetState({
+    host,
+    nodeId: null,
+    setTargetNodeId,
+    targetNodeIdRef,
+  })
+
+  if (previousNodeId) {
+    dispatchCanvasAppCustomFocusClear(host, {
+      itemId,
+      ownerId: 'html-specimen',
+      targetId: previousNodeId,
+    })
+  }
 }
 
 function setHtmlSpecimenPreviewTargetState({

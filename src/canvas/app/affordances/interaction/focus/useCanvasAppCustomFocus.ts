@@ -7,6 +7,7 @@ import {
   CANVAS_APP_CUSTOM_FOCUS_EVENT,
   getCanvasAppCustomFocusForSelection,
   isCanvasAppCustomFocusEvent,
+  reduceCanvasAppCustomFocus,
   type CanvasAppCustomFocus,
 } from './CanvasAppCustomFocus'
 
@@ -21,7 +22,8 @@ export function useCanvasAppCustomFocus({
   useEffect(() => {
     const handleCustomFocus = (event: Event) => {
       if (isCanvasAppCustomFocusEvent(event)) {
-        setCustomFocus(event.detail)
+        setCustomFocus((current) =>
+          reduceCanvasAppCustomFocus({ current, event: event.detail }))
       }
     }
 

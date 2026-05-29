@@ -10,6 +10,7 @@ export {
   createCanvasAppCustomItemRenderers,
   defineCanvasAppCustomItemModule,
   dispatchCanvasAppCustomFocus,
+  dispatchCanvasAppCustomFocusClear,
   isCanvasAppExtensionId,
   type CanvasAppAssembly,
   type CanvasAppAssemblyInput,
