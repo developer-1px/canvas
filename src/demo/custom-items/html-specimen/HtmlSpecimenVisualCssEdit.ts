@@ -1979,11 +1979,16 @@ function isCssAtRuleActive(
     return matchesCssSupportsRule(source) ?? true
   }
 
-  if (isCssAtRuleKeyword(source, '@container')) {
+  if (isUnsupportedCssAtRuleInVisualEditModel(source)) {
     return false
   }
 
   return true
+}
+
+function isUnsupportedCssAtRuleInVisualEditModel(source: string) {
+  return isCssAtRuleKeyword(source, '@container') ||
+    isCssAtRuleKeyword(source, '@scope')
 }
 
 function isCssAtRuleKeyword(source: string, keyword: string) {
