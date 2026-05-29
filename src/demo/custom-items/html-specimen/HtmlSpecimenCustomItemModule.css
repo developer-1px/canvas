@@ -8,7 +8,7 @@
   border-radius: 5px;
   color: var(--canvas-ink);
   background: #ffffff;
-  pointer-events: none;
+  pointer-events: auto;
 }
 
 .demo-html-specimen-bar {
@@ -39,9 +39,9 @@
   height: 100%;
   min-height: 0;
   background: #ffffff;
-  pointer-events: none;
+  pointer-events: auto;
 }
 
 .demo-html-specimen-hit {
-  pointer-events: all;
+  pointer-events: none;
 }

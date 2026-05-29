@@ -31,6 +31,7 @@ export const htmlSpecimenItemRenderer: CanvasAppCustomItemRendererStrategy = ({
             </span>
           </div>
           <HtmlSpecimenShadowPreview
+            itemId={item.id}
             specimen={specimen}
             title={item.title}
           />
