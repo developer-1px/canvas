@@ -89,6 +89,31 @@ test('pastes HTML/CSS and edits preview target CSS through the inspector', async
         : ''
     }),
   ).toMatch(/^dom:/)
+  await expect.poll(async () =>
+    preview.evaluate((host) => {
+      const padding = host.shadowRoot?.querySelector(
+        '[data-html-specimen-preview-spacing="target-padding"]',
+      )
+      const target = host.shadowRoot?.querySelector(
+        '[data-html-specimen-preview-overlay="target"]',
+      )
+
+      if (
+        !(padding instanceof HTMLElement) ||
+        !(target instanceof HTMLElement)
+      ) {
+        return false
+      }
+
+      return (
+        padding.dataset.previewNodeId === target.dataset.previewNodeId &&
+        Number.parseFloat(padding.style.width) <
+          Number.parseFloat(target.style.width) &&
+        Number.parseFloat(padding.style.height) <
+          Number.parseFloat(target.style.height)
+      )
+    }),
+  ).toBe(true)
   await expect(page
     .locator('.html-specimen-css-field')
     .filter({ hasText: 'Radius' })
@@ -137,6 +162,31 @@ test('pastes HTML/CSS and edits preview target CSS through the inspector', async
     preview.locator('button#primary').evaluate((button) =>
       getComputedStyle(button).marginTop),
   ).toBe('4px')
+  await expect.poll(async () =>
+    preview.evaluate((host) => {
+      const margin = host.shadowRoot?.querySelector(
+        '[data-html-specimen-preview-spacing="target-margin"]',
+      )
+      const target = host.shadowRoot?.querySelector(
+        '[data-html-specimen-preview-overlay="target"]',
+      )
+
+      if (
+        !(margin instanceof HTMLElement) ||
+        !(target instanceof HTMLElement)
+      ) {
+        return false
+      }
+
+      return (
+        margin.dataset.previewNodeId === target.dataset.previewNodeId &&
+        Number.parseFloat(margin.style.width) >
+          Number.parseFloat(target.style.width) &&
+        Number.parseFloat(margin.style.height) >
+          Number.parseFloat(target.style.height)
+      )
+    }),
+  ).toBe(true)
 
   const previewHtml = await preview.evaluate((host) =>
     host.shadowRoot?.querySelector('[data-preview-surface-root]')
