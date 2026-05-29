@@ -1962,9 +1962,8 @@ function isCssAtRuleActive(
   mediaContext: HtmlSpecimenCssMediaContext | undefined,
 ) {
   const source = stripCssComments(atRule).trim()
-  const lowerSource = source.toLowerCase()
 
-  if (lowerSource.startsWith('@media')) {
+  if (isCssAtRuleKeyword(source, '@media')) {
     if (!mediaContext) {
       return true
     }
@@ -1975,20 +1974,15 @@ function isCssAtRuleActive(
       matchesCssMediaQuery(query, mediaContext))
   }
 
-  if (lowerSource.startsWith('@supports')) {
+  if (isCssAtRuleKeyword(source, '@supports')) {
     return matchesCssSupportsRule(source) ?? true
   }
 
-  if (isUnsupportedCssAtRuleInVisualEditModel(source)) {
-    return false
+  if (isCssLayerAtRule(source)) {
+    return true
   }
 
-  return true
-}
-
-function isUnsupportedCssAtRuleInVisualEditModel(source: string) {
-  return isCssAtRuleKeyword(source, '@container') ||
-    isCssAtRuleKeyword(source, '@scope')
+  return false
 }
 
 function isCssAtRuleKeyword(source: string, keyword: string) {
