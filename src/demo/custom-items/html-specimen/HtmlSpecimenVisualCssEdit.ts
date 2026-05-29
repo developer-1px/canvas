@@ -678,7 +678,7 @@ function parseCssRules(css: string): CssRule[] {
   let cursor = 0
 
   while (cursor < css.length) {
-    const blockStart = css.indexOf('{', cursor)
+    const blockStart = findNextCssBlockStart(css, cursor)
 
     if (blockStart < 0) {
       break
@@ -690,7 +690,7 @@ function parseCssRules(css: string): CssRule[] {
       break
     }
 
-    const selector = css.slice(cursor, blockStart).trim()
+    const selector = stripCssComments(css.slice(cursor, blockStart)).trim()
 
     if (selector.length > 0 && !selector.startsWith('@')) {
       rules.push({
@@ -719,7 +719,7 @@ function parseScopedCssRules(css: string) {
   let cursor = 0
 
   while (cursor < css.length) {
-    const blockStart = css.indexOf('{', cursor)
+    const blockStart = findNextCssBlockStart(css, cursor)
 
     if (blockStart < 0) {
       break
@@ -731,7 +731,7 @@ function parseScopedCssRules(css: string) {
       break
     }
 
-    const selector = css.slice(cursor, blockStart).trim()
+    const selector = stripCssComments(css.slice(cursor, blockStart)).trim()
 
     if (selector.startsWith('@')) {
       for (const rule of parseCssRules(css.slice(blockStart + 1, blockEnd))) {
@@ -749,6 +749,75 @@ function parseScopedCssRules(css: string) {
   }
 
   return scopedRules
+}
+
+function findNextCssBlockStart(css: string, cursor: number) {
+  const scanner = createCssScannerState()
+  let index = cursor
+
+  while (index < css.length) {
+    if (css[index] === '{' && isCssScannerTopLevel(scanner)) {
+      return index
+    }
+
+    index = advanceCssScannerState(css, index, scanner)
+  }
+
+  return -1
+}
+
+function stripCssComments(css: string) {
+  let result = ''
+  let comment = false
+  let quote: '"' | "'" | null = null
+  let escaped = false
+  let index = 0
+
+  while (index < css.length) {
+    const char = css[index] ?? ''
+    const next = css[index + 1] ?? ''
+
+    if (comment) {
+      if (char === '*' && next === '/') {
+        comment = false
+        index += 2
+        continue
+      }
+
+      index += 1
+      continue
+    }
+
+    if (quote) {
+      result += char
+
+      if (escaped) {
+        escaped = false
+      } else if (char === '\\') {
+        escaped = true
+      } else if (char === quote) {
+        quote = null
+      }
+
+      index += 1
+      continue
+    }
+
+    if (char === '/' && next === '*') {
+      comment = true
+      index += 2
+      continue
+    }
+
+    if (char === '"' || char === "'") {
+      quote = char
+    }
+
+    result += char
+    index += 1
+  }
+
+  return result
 }
 
 function parseCssDeclarations({

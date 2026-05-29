@@ -637,6 +637,77 @@ describe('HtmlSpecimenVisualCssEdit', () => {
     })
   })
 
+  it('ignores top-level CSS comments when finding rule blocks', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `/* section { not a rule } */
+.primary {
+  color: #334155;
+}`,
+    }
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '#111827',
+        nodeId: 'primary',
+        property: 'color',
+      },
+      nodes: createButtonNodes(),
+      specimen,
+    })
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) {
+      throw new Error(result.reason)
+    }
+
+    expect(result.source).toMatchObject({
+      affectedNodeIds: ['primary'],
+      selector: '.primary',
+      value: '#111827',
+    })
+    expect(result.specimen.css).toContain('/* section { not a rule } */')
+    expect(result.specimen.css).toContain('color: #111827;')
+  })
+
+  it('ignores selector comments before matching and patching rule blocks', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `.button/* active state */[data-state="active"] {
+  color: #334155;
+}`,
+    }
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '#111827',
+        nodeId: 'active',
+        property: 'color',
+      },
+      nodes: [
+        createNode({
+          attributes: { 'data-state': 'active' },
+          className: 'button',
+          id: 'active',
+          path: [0],
+          tagName: 'button',
+        }),
+      ],
+      specimen,
+    })
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) {
+      throw new Error(result.reason)
+    }
+
+    expect(result.source).toMatchObject({
+      affectedNodeIds: ['active'],
+      selector: '.button[data-state="active"]',
+      value: '#111827',
+    })
+  })
+
   it('does not simplify unsupported pseudo-class selectors into patchable matches', () => {
     const specimen = {
       ...createButtonSpecimenData(),
