@@ -76,7 +76,8 @@ function normalizeHtmlSpecimenCssColor(value: string) {
   }
 
   return normalizeHtmlSpecimenHexColor(normalizedValue) ??
-    normalizeHtmlSpecimenRgbColor(normalizedValue)
+    normalizeHtmlSpecimenRgbColor(normalizedValue) ??
+    normalizeHtmlSpecimenHslColor(normalizedValue)
 }
 
 function normalizeHtmlSpecimenHexColor(value: string) {
@@ -171,6 +172,134 @@ function parseHtmlSpecimenCssAlphaChannel(value: string) {
   return alpha >= 0 && alpha <= 1
     ? Math.round(alpha * 255)
     : null
+}
+
+function normalizeHtmlSpecimenHslColor(value: string) {
+  const match = /^hsla?\((.+)\)$/.exec(value)
+
+  if (!match) {
+    return null
+  }
+
+  const components = splitHtmlSpecimenCssColorFunctionComponents(match[1])
+
+  if (components === null || components.channels.length !== 3) {
+    return null
+  }
+
+  const hue = parseHtmlSpecimenCssHue(components.channels[0])
+  const saturation = parseHtmlSpecimenCssPercentage(components.channels[1])
+  const lightness = parseHtmlSpecimenCssPercentage(components.channels[2])
+  const alpha = components.alpha === null
+    ? 255
+    : parseHtmlSpecimenCssAlphaChannel(components.alpha)
+
+  if (hue === null || saturation === null || lightness === null || alpha === null) {
+    return null
+  }
+
+  const chroma = (1 - Math.abs(2 * lightness - 1)) * saturation
+  const huePrime = hue / 60
+  const second = chroma * (1 - Math.abs(huePrime % 2 - 1))
+  const matchValue = lightness - chroma / 2
+  const [red, green, blue] = getHtmlSpecimenHslPrimeRgb({
+    chroma,
+    huePrime,
+    second,
+  })
+
+  return formatHtmlSpecimenCssColor(
+    Math.round((red + matchValue) * 255),
+    Math.round((green + matchValue) * 255),
+    Math.round((blue + matchValue) * 255),
+    alpha,
+  )
+}
+
+function splitHtmlSpecimenCssColorFunctionComponents(value: string) {
+  const normalizedValue = value.trim()
+
+  if (normalizedValue.length === 0) {
+    return null
+  }
+
+  if (normalizedValue.includes(',')) {
+    const parts = normalizedValue.split(',').map((part) => part.trim())
+
+    return parts.length === 3 || parts.length === 4
+      ? {
+          alpha: parts[3] ?? null,
+          channels: parts.slice(0, 3),
+        }
+      : null
+  }
+
+  const slashParts = normalizedValue.split('/').map((part) => part.trim())
+
+  if (slashParts.length > 2) {
+    return null
+  }
+
+  return {
+    alpha: slashParts[1] ?? null,
+    channels: slashParts[0].split(/\s+/).filter(Boolean),
+  }
+}
+
+function parseHtmlSpecimenCssHue(value: string | undefined) {
+  if (!value) {
+    return null
+  }
+
+  const match = /^([+-]?(?:\d+|\d*\.\d+))(deg|grad|rad|turn)?$/.exec(value)
+
+  if (!match) {
+    return null
+  }
+
+  const hue = Number(match[1])
+  const unit = match[2] ?? 'deg'
+  const degrees = unit === 'turn'
+    ? hue * 360
+    : unit === 'rad'
+      ? hue * 180 / Math.PI
+      : unit === 'grad'
+        ? hue * 0.9
+        : hue
+
+  return ((degrees % 360) + 360) % 360
+}
+
+function getHtmlSpecimenHslPrimeRgb({
+  chroma,
+  huePrime,
+  second,
+}: {
+  chroma: number
+  huePrime: number
+  second: number
+}) {
+  if (huePrime < 1) {
+    return [chroma, second, 0]
+  }
+
+  if (huePrime < 2) {
+    return [second, chroma, 0]
+  }
+
+  if (huePrime < 3) {
+    return [0, chroma, second]
+  }
+
+  if (huePrime < 4) {
+    return [0, second, chroma]
+  }
+
+  if (huePrime < 5) {
+    return [second, 0, chroma]
+  }
+
+  return [chroma, 0, second]
 }
 
 function parseHtmlSpecimenCssPercentage(value: string) {

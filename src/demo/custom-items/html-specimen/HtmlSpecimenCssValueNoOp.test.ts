@@ -28,6 +28,21 @@ describe('isHtmlSpecimenCssComputedValueNoOp', () => {
       property: 'color',
       value: 'rebeccapurple',
     })).toBe(true)
+    expect(isHtmlSpecimenCssComputedValueNoOp({
+      computedValue: 'rgb(255, 0, 0)',
+      property: 'color',
+      value: 'hsl(0 100% 50%)',
+    })).toBe(true)
+    expect(isHtmlSpecimenCssComputedValueNoOp({
+      computedValue: 'rgba(255, 0, 0, 0.5)',
+      property: 'color',
+      value: 'hsla(0, 100%, 50%, 0.5)',
+    })).toBe(true)
+    expect(isHtmlSpecimenCssComputedValueNoOp({
+      computedValue: 'rgba(255, 0, 0, 0.5)',
+      property: 'color',
+      value: 'hsl(1turn 100% 50% / 50%)',
+    })).toBe(true)
   })
 
   it('treats transparent and computed transparent rgba as no-op values', () => {

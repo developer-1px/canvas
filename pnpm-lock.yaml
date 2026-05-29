@@ -24,8 +24,8 @@ importers:
         specifier: link:../zod-crud/packages/patch-preview
         version: link:../zod-crud/packages/patch-preview
       '@zod-crud/search-replace':
-        specifier: link:../zod-crud/labs/extensions/search-replace
-        version: link:../zod-crud/labs/extensions/search-replace
+        specifier: link:../zod-crud/packages/search-replace
+        version: link:../zod-crud/packages/search-replace
       lucide-react:
         specifier: ^1.16.0
         version: 1.16.0(react@19.2.6)

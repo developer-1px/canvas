@@ -63,7 +63,7 @@
     "@zod-crud/grouping": "link:../zod-crud/labs/extensions/grouping",
     "@zod-crud/layer-order": "link:../zod-crud/labs/extensions/layer-order",
     "@zod-crud/patch-preview": "link:../zod-crud/packages/patch-preview",
-    "@zod-crud/search-replace": "link:../zod-crud/labs/extensions/search-replace",
+    "@zod-crud/search-replace": "link:../zod-crud/packages/search-replace",
     "lucide-react": "^1.16.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
