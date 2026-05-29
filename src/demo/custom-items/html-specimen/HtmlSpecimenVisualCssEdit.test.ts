@@ -1219,6 +1219,162 @@ describe('HtmlSpecimenVisualCssEdit', () => {
 }`)
   })
 
+  it('ignores inactive media range syntax declarations when choosing the patch source', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `.primary {
+  color: #334155;
+}
+@media (width >= 1000px) {
+  .primary {
+    color: #ffffff;
+  }
+}`,
+      viewportWidth: 360,
+    }
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '#111827',
+        nodeId: 'primary',
+        property: 'color',
+      },
+      nodes: createButtonNodes(),
+      specimen,
+    })
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) {
+      throw new Error(result.reason)
+    }
+
+    expect(result.source).toMatchObject({
+      affectedNodeIds: ['primary'],
+      property: 'color',
+      selector: '.primary',
+      value: '#111827',
+    })
+    expect(result.source.atRule).toBeUndefined()
+    expect(result.specimen.css).toContain(`.primary {
+  color: #111827;
+}`)
+    expect(result.specimen.css).toContain('color: #ffffff;')
+  })
+
+  it('patches active media range syntax declarations', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `@media (width >= 1px) {
+  .primary {
+    color: #ffffff;
+  }
+}`,
+      viewportWidth: 360,
+    }
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '#111827',
+        nodeId: 'primary',
+        property: 'color',
+      },
+      nodes: createButtonNodes(),
+      specimen,
+    })
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) {
+      throw new Error(result.reason)
+    }
+
+    expect(result.source).toMatchObject({
+      affectedNodeIds: ['primary'],
+      atRule: '@media (width >= 1px)',
+      property: 'color',
+      selector: '.primary',
+      value: '#111827',
+    })
+    expect(result.specimen.css).toContain('color: #111827;')
+  })
+
+  it('patches active chained media range syntax declarations', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `@media (320px <= width < 768px) {
+  .primary {
+    color: #ffffff;
+  }
+}`,
+      viewportWidth: 360,
+    }
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '#111827',
+        nodeId: 'primary',
+        property: 'color',
+      },
+      nodes: createButtonNodes(),
+      specimen,
+    })
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) {
+      throw new Error(result.reason)
+    }
+
+    expect(result.source).toMatchObject({
+      affectedNodeIds: ['primary'],
+      atRule: '@media (320px <= width < 768px)',
+      property: 'color',
+      selector: '.primary',
+      value: '#111827',
+    })
+    expect(result.specimen.css).toContain('color: #111827;')
+  })
+
+  it('ignores unsupported media feature declarations when choosing the patch source', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `.primary {
+  color: #334155;
+}
+@media (prefers-color-scheme: dark) {
+  .primary {
+    color: #ffffff;
+  }
+}`,
+      viewportWidth: 360,
+    }
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '#111827',
+        nodeId: 'primary',
+        property: 'color',
+      },
+      nodes: createButtonNodes(),
+      specimen,
+    })
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) {
+      throw new Error(result.reason)
+    }
+
+    expect(result.source).toMatchObject({
+      affectedNodeIds: ['primary'],
+      property: 'color',
+      selector: '.primary',
+      value: '#111827',
+    })
+    expect(result.source.atRule).toBeUndefined()
+    expect(result.specimen.css).toContain(`.primary {
+  color: #111827;
+}`)
+    expect(result.specimen.css).toContain('color: #ffffff;')
+  })
+
   it('ignores inactive supports declarations when choosing the patch source', () => {
     const specimen = {
       ...createButtonSpecimenData(),
@@ -2424,6 +2580,40 @@ describe('HtmlSpecimenVisualCssEdit', () => {
   color: #334155;
 }
 @media (min-width: 1000px) {
+  .primary {
+    color: #ffffff;
+  }
+}`
+    const mediaContext = {
+      viewportHeight: 188,
+      viewportWidth: 360,
+    }
+
+    expect(resolveHtmlSpecimenCssDeclarationSource({
+      css,
+      mediaContext,
+      nodeId: 'primary',
+      nodes: createButtonNodes(),
+      property: 'color',
+    })).toMatchObject({
+      property: 'color',
+      selector: '.primary',
+      value: '#334155',
+    })
+    expect(resolveHtmlSpecimenCssScopedRuleSource({
+      css,
+      mediaContext,
+      nodeId: 'primary',
+      nodes: createButtonNodes(),
+      property: 'color',
+    })).toBeNull()
+  })
+
+  it('filters inactive media range syntax rules by viewport when resolving sources', () => {
+    const css = `.primary {
+  color: #334155;
+}
+@media (width >= 1000px) {
   .primary {
     color: #ffffff;
   }

@@ -2030,31 +2030,15 @@ function matchesCssMediaQuery(
 
   let active = matchesCssMediaType(source)
 
-  for (const match of source.matchAll(
-    /\(\s*(min|max)-(width|height)\s*:\s*([0-9]*\.?[0-9]+)(px|rem|em)?\s*\)/g,
-  )) {
-    const [, range, axis, rawValue, unit = 'px'] = match
-    const expected = parseCssMediaLengthPx(rawValue, unit)
-    const actual = axis === 'height'
-      ? mediaContext.viewportHeight
-      : mediaContext.viewportWidth
+  for (const feature of readCssMediaFeatureExpressions(source)) {
+    const result = matchesCssMediaFeatureExpression(feature, mediaContext)
 
-    active = active && (
-      range === 'min'
-        ? actual >= expected
-        : actual <= expected
-    )
-  }
+    if (result === null) {
+      active = false
+      break
+    }
 
-  for (const match of source.matchAll(
-    /\(\s*orientation\s*:\s*(landscape|portrait)\s*\)/g,
-  )) {
-    const [, orientation] = match
-    const actual = mediaContext.viewportWidth >= mediaContext.viewportHeight
-      ? 'landscape'
-      : 'portrait'
-
-    active = active && orientation === actual
+    active = active && result
   }
 
   return negated ? !active : active
@@ -2083,6 +2067,174 @@ function parseCssMediaLengthPx(value: string | undefined, unit: string) {
   const parsed = Number.parseFloat(value ?? '0')
 
   return unit === 'em' || unit === 'rem' ? parsed * 16 : parsed
+}
+
+function readCssMediaFeatureExpressions(source: string) {
+  const features: string[] = []
+  let index = 0
+
+  while (index < source.length) {
+    if (source[index] !== '(') {
+      index += 1
+      continue
+    }
+
+    const end = findMatchingCssParenthesis(source, index)
+
+    if (end < 0) {
+      return ['']
+    }
+
+    features.push(source.slice(index + 1, end).trim())
+    index = end + 1
+  }
+
+  return features
+}
+
+function matchesCssMediaFeatureExpression(
+  feature: string,
+  mediaContext: HtmlSpecimenCssMediaContext,
+) {
+  const source = stripCssComments(feature).trim().toLowerCase()
+
+  if (source.length === 0) {
+    return null
+  }
+
+  const legacyRange = source.match(
+    /^(min|max)-(width|height)\s*:\s*([0-9]*\.?[0-9]+)(px|rem|em)?$/,
+  )
+
+  if (legacyRange) {
+    const [, range, axis, rawValue, unit = 'px'] = legacyRange
+    const actual = getCssMediaAxisValue(axis, mediaContext)
+    const expected = parseCssMediaLengthPx(rawValue, unit)
+
+    return range === 'min'
+      ? actual >= expected
+      : actual <= expected
+  }
+
+  const exactFeature = source.match(
+    /^(width|height)\s*:\s*([0-9]*\.?[0-9]+)(px|rem|em)?$/,
+  )
+
+  if (exactFeature) {
+    const [, axis, rawValue, unit = 'px'] = exactFeature
+
+    return getCssMediaAxisValue(axis, mediaContext) ===
+      parseCssMediaLengthPx(rawValue, unit)
+  }
+
+  const orientation = source.match(/^orientation\s*:\s*(landscape|portrait)$/)
+
+  if (orientation) {
+    const actual = mediaContext.viewportWidth >= mediaContext.viewportHeight
+      ? 'landscape'
+      : 'portrait'
+
+    return orientation[1] === actual
+  }
+
+  return matchesCssMediaRangeExpression(source, mediaContext)
+}
+
+function matchesCssMediaRangeExpression(
+  source: string,
+  mediaContext: HtmlSpecimenCssMediaContext,
+) {
+  const operator = '(<=|>=|<|>|=)'
+  const length = '([0-9]*\\.?[0-9]+)(px|rem|em)?'
+  const axis = '(width|height)'
+  const axisFirst = source.match(new RegExp(
+    `^${axis}\\s*${operator}\\s*${length}$`,
+  ))
+
+  if (axisFirst) {
+    const [, rawAxis, rawOperator, rawValue, unit = 'px'] = axisFirst
+
+    return compareCssMediaRangeValue(
+      getCssMediaAxisValue(rawAxis, mediaContext),
+      rawOperator,
+      parseCssMediaLengthPx(rawValue, unit),
+    )
+  }
+
+  const lengthFirst = source.match(new RegExp(
+    `^${length}\\s*${operator}\\s*${axis}$`,
+  ))
+
+  if (lengthFirst) {
+    const [, rawValue, unit = 'px', rawOperator, rawAxis] = lengthFirst
+
+    return compareCssMediaRangeValue(
+      parseCssMediaLengthPx(rawValue, unit),
+      rawOperator,
+      getCssMediaAxisValue(rawAxis, mediaContext),
+    )
+  }
+
+  const chained = source.match(new RegExp(
+    `^${length}\\s*${operator}\\s*${axis}\\s*${operator}\\s*${length}$`,
+  ))
+
+  if (chained) {
+    const [
+      ,
+      rawLeft,
+      leftUnit = 'px',
+      leftOperator,
+      rawAxis,
+      rightOperator,
+      rawRight,
+      rightUnit = 'px',
+    ] = chained
+    const actual = getCssMediaAxisValue(rawAxis, mediaContext)
+
+    return compareCssMediaRangeValue(
+      parseCssMediaLengthPx(rawLeft, leftUnit),
+      leftOperator,
+      actual,
+    ) &&
+      compareCssMediaRangeValue(
+        actual,
+        rightOperator,
+        parseCssMediaLengthPx(rawRight, rightUnit),
+      )
+  }
+
+  return null
+}
+
+function getCssMediaAxisValue(
+  axis: string | undefined,
+  mediaContext: HtmlSpecimenCssMediaContext,
+) {
+  return axis === 'height'
+    ? mediaContext.viewportHeight
+    : mediaContext.viewportWidth
+}
+
+function compareCssMediaRangeValue(
+  left: number,
+  operator: string | undefined,
+  right: number,
+) {
+  switch (operator) {
+    case '<':
+      return left < right
+    case '<=':
+      return left <= right
+    case '>':
+      return left > right
+    case '>=':
+      return left >= right
+    case '=':
+      return left === right
+    default:
+      return false
+  }
 }
 
 function matchesCssSupportsRule(atRule: string): CssSupportsEvaluation {
