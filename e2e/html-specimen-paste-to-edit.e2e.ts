@@ -1264,6 +1264,67 @@ test('matches not pseudo function selector rules', async ({
   ).not.toBe('rgb(17, 24, 39)')
 })
 
+test('matches has pseudo function selector rules', async ({
+  page,
+}) => {
+  await page.goto('/')
+
+  const pasteWasHandled = await page.evaluate((text) => {
+    const data = new DataTransfer()
+
+    data.setData('text/plain', text)
+
+    const event = new ClipboardEvent('paste', {
+      bubbles: true,
+      cancelable: true,
+      clipboardData: data,
+    })
+
+    window.dispatchEvent(event)
+
+    return event.defaultPrevented
+  }, JSON.stringify({
+    css: [
+      '.card:has(.badge) {',
+      '  color: #334155;',
+      '}',
+    ].join('\n'),
+    html: [
+      '<main>',
+      '<article id="card" class="card"><span class="badge">New</span></article>',
+      '<article id="empty" class="card">Empty</article>',
+      '</main>',
+    ].join(''),
+  }))
+
+  expect(pasteWasHandled).toBe(true)
+
+  const preview = page.locator('.demo-html-specimen-preview').last()
+
+  await expect(preview).toBeVisible()
+  await preview.locator('article#card').click()
+
+  const textField = page
+    .locator('.html-specimen-css-field')
+    .filter({ hasText: 'Text' })
+  const textInput = textField.locator('input')
+
+  await expect(textField
+    .getByText('Rule .card:has(.badge) / 1 node'),
+  ).toBeVisible()
+  await expect(textInput).toHaveValue('#334155')
+  await textInput.fill('#111827')
+  await textInput.blur()
+  await expect.poll(async () =>
+    preview.locator('article#card').evaluate((card) =>
+      getComputedStyle(card).color),
+  ).toBe('rgb(17, 24, 39)')
+  await expect.poll(async () =>
+    preview.locator('article#empty').evaluate((card) =>
+      getComputedStyle(card).color),
+  ).not.toBe('rgb(17, 24, 39)')
+})
+
 test('keeps commas inside attribute selector values', async ({
   page,
 }) => {

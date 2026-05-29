@@ -126,6 +126,77 @@ describe('HtmlSpecimenCssSelectorMatcher', () => {
       [node],
     )).toEqual([0, 2, 0])
   })
+
+  it('matches has pseudo function selectors against indexed relations', () => {
+    const nodes = [
+      createNode({
+        className: 'card',
+        id: 'card',
+        path: [0],
+        tagName: 'article',
+      }),
+      createNode({
+        className: 'content',
+        id: 'content',
+        path: [0, 0],
+        tagName: 'section',
+      }),
+      createNode({
+        className: 'badge',
+        id: 'badge',
+        path: [0, 0, 0],
+        tagName: 'span',
+      }),
+      createNode({
+        className: 'empty',
+        id: 'empty',
+        path: [1],
+        tagName: 'article',
+      }),
+      createNode({
+        className: 'next',
+        id: 'next',
+        path: [2],
+        tagName: 'article',
+      }),
+    ]
+
+    expect(matchHtmlSpecimenCssSelectorList(
+      '.card:has(.badge)',
+      nodes[0]!,
+      nodes,
+    )).toEqual([0, 2, 0])
+    expect(matchHtmlSpecimenCssSelectorList(
+      '.card:has(> .content)',
+      nodes[0]!,
+      nodes,
+    )).toEqual([0, 2, 0])
+    expect(matchHtmlSpecimenCssSelectorList(
+      '.card:has(> .badge)',
+      nodes[0]!,
+      nodes,
+    )).toBeNull()
+    expect(matchHtmlSpecimenCssSelectorList(
+      '.empty:has(+ .next)',
+      nodes[3]!,
+      nodes,
+    )).toEqual([0, 2, 0])
+    expect(matchHtmlSpecimenCssSelectorList(
+      '.empty:has(~ .next)',
+      nodes[3]!,
+      nodes,
+    )).toEqual([0, 2, 0])
+    expect(matchHtmlSpecimenCssSelectorList(
+      '.card:has(.content .badge)',
+      nodes[0]!,
+      nodes,
+    )).toBeNull()
+    expect(matchHtmlSpecimenCssSelectorList(
+      '.card:has(:hover)',
+      nodes[0]!,
+      nodes,
+    )).toBeNull()
+  })
 })
 
 function matches(selector: string, node: HtmlSpecimenCssSelectorNode) {
@@ -137,11 +208,13 @@ function createNode({
   className,
   id,
   path = [0],
+  tagName = 'button',
 }: {
   attributes?: Readonly<Record<string, string>>
   className: string
   id: string
   path?: readonly number[]
+  tagName?: string
 }): HtmlSpecimenCssSelectorNode {
   return {
     attributes: {
@@ -151,6 +224,6 @@ function createNode({
     },
     classList: className.split(' '),
     path,
-    tagName: 'button',
+    tagName,
   }
 }

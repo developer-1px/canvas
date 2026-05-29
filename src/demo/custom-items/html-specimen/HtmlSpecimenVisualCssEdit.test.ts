@@ -1693,6 +1693,56 @@ describe('HtmlSpecimenVisualCssEdit', () => {
     })
   })
 
+  it('matches has pseudo function selectors against indexed descendants', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `.card:has(.badge) {
+  color: #334155;
+}`,
+    }
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '#111827',
+        nodeId: 'card',
+        property: 'color',
+      },
+      nodes: [
+        createNode({
+          className: 'card',
+          id: 'card',
+          path: [0],
+          tagName: 'article',
+        }),
+        createNode({
+          className: 'badge',
+          id: 'badge',
+          path: [0, 0],
+          tagName: 'span',
+        }),
+        createNode({
+          className: 'card',
+          id: 'empty',
+          path: [1],
+          tagName: 'article',
+        }),
+      ],
+      specimen,
+    })
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) {
+      throw new Error(result.reason)
+    }
+
+    expect(result.source).toMatchObject({
+      affectedNodeIds: ['card'],
+      selector: '.card:has(.badge)',
+      specificity: [0, 2, 0],
+      value: '#111827',
+    })
+  })
+
   it('does not match negated pseudo function selectors when the node is excluded', () => {
     const specimen = {
       ...createButtonSpecimenData(),

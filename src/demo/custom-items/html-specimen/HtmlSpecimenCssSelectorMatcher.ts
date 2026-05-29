@@ -37,8 +37,13 @@ type CssAttributeSelector =
 type CssPseudoFunctionSelector = {
   args: string
   end: number
-  name: 'is' | 'not' | 'where'
+  name: 'has' | 'is' | 'not' | 'where'
   start: number
+}
+
+type CssHasRelativeSelector = {
+  compound: string
+  relation: CssSelectorRelation
 }
 
 export function matchHtmlSpecimenCssSelectorList(
@@ -246,6 +251,14 @@ function matchesCompoundSelector(
       return false
     }
 
+    if (pseudoFunction.name === 'has') {
+      if (!matchesCssHasPseudoFunctionSelector(pseudoFunction, node, nodes)) {
+        return false
+      }
+
+      continue
+    }
+
     const matchesPseudoArgs =
       matchHtmlSpecimenCssSelectorList(pseudoFunction.args, node, nodes) !== null
 
@@ -311,6 +324,10 @@ function matchesCompoundSelector(
 function canMatchCssPseudoFunctionSelector(
   pseudoFunction: CssPseudoFunctionSelector,
 ) {
+  if (pseudoFunction.name === 'has') {
+    return parseCssHasRelativeSelectors(pseudoFunction.args) !== null
+  }
+
   const selectors = splitCssSelectorList(pseudoFunction.args)
 
   return selectors.length > 0 &&
@@ -320,6 +337,93 @@ function canMatchCssPseudoFunctionSelector(
       return selectorPart.length > 0 &&
         parseCssSelectorSegments(selectorPart) !== null
     })
+}
+
+function matchesCssHasPseudoFunctionSelector(
+  pseudoFunction: CssPseudoFunctionSelector,
+  node: HtmlSpecimenCssSelectorNode,
+  nodes: readonly HtmlSpecimenCssSelectorNode[],
+) {
+  const relatives = parseCssHasRelativeSelectors(pseudoFunction.args)
+
+  if (!relatives) {
+    return false
+  }
+
+  return relatives.some((relative) =>
+    nodes.some((candidate) =>
+      matchesCssHasRelation({
+        candidate,
+        node,
+        relation: relative.relation,
+      }) &&
+      matchesCompoundSelector(relative.compound, candidate, nodes)))
+}
+
+function parseCssHasRelativeSelectors(
+  args: string,
+): CssHasRelativeSelector[] | null {
+  const relatives: CssHasRelativeSelector[] = []
+
+  for (const selector of splitCssSelectorList(args)) {
+    const relative = parseCssHasRelativeSelector(selector)
+
+    if (!relative) {
+      return null
+    }
+
+    relatives.push(relative)
+  }
+
+  return relatives.length > 0 ? relatives : null
+}
+
+function parseCssHasRelativeSelector(
+  selector: string,
+): CssHasRelativeSelector | null {
+  let source = selector.trim()
+  let relation: CssSelectorRelation = 'descendant'
+
+  if (source.startsWith('>')) {
+    relation = 'child'
+    source = source.slice(1).trim()
+  } else if (source.startsWith('+')) {
+    relation = 'adjacent-sibling'
+    source = source.slice(1).trim()
+  } else if (source.startsWith('~')) {
+    relation = 'subsequent-sibling'
+    source = source.slice(1).trim()
+  }
+
+  const segments = parseCssSelectorSegments(source)
+
+  return segments && segments.length === 1
+    ? {
+        compound: segments[0]!.compound,
+        relation,
+      }
+    : null
+}
+
+function matchesCssHasRelation({
+  candidate,
+  node,
+  relation,
+}: {
+  candidate: HtmlSpecimenCssSelectorNode
+  node: HtmlSpecimenCssSelectorNode
+  relation: CssSelectorRelation
+}) {
+  switch (relation) {
+    case 'adjacent-sibling':
+      return isNextNodeSibling({ candidate, node })
+    case 'child':
+      return isNodeParent(node, candidate)
+    case 'descendant':
+      return isNodeAncestor(node, candidate)
+    case 'subsequent-sibling':
+      return isSubsequentNodeSibling({ candidate, node })
+  }
 }
 
 function parseCssSelectorSegments(selector: string): CssSelectorSegment[] | null {
@@ -622,7 +726,7 @@ function readCssPseudoFunctionSelector(
     return null
   }
 
-  const match = /^(is|not|where)\(/i.exec(source.slice(start + 1))
+  const match = /^(has|is|not|where)\(/i.exec(source.slice(start + 1))
 
   if (!match) {
     return null
@@ -630,7 +734,12 @@ function readCssPseudoFunctionSelector(
 
   const name = match[1]?.toLowerCase()
 
-  if (name !== 'is' && name !== 'not' && name !== 'where') {
+  if (
+    name !== 'has' &&
+    name !== 'is' &&
+    name !== 'not' &&
+    name !== 'where'
+  ) {
     return null
   }
 
@@ -1093,6 +1202,57 @@ function isPreviousNodeSibling({
     parentPath.every((part, index) => part === candidate.path?.[index])
 }
 
+function isNextNodeSibling({
+  candidate,
+  node,
+}: {
+  candidate: HtmlSpecimenCssSelectorNode
+  node: HtmlSpecimenCssSelectorNode
+}) {
+  if (!candidate.path || !node.path || node.path.length === 0) {
+    return false
+  }
+
+  const nodeSiblingIndex = node.path.at(-1)
+  const candidateSiblingIndex = candidate.path.at(-1)
+
+  return nodeSiblingIndex !== undefined &&
+    candidateSiblingIndex === nodeSiblingIndex + 1 &&
+    hasSameParentPath(candidate.path, node.path)
+}
+
+function isSubsequentNodeSibling({
+  candidate,
+  node,
+}: {
+  candidate: HtmlSpecimenCssSelectorNode
+  node: HtmlSpecimenCssSelectorNode
+}) {
+  if (!candidate.path || !node.path || node.path.length === 0) {
+    return false
+  }
+
+  const nodeSiblingIndex = node.path.at(-1)
+  const candidateSiblingIndex = candidate.path.at(-1)
+
+  return nodeSiblingIndex !== undefined &&
+    candidateSiblingIndex !== undefined &&
+    candidateSiblingIndex > nodeSiblingIndex &&
+    hasSameParentPath(candidate.path, node.path)
+}
+
+function isNodeParent(
+  candidate: HtmlSpecimenCssSelectorNode,
+  node: HtmlSpecimenCssSelectorNode,
+) {
+  return Boolean(
+    candidate.path &&
+    node.path &&
+    candidate.path.length + 1 === node.path.length &&
+    candidate.path.every((part, index) => part === node.path?.[index]),
+  )
+}
+
 function isNodeAncestor(
   candidate: HtmlSpecimenCssSelectorNode,
   node: HtmlSpecimenCssSelectorNode,
@@ -1102,6 +1262,19 @@ function isNodeAncestor(
   }
 
   return candidate.path.every((part, index) => part === node.path?.[index])
+}
+
+function hasSameParentPath(
+  left: readonly number[],
+  right: readonly number[],
+) {
+  if (left.length !== right.length || left.length === 0) {
+    return false
+  }
+
+  return left
+    .slice(0, -1)
+    .every((part, index) => part === right[index])
 }
 
 function readCssSimpleSelectorNames(compound: string, prefix: '.' | '#') {
