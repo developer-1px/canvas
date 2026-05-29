@@ -89,6 +89,31 @@ describe('HtmlSpecimenVisualCssEdit', () => {
     })
   })
 
+  it('blocks background-color edits that would drop complex background layers', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `.primary {
+  background: linear-gradient(#ffffff, #f8fafc), #2563eb;
+}`,
+    }
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '#111827',
+        nodeId: 'primary',
+        property: 'background-color',
+      },
+      nodes: createButtonNodes(),
+      specimen,
+    })
+
+    expect(result).toEqual({
+      affectedNodeIds: ['primary'],
+      ok: false,
+      reason: 'shorthand-conflict',
+      specimen,
+    })
+  })
+
   it('patches shared CSS rules and reports the affected nodes', () => {
     const result = applyHtmlSpecimenVisualCssEdit({
       intent: {

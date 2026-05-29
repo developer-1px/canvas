@@ -615,6 +615,13 @@ export function resolveHtmlSpecimenCssShorthandConflictSource({
   })
   let winner: HtmlSpecimenCssDeclarationSource | null = null
 
+  if (isComplexBackgroundShorthandColorSource({
+    property,
+    source: shorthandSource,
+  })) {
+    winner = shorthandSource
+  }
+
   for (const candidateProperty of getCssShorthandConflictProperties(property)) {
     const source = resolveHtmlSpecimenCssDeclarationSource({
       css,
@@ -639,6 +646,18 @@ export function resolveHtmlSpecimenCssShorthandConflictSource({
   }
 
   return winner
+}
+
+function isComplexBackgroundShorthandColorSource({
+  property,
+  source,
+}: {
+  property: string
+  source: HtmlSpecimenCssDeclarationSource | null
+}) {
+  return normalizeProperty(property) === 'background-color' &&
+    source?.property === 'background' &&
+    !isPlainBackgroundColorValue(source.value)
 }
 
 export function resolveHtmlSpecimenCssScopedRuleSource({
@@ -786,6 +805,49 @@ function isSameCssScopedDeclarationMatch(
 
 export function isHtmlSpecimenCssTokenValue(value: string) {
   return /\bvar\s*\(/i.test(value)
+}
+
+function isPlainBackgroundColorValue(value: string) {
+  const normalizedValue = stripCssComments(value).trim().toLowerCase()
+
+  if (/^#[\da-f]{3,8}$/i.test(normalizedValue)) {
+    return true
+  }
+
+  if (/^(?:rgb|rgba|hsl|hsla|hwb|lab|lch|oklab|oklch|color)\s*\([^)]*\)$/.test(
+    normalizedValue,
+  )) {
+    return true
+  }
+
+  if (!/^[a-z][a-z-]*$/i.test(normalizedValue)) {
+    return false
+  }
+
+  return !new Set([
+    'auto',
+    'border-box',
+    'bottom',
+    'center',
+    'contain',
+    'content-box',
+    'cover',
+    'fixed',
+    'left',
+    'local',
+    'no-repeat',
+    'none',
+    'padding-box',
+    'repeat',
+    'repeat-x',
+    'repeat-y',
+    'right',
+    'round',
+    'scroll',
+    'space',
+    'text',
+    'top',
+  ]).has(normalizedValue)
 }
 
 export function serializeHtmlSpecimenCssPatch(

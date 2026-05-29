@@ -1192,6 +1192,61 @@ test('keeps token-backed preview CSS read-only in the inspector', async ({
   ).toContain('font: var(--control-font);')
 })
 
+test('keeps complex background shorthand fill edits read-only', async ({
+  page,
+}) => {
+  await page.goto('/')
+
+  const pasteWasHandled = await page.evaluate((text) => {
+    const data = new DataTransfer()
+
+    data.setData('text/plain', text)
+
+    const event = new ClipboardEvent('paste', {
+      bubbles: true,
+      cancelable: true,
+      clipboardData: data,
+    })
+
+    window.dispatchEvent(event)
+
+    return event.defaultPrevented
+  }, JSON.stringify({
+    css: [
+      '.primary {',
+      '  color: #ffffff;',
+      '  background: linear-gradient(#ffffff, #f8fafc), #2563eb;',
+      '}',
+    ].join('\n'),
+    html: [
+      '<main>',
+      '<button id="primary" class="primary">Save</button>',
+      '</main>',
+    ].join(''),
+  }))
+
+  expect(pasteWasHandled).toBe(true)
+
+  const preview = page.locator('.demo-html-specimen-preview').last()
+
+  await expect(preview).toBeVisible()
+  await preview.locator('button#primary').click()
+
+  const backgroundField = page
+    .locator('.html-specimen-css-field')
+    .filter({ hasText: 'Bg' })
+  const backgroundInput = backgroundField.locator('input')
+
+  await expect(backgroundField
+    .getByText('Conflict .primary / 1 node'),
+  ).toBeVisible()
+  await expect(backgroundInput).toBeDisabled()
+  await expect.poll(async () =>
+    preview.evaluate((host) =>
+      host.shadowRoot?.querySelector('style')?.textContent ?? ''),
+  ).toContain('linear-gradient(#ffffff, #f8fafc), #2563eb')
+})
+
 test('allows longhand edits after token-backed shorthand is overridden', async ({
   page,
 }) => {
