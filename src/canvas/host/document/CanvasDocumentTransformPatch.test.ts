@@ -160,7 +160,7 @@ describe('CanvasDocument transform patches', () => {
   })
 
 
-  test('commits z-order changes as zod-crud move patches', () => {
+  test('commits z-order changes as layer-order replace patches', () => {
     const items: CanvasItem[] = [
       rectItem('a'),
       rectItem('b'),
@@ -177,9 +177,9 @@ describe('CanvasDocument transform patches', () => {
     )
 
     expect(patch).toEqual([{
-      op: 'move',
-      from: '/2',
-      path: '/1',
+      op: 'replace',
+      path: '',
+      value: [items[0], items[2], items[1], items[3]],
     }])
     expect(
       commitCanvasItemsPatch({
@@ -276,4 +276,3 @@ function rectItem(id: string): CanvasItem {
     y: 0,
   }
 }
-

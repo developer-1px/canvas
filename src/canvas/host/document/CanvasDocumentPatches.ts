@@ -2,12 +2,9 @@ import type { JSONPatchOperation, Pointer } from 'zod-crud'
 import type { Bounds } from '../../core'
 import type { CanvasItem } from '../model'
 import {
-  groupCanvasSelection,
   removeCanvasItems,
-  reorderCanvasItems,
   resizeCanvasItems,
   type CanvasZOrderMode,
-  ungroupCanvasSelection,
 } from '../operations/CanvasOperations'
 import {
   getCanvasEditableTextPatchUpdates,
@@ -16,17 +13,17 @@ import {
 } from '../text/CanvasEditableTextItem'
 import {
   findCanvasItemEntry,
-  isCanvasGroupItem,
 } from '../tree/CanvasTree'
+import {
+  createCanvasDocumentGroupPatch,
+  createCanvasDocumentUngroupPatch,
+} from './CanvasDocumentGroupingPatch'
+import { createCanvasDocumentLayerOrderPatch } from './CanvasDocumentLayerOrderPatch'
 import { canvasItemPathToPointer } from './CanvasDocumentPointers'
 import {
-  areCanvasDocumentPatchItemsEqual,
   createCanvasDocumentPatchTreeDiff,
-  getCanvasDocumentPatchEntries,
-  getCanvasDocumentPatchRemovalEntries,
   type CanvasDocumentPatchTreeDiff,
 } from './CanvasDocumentPatchTreeDiff'
-import { createReorderCanvasSiblingArraysPatch } from './CanvasDocumentReorderPatch'
 
 export function createRemoveCanvasItemsPatch(
   items: CanvasItem[],
@@ -71,73 +68,14 @@ export function createGroupCanvasItemsPatch(
   selection: string[],
   groupId: string,
 ): JSONPatchOperation[] {
-  const next = groupCanvasSelection(items, selection, groupId)
-
-  if (areCanvasDocumentPatchItemsEqual(items, next.items)) {
-    return []
-  }
-
-  const selected = new Set(selection)
-  const groupedEntries = getCanvasDocumentPatchRemovalEntries(
-    getCanvasDocumentPatchEntries(items).filter((entry) =>
-      selected.has(entry.item.id),
-    ),
-  )
-  const groupEntry = findCanvasItemEntry(next.items, groupId)
-
-  if (!groupEntry || groupedEntries.length === 0) {
-    return []
-  }
-
-  return [
-    ...groupedEntries.map((entry): JSONPatchOperation => ({
-      op: 'remove',
-      path: canvasItemPathToPointer(entry.path),
-    })),
-    {
-      op: 'add',
-      path: canvasItemPathToPointer(groupEntry.path),
-      value: groupEntry.item,
-    },
-  ]
+  return createCanvasDocumentGroupPatch({ groupId, items, selection })
 }
 
 export function createUngroupCanvasItemsPatch(
   items: CanvasItem[],
   selection: string[],
 ): JSONPatchOperation[] {
-  const next = ungroupCanvasSelection(items, selection)
-
-  if (areCanvasDocumentPatchItemsEqual(items, next.items)) {
-    return []
-  }
-
-  return getCanvasDocumentPatchRemovalEntries(
-    getCanvasDocumentPatchEntries(items).filter(
-      (entry) =>
-        isCanvasGroupItem(entry.item) && selection.includes(entry.item.id),
-    ),
-  )
-    .flatMap((entry): JSONPatchOperation[] => {
-      if (!isCanvasGroupItem(entry.item)) {
-        return []
-      }
-
-      return [
-        {
-          op: 'remove',
-          path: canvasItemPathToPointer(entry.path),
-        },
-        ...entry.item.children.map((child, index): JSONPatchOperation => ({
-          op: 'add',
-          path: canvasItemPathToPointer([
-            ...entry.parentPath,
-            entry.index + index,
-          ]),
-          value: child,
-        })),
-      ]
-    })
+  return createCanvasDocumentUngroupPatch({ items, selection })
 }
 
 export function createReorderCanvasItemsPatch(
@@ -145,16 +83,7 @@ export function createReorderCanvasItemsPatch(
   selection: string[],
   mode: CanvasZOrderMode,
 ): JSONPatchOperation[] {
-  const nextItems = reorderCanvasItems(items, selection, mode)
-
-  if (areCanvasDocumentPatchItemsEqual(items, nextItems)) {
-    return []
-  }
-
-  return createReorderCanvasSiblingArraysPatch({
-    afterItems: nextItems,
-    beforeItems: items,
-  })
+  return createCanvasDocumentLayerOrderPatch({ items, mode, selection })
 }
 
 export function createResizeCanvasItemsPatch(

@@ -141,9 +141,10 @@ describe('Canvas host item boundaries', () => {
     const groupPredicateConsumers = [
       'src/canvas/host/adapters/CanvasItemSceneAdapter.ts',
       'src/canvas/host/document/CanvasCustomItemValidation.ts',
+      'src/canvas/host/document/CanvasDocumentGroupingPatch.ts',
+      'src/canvas/host/document/CanvasDocumentLayerOrderPatch.ts',
       'src/canvas/host/document/CanvasDocumentPatchTreeDiff.ts',
       'src/canvas/host/document/CanvasDocumentPatches.ts',
-      'src/canvas/host/document/CanvasDocumentReorderPatch.ts',
       'src/canvas/host/operations/CanvasItemAlignmentOperations.ts',
       'src/canvas/host/operations/CanvasItemCloneOperations.ts',
       'src/canvas/host/operations/CanvasItemGroupOperations.ts',

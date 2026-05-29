@@ -11,7 +11,7 @@ import { createSetCanvasItemTextPatch } from './CanvasDocumentPatches'
 import type { CanvasItem } from '../model'
 
 describe('CanvasDocument text patches', () => {
-  test('finds searchable canvas text fields through zod-crud query', () => {
+  test('finds searchable canvas text fields through search-replace', () => {
     const document = createCanvasItemsDocument(INITIAL_ITEMS)
 
     expect(findCanvasDocumentText(document, 'concept')).toEqual([
@@ -23,6 +23,23 @@ describe('CanvasDocument text patches', () => {
         value: 'Concept block',
       },
     ])
+  })
+
+
+  test('does not search canvas storage identity fields', () => {
+    const document = createCanvasItemsDocument([{
+      fill: '#ffffff',
+      h: 48,
+      id: 'concept-id',
+      stroke: '#111111',
+      type: 'rect',
+      w: 120,
+      x: 10,
+      y: 20,
+    }])
+
+    expect(findCanvasDocumentText(document, 'concept-id')).toEqual([])
+    expect(findCanvasDocumentText(document, 'rect')).toEqual([])
   })
 
 
@@ -63,6 +80,30 @@ describe('CanvasDocument text patches', () => {
       },
     ])
     expect(getCanvasDocumentSelectionIds(document)).toEqual(['component-card'])
+  })
+
+
+  test('replaces all occurrences inside searchable fields', () => {
+    const document = createCanvasItemsDocument([{
+      h: 48,
+      id: 'text-1',
+      text: 'draft draft',
+      type: 'text',
+      w: 120,
+      x: 10,
+      y: 20,
+    }])
+    const patch = createReplaceCanvasDocumentTextPatch(
+      document,
+      'draft',
+      'final',
+    )
+
+    expect(patch).toEqual([{
+      op: 'replace',
+      path: '/0/text',
+      value: 'final final',
+    }])
   })
 
 

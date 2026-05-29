@@ -21,6 +21,7 @@ describe('CanvasDemoAssembly', () => {
   it('discovers custom item modules by folder convention', () => {
     expect(DEMO_CUSTOM_ITEM_MODULES.map((module) => module.id)).toEqual([
       'decision',
+      'html-specimen',
       'risk',
     ])
     expect(modules['./custom-items/index.ts']).toMatch('import.meta.glob')
@@ -36,16 +37,22 @@ describe('CanvasDemoAssembly', () => {
     expect(DEMO_CANVAS_APP_ASSEMBLY.initialSelection).toEqual([])
     expect(
       DEMO_CANVAS_APP_ASSEMBLY.customCreationTools.map((tool) => tool.id),
-    ).toEqual(['decision', 'risk'])
+    ).toEqual(['decision', 'html-specimen', 'risk'])
     expect(
       DEMO_CANVAS_APP_ASSEMBLY.customCommands.map((command) => command.id),
     ).toEqual(['decide-decision'])
     expect(
       DEMO_CANVAS_APP_ASSEMBLY.customItemRenderers['decision-node'],
     ).toBeTypeOf('function')
+    expect(
+      DEMO_CANVAS_APP_ASSEMBLY.customItemRenderers['html-specimen'],
+    ).toBeTypeOf('function')
     expect(DEMO_CANVAS_APP_ASSEMBLY.customItemValidators.decision).toBeTypeOf(
       'function',
     )
+    expect(
+      DEMO_CANVAS_APP_ASSEMBLY.customItemValidators['html-specimen'],
+    ).toBeTypeOf('function')
     expect(DEMO_CANVAS_APP_ASSEMBLY.customItemRenderers['risk-node']).toBeTypeOf(
       'function',
     )

@@ -44,7 +44,7 @@ describe('CanvasDemoSvgComponentRendererExecution', () => {
       },
     })
 
-    expect(markup).toContain('class="component-card"')
+    expect(markup).toMatch(/\bclass="[^"]*\bcomponent-card\b/)
     expect(markup).toContain('Risk')
   })
 
@@ -59,7 +59,7 @@ describe('CanvasDemoSvgComponentRendererExecution', () => {
       },
     })
 
-    expect(markup).toContain('class="component-card"')
+    expect(markup).toMatch(/\bclass="[^"]*\bcomponent-card\b/)
     expect(markup).toContain('Risk')
   })
 

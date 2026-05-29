@@ -30,27 +30,70 @@ describe('Canvas document boundaries', () => {
   })
 
 
-  it('keeps Host document reorder patch moves behind a named module', () => {
+  it('keeps Host document layer-order patching behind a named module', () => {
     const patchesFile = getSourceFile(
       'src/canvas/host/document/CanvasDocumentPatches.ts',
     )
-    const reorderPatchFile = getSourceFile(
-      'src/canvas/host/document/CanvasDocumentReorderPatch.ts',
+    const layerOrderPatchFile = getSourceFile(
+      'src/canvas/host/document/CanvasDocumentLayerOrderPatch.ts',
     )
 
     expect(patchesFile.source).toContain(
-      "from './CanvasDocumentReorderPatch'",
+      "from './CanvasDocumentLayerOrderPatch'",
     )
-    expect(patchesFile.source).not.toContain('collectCanvasSiblingArrays')
-    expect(patchesFile.source).not.toContain('createReorderSiblingArrayPatch')
-    expect(patchesFile.source).not.toContain('canvasArrayItemPointer')
-    expect(reorderPatchFile.source).toContain(
-      'export function createReorderCanvasSiblingArraysPatch',
+    expect(patchesFile.source).not.toContain('createLayerOrder')
+    expect(patchesFile.source).not.toContain('flattenCanvasItems')
+    expect(patchesFile.source).not.toContain('pruneNestedSelection')
+    expect(layerOrderPatchFile.source).toContain(
+      'export function createCanvasDocumentLayerOrderPatch',
     )
-    expect(reorderPatchFile.source).toContain('collectCanvasSiblingArrays')
-    expect(reorderPatchFile.source).toContain('createReorderSiblingArrayPatch')
-    expect(reorderPatchFile.source).toContain('canvasArrayItemPointer')
-    expect(reorderPatchFile.source).toContain("op: 'move'")
+    expect(layerOrderPatchFile.source).toContain(
+      "from '@zod-crud/layer-order'",
+    )
+    expect(layerOrderPatchFile.source).toContain('createLayerOrder')
+    expect(layerOrderPatchFile.source).toContain('flattenCanvasItems')
+    expect(layerOrderPatchFile.source).toContain('pruneNestedSelection')
+  })
+
+
+  it('keeps zod-crud feature extensions behind Host document adapters', () => {
+    const documentFile = getSourceFile(
+      'src/canvas/host/document/CanvasDocument.ts',
+    )
+    const groupingPatchFile = getSourceFile(
+      'src/canvas/host/document/CanvasDocumentGroupingPatch.ts',
+    )
+    const layerOrderPatchFile = getSourceFile(
+      'src/canvas/host/document/CanvasDocumentLayerOrderPatch.ts',
+    )
+    const searchFile = getSourceFile(
+      'src/canvas/host/document/CanvasDocumentSearch.ts',
+    )
+    const patchesFile = getSourceFile(
+      'src/canvas/host/document/CanvasDocumentPatches.ts',
+    )
+    const appFiles = sourceFiles.filter((file) =>
+      file.path.startsWith('src/canvas/app/'),
+    )
+
+    expect(groupingPatchFile.source).toContain(
+      "from '@zod-crud/grouping'",
+    )
+    expect(layerOrderPatchFile.source).toContain(
+      "from '@zod-crud/layer-order'",
+    )
+    expect(documentFile.source).toContain(
+      "from '@zod-crud/patch-preview'",
+    )
+    expect(searchFile.source).toContain(
+      "from '@zod-crud/search-replace'",
+    )
+    expect(patchesFile.source).not.toContain("from '@zod-crud/")
+    expect(
+      appFiles.flatMap((file) =>
+        file.source.includes('zod-crud') ? [file.path] : [],
+      ),
+    ).toEqual([])
   })
 
 

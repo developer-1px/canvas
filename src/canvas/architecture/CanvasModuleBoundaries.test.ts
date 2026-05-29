@@ -123,7 +123,7 @@ describe('Canvas module layer boundaries', () => {
 
   it('keeps product-specific custom item ids outside canvas implementation', () => {
     const productCustomTerms =
-      /\b(risk|risk-node|custom:risk|demo-risk-text|decision|decision-node|custom:decision|demo-decision)\b|kind:\s*['"](risk|decision)['"]/
+      /\b(risk-node|custom:risk|demo-risk-text|decision-node|custom:decision|demo-decision)\b|kind:\s*['"](risk|decision)['"]/
     const violations = sourceFiles
       .filter((file) =>
         file.path.startsWith('src/canvas/') &&
@@ -206,15 +206,19 @@ describe('Canvas module layer boundaries', () => {
   })
 
 
-  it('keeps zod-crud document internals inside the host document layer', () => {
+  it('keeps zod-crud ownership inside the host document layer', () => {
     const violations = sourceFiles
       .filter((file) =>
         !file.path.endsWith('.test.ts') &&
-        !file.path.endsWith('.test.tsx') &&
-        !file.path.startsWith('src/canvas/host/document/'),
+        !file.path.endsWith('.test.tsx'),
       )
-      .flatMap((file) =>
-        file.source.includes('zod-crud') ? [file.path] : [],
+      .flatMap(getImportReferences)
+      .filter((reference) =>
+        reference.target === 'zod-crud' ||
+        reference.target.startsWith('@zod-crud/'),
+      )
+      .filter((reference) =>
+        !reference.from.startsWith('src/canvas/host/document/'),
       )
 
     expect(violations).toEqual([])

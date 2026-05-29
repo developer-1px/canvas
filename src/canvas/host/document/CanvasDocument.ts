@@ -1,4 +1,7 @@
 import {
+  previewPatch,
+} from '@zod-crud/patch-preview'
+import {
   createJSONDocument,
   type JSONDocument,
   type JSONPatchOperation,
@@ -6,12 +9,12 @@ import {
 } from 'zod-crud'
 import type { CanvasSelectionIds } from '../../core'
 import type { CanvasItem } from '../model'
+import { syncCanvasItems } from '../tree/CanvasTree'
 import {
   CanvasItemsSchema,
   validateCanvasItems,
   type CanvasItemValidationOptions,
 } from './CanvasItemSchema'
-import { syncCanvasItems } from '../tree/CanvasTree'
 import {
   createCanvasSelectionSnapshot,
   restoreCanvasDocumentSelection,
@@ -55,17 +58,34 @@ function previewCanvasItemsPatch(
   patch: JSONPatchOperation[],
   validation?: CanvasItemValidationOptions,
 ) {
-  const document = createCanvasItemsDocument(current, {
-    history: 0,
-    ...validation,
-  })
-  const result = document.patch(patch)
+  return previewCanvasItemsDocumentPatch(
+    createCanvasItemsDocument(current, {
+      history: 0,
+      ...validation,
+    }),
+    patch,
+    validation,
+  )
+}
 
-  assertJSONResult(result)
+function previewCanvasItemsDocumentPatch(
+  document: CanvasItemsDocument,
+  patch: JSONPatchOperation[],
+  validation?: CanvasItemValidationOptions,
+) {
+  const preview = previewPatch(
+    CanvasItemsSchema as never,
+    document,
+    patch,
+  )
+
+  if (!preview.ok) {
+    throw new Error(preview.reason)
+  }
 
   return {
-    items: validateCanvasItems(document.value, validation),
-    rawItems: document.value,
+    items: validateCanvasItems(preview.value, validation),
+    rawItems: preview.value,
   }
 }
 
@@ -112,7 +132,7 @@ export function commitCanvasItemsPatch({
     return false
   }
 
-  const next = previewCanvasItemsPatch(document.value, patch, validation)
+  const next = previewCanvasItemsDocumentPatch(document, patch, validation)
 
   if (canvasItemsEqual(document.value, next.items)) {
     return false

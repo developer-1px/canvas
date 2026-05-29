@@ -163,6 +163,21 @@ describe('CanvasDocument item patch commits', () => {
   })
 
 
+  test('rejects grouping non-contiguous siblings', () => {
+    const selection = ['component-sticky', 'component-card']
+
+    expect(
+      groupCanvasSelection(INITIAL_ITEMS, selection, 'group-1'),
+    ).toEqual({
+      items: INITIAL_ITEMS,
+      selection,
+    })
+    expect(
+      createGroupCanvasItemsPatch(INITIAL_ITEMS, selection, 'group-1'),
+    ).toEqual([])
+  })
+
+
   test('commits ungrouping as zod-crud remove and add patches', () => {
     const grouped = groupCanvasSelection(
       INITIAL_ITEMS,

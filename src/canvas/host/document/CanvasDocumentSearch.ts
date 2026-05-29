@@ -1,3 +1,4 @@
+import { createSearchReplace } from '@zod-crud/search-replace'
 import type { JSONPatchOperation, Pointer } from 'zod-crud'
 import { parsePointer } from 'zod-crud'
 import type { CanvasItem } from '../model'
@@ -22,15 +23,12 @@ export type CanvasTextSearchOptions = {
   caseSensitive?: boolean
 }
 
-const CANVAS_TEXT_SEARCH_QUERIES: Array<{
-  field: CanvasSearchField
-  jsonPath: string
-}> = [
-  { field: 'title', jsonPath: '$..title' },
-  { field: 'body', jsonPath: '$..body' },
-  { field: 'text', jsonPath: '$..text' },
-  { field: 'items', jsonPath: '$..items[*]' },
-  { field: 'columns', jsonPath: '$..columns[*]' },
+const CANVAS_TEXT_SEARCH_FIELD_ORDER: CanvasSearchField[] = [
+  'title',
+  'body',
+  'text',
+  'items',
+  'columns',
 ]
 
 export function findCanvasDocumentText(
@@ -38,38 +36,29 @@ export function findCanvasDocumentText(
   text: string,
   options: CanvasTextSearchOptions = {},
 ): CanvasTextSearchMatch[] {
-  if (text.length === 0) {
+  const result = createSearchReplace(document).find(text, {
+    ...options,
+    include: ({ pointer }) => isCanvasSearchableTextPointer(pointer),
+  })
+
+  if (!result.ok) {
     return []
   }
 
-  return CANVAS_TEXT_SEARCH_QUERIES.flatMap(({ field, jsonPath }) => {
-    const result = document.query(jsonPath)
+  return result.matches.flatMap((match) => {
+    const field = getCanvasSearchFieldForPointer(match.pointer)
+    const itemId = getCanvasItemIdForPointer(document.value, match.pointer)
 
-    if (!result.ok) {
-      return []
-    }
-
-    return result.pointers.flatMap((path) => {
-      const read = document.at(path)
-
-      if (!read.ok || typeof read.value !== 'string') {
-        return []
-      }
-
-      const occurrences = countTextOccurrences(read.value, text, options)
-      const itemId = getCanvasItemIdForPointer(document.value, path)
-
-      return occurrences > 0 && itemId
-        ? [{
-            field,
-            itemId,
-            occurrences,
-            path,
-            value: read.value,
-          }]
-        : []
-    })
-  })
+    return field && itemId
+      ? [{
+          field,
+          itemId,
+          occurrences: match.ranges.length,
+          path: match.pointer,
+          value: match.value,
+        }]
+      : []
+  }).sort(compareCanvasTextSearchMatches)
 }
 
 export function createReplaceCanvasDocumentTextPatch(
@@ -78,41 +67,53 @@ export function createReplaceCanvasDocumentTextPatch(
   replacement: string,
   options: CanvasTextSearchOptions = {},
 ): JSONPatchOperation[] {
-  return findCanvasDocumentText(document, searchText, options).flatMap(
-    (match) => {
-      const value = replaceText(match.value, searchText, replacement, options)
-
-      return value === match.value
-        ? []
-        : [{
-            op: 'replace',
-            path: match.path,
-            value,
-          }]
+  const change = createSearchReplace(document).canReplaceAll(
+    searchText,
+    replacement,
+    {
+      ...options,
+      include: ({ pointer }) => isCanvasSearchableTextPointer(pointer),
     },
   )
+
+  return change.ok ? [...change.operations] : []
 }
 
-function countTextOccurrences(
-  value: string,
-  searchText: string,
-  options: CanvasTextSearchOptions,
+function compareCanvasTextSearchMatches(
+  left: CanvasTextSearchMatch,
+  right: CanvasTextSearchMatch,
 ) {
-  const flags = options.caseSensitive ? 'g' : 'gi'
-  const matches = value.match(new RegExp(escapeRegExp(searchText), flags))
-
-  return matches?.length ?? 0
+  return (
+    CANVAS_TEXT_SEARCH_FIELD_ORDER.indexOf(left.field) -
+    CANVAS_TEXT_SEARCH_FIELD_ORDER.indexOf(right.field)
+  ) || left.path.localeCompare(right.path)
 }
 
-function replaceText(
-  value: string,
-  searchText: string,
-  replacement: string,
-  options: CanvasTextSearchOptions,
-) {
-  const flags = options.caseSensitive ? 'g' : 'gi'
+function isCanvasSearchableTextPointer(pointer: Pointer) {
+  return getCanvasSearchFieldForPointer(pointer) !== null
+}
 
-  return value.replace(new RegExp(escapeRegExp(searchText), flags), replacement)
+function getCanvasSearchFieldForPointer(pointer: Pointer) {
+  const segments = parsePointer(pointer)
+  const last = segments.at(-1)
+  const parent = segments.at(-2)
+
+  if (isCanvasSearchField(last)) {
+    return last
+  }
+
+  return isArrayIndexSegment(last) && isCanvasSearchField(parent)
+    ? parent
+    : null
+}
+
+function isCanvasSearchField(value: unknown): value is CanvasSearchField {
+  return typeof value === 'string' &&
+    (CANVAS_TEXT_SEARCH_FIELD_ORDER as string[]).includes(value)
+}
+
+function isArrayIndexSegment(value: unknown) {
+  return typeof value === 'string' && /^\d+$/.test(value)
 }
 
 function getCanvasItemIdForPointer(items: CanvasItem[], pointer: Pointer) {
@@ -140,8 +141,4 @@ function getCanvasItemIdForPointer(items: CanvasItem[], pointer: Pointer) {
   }
 
   return item?.id ?? null
-}
-
-function escapeRegExp(value: string) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }

@@ -1,60 +1,54 @@
+import { planSurfaceGrouping } from '@interactive-os/object-surface'
 import { unique } from '../../core'
 import type { CanvasItem } from '../model'
 import {
-  flattenCanvasItems,
-  pruneNestedSelection,
   syncCanvasItems,
   syncGroupBounds,
 } from '../tree/CanvasTree'
 import { isCanvasGroupItem } from '../tree/CanvasGroupItem'
 import {
   replaceCanvasChildrenAtPath,
-  sameCanvasPath,
 } from './CanvasItemOperationTree'
+import { CANVAS_OBJECT_SURFACE_ADAPTER } from '../surface/CanvasObjectSurfaceAdapter'
 
 export function groupCanvasSelection(
   items: CanvasItem[],
   ids: string[],
   groupId: string,
 ) {
-  const selectedIds = pruneNestedSelection(items, ids)
-
-  if (selectedIds.length < 2) {
-    return { items, selection: ids }
-  }
-
-  const selected = new Set(selectedIds)
-  const entries = flattenCanvasItems(items).filter((entry) =>
-    selected.has(entry.item.id),
-  )
-  const parentPath = entries[0]?.parentPath
-
-  if (
-    !parentPath ||
-    !entries.every((entry) => sameCanvasPath(entry.parentPath, parentPath))
-  ) {
-    return { items, selection: ids }
-  }
-
-  const minIndex = Math.min(...entries.map((entry) => entry.index))
-  const nextItems = replaceCanvasChildrenAtPath(items, parentPath, (children) => {
-    const grouped = children.filter((child) => selected.has(child.id))
-    const rest = children.filter((child) => !selected.has(child.id))
-    const insertIndex = children
-      .slice(0, minIndex)
-      .filter((child) => !selected.has(child.id)).length
-    const group = syncGroupBounds({
-      id: groupId,
-      type: 'group',
-      x: 0,
-      y: 0,
-      w: 0,
-      h: 0,
-      children: grouped,
-    })
-
-    return [...rest.slice(0, insertIndex), group, ...rest.slice(insertIndex)]
+  const groupPlan = planSurfaceGrouping({
+    adapter: CANVAS_OBJECT_SURFACE_ADAPTER,
+    items,
+    selection: ids,
   })
+
+  if (!groupPlan.ok) {
+    return { items, selection: ids }
+  }
+
+  const selected = new Set(groupPlan.ids)
+  const nextItems = replaceCanvasChildrenAtPath(
+    items,
+    [...groupPlan.parentPath],
+    (children) => {
+      const grouped = children.filter((child) => selected.has(child.id))
+      const rest = children.filter((child) => !selected.has(child.id))
+      const insertIndex = children
+        .slice(0, groupPlan.insertIndex)
+        .filter((child) => !selected.has(child.id)).length
+      const group = syncGroupBounds({
+        id: groupId,
+        type: 'group',
+        x: 0,
+        y: 0,
+        w: 0,
+        h: 0,
+        children: grouped,
+      })
+
+      return [...rest.slice(0, insertIndex), group, ...rest.slice(insertIndex)]
+    },
+  )
 
   return { items: syncCanvasItems(nextItems), selection: [groupId] }
 }

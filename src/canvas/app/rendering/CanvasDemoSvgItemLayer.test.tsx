@@ -99,7 +99,7 @@ describe('CanvasDemoSvgItemLayer external renderers', () => {
     )
 
     expect(markup).toContain('data-type="component"')
-    expect(markup).toContain('class="component-card"')
+    expect(markup).toMatch(/\bclass="[^"]*\bcomponent-card\b/)
     expect(markup).toContain('Risk')
   })
 
@@ -128,7 +128,7 @@ describe('CanvasDemoSvgItemLayer external renderers', () => {
     )
 
     expect(markup).toContain('data-type="component"')
-    expect(markup).toContain('class="component-card"')
+    expect(markup).toMatch(/\bclass="[^"]*\bcomponent-card\b/)
     expect(markup).toContain('Risk')
   })
 

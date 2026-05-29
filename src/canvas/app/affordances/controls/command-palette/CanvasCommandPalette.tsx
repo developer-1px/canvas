@@ -24,6 +24,17 @@ export function CanvasCommandPalette({
   open,
   onClose,
 }: CanvasCommandPaletteProps) {
+  if (!open) {
+    return null
+  }
+
+  return <CanvasCommandPaletteDialog items={items} onClose={onClose} />
+}
+
+function CanvasCommandPaletteDialog({
+  items,
+  onClose,
+}: Omit<CanvasCommandPaletteProps, 'open'>) {
   const [query, setQuery] = useState('')
   const [activeIndex, setActiveIndex] = useState(0)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -33,26 +44,14 @@ export function CanvasCommandPalette({
         .slice(0, MAX_VISIBLE_ITEMS),
     [items, query],
   )
+  const maxActiveIndex = Math.max(0, filteredItems.length - 1)
+  const activeItemIndex = Math.min(activeIndex, maxActiveIndex)
 
   useEffect(() => {
-    if (!open) {
-      return
-    }
+    const focusTimer = window.setTimeout(() => inputRef.current?.focus(), 0)
 
-    setQuery('')
-    setActiveIndex(0)
-    window.setTimeout(() => inputRef.current?.focus(), 0)
-  }, [open])
-
-  useEffect(() => {
-    setActiveIndex((index) =>
-      Math.min(index, Math.max(0, filteredItems.length - 1)),
-    )
-  }, [filteredItems.length])
-
-  if (!open) {
-    return null
-  }
+    return () => window.clearTimeout(focusTimer)
+  }, [])
 
   const runItem = (item: CanvasCommandPaletteItem | undefined) => {
     if (!item || item.disabled) {
@@ -74,23 +73,21 @@ export function CanvasCommandPalette({
     if (event.key === 'ArrowDown') {
       event.preventDefault()
       event.stopPropagation()
-      setActiveIndex((index) =>
-        Math.min(index + 1, Math.max(0, filteredItems.length - 1)),
-      )
+      setActiveIndex(() => Math.min(activeItemIndex + 1, maxActiveIndex))
       return
     }
 
     if (event.key === 'ArrowUp') {
       event.preventDefault()
       event.stopPropagation()
-      setActiveIndex((index) => Math.max(0, index - 1))
+      setActiveIndex(() => Math.max(0, activeItemIndex - 1))
       return
     }
 
     if (event.key === 'Enter') {
       event.preventDefault()
       event.stopPropagation()
-      runItem(filteredItems[activeIndex])
+      runItem(filteredItems[activeItemIndex])
     }
   }
 
@@ -130,7 +127,7 @@ export function CanvasCommandPalette({
                 key={item.id}
                 type="button"
                 className="command-palette-item"
-                aria-selected={index === activeIndex}
+                aria-selected={index === activeItemIndex}
                 disabled={item.disabled}
                 role="option"
                 onClick={() => runItem(item)}
