@@ -28,6 +28,7 @@ export type HtmlSpecimenCssDeclarationSource = {
   atRule?: string
   declarationIndex: number
   important: boolean
+  layer?: CssCascadeLayer
   property: string
   ruleIndex: number
   selector: string
@@ -38,6 +39,7 @@ export type HtmlSpecimenCssDeclarationSource = {
 export type HtmlSpecimenCssRuleSource = {
   affectedNodeIds: string[]
   atRule?: string
+  layer?: CssCascadeLayer
   ruleIndex: number
   selector: string
   specificity: [number, number, number]
@@ -48,6 +50,7 @@ export type HtmlSpecimenCssScopedRuleSource = {
   atRule: string
   declarationIndex: number
   important: boolean
+  layer?: CssCascadeLayer
   property: string
   ruleIndex: number
   selector: string
@@ -122,9 +125,15 @@ export type HtmlSpecimenVisualCssEditResult =
 type CssRule = {
   atRule: string | null
   blockEnd: number
+  layer: CssCascadeLayer | null
   declarations: CssDeclaration[]
   ruleIndex: number
   selector: string
+}
+
+type CssCascadeLayer = {
+  name: string
+  order: number
 }
 
 type CssDeclaration = {
@@ -160,6 +169,11 @@ type CssScannerState = {
 }
 
 type CssSupportsEvaluation = boolean | null
+
+type CssLayerRegistry = {
+  createAnonymousLayer(): CssCascadeLayer
+  getOrCreateLayer(name: string): CssCascadeLayer
+}
 
 export function applyHtmlSpecimenVisualCssEdit({
   intent,
@@ -348,6 +362,7 @@ export function resolveHtmlSpecimenCssDeclarationSource({
     ...(winner.rule.atRule ? { atRule: winner.rule.atRule } : {}),
     declarationIndex: winner.declaration.declarationIndex,
     important: winner.declaration.important,
+    ...(winner.rule.layer ? { layer: winner.rule.layer } : {}),
     property: winner.declaration.property,
     ruleIndex: winner.rule.ruleIndex,
     selector: winner.rule.selector,
@@ -416,12 +431,14 @@ function resolveHtmlSpecimenCssDeclarationMatchForProperties({
           {
             declarationIndex: declaration.declarationIndex,
             important: declaration.important,
+            layer: rule.layer,
             ruleIndex: rule.ruleIndex,
             specificity,
           },
           {
             declarationIndex: winner.declaration.declarationIndex,
             important: winner.declaration.important,
+            layer: winner.rule.layer,
             ruleIndex: winner.rule.ruleIndex,
             specificity: winner.specificity,
           },
@@ -564,6 +581,7 @@ export function resolveHtmlSpecimenCssRuleSource({
           property,
         }),
         ...(match.rule.atRule ? { atRule: match.rule.atRule } : {}),
+        ...(match.rule.layer ? { layer: match.rule.layer } : {}),
         ruleIndex: match.rule.ruleIndex,
         selector: match.rule.selector,
         specificity: match.specificity,
@@ -619,12 +637,14 @@ function getAffectedNodeIdsForRuleInsertion({
           {
             declarationIndex: match.rule.declarations.length,
             important: false,
+            layer: match.rule.layer,
             ruleIndex: match.rule.ruleIndex,
             specificity,
           },
           {
             declarationIndex: currentMatch.declaration.declarationIndex,
             important: currentMatch.declaration.important,
+            layer: currentMatch.rule.layer,
             ruleIndex: currentMatch.rule.ruleIndex,
             specificity: currentMatch.specificity,
           },
@@ -679,6 +699,7 @@ export function resolveHtmlSpecimenCssTokenSource({
     ...(winner.rule.atRule ? { atRule: winner.rule.atRule } : {}),
     declarationIndex: winner.declaration.declarationIndex,
     important: winner.declaration.important,
+    ...(winner.rule.layer ? { layer: winner.rule.layer } : {}),
     property: winner.declaration.property,
     ruleIndex: winner.rule.ruleIndex,
     selector: winner.rule.selector,
@@ -904,6 +925,7 @@ export function resolveHtmlSpecimenCssScopedRuleSource({
     atRule: winner.atRule,
     declarationIndex: winner.declaration.declarationIndex,
     important: winner.declaration.important,
+    ...(winner.rule.layer ? { layer: winner.rule.layer } : {}),
     property: winner.declaration.property,
     ruleIndex: winner.rule.ruleIndex,
     selector: winner.rule.selector,
@@ -953,12 +975,14 @@ function resolveHtmlSpecimenCssScopedDeclarationMatch({
           {
             declarationIndex: declaration.declarationIndex,
             important: declaration.important,
+            layer: scopedRule.rule.layer,
             ruleIndex: scopedRule.rule.ruleIndex,
             specificity,
           },
           {
             declarationIndex: winner.declaration.declarationIndex,
             important: winner.declaration.important,
+            layer: winner.rule.layer,
             ruleIndex: winner.rule.ruleIndex,
             specificity: winner.specificity,
           },
@@ -1190,11 +1214,13 @@ function resolveBestMatchingRuleMatch({
         compareCssSource(
           {
             declarationIndex: rule.declarations.length,
+            layer: rule.layer,
             ruleIndex: rule.ruleIndex,
             specificity,
           },
           {
             declarationIndex: best.rule.declarations.length,
+            layer: best.rule.layer,
             ruleIndex: best.rule.ruleIndex,
             specificity: best.specificity,
           },
@@ -1213,11 +1239,14 @@ function parseCssRules(
   mediaContext?: HtmlSpecimenCssMediaContext,
 ): CssRule[] {
   const rules: CssRule[] = []
+  const layerRegistry = createCssLayerRegistry(css)
 
   collectCssRules({
     atRule: null,
     css,
     end: css.length,
+    layer: null,
+    layerRegistry,
     mediaContext,
     rules,
     start: 0,
@@ -1230,6 +1259,8 @@ function collectCssRules({
   atRule,
   css,
   end,
+  layer,
+  layerRegistry,
   mediaContext,
   rules,
   start,
@@ -1237,6 +1268,8 @@ function collectCssRules({
   atRule: string | null
   css: string
   end: number
+  layer: CssCascadeLayer | null
+  layerRegistry: CssLayerRegistry
   mediaContext?: HtmlSpecimenCssMediaContext
   rules: CssRule[]
   start: number
@@ -1256,14 +1289,24 @@ function collectCssRules({
       break
     }
 
-    const selector = stripCssComments(css.slice(cursor, blockStart)).trim()
+    const preludeStart = findCssRulePreludeStart(css, cursor, blockStart)
+    const selector = stripCssComments(css.slice(preludeStart, blockStart)).trim()
 
     if (selector.startsWith('@')) {
       if (isCssAtRuleActive(selector, mediaContext)) {
+        const ruleLayer = resolveCssAtRuleLayer({
+          atRule: selector,
+          blockStart,
+          layer,
+          layerRegistry,
+        })
+
         collectCssRules({
           atRule: formatNestedCssAtRule(atRule, selector),
           css,
           end: blockEnd,
+          layer: ruleLayer,
+          layerRegistry,
           mediaContext,
           rules,
           start: blockStart + 1,
@@ -1278,6 +1321,7 @@ function collectCssRules({
           blockStart: blockStart + 1,
           css,
         }),
+        layer,
         ruleIndex: rules.length,
         selector,
       })
@@ -1285,6 +1329,197 @@ function collectCssRules({
 
     cursor = blockEnd + 1
   }
+}
+
+function createCssLayerRegistry(css: string): CssLayerRegistry {
+  const layers = new Map<string, CssCascadeLayer>()
+  let nextOrder = 0
+
+  const getOrCreateLayer = (name: string): CssCascadeLayer => {
+    const existing = layers.get(name)
+
+    if (existing) {
+      return existing
+    }
+
+    const layer = {
+      name,
+      order: nextOrder,
+    }
+
+    nextOrder += 1
+    layers.set(name, layer)
+
+    return layer
+  }
+
+  collectCssLayerOrderDeclarations(css, getOrCreateLayer)
+
+  return {
+    createAnonymousLayer() {
+      const layer = {
+        name: `(anonymous ${nextOrder})`,
+        order: nextOrder,
+      }
+
+      nextOrder += 1
+
+      return layer
+    },
+    getOrCreateLayer,
+  }
+}
+
+function collectCssLayerOrderDeclarations(
+  css: string,
+  getOrCreateLayer: (name: string) => CssCascadeLayer,
+) {
+  const scanner = createCssScannerState()
+  let index = 0
+
+  while (index < css.length) {
+    if (isCssScannerTopLevel(scanner) && isCssLayerKeywordAt(css, index)) {
+      const preludeStart = index + '@layer'.length
+      const terminator = findCssAtRulePreludeTerminator(css, preludeStart)
+
+      if (!terminator) {
+        return
+      }
+
+      for (const name of splitCssLayerNameList(
+        stripCssComments(css.slice(preludeStart, terminator.index)).trim(),
+      )) {
+        getOrCreateLayer(name)
+      }
+
+      if (terminator.kind === 'block') {
+        const blockEnd = findMatchingBrace(css, terminator.index)
+
+        index = blockEnd >= 0 ? blockEnd + 1 : terminator.index + 1
+        continue
+      }
+
+      index = terminator.index + 1
+      continue
+    }
+
+    index = advanceCssScannerState(css, index, scanner)
+  }
+}
+
+function resolveCssAtRuleLayer({
+  atRule,
+  blockStart,
+  layer,
+  layerRegistry,
+}: {
+  atRule: string
+  blockStart: number
+  layer: CssCascadeLayer | null
+  layerRegistry: CssLayerRegistry
+}) {
+  if (!isCssLayerAtRule(atRule)) {
+    return layer
+  }
+
+  const names = splitCssLayerNameList(
+    stripCssComments(atRule.slice('@layer'.length)).trim(),
+  )
+
+  if (names.length === 0) {
+    return layerRegistry.createAnonymousLayer()
+  }
+
+  const name = layer ? `${layer.name}.${names[0]}` : names[0]
+
+  return layerRegistry.getOrCreateLayer(name ?? `(anonymous ${blockStart})`)
+}
+
+function isCssLayerAtRule(atRule: string) {
+  return isCssLayerKeywordAt(stripCssComments(atRule).trim(), 0)
+}
+
+function isCssLayerKeywordAt(source: string, index: number) {
+  return source.slice(index, index + '@layer'.length).toLowerCase() ===
+    '@layer' &&
+    !isCssIdentifierChar(source[index + '@layer'.length] ?? '')
+}
+
+function findCssAtRulePreludeTerminator(css: string, start: number) {
+  const scanner = createCssScannerState()
+  let index = start
+
+  while (index < css.length) {
+    if (isCssScannerTopLevel(scanner)) {
+      if (css[index] === ';') {
+        return {
+          index,
+          kind: 'statement' as const,
+        }
+      }
+
+      if (css[index] === '{') {
+        return {
+          index,
+          kind: 'block' as const,
+        }
+      }
+    }
+
+    index = advanceCssScannerState(css, index, scanner)
+  }
+
+  return null
+}
+
+function splitCssLayerNameList(source: string) {
+  const names: string[] = []
+  const scanner = createCssScannerState()
+  let start = 0
+  let index = 0
+
+  while (index < source.length) {
+    if (source[index] === ',' && isCssScannerTopLevel(scanner)) {
+      appendCssLayerName(names, source.slice(start, index))
+      start = index + 1
+      index += 1
+      continue
+    }
+
+    index = advanceCssScannerState(source, index, scanner)
+  }
+
+  appendCssLayerName(names, source.slice(start))
+
+  return names
+}
+
+function appendCssLayerName(names: string[], rawName: string) {
+  const name = rawName.trim()
+
+  if (/^[a-z_][\w-]*(?:\.[a-z_][\w-]*)*$/i.test(name)) {
+    names.push(name)
+  }
+}
+
+function findCssRulePreludeStart(
+  css: string,
+  start: number,
+  end: number,
+) {
+  const scanner = createCssScannerState()
+  let preludeStart = start
+  let index = start
+
+  while (index < end) {
+    if (css[index] === ';' && isCssScannerTopLevel(scanner)) {
+      preludeStart = index + 1
+    }
+
+    index = advanceCssScannerState(css, index, scanner)
+  }
+
+  return preludeStart
 }
 
 function formatNestedCssAtRule(parent: string | null, atRule: string) {
@@ -1998,18 +2233,28 @@ function compareCssSource(
   left: {
     declarationIndex: number
     important?: boolean
+    layer?: CssCascadeLayer | null
     ruleIndex: number
     specificity: [number, number, number]
   },
   right: {
     declarationIndex: number
     important?: boolean
+    layer?: CssCascadeLayer | null
     ruleIndex: number
     specificity: [number, number, number]
   },
 ) {
-  if (Boolean(left.important) !== Boolean(right.important)) {
-    return left.important ? 1 : -1
+  const important = Boolean(left.important)
+
+  if (important !== Boolean(right.important)) {
+    return important ? 1 : -1
+  }
+
+  const layer = compareCssCascadeLayerPrecedence(left, right, important)
+
+  if (layer !== 0) {
+    return layer
   }
 
   const specificity = compareHtmlSpecimenCssSpecificity(
@@ -2026,6 +2271,35 @@ function compareCssSource(
   }
 
   return left.declarationIndex - right.declarationIndex
+}
+
+function compareCssCascadeLayerPrecedence(
+  left: { layer?: CssCascadeLayer | null },
+  right: { layer?: CssCascadeLayer | null },
+  important: boolean,
+) {
+  const leftLayer = left.layer ?? null
+  const rightLayer = right.layer ?? null
+
+  if (leftLayer === null && rightLayer === null) {
+    return 0
+  }
+
+  if (leftLayer === null || rightLayer === null) {
+    if (important) {
+      return leftLayer === null ? -1 : 1
+    }
+
+    return leftLayer === null ? 1 : -1
+  }
+
+  if (leftLayer.order === rightLayer.order) {
+    return 0
+  }
+
+  return important
+    ? rightLayer.order - leftLayer.order
+    : leftLayer.order - rightLayer.order
 }
 
 function compareCssInlineDeclaration(

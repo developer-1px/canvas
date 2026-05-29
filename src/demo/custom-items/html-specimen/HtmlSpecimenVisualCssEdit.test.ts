@@ -901,6 +901,148 @@ describe('HtmlSpecimenVisualCssEdit', () => {
     expect(result.specimen.css).toContain('color: #ffffff;')
   })
 
+  it('lets unlayered normal declarations beat later layered declarations', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `.primary {
+  color: #334155;
+}
+
+@layer components {
+  .primary {
+    color: #ef4444;
+  }
+}`,
+    }
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '#111827',
+        nodeId: 'primary',
+        property: 'color',
+      },
+      nodes: createButtonNodes(),
+      specimen,
+    })
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) {
+      throw new Error(result.reason)
+    }
+
+    expect(result.source).toMatchObject({
+      affectedNodeIds: ['primary'],
+      selector: '.primary',
+      value: '#111827',
+    })
+    expect(result.source.atRule).toBeUndefined()
+    expect(result.specimen.css).toContain(`.primary {
+  color: #111827;
+}`)
+    expect(result.specimen.css).toContain(`@layer components {
+  .primary {
+    color: #ef4444;
+  }
+}`)
+  })
+
+  it('respects declared layer order before specificity and source order', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `@layer base, components;
+
+@layer components {
+  .primary {
+    color: #334155;
+  }
+}
+
+@layer base {
+  .primary {
+    color: #ef4444;
+  }
+}`,
+    }
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '#111827',
+        nodeId: 'primary',
+        property: 'color',
+      },
+      nodes: createButtonNodes(),
+      specimen,
+    })
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) {
+      throw new Error(result.reason)
+    }
+
+    expect(result.source).toMatchObject({
+      affectedNodeIds: ['primary'],
+      atRule: '@layer components',
+      selector: '.primary',
+      value: '#111827',
+    })
+    expect(result.specimen.css).toContain(`@layer components {
+  .primary {
+    color: #111827;
+  }
+}`)
+    expect(result.specimen.css).toContain(`@layer base {
+  .primary {
+    color: #ef4444;
+  }
+}`)
+  })
+
+  it('lets layered important declarations beat unlayered important declarations', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `@layer components {
+  .primary {
+    color: #334155 !important;
+  }
+}
+
+.primary {
+  color: #ef4444 !important;
+}`,
+    }
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '#111827',
+        nodeId: 'primary',
+        property: 'color',
+      },
+      nodes: createButtonNodes(),
+      specimen,
+    })
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) {
+      throw new Error(result.reason)
+    }
+
+    expect(result.source).toMatchObject({
+      affectedNodeIds: ['primary'],
+      atRule: '@layer components',
+      important: true,
+      selector: '.primary',
+      value: '#111827',
+    })
+    expect(result.specimen.css).toContain(`@layer components {
+  .primary {
+    color: #111827 !important;
+  }
+}`)
+    expect(result.specimen.css).toContain(`.primary {
+  color: #ef4444 !important;
+}`)
+  })
+
   it('blocks stylesheet edits when an inline style wins the property', () => {
     const specimen = {
       ...createButtonSpecimenData(),
