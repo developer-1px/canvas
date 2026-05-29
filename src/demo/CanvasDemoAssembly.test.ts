@@ -34,7 +34,9 @@ describe('CanvasDemoAssembly', () => {
     expect(DEMO_CANVAS_APP_ASSEMBLY_INPUT.customItemModules).toBe(
       DEMO_CUSTOM_ITEM_MODULES,
     )
-    expect(DEMO_CANVAS_APP_ASSEMBLY.initialSelection).toEqual([])
+    expect(DEMO_CANVAS_APP_ASSEMBLY.initialSelection).toEqual([
+      'html-specimen-internal-admin',
+    ])
     expect(
       DEMO_CANVAS_APP_ASSEMBLY.customCreationTools.map((tool) => tool.id),
     ).toEqual(['decision', 'html-specimen', 'risk'])

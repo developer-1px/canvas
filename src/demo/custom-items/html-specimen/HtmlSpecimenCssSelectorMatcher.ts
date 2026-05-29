@@ -87,8 +87,8 @@ type CssPseudoSelectors = {
 }
 
 type CssHasRelativeSelector = {
-  compound: string
-  relation: CssSelectorRelation
+  relationToScope: CssSelectorRelation
+  segments: readonly CssSelectorSegment[]
 }
 
 export function matchHtmlSpecimenCssSelectorList(
@@ -411,12 +411,13 @@ function matchesCssHasPseudoFunctionSelector(
 
   return relatives.some((relative) =>
     nodes.some((candidate) =>
-      matchesCssHasRelation({
+      matchesCssHasRelativeSelectorSegments({
+        anchor: node,
         candidate,
-        node,
-        relation: relative.relation,
-      }) &&
-      matchesCompoundSelector(relative.compound, candidate, nodes)))
+        index: relative.segments.length - 1,
+        nodes,
+        relative,
+      })))
 }
 
 function parseCssHasRelativeSelectors(
@@ -441,47 +442,138 @@ function parseCssHasRelativeSelector(
   selector: string,
 ): CssHasRelativeSelector | null {
   let source = selector.trim()
-  let relation: CssSelectorRelation = 'descendant'
+  let relationToScope: CssSelectorRelation = 'descendant'
 
   if (source.startsWith('>')) {
-    relation = 'child'
+    relationToScope = 'child'
     source = source.slice(1).trim()
   } else if (source.startsWith('+')) {
-    relation = 'adjacent-sibling'
+    relationToScope = 'adjacent-sibling'
     source = source.slice(1).trim()
   } else if (source.startsWith('~')) {
-    relation = 'subsequent-sibling'
+    relationToScope = 'subsequent-sibling'
     source = source.slice(1).trim()
   }
 
   const segments = parseCssSelectorSegments(source)
 
-  return segments && segments.length === 1
+  return segments && segments.length > 0
     ? {
-        compound: segments[0]!.compound,
-        relation,
+        relationToScope,
+        segments,
       }
     : null
 }
 
-function matchesCssHasRelation({
+function matchesCssHasRelativeSelectorSegments({
+  anchor,
   candidate,
-  node,
+  index,
+  nodes,
+  relative,
+}: {
+  anchor: HtmlSpecimenCssSelectorNode
+  candidate: HtmlSpecimenCssSelectorNode
+  index: number
+  nodes: readonly HtmlSpecimenCssSelectorNode[]
+  relative: CssHasRelativeSelector
+}): boolean {
+  const segment = relative.segments[index]
+
+  if (
+    !segment ||
+    !matchesCompoundSelector(segment.compound, candidate, nodes)
+  ) {
+    return false
+  }
+
+  if (index === 0) {
+    return matchesCssHasScopeRelation({
+      candidate,
+      relation: relative.relationToScope,
+      scope: anchor,
+    })
+  }
+
+  const ancestors = getNodeAncestors({ node: candidate, nodes })
+
+  if (segment.relationToPrevious === 'child') {
+    const parent = ancestors.at(-1)
+
+    return parent
+      ? matchesCssHasRelativeSelectorSegments({
+          anchor,
+          candidate: parent,
+          index: index - 1,
+          nodes,
+          relative,
+        })
+      : false
+  }
+
+  if (segment.relationToPrevious === 'adjacent-sibling') {
+    const sibling = getPreviousNodeSibling({ node: candidate, nodes })
+
+    return sibling
+      ? matchesCssHasRelativeSelectorSegments({
+          anchor,
+          candidate: sibling,
+          index: index - 1,
+          nodes,
+          relative,
+        })
+      : false
+  }
+
+  if (segment.relationToPrevious === 'subsequent-sibling') {
+    for (const sibling of getPreviousNodeSiblings({ node: candidate, nodes })) {
+      if (matchesCssHasRelativeSelectorSegments({
+        anchor,
+        candidate: sibling,
+        index: index - 1,
+        nodes,
+        relative,
+      })) {
+        return true
+      }
+    }
+
+    return false
+  }
+
+  for (let ancestorIndex = ancestors.length - 1; ancestorIndex >= 0; ancestorIndex -= 1) {
+    if (matchesCssHasRelativeSelectorSegments({
+      anchor,
+      candidate: ancestors[ancestorIndex],
+      index: index - 1,
+      nodes,
+      relative,
+    })) {
+      return true
+    }
+  }
+
+  return false
+}
+
+function matchesCssHasScopeRelation({
+  candidate,
   relation,
+  scope,
 }: {
   candidate: HtmlSpecimenCssSelectorNode
-  node: HtmlSpecimenCssSelectorNode
   relation: CssSelectorRelation
+  scope: HtmlSpecimenCssSelectorNode
 }) {
   switch (relation) {
     case 'adjacent-sibling':
-      return isNextNodeSibling({ candidate, node })
+      return isNextNodeSibling({ candidate, node: scope })
     case 'child':
-      return isNodeParent(node, candidate)
+      return isNodeParent(scope, candidate)
     case 'descendant':
-      return isNodeAncestor(node, candidate)
+      return isNodeAncestor(scope, candidate)
     case 'subsequent-sibling':
-      return isSubsequentNodeSibling({ candidate, node })
+      return isSubsequentNodeSibling({ candidate, node: scope })
   }
 }
 

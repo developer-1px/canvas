@@ -2332,7 +2332,7 @@ describe('HtmlSpecimenVisualCssEdit', () => {
   it('matches has pseudo function selectors against indexed descendants', () => {
     const specimen = {
       ...createButtonSpecimenData(),
-      css: `.card:has(.badge) {
+      css: `.card:has(.content .badge) {
   color: #334155;
 }`,
     }
@@ -2350,9 +2350,15 @@ describe('HtmlSpecimenVisualCssEdit', () => {
           tagName: 'article',
         }),
         createNode({
+          className: 'content',
+          id: 'content',
+          path: [0, 0],
+          tagName: 'section',
+        }),
+        createNode({
           className: 'badge',
           id: 'badge',
-          path: [0, 0],
+          path: [0, 0, 0],
           tagName: 'span',
         }),
         createNode({
@@ -2373,8 +2379,8 @@ describe('HtmlSpecimenVisualCssEdit', () => {
 
     expect(result.source).toMatchObject({
       affectedNodeIds: ['card'],
-      selector: '.card:has(.badge)',
-      specificity: [0, 2, 0],
+      selector: '.card:has(.content .badge)',
+      specificity: [0, 3, 0],
       value: '#111827',
     })
   })

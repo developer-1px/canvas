@@ -22,6 +22,10 @@ import {
   type HtmlSpecimenCssRuleSource,
   type HtmlSpecimenVisualCssNode,
 } from './HtmlSpecimenVisualCssEdit'
+import {
+  formatHtmlSpecimenPreviewNodeSelector,
+  readNodeAttribute,
+} from './HtmlSpecimenPreviewNodeLabel'
 
 type HtmlSpecimenCssControl = {
   computedStyleKey:
@@ -37,10 +41,20 @@ type HtmlSpecimenCssControl = {
 }
 
 type HtmlSpecimenPreviewFocusData = {
-  node: HtmlSpecimenVisualCssNode & {
-    computedStyle?: Partial<Record<HtmlSpecimenCssControl['computedStyleKey'], string>>
+  node: HtmlSpecimenPreviewFocusNode
+  nodes: readonly HtmlSpecimenPreviewFocusNode[]
+}
+
+type HtmlSpecimenPreviewFocusNode = HtmlSpecimenVisualCssNode & {
+  computedStyle?: Partial<Record<
+    HtmlSpecimenCssControl['computedStyleKey'],
+    string
+  >>
+  provenance?: {
+    componentId?: string
+    sourceId?: string
   }
-  nodes: readonly HtmlSpecimenVisualCssNode[]
+  text?: string
 }
 
 type HtmlSpecimenCssControlModel = {
@@ -210,52 +224,61 @@ function renderHtmlSpecimenCssInspector({
 }) {
   return (
     <div className="html-specimen-css-inspector">
-      <div className="html-specimen-css-target">
-        {formatHtmlSpecimenCssTargetLabel(target.node)}
-      </div>
-      {HTML_SPECIMEN_CSS_CONTROLS.map((control) => {
-        const model = getHtmlSpecimenCssControlModel({ control, target })
-        const sourceSelector = getHtmlSpecimenCssControlSourceSelector(model)
+      <section className="html-specimen-devtools-section">
+        <div className="html-specimen-devtools-heading">Elements</div>
+        <div className="html-specimen-css-target">
+          <code>{formatHtmlSpecimenCssTargetLabel(target.node)}</code>
+        </div>
+        <div className="html-specimen-node-meta">
+          {formatHtmlSpecimenNodeMeta(target.node)}
+        </div>
+      </section>
+      <section className="html-specimen-devtools-section">
+        <div className="html-specimen-devtools-heading">Styles</div>
+        {HTML_SPECIMEN_CSS_CONTROLS.map((control) => {
+          const model = getHtmlSpecimenCssControlModel({ control, target })
+          const sourceSelector = getHtmlSpecimenCssControlSourceSelector(model)
 
-        return (
-          <label
-            className="html-specimen-css-field"
-            data-editable={model.editable}
-            key={control.property}
-          >
-            <span className="html-specimen-css-field-label">
-              {control.label}
-            </span>
-            <input
-              key={`${target.node.id}:${control.property}:${model.value}`}
-              defaultValue={model.value}
-              disabled={context.disabled || !model.editable}
-              onBlur={(event) =>
-                changeHtmlSpecimenPreviewTargetCss({
-                  context,
-                  nextValue: event.currentTarget.value,
-                  property: control.property,
-                })}
-              onKeyDown={(event) =>
-                handleHtmlSpecimenCssFieldKeyDown(event, model.value)}
-              spellCheck={false}
-              type="text"
-            />
-            {sourceSelector ? (
-              <span
-                className="html-specimen-css-source"
-                title={sourceSelector}
-              >
-                {formatHtmlSpecimenCssControlSource(model)}
+          return (
+            <label
+              className="html-specimen-css-field"
+              data-editable={model.editable}
+              key={control.property}
+            >
+              <span className="html-specimen-css-field-label">
+                {control.label}
               </span>
-            ) : (
-              <span className="html-specimen-css-source">
-                No matching rule
-              </span>
-            )}
-          </label>
-        )
-      })}
+              <input
+                key={`${target.node.id}:${control.property}:${model.value}`}
+                defaultValue={model.value}
+                disabled={context.disabled || !model.editable}
+                onBlur={(event) =>
+                  changeHtmlSpecimenPreviewTargetCss({
+                    context,
+                    nextValue: event.currentTarget.value,
+                    property: control.property,
+                  })}
+                onKeyDown={(event) =>
+                  handleHtmlSpecimenCssFieldKeyDown(event, model.value)}
+                spellCheck={false}
+                type="text"
+              />
+              {sourceSelector ? (
+                <span
+                  className="html-specimen-css-source"
+                  title={sourceSelector}
+                >
+                  {formatHtmlSpecimenCssControlSource(model)}
+                </span>
+              ) : (
+                <span className="html-specimen-css-source">
+                  No matching rule
+                </span>
+              )}
+            </label>
+          )
+        })}
+      </section>
     </div>
   )
 }
@@ -409,7 +432,9 @@ function readHtmlSpecimenPreviewFocusData(
     : null
 }
 
-function isHtmlSpecimenCssNode(value: unknown): value is HtmlSpecimenVisualCssNode {
+function isHtmlSpecimenCssNode(
+  value: unknown,
+): value is HtmlSpecimenPreviewFocusNode {
   return (
     isRecord(value) &&
     typeof value.id === 'string' &&
@@ -420,13 +445,24 @@ function isHtmlSpecimenCssNode(value: unknown): value is HtmlSpecimenVisualCssNo
 }
 
 function formatHtmlSpecimenCssTargetLabel(
-  node: HtmlSpecimenVisualCssNode,
+  node: HtmlSpecimenPreviewFocusNode,
 ) {
-  const classes = node.classList.length > 0
-    ? `.${node.classList.join('.')}`
-    : ''
+  return formatHtmlSpecimenPreviewNodeSelector(node)
+}
 
-  return `${node.tagName}${classes}`
+function formatHtmlSpecimenNodeMeta(
+  node: HtmlSpecimenPreviewFocusNode,
+) {
+  const name = readNodeAttribute(node, 'name')
+  const source = node.provenance?.sourceId
+  const component = node.provenance?.componentId
+  const parts = [
+    component ? `component ${component}` : '',
+    name ? `name ${name}` : '',
+    source ? source : '',
+  ].filter(Boolean)
+
+  return parts.length > 0 ? parts.join('  ') : 'html element'
 }
 
 function formatHtmlSpecimenCssControlSource(

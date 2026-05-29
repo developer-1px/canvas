@@ -1,14 +1,16 @@
 import type { CanvasAppCustomItemModuleCreationTool } from '../../../canvas'
-import { createDesignSystemSpecimenData } from './HtmlSpecimenCustomItemModel'
+import {
+  createInternalAdminAppSpecimenData,
+} from './HtmlSpecimenCustomItemModel'
 
 export const htmlSpecimenTool: CanvasAppCustomItemModuleCreationTool = {
   id: 'html-specimen',
-  ariaLabel: 'Design system specimen tool',
-  label: 'DS',
-  title: 'Design system specimen',
-  statusLabel: 'Design system specimen',
+  ariaLabel: 'Internal app preview tool',
+  label: 'DOM',
+  title: 'Internal app preview',
+  statusLabel: 'Internal app preview',
   createItem: ({ currentWorld, moved, startWorld }) => {
-    const specimen = createDesignSystemSpecimenData()
+    const specimen = createInternalAdminAppSpecimenData()
     const bounds = moved
       ? {
           x: Math.min(startWorld.x, currentWorld.x),
@@ -24,7 +26,7 @@ export const htmlSpecimenTool: CanvasAppCustomItemModuleCreationTool = {
         }
 
     return {
-      title: 'Design system specimen',
+      title: 'Internal app preview',
       data: {
         ...specimen,
         viewportHeight: Math.round(bounds.h - 44),

@@ -121,9 +121,11 @@ export function CanvasAppView({
   const { visible: showStatus, ...statusProps } = status
   const [contextMenu, setContextMenu] =
     useState<CanvasContextCommandMenuState | null>(null)
+  const devtoolsInspectorActive = inspectorProps.customPanels.some((panel) =>
+    panel.id === 'html-specimen-css')
   const closeContextMenu = useCallback(() => {
     setContextMenu(null)
-  }, [])
+  }, [setContextMenu])
   const openContextMenu = useCallback((event: MouseEvent<HTMLElement>) => {
     if (isAppControlTarget(event.target)) {
       return
@@ -131,7 +133,7 @@ export function CanvasAppView({
 
     event.preventDefault()
     setContextMenu({ x: event.clientX, y: event.clientY })
-  }, [])
+  }, [setContextMenu])
   const surfaces = getCanvasAppSurfaceVisibility({
     'canvas-status': showStatus,
     'command-palette': commandPalette.open,
@@ -144,6 +146,7 @@ export function CanvasAppView({
     'image-controls': showImageControls,
     'object-inspector': showInspector,
     'selection-floating-bar': showToolbar &&
+      !devtoolsInspectorActive &&
       statusProps.selectionLength > 0 &&
       selectionCommandAnchor !== null,
     'session-timer': sessionTimer.visible,

@@ -1,5 +1,69 @@
 import { expect, test } from '@playwright/test'
 
+test('opens as a Canvas DevTools demo for an internal web app', async ({
+  page,
+}) => {
+  await page.goto('/')
+  await page.evaluate(() => {
+    window.addEventListener('html-specimen-html:export', (event) => {
+      const targetWindow = window as Window & {
+        __htmlSpecimenExportedHtml?: string
+      }
+      const detail = (event as CustomEvent<{ html?: unknown }>).detail
+
+      targetWindow.__htmlSpecimenExportedHtml =
+        typeof detail.html === 'string' ? detail.html : ''
+    })
+    window.addEventListener('html-specimen-css:export', (event) => {
+      const targetWindow = window as Window & {
+        __htmlSpecimenExportedCss?: string
+      }
+      const detail = (event as CustomEvent<{ css?: unknown }>).detail
+
+      targetWindow.__htmlSpecimenExportedCss =
+        typeof detail.css === 'string' ? detail.css : ''
+    })
+  })
+
+  await expect(page.getByText('Customer onboarding').first()).toBeVisible()
+  await expect(page.getByText('Evidence Map')).toHaveCount(0)
+  await expect(page.getByText('Target outcomes')).toHaveCount(0)
+  await expect(page.getByText('Design system specimen')).toHaveCount(0)
+  await expect(page.locator('.toolbar')).toHaveCount(0)
+  await expect(page.locator('.selection-floating-bar')).toHaveCount(0)
+
+  const preview = page.locator('.demo-html-specimen-preview').first()
+
+  await expect(preview).toBeVisible()
+  await expect(preview).toHaveAttribute('data-preview-target-node-id', /dom:/)
+  await expect(page.locator('.object-inspector-devtools')).toBeVisible()
+  await expect(page.locator('.html-specimen-css-target')).toContainText(
+    'section.queue-panel',
+  )
+  await expect(page.getByRole('button', { name: 'Copy HTML' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Copy CSS' })).toBeVisible()
+  await expect(page
+    .locator('.html-specimen-css-field')
+    .filter({ hasText: 'Pad' })
+    .locator('input')).toHaveValue('16px')
+
+  await page.getByRole('button', { name: 'Copy HTML' }).click()
+  await page.getByRole('button', { name: 'Copy CSS' }).click()
+
+  await expect.poll(async () =>
+    page.evaluate(() =>
+      (window as Window & {
+        __htmlSpecimenExportedHtml?: string
+      }).__htmlSpecimenExportedHtml ?? ''),
+  ).toContain('data-surface-component="CustomerOnboardingAdmin"')
+  await expect.poll(async () =>
+    page.evaluate(() =>
+      (window as Window & {
+        __htmlSpecimenExportedCss?: string
+      }).__htmlSpecimenExportedCss ?? ''),
+  ).toContain('.queue-panel')
+})
+
 test('pastes HTML/CSS and edits preview target CSS through the inspector', async ({
   page,
 }) => {
@@ -397,7 +461,9 @@ test('pastes HTML/CSS and edits preview target CSS through the inspector', async
     .filter({ hasText: 'Text' })
     .locator('input')
 
-  await expect(page.locator('.html-specimen-css-target')).toHaveText('span')
+  await expect(page.locator('.html-specimen-css-target')).toHaveText(
+    'span#orphan',
+  )
   await expect(page
     .locator('.html-specimen-css-field')
     .filter({ hasText: 'Text' })
@@ -1343,13 +1409,14 @@ test('matches has pseudo function selector rules', async ({
     return event.defaultPrevented
   }, JSON.stringify({
     css: [
-      '.card:has(.badge) {',
+      '.card:has(.content .badge) {',
       '  color: #334155;',
+      '  padding: 12px;',
       '}',
     ].join('\n'),
     html: [
       '<main>',
-      '<article id="card" class="card"><span class="badge">New</span></article>',
+      '<article id="card" class="card"><section class="content"><span class="badge">New</span></section></article>',
       '<article id="empty" class="card">Empty</article>',
       '</main>',
     ].join(''),
@@ -1360,7 +1427,7 @@ test('matches has pseudo function selector rules', async ({
   const preview = page.locator('.demo-html-specimen-preview').last()
 
   await expect(preview).toBeVisible()
-  await preview.locator('article#card').click()
+  await preview.locator('article#card').click({ position: { x: 4, y: 4 } })
 
   const textField = page
     .locator('.html-specimen-css-field')
@@ -1368,7 +1435,7 @@ test('matches has pseudo function selector rules', async ({
   const textInput = textField.locator('input')
 
   await expect(textField
-    .getByText('Rule .card:has(.badge) / 1 node'),
+    .getByText('Rule .card:has(.content .badge) / 1 node'),
   ).toBeVisible()
   await expect(textInput).toHaveValue('#334155')
   await textInput.fill('#111827')

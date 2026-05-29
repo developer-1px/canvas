@@ -473,6 +473,24 @@ describe('HtmlSpecimenCssSelectorMatcher', () => {
         path: [2],
         tagName: 'article',
       }),
+      createNode({
+        className: 'content',
+        id: 'outer-content',
+        path: [3],
+        tagName: 'section',
+      }),
+      createNode({
+        className: 'card',
+        id: 'nested-card',
+        path: [3, 0],
+        tagName: 'article',
+      }),
+      createNode({
+        className: 'badge',
+        id: 'nested-card-badge',
+        path: [3, 0, 0],
+        tagName: 'span',
+      }),
     ]
 
     expect(matchHtmlSpecimenCssSelectorList(
@@ -485,6 +503,16 @@ describe('HtmlSpecimenCssSelectorMatcher', () => {
       nodes[0]!,
       nodes,
     )).toEqual([0, 2, 0])
+    expect(matchHtmlSpecimenCssSelectorList(
+      '.card:has(.content .badge)',
+      nodes[0]!,
+      nodes,
+    )).toEqual([0, 3, 0])
+    expect(matchHtmlSpecimenCssSelectorList(
+      '.card:has(> .content .badge)',
+      nodes[0]!,
+      nodes,
+    )).toEqual([0, 3, 0])
     expect(matchHtmlSpecimenCssSelectorList(
       '.card:has(> .badge)',
       nodes[0]!,
@@ -502,7 +530,7 @@ describe('HtmlSpecimenCssSelectorMatcher', () => {
     )).toEqual([0, 2, 0])
     expect(matchHtmlSpecimenCssSelectorList(
       '.card:has(.content .badge)',
-      nodes[0]!,
+      nodes[6]!,
       nodes,
     )).toBeNull()
     expect(matchHtmlSpecimenCssSelectorList(

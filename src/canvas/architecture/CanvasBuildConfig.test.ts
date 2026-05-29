@@ -31,10 +31,10 @@ const e2eConfig = playwrightConfig as {
     url?: string
   }
 }
-const linkedDocumentPackageDist = [
+const linkedDocumentPackageSource = [
   'zod',
   'crud/packages/zod',
-  'crud/dist',
+  'crud/src',
 ].join('-')
 
 describe('Canvas build config', () => {
@@ -62,7 +62,7 @@ describe('Canvas build config', () => {
       fs: {
         allow: [
           expect.stringContaining('@interactive-os/canvas'),
-          expect.stringContaining(linkedDocumentPackageDist),
+          expect.stringContaining(linkedDocumentPackageSource),
         ],
       },
       host: '::',

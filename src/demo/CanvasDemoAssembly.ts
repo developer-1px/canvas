@@ -6,16 +6,19 @@ import {
   type CanvasWorkspaceStorageProvider,
 } from '../canvas'
 import { DEMO_CANVAS_SEED_ITEMS } from './CanvasDemoSeedItems'
+import {
+  HTML_SPECIMEN_SEED_ITEM_ID,
+} from './custom-items/html-specimen/HtmlSpecimenCustomItemSeed'
 import { DEMO_CUSTOM_ITEM_MODULES } from './custom-items'
 
 const DEMO_CANVAS_INITIAL_WORKSPACE = JSON.stringify({
   items: DEMO_CANVAS_SEED_ITEMS,
-  selection: [],
+  selection: [HTML_SPECIMEN_SEED_ITEM_ID],
   version: 1,
   viewport: {
-    scale: 0.88,
-    x: 80,
-    y: 8,
+    scale: 0.86,
+    x: 42,
+    y: 20,
   },
 })
 
@@ -168,6 +171,7 @@ export const DEMO_CANVAS_APP_ASSEMBLY_INPUT = {
       sessionTimer: false,
       spotlight: false,
       status: false,
+      toolbar: false,
       votingSession: false,
     },
     tools: {
@@ -183,7 +187,7 @@ export const DEMO_CANVAS_APP_ASSEMBLY_INPUT = {
   componentLibrary: DEMO_CANVAS_COMPONENT_LIBRARY,
   customItemModules: DEMO_CUSTOM_ITEM_MODULES,
   initialItems: DEMO_CANVAS_SEED_ITEMS,
-  initialSelection: [],
+  initialSelection: [HTML_SPECIMEN_SEED_ITEM_ID],
   workspaceStorageProvider: DEMO_CANVAS_STORAGE_PROVIDER,
 } satisfies CanvasAppAssemblyInput
 

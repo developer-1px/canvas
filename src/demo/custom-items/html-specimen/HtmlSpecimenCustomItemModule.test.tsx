@@ -7,8 +7,13 @@ import {
 import HTML_SPECIMEN_CUSTOM_ITEM_MODULE from './HtmlSpecimenCustomItemModule'
 import {
   createButtonSpecimenData,
-  createDesignSystemSpecimenData,
+  createInternalAdminAppSpecimenData,
+  getHtmlSpecimenData,
 } from './HtmlSpecimenCustomItemModel'
+import {
+  createHtmlSpecimenSeedItem,
+  HTML_SPECIMEN_SEED_ITEM_ID,
+} from './HtmlSpecimenCustomItemSeed'
 
 describe('HtmlSpecimenCustomItemModule', () => {
   it('assembles an HTML specimen through the public custom module seam', () => {
@@ -40,7 +45,7 @@ describe('HtmlSpecimenCustomItemModule', () => {
       type: 'custom',
       kind: 'html-specimen',
       presentation: 'html-specimen',
-      title: 'Design system specimen',
+      title: 'Internal app preview',
       x: 120,
       y: 80,
       w: 800,
@@ -68,6 +73,7 @@ describe('HtmlSpecimenCustomItemModule', () => {
 
     expect(markup).toContain('class="demo-html-specimen-node"')
     expect(markup).toContain('class="demo-html-specimen-preview"')
+    expect(markup).toContain('aria-label="Copy HTML"')
     expect(markup).toContain('aria-label="Copy CSS"')
     expect(markup).not.toContain('<iframe')
     expect(markup).not.toContain('srcDoc=')
@@ -84,29 +90,43 @@ describe('HtmlSpecimenCustomItemModule', () => {
     expect(specimen.html).toContain('Create project')
   })
 
-  it('keeps a visible design-system specimen artifact', () => {
-    const specimen = createDesignSystemSpecimenData()
+  it('keeps a visible internal admin app specimen artifact', () => {
+    const specimen = createInternalAdminAppSpecimenData()
 
-    expect(specimen.viewportWidth).toBe(760)
-    expect(specimen.viewportHeight).toBe(486)
-    expect(specimen.artifact).toMatchObject({
-      kind: 'design-system-sample',
-      schemaVersion: 1,
-    })
-    expect(specimen.artifact?.catalog.primitives).toContain('button')
-    expect(specimen.artifact?.surface.blocks.map((block) => block.kind)).toEqual([
-      'toolbar',
-      'form-panel',
-      'status-panel',
-      'data-table',
-    ])
-    expect(JSON.stringify(specimen.artifact)).not.toContain('zod-admin-ui')
+    expect(specimen.viewportWidth).toBe(960)
+    expect(specimen.viewportHeight).toBe(620)
+    expect(specimen.artifact).toBeUndefined()
     expect(specimen.html).toContain(
-      'data-surface-component="DesignSystemSpecimen"',
+      'data-surface-component="CustomerOnboardingAdmin"',
     )
-    expect(specimen.html).toContain('data-surface-component="DataTable"')
-    expect(specimen.html).toContain('Workspace controls')
-    expect(specimen.css).toContain('.table-row')
+    expect(specimen.html).toContain('data-preview-default-target="true"')
+    expect(specimen.html).toContain('Customer onboarding')
+    expect(specimen.html).not.toContain('Design system')
+    expect(specimen.html).not.toContain('Evidence Map')
+    expect(specimen.css).toContain('.queue-panel')
+  })
+
+  it('creates the default demo seed from the internal app specimen', () => {
+    const seed = createHtmlSpecimenSeedItem()
+    const specimen = getHtmlSpecimenData(seed)
+
+    expect(seed).toMatchObject({
+      id: HTML_SPECIMEN_SEED_ITEM_ID,
+      type: 'custom',
+      kind: 'html-specimen',
+      presentation: 'html-specimen',
+      title: 'Customer onboarding admin',
+      x: 48,
+      y: 44,
+      w: 980,
+      h: 660,
+    })
+    expect(specimen.viewportWidth).toBe(960)
+    expect(specimen.viewportHeight).toBe(620)
+    expect(specimen.artifact).toBeUndefined()
+    expect(specimen.html).toContain(
+      'data-surface-component="CustomerOnboardingAdmin"',
+    )
   })
 })
 

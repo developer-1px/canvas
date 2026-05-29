@@ -81,7 +81,7 @@ export function HtmlSpecimenShadowPreview({
       itemId,
       nodes,
       previousNodeId,
-    })
+    }) ?? createDefaultHtmlSpecimenPreviewTarget({ itemId, nodes })
 
     host.dataset.previewNodeCount = String(nodes.length)
     clearHtmlSpecimenPreviewHoverState({
@@ -348,23 +348,38 @@ function publishHtmlSpecimenPreviewTarget({
   nodes: readonly PreviewSurfaceNode[]
   target: HtmlSpecimenPreviewTarget
 }) {
-  dispatchCanvasAppCustomFocus(host, {
-    data: {
-      node: target.node,
-      nodes,
-    },
-    itemId,
-    ownerId: 'html-specimen',
-    targetId: target.nodeId,
+  queueMicrotask(() => {
+    if (!host.isConnected) {
+      return
+    }
+
+    dispatchCanvasAppCustomFocus(host, {
+      data: {
+        node: target.node,
+        nodes,
+      },
+      itemId,
+      ownerId: 'html-specimen',
+      targetId: target.nodeId,
+    })
+    host.dispatchEvent(new CustomEvent(HTML_SPECIMEN_PREVIEW_TARGET_EVENT, {
+      bubbles: true,
+      composed: true,
+      detail: {
+        ...target,
+        nodes,
+      },
+    }))
   })
-  host.dispatchEvent(new CustomEvent(HTML_SPECIMEN_PREVIEW_TARGET_EVENT, {
-    bubbles: true,
-    composed: true,
-    detail: {
-      ...target,
-      nodes,
-    },
-  }))
+}
+
+function queueMicrotask(callback: () => void) {
+  if (typeof globalThis.queueMicrotask === 'function') {
+    globalThis.queueMicrotask(callback)
+    return
+  }
+
+  void Promise.resolve().then(callback)
 }
 
 function getHtmlSpecimenPreviewTargetFromEvent({
@@ -385,6 +400,25 @@ function getHtmlSpecimenPreviewTargetFromEvent({
   }
 
   const node = findHtmlSpecimenPreviewNodeByPath({ nodes, path })
+
+  return node
+    ? createHtmlSpecimenPreviewTarget({
+        itemId,
+        nodeId: node.id,
+        nodes,
+      })
+    : null
+}
+
+function createDefaultHtmlSpecimenPreviewTarget({
+  itemId,
+  nodes,
+}: {
+  itemId: string
+  nodes: readonly PreviewSurfaceNode[]
+}) {
+  const node = nodes.find((candidate) =>
+    candidate.attributes['data-preview-default-target'] === 'true')
 
   return node
     ? createHtmlSpecimenPreviewTarget({

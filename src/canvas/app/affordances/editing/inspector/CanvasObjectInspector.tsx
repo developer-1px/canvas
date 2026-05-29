@@ -53,6 +53,12 @@ export function CanvasObjectInspector({
     return null
   }
 
+  const devtoolsPanelActive = customPanels.some((panel) =>
+    panel.id === 'html-specimen-css')
+  const objectBounds = devtoolsPanelActive ? null : bounds
+  const objectLabel = devtoolsPanelActive ? null : label
+  const visibleStyleControls = devtoolsPanelActive ? [] : styleControls
+
   const commitField = (field: BoundsField, inputValue: string) => {
     if (!bounds) {
       return
@@ -93,17 +99,24 @@ export function CanvasObjectInspector({
   }
 
   return (
-    <aside className="object-inspector" aria-label="Inspector">
-      {bounds && label ? (
+    <aside
+      className={devtoolsPanelActive
+        ? 'object-inspector object-inspector-devtools'
+        : 'object-inspector'}
+      aria-label="Inspector"
+    >
+      {objectBounds && objectLabel ? (
         <>
-          <div className="inspector-header">{label}</div>
+          <div className="inspector-header">{objectLabel}</div>
           <div className="inspector-grid">
             {FIELDS.map((field) => (
               <label className="inspector-field" key={field.id}>
                 <span>{field.label}</span>
                 <input
-                  key={`${field.id}:${formatBoundsValue(bounds[field.id])}`}
-                  defaultValue={formatBoundsValue(bounds[field.id])}
+                  key={`${field.id}:${
+                    formatBoundsValue(objectBounds[field.id])
+                  }`}
+                  defaultValue={formatBoundsValue(objectBounds[field.id])}
                   disabled={disabled}
                   inputMode="numeric"
                   min={field.min}
@@ -119,9 +132,9 @@ export function CanvasObjectInspector({
           </div>
         </>
       ) : null}
-      {styleControls.length > 0 ? (
+      {visibleStyleControls.length > 0 ? (
         <div className="inspector-style-controls">
-          {styleControls.map((control) => (
+          {visibleStyleControls.map((control) => (
             <div className="inspector-style-control" key={control.id}>
               <div className="inspector-style-label">{control.label}</div>
               <div className="inspector-swatches">

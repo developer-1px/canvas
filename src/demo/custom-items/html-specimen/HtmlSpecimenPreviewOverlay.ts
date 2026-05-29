@@ -1,4 +1,7 @@
 import type { PreviewSurfaceNode } from '@interactive-os/preview-surface'
+import {
+  formatHtmlSpecimenPreviewNodeSelector,
+} from './HtmlSpecimenPreviewNodeLabel'
 
 export const HTML_SPECIMEN_PREVIEW_HOVER_ATTRIBUTE =
   'data-html-specimen-preview-hover'
@@ -91,6 +94,7 @@ export function updateHtmlSpecimenPreviewBoundsOverlay({
   })
 
   box.dataset.previewNodeId = node.id
+  box.dataset.previewLabel = formatHtmlSpecimenPreviewNodeSelector(node)
   box.style.transform = `translate(${node.bounds.x}px, ${node.bounds.y}px)`
   box.style.width = `${Math.max(0, node.bounds.width)}px`
   box.style.height = `${Math.max(0, node.bounds.height)}px`
@@ -169,6 +173,27 @@ export function ensureHtmlSpecimenPreviewToolStyle(root: ShadowRoot) {
 }
 [${HTML_SPECIMEN_PREVIEW_OVERLAY_ATTRIBUTE}="target"] {
   border: 2px solid #0f766e;
+}
+[${HTML_SPECIMEN_PREVIEW_OVERLAY_ATTRIBUTE}]::before {
+  position: absolute;
+  top: -22px;
+  left: -1px;
+  max-width: 240px;
+  overflow: hidden;
+  padding: 3px 6px;
+  border-radius: 4px;
+  color: #ffffff;
+  background: #172033;
+  content: attr(data-preview-label);
+  font: 700 11px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+[${HTML_SPECIMEN_PREVIEW_OVERLAY_ATTRIBUTE}="hover"]::before {
+  background: #0369a1;
+}
+[${HTML_SPECIMEN_PREVIEW_OVERLAY_ATTRIBUTE}="target"]::before {
+  background: #0f766e;
 }
 [${HTML_SPECIMEN_PREVIEW_SPACING_ATTRIBUTE}] {
   position: absolute;

@@ -1,17 +1,21 @@
 import type { CanvasCustomItem } from '../../../canvas'
-import { createDesignSystemSpecimenData } from './HtmlSpecimenCustomItemModel'
+import {
+  createInternalAdminAppSpecimenData,
+} from './HtmlSpecimenCustomItemModel'
+
+export const HTML_SPECIMEN_SEED_ITEM_ID = 'html-specimen-internal-admin'
 
 export function createHtmlSpecimenSeedItem(): CanvasCustomItem {
   return {
-    id: 'html-specimen-design-system',
+    id: HTML_SPECIMEN_SEED_ITEM_ID,
     type: 'custom',
     kind: 'html-specimen',
     presentation: 'html-specimen',
-    title: 'Design system specimen',
-    x: 72,
-    y: 40,
-    w: 800,
-    h: 540,
-    data: createDesignSystemSpecimenData(),
+    title: 'Customer onboarding admin',
+    x: 48,
+    y: 44,
+    w: 980,
+    h: 660,
+    data: createInternalAdminAppSpecimenData(),
   }
 }

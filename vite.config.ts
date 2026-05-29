@@ -3,11 +3,11 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 const zodCrudEntry = fileURLToPath(
-  new URL('../zod-crud/packages/zod-crud/dist/index.js', import.meta.url),
+  new URL('../zod-crud/packages/zod-crud/src/index.ts', import.meta.url),
 )
 const canvasRoot = fileURLToPath(new URL('.', import.meta.url))
-const zodCrudDistRoot = fileURLToPath(
-  new URL('../zod-crud/packages/zod-crud/dist', import.meta.url),
+const zodCrudSourceRoot = fileURLToPath(
+  new URL('../zod-crud/packages/zod-crud/src', import.meta.url),
 )
 
 // https://vite.dev/config/
@@ -37,7 +37,7 @@ export default defineConfig({
   },
   server: {
     fs: {
-      allow: [canvasRoot, zodCrudDistRoot],
+      allow: [canvasRoot, zodCrudSourceRoot],
     },
     host: '::',
     port: 5173,

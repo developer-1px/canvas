@@ -32,24 +32,46 @@ export const htmlSpecimenItemRenderer: CanvasAppCustomItemRendererStrategy = ({
                 {specimen.viewportWidth}x{specimen.viewportHeight}
               </span>
               <button
+                aria-label="Copy HTML"
+                className="demo-html-specimen-copy"
+                onClick={(event) => {
+                  if (event.detail === 0) {
+                    exportHtmlSpecimenHtml(event.currentTarget, specimen.html)
+                    void copyHtmlSpecimenText(specimen.html)
+                  }
+                }}
+                onPointerDown={(event) => {
+                  event.preventDefault()
+                  event.stopPropagation()
+                  exportHtmlSpecimenHtml(event.currentTarget, specimen.html)
+                  void copyHtmlSpecimenText(specimen.html)
+                }}
+                title="Copy HTML"
+                type="button"
+              >
+                <Copy aria-hidden="true" size={13} strokeWidth={1.8} />
+                <span>HTML</span>
+              </button>
+              <button
                 aria-label="Copy CSS"
-                className="demo-html-specimen-copy-css"
+                className="demo-html-specimen-copy"
                 onClick={(event) => {
                   if (event.detail === 0) {
                     exportHtmlSpecimenCss(event.currentTarget, specimen.css)
-                    void copyHtmlSpecimenCss(specimen.css)
+                    void copyHtmlSpecimenText(specimen.css)
                   }
                 }}
                 onPointerDown={(event) => {
                   event.preventDefault()
                   event.stopPropagation()
                   exportHtmlSpecimenCss(event.currentTarget, specimen.css)
-                  void copyHtmlSpecimenCss(specimen.css)
+                  void copyHtmlSpecimenText(specimen.css)
                 }}
                 title="Copy CSS"
                 type="button"
               >
-                <Copy aria-hidden="true" size={14} strokeWidth={1.8} />
+                <Copy aria-hidden="true" size={13} strokeWidth={1.8} />
+                <span>CSS</span>
               </button>
             </div>
           </div>
@@ -79,13 +101,20 @@ function exportHtmlSpecimenCss(target: HTMLElement, css: string) {
   }))
 }
 
-async function copyHtmlSpecimenCss(css: string) {
+function exportHtmlSpecimenHtml(target: HTMLElement, html: string) {
+  target.dispatchEvent(new CustomEvent('html-specimen-html:export', {
+    bubbles: true,
+    detail: { html },
+  }))
+}
+
+async function copyHtmlSpecimenText(text: string) {
   if (typeof navigator === 'undefined' || !navigator.clipboard) {
     return
   }
 
   try {
-    await navigator.clipboard.writeText(css)
+    await navigator.clipboard.writeText(text)
   } catch {
     // Export event above remains available when clipboard permission is denied.
   }
