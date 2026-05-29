@@ -116,6 +116,16 @@ describe('CanvasAppCustomItemModules validation', () => {
         ],
       } as unknown as Partial<CanvasAppCustomItemModule>),
     ).toThrow('Canvas app inspector panel risk-meta requires render')
+
+    expect(() =>
+      defineRiskModule({
+        textPasteImporters: [
+          {
+            id: 'risk-paste',
+          },
+        ],
+      } as unknown as Partial<CanvasAppCustomItemModule>),
+    ).toThrow('Canvas app text paste importer risk-paste requires createItems')
   })
 
 
@@ -195,4 +205,3 @@ function defineDependencyModule(
     ...overrides,
   })
 }
-

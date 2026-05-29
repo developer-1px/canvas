@@ -42,6 +42,9 @@ describe('CanvasDemoAssembly', () => {
       DEMO_CANVAS_APP_ASSEMBLY.customCommands.map((command) => command.id),
     ).toEqual(['decide-decision', 'paste-html-specimen'])
     expect(
+      DEMO_CANVAS_APP_ASSEMBLY.textPasteImporters.map((importer) => importer.id),
+    ).toEqual(['html-specimen'])
+    expect(
       DEMO_CANVAS_APP_ASSEMBLY.customItemRenderers['decision-node'],
     ).toBeTypeOf('function')
     expect(

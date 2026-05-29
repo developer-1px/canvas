@@ -166,6 +166,45 @@ describe('Canvas App IO boundaries', () => {
   })
 
 
+  it('keeps browser text paste import IO behind App text paste modules', () => {
+    const appModelFile = getSourceFile(
+      'src/canvas/app/workflow/useCanvasAppModel.ts',
+    )
+    const textPasteModelFile = getSourceFile(
+      'src/canvas/app/workflow/useCanvasAppTextPasteImportModel.ts',
+    )
+    const textPasteHookFile = getSourceFile(
+      'src/canvas/app/affordances/io/text-paste/useCanvasTextPasteImport.ts',
+    )
+    const textPasteImportFile = getSourceFile(
+      'src/canvas/app/affordances/io/text-paste/CanvasTextPasteImport.ts',
+    )
+    const textPasteImporterFile = getSourceFile(
+      'src/canvas/app/affordances/io/text-paste/CanvasTextPasteImporters.ts',
+    )
+    const browserTextPasteHow =
+      /\b(DataTransfer|ClipboardEvent|window\.addEventListener)\b/
+
+    expect(appModelFile.source).toContain(
+      "from './useCanvasAppTextPasteImportModel'",
+    )
+    expect(appModelFile.source).not.toMatch(browserTextPasteHow)
+    expect(textPasteModelFile.source).toContain(
+      "from '../affordances/io/text-paste/useCanvasTextPasteImport'",
+    )
+    expect(textPasteHookFile.source).toContain('window.addEventListener')
+    expect(textPasteHookFile.source).toContain('ClipboardEvent')
+    expect(textPasteImportFile.source).toContain('DataTransfer')
+    expect(textPasteImportFile.source).toContain(
+      'export function insertCanvasTextPasteSource',
+    )
+    expect(textPasteImporterFile.source).toContain(
+      'export type CanvasTextPasteImporter',
+    )
+    expect(textPasteImporterFile.source).not.toMatch(browserTextPasteHow)
+  })
+
+
   it('keeps browser workspace storage behind the persistence provider seam', () => {
     const violations = sourceFiles
       .filter((file) =>

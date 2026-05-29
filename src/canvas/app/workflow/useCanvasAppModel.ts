@@ -24,6 +24,7 @@ import { useCanvasAppPointerModel } from './useCanvasAppPointerModel'
 import { useCanvasAppStampModel } from './useCanvasAppStampModel'
 import { useCanvasAppStageElementModel } from './useCanvasAppStageElementModel'
 import { useCanvasAppTableImportModel } from './useCanvasAppTableImportModel'
+import { useCanvasAppTextPasteImportModel } from './useCanvasAppTextPasteImportModel'
 import { useCanvasAppTextModel } from './useCanvasAppTextModel'
 import { useCanvasInteractionModel } from './useCanvasInteractionModel'
 import { useCanvasAppViewportModel } from './useCanvasAppViewportModel'
@@ -110,6 +111,13 @@ export function useCanvasAppModel({
     ...affordance.linkPreview,
     ...workspace.linkPreview,
     ...stageElement.linkPreview,
+  })
+
+  useCanvasAppTextPasteImportModel({
+    ...affordance.textPaste,
+    ...appAssembly.extension,
+    ...workspace.textPaste,
+    ...stageElement.textPaste,
   })
 
   const text = useCanvasAppTextModel({

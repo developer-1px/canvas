@@ -29,6 +29,7 @@ export function createCanvasAppExtensionAssembly(
     entries: createCanvasAppExtensionBundle({
       customCommands: input.customCommands,
       inspectorPanels: input.inspectorPanels,
+      textPasteImporters: input.textPasteImporters,
     }),
     owner: 'app assembly',
   })

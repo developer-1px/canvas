@@ -31,6 +31,9 @@ export function getCanvasAppStageElementConsumerModel({
     table: {
       stageElement,
     },
+    textPaste: {
+      stageElement,
+    },
     viewport: {
       stageElement,
     },

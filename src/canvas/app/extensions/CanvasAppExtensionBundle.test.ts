@@ -5,6 +5,7 @@ import {
   mergeCanvasAppExtensionBundle,
   snapshotCanvasAppExtensionBundle,
 } from './CanvasAppExtensionBundle'
+import type { CanvasTextPasteImporter } from '../affordances/io/text-paste/CanvasTextPasteImporters'
 
 describe('CanvasAppExtensionBundle', () => {
   it('creates empty extension bundles', () => {
@@ -14,6 +15,7 @@ describe('CanvasAppExtensionBundle', () => {
       customItemRenderers: {},
       customItemValidators: {},
       inspectorPanels: [],
+      textPasteImporters: [],
     })
   })
 
@@ -28,6 +30,7 @@ describe('CanvasAppExtensionBundle', () => {
         risk: () => true,
       },
       inspectorPanels: [createPanel('risk-panel')],
+      textPasteImporters: [createTextPasteImporter('risk-paste')],
     })
     const entries = createCanvasAppExtensionBundle({
       customCommands: [createCommand('archive')],
@@ -39,6 +42,7 @@ describe('CanvasAppExtensionBundle', () => {
         note: () => true,
       },
       inspectorPanels: [createPanel('note-panel')],
+      textPasteImporters: [createTextPasteImporter('note-paste')],
     })
 
     const merged = mergeCanvasAppExtensionBundle({
@@ -60,6 +64,10 @@ describe('CanvasAppExtensionBundle', () => {
     expect(merged.inspectorPanels.map((panel) => panel.id)).toEqual([
       'risk-panel',
       'note-panel',
+    ])
+    expect(merged.textPasteImporters.map((importer) => importer.id)).toEqual([
+      'risk-paste',
+      'note-paste',
     ])
   })
 
@@ -91,6 +99,18 @@ describe('CanvasAppExtensionBundle', () => {
         owner: 'app assembly',
       }),
     ).toThrow('Duplicate canvas app assembly custom item renderer: risk')
+
+    expect(() =>
+      mergeCanvasAppExtensionBundle({
+        current: createCanvasAppExtensionBundle({
+          textPasteImporters: [createTextPasteImporter('html')],
+        }),
+        entries: createCanvasAppExtensionBundle({
+          textPasteImporters: [createTextPasteImporter('html')],
+        }),
+        owner: 'custom item module',
+      }),
+    ).toThrow('Duplicate canvas custom item module text paste importer: html')
   })
 
   it('snapshots extension bundle slots against later external mutation', () => {
@@ -100,6 +120,7 @@ describe('CanvasAppExtensionBundle', () => {
     const renderRisk = () => null
     const validateRisk = () => true
     const panel = createPanel('risk-panel')
+    const textPasteImporter = createTextPasteImporter('risk-paste')
     const bundle = createCanvasAppExtensionBundle({
       customCommands: [command],
       customCreationTools: [tool],
@@ -110,6 +131,7 @@ describe('CanvasAppExtensionBundle', () => {
         risk: validateRisk,
       },
       inspectorPanels: [panel],
+      textPasteImporters: [textPasteImporter],
     })
 
     const snapshot = snapshotCanvasAppExtensionBundle(bundle)
@@ -117,12 +139,14 @@ describe('CanvasAppExtensionBundle', () => {
     command.title = 'Mutated'
     tool.shortcut.key = 'x'
     panel.id = 'mutated-panel'
+    textPasteImporter.createItems = () => []
 
     expect(snapshot.customCommands[0]?.title).toBe('publish')
     expect(snapshot.customCreationTools[0]?.shortcut).toEqual({ key: 'r' })
     expect(snapshot.customItemRenderers.risk).toBe(renderRisk)
     expect(snapshot.customItemValidators.risk).toBe(validateRisk)
     expect(snapshot.inspectorPanels[0]?.id).toBe('risk-panel')
+    expect(snapshot.textPasteImporters[0]?.createItems({} as never)).toBeNull()
     expect(Object.isFrozen(snapshot)).toBe(true)
     expect(Object.isFrozen(snapshot.customCommands)).toBe(true)
     expect(Object.isFrozen(snapshot.customCommands[0])).toBe(true)
@@ -132,6 +156,7 @@ describe('CanvasAppExtensionBundle', () => {
     expect(Object.isFrozen(snapshot.customItemRenderers)).toBe(true)
     expect(Object.isFrozen(snapshot.customItemValidators)).toBe(true)
     expect(Object.isFrozen(snapshot.inspectorPanels[0])).toBe(true)
+    expect(Object.isFrozen(snapshot.textPasteImporters[0])).toBe(true)
   })
 })
 
@@ -158,5 +183,12 @@ function createPanel(id: string) {
   return {
     id,
     render: () => null,
+  }
+}
+
+function createTextPasteImporter(id: string): CanvasTextPasteImporter {
+  return {
+    id,
+    createItems: () => null,
   }
 }

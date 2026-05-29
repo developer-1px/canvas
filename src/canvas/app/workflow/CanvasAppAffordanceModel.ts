@@ -50,6 +50,9 @@ export function getCanvasAppAffordanceModel(
     text: {
       config,
     },
+    textPaste: {
+      config,
+    },
     viewport: {
       config,
     },

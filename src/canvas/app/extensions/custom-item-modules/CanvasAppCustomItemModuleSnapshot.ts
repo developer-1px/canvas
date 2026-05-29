@@ -42,5 +42,11 @@ export function snapshotCanvasAppCustomItemModule(
     )
   }
 
+  if (module.textPasteImporters) {
+    snapshot.textPasteImporters = snapshotCanvasAppDescriptorArray(
+      module.textPasteImporters,
+    )
+  }
+
   return Object.freeze(snapshot)
 }

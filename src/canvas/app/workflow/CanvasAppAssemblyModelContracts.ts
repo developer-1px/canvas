@@ -24,6 +24,7 @@ import type {
 } from '../rendering/CanvasAppRenderingContracts'
 import type { CanvasAppInspectorPanel } from '../affordances/editing/inspector/CanvasAppInspectorPanels'
 import type { CanvasAppCustomCreationTool } from '../extensions/custom-tools/CanvasAppCustomCreationTools'
+import type { CanvasTextPasteImporter } from '../affordances/io/text-paste/CanvasTextPasteImporters'
 
 export type CanvasAppAssemblyAffordanceModel = {
   config: CanvasAffordanceConfig
@@ -45,6 +46,7 @@ export type CanvasAppAssemblyControlModel = {
 export type CanvasAppAssemblyExtensionModel = {
   customCommands: readonly CanvasAppCustomCommand[]
   customCreationTools: readonly CanvasAppCustomCreationTool[]
+  textPasteImporters: readonly CanvasTextPasteImporter[]
 }
 
 export type CanvasAppAssemblyInspectorModel = {

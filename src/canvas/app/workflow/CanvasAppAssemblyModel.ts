@@ -15,6 +15,7 @@ export function getCanvasAppAssemblyModel({
   itemAdapters,
   itemLayerAdapter,
   stageAdapter,
+  textPasteImporters,
   workspaceStorageProvider,
 }: CanvasAppAssembly): CanvasAppAssemblyModel {
   return {
@@ -34,6 +35,7 @@ export function getCanvasAppAssemblyModel({
     extension: {
       customCommands,
       customCreationTools,
+      textPasteImporters,
     },
     inspector: {
       inspectorPanels,

@@ -7,6 +7,9 @@ import type { CanvasAppInspectorPanel } from '../../affordances/editing/inspecto
 import type {
   CanvasAppCustomItemRendererStrategy,
 } from '../../rendering/CanvasAppRenderingContracts'
+import type {
+  CanvasTextPasteImporter,
+} from '../../affordances/io/text-paste/CanvasTextPasteImporters'
 import {
   type CanvasAppCustomCreationToolContext,
   type CanvasAppCustomToolShortcut,
@@ -46,6 +49,7 @@ export type CanvasAppCustomItemModule = {
   inspectorPanels?: readonly CanvasAppInspectorPanel[]
   presentation: string
   renderItem: CanvasAppCustomItemRendererStrategy
+  textPasteImporters?: readonly CanvasTextPasteImporter[]
   validateItem: CanvasAppCustomItemValidator
 }
 

@@ -88,6 +88,11 @@ export function getCanvasWorkspaceConsumerModel({
       createId,
       ...selectionContext,
     },
+    textPaste: {
+      commitItemsChange: document.commitItemsChange,
+      createId,
+      ...selectionContext,
+    },
     interaction: {
       scene,
       ...selectionContext,

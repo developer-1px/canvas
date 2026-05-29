@@ -5,6 +5,9 @@ import {
 } from '../CanvasAppDescriptorContracts'
 import { assertCanvasAppExtensionId } from '../CanvasAppExtensionIds'
 import { assertCanvasAppInspectorPanels } from '../../affordances/editing/inspector/CanvasAppInspectorPanelContracts'
+import {
+  assertCanvasTextPasteImporters,
+} from '../../affordances/io/text-paste/CanvasTextPasteImporters'
 import { assertCanvasAppCustomCreationTools } from '../custom-tools/CanvasAppCustomCreationToolContracts'
 import type { CanvasAppCustomItemModuleAssembly } from './CanvasAppCustomItemModuleAssembly'
 import type {
@@ -48,6 +51,7 @@ export function assertCanvasAppCustomItemModule(
   })
   assertCanvasAppCustomCommands(module.customCommands ?? [])
   assertCanvasAppCustomItemModuleCreationTools(module)
+  assertCanvasTextPasteImporters(module.textPasteImporters ?? [])
   assertCanvasAppExtensionId({
     id: module.presentation,
     label: 'custom item presentation',

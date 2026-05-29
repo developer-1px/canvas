@@ -43,6 +43,8 @@ export {
   type CanvasAppInspectorPanel,
   type CanvasAppInspectorPanelContext,
   type CanvasAppInspectorPanelView,
+  type CanvasTextPasteImporter,
+  type CanvasTextPasteImporterContext,
   type CanvasAppEventInput,
   type CanvasAppPointerInput,
   type CanvasAppItemAdapters,

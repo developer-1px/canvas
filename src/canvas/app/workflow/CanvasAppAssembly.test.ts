@@ -93,6 +93,10 @@ describe('CanvasAppAssembly seams', () => {
           render: ({ selection }) => selection.length,
         },
       ],
+      textPasteImporters: [{
+        id: 'risk-paste',
+        createItems: () => [],
+      }],
     })
 
     const assembly = createCanvasAppAssembly({
@@ -122,6 +126,9 @@ describe('CanvasAppAssembly seams', () => {
     ])
     expect(assembly.customCreationTools.map((tool) => tool.id)).toEqual([
       'risk',
+    ])
+    expect(assembly.textPasteImporters.map((importer) => importer.id)).toEqual([
+      'risk-paste',
     ])
     expect(assembly.inspectorPanels.map((panel) => panel.id)).toEqual([
       'link-preview-actions',

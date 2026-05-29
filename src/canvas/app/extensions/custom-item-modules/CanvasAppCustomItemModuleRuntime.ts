@@ -84,6 +84,7 @@ export function getCanvasAppCustomItemModuleExtensionBundle(
     customItemRenderers: getCanvasAppCustomItemModuleRenderers(module),
     customItemValidators: getCanvasAppCustomItemModuleValidators(module),
     inspectorPanels: module.inspectorPanels,
+    textPasteImporters: module.textPasteImporters,
   })
 }
 

@@ -41,6 +41,10 @@ export type {
   CanvasAppInspectorPanelView,
 } from '../affordances/editing/inspector/CanvasAppInspectorPanels'
 export type {
+  CanvasTextPasteImporter,
+  CanvasTextPasteImporterContext,
+} from '../affordances/io/text-paste/CanvasTextPasteImporters'
+export type {
   CanvasAppCustomCreationTool,
   CanvasAppCustomCreationToolContext,
   CanvasAppCustomToolShortcut,

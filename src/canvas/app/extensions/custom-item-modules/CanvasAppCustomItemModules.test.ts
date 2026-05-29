@@ -36,6 +36,10 @@ describe('CanvasAppCustomItemModules assembly seam', () => {
           render: ({ selection }) => selection.length,
         },
       ],
+      textPasteImporters: [{
+        id: 'risk-paste',
+        createItems: () => [],
+      }],
     })
 
     const assembly = createCanvasAppCustomItemModuleAssembly([module])
@@ -72,6 +76,9 @@ describe('CanvasAppCustomItemModules assembly seam', () => {
     expect(assembly.inspectorPanels.map((panel) => panel.id)).toEqual([
       'risk-meta',
     ])
+    expect(assembly.textPasteImporters.map((importer) => importer.id)).toEqual([
+      'risk-paste',
+    ])
   })
 
 
@@ -94,6 +101,7 @@ describe('CanvasAppCustomItemModules assembly seam', () => {
     expect(assembly.customCreationTools).toEqual([])
     expect(assembly.customItemRenderers).toEqual({})
     expect(assembly.customItemValidators).toEqual({})
+    expect(assembly.textPasteImporters).toEqual([])
   })
 
 })

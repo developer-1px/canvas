@@ -64,6 +64,7 @@ describe('Canvas App model assembly boundaries', () => {
       'itemAdapters',
       'itemLayerAdapter',
       'stageAdapter',
+      'textPasteImporters',
       'workspaceStorageProvider',
     ]) {
       expect(appModelFile.source).not.toContain(assemblyOutputField)
@@ -137,6 +138,7 @@ describe('Canvas App model assembly boundaries', () => {
       'CanvasAppAffordanceStampModel',
       'CanvasAppAffordanceTableModel',
       'CanvasAppAffordanceTextModel',
+      'CanvasAppAffordanceTextPasteModel',
       'CanvasAppAffordanceViewportModel',
     ]) {
       expect(affordanceModelContractsFile.source).toContain(
@@ -155,6 +157,7 @@ describe('Canvas App model assembly boundaries', () => {
       'stamp: {',
       'table: {',
       'text: {',
+      'textPaste: {',
       'viewport: {',
     ]) {
       expect(affordanceModelFile.source).toContain(consumerContext)

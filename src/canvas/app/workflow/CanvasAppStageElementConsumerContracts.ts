@@ -21,5 +21,6 @@ export type CanvasAppStageElementConsumerModel = {
   stage: CanvasAppStageElementStageContext
   stamp: CanvasAppStageElementControllerContext
   table: CanvasAppStageElementControllerContext
+  textPaste: CanvasAppStageElementControllerContext
   viewport: CanvasAppStageElementControllerContext
 }

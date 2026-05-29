@@ -10,6 +10,7 @@ import type {
   CanvasAppAssembly,
   CanvasAppComponentRendererStrategy,
   CanvasAppCustomItemModuleCreationTool,
+  CanvasTextPasteImporter,
   CanvasAppInspectorPanel,
   CanvasAppItemLayerAdapter,
   CanvasAppStageAdapter,
@@ -49,6 +50,10 @@ describe('CanvasAppAssembly snapshots', () => {
     const customInspectorPanel: CanvasAppInspectorPanel = {
       id: 'risk-meta',
       render: ({ selection }) => selection.length,
+    }
+    const textPasteImporter: CanvasTextPasteImporter = {
+      id: 'risk-paste',
+      createItems: () => null,
     }
     const initialItems = [
       {
@@ -119,6 +124,7 @@ describe('CanvasAppAssembly snapshots', () => {
       itemAdapters,
       itemLayerAdapter,
       stageAdapter,
+      textPasteImporters: [textPasteImporter],
     })
 
     componentLibrary.getPresentation = () => 'mutated-card'
@@ -132,6 +138,7 @@ describe('CanvasAppAssembly snapshots', () => {
       throw new Error('mutated command')
     }
     customInspectorPanel.render = () => 'mutated'
+    textPasteImporter.createItems = () => []
     initialItems[0].x = 999
     initialItems.push({
       ...initialItems[0],
@@ -164,6 +171,7 @@ describe('CanvasAppAssembly snapshots', () => {
       title: 'Publish risk',
     })
     expect(assembly.customCommands[0]?.run).toBe(customCommandRun)
+    expect(assembly.textPasteImporters[0]?.createItems({} as never)).toBeNull()
     expect(assembly.inspectorPanels.find((panel) =>
       panel.id === 'risk-meta'
     )?.render({

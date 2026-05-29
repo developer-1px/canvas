@@ -29,6 +29,9 @@ describe('HtmlSpecimenCustomItemModule', () => {
     expect(assembly.customCommands.map((command) => command.id)).toEqual([
       'paste-html-specimen',
     ])
+    expect(assembly.textPasteImporters.map((importer) => importer.id)).toEqual([
+      'html-specimen',
+    ])
     expect(created).toMatchObject({
       id: 'html-specimen-1',
       type: 'custom',

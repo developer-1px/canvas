@@ -52,6 +52,10 @@ export type {
   CanvasAppTextSearchOptions,
 } from '../workspace/document/CanvasAppDocumentContracts'
 export type {
+  CanvasTextPasteImporter,
+  CanvasTextPasteImporterContext,
+} from '../affordances/io/text-paste/CanvasTextPasteImporters'
+export type {
   CanvasWorkspaceStorage,
   CanvasWorkspaceStorageProvider,
 } from '../workspace/document/CanvasWorkspacePersistence'

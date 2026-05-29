@@ -120,6 +120,7 @@ describe('Canvas App workspace boundaries', () => {
       'stage: {',
       'text: {',
       'table: {',
+      'textPaste: {',
       'viewport: {',
     ]) {
       expect(workspaceModelFile.source).not.toContain(consumerContext)
@@ -139,6 +140,7 @@ describe('Canvas App workspace boundaries', () => {
       'stage: {',
       'text: {',
       'table: {',
+      'textPaste: {',
       'viewport: {',
     ]) {
       expect(workspaceConsumerModelFile.source).toContain(consumerContext)

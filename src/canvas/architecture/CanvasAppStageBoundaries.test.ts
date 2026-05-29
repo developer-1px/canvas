@@ -78,6 +78,7 @@ describe('Canvas App stage boundaries', () => {
       'stage: {',
       'stamp: {',
       'table: {',
+      'textPaste: {',
       'viewport: {',
     ]) {
       expect(stageElementModelFile.source).not.toContain(consumerContext)

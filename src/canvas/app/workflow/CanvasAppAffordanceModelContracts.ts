@@ -46,6 +46,9 @@ export type CanvasAppAffordancePointerModel =
 export type CanvasAppAffordanceTextModel =
   CanvasAppAffordanceConfigContext
 
+export type CanvasAppAffordanceTextPasteModel =
+  CanvasAppAffordanceConfigContext
+
 export type CanvasAppAffordanceViewportModel =
   CanvasAppAffordanceConfigContext
 
@@ -64,5 +67,6 @@ export type CanvasAppAffordanceModel = {
   stamp: CanvasAppAffordanceStampModel
   table: CanvasAppAffordanceTableModel
   text: CanvasAppAffordanceTextModel
+  textPaste: CanvasAppAffordanceTextPasteModel
   viewport: CanvasAppAffordanceViewportModel
 }

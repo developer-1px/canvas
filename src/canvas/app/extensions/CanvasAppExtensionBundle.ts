@@ -5,6 +5,7 @@ import type {
 } from './custom-item-modules/CanvasAppCustomItemValidatorContracts'
 import type { CanvasAppCustomItemRenderers } from '../rendering/CanvasAppRenderingContracts'
 import type { CanvasAppCustomCreationTool } from './custom-tools/CanvasAppCustomCreationTools'
+import type { CanvasTextPasteImporter } from '../affordances/io/text-paste/CanvasTextPasteImporters'
 import {
   snapshotCanvasAppDescriptorArray,
   snapshotCanvasAppRecord,
@@ -22,6 +23,7 @@ export type CanvasAppExtensionBundle = {
   customItemRenderers: CanvasAppCustomItemRenderers
   customItemValidators: CanvasAppCustomItemValidators
   inspectorPanels: readonly CanvasAppInspectorPanel[]
+  textPasteImporters: readonly CanvasTextPasteImporter[]
 }
 
 export type CanvasAppExtensionBundleInput = {
@@ -30,6 +32,7 @@ export type CanvasAppExtensionBundleInput = {
   customItemRenderers?: CanvasAppCustomItemRenderers
   customItemValidators?: CanvasAppCustomItemValidators
   inspectorPanels?: readonly CanvasAppInspectorPanel[]
+  textPasteImporters?: readonly CanvasTextPasteImporter[]
 }
 
 export function createEmptyCanvasAppExtensionBundle(): CanvasAppExtensionBundle {
@@ -39,6 +42,7 @@ export function createEmptyCanvasAppExtensionBundle(): CanvasAppExtensionBundle 
     customItemRenderers: {},
     customItemValidators: {},
     inspectorPanels: [],
+    textPasteImporters: [],
   }
 }
 
@@ -48,6 +52,7 @@ export function createCanvasAppExtensionBundle({
   customItemRenderers = {},
   customItemValidators = {},
   inspectorPanels = [],
+  textPasteImporters = [],
 }: CanvasAppExtensionBundleInput = {}): CanvasAppExtensionBundle {
   return {
     customCommands,
@@ -55,6 +60,7 @@ export function createCanvasAppExtensionBundle({
     customItemRenderers,
     customItemValidators,
     inspectorPanels,
+    textPasteImporters,
   }
 }
 
@@ -98,6 +104,12 @@ export function mergeCanvasAppExtensionBundle({
       label: 'inspector panel',
       owner,
     }),
+    textPasteImporters: appendUniqueCanvasAppExtensionEntries({
+      current: current.textPasteImporters,
+      entries: entries.textPasteImporters,
+      label: 'text paste importer',
+      owner,
+    }),
   }
 }
 
@@ -112,5 +124,8 @@ export function snapshotCanvasAppExtensionBundle(
     customItemRenderers: snapshotCanvasAppRecord(bundle.customItemRenderers),
     customItemValidators: snapshotCanvasAppRecord(bundle.customItemValidators),
     inspectorPanels: snapshotCanvasAppDescriptorArray(bundle.inspectorPanels),
+    textPasteImporters: snapshotCanvasAppDescriptorArray(
+      bundle.textPasteImporters,
+    ),
   })
 }

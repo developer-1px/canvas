@@ -27,6 +27,7 @@ describe('CanvasAppAffordanceModel', () => {
     expect(model.stamp.config).toBe(config)
     expect(model.table.config).toBe(config)
     expect(model.text.config).toBe(config)
+    expect(model.textPaste.config).toBe(config)
     expect(model.viewport.config).toBe(config)
   })
 
@@ -41,6 +42,7 @@ describe('CanvasAppAffordanceModel', () => {
     expect(model.pointer.config).toBe(DEFAULT_CANVAS_AFFORDANCE_CONFIG)
     expect(model.stamp.config).toBe(DEFAULT_CANVAS_AFFORDANCE_CONFIG)
     expect(model.table.config).toBe(DEFAULT_CANVAS_AFFORDANCE_CONFIG)
+    expect(model.textPaste.config).toBe(DEFAULT_CANVAS_AFFORDANCE_CONFIG)
     expect(model.viewport.config).toBe(DEFAULT_CANVAS_AFFORDANCE_CONFIG)
   })
 })

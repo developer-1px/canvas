@@ -119,6 +119,12 @@ export type CanvasWorkspaceTableContext =
     createId: (prefix: string) => string
   }
 
+export type CanvasWorkspaceTextPasteContext =
+  CanvasWorkspaceSelectionContext & {
+    commitItemsChange: CommitCanvasItemsChange
+    createId: (prefix: string) => string
+  }
+
 export type CanvasWorkspaceStampContext =
   CanvasWorkspaceSelectionContext & {
     commitItemsChange: CommitCanvasItemsChange
@@ -199,5 +205,6 @@ export type CanvasWorkspaceConsumerModel = {
   stamp: CanvasWorkspaceStampContext
   table: CanvasWorkspaceTableContext
   text: CanvasWorkspaceTextContext
+  textPaste: CanvasWorkspaceTextPasteContext
   viewport: CanvasWorkspaceViewportContext
 }
