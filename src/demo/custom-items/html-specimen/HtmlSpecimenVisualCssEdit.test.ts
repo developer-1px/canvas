@@ -7,6 +7,7 @@ import {
   applyHtmlSpecimenVisualCssEdit,
   resolveHtmlSpecimenCssDeclarationSource,
   resolveHtmlSpecimenCssRuleSource,
+  resolveHtmlSpecimenCssScopedRuleSource,
   type HtmlSpecimenVisualCssNode,
 } from './HtmlSpecimenVisualCssEdit'
 
@@ -144,6 +145,33 @@ describe('HtmlSpecimenVisualCssEdit', () => {
     })
   })
 
+  it('blocks edits to scoped at-rule declarations', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `@media (min-width: 1px) {
+  .primary {
+    color: #ffffff;
+  }
+}`,
+    }
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '#111827',
+        nodeId: 'primary',
+        property: 'color',
+      },
+      nodes: createButtonNodes(),
+      specimen,
+    })
+
+    expect(result).toEqual({
+      affectedNodeIds: ['primary'],
+      ok: false,
+      reason: 'scoped-rule',
+      specimen,
+    })
+  })
+
   it('adds missing declarations to the most specific matching rule', () => {
     const result = applyHtmlSpecimenVisualCssEdit({
       intent: {
@@ -206,6 +234,35 @@ describe('HtmlSpecimenVisualCssEdit', () => {
       nodeId: 'primary',
       nodes: createButtonNodes(),
     })).toBeNull()
+  })
+
+  it('resolves scoped at-rule declarations without treating them as patchable rules', () => {
+    expect(resolveHtmlSpecimenCssDeclarationSource({
+      css: `@media (min-width: 1px) {
+  .primary {
+    background: #2563eb;
+  }
+}`,
+      nodeId: 'primary',
+      nodes: createButtonNodes(),
+      property: 'background-color',
+    })).toBeNull()
+    expect(resolveHtmlSpecimenCssScopedRuleSource({
+      css: `@media (min-width: 1px) {
+  .primary {
+    background: #2563eb;
+  }
+}`,
+      nodeId: 'primary',
+      nodes: createButtonNodes(),
+      property: 'background-color',
+    })).toMatchObject({
+      affectedNodeIds: ['primary'],
+      atRule: '@media (min-width: 1px)',
+      property: 'background',
+      selector: '.primary',
+      value: '#2563eb',
+    })
   })
 
   it('returns an unresolved result when no stylesheet rule matches', () => {

@@ -147,6 +147,34 @@ describe('HtmlSpecimenCssInspectorPanel', () => {
     expect(commitItemsChange).not.toHaveBeenCalled()
   })
 
+  it('shows scoped at-rule declarations as non-editable', () => {
+    const commitItemsChange = vi.fn(() => true)
+    const context = createContext({
+      commitItemsChange,
+      item: createHtmlSpecimenItem({
+        ...createButtonSpecimenData(),
+        css: `@media (min-width: 1px) {
+  .primary {
+    color: #ffffff;
+  }
+}`,
+      }),
+    })
+    const markup = renderToStaticMarkup(
+      <>{HTML_SPECIMEN_CSS_INSPECTOR_PANEL.render(context)}</>,
+    )
+
+    expect(markup).toContain('#ffffff')
+    expect(markup).toContain('Scoped @media (min-width: 1px) / .primary / 1 node')
+    expect(markup).toContain('disabled=""')
+    expect(changeHtmlSpecimenPreviewTargetCss({
+      context,
+      nextValue: '#111827',
+      property: 'color',
+    })).toBe(false)
+    expect(commitItemsChange).not.toHaveBeenCalled()
+  })
+
   it('stays hidden when custom focus belongs to another item', () => {
     expect(HTML_SPECIMEN_CSS_INSPECTOR_PANEL.isVisible?.(
       createContext({

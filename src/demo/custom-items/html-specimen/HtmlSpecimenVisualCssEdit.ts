@@ -30,6 +30,17 @@ export type HtmlSpecimenCssRuleSource = {
   specificity: [number, number, number]
 }
 
+export type HtmlSpecimenCssScopedRuleSource = {
+  affectedNodeIds: string[]
+  atRule: string
+  declarationIndex: number
+  property: string
+  ruleIndex: number
+  selector: string
+  specificity: [number, number, number]
+  value: string
+}
+
 export type HtmlSpecimenVisualCssEditResult =
   | {
       affectedNodeIds: string[]
@@ -37,6 +48,7 @@ export type HtmlSpecimenVisualCssEditResult =
       reason:
         | 'node-not-found'
         | 'rule-not-found'
+        | 'scoped-rule'
         | 'shorthand-conflict'
         | 'token-value'
         | 'verification-failed'
@@ -131,6 +143,22 @@ export function applyHtmlSpecimenVisualCssEdit({
       affectedNodeIds: shorthandConflictSource.affectedNodeIds,
       ok: false,
       reason: 'shorthand-conflict',
+      specimen,
+    }
+  }
+
+  const scopedSource = resolveHtmlSpecimenCssScopedRuleSource({
+    css: specimen.css,
+    nodeId: intent.nodeId,
+    nodes,
+    property: intent.property,
+  })
+
+  if (scopedSource) {
+    return {
+      affectedNodeIds: scopedSource.affectedNodeIds,
+      ok: false,
+      reason: 'scoped-rule',
       specimen,
     }
   }
@@ -375,6 +403,89 @@ export function resolveHtmlSpecimenCssShorthandConflictSource({
   return winner
 }
 
+export function resolveHtmlSpecimenCssScopedRuleSource({
+  css,
+  nodeId,
+  nodes,
+  property,
+}: {
+  css: string
+  nodeId: string
+  nodes: readonly HtmlSpecimenVisualCssNode[]
+  property: string
+}): HtmlSpecimenCssScopedRuleSource | null {
+  const node = findNode(nodes, nodeId)
+
+  if (!node) {
+    return null
+  }
+
+  const properties = new Set([
+    normalizeProperty(property),
+    ...getCssTokenGuardProperties(property),
+  ])
+  let winner: {
+    atRule: string
+    declaration: CssDeclaration
+    rule: CssRule
+    specificity: [number, number, number]
+  } | null = null
+
+  for (const scopedRule of parseScopedCssRules(css)) {
+    const specificity = matchSelectorList(scopedRule.rule.selector, node)
+
+    if (!specificity) {
+      continue
+    }
+
+    for (const declaration of scopedRule.rule.declarations) {
+      if (!properties.has(declaration.property)) {
+        continue
+      }
+
+      if (
+        !winner ||
+        compareCssSource(
+          {
+            declarationIndex: declaration.declarationIndex,
+            ruleIndex: scopedRule.rule.ruleIndex,
+            specificity,
+          },
+          {
+            declarationIndex: winner.declaration.declarationIndex,
+            ruleIndex: winner.rule.ruleIndex,
+            specificity: winner.specificity,
+          },
+        ) > 0
+      ) {
+        winner = {
+          atRule: scopedRule.atRule,
+          declaration,
+          rule: scopedRule.rule,
+          specificity,
+        }
+      }
+    }
+  }
+
+  if (!winner) {
+    return null
+  }
+
+  return {
+    affectedNodeIds: nodes
+      .filter((candidate) => matchSelectorList(winner.rule.selector, candidate))
+      .map((candidate) => candidate.id),
+    atRule: winner.atRule,
+    declarationIndex: winner.declaration.declarationIndex,
+    property: winner.declaration.property,
+    ruleIndex: winner.rule.ruleIndex,
+    selector: winner.rule.selector,
+    specificity: winner.specificity,
+    value: winner.declaration.value,
+  }
+}
+
 export function isHtmlSpecimenCssTokenValue(value: string) {
   return /\bvar\s*\(/i.test(value)
 }
@@ -510,6 +621,46 @@ function parseCssRules(css: string): CssRule[] {
   }
 
   return rules
+}
+
+function parseScopedCssRules(css: string) {
+  const scopedRules: {
+    atRule: string
+    rule: CssRule
+  }[] = []
+  let cursor = 0
+
+  while (cursor < css.length) {
+    const blockStart = css.indexOf('{', cursor)
+
+    if (blockStart < 0) {
+      break
+    }
+
+    const blockEnd = findMatchingBrace(css, blockStart)
+
+    if (blockEnd < 0) {
+      break
+    }
+
+    const selector = css.slice(cursor, blockStart).trim()
+
+    if (selector.startsWith('@')) {
+      for (const rule of parseCssRules(css.slice(blockStart + 1, blockEnd))) {
+        scopedRules.push({
+          atRule: selector,
+          rule: {
+            ...rule,
+            ruleIndex: scopedRules.length,
+          },
+        })
+      }
+    }
+
+    cursor = blockEnd + 1
+  }
+
+  return scopedRules
 }
 
 function parseCssDeclarations({
