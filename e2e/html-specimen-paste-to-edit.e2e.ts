@@ -23,6 +23,8 @@ test('pastes HTML/CSS and edits preview target CSS through the inspector', async
     css: [
       '.button {',
       '  border-radius: 6px;',
+      '  font-size: 14px;',
+      '  margin: 0;',
       '  padding: 12px 18px;',
       '}',
       '.primary {',
@@ -51,6 +53,10 @@ test('pastes HTML/CSS and edits preview target CSS through the inspector', async
     .locator('.html-specimen-css-field')
     .filter({ hasText: 'Radius' })
     .getByText('Rule .button / 2 nodes')).toBeVisible()
+  await expect(page
+    .locator('.html-specimen-css-field')
+    .filter({ hasText: 'Font' })
+    .locator('input')).toHaveValue('14px')
 
   const backgroundInput = page
     .locator('.html-specimen-css-field')
@@ -69,6 +75,20 @@ test('pastes HTML/CSS and edits preview target CSS through the inspector', async
     .locator('.html-specimen-css-field')
     .filter({ hasText: 'Bg' })
     .getByText('Rule .primary / 1 node')).toBeVisible()
+
+  const marginInput = page
+    .locator('.html-specimen-css-field')
+    .filter({ hasText: 'Margin' })
+    .locator('input')
+
+  await expect(marginInput).toBeVisible()
+  await marginInput.fill('4px')
+  await marginInput.blur()
+
+  await expect.poll(async () =>
+    preview.evaluate((host) =>
+      host.shadowRoot?.querySelector('style')?.textContent ?? ''),
+  ).toContain('margin: 4px;')
 
   const previewHtml = await preview.evaluate((host) =>
     host.shadowRoot?.querySelector('[data-preview-surface-root]')

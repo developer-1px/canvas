@@ -23,7 +23,11 @@ describe('HtmlSpecimenCssInspectorPanel', () => {
     expect(markup).toContain('button.primary')
     expect(markup).toContain('Text')
     expect(markup).toContain('#ffffff')
+    expect(markup).toContain('Font')
+    expect(markup).toContain('14px')
     expect(markup).toContain('Radius')
+    expect(markup).toContain('Margin')
+    expect(markup).toContain('0px')
     expect(markup).toContain('Rule .button / 3 nodes')
     expect(markup).toContain('Rule .primary / 1 node')
   })
@@ -45,6 +49,36 @@ describe('HtmlSpecimenCssInspectorPanel', () => {
             id: 'html-specimen-1',
             data: expect.objectContaining({
               css: expect.stringContaining('color: #111111;'),
+              html: createButtonSpecimenData().html,
+            }),
+          }),
+        ],
+        type: 'replace-changed',
+      },
+      {
+        after: ['html-specimen-1'],
+        before: ['html-specimen-1'],
+      },
+    )
+  })
+
+  it('adds supported CSS declarations through the shared patch path', () => {
+    const commitItemsChange = vi.fn(() => true)
+    const context = createContext({ commitItemsChange })
+
+    expect(changeHtmlSpecimenPreviewTargetCss({
+      context,
+      nextValue: '16px',
+      property: 'font-size',
+    })).toBe(true)
+
+    expect(commitItemsChange).toHaveBeenCalledWith(
+      {
+        items: [
+          expect.objectContaining({
+            id: 'html-specimen-1',
+            data: expect.objectContaining({
+              css: expect.stringContaining('font-size: 16px;'),
               html: createButtonSpecimenData().html,
             }),
           }),
@@ -89,6 +123,8 @@ function createContext({
       color: '#ffffff',
       backgroundColor: '#2563eb',
       borderRadius: '6px',
+      fontSize: '14px',
+      margin: '0px',
       padding: '0px',
     },
     id: 'dom:primary',

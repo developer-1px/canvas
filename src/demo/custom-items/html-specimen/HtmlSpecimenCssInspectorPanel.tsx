@@ -16,7 +16,13 @@ import {
 } from './HtmlSpecimenVisualCssEdit'
 
 type HtmlSpecimenCssControl = {
-  computedStyleKey: 'backgroundColor' | 'borderRadius' | 'color' | 'padding'
+  computedStyleKey:
+    | 'backgroundColor'
+    | 'borderRadius'
+    | 'color'
+    | 'fontSize'
+    | 'margin'
+    | 'padding'
   label: string
   property: string
 }
@@ -40,6 +46,11 @@ const HTML_SPECIMEN_CSS_CONTROLS: readonly HtmlSpecimenCssControl[] = [
     property: 'background-color',
   },
   {
+    computedStyleKey: 'fontSize',
+    label: 'Font',
+    property: 'font-size',
+  },
+  {
     computedStyleKey: 'borderRadius',
     label: 'Radius',
     property: 'border-radius',
@@ -48,6 +59,11 @@ const HTML_SPECIMEN_CSS_CONTROLS: readonly HtmlSpecimenCssControl[] = [
     computedStyleKey: 'padding',
     label: 'Pad',
     property: 'padding',
+  },
+  {
+    computedStyleKey: 'margin',
+    label: 'Margin',
+    property: 'margin',
   },
 ]
 
