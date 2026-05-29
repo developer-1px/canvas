@@ -1107,6 +1107,70 @@ describe('HtmlSpecimenVisualCssEdit', () => {
     })
   })
 
+  it('matches adjacent sibling selectors against indexed DOM paths', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `.item + .item {
+  color: #334155;
+}`,
+    }
+    const nodes = [
+      createNode({
+        className: 'item',
+        id: 'first',
+        path: [0, 0],
+        tagName: 'button',
+      }),
+      createNode({
+        className: 'item',
+        id: 'second',
+        path: [0, 1],
+        tagName: 'button',
+      }),
+      createNode({
+        className: 'item',
+        id: 'loose',
+        path: [1, 0],
+        tagName: 'button',
+      }),
+    ]
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '#111827',
+        nodeId: 'second',
+        property: 'color',
+      },
+      nodes,
+      specimen,
+    })
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) {
+      throw new Error(result.reason)
+    }
+
+    expect(result.source).toMatchObject({
+      affectedNodeIds: ['second'],
+      selector: '.item + .item',
+      value: '#111827',
+    })
+    expect(applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '#111827',
+        nodeId: 'first',
+        property: 'color',
+      },
+      nodes,
+      specimen,
+    })).toEqual({
+      affectedNodeIds: [],
+      ok: false,
+      reason: 'rule-not-found',
+      specimen,
+    })
+  })
+
   it('matches exact attribute selectors against indexed node attributes', () => {
     const specimen = {
       ...createButtonSpecimenData(),

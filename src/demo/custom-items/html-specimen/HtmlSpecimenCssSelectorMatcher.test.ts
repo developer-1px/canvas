@@ -46,6 +46,52 @@ describe('HtmlSpecimenCssSelectorMatcher', () => {
       [node],
     )).toEqual([0, 1, 0])
   })
+
+  it('matches sibling combinators against indexed DOM paths', () => {
+    const nodes = [
+      createNode({
+        className: 'item first',
+        id: 'first',
+        path: [0, 0],
+      }),
+      createNode({
+        className: 'item second',
+        id: 'second',
+        path: [0, 1],
+      }),
+      createNode({
+        className: 'item third',
+        id: 'third',
+        path: [0, 2],
+      }),
+      createNode({
+        className: 'item loose',
+        id: 'loose',
+        path: [1, 0],
+      }),
+    ]
+
+    expect(matchHtmlSpecimenCssSelectorList(
+      '.first + .second',
+      nodes[1]!,
+      nodes,
+    )).toEqual([0, 2, 0])
+    expect(matchHtmlSpecimenCssSelectorList(
+      '.first + .third',
+      nodes[2]!,
+      nodes,
+    )).toBeNull()
+    expect(matchHtmlSpecimenCssSelectorList(
+      '.first ~ .third',
+      nodes[2]!,
+      nodes,
+    )).toEqual([0, 2, 0])
+    expect(matchHtmlSpecimenCssSelectorList(
+      '.first ~ .loose',
+      nodes[3]!,
+      nodes,
+    )).toBeNull()
+  })
 })
 
 function matches(selector: string, node: HtmlSpecimenCssSelectorNode) {
@@ -56,10 +102,12 @@ function createNode({
   attributes = {},
   className,
   id,
+  path = [0],
 }: {
   attributes?: Readonly<Record<string, string>>
   className: string
   id: string
+  path?: readonly number[]
 }): HtmlSpecimenCssSelectorNode {
   return {
     attributes: {
@@ -68,7 +116,7 @@ function createNode({
       id,
     },
     classList: className.split(' '),
-    path: [0],
+    path,
     tagName: 'button',
   }
 }

@@ -886,6 +886,72 @@ test('matches descendant selector rules against DOM ancestry', async ({
   await expect(looseTextInput).toBeDisabled()
 })
 
+test('matches adjacent sibling selector rules against DOM paths', async ({
+  page,
+}) => {
+  await page.goto('/')
+
+  const pasteWasHandled = await page.evaluate((text) => {
+    const data = new DataTransfer()
+
+    data.setData('text/plain', text)
+
+    const event = new ClipboardEvent('paste', {
+      bubbles: true,
+      cancelable: true,
+      clipboardData: data,
+    })
+
+    window.dispatchEvent(event)
+
+    return event.defaultPrevented
+  }, JSON.stringify({
+    css: [
+      '.item + .item {',
+      '  color: #334155;',
+      '}',
+    ].join('\n'),
+    html: [
+      '<main>',
+      '<button id="first" class="item">First</button>',
+      '<button id="second" class="item">Second</button>',
+      '</main>',
+      '<button id="loose" class="item">Loose</button>',
+    ].join(''),
+  }))
+
+  expect(pasteWasHandled).toBe(true)
+
+  const preview = page.locator('.demo-html-specimen-preview').last()
+
+  await expect(preview).toBeVisible()
+  await preview.locator('button#second').click()
+
+  const textField = page
+    .locator('.html-specimen-css-field')
+    .filter({ hasText: 'Text' })
+  const textInput = textField.locator('input')
+
+  await expect(textField
+    .getByText('Rule .item + .item / 1 node'),
+  ).toBeVisible()
+  await expect(textInput).toHaveValue('#334155')
+  await textInput.fill('#111827')
+  await textInput.blur()
+  await expect.poll(async () =>
+    preview.locator('button#second').evaluate((button) =>
+      getComputedStyle(button).color),
+  ).toBe('rgb(17, 24, 39)')
+  await expect.poll(async () =>
+    preview.locator('button#first').evaluate((button) =>
+      getComputedStyle(button).color),
+  ).not.toBe('rgb(17, 24, 39)')
+  await expect.poll(async () =>
+    preview.locator('button#loose').evaluate((button) =>
+      getComputedStyle(button).color),
+  ).not.toBe('rgb(17, 24, 39)')
+})
+
 test('matches attribute selector rules against DOM attributes', async ({
   page,
 }) => {

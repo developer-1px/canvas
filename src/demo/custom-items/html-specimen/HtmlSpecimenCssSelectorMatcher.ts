@@ -5,7 +5,11 @@ export type HtmlSpecimenCssSelectorNode = {
   tagName: string
 }
 
-type CssSelectorRelation = 'child' | 'descendant'
+type CssSelectorRelation =
+  | 'adjacent-sibling'
+  | 'child'
+  | 'descendant'
+  | 'subsequent-sibling'
 
 type CssSelectorSegment = {
   compound: string
@@ -177,6 +181,34 @@ function matchesCssSelectorSegment({
       : false
   }
 
+  if (segment.relationToPrevious === 'adjacent-sibling') {
+    const sibling = getPreviousNodeSibling({ node, nodes })
+
+    return sibling
+      ? matchesCssSelectorSegment({
+          index: index - 1,
+          node: sibling,
+          nodes,
+          segments,
+        })
+      : false
+  }
+
+  if (segment.relationToPrevious === 'subsequent-sibling') {
+    for (const sibling of getPreviousNodeSiblings({ node, nodes })) {
+      if (matchesCssSelectorSegment({
+        index: index - 1,
+        node: sibling,
+        nodes,
+        segments,
+      })) {
+        return true
+      }
+    }
+
+    return false
+  }
+
   for (let ancestorIndex = ancestors.length - 1; ancestorIndex >= 0; ancestorIndex -= 1) {
     if (matchesCssSelectorSegment({
       index: index - 1,
@@ -265,10 +297,6 @@ function parseCssSelectorSegments(selector: string): CssSelectorSegment[] | null
       continue
     }
 
-    if (bracketDepth === 0 && (char === '+' || char === '~')) {
-      return null
-    }
-
     if (bracketDepth === 0 && char === '>') {
       appendCssSelectorSegment({
         buffer,
@@ -277,6 +305,20 @@ function parseCssSelectorSegments(selector: string): CssSelectorSegment[] | null
       })
       buffer = ''
       relationToNext = 'child'
+      index += 1
+      continue
+    }
+
+    if (bracketDepth === 0 && (char === '+' || char === '~')) {
+      appendCssSelectorSegment({
+        buffer,
+        relationToPrevious: relationToNext,
+        segments,
+      })
+      buffer = ''
+      relationToNext = char === '+'
+        ? 'adjacent-sibling'
+        : 'subsequent-sibling'
       index += 1
       continue
     }
@@ -683,6 +725,66 @@ function getNodeAncestors({
   return nodes
     .filter((candidate) => isNodeAncestor(candidate, node))
     .sort((left, right) => (left.path?.length ?? 0) - (right.path?.length ?? 0))
+}
+
+function getPreviousNodeSibling({
+  node,
+  nodes,
+}: {
+  node: HtmlSpecimenCssSelectorNode
+  nodes: readonly HtmlSpecimenCssSelectorNode[]
+}) {
+  return getPreviousNodeSiblings({ node, nodes })[0] ?? null
+}
+
+function getPreviousNodeSiblings({
+  node,
+  nodes,
+}: {
+  node: HtmlSpecimenCssSelectorNode
+  nodes: readonly HtmlSpecimenCssSelectorNode[]
+}) {
+  if (!node.path || node.path.length === 0) {
+    return []
+  }
+
+  const siblingIndex = node.path.at(-1)
+
+  if (siblingIndex === undefined) {
+    return []
+  }
+
+  const parentPath = node.path.slice(0, -1)
+
+  return nodes
+    .filter((candidate) =>
+      isPreviousNodeSibling({
+        candidate,
+        parentPath,
+        siblingIndex,
+      }))
+    .sort((left, right) =>
+      (right.path?.at(-1) ?? 0) - (left.path?.at(-1) ?? 0))
+}
+
+function isPreviousNodeSibling({
+  candidate,
+  parentPath,
+  siblingIndex,
+}: {
+  candidate: HtmlSpecimenCssSelectorNode
+  parentPath: readonly number[]
+  siblingIndex: number
+}) {
+  if (!candidate.path || candidate.path.length !== parentPath.length + 1) {
+    return false
+  }
+
+  const candidateSiblingIndex = candidate.path.at(-1)
+
+  return candidateSiblingIndex !== undefined &&
+    candidateSiblingIndex < siblingIndex &&
+    parentPath.every((part, index) => part === candidate.path?.[index])
 }
 
 function isNodeAncestor(
