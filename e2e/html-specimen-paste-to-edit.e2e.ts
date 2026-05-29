@@ -185,6 +185,47 @@ test('pastes HTML/CSS and edits preview target CSS through the inspector', async
     .filter({ hasText: 'Stroke' })
     .getByText('Rule .button / 2 nodes')).toBeVisible()
 
+  const paddingInput = page
+    .locator('.html-specimen-css-field')
+    .filter({ hasText: 'Pad' })
+    .locator('input')
+
+  await expect(paddingInput).toBeVisible()
+  await paddingInput.fill('8px 16px')
+  await paddingInput.blur()
+
+  await expect.poll(async () =>
+    preview.evaluate((host) =>
+      host.shadowRoot?.querySelector('style')?.textContent ?? ''),
+  ).toContain('padding: 8px 16px;')
+  await expect.poll(async () =>
+    preview.locator('button#primary').evaluate((button) => {
+      const style = getComputedStyle(button)
+
+      return `${style.paddingTop} ${style.paddingLeft}`
+    }),
+  ).toBe('8px 16px')
+  await expect(page
+    .locator('.html-specimen-css-field')
+    .filter({ hasText: 'Pad' })
+    .getByText('Rule .button / 2 nodes')).toBeVisible()
+  await expect.poll(async () =>
+    preview.evaluate((host) => {
+      const padding = host.shadowRoot?.querySelector(
+        '[data-html-specimen-preview-spacing="target-padding"]',
+      )
+      const target = host.shadowRoot?.querySelector(
+        '[data-html-specimen-preview-overlay="target"]',
+      )
+
+      return (
+        padding instanceof HTMLElement &&
+        target instanceof HTMLElement &&
+        padding.dataset.previewNodeId === target.dataset.previewNodeId
+      )
+    }),
+  ).toBe(true)
+
   const marginInput = page
     .locator('.html-specimen-css-field')
     .filter({ hasText: 'Margin' })
@@ -252,6 +293,12 @@ test('pastes HTML/CSS and edits preview target CSS through the inspector', async
         __htmlSpecimenExportedCss?: string
       }).__htmlSpecimenExportedCss ?? ''),
   ).toContain('border-color: #f97316;')
+  await expect.poll(async () =>
+    page.evaluate(() =>
+      (window as Window & {
+        __htmlSpecimenExportedCss?: string
+      }).__htmlSpecimenExportedCss ?? ''),
+  ).toContain('padding: 8px 16px;')
 
   const previewHtml = await preview.evaluate((host) =>
     host.shadowRoot?.querySelector('[data-preview-surface-root]')

@@ -111,6 +111,38 @@ describe('HtmlSpecimenVisualCssEdit', () => {
     expect(result.specimen.css).toContain('border-radius: 12px;')
   })
 
+  it('patches spacing declarations and reports the affected nodes', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `.button {
+  padding: 12px 18px;
+}`,
+    }
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '8px 16px',
+        nodeId: 'primary',
+        property: 'padding',
+      },
+      nodes: createButtonNodes(),
+      specimen,
+    })
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) {
+      throw new Error(result.reason)
+    }
+
+    expect(result.source).toMatchObject({
+      affectedNodeIds: ['primary', 'secondary', 'danger'],
+      property: 'padding',
+      selector: '.button',
+      value: '8px 16px',
+    })
+    expect(result.specimen.css).toContain('padding: 8px 16px;')
+  })
+
   it('patches declarations after CSS strings and functions with separators', () => {
     const specimen = {
       ...createButtonSpecimenData(),
