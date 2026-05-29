@@ -15,6 +15,10 @@ describe('isHtmlSpecimenCssSupportedValue', () => {
       value: '#2563eb',
     })).toBe(true)
     expect(isHtmlSpecimenCssSupportedValue({
+      property: 'color',
+      value: 'red',
+    })).toBe(true)
+    expect(isHtmlSpecimenCssSupportedValue({
       property: 'font-size',
       value: '16px',
     })).toBe(true)
