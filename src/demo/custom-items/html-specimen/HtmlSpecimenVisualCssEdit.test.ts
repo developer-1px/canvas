@@ -500,6 +500,37 @@ describe('HtmlSpecimenVisualCssEdit', () => {
     })
   })
 
+  it('does not simplify unsupported pseudo-class selectors into patchable matches', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `.primary:not(.disabled) {
+  color: #334155;
+}`,
+    }
+
+    expect(applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '#111827',
+        nodeId: 'primary',
+        property: 'color',
+      },
+      nodes: [
+        createNode({
+          className: 'primary disabled',
+          id: 'primary',
+          path: [0],
+          tagName: 'button',
+        }),
+      ],
+      specimen,
+    })).toEqual({
+      affectedNodeIds: [],
+      ok: false,
+      reason: 'rule-not-found',
+      specimen,
+    })
+  })
+
   it('resolves grouped selector declarations from the rendered node', () => {
     const source = resolveHtmlSpecimenCssDeclarationSource({
       css: createDesignSystemSpecimenData().css,

@@ -683,6 +683,58 @@ test('matches descendant selector rules against DOM ancestry', async ({
   await expect(looseTextInput).toBeDisabled()
 })
 
+test('keeps unsupported pseudo-class selector CSS read-only', async ({
+  page,
+}) => {
+  await page.goto('/')
+
+  const pasteWasHandled = await page.evaluate((text) => {
+    const data = new DataTransfer()
+
+    data.setData('text/plain', text)
+
+    const event = new ClipboardEvent('paste', {
+      bubbles: true,
+      cancelable: true,
+      clipboardData: data,
+    })
+
+    window.dispatchEvent(event)
+
+    return event.defaultPrevented
+  }, JSON.stringify({
+    css: [
+      '.primary:not(.disabled) {',
+      '  color: #334155;',
+      '}',
+    ].join('\n'),
+    html: [
+      '<main>',
+      '<button id="primary" class="primary disabled">Save</button>',
+      '</main>',
+    ].join(''),
+  }))
+
+  expect(pasteWasHandled).toBe(true)
+
+  const preview = page.locator('.demo-html-specimen-preview').last()
+
+  await expect(preview).toBeVisible()
+  await preview.locator('button#primary').click()
+
+  const textField = page
+    .locator('.html-specimen-css-field')
+    .filter({ hasText: 'Text' })
+  const textInput = textField.locator('input')
+
+  await expect(textField.getByText('No matching rule')).toBeVisible()
+  await expect(textInput).toBeDisabled()
+  await expect.poll(async () =>
+    preview.evaluate((host) =>
+      host.shadowRoot?.querySelector('style')?.textContent ?? ''),
+  ).toContain('.primary:not(.disabled)')
+})
+
 test('keeps token-backed preview CSS read-only in the inspector', async ({
   page,
 }) => {

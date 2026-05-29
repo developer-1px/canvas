@@ -1083,15 +1083,19 @@ function matchesCompoundSelector(
 }
 
 function parseCssSelectorSegments(selector: string): CssSelectorSegment[] | null {
-  const withoutPseudo = stripCssPseudoSelectors(selector).trim()
+  if (hasCssPseudoSelector(selector)) {
+    return null
+  }
+
+  const sourceSelector = selector.trim()
   const segments: CssSelectorSegment[] = []
   let bracketDepth = 0
   let buffer = ''
   let relationToNext: CssSelectorRelation = 'descendant'
   let index = 0
 
-  while (index < withoutPseudo.length) {
-    const char = withoutPseudo[index] ?? ''
+  while (index < sourceSelector.length) {
+    const char = sourceSelector[index] ?? ''
 
     if (char === '[') {
       bracketDepth += 1
@@ -1173,8 +1177,54 @@ function appendCssSelectorSegment({
   })
 }
 
-function stripCssPseudoSelectors(selector: string) {
-  return selector.replace(/:{1,2}[_a-zA-Z][\w-]*(\([^)]*\))?/g, '')
+function hasCssPseudoSelector(selector: string) {
+  let bracketDepth = 0
+  let quote: '"' | "'" | null = null
+  let escaped = false
+  let index = 0
+
+  while (index < selector.length) {
+    const char = selector[index] ?? ''
+
+    if (quote) {
+      if (escaped) {
+        escaped = false
+      } else if (char === '\\') {
+        escaped = true
+      } else if (char === quote) {
+        quote = null
+      }
+
+      index += 1
+      continue
+    }
+
+    if (char === '"' || char === "'") {
+      quote = char
+      index += 1
+      continue
+    }
+
+    if (char === '[') {
+      bracketDepth += 1
+      index += 1
+      continue
+    }
+
+    if (char === ']') {
+      bracketDepth = Math.max(0, bracketDepth - 1)
+      index += 1
+      continue
+    }
+
+    if (bracketDepth === 0 && char === ':') {
+      return true
+    }
+
+    index += 1
+  }
+
+  return false
 }
 
 function getNodeAncestors({
