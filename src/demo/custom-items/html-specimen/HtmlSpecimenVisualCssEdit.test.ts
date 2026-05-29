@@ -1328,6 +1328,37 @@ describe('HtmlSpecimenVisualCssEdit', () => {
     })
   })
 
+  it('matches where pseudo function selectors against indexed nodes', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `:where(.button).primary {
+  color: #334155;
+}`,
+    }
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '#111827',
+        nodeId: 'primary',
+        property: 'color',
+      },
+      nodes: createButtonNodes(),
+      specimen,
+    })
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) {
+      throw new Error(result.reason)
+    }
+
+    expect(result.source).toMatchObject({
+      affectedNodeIds: ['primary'],
+      selector: ':where(.button).primary',
+      specificity: [0, 1, 0],
+      value: '#111827',
+    })
+  })
+
   it('does not read class selectors from attribute values', () => {
     const specimen = {
       ...createButtonSpecimenData(),

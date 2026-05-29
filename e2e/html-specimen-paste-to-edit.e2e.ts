@@ -1142,6 +1142,67 @@ test('matches escaped utility class selector rules', async ({
   ).toBe('rgb(17, 24, 39)')
 })
 
+test('matches where pseudo function selector rules', async ({
+  page,
+}) => {
+  await page.goto('/')
+
+  const pasteWasHandled = await page.evaluate((text) => {
+    const data = new DataTransfer()
+
+    data.setData('text/plain', text)
+
+    const event = new ClipboardEvent('paste', {
+      bubbles: true,
+      cancelable: true,
+      clipboardData: data,
+    })
+
+    window.dispatchEvent(event)
+
+    return event.defaultPrevented
+  }, JSON.stringify({
+    css: [
+      ':where(.button).primary {',
+      '  color: #334155;',
+      '}',
+    ].join('\n'),
+    html: [
+      '<main>',
+      '<button id="primary" class="button primary">Save</button>',
+      '<button id="secondary" class="button secondary">Cancel</button>',
+      '</main>',
+    ].join(''),
+  }))
+
+  expect(pasteWasHandled).toBe(true)
+
+  const preview = page.locator('.demo-html-specimen-preview').last()
+
+  await expect(preview).toBeVisible()
+  await preview.locator('button#primary').click()
+
+  const textField = page
+    .locator('.html-specimen-css-field')
+    .filter({ hasText: 'Text' })
+  const textInput = textField.locator('input')
+
+  await expect(textField
+    .getByText('Rule :where(.button).primary / 1 node'),
+  ).toBeVisible()
+  await expect(textInput).toHaveValue('#334155')
+  await textInput.fill('#111827')
+  await textInput.blur()
+  await expect.poll(async () =>
+    preview.locator('button#primary').evaluate((button) =>
+      getComputedStyle(button).color),
+  ).toBe('rgb(17, 24, 39)')
+  await expect.poll(async () =>
+    preview.locator('button#secondary').evaluate((button) =>
+      getComputedStyle(button).color),
+  ).not.toBe('rgb(17, 24, 39)')
+})
+
 test('keeps commas inside attribute selector values', async ({
   page,
 }) => {

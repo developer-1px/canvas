@@ -92,6 +92,32 @@ describe('HtmlSpecimenCssSelectorMatcher', () => {
       nodes,
     )).toBeNull()
   })
+
+  it('matches supported pseudo function selectors', () => {
+    const node = createNode({
+      attributes: {
+        'data-state': 'active',
+      },
+      className: 'button primary',
+      id: 'primary',
+    })
+
+    expect(matches(':where(.button)', node)).toBe(true)
+    expect(matches('.button:where([data-state="active"])', node)).toBe(true)
+    expect(matches(':is(button, a).primary', node)).toBe(true)
+    expect(matches(':is(a, .secondary).primary', node)).toBe(false)
+    expect(matches('.primary:not(.disabled)', node)).toBe(false)
+    expect(matchHtmlSpecimenCssSelectorList(
+      ':where(.button).primary',
+      node,
+      [node],
+    )).toEqual([0, 1, 0])
+    expect(matchHtmlSpecimenCssSelectorList(
+      ':is(button, .button).primary',
+      node,
+      [node],
+    )).toEqual([0, 2, 0])
+  })
 })
 
 function matches(selector: string, node: HtmlSpecimenCssSelectorNode) {

@@ -34,6 +34,13 @@ type CssAttributeSelector =
       operator: 'exists'
     }
 
+type CssPseudoFunctionSelector = {
+  args: string
+  end: number
+  name: 'is' | 'where'
+  start: number
+}
+
 export function matchHtmlSpecimenCssSelectorList(
   selector: string,
   node: HtmlSpecimenCssSelectorNode,
@@ -158,7 +165,7 @@ function matchesCssSelectorSegment({
 }): boolean {
   const segment = segments[index]
 
-  if (!segment || !matchesCompoundSelector(segment.compound, node)) {
+  if (!segment || !matchesCompoundSelector(segment.compound, node, nodes)) {
     return false
   }
 
@@ -226,18 +233,43 @@ function matchesCssSelectorSegment({
 function matchesCompoundSelector(
   compound: string,
   node: HtmlSpecimenCssSelectorNode,
+  nodes: readonly HtmlSpecimenCssSelectorNode[],
 ) {
-  if (compound.length === 0 || compound === '*') {
+  const pseudoFunctions = readCssPseudoFunctionSelectors(compound)
+
+  if (!pseudoFunctions) {
+    return false
+  }
+
+  for (const pseudoFunction of pseudoFunctions) {
+    if (!matchHtmlSpecimenCssSelectorList(pseudoFunction.args, node, nodes)) {
+      return false
+    }
+  }
+
+  const compoundWithoutPseudos = removeCssPseudoFunctionSelectors(
+    compound,
+    pseudoFunctions,
+  )
+
+  if (hasUnsupportedCssPseudoSelector(compoundWithoutPseudos)) {
+    return false
+  }
+
+  if (
+    compoundWithoutPseudos.length === 0 ||
+    compoundWithoutPseudos === '*'
+  ) {
     return true
   }
 
-  const attributes = parseCssAttributeSelectors(compound)
+  const attributes = parseCssAttributeSelectors(compoundWithoutPseudos)
 
   if (!attributes) {
     return false
   }
 
-  const simpleCompound = removeCssAttributeSelectors(compound)
+  const simpleCompound = removeCssAttributeSelectors(compoundWithoutPseudos)
   const classNames = readCssSimpleSelectorNames(simpleCompound, '.')
   const ids = readCssSimpleSelectorNames(simpleCompound, '#')
   const nodeClasses = getNodeClassSet(node)
@@ -262,13 +294,15 @@ function matchesCompoundSelector(
 }
 
 function parseCssSelectorSegments(selector: string): CssSelectorSegment[] | null {
-  if (hasCssPseudoSelector(selector)) {
+  if (hasUnsupportedCssPseudoSelector(selector)) {
     return null
   }
 
   const sourceSelector = selector.trim()
   const segments: CssSelectorSegment[] = []
   let bracketDepth = 0
+  let parenDepth = 0
+  let quote: '"' | "'" | null = null
   let buffer = ''
   let relationToNext: CssSelectorRelation = 'descendant'
   let index = 0
@@ -276,10 +310,34 @@ function parseCssSelectorSegments(selector: string): CssSelectorSegment[] | null
   while (index < sourceSelector.length) {
     const char = sourceSelector[index] ?? ''
 
+    if (quote) {
+      buffer += char
+
+      if (char === '\\') {
+        buffer += sourceSelector[index + 1] ?? ''
+        index += 2
+        continue
+      }
+
+      if (char === quote) {
+        quote = null
+      }
+
+      index += 1
+      continue
+    }
+
     if (char === '\\') {
       buffer += char
       buffer += sourceSelector[index + 1] ?? ''
       index += 2
+      continue
+    }
+
+    if (char === '"' || char === "'") {
+      quote = char
+      buffer += char
+      index += 1
       continue
     }
 
@@ -297,7 +355,21 @@ function parseCssSelectorSegments(selector: string): CssSelectorSegment[] | null
       continue
     }
 
-    if (bracketDepth === 0 && char === '>') {
+    if (bracketDepth === 0 && char === '(') {
+      parenDepth += 1
+      buffer += char
+      index += 1
+      continue
+    }
+
+    if (bracketDepth === 0 && char === ')') {
+      parenDepth = Math.max(0, parenDepth - 1)
+      buffer += char
+      index += 1
+      continue
+    }
+
+    if (bracketDepth === 0 && parenDepth === 0 && char === '>') {
       appendCssSelectorSegment({
         buffer,
         relationToPrevious: relationToNext,
@@ -309,7 +381,11 @@ function parseCssSelectorSegments(selector: string): CssSelectorSegment[] | null
       continue
     }
 
-    if (bracketDepth === 0 && (char === '+' || char === '~')) {
+    if (
+      bracketDepth === 0 &&
+      parenDepth === 0 &&
+      (char === '+' || char === '~')
+    ) {
       appendCssSelectorSegment({
         buffer,
         relationToPrevious: relationToNext,
@@ -323,7 +399,7 @@ function parseCssSelectorSegments(selector: string): CssSelectorSegment[] | null
       continue
     }
 
-    if (bracketDepth === 0 && /\s/.test(char)) {
+    if (bracketDepth === 0 && parenDepth === 0 && /\s/.test(char)) {
       if (buffer.trim().length > 0) {
         appendCssSelectorSegment({
           buffer,
@@ -339,6 +415,10 @@ function parseCssSelectorSegments(selector: string): CssSelectorSegment[] | null
 
     buffer += char
     index += 1
+  }
+
+  if (bracketDepth !== 0 || parenDepth !== 0 || quote !== null) {
+    return null
   }
 
   appendCssSelectorSegment({
@@ -373,7 +453,7 @@ function appendCssSelectorSegment({
   })
 }
 
-function hasCssPseudoSelector(selector: string) {
+function hasUnsupportedCssPseudoSelector(selector: string) {
   let bracketDepth = 0
   let escaped = false
   let quote: '"' | "'" | null = null
@@ -422,6 +502,13 @@ function hasCssPseudoSelector(selector: string) {
     }
 
     if (bracketDepth === 0 && char === ':') {
+      const pseudoFunction = readCssPseudoFunctionSelector(selector, index)
+
+      if (pseudoFunction) {
+        index = pseudoFunction.end
+        continue
+      }
+
       return true
     }
 
@@ -429,6 +516,196 @@ function hasCssPseudoSelector(selector: string) {
   }
 
   return false
+}
+
+function readCssPseudoFunctionSelectors(source: string) {
+  const pseudoFunctions: CssPseudoFunctionSelector[] = []
+  let bracketDepth = 0
+  let escaped = false
+  let quote: '"' | "'" | null = null
+  let index = 0
+
+  while (index < source.length) {
+    const char = source[index] ?? ''
+
+    if (escaped) {
+      escaped = false
+      index += 1
+      continue
+    }
+
+    if (char === '\\') {
+      escaped = true
+      index += 1
+      continue
+    }
+
+    if (quote) {
+      if (char === quote) {
+        quote = null
+      }
+
+      index += 1
+      continue
+    }
+
+    if (char === '"' || char === "'") {
+      quote = char
+      index += 1
+      continue
+    }
+
+    if (char === '[') {
+      bracketDepth += 1
+      index += 1
+      continue
+    }
+
+    if (char === ']') {
+      bracketDepth = Math.max(0, bracketDepth - 1)
+      index += 1
+      continue
+    }
+
+    if (bracketDepth === 0 && char === ':') {
+      const pseudoFunction = readCssPseudoFunctionSelector(source, index)
+
+      if (!pseudoFunction) {
+        return null
+      }
+
+      pseudoFunctions.push(pseudoFunction)
+      index = pseudoFunction.end
+      continue
+    }
+
+    index += 1
+  }
+
+  return bracketDepth === 0 && quote === null ? pseudoFunctions : null
+}
+
+function readCssPseudoFunctionSelector(
+  source: string,
+  start: number,
+): CssPseudoFunctionSelector | null {
+  if (source[start] !== ':') {
+    return null
+  }
+
+  const match = /^(is|where)\(/i.exec(source.slice(start + 1))
+
+  if (!match) {
+    return null
+  }
+
+  const name = match[1]?.toLowerCase()
+
+  if (name !== 'is' && name !== 'where') {
+    return null
+  }
+
+  const openParen = start + 1 + name.length
+  const closeParen = findCssFunctionEnd(source, openParen)
+
+  if (closeParen === null) {
+    return null
+  }
+
+  return {
+    args: source.slice(openParen + 1, closeParen),
+    end: closeParen + 1,
+    name,
+    start,
+  }
+}
+
+function findCssFunctionEnd(source: string, openParen: number) {
+  let bracketDepth = 0
+  let depth = 1
+  let escaped = false
+  let quote: '"' | "'" | null = null
+  let index = openParen + 1
+
+  while (index < source.length) {
+    const char = source[index] ?? ''
+
+    if (escaped) {
+      escaped = false
+      index += 1
+      continue
+    }
+
+    if (char === '\\') {
+      escaped = true
+      index += 1
+      continue
+    }
+
+    if (quote) {
+      if (char === quote) {
+        quote = null
+      }
+
+      index += 1
+      continue
+    }
+
+    if (char === '"' || char === "'") {
+      quote = char
+      index += 1
+      continue
+    }
+
+    if (char === '[') {
+      bracketDepth += 1
+      index += 1
+      continue
+    }
+
+    if (char === ']') {
+      bracketDepth = Math.max(0, bracketDepth - 1)
+      index += 1
+      continue
+    }
+
+    if (bracketDepth === 0 && char === '(') {
+      depth += 1
+      index += 1
+      continue
+    }
+
+    if (bracketDepth === 0 && char === ')') {
+      depth -= 1
+
+      if (depth === 0) {
+        return index
+      }
+    }
+
+    index += 1
+  }
+
+  return null
+}
+
+function removeCssPseudoFunctionSelectors(
+  source: string,
+  pseudoFunctions: readonly CssPseudoFunctionSelector[],
+) {
+  if (pseudoFunctions.length === 0) {
+    return source
+  }
+
+  let result = ''
+  let cursor = 0
+
+  for (const pseudoFunction of pseudoFunctions) {
+    result += source.slice(cursor, pseudoFunction.start)
+    cursor = pseudoFunction.end
+  }
+
+  return result + source.slice(cursor)
 }
 
 function parseCssAttributeSelectors(
@@ -875,36 +1152,6 @@ function isCssIdentifierChar(char: string) {
   return /[_a-zA-Z0-9-]/.test(char)
 }
 
-function countCssPseudoSelectors(selector: string) {
-  let count = 0
-  let escaped = false
-  let index = 0
-
-  while (index < selector.length) {
-    const char = selector[index] ?? ''
-
-    if (escaped) {
-      escaped = false
-      index += 1
-      continue
-    }
-
-    if (char === '\\') {
-      escaped = true
-      index += 1
-      continue
-    }
-
-    if (char === ':') {
-      count += 1
-    }
-
-    index += 1
-  }
-
-  return count
-}
-
 function getSelectorTagName(compound: string) {
   const tagName = readCssTypeSelectorName(removeCssAttributeSelectors(compound))
 
@@ -923,21 +1170,92 @@ function getNodeClassSet(node: HtmlSpecimenCssSelectorNode) {
 }
 
 function calculateSpecificity(selector: string): [number, number, number] {
-  const selectorWithoutAttributes = removeCssAttributeSelectors(selector)
-  const attributeCount = readCssAttributeSelectorRanges(selector)?.length ?? 0
+  const pseudoFunctionSpecificity =
+    calculateCssPseudoFunctionSpecificity(selector)
+  const selectorWithoutPseudos = removeCssPseudoFunctionSelectors(
+    selector,
+    readCssPseudoFunctionSelectors(selector) ?? [],
+  )
+  const selectorWithoutAttributes =
+    removeCssAttributeSelectors(selectorWithoutPseudos)
+  const attributeCount =
+    readCssAttributeSelectorRanges(selectorWithoutPseudos)?.length ?? 0
   const idCount = readCssSimpleSelectorNames(
     selectorWithoutAttributes,
     '#',
   ).length
   const classCount = (
     readCssSimpleSelectorNames(selectorWithoutAttributes, '.').length +
-    attributeCount +
-    countCssPseudoSelectors(selectorWithoutAttributes)
+    attributeCount
   )
   const tagCount = selectorWithoutAttributes
     .split(/[\s>+~]+/)
     .filter((part) => getSelectorTagName(part) !== null)
     .length
 
-  return [idCount, classCount, tagCount]
+  return addHtmlSpecimenCssSpecificity(
+    [idCount, classCount, tagCount],
+    pseudoFunctionSpecificity,
+  )
+}
+
+function calculateCssPseudoFunctionSpecificity(
+  selector: string,
+): [number, number, number] {
+  const pseudoFunctions = readCssPseudoFunctionSelectors(selector)
+
+  if (!pseudoFunctions) {
+    return [0, 0, 0]
+  }
+
+  return pseudoFunctions.reduce<[number, number, number]>(
+    (specificity, pseudoFunction) =>
+      addHtmlSpecimenCssSpecificity(
+        specificity,
+        calculateSingleCssPseudoFunctionSpecificity(pseudoFunction),
+      ),
+    [0, 0, 0],
+  )
+}
+
+function calculateSingleCssPseudoFunctionSpecificity(
+  pseudoFunction: CssPseudoFunctionSelector,
+): [number, number, number] {
+  if (pseudoFunction.name === 'where') {
+    return [0, 0, 0]
+  }
+
+  let specificity: [number, number, number] = [0, 0, 0]
+
+  for (const selector of splitCssSelectorList(pseudoFunction.args)) {
+    const selectorPart = selector.trim()
+
+    if (
+      selectorPart.length === 0 ||
+      parseCssSelectorSegments(selectorPart) === null
+    ) {
+      continue
+    }
+
+    const candidateSpecificity = calculateSpecificity(selectorPart)
+
+    if (
+      compareHtmlSpecimenCssSpecificity(candidateSpecificity, specificity) > 0
+    ) {
+      specificity = candidateSpecificity
+    }
+  }
+
+  return specificity
+}
+
+function addHtmlSpecimenCssSpecificity(
+  left: [number, number, number],
+  right: [number, number, number],
+): [number, number, number] {
+  return [
+    left[0] + right[0],
+    left[1] + right[1],
+    left[2] + right[2],
+  ]
 }
