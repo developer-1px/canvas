@@ -2503,10 +2503,88 @@ describe('HtmlSpecimenVisualCssEdit', () => {
     })
   })
 
-  it('does not simplify unsupported pseudo-class selectors into patchable matches', () => {
+  it('matches enabled pseudo-class selectors against form state', () => {
     const specimen = {
       ...createButtonSpecimenData(),
       css: `.primary:enabled {
+  color: #334155;
+}`,
+    }
+
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '#111827',
+        nodeId: 'primary',
+        property: 'color',
+      },
+      nodes: [
+        createNode({
+          className: 'primary',
+          id: 'primary',
+          path: [0],
+          tagName: 'button',
+        }),
+      ],
+      specimen,
+    })
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) {
+      throw new Error(result.reason)
+    }
+
+    expect(result.source).toMatchObject({
+      affectedNodeIds: ['primary'],
+      selector: '.primary:enabled',
+      specificity: [0, 2, 0],
+      value: '#111827',
+    })
+  })
+
+  it('matches disabled pseudo-class selectors against form state', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `.primary:disabled {
+  color: #334155;
+}`,
+    }
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '#111827',
+        nodeId: 'primary',
+        property: 'color',
+      },
+      nodes: [
+        createNode({
+          attributes: { disabled: '' },
+          className: 'primary',
+          id: 'primary',
+          path: [0],
+          tagName: 'button',
+        }),
+      ],
+      specimen,
+    })
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) {
+      throw new Error(result.reason)
+    }
+
+    expect(result.source).toMatchObject({
+      affectedNodeIds: ['primary'],
+      selector: '.primary:disabled',
+      specificity: [0, 2, 0],
+      value: '#111827',
+    })
+  })
+
+  it('does not simplify unsupported pseudo-class selectors into patchable matches', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `.primary:hover {
   color: #334155;
 }`,
     }

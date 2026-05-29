@@ -127,6 +127,51 @@ describe('HtmlSpecimenCssSelectorMatcher', () => {
     )).toEqual([0, 2, 0])
   })
 
+  it('matches form state pseudo classes against DOM attributes', () => {
+    const enabledButton = createNode({
+      className: 'primary',
+      id: 'enabled',
+      tagName: 'button',
+    })
+    const disabledButton = createNode({
+      attributes: { disabled: '' },
+      className: 'primary',
+      id: 'disabled',
+      tagName: 'button',
+    })
+    const plainDiv = createNode({
+      className: 'primary',
+      id: 'plain',
+      tagName: 'div',
+    })
+
+    expect(matchHtmlSpecimenCssSelectorList(
+      '.primary:enabled',
+      enabledButton,
+      [enabledButton],
+    )).toEqual([0, 2, 0])
+    expect(matchHtmlSpecimenCssSelectorList(
+      '.primary:enabled',
+      disabledButton,
+      [disabledButton],
+    )).toBeNull()
+    expect(matchHtmlSpecimenCssSelectorList(
+      '.primary:disabled',
+      disabledButton,
+      [disabledButton],
+    )).toEqual([0, 2, 0])
+    expect(matchHtmlSpecimenCssSelectorList(
+      '.primary:disabled',
+      enabledButton,
+      [enabledButton],
+    )).toBeNull()
+    expect(matchHtmlSpecimenCssSelectorList(
+      '.primary:enabled',
+      plainDiv,
+      [plainDiv],
+    )).toBeNull()
+  })
+
   it('matches structural child pseudo classes against indexed DOM paths', () => {
     const nodes = [
       createNode({

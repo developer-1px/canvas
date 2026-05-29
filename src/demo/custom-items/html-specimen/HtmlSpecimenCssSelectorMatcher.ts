@@ -69,6 +69,12 @@ type CssStructuralPseudoClassSelector =
       start: number
     }
 
+type CssStatePseudoClassSelector = {
+  end: number
+  name: 'disabled' | 'enabled'
+  start: number
+}
+
 type CssPseudoSelectorRange = {
   end: number
   start: number
@@ -76,6 +82,7 @@ type CssPseudoSelectorRange = {
 
 type CssPseudoSelectors = {
   functions: CssPseudoFunctionSelector[]
+  stateClasses: CssStatePseudoClassSelector[]
   structuralClasses: CssStructuralPseudoClassSelector[]
 }
 
@@ -318,10 +325,16 @@ function matchesCompoundSelector(
     return false
   }
 
+  if (!pseudoSelectors.stateClasses.every((pseudoClass) =>
+    matchesCssStatePseudoClassSelector(pseudoClass, node))) {
+    return false
+  }
+
   const compoundWithoutPseudos = removeCssPseudoSelectors(
     compound,
     [
       ...pseudoSelectors.functions,
+      ...pseudoSelectors.stateClasses,
       ...pseudoSelectors.structuralClasses,
     ],
   )
@@ -511,6 +524,18 @@ function matchesCssStructuralPseudoClassSelector(
     case 'only-of-type':
       return getNodeOfTypePosition(node, nodes) === 1 &&
         getNodeLastOfTypePosition(node, nodes) === 1
+  }
+}
+
+function matchesCssStatePseudoClassSelector(
+  pseudoClass: CssStatePseudoClassSelector,
+  node: HtmlSpecimenCssSelectorNode,
+) {
+  switch (pseudoClass.name) {
+    case 'disabled':
+      return isDisabledCssFormControl(node)
+    case 'enabled':
+      return isEnableableCssFormControl(node) && !isDisabledCssFormControl(node)
   }
 }
 
@@ -737,6 +762,13 @@ function hasUnsupportedCssPseudoSelector(selector: string) {
         continue
       }
 
+      const statePseudoClass = readCssStatePseudoClassSelector(selector, index)
+
+      if (statePseudoClass) {
+        index = statePseudoClass.end
+        continue
+      }
+
       return true
     }
 
@@ -748,6 +780,7 @@ function hasUnsupportedCssPseudoSelector(selector: string) {
 
 function readCssPseudoSelectors(source: string): CssPseudoSelectors | null {
   const functions: CssPseudoFunctionSelector[] = []
+  const stateClasses: CssStatePseudoClassSelector[] = []
   const structuralClasses: CssStructuralPseudoClassSelector[] = []
   let bracketDepth = 0
   let escaped = false
@@ -807,12 +840,20 @@ function readCssPseudoSelectors(source: string): CssPseudoSelectors | null {
 
       const pseudoClass = readCssStructuralPseudoClassSelector(source, index)
 
-      if (!pseudoClass) {
+      if (pseudoClass) {
+        structuralClasses.push(pseudoClass)
+        index = pseudoClass.end
+        continue
+      }
+
+      const statePseudoClass = readCssStatePseudoClassSelector(source, index)
+
+      if (!statePseudoClass) {
         return null
       }
 
-      structuralClasses.push(pseudoClass)
-      index = pseudoClass.end
+      stateClasses.push(statePseudoClass)
+      index = statePseudoClass.end
       continue
     }
 
@@ -822,6 +863,7 @@ function readCssPseudoSelectors(source: string): CssPseudoSelectors | null {
   return bracketDepth === 0 && quote === null
     ? {
         functions,
+        stateClasses,
         structuralClasses,
       }
     : null
@@ -930,6 +972,29 @@ function readCssStructuralPseudoClassSelector(
     end: closeParen + 1,
     formula,
     name: nthName,
+    start,
+  }
+}
+
+function readCssStatePseudoClassSelector(
+  source: string,
+  start: number,
+): CssStatePseudoClassSelector | null {
+  if (source[start] !== ':' || source[start + 1] === ':') {
+    return null
+  }
+
+  const match = /^(disabled|enabled)(?![-_a-zA-Z0-9(])/i
+    .exec(source.slice(start + 1))
+  const name = match?.[1]?.toLowerCase()
+
+  if (name !== 'disabled' && name !== 'enabled') {
+    return null
+  }
+
+  return {
+    end: start + 1 + name.length,
+    name,
     start,
   }
 }
@@ -1738,17 +1803,38 @@ function getNodeClassSet(node: HtmlSpecimenCssSelectorNode) {
   ].filter((className) => className.length > 0))
 }
 
+const CSS_ENABLEABLE_FORM_CONTROL_TAGS = new Set([
+  'button',
+  'fieldset',
+  'input',
+  'optgroup',
+  'option',
+  'select',
+  'textarea',
+])
+
+function isEnableableCssFormControl(node: HtmlSpecimenCssSelectorNode) {
+  return CSS_ENABLEABLE_FORM_CONTROL_TAGS.has(node.tagName.toLowerCase())
+}
+
+function isDisabledCssFormControl(node: HtmlSpecimenCssSelectorNode) {
+  return isEnableableCssFormControl(node) &&
+    readCssNodeAttribute(node, 'disabled') !== undefined
+}
+
 function calculateSpecificity(selector: string): [number, number, number] {
   const pseudoFunctionSpecificity =
     calculateCssPseudoFunctionSpecificity(selector)
   const pseudoSelectors = readCssPseudoSelectors(selector) ?? {
     functions: [],
+    stateClasses: [],
     structuralClasses: [],
   }
   const selectorWithoutPseudos = removeCssPseudoSelectors(
     selector,
     [
       ...pseudoSelectors.functions,
+      ...pseudoSelectors.stateClasses,
       ...pseudoSelectors.structuralClasses,
     ],
   )
@@ -1763,6 +1849,7 @@ function calculateSpecificity(selector: string): [number, number, number] {
   const classCount = (
     readCssSimpleSelectorNames(selectorWithoutAttributes, '.').length +
     attributeCount +
+    pseudoSelectors.stateClasses.length +
     pseudoSelectors.structuralClasses.length
   )
   const tagCount = selectorWithoutAttributes
