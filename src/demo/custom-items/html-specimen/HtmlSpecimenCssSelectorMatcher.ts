@@ -30,7 +30,7 @@ export function matchHtmlSpecimenCssSelectorList(
 ): [number, number, number] | null {
   let best: [number, number, number] | null = null
 
-  for (const candidate of selector.split(',')) {
+  for (const candidate of splitCssSelectorList(selector)) {
     const selectorPart = candidate.trim()
 
     if (!matchesSelector(selectorPart, node, nodes)) {
@@ -45,6 +45,58 @@ export function matchHtmlSpecimenCssSelectorList(
   }
 
   return best
+}
+
+function splitCssSelectorList(selector: string) {
+  const selectors: string[] = []
+  let bracketDepth = 0
+  let parenDepth = 0
+  let quote: '"' | "'" | null = null
+  let escaped = false
+  let start = 0
+  let index = 0
+
+  while (index < selector.length) {
+    const char = selector[index] ?? ''
+
+    if (quote) {
+      if (escaped) {
+        escaped = false
+      } else if (char === '\\') {
+        escaped = true
+      } else if (char === quote) {
+        quote = null
+      }
+
+      index += 1
+      continue
+    }
+
+    if (char === '"' || char === "'") {
+      quote = char
+      index += 1
+      continue
+    }
+
+    if (char === '[') {
+      bracketDepth += 1
+    } else if (char === ']' && bracketDepth > 0) {
+      bracketDepth -= 1
+    } else if (char === '(') {
+      parenDepth += 1
+    } else if (char === ')' && parenDepth > 0) {
+      parenDepth -= 1
+    } else if (char === ',' && bracketDepth === 0 && parenDepth === 0) {
+      selectors.push(selector.slice(start, index))
+      start = index + 1
+    }
+
+    index += 1
+  }
+
+  selectors.push(selector.slice(start))
+
+  return selectors
 }
 
 export function compareHtmlSpecimenCssSpecificity(

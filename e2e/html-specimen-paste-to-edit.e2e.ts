@@ -750,6 +750,64 @@ test('matches attribute selector rules against DOM attributes', async ({
   await expect(idleTextInput).toBeDisabled()
 })
 
+test('keeps commas inside attribute selector values', async ({
+  page,
+}) => {
+  await page.goto('/')
+
+  const pasteWasHandled = await page.evaluate((text) => {
+    const data = new DataTransfer()
+
+    data.setData('text/plain', text)
+
+    const event = new ClipboardEvent('paste', {
+      bubbles: true,
+      cancelable: true,
+      clipboardData: data,
+    })
+
+    window.dispatchEvent(event)
+
+    return event.defaultPrevented
+  }, JSON.stringify({
+    css: [
+      '.button[data-label="Save, now"] {',
+      '  color: #334155;',
+      '}',
+    ].join('\n'),
+    html: [
+      '<main>',
+      '<button id="save-now" class="button" data-label="Save, now">',
+      'Save',
+      '</button>',
+      '</main>',
+    ].join(''),
+  }))
+
+  expect(pasteWasHandled).toBe(true)
+
+  const preview = page.locator('.demo-html-specimen-preview').last()
+
+  await expect(preview).toBeVisible()
+  await preview.locator('button#save-now').click()
+
+  const textField = page
+    .locator('.html-specimen-css-field')
+    .filter({ hasText: 'Text' })
+  const textInput = textField.locator('input')
+
+  await expect(textField
+    .getByText('Rule .button[data-label="Save, now"] / 1 node'),
+  ).toBeVisible()
+  await expect(textInput).toHaveValue('#334155')
+  await textInput.fill('#111827')
+  await textInput.blur()
+  await expect.poll(async () =>
+    preview.locator('button#save-now').evaluate((button) =>
+      getComputedStyle(button).color),
+  ).toBe('rgb(17, 24, 39)')
+})
+
 test('keeps unsupported pseudo-class selector CSS read-only', async ({
   page,
 }) => {

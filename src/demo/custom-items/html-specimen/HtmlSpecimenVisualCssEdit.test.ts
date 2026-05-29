@@ -599,6 +599,44 @@ describe('HtmlSpecimenVisualCssEdit', () => {
     })
   })
 
+  it('does not split selector lists on commas inside attribute values', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `.button[data-label="Save, now"] {
+  color: #334155;
+}`,
+    }
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '#111827',
+        nodeId: 'save-now',
+        property: 'color',
+      },
+      nodes: [
+        createNode({
+          attributes: { 'data-label': 'Save, now' },
+          className: 'button',
+          id: 'save-now',
+          path: [0],
+          tagName: 'button',
+        }),
+      ],
+      specimen,
+    })
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) {
+      throw new Error(result.reason)
+    }
+
+    expect(result.source).toMatchObject({
+      affectedNodeIds: ['save-now'],
+      selector: '.button[data-label="Save, now"]',
+      value: '#111827',
+    })
+  })
+
   it('does not simplify unsupported pseudo-class selectors into patchable matches', () => {
     const specimen = {
       ...createButtonSpecimenData(),
