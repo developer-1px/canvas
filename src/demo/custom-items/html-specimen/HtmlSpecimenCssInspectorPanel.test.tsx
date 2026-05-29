@@ -160,6 +160,40 @@ describe('HtmlSpecimenCssInspectorPanel', () => {
     expect(commitItemsChange).not.toHaveBeenCalled()
   })
 
+  it('skips color patches when requested color is equivalent to computed style', () => {
+    const commitItemsChange = vi.fn(() => true)
+    const node = createFocusNode({
+      computedStyle: {
+        backgroundColor: 'rgb(37, 99, 235)',
+      },
+    })
+    const context = createContext({
+      commitItemsChange,
+      customFocus: {
+        data: {
+          node,
+          nodes: [node],
+        },
+        itemId: 'html-specimen-1',
+        ownerId: 'html-specimen',
+        targetId: 'dom:primary',
+      },
+      item: createHtmlSpecimenItem({
+        ...createButtonSpecimenData(),
+        css: `.primary {
+  background: #2563eb;
+}`,
+      }),
+    })
+
+    expect(changeHtmlSpecimenPreviewTargetCss({
+      context,
+      nextValue: '#2563eb',
+      property: 'background-color',
+    })).toBe(false)
+    expect(commitItemsChange).not.toHaveBeenCalled()
+  })
+
   it('shows shorthand conflicts as non-editable', () => {
     const commitItemsChange = vi.fn(() => true)
     const context = createContext({
@@ -376,6 +410,23 @@ describe('HtmlSpecimenCssInspectorPanel', () => {
     expect(commitItemsChange).not.toHaveBeenCalled()
   })
 })
+
+function createFocusNode({
+  computedStyle = {},
+}: {
+  computedStyle?: Record<string, string>
+} = {}) {
+  return {
+    attributes: {
+      class: 'button primary',
+      id: 'primary',
+    },
+    classList: ['button', 'primary'],
+    computedStyle,
+    id: 'dom:primary',
+    tagName: 'button',
+  }
+}
 
 function createContext({
   commitItemsChange = vi.fn(() => true),
