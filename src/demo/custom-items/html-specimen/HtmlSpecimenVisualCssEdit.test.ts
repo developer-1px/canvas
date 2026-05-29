@@ -64,6 +64,38 @@ describe('HtmlSpecimenVisualCssEdit', () => {
     expect(result.specimen.css).toContain('border-radius: 12px;')
   })
 
+  it('patches declarations after CSS strings and functions with separators', () => {
+    const specimen = {
+      ...createButtonSpecimenData(),
+      css: `.primary {
+  /* note: ignore ; and } inside comments */
+  --asset: url("data:image/svg+xml;utf8,<svg>{}</svg>");
+  content: "semi; brace }";
+  color: #ffffff;
+}`,
+    }
+    const result = applyHtmlSpecimenVisualCssEdit({
+      intent: {
+        nextValue: '#111827',
+        nodeId: 'primary',
+        property: 'color',
+      },
+      nodes: createButtonNodes(),
+      specimen,
+    })
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) {
+      throw new Error(result.reason)
+    }
+
+    expect(result.source.selector).toBe('.primary')
+    expect(result.specimen.css).toContain('color: #111827;')
+    expect(result.specimen.css).toContain('/* note: ignore ; and } inside comments */')
+    expect(result.specimen.css).toContain('content: "semi; brace }";')
+  })
+
   it('blocks raw edits to token-backed stylesheet declarations', () => {
     const specimen = {
       ...createButtonSpecimenData(),

@@ -88,6 +88,14 @@ type CssRuleMatch = {
   specificity: [number, number, number]
 }
 
+type CssScannerState = {
+  bracketDepth: number
+  comment: boolean
+  escaped: boolean
+  parenDepth: number
+  quote: '"' | "'" | null
+}
+
 export function applyHtmlSpecimenVisualCssEdit({
   intent,
   nodes,
@@ -674,19 +682,32 @@ function parseCssDeclarations({
 }): CssDeclaration[] {
   const declarations: CssDeclaration[] = []
   let segmentStart = blockStart
+  let scanner = createCssScannerState()
+  let index = blockStart
 
-  for (let index = blockStart; index <= blockEnd; index += 1) {
-    if (index !== blockEnd && css[index] !== ';') {
+  while (index <= blockEnd) {
+    if (
+      index !== blockEnd &&
+      (css[index] !== ';' || !isCssScannerTopLevel(scanner))
+    ) {
+      index = advanceCssScannerState(css, index, scanner)
       continue
     }
 
-    const segment = css.slice(segmentStart, index)
-    const colonOffset = segment.indexOf(':')
+    const colonIndex = findCssDeclarationColon({
+      css,
+      end: index,
+      start: segmentStart,
+    })
 
-    if (colonOffset > 0) {
-      const propertyStart = segmentStart + countLeadingWhitespace(segment)
-      const rawProperty = css.slice(propertyStart, segmentStart + colonOffset)
-      const valueSegmentStart = segmentStart + colonOffset + 1
+    if (colonIndex > segmentStart) {
+      const propertyStart = findCssDeclarationPropertyStart({
+        css,
+        end: colonIndex,
+        start: segmentStart,
+      })
+      const rawProperty = css.slice(propertyStart, colonIndex)
+      const valueSegmentStart = colonIndex + 1
       const rawValue = css.slice(valueSegmentStart, index)
       const valueStart = valueSegmentStart + countLeadingWhitespace(rawValue)
       const valueEnd = index - countTrailingWhitespace(rawValue)
@@ -704,6 +725,8 @@ function parseCssDeclarations({
     }
 
     segmentStart = index + 1
+    scanner = createCssScannerState()
+    index += 1
   }
 
   return declarations
@@ -711,20 +734,152 @@ function parseCssDeclarations({
 
 function findMatchingBrace(css: string, blockStart: number) {
   let depth = 0
+  let index = blockStart
+  const scanner = createCssScannerState()
 
-  for (let index = blockStart; index < css.length; index += 1) {
-    if (css[index] === '{') {
+  while (index < css.length) {
+    if (css[index] === '{' && isCssScannerTopLevel(scanner)) {
       depth += 1
-    } else if (css[index] === '}') {
+    } else if (css[index] === '}' && isCssScannerTopLevel(scanner)) {
       depth -= 1
 
       if (depth === 0) {
         return index
       }
     }
+
+    index = advanceCssScannerState(css, index, scanner)
   }
 
   return -1
+}
+
+function findCssDeclarationColon({
+  css,
+  end,
+  start,
+}: {
+  css: string
+  end: number
+  start: number
+}) {
+  const scanner = createCssScannerState()
+  let index = start
+
+  while (index < end) {
+    if (css[index] === ':' && isCssScannerTopLevel(scanner)) {
+      return index
+    }
+
+    index = advanceCssScannerState(css, index, scanner)
+  }
+
+  return -1
+}
+
+function findCssDeclarationPropertyStart({
+  css,
+  end,
+  start,
+}: {
+  css: string
+  end: number
+  start: number
+}) {
+  let index = start
+
+  while (index < end) {
+    if (/\s/.test(css[index] ?? '')) {
+      index += 1
+      continue
+    }
+
+    if (css[index] === '/' && css[index + 1] === '*') {
+      const commentEnd = css.indexOf('*/', index + 2)
+
+      if (commentEnd < 0 || commentEnd >= end) {
+        return index
+      }
+
+      index = commentEnd + 2
+      continue
+    }
+
+    return index
+  }
+
+  return index
+}
+
+function createCssScannerState(): CssScannerState {
+  return {
+    bracketDepth: 0,
+    comment: false,
+    escaped: false,
+    parenDepth: 0,
+    quote: null,
+  }
+}
+
+function advanceCssScannerState(
+  css: string,
+  index: number,
+  state: CssScannerState,
+) {
+  const char = css[index]
+  const next = css[index + 1]
+
+  if (state.comment) {
+    if (char === '*' && next === '/') {
+      state.comment = false
+      return index + 2
+    }
+
+    return index + 1
+  }
+
+  if (state.quote) {
+    if (state.escaped) {
+      state.escaped = false
+    } else if (char === '\\') {
+      state.escaped = true
+    } else if (char === state.quote) {
+      state.quote = null
+    }
+
+    return index + 1
+  }
+
+  if (char === '/' && next === '*') {
+    state.comment = true
+    return index + 2
+  }
+
+  if (char === '"' || char === "'") {
+    state.quote = char
+    return index + 1
+  }
+
+  if (char === '(') {
+    state.parenDepth += 1
+  } else if (char === ')' && state.parenDepth > 0) {
+    state.parenDepth -= 1
+  } else if (char === '[') {
+    state.bracketDepth += 1
+  } else if (char === ']' && state.bracketDepth > 0) {
+    state.bracketDepth -= 1
+  }
+
+  return index + 1
+}
+
+function isCssScannerTopLevel(state: CssScannerState) {
+  return (
+    !state.comment &&
+    !state.quote &&
+    state.parenDepth === 0 &&
+    state.bracketDepth === 0
+  )
 }
 
 function matchSelectorList(
