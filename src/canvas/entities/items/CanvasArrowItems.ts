@@ -7,6 +7,7 @@ import type { CanvasItemBase } from './CanvasItemBase'
 
 export type ArrowItem = CanvasItemBase & {
   type: 'arrow'
+  arrowhead?: CanvasArrowhead
   end: Point
   endAttachedTo?: CanvasItemId
   routing?: CanvasArrowRouting
@@ -19,3 +20,6 @@ export type ArrowItem = CanvasItemBase & {
 
 export type CanvasArrowEndpoint = 'end' | 'start'
 export type CanvasArrowRouting = 'elbow' | 'straight'
+
+// `end` keeps the arrowhead (default); `none` draws a plain line.
+export type CanvasArrowhead = 'end' | 'none'

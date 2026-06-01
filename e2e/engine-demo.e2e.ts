@@ -338,6 +338,24 @@ test('toggles the token-driven dark theme', async ({ page }) => {
   await expect(root).toHaveAttribute('data-theme', 'light')
 })
 
+test('toggles an arrow between arrowhead and plain line', async ({ page }) => {
+  await page.goto('/')
+
+  await page.locator('[data-canvas-item-id="engine-arrow"]').click()
+  const arrowPath = page.locator(
+    '[data-canvas-item-id="engine-arrow"] .arrow-item',
+  )
+
+  // arrows ship with an arrowhead marker by default.
+  await expect(arrowPath).toHaveAttribute('marker-end', /.+/)
+
+  await page.getByRole('button', { name: 'Line (no arrow head)' }).click()
+  await expect(arrowPath).not.toHaveAttribute('marker-end', /.+/)
+
+  await page.getByRole('button', { name: 'Arrow head', exact: true }).click()
+  await expect(arrowPath).toHaveAttribute('marker-end', /.+/)
+})
+
 test('exports the selected objects as a downloadable image', async ({
   page,
 }) => {

@@ -36,6 +36,7 @@ function isCanvasArrowDrawingItemStorageShape(
     isPoint(value.start) &&
     isPoint(value.end) &&
     !isSamePoint(value.start, value.end) &&
+    isOptionalArrowhead(value.arrowhead) &&
     isOptionalArrowRouting(value.routing) &&
     isOptionalStableItemId(value.startAttachedTo) &&
     isOptionalStableItemId(value.endAttachedTo) &&
@@ -68,6 +69,10 @@ function isOptionalStableItemId(value: unknown) {
 
 function isOptionalArrowRouting(value: unknown) {
   return value === undefined || isCanvasArrowRouting(value)
+}
+
+function isOptionalArrowhead(value: unknown) {
+  return value === undefined || value === 'end' || value === 'none'
 }
 
 function isPoint(value: unknown): value is Point {

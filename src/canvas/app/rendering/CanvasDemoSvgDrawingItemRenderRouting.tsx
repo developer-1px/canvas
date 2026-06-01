@@ -61,7 +61,9 @@ function renderCanvasDemoSvgArrowDrawingItem({
         d={pathData}
         stroke={item.stroke}
         strokeWidth={item.strokeWidth}
-        markerEnd={CANVAS_SVG_ARROW_MARKER_IRI}
+        markerEnd={
+          item.arrowhead === 'none' ? undefined : CANVAS_SVG_ARROW_MARKER_IRI
+        }
         opacity="0.72"
         vectorEffect="non-scaling-stroke"
       />
