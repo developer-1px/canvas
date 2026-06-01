@@ -37,6 +37,7 @@ describe('CanvasWorkspaceConsumerModel', () => {
     expect(model.keyboard.command.commitSelection).toBe(
       input.document.commitSelection,
     )
+    expect(model.keyboard.itemReadModel).toBe(input.itemReadModel)
     expect(model.component.workspace).toMatchObject({
       itemReadModel: input.itemReadModel,
       selection: input.document.selection,
@@ -100,6 +101,14 @@ describe('CanvasWorkspaceConsumerModel', () => {
     expect(model.itemLayer).toEqual({
       items: input.document.items,
       selected: input.selected,
+    })
+    expect(model.selection).toEqual({
+      commitItemsChange: input.document.commitItemsChange,
+      commitSelection: input.document.commitSelection,
+      createId: input.createId,
+      itemReadModel: input.itemReadModel,
+      items: input.document.items,
+      selection: input.document.selection,
     })
   })
 
