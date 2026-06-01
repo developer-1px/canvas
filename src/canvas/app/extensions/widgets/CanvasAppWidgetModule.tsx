@@ -13,6 +13,7 @@ import {
   type CanvasAppCustomItemModuleCreationTool,
 } from '../custom-item-modules/CanvasAppCustomItemModules'
 import type { CanvasAppCustomToolShortcut } from '../custom-tools/CanvasAppCustomCreationTools'
+import { CanvasWidgetIsolationHost } from './CanvasWidgetIsolationHost'
 
 export type CanvasAppWidgetItem<
   TData extends CanvasJsonObject = CanvasJsonObject,
@@ -170,7 +171,9 @@ function defineCanvasAppWidgetModule<
             className="canvas-widget"
             data-canvas-widget-kind={id}
           >
-            {renderWidget({ data, item: widgetItem })}
+            <CanvasWidgetIsolationHost fallbackLabel={`${title} unavailable`}>
+              {renderWidget({ data, item: widgetItem })}
+            </CanvasWidgetIsolationHost>
           </div>
         </foreignObject>
       )
