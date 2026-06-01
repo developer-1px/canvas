@@ -201,12 +201,12 @@
   display: flex;
   align-items: center;
   max-width: calc(100vw - 20px);
-  min-height: 30px;
-  gap: 2px;
+  min-height: 28px;
+  gap: 1px;
   padding: 2px;
   border-radius: 5px;
-  outline: 1px solid color-mix(in srgb, var(--canvas-line) 30%, transparent);
-  background: color-mix(in srgb, var(--canvas-panel) 92%, transparent);
+  outline: 1px solid color-mix(in srgb, var(--canvas-line) 24%, transparent);
+  background: color-mix(in srgb, var(--canvas-panel) 88%, transparent);
   transform: translate(-50%, calc(-100% - 10px));
 }
 
@@ -214,11 +214,16 @@
   transform: translate(-50%, 10px);
 }
 
+.engine-selection-toolbar-item {
+  position: relative;
+  display: inline-flex;
+}
+
 .engine-selection-toolbar button {
   display: inline-grid;
   place-items: center;
-  min-width: 0;
-  height: 26px;
+  min-width: 24px;
+  height: 24px;
   padding: 0;
   border: 0;
   border-radius: 3px;
@@ -229,9 +234,10 @@
 
 .engine-selection-toolbar button:hover,
 .engine-selection-toolbar button:focus-visible,
-.engine-selection-toolbar button[aria-pressed='true'] {
+.engine-selection-toolbar button[aria-pressed='true'],
+.engine-selection-toolbar button[data-open='true'] {
   color: var(--canvas-ink);
-  background: var(--canvas-paper);
+  background: color-mix(in srgb, var(--canvas-paper) 72%, transparent);
   outline: 0;
 }
 
@@ -240,58 +246,80 @@
   cursor: default;
 }
 
-.engine-selection-divider {
-  width: 1px;
-  height: 18px;
-  margin: 0 2px;
-  background: color-mix(in srgb, var(--canvas-line) 38%, transparent);
-}
-
-.engine-selection-style-control {
-  display: flex;
-  align-items: center;
-}
-
-.engine-selection-toolbar .engine-selection-style-button {
+.engine-selection-toolbar button[data-has-swatch='true'] {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   width: auto;
-  padding: 0 6px;
+  padding: 0 5px;
 }
 
-.engine-selection-current-swatch,
-.engine-selection-toolbar .engine-selection-swatch {
-  width: 18px;
-  height: 18px;
+.engine-selection-swatch-mark {
+  width: 12px;
+  height: 12px;
   border-radius: 999px;
-  outline: 1px solid color-mix(in srgb, var(--canvas-ink) 18%, transparent);
+  outline: 1px solid color-mix(in srgb, var(--canvas-ink) 16%, transparent);
 }
 
-.engine-selection-color-popover {
+.engine-selection-toolbar-text {
+  min-width: 12px;
+  color: inherit;
+  font: 650 11px/1 var(--sans);
+}
+
+.engine-selection-menu {
   position: absolute;
   left: 50%;
   top: calc(100% + 6px);
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
+  z-index: 2;
+  display: grid;
+  gap: 3px;
   width: max-content;
-  max-width: min(300px, calc(100vw - 20px));
-  padding: 6px;
+  max-width: min(240px, calc(100vw - 20px));
+  padding: 4px;
   border-radius: 5px;
-  outline: 1px solid color-mix(in srgb, var(--canvas-line) 30%, transparent);
+  outline: 1px solid color-mix(in srgb, var(--canvas-line) 24%, transparent);
   background: color-mix(in srgb, var(--canvas-panel) 94%, transparent);
   transform: translateX(-50%);
 }
 
-.engine-selection-toolbar[data-placement='below'] .engine-selection-color-popover {
-  top: auto;
-  bottom: calc(100% + 6px);
+.engine-selection-menu-group {
+  display: flex;
+  align-items: center;
+  gap: 1px;
 }
 
-.engine-selection-toolbar .engine-selection-swatch[aria-pressed='true'] {
+.engine-selection-menu-group + .engine-selection-menu-group {
+  padding-top: 3px;
+  border-top: 1px solid color-mix(in srgb, var(--canvas-line) 18%, transparent);
+}
+
+.engine-selection-menu-group[data-layout='swatches'] {
+  display: grid;
+  grid-template-columns: repeat(6, 18px);
+  gap: 4px;
+}
+
+.engine-selection-menu-group[data-layout='swatches'] button {
+  min-width: 18px;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+}
+
+.engine-selection-menu-group[data-layout='swatches'] .engine-selection-swatch-mark {
+  width: 18px;
+  height: 18px;
+}
+
+.engine-selection-menu-group[data-layout='swatches'] button[aria-pressed='true'] .engine-selection-swatch-mark {
   outline: 2px solid var(--canvas-ink);
   outline-offset: 1px;
+}
+
+.engine-selection-toolbar[data-placement='below'] .engine-selection-menu {
+  top: auto;
+  bottom: calc(100% + 6px);
 }
 
 .engine-stamp-pad {
