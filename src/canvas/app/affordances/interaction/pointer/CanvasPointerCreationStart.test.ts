@@ -99,6 +99,12 @@ describe('CanvasPointerCreationStart', () => {
         body: 'Comment',
         h: 36,
         id: 'comment-1',
+        thread: [{
+          authorName: 'You',
+          body: 'Comment',
+          createdAt: 'Just now',
+          id: 'comment-1:message-1',
+        }],
         type: 'comment',
         w: 36,
         x: 62,

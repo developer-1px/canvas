@@ -7,6 +7,7 @@ import type { CommitCanvasItemsChange } from '../../../workflow/CanvasWorkflowCo
 import type { CanvasAppCustomFocus } from '../../interaction/focus/CanvasAppCustomFocus'
 import { getCanvasAppInspectorPanelViews } from './CanvasAppInspectorPanelExecution'
 import type { CanvasAppInspectorPanel } from './CanvasAppInspectorPanels'
+import { getCanvasObjectInspectorCommentThread } from './CanvasObjectInspectorCommentThread'
 import { getCanvasObjectInspectorLabel } from './CanvasObjectInspectorLabel'
 import { getCanvasObjectStyleControls } from './CanvasObjectStyleInspector'
 
@@ -39,6 +40,13 @@ export function getCanvasObjectInspectorModel({
 
   return {
     bounds,
+    commentThread: getCanvasObjectInspectorCommentThread({
+      commitItemsChange,
+      disabled,
+      items,
+      selectedItems,
+      selection,
+    }),
     customPanels: getCanvasAppInspectorPanelViews({
       context: {
         bounds,

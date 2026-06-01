@@ -4,6 +4,7 @@ export type {
   CanvasArrowhead,
   CanvasArrowRouting,
   CanvasCommentItem,
+  CanvasCommentThreadMessage,
   CanvasComponentItem,
   CanvasComponentKind,
   CanvasCustomItem,

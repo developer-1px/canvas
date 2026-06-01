@@ -10,6 +10,7 @@ import type {
   CanvasObjectStyleSegmentedControl,
   CanvasObjectStyleSwatchControl,
 } from './CanvasObjectStyleInspector'
+import type { CanvasObjectInspectorCommentThread } from './CanvasObjectInspectorCommentThread'
 
 type CanvasObjectInspectorPanel = {
   content: ReactNode
@@ -18,6 +19,7 @@ type CanvasObjectInspectorPanel = {
 
 type CanvasObjectInspectorProps = {
   bounds: Bounds | null
+  commentThread: CanvasObjectInspectorCommentThread | null
   customPanels: readonly CanvasObjectInspectorPanel[]
   disabled: boolean
   label: string | null
@@ -36,13 +38,19 @@ const FIELDS: Array<{ id: BoundsField; label: string; min?: number }> = [
 
 export function CanvasObjectInspector({
   bounds,
+  commentThread,
   customPanels,
   disabled,
   label,
   styleControls,
   onChangeBounds,
 }: CanvasObjectInspectorProps) {
-  if ((!bounds || !label) && customPanels.length === 0 && styleControls.length === 0) {
+  if (
+    (!bounds || !label) &&
+    !commentThread &&
+    customPanels.length === 0 &&
+    styleControls.length === 0
+  ) {
     return null
   }
 
@@ -125,12 +133,54 @@ export function CanvasObjectInspector({
           ))}
         </div>
       ) : null}
+      {commentThread ? (
+        <CanvasObjectInspectorCommentThreadView thread={commentThread} />
+      ) : null}
       {customPanels.map((panel) => (
         <div className="inspector-custom-panel" key={panel.id}>
           {panel.content}
         </div>
       ))}
     </aside>
+  )
+}
+
+function CanvasObjectInspectorCommentThreadView({
+  thread,
+}: {
+  thread: CanvasObjectInspectorCommentThread
+}) {
+  return (
+    <section
+      aria-label="Comment thread"
+      className="inspector-comment-thread"
+      data-resolved={thread.resolved ? 'true' : 'false'}
+    >
+      <div className="inspector-comment-thread-header">
+        <span>{thread.resolved ? 'Resolved' : 'Open'}</span>
+        <button
+          disabled={thread.disabled}
+          onClick={thread.onToggleResolved}
+          type="button"
+        >
+          {thread.resolved ? 'Reopen' : 'Resolve'}
+        </button>
+      </div>
+      <div className="inspector-comment-thread-messages">
+        {thread.messages.map((message) => (
+          <article
+            className="inspector-comment-thread-message"
+            key={message.id}
+          >
+            <div className="inspector-comment-thread-meta">
+              <span>{message.authorName}</span>
+              <span>{message.createdAt}</span>
+            </div>
+            <div className="inspector-comment-thread-body">{message.body}</div>
+          </article>
+        ))}
+      </div>
+    </section>
   )
 }
 

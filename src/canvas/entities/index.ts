@@ -21,6 +21,7 @@ export type {
   CanvasArrowhead,
   CanvasArrowRouting,
   CanvasCommentItem,
+  CanvasCommentThreadMessage,
   CanvasCustomItem,
   CanvasDrawingItemBase,
   CanvasEditableTextItem,

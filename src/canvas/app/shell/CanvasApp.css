@@ -1152,10 +1152,49 @@
   border-radius: 6px;
   background: var(--canvas-panel);
   color: var(--canvas-ink);
-  font: 500 14px/1.35 var(--sans);
+  font: 500 12px/1.35 var(--sans);
+  pointer-events: none;
+}
+
+.comment-body-card[data-resolved='true'] {
+  opacity: 0.72;
+}
+
+.comment-thread-header,
+.comment-thread-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.comment-thread-header {
+  margin-bottom: 8px;
+  color: var(--canvas-text-secondary);
+  font: 750 11px/1 var(--sans);
+}
+
+.comment-thread-messages {
+  display: grid;
+  gap: 8px;
+}
+
+.comment-thread-message {
+  display: grid;
+  gap: 4px;
+}
+
+.comment-thread-meta {
+  color: var(--canvas-text-secondary);
+  font: 700 10px/1 var(--sans);
+}
+
+.comment-thread-body {
+  overflow: hidden;
+  color: var(--canvas-ink);
+  text-overflow: ellipsis;
   white-space: pre-wrap;
   word-break: break-word;
-  pointer-events: none;
 }
 
 .stamp-item {
@@ -1847,6 +1886,61 @@
 .inspector-segment[aria-pressed='true'] {
   border-color: var(--canvas-blue);
   color: var(--canvas-blue);
+}
+
+.inspector-comment-thread {
+  display: grid;
+  gap: 8px;
+  padding-top: 2px;
+}
+
+.inspector-comment-thread[data-resolved='true'] {
+  opacity: 0.76;
+}
+
+.inspector-comment-thread-header,
+.inspector-comment-thread-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.inspector-comment-thread-header {
+  color: var(--canvas-muted);
+  font: 700 11px/1 var(--sans);
+}
+
+.inspector-comment-thread-header button {
+  height: 24px;
+  padding: 0 7px;
+  border: 1px solid var(--canvas-line);
+  border-radius: 5px;
+  background: var(--canvas-panel);
+  color: var(--canvas-text-secondary);
+  font: 700 10px/1 var(--sans);
+}
+
+.inspector-comment-thread-messages {
+  display: grid;
+  gap: 7px;
+}
+
+.inspector-comment-thread-message {
+  display: grid;
+  gap: 4px;
+}
+
+.inspector-comment-thread-meta {
+  color: var(--canvas-text-secondary);
+  font: 700 10px/1 var(--sans);
+}
+
+.inspector-comment-thread-body {
+  color: var(--canvas-ink);
+  font: 500 12px/1.35 var(--sans);
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .drawing-swatches,

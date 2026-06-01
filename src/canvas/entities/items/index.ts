@@ -18,6 +18,7 @@ export type {
 } from './CanvasImageItems'
 export type {
   CanvasCommentItem,
+  CanvasCommentThreadMessage,
 } from './CanvasCommentItems'
 export type {
   CanvasStampItem,

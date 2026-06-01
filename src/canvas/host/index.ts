@@ -155,14 +155,20 @@ export {
   type CreateCanvasImageItemInput,
 } from './image/CanvasImageItem'
 export {
+  CANVAS_COMMENT_DEFAULT_AUTHOR_NAME,
   CANVAS_COMMENT_DEFAULT_BODY,
+  CANVAS_COMMENT_DEFAULT_CREATED_AT,
   CANVAS_COMMENT_BODY_MAX_LENGTH,
   CANVAS_COMMENT_ITEM_SIZE,
   createCanvasCommentItem,
+  createCanvasCommentThreadMessage,
   getCanvasCommentBodyBounds,
+  getCanvasCommentTextPatchUpdates,
+  getCanvasCommentThreadMessages,
   isCanvasCommentAttachedTo,
   isCanvasCommentItem,
   isCanvasCommentItemStorageShape,
+  setCanvasCommentResolved,
   translateCanvasCommentItem,
   type CreateCanvasCommentItemInput,
 } from './comment/CanvasCommentItem'

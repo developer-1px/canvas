@@ -131,6 +131,47 @@ describe('CanvasObjectInspectorModel', () => {
     )
   })
 
+  it('builds a comment thread panel model that toggles resolved state', () => {
+    const commitItemsChange = vi.fn()
+    const comment = createCommentItem()
+    const model = createModel({
+      commitItemsChange,
+      items: [createRectItem(), comment],
+      selectedItems: [comment],
+      selection: ['comment-1'],
+    })
+
+    expect(model.commentThread).toMatchObject({
+      itemId: 'comment-1',
+      messages: [{
+        authorName: 'Ari',
+        body: 'Needs follow-up',
+        createdAt: '2026-06-02T00:00:00.000Z',
+        id: 'message-1',
+      }],
+      resolved: false,
+    })
+
+    model.commentThread?.onToggleResolved()
+
+    expect(commitItemsChange).toHaveBeenCalledWith(
+      {
+        type: 'replace-changed',
+        items: [
+          createRectItem(),
+          {
+            ...comment,
+            resolved: true,
+          },
+        ],
+      },
+      {
+        before: ['comment-1'],
+        after: ['comment-1'],
+      },
+    )
+  })
+
   it('respects the object style controls affordance toggle', () => {
     const model = createModel({
       config: createCanvasAffordanceConfig({
@@ -172,6 +213,7 @@ function createModel({
   config = createCanvasAffordanceConfig(),
   customFocus = null,
   inspectorPanels = [],
+  items,
   selectedItems = [],
   selection = [],
 }: {
@@ -188,6 +230,7 @@ function createModel({
   inspectorPanels?: Parameters<
     typeof getCanvasObjectInspectorModel
   >[0]['inspectorPanels']
+  items?: CanvasItem[]
   selectedItems?: CanvasItem[]
   selection?: string[]
 }) {
@@ -197,9 +240,28 @@ function createModel({
     config,
     customFocus,
     inspectorPanels,
+    items,
     selectedItems,
     selection,
   })
+}
+
+function createCommentItem(): CanvasItem {
+  return {
+    body: 'Needs follow-up',
+    h: 36,
+    id: 'comment-1',
+    thread: [{
+      authorName: 'Ari',
+      body: 'Needs follow-up',
+      createdAt: '2026-06-02T00:00:00.000Z',
+      id: 'message-1',
+    }],
+    type: 'comment',
+    w: 36,
+    x: 10,
+    y: 20,
+  }
 }
 
 function createRectItem(): CanvasItem {

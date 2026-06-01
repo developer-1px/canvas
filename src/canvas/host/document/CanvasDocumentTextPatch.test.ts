@@ -26,6 +26,44 @@ describe('CanvasDocument text patches', () => {
   })
 
 
+  test('finds and replaces comment thread message bodies', () => {
+    const document = createCanvasItemsDocument([{
+      body: 'Legacy summary',
+      h: 36,
+      id: 'comment-1',
+      thread: [{
+        authorName: 'Ari',
+        body: '@bo please review this',
+        createdAt: '2026-06-02T00:00:00.000Z',
+        id: 'message-1',
+      }],
+      type: 'comment',
+      w: 36,
+      x: 10,
+      y: 20,
+    }])
+
+    expect(findCanvasDocumentText(document, '@bo')).toEqual([
+      {
+        field: 'body',
+        itemId: 'comment-1',
+        occurrences: 1,
+        path: '/0/thread/0/body',
+        value: '@bo please review this',
+      },
+    ])
+    expect(createReplaceCanvasDocumentTextPatch(
+      document,
+      '@bo',
+      '@ari',
+    )).toEqual([{
+      op: 'replace',
+      path: '/0/thread/0/body',
+      value: '@ari please review this',
+    }])
+  })
+
+
   test('does not search canvas storage identity fields', () => {
     const document = createCanvasItemsDocument([{
       fill: '#ffffff',
@@ -226,6 +264,62 @@ describe('CanvasDocument text patches', () => {
 
     expect(document.lastPatch).toEqual(patch)
     expect(document.value[0]).toMatchObject({ text: 'Label' })
+  })
+
+
+  test('commits comment text edits to the body and first thread message', () => {
+    const items: CanvasItem[] = [{
+      body: 'Draft',
+      h: 36,
+      id: 'comment-1',
+      thread: [{
+        authorName: 'Ari',
+        body: 'Draft',
+        createdAt: '2026-06-02T00:00:00.000Z',
+        id: 'message-1',
+      }],
+      type: 'comment',
+      w: 36,
+      x: 10,
+      y: 20,
+    }]
+    const document = createCanvasItemsDocument(items, {
+      selection: ['comment-1'],
+    })
+    const patch = createSetCanvasItemTextPatch(items, 'comment-1', 'Final')
+
+    expect(patch).toEqual([
+      {
+        op: 'replace',
+        path: '/0/body',
+        value: 'Final',
+      },
+      {
+        op: 'replace',
+        path: '/0/thread/0/body',
+        value: 'Final',
+      },
+    ])
+    expect(
+      commitCanvasItemsPatch({
+        document,
+        patch,
+        selection: {
+          before: ['comment-1'],
+          after: ['comment-1'],
+        },
+      }),
+    ).toBe(true)
+
+    expect(document.value[0]).toMatchObject({
+      body: 'Final',
+      thread: [{
+        authorName: 'Ari',
+        body: 'Final',
+        createdAt: '2026-06-02T00:00:00.000Z',
+        id: 'message-1',
+      }],
+    })
   })
 
 })

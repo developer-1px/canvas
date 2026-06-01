@@ -7,6 +7,7 @@ describe('CanvasObjectInspector', () => {
     const markup = renderToStaticMarkup(
       <CanvasObjectInspector
         bounds={{ h: 40, w: 80, x: 10, y: 20 }}
+        commentThread={null}
         customPanels={[]}
         disabled={false}
         label="Rect"
@@ -38,6 +39,7 @@ describe('CanvasObjectInspector', () => {
     const markup = renderToStaticMarkup(
       <CanvasObjectInspector
         bounds={{ h: 40, w: 80, x: 10, y: 20 }}
+        commentThread={null}
         customPanels={[]}
         disabled={false}
         label="Rect"
@@ -78,10 +80,40 @@ describe('CanvasObjectInspector', () => {
     expect(markup).toContain('aria-pressed="true"')
   })
 
+  it('renders compact comment thread controls', () => {
+    const markup = renderToStaticMarkup(
+      <CanvasObjectInspector
+        bounds={{ h: 36, w: 36, x: 10, y: 20 }}
+        commentThread={{
+          disabled: false,
+          itemId: 'comment-1',
+          messages: [{
+            authorName: 'Ari',
+            body: 'Needs follow-up',
+            createdAt: '2026-06-02T00:00:00.000Z',
+            id: 'message-1',
+          }],
+          resolved: false,
+          onToggleResolved: vi.fn(),
+        }}
+        customPanels={[]}
+        disabled={false}
+        label="Comment"
+        styleControls={[]}
+        onChangeBounds={vi.fn()}
+      />,
+    )
+
+    expect(markup).toContain('aria-label="Comment thread"')
+    expect(markup).toContain('Needs follow-up')
+    expect(markup).toContain('Resolve')
+  })
+
   it('renders custom panels alongside standard inspector chrome', () => {
     const markup = renderToStaticMarkup(
       <CanvasObjectInspector
         bounds={{ h: 40, w: 80, x: 10, y: 20 }}
+        commentThread={null}
         customPanels={[{
           content: <div>Styles</div>,
           id: 'custom-styles',

@@ -1,8 +1,10 @@
 import type { Point } from '../../core'
 import type {
+  CanvasCommentItem,
   CanvasItem,
   GroupItem,
 } from '../model'
+import { isCanvasCommentItem } from '../comment/CanvasCommentItem'
 import {
   isCanvasDrawingItem,
   translateCanvasDrawingItem,
@@ -141,10 +143,31 @@ function cloneCanvasItemWithNewId(
     })
   }
 
-  return {
+  const id = createId(item.type)
+  const clone = {
     ...item,
-    id: createId(item.type),
+    id,
     x: item.x + offset.x,
     y: item.y + offset.y,
+  }
+
+  return isCanvasCommentItem(clone)
+    ? cloneCanvasCommentItemThreadIds(clone)
+    : clone
+}
+
+function cloneCanvasCommentItemThreadIds(
+  item: CanvasCommentItem,
+): CanvasCommentItem {
+  if (!item.thread) {
+    return item
+  }
+
+  return {
+    ...item,
+    thread: item.thread.map((message, index) => ({
+      ...message,
+      id: `${item.id}:message-${index + 1}`,
+    })),
   }
 }

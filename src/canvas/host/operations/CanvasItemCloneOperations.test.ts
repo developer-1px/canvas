@@ -148,6 +148,42 @@ describe('CanvasItemCloneOperations drawing items', () => {
       selection: ['rect-copy-1'],
     })
   })
+
+  test('duplicates comment thread messages with ids scoped to the clone', () => {
+    const items = [comment('comment-1', 10, 20)]
+
+    expect(
+      duplicateCanvasSelection(
+        items,
+        ['comment-1'],
+        createSequenceId(),
+        { x: 12, y: 16 },
+      ),
+    ).toEqual({
+      clones: [{
+        ...comment('comment-copy-1', 22, 36),
+        thread: [{
+          authorName: 'You',
+          body: 'Needs follow-up',
+          createdAt: 'Just now',
+          id: 'comment-copy-1:message-1',
+        }],
+      }],
+      items: [
+        comment('comment-1', 10, 20),
+        {
+          ...comment('comment-copy-1', 22, 36),
+          thread: [{
+            authorName: 'You',
+            body: 'Needs follow-up',
+            createdAt: 'Just now',
+            id: 'comment-copy-1:message-1',
+          }],
+        },
+      ],
+      selection: ['comment-copy-1'],
+    })
+  })
 })
 
 function rect(id: string, x: number, y: number): CanvasItem {
@@ -158,6 +194,24 @@ function rect(id: string, x: number, y: number): CanvasItem {
     stroke: '#111827',
     type: 'rect',
     w: 80,
+    x,
+    y,
+  }
+}
+
+function comment(id: string, x: number, y: number): CanvasItem {
+  return {
+    body: 'Needs follow-up',
+    h: 24,
+    id,
+    thread: [{
+      authorName: 'You',
+      body: 'Needs follow-up',
+      createdAt: 'Just now',
+      id: 'comment-1:message-1',
+    }],
+    type: 'comment',
+    w: 24,
     x,
     y,
   }
