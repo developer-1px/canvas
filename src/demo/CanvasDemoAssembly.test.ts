@@ -19,7 +19,10 @@ describe('CanvasDemoAssembly', () => {
   })
 
   it('keeps the default demo free of product custom modules', () => {
-    expect(DEMO_CUSTOM_ITEM_MODULES.map((module) => module.id)).toEqual([])
+    // The widget-seam example is allowed; the abandoned product modules are not.
+    expect(DEMO_CUSTOM_ITEM_MODULES.map((module) => module.id)).toEqual([
+      'metric-widget',
+    ])
     expect(modules['./custom-items/index.ts']).not.toMatch('import.meta.glob')
     expect(modules['./custom-items/index.ts']).not.toMatch(
       /HTML_SPECIMEN_CUSTOM_ITEM_MODULE|RiskCustomItemModule|DecisionMapCustomItemModule|risk-node|decision-node|kind:\s*['"](html-specimen|risk|decision)['"]/,
@@ -50,6 +53,7 @@ describe('CanvasDemoAssembly', () => {
         'image',
         'stamp',
         'stamp',
+        'custom',
       ])
     expect(
       DEMO_CANVAS_APP_ASSEMBLY.customCreationTools.map((tool) => tool.id),
