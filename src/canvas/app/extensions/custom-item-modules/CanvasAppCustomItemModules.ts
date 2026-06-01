@@ -10,6 +10,9 @@ import type {
 import type {
   CanvasTextPasteImporter,
 } from '../../affordances/io/text-paste/CanvasTextPasteImporters'
+import type {
+  CanvasMediaImporter,
+} from '../../affordances/io/media/CanvasMediaImporters'
 import {
   type CanvasAppCustomCreationToolContext,
   type CanvasAppCustomToolShortcut,
@@ -47,6 +50,7 @@ export type CanvasAppCustomItemModule = {
   customCreationTools?: readonly CanvasAppCustomItemModuleCreationTool[]
   id: string
   inspectorPanels?: readonly CanvasAppInspectorPanel[]
+  mediaImporters?: readonly CanvasMediaImporter[]
   presentation: string
   renderItem: CanvasAppCustomItemRendererStrategy
   textPasteImporters?: readonly CanvasTextPasteImporter[]

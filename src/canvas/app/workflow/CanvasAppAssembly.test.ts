@@ -11,6 +11,7 @@ import type {
   CanvasAppCustomItemRendererStrategy,
   CanvasAppItemLayerAdapter,
   CanvasAppStageAdapter,
+  CanvasMediaImporter,
   CanvasWorkspaceStorageProvider,
 } from './index'
 
@@ -59,6 +60,10 @@ describe('CanvasAppAssembly seams', () => {
       })
     const renderRiskItem: CanvasAppCustomItemRendererStrategy = ({ item }) =>
       item.title
+    const mediaImporter: CanvasMediaImporter = {
+      id: 'risk-media',
+      createItems: () => [],
+    }
     const riskModule = defineCanvasAppCustomItemModule({
       id: 'risk',
       presentation: 'risk-node',
@@ -93,6 +98,7 @@ describe('CanvasAppAssembly seams', () => {
           render: ({ selection }) => selection.length,
         },
       ],
+      mediaImporters: [mediaImporter],
       textPasteImporters: [{
         id: 'risk-paste',
         createItems: () => [],
@@ -136,6 +142,9 @@ describe('CanvasAppAssembly seams', () => {
       'checklist-actions',
       'kanban-actions',
       'risk-meta',
+    ])
+    expect(assembly.mediaImporters.map((importer) => importer.id)).toEqual([
+      'risk-media',
     ])
     expect(assembly.initialItems).toEqual([])
   })

@@ -5,6 +5,7 @@ import {
   mergeCanvasAppExtensionBundle,
   snapshotCanvasAppExtensionBundle,
 } from './CanvasAppExtensionBundle'
+import type { CanvasMediaImporter } from '../affordances/io/media/CanvasMediaImporters'
 import type { CanvasTextPasteImporter } from '../affordances/io/text-paste/CanvasTextPasteImporters'
 
 describe('CanvasAppExtensionBundle', () => {
@@ -15,6 +16,7 @@ describe('CanvasAppExtensionBundle', () => {
       customItemRenderers: {},
       customItemValidators: {},
       inspectorPanels: [],
+      mediaImporters: [],
       textPasteImporters: [],
     })
   })
@@ -30,6 +32,7 @@ describe('CanvasAppExtensionBundle', () => {
         risk: () => true,
       },
       inspectorPanels: [createPanel('risk-panel')],
+      mediaImporters: [createMediaImporter('risk-media')],
       textPasteImporters: [createTextPasteImporter('risk-paste')],
     })
     const entries = createCanvasAppExtensionBundle({
@@ -42,6 +45,7 @@ describe('CanvasAppExtensionBundle', () => {
         note: () => true,
       },
       inspectorPanels: [createPanel('note-panel')],
+      mediaImporters: [createMediaImporter('note-media')],
       textPasteImporters: [createTextPasteImporter('note-paste')],
     })
 
@@ -64,6 +68,10 @@ describe('CanvasAppExtensionBundle', () => {
     expect(merged.inspectorPanels.map((panel) => panel.id)).toEqual([
       'risk-panel',
       'note-panel',
+    ])
+    expect(merged.mediaImporters.map((importer) => importer.id)).toEqual([
+      'risk-media',
+      'note-media',
     ])
     expect(merged.textPasteImporters.map((importer) => importer.id)).toEqual([
       'risk-paste',
@@ -103,6 +111,18 @@ describe('CanvasAppExtensionBundle', () => {
     expect(() =>
       mergeCanvasAppExtensionBundle({
         current: createCanvasAppExtensionBundle({
+          mediaImporters: [createMediaImporter('embed')],
+        }),
+        entries: createCanvasAppExtensionBundle({
+          mediaImporters: [createMediaImporter('embed')],
+        }),
+        owner: 'custom item module',
+      }),
+    ).toThrow('Duplicate canvas custom item module media importer: embed')
+
+    expect(() =>
+      mergeCanvasAppExtensionBundle({
+        current: createCanvasAppExtensionBundle({
           textPasteImporters: [createTextPasteImporter('html')],
         }),
         entries: createCanvasAppExtensionBundle({
@@ -120,6 +140,7 @@ describe('CanvasAppExtensionBundle', () => {
     const renderRisk = () => null
     const validateRisk = () => true
     const panel = createPanel('risk-panel')
+    const mediaImporter = createMediaImporter('risk-media')
     const textPasteImporter = createTextPasteImporter('risk-paste')
     const bundle = createCanvasAppExtensionBundle({
       customCommands: [command],
@@ -131,6 +152,7 @@ describe('CanvasAppExtensionBundle', () => {
         risk: validateRisk,
       },
       inspectorPanels: [panel],
+      mediaImporters: [mediaImporter],
       textPasteImporters: [textPasteImporter],
     })
 
@@ -139,6 +161,7 @@ describe('CanvasAppExtensionBundle', () => {
     command.title = 'Mutated'
     tool.shortcut.key = 'x'
     panel.id = 'mutated-panel'
+    mediaImporter.createItems = () => []
     textPasteImporter.createItems = () => []
 
     expect(snapshot.customCommands[0]?.title).toBe('publish')
@@ -146,6 +169,7 @@ describe('CanvasAppExtensionBundle', () => {
     expect(snapshot.customItemRenderers.risk).toBe(renderRisk)
     expect(snapshot.customItemValidators.risk).toBe(validateRisk)
     expect(snapshot.inspectorPanels[0]?.id).toBe('risk-panel')
+    expect(snapshot.mediaImporters[0]?.createItems({} as never)).toBeNull()
     expect(snapshot.textPasteImporters[0]?.createItems({} as never)).toBeNull()
     expect(Object.isFrozen(snapshot)).toBe(true)
     expect(Object.isFrozen(snapshot.customCommands)).toBe(true)
@@ -156,6 +180,7 @@ describe('CanvasAppExtensionBundle', () => {
     expect(Object.isFrozen(snapshot.customItemRenderers)).toBe(true)
     expect(Object.isFrozen(snapshot.customItemValidators)).toBe(true)
     expect(Object.isFrozen(snapshot.inspectorPanels[0])).toBe(true)
+    expect(Object.isFrozen(snapshot.mediaImporters[0])).toBe(true)
     expect(Object.isFrozen(snapshot.textPasteImporters[0])).toBe(true)
   })
 })
@@ -183,6 +208,13 @@ function createPanel(id: string) {
   return {
     id,
     render: () => null,
+  }
+}
+
+function createMediaImporter(id: string): CanvasMediaImporter {
+  return {
+    id,
+    createItems: () => null,
   }
 }
 

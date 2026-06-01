@@ -119,6 +119,16 @@ describe('CanvasAppCustomItemModules validation', () => {
 
     expect(() =>
       defineRiskModule({
+        mediaImporters: [
+          {
+            id: 'risk-media',
+          },
+        ],
+      } as unknown as Partial<CanvasAppCustomItemModule>),
+    ).toThrow('Canvas app media importer risk-media requires createItems')
+
+    expect(() =>
+      defineRiskModule({
         textPasteImporters: [
           {
             id: 'risk-paste',

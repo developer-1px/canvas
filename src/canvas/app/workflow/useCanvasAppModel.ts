@@ -115,6 +115,7 @@ export function useCanvasAppModel({
 
   useCanvasAppLinkPreviewImportModel({
     ...affordance.linkPreview,
+    mediaImporters: appAssembly.extension.mediaImporters,
     ...workspace.linkPreview,
     ...stageElement.linkPreview,
   })

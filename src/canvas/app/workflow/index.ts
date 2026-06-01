@@ -49,6 +49,11 @@ export type {
   CanvasAppInspectorPanelView,
 } from '../affordances/editing/inspector/CanvasAppInspectorPanels'
 export type {
+  CanvasMediaImporter,
+  CanvasMediaImporterContext,
+  CanvasMediaImportSource,
+} from '../affordances/io/media/CanvasMediaImporters'
+export type {
   CanvasTextPasteImporter,
   CanvasTextPasteImporterContext,
 } from '../affordances/io/text-paste/CanvasTextPasteImporters'

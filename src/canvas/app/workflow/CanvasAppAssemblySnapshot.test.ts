@@ -10,10 +10,11 @@ import type {
   CanvasAppAssembly,
   CanvasAppComponentRendererStrategy,
   CanvasAppCustomItemModuleCreationTool,
-  CanvasTextPasteImporter,
   CanvasAppInspectorPanel,
   CanvasAppItemLayerAdapter,
   CanvasAppStageAdapter,
+  CanvasMediaImporter,
+  CanvasTextPasteImporter,
 } from './index'
 
 describe('CanvasAppAssembly snapshots', () => {
@@ -53,6 +54,10 @@ describe('CanvasAppAssembly snapshots', () => {
     }
     const textPasteImporter: CanvasTextPasteImporter = {
       id: 'risk-paste',
+      createItems: () => null,
+    }
+    const mediaImporter: CanvasMediaImporter = {
+      id: 'risk-media',
       createItems: () => null,
     }
     const initialItems = [
@@ -123,6 +128,7 @@ describe('CanvasAppAssembly snapshots', () => {
       inspectorPanels: [customInspectorPanel],
       itemAdapters,
       itemLayerAdapter,
+      mediaImporters: [mediaImporter],
       stageAdapter,
       textPasteImporters: [textPasteImporter],
     })
@@ -138,6 +144,7 @@ describe('CanvasAppAssembly snapshots', () => {
       throw new Error('mutated command')
     }
     customInspectorPanel.render = () => 'mutated'
+    mediaImporter.createItems = () => []
     textPasteImporter.createItems = () => []
     initialItems[0].x = 999
     initialItems.push({
@@ -171,6 +178,7 @@ describe('CanvasAppAssembly snapshots', () => {
       title: 'Publish risk',
     })
     expect(assembly.customCommands[0]?.run).toBe(customCommandRun)
+    expect(assembly.mediaImporters[0]?.createItems({} as never)).toBeNull()
     expect(assembly.textPasteImporters[0]?.createItems({} as never)).toBeNull()
     expect(assembly.inspectorPanels.find((panel) =>
       panel.id === 'risk-meta'
@@ -210,6 +218,7 @@ describe('CanvasAppAssembly snapshots', () => {
     expect(Object.isFrozen(assembly.customCommands)).toBe(true)
     expect(Object.isFrozen(assembly.customCommands[0])).toBe(true)
     expect(Object.isFrozen(assembly.customCreationTools[0]?.shortcut)).toBe(true)
+    expect(Object.isFrozen(assembly.mediaImporters[0])).toBe(true)
     expect(Object.isFrozen(assembly.componentPresentationRenderers)).toBe(true)
     expect(Object.isFrozen(assembly.customItemValidators)).toBe(true)
     expect(Object.isFrozen(assembly.initialItems)).toBe(true)

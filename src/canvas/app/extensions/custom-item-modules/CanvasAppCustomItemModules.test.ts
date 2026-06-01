@@ -36,6 +36,10 @@ describe('CanvasAppCustomItemModules assembly seam', () => {
           render: ({ selection }) => selection.length,
         },
       ],
+      mediaImporters: [{
+        id: 'risk-media',
+        createItems: () => [],
+      }],
       textPasteImporters: [{
         id: 'risk-paste',
         createItems: () => [],
@@ -76,6 +80,9 @@ describe('CanvasAppCustomItemModules assembly seam', () => {
     expect(assembly.inspectorPanels.map((panel) => panel.id)).toEqual([
       'risk-meta',
     ])
+    expect(assembly.mediaImporters.map((importer) => importer.id)).toEqual([
+      'risk-media',
+    ])
     expect(assembly.textPasteImporters.map((importer) => importer.id)).toEqual([
       'risk-paste',
     ])
@@ -101,6 +108,7 @@ describe('CanvasAppCustomItemModules assembly seam', () => {
     expect(assembly.customCreationTools).toEqual([])
     expect(assembly.customItemRenderers).toEqual({})
     expect(assembly.customItemValidators).toEqual({})
+    expect(assembly.mediaImporters).toEqual([])
     expect(assembly.textPasteImporters).toEqual([])
   })
 

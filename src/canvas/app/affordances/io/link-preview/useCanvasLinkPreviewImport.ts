@@ -8,16 +8,20 @@ import { isCanvasKeyboardTypingTarget } from '../../interaction/keyboard/CanvasK
 import type { CanvasAppStageElement } from '../../../rendering/stage/CanvasAppStageElement'
 import type { CommitCanvasItemsChange } from '../../../workflow/CanvasWorkflowContract'
 import {
-  getCanvasLinkPreviewInsertCenter,
-  getCanvasLinkPreviewSourceFromDataTransfer,
-  insertCanvasLinkPreviewSource,
-  type CanvasLinkPreviewImportSource,
-} from './CanvasLinkPreviewImport'
+  getCanvasMediaInsertPosition,
+  getCanvasMediaSourceFromDataTransfer,
+  insertCanvasMediaSource,
+} from '../media/CanvasMediaImport'
+import type {
+  CanvasMediaImporter,
+  CanvasMediaImportSource,
+} from '../media/CanvasMediaImporters'
 
 export type CanvasLinkPreviewImportInput = {
   commitItemsChange: CommitCanvasItemsChange
   config: CanvasAffordanceConfig
   createId: (prefix: string) => string
+  mediaImporters: readonly CanvasMediaImporter[]
   selection: string[]
   stageElement: CanvasAppStageElement
   viewport: Viewport
@@ -27,34 +31,44 @@ export function useCanvasLinkPreviewImport({
   commitItemsChange,
   config,
   createId,
+  mediaImporters,
   selection,
   stageElement,
   viewport,
 }: CanvasLinkPreviewImportInput) {
-  const canImportLinkPreview = config.commands.paste
-  const insertLinkPreviewSource = useCallback(
+  const canImportMedia = config.commands.paste
+  const insertMediaSource = useCallback(
     (
-      source: CanvasLinkPreviewImportSource,
+      source: CanvasMediaImportSource,
       event?: { clientX: number; clientY: number },
     ) =>
-      insertCanvasLinkPreviewSource({
-        center: getCanvasLinkPreviewInsertCenter({
-          event,
-          stageElement,
-          viewport,
-        }),
+      insertCanvasMediaSource({
         context: {
           commitItemsChange,
           createId,
           selection,
         },
+        importers: mediaImporters,
+        position: getCanvasMediaInsertPosition({
+          event,
+          stageElement,
+          viewport,
+        }),
         source,
+        viewport,
       }),
-    [commitItemsChange, createId, selection, stageElement, viewport],
+    [
+      commitItemsChange,
+      createId,
+      mediaImporters,
+      selection,
+      stageElement,
+      viewport,
+    ],
   )
 
   useEffect(() => {
-    if (!canImportLinkPreview) {
+    if (!canImportMedia) {
       return undefined
     }
 
@@ -63,7 +77,7 @@ export function useCanvasLinkPreviewImport({
         return
       }
 
-      const source = getCanvasLinkPreviewSourceFromDataTransfer(
+      const source = getCanvasMediaSourceFromDataTransfer(
         event.clipboardData,
       )
 
@@ -72,7 +86,7 @@ export function useCanvasLinkPreviewImport({
       }
 
       event.preventDefault()
-      insertLinkPreviewSource(source)
+      insertMediaSource(source)
     }
 
     window.addEventListener('paste', handlePaste)
@@ -80,10 +94,10 @@ export function useCanvasLinkPreviewImport({
     return () => {
       window.removeEventListener('paste', handlePaste)
     }
-  }, [canImportLinkPreview, insertLinkPreviewSource])
+  }, [canImportMedia, insertMediaSource])
 
   useEffect(() => {
-    if (!canImportLinkPreview) {
+    if (!canImportMedia) {
       return undefined
     }
 
@@ -92,7 +106,7 @@ export function useCanvasLinkPreviewImport({
         return
       }
 
-      if (getCanvasLinkPreviewSourceFromDataTransfer(event.dataTransfer)) {
+      if (getCanvasMediaSourceFromDataTransfer(event.dataTransfer)) {
         event.preventDefault()
       }
     }
@@ -102,7 +116,7 @@ export function useCanvasLinkPreviewImport({
         return
       }
 
-      const source = getCanvasLinkPreviewSourceFromDataTransfer(
+      const source = getCanvasMediaSourceFromDataTransfer(
         event.dataTransfer,
       )
 
@@ -111,7 +125,7 @@ export function useCanvasLinkPreviewImport({
       }
 
       event.preventDefault()
-      insertLinkPreviewSource(source, event)
+      insertMediaSource(source, event)
     }
 
     window.addEventListener('dragover', handleDragOver)
@@ -121,5 +135,5 @@ export function useCanvasLinkPreviewImport({
       window.removeEventListener('dragover', handleDragOver)
       window.removeEventListener('drop', handleDrop)
     }
-  }, [canImportLinkPreview, insertLinkPreviewSource])
+  }, [canImportMedia, insertMediaSource])
 }

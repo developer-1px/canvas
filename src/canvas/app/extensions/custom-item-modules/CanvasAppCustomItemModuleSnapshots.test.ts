@@ -42,6 +42,12 @@ describe('CanvasAppCustomItemModules snapshots', () => {
       id: 'risk-paste',
       createItems: () => null,
     }
+    const mediaImporter: NonNullable<
+      CanvasAppCustomItemModule['mediaImporters']
+    >[number] = {
+      id: 'risk-media',
+      createItems: () => null,
+    }
     const moduleInput: CanvasAppCustomItemModule = {
       id: 'risk',
       presentation: 'risk-node',
@@ -50,6 +56,7 @@ describe('CanvasAppCustomItemModules snapshots', () => {
       customCommands: [command],
       customCreationTools: [creationTool],
       inspectorPanels: [inspectorPanel],
+      mediaImporters: [mediaImporter],
       textPasteImporters: [textPasteImporter],
     }
 
@@ -69,6 +76,7 @@ describe('CanvasAppCustomItemModules snapshots', () => {
       data: { severity: 'high' },
     })
     inspectorPanel.render = () => 'mutated'
+    mediaImporter.createItems = () => []
     textPasteImporter.createItems = () => []
 
     const assembly = createCanvasAppCustomItemModuleAssembly([module])
@@ -103,6 +111,7 @@ describe('CanvasAppCustomItemModules snapshots', () => {
       selectedItems: [],
       selection: ['risk-1'],
     })).toBe(1)
+    expect(assembly.mediaImporters[0]?.createItems({} as never)).toBeNull()
     expect(assembly.textPasteImporters[0]?.createItems({} as never)).toBeNull()
     expect(Object.isFrozen(module)).toBe(true)
     expect(Object.isFrozen(module.customCommands)).toBe(true)
@@ -113,6 +122,7 @@ describe('CanvasAppCustomItemModules snapshots', () => {
       true,
     )
     expect(Object.isFrozen(module.inspectorPanels?.[0])).toBe(true)
+    expect(Object.isFrozen(module.mediaImporters?.[0])).toBe(true)
     expect(Object.isFrozen(module.textPasteImporters?.[0])).toBe(true)
   })
 
@@ -154,10 +164,17 @@ describe('CanvasAppCustomItemModules snapshots', () => {
       id: 'risk-paste',
       createItems: () => null,
     }
+    const mediaImporter: NonNullable<
+      CanvasAppCustomItemModule['mediaImporters']
+    >[number] = {
+      id: 'risk-media',
+      createItems: () => null,
+    }
     const module = defineRiskModule({
       customCommands: [command],
       customCreationTools: [creationTool],
       inspectorPanels: [inspectorPanel],
+      mediaImporters: [mediaImporter],
       textPasteImporters: [textPasteImporter],
     })
 
@@ -176,6 +193,7 @@ describe('CanvasAppCustomItemModules snapshots', () => {
       data: { severity: 'high' },
     })
     inspectorPanel.render = () => 'mutated'
+    mediaImporter.createItems = () => []
     textPasteImporter.createItems = () => []
 
     expect(assembly.customCommands[0]).toMatchObject({
@@ -199,6 +217,7 @@ describe('CanvasAppCustomItemModules snapshots', () => {
       selectedItems: [],
       selection: ['risk-1'],
     })).toBe(1)
+    expect(assembly.mediaImporters[0]?.createItems({} as never)).toBeNull()
     expect(assembly.textPasteImporters[0]?.createItems({} as never)).toBeNull()
     expect(Object.isFrozen(assembly)).toBe(true)
     expect(Object.isFrozen(assembly.customCommands)).toBe(true)
@@ -211,6 +230,7 @@ describe('CanvasAppCustomItemModules snapshots', () => {
     expect(Object.isFrozen(assembly.customItemRenderers)).toBe(true)
     expect(Object.isFrozen(assembly.customItemValidators)).toBe(true)
     expect(Object.isFrozen(assembly.inspectorPanels[0])).toBe(true)
+    expect(Object.isFrozen(assembly.mediaImporters[0])).toBe(true)
     expect(Object.isFrozen(assembly.textPasteImporters[0])).toBe(true)
   })
 

@@ -8,6 +8,9 @@ import { assertCanvasAppInspectorPanels } from '../../affordances/editing/inspec
 import {
   assertCanvasTextPasteImporters,
 } from '../../affordances/io/text-paste/CanvasTextPasteImporters'
+import {
+  assertCanvasMediaImporters,
+} from '../../affordances/io/media/CanvasMediaImporters'
 import { assertCanvasAppCustomCreationTools } from '../custom-tools/CanvasAppCustomCreationToolContracts'
 import type { CanvasAppCustomItemModuleAssembly } from './CanvasAppCustomItemModuleAssembly'
 import type {
@@ -51,6 +54,7 @@ export function assertCanvasAppCustomItemModule(
   })
   assertCanvasAppCustomCommands(module.customCommands ?? [])
   assertCanvasAppCustomItemModuleCreationTools(module)
+  assertCanvasMediaImporters(module.mediaImporters ?? [])
   assertCanvasTextPasteImporters(module.textPasteImporters ?? [])
   assertCanvasAppExtensionId({
     id: module.presentation,
