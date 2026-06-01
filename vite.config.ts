@@ -40,7 +40,7 @@ export default defineConfig({
       allow: [canvasRoot, zodCrudSourceRoot],
     },
     host: '::',
-    port: 5173,
+    port: 53175,
     strictPort: true,
   },
 })

@@ -71,7 +71,7 @@ export function useCanvasVotingSessionModel({
 
   return {
     stamp: {
-      active: visible && session.status === 'active',
+      active: session.status === 'active',
       canCastVote,
       votesCast: session.votesCast,
       votesPerParticipant: session.votesPerParticipant,

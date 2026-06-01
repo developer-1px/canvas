@@ -12,6 +12,7 @@ export type CanvasKeyboardCommandHandlers = {
   cutSelection: () => void
   deleteSelection: () => void
   duplicateSelection: () => void
+  editSelection: () => void
   groupSelection: () => void
   lockSelection: () => void
   moveSelection: (dx: number, dy: number) => void
@@ -41,6 +42,9 @@ const CANVAS_KEYBOARD_COMMAND_INTENT_DISPATCH =
     },
     'duplicate-selection': ({ handlers }) => {
       handlers.duplicateSelection()
+    },
+    'edit-selection': ({ handlers }) => {
+      handlers.editSelection()
     },
     'group-selection': ({ handlers }) => {
       handlers.groupSelection()

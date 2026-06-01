@@ -7,10 +7,14 @@ import {
   AlignStartVertical,
   BetweenHorizontalStart,
   BetweenVerticalStart,
+  BringToFront,
   Copy,
   Group,
   Lock,
+  MoveDown,
+  MoveUp,
   Redo2,
+  SendToBack,
   Trash2,
   Undo2,
   Ungroup,
@@ -72,6 +76,22 @@ export function DistributeHorizontalIcon() {
 
 export function DistributeVerticalIcon() {
   return <CanvasIcon icon={BetweenVerticalStart} />
+}
+
+export function BringToFrontIcon() {
+  return <CanvasIcon icon={BringToFront} />
+}
+
+export function BringForwardIcon() {
+  return <CanvasIcon icon={MoveUp} />
+}
+
+export function SendBackwardIcon() {
+  return <CanvasIcon icon={MoveDown} />
+}
+
+export function SendToBackIcon() {
+  return <CanvasIcon icon={SendToBack} />
 }
 
 export function LockIcon() {

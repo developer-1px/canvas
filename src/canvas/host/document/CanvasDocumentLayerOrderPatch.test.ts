@@ -53,18 +53,11 @@ describe('CanvasDocumentLayerOrderPatch', () => {
         mode: 'bringForward',
         selection: ['root-a', 'b'],
       }),
-    ).toEqual([
-      {
-        op: 'replace',
-        path: '/1/children',
-        value: [children[0], children[2], children[1]],
-      },
-      {
-        op: 'replace',
-        path: '',
-        value: [reorderedGroup, rootItem, lastItem],
-      },
-    ])
+    ).toEqual([{
+      op: 'replace',
+      path: '',
+      value: [reorderedGroup, rootItem, lastItem],
+    }])
   })
 
   it('returns an empty patch when sibling order is unchanged', () => {
@@ -75,6 +68,30 @@ describe('CanvasDocumentLayerOrderPatch', () => {
         selection: ['a'],
       }),
     ).toEqual([])
+  })
+
+  it('keeps section layers anchored for non-section reorder patches', () => {
+    const section = sectionItem('section')
+    const items = [section, rect('a'), rect('b')]
+
+    expect(
+      createCanvasDocumentLayerOrderPatch({
+        items,
+        mode: 'sendToBack',
+        selection: ['a'],
+      }),
+    ).toEqual([])
+    expect(
+      createCanvasDocumentLayerOrderPatch({
+        items,
+        mode: 'bringToFront',
+        selection: ['a'],
+      }),
+    ).toEqual([{
+      op: 'replace',
+      path: '',
+      value: [section, items[2], items[1]],
+    }])
   })
 })
 
@@ -98,6 +115,23 @@ function group(id: string, children: CanvasItem[]): CanvasItem {
     id,
     type: 'group',
     w: 40,
+    x: 0,
+    y: 0,
+  }
+}
+
+function sectionItem(id: string): CanvasItem {
+  return {
+    accent: '#64748b',
+    body: '',
+    component: 'section',
+    fill: '#ffffff',
+    h: 120,
+    id,
+    stroke: '#94a3b8',
+    title: 'Section',
+    type: 'component',
+    w: 200,
     x: 0,
     y: 0,
   }

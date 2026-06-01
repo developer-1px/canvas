@@ -9,13 +9,15 @@ import {
 } from './CanvasDemoSvgStructuredComponentRenderer'
 import {
   CanvasDemoSvgCommandCenterComponent,
-  CanvasDemoSvgEvidenceComponent,
   CanvasDemoSvgGateStripComponent,
-  CanvasDemoSvgQueueComponent,
   CanvasDemoSvgReviewBoardComponent,
+  CanvasDemoSvgTraceMapComponent,
+} from './CanvasDemoSvgCommandCenterComponentRenderer'
+import {
+  CanvasDemoSvgEvidenceComponent,
+  CanvasDemoSvgQueueComponent,
   CanvasDemoSvgScorecardComponent,
   CanvasDemoSvgTimelineComponent,
-  CanvasDemoSvgTraceMapComponent,
 } from './CanvasDemoSvgReportComponentRenderer'
 import {
   CanvasDemoSvgCardComponent,

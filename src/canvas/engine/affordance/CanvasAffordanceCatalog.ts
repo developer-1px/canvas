@@ -119,6 +119,7 @@ export const CANVAS_AFFORDANCE_CONFIG_DEFAULTS = Object.freeze({
     cut: true,
     delete: true,
     duplicate: true,
+    editSelection: true,
     escape: true,
     fitAll: true,
     fitSelection: true,

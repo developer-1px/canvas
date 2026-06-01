@@ -1,6 +1,9 @@
 import { describe, expect, test } from 'vitest'
 import type { CanvasItem } from '../../entities'
-import { cloneCanvasItemsWithNewIds } from './CanvasItemCloneOperations'
+import {
+  cloneCanvasItemsWithNewIds,
+  duplicateCanvasSelection,
+} from './CanvasItemCloneOperations'
 
 const arrow: CanvasItem = {
   id: 'arrow-1',
@@ -61,4 +64,110 @@ describe('CanvasItemCloneOperations drawing items', () => {
       points: [{ x: 112, y: 116 }, { x: 212, y: 136 }],
     }])
   })
+
+  test('duplicates groups with new child ids and synced bounds', () => {
+    const createId = createSequenceId()
+
+    expect(
+      cloneCanvasItemsWithNewIds(
+        [
+          {
+            children: [
+              rect('rect-1', 10, 20),
+              rect('rect-2', 140, 60),
+            ],
+            h: 80,
+            id: 'group-1',
+            type: 'group',
+            w: 210,
+            x: 10,
+            y: 20,
+          },
+        ],
+        createId,
+        { x: 12, y: 16 },
+      ),
+    ).toEqual([
+      {
+        children: [
+          rect('rect-copy-2', 22, 36),
+          rect('rect-copy-3', 152, 76),
+        ],
+        h: 80,
+        id: 'group-copy-1',
+        type: 'group',
+        w: 210,
+        x: 22,
+        y: 36,
+      },
+    ])
+  })
+
+  test('duplicates a selected child inside its group', () => {
+    const items: CanvasItem[] = [
+      {
+        children: [
+          rect('rect-1', 10, 20),
+          rect('rect-2', 140, 60),
+        ],
+        h: 80,
+        id: 'group-1',
+        type: 'group',
+        w: 210,
+        x: 10,
+        y: 20,
+      },
+      rect('outside', 320, 40),
+    ]
+
+    expect(
+      duplicateCanvasSelection(
+        items,
+        ['rect-1'],
+        createSequenceId(),
+        { x: 12, y: 16 },
+      ),
+    ).toEqual({
+      clones: [rect('rect-copy-1', 22, 36)],
+      items: [
+        {
+          children: [
+            rect('rect-1', 10, 20),
+            rect('rect-copy-1', 22, 36),
+            rect('rect-2', 140, 60),
+          ],
+          h: 80,
+          id: 'group-1',
+          type: 'group',
+          w: 210,
+          x: 10,
+          y: 20,
+        },
+        rect('outside', 320, 40),
+      ],
+      selection: ['rect-copy-1'],
+    })
+  })
 })
+
+function rect(id: string, x: number, y: number): CanvasItem {
+  return {
+    fill: '#ffffff',
+    h: 40,
+    id,
+    stroke: '#111827',
+    type: 'rect',
+    w: 80,
+    x,
+    y,
+  }
+}
+
+function createSequenceId() {
+  let count = 0
+
+  return (prefix: string) => {
+    count += 1
+    return `${prefix}-copy-${count}`
+  }
+}

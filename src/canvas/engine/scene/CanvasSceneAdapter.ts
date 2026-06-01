@@ -2,6 +2,7 @@ import type { Bounds } from '../../core'
 
 export type CanvasSceneEntry = {
   bounds: Bounds
+  canResize?: boolean
   id: string
   isGroup: boolean
   parentId: string | null
@@ -9,6 +10,7 @@ export type CanvasSceneEntry = {
 }
 
 export type CanvasSceneAdapter = {
+  canResizeSelection?: (ids: string[]) => boolean
   entries: CanvasSceneEntry[]
   getBounds: (ids: string[]) => Bounds | null
   getParentId: (id: string) => string | null
@@ -23,6 +25,9 @@ export function createCanvasSceneAdapter(
 
   return {
     entries,
+    canResizeSelection: (ids) =>
+      ids.length > 0 &&
+      ids.every((id) => entryById.get(id)?.canResize !== false),
     getBounds: (ids) => getSceneEntriesBounds(entries, new Set(ids)),
     getParentId: (id) => entryById.get(id)?.parentId ?? null,
     getSelectedAncestorId: (id, selectedIds) => {

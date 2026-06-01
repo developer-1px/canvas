@@ -42,6 +42,13 @@ export type CanvasCommandAdapter<TItem extends CanvasCommandItem> = {
     items: TItem[]
     offset: CanvasCommandOffset
   }) => TItem[]
+  duplicateSelection?: (input: {
+    createId: (prefix: string) => string
+    items: TItem[]
+    offset: CanvasCommandOffset
+    selection: string[]
+    sourceIds: string[]
+  }) => DuplicateCanvasCommandResult<TItem>
   deleteSelection: (input: { items: TItem[]; selection: string[] }) => TItem[]
   groupSelection: (input: {
     groupId: string

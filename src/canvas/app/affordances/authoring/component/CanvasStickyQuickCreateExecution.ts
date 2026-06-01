@@ -1,4 +1,5 @@
 import type {
+  CanvasComponentItem,
   CanvasItem,
   CanvasSide,
   EditingText,
@@ -71,16 +72,19 @@ export function quickCreateCanvasSticky({
 
   const sourceBounds = itemReadModel.getItemBounds(source)
   const template = componentLibrary.getTemplate(CANVAS_STICKY_COMPONENT_KIND)
-  const item = applyCanvasStickyComponentCreationDefaults(
-    componentLibrary.createItem({
-      id: createId('component'),
-      point: getCanvasStickyQuickCreateTargetPoint({
-        direction,
-        sourceBounds,
-        targetSize: template,
+  const item = applyCanvasStickyQuickCreateSourceStyle(
+    applyCanvasStickyComponentCreationDefaults(
+      componentLibrary.createItem({
+        id: createId('component'),
+        point: getCanvasStickyQuickCreateTargetPoint({
+          direction,
+          sourceBounds,
+          targetSize: template,
+        }),
+        templateId: CANVAS_STICKY_COMPONENT_KIND,
       }),
-      templateId: CANVAS_STICKY_COMPONENT_KIND,
-    }),
+    ),
+    source,
   )
   const connector = createCanvasStickyQuickCreateConnector({
     creationAdapter,
@@ -104,6 +108,22 @@ export function quickCreateCanvasSticky({
   setTool('select')
 
   return true
+}
+
+function applyCanvasStickyQuickCreateSourceStyle(
+  item: CanvasComponentItem,
+  source: CanvasComponentItem,
+): CanvasComponentItem {
+  if (!isCanvasStickyComponentItem(item) || !isCanvasStickyComponentItem(source)) {
+    return item
+  }
+
+  return {
+    ...item,
+    accent: source.accent,
+    fill: source.fill,
+    stroke: source.stroke,
+  }
 }
 
 export function getCanvasStickyQuickCreateControlPoints({

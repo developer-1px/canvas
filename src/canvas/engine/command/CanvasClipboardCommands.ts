@@ -44,6 +44,18 @@ export function duplicateCanvasCommand<TItem extends CanvasCommandItem>({
     return null
   }
 
+  if (adapter.duplicateSelection) {
+    const result = adapter.duplicateSelection({
+      createId,
+      items,
+      offset,
+      selection,
+      sourceIds,
+    })
+
+    return result.clones.length > 0 ? result : null
+  }
+
   const clones = cloneCanvasCommandItems({
     adapter,
     createId,

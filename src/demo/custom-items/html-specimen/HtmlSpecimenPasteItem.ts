@@ -6,8 +6,6 @@ import {
   createHtmlSpecimenDataFromPastedText,
 } from './HtmlSpecimenPasteArtifact'
 
-const HTML_SPECIMEN_CHROME_WIDTH = 40
-const HTML_SPECIMEN_CHROME_HEIGHT = 44
 const HTML_SPECIMEN_MIN_WIDTH = 340
 const HTML_SPECIMEN_MIN_HEIGHT = 220
 
@@ -35,20 +33,14 @@ export function createHtmlSpecimenItemFromPastedText({
 
   return {
     data,
-    h: Math.max(
-      HTML_SPECIMEN_MIN_HEIGHT,
-      data.viewportHeight + HTML_SPECIMEN_CHROME_HEIGHT,
-    ),
+    h: Math.max(HTML_SPECIMEN_MIN_HEIGHT, data.viewportHeight),
     id: createId('html-specimen'),
     kind: 'html-specimen',
     locked: false,
     presentation: 'html-specimen',
     title: 'HTML specimen',
     type: 'custom',
-    w: Math.max(
-      HTML_SPECIMEN_MIN_WIDTH,
-      data.viewportWidth + HTML_SPECIMEN_CHROME_WIDTH,
-    ),
+    w: Math.max(HTML_SPECIMEN_MIN_WIDTH, data.viewportWidth),
     x: position.x,
     y: position.y,
   }

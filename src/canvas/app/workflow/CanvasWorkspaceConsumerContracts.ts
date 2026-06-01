@@ -100,6 +100,15 @@ export type CanvasWorkspaceInspectorContext = {
   selection: string[]
 }
 
+export type CanvasWorkspaceSelectionModelContext = {
+  commitItemsChange: CommitCanvasItemsChange
+  commitSelection: CommitCanvasSelection
+  createId: (prefix: string) => string
+  itemReadModel: CanvasAppItemReadModel
+  items: CanvasItem[]
+  selection: string[]
+}
+
 export type CanvasWorkspaceImageContext =
   CanvasWorkspaceSelectionContext & {
     commitItemsChange: CommitCanvasItemsChange
@@ -146,6 +155,7 @@ export type CanvasWorkspaceKeyboardContext = {
   command: {
     commitSelection: CommitCanvasSelection
   }
+  itemReadModel: CanvasAppItemReadModel
   selection: string[]
 }
 
@@ -201,6 +211,7 @@ export type CanvasWorkspaceConsumerModel = {
   keyboard: CanvasWorkspaceKeyboardContext
   linkPreview: CanvasWorkspaceLinkPreviewContext
   pointer: CanvasWorkspacePointerContext
+  selection: CanvasWorkspaceSelectionModelContext
   stage: CanvasWorkspaceStageContext
   stamp: CanvasWorkspaceStampContext
   table: CanvasWorkspaceTableContext

@@ -1,26 +1,21 @@
 # 사용성 루프 기록
 
-범위: 로컬 캔버스 데모. 인앱 브라우저 연결은 실패해 코드 검사, dev server HTTP 확인, `pnpm lint`, `pnpm build`를 평가 근거로 사용했다.
+범위: headless에 가까운 canvas affordance engine demo.
 
-주의: 아래 10회는 전문가 평가 루프다. 실제 사용자 검증은
-`docs/usability-test.md`와 `docs/usability-results.md` 기준으로 별도 진행한다.
+주의: 아래 기록은 기본 demo가 제품 UI가 아니라 engine 부품 검증용이어야 한다는 정리 기준을 따른다.
 
-| 회차 | 사용성 테스트 | 인터뷰 메모 | 개선 | 평가 |
-| --- | --- | --- | --- | --- |
-| 1 | 마우스만으로 되돌리기/다시 실행 찾기 | 실행 취소가 키보드에만 숨어 있다. | Undo/Redo 아이콘 버튼 추가 | 툴바에서 명령 노출, 빈 히스토리에서는 비활성 |
-| 2 | 선택 항목 삭제 | Delete 키를 모르면 삭제 경로가 없다. | Delete 아이콘 버튼 추가 | 선택 없음 상태에서 비활성 |
-| 3 | 선택 항목 복제 | 복제 단축키를 추측하기 어렵다. | Duplicate 아이콘 버튼 추가 | 선택 없음 상태에서 비활성 |
-| 4 | 현재 선택 상태 확인 | 선택 수를 외곽선만으로 판단해야 한다. | 하단 상태 바에 선택 개수 표시 | 초기 상태에서 `2 selected` 노출 |
-| 5 | 현재 도구 확인 | 활성 버튼 외에 작업 상태 문구가 없다. | 상태 바에 도구/제스처 표시 | 이동/리사이즈/팬 상태를 짧게 표시 |
-| 6 | 그룹/언그룹 가능 여부 확인 | 가능한 명령과 불가능한 명령이 섞여 보인다. | 선택 기반 명령 비활성화 유지, 명령군 분리 | 툴바 구획이 명령 종류별로 분리됨 |
-| 7 | 단축키 발견 | 화면 설명을 늘리면 데모가 산만해진다. | 버튼 `title`에 V/H/R/T 단축키만 추가 | 가시 설명 없이 hover 정보 제공 |
-| 8 | 좁은 화면에서 조작 | 버튼이 늘어나면 모바일 폭에서 밀릴 수 있다. | 툴바 wrap, 상태 바 위치 보정 | 320px 이상에서 컨트롤 겹침 위험 감소 |
-| 9 | 줌 컨트롤 접근성 | 줌 컨트롤이 툴바로 선언되지 않았다. | 줌 컨트롤에 `role="toolbar"` 추가 | 보조기술에서 별도 툴바로 탐색 가능 |
-| 10 | 저장소 진입 후 실행 | Vite 기본 README가 데모와 무관하다. | README를 실행/검증 명령만 남기도록 축소 | 불필요한 설명 제거 |
+| 회차 | 점검 | 개선 | 평가 |
+| --- | --- | --- | --- |
+| 1 | 기본 화면이 design-system/product demo로 읽힘 | default seed를 shape/text/drawing으로 교체 | engine 부품이 첫 화면에 드러남 |
+| 2 | product rail/source/review UI가 목적을 흐림 | demo shell에서 rail과 dock 장식 제거 | stage와 최소 controls만 남음 |
+| 3 | DOM/CSS inspector가 core처럼 보임 | HTML/CSS E2E를 legacy consumer 검증으로 분류 | default E2E가 engine demo만 검증 |
+| 4 | 보편 부품과 제품 feature가 섞임 | `docs/affordance-inventory.md`에 keep/legacy/drop 분류 추가 | 다음 정리 기준이 남음 |
 
 검증:
 
-- `curl -I http://127.0.0.1:5173/` -> 200 OK
+- `pnpm exec tsc -b --pretty false` -> pass
+- focused Vitest -> pass
+- `pnpm test:e2e` -> pass
 - `pnpm lint` -> pass
 - `pnpm build` -> pass
-- Headless Chrome screenshot: 1280x800, 360x720에서 툴바/상태 바 표시 확인
+- `http://localhost:53175/` screenshot 확인

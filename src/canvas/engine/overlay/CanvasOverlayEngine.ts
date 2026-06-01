@@ -106,6 +106,7 @@ export function createCanvasOverlayState({
   viewport: Viewport
 }): CanvasOverlayState {
   const selectedBounds = scene.getBounds(selection)
+  const canResizeSelection = scene.canResizeSelection?.(selection) ?? true
 
   return {
     alignmentGuides: config.overlays.alignmentGuides
@@ -123,7 +124,7 @@ export function createCanvasOverlayState({
     marquee: config.overlays.marquee ? marquee : null,
     presence: config.overlays.presence ? [...presence] : [],
     resizeHandles:
-      config.overlays.resizeHandles && selectedBounds
+      config.overlays.resizeHandles && selectedBounds && canResizeSelection
         ? RESIZE_HANDLES.map((handle) => ({
             handle,
             point: handlePoint(selectedBounds, handle),

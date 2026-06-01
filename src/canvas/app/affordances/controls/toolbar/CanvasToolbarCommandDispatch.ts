@@ -40,6 +40,9 @@ const CANVAS_TOOLBAR_COMMAND_ACTION_RUNNERS = Object.freeze({
   redo: ({ handlers }) => {
     handlers.onRedo()
   },
+  reorder: ({ action, handlers }) => {
+    handlers.onReorder(action.mode)
+  },
   undo: ({ handlers }) => {
     handlers.onUndo()
   },

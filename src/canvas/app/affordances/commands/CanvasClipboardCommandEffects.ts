@@ -40,6 +40,8 @@ const CANVAS_CLIPBOARD_COMMAND_EFFECT_APPLIERS = Object.freeze({
     applyCanvasClipboardCutCopyOnlyEffect({ context, effect }),
   'cut-selection': ({ context, effect }) =>
     applyCanvasClipboardCutSelectionEffect({ context, effect }),
+  'transform-items': ({ context, effect }) =>
+    applyCanvasClipboardTransformItemsEffect({ context, effect }),
 } satisfies CanvasClipboardCommandEffectAppliers)
 
 export function applyCanvasClipboardCommandEffect({
@@ -98,6 +100,33 @@ function applyCanvasClipboardAddItemsEffect({
     executed: true,
     nextPasteIndex: effect.nextPasteIndex,
   }
+}
+
+function applyCanvasClipboardTransformItemsEffect({
+  context,
+  effect,
+}: {
+  context: CanvasClipboardCommandEffectContext
+  effect: Extract<CanvasClipboardCommandEffect, { kind: 'transform-items' }>
+}): CanvasClipboardCommandExecutionResult {
+  const didCommit = context.commitItemsChange(
+    {
+      afterItems: effect.afterItems,
+      beforeItems: effect.beforeItems,
+      type: 'transform',
+    },
+    {
+      after: effect.afterSelection,
+      before: context.selection,
+    },
+  )
+
+  return didCommit
+    ? {
+        clonedItems: effect.clonedItems,
+        executed: true,
+      }
+    : EMPTY_CLIPBOARD_COMMAND_RESULT
 }
 
 function applyCanvasClipboardCutSelectionEffect({

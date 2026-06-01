@@ -6,6 +6,11 @@ describe('CanvasKeyboardCommandShortcutCatalog', () => {
     expect(CANVAS_KEYBOARD_COMMAND_SHORTCUTS).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
+          label: 'edit selection',
+          shortcut: { key: 'Enter' },
+          shortcutId: 'editSelection',
+        }),
+        expect.objectContaining({
           label: 'undo history',
           modifier: 'mod',
           shortcut: { key: 'z' },

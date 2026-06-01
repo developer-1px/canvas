@@ -5,7 +5,9 @@ import type {
   CanvasItem,
 } from '../../entities'
 import {
+  getCanvasItemRotation,
   getCanvasItemBounds,
+  getCanvasItemRotationTransform,
 } from '../../host'
 import { CanvasDemoSvgItemFrame } from './CanvasDemoSvgItemFrame'
 import { getCanvasDemoSvgItemRenderRoute } from './CanvasDemoSvgItemRenderRouting'
@@ -44,10 +46,16 @@ export function renderCanvasDemoSvgItem({
   outlineIds,
   selected,
 }: CanvasDemoSvgItemRenderArgs) {
+  if (item.hidden) {
+    return null
+  }
+
   const isSelected = selected.has(item.id)
   const isLocked = locked || item.locked === true
   const outlined = outlineIds.has(item.id)
   const bounds = getCanvasItemBounds(item)
+  const rotation = getCanvasItemRotation(item)
+  const rotationTransform = getCanvasItemRotationTransform(item)
   const route = getCanvasDemoSvgItemRenderRoute({
     bounds,
     componentPresentationRenderers,
@@ -85,6 +93,8 @@ export function renderCanvasDemoSvgItem({
       locked={isLocked}
       outlined={outlined}
       outlineKind={route.outlineKind}
+      rotation={rotation}
+      rotationTransform={rotationTransform}
       selected={isSelected}
       onDoubleClick={route.onDoubleClick}
       onItemPointerDown={onItemPointerDown}

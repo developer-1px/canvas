@@ -28,16 +28,20 @@ describe('CanvasClipboardCommandResultEffects', () => {
     })
   })
 
-  it('maps duplicate results to add-items effects', () => {
+  it('maps duplicate results to transform-items effects', () => {
     expect(createCanvasClipboardDuplicateResultEffect({
+      beforeItems: [],
       result: {
         clones: [rect1, rect2],
+        items: [rect1, rect2],
         selection: ['rect-1', 'rect-2'],
       },
     })).toEqual({
+      afterItems: [rect1, rect2],
       afterSelection: ['rect-1', 'rect-2'],
-      items: [rect1, rect2],
-      kind: 'add-items',
+      beforeItems: [],
+      clonedItems: [rect1, rect2],
+      kind: 'transform-items',
     })
   })
 

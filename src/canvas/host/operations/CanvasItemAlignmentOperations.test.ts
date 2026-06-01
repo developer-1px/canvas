@@ -2,7 +2,9 @@ import { describe, expect, test } from 'vitest'
 import type { CanvasItem } from '../model'
 import {
   alignCanvasSelection,
+  canTidyCanvasSelection,
   distributeCanvasSelection,
+  tidyCanvasSelection,
 } from './CanvasItemAlignmentOperations'
 
 function rect(id: string, x: number, y: number, w = 20, h = 20): CanvasItem {
@@ -54,6 +56,23 @@ describe('CanvasItemAlignmentOperations', () => {
     ])
   })
 
+  test.each([
+    ['alignRight', [{ id: 'a', x: 70, y: 20 }, { id: 'b', x: 50, y: 40 }]],
+    ['alignTop', [{ id: 'a', x: 10, y: 20 }, { id: 'b', x: 50, y: 20 }]],
+    ['alignMiddle', [{ id: 'a', x: 10, y: 50 }, { id: 'b', x: 50, y: 30 }]],
+    ['alignBottom', [{ id: 'a', x: 10, y: 80 }, { id: 'b', x: 50, y: 40 }]],
+  ] as const)('supports %s', (mode, expected) => {
+    expect(
+      positions(
+        alignCanvasSelection(
+          [rect('a', 10, 20, 20, 20), rect('b', 50, 40, 40, 60)],
+          ['a', 'b'],
+          mode,
+        ),
+      ),
+    ).toEqual(expected)
+  })
+
   test('distributes selected siblings horizontally', () => {
     expect(
       positions(
@@ -99,5 +118,60 @@ describe('CanvasItemAlignmentOperations', () => {
     expect(alignCanvasSelection(items, ['child', 'sibling'], 'alignLeft')).toBe(
       items,
     )
+  })
+
+  test('tidies selected non-drawing siblings into a compact grid', () => {
+    const arrow: CanvasItem = {
+      end: { x: 280, y: 120 },
+      h: 40,
+      id: 'arrow-1',
+      start: { x: 220, y: 80 },
+      stroke: '#000',
+      strokeWidth: 2,
+      type: 'arrow',
+      w: 60,
+      x: 220,
+      y: 80,
+    }
+    const result = tidyCanvasSelection(
+      [
+        rect('a', 120, 40, 20, 20),
+        arrow,
+        rect('b', 10, 20, 40, 20),
+        rect('c', 90, 120, 20, 30),
+      ],
+      ['a', 'arrow-1', 'b', 'c'],
+      { gap: 10 },
+    )
+
+    expect(positions(result)).toEqual([
+      { id: 'a', x: 60, y: 20 },
+      { id: 'arrow-1', x: 220, y: 80 },
+      { id: 'b', x: 10, y: 20 },
+      { id: 'c', x: 10, y: 60 },
+    ])
+    expect(result[1]).toBe(arrow)
+  })
+
+  test('requires three tidy-eligible items', () => {
+    const items = [
+      rect('a', 120, 40),
+      rect('b', 10, 20),
+      {
+        end: { x: 280, y: 120 },
+        h: 40,
+        id: 'arrow-1',
+        start: { x: 220, y: 80 },
+        stroke: '#000',
+        strokeWidth: 2,
+        type: 'arrow',
+        w: 60,
+        x: 220,
+        y: 80,
+      },
+    ] satisfies CanvasItem[]
+
+    expect(canTidyCanvasSelection(items, ['a', 'b', 'arrow-1'])).toBe(false)
+    expect(tidyCanvasSelection(items, ['a', 'b', 'arrow-1'])).toBe(items)
   })
 })

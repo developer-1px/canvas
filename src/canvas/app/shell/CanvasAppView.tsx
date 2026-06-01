@@ -121,8 +121,11 @@ export function CanvasAppView({
   const { visible: showStatus, ...statusProps } = status
   const [contextMenu, setContextMenu] =
     useState<CanvasContextCommandMenuState | null>(null)
-  const devtoolsInspectorActive = inspectorProps.customPanels.some((panel) =>
-    panel.id === 'html-specimen-css')
+  const inspectorHasContent = showInspector && (
+    inspectorProps.customPanels.length > 0 ||
+    inspectorProps.styleControls.length > 0 ||
+    (inspectorProps.bounds !== null && inspectorProps.label !== null)
+  )
   const closeContextMenu = useCallback(() => {
     setContextMenu(null)
   }, [setContextMenu])
@@ -144,9 +147,8 @@ export function CanvasAppView({
     'emote-controls': emoteControls.visible,
     'find-replace-panel': findReplace.open,
     'image-controls': showImageControls,
-    'object-inspector': showInspector,
+    'object-inspector': inspectorHasContent,
     'selection-floating-bar': showToolbar &&
-      !devtoolsInspectorActive &&
       statusProps.selectionLength > 0 &&
       selectionCommandAnchor !== null,
     'session-timer': sessionTimer.visible,

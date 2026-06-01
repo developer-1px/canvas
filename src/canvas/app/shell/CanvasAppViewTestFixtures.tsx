@@ -197,6 +197,7 @@ export function createViewProps(
         onGroup: noop,
         onLock: noop,
         onRedo: noop,
+        onReorder: noop,
         onUndo: noop,
         onUngroup: noop,
         onUnlockAll: noop,

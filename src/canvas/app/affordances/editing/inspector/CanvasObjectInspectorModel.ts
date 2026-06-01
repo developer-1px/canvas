@@ -54,6 +54,7 @@ export function getCanvasObjectInspectorModel({
     styleControls: getCanvasObjectStyleControls({
       commitItemsChange,
       disabled,
+      items,
       selectedItems,
       selection,
     }),

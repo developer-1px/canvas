@@ -47,12 +47,15 @@ describe('Canvas document boundaries', () => {
     expect(layerOrderPatchFile.source).toContain(
       'export function createCanvasDocumentLayerOrderPatch',
     )
+    expect(layerOrderPatchFile.source).toContain('reorderCanvasItems')
     expect(layerOrderPatchFile.source).toContain(
+      'createCanvasLayerOrderReplacePatches',
+    )
+    expect(layerOrderPatchFile.source).toContain('getCanvasSiblingArrayPointer')
+    expect(layerOrderPatchFile.source).not.toContain('createLayerOrder')
+    expect(layerOrderPatchFile.source).not.toContain(
       "from '@zod-crud/layer-order'",
     )
-    expect(layerOrderPatchFile.source).toContain('createLayerOrder')
-    expect(layerOrderPatchFile.source).toContain('flattenCanvasItems')
-    expect(layerOrderPatchFile.source).toContain('pruneNestedSelection')
   })
 
 
@@ -80,6 +83,9 @@ describe('Canvas document boundaries', () => {
       "from '@zod-crud/grouping'",
     )
     expect(layerOrderPatchFile.source).toContain(
+      "from '../operations/CanvasOperations'",
+    )
+    expect(layerOrderPatchFile.source).not.toContain(
       "from '@zod-crud/layer-order'",
     )
     expect(documentFile.source).toContain(

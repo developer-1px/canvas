@@ -110,18 +110,20 @@ describe('CanvasAppView', () => {
     expect(markup).not.toContain('component-palette')
   })
 
-  it('lets DevTools inspector mode suppress selection command chrome', () => {
+  it('keeps custom inspector panels composed with standard chrome', () => {
     const props = createViewProps()
 
     props.inspector.customPanels = [{
       content: <div>Styles</div>,
-      id: 'html-specimen-css',
+      id: 'custom-styles',
     }]
 
     const markup = renderToStaticMarkup(<CanvasAppView {...props} />)
 
-    expect(markup).toContain('object-inspector-devtools')
-    expect(markup).not.toContain('selection-floating-bar')
+    expect(markup).toContain('Styles')
+    expect(markup).not.toContain('object-inspector-devtools')
+    expect(markup).toContain('selection-floating-bar')
+    expect(markup).toContain('zoom-controls')
   })
 
   it('renders only one bottom-center transient surface at a time', () => {

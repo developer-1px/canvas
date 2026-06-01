@@ -16,11 +16,16 @@ describe('CanvasToolbarCommandDispatch', () => {
       action: { kind: 'distribute', mode: 'distributeHorizontal' },
       handlers,
     })
+    runCanvasToolbarCommandAction({
+      action: { kind: 'reorder', mode: 'bringToFront' },
+      handlers,
+    })
 
     expect(handlers.onAlign).toHaveBeenCalledWith('alignLeft')
     expect(handlers.onDistribute).toHaveBeenCalledWith(
       'distributeHorizontal',
     )
+    expect(handlers.onReorder).toHaveBeenCalledWith('bringToFront')
   })
 
   it('routes simple command actions to the matching handler', () => {
@@ -59,6 +64,7 @@ function createHandlers(): CanvasToolbarCommandHandlers {
     onGroup: vi.fn(),
     onLock: vi.fn(),
     onRedo: vi.fn(),
+    onReorder: vi.fn(),
     onUndo: vi.fn(),
     onUngroup: vi.fn(),
     onUnlockAll: vi.fn(),

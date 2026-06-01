@@ -1,44 +1,55 @@
 import {
   getOrCreatePreviewSurfaceRoot,
-  indexPreviewSurface,
   type PreviewSurfaceNode,
   renderHtmlPreviewSurface,
 } from '@interactive-os/preview-surface'
 import {
-  dispatchCanvasAppCustomFocus,
-  dispatchCanvasAppCustomFocusClear,
-} from '../../../canvas'
-import {
+  memo,
   useEffect,
   useRef,
-  useState,
 } from 'react'
 import type { HtmlSpecimenData } from './HtmlSpecimenCustomItemModel'
 import {
-  clearHtmlSpecimenPreviewBoundsOverlay,
-  clearHtmlSpecimenPreviewMarkedElement,
+  createHtmlSpecimenShadowPreviewCss,
+} from './HtmlSpecimenVisualCssEdit'
+import {
   clearHtmlSpecimenPreviewTargetSpacingOverlays,
   ensureHtmlSpecimenPreviewOverlayLayer,
   ensureHtmlSpecimenPreviewToolStyle,
-  getHtmlSpecimenPreviewSurfaceRoot,
-  HTML_SPECIMEN_PREVIEW_HOVER_ATTRIBUTE,
-  HTML_SPECIMEN_PREVIEW_TARGET_ATTRIBUTE,
   markHtmlSpecimenPreviewHoverElement,
   markHtmlSpecimenPreviewTargetElement,
   updateHtmlSpecimenPreviewBoundsOverlay,
-  updateHtmlSpecimenPreviewTargetSpacingOverlays,
 } from './HtmlSpecimenPreviewOverlay'
 import {
   createHtmlSpecimenPreviewTarget,
-  findHtmlSpecimenPreviewNodeByPath,
   reconcileHtmlSpecimenPreviewTarget,
   type HtmlSpecimenPreviewTarget,
 } from './HtmlSpecimenPreviewTarget'
-import { createHtmlSpecimenShadowPreviewCss } from './HtmlSpecimenVisualCssEdit'
+import {
+  HTML_SPECIMEN_PREVIEW_FOCUS_REQUEST_EVENT,
+  isHtmlSpecimenPreviewFocusRequestEvent,
+} from './HtmlSpecimenPreviewFocusRequest'
+import {
+  updateHtmlSpecimenPreviewStyle,
+} from './HtmlSpecimenShadowPreviewStyle'
+import {
+  indexHtmlSpecimenPreviewSurfaceStructure,
+  refreshHtmlSpecimenPreviewTargetSnapshot,
+} from './HtmlSpecimenShadowPreviewStructure'
+import {
+  patchHtmlSpecimenPreviewTextOnly,
+} from './HtmlSpecimenShadowPreviewTextPatch'
+import {
+  clearHtmlSpecimenPreviewHoverState,
+  clearHtmlSpecimenPreviewTargetState,
+  createDefaultHtmlSpecimenPreviewTarget,
+  getHtmlSpecimenPreviewTargetFromEvent,
+  publishHtmlSpecimenPreviewTarget,
+  setHtmlSpecimenPreviewHoverState,
+  setHtmlSpecimenPreviewTargetState,
+} from './HtmlSpecimenShadowPreviewTargetState'
 
-const HTML_SPECIMEN_PREVIEW_TARGET_EVENT = 'html-specimen-preview:target'
-
-export function HtmlSpecimenShadowPreview({
+export const HtmlSpecimenShadowPreview = memo(function HtmlSpecimenShadowPreview({
   itemId,
   specimen,
   title,
@@ -49,9 +60,9 @@ export function HtmlSpecimenShadowPreview({
 }) {
   const hostRef = useRef<HTMLDivElement | null>(null)
   const hoverNodeIdRef = useRef<string | null>(null)
+  const nodesRef = useRef<readonly PreviewSurfaceNode[]>([])
+  const renderedHtmlRef = useRef<string | null>(null)
   const targetNodeIdRef = useRef<string | null>(null)
-  const [hoverNodeId, setHoverNodeId] = useState<string | null>(null)
-  const [targetNodeId, setTargetNodeId] = useState<string | null>(null)
 
   useEffect(() => {
     const host = hostRef.current
@@ -61,40 +72,82 @@ export function HtmlSpecimenShadowPreview({
     }
 
     const root = getOrCreatePreviewSurfaceRoot(host)
+    const textPatch = renderedHtmlRef.current &&
+      renderedHtmlRef.current !== specimen.html
+      ? patchHtmlSpecimenPreviewTextOnly({
+          nextHtml: specimen.html,
+          nodes: nodesRef.current,
+          previousHtml: renderedHtmlRef.current,
+          root,
+        })
+      : null
+    const htmlChanged =
+      renderedHtmlRef.current !== specimen.html && textPatch === null
 
-    renderHtmlPreviewSurface(root, {
-      css: createHtmlSpecimenShadowPreviewCss({
+    if (htmlChanged || nodesRef.current.length === 0) {
+      renderHtmlPreviewSurface(root, {
+        css: createHtmlSpecimenShadowPreviewCss({
+          css: specimen.css,
+          mediaContext: {
+            viewportHeight: specimen.viewportHeight,
+            viewportWidth: specimen.viewportWidth,
+          },
+        }),
+        html: specimen.html,
+      })
+      renderedHtmlRef.current = specimen.html
+    } else {
+      if (textPatch) {
+        nodesRef.current = textPatch.nodes
+        renderedHtmlRef.current = specimen.html
+      }
+      updateHtmlSpecimenPreviewStyle({
         css: specimen.css,
         mediaContext: {
           viewportHeight: specimen.viewportHeight,
           viewportWidth: specimen.viewportWidth,
         },
-      }),
-      html: specimen.html,
-    })
+        root,
+      })
+    }
+
     ensureHtmlSpecimenPreviewToolStyle(root)
     ensureHtmlSpecimenPreviewOverlayLayer(root)
 
-    const nodes = indexPreviewSurface(root)
+    let nodes: readonly PreviewSurfaceNode[] =
+      htmlChanged || nodesRef.current.length === 0
+      ? indexHtmlSpecimenPreviewSurfaceStructure(root)
+      : [...nodesRef.current]
+    nodesRef.current = nodes
     const previousNodeId = targetNodeIdRef.current
-    const retainedTarget = reconcileHtmlSpecimenPreviewTarget({
+    let retainedTarget = reconcileHtmlSpecimenPreviewTarget({
       itemId,
       nodes,
       previousNodeId,
     }) ?? createDefaultHtmlSpecimenPreviewTarget({ itemId, nodes })
+
+    if (!htmlChanged && retainedTarget) {
+      const refreshed = refreshHtmlSpecimenPreviewTargetSnapshot({
+        nodes,
+        root,
+        target: retainedTarget,
+      })
+
+      nodes = refreshed.nodes
+      retainedTarget = refreshed.target
+      nodesRef.current = nodes
+    }
 
     host.dataset.previewNodeCount = String(nodes.length)
     clearHtmlSpecimenPreviewHoverState({
       host,
       hoverNodeIdRef,
       root,
-      setHoverNodeId,
     })
     if (retainedTarget) {
       setHtmlSpecimenPreviewTargetState({
         host,
         nodeId: retainedTarget.nodeId,
-        setTargetNodeId,
         targetNodeIdRef,
       })
       markHtmlSpecimenPreviewTargetElement(root, retainedTarget.node.path)
@@ -103,10 +156,7 @@ export function HtmlSpecimenShadowPreview({
         node: retainedTarget.node,
         root,
       })
-      updateHtmlSpecimenPreviewTargetSpacingOverlays({
-        node: retainedTarget.node,
-        root,
-      })
+      clearHtmlSpecimenPreviewTargetSpacingOverlays(root)
       publishHtmlSpecimenPreviewTarget({
         host,
         itemId,
@@ -119,7 +169,6 @@ export function HtmlSpecimenShadowPreview({
         itemId,
         previousNodeId,
         root,
-        setTargetNodeId,
         targetNodeIdRef,
       })
     }
@@ -127,6 +176,40 @@ export function HtmlSpecimenShadowPreview({
       bubbles: true,
       detail: { nodes },
     }))
+
+    const focusPreviewTarget = (target: HtmlSpecimenPreviewTarget) => {
+      if (targetNodeIdRef.current === target.nodeId) {
+        return
+      }
+
+      const refreshed = refreshHtmlSpecimenPreviewTargetSnapshot({
+        nodes,
+        root,
+        target,
+      })
+
+      nodes = refreshed.nodes
+      nodesRef.current = nodes
+
+      setHtmlSpecimenPreviewTargetState({
+        host,
+        nodeId: refreshed.target.nodeId,
+        targetNodeIdRef,
+      })
+      markHtmlSpecimenPreviewTargetElement(root, refreshed.target.node.path)
+      updateHtmlSpecimenPreviewBoundsOverlay({
+        kind: 'target',
+        node: refreshed.target.node,
+        root,
+      })
+      clearHtmlSpecimenPreviewTargetSpacingOverlays(root)
+      publishHtmlSpecimenPreviewTarget({
+        host,
+        itemId,
+        nodes,
+        target: refreshed.target,
+      })
+    }
 
     const handlePointerDown: EventListener = (event) => {
       const target = getHtmlSpecimenPreviewTargetFromEvent({
@@ -136,32 +219,28 @@ export function HtmlSpecimenShadowPreview({
         root,
       })
 
-      if (!target) {
+      if (target) {
+        focusPreviewTarget(target)
+      }
+    }
+
+    const handleFocusRequest = (event: Event) => {
+      if (
+        !isHtmlSpecimenPreviewFocusRequestEvent(event) ||
+        event.detail.itemId !== itemId
+      ) {
         return
       }
 
-      setHtmlSpecimenPreviewTargetState({
-        host,
-        nodeId: target.nodeId,
-        setTargetNodeId,
-        targetNodeIdRef,
-      })
-      markHtmlSpecimenPreviewTargetElement(root, target.node.path)
-      updateHtmlSpecimenPreviewBoundsOverlay({
-        kind: 'target',
-        node: target.node,
-        root,
-      })
-      updateHtmlSpecimenPreviewTargetSpacingOverlays({
-        node: target.node,
-        root,
-      })
-      publishHtmlSpecimenPreviewTarget({
-        host,
+      const target = createHtmlSpecimenPreviewTarget({
         itemId,
+        nodeId: event.detail.nodeId,
         nodes,
-        target,
       })
+
+      if (target) {
+        focusPreviewTarget(target)
+      }
     }
 
     const handlePointerMove: EventListener = (event) => {
@@ -173,46 +252,68 @@ export function HtmlSpecimenShadowPreview({
       })
 
       if (!target) {
-        clearHtmlSpecimenPreviewHoverState({
-          host,
-          hoverNodeIdRef,
-          root,
-          setHoverNodeId,
-        })
+        if (hoverNodeIdRef.current !== null) {
+          clearHtmlSpecimenPreviewHoverState({
+            host,
+            hoverNodeIdRef,
+            root,
+          })
+        }
         return
       }
+
+      if (hoverNodeIdRef.current === target.nodeId) {
+        return
+      }
+
+      const refreshed = refreshHtmlSpecimenPreviewTargetSnapshot({
+        nodes,
+        root,
+        target,
+      })
+
+      nodes = refreshed.nodes
+      nodesRef.current = nodes
 
       setHtmlSpecimenPreviewHoverState({
         host,
         hoverNodeIdRef,
-        nodeId: target.nodeId,
-        setHoverNodeId,
+        nodeId: refreshed.target.nodeId,
       })
-      markHtmlSpecimenPreviewHoverElement(root, target.node.path)
+      markHtmlSpecimenPreviewHoverElement(root, refreshed.target.node.path)
       updateHtmlSpecimenPreviewBoundsOverlay({
         kind: 'hover',
-        node: target.node,
+        node: refreshed.target.node,
         root,
       })
     }
 
     const handlePointerLeave = () => {
-      clearHtmlSpecimenPreviewHoverState({
-        host,
-        hoverNodeIdRef,
-        root,
-        setHoverNodeId,
-      })
+      if (hoverNodeIdRef.current !== null) {
+        clearHtmlSpecimenPreviewHoverState({
+          host,
+          hoverNodeIdRef,
+          root,
+        })
+      }
     }
 
     root.addEventListener('pointermove', handlePointerMove)
     root.addEventListener('pointerleave', handlePointerLeave)
     root.addEventListener('pointerdown', handlePointerDown)
+    window.addEventListener(
+      HTML_SPECIMEN_PREVIEW_FOCUS_REQUEST_EVENT,
+      handleFocusRequest,
+    )
 
     return () => {
       root.removeEventListener('pointermove', handlePointerMove)
       root.removeEventListener('pointerleave', handlePointerLeave)
       root.removeEventListener('pointerdown', handlePointerDown)
+      window.removeEventListener(
+        HTML_SPECIMEN_PREVIEW_FOCUS_REQUEST_EVENT,
+        handleFocusRequest,
+      )
     }
   }, [
     itemId,
@@ -227,236 +328,7 @@ export function HtmlSpecimenShadowPreview({
       ref={hostRef}
       className="demo-html-specimen-preview"
       data-html-specimen-item-id={itemId}
-      data-preview-hover-node-id={hoverNodeId ?? undefined}
-      data-preview-target-node-id={targetNodeId ?? undefined}
       title={title}
     />
   )
-}
-
-function clearHtmlSpecimenPreviewTargetState({
-  host,
-  itemId,
-  previousNodeId,
-  root,
-  setTargetNodeId,
-  targetNodeIdRef,
-}: {
-  host: HTMLElement
-  itemId: string
-  previousNodeId: string | null
-  root: ShadowRoot
-  setTargetNodeId: (nodeId: string | null) => void
-  targetNodeIdRef: { current: string | null }
-}) {
-  setHtmlSpecimenPreviewTargetState({
-    host,
-    nodeId: null,
-    setTargetNodeId,
-    targetNodeIdRef,
-  })
-  clearHtmlSpecimenPreviewMarkedElement(
-    root,
-    HTML_SPECIMEN_PREVIEW_TARGET_ATTRIBUTE,
-  )
-  clearHtmlSpecimenPreviewBoundsOverlay(root, 'target')
-  clearHtmlSpecimenPreviewTargetSpacingOverlays(root)
-
-  if (previousNodeId) {
-    dispatchCanvasAppCustomFocusClear(host, {
-      itemId,
-      ownerId: 'html-specimen',
-      targetId: previousNodeId,
-    })
-  }
-}
-
-function setHtmlSpecimenPreviewTargetState({
-  host,
-  nodeId,
-  setTargetNodeId,
-  targetNodeIdRef,
-}: {
-  host: HTMLElement
-  nodeId: string | null
-  setTargetNodeId: (nodeId: string | null) => void
-  targetNodeIdRef: { current: string | null }
-}) {
-  targetNodeIdRef.current = nodeId
-  setTargetNodeId(nodeId)
-
-  if (nodeId) {
-    host.dataset.previewTargetNodeId = nodeId
-  } else {
-    delete host.dataset.previewTargetNodeId
-  }
-}
-
-function clearHtmlSpecimenPreviewHoverState({
-  host,
-  hoverNodeIdRef,
-  root,
-  setHoverNodeId,
-}: {
-  host: HTMLElement
-  hoverNodeIdRef: { current: string | null }
-  root: ShadowRoot
-  setHoverNodeId: (nodeId: string | null) => void
-}) {
-  setHtmlSpecimenPreviewHoverState({
-    host,
-    hoverNodeIdRef,
-    nodeId: null,
-    setHoverNodeId,
-  })
-  clearHtmlSpecimenPreviewMarkedElement(
-    root,
-    HTML_SPECIMEN_PREVIEW_HOVER_ATTRIBUTE,
-  )
-  clearHtmlSpecimenPreviewBoundsOverlay(root, 'hover')
-}
-
-function setHtmlSpecimenPreviewHoverState({
-  host,
-  hoverNodeIdRef,
-  nodeId,
-  setHoverNodeId,
-}: {
-  host: HTMLElement
-  hoverNodeIdRef: { current: string | null }
-  nodeId: string | null
-  setHoverNodeId: (nodeId: string | null) => void
-}) {
-  hoverNodeIdRef.current = nodeId
-  setHoverNodeId(nodeId)
-
-  if (nodeId) {
-    host.dataset.previewHoverNodeId = nodeId
-  } else {
-    delete host.dataset.previewHoverNodeId
-  }
-}
-
-function publishHtmlSpecimenPreviewTarget({
-  host,
-  itemId,
-  nodes,
-  target,
-}: {
-  host: HTMLElement
-  itemId: string
-  nodes: readonly PreviewSurfaceNode[]
-  target: HtmlSpecimenPreviewTarget
-}) {
-  queueMicrotask(() => {
-    if (!host.isConnected) {
-      return
-    }
-
-    dispatchCanvasAppCustomFocus(host, {
-      data: {
-        node: target.node,
-        nodes,
-      },
-      itemId,
-      ownerId: 'html-specimen',
-      targetId: target.nodeId,
-    })
-    host.dispatchEvent(new CustomEvent(HTML_SPECIMEN_PREVIEW_TARGET_EVENT, {
-      bubbles: true,
-      composed: true,
-      detail: {
-        ...target,
-        nodes,
-      },
-    }))
-  })
-}
-
-function queueMicrotask(callback: () => void) {
-  if (typeof globalThis.queueMicrotask === 'function') {
-    globalThis.queueMicrotask(callback)
-    return
-  }
-
-  void Promise.resolve().then(callback)
-}
-
-function getHtmlSpecimenPreviewTargetFromEvent({
-  eventTarget,
-  itemId,
-  nodes,
-  root,
-}: {
-  eventTarget: EventTarget | null
-  itemId: string
-  nodes: readonly PreviewSurfaceNode[]
-  root: ShadowRoot
-}) {
-  const path = getHtmlSpecimenPreviewElementPath(root, eventTarget)
-
-  if (!path) {
-    return null
-  }
-
-  const node = findHtmlSpecimenPreviewNodeByPath({ nodes, path })
-
-  return node
-    ? createHtmlSpecimenPreviewTarget({
-        itemId,
-        nodeId: node.id,
-        nodes,
-      })
-    : null
-}
-
-function createDefaultHtmlSpecimenPreviewTarget({
-  itemId,
-  nodes,
-}: {
-  itemId: string
-  nodes: readonly PreviewSurfaceNode[]
-}) {
-  const node = nodes.find((candidate) =>
-    candidate.attributes['data-preview-default-target'] === 'true')
-
-  return node
-    ? createHtmlSpecimenPreviewTarget({
-        itemId,
-        nodeId: node.id,
-        nodes,
-      })
-    : null
-}
-
-function getHtmlSpecimenPreviewElementPath(
-  root: ShadowRoot,
-  eventTarget: EventTarget | null,
-) {
-  const surfaceRoot = getHtmlSpecimenPreviewSurfaceRoot(root)
-  const target = eventTarget instanceof Element ? eventTarget : null
-
-  if (!surfaceRoot || !target || target === surfaceRoot) {
-    return null
-  }
-
-  if (!surfaceRoot.contains(target)) {
-    return null
-  }
-
-  const path: number[] = []
-  let current: Element | null = target
-
-  while (current && current !== surfaceRoot) {
-    const parent: Element | null = current.parentElement
-
-    if (!parent) {
-      return null
-    }
-
-    path.unshift([...parent.children].indexOf(current))
-    current = parent
-  }
-
-  return path.length > 0 ? path : null
-}
+})

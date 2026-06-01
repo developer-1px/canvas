@@ -14,8 +14,16 @@ const HTML_SPECIMEN_PREVIEW_OVERLAY_LAYER_ATTRIBUTE =
   'data-html-specimen-preview-overlay-layer'
 const HTML_SPECIMEN_PREVIEW_SPACING_ATTRIBUTE =
   'data-html-specimen-preview-spacing'
-const HTML_SPECIMEN_PREVIEW_TOOL_STYLE_ATTRIBUTE =
-  'data-html-specimen-preview-tool-style'
+
+export {
+  clearHtmlSpecimenPreviewMarkedElement,
+  getHtmlSpecimenPreviewSurfaceRoot,
+  markHtmlSpecimenPreviewHoverElement,
+  markHtmlSpecimenPreviewTargetElement,
+} from './HtmlSpecimenPreviewElementMarking'
+export {
+  ensureHtmlSpecimenPreviewToolStyle,
+} from './HtmlSpecimenPreviewToolStyle'
 
 type HtmlSpecimenPreviewBoundsOverlayKind = 'hover' | 'target'
 type HtmlSpecimenPreviewSpacingOverlayKind = 'target-margin' | 'target-padding'
@@ -47,37 +55,6 @@ export function ensureHtmlSpecimenPreviewOverlayLayer(root: ShadowRoot) {
   return nextLayer
 }
 
-export function markHtmlSpecimenPreviewTargetElement(
-  root: ShadowRoot,
-  path: readonly number[],
-) {
-  markHtmlSpecimenPreviewElement({
-    attribute: HTML_SPECIMEN_PREVIEW_TARGET_ATTRIBUTE,
-    path,
-    root,
-  })
-}
-
-export function markHtmlSpecimenPreviewHoverElement(
-  root: ShadowRoot,
-  path: readonly number[],
-) {
-  markHtmlSpecimenPreviewElement({
-    attribute: HTML_SPECIMEN_PREVIEW_HOVER_ATTRIBUTE,
-    path,
-    root,
-  })
-}
-
-export function clearHtmlSpecimenPreviewMarkedElement(
-  root: ShadowRoot,
-  attribute: string,
-) {
-  for (const element of root.querySelectorAll(`[${attribute}]`)) {
-    element.removeAttribute(attribute)
-  }
-}
-
 export function updateHtmlSpecimenPreviewBoundsOverlay({
   kind,
   node,
@@ -92,12 +69,14 @@ export function updateHtmlSpecimenPreviewBoundsOverlay({
     kind,
     layer,
   })
+  const scale = getHtmlSpecimenPreviewHostScale(root)
 
   box.dataset.previewNodeId = node.id
   box.dataset.previewLabel = formatHtmlSpecimenPreviewNodeSelector(node)
-  box.style.transform = `translate(${node.bounds.x}px, ${node.bounds.y}px)`
-  box.style.width = `${Math.max(0, node.bounds.width)}px`
-  box.style.height = `${Math.max(0, node.bounds.height)}px`
+  box.style.transform =
+    `translate(${node.bounds.x / scale}px, ${node.bounds.y / scale}px)`
+  box.style.width = `${Math.max(0, node.bounds.width / scale)}px`
+  box.style.height = `${Math.max(0, node.bounds.height / scale)}px`
 }
 
 export function clearHtmlSpecimenPreviewBoundsOverlay(
@@ -144,122 +123,6 @@ export function clearHtmlSpecimenPreviewTargetSpacingOverlays(
   clearHtmlSpecimenPreviewSpacingOverlay(root, 'target-padding')
 }
 
-export function ensureHtmlSpecimenPreviewToolStyle(root: ShadowRoot) {
-  if (root.querySelector(`[${HTML_SPECIMEN_PREVIEW_TOOL_STYLE_ATTRIBUTE}]`)) {
-    return
-  }
-
-  const style = root.ownerDocument.createElement('style')
-
-  style.setAttribute(HTML_SPECIMEN_PREVIEW_TOOL_STYLE_ATTRIBUTE, '')
-  style.textContent = `:host {
-  position: relative;
-}
-[${HTML_SPECIMEN_PREVIEW_OVERLAY_LAYER_ATTRIBUTE}] {
-  position: absolute;
-  inset: 0;
-  z-index: 2147483647;
-  pointer-events: none;
-}
-[${HTML_SPECIMEN_PREVIEW_OVERLAY_ATTRIBUTE}] {
-  position: absolute;
-  top: 0;
-  left: 0;
-  box-sizing: border-box;
-  pointer-events: none;
-}
-[${HTML_SPECIMEN_PREVIEW_OVERLAY_ATTRIBUTE}="hover"] {
-  border: 1px solid #38bdf8;
-}
-[${HTML_SPECIMEN_PREVIEW_OVERLAY_ATTRIBUTE}="target"] {
-  border: 2px solid #0f766e;
-}
-[${HTML_SPECIMEN_PREVIEW_OVERLAY_ATTRIBUTE}]::before {
-  position: absolute;
-  top: -22px;
-  left: -1px;
-  max-width: 240px;
-  overflow: hidden;
-  padding: 3px 6px;
-  border-radius: 4px;
-  color: #ffffff;
-  background: #172033;
-  content: attr(data-preview-label);
-  font: 700 11px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-[${HTML_SPECIMEN_PREVIEW_OVERLAY_ATTRIBUTE}="hover"]::before {
-  background: #0369a1;
-}
-[${HTML_SPECIMEN_PREVIEW_OVERLAY_ATTRIBUTE}="target"]::before {
-  background: #0f766e;
-}
-[${HTML_SPECIMEN_PREVIEW_SPACING_ATTRIBUTE}] {
-  position: absolute;
-  top: 0;
-  left: 0;
-  box-sizing: border-box;
-  pointer-events: none;
-}
-[${HTML_SPECIMEN_PREVIEW_SPACING_ATTRIBUTE}="target-margin"] {
-  background: rgba(251, 146, 60, 0.1);
-  border: 1px dashed #f97316;
-}
-[${HTML_SPECIMEN_PREVIEW_SPACING_ATTRIBUTE}="target-padding"] {
-  background: rgba(45, 212, 191, 0.08);
-  border: 1px dashed #14b8a6;
-}
-[${HTML_SPECIMEN_PREVIEW_HOVER_ATTRIBUTE}] {
-  outline: 1px solid #38bdf8 !important;
-  outline-offset: 1px !important;
-}
-[${HTML_SPECIMEN_PREVIEW_TARGET_ATTRIBUTE}] {
-  outline: 2px solid #0f766e !important;
-  outline-offset: 2px !important;
-}`
-  root.append(style)
-}
-
-export function getHtmlSpecimenPreviewSurfaceRoot(root: ShadowRoot) {
-  return root.querySelector('[data-preview-surface-root]')
-}
-
-function markHtmlSpecimenPreviewElement({
-  attribute,
-  path,
-  root,
-}: {
-  attribute: string
-  path: readonly number[]
-  root: ShadowRoot
-}) {
-  clearHtmlSpecimenPreviewMarkedElement(root, attribute)
-  findHtmlSpecimenPreviewElementByPath(root, path)?.setAttribute(
-    attribute,
-    'true',
-  )
-}
-
-function findHtmlSpecimenPreviewElementByPath(
-  root: ShadowRoot,
-  path: readonly number[],
-) {
-  let element = getHtmlSpecimenPreviewSurfaceRoot(root)
-
-  for (const index of path) {
-    const child = element?.children[index]
-
-    if (!child) {
-      return null
-    }
-
-    element = child
-  }
-
-  return element
-}
-
 function getOrCreateHtmlSpecimenPreviewBoundsOverlayBox({
   kind,
   layer,
@@ -303,11 +166,24 @@ function updateHtmlSpecimenPreviewSpacingOverlay({
     kind,
     layer,
   })
+  const scale = getHtmlSpecimenPreviewHostScale(root)
 
   overlay.dataset.previewNodeId = nodeId
-  overlay.style.transform = `translate(${box.x}px, ${box.y}px)`
-  overlay.style.width = `${Math.max(0, box.width)}px`
-  overlay.style.height = `${Math.max(0, box.height)}px`
+  overlay.style.transform = `translate(${box.x / scale}px, ${box.y / scale}px)`
+  overlay.style.width = `${Math.max(0, box.width / scale)}px`
+  overlay.style.height = `${Math.max(0, box.height / scale)}px`
+}
+
+function getHtmlSpecimenPreviewHostScale(root: ShadowRoot) {
+  const host = root.host
+
+  if (!(host instanceof HTMLElement) || host.offsetWidth <= 0) {
+    return 1
+  }
+
+  const scale = host.getBoundingClientRect().width / host.offsetWidth
+
+  return Number.isFinite(scale) && scale > 0 ? scale : 1
 }
 
 function getOrCreateHtmlSpecimenPreviewSpacingOverlay({

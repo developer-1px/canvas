@@ -27,6 +27,7 @@ describe('CanvasKeyboardCommandDispatch', () => {
       { kind: 'cut-selection', preventDefault: true },
       { kind: 'delete-selection', preventDefault: true },
       { kind: 'duplicate-selection', preventDefault: true },
+      { kind: 'edit-selection', preventDefault: true },
       { kind: 'group-selection', preventDefault: true },
       { kind: 'lock-selection', preventDefault: true },
       { kind: 'paste-selection', preventDefault: true },
@@ -44,6 +45,7 @@ describe('CanvasKeyboardCommandDispatch', () => {
     expect(handlers.cutSelection).toHaveBeenCalledTimes(1)
     expect(handlers.deleteSelection).toHaveBeenCalledTimes(1)
     expect(handlers.duplicateSelection).toHaveBeenCalledTimes(1)
+    expect(handlers.editSelection).toHaveBeenCalledTimes(1)
     expect(handlers.groupSelection).toHaveBeenCalledTimes(1)
     expect(handlers.lockSelection).toHaveBeenCalledTimes(1)
     expect(handlers.pasteSelection).toHaveBeenCalledTimes(1)
@@ -87,6 +89,7 @@ function createHandlers(): CanvasKeyboardCommandHandlers {
     cutSelection: vi.fn(),
     deleteSelection: vi.fn(),
     duplicateSelection: vi.fn(),
+    editSelection: vi.fn(),
     groupSelection: vi.fn(),
     lockSelection: vi.fn(),
     moveSelection: vi.fn(),

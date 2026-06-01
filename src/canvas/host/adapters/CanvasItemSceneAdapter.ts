@@ -6,6 +6,7 @@ import {
 } from '../../engine'
 import { flattenCanvasItems, getItemBounds } from '../tree/CanvasTree'
 import { isCanvasGroupItem } from '../tree/CanvasGroupItem'
+import { canResizeCanvasItem } from '../operations/CanvasItemRotationOperations'
 
 export function createCanvasItemScene(items: CanvasItem[]): CanvasSceneAdapter {
   const treeEntries = flattenCanvasItems(items)
@@ -15,14 +16,17 @@ export function createCanvasItemScene(items: CanvasItem[]): CanvasSceneAdapter {
   const entries = treeEntries
     .filter(
       (entry) =>
+        !entry.item.hidden &&
         !entry.item.locked &&
         !treeEntries.some(
           (candidate) =>
-            candidate.item.locked && isAncestorPath(candidate.path, entry.path),
+            (candidate.item.hidden || candidate.item.locked) &&
+              isAncestorPath(candidate.path, entry.path),
         ),
     )
     .map((entry): CanvasSceneEntry => ({
       bounds: getItemBounds(entry.item),
+      canResize: canResizeCanvasItem(entry.item),
       id: entry.item.id,
       isGroup: isCanvasGroupItem(entry.item),
       parentId:

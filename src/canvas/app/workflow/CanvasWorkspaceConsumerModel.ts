@@ -105,6 +105,7 @@ export function getCanvasWorkspaceConsumerModel({
       command: {
         commitSelection: document.commitSelection,
       },
+      itemReadModel,
       selection: document.selection,
     },
     pointer: {
@@ -123,6 +124,14 @@ export function getCanvasWorkspaceConsumerModel({
         setViewport,
         ...selectionContext,
       },
+    },
+    selection: {
+      commitItemsChange: document.commitItemsChange,
+      commitSelection: document.commitSelection,
+      createId,
+      itemReadModel,
+      items: document.items,
+      selection: document.selection,
     },
     stage: {
       viewport,

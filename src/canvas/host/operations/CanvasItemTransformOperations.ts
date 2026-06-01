@@ -19,6 +19,7 @@ import {
 import { isCanvasGroupItem } from '../tree/CanvasGroupItem'
 import { mapCanvasItems } from './CanvasItemOperationTree'
 import { isCanvasItemLocked } from './CanvasItemLockOperations'
+import { canResizeCanvasItem } from './CanvasItemRotationOperations'
 
 export function translateCanvasItems(
   items: CanvasItem[],
@@ -52,7 +53,7 @@ export function resizeCanvasItems(
   const selected = new Set(pruneNestedSelection(items, ids))
 
   return mapCanvasItems(items, (item) =>
-    selected.has(item.id) && !isCanvasItemLocked(item)
+    selected.has(item.id) && !isCanvasItemLocked(item) && canResizeCanvasItem(item)
       ? scaleCanvasItem(item, from, to)
       : item,
   )

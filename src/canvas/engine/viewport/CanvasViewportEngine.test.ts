@@ -34,7 +34,7 @@ describe('CanvasViewportEngine', () => {
     ).toEqual({ x: -9, y: -18, scale: 1 })
   })
 
-  test('uses pinch wheel input as 1.5x zoom around the pointer', () => {
+  test('uses pinch wheel input as 3x zoom around the pointer', () => {
     const next = getCanvasWheelViewport({
       config,
       input: {
@@ -46,9 +46,9 @@ describe('CanvasViewportEngine', () => {
       viewport,
     })
 
-    expect(next?.scale).toBeCloseTo(Math.exp(0.15))
-    expect(next?.x).toBeCloseTo(100 - 100 * Math.exp(0.15))
-    expect(next?.y).toBeCloseTo(100 - 100 * Math.exp(0.15))
+    expect(next?.scale).toBeCloseTo(Math.exp(0.3))
+    expect(next?.x).toBeCloseTo(100 - 100 * Math.exp(0.3))
+    expect(next?.y).toBeCloseTo(100 - 100 * Math.exp(0.3))
   })
 
   test('routes ordinary wheel to pan and pinch wheel to zoom', () => {

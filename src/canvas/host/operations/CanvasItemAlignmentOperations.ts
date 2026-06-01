@@ -9,6 +9,10 @@ import {
 } from '../tree/CanvasTree'
 import { isCanvasGroupItem } from '../tree/CanvasGroupItem'
 import {
+  isCanvasDrawingItem,
+  translateCanvasDrawingItem,
+} from '../drawing/CanvasDrawingItemGeometry'
+import {
   replaceCanvasChildrenAtPath,
   sameCanvasPath,
 } from './CanvasItemOperationTree'
@@ -25,6 +29,10 @@ export type CanvasAlignMode =
 export type CanvasDistributeMode =
   | 'distributeHorizontal'
   | 'distributeVertical'
+
+export type CanvasTidyOptions = {
+  gap?: number
+}
 
 export function alignCanvasSelection(
   items: CanvasItem[],
@@ -104,6 +112,62 @@ export function distributeCanvasSelection(
   )
 }
 
+export function canTidyCanvasSelection(items: CanvasItem[], ids: string[]) {
+  return getSelectedTidyEntries(items, ids) !== null
+}
+
+export function tidyCanvasSelection(
+  items: CanvasItem[],
+  ids: string[],
+  options: CanvasTidyOptions = {},
+) {
+  const entries = getSelectedTidyEntries(items, ids)
+
+  if (!entries) {
+    return items
+  }
+
+  const gap = options.gap ?? 24
+  const boundsList = entries.map((entry) => getItemBounds(entry.item))
+  const bounds = getItemsBounds(entries.map((entry) => entry.item))
+
+  if (!bounds) {
+    return items
+  }
+
+  const columnCount = Math.ceil(Math.sqrt(entries.length))
+  const cellWidth = Math.max(...boundsList.map((item) => item.w)) + gap
+  const cellHeight = Math.max(...boundsList.map((item) => item.h)) + gap
+  const sorted = [...entries].sort((a, b) => {
+    const aBounds = getItemBounds(a.item)
+    const bBounds = getItemBounds(b.item)
+
+    return aBounds.y === bBounds.y
+      ? aBounds.x - bBounds.x
+      : aBounds.y - bBounds.y
+  })
+  const tidied = new Map<string, CanvasItem>()
+
+  sorted.forEach((entry, index) => {
+    const itemBounds = getItemBounds(entry.item)
+    const column = index % columnCount
+    const row = Math.floor(index / columnCount)
+    const target = {
+      x: bounds.x + column * cellWidth,
+      y: bounds.y + row * cellHeight,
+    }
+
+    tidied.set(entry.item.id, translateCanvasItemByDelta(entry.item, {
+      x: target.x - itemBounds.x,
+      y: target.y - itemBounds.y,
+    }))
+  })
+
+  return replaceCanvasChildrenAtPath(items, entries[0].parentPath, (children) =>
+    children.map((child) => tidied.get(child.id) ?? child),
+  )
+}
+
 function getSelectedSiblingEntries(
   items: CanvasItem[],
   ids: string[],
@@ -124,6 +188,31 @@ function getSelectedSiblingEntries(
   }
 
   return entries
+}
+
+function getSelectedTidyEntries(items: CanvasItem[], ids: string[]) {
+  const selected = new Set(pruneNestedSelection(items, ids))
+  const entries = flattenCanvasItems(items).filter(
+    (entry) =>
+      selected.has(entry.item.id) &&
+      !isCanvasItemLocked(entry.item) &&
+      isTidyCanvasItem(entry.item),
+  )
+  const parentPath = entries[0]?.parentPath
+
+  if (
+    entries.length < 3 ||
+    !parentPath ||
+    !entries.every((entry) => sameCanvasPath(entry.parentPath, parentPath))
+  ) {
+    return null
+  }
+
+  return entries
+}
+
+function isTidyCanvasItem(item: CanvasItem) {
+  return !isCanvasDrawingItem(item)
 }
 
 function getAlignmentDelta(
@@ -174,6 +263,14 @@ function translateCanvasItemByDelta(
       children: item.children.map((child) =>
         translateCanvasItemByDelta(child, delta),
       ),
+    })
+  }
+
+  if (isCanvasDrawingItem(item)) {
+    return translateCanvasDrawingItem({
+      dx: delta.x,
+      dy: delta.y,
+      item,
     })
   }
 

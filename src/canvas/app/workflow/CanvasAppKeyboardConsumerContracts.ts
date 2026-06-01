@@ -18,11 +18,10 @@ import type {
 } from '../../entities'
 import type { CanvasAppCustomCreationToolState } from '../extensions/CanvasAppExtensionStateContracts'
 import type { Interaction } from '../affordances/interaction/pointer/CanvasInteractionState'
-import type { CommitCanvasSelection } from './CanvasWorkflowContract'
 import type { CanvasAppComponentKeyboardContext } from './CanvasAppComponentConsumerContracts'
+import type { CanvasWorkspaceKeyboardContext } from './CanvasWorkspaceConsumerContracts'
 
 export type CanvasAppKeyboardCommandContext = {
-  commitSelection: CommitCanvasSelection
   copySelection: () => void
   cutSelection: () => void
   deleteSelection: () => void
@@ -72,6 +71,6 @@ export type CanvasAppKeyboardModelInput = {
   interaction: CanvasAppKeyboardInteractionContext
   openCommandPalette: () => void
   openFindReplace: () => void
-  selection: string[]
   viewport: CanvasAppKeyboardViewportContext
+  workspace: CanvasWorkspaceKeyboardContext
 }

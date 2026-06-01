@@ -8,6 +8,7 @@ describe('CanvasToolbarCommandCatalog', () => {
       'selection',
       'grouping',
       'alignment',
+      'layer-order',
       'lock',
     ])
     expect(getCommand('undo')).toMatchObject({
@@ -20,6 +21,10 @@ describe('CanvasToolbarCommandCatalog', () => {
     })
     expect(getCommand('alignLeft')).toMatchObject({
       action: { kind: 'align', mode: 'alignLeft' },
+      surfaces: ['selection-floating-bar', 'context-menu'],
+    })
+    expect(getCommand('bringToFront')).toMatchObject({
+      action: { kind: 'reorder', mode: 'bringToFront' },
       surfaces: ['selection-floating-bar', 'context-menu'],
     })
     expect(getCommand('unlockAll')).toMatchObject({

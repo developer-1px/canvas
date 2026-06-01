@@ -37,6 +37,13 @@ export type CanvasClipboardCommandEffect =
       kind: 'copy-selection'
     }
   | {
+      afterItems: CanvasItem[]
+      afterSelection: string[]
+      beforeItems: CanvasItem[]
+      clonedItems: CanvasItem[]
+      kind: 'transform-items'
+    }
+  | {
       afterSelection: string[]
       items: CanvasItem[]
       kind: 'add-items'

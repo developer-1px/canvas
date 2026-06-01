@@ -22,6 +22,7 @@ import { useCanvasAppImageModel } from './useCanvasAppImageModel'
 import { useCanvasAppKeyboardModel } from './useCanvasAppKeyboardModel'
 import { useCanvasAppLinkPreviewImportModel } from './useCanvasAppLinkPreviewImportModel'
 import { useCanvasAppPointerModel } from './useCanvasAppPointerModel'
+import { useCanvasAppSelectionModel } from './useCanvasAppSelectionModel'
 import { useCanvasAppStampModel } from './useCanvasAppStampModel'
 import { useCanvasAppStageElementModel } from './useCanvasAppStageElementModel'
 import { useCanvasAppTableImportModel } from './useCanvasAppTableImportModel'
@@ -171,10 +172,7 @@ export function useCanvasAppModel({
   })
 
   useCanvasAppKeyboardModel({
-    command: {
-      ...workspace.keyboard.command,
-      ...commands.keyboard,
-    },
+    command: commands.keyboard,
     component: components.keyboard,
     cursorChat: cursorChat.keyboard,
     ...affordance.keyboard,
@@ -185,8 +183,8 @@ export function useCanvasAppModel({
       ...interaction.keyboard,
       ...text.keyboard.interaction,
     },
-    selection: workspace.keyboard.selection,
     viewport: viewportControls.keyboard,
+    workspace: workspace.keyboard,
   })
 
   const pointer = useCanvasAppPointerModel({
@@ -219,6 +217,15 @@ export function useCanvasAppModel({
     ...components.control,
     onToolChange: interaction.control.onToolChange,
   })
+  const selection = useCanvasAppSelectionModel({
+    anchor: controls.toolbar.selectionCommandAnchor,
+    bounds: inspector.bounds,
+    disabled: inspector.disabled,
+    label: inspector.label,
+    setEditing: text.command.setEditing,
+    votingSession: votingSession.stamp,
+    workspace: workspace.selection,
+  })
 
   return {
     ...text.view,
@@ -231,6 +238,7 @@ export function useCanvasAppModel({
     drawingControls: drawing.control,
     imageControls,
     inspector,
+    selection,
     stage: renderCanvasAppStageModel({
       cursorChat: cursorChat.stage,
       emote: emotes.stage,

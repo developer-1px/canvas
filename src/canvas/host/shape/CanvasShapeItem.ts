@@ -42,6 +42,15 @@ export function getCanvasLegacyShapeKind(item: Pick<RectItem, 'shape'>) {
   return item.shape ?? CANVAS_DEFAULT_SHAPE_KIND
 }
 
+export function setCanvasShapeKind<TItem extends CanvasShapeLikeItem>(
+  item: TItem,
+  shapeType: CanvasShapeType,
+): TItem {
+  return item.type === 'shape'
+    ? { ...item, shapeType } as TItem
+    : { ...item, shape: shapeType } as TItem
+}
+
 export function getCanvasToolShapeKind(tool: Tool): CanvasShapeKind | null {
   return isCanvasShapeTool(tool) ? CANVAS_TOOL_SHAPE_KINDS[tool] : null
 }

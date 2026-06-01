@@ -84,6 +84,7 @@
 | `src/canvas/app/extensions/custom-item-modules/CanvasAppCustomItemValidatorContracts.ts` | Custom item validator registry key와 validate strategy slot을 검증한다 |
 | `src/canvas/app/extensions/custom-item-modules/CanvasAppCustomItemModuleRuntime.ts` | Module-owned creation tool envelope 생성, item validation, renderer/validator registry 변환과 실패 containment를 소유한다 |
 | `src/canvas/app/extensions/custom-item-modules/CanvasAppCustomItemModuleSnapshot.ts` | Custom item module define/assembly 후 외부 descriptor mutation에서 module과 assembled extension parts를 보호한다 |
+| `src/canvas/app/extensions/widgets/CanvasAppWidgetModule.tsx` | React component 또는 trusted HTML/CSS를 custom canvas item의 `<foreignObject>` content로 렌더링하는 authoring helper를 소유한다 |
 | `src/canvas/app/extensions/custom-tools/CanvasAppCustomCreationTools.ts` | 내부 Tool union에 구체 id를 추가하지 않고 제품별 생성 도구를 등록하는 descriptor를 제공한다 |
 | `src/canvas/app/extensions/custom-tools/CanvasAppCustomCreationToolContracts.ts` | Custom creation tool descriptor shape와 reserved/duplicate shortcut conflict를 검증한다 |
 | `src/canvas/app/extensions/custom-tools/CanvasAppCustomCreationToolRuntime.ts` | Custom creation tool id 변환, toolbar state, lookup, shortcut matching을 소유한다 |
@@ -290,7 +291,9 @@ type CanvasAffordanceConfig = {
 - Canvas Custom Item Validator registry shape 검증은 Canvas App Custom Item Validator Contracts가 소유한다.
 - Canvas App Custom Item Module mutation 방어는 Canvas App Custom Item Module Snapshot이 소유한다.
 - Module-owned custom creation tool은 bounds/title/data만 반환하고, `id`, `type`, `kind`, `presentation`은 Canvas App Custom Item Module이 주입한다.
-- Demo custom item module은 `src/demo/custom-items/<name>/index.ts`에서 default export하면 자동 수집된다.
+- Canvas App Widget Module은 별도 Storybook/catalog UI가 아니라 custom item renderer helper다. React widget은 ReactNode를, HTML widget은 trusted `html/css` data를 SVG `<foreignObject>` 안에 렌더링하고 selection, move, resize, duplicate, validation은 기존 custom item 문법을 그대로 쓴다.
+- Demo custom item module은 `src/demo/custom-items/<name>/index.ts` 형태로 분리할 수 있지만 default demo에는 `src/demo/custom-items/index.ts`에서 명시적으로 opt-in한 모듈만 들어간다.
+- `src/demo/custom-items/widget-counter`는 FigJam widget-like seam 검증 fixture이며 default demo product surface가 아니다.
 - Demo와 Demo custom item module은 `src/canvas` package public entry만 사용하고 canvas 하위 구현 경로를 직접 import하지 않는다.
 - package manifest는 `canvas`, `canvas/app`, `canvas/app/authoring`, `canvas/core`, `canvas/engine`, `canvas/entities`, `canvas/host`, `canvas/renderer` export만 열고 각 export는 public facade `index.ts`를 가리킨다.
 - package manifest의 각 export entry는 `types`, `import`, `default` target을 같은 public facade `index.ts`로 맞춘다.
@@ -327,7 +330,7 @@ type CanvasAffordanceConfig = {
 - Custom creation tool shortcut이 내부 canvas shortcut, shift-insensitive built-in shortcut, temporary pan, nudge shortcut, 다른 custom creation tool shortcut과 겹치면 assembly 단계에서 실패한다.
 - 제품별 renderer 세부 스타일은 canvas shell CSS에 두지 않고 Host App/Demo module 쪽에서 소유한다.
 - 제품별 inspector UI는 기본 Object Inspector 구현을 수정하지 않고 Canvas App Assembly의 inspector panel descriptor로 등록한다.
-- Linked peer dependency는 앱 번들에 한 번만 들어가야 한다. Package manifest는 React, React DOM, Zod를 peer dependency로 열고, Vite config는 `zod-crud` 같은 linked package가 `react`, `react-dom`, `zod`를 중복 번들링하지 않도록 dedupe하고, linked dist 경로를 dev server fs allowlist에 넣으며, local dev server를 loopback host `:5173` strict port로 고정하고, production build에서 React runtime을 별도 chunk로 분리한다.
+- Linked peer dependency는 앱 번들에 한 번만 들어가야 한다. Package manifest는 React, React DOM, Zod를 peer dependency로 열고, Vite config는 `zod-crud` 같은 linked package가 `react`, `react-dom`, `zod`를 중복 번들링하지 않도록 dedupe하고, linked dist 경로를 dev server fs allowlist에 넣으며, local dev server를 `:53175` strict port로 고정하고, production build에서 React runtime을 별도 chunk로 분리한다.
 - 위 import 경계는 `src/canvas/architecture/CanvasModuleBoundaries.test.ts`에서 검증한다.
 
 추출 순서는 동작 변경 없이 app workflow에서 Engine 책임을 하나씩 떼어내는 방식으로 진행한다.
