@@ -30,6 +30,7 @@ import {
   PanelTopClose,
   PaintBucket,
   PencilLine,
+  Play,
   RotateCcw,
   RotateCw,
   SendToBack,
@@ -50,11 +51,17 @@ import {
   type CanvasShapeLikeItem,
   type CanvasShapeType,
 } from '../canvas'
+import { TODO_WIDGET_KIND } from './widget-catalog/TodoWidget'
+
+function isPlayableWidget(item: CanvasItem | null): item is CanvasItem {
+  return item?.type === 'custom' && item.kind === TODO_WIDGET_KIND
+}
 
 type CanvasEngineDemoModel =
   Parameters<NonNullable<CanvasAppProps['renderApp']>>[0]
 
 type EngineSelectionToolbarContext = {
+  activeWidgetId: string | null
   app: CanvasEngineDemoModel
   arrowItem: Extract<CanvasItem, { type: 'arrow' }> | null
   canArrange: boolean
@@ -68,6 +75,7 @@ type EngineSelectionToolbarContext = {
   disabled: boolean
   items: readonly CanvasItem[]
   onClose: () => void
+  onToggleWidgetPlay: () => void
   selectedItem: CanvasItem | null
 }
 
@@ -246,6 +254,20 @@ const ENGINE_SELECTION_TOOLBAR_DESCRIPTORS = [
     visible: (context) => context.arrowItem !== null,
   },
   {
+    icon: Play,
+    id: 'widget-play',
+    kind: 'button',
+    label: (context) =>
+      context.activeWidgetId === context.selectedItem?.id
+        ? 'Stop widget'
+        : 'Play widget',
+    onSelect: (context) => context.onToggleWidgetPlay(),
+    pressed: (context) =>
+      context.activeWidgetId !== null &&
+      context.activeWidgetId === context.selectedItem?.id,
+    visible: (context) => isPlayableWidget(context.selectedItem),
+  },
+  {
     disabled: (context) => !context.app.selection.canRotate,
     groups: getEngineSelectionRotationMenuGroups,
     icon: RotateCw,
@@ -311,11 +333,15 @@ const ENGINE_SELECTION_TOOLBAR_DESCRIPTORS = [
 ] as const satisfies readonly EngineSelectionToolbarDescriptor[]
 
 export function EngineSelectionToolbar({
+  activeWidgetId,
   app,
   onClose,
+  onToggleWidgetPlay,
 }: {
+  activeWidgetId: string | null
   app: CanvasEngineDemoModel
   onClose: () => void
+  onToggleWidgetPlay: () => void
 }) {
   const [openMenu, setOpenMenu] = useState<string | null>(null)
   const {
@@ -332,7 +358,12 @@ export function EngineSelectionToolbar({
     return null
   }
 
-  const context = getEngineSelectionToolbarContext({ app, onClose })
+  const context = getEngineSelectionToolbarContext({
+    activeWidgetId,
+    app,
+    onClose,
+    onToggleWidgetPlay,
+  })
   const descriptors = getEngineSelectionToolbarDescriptors(context)
 
   return (
@@ -361,11 +392,15 @@ export function EngineSelectionToolbar({
 }
 
 function getEngineSelectionToolbarContext({
+  activeWidgetId,
   app,
   onClose,
+  onToggleWidgetPlay,
 }: {
+  activeWidgetId: string | null
   app: CanvasEngineDemoModel
   onClose: () => void
+  onToggleWidgetPlay: () => void
 }): EngineSelectionToolbarContext {
   const {
     disabled,
@@ -389,6 +424,7 @@ function getEngineSelectionToolbarContext({
   )
 
   return {
+    activeWidgetId,
     app,
     arrowItem,
     canArrange:
@@ -408,6 +444,7 @@ function getEngineSelectionToolbarContext({
     disabled,
     items,
     onClose,
+    onToggleWidgetPlay,
     selectedItem,
   }
 }

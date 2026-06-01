@@ -378,6 +378,37 @@ test('renders a widget in an isolated shadow root without leaking styles', async
   expect(leaked).toBe('')
 })
 
+test('toggles Todo items in play mode and persists the change', async ({
+  page,
+}) => {
+  await page.goto('/')
+
+  const playTodo = page.locator('[data-canvas-item-id="engine-todo-widget"]')
+  await expect(playTodo).toBeVisible()
+  await playTodo.click()
+
+  await page.getByRole('button', { name: 'Play widget' }).click()
+  const overlay = page.locator('.engine-widget-play-overlay')
+  await expect(overlay).toBeVisible()
+
+  const checkbox = overlay.getByRole('checkbox', {
+    name: 'Ship the isolation host',
+  })
+  await expect(checkbox).not.toBeChecked()
+  await checkbox.click()
+  // the checkbox reflects committed document data after the round-trip.
+  await expect(checkbox).toBeChecked()
+
+  await page.getByRole('button', { name: 'Stop widget' }).click()
+  await expect(overlay).toHaveCount(0)
+
+  // re-entering play re-reads the document: the toggle persisted.
+  await page.getByRole('button', { name: 'Play widget' }).click()
+  await expect(
+    overlay.getByRole('checkbox', { name: 'Ship the isolation host' }),
+  ).toBeChecked()
+})
+
 test('renders the Todo widget with its checklist items', async ({ page }) => {
   await page.goto('/')
 
