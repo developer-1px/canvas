@@ -114,6 +114,13 @@ function CanvasEngineDemoSurface({
     useState<EngineSelectionPointerState | null>(null)
   const votingPanelVisible = votingPanelOpen ||
     app.votingSession.status !== 'idle'
+  // Play mode is bound to the single selected widget: if the selection moves
+  // off it, leave play mode (React-sanctioned reset-state-on-prop-change).
+  const selectedSingleId =
+    app.selection.items.length === 1 ? app.selection.items[0].id : null
+  if (activeWidgetId !== null && activeWidgetId !== selectedSingleId) {
+    setActiveWidgetId(null)
+  }
   const activeWidgetItem = activeWidgetId
     ? app.selection.items.find((item) => item.id === activeWidgetId) ?? null
     : null

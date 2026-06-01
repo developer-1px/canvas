@@ -409,6 +409,23 @@ test('toggles Todo items in play mode and persists the change', async ({
   ).toBeChecked()
 })
 
+test('leaves widget play mode when the selection changes', async ({ page }) => {
+  await page.goto('/')
+
+  await page.locator('[data-canvas-item-id="engine-todo-widget"]').click()
+  await page.getByRole('button', { name: 'Play widget' }).click()
+  await expect(page.locator('.engine-widget-play-overlay')).toBeVisible()
+
+  // selecting another object exits play mode.
+  await page.locator('[data-canvas-item-id="engine-shape"]').click()
+  await expect(page.locator('.engine-widget-play-overlay')).toHaveCount(0)
+
+  // re-selecting the widget starts in stop mode, not resumed play.
+  await page.locator('[data-canvas-item-id="engine-todo-widget"]').click()
+  await expect(page.getByRole('button', { name: 'Play widget' })).toBeVisible()
+  await expect(page.locator('.engine-widget-play-overlay')).toHaveCount(0)
+})
+
 test('renders the Todo widget with its checklist items', async ({ page }) => {
   await page.goto('/')
 
