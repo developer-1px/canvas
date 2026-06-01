@@ -238,6 +238,7 @@ export function useCanvasAppModel({
     drawingControls: drawing.control,
     imageControls,
     inspector,
+    items: workspace.itemLayer.items,
     selection,
     stage: renderCanvasAppStageModel({
       cursorChat: cursorChat.stage,

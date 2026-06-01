@@ -111,6 +111,7 @@ const DEMO_CANVAS_FOCUSED_AFFORDANCE_CONFIG = {
     laserTrail: false,
     marquee: true,
     presence: false,
+    presentationMode: true,
     resizeHandles: true,
     selectionBounds: true,
     sessionTimer: false,

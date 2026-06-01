@@ -134,6 +134,8 @@ describe('CanvasDemoAssembly', () => {
       .toBe(false)
     expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.votingSession)
       .toBe(false)
+    expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.presentationMode)
+      .toBe(true)
     expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.draftArrow)
       .toBe(true)
     expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.draftRect)

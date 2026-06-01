@@ -95,6 +95,7 @@ export const CANVAS_AFFORDANCE_CONFIG_DEFAULTS = Object.freeze({
     laserTrail: true,
     marquee: true,
     presence: true,
+    presentationMode: false,
     resizeHandles: true,
     selectionBounds: true,
     sessionTimer: true,

@@ -1,5 +1,7 @@
 import {
   ArrowUpRight,
+  ChevronLeft,
+  ChevronRight,
   Eraser,
   Frame,
   Highlighter,
@@ -18,6 +20,7 @@ import {
   Type,
   Unlock,
   Vote,
+  X,
   ZoomIn,
   ZoomOut,
 } from 'lucide-react'
@@ -43,6 +46,10 @@ import {
   getCanvasAppWidgetInteractions,
 } from '../canvas'
 import { EngineSelectionToolbar } from './CanvasDevToolsSelectionToolbar'
+import {
+  getCanvasPresentationFrames,
+  getNextCanvasPresentationFrameIndex,
+} from './CanvasDevToolsPresentationMode'
 import { EngineWidgetPlayOverlay } from './CanvasDevToolsWidgetPlayOverlay'
 import './CanvasDevToolsDemoApp.css'
 
@@ -72,6 +79,11 @@ type EngineSelectionPointerState = {
   pointerId: number
   x: number
   y: number
+}
+
+type EnginePresentationState = {
+  active: boolean
+  index: number
 }
 
 const ENGINE_SELECTION_DRAG_THRESHOLD = 3
@@ -119,6 +131,10 @@ function CanvasEngineDemoSurface({
   const viewportPercent = `${Math.round(app.zoomControls.scale * 100)}%`
   const [selectionToolbarVisible, setSelectionToolbarVisible] = useState(false)
   const [activeWidgetId, setActiveWidgetId] = useState<string | null>(null)
+  const [presentation, setPresentation] = useState<EnginePresentationState>({
+    active: false,
+    index: 0,
+  })
   const [theme, setTheme] = useState<'dark' | 'light'>('light')
   const [votingPanelOpen, setVotingPanelOpen] = useState(false)
   const [contextMenu, setContextMenu] =
@@ -127,6 +143,16 @@ function CanvasEngineDemoSurface({
     useState<EngineSelectionPointerState | null>(null)
   const votingPanelVisible = votingPanelOpen ||
     app.votingSession.status !== 'idle'
+  const presentationEnabled = app.toolbar.config.overlays.presentationMode
+  const presentationFrames = getCanvasPresentationFrames(app.items)
+  const activePresentationIndex =
+    presentationFrames.length > 0
+      ? Math.min(presentation.index, presentationFrames.length - 1)
+      : 0
+  const activePresentationFrame = presentationFrames[activePresentationIndex] ??
+    null
+  const presenting =
+    presentationEnabled && presentation.active && activePresentationFrame !== null
   const activeItem = activeWidgetId
     ? app.selection.items.find((item) => item.id === activeWidgetId) ?? null
     : null
@@ -164,6 +190,41 @@ function CanvasEngineDemoSurface({
         : item,
     )
   }
+  const fitPresentationFrame = (index: number) => {
+    const frame = presentationFrames[index]
+
+    if (!frame) {
+      return false
+    }
+
+    app.zoomControls.onFitItems([frame.id])
+    return true
+  }
+  const enterPresentation = () => {
+    if (!presentationEnabled || presentationFrames.length === 0) {
+      return
+    }
+
+    hideSelectionToolbar()
+    setActiveWidgetId(null)
+    setContextMenu(null)
+    app.toolbar.onToolChange('select')
+    setPresentation({ active: true, index: 0 })
+    fitPresentationFrame(0)
+  }
+  const exitPresentation = () => {
+    setPresentation({ active: false, index: 0 })
+  }
+  const navigatePresentation = (direction: -1 | 1) => {
+    const nextIndex = getNextCanvasPresentationFrameIndex({
+      current: activePresentationIndex,
+      direction,
+      length: presentationFrames.length,
+    })
+
+    setPresentation({ active: true, index: nextIndex })
+    fitPresentationFrame(nextIndex)
+  }
   const hideSelectionToolbar = () => {
     setSelectionToolbarVisible(false)
   }
@@ -173,6 +234,12 @@ function CanvasEngineDemoSurface({
   const handleWorkspacePointerDownCapture = (
     event: ReactPointerEvent<HTMLElement>,
   ) => {
+    if (presenting) {
+      event.preventDefault()
+      event.stopPropagation()
+      return
+    }
+
     if (isEngineDemoControlTarget(event.target)) {
       return
     }
@@ -190,6 +257,12 @@ function CanvasEngineDemoSurface({
   const handleWorkspacePointerMoveCapture = (
     event: ReactPointerEvent<HTMLElement>,
   ) => {
+    if (presenting) {
+      event.preventDefault()
+      event.stopPropagation()
+      return
+    }
+
     setSelectionPointer((current) => {
       if (!current || current.pointerId !== event.pointerId) {
         return current
@@ -207,6 +280,12 @@ function CanvasEngineDemoSurface({
   const handleWorkspacePointerUpCapture = (
     event: ReactPointerEvent<HTMLElement>,
   ) => {
+    if (presenting) {
+      event.preventDefault()
+      event.stopPropagation()
+      return
+    }
+
     if (isEngineDemoControlTarget(event.target)) {
       return
     }
@@ -227,6 +306,12 @@ function CanvasEngineDemoSurface({
   const handleWorkspaceContextMenuCapture = (
     event: ReactMouseEvent<HTMLElement>,
   ) => {
+    if (presenting) {
+      event.preventDefault()
+      event.stopPropagation()
+      return
+    }
+
     if (isEngineDemoControlTarget(event.target)) {
       return
     }
@@ -241,6 +326,33 @@ function CanvasEngineDemoSurface({
   const handleWorkspaceKeyDownCapture = (
     event: ReactKeyboardEvent<HTMLElement>,
   ) => {
+    if (presenting) {
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        event.stopPropagation()
+        exitPresentation()
+        return
+      }
+
+      if (event.key === 'ArrowRight') {
+        event.preventDefault()
+        event.stopPropagation()
+        navigatePresentation(1)
+        return
+      }
+
+      if (event.key === 'ArrowLeft') {
+        event.preventDefault()
+        event.stopPropagation()
+        navigatePresentation(-1)
+        return
+      }
+
+      event.preventDefault()
+      event.stopPropagation()
+      return
+    }
+
     if (event.key === 'Escape' && activeWidgetId) {
       setActiveWidgetId(null)
       return
@@ -263,7 +375,11 @@ function CanvasEngineDemoSurface({
   }
 
   return (
-    <main className="engine-demo-app" data-theme={theme}>
+    <main
+      className="engine-demo-app"
+      data-presenting={presenting ? 'true' : 'false'}
+      data-theme={theme}
+    >
       <section
         className="engine-demo-workspace"
         aria-label="Canvas"
@@ -280,7 +396,7 @@ function CanvasEngineDemoSurface({
           stickyQuickCreate={app.stickyQuickCreate}
           onCreate={hideSelectionToolbar}
         />
-        {selectionToolbarVisible ? (
+        {selectionToolbarVisible && !presenting ? (
           <EngineSelectionToolbar
             key={app.selection.ids.join('\u0000')}
             activeWidgetId={visibleActiveWidgetId}
@@ -291,19 +407,21 @@ function CanvasEngineDemoSurface({
             onToggleWidgetPlay={onToggleWidgetPlay}
           />
         ) : null}
-        {selectionToolbarVisible ? (
+        {selectionToolbarVisible && !presenting ? (
           <EngineStampPad
             app={app}
             onInsert={hideSelectionToolbar}
           />
         ) : null}
-        <EngineWidgetPlayOverlay
-          activeWidgetId={visibleActiveWidgetId}
-          interaction={activeWidgetInteraction}
-          item={visibleActiveWidgetId ? activeWidgetItem : null}
-          onChangeData={onChangeWidgetData}
-        />
-        <EngineTextEditor {...app.textEditor} />
+        {!presenting ? (
+          <EngineWidgetPlayOverlay
+            activeWidgetId={visibleActiveWidgetId}
+            interaction={activeWidgetInteraction}
+            item={visibleActiveWidgetId ? activeWidgetItem : null}
+            onChangeData={onChangeWidgetData}
+          />
+        ) : null}
+        {!presenting ? <EngineTextEditor {...app.textEditor} /> : null}
         <CanvasContextCommandMenu
           commandAvailability={app.toolbar.commandAvailability}
           config={app.toolbar.config}
@@ -314,27 +432,29 @@ function CanvasEngineDemoSurface({
           onCustomCommand={app.toolbar.onCustomCommand}
         />
       </section>
-      <div
-        className="engine-demo-controls"
-        role="toolbar"
-        aria-label="Engine affordances"
-      >
-        {ENGINE_DEMO_TOOLS.map(({ icon: Icon, id, label }) => (
-          <button
-            aria-label={label}
-            aria-pressed={app.toolbar.tool === id}
-            key={id}
-            onClick={() => {
-              hideSelectionToolbar()
-              setActiveWidgetId(null)
-              app.toolbar.onToolChange(id)
-            }}
-            type="button"
-          >
-            <Icon aria-hidden="true" size={14} strokeWidth={2} />
-          </button>
-        ))}
-      </div>
+      {!presenting ? (
+        <div
+          className="engine-demo-controls"
+          role="toolbar"
+          aria-label="Engine affordances"
+        >
+          {ENGINE_DEMO_TOOLS.map(({ icon: Icon, id, label }) => (
+            <button
+              aria-label={label}
+              aria-pressed={app.toolbar.tool === id}
+              key={id}
+              onClick={() => {
+                hideSelectionToolbar()
+                setActiveWidgetId(null)
+                app.toolbar.onToolChange(id)
+              }}
+              type="button"
+            >
+              <Icon aria-hidden="true" size={14} strokeWidth={2} />
+            </button>
+          ))}
+        </div>
+      ) : null}
       <div
         className="engine-demo-viewport-controls"
         role="toolbar"
@@ -362,9 +482,20 @@ function CanvasEngineDemoSurface({
         >
           <Maximize2 aria-hidden="true" size={14} strokeWidth={2} />
         </button>
+        {presentationEnabled ? (
+          <EnginePresentationControls
+            active={presenting}
+            count={presentationFrames.length}
+            index={activePresentationIndex}
+            onEnter={enterPresentation}
+            onExit={exitPresentation}
+            onNext={() => navigatePresentation(1)}
+            onPrevious={() => navigatePresentation(-1)}
+          />
+        ) : null}
         <button
           aria-label="Voting session"
-          aria-pressed={votingPanelVisible}
+          aria-pressed={!presenting && votingPanelVisible}
           onClick={() => setVotingPanelOpen((open) => !open)}
           type="button"
         >
@@ -398,11 +529,69 @@ function CanvasEngineDemoSurface({
         </button>
       </div>
       <EngineVotingSessionPanel
-        visible={votingPanelVisible}
+        visible={!presenting && votingPanelVisible}
         votingSession={app.votingSession}
         onClose={() => setVotingPanelOpen(false)}
       />
     </main>
+  )
+}
+
+function EnginePresentationControls({
+  active,
+  count,
+  index,
+  onEnter,
+  onExit,
+  onNext,
+  onPrevious,
+}: {
+  active: boolean
+  count: number
+  index: number
+  onEnter: () => void
+  onExit: () => void
+  onNext: () => void
+  onPrevious: () => void
+}) {
+  if (!active) {
+    return (
+      <button
+        aria-label="Enter presentation"
+        disabled={count === 0}
+        onClick={onEnter}
+        type="button"
+      >
+        <Frame aria-hidden="true" size={14} strokeWidth={2} />
+      </button>
+    )
+  }
+
+  return (
+    <>
+      <button
+        aria-label="Previous frame"
+        onClick={onPrevious}
+        type="button"
+      >
+        <ChevronLeft aria-hidden="true" size={14} strokeWidth={2} />
+      </button>
+      <span aria-label="Presentation frame">{index + 1}/{count}</span>
+      <button
+        aria-label="Next frame"
+        onClick={onNext}
+        type="button"
+      >
+        <ChevronRight aria-hidden="true" size={14} strokeWidth={2} />
+      </button>
+      <button
+        aria-label="Exit presentation"
+        onClick={onExit}
+        type="button"
+      >
+        <X aria-hidden="true" size={14} strokeWidth={2} />
+      </button>
+    </>
   )
 }
 

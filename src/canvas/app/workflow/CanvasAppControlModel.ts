@@ -105,6 +105,7 @@ export function getCanvasAppControlModel({
       visible: config.overlays.zoomControls,
       onFit: () =>
         onFitItems(selection.length > 0 ? selection : undefined),
+      onFitItems,
       onReset: onViewportReset,
       onZoomIn: () => onZoomBy(1.25),
       onZoomOut: () => onZoomBy(0.8),

@@ -349,6 +349,40 @@ test('toggles the token-driven dark theme', async ({ page }) => {
   await expect(root).toHaveAttribute('data-theme', 'light')
 })
 
+test('presents section frames without edit chrome', async ({ page }) => {
+  await page.goto('/')
+
+  const root = page.locator('main.engine-demo-app')
+  const shape = page.locator('[data-canvas-item-id="engine-shape"]')
+  await page.getByRole('button', { name: 'Reset viewport' }).click()
+  await expect(page.getByLabel('Canvas scale')).toHaveText('100%')
+  await shape.click()
+  await expect(page.getByRole('toolbar', { name: 'Object actions' }))
+    .toBeVisible()
+
+  await page.getByRole('button', { name: 'Enter presentation' }).click()
+  await expect(root).toHaveAttribute('data-presenting', 'true')
+  await expect(page.getByLabel('Canvas scale')).not.toHaveText('100%')
+  await expect(page.getByLabel('Presentation frame')).toHaveText('1/1')
+  await expect(
+    page.getByRole('toolbar', { name: 'Engine affordances' }),
+  ).toHaveCount(0)
+
+  await shape.click()
+  await expect(page.getByRole('toolbar', { name: 'Object actions' }))
+    .toHaveCount(0)
+
+  await page.locator('.engine-demo-workspace').focus()
+  await page.keyboard.press('Backspace')
+  await page.keyboard.press('ArrowRight')
+  await expect(page.getByLabel('Presentation frame')).toHaveText('1/1')
+  await page.keyboard.press('Escape')
+  await expect(root).toHaveAttribute('data-presenting', 'false')
+  await expect(shape).toBeVisible()
+  await expect(page.getByRole('toolbar', { name: 'Engine affordances' }))
+    .toBeVisible()
+})
+
 test('renders a widget in an isolated shadow root without leaking styles', async ({
   page,
 }) => {
