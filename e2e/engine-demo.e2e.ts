@@ -338,6 +338,22 @@ test('toggles the token-driven dark theme', async ({ page }) => {
   await expect(root).toHaveAttribute('data-theme', 'light')
 })
 
+test('exports the selected objects as a downloadable image', async ({
+  page,
+}) => {
+  await page.goto('/')
+
+  const shape = page.locator('[data-canvas-item-id="engine-shape"]')
+  await expect(shape).toBeVisible()
+  await shape.click()
+
+  const downloadPromise = page.waitForEvent('download', { timeout: 20_000 })
+  await page.getByRole('button', { name: 'Export selection as image' }).click()
+  const download = await downloadPromise
+
+  expect(download.suggestedFilename()).toMatch(/\.png$/)
+})
+
 test('selects every same-type object with select same', async ({ page }) => {
   await page.goto('/')
 

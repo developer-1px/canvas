@@ -14,6 +14,7 @@ import {
   Copy,
   CornerDownRight,
   Diamond,
+  Download,
   Eraser,
   Eye,
   EyeOff,
@@ -885,6 +886,13 @@ function EngineSelectionToolbar({
         type="button"
       >
         <Copy aria-hidden="true" size={13} strokeWidth={2} />
+      </button>
+      <button
+        aria-label="Export selection as image"
+        onClick={app.imageControls.onDownloadImage}
+        type="button"
+      >
+        <Download aria-hidden="true" size={13} strokeWidth={2} />
       </button>
       <button
         aria-label="Delete selection"
