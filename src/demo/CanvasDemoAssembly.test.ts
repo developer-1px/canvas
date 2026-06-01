@@ -22,6 +22,7 @@ describe('CanvasDemoAssembly', () => {
     // The widget-seam example is allowed; the abandoned product modules are not.
     expect(DEMO_CUSTOM_ITEM_MODULES.map((module) => module.id)).toEqual([
       'metric-widget',
+      'todo-widget',
     ])
     expect(modules['./custom-items/index.ts']).not.toMatch('import.meta.glob')
     expect(modules['./custom-items/index.ts']).not.toMatch(
@@ -53,6 +54,7 @@ describe('CanvasDemoAssembly', () => {
         'image',
         'stamp',
         'stamp',
+        'custom',
         'custom',
       ])
     expect(

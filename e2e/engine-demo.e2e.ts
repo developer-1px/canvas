@@ -367,6 +367,17 @@ test('renders a widget in an isolated shadow root without leaking styles', async
   expect(leaked).toBe('')
 })
 
+test('renders the Todo widget with its checklist items', async ({ page }) => {
+  await page.goto('/')
+
+  const todo = page.locator('[data-canvas-item-id="engine-todo-widget"]')
+  await expect(todo).toBeVisible()
+  // shadow-root content is reachable through Playwright's shadow piercing.
+  await expect(todo.getByText('Today')).toBeVisible()
+  await expect(todo.getByText('Ship the isolation host')).toBeVisible()
+  await expect(todo.getByText('Add a Todo widget')).toBeVisible()
+})
+
 test('toggles an arrow between arrowhead and plain line', async ({ page }) => {
   await page.goto('/')
 

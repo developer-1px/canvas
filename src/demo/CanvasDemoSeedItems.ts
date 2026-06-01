@@ -1,5 +1,6 @@
 import type { CanvasItem } from '../canvas'
 import { createMetricWidgetSeedItem } from './widget-catalog/MetricWidget'
+import { createTodoWidgetSeedItem } from './widget-catalog/TodoWidget'
 
 export const DEMO_CANVAS_INITIAL_SELECTION = ['engine-shape']
 
@@ -226,4 +227,5 @@ export const DEMO_CANVAS_SEED_ITEMS: CanvasItem[] = [
     y: 124,
   },
   createMetricWidgetSeedItem(),
+  createTodoWidgetSeedItem(),
 ]
