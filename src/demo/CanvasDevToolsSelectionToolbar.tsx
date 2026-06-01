@@ -51,11 +51,6 @@ import {
   type CanvasShapeLikeItem,
   type CanvasShapeType,
 } from '../canvas'
-import { TODO_WIDGET_KIND } from './widget-catalog/TodoWidget'
-
-function isPlayableWidget(item: CanvasItem | null): item is CanvasItem {
-  return item?.type === 'custom' && item.kind === TODO_WIDGET_KIND
-}
 
 type CanvasEngineDemoModel =
   Parameters<NonNullable<CanvasAppProps['renderApp']>>[0]
@@ -73,6 +68,7 @@ type EngineSelectionToolbarContext = {
   canUnsection: boolean
   canUseSectionActions: boolean
   disabled: boolean
+  hasWidgetInteraction: (item: CanvasItem | null) => boolean
   items: readonly CanvasItem[]
   onClose: () => void
   onToggleWidgetPlay: () => void
@@ -265,7 +261,7 @@ const ENGINE_SELECTION_TOOLBAR_DESCRIPTORS = [
     pressed: (context) =>
       context.activeWidgetId !== null &&
       context.activeWidgetId === context.selectedItem?.id,
-    visible: (context) => isPlayableWidget(context.selectedItem),
+    visible: (context) => context.hasWidgetInteraction(context.selectedItem),
   },
   {
     disabled: (context) => !context.app.selection.canRotate,
@@ -335,11 +331,13 @@ const ENGINE_SELECTION_TOOLBAR_DESCRIPTORS = [
 export function EngineSelectionToolbar({
   activeWidgetId,
   app,
+  hasWidgetInteraction,
   onClose,
   onToggleWidgetPlay,
 }: {
   activeWidgetId: string | null
   app: CanvasEngineDemoModel
+  hasWidgetInteraction: (item: CanvasItem | null) => boolean
   onClose: () => void
   onToggleWidgetPlay: () => void
 }) {
@@ -361,6 +359,7 @@ export function EngineSelectionToolbar({
   const context = getEngineSelectionToolbarContext({
     activeWidgetId,
     app,
+    hasWidgetInteraction,
     onClose,
     onToggleWidgetPlay,
   })
@@ -394,11 +393,13 @@ export function EngineSelectionToolbar({
 function getEngineSelectionToolbarContext({
   activeWidgetId,
   app,
+  hasWidgetInteraction,
   onClose,
   onToggleWidgetPlay,
 }: {
   activeWidgetId: string | null
   app: CanvasEngineDemoModel
+  hasWidgetInteraction: (item: CanvasItem | null) => boolean
   onClose: () => void
   onToggleWidgetPlay: () => void
 }): EngineSelectionToolbarContext {
@@ -442,6 +443,7 @@ function getEngineSelectionToolbarContext({
     canUnsection: canUseSectionActions,
     canUseSectionActions,
     disabled,
+    hasWidgetInteraction,
     items,
     onClose,
     onToggleWidgetPlay,

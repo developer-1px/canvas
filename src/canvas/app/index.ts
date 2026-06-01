@@ -29,6 +29,7 @@ export {
   defineCanvasAppReactWidgetModule,
   dispatchCanvasAppCustomFocus,
   dispatchCanvasAppCustomFocusClear,
+  getCanvasAppWidgetInteractions,
   isCanvasAppExtensionId,
   type CanvasAppAssembly,
   type CanvasAppAssemblyInput,
@@ -80,6 +81,10 @@ export {
   type CanvasAppStageMount,
   type CanvasAppStageRenderInput,
   type CanvasAppWidgetCreationOptions,
+  type CanvasAppWidgetInteraction,
+  type CanvasAppWidgetInteractionRenderContext,
+  type CanvasAppWidgetInteractions,
   type CanvasAppWidgetItem,
+  type CanvasAppWidgetModule,
   type CanvasAppWidgetRenderContext,
 } from './authoring'

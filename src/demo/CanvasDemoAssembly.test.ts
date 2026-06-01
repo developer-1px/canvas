@@ -30,6 +30,18 @@ describe('CanvasDemoAssembly', () => {
     )
   })
 
+  it('keeps widget play mode behind the widget interaction seam', () => {
+    expect(modules['./CanvasDevToolsDemoApp.tsx']).not.toMatch(
+      /TodoWidget|TODO_WIDGET_KIND|toggleTodoWidgetItemDone/,
+    )
+    expect(modules['./CanvasDevToolsSelectionToolbar.tsx']).not.toMatch(
+      /TodoWidget|TODO_WIDGET_KIND/,
+    )
+    expect(modules['./CanvasDevToolsWidgetPlayOverlay.tsx']).not.toMatch(
+      /TodoWidget|TODO_WIDGET_KIND|TodoWidgetData|toggleTodoWidgetItemDone/,
+    )
+  })
+
   it('assembles demo custom item modules through the app seam', () => {
     expect(DEMO_CANVAS_APP_ASSEMBLY_INPUT.customItemModules).toBe(
       DEMO_CUSTOM_ITEM_MODULES,

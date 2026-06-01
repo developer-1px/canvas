@@ -28,6 +28,33 @@ export type CanvasAppWidgetRenderContext<
   item: CanvasAppWidgetItem<TData>
 }
 
+export type CanvasAppWidgetInteractionRenderContext<
+  TData extends CanvasJsonObject = CanvasJsonObject,
+> = CanvasAppWidgetRenderContext<TData> & {
+  onChangeData: (data: TData) => void
+}
+
+export type CanvasAppWidgetInteraction<
+  TData extends CanvasJsonObject = CanvasJsonObject,
+> = {
+  render: (context: CanvasAppWidgetInteractionRenderContext<TData>) => ReactNode
+}
+
+export type CanvasAppWidgetInteractions = Readonly<
+  Record<string, CanvasAppWidgetInteraction>
+>
+
+export type CanvasAppWidgetModule<
+  TData extends CanvasJsonObject = CanvasJsonObject,
+> = ReturnType<typeof defineCanvasAppCustomItemModule> & {
+  widgetInteraction?: CanvasAppWidgetInteraction<TData>
+}
+
+type CanvasAppWidgetInteractionCarrier =
+  ReturnType<typeof defineCanvasAppCustomItemModule> & {
+    widgetInteraction?: CanvasAppWidgetInteraction
+  }
+
 export type CanvasAppHtmlWidgetData = CanvasJsonObject & {
   css?: string
   html: string
@@ -63,6 +90,11 @@ type CanvasAppWidgetModuleBaseInput<
 export type CanvasAppReactWidgetModuleInput<
   TData extends CanvasJsonObject = CanvasJsonObject,
 > = CanvasAppWidgetModuleBaseInput<TData> & {
+  interaction?: {
+    render: (
+      context: CanvasAppWidgetInteractionRenderContext<TData>,
+    ) => ReactNode
+  }
   render: (context: CanvasAppWidgetRenderContext<TData>) => ReactNode
 }
 
@@ -118,6 +150,7 @@ function defineCanvasAppWidgetModule<
   defaultData,
   defaultSize = { h: 160, w: 240 },
   id,
+  interaction,
   inspectorPanels,
   label,
   presentation = `${id}-widget`,
@@ -127,8 +160,9 @@ function defineCanvasAppWidgetModule<
   tool = {},
   validateData,
 }: CanvasAppWidgetModuleBaseInput<TData> & {
+  interaction?: CanvasAppReactWidgetModuleInput<TData>['interaction']
   renderWidget: (context: CanvasAppWidgetRenderContext<TData>) => ReactNode
-}) {
+}): CanvasAppWidgetModule<TData> {
   const getDefaultData = () => {
     if (typeof defaultData === 'function') {
       return defaultData()
@@ -139,7 +173,7 @@ function defineCanvasAppWidgetModule<
   const isWidgetData = (data: CanvasJsonObject): data is TData =>
     validateData ? validateData(data) : true
 
-  return defineCanvasAppCustomItemModule({
+  const module = defineCanvasAppCustomItemModule({
     customCommands,
     customCreationTools: tool === false
       ? undefined
@@ -184,6 +218,44 @@ function defineCanvasAppWidgetModule<
       item.presentation === presentation &&
       isWidgetData(item.data),
   })
+
+  if (!interaction) {
+    return module
+  }
+
+  const widgetInteraction: CanvasAppWidgetInteraction<TData> = Object.freeze({
+    render: ({ data, item, onChangeData }) => {
+      const widgetData = isWidgetData(data) ? data : getDefaultData()
+
+      return interaction.render({
+        data: widgetData,
+        item: item as CanvasAppWidgetItem<TData>,
+        onChangeData,
+      })
+    },
+  })
+
+  return Object.freeze({
+    ...module,
+    widgetInteraction,
+  })
+}
+
+export function getCanvasAppWidgetInteractions(
+  modules: readonly ReturnType<typeof defineCanvasAppCustomItemModule>[] = [],
+): CanvasAppWidgetInteractions {
+  const interactions: Record<string, CanvasAppWidgetInteraction> = {}
+
+  for (const module of modules) {
+    const widgetInteraction =
+      (module as CanvasAppWidgetInteractionCarrier).widgetInteraction
+
+    if (widgetInteraction) {
+      interactions[module.id] = widgetInteraction
+    }
+  }
+
+  return Object.freeze(interactions)
 }
 
 function createCanvasAppWidgetCreationTool<

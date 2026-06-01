@@ -4,7 +4,12 @@ import { createCanvasAppAssembly } from '../../workflow/CanvasAppAssembly'
 import {
   defineCanvasAppHtmlWidgetModule,
   defineCanvasAppReactWidgetModule,
+  getCanvasAppWidgetInteractions,
 } from './CanvasAppWidgetModule'
+import type {
+  CanvasCustomItem,
+  CanvasJsonObject,
+} from '../../../entities'
 
 describe('CanvasAppWidgetModule', () => {
   it('defines a React component widget as a normal custom canvas item', () => {
@@ -112,5 +117,45 @@ describe('CanvasAppWidgetModule', () => {
     expect(markup).toContain('<foreignObject')
     expect(markup).toContain('<style>.cta{color:#2563eb;font-weight:700}</style>')
     expect(markup).toContain('<button class="cta">Run</button>')
+  })
+
+  it('exposes optional widget interactions by widget kind', () => {
+    type CounterWidgetData = CanvasJsonObject & { count: number }
+    const module = defineCanvasAppReactWidgetModule<CounterWidgetData>({
+      defaultData: { count: 0 },
+      id: 'counter-widget',
+      interaction: {
+        render: ({ data }) => <button>{String(data.count)}</button>,
+      },
+      render: ({ data }) => <span>{String(data.count)}</span>,
+      title: 'Counter widget',
+      validateData: (data): data is CounterWidgetData =>
+        typeof data.count === 'number',
+    })
+    const item = {
+      data: { count: 3 },
+      h: 80,
+      id: 'counter-1',
+      kind: 'counter-widget',
+      presentation: 'counter-widget-widget',
+      title: 'Counter widget',
+      type: 'custom',
+      w: 120,
+      x: 0,
+      y: 0,
+    } satisfies CanvasCustomItem
+    const interactions = getCanvasAppWidgetInteractions([module])
+
+    expect(Object.keys(interactions)).toEqual(['counter-widget'])
+    expect(Object.isFrozen(interactions)).toBe(true)
+    expect(renderToStaticMarkup(
+      <>
+        {interactions['counter-widget']?.render({
+          data: item.data,
+          item,
+          onChangeData: () => undefined,
+        })}
+      </>,
+    )).toContain('<button>3</button>')
   })
 })

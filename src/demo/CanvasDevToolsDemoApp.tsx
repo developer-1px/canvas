@@ -22,6 +22,7 @@ import {
   ZoomOut,
 } from 'lucide-react'
 import {
+  useMemo,
   useState,
   type CSSProperties,
   type KeyboardEvent as ReactKeyboardEvent,
@@ -33,16 +34,16 @@ import {
   CanvasContextCommandMenu,
   type CanvasAppAssemblyInput,
   type CanvasAppProps,
+  type CanvasAppWidgetInteractions,
   type CanvasContextCommandMenuState,
+  type CanvasItem,
+  type CanvasJsonObject,
   type CanvasStampKind,
   type Tool,
+  getCanvasAppWidgetInteractions,
 } from '../canvas'
 import { EngineSelectionToolbar } from './CanvasDevToolsSelectionToolbar'
 import { EngineWidgetPlayOverlay } from './CanvasDevToolsWidgetPlayOverlay'
-import {
-  isTodoWidgetData,
-  toggleTodoWidgetItemDone,
-} from './widget-catalog/TodoWidget'
 import './CanvasDevToolsDemoApp.css'
 
 type CanvasEngineDemoModel =
@@ -90,18 +91,30 @@ export function CanvasDevToolsDemoApp({
 }: {
   assemblyInput?: CanvasAppAssemblyInput
 }) {
+  const widgetInteractions = useMemo(
+    () => getCanvasAppWidgetInteractions(assemblyInput?.customItemModules),
+    [assemblyInput],
+  )
+
   return (
     <CanvasApp
       assemblyInput={assemblyInput}
-      renderApp={(app) => <CanvasEngineDemoSurface app={app} />}
+      renderApp={(app) => (
+        <CanvasEngineDemoSurface
+          app={app}
+          widgetInteractions={widgetInteractions}
+        />
+      )}
     />
   )
 }
 
 function CanvasEngineDemoSurface({
   app,
+  widgetInteractions,
 }: {
   app: CanvasEngineDemoModel
+  widgetInteractions: CanvasAppWidgetInteractions
 }) {
   const viewportPercent = `${Math.round(app.zoomControls.scale * 100)}%`
   const [selectionToolbarVisible, setSelectionToolbarVisible] = useState(false)
@@ -114,33 +127,40 @@ function CanvasEngineDemoSurface({
     useState<EngineSelectionPointerState | null>(null)
   const votingPanelVisible = votingPanelOpen ||
     app.votingSession.status !== 'idle'
-  // Play mode is bound to the single selected widget: if the selection moves
-  // off it, leave play mode (React-sanctioned reset-state-on-prop-change).
-  const selectedSingleId =
-    app.selection.items.length === 1 ? app.selection.items[0].id : null
-  if (activeWidgetId !== null && activeWidgetId !== selectedSingleId) {
-    setActiveWidgetId(null)
-  }
-  const activeWidgetItem = activeWidgetId
+  const activeItem = activeWidgetId
     ? app.selection.items.find((item) => item.id === activeWidgetId) ?? null
     : null
-  const activeWidgetData =
-    activeWidgetItem?.type === 'custom' && isTodoWidgetData(activeWidgetItem.data)
-      ? activeWidgetItem.data
+  const activeWidgetItem = activeItem?.type === 'custom' ? activeItem : null
+  const activeWidgetInteraction = activeWidgetItem
+    ? widgetInteractions[activeWidgetItem.kind] ?? null
+    : null
+  const visibleActiveWidgetId =
+    activeWidgetInteraction && app.toolbar.tool === 'select'
+      ? activeWidgetId
       : null
   const onToggleWidgetPlay = () => {
-    const selectedId =
-      app.selection.items.length === 1 ? app.selection.items[0].id : null
+    const selectedItem =
+      app.selection.items.length === 1 ? app.selection.items[0] : null
+    const selectedId = getEngineWidgetInteraction(
+      selectedItem,
+      widgetInteractions,
+    )
+      ? selectedItem?.id
+      : null
+
+    if (!selectedId) {
+      setActiveWidgetId(null)
+      return
+    }
+
     setActiveWidgetId((current) =>
       current && current === selectedId ? null : selectedId,
     )
   }
-  const onToggleWidgetItem = (index: number) => {
+  const onChangeWidgetData = (itemId: string, data: CanvasJsonObject) => {
     app.selection.onReplaceSelectedItems((item) =>
-      item.id === activeWidgetId &&
-      item.type === 'custom' &&
-      isTodoWidgetData(item.data)
-        ? { ...item, data: toggleTodoWidgetItemDone(item.data, index) }
+      item.id === itemId && item.type === 'custom'
+        ? { ...item, data }
         : item,
     )
   }
@@ -159,6 +179,7 @@ function CanvasEngineDemoSurface({
 
     setSelectionToolbarVisible(false)
     setContextMenu(null)
+    setActiveWidgetId(null)
     setSelectionPointer({
       dragging: false,
       pointerId: event.pointerId,
@@ -220,6 +241,11 @@ function CanvasEngineDemoSurface({
   const handleWorkspaceKeyDownCapture = (
     event: ReactKeyboardEvent<HTMLElement>,
   ) => {
+    if (event.key === 'Escape' && activeWidgetId) {
+      setActiveWidgetId(null)
+      return
+    }
+
     if (
       event.key !== 'ContextMenu' &&
       !(event.key === 'F10' && event.shiftKey)
@@ -257,8 +283,10 @@ function CanvasEngineDemoSurface({
         {selectionToolbarVisible ? (
           <EngineSelectionToolbar
             key={app.selection.ids.join('\u0000')}
-            activeWidgetId={activeWidgetId}
+            activeWidgetId={visibleActiveWidgetId}
             app={app}
+            hasWidgetInteraction={(item) =>
+              Boolean(getEngineWidgetInteraction(item, widgetInteractions))}
             onClose={hideSelectionToolbar}
             onToggleWidgetPlay={onToggleWidgetPlay}
           />
@@ -270,9 +298,10 @@ function CanvasEngineDemoSurface({
           />
         ) : null}
         <EngineWidgetPlayOverlay
-          activeWidgetId={activeWidgetData ? activeWidgetId : null}
-          data={activeWidgetData}
-          onToggle={onToggleWidgetItem}
+          activeWidgetId={visibleActiveWidgetId}
+          interaction={activeWidgetInteraction}
+          item={visibleActiveWidgetId ? activeWidgetItem : null}
+          onChangeData={onChangeWidgetData}
         />
         <EngineTextEditor {...app.textEditor} />
         <CanvasContextCommandMenu
@@ -297,6 +326,7 @@ function CanvasEngineDemoSurface({
             key={id}
             onClick={() => {
               hideSelectionToolbar()
+              setActiveWidgetId(null)
               app.toolbar.onToolChange(id)
             }}
             type="button"
@@ -573,6 +603,15 @@ function EngineVotingSessionPanel({
   )
 }
 
+function getEngineWidgetInteraction(
+  item: CanvasItem | null,
+  widgetInteractions: CanvasAppWidgetInteractions,
+) {
+  return item?.type === 'custom'
+    ? widgetInteractions[item.kind] ?? null
+    : null
+}
+
 function getEngineContextMenuPoint({
   app,
   fallback,
@@ -606,6 +645,7 @@ function isEngineDemoControlTarget(target: EventTarget) {
         '.engine-sticky-quick-create',
         '.engine-selection-toolbar',
         '.engine-stamp-pad',
+        '.engine-widget-play-overlay',
         '.engine-voting-session',
         '.text-editor',
         'button',

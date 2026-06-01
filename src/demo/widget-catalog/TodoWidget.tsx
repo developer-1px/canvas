@@ -45,9 +45,8 @@ function createTodoWidgetData(): TodoWidgetData {
   }
 }
 
-// Pure data mutation used by the (forthcoming) play-mode interaction: toggling
-// a checklist item's done state. Kept independent of any toolbar/overlay UI so
-// it can be wired through onReplaceSelectedItems once interaction lands.
+// Pure data mutation used by play-mode interaction. Kept independent of the
+// overlay UI so commits can flow through the host document update path.
 export function toggleTodoWidgetItemDone(
   data: TodoWidgetData,
   index: number,
@@ -79,6 +78,90 @@ export function createTodoWidgetSeedItem(): CanvasCustomItem {
   }
 }
 
+function renderTodoWidgetCard({
+  active = false,
+  data,
+  itemId,
+  onToggleItem,
+}: {
+  active?: boolean
+  data: TodoWidgetData
+  itemId: string
+  onToggleItem?: (index: number) => void
+}) {
+  return (
+    <div
+      data-todo-widget={itemId}
+      style={{
+        background: '#fff',
+        border: active ? '1px solid #2457c5' : '1px solid #d0d2cc',
+        borderRadius: 6,
+        boxShadow: active ? '0 1px 4px rgba(23,32,51,0.12)' : 'none',
+        boxSizing: 'border-box',
+        color: '#1d2028',
+        display: 'flex',
+        flexDirection: 'column',
+        fontFamily: 'Inter, system-ui, sans-serif',
+        gap: 6,
+        height: '100%',
+        padding: '12px 14px',
+        width: '100%',
+      }}
+    >
+      <div style={{ color: '#39404c', fontSize: 12, fontWeight: 600 }}>
+        {data.title}
+      </div>
+      <ul
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 4,
+          listStyle: 'none',
+          margin: 0,
+          padding: 0,
+        }}
+      >
+        {data.items.map((todo, index) => (
+          <li
+            key={index}
+            style={{
+              alignItems: 'center',
+              color: todo.done ? '#6d7380' : '#1d2028',
+              display: 'flex',
+              fontSize: 13,
+              gap: 8,
+              textDecoration: todo.done ? 'line-through' : 'none',
+            }}
+          >
+            {onToggleItem ? (
+              <label
+                style={{
+                  alignItems: 'center',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  gap: 8,
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={todo.done}
+                  onChange={() => onToggleItem(index)}
+                />
+                <span>{todo.text}</span>
+              </label>
+            ) : (
+              <>
+                <span aria-hidden="true">{todo.done ? '☑' : '☐'}</span>
+                <span>{todo.text}</span>
+              </>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
 export const TODO_WIDGET_MODULE =
   defineCanvasAppReactWidgetModule<TodoWidgetData>({
     defaultData: createTodoWidgetData,
@@ -87,56 +170,18 @@ export const TODO_WIDGET_MODULE =
     label: 'Todo',
     presentation: TODO_WIDGET_PRESENTATION,
     tool: false,
-    render: ({ data, item }) => (
-      <div
-        data-todo-widget={item.id}
-        style={{
-          background: '#fff',
-          border: '1px solid #d0d2cc',
-          borderRadius: 6,
-          boxSizing: 'border-box',
-          color: '#1d2028',
-          display: 'flex',
-          flexDirection: 'column',
-          fontFamily: 'Inter, system-ui, sans-serif',
-          gap: 6,
-          height: '100%',
-          padding: '12px 14px',
-          width: '100%',
-        }}
-      >
-        <div style={{ color: '#39404c', fontSize: 12, fontWeight: 600 }}>
-          {data.title}
-        </div>
-        <ul
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 4,
-            listStyle: 'none',
-            margin: 0,
-            padding: 0,
-          }}
-        >
-          {data.items.map((todo, index) => (
-            <li
-              key={index}
-              style={{
-                alignItems: 'center',
-                color: todo.done ? '#6d7380' : '#1d2028',
-                display: 'flex',
-                fontSize: 13,
-                gap: 8,
-                textDecoration: todo.done ? 'line-through' : 'none',
-              }}
-            >
-              <span aria-hidden="true">{todo.done ? '☑' : '☐'}</span>
-              <span>{todo.text}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-    ),
+    interaction: {
+      render: ({ data, item, onChangeData }) =>
+        renderTodoWidgetCard({
+          active: true,
+          data,
+          itemId: item.id,
+          onToggleItem: (index) => {
+            onChangeData(toggleTodoWidgetItemDone(data, index))
+          },
+        }),
+    },
+    render: ({ data, item }) => renderTodoWidgetCard({ data, itemId: item.id }),
     title: 'Todo widget',
     validateData: isTodoWidgetData,
   })
