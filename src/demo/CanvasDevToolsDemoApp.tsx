@@ -38,6 +38,11 @@ import {
   type Tool,
 } from '../canvas'
 import { EngineSelectionToolbar } from './CanvasDevToolsSelectionToolbar'
+import { EngineWidgetPlayOverlay } from './CanvasDevToolsWidgetPlayOverlay'
+import {
+  isTodoWidgetData,
+  toggleTodoWidgetItemDone,
+} from './widget-catalog/TodoWidget'
 import './CanvasDevToolsDemoApp.css'
 
 type CanvasEngineDemoModel =
@@ -100,6 +105,7 @@ function CanvasEngineDemoSurface({
 }) {
   const viewportPercent = `${Math.round(app.zoomControls.scale * 100)}%`
   const [selectionToolbarVisible, setSelectionToolbarVisible] = useState(false)
+  const [activeWidgetId, setActiveWidgetId] = useState<string | null>(null)
   const [theme, setTheme] = useState<'dark' | 'light'>('light')
   const [votingPanelOpen, setVotingPanelOpen] = useState(false)
   const [contextMenu, setContextMenu] =
@@ -108,6 +114,29 @@ function CanvasEngineDemoSurface({
     useState<EngineSelectionPointerState | null>(null)
   const votingPanelVisible = votingPanelOpen ||
     app.votingSession.status !== 'idle'
+  const activeWidgetItem = activeWidgetId
+    ? app.selection.items.find((item) => item.id === activeWidgetId) ?? null
+    : null
+  const activeWidgetData =
+    activeWidgetItem?.type === 'custom' && isTodoWidgetData(activeWidgetItem.data)
+      ? activeWidgetItem.data
+      : null
+  const onToggleWidgetPlay = () => {
+    const selectedId =
+      app.selection.items.length === 1 ? app.selection.items[0].id : null
+    setActiveWidgetId((current) =>
+      current && current === selectedId ? null : selectedId,
+    )
+  }
+  const onToggleWidgetItem = (index: number) => {
+    app.selection.onReplaceSelectedItems((item) =>
+      item.id === activeWidgetId &&
+      item.type === 'custom' &&
+      isTodoWidgetData(item.data)
+        ? { ...item, data: toggleTodoWidgetItemDone(item.data, index) }
+        : item,
+    )
+  }
   const hideSelectionToolbar = () => {
     setSelectionToolbarVisible(false)
   }
@@ -221,8 +250,10 @@ function CanvasEngineDemoSurface({
         {selectionToolbarVisible ? (
           <EngineSelectionToolbar
             key={app.selection.ids.join('\u0000')}
+            activeWidgetId={activeWidgetId}
             app={app}
             onClose={hideSelectionToolbar}
+            onToggleWidgetPlay={onToggleWidgetPlay}
           />
         ) : null}
         {selectionToolbarVisible ? (
@@ -231,6 +262,11 @@ function CanvasEngineDemoSurface({
             onInsert={hideSelectionToolbar}
           />
         ) : null}
+        <EngineWidgetPlayOverlay
+          activeWidgetId={activeWidgetData ? activeWidgetId : null}
+          data={activeWidgetData}
+          onToggle={onToggleWidgetItem}
+        />
         <EngineTextEditor {...app.textEditor} />
         <CanvasContextCommandMenu
           commandAvailability={app.toolbar.commandAvailability}
