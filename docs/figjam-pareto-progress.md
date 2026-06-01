@@ -67,7 +67,7 @@ de-facto 표준 어휘를 정본화하고, 그 5축 표의 빈 칸(필수+보편
 | [#33](https://github.com/developer-1px/canvas/issues/33) Flip H/V | Done | host flip op + app affordance + demo 버튼. 유닛+e2e+앱 시연(미러/undo) |
 | [#34](https://github.com/developer-1px/canvas/issues/34) Zoom to selection | Already satisfied | `fitView`가 선택분 fit, 'Fit selection' 버튼으로 노출됨 |
 | [#35](https://github.com/developer-1px/canvas/issues/35) Tidy up | Already satisfied | `tidyCanvasSelection` 구현+노출+e2e 존재 |
-| [#36](https://github.com/developer-1px/canvas/issues/36) Image/SVG export | Decision pending | 부분 충돌 — export UI 최소화 결정과 충돌, 스코프 결정 후 진행 |
+| [#36](https://github.com/developer-1px/canvas/issues/36) Image/SVG export | Done | 파이프라인은 이미 완비(직렬화+래스터+모델)였고 demo 노출만 빠져 있었음. demo export 버튼으로 마감. behavioral e2e(다운로드) |
 | [#37](https://github.com/developer-1px/canvas/issues/37) Select same type | Done | `CanvasItemSelectionQuery` + `onSelectSameType`(commitSelection) + demo 버튼. 유닛+e2e |
 | [#38](https://github.com/developer-1px/canvas/issues/38) Dark mode toggle | Done | `<main data-theme>` 토글, 기존 dark 토큰 재사용. behavioral e2e(repaint) |
 

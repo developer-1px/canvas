@@ -135,7 +135,7 @@ repo: ✅ 보유 · ⚠️ 부분 · ❌ 갭. (repo 보유 근거: `CanvasAfford
 | Command palette | 보편 | ✅ | `commandPalette` overlay |
 | Context command menu | 보편 | ✅ | context menu |
 | Keyboard shortcut grammar | 필수 | ✅ | feature-toggle별 shortcut |
-| **Image/SVG/PNG export** | 보편 | ❌ | tldraw/Excalidraw/Figma 코어 action. *DOM/CSS export 제거와 혼동 금지* — 캔버스 래스터/벡터 export는 별개 표준 |
+| **Image/SVG/PNG export** | 보편 | ✅ | `CanvasImageExportSvg`(전 item SVG) + SVG→PNG 래스터 download. demo 'Export selection as image' 버튼 (#36) |
 | Keyboard shortcut help (Shift+/) | 선택 | ❌ | tldraw/Excalidraw 보유, 보류 가능 |
 | Dark mode toggle | 선택 | ✅ | demo `<main data-theme>` 토글, 기존 dark 토큰 재사용 (#38) |
 
