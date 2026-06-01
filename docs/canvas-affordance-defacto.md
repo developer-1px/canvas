@@ -70,7 +70,7 @@ repo: ✅ 보유 · ⚠️ 부분 · ❌ 갭. (repo 보유 근거: `CanvasAfford
 | Pan | 필수 | ✅ | `pan` tool + temporary pan |
 | Zoom in/out/reset | 필수 | ✅ | `zoomIn/zoomOut/zoomReset` |
 | Zoom to fit | 보편 | ✅ | `fitView` |
-| **Zoom to selection** | 보편 | ❌ | Figma `Shift 2`, Miro `Cmd 2` — 없음 |
+| **Zoom to selection** | 보편 | ✅ | `fitView`가 선택 시 선택분에 fit, 'Fit selection' 버튼으로 노출 (#34) |
 | Minimap | 선택 | ❌ | Miro 특유, 보류 가능 |
 
 ### ② Creation
@@ -111,7 +111,7 @@ repo: ✅ 보유 · ⚠️ 부분 · ❌ 갭. (repo 보유 근거: `CanvasAfford
 | Group / ungroup | 필수 | ✅ | `group`/`ungroup` |
 | Lock / unlock | 보편 | ✅ | `lockSelection`/`unlockAll` |
 | Snap grid + smart guides | 보편 | ✅ | snap engine: grid/alignment/spacing |
-| **Tidy up (2D auto-arrange)** | 보편 | ❌ | Figma/Canva tidy-up — align/distribute는 있으나 2D 격자 정돈 없음 |
+| **Tidy up (2D auto-arrange)** | 보편 | ✅ | `tidyCanvasSelection`(2D 격자 정돈) + demo 'Tidy selection' 버튼 (#35) |
 | Select-same (type) | 선택 | ✅ | `selectSameTypeCanvasSelection` + demo 'Select same type' (#37). fill/stroke 변형은 후순위 |
 
 ### ⑤ Collaboration / Presence
