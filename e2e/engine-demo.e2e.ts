@@ -338,6 +338,35 @@ test('toggles the token-driven dark theme', async ({ page }) => {
   await expect(root).toHaveAttribute('data-theme', 'light')
 })
 
+test('renders a widget in an isolated shadow root without leaking styles', async ({
+  page,
+}) => {
+  await page.goto('/')
+
+  const widget = page.locator('[data-canvas-item-id="engine-metric-widget"]')
+  await expect(widget).toBeVisible()
+  // Playwright pierces open shadow roots, so widget content is still reachable.
+  await expect(widget.getByText('1,284')).toBeVisible()
+
+  // the widget content lives inside a shadow root (style/DOM encapsulation).
+  const hasShadowRoot = await page.evaluate(() => {
+    const host = document
+      .querySelector('[data-canvas-item-id="engine-metric-widget"]')
+      ?.querySelector('.canvas-widget-shadow-host')
+    return Boolean(host && host.shadowRoot)
+  })
+  expect(hasShadowRoot).toBe(true)
+
+  // the widget's <style> probe must not escape onto the document canvas stage.
+  const leaked = await page.evaluate(() => {
+    const stage = document.querySelector('.canvas-stage')
+    return stage
+      ? getComputedStyle(stage).getPropertyValue('--metric-widget-leak').trim()
+      : 'no-stage'
+  })
+  expect(leaked).toBe('')
+})
+
 test('toggles an arrow between arrowhead and plain line', async ({ page }) => {
   await page.goto('/')
 
