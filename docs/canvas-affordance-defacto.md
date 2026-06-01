@@ -83,7 +83,7 @@ repo: ✅ 보유 · ⚠️ 부분 · ❌ 갭. (repo 보유 근거: `CanvasAfford
 | Sticky note | 필수(whiteboard) | ✅ | `sticky` + quick-create |
 | Connector/arrow | 필수(whiteboard) | ✅ | `arrow` + 스냅 attach + elbow/straight |
 | Frame/Section | 보편 | ✅ | `section` |
-| **Line (arrow와 별개)** | 보편 | ⚠️ | arrow는 있으나 plain line 미분리 (tldraw/Excalidraw는 별 도구) |
+| **Line (arrow와 별개)** | 보편 | ✅ | arrow의 `arrowhead` 토글(end/none)로 plain line 제공 (#41). 별도 tool 대신 arrow item 재사용 — tool-union cascade 회피 |
 | **Vector pen (bezier path)** | 보편 | ❌ | Figma pen, tldraw/Excalidraw — 없음 (freehand만) |
 | Table / Kanban / Link / Checklist | 선택(제품) | ✅ | custom component로 보유(제품-domain) |
 | Stamp | 선택 | ✅ | reaction stamp |

@@ -607,6 +607,32 @@ function EngineSelectionToolbar({
               <Icon aria-hidden="true" size={13} strokeWidth={2} />
             </button>
           ))}
+          <button
+            aria-label="Arrow head"
+            aria-pressed={arrowItem.arrowhead !== 'none'}
+            disabled={disabled}
+            onClick={() => {
+              app.selection.onReplaceSelectedItems((item) =>
+                item.type === 'arrow' ? setEngineArrowhead(item, 'end') : item,
+              )
+            }}
+            type="button"
+          >
+            <ArrowUpRight aria-hidden="true" size={13} strokeWidth={2} />
+          </button>
+          <button
+            aria-label="Line (no arrow head)"
+            aria-pressed={arrowItem.arrowhead === 'none'}
+            disabled={disabled}
+            onClick={() => {
+              app.selection.onReplaceSelectedItems((item) =>
+                item.type === 'arrow' ? setEngineArrowhead(item, 'none') : item,
+              )
+            }}
+            type="button"
+          >
+            <Minus aria-hidden="true" size={13} strokeWidth={2} />
+          </button>
         </>
       ) : null}
 
@@ -1138,6 +1164,19 @@ function getEngineArrowRouting(
   item: Extract<CanvasItem, { type: 'arrow' }>,
 ) {
   return CanvasHost.normalizeCanvasArrowRouting(item.routing)
+}
+
+function setEngineArrowhead(
+  item: Extract<CanvasItem, { type: 'arrow' }>,
+  arrowhead: 'end' | 'none',
+): CanvasItem {
+  if (arrowhead === 'none') {
+    return { ...item, arrowhead: 'none' }
+  }
+
+  const next = { ...item }
+  delete next.arrowhead
+  return next
 }
 
 function getEngineSelectionStyleColor(

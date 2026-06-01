@@ -70,6 +70,7 @@ de-facto 표준 어휘를 정본화하고, 그 5축 표의 빈 칸(필수+보편
 | [#36](https://github.com/developer-1px/canvas/issues/36) Image/SVG export | Done | 파이프라인은 이미 완비(직렬화+래스터+모델)였고 demo 노출만 빠져 있었음. demo export 버튼으로 마감. behavioral e2e(다운로드) |
 | [#37](https://github.com/developer-1px/canvas/issues/37) Select same type | Done | `CanvasItemSelectionQuery` + `onSelectSameType`(commitSelection) + demo 버튼. 유닛+e2e |
 | [#38](https://github.com/developer-1px/canvas/issues/38) Dark mode toggle | Done | `<main data-theme>` 토글, 기존 dark 토큰 재사용. behavioral e2e(repaint) |
+| [#41](https://github.com/developer-1px/canvas/issues/41) Line tool | Done (변형) | 별도 tool-union cascade 대신 arrow `arrowhead` 토글(end/none)로 plain line 능력 제공. behavioral e2e(marker-end 토글) |
 
 검증(이 패스 최신): `tsc -b` pass · `vitest run` 260 files/988 tests pass · `pnpm lint` pass · `pnpm build` pass · `pnpm test:e2e` 23 tests pass.
 
