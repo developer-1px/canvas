@@ -26,6 +26,11 @@ import {
   isCanvasShapeItem,
   isCanvasShapeItemStorageShape,
 } from '../shape/CanvasShapeItem'
+import {
+  isOptionalCanvasItemFontSize,
+  isOptionalCanvasItemOpacity,
+  isOptionalCanvasItemTextAlign,
+} from '../style/CanvasItemStyleValidation'
 
 export type { CanvasEditableTextItem } from '../model'
 
@@ -198,7 +203,11 @@ function getCanvasEditableTextAutoHeight(
 function isCanvasTextItemStorageShape(
   value: Record<string, unknown>,
 ) {
-  return value.type === 'text' && typeof value.text === 'string'
+  return value.type === 'text' &&
+    isOptionalCanvasItemFontSize(value.fontSize) &&
+    isOptionalCanvasItemOpacity(value.opacity) &&
+    typeof value.text === 'string' &&
+    isOptionalCanvasItemTextAlign(value.textAlign)
 }
 
 function isCanvasArrowTextItemStorageShape(

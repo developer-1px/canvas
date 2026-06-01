@@ -28,6 +28,10 @@ export type CanvasTextEditorStyle = {
   width: number
 }
 
+const CANVAS_TEXT_EDITOR_DEFAULT_STYLE = Object.freeze({
+  fontSize: 16,
+})
+
 export function commitCanvasTextEditing({
   commitItemsChange,
   editing,
@@ -73,8 +77,14 @@ export function getCanvasTextEditorStyle({
     width: bounds.w * viewport.scale,
     height: bounds.h * viewport.scale,
     minHeight: bounds.h * viewport.scale,
-    fontSize: 16 * viewport.scale,
+    fontSize: getCanvasTextEditorFontSize(editingItem) * viewport.scale,
   }
+}
+
+function getCanvasTextEditorFontSize(item: CanvasEditableTextItem) {
+  return 'fontSize' in item && typeof item.fontSize === 'number'
+    ? item.fontSize
+    : CANVAS_TEXT_EDITOR_DEFAULT_STYLE.fontSize
 }
 
 function getCommittedCanvasTextValue({

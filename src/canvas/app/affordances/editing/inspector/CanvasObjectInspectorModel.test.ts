@@ -3,6 +3,7 @@ import type {
   Bounds,
   CanvasItem,
 } from '../../../../entities'
+import { createCanvasAffordanceConfig } from '../../../../engine'
 import { getCanvasObjectInspectorModel } from './CanvasObjectInspectorModel'
 
 describe('CanvasObjectInspectorModel', () => {
@@ -100,11 +101,18 @@ describe('CanvasObjectInspectorModel', () => {
     expect(model.styleControls.map((control) => control.id)).toEqual([
       'fill',
       'stroke',
+      'opacity',
+      'strokeWidth',
+      'fontSize',
+      'textAlign',
     ])
 
-    model.styleControls
-      .find((control) => control.id === 'fill')
-      ?.onSelect('#C2E5FF')
+    const fillControl = model.styleControls
+      .find((control) => control.kind === 'swatches' && control.id === 'fill')
+
+    if (fillControl?.kind === 'swatches') {
+      fillControl.onSelect('#C2E5FF')
+    }
 
     expect(commitItemsChange).toHaveBeenCalledWith(
       {
@@ -121,6 +129,20 @@ describe('CanvasObjectInspectorModel', () => {
         after: ['rect-1'],
       },
     )
+  })
+
+  it('respects the object style controls affordance toggle', () => {
+    const model = createModel({
+      config: createCanvasAffordanceConfig({
+        overlays: {
+          objectStyleControls: false,
+        },
+      }),
+      selectedItems: [createRectItem()],
+      selection: ['rect-1'],
+    })
+
+    expect(model.styleControls).toEqual([])
   })
 
   it('ignores bounds changes when there is no committed selection bounds', () => {
@@ -147,6 +169,7 @@ describe('CanvasObjectInspectorModel', () => {
 function createModel({
   bounds = null,
   commitItemsChange = vi.fn(),
+  config = createCanvasAffordanceConfig(),
   customFocus = null,
   inspectorPanels = [],
   selectedItems = [],
@@ -156,6 +179,9 @@ function createModel({
   commitItemsChange?: Parameters<
     typeof getCanvasObjectInspectorModel
   >[0]['commitItemsChange']
+  config?: Parameters<
+    typeof getCanvasObjectInspectorModel
+  >[0]['config']
   customFocus?: Parameters<
     typeof getCanvasObjectInspectorModel
   >[0]['customFocus']
@@ -168,6 +194,7 @@ function createModel({
   return getCanvasObjectInspectorModel({
     bounds,
     commitItemsChange,
+    config,
     customFocus,
     inspectorPanels,
     selectedItems,

@@ -95,6 +95,12 @@ describe('CanvasEditableTextItem', () => {
     })).toBe(true)
     expect(isCanvasEditableTextItemStorageShape(textItem)).toBe(true)
     expect(isCanvasEditableTextItemStorageShape({
+      ...textItem,
+      fontSize: 18,
+      opacity: 0.7,
+      textAlign: 'center',
+    })).toBe(true)
+    expect(isCanvasEditableTextItemStorageShape({
       ...rectItem,
       fill: 1,
     })).toBe(false)
@@ -105,6 +111,14 @@ describe('CanvasEditableTextItem', () => {
     expect(isCanvasEditableTextItemStorageShape({
       ...textItem,
       text: undefined,
+    })).toBe(false)
+    expect(isCanvasEditableTextItemStorageShape({
+      ...textItem,
+      fontSize: 0,
+    })).toBe(false)
+    expect(isCanvasEditableTextItemStorageShape({
+      ...textItem,
+      textAlign: 'justify',
     })).toBe(false)
     expect(isCanvasEditableTextItemStorageShape(arrowItem)).toBe(true)
   })

@@ -10,9 +10,12 @@ export type CanvasComponentItem = CanvasItemBase & {
   columns?: string[]
   component: CanvasComponentKind
   fill: string
+  fontSize?: number
   items?: string[]
+  opacity?: number
   orientation?: 'horizontal' | 'vertical'
   stroke: string
+  textAlign?: 'center' | 'left' | 'right'
   title: string
   url?: string
 }

@@ -4,23 +4,16 @@ import type {
 } from 'react'
 import type { Bounds } from '../../../../entities'
 import { MIN_ITEM_SIZE } from '../../../../core'
+import type {
+  CanvasObjectStyleControl,
+  CanvasObjectStyleNumberControl,
+  CanvasObjectStyleSegmentedControl,
+  CanvasObjectStyleSwatchControl,
+} from './CanvasObjectStyleInspector'
 
 type CanvasObjectInspectorPanel = {
   content: ReactNode
   id: string
-}
-
-type CanvasObjectInspectorStyleControl = {
-  disabled: boolean
-  id: string
-  label: string
-  swatches: readonly CanvasObjectInspectorStyleSwatch[]
-  onSelect: (color: string) => void
-}
-
-type CanvasObjectInspectorStyleSwatch = {
-  color: string
-  selected: boolean
 }
 
 type CanvasObjectInspectorProps = {
@@ -28,7 +21,7 @@ type CanvasObjectInspectorProps = {
   customPanels: readonly CanvasObjectInspectorPanel[]
   disabled: boolean
   label: string | null
-  styleControls: readonly CanvasObjectInspectorStyleControl[]
+  styleControls: readonly CanvasObjectStyleControl[]
   onChangeBounds: (bounds: Bounds) => void
 }
 
@@ -124,24 +117,11 @@ export function CanvasObjectInspector({
       {styleControls.length > 0 ? (
         <div className="inspector-style-controls">
           {styleControls.map((control) => (
-            <div className="inspector-style-control" key={control.id}>
-              <div className="inspector-style-label">{control.label}</div>
-              <div className="inspector-swatches">
-                {control.swatches.map((swatch) => (
-                  <button
-                    key={swatch.color}
-                    type="button"
-                    className="inspector-swatch"
-                    aria-label={`${control.label} ${swatch.color}`}
-                    aria-pressed={swatch.selected}
-                    disabled={disabled || control.disabled}
-                    title={swatch.color}
-                    style={{ backgroundColor: swatch.color }}
-                    onClick={() => control.onSelect(swatch.color)}
-                  />
-                ))}
-              </div>
-            </div>
+            <CanvasObjectInspectorStyleControlView
+              control={control}
+              disabled={disabled}
+              key={control.id}
+            />
           ))}
         </div>
       ) : null}
@@ -154,6 +134,149 @@ export function CanvasObjectInspector({
   )
 }
 
+function CanvasObjectInspectorStyleControlView({
+  control,
+  disabled,
+}: {
+  control: CanvasObjectStyleControl
+  disabled: boolean
+}) {
+  if (control.kind === 'number') {
+    return (
+      <CanvasObjectInspectorNumberStyleControl
+        control={control}
+        disabled={disabled}
+      />
+    )
+  }
+
+  if (control.kind === 'segmented') {
+    return (
+      <CanvasObjectInspectorSegmentedStyleControl
+        control={control}
+        disabled={disabled}
+      />
+    )
+  }
+
+  return (
+    <CanvasObjectInspectorSwatchStyleControl
+      control={control}
+      disabled={disabled}
+    />
+  )
+}
+
+function CanvasObjectInspectorSwatchStyleControl({
+  control,
+  disabled,
+}: {
+  control: CanvasObjectStyleSwatchControl
+  disabled: boolean
+}) {
+  return (
+    <div className="inspector-style-control">
+      <div className="inspector-style-label">{control.label}</div>
+      <div className="inspector-swatches">
+        {control.swatches.map((swatch) => (
+          <button
+            aria-label={`${control.label} ${swatch.color}`}
+            aria-pressed={swatch.selected}
+            className="inspector-swatch"
+            disabled={disabled || control.disabled}
+            key={swatch.color}
+            onClick={() => control.onSelect(swatch.color)}
+            style={{ backgroundColor: swatch.color }}
+            title={swatch.color}
+            type="button"
+          />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function CanvasObjectInspectorNumberStyleControl({
+  control,
+  disabled,
+}: {
+  control: CanvasObjectStyleNumberControl
+  disabled: boolean
+}) {
+  const commitNumber = (value: string) => {
+    const parsed = Number(value)
+
+    if (Number.isFinite(parsed)) {
+      control.onChange(parsed)
+    }
+  }
+  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      event.currentTarget.blur()
+      return
+    }
+
+    if (event.key === 'Escape') {
+      event.currentTarget.value = formatStyleNumberValue(control.value)
+      event.currentTarget.blur()
+    }
+  }
+
+  return (
+    <label className="inspector-style-control">
+      <span className="inspector-style-label">{control.label}</span>
+      <input
+        aria-label={control.label}
+        className="inspector-style-number"
+        defaultValue={formatStyleNumberValue(control.value)}
+        disabled={disabled || control.disabled}
+        inputMode="decimal"
+        key={`${control.id}:${formatStyleNumberValue(control.value)}`}
+        max={control.max}
+        min={control.min}
+        onBlur={(event) => commitNumber(event.currentTarget.value)}
+        onKeyDown={handleKeyDown}
+        placeholder={control.mixed ? 'Mixed' : undefined}
+        step={control.step}
+        type="number"
+      />
+    </label>
+  )
+}
+
+function CanvasObjectInspectorSegmentedStyleControl({
+  control,
+  disabled,
+}: {
+  control: CanvasObjectStyleSegmentedControl
+  disabled: boolean
+}) {
+  return (
+    <div className="inspector-style-control">
+      <div className="inspector-style-label">{control.label}</div>
+      <div className="inspector-segments">
+        {control.segments.map((segment) => (
+          <button
+            aria-label={`${control.label} ${segment.label}`}
+            aria-pressed={segment.selected}
+            className="inspector-segment"
+            disabled={disabled || control.disabled}
+            key={segment.value}
+            onClick={() => control.onSelect(segment.value)}
+            type="button"
+          >
+            {segment.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 function formatBoundsValue(value: number | undefined) {
   return value === undefined ? '' : String(Math.round(value))
+}
+
+function formatStyleNumberValue(value: number | null) {
+  return value === null ? '' : String(value)
 }

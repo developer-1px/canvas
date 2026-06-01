@@ -467,27 +467,38 @@ function getEngineSelectionToolbarDescriptors(
 function getEngineSelectionStyleToolbarDescriptors(
   context: EngineSelectionToolbarContext,
 ): EngineSelectionToolbarMenuDescriptor[] {
-  return context.app.inspector.styleControls.map((control) => ({
-    disabled: (nextContext) => nextContext.disabled || control.disabled,
-    groups: () => [{
-      id: `${control.id}-swatches`,
-      items: control.swatches.map((swatch) => ({
-        disabled: (nextContext) => nextContext.disabled || control.disabled,
-        id: swatch.color,
-        label: `${control.label} ${swatch.color}`,
-        onSelect: () => control.onSelect(swatch.color),
-        pressed: () => swatch.selected,
-        swatchColor: swatch.color,
-        title: swatch.color,
-      })),
-      layout: 'swatches',
-    }],
-    icon: control.id === 'fill' ? PaintBucket : PencilLine,
-    id: `style-${control.id}`,
-    kind: 'menu',
-    label: `${control.label} color`,
-    swatchColor: () => getEngineSelectionStyleColor(control),
-  }))
+  return context.app.inspector.styleControls
+    .filter(isEngineSelectionSwatchStyleControl)
+    .map((control) => ({
+      disabled: (nextContext) => nextContext.disabled || control.disabled,
+      groups: () => [{
+        id: `${control.id}-swatches`,
+        items: control.swatches.map((swatch) => ({
+          disabled: (nextContext) => nextContext.disabled || control.disabled,
+          id: swatch.color,
+          label: `${control.label} ${swatch.color}`,
+          onSelect: () => control.onSelect(swatch.color),
+          pressed: () => swatch.selected,
+          swatchColor: swatch.color,
+          title: swatch.color,
+        })),
+        layout: 'swatches',
+      }],
+      icon: control.id === 'fill' ? PaintBucket : PencilLine,
+      id: `style-${control.id}`,
+      kind: 'menu',
+      label: `${control.label} color`,
+      swatchColor: () => getEngineSelectionStyleColor(control),
+    }))
+}
+
+function isEngineSelectionSwatchStyleControl(
+  control: CanvasEngineDemoModel['inspector']['styleControls'][number],
+): control is Extract<
+  CanvasEngineDemoModel['inspector']['styleControls'][number],
+  { kind: 'swatches' }
+> {
+  return control.kind === 'swatches'
 }
 
 function EngineSelectionToolbarSlot({
@@ -1110,7 +1121,10 @@ function setEngineArrowhead(
 }
 
 function getEngineSelectionStyleColor(
-  control: CanvasEngineDemoModel['inspector']['styleControls'][number],
+  control: Extract<
+    CanvasEngineDemoModel['inspector']['styleControls'][number],
+    { kind: 'swatches' }
+  >,
 ) {
   return (
     control.swatches.find((swatch) => swatch.selected) ??

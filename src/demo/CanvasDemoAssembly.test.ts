@@ -123,6 +123,8 @@ describe('CanvasDemoAssembly', () => {
     expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.grid).toBe(false)
     expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.itemOutline)
       .toBe(true)
+    expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.objectStyleControls)
+      .toBe(true)
     expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.marquee).toBe(
       true,
     )

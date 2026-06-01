@@ -18,6 +18,7 @@ export type {
   CanvasComponentItem,
   CanvasComponentKind,
   CanvasArrowEndpoint,
+  CanvasArrowhead,
   CanvasArrowRouting,
   CanvasCommentItem,
   CanvasCustomItem,

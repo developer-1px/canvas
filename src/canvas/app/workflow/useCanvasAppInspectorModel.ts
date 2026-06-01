@@ -13,6 +13,7 @@ export function useCanvasAppInspectorModel({
   return {
     ...useCanvasObjectInspector({
       commitItemsChange,
+      config,
       customFocus,
       inspectorPanels,
       itemReadModel,

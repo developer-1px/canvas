@@ -10,6 +10,12 @@ import {
   type CanvasBuiltinShapeTool,
   type Tool,
 } from '../../core'
+import {
+  isOptionalCanvasItemFontSize,
+  isOptionalCanvasItemOpacity,
+  isOptionalCanvasItemStrokeWidth,
+  isOptionalCanvasItemTextAlign,
+} from '../style/CanvasItemStyleValidation'
 
 export const CANVAS_DEFAULT_SHAPE_TYPE: CanvasShapeType = 'rect'
 export const CANVAS_DEFAULT_SHAPE_KIND: CanvasShapeKind =
@@ -83,9 +89,13 @@ function isCanvasShapeStorageShape(
   return (
     value.type === 'shape' &&
     typeof value.fill === 'string' &&
+    isOptionalCanvasItemFontSize(value.fontSize) &&
+    isOptionalCanvasItemOpacity(value.opacity) &&
     typeof value.stroke === 'string' &&
+    isOptionalCanvasItemStrokeWidth(value.strokeWidth) &&
     isCanvasShapeKind(value.shapeType) &&
-    (value.text === undefined || typeof value.text === 'string')
+    (value.text === undefined || typeof value.text === 'string') &&
+    isOptionalCanvasItemTextAlign(value.textAlign)
   )
 }
 
@@ -95,8 +105,12 @@ function isLegacyCanvasRectStorageShape(
   return (
     value.type === 'rect' &&
     typeof value.fill === 'string' &&
+    isOptionalCanvasItemFontSize(value.fontSize) &&
+    isOptionalCanvasItemOpacity(value.opacity) &&
     typeof value.stroke === 'string' &&
+    isOptionalCanvasItemStrokeWidth(value.strokeWidth) &&
     (value.shape === undefined || isCanvasShapeKind(value.shape)) &&
-    (value.text === undefined || typeof value.text === 'string')
+    (value.text === undefined || typeof value.text === 'string') &&
+    isOptionalCanvasItemTextAlign(value.textAlign)
   )
 }

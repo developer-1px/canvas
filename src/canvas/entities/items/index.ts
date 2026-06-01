@@ -31,6 +31,7 @@ export type {
 export type {
   ArrowItem,
   CanvasArrowEndpoint,
+  CanvasArrowhead,
   CanvasArrowRouting,
 } from './CanvasArrowItems'
 export type {

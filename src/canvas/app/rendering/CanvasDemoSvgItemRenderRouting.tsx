@@ -134,13 +134,13 @@ function renderCanvasDemoSvgComponentItemRoute({
   const editable = isCanvasEditableTextItem(item)
 
   return {
-    children: (
+    children: renderCanvasDemoSvgOpacityGroup(item.opacity, (
       <CanvasDemoSvgComponentRenderer
         getComponentPresentation={getComponentPresentation}
         item={item}
         renderers={componentPresentationRenderers}
       />
-    ),
+    )),
     component: item.component,
     onDoubleClick: editable ? () => onTextDoubleClick(item) : undefined,
   }
@@ -285,4 +285,13 @@ function renderCanvasDemoSvgRectTextItemRoute({
     children: renderCanvasDemoSvgRectTextItem({ item }),
     onDoubleClick: () => onTextDoubleClick(item),
   }
+}
+
+function renderCanvasDemoSvgOpacityGroup(
+  opacity: number | undefined,
+  children: ReactNode,
+) {
+  return opacity === undefined || opacity === 1
+    ? children
+    : <g opacity={opacity}>{children}</g>
 }

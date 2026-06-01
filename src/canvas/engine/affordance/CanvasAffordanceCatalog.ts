@@ -91,6 +91,7 @@ export const CANVAS_AFFORDANCE_CONFIG_DEFAULTS = Object.freeze({
     grid: true,
     imageControls: true,
     inspector: true,
+    objectStyleControls: true,
     itemOutline: true,
     laserTrail: true,
     marquee: true,

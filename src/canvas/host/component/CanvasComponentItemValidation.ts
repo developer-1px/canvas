@@ -4,6 +4,11 @@ import {
   isCanvasLinkPreviewOrientation,
   isCanvasLinkPreviewUrl,
 } from './CanvasLinkPreviewComponent'
+import {
+  isOptionalCanvasItemFontSize,
+  isOptionalCanvasItemOpacity,
+  isOptionalCanvasItemTextAlign,
+} from '../style/CanvasItemStyleValidation'
 
 export function isCanvasComponentItemStorageShape(
   value: Record<string, unknown>,
@@ -14,7 +19,10 @@ export function isCanvasComponentItemStorageShape(
     isCanvasStableId(value.component) &&
     typeof value.title === 'string' &&
     typeof value.fill === 'string' &&
+    isOptionalCanvasItemFontSize(value.fontSize) &&
+    isOptionalCanvasItemOpacity(value.opacity) &&
     typeof value.stroke === 'string' &&
+    isOptionalCanvasItemTextAlign(value.textAlign) &&
     typeof value.accent === 'string' &&
     (value.body === undefined || typeof value.body === 'string') &&
     (value.checkedItems === undefined ||
