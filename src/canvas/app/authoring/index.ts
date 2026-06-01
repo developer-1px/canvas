@@ -128,3 +128,12 @@ export {
   isCanvasAppExtensionId,
   type CanvasAppExtensionId,
 } from '../extensions/CanvasAppExtensionIds'
+export {
+  CANVAS_APP_FACILITATION_AFFORDANCE_CONFIG,
+  CANVAS_APP_FACILITATION_BUNDLE_ID,
+  CANVAS_APP_FACILITATION_DISABLED_AFFORDANCE_CONFIG,
+  createCanvasAppFacilitationAffordanceConfigInput,
+  mergeCanvasAppAffordanceConfigInput,
+  withCanvasAppFacilitationBundle,
+  type CanvasAppFacilitationBundleOptions,
+} from '../extensions/facilitation/CanvasAppFacilitationBundle'

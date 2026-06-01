@@ -73,6 +73,11 @@ Legacy specimen tests are kept as `.legacy.ts(x)` and excluded from the default 
 | Command palette/component palette/floating product chrome | 같은 명령 노출 취지의 중복 UI surface |
 | Export HTML/CSS/patch UI | DOM/CSS consumer feature이며 canvas engine core가 아님 |
 
+Facilitation 기능은 제거 대상이 아니라 `canvas-facilitation` first-party
+bundle이다. Host/Demo는 `withCanvasAppFacilitationBundle`로 timer, voting,
+spotlight, emote, cursor chat, laser pointer의 overlay/shortcut/gesture/tool
+toggle을 한 번에 opt-in/out한다.
+
 ## De-facto Reconciliation
 
 > `docs/canvas-affordance-defacto.md` 정본 기준으로 위 keep/legacy/drop을 재해석한다.
