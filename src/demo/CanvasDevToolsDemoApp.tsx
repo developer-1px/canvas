@@ -1,51 +1,21 @@
 import {
-  AlignHorizontalJustifyCenter,
-  AlignHorizontalJustifyEnd,
-  AlignHorizontalJustifyStart,
-  AlignHorizontalSpaceBetween,
-  AlignVerticalJustifyCenter,
-  AlignVerticalJustifyEnd,
-  AlignVerticalJustifyStart,
-  AlignVerticalSpaceBetween,
   ArrowUpRight,
-  Boxes,
-  BringToFront,
-  Circle,
-  Copy,
-  CornerDownRight,
-  Diamond,
-  Download,
   Eraser,
-  Eye,
-  EyeOff,
-  FlipHorizontal,
-  FlipVertical,
   Frame,
-  Group,
   Highlighter,
-  LayoutGrid,
-  Lock,
   Maximize2,
   MessageSquareText,
   Minus,
   Moon,
   MousePointer2,
   Move,
-  MoveDown,
-  MoveUp,
-  PanelTopClose,
-  PaintBucket,
   PencilLine,
   Plus,
   RotateCcw,
-  RotateCw,
-  SendToBack,
   Square,
   StickyNote,
   Sun,
   Type,
-  Trash2,
-  Ungroup,
   Unlock,
   Vote,
   ZoomIn,
@@ -61,16 +31,13 @@ import {
 import {
   CanvasApp,
   CanvasContextCommandMenu,
-  CanvasHost,
   type CanvasAppAssemblyInput,
   type CanvasAppProps,
   type CanvasContextCommandMenuState,
-  type CanvasItem,
-  type CanvasShapeLikeItem,
-  type CanvasShapeType,
   type CanvasStampKind,
   type Tool,
 } from '../canvas'
+import { EngineSelectionToolbar } from './CanvasDevToolsSelectionToolbar'
 import './CanvasDevToolsDemoApp.css'
 
 type CanvasEngineDemoModel =
@@ -94,8 +61,6 @@ const ENGINE_DEMO_TOOLS = [
   label: string
 }[]
 
-type EngineSelectionStyleControlId = 'fill' | 'stroke'
-
 type EngineSelectionPointerState = {
   dragging: boolean
   pointerId: number
@@ -104,25 +69,6 @@ type EngineSelectionPointerState = {
 }
 
 const ENGINE_SELECTION_DRAG_THRESHOLD = 3
-
-const ENGINE_SELECTION_SHAPE_TYPES = [
-  { icon: Square, label: 'Rect shape', type: 'rect' },
-  { icon: Circle, label: 'Ellipse shape', type: 'ellipse' },
-  { icon: Diamond, label: 'Diamond shape', type: 'diamond' },
-] as const satisfies readonly {
-  icon: typeof Square
-  label: string
-  type: CanvasShapeType
-}[]
-
-const ENGINE_SELECTION_ARROW_ROUTINGS = [
-  { icon: CornerDownRight, label: 'Elbow connector', routing: 'elbow' },
-  { icon: ArrowUpRight, label: 'Straight connector', routing: 'straight' },
-] as const satisfies readonly {
-  icon: typeof ArrowUpRight
-  label: string
-  routing: Extract<CanvasItem, { type: 'arrow' }>['routing']
-}[]
 
 const ENGINE_SELECTION_STAMPS = [
   { label: '+1', stamp: 'thumbs-up', title: 'Stamp +1' },
@@ -133,57 +79,6 @@ const ENGINE_SELECTION_STAMPS = [
   stamp: CanvasStampKind
   title: string
 }[]
-
-const ENGINE_SELECTION_ALIGN_CONTROLS = [
-  { command: 'alignLeft', icon: AlignHorizontalJustifyStart, label: 'Align left', mode: 'alignLeft' },
-  { command: 'alignCenter', icon: AlignHorizontalJustifyCenter, label: 'Align center', mode: 'alignCenter' },
-  { command: 'alignRight', icon: AlignHorizontalJustifyEnd, label: 'Align right', mode: 'alignRight' },
-  { command: 'alignTop', icon: AlignVerticalJustifyStart, label: 'Align top', mode: 'alignTop' },
-  { command: 'alignMiddle', icon: AlignVerticalJustifyCenter, label: 'Align middle', mode: 'alignMiddle' },
-  { command: 'alignBottom', icon: AlignVerticalJustifyEnd, label: 'Align bottom', mode: 'alignBottom' },
-] as const
-
-const ENGINE_SELECTION_DISTRIBUTE_CONTROLS = [
-  {
-    command: 'distributeHorizontal',
-    icon: AlignHorizontalSpaceBetween,
-    label: 'Distribute horizontally',
-    mode: 'distributeHorizontal',
-  },
-  {
-    command: 'distributeVertical',
-    icon: AlignVerticalSpaceBetween,
-    label: 'Distribute vertically',
-    mode: 'distributeVertical',
-  },
-] as const
-
-const ENGINE_SELECTION_LAYER_ORDER_CONTROLS = [
-  {
-    command: 'bringToFront',
-    icon: BringToFront,
-    label: 'Bring to front',
-    mode: 'bringToFront',
-  },
-  {
-    command: 'bringForward',
-    icon: MoveUp,
-    label: 'Bring forward',
-    mode: 'bringForward',
-  },
-  {
-    command: 'sendBackward',
-    icon: MoveDown,
-    label: 'Send backward',
-    mode: 'sendBackward',
-  },
-  {
-    command: 'sendToBack',
-    icon: SendToBack,
-    label: 'Send to back',
-    mode: 'sendToBack',
-  },
-] as const
 
 export function CanvasDevToolsDemoApp({
   assemblyInput,
@@ -477,495 +372,6 @@ function EngineStickyQuickCreateControls({
   )
 }
 
-function EngineSelectionToolbar({
-  app,
-  onClose,
-}: {
-  app: CanvasEngineDemoModel
-  onClose: () => void
-}) {
-  const [openStyleControl, setOpenStyleControl] =
-    useState<EngineSelectionStyleControlId | null>(null)
-  const {
-    anchor,
-    disabled,
-    ids,
-    items,
-  } = app.selection
-  const selectedItem = items.length === 1 ? items[0] : null
-  const canEditText = selectedItem
-    ? CanvasHost.isCanvasEditableTextItem(selectedItem)
-    : false
-  const canChangeShape = items.length > 0 &&
-    items.every(CanvasHost.isCanvasShapeItem)
-  const arrowItem = selectedItem?.type === 'arrow' ? selectedItem : null
-  const sectionItems = items.filter(CanvasHost.isCanvasSectionComponentItem)
-  const canUseSectionActions =
-    sectionItems.length > 0 && sectionItems.length === items.length
-  const canGroup =
-    app.toolbar.commandAvailability.group && sectionItems.length === 0
-  const canUngroup = app.toolbar.commandAvailability.ungroup
-  const canSection = sectionItems.length === 0 && items.length > 0
-  const canUnsection = canUseSectionActions
-  const canDuplicate = app.toolbar.commandAvailability.duplicate
-  const canDelete = app.toolbar.commandAvailability.delete
-  const canAlign = ENGINE_SELECTION_ALIGN_CONTROLS.some(
-    (control) => app.toolbar.commandAvailability[control.command],
-  )
-  const canDistribute = ENGINE_SELECTION_DISTRIBUTE_CONTROLS.some(
-    (control) => app.toolbar.commandAvailability[control.command],
-  )
-  const canArrange =
-    canAlign ||
-    canDistribute ||
-    app.selection.canTidy ||
-    app.selection.canFlip ||
-    app.selection.canSelectSame
-  const canLayerOrder = ENGINE_SELECTION_LAYER_ORDER_CONTROLS.some(
-    (control) =>
-      app.toolbar.commandAvailability[control.command] &&
-      app.selection.canReorder[control.mode],
-  )
-  const showRotationControls = items.length > 0
-
-  if (
-    !anchor ||
-    ids.length === 0 ||
-    app.textEditor.editing ||
-    app.toolbar.tool !== 'select'
-  ) {
-    return null
-  }
-
-  const visibleStyleControl = app.inspector.styleControls.find(
-    (control) => control.id === openStyleControl,
-  )
-
-  return (
-    <div
-      className="engine-selection-toolbar"
-      role="toolbar"
-      aria-label="Object actions"
-      data-placement={anchor.placement}
-      style={{
-        '--engine-selection-x': `${anchor.x}px`,
-        '--engine-selection-y': `${anchor.y}px`,
-      } as CSSProperties}
-      onPointerDown={(event) => event.stopPropagation()}
-    >
-      {canEditText ? (
-        <button
-          aria-label="Edit text"
-          disabled={disabled}
-          onClick={app.selection.onEditText}
-          type="button"
-        >
-          <Type aria-hidden="true" size={13} strokeWidth={2} />
-        </button>
-      ) : null}
-
-      {canChangeShape ? (
-        <>
-          <EngineSelectionDivider />
-          {ENGINE_SELECTION_SHAPE_TYPES.map(({ icon: Icon, label, type }) => (
-            <button
-              aria-label={label}
-              aria-pressed={getEngineSelectionShapeType(items) === type}
-              disabled={disabled}
-              key={type}
-              onClick={() => {
-                app.selection.onReplaceSelectedItems((item) =>
-                  replaceEngineSelectionShapeType(item, type),
-                )
-              }}
-              type="button"
-            >
-              <Icon aria-hidden="true" size={13} strokeWidth={2} />
-            </button>
-          ))}
-        </>
-      ) : null}
-
-      {arrowItem ? (
-        <>
-          <EngineSelectionDivider />
-          {ENGINE_SELECTION_ARROW_ROUTINGS.map(({ icon: Icon, label, routing }) => (
-            <button
-              aria-label={label}
-              aria-pressed={getEngineArrowRouting(arrowItem) === routing}
-              disabled={disabled}
-              key={routing}
-              onClick={() => {
-                app.selection.onReplaceSelectedItems((item) =>
-                  item.type === 'arrow'
-                    ? CanvasHost.setCanvasArrowRouting(item, routing)
-                    : item,
-                )
-              }}
-              type="button"
-            >
-              <Icon aria-hidden="true" size={13} strokeWidth={2} />
-            </button>
-          ))}
-          <button
-            aria-label="Arrow head"
-            aria-pressed={arrowItem.arrowhead !== 'none'}
-            disabled={disabled}
-            onClick={() => {
-              app.selection.onReplaceSelectedItems((item) =>
-                item.type === 'arrow' ? setEngineArrowhead(item, 'end') : item,
-              )
-            }}
-            type="button"
-          >
-            <ArrowUpRight aria-hidden="true" size={13} strokeWidth={2} />
-          </button>
-          <button
-            aria-label="Line (no arrow head)"
-            aria-pressed={arrowItem.arrowhead === 'none'}
-            disabled={disabled}
-            onClick={() => {
-              app.selection.onReplaceSelectedItems((item) =>
-                item.type === 'arrow' ? setEngineArrowhead(item, 'none') : item,
-              )
-            }}
-            type="button"
-          >
-            <Minus aria-hidden="true" size={13} strokeWidth={2} />
-          </button>
-        </>
-      ) : null}
-
-      {app.inspector.styleControls.map((control) => (
-        <div className="engine-selection-style-control" key={control.id}>
-          <EngineSelectionDivider />
-          <button
-            aria-label={`${control.label} color`}
-            aria-expanded={openStyleControl === control.id}
-            className="engine-selection-style-button"
-            disabled={disabled || control.disabled}
-            onClick={() =>
-              setOpenStyleControl((current) =>
-                current === control.id ? null : control.id,
-              )}
-            type="button"
-          >
-            {control.id === 'fill' ? (
-              <PaintBucket aria-hidden="true" size={12} strokeWidth={2} />
-            ) : (
-              <PencilLine aria-hidden="true" size={12} strokeWidth={2} />
-            )}
-            <span
-              className="engine-selection-current-swatch"
-              style={{
-                backgroundColor: getEngineSelectionStyleColor(control),
-              }}
-            />
-          </button>
-        </div>
-      ))}
-
-      {showRotationControls ? <EngineSelectionDivider /> : null}
-      {showRotationControls ? (
-        <>
-          <button
-            aria-label="Rotate counterclockwise"
-            disabled={!app.selection.canRotate}
-            onClick={() => {
-              app.selection.onRotateSelectedItems(-15)
-            }}
-            type="button"
-          >
-            <RotateCcw aria-hidden="true" size={13} strokeWidth={2} />
-          </button>
-          <button
-            aria-label="Reset rotation"
-            disabled={!app.selection.canRotate || !app.selection.hasRotation}
-            onClick={app.selection.onResetSelectedRotation}
-            type="button"
-          >
-            <span aria-hidden="true">0</span>
-          </button>
-          <button
-            aria-label="Rotate clockwise"
-            disabled={!app.selection.canRotate}
-            onClick={() => {
-              app.selection.onRotateSelectedItems(15)
-            }}
-            type="button"
-          >
-            <RotateCw aria-hidden="true" size={13} strokeWidth={2} />
-          </button>
-        </>
-      ) : null}
-
-      {canArrange ? <EngineSelectionDivider /> : null}
-      {canAlign
-        ? ENGINE_SELECTION_ALIGN_CONTROLS.map(({ command, icon: Icon, label, mode }) => (
-          <button
-            aria-label={label}
-            disabled={disabled || !app.toolbar.commandAvailability[command]}
-            key={command}
-            onClick={() => {
-              app.toolbar.commandHandlers.onAlign(mode)
-            }}
-            type="button"
-          >
-            <Icon aria-hidden="true" size={13} strokeWidth={2} />
-          </button>
-        ))
-        : null}
-      {canDistribute
-        ? ENGINE_SELECTION_DISTRIBUTE_CONTROLS.map(({
-          command,
-          icon: Icon,
-          label,
-          mode,
-        }) => (
-          <button
-            aria-label={label}
-            disabled={disabled || !app.toolbar.commandAvailability[command]}
-            key={command}
-            onClick={() => {
-              app.toolbar.commandHandlers.onDistribute(mode)
-            }}
-            type="button"
-          >
-            <Icon aria-hidden="true" size={13} strokeWidth={2} />
-          </button>
-        ))
-        : null}
-      {app.selection.canTidy ? (
-        <button
-          aria-label="Tidy selection"
-          disabled={disabled}
-          onClick={app.selection.onTidySelectedItems}
-          type="button"
-        >
-          <LayoutGrid aria-hidden="true" size={13} strokeWidth={2} />
-        </button>
-      ) : null}
-      {app.selection.canFlip ? (
-        <>
-          <button
-            aria-label="Flip horizontal"
-            disabled={disabled}
-            onClick={() => {
-              app.selection.onFlipSelectedItems('horizontal')
-            }}
-            type="button"
-          >
-            <FlipHorizontal aria-hidden="true" size={13} strokeWidth={2} />
-          </button>
-          <button
-            aria-label="Flip vertical"
-            disabled={disabled}
-            onClick={() => {
-              app.selection.onFlipSelectedItems('vertical')
-            }}
-            type="button"
-          >
-            <FlipVertical aria-hidden="true" size={13} strokeWidth={2} />
-          </button>
-        </>
-      ) : null}
-      {app.selection.canSelectSame ? (
-        <button
-          aria-label="Select same type"
-          disabled={disabled}
-          onClick={app.selection.onSelectSameType}
-          type="button"
-        >
-          <Boxes aria-hidden="true" size={13} strokeWidth={2} />
-        </button>
-      ) : null}
-
-      {canLayerOrder ? <EngineSelectionDivider /> : null}
-      {canLayerOrder
-        ? ENGINE_SELECTION_LAYER_ORDER_CONTROLS.map(({
-          command,
-          icon: Icon,
-          label,
-          mode,
-        }) => (
-          <button
-            aria-label={label}
-            disabled={disabled ||
-              !app.toolbar.commandAvailability[command] ||
-              !app.selection.canReorder[mode]}
-            key={command}
-            onClick={() => {
-              app.toolbar.commandHandlers.onReorder(mode)
-            }}
-            type="button"
-          >
-            <Icon aria-hidden="true" size={13} strokeWidth={2} />
-          </button>
-        ))
-        : null}
-
-      {canGroup || canUngroup || canSection || canUnsection ? (
-        <EngineSelectionDivider />
-      ) : null}
-      {canGroup ? (
-        <button
-          aria-label="Group selection"
-          disabled={disabled}
-          onClick={() => {
-            app.toolbar.commandHandlers.onGroup()
-            onClose()
-          }}
-          type="button"
-        >
-          <Group aria-hidden="true" size={13} strokeWidth={2} />
-        </button>
-      ) : null}
-      {canUngroup ? (
-        <button
-          aria-label="Ungroup selection"
-          disabled={disabled}
-          onClick={() => {
-            app.toolbar.commandHandlers.onUngroup()
-            onClose()
-          }}
-          type="button"
-        >
-          <Ungroup aria-hidden="true" size={13} strokeWidth={2} />
-        </button>
-      ) : null}
-      {canSection ? (
-        <button
-          aria-label="Section selection"
-          disabled={disabled}
-          onClick={() => {
-            app.selection.onSectionSelectedItems()
-            onClose()
-          }}
-          type="button"
-        >
-          <Frame aria-hidden="true" size={13} strokeWidth={2} />
-        </button>
-      ) : null}
-      {canUnsection ? (
-        <button
-          aria-label="Delete section frame"
-          disabled={disabled}
-          onClick={() => {
-            app.selection.onUnsectionSelectedItems()
-            onClose()
-          }}
-          type="button"
-        >
-          <PanelTopClose aria-hidden="true" size={13} strokeWidth={2} />
-        </button>
-      ) : null}
-      {canUseSectionActions ? (
-        <button
-          aria-label={
-            app.selection.sectionContentsHidden
-              ? 'Show section contents'
-              : 'Hide section contents'
-          }
-          onClick={() => {
-            app.selection.onSetSelectedSectionsHidden(
-              !app.selection.sectionContentsHidden,
-            )
-          }}
-          type="button"
-        >
-          {app.selection.sectionContentsHidden ? (
-            <Eye aria-hidden="true" size={13} strokeWidth={2} />
-          ) : (
-            <EyeOff aria-hidden="true" size={13} strokeWidth={2} />
-          )}
-        </button>
-      ) : null}
-      {canUseSectionActions ? (
-        <button
-          aria-label={
-            app.selection.selectedSectionsLocked
-              ? 'Unlock section'
-              : 'Lock section'
-          }
-          onClick={() => {
-            app.selection.onSetSelectedSectionsLocked(
-              !app.selection.selectedSectionsLocked,
-            )
-          }}
-          type="button"
-        >
-          {app.selection.selectedSectionsLocked ? (
-            <Unlock aria-hidden="true" size={13} strokeWidth={2} />
-          ) : (
-            <Lock aria-hidden="true" size={13} strokeWidth={2} />
-          )}
-        </button>
-      ) : null}
-
-      <EngineSelectionDivider />
-      <button
-        aria-label="Duplicate selection"
-        disabled={!canDuplicate}
-        onClick={() => {
-          app.toolbar.commandHandlers.onDuplicate()
-        }}
-        type="button"
-      >
-        <Copy aria-hidden="true" size={13} strokeWidth={2} />
-      </button>
-      <button
-        aria-label="Export selection as image"
-        onClick={app.imageControls.onDownloadImage}
-        type="button"
-      >
-        <Download aria-hidden="true" size={13} strokeWidth={2} />
-      </button>
-      <button
-        aria-label="Delete selection"
-        disabled={!canDelete}
-        onClick={() => {
-          app.toolbar.commandHandlers.onDelete()
-          onClose()
-        }}
-        type="button"
-      >
-        <Trash2 aria-hidden="true" size={13} strokeWidth={2} />
-      </button>
-      <button
-        aria-label="Fit selection"
-        onClick={app.zoomControls.onFit}
-        type="button"
-      >
-        <Maximize2 aria-hidden="true" size={13} strokeWidth={2} />
-      </button>
-      {visibleStyleControl ? (
-        <div
-          className="engine-selection-color-popover"
-          role="menu"
-          aria-label={`${visibleStyleControl.label} colors`}
-        >
-          {visibleStyleControl.swatches.map((swatch) => (
-            <button
-              aria-label={`${visibleStyleControl.label} ${swatch.color}`}
-              aria-pressed={swatch.selected}
-              className="engine-selection-swatch"
-              disabled={disabled || visibleStyleControl.disabled}
-              key={swatch.color}
-              onClick={() => {
-                visibleStyleControl.onSelect(swatch.color)
-                setOpenStyleControl(null)
-              }}
-              style={{ backgroundColor: swatch.color }}
-              title={swatch.color}
-              type="button"
-            />
-          ))}
-        </div>
-      ) : null}
-    </div>
-  )
-}
-
 function EngineStampPad({
   app,
   onInsert,
@@ -1019,10 +425,6 @@ function EngineStampPad({
       ))}
     </div>
   )
-}
-
-function EngineSelectionDivider() {
-  return <span className="engine-selection-divider" aria-hidden="true" />
 }
 
 function EngineVotingSessionPanel({
@@ -1126,66 +528,6 @@ function EngineVotingSessionPanel({
       ) : null}
     </section>
   )
-}
-
-function isEngineShapeToolbarItem(
-  item: CanvasItem,
-): item is CanvasShapeLikeItem {
-  return CanvasHost.isCanvasShapeItem(item)
-}
-
-function getEngineSelectionShapeType(
-  items: readonly CanvasItem[],
-): CanvasShapeType | null {
-  const shapeTypes = items
-    .filter(isEngineShapeToolbarItem)
-    .map(getEngineShapeType)
-  const [first] = shapeTypes
-
-  return first && shapeTypes.every((type) => type === first) ? first : null
-}
-
-function getEngineShapeType(item: CanvasShapeLikeItem): CanvasShapeType {
-  return CanvasHost.getCanvasShapeKind(item)
-}
-
-function replaceEngineSelectionShapeType(
-  item: CanvasItem,
-  shapeType: CanvasShapeType,
-): CanvasItem {
-  if (CanvasHost.isCanvasShapeItem(item)) {
-    return CanvasHost.setCanvasShapeKind(item, shapeType)
-  }
-
-  return item
-}
-
-function getEngineArrowRouting(
-  item: Extract<CanvasItem, { type: 'arrow' }>,
-) {
-  return CanvasHost.normalizeCanvasArrowRouting(item.routing)
-}
-
-function setEngineArrowhead(
-  item: Extract<CanvasItem, { type: 'arrow' }>,
-  arrowhead: 'end' | 'none',
-): CanvasItem {
-  if (arrowhead === 'none') {
-    return { ...item, arrowhead: 'none' }
-  }
-
-  const next = { ...item }
-  delete next.arrowhead
-  return next
-}
-
-function getEngineSelectionStyleColor(
-  control: CanvasEngineDemoModel['inspector']['styleControls'][number],
-) {
-  return (
-    control.swatches.find((swatch) => swatch.selected) ??
-    control.swatches[0]
-  )?.color ?? 'transparent'
 }
 
 function getEngineContextMenuPoint({
