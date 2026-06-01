@@ -10,9 +10,11 @@ import {
 import {
   flattenCanvasItems,
   pruneNestedSelection,
+  syncCanvasItems,
   syncGroupBounds,
 } from '../tree/CanvasTree'
 import { isCanvasGroupItem } from '../tree/CanvasGroupItem'
+import { replaceCanvasChildrenAtPath } from './CanvasItemOperationTree'
 
 export function copyCanvasSelection(items: CanvasItem[], ids: string[]) {
   const selected = new Set(pruneNestedSelection(items, ids))
@@ -33,6 +35,63 @@ export function cloneCanvasSelection(
     createId,
     offset,
   )
+}
+
+export function duplicateCanvasSelection(
+  items: CanvasItem[],
+  ids: string[],
+  createId: (prefix: string) => string,
+  offset: Point,
+) {
+  const selected = new Set(pruneNestedSelection(items, ids))
+  const selectedEntries = flattenCanvasItems(items).filter((entry) =>
+    selected.has(entry.item.id),
+  )
+  const clones: CanvasItem[] = []
+  const groups = new Map<
+    string,
+    {
+      entries: { clone: CanvasItem; index: number }[]
+      parentPath: number[]
+    }
+  >()
+
+  for (const entry of selectedEntries) {
+    const clone = cloneCanvasItemWithNewId(entry.item, createId, offset)
+    const parentPath = entry.path.slice(0, -1)
+    const key = parentPath.join('/')
+    const group = groups.get(key) ?? { entries: [], parentPath }
+
+    group.entries.push({
+      clone,
+      index: entry.path[entry.path.length - 1] ?? 0,
+    })
+    groups.set(key, group)
+    clones.push(clone)
+  }
+
+  const nextItems = [...groups.values()]
+    .sort((a, b) => b.parentPath.length - a.parentPath.length)
+    .reduce((currentItems, group) =>
+      replaceCanvasChildrenAtPath(currentItems, group.parentPath, (children) => {
+        const insertIndex = Math.max(
+          ...group.entries.map((entry) => entry.index),
+        ) + 1
+
+        return [
+          ...children.slice(0, insertIndex),
+          ...group.entries
+            .sort((a, b) => a.index - b.index)
+            .map((entry) => entry.clone),
+          ...children.slice(insertIndex),
+        ]
+      }), items)
+
+  return {
+    clones,
+    items: syncCanvasItems(nextItems),
+    selection: clones.map((item) => item.id),
+  }
 }
 
 export function cloneCanvasItemsWithNewIds(

@@ -14,7 +14,7 @@ const rect1 = createRectItem('rect-1')
 const rect2 = createRectItem('rect-2', { x: 120 })
 
 describe('CanvasClipboardCommandEffectPlan', () => {
-  it('maps duplicate results to add item effects', () => {
+  it('maps duplicate results to transform item effects', () => {
     const clone = createRectItem('rect-copy', { x: 28, y: 28 })
     const context = createContext({
       commandAdapter: createCommandAdapter({
@@ -28,9 +28,11 @@ describe('CanvasClipboardCommandEffectPlan', () => {
         context,
       }),
     ).toEqual({
+      afterItems: [rect1, rect2, clone],
       afterSelection: ['rect-copy'],
-      items: [clone],
-      kind: 'add-items',
+      beforeItems: [rect1, rect2],
+      clonedItems: [clone],
+      kind: 'transform-items',
     })
   })
 

@@ -1,7 +1,11 @@
 export {
   default as CanvasApp,
   type CanvasAppProps,
-} from './shell/CanvasApp'
+} from './shell/LazyCanvasApp'
+export {
+  CanvasContextCommandMenu,
+  type CanvasContextCommandMenuState,
+} from './affordances/controls/toolbar/CanvasContextCommandMenu'
 export type {
   CanvasAppAssemblySource,
 } from './shell/CanvasAppAssemblySource'
@@ -12,6 +16,7 @@ export {
   createCanvasAppCustomItemModuleAssembly,
   type CanvasAppCustomItemModuleAssembly,
   type CanvasAppCustomItemModuleAssemblyOptions,
+  useCanvasDevToolsAppModel,
   useCanvasAppModel,
 } from './workflow'
 export {
@@ -20,6 +25,8 @@ export {
   createCanvasAppComponentPresentationRenderers,
   createCanvasAppCustomItemRenderers,
   defineCanvasAppCustomItemModule,
+  defineCanvasAppHtmlWidgetModule,
+  defineCanvasAppReactWidgetModule,
   dispatchCanvasAppCustomFocus,
   dispatchCanvasAppCustomFocusClear,
   isCanvasAppExtensionId,
@@ -63,10 +70,16 @@ export {
   type CanvasAppPointerInput,
   type CanvasAppCustomItemRendererStrategy,
   type CanvasAppCustomItemRenderers,
+  type CanvasAppHtmlWidgetData,
+  type CanvasAppHtmlWidgetModuleInput,
   type CanvasAppItemAdapters,
   type CanvasAppItemLayerAdapter,
   type CanvasAppItemLayerRenderInput,
+  type CanvasAppReactWidgetModuleInput,
   type CanvasAppStageAdapter,
   type CanvasAppStageMount,
   type CanvasAppStageRenderInput,
+  type CanvasAppWidgetCreationOptions,
+  type CanvasAppWidgetItem,
+  type CanvasAppWidgetRenderContext,
 } from './authoring'

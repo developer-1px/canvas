@@ -111,6 +111,47 @@ describe('CanvasItemTransformOperations drawing items', () => {
     ])
   })
 
+  test('syncs group bounds when a selected child moves', () => {
+    const child = rect
+    const sibling: CanvasItem = {
+      ...rect,
+      h: 60,
+      id: 'rect-2',
+      w: 50,
+      x: 200,
+      y: 40,
+    }
+
+    expect(translateCanvasItems([
+      {
+        children: [child, sibling],
+        h: 80,
+        id: 'group-1',
+        type: 'group',
+        w: 240,
+        x: 10,
+        y: 20,
+      },
+    ], ['rect-1'], 20, 10)).toEqual([
+      {
+        children: [
+          {
+            ...child,
+            x: 30,
+            y: 30,
+          },
+          sibling,
+        ],
+        h: 80,
+        id: 'group-1',
+        type: 'group',
+        w: 220,
+        x: 30,
+        y: 30,
+      },
+    ])
+  })
+
   test('resizes marker bounds and points together', () => {
     expect(
       resizeCanvasItems(

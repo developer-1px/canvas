@@ -17,6 +17,7 @@ export function getCanvasAppCommandConsumerModel(
         onGroup: commands.groupSelection,
         onLock: commands.lockSelection,
         onRedo: commands.redoHistory,
+        onReorder: commands.reorderSelection,
         onUndo: commands.undoHistory,
         onUngroup: commands.ungroupSelection,
         onUnlockAll: commands.unlockAll,

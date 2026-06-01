@@ -1,6 +1,9 @@
 import { describe, expect, test } from 'vitest'
 import type { CanvasItem } from '../model'
-import { reorderCanvasItems } from './CanvasItemZOrderOperations'
+import {
+  canReorderCanvasItems,
+  reorderCanvasItems,
+} from './CanvasItemZOrderOperations'
 
 function rect(id: string): CanvasItem {
   return {
@@ -12,6 +15,23 @@ function rect(id: string): CanvasItem {
     h: 40,
     fill: '#fff',
     stroke: '#000',
+  }
+}
+
+function sectionItem(id: string): CanvasItem {
+  return {
+    accent: '#64748b',
+    body: '',
+    component: 'section',
+    fill: '#ffffff',
+    h: 120,
+    id,
+    stroke: '#94a3b8',
+    title: 'Section',
+    type: 'component',
+    w: 200,
+    x: 0,
+    y: 0,
   }
 }
 
@@ -63,5 +83,44 @@ describe('reorderCanvasItems', () => {
       'c',
       'b',
     ])
+  })
+
+  test('reports whether a reorder mode can change the selected sibling order', () => {
+    const items = [rect('a'), rect('b'), rect('c')]
+
+    expect(canReorderCanvasItems(items, ['a'], 'sendBackward')).toBe(false)
+    expect(canReorderCanvasItems(items, ['a'], 'sendToBack')).toBe(false)
+    expect(canReorderCanvasItems(items, ['a'], 'bringForward')).toBe(true)
+    expect(canReorderCanvasItems(items, ['a'], 'bringToFront')).toBe(true)
+    expect(canReorderCanvasItems(items, ['c'], 'bringForward')).toBe(false)
+    expect(canReorderCanvasItems(items, ['c'], 'bringToFront')).toBe(false)
+  })
+
+  test('keeps section layers anchored behind non-section sibling reorder', () => {
+    const items = [sectionItem('section'), rect('a'), rect('b')]
+
+    expect(ids(reorderCanvasItems(items, ['a'], 'sendToBack'))).toEqual([
+      'section',
+      'a',
+      'b',
+    ])
+    expect(canReorderCanvasItems(items, ['a'], 'sendToBack')).toBe(false)
+    expect(ids(reorderCanvasItems(items, ['a'], 'bringToFront'))).toEqual([
+      'section',
+      'b',
+      'a',
+    ])
+  })
+
+  test('allows selected section layers to be reordered', () => {
+    expect(
+      ids(
+        reorderCanvasItems(
+          [sectionItem('section'), rect('a'), rect('b')],
+          ['section'],
+          'bringToFront',
+        ),
+      ),
+    ).toEqual(['a', 'b', 'section'])
   })
 })

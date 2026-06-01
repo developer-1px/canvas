@@ -8,6 +8,10 @@ import {
   isCanvasDrawingItem,
   syncCanvasDrawingItemBounds,
 } from '../drawing/CanvasDrawingItemGeometry'
+import {
+  getCanvasItemRotation,
+  getCanvasRotatedBounds,
+} from '../operations/CanvasItemRotationOperations'
 import { isCanvasGroupItem } from './CanvasGroupItem'
 
 export function boundsIntersect(a: Bounds, b: Bounds) {
@@ -33,12 +37,14 @@ export function getItemBounds(item: CanvasItem): Bounds {
     return getCanvasDrawingItemBounds(item)
   }
 
-  return {
+  const bounds = {
     x: item.x,
     y: item.y,
     w: item.w,
     h: item.h,
   }
+
+  return getCanvasRotatedBounds(bounds, getCanvasItemRotation(item))
 }
 
 export function getItemsBounds(items: CanvasItem[]) {

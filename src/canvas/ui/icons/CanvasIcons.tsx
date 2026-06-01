@@ -29,6 +29,10 @@ export {
   AlignBottomIcon,
   DistributeHorizontalIcon,
   DistributeVerticalIcon,
+  BringToFrontIcon,
+  BringForwardIcon,
+  SendBackwardIcon,
+  SendToBackIcon,
   LockIcon,
   UnlockIcon,
 } from './CanvasCommandIcons'

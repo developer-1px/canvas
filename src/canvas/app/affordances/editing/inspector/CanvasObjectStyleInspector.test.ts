@@ -27,6 +27,7 @@ describe('CanvasObjectStyleInspector', () => {
     const controls = getCanvasObjectStyleControls({
       commitItemsChange,
       disabled: false,
+      items: [createRectItem(), createArrowItem()],
       selectedItems: [createRectItem(), createArrowItem()],
       selection: ['rect-1', 'arrow-1'],
     })
@@ -56,6 +57,7 @@ describe('CanvasObjectStyleInspector', () => {
     const controls = getCanvasObjectStyleControls({
       commitItemsChange,
       disabled: false,
+      items: [createRectItem(), createArrowItem()],
       selectedItems: [createArrowItem()],
       selection: ['arrow-1'],
     })
@@ -68,6 +70,7 @@ describe('CanvasObjectStyleInspector', () => {
       {
         type: 'replace-changed',
         items: [
+          createRectItem(),
           {
             ...createArrowItem(),
             stroke: '#9747FF',

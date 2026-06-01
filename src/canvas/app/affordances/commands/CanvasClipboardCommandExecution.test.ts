@@ -17,7 +17,7 @@ const rect1 = createRectItem('rect-1')
 const rect2 = createRectItem('rect-2', { x: 120 })
 
 describe('CanvasClipboardCommandExecution', () => {
-  it('duplicates selection through add commits and returns clones', () => {
+  it('duplicates selection through transform commits and returns clones', () => {
     const clone = createRectItem('rect-copy', { x: 28, y: 28 })
     const context = createContext({
       commandAdapter: createCommandAdapter({
@@ -35,7 +35,11 @@ describe('CanvasClipboardCommandExecution', () => {
       executed: true,
     })
     expect(context.commitItemsChange).toHaveBeenCalledWith(
-      { type: 'add', items: [clone] },
+      {
+        afterItems: [rect1, rect2, clone],
+        beforeItems: [rect1, rect2],
+        type: 'transform',
+      },
       {
         after: ['rect-copy'],
         before: ['rect-1', 'rect-2'],

@@ -107,7 +107,10 @@ function planCanvasDuplicateCommand(
   })
 
   return result
-    ? createCanvasClipboardDuplicateResultEffect({ result })
+    ? createCanvasClipboardDuplicateResultEffect({
+        beforeItems: context.items,
+        result,
+      })
     : null
 }
 

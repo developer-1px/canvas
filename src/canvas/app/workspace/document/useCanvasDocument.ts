@@ -84,6 +84,15 @@ export function useCanvasDocument(
       }
 
       syncCommittedState(committedState)
+      if (selection) {
+        restoreCanvasDocumentSelection({
+          action: selection.after,
+          currentItems: committedState.items,
+          document,
+        })
+        setSelectionState(document.readSelection())
+      }
+
       return true
     },
     [document, syncCommittedState],

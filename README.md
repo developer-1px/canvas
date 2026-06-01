@@ -1,6 +1,6 @@
 # Canvas
 
-Minimal canvas editor demo.
+Headless-leaning canvas affordance engine.
 
 ## Run
 
@@ -8,6 +8,10 @@ Minimal canvas editor demo.
 pnpm install
 pnpm dev
 ```
+
+Default route `/` opens the minimal engine demo for pan/zoom, object
+selection, object toolbar actions, shape switching, sticky notes, text editing,
+and drawing.
 
 ## Check
 

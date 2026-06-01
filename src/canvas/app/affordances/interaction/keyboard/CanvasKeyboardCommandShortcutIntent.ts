@@ -12,6 +12,7 @@ export type CanvasKeyboardReorderMode =
 export type CanvasKeyboardCommandShortcutIntent =
   | { kind: 'none'; preventDefault: false }
   | { kind: 'delete-selection'; preventDefault: true }
+  | { kind: 'edit-selection'; preventDefault: true }
   | { kind: 'undo-history'; preventDefault: true }
   | { kind: 'redo-history'; preventDefault: true }
   | { kind: 'zoom-by'; multiplier: number; preventDefault: true }

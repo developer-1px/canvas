@@ -5,6 +5,7 @@ import type {
 
 export type CanvasClipboardDuplicateResult = {
   clones: CanvasItem[]
+  items: CanvasItem[]
   selection: string[]
 }
 
@@ -32,14 +33,19 @@ export function createCanvasClipboardCloneResultEffect({
 }
 
 export function createCanvasClipboardDuplicateResultEffect({
+  beforeItems,
   result,
 }: {
+  beforeItems: CanvasItem[]
   result: CanvasClipboardDuplicateResult
 }): CanvasClipboardCommandEffect {
-  return createCanvasClipboardAddItemsResultEffect({
+  return {
+    afterItems: result.items,
     afterSelection: result.selection,
-    items: result.clones,
-  })
+    beforeItems,
+    clonedItems: result.clones,
+    kind: 'transform-items',
+  }
 }
 
 export function createCanvasClipboardPasteResultEffect({

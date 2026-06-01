@@ -57,11 +57,13 @@ const CANVAS_OBJECT_STROKE_COLORS = [
 export function getCanvasObjectStyleControls({
   commitItemsChange,
   disabled,
+  items,
   selectedItems,
   selection,
 }: {
   commitItemsChange: CommitCanvasItemsChange
   disabled: boolean
+  items?: CanvasItem[]
   selectedItems: CanvasItem[]
   selection: string[]
 }): CanvasObjectStyleControl[] {
@@ -75,6 +77,7 @@ export function getCanvasObjectStyleControls({
       colors: CANVAS_OBJECT_FILL_COLORS,
       commitItemsChange,
       disabled,
+      items,
       label: 'Fill',
       selectedItems,
       selection,
@@ -84,6 +87,7 @@ export function getCanvasObjectStyleControls({
       colors: CANVAS_OBJECT_STROKE_COLORS,
       commitItemsChange,
       disabled,
+      items,
       label: 'Stroke',
       selectedItems,
       selection,
@@ -96,6 +100,7 @@ function getCanvasObjectStyleControl({
   colors,
   commitItemsChange,
   disabled,
+  items,
   label,
   selectedItems,
   selection,
@@ -104,6 +109,7 @@ function getCanvasObjectStyleControl({
   colors: readonly string[]
   commitItemsChange: CommitCanvasItemsChange
   disabled: boolean
+  items?: CanvasItem[]
   label: string
   selectedItems: CanvasItem[]
   selection: string[]
@@ -131,10 +137,12 @@ function getCanvasObjectStyleControl({
         return
       }
 
+      const selectedIds = new Set(selection)
+
       commitItemsChange({
         type: 'replace-changed',
-        items: selectedItems.map((item) =>
-          canApplyCanvasObjectStyle(item, channel)
+        items: (items ?? selectedItems).map((item) =>
+          selectedIds.has(item.id) && canApplyCanvasObjectStyle(item, channel)
             ? applyCanvasObjectStyle(item, channel, color)
             : item,
         ),

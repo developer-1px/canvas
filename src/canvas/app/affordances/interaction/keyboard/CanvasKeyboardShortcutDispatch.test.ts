@@ -21,6 +21,12 @@ describe('CanvasKeyboardShortcutDispatch', () => {
     expect(
       runCanvasKeyboardShortcutIntent({
         handlers,
+        intent: { kind: 'edit-selection', preventDefault: true },
+      }),
+    ).toBe(true)
+    expect(
+      runCanvasKeyboardShortcutIntent({
+        handlers,
         intent: { kind: 'quick-create-sticky', preventDefault: true },
       }),
     ).toBe(true)
@@ -60,6 +66,7 @@ describe('CanvasKeyboardShortcutDispatch', () => {
     ).toBe(true)
 
     expect(handlers.deleteSelection).toHaveBeenCalledTimes(1)
+    expect(handlers.editSelection).toHaveBeenCalledTimes(1)
     expect(handlers.quickCreateSticky).toHaveBeenCalledTimes(1)
     expect(handlers.zoomBy).toHaveBeenCalledWith(1.25)
     expect(handlers.openCommandPalette).toHaveBeenCalledTimes(1)
@@ -77,6 +84,7 @@ function createHandlers(): CanvasKeyboardShortcutDispatchHandlers {
     cutSelection: vi.fn(),
     deleteSelection: vi.fn(),
     duplicateSelection: vi.fn(),
+    editSelection: vi.fn(),
     fitToItems: vi.fn(),
     groupSelection: vi.fn(),
     interactionRef: { current: { kind: 'none' } },

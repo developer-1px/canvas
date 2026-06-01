@@ -6,6 +6,23 @@ import { DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS } from './Canv
 import { DEFAULT_CANVAS_DEMO_SVG_CUSTOM_ITEM_RENDERERS } from './CanvasDemoSvgCustomItemRendererRegistry'
 
 describe('CanvasDemoSvgItemRenderer', () => {
+  it('does not render hidden items', () => {
+    const markup = renderItem({
+      fill: '#ffffff',
+      h: 40,
+      hidden: true,
+      id: 'rect-1',
+      shapeType: 'rect',
+      stroke: '#111827',
+      type: 'shape',
+      w: 80,
+      x: 10,
+      y: 20,
+    })
+
+    expect(markup).not.toContain('data-canvas-item-id="rect-1"')
+  })
+
   it('renders group frames recursively and passes lock state to children', () => {
     const markup = renderItem({
       children: [
@@ -34,6 +51,7 @@ describe('CanvasDemoSvgItemRenderer', () => {
     expect(markup).toContain('class="group-hit"')
     expect(markup).toContain('data-locked="true"')
     expect(markup).toContain('data-type="shape"')
+    expect(markup).not.toContain('component-section')
   })
 
 

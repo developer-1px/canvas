@@ -8,6 +8,7 @@ import { isCanvasStampItemStorageShape } from '../stamp/CanvasStampItem'
 import { isCanvasEditableTextItemStorageShape } from '../text/CanvasEditableTextItem'
 import { isCanvasGroupItemStorageShape } from '../tree/CanvasGroupItem'
 import { syncCanvasItems } from '../tree/CanvasTree'
+import { isCanvasItemRotationStorageShape } from '../operations/CanvasItemRotationStorage'
 import {
   assertCanvasCustomItemValidators,
   assertCustomCanvasItems,
@@ -57,47 +58,26 @@ function isCanvasItem(value: unknown): value is CanvasItem {
     isFiniteNumber(value.y) &&
     isFiniteNumber(value.w) &&
     isFiniteNumber(value.h) &&
-    (value.locked === undefined || typeof value.locked === 'boolean')
+    (value.hidden === undefined || typeof value.hidden === 'boolean') &&
+    (value.locked === undefined || typeof value.locked === 'boolean') &&
+    (value.rotation === undefined || isFiniteNumber(value.rotation))
 
   if (!base) {
     return false
   }
 
-  if (isCanvasEditableTextItemStorageShape(value)) {
-    return true
-  }
+  const validItem =
+    isCanvasEditableTextItemStorageShape(value) ||
+    isCanvasImageItemStorageShape(value) ||
+    isCanvasCommentItemStorageShape(value) ||
+    isCanvasStampItemStorageShape(value) ||
+    isCanvasDrawingItemStorageShape(value) ||
+    isCanvasGroupItemStorageShape(value, isCanvasItem) ||
+    isCanvasComponentItemStorageShape(value) ||
+    (value.type === 'custom' && isCanvasCustomItemStorageEnvelope(value))
 
-  if (isCanvasImageItemStorageShape(value)) {
-    return true
-  }
-
-  if (isCanvasCommentItemStorageShape(value)) {
-    return true
-  }
-
-  if (isCanvasStampItemStorageShape(value)) {
-    return true
-  }
-
-  if (isCanvasDrawingItemStorageShape(value)) {
-    return true
-  }
-
-  if (isCanvasGroupItemStorageShape(value, isCanvasItem)) {
-    return true
-  }
-
-  if (isCanvasComponentItemStorageShape(value)) {
-    return true
-  }
-
-  if (value.type === 'custom') {
-    return isCanvasCustomItemStorageEnvelope(value)
-  }
-
-  return false
+  return validItem && isCanvasItemRotationStorageShape(value)
 }
-
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null
 }

@@ -127,6 +127,7 @@ function createHandlers(
     cutSelection: vi.fn(),
     deleteSelection: vi.fn(),
     duplicateSelection: vi.fn(),
+    editSelection: vi.fn(),
     fitToItems: vi.fn(),
     groupSelection: vi.fn(),
     interactionRef: { current: { kind: 'none' } },

@@ -1,6 +1,7 @@
 import type {
   CanvasAlignMode,
   CanvasDistributeMode,
+  CanvasReorderMode,
 } from '../../engine'
 
 export type CanvasAppControlCommandHandlers = {
@@ -11,6 +12,7 @@ export type CanvasAppControlCommandHandlers = {
   onGroup: () => void
   onLock: () => void
   onRedo: () => void
+  onReorder: (mode: CanvasReorderMode) => void
   onUndo: () => void
   onUngroup: () => void
   onUnlockAll: () => void

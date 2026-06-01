@@ -15,7 +15,7 @@ export type CanvasWheelInput = {
 }
 
 const WHEEL_PAN_MULTIPLIER = 0.9
-const WHEEL_ZOOM_MULTIPLIER = 1.5
+const WHEEL_ZOOM_MULTIPLIER = 3
 const WHEEL_LINE_DELTA = 16
 const WHEEL_PAGE_DELTA = 800
 const WHEEL_ZOOM_SENSITIVITY = 0.001

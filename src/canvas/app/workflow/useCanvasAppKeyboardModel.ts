@@ -1,4 +1,5 @@
 import { useCanvasKeyboardShortcuts } from '../affordances/interaction/keyboard/useCanvasKeyboardShortcuts'
+import { editCanvasAppSelectionText } from './CanvasAppSelectionModel'
 import type { CanvasAppKeyboardModelInput } from './CanvasAppKeyboardConsumerContracts'
 
 export function useCanvasAppKeyboardModel({
@@ -10,11 +11,11 @@ export function useCanvasAppKeyboardModel({
   interaction,
   openCommandPalette,
   openFindReplace,
-  selection,
   viewport,
+  workspace,
 }: CanvasAppKeyboardModelInput) {
   useCanvasKeyboardShortcuts({
-    commitSelection: command.commitSelection,
+    commitSelection: workspace.command.commitSelection,
     config,
     closeCursorChat: cursorChat.closeCursorChat,
     copySelection: command.copySelection,
@@ -22,6 +23,12 @@ export function useCanvasAppKeyboardModel({
     cutSelection: command.cutSelection,
     deleteSelection: command.deleteSelection,
     duplicateSelection: command.duplicateSelection,
+    editSelection: () =>
+      editCanvasAppSelectionText({
+        itemReadModel: workspace.itemReadModel,
+        selection: workspace.selection,
+        setEditing: interaction.setEditing,
+      }),
     fitToItems: viewport.fitToItems,
     groupSelection: command.groupSelection,
     interactionRef: interaction.interactionRef,
@@ -36,7 +43,7 @@ export function useCanvasAppKeyboardModel({
     reorderSelection: command.reorderSelection,
     resetViewport: viewport.resetViewport,
     selectAll: command.selectAll,
-    selection,
+    selection: workspace.selection,
     setDraftArrow: interaction.setDraftArrow,
     setDraftRect: interaction.setDraftRect,
     setDraftStroke: interaction.setDraftStroke,

@@ -5,7 +5,9 @@ import type {
   CanvasSceneAdapter,
 } from '../../../../engine'
 import {
+  CANVAS_ITEM_ENGINE_ADAPTERS,
   createCanvasComponentLibrary,
+  createCanvasDocumentController,
   getCanvasDrawingStrokeStyle,
 } from '../../../../host'
 import type { CommitCanvasItemsChange } from '../../../workflow/CanvasWorkflowContract'
@@ -87,6 +89,35 @@ describe('CanvasPointerCreationCommit', () => {
       { before: ['selected-1'], after: ['selected-1'] },
     )
     expect(setTool).not.toHaveBeenCalled()
+  })
+
+  it('commits arrow creation through the default document adapter', () => {
+    const document = createCanvasDocumentController([], [])
+    const commitItemsChange = vi.fn<CommitCanvasItemsChange>(
+      (change, selection) =>
+        document.commitItemsChange(change, document.readItems(), selection),
+    )
+
+    commitCanvasPointerCreation(createInput({
+      commitItemsChange,
+      creationAdapter: CANVAS_ITEM_ENGINE_ADAPTERS.creation,
+      interaction: {
+        kind: 'create-arrow',
+        pointerId: 1,
+        startScreen: { x: 0, y: 0 },
+        startWorld: { x: 80, y: 120 },
+        currentWorld: { x: 220, y: 180 },
+        moved: true,
+      },
+    }))
+
+    expect(commitItemsChange).toHaveReturnedWith(true)
+    expect(document.readItems()).toEqual([
+      expect.objectContaining({
+        id: 'arrow-1',
+        type: 'arrow',
+      }),
+    ])
   })
 
   it('delegates custom creation to the registered custom tool', () => {

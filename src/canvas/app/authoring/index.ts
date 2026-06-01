@@ -22,6 +22,16 @@ export {
   type CanvasAppCustomItemModuleCreationItem,
   type CanvasAppCustomItemModuleCreationTool,
 } from '../extensions/custom-item-modules/CanvasAppCustomItemModules'
+export {
+  defineCanvasAppHtmlWidgetModule,
+  defineCanvasAppReactWidgetModule,
+  type CanvasAppHtmlWidgetData,
+  type CanvasAppHtmlWidgetModuleInput,
+  type CanvasAppReactWidgetModuleInput,
+  type CanvasAppWidgetCreationOptions,
+  type CanvasAppWidgetItem,
+  type CanvasAppWidgetRenderContext,
+} from '../extensions/widgets/CanvasAppWidgetModule'
 export type {
   CanvasAppCustomItemValidator,
   CanvasAppCustomItemValidators,

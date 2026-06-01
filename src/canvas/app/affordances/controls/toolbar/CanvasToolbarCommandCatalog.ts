@@ -3,6 +3,7 @@ import type {
   CanvasCommandAvailability,
   CanvasCommandId,
   CanvasDistributeMode,
+  CanvasReorderMode,
 } from '../../../../engine'
 
 export type CanvasToolbarCommandAction =
@@ -13,6 +14,7 @@ export type CanvasToolbarCommandAction =
   | { kind: 'group' }
   | { kind: 'lock' }
   | { kind: 'redo' }
+  | { kind: 'reorder'; mode: CanvasReorderMode }
   | { kind: 'undo' }
   | { kind: 'ungroup' }
   | { kind: 'unlock-all' }
@@ -27,6 +29,7 @@ export type CanvasToolbarCommandGroupId =
   | 'selection'
   | 'grouping'
   | 'alignment'
+  | 'layer-order'
   | 'lock'
 
 export type CanvasToolbarAvailableCommandId =
@@ -130,6 +133,31 @@ export const CANVAS_TOOLBAR_COMMAND_GROUPS = [
       {
         action: { kind: 'distribute', mode: 'distributeVertical' },
         command: 'distributeVertical',
+        surfaces: ['selection-floating-bar', 'context-menu'],
+      },
+    ],
+  },
+  {
+    id: 'layer-order',
+    commands: [
+      {
+        action: { kind: 'reorder', mode: 'bringToFront' },
+        command: 'bringToFront',
+        surfaces: ['selection-floating-bar', 'context-menu'],
+      },
+      {
+        action: { kind: 'reorder', mode: 'bringForward' },
+        command: 'bringForward',
+        surfaces: ['selection-floating-bar', 'context-menu'],
+      },
+      {
+        action: { kind: 'reorder', mode: 'sendBackward' },
+        command: 'sendBackward',
+        surfaces: ['selection-floating-bar', 'context-menu'],
+      },
+      {
+        action: { kind: 'reorder', mode: 'sendToBack' },
+        command: 'sendToBack',
         surfaces: ['selection-floating-bar', 'context-menu'],
       },
     ],

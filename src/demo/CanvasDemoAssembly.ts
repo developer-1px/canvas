@@ -1,193 +1,195 @@
 import {
-  CanvasHost,
   createCanvasAppAssembly,
   type CanvasAppAssemblyInput,
   type CanvasWorkspaceStorage,
   type CanvasWorkspaceStorageProvider,
 } from '../canvas'
-import { DEMO_CANVAS_SEED_ITEMS } from './CanvasDemoSeedItems'
 import {
-  HTML_SPECIMEN_SEED_ITEM_ID,
-} from './custom-items/html-specimen/HtmlSpecimenCustomItemSeed'
+  DEMO_CANVAS_INITIAL_SELECTION,
+  DEMO_CANVAS_REFERENCE_BOUNDS,
+  DEMO_CANVAS_SEED_ITEMS,
+} from './CanvasDemoSeedItems'
 import { DEMO_CUSTOM_ITEM_MODULES } from './custom-items'
 
-const DEMO_CANVAS_INITIAL_WORKSPACE = JSON.stringify({
-  items: DEMO_CANVAS_SEED_ITEMS,
-  selection: [HTML_SPECIMEN_SEED_ITEM_ID],
-  version: 1,
-  viewport: {
-    scale: 0.86,
-    x: 42,
-    y: 20,
+function createDemoCanvasInitialWorkspace() {
+  return JSON.stringify({
+    items: DEMO_CANVAS_SEED_ITEMS,
+    selection: DEMO_CANVAS_INITIAL_SELECTION,
+    version: 1,
+    viewport: createDemoCanvasInitialViewport(),
+  })
+}
+
+function createDemoCanvasInitialViewport() {
+  const viewportWidth = typeof globalThis.innerWidth === 'number'
+    ? globalThis.innerWidth
+    : 1440
+  const isMobile = viewportWidth < 700
+  const canvasWidth = Math.max(isMobile ? viewportWidth : 640, viewportWidth)
+  const scale = clampNumber(
+    (canvasWidth - (isMobile ? 32 : 96)) / DEMO_CANVAS_REFERENCE_BOUNDS.w,
+    isMobile
+      ? { max: 0.62, min: 0.28 }
+      : viewportWidth < 1360
+        ? { max: 1.04, min: 0.62 }
+        : { max: 1.18, min: 0.72 },
+  )
+  const demoScreenWidth = DEMO_CANVAS_REFERENCE_BOUNDS.w * scale
+  const viewportX = Math.max(
+    isMobile ? 16 : 48,
+    (canvasWidth - demoScreenWidth) / 2 -
+      DEMO_CANVAS_REFERENCE_BOUNDS.x * scale,
+  )
+
+  return {
+    scale,
+    x: Math.round(viewportX),
+    y: isMobile ? 18 : 58,
+  }
+}
+
+function clampNumber(
+  value: number,
+  bounds: {
+    max: number
+    min: number
   },
-})
+) {
+  return Math.min(bounds.max, Math.max(bounds.min, value))
+}
 
 const DEMO_CANVAS_STORAGE: CanvasWorkspaceStorage = {
-  getItem: () => DEMO_CANVAS_INITIAL_WORKSPACE,
+  getItem: createDemoCanvasInitialWorkspace,
   setItem: () => undefined,
 }
 
 const DEMO_CANVAS_STORAGE_PROVIDER: CanvasWorkspaceStorageProvider = () =>
   DEMO_CANVAS_STORAGE
 
-const DEMO_REPORT_COMPONENT_TEMPLATES = [
-  {
-    id: 'command-center',
-    label: 'S',
-    title: 'Command center',
-    body: 'Workspace operating state',
-    columns: ['Run', 'Trace', 'Gate'],
-    items: ['Review', '6 warnings', '78%', 'risk claims', 'Open', 'owner gap'],
-    w: 560,
-    h: 210,
-    fill: '#ffffff',
-    stroke: '#dfe5ee',
-    accent: '#ff8a4c',
-    presentation: 'command-center',
+const DEMO_CANVAS_FOCUSED_AFFORDANCE_CONFIG = {
+  gestures: {
+    altDragDuplicate: false,
+    createArrow: true,
+    createComment: true,
+    createCustom: false,
+    createSection: true,
+    createShape: true,
+    createSticky: true,
+    createText: true,
+    drawHighlight: true,
+    drawMarker: true,
+    emoteBurst: false,
+    eraseDrawing: true,
+    laserPointer: false,
+    marquee: true,
+    move: true,
+    pan: true,
+    resize: true,
+    snapToAlignment: true,
+    snapToGrid: true,
+    snapToSpacing: true,
+    temporaryPan: true,
+    textEdit: true,
+    wheelZoom: true,
   },
-  {
-    id: 'scorecard',
-    label: 'M',
-    title: 'Scorecard',
-    body: 'Outcome summary',
-    columns: ['Signal', 'Risk', 'Ready'],
-    items: ['47', 'events', '6', 'warnings', '82%', 'confidence'],
-    w: 430,
-    h: 164,
-    fill: '#ffffff',
-    stroke: '#dfe5ee',
-    accent: '#7fb7ff',
-    presentation: 'metric-scorecard',
+  overlays: {
+    alignmentGuides: true,
+    commandPalette: false,
+    componentPalette: false,
+    cursorChat: false,
+    draftArrow: true,
+    draftRect: true,
+    draftStroke: true,
+    drawingControls: false,
+    emoteBursts: false,
+    emoteControls: false,
+    findReplace: false,
+    grid: false,
+    imageControls: false,
+    inspector: false,
+    itemOutline: true,
+    laserTrail: false,
+    marquee: true,
+    presence: false,
+    resizeHandles: true,
+    selectionBounds: true,
+    sessionTimer: false,
+    spacingGuides: true,
+    spotlight: false,
+    stampControls: false,
+    stickyQuickCreate: true,
+    status: false,
+    textEditor: true,
+    toolbar: false,
+    votingSession: false,
+    zoomControls: false,
   },
-  {
-    id: 'gate-strip',
-    label: 'G',
-    title: 'Gate strip',
-    body: 'Quality gate summary',
-    columns: ['Schema', 'Evidence', 'Layout'],
-    items: ['Pass', '0 invalid', 'Review', '4 claims', 'Pass', '0 overlaps'],
-    w: 430,
-    h: 150,
-    fill: '#ffffff',
-    stroke: '#dfe5ee',
-    accent: '#ff8a4c',
-    presentation: 'gate-strip',
+  shortcuts: {
+    arrowTool: true,
+    bringForward: true,
+    bringToFront: true,
+    commandPalette: false,
+    commentTool: true,
+    cursorChat: false,
+    copy: true,
+    cut: true,
+    delete: true,
+    duplicate: true,
+    ellipseTool: false,
+    eraserTool: true,
+    escape: true,
+    fitAll: true,
+    fitSelection: true,
+    findReplace: false,
+    group: true,
+    highlighterTool: true,
+    laserTool: false,
+    lockSelection: true,
+    markerTool: true,
+    nudge: true,
+    quickCreateSticky: true,
+    panTool: true,
+    paste: true,
+    rectTool: true,
+    redo: true,
+    sectionTool: true,
+    sendBackward: true,
+    sendToBack: true,
+    stickyTool: true,
+    selectAll: true,
+    selectTool: true,
+    textTool: true,
+    temporaryPan: true,
+    undo: true,
+    ungroup: true,
+    unlockAll: true,
+    zoomIn: true,
+    zoomOut: true,
+    zoomReset: true,
   },
-  {
-    id: 'timeline',
-    label: 'F',
-    title: 'Timeline',
-    checkedItems: [0, 1],
-    items: ['Brief', 'Generate', 'Review', 'Publish'],
-    w: 430,
-    h: 126,
-    fill: '#ffffff',
-    stroke: '#dfe5ee',
-    accent: '#0f8f63',
-    presentation: 'workflow-timeline',
+  tools: {
+    arrow: true,
+    comment: true,
+    diamond: false,
+    ellipse: false,
+    eraser: true,
+    highlight: true,
+    marker: true,
+    laser: false,
+    pan: true,
+    rect: true,
+    section: true,
+    sticky: true,
+    select: true,
+    text: true,
   },
-  {
-    id: 'queue',
-    label: 'Q',
-    title: 'Queue',
-    checkedItems: [0],
-    items: ['Resolve duplicate', 'Assign owner', 'Approve publish'],
-    w: 430,
-    h: 166,
-    fill: '#ffffff',
-    stroke: '#dfe5ee',
-    accent: '#7fb7ff',
-    presentation: 'review-board',
-  },
-  {
-    id: 'review-board',
-    label: 'R',
-    title: 'Review board',
-    checkedItems: [0],
-    items: ['Resolve duplicate', 'Assign owner', 'Approve publish'],
-    w: 430,
-    h: 166,
-    fill: '#ffffff',
-    stroke: '#dfe5ee',
-    accent: '#7fb7ff',
-    presentation: 'review-board',
-  },
-  {
-    id: 'evidence',
-    label: 'E',
-    title: 'Evidence',
-    columns: ['Source', 'Signal', 'State'],
-    items: [
-      'CRM',
-      'Expansion risk',
-      'verified',
-      'Support',
-      'Security blocker',
-      'linked',
-    ],
-    w: 430,
-    h: 152,
-    fill: '#ffffff',
-    stroke: '#dfe5ee',
-    accent: '#0f8f63',
-    presentation: 'evidence-map',
-  },
-  {
-    id: 'evidence-map',
-    label: 'T',
-    title: 'Trace map',
-    columns: ['Source', 'Signal', 'State'],
-    items: [
-      'CRM',
-      'Expansion risk',
-      'verified',
-      'Support',
-      'Security blocker',
-      'linked',
-    ],
-    w: 430,
-    h: 152,
-    fill: '#ffffff',
-    stroke: '#dfe5ee',
-    accent: '#0f8f63',
-    presentation: 'evidence-map',
-  },
-] satisfies readonly CanvasHost.CanvasComponentTemplate[]
-
-const DEMO_CANVAS_COMPONENT_LIBRARY = CanvasHost.createCanvasComponentLibrary({
-  templates: [
-    ...CanvasHost.DEFAULT_CANVAS_COMPONENT_TEMPLATES,
-    ...DEMO_REPORT_COMPONENT_TEMPLATES,
-  ],
-})
+} satisfies CanvasAppAssemblyInput['affordanceConfig']
 
 export const DEMO_CANVAS_APP_ASSEMBLY_INPUT = {
-  affordanceConfig: {
-    overlays: {
-      componentPalette: false,
-      emoteControls: false,
-      imageControls: false,
-      presence: false,
-      sessionTimer: false,
-      spotlight: false,
-      status: false,
-      toolbar: false,
-      votingSession: false,
-    },
-    tools: {
-      comment: false,
-      diamond: false,
-      ellipse: false,
-      eraser: false,
-      highlight: false,
-      laser: false,
-      marker: false,
-    },
-  },
-  componentLibrary: DEMO_CANVAS_COMPONENT_LIBRARY,
+  affordanceConfig: DEMO_CANVAS_FOCUSED_AFFORDANCE_CONFIG,
   customItemModules: DEMO_CUSTOM_ITEM_MODULES,
   initialItems: DEMO_CANVAS_SEED_ITEMS,
-  initialSelection: [HTML_SPECIMEN_SEED_ITEM_ID],
+  initialSelection: DEMO_CANVAS_INITIAL_SELECTION,
   workspaceStorageProvider: DEMO_CANVAS_STORAGE_PROVIDER,
 } satisfies CanvasAppAssemblyInput
 

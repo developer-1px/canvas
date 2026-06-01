@@ -4,6 +4,7 @@ import {
   alignCanvasSelection,
   cloneCanvasItemsWithNewIds,
   cloneCanvasSelection,
+  duplicateCanvasSelection,
   distributeCanvasSelection,
   groupCanvasSelection,
   lockCanvasSelection,
@@ -19,6 +20,8 @@ export const CANVAS_ITEM_COMMAND_ADAPTER: CanvasCommandAdapter<CanvasItem> = {
     alignCanvasSelection(items, selection, mode),
   cloneSelection: ({ createId, ids, items, offset }) =>
     cloneCanvasSelection(items, ids, createId, offset),
+  duplicateSelection: ({ createId, items, offset, sourceIds }) =>
+    duplicateCanvasSelection(items, sourceIds, createId, offset),
   deleteSelection: ({ items, selection }) => removeCanvasItems(items, selection),
   distributeSelection: ({ items, mode, selection }) =>
     distributeCanvasSelection(items, selection, mode),

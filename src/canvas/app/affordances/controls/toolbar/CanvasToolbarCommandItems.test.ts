@@ -94,6 +94,42 @@ describe('CanvasToolbarCommandItems', () => {
       },
     ])
   })
+
+  it('models layer order commands as reorder action payloads', () => {
+    const groups = getCanvasToolbarCommandGroups(createInput({
+      availability: createCommandAvailability({
+        bringForward: false,
+        sendToBack: false,
+      }),
+    }))
+
+    expect(getGroup(groups, 'layer-order')?.items).toEqual([
+      {
+        action: { kind: 'reorder', mode: 'bringToFront' },
+        command: 'bringToFront',
+        disabled: false,
+        kind: 'command',
+      },
+      {
+        action: { kind: 'reorder', mode: 'bringForward' },
+        command: 'bringForward',
+        disabled: true,
+        kind: 'command',
+      },
+      {
+        action: { kind: 'reorder', mode: 'sendBackward' },
+        command: 'sendBackward',
+        disabled: false,
+        kind: 'command',
+      },
+      {
+        action: { kind: 'reorder', mode: 'sendToBack' },
+        command: 'sendToBack',
+        disabled: true,
+        kind: 'command',
+      },
+    ])
+  })
 })
 
 function createInput(

@@ -49,4 +49,21 @@ describe('CanvasItemLockOperations', () => {
 
     expect(scene.entries.map((entry) => entry.id)).toEqual(['b'])
   })
+
+  test('excludes hidden items from scene hit entries', () => {
+    const scene = createCanvasItemScene([
+      { ...rect('a'), hidden: true },
+      {
+        ...rect('group'),
+        type: 'group',
+        children: [
+          rect('child'),
+        ],
+        hidden: true,
+      },
+      rect('b'),
+    ])
+
+    expect(scene.entries.map((entry) => entry.id)).toEqual(['b'])
+  })
 })

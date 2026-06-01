@@ -23,6 +23,21 @@ const customItem: CanvasCustomItem = {
 }
 
 describe('CanvasItemSchema custom items', () => {
+  it('accepts optional base hidden state and rejects invalid hidden values', () => {
+    expect(validateCanvasItems([{ ...customItem, hidden: true }])).toEqual([
+      { ...customItem, hidden: true },
+    ])
+
+    expect(() =>
+      validateCanvasItems([
+        {
+          ...customItem,
+          hidden: 'true',
+        } as unknown as CanvasItem,
+      ]),
+    ).toThrow()
+  })
+
   it('rejects component item kinds outside the stable id contract', () => {
     expect(() =>
       validateCanvasItems([
@@ -98,6 +113,36 @@ describe('CanvasItemSchema custom items', () => {
         },
       }),
     ).toThrow('Invalid custom canvas item: risk')
+  })
+})
+
+describe('CanvasItemSchema rotation storage', () => {
+  it('accepts rotation on supported bounded items', () => {
+    const shape: CanvasItem = {
+      fill: '#ffffff',
+      h: 40,
+      id: 'shape-1',
+      rotation: 15,
+      shapeType: 'rect',
+      stroke: '#111827',
+      type: 'shape',
+      w: 80,
+      x: 0,
+      y: 0,
+    }
+
+    expect(validateCanvasItems([shape])).toEqual([shape])
+  })
+
+  it('rejects rotation on unsupported drawing items', () => {
+    expect(() =>
+      validateCanvasItems([
+        {
+          ...arrowItem,
+          rotation: 15,
+        },
+      ]),
+    ).toThrow()
   })
 })
 

@@ -14,8 +14,11 @@ import {
 describe('CanvasStickyQuickCreateExecution', () => {
   it('quick-creates a blank sticky next to the selected sticky', () => {
     const source = createComponentItem({
+      accent: '#A855F7',
+      fill: '#C2E5FF',
       h: 148,
       id: 'component-source',
+      stroke: '#9747FF',
       w: 188,
       x: 40,
       y: 60,
@@ -75,7 +78,10 @@ describe('CanvasStickyQuickCreateExecution', () => {
           connector,
           {
             ...next,
+            accent: '#A855F7',
             body: '',
+            fill: '#C2E5FF',
+            stroke: '#9747FF',
           },
         ],
       },

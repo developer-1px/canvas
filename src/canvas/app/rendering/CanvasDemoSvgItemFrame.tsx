@@ -20,6 +20,8 @@ export type CanvasDemoSvgItemFrameProps = {
   locked: boolean
   outlined: boolean
   outlineKind?: CanvasDemoSvgSelectionOutlineKind
+  rotation?: number
+  rotationTransform?: string
   selected: boolean
   onDoubleClick?: () => void
   onItemPointerDown: (
@@ -39,6 +41,8 @@ export function CanvasDemoSvgItemFrame({
   locked,
   outlined,
   outlineKind,
+  rotation,
+  rotationTransform,
   selected,
   onDoubleClick,
   onItemPointerDown,
@@ -50,6 +54,7 @@ export function CanvasDemoSvgItemFrame({
       data-canvas-item-id={itemId}
       data-custom-kind={customKind}
       data-locked={locked || undefined}
+      data-rotation={rotation === undefined || rotation === 0 ? undefined : rotation}
       data-selected={selected}
       data-type={itemType}
       pointerEvents={locked ? 'none' : undefined}
@@ -58,7 +63,11 @@ export function CanvasDemoSvgItemFrame({
         locked ? undefined : (event) => onItemPointerDown(event, itemId)
       }
     >
-      {children}
+      {rotationTransform ? (
+        <g className="canvas-item-rotation" transform={rotationTransform}>
+          {children}
+        </g>
+      ) : children}
       {outlined ? (
         <CanvasDemoSvgSelectionOutline bounds={bounds} kind={outlineKind} />
       ) : null}

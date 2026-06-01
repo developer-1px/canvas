@@ -66,7 +66,7 @@ describe('Canvas build config', () => {
         ],
       },
       host: '::',
-      port: 5173,
+      port: 53175,
       strictPort: true,
     })
   })

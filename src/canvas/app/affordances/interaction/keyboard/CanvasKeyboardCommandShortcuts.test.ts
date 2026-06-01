@@ -9,6 +9,14 @@ import type { CanvasKeyboardCommandShortcutIntentInput } from './CanvasKeyboardC
 describe('CanvasKeyboardCommandShortcuts', () => {
   it('resolves built-in command shortcuts from descriptors', () => {
     expect(getCanvasKeyboardBuiltinCommandShortcutIntent(createInput({
+      event: createKeyboardEvent({ key: 'Enter' }),
+      key: 'enter',
+    }))).toEqual({
+      kind: 'edit-selection',
+      preventDefault: true,
+    })
+
+    expect(getCanvasKeyboardBuiltinCommandShortcutIntent(createInput({
       event: createKeyboardEvent({ key: 'z', metaKey: true }),
       key: 'z',
       mod: true,
@@ -45,6 +53,14 @@ describe('CanvasKeyboardCommandShortcuts', () => {
   it('honors command shortcut feature toggles', () => {
     expect(getCanvasKeyboardBuiltinCommandShortcutIntent(createInput({
       config: createCanvasAffordanceConfig({
+        shortcuts: { editSelection: false },
+      }),
+      event: createKeyboardEvent({ key: 'Enter' }),
+      key: 'enter',
+    }))).toBeNull()
+
+    expect(getCanvasKeyboardBuiltinCommandShortcutIntent(createInput({
+      config: createCanvasAffordanceConfig({
         commands: { delete: false },
       }),
       event: createKeyboardEvent({ key: 'Delete' }),
@@ -67,7 +83,30 @@ describe('CanvasKeyboardCommandShortcuts', () => {
       event: createKeyboardEvent({ key: 'Enter', metaKey: true }),
       key: 'enter',
       mod: true,
-    }))).toBeNull()
+    }))).toEqual({
+      kind: 'none',
+      preventDefault: false,
+    })
+  })
+
+  it('does not edit selection when Enter has no single selected item', () => {
+    expect(getCanvasKeyboardBuiltinCommandShortcutIntent(createInput({
+      event: createKeyboardEvent({ key: 'Enter' }),
+      key: 'enter',
+      selection: [],
+    }))).toEqual({
+      kind: 'none',
+      preventDefault: false,
+    })
+
+    expect(getCanvasKeyboardBuiltinCommandShortcutIntent(createInput({
+      event: createKeyboardEvent({ key: 'Enter' }),
+      key: 'enter',
+      selection: ['a', 'b'],
+    }))).toEqual({
+      kind: 'none',
+      preventDefault: false,
+    })
   })
 })
 

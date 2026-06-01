@@ -32,16 +32,16 @@ describe('CanvasObjectInspector', () => {
     expect(markup).toContain('background-color:#FFFFFF')
   })
 
-  it('lets HTML specimen panels take over the inspector chrome', () => {
+  it('renders custom panels alongside standard inspector chrome', () => {
     const markup = renderToStaticMarkup(
       <CanvasObjectInspector
         bounds={{ h: 40, w: 80, x: 10, y: 20 }}
         customPanels={[{
           content: <div>Styles</div>,
-          id: 'html-specimen-css',
+          id: 'custom-styles',
         }]}
         disabled={false}
-        label="HTML specimen"
+        label="Custom item"
         styleControls={[
           {
             disabled: false,
@@ -55,9 +55,9 @@ describe('CanvasObjectInspector', () => {
       />,
     )
 
-    expect(markup).toContain('object-inspector-devtools')
     expect(markup).toContain('Styles')
-    expect(markup).not.toContain('inspector-grid')
-    expect(markup).not.toContain('inspector-style-controls')
+    expect(markup).not.toContain('object-inspector-devtools')
+    expect(markup).toContain('inspector-grid')
+    expect(markup).toContain('inspector-style-controls')
   })
 })

@@ -89,6 +89,7 @@ function createContext(): CanvasToolbarItemRenderContext {
       onGroup: vi.fn(),
       onLock: vi.fn(),
       onRedo: vi.fn(),
+      onReorder: vi.fn(),
       onUndo: vi.fn(),
       onUngroup: vi.fn(),
       onUnlockAll: vi.fn(),

@@ -10,6 +10,20 @@ const snapOnlyConfig = createCanvasAffordanceConfig({
   },
 })
 
+const gridOnlyConfig = createCanvasAffordanceConfig({
+  gestures: {
+    snapToAlignment: false,
+    snapToSpacing: false,
+  },
+})
+
+const spacingOnlyConfig = createCanvasAffordanceConfig({
+  gestures: {
+    snapToAlignment: false,
+    snapToGrid: false,
+  },
+})
+
 describe('CanvasSnapEngine alignment', () => {
   test('snaps same-kind anchors', () => {
     const scene = createCanvasSceneAdapter([
@@ -66,5 +80,73 @@ describe('CanvasSnapEngine alignment', () => {
 
     expect(snap.dy).toBe(45)
     expect(snap.alignmentGuides).toEqual([])
+  })
+})
+
+describe('CanvasSnapEngine grid and spacing', () => {
+  test('uses grid snap when no object snap owns the axis', () => {
+    const scene = createCanvasSceneAdapter([])
+
+    const snap = getCanvasMoveSnap({
+      bounds: { x: 0, y: 0, w: 100, h: 100 },
+      config: gridOnlyConfig,
+      dx: 37,
+      dy: 0,
+      scene,
+      selection: ['selected'],
+      viewport: { x: 0, y: 0, scale: 1 },
+    })
+
+    expect(snap.dx).toBe(40)
+    expect(snap.dy).toBe(0)
+    expect(snap.alignmentGuides).toEqual([])
+    expect(snap.spacingGuides).toEqual([])
+  })
+
+  test('uses spacing snap and emits the matching guide', () => {
+    const scene = createCanvasSceneAdapter([
+      {
+        id: 'left',
+        bounds: { x: 0, y: 0, w: 100, h: 100 },
+        isGroup: false,
+        parentId: null,
+        path: [0],
+      },
+      {
+        id: 'right',
+        bounds: { x: 300, y: 0, w: 100, h: 100 },
+        isGroup: false,
+        parentId: null,
+        path: [1],
+      },
+    ])
+
+    const snap = getCanvasMoveSnap({
+      bounds: { x: 150, y: 0, w: 80, h: 100 },
+      config: spacingOnlyConfig,
+      dx: 6,
+      dy: 0,
+      scene,
+      selection: ['selected'],
+      viewport: { x: 0, y: 0, scale: 1 },
+    })
+
+    expect(snap.dx).toBe(10)
+    expect(snap.spacingGuides).toEqual([
+      {
+        gap: 60,
+        orientation: 'horizontal',
+        segments: [
+          {
+            start: { x: 100, y: 50 },
+            end: { x: 160, y: 50 },
+          },
+          {
+            start: { x: 240, y: 50 },
+            end: { x: 300, y: 50 },
+          },
+        ],
+      },
+    ])
   })
 })

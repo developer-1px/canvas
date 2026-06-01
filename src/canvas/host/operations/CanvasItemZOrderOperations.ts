@@ -22,6 +22,17 @@ export function reorderCanvasItems(
   return reorderCanvasItemTree(items, selected, mode)
 }
 
+export function canReorderCanvasItems(
+  items: CanvasItem[],
+  ids: string[],
+  mode: CanvasZOrderMode,
+) {
+  return !areCanvasItemOrdersEqual(
+    items,
+    reorderCanvasItems(items, ids, mode),
+  )
+}
+
 function reorderCanvasItemTree(
   items: CanvasItem[],
   selected: Set<string>,
@@ -48,6 +59,25 @@ function reorderCanvasSiblings(
     return items
   }
 
+  if (!items.some((item) => selected.has(item.id) && isCanvasSectionLayer(item))) {
+    return mergeCanvasSectionLayers(
+      items,
+      reorderCanvasSiblingList(
+        items.filter((item) => !isCanvasSectionLayer(item)),
+        selected,
+        mode,
+      ),
+    )
+  }
+
+  return reorderCanvasSiblingList(items, selected, mode)
+}
+
+function reorderCanvasSiblingList(
+  items: CanvasItem[],
+  selected: Set<string>,
+  mode: CanvasZOrderMode,
+) {
   if (mode === 'bringToFront') {
     return [
       ...items.filter((item) => !selected.has(item.id)),
@@ -79,4 +109,50 @@ function reorderCanvasSiblings(
   }
 
   return next
+}
+
+function mergeCanvasSectionLayers(
+  items: CanvasItem[],
+  reorderedItems: CanvasItem[],
+) {
+  let reorderedIndex = 0
+
+  return items.map((item) => {
+    if (isCanvasSectionLayer(item)) {
+      return item
+    }
+
+    const nextItem = reorderedItems[reorderedIndex]
+    reorderedIndex += 1
+    return nextItem ?? item
+  })
+}
+
+function isCanvasSectionLayer(item: CanvasItem) {
+  return item.type === 'component' && item.component === 'section'
+}
+
+function areCanvasItemOrdersEqual(left: CanvasItem[], right: CanvasItem[]) {
+  const leftIds = getCanvasItemOrderIds(left)
+  const rightIds = getCanvasItemOrderIds(right)
+
+  return leftIds.length === rightIds.length &&
+    leftIds.every((id, index) => rightIds[index] === id)
+}
+
+function getCanvasItemOrderIds(items: CanvasItem[]) {
+  const ids: string[] = []
+
+  function visit(nodes: CanvasItem[]) {
+    nodes.forEach((item) => {
+      ids.push(item.id)
+
+      if (isCanvasGroupItem(item)) {
+        visit(item.children)
+      }
+    })
+  }
+
+  visit(items)
+  return ids
 }

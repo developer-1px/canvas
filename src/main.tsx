@@ -1,15 +1,21 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { CanvasApp } from './canvas'
+import {
+  CanvasDevToolsDemoApp,
+} from './demo/CanvasDevToolsDemoApp'
 import {
   DEMO_CANVAS_APP_ASSEMBLY_INPUT,
 } from './demo/CanvasDemoAssembly'
 import './index.css'
 
+const themeMode = new URLSearchParams(window.location.search).get('theme')
+
+if (themeMode === 'dark' || themeMode === 'light') {
+  document.documentElement.dataset.theme = themeMode
+}
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <CanvasApp
-      assemblyInput={DEMO_CANVAS_APP_ASSEMBLY_INPUT}
-    />
+    <CanvasDevToolsDemoApp assemblyInput={DEMO_CANVAS_APP_ASSEMBLY_INPUT} />
   </StrictMode>,
 )

@@ -131,6 +131,44 @@ describe('CanvasToolbarItems', () => {
     ])
   })
 
+  it('models layer order commands as reorder action payloads', () => {
+    const groups = getCanvasCommandSurfaceGroups(createSurfaceInput({
+      commandAvailability: createCommandAvailability({
+        bringForward: false,
+        sendToBack: false,
+      }),
+      includeDisabled: true,
+      surface: 'selection-floating-bar',
+    }))
+
+    expect(getGroup(groups, 'layer-order')?.items).toEqual([
+      {
+        action: { kind: 'reorder', mode: 'bringToFront' },
+        command: 'bringToFront',
+        disabled: false,
+        kind: 'command',
+      },
+      {
+        action: { kind: 'reorder', mode: 'bringForward' },
+        command: 'bringForward',
+        disabled: true,
+        kind: 'command',
+      },
+      {
+        action: { kind: 'reorder', mode: 'sendBackward' },
+        command: 'sendBackward',
+        disabled: false,
+        kind: 'command',
+      },
+      {
+        action: { kind: 'reorder', mode: 'sendToBack' },
+        command: 'sendToBack',
+        disabled: true,
+        kind: 'command',
+      },
+    ])
+  })
+
   it('adds custom command items as their own group', () => {
     const groups = getCanvasCommandSurfaceGroups(createSurfaceInput({
       customCommands: [

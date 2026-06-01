@@ -14,8 +14,8 @@ export const CANVAS_ITEM_CREATION_ADAPTER: CanvasCreationAdapter<CanvasItem> = {
     routing,
     start,
     startAttachedTo,
-  }) =>
-    syncCanvasItemBounds({
+  }) => {
+    const item: CanvasItem = {
       id,
       type: 'arrow',
       x: 0,
@@ -23,12 +23,21 @@ export const CANVAS_ITEM_CREATION_ADAPTER: CanvasCreationAdapter<CanvasItem> = {
       w: 0,
       h: 0,
       end,
-      endAttachedTo,
       routing,
       start,
-      startAttachedTo,
       ...getCanvasArrowStyle(),
-    }),
+    }
+
+    if (endAttachedTo !== undefined) {
+      item.endAttachedTo = endAttachedTo
+    }
+
+    if (startAttachedTo !== undefined) {
+      item.startAttachedTo = startAttachedTo
+    }
+
+    return syncCanvasItemBounds(item)
+  },
   createHighlight: ({ id, points, style }) =>
     syncCanvasItemBounds({
       id,
