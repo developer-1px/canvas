@@ -45,6 +45,25 @@ function createTodoWidgetData(): TodoWidgetData {
   }
 }
 
+// Pure data mutation used by the (forthcoming) play-mode interaction: toggling
+// a checklist item's done state. Kept independent of any toolbar/overlay UI so
+// it can be wired through onReplaceSelectedItems once interaction lands.
+export function toggleTodoWidgetItemDone(
+  data: TodoWidgetData,
+  index: number,
+): TodoWidgetData {
+  if (index < 0 || index >= data.items.length) {
+    return data
+  }
+
+  return {
+    ...data,
+    items: data.items.map((item, current) =>
+      current === index ? { ...item, done: !item.done } : item,
+    ),
+  }
+}
+
 export function createTodoWidgetSeedItem(): CanvasCustomItem {
   return {
     data: createTodoWidgetData(),
