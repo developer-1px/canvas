@@ -17,7 +17,7 @@ tags: [canvas, affordance, taxonomy, figma, figjam, miro, tldraw, excalidraw, go
 - canvas 편집기 affordance는 **5개 계열 축**으로 묶인다: **Navigation · Creation · Manipulation · Arrangement · Collaboration**. (Figma/FigJam/Miro/Canva/tldraw/Excalidraw 공통 + infinite-canvas/Shneiderman 합성)
 - 각 affordance는 **필수 / 보편 / 선택** 3단계 완성도로 분류한다. "필수+보편"을 5축 전부에서 채우는 것이 곧 "엔진으로 성립"의 정의다.
 - "keep vs legacy"가 아니라 **엔진-commodity vs 제품-domain**, 그리고 **persistent(문서) vs ephemeral(presence)** 이 진짜 경계다. HTML/CSS specimen은 *legacy*가 아니라 axis 2·3의 *제품-domain* 기능일 뿐이다.
-- 이 repo는 5축 코어를 거의 다 가졌다. **진짜 갭**은: flip, zoom-to-selection, image/SVG export, tidy-up(2D auto-arrange), 그리고 (의도적 out-of-scope일 수 있는) **실 multiplayer sync 엔진**.
+- 이 repo는 5축의 필수+보편 편집 코어를 대부분 닫았다. 남은 명시 항목은 선택 기능인 Minimap/shortcut help와, host-owned collaboration 결정이 필요한 follow-view/실 multiplayer sync다.
 
 ## Why — 왜 이 기준이 지금 필요한가
 
@@ -142,10 +142,7 @@ repo: ✅ 보유 · ⚠️ 부분 · ❌ 갭. (repo 보유 근거: `CanvasAfford
 ## What-if — 이 기준을 repo에 적용하면
 
 1. **`affordance-inventory.md` 재해석.** keep/legacy/drop → 각 항목을 (계열 축 × 엔진/제품 × persistent/ephemeral)로 재태깅. "HTML/CSS specimen=legacy"는 "axis 2·3 제품-domain 기능, 기본 데모에서 미노출"로 정정 — 폐기가 아니라 위치 지정.
-2. **갭이 곧 goal.** 위 ❌가 재오픈할 실제 이슈다:
-   - 보편 갭(우선): **flip H/V**, **zoom-to-selection**, **image/SVG export**, **tidy-up**.
-   - 보편 갭(아키텍처 결정 필요): **실 multiplayer sync** — host-owns-data 원칙과 충돌하므로 "엔진 out-of-scope" 명시 or presence sync seam 설계. *결정이 필요한 항목.*
-   - 선택 갭(후순위): vector pen, line 분리, select-same, shortcut help, dark toggle.
+2. **갭이 곧 goal.** #33, #34, #35, #36, #37, #38, #41, #65로 flip, zoom-to-selection, image/SVG/PNG export, tidy-up, select-same, dark mode, plain line, vector pen은 behavioral DoD로 닫혔다. 남은 실제 후보는 선택 기능인 Minimap/shortcut help와 collaboration 결정 항목인 follow-view/실 multiplayer sync다.
 3. **DoD 격상.** "버튼 렌더 + 유닛 그린" → "해당 affordance가 표준 동작(이 문서의 인용 동작)대로 running 앱에서 작동". presence e2e를 behavioral e2e로 보강.
 
 ## 흥미로운 이야기
@@ -154,11 +151,11 @@ Figma 멀티플레이어는 출시 당시 "controversial"했다 — OT/CRDT가 "
 
 ## Insight
 
-이 repo의 affordance 엔진은 de-facto 코어(5축의 필수+보편)를 **이미 80%+ 충족**한다. 문제는 기능 부족이 아니라 **기준의 부재**였다 — 자체 inventory가 외부 권위와 정합하지 않아 "어디까지가 끝인지"를 측정할 자가 없었고, 그래서 닫힌 이슈가 곧 완료로 둔갑했다.
+이 repo의 affordance 엔진은 de-facto 편집 코어(5축의 필수+보편 중 host-owned collaboration transport를 제외한 항목)를 behavioral DoD로 닫았다. 문제는 기능 부족이 아니라 **기준의 부재**였다 — 자체 inventory가 외부 권위와 정합하지 않아 "어디까지가 끝인지"를 측정할 자가 없었고, 그래서 닫힌 이슈가 곧 완료로 둔갑했다.
 
-**스코프 정합성 판정: 부분 충돌.** de-facto는 multiplayer sync·export를 엔진 commodity로 보지만, 이 repo는 (a) host-owns-data, (b) headless 지향, (c) DOM/CSS export 제거라는 의도적 결정을 가졌다. 따라서 sync와 export는 "표준이니 무조건 구현"이 아니라 **명시적 in/out-of-scope 결정**으로 처리해야 한다. 나머지 보편 갭(flip, zoom-to-selection, tidy-up)은 의도적 거부 근거가 없으므로 곧바로 goal 후보다.
+**스코프 정합성 판정: 부분 충돌.** de-facto는 multiplayer sync를 엔진 commodity로 보지만, 이 repo는 (a) host-owns-data, (b) headless 지향, (c) collaboration transport를 Host가 소유한다는 결정을 가졌다. 따라서 실 sync는 "표준이니 무조건 구현"이 아니라 **명시적 in/out-of-scope 결정**으로 처리해야 한다. Export는 #36에서 canvas SVG/PNG export로 닫혔고, DOM/CSS consumer export는 제품-domain out-of-scope다.
 
-다음 goal의 올바른 형태: *"de-facto 5축의 필수+보편 칸 중 의도적 out-of-scope를 제외한 빈 칸(flip, zoom-to-selection, image export, tidy-up)을 behavioral DoD로 채운다."*
+다음 goal의 올바른 형태: *"collaboration transport/follow-view를 Host-owned seam으로 명시할지, 또는 optional Minimap/shortcut help를 제품 가치가 있는 선택 기능으로 열지 결정한다."*
 
 ## 출처
 
