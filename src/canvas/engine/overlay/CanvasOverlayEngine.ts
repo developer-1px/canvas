@@ -11,7 +11,7 @@ import {
   RESIZE_HANDLES,
 } from '../primitives/CanvasPrimitives'
 import type { CanvasSceneAdapter } from '../../foundation/CanvasSceneAdapter'
-import type { CanvasSnapGuides } from '../snap/CanvasSnapEngine'
+import type { CanvasSnapGuides } from '../../foundation/CanvasSnapEngine'
 
 export type CanvasResizeHandleOverlay = {
   handle: ResizeHandle

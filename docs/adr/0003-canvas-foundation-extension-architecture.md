@@ -73,6 +73,9 @@ command, and patch-planning grammar that can run through adapters.
   `CanvasCommandTypes` live in Foundation source ownership. Engine command
   actions still execute adapters, but their availability guards read Foundation
   contracts.
+- `CanvasSnapEngine`, grid snap, snap geometry, and guide contracts live in
+  Foundation source ownership. They read structural snap config so Engine
+  affordance config remains compatible without becoming a Foundation import.
 - `CANVAS_STICKY_NOTE_EXTENSION` is the first concrete first-party extension
   descriptor. It names the sticky note creation affordance and adapter slots
   without moving Demo component storage, SVG rendering, or App workflow.

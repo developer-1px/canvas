@@ -297,6 +297,19 @@ describe('Canvas package consumer imports', () => {
     expect(CanvasFoundationFromPackage.createCanvasSceneAdapter).toBe(
       CanvasFoundation.createCanvasSceneAdapter,
     )
+    expect(CanvasFoundation.snapCanvasPointToGrid({
+      config: affordanceConfig,
+      point: { x: 41, y: 78 },
+    })).toEqual({ x: 40, y: 80 })
+    expect(CanvasEngine.getCanvasMoveSnap({
+      bounds: { h: 20, w: 20, x: 0, y: 0 },
+      config: affordanceConfig,
+      dx: 37,
+      dy: 0,
+      scene,
+      selection: ['rect-1'],
+      viewport: { scale: 1, x: 0, y: 0 },
+    }).dx).toBe(40)
     expect(CanvasFoundation.defineCanvasExtension({
       id: 'whiteboard-comment',
       requiredAdapters: ['document', 'scene'],

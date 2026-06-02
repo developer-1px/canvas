@@ -1,4 +1,4 @@
-import type { Point } from '../../core'
+import type { Point } from '../core'
 
 export type CanvasAlignmentGuide = {
   end: number

@@ -32,12 +32,18 @@ describe('Canvas foundation architecture plan', () => {
   it('keeps the inventory explicit about what can and cannot move', () => {
     for (const row of [
       '`src/canvas/foundation` | Foundation public facade',
+      '`src/canvas/foundation/CanvasAlignmentSnap.ts` | Foundation',
       '`src/canvas/foundation/CanvasCommandAvailabilityRules.ts` | Foundation',
       '`src/canvas/foundation/CanvasCommandSelectionRules.ts` | Foundation',
       '`src/canvas/foundation/CanvasCommandTypes.ts` | Foundation',
       '`src/canvas/foundation/CanvasExtensionContracts.ts` | Foundation',
       '`src/canvas/foundation/CanvasFirstPartyExtensions.ts` | First-party extension',
       '`src/canvas/foundation/CanvasGestureEngine.ts` | Foundation',
+      '`src/canvas/foundation/CanvasGridSnap.ts` | Foundation',
+      '`src/canvas/foundation/CanvasSnapEngine.ts` | Foundation',
+      '`src/canvas/foundation/CanvasSnapGeometry.ts` | Foundation',
+      '`src/canvas/foundation/CanvasSnapGuides.ts` | Foundation',
+      '`src/canvas/foundation/CanvasSpacingSnap.ts` | Foundation',
       '`src/canvas/foundation/CanvasSceneAdapter.ts` | Foundation',
       '`src/canvas/foundation/CanvasSelectionEngine.ts` | Foundation',
       '`src/canvas/foundation/CanvasToolGestureRouting.ts` | Foundation',

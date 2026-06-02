@@ -1,11 +1,13 @@
-import type { CanvasAffordanceConfig } from '../affordance/CanvasAffordances'
 import type {
   Bounds,
   Viewport
-} from '../../core'
-import type { CanvasSceneAdapter } from '../../foundation/CanvasSceneAdapter'
+} from '../core'
+import type { CanvasSceneAdapter } from './CanvasSceneAdapter'
 import { getCanvasAlignmentSnap } from './CanvasAlignmentSnap'
-import { getCanvasGridSnap } from './CanvasGridSnap'
+import {
+  getCanvasGridSnap,
+  type CanvasGridSnapConfig,
+} from './CanvasGridSnap'
 import {
   createEmptyCanvasAxisSnap,
   type CanvasAlignmentGuide,
@@ -15,7 +17,10 @@ import {
 import { translateCanvasSnapBounds } from './CanvasSnapGeometry'
 import { getCanvasSpacingSnap } from './CanvasSpacingSnap'
 
-export { snapCanvasPointToGrid } from './CanvasGridSnap'
+export {
+  snapCanvasPointToGrid,
+  type CanvasGridSnapConfig,
+} from './CanvasGridSnap'
 export {
   EMPTY_CANVAS_SNAP_GUIDES,
   type CanvasAlignmentGuide,
@@ -27,6 +32,13 @@ export type CanvasMoveSnap = CanvasSnapGuides & {
   dx: number
   dy: number
 }
+
+export type CanvasMoveSnapConfig = CanvasGridSnapConfig & Readonly<{
+  gestures: CanvasGridSnapConfig['gestures'] & Readonly<{
+    snapToAlignment: boolean
+    snapToSpacing: boolean
+  }>
+}>
 
 const SNAP_THRESHOLD = 8
 
@@ -40,7 +52,7 @@ export function getCanvasMoveSnap({
   viewport,
 }: {
   bounds: Bounds
-  config: CanvasAffordanceConfig
+  config: CanvasMoveSnapConfig
   dx: number
   dy: number
   scene: CanvasSceneAdapter
