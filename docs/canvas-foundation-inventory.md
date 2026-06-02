@@ -21,10 +21,11 @@ product/app meaning last.
 |---|---|---|---|
 | `src/canvas/foundation` | Foundation public facade | tracer bullet added | Re-exports headless core, scene, selection, and transform contracts through a named public subpath. |
 | `src/canvas/foundation/CanvasExtensionContracts.ts` | Foundation | tracer bullet added | Defines reusable extension descriptor, adapter slot, command planner, renderer slot, and generic effect contracts without app or host ownership. |
+| `src/canvas/foundation/CanvasSceneAdapter.ts` | Foundation | promoted | Owns scene entries, parent/path/bounds read contracts, and scene-derived bounds without Demo item variants. |
+| `src/canvas/foundation/CanvasSelectionEngine.ts` | Foundation | promoted | Owns pointer click and marquee selection policy over `CanvasSceneAdapter`. |
 | `src/canvas/core` | Foundation | already close | Headless geometry, viewport, stable id, and primitive types. |
-| `src/canvas/engine/scene` | Foundation | tracer-bullet candidate | `CanvasSceneAdapter` uses entries, paths, parent ids, and bounds without Demo item variants. |
-| `src/canvas/engine/selection` | Foundation | tracer-bullet candidate | Pointer click and marquee selection depend on `CanvasSceneAdapter` and bounds only. |
 | `src/canvas/engine/transform` | Foundation | tracer-bullet candidate | Move/resize planning already uses a generic transform adapter. |
+| `src/canvas/engine` | Engine public facade | compatibility | Re-exports promoted foundation scene and selection contracts while retaining existing engine imports. |
 | `src/canvas/engine/gesture` | Foundation | candidate | Gesture classification is host-independent but still tied to current built-in tool grammar. |
 | `src/canvas/engine/command` | Foundation or first-party extension | split needed | Availability and selection rules are generic; built-in whiteboard commands may become extension descriptors. |
 | `src/canvas/engine/snap` | Foundation or first-party extension | split needed | Grid and geometry primitives are generic; guide policy may stay extension-owned. |
@@ -42,7 +43,7 @@ product/app meaning last.
 ## Tracer Bullet Order
 
 1. Name and guard the Foundation/Extension ownership model.
-2. Promote scene and selection contracts without changing runtime behaviour.
+2. Promote scene and selection contracts without changing runtime behaviour. Done in issue #71.
 3. Promote transform planner contracts behind generic adapters.
 4. Define an extension descriptor shape for reusable affordance bundles.
 5. Move one low-risk first-party affordance into the extension shape.

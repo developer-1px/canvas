@@ -1,6 +1,6 @@
-import type { Bounds } from '../../core'
-import { unique } from '../primitives/CanvasPrimitives'
-import type { CanvasSceneAdapter } from '../scene/CanvasSceneAdapter'
+import type { Bounds } from '../core'
+import { unique } from '../core'
+import type { CanvasSceneAdapter } from './CanvasSceneAdapter'
 
 export type CanvasItemPointerSelection = {
   alreadySelected: boolean

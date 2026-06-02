@@ -36,12 +36,12 @@ export {
   createCanvasSceneAdapter,
   type CanvasSceneAdapter,
   type CanvasSceneEntry,
-} from '../engine/scene/CanvasSceneAdapter'
+} from './CanvasSceneAdapter'
 export {
   getCanvasItemPointerSelection,
   getCanvasMarqueeSelection,
   type CanvasItemPointerSelection,
-} from '../engine/selection/CanvasSelectionEngine'
+} from './CanvasSelectionEngine'
 export {
   moveCanvasSelection,
   resizeCanvasSelection,

@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import { createCanvasSceneAdapter } from '../scene/CanvasSceneAdapter'
+import { createCanvasSceneAdapter } from './CanvasSceneAdapter'
 import {
   getCanvasItemPointerSelection,
   getCanvasMarqueeSelection,

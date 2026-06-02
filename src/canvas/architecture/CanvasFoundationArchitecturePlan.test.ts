@@ -32,10 +32,11 @@ describe('Canvas foundation architecture plan', () => {
     for (const row of [
       '`src/canvas/foundation` | Foundation public facade',
       '`src/canvas/foundation/CanvasExtensionContracts.ts` | Foundation',
+      '`src/canvas/foundation/CanvasSceneAdapter.ts` | Foundation',
+      '`src/canvas/foundation/CanvasSelectionEngine.ts` | Foundation',
       '`src/canvas/core` | Foundation',
-      '`src/canvas/engine/scene` | Foundation',
-      '`src/canvas/engine/selection` | Foundation',
       '`src/canvas/engine/transform` | Foundation',
+      '`src/canvas/engine` | Engine public facade',
       '`src/canvas/host/document` | Host adapter',
       '`src/canvas/app/workflow` | App',
       '`src/canvas/renderer` | Renderer',
