@@ -18,6 +18,10 @@ import type {
   CanvasAppWorkspaceAssemblyInput,
 } from './CanvasAppAssemblyInputTypes'
 import type {
+  CanvasAppCapabilityAssemblyInput,
+  CanvasAppCapabilitySnapshot,
+} from './CanvasAppCapabilityAssembly'
+import type {
   CanvasAppCollaborationAssemblyInput,
   CanvasAppPresenceProvider,
 } from './CanvasAppCollaborationAssembly'
@@ -25,6 +29,7 @@ import type { CanvasAppExtensionAssemblyInput } from './CanvasAppExtensionAssemb
 
 export type CanvasAppAssembly = CanvasAppExtensionBundle & {
   affordanceConfig: CanvasAffordanceConfig
+  capabilities: CanvasAppCapabilitySnapshot
   componentLibrary: CanvasAppComponentLibrary
   componentPresentationRenderers: CanvasAppComponentPresentationRenderers
   initialItems: CanvasItem[]
@@ -38,6 +43,7 @@ export type CanvasAppAssembly = CanvasAppExtensionBundle & {
 
 export type CanvasAppAssemblyInput =
   CanvasAppExtensionAssemblyInput &
+  CanvasAppCapabilityAssemblyInput &
   CanvasAppCollaborationAssemblyInput &
   CanvasAppAffordanceAssemblyInput &
   CanvasAppComponentAssemblyInput &

@@ -22,6 +22,7 @@ export function snapshotCanvasAppAssembly(
     affordanceConfig: snapshotCanvasAppAffordanceConfig(
       assembly.affordanceConfig,
     ),
+    capabilities: Object.freeze({ ...assembly.capabilities }),
     componentLibrary: snapshotCanvasAppComponentLibrary(
       assembly.componentLibrary,
     ),

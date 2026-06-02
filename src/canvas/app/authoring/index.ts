@@ -6,6 +6,16 @@ export type {
   CanvasAppAssembly,
   CanvasAppAssemblyInput,
 } from '../workflow/CanvasAppAssemblyTypes'
+export {
+  CANVAS_APP_COMMENT_ONLY_CAPABILITIES,
+  CANVAS_APP_EDITOR_CAPABILITIES,
+  CANVAS_APP_READ_ONLY_CAPABILITIES,
+  createCanvasAppCapabilities,
+  createCanvasAppCapabilityAffordanceConfigInput,
+  withCanvasAppCapabilities,
+  type CanvasAppCapabilityInput,
+  type CanvasAppCapabilitySnapshot,
+} from '../workflow/CanvasAppCapabilityAssembly'
 export type {
   CanvasAppPresenceProvider,
   CanvasAppPresenceProviderContext,

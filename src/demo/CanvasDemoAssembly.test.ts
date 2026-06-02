@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest'
+import { createCanvasAppAssembly } from '../canvas'
 import {
   DEMO_CANVAS_APP_ASSEMBLY,
   DEMO_CANVAS_APP_ASSEMBLY_INPUT,
+  DEMO_CANVAS_COMMENT_ONLY_ASSEMBLY_INPUT,
+  DEMO_CANVAS_READ_ONLY_ASSEMBLY_INPUT,
 } from './CanvasDemoAssembly'
 import { DEMO_CUSTOM_ITEM_MODULES } from './custom-items'
 
@@ -125,14 +128,14 @@ describe('CanvasDemoAssembly', () => {
       .toBe(true)
     expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.objectStyleControls)
       .toBe(true)
-	    expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.marquee).toBe(
-	      true,
-	    )
-	    expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.presence).toBe(
-	      true,
-	    )
-	    expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.stickyQuickCreate)
-	      .toBe(true)
+    expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.marquee).toBe(
+      true,
+    )
+    expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.presence).toBe(
+      true,
+    )
+    expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.stickyQuickCreate)
+      .toBe(true)
     expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.emoteControls)
       .toBe(false)
     expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.stampControls)
@@ -168,11 +171,70 @@ describe('CanvasDemoAssembly', () => {
     expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.tools.sticky).toBe(true)
     expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.tools.comment).toBe(true)
     expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.tools.section).toBe(true)
-	    expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.tools.highlight).toBe(true)
-	    expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.tools.eraser).toBe(true)
-	    expect(DEMO_CANVAS_APP_ASSEMBLY.presenceProvider({
-	      selection: [],
-	      viewport: { scale: 1, x: 0, y: 0 },
-	    }).map((entry) => entry.label)).toEqual(['Mia', 'Noah'])
-	  })
-	})
+    expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.tools.highlight).toBe(true)
+    expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.tools.eraser).toBe(true)
+    expect(DEMO_CANVAS_APP_ASSEMBLY.presenceProvider({
+      selection: [],
+      viewport: { scale: 1, x: 0, y: 0 },
+    }).map((entry) => entry.label)).toEqual(['Mia', 'Noah'])
+  })
+
+  it('exposes demo capability fixtures without explanatory UI decoration', () => {
+    const readOnlyAssembly = createCanvasAppAssembly(
+      DEMO_CANVAS_READ_ONLY_ASSEMBLY_INPUT,
+    )
+    const commentOnlyAssembly = createCanvasAppAssembly(
+      DEMO_CANVAS_COMMENT_ONLY_ASSEMBLY_INPUT,
+    )
+
+    expect(DEMO_CANVAS_APP_ASSEMBLY.capabilities).toEqual({
+      comment: true,
+      editDocument: true,
+      export: true,
+      follow: true,
+      present: true,
+      view: true,
+    })
+    expect(readOnlyAssembly.capabilities).toEqual({
+      comment: false,
+      editDocument: false,
+      export: false,
+      follow: false,
+      present: false,
+      view: true,
+    })
+    expect(readOnlyAssembly.affordanceConfig.commands.copy).toBe(false)
+    expect(readOnlyAssembly.affordanceConfig.commands.delete).toBe(false)
+    expect(readOnlyAssembly.affordanceConfig.gestures.createComment).toBe(false)
+    expect(readOnlyAssembly.affordanceConfig.gestures.createShape).toBe(false)
+    expect(readOnlyAssembly.affordanceConfig.gestures.move).toBe(false)
+    expect(readOnlyAssembly.affordanceConfig.gestures.pan).toBe(true)
+    expect(readOnlyAssembly.affordanceConfig.gestures.textEdit).toBe(false)
+    expect(readOnlyAssembly.affordanceConfig.overlays.textEditor).toBe(false)
+    expect(readOnlyAssembly.affordanceConfig.shortcuts.editSelection).toBe(false)
+    expect(readOnlyAssembly.affordanceConfig.tools.comment).toBe(false)
+    expect(readOnlyAssembly.affordanceConfig.tools.rect).toBe(false)
+    expect(readOnlyAssembly.affordanceConfig.tools.select).toBe(true)
+
+    expect(commentOnlyAssembly.capabilities).toEqual({
+      comment: true,
+      editDocument: false,
+      export: false,
+      follow: false,
+      present: false,
+      view: true,
+    })
+    expect(commentOnlyAssembly.affordanceConfig.commands.copy).toBe(false)
+    expect(commentOnlyAssembly.affordanceConfig.commands.delete).toBe(false)
+    expect(commentOnlyAssembly.affordanceConfig.gestures.createComment).toBe(
+      true,
+    )
+    expect(commentOnlyAssembly.affordanceConfig.gestures.createShape).toBe(false)
+    expect(commentOnlyAssembly.affordanceConfig.gestures.move).toBe(false)
+    expect(commentOnlyAssembly.affordanceConfig.gestures.pan).toBe(true)
+    expect(commentOnlyAssembly.affordanceConfig.gestures.textEdit).toBe(true)
+    expect(commentOnlyAssembly.affordanceConfig.tools.comment).toBe(true)
+    expect(commentOnlyAssembly.affordanceConfig.tools.rect).toBe(false)
+    expect(commentOnlyAssembly.affordanceConfig.tools.select).toBe(true)
+  })
+})

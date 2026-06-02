@@ -1,4 +1,7 @@
 import {
+  CANVAS_APP_COMMENT_ONLY_CAPABILITIES,
+  CANVAS_APP_EDITOR_CAPABILITIES,
+  CANVAS_APP_READ_ONLY_CAPABILITIES,
   createCanvasAppAssembly,
   type CanvasAppAssemblyInput,
   type CanvasPresenceOverlay,
@@ -204,13 +207,28 @@ const DEMO_CANVAS_FOCUSED_AFFORDANCE_CONFIG = {
   },
 } satisfies CanvasAppAssemblyInput['affordanceConfig']
 
-export const DEMO_CANVAS_APP_ASSEMBLY_INPUT = {
+const DEMO_CANVAS_BASE_ASSEMBLY_INPUT = {
   affordanceConfig: DEMO_CANVAS_FOCUSED_AFFORDANCE_CONFIG,
   customItemModules: DEMO_CUSTOM_ITEM_MODULES,
   initialItems: DEMO_CANVAS_SEED_ITEMS,
   initialSelection: DEMO_CANVAS_INITIAL_SELECTION,
   presenceProvider: () => DEMO_CANVAS_PRESENCE,
   workspaceStorageProvider: DEMO_CANVAS_STORAGE_PROVIDER,
+} satisfies CanvasAppAssemblyInput
+
+export const DEMO_CANVAS_APP_ASSEMBLY_INPUT = {
+  ...DEMO_CANVAS_BASE_ASSEMBLY_INPUT,
+  capabilities: CANVAS_APP_EDITOR_CAPABILITIES,
+} satisfies CanvasAppAssemblyInput
+
+export const DEMO_CANVAS_READ_ONLY_ASSEMBLY_INPUT = {
+  ...DEMO_CANVAS_BASE_ASSEMBLY_INPUT,
+  capabilities: CANVAS_APP_READ_ONLY_CAPABILITIES,
+} satisfies CanvasAppAssemblyInput
+
+export const DEMO_CANVAS_COMMENT_ONLY_ASSEMBLY_INPUT = {
+  ...DEMO_CANVAS_BASE_ASSEMBLY_INPUT,
+  capabilities: CANVAS_APP_COMMENT_ONLY_CAPABILITIES,
 } satisfies CanvasAppAssemblyInput
 
 export const DEMO_CANVAS_APP_ASSEMBLY = createCanvasAppAssembly(

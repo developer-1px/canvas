@@ -5,6 +5,10 @@ import type {
   CanvasAppAssembly,
   CanvasAppAssemblyInput,
 } from './CanvasAppAssemblyTypes'
+import {
+  createCanvasAppCapabilityAssembly,
+  withCanvasAppCapabilities,
+} from './CanvasAppCapabilityAssembly'
 import { createCanvasAppCollaborationAssembly } from './CanvasAppCollaborationAssembly'
 import { createCanvasAppComponentAssembly } from './CanvasAppComponentAssembly'
 import { DEFAULT_CANVAS_APP_ASSEMBLY } from './CanvasAppDefaultAssembly'
@@ -40,8 +44,18 @@ export function createCanvasAppAssembly(
     input,
     DEFAULT_CANVAS_APP_ASSEMBLY,
   )
-  const affordanceAssembly = createCanvasAppAffordanceAssembly(
+  const capabilityAssembly = createCanvasAppCapabilityAssembly(
     input,
+    DEFAULT_CANVAS_APP_ASSEMBLY,
+  )
+  const affordanceAssembly = createCanvasAppAffordanceAssembly(
+    {
+      ...input,
+      affordanceConfig: withCanvasAppCapabilities(
+        input.affordanceConfig,
+        capabilityAssembly.capabilities,
+      ),
+    },
     DEFAULT_CANVAS_APP_ASSEMBLY,
   )
   const collaborationAssembly = createCanvasAppCollaborationAssembly(
@@ -52,6 +66,7 @@ export function createCanvasAppAssembly(
   const assembly: CanvasAppAssembly = {
     ...extensionAssembly,
     affordanceConfig: affordanceAssembly.affordanceConfig,
+    capabilities: capabilityAssembly.capabilities,
     componentLibrary: componentAssembly.componentLibrary,
     componentPresentationRenderers:
       componentAssembly.componentPresentationRenderers,

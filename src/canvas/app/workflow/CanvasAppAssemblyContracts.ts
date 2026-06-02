@@ -10,6 +10,9 @@ import { assertCanvasTextPasteImporters } from '../affordances/io/text-paste/Can
 import { assertCanvasAppAssemblyAdapters } from './CanvasAppAdapterContracts'
 import type { CanvasAppAssembly } from './CanvasAppAssemblyTypes'
 import {
+  assertCanvasAppCapabilityAssembly,
+} from './CanvasAppCapabilityAssembly'
+import {
   assertCanvasAppCollaborationAssembly,
 } from './CanvasAppCollaborationAssembly'
 import { assertCanvasAppComponentAssembly } from './CanvasAppComponentAssemblyContracts'
@@ -18,6 +21,7 @@ import { assertCanvasAppWorkspaceAssembly } from './CanvasAppWorkspaceAssemblyCo
 export function assertCanvasAppAssembly(assembly: CanvasAppAssembly) {
   assertCanvasAppDescriptorObject(assembly, 'assembly')
   assertCanvasAffordanceConfig(assembly.affordanceConfig)
+  assertCanvasAppCapabilityAssembly(assembly)
   assertCanvasAppComponentAssembly(assembly)
   assertCanvasAppCustomCommands(assembly.customCommands)
   assertCanvasAppCustomCreationTools(assembly.customCreationTools)

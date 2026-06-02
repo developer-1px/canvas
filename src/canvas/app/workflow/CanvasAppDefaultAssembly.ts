@@ -25,6 +25,9 @@ import { DEFAULT_CANVAS_APP_ITEM_LAYER_ADAPTER } from '../rendering/CanvasAppIte
 import { DEFAULT_CANVAS_APP_STAGE_ADAPTER } from '../rendering/CanvasAppStageAdapter'
 import { DEFAULT_CANVAS_WORKSPACE_STORAGE_PROVIDER } from '../workspace/document/CanvasWorkspacePersistence'
 import {
+  CANVAS_APP_EDITOR_CAPABILITIES,
+} from './CanvasAppCapabilityAssembly'
+import {
   EMPTY_CANVAS_APP_PRESENCE_PROVIDER,
 } from './CanvasAppCollaborationAssembly'
 import type { CanvasAppAssembly } from './CanvasAppAssemblyTypes'
@@ -47,6 +50,7 @@ export const DEFAULT_CANVAS_APP_ASSEMBLY: CanvasAppAssembly =
       ],
     }),
     affordanceConfig: DEFAULT_CANVAS_AFFORDANCE_CONFIG,
+    capabilities: CANVAS_APP_EDITOR_CAPABILITIES,
     componentLibrary: CANVAS_COMPONENT_LIBRARY,
     componentPresentationRenderers:
       DEFAULT_CANVAS_APP_COMPONENT_PRESENTATION_RENDERERS,
