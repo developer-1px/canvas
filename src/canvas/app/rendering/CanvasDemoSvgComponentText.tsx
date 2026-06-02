@@ -1,5 +1,7 @@
 import type { CSSProperties } from 'react'
 import type { CanvasComponentItem } from '../../entities'
+import { CanvasContentEditableText } from '../affordances/editing/text-editor/CanvasContentEditableText'
+import { useCanvasInlineTextEditing } from '../affordances/editing/text-editor/CanvasInlineTextEditingContext'
 
 type CanvasDemoSvgComponentTextProps = {
   compact?: boolean
@@ -114,6 +116,7 @@ export function CanvasDemoSvgStickyText({
   item: CanvasComponentItem
 }) {
   const showTitle = item.title.trim().length > 0 && item.title !== 'Sticky'
+  const editor = useCanvasInlineTextEditing()
   const style = getCanvasDemoSvgComponentTextStyle(item)
 
   return (
@@ -124,11 +127,13 @@ export function CanvasDemoSvgStickyText({
             {item.title}
           </div>
         ) : null}
-        {item.body ? (
-          <div className="component-sticky-body" style={style}>
-            {item.body}
-          </div>
-        ) : null}
+        <CanvasContentEditableText
+          className="component-sticky-body"
+          editor={editor}
+          id={item.id}
+          style={style}
+          value={item.body ?? ''}
+        />
       </div>
     </foreignObject>
   )

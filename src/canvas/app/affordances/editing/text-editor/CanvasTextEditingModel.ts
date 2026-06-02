@@ -6,6 +6,7 @@ import type {
 import {
   getCanvasEditableTextBounds,
   getCommittedCanvasEditableTextValue,
+  isCanvasStickyComponentItem,
 } from '../../../../host'
 import type { CommitCanvasItemsChange } from '../../../workflow/CanvasWorkflowContract'
 
@@ -79,6 +80,12 @@ export function getCanvasTextEditorStyle({
     minHeight: bounds.h * viewport.scale,
     fontSize: getCanvasTextEditorFontSize(editingItem) * viewport.scale,
   }
+}
+
+export function shouldUseCanvasContentEditableText(
+  item: CanvasEditableTextItem | null,
+) {
+  return item !== null && isCanvasStickyComponentItem(item)
 }
 
 function getCanvasTextEditorFontSize(item: CanvasEditableTextItem) {

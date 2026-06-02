@@ -2,6 +2,10 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import type { CanvasItem } from '../../entities'
 import { renderCanvasDemoSvgItem } from './CanvasDemoSvgItemRenderer'
+import {
+  CanvasInlineTextEditingContext,
+  type CanvasInlineTextEditingContextValue,
+} from '../affordances/editing/text-editor/CanvasInlineTextEditingContext'
 import { DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS } from './CanvasDemoSvgComponentPresentationRegistry'
 import { DEFAULT_CANVAS_DEMO_SVG_CUSTOM_ITEM_RENDERERS } from './CanvasDemoSvgCustomItemRendererRegistry'
 
@@ -24,6 +28,7 @@ describe('CanvasDemoSvgItemRenderer built-in components', () => {
 
     expect(markup).toContain('component-sticky-note')
     expect(markup).toContain('component-sticky-text')
+    expect(markup).toContain('data-text-item-id="component-sticky"')
     expect(markup).toContain('Decision note')
     expect(markup).not.toContain('component-title')
     expect(markup).not.toContain('Sticky')
@@ -47,7 +52,35 @@ describe('CanvasDemoSvgItemRenderer built-in components', () => {
     }, () => 'note-card')
 
     expect(markup).toContain('component-sticky-text')
+    expect(markup).toContain('component-sticky-body')
+    expect(markup).toContain('data-text-item-id="component-sticky"')
     expect(markup).not.toContain('Sticky')
+  })
+
+  it('opens active sticky body as a contenteditable text surface', () => {
+    const markup = renderItem({
+      accent: '#ca8a04',
+      body: 'Decision note',
+      component: 'sticky',
+      fill: '#fef3c7',
+      h: 148,
+      id: 'component-sticky',
+      stroke: '#eab308',
+      title: 'Sticky',
+      type: 'component',
+      w: 188,
+      x: 92,
+      y: 88,
+    }, () => 'note-card', {
+      inlineTextEditor: createInlineTextEditor({
+        editing: { id: 'component-sticky', value: 'Draft note' },
+      }),
+    })
+
+    expect(markup).toContain('contentEditable="plaintext-only"')
+    expect(markup).toContain('data-editing="true"')
+    expect(markup).toContain('role="textbox"')
+    expect(markup).not.toContain('textarea')
   })
 
 
@@ -286,10 +319,11 @@ function renderItem(
   item: CanvasItem,
   getComponentPresentation = (component: string) => component,
   options: {
+    inlineTextEditor?: CanvasInlineTextEditingContextValue
     selected?: Set<string>
   } = {},
 ) {
-  return renderToStaticMarkup(
+  const itemMarkup = (
     <svg>
       {renderCanvasDemoSvgItem({
         componentPresentationRenderers:
@@ -304,6 +338,30 @@ function renderItem(
         outlineIds: new Set(),
         selected: options.selected ?? new Set(),
       })}
-    </svg>,
+    </svg>
   )
+
+  return renderToStaticMarkup(
+    options.inlineTextEditor ? (
+      <CanvasInlineTextEditingContext.Provider value={options.inlineTextEditor}>
+        {itemMarkup}
+      </CanvasInlineTextEditingContext.Provider>
+    ) : itemMarkup,
+  )
+}
+
+function createInlineTextEditor(
+  overrides: Partial<CanvasInlineTextEditingContextValue> = {},
+): CanvasInlineTextEditingContextValue {
+  return {
+    commitOnEnter: true,
+    editing: null,
+    enabled: true,
+    setEditorElement: () => undefined,
+    onBlur: () => undefined,
+    onCancel: () => undefined,
+    onChange: () => undefined,
+    onCommit: () => undefined,
+    ...overrides,
+  }
 }

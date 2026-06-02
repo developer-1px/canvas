@@ -428,6 +428,18 @@
   line-height: 1.35;
 }
 
+.component-sticky-text:has(.canvas-content-editable-text-active) {
+  pointer-events: auto;
+}
+
+.canvas-content-editable-text-active {
+  min-height: 1.35em;
+  cursor: text;
+  outline: none;
+  pointer-events: auto;
+  user-select: text;
+}
+
 .component-svg-title,
 .component-svg-text {
   fill: var(--canvas-ink);

@@ -13,6 +13,9 @@ import type {
   CanvasAppStageAdapter,
   CanvasAppStageMount,
 } from '../rendering/CanvasAppRenderingContracts'
+import type {
+  CanvasInlineTextEditingContextValue,
+} from '../affordances/editing/text-editor/CanvasInlineTextEditingContext'
 import type { CanvasAppPointerConsumerModel } from './CanvasAppPointerConsumerContracts'
 
 export type CanvasAppStageItemLayerContext = {
@@ -40,6 +43,7 @@ export type CanvasAppStageModelInput = {
   blurTextEditor: () => void
   cursorChat: CanvasAppStageCursorChatContext
   emote: CanvasAppStageEmoteContext
+  inlineTextEditor: CanvasInlineTextEditingContextValue
   itemLayer: CanvasAppStageItemLayerContext
   pointer: CanvasAppPointerConsumerModel
   rendering: CanvasAppStageRenderingContext

@@ -48,6 +48,16 @@ function createTextRuntime() {
       onReplaceAll: vi.fn(),
       onReplacementChange: vi.fn(),
     },
+    inlineTextEditor: {
+      commitOnEnter: true,
+      editing: null,
+      enabled: true,
+      setEditorElement: vi.fn(),
+      onBlur: vi.fn(),
+      onCancel: vi.fn(),
+      onChange: vi.fn(),
+      onCommit: vi.fn(),
+    },
     openFindReplace: vi.fn(),
     setEditing: vi.fn(),
     textEditor: {

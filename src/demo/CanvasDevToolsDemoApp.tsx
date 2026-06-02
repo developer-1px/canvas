@@ -31,6 +31,7 @@ import {
   type KeyboardEvent as ReactKeyboardEvent,
   type MouseEvent as ReactMouseEvent,
   type PointerEvent as ReactPointerEvent,
+  type RefObject,
 } from 'react'
 import {
   CanvasApp,
@@ -860,7 +861,7 @@ function EngineTextEditor({
 
   return (
     <textarea
-      ref={editorRef}
+      ref={editorRef as RefObject<HTMLTextAreaElement | null>}
       className="text-editor"
       value={editing.value}
       style={style}

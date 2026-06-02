@@ -1,4 +1,9 @@
+import {
+  isValidElement,
+  type ReactElement,
+} from 'react'
 import { describe, expect, it, vi } from 'vitest'
+import { CanvasInlineTextEditingContext } from '../affordances/editing/text-editor/CanvasInlineTextEditingContext'
 import type {
   CanvasAppItemLayerRenderInput,
   CanvasAppStageRenderInput,
@@ -30,7 +35,10 @@ describe('CanvasAppStageModel', () => {
     expect(renderCanvasAppStageModel(input)).toBe('stage')
     const renderedStageInput = expectStageInput(stageInput)
 
-    expect(renderedStageInput.children).toBe('items')
+    expect(
+      expectInlineTextEditingProvider(renderedStageInput.children).props
+        .children,
+    ).toBe('items')
 
     const preventDefault = vi.fn()
     renderedStageInput.onContextMenu({
@@ -201,11 +209,37 @@ function createStageModelInput(
     blurTextEditor: vi.fn(),
     cursorChat: createCursorChatModel(),
     emote: createEmoteModel(),
+    inlineTextEditor: createInlineTextEditorModel(),
     itemLayer: createItemLayerModel(),
     pointer: createPointerModel(),
     rendering: createRenderingModel(),
     stage: createStageModel(),
     ...overrides,
+  }
+}
+
+function expectInlineTextEditingProvider(
+  value: unknown,
+): ReactElement<{ children?: unknown }> {
+  if (!isValidElement(value)) {
+    throw new Error('Expected inline text editing provider')
+  }
+
+  expect(value.type).toBe(CanvasInlineTextEditingContext.Provider)
+
+  return value as ReactElement<{ children?: unknown }>
+}
+
+function createInlineTextEditorModel(): CanvasAppStageModelInput['inlineTextEditor'] {
+  return {
+    commitOnEnter: true,
+    editing: null,
+    enabled: true,
+    setEditorElement: vi.fn(),
+    onBlur: vi.fn(),
+    onCancel: vi.fn(),
+    onChange: vi.fn(),
+    onCommit: vi.fn(),
   }
 }
 

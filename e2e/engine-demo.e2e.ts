@@ -1134,10 +1134,21 @@ test('creates shape, sticky, section, arrow, and highlighter objects from expose
   await expect.poll(() =>
     page.locator('[data-type="component"][data-component="sticky"]').count(),
   ).toBeGreaterThan(stickyCount)
-  await expect(page.locator('textarea.text-editor')).toBeVisible()
-  await page.locator('textarea.text-editor').fill('New note')
-  await page.keyboard.press('Enter')
-  await expect(page.locator('textarea.text-editor')).toHaveCount(0)
+  const stickyEditor = page.locator(
+    '.component-sticky-body.canvas-content-editable-text-active',
+  )
+  await expect(stickyEditor).toBeVisible()
+  await stickyEditor.fill('New note')
+  await stickyEditor.press('Enter')
+  await expect(stickyEditor).toBeVisible()
+  await expect.poll(async () => {
+    const text = await stickyEditor.evaluate((element) => element.textContent)
+
+    return text?.startsWith('New note') === true &&
+      text.includes('\n')
+  }).toBe(true)
+  await stickyEditor.press('Escape')
+  await expect(stickyEditor).toHaveCount(0)
 
   const sectionCount = await page.locator(
     '[data-type="component"][data-component="section"]',
@@ -1182,6 +1193,12 @@ test('quick-creates connected sticky notes with inherited style', async ({
   const source = page.locator('[data-canvas-item-id="engine-sticky"]')
   await source.click()
   await expect(source).toHaveAttribute('data-selected', 'true')
+  const sourceEditor = source.locator(
+    '.component-sticky-body.canvas-content-editable-text-active',
+  )
+  await expect(sourceEditor).toBeVisible()
+  await sourceEditor.press('Escape')
+  await expect(sourceEditor).toHaveCount(0)
 
   await page.getByRole('button', { name: 'Fill color' }).click()
   await page.getByRole('button', { name: 'Fill #C2E5FF' }).click()
@@ -1198,7 +1215,10 @@ test('quick-creates connected sticky notes with inherited style', async ({
   await page.getByRole('button', { name: 'Create sticky note right' }).click()
   await expect.poll(() => stickyItems.count()).toBe(stickyCount + 1)
   await expect.poll(() => arrowItems.count()).toBe(arrowCount + 1)
-  await expect(page.locator('textarea.text-editor')).toBeVisible()
+  const stickyEditor = page.locator(
+    '.component-sticky-body.canvas-content-editable-text-active',
+  )
+  await expect(stickyEditor).toBeVisible()
 
   const selectedSticky = page.locator(
     '[data-type="component"][data-component="sticky"][data-selected="true"]',
@@ -1213,11 +1233,11 @@ test('quick-creates connected sticky notes with inherited style', async ({
     'height',
   )
 
-  await page.locator('textarea.text-editor').fill(
+  await stickyEditor.fill(
     'This sticky expands when the text crosses multiple lines in the same compact object.',
   )
-  await page.keyboard.press('Enter')
-  await expect(page.locator('textarea.text-editor')).toHaveCount(0)
+  await stickyEditor.press('Escape')
+  await expect(stickyEditor).toHaveCount(0)
   await expect.poll(() => getSvgNumberAttribute(selectedStickyNote, 'height'))
     .toBeGreaterThan(initialHeight)
 })

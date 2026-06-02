@@ -70,7 +70,7 @@ describe('Canvas App text interaction workflow boundaries', () => {
       'type UseCanvasAppTextModelArgs',
     )
     expect(textModelFile.source).toContain(
-      'useRef<HTMLTextAreaElement | null>',
+      'useRef<HTMLElement | null>',
     )
     expect(textModelFile.source).toContain(
       'export function useCanvasAppTextModel',

@@ -6,6 +6,7 @@ import type {
   CanvasAppStageRenderInput,
 } from '../rendering/CanvasAppRenderingContracts'
 import type { CanvasAppEventInput } from '../affordances/interaction/pointer/CanvasAppPointerInput'
+import { CanvasInlineTextEditingContext } from '../affordances/editing/text-editor/CanvasInlineTextEditingContext'
 import type { CanvasAppStageModelInput } from './CanvasAppStageConsumerContracts'
 
 export type { CanvasAppStageModelInput } from './CanvasAppStageConsumerContracts'
@@ -14,12 +15,13 @@ export function renderCanvasAppStageModel({
   blurTextEditor,
   cursorChat,
   emote,
+  inlineTextEditor,
   itemLayer,
   pointer,
   rendering,
   stage,
 }: CanvasAppStageModelInput) {
-  const children = renderCanvasAppItemLayerSafely({
+  const itemLayerChildren = renderCanvasAppItemLayerSafely({
     adapter: rendering.itemLayerAdapter,
     input: {
       componentPresentationRenderers:
@@ -46,6 +48,13 @@ export function renderCanvasAppStageModel({
       },
     },
   })
+  const children = itemLayerChildren === null
+    ? null
+    : (
+      <CanvasInlineTextEditingContext.Provider value={inlineTextEditor}>
+        {itemLayerChildren}
+      </CanvasInlineTextEditingContext.Provider>
+    )
 
   return renderCanvasAppStageSafely({
     adapter: rendering.stageAdapter,
