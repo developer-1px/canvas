@@ -2,6 +2,8 @@ import {
   CANVAS_APP_COMMENT_ONLY_CAPABILITIES,
   CANVAS_APP_EDITOR_CAPABILITIES,
   CANVAS_APP_READ_ONLY_CAPABILITIES,
+  createCanvasAppAiLabsDemoSummaryProvider,
+  createCanvasAppAiLabsSummarizeSelectionCommand,
   createCanvasAppAssembly,
   type CanvasAppAssemblyInput,
   type CanvasPresenceOverlay,
@@ -219,6 +221,20 @@ const DEMO_CANVAS_BASE_ASSEMBLY_INPUT = {
 export const DEMO_CANVAS_APP_ASSEMBLY_INPUT = {
   ...DEMO_CANVAS_BASE_ASSEMBLY_INPUT,
   capabilities: CANVAS_APP_EDITOR_CAPABILITIES,
+} satisfies CanvasAppAssemblyInput
+
+export const DEMO_CANVAS_AI_LABS_SUMMARIZE_SELECTION_COMMAND =
+  createCanvasAppAiLabsSummarizeSelectionCommand({
+    provider: createCanvasAppAiLabsDemoSummaryProvider(),
+    requestReview: () => ({
+      kind: 'cancel',
+      reason: 'demo fixture requires a host review UI',
+    }),
+  })
+
+export const DEMO_CANVAS_AI_LABS_ASSEMBLY_INPUT = {
+  ...DEMO_CANVAS_APP_ASSEMBLY_INPUT,
+  customCommands: [DEMO_CANVAS_AI_LABS_SUMMARIZE_SELECTION_COMMAND],
 } satisfies CanvasAppAssemblyInput
 
 export const DEMO_CANVAS_READ_ONLY_ASSEMBLY_INPUT = {
