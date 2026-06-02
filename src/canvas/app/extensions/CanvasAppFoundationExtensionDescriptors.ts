@@ -14,15 +14,17 @@ import {
   snapshotCanvasAppFoundationCommandDescriptor,
 } from './CanvasAppFoundationExtensionCommands'
 import {
+  assertCanvasAppFoundationRendererSlotDescriptors,
+  assertUniqueCanvasAppFoundationExtensionRendererSlotIds,
+  snapshotCanvasAppFoundationRendererSlotDescriptor,
+} from './CanvasAppFoundationExtensionRendererSlots'
+import {
   assertCanvasAppFoundationToolDescriptors,
   assertUniqueCanvasAppFoundationExtensionToolIds,
   snapshotCanvasAppFoundationToolDescriptor,
 } from './CanvasAppFoundationExtensionTools'
 
 export type CanvasAppFoundationExtension = CanvasExtensionDescriptor
-
-type CanvasAppFoundationRendererSlot =
-  NonNullable<CanvasAppFoundationExtension['rendererSlots']>[number]
 
 export function appendUniqueCanvasAppFoundationExtensions({
   current,
@@ -58,6 +60,10 @@ export function appendUniqueCanvasAppFoundationExtensions({
     extensions: merged,
     owner,
   })
+  assertUniqueCanvasAppFoundationExtensionRendererSlotIds({
+    extensions: merged,
+    owner,
+  })
 
   return merged
 }
@@ -82,11 +88,15 @@ export function assertCanvasAppFoundationExtensions(
       value: extension.requiredAdapters,
     })
     assertCanvasAppFoundationCommandDescriptors(extension.commands)
-    assertCanvasAppFoundationRendererSlots(extension.rendererSlots)
+    assertCanvasAppFoundationRendererSlotDescriptors(extension.rendererSlots)
     assertCanvasAppFoundationToolDescriptors(extension.tools)
   }
 
   assertUniqueCanvasAppFoundationExtensionCommandIds({
+    extensions: foundationExtensions,
+    owner: 'foundation extension descriptors',
+  })
+  assertUniqueCanvasAppFoundationExtensionRendererSlotIds({
     extensions: foundationExtensions,
     owner: 'foundation extension descriptors',
   })
@@ -104,30 +114,6 @@ export function snapshotCanvasAppFoundationExtensions(
   return snapshotCanvasAppArray(
     extensions.map(snapshotCanvasAppFoundationExtension),
   ) as readonly CanvasAppFoundationExtension[]
-}
-
-function assertCanvasAppFoundationRendererSlots(
-  rendererSlots: unknown,
-): asserts rendererSlots is readonly CanvasAppFoundationRendererSlot[] | undefined {
-  if (rendererSlots === undefined) {
-    return
-  }
-
-  assertCanvasAppArray(rendererSlots, 'foundation extension renderer slots')
-
-  for (const slot of rendererSlots) {
-    assertCanvasAppDescriptorObject(slot, 'foundation extension renderer slot')
-    assertCanvasAppDescriptorStringField({
-      field: 'id',
-      owner: 'foundation extension renderer slot',
-      value: slot.id,
-    })
-    assertCanvasAppDescriptorStringField({
-      field: 'surface',
-      owner: 'foundation extension renderer slot',
-      value: slot.surface,
-    })
-  }
 }
 
 function assertOptionalCanvasAppFoundationDescriptorArray({
@@ -154,7 +140,9 @@ function snapshotCanvasAppFoundationExtension(
     } : {}),
     ...(extension.rendererSlots ? {
       rendererSlots: snapshotCanvasAppArray(
-        extension.rendererSlots.map(snapshotCanvasAppFoundationRendererSlot),
+        extension.rendererSlots.map(
+          snapshotCanvasAppFoundationRendererSlotDescriptor,
+        ),
       ),
     } : {}),
     ...(extension.requiredAdapters ? {
@@ -166,10 +154,4 @@ function snapshotCanvasAppFoundationExtension(
       ),
     } : {}),
   }) as CanvasAppFoundationExtension
-}
-
-function snapshotCanvasAppFoundationRendererSlot(
-  slot: CanvasAppFoundationRendererSlot,
-) {
-  return Object.freeze({ ...slot })
 }

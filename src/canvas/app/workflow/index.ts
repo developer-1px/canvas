@@ -45,6 +45,10 @@ export {
   type CanvasAppFoundationExtensionCommand,
 } from '../extensions/CanvasAppFoundationExtensionCommands'
 export {
+  getCanvasAppFoundationExtensionRendererSlots,
+  type CanvasAppFoundationExtensionRendererSlot,
+} from '../extensions/CanvasAppFoundationExtensionRendererSlots'
+export {
   getCanvasAppFoundationExtensionTools,
   type CanvasAppFoundationExtensionTool,
 } from '../extensions/CanvasAppFoundationExtensionTools'

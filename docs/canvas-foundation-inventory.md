@@ -65,6 +65,7 @@ product/app meaning last.
 9. Bridge app extension bundles to foundation extension descriptors. Done in issue #83.
 10. Index foundation extension tools for App-owned discovery. Done in issue #85.
 11. Index foundation extension commands for App-owned discovery. Done in issue #87.
+12. Index foundation extension renderer slots for App-owned discovery. Done in issue #89.
 
 ## Extension Shape
 
@@ -103,6 +104,11 @@ owners.
 foundation extension command metadata. It reports command ids, planner
 references, adapter requirements, and owning extension ids without executing
 planners or moving toolbar, keyboard, document effect, or Host patch logic.
+
+`getCanvasAppFoundationExtensionRendererSlots` is the app-owned discovery index
+for foundation extension renderer slot metadata. It reports renderer slot ids,
+surfaces, and owning extension ids without moving item-layer adapters, SVG
+rendering, overlay wiring, or Host item storage.
 
 ## Guardrails
 

@@ -93,6 +93,10 @@ command, and patch-planning grammar that can run through adapters.
   planner references, adapter requirements, and owning extension ids without
   executing planners or moving toolbar, keyboard, document effect, or Host
   patch logic.
+- `getCanvasAppFoundationExtensionRendererSlots` is the App-owned discovery
+  index for Foundation extension renderer slot descriptors. It can expose slot
+  ids, surfaces, and owning extension ids without moving item-layer adapters,
+  SVG rendering, overlay wiring, or Host item storage.
 - `canvas/foundation` is the named public facade for low-risk foundation
   tracer bullets. It can re-export existing headless contracts before broad
   implementation moves.
