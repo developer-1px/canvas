@@ -26,10 +26,20 @@ describe('CanvasExtensionContracts', () => {
         surface: 'overlay',
       }],
       requiredAdapters: ['document', 'scene'],
+      tools: [{
+        id: 'sticky',
+        kind: 'creation',
+        requiredAdapters: ['creation', 'document'],
+      }],
     } satisfies CanvasExtensionDescriptor)
 
     expect(extension.id).toBe('whiteboard-grouping')
     expect(extension.requiredAdapters).toEqual(['document', 'scene'])
+    expect(extension.tools).toEqual([{
+      id: 'sticky',
+      kind: 'creation',
+      requiredAdapters: ['creation', 'document'],
+    }])
     expect(extension.commands?.[0].plan({ selection: ['a', 'b'] })).toEqual([{
       patch: [{ op: 'replace', path: '', value: ['a', 'b'] }],
       selection: { after: ['a', 'b'], before: [] },

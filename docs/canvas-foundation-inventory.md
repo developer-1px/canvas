@@ -21,6 +21,7 @@ product/app meaning last.
 |---|---|---|---|
 | `src/canvas/foundation` | Foundation public facade | tracer bullet added | Re-exports headless core, scene, selection, and transform contracts through a named public subpath. |
 | `src/canvas/foundation/CanvasExtensionContracts.ts` | Foundation | tracer bullet added | Defines reusable extension descriptor, adapter slot, command planner, renderer slot, and generic effect contracts without app or host ownership. |
+| `src/canvas/foundation/CanvasFirstPartyExtensions.ts` | First-party extension | tracer bullet added | Holds the first concrete first-party extension descriptor without Host/App/UI/Renderer imports. |
 | `src/canvas/foundation/CanvasSceneAdapter.ts` | Foundation | promoted | Owns scene entries, parent/path/bounds read contracts, and scene-derived bounds without Demo item variants. |
 | `src/canvas/foundation/CanvasSelectionEngine.ts` | Foundation | promoted | Owns pointer click and marquee selection policy over `CanvasSceneAdapter`. |
 | `src/canvas/foundation/CanvasTransformEngine.ts` | Foundation | promoted | Owns move/resize planner contracts over a generic transform adapter. |
@@ -45,8 +46,8 @@ product/app meaning last.
 1. Name and guard the Foundation/Extension ownership model.
 2. Promote scene and selection contracts without changing runtime behaviour. Done in issue #71.
 3. Promote transform planner contracts behind generic adapters. Done in issue #73.
-4. Define an extension descriptor shape for reusable affordance bundles.
-5. Move one low-risk first-party affordance into the extension shape.
+4. Define an extension descriptor shape for reusable affordance bundles. Done in issue #70.
+5. Move one low-risk first-party affordance into the extension shape. Done in issue #75.
 
 ## Extension Shape
 
@@ -58,11 +59,17 @@ product/app meaning last.
 | What document patch or effect descriptor does it produce? | `CanvasExtensionEffect` |
 | What adapter slots does it require? | `requiredAdapters` |
 | What feature toggle or command id does it register? | `commands[].id` |
+| What creation or drawing tool does it expose? | `tools[].id` and `tools[].kind` |
 | What renderer or UI surface is optional? | `rendererSlots` |
 
 The descriptor deliberately uses generic patch payloads instead of importing
 zod-crud. Host document adapters decide how document effects become concrete
 patches.
+
+`CANVAS_STICKY_NOTE_EXTENSION` is the first concrete first-party extension
+descriptor. It names sticky note creation as a creation tool and declares the
+creation, document, renderer, and text-target adapter slots without moving Demo
+component templates, item schemas, SVG rendering, or app workflow.
 
 ## Guardrails
 
