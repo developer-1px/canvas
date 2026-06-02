@@ -35,6 +35,10 @@ command, and patch-planning grammar that can run through adapters.
    Foundation contracts. They may register command descriptors, effect
    descriptors, renderer slots, or document patch planners, but they do not own
    product persistence, browser IO, or app shell layout.
+   `CanvasExtensionDescriptor` is the headless descriptor shape: it declares
+   required adapter slots, command planners, renderer slots, and generic
+   document/selection/viewport effects without importing zod-crud, React, Host,
+   App, UI, or Renderer implementation modules.
 4. First-party whiteboard extensions own de-facto canvas affordances such as
    shapes, sticky notes, drawing strokes, connectors, comments, stamps, image
    import/export, and presence overlays. They remain internal/reusable
@@ -59,6 +63,8 @@ command, and patch-planning grammar that can run through adapters.
 - `canvas/foundation` is the named public facade for low-risk foundation
   tracer bullets. It can re-export existing headless contracts before broad
   implementation moves.
+- `defineCanvasExtension` fixes the first extension descriptor shape. It keeps
+  reusable extension planning separate from App Assembly and Host item storage.
 - `CanvasItemReadModel`, `CanvasItemSchema`, component library templates, and
   Demo SVG item renderers remain Host/App-owned adapters.
 - Built-in whiteboard affordances can become first-party extensions without

@@ -31,6 +31,7 @@ describe('Canvas foundation architecture plan', () => {
   it('keeps the inventory explicit about what can and cannot move', () => {
     for (const row of [
       '`src/canvas/foundation` | Foundation public facade',
+      '`src/canvas/foundation/CanvasExtensionContracts.ts` | Foundation',
       '`src/canvas/core` | Foundation',
       '`src/canvas/engine/scene` | Foundation',
       '`src/canvas/engine/selection` | Foundation',
@@ -44,5 +45,8 @@ describe('Canvas foundation architecture plan', () => {
 
     expect(foundationInventory).toContain('must not mention Demo `CanvasItem`')
     expect(foundationInventory).toContain('zod-crud imports stay inside Host document adapters')
+    expect(foundationInventory).toContain('`CanvasExtensionDescriptor` answers')
+    expect(foundationAdr).toContain('CanvasExtensionDescriptor')
+    expect(foundationAdr).toContain('defineCanvasExtension')
   })
 })

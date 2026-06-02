@@ -20,6 +20,7 @@ product/app meaning last.
 | Path | Target owner | Status | Reason |
 |---|---|---|---|
 | `src/canvas/foundation` | Foundation public facade | tracer bullet added | Re-exports headless core, scene, selection, and transform contracts through a named public subpath. |
+| `src/canvas/foundation/CanvasExtensionContracts.ts` | Foundation | tracer bullet added | Defines reusable extension descriptor, adapter slot, command planner, renderer slot, and generic effect contracts without app or host ownership. |
 | `src/canvas/core` | Foundation | already close | Headless geometry, viewport, stable id, and primitive types. |
 | `src/canvas/engine/scene` | Foundation | tracer-bullet candidate | `CanvasSceneAdapter` uses entries, paths, parent ids, and bounds without Demo item variants. |
 | `src/canvas/engine/selection` | Foundation | tracer-bullet candidate | Pointer click and marquee selection depend on `CanvasSceneAdapter` and bounds only. |
@@ -45,6 +46,22 @@ product/app meaning last.
 3. Promote transform planner contracts behind generic adapters.
 4. Define an extension descriptor shape for reusable affordance bundles.
 5. Move one low-risk first-party affordance into the extension shape.
+
+## Extension Shape
+
+`CanvasExtensionDescriptor` answers the minimum questions from issue #69:
+
+| Question | Contract field |
+|---|---|
+| What state does the extension read? | planner input generic |
+| What document patch or effect descriptor does it produce? | `CanvasExtensionEffect` |
+| What adapter slots does it require? | `requiredAdapters` |
+| What feature toggle or command id does it register? | `commands[].id` |
+| What renderer or UI surface is optional? | `rendererSlots` |
+
+The descriptor deliberately uses generic patch payloads instead of importing
+zod-crud. Host document adapters decide how document effects become concrete
+patches.
 
 ## Guardrails
 

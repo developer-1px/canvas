@@ -283,6 +283,10 @@ describe('Canvas package consumer imports', () => {
     expect(CanvasFoundationFromPackage.createCanvasSceneAdapter).toBe(
       CanvasFoundation.createCanvasSceneAdapter,
     )
+    expect(CanvasFoundation.defineCanvasExtension({
+      id: 'whiteboard-comment',
+      requiredAdapters: ['document', 'scene'],
+    }).id).toBe('whiteboard-comment')
     expect(
       createCanvasAppComponentPresentationRenderers(),
     ).toBeTypeOf('object')
