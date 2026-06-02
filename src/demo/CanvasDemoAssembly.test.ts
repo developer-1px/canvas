@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { createCanvasAppAssembly } from '../canvas'
 import {
+  DEMO_CANVAS_AI_LABS_ASSEMBLY_INPUT,
+  DEMO_CANVAS_AI_LABS_SUMMARIZE_SELECTION_COMMAND,
   DEMO_CANVAS_APP_ASSEMBLY,
   DEMO_CANVAS_APP_ASSEMBLY_INPUT,
   DEMO_CANVAS_COMMENT_ONLY_ASSEMBLY_INPUT,
@@ -236,5 +238,16 @@ describe('CanvasDemoAssembly', () => {
     expect(commentOnlyAssembly.affordanceConfig.tools.comment).toBe(true)
     expect(commentOnlyAssembly.affordanceConfig.tools.rect).toBe(false)
     expect(commentOnlyAssembly.affordanceConfig.tools.select).toBe(true)
+  })
+
+  it('keeps the AI labs command in a separate demo fixture', () => {
+    const labsAssembly = createCanvasAppAssembly(
+      DEMO_CANVAS_AI_LABS_ASSEMBLY_INPUT,
+    )
+
+    expect(DEMO_CANVAS_APP_ASSEMBLY.customCommands).toEqual([])
+    expect(labsAssembly.customCommands.map((command) => command.id)).toEqual([
+      DEMO_CANVAS_AI_LABS_SUMMARIZE_SELECTION_COMMAND.id,
+    ])
   })
 })

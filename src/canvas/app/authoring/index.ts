@@ -151,3 +151,23 @@ export {
   withCanvasAppFacilitationBundle,
   type CanvasAppFacilitationBundleOptions,
 } from '../extensions/facilitation/CanvasAppFacilitationBundle'
+export {
+  CANVAS_APP_AI_AUTOMATION_LABS_DATA_POLICY,
+  CANVAS_APP_AI_LABS_SUMMARIZE_SELECTION_COMMAND_ID,
+  CANVAS_APP_AI_LABS_SUMMARIZE_SELECTION_OPERATION_ID,
+  commitCanvasAppAiAutomationDraft,
+  createCanvasAppAiAutomationProviderRequest,
+  createCanvasAppAiLabsDemoSummaryProvider,
+  createCanvasAppAiLabsSummarizeSelectionCommand,
+  createCanvasAppAiLabsSummarizeSelectionDraft,
+  runCanvasAppAiLabsSummarizeSelectionCommand,
+  type CanvasAppAiAutomationDraft,
+  type CanvasAppAiAutomationProvider,
+  type CanvasAppAiAutomationProviderDataPolicy,
+  type CanvasAppAiAutomationProviderItemSnapshot,
+  type CanvasAppAiAutomationProviderOutput,
+  type CanvasAppAiAutomationProviderRequest,
+  type CanvasAppAiAutomationReviewDecision,
+  type CanvasAppAiAutomationReviewRequest,
+  type CanvasAppAiAutomationReviewResult,
+} from '../extensions/ai-labs/CanvasAppAiAutomationLabs'
