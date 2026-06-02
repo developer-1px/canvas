@@ -32,13 +32,16 @@ describe('Canvas foundation boundaries', () => {
     expect(violations).toEqual([])
   })
 
-  it('keeps promoted scene and selection source in foundation', () => {
+  it('keeps promoted scene, selection, and transform source in foundation', () => {
     const paths = new Set(sourceFiles.map((file) => file.path))
 
     expect(paths.has('src/canvas/foundation/CanvasSceneAdapter.ts')).toBe(true)
     expect(paths.has('src/canvas/foundation/CanvasSelectionEngine.ts')).toBe(true)
+    expect(paths.has('src/canvas/foundation/CanvasTransformEngine.ts')).toBe(true)
     expect(paths.has('src/canvas/engine/scene/CanvasSceneAdapter.ts')).toBe(false)
     expect(paths.has('src/canvas/engine/selection/CanvasSelectionEngine.ts'))
+      .toBe(false)
+    expect(paths.has('src/canvas/engine/transform/CanvasTransformEngine.ts'))
       .toBe(false)
   })
 })
