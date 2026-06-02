@@ -11,6 +11,7 @@ import {
   createCanvasAppAssembly,
   defineCanvasAppCustomItemModule,
   getCanvasAppFoundationExtensionCommands,
+  getCanvasAppFoundationExtensionRendererSlots,
   getCanvasAppFoundationExtensionTools,
   type CanvasAppAssemblySource,
   type CanvasAppCommitItemsChange,
@@ -22,6 +23,7 @@ import {
   type CanvasAppCustomItemValidator,
   type CanvasAppFoundationExtension,
   type CanvasAppFoundationExtensionCommand,
+  type CanvasAppFoundationExtensionRendererSlot,
   type CanvasAppFoundationExtensionTool,
   type CanvasAppItemLayerAdapter,
   type CanvasAppProps,
@@ -133,6 +135,10 @@ describe('Canvas package consumer imports', () => {
           requiredAdapters: ['command'],
         }],
         id: 'canvas.smoke',
+        rendererSlots: [{
+          id: 'canvas.smoke.renderer',
+          surface: 'item-layer',
+        }],
         requiredAdapters: ['document'],
       })
     const pointerInput: CanvasAppPointerInput = {
@@ -203,6 +209,17 @@ describe('Canvas package consumer imports', () => {
     expect(CanvasAppAuthoring.getCanvasAppFoundationExtensionCommands(
       assembly.foundationExtensions,
     )).toEqual(foundationCommands)
+    const foundationRendererSlots =
+      getCanvasAppFoundationExtensionRendererSlots(
+        assembly.foundationExtensions,
+      ) satisfies readonly CanvasAppFoundationExtensionRendererSlot[]
+
+    expect(foundationRendererSlots.map((slot) => slot.id)).toContain(
+      'canvas.smoke.renderer',
+    )
+    expect(CanvasAppAuthoring.getCanvasAppFoundationExtensionRendererSlots(
+      assembly.foundationExtensions,
+    )).toEqual(foundationRendererSlots)
     expect(commitAppItemsChange(appItemsChange)).toBe(true)
     expect(assembly.initialSelection).toEqual([rect.id])
     expect(
@@ -272,6 +289,8 @@ describe('Canvas package consumer imports', () => {
       .toBeTypeOf('function')
     expect(CanvasAppAuthoring.createCanvasAppAssembly).toBeTypeOf('function')
     expect(CanvasAppAuthoring.getCanvasAppFoundationExtensionCommands)
+      .toBeTypeOf('function')
+    expect(CanvasAppAuthoring.getCanvasAppFoundationExtensionRendererSlots)
       .toBeTypeOf('function')
     expect(CanvasAppAuthoring.getCanvasAppFoundationExtensionTools)
       .toBeTypeOf('function')
