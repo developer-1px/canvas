@@ -142,6 +142,9 @@ export {
   isCanvasAppExtensionId,
   type CanvasAppExtensionId,
 } from '../extensions/CanvasAppExtensionIds'
+export type {
+  CanvasAppFoundationExtension,
+} from '../extensions/CanvasAppFoundationExtensionDescriptors'
 export {
   CANVAS_APP_FACILITATION_AFFORDANCE_CONFIG,
   CANVAS_APP_FACILITATION_BUNDLE_ID,

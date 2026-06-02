@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { defineCanvasExtension } from '../../foundation'
 import { createCanvasComponentLibrary } from '../../host'
 import {
   DEFAULT_CANVAS_APP_ASSEMBLY,
@@ -11,6 +12,7 @@ import type {
   CanvasAppCapabilityInput,
   CanvasAppComponentRendererStrategy,
   CanvasAppCustomItemModuleCreationTool,
+  CanvasAppFoundationExtension,
   CanvasAppInspectorPanel,
   CanvasAppItemLayerAdapter,
   CanvasAppPresenceProvider,
@@ -62,6 +64,20 @@ describe('CanvasAppAssembly snapshots', () => {
       id: 'risk-media',
       createItems: () => null,
     }
+    const foundationExtension: CanvasAppFoundationExtension =
+      defineCanvasExtension({
+      id: 'canvas.risk',
+      requiredAdapters: ['document'],
+      rendererSlots: [{
+        id: 'canvas.risk.renderer',
+        surface: 'item-layer',
+      }],
+      tools: [{
+        id: 'canvas.risk.tool',
+        kind: 'creation',
+        requiredAdapters: ['creation'],
+      }],
+    })
     const presenceProvider: CanvasAppPresenceProvider = () => [{
       color: '#2563eb',
       id: 'remote-mia',
@@ -134,6 +150,7 @@ describe('CanvasAppAssembly snapshots', () => {
       componentLibrary,
       componentPresentationRenderers,
       customCommands: [customCommand],
+      foundationExtensions: [foundationExtension],
       customItemModules: [riskModule],
       initialItems,
       initialSelection: ['rect-1'],
@@ -157,6 +174,8 @@ describe('CanvasAppAssembly snapshots', () => {
     customCommand.run = () => {
       throw new Error('mutated command')
     }
+    foundationExtension.requiredAdapters = ['renderer']
+    foundationExtension.tools = []
     customInspectorPanel.render = () => 'mutated'
     mediaImporter.createItems = () => []
     textPasteImporter.createItems = () => []
@@ -193,6 +212,16 @@ describe('CanvasAppAssembly snapshots', () => {
       title: 'Publish risk',
     })
     expect(assembly.customCommands[0]?.run).toBe(customCommandRun)
+    const riskFoundationExtension = assembly.foundationExtensions.find(
+      (extension) => extension.id === 'canvas.risk',
+    )
+
+    expect(riskFoundationExtension?.requiredAdapters).toEqual([
+      'document',
+    ])
+    expect(riskFoundationExtension?.tools?.[0]?.requiredAdapters).toEqual([
+      'creation',
+    ])
     expect(assembly.mediaImporters[0]?.createItems({} as never)).toBeNull()
     expect(assembly.textPasteImporters[0]?.createItems({} as never)).toBeNull()
     expect(assembly.inspectorPanels.find((panel) =>
@@ -243,6 +272,8 @@ describe('CanvasAppAssembly snapshots', () => {
     expect(Object.isFrozen(assembly.customCommands)).toBe(true)
     expect(Object.isFrozen(assembly.customCommands[0])).toBe(true)
     expect(Object.isFrozen(assembly.customCreationTools[0]?.shortcut)).toBe(true)
+    expect(Object.isFrozen(riskFoundationExtension)).toBe(true)
+    expect(Object.isFrozen(riskFoundationExtension?.tools?.[0])).toBe(true)
     expect(Object.isFrozen(assembly.mediaImporters[0])).toBe(true)
     expect(Object.isFrozen(assembly.componentPresentationRenderers)).toBe(true)
     expect(Object.isFrozen(assembly.customItemValidators)).toBe(true)

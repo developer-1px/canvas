@@ -18,6 +18,7 @@ import {
   type CanvasAppCustomItemModule,
   type CanvasAppCustomItemRendererStrategy,
   type CanvasAppCustomItemValidator,
+  type CanvasAppFoundationExtension,
   type CanvasAppItemLayerAdapter,
   type CanvasAppProps,
   type CanvasAppPointerInput,
@@ -120,6 +121,11 @@ describe('Canvas package consumer imports', () => {
       ref: () => undefined,
     }
     const workspaceStorageProvider: CanvasWorkspaceStorageProvider = () => null
+    const foundationExtension: CanvasAppFoundationExtension =
+      CanvasFoundation.defineCanvasExtension({
+        id: 'canvas.smoke',
+        requiredAdapters: ['document'],
+      })
     const pointerInput: CanvasAppPointerInput = {
       altKey: false,
       button: 0,
@@ -139,6 +145,7 @@ describe('Canvas package consumer imports', () => {
         'smoke-card': renderComponent,
       }),
       customItemModules: [module],
+      foundationExtensions: [foundationExtension],
       initialItems: [rect],
       initialSelection: [rect.id],
       itemLayerAdapter,
@@ -167,6 +174,8 @@ describe('Canvas package consumer imports', () => {
     } satisfies CanvasAppProps
 
     expect(assembly.initialItems).toEqual([rect])
+    expect(assembly.foundationExtensions.map((extension) => extension.id))
+      .toContain('canvas.smoke')
     expect(commitAppItemsChange(appItemsChange)).toBe(true)
     expect(assembly.initialSelection).toEqual([rect.id])
     expect(

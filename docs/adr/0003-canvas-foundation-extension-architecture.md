@@ -79,6 +79,11 @@ command, and patch-planning grammar that can run through adapters.
 - `CANVAS_STICKY_NOTE_EXTENSION` is the first concrete first-party extension
   descriptor. It names the sticky note creation affordance and adapter slots
   without moving Demo component storage, SVG rendering, or App workflow.
+- `CanvasAppExtensionBundle.foundationExtensions` is the App-owned bridge for
+  Foundation descriptor metadata. App assembly can carry descriptors for
+  discovery and future assembly work, but command planner execution, toolbar
+  wiring, renderer adapters, document patches, and Host item storage remain in
+  their current owners.
 - `canvas/foundation` is the named public facade for low-risk foundation
   tracer bullets. It can re-export existing headless contracts before broad
   implementation moves.
