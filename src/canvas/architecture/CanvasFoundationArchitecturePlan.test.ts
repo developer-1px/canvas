@@ -32,6 +32,9 @@ describe('Canvas foundation architecture plan', () => {
   it('keeps the inventory explicit about what can and cannot move', () => {
     for (const row of [
       '`src/canvas/foundation` | Foundation public facade',
+      '`src/canvas/foundation/CanvasCommandAvailabilityRules.ts` | Foundation',
+      '`src/canvas/foundation/CanvasCommandSelectionRules.ts` | Foundation',
+      '`src/canvas/foundation/CanvasCommandTypes.ts` | Foundation',
       '`src/canvas/foundation/CanvasExtensionContracts.ts` | Foundation',
       '`src/canvas/foundation/CanvasFirstPartyExtensions.ts` | First-party extension',
       '`src/canvas/foundation/CanvasGestureEngine.ts` | Foundation',

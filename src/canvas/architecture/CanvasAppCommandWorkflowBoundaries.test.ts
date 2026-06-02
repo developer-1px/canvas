@@ -5,22 +5,22 @@ import {
 } from './CanvasArchitectureTestSources'
 
 describe('Canvas App command workflow boundaries', () => {
-  it('keeps built-in command selection thresholds in Engine command selection rules', () => {
+  it('keeps built-in command selection thresholds in Foundation command selection rules', () => {
     const actionFile = getSourceFile(
       'src/canvas/engine/command/CanvasCommandActions.ts',
     )
     const availabilityFile = getSourceFile(
-      'src/canvas/engine/command/CanvasCommandAvailability.ts',
+      'src/canvas/foundation/CanvasCommandAvailability.ts',
     )
     const availabilityRulesFile = getSourceFile(
-      'src/canvas/engine/command/CanvasCommandAvailabilityRules.ts',
+      'src/canvas/foundation/CanvasCommandAvailabilityRules.ts',
     )
     const rulesFile = getSourceFile(
-      'src/canvas/engine/command/CanvasCommandSelectionRules.ts',
+      'src/canvas/foundation/CanvasCommandSelectionRules.ts',
     )
 
     expect(actionFile.source).toContain(
-      "from './CanvasCommandAvailabilityRules'",
+      "from '../../foundation/CanvasCommandAvailabilityRules'",
     )
     expect(actionFile.source).toContain('canUseCanvasCommand')
     expect(actionFile.source).not.toContain('selection.length < 2')

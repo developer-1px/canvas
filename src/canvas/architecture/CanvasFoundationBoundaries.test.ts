@@ -32,9 +32,16 @@ describe('Canvas foundation boundaries', () => {
     expect(violations).toEqual([])
   })
 
-  it('keeps promoted scene, selection, and transform source in foundation', () => {
+  it('keeps promoted foundation source out of engine implementation folders', () => {
     const paths = new Set(sourceFiles.map((file) => file.path))
 
+    expect(paths.has('src/canvas/foundation/CanvasCommandAvailability.ts'))
+      .toBe(true)
+    expect(paths.has('src/canvas/foundation/CanvasCommandAvailabilityRules.ts'))
+      .toBe(true)
+    expect(paths.has('src/canvas/foundation/CanvasCommandSelectionRules.ts'))
+      .toBe(true)
+    expect(paths.has('src/canvas/foundation/CanvasCommandTypes.ts')).toBe(true)
     expect(paths.has('src/canvas/foundation/CanvasFirstPartyExtensions.ts'))
       .toBe(true)
     expect(paths.has('src/canvas/foundation/CanvasGestureEngine.ts')).toBe(true)
@@ -44,6 +51,14 @@ describe('Canvas foundation boundaries', () => {
       .toBe(true)
     expect(paths.has('src/canvas/foundation/CanvasTransformEngine.ts')).toBe(true)
     expect(paths.has('src/canvas/engine/gesture/CanvasGestureEngine.ts'))
+      .toBe(false)
+    expect(paths.has('src/canvas/engine/command/CanvasCommandAvailability.ts'))
+      .toBe(false)
+    expect(paths.has('src/canvas/engine/command/CanvasCommandAvailabilityRules.ts'))
+      .toBe(false)
+    expect(paths.has('src/canvas/engine/command/CanvasCommandSelectionRules.ts'))
+      .toBe(false)
+    expect(paths.has('src/canvas/engine/command/CanvasCommandTypes.ts'))
       .toBe(false)
     expect(paths.has('src/canvas/engine/scene/CanvasSceneAdapter.ts')).toBe(false)
     expect(paths.has('src/canvas/engine/selection/CanvasSelectionEngine.ts'))
