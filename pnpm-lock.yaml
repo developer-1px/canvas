@@ -17,9 +17,6 @@ importers:
       '@zod-crud/grouping':
         specifier: link:../zod-crud/labs/extensions/grouping
         version: link:../zod-crud/labs/extensions/grouping
-      '@zod-crud/layer-order':
-        specifier: link:../zod-crud/labs/extensions/layer-order
-        version: link:../zod-crud/labs/extensions/layer-order
       '@zod-crud/patch-preview':
         specifier: link:../zod-crud/packages/patch-preview
         version: link:../zod-crud/packages/patch-preview

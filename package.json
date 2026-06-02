@@ -28,6 +28,11 @@
       "import": "./src/canvas/core/index.ts",
       "default": "./src/canvas/core/index.ts"
     },
+    "./foundation": {
+      "types": "./src/canvas/foundation/index.ts",
+      "import": "./src/canvas/foundation/index.ts",
+      "default": "./src/canvas/foundation/index.ts"
+    },
     "./engine": {
       "types": "./src/canvas/engine/index.ts",
       "import": "./src/canvas/engine/index.ts",
@@ -61,7 +66,6 @@
     "@interactive-os/object-surface": "link:../object-surface/packages/object-surface",
     "@interactive-os/preview-surface": "link:../preview-surface/packages/preview-surface",
     "@zod-crud/grouping": "link:../zod-crud/labs/extensions/grouping",
-    "@zod-crud/layer-order": "link:../zod-crud/labs/extensions/layer-order",
     "@zod-crud/patch-preview": "link:../zod-crud/packages/patch-preview",
     "@zod-crud/search-replace": "link:../zod-crud/packages/search-replace",
     "lucide-react": "^1.16.0",

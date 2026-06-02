@@ -49,6 +49,9 @@ describe('Canvas package manifest', () => {
         './src/canvas/app/authoring/index.ts',
       ),
       './core': createPackageExportEntry('./src/canvas/core/index.ts'),
+      './foundation': createPackageExportEntry(
+        './src/canvas/foundation/index.ts',
+      ),
       './engine': createPackageExportEntry('./src/canvas/engine/index.ts'),
       './entities': createPackageExportEntry('./src/canvas/entities/index.ts'),
       './host': createPackageExportEntry('./src/canvas/host/index.ts'),
@@ -60,7 +63,7 @@ describe('Canvas package manifest', () => {
     const exportedPaths = Object.values(packageJson.exports ?? {})
       .flatMap((entry) => [entry.types, entry.import, entry.default])
 
-    expect(exportedPaths).toHaveLength(24)
+    expect(exportedPaths).toHaveLength(27)
     expect(exportedPaths.every((path) => sourcePaths.has(path))).toBe(true)
     expect(exportedPaths.every((path) => path.endsWith('/index.ts'))).toBe(true)
   })
@@ -68,7 +71,7 @@ describe('Canvas package manifest', () => {
   it('keeps package export type and runtime targets aligned', () => {
     const exportEntries = Object.entries(packageJson.exports ?? {})
 
-    expect(exportEntries).toHaveLength(8)
+    expect(exportEntries).toHaveLength(9)
     for (const [, entry] of exportEntries) {
       expect(entry.types).toBe(entry.import)
       expect(entry.types).toBe(entry.default)

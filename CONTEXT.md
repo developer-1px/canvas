@@ -9,6 +9,10 @@
 - Canvas Affordance Metadata: built-in tool/command label, status label, keyboard shortcut, toolbar tool order를 소유하고 tool title/shortcut display를 keyboard shortcut에서 파생하는 immutable Engine-owned what 계약.
 - Host App: 엔진을 사용하는 실제 제품. 데이터 모델, 저장, 도메인 명령, 화면 구성을 소유한다.
 - Core Contract: 특정 Host App, Renderer, React 상태에 묶이지 않는 재사용 부품의 입력과 출력 계약.
+- Canvas Foundation: 특정 Host App, Renderer, React 상태, Demo `CanvasItem` 저장 shape에 묶이지 않는 geometry, scene, selection, gesture, transform, command, patch-planning grammar를 소유하는 재사용 Module 집합.
+- Canvas Foundation Contract: Canvas Foundation이 외부에 노출하는 Adapter 중심 Interface. Host App은 item tree, bounds, editable target, document commit 같은 concrete 의미를 Adapter로 제공하고 Foundation은 `CanvasItem` variant를 import하지 않는다.
+- Canvas Extension: Canvas Foundation Contract를 소비해 reusable affordance나 document/gesture/command planner를 제공하는 Module. Extension은 제품 storage, UI layout, browser IO, persistence를 소유하지 않고 patch/effect descriptor 또는 renderer/command registration을 산출한다.
+- Canvas First-party Whiteboard Extension: sticky note, shape, drawing stroke, connector, comment, stamp처럼 de-facto whiteboard affordance를 Foundation 위에 올리는 내부 Extension bundle. 제품별 custom item module은 아니지만 Demo Host storage와도 동일하지 않다.
 - Canvas Bounds Resize: bounds resize, aspect ratio lock, center resize, handle point, item bounds scaling을 제공하는 Core geometry Module.
 - Canvas Stable Id: persisted kind, presentation key, registry key에 쓰는 lower-kebab 문자열 계약.
 - Entities Contract: 런타임 구현 없이 Core geometry type, Demo canvas item type, stable item subtype alias를 노출하는 type-only 계약. Runtime helper는 Core/Host/App seam에 둔다.

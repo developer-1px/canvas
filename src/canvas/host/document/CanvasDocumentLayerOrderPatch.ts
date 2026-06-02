@@ -1,4 +1,8 @@
-import type { JSONPatchOperation, Pointer } from 'zod-crud'
+import {
+  appendSegment,
+  type JSONPatchOperation,
+  type Pointer,
+} from 'zod-crud'
 import type { CanvasItem } from '../model'
 import {
   reorderCanvasItems,
@@ -63,6 +67,6 @@ function hasSameCanvasSiblingOrder(
 
 function getCanvasSiblingArrayPointer(parentPath: number[]): Pointer {
   return parentPath.length === 0
-    ? '' as Pointer
-    : `${canvasItemPathToPointer(parentPath)}/children` as Pointer
+    ? ''
+    : appendSegment(canvasItemPathToPointer(parentPath), 'children')
 }
