@@ -32,6 +32,7 @@ describe('Canvas foundation architecture plan', () => {
     for (const row of [
       '`src/canvas/foundation` | Foundation public facade',
       '`src/canvas/foundation/CanvasExtensionContracts.ts` | Foundation',
+      '`src/canvas/foundation/CanvasFirstPartyExtensions.ts` | First-party extension',
       '`src/canvas/foundation/CanvasSceneAdapter.ts` | Foundation',
       '`src/canvas/foundation/CanvasSelectionEngine.ts` | Foundation',
       '`src/canvas/foundation/CanvasTransformEngine.ts` | Foundation',
@@ -47,7 +48,9 @@ describe('Canvas foundation architecture plan', () => {
     expect(foundationInventory).toContain('must not mention Demo `CanvasItem`')
     expect(foundationInventory).toContain('zod-crud imports stay inside Host document adapters')
     expect(foundationInventory).toContain('`CanvasExtensionDescriptor` answers')
+    expect(foundationInventory).toContain('first concrete first-party extension descriptor')
     expect(foundationAdr).toContain('CanvasExtensionDescriptor')
     expect(foundationAdr).toContain('defineCanvasExtension')
+    expect(foundationAdr).toContain('CANVAS_STICKY_NOTE_EXTENSION')
   })
 })

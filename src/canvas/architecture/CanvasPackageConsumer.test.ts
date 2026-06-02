@@ -287,6 +287,11 @@ describe('Canvas package consumer imports', () => {
       id: 'whiteboard-comment',
       requiredAdapters: ['document', 'scene'],
     }).id).toBe('whiteboard-comment')
+    expect(CanvasFoundation.CANVAS_STICKY_NOTE_EXTENSION.tools?.[0].id)
+      .toBe('sticky')
+    expect(CanvasFoundationFromPackage.CANVAS_STICKY_NOTE_EXTENSION).toBe(
+      CanvasFoundation.CANVAS_STICKY_NOTE_EXTENSION,
+    )
     expect(
       createCanvasAppComponentPresentationRenderers(),
     ).toBeTypeOf('object')

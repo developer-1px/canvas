@@ -8,6 +8,7 @@ export type CanvasExtensionId = string
 export type CanvasExtensionAdapterSlot =
   | 'capability'
   | 'command'
+  | 'creation'
   | 'document'
   | 'presence'
   | 'renderer'
@@ -56,6 +57,20 @@ export type CanvasExtensionCommandDescriptor<
   requiredAdapters?: readonly CanvasExtensionAdapterSlot[]
 }
 
+export type CanvasExtensionToolKind =
+  | 'creation'
+  | 'drawing'
+  | 'navigation'
+  | 'selection'
+
+export type CanvasExtensionToolDescriptor<
+  TToolId extends CanvasExtensionId = CanvasExtensionId,
+> = {
+  id: TToolId
+  kind: CanvasExtensionToolKind
+  requiredAdapters?: readonly CanvasExtensionAdapterSlot[]
+}
+
 export type CanvasExtensionRendererSlot<
   TSlotId extends CanvasExtensionId = CanvasExtensionId,
 > = {
@@ -74,6 +89,7 @@ export type CanvasExtensionDescriptor<
   id: TExtensionId
   rendererSlots?: readonly CanvasExtensionRendererSlot[]
   requiredAdapters?: readonly CanvasExtensionAdapterSlot[]
+  tools?: readonly CanvasExtensionToolDescriptor[]
 }
 
 export function defineCanvasExtension<

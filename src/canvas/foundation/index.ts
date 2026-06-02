@@ -30,8 +30,16 @@ export {
   type CanvasExtensionRendererSlot,
   type CanvasExtensionSelectionEffect,
   type CanvasExtensionSelectionHistory,
+  type CanvasExtensionToolDescriptor,
+  type CanvasExtensionToolKind,
   type CanvasExtensionViewportEffect,
 } from './CanvasExtensionContracts'
+export {
+  CANVAS_STICKY_NOTE_EXTENSION,
+  CANVAS_STICKY_NOTE_EXTENSION_ID,
+  CANVAS_STICKY_NOTE_RENDERER_SLOT_ID,
+  CANVAS_STICKY_NOTE_TOOL_ID,
+} from './CanvasFirstPartyExtensions'
 export {
   createCanvasSceneAdapter,
   type CanvasSceneAdapter,
