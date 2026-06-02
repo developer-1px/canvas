@@ -26,6 +26,7 @@ import type { CanvasAppInspectorPanel } from '../affordances/editing/inspector/C
 import type { CanvasAppCustomCreationTool } from '../extensions/custom-tools/CanvasAppCustomCreationTools'
 import type { CanvasMediaImporter } from '../affordances/io/media/CanvasMediaImporters'
 import type { CanvasTextPasteImporter } from '../affordances/io/text-paste/CanvasTextPasteImporters'
+import type { CanvasAppCapabilitySnapshot } from './CanvasAppCapabilityAssembly'
 import type { CanvasAppPresenceProvider } from './CanvasAppCollaborationAssembly'
 
 export type CanvasAppAssemblyAffordanceModel = {
@@ -33,6 +34,7 @@ export type CanvasAppAssemblyAffordanceModel = {
 }
 
 export type CanvasAppAssemblyCommandModel = {
+  capabilities: CanvasAppCapabilitySnapshot
   commandAdapter: CanvasCommandAdapter<CanvasItem>
 }
 

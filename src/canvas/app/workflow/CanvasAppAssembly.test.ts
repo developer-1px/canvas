@@ -9,11 +9,11 @@ import {
 import type {
   CanvasAppComponentRendererStrategy,
   CanvasAppCustomItemRendererStrategy,
-	  CanvasAppItemLayerAdapter,
-	  CanvasAppPresenceProvider,
-	  CanvasAppStageAdapter,
-	  CanvasMediaImporter,
-	  CanvasWorkspaceStorageProvider,
+  CanvasAppItemLayerAdapter,
+  CanvasAppPresenceProvider,
+  CanvasAppStageAdapter,
+  CanvasMediaImporter,
+  CanvasWorkspaceStorageProvider,
 } from './index'
 
 describe('CanvasAppAssembly seams', () => {
@@ -36,6 +36,68 @@ describe('CanvasAppAssembly seams', () => {
     expect(assembly.affordanceConfig.tools.select).toBe(true)
   })
 
+  it('applies host capability gates after product affordance config', () => {
+    const assembly = createCanvasAppAssembly({
+      affordanceConfig: {
+        commands: {
+          copy: true,
+          delete: true,
+        },
+        gestures: {
+          createComment: true,
+          createShape: true,
+          move: true,
+          pan: true,
+          textEdit: true,
+        },
+        overlays: {
+          inspector: true,
+          presentationMode: true,
+          textEditor: true,
+        },
+        shortcuts: {
+          copy: true,
+          editSelection: true,
+        },
+        tools: {
+          comment: true,
+          rect: true,
+          select: true,
+        },
+      },
+      capabilities: {
+        comment: false,
+        editDocument: false,
+        export: false,
+        follow: false,
+        present: false,
+      },
+    })
+
+    expect(assembly.capabilities).toEqual({
+      comment: false,
+      editDocument: false,
+      export: false,
+      follow: false,
+      present: false,
+      view: true,
+    })
+    expect(assembly.affordanceConfig.commands.copy).toBe(false)
+    expect(assembly.affordanceConfig.commands.delete).toBe(false)
+    expect(assembly.affordanceConfig.gestures.createComment).toBe(false)
+    expect(assembly.affordanceConfig.gestures.createShape).toBe(false)
+    expect(assembly.affordanceConfig.gestures.move).toBe(false)
+    expect(assembly.affordanceConfig.gestures.pan).toBe(true)
+    expect(assembly.affordanceConfig.gestures.textEdit).toBe(false)
+    expect(assembly.affordanceConfig.overlays.inspector).toBe(false)
+    expect(assembly.affordanceConfig.overlays.presentationMode).toBe(false)
+    expect(assembly.affordanceConfig.overlays.textEditor).toBe(false)
+    expect(assembly.affordanceConfig.shortcuts.copy).toBe(false)
+    expect(assembly.affordanceConfig.shortcuts.editSelection).toBe(false)
+    expect(assembly.affordanceConfig.tools.comment).toBe(false)
+    expect(assembly.affordanceConfig.tools.rect).toBe(false)
+    expect(assembly.affordanceConfig.tools.select).toBe(true)
+  })
 
   it('assembles product-specific component library and presentation registry', () => {
     const componentLibrary = createCanvasComponentLibrary({
@@ -150,7 +212,6 @@ describe('CanvasAppAssembly seams', () => {
     expect(assembly.initialItems).toEqual([])
   })
 
-
   it('treats direct component presentation renderers as extensions', () => {
     const renderRisk: CanvasAppComponentRendererStrategy = ({ item }) =>
       item.title
@@ -164,7 +225,6 @@ describe('CanvasAppAssembly seams', () => {
     expect(assembly.componentPresentationRenderers['risk-card']).toBe(renderRisk)
     expect(assembly.componentPresentationRenderers['note-card']).toBeDefined()
   })
-
 
   it('accepts rendering adapters at the app assembly seam', () => {
     const itemLayerAdapter: CanvasAppItemLayerAdapter = {
@@ -184,7 +244,6 @@ describe('CanvasAppAssembly seams', () => {
     )).toBe(DEFAULT_CANVAS_APP_ASSEMBLY.initialItems.length)
     expect(assembly.stageAdapter.renderStage).toBe(stageAdapter.renderStage)
   })
-
 
   it('accepts workspace storage provider at the app assembly seam', () => {
     const workspaceStorageProvider: CanvasWorkspaceStorageProvider = () => null
@@ -254,7 +313,6 @@ describe('CanvasAppAssembly seams', () => {
     }).initialSelection).toEqual(['rect-1'])
   })
 
-
   it('can disable custom item modules at the app assembly seam', () => {
     const riskModule = defineCanvasAppCustomItemModule({
       id: 'risk',
@@ -279,7 +337,6 @@ describe('CanvasAppAssembly seams', () => {
     expect(assembly.customCreationTools).toEqual([])
     expect(assembly.customItemValidators).toEqual({})
   })
-
 })
 
 function createItemLayerInput(

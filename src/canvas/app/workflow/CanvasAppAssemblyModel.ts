@@ -3,6 +3,7 @@ import type { CanvasAppAssemblyModel } from './CanvasAppAssemblyModelContracts'
 
 export function getCanvasAppAssemblyModel({
   affordanceConfig,
+  capabilities,
   componentLibrary,
   componentPresentationRenderers,
   customCommands,
@@ -25,6 +26,7 @@ export function getCanvasAppAssemblyModel({
       config: affordanceConfig,
     },
     command: {
+      capabilities,
       commandAdapter: itemAdapters.command,
     },
     collaboration: {

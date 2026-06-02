@@ -13,6 +13,17 @@ export type {
 export type {
   CanvasAppExtensionAssemblyInput,
 } from './CanvasAppExtensionAssemblyTypes'
+export {
+  CANVAS_APP_COMMENT_ONLY_CAPABILITIES,
+  CANVAS_APP_EDITOR_CAPABILITIES,
+  CANVAS_APP_READ_ONLY_CAPABILITIES,
+  createCanvasAppCapabilities,
+  createCanvasAppCapabilityAffordanceConfigInput,
+  withCanvasAppCapabilities,
+  type CanvasAppCapabilityAssemblyInput,
+  type CanvasAppCapabilityInput,
+  type CanvasAppCapabilitySnapshot,
+} from './CanvasAppCapabilityAssembly'
 export type {
   CanvasAppCollaborationAssemblyInput,
   CanvasAppPresenceProvider,
