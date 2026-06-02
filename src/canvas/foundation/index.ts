@@ -94,6 +94,17 @@ export {
   type CanvasTransformItem,
 } from './CanvasTransformEngine'
 export {
+  EMPTY_CANVAS_SNAP_GUIDES,
+  getCanvasMoveSnap,
+  snapCanvasPointToGrid,
+  type CanvasAlignmentGuide,
+  type CanvasGridSnapConfig,
+  type CanvasMoveSnap,
+  type CanvasMoveSnapConfig,
+  type CanvasSnapGuides,
+  type CanvasSpacingGuide,
+} from './CanvasSnapEngine'
+export {
   CANVAS_TOOL_GESTURE_ROUTES,
   getCanvasToolPointerGesture,
   shouldRouteCanvasToolPointerToCanvasGesture,

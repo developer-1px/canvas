@@ -19,22 +19,28 @@ product/app meaning last.
 
 | Path | Target owner | Status | Reason |
 |---|---|---|---|
-| `src/canvas/foundation` | Foundation public facade | tracer bullet added | Re-exports headless core, scene, selection, transform, gesture, command, and extension contracts through a named public subpath. |
+| `src/canvas/foundation` | Foundation public facade | tracer bullet added | Re-exports headless core, scene, selection, transform, gesture, command, snap, and extension contracts through a named public subpath. |
+| `src/canvas/foundation/CanvasAlignmentSnap.ts` | Foundation | promoted | Owns alignment snap calculations and guide derivation. |
 | `src/canvas/foundation/CanvasCommandAvailabilityRules.ts` | Foundation | promoted | Owns command availability rule descriptors over a structural command config contract. |
 | `src/canvas/foundation/CanvasCommandSelectionRules.ts` | Foundation | promoted | Owns command selection threshold grammar. |
 | `src/canvas/foundation/CanvasCommandTypes.ts` | Foundation | promoted | Owns generic command item, adapter, result, mode, and availability contracts without Host item storage. |
 | `src/canvas/foundation/CanvasExtensionContracts.ts` | Foundation | tracer bullet added | Defines reusable extension descriptor, adapter slot, command planner, renderer slot, and generic effect contracts without app or host ownership. |
 | `src/canvas/foundation/CanvasFirstPartyExtensions.ts` | First-party extension | tracer bullet added | Holds the first concrete first-party extension descriptor without Host/App/UI/Renderer imports. |
 | `src/canvas/foundation/CanvasGestureEngine.ts` | Foundation | promoted | Owns pointer input to gesture classification over a structural gesture config contract. |
+| `src/canvas/foundation/CanvasGridSnap.ts` | Foundation | promoted | Owns grid snap calculations over a structural grid snap config contract. |
 | `src/canvas/foundation/CanvasSceneAdapter.ts` | Foundation | promoted | Owns scene entries, parent/path/bounds read contracts, and scene-derived bounds without Demo item variants. |
 | `src/canvas/foundation/CanvasSelectionEngine.ts` | Foundation | promoted | Owns pointer click and marquee selection policy over `CanvasSceneAdapter`. |
+| `src/canvas/foundation/CanvasSnapEngine.ts` | Foundation | promoted | Owns move snap planning over structural snap config and `CanvasSceneAdapter`. |
+| `src/canvas/foundation/CanvasSnapGeometry.ts` | Foundation | promoted | Owns snap bounds translation primitives. |
+| `src/canvas/foundation/CanvasSnapGuides.ts` | Foundation | promoted | Owns alignment and spacing guide contracts. |
+| `src/canvas/foundation/CanvasSpacingSnap.ts` | Foundation | promoted | Owns spacing snap calculations and guide derivation. |
 | `src/canvas/foundation/CanvasToolGestureRouting.ts` | Foundation | promoted | Owns built-in and custom tool gesture route descriptors without importing Engine affordance config. |
 | `src/canvas/foundation/CanvasTransformEngine.ts` | Foundation | promoted | Owns move/resize planner contracts over a generic transform adapter. |
 | `src/canvas/core` | Foundation | already close | Headless geometry, viewport, stable id, and primitive types. |
 | `src/canvas/engine` | Engine public facade | compatibility | Re-exports promoted foundation scene, selection, transform, gesture, and command contracts while retaining existing engine imports. |
 | `src/canvas/engine/gesture` | Engine public facade | retired | Gesture source moved to Foundation; Engine keeps compatibility exports from the public facade. |
 | `src/canvas/engine/command` | Engine / first-party extension | split started | Availability, selection, and generic command contracts moved to Foundation; execution actions remain Engine-owned. |
-| `src/canvas/engine/snap` | Foundation or first-party extension | split needed | Grid and geometry primitives are generic; guide policy may stay extension-owned. |
+| `src/canvas/engine/snap` | Engine public facade | retired | Snap source moved to Foundation; Engine keeps compatibility exports from the public facade. |
 | `src/canvas/host/read` | Host adapter | keep | Converts Demo `CanvasItem` trees into scene/read contracts. |
 | `src/canvas/host/document` | Host adapter | keep | Owns zod-crud document adapter, validation, patch factories, and item-specific field mapping. |
 | `src/canvas/host/tree` | Host | keep | Encodes Demo group children, bounds sync, pruning, and item traversal. |
@@ -55,6 +61,7 @@ product/app meaning last.
 5. Move one low-risk first-party affordance into the extension shape. Done in issue #75.
 6. Promote gesture routing contracts behind structural config adapters. Done in issue #77.
 7. Promote command availability contracts behind structural config adapters. Done in issue #79.
+8. Promote snap contracts behind structural config adapters. Done in issue #81.
 
 ## Extension Shape
 

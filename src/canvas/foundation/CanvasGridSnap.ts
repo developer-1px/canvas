@@ -1,8 +1,13 @@
-import type { CanvasAffordanceConfig } from '../affordance/CanvasAffordances'
 import type {
   Bounds,
   Point
-} from '../../core'
+} from '../core'
+
+export type CanvasGridSnapConfig = Readonly<{
+  gestures: Readonly<{
+    snapToGrid: boolean
+  }>
+}>
 
 const CANVAS_GRID_SIZE = 40
 
@@ -28,7 +33,7 @@ export function snapCanvasPointToGrid({
   config,
   point,
 }: {
-  config: CanvasAffordanceConfig
+  config: CanvasGridSnapConfig
   point: Point
 }): Point {
   if (!config.gestures.snapToGrid) {

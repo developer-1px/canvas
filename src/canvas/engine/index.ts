@@ -101,10 +101,12 @@ export {
   getCanvasMoveSnap,
   snapCanvasPointToGrid,
   type CanvasAlignmentGuide,
+  type CanvasGridSnapConfig,
   type CanvasMoveSnap,
+  type CanvasMoveSnapConfig,
   type CanvasSnapGuides,
   type CanvasSpacingGuide,
-} from './snap/CanvasSnapEngine'
+} from '../foundation/CanvasSnapEngine'
 export {
   moveCanvasSelection,
   resizeCanvasSelection,

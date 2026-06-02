@@ -1,23 +1,25 @@
 import { describe, expect, test } from 'vitest'
-import { createCanvasAffordanceConfig } from '../affordance/CanvasAffordances'
-import { createCanvasSceneAdapter } from '../../foundation/CanvasSceneAdapter'
-import { getCanvasMoveSnap } from './CanvasSnapEngine'
+import { createCanvasSceneAdapter } from './CanvasSceneAdapter'
+import {
+  getCanvasMoveSnap,
+  type CanvasMoveSnapConfig,
+} from './CanvasSnapEngine'
 
-const snapOnlyConfig = createCanvasAffordanceConfig({
+const snapOnlyConfig = createCanvasSnapConfig({
   gestures: {
     snapToGrid: false,
     snapToSpacing: false,
   },
 })
 
-const gridOnlyConfig = createCanvasAffordanceConfig({
+const gridOnlyConfig = createCanvasSnapConfig({
   gestures: {
     snapToAlignment: false,
     snapToSpacing: false,
   },
 })
 
-const spacingOnlyConfig = createCanvasAffordanceConfig({
+const spacingOnlyConfig = createCanvasSnapConfig({
   gestures: {
     snapToAlignment: false,
     snapToGrid: false,
@@ -150,3 +152,18 @@ describe('CanvasSnapEngine grid and spacing', () => {
     ])
   })
 })
+
+function createCanvasSnapConfig({
+  gestures = {},
+}: {
+  gestures?: Partial<CanvasMoveSnapConfig['gestures']>
+} = {}): CanvasMoveSnapConfig {
+  return {
+    gestures: {
+      snapToAlignment: true,
+      snapToGrid: true,
+      snapToSpacing: true,
+      ...gestures,
+    },
+  }
+}
