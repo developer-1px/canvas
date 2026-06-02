@@ -6,6 +6,7 @@ import {
   EMPTY_CANVAS_SNAP_GUIDES,
   createCanvasHighlight,
   createCanvasMarker,
+  createCanvasPath,
   type CanvasAffordanceConfig,
   type CanvasCreationAdapter,
   type CanvasCreationItem,
@@ -92,6 +93,29 @@ const CANVAS_POINTER_DRAWING_CREATION_DESCRIPTORS = Object.freeze({
     isEnabled: (config: CanvasAffordanceConfig) =>
       config.gestures.drawMarker,
     strokeKind: 'marker',
+  }),
+  'draw-path': Object.freeze({
+    createItem: <TItem extends CanvasCreationItem>({
+      adapter,
+      createId,
+      interaction,
+      style,
+    }: {
+      adapter: CanvasCreationAdapter<TItem>
+      createId: (prefix: string) => string
+      interaction: CanvasPointerDrawingCreationInteraction
+      style: CanvasDrawingStrokeStyle
+    }) =>
+      createCanvasPath({
+        adapter,
+        createId,
+        points: interaction.points,
+        startWorld: interaction.startWorld,
+        style,
+      }),
+    isEnabled: (config: CanvasAffordanceConfig) =>
+      config.gestures.drawPath,
+    strokeKind: 'path',
   }),
 } satisfies Readonly<
   Record<CanvasPointerDrawingCreationKind, CanvasPointerDrawingCreationDescriptor>

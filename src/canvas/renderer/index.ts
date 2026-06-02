@@ -7,4 +7,6 @@ export {
   createCanvasSvgArrowPathData,
   createCanvasSvgFreehandPathData,
   createCanvasSvgPathData,
+  createCanvasSvgPathSegmentData,
+  type CanvasSvgPathSegment,
 } from './svg/CanvasSvgDrawingPrimitives'

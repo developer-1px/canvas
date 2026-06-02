@@ -181,6 +181,7 @@ const CANVAS_STAGE_SNAPSHOT_STYLE = `
 .component-section{fill:rgba(248,250,252,.18);stroke:rgba(100,116,139,.48);stroke-dasharray:7 5}
 .component-section-rule{display:none}
 .marker-item,.highlight-item{fill:none;stroke-linecap:round;stroke-linejoin:round}
+.path-item{stroke-linecap:round;stroke-linejoin:round}
 .highlight-item{mix-blend-mode:multiply}
 .arrow-item{fill:none;stroke-linecap:round;stroke-linejoin:round}
 .arrow-head{fill:#a8b2c0}

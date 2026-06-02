@@ -30,7 +30,7 @@ export type CanvasDraftShapeOverlay = Bounds & {
 }
 
 export type CanvasDraftStrokeOverlay = {
-  kind: 'marker' | 'highlight'
+  kind: 'marker' | 'highlight' | 'path'
   opacity: number
   points: Point[]
   stroke: string

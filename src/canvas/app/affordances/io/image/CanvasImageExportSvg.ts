@@ -10,6 +10,7 @@ import type {
   Point,
 } from '../../../../entities'
 import { getCanvasItemSvgShapeGeometry } from '../../../../host'
+import { createCanvasSvgPathSegmentData } from '../../../../renderer'
 
 export type CanvasImageExportPayload = {
   filename: string
@@ -79,6 +80,10 @@ function renderCanvasImageExportItem(item: CanvasItem): string {
 
   if (item.type === 'marker' || item.type === 'highlight') {
     return `<polyline points="${formatCanvasPoints(item.points)}" fill="none" stroke="${escapeXmlAttribute(item.stroke)}" stroke-width="${formatNumber(item.strokeWidth)}" stroke-linecap="round" stroke-linejoin="round" opacity="${formatNumber(item.opacity)}" />`
+  }
+
+  if (item.type === 'path') {
+    return `<path d="${escapeXmlAttribute(createCanvasSvgPathSegmentData(item.segments))}" fill="${escapeXmlAttribute(item.fill ?? 'none')}" stroke="${escapeXmlAttribute(item.stroke)}" stroke-width="${formatNumber(item.strokeWidth)}" stroke-linecap="round" stroke-linejoin="round" opacity="${formatNumber(item.opacity)}" />`
   }
 
   if (item.type === 'arrow') {

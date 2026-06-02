@@ -62,6 +62,19 @@ export const CANVAS_ITEM_CREATION_ADAPTER: CanvasCreationAdapter<CanvasItem> = {
       ...getCanvasDrawingStrokeStyle('marker'),
       ...style,
     }),
+  createPath: ({ id, segments, style }) =>
+    syncCanvasItemBounds({
+      id,
+      type: 'path',
+      x: 0,
+      y: 0,
+      w: 0,
+      h: 0,
+      fill: 'none',
+      segments,
+      ...getCanvasDrawingStrokeStyle('path'),
+      ...style,
+    }),
   createShape: ({ bounds, id, shapeType }) => ({
     id,
     type: 'shape',

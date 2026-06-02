@@ -176,6 +176,27 @@ const arrowItem: CanvasItem = {
   text: 'Flow',
 }
 
+const pathItem: CanvasItem = {
+  h: 74,
+  id: 'path-1',
+  opacity: 1,
+  segments: [
+    { point: { x: 20, y: 40 }, type: 'move' },
+    {
+      control1: { x: 50, y: 20 },
+      control2: { x: 70, y: 90 },
+      point: { x: 110, y: 60 },
+      type: 'cubic',
+    },
+  ],
+  stroke: '#334155',
+  strokeWidth: 4,
+  type: 'path',
+  w: 94,
+  x: 18,
+  y: 18,
+}
+
 const stampItem: CanvasItem = {
   h: 44,
   id: 'stamp-1',
@@ -189,9 +210,10 @@ const stampItem: CanvasItem = {
 
 describe('CanvasItemSchema drawing items', () => {
   it('accepts built-in drawing item storage envelopes', () => {
-    expect(validateCanvasItems([markerItem, arrowItem])).toEqual([
+    expect(validateCanvasItems([markerItem, arrowItem, pathItem])).toEqual([
       markerItem,
       arrowItem,
+      pathItem,
     ])
   })
 
@@ -212,8 +234,15 @@ describe('CanvasItemSchema drawing items', () => {
           w: 1,
           h: 1,
         },
+        {
+          ...pathItem,
+          x: 0,
+          y: 0,
+          w: 1,
+          h: 1,
+        },
       ]),
-    ).toEqual([markerItem, arrowItem])
+    ).toEqual([markerItem, arrowItem, pathItem])
   })
 
   it('rejects drawing strokes without visible geometry', () => {
@@ -231,6 +260,15 @@ describe('CanvasItemSchema drawing items', () => {
         {
           ...arrowItem,
           end: arrowItem.start,
+        },
+      ]),
+    ).toThrow()
+
+    expect(() =>
+      validateCanvasItems([
+        {
+          ...pathItem,
+          segments: [{ point: { x: 20, y: 40 }, type: 'move' }],
         },
       ]),
     ).toThrow()

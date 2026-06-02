@@ -3,6 +3,7 @@ import {
   CANVAS_ARROW_STYLE,
   CANVAS_HIGHLIGHT_STYLE,
   CANVAS_MARKER_STYLE,
+  CANVAS_PATH_STYLE,
 } from '../drawing/CanvasDrawingItemStyles'
 import { CANVAS_ITEM_CREATION_ADAPTER } from './CanvasItemCreationAdapter'
 
@@ -49,6 +50,26 @@ describe('CanvasItemCreationAdapter', () => {
       routing: 'elbow',
       startAttachedTo: 'component-1',
       type: 'arrow',
+    })
+    expect(CANVAS_ITEM_CREATION_ADAPTER.createPath?.({
+      id: 'path-1',
+      segments: [
+        { point: { x: 10, y: 20 }, type: 'move' },
+        {
+          control1: { x: 20, y: 10 },
+          control2: { x: 40, y: 50 },
+          point: { x: 60, y: 30 },
+          type: 'cubic',
+        },
+      ],
+    })).toMatchObject({
+      ...CANVAS_PATH_STYLE,
+      fill: 'none',
+      h: 43,
+      type: 'path',
+      w: 53,
+      x: 8.5,
+      y: 8.5,
     })
   })
 })

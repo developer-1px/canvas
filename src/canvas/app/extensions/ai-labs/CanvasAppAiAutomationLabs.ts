@@ -354,6 +354,7 @@ function getCanvasAppAiAutomationItemText(
     case 'highlight':
     case 'image':
     case 'marker':
+    case 'path':
       return []
   }
 }

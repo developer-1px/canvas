@@ -16,9 +16,10 @@ import {
 describe('CanvasPointerDrawingCreation', () => {
   const drawingStyles = createCanvasDrawingStrokeStyleSet({
     marker: { stroke: '#111827', strokeWidth: 8 },
+    path: { stroke: '#334155', strokeWidth: 3 },
   })
 
-  it('starts marker and highlighter gestures from the same drawing contract', () => {
+  it('starts drawing gestures from the same drawing contract', () => {
     const marker = startCanvasPointerDrawingCreation({
       drawingStyles,
       input: createPointerInput(),
@@ -30,6 +31,13 @@ describe('CanvasPointerDrawingCreation', () => {
       drawingStyles,
       input: createPointerInput(),
       pointerGesture: 'draw-highlight',
+      startScreen: { x: 8, y: 12 },
+      startWorld: { x: 80, y: 120 },
+    })
+    const path = startCanvasPointerDrawingCreation({
+      drawingStyles,
+      input: createPointerInput(),
+      pointerGesture: 'draw-path',
       startScreen: { x: 8, y: 12 },
       startWorld: { x: 80, y: 120 },
     })
@@ -53,6 +61,11 @@ describe('CanvasPointerDrawingCreation', () => {
       gesture: 'draw-highlight',
       interaction: { kind: 'draw-highlight' },
     })
+    expect(path).toMatchObject({
+      draftStroke: { kind: 'path', stroke: '#334155', strokeWidth: 3 },
+      gesture: 'draw-path',
+      interaction: { kind: 'draw-path' },
+    })
   })
 
   it('previews enabled drawing gestures and contains disabled gestures', () => {
@@ -74,7 +87,7 @@ describe('CanvasPointerDrawingCreation', () => {
     })
     const disabled = previewCanvasPointerDrawingCreation({
       config: createCanvasAffordanceConfig({
-        gestures: { drawMarker: false },
+        gestures: { drawMarker: false, drawPath: false },
       }),
       currentScreen: { x: 40, y: 20 },
       currentWorld: { x: 40, y: 20 },
@@ -88,6 +101,24 @@ describe('CanvasPointerDrawingCreation', () => {
         startScreen: { x: 0, y: 0 },
         startWorld: { x: 0, y: 0 },
         style: drawingStyles.marker,
+      },
+    })
+    const disabledPath = previewCanvasPointerDrawingCreation({
+      config: createCanvasAffordanceConfig({
+        gestures: { drawPath: false },
+      }),
+      currentScreen: { x: 40, y: 20 },
+      currentWorld: { x: 40, y: 20 },
+      input: createPointerInput(),
+      interaction: {
+        currentWorld: { x: 0, y: 0 },
+        kind: 'draw-path',
+        moved: false,
+        pointerId: 1,
+        points: [{ x: 0, y: 0 }],
+        startScreen: { x: 0, y: 0 },
+        startWorld: { x: 0, y: 0 },
+        style: drawingStyles.path,
       },
     })
 
@@ -105,6 +136,7 @@ describe('CanvasPointerDrawingCreation', () => {
       kind: 'preview',
     })
     expect(disabled).toEqual({ kind: 'none' })
+    expect(disabledPath).toEqual({ kind: 'none' })
   })
 
   it('commits drawing interactions without stealing the current selection', () => {
@@ -136,6 +168,56 @@ describe('CanvasPointerDrawingCreation', () => {
             stroke: '#111827',
             strokeWidth: 8,
             type: 'marker',
+          }),
+        ],
+      },
+      { before: ['selected-1'], after: ['selected-1'] },
+    )
+  })
+
+  it('commits pen path interactions as typed path segments', () => {
+    const commitItemsChange = vi.fn<CommitCanvasItemsChange>(() => true)
+
+    commitCanvasPointerDrawingCreation({
+      commitItemsChange,
+      creationAdapter,
+      createId: (prefix) => `${prefix}-1`,
+      interaction: {
+        currentWorld: { x: 100, y: 40 },
+        kind: 'draw-path',
+        moved: true,
+        pointerId: 1,
+        points: [
+          { x: 10, y: 20 },
+          { x: 40, y: 5 },
+          { x: 70, y: 55 },
+          { x: 100, y: 40 },
+        ],
+        startScreen: { x: 0, y: 0 },
+        startWorld: { x: 10, y: 20 },
+        style: drawingStyles.path,
+      },
+      selection: ['selected-1'],
+    })
+
+    expect(commitItemsChange).toHaveBeenCalledWith(
+      {
+        type: 'add',
+        items: [
+          expect.objectContaining({
+            id: 'path-1',
+            segments: [
+              { point: { x: 10, y: 20 }, type: 'move' },
+              {
+                control1: { x: 40, y: 5 },
+                control2: { x: 70, y: 55 },
+                point: { x: 100, y: 40 },
+                type: 'cubic',
+              },
+            ],
+            stroke: '#334155',
+            strokeWidth: 3,
+            type: 'path',
           }),
         ],
       },
@@ -197,6 +279,20 @@ const creationAdapter: CanvasCreationAdapter<CanvasItem> = {
     stroke: '#475569',
     strokeWidth: 3,
     type: 'marker',
+    w: 0,
+    x: 0,
+    y: 0,
+    ...style,
+  }),
+  createPath: ({ id, segments, style }) => ({
+    h: 0,
+    id,
+    fill: 'none',
+    opacity: 1,
+    segments,
+    stroke: '#334155',
+    strokeWidth: 3,
+    type: 'path',
     w: 0,
     x: 0,
     y: 0,

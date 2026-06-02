@@ -57,6 +57,48 @@ describe('CanvasItemFlipOperations', () => {
     expect(arrow.end).toEqual({ x: 0, y: 0 })
   })
 
+  test('reflects path segments so a vector path visibly mirrors', () => {
+    const items: CanvasItem[] = [
+      {
+        h: 74,
+        id: 'path-1',
+        opacity: 1,
+        segments: [
+          { point: { x: 20, y: 40 }, type: 'move' },
+          {
+            control1: { x: 50, y: 20 },
+            control2: { x: 70, y: 90 },
+            point: { x: 110, y: 60 },
+            type: 'cubic',
+          },
+        ],
+        stroke: '#334155',
+        strokeWidth: 4,
+        type: 'path',
+        w: 94,
+        x: 18,
+        y: 18,
+      },
+    ]
+
+    const flipped = flipCanvasSelection(items, ['path-1'], 'horizontal')
+    const path = pick(flipped, 'path-1') as Extract<
+      CanvasItem,
+      { type: 'path' }
+    >
+
+    expect(path.segments).toEqual([
+      { point: { x: 110, y: 40 }, type: 'move' },
+      {
+        control1: { x: 80, y: 20 },
+        control2: { x: 60, y: 90 },
+        point: { x: 20, y: 60 },
+        type: 'cubic',
+      },
+    ])
+    expect(path).toMatchObject({ x: 18, y: 18, w: 94, h: 74 })
+  })
+
   test('negates rotation when flipping a rotated item', () => {
     const items: CanvasItem[] = [
       { ...rect('rect-1', 0, 0, 100, 40), rotation: 30 },

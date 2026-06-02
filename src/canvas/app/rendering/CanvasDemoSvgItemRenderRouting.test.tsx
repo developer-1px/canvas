@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
+import { renderToStaticMarkup } from 'react-dom/server'
 import type {
   ArrowItem,
   CanvasCommentItem,
@@ -65,6 +66,39 @@ describe('CanvasDemoSvgItemRenderRouting', () => {
     route.onDoubleClick?.()
 
     expect(onTextDoubleClick).toHaveBeenCalledWith(comment)
+  })
+
+  it('shows path anchor handles only while a path item is selected', () => {
+    const path: CanvasItem = {
+      h: 74,
+      id: 'path-1',
+      opacity: 1,
+      segments: [
+        { point: { x: 20, y: 40 }, type: 'move' },
+        {
+          control1: { x: 50, y: 20 },
+          control2: { x: 70, y: 90 },
+          point: { x: 110, y: 60 },
+          type: 'cubic',
+        },
+      ],
+      stroke: '#334155',
+      strokeWidth: 4,
+      type: 'path',
+      w: 94,
+      x: 18,
+      y: 18,
+    }
+
+    const route = getCanvasDemoSvgItemRenderRoute({
+      ...createInput(path),
+      selected: true,
+    })
+    const markup = renderToStaticMarkup(<svg>{route.children}</svg>)
+
+    expect(markup).toContain('class="path-anchor-handles"')
+    expect(markup).toContain('data-segment-type="move"')
+    expect(markup).toContain('data-segment-type="cubic"')
   })
 })
 

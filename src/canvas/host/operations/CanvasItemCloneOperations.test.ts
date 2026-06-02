@@ -31,6 +31,27 @@ const marker: CanvasItem = {
   opacity: 1,
 }
 
+const path: CanvasItem = {
+  h: 74,
+  id: 'path-1',
+  opacity: 1,
+  segments: [
+    { point: { x: 20, y: 40 }, type: 'move' },
+    {
+      control1: { x: 50, y: 20 },
+      control2: { x: 70, y: 90 },
+      point: { x: 110, y: 60 },
+      type: 'cubic',
+    },
+  ],
+  stroke: '#334155',
+  strokeWidth: 4,
+  type: 'path',
+  w: 94,
+  x: 18,
+  y: 18,
+}
+
 describe('CanvasItemCloneOperations drawing items', () => {
   test('offsets arrow bounds and endpoints together', () => {
     expect(
@@ -62,6 +83,30 @@ describe('CanvasItemCloneOperations drawing items', () => {
       x: 110,
       y: 114,
       points: [{ x: 112, y: 116 }, { x: 212, y: 136 }],
+    }])
+  })
+
+  test('offsets path bounds and typed segments together', () => {
+    expect(
+      cloneCanvasItemsWithNewIds(
+        [path],
+        (prefix) => `${prefix}-copy`,
+        { x: 12, y: 16 },
+      ),
+    ).toEqual([{
+      ...path,
+      id: 'path-copy',
+      segments: [
+        { point: { x: 32, y: 56 }, type: 'move' },
+        {
+          control1: { x: 62, y: 36 },
+          control2: { x: 82, y: 106 },
+          point: { x: 122, y: 76 },
+          type: 'cubic',
+        },
+      ],
+      x: 30,
+      y: 34,
     }])
   })
 

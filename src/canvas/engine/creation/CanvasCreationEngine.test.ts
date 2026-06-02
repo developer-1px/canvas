@@ -3,10 +3,12 @@ import {
   createCanvasArrow,
   createCanvasHighlight,
   createCanvasMarker,
+  createCanvasPath,
   createCanvasRect,
   createCanvasShape,
   getCanvasCreatedArrowEnd,
   getCanvasCreatedDrawingPoints,
+  getCanvasCreatedPathSegments,
   type CanvasCreationAdapter,
 } from './CanvasCreationEngine'
 
@@ -20,6 +22,16 @@ type CreatedItem =
         strokeWidth: number
       }
       type: 'highlight' | 'marker'
+    }
+  | {
+      id: string
+      segments: ReturnType<typeof getCanvasCreatedPathSegments>
+      style?: {
+        opacity: number
+        stroke: string
+        strokeWidth: number
+      }
+      type: 'path'
     }
   | {
       end: { x: number; y: number }
@@ -54,6 +66,12 @@ const adapter: CanvasCreationAdapter<CreatedItem> = {
     points,
     style,
     type: 'marker',
+  }),
+  createPath: ({ id, segments, style }) => ({
+    id,
+    segments,
+    style,
+    type: 'path',
   }),
   createShape: ({ id, shapeType }) => ({ id, shapeType, type: 'shape' }),
   createText: ({ id }) => ({
@@ -109,6 +127,53 @@ describe('CanvasCreationEngine drawing tools', () => {
         strokeWidth: 8,
       },
       type: 'marker',
+    })
+  })
+
+  test('creates typed cubic path segments for pen paths', () => {
+    expect(
+      getCanvasCreatedPathSegments({
+        points: [
+          { x: 10, y: 20 },
+          { x: 40, y: 5 },
+          { x: 70, y: 55 },
+          { x: 100, y: 40 },
+        ],
+        startWorld: { x: 10, y: 20 },
+      }),
+    ).toEqual([
+      { point: { x: 10, y: 20 }, type: 'move' },
+      {
+        control1: { x: 40, y: 5 },
+        control2: { x: 70, y: 55 },
+        point: { x: 100, y: 40 },
+        type: 'cubic',
+      },
+    ])
+    expect(
+      createCanvasPath({
+        adapter,
+        createId: () => 'path-1',
+        points: [{ x: 10, y: 20 }, { x: 40, y: 50 }],
+        startWorld: { x: 10, y: 20 },
+        style: {
+          opacity: 1,
+          stroke: '#334155',
+          strokeWidth: 3,
+        },
+      }),
+    ).toEqual({
+      id: 'path-1',
+      segments: [
+        { point: { x: 10, y: 20 }, type: 'move' },
+        { point: { x: 40, y: 50 }, type: 'line' },
+      ],
+      style: {
+        opacity: 1,
+        stroke: '#334155',
+        strokeWidth: 3,
+      },
+      type: 'path',
     })
   })
 

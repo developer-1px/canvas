@@ -28,6 +28,27 @@ const arrowItem: CanvasItem = {
   y: 108,
 }
 
+const pathItem: CanvasItem = {
+  h: 74,
+  id: 'path-1',
+  opacity: 1,
+  segments: [
+    { point: { x: 20, y: 40 }, type: 'move' },
+    {
+      control1: { x: 50, y: 20 },
+      control2: { x: 70, y: 90 },
+      point: { x: 110, y: 60 },
+      type: 'cubic',
+    },
+  ],
+  stroke: '#334155',
+  strokeWidth: 4,
+  type: 'path',
+  w: 94,
+  x: 18,
+  y: 18,
+}
+
 describe('CanvasDrawingItemValidation', () => {
   it('accepts built-in drawing item storage shapes', () => {
     expect(isCanvasDrawingItemStorageShape(markerItem)).toBe(true)
@@ -36,6 +57,7 @@ describe('CanvasDrawingItemValidation', () => {
       type: 'highlight',
     })).toBe(true)
     expect(isCanvasDrawingItemStorageShape(arrowItem)).toBe(true)
+    expect(isCanvasDrawingItemStorageShape(pathItem)).toBe(true)
     expect(isCanvasDrawingItemStorageShape({
       ...arrowItem,
       fontSize: 12,
@@ -48,6 +70,27 @@ describe('CanvasDrawingItemValidation', () => {
     expect(isCanvasDrawingItemStorageShape({
       ...markerItem,
       points: [{ x: 10, y: 20 }],
+    })).toBe(false)
+  })
+
+  it('rejects path items without a typed visible path segment shape', () => {
+    expect(isCanvasDrawingItemStorageShape({
+      ...pathItem,
+      segments: [{ point: { x: 20, y: 40 }, type: 'move' }],
+    })).toBe(false)
+    expect(isCanvasDrawingItemStorageShape({
+      ...pathItem,
+      segments: [
+        { point: { x: 20, y: 40 }, type: 'line' },
+        { point: { x: 110, y: 60 }, type: 'line' },
+      ],
+    })).toBe(false)
+    expect(isCanvasDrawingItemStorageShape({
+      ...pathItem,
+      segments: [
+        { point: { x: 20, y: 40 }, type: 'move' },
+        { point: { x: 110, y: Number.NaN }, type: 'line' },
+      ],
     })).toBe(false)
   })
 

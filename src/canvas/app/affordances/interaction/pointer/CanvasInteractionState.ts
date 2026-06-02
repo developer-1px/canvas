@@ -81,6 +81,16 @@ export type Interaction =
       moved: boolean
     }
   | {
+      kind: 'draw-path'
+      pointerId: number
+      startScreen: Point
+      startWorld: Point
+      currentWorld: Point
+      points: Point[]
+      style: CanvasDrawingStrokeStyle
+      moved: boolean
+    }
+  | {
       kind: 'erase'
       pointerId: number
       startScreen: Point

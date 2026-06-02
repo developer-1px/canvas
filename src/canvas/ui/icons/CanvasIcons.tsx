@@ -10,6 +10,7 @@ export {
   SectionIcon,
   HighlighterIcon,
   MarkerIcon,
+  PenIcon,
   EraserIcon,
   LaserIcon,
   ArrowIcon,

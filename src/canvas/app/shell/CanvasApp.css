@@ -103,8 +103,15 @@
   pointer-events: none;
 }
 
+.path-item {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+
 .marker-hit,
-.highlight-hit {
+.highlight-hit,
+.path-hit {
   fill: none;
   stroke: transparent;
   pointer-events: stroke;
@@ -116,6 +123,10 @@
 
 .highlight-hit {
   stroke-width: 28;
+}
+
+.path-hit {
+  stroke-width: 18;
 }
 
 .highlight-item,
@@ -195,6 +206,16 @@
   stroke-width: 2;
   cursor: crosshair;
   pointer-events: all;
+}
+
+.path-anchor-handles {
+  pointer-events: none;
+}
+
+.path-anchor-handle {
+  fill: var(--canvas-panel);
+  stroke: var(--canvas-blue);
+  stroke-width: 1.5;
 }
 
 .arrow-label {

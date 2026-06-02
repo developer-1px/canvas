@@ -1,5 +1,8 @@
 import type { Point } from '../../core'
-import type { CanvasItem } from '../model'
+import type {
+  CanvasItem,
+  CanvasPathSegment,
+} from '../model'
 import {
   flattenCanvasItems,
   getItemsBounds,
@@ -11,6 +14,7 @@ import { isCanvasGroupItem } from '../tree/CanvasGroupItem'
 import type { CanvasDrawingItem } from '../drawing/CanvasDrawingItemGeometry'
 import {
   isCanvasDrawingItem,
+  isCanvasPathDrawingItem,
   isCanvasStrokeDrawingItem,
   syncCanvasDrawingItemBounds,
 } from '../drawing/CanvasDrawingItemGeometry'
@@ -119,11 +123,38 @@ function flipCanvasDrawingItem<TItem extends CanvasDrawingItem>(
     }) as TItem
   }
 
+  if (isCanvasPathDrawingItem(item)) {
+    return syncCanvasDrawingItemBounds({
+      ...item,
+      segments: item.segments.map((segment) =>
+        reflectCanvasPathSegment(segment, reflect)),
+    }) as TItem
+  }
+
   return syncCanvasDrawingItemBounds({
     ...item,
     end: reflect(item.end),
     start: reflect(item.start),
   }) as TItem
+}
+
+function reflectCanvasPathSegment(
+  segment: CanvasPathSegment,
+  reflect: (point: Point) => Point,
+): CanvasPathSegment {
+  if (segment.type === 'cubic') {
+    return {
+      ...segment,
+      control1: reflect(segment.control1),
+      control2: reflect(segment.control2),
+      point: reflect(segment.point),
+    }
+  }
+
+  return {
+    ...segment,
+    point: reflect(segment.point),
+  }
 }
 
 function getSelectedCanvasFlipItems(items: CanvasItem[], ids: string[]) {

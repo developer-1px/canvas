@@ -126,6 +126,8 @@ test('opens as a minimal canvas affordance engine demo', async ({ page }) => {
     .toBeVisible()
   await expect(page.getByRole('button', { name: 'Section tool' }))
     .toBeVisible()
+  await expect(page.getByRole('button', { name: 'Pen tool' }))
+    .toBeVisible()
   await expect(page.getByRole('button', { name: 'Arrow tool' }))
     .toBeVisible()
   await expect(page.getByRole('button', { name: 'Highlighter tool' }))
@@ -1111,7 +1113,7 @@ test('keeps text editing and drawing as engine affordances', async ({
     .toBeGreaterThan(markerCount)
 })
 
-test('creates shape, sticky, section, arrow, and highlighter objects from exposed tools', async ({
+test('creates shape, sticky, section, arrow, pen path, and highlighter objects from exposed tools', async ({
   page,
 }) => {
   await page.goto('/')
@@ -1179,6 +1181,38 @@ test('creates shape, sticky, section, arrow, and highlighter objects from expose
   await page.mouse.up()
   await expect.poll(() => page.locator('[data-type="arrow"]').count())
     .toBeGreaterThan(arrowCount)
+
+  const pathCount = await page.locator('[data-type="path"]').count()
+
+  await page.getByRole('button', { name: 'Pen tool' }).click()
+  await page.mouse.move(stageBox.x + 900, stageBox.y + 360)
+  await page.mouse.down()
+  await page.mouse.move(stageBox.x + 940, stageBox.y + 320)
+  await page.mouse.move(stageBox.x + 1000, stageBox.y + 400)
+  await page.mouse.move(stageBox.x + 1040, stageBox.y + 360)
+  await page.mouse.up()
+  await expect.poll(() => page.locator('[data-type="path"]').count())
+    .toBeGreaterThan(pathCount)
+
+  const path = page.locator('[data-type="path"]').last()
+  await expect(path.locator('.path-item')).toHaveAttribute('d', /C /)
+
+  await page.getByRole('button', { name: 'Select tool' }).click()
+  const pathSelectPoint = await getSvgPathScreenPoint(path.locator('.path-hit'))
+
+  await page.mouse.click(pathSelectPoint.x, pathSelectPoint.y)
+  await expect(path).toHaveAttribute('data-selected', 'true')
+  await expect(path.locator('.path-anchor-handle')).toHaveCount(2)
+
+  const pathBeforeMove = await getRequiredBox(path)
+  const pathDragPoint = await getSvgPathScreenPoint(path.locator('.path-hit'))
+
+  await page.mouse.move(pathDragPoint.x, pathDragPoint.y)
+  await page.mouse.down()
+  await page.mouse.move(pathDragPoint.x + 40, pathDragPoint.y + 20)
+  await page.mouse.up()
+  await expect.poll(async () => Math.round((await getRequiredBox(path)).x))
+    .not.toBe(Math.round(pathBeforeMove.x))
 
   const highlightCount = await page.locator('[data-type="highlight"]').count()
 
@@ -1384,6 +1418,25 @@ async function getRequiredBox(locator: Locator) {
   }
 
   return box
+}
+
+async function getSvgPathScreenPoint(locator: Locator, ratio = 0.75) {
+  return locator.evaluate((element, ratio) => {
+    const path = element as SVGPathElement
+    const matrix = path.getScreenCTM()
+
+    if (!matrix) {
+      throw new Error('expected SVG path screen matrix')
+    }
+
+    const point = path.getPointAtLength(path.getTotalLength() * ratio)
+    const screenPoint = new DOMPoint(point.x, point.y).matrixTransform(matrix)
+
+    return {
+      x: screenPoint.x,
+      y: screenPoint.y,
+    }
+  }, ratio)
 }
 
 async function getCanvasItemOrderIndex(page: Page, itemId: string) {

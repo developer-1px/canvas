@@ -26,7 +26,10 @@ describe('CanvasAffordanceConfig', () => {
     expect(config.overlays.inspector).toBe(false)
     expect(config.overlays.toolbar).toBe(true)
     expect(config.shortcuts.findReplace).toBe(true)
+    expect(config.shortcuts.penTool).toBe(true)
+    expect(config.gestures.drawPath).toBe(true)
     expect(config.tools.marker).toBe(false)
+    expect(config.tools.pen).toBe(true)
     expect(config.tools.select).toBe(true)
   })
 

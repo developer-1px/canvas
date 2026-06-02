@@ -1,4 +1,4 @@
-export type CanvasDrawingStrokeKind = 'highlight' | 'marker'
+export type CanvasDrawingStrokeKind = 'highlight' | 'marker' | 'path'
 
 export type CanvasDrawingStrokeStyle = Readonly<{
   opacity: number
@@ -32,9 +32,16 @@ export const CANVAS_ARROW_STYLE = Object.freeze({
   strokeWidth: 3,
 }) satisfies CanvasArrowStyle
 
+export const CANVAS_PATH_STYLE = Object.freeze({
+  opacity: 1,
+  stroke: '#334155',
+  strokeWidth: 3,
+}) satisfies CanvasDrawingStrokeStyle
+
 export const CANVAS_DRAWING_STROKE_STYLE_DEFAULTS = Object.freeze({
   highlight: CANVAS_HIGHLIGHT_STYLE,
   marker: CANVAS_MARKER_STYLE,
+  path: CANVAS_PATH_STYLE,
 }) satisfies CanvasDrawingStrokeStyleSet
 
 export function getCanvasDrawingStrokeStyle(
@@ -57,6 +64,10 @@ export function createCanvasDrawingStrokeStyleSet(
     marker: freezeCanvasDrawingStrokeStyle({
       ...CANVAS_MARKER_STYLE,
       ...overrides.marker,
+    }),
+    path: freezeCanvasDrawingStrokeStyle({
+      ...CANVAS_PATH_STYLE,
+      ...overrides.path,
     }),
   })
 }

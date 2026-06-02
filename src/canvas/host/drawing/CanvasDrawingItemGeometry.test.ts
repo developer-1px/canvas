@@ -40,10 +40,32 @@ const marker: CanvasItem = {
   y: 38,
 }
 
+const path: CanvasItem = {
+  h: 53,
+  id: 'path-1',
+  opacity: 1,
+  segments: [
+    { point: { x: 20, y: 40 }, type: 'move' },
+    {
+      control1: { x: 50, y: 20 },
+      control2: { x: 70, y: 90 },
+      point: { x: 110, y: 60 },
+      type: 'cubic',
+    },
+  ],
+  stroke: '#334155',
+  strokeWidth: 4,
+  type: 'path',
+  w: 94,
+  x: 18,
+  y: 18,
+}
+
 describe('CanvasDrawingItemGeometry', () => {
   it('recognizes built-in drawing items', () => {
     expect(isCanvasDrawingItem(arrow)).toBe(true)
     expect(isCanvasDrawingItem(marker)).toBe(true)
+    expect(isCanvasDrawingItem(path)).toBe(true)
     expect(isCanvasDrawingItem({
       fill: '#ffffff',
       h: 60,
@@ -68,6 +90,12 @@ describe('CanvasDrawingItemGeometry', () => {
       w: 104,
       x: 8,
       y: 28,
+    })
+    expect(getCanvasDrawingItemBounds(path)).toEqual({
+      h: 74,
+      w: 94,
+      x: 18,
+      y: 18,
     })
   })
 
@@ -165,6 +193,25 @@ describe('CanvasDrawingItemGeometry', () => {
       x: 18,
       y: 23,
     })
+    expect(translateCanvasDrawingItem({
+      dx: 10,
+      dy: -5,
+      item: path,
+    })).toEqual({
+      ...path,
+      h: 74,
+      segments: [
+        { point: { x: 30, y: 35 }, type: 'move' },
+        {
+          control1: { x: 60, y: 15 },
+          control2: { x: 80, y: 85 },
+          point: { x: 120, y: 55 },
+          type: 'cubic',
+        },
+      ],
+      x: 28,
+      y: 13,
+    })
   })
 
   it('translates only arrow endpoints attached to moved items', () => {
@@ -214,6 +261,26 @@ describe('CanvasDrawingItemGeometry', () => {
       w: 208,
       x: 16,
       y: 36,
+    })
+    expect(scaleCanvasDrawingItem({
+      from: { h: 80, w: 120, x: 0, y: 20 },
+      item: path,
+      to: { h: 160, w: 240, x: 0, y: 20 },
+    })).toEqual({
+      ...path,
+      h: 148,
+      segments: [
+        { point: { x: 38, y: 59.14285714285714 }, type: 'move' },
+        {
+          control1: { x: 99.33333333333333, y: 18 },
+          control2: { x: 140.22222222222223, y: 162 },
+          point: { x: 222, y: 100.28571428571428 },
+          type: 'cubic',
+        },
+      ],
+      w: 188,
+      x: 36,
+      y: 16,
     })
   })
 })

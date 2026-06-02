@@ -1,5 +1,21 @@
 import type { Point } from '../../core'
 
+export type CanvasSvgPathSegment =
+  | {
+      point: Point
+      type: 'move'
+    }
+  | {
+      point: Point
+      type: 'line'
+    }
+  | {
+      control1: Point
+      control2: Point
+      point: Point
+      type: 'cubic'
+    }
+
 export const CANVAS_SVG_ARROW_MARKER_ID = 'canvas-arrow-head'
 export const CANVAS_SVG_DRAFT_ARROW_MARKER_ID = 'canvas-draft-arrow-head'
 export const CANVAS_SVG_ARROW_MARKER_IRI = getCanvasSvgMarkerIri(
@@ -47,6 +63,30 @@ export function createCanvasSvgFreehandPathData(points: readonly Point[]) {
     }),
     `L ${rest[rest.length - 1].x} ${rest[rest.length - 1].y}`,
   ].join(' ')
+}
+
+export function createCanvasSvgPathSegmentData(
+  segments: readonly CanvasSvgPathSegment[],
+) {
+  return segments.map((segment) => {
+    if (segment.type === 'move') {
+      return `M ${segment.point.x} ${segment.point.y}`
+    }
+
+    if (segment.type === 'line') {
+      return `L ${segment.point.x} ${segment.point.y}`
+    }
+
+    return [
+      'C',
+      segment.control1.x,
+      segment.control1.y,
+      segment.control2.x,
+      segment.control2.y,
+      segment.point.x,
+      segment.point.y,
+    ].join(' ')
+  }).join(' ')
 }
 
 export function createCanvasSvgArrowPathData({
