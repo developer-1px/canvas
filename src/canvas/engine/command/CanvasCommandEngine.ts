@@ -1,7 +1,7 @@
 export {
   canUseCanvasCommand,
   getCanvasCommandAvailability,
-} from './CanvasCommandAvailability'
+} from '../../foundation/CanvasCommandAvailability'
 export {
   canAlignCanvasCommandSelection,
   canDistributeCanvasCommandSelection,
@@ -9,7 +9,7 @@ export {
   getCanvasCommandSelectionState,
   hasCanvasCommandSelection,
   type CanvasCommandSelectionState,
-} from './CanvasCommandSelectionRules'
+} from '../../foundation/CanvasCommandSelectionRules'
 export {
   alignCanvasCommand,
   deleteCanvasCommand,
@@ -38,4 +38,4 @@ export {
   type CanvasReorderMode,
   type DeleteCanvasCommandResult,
   type DuplicateCanvasCommandResult,
-} from './CanvasCommandTypes'
+} from '../../foundation/CanvasCommandTypes'

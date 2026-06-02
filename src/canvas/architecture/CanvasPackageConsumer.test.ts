@@ -267,6 +267,20 @@ describe('Canvas package consumer imports', () => {
     expect(CanvasEngine.assertCanvasAffordanceConfig(affordanceConfig)).toBe(
       affordanceConfig,
     )
+    expect(CanvasFoundation.getCanvasCommandAvailability({
+      canRedo: false,
+      canUndo: true,
+      config: affordanceConfig,
+      hasSelectedGroup: false,
+      selection: ['rect-1', 'rect-2'],
+    }).alignLeft).toBe(true)
+    expect(CanvasEngine.getCanvasCommandAvailability({
+      canRedo: false,
+      canUndo: true,
+      config: affordanceConfig,
+      hasSelectedGroup: false,
+      selection: ['rect-1', 'rect-2'],
+    }).alignLeft).toBe(true)
     const scene = CanvasFoundation.createCanvasSceneAdapter([{
       bounds: { h: 20, w: 20, x: 0, y: 0 },
       id: 'rect-1',

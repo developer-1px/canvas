@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { createCanvasAffordanceConfig } from '../affordance/CanvasAffordances'
 import {
   CANVAS_COMMAND_AVAILABILITY_RULES,
   canUseCanvasCommand,
   getCanvasCommandAvailability,
+  type CanvasCommandAvailabilityConfig,
 } from './CanvasCommandAvailabilityRules'
 
 describe('CanvasCommandAvailabilityRules', () => {
@@ -26,7 +26,7 @@ describe('CanvasCommandAvailabilityRules', () => {
       getCanvasCommandAvailability({
         canRedo: false,
         canUndo: true,
-        config: createCanvasAffordanceConfig({
+        config: createCanvasCommandAvailabilityConfig({
           commands: {
             alignLeft: false,
             delete: false,
@@ -54,7 +54,7 @@ describe('CanvasCommandAvailabilityRules', () => {
       getCanvasCommandAvailability({
         canRedo: true,
         canUndo: false,
-        config: createCanvasAffordanceConfig(),
+        config: createCanvasCommandAvailabilityConfig(),
         hasSelectedGroup: false,
         selection: ['rect-1'],
       }),
@@ -73,7 +73,7 @@ describe('CanvasCommandAvailabilityRules', () => {
   })
 
   it('exposes the same rule table to command action guards', () => {
-    const config = createCanvasAffordanceConfig({
+    const config = createCanvasCommandAvailabilityConfig({
       commands: { delete: false },
     })
 
@@ -114,3 +114,21 @@ describe('CanvasCommandAvailabilityRules', () => {
     ).toBe(false)
   })
 })
+
+function createCanvasCommandAvailabilityConfig({
+  commands = {},
+}: {
+  commands?: Partial<CanvasCommandAvailabilityConfig['commands']>
+} = {}): CanvasCommandAvailabilityConfig {
+  return {
+    commands: {
+      ...Object.fromEntries(
+        Object.keys(CANVAS_COMMAND_AVAILABILITY_RULES).map((commandId) => [
+          commandId,
+          true,
+        ]),
+      ) as CanvasCommandAvailabilityConfig['commands'],
+      ...commands,
+    },
+  }
+}

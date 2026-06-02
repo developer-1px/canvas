@@ -69,6 +69,10 @@ command, and patch-planning grammar that can run through adapters.
 - `CanvasGestureEngine` and `CanvasToolGestureRouting` live in Foundation source
   ownership. They read a structural gesture config contract so Engine
   affordance config remains compatible without becoming a Foundation import.
+- `CanvasCommandSelectionRules`, `CanvasCommandAvailabilityRules`, and generic
+  `CanvasCommandTypes` live in Foundation source ownership. Engine command
+  actions still execute adapters, but their availability guards read Foundation
+  contracts.
 - `CANVAS_STICKY_NOTE_EXTENSION` is the first concrete first-party extension
   descriptor. It names the sticky note creation affordance and adapter slots
   without moving Demo component storage, SVG rendering, or App workflow.

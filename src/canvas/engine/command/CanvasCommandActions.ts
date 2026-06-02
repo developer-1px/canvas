@@ -7,8 +7,8 @@ import {
   type CanvasDistributeMode,
   type CanvasReorderMode,
   type DeleteCanvasCommandResult,
-} from './CanvasCommandTypes'
-import { canUseCanvasCommand } from './CanvasCommandAvailabilityRules'
+} from '../../foundation/CanvasCommandTypes'
+import { canUseCanvasCommand } from '../../foundation/CanvasCommandAvailabilityRules'
 
 export function alignCanvasCommand<TItem extends CanvasCommandItem>({
   adapter,

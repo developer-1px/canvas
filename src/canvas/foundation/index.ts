@@ -35,6 +35,34 @@ export {
   type CanvasExtensionViewportEffect,
 } from './CanvasExtensionContracts'
 export {
+  canUseCanvasCommand,
+  getCanvasCommandAvailability,
+  type CanvasCommandAvailabilityConfig,
+  type CanvasCommandAvailabilityInput,
+  type CanvasCommandUseInput,
+} from './CanvasCommandAvailability'
+export {
+  canAlignCanvasCommandSelection,
+  canDistributeCanvasCommandSelection,
+  canGroupCanvasCommandSelection,
+  getCanvasCommandSelectionState,
+  hasCanvasCommandSelection,
+  type CanvasCommandSelectionState,
+} from './CanvasCommandSelectionRules'
+export {
+  CANVAS_COMMAND_INSERT_OFFSET,
+  type CanvasAlignMode,
+  type CanvasCommandAdapter,
+  type CanvasCommandAvailability,
+  type CanvasCommandItem,
+  type CanvasCommandItemsResult,
+  type CanvasCommandOffset,
+  type CanvasDistributeMode,
+  type CanvasReorderMode,
+  type DeleteCanvasCommandResult,
+  type DuplicateCanvasCommandResult,
+} from './CanvasCommandTypes'
+export {
   CANVAS_STICKY_NOTE_EXTENSION,
   CANVAS_STICKY_NOTE_EXTENSION_ID,
   CANVAS_STICKY_NOTE_RENDERER_SLOT_ID,

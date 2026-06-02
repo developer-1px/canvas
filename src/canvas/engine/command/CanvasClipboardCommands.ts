@@ -5,7 +5,7 @@ import {
   type CanvasCommandItem,
   type CanvasCommandOffset,
   type DuplicateCanvasCommandResult,
-} from './CanvasCommandTypes'
+} from '../../foundation/CanvasCommandTypes'
 
 export function cloneCanvasCommandItems<TItem extends CanvasCommandItem>({
   adapter,

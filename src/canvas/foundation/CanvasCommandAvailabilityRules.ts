@@ -1,13 +1,14 @@
-import type { CanvasCommandId } from '../affordance/CanvasAffordanceTypes'
-import type { CanvasAffordanceConfig } from '../affordance/CanvasAffordances'
 import type { CanvasCommandAvailability } from './CanvasCommandTypes'
 import {
   getCanvasCommandSelectionState,
   type CanvasCommandSelectionState,
 } from './CanvasCommandSelectionRules'
 
-type CanvasAvailableCommandId =
-  keyof CanvasCommandAvailability & CanvasCommandId
+type CanvasAvailableCommandId = keyof CanvasCommandAvailability
+
+export type CanvasCommandAvailabilityConfig = Readonly<{
+  commands: Readonly<Record<CanvasAvailableCommandId, boolean>>
+}>
 
 type CanvasCommandAvailabilityRule =
   | keyof CanvasCommandSelectionState
@@ -35,7 +36,7 @@ type CanvasCommandAvailabilityRuleStateInput = Readonly<{
 export type CanvasCommandAvailabilityInput = Readonly<{
   canRedo: boolean
   canUndo: boolean
-  config: CanvasAffordanceConfig
+  config: CanvasCommandAvailabilityConfig
   hasSelectedGroup: boolean
   selection: readonly string[]
 }>
@@ -44,7 +45,7 @@ export type CanvasCommandUseInput = Readonly<{
   canRedo?: boolean
   canUndo?: boolean
   commandId: CanvasAvailableCommandId
-  config: CanvasAffordanceConfig
+  config: CanvasCommandAvailabilityConfig
   hasSelectedGroup?: boolean
   selection?: readonly string[]
 }>
@@ -129,7 +130,7 @@ function canUseCanvasCommandWithRuleState({
   ruleState,
 }: {
   commandId: CanvasAvailableCommandId
-  config: CanvasAffordanceConfig
+  config: CanvasCommandAvailabilityConfig
   ruleState: CanvasCommandAvailabilityRuleState
 }) {
   const rule = CANVAS_COMMAND_AVAILABILITY_RULES[commandId]
