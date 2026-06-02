@@ -107,6 +107,8 @@ describe('CanvasDemoAssembly', () => {
       .toBe(true)
     expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.gestures.drawHighlight)
       .toBe(true)
+    expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.gestures.drawPath)
+      .toBe(true)
     expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.gestures.eraseDrawing)
       .toBe(true)
     expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.gestures.wheelZoom).toBe(
@@ -127,6 +129,9 @@ describe('CanvasDemoAssembly', () => {
       .toBe(true)
     expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.grid).toBe(false)
     expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.itemOutline)
+      .toBe(true)
+    expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.tools.pen).toBe(true)
+    expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.shortcuts.penTool)
       .toBe(true)
     expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.objectStyleControls)
       .toBe(true)

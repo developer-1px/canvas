@@ -31,6 +31,27 @@ const marker: CanvasItem = {
   opacity: 1,
 }
 
+const path: CanvasItem = {
+  h: 74,
+  id: 'path-1',
+  opacity: 1,
+  segments: [
+    { point: { x: 20, y: 40 }, type: 'move' },
+    {
+      control1: { x: 50, y: 20 },
+      control2: { x: 70, y: 90 },
+      point: { x: 110, y: 60 },
+      type: 'cubic',
+    },
+  ],
+  stroke: '#334155',
+  strokeWidth: 4,
+  type: 'path',
+  w: 94,
+  x: 18,
+  y: 18,
+}
+
 const rect: CanvasItem = {
   fill: '#ffffff',
   h: 80,
@@ -76,6 +97,23 @@ describe('CanvasItemTransformOperations drawing items', () => {
       x: 108,
       y: 93,
       points: [{ x: 110, y: 95 }, { x: 210, y: 115 }],
+    })
+  })
+
+  test('translates path bounds and typed segments together', () => {
+    expect(translateCanvasItems([path], ['path-1'], 10, -5)[0]).toEqual({
+      ...path,
+      segments: [
+        { point: { x: 30, y: 35 }, type: 'move' },
+        {
+          control1: { x: 60, y: 15 },
+          control2: { x: 80, y: 85 },
+          point: { x: 120, y: 55 },
+          type: 'cubic',
+        },
+      ],
+      x: 28,
+      y: 13,
     })
   })
 

@@ -37,6 +37,7 @@ export const CANVAS_TOOL_AFFORDANCE_ORDER = Object.freeze([
   'diamond',
   'text',
   'comment',
+  'pen',
   'marker',
   'highlight',
   'eraser',
@@ -110,6 +111,15 @@ export const CANVAS_TOOL_AFFORDANCES = Object.freeze({
       shortcutId: 'markerTool',
     },
     statusLabel: 'Marker',
+  }),
+  pen: createCanvasToolAffordance({
+    ariaLabel: 'Pen tool',
+    keyboardShortcut: {
+      key: 'p',
+      shiftKey: true,
+      shortcutId: 'penTool',
+    },
+    statusLabel: 'Pen',
   }),
   pan: createCanvasToolAffordance({
     ariaLabel: 'Pan tool',
@@ -286,6 +296,7 @@ export const CANVAS_GESTURE_STATUS_LABELS: Partial<
   'create-shape': 'Drawing',
   'draw-highlight': 'Highlighting',
   'draw-marker': 'Drawing',
+  'draw-path': 'Drawing',
   erase: 'Erasing',
   laser: 'Pointing',
   'arrow-endpoint': 'Connecting',

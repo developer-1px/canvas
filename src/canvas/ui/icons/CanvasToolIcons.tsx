@@ -8,6 +8,7 @@ import {
   MessageSquareText,
   MousePointer2,
   PanelTop,
+  PenLine,
   Pencil,
   Sparkles,
   Square,
@@ -58,6 +59,10 @@ export function HighlighterIcon() {
 
 export function MarkerIcon() {
   return <CanvasIcon icon={Pencil} />
+}
+
+export function PenIcon() {
+  return <CanvasIcon icon={PenLine} />
 }
 
 export function EraserIcon() {

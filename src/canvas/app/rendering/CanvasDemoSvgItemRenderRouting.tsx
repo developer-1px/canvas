@@ -32,6 +32,7 @@ import { renderCanvasDemoSvgStampItem } from './CanvasDemoSvgStampItemRenderer'
 import {
   isCanvasArrowDrawingItem,
   isCanvasEditableTextItem,
+  isCanvasPathDrawingItem,
 } from '../../host'
 
 export type CanvasDemoSvgItemRenderRouteInput = {
@@ -81,6 +82,7 @@ const CANVAS_DEMO_SVG_ITEM_RENDER_STRATEGIES = Object.freeze({
   highlight: renderCanvasDemoSvgDrawingItemRoute,
   image: renderCanvasDemoSvgImageItemRoute,
   marker: renderCanvasDemoSvgDrawingItemRoute,
+  path: renderCanvasDemoSvgDrawingItemRoute,
   rect: renderCanvasDemoSvgRectTextItemRoute,
   shape: renderCanvasDemoSvgRectTextItemRoute,
   stamp: renderCanvasDemoSvgStampItemRoute,
@@ -196,6 +198,9 @@ function renderCanvasDemoSvgDrawingItemRoute({
             onArrowEndpointPointerDown,
           })
         ) : null}
+        {selected && isCanvasPathDrawingItem(item) ? (
+          renderCanvasDemoSvgPathAnchorHandles({ item })
+        ) : null}
       </>
     ),
     onDoubleClick: editable ? () => onTextDoubleClick(item) : undefined,
@@ -232,6 +237,29 @@ function renderCanvasDemoSvgArrowEndpointHandles({
           />
         )
       })}
+    </g>
+  )
+}
+
+function renderCanvasDemoSvgPathAnchorHandles({
+  item,
+}: {
+  item: Extract<CanvasItem, { type: 'path' }>
+}) {
+  return (
+    <g className="path-anchor-handles">
+      {item.segments.map((segment, index) => (
+        <circle
+          key={`${index}:${segment.type}`}
+          className="path-anchor-handle"
+          data-segment-index={index}
+          data-segment-type={segment.type}
+          cx={segment.point.x}
+          cy={segment.point.y}
+          r="4"
+          vectorEffect="non-scaling-stroke"
+        />
+      ))}
     </g>
   )
 }

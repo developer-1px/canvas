@@ -19,6 +19,7 @@ describe('CanvasAffordanceMetadata', () => {
       'diamond',
       'text',
       'comment',
+      'pen',
       'marker',
       'highlight',
       'eraser',
@@ -66,6 +67,11 @@ describe('CanvasAffordanceMetadata', () => {
       shiftInsensitive: true,
       shortcutId: 'laserTool',
     })
+    expect(CANVAS_TOOL_AFFORDANCES.pen.keyboardShortcut).toEqual({
+      key: 'p',
+      shiftKey: true,
+      shortcutId: 'penTool',
+    })
     expect(CANVAS_TOOL_AFFORDANCES.sticky.keyboardShortcut).toEqual({
       key: 's',
       shortcutId: 'stickyTool',
@@ -90,6 +96,7 @@ describe('CanvasAffordanceMetadata', () => {
     expect(CANVAS_TOOL_AFFORDANCES.select.shortcut).toBe('V')
     expect(CANVAS_TOOL_AFFORDANCES.eraser.shortcut).toBe('E')
     expect(CANVAS_TOOL_AFFORDANCES.laser.shortcut).toBe('P')
+    expect(CANVAS_TOOL_AFFORDANCES.pen.shortcut).toBe('Shift+P')
     expect(CANVAS_TOOL_AFFORDANCES.ellipse.shortcut).toBe('O')
     expect(CANVAS_TOOL_AFFORDANCES.select.title).toBe('Select (V)')
   })

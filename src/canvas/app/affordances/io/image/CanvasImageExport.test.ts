@@ -38,6 +38,27 @@ const commentItem: CanvasItem = {
   y: 30,
 }
 
+const pathItem: CanvasItem = {
+  h: 74,
+  id: 'path-1',
+  opacity: 1,
+  segments: [
+    { point: { x: 20, y: 40 }, type: 'move' },
+    {
+      control1: { x: 50, y: 20 },
+      control2: { x: 70, y: 90 },
+      point: { x: 110, y: 60 },
+      type: 'cubic',
+    },
+  ],
+  stroke: '#334155',
+  strokeWidth: 4,
+  type: 'path',
+  w: 94,
+  x: 18,
+  y: 18,
+}
+
 describe('CanvasImageExport', () => {
   it('serializes selected image items into a downloadable SVG payload', () => {
     const payload = createCanvasItemsImageExport({
@@ -146,6 +167,19 @@ describe('CanvasImageExport', () => {
     expect(payload.svg).toContain('<path')
     expect(payload.svg).toContain('#2563eb')
     expect(payload.svg).toContain('rx="10"')
+  })
+
+  it('serializes selected path items in the data-rendered fallback', () => {
+    const payload = createCanvasItemsImageExport({
+      bounds: { h: 74, w: 94, x: 18, y: 18 },
+      items: [pathItem],
+    })
+
+    expect(payload.svg).toContain(
+      'd="M 20 40 C 50 20 70 90 110 60"',
+    )
+    expect(payload.svg).toContain('stroke="#334155"')
+    expect(payload.svg).toContain('fill="none"')
   })
 
   it('does not export without a concrete selection', () => {

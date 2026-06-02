@@ -5,6 +5,7 @@ import {
   createCanvasSvgArrowPathData,
   createCanvasSvgFreehandPathData,
   createCanvasSvgPathData,
+  createCanvasSvgPathSegmentData,
 } from './CanvasSvgDrawingPrimitives'
 
 describe('CanvasSvgDrawingPrimitives', () => {
@@ -47,5 +48,18 @@ describe('CanvasSvgDrawingPrimitives', () => {
       routing: 'elbow',
       start: { x: 10, y: 20 },
     })).toBe('M 10 20 L 50 20 L 50 60 L 90 60')
+  })
+
+  it('creates path data from typed vector path segments', () => {
+    expect(createCanvasSvgPathSegmentData([
+      { point: { x: 10, y: 20 }, type: 'move' },
+      { point: { x: 30, y: 40 }, type: 'line' },
+      {
+        control1: { x: 40, y: 10 },
+        control2: { x: 70, y: 60 },
+        point: { x: 90, y: 30 },
+        type: 'cubic',
+      },
+    ])).toBe('M 10 20 L 30 40 C 40 10 70 60 90 30')
   })
 })

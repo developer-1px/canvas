@@ -26,6 +26,7 @@ export type CanvasPointerComponentCreationKind =
 export const CANVAS_POINTER_DRAWING_CREATION_KINDS = Object.freeze([
   'draw-highlight',
   'draw-marker',
+  'draw-path',
 ] as const satisfies readonly CanvasPointerGesture[])
 
 export type CanvasPointerDrawingCreationKind =

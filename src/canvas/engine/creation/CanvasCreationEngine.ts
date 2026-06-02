@@ -2,7 +2,10 @@ import type {
   Bounds,
   Point
 } from '../../core'
-import type { CanvasShapeKind } from '../../entities'
+import type {
+  CanvasPathSegment,
+  CanvasShapeKind,
+} from '../../entities'
 import {
   normalizeBounds,
   pointDistance,
@@ -27,6 +30,8 @@ export type CanvasCreatedDrawingStyle = Readonly<{
   strokeWidth: number
 }>
 
+export type CanvasCreatedPathSegment = CanvasPathSegment
+
 export type CanvasCreationAdapter<TItem extends CanvasCreationItem> = {
   createArrow: (input: {
     end: Point
@@ -44,6 +49,11 @@ export type CanvasCreationAdapter<TItem extends CanvasCreationItem> = {
   createMarker: (input: {
     id: string
     points: Point[]
+    style?: CanvasCreatedDrawingStyle
+  }) => TItem
+  createPath?: (input: {
+    id: string
+    segments: CanvasCreatedPathSegment[]
     style?: CanvasCreatedDrawingStyle
   }) => TItem
   createShape?: (input: {
@@ -110,6 +120,49 @@ export function getCanvasCreatedDrawingPoints({
     {
       x: startWorld.x + DEFAULT_DRAWING_OFFSET.x,
       y: startWorld.y + DEFAULT_DRAWING_OFFSET.y,
+    },
+  ]
+}
+
+export function getCanvasCreatedPathSegments({
+  points,
+  startWorld,
+}: {
+  points: Point[]
+  startWorld: Point
+}): CanvasCreatedPathSegment[] {
+  const pathPoints = points.length > 1
+    ? points
+    : [
+        startWorld,
+        { x: startWorld.x + 48, y: startWorld.y - 32 },
+        { x: startWorld.x + 104, y: startWorld.y + 32 },
+        { x: startWorld.x + 152, y: startWorld.y },
+      ]
+  const [start, second] = pathPoints
+
+  if (!start || !second) {
+    return []
+  }
+
+  if (pathPoints.length < 3) {
+    return [
+      { point: start, type: 'move' },
+      { point: second, type: 'line' },
+    ]
+  }
+
+  const end = pathPoints[pathPoints.length - 1]
+  const control1 = pathPoints[Math.floor((pathPoints.length - 1) / 3)]
+  const control2 = pathPoints[Math.floor((pathPoints.length - 1) * 2 / 3)]
+
+  return [
+    { point: start, type: 'move' },
+    {
+      control1,
+      control2,
+      point: end,
+      type: 'cubic',
     },
   ]
 }
@@ -213,6 +266,30 @@ export function createCanvasMarker<TItem extends CanvasCreationItem>({
   return adapter.createMarker({
     id: createId('marker'),
     points: getCanvasCreatedDrawingPoints({ points, startWorld }),
+    style,
+  })
+}
+
+export function createCanvasPath<TItem extends CanvasCreationItem>({
+  adapter,
+  createId,
+  points,
+  startWorld,
+  style,
+}: {
+  adapter: CanvasCreationAdapter<TItem>
+  createId: (prefix: string) => string
+  points: Point[]
+  startWorld: Point
+  style?: CanvasCreatedDrawingStyle
+}) {
+  if (!adapter.createPath) {
+    throw new Error('Canvas creation adapter requires createPath')
+  }
+
+  return adapter.createPath({
+    id: createId('path'),
+    segments: getCanvasCreatedPathSegments({ points, startWorld }),
     style,
   })
 }

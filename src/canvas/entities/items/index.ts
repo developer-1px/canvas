@@ -25,9 +25,14 @@ export type {
   CanvasStampKind,
 } from './CanvasStampItems'
 export type {
+  CanvasPathCubicSegment,
+  CanvasPathLineSegment,
+  CanvasPathMoveSegment,
+  CanvasPathSegment,
   CanvasDrawingItemBase,
   HighlightItem,
   MarkerItem,
+  PathItem,
 } from './CanvasDrawingItems'
 export type {
   ArrowItem,

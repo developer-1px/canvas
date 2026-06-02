@@ -84,7 +84,7 @@ repo: ✅ 보유 · ⚠️ 부분 · ❌ 갭. (repo 보유 근거: `CanvasAfford
 | Connector/arrow | 필수(whiteboard) | ✅ | `arrow` + 스냅 attach + elbow/straight |
 | Frame/Section | 보편 | ✅ | `section` |
 | **Line (arrow와 별개)** | 보편 | ✅ | arrow의 `arrowhead` 토글(end/none)로 plain line 제공 (#41). 별도 tool 대신 arrow item 재사용 — tool-union cascade 회피 |
-| **Vector pen (bezier path)** | 보편 | ❌ | Figma pen, tldraw/Excalidraw — 없음 (freehand만) |
+| **Vector pen (bezier path)** | 보편 | ✅ | `pen` tool + typed `path` item segments. SVG path data는 renderer가 파생 |
 | Table / Kanban / Link / Checklist | 선택(제품) | ✅ | custom component로 보유(제품-domain) |
 | Stamp | 선택 | ✅ | reaction stamp |
 

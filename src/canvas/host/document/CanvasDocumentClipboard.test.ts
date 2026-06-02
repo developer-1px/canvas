@@ -139,4 +139,61 @@ describe('CanvasDocument clipboard commits', () => {
     expect(getCanvasDocumentSelectionIds(document)).toEqual(['component-card'])
   })
 
+
+  test('copies and pastes path items through validated document patches', () => {
+    const pathItem: CanvasItem = {
+      h: 74,
+      id: 'path-1',
+      opacity: 1,
+      segments: [
+        { point: { x: 20, y: 40 }, type: 'move' },
+        {
+          control1: { x: 50, y: 20 },
+          control2: { x: 70, y: 90 },
+          point: { x: 110, y: 60 },
+          type: 'cubic',
+        },
+      ],
+      stroke: '#334155',
+      strokeWidth: 4,
+      type: 'path',
+      w: 94,
+      x: 18,
+      y: 18,
+    }
+    const document = createCanvasItemsDocument([pathItem])
+
+    expect(copyCanvasDocumentSelectionToClipboard(document, ['path-1']))
+      .toBe(true)
+
+    const clones = cloneCanvasItemsWithNewIds(
+      readCanvasDocumentClipboardItems(document),
+      (prefix) => `${prefix}-pasted`,
+      { x: 28, y: 28 },
+    )
+
+    expect(commitCanvasItemsPatch({
+      document,
+      patch: createAddCanvasItemsPatch(clones),
+      selection: {
+        before: ['path-1'],
+        after: clones.map((item) => item.id),
+      },
+    })).toBe(true)
+    expect(document.value.at(-1)).toMatchObject({
+      id: 'path-pasted',
+      segments: [
+        { point: { x: 48, y: 68 }, type: 'move' },
+        {
+          control1: { x: 78, y: 48 },
+          control2: { x: 98, y: 118 },
+          point: { x: 138, y: 88 },
+          type: 'cubic',
+        },
+      ],
+      type: 'path',
+    })
+    expect(getCanvasDocumentSelectionIds(document)).toEqual(['path-pasted'])
+  })
+
 })

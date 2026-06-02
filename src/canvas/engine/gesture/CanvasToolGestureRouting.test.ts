@@ -27,6 +27,10 @@ describe('CanvasToolGestureRouting', () => {
       gesture: 'draw-highlight',
       routeItemPointerToCanvasGesture: true,
     })
+    expect(CANVAS_TOOL_GESTURE_ROUTES.pen).toMatchObject({
+      gesture: 'draw-path',
+      routeItemPointerToCanvasGesture: true,
+    })
     expect(CANVAS_TOOL_GESTURE_ROUTES.eraser).toMatchObject({
       gesture: 'erase',
       routeItemPointerToCanvasGesture: true,
@@ -66,6 +70,9 @@ describe('CanvasToolGestureRouting', () => {
     expect(getCanvasToolPointerGesture({ config, tool: 'highlight' })).toBe(
       'draw-highlight',
     )
+    expect(getCanvasToolPointerGesture({ config, tool: 'pen' })).toBe(
+      'draw-path',
+    )
     expect(getCanvasToolPointerGesture({ config, tool: 'eraser' })).toBe(
       'erase',
     )
@@ -99,6 +106,7 @@ describe('CanvasToolGestureRouting', () => {
         createText: false,
         drawHighlight: false,
         drawMarker: false,
+        drawPath: false,
         eraseDrawing: false,
         laserPointer: false,
       },
@@ -111,6 +119,8 @@ describe('CanvasToolGestureRouting', () => {
     expect(getCanvasToolPointerGesture({ config: disabled, tool: 'diamond' }))
       .toBeNull()
     expect(getCanvasToolPointerGesture({ config: disabled, tool: 'marker' }))
+      .toBeNull()
+    expect(getCanvasToolPointerGesture({ config: disabled, tool: 'pen' }))
       .toBeNull()
     expect(getCanvasToolPointerGesture({ config: disabled, tool: 'eraser' }))
       .toBeNull()

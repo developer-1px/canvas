@@ -5,6 +5,7 @@ import {
 import {
   type CanvasDrawingItem,
 } from './CanvasDrawingItemGeometry'
+import type { CanvasPathSegment } from '../model'
 import { isCanvasArrowRouting } from './CanvasArrowRouting'
 import {
   isOptionalCanvasItemFontSize,
@@ -19,6 +20,7 @@ export function isCanvasDrawingItemStorageShape(
 ): value is CanvasDrawingItem {
   return (
     isCanvasStrokeDrawingItemStorageShape(value) ||
+    isCanvasPathDrawingItemStorageShape(value) ||
     isCanvasArrowDrawingItemStorageShape(value)
   )
 }
@@ -53,6 +55,19 @@ function isCanvasArrowDrawingItemStorageShape(
     isStrokeWidth(value.strokeWidth) &&
     (value.text === undefined || typeof value.text === 'string') &&
     isOptionalCanvasItemTextAlign(value.textAlign)
+  )
+}
+
+function isCanvasPathDrawingItemStorageShape(
+  value: Record<string, unknown>,
+) {
+  return (
+    value.type === 'path' &&
+    isDrawingPathSegmentArray(value.segments) &&
+    typeof value.stroke === 'string' &&
+    isStrokeWidth(value.strokeWidth) &&
+    isOpacity(value.opacity) &&
+    (value.fill === undefined || typeof value.fill === 'string')
   )
 }
 
@@ -99,6 +114,86 @@ function isPointArray(value: unknown): value is Point[] {
 
 function isDrawingPointArray(value: unknown): value is Point[] {
   return isPointArray(value) && value.length >= 2
+}
+
+function isDrawingPathSegmentArray(
+  value: unknown,
+): value is CanvasPathSegment[] {
+  if (!Array.isArray(value) || value.length < 2) {
+    return false
+  }
+
+  const [first] = value
+
+  return (
+    isCanvasPathMoveSegment(first) &&
+    value.every(isCanvasPathSegment) &&
+    hasVisiblePathGeometry(value)
+  )
+}
+
+function isCanvasPathSegment(value: unknown): value is CanvasPathSegment {
+  return (
+    isCanvasPathMoveSegment(value) ||
+    isCanvasPathLineSegment(value) ||
+    isCanvasPathCubicSegment(value)
+  )
+}
+
+function isCanvasPathMoveSegment(
+  value: unknown,
+): value is Extract<CanvasPathSegment, { type: 'move' }> {
+  return (
+    isRecord(value) &&
+    value.type === 'move' &&
+    isPoint(value.point)
+  )
+}
+
+function isCanvasPathLineSegment(
+  value: unknown,
+): value is Extract<CanvasPathSegment, { type: 'line' }> {
+  return (
+    isRecord(value) &&
+    value.type === 'line' &&
+    isPoint(value.point)
+  )
+}
+
+function isCanvasPathCubicSegment(
+  value: unknown,
+): value is Extract<CanvasPathSegment, { type: 'cubic' }> {
+  return (
+    isRecord(value) &&
+    value.type === 'cubic' &&
+    isPoint(value.control1) &&
+    isPoint(value.control2) &&
+    isPoint(value.point)
+  )
+}
+
+function hasVisiblePathGeometry(
+  segments: readonly CanvasPathSegment[],
+) {
+  const [first] = segments
+
+  if (!isCanvasPathMoveSegment(first)) {
+    return false
+  }
+
+  return segments.slice(1).some((segment) => {
+    if (!isCanvasPathSegment(segment)) {
+      return false
+    }
+
+    if (!isSamePoint(segment.point, first.point)) {
+      return true
+    }
+
+    return segment.type === 'cubic' &&
+      (!isSamePoint(segment.control1, first.point) ||
+        !isSamePoint(segment.control2, first.point))
+  })
 }
 
 function isSamePoint(left: Point, right: Point) {

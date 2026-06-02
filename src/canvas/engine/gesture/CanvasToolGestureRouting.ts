@@ -25,6 +25,7 @@ export type CanvasPointerGesture =
   | 'create-text'
   | 'draw-highlight'
   | 'draw-marker'
+  | 'draw-path'
   | 'erase'
   | 'laser'
   | 'marquee'
@@ -71,6 +72,10 @@ export const CANVAS_TOOL_GESTURE_ROUTES = Object.freeze({
   marker: createCanvasToolGestureRoute({
     gesture: 'draw-marker',
     isEnabled: (config) => config.gestures.drawMarker,
+  }),
+  pen: createCanvasToolGestureRoute({
+    gesture: 'draw-path',
+    isEnabled: (config) => config.gestures.drawPath,
   }),
   eraser: createCanvasToolGestureRoute({
     gesture: 'erase',

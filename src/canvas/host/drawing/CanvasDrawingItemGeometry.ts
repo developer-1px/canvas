@@ -9,6 +9,7 @@ import type {
   CanvasItem,
   HighlightItem,
   MarkerItem,
+  PathItem,
 } from '../model'
 import {
   getCanvasArrowLabelBounds,
@@ -21,7 +22,11 @@ export {
 } from './CanvasArrowLabelGeometry'
 
 export type CanvasStrokeDrawingItem = MarkerItem | HighlightItem
-export type CanvasDrawingItem = CanvasStrokeDrawingItem | ArrowItem
+export type CanvasPathDrawingItem = PathItem
+export type CanvasDrawingItem =
+  | CanvasStrokeDrawingItem
+  | CanvasPathDrawingItem
+  | ArrowItem
 
 export function isCanvasStrokeDrawingItem(
   item: CanvasItem,
@@ -35,10 +40,20 @@ export function isCanvasArrowDrawingItem(
   return item.type === 'arrow'
 }
 
+export function isCanvasPathDrawingItem(
+  item: CanvasItem,
+): item is CanvasPathDrawingItem {
+  return item.type === 'path'
+}
+
 export function isCanvasDrawingItem(
   item: CanvasItem,
 ): item is CanvasDrawingItem {
-  return isCanvasStrokeDrawingItem(item) || isCanvasArrowDrawingItem(item)
+  return (
+    isCanvasStrokeDrawingItem(item) ||
+    isCanvasPathDrawingItem(item) ||
+    isCanvasArrowDrawingItem(item)
+  )
 }
 
 export function getCanvasDrawingItemBounds(
@@ -46,7 +61,9 @@ export function getCanvasDrawingItemBounds(
 ): Bounds {
   return isCanvasStrokeDrawingItem(item)
     ? getCanvasStrokeDrawingItemBounds(item)
-    : getCanvasArrowDrawingItemBounds(item)
+    : isCanvasPathDrawingItem(item)
+      ? getCanvasPathDrawingItemBounds(item)
+      : getCanvasArrowDrawingItemBounds(item)
 }
 
 export function syncCanvasDrawingItemBounds<TItem extends CanvasDrawingItem>(
@@ -73,11 +90,17 @@ export function translateCanvasDrawingItem<TItem extends CanvasDrawingItem>({
           ...item,
           points: item.points.map((point) => translatePoint(point, dx, dy)),
         }
-      : {
-          ...item,
-          end: translatePoint(item.end, dx, dy),
-          start: translatePoint(item.start, dx, dy),
-        },
+      : isCanvasPathDrawingItem(item)
+        ? {
+            ...item,
+            segments: item.segments.map((segment) =>
+              translateCanvasPathSegment(segment, dx, dy)),
+          }
+        : {
+            ...item,
+            end: translatePoint(item.end, dx, dy),
+            start: translatePoint(item.start, dx, dy),
+          },
   ) as TItem
 }
 
@@ -136,6 +159,22 @@ export function scaleCanvasDrawingItem<TItem extends CanvasDrawingItem>({
     }) as TItem
   }
 
+  if (isCanvasPathDrawingItem(item)) {
+    const sourcePathBounds = getPointBounds(
+      getCanvasPathSegmentPoints(item.segments),
+    )
+
+    return syncCanvasDrawingItemBounds({
+      ...item,
+      segments: item.segments.map((segment) =>
+        scaleCanvasPathSegment(
+          segment,
+          sourcePathBounds,
+          insetBounds(targetBounds, item.strokeWidth / 2),
+        )),
+    }) as TItem
+  }
+
   const sourceGeometryBounds = normalizeBounds(item.start, item.end)
   const targetGeometryBounds = insetBounds(
     targetBounds,
@@ -153,6 +192,15 @@ function getCanvasStrokeDrawingItemBounds(
   item: CanvasStrokeDrawingItem,
 ) {
   return padBounds(getPointBounds(item.points), item.strokeWidth / 2)
+}
+
+function getCanvasPathDrawingItemBounds(
+  item: CanvasPathDrawingItem,
+) {
+  return padBounds(
+    getPointBounds(getCanvasPathSegmentPoints(item.segments)),
+    item.strokeWidth / 2,
+  )
 }
 
 function getCanvasArrowDrawingItemBounds(item: ArrowItem) {
@@ -195,6 +243,26 @@ function translatePoint(point: Point, dx: number, dy: number): Point {
   }
 }
 
+function translateCanvasPathSegment(
+  segment: PathItem['segments'][number],
+  dx: number,
+  dy: number,
+): PathItem['segments'][number] {
+  if (segment.type === 'cubic') {
+    return {
+      ...segment,
+      control1: translatePoint(segment.control1, dx, dy),
+      control2: translatePoint(segment.control2, dx, dy),
+      point: translatePoint(segment.point, dx, dy),
+    }
+  }
+
+  return {
+    ...segment,
+    point: translatePoint(segment.point, dx, dy),
+  }
+}
+
 function scalePoint(point: Point, from: Bounds, to: Bounds): Point {
   const scaleX = to.w / from.w
   const scaleY = to.h / from.h
@@ -209,6 +277,26 @@ function scalePoint(point: Point, from: Bounds, to: Bounds): Point {
   }
 }
 
+function scaleCanvasPathSegment(
+  segment: PathItem['segments'][number],
+  from: Bounds,
+  to: Bounds,
+): PathItem['segments'][number] {
+  if (segment.type === 'cubic') {
+    return {
+      ...segment,
+      control1: scalePoint(segment.control1, from, to),
+      control2: scalePoint(segment.control2, from, to),
+      point: scalePoint(segment.point, from, to),
+    }
+  }
+
+  return {
+    ...segment,
+    point: scalePoint(segment.point, from, to),
+  }
+}
+
 function scalePointsToBounds({
   from,
   points,
@@ -219,6 +307,16 @@ function scalePointsToBounds({
   to: Bounds
 }) {
   return points.map((point) => scalePoint(point, from, to))
+}
+
+function getCanvasPathSegmentPoints(
+  segments: readonly PathItem['segments'][number][],
+) {
+  return segments.flatMap((segment) =>
+    segment.type === 'cubic'
+      ? [segment.control1, segment.control2, segment.point]
+      : [segment.point],
+  )
 }
 
 function padBounds(bounds: Bounds, pad: number): Bounds {

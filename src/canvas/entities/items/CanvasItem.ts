@@ -5,6 +5,7 @@ import type { CanvasCustomItem } from './CanvasCustomItems'
 import type {
   HighlightItem,
   MarkerItem,
+  PathItem,
 } from './CanvasDrawingItems'
 import type { GroupItem } from './CanvasGroupItems'
 import type { CanvasImageItem } from './CanvasImageItems'
@@ -24,6 +25,7 @@ export type CanvasItem =
   | CanvasStampItem
   | MarkerItem
   | HighlightItem
+  | PathItem
   | ArrowItem
   | GroupItem
   | CanvasComponentItem

@@ -5,14 +5,17 @@ import type {
 import {
   getCanvasArrowLabelBounds,
   isCanvasArrowDrawingItem,
+  isCanvasPathDrawingItem,
   type ArrowItem,
   type CanvasDrawingItem,
+  type CanvasPathDrawingItem,
   type CanvasStrokeDrawingItem,
 } from '../../host'
 import {
   CANVAS_SVG_ARROW_MARKER_IRI,
   createCanvasSvgArrowPathData,
   createCanvasSvgFreehandPathData,
+  createCanvasSvgPathSegmentData,
 } from '../../renderer'
 
 type CanvasDemoSvgDrawingItemRenderStrategy<TItem extends CanvasDrawingItem> = {
@@ -26,8 +29,12 @@ export const CANVAS_DEMO_SVG_DRAWING_ITEM_RENDER_STRATEGIES = {
   stroke: {
     render: renderCanvasDemoSvgStrokeDrawingItem,
   },
+  path: {
+    render: renderCanvasDemoSvgPathDrawingItem,
+  },
 } satisfies {
   arrow: CanvasDemoSvgDrawingItemRenderStrategy<ArrowItem>
+  path: CanvasDemoSvgDrawingItemRenderStrategy<CanvasPathDrawingItem>
   stroke: CanvasDemoSvgDrawingItemRenderStrategy<CanvasStrokeDrawingItem>
 }
 
@@ -38,6 +45,8 @@ export function renderCanvasDemoSvgDrawingItemByRoute({
 }) {
   return isCanvasArrowDrawingItem(item)
     ? CANVAS_DEMO_SVG_DRAWING_ITEM_RENDER_STRATEGIES.arrow.render({ item })
+    : isCanvasPathDrawingItem(item)
+      ? CANVAS_DEMO_SVG_DRAWING_ITEM_RENDER_STRATEGIES.path.render({ item })
     : CANVAS_DEMO_SVG_DRAWING_ITEM_RENDER_STRATEGIES.stroke.render({ item })
 }
 
@@ -140,6 +149,33 @@ function renderCanvasDemoSvgStrokeDrawingItem({
       <path
         className={`${item.type}-item`}
         d={pathData}
+        opacity={item.opacity}
+        stroke={item.stroke}
+        strokeWidth={item.strokeWidth}
+        vectorEffect="non-scaling-stroke"
+      />
+    </>
+  )
+}
+
+function renderCanvasDemoSvgPathDrawingItem({
+  item,
+}: {
+  item: CanvasPathDrawingItem
+}) {
+  const pathData = createCanvasSvgPathSegmentData(item.segments)
+
+  return (
+    <>
+      <path
+        className="path-hit"
+        d={pathData}
+        vectorEffect="non-scaling-stroke"
+      />
+      <path
+        className="path-item"
+        d={pathData}
+        fill={item.fill ?? 'none'}
         opacity={item.opacity}
         stroke={item.stroke}
         strokeWidth={item.strokeWidth}

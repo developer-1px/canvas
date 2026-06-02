@@ -39,6 +39,15 @@ describe('CanvasGestureEngine drawing tools', () => {
         config,
         input: baseInput,
         spaceDown: false,
+        tool: 'pen',
+      }),
+    ).toBe('draw-path')
+
+    expect(
+      getCanvasPointerGesture({
+        config,
+        input: baseInput,
+        spaceDown: false,
         tool: 'eraser',
       }),
     ).toBe('erase')
@@ -118,6 +127,7 @@ describe('CanvasGestureEngine drawing tools', () => {
         createSticky: false,
         drawHighlight: false,
         drawMarker: false,
+        drawPath: false,
         eraseDrawing: false,
         laserPointer: false,
       },
@@ -138,6 +148,15 @@ describe('CanvasGestureEngine drawing tools', () => {
         input: baseInput,
         spaceDown: false,
         tool: 'highlight',
+      }),
+    ).toBe('marquee')
+
+    expect(
+      getCanvasPointerGesture({
+        config: disabled,
+        input: baseInput,
+        spaceDown: false,
+        tool: 'pen',
       }),
     ).toBe('marquee')
 
@@ -245,6 +264,12 @@ describe('CanvasGestureEngine drawing tools', () => {
       shouldRouteCanvasItemPointerToCanvasGesture({
         spaceDown: false,
         tool: 'highlight',
+      }),
+    ).toBe(true)
+    expect(
+      shouldRouteCanvasItemPointerToCanvasGesture({
+        spaceDown: false,
+        tool: 'pen',
       }),
     ).toBe(true)
     expect(

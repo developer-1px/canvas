@@ -19,6 +19,7 @@ describe('CanvasPointerCreationGrammar', () => {
       'create-text',
       'draw-highlight',
       'draw-marker',
+      'draw-path',
     ]
     const nonCreationGestures: CanvasPointerGesture[] = [
       'marquee',
@@ -57,6 +58,16 @@ describe('CanvasPointerCreationGrammar', () => {
         pointerId: 1,
         points: [{ x: 0, y: 0 }],
         style: getCanvasDrawingStrokeStyle('marker'),
+        startScreen: { x: 0, y: 0 },
+        startWorld: { x: 0, y: 0 },
+      },
+      {
+        currentWorld: { x: 0, y: 0 },
+        kind: 'draw-path',
+        moved: false,
+        pointerId: 1,
+        points: [{ x: 0, y: 0 }],
+        style: getCanvasDrawingStrokeStyle('path'),
         startScreen: { x: 0, y: 0 },
         startWorld: { x: 0, y: 0 },
       },

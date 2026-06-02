@@ -113,11 +113,23 @@ function getCanvasDrawingToolKind(tool: Tool): CanvasDrawingStrokeKind | null {
     return 'highlight'
   }
 
+  if (tool === 'pen') {
+    return 'path'
+  }
+
   return null
 }
 
 function getCanvasDrawingToolLabel(kind: CanvasDrawingStrokeKind) {
-  return kind === 'marker' ? 'Marker' : 'Highlighter'
+  if (kind === 'marker') {
+    return 'Marker'
+  }
+
+  if (kind === 'path') {
+    return 'Pen'
+  }
+
+  return 'Highlighter'
 }
 
 function clampCanvasDrawingOpacity(opacity: number) {
