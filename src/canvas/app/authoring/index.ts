@@ -146,6 +146,10 @@ export type {
   CanvasAppFoundationExtension,
 } from '../extensions/CanvasAppFoundationExtensionDescriptors'
 export {
+  getCanvasAppFoundationExtensionCommands,
+  type CanvasAppFoundationExtensionCommand,
+} from '../extensions/CanvasAppFoundationExtensionCommands'
+export {
   getCanvasAppFoundationExtensionTools,
   type CanvasAppFoundationExtensionTool,
 } from '../extensions/CanvasAppFoundationExtensionTools'
