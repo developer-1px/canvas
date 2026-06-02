@@ -71,8 +71,9 @@ export {
   shouldRouteCanvasItemPointerToCanvasGesture,
   type CanvasItemPointerIntent,
   type CanvasPointerGesture,
+  type CanvasPointerGestureConfig,
   type CanvasPointerInput,
-} from './gesture/CanvasGestureEngine'
+} from '../foundation/CanvasGestureEngine'
 export {
   createCanvasOverlayState,
   type CanvasDraftArrowOverlay,

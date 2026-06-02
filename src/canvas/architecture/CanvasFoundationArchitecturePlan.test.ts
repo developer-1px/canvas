@@ -24,6 +24,7 @@ describe('Canvas foundation architecture plan', () => {
     expect(foundationAdr).toContain('ADR 0002')
     expect(foundationAdr).toContain('zod-crud')
     expect(foundationAdr).toContain('must not import Host, App, UI, Renderer')
+    expect(foundationAdr).toContain('or Engine')
     expect(foundationAdr).toContain('Demo `CanvasItem`')
     expect(foundationAdr).toContain('Issue #69')
   })
@@ -33,8 +34,10 @@ describe('Canvas foundation architecture plan', () => {
       '`src/canvas/foundation` | Foundation public facade',
       '`src/canvas/foundation/CanvasExtensionContracts.ts` | Foundation',
       '`src/canvas/foundation/CanvasFirstPartyExtensions.ts` | First-party extension',
+      '`src/canvas/foundation/CanvasGestureEngine.ts` | Foundation',
       '`src/canvas/foundation/CanvasSceneAdapter.ts` | Foundation',
       '`src/canvas/foundation/CanvasSelectionEngine.ts` | Foundation',
+      '`src/canvas/foundation/CanvasToolGestureRouting.ts` | Foundation',
       '`src/canvas/foundation/CanvasTransformEngine.ts` | Foundation',
       '`src/canvas/core` | Foundation',
       '`src/canvas/engine` | Engine public facade',

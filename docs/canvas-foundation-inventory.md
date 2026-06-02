@@ -22,12 +22,14 @@ product/app meaning last.
 | `src/canvas/foundation` | Foundation public facade | tracer bullet added | Re-exports headless core, scene, selection, and transform contracts through a named public subpath. |
 | `src/canvas/foundation/CanvasExtensionContracts.ts` | Foundation | tracer bullet added | Defines reusable extension descriptor, adapter slot, command planner, renderer slot, and generic effect contracts without app or host ownership. |
 | `src/canvas/foundation/CanvasFirstPartyExtensions.ts` | First-party extension | tracer bullet added | Holds the first concrete first-party extension descriptor without Host/App/UI/Renderer imports. |
+| `src/canvas/foundation/CanvasGestureEngine.ts` | Foundation | promoted | Owns pointer input to gesture classification over a structural gesture config contract. |
 | `src/canvas/foundation/CanvasSceneAdapter.ts` | Foundation | promoted | Owns scene entries, parent/path/bounds read contracts, and scene-derived bounds without Demo item variants. |
 | `src/canvas/foundation/CanvasSelectionEngine.ts` | Foundation | promoted | Owns pointer click and marquee selection policy over `CanvasSceneAdapter`. |
+| `src/canvas/foundation/CanvasToolGestureRouting.ts` | Foundation | promoted | Owns built-in and custom tool gesture route descriptors without importing Engine affordance config. |
 | `src/canvas/foundation/CanvasTransformEngine.ts` | Foundation | promoted | Owns move/resize planner contracts over a generic transform adapter. |
 | `src/canvas/core` | Foundation | already close | Headless geometry, viewport, stable id, and primitive types. |
-| `src/canvas/engine` | Engine public facade | compatibility | Re-exports promoted foundation scene, selection, and transform contracts while retaining existing engine imports. |
-| `src/canvas/engine/gesture` | Foundation | candidate | Gesture classification is host-independent but still tied to current built-in tool grammar. |
+| `src/canvas/engine` | Engine public facade | compatibility | Re-exports promoted foundation scene, selection, transform, and gesture contracts while retaining existing engine imports. |
+| `src/canvas/engine/gesture` | Engine public facade | retired | Gesture source moved to Foundation; Engine keeps compatibility exports from the public facade. |
 | `src/canvas/engine/command` | Foundation or first-party extension | split needed | Availability and selection rules are generic; built-in whiteboard commands may become extension descriptors. |
 | `src/canvas/engine/snap` | Foundation or first-party extension | split needed | Grid and geometry primitives are generic; guide policy may stay extension-owned. |
 | `src/canvas/host/read` | Host adapter | keep | Converts Demo `CanvasItem` trees into scene/read contracts. |
@@ -48,6 +50,7 @@ product/app meaning last.
 3. Promote transform planner contracts behind generic adapters. Done in issue #73.
 4. Define an extension descriptor shape for reusable affordance bundles. Done in issue #70.
 5. Move one low-risk first-party affordance into the extension shape. Done in issue #75.
+6. Promote gesture routing contracts behind structural config adapters. Done in issue #77.
 
 ## Extension Shape
 
@@ -73,8 +76,9 @@ component templates, item schemas, SVG rendering, or app workflow.
 
 ## Guardrails
 
-- Foundation candidates must not import `src/canvas/host`, `src/canvas/app`,
-  `src/canvas/renderer`, or `src/canvas/ui` implementation modules.
+- Foundation candidates must not import `src/canvas/engine`, `src/canvas/host`,
+  `src/canvas/app`, `src/canvas/renderer`, or `src/canvas/ui` implementation
+  modules.
 - Foundation contracts must not mention Demo `CanvasItem`, `RectItem`,
   `CanvasComponentItem`, or component library constants.
 - zod-crud imports stay inside Host document adapters unless an explicit

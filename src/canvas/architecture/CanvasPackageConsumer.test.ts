@@ -292,6 +292,25 @@ describe('Canvas package consumer imports', () => {
     expect(CanvasFoundationFromPackage.CANVAS_STICKY_NOTE_EXTENSION).toBe(
       CanvasFoundation.CANVAS_STICKY_NOTE_EXTENSION,
     )
+    const pointerGestureInput = {
+      altKey: false,
+      button: 0,
+      ctrlKey: false,
+      metaKey: false,
+      shiftKey: false,
+    }
+    expect(CanvasFoundation.getCanvasPointerGesture({
+      config: affordanceConfig,
+      input: pointerGestureInput,
+      spaceDown: false,
+      tool: 'sticky',
+    })).toBe('create-sticky')
+    expect(CanvasEngine.getCanvasPointerGesture({
+      config: affordanceConfig,
+      input: pointerGestureInput,
+      spaceDown: false,
+      tool: 'sticky',
+    })).toBe('create-sticky')
     expect(
       createCanvasAppComponentPresentationRenderers(),
     ).toBeTypeOf('object')

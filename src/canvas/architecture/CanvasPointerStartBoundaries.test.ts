@@ -13,10 +13,10 @@ describe('Canvas pointer start boundaries', () => {
       'src/canvas/app/affordances/interaction/pointer/CanvasPointerStartSession.ts',
     )
     const gestureEngineFile = getSourceFile(
-      'src/canvas/engine/gesture/CanvasGestureEngine.ts',
+      'src/canvas/foundation/CanvasGestureEngine.ts',
     )
     const toolGestureRoutingFile = getSourceFile(
-      'src/canvas/engine/gesture/CanvasToolGestureRouting.ts',
+      'src/canvas/foundation/CanvasToolGestureRouting.ts',
     )
     const startFile = getSourceFile(
       'src/canvas/app/affordances/interaction/pointer/CanvasPointerInteractionStart.ts',

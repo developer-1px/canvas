@@ -41,6 +41,15 @@ export {
   CANVAS_STICKY_NOTE_TOOL_ID,
 } from './CanvasFirstPartyExtensions'
 export {
+  getCanvasItemPointerIntent,
+  getCanvasPointerGesture,
+  isAdditivePointerInput,
+  shouldRouteCanvasItemPointerToCanvasGesture,
+  type CanvasItemPointerIntent,
+  type CanvasPointerGestureConfig,
+  type CanvasPointerInput,
+} from './CanvasGestureEngine'
+export {
   createCanvasSceneAdapter,
   type CanvasSceneAdapter,
   type CanvasSceneEntry,
@@ -56,3 +65,11 @@ export {
   type CanvasTransformAdapter,
   type CanvasTransformItem,
 } from './CanvasTransformEngine'
+export {
+  CANVAS_TOOL_GESTURE_ROUTES,
+  getCanvasToolPointerGesture,
+  shouldRouteCanvasToolPointerToCanvasGesture,
+  shouldStartCanvasPanGesture,
+  type CanvasPointerGesture,
+  type CanvasToolGestureConfig,
+} from './CanvasToolGestureRouting'

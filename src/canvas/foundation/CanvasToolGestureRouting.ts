@@ -4,8 +4,7 @@ import {
   type CanvasBuiltinShapeTool,
   type CanvasBuiltinTool,
   type Tool,
-} from '../../core'
-import type { CanvasAffordanceConfig } from '../affordance/CanvasAffordances'
+} from '../core'
 
 export type CanvasPointerInput = {
   altKey: boolean
@@ -32,17 +31,35 @@ export type CanvasPointerGesture =
   | 'none'
   | 'pan'
 
+export type CanvasToolGestureConfig = Readonly<{
+  gestures: Readonly<{
+    createArrow: boolean
+    createComment: boolean
+    createCustom: boolean
+    createShape: boolean
+    createSection: boolean
+    createSticky: boolean
+    createText: boolean
+    drawHighlight: boolean
+    drawMarker: boolean
+    drawPath: boolean
+    eraseDrawing: boolean
+    laserPointer: boolean
+    pan: boolean
+  }>
+}>
+
 type CanvasToolPointerGesture = Exclude<CanvasPointerGesture, 'marquee' | 'none'>
 
 type CanvasToolGestureRoute = Readonly<{
   gesture?: CanvasToolPointerGesture
-  isEnabled?: (config: CanvasAffordanceConfig) => boolean
+  isEnabled?: (config: CanvasToolGestureConfig) => boolean
   routeItemPointerToCanvasGesture: boolean
 }>
 
 type CanvasToolGestureRouteInput = Readonly<{
   gesture?: CanvasToolPointerGesture
-  isEnabled?: (config: CanvasAffordanceConfig) => boolean
+  isEnabled?: (config: CanvasToolGestureConfig) => boolean
   routeItemPointerToCanvasGesture?: boolean
 }>
 
@@ -112,7 +129,7 @@ export function shouldStartCanvasPanGesture({
   spaceDown,
   tool,
 }: {
-  config: CanvasAffordanceConfig
+  config: CanvasToolGestureConfig
   input: CanvasPointerInput
   spaceDown: boolean
   tool: Tool
@@ -127,7 +144,7 @@ export function getCanvasToolPointerGesture({
   config,
   tool,
 }: {
-  config: CanvasAffordanceConfig
+  config: CanvasToolGestureConfig
   tool: Tool
 }): CanvasPointerGesture | null {
   if (isCanvasCustomToolId(tool)) {

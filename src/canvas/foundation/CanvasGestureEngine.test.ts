@@ -1,11 +1,11 @@
 import { describe, expect, test } from 'vitest'
-import { createCanvasAffordanceConfig } from '../affordance/CanvasAffordances'
 import {
   getCanvasPointerGesture,
   shouldRouteCanvasItemPointerToCanvasGesture,
+  type CanvasPointerGestureConfig,
 } from './CanvasGestureEngine'
 
-const config = createCanvasAffordanceConfig()
+const config = createCanvasGestureConfig()
 const baseInput = {
   altKey: false,
   button: 0,
@@ -117,7 +117,7 @@ describe('CanvasGestureEngine drawing tools', () => {
   })
 
   test('honors drawing gesture feature toggles', () => {
-    const disabled = createCanvasAffordanceConfig({
+    const disabled = createCanvasGestureConfig({
       gestures: {
         createArrow: false,
         createComment: false,
@@ -340,3 +340,37 @@ describe('CanvasGestureEngine drawing tools', () => {
     ).toBe(true)
   })
 })
+
+function createCanvasGestureConfig({
+  commands = {},
+  gestures = {},
+}: {
+  commands?: Partial<CanvasPointerGestureConfig['commands']>
+  gestures?: Partial<CanvasPointerGestureConfig['gestures']>
+} = {}): CanvasPointerGestureConfig {
+  return {
+    commands: {
+      duplicate: true,
+      ...commands,
+    },
+    gestures: {
+      altDragDuplicate: true,
+      createArrow: true,
+      createComment: true,
+      createCustom: true,
+      createShape: true,
+      createSection: true,
+      createSticky: true,
+      createText: true,
+      drawHighlight: true,
+      drawMarker: true,
+      drawPath: true,
+      eraseDrawing: true,
+      laserPointer: true,
+      marquee: true,
+      pan: true,
+      textEdit: true,
+      ...gestures,
+    },
+  }
+}
