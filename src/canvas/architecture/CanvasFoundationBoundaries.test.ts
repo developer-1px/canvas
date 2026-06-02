@@ -7,10 +7,10 @@ import {
 } from './CanvasArchitectureTestSources'
 
 describe('Canvas foundation boundaries', () => {
-  it('keeps foundation independent from Host, App, Renderer, and UI implementation layers', () => {
+  it('keeps foundation independent from Engine, Host, App, Renderer, and UI implementation layers', () => {
     const violations = getImportsFrom('src/canvas/foundation/')
       .filter((reference) =>
-        targetsAnyLayer(reference, ['app', 'host', 'renderer', 'ui']),
+        targetsAnyLayer(reference, ['app', 'engine', 'host', 'renderer', 'ui']),
       )
 
     expect(violations).toEqual([])
@@ -37,11 +37,18 @@ describe('Canvas foundation boundaries', () => {
 
     expect(paths.has('src/canvas/foundation/CanvasFirstPartyExtensions.ts'))
       .toBe(true)
+    expect(paths.has('src/canvas/foundation/CanvasGestureEngine.ts')).toBe(true)
     expect(paths.has('src/canvas/foundation/CanvasSceneAdapter.ts')).toBe(true)
     expect(paths.has('src/canvas/foundation/CanvasSelectionEngine.ts')).toBe(true)
+    expect(paths.has('src/canvas/foundation/CanvasToolGestureRouting.ts'))
+      .toBe(true)
     expect(paths.has('src/canvas/foundation/CanvasTransformEngine.ts')).toBe(true)
+    expect(paths.has('src/canvas/engine/gesture/CanvasGestureEngine.ts'))
+      .toBe(false)
     expect(paths.has('src/canvas/engine/scene/CanvasSceneAdapter.ts')).toBe(false)
     expect(paths.has('src/canvas/engine/selection/CanvasSelectionEngine.ts'))
+      .toBe(false)
+    expect(paths.has('src/canvas/engine/gesture/CanvasToolGestureRouting.ts'))
       .toBe(false)
     expect(paths.has('src/canvas/engine/transform/CanvasTransformEngine.ts'))
       .toBe(false)

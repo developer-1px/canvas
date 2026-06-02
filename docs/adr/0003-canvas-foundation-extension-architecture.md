@@ -27,10 +27,10 @@ command, and patch-planning grammar that can run through adapters.
    geometry, scene entries, selection rules, gesture descriptors, transform
    planners, command availability grammar, document patch planning contracts,
    and renderer adapter contracts.
-2. Canvas Foundation must not import Host, App, UI, Renderer implementation
-   modules, or concrete Demo `CanvasItem` variants. Host-specific item storage
-   enters through adapters such as scene, transform, text target, document, and
-   renderer item-layer adapters.
+2. Canvas Foundation must not import Host, App, UI, Renderer, or Engine
+   implementation modules, or concrete Demo `CanvasItem` variants.
+   Host-specific item storage enters through adapters such as scene, transform,
+   text target, document, and renderer item-layer adapters.
 3. Canvas Extensions provide reusable affordance or planner bundles on top of
    Foundation contracts. They may register command descriptors, effect
    descriptors, renderer slots, or document patch planners, but they do not own
@@ -66,6 +66,9 @@ command, and patch-planning grammar that can run through adapters.
 - `CanvasTransformEngine` lives in Foundation source ownership. Host item
   mutation remains adapter-owned; Foundation only plans move and resize through
   `CanvasTransformAdapter`.
+- `CanvasGestureEngine` and `CanvasToolGestureRouting` live in Foundation source
+  ownership. They read a structural gesture config contract so Engine
+  affordance config remains compatible without becoming a Foundation import.
 - `CANVAS_STICKY_NOTE_EXTENSION` is the first concrete first-party extension
   descriptor. It names the sticky note creation affordance and adapter slots
   without moving Demo component storage, SVG rendering, or App workflow.

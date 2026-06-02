@@ -1,11 +1,11 @@
-import type { CanvasAffordanceConfig } from '../affordance/CanvasAffordances'
-import type { Tool } from '../../core'
+import type { Tool } from '../core'
 import {
   getCanvasToolPointerGesture,
   shouldRouteCanvasToolPointerToCanvasGesture,
   shouldStartCanvasPanGesture,
   type CanvasPointerGesture,
   type CanvasPointerInput,
+  type CanvasToolGestureConfig,
 } from './CanvasToolGestureRouting'
 
 export type {
@@ -19,13 +19,24 @@ export type CanvasItemPointerIntent = {
   textEdit: boolean
 }
 
+export type CanvasPointerGestureConfig = CanvasToolGestureConfig & Readonly<{
+  commands: Readonly<{
+    duplicate: boolean
+  }>
+  gestures: CanvasToolGestureConfig['gestures'] & Readonly<{
+    altDragDuplicate: boolean
+    marquee: boolean
+    textEdit: boolean
+  }>
+}>
+
 export function getCanvasPointerGesture({
   config,
   input,
   spaceDown,
   tool,
 }: {
-  config: CanvasAffordanceConfig
+  config: CanvasPointerGestureConfig
   input: CanvasPointerInput
   spaceDown: boolean
   tool: Tool
@@ -62,7 +73,7 @@ export function getCanvasItemPointerIntent({
   input,
   isDoubleClick,
 }: {
-  config: CanvasAffordanceConfig
+  config: CanvasPointerGestureConfig
   input: CanvasPointerInput
   isDoubleClick: boolean
 }): CanvasItemPointerIntent {

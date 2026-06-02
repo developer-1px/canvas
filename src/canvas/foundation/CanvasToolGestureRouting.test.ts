@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import { createCanvasAffordanceConfig } from '../affordance/CanvasAffordances'
 import {
   CANVAS_TOOL_GESTURE_ROUTES,
   getCanvasToolPointerGesture,
   shouldRouteCanvasToolPointerToCanvasGesture,
   shouldStartCanvasPanGesture,
+  type CanvasToolGestureConfig,
 } from './CanvasToolGestureRouting'
 
-const config = createCanvasAffordanceConfig()
+const config = createCanvasGestureConfig()
 const baseInput = {
   altKey: false,
   button: 0,
@@ -95,7 +95,7 @@ describe('CanvasToolGestureRouting', () => {
   })
 
   it('contains disabled tool gestures without changing fallback policy', () => {
-    const disabled = createCanvasAffordanceConfig({
+    const disabled = createCanvasGestureConfig({
       gestures: {
         createArrow: false,
         createComment: false,
@@ -198,3 +198,28 @@ describe('CanvasToolGestureRouting', () => {
     ).toBe(true)
   })
 })
+
+function createCanvasGestureConfig({
+  gestures = {},
+}: {
+  gestures?: Partial<CanvasToolGestureConfig['gestures']>
+} = {}): CanvasToolGestureConfig {
+  return {
+    gestures: {
+      createArrow: true,
+      createComment: true,
+      createCustom: true,
+      createShape: true,
+      createSection: true,
+      createSticky: true,
+      createText: true,
+      drawHighlight: true,
+      drawMarker: true,
+      drawPath: true,
+      eraseDrawing: true,
+      laserPointer: true,
+      pan: true,
+      ...gestures,
+    },
+  }
+}
