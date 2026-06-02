@@ -24,7 +24,9 @@ import type {
 } from '../rendering/CanvasAppRenderingContracts'
 import type { CanvasAppInspectorPanel } from '../affordances/editing/inspector/CanvasAppInspectorPanels'
 import type { CanvasAppCustomCreationTool } from '../extensions/custom-tools/CanvasAppCustomCreationTools'
+import type { CanvasMediaImporter } from '../affordances/io/media/CanvasMediaImporters'
 import type { CanvasTextPasteImporter } from '../affordances/io/text-paste/CanvasTextPasteImporters'
+import type { CanvasAppPresenceProvider } from './CanvasAppCollaborationAssembly'
 
 export type CanvasAppAssemblyAffordanceModel = {
   config: CanvasAffordanceConfig
@@ -43,9 +45,14 @@ export type CanvasAppAssemblyControlModel = {
   components: readonly CanvasAppComponentTemplate[]
 }
 
+export type CanvasAppAssemblyCollaborationModel = {
+  presenceProvider: CanvasAppPresenceProvider
+}
+
 export type CanvasAppAssemblyExtensionModel = {
   customCommands: readonly CanvasAppCustomCommand[]
   customCreationTools: readonly CanvasAppCustomCreationTool[]
+  mediaImporters: readonly CanvasMediaImporter[]
   textPasteImporters: readonly CanvasTextPasteImporter[]
 }
 
@@ -81,6 +88,7 @@ export type CanvasAppAssemblyWorkspaceModel = {
 export type CanvasAppAssemblyModel = {
   affordance: CanvasAppAssemblyAffordanceModel
   command: CanvasAppAssemblyCommandModel
+  collaboration: CanvasAppAssemblyCollaborationModel
   component: CanvasAppAssemblyComponentModel
   control: CanvasAppAssemblyControlModel
   extension: CanvasAppAssemblyExtensionModel

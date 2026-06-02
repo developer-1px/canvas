@@ -207,6 +207,13 @@ const CANVAS_STAGE_SNAPSHOT_STYLE = `
 .comment-item,.comment-tail{fill:#fff;stroke:#2563eb;stroke-width:1.4}
 .comment-line{stroke:#2563eb;stroke-linecap:round;stroke-width:1.6;pointer-events:none}
 .comment-hit{fill:transparent;pointer-events:all}
+.comment-body-card{box-sizing:border-box;width:100%;height:100%;overflow:hidden;padding:10px 12px;border:1.5px solid #e1e7ef;border-radius:6px;background:#fff;color:#172033;font:500 12px/1.35 sans-serif;pointer-events:none}
+.comment-thread-header,.comment-thread-meta{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.comment-thread-header{margin-bottom:8px;color:#5d6878;font:750 11px/1 sans-serif}
+.comment-thread-messages{display:grid;gap:8px}
+.comment-thread-message{display:grid;gap:4px}
+.comment-thread-meta{color:#5d6878;font:700 10px/1 sans-serif}
+.comment-thread-body{overflow:hidden;color:#172033;text-overflow:ellipsis;white-space:pre-wrap;word-break:break-word}
 .stamp-item{fill:#fff;stroke:#cbd5e1;stroke-width:1.25}
 .stamp-label{fill:#111827;font:750 18px/1 sans-serif;pointer-events:none;text-anchor:middle}
 .stamp-hit{fill:transparent;pointer-events:all}

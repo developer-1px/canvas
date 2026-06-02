@@ -18,6 +18,7 @@ export type {
 } from './CanvasImageItems'
 export type {
   CanvasCommentItem,
+  CanvasCommentThreadMessage,
 } from './CanvasCommentItems'
 export type {
   CanvasStampItem,
@@ -31,6 +32,7 @@ export type {
 export type {
   ArrowItem,
   CanvasArrowEndpoint,
+  CanvasArrowhead,
   CanvasArrowRouting,
 } from './CanvasArrowItems'
 export type {

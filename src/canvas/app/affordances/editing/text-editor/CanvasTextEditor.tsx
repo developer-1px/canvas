@@ -13,7 +13,7 @@ type CanvasTextEditorValue = {
 type CanvasTextEditorProps = {
   commitOnEnter?: boolean
   editing: CanvasTextEditorValue | null
-  editorRef: RefObject<HTMLTextAreaElement | null>
+  editorRef: RefObject<HTMLElement | null>
   style: CSSProperties | undefined
   onBlur: () => void
   onChange: (editing: CanvasTextEditorValue) => void
@@ -60,7 +60,7 @@ export function CanvasTextEditor({
 
   return (
     <textarea
-      ref={editorRef}
+      ref={editorRef as RefObject<HTMLTextAreaElement | null>}
       className="text-editor"
       value={editing.value}
       style={style}

@@ -11,7 +11,10 @@ import type {
 
 export type TextItem = CanvasItemBase & {
   type: 'text'
+  fontSize?: number
+  opacity?: number
   text: string
+  textAlign?: 'center' | 'left' | 'right'
 }
 
 export type CanvasEditableTextItem =

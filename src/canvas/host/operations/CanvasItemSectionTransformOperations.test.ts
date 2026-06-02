@@ -44,6 +44,12 @@ const attachedComment: CanvasItem = {
   body: 'Needs follow-up',
   h: 36,
   id: 'comment-1',
+  thread: [{
+    authorName: 'Ari',
+    body: 'Needs follow-up',
+    createdAt: '2026-06-02T00:00:00.000Z',
+    id: 'message-1',
+  }],
   type: 'comment',
   w: 36,
   x: 112,

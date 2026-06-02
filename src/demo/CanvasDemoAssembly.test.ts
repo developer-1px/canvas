@@ -30,6 +30,18 @@ describe('CanvasDemoAssembly', () => {
     )
   })
 
+  it('keeps widget play mode behind the widget interaction seam', () => {
+    expect(modules['./CanvasDevToolsDemoApp.tsx']).not.toMatch(
+      /TodoWidget|TODO_WIDGET_KIND|toggleTodoWidgetItemDone/,
+    )
+    expect(modules['./CanvasDevToolsSelectionToolbar.tsx']).not.toMatch(
+      /TodoWidget|TODO_WIDGET_KIND/,
+    )
+    expect(modules['./CanvasDevToolsWidgetPlayOverlay.tsx']).not.toMatch(
+      /TodoWidget|TODO_WIDGET_KIND|TodoWidgetData|toggleTodoWidgetItemDone/,
+    )
+  })
+
   it('assembles demo custom item modules through the app seam', () => {
     expect(DEMO_CANVAS_APP_ASSEMBLY_INPUT.customItemModules).toBe(
       DEMO_CUSTOM_ITEM_MODULES,
@@ -111,17 +123,24 @@ describe('CanvasDemoAssembly', () => {
     expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.grid).toBe(false)
     expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.itemOutline)
       .toBe(true)
-    expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.marquee).toBe(
-      true,
-    )
-    expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.stickyQuickCreate)
+    expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.objectStyleControls)
       .toBe(true)
+	    expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.marquee).toBe(
+	      true,
+	    )
+	    expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.presence).toBe(
+	      true,
+	    )
+	    expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.stickyQuickCreate)
+	      .toBe(true)
     expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.emoteControls)
       .toBe(false)
     expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.stampControls)
       .toBe(false)
     expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.votingSession)
       .toBe(false)
+    expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.presentationMode)
+      .toBe(true)
     expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.draftArrow)
       .toBe(true)
     expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.draftRect)
@@ -149,7 +168,11 @@ describe('CanvasDemoAssembly', () => {
     expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.tools.sticky).toBe(true)
     expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.tools.comment).toBe(true)
     expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.tools.section).toBe(true)
-    expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.tools.highlight).toBe(true)
-    expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.tools.eraser).toBe(true)
-  })
-})
+	    expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.tools.highlight).toBe(true)
+	    expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.tools.eraser).toBe(true)
+	    expect(DEMO_CANVAS_APP_ASSEMBLY.presenceProvider({
+	      selection: [],
+	      viewport: { scale: 1, x: 0, y: 0 },
+	    }).map((entry) => entry.label)).toEqual(['Mia', 'Noah'])
+	  })
+	})

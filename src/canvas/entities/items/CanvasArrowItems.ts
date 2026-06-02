@@ -10,12 +10,15 @@ export type ArrowItem = CanvasItemBase & {
   arrowhead?: CanvasArrowhead
   end: Point
   endAttachedTo?: CanvasItemId
+  fontSize?: number
+  opacity?: number
   routing?: CanvasArrowRouting
   start: Point
   startAttachedTo?: CanvasItemId
   stroke: string
   strokeWidth: number
   text?: string
+  textAlign?: 'center' | 'left' | 'right'
 }
 
 export type CanvasArrowEndpoint = 'end' | 'start'

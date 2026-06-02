@@ -34,6 +34,12 @@ describe('CanvasComponentItemValidation', () => {
       orientation: 'vertical',
       url: 'https://example.com/reference',
     })).toBe(true)
+    expect(isCanvasComponentItemStorageShape({
+      ...componentItem,
+      fontSize: 18,
+      opacity: 0.75,
+      textAlign: 'right',
+    })).toBe(true)
   })
 
   it('rejects component ids outside the stable id contract', () => {
@@ -51,6 +57,14 @@ describe('CanvasComponentItemValidation', () => {
     expect(isCanvasComponentItemStorageShape({
       ...componentItem,
       fill: null,
+    })).toBe(false)
+    expect(isCanvasComponentItemStorageShape({
+      ...componentItem,
+      opacity: 2,
+    })).toBe(false)
+    expect(isCanvasComponentItemStorageShape({
+      ...componentItem,
+      textAlign: 'justify',
     })).toBe(false)
     expect(isCanvasComponentItemStorageShape({
       ...componentItem,

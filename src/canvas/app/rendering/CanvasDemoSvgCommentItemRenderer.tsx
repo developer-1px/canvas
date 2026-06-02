@@ -1,5 +1,8 @@
 import type { CanvasCommentItem } from '../../entities'
-import { getCanvasCommentBodyBounds } from '../../host'
+import {
+  getCanvasCommentBodyBounds,
+  getCanvasCommentThreadMessages,
+} from '../../host'
 
 export function renderCanvasDemoSvgCommentItem({
   item,
@@ -14,6 +17,7 @@ export function renderCanvasDemoSvgCommentItem({
   const tailEndX = item.x + item.w * 0.22
   const tailEndY = item.y + item.h + 7
   const bodyBounds = getCanvasCommentBodyBounds(item)
+  const messages = getCanvasCommentThreadMessages(item)
 
   return (
     <>
@@ -48,7 +52,26 @@ export function renderCanvasDemoSvgCommentItem({
           width={bodyBounds.w}
           height={bodyBounds.h}
         >
-          <div className="comment-body-card">{item.body}</div>
+          <div
+            className="comment-body-card"
+            data-resolved={item.resolved === true ? 'true' : 'false'}
+          >
+            <div className="comment-thread-header">
+              <span>Thread</span>
+              <span>{item.resolved === true ? 'Resolved' : 'Open'}</span>
+            </div>
+            <div className="comment-thread-messages">
+              {messages.map((message) => (
+                <div className="comment-thread-message" key={message.id}>
+                  <div className="comment-thread-meta">
+                    <span>{message.authorName}</span>
+                    <span>{message.createdAt}</span>
+                  </div>
+                  <div className="comment-thread-body">{message.body}</div>
+                </div>
+              ))}
+            </div>
+          </div>
         </foreignObject>
       ) : null}
     </>

@@ -36,6 +36,12 @@ describe('CanvasDrawingItemValidation', () => {
       type: 'highlight',
     })).toBe(true)
     expect(isCanvasDrawingItemStorageShape(arrowItem)).toBe(true)
+    expect(isCanvasDrawingItemStorageShape({
+      ...arrowItem,
+      fontSize: 12,
+      opacity: 0.8,
+      textAlign: 'right',
+    })).toBe(true)
   })
 
   it('rejects drawing strokes without visible point geometry', () => {
@@ -91,6 +97,14 @@ describe('CanvasDrawingItemValidation', () => {
     expect(isCanvasDrawingItemStorageShape({
       ...markerItem,
       opacity: 2,
+    })).toBe(false)
+    expect(isCanvasDrawingItemStorageShape({
+      ...arrowItem,
+      opacity: 0,
+    })).toBe(false)
+    expect(isCanvasDrawingItemStorageShape({
+      ...arrowItem,
+      textAlign: 'justify',
     })).toBe(false)
   })
 })

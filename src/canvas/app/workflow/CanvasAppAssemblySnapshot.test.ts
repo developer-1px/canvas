@@ -10,10 +10,12 @@ import type {
   CanvasAppAssembly,
   CanvasAppComponentRendererStrategy,
   CanvasAppCustomItemModuleCreationTool,
+	  CanvasAppInspectorPanel,
+	  CanvasAppItemLayerAdapter,
+	  CanvasAppPresenceProvider,
+	  CanvasAppStageAdapter,
+  CanvasMediaImporter,
   CanvasTextPasteImporter,
-  CanvasAppInspectorPanel,
-  CanvasAppItemLayerAdapter,
-  CanvasAppStageAdapter,
 } from './index'
 
 describe('CanvasAppAssembly snapshots', () => {
@@ -55,7 +57,17 @@ describe('CanvasAppAssembly snapshots', () => {
       id: 'risk-paste',
       createItems: () => null,
     }
-    const initialItems = [
+	    const mediaImporter: CanvasMediaImporter = {
+	      id: 'risk-media',
+	      createItems: () => null,
+	    }
+	    const presenceProvider: CanvasAppPresenceProvider = () => [{
+	      color: '#2563eb',
+	      id: 'remote-mia',
+	      label: 'Mia',
+	      point: { x: 10, y: 20 },
+	    }]
+	    const initialItems = [
       {
         id: 'rect-1',
         type: 'rect',
@@ -122,9 +134,11 @@ describe('CanvasAppAssembly snapshots', () => {
       initialSelection: ['rect-1'],
       inspectorPanels: [customInspectorPanel],
       itemAdapters,
-      itemLayerAdapter,
-      stageAdapter,
-      textPasteImporters: [textPasteImporter],
+	      itemLayerAdapter,
+	      mediaImporters: [mediaImporter],
+	      presenceProvider,
+	      stageAdapter,
+	      textPasteImporters: [textPasteImporter],
     })
 
     componentLibrary.getPresentation = () => 'mutated-card'
@@ -138,6 +152,7 @@ describe('CanvasAppAssembly snapshots', () => {
       throw new Error('mutated command')
     }
     customInspectorPanel.render = () => 'mutated'
+    mediaImporter.createItems = () => []
     textPasteImporter.createItems = () => []
     initialItems[0].x = 999
     initialItems.push({
@@ -171,6 +186,7 @@ describe('CanvasAppAssembly snapshots', () => {
       title: 'Publish risk',
     })
     expect(assembly.customCommands[0]?.run).toBe(customCommandRun)
+    expect(assembly.mediaImporters[0]?.createItems({} as never)).toBeNull()
     expect(assembly.textPasteImporters[0]?.createItems({} as never)).toBeNull()
     expect(assembly.inspectorPanels.find((panel) =>
       panel.id === 'risk-meta'
@@ -185,10 +201,19 @@ describe('CanvasAppAssembly snapshots', () => {
     expect(assembly.initialItems).toHaveLength(1)
     expect(assembly.initialItems[0]).toMatchObject({ id: 'rect-1', x: 0 })
     expect(assembly.initialSelection).toEqual(['rect-1'])
-    expect(assembly.itemAdapters.command.selectAll({ items: [] })).toEqual([])
-    expect(assembly.itemLayerAdapter.renderItems(
-      createItemLayerInput({ items: assembly.initialItems }),
-    )).toBe(1)
+	    expect(assembly.itemAdapters.command.selectAll({ items: [] })).toEqual([])
+	    expect(assembly.presenceProvider({
+	      selection: [],
+	      viewport: { scale: 1, x: 0, y: 0 },
+	    })).toEqual([{
+	      color: '#2563eb',
+	      id: 'remote-mia',
+	      label: 'Mia',
+	      point: { x: 10, y: 20 },
+	    }])
+	    expect(assembly.itemLayerAdapter.renderItems(
+	      createItemLayerInput({ items: assembly.initialItems }),
+	    )).toBe(1)
     expect(assembly.itemLayerAdapter.renderItems).toBe(itemLayerRenderItems)
     expect(assembly.stageAdapter.renderStage).toBe(renderStage)
     expect(assembly.customCreationTools[0]?.createItem({
@@ -210,14 +235,15 @@ describe('CanvasAppAssembly snapshots', () => {
     expect(Object.isFrozen(assembly.customCommands)).toBe(true)
     expect(Object.isFrozen(assembly.customCommands[0])).toBe(true)
     expect(Object.isFrozen(assembly.customCreationTools[0]?.shortcut)).toBe(true)
+    expect(Object.isFrozen(assembly.mediaImporters[0])).toBe(true)
     expect(Object.isFrozen(assembly.componentPresentationRenderers)).toBe(true)
     expect(Object.isFrozen(assembly.customItemValidators)).toBe(true)
     expect(Object.isFrozen(assembly.initialItems)).toBe(true)
     expect(Object.isFrozen(assembly.initialItems[0])).toBe(true)
     expect(Object.isFrozen(assembly.initialSelection)).toBe(true)
-    expect(Object.isFrozen(assembly.itemAdapters.command)).toBe(true)
-    expect(Object.isFrozen(assembly.itemLayerAdapter)).toBe(true)
-    expect(Object.isFrozen(assembly.stageAdapter)).toBe(true)
+	    expect(Object.isFrozen(assembly.itemAdapters.command)).toBe(true)
+	    expect(Object.isFrozen(assembly.itemLayerAdapter)).toBe(true)
+	    expect(Object.isFrozen(assembly.stageAdapter)).toBe(true)
   })
 
 })

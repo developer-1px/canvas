@@ -95,6 +95,12 @@ describe('CanvasEditableTextItem', () => {
     })).toBe(true)
     expect(isCanvasEditableTextItemStorageShape(textItem)).toBe(true)
     expect(isCanvasEditableTextItemStorageShape({
+      ...textItem,
+      fontSize: 18,
+      opacity: 0.7,
+      textAlign: 'center',
+    })).toBe(true)
+    expect(isCanvasEditableTextItemStorageShape({
       ...rectItem,
       fill: 1,
     })).toBe(false)
@@ -105,6 +111,14 @@ describe('CanvasEditableTextItem', () => {
     expect(isCanvasEditableTextItemStorageShape({
       ...textItem,
       text: undefined,
+    })).toBe(false)
+    expect(isCanvasEditableTextItemStorageShape({
+      ...textItem,
+      fontSize: 0,
+    })).toBe(false)
+    expect(isCanvasEditableTextItemStorageShape({
+      ...textItem,
+      textAlign: 'justify',
     })).toBe(false)
     expect(isCanvasEditableTextItemStorageShape(arrowItem)).toBe(true)
   })
@@ -187,6 +201,46 @@ describe('CanvasEditableTextItem', () => {
     expect(getCanvasEditableTextPatchField(commentItem)).toBe('body')
   })
 
+  it('keeps comment body and first thread message synced during text edits', () => {
+    expect(getCanvasEditableTextPatchUpdates(commentItem, 'Answer')).toEqual([
+      {
+        field: 'body',
+        operation: 'replace',
+        value: 'Answer',
+      },
+      {
+        field: 'thread',
+        operation: 'add',
+        value: [{
+          authorName: 'You',
+          body: 'Answer',
+          createdAt: 'Just now',
+          id: 'comment-1:message-1',
+        }],
+      },
+    ])
+    expect(getCanvasEditableTextPatchUpdates({
+      ...commentItem,
+      thread: [{
+        authorName: 'Ari',
+        body: 'Question',
+        createdAt: '2026-06-02T00:00:00.000Z',
+        id: 'message-1',
+      }],
+    }, 'Answer')).toEqual([
+      {
+        field: 'body',
+        operation: 'replace',
+        value: 'Answer',
+      },
+      {
+        field: 'thread/0/body',
+        operation: 'replace',
+        value: 'Answer',
+      },
+    ])
+  })
+
   it('adds sticky height updates when committed text needs more room', () => {
     expect(getCanvasEditableTextPatchUpdates(
       createComponentItem('sticky', {
@@ -242,7 +296,7 @@ describe('CanvasEditableTextItem', () => {
 
   it('derives comment body editing bounds beside the comment pin', () => {
     expect(getCanvasEditableTextBounds(commentItem)).toEqual({
-      h: 88,
+      h: 132,
       w: 220,
       x: 86,
       y: 56,

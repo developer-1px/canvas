@@ -1,8 +1,10 @@
 export type {
   ArrowItem,
   CanvasArrowEndpoint,
+  CanvasArrowhead,
   CanvasArrowRouting,
   CanvasCommentItem,
+  CanvasCommentThreadMessage,
   CanvasComponentItem,
   CanvasComponentKind,
   CanvasCustomItem,

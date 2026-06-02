@@ -1,4 +1,7 @@
-import type { ReactNode } from 'react'
+import type {
+  CSSProperties,
+  ReactNode,
+} from 'react'
 import {
   getCanvasArrowLabelBounds,
   isCanvasArrowDrawingItem,
@@ -64,7 +67,7 @@ function renderCanvasDemoSvgArrowDrawingItem({
         markerEnd={
           item.arrowhead === 'none' ? undefined : CANVAS_SVG_ARROW_MARKER_IRI
         }
-        opacity="0.72"
+        opacity={item.opacity ?? 0.72}
         vectorEffect="non-scaling-stroke"
       />
       {item.text?.trim() ? renderCanvasDemoSvgArrowLabel({ item }) : null}
@@ -96,10 +99,28 @@ function renderCanvasDemoSvgArrowLabel({
         width={bounds.w}
         height={bounds.h}
       >
-        <div className="arrow-label-text">{item.text}</div>
+        <div
+          className="arrow-label-text"
+          style={getCanvasDemoSvgArrowLabelStyle(item)}
+        >
+          {item.text}
+        </div>
       </foreignObject>
     </g>
   )
+}
+
+function getCanvasDemoSvgArrowLabelStyle(
+  item: ArrowItem,
+): CSSProperties | undefined {
+  if (item.fontSize === undefined && item.textAlign === undefined) {
+    return undefined
+  }
+
+  return {
+    fontSize: item.fontSize,
+    textAlign: item.textAlign,
+  }
 }
 
 function renderCanvasDemoSvgStrokeDrawingItem({

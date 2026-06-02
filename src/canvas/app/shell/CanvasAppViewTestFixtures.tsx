@@ -98,6 +98,7 @@ export function createViewProps(
     },
     inspector: {
       bounds: { h: 80, w: 120, x: 10, y: 20 },
+      commentThread: null,
       customPanels: [],
       disabled: false,
       label: 'Rect',

@@ -114,6 +114,9 @@ describe('Canvas App IO boundaries', () => {
     const linkPreviewImportFile = getSourceFile(
       'src/canvas/app/affordances/io/link-preview/CanvasLinkPreviewImport.ts',
     )
+    const mediaImportFile = getSourceFile(
+      'src/canvas/app/affordances/io/media/CanvasMediaImport.ts',
+    )
     const linkPreviewInspectorPanelFile = getSourceFile(
       'src/canvas/app/affordances/io/link-preview/CanvasLinkPreviewInspectorPanel.tsx',
     )
@@ -129,6 +132,7 @@ describe('Canvas App IO boundaries', () => {
     expect(appModelFile.source).toContain(
       "from './useCanvasAppLinkPreviewImportModel'",
     )
+    expect(appModelFile.source).toContain('mediaImporters')
     expect(appModelFile.source).not.toMatch(browserLinkPreviewHow)
     expect(linkPreviewModelFile.source).toContain(
       "from '../affordances/io/link-preview/useCanvasLinkPreviewImport'",
@@ -138,7 +142,8 @@ describe('Canvas App IO boundaries', () => {
     )
     expect(linkPreviewImportHookFile.source).toContain('ClipboardEvent')
     expect(linkPreviewImportHookFile.source).toContain('DragEvent')
-    expect(linkPreviewImportFile.source).toContain(
+    expect(linkPreviewImportFile.source).toContain('insertCanvasMediaSource')
+    expect(mediaImportFile.source).toContain(
       'createCanvasLinkPreviewComponentItem',
     )
     expect(linkPreviewInspectorPanelFile.source).toContain(

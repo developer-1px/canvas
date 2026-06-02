@@ -31,6 +31,13 @@ test('opens as a minimal canvas affordance engine demo', async ({ page }) => {
   await expect(page.locator('.alignment-guide')).toHaveCount(0)
   await expect(page.locator('.spacing-guide')).toHaveCount(0)
   await expect(page.locator('.context-command-menu')).toHaveCount(0)
+  await expect(page.locator('.presence-overlays')).toBeVisible()
+  await expect(page.locator('.presence-cursor')).toHaveCount(2)
+  await expect(page.locator('.presence-selection')).toHaveCount(2)
+  await expect(page.locator('.presence-label-text', { hasText: 'Mia' }))
+    .toHaveCount(2)
+  await expect(page.locator('.presence-label-text', { hasText: 'Noah' }))
+    .toHaveCount(2)
   await expect(page.getByRole('region', { name: 'Voting session' }))
     .toHaveCount(0)
 
@@ -347,6 +354,40 @@ test('toggles the token-driven dark theme', async ({ page }) => {
 
   await page.getByRole('button', { name: 'Switch to light theme' }).click()
   await expect(root).toHaveAttribute('data-theme', 'light')
+})
+
+test('presents section frames without edit chrome', async ({ page }) => {
+  await page.goto('/')
+
+  const root = page.locator('main.engine-demo-app')
+  const shape = page.locator('[data-canvas-item-id="engine-shape"]')
+  await page.getByRole('button', { name: 'Reset viewport' }).click()
+  await expect(page.getByLabel('Canvas scale')).toHaveText('100%')
+  await shape.click()
+  await expect(page.getByRole('toolbar', { name: 'Object actions' }))
+    .toBeVisible()
+
+  await page.getByRole('button', { name: 'Enter presentation' }).click()
+  await expect(root).toHaveAttribute('data-presenting', 'true')
+  await expect(page.getByLabel('Canvas scale')).not.toHaveText('100%')
+  await expect(page.getByLabel('Presentation frame')).toHaveText('1/1')
+  await expect(
+    page.getByRole('toolbar', { name: 'Engine affordances' }),
+  ).toHaveCount(0)
+
+  await shape.click()
+  await expect(page.getByRole('toolbar', { name: 'Object actions' }))
+    .toHaveCount(0)
+
+  await page.locator('.engine-demo-workspace').focus()
+  await page.keyboard.press('Backspace')
+  await page.keyboard.press('ArrowRight')
+  await expect(page.getByLabel('Presentation frame')).toHaveText('1/1')
+  await page.keyboard.press('Escape')
+  await expect(root).toHaveAttribute('data-presenting', 'false')
+  await expect(shape).toBeVisible()
+  await expect(page.getByRole('toolbar', { name: 'Engine affordances' }))
+    .toBeVisible()
 })
 
 test('renders a widget in an isolated shadow root without leaking styles', async ({
@@ -1100,10 +1141,21 @@ test('creates shape, sticky, section, arrow, and highlighter objects from expose
   await expect.poll(() =>
     page.locator('[data-type="component"][data-component="sticky"]').count(),
   ).toBeGreaterThan(stickyCount)
-  await expect(page.locator('textarea.text-editor')).toBeVisible()
-  await page.locator('textarea.text-editor').fill('New note')
-  await page.keyboard.press('Enter')
-  await expect(page.locator('textarea.text-editor')).toHaveCount(0)
+  const stickyEditor = page.locator(
+    '.component-sticky-body.canvas-content-editable-text-active',
+  )
+  await expect(stickyEditor).toBeVisible()
+  await stickyEditor.fill('New note')
+  await stickyEditor.press('Enter')
+  await expect(stickyEditor).toBeVisible()
+  await expect.poll(async () => {
+    const text = await stickyEditor.evaluate((element) => element.textContent)
+
+    return text?.startsWith('New note') === true &&
+      text.includes('\n')
+  }).toBe(true)
+  await stickyEditor.press('Escape')
+  await expect(stickyEditor).toHaveCount(0)
 
   const sectionCount = await page.locator(
     '[data-type="component"][data-component="section"]',
@@ -1148,6 +1200,12 @@ test('quick-creates connected sticky notes with inherited style', async ({
   const source = page.locator('[data-canvas-item-id="engine-sticky"]')
   await source.click()
   await expect(source).toHaveAttribute('data-selected', 'true')
+  const sourceEditor = source.locator(
+    '.component-sticky-body.canvas-content-editable-text-active',
+  )
+  await expect(sourceEditor).toBeVisible()
+  await sourceEditor.press('Escape')
+  await expect(sourceEditor).toHaveCount(0)
 
   await page.getByRole('button', { name: 'Fill color' }).click()
   await page.getByRole('button', { name: 'Fill #C2E5FF' }).click()
@@ -1164,7 +1222,10 @@ test('quick-creates connected sticky notes with inherited style', async ({
   await page.getByRole('button', { name: 'Create sticky note right' }).click()
   await expect.poll(() => stickyItems.count()).toBe(stickyCount + 1)
   await expect.poll(() => arrowItems.count()).toBe(arrowCount + 1)
-  await expect(page.locator('textarea.text-editor')).toBeVisible()
+  const stickyEditor = page.locator(
+    '.component-sticky-body.canvas-content-editable-text-active',
+  )
+  await expect(stickyEditor).toBeVisible()
 
   const selectedSticky = page.locator(
     '[data-type="component"][data-component="sticky"][data-selected="true"]',
@@ -1179,11 +1240,11 @@ test('quick-creates connected sticky notes with inherited style', async ({
     'height',
   )
 
-  await page.locator('textarea.text-editor').fill(
+  await stickyEditor.fill(
     'This sticky expands when the text crosses multiple lines in the same compact object.',
   )
-  await page.keyboard.press('Enter')
-  await expect(page.locator('textarea.text-editor')).toHaveCount(0)
+  await stickyEditor.press('Escape')
+  await expect(stickyEditor).toHaveCount(0)
   await expect.poll(() => getSvgNumberAttribute(selectedStickyNote, 'height'))
     .toBeGreaterThan(initialHeight)
 })

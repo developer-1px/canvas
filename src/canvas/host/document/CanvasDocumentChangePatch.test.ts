@@ -139,6 +139,16 @@ describe('CanvasDocumentChangePatch', () => {
         path: '/4/body',
         value: 'Looks good',
       },
+      {
+        op: 'add',
+        path: '/4/thread',
+        value: [{
+          authorName: 'You',
+          body: 'Looks good',
+          createdAt: 'Just now',
+          id: 'comment-1:message-1',
+        }],
+      },
     ])
   })
 

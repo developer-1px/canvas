@@ -6,6 +6,13 @@ import {
   type CanvasDrawingItem,
 } from './CanvasDrawingItemGeometry'
 import { isCanvasArrowRouting } from './CanvasArrowRouting'
+import {
+  isOptionalCanvasItemFontSize,
+  isOptionalCanvasItemOpacity,
+  isOptionalCanvasItemTextAlign,
+  isCanvasItemOpacity,
+  isCanvasItemStrokeWidth,
+} from '../style/CanvasItemStyleValidation'
 
 export function isCanvasDrawingItemStorageShape(
   value: Record<string, unknown>,
@@ -23,7 +30,7 @@ function isCanvasStrokeDrawingItemStorageShape(
     (value.type === 'marker' || value.type === 'highlight') &&
     isDrawingPointArray(value.points) &&
     typeof value.stroke === 'string' &&
-    isPositiveFiniteNumber(value.strokeWidth) &&
+    isStrokeWidth(value.strokeWidth) &&
     isOpacity(value.opacity)
   )
 }
@@ -40,9 +47,12 @@ function isCanvasArrowDrawingItemStorageShape(
     isOptionalArrowRouting(value.routing) &&
     isOptionalStableItemId(value.startAttachedTo) &&
     isOptionalStableItemId(value.endAttachedTo) &&
+    isOptionalCanvasItemFontSize(value.fontSize) &&
+    isOptionalCanvasItemOpacity(value.opacity) &&
     typeof value.stroke === 'string' &&
-    isPositiveFiniteNumber(value.strokeWidth) &&
-    (value.text === undefined || typeof value.text === 'string')
+    isStrokeWidth(value.strokeWidth) &&
+    (value.text === undefined || typeof value.text === 'string') &&
+    isOptionalCanvasItemTextAlign(value.textAlign)
   )
 }
 
@@ -54,12 +64,12 @@ function isFiniteNumber(value: unknown): value is number {
   return typeof value === 'number' && Number.isFinite(value)
 }
 
-function isPositiveFiniteNumber(value: unknown): value is number {
-  return isFiniteNumber(value) && value > 0
+function isStrokeWidth(value: unknown): value is number {
+  return isCanvasItemStrokeWidth(value)
 }
 
 function isOpacity(value: unknown): value is number {
-  return isFiniteNumber(value) && value > 0 && value <= 1
+  return isCanvasItemOpacity(value)
 }
 
 function isOptionalStableItemId(value: unknown) {

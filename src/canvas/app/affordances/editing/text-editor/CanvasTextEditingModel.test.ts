@@ -10,6 +10,7 @@ import type {
 import {
   commitCanvasTextEditing,
   getCanvasTextEditorStyle,
+  shouldUseCanvasContentEditableText,
 } from './CanvasTextEditingModel'
 
 describe('CanvasTextEditingModel', () => {
@@ -178,6 +179,13 @@ describe('CanvasTextEditingModel', () => {
       top: 215,
       width: 192,
     })
+  })
+
+  it('routes only sticky text editing to the contenteditable surface', () => {
+    expect(shouldUseCanvasContentEditableText(createStickyItem())).toBe(true)
+    expect(shouldUseCanvasContentEditableText(createTextItem())).toBe(false)
+    expect(shouldUseCanvasContentEditableText(createArrowItem())).toBe(false)
+    expect(shouldUseCanvasContentEditableText(null)).toBe(false)
   })
 })
 

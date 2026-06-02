@@ -1,5 +1,6 @@
 import type {
   CanvasEditableTextItem,
+  CanvasCommentThreadMessage,
   CanvasItem,
   TextItem,
 } from '../model'
@@ -7,6 +8,7 @@ import type { Bounds } from '../../core'
 import {
   CANVAS_COMMENT_DEFAULT_BODY,
   getCanvasCommentBodyBounds,
+  getCanvasCommentTextPatchUpdates,
   isCanvasCommentItem,
 } from '../comment/CanvasCommentItem'
 import {
@@ -26,13 +28,18 @@ import {
   isCanvasShapeItem,
   isCanvasShapeItemStorageShape,
 } from '../shape/CanvasShapeItem'
+import {
+  isOptionalCanvasItemFontSize,
+  isOptionalCanvasItemOpacity,
+  isOptionalCanvasItemTextAlign,
+} from '../style/CanvasItemStyleValidation'
 
 export type { CanvasEditableTextItem } from '../model'
 
 export type CanvasEditableTextPatchUpdate = {
   field: string
   operation: 'add' | 'replace'
-  value: number | string
+  value: CanvasCommentThreadMessage[] | number | string
 }
 
 export function isCanvasTextItem(item: CanvasItem): item is TextItem {
@@ -120,6 +127,10 @@ export function getCanvasEditableTextPatchUpdates(
   item: CanvasEditableTextItem,
   text: string,
 ): CanvasEditableTextPatchUpdate[] {
+  if (isCanvasCommentItem(item)) {
+    return getCanvasCommentTextPatchUpdates(item, text)
+  }
+
   const updates: CanvasEditableTextPatchUpdate[] = [{
     field: getCanvasEditableTextPatchField(item),
     operation: getCanvasEditableTextPatchOperation(item),
@@ -198,7 +209,11 @@ function getCanvasEditableTextAutoHeight(
 function isCanvasTextItemStorageShape(
   value: Record<string, unknown>,
 ) {
-  return value.type === 'text' && typeof value.text === 'string'
+  return value.type === 'text' &&
+    isOptionalCanvasItemFontSize(value.fontSize) &&
+    isOptionalCanvasItemOpacity(value.opacity) &&
+    typeof value.text === 'string' &&
+    isOptionalCanvasItemTextAlign(value.textAlign)
 }
 
 function isCanvasArrowTextItemStorageShape(

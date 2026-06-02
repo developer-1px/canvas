@@ -7,4 +7,12 @@ export type CanvasCommentItem = CanvasItemBase & {
   attachedTo?: CanvasItemId
   body: string
   resolved?: boolean
+  thread?: CanvasCommentThreadMessage[]
+}
+
+export type CanvasCommentThreadMessage = {
+  authorName: string
+  body: string
+  createdAt: string
+  id: string
 }

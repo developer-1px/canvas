@@ -13,9 +13,10 @@ export function useCanvasAppTextModel({
   selection,
   viewport,
 }: CanvasAppTextModelInput) {
-  const editorRef = useRef<HTMLTextAreaElement | null>(null)
+  const editorRef = useRef<HTMLElement | null>(null)
   const {
     blurTextEditor,
+    inlineTextEditor,
     setEditing,
     textEditor,
   } = useCanvasTextEditorModel({
@@ -35,6 +36,7 @@ export function useCanvasAppTextModel({
   return getCanvasAppTextConsumerModel({
     blurTextEditor,
     findReplace,
+    inlineTextEditor,
     openFindReplace,
     setEditing,
     textEditor,

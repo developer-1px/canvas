@@ -187,6 +187,8 @@ describe('CanvasDemoSvgItemRenderer', () => {
     })
 
     expect(markup).toContain('comment-body-card')
+    expect(markup).toContain('Thread')
+    expect(markup).toContain('Open')
     expect(markup).toContain('Needs follow-up')
   })
 

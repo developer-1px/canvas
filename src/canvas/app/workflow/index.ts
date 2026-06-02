@@ -14,6 +14,11 @@ export type {
   CanvasAppExtensionAssemblyInput,
 } from './CanvasAppExtensionAssemblyTypes'
 export type {
+  CanvasAppCollaborationAssemblyInput,
+  CanvasAppPresenceProvider,
+  CanvasAppPresenceProviderContext,
+} from './CanvasAppCollaborationAssembly'
+export type {
   CanvasAppCustomCommand,
   CanvasAppCustomCommandContext,
 } from '../affordances/commands/CanvasAppCustomCommands'
@@ -48,6 +53,11 @@ export type {
   CanvasAppInspectorPanelContext,
   CanvasAppInspectorPanelView,
 } from '../affordances/editing/inspector/CanvasAppInspectorPanels'
+export type {
+  CanvasMediaImporter,
+  CanvasMediaImporterContext,
+  CanvasMediaImportSource,
+} from '../affordances/io/media/CanvasMediaImporters'
 export type {
   CanvasTextPasteImporter,
   CanvasTextPasteImporterContext,

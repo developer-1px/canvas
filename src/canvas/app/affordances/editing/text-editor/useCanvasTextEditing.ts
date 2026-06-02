@@ -19,7 +19,7 @@ type UseCanvasTextEditingArgs = {
   commitItemsChange: CommitCanvasItemsChange
   editing: EditingText | null
   editingItem: EditableCanvasTextItem | null
-  editorRef: RefObject<HTMLTextAreaElement | null>
+  editorRef: RefObject<HTMLElement | null>
   selection: string[]
   setEditing: Dispatch<SetStateAction<EditingText | null>>
   viewport: Viewport
@@ -42,8 +42,12 @@ export function useCanvasTextEditing({
     }
 
     const frame = requestAnimationFrame(() => {
-      editorRef.current?.focus()
-      editorRef.current?.select()
+      const editor = editorRef.current
+      editor?.focus()
+
+      if (editor instanceof HTMLTextAreaElement) {
+        editor.select()
+      }
     })
 
     return () => cancelAnimationFrame(frame)

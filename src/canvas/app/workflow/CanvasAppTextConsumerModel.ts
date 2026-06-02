@@ -1,12 +1,17 @@
 import type { CanvasAppTextRuntime } from './CanvasAppTextConsumerContracts'
 
-export function getCanvasAppTextConsumerModel<TFindReplace, TTextEditor>({
+export function getCanvasAppTextConsumerModel<
+  TFindReplace,
+  TTextEditor,
+  TInlineTextEditor,
+>({
   blurTextEditor,
   findReplace,
+  inlineTextEditor,
   openFindReplace,
   setEditing,
   textEditor,
-}: CanvasAppTextRuntime<TFindReplace, TTextEditor>) {
+}: CanvasAppTextRuntime<TFindReplace, TTextEditor, TInlineTextEditor>) {
   return {
     command: {
       setEditing,
@@ -32,6 +37,7 @@ export function getCanvasAppTextConsumerModel<TFindReplace, TTextEditor>({
     },
     stage: {
       blurTextEditor,
+      inlineTextEditor,
     },
     view: {
       findReplace,

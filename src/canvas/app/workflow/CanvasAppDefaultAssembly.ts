@@ -24,6 +24,9 @@ import {
 import { DEFAULT_CANVAS_APP_ITEM_LAYER_ADAPTER } from '../rendering/CanvasAppItemLayerAdapter'
 import { DEFAULT_CANVAS_APP_STAGE_ADAPTER } from '../rendering/CanvasAppStageAdapter'
 import { DEFAULT_CANVAS_WORKSPACE_STORAGE_PROVIDER } from '../workspace/document/CanvasWorkspacePersistence'
+import {
+  EMPTY_CANVAS_APP_PRESENCE_PROVIDER,
+} from './CanvasAppCollaborationAssembly'
 import type { CanvasAppAssembly } from './CanvasAppAssemblyTypes'
 import { snapshotCanvasAppAssembly } from './CanvasAppAssemblySnapshot'
 
@@ -51,6 +54,7 @@ export const DEFAULT_CANVAS_APP_ASSEMBLY: CanvasAppAssembly =
     initialSelection: DEFAULT_CANVAS_APP_INITIAL_SELECTION,
     itemAdapters: CANVAS_ITEM_ENGINE_ADAPTERS,
     itemLayerAdapter: DEFAULT_CANVAS_APP_ITEM_LAYER_ADAPTER,
+    presenceProvider: EMPTY_CANVAS_APP_PRESENCE_PROVIDER,
     stageAdapter: DEFAULT_CANVAS_APP_STAGE_ADAPTER,
     workspaceStorageProvider: DEFAULT_CANVAS_WORKSPACE_STORAGE_PROVIDER,
   })

@@ -36,6 +36,7 @@ export function snapshotCanvasAppAssembly(
     initialSelection: snapshotCanvasAppArray(assembly.initialSelection),
     itemAdapters: adapterSnapshot.itemAdapters,
     itemLayerAdapter: adapterSnapshot.itemLayerAdapter,
+    presenceProvider: assembly.presenceProvider,
     stageAdapter: adapterSnapshot.stageAdapter,
     workspaceStorageProvider: assembly.workspaceStorageProvider,
   })

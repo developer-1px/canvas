@@ -1,5 +1,6 @@
 import type { CanvasAffordanceConfig } from '../../engine'
 import type { Viewport } from '../../entities'
+import type { CanvasMediaImporter } from '../affordances/io/media/CanvasMediaImporters'
 import type { CanvasTextPasteImporter } from '../affordances/io/text-paste/CanvasTextPasteImporters'
 import type { CanvasAppItemReadModel } from './CanvasAppItemReadModelContracts'
 import type { CanvasAppStageElement } from '../rendering/stage/CanvasAppStageElement'
@@ -19,6 +20,7 @@ export type CanvasAppLinkPreviewImportModelInput = {
   commitItemsChange: CommitCanvasItemsChange
   config: CanvasAffordanceConfig
   createId: (prefix: string) => string
+  mediaImporters: readonly CanvasMediaImporter[]
   selection: string[]
   stageElement: CanvasAppStageElement
   viewport: Viewport

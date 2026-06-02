@@ -1,4 +1,7 @@
-import type { ReactNode } from 'react'
+import type {
+  CSSProperties,
+  ReactNode,
+} from 'react'
 import type {
   CanvasShapeItem,
   RectItem,
@@ -56,14 +59,19 @@ function renderCanvasDemoSvgShapeItem({
   item: CanvasShapeItem | RectItem
 }) {
   return (
-    <>
+    <g opacity={item.opacity}>
       {renderCanvasDemoSvgShapeNode({ item })}
       {item.text ? (
         <foreignObject x={item.x} y={item.y} width={item.w} height={item.h}>
-          <div className="canvas-text canvas-shape-text">{item.text}</div>
+          <div
+            className="canvas-text canvas-shape-text"
+            style={getCanvasDemoSvgTextStyle(item)}
+          >
+            {item.text}
+          </div>
         </foreignObject>
       ) : null}
-    </>
+    </g>
   )
 }
 
@@ -78,6 +86,7 @@ function renderCanvasDemoSvgShapeNode({
     fill: item.fill,
     geometry,
     stroke: item.stroke,
+    strokeWidth: item.strokeWidth,
   })
 }
 
@@ -85,11 +94,15 @@ function renderCanvasDemoSvgShapeGeometry({
   fill,
   geometry,
   stroke,
+  strokeWidth,
 }: {
   fill: string
   geometry: CanvasSvgShapeGeometry
   stroke: string
+  strokeWidth?: number
 }) {
+  const style = getCanvasDemoSvgStrokeWidthStyle(strokeWidth)
+
   if (geometry.kind === 'ellipse') {
     return (
       <ellipse
@@ -100,6 +113,7 @@ function renderCanvasDemoSvgShapeGeometry({
         ry={geometry.ry}
         fill={fill}
         stroke={stroke}
+        style={style}
         vectorEffect="non-scaling-stroke"
       />
     )
@@ -112,6 +126,7 @@ function renderCanvasDemoSvgShapeGeometry({
         d={geometry.d}
         fill={fill}
         stroke={stroke}
+        style={style}
         vectorEffect="non-scaling-stroke"
       />
     )
@@ -127,6 +142,7 @@ function renderCanvasDemoSvgShapeGeometry({
       rx={geometry.rx}
       fill={fill}
       stroke={stroke}
+      style={style}
       vectorEffect="non-scaling-stroke"
     />
   )
@@ -138,8 +154,35 @@ function renderCanvasDemoSvgTextItem({
   item: TextItem
 }) {
   return (
-    <foreignObject x={item.x} y={item.y} width={item.w} height={item.h}>
-      <div className="canvas-text">{item.text}</div>
+    <foreignObject
+      opacity={item.opacity}
+      x={item.x}
+      y={item.y}
+      width={item.w}
+      height={item.h}
+    >
+      <div className="canvas-text" style={getCanvasDemoSvgTextStyle(item)}>
+        {item.text}
+      </div>
     </foreignObject>
   )
+}
+
+function getCanvasDemoSvgTextStyle(
+  item: CanvasDemoSvgRectTextItem,
+): CSSProperties | undefined {
+  if (item.fontSize === undefined && item.textAlign === undefined) {
+    return undefined
+  }
+
+  return {
+    fontSize: item.fontSize,
+    textAlign: item.textAlign,
+  }
+}
+
+function getCanvasDemoSvgStrokeWidthStyle(
+  strokeWidth: number | undefined,
+): CSSProperties | undefined {
+  return strokeWidth === undefined ? undefined : { strokeWidth }
 }

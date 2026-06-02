@@ -65,6 +65,7 @@
     "@zod-crud/patch-preview": "link:../zod-crud/packages/patch-preview",
     "@zod-crud/search-replace": "link:../zod-crud/packages/search-replace",
     "lucide-react": "^1.16.0",
+    "nano-edit": "link:../nano-edit",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "zod": "^4.4.3",

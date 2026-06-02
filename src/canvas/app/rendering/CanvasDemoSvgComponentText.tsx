@@ -1,4 +1,7 @@
+import type { CSSProperties } from 'react'
 import type { CanvasComponentItem } from '../../entities'
+import { CanvasContentEditableText } from '../affordances/editing/text-editor/CanvasContentEditableText'
+import { useCanvasInlineTextEditing } from '../affordances/editing/text-editor/CanvasInlineTextEditingContext'
 
 type CanvasDemoSvgComponentTextProps = {
   compact?: boolean
@@ -51,6 +54,8 @@ export function CanvasDemoSvgSectionText({
 }: {
   item: CanvasComponentItem
 }) {
+  const style = getCanvasDemoSvgComponentTextStyle(item)
+
   return (
     <foreignObject
       data-section-id={item.id}
@@ -64,9 +69,13 @@ export function CanvasDemoSvgSectionText({
           className="component-section-accent"
           style={{ background: item.accent }}
         />
-        <div className="component-section-title">{item.title}</div>
+        <div className="component-section-title" style={style}>
+          {item.title}
+        </div>
         {item.body ? (
-          <div className="component-section-body">{item.body}</div>
+          <div className="component-section-body" style={style}>
+            {item.body}
+          </div>
         ) : null}
       </div>
     </foreignObject>
@@ -77,6 +86,8 @@ export function CanvasDemoSvgComponentText({
   compact,
   item,
 }: CanvasDemoSvgComponentTextProps) {
+  const style = getCanvasDemoSvgComponentTextStyle(item)
+
   return (
     <foreignObject x={item.x} y={item.y} width={item.w} height={item.h}>
       <div
@@ -86,8 +97,14 @@ export function CanvasDemoSvgComponentText({
             : 'component-text'
         }
       >
-        <div className="component-title">{item.title}</div>
-        {item.body ? <div className="component-body">{item.body}</div> : null}
+        <div className="component-title" style={style}>
+          {item.title}
+        </div>
+        {item.body ? (
+          <div className="component-body" style={style}>
+            {item.body}
+          </div>
+        ) : null}
       </div>
     </foreignObject>
   )
@@ -99,16 +116,24 @@ export function CanvasDemoSvgStickyText({
   item: CanvasComponentItem
 }) {
   const showTitle = item.title.trim().length > 0 && item.title !== 'Sticky'
+  const editor = useCanvasInlineTextEditing()
+  const style = getCanvasDemoSvgComponentTextStyle(item)
 
   return (
     <foreignObject x={item.x} y={item.y} width={item.w} height={item.h}>
       <div className="component-sticky-text">
         {showTitle ? (
-          <div className="component-sticky-title">{item.title}</div>
+          <div className="component-sticky-title" style={style}>
+            {item.title}
+          </div>
         ) : null}
-        {item.body ? (
-          <div className="component-sticky-body">{item.body}</div>
-        ) : null}
+        <CanvasContentEditableText
+          className="component-sticky-body"
+          editor={editor}
+          id={item.id}
+          style={style}
+          value={item.body ?? ''}
+        />
       </div>
     </foreignObject>
   )
@@ -121,8 +146,25 @@ export function CanvasDemoSvgText({
   y,
 }: CanvasDemoSvgTextProps) {
   return (
-    <text x={x} y={y} className={strong ? 'component-svg-title' : 'component-svg-text'}>
+    <text
+      x={x}
+      y={y}
+      className={strong ? 'component-svg-title' : 'component-svg-text'}
+    >
       {text}
     </text>
   )
+}
+
+function getCanvasDemoSvgComponentTextStyle(
+  item: CanvasComponentItem,
+): CSSProperties | undefined {
+  if (item.fontSize === undefined && item.textAlign === undefined) {
+    return undefined
+  }
+
+  return {
+    fontSize: item.fontSize,
+    textAlign: item.textAlign,
+  }
 }

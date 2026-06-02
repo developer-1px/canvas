@@ -6,6 +6,7 @@ import type {
 import {
   getCanvasEditableTextBounds,
   getCommittedCanvasEditableTextValue,
+  isCanvasStickyComponentItem,
 } from '../../../../host'
 import type { CommitCanvasItemsChange } from '../../../workflow/CanvasWorkflowContract'
 
@@ -27,6 +28,10 @@ export type CanvasTextEditorStyle = {
   top: number
   width: number
 }
+
+const CANVAS_TEXT_EDITOR_DEFAULT_STYLE = Object.freeze({
+  fontSize: 16,
+})
 
 export function commitCanvasTextEditing({
   commitItemsChange,
@@ -73,8 +78,20 @@ export function getCanvasTextEditorStyle({
     width: bounds.w * viewport.scale,
     height: bounds.h * viewport.scale,
     minHeight: bounds.h * viewport.scale,
-    fontSize: 16 * viewport.scale,
+    fontSize: getCanvasTextEditorFontSize(editingItem) * viewport.scale,
   }
+}
+
+export function shouldUseCanvasContentEditableText(
+  item: CanvasEditableTextItem | null,
+) {
+  return item !== null && isCanvasStickyComponentItem(item)
+}
+
+function getCanvasTextEditorFontSize(item: CanvasEditableTextItem) {
+  return 'fontSize' in item && typeof item.fontSize === 'number'
+    ? item.fontSize
+    : CANVAS_TEXT_EDITOR_DEFAULT_STYLE.fontSize
 }
 
 function getCommittedCanvasTextValue({

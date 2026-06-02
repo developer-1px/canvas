@@ -27,9 +27,14 @@ export type CanvasAppTextModelInput = {
   viewport: Viewport
 }
 
-export type CanvasAppTextRuntime<TFindReplace, TTextEditor> = {
+export type CanvasAppTextRuntime<
+  TFindReplace,
+  TTextEditor,
+  TInlineTextEditor,
+> = {
   blurTextEditor: () => void
   findReplace: TFindReplace
+  inlineTextEditor: TInlineTextEditor
   openFindReplace: () => void
   setEditing: Dispatch<SetStateAction<EditingText | null>>
   textEditor: TTextEditor
