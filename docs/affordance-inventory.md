@@ -78,6 +78,11 @@ bundle이다. Host/Demo는 `withCanvasAppFacilitationBundle`로 timer, voting,
 spotlight, emote, cursor chat, laser pointer의 overlay/shortcut/gesture/tool
 toggle을 한 번에 opt-in/out한다.
 
+Collaboration 경계는 `docs/adr/0002-collaboration-boundary.md`를 따른다.
+document sync는 Host-owned persistent state, presence sync는 App provider
+seam을 통과하는 ephemeral overlay state, sharing/permissions는 Host-owned
+capability policy다. Core는 transport, account, share link를 소유하지 않는다.
+
 ## De-facto Reconciliation
 
 > `docs/canvas-affordance-defacto.md` 정본 기준으로 위 keep/legacy/drop을 재해석한다.
