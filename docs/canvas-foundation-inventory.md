@@ -47,7 +47,7 @@ product/app meaning last.
 | `src/canvas/host/component` | Host | keep | Demo component templates and component storage rules. |
 | `src/canvas/host/text` | Host | keep | Maps item variants to editable values and patch fields. |
 | `src/canvas/app/workflow` | App | keep | React state fan-out, command effects, pointer lifecycle effects, and assembly wiring. |
-| `src/canvas/app/extensions` | App / first-party extension bridge | split needed | Registry and descriptor validation are reusable candidates; current assembly output remains App-owned. |
+| `src/canvas/app/extensions` | App / first-party extension bridge | split started | App bundles now carry foundation extension descriptor metadata; current assembly output remains App-owned. |
 | `src/canvas/app/rendering` | App adapter | keep | Demo SVG item layer adapter and presentation resolution. |
 | `src/canvas/renderer` | Renderer | keep | Stage and overlay renderer should remain item-model independent. |
 | `src/canvas/ui` | UI | keep | Shared icons and controls only. |
@@ -62,6 +62,7 @@ product/app meaning last.
 6. Promote gesture routing contracts behind structural config adapters. Done in issue #77.
 7. Promote command availability contracts behind structural config adapters. Done in issue #79.
 8. Promote snap contracts behind structural config adapters. Done in issue #81.
+9. Bridge app extension bundles to foundation extension descriptors. Done in issue #83.
 
 ## Extension Shape
 
@@ -84,6 +85,11 @@ patches.
 descriptor. It names sticky note creation as a creation tool and declares the
 creation, document, renderer, and text-target adapter slots without moving Demo
 component templates, item schemas, SVG rendering, or app workflow.
+
+`CanvasAppExtensionBundle.foundationExtensions` is the app-owned bridge for
+descriptor metadata. It lets app assembly carry first-party extension
+descriptors such as `CANVAS_STICKY_NOTE_EXTENSION` without executing command
+planners or moving toolbar, rendering, document, or Host item logic.
 
 ## Guardrails
 

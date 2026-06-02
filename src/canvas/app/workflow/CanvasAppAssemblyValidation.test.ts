@@ -208,6 +208,16 @@ describe('CanvasAppAssembly validation', () => {
 
     expect(() =>
       createCanvasAppAssembly({
+        foundationExtensions: [
+          {
+            requiredAdapters: [],
+          } as never,
+        ],
+      }),
+    ).toThrow('Canvas app foundation extension requires id')
+
+    expect(() =>
+      createCanvasAppAssembly({
         itemLayerAdapter: {} as unknown as CanvasAppItemLayerAdapter,
       }),
     ).toThrow('Canvas app item layer adapter requires renderItems')
@@ -309,4 +319,3 @@ function defineRiskModule() {
     ],
   })
 }
-

@@ -37,6 +37,9 @@ export type {
   CanvasAppCustomCommandState,
   CanvasAppCustomCreationToolState,
 } from '../extensions/CanvasAppExtensionStateContracts'
+export type {
+  CanvasAppFoundationExtension,
+} from '../extensions/CanvasAppFoundationExtensionDescriptors'
 export {
   createCanvasAppCustomItemModuleAssembly,
   type CanvasAppCustomItemModuleAssembly,

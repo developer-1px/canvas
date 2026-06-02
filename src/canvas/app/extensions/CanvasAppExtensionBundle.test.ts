@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest'
+import { defineCanvasExtension } from '../../foundation'
 import {
   createCanvasAppExtensionBundle,
   createEmptyCanvasAppExtensionBundle,
   mergeCanvasAppExtensionBundle,
   snapshotCanvasAppExtensionBundle,
 } from './CanvasAppExtensionBundle'
+import type { CanvasAppFoundationExtension } from './CanvasAppFoundationExtensionDescriptors'
 import type { CanvasMediaImporter } from '../affordances/io/media/CanvasMediaImporters'
 import type { CanvasTextPasteImporter } from '../affordances/io/text-paste/CanvasTextPasteImporters'
 
@@ -15,6 +17,7 @@ describe('CanvasAppExtensionBundle', () => {
       customCreationTools: [],
       customItemRenderers: {},
       customItemValidators: {},
+      foundationExtensions: [],
       inspectorPanels: [],
       mediaImporters: [],
       textPasteImporters: [],
@@ -31,6 +34,7 @@ describe('CanvasAppExtensionBundle', () => {
       customItemValidators: {
         risk: () => true,
       },
+      foundationExtensions: [createFoundationExtension('canvas.risk')],
       inspectorPanels: [createPanel('risk-panel')],
       mediaImporters: [createMediaImporter('risk-media')],
       textPasteImporters: [createTextPasteImporter('risk-paste')],
@@ -44,6 +48,7 @@ describe('CanvasAppExtensionBundle', () => {
       customItemValidators: {
         note: () => true,
       },
+      foundationExtensions: [createFoundationExtension('canvas.note')],
       inspectorPanels: [createPanel('note-panel')],
       mediaImporters: [createMediaImporter('note-media')],
       textPasteImporters: [createTextPasteImporter('note-paste')],
@@ -65,6 +70,8 @@ describe('CanvasAppExtensionBundle', () => {
     ])
     expect(Object.keys(merged.customItemRenderers)).toEqual(['risk', 'note'])
     expect(Object.keys(merged.customItemValidators)).toEqual(['risk', 'note'])
+    expect(merged.foundationExtensions.map((extension) => extension.id))
+      .toEqual(['canvas.risk', 'canvas.note'])
     expect(merged.inspectorPanels.map((panel) => panel.id)).toEqual([
       'risk-panel',
       'note-panel',
@@ -111,6 +118,18 @@ describe('CanvasAppExtensionBundle', () => {
     expect(() =>
       mergeCanvasAppExtensionBundle({
         current: createCanvasAppExtensionBundle({
+          foundationExtensions: [createFoundationExtension('canvas.risk')],
+        }),
+        entries: createCanvasAppExtensionBundle({
+          foundationExtensions: [createFoundationExtension('canvas.risk')],
+        }),
+        owner: 'app assembly',
+      }),
+    ).toThrow('Duplicate canvas app assembly foundation extension: canvas.risk')
+
+    expect(() =>
+      mergeCanvasAppExtensionBundle({
+        current: createCanvasAppExtensionBundle({
           mediaImporters: [createMediaImporter('embed')],
         }),
         entries: createCanvasAppExtensionBundle({
@@ -142,6 +161,7 @@ describe('CanvasAppExtensionBundle', () => {
     const panel = createPanel('risk-panel')
     const mediaImporter = createMediaImporter('risk-media')
     const textPasteImporter = createTextPasteImporter('risk-paste')
+    const foundationExtension = createFoundationExtension('canvas.risk')
     const bundle = createCanvasAppExtensionBundle({
       customCommands: [command],
       customCreationTools: [tool],
@@ -151,6 +171,7 @@ describe('CanvasAppExtensionBundle', () => {
       customItemValidators: {
         risk: validateRisk,
       },
+      foundationExtensions: [foundationExtension],
       inspectorPanels: [panel],
       mediaImporters: [mediaImporter],
       textPasteImporters: [textPasteImporter],
@@ -160,12 +181,19 @@ describe('CanvasAppExtensionBundle', () => {
 
     command.title = 'Mutated'
     tool.shortcut.key = 'x'
+    foundationExtension.requiredAdapters = ['renderer']
+    foundationExtension.tools = []
     panel.id = 'mutated-panel'
     mediaImporter.createItems = () => []
     textPasteImporter.createItems = () => []
 
     expect(snapshot.customCommands[0]?.title).toBe('publish')
     expect(snapshot.customCreationTools[0]?.shortcut).toEqual({ key: 'r' })
+    expect(snapshot.foundationExtensions[0]?.requiredAdapters).toEqual([
+      'document',
+    ])
+    expect(snapshot.foundationExtensions[0]?.tools?.[0]?.requiredAdapters)
+      .toEqual(['creation'])
     expect(snapshot.customItemRenderers.risk).toBe(renderRisk)
     expect(snapshot.customItemValidators.risk).toBe(validateRisk)
     expect(snapshot.inspectorPanels[0]?.id).toBe('risk-panel')
@@ -177,6 +205,11 @@ describe('CanvasAppExtensionBundle', () => {
     expect(Object.isFrozen(snapshot.customCreationTools[0]?.shortcut)).toBe(
       true,
     )
+    expect(Object.isFrozen(snapshot.foundationExtensions[0])).toBe(true)
+    expect(Object.isFrozen(snapshot.foundationExtensions[0]?.requiredAdapters))
+      .toBe(true)
+    expect(Object.isFrozen(snapshot.foundationExtensions[0]?.tools?.[0]))
+      .toBe(true)
     expect(Object.isFrozen(snapshot.customItemRenderers)).toBe(true)
     expect(Object.isFrozen(snapshot.customItemValidators)).toBe(true)
     expect(Object.isFrozen(snapshot.inspectorPanels[0])).toBe(true)
@@ -202,6 +235,22 @@ function createTool(id: string) {
     shortcut: undefined as { key: string } | undefined,
     title: id,
   }
+}
+
+function createFoundationExtension(id: string): CanvasAppFoundationExtension {
+  return defineCanvasExtension({
+    id,
+    requiredAdapters: ['document'],
+    rendererSlots: [{
+      id: `${id}.renderer`,
+      surface: 'item-layer',
+    }],
+    tools: [{
+      id: `${id}.tool`,
+      kind: 'creation',
+      requiredAdapters: ['creation'],
+    }],
+  })
 }
 
 function createPanel(id: string) {

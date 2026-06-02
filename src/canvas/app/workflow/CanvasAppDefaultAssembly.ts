@@ -1,3 +1,6 @@
+import {
+  CANVAS_STICKY_NOTE_EXTENSION,
+} from '../../foundation'
 import { DEFAULT_CANVAS_AFFORDANCE_CONFIG } from '../../engine'
 import {
   CANVAS_COMPONENT_LIBRARY,
@@ -42,6 +45,7 @@ export const DEFAULT_CANVAS_APP_ASSEMBLY: CanvasAppAssembly =
   snapshotCanvasAppAssembly({
     ...createCanvasAppExtensionBundle({
       customItemRenderers: DEFAULT_CANVAS_APP_CUSTOM_ITEM_RENDERERS,
+      foundationExtensions: [CANVAS_STICKY_NOTE_EXTENSION],
       inspectorPanels: [
         CANVAS_LINK_PREVIEW_INSPECTOR_PANEL,
         CANVAS_ARROW_ROUTING_INSPECTOR_PANEL,

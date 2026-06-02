@@ -118,6 +118,7 @@ export {
   type CanvasAppCustomItemRendererStrategy,
   type CanvasAppCustomItemRenderers,
   type CanvasAppFacilitationBundleOptions,
+  type CanvasAppFoundationExtension,
   type CanvasBoardExportInput,
   type CanvasBoardExportMetadata,
   type CanvasBoardExportPayload,

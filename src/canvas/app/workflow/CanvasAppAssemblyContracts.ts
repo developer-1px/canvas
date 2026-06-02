@@ -3,6 +3,7 @@ import { assertCanvasAppCustomCommands } from '../affordances/commands/CanvasApp
 import { assertCanvasAppDescriptorObject } from '../extensions/CanvasAppDescriptorContracts'
 import { assertCanvasAppInspectorPanels } from '../affordances/editing/inspector/CanvasAppInspectorPanelContracts'
 import { assertCanvasAppCustomItemValidators } from '../extensions/custom-item-modules/CanvasAppCustomItemValidatorContracts'
+import { assertCanvasAppFoundationExtensions } from '../extensions/CanvasAppFoundationExtensionDescriptors'
 import { assertCanvasAppCustomItemRenderers } from '../rendering/CanvasAppRendererRegistries'
 import { assertCanvasAppCustomCreationTools } from '../extensions/custom-tools/CanvasAppCustomCreationToolContracts'
 import { assertCanvasMediaImporters } from '../affordances/io/media/CanvasMediaImporters'
@@ -27,6 +28,7 @@ export function assertCanvasAppAssembly(assembly: CanvasAppAssembly) {
   assertCanvasAppCustomCreationTools(assembly.customCreationTools)
   assertCanvasAppCustomItemRenderers(assembly.customItemRenderers)
   assertCanvasAppCustomItemValidators(assembly.customItemValidators)
+  assertCanvasAppFoundationExtensions(assembly.foundationExtensions)
   assertCanvasAppInspectorPanels(assembly.inspectorPanels)
   assertCanvasMediaImporters(assembly.mediaImporters)
   assertCanvasTextPasteImporters(assembly.textPasteImporters)
