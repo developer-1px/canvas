@@ -63,6 +63,9 @@ command, and patch-planning grammar that can run through adapters.
 - `CanvasSceneAdapter` and `CanvasSelectionEngine` live in Foundation source
   ownership. The Engine facade may re-export them for compatibility, but Engine
   internals should import scene contracts from Foundation.
+- `CanvasTransformEngine` lives in Foundation source ownership. Host item
+  mutation remains adapter-owned; Foundation only plans move and resize through
+  `CanvasTransformAdapter`.
 - `canvas/foundation` is the named public facade for low-risk foundation
   tracer bullets. It can re-export existing headless contracts before broad
   implementation moves.

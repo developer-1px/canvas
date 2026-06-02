@@ -109,7 +109,7 @@ export {
   resizeCanvasSelection,
   type CanvasTransformAdapter,
   type CanvasTransformItem,
-} from './transform/CanvasTransformEngine'
+} from '../foundation/CanvasTransformEngine'
 export {
   getCanvasWheelViewport,
   shouldHandleCanvasWheelViewport,

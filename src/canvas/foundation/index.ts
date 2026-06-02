@@ -47,4 +47,4 @@ export {
   resizeCanvasSelection,
   type CanvasTransformAdapter,
   type CanvasTransformItem,
-} from '../engine/transform/CanvasTransformEngine'
+} from './CanvasTransformEngine'

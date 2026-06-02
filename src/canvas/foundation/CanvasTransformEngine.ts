@@ -2,11 +2,11 @@ import type {
   Bounds,
   Point,
   ResizeHandle
-} from '../../core'
+} from '../core'
 import {
   resizeBounds,
   type ResizeBoundsOptions,
-} from '../primitives/CanvasPrimitives'
+} from '../core'
 
 export type CanvasTransformItem = {
   id: string
