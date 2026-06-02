@@ -10,6 +10,7 @@ import {
   CanvasRenderer,
   createCanvasAppAssembly,
   defineCanvasAppCustomItemModule,
+  getCanvasAppFoundationExtensionTools,
   type CanvasAppAssemblySource,
   type CanvasAppCommitItemsChange,
   type CanvasAppComponentLibrary,
@@ -19,6 +20,7 @@ import {
   type CanvasAppCustomItemRendererStrategy,
   type CanvasAppCustomItemValidator,
   type CanvasAppFoundationExtension,
+  type CanvasAppFoundationExtensionTool,
   type CanvasAppItemLayerAdapter,
   type CanvasAppProps,
   type CanvasAppPointerInput,
@@ -176,6 +178,15 @@ describe('Canvas package consumer imports', () => {
     expect(assembly.initialItems).toEqual([rect])
     expect(assembly.foundationExtensions.map((extension) => extension.id))
       .toContain('canvas.smoke')
+    const foundationTools: readonly CanvasAppFoundationExtensionTool[] =
+      getCanvasAppFoundationExtensionTools(assembly.foundationExtensions)
+
+    expect(foundationTools.map((tool) => tool.extensionId)).toContain(
+      'canvas.sticky-note',
+    )
+    expect(CanvasAppAuthoring.getCanvasAppFoundationExtensionTools(
+      assembly.foundationExtensions,
+    )).toEqual(foundationTools)
     expect(commitAppItemsChange(appItemsChange)).toBe(true)
     expect(assembly.initialSelection).toEqual([rect.id])
     expect(
@@ -244,6 +255,8 @@ describe('Canvas package consumer imports', () => {
     expect(CanvasAppFacade.createCanvasAppCustomItemModuleAssembly)
       .toBeTypeOf('function')
     expect(CanvasAppAuthoring.createCanvasAppAssembly).toBeTypeOf('function')
+    expect(CanvasAppAuthoring.getCanvasAppFoundationExtensionTools)
+      .toBeTypeOf('function')
     expect(CanvasAppAuthoring.defineCanvasAppCustomItemModule).toBeTypeOf(
       'function',
     )

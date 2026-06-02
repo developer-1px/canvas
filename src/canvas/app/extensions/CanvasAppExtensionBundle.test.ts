@@ -7,6 +7,7 @@ import {
   snapshotCanvasAppExtensionBundle,
 } from './CanvasAppExtensionBundle'
 import type { CanvasAppFoundationExtension } from './CanvasAppFoundationExtensionDescriptors'
+import { getCanvasAppFoundationExtensionTools } from './CanvasAppFoundationExtensionTools'
 import type { CanvasMediaImporter } from '../affordances/io/media/CanvasMediaImporters'
 import type { CanvasTextPasteImporter } from '../affordances/io/text-paste/CanvasTextPasteImporters'
 
@@ -130,6 +131,24 @@ describe('CanvasAppExtensionBundle', () => {
     expect(() =>
       mergeCanvasAppExtensionBundle({
         current: createCanvasAppExtensionBundle({
+          foundationExtensions: [
+            createFoundationExtension('canvas.risk', 'canvas.shared.tool'),
+          ],
+        }),
+        entries: createCanvasAppExtensionBundle({
+          foundationExtensions: [
+            createFoundationExtension('canvas.note', 'canvas.shared.tool'),
+          ],
+        }),
+        owner: 'app assembly',
+      }),
+    ).toThrow(
+      'Duplicate canvas app assembly foundation extension tool: canvas.shared.tool',
+    )
+
+    expect(() =>
+      mergeCanvasAppExtensionBundle({
+        current: createCanvasAppExtensionBundle({
           mediaImporters: [createMediaImporter('embed')],
         }),
         entries: createCanvasAppExtensionBundle({
@@ -194,6 +213,16 @@ describe('CanvasAppExtensionBundle', () => {
     ])
     expect(snapshot.foundationExtensions[0]?.tools?.[0]?.requiredAdapters)
       .toEqual(['creation'])
+    const foundationTools = getCanvasAppFoundationExtensionTools(
+      snapshot.foundationExtensions,
+    )
+
+    expect(foundationTools).toEqual([{
+      extensionId: 'canvas.risk',
+      id: 'canvas.risk.tool',
+      kind: 'creation',
+      requiredAdapters: ['creation'],
+    }])
     expect(snapshot.customItemRenderers.risk).toBe(renderRisk)
     expect(snapshot.customItemValidators.risk).toBe(validateRisk)
     expect(snapshot.inspectorPanels[0]?.id).toBe('risk-panel')
@@ -210,11 +239,29 @@ describe('CanvasAppExtensionBundle', () => {
       .toBe(true)
     expect(Object.isFrozen(snapshot.foundationExtensions[0]?.tools?.[0]))
       .toBe(true)
+    expect(Object.isFrozen(foundationTools)).toBe(true)
+    expect(Object.isFrozen(foundationTools[0])).toBe(true)
+    expect(Object.isFrozen(foundationTools[0]?.requiredAdapters)).toBe(true)
     expect(Object.isFrozen(snapshot.customItemRenderers)).toBe(true)
     expect(Object.isFrozen(snapshot.customItemValidators)).toBe(true)
     expect(Object.isFrozen(snapshot.inspectorPanels[0])).toBe(true)
     expect(Object.isFrozen(snapshot.mediaImporters[0])).toBe(true)
     expect(Object.isFrozen(snapshot.textPasteImporters[0])).toBe(true)
+  })
+})
+
+describe('CanvasAppFoundationExtensionTools', () => {
+  it('indexes registered foundation extension tools with owning extension ids', () => {
+    expect(getCanvasAppFoundationExtensionTools([])).toEqual([])
+
+    expect(getCanvasAppFoundationExtensionTools([
+      createFoundationExtension('canvas.risk'),
+    ])).toEqual([{
+      extensionId: 'canvas.risk',
+      id: 'canvas.risk.tool',
+      kind: 'creation',
+      requiredAdapters: ['creation'],
+    }])
   })
 })
 
@@ -237,7 +284,10 @@ function createTool(id: string) {
   }
 }
 
-function createFoundationExtension(id: string): CanvasAppFoundationExtension {
+function createFoundationExtension(
+  id: string,
+  toolId = `${id}.tool`,
+): CanvasAppFoundationExtension {
   return defineCanvasExtension({
     id,
     requiredAdapters: ['document'],
@@ -246,7 +296,7 @@ function createFoundationExtension(id: string): CanvasAppFoundationExtension {
       surface: 'item-layer',
     }],
     tools: [{
-      id: `${id}.tool`,
+      id: toolId,
       kind: 'creation',
       requiredAdapters: ['creation'],
     }],
