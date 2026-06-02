@@ -15,6 +15,7 @@ export function getCanvasAppAssemblyModel({
   itemAdapters,
   itemLayerAdapter,
   mediaImporters,
+  presenceProvider,
   stageAdapter,
   textPasteImporters,
   workspaceStorageProvider,
@@ -25,6 +26,9 @@ export function getCanvasAppAssemblyModel({
     },
     command: {
       commandAdapter: itemAdapters.command,
+    },
+    collaboration: {
+      presenceProvider,
     },
     component: {
       componentLibrary,

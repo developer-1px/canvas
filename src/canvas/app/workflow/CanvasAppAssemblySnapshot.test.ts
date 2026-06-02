@@ -10,9 +10,10 @@ import type {
   CanvasAppAssembly,
   CanvasAppComponentRendererStrategy,
   CanvasAppCustomItemModuleCreationTool,
-  CanvasAppInspectorPanel,
-  CanvasAppItemLayerAdapter,
-  CanvasAppStageAdapter,
+	  CanvasAppInspectorPanel,
+	  CanvasAppItemLayerAdapter,
+	  CanvasAppPresenceProvider,
+	  CanvasAppStageAdapter,
   CanvasMediaImporter,
   CanvasTextPasteImporter,
 } from './index'
@@ -56,11 +57,17 @@ describe('CanvasAppAssembly snapshots', () => {
       id: 'risk-paste',
       createItems: () => null,
     }
-    const mediaImporter: CanvasMediaImporter = {
-      id: 'risk-media',
-      createItems: () => null,
-    }
-    const initialItems = [
+	    const mediaImporter: CanvasMediaImporter = {
+	      id: 'risk-media',
+	      createItems: () => null,
+	    }
+	    const presenceProvider: CanvasAppPresenceProvider = () => [{
+	      color: '#2563eb',
+	      id: 'remote-mia',
+	      label: 'Mia',
+	      point: { x: 10, y: 20 },
+	    }]
+	    const initialItems = [
       {
         id: 'rect-1',
         type: 'rect',
@@ -127,10 +134,11 @@ describe('CanvasAppAssembly snapshots', () => {
       initialSelection: ['rect-1'],
       inspectorPanels: [customInspectorPanel],
       itemAdapters,
-      itemLayerAdapter,
-      mediaImporters: [mediaImporter],
-      stageAdapter,
-      textPasteImporters: [textPasteImporter],
+	      itemLayerAdapter,
+	      mediaImporters: [mediaImporter],
+	      presenceProvider,
+	      stageAdapter,
+	      textPasteImporters: [textPasteImporter],
     })
 
     componentLibrary.getPresentation = () => 'mutated-card'
@@ -193,10 +201,19 @@ describe('CanvasAppAssembly snapshots', () => {
     expect(assembly.initialItems).toHaveLength(1)
     expect(assembly.initialItems[0]).toMatchObject({ id: 'rect-1', x: 0 })
     expect(assembly.initialSelection).toEqual(['rect-1'])
-    expect(assembly.itemAdapters.command.selectAll({ items: [] })).toEqual([])
-    expect(assembly.itemLayerAdapter.renderItems(
-      createItemLayerInput({ items: assembly.initialItems }),
-    )).toBe(1)
+	    expect(assembly.itemAdapters.command.selectAll({ items: [] })).toEqual([])
+	    expect(assembly.presenceProvider({
+	      selection: [],
+	      viewport: { scale: 1, x: 0, y: 0 },
+	    })).toEqual([{
+	      color: '#2563eb',
+	      id: 'remote-mia',
+	      label: 'Mia',
+	      point: { x: 10, y: 20 },
+	    }])
+	    expect(assembly.itemLayerAdapter.renderItems(
+	      createItemLayerInput({ items: assembly.initialItems }),
+	    )).toBe(1)
     expect(assembly.itemLayerAdapter.renderItems).toBe(itemLayerRenderItems)
     expect(assembly.stageAdapter.renderStage).toBe(renderStage)
     expect(assembly.customCreationTools[0]?.createItem({
@@ -224,9 +241,9 @@ describe('CanvasAppAssembly snapshots', () => {
     expect(Object.isFrozen(assembly.initialItems)).toBe(true)
     expect(Object.isFrozen(assembly.initialItems[0])).toBe(true)
     expect(Object.isFrozen(assembly.initialSelection)).toBe(true)
-    expect(Object.isFrozen(assembly.itemAdapters.command)).toBe(true)
-    expect(Object.isFrozen(assembly.itemLayerAdapter)).toBe(true)
-    expect(Object.isFrozen(assembly.stageAdapter)).toBe(true)
+	    expect(Object.isFrozen(assembly.itemAdapters.command)).toBe(true)
+	    expect(Object.isFrozen(assembly.itemLayerAdapter)).toBe(true)
+	    expect(Object.isFrozen(assembly.stageAdapter)).toBe(true)
   })
 
 })

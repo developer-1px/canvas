@@ -5,6 +5,7 @@ import type {
   CanvasAppAssembly,
   CanvasAppAssemblyInput,
 } from './CanvasAppAssemblyTypes'
+import { createCanvasAppCollaborationAssembly } from './CanvasAppCollaborationAssembly'
 import { createCanvasAppComponentAssembly } from './CanvasAppComponentAssembly'
 import { DEFAULT_CANVAS_APP_ASSEMBLY } from './CanvasAppDefaultAssembly'
 import { createCanvasAppExtensionAssembly } from './CanvasAppExtensionAssembly'
@@ -43,6 +44,10 @@ export function createCanvasAppAssembly(
     input,
     DEFAULT_CANVAS_APP_ASSEMBLY,
   )
+  const collaborationAssembly = createCanvasAppCollaborationAssembly(
+    input,
+    DEFAULT_CANVAS_APP_ASSEMBLY,
+  )
 
   const assembly: CanvasAppAssembly = {
     ...extensionAssembly,
@@ -54,6 +59,7 @@ export function createCanvasAppAssembly(
     initialSelection: workspaceAssembly.initialSelection,
     itemAdapters: adapterAssembly.itemAdapters,
     itemLayerAdapter: adapterAssembly.itemLayerAdapter,
+    presenceProvider: collaborationAssembly.presenceProvider,
     stageAdapter: adapterAssembly.stageAdapter,
     workspaceStorageProvider: workspaceAssembly.workspaceStorageProvider,
   }

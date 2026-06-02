@@ -14,6 +14,11 @@ export type {
   CanvasAppExtensionAssemblyInput,
 } from './CanvasAppExtensionAssemblyTypes'
 export type {
+  CanvasAppCollaborationAssemblyInput,
+  CanvasAppPresenceProvider,
+  CanvasAppPresenceProviderContext,
+} from './CanvasAppCollaborationAssembly'
+export type {
   CanvasAppCustomCommand,
   CanvasAppCustomCommandContext,
 } from '../affordances/commands/CanvasAppCustomCommands'

@@ -62,6 +62,10 @@ export function useCanvasAppModel({
   )
   const stageElement = useCanvasAppStageElementModel()
   const workspace = useCanvasWorkspaceModel(appAssembly.workspace)
+  const providedPresence = presence ?? appAssembly.collaboration.presenceProvider({
+    selection: workspace.interaction.selection,
+    viewport: workspace.interaction.viewport,
+  })
   const cursorChat = useCanvasCursorChatModel({
     ...affordance.keyboard,
     ...stageElement.pointer,
@@ -69,7 +73,7 @@ export function useCanvasAppModel({
   const sessionTimer = useCanvasSessionTimerModel(affordance.facilitation)
   const spotlight = useCanvasSpotlightModel({
     ...affordance.facilitation,
-    followerCount: presence?.length ?? 0,
+    followerCount: providedPresence.length,
   })
   const votingSession = useCanvasVotingSessionModel(affordance.facilitation)
   const emotes = useCanvasEmoteModel({
@@ -80,7 +84,7 @@ export function useCanvasAppModel({
   const interaction = useCanvasInteractionModel({
     ...affordance.interaction,
     emoteBursts: emotes.overlay.bursts,
-    presence,
+    presence: providedPresence,
     ...workspace.interaction,
   })
   const customFocus = useCanvasAppCustomFocusModel({

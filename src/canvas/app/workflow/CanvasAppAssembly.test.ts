@@ -9,10 +9,11 @@ import {
 import type {
   CanvasAppComponentRendererStrategy,
   CanvasAppCustomItemRendererStrategy,
-  CanvasAppItemLayerAdapter,
-  CanvasAppStageAdapter,
-  CanvasMediaImporter,
-  CanvasWorkspaceStorageProvider,
+	  CanvasAppItemLayerAdapter,
+	  CanvasAppPresenceProvider,
+	  CanvasAppStageAdapter,
+	  CanvasMediaImporter,
+	  CanvasWorkspaceStorageProvider,
 } from './index'
 
 describe('CanvasAppAssembly seams', () => {
@@ -196,6 +197,37 @@ describe('CanvasAppAssembly seams', () => {
     expect(DEFAULT_CANVAS_APP_ASSEMBLY.workspaceStorageProvider()).toBeNull()
   })
 
+  it('accepts live presence providers at the app assembly seam', () => {
+    const presenceProvider: CanvasAppPresenceProvider = ({
+      selection,
+      viewport,
+    }) => [{
+      color: '#2563eb',
+      id: 'remote-mia',
+      label: `${selection[0] ?? 'none'}:${viewport.scale}`,
+      point: { x: 10, y: 20 },
+      selectionBounds: { h: 40, w: 80, x: 5, y: 6 },
+    }]
+
+    const assembly = createCanvasAppAssembly({
+      presenceProvider,
+    })
+
+    expect(assembly.presenceProvider({
+      selection: ['rect-1'],
+      viewport: { scale: 2, x: 0, y: 0 },
+    })).toEqual([{
+      color: '#2563eb',
+      id: 'remote-mia',
+      label: 'rect-1:2',
+      point: { x: 10, y: 20 },
+      selectionBounds: { h: 40, w: 80, x: 5, y: 6 },
+    }])
+    expect(DEFAULT_CANVAS_APP_ASSEMBLY.presenceProvider({
+      selection: [],
+      viewport: { scale: 1, x: 0, y: 0 },
+    })).toEqual([])
+  })
 
   it('keeps demo default selection inside the default assembly only', () => {
     const customInitialItems = [{

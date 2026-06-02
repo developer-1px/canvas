@@ -31,6 +31,13 @@ test('opens as a minimal canvas affordance engine demo', async ({ page }) => {
   await expect(page.locator('.alignment-guide')).toHaveCount(0)
   await expect(page.locator('.spacing-guide')).toHaveCount(0)
   await expect(page.locator('.context-command-menu')).toHaveCount(0)
+  await expect(page.locator('.presence-overlays')).toBeVisible()
+  await expect(page.locator('.presence-cursor')).toHaveCount(2)
+  await expect(page.locator('.presence-selection')).toHaveCount(2)
+  await expect(page.locator('.presence-label-text', { hasText: 'Mia' }))
+    .toHaveCount(2)
+  await expect(page.locator('.presence-label-text', { hasText: 'Noah' }))
+    .toHaveCount(2)
   await expect(page.getByRole('region', { name: 'Voting session' }))
     .toHaveCount(0)
 

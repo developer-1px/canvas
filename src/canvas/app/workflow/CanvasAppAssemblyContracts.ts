@@ -9,6 +9,9 @@ import { assertCanvasMediaImporters } from '../affordances/io/media/CanvasMediaI
 import { assertCanvasTextPasteImporters } from '../affordances/io/text-paste/CanvasTextPasteImporters'
 import { assertCanvasAppAssemblyAdapters } from './CanvasAppAdapterContracts'
 import type { CanvasAppAssembly } from './CanvasAppAssemblyTypes'
+import {
+  assertCanvasAppCollaborationAssembly,
+} from './CanvasAppCollaborationAssembly'
 import { assertCanvasAppComponentAssembly } from './CanvasAppComponentAssemblyContracts'
 import { assertCanvasAppWorkspaceAssembly } from './CanvasAppWorkspaceAssemblyContracts'
 
@@ -23,6 +26,7 @@ export function assertCanvasAppAssembly(assembly: CanvasAppAssembly) {
   assertCanvasAppInspectorPanels(assembly.inspectorPanels)
   assertCanvasMediaImporters(assembly.mediaImporters)
   assertCanvasTextPasteImporters(assembly.textPasteImporters)
+  assertCanvasAppCollaborationAssembly(assembly)
   assertCanvasAppWorkspaceAssembly(assembly)
   assertCanvasAppAssemblyAdapters(assembly)
 

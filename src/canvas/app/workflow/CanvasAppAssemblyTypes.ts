@@ -17,6 +17,10 @@ import type {
   CanvasAppComponentAssemblyInput,
   CanvasAppWorkspaceAssemblyInput,
 } from './CanvasAppAssemblyInputTypes'
+import type {
+  CanvasAppCollaborationAssemblyInput,
+  CanvasAppPresenceProvider,
+} from './CanvasAppCollaborationAssembly'
 import type { CanvasAppExtensionAssemblyInput } from './CanvasAppExtensionAssemblyTypes'
 
 export type CanvasAppAssembly = CanvasAppExtensionBundle & {
@@ -27,12 +31,14 @@ export type CanvasAppAssembly = CanvasAppExtensionBundle & {
   initialSelection: readonly string[]
   itemAdapters: CanvasAppItemAdapters
   itemLayerAdapter: CanvasAppItemLayerAdapter
+  presenceProvider: CanvasAppPresenceProvider
   stageAdapter: CanvasAppStageAdapter
   workspaceStorageProvider: CanvasWorkspaceStorageProvider
 }
 
 export type CanvasAppAssemblyInput =
   CanvasAppExtensionAssemblyInput &
+  CanvasAppCollaborationAssemblyInput &
   CanvasAppAffordanceAssemblyInput &
   CanvasAppComponentAssemblyInput &
   CanvasAppAdapterAssemblyInput &

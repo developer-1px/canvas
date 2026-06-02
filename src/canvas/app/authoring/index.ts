@@ -7,6 +7,10 @@ export type {
   CanvasAppAssemblyInput,
 } from '../workflow/CanvasAppAssemblyTypes'
 export type {
+  CanvasAppPresenceProvider,
+  CanvasAppPresenceProviderContext,
+} from '../workflow/CanvasAppCollaborationAssembly'
+export type {
   CanvasAppComponentLibrary,
   CanvasAppComponentPresentation,
   CanvasAppComponentTemplate,

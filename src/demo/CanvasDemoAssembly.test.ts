@@ -125,11 +125,14 @@ describe('CanvasDemoAssembly', () => {
       .toBe(true)
     expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.objectStyleControls)
       .toBe(true)
-    expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.marquee).toBe(
-      true,
-    )
-    expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.stickyQuickCreate)
-      .toBe(true)
+	    expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.marquee).toBe(
+	      true,
+	    )
+	    expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.presence).toBe(
+	      true,
+	    )
+	    expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.stickyQuickCreate)
+	      .toBe(true)
     expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.emoteControls)
       .toBe(false)
     expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.stampControls)
@@ -165,7 +168,11 @@ describe('CanvasDemoAssembly', () => {
     expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.tools.sticky).toBe(true)
     expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.tools.comment).toBe(true)
     expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.tools.section).toBe(true)
-    expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.tools.highlight).toBe(true)
-    expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.tools.eraser).toBe(true)
-  })
-})
+	    expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.tools.highlight).toBe(true)
+	    expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.tools.eraser).toBe(true)
+	    expect(DEMO_CANVAS_APP_ASSEMBLY.presenceProvider({
+	      selection: [],
+	      viewport: { scale: 1, x: 0, y: 0 },
+	    }).map((entry) => entry.label)).toEqual(['Mia', 'Noah'])
+	  })
+	})
