@@ -10,6 +10,7 @@ import {
   CanvasRenderer,
   createCanvasAppAssembly,
   defineCanvasAppCustomItemModule,
+  getCanvasAppFoundationExtensionCommands,
   getCanvasAppFoundationExtensionTools,
   type CanvasAppAssemblySource,
   type CanvasAppCommitItemsChange,
@@ -20,6 +21,7 @@ import {
   type CanvasAppCustomItemRendererStrategy,
   type CanvasAppCustomItemValidator,
   type CanvasAppFoundationExtension,
+  type CanvasAppFoundationExtensionCommand,
   type CanvasAppFoundationExtensionTool,
   type CanvasAppItemLayerAdapter,
   type CanvasAppProps,
@@ -125,6 +127,11 @@ describe('Canvas package consumer imports', () => {
     const workspaceStorageProvider: CanvasWorkspaceStorageProvider = () => null
     const foundationExtension: CanvasAppFoundationExtension =
       CanvasFoundation.defineCanvasExtension({
+        commands: [{
+          id: 'canvas.smoke.command',
+          plan: () => [],
+          requiredAdapters: ['command'],
+        }],
         id: 'canvas.smoke',
         requiredAdapters: ['document'],
       })
@@ -187,6 +194,15 @@ describe('Canvas package consumer imports', () => {
     expect(CanvasAppAuthoring.getCanvasAppFoundationExtensionTools(
       assembly.foundationExtensions,
     )).toEqual(foundationTools)
+    const foundationCommands: readonly CanvasAppFoundationExtensionCommand[] =
+      getCanvasAppFoundationExtensionCommands(assembly.foundationExtensions)
+
+    expect(foundationCommands.map((command) => command.id)).toContain(
+      'canvas.smoke.command',
+    )
+    expect(CanvasAppAuthoring.getCanvasAppFoundationExtensionCommands(
+      assembly.foundationExtensions,
+    )).toEqual(foundationCommands)
     expect(commitAppItemsChange(appItemsChange)).toBe(true)
     expect(assembly.initialSelection).toEqual([rect.id])
     expect(
@@ -255,6 +271,8 @@ describe('Canvas package consumer imports', () => {
     expect(CanvasAppFacade.createCanvasAppCustomItemModuleAssembly)
       .toBeTypeOf('function')
     expect(CanvasAppAuthoring.createCanvasAppAssembly).toBeTypeOf('function')
+    expect(CanvasAppAuthoring.getCanvasAppFoundationExtensionCommands)
+      .toBeTypeOf('function')
     expect(CanvasAppAuthoring.getCanvasAppFoundationExtensionTools)
       .toBeTypeOf('function')
     expect(CanvasAppAuthoring.defineCanvasAppCustomItemModule).toBeTypeOf(

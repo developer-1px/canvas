@@ -64,6 +64,7 @@ product/app meaning last.
 8. Promote snap contracts behind structural config adapters. Done in issue #81.
 9. Bridge app extension bundles to foundation extension descriptors. Done in issue #83.
 10. Index foundation extension tools for App-owned discovery. Done in issue #85.
+11. Index foundation extension commands for App-owned discovery. Done in issue #87.
 
 ## Extension Shape
 
@@ -97,6 +98,11 @@ foundation extension tool metadata. It reports tool ids, kinds, adapter
 requirements, and owning extension ids while still leaving toolbar rendering,
 pointer creation, document patches, and renderer slots with their current
 owners.
+
+`getCanvasAppFoundationExtensionCommands` is the app-owned discovery index for
+foundation extension command metadata. It reports command ids, planner
+references, adapter requirements, and owning extension ids without executing
+planners or moving toolbar, keyboard, document effect, or Host patch logic.
 
 ## Guardrails
 
