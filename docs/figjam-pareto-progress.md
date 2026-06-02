@@ -1,6 +1,6 @@
 # FigJam Pareto Roadmap Progress
 
-Last updated: 2026-05-31
+Last updated: 2026-06-02
 
 ## Tracker
 
@@ -63,7 +63,7 @@ de-facto 표준 어휘를 정본화하고, 그 5축 표의 빈 칸(필수+보편
 
 | Issue | Status | 결과 |
 | --- | --- | --- |
-| [#32](https://github.com/developer-1px/canvas/issues/32) | Open | parent — de-facto 갭 채우기 |
+| [#32](https://github.com/developer-1px/canvas/issues/32) | Closed | parent — de-facto 갭 채우기 |
 | [#33](https://github.com/developer-1px/canvas/issues/33) Flip H/V | Done | host flip op + app affordance + demo 버튼. 유닛+e2e+앱 시연(미러/undo) |
 | [#34](https://github.com/developer-1px/canvas/issues/34) Zoom to selection | Already satisfied | `fitView`가 선택분 fit, 'Fit selection' 버튼으로 노출됨 |
 | [#35](https://github.com/developer-1px/canvas/issues/35) Tidy up | Already satisfied | `tidyCanvasSelection` 구현+노출+e2e 존재 |
@@ -71,10 +71,11 @@ de-facto 표준 어휘를 정본화하고, 그 5축 표의 빈 칸(필수+보편
 | [#37](https://github.com/developer-1px/canvas/issues/37) Select same type | Done | `CanvasItemSelectionQuery` + `onSelectSameType`(commitSelection) + demo 버튼. 유닛+e2e |
 | [#38](https://github.com/developer-1px/canvas/issues/38) Dark mode toggle | Done | `<main data-theme>` 토글, 기존 dark 토큰 재사용. behavioral e2e(repaint) |
 | [#41](https://github.com/developer-1px/canvas/issues/41) Line tool | Done (변형) | 별도 tool-union cascade 대신 arrow `arrowhead` 토글(end/none)로 plain line 능력 제공. behavioral e2e(marker-end 토글) |
+| [#65](https://github.com/developer-1px/canvas/issues/65) Vector pen | Done | `pen` tool + typed `path` segments + path render/select/move/export. unit + e2e |
 
-검증(이 패스 최신): `tsc -b` pass · `vitest run` 260 files/988 tests pass · `pnpm lint` pass · `pnpm build` pass · `pnpm test:e2e` 23 tests pass.
+검증(이 패스 최신): `npx tsc -b --pretty false` pass · `npx vitest run --run` 268 files/1055 tests pass · `npm run lint` pass · `npx playwright test e2e/engine-demo.e2e.ts` 30 tests pass.
 
-남은 갭: #36(export, decision pending) · 선택 갭 line tool/vector pen/keyboard-shortcut-help · 스코프 외 실 multiplayer sync.
+남은 갭: 선택 기능 Minimap/keyboard-shortcut-help · collaboration 결정 항목 follow-view/실 multiplayer sync.
 
 ## Current Focus
 
