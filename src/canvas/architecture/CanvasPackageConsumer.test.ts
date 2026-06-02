@@ -5,6 +5,7 @@ import * as CanvasAppFacade from 'canvas/app'
 import {
   CanvasCore,
   CanvasEngine,
+  CanvasFoundation as CanvasFoundationFromPackage,
   CanvasHost,
   CanvasRenderer,
   createCanvasAppAssembly,
@@ -28,6 +29,7 @@ import {
   type CanvasEditableTextItem,
   type CanvasItem,
 } from 'canvas'
+import * as CanvasFoundation from 'canvas/foundation'
 import {
   CanvasApp,
   createCanvasAppComponentPresentationRenderers,
@@ -264,6 +266,22 @@ describe('Canvas package consumer imports', () => {
     expect(CanvasEngine.createCanvasAffordanceConfig().tools.select).toBe(true)
     expect(CanvasEngine.assertCanvasAffordanceConfig(affordanceConfig)).toBe(
       affordanceConfig,
+    )
+    const scene = CanvasFoundation.createCanvasSceneAdapter([{
+      bounds: { h: 20, w: 20, x: 0, y: 0 },
+      id: 'rect-1',
+      isGroup: false,
+      parentId: null,
+      path: [0],
+    }])
+    expect(CanvasFoundation.getCanvasMarqueeSelection({
+      additive: false,
+      baseSelection: [],
+      bounds: { h: 10, w: 10, x: 5, y: 5 },
+      scene,
+    })).toEqual(['rect-1'])
+    expect(CanvasFoundationFromPackage.createCanvasSceneAdapter).toBe(
+      CanvasFoundation.createCanvasSceneAdapter,
     )
     expect(
       createCanvasAppComponentPresentationRenderers(),

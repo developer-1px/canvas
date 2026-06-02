@@ -182,6 +182,7 @@ export type {
   Viewport,
 } from './entities'
 export * as CanvasCore from './core'
+export * as CanvasFoundation from './foundation'
 export * as CanvasEngine from './engine'
 export * as CanvasHost from './host'
 export * as CanvasRenderer from './renderer'

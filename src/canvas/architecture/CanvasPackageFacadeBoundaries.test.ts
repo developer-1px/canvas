@@ -31,6 +31,7 @@ describe('Canvas package facade boundaries', () => {
           'src/canvas/app',
           'src/canvas/app/authoring',
           'src/canvas/core',
+          'src/canvas/foundation',
           'src/canvas/engine',
           'src/canvas/entities',
           'src/canvas/host',
