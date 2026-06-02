@@ -84,6 +84,10 @@ command, and patch-planning grammar that can run through adapters.
   discovery and future assembly work, but command planner execution, toolbar
   wiring, renderer adapters, document patches, and Host item storage remain in
   their current owners.
+- `getCanvasAppFoundationExtensionTools` is the App-owned discovery index for
+  Foundation extension tool descriptors. It can expose tool ids, kinds, adapter
+  requirements, and owning extension ids without moving toolbar rendering,
+  pointer creation, document patching, or renderer slot wiring.
 - `canvas/foundation` is the named public facade for low-risk foundation
   tracer bullets. It can re-export existing headless contracts before broad
   implementation moves.

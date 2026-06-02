@@ -41,6 +41,10 @@ export type {
   CanvasAppFoundationExtension,
 } from '../extensions/CanvasAppFoundationExtensionDescriptors'
 export {
+  getCanvasAppFoundationExtensionTools,
+  type CanvasAppFoundationExtensionTool,
+} from '../extensions/CanvasAppFoundationExtensionTools'
+export {
   createCanvasAppCustomItemModuleAssembly,
   type CanvasAppCustomItemModuleAssembly,
   type CanvasAppCustomItemModuleAssemblyOptions,

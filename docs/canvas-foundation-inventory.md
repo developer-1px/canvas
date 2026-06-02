@@ -47,7 +47,7 @@ product/app meaning last.
 | `src/canvas/host/component` | Host | keep | Demo component templates and component storage rules. |
 | `src/canvas/host/text` | Host | keep | Maps item variants to editable values and patch fields. |
 | `src/canvas/app/workflow` | App | keep | React state fan-out, command effects, pointer lifecycle effects, and assembly wiring. |
-| `src/canvas/app/extensions` | App / first-party extension bridge | split started | App bundles now carry foundation extension descriptor metadata; current assembly output remains App-owned. |
+| `src/canvas/app/extensions` | App / first-party extension bridge | split started | App bundles now carry and index foundation extension descriptor metadata; current assembly output remains App-owned. |
 | `src/canvas/app/rendering` | App adapter | keep | Demo SVG item layer adapter and presentation resolution. |
 | `src/canvas/renderer` | Renderer | keep | Stage and overlay renderer should remain item-model independent. |
 | `src/canvas/ui` | UI | keep | Shared icons and controls only. |
@@ -63,6 +63,7 @@ product/app meaning last.
 7. Promote command availability contracts behind structural config adapters. Done in issue #79.
 8. Promote snap contracts behind structural config adapters. Done in issue #81.
 9. Bridge app extension bundles to foundation extension descriptors. Done in issue #83.
+10. Index foundation extension tools for App-owned discovery. Done in issue #85.
 
 ## Extension Shape
 
@@ -90,6 +91,12 @@ component templates, item schemas, SVG rendering, or app workflow.
 descriptor metadata. It lets app assembly carry first-party extension
 descriptors such as `CANVAS_STICKY_NOTE_EXTENSION` without executing command
 planners or moving toolbar, rendering, document, or Host item logic.
+
+`getCanvasAppFoundationExtensionTools` is the app-owned discovery index for
+foundation extension tool metadata. It reports tool ids, kinds, adapter
+requirements, and owning extension ids while still leaving toolbar rendering,
+pointer creation, document patches, and renderer slots with their current
+owners.
 
 ## Guardrails
 

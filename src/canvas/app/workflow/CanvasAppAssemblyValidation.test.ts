@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { defineCanvasExtension } from '../../foundation'
 import { createCanvasComponentLibrary } from '../../host'
 import {
   DEFAULT_CANVAS_APP_ASSEMBLY,
@@ -215,6 +216,20 @@ describe('CanvasAppAssembly validation', () => {
         ],
       }),
     ).toThrow('Canvas app foundation extension requires id')
+
+    expect(() =>
+      createCanvasAppAssembly({
+        foundationExtensions: [
+          defineCanvasExtension({
+            id: 'canvas.duplicate-sticky-tool',
+            tools: [{
+              id: 'sticky',
+              kind: 'creation',
+            }],
+          }),
+        ],
+      }),
+    ).toThrow('Duplicate canvas app assembly foundation extension tool: sticky')
 
     expect(() =>
       createCanvasAppAssembly({

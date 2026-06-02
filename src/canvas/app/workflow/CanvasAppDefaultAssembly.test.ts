@@ -5,7 +5,11 @@ import {
   INITIAL_ITEMS,
 } from '../../host'
 import { DEFAULT_CANVAS_AFFORDANCE_CONFIG } from '../../engine'
-import { CANVAS_STICKY_NOTE_EXTENSION } from '../../foundation'
+import {
+  CANVAS_STICKY_NOTE_EXTENSION,
+  CANVAS_STICKY_NOTE_TOOL_ID,
+} from '../../foundation'
+import { getCanvasAppFoundationExtensionTools } from '../extensions/CanvasAppFoundationExtensionTools'
 import {
   DEFAULT_CANVAS_APP_COMPONENT_PRESENTATION_RENDERERS,
   DEFAULT_CANVAS_APP_CUSTOM_ITEM_RENDERERS,
@@ -44,6 +48,14 @@ describe('CanvasAppDefaultAssembly', () => {
     expect(DEFAULT_CANVAS_APP_ASSEMBLY.foundationExtensions).toEqual([
       CANVAS_STICKY_NOTE_EXTENSION,
     ])
+    expect(getCanvasAppFoundationExtensionTools(
+      DEFAULT_CANVAS_APP_ASSEMBLY.foundationExtensions,
+    )).toEqual([{
+      extensionId: CANVAS_STICKY_NOTE_EXTENSION.id,
+      id: CANVAS_STICKY_NOTE_TOOL_ID,
+      kind: 'creation',
+      requiredAdapters: ['creation', 'document', 'text-target'],
+    }])
     expect(DEFAULT_CANVAS_APP_ASSEMBLY.inspectorPanels).toEqual([
       CANVAS_LINK_PREVIEW_INSPECTOR_PANEL,
       CANVAS_ARROW_ROUTING_INSPECTOR_PANEL,
