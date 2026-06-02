@@ -89,12 +89,12 @@ export {
   createCanvasSceneAdapter,
   type CanvasSceneAdapter,
   type CanvasSceneEntry,
-} from './scene/CanvasSceneAdapter'
+} from '../foundation/CanvasSceneAdapter'
 export {
   getCanvasItemPointerSelection,
   getCanvasMarqueeSelection,
   type CanvasItemPointerSelection,
-} from './selection/CanvasSelectionEngine'
+} from '../foundation/CanvasSelectionEngine'
 export {
   EMPTY_CANVAS_SNAP_GUIDES,
   getCanvasMoveSnap,

@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 import { createCanvasAffordanceConfig } from '../affordance/CanvasAffordances'
-import { createCanvasSceneAdapter } from '../scene/CanvasSceneAdapter'
+import { createCanvasSceneAdapter } from '../../foundation/CanvasSceneAdapter'
 import { getCanvasMoveSnap } from './CanvasSnapEngine'
 
 const snapOnlyConfig = createCanvasAffordanceConfig({

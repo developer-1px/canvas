@@ -3,7 +3,7 @@ import type {
   Bounds,
   Viewport
 } from '../../core'
-import type { CanvasSceneAdapter } from '../scene/CanvasSceneAdapter'
+import type { CanvasSceneAdapter } from '../../foundation/CanvasSceneAdapter'
 import { getCanvasAlignmentSnap } from './CanvasAlignmentSnap'
 import { getCanvasGridSnap } from './CanvasGridSnap'
 import {

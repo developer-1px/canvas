@@ -10,7 +10,7 @@ import {
   handlePoint,
   RESIZE_HANDLES,
 } from '../primitives/CanvasPrimitives'
-import type { CanvasSceneAdapter } from '../scene/CanvasSceneAdapter'
+import type { CanvasSceneAdapter } from '../../foundation/CanvasSceneAdapter'
 import type { CanvasSnapGuides } from '../snap/CanvasSnapEngine'
 
 export type CanvasResizeHandleOverlay = {
