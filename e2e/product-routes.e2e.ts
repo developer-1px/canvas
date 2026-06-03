@@ -53,6 +53,47 @@ test('selects free text into immediate contenteditable editing on /', async ({
     .toContainText('Product text')
 })
 
+test('creates multiline sticky notes and arrows on /', async ({ page }) => {
+  await page.goto('/')
+
+  const stageBox = await getRequiredStageBox(page)
+  const stickies = page.locator(
+    '[data-type="component"][data-component="sticky"]',
+  )
+  const stickyCount = await stickies.count()
+
+  await page.getByRole('button', { name: 'Sticky note tool' }).click()
+  await page.mouse.click(stageBox.x + 720, stageBox.y + 210)
+  await expect.poll(() => stickies.count()).toBeGreaterThan(stickyCount)
+
+  const stickyEditor = page.locator(
+    '.component-sticky-body.canvas-content-editable-text-active',
+  )
+
+  await expect(stickyEditor).toBeVisible()
+  await stickyEditor.fill('Product note')
+  await stickyEditor.press('Enter')
+  await expect.poll(async () => {
+    const text = await stickyEditor.evaluate((element) => element.textContent)
+
+    return text?.startsWith('Product note') === true &&
+      text.includes('\n')
+  }).toBe(true)
+  await stickyEditor.press('Escape')
+  await expect(stickyEditor).toHaveCount(0)
+  await expect(stickies.last()).toContainText('Product note')
+
+  const arrowCount = await page.locator('[data-type="arrow"]').count()
+
+  await page.getByRole('button', { name: 'Arrow tool' }).click()
+  await page.mouse.move(stageBox.x + 708, stageBox.y + 220)
+  await page.mouse.down()
+  await page.mouse.move(stageBox.x + 812, stageBox.y + 270)
+  await page.mouse.up()
+  await expect.poll(() => page.locator('[data-type="arrow"]').count())
+    .toBeGreaterThan(arrowCount)
+})
+
 test('persists product board edits across reloads on /', async ({ page }) => {
   await page.goto('/')
 
