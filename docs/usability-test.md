@@ -1,12 +1,13 @@
 # 사용성 테스트 프로토콜
 
-목적: canvas affordance engine demo가 설명 없이 기본 부품을 드러내는지 확인한다.
+목적: 기본 URL의 product brainstorming board가 설명 없이 아이디어 작성, 정리, 연결, 표시 흐름을 드러내는지 확인한다.
 
 대상: canvas, whiteboard, diagram editor류를 써본 사용자 5명.
 
 환경:
 
 - URL: `http://127.0.0.1:53175/`
+- Engine 검증 URL: `http://127.0.0.1:53175/engine`
 - 화면: 데스크톱 1280x800 우선, 필요 시 390x844 추가 확인
 - 진행자 개입: 막히면 기능 위치를 말하지 않고 중립 질문만 한다.
 
@@ -21,11 +22,11 @@
 
 ## 과제
 
-1. 첫 화면에서 canvas와 선택된 object를 확인한다.
-2. object를 선택하고 resize handle이 보이는지 확인한다.
-3. pan/zoom으로 viewport를 움직인다.
-4. text object를 더블클릭해 텍스트를 편집한다.
-5. drawing tool로 stroke를 추가한다.
+1. 첫 화면에서 canvas board와 선택된 object를 확인한다.
+2. sticky note를 만들고 내용을 편집한다.
+3. section으로 관련 아이디어를 정리한다.
+4. arrow/connector로 관련 object를 연결한다.
+5. drawing tool이나 stamp로 board item을 표시한다.
 
 ## 진행 질문
 

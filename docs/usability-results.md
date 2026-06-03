@@ -1,6 +1,6 @@
 # 사용성 테스트 결과
 
-상태: canvas affordance engine demo 기준 실제 참가자 테스트 대기.
+상태: product brainstorming board 기준 실제 참가자 테스트 대기. 기존 engine demo 파일럿은 `/engine` 검증 기준으로 남긴다.
 
 ## 진행자 파일럿
 
