@@ -1424,8 +1424,8 @@
 }
 
 .canvas-floating-zone-bottom-left {
-  top: var(--canvas-floating-edge);
-  right: var(--canvas-floating-edge);
+  bottom: var(--canvas-floating-edge);
+  left: var(--canvas-floating-edge);
 }
 
 .canvas-floating-zone-bottom-center {
