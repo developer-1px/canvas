@@ -261,8 +261,9 @@ test('applies object-specific toolbar actions to the selected item', async ({
   )).toHaveAttribute('stroke', '#9747FF')
 
   await page.locator('[data-canvas-item-id="engine-text"]').click()
-  await page.getByRole('button', { name: 'Edit text' }).click()
-  await expect(page.locator('textarea.text-editor')).toBeVisible()
+  await expect(page.locator(
+    '[data-text-item-id="engine-text"].canvas-content-editable-text-active',
+  )).toBeVisible()
 })
 
 test('adds reaction stamps as independent annotation objects', async ({
@@ -1085,10 +1086,21 @@ test('keeps text editing and drawing as engine affordances', async ({
   await page.goto('/engine')
 
   await page.locator('[data-canvas-item-id="engine-text"]').dblclick()
-  await expect(page.locator('textarea.text-editor')).toBeVisible()
-  await page.locator('textarea.text-editor').fill('Edited text')
+  const textEditor = page.locator(
+    '[data-text-item-id="engine-text"].canvas-content-editable-text-active',
+  )
+
+  await expect(textEditor).toBeVisible()
+  await textEditor.fill('Edited text')
   await page.keyboard.press('Enter')
-  await expect(page.locator('textarea.text-editor')).toHaveCount(0)
+  await expect.poll(async () => {
+    const text = await textEditor.evaluate((element) => element.textContent)
+
+    return text?.startsWith('Edited text') === true &&
+      text.includes('\n')
+  }).toBe(true)
+  await page.keyboard.press('Escape')
+  await expect(textEditor).toHaveCount(0)
   await expect(page.locator('[data-canvas-item-id="engine-text"]'))
     .toContainText('Edited text')
 

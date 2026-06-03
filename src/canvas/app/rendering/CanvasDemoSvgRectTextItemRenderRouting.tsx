@@ -12,6 +12,8 @@ import {
   isCanvasTextItem,
   type CanvasSvgShapeGeometry,
 } from '../../host'
+import { CanvasDemoSvgTextItem } from './CanvasDemoSvgTextItem'
+import { getCanvasDemoSvgTextStyle } from './CanvasDemoSvgTextStyle'
 
 type CanvasDemoSvgRectTextItem = CanvasShapeItem | RectItem | TextItem
 
@@ -153,32 +155,7 @@ function renderCanvasDemoSvgTextItem({
 }: {
   item: TextItem
 }) {
-  return (
-    <foreignObject
-      opacity={item.opacity}
-      x={item.x}
-      y={item.y}
-      width={item.w}
-      height={item.h}
-    >
-      <div className="canvas-text" style={getCanvasDemoSvgTextStyle(item)}>
-        {item.text}
-      </div>
-    </foreignObject>
-  )
-}
-
-function getCanvasDemoSvgTextStyle(
-  item: CanvasDemoSvgRectTextItem,
-): CSSProperties | undefined {
-  if (item.fontSize === undefined && item.textAlign === undefined) {
-    return undefined
-  }
-
-  return {
-    fontSize: item.fontSize,
-    textAlign: item.textAlign,
-  }
+  return <CanvasDemoSvgTextItem item={item} />
 }
 
 function getCanvasDemoSvgStrokeWidthStyle(

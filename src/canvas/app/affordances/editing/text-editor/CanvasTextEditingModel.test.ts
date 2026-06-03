@@ -181,9 +181,9 @@ describe('CanvasTextEditingModel', () => {
     })
   })
 
-  it('routes only sticky text editing to the contenteditable surface', () => {
+  it('routes sticky and free text editing to the contenteditable surface', () => {
     expect(shouldUseCanvasContentEditableText(createStickyItem())).toBe(true)
-    expect(shouldUseCanvasContentEditableText(createTextItem())).toBe(false)
+    expect(shouldUseCanvasContentEditableText(createTextItem())).toBe(true)
     expect(shouldUseCanvasContentEditableText(createArrowItem())).toBe(false)
     expect(shouldUseCanvasContentEditableText(null)).toBe(false)
   })
