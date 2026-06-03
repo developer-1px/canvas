@@ -2,6 +2,10 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import type { CanvasDemoSvgRectTextItem } from './CanvasDemoSvgRectTextItemRenderer'
 import { renderCanvasDemoSvgRectTextItem } from './CanvasDemoSvgRectTextItemRenderer'
+import {
+  CanvasInlineTextEditingContext,
+  type CanvasInlineTextEditingContextValue,
+} from '../affordances/editing/text-editor/CanvasInlineTextEditingContext'
 
 describe('CanvasDemoSvgRectTextItemRenderer', () => {
   it('renders shape geometry and embedded text', () => {
@@ -44,7 +48,31 @@ describe('CanvasDemoSvgRectTextItemRenderer', () => {
     expect(markup).toContain('x="44"')
     expect(markup).toContain('height="48"')
     expect(markup).toContain('class="canvas-text"')
+    expect(markup).toContain('data-text-item-id="text-1"')
     expect(markup).toContain('Label')
+  })
+
+  it('opens active text items as contenteditable text surfaces', () => {
+    const markup = renderRectTextItems([{
+      h: 48,
+      id: 'text-1',
+      text: 'Label',
+      type: 'text',
+      w: 140,
+      x: 44,
+      y: 56,
+    }], {
+      inlineTextEditor: createInlineTextEditor({
+        editing: { id: 'text-1', value: 'Draft label' },
+      }),
+    })
+
+    expect(markup).toContain('contentEditable="plaintext-only"')
+    expect(markup).toContain('data-editing="true"')
+    expect(markup).toContain('data-text-item-id="text-1"')
+    expect(markup).toContain('role="textbox"')
+    expect(markup).not.toContain('textarea')
+    expect(markup).not.toContain('Label')
   })
 
   it('renders ellipse shapes with the same embedded text contract', () => {
@@ -93,12 +121,41 @@ describe('CanvasDemoSvgRectTextItemRenderer', () => {
   })
 })
 
-function renderRectTextItems(items: CanvasDemoSvgRectTextItem[]) {
-  return renderToStaticMarkup(
+function renderRectTextItems(
+  items: CanvasDemoSvgRectTextItem[],
+  options: {
+    inlineTextEditor?: CanvasInlineTextEditingContextValue
+  } = {},
+) {
+  const markup = (
     <svg>
       {items.map((item) => (
         <g key={item.id}>{renderCanvasDemoSvgRectTextItem({ item })}</g>
       ))}
-    </svg>,
+    </svg>
   )
+
+  return renderToStaticMarkup(
+    options.inlineTextEditor ? (
+      <CanvasInlineTextEditingContext.Provider value={options.inlineTextEditor}>
+        {markup}
+      </CanvasInlineTextEditingContext.Provider>
+    ) : markup,
+  )
+}
+
+function createInlineTextEditor(
+  overrides: Partial<CanvasInlineTextEditingContextValue> = {},
+): CanvasInlineTextEditingContextValue {
+  return {
+    commitOnEnter: false,
+    editing: null,
+    enabled: true,
+    setEditorElement: () => undefined,
+    onBlur: () => undefined,
+    onCancel: () => undefined,
+    onChange: () => undefined,
+    onCommit: () => undefined,
+    ...overrides,
+  }
 }
