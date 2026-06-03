@@ -16,7 +16,7 @@ const SCREENSHOT_SMOKE_VIEWPORTS = [
 ] as const
 
 test('opens as a minimal canvas affordance engine demo', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/engine')
 
   await expect(page.getByRole('toolbar', {
     name: 'Engine affordances',
@@ -149,7 +149,7 @@ test('keeps desktop and mobile canvas screenshots nonblank', async ({
 }) => {
   for (const target of SCREENSHOT_SMOKE_VIEWPORTS) {
     await page.setViewportSize(target.viewport)
-    await page.goto('/')
+    await page.goto('/engine')
 
     await expect(page.locator('.canvas-stage')).toBeVisible()
     await expect(page.locator('[data-canvas-item-id]')).not.toHaveCount(0)
@@ -173,7 +173,7 @@ test('keeps desktop and mobile canvas screenshots nonblank', async ({
 test('applies object-specific toolbar actions to the selected item', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/engine')
   const shape = page.locator('[data-canvas-item-id="engine-shape"]')
 
   await expect(shape).toBeVisible()
@@ -268,7 +268,7 @@ test('applies object-specific toolbar actions to the selected item', async ({
 test('adds reaction stamps as independent annotation objects', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/engine')
 
   const shape = page.locator('[data-canvas-item-id="engine-shape"]')
   const stamps = page.locator('[data-type="stamp"]')
@@ -309,7 +309,7 @@ test('adds reaction stamps as independent annotation objects', async ({
 })
 
 test('mirrors multi-selected objects with flip', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/engine')
 
   const shape = page.locator('[data-canvas-item-id="engine-shape"]')
   const image = page.locator('[data-canvas-item-id="engine-image"]')
@@ -335,7 +335,7 @@ test('mirrors multi-selected objects with flip', async ({ page }) => {
 })
 
 test('toggles the token-driven dark theme', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/engine')
 
   const root = page.locator('main.engine-demo-app')
   await expect(root).toHaveAttribute('data-theme', 'light')
@@ -359,7 +359,7 @@ test('toggles the token-driven dark theme', async ({ page }) => {
 })
 
 test('presents section frames without edit chrome', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/engine')
 
   const root = page.locator('main.engine-demo-app')
   const shape = page.locator('[data-canvas-item-id="engine-shape"]')
@@ -395,7 +395,7 @@ test('presents section frames without edit chrome', async ({ page }) => {
 test('renders a widget in an isolated shadow root without leaking styles', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/engine')
 
   const widget = page.locator('[data-canvas-item-id="engine-metric-widget"]')
   await expect(widget).toBeVisible()
@@ -424,7 +424,7 @@ test('renders a widget in an isolated shadow root without leaking styles', async
 test('toggles Todo items in play mode and persists the change', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/engine')
 
   const playTodo = page.locator('[data-canvas-item-id="engine-todo-widget"]')
   await expect(playTodo).toBeVisible()
@@ -453,7 +453,7 @@ test('toggles Todo items in play mode and persists the change', async ({
 })
 
 test('leaves widget play mode when the selection changes', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/engine')
 
   await page.locator('[data-canvas-item-id="engine-todo-widget"]').click()
   await page.getByRole('button', { name: 'Play widget' }).click()
@@ -470,7 +470,7 @@ test('leaves widget play mode when the selection changes', async ({ page }) => {
 })
 
 test('renders the Todo widget with its checklist items', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/engine')
 
   const todo = page.locator('[data-canvas-item-id="engine-todo-widget"]')
   await expect(todo).toBeVisible()
@@ -481,7 +481,7 @@ test('renders the Todo widget with its checklist items', async ({ page }) => {
 })
 
 test('toggles an arrow between arrowhead and plain line', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/engine')
 
   await page.locator('[data-canvas-item-id="engine-arrow"]').click()
   const arrowPath = page.locator(
@@ -501,7 +501,7 @@ test('toggles an arrow between arrowhead and plain line', async ({ page }) => {
 test('exports the selected objects as a downloadable image', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/engine')
 
   const shape = page.locator('[data-canvas-item-id="engine-shape"]')
   await expect(shape).toBeVisible()
@@ -515,7 +515,7 @@ test('exports the selected objects as a downloadable image', async ({
 })
 
 test('selects every same-type object with select same', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/engine')
 
   const shape = page.locator('[data-canvas-item-id="engine-shape"]')
 
@@ -536,7 +536,7 @@ test('selects every same-type object with select same', async ({ page }) => {
 test('creates and edits comments as independent annotation objects', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/engine')
 
   const comments = page.locator('[data-type="comment"]')
   const initialCommentCount = await comments.count()
@@ -570,7 +570,7 @@ test('creates and edits comments as independent annotation objects', async ({
 })
 
 test('runs a simple voting session on top of stamps', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/engine')
 
   const shape = page.locator('[data-canvas-item-id="engine-shape"]')
   const stamps = page.locator('[data-type="stamp"]')
@@ -613,7 +613,7 @@ test('runs a simple voting session on top of stamps', async ({ page }) => {
 })
 
 test('keeps object toolbar quiet while dragging selection', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/engine')
 
   const item = page.locator('[data-canvas-item-id="engine-shape"]')
   await item.click()
@@ -639,7 +639,7 @@ test('keeps object toolbar quiet while dragging selection', async ({ page }) => 
 test('shows snap guides only while moving near aligned objects', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/engine')
 
   const shape = page.locator('[data-canvas-item-id="engine-shape"]')
 
@@ -683,7 +683,7 @@ test('keeps shell controls usable on a mobile viewport', async ({ page }) => {
   const viewport = { height: 844, width: 390 }
 
   await page.setViewportSize(viewport)
-  await page.goto('/')
+  await page.goto('/engine')
 
   const toolRail = page.getByRole('toolbar', { name: 'Engine affordances' })
   const viewportControls = page.getByRole('toolbar', {
@@ -715,7 +715,7 @@ test('keeps shell controls usable on a mobile viewport', async ({ page }) => {
 test('routes selection keyboard commands through the engine demo', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/engine')
 
   const shape = page.locator('[data-canvas-item-id="engine-shape"]')
   const sticky = page.locator('[data-canvas-item-id="engine-sticky"]')
@@ -766,7 +766,7 @@ test('routes selection keyboard commands through the engine demo', async ({
 test('runs selection and history commands from the context menu', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/engine')
 
   const workspace = page.locator('.engine-demo-workspace')
   const shape = page.locator('[data-canvas-item-id="engine-shape"]')
@@ -810,7 +810,7 @@ test('runs selection and history commands from the context menu', async ({
 test('reorders selected objects through layer controls and shortcuts', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/engine')
 
   const shape = page.locator('[data-canvas-item-id="engine-shape"]')
   const sticky = page.locator('[data-canvas-item-id="engine-sticky"]')
@@ -842,7 +842,7 @@ test('reorders selected objects through layer controls and shortcuts', async ({
 test('exposes group and section structure actions as canvas parts', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/engine')
 
   await selectShapeAndSticky(page)
   const groupMenu = await openObjectToolbarMenu(page, 'Structure')
@@ -948,7 +948,7 @@ test('exposes group and section structure actions as canvas parts', async ({
 })
 
 test('direct-selects and edits a child inside a group', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/engine')
 
   await selectShapeAndSticky(page)
   await clickObjectToolbarMenuAction(page, 'Structure', 'Group selection')
@@ -1024,7 +1024,7 @@ test('direct-selects and edits a child inside a group', async ({ page }) => {
 })
 
 test('arranges and tidies selected layout objects', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/engine')
 
   await selectShapeStickyTextAndArrow(page)
 
@@ -1064,7 +1064,7 @@ test('arranges and tidies selected layout objects', async ({ page }) => {
 test('shows expected selection feedback while marquee selecting', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/engine')
 
   const stageBox = await page.locator('.canvas-stage').boundingBox()
 
@@ -1082,7 +1082,7 @@ test('shows expected selection feedback while marquee selecting', async ({
 test('keeps text editing and drawing as engine affordances', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/engine')
 
   await page.locator('[data-canvas-item-id="engine-text"]').dblclick()
   await expect(page.locator('textarea.text-editor')).toBeVisible()
@@ -1116,7 +1116,7 @@ test('keeps text editing and drawing as engine affordances', async ({
 test('creates shape, sticky, section, arrow, pen path, and highlighter objects from exposed tools', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/engine')
 
   const stageBox = await page.locator('.canvas-stage').boundingBox()
 
@@ -1229,7 +1229,7 @@ test('creates shape, sticky, section, arrow, pen path, and highlighter objects f
 test('quick-creates connected sticky notes with inherited style', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/engine')
 
   const source = page.locator('[data-canvas-item-id="engine-sticky"]')
   await source.click()
@@ -1286,7 +1286,7 @@ test('quick-creates connected sticky notes with inherited style', async ({
 test('keeps connectors attached when connected objects move', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/engine')
 
   const shape = page.locator('[data-canvas-item-id="engine-shape"]')
   const sticky = page.locator('[data-canvas-item-id="engine-sticky"]')

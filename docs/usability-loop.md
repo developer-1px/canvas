@@ -1,8 +1,8 @@
 # 사용성 루프 기록
 
-범위: headless에 가까운 canvas affordance engine demo.
+범위: product brainstorming board와 별도 `/engine` 검증 demo.
 
-주의: 아래 기록은 기본 demo가 제품 UI가 아니라 engine 부품 검증용이어야 한다는 정리 기준을 따른다.
+주의: 1-4회차 기록은 기본 demo가 제품 UI가 아니라 engine 부품 검증용이어야 한다는 과거 정리 기준을 따른다. #91 이후 기본 `/`는 제품 표면이고 engine 검증은 `/engine`에서 보존한다.
 
 | 회차 | 점검 | 개선 | 평가 |
 | --- | --- | --- | --- |
@@ -10,6 +10,7 @@
 | 2 | product rail/source/review UI가 목적을 흐림 | demo shell에서 rail과 dock 장식 제거 | stage와 최소 controls만 남음 |
 | 3 | DOM/CSS inspector가 core처럼 보임 | HTML/CSS E2E를 legacy consumer 검증으로 분류 | default E2E가 engine demo만 검증 |
 | 4 | 보편 부품과 제품 feature가 섞임 | `docs/affordance-inventory.md`에 keep/legacy/drop 분류 추가 | 다음 정리 기준이 남음 |
+| 5 | foundation만 키우면 제품 압력이 부족함 | `/`를 product brainstorming board로 전환하고 `/engine`을 검증 route로 보존 | 제품 사용 흐름에서 추출 후보를 다시 발견 |
 
 검증:
 

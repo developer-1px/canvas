@@ -21,7 +21,12 @@ const demoModules = import.meta.glob('../../demo/**/*.{ts,tsx,css}', {
   query: '?raw',
 }) as Record<string, string>
 
-const appEntryModules = import.meta.glob('../../main.tsx', {
+const appEntryModules = import.meta.glob([
+  '../../main.tsx',
+  '../../CanvasRoot.tsx',
+  '../../CanvasRoute.ts',
+  '../../product/**/*.{ts,tsx,css}',
+], {
   eager: true,
   import: 'default',
   query: '?raw',
