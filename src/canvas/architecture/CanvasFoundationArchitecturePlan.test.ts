@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import foundationInventory from '../../../docs/canvas-foundation-inventory.md?raw'
 import foundationAdr from '../../../docs/adr/0003-canvas-foundation-extension-architecture.md?raw'
+import extractionLedger from '../../../docs/canvas-product-extraction-ledger.md?raw'
 import context from '../../../CONTEXT.md?raw'
 
 describe('Canvas foundation architecture plan', () => {
@@ -72,5 +73,33 @@ describe('Canvas foundation architecture plan', () => {
     expect(foundationAdr).toContain('getCanvasAppFoundationExtensionCommands')
     expect(foundationAdr).toContain('getCanvasAppFoundationExtensionRendererSlots')
     expect(foundationAdr).toContain('getCanvasAppFoundationExtensionTools')
+  })
+
+  it('records product pressure before promoting app-owned pieces', () => {
+    expect(foundationInventory).toContain('docs/canvas-product-extraction-ledger.md')
+
+    for (const section of [
+      '# Canvas product extraction ledger',
+      '## Promotion rule',
+      '## App-owned product features',
+      '## Foundation/package candidates',
+      '## Hold list',
+      '## Next extraction gate',
+    ]) {
+      expect(extractionLedger).toContain(section)
+    }
+
+    for (const row of [
+      '| Product route `/` shell | App-owned product |',
+      '| Workspace persistence | App-owned Host/App adapter |',
+      '| Board JSON/SVG IO plugin | App-owned IO affordance |',
+      '| Inline text editing adapter over `nano-edit` |',
+      '| Whiteboard organize/mark tool bundle |',
+      '| localStorage key and save debounce | Browser/runtime policy',
+    ]) {
+      expect(extractionLedger).toContain(row)
+    }
+
+    expect(extractionLedger).toContain('zod-crud stays behind Host document adapters')
   })
 })
