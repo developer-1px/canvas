@@ -1,6 +1,8 @@
 import type { Page } from '@playwright/test'
 import { expect, test } from '@playwright/test'
 
+const WORKSPACE_STORAGE_KEY = 'interactive-os.canvas.workspace.v1'
+
 test('opens the product brainstorming board on /', async ({ page }) => {
   await page.goto('/')
 
@@ -49,6 +51,35 @@ test('selects free text into immediate contenteditable editing on /', async ({
   await expect(textEditor).toHaveCount(0)
   await expect(page.locator('[data-canvas-item-id="engine-text"]'))
     .toContainText('Product text')
+})
+
+test('persists product board edits across reloads on /', async ({ page }) => {
+  await page.goto('/')
+
+  await page.locator('[data-canvas-item-id="engine-text"]').click()
+  const textEditor = page.locator(
+    '[data-text-item-id="engine-text"].canvas-content-editable-text-active',
+  )
+
+  await expect(textEditor).toBeVisible()
+  await textEditor.fill('Product persisted text')
+  await textEditor.press('Escape')
+
+  const stamps = page.locator('[data-type="stamp"]')
+  const stampCount = await stamps.count()
+
+  await page.locator('[data-canvas-item-id="engine-shape"]').click()
+  await page.getByRole('button', { name: 'Thumbs up' }).click()
+  await expect.poll(() => stamps.count()).toBe(stampCount + 1)
+  await expect.poll(() =>
+    page.evaluate((key) => localStorage.getItem(key), WORKSPACE_STORAGE_KEY),
+  ).toContain('Product persisted text')
+
+  await page.reload()
+
+  await expect(page.locator('[data-canvas-item-id="engine-text"]'))
+    .toContainText('Product persisted text')
+  await expect(page.locator('[data-type="stamp"]')).toHaveCount(stampCount + 1)
 })
 
 test('supports organize and mark workflows on /', async ({ page }) => {

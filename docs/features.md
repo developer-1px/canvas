@@ -9,6 +9,7 @@
 3. toolbar, selection floating bar, zoom controls, status, sticky quick-create, stamp controls만 기본 product surface에 노출한다.
 4. inspector, component palette, command palette, cursor chat, emote, timer, voting, spotlight는 기본 product surface에 노출하지 않는다.
 5. 제품 chrome은 작업을 돕는 compact control만 허용하고, landing page/hero/설명 panel은 두지 않는다.
+6. board state는 reload 후에도 복원된다.
 
 ## Engine demo
 

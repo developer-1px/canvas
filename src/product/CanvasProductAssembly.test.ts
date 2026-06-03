@@ -25,6 +25,8 @@ describe('CanvasProductAssembly', () => {
     expect(PRODUCT_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.emoteControls)
       .toBe(false)
     expect(PRODUCT_CANVAS_APP_ASSEMBLY.affordanceConfig.tools.laser).toBe(false)
+    expect(typeof PRODUCT_CANVAS_APP_ASSEMBLY.workspaceStorageProvider)
+      .toBe('function')
   })
 
   it('keeps organize and mark affordances enabled for the product board', () => {
