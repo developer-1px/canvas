@@ -21,6 +21,9 @@ describe('CanvasProductAssembly', () => {
       .toBe(true)
     expect(PRODUCT_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.stampControls)
       .toBe(true)
+    expect(
+      PRODUCT_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.stickyQuickCreate,
+    ).toBe(true)
     expect(PRODUCT_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.drawingControls)
       .toBe(true)
     expect(PRODUCT_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.inspector)
@@ -32,6 +35,9 @@ describe('CanvasProductAssembly', () => {
     expect(PRODUCT_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.emoteControls)
       .toBe(false)
     expect(PRODUCT_CANVAS_APP_ASSEMBLY.affordanceConfig.tools.laser).toBe(false)
+    expect(
+      PRODUCT_CANVAS_APP_ASSEMBLY.affordanceConfig.shortcuts.quickCreateSticky,
+    ).toBe(true)
     expect(typeof PRODUCT_CANVAS_APP_ASSEMBLY.workspaceStorageProvider)
       .toBe('function')
   })

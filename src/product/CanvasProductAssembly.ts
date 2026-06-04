@@ -30,6 +30,7 @@ const PRODUCT_CANVAS_AFFORDANCE_CONFIG = {
     spotlight: false,
     stampControls: true,
     status: true,
+    stickyQuickCreate: true,
     toolbar: true,
     votingSession: false,
     zoomControls: true,
@@ -39,6 +40,7 @@ const PRODUCT_CANVAS_AFFORDANCE_CONFIG = {
     cursorChat: false,
     findReplace: false,
     laserTool: false,
+    quickCreateSticky: true,
   },
   tools: {
     laser: false,
