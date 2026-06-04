@@ -12,6 +12,16 @@ test('opens the product brainstorming board on /', async ({ page }) => {
   await expect(page.getByRole('toolbar', { name: 'Zoom controls' }))
     .toBeVisible()
   await expect(page.locator('.canvas-status')).toContainText('select')
+  await expect(page.locator('[data-canvas-item-id="product-board-title"]'))
+    .toContainText('Launch workshop')
+  await expect(page.locator('[data-canvas-item-id="product-section-signals"]'))
+    .toContainText('Signals')
+  await expect(page.locator(
+    '[data-canvas-item-id="product-section-experiments"]',
+  ))
+    .toContainText('Experiments')
+  await expect(page.locator('[data-canvas-item-id="engine-section"]'))
+    .toHaveCount(0)
 })
 
 test('keeps the engine verification demo on /engine', async ({ page }) => {
@@ -32,10 +42,10 @@ test('selects free text into immediate contenteditable editing on /', async ({
 }) => {
   await page.goto('/')
 
-  await page.locator('[data-canvas-item-id="engine-text"]').click()
+  await page.locator('[data-canvas-item-id="product-text"]').click()
 
   const textEditor = page.locator(
-    '[data-text-item-id="engine-text"].canvas-content-editable-text-active',
+    '[data-text-item-id="product-text"].canvas-content-editable-text-active',
   )
 
   await expect(textEditor).toBeVisible()
@@ -49,7 +59,7 @@ test('selects free text into immediate contenteditable editing on /', async ({
   }).toBe(true)
   await textEditor.press('Escape')
   await expect(textEditor).toHaveCount(0)
-  await expect(page.locator('[data-canvas-item-id="engine-text"]'))
+  await expect(page.locator('[data-canvas-item-id="product-text"]'))
     .toContainText('Product text')
 })
 
@@ -97,9 +107,9 @@ test('creates multiline sticky notes and arrows on /', async ({ page }) => {
 test('persists product board edits across reloads on /', async ({ page }) => {
   await page.goto('/')
 
-  await page.locator('[data-canvas-item-id="engine-text"]').click()
+  await page.locator('[data-canvas-item-id="product-text"]').click()
   const textEditor = page.locator(
-    '[data-text-item-id="engine-text"].canvas-content-editable-text-active',
+    '[data-text-item-id="product-text"].canvas-content-editable-text-active',
   )
 
   await expect(textEditor).toBeVisible()
@@ -109,7 +119,7 @@ test('persists product board edits across reloads on /', async ({ page }) => {
   const stamps = page.locator('[data-type="stamp"]')
   const stampCount = await stamps.count()
 
-  await page.locator('[data-canvas-item-id="engine-shape"]').click()
+  await page.locator('[data-canvas-item-id="product-decision-shape"]').click()
   await page.getByRole('button', { name: 'Thumbs up' }).click()
   await expect.poll(() => stamps.count()).toBe(stampCount + 1)
   await expect.poll(() =>
@@ -118,7 +128,7 @@ test('persists product board edits across reloads on /', async ({ page }) => {
 
   await page.reload()
 
-  await expect(page.locator('[data-canvas-item-id="engine-text"]'))
+  await expect(page.locator('[data-canvas-item-id="product-text"]'))
     .toContainText('Product persisted text')
   await expect(page.locator('[data-type="stamp"]')).toHaveCount(stampCount + 1)
 })
@@ -145,9 +155,9 @@ test('supports organize and mark workflows on /', async ({ page }) => {
   const sectionCount = await sections.count()
 
   await page.getByRole('button', { name: 'Section tool' }).click()
-  await page.mouse.move(stageBox.x + 760, stageBox.y + 130)
+  await page.mouse.move(stageBox.x + 1088, stageBox.y + 464)
   await page.mouse.down()
-  await page.mouse.move(stageBox.x + 1020, stageBox.y + 280)
+  await page.mouse.move(stageBox.x + 1240, stageBox.y + 612)
   await page.mouse.up()
   await expect.poll(() => sections.count()).toBeGreaterThan(sectionCount)
   await page.keyboard.press('Escape')
@@ -167,7 +177,7 @@ test('supports organize and mark workflows on /', async ({ page }) => {
   const stampCount = await stamps.count()
 
   await page.getByRole('button', { name: 'Select tool' }).click()
-  await page.locator('[data-canvas-item-id="engine-shape"]').click()
+  await page.locator('[data-canvas-item-id="product-decision-shape"]').click()
   await page.getByRole('button', { name: 'Thumbs up' }).click()
   await expect.poll(() => stamps.count()).toBe(stampCount + 1)
 

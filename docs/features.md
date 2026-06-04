@@ -5,11 +5,12 @@
 ## Product board
 
 1. 설명 화면 없이 바로 canvas stage를 표시한다.
-2. sticky note, section, shape, arrow/connector, drawing, stamp, text editing을 한 작업 흐름으로 드러낸다.
-3. toolbar, selection floating bar, zoom controls, status, sticky quick-create, stamp controls만 기본 product surface에 노출한다.
-4. inspector, component palette, command palette, cursor chat, emote, timer, voting, spotlight는 기본 product surface에 노출하지 않는다.
-5. 제품 chrome은 작업을 돕는 compact control만 허용하고, landing page/hero/설명 panel은 두지 않는다.
-6. board state는 reload 후에도 복원된다.
+2. demo fixture가 아닌 product-owned workshop seed board를 표시한다.
+3. sticky note, section, shape, arrow/connector, drawing, stamp, text editing을 한 작업 흐름으로 드러낸다.
+4. toolbar, selection floating bar, zoom controls, status, sticky quick-create, stamp controls만 기본 product surface에 노출한다.
+5. inspector, component palette, command palette, cursor chat, emote, timer, voting, spotlight는 기본 product surface에 노출하지 않는다.
+6. 제품 chrome은 작업을 돕는 compact control만 허용하고, landing page/hero/설명 panel은 두지 않는다.
+7. board state는 reload 후에도 복원된다.
 
 ## Engine demo
 
