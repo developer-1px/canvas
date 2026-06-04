@@ -167,6 +167,76 @@ describe('CanvasStickyQuickCreateExecution', () => {
     })
   })
 
+  it('uses a nearby open slot when the immediate target is occupied', () => {
+    const source = createComponentItem({
+      h: 148,
+      id: 'component-source',
+      w: 188,
+      x: 40,
+      y: 60,
+    })
+    const next = createComponentItem({
+      h: 148,
+      id: 'component-next',
+      w: 188,
+      x: 252,
+      y: 232,
+    })
+    const componentLibrary = createComponentLibrary(next)
+    const creationAdapter = createCreationAdapter()
+
+    expect(quickCreateCanvasSticky({
+      commitItemsChange: vi.fn(() => true),
+      componentLibrary,
+      creationAdapter,
+      createId: vi.fn((prefix) =>
+        prefix === 'arrow' ? 'arrow-next' : 'component-next',
+      ),
+      itemReadModel: createItemReadModel([
+        source,
+        createComponentItem({
+          h: 148,
+          id: 'component-occupied-1',
+          w: 188,
+          x: 252,
+          y: 60,
+        }),
+        createComponentItem({
+          h: 148,
+          id: 'component-occupied-2',
+          w: 188,
+          x: 464,
+          y: 60,
+        }),
+        createComponentItem({
+          component: 'section',
+          h: 360,
+          id: 'component-section',
+          w: 840,
+          x: 24,
+          y: 24,
+        }),
+      ]),
+      selection: ['component-source'],
+      setEditing: vi.fn(),
+      setTool: vi.fn(),
+    })).toBe(true)
+
+    expect(componentLibrary.createItem).toHaveBeenCalledWith({
+      id: 'component-next',
+      point: { x: 252, y: 232 },
+      templateId: 'sticky',
+    })
+    expect(creationAdapter.createArrow).toHaveBeenCalledWith({
+      end: { x: 252, y: 306 },
+      endAttachedTo: 'component-next',
+      id: 'arrow-next',
+      routing: 'elbow',
+      start: { x: 228, y: 134 },
+      startAttachedTo: 'component-source',
+    })
+  })
+
   it('ignores quick-create when selection is not one sticky', () => {
     const componentLibrary = createComponentLibrary()
     const commitItemsChange = vi.fn()
@@ -300,6 +370,7 @@ function createCreationAdapter(
 
 function createItemReadModel(items: CanvasItem[]): CanvasAppItemReadModel {
   return {
+    getAllItems: vi.fn(() => items),
     getItemBounds: vi.fn((item: CanvasItem) => ({
       h: item.h,
       w: item.w,

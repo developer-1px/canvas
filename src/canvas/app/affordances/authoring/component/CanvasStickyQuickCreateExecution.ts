@@ -12,6 +12,7 @@ import {
   type CanvasCreationAdapter,
 } from '../../../../engine'
 import {
+  CANVAS_SECTION_COMPONENT_KIND,
   CANVAS_STICKY_COMPONENT_KIND,
   applyCanvasStickyComponentCreationDefaults,
   isCanvasStickyComponentItem,
@@ -43,6 +44,16 @@ export type CanvasStickyQuickCreateControlPoint = Point & {
 }
 
 const CANVAS_STICKY_QUICK_CREATE_GAP = 24
+const CANVAS_STICKY_QUICK_CREATE_MAX_SLOT_ATTEMPTS = 12
+const CANVAS_STICKY_QUICK_CREATE_CROSS_OFFSETS = [
+  0,
+  1,
+  -1,
+  2,
+  -2,
+  3,
+  -3,
+] as const
 const CANVAS_STICKY_QUICK_CREATE_DIRECTIONS = [
   'right',
   'bottom',
@@ -71,16 +82,19 @@ export function quickCreateCanvasSticky({
   }
 
   const sourceBounds = itemReadModel.getItemBounds(source)
-  const template = componentLibrary.getTemplate(CANVAS_STICKY_COMPONENT_KIND)
+  const targetSize = { h: source.h, w: source.w }
+  const targetPoint = getCanvasStickyQuickCreateAvailableTargetPoint({
+    direction,
+    itemReadModel,
+    sourceBounds,
+    sourceId: source.id,
+    targetSize,
+  })
   const item = applyCanvasStickyQuickCreateSourceStyle(
     applyCanvasStickyComponentCreationDefaults(
       componentLibrary.createItem({
         id: createId('component'),
-        point: getCanvasStickyQuickCreateTargetPoint({
-          direction,
-          sourceBounds,
-          targetSize: template,
-        }),
+        point: targetPoint,
         templateId: CANVAS_STICKY_COMPONENT_KIND,
       }),
     ),
@@ -122,7 +136,9 @@ function applyCanvasStickyQuickCreateSourceStyle(
     ...item,
     accent: source.accent,
     fill: source.fill,
+    h: source.h,
     stroke: source.stroke,
+    w: source.w,
   }
 }
 
@@ -281,6 +297,182 @@ function getCanvasStickyQuickCreateTargetPoint({
     x: sourceBounds.x,
     y: sourceBounds.y + sourceBounds.h + CANVAS_STICKY_QUICK_CREATE_GAP,
   }
+}
+
+function getCanvasStickyQuickCreateAvailableTargetPoint({
+  direction,
+  itemReadModel,
+  sourceBounds,
+  sourceId,
+  targetSize,
+}: {
+  direction: CanvasSide
+  itemReadModel: CanvasAppItemReadModel
+  sourceBounds: { h: number; w: number; x: number; y: number }
+  sourceId: string
+  targetSize: { h: number; w: number }
+}): Point {
+  const blockers = getCanvasStickyQuickCreateBlockerBounds({
+    itemReadModel,
+    sourceId,
+  })
+  const candidates = getCanvasStickyQuickCreateCandidatePoints({
+    direction,
+    sourceBounds,
+    targetSize,
+  })
+  let fallback = candidates[0]
+
+  for (const candidate of candidates) {
+    if (!doesCanvasStickyQuickCreateTargetOverlap({
+      blockers,
+      targetBounds: {
+        ...candidate,
+        ...targetSize,
+      },
+    })) {
+      return candidate
+    }
+
+    fallback = candidate
+  }
+
+  return fallback
+}
+
+function getCanvasStickyQuickCreateCandidatePoints({
+  direction,
+  sourceBounds,
+  targetSize,
+}: {
+  direction: CanvasSide
+  sourceBounds: { h: number; w: number; x: number; y: number }
+  targetSize: { h: number; w: number }
+}): Point[] {
+  const preferred = getCanvasStickyQuickCreateTargetPoint({
+    direction,
+    sourceBounds,
+    targetSize,
+  })
+  const mainStep = getCanvasStickyQuickCreateMainStep({
+    direction,
+    targetSize,
+  })
+  const crossStep = getCanvasStickyQuickCreateCrossStep({
+    direction,
+    targetSize,
+  })
+  const candidates: Point[] = []
+
+  for (let main = 0;
+    main < CANVAS_STICKY_QUICK_CREATE_MAX_SLOT_ATTEMPTS;
+    main += 1) {
+    for (const cross of CANVAS_STICKY_QUICK_CREATE_CROSS_OFFSETS) {
+      candidates.push({
+        x: preferred.x + mainStep.x * main + crossStep.x * cross,
+        y: preferred.y + mainStep.y * main + crossStep.y * cross,
+      })
+    }
+  }
+
+  return candidates
+}
+
+function getCanvasStickyQuickCreateMainStep({
+  direction,
+  targetSize,
+}: {
+  direction: CanvasSide
+  targetSize: { h: number; w: number }
+}): Point {
+  const gap = CANVAS_STICKY_QUICK_CREATE_GAP
+
+  if (direction === 'left') {
+    return { x: -(targetSize.w + gap), y: 0 }
+  }
+
+  if (direction === 'right') {
+    return { x: targetSize.w + gap, y: 0 }
+  }
+
+  if (direction === 'top') {
+    return { x: 0, y: -(targetSize.h + gap) }
+  }
+
+  return { x: 0, y: targetSize.h + gap }
+}
+
+function getCanvasStickyQuickCreateCrossStep({
+  direction,
+  targetSize,
+}: {
+  direction: CanvasSide
+  targetSize: { h: number; w: number }
+}): Point {
+  const gap = CANVAS_STICKY_QUICK_CREATE_GAP
+
+  if (direction === 'left' || direction === 'right') {
+    return { x: 0, y: targetSize.h + gap }
+  }
+
+  return { x: targetSize.w + gap, y: 0 }
+}
+
+function getCanvasStickyQuickCreateBlockerBounds({
+  itemReadModel,
+  sourceId,
+}: {
+  itemReadModel: CanvasAppItemReadModel
+  sourceId: string
+}) {
+  return itemReadModel.getAllItems()
+    .filter((item) => isCanvasStickyQuickCreateBlocker(item, sourceId))
+    .map((item) => itemReadModel.getItemBounds(item))
+}
+
+function isCanvasStickyQuickCreateBlocker(
+  item: CanvasItem,
+  sourceId: string,
+) {
+  if (
+    item.id === sourceId ||
+    (
+      item.type === 'component' &&
+      item.component === CANVAS_SECTION_COMPONENT_KIND
+    )
+  ) {
+    return false
+  }
+
+  return item.type === 'component' ||
+    item.type === 'custom' ||
+    item.type === 'image' ||
+    item.type === 'rect' ||
+    item.type === 'shape' ||
+    item.type === 'text'
+}
+
+function doesCanvasStickyQuickCreateTargetOverlap({
+  blockers,
+  targetBounds,
+}: {
+  blockers: readonly { h: number; w: number; x: number; y: number }[]
+  targetBounds: { h: number; w: number; x: number; y: number }
+}) {
+  return blockers.some((blocker) => doCanvasBoundsOverlap(
+    targetBounds,
+    blocker,
+  ))
+}
+
+function doCanvasBoundsOverlap(
+  a: { h: number; w: number; x: number; y: number },
+  b: { h: number; w: number; x: number; y: number },
+) {
+  return a.x < b.x + b.w &&
+    a.x + a.w > b.x &&
+    a.y < b.y + b.h &&
+    a.y + a.h > b.y
 }
 
 function getCanvasStickyQuickCreateSourceAnchor({

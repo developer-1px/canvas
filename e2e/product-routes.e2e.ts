@@ -1,4 +1,7 @@
-import type { Page } from '@playwright/test'
+import type {
+  Locator,
+  Page,
+} from '@playwright/test'
 import { expect, test } from '@playwright/test'
 
 const WORKSPACE_STORAGE_KEY = 'interactive-os.canvas.workspace.v1'
@@ -102,6 +105,56 @@ test('creates multiline sticky notes and arrows on /', async ({ page }) => {
   await page.mouse.up()
   await expect.poll(() => page.locator('[data-type="arrow"]').count())
     .toBeGreaterThan(arrowCount)
+})
+
+test('chains sticky notes with quick-create on /', async ({ page }) => {
+  await page.goto('/')
+
+  const stickies = page.locator(
+    '[data-type="component"][data-component="sticky"]',
+  )
+  const arrows = page.locator('[data-type="arrow"]')
+  const sourceSticky = page.locator(
+    '[data-canvas-item-id="product-sticky-examples"]',
+  )
+  const occupiedSticky = page.locator(
+    '[data-canvas-item-id="product-sticky-undo"]',
+  )
+
+  await expect(sourceSticky).toBeVisible()
+  await expect(occupiedSticky).toBeVisible()
+
+  const stickyCount = await stickies.count()
+  const arrowCount = await arrows.count()
+  const occupiedBox = await getRequiredElementBox(occupiedSticky)
+
+  await sourceSticky.click()
+
+  const quickCreateRight = page.getByRole('button', {
+    name: 'Create sticky note right',
+  })
+
+  await expect(quickCreateRight).toBeVisible()
+  await quickCreateRight.click()
+  await expect.poll(() => stickies.count()).toBe(stickyCount + 1)
+  await expect.poll(() => arrows.count()).toBe(arrowCount + 1)
+
+  const stickyEditor = page.locator(
+    '.component-sticky-body.canvas-content-editable-text-active',
+  )
+
+  await expect(stickyEditor).toBeVisible()
+  await stickyEditor.fill('Next experiment')
+  await stickyEditor.press('Escape')
+  await expect(stickyEditor).toHaveCount(0)
+
+  const newSticky = stickies.last()
+
+  await expect(newSticky).toContainText('Next experiment')
+  expect(doElementBoxesOverlap(
+    await getRequiredElementBox(newSticky),
+    occupiedBox,
+  )).toBe(false)
 })
 
 test('persists product board edits across reloads on /', async ({ page }) => {
@@ -214,4 +267,24 @@ async function getRequiredStageBox(page: Page) {
   }
 
   return stageBox
+}
+
+async function getRequiredElementBox(locator: Locator) {
+  const box = await locator.boundingBox()
+
+  if (!box) {
+    throw new Error('expected element bounds')
+  }
+
+  return box
+}
+
+function doElementBoxesOverlap(
+  a: { height: number; width: number; x: number; y: number },
+  b: { height: number; width: number; x: number; y: number },
+) {
+  return a.x < b.x + b.width &&
+    a.x + a.width > b.x &&
+    a.y < b.y + b.height &&
+    a.y + a.height > b.y
 }
