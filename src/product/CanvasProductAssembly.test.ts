@@ -3,9 +3,16 @@ import { PRODUCT_CANVAS_APP_ASSEMBLY } from './CanvasProductAssembly'
 
 describe('CanvasProductAssembly', () => {
   it('turns on the compact product workbench surfaces for /', () => {
-    expect(PRODUCT_CANVAS_APP_ASSEMBLY.initialSelection).toEqual([
-      'engine-shape',
-    ])
+    const productItemIds = PRODUCT_CANVAS_APP_ASSEMBLY.initialItems.map(
+      (item) => item.id,
+    )
+
+    expect(PRODUCT_CANVAS_APP_ASSEMBLY.initialSelection).toEqual([])
+    expect(productItemIds).toContain('product-board-title')
+    expect(productItemIds).not.toContain('engine-section')
+    expect(PRODUCT_CANVAS_APP_ASSEMBLY.initialItems.some((item) =>
+      item.type === 'custom'
+    )).toBe(false)
     expect(PRODUCT_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.toolbar)
       .toBe(true)
     expect(PRODUCT_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.zoomControls)
