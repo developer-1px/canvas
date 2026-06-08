@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@interactive-os/interaction':
+        specifier: link:../apg-patterns/packages/interaction
+        version: link:../apg-patterns/packages/interaction
       '@interactive-os/object-surface':
         specifier: link:../object-surface/packages/object-surface
         version: link:../object-surface/packages/object-surface

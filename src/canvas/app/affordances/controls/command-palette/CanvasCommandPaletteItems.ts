@@ -22,6 +22,10 @@ import type {
 import {
   runCanvasToolbarCommandAction,
 } from '../toolbar/CanvasToolbarCommandDispatch'
+import {
+  getCanvasAppCommandMapping,
+  getCanvasAppCommandMappingShortcut,
+} from '../../commands/CanvasAppCommandRegistry'
 
 export type CanvasCommandPaletteItem = {
   disabled?: boolean
@@ -189,6 +193,10 @@ function getCanvasCommandPaletteCommandItems({
         disabled,
         id: `command:${descriptor.command}`,
         section: 'Commands',
+        shortcut: getCanvasAppCommandMappingShortcut({
+          config,
+          mapping: getCanvasAppCommandMapping(`command:${descriptor.command}`),
+        }),
         title: CANVAS_COMMAND_AFFORDANCES[descriptor.command].title,
         onSelect: () =>
           runCanvasToolbarCommandAction({
@@ -232,6 +240,10 @@ function getCanvasCommandPaletteViewportItems({
     items.push({
       id: 'viewport:fit',
       section: 'View',
+      shortcut: getCanvasAppCommandMappingShortcut({
+        config,
+        mapping: getCanvasAppCommandMapping('viewport:fit'),
+      }),
       title: CANVAS_COMMAND_AFFORDANCES.fitView.title,
       onSelect: () =>
         onFitItems(selection.length > 0 ? [...selection] : undefined),
@@ -242,6 +254,10 @@ function getCanvasCommandPaletteViewportItems({
     items.push({
       id: 'viewport:reset-zoom',
       section: 'View',
+      shortcut: getCanvasAppCommandMappingShortcut({
+        config,
+        mapping: getCanvasAppCommandMapping('viewport:reset-zoom'),
+      }),
       title: CANVAS_COMMAND_AFFORDANCES.zoomReset.title,
       onSelect: onViewportReset,
     })
@@ -251,6 +267,10 @@ function getCanvasCommandPaletteViewportItems({
     items.push({
       id: 'viewport:zoom-in',
       section: 'View',
+      shortcut: getCanvasAppCommandMappingShortcut({
+        config,
+        mapping: getCanvasAppCommandMapping('viewport:zoom-in'),
+      }),
       title: CANVAS_COMMAND_AFFORDANCES.zoomIn.title,
       onSelect: () => onZoomBy(1.25),
     })
@@ -260,6 +280,10 @@ function getCanvasCommandPaletteViewportItems({
     items.push({
       id: 'viewport:zoom-out',
       section: 'View',
+      shortcut: getCanvasAppCommandMappingShortcut({
+        config,
+        mapping: getCanvasAppCommandMapping('viewport:zoom-out'),
+      }),
       title: CANVAS_COMMAND_AFFORDANCES.zoomOut.title,
       onSelect: () => onZoomBy(0.8),
     })

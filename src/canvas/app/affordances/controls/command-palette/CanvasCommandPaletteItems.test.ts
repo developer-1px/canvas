@@ -65,6 +65,12 @@ describe('CanvasCommandPaletteItems', () => {
     expect(items.find((item) => item.id === 'tool:marker')).toBeUndefined()
     expect(items.find((item) => item.id === 'tool:custom:risk')?.shortcut)
       .toBe('Shift+K')
+    expect(items.find((item) => item.id === 'command:delete')?.shortcut)
+      .toBe('Delete / Backspace')
+    expect(items.find((item) => item.id === 'command:duplicate')?.shortcut)
+      .toBe('Cmd+D / Alt+Drag')
+    expect(items.find((item) => item.id === 'viewport:fit')?.shortcut)
+      .toBe('0 / 1')
 
     items.find((item) => item.id === 'tool:select')?.onSelect()
     items.find((item) => item.id === 'component:card')?.onSelect()

@@ -63,6 +63,7 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@interactive-os/interaction": "link:../apg-patterns/packages/interaction",
     "@interactive-os/object-surface": "link:../object-surface/packages/object-surface",
     "@interactive-os/preview-surface": "link:../preview-surface/packages/preview-surface",
     "@zod-crud/grouping": "link:../zod-crud/labs/extensions/grouping",
