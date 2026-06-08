@@ -114,6 +114,9 @@ export {
   type CanvasTransformItem,
 } from '../foundation/CanvasTransformEngine'
 export {
+  CANVAS_WHEEL_PAN_SPEED,
+  CANVAS_WHEEL_ZOOM_DELTA_LIMIT,
+  CANVAS_WHEEL_ZOOM_SENSITIVITY,
   getCanvasWheelViewport,
   shouldHandleCanvasWheelViewport,
   type CanvasWheelInput,

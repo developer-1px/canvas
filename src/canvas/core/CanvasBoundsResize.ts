@@ -114,14 +114,22 @@ function preserveResizeAspectRatio(
   let height = resized.h
 
   if (changesX && !changesY) {
-    height = Math.max(MIN_ITEM_SIZE, width / aspectRatio)
+    height = width / aspectRatio
   } else if (!changesX && changesY) {
-    width = Math.max(MIN_ITEM_SIZE, height * aspectRatio)
+    width = height * aspectRatio
   } else if (width / height > aspectRatio) {
-    height = Math.max(MIN_ITEM_SIZE, width / aspectRatio)
+    height = width / aspectRatio
   } else {
-    width = Math.max(MIN_ITEM_SIZE, height * aspectRatio)
+    width = height * aspectRatio
   }
+
+  const minimumScale = Math.max(
+    1,
+    MIN_ITEM_SIZE / width,
+    MIN_ITEM_SIZE / height,
+  )
+  width *= minimumScale
+  height *= minimumScale
 
   return placeResizedBounds(origin, handle, width, height, resizeFromCenter)
 }

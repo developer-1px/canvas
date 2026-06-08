@@ -51,6 +51,11 @@ describe('CanvasImageInsertion', () => {
       viewport: { scale: 2, x: 10, y: 20 },
     })).toEqual({ x: 20, y: 30 })
     expect(getCanvasImageInsertCenter({
+      event: { clientX: 90, clientY: 130 },
+      stageElement,
+      viewport: { scale: 0, x: 10, y: 20 },
+    })).toEqual({ x: 400, y: 600 })
+    expect(getCanvasImageInsertCenter({
       stageElement,
       viewport: { scale: 2, x: 10, y: 20 },
     })).toEqual({ x: 80, y: 60 })

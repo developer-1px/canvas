@@ -8,8 +8,8 @@ import {
 describe('CanvasKeyboardViewportDispatch', () => {
   it('recognizes viewport intents and ignores non-viewport intents', () => {
     expect(isCanvasKeyboardViewportIntent({
-      kind: 'zoom-by',
-      multiplier: 1.25,
+      direction: 'in',
+      kind: 'zoom-viewport',
       preventDefault: true,
     })).toBe(true)
     expect(isCanvasKeyboardViewportIntent({
@@ -23,14 +23,18 @@ describe('CanvasKeyboardViewportDispatch', () => {
 
     runCanvasKeyboardViewportIntent({
       handlers,
-      intent: { kind: 'zoom-by', multiplier: 0.8, preventDefault: true },
+      intent: {
+        direction: 'out',
+        kind: 'zoom-viewport',
+        preventDefault: true,
+      },
     })
     runCanvasKeyboardViewportIntent({
       handlers,
       intent: { kind: 'reset-viewport', preventDefault: true },
     })
 
-    expect(handlers.zoomBy).toHaveBeenCalledWith(0.8)
+    expect(handlers.zoom).toHaveBeenCalledWith('out')
     expect(handlers.resetViewport).toHaveBeenCalledTimes(1)
   })
 
@@ -62,6 +66,6 @@ function createHandlers(): CanvasKeyboardViewportHandlers {
   return {
     fitToItems: vi.fn(),
     resetViewport: vi.fn(),
-    zoomBy: vi.fn(),
+    zoom: vi.fn(),
   }
 }

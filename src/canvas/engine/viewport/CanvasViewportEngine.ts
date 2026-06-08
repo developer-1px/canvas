@@ -3,7 +3,10 @@ import type {
   Point,
   Viewport
 } from '../../core'
-import { zoomViewport } from '../primitives/CanvasPrimitives'
+import {
+  clamp,
+  zoomViewport,
+} from '../primitives/CanvasPrimitives'
 
 export type CanvasWheelInput = {
   ctrlKey: boolean
@@ -14,11 +17,11 @@ export type CanvasWheelInput = {
   shiftKey: boolean
 }
 
-const WHEEL_PAN_MULTIPLIER = 0.9
-const WHEEL_ZOOM_MULTIPLIER = 3
+export const CANVAS_WHEEL_PAN_SPEED = 1
 const WHEEL_LINE_DELTA = 16
 const WHEEL_PAGE_DELTA = 800
-const WHEEL_ZOOM_SENSITIVITY = 0.001
+export const CANVAS_WHEEL_ZOOM_DELTA_LIMIT = 10
+export const CANVAS_WHEEL_ZOOM_SENSITIVITY = 0.01
 
 export function shouldHandleCanvasWheelViewport({
   config,
@@ -54,8 +57,13 @@ export function getCanvasWheelViewport({
   }
 
   if (isPinchWheelInput(input)) {
+    const zoomDelta = clamp(
+      delta.y,
+      -CANVAS_WHEEL_ZOOM_DELTA_LIMIT,
+      CANVAS_WHEEL_ZOOM_DELTA_LIMIT,
+    )
     const multiplier = Math.exp(
-      -delta.y * WHEEL_ZOOM_SENSITIVITY * WHEEL_ZOOM_MULTIPLIER,
+      -zoomDelta * CANVAS_WHEEL_ZOOM_SENSITIVITY,
     )
 
     return zoomViewport(viewport, point, multiplier)
@@ -65,8 +73,8 @@ export function getCanvasWheelViewport({
 
   return {
     ...viewport,
-    x: viewport.x - panDelta.x * WHEEL_PAN_MULTIPLIER,
-    y: viewport.y - panDelta.y * WHEEL_PAN_MULTIPLIER,
+    x: viewport.x - panDelta.x * CANVAS_WHEEL_PAN_SPEED,
+    y: viewport.y - panDelta.y * CANVAS_WHEEL_PAN_SPEED,
   }
 }
 

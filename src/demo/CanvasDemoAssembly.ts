@@ -6,7 +6,6 @@ import {
   createCanvasAppAiLabsSummarizeSelectionCommand,
   createCanvasAppAssembly,
   type CanvasAppAssemblyInput,
-  type CanvasPresenceOverlay,
   type CanvasWorkspaceStorage,
   type CanvasWorkspaceStorageProvider,
 } from '../canvas'
@@ -72,23 +71,6 @@ const DEMO_CANVAS_STORAGE: CanvasWorkspaceStorage = {
 const DEMO_CANVAS_STORAGE_PROVIDER: CanvasWorkspaceStorageProvider = () =>
   DEMO_CANVAS_STORAGE
 
-const DEMO_CANVAS_PRESENCE: readonly CanvasPresenceOverlay[] = Object.freeze([
-  {
-    color: '#2563eb',
-    id: 'remote-mia',
-    label: 'Mia',
-    point: { x: 318, y: 132 },
-    selectionBounds: { h: 132, w: 164, x: 360, y: 142 },
-  },
-  {
-    color: '#16a34a',
-    id: 'remote-noah',
-    label: 'Noah',
-    point: { x: 514, y: 332 },
-    selectionBounds: { h: 104, w: 148, x: 530, y: 344 },
-  },
-])
-
 const DEMO_CANVAS_FOCUSED_AFFORDANCE_CONFIG = {
   gestures: {
     altDragDuplicate: false,
@@ -134,7 +116,7 @@ const DEMO_CANVAS_FOCUSED_AFFORDANCE_CONFIG = {
     itemOutline: true,
     laserTrail: false,
     marquee: true,
-    presence: true,
+    presence: false,
     presentationMode: true,
     resizeHandles: true,
     selectionBounds: true,
@@ -217,7 +199,6 @@ const DEMO_CANVAS_BASE_ASSEMBLY_INPUT = {
   customItemModules: DEMO_CUSTOM_ITEM_MODULES,
   initialItems: DEMO_CANVAS_SEED_ITEMS,
   initialSelection: DEMO_CANVAS_INITIAL_SELECTION,
-  presenceProvider: () => DEMO_CANVAS_PRESENCE,
   workspaceStorageProvider: DEMO_CANVAS_STORAGE_PROVIDER,
 } satisfies CanvasAppAssemblyInput
 

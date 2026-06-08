@@ -27,8 +27,8 @@ export const CANVAS_KEYBOARD_VIEWPORT_SHORTCUTS:
   {
     commandId: 'zoomIn',
     getIntent: () => ({
-      kind: 'zoom-by',
-      multiplier: 1.25,
+      direction: 'in',
+      kind: 'zoom-viewport',
       preventDefault: true,
     }),
     keys: ['=', '+'],
@@ -41,8 +41,8 @@ export const CANVAS_KEYBOARD_VIEWPORT_SHORTCUTS:
   {
     commandId: 'zoomOut',
     getIntent: () => ({
-      kind: 'zoom-by',
-      multiplier: 0.8,
+      direction: 'out',
+      kind: 'zoom-viewport',
       preventDefault: true,
     }),
     label: 'zoom out',

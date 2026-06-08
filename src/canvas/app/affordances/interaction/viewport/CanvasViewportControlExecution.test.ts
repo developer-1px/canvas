@@ -6,6 +6,7 @@ import {
 } from 'vitest'
 import {
   fitBoundsIntoViewport,
+  getCanvasViewportZoomStepMultiplier,
   INITIAL_VIEWPORT,
   zoomViewport,
 } from '../../../../core'
@@ -18,7 +19,7 @@ import {
   fitCanvasViewportToItems,
   resetCanvasViewport,
   type CanvasViewportSetter,
-  zoomCanvasViewportBy,
+  zoomCanvasViewport,
 } from './CanvasViewportControlExecution'
 
 describe('CanvasViewportControlExecution', () => {
@@ -114,8 +115,8 @@ describe('CanvasViewportControlExecution', () => {
     const setViewport = vi.fn<CanvasViewportSetter>()
     const currentViewport = { scale: 1, x: 10, y: 20 }
 
-    zoomCanvasViewportBy({
-      multiplier: 1.5,
+    zoomCanvasViewport({
+      direction: 'in',
       setViewport,
       stageElement: createStageElement(createRect()),
     })
@@ -127,15 +128,44 @@ describe('CanvasViewportControlExecution', () => {
     }
 
     expect(viewportUpdate(currentViewport)).toEqual(
-      zoomViewport(currentViewport, { x: 250, y: 150 }, 1.5),
+      zoomViewport(
+        currentViewport,
+        { x: 250, y: 150 },
+        getCanvasViewportZoomStepMultiplier(currentViewport.scale, 'in'),
+      ),
+    )
+  })
+
+  it('zooms to the previous mounted stage center step', () => {
+    const setViewport = vi.fn<CanvasViewportSetter>()
+    const currentViewport = { scale: 1, x: 10, y: 20 }
+
+    zoomCanvasViewport({
+      direction: 'out',
+      setViewport,
+      stageElement: createStageElement(createRect()),
+    })
+
+    const viewportUpdate = setViewport.mock.calls[0][0]
+
+    if (typeof viewportUpdate !== 'function') {
+      throw new Error('expected viewport updater')
+    }
+
+    expect(viewportUpdate(currentViewport)).toEqual(
+      zoomViewport(
+        currentViewport,
+        { x: 250, y: 150 },
+        getCanvasViewportZoomStepMultiplier(currentViewport.scale, 'out'),
+      ),
     )
   })
 
   it('ignores zoom requests when the stage rect is missing', () => {
     const setViewport = vi.fn<CanvasViewportSetter>()
 
-    zoomCanvasViewportBy({
-      multiplier: 1.5,
+    zoomCanvasViewport({
+      direction: 'in',
       setViewport,
       stageElement: createStageElement(null),
     })

@@ -7,7 +7,6 @@ import {
   Highlighter,
   Maximize2,
   MessageSquareText,
-  Minus,
   Moon,
   MousePointer2,
   Move,
@@ -20,7 +19,6 @@ import {
   Sun,
   Type,
   Unlock,
-  Vote,
   X,
   ZoomIn,
   ZoomOut,
@@ -139,13 +137,10 @@ function CanvasEngineDemoSurface({
     index: 0,
   })
   const [theme, setTheme] = useState<'dark' | 'light'>('light')
-  const [votingPanelOpen, setVotingPanelOpen] = useState(false)
   const [contextMenu, setContextMenu] =
     useState<CanvasContextCommandMenuState | null>(null)
   const [, setSelectionPointer] =
     useState<EngineSelectionPointerState | null>(null)
-  const votingPanelVisible = votingPanelOpen ||
-    app.votingSession.status !== 'idle'
   const presentationEnabled = app.toolbar.config.overlays.presentationMode
   const presentationFrames = getCanvasPresentationFrames(app.items)
   const activePresentationIndex =
@@ -497,14 +492,6 @@ function CanvasEngineDemoSurface({
           />
         ) : null}
         <button
-          aria-label="Voting session"
-          aria-pressed={!presenting && votingPanelVisible}
-          onClick={() => setVotingPanelOpen((open) => !open)}
-          type="button"
-        >
-          <Vote aria-hidden="true" size={14} strokeWidth={2} />
-        </button>
-        <button
           aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
           aria-pressed={theme === 'dark'}
           onClick={() => setTheme((current) => (current === 'dark' ? 'light' : 'dark'))}
@@ -531,11 +518,6 @@ function CanvasEngineDemoSurface({
           <Unlock aria-hidden="true" size={14} strokeWidth={2} />
         </button>
       </div>
-      <EngineVotingSessionPanel
-        visible={!presenting && votingPanelVisible}
-        votingSession={app.votingSession}
-        onClose={() => setVotingPanelOpen(false)}
-      />
     </main>
   )
 }
@@ -692,109 +674,6 @@ function EngineStampPad({
   )
 }
 
-function EngineVotingSessionPanel({
-  visible,
-  votingSession,
-  onClose,
-}: {
-  visible: boolean
-  votingSession: CanvasEngineDemoModel['votingSession']
-  onClose: () => void
-}) {
-  if (!visible) {
-    return null
-  }
-
-  const isActive = votingSession.status === 'active'
-
-  return (
-    <section
-      className="engine-voting-session"
-      data-status={votingSession.status}
-      aria-label="Voting session"
-    >
-      <input
-        aria-label="Voting prompt"
-        disabled={isActive}
-        maxLength={80}
-        value={votingSession.prompt}
-        onChange={(event) =>
-          votingSession.onPromptChange(event.currentTarget.value)}
-      />
-      <div className="engine-voting-stepper">
-        <button
-          aria-label="Decrease votes"
-          disabled={isActive}
-          onClick={() =>
-            votingSession.onVotesPerParticipantChange(
-              votingSession.votesPerParticipant - 1,
-            )}
-          type="button"
-        >
-          <Minus aria-hidden="true" size={12} strokeWidth={2} />
-        </button>
-        <span aria-label="Votes per person">
-          {votingSession.votesPerParticipant}
-        </span>
-        <button
-          aria-label="Increase votes"
-          disabled={isActive}
-          onClick={() =>
-            votingSession.onVotesPerParticipantChange(
-              votingSession.votesPerParticipant + 1,
-            )}
-          type="button"
-        >
-          <Plus aria-hidden="true" size={12} strokeWidth={2} />
-        </button>
-      </div>
-      <span
-        className="engine-voting-count"
-        aria-label="Voting result count"
-      >
-        {votingSession.votesCast}/{votingSession.votesPerParticipant}
-      </span>
-      {isActive ? (
-        <button
-          aria-label="End voting"
-          onClick={votingSession.onEnd}
-          type="button"
-        >
-          End
-        </button>
-      ) : (
-        <button
-          aria-label="Start voting"
-          onClick={votingSession.onStart}
-          type="button"
-        >
-          Start
-        </button>
-      )}
-      {votingSession.status === 'ended' ? (
-        <button
-          aria-label="Clear voting results"
-          onClick={() => {
-            votingSession.onReset()
-            onClose()
-          }}
-          type="button"
-        >
-          Clear
-        </button>
-      ) : null}
-      {isActive && !votingSession.canCastVote ? (
-        <span
-          className="engine-voting-done"
-          aria-label="Voting complete"
-        >
-          Done
-        </span>
-      ) : null}
-    </section>
-  )
-}
-
 function getEngineWidgetInteraction(
   item: CanvasItem | null,
   widgetInteractions: CanvasAppWidgetInteractions,
@@ -838,7 +717,6 @@ function isEngineDemoControlTarget(target: EventTarget) {
         '.engine-selection-toolbar',
         '.engine-stamp-pad',
         '.engine-widget-play-overlay',
-        '.engine-voting-session',
         '.text-editor',
         'button',
         'input',

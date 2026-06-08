@@ -128,7 +128,7 @@ describe('CanvasAppControlModel', () => {
   it('wires command callbacks without knowing toolbar rendering details', () => {
     const onAlign = vi.fn()
     const onRunCustomCommand = vi.fn()
-    const onZoomBy = vi.fn()
+    const onZoom = vi.fn()
     const model = getCanvasAppControlModel(createInput({
       commandHandlers: createCommandHandlers({ onAlign }),
       customCommands: [{
@@ -139,7 +139,7 @@ describe('CanvasAppControlModel', () => {
         title: 'Publish',
       }],
       onRunCustomCommand,
-      onZoomBy,
+      onZoom,
     }))
 
     model.toolbar.commandHandlers.onAlign('alignLeft')
@@ -160,9 +160,9 @@ describe('CanvasAppControlModel', () => {
     expect(onAlign).toHaveBeenLastCalledWith('alignLeft')
     expect(onRunCustomCommand).toHaveBeenCalledTimes(2)
     expect(onRunCustomCommand).toHaveBeenLastCalledWith('publish')
-    expect(onZoomBy).toHaveBeenNthCalledWith(1, 1.25)
-    expect(onZoomBy).toHaveBeenNthCalledWith(2, 0.8)
-    expect(onZoomBy).toHaveBeenNthCalledWith(3, 0.8)
+    expect(onZoom).toHaveBeenNthCalledWith(1, 'in')
+    expect(onZoom).toHaveBeenNthCalledWith(2, 'out')
+    expect(onZoom).toHaveBeenNthCalledWith(3, 'out')
   })
 })
 
@@ -187,7 +187,7 @@ function createInput(
     onRunCustomCommand: vi.fn(),
     onToolChange: vi.fn(),
     onViewportReset: vi.fn(),
-    onZoomBy: vi.fn(),
+    onZoom: vi.fn(),
     ...overrides,
   }
 }

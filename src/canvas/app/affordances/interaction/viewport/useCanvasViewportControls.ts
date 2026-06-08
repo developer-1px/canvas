@@ -3,13 +3,14 @@ import {
   type Dispatch,
   type SetStateAction,
 } from 'react'
+import type { CanvasViewportZoomDirection } from '../../../../core'
 import type { Viewport } from '../../../../entities'
 import type { CanvasAppStageElement } from '../../../rendering/stage/CanvasAppStageElement'
 import type { CanvasAppItemReadModel } from '../../../workflow/CanvasAppItemReadModelContracts'
 import {
   fitCanvasViewportToItems,
   resetCanvasViewport,
-  zoomCanvasViewportBy,
+  zoomCanvasViewport,
 } from './CanvasViewportControlExecution'
 
 type UseCanvasViewportControlsArgs = {
@@ -39,10 +40,10 @@ export function useCanvasViewportControls({
     resetCanvasViewport({ setViewport })
   }, [setViewport])
 
-  const zoomBy = useCallback(
-    (multiplier: number) => {
-      zoomCanvasViewportBy({
-        multiplier,
+  const zoom = useCallback(
+    (direction: CanvasViewportZoomDirection) => {
+      zoomCanvasViewport({
+        direction,
         setViewport,
         stageElement,
       })
@@ -53,6 +54,6 @@ export function useCanvasViewportControls({
   return {
     fitToItems,
     resetViewport,
-    zoomBy,
+    zoom,
   }
 }

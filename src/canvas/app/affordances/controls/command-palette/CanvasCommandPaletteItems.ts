@@ -5,6 +5,7 @@ import {
   type CanvasAffordanceConfig,
   type CanvasCommandAvailability,
 } from '../../../../engine'
+import type { CanvasViewportZoomDirection } from '../../../../core'
 import type {
   CanvasComponentKind,
   Tool,
@@ -54,7 +55,7 @@ export type CanvasCommandPaletteItemsInput = {
   onInsertComponent: (component: CanvasComponentKind) => void
   onToolChange: (tool: Tool) => void
   onViewportReset: () => void
-  onZoomBy: (multiplier: number) => void
+  onZoom: (direction: CanvasViewportZoomDirection) => void
 }
 
 export function getCanvasCommandPaletteItems({
@@ -69,7 +70,7 @@ export function getCanvasCommandPaletteItems({
   onInsertComponent,
   onToolChange,
   onViewportReset,
-  onZoomBy,
+  onZoom,
   selection,
 }: CanvasCommandPaletteItemsInput): CanvasCommandPaletteItem[] {
   return [
@@ -95,7 +96,7 @@ export function getCanvasCommandPaletteItems({
       config,
       onFitItems,
       onViewportReset,
-      onZoomBy,
+      onZoom,
       selection,
     }),
   ]
@@ -228,11 +229,11 @@ function getCanvasCommandPaletteViewportItems({
   config,
   onFitItems,
   onViewportReset,
-  onZoomBy,
+  onZoom,
   selection,
 }: Pick<
   CanvasCommandPaletteItemsInput,
-  'config' | 'onFitItems' | 'onViewportReset' | 'onZoomBy' | 'selection'
+  'config' | 'onFitItems' | 'onViewportReset' | 'onZoom' | 'selection'
 >): CanvasCommandPaletteItem[] {
   const items: CanvasCommandPaletteItem[] = []
 
@@ -272,7 +273,7 @@ function getCanvasCommandPaletteViewportItems({
         mapping: getCanvasAppCommandMapping('viewport:zoom-in'),
       }),
       title: CANVAS_COMMAND_AFFORDANCES.zoomIn.title,
-      onSelect: () => onZoomBy(1.25),
+      onSelect: () => onZoom('in'),
     })
   }
 
@@ -285,7 +286,7 @@ function getCanvasCommandPaletteViewportItems({
         mapping: getCanvasAppCommandMapping('viewport:zoom-out'),
       }),
       title: CANVAS_COMMAND_AFFORDANCES.zoomOut.title,
-      onSelect: () => onZoomBy(0.8),
+      onSelect: () => onZoom('out'),
     })
   }
 

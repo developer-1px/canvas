@@ -19,7 +19,7 @@ describe('Canvas keyboard viewport and system boundaries', () => {
     expect(viewportShortcutFile.source).not.toContain("shortcutId: 'fitAll'")
     expect(viewportShortcutFile.source).not.toContain("shortcutId: 'zoomIn'")
     expect(viewportShortcutFile.source).not.toContain("kind: 'fit-selection'")
-    expect(viewportShortcutFile.source).not.toContain("kind: 'zoom-by'")
+    expect(viewportShortcutFile.source).not.toContain("kind: 'zoom-viewport'")
     expect(viewportShortcutCatalogFile.source).toContain(
       'CANVAS_KEYBOARD_VIEWPORT_SHORTCUTS',
     )
@@ -32,7 +32,9 @@ describe('Canvas keyboard viewport and system boundaries', () => {
     expect(viewportShortcutCatalogFile.source).toContain(
       "kind: 'fit-selection'",
     )
-    expect(viewportShortcutCatalogFile.source).toContain("kind: 'zoom-by'")
+    expect(viewportShortcutCatalogFile.source).toContain(
+      "kind: 'zoom-viewport'",
+    )
     expect(viewportShortcutCatalogFile.source).not.toContain(
       "shortcutId: 'nudge'",
     )

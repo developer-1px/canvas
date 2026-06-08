@@ -2,6 +2,7 @@ import type {
   Dispatch,
   SetStateAction,
 } from 'react'
+import type { CanvasViewportZoomDirection } from '../../core'
 import type { CanvasAffordanceConfig } from '../../engine'
 import type { Viewport } from '../../entities'
 import type { CanvasAppItemReadModel } from './CanvasAppItemReadModelContracts'
@@ -18,13 +19,13 @@ export type CanvasAppViewportModelInput = {
 export type CanvasAppViewportRuntime = {
   fitToItems: (ids?: string[]) => void
   resetViewport: () => void
-  zoomBy: (multiplier: number) => void
+  zoom: (direction: CanvasViewportZoomDirection) => void
 }
 
 export type CanvasAppViewportControlContext = {
   onFitItems: (ids?: string[]) => void
   onViewportReset: () => void
-  onZoomBy: (multiplier: number) => void
+  onZoom: (direction: CanvasViewportZoomDirection) => void
 }
 
 export type CanvasAppViewportConsumerModel = {

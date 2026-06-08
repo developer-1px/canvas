@@ -11,6 +11,6 @@ if (themeMode === 'dark' || themeMode === 'light') {
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <CanvasRoot pathname={window.location.pathname} />
+    <CanvasRoot />
   </StrictMode>,
 )

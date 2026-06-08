@@ -24,6 +24,8 @@ export {
   type CanvasStableId,
 } from './CanvasStableIds'
 export {
+  CANVAS_FIT_VIEWPORT_PADDING,
+  CANVAS_ZOOM_STEPS,
   DRAG_THRESHOLD,
   INITIAL_VIEWPORT,
   MAX_SCALE,
@@ -32,6 +34,9 @@ export {
   RESIZE_HANDLES,
   clamp,
   fitBoundsIntoViewport,
+  getCanvasViewportWorldPoint,
+  getCanvasViewportZoomStep,
+  getCanvasViewportZoomStepMultiplier,
   handlePoint,
   normalizeBounds,
   pointDistance,
@@ -39,6 +44,7 @@ export {
   scaleItemBounds,
   unique,
   zoomViewport,
+  type CanvasViewportZoomDirection,
   type CanvasViewportRect,
   type ResizeBoundsOptions,
 } from './CanvasCorePrimitives'

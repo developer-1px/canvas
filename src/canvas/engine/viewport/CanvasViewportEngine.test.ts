@@ -1,6 +1,8 @@
 import { describe, expect, test } from 'vitest'
 import { createCanvasAffordanceConfig } from '../affordance/CanvasAffordances'
 import {
+  CANVAS_WHEEL_ZOOM_DELTA_LIMIT,
+  CANVAS_WHEEL_ZOOM_SENSITIVITY,
   getCanvasWheelViewport,
   shouldHandleCanvasWheelViewport,
   type CanvasWheelInput,
@@ -19,7 +21,7 @@ const baseWheel: CanvasWheelInput = {
 }
 
 describe('CanvasViewportEngine', () => {
-  test('uses wheel delta as 0.9x pan offset for trackpads', () => {
+  test('uses ordinary wheel delta as 1:1 screen-space pan for trackpads', () => {
     expect(
       getCanvasWheelViewport({
         config,
@@ -31,10 +33,25 @@ describe('CanvasViewportEngine', () => {
         point: { x: 100, y: 100 },
         viewport,
       }),
-    ).toEqual({ x: -9, y: -18, scale: 1 })
+    ).toEqual({ x: -10, y: -20, scale: 1 })
   })
 
-  test('uses pinch wheel input as 3x zoom around the pointer', () => {
+  test('uses shift wheel as horizontal pan for mouse wheel input', () => {
+    expect(
+      getCanvasWheelViewport({
+        config,
+        input: {
+          ...baseWheel,
+          deltaY: 20,
+          shiftKey: true,
+        },
+        point: { x: 100, y: 100 },
+        viewport,
+      }),
+    ).toEqual({ x: -20, y: 0, scale: 1 })
+  })
+
+  test('uses clamped pinch wheel input as smooth zoom around the pointer', () => {
     const next = getCanvasWheelViewport({
       config,
       input: {
@@ -45,10 +62,13 @@ describe('CanvasViewportEngine', () => {
       point: { x: 100, y: 100 },
       viewport,
     })
+    const multiplier = Math.exp(
+      CANVAS_WHEEL_ZOOM_DELTA_LIMIT * CANVAS_WHEEL_ZOOM_SENSITIVITY,
+    )
 
-    expect(next?.scale).toBeCloseTo(Math.exp(0.3))
-    expect(next?.x).toBeCloseTo(100 - 100 * Math.exp(0.3))
-    expect(next?.y).toBeCloseTo(100 - 100 * Math.exp(0.3))
+    expect(next?.scale).toBeCloseTo(multiplier)
+    expect(next?.x).toBeCloseTo(100 - 100 * multiplier)
+    expect(next?.y).toBeCloseTo(100 - 100 * multiplier)
   })
 
   test('routes ordinary wheel to pan and pinch wheel to zoom', () => {

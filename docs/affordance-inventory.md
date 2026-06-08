@@ -30,12 +30,14 @@ unsupported items disabled rather than adding a full transform inspector.
 | 항목 | 분류 | 이유 |
 |------|------|------|
 | DOM inspector | feature 후보 | DOM tree 선택 개념은 쓸 수 있지만 core engine default는 아님 |
-| HTML/CSS specimen | legacy consumer demo | CSS cascade/editor 실험으로는 유효하지만 canvas affordance core보다 제품 쪽에 가까움 |
-| Design-system specimen | legacy product demo | source/design 협업 제품 컨셉이며 default engine demo를 흐림 |
+| HTML/CSS specimen | removed consumer demo | CSS cascade/editor 실험은 public canvas API 공급 경로가 아니어서 코드 quarantine을 제거함 |
+| Design-system specimen | removed product demo | source/design 협업 제품 컨셉이며 default engine demo를 흐려 코드 quarantine을 제거함 |
 | Widget-like modules | extension seam | React component 또는 trusted HTML/CSS를 canvas object 안에 렌더링하는 custom item helper로 살림 |
 | Comment annotations | collaboration part | 독립 canvas object로는 살리되 thread/sidebar/review product는 core가 아님 |
 
-Legacy specimen tests are kept as `.legacy.ts(x)` and excluded from the default test run until the DOM/CSS feature is promoted again.
+Legacy specimen code and `.legacy.ts(x)` tests were removed. If the DOM/CSS
+feature is promoted again, rebuild it as a consumer-owned custom item module on
+top of the public authoring API.
 
 ## File-Level Boundary
 
@@ -48,8 +50,8 @@ Legacy specimen tests are kept as `.legacy.ts(x)` and excluded from the default 
 | `src/demo/custom-items/index.ts` | keep seam | custom object extension point. default exports stay empty |
 | `src/demo/custom-items/widget-counter/**` | extension fixture | FigJam widget-like seam 검증용 sample module. default demo에서 import하지 않는다 |
 | `src/canvas/app/extensions/widgets/**` | keep seam | React/HTML widget을 `<foreignObject>` custom item으로 렌더링하는 authoring helper |
-| `src/demo/custom-items/html-specimen/**` | legacy quarantine | DOM/CSS editor consumer demo. default demo에서 import하지 않는다 |
-| `e2e/legacy/html-specimen-paste-to-edit.legacy.ts` | legacy quarantine | promoted DOM/CSS feature가 될 때만 되살릴 regression suite |
+| `src/demo/custom-items/html-specimen/**` | removed | DOM/CSS editor consumer demo는 public API 공급 경로가 아니어서 제거 |
+| `e2e/legacy/html-specimen-paste-to-edit.legacy.ts` | removed | 제거된 consumer demo의 비기본 regression suite |
 | `src/canvas/app/shell/CanvasAppView.tsx` | keep generic | app surfaces must not branch on consumer panel ids |
 | `src/canvas/app/affordances/editing/inspector/CanvasObjectInspector.tsx` | keep generic | custom panel은 기본 bounds/style inspector 옆에 compose만 한다 |
 | `src/canvas/app/shell/CanvasApp.css` | keep generic | consumer-specific rail/inspector styling 제거 대상 |
@@ -98,12 +100,12 @@ capability policy다. Core는 transport, account, share link를 소유하지 않
 | comment, stamp, cursor-chat, emote, presence cursor | ⑤ | 엔진(협업) | comment=persistent, 나머지=**ephemeral** | keep(comment) / drop-from-default(나머지) | drop은 "불법"이 아니라 facilitation product surface라 본 데모서 숨김 |
 | voting, timer, spotlight | ⑤ | 제품(facilitation) | ephemeral | drop-from-default | 정당한 ⑤축 제품 기능. core 데모만 비노출 |
 | dark mode | cross-cutting | 제품 chrome | ephemeral(UI state) | keep | 토큰은 엔진 자산, 토글은 데모 (#38) |
-| HTML/CSS specimen, DOM inspector, design-system specimen | ②③(제품 콘텐츠) | **제품 domain** | persistent | legacy-quarantine | **legacy=폐기가 아니라 제품-domain 위치 지정.** custom item module로 승격 가능 |
+| HTML/CSS specimen, DOM inspector, design-system specimen | ②③(제품 콘텐츠) | **제품 domain** | persistent | removed | public API 공급에는 필요 없으므로 제거. 승격 시 consumer-owned custom item module로 재구현 |
 | Export HTML/CSS/patch UI | — | 제품 domain | — | drop | DOM/CSS consumer export. **캔버스 SVG/PNG export(#36)와 별개** |
 | widget-counter | ② | 엔진 seam fixture | persistent | fixture | custom item 계약 검증용 |
 
 ### 핵심 정정
 
-- 이전 inventory의 "legacy"는 **폐기 신호로 읽히기 쉬웠다.** de-facto 기준으로는 "제품-domain 기능, 본 데모 비노출"이며 — custom item module seam으로 언제든 승격 가능한 **정당한** affordance다.
+- 이전 inventory의 "legacy"는 **폐기 신호로 읽히기 쉬웠다.** de-facto 기준으로는 "제품-domain 기능, 본 데모 비노출"이다. 이번 정리에서는 public API 공급 경로가 아니므로 코드 quarantine은 제거했고, 필요해지면 custom item module seam 위에서 다시 구현한다.
 - ⑤ Collaboration 항목의 drop은 "core 보편 부품이 아님"이지 "표준이 아님"이 아니다. presence/voting/timer는 de-facto 협업 표준이며 ephemeral 채널로 분리돼 있다(Figma/Yjs 경계와 정합).
 - "완료"는 본 inventory 소진이 아니라 `canvas-affordance-defacto.md` 5축 표의 **필수+보편 칸이 채워졌는가**로 측정한다.

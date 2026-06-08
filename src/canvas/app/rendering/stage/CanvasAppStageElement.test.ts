@@ -76,6 +76,11 @@ describe('CanvasAppStageElement', () => {
         x: 70,
         y: 40,
       })
+    expect(stageElement.getViewportCenter({ scale: 0, x: 10, y: 20 }))
+      .toEqual({
+        x: 1400,
+        y: 800,
+      })
   })
 
   it('captures and releases pointer ownership through the stage element', () => {

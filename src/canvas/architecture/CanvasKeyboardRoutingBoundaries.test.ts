@@ -43,7 +43,7 @@ describe('Canvas keyboard routing boundaries', () => {
     expect(routerFile.source).not.toContain('handlers.openFindReplace()')
     expect(routerFile.source).not.toContain('handlers.setSpaceDown(true)')
     expect(routerFile.source).not.toContain('handlers.commitSelection([])')
-    expect(routerFile.source).not.toContain('handlers.zoomBy(')
+    expect(routerFile.source).not.toContain('handlers.zoom(')
     expect(routerFile.source).not.toContain('handlers.resetViewport()')
     expect(routerFile.source).not.toContain('handlers.fitToItems(')
     expect(routerFile.source).not.toContain('handlers.setTool(')

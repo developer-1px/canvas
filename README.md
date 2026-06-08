@@ -1,6 +1,6 @@
 # Canvas
 
-Product-first canvas board with a reusable affordance engine underneath.
+Reusable canvas package with a minimal affordance engine demo.
 
 ## Run
 
@@ -9,12 +9,9 @@ pnpm install
 pnpm dev
 ```
 
-Default route `/` opens the product brainstorming board. It keeps the first
-screen on the canvas and exposes compact work controls for sticky notes,
-sections, connectors, drawing, stamps, zoom, and selection actions.
-
-Route `/engine` preserves the minimal engine verification demo for pan/zoom,
+Default route `/` opens the minimal engine verification demo for pan/zoom,
 object selection, toolbar actions, sticky notes, text editing, and drawing.
+Route `/engine` remains available as the same demo path for existing checks.
 
 ## Check
 

@@ -13,8 +13,8 @@ describe('CanvasKeyboardViewportShortcuts', () => {
       key: '+',
       mod: true,
     }))).toEqual({
-      kind: 'zoom-by',
-      multiplier: 1.25,
+      direction: 'in',
+      kind: 'zoom-viewport',
       preventDefault: true,
     })
 

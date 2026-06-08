@@ -138,6 +138,11 @@ describe('CanvasTextPasteImport', () => {
       viewport,
     })).toEqual({ x: 200, y: 120 })
     expect(getCanvasTextPasteInsertPosition({
+      event: { clientX: 410, clientY: 260 },
+      stageElement: stageElement as never,
+      viewport: { scale: Number.NaN, x: 10, y: 20 },
+    })).toEqual({ x: 4000, y: 2400 })
+    expect(getCanvasTextPasteInsertPosition({
       stageElement: stageElement as never,
       viewport,
     })).toEqual({ x: 100, y: 120 })

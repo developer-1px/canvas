@@ -93,7 +93,7 @@ describe('Canvas App viewport workflow boundaries', () => {
     expect(viewportConsumerModelFile.source).toContain('keyboard: {')
     expect(appModelFile.source).not.toContain('viewportControls.fitToItems')
     expect(appModelFile.source).not.toContain('viewportControls.resetViewport')
-    expect(appModelFile.source).not.toContain('viewportControls.zoomBy')
+    expect(appModelFile.source).not.toContain('viewportControls.zoom(')
     expect(viewportControlsHookFile.source).toContain(
       "from './CanvasViewportControlExecution'",
     )
@@ -118,7 +118,7 @@ describe('Canvas App viewport workflow boundaries', () => {
       'export function resetCanvasViewport',
     )
     expect(viewportControlExecutionFile.source).toContain(
-      'export function zoomCanvasViewportBy',
+      'export function zoomCanvasViewport',
     )
     expect(wheelViewportHookFile.source).toContain(
       "from './CanvasWheelViewportExecution'",

@@ -1,4 +1,5 @@
 import { createCanvasKeyboardIntentDispatchTable } from './CanvasKeyboardIntentDispatchTable'
+import type { CanvasViewportZoomDirection } from '../../../../core'
 import type {
   CanvasKeyboardShortcutIntent,
 } from './CanvasKeyboardShortcutIntentContracts'
@@ -6,7 +7,7 @@ import type {
 export type CanvasKeyboardViewportHandlers = {
   fitToItems: (ids?: string[]) => void
   resetViewport: () => void
-  zoomBy: (multiplier: number) => void
+  zoom: (direction: CanvasViewportZoomDirection) => void
 }
 
 const CANVAS_KEYBOARD_VIEWPORT_INTENT_DISPATCH =
@@ -23,8 +24,8 @@ const CANVAS_KEYBOARD_VIEWPORT_INTENT_DISPATCH =
     'reset-viewport': ({ handlers }) => {
       handlers.resetViewport()
     },
-    'zoom-by': ({ handlers, intent }) => {
-      handlers.zoomBy(intent.multiplier)
+    'zoom-viewport': ({ handlers, intent }) => {
+      handlers.zoom(intent.direction)
     },
   })
 

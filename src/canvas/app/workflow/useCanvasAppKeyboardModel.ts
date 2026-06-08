@@ -56,6 +56,6 @@ export function useCanvasAppKeyboardModel({
     undoHistory: command.undoHistory,
     ungroupSelection: command.ungroupSelection,
     unlockAll: command.unlockAll,
-    zoomBy: viewport.zoomBy,
+    zoom: viewport.zoom,
   })
 }

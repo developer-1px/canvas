@@ -74,6 +74,17 @@ describe('CanvasSelectionEngine pointer policy', () => {
     ).toEqual(['sibling'])
   })
 
+  test('shift-clicking a parent group replaces selected children with the group', () => {
+    expect(
+      getCanvasItemPointerSelection({
+        additive: true,
+        itemId: 'group',
+        scene,
+        selection: ['child', 'sibling'],
+      }).nextSelection,
+    ).toEqual(['sibling', 'group'])
+  })
+
   test('marquee selects a group through child hits', () => {
     expect(
       getCanvasMarqueeSelection({
@@ -83,5 +94,16 @@ describe('CanvasSelectionEngine pointer policy', () => {
         scene,
       }),
     ).toEqual(['group'])
+  })
+
+  test('additive marquee prunes selected children when the parent group is hit', () => {
+    expect(
+      getCanvasMarqueeSelection({
+        additive: true,
+        baseSelection: ['child', 'sibling'],
+        bounds: { x: 5, y: 5, w: 12, h: 12 },
+        scene,
+      }),
+    ).toEqual(['sibling', 'group'])
   })
 })

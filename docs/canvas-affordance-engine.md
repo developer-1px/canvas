@@ -51,7 +51,6 @@
 | `src/canvas/app/rendering/CanvasAppRendererRegistries.ts` | App-named component/custom item renderer registry 생성, 검증, default를 소유하고 Demo SVG registry 구현명을 외부 authoring seam 뒤에 숨긴다 |
 | `src/canvas/app/rendering/CanvasAppStageAdapter.tsx` | App Shell이 stage props를 알지 않도록 stage ReactNode를 만드는 Adapter Interface를 제공하고, stage mount Interface를 기본 SVG Stage ref로 매핑한다 |
 | `src/canvas/app/rendering/CanvasAppItemLayerAdapter.tsx` | App workflow가 concrete Demo SVG item layer 없이 stage children을 만들도록 하는 Adapter Interface를 제공하고, SVG item pointer event를 App pointer Interface로 매핑한다 |
-| `src/canvas/app/workflow/CanvasAppConsumerContracts.ts` | Command, extension, interaction, keyboard, pointer, stage, stage element runtime fan-out의 입력과 consumer별 출력 Interface를 한곳에 모은다 |
 | `src/canvas/app/rendering/CanvasDemoSvgItemFrame.tsx` | Demo SVG item의 lock, selected, pointer event, outline wrapper 문법을 item type별 shape rendering과 분리해 소유한다 |
 | `src/canvas/app/rendering/CanvasDemoSvgDrawingItemRenderer.tsx` | Marker, highlighter, vector path, arrow의 SVG path/line shape와 arrow marker 사용을 소유한다 |
 | `src/canvas/app/rendering/CanvasDemoSvgRectTextItemRenderer.tsx` | Rect와 text item의 embedded text foreignObject 문법을 소유하고, bounded shape SVG geometry는 Host shape 계약에 위임한다 |
@@ -110,8 +109,8 @@
 | `src/canvas/app/table/useCanvasTableImport.ts` | paste/drop DOM listener와 typing target guard를 table import workflow로 연결하고 App Shell에 노출하지 않는다 |
 | `src/canvas/app/checklist/CanvasChecklistInspectorPanel.tsx` | 선택한 checklist의 item check/text/add/remove action을 App checklist affordance 뒤에 숨긴다 |
 | `src/canvas/app/kanban/CanvasKanbanInspectorPanel.tsx` | 선택한 Queue/Kanban의 card text/add/remove/reorder action을 App kanban affordance 뒤에 숨긴다 |
-| `src/canvas/app/link/CanvasLinkPreviewImport.ts` | URL/embed text parsing, insert center 계산, link preview component 생성 요청을 link preview import deep module 뒤에 숨긴다 |
-| `src/canvas/app/link/useCanvasLinkPreviewImport.ts` | paste/drop DOM listener와 typing target guard를 link preview import workflow로 연결하고 App Shell에 노출하지 않는다 |
+| `src/canvas/app/affordances/io/media/CanvasMediaImport.ts` | URL/embed text parsing, insert center 계산, media/link-preview item 생성 요청을 media import deep module 뒤에 숨긴다 |
+| `src/canvas/app/affordances/io/link-preview/useCanvasLinkPreviewImport.ts` | paste/drop DOM listener와 typing target guard를 link preview import workflow로 연결하고 App Shell에 노출하지 않는다 |
 | `src/canvas/app/link/CanvasLinkPreviewInspectorPanel.tsx` | 선택한 link preview의 open/source text 변환과 orientation action을 App link preview affordance 뒤에 숨긴다 |
 | `src/canvas/app/drawing/CanvasArrowRoutingInspectorPanel.tsx` | 선택한 connector의 elbow/straight routing action을 App drawing affordance 뒤에 숨긴다 |
 | `src/canvas/app/workflow/CanvasAppStageModel.tsx` | stage와 item layer Adapter 호출 순서, text editor blur, context menu 차단, render 실패 containment를 소유한다 |

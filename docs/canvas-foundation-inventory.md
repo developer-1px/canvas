@@ -4,9 +4,10 @@ Purpose: fix the ownership map before moving code. Canvas Foundation should look
 like `zod-crud` core: small headless contracts first, reusable extensions second,
 product/app meaning last.
 
-Product pressure from the `/` board is tracked separately in
-`docs/canvas-product-extraction-ledger.md`. Promotion decisions should use that
-ledger before moving app-owned code into Foundation or first-party extensions.
+Product pressure stays app-owned until repeated consumer demand appears.
+Promotion decisions should use a headless contract and at least two real
+consumers before moving app-owned code into Foundation or first-party
+extensions.
 
 ## Ownership Rules
 

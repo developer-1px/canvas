@@ -2,6 +2,9 @@ import type {
   Point,
   Viewport
 } from '../../../../core'
+import {
+  getCanvasViewportWorldPoint,
+} from '../../../../core'
 import type { CanvasAppStageElement } from '../../../rendering/stage/CanvasAppStageElement'
 
 export function screenPoint(
@@ -12,10 +15,7 @@ export function screenPoint(
 }
 
 export function screenToWorld(point: Point, viewport: Viewport) {
-  return {
-    x: (point.x - viewport.x) / viewport.scale,
-    y: (point.y - viewport.y) / viewport.scale,
-  }
+  return getCanvasViewportWorldPoint(viewport, point)
 }
 
 export function capturePointer(

@@ -60,6 +60,44 @@ describe('CanvasPointerDragSession', () => {
       pointerId: 7,
     })
   })
+
+  it('keeps pointer projection finite when persisted viewport scale is invalid', () => {
+    const interaction = moveInteraction({ pointerId: 7 })
+
+    expect(
+      getCanvasPointerDragProjection({
+        event: {
+          clientX: 120,
+          clientY: 80,
+          pointerId: 7,
+        },
+        interaction,
+        stageElement: createStageElement(),
+        viewport: { scale: 0, x: 10, y: 20 },
+      }),
+    ).toEqual({
+      currentScreen: { x: 120, y: 80 },
+      currentWorld: { x: 1100, y: 600 },
+      interaction,
+    })
+
+    expect(
+      getCanvasPointerDragProjection({
+        event: {
+          clientX: 120,
+          clientY: 80,
+          pointerId: 7,
+        },
+        interaction,
+        stageElement: createStageElement(),
+        viewport: { scale: Number.NaN, x: 10, y: 20 },
+      }),
+    ).toEqual({
+      currentScreen: { x: 120, y: 80 },
+      currentWorld: { x: 1100, y: 600 },
+      interaction,
+    })
+  })
 })
 
 function moveInteraction(

@@ -8,11 +8,11 @@ describe('CanvasAppViewportConsumerModel', () => {
 
     model.control.onFitItems(['item-1'])
     model.control.onViewportReset()
-    model.control.onZoomBy(1.25)
+    model.control.onZoom('in')
 
     expect(viewportControls.fitToItems).toHaveBeenCalledWith(['item-1'])
     expect(viewportControls.resetViewport).toHaveBeenCalledTimes(1)
-    expect(viewportControls.zoomBy).toHaveBeenCalledWith(1.25)
+    expect(viewportControls.zoom).toHaveBeenCalledWith('in')
   })
 
   it('builds keyboard viewport handlers without control naming', () => {
@@ -21,11 +21,11 @@ describe('CanvasAppViewportConsumerModel', () => {
 
     model.keyboard.fitToItems()
     model.keyboard.resetViewport()
-    model.keyboard.zoomBy(0.8)
+    model.keyboard.zoom('out')
 
     expect(viewportControls.fitToItems).toHaveBeenCalledWith()
     expect(viewportControls.resetViewport).toHaveBeenCalledTimes(1)
-    expect(viewportControls.zoomBy).toHaveBeenCalledWith(0.8)
+    expect(viewportControls.zoom).toHaveBeenCalledWith('out')
   })
 })
 
@@ -33,6 +33,6 @@ function createViewportControls() {
   return {
     fitToItems: vi.fn(),
     resetViewport: vi.fn(),
-    zoomBy: vi.fn(),
+    zoom: vi.fn(),
   }
 }

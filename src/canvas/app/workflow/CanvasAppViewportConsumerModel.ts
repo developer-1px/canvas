@@ -10,12 +10,12 @@ export function getCanvasAppViewportConsumerModel(
     control: {
       onFitItems: viewportControls.fitToItems,
       onViewportReset: viewportControls.resetViewport,
-      onZoomBy: viewportControls.zoomBy,
+      onZoom: viewportControls.zoom,
     },
     keyboard: {
       fitToItems: viewportControls.fitToItems,
       resetViewport: viewportControls.resetViewport,
-      zoomBy: viewportControls.zoomBy,
+      zoom: viewportControls.zoom,
     },
   }
 }

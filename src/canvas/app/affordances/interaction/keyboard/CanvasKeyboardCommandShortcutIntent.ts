@@ -1,4 +1,5 @@
 import type { CanvasAffordanceConfig } from '../../../../engine'
+import type { CanvasViewportZoomDirection } from '../../../../core'
 import { getCanvasKeyboardBuiltinCommandShortcutIntent } from './CanvasKeyboardCommandShortcuts'
 import { getCanvasKeyboardNudgeShortcutIntent } from './CanvasKeyboardNudgeShortcuts'
 import { getCanvasKeyboardViewportShortcutIntent } from './CanvasKeyboardViewportShortcuts'
@@ -15,7 +16,11 @@ export type CanvasKeyboardCommandShortcutIntent =
   | { kind: 'edit-selection'; preventDefault: true }
   | { kind: 'undo-history'; preventDefault: true }
   | { kind: 'redo-history'; preventDefault: true }
-  | { kind: 'zoom-by'; multiplier: number; preventDefault: true }
+  | {
+      direction: CanvasViewportZoomDirection
+      kind: 'zoom-viewport'
+      preventDefault: true
+    }
   | { kind: 'reset-viewport'; preventDefault: true }
   | { kind: 'copy-selection'; preventDefault: true }
   | { kind: 'cut-selection'; preventDefault: true }

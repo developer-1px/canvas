@@ -111,9 +111,6 @@ describe('Canvas App IO boundaries', () => {
     const linkPreviewImportHookFile = getSourceFile(
       'src/canvas/app/affordances/io/link-preview/useCanvasLinkPreviewImport.ts',
     )
-    const linkPreviewImportFile = getSourceFile(
-      'src/canvas/app/affordances/io/link-preview/CanvasLinkPreviewImport.ts',
-    )
     const mediaImportFile = getSourceFile(
       'src/canvas/app/affordances/io/media/CanvasMediaImport.ts',
     )
@@ -142,7 +139,15 @@ describe('Canvas App IO boundaries', () => {
     )
     expect(linkPreviewImportHookFile.source).toContain('ClipboardEvent')
     expect(linkPreviewImportHookFile.source).toContain('DragEvent')
-    expect(linkPreviewImportFile.source).toContain('insertCanvasMediaSource')
+    expect(linkPreviewImportHookFile.source).toContain(
+      'insertCanvasMediaSource',
+    )
+    expect(mediaImportFile.source).toContain(
+      'export function insertCanvasMediaSource',
+    )
+    expect(mediaImportFile.source).toContain(
+      'export function getCanvasMediaInsertPosition',
+    )
     expect(mediaImportFile.source).toContain(
       'createCanvasLinkPreviewComponentItem',
     )

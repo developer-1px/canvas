@@ -128,7 +128,7 @@ function createHandlers(
     undoHistory: vi.fn(),
     ungroupSelection: vi.fn(),
     unlockAll: vi.fn(),
-    zoomBy: vi.fn(),
+    zoom: vi.fn(),
     ...overrides,
   }
 }

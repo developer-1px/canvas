@@ -1,7 +1,9 @@
 import {
   fitBoundsIntoViewport,
+  getCanvasViewportZoomStepMultiplier,
   INITIAL_VIEWPORT,
   zoomViewport,
+  type CanvasViewportZoomDirection,
 } from '../../../../core'
 import type { Viewport } from '../../../../entities'
 import type { CanvasAppStageElement } from '../../../rendering/stage/CanvasAppStageElement'
@@ -22,8 +24,8 @@ type ResetCanvasViewportArgs = {
   setViewport: CanvasViewportSetter
 }
 
-type ZoomCanvasViewportByArgs = {
-  multiplier: number
+type ZoomCanvasViewportArgs = {
+  direction: CanvasViewportZoomDirection
   setViewport: CanvasViewportSetter
   stageElement: CanvasAppStageElement
 }
@@ -54,11 +56,11 @@ export function resetCanvasViewport({
   setViewport(INITIAL_VIEWPORT)
 }
 
-export function zoomCanvasViewportBy({
-  multiplier,
+export function zoomCanvasViewport({
+  direction,
   setViewport,
   stageElement,
-}: ZoomCanvasViewportByArgs) {
+}: ZoomCanvasViewportArgs) {
   const rect = stageElement.getRect()
 
   if (!rect) {
@@ -70,5 +72,11 @@ export function zoomCanvasViewportBy({
     y: rect.height / 2,
   }
 
-  setViewport((current) => zoomViewport(current, point, multiplier))
+  setViewport((current) =>
+    zoomViewport(
+      current,
+      point,
+      getCanvasViewportZoomStepMultiplier(current.scale, direction),
+    ),
+  )
 }

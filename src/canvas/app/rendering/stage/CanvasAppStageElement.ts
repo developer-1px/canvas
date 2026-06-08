@@ -2,6 +2,9 @@ import {
   useState,
   type RefCallback,
 } from 'react'
+import {
+  getCanvasViewportWorldPoint,
+} from '../../../core'
 import type {
   Point,
   Viewport,
@@ -154,10 +157,10 @@ export function createCanvasAppStageElement({
         return null
       }
 
-      return {
-        x: (rect.width / 2 - viewport.x) / viewport.scale,
-        y: (rect.height / 2 - viewport.y) / viewport.scale,
-      }
+      return getCanvasViewportWorldPoint(viewport, {
+        x: rect.width / 2,
+        y: rect.height / 2,
+      })
     },
     releasePointer: (pointerId) => {
       const element = getElement()

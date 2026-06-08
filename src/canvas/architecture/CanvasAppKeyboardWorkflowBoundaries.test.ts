@@ -38,7 +38,7 @@ describe('Canvas App keyboard workflow boundaries', () => {
     expect(keyboardModelFile.source).not.toContain('Pick<')
     expect(keyboardModelFile.source).toContain('command.copySelection')
     expect(keyboardModelFile.source).toContain('interaction.setSpaceDown')
-    expect(keyboardModelFile.source).toContain('viewport.zoomBy')
+    expect(keyboardModelFile.source).toContain('viewport.zoom')
     expect(keyboardConsumerContractsFile.source).toContain(
       'export type CanvasAppKeyboardModelInput',
     )

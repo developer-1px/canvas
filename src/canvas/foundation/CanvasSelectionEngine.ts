@@ -37,8 +37,14 @@ export function getCanvasItemPointerSelection({
       alreadySelected,
       dragItemId,
       nextSelection: alreadySelected
-        ? selection.filter((id) => id !== itemId)
-        : unique([...baseSelection, itemId]),
+        ? pruneCanvasSceneSelection({
+            scene,
+            selection: selection.filter((id) => id !== itemId),
+          })
+        : pruneCanvasSceneSelection({
+            scene,
+            selection: unique([...baseSelection, itemId]),
+          }),
     }
   }
 
@@ -66,7 +72,37 @@ export function getCanvasMarqueeSelection({
       .map((entry) => scene.getParentId(entry.id) ?? entry.id),
   )
 
-  return additive ? unique([...baseSelection, ...hitIds]) : hitIds
+  return pruneCanvasSceneSelection({
+    scene,
+    selection: additive ? unique([...baseSelection, ...hitIds]) : hitIds,
+  })
+}
+
+function pruneCanvasSceneSelection({
+  scene,
+  selection,
+}: {
+  scene: CanvasSceneAdapter
+  selection: string[]
+}) {
+  const entries = scene.entries
+  const byId = new Map(entries.map((entry) => [entry.id, entry]))
+  const selected = new Set(selection)
+
+  return unique(selection).filter((id) => {
+    const entry = byId.get(id)
+
+    if (!entry) {
+      return true
+    }
+
+    return !entries.some(
+      (candidate) =>
+        candidate.isGroup &&
+        selected.has(candidate.id) &&
+        isAncestorPath(candidate.path, entry.path),
+    )
+  })
 }
 
 function boundsIntersect(a: Bounds, b: Bounds) {
@@ -75,5 +111,12 @@ function boundsIntersect(a: Bounds, b: Bounds) {
     a.x + a.w >= b.x &&
     a.y <= b.y + b.h &&
     a.y + a.h >= b.y
+  )
+}
+
+function isAncestorPath(parent: number[], child: number[]) {
+  return (
+    parent.length < child.length &&
+    parent.every((segment, index) => segment === child[index])
   )
 }

@@ -139,7 +139,7 @@ describe('CanvasDemoAssembly', () => {
       true,
     )
     expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.presence).toBe(
-      true,
+      false,
     )
     expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.stickyQuickCreate)
       .toBe(true)
@@ -183,7 +183,7 @@ describe('CanvasDemoAssembly', () => {
     expect(DEMO_CANVAS_APP_ASSEMBLY.presenceProvider({
       selection: [],
       viewport: { scale: 1, x: 0, y: 0 },
-    }).map((entry) => entry.label)).toEqual(['Mia', 'Noah'])
+    })).toEqual([])
   })
 
   it('exposes demo capability fixtures without explanatory UI decoration', () => {

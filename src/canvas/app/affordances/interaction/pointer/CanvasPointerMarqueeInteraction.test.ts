@@ -74,6 +74,24 @@ describe('CanvasPointerMarqueeInteraction', () => {
     })
   })
 
+  it('previews additive marquee without nested parent and child selection', () => {
+    const result = previewCanvasPointerMarqueeInteraction({
+      config,
+      currentScreen: { x: 80, y: 80 },
+      currentWorld: { x: 80, y: 80 },
+      interaction: createInteraction({
+        additive: true,
+        baseSelection: ['child', 'sibling'],
+      }),
+      scene: createGroupedScene(),
+    })
+
+    expect(result).toMatchObject({
+      kind: 'preview',
+      selection: ['sibling', 'group'],
+    })
+  })
+
   it('keeps preview quiet before movement or when marquee is disabled', () => {
     const interaction = createInteraction()
 
@@ -137,6 +155,26 @@ describe('CanvasPointerMarqueeInteraction', () => {
 
     expect(setSelection).toHaveBeenCalledWith(['existing'])
     expect(commitSelection).toHaveBeenCalledWith(['existing', 'rect-1'])
+  })
+
+  it('commits additive marquee without nested parent and child selection', () => {
+    const commitSelection = vi.fn(() => true)
+    const setSelection = vi.fn()
+
+    commitCanvasPointerMarqueeInteraction({
+      commitSelection,
+      interaction: createInteraction({
+        additive: true,
+        baseSelection: ['child', 'sibling'],
+        currentWorld: { x: 80, y: 80 },
+        moved: true,
+      }),
+      scene: createGroupedScene(),
+      setSelection,
+    })
+
+    expect(setSelection).toHaveBeenCalledWith(['child', 'sibling'])
+    expect(commitSelection).toHaveBeenCalledWith(['sibling', 'group'])
   })
 
   it('commits a non-additive click as selection clear', () => {
@@ -204,4 +242,30 @@ function createInteraction(
     startWorld: { x: 0, y: 0 },
     ...overrides,
   }
+}
+
+function createGroupedScene() {
+  return createCanvasSceneAdapter([
+    {
+      bounds: { h: 80, w: 120, x: 0, y: 0 },
+      id: 'group',
+      isGroup: true,
+      parentId: null,
+      path: [0],
+    },
+    {
+      bounds: { h: 30, w: 40, x: 20, y: 20 },
+      id: 'child',
+      isGroup: false,
+      parentId: 'group',
+      path: [0, 0],
+    },
+    {
+      bounds: { h: 30, w: 40, x: 200, y: 20 },
+      id: 'sibling',
+      isGroup: false,
+      parentId: null,
+      path: [1],
+    },
+  ])
 }

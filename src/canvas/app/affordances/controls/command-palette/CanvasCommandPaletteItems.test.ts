@@ -15,7 +15,7 @@ describe('CanvasCommandPaletteItems', () => {
     const onDelete = vi.fn()
     const onFitItems = vi.fn()
     const onViewportReset = vi.fn()
-    const onZoomBy = vi.fn()
+    const onZoom = vi.fn()
     const onCustomCommand = vi.fn()
 
     const items = getCanvasCommandPaletteItems({
@@ -49,7 +49,7 @@ describe('CanvasCommandPaletteItems', () => {
       onInsertComponent,
       onToolChange,
       onViewportReset,
-      onZoomBy,
+      onZoom,
     })
 
     expect(items.map((item) => item.title)).toEqual(
@@ -86,7 +86,7 @@ describe('CanvasCommandPaletteItems', () => {
     expect(onCustomCommand).toHaveBeenCalledWith('publish')
     expect(onFitItems).toHaveBeenCalledWith(['rect-1'])
     expect(onViewportReset).toHaveBeenCalledTimes(1)
-    expect(onZoomBy).toHaveBeenCalledWith(1.25)
+    expect(onZoom).toHaveBeenCalledWith('in')
   })
 
   it('marks unavailable commands disabled while keeping them discoverable', () => {
@@ -103,7 +103,7 @@ describe('CanvasCommandPaletteItems', () => {
       onInsertComponent: vi.fn(),
       onToolChange: vi.fn(),
       onViewportReset: vi.fn(),
-      onZoomBy: vi.fn(),
+      onZoom: vi.fn(),
     })
 
     expect(items.find((item) => item.id === 'command:delete')).toMatchObject({

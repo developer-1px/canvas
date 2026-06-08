@@ -3,6 +3,7 @@ import type {
   MutableRefObject,
   SetStateAction,
 } from 'react'
+import type { CanvasViewportZoomDirection } from '../../core'
 import type {
   CanvasAffordanceConfig,
   CanvasDraftArrowOverlay,
@@ -59,7 +60,7 @@ export type CanvasAppKeyboardInteractionContext = {
 export type CanvasAppKeyboardViewportContext = {
   fitToItems: (ids?: string[]) => void
   resetViewport: () => void
-  zoomBy: (multiplier: number) => void
+  zoom: (direction: CanvasViewportZoomDirection) => void
 }
 
 export type CanvasAppKeyboardModelInput = {

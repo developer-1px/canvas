@@ -83,6 +83,38 @@ describe('CanvasSnapEngine alignment', () => {
     expect(snap.dy).toBe(45)
     expect(snap.alignmentGuides).toEqual([])
   })
+
+  test('does not snap a direct-selected child to its parent group bounds', () => {
+    const scene = createCanvasSceneAdapter([
+      {
+        id: 'group',
+        bounds: { x: 0, y: 0, w: 200, h: 120 },
+        isGroup: true,
+        parentId: null,
+        path: [0],
+      },
+      {
+        id: 'child',
+        bounds: { x: 20, y: 20, w: 40, h: 40 },
+        isGroup: false,
+        parentId: 'group',
+        path: [0, 0],
+      },
+    ])
+
+    const snap = getCanvasMoveSnap({
+      bounds: { x: 20, y: 20, w: 40, h: 40 },
+      config: snapOnlyConfig,
+      dx: -17,
+      dy: 0,
+      scene,
+      selection: ['child'],
+      viewport: { x: 0, y: 0, scale: 1 },
+    })
+
+    expect(snap.dx).toBe(-17)
+    expect(snap.alignmentGuides).toEqual([])
+  })
 })
 
 describe('CanvasSnapEngine grid and spacing', () => {

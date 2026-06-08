@@ -22,9 +22,6 @@ describe('Canvas rendering authoring boundaries', () => {
     const workflowFacadeFile = getSourceFile(
       'src/canvas/app/workflow/index.ts',
     )
-    const renderingFacadeFile = getSourceFile(
-      'src/canvas/app/rendering/index.ts',
-    )
 
     expect(contractsFile.source).toContain(
       'CanvasAppComponentRendererStrategy',
@@ -81,12 +78,6 @@ describe('Canvas rendering authoring boundaries', () => {
     )
     expect(workflowFacadeFile.source).not.toContain(
       "from '../rendering/CanvasAppItemLayerAdapter'",
-    )
-    expect(renderingFacadeFile.source).toContain(
-      "from './CanvasAppRendererRegistries'",
-    )
-    expect(renderingFacadeFile.source).toContain(
-      "from './CanvasAppRenderingContracts'",
     )
     expect(authoringFacadeFile.source).not.toContain("from '../rendering'")
     expect(itemLayerAdapterFile.source).not.toMatch(

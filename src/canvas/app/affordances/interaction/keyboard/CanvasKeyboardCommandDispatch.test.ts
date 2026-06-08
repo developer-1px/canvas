@@ -13,8 +13,8 @@ describe('CanvasKeyboardCommandDispatch', () => {
       preventDefault: true,
     })).toBe(true)
     expect(isCanvasKeyboardCommandIntent({
-      kind: 'zoom-by',
-      multiplier: 1.25,
+      direction: 'in',
+      kind: 'zoom-viewport',
       preventDefault: true,
     })).toBe(false)
   })

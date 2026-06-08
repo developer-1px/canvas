@@ -42,7 +42,7 @@ export function getCanvasAppControlModel({
   onRunCustomCommand,
   onToolChange,
   onViewportReset,
-  onZoomBy,
+  onZoom,
 }: CanvasAppControlModelInput) {
   const commandAvailability = getCanvasCommandAvailability({
     canRedo,
@@ -70,7 +70,7 @@ export function getCanvasAppControlModel({
         onInsertComponent,
         onToolChange,
         onViewportReset,
-        onZoomBy,
+        onZoom,
         selection,
       }),
       visible: config.overlays.commandPalette,
@@ -107,8 +107,8 @@ export function getCanvasAppControlModel({
         onFitItems(selection.length > 0 ? selection : undefined),
       onFitItems,
       onReset: onViewportReset,
-      onZoomIn: () => onZoomBy(1.25),
-      onZoomOut: () => onZoomBy(0.8),
+      onZoomIn: () => onZoom('in'),
+      onZoomOut: () => onZoom('out'),
     },
   }
 }

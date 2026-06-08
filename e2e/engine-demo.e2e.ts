@@ -15,6 +15,15 @@ const SCREENSHOT_SMOKE_VIEWPORTS = [
   },
 ] as const
 
+test('opens the engine demo on the default route', async ({ page }) => {
+  await page.goto('/')
+
+  await expect(page.locator('main.engine-demo-app')).toBeVisible()
+  await expect(page.getByRole('toolbar', {
+    name: 'Engine affordances',
+  })).toBeVisible()
+})
+
 test('opens as a minimal canvas affordance engine demo', async ({ page }) => {
   await page.goto('/engine')
 
@@ -31,14 +40,12 @@ test('opens as a minimal canvas affordance engine demo', async ({ page }) => {
   await expect(page.locator('.alignment-guide')).toHaveCount(0)
   await expect(page.locator('.spacing-guide')).toHaveCount(0)
   await expect(page.locator('.context-command-menu')).toHaveCount(0)
-  await expect(page.locator('.presence-overlays')).toBeVisible()
-  await expect(page.locator('.presence-cursor')).toHaveCount(2)
-  await expect(page.locator('.presence-selection')).toHaveCount(2)
-  await expect(page.locator('.presence-label-text', { hasText: 'Mia' }))
-    .toHaveCount(2)
-  await expect(page.locator('.presence-label-text', { hasText: 'Noah' }))
-    .toHaveCount(2)
+  await expect(page.locator('.presence-overlays')).toHaveCount(0)
+  await expect(page.locator('.presence-cursor')).toHaveCount(0)
+  await expect(page.locator('.presence-selection')).toHaveCount(0)
   await expect(page.getByRole('region', { name: 'Voting session' }))
+    .toHaveCount(0)
+  await expect(page.getByRole('button', { name: 'Voting session' }))
     .toHaveCount(0)
 
   await expect(page.locator('[data-canvas-item-id="engine-shape"]'))
@@ -134,9 +141,6 @@ test('opens as a minimal canvas affordance engine demo', async ({ page }) => {
     .toBeVisible()
   await expect(page.getByRole('button', { name: 'Eraser tool' }))
     .toBeVisible()
-  await expect(page.getByRole('button', { name: 'Voting session' }))
-    .toBeVisible()
-
   const initialScale = await readCanvasScalePercent(page)
 
   await page.getByRole('button', { name: 'Zoom in' }).click()
@@ -568,49 +572,6 @@ test('creates and edits comments as independent annotation objects', async ({
 
   await page.keyboard.press('Delete')
   await expect.poll(() => comments.count()).toBe(initialCommentCount + 1)
-})
-
-test('runs a simple voting session on top of stamps', async ({ page }) => {
-  await page.goto('/engine')
-
-  const shape = page.locator('[data-canvas-item-id="engine-shape"]')
-  const stamps = page.locator('[data-type="stamp"]')
-
-  await page.getByRole('button', { name: 'Voting session' }).click()
-
-  const voting = page.getByRole('region', { name: 'Voting session' })
-
-  await expect(voting).toBeVisible()
-  await voting.getByLabel('Voting prompt').fill('Pick one')
-  await voting.getByRole('button', { name: 'Decrease votes' }).click()
-  await voting.getByRole('button', { name: 'Decrease votes' }).click()
-  await expect(voting.getByLabel('Votes per person')).toHaveText('1')
-
-  await voting.getByRole('button', { name: 'Start voting' }).click()
-  await expect(voting).toHaveAttribute('data-status', 'active')
-  await expect(voting.getByLabel('Voting result count')).toHaveText('0/1')
-
-  const stampCount = await stamps.count()
-
-  await shape.click()
-  await page.getByRole('button', { name: 'Add +1 stamp' }).click()
-  await expect.poll(() => stamps.count()).toBe(stampCount + 1)
-  await expect(voting.getByLabel('Voting result count')).toHaveText('1/1')
-  await expect(voting.getByLabel('Voting complete')).toBeVisible()
-
-  await shape.click()
-  await expect(page.getByRole('group', { name: 'Stamp reactions' }))
-    .toHaveCount(0)
-
-  await voting.getByRole('button', { name: 'End voting' }).click()
-  await expect(voting).toHaveAttribute('data-status', 'ended')
-  await expect(voting.getByLabel('Voting result count')).toHaveText('1/1')
-
-  await voting.getByRole('button', { name: 'Clear voting results' }).click()
-  await expect(voting).toHaveCount(0)
-
-  await page.getByRole('button', { name: 'Voting session' }).click()
-  await expect(voting.getByLabel('Voting result count')).toHaveText('0/3')
 })
 
 test('keeps object toolbar quiet while dragging selection', async ({ page }) => {

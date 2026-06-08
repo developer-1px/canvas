@@ -39,6 +39,19 @@ describe('CanvasBoundsResize', () => {
     })
   })
 
+  test('preserves aspect ratio while enforcing minimum size from a side handle', () => {
+    expect(
+      resizeBounds(bounds, 'e', { x: 10, y: 0 }, {
+        preserveAspectRatio: true,
+      }),
+    ).toEqual({
+      x: 0,
+      y: 13,
+      w: 48,
+      h: 24,
+    })
+  })
+
   test('resizes from center with option pressed', () => {
     expect(
       resizeBounds(bounds, 'e', { x: 150, y: 0 }, {
@@ -63,6 +76,20 @@ describe('CanvasBoundsResize', () => {
       y: -25,
       w: 200,
       h: 100,
+    })
+  })
+
+  test('preserves aspect ratio minimums when resizing from center', () => {
+    expect(
+      resizeBounds(bounds, 'e', { x: 52, y: 0 }, {
+        preserveAspectRatio: true,
+        resizeFromCenter: true,
+      }),
+    ).toEqual({
+      x: 26,
+      y: 13,
+      w: 48,
+      h: 24,
     })
   })
 })

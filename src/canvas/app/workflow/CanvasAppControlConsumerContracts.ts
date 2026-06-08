@@ -2,6 +2,7 @@ import type {
   CanvasAffordanceConfig,
   CanvasSceneAdapter,
 } from '../../engine'
+import type { CanvasViewportZoomDirection } from '../../core'
 import type {
   CanvasComponentKind,
   CanvasInteractionKind,
@@ -29,7 +30,7 @@ export type CanvasAppControlModelInput = {
   onRunCustomCommand: (commandId: string) => void
   onToolChange: (tool: Tool) => void
   onViewportReset: () => void
-  onZoomBy: (multiplier: number) => void
+  onZoom: (direction: CanvasViewportZoomDirection) => void
   scene: CanvasSceneAdapter
   selection: string[]
   tool: Tool

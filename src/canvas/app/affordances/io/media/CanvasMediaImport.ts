@@ -4,6 +4,9 @@ import type {
   Viewport,
 } from '../../../../entities'
 import {
+  getCanvasViewportWorldPoint,
+} from '../../../../core'
+import {
   createCanvasLinkPreviewComponentItem,
   normalizeCanvasLinkPreviewUrl,
 } from '../../../../host'
@@ -142,10 +145,7 @@ export function getCanvasMediaInsertPosition({
   if (event) {
     const point = stageElement.getScreenPoint(event)
 
-    return {
-      x: (point.x - viewport.x) / viewport.scale,
-      y: (point.y - viewport.y) / viewport.scale,
-    }
+    return getCanvasViewportWorldPoint(viewport, point)
   }
 
   return stageElement.getViewportCenter(viewport) ?? { x: 0, y: 0 }

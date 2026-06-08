@@ -34,8 +34,8 @@ describe('CanvasKeyboardShortcutDispatch', () => {
       runCanvasKeyboardShortcutIntent({
         handlers,
         intent: {
-          kind: 'zoom-by',
-          multiplier: 1.25,
+          direction: 'in',
+          kind: 'zoom-viewport',
           preventDefault: true,
         },
       }),
@@ -68,7 +68,7 @@ describe('CanvasKeyboardShortcutDispatch', () => {
     expect(handlers.deleteSelection).toHaveBeenCalledTimes(1)
     expect(handlers.editSelection).toHaveBeenCalledTimes(1)
     expect(handlers.quickCreateSticky).toHaveBeenCalledTimes(1)
-    expect(handlers.zoomBy).toHaveBeenCalledWith(1.25)
+    expect(handlers.zoom).toHaveBeenCalledWith('in')
     expect(handlers.openCommandPalette).toHaveBeenCalledTimes(1)
     expect(handlers.openCursorChat).toHaveBeenCalledTimes(1)
     expect(handlers.setTool).toHaveBeenCalledWith('text')
@@ -111,6 +111,6 @@ function createHandlers(): CanvasKeyboardShortcutDispatchHandlers {
     undoHistory: vi.fn(),
     ungroupSelection: vi.fn(),
     unlockAll: vi.fn(),
-    zoomBy: vi.fn(),
+    zoom: vi.fn(),
   }
 }
