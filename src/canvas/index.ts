@@ -1,8 +1,10 @@
 export {
   CanvasApp,
+  CanvasAppViewportOverlayLayer,
   CanvasContextCommandMenu,
   useCanvasDevToolsAppModel,
   type CanvasAppAssemblySource,
+  type CanvasAppViewportOverlayLayerProps,
   type CanvasContextCommandMenuState,
   type CanvasAppProps,
 } from './app'

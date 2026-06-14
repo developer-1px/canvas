@@ -6,6 +6,10 @@ export {
   CanvasContextCommandMenu,
   type CanvasContextCommandMenuState,
 } from './affordances/controls/toolbar/CanvasContextCommandMenu'
+export {
+  CanvasAppViewportOverlayLayer,
+  type CanvasAppViewportOverlayLayerProps,
+} from './rendering/CanvasAppViewportOverlayLayer'
 export type {
   CanvasAppAssemblySource,
 } from './shell/CanvasAppAssemblySource'

@@ -233,6 +233,7 @@ export function useCanvasAppModel({
   })
 
   return {
+    activeMode: interaction.stage.activeMode,
     ...text.view,
     commandPalette: {
       items: controls.commandPalette.items,
@@ -258,8 +259,10 @@ export function useCanvasAppModel({
         ...workspace.stage,
       },
     }),
+    viewport: workspace.stage.viewport,
     cursorChat: cursorChat.view,
     emoteControls: emotes.view,
+    gesture: interaction.stage.gesture,
     sessionTimer: sessionTimer.view,
     spotlight: spotlight.view,
     stampControls,

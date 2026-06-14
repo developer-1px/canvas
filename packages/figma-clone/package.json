@@ -1,0 +1,14 @@
+{
+  "name": "@interactive-os/figma-clone",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "peerDependencies": {
+    "@interactive-os/canvas": "^0.1.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  }
+}

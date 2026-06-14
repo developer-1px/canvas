@@ -99,7 +99,7 @@ describe('CanvasAppStageElement', () => {
   })
 
   it('owns wheel listener registration and cleanup', () => {
-    const { element, wheelListeners } = createStageElementFake()
+    const { element, parentWheelListeners } = createStageElementFake()
     const stageElement = createCanvasAppStageElement({
       getElement: () => element,
       setElement: () => undefined,
@@ -112,9 +112,9 @@ describe('CanvasAppStageElement', () => {
 
     const cleanup = stageElement.addWheelListener(handler)
 
-    expect(wheelListeners.size).toBe(1)
+    expect(parentWheelListeners.size).toBe(1)
 
-    for (const listener of wheelListeners) {
+    for (const listener of parentWheelListeners) {
       listener(wheelEvent)
     }
 
@@ -127,7 +127,7 @@ describe('CanvasAppStageElement', () => {
 
     cleanup()
 
-    expect(wheelListeners.size).toBe(0)
+    expect(parentWheelListeners.size).toBe(0)
   })
 
   it('cleans up wheel listeners from the element active at registration', () => {
@@ -143,13 +143,13 @@ describe('CanvasAppStageElement', () => {
 
     currentElement = second.element
 
-    expect(first.wheelListeners.size).toBe(1)
-    expect(second.wheelListeners.size).toBe(0)
+    expect(first.parentWheelListeners.size).toBe(1)
+    expect(second.parentWheelListeners.size).toBe(0)
 
     cleanup()
 
-    expect(first.wheelListeners.size).toBe(0)
-    expect(second.wheelListeners.size).toBe(0)
+    expect(first.parentWheelListeners.size).toBe(0)
+    expect(second.parentWheelListeners.size).toBe(0)
   })
 })
 
@@ -163,12 +163,29 @@ function createStageElementFake(
 ) {
   const capturedPointers = new Set<number>()
   const wheelListeners = new Set<(event: globalThis.WheelEvent) => void>()
+  const parentWheelListeners = new Set<(event: globalThis.WheelEvent) => void>()
+  const parentElement = {
+    addEventListener: (
+      _type: 'wheel',
+      listener: (event: globalThis.WheelEvent) => void,
+    ) => {
+      parentWheelListeners.add(listener)
+    },
+    removeEventListener: (
+      _type: 'wheel',
+      listener: (event: globalThis.WheelEvent) => void,
+    ) => {
+      parentWheelListeners.delete(listener)
+    },
+  }
   const element: CanvasAppStageDomElement = {
     addEventListener: (_type, listener) => {
       wheelListeners.add(listener)
     },
+    contains: () => true,
     getBoundingClientRect: () => rect,
     hasPointerCapture: (pointerId) => capturedPointers.has(pointerId),
+    parentElement,
     releasePointerCapture: (pointerId) => {
       capturedPointers.delete(pointerId)
     },
@@ -183,6 +200,7 @@ function createStageElementFake(
   return {
     capturedPointers,
     element,
+    parentWheelListeners,
     wheelListeners,
   }
 }

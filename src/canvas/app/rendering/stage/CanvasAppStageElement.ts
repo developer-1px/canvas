@@ -44,14 +44,30 @@ type CanvasAppStageDomElement = {
     listener: (event: globalThis.WheelEvent) => void,
     options?: AddEventListenerOptions,
   ) => void
+  contains: (target: Node | null) => boolean
   getBoundingClientRect: () => CanvasAppStageRect
   hasPointerCapture: (pointerId: number) => boolean
+  parentElement: CanvasAppStageWheelRoot | null
   releasePointerCapture: (pointerId: number) => void
   removeEventListener: (
     type: 'wheel',
     listener: (event: globalThis.WheelEvent) => void,
+    options?: EventListenerOptions,
   ) => void
   setPointerCapture: (pointerId: number) => void
+}
+
+type CanvasAppStageWheelRoot = {
+  addEventListener: (
+    type: 'wheel',
+    listener: (event: globalThis.WheelEvent) => void,
+    options?: AddEventListenerOptions,
+  ) => void
+  removeEventListener: (
+    type: 'wheel',
+    listener: (event: globalThis.WheelEvent) => void,
+    options?: EventListenerOptions,
+  ) => void
 }
 
 export type CanvasAppStageElement = {
@@ -107,15 +123,23 @@ export function createCanvasAppStageElement({
       }
 
       const activeElement = element
+      const wheelRoot = activeElement.parentElement ?? activeElement
 
       function handleWheel(event: globalThis.WheelEvent) {
+        if (!isCanvasStageWheelEvent(event, activeElement)) {
+          return
+        }
+
         handler(event, getStageElementRect(activeElement))
       }
 
-      activeElement.addEventListener('wheel', handleWheel, { passive: false })
+      wheelRoot.addEventListener('wheel', handleWheel, {
+        capture: true,
+        passive: false,
+      })
 
       return () => {
-        activeElement.removeEventListener('wheel', handleWheel)
+        wheelRoot.removeEventListener('wheel', handleWheel, { capture: true })
       }
     },
     capturePointer: (pointerId) => {
@@ -173,6 +197,28 @@ export function createCanvasAppStageElement({
       ref: setElement,
     },
   }
+}
+
+function isCanvasStageWheelEvent(
+  event: globalThis.WheelEvent,
+  stageElement: CanvasAppStageDomElement,
+): boolean {
+  const target = event.target
+
+  if (typeof Node === 'undefined' || typeof Element === 'undefined') {
+    return true
+  }
+
+  if (!(target instanceof Node)) {
+    return true
+  }
+
+  if (stageElement.contains(target)) {
+    return true
+  }
+
+  return target instanceof Element &&
+    Boolean(target.closest('.canvas-viewport-overlay-layer'))
 }
 
 const CANVAS_STAGE_SNAPSHOT_PADDING = 24
