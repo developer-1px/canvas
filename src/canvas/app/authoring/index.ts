@@ -72,6 +72,16 @@ export type {
   CanvasAppInspectorPanelContext,
   CanvasAppInspectorPanelView,
 } from '../affordances/editing/inspector/CanvasAppInspectorPanels'
+export {
+  createCanvasDomEditStyleInspectorPanel,
+  getCanvasDomEditStyle,
+  getCanvasDomEditStyleProperties,
+  setCanvasDomEditStyleValue,
+  type CanvasDomEditStyle,
+  type CanvasDomEditStyleChannel,
+  type CanvasDomEditStyleLimit,
+  type CanvasDomEditStyleOptions,
+} from '../affordances/editing/dom/CanvasDomEditStyle'
 export type {
   CanvasAppCustomCreationToolContext,
   CanvasAppCustomToolShortcut,

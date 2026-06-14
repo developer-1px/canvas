@@ -87,7 +87,7 @@ describe('CanvasDemoAssembly', () => {
       false,
     )
     expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.inspector).toBe(
-      false,
+      true,
     )
     expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.gestures.move).toBe(true)
     expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.gestures.resize).toBe(true)

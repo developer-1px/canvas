@@ -112,7 +112,7 @@ const DEMO_CANVAS_FOCUSED_AFFORDANCE_CONFIG = {
     findReplace: false,
     grid: false,
     imageControls: false,
-    inspector: false,
+    inspector: true,
     itemOutline: true,
     laserTrail: false,
     marquee: true,

@@ -45,6 +45,7 @@ import {
   type Tool,
   getCanvasAppWidgetInteractions,
 } from '../canvas'
+import { CanvasObjectInspector } from '../canvas/app/affordances/editing/inspector/CanvasObjectInspector'
 import { EngineSelectionToolbar } from './CanvasDevToolsSelectionToolbar'
 import {
   getCanvasPresentationFrames,
@@ -162,6 +163,15 @@ function CanvasEngineDemoSurface({
     activeWidgetInteraction && app.toolbar.tool === 'select'
       ? activeWidgetId
       : null
+  const {
+    visible: inspectorVisible,
+    ...inspectorProps
+  } = app.inspector
+  const inspectorHasContent = inspectorVisible && (
+    inspectorProps.customPanels.length > 0 ||
+    inspectorProps.styleControls.length > 0 ||
+    (inspectorProps.bounds !== null && inspectorProps.label !== null)
+  )
   const onToggleWidgetPlay = () => {
     const selectedItem =
       app.selection.items.length === 1 ? app.selection.items[0] : null
@@ -430,6 +440,11 @@ function CanvasEngineDemoSurface({
           onCustomCommand={app.toolbar.onCustomCommand}
         />
       </section>
+      {!presenting && inspectorHasContent ? (
+        <div className="engine-demo-inspector">
+          <CanvasObjectInspector {...inspectorProps} />
+        </div>
+      ) : null}
       {!presenting ? (
         <div
           className="engine-demo-controls"
