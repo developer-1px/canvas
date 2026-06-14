@@ -14,7 +14,7 @@ import {
   insertInlineEditText,
   isInlineEditLineBreakInput,
   restoreInlineEditFocus,
-} from 'nano-edit/inline-edit'
+} from './CanvasInlineEditDom'
 import type {
   CanvasInlineTextEditingContextValue,
 } from './CanvasInlineTextEditingContext'
