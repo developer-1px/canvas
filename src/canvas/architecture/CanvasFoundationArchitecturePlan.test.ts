@@ -22,7 +22,7 @@ describe('Canvas foundation architecture plan', () => {
     )
     expect(foundationAdr).toContain('ADR 0001')
     expect(foundationAdr).toContain('ADR 0002')
-    expect(foundationAdr).toContain('zod-crud')
+    expect(foundationAdr).toContain('@interactive-os/json-document')
     expect(foundationAdr).toContain('must not import Host, App, UI, Renderer')
     expect(foundationAdr).toContain('or Engine')
     expect(foundationAdr).toContain('Demo `CanvasItem`')
@@ -58,7 +58,7 @@ describe('Canvas foundation architecture plan', () => {
     }
 
     expect(foundationInventory).toContain('must not mention Demo `CanvasItem`')
-    expect(foundationInventory).toContain('zod-crud imports stay inside Host document adapters')
+    expect(foundationInventory).toContain('json-document imports stay inside Host document adapters')
     expect(foundationInventory).toContain('`CanvasExtensionDescriptor` answers')
     expect(foundationInventory).toContain('first concrete first-party extension descriptor')
     expect(foundationInventory).toContain('CanvasAppExtensionBundle.foundationExtensions')

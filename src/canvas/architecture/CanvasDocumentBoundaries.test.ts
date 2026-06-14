@@ -54,12 +54,12 @@ describe('Canvas document boundaries', () => {
     expect(layerOrderPatchFile.source).toContain('getCanvasSiblingArrayPointer')
     expect(layerOrderPatchFile.source).not.toContain('createLayerOrder')
     expect(layerOrderPatchFile.source).not.toContain(
-      "from '@zod-crud/layer-order'",
+      "from '@interactive-os/json-document-layer-order'",
     )
   })
 
 
-  it('keeps zod-crud feature extensions behind Host document adapters', () => {
+  it('keeps json-document feature extensions behind Host document adapters', () => {
     const documentFile = getSourceFile(
       'src/canvas/host/document/CanvasDocument.ts',
     )
@@ -80,24 +80,24 @@ describe('Canvas document boundaries', () => {
     )
 
     expect(groupingPatchFile.source).toContain(
-      "from '@zod-crud/grouping'",
+      "from '@interactive-os/json-document-grouping'",
     )
     expect(layerOrderPatchFile.source).toContain(
       "from '../operations/CanvasOperations'",
     )
     expect(layerOrderPatchFile.source).not.toContain(
-      "from '@zod-crud/layer-order'",
+      "from '@interactive-os/json-document-layer-order'",
     )
     expect(documentFile.source).toContain(
-      "from '@zod-crud/patch-preview'",
+      "from '@interactive-os/json-document-patch-preview'",
     )
     expect(searchFile.source).toContain(
-      "from '@zod-crud/search-replace'",
+      "from '@interactive-os/json-document-search-replace'",
     )
-    expect(patchesFile.source).not.toContain("from '@zod-crud/")
+    expect(patchesFile.source).not.toContain("from '@interactive-os/json-document-")
     expect(
       appFiles.flatMap((file) =>
-        file.source.includes('zod-crud') ? [file.path] : [],
+        file.source.includes('@interactive-os/json-document') ? [file.path] : [],
       ),
     ).toEqual([])
   })

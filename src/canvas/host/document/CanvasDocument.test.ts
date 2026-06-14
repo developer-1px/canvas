@@ -10,7 +10,7 @@ import { INITIAL_ITEMS } from '../component/CanvasInitialItems'
 import { groupCanvasSelection } from '../operations/CanvasOperations'
 
 describe('CanvasDocument selection history', () => {
-  test('seeds zod-crud document selection from canvas ids', () => {
+  test('seeds json-document document selection from canvas ids', () => {
     const document = createCanvasItemsDocument(INITIAL_ITEMS, {
       selection: ['component-sticky', 'component-card'],
     })
@@ -26,7 +26,7 @@ describe('CanvasDocument selection history', () => {
   })
 
 
-  test('uses zod-crud document history for undo and redo', () => {
+  test('uses json-document document history for undo and redo', () => {
     const document = createCanvasItemsDocument(INITIAL_ITEMS)
     const nextItems = INITIAL_ITEMS.map((item) =>
       item.id === 'component-card' ? { ...item, x: item.x + 40 } : item,
@@ -59,7 +59,7 @@ describe('CanvasDocument selection history', () => {
   })
 
 
-  test('commits selection-only changes as zod-crud mutation diffs', () => {
+  test('commits selection-only changes as json-document mutation diffs', () => {
     const document = createCanvasItemsDocument(INITIAL_ITEMS, {
       selection: ['component-sticky'],
     })

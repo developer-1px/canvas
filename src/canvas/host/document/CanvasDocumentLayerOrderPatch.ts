@@ -2,7 +2,7 @@ import {
   appendSegment,
   type JSONPatchOperation,
   type Pointer,
-} from 'zod-crud'
+} from '@interactive-os/json-document'
 import type { CanvasItem } from '../model'
 import {
   reorderCanvasItems,

@@ -81,7 +81,7 @@ describe('CanvasDocument text patches', () => {
   })
 
 
-  test('commits find replace as zod-crud replace patches', () => {
+  test('commits find replace as json-document replace patches', () => {
     const document = createCanvasItemsDocument(INITIAL_ITEMS)
     const patch = createReplaceCanvasDocumentTextPatch(
       document,
@@ -145,7 +145,7 @@ describe('CanvasDocument text patches', () => {
   })
 
 
-  test('commits text editing as a zod-crud replace patch', () => {
+  test('commits text editing as a json-document replace patch', () => {
     const items: CanvasItem[] = [{
       h: 48,
       id: 'text-1',
@@ -185,7 +185,7 @@ describe('CanvasDocument text patches', () => {
   })
 
 
-  test('commits sticky text editing as a zod-crud body replace patch', () => {
+  test('commits sticky text editing as a json-document body replace patch', () => {
     const items: CanvasItem[] = [{
       accent: '#ca8a04',
       body: 'Draft idea',
@@ -230,7 +230,7 @@ describe('CanvasDocument text patches', () => {
   })
 
 
-  test('commits empty rect text editing as a zod-crud add patch', () => {
+  test('commits empty rect text editing as a json-document add patch', () => {
     const items: CanvasItem[] = [{
       fill: '#ffffff',
       h: 48,

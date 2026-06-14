@@ -1,8 +1,8 @@
 import {
   createGrouping,
   type GroupingAdapter,
-} from '@zod-crud/grouping'
-import type { JSONPatchOperation, Pointer } from 'zod-crud'
+} from '@interactive-os/json-document-grouping'
+import type { JSONPatchOperation, Pointer } from '@interactive-os/json-document'
 import type { CanvasItem } from '../model'
 import {
   flattenCanvasItems,

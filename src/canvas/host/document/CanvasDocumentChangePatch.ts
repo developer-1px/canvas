@@ -1,4 +1,4 @@
-import type { JSONPatchOperation } from 'zod-crud'
+import type { JSONPatchOperation } from '@interactive-os/json-document'
 import type { Bounds, CanvasSelectionIds } from '../../core'
 import type { CanvasItem } from '../model'
 import {

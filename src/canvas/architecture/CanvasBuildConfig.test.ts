@@ -11,6 +11,7 @@ type CanvasViteConfig = {
     }
   }
   resolve?: {
+    alias?: unknown
     dedupe?: string[]
   }
   server?: {
@@ -31,14 +32,9 @@ const e2eConfig = playwrightConfig as {
     url?: string
   }
 }
-const linkedDocumentPackageSource = [
-  'zod',
-  'crud/packages/zod',
-  'crud/src',
-].join('-')
-
 describe('Canvas build config', () => {
   it('keeps linked peer dependencies deduped', () => {
+    expect(config.resolve?.alias).toBeUndefined()
     expect(config.resolve?.dedupe).toEqual(
       expect.arrayContaining(['react', 'react-dom', 'zod']),
     )
@@ -62,7 +58,6 @@ describe('Canvas build config', () => {
       fs: {
         allow: [
           expect.stringContaining('@interactive-os/canvas'),
-          expect.stringContaining(linkedDocumentPackageSource),
         ],
       },
       host: '::',

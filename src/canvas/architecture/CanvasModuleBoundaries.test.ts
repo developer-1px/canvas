@@ -206,7 +206,7 @@ describe('Canvas module layer boundaries', () => {
   })
 
 
-  it('keeps zod-crud ownership inside the host document layer', () => {
+  it('keeps json-document ownership inside the host document layer', () => {
     const violations = sourceFiles
       .filter((file) =>
         !file.path.endsWith('.test.ts') &&
@@ -214,8 +214,8 @@ describe('Canvas module layer boundaries', () => {
       )
       .flatMap(getImportReferences)
       .filter((reference) =>
-        reference.target === 'zod-crud' ||
-        reference.target.startsWith('@zod-crud/'),
+        reference.target === '@interactive-os/json-document' ||
+        reference.target.startsWith('@interactive-os/json-document-'),
       )
       .filter((reference) =>
         !reference.from.startsWith('src/canvas/host/document/'),

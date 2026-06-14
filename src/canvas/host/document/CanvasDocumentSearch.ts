@@ -1,6 +1,6 @@
-import { createSearchReplace } from '@zod-crud/search-replace'
-import type { JSONPatchOperation, Pointer } from 'zod-crud'
-import { parsePointer } from 'zod-crud'
+import { createSearchReplace } from '@interactive-os/json-document-search-replace'
+import type { JSONPatchOperation, Pointer } from '@interactive-os/json-document'
+import { parsePointer } from '@interactive-os/json-document'
 import type { CanvasItem } from '../model'
 import type { CanvasItemsDocument } from './CanvasDocument'
 

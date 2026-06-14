@@ -18,7 +18,7 @@ import {
 } from './CanvasDocumentPatches'
 
 describe('CanvasDocument item patch commits', () => {
-  test('commits item creation as a zod-crud add patch', () => {
+  test('commits item creation as a json-document add patch', () => {
     const document = createCanvasItemsDocument(INITIAL_ITEMS)
     const nextItem = CANVAS_COMPONENT_LIBRARY.createItem({
       id: 'component-created',
@@ -49,7 +49,7 @@ describe('CanvasDocument item patch commits', () => {
   })
 
 
-  test('commits top-level deletion as zod-crud remove patch', () => {
+  test('commits top-level deletion as json-document remove patch', () => {
     const document = createCanvasItemsDocument(INITIAL_ITEMS, {
       selection: ['component-card'],
     })
@@ -110,7 +110,7 @@ describe('CanvasDocument item patch commits', () => {
   })
 
 
-  test('commits grouping as zod-crud remove and add patches', () => {
+  test('commits grouping as json-document remove and add patches', () => {
     const document = createCanvasItemsDocument(INITIAL_ITEMS, {
       selection: ['component-sticky', 'component-label'],
     })
@@ -178,7 +178,7 @@ describe('CanvasDocument item patch commits', () => {
   })
 
 
-  test('commits ungrouping as zod-crud remove and add patches', () => {
+  test('commits ungrouping as json-document remove and add patches', () => {
     const grouped = groupCanvasSelection(
       INITIAL_ITEMS,
       ['component-sticky', 'component-label'],

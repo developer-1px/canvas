@@ -16,15 +16,15 @@ describe('Canvas foundation boundaries', () => {
     expect(violations).toEqual([])
   })
 
-  it('keeps foundation free of Demo item storage vocabulary and zod-crud ownership', () => {
+  it('keeps foundation free of Demo item storage vocabulary and json-document ownership', () => {
     const demoItemTerms =
       /\b(CanvasItem|RectItem|TextItem|GroupItem|CanvasComponentItem|CANVAS_COMPONENT_LIBRARY)\b/
     const violations = sourceFiles
       .filter((file) => file.path.startsWith('src/canvas/foundation/'))
       .flatMap((file) =>
         demoItemTerms.test(file.source) ||
-          file.source.includes('zod-crud') ||
-          file.source.includes('@zod-crud/')
+          file.source.includes('@interactive-os/json-document') ||
+          file.source.includes('@interactive-os/json-document-')
           ? [file.path]
           : [],
       )

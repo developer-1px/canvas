@@ -1,7 +1,7 @@
 # Canvas Foundation Inventory
 
 Purpose: fix the ownership map before moving code. Canvas Foundation should look
-like `zod-crud` core: small headless contracts first, reusable extensions second,
+like `@interactive-os/json-document` core: small headless contracts first, reusable extensions second,
 product/app meaning last.
 
 Product pressure stays app-owned until repeated consumer demand appears.
@@ -16,7 +16,7 @@ extensions.
 | Foundation | geometry, scene, selection, gesture, transform, command, patch-planning contracts | Demo `CanvasItem`, React workflow, UI layout, browser IO, persistence |
 | First-party extension | reusable whiteboard affordance bundles on foundation contracts | product-specific storage policy or app shell composition |
 | Host | concrete item model, validation, tree adapters, document adapters | app workflow and UI chrome |
-| App | React state, assembly, command effects, pointer lifecycle effects, toolbar/inspector wiring | concrete document internals or zod-crud APIs |
+| App | React state, assembly, command effects, pointer lifecycle effects, toolbar/inspector wiring | concrete document internals or json-document APIs |
 | Renderer | stage and overlay orchestration through injected item layers | Demo item variants or Host tree helpers |
 | UI | shared controls and icons | app workflow state or Host document internals |
 
@@ -47,7 +47,7 @@ extensions.
 | `src/canvas/engine/command` | Engine / first-party extension | split started | Availability, selection, and generic command contracts moved to Foundation; execution actions remain Engine-owned. |
 | `src/canvas/engine/snap` | Engine public facade | retired | Snap source moved to Foundation; Engine keeps compatibility exports from the public facade. |
 | `src/canvas/host/read` | Host adapter | keep | Converts Demo `CanvasItem` trees into scene/read contracts. |
-| `src/canvas/host/document` | Host adapter | keep | Owns zod-crud document adapter, validation, patch factories, and item-specific field mapping. |
+| `src/canvas/host/document` | Host adapter | keep | Owns json-document document adapter, validation, patch factories, and item-specific field mapping. |
 | `src/canvas/host/tree` | Host | keep | Encodes Demo group children, bounds sync, pruning, and item traversal. |
 | `src/canvas/host/component` | Host | keep | Demo component templates and component storage rules. |
 | `src/canvas/host/text` | Host | keep | Maps item variants to editable values and patch fields. |
@@ -86,7 +86,7 @@ extensions.
 | What renderer or UI surface is optional? | `rendererSlots` |
 
 The descriptor deliberately uses generic patch payloads instead of importing
-zod-crud. Host document adapters decide how document effects become concrete
+json-document. Host document adapters decide how document effects become concrete
 patches.
 
 `CANVAS_STICKY_NOTE_EXTENSION` is the first concrete first-party extension
@@ -122,6 +122,6 @@ rendering, overlay wiring, or Host item storage.
   modules.
 - Foundation contracts must not mention Demo `CanvasItem`, `RectItem`,
   `CanvasComponentItem`, or component library constants.
-- zod-crud imports stay inside Host document adapters unless an explicit
+- json-document imports stay inside Host document adapters unless an explicit
   document/patch contract issue justifies moving them.
 - Renderer stage remains independent from Demo item variants.

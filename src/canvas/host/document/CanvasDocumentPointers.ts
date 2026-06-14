@@ -1,4 +1,4 @@
-import { buildPointer, type Pointer } from 'zod-crud'
+import { buildPointer, type Pointer } from '@interactive-os/json-document'
 
 export function canvasItemPathToPointer(path: number[]): Pointer {
   return buildPointer(

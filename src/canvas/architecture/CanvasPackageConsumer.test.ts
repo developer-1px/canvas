@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import * as CanvasPackage from 'canvas'
-import * as CanvasAppAuthoring from 'canvas/app/authoring'
-import * as CanvasAppFacade from 'canvas/app'
+import * as CanvasPackage from '@interactive-os/canvas'
+import * as CanvasAppAuthoring from '@interactive-os/canvas/app/authoring'
+import * as CanvasAppFacade from '@interactive-os/canvas/app'
 import {
   CanvasCore,
   CanvasEngine,
@@ -35,8 +35,8 @@ import {
   type CanvasCustomItem,
   type CanvasEditableTextItem,
   type CanvasItem,
-} from 'canvas'
-import * as CanvasFoundation from 'canvas/foundation'
+} from '@interactive-os/canvas'
+import * as CanvasFoundation from '@interactive-os/canvas/foundation'
 import {
   CanvasApp,
   createCanvasAppComponentPresentationRenderers,
@@ -44,20 +44,20 @@ import {
   createCanvasAppCustomItemRenderers,
   type CanvasAppAssemblySource as CanvasAppAssemblySourceFromApp,
   type CanvasAppProps as CanvasAppPropsFromApp,
-} from 'canvas/app'
-import { isCanvasCustomToolId, normalizeBounds } from 'canvas/core'
+} from '@interactive-os/canvas/app'
+import { isCanvasCustomToolId, normalizeBounds } from '@interactive-os/canvas/core'
 import {
   assertCanvasAffordanceConfig as assertCanvasAffordanceConfigFromEngine,
   createCanvasAffordanceConfig,
-} from 'canvas/engine'
-import type { CanvasItem as CanvasEntityItem } from 'canvas/entities'
-import { createCanvasComponentLibrary } from 'canvas/host'
+} from '@interactive-os/canvas/engine'
+import type { CanvasItem as CanvasEntityItem } from '@interactive-os/canvas/entities'
+import { createCanvasComponentLibrary } from '@interactive-os/canvas/host'
 import {
   CANVAS_SVG_ARROW_MARKER_IRI,
   CanvasSvgStage,
   createCanvasSvgFreehandPathData,
   createCanvasSvgPathData,
-} from 'canvas/renderer'
+} from '@interactive-os/canvas/renderer'
 
 describe('Canvas package consumer imports', () => {
   it('supports assembling a canvas app from package exports', () => {

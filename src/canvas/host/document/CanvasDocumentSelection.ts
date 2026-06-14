@@ -1,4 +1,4 @@
-import type { JSONPatchOperation, JSONResult, SelectionSnap } from 'zod-crud'
+import type { JSONPatchOperation, JSONResult, SelectionSnap } from '@interactive-os/json-document'
 import type { CanvasSelectionIds } from '../../core'
 import type { CanvasItem } from '../model'
 import type { CanvasItemsDocument } from './CanvasDocument'

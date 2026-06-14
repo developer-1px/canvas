@@ -2,17 +2,29 @@ import { describe, expect, it } from 'vitest'
 
 type CanvasPackageJson = {
   dependencies?: Record<string, string>
-  exports?: Record<string, CanvasPackageExportEntry>
+  exports?: Record<string, CanvasPackageExportEntry | CanvasPackageStyleExportEntry>
+  files?: string[]
+  name?: string
   peerDependencies?: Record<string, string>
+  publishConfig?: {
+    access?: string
+    provenance?: boolean
+    registry?: string
+  }
   private?: boolean
   sideEffects?: boolean | string[]
   types?: string
+  version?: string
 }
 
 type CanvasPackageExportEntry = {
   default: string
   import: string
   types: string
+}
+
+type CanvasPackageStyleExportEntry = {
+  default: string
 }
 
 const packageModules = import.meta.glob('../../../package.json', {
@@ -30,7 +42,17 @@ const sourceModules = import.meta.glob('../**/index.ts', {
 const packageJson = JSON.parse(
   packageModules['../../../package.json'],
 ) as CanvasPackageJson
-const hostDocumentDependencyName = ['zod', 'crud'].join('-')
+const hostDocumentDependencyName = '@interactive-os/json-document'
+const publishedRuntimeDependencies = [
+  '@interactive-os/interaction',
+  '@interactive-os/json-document',
+  '@interactive-os/json-document-grouping',
+  '@interactive-os/json-document-patch-preview',
+  '@interactive-os/json-document-search-replace',
+  '@interactive-os/object-surface',
+  '@interactive-os/preview-surface',
+  'lucide-react',
+]
 const sourcePaths = new Set(
   Object.keys(sourceModules).map((path) =>
     path.replace(/^\.\.\//, './src/canvas/'),
@@ -39,42 +61,62 @@ const sourcePaths = new Set(
 
 describe('Canvas package manifest', () => {
   it('keeps the reusable canvas package entry explicit', () => {
-    expect(packageJson.private).toBe(true)
+    expect(packageJson.name).toBe('@interactive-os/canvas')
+    expect(packageJson.private).toBe(false)
+    expect(packageJson.version).toMatch(/^\d+\.\d+\.\d+/)
     expect(packageJson.sideEffects).toEqual(['**/*.css'])
-    expect(packageJson.types).toBe('./src/canvas/index.ts')
+    expect(packageJson.types).toBe('./dist/package/canvas/index.d.ts')
+    expect(packageJson.files).toEqual(['dist/package', 'README.md'])
+    expect(packageJson.publishConfig).toEqual({
+      access: 'public',
+      provenance: true,
+      registry: 'https://registry.npmjs.org/',
+    })
     expect(packageJson.exports).toEqual({
-      '.': createPackageExportEntry('./src/canvas/index.ts'),
-      './app': createPackageExportEntry('./src/canvas/app/index.ts'),
+      '.': createPackageExportEntry('./dist/package/canvas/index'),
+      './app': createPackageExportEntry('./dist/package/canvas/app/index'),
       './app/authoring': createPackageExportEntry(
-        './src/canvas/app/authoring/index.ts',
+        './dist/package/canvas/app/authoring/index',
       ),
-      './core': createPackageExportEntry('./src/canvas/core/index.ts'),
+      './core': createPackageExportEntry('./dist/package/canvas/core/index'),
       './foundation': createPackageExportEntry(
-        './src/canvas/foundation/index.ts',
+        './dist/package/canvas/foundation/index',
       ),
-      './engine': createPackageExportEntry('./src/canvas/engine/index.ts'),
-      './entities': createPackageExportEntry('./src/canvas/entities/index.ts'),
-      './host': createPackageExportEntry('./src/canvas/host/index.ts'),
-      './renderer': createPackageExportEntry('./src/canvas/renderer/index.ts'),
+      './engine': createPackageExportEntry('./dist/package/canvas/engine/index'),
+      './entities': createPackageExportEntry('./dist/package/canvas/entities/index'),
+      './host': createPackageExportEntry('./dist/package/canvas/host/index'),
+      './renderer': createPackageExportEntry('./dist/package/canvas/renderer/index'),
+      './style.css': {
+        default: './dist/package/canvas/app/shell/CanvasApp.css',
+      },
     })
   })
 
-  it('points package exports only at existing canvas public facades', () => {
+  it('points package exports at built equivalents of canvas public facades', () => {
     const exportedPaths = Object.values(packageJson.exports ?? {})
+      .filter(isPackageCodeExportEntry)
       .flatMap((entry) => [entry.types, entry.import, entry.default])
 
     expect(exportedPaths).toHaveLength(27)
-    expect(exportedPaths.every((path) => sourcePaths.has(path))).toBe(true)
-    expect(exportedPaths.every((path) => path.endsWith('/index.ts'))).toBe(true)
+    expect(exportedPaths.every((path) => path.startsWith('./dist/package/canvas/'))).toBe(true)
+    expect(exportedPaths.every((path) => path.endsWith('/index.d.ts') || path.endsWith('/index.js'))).toBe(true)
+    expect(
+      exportedPaths
+        .filter((path) => path.endsWith('.js'))
+        .every((path) => sourcePaths.has(toSourceIndexPath(path))),
+    ).toBe(true)
   })
 
   it('keeps package export type and runtime targets aligned', () => {
     const exportEntries = Object.entries(packageJson.exports ?? {})
+      .flatMap(([subpath, entry]) =>
+        isPackageCodeExportEntry(entry) ? [[subpath, entry] as const] : [],
+      )
 
     expect(exportEntries).toHaveLength(9)
     for (const [, entry] of exportEntries) {
-      expect(entry.types).toBe(entry.import)
-      expect(entry.types).toBe(entry.default)
+      expect(entry.types).toBe(entry.import.replace(/\.js$/, '.d.ts'))
+      expect(entry.import).toBe(entry.default)
     }
   })
 
@@ -86,19 +128,38 @@ describe('Canvas package manifest', () => {
     })
     expect(packageJson.dependencies).toEqual(
       expect.objectContaining({
-        react: expect.any(String),
-        'react-dom': expect.any(String),
-        zod: expect.any(String),
         [hostDocumentDependencyName]: expect.any(String),
       }),
     )
+    expect(packageJson.dependencies).not.toHaveProperty('react')
+    expect(packageJson.dependencies).not.toHaveProperty('react-dom')
+    expect(packageJson.dependencies).not.toHaveProperty('zod')
+    for (const dependency of publishedRuntimeDependencies) {
+      expect(packageJson.dependencies?.[dependency]).toMatch(/^\^?\d+\.\d+\.\d+/)
+    }
   })
 })
 
 function createPackageExportEntry(path: string): CanvasPackageExportEntry {
   return {
-    types: path,
-    import: path,
-    default: path,
+    types: `${path}.d.ts`,
+    import: `${path}.js`,
+    default: `${path}.js`,
   }
+}
+
+function isPackageCodeExportEntry(
+  entry: CanvasPackageExportEntry | CanvasPackageStyleExportEntry,
+): entry is CanvasPackageExportEntry {
+  return 'types' in entry
+}
+
+function toSourceIndexPath(path: string) {
+  return path
+    .replace(/^\.\.\/dist\/package\//, './src/')
+    .replace(/^\.\//, './')
+    .replace(/^\.\.\/\.\//, './')
+    .replace(/^\.\//, './')
+    .replace(/^\.\/dist\/package\//, './src/')
+    .replace(/\.js$/, '.ts')
 }

@@ -1,12 +1,12 @@
 import {
   previewPatch,
-} from '@zod-crud/patch-preview'
+} from '@interactive-os/json-document-patch-preview'
 import {
   createJSONDocument,
   type JSONDocument,
   type JSONPatchOperation,
   type JSONResult,
-} from 'zod-crud'
+} from '@interactive-os/json-document'
 import type { CanvasSelectionIds } from '../../core'
 import type { CanvasItem } from '../model'
 import { syncCanvasItems } from '../tree/CanvasTree'
@@ -73,7 +73,7 @@ function previewCanvasItemsDocumentPatch(
   patch: JSONPatchOperation[],
   validation?: CanvasItemValidationOptions,
 ) {
-  const preview = previewPatch(
+  const preview = previewPatch<CanvasItem[]>(
     CanvasItemsSchema as never,
     document,
     patch,

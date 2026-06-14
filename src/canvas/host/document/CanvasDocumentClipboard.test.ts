@@ -15,7 +15,7 @@ import { createAddCanvasItemsPatch } from './CanvasDocumentPatches'
 import type { CanvasItem } from '../model'
 
 describe('CanvasDocument clipboard commits', () => {
-  test('stores copied items in zod-crud document clipboard', () => {
+  test('stores copied items in json-document document clipboard', () => {
     const document = createCanvasItemsDocument(INITIAL_ITEMS)
 
     expect(
@@ -28,7 +28,7 @@ describe('CanvasDocument clipboard commits', () => {
   })
 
 
-  test('pastes zod-crud clipboard items through add patches', () => {
+  test('pastes json-document clipboard items through add patches', () => {
     const document = createCanvasItemsDocument(INITIAL_ITEMS)
 
     expect(
@@ -99,7 +99,7 @@ describe('CanvasDocument clipboard commits', () => {
   })
 
 
-  test('commits duplicate clones through zod-crud add patches', () => {
+  test('commits duplicate clones through json-document add patches', () => {
     const document = createCanvasItemsDocument(INITIAL_ITEMS)
     const clones = cloneCanvasItemsWithNewIds(
       [INITIAL_ITEMS[2]],

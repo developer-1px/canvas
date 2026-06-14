@@ -1,80 +1,94 @@
 {
-  "name": "canvas",
-  "private": true,
-  "version": "0.0.0",
+  "name": "@interactive-os/canvas",
+  "private": false,
+  "version": "0.1.1",
   "type": "module",
   "sideEffects": [
     "**/*.css"
   ],
-  "types": "./src/canvas/index.ts",
+  "types": "./dist/package/canvas/index.d.ts",
+  "files": [
+    "dist/package",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true,
+    "registry": "https://registry.npmjs.org/"
+  },
   "exports": {
     ".": {
-      "types": "./src/canvas/index.ts",
-      "import": "./src/canvas/index.ts",
-      "default": "./src/canvas/index.ts"
+      "types": "./dist/package/canvas/index.d.ts",
+      "import": "./dist/package/canvas/index.js",
+      "default": "./dist/package/canvas/index.js"
     },
     "./app": {
-      "types": "./src/canvas/app/index.ts",
-      "import": "./src/canvas/app/index.ts",
-      "default": "./src/canvas/app/index.ts"
+      "types": "./dist/package/canvas/app/index.d.ts",
+      "import": "./dist/package/canvas/app/index.js",
+      "default": "./dist/package/canvas/app/index.js"
     },
     "./app/authoring": {
-      "types": "./src/canvas/app/authoring/index.ts",
-      "import": "./src/canvas/app/authoring/index.ts",
-      "default": "./src/canvas/app/authoring/index.ts"
+      "types": "./dist/package/canvas/app/authoring/index.d.ts",
+      "import": "./dist/package/canvas/app/authoring/index.js",
+      "default": "./dist/package/canvas/app/authoring/index.js"
     },
     "./core": {
-      "types": "./src/canvas/core/index.ts",
-      "import": "./src/canvas/core/index.ts",
-      "default": "./src/canvas/core/index.ts"
+      "types": "./dist/package/canvas/core/index.d.ts",
+      "import": "./dist/package/canvas/core/index.js",
+      "default": "./dist/package/canvas/core/index.js"
     },
     "./foundation": {
-      "types": "./src/canvas/foundation/index.ts",
-      "import": "./src/canvas/foundation/index.ts",
-      "default": "./src/canvas/foundation/index.ts"
+      "types": "./dist/package/canvas/foundation/index.d.ts",
+      "import": "./dist/package/canvas/foundation/index.js",
+      "default": "./dist/package/canvas/foundation/index.js"
     },
     "./engine": {
-      "types": "./src/canvas/engine/index.ts",
-      "import": "./src/canvas/engine/index.ts",
-      "default": "./src/canvas/engine/index.ts"
+      "types": "./dist/package/canvas/engine/index.d.ts",
+      "import": "./dist/package/canvas/engine/index.js",
+      "default": "./dist/package/canvas/engine/index.js"
     },
     "./entities": {
-      "types": "./src/canvas/entities/index.ts",
-      "import": "./src/canvas/entities/index.ts",
-      "default": "./src/canvas/entities/index.ts"
+      "types": "./dist/package/canvas/entities/index.d.ts",
+      "import": "./dist/package/canvas/entities/index.js",
+      "default": "./dist/package/canvas/entities/index.js"
     },
     "./host": {
-      "types": "./src/canvas/host/index.ts",
-      "import": "./src/canvas/host/index.ts",
-      "default": "./src/canvas/host/index.ts"
+      "types": "./dist/package/canvas/host/index.d.ts",
+      "import": "./dist/package/canvas/host/index.js",
+      "default": "./dist/package/canvas/host/index.js"
     },
     "./renderer": {
-      "types": "./src/canvas/renderer/index.ts",
-      "import": "./src/canvas/renderer/index.ts",
-      "default": "./src/canvas/renderer/index.ts"
+      "types": "./dist/package/canvas/renderer/index.d.ts",
+      "import": "./dist/package/canvas/renderer/index.js",
+      "default": "./dist/package/canvas/renderer/index.js"
+    },
+    "./style.css": {
+      "default": "./dist/package/canvas/app/shell/CanvasApp.css"
     }
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "npm run build:package && tsc -b && vite build",
+    "build:package": "rm -rf dist/package && tsc -p tsconfig.package.json && node scripts/copy-package-assets.mjs && node scripts/resolve-package-imports.mjs",
     "lint": "eslint .",
+    "pack:dry-run": "npm pack --dry-run",
+    "prepack": "npm run build:package",
     "preview": "vite preview",
+    "release:check": "npm run build:package && npm run smoke:package && npm run test -- src/canvas/host/document src/canvas/architecture && npm run build",
+    "smoke:package": "node scripts/smoke-package.mjs",
     "test": "vitest run",
     "test:e2e": "playwright test"
   },
   "dependencies": {
-    "@interactive-os/interaction": "link:../apg-patterns/packages/interaction",
-    "@interactive-os/object-surface": "link:../object-surface/packages/object-surface",
-    "@interactive-os/preview-surface": "link:../preview-surface/packages/preview-surface",
-    "@zod-crud/grouping": "link:../zod-crud/labs/extensions/grouping",
-    "@zod-crud/patch-preview": "link:../zod-crud/packages/patch-preview",
-    "@zod-crud/search-replace": "link:../zod-crud/packages/search-replace",
+    "@interactive-os/interaction": "^0.1.0",
+    "@interactive-os/json-document": "^1.0.0",
+    "@interactive-os/json-document-grouping": "^0.1.0",
+    "@interactive-os/json-document-patch-preview": "^0.1.0",
+    "@interactive-os/json-document-search-replace": "^0.1.0",
+    "@interactive-os/object-surface": "^0.1.0",
+    "@interactive-os/preview-surface": "^0.1.0",
     "lucide-react": "^1.16.0",
-    "nano-edit": "link:../nano-edit",
-    "react": "^19.2.6",
-    "react-dom": "^19.2.6",
-    "zod": "^4.4.3",
-    "zod-crud": "link:../zod-crud/packages/zod-crud"
+    "react-moveable": "^0.56.0"
   },
   "peerDependencies": {
     "react": "^19.0.0",

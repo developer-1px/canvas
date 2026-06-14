@@ -17,10 +17,10 @@
 - Canvas Stable Id: persisted kind, presentation key, registry key에 쓰는 lower-kebab 문자열 계약.
 - Entities Contract: 런타임 구현 없이 Core geometry type, Demo canvas item type, stable item subtype alias를 노출하는 type-only 계약. Runtime helper는 Core/Host/App seam에 둔다.
 - Engine Public Facade: Host App, Demo App, UI, Renderer Adapter가 Engine을 사용할 때 import하는 안정된 Module 경계.
-- Host Document Controller: Demo `CanvasItem` 문서의 history, selection, clipboard, text search, item commit을 React와 zod-crud 세부 구현 없이 제공하는 Module.
+- Host Document Controller: Demo `CanvasItem` 문서의 history, selection, clipboard, text search, item commit을 React와 json-document 세부 구현 없이 제공하는 Module.
 - Canvas Document Change Patch: CanvasItemsChange별 patch builder table과 Host-owned JSON Patch factory 호출을 소유하는 change-to-patch grammar Module.
 - Canvas Document Patch Tree Diff: before/after Demo item tree를 patch factory가 쓰는 topmost changed entry, changed group entry, removal entry로 변환하고 patch applier가 명시 `CanvasDocumentPatchTreeDiff` contract를 소비하게 하는 Host-owned tree diff Module.
-- Canvas Document Reorder Patch: before/after Demo item tree의 sibling order 차이를 zod-crud JSON Patch `move` operation으로 변환하는 Host-owned patch Module.
+- Canvas Document Reorder Patch: before/after Demo item tree의 sibling order 차이를 json-document JSON Patch `move` operation으로 변환하는 Host-owned patch Module.
 - Canvas Group Item: group item 판정과 recursive children 저장 shape를 소유하는 Host tree structural contract Module.
 - Host Public Facade: Demo Host model type, read model, component library, document controller를 외부 레이어에 노출하는 안정된 Module 경계.
 - Canvas Package Public Entry: 외부 조립자와 Demo가 사용하는 `src/canvas` 단일 entry. App Shell, assembly input, descriptor authoring contract, stable entity type, layer facade namespace를 노출하고 workflow hook, assembly default/validator, custom module assembly helper, layer별 function export 같은 runtime how는 직접 노출하지 않는다.

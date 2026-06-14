@@ -162,10 +162,10 @@
 | `src/canvas/host/drawing/CanvasDrawingItemStyles.ts` | Built-in Drawing Item의 stroke/opacity 기본값과 style set factory를 소유하고 draft overlay와 item creation이 공유하게 한다 |
 | `src/canvas/host/shape/CanvasShapeItem.ts` | Bounded shape item의 stable shape kind 기본값, tool-to-shape mapping, 저장 shape 검증을 소유한다 |
 | `src/canvas/host/shape/CanvasShapeGeometry.ts` | Bounded shape kind를 SVG primitive geometry로 변환하는 descriptor를 소유해 renderer가 concrete shape kind 분기를 반복하지 않게 한다 |
-| `src/canvas/host/document/CanvasDocumentController.ts` | App workflow가 사용하는 Host Document Controller. zod-crud, JSON Patch, selection snapshot, clipboard 구현을 숨긴다 |
+| `src/canvas/host/document/CanvasDocumentController.ts` | App workflow가 사용하는 Host Document Controller. json-document, JSON Patch, selection snapshot, clipboard 구현을 숨긴다 |
 | `src/canvas/host/document/CanvasDocumentChangePatch.ts` | High-level CanvasItemsChange를 Host-owned JSON Patch factory 호출로 변환하는 change-to-patch grammar를 소유한다 |
 | `src/canvas/host/document/CanvasDocumentPatchTreeDiff.ts` | before/after Demo item tree를 patch factory용 topmost changed entry, changed group entry, removal entry로 변환한다 |
-| `src/canvas/host/document/CanvasDocumentReorderPatch.ts` | before/after Demo item tree의 sibling order 차이를 zod-crud JSON Patch `move` operation으로 변환한다 |
+| `src/canvas/host/document/CanvasDocumentReorderPatch.ts` | before/after Demo item tree의 sibling order 차이를 json-document JSON Patch `move` operation으로 변환한다 |
 | `src/canvas/host/read/CanvasItemReadModel.ts` | Demo item tree 조회, bounds, selection 정규화, Scene Adapter 생성을 tree helper 구현 없이 제공한다 |
 | `src/canvas/host/operations` | Transform, text, clone, remove, group item operations |
 | `src/canvas/host/tree` | Bounds, traversal, selection tree helpers |
@@ -233,7 +233,7 @@ type CanvasAffordanceConfig = {
 - App과 Renderer는 Demo Host 내부 subpath를 import하지 않는다. 안정 entity type은 `src/canvas/entities` type-only public contract에서 받는다.
 - UI controls는 Demo Host를 import하지 않는다. Host component/template/text editing 값은 App workflow가 UI prop으로 주입한다.
 - App workflow는 Host document 구현 파일을 import하지 않는다. 문서 변경, history, selection, clipboard, text search는 명시적인 Host Document Controller interface를 통해 사용한다.
-- zod-crud document, JSON Patch, selection snapshot, clipboard 구현은 Host document layer 밖으로 새지 않는다.
+- json-document document, JSON Patch, selection snapshot, clipboard 구현은 Host document layer 밖으로 새지 않는다.
 - Canvas Document Changes는 document commit orchestration을 맡고, CanvasItemsChange별 JSON Patch factory 선택은 Canvas Document Change Patch가 소유한다.
 - Canvas Document Patches는 tree flattening, topmost filtering, item equality, removal path ordering을 Canvas Document Patch Tree Diff에 위임한다.
 - Canvas Document Patches는 z-order sibling traversal와 JSON Patch move sequence 생성을 Canvas Document Reorder Patch에 위임한다.
@@ -329,7 +329,7 @@ type CanvasAffordanceConfig = {
 - Custom creation tool shortcut이 내부 canvas shortcut, shift-insensitive built-in shortcut, temporary pan, nudge shortcut, 다른 custom creation tool shortcut과 겹치면 assembly 단계에서 실패한다.
 - 제품별 renderer 세부 스타일은 canvas shell CSS에 두지 않고 Host App/Demo module 쪽에서 소유한다.
 - 제품별 inspector UI는 기본 Object Inspector 구현을 수정하지 않고 Canvas App Assembly의 inspector panel descriptor로 등록한다.
-- Linked peer dependency는 앱 번들에 한 번만 들어가야 한다. Package manifest는 React, React DOM, Zod를 peer dependency로 열고, Vite config는 `zod-crud` 같은 linked package가 `react`, `react-dom`, `zod`를 중복 번들링하지 않도록 dedupe하고, linked dist 경로를 dev server fs allowlist에 넣으며, local dev server를 `:53175` strict port로 고정하고, production build에서 React runtime을 별도 chunk로 분리한다.
+- Linked peer dependency는 앱 번들에 한 번만 들어가야 한다. Package manifest는 React, React DOM, Zod를 peer dependency로 열고, Vite config는 `@interactive-os/json-document` 같은 linked package가 `react`, `react-dom`, `zod`를 중복 번들링하지 않도록 dedupe하고, linked dist 경로를 dev server fs allowlist에 넣으며, local dev server를 `:53175` strict port로 고정하고, production build에서 React runtime을 별도 chunk로 분리한다.
 - 위 import 경계는 `src/canvas/architecture/CanvasModuleBoundaries.test.ts`에서 검증한다.
 
 추출 순서는 동작 변경 없이 app workflow에서 Engine 책임을 하나씩 떼어내는 방식으로 진행한다.

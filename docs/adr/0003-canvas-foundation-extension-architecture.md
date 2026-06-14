@@ -9,9 +9,9 @@ Accepted
 ADR 0001 makes the canvas package a reusable component factory instead of a
 single demo app. ADR 0002 keeps collaboration transport, account, and sharing
 policy outside core. Those decisions protect seams, but they do not yet name the
-next ownership layer: a canvas foundation that mirrors the shape of `zod-crud`.
+next ownership layer: a canvas foundation that mirrors the shape of `@interactive-os/json-document`.
 
-`zod-crud` keeps a small core for JSON Pointer, JSON Patch, document runtime,
+`@interactive-os/json-document` keeps a small core for JSON Pointer, JSON Patch, document runtime,
 selection primitives, and headless contracts. Reusable behaviours such as
 grouping, search/replace, and patch preview live as packages or labs extensions.
 Applications own their domain data, UI, persistence, and concrete product
@@ -37,20 +37,20 @@ command, and patch-planning grammar that can run through adapters.
    product persistence, browser IO, or app shell layout.
    `CanvasExtensionDescriptor` is the headless descriptor shape: it declares
    required adapter slots, command planners, tool descriptors, renderer slots,
-   and generic document/selection/viewport effects without importing zod-crud,
+   and generic document/selection/viewport effects without importing json-document,
    React, Host, App, UI, or Renderer implementation modules.
 4. First-party whiteboard extensions own de-facto canvas affordances such as
    shapes, sticky notes, drawing strokes, connectors, comments, stamps, image
    import/export, and presence overlays. They remain internal/reusable
    affordances, not product-specific custom item modules.
 5. Host/Demo continues to own concrete `CanvasItem` storage, validation,
-   component templates, item-specific bounds derivation, zod-crud document
+   component templates, item-specific bounds derivation, json-document document
    adapters, and Demo SVG item rendering.
 6. App continues to own React workflow, toolbar and inspector UI, local
    workspace persistence, browser clipboard/file/download details, and product
    assembly.
-7. zod-crud remains the document/patch substrate behind Host document adapters.
-   Canvas Foundation should not expose zod-crud directly except through explicit
+7. json-document remains the document/patch substrate behind Host document adapters.
+   Canvas Foundation should not expose json-document directly except through explicit
    document or patch contracts.
 8. The migration must use tracer bullets. Contract and guardrail tests come
    before broad package or folder moves.

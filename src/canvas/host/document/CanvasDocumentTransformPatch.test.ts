@@ -19,7 +19,7 @@ import {
 import type { CanvasItem } from '../model'
 
 describe('CanvasDocument transform patches', () => {
-  test('commits inspector bounds edits as zod-crud replace patches', () => {
+  test('commits inspector bounds edits as json-document replace patches', () => {
     const document = createCanvasItemsDocument(INITIAL_ITEMS, {
       selection: ['component-card'],
     })
@@ -68,7 +68,7 @@ describe('CanvasDocument transform patches', () => {
   })
 
 
-  test('commits alignment results as zod-crud replace patches', () => {
+  test('commits alignment results as json-document replace patches', () => {
     const document = createCanvasItemsDocument(INITIAL_ITEMS, {
       selection: ['component-sticky', 'component-card'],
     })
@@ -103,7 +103,7 @@ describe('CanvasDocument transform patches', () => {
   })
 
 
-  test('commits lock and nudge results as zod-crud replace patches', () => {
+  test('commits lock and nudge results as json-document replace patches', () => {
     const document = createCanvasItemsDocument(INITIAL_ITEMS, {
       selection: ['component-card'],
     })
@@ -211,7 +211,7 @@ describe('CanvasDocument transform patches', () => {
   })
 
 
-  test('commits pointer transform previews as zod-crud patches', () => {
+  test('commits pointer transform previews as json-document patches', () => {
     const items: CanvasItem[] = [
       rectItem('a'),
       rectItem('b'),
