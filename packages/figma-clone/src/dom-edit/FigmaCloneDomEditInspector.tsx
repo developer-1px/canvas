@@ -4,25 +4,31 @@ import {
 } from 'react'
 import type { Viewport } from '../../../../src/canvas'
 import {
+  canFigmaCloneDomNodeEditText,
   getFigmaCloneDomElement,
   getFigmaCloneDomEditStyle,
   getFigmaCloneDomLayoutContext,
+  getFigmaCloneDomText,
   type FigmaCloneDomAutoLayoutField,
   type FigmaCloneDomEditField,
   type FigmaCloneDomEditNodeState,
   type FigmaCloneDomEditState,
   type FigmaCloneDomNodeId,
+  type FigmaCloneDomTextState,
 } from './FigmaCloneDomEditModel'
 
 export function FigmaCloneDomEditInspector({
   selectedNodeId,
   state,
+  textState,
   viewport,
   onChange,
   onChangeAutoLayout,
+  onChangeText,
 }: {
   selectedNodeId: FigmaCloneDomNodeId | null
   state: FigmaCloneDomEditState
+  textState: FigmaCloneDomTextState
   viewport: Viewport
   onChange: (
     nodeId: FigmaCloneDomNodeId,
@@ -34,6 +40,7 @@ export function FigmaCloneDomEditInspector({
     field: FigmaCloneDomAutoLayoutField,
     value: FigmaCloneDomEditNodeState[FigmaCloneDomAutoLayoutField],
   ) => void
+  onChangeText: (nodeId: FigmaCloneDomNodeId, value: string) => void
 }) {
   const measuredSize = useFigmaCloneMeasuredDomSize({
     selectedNodeId,
@@ -53,6 +60,7 @@ export function FigmaCloneDomEditInspector({
   const style = getFigmaCloneDomEditStyle(state, selectedNodeId)
   const displayWidth = measuredSize?.w ?? style.w
   const displayHeight = measuredSize?.h ?? style.h
+  const canEditText = canFigmaCloneDomNodeEditText(selectedNodeId)
 
   return (
     <>
@@ -165,13 +173,17 @@ export function FigmaCloneDomEditInspector({
             onChange={onChangeAutoLayout}
           />
           <div className="figma-field-grid">
-            <FigmaNumberField
-              field="gap"
-              label="Gap"
-              nodeId={selectedNodeId}
-              value={style.gap}
-              onChange={onChange}
-            />
+            {style.distribution === 'space-between' ? (
+              <FigmaReadOnlyField label="Gap" value="Between" />
+            ) : (
+              <FigmaNumberField
+                field="gap"
+                label="Gap"
+                nodeId={selectedNodeId}
+                value={style.gap}
+                onChange={onChange}
+              />
+            )}
           </div>
         </section>
       ) : null}
@@ -252,6 +264,13 @@ export function FigmaCloneDomEditInspector({
               <dd>{context.contentType}</dd>
             </div>
           </dl>
+          {canEditText ? (
+            <FigmaTextField
+              nodeId={selectedNodeId}
+              value={getFigmaCloneDomText(textState, selectedNodeId)}
+              onChange={onChangeText}
+            />
+          ) : null}
         </section>
       ) : null}
       <section className="figma-panel-section">
@@ -275,6 +294,11 @@ type FigmaCloneMeasuredDomSize = {
   w: number
 }
 
+type FigmaCloneMeasuredDomSizeState = {
+  nodeId: FigmaCloneDomNodeId
+  size: FigmaCloneMeasuredDomSize
+}
+
 function useFigmaCloneMeasuredDomSize({
   selectedNodeId,
   state,
@@ -284,19 +308,26 @@ function useFigmaCloneMeasuredDomSize({
   state: FigmaCloneDomEditState
   viewport: Viewport
 }): FigmaCloneMeasuredDomSize | null {
-  const [size, setSize] = useState<FigmaCloneMeasuredDomSize | null>(null)
+  const [measurement, setMeasurement] =
+    useState<FigmaCloneMeasuredDomSizeState | null>(null)
 
   useLayoutEffect(() => {
     if (!selectedNodeId) {
-      setSize(null)
-      return undefined
+      const frame = requestAnimationFrame(() => {
+        setMeasurement(null)
+      })
+
+      return () => cancelAnimationFrame(frame)
     }
 
     const target = getFigmaCloneDomElement(selectedNodeId)
 
     if (!target) {
-      setSize(null)
-      return undefined
+      const frame = requestAnimationFrame(() => {
+        setMeasurement(null)
+      })
+
+      return () => cancelAnimationFrame(frame)
     }
 
     let frame = 0
@@ -308,10 +339,13 @@ function useFigmaCloneMeasuredDomSize({
         w: Math.round(rect.width / scale),
       }
 
-      setSize((current) =>
-        current && current.h === nextSize.h && current.w === nextSize.w
+      setMeasurement((current) =>
+        current &&
+        current.nodeId === selectedNodeId &&
+        current.size.h === nextSize.h &&
+        current.size.w === nextSize.w
           ? current
-          : nextSize)
+          : { nodeId: selectedNodeId, size: nextSize })
     }
     const scheduleMeasure = () => {
       cancelAnimationFrame(frame)
@@ -331,7 +365,7 @@ function useFigmaCloneMeasuredDomSize({
     }
   }, [selectedNodeId, state, viewport.scale])
 
-  return size
+  return measurement?.nodeId === selectedNodeId ? measurement.size : null
 }
 
 function FigmaResizeModeFields({
@@ -491,6 +525,45 @@ function FigmaNumberField({
         value={value}
         onChange={(event) => {
           onChange(nodeId, field, Number(event.currentTarget.value))
+        }}
+      />
+    </label>
+  )
+}
+
+function FigmaReadOnlyField({
+  label,
+  value,
+}: {
+  label: string
+  value: string
+}) {
+  return (
+    <div className="figma-readonly-field">
+      <span>{label}</span>
+      <strong>{value}</strong>
+    </div>
+  )
+}
+
+function FigmaTextField({
+  nodeId,
+  value,
+  onChange,
+}: {
+  nodeId: FigmaCloneDomNodeId
+  value: string
+  onChange: (nodeId: FigmaCloneDomNodeId, value: string) => void
+}) {
+  return (
+    <label className="figma-text-field">
+      <span>Text</span>
+      <textarea
+        aria-label="Text"
+        rows={Math.min(3, Math.max(1, value.split('\n').length))}
+        value={value}
+        onChange={(event) => {
+          onChange(nodeId, event.currentTarget.value)
         }}
       />
     </label>

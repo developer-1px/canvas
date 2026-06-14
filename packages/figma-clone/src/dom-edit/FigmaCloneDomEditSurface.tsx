@@ -1,31 +1,56 @@
 import {
   type CSSProperties,
+  type FocusEvent,
+  type KeyboardEvent,
   type MouseEvent,
 } from 'react'
 import {
+  type FigmaCloneSectionViewport,
+} from '../figmaCloneCanvas'
+import {
   canFigmaCloneDomNodeUseAutoLayout,
+  canFigmaCloneDomNodeEditText,
+  getFigmaCloneDomElement,
   getFigmaCloneDomEditStyle,
   getFigmaCloneDomParentId,
   getFigmaCloneDomRootId,
+  getFigmaCloneDomText,
   isFigmaCloneDomGridContainer,
   resolveFigmaCloneDomClickTarget,
   type FigmaCloneDomEditState,
   type FigmaCloneDomNodeId,
+  type FigmaCloneDomTextState,
 } from './FigmaCloneDomEditModel'
 import { isFigmaCloneDomCanvasPanTarget } from './FigmaCloneDomCanvasPointer'
 
 export function FigmaCloneDomEditSurface({
+  isSectionSelected,
+  sectionViewport,
   selectedNodeId,
   state,
+  textState,
+  onSelectSection,
   onSelectNode,
+  onChangeText,
 }: {
+  isSectionSelected: boolean
+  sectionViewport: FigmaCloneSectionViewport
   selectedNodeId: FigmaCloneDomNodeId | null
   state: FigmaCloneDomEditState
+  textState: FigmaCloneDomTextState
+  onSelectSection: () => void
   onSelectNode: (nodeId: FigmaCloneDomNodeId) => void
+  onChangeText: (nodeId: FigmaCloneDomNodeId, value: string) => void
 }) {
   const activeRootId = getFigmaCloneDomRootId(selectedNodeId)
+  const shouldPassThroughCanvasEvent = (target: EventTarget | null) =>
+    isFigmaCloneDomCanvasPanTarget(target) ||
+    (
+      target instanceof Element &&
+      Boolean(target.closest('[data-figma-dom-editing="true"]'))
+    )
   const handleClickCapture = (event: MouseEvent<HTMLDivElement>) => {
-    if (isFigmaCloneDomCanvasPanTarget(event.target)) {
+    if (shouldPassThroughCanvasEvent(event.target)) {
       return
     }
 
@@ -37,6 +62,9 @@ export function FigmaCloneDomEditSurface({
     })
 
     if (!target) {
+      event.preventDefault()
+      event.stopPropagation()
+      onSelectSection()
       return
     }
 
@@ -44,32 +72,75 @@ export function FigmaCloneDomEditSurface({
     event.stopPropagation()
     onSelectNode(target)
   }
+  const handleDoubleClickCapture = (event: MouseEvent<HTMLDivElement>) => {
+    if (shouldPassThroughCanvasEvent(event.target)) {
+      return
+    }
+
+    const target = resolveFigmaCloneDomClickTarget({
+      exactTarget: true,
+      root: event.currentTarget,
+      selectedNodeId,
+      target: event.target,
+    })
+
+    if (!target || !canFigmaCloneDomNodeEditText(target)) {
+      if (!target) {
+        event.preventDefault()
+        event.stopPropagation()
+        onSelectNode(getFigmaCloneDomRootId(selectedNodeId))
+      }
+
+      return
+    }
+
+    event.preventDefault()
+    event.stopPropagation()
+    onSelectNode(target)
+    requestAnimationFrame(() => focusFigmaCloneEditableDomNode(target))
+  }
 
   return (
     <div
       className="figma-dom-frame"
       data-figma-dom-root="true"
       onClickCapture={handleClickCapture}
+      onDoubleClickCapture={handleDoubleClickCapture}
     >
-      {activeRootId === 'workspacePage'
-        ? renderWorkspacePage(state, selectedNodeId)
-        : null}
-      {activeRootId === 'card'
-        ? renderProfileCard(state, selectedNodeId)
-        : null}
-      {activeRootId === 'toolbar'
-        ? renderToolbar(state, selectedNodeId)
-        : null}
-      {activeRootId === 'notice'
-        ? renderNotice(state, selectedNodeId)
-        : null}
+      <div
+        className="figma-dom-browser"
+        data-figma-section="dom"
+        data-section-selected={isSectionSelected ? 'true' : 'false'}
+        style={{
+          height: sectionViewport.h,
+          overflow: sectionViewport.overflow === 'scroll' ? 'auto' : 'hidden',
+          width: sectionViewport.w,
+        }}
+      >
+        <div className="figma-dom-document">
+          {activeRootId === 'workspacePage'
+            ? renderWorkspacePage(state, textState, selectedNodeId, onChangeText)
+            : null}
+          {activeRootId === 'card'
+            ? renderProfileCard(state, textState, selectedNodeId, onChangeText)
+            : null}
+          {activeRootId === 'toolbar'
+            ? renderToolbar(state, textState, selectedNodeId, onChangeText)
+            : null}
+          {activeRootId === 'notice'
+            ? renderNotice(state, textState, selectedNodeId, onChangeText)
+            : null}
+        </div>
+      </div>
     </div>
   )
 }
 
 function renderWorkspacePage(
   state: FigmaCloneDomEditState,
+  textState: FigmaCloneDomTextState,
   selectedNodeId: FigmaCloneDomNodeId | null,
+  onChangeText: (nodeId: FigmaCloneDomNodeId, value: string) => void,
 ) {
   return (
     <section
@@ -86,15 +157,27 @@ function renderWorkspacePage(
         >
           <div
             className="figma-dom-workspace__brand-mark"
-            {...createDomNodeProps(state, selectedNodeId, 'workspaceBrandMark')}
+            {...createEditableDomNodeProps(
+              state,
+              textState,
+              selectedNodeId,
+              'workspaceBrandMark',
+              onChangeText,
+            )}
           >
-            C
+            {getFigmaCloneDomText(textState, 'workspaceBrandMark')}
           </div>
           <strong
             className="figma-dom-workspace__brand-text"
-            {...createDomNodeProps(state, selectedNodeId, 'workspaceBrandText')}
+            {...createEditableDomNodeProps(
+              state,
+              textState,
+              selectedNodeId,
+              'workspaceBrandText',
+              onChangeText,
+            )}
           >
-            CoreOS
+            {getFigmaCloneDomText(textState, 'workspaceBrandText')}
           </strong>
         </div>
 
@@ -104,24 +187,42 @@ function renderWorkspacePage(
         >
           <button
             className="figma-dom-workspace__nav-item figma-dom-workspace__nav-item--active"
-            {...createDomNodeProps(state, selectedNodeId, 'workspaceNavOverview')}
+            {...createEditableDomNodeProps(
+              state,
+              textState,
+              selectedNodeId,
+              'workspaceNavOverview',
+              onChangeText,
+            )}
             type="button"
           >
-            Overview
+            {getFigmaCloneDomText(textState, 'workspaceNavOverview')}
           </button>
           <button
             className="figma-dom-workspace__nav-item"
-            {...createDomNodeProps(state, selectedNodeId, 'workspaceNavRoadmap')}
+            {...createEditableDomNodeProps(
+              state,
+              textState,
+              selectedNodeId,
+              'workspaceNavRoadmap',
+              onChangeText,
+            )}
             type="button"
           >
-            Roadmap
+            {getFigmaCloneDomText(textState, 'workspaceNavRoadmap')}
           </button>
           <button
             className="figma-dom-workspace__nav-item"
-            {...createDomNodeProps(state, selectedNodeId, 'workspaceNavCustomers')}
+            {...createEditableDomNodeProps(
+              state,
+              textState,
+              selectedNodeId,
+              'workspaceNavCustomers',
+              onChangeText,
+            )}
             type="button"
           >
-            Customers
+            {getFigmaCloneDomText(textState, 'workspaceNavCustomers')}
           </button>
         </nav>
 
@@ -129,11 +230,27 @@ function renderWorkspacePage(
           className="figma-dom-workspace__usage"
           {...createDomNodeProps(state, selectedNodeId, 'workspaceUpgrade')}
         >
-          <strong {...createDomNodeProps(state, selectedNodeId, 'workspaceUpgradeTitle')}>
-            Capacity
+          <strong
+            {...createEditableDomNodeProps(
+              state,
+              textState,
+              selectedNodeId,
+              'workspaceUpgradeTitle',
+              onChangeText,
+            )}
+          >
+            {getFigmaCloneDomText(textState, 'workspaceUpgradeTitle')}
           </strong>
-          <span {...createDomNodeProps(state, selectedNodeId, 'workspaceUpgradeText')}>
-            68% of this quarter's workspace budget is allocated.
+          <span
+            {...createEditableDomNodeProps(
+              state,
+              textState,
+              selectedNodeId,
+              'workspaceUpgradeText',
+              onChangeText,
+            )}
+          >
+            {getFigmaCloneDomText(textState, 'workspaceUpgradeText')}
           </span>
         </div>
       </aside>
@@ -146,21 +263,41 @@ function renderWorkspacePage(
           className="figma-dom-workspace__topbar"
           {...createDomNodeProps(state, selectedNodeId, 'workspaceTopbar')}
         >
-          <span {...createDomNodeProps(state, selectedNodeId, 'workspaceBreadcrumb')}>
-            Workspace / Growth
+          <span
+            {...createEditableDomNodeProps(
+              state,
+              textState,
+              selectedNodeId,
+              'workspaceBreadcrumb',
+              onChangeText,
+            )}
+          >
+            {getFigmaCloneDomText(textState, 'workspaceBreadcrumb')}
           </span>
           <div
             className="figma-dom-workspace__search"
-            {...createDomNodeProps(state, selectedNodeId, 'workspaceSearch')}
+            {...createEditableDomNodeProps(
+              state,
+              textState,
+              selectedNodeId,
+              'workspaceSearch',
+              onChangeText,
+            )}
           >
-            Search accounts
+            {getFigmaCloneDomText(textState, 'workspaceSearch')}
           </div>
           <button
             className="figma-dom-workspace__profile"
-            {...createDomNodeProps(state, selectedNodeId, 'workspaceProfile')}
+            {...createEditableDomNodeProps(
+              state,
+              textState,
+              selectedNodeId,
+              'workspaceProfile',
+              onChangeText,
+            )}
             type="button"
           >
-            MK
+            {getFigmaCloneDomText(textState, 'workspaceProfile')}
           </button>
         </header>
 
@@ -172,11 +309,27 @@ function renderWorkspacePage(
             className="figma-dom-workspace__hero-copy"
             {...createDomNodeProps(state, selectedNodeId, 'workspaceHeroCopy')}
           >
-            <h2 {...createDomNodeProps(state, selectedNodeId, 'workspaceHeroTitle')}>
-              Revenue operations
+            <h2
+              {...createEditableDomNodeProps(
+                state,
+                textState,
+                selectedNodeId,
+                'workspaceHeroTitle',
+                onChangeText,
+              )}
+            >
+              {getFigmaCloneDomText(textState, 'workspaceHeroTitle')}
             </h2>
-            <p {...createDomNodeProps(state, selectedNodeId, 'workspaceHeroText')}>
-              Review pipeline health, expansion risk, and activation blockers.
+            <p
+              {...createEditableDomNodeProps(
+                state,
+                textState,
+                selectedNodeId,
+                'workspaceHeroText',
+                onChangeText,
+              )}
+            >
+              {getFigmaCloneDomText(textState, 'workspaceHeroText')}
             </p>
           </div>
           <div
@@ -185,17 +338,29 @@ function renderWorkspacePage(
           >
             <button
               className="figma-dom-workspace__primary"
-              {...createDomNodeProps(state, selectedNodeId, 'workspacePrimaryAction')}
+              {...createEditableDomNodeProps(
+                state,
+                textState,
+                selectedNodeId,
+                'workspacePrimaryAction',
+                onChangeText,
+              )}
               type="button"
             >
-              New report
+              {getFigmaCloneDomText(textState, 'workspacePrimaryAction')}
             </button>
             <button
               className="figma-dom-workspace__secondary"
-              {...createDomNodeProps(state, selectedNodeId, 'workspaceSecondaryAction')}
+              {...createEditableDomNodeProps(
+                state,
+                textState,
+                selectedNodeId,
+                'workspaceSecondaryAction',
+                onChangeText,
+              )}
               type="button"
             >
-              Export
+              {getFigmaCloneDomText(textState, 'workspaceSecondaryAction')}
             </button>
           </div>
         </section>
@@ -208,25 +373,115 @@ function renderWorkspacePage(
             className="figma-dom-workspace__stat"
             {...createDomNodeProps(state, selectedNodeId, 'workspaceStatRevenue')}
           >
-            <span>Revenue</span>
-            <strong>$482k</strong>
-            <em>+18.2%</em>
+            <span
+              {...createEditableDomNodeProps(
+                state,
+                textState,
+                selectedNodeId,
+                'workspaceStatRevenueLabel',
+                onChangeText,
+              )}
+            >
+              {getFigmaCloneDomText(textState, 'workspaceStatRevenueLabel')}
+            </span>
+            <strong
+              {...createEditableDomNodeProps(
+                state,
+                textState,
+                selectedNodeId,
+                'workspaceStatRevenueValue',
+                onChangeText,
+              )}
+            >
+              {getFigmaCloneDomText(textState, 'workspaceStatRevenueValue')}
+            </strong>
+            <em
+              {...createEditableDomNodeProps(
+                state,
+                textState,
+                selectedNodeId,
+                'workspaceStatRevenueDelta',
+                onChangeText,
+              )}
+            >
+              {getFigmaCloneDomText(textState, 'workspaceStatRevenueDelta')}
+            </em>
           </div>
           <div
             className="figma-dom-workspace__stat"
             {...createDomNodeProps(state, selectedNodeId, 'workspaceStatConversion')}
           >
-            <span>Conversion</span>
-            <strong>32.8%</strong>
-            <em>+4.1%</em>
+            <span
+              {...createEditableDomNodeProps(
+                state,
+                textState,
+                selectedNodeId,
+                'workspaceStatConversionLabel',
+                onChangeText,
+              )}
+            >
+              {getFigmaCloneDomText(textState, 'workspaceStatConversionLabel')}
+            </span>
+            <strong
+              {...createEditableDomNodeProps(
+                state,
+                textState,
+                selectedNodeId,
+                'workspaceStatConversionValue',
+                onChangeText,
+              )}
+            >
+              {getFigmaCloneDomText(textState, 'workspaceStatConversionValue')}
+            </strong>
+            <em
+              {...createEditableDomNodeProps(
+                state,
+                textState,
+                selectedNodeId,
+                'workspaceStatConversionDelta',
+                onChangeText,
+              )}
+            >
+              {getFigmaCloneDomText(textState, 'workspaceStatConversionDelta')}
+            </em>
           </div>
           <div
             className="figma-dom-workspace__stat"
             {...createDomNodeProps(state, selectedNodeId, 'workspaceStatTickets')}
           >
-            <span>Open tickets</span>
-            <strong>124</strong>
-            <em>-12</em>
+            <span
+              {...createEditableDomNodeProps(
+                state,
+                textState,
+                selectedNodeId,
+                'workspaceStatTicketsLabel',
+                onChangeText,
+              )}
+            >
+              {getFigmaCloneDomText(textState, 'workspaceStatTicketsLabel')}
+            </span>
+            <strong
+              {...createEditableDomNodeProps(
+                state,
+                textState,
+                selectedNodeId,
+                'workspaceStatTicketsValue',
+                onChangeText,
+              )}
+            >
+              {getFigmaCloneDomText(textState, 'workspaceStatTicketsValue')}
+            </strong>
+            <em
+              {...createEditableDomNodeProps(
+                state,
+                textState,
+                selectedNodeId,
+                'workspaceStatTicketsDelta',
+                onChangeText,
+              )}
+            >
+              {getFigmaCloneDomText(textState, 'workspaceStatTicketsDelta')}
+            </em>
           </div>
         </section>
 
@@ -238,16 +493,48 @@ function renderWorkspacePage(
             className="figma-dom-workspace__panel figma-dom-workspace__panel--pipeline"
             {...createDomNodeProps(state, selectedNodeId, 'workspacePipeline')}
           >
-            <header {...createDomNodeProps(state, selectedNodeId, 'workspacePipelineHeader')}>
-              Pipeline review
+            <header
+              {...createEditableDomNodeProps(
+                state,
+                textState,
+                selectedNodeId,
+                'workspacePipelineHeader',
+                onChangeText,
+              )}
+            >
+              {getFigmaCloneDomText(textState, 'workspacePipelineHeader')}
             </header>
             <div
               className="figma-dom-workspace__list"
               {...createDomNodeProps(state, selectedNodeId, 'workspacePipelineList')}
             >
-              {renderWorkspaceDeal(state, selectedNodeId, 'workspaceDealOne', 'Acme rollout', '$84k')}
-              {renderWorkspaceDeal(state, selectedNodeId, 'workspaceDealTwo', 'Northstar renewal', '$62k')}
-              {renderWorkspaceDeal(state, selectedNodeId, 'workspaceDealThree', 'Helio expansion', '$38k')}
+              {renderWorkspaceDeal(
+                state,
+                textState,
+                selectedNodeId,
+                'workspaceDealOne',
+                'workspaceDealOneTitle',
+                'workspaceDealOneValue',
+                onChangeText,
+              )}
+              {renderWorkspaceDeal(
+                state,
+                textState,
+                selectedNodeId,
+                'workspaceDealTwo',
+                'workspaceDealTwoTitle',
+                'workspaceDealTwoValue',
+                onChangeText,
+              )}
+              {renderWorkspaceDeal(
+                state,
+                textState,
+                selectedNodeId,
+                'workspaceDealThree',
+                'workspaceDealThreeTitle',
+                'workspaceDealThreeValue',
+                onChangeText,
+              )}
             </div>
           </section>
 
@@ -255,16 +542,45 @@ function renderWorkspacePage(
             className="figma-dom-workspace__panel figma-dom-workspace__panel--activity"
             {...createDomNodeProps(state, selectedNodeId, 'workspaceActivity')}
           >
-            <header {...createDomNodeProps(state, selectedNodeId, 'workspaceActivityHeader')}>
-              Activity
+            <header
+              {...createEditableDomNodeProps(
+                state,
+                textState,
+                selectedNodeId,
+                'workspaceActivityHeader',
+                onChangeText,
+              )}
+            >
+              {getFigmaCloneDomText(textState, 'workspaceActivityHeader')}
             </header>
             <div
               className="figma-dom-workspace__activity-list"
               {...createDomNodeProps(state, selectedNodeId, 'workspaceActivityList')}
             >
-              {renderWorkspaceActivity(state, selectedNodeId, 'workspaceActivityOne', 'Mina updated forecast')}
-              {renderWorkspaceActivity(state, selectedNodeId, 'workspaceActivityTwo', 'Jae flagged churn risk')}
-              {renderWorkspaceActivity(state, selectedNodeId, 'workspaceActivityThree', 'Lina shared notes')}
+              {renderWorkspaceActivity(
+                state,
+                textState,
+                selectedNodeId,
+                'workspaceActivityOne',
+                'workspaceActivityOneText',
+                onChangeText,
+              )}
+              {renderWorkspaceActivity(
+                state,
+                textState,
+                selectedNodeId,
+                'workspaceActivityTwo',
+                'workspaceActivityTwoText',
+                onChangeText,
+              )}
+              {renderWorkspaceActivity(
+                state,
+                textState,
+                selectedNodeId,
+                'workspaceActivityThree',
+                'workspaceActivityThreeText',
+                onChangeText,
+              )}
             </div>
           </section>
         </section>
@@ -275,131 +591,234 @@ function renderWorkspacePage(
 
 function renderWorkspaceDeal(
   state: FigmaCloneDomEditState,
+  textState: FigmaCloneDomTextState,
   selectedNodeId: FigmaCloneDomNodeId | null,
   nodeId: Extract<
     FigmaCloneDomNodeId,
     'workspaceDealOne' | 'workspaceDealTwo' | 'workspaceDealThree'
   >,
-  title: string,
-  value: string,
+  titleNodeId: Extract<
+    FigmaCloneDomNodeId,
+    | 'workspaceDealOneTitle'
+    | 'workspaceDealTwoTitle'
+    | 'workspaceDealThreeTitle'
+  >,
+  valueNodeId: Extract<
+    FigmaCloneDomNodeId,
+    | 'workspaceDealOneValue'
+    | 'workspaceDealTwoValue'
+    | 'workspaceDealThreeValue'
+  >,
+  onChangeText: (nodeId: FigmaCloneDomNodeId, value: string) => void,
 ) {
   return (
     <article
       className="figma-dom-workspace__deal"
       {...createDomNodeProps(state, selectedNodeId, nodeId)}
     >
-      <strong>{title}</strong>
-      <span>{value}</span>
+      <strong
+        {...createEditableDomNodeProps(
+          state,
+          textState,
+          selectedNodeId,
+          titleNodeId,
+          onChangeText,
+        )}
+      >
+        {getFigmaCloneDomText(textState, titleNodeId)}
+      </strong>
+      <span
+        {...createEditableDomNodeProps(
+          state,
+          textState,
+          selectedNodeId,
+          valueNodeId,
+          onChangeText,
+        )}
+      >
+        {getFigmaCloneDomText(textState, valueNodeId)}
+      </span>
     </article>
   )
 }
 
 function renderWorkspaceActivity(
   state: FigmaCloneDomEditState,
+  textState: FigmaCloneDomTextState,
   selectedNodeId: FigmaCloneDomNodeId | null,
   nodeId: Extract<
     FigmaCloneDomNodeId,
     'workspaceActivityOne' | 'workspaceActivityTwo' | 'workspaceActivityThree'
   >,
-  label: string,
+  textNodeId: Extract<
+    FigmaCloneDomNodeId,
+    | 'workspaceActivityOneText'
+    | 'workspaceActivityTwoText'
+    | 'workspaceActivityThreeText'
+  >,
+  onChangeText: (nodeId: FigmaCloneDomNodeId, value: string) => void,
 ) {
   return (
     <article
       className="figma-dom-workspace__activity"
       {...createDomNodeProps(state, selectedNodeId, nodeId)}
     >
-      <span>{label}</span>
+      <span
+        {...createEditableDomNodeProps(
+          state,
+          textState,
+          selectedNodeId,
+          textNodeId,
+          onChangeText,
+        )}
+      >
+        {getFigmaCloneDomText(textState, textNodeId)}
+      </span>
     </article>
   )
 }
 
 function renderProfileCard(
   state: FigmaCloneDomEditState,
+  textState: FigmaCloneDomTextState,
   selectedNodeId: FigmaCloneDomNodeId | null,
+  onChangeText: (nodeId: FigmaCloneDomNodeId, value: string) => void,
 ) {
   return (
     <section
       className="figma-dom-card"
-      data-figma-dom-node="card"
-      data-selected={selectedNodeId === 'card' ? 'true' : 'false'}
-      style={createNodeStyle(state, 'card')}
+      {...createDomNodeProps(state, selectedNodeId, 'card')}
     >
       <header
         className="figma-dom-header"
-        data-figma-dom-node="header"
-        data-selected={selectedNodeId === 'header' ? 'true' : 'false'}
-        style={createNodeStyle(state, 'header')}
+        {...createDomNodeProps(state, selectedNodeId, 'header')}
       >
         <div
           className="figma-dom-avatar"
-          data-figma-dom-node="avatar"
-          data-selected={selectedNodeId === 'avatar' ? 'true' : 'false'}
-          style={createNodeStyle(state, 'avatar')}
+          {...createEditableDomNodeProps(
+            state,
+            textState,
+            selectedNodeId,
+            'avatar',
+            onChangeText,
+          )}
         >
-          LK
+          {getFigmaCloneDomText(textState, 'avatar')}
         </div>
         <div
           className="figma-dom-headline"
-          data-figma-dom-node="headline"
-          data-selected={selectedNodeId === 'headline' ? 'true' : 'false'}
-          style={createNodeStyle(state, 'headline')}
+          {...createDomNodeProps(state, selectedNodeId, 'headline')}
         >
-          <strong>Lina Kim</strong>
-          <span
-            data-figma-dom-node="supporting"
-            data-selected={selectedNodeId === 'supporting' ? 'true' : 'false'}
-            style={createNodeStyle(state, 'supporting')}
+          <strong
+            {...createEditableDomNodeProps(
+              state,
+              textState,
+              selectedNodeId,
+              'headlineTitle',
+              onChangeText,
+            )}
           >
-            Product systems lead
+            {getFigmaCloneDomText(textState, 'headlineTitle')}
+          </strong>
+          <span
+            {...createEditableDomNodeProps(
+              state,
+              textState,
+              selectedNodeId,
+              'supporting',
+              onChangeText,
+            )}
+          >
+            {getFigmaCloneDomText(textState, 'supporting')}
           </span>
         </div>
       </header>
 
       <div
         className="figma-dom-actions"
-        data-figma-dom-node="actions"
-        data-selected={selectedNodeId === 'actions' ? 'true' : 'false'}
-        style={createNodeStyle(state, 'actions')}
+        {...createDomNodeProps(state, selectedNodeId, 'actions')}
       >
         <button
-          data-figma-dom-node="primaryButton"
-          data-selected={selectedNodeId === 'primaryButton' ? 'true' : 'false'}
-          style={createNodeStyle(state, 'primaryButton')}
+          {...createEditableDomNodeProps(
+            state,
+            textState,
+            selectedNodeId,
+            'primaryButton',
+            onChangeText,
+          )}
           type="button"
         >
-          Invite
+          {getFigmaCloneDomText(textState, 'primaryButton')}
         </button>
         <button
-          data-figma-dom-node="secondaryButton"
-          data-selected={selectedNodeId === 'secondaryButton' ? 'true' : 'false'}
-          style={createNodeStyle(state, 'secondaryButton')}
+          {...createEditableDomNodeProps(
+            state,
+            textState,
+            selectedNodeId,
+            'secondaryButton',
+            onChangeText,
+          )}
           type="button"
         >
-          Message
+          {getFigmaCloneDomText(textState, 'secondaryButton')}
         </button>
       </div>
 
       <div
         className="figma-dom-metrics"
-        data-figma-dom-node="metrics"
-        data-selected={selectedNodeId === 'metrics' ? 'true' : 'false'}
-        style={createNodeStyle(state, 'metrics')}
+        {...createDomNodeProps(state, selectedNodeId, 'metrics')}
       >
         <div
-          data-figma-dom-node="metricOne"
-          data-selected={selectedNodeId === 'metricOne' ? 'true' : 'false'}
-          style={createNodeStyle(state, 'metricOne')}
+          {...createDomNodeProps(state, selectedNodeId, 'metricOne')}
         >
-          <span>Usage</span>
-          <strong>18k</strong>
+          <span
+            {...createEditableDomNodeProps(
+              state,
+              textState,
+              selectedNodeId,
+              'metricOneLabel',
+              onChangeText,
+            )}
+          >
+            {getFigmaCloneDomText(textState, 'metricOneLabel')}
+          </span>
+          <strong
+            {...createEditableDomNodeProps(
+              state,
+              textState,
+              selectedNodeId,
+              'metricOneValue',
+              onChangeText,
+            )}
+          >
+            {getFigmaCloneDomText(textState, 'metricOneValue')}
+          </strong>
         </div>
         <div
-          data-figma-dom-node="metricTwo"
-          data-selected={selectedNodeId === 'metricTwo' ? 'true' : 'false'}
-          style={createNodeStyle(state, 'metricTwo')}
+          {...createDomNodeProps(state, selectedNodeId, 'metricTwo')}
         >
-          <span>NPS</span>
-          <strong>71</strong>
+          <span
+            {...createEditableDomNodeProps(
+              state,
+              textState,
+              selectedNodeId,
+              'metricTwoLabel',
+              onChangeText,
+            )}
+          >
+            {getFigmaCloneDomText(textState, 'metricTwoLabel')}
+          </span>
+          <strong
+            {...createEditableDomNodeProps(
+              state,
+              textState,
+              selectedNodeId,
+              'metricTwoValue',
+              onChangeText,
+            )}
+          >
+            {getFigmaCloneDomText(textState, 'metricTwoValue')}
+          </strong>
         </div>
       </div>
     </section>
@@ -408,37 +827,49 @@ function renderProfileCard(
 
 function renderToolbar(
   state: FigmaCloneDomEditState,
+  textState: FigmaCloneDomTextState,
   selectedNodeId: FigmaCloneDomNodeId | null,
+  onChangeText: (nodeId: FigmaCloneDomNodeId, value: string) => void,
 ) {
   return (
     <section
       className="figma-dom-toolbar"
-      data-figma-dom-node="toolbar"
-      data-selected={selectedNodeId === 'toolbar' ? 'true' : 'false'}
-      style={createNodeStyle(state, 'toolbar')}
+      {...createDomNodeProps(state, selectedNodeId, 'toolbar')}
     >
       <strong
-        data-figma-dom-node="toolbarTitle"
-        data-selected={selectedNodeId === 'toolbarTitle' ? 'true' : 'false'}
-        style={createNodeStyle(state, 'toolbarTitle')}
+        {...createEditableDomNodeProps(
+          state,
+          textState,
+          selectedNodeId,
+          'toolbarTitle',
+          onChangeText,
+        )}
       >
-        Projects
+        {getFigmaCloneDomText(textState, 'toolbarTitle')}
       </strong>
       <div
         className="figma-dom-search"
-        data-figma-dom-node="searchBox"
-        data-selected={selectedNodeId === 'searchBox' ? 'true' : 'false'}
-        style={createNodeStyle(state, 'searchBox')}
+        {...createEditableDomNodeProps(
+          state,
+          textState,
+          selectedNodeId,
+          'searchBox',
+          onChangeText,
+        )}
       >
-        Search
+        {getFigmaCloneDomText(textState, 'searchBox')}
       </div>
       <button
-        data-figma-dom-node="toolbarButton"
-        data-selected={selectedNodeId === 'toolbarButton' ? 'true' : 'false'}
-        style={createNodeStyle(state, 'toolbarButton')}
+        {...createEditableDomNodeProps(
+          state,
+          textState,
+          selectedNodeId,
+          'toolbarButton',
+          onChangeText,
+        )}
         type="button"
       >
-        New
+        {getFigmaCloneDomText(textState, 'toolbarButton')}
       </button>
     </section>
   )
@@ -446,51 +877,65 @@ function renderToolbar(
 
 function renderNotice(
   state: FigmaCloneDomEditState,
+  textState: FigmaCloneDomTextState,
   selectedNodeId: FigmaCloneDomNodeId | null,
+  onChangeText: (nodeId: FigmaCloneDomNodeId, value: string) => void,
 ) {
   return (
     <section
       className="figma-dom-notice"
-      data-figma-dom-node="notice"
-      data-selected={selectedNodeId === 'notice' ? 'true' : 'false'}
-      style={createNodeStyle(state, 'notice')}
+      {...createDomNodeProps(state, selectedNodeId, 'notice')}
     >
       <div
         className="figma-dom-notice-icon"
-        data-figma-dom-node="noticeIcon"
-        data-selected={selectedNodeId === 'noticeIcon' ? 'true' : 'false'}
-        style={createNodeStyle(state, 'noticeIcon')}
+        {...createEditableDomNodeProps(
+          state,
+          textState,
+          selectedNodeId,
+          'noticeIcon',
+          onChangeText,
+        )}
       >
-        A
+        {getFigmaCloneDomText(textState, 'noticeIcon')}
       </div>
       <div
         className="figma-dom-notice-content"
-        data-figma-dom-node="noticeContent"
-        data-selected={selectedNodeId === 'noticeContent' ? 'true' : 'false'}
-        style={createNodeStyle(state, 'noticeContent')}
+        {...createDomNodeProps(state, selectedNodeId, 'noticeContent')}
       >
         <strong
-          data-figma-dom-node="noticeTitle"
-          data-selected={selectedNodeId === 'noticeTitle' ? 'true' : 'false'}
-          style={createNodeStyle(state, 'noticeTitle')}
+          {...createEditableDomNodeProps(
+            state,
+            textState,
+            selectedNodeId,
+            'noticeTitle',
+            onChangeText,
+          )}
         >
-          Access requested
+          {getFigmaCloneDomText(textState, 'noticeTitle')}
         </strong>
         <span
-          data-figma-dom-node="noticeText"
-          data-selected={selectedNodeId === 'noticeText' ? 'true' : 'false'}
-          style={createNodeStyle(state, 'noticeText')}
+          {...createEditableDomNodeProps(
+            state,
+            textState,
+            selectedNodeId,
+            'noticeText',
+            onChangeText,
+          )}
         >
-          Mina wants edit access to the workspace.
+          {getFigmaCloneDomText(textState, 'noticeText')}
         </span>
       </div>
       <button
-        data-figma-dom-node="noticeAction"
-        data-selected={selectedNodeId === 'noticeAction' ? 'true' : 'false'}
-        style={createNodeStyle(state, 'noticeAction')}
+        {...createEditableDomNodeProps(
+          state,
+          textState,
+          selectedNodeId,
+          'noticeAction',
+          onChangeText,
+        )}
         type="button"
       >
-        Allow
+        {getFigmaCloneDomText(textState, 'noticeAction')}
       </button>
     </section>
   )
@@ -506,6 +951,63 @@ function createDomNodeProps(
     'data-selected': selectedNodeId === nodeId ? 'true' : 'false',
     style: createNodeStyle(state, nodeId),
   } as const
+}
+
+function createEditableDomNodeProps(
+  state: FigmaCloneDomEditState,
+  textState: FigmaCloneDomTextState,
+  selectedNodeId: FigmaCloneDomNodeId | null,
+  nodeId: FigmaCloneDomNodeId,
+  onChangeText: (nodeId: FigmaCloneDomNodeId, value: string) => void,
+) {
+  const isEditing =
+    selectedNodeId === nodeId && canFigmaCloneDomNodeEditText(nodeId)
+
+  return {
+    ...createDomNodeProps(state, selectedNodeId, nodeId),
+    'aria-label': isEditing
+      ? `Edit ${getFigmaCloneDomText(textState, nodeId)}`
+      : undefined,
+    contentEditable: isEditing ? 'plaintext-only' : undefined,
+    'data-figma-dom-editing': isEditing ? 'true' : undefined,
+    suppressContentEditableWarning: isEditing ? true : undefined,
+    tabIndex: isEditing ? 0 : undefined,
+    onBlur: isEditing
+      ? (event: FocusEvent<HTMLElement>) => {
+          onChangeText(nodeId, event.currentTarget.textContent ?? '')
+        }
+      : undefined,
+    onKeyDown: isEditing
+      ? (event: KeyboardEvent<HTMLElement>) => {
+          if (event.key === 'Escape') {
+            event.currentTarget.blur()
+            return
+          }
+
+          if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault()
+            event.currentTarget.blur()
+          }
+        }
+      : undefined,
+  } as const
+}
+
+function focusFigmaCloneEditableDomNode(nodeId: FigmaCloneDomNodeId) {
+  const element = getFigmaCloneDomElement(nodeId)
+
+  if (!element?.isContentEditable) {
+    return
+  }
+
+  element.focus()
+
+  const selection = window.getSelection()
+  const range = document.createRange()
+  range.selectNodeContents(element)
+  range.collapse(false)
+  selection?.removeAllRanges()
+  selection?.addRange(range)
 }
 
 function createNodeStyle(

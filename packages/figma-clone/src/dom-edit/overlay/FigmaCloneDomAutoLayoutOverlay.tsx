@@ -84,13 +84,18 @@ export function FigmaCloneDomAutoLayoutOverlay({
     useState<AutoLayoutAffordanceMode | null>(null)
   const style = getFigmaCloneDomEditStyle(state, selectedNodeId)
   const context = getFigmaCloneDomLayoutContext(selectedNodeId)
+  const isBetweenDistribution = style.distribution === 'space-between'
 
   useLayoutEffect(() => {
     if (!context.showSelfLayout) {
-      setGapRects([])
-      return
+      const frame = requestAnimationFrame(() => {
+        setGapRects([])
+      })
+
+      return () => cancelAnimationFrame(frame)
     }
 
+    let frame = 0
     const measure = () => {
       setGapRects(measureFigmaCloneAutoLayoutGapRects({
         direction: style.direction,
@@ -100,7 +105,9 @@ export function FigmaCloneDomAutoLayoutOverlay({
       }))
     }
 
-    measure()
+    frame = requestAnimationFrame(measure)
+
+    return () => cancelAnimationFrame(frame)
   }, [
     context.showSelfLayout,
     rect.h,
@@ -324,9 +331,14 @@ export function FigmaCloneDomAutoLayoutOverlay({
               {gapRects.map((gapRect, index) => (
                 <button
                   key={`${index}:${gapRect.x}:${gapRect.y}`}
-                  aria-label={`Edit gap ${index + 1}`}
+                  aria-label={
+                    isBetweenDistribution
+                      ? `Between space ${index + 1}`
+                      : `Edit gap ${index + 1}`
+                  }
                   className={getFigmaCloneGapClassName({
                     direction: style.direction,
+                    isBetween: isBetweenDistribution,
                     isVisible: visibility.gapVisuals,
                   })}
                   style={{
@@ -335,22 +347,41 @@ export function FigmaCloneDomAutoLayoutOverlay({
                     top: gapRect.y,
                     width: gapRect.w,
                   }}
-                  title="Gap"
+                  title={isBetweenDistribution ? 'Between' : 'Gap'}
                   type="button"
                   onPointerEnter={() => setHoveredAffordance('gap')}
                   onPointerLeave={() => setHoveredAffordance(null)}
-                  onPointerDown={(event) => startDrag(event, 'gap')}
+                  onPointerDown={(event) => {
+                    if (isBetweenDistribution) {
+                      event.preventDefault()
+                      event.stopPropagation()
+                      return
+                    }
+
+                    startDrag(event, 'gap')
+                  }}
                 />
               ))}
               {visibility.gapVisuals && activeGapRect ? (
                 <span
-                  className="figma-autolayout-value figma-autolayout-value--gap"
+                  className={[
+                    'figma-autolayout-value',
+                    'figma-autolayout-value--gap',
+                    isBetweenDistribution
+                      ? 'figma-autolayout-value--between'
+                      : '',
+                  ].filter(Boolean).join(' ')}
                   style={{
                     left: activeGapRect.x + activeGapRect.w / 2,
                     top: activeGapRect.y + activeGapRect.h / 2,
                   }}
                 >
-                  Gap {style.gap}
+                  {isBetweenDistribution
+                    ? `Between ${getFigmaCloneGapRectValue({
+                      direction: style.direction,
+                      rect: activeGapRect,
+                    })}`
+                    : `Gap ${style.gap}`}
                 </span>
               ) : null}
             </>
@@ -510,16 +541,29 @@ function getFigmaClonePaddingClassName({
 
 function getFigmaCloneGapClassName({
   direction,
+  isBetween,
   isVisible,
 }: {
   direction: FigmaCloneDomEditNodeState['direction']
+  isBetween: boolean
   isVisible: boolean
 }) {
   return [
     'figma-autolayout-gap',
     `figma-autolayout-gap--${direction}`,
+    isBetween ? 'figma-autolayout-gap--between' : '',
     !isVisible ? 'figma-autolayout-gap--empty' : '',
   ].filter(Boolean).join(' ')
+}
+
+function getFigmaCloneGapRectValue({
+  direction,
+  rect,
+}: {
+  direction: FigmaCloneDomEditNodeState['direction']
+  rect: AutoLayoutRect
+}) {
+  return Math.round(direction === 'row' ? rect.w : rect.h)
 }
 
 function FigmaCloneSizeModeButton({

@@ -25,32 +25,55 @@ export type FigmaCloneDomNodeId =
   | 'workspaceSecondaryAction'
   | 'workspaceStats'
   | 'workspaceStatRevenue'
+  | 'workspaceStatRevenueLabel'
+  | 'workspaceStatRevenueValue'
+  | 'workspaceStatRevenueDelta'
   | 'workspaceStatConversion'
+  | 'workspaceStatConversionLabel'
+  | 'workspaceStatConversionValue'
+  | 'workspaceStatConversionDelta'
   | 'workspaceStatTickets'
+  | 'workspaceStatTicketsLabel'
+  | 'workspaceStatTicketsValue'
+  | 'workspaceStatTicketsDelta'
   | 'workspaceContent'
   | 'workspacePipeline'
   | 'workspacePipelineHeader'
   | 'workspacePipelineList'
   | 'workspaceDealOne'
+  | 'workspaceDealOneTitle'
+  | 'workspaceDealOneValue'
   | 'workspaceDealTwo'
+  | 'workspaceDealTwoTitle'
+  | 'workspaceDealTwoValue'
   | 'workspaceDealThree'
+  | 'workspaceDealThreeTitle'
+  | 'workspaceDealThreeValue'
   | 'workspaceActivity'
   | 'workspaceActivityHeader'
   | 'workspaceActivityList'
   | 'workspaceActivityOne'
+  | 'workspaceActivityOneText'
   | 'workspaceActivityTwo'
+  | 'workspaceActivityTwoText'
   | 'workspaceActivityThree'
+  | 'workspaceActivityThreeText'
   | 'card'
   | 'header'
   | 'avatar'
   | 'headline'
+  | 'headlineTitle'
   | 'supporting'
   | 'actions'
   | 'primaryButton'
   | 'secondaryButton'
   | 'metrics'
   | 'metricOne'
+  | 'metricOneLabel'
+  | 'metricOneValue'
   | 'metricTwo'
+  | 'metricTwoLabel'
+  | 'metricTwoValue'
   | 'notice'
   | 'noticeAction'
   | 'noticeContent'
@@ -141,6 +164,9 @@ export type FigmaCloneDomEditNodeState =
 export type FigmaCloneDomEditState =
   Record<FigmaCloneDomNodeId, FigmaCloneDomEditNodeState>
 
+export type FigmaCloneDomTextState =
+  Partial<Record<FigmaCloneDomNodeId, string>>
+
 const EMPTY_STYLE: FigmaCloneDomEditStyle = {
   gap: 0,
   h: 0,
@@ -181,6 +207,13 @@ const HUG_BOX_LAYOUT: FigmaCloneDomAutoLayout = {
   ...AUTO_LAYOUT_BASE,
   heightMode: 'hug',
   widthMode: 'hug',
+}
+
+const TEXT_LEAF_STYLE: FigmaCloneDomEditNodeState = {
+  ...EMPTY_STYLE,
+  ...HUG_BOX_LAYOUT,
+  h: 18,
+  w: 80,
 }
 
 export const FIGMA_CLONE_DOM_TREE: readonly FigmaCloneDomNode[] = [
@@ -258,9 +291,33 @@ export const FIGMA_CLONE_DOM_TREE: readonly FigmaCloneDomNode[] = [
             id: 'workspaceStats',
             label: 'Stats row',
             children: [
-              { id: 'workspaceStatRevenue', label: 'Revenue stat' },
-              { id: 'workspaceStatConversion', label: 'Conversion stat' },
-              { id: 'workspaceStatTickets', label: 'Tickets stat' },
+              {
+                id: 'workspaceStatRevenue',
+                label: 'Revenue stat',
+                children: [
+                  { id: 'workspaceStatRevenueLabel', label: 'Revenue label' },
+                  { id: 'workspaceStatRevenueValue', label: 'Revenue value' },
+                  { id: 'workspaceStatRevenueDelta', label: 'Revenue delta' },
+                ],
+              },
+              {
+                id: 'workspaceStatConversion',
+                label: 'Conversion stat',
+                children: [
+                  { id: 'workspaceStatConversionLabel', label: 'Conversion label' },
+                  { id: 'workspaceStatConversionValue', label: 'Conversion value' },
+                  { id: 'workspaceStatConversionDelta', label: 'Conversion delta' },
+                ],
+              },
+              {
+                id: 'workspaceStatTickets',
+                label: 'Tickets stat',
+                children: [
+                  { id: 'workspaceStatTicketsLabel', label: 'Tickets label' },
+                  { id: 'workspaceStatTicketsValue', label: 'Tickets value' },
+                  { id: 'workspaceStatTicketsDelta', label: 'Tickets delta' },
+                ],
+              },
             ],
           },
           {
@@ -276,9 +333,30 @@ export const FIGMA_CLONE_DOM_TREE: readonly FigmaCloneDomNode[] = [
                     id: 'workspacePipelineList',
                     label: 'Pipeline list',
                     children: [
-                      { id: 'workspaceDealOne', label: 'Deal row 1' },
-                      { id: 'workspaceDealTwo', label: 'Deal row 2' },
-                      { id: 'workspaceDealThree', label: 'Deal row 3' },
+                      {
+                        id: 'workspaceDealOne',
+                        label: 'Deal row 1',
+                        children: [
+                          { id: 'workspaceDealOneTitle', label: 'Deal title 1' },
+                          { id: 'workspaceDealOneValue', label: 'Deal value 1' },
+                        ],
+                      },
+                      {
+                        id: 'workspaceDealTwo',
+                        label: 'Deal row 2',
+                        children: [
+                          { id: 'workspaceDealTwoTitle', label: 'Deal title 2' },
+                          { id: 'workspaceDealTwoValue', label: 'Deal value 2' },
+                        ],
+                      },
+                      {
+                        id: 'workspaceDealThree',
+                        label: 'Deal row 3',
+                        children: [
+                          { id: 'workspaceDealThreeTitle', label: 'Deal title 3' },
+                          { id: 'workspaceDealThreeValue', label: 'Deal value 3' },
+                        ],
+                      },
                     ],
                   },
                 ],
@@ -292,9 +370,27 @@ export const FIGMA_CLONE_DOM_TREE: readonly FigmaCloneDomNode[] = [
                     id: 'workspaceActivityList',
                     label: 'Activity list',
                     children: [
-                      { id: 'workspaceActivityOne', label: 'Activity item 1' },
-                      { id: 'workspaceActivityTwo', label: 'Activity item 2' },
-                      { id: 'workspaceActivityThree', label: 'Activity item 3' },
+                      {
+                        id: 'workspaceActivityOne',
+                        label: 'Activity item 1',
+                        children: [
+                          { id: 'workspaceActivityOneText', label: 'Activity text 1' },
+                        ],
+                      },
+                      {
+                        id: 'workspaceActivityTwo',
+                        label: 'Activity item 2',
+                        children: [
+                          { id: 'workspaceActivityTwoText', label: 'Activity text 2' },
+                        ],
+                      },
+                      {
+                        id: 'workspaceActivityThree',
+                        label: 'Activity item 3',
+                        children: [
+                          { id: 'workspaceActivityThreeText', label: 'Activity text 3' },
+                        ],
+                      },
                     ],
                   },
                 ],
@@ -318,6 +414,7 @@ export const FIGMA_CLONE_DOM_TREE: readonly FigmaCloneDomNode[] = [
             id: 'headline',
             label: 'Headline',
             children: [
+              { id: 'headlineTitle', label: 'Headline title' },
               { id: 'supporting', label: 'Supporting text' },
             ],
           },
@@ -335,8 +432,22 @@ export const FIGMA_CLONE_DOM_TREE: readonly FigmaCloneDomNode[] = [
         id: 'metrics',
         label: 'Metrics',
         children: [
-          { id: 'metricOne', label: 'Metric 1' },
-          { id: 'metricTwo', label: 'Metric 2' },
+          {
+            id: 'metricOne',
+            label: 'Metric 1',
+            children: [
+              { id: 'metricOneLabel', label: 'Metric label 1' },
+              { id: 'metricOneValue', label: 'Metric value 1' },
+            ],
+          },
+          {
+            id: 'metricTwo',
+            label: 'Metric 2',
+            children: [
+              { id: 'metricTwoLabel', label: 'Metric label 2' },
+              { id: 'metricTwoValue', label: 'Metric value 2' },
+            ],
+          },
         ],
       },
     ],
@@ -603,6 +714,13 @@ const DEFAULT_STYLES: FigmaCloneDomEditState = {
     w: 201,
     widthMode: 'fill',
   },
+  workspaceStatRevenueLabel: TEXT_LEAF_STYLE,
+  workspaceStatRevenueValue: {
+    ...TEXT_LEAF_STYLE,
+    h: 28,
+    w: 104,
+  },
+  workspaceStatRevenueDelta: TEXT_LEAF_STYLE,
   workspaceStatConversion: {
     ...EMPTY_STYLE,
     ...HUG_BOX_LAYOUT,
@@ -612,6 +730,13 @@ const DEFAULT_STYLES: FigmaCloneDomEditState = {
     w: 201,
     widthMode: 'fill',
   },
+  workspaceStatConversionLabel: TEXT_LEAF_STYLE,
+  workspaceStatConversionValue: {
+    ...TEXT_LEAF_STYLE,
+    h: 28,
+    w: 104,
+  },
+  workspaceStatConversionDelta: TEXT_LEAF_STYLE,
   workspaceStatTickets: {
     ...EMPTY_STYLE,
     ...HUG_BOX_LAYOUT,
@@ -621,6 +746,13 @@ const DEFAULT_STYLES: FigmaCloneDomEditState = {
     w: 202,
     widthMode: 'fill',
   },
+  workspaceStatTicketsLabel: TEXT_LEAF_STYLE,
+  workspaceStatTicketsValue: {
+    ...TEXT_LEAF_STYLE,
+    h: 28,
+    w: 80,
+  },
+  workspaceStatTicketsDelta: TEXT_LEAF_STYLE,
   workspaceContent: {
     ...EMPTY_STYLE,
     ...HUG_AUTO_LAYOUT_FRAME,
@@ -660,31 +792,58 @@ const DEFAULT_STYLES: FigmaCloneDomEditState = {
   },
   workspaceDealOne: {
     ...EMPTY_STYLE,
-    ...HUG_BOX_LAYOUT,
+    ...HUG_AUTO_LAYOUT_FRAME,
+    align: 'center',
+    direction: 'row',
+    distribution: 'space-between',
+    gap: 12,
     h: 54,
     padding: 12,
     radius: 12,
     w: 344,
     widthMode: 'fill',
   },
+  workspaceDealOneTitle: {
+    ...TEXT_LEAF_STYLE,
+    w: 180,
+  },
+  workspaceDealOneValue: TEXT_LEAF_STYLE,
   workspaceDealTwo: {
     ...EMPTY_STYLE,
-    ...HUG_BOX_LAYOUT,
+    ...HUG_AUTO_LAYOUT_FRAME,
+    align: 'center',
+    direction: 'row',
+    distribution: 'space-between',
+    gap: 12,
     h: 54,
     padding: 12,
     radius: 12,
     w: 344,
     widthMode: 'fill',
   },
+  workspaceDealTwoTitle: {
+    ...TEXT_LEAF_STYLE,
+    w: 180,
+  },
+  workspaceDealTwoValue: TEXT_LEAF_STYLE,
   workspaceDealThree: {
     ...EMPTY_STYLE,
-    ...HUG_BOX_LAYOUT,
+    ...HUG_AUTO_LAYOUT_FRAME,
+    align: 'center',
+    direction: 'row',
+    distribution: 'space-between',
+    gap: 12,
     h: 54,
     padding: 12,
     radius: 12,
     w: 344,
     widthMode: 'fill',
   },
+  workspaceDealThreeTitle: {
+    ...TEXT_LEAF_STYLE,
+    w: 180,
+  },
+  workspaceDealThreeValue: TEXT_LEAF_STYLE,
   workspaceActivity: {
     ...EMPTY_STYLE,
     ...HUG_AUTO_LAYOUT_FRAME,
@@ -714,29 +873,47 @@ const DEFAULT_STYLES: FigmaCloneDomEditState = {
   },
   workspaceActivityOne: {
     ...EMPTY_STYLE,
-    ...HUG_BOX_LAYOUT,
+    ...HUG_AUTO_LAYOUT_FRAME,
+    align: 'center',
+    direction: 'row',
     h: 50,
     padding: 10,
     radius: 12,
     w: 188,
+    widthMode: 'fill',
+  },
+  workspaceActivityOneText: {
+    ...TEXT_LEAF_STYLE,
     widthMode: 'fill',
   },
   workspaceActivityTwo: {
     ...EMPTY_STYLE,
-    ...HUG_BOX_LAYOUT,
+    ...HUG_AUTO_LAYOUT_FRAME,
+    align: 'center',
+    direction: 'row',
     h: 50,
     padding: 10,
     radius: 12,
     w: 188,
     widthMode: 'fill',
   },
+  workspaceActivityTwoText: {
+    ...TEXT_LEAF_STYLE,
+    widthMode: 'fill',
+  },
   workspaceActivityThree: {
     ...EMPTY_STYLE,
-    ...HUG_BOX_LAYOUT,
+    ...HUG_AUTO_LAYOUT_FRAME,
+    align: 'center',
+    direction: 'row',
     h: 50,
     padding: 10,
     radius: 12,
     w: 188,
+    widthMode: 'fill',
+  },
+  workspaceActivityThreeText: {
+    ...TEXT_LEAF_STYLE,
     widthMode: 'fill',
   },
   card: {
@@ -772,6 +949,12 @@ const DEFAULT_STYLES: FigmaCloneDomEditState = {
     gap: 5,
     h: 60,
     w: 212,
+    widthMode: 'fill',
+  },
+  headlineTitle: {
+    ...TEXT_LEAF_STYLE,
+    h: 28,
+    w: 196,
     widthMode: 'fill',
   },
   supporting: {
@@ -825,6 +1008,12 @@ const DEFAULT_STYLES: FigmaCloneDomEditState = {
     w: 151,
     widthMode: 'fill',
   },
+  metricOneLabel: TEXT_LEAF_STYLE,
+  metricOneValue: {
+    ...TEXT_LEAF_STYLE,
+    h: 28,
+    w: 64,
+  },
   metricTwo: {
     ...EMPTY_STYLE,
     ...HUG_BOX_LAYOUT,
@@ -833,6 +1022,12 @@ const DEFAULT_STYLES: FigmaCloneDomEditState = {
     radius: 12,
     w: 151,
     widthMode: 'fill',
+  },
+  metricTwoLabel: TEXT_LEAF_STYLE,
+  metricTwoValue: {
+    ...TEXT_LEAF_STYLE,
+    h: 28,
+    w: 64,
   },
   toolbar: {
     ...EMPTY_STYLE,
@@ -919,6 +1114,59 @@ const DEFAULT_STYLES: FigmaCloneDomEditState = {
   },
 }
 
+const DEFAULT_TEXT: FigmaCloneDomTextState = {
+  avatar: 'LK',
+  headlineTitle: 'Lina Kim',
+  metricOneLabel: 'Usage',
+  metricOneValue: '18k',
+  metricTwoLabel: 'NPS',
+  metricTwoValue: '71',
+  noticeAction: 'Allow',
+  noticeIcon: 'A',
+  noticeText: 'Mina wants edit access to the workspace.',
+  noticeTitle: 'Access requested',
+  primaryButton: 'Invite',
+  searchBox: 'Search',
+  secondaryButton: 'Message',
+  supporting: 'Product systems lead',
+  toolbarButton: 'New',
+  toolbarTitle: 'Projects',
+  workspaceActivityHeader: 'Activity',
+  workspaceActivityOneText: 'Mina updated forecast',
+  workspaceActivityThreeText: 'Lina shared notes',
+  workspaceActivityTwoText: 'Jae flagged churn risk',
+  workspaceBrandMark: 'C',
+  workspaceBrandText: 'CoreOS',
+  workspaceBreadcrumb: 'Workspace / Growth',
+  workspaceDealOneTitle: 'Acme rollout',
+  workspaceDealOneValue: '$84k',
+  workspaceDealThreeTitle: 'Helio expansion',
+  workspaceDealThreeValue: '$38k',
+  workspaceDealTwoTitle: 'Northstar renewal',
+  workspaceDealTwoValue: '$62k',
+  workspaceHeroText: 'Review pipeline health, expansion risk, and activation blockers.',
+  workspaceHeroTitle: 'Revenue operations',
+  workspaceNavCustomers: 'Customers',
+  workspaceNavOverview: 'Overview',
+  workspaceNavRoadmap: 'Roadmap',
+  workspacePipelineHeader: 'Pipeline review',
+  workspacePrimaryAction: 'New report',
+  workspaceProfile: 'MK',
+  workspaceSearch: 'Search accounts',
+  workspaceSecondaryAction: 'Export',
+  workspaceStatConversionDelta: '+4.1%',
+  workspaceStatConversionLabel: 'Conversion',
+  workspaceStatConversionValue: '32.8%',
+  workspaceStatRevenueDelta: '+18.2%',
+  workspaceStatRevenueLabel: 'Revenue',
+  workspaceStatRevenueValue: '$482k',
+  workspaceStatTicketsDelta: '-12',
+  workspaceStatTicketsLabel: 'Open tickets',
+  workspaceStatTicketsValue: '124',
+  workspaceUpgradeText: "68% of this quarter's workspace budget is allocated.",
+  workspaceUpgradeTitle: 'Capacity',
+}
+
 const FIELD_LIMITS = {
   gap: { max: 80, min: 0 },
   h: { max: 720, min: 12 },
@@ -937,11 +1185,51 @@ export function createFigmaCloneDomEditState(): FigmaCloneDomEditState {
   return mapFigmaCloneDomEditState((style) => ({ ...style }), DEFAULT_STYLES)
 }
 
+export function createFigmaCloneDomTextState(): FigmaCloneDomTextState {
+  return { ...DEFAULT_TEXT }
+}
+
 export function getFigmaCloneDomEditStyle(
   state: FigmaCloneDomEditState,
   nodeId: FigmaCloneDomNodeId,
 ): FigmaCloneDomEditNodeState {
   return state[nodeId] ?? DEFAULT_STYLES[nodeId]
+}
+
+export function canFigmaCloneDomNodeEditText(
+  nodeId: FigmaCloneDomNodeId,
+): boolean {
+  return nodeId in DEFAULT_TEXT
+}
+
+export function getFigmaCloneDomText(
+  state: FigmaCloneDomTextState,
+  nodeId: FigmaCloneDomNodeId,
+): string {
+  return state[nodeId] ?? DEFAULT_TEXT[nodeId] ?? ''
+}
+
+export function updateFigmaCloneDomText({
+  nodeId,
+  state,
+  value,
+}: {
+  nodeId: FigmaCloneDomNodeId
+  state: FigmaCloneDomTextState
+  value: string
+}): FigmaCloneDomTextState {
+  if (!canFigmaCloneDomNodeEditText(nodeId)) {
+    return state
+  }
+
+  if (getFigmaCloneDomText(state, nodeId) === value) {
+    return state
+  }
+
+  return {
+    ...state,
+    [nodeId]: value,
+  }
 }
 
 export function updateFigmaCloneDomEditField({
@@ -1000,7 +1288,8 @@ export function updateFigmaCloneDomAutoLayoutField({
 export function canFigmaCloneDomNodeUseAutoLayout(
   nodeId: FigmaCloneDomNodeId,
 ): boolean {
-  return Boolean(FIGMA_CLONE_DOM_NODE_BY_ID[nodeId].children?.length)
+  return Boolean(FIGMA_CLONE_DOM_NODE_BY_ID[nodeId].children?.length) &&
+    !isFigmaCloneDomStaticComposite(nodeId)
 }
 
 export function getFigmaCloneDomLayoutContext(
@@ -1014,11 +1303,12 @@ export function getFigmaCloneDomLayoutContext(
     ? getFigmaCloneDomRuntimeDisplay(parentId) ?? getFigmaCloneDomDisplay(parentId)
     : null
   const position = getFigmaCloneDomRuntimePosition(nodeId) ??
-    getFigmaCloneDomPosition(nodeId)
+    getFigmaCloneDomPosition()
   const contentType = getFigmaCloneDomContentType(nodeId)
   const hasChildren = Boolean(node.children?.length)
-  const showFlexLayout = display === 'flex' && hasChildren
-  const showGridLayout = display === 'grid' && hasChildren
+  const supportsAutoLayout = canFigmaCloneDomNodeUseAutoLayout(nodeId)
+  const showFlexLayout = supportsAutoLayout && display === 'flex' && hasChildren
+  const showGridLayout = supportsAutoLayout && display === 'grid' && hasChildren
 
   return {
     contentType,
@@ -1185,6 +1475,18 @@ export function isFigmaCloneDomGridContainer(
   return nodeId === 'workspaceContent'
 }
 
+function isFigmaCloneDomStaticComposite(
+  nodeId: FigmaCloneDomNodeId,
+): boolean {
+  return (
+    nodeId === 'metricOne' ||
+    nodeId === 'metricTwo' ||
+    nodeId === 'workspaceStatRevenue' ||
+    nodeId === 'workspaceStatConversion' ||
+    nodeId === 'workspaceStatTickets'
+  )
+}
+
 function getFigmaCloneDomRuntimeDisplay(
   nodeId: FigmaCloneDomNodeId,
 ): FigmaCloneDomDisplay | null {
@@ -1248,14 +1550,31 @@ function getFigmaCloneDomContentType(
     nodeId === 'workspaceHeroTitle' ||
     nodeId === 'workspaceHeroText' ||
     nodeId === 'workspacePipelineHeader' ||
-    nodeId === 'workspaceDealOne' ||
-    nodeId === 'workspaceDealTwo' ||
-    nodeId === 'workspaceDealThree' ||
+    nodeId === 'workspaceDealOneTitle' ||
+    nodeId === 'workspaceDealOneValue' ||
+    nodeId === 'workspaceDealTwoTitle' ||
+    nodeId === 'workspaceDealTwoValue' ||
+    nodeId === 'workspaceDealThreeTitle' ||
+    nodeId === 'workspaceDealThreeValue' ||
     nodeId === 'workspaceActivityHeader' ||
-    nodeId === 'workspaceActivityOne' ||
-    nodeId === 'workspaceActivityTwo' ||
-    nodeId === 'workspaceActivityThree' ||
+    nodeId === 'workspaceActivityOneText' ||
+    nodeId === 'workspaceActivityTwoText' ||
+    nodeId === 'workspaceActivityThreeText' ||
+    nodeId === 'workspaceStatRevenueLabel' ||
+    nodeId === 'workspaceStatRevenueValue' ||
+    nodeId === 'workspaceStatRevenueDelta' ||
+    nodeId === 'workspaceStatConversionLabel' ||
+    nodeId === 'workspaceStatConversionValue' ||
+    nodeId === 'workspaceStatConversionDelta' ||
+    nodeId === 'workspaceStatTicketsLabel' ||
+    nodeId === 'workspaceStatTicketsValue' ||
+    nodeId === 'workspaceStatTicketsDelta' ||
     nodeId === 'avatar' ||
+    nodeId === 'headlineTitle' ||
+    nodeId === 'metricOneLabel' ||
+    nodeId === 'metricOneValue' ||
+    nodeId === 'metricTwoLabel' ||
+    nodeId === 'metricTwoValue' ||
     nodeId === 'noticeIcon' ||
     nodeId === 'noticeText' ||
     nodeId === 'noticeTitle' ||
@@ -1268,9 +1587,7 @@ function getFigmaCloneDomContentType(
   return 'container'
 }
 
-function getFigmaCloneDomPosition(
-  _nodeId: FigmaCloneDomNodeId,
-): FigmaCloneDomPosition {
+function getFigmaCloneDomPosition(): FigmaCloneDomPosition {
   return 'static'
 }
 

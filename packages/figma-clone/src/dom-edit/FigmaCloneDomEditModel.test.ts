@@ -1,12 +1,16 @@
 import { describe, expect, it } from 'vitest'
 import { getFigmaCloneDomOverlayVisibility } from './overlay'
 import {
+  canFigmaCloneDomNodeEditText,
   createFigmaCloneDomEditState,
+  createFigmaCloneDomTextState,
   getFigmaCloneDomEditStyle,
   getFigmaCloneDomLayoutContext,
   getFigmaCloneDomRootId,
+  getFigmaCloneDomText,
   updateFigmaCloneDomAutoLayoutField,
   updateFigmaCloneDomEditField,
+  updateFigmaCloneDomText,
 } from './FigmaCloneDomEditModel'
 
 describe('FigmaCloneDomEditModel', () => {
@@ -56,6 +60,33 @@ describe('FigmaCloneDomEditModel', () => {
 
     expect(getFigmaCloneDomEditStyle(next, 'card').direction).toBe('row')
     expect(getFigmaCloneDomEditStyle(state, 'card').direction).toBe('column')
+  })
+
+  it('stores editable copy outside DOM layout values', () => {
+    const state = createFigmaCloneDomTextState()
+    const next = updateFigmaCloneDomText({
+      nodeId: 'workspaceHeroTitle',
+      state,
+      value: 'Revenue command center',
+    })
+
+    expect(getFigmaCloneDomText(next, 'workspaceHeroTitle')).toBe(
+      'Revenue command center',
+    )
+    expect(getFigmaCloneDomText(state, 'workspaceHeroTitle')).toBe(
+      'Revenue operations',
+    )
+    expect(canFigmaCloneDomNodeEditText('workspaceHeroTitle')).toBe(true)
+    expect(canFigmaCloneDomNodeEditText('workspaceHero')).toBe(false)
+  })
+
+  it('models composite UI copy as selectable text leaves', () => {
+    const dealValue = getFigmaCloneDomLayoutContext('workspaceDealTwoValue')
+    const headlineTitle = getFigmaCloneDomLayoutContext('headlineTitle')
+
+    expect(getFigmaCloneDomRootId('workspaceDealTwoValue')).toBe('workspacePage')
+    expect(dealValue.contentType).toBe('text')
+    expect(headlineTitle.contentType).toBe('text')
   })
 
   it('defaults DOM samples to hug/fill sizing and reserves fixed for atomic visuals', () => {
