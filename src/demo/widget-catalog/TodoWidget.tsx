@@ -104,7 +104,7 @@ function renderTodoWidgetCard({
         fontFamily: 'Inter, system-ui, sans-serif',
         gap: 6,
         height: '100%',
-        padding: '12px 14px',
+        padding: 12,
         width: '100%',
       }}
     >
@@ -167,6 +167,7 @@ export const TODO_WIDGET_MODULE =
     defaultData: createTodoWidgetData,
     defaultSize: { h: 132, w: 220 },
     id: TODO_WIDGET_KIND,
+    isolation: 'none',
     label: 'Todo',
     presentation: TODO_WIDGET_PRESENTATION,
     tool: false,
@@ -181,7 +182,11 @@ export const TODO_WIDGET_MODULE =
           },
         }),
     },
-    render: ({ data, item }) => renderTodoWidgetCard({ data, itemId: item.id }),
+    render: ({ data, item }) =>
+      renderTodoWidgetCard({
+        data,
+        itemId: item.id,
+      }),
     title: 'Todo widget',
     validateData: isTodoWidgetData,
   })

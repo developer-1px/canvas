@@ -7,6 +7,8 @@ import {
 } from 'react'
 import { createPortal } from 'react-dom'
 
+export type CanvasWidgetIsolationMode = 'none' | 'shadow'
+
 // Stable, non-iframe isolation for independent widget objects:
 //  - Shadow DOM encapsulates the widget's styles/DOM so a widget can neither
 //    leak CSS into the canvas nor inherit canvas chrome styles.
@@ -61,9 +63,11 @@ function CanvasWidgetShadowHost({ children }: { children: ReactNode }) {
 export function CanvasWidgetIsolationHost({
   children,
   fallbackLabel = 'Widget unavailable',
+  mode = 'shadow',
 }: {
   children: ReactNode
   fallbackLabel?: string
+  mode?: CanvasWidgetIsolationMode
 }) {
   return (
     <CanvasWidgetErrorBoundary
@@ -73,7 +77,9 @@ export function CanvasWidgetIsolationHost({
         </div>
       }
     >
-      <CanvasWidgetShadowHost>{children}</CanvasWidgetShadowHost>
+      {mode === 'shadow'
+        ? <CanvasWidgetShadowHost>{children}</CanvasWidgetShadowHost>
+        : children}
     </CanvasWidgetErrorBoundary>
   )
 }

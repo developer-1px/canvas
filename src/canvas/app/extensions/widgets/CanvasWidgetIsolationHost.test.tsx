@@ -30,4 +30,15 @@ describe('CanvasWidgetIsolationHost', () => {
     expect(markup).toContain('ok')
     expect(markup).not.toContain('Metric unavailable')
   })
+
+  it('can render children without a shadow host for inspectable widgets', () => {
+    const markup = renderToStaticMarkup(
+      <CanvasWidgetIsolationHost mode="none">
+        <span data-preview-source="Metric.tsx:12:4">Inspectable</span>
+      </CanvasWidgetIsolationHost>,
+    )
+
+    expect(markup).not.toContain('canvas-widget-shadow-host')
+    expect(markup).toContain('data-preview-source="Metric.tsx:12:4"')
+  })
 })

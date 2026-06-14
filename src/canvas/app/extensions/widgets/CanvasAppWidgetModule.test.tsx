@@ -64,6 +64,9 @@ describe('CanvasAppWidgetModule', () => {
 
     expect(markup).toContain('<foreignObject')
     expect(markup).toContain('data-canvas-widget-kind="metric-widget"')
+    expect(markup).toContain('class="canvas-widget-hit"')
+    expect(markup).toContain('data-canvas-widget-hit="metric-widget"')
+    expect(markup).toContain('pointer-events:none')
     expect(markup).toContain('Revenue')
     expect(markup).toContain('$42k')
   })
@@ -117,6 +120,39 @@ describe('CanvasAppWidgetModule', () => {
     expect(markup).toContain('<foreignObject')
     expect(markup).toContain('<style>.cta{color:#2563eb;font-weight:700}</style>')
     expect(markup).toContain('<button class="cta">Run</button>')
+  })
+
+  it('can render a React widget without shadow isolation for preview inspection', () => {
+    const module = defineCanvasAppReactWidgetModule({
+      defaultData: { source: 'src/cards/MetricCard.tsx:18:6' },
+      id: 'inspectable-preview',
+      isolation: 'none',
+      render: ({ data }) => (
+        <article data-preview-source={String(data.source)}>
+          Inspect me
+        </article>
+      ),
+      title: 'Inspectable preview',
+    })
+    const item = {
+      data: { source: 'src/cards/MetricCard.tsx:18:6' },
+      h: 120,
+      id: 'preview-1',
+      kind: 'inspectable-preview',
+      presentation: 'inspectable-preview-widget',
+      title: 'Inspectable preview',
+      type: 'custom',
+      w: 220,
+      x: 0,
+      y: 0,
+    } satisfies CanvasCustomItem
+    const markup = renderToStaticMarkup(
+      <svg>{module.renderItem({ item })}</svg>,
+    )
+
+    expect(markup).not.toContain('canvas-widget-shadow-host')
+    expect(markup).toContain('data-canvas-widget-kind="inspectable-preview"')
+    expect(markup).toContain('data-preview-source="src/cards/MetricCard.tsx:18:6"')
   })
 
   it('exposes optional widget interactions by widget kind', () => {

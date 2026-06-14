@@ -42,6 +42,7 @@ export {
   getCanvasAppWidgetInteractions,
   type CanvasAppHtmlWidgetData,
   type CanvasAppHtmlWidgetModuleInput,
+  type CanvasAppWidgetIsolationMode,
   type CanvasAppReactWidgetModuleInput,
   type CanvasAppWidgetInteraction,
   type CanvasAppWidgetInteractionRenderContext,

@@ -117,6 +117,7 @@ export {
   type CanvasAppStageMount,
   type CanvasAppStageRenderInput,
   type CanvasAppWidgetCreationOptions,
+  type CanvasAppWidgetIsolationMode,
   type CanvasAppWidgetInteraction,
   type CanvasAppWidgetInteractionRenderContext,
   type CanvasAppWidgetInteractions,

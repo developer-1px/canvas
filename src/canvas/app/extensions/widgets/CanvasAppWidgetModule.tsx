@@ -13,7 +13,12 @@ import {
   type CanvasAppCustomItemModuleCreationTool,
 } from '../custom-item-modules/CanvasAppCustomItemModules'
 import type { CanvasAppCustomToolShortcut } from '../custom-tools/CanvasAppCustomCreationTools'
-import { CanvasWidgetIsolationHost } from './CanvasWidgetIsolationHost'
+import {
+  CanvasWidgetIsolationHost,
+  type CanvasWidgetIsolationMode,
+} from './CanvasWidgetIsolationHost'
+
+export type CanvasAppWidgetIsolationMode = CanvasWidgetIsolationMode
 
 export type CanvasAppWidgetItem<
   TData extends CanvasJsonObject = CanvasJsonObject,
@@ -79,6 +84,7 @@ type CanvasAppWidgetModuleBaseInput<
   }
   id: string
   inspectorPanels?: readonly CanvasAppInspectorPanel[]
+  isolation?: CanvasAppWidgetIsolationMode
   label?: string
   presentation?: string
   textPasteImporters?: readonly CanvasTextPasteImporter[]
@@ -152,6 +158,7 @@ function defineCanvasAppWidgetModule<
   id,
   interaction,
   inspectorPanels,
+  isolation = 'shadow',
   label,
   presentation = `${id}-widget`,
   renderWidget,
@@ -195,21 +202,44 @@ function defineCanvasAppWidgetModule<
         : getDefaultData()
 
       return (
-        <foreignObject
-          x={item.x}
-          y={item.y}
-          width={item.w}
-          height={item.h}
-        >
-          <div
-            className="canvas-widget"
-            data-canvas-widget-kind={id}
+        <>
+          <foreignObject
+            x={item.x}
+            y={item.y}
+            width={item.w}
+            height={item.h}
           >
-            <CanvasWidgetIsolationHost fallbackLabel={`${title} unavailable`}>
-              {renderWidget({ data, item: widgetItem })}
-            </CanvasWidgetIsolationHost>
-          </div>
-        </foreignObject>
+            <div
+              className="canvas-widget"
+              data-canvas-widget-kind={id}
+              style={{
+                height: '100%',
+                pointerEvents: 'none',
+                width: '100%',
+              }}
+            >
+              <CanvasWidgetIsolationHost
+                fallbackLabel={`${title} unavailable`}
+                mode={isolation}
+              >
+                {renderWidget({
+                  data,
+                  item: widgetItem,
+                })}
+              </CanvasWidgetIsolationHost>
+            </div>
+          </foreignObject>
+          <rect
+            className="canvas-widget-hit"
+            data-canvas-widget-hit={id}
+            fill="transparent"
+            height={item.h}
+            pointerEvents="all"
+            width={item.w}
+            x={item.x}
+            y={item.y}
+          />
+        </>
       )
     },
     textPasteImporters,
