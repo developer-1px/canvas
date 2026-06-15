@@ -1,6 +1,7 @@
 import {
   useCallback,
   useEffect,
+  useId,
   useLayoutEffect,
   useState,
   type CSSProperties,
@@ -231,6 +232,9 @@ export function DomEditAutoLayoutOverlay<
         : { ...current, alignmentPreview: next }
     })
   }, [updateTransientState])
+  const alignmentEditorControlId = useId()
+  const alignmentEditorTriggerId = `${alignmentEditorControlId}-trigger`
+  const alignmentEditorPanelId = `${alignmentEditorControlId}-panel`
 
   useLayoutEffect(() => {
     if (!context.showSelfLayout) {
@@ -690,6 +694,8 @@ export function DomEditAutoLayoutOverlay<
           {shouldRenderAlignmentEditor ? (
             <>
               <button
+                id={alignmentEditorTriggerId}
+                aria-controls={alignmentEditorPanelId}
                 aria-expanded={isAlignmentEditorOpen}
                 aria-label="Alignment editor"
                 className="figma-alignment-editor-trigger"
@@ -718,8 +724,10 @@ export function DomEditAutoLayoutOverlay<
                 }}
               >
                 <DomEditAlignmentEditor
+                  id={alignmentEditorPanelId}
                   context={context}
                   isOpen={isAlignmentEditorOpen}
+                  labelledBy={alignmentEditorTriggerId}
                   selectedNodeId={selectedNodeId}
                   style={style}
                   onChangeAutoLayout={onChangeAutoLayout}

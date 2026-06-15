@@ -39,7 +39,9 @@ export function DomEditAlignmentEditor<
   TNodeId extends DomEditNodeId,
 >({
   context,
+  id,
   isOpen,
+  labelledBy,
   selectedNodeId,
   style,
   onChangeAutoLayout,
@@ -47,7 +49,9 @@ export function DomEditAlignmentEditor<
   onPreview,
 }: {
   context: DomEditLayoutContext<TNodeId>
+  id: string
   isOpen: boolean
+  labelledBy: string
   selectedNodeId: TNodeId
   style: DomEditNodeState
   onChangeAutoLayout: (
@@ -81,9 +85,10 @@ export function DomEditAlignmentEditor<
 
   return (
     <div
+      id={id}
       className="figma-alignment-popover"
-      role="dialog"
-      aria-label="Alignment editor"
+      role="region"
+      aria-labelledby={labelledBy}
       onKeyDown={handleKeyDown}
     >
       {context.showSelfLayout ? (
