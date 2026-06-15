@@ -5,34 +5,37 @@ import {
   type PointerEvent,
   type RefObject,
 } from 'react'
-import type { Viewport } from '../../../../../src/canvas'
 import {
-  getFigmaCloneDomEditStyle,
-  getFigmaCloneDomLayoutContext,
-  type FigmaCloneDomEditField,
-  type FigmaCloneDomEditState,
-  type FigmaCloneDomNodeId,
-} from '../FigmaCloneDomEditModel'
+  getDomEditOverlayVisibility,
+  type DomEditAffordanceState,
+} from '../../../features/node-selection/DomEditAffordanceVisibility'
 import {
-  getFigmaCloneDomOverlayVisibility,
-  type FigmaCloneDomAffordanceState,
-} from './FigmaCloneDomAffordanceVisibility'
+  clampDomEditOverlayPosition,
+  createDomEditOverlayRectStyle,
+  getDomEditWorldOverlayRect,
+  type DomEditOverlayRect,
+} from '../../../shared/geometry/DomEditOverlayGeometry'
 import {
-  clampFigmaCloneDomOverlayPosition,
-  createFigmaCloneDomOverlayRectStyle,
-  getFigmaCloneDomWorldOverlayRect,
-  type FigmaCloneDomOverlayRect,
-} from './FigmaCloneDomOverlayGeometry'
-import {
-  resolveFigmaCloneSpacingDragValue,
-} from './FigmaCloneDomOverlayGesture'
+  resolveDomEditSpacingDragValue,
+} from '../../../shared/gesture/DomEditOverlayGesture'
+import type {
+  DomEditField,
+  DomEditModelAdapter,
+  DomEditNodeId,
+  DomEditState,
+  DomEditViewport,
+} from '../../../shared/model/DomEditTypes'
 
-type GridOverlayRect = FigmaCloneDomOverlayRect
-type GridGapRect = FigmaCloneDomOverlayRect & {
+type GridOverlayRect = DomEditOverlayRect
+type GridGapRect = DomEditOverlayRect & {
   axis: 'column' | 'row'
 }
 
-export function FigmaCloneDomGridOverlay({
+export function DomEditGridOverlay<
+  TNodeId extends DomEditNodeId,
+  TState extends DomEditState<TNodeId>,
+>({
+  adapter,
   affordanceState: baseAffordanceState,
   rect,
   selectedNodeId,
@@ -41,27 +44,30 @@ export function FigmaCloneDomGridOverlay({
   target,
   viewport,
   onChange,
+  onAffordanceStateChange,
 }: {
-  affordanceState: FigmaCloneDomAffordanceState
+  adapter: DomEditModelAdapter<TNodeId, TState>
+  affordanceState: DomEditAffordanceState
   rect: GridOverlayRect & { scale: number }
-  selectedNodeId: FigmaCloneDomNodeId
+  selectedNodeId: TNodeId
   shellRef: RefObject<HTMLElement | null>
-  state: FigmaCloneDomEditState
+  state: TState
   target: HTMLElement
-  viewport: Viewport
+  viewport: DomEditViewport
   onChange: (
-    nodeId: FigmaCloneDomNodeId,
-    field: FigmaCloneDomEditField,
+    nodeId: TNodeId,
+    field: DomEditField,
     value: number,
   ) => void
+  onAffordanceStateChange: (state: DomEditAffordanceState) => void
 }) {
   const [activeDragAxis, setActiveDragAxis] =
     useState<GridGapRect['axis'] | null>(null)
   const [gapRects, setGapRects] = useState<GridGapRect[]>([])
   const [trackRects, setTrackRects] = useState<GridOverlayRect[]>([])
   const [isGapHovered, setIsGapHovered] = useState(false)
-  const context = getFigmaCloneDomLayoutContext(selectedNodeId)
-  const style = getFigmaCloneDomEditStyle(state, selectedNodeId)
+  const context = adapter.getLayoutContext(selectedNodeId)
+  const style = adapter.getStyle(state, selectedNodeId)
 
   useLayoutEffect(() => {
     if (!context.showGridLayout) {
@@ -70,7 +76,7 @@ export function FigmaCloneDomGridOverlay({
       return
     }
 
-    const measurement = measureFigmaCloneGrid({
+    const measurement = measureDomEditGrid({
       shell: shellRef.current,
       target,
       viewport,
@@ -124,7 +130,7 @@ export function FigmaCloneDomGridOverlay({
         property: 'gap' as const,
       }
     : baseAffordanceState
-  const visibility = getFigmaCloneDomOverlayVisibility({
+  const visibility = getDomEditOverlayVisibility({
     affordanceState,
     context,
   })
@@ -144,6 +150,7 @@ export function FigmaCloneDomGridOverlay({
     source.setPointerCapture(pointerId)
     setActiveDragAxis(gap.axis)
     setIsGapHovered(true)
+    onAffordanceStateChange({ mode: 'drag-property', property: 'gap' })
     event.preventDefault()
     event.stopPropagation()
 
@@ -154,7 +161,7 @@ export function FigmaCloneDomGridOverlay({
       onChange(
         selectedNodeId,
         'gap',
-        resolveFigmaCloneGridGapDragValue(
+        resolveDomEditGridGapDragValue(
           start.gap + (gap.axis === 'column' ? dx : dy),
           moveEvent,
         ),
@@ -166,6 +173,7 @@ export function FigmaCloneDomGridOverlay({
       }
       setActiveDragAxis(null)
       setIsGapHovered(false)
+      onAffordanceStateChange({ mode: 'idle' })
       window.removeEventListener('pointermove', handleMove)
       window.removeEventListener('pointercancel', handleEnd)
       window.removeEventListener('pointerup', handleEnd)
@@ -182,7 +190,7 @@ export function FigmaCloneDomGridOverlay({
         <span
           key={`${index}:${track.x}:${track.y}`}
           className="figma-grid-track"
-          style={createFigmaCloneDomOverlayRectStyle(track)}
+          style={createDomEditOverlayRectStyle(track)}
         />
       )) : null}
       {visibility.gridGapHitTargets ? gapRects.map((gap, index) => (
@@ -194,7 +202,7 @@ export function FigmaCloneDomGridOverlay({
             `figma-grid-gap--${gap.axis}`,
             !visibility.gridGapVisuals ? 'figma-grid-gap--empty' : '',
           ].filter(Boolean).join(' ')}
-          style={createFigmaCloneDomOverlayRectStyle(gap)}
+          style={createDomEditOverlayRectStyle(gap)}
           title="Grid gap"
           type="button"
           onPointerDown={(event) => startGapDrag(event, gap)}
@@ -215,14 +223,14 @@ export function FigmaCloneDomGridOverlay({
   )
 }
 
-function measureFigmaCloneGrid({
+function measureDomEditGrid({
   shell,
   target,
   viewport,
 }: {
   shell: HTMLElement | null
   target: HTMLElement
-  viewport: Viewport
+  viewport: DomEditViewport
 }) {
   if (!shell || target.children.length < 2) {
     return {
@@ -233,7 +241,7 @@ function measureFigmaCloneGrid({
 
   const shellRect = shell.getBoundingClientRect()
   const targetRect = target.getBoundingClientRect()
-  const targetWorldRect = measureFigmaCloneGridWorldRect({
+  const targetWorldRect = measureDomEditGridWorldRect({
     elementRect: targetRect,
     shellRect,
     viewport,
@@ -241,7 +249,7 @@ function measureFigmaCloneGrid({
   const tracks = Array.from(target.children)
     .map((child) => child.getBoundingClientRect())
     .filter((childRect) => childRect.width > 0 && childRect.height > 0)
-    .map((childRect) => measureFigmaCloneGridWorldRect({
+    .map((childRect) => measureDomEditGridWorldRect({
       elementRect: childRect,
       shellRect,
       viewport,
@@ -249,14 +257,14 @@ function measureFigmaCloneGrid({
 
   return {
     gaps: [
-      ...measureFigmaCloneGridColumnGaps(tracks, targetWorldRect),
-      ...measureFigmaCloneGridRowGaps(tracks, targetWorldRect),
+      ...measureDomEditGridColumnGaps(tracks, targetWorldRect),
+      ...measureDomEditGridRowGaps(tracks, targetWorldRect),
     ],
     tracks,
   }
 }
 
-function measureFigmaCloneGridColumnGaps(
+function measureDomEditGridColumnGaps(
   tracks: GridOverlayRect[],
   targetRect: GridOverlayRect,
 ): GridGapRect[] {
@@ -278,7 +286,7 @@ function measureFigmaCloneGridColumnGaps(
       h: height,
       w: gapWidth,
       x: first.x + first.w,
-      y: clampFigmaCloneDomOverlayPosition(
+      y: clampDomEditOverlayPosition(
         top,
         targetRect.y,
         targetRect.y + targetRect.h - height,
@@ -287,7 +295,7 @@ function measureFigmaCloneGridColumnGaps(
   })
 }
 
-function measureFigmaCloneGridRowGaps(
+function measureDomEditGridRowGaps(
   tracks: GridOverlayRect[],
   targetRect: GridOverlayRect,
 ): GridGapRect[] {
@@ -308,7 +316,7 @@ function measureFigmaCloneGridRowGaps(
       axis: 'row',
       h: gapHeight,
       w: width,
-      x: clampFigmaCloneDomOverlayPosition(
+      x: clampDomEditOverlayPosition(
         left,
         targetRect.x,
         targetRect.x + targetRect.w - width,
@@ -318,16 +326,16 @@ function measureFigmaCloneGridRowGaps(
   })
 }
 
-function measureFigmaCloneGridWorldRect({
+function measureDomEditGridWorldRect({
   elementRect,
   shellRect,
   viewport,
 }: {
   elementRect: DOMRect
   shellRect: DOMRect
-  viewport: Viewport
+  viewport: DomEditViewport
 }): GridOverlayRect {
-  const rect = getFigmaCloneDomWorldOverlayRect({
+  const rect = getDomEditWorldOverlayRect({
     elementRect,
     shellRect,
     viewport,
@@ -341,9 +349,9 @@ function measureFigmaCloneGridWorldRect({
   }
 }
 
-function resolveFigmaCloneGridGapDragValue(
+function resolveDomEditGridGapDragValue(
   value: number,
   event: globalThis.PointerEvent,
 ) {
-  return resolveFigmaCloneSpacingDragValue(value, event)
+  return resolveDomEditSpacingDragValue(value, event)
 }

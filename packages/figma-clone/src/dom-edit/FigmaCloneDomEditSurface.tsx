@@ -4,6 +4,7 @@ import {
   type KeyboardEvent,
   type MouseEvent,
 } from 'react'
+import { isDomEditCanvasPanTarget } from '@interactive-os/dom-edit-affordance/canvas'
 import {
   type FigmaCloneSectionViewport,
 } from '../figmaCloneCanvas'
@@ -21,10 +22,10 @@ import {
   type FigmaCloneDomNodeId,
   type FigmaCloneDomTextState,
 } from './FigmaCloneDomEditModel'
-import { isFigmaCloneDomCanvasPanTarget } from './FigmaCloneDomCanvasPointer'
 
 export function FigmaCloneDomEditSurface({
   isSectionSelected,
+  rootId,
   sectionViewport,
   selectedNodeId,
   state,
@@ -34,6 +35,7 @@ export function FigmaCloneDomEditSurface({
   onChangeText,
 }: {
   isSectionSelected: boolean
+  rootId: FigmaCloneDomNodeId
   sectionViewport: FigmaCloneSectionViewport
   selectedNodeId: FigmaCloneDomNodeId | null
   state: FigmaCloneDomEditState
@@ -42,9 +44,13 @@ export function FigmaCloneDomEditSurface({
   onSelectNode: (nodeId: FigmaCloneDomNodeId) => void
   onChangeText: (nodeId: FigmaCloneDomNodeId, value: string) => void
 }) {
-  const activeRootId = getFigmaCloneDomRootId(selectedNodeId)
+  const selectedNodeIdInRoot =
+    selectedNodeId && getFigmaCloneDomRootId(selectedNodeId) === rootId
+      ? selectedNodeId
+      : null
+  const isMockFrame = sectionViewport.frameMode === 'mock'
   const shouldPassThroughCanvasEvent = (target: EventTarget | null) =>
-    isFigmaCloneDomCanvasPanTarget(target) ||
+    isDomEditCanvasPanTarget(target) ||
     (
       target instanceof Element &&
       Boolean(target.closest('[data-figma-dom-editing="true"]'))
@@ -57,7 +63,7 @@ export function FigmaCloneDomEditSurface({
     const target = resolveFigmaCloneDomClickTarget({
       exactTarget: event.metaKey || event.ctrlKey,
       root: event.currentTarget,
-      selectedNodeId,
+      selectedNodeId: selectedNodeIdInRoot,
       target: event.target,
     })
 
@@ -80,7 +86,7 @@ export function FigmaCloneDomEditSurface({
     const target = resolveFigmaCloneDomClickTarget({
       exactTarget: true,
       root: event.currentTarget,
-      selectedNodeId,
+      selectedNodeId: selectedNodeIdInRoot,
       target: event.target,
     })
 
@@ -88,7 +94,7 @@ export function FigmaCloneDomEditSurface({
       if (!target) {
         event.preventDefault()
         event.stopPropagation()
-        onSelectNode(getFigmaCloneDomRootId(selectedNodeId))
+        onSelectSection()
       }
 
       return
@@ -108,28 +114,50 @@ export function FigmaCloneDomEditSurface({
       onDoubleClickCapture={handleDoubleClickCapture}
     >
       <div
-        className="figma-dom-browser"
-        data-figma-section="dom"
+        className="figma-dom-section-shell"
         data-section-selected={isSectionSelected ? 'true' : 'false'}
+        data-section-mode={sectionViewport.frameMode}
         style={{
-          height: sectionViewport.h,
-          overflow: sectionViewport.overflow === 'scroll' ? 'auto' : 'hidden',
           width: sectionViewport.w,
         }}
       >
-        <div className="figma-dom-document">
-          {activeRootId === 'workspacePage'
-            ? renderWorkspacePage(state, textState, selectedNodeId, onChangeText)
-            : null}
-          {activeRootId === 'card'
-            ? renderProfileCard(state, textState, selectedNodeId, onChangeText)
-            : null}
-          {activeRootId === 'toolbar'
-            ? renderToolbar(state, textState, selectedNodeId, onChangeText)
-            : null}
-          {activeRootId === 'notice'
-            ? renderNotice(state, textState, selectedNodeId, onChangeText)
-            : null}
+        {isMockFrame ? (
+          <div className="figma-dom-section-chrome" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+            <strong>{sectionViewport.w} × {sectionViewport.h}</strong>
+          </div>
+        ) : null}
+        <div
+          className="figma-dom-browser"
+          data-canvas-wheel-passthrough={isMockFrame ? 'true' : undefined}
+          data-figma-section="dom"
+          style={{
+            height: isMockFrame ? sectionViewport.h : undefined,
+            overflow: isMockFrame
+              ? sectionViewport.overflow === 'scroll' ? 'auto' : 'hidden'
+              : 'visible',
+            width: sectionViewport.w,
+          }}
+        >
+          <div className="figma-dom-document">
+            {rootId === 'workspacePage'
+              ? renderWorkspacePage(state, textState, selectedNodeIdInRoot, onChangeText)
+              : null}
+            {rootId === 'homePage'
+              ? renderEditorialHomePage(state, textState, selectedNodeIdInRoot, onChangeText)
+              : null}
+            {rootId === 'card'
+              ? renderProfileCard(state, textState, selectedNodeIdInRoot, onChangeText)
+              : null}
+            {rootId === 'toolbar'
+              ? renderToolbar(state, textState, selectedNodeIdInRoot, onChangeText)
+              : null}
+            {rootId === 'notice'
+              ? renderNotice(state, textState, selectedNodeIdInRoot, onChangeText)
+              : null}
+          </div>
         </div>
       </div>
     </div>
@@ -678,6 +706,647 @@ function renderWorkspaceActivity(
   )
 }
 
+function renderEditorialHomePage(
+  state: FigmaCloneDomEditState,
+  textState: FigmaCloneDomTextState,
+  selectedNodeId: FigmaCloneDomNodeId | null,
+  onChangeText: (nodeId: FigmaCloneDomNodeId, value: string) => void,
+) {
+  return (
+    <section
+      className="figma-dom-home"
+      {...createDomNodeProps(state, selectedNodeId, 'homePage')}
+    >
+      <header
+        className="figma-dom-home__header"
+        {...createDomNodeProps(state, selectedNodeId, 'homeHeader')}
+      >
+        <div
+          className="figma-dom-home__brand"
+          {...createDomNodeProps(state, selectedNodeId, 'homeBrand')}
+        >
+          <div
+            className="figma-dom-home__brand-mark"
+            {...createEditableDomNodeProps(
+              state,
+              textState,
+              selectedNodeId,
+              'homeBrandMark',
+              onChangeText,
+            )}
+          >
+            {getFigmaCloneDomText(textState, 'homeBrandMark')}
+          </div>
+          <strong
+            className="figma-dom-home__brand-text"
+            {...createEditableDomNodeProps(
+              state,
+              textState,
+              selectedNodeId,
+              'homeBrandText',
+              onChangeText,
+            )}
+          >
+            {getFigmaCloneDomText(textState, 'homeBrandText')}
+          </strong>
+        </div>
+
+        <nav
+          className="figma-dom-home__nav"
+          {...createDomNodeProps(state, selectedNodeId, 'homeNav')}
+        >
+          {renderHomeButton(
+            state,
+            textState,
+            selectedNodeId,
+            'homeNavEssays',
+            'figma-dom-home__nav-item figma-dom-home__nav-item--active',
+            onChangeText,
+          )}
+          {renderHomeButton(
+            state,
+            textState,
+            selectedNodeId,
+            'homeNavMethods',
+            'figma-dom-home__nav-item',
+            onChangeText,
+          )}
+          {renderHomeButton(
+            state,
+            textState,
+            selectedNodeId,
+            'homeNavArchive',
+            'figma-dom-home__nav-item',
+            onChangeText,
+          )}
+        </nav>
+
+        <div
+          className="figma-dom-home__subscribe"
+          {...createDomNodeProps(state, selectedNodeId, 'homeSubscribe')}
+        >
+          <strong
+            {...createEditableDomNodeProps(
+              state,
+              textState,
+              selectedNodeId,
+              'homeSubscribeLabel',
+              onChangeText,
+            )}
+          >
+            {getFigmaCloneDomText(textState, 'homeSubscribeLabel')}
+          </strong>
+          <span
+            {...createEditableDomNodeProps(
+              state,
+              textState,
+              selectedNodeId,
+              'homeSubscribeNote',
+              onChangeText,
+            )}
+          >
+            {getFigmaCloneDomText(textState, 'homeSubscribeNote')}
+          </span>
+        </div>
+      </header>
+
+      <main
+        className="figma-dom-home__main"
+        {...createDomNodeProps(state, selectedNodeId, 'homeMain')}
+      >
+        <section
+          className="figma-dom-home__issue"
+          {...createDomNodeProps(state, selectedNodeId, 'homeIssueRail')}
+        >
+          <span
+            {...createEditableDomNodeProps(
+              state,
+              textState,
+              selectedNodeId,
+              'homeIssueKicker',
+              onChangeText,
+            )}
+          >
+            {getFigmaCloneDomText(textState, 'homeIssueKicker')}
+          </span>
+          <div
+            {...createEditableDomNodeProps(
+              state,
+              textState,
+              selectedNodeId,
+              'homeIssueTitle',
+              onChangeText,
+            )}
+          >
+            {getFigmaCloneDomText(textState, 'homeIssueTitle')}
+          </div>
+          <button
+            className="figma-dom-home__time"
+            {...createEditableDomNodeProps(
+              state,
+              textState,
+              selectedNodeId,
+              'homeIssueTime',
+              onChangeText,
+            )}
+            type="button"
+          >
+            {getFigmaCloneDomText(textState, 'homeIssueTime')}
+          </button>
+        </section>
+
+        <section
+          className="figma-dom-home__hero"
+          {...createDomNodeProps(state, selectedNodeId, 'homeHero')}
+        >
+          <div
+            className="figma-dom-home__hero-copy"
+            {...createDomNodeProps(state, selectedNodeId, 'homeHeroCopy')}
+          >
+            <h1
+              {...createEditableDomNodeProps(
+                state,
+                textState,
+                selectedNodeId,
+                'homeHeroTitle',
+                onChangeText,
+              )}
+            >
+              {getFigmaCloneDomText(textState, 'homeHeroTitle')}
+            </h1>
+            <p
+              {...createEditableDomNodeProps(
+                state,
+                textState,
+                selectedNodeId,
+                'homeHeroText',
+                onChangeText,
+              )}
+            >
+              {getFigmaCloneDomText(textState, 'homeHeroText')}
+            </p>
+          </div>
+          <div
+            className="figma-dom-home__hero-actions"
+            {...createDomNodeProps(state, selectedNodeId, 'homeHeroActions')}
+          >
+            {renderHomeButton(
+              state,
+              textState,
+              selectedNodeId,
+              'homePrimaryAction',
+              'figma-dom-home__primary',
+              onChangeText,
+            )}
+            {renderHomeButton(
+              state,
+              textState,
+              selectedNodeId,
+              'homeSecondaryAction',
+              'figma-dom-home__secondary',
+              onChangeText,
+            )}
+          </div>
+        </section>
+
+        <section
+          className="figma-dom-home__meta"
+          {...createDomNodeProps(state, selectedNodeId, 'homeMeta')}
+        >
+          {renderHomeMetaItem(
+            state,
+            textState,
+            selectedNodeId,
+            'homeByline',
+            'homeBylineLabel',
+            'homeBylineValue',
+            'homeBylineNote',
+            onChangeText,
+          )}
+          {renderHomeMetaItem(
+            state,
+            textState,
+            selectedNodeId,
+            'homeCategory',
+            'homeCategoryLabel',
+            'homeCategoryValue',
+            'homeCategoryNote',
+            onChangeText,
+          )}
+          {renderHomeMetaItem(
+            state,
+            textState,
+            selectedNodeId,
+            'homeReadTime',
+            'homeReadTimeLabel',
+            'homeReadTimeValue',
+            'homeReadTimeNote',
+            onChangeText,
+          )}
+        </section>
+
+        <section
+          className="figma-dom-home__article"
+          {...createDomNodeProps(state, selectedNodeId, 'homeArticle')}
+        >
+          <article
+            className="figma-dom-home__essay"
+            {...createDomNodeProps(state, selectedNodeId, 'homeEssay')}
+          >
+            <h2
+              {...createEditableDomNodeProps(
+                state,
+                textState,
+                selectedNodeId,
+                'homeEssayHeading',
+                onChangeText,
+              )}
+            >
+              {getFigmaCloneDomText(textState, 'homeEssayHeading')}
+            </h2>
+            <div
+              className="figma-dom-home__chapters"
+              {...createDomNodeProps(state, selectedNodeId, 'homeChapterList')}
+            >
+              {renderHomeChapter(
+                state,
+                textState,
+                selectedNodeId,
+                'homeChapterOne',
+                'homeChapterOneTitle',
+                'homeChapterOneNumber',
+                onChangeText,
+              )}
+              {renderHomeChapter(
+                state,
+                textState,
+                selectedNodeId,
+                'homeChapterTwo',
+                'homeChapterTwoTitle',
+                'homeChapterTwoNumber',
+                onChangeText,
+              )}
+              {renderHomeChapter(
+                state,
+                textState,
+                selectedNodeId,
+                'homeChapterThree',
+                'homeChapterThreeTitle',
+                'homeChapterThreeNumber',
+                onChangeText,
+              )}
+            </div>
+          </article>
+
+          <aside
+            className="figma-dom-home__quote"
+            {...createDomNodeProps(state, selectedNodeId, 'homeQuote')}
+          >
+            <h2
+              {...createEditableDomNodeProps(
+                state,
+                textState,
+                selectedNodeId,
+                'homeQuoteHeading',
+                onChangeText,
+              )}
+            >
+              {getFigmaCloneDomText(textState, 'homeQuoteHeading')}
+            </h2>
+            <div
+              className="figma-dom-home__quote-list"
+              {...createDomNodeProps(state, selectedNodeId, 'homeQuoteList')}
+            >
+              {renderHomeQuoteLine(
+                state,
+                textState,
+                selectedNodeId,
+                'homeQuoteOne',
+                'homeQuoteOneText',
+                onChangeText,
+              )}
+              {renderHomeQuoteLine(
+                state,
+                textState,
+                selectedNodeId,
+                'homeQuoteTwo',
+                'homeQuoteTwoText',
+                onChangeText,
+              )}
+              {renderHomeQuoteLine(
+                state,
+                textState,
+                selectedNodeId,
+                'homeQuoteThree',
+                'homeQuoteThreeText',
+                onChangeText,
+              )}
+            </div>
+          </aside>
+        </section>
+
+        <section
+          className="figma-dom-home__dispatches"
+          {...createDomNodeProps(state, selectedNodeId, 'homeDispatches')}
+        >
+          <h2
+            {...createEditableDomNodeProps(
+              state,
+              textState,
+              selectedNodeId,
+              'homeDispatchHeading',
+              onChangeText,
+            )}
+          >
+            {getFigmaCloneDomText(textState, 'homeDispatchHeading')}
+          </h2>
+          <div
+            className="figma-dom-home__dispatch-grid"
+            {...createDomNodeProps(state, selectedNodeId, 'homeDispatchGrid')}
+          >
+            {renderHomeDispatch(
+              state,
+              textState,
+              selectedNodeId,
+              'homeDispatchOne',
+              'homeDispatchOneTitle',
+              'homeDispatchOneText',
+              onChangeText,
+            )}
+            {renderHomeDispatch(
+              state,
+              textState,
+              selectedNodeId,
+              'homeDispatchTwo',
+              'homeDispatchTwoTitle',
+              'homeDispatchTwoText',
+              onChangeText,
+            )}
+            {renderHomeDispatch(
+              state,
+              textState,
+              selectedNodeId,
+              'homeDispatchThree',
+              'homeDispatchThreeTitle',
+              'homeDispatchThreeText',
+              onChangeText,
+            )}
+          </div>
+        </section>
+
+        <section
+          className="figma-dom-home__newsletter"
+          {...createDomNodeProps(state, selectedNodeId, 'homeNewsletter')}
+        >
+          <h2
+            {...createEditableDomNodeProps(
+              state,
+              textState,
+              selectedNodeId,
+              'homeNewsletterHeading',
+              onChangeText,
+            )}
+          >
+            {getFigmaCloneDomText(textState, 'homeNewsletterHeading')}
+          </h2>
+          <p
+            {...createEditableDomNodeProps(
+              state,
+              textState,
+              selectedNodeId,
+              'homeNewsletterText',
+              onChangeText,
+            )}
+          >
+            {getFigmaCloneDomText(textState, 'homeNewsletterText')}
+          </p>
+          {renderHomeButton(
+            state,
+            textState,
+            selectedNodeId,
+            'homeNewsletterAction',
+            'figma-dom-home__newsletter-action',
+            onChangeText,
+          )}
+        </section>
+
+        <footer
+          className="figma-dom-home__footer"
+          {...createDomNodeProps(state, selectedNodeId, 'homeFooter')}
+        >
+          <strong
+            {...createEditableDomNodeProps(
+              state,
+              textState,
+              selectedNodeId,
+              'homeFooterBrand',
+              onChangeText,
+            )}
+          >
+            {getFigmaCloneDomText(textState, 'homeFooterBrand')}
+          </strong>
+          <span
+            {...createEditableDomNodeProps(
+              state,
+              textState,
+              selectedNodeId,
+              'homeFooterNote',
+              onChangeText,
+            )}
+          >
+            {getFigmaCloneDomText(textState, 'homeFooterNote')}
+          </span>
+        </footer>
+      </main>
+    </section>
+  )
+}
+
+function renderHomeButton(
+  state: FigmaCloneDomEditState,
+  textState: FigmaCloneDomTextState,
+  selectedNodeId: FigmaCloneDomNodeId | null,
+  nodeId: FigmaCloneDomNodeId,
+  className: string,
+  onChangeText: (nodeId: FigmaCloneDomNodeId, value: string) => void,
+) {
+  return (
+    <button
+      className={className}
+      {...createEditableDomNodeProps(
+        state,
+        textState,
+        selectedNodeId,
+        nodeId,
+        onChangeText,
+      )}
+      type="button"
+    >
+      {getFigmaCloneDomText(textState, nodeId)}
+    </button>
+  )
+}
+
+function renderHomeMetaItem(
+  state: FigmaCloneDomEditState,
+  textState: FigmaCloneDomTextState,
+  selectedNodeId: FigmaCloneDomNodeId | null,
+  nodeId: FigmaCloneDomNodeId,
+  labelNodeId: FigmaCloneDomNodeId,
+  valueNodeId: FigmaCloneDomNodeId,
+  noteNodeId: FigmaCloneDomNodeId,
+  onChangeText: (nodeId: FigmaCloneDomNodeId, value: string) => void,
+) {
+  return (
+    <article
+      className="figma-dom-home__meta-item"
+      {...createDomNodeProps(state, selectedNodeId, nodeId)}
+    >
+      <span
+        {...createEditableDomNodeProps(
+          state,
+          textState,
+          selectedNodeId,
+          labelNodeId,
+          onChangeText,
+        )}
+      >
+        {getFigmaCloneDomText(textState, labelNodeId)}
+      </span>
+      <strong
+        {...createEditableDomNodeProps(
+          state,
+          textState,
+          selectedNodeId,
+          valueNodeId,
+          onChangeText,
+        )}
+      >
+        {getFigmaCloneDomText(textState, valueNodeId)}
+      </strong>
+      <em
+        {...createEditableDomNodeProps(
+          state,
+          textState,
+          selectedNodeId,
+          noteNodeId,
+          onChangeText,
+        )}
+      >
+        {getFigmaCloneDomText(textState, noteNodeId)}
+      </em>
+    </article>
+  )
+}
+
+function renderHomeChapter(
+  state: FigmaCloneDomEditState,
+  textState: FigmaCloneDomTextState,
+  selectedNodeId: FigmaCloneDomNodeId | null,
+  nodeId: FigmaCloneDomNodeId,
+  titleNodeId: FigmaCloneDomNodeId,
+  numberNodeId: FigmaCloneDomNodeId,
+  onChangeText: (nodeId: FigmaCloneDomNodeId, value: string) => void,
+) {
+  return (
+    <article
+      className="figma-dom-home__chapter"
+      {...createDomNodeProps(state, selectedNodeId, nodeId)}
+    >
+      <strong
+        {...createEditableDomNodeProps(
+          state,
+          textState,
+          selectedNodeId,
+          titleNodeId,
+          onChangeText,
+        )}
+      >
+        {getFigmaCloneDomText(textState, titleNodeId)}
+      </strong>
+      <span
+        {...createEditableDomNodeProps(
+          state,
+          textState,
+          selectedNodeId,
+          numberNodeId,
+          onChangeText,
+        )}
+      >
+        {getFigmaCloneDomText(textState, numberNodeId)}
+      </span>
+    </article>
+  )
+}
+
+function renderHomeQuoteLine(
+  state: FigmaCloneDomEditState,
+  textState: FigmaCloneDomTextState,
+  selectedNodeId: FigmaCloneDomNodeId | null,
+  nodeId: FigmaCloneDomNodeId,
+  textNodeId: FigmaCloneDomNodeId,
+  onChangeText: (nodeId: FigmaCloneDomNodeId, value: string) => void,
+) {
+  return (
+    <article
+      className="figma-dom-home__quote-line"
+      {...createDomNodeProps(state, selectedNodeId, nodeId)}
+    >
+      <span
+        {...createEditableDomNodeProps(
+          state,
+          textState,
+          selectedNodeId,
+          textNodeId,
+          onChangeText,
+        )}
+      >
+        {getFigmaCloneDomText(textState, textNodeId)}
+      </span>
+    </article>
+  )
+}
+
+function renderHomeDispatch(
+  state: FigmaCloneDomEditState,
+  textState: FigmaCloneDomTextState,
+  selectedNodeId: FigmaCloneDomNodeId | null,
+  nodeId: FigmaCloneDomNodeId,
+  titleNodeId: FigmaCloneDomNodeId,
+  textNodeId: FigmaCloneDomNodeId,
+  onChangeText: (nodeId: FigmaCloneDomNodeId, value: string) => void,
+) {
+  return (
+    <article
+      className="figma-dom-home__dispatch"
+      {...createDomNodeProps(state, selectedNodeId, nodeId)}
+    >
+      <strong
+        {...createEditableDomNodeProps(
+          state,
+          textState,
+          selectedNodeId,
+          titleNodeId,
+          onChangeText,
+        )}
+      >
+        {getFigmaCloneDomText(textState, titleNodeId)}
+      </strong>
+      <p
+        {...createEditableDomNodeProps(
+          state,
+          textState,
+          selectedNodeId,
+          textNodeId,
+          onChangeText,
+        )}
+      >
+        {getFigmaCloneDomText(textState, textNodeId)}
+      </p>
+    </article>
+  )
+}
+
 function renderProfileCard(
   state: FigmaCloneDomEditState,
   textState: FigmaCloneDomTextState,
@@ -947,6 +1616,7 @@ function createDomNodeProps(
   nodeId: FigmaCloneDomNodeId,
 ) {
   return {
+    'data-dom-edit-node': nodeId,
     'data-figma-dom-node': nodeId,
     'data-selected': selectedNodeId === nodeId ? 'true' : 'false',
     style: createNodeStyle(state, nodeId),
@@ -1061,7 +1731,10 @@ function createNodeStyle(
     minWidth: style.widthMode === 'fill' ? 0 : undefined,
     opacity: style.opacity / 100,
     order: style.order,
-    padding: style.padding,
+    paddingBottom: style.paddingBottom,
+    paddingLeft: style.paddingLeft,
+    paddingRight: style.paddingRight,
+    paddingTop: style.paddingTop,
     width: fillsParentRow
       ? 0
       : mapFigmaCloneAutoLayoutSize(style.widthMode, style.w),

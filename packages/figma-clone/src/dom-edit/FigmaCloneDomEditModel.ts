@@ -1,3 +1,31 @@
+import {
+  createDomEditUniformPaddingSides,
+  canDomEditFillParent,
+  DOM_EDIT_PADDING_SIDE_FIELDS,
+  getDomEditPaddingSides,
+  getDomEditToggledAxisSizeMode,
+  getDomEditUniformPadding,
+  type DomEditAutoLayout,
+  type DomEditAutoLayoutAlign,
+  type DomEditAutoLayoutDirection,
+  type DomEditAutoLayoutDistribution,
+  type DomEditAutoLayoutField,
+  type DomEditAutoLayoutSizeMode,
+  type DomEditContentType,
+  type DomEditDisplay,
+  type DomEditField,
+  type DomEditLayoutContext,
+  type DomEditModelAdapter,
+  type DomEditNode,
+  type DomEditNodeState,
+  type DomEditPaddingSides,
+  type DomEditPaddingSide,
+  type DomEditPosition,
+  type DomEditState,
+  type DomEditStyle,
+  type DomEditTextState,
+} from '@interactive-os/dom-edit-affordance'
+
 export type FigmaCloneDomNodeId =
   | 'workspacePage'
   | 'workspaceSidebar'
@@ -58,6 +86,84 @@ export type FigmaCloneDomNodeId =
   | 'workspaceActivityTwoText'
   | 'workspaceActivityThree'
   | 'workspaceActivityThreeText'
+  | 'homePage'
+  | 'homeHeader'
+  | 'homeBrand'
+  | 'homeBrandMark'
+  | 'homeBrandText'
+  | 'homeNav'
+  | 'homeNavEssays'
+  | 'homeNavMethods'
+  | 'homeNavArchive'
+  | 'homeSubscribe'
+  | 'homeSubscribeLabel'
+  | 'homeSubscribeNote'
+  | 'homeMain'
+  | 'homeIssueRail'
+  | 'homeIssueKicker'
+  | 'homeIssueTitle'
+  | 'homeIssueTime'
+  | 'homeHero'
+  | 'homeHeroCopy'
+  | 'homeHeroTitle'
+  | 'homeHeroText'
+  | 'homeHeroActions'
+  | 'homePrimaryAction'
+  | 'homeSecondaryAction'
+  | 'homeMeta'
+  | 'homeByline'
+  | 'homeBylineLabel'
+  | 'homeBylineValue'
+  | 'homeBylineNote'
+  | 'homeCategory'
+  | 'homeCategoryLabel'
+  | 'homeCategoryValue'
+  | 'homeCategoryNote'
+  | 'homeReadTime'
+  | 'homeReadTimeLabel'
+  | 'homeReadTimeValue'
+  | 'homeReadTimeNote'
+  | 'homeArticle'
+  | 'homeEssay'
+  | 'homeEssayHeading'
+  | 'homeChapterList'
+  | 'homeChapterOne'
+  | 'homeChapterOneTitle'
+  | 'homeChapterOneNumber'
+  | 'homeChapterTwo'
+  | 'homeChapterTwoTitle'
+  | 'homeChapterTwoNumber'
+  | 'homeChapterThree'
+  | 'homeChapterThreeTitle'
+  | 'homeChapterThreeNumber'
+  | 'homeQuote'
+  | 'homeQuoteHeading'
+  | 'homeQuoteList'
+  | 'homeQuoteOne'
+  | 'homeQuoteOneText'
+  | 'homeQuoteTwo'
+  | 'homeQuoteTwoText'
+  | 'homeQuoteThree'
+  | 'homeQuoteThreeText'
+  | 'homeDispatches'
+  | 'homeDispatchHeading'
+  | 'homeDispatchGrid'
+  | 'homeDispatchOne'
+  | 'homeDispatchOneTitle'
+  | 'homeDispatchOneText'
+  | 'homeDispatchTwo'
+  | 'homeDispatchTwoTitle'
+  | 'homeDispatchTwoText'
+  | 'homeDispatchThree'
+  | 'homeDispatchThreeTitle'
+  | 'homeDispatchThreeText'
+  | 'homeNewsletter'
+  | 'homeNewsletterHeading'
+  | 'homeNewsletterText'
+  | 'homeNewsletterAction'
+  | 'homeFooter'
+  | 'homeFooterBrand'
+  | 'homeFooterNote'
   | 'card'
   | 'header'
   | 'avatar'
@@ -85,87 +191,24 @@ export type FigmaCloneDomNodeId =
   | 'toolbarButton'
   | 'toolbarTitle'
 
-export type FigmaCloneDomNode = {
-  children?: readonly FigmaCloneDomNode[]
-  id: FigmaCloneDomNodeId
-  label: string
-}
-
-export type FigmaCloneDomContentType = 'container' | 'control' | 'text'
-export type FigmaCloneDomDisplay = 'block' | 'flex' | 'grid' | 'inline'
-export type FigmaCloneDomPosition = 'absolute' | 'static'
-
-export type FigmaCloneDomLayoutContext = {
-  contentType: FigmaCloneDomContentType
-  display: FigmaCloneDomDisplay
-  hasChildren: boolean
-  label: string
-  nodeId: FigmaCloneDomNodeId
-  parentDisplay: FigmaCloneDomDisplay | null
-  parentId: FigmaCloneDomNodeId | null
-  position: FigmaCloneDomPosition
-  showBox: boolean
-  showContent: boolean
-  showFlexLayout: boolean
-  showGeometry: boolean
-  showGridLayout: boolean
-  showParentParticipation: boolean
-  showSelfLayout: boolean
-}
-
-export type FigmaCloneDomEditField =
-  | 'gap'
-  | 'h'
-  | 'margin'
-  | 'order'
-  | 'opacity'
-  | 'padding'
-  | 'radius'
-  | 'rotation'
-  | 'w'
-  | 'x'
-  | 'y'
-
-export type FigmaCloneDomAutoLayoutField =
-  | 'align'
-  | 'alignSelf'
-  | 'direction'
-  | 'distribution'
-  | 'heightMode'
-  | 'widthMode'
-
-export type FigmaCloneDomAutoLayoutDirection = 'column' | 'row'
-export type FigmaCloneDomAutoLayoutAlign =
-  | 'auto'
-  | 'center'
-  | 'end'
-  | 'start'
-  | 'stretch'
+export type FigmaCloneDomNode = DomEditNode<FigmaCloneDomNodeId>
+export type FigmaCloneDomContentType = DomEditContentType
+export type FigmaCloneDomDisplay = DomEditDisplay
+export type FigmaCloneDomPosition = DomEditPosition
+export type FigmaCloneDomLayoutContext =
+  DomEditLayoutContext<FigmaCloneDomNodeId>
+export type FigmaCloneDomEditField = DomEditField
+export type FigmaCloneDomAutoLayoutField = DomEditAutoLayoutField
+export type FigmaCloneDomAutoLayoutDirection = DomEditAutoLayoutDirection
+export type FigmaCloneDomAutoLayoutAlign = DomEditAutoLayoutAlign
 export type FigmaCloneDomAutoLayoutDistribution =
-  | 'packed'
-  | 'space-between'
-export type FigmaCloneDomAutoLayoutSizeMode =
-  | 'fill'
-  | 'fixed'
-  | 'hug'
-
-export type FigmaCloneDomEditStyle = Record<FigmaCloneDomEditField, number>
-export type FigmaCloneDomAutoLayout = {
-  align: FigmaCloneDomAutoLayoutAlign
-  alignSelf: FigmaCloneDomAutoLayoutAlign
-  direction: FigmaCloneDomAutoLayoutDirection
-  distribution: FigmaCloneDomAutoLayoutDistribution
-  heightMode: FigmaCloneDomAutoLayoutSizeMode
-  widthMode: FigmaCloneDomAutoLayoutSizeMode
-}
-export type FigmaCloneDomEditNodeState =
-  FigmaCloneDomEditStyle & FigmaCloneDomAutoLayout
-
-export type FigmaCloneDomEditState =
-  Record<FigmaCloneDomNodeId, FigmaCloneDomEditNodeState>
-
-export type FigmaCloneDomTextState =
-  Partial<Record<FigmaCloneDomNodeId, string>>
+  DomEditAutoLayoutDistribution
+export type FigmaCloneDomAutoLayoutSizeMode = DomEditAutoLayoutSizeMode
+export type FigmaCloneDomEditStyle = DomEditStyle
+export type FigmaCloneDomAutoLayout = DomEditAutoLayout
+export type FigmaCloneDomEditNodeState = DomEditNodeState
+export type FigmaCloneDomEditState = DomEditState<FigmaCloneDomNodeId>
+export type FigmaCloneDomTextState = DomEditTextState<FigmaCloneDomNodeId>
 
 const EMPTY_STYLE: FigmaCloneDomEditStyle = {
   gap: 0,
@@ -174,6 +217,10 @@ const EMPTY_STYLE: FigmaCloneDomEditStyle = {
   opacity: 100,
   order: 0,
   padding: 0,
+  paddingBottom: 0,
+  paddingLeft: 0,
+  paddingRight: 0,
+  paddingTop: 0,
   radius: 0,
   rotation: 0,
   w: 0,
@@ -402,6 +449,244 @@ export const FIGMA_CLONE_DOM_TREE: readonly FigmaCloneDomNode[] = [
     ],
   },
   {
+    id: 'homePage',
+    label: 'Editorial homepage',
+    children: [
+      {
+        id: 'homeHeader',
+        label: 'Header',
+        children: [
+          {
+            id: 'homeBrand',
+            label: 'Brand',
+            children: [
+              { id: 'homeBrandMark', label: 'Logo mark' },
+              { id: 'homeBrandText', label: 'Logo text' },
+            ],
+          },
+          {
+            id: 'homeNav',
+            label: 'Primary nav',
+            children: [
+              { id: 'homeNavEssays', label: 'Essays link' },
+              { id: 'homeNavMethods', label: 'Methods link' },
+              { id: 'homeNavArchive', label: 'Archive link' },
+            ],
+          },
+          {
+            id: 'homeSubscribe',
+            label: 'Subscribe CTA',
+            children: [
+              { id: 'homeSubscribeLabel', label: 'CTA label' },
+              { id: 'homeSubscribeNote', label: 'CTA note' },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'homeMain',
+        label: 'Page body',
+        children: [
+          {
+            id: 'homeIssueRail',
+            label: 'Issue rail',
+            children: [
+              { id: 'homeIssueKicker', label: 'Issue kicker' },
+              { id: 'homeIssueTitle', label: 'Issue title' },
+              { id: 'homeIssueTime', label: 'Read time' },
+            ],
+          },
+          {
+            id: 'homeHero',
+            label: 'Hero article',
+            children: [
+              {
+                id: 'homeHeroCopy',
+                label: 'Hero copy',
+                children: [
+                  { id: 'homeHeroTitle', label: 'Hero title' },
+                  { id: 'homeHeroText', label: 'Hero dek' },
+                ],
+              },
+              {
+                id: 'homeHeroActions',
+                label: 'Hero actions',
+                children: [
+                  { id: 'homePrimaryAction', label: 'Primary action' },
+                  { id: 'homeSecondaryAction', label: 'Secondary action' },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'homeMeta',
+            label: 'Article meta',
+            children: [
+              {
+                id: 'homeByline',
+                label: 'Byline',
+                children: [
+                  { id: 'homeBylineLabel', label: 'Byline label' },
+                  { id: 'homeBylineValue', label: 'Author name' },
+                  { id: 'homeBylineNote', label: 'Author note' },
+                ],
+              },
+              {
+                id: 'homeCategory',
+                label: 'Category',
+                children: [
+                  { id: 'homeCategoryLabel', label: 'Category label' },
+                  { id: 'homeCategoryValue', label: 'Category name' },
+                  { id: 'homeCategoryNote', label: 'Category note' },
+                ],
+              },
+              {
+                id: 'homeReadTime',
+                label: 'Reading time',
+                children: [
+                  { id: 'homeReadTimeLabel', label: 'Time label' },
+                  { id: 'homeReadTimeValue', label: 'Time value' },
+                  { id: 'homeReadTimeNote', label: 'Time note' },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'homeArticle',
+            label: 'Article preview',
+            children: [
+              {
+                id: 'homeEssay',
+                label: 'Essay body',
+                children: [
+                  { id: 'homeEssayHeading', label: 'Body heading' },
+                  {
+                    id: 'homeChapterList',
+                    label: 'Chapter list',
+                    children: [
+                      {
+                        id: 'homeChapterOne',
+                        label: 'Chapter 1',
+                        children: [
+                          { id: 'homeChapterOneTitle', label: 'Chapter title 1' },
+                          { id: 'homeChapterOneNumber', label: 'Chapter number 1' },
+                        ],
+                      },
+                      {
+                        id: 'homeChapterTwo',
+                        label: 'Chapter 2',
+                        children: [
+                          { id: 'homeChapterTwoTitle', label: 'Chapter title 2' },
+                          { id: 'homeChapterTwoNumber', label: 'Chapter number 2' },
+                        ],
+                      },
+                      {
+                        id: 'homeChapterThree',
+                        label: 'Chapter 3',
+                        children: [
+                          { id: 'homeChapterThreeTitle', label: 'Chapter title 3' },
+                          { id: 'homeChapterThreeNumber', label: 'Chapter number 3' },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+              {
+                id: 'homeQuote',
+                label: 'Pull quote',
+                children: [
+                  { id: 'homeQuoteHeading', label: 'Quote heading' },
+                  {
+                    id: 'homeQuoteList',
+                    label: 'Quote lines',
+                    children: [
+                      {
+                        id: 'homeQuoteOne',
+                        label: 'Quote line 1',
+                        children: [
+                          { id: 'homeQuoteOneText', label: 'Quote text 1' },
+                        ],
+                      },
+                      {
+                        id: 'homeQuoteTwo',
+                        label: 'Quote line 2',
+                        children: [
+                          { id: 'homeQuoteTwoText', label: 'Quote text 2' },
+                        ],
+                      },
+                      {
+                        id: 'homeQuoteThree',
+                        label: 'Quote line 3',
+                        children: [
+                          { id: 'homeQuoteThreeText', label: 'Quote text 3' },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'homeDispatches',
+            label: 'Dispatches',
+            children: [
+              { id: 'homeDispatchHeading', label: 'Dispatch heading' },
+              {
+                id: 'homeDispatchGrid',
+                label: 'Dispatch grid',
+                children: [
+                  {
+                    id: 'homeDispatchOne',
+                    label: 'Dispatch card 1',
+                    children: [
+                      { id: 'homeDispatchOneTitle', label: 'Dispatch title 1' },
+                      { id: 'homeDispatchOneText', label: 'Dispatch text 1' },
+                    ],
+                  },
+                  {
+                    id: 'homeDispatchTwo',
+                    label: 'Dispatch card 2',
+                    children: [
+                      { id: 'homeDispatchTwoTitle', label: 'Dispatch title 2' },
+                      { id: 'homeDispatchTwoText', label: 'Dispatch text 2' },
+                    ],
+                  },
+                  {
+                    id: 'homeDispatchThree',
+                    label: 'Dispatch card 3',
+                    children: [
+                      { id: 'homeDispatchThreeTitle', label: 'Dispatch title 3' },
+                      { id: 'homeDispatchThreeText', label: 'Dispatch text 3' },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'homeNewsletter',
+            label: 'Newsletter band',
+            children: [
+              { id: 'homeNewsletterHeading', label: 'Newsletter heading' },
+              { id: 'homeNewsletterText', label: 'Newsletter text' },
+              { id: 'homeNewsletterAction', label: 'Newsletter action' },
+            ],
+          },
+          {
+            id: 'homeFooter',
+            label: 'Footer',
+            children: [
+              { id: 'homeFooterBrand', label: 'Footer brand' },
+              { id: 'homeFooterNote', label: 'Footer note' },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  {
     id: 'card',
     label: 'Profile card',
     children: [
@@ -482,7 +767,9 @@ export const FIGMA_CLONE_DOM_TREE: readonly FigmaCloneDomNode[] = [
 export const FIGMA_CLONE_DOM_NODE_BY_ID =
   createFigmaCloneDomNodeMap(FIGMA_CLONE_DOM_TREE)
 
-const DEFAULT_STYLES: FigmaCloneDomEditState = {
+const DEFAULT_STYLES = mapFigmaCloneDomEditState(
+  normalizeFigmaCloneDomEditStyle,
+  {
   workspacePage: {
     ...EMPTY_STYLE,
     ...HUG_AUTO_LAYOUT_FRAME,
@@ -916,6 +1203,540 @@ const DEFAULT_STYLES: FigmaCloneDomEditState = {
     ...TEXT_LEAF_STYLE,
     widthMode: 'fill',
   },
+  homePage: {
+    ...EMPTY_STYLE,
+    ...HUG_AUTO_LAYOUT_FRAME,
+    align: 'stretch',
+    direction: 'column',
+    h: 1736,
+    w: 1180,
+    widthMode: 'fill',
+  },
+  homeHeader: {
+    ...EMPTY_STYLE,
+    ...HUG_AUTO_LAYOUT_FRAME,
+    align: 'center',
+    direction: 'row',
+    distribution: 'space-between',
+    gap: 28,
+    h: 88,
+    padding: 42,
+    w: 1180,
+    widthMode: 'fill',
+  },
+  homeBrand: {
+    ...EMPTY_STYLE,
+    ...HUG_AUTO_LAYOUT_FRAME,
+    align: 'center',
+    direction: 'row',
+    gap: 12,
+    h: 32,
+    w: 168,
+  },
+  homeBrandMark: {
+    ...EMPTY_STYLE,
+    ...FIXED_BOX_LAYOUT,
+    h: 28,
+    radius: 8,
+    w: 28,
+  },
+  homeBrandText: {
+    ...EMPTY_STYLE,
+    ...HUG_BOX_LAYOUT,
+    h: 22,
+    w: 122,
+  },
+  homeNav: {
+    ...EMPTY_STYLE,
+    ...HUG_AUTO_LAYOUT_FRAME,
+    align: 'center',
+    direction: 'row',
+    gap: 18,
+    h: 36,
+    w: 310,
+  },
+  homeNavEssays: {
+    ...EMPTY_STYLE,
+    ...HUG_BOX_LAYOUT,
+    h: 32,
+    padding: 8,
+    radius: 16,
+    w: 74,
+  },
+  homeNavMethods: {
+    ...EMPTY_STYLE,
+    ...HUG_BOX_LAYOUT,
+    h: 32,
+    padding: 8,
+    radius: 16,
+    w: 86,
+  },
+  homeNavArchive: {
+    ...EMPTY_STYLE,
+    ...HUG_BOX_LAYOUT,
+    h: 32,
+    padding: 8,
+    radius: 16,
+    w: 78,
+  },
+  homeSubscribe: {
+    ...EMPTY_STYLE,
+    ...HUG_AUTO_LAYOUT_FRAME,
+    align: 'center',
+    direction: 'row',
+    gap: 10,
+    h: 38,
+    padding: 12,
+    radius: 18,
+    w: 158,
+  },
+  homeSubscribeLabel: {
+    ...EMPTY_STYLE,
+    ...HUG_BOX_LAYOUT,
+    h: 18,
+    w: 72,
+  },
+  homeSubscribeNote: {
+    ...EMPTY_STYLE,
+    ...HUG_BOX_LAYOUT,
+    h: 18,
+    w: 48,
+  },
+  homeMain: {
+    ...EMPTY_STYLE,
+    ...HUG_AUTO_LAYOUT_FRAME,
+    direction: 'column',
+    h: 1648,
+    w: 1180,
+    widthMode: 'fill',
+  },
+  homeIssueRail: {
+    ...EMPTY_STYLE,
+    ...HUG_AUTO_LAYOUT_FRAME,
+    align: 'center',
+    direction: 'row',
+    distribution: 'space-between',
+    gap: 18,
+    h: 72,
+    padding: 42,
+    w: 1180,
+    widthMode: 'fill',
+  },
+  homeIssueKicker: {
+    ...EMPTY_STYLE,
+    ...HUG_BOX_LAYOUT,
+    h: 22,
+    w: 104,
+  },
+  homeIssueTitle: {
+    ...EMPTY_STYLE,
+    ...HUG_BOX_LAYOUT,
+    h: 34,
+    padding: 10,
+    radius: 17,
+    w: 460,
+    widthMode: 'fill',
+  },
+  homeIssueTime: {
+    ...EMPTY_STYLE,
+    ...HUG_BOX_LAYOUT,
+    h: 34,
+    padding: 10,
+    radius: 17,
+    w: 104,
+  },
+  homeHero: {
+    ...EMPTY_STYLE,
+    ...HUG_AUTO_LAYOUT_FRAME,
+    align: 'start',
+    direction: 'column',
+    gap: 30,
+    h: 560,
+    padding: 84,
+    w: 1180,
+    widthMode: 'fill',
+  },
+  homeHeroCopy: {
+    ...EMPTY_STYLE,
+    ...HUG_AUTO_LAYOUT_FRAME,
+    direction: 'column',
+    gap: 18,
+    h: 302,
+    w: 780,
+  },
+  homeHeroTitle: {
+    ...EMPTY_STYLE,
+    ...HUG_BOX_LAYOUT,
+    h: 204,
+    w: 760,
+  },
+  homeHeroText: {
+    ...EMPTY_STYLE,
+    ...HUG_BOX_LAYOUT,
+    h: 80,
+    w: 650,
+  },
+  homeHeroActions: {
+    ...EMPTY_STYLE,
+    ...HUG_AUTO_LAYOUT_FRAME,
+    align: 'center',
+    direction: 'row',
+    gap: 12,
+    h: 46,
+    w: 300,
+  },
+  homePrimaryAction: {
+    ...EMPTY_STYLE,
+    ...HUG_BOX_LAYOUT,
+    h: 44,
+    padding: 14,
+    radius: 22,
+    w: 136,
+  },
+  homeSecondaryAction: {
+    ...EMPTY_STYLE,
+    ...HUG_BOX_LAYOUT,
+    h: 44,
+    padding: 14,
+    radius: 22,
+    w: 146,
+  },
+  homeMeta: {
+    ...EMPTY_STYLE,
+    ...HUG_AUTO_LAYOUT_FRAME,
+    align: 'stretch',
+    direction: 'row',
+    h: 150,
+    padding: 48,
+    w: 1180,
+    widthMode: 'fill',
+  },
+  homeByline: {
+    ...EMPTY_STYLE,
+    ...HUG_BOX_LAYOUT,
+    h: 72,
+    w: 352,
+    widthMode: 'fill',
+  },
+  homeBylineLabel: TEXT_LEAF_STYLE,
+  homeBylineValue: {
+    ...TEXT_LEAF_STYLE,
+    h: 26,
+    w: 190,
+  },
+  homeBylineNote: TEXT_LEAF_STYLE,
+  homeCategory: {
+    ...EMPTY_STYLE,
+    ...HUG_BOX_LAYOUT,
+    h: 72,
+    w: 352,
+    widthMode: 'fill',
+  },
+  homeCategoryLabel: TEXT_LEAF_STYLE,
+  homeCategoryValue: {
+    ...TEXT_LEAF_STYLE,
+    h: 26,
+    w: 190,
+  },
+  homeCategoryNote: TEXT_LEAF_STYLE,
+  homeReadTime: {
+    ...EMPTY_STYLE,
+    ...HUG_BOX_LAYOUT,
+    h: 72,
+    w: 352,
+    widthMode: 'fill',
+  },
+  homeReadTimeLabel: TEXT_LEAF_STYLE,
+  homeReadTimeValue: {
+    ...TEXT_LEAF_STYLE,
+    h: 26,
+    w: 190,
+  },
+  homeReadTimeNote: TEXT_LEAF_STYLE,
+  homeArticle: {
+    ...EMPTY_STYLE,
+    ...HUG_AUTO_LAYOUT_FRAME,
+    align: 'stretch',
+    direction: 'row',
+    gap: 52,
+    h: 430,
+    padding: 72,
+    w: 1180,
+    widthMode: 'fill',
+  },
+  homeEssay: {
+    ...EMPTY_STYLE,
+    ...HUG_AUTO_LAYOUT_FRAME,
+    direction: 'column',
+    gap: 26,
+    h: 286,
+    w: 690,
+    widthMode: 'fill',
+  },
+  homeEssayHeading: {
+    ...EMPTY_STYLE,
+    ...HUG_BOX_LAYOUT,
+    h: 42,
+    w: 620,
+    widthMode: 'fill',
+  },
+  homeChapterList: {
+    ...EMPTY_STYLE,
+    ...HUG_AUTO_LAYOUT_FRAME,
+    direction: 'column',
+    h: 218,
+    w: 690,
+    widthMode: 'fill',
+  },
+  homeChapterOne: {
+    ...EMPTY_STYLE,
+    ...HUG_AUTO_LAYOUT_FRAME,
+    align: 'center',
+    direction: 'row',
+    distribution: 'space-between',
+    h: 68,
+    w: 690,
+    widthMode: 'fill',
+  },
+  homeChapterOneTitle: {
+    ...TEXT_LEAF_STYLE,
+    w: 520,
+  },
+  homeChapterOneNumber: TEXT_LEAF_STYLE,
+  homeChapterTwo: {
+    ...EMPTY_STYLE,
+    ...HUG_AUTO_LAYOUT_FRAME,
+    align: 'center',
+    direction: 'row',
+    distribution: 'space-between',
+    h: 68,
+    w: 690,
+    widthMode: 'fill',
+  },
+  homeChapterTwoTitle: {
+    ...TEXT_LEAF_STYLE,
+    w: 520,
+  },
+  homeChapterTwoNumber: TEXT_LEAF_STYLE,
+  homeChapterThree: {
+    ...EMPTY_STYLE,
+    ...HUG_AUTO_LAYOUT_FRAME,
+    align: 'center',
+    direction: 'row',
+    distribution: 'space-between',
+    h: 68,
+    w: 690,
+    widthMode: 'fill',
+  },
+  homeChapterThreeTitle: {
+    ...TEXT_LEAF_STYLE,
+    w: 520,
+  },
+  homeChapterThreeNumber: TEXT_LEAF_STYLE,
+  homeQuote: {
+    ...EMPTY_STYLE,
+    ...HUG_AUTO_LAYOUT_FRAME,
+    direction: 'column',
+    gap: 28,
+    h: 286,
+    w: 330,
+  },
+  homeQuoteHeading: {
+    ...EMPTY_STYLE,
+    ...HUG_BOX_LAYOUT,
+    h: 42,
+    w: 330,
+    widthMode: 'fill',
+  },
+  homeQuoteList: {
+    ...EMPTY_STYLE,
+    ...HUG_AUTO_LAYOUT_FRAME,
+    direction: 'column',
+    h: 218,
+    w: 330,
+    widthMode: 'fill',
+  },
+  homeQuoteOne: {
+    ...EMPTY_STYLE,
+    ...HUG_AUTO_LAYOUT_FRAME,
+    align: 'center',
+    direction: 'row',
+    h: 68,
+    w: 330,
+    widthMode: 'fill',
+  },
+  homeQuoteOneText: {
+    ...TEXT_LEAF_STYLE,
+    widthMode: 'fill',
+  },
+  homeQuoteTwo: {
+    ...EMPTY_STYLE,
+    ...HUG_AUTO_LAYOUT_FRAME,
+    align: 'center',
+    direction: 'row',
+    h: 68,
+    w: 330,
+    widthMode: 'fill',
+  },
+  homeQuoteTwoText: {
+    ...TEXT_LEAF_STYLE,
+    widthMode: 'fill',
+  },
+  homeQuoteThree: {
+    ...EMPTY_STYLE,
+    ...HUG_AUTO_LAYOUT_FRAME,
+    align: 'center',
+    direction: 'row',
+    h: 68,
+    w: 330,
+    widthMode: 'fill',
+  },
+  homeQuoteThreeText: {
+    ...TEXT_LEAF_STYLE,
+    widthMode: 'fill',
+  },
+  homeDispatches: {
+    ...EMPTY_STYLE,
+    ...HUG_AUTO_LAYOUT_FRAME,
+    direction: 'column',
+    gap: 28,
+    h: 392,
+    padding: 72,
+    w: 1180,
+    widthMode: 'fill',
+  },
+  homeDispatchHeading: {
+    ...EMPTY_STYLE,
+    ...HUG_BOX_LAYOUT,
+    h: 44,
+    w: 520,
+  },
+  homeDispatchGrid: {
+    ...EMPTY_STYLE,
+    ...HUG_AUTO_LAYOUT_FRAME,
+    direction: 'row',
+    gap: 24,
+    h: 176,
+    w: 1036,
+    widthMode: 'fill',
+  },
+  homeDispatchOne: {
+    ...EMPTY_STYLE,
+    ...HUG_AUTO_LAYOUT_FRAME,
+    direction: 'column',
+    gap: 14,
+    h: 176,
+    padding: 24,
+    radius: 22,
+    w: 329,
+    widthMode: 'fill',
+  },
+  homeDispatchOneTitle: {
+    ...TEXT_LEAF_STYLE,
+    h: 30,
+    w: 260,
+    widthMode: 'fill',
+  },
+  homeDispatchOneText: {
+    ...TEXT_LEAF_STYLE,
+    h: 72,
+    w: 260,
+    widthMode: 'fill',
+  },
+  homeDispatchTwo: {
+    ...EMPTY_STYLE,
+    ...HUG_AUTO_LAYOUT_FRAME,
+    direction: 'column',
+    gap: 14,
+    h: 176,
+    padding: 24,
+    radius: 22,
+    w: 329,
+    widthMode: 'fill',
+  },
+  homeDispatchTwoTitle: {
+    ...TEXT_LEAF_STYLE,
+    h: 30,
+    w: 260,
+    widthMode: 'fill',
+  },
+  homeDispatchTwoText: {
+    ...TEXT_LEAF_STYLE,
+    h: 72,
+    w: 260,
+    widthMode: 'fill',
+  },
+  homeDispatchThree: {
+    ...EMPTY_STYLE,
+    ...HUG_AUTO_LAYOUT_FRAME,
+    direction: 'column',
+    gap: 14,
+    h: 176,
+    padding: 24,
+    radius: 22,
+    w: 330,
+    widthMode: 'fill',
+  },
+  homeDispatchThreeTitle: {
+    ...TEXT_LEAF_STYLE,
+    h: 30,
+    w: 260,
+    widthMode: 'fill',
+  },
+  homeDispatchThreeText: {
+    ...TEXT_LEAF_STYLE,
+    h: 72,
+    w: 260,
+    widthMode: 'fill',
+  },
+  homeNewsletter: {
+    ...EMPTY_STYLE,
+    ...HUG_AUTO_LAYOUT_FRAME,
+    align: 'center',
+    direction: 'column',
+    gap: 18,
+    h: 264,
+    padding: 72,
+    w: 1180,
+    widthMode: 'fill',
+  },
+  homeNewsletterHeading: {
+    ...TEXT_LEAF_STYLE,
+    h: 44,
+    w: 560,
+  },
+  homeNewsletterText: {
+    ...TEXT_LEAF_STYLE,
+    h: 52,
+    w: 620,
+  },
+  homeNewsletterAction: {
+    ...EMPTY_STYLE,
+    ...HUG_BOX_LAYOUT,
+    h: 42,
+    padding: 14,
+    radius: 21,
+    w: 148,
+  },
+  homeFooter: {
+    ...EMPTY_STYLE,
+    ...HUG_AUTO_LAYOUT_FRAME,
+    align: 'center',
+    direction: 'row',
+    distribution: 'space-between',
+    h: 92,
+    padding: 42,
+    w: 1180,
+    widthMode: 'fill',
+  },
+  homeFooterBrand: {
+    ...TEXT_LEAF_STYLE,
+    w: 180,
+  },
+  homeFooterNote: {
+    ...TEXT_LEAF_STYLE,
+    w: 420,
+  },
   card: {
     ...EMPTY_STYLE,
     ...HUG_AUTO_LAYOUT_FRAME,
@@ -1112,7 +1933,8 @@ const DEFAULT_STYLES: FigmaCloneDomEditState = {
     radius: 8,
     w: 68,
   },
-}
+  } satisfies FigmaCloneDomEditState,
+)
 
 const DEFAULT_TEXT: FigmaCloneDomTextState = {
   avatar: 'LK',
@@ -1131,6 +1953,52 @@ const DEFAULT_TEXT: FigmaCloneDomTextState = {
   supporting: 'Product systems lead',
   toolbarButton: 'New',
   toolbarTitle: 'Projects',
+  homeBrandMark: 'C',
+  homeBrandText: 'Canvas Review',
+  homeBylineLabel: 'Written by',
+  homeBylineNote: 'Design systems editor',
+  homeBylineValue: 'Lina Kim',
+  homeCategoryLabel: 'Filed under',
+  homeCategoryNote: 'Interfaces, layout, copy',
+  homeCategoryValue: 'Product craft',
+  homeChapterOneNumber: '01',
+  homeChapterOneTitle: 'Start with the lead, not the module',
+  homeChapterThreeNumber: '03',
+  homeChapterThreeTitle: 'Retouch inside the real viewport',
+  homeChapterTwoNumber: '02',
+  homeChapterTwoTitle: 'Let spacing carry the argument',
+  homeDispatchHeading: 'More from the issue',
+  homeDispatchOneText: 'How component affordances change when the page is the source of truth.',
+  homeDispatchOneTitle: 'The editor is a viewport',
+  homeDispatchThreeText: 'A compact guide to deciding what belongs in a panel and what belongs on canvas.',
+  homeDispatchThreeTitle: 'Panel last, canvas first',
+  homeDispatchTwoText: 'Why final retouching needs distance, baseline, and spacing cues together.',
+  homeDispatchTwoTitle: 'Measuring the rhythm',
+  homeEssayHeading: 'When the page becomes the editor',
+  homeFooterBrand: 'Canvas Review',
+  homeFooterNote: 'Independent notes on design tooling, DOM layout, and editorial interfaces.',
+  homeHeroText: 'A field note on turning layout controls into editorial rhythm: headline, dek, metadata, quote, body, dispatches, newsletter, and footer all editable in place.',
+  homeHeroTitle: 'The homepage is an article before it is an interface',
+  homeIssueKicker: 'Field essay',
+  homeIssueTime: '12 min',
+  homeIssueTitle: 'Issue 04 - Design after the mockup',
+  homeNavArchive: 'Archive',
+  homeNavEssays: 'Essays',
+  homeNavMethods: 'Methods',
+  homeNewsletterAction: 'Join weekly',
+  homeNewsletterHeading: 'Receive the next field note',
+  homeNewsletterText: 'A short weekly note on interface craft, layout semantics, and the last mile of design editing.',
+  homePrimaryAction: 'Read essay',
+  homeQuoteHeading: "Editor's note",
+  homeQuoteOneText: 'A homepage can read like a lead paragraph.',
+  homeQuoteThreeText: 'The last retouch belongs in the viewport.',
+  homeQuoteTwoText: 'Spacing is part of the argument, not decoration.',
+  homeReadTimeLabel: 'Reading time',
+  homeReadTimeNote: 'Updated Jun 2026',
+  homeReadTimeValue: '12 minutes',
+  homeSecondaryAction: 'Save note',
+  homeSubscribeLabel: 'Subscribe',
+  homeSubscribeNote: 'Weekly',
   workspaceActivityHeader: 'Activity',
   workspaceActivityOneText: 'Mina updated forecast',
   workspaceActivityThreeText: 'Lina shared notes',
@@ -1169,14 +2037,18 @@ const DEFAULT_TEXT: FigmaCloneDomTextState = {
 
 const FIELD_LIMITS = {
   gap: { max: 80, min: 0 },
-  h: { max: 720, min: 12 },
+  h: { max: 2400, min: 12 },
   margin: { max: 80, min: -40 },
   order: { max: 20, min: -20 },
   opacity: { max: 100, min: 0 },
   padding: { max: 96, min: 0 },
+  paddingBottom: { max: 96, min: 0 },
+  paddingLeft: { max: 96, min: 0 },
+  paddingRight: { max: 96, min: 0 },
+  paddingTop: { max: 96, min: 0 },
   radius: { max: 80, min: 0 },
   rotation: { max: 180, min: -180 },
-  w: { max: 900, min: 12 },
+  w: { max: 1600, min: 12 },
   x: { max: 240, min: -240 },
   y: { max: 240, min: -240 },
 } satisfies Record<FigmaCloneDomEditField, { max: number; min: number }>
@@ -1245,17 +2117,19 @@ export function updateFigmaCloneDomEditField({
 }): FigmaCloneDomEditState {
   const current = getFigmaCloneDomEditStyle(state, nodeId)
   const nextValue = clampFigmaCloneDomEditField(field, value)
+  const nextStyle = createNextFigmaCloneDomEditStyle({
+    current,
+    field,
+    value: nextValue,
+  })
 
-  if (current[field] === nextValue) {
+  if (nextStyle === current) {
     return state
   }
 
   return {
     ...state,
-    [nodeId]: {
-      ...current,
-      [field]: nextValue,
-    },
+    [nodeId]: nextStyle,
   }
 }
 
@@ -1283,6 +2157,22 @@ export function updateFigmaCloneDomAutoLayoutField({
       [field]: value,
     },
   }
+}
+
+export function canFigmaCloneDomFillParent(
+  parentDisplay: FigmaCloneDomDisplay | null,
+): boolean {
+  return canDomEditFillParent(parentDisplay)
+}
+
+export function getFigmaCloneDomToggledAxisSizeMode({
+  mode,
+  parentDisplay,
+}: {
+  mode: FigmaCloneDomAutoLayoutSizeMode
+  parentDisplay: FigmaCloneDomDisplay | null
+}): FigmaCloneDomAutoLayoutSizeMode {
+  return getDomEditToggledAxisSizeMode({ mode, parentDisplay })
 }
 
 export function canFigmaCloneDomNodeUseAutoLayout(
@@ -1324,7 +2214,7 @@ export function getFigmaCloneDomLayoutContext(
     showFlexLayout,
     showGeometry: true,
     showGridLayout,
-    showParentParticipation: parentDisplay === 'flex',
+    showParentParticipation: canFigmaCloneDomFillParent(parentDisplay),
     showSelfLayout: showFlexLayout,
   }
 }
@@ -1454,7 +2344,11 @@ function getFigmaCloneDomDisplay(
     return 'grid'
   }
 
-  if (nodeId === 'avatar' || nodeId === 'noticeIcon') {
+  if (
+    nodeId === 'avatar' ||
+    nodeId === 'homeBrandMark' ||
+    nodeId === 'noticeIcon'
+  ) {
     return 'grid'
   }
 
@@ -1532,6 +2426,13 @@ function getFigmaCloneDomContentType(
     nodeId === 'workspaceProfile' ||
     nodeId === 'workspacePrimaryAction' ||
     nodeId === 'workspaceSecondaryAction' ||
+    nodeId === 'homeIssueTime' ||
+    nodeId === 'homeNavArchive' ||
+    nodeId === 'homeNavEssays' ||
+    nodeId === 'homeNavMethods' ||
+    nodeId === 'homeNewsletterAction' ||
+    nodeId === 'homePrimaryAction' ||
+    nodeId === 'homeSecondaryAction' ||
     nodeId === 'primaryButton' ||
     nodeId === 'secondaryButton' ||
     nodeId === 'searchBox' ||
@@ -1569,6 +2470,45 @@ function getFigmaCloneDomContentType(
     nodeId === 'workspaceStatTicketsLabel' ||
     nodeId === 'workspaceStatTicketsValue' ||
     nodeId === 'workspaceStatTicketsDelta' ||
+    nodeId === 'homeBrandMark' ||
+    nodeId === 'homeBrandText' ||
+    nodeId === 'homeSubscribeLabel' ||
+    nodeId === 'homeSubscribeNote' ||
+    nodeId === 'homeIssueKicker' ||
+    nodeId === 'homeIssueTitle' ||
+    nodeId === 'homeHeroTitle' ||
+    nodeId === 'homeHeroText' ||
+    nodeId === 'homeBylineLabel' ||
+    nodeId === 'homeBylineValue' ||
+    nodeId === 'homeBylineNote' ||
+    nodeId === 'homeCategoryLabel' ||
+    nodeId === 'homeCategoryValue' ||
+    nodeId === 'homeCategoryNote' ||
+    nodeId === 'homeReadTimeLabel' ||
+    nodeId === 'homeReadTimeValue' ||
+    nodeId === 'homeReadTimeNote' ||
+    nodeId === 'homeEssayHeading' ||
+    nodeId === 'homeChapterOneTitle' ||
+    nodeId === 'homeChapterOneNumber' ||
+    nodeId === 'homeChapterTwoTitle' ||
+    nodeId === 'homeChapterTwoNumber' ||
+    nodeId === 'homeChapterThreeTitle' ||
+    nodeId === 'homeChapterThreeNumber' ||
+    nodeId === 'homeQuoteHeading' ||
+    nodeId === 'homeQuoteOneText' ||
+    nodeId === 'homeQuoteTwoText' ||
+    nodeId === 'homeQuoteThreeText' ||
+    nodeId === 'homeDispatchHeading' ||
+    nodeId === 'homeDispatchOneTitle' ||
+    nodeId === 'homeDispatchOneText' ||
+    nodeId === 'homeDispatchTwoTitle' ||
+    nodeId === 'homeDispatchTwoText' ||
+    nodeId === 'homeDispatchThreeTitle' ||
+    nodeId === 'homeDispatchThreeText' ||
+    nodeId === 'homeNewsletterHeading' ||
+    nodeId === 'homeNewsletterText' ||
+    nodeId === 'homeFooterBrand' ||
+    nodeId === 'homeFooterNote' ||
     nodeId === 'avatar' ||
     nodeId === 'headlineTitle' ||
     nodeId === 'metricOneLabel' ||
@@ -1632,14 +2572,123 @@ function getFigmaCloneDomElementChain(root: HTMLElement, target: Element) {
   return chain
 }
 
-function readFigmaCloneDomNodeId(
+export function readFigmaCloneDomNodeId(
   element: HTMLElement | null,
 ): FigmaCloneDomNodeId | null {
-  const nodeId = element?.dataset.figmaDomNode
+  const nodeId = element?.dataset.domEditNode ?? element?.dataset.figmaDomNode
 
   return nodeId && nodeId in FIGMA_CLONE_DOM_NODE_BY_ID
     ? nodeId as FigmaCloneDomNodeId
     : null
+}
+
+export const FIGMA_CLONE_DOM_EDIT_ADAPTER = {
+  getElement: getFigmaCloneDomElement,
+  getLayoutContext: getFigmaCloneDomLayoutContext,
+  getParentId: getFigmaCloneDomParentId,
+  getStyle: getFigmaCloneDomEditStyle,
+  readNodeId: readFigmaCloneDomNodeId,
+} satisfies DomEditModelAdapter<FigmaCloneDomNodeId, FigmaCloneDomEditState>
+
+const PADDING_SIDE_BY_FIELD = Object.fromEntries(
+  Object.entries(DOM_EDIT_PADDING_SIDE_FIELDS).map(([side, field]) => [
+    field,
+    side,
+  ]),
+) as Partial<Record<FigmaCloneDomEditField, DomEditPaddingSide>>
+
+function createNextFigmaCloneDomEditStyle({
+  current,
+  field,
+  value,
+}: {
+  current: FigmaCloneDomEditNodeState
+  field: FigmaCloneDomEditField
+  value: number
+}): FigmaCloneDomEditNodeState {
+  if (field === 'padding') {
+    const nextPadding = createDomEditUniformPaddingSides(value)
+
+    if (
+      current.padding === value &&
+      areFigmaCloneDomPaddingSidesEqual(
+        getDomEditPaddingSides(current),
+        nextPadding,
+      )
+    ) {
+      return current
+    }
+
+    return normalizeFigmaCloneDomEditStyle({
+      ...current,
+      padding: value,
+      ...createFigmaCloneDomPaddingSideStyle(nextPadding),
+    })
+  }
+
+  const side = PADDING_SIDE_BY_FIELD[field]
+
+  if (side) {
+    const currentPadding = getDomEditPaddingSides(current)
+
+    if (currentPadding[side] === value) {
+      return current
+    }
+
+    return normalizeFigmaCloneDomEditStyle({
+      ...current,
+      ...createFigmaCloneDomPaddingSideStyle({
+        ...currentPadding,
+        [side]: value,
+      }),
+    })
+  }
+
+  if (current[field] === value) {
+    return current
+  }
+
+  return {
+    ...current,
+    [field]: value,
+  }
+}
+
+function normalizeFigmaCloneDomEditStyle(
+  style: FigmaCloneDomEditNodeState,
+): FigmaCloneDomEditNodeState {
+  const padding = getDomEditPaddingSides(style)
+  const uniformPadding = getDomEditUniformPadding(padding)
+
+  return {
+    ...style,
+    padding: uniformPadding ?? style.padding,
+    ...createFigmaCloneDomPaddingSideStyle(padding),
+  }
+}
+
+function createFigmaCloneDomPaddingSideStyle(
+  padding: DomEditPaddingSides,
+): Pick<
+  FigmaCloneDomEditNodeState,
+  'paddingBottom' | 'paddingLeft' | 'paddingRight' | 'paddingTop'
+> {
+  return {
+    paddingBottom: padding.bottom,
+    paddingLeft: padding.left,
+    paddingRight: padding.right,
+    paddingTop: padding.top,
+  }
+}
+
+function areFigmaCloneDomPaddingSidesEqual(
+  left: DomEditPaddingSides,
+  right: DomEditPaddingSides,
+) {
+  return left.bottom === right.bottom &&
+    left.left === right.left &&
+    left.right === right.right &&
+    left.top === right.top
 }
 
 function clampFigmaCloneDomEditField(

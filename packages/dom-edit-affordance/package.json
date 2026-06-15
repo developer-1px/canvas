@@ -1,0 +1,22 @@
+{
+  "name": "@interactive-os/dom-edit-affordance",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./react": "./src/react.ts",
+    "./canvas": "./src/canvas.ts",
+    "./interaction": "./src/interaction.ts",
+    "./style.css": "./src/style.css"
+  },
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "peerDependencies": {
+    "@interactive-os/interaction": "^0.1.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-moveable": "^0.56.0"
+  }
+}

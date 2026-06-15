@@ -130,6 +130,57 @@ describe('CanvasAppStageElement', () => {
     expect(parentWheelListeners.size).toBe(0)
   })
 
+  it('lets wheel passthrough targets keep native scroll', () => {
+    class FakeNode {
+      parentElement: FakeElement | null = null
+    }
+
+    class FakeElement extends FakeNode {
+      private readonly isPassthrough: boolean
+
+      constructor(isPassthrough: boolean) {
+        super()
+        this.isPassthrough = isPassthrough
+      }
+
+      closest(selector: string) {
+        return selector === '[data-canvas-wheel-passthrough="true"]' &&
+          this.isPassthrough
+          ? this
+          : null
+      }
+    }
+
+    const previousNode = globalThis.Node
+    const previousElement = globalThis.Element
+    vi.stubGlobal('Node', FakeNode)
+    vi.stubGlobal('Element', FakeElement)
+
+    try {
+      const { element, parentWheelListeners } = createStageElementFake()
+      const stageElement = createCanvasAppStageElement({
+        getElement: () => element,
+        setElement: () => undefined,
+      })
+      const handler = vi.fn()
+      const cleanup = stageElement.addWheelListener(handler)
+      const wheelEvent = {
+        target: new FakeElement(true),
+      } as unknown as globalThis.WheelEvent
+
+      for (const listener of parentWheelListeners) {
+        listener(wheelEvent)
+      }
+
+      expect(handler).not.toHaveBeenCalled()
+
+      cleanup()
+    } finally {
+      vi.stubGlobal('Node', previousNode)
+      vi.stubGlobal('Element', previousElement)
+    }
+  })
+
   it('cleans up wheel listeners from the element active at registration', () => {
     const first = createStageElementFake()
     const second = createStageElementFake()

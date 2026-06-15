@@ -21,5 +21,9 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "packages/figma-clone/src"]
+  "include": [
+    "src",
+    "packages/dom-edit-affordance/src",
+    "packages/figma-clone/src"
+  ]
 }

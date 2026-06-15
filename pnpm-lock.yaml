@@ -206,17 +206,41 @@ importers:
         specifier: ~6.0.2
         version: 6.0.3
 
-  packages/figma-clone:
+  packages/dom-edit-affordance:
     dependencies:
-      '@interactive-os/canvas':
-        specifier: ^0.1.1
-        version: link:../..
+      '@interactive-os/interaction':
+        specifier: ^0.1.0
+        version: link:../../../apg-patterns/packages/interaction
       react:
         specifier: ^19.0.0
         version: 19.2.6
       react-dom:
         specifier: ^19.0.0
         version: 19.2.6(react@19.2.6)
+      react-moveable:
+        specifier: ^0.56.0
+        version: 0.56.0
+
+  packages/figma-clone:
+    dependencies:
+      '@interactive-os/canvas':
+        specifier: ^0.1.1
+        version: link:../..
+      '@interactive-os/dom-edit-affordance':
+        specifier: workspace:*
+        version: link:../dom-edit-affordance
+      '@interactive-os/json-document':
+        specifier: ^1.0.0
+        version: link:../../../json-document/packages/json-document
+      react:
+        specifier: ^19.0.0
+        version: 19.2.6
+      react-dom:
+        specifier: ^19.0.0
+        version: 19.2.6(react@19.2.6)
+      zod:
+        specifier: ^4.0.0
+        version: 4.4.3
 
 packages:
 

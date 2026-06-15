@@ -2,12 +2,14 @@ import { describe, expect, it } from 'vitest'
 import { getFigmaCloneDomOverlayVisibility } from './overlay'
 import {
   canFigmaCloneDomNodeEditText,
+  canFigmaCloneDomFillParent,
   createFigmaCloneDomEditState,
   createFigmaCloneDomTextState,
   getFigmaCloneDomEditStyle,
   getFigmaCloneDomLayoutContext,
   getFigmaCloneDomRootId,
   getFigmaCloneDomText,
+  getFigmaCloneDomToggledAxisSizeMode,
   updateFigmaCloneDomAutoLayoutField,
   updateFigmaCloneDomEditField,
   updateFigmaCloneDomText,
@@ -24,7 +26,29 @@ describe('FigmaCloneDomEditModel', () => {
     })
 
     expect(getFigmaCloneDomEditStyle(next, 'card').padding).toBe(32)
+    expect(getFigmaCloneDomEditStyle(next, 'card').paddingTop).toBe(32)
+    expect(getFigmaCloneDomEditStyle(next, 'card').paddingRight).toBe(32)
+    expect(getFigmaCloneDomEditStyle(next, 'card').paddingBottom).toBe(32)
+    expect(getFigmaCloneDomEditStyle(next, 'card').paddingLeft).toBe(32)
     expect(getFigmaCloneDomEditStyle(state, 'card').padding).toBe(24)
+    expect(getFigmaCloneDomEditStyle(state, 'card').paddingTop).toBe(24)
+  })
+
+  it('updates one padding side without mutating the other sides', () => {
+    const state = createFigmaCloneDomEditState()
+    const next = updateFigmaCloneDomEditField({
+      field: 'paddingLeft',
+      nodeId: 'card',
+      state,
+      value: 40,
+    })
+
+    expect(getFigmaCloneDomEditStyle(next, 'card').padding).toBe(24)
+    expect(getFigmaCloneDomEditStyle(next, 'card').paddingTop).toBe(24)
+    expect(getFigmaCloneDomEditStyle(next, 'card').paddingRight).toBe(24)
+    expect(getFigmaCloneDomEditStyle(next, 'card').paddingBottom).toBe(24)
+    expect(getFigmaCloneDomEditStyle(next, 'card').paddingLeft).toBe(40)
+    expect(getFigmaCloneDomEditStyle(state, 'card').paddingLeft).toBe(24)
   })
 
   it('clamps direct manipulation values', () => {
@@ -77,6 +101,7 @@ describe('FigmaCloneDomEditModel', () => {
       'Revenue operations',
     )
     expect(canFigmaCloneDomNodeEditText('workspaceHeroTitle')).toBe(true)
+    expect(canFigmaCloneDomNodeEditText('homeHeroTitle')).toBe(true)
     expect(canFigmaCloneDomNodeEditText('workspaceHero')).toBe(false)
   })
 
@@ -103,6 +128,8 @@ describe('FigmaCloneDomEditModel', () => {
     expect(getFigmaCloneDomEditStyle(state, 'workspaceMain').widthMode).toBe('fill')
     expect(getFigmaCloneDomEditStyle(state, 'workspaceMain').heightMode).toBe('hug')
     expect(getFigmaCloneDomEditStyle(state, 'workspaceSearch').widthMode).toBe('fill')
+    expect(getFigmaCloneDomEditStyle(state, 'homePage').widthMode).toBe('fill')
+    expect(getFigmaCloneDomEditStyle(state, 'homePage').heightMode).toBe('hug')
     expect(getFigmaCloneDomEditStyle(state, 'card').widthMode).toBe('hug')
     expect(getFigmaCloneDomEditStyle(state, 'card').heightMode).toBe('hug')
     expect(getFigmaCloneDomEditStyle(state, 'header').widthMode).toBe('fill')
@@ -112,9 +139,16 @@ describe('FigmaCloneDomEditModel', () => {
     expect(getFigmaCloneDomEditStyle(state, 'noticeContent').widthMode).toBe('fill')
     expect(getFigmaCloneDomEditStyle(state, 'workspaceBrandMark').widthMode).toBe('fixed')
     expect(getFigmaCloneDomEditStyle(state, 'workspaceBrandMark').heightMode).toBe('fixed')
+    expect(getFigmaCloneDomEditStyle(state, 'homeBrandMark').widthMode).toBe('fixed')
+    expect(getFigmaCloneDomEditStyle(state, 'homeBrandMark').heightMode).toBe('fixed')
     expect(getFigmaCloneDomEditStyle(state, 'avatar').widthMode).toBe('fixed')
     expect(getFigmaCloneDomEditStyle(state, 'avatar').heightMode).toBe('fixed')
-    expect(fixedNodes).toEqual(['workspaceBrandMark', 'avatar', 'noticeIcon'])
+    expect(fixedNodes).toEqual([
+      'workspaceBrandMark',
+      'homeBrandMark',
+      'avatar',
+      'noticeIcon',
+    ])
   })
 
   it('projects controls from display and parent display', () => {
@@ -149,7 +183,37 @@ describe('FigmaCloneDomEditModel', () => {
     expect(contentGrid.showFlexLayout).toBe(false)
     expect(contentGrid.showSelfLayout).toBe(false)
     expect(pipeline.parentDisplay).toBe('grid')
-    expect(pipeline.showParentParticipation).toBe(false)
+    expect(pipeline.showParentParticipation).toBe(true)
+  })
+
+  it('allows fill participation in flex and grid parents', () => {
+    expect(canFigmaCloneDomFillParent('flex')).toBe(true)
+    expect(canFigmaCloneDomFillParent('grid')).toBe(true)
+    expect(canFigmaCloneDomFillParent('block')).toBe(false)
+    expect(canFigmaCloneDomFillParent(null)).toBe(false)
+  })
+
+  it('toggles resize handles between natural and parent fill sizing', () => {
+    expect(getFigmaCloneDomToggledAxisSizeMode({
+      mode: 'fixed',
+      parentDisplay: 'flex',
+    })).toBe('hug')
+    expect(getFigmaCloneDomToggledAxisSizeMode({
+      mode: 'hug',
+      parentDisplay: 'flex',
+    })).toBe('fill')
+    expect(getFigmaCloneDomToggledAxisSizeMode({
+      mode: 'hug',
+      parentDisplay: 'grid',
+    })).toBe('fill')
+    expect(getFigmaCloneDomToggledAxisSizeMode({
+      mode: 'fill',
+      parentDisplay: 'grid',
+    })).toBe('hug')
+    expect(getFigmaCloneDomToggledAxisSizeMode({
+      mode: 'hug',
+      parentDisplay: null,
+    })).toBe('hug')
   })
 
   it('projects controls for additional ui samples', () => {
@@ -168,6 +232,7 @@ describe('FigmaCloneDomEditModel', () => {
 
   it('resolves the active rendered root from the selected node', () => {
     expect(getFigmaCloneDomRootId('workspaceDealTwo')).toBe('workspacePage')
+    expect(getFigmaCloneDomRootId('homeQuoteTwoText')).toBe('homePage')
     expect(getFigmaCloneDomRootId('searchBox')).toBe('toolbar')
     expect(getFigmaCloneDomRootId('noticeText')).toBe('notice')
     expect(getFigmaCloneDomRootId('metricOne')).toBe('card')

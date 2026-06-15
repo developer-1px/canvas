@@ -3,11 +3,11 @@ import {
   useState,
 } from 'react'
 import {
-  createFigmaCloneDomOverlayRectStyle,
-  type FigmaCloneDomScaledOverlayRect,
-} from './FigmaCloneDomOverlayGeometry'
+  createDomEditOverlayRectStyle,
+  type DomEditScaledOverlayRect,
+} from '../../../shared/geometry/DomEditOverlayGeometry'
 
-type BoxModelRect = FigmaCloneDomScaledOverlayRect
+type BoxModelRect = DomEditScaledOverlayRect
 
 type BoxModelSides = {
   bottom: number
@@ -22,7 +22,7 @@ type BoxModelMetrics = {
   padding: BoxModelSides
 }
 
-export function FigmaCloneDomBoxModelOverlay({
+export function DomEditBoxModelOverlay({
   rect,
   target,
 }: {
@@ -32,7 +32,7 @@ export function FigmaCloneDomBoxModelOverlay({
   const [metrics, setMetrics] = useState<BoxModelMetrics | null>(null)
 
   useLayoutEffect(() => {
-    setMetrics(measureFigmaCloneBoxModel(target))
+    setMetrics(measureDomEditBoxModel(target))
   }, [
     rect.h,
     rect.w,
@@ -45,14 +45,14 @@ export function FigmaCloneDomBoxModelOverlay({
     return null
   }
 
-  const contentRect = getFigmaCloneContentRect(rect, metrics)
-  const paddingRects = getFigmaClonePaddingRects(rect, metrics)
-  const marginRects = getFigmaCloneMarginRects(rect, metrics)
+  const contentRect = getDomEditContentRect(rect, metrics)
+  const paddingRects = getDomEditPaddingRects(rect, metrics)
+  const marginRects = getDomEditMarginRects(rect, metrics)
 
   return (
     <>
       {marginRects.map((marginRect) => (
-        <FigmaCloneBoxModelBand
+        <DomEditBoxModelBand
           key={`margin:${marginRect.side}`}
           className="figma-boxmodel-margin"
           rect={marginRect}
@@ -60,10 +60,10 @@ export function FigmaCloneDomBoxModelOverlay({
       ))}
       <div
         className="figma-boxmodel-border"
-        style={createFigmaCloneDomOverlayRectStyle(rect)}
+        style={createDomEditOverlayRectStyle(rect)}
       />
       {paddingRects.map((paddingRect) => (
-        <FigmaCloneBoxModelBand
+        <DomEditBoxModelBand
           key={`padding:${paddingRect.side}`}
           className="figma-boxmodel-padding"
           rect={paddingRect}
@@ -71,7 +71,7 @@ export function FigmaCloneDomBoxModelOverlay({
       ))}
       <div
         className="figma-boxmodel-content"
-        style={createFigmaCloneDomOverlayRectStyle(contentRect)}
+        style={createDomEditOverlayRectStyle(contentRect)}
       />
       {hasAnySide(metrics.margin) ? (
         <span
@@ -81,7 +81,7 @@ export function FigmaCloneDomBoxModelOverlay({
             top: rect.y - metrics.margin.top - 4,
           }}
         >
-          Mar {formatFigmaCloneSides(metrics.margin)}
+          Mar {formatDomEditSides(metrics.margin)}
         </span>
       ) : null}
       {hasAnySide(metrics.padding) ? (
@@ -92,14 +92,14 @@ export function FigmaCloneDomBoxModelOverlay({
             top: rect.y + metrics.border.top + metrics.padding.top,
           }}
         >
-          Pad {formatFigmaCloneSides(metrics.padding)}
+          Pad {formatDomEditSides(metrics.padding)}
         </span>
       ) : null}
     </>
   )
 }
 
-function FigmaCloneBoxModelBand({
+function DomEditBoxModelBand({
   className,
   rect,
 }: {
@@ -113,12 +113,12 @@ function FigmaCloneBoxModelBand({
   return (
     <div
       className={className}
-      style={createFigmaCloneDomOverlayRectStyle(rect)}
+      style={createDomEditOverlayRectStyle(rect)}
     />
   )
 }
 
-function measureFigmaCloneBoxModel(target: HTMLElement): BoxModelMetrics {
+function measureDomEditBoxModel(target: HTMLElement): BoxModelMetrics {
   const style = getComputedStyle(target)
 
   return {
@@ -143,7 +143,7 @@ function measureFigmaCloneBoxModel(target: HTMLElement): BoxModelMetrics {
   }
 }
 
-function getFigmaCloneContentRect(
+function getDomEditContentRect(
   rect: BoxModelRect,
   metrics: BoxModelMetrics,
 ): BoxModelRect {
@@ -161,7 +161,7 @@ function getFigmaCloneContentRect(
   }
 }
 
-function getFigmaClonePaddingRects(
+function getDomEditPaddingRects(
   rect: BoxModelRect,
   metrics: BoxModelMetrics,
 ): Array<BoxModelRect & { side: keyof BoxModelSides }> {
@@ -206,7 +206,7 @@ function getFigmaClonePaddingRects(
   ]
 }
 
-function getFigmaCloneMarginRects(
+function getDomEditMarginRects(
   rect: BoxModelRect,
   metrics: BoxModelMetrics,
 ): Array<BoxModelRect & { side: keyof BoxModelSides }> {
@@ -258,7 +258,7 @@ function hasAnySide(sides: BoxModelSides): boolean {
   return Object.values(sides).some((value) => value > 0.5)
 }
 
-function formatFigmaCloneSides(sides: BoxModelSides): string {
+function formatDomEditSides(sides: BoxModelSides): string {
   const values = [sides.top, sides.right, sides.bottom, sides.left]
     .map((value) => Math.round(value))
   const uniqueValues = new Set(values)

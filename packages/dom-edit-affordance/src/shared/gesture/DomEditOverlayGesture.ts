@@ -1,17 +1,4 @@
-export function isFigmaCloneEditableKeyboardTarget(
-  target: EventTarget | null,
-): boolean {
-  if (!(target instanceof HTMLElement)) {
-    return false
-  }
-
-  return target.isContentEditable ||
-    target instanceof HTMLInputElement ||
-    target instanceof HTMLTextAreaElement ||
-    target instanceof HTMLSelectElement
-}
-
-export function constrainFigmaCloneMoveableDrag({
+export function constrainDomEditMoveableDrag({
   current,
   isConstrained,
   start,
@@ -37,7 +24,7 @@ export function constrainFigmaCloneMoveableDrag({
     : [start[0], next[1]]
 }
 
-export function readFigmaCloneMoveableTuple(
+export function readDomEditMoveableTuple(
   value: unknown,
   fallback: [number, number],
 ): [number, number] {
@@ -54,7 +41,7 @@ export function readFigmaCloneMoveableTuple(
   ]
 }
 
-export function resolveFigmaCloneResizeSize({
+export function resolveDomEditResizeSize({
   dist,
   scale,
   start,
@@ -71,7 +58,7 @@ export function resolveFigmaCloneResizeSize({
   ]
 }
 
-export function resolveFigmaCloneSpacingDragValue(
+export function resolveDomEditSpacingDragValue(
   value: number,
   event: globalThis.PointerEvent,
 ) {

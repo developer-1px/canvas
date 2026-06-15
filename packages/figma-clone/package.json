@@ -4,7 +4,14 @@
   "version": "0.0.0",
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./dom-editor": "./src/dom-editor/index.ts",
+    "./style.css": "./src/FigmaCloneApp.css"
+  },
+  "dependencies": {
+    "@interactive-os/dom-edit-affordance": "workspace:*",
+    "@interactive-os/json-document": "^1.0.0",
+    "zod": "^4.0.0"
   },
   "peerDependencies": {
     "@interactive-os/canvas": "^0.1.1",
