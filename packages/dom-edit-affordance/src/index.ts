@@ -26,6 +26,13 @@ export {
   getDomEditToggledAxisSizeMode,
 } from './features/size-editing/DomEditSizeMode'
 export {
+  getDomEditSizeSourceDescriptor,
+  getDomEditSizeSourceLabel,
+  type DomEditSizeSourceAxis,
+  type DomEditSizeSourceDescriptor,
+  type DomEditSizeSourceKind,
+} from './features/size-editing/DomEditSizeSource'
+export {
   getDomEditFlexParticipationDescriptor,
   type DomEditFlexParticipationAxis,
   type DomEditFlexParticipationDescriptor,

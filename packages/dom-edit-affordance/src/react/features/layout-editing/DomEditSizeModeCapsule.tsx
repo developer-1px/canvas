@@ -5,6 +5,9 @@ import type {
   DomEditLayoutContext,
   DomEditNodeState,
 } from '../../../shared/model/DomEditTypes'
+import {
+  getDomEditSizeSourceDescriptor,
+} from '../../../features/size-editing/DomEditSizeSource'
 import type { DomEditAutoLayoutRect } from './DomEditAutoLayoutGeometry'
 
 type DomEditSizeModeAxis = 'height' | 'width'
@@ -13,6 +16,7 @@ type DomEditSizeMode = DomEditNodeState['widthMode']
 export function DomEditSizeModeCapsule({
   heightMode,
   heightValue,
+  parentDisplay,
   rect,
   showFill,
   widthMode,
@@ -23,6 +27,7 @@ export function DomEditSizeModeCapsule({
 }: {
   heightMode: DomEditSizeMode
   heightValue: number
+  parentDisplay: DomEditLayoutContext['parentDisplay']
   rect: DomEditAutoLayoutRect & { scale: number }
   showFill: boolean
   widthMode: DomEditSizeMode
@@ -50,6 +55,7 @@ export function DomEditSizeModeCapsule({
       <DomEditSizeModeControl
         axis="width"
         mode={widthMode}
+        parentDisplay={parentDisplay}
         showFill={showFill}
         value={widthValue}
         onChange={onChangeWidth}
@@ -60,6 +66,7 @@ export function DomEditSizeModeCapsule({
       <DomEditSizeModeControl
         axis="height"
         mode={heightMode}
+        parentDisplay={parentDisplay}
         showFill={showFill}
         value={heightValue}
         onChange={onChangeHeight}
@@ -68,67 +75,59 @@ export function DomEditSizeModeCapsule({
   )
 }
 
-export function shouldRenderDomEditSizeModeCapsule({
-  affordanceState,
-  context,
-  isDragging,
-}: {
-  affordanceState: DomEditAffordanceState
-  context: DomEditLayoutContext
-  isDragging: boolean
-}) {
-  return (
-    context.showSelfLayout ||
-    context.showGridLayout ||
-    context.showParentParticipation
-  ) &&
-    affordanceState.mode !== 'measure' &&
-    affordanceState.mode !== 'xray' &&
-    !isDragging
-}
-
 function DomEditSizeModeControl({
   axis,
   mode,
+  parentDisplay,
   showFill,
   value,
   onChange,
 }: {
   axis: DomEditSizeModeAxis
   mode: DomEditSizeMode
+  parentDisplay: DomEditLayoutContext['parentDisplay']
   showFill: boolean
   value: number
   onChange: (mode: DomEditSizeMode) => void
 }) {
   const availableModes = getDomEditAvailableSizeModes({ mode, showFill })
-  const axisLabel = axis === 'width' ? 'W' : 'H'
+  const source = getDomEditSizeSourceDescriptor({
+    axis,
+    mode,
+    parentDisplay,
+    value,
+  })
 
   return (
     <div
-      aria-label={`${axisLabel} ${Math.round(value)} ${getDomEditSizeModeLabel(mode)}`}
+      aria-label={source.ariaLabel}
       className="figma-size-mode-control"
       data-mode={mode}
+      data-parent-relative={source.isParentRelative ? 'true' : 'false'}
+      data-size-source={source.kind}
       role="group"
       tabIndex={0}
-      title={`${axisLabel} ${getDomEditSizeModeLabel(mode)}`}
+      title={`${source.axisLabel} ${source.label}`}
       onPointerDown={(event) => {
         event.stopPropagation()
       }}
     >
       <span className="figma-size-mode-control__summary">
-        <span className="figma-size-mode-capsule__axis">{axisLabel}</span>
+        <span className="figma-size-mode-capsule__axis">
+          {source.axisLabel}
+        </span>
         <span className="figma-size-mode-capsule__value">
-          {Math.round(value)}
+          {source.valueLabel}
         </span>
         <span className="figma-size-mode-capsule__mode">
-          {getDomEditSizeModeLabel(mode)}
+          {source.label}
         </span>
       </span>
       <span className="figma-size-mode-control__choices">
         {availableModes.map((availableMode) => (
           <button
             key={availableMode}
-            aria-label={`${axisLabel} ${getDomEditSizeModeLabel(availableMode)}`}
+            aria-label={`${source.axisLabel} ${getDomEditSizeModeLabel(availableMode)}`}
             aria-pressed={availableMode === mode}
             type="button"
             onClick={(event) => {
