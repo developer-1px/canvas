@@ -29,6 +29,13 @@ import {
   getDomEditGridChildArea,
   type DomEditGridChildArea,
 } from './DomEditGridChildGeometry'
+import {
+  getDomEditGridHoveredTracks,
+  getDomEditGridTrackKey,
+  getDomEditGridTrackLayout,
+  type DomEditGridTrackGuide,
+  type DomEditGridTrackLayout,
+} from './DomEditGridTrackGeometry'
 
 type GridOverlayRect = DomEditOverlayRect
 type GridGapRect = DomEditOverlayRect & {
@@ -70,6 +77,10 @@ export function DomEditGridOverlay<
   const [gapRects, setGapRects] = useState<GridGapRect[]>([])
   const [gridChildArea, setGridChildArea] =
     useState<DomEditGridChildArea | null>(null)
+  const [gridTrackLayout, setGridTrackLayout] =
+    useState<DomEditGridTrackLayout | null>(null)
+  const [hoveredGridTrackKeys, setHoveredGridTrackKeys] =
+    useState<string[]>([])
   const [trackRects, setTrackRects] = useState<GridOverlayRect[]>([])
   const [isGapHovered, setIsGapHovered] = useState(false)
   const context = adapter.getLayoutContext(selectedNodeId)
@@ -84,17 +95,21 @@ export function DomEditGridOverlay<
     const frame = requestAnimationFrame(() => {
       if (!context.showGridLayout) {
         setGapRects([])
+        setGridTrackLayout(null)
+        setHoveredGridTrackKeys([])
         setTrackRects([])
         return
       }
 
       const measurement = measureDomEditGrid({
+        lineThickness: Math.max(1 / rect.scale, 0.5),
         shell: shellRef.current,
         target,
         viewport,
       })
 
       setGapRects(measurement.gaps)
+      setGridTrackLayout(measurement.trackLayout)
       setTrackRects(measurement.tracks)
     })
 
@@ -102,6 +117,7 @@ export function DomEditGridOverlay<
   }, [
     context.showGridLayout,
     rect.h,
+    rect.scale,
     rect.w,
     rect.x,
     rect.y,
@@ -152,14 +168,29 @@ export function DomEditGridOverlay<
 
     const trackGridAffordance = (event: globalThis.PointerEvent) => {
       if (activeDragAxis) {
+        setHoveredGridTrackKeys([])
         return
       }
 
       const hoveredTarget = document.elementFromPoint(event.clientX, event.clientY)
       const nextIsGapHovered = Boolean(hoveredTarget?.closest('.figma-grid-gap'))
+      const nextHoveredTrackKeys = shellRef.current && gridTrackLayout
+        ? getDomEditGridHoveredTracks({
+            layout: gridTrackLayout,
+            point: getDomEditGridWorldPoint({
+              event,
+              shell: shellRef.current,
+              viewport,
+            }),
+          }).map(getDomEditGridTrackKey)
+        : []
 
       setIsGapHovered((current) =>
         current === nextIsGapHovered ? current : nextIsGapHovered)
+      setHoveredGridTrackKeys((current) =>
+        areDomEditGridTrackKeysEqual(current, nextHoveredTrackKeys)
+          ? current
+          : nextHoveredTrackKeys)
     }
 
     window.addEventListener('pointermove', trackGridAffordance)
@@ -167,7 +198,13 @@ export function DomEditGridOverlay<
     return () => {
       window.removeEventListener('pointermove', trackGridAffordance)
     }
-  }, [activeDragAxis, context.showGridLayout])
+  }, [
+    activeDragAxis,
+    context.showGridLayout,
+    gridTrackLayout,
+    shellRef,
+    viewport,
+  ])
 
   const activeGridChildArea = shouldShowGridChildArea ? gridChildArea : null
 
@@ -185,6 +222,10 @@ export function DomEditGridOverlay<
     affordanceState,
     context,
   })
+  const activeGridTrackLayout = context.showGridLayout &&
+    visibility.gridGapHitTargets
+    ? gridTrackLayout
+    : null
   const activeGap = gapRects[0]
   const startGapDrag = (
     event: PointerEvent<HTMLButtonElement>,
@@ -239,6 +280,12 @@ export function DomEditGridOverlay<
     <>
       {activeGridChildArea ? (
         <DomEditGridChildAreaGuide area={activeGridChildArea} />
+      ) : null}
+      {activeGridTrackLayout ? (
+        <DomEditGridTrackGuides
+          hoveredTrackKeys={hoveredGridTrackKeys}
+          layout={activeGridTrackLayout}
+        />
       ) : null}
       {visibility.gridGapVisuals ? trackRects.map((track, index) => (
         <span
@@ -319,6 +366,101 @@ function DomEditGridChildAreaGuide({
   )
 }
 
+function DomEditGridTrackGuides({
+  hoveredTrackKeys,
+  layout,
+}: {
+  hoveredTrackKeys: string[]
+  layout: DomEditGridTrackLayout
+}) {
+  const hoveredTrackKeySet = new Set(hoveredTrackKeys)
+  const lines = [
+    ...layout.columnLines,
+    ...layout.rowLines,
+  ]
+  const tracks = [
+    ...layout.columnTracks,
+    ...layout.rowTracks,
+  ]
+  const hoveredTracks = tracks.filter((track) =>
+    hoveredTrackKeySet.has(getDomEditGridTrackKey(track)))
+
+  return (
+    <>
+      {hoveredTracks.map((track) => (
+        <span
+          key={`track:${getDomEditGridTrackKey(track)}`}
+          className={[
+            'figma-grid-track-hover',
+            `figma-grid-track-hover--${track.axis}`,
+          ].join(' ')}
+          data-grid-track-hover-axis={track.axis}
+          data-grid-track-hover-index={track.index + 1}
+          style={createDomEditOverlayRectStyle(track.rect)}
+        />
+      ))}
+      {lines.map((line) => (
+        <span
+          key={`line:${line.axis}:${line.lineNumber}`}
+          className={[
+            'figma-grid-line',
+            `figma-grid-line--${line.axis}`,
+          ].join(' ')}
+          data-grid-line-axis={line.axis}
+          data-grid-line-number={line.lineNumber}
+          style={createDomEditOverlayRectStyle(line.rect)}
+        />
+      ))}
+      {lines.map((line) => (
+        <span
+          key={`line-label:${line.axis}:${line.lineNumber}`}
+          className={[
+            'figma-grid-line-label',
+            `figma-grid-line-label--${line.axis}`,
+          ].join(' ')}
+          data-grid-line-label-axis={line.axis}
+          data-grid-line-label-number={line.lineNumber}
+          style={{
+            left: line.labelX,
+            top: line.labelY,
+          }}
+        >
+          {line.lineNumber}
+        </span>
+      ))}
+      {hoveredTracks.map((track) => (
+        <DomEditGridTrackSizeLabel
+          key={`track-size:${getDomEditGridTrackKey(track)}`}
+          track={track}
+        />
+      ))}
+    </>
+  )
+}
+
+function DomEditGridTrackSizeLabel({
+  track,
+}: {
+  track: DomEditGridTrackGuide
+}) {
+  return (
+    <span
+      className={[
+        'figma-grid-track-size',
+        `figma-grid-track-size--${track.axis}`,
+      ].join(' ')}
+      data-grid-track-size-axis={track.axis}
+      data-grid-track-size-index={track.index + 1}
+      style={{
+        left: track.labelX,
+        top: track.labelY,
+      }}
+    >
+      {track.label}
+    </span>
+  )
+}
+
 function measureDomEditGridChildArea<
   TNodeId extends DomEditNodeId,
   TState extends DomEditState<TNodeId>,
@@ -362,17 +504,20 @@ function measureDomEditGridChildArea<
 }
 
 function measureDomEditGrid({
+  lineThickness,
   shell,
   target,
   viewport,
 }: {
+  lineThickness: number
   shell: HTMLElement | null
   target: HTMLElement
   viewport: DomEditViewport
 }) {
-  if (!shell || target.children.length < 2) {
+  if (!shell) {
     return {
       gaps: [],
+      trackLayout: null,
       tracks: [],
     }
   }
@@ -392,12 +537,20 @@ function measureDomEditGrid({
       shellRect,
       viewport,
     }))
+  const trackLayout = getDomEditGridTrackLayout({
+    columnTemplate: readDomEditGridTemplate(target, 'column'),
+    container: targetWorldRect,
+    lineThickness,
+    rowTemplate: readDomEditGridTemplate(target, 'row'),
+    tracks,
+  })
 
   return {
     gaps: [
       ...measureDomEditGridColumnGaps(tracks, targetWorldRect),
       ...measureDomEditGridRowGaps(tracks, targetWorldRect),
     ],
+    trackLayout,
     tracks,
   }
 }
@@ -492,4 +645,45 @@ function resolveDomEditGridGapDragValue(
   event: globalThis.PointerEvent,
 ) {
   return resolveDomEditSpacingDragValue(value, event)
+}
+
+function readDomEditGridTemplate(
+  target: HTMLElement,
+  axis: 'column' | 'row',
+) {
+  const computedStyle = target.ownerDocument.defaultView?.getComputedStyle(target)
+  const inlineTemplate = axis === 'column'
+    ? target.style.gridTemplateColumns
+    : target.style.gridTemplateRows
+  const computedTemplate = axis === 'column'
+    ? computedStyle?.gridTemplateColumns
+    : computedStyle?.gridTemplateRows
+
+  return inlineTemplate || computedTemplate || ''
+}
+
+function getDomEditGridWorldPoint({
+  event,
+  shell,
+  viewport,
+}: {
+  event: globalThis.PointerEvent
+  shell: HTMLElement
+  viewport: DomEditViewport
+}) {
+  const shellRect = shell.getBoundingClientRect()
+  const scale = viewport.scale > 0 ? viewport.scale : 1
+
+  return {
+    x: (event.clientX - shellRect.left - viewport.x) / scale,
+    y: (event.clientY - shellRect.top - viewport.y) / scale,
+  }
+}
+
+function areDomEditGridTrackKeysEqual(
+  current: string[],
+  next: string[],
+) {
+  return current.length === next.length &&
+    current.every((key, index) => key === next[index])
 }

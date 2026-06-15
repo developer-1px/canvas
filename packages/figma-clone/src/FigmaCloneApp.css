@@ -2129,6 +2129,10 @@
 
 .figma-grid-track,
 .figma-grid-gap,
+.figma-grid-line,
+.figma-grid-line-label,
+.figma-grid-track-hover,
+.figma-grid-track-size,
 .figma-grid-child-area,
 .figma-grid-child-badge,
 .figma-grid-value {
@@ -2141,6 +2145,59 @@
   border: 1px dashed rgba(14, 116, 144, 0.42);
   background: rgba(103, 232, 249, 0.06);
   pointer-events: none;
+}
+
+.figma-grid-line {
+  z-index: 3;
+  background: rgba(37, 99, 235, 0.72);
+  pointer-events: none;
+}
+
+.figma-grid-line-label,
+.figma-grid-track-size {
+  border-radius: 3px;
+  background: #2563eb;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 650;
+  line-height: 14px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.figma-grid-line-label {
+  z-index: 7;
+  min-width: 14px;
+  padding: 0 4px;
+  text-align: center;
+}
+
+.figma-grid-line-label--column {
+  transform: translate(-50%, -100%);
+}
+
+.figma-grid-line-label--row {
+  transform: translate(-100%, -50%);
+}
+
+.figma-grid-track-hover {
+  z-index: 2;
+  background: rgba(37, 99, 235, 0.06);
+  outline: 1px solid rgba(37, 99, 235, 0.22);
+  pointer-events: none;
+}
+
+.figma-grid-track-size {
+  z-index: 8;
+  padding: 1px 5px;
+}
+
+.figma-grid-track-size--column {
+  transform: translate(-50%, 0);
+}
+
+.figma-grid-track-size--row {
+  transform: translate(0, -50%);
 }
 
 .figma-grid-gap {
