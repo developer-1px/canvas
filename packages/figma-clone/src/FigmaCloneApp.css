@@ -1660,6 +1660,10 @@
   width: 1px;
 }
 
+.figma-guide-distance--inset {
+  background: #f97316;
+}
+
 .figma-guide-distance--y::before,
 .figma-guide-distance--y::after {
   left: -4px;

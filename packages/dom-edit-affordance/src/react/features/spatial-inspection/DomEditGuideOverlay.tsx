@@ -39,17 +39,12 @@ import {
   type DomEditFrameGuideLine,
   type DomEditFrameLayoutColumn,
 } from './DomEditFrameGuides'
+import {
+  getDomEditMeasurementDistances,
+  type DomEditMeasurementDistance,
+} from './DomEditMeasurementGeometry'
 
 type GuideRect = DomEditScaledOverlayRect
-
-type GuideDistance = {
-  axis: 'x' | 'y'
-  from: {
-    x: number
-    y: number
-  }
-  length: number
-}
 
 export function DomEditGuideOverlay<
   TNodeId extends DomEditNodeId,
@@ -584,25 +579,38 @@ function getDomEditHoveredMeasurementNodeId<
   selectedNodeId,
   target,
 }: {
-  adapter: Pick<DomEditModelAdapter<TNodeId, TState>, 'readNodeId'>
+  adapter: Pick<
+    DomEditModelAdapter<TNodeId, TState>,
+    'getParentId' | 'readNodeId'
+  >
   selectedNodeId: TNodeId
   target: Element | null
 }): TNodeId | null {
+  if (target?.closest('.figma-selection-layer')) {
+    return null
+  }
+
+  const selectedParentId = adapter.getParentId(selectedNodeId)
+  const nodePath: TNodeId[] = []
   let current: Element | null = target
 
   while (current) {
     if (current instanceof HTMLElement) {
       const nodeId = adapter.readNodeId(current)
 
-      if (nodeId && nodeId !== selectedNodeId) {
-        return nodeId
+      if (nodeId && nodeId !== selectedNodeId && !nodePath.includes(nodeId)) {
+        nodePath.push(nodeId)
       }
     }
 
     current = current.parentElement
   }
 
-  return null
+  const siblingNodeId = selectedParentId
+    ? nodePath.find((nodeId) => adapter.getParentId(nodeId) === selectedParentId)
+    : null
+
+  return siblingNodeId ?? nodePath[0] ?? null
 }
 
 function DomEditTransformGuides({
@@ -660,7 +668,7 @@ function DomEditTransformGuides({
 function DomEditGuideDistance({
   distance,
 }: {
-  distance: GuideDistance
+  distance: DomEditMeasurementDistance
 }) {
   const style: CSSProperties = distance.axis === 'x'
     ? {
@@ -676,164 +684,14 @@ function DomEditGuideDistance({
 
   return (
     <div
-      className={`figma-guide-distance figma-guide-distance--${distance.axis}`}
+      className={[
+        'figma-guide-distance',
+        `figma-guide-distance--${distance.axis}`,
+        `figma-guide-distance--${distance.kind}`,
+      ].join(' ')}
       style={style}
     >
-      <span>{Math.round(distance.length)}</span>
+      <span>{Math.round(distance.length)} px</span>
     </div>
   )
-}
-
-function getDomEditInsetDistances(
-  inner: GuideRect,
-  outer: GuideRect,
-): GuideDistance[] {
-  const midX = inner.x + inner.w / 2
-  const midY = inner.y + inner.h / 2
-  const outerRight = outer.x + outer.w
-  const outerBottom = outer.y + outer.h
-  const innerRight = inner.x + inner.w
-  const innerBottom = inner.y + inner.h
-
-  const distances: GuideDistance[] = [
-    {
-      axis: 'y',
-      from: { x: midX, y: outer.y },
-      length: inner.y - outer.y,
-    },
-    {
-      axis: 'y',
-      from: { x: midX, y: innerBottom },
-      length: outerBottom - innerBottom,
-    },
-    {
-      axis: 'x',
-      from: { x: outer.x, y: midY },
-      length: inner.x - outer.x,
-    },
-    {
-      axis: 'x',
-      from: { x: innerRight, y: midY },
-      length: outerRight - innerRight,
-    },
-  ]
-
-  return distances.filter((distance) => distance.length > 0.5)
-}
-
-function getDomEditMeasurementDistances(
-  selected: GuideRect,
-  reference: GuideRect,
-): GuideDistance[] {
-  if (containsDomEditGuideRect(reference, selected)) {
-    return getDomEditInsetDistances(selected, reference)
-  }
-
-  if (containsDomEditGuideRect(selected, reference)) {
-    return getDomEditInsetDistances(reference, selected)
-  }
-
-  return [
-    getDomEditHorizontalDistance(selected, reference),
-    getDomEditVerticalDistance(selected, reference),
-  ].filter((distance): distance is GuideDistance =>
-    Boolean(distance && distance.length > 0.5))
-}
-
-function containsDomEditGuideRect(
-  outer: GuideRect,
-  inner: GuideRect,
-) {
-  return inner.x >= outer.x &&
-    inner.y >= outer.y &&
-    inner.x + inner.w <= outer.x + outer.w &&
-    inner.y + inner.h <= outer.y + outer.h
-}
-
-function getDomEditHorizontalDistance(
-  selected: GuideRect,
-  reference: GuideRect,
-): GuideDistance | null {
-  const selectedRight = selected.x + selected.w
-  const referenceRight = reference.x + reference.w
-  const y = getDomEditGuideOverlapCenter({
-    firstEnd: selected.y + selected.h,
-    firstStart: selected.y,
-    secondEnd: reference.y + reference.h,
-    secondStart: reference.y,
-  })
-
-  if (selectedRight <= reference.x) {
-    return {
-      axis: 'x',
-      from: { x: selectedRight, y },
-      length: reference.x - selectedRight,
-    }
-  }
-
-  if (referenceRight <= selected.x) {
-    return {
-      axis: 'x',
-      from: { x: referenceRight, y },
-      length: selected.x - referenceRight,
-    }
-  }
-
-  return null
-}
-
-function getDomEditVerticalDistance(
-  selected: GuideRect,
-  reference: GuideRect,
-): GuideDistance | null {
-  const selectedBottom = selected.y + selected.h
-  const referenceBottom = reference.y + reference.h
-  const x = getDomEditGuideOverlapCenter({
-    firstEnd: selected.x + selected.w,
-    firstStart: selected.x,
-    secondEnd: reference.x + reference.w,
-    secondStart: reference.x,
-  })
-
-  if (selectedBottom <= reference.y) {
-    return {
-      axis: 'y',
-      from: { x, y: selectedBottom },
-      length: reference.y - selectedBottom,
-    }
-  }
-
-  if (referenceBottom <= selected.y) {
-    return {
-      axis: 'y',
-      from: { x, y: referenceBottom },
-      length: selected.y - referenceBottom,
-    }
-  }
-
-  return null
-}
-
-function getDomEditGuideOverlapCenter({
-  firstEnd,
-  firstStart,
-  secondEnd,
-  secondStart,
-}: {
-  firstEnd: number
-  firstStart: number
-  secondEnd: number
-  secondStart: number
-}) {
-  const overlapStart = Math.max(firstStart, secondStart)
-  const overlapEnd = Math.min(firstEnd, secondEnd)
-
-  if (overlapEnd >= overlapStart) {
-    return overlapStart + (overlapEnd - overlapStart) / 2
-  }
-
-  const firstCenter = firstStart + (firstEnd - firstStart) / 2
-  const secondCenter = secondStart + (secondEnd - secondStart) / 2
-
-  return firstCenter + (secondCenter - firstCenter) / 2
 }
