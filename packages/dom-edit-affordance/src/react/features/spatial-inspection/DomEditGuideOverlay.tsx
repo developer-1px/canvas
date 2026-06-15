@@ -22,8 +22,10 @@ import {
   type DomEditScaledOverlayRect,
 } from '../../../shared/geometry/DomEditOverlayGeometry'
 import type {
+  DomEditLayoutContext,
   DomEditModelAdapter,
   DomEditNodeId,
+  DomEditNodeState,
   DomEditState,
   DomEditViewport,
 } from '../../../shared/model/DomEditTypes'
@@ -79,6 +81,7 @@ export function DomEditGuideOverlay<
   const [hoveredRect, setHoveredRect] = useState<GuideRect | null>(null)
   const context = adapter.getLayoutContext(selectedNodeId)
   const style = adapter.getStyle(state, selectedNodeId)
+  const contextBadge = getDomEditLayoutContextBadge({ context, style })
   const parentId = adapter.getParentId(selectedNodeId)
   const visibility = getDomEditOverlayVisibility({
     affordanceState,
@@ -338,12 +341,53 @@ export function DomEditGuideOverlay<
           top: Math.max(8, rect.y - 6),
         }}
       >
-        {context.label} · {context.display}
-        {context.showFlexLayout ? ` ${style.direction === 'row' ? 'H' : 'V'}` : ''}
-        {context.showGridLayout ? ' Grid' : ''}
+        <span className="figma-guide-label__name">{context.label}</span>
+        <span
+          className={[
+            'figma-guide-context-badge',
+            `figma-guide-context-badge--${contextBadge.kind}`,
+          ].join(' ')}
+          data-dom-layout-context-badge={contextBadge.kind}
+        >
+          {contextBadge.label}
+        </span>
       </span>
     </>
   )
+}
+
+function getDomEditLayoutContextBadge<TNodeId extends DomEditNodeId>({
+  context,
+  style,
+}: {
+  context: DomEditLayoutContext<TNodeId>
+  style: DomEditNodeState
+}) {
+  if (context.position === 'absolute') {
+    return {
+      kind: 'absolute',
+      label: 'absolute',
+    } as const
+  }
+
+  if (context.showGridLayout || context.display === 'grid') {
+    return {
+      kind: 'grid',
+      label: 'grid',
+    } as const
+  }
+
+  if (context.showSelfLayout || context.display === 'flex') {
+    return {
+      kind: 'flex',
+      label: `flex ${style.direction}`,
+    } as const
+  }
+
+  return {
+    kind: 'block',
+    label: 'block',
+  } as const
 }
 
 function measureDomEditSiblingSmartGuideCandidates<
