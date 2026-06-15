@@ -12,6 +12,9 @@ describe('DomEditAffordanceVisibility', () => {
     expect(visibility.selection).toBe(true)
     expect(visibility.parentReference).toBe(true)
     expect(visibility.directionControls).toBe(true)
+    expect(visibility.flexChildControls).toBe(true)
+    expect(visibility.flexChildMargin).toBe(true)
+    expect(visibility.flexChildAlignSelfGuide).toBe(false)
     expect(visibility.sizeModes).toBe(true)
     expect(visibility.geometry).toBe(false)
     expect(visibility.measurements).toBe(false)
@@ -35,6 +38,7 @@ describe('DomEditAffordanceVisibility', () => {
     expect(gapDrag.geometry).toBe(false)
     expect(gapDrag.measurements).toBe(false)
     expect(gapDrag.directionControls).toBe(false)
+    expect(gapDrag.flexChildControls).toBe(false)
     expect(gapDrag.sizeModes).toBe(false)
 
     expect(paddingDrag.paddingVisuals).toBe(true)
@@ -43,6 +47,7 @@ describe('DomEditAffordanceVisibility', () => {
     expect(paddingDrag.geometry).toBe(false)
     expect(paddingDrag.measurements).toBe(false)
     expect(paddingDrag.directionControls).toBe(false)
+    expect(paddingDrag.flexChildControls).toBe(false)
     expect(paddingDrag.sizeModes).toBe(false)
   })
 
@@ -54,6 +59,7 @@ describe('DomEditAffordanceVisibility', () => {
     expect(measure.parentReference).toBe(false)
     expect(measure.geometry).toBe(false)
     expect(measure.directionControls).toBe(false)
+    expect(measure.flexChildControls).toBe(false)
     expect(measure.sizeModes).toBe(false)
     expect(measure.xray).toBe(false)
 
@@ -61,6 +67,7 @@ describe('DomEditAffordanceVisibility', () => {
     expect(xray.measurements).toBe(false)
     expect(xray.parentReference).toBe(false)
     expect(xray.directionControls).toBe(false)
+    expect(xray.flexChildControls).toBe(false)
     expect(xray.gapHitTargets).toBe(false)
     expect(xray.paddingHitTargets).toBe(false)
     expect(xray.sizeModes).toBe(false)
@@ -105,6 +112,31 @@ describe('DomEditAffordanceVisibility', () => {
       { mode: 'idle' },
       { showSelfLayout: false },
     ).directionControls).toBe(false)
+  })
+
+  it('shows flex child controls only for flex parent participation', () => {
+    expect(getVisibility({ mode: 'idle' }).flexChildControls).toBe(true)
+    expect(getVisibility({ mode: 'idle' }).flexChildMargin).toBe(true)
+    expect(getVisibility({
+      mode: 'hover-property',
+      property: 'alignSelf',
+    }).flexChildControls).toBe(true)
+    expect(getVisibility({
+      mode: 'hover-property',
+      property: 'alignSelf',
+    }).flexChildAlignSelfGuide).toBe(true)
+    expect(getVisibility({
+      mode: 'hover-property',
+      property: 'alignSelf',
+    }).flexChildMargin).toBe(false)
+    expect(getVisibility(
+      { mode: 'idle' },
+      { parentDisplay: 'grid' },
+    ).flexChildControls).toBe(false)
+    expect(getVisibility(
+      { mode: 'idle' },
+      { parentDisplay: null, parentId: null },
+    ).flexChildControls).toBe(false)
   })
 })
 

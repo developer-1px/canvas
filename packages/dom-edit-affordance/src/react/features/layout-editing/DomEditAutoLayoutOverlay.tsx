@@ -31,6 +31,7 @@ import {
   type DomEditFlexParticipationDescriptor,
 } from '../../../features/size-editing/DomEditFlexParticipation'
 import type {
+  DomEditAutoLayoutAlign,
   DomEditAutoLayoutField,
   DomEditField,
   DomEditModelAdapter,
@@ -67,8 +68,18 @@ import {
   DomEditAlignmentEditor,
   type DomEditAlignmentPreview,
 } from './DomEditAlignmentEditor'
+import { DomEditMarginGhostOverlay } from '../box-model-xray/DomEditMarginGhostOverlay'
 
 type AutoLayoutAffordanceMode = 'gap' | 'padding'
+type DomEditFlexChildEffectiveAlign =
+  Exclude<DomEditAutoLayoutAlign, 'auto'>
+
+type DomEditFlexChildAlignSelfDescriptor = {
+  alignSelf: DomEditAutoLayoutAlign
+  direction: DomEditNodeState['direction']
+  effectiveAlign: DomEditFlexChildEffectiveAlign
+  label: string
+}
 
 type DomEditAutoLayoutOverlayTransientState<
   TNodeId extends DomEditNodeId,
@@ -174,12 +185,20 @@ export function DomEditAutoLayoutOverlay<
   const parentStyle = context.parentId
     ? adapter.getStyle(state, context.parentId)
     : null
+  const parentDirection = parentStyle?.direction ?? null
   const flexParticipation = getDomEditFlexParticipationDescriptor({
     heightMode: style.heightMode,
-    parentDirection: parentStyle?.direction ?? null,
+    parentDirection,
     parentDisplay: context.parentDisplay,
     widthMode: style.widthMode,
   })
+  const flexChildAlignSelf = parentDirection
+    ? getDomEditFlexChildAlignSelfDescriptor({
+      alignSelf: style.alignSelf,
+      parentAlign: parentStyle?.align ?? 'start',
+      parentDirection,
+    })
+    : null
   const isBetweenDistribution = style.distribution === 'space-between'
   const updateTransientState = useCallback((
     update: (
@@ -536,6 +555,31 @@ export function DomEditAutoLayoutOverlay<
 
   return (
     <>
+      {visibility.flexChildMargin ? (
+        <DomEditMarginGhostOverlay
+          owner="selected"
+          rect={rect}
+          target={target}
+        />
+      ) : null}
+      {visibility.flexChildAlignSelfGuide && flexChildAlignSelf ? (
+        <DomEditFlexChildAlignSelfGuide
+          descriptor={flexChildAlignSelf}
+          rect={rect}
+        />
+      ) : null}
+      {visibility.flexChildControls && flexChildAlignSelf ? (
+        <DomEditFlexChildAlignSelfControl
+          descriptor={flexChildAlignSelf}
+          rect={rect}
+          onPointerEnter={() =>
+            onAffordanceStateChange({
+              mode: 'hover-property',
+              property: 'alignSelf',
+            })}
+          onPointerLeave={() => onAffordanceStateChange({ mode: 'idle' })}
+        />
+      ) : null}
       {canEditBoxSpacing ? (
         <>
           {shouldRenderAlignGuide && alignGuideValue ? (
@@ -872,7 +916,7 @@ export function DomEditAutoLayoutOverlay<
             heightValue={rect.h}
             parentDisplay={context.parentDisplay}
             rect={rect}
-            showFill={context.showParentParticipation}
+            showFill={context.parentDisplay === 'flex'}
             widthMode={style.widthMode}
             widthValue={rect.w}
             onAffordanceStateChange={onAffordanceStateChange}
@@ -890,6 +934,64 @@ export function DomEditAutoLayoutOverlay<
         </>
       ) : null}
     </>
+  )
+}
+
+function DomEditFlexChildAlignSelfControl({
+  descriptor,
+  rect,
+  onPointerEnter,
+  onPointerLeave,
+}: {
+  descriptor: DomEditFlexChildAlignSelfDescriptor
+  rect: DomEditAutoLayoutRect & { scale: number }
+  onPointerEnter: () => void
+  onPointerLeave: () => void
+}) {
+  return (
+    <button
+      aria-label={`Align self ${descriptor.label}`}
+      className={[
+        'figma-flex-child-align-self',
+        `figma-flex-child-align-self--${descriptor.direction}`,
+        `figma-flex-child-align-self--${descriptor.effectiveAlign}`,
+      ].join(' ')}
+      data-align-effective={descriptor.effectiveAlign}
+      data-align-self={descriptor.alignSelf}
+      style={getDomEditFlexChildAlignSelfControlStyle({ descriptor, rect })}
+      title="Align self"
+      type="button"
+      onPointerDown={(event) => {
+        event.preventDefault()
+        event.stopPropagation()
+      }}
+      onPointerEnter={onPointerEnter}
+      onPointerLeave={onPointerLeave}
+    >
+      <span aria-hidden="true" />
+    </button>
+  )
+}
+
+function DomEditFlexChildAlignSelfGuide({
+  descriptor,
+  rect,
+}: {
+  descriptor: DomEditFlexChildAlignSelfDescriptor
+  rect: DomEditAutoLayoutRect
+}) {
+  return (
+    <span
+      aria-hidden="true"
+      className={[
+        'figma-flex-child-align-self-guide',
+        `figma-flex-child-align-self-guide--${descriptor.direction}`,
+        `figma-flex-child-align-self-guide--${descriptor.effectiveAlign}`,
+      ].join(' ')}
+      data-align-effective={descriptor.effectiveAlign}
+      data-align-self-guide="true"
+      style={getDomEditFlexChildAlignSelfGuideStyle({ descriptor, rect })}
+    />
   )
 }
 
@@ -1076,6 +1178,29 @@ function createDomEditAutoLayoutOverlayTransientState<
   }
 }
 
+function getDomEditFlexChildAlignSelfDescriptor({
+  alignSelf,
+  parentAlign,
+  parentDirection,
+}: {
+  alignSelf: DomEditAutoLayoutAlign
+  parentAlign: DomEditAutoLayoutAlign
+  parentDirection: DomEditNodeState['direction']
+}): DomEditFlexChildAlignSelfDescriptor {
+  const effectiveAlign = alignSelf === 'auto'
+    ? normalizeDomEditFlexChildAlign(parentAlign)
+    : alignSelf
+
+  return {
+    alignSelf,
+    direction: parentDirection,
+    effectiveAlign,
+    label: alignSelf === 'auto'
+      ? `Auto (${getDomEditFlexChildAlignLabel(effectiveAlign)})`
+      : getDomEditFlexChildAlignLabel(effectiveAlign),
+  }
+}
+
 function resolveDomEditStateAction<T>(
   current: T,
   action: SetStateAction<T>,
@@ -1083,6 +1208,122 @@ function resolveDomEditStateAction<T>(
   return typeof action === 'function'
     ? (action as (current: T) => T)(current)
     : action
+}
+
+function getDomEditFlexChildAlignSelfControlStyle({
+  descriptor,
+  rect,
+}: {
+  descriptor: DomEditFlexChildAlignSelfDescriptor
+  rect: DomEditAutoLayoutRect & { scale: number }
+}): CSSProperties {
+  const position = getDomEditFlexChildCrossAxisPosition({
+    align: descriptor.effectiveAlign,
+    direction: descriptor.direction,
+    rect,
+  })
+
+  if (descriptor.direction === 'row') {
+    return {
+      left: rect.x - 7,
+      top: position,
+      transform: `translate(-100%, -50%) scale(${1 / rect.scale})`,
+    }
+  }
+
+  return {
+    left: position,
+    top: rect.y - 7,
+    transform: `translate(-50%, -100%) scale(${1 / rect.scale})`,
+  }
+}
+
+function getDomEditFlexChildAlignSelfGuideStyle({
+  descriptor,
+  rect,
+}: {
+  descriptor: DomEditFlexChildAlignSelfDescriptor
+  rect: DomEditAutoLayoutRect
+}): CSSProperties {
+  const lineSize = 2
+
+  if (descriptor.effectiveAlign === 'stretch') {
+    return {
+      height: rect.h,
+      left: rect.x,
+      top: rect.y,
+      width: rect.w,
+    }
+  }
+
+  const position = getDomEditFlexChildCrossAxisPosition({
+    align: descriptor.effectiveAlign,
+    direction: descriptor.direction,
+    rect,
+  })
+
+  if (descriptor.direction === 'row') {
+    return {
+      height: lineSize,
+      left: rect.x,
+      top: position - lineSize / 2,
+      width: rect.w,
+    }
+  }
+
+  return {
+    height: rect.h,
+    left: position - lineSize / 2,
+    top: rect.y,
+    width: lineSize,
+  }
+}
+
+function getDomEditFlexChildCrossAxisPosition({
+  align,
+  direction,
+  rect,
+}: {
+  align: DomEditFlexChildEffectiveAlign
+  direction: DomEditNodeState['direction']
+  rect: DomEditAutoLayoutRect
+}) {
+  const start = direction === 'row' ? rect.y : rect.x
+  const size = direction === 'row' ? rect.h : rect.w
+
+  if (align === 'center' || align === 'stretch') {
+    return start + size / 2
+  }
+
+  if (align === 'end') {
+    return start + size
+  }
+
+  return start
+}
+
+function normalizeDomEditFlexChildAlign(
+  align: DomEditAutoLayoutAlign,
+): DomEditFlexChildEffectiveAlign {
+  return align === 'auto' ? 'start' : align
+}
+
+function getDomEditFlexChildAlignLabel(
+  align: DomEditFlexChildEffectiveAlign,
+) {
+  if (align === 'center') {
+    return 'Center'
+  }
+
+  if (align === 'end') {
+    return 'End'
+  }
+
+  if (align === 'stretch') {
+    return 'Stretch'
+  }
+
+  return 'Start'
 }
 
 function getDomEditAlignItemsGuideStyle({
