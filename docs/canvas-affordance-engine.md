@@ -30,6 +30,7 @@
 | Folder | 책임 |
 | --- | --- |
 | `package.json` | Canvas package export map을 public facade entry로 고정한다 |
+| `packages/slide-edit-affordance` | Slide 기반 편집기용 first-party affordance 후보. `canvas/core`/`canvas/foundation` 계약을 재사용하고 slide frame, object bounds, selection, command effect, text measurement adapter slot을 제품 모델명 없이 소유한다 |
 | `src/canvas/architecture/CanvasModuleBoundaries.test.ts` | Module seam import 규칙을 회귀 테스트로 검증한다 |
 | `src/canvas/architecture/CanvasPackageConsumer.test.ts` | 외부 소비자처럼 `canvas`와 `canvas/*` export를 import해 public package surface를 검증한다 |
 | `src/canvas/architecture/CanvasPackageManifest.test.ts` | package manifest export map이 public facade만 가리키는지 검증한다 |
