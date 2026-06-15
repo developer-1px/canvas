@@ -21,6 +21,7 @@ describe('slide-edit-affordance boundary', () => {
       'slide-metadata',
       'slide-transition',
       'text-font-family',
+      'text-frame-inset',
       'text-vertical-alignment',
       'text-paragraph-spacing',
       'text-measurement',

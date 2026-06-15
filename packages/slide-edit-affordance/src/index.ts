@@ -123,6 +123,29 @@ export {
   type SlideEditTextVerticalAlignmentValue,
 } from './SlideEditTextVerticalAlignment'
 export {
+  createSlideEditTextFrameInsetDescriptor,
+  getSlideEditTextFrameInsetCommandEffect,
+  getSlideEditTextFrameInsetMetadata,
+  normalizeSlideEditTextFrameInset,
+  normalizeSlideEditTextFrameInsetUpdateCommand,
+  normalizeSlideEditTextFrameInsetValue,
+  SLIDE_EDIT_TEXT_FRAME_INSET_DATA_ATTRIBUTE,
+  SLIDE_EDIT_TEXT_FRAME_INSET_DEFAULT,
+  SLIDE_EDIT_TEXT_FRAME_INSET_FIELDS,
+  SLIDE_EDIT_TEXT_FRAME_INSET_LIMITS,
+  toSlideEditTextFrameInsetAttributeValue,
+  type SlideEditTextFrameInset,
+  type SlideEditTextFrameInsetDescriptor,
+  type SlideEditTextFrameInsetFieldDescriptor,
+  type SlideEditTextFrameInsetHostCommandEffect,
+  type SlideEditTextFrameInsetMetadata,
+  type SlideEditTextFrameInsetNumericLimits,
+  type SlideEditTextFrameInsetObjectId,
+  type SlideEditTextFrameInsetSide,
+  type SlideEditTextFrameInsetSlideId,
+  type SlideEditTextFrameInsetUpdateCommand,
+} from './SlideEditTextFrameInset'
+export {
   createSlideEditPlaceholderDescriptor,
   getSlideEditObjectVisibilityCommandAvailability,
   getSlideEditObjectVisibilityCommandEffect,
@@ -368,6 +391,7 @@ export type SlideEditAdapterSlotId =
   | 'slide-metadata'
   | 'slide-transition'
   | 'text-font-family'
+  | 'text-frame-inset'
   | 'text-vertical-alignment'
   | 'text-paragraph-spacing'
   | 'text-measurement'
@@ -423,6 +447,11 @@ export const SLIDE_EDIT_ADAPTER_SLOTS = Object.freeze([
     id: 'text-font-family',
     owner: 'host',
     purpose: 'Provide selected text object font family values and allowed family options.',
+  },
+  {
+    id: 'text-frame-inset',
+    owner: 'host',
+    purpose: 'Provide selected text object frame inset values for stage, thumbnail, and export.',
   },
   {
     id: 'text-vertical-alignment',
@@ -496,6 +525,7 @@ export type SlideEditOwnedContractId =
   | 'slide-rail-interaction'
   | 'slide-transition-timing'
   | 'text-font-family-affordance'
+  | 'text-frame-inset-affordance'
   | 'text-overflow-affordance'
   | 'text-paragraph-spacing-affordance'
   | 'text-vertical-alignment-affordance'
@@ -571,6 +601,11 @@ export const SLIDE_EDIT_OWNED_CONTRACTS = Object.freeze([
     id: 'text-font-family-affordance',
     owner: 'slide-edit-affordance',
     scope: 'Selected text object font family options, fallback normalization, and update command effects.',
+  },
+  {
+    id: 'text-frame-inset-affordance',
+    owner: 'slide-edit-affordance',
+    scope: 'Text frame top/right/bottom/left inset metadata and update command effects.',
   },
   {
     id: 'text-vertical-alignment-affordance',
