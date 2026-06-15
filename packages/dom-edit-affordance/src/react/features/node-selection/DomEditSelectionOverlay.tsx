@@ -62,6 +62,12 @@ type DomEditResizeSessionData = {
   startSize?: number[]
 }
 
+type DomEditXrayHoverTarget<TNodeId extends DomEditNodeId> = {
+  nodeId: TNodeId
+  rect: DomEditScaledOverlayRect
+  target: HTMLElement
+}
+
 const DOM_EDIT_TEXT_ENTRY_TARGET_KINDS = new Set<InteractionKeyTargetKind>([
   'contenteditable',
   'select',
@@ -111,6 +117,8 @@ export function DomEditSelectionOverlay<
 }) {
   const [rect, setRect] = useState<DomEditScaledOverlayRect | null>(null)
   const [target, setTarget] = useState<HTMLElement | null>(null)
+  const [xrayHoverTarget, setXrayHoverTarget] =
+    useState<DomEditXrayHoverTarget<TNodeId> | null>(null)
   const [isDirectManipulation, setIsDirectManipulation] = useState(false)
   const [isTemporaryGuideMode, setIsTemporaryGuideMode] = useState(false)
   const [isTemporaryMeasureMode, setIsTemporaryMeasureMode] = useState(false)
@@ -239,6 +247,79 @@ export function DomEditSelectionOverlay<
     }
   }, [appAffordanceState, onAffordanceStateChange, onCommand])
 
+  useEffect(() => {
+    if (
+      appAffordanceState.mode !== 'xray' ||
+      !selectedNodeId ||
+      !shellElement
+    ) {
+      return undefined
+    }
+
+    const clearHoverTarget = () => {
+      setXrayHoverTarget(null)
+    }
+    const handlePointerMove = (event: PointerEvent) => {
+      if (!(event.target instanceof HTMLElement)) {
+        clearHoverTarget()
+        return
+      }
+
+      const hoveredNodeId = adapter.readNodeId(event.target)
+
+      if (!hoveredNodeId || hoveredNodeId === selectedNodeId) {
+        clearHoverTarget()
+        return
+      }
+
+      const hoverTarget = adapter.getElement(hoveredNodeId)
+      const hoverRect = measureDomEditNodeOverlayRect({
+        adapter,
+        nodeId: hoveredNodeId,
+        shell: shellRef.current,
+        state,
+        viewport,
+      })
+
+      if (!hoverTarget || !hoverRect) {
+        clearHoverTarget()
+        return
+      }
+
+      setXrayHoverTarget((current) => {
+        if (
+          current?.nodeId === hoveredNodeId &&
+          current.target === hoverTarget &&
+          areDomEditOverlayRectsEqual(current.rect, hoverRect)
+        ) {
+          return current
+        }
+
+        return {
+          nodeId: hoveredNodeId,
+          rect: hoverRect,
+          target: hoverTarget,
+        }
+      })
+    }
+
+    shellElement.addEventListener('pointermove', handlePointerMove, true)
+    shellElement.addEventListener('pointerleave', clearHoverTarget)
+
+    return () => {
+      shellElement.removeEventListener('pointermove', handlePointerMove, true)
+      shellElement.removeEventListener('pointerleave', clearHoverTarget)
+    }
+  }, [
+    adapter,
+    appAffordanceState.mode,
+    selectedNodeId,
+    shellElement,
+    shellRef,
+    state,
+    viewport,
+  ])
+
   useLayoutEffect(() => {
     if (!target) {
       return undefined
@@ -360,6 +441,11 @@ export function DomEditSelectionOverlay<
     context,
   })
   const layerVisibility = getDomEditOverlayLayerVisibility(overlayLayers)
+  const activeXrayHoverTarget = affordanceState.mode === 'xray' &&
+    xrayHoverTarget?.target.isConnected === true &&
+    xrayHoverTarget.nodeId !== selectedNodeId
+    ? xrayHoverTarget
+    : null
   const changeField = (field: DomEditField, value: number) => {
     onChange(selectedNodeId, field, roundDomEditNumber(value))
   }
@@ -478,10 +564,20 @@ export function DomEditSelectionOverlay<
           />
         ) : null}
         {visibility.xray && layerVisibility.boxModel ? (
-          <DomEditBoxModelOverlay
-            rect={rect}
-            target={target}
-          />
+          <>
+            <DomEditBoxModelOverlay
+              owner="selected"
+              rect={rect}
+              target={target}
+            />
+            {activeXrayHoverTarget ? (
+              <DomEditBoxModelOverlay
+                owner="hover"
+                rect={activeXrayHoverTarget.rect}
+                target={activeXrayHoverTarget.target}
+              />
+            ) : null}
+          </>
         ) : null}
         {layerVisibility.grid ? (
           <DomEditGridOverlay

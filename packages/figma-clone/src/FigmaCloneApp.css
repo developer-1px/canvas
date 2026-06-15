@@ -1,5 +1,12 @@
 .figma-clone {
   --figma-bg: #f3f3f3;
+  --figma-boxmodel-border: rgba(15, 23, 42, 0.44);
+  --figma-boxmodel-content: rgba(20, 184, 166, 0.08);
+  --figma-boxmodel-content-line: rgba(20, 184, 166, 0.72);
+  --figma-boxmodel-margin: rgba(168, 85, 247, 0.2);
+  --figma-boxmodel-margin-label: #7e22ce;
+  --figma-boxmodel-padding: rgba(245, 158, 11, 0.3);
+  --figma-boxmodel-padding-label: #b45309;
   --figma-panel: #ffffff;
   --figma-text: #1f2328;
   --figma-muted: #6b7280;
@@ -1704,34 +1711,35 @@
   transform: translateY(-50%);
 }
 
-.figma-boxmodel-border,
-.figma-boxmodel-content,
-.figma-boxmodel-margin,
-.figma-boxmodel-padding {
+.figma-boxmodel-layer {
   position: absolute;
   box-sizing: border-box;
   pointer-events: none;
 }
 
+.figma-boxmodel-layer--hover {
+  opacity: 0.72;
+}
+
 .figma-boxmodel-margin {
   z-index: 3;
-  background: rgba(168, 85, 247, 0.2);
+  background: var(--figma-boxmodel-margin);
 }
 
 .figma-boxmodel-border {
   z-index: 4;
-  border: 1px solid rgba(15, 23, 42, 0.44);
+  border: 1px solid var(--figma-boxmodel-border);
 }
 
 .figma-boxmodel-padding {
   z-index: 4;
-  background: rgba(245, 158, 11, 0.3);
+  background: var(--figma-boxmodel-padding);
 }
 
 .figma-boxmodel-content {
   z-index: 3;
-  border: 1px dashed rgba(20, 184, 166, 0.72);
-  background: rgba(20, 184, 166, 0.08);
+  border: 1px dashed var(--figma-boxmodel-content-line);
+  background: var(--figma-boxmodel-content);
 }
 
 .figma-boxmodel-value {
@@ -1748,12 +1756,12 @@
 }
 
 .figma-boxmodel-value--margin {
-  background: #7e22ce;
+  background: var(--figma-boxmodel-margin-label);
   transform: translateY(-100%);
 }
 
 .figma-boxmodel-value--padding {
-  background: #b45309;
+  background: var(--figma-boxmodel-padding-label);
   transform: translate(-50%, -50%);
 }
 

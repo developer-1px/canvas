@@ -292,6 +292,7 @@ describe('FigmaCloneDomEditModel', () => {
     expect(paddingDrag.paddingVisuals).toBe(true)
     expect(paddingDrag.gapHitTargets).toBe(false)
     expect(paddingDrag.parentReference).toBe(false)
+    expect(paddingDrag.xray).toBe(false)
     expect(transform.geometry).toBe(true)
   })
 
