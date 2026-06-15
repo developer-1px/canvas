@@ -66,7 +66,7 @@ export function DomEditBoxModelOverlay({
             top: rect.y - metrics.margin.top - 4,
           }}
         >
-          Mar {formatDomEditSides(metrics.margin)}
+          Margin {formatDomEditSides(metrics.margin)}
         </span>
       ) : null}
       {hasAnySide(metrics.padding) ? (
@@ -127,6 +127,7 @@ function DomEditBoxModelBand({
       data-box-model-layer={layer}
       data-box-model-owner={owner}
       data-box-model-side={rect.side}
+      data-margin-readonly={layer === 'margin' ? 'true' : undefined}
       style={createDomEditOverlayRectStyle(rect)}
     />
   )
@@ -145,6 +146,7 @@ function getDomEditBoxModelLayerClassName(
     `figma-boxmodel-layer--${owner}`,
     `figma-boxmodel-${layer}`,
     `figma-boxmodel-${layer}--${owner}`,
+    layer === 'margin' ? 'figma-margin-ghost' : '',
   ].join(' ')
 }
 
