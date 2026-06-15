@@ -15,6 +15,7 @@ export function createViewProps(
     imageControls?: boolean
     inspector?: boolean
     sessionTimer?: boolean
+    shortcutHelp?: boolean
     spotlight?: boolean
     stampControls?: boolean
     stickyQuickCreate?: boolean
@@ -130,6 +131,24 @@ export function createViewProps(
       onResume: noop,
       onSetDuration: noop,
       onStart: noop,
+    },
+    shortcutHelp: {
+      items: [
+        {
+          id: 'tool:select',
+          section: 'Tools',
+          shortcut: 'V',
+          title: 'Select Tool',
+        },
+        {
+          id: 'system:shortcutHelp',
+          section: 'System',
+          shortcut: 'Shift+/',
+          title: 'Keyboard shortcuts',
+        },
+      ],
+      open: visible.shortcutHelp ?? false,
+      onClose: noop,
     },
     spotlight: {
       active: false,

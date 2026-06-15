@@ -93,6 +93,7 @@ function createHandlers(): CanvasKeyboardShortcutDispatchHandlers {
     openCommandPalette: vi.fn(),
     openCursorChat: vi.fn(),
     openFindReplace: vi.fn(),
+    openShortcutHelp: vi.fn(),
     pasteSelection: vi.fn(),
     quickCreateSticky: vi.fn(),
     redoHistory: vi.fn(),

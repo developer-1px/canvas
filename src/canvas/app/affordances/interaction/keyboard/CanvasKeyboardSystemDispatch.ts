@@ -30,6 +30,7 @@ export type CanvasKeyboardSystemHandlers = {
   openCommandPalette: () => void
   openCursorChat: () => void
   openFindReplace: () => void
+  openShortcutHelp: () => void
   setDraftArrow: Dispatch<SetStateAction<CanvasDraftArrowOverlay | null>>
   setDraftRect: Dispatch<SetStateAction<CanvasDraftShapeOverlay | null>>
   setDraftStroke: Dispatch<SetStateAction<CanvasDraftStrokeOverlay | null>>
@@ -71,6 +72,9 @@ const CANVAS_KEYBOARD_SYSTEM_INTENT_DISPATCH =
     },
     'open-find-replace': ({ handlers }) => {
       handlers.openFindReplace()
+    },
+    'open-shortcut-help': ({ handlers }) => {
+      handlers.openShortcutHelp()
     },
     'temporary-pan': ({ handlers }) => {
       handlers.setSpaceDown(true)

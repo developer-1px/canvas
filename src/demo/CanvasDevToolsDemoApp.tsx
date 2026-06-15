@@ -45,6 +45,8 @@ import {
   type Tool,
   getCanvasAppWidgetInteractions,
 } from '../canvas'
+import { CanvasCommandPalette } from '../canvas/app/affordances/controls/command-palette/CanvasCommandPalette'
+import { CanvasShortcutHelpOverlay } from '../canvas/app/affordances/controls/shortcut-help/CanvasShortcutHelpOverlay'
 import { CanvasObjectInspector } from '../canvas/app/affordances/editing/inspector/CanvasObjectInspector'
 import { EngineSelectionToolbar } from './CanvasDevToolsSelectionToolbar'
 import {
@@ -533,6 +535,8 @@ function CanvasEngineDemoSurface({
           <Unlock aria-hidden="true" size={14} strokeWidth={2} />
         </button>
       </div>
+      {!presenting ? <CanvasCommandPalette {...app.commandPalette} /> : null}
+      {!presenting ? <CanvasShortcutHelpOverlay {...app.shortcutHelp} /> : null}
     </main>
   )
 }
@@ -726,12 +730,14 @@ function isEngineDemoControlTarget(target: EventTarget) {
     target.closest(
       [
         '.context-command-menu',
+        '.command-palette',
         '.engine-demo-controls',
         '.engine-demo-viewport-controls',
         '.engine-sticky-quick-create',
         '.engine-selection-toolbar',
         '.engine-stamp-pad',
         '.engine-widget-play-overlay',
+        '.shortcut-help',
         '.text-editor',
         'button',
         'input',

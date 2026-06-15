@@ -46,6 +46,7 @@ describe('CanvasAppCommandRegistry', () => {
       title: 'Command Palette',
     })
     expect(commandShortcut('system:commandPalette')).toBe('Cmd+K')
+    expect(commandShortcut('system:shortcutHelp')).toBe('Shift+/')
     expect(commandShortcut('viewport:zoom-in')).toBe('Cmd+=')
   })
 

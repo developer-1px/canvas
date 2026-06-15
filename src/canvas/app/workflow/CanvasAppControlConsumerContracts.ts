@@ -27,6 +27,7 @@ export type CanvasAppControlModelInput = {
   gesture: CanvasInteractionKind
   onFitItems: (ids?: string[]) => void
   onInsertComponent: (component: CanvasComponentKind) => void
+  onOpenShortcutHelp: () => void
   onRunCustomCommand: (commandId: string) => void
   onToolChange: (tool: Tool) => void
   onViewportReset: () => void

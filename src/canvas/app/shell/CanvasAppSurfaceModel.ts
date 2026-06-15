@@ -1,6 +1,7 @@
 export const CANVAS_APP_SURFACE_IDS = [
   'toolbar',
   'command-palette',
+  'shortcut-help',
   'session-timer',
   'spotlight',
   'voting-session',
@@ -48,6 +49,7 @@ export type CanvasAppSurfaceConcept =
   | 'presence'
   | 'object-adjacent-action'
   | 'right-rail-panel'
+  | 'shortcut-help'
   | 'viewport'
 
 type CanvasAppSurfaceExclusiveGroup =
@@ -79,6 +81,12 @@ export const CANVAS_APP_SURFACE_DEFINITIONS: readonly CanvasAppSurfaceDefinition
   {
     concept: 'command-palette',
     id: 'command-palette',
+    priority: 0,
+    region: 'modal',
+  },
+  {
+    concept: 'shortcut-help',
+    id: 'shortcut-help',
     priority: 0,
     region: 'modal',
   },

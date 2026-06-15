@@ -31,6 +31,23 @@ describe('CanvasKeyboardSystemShortcuts', () => {
     })
   })
 
+  it('resolves keyboard shortcut help after typing-target suppression', () => {
+    expect(getCanvasKeyboardSystemShortcutIntent({
+      config: createCanvasAffordanceConfig(),
+      event: createKeyboardEvent({
+        code: 'Slash',
+        key: '?',
+        shiftKey: true,
+      }),
+      key: '?',
+      mod: false,
+      phase: 'after-typing-target',
+    })).toEqual({
+      kind: 'open-shortcut-help',
+      preventDefault: true,
+    })
+  })
+
   it('honors system shortcut feature toggles', () => {
     expect(getCanvasKeyboardSystemShortcutIntent({
       config: createCanvasAffordanceConfig({
@@ -58,6 +75,20 @@ describe('CanvasKeyboardSystemShortcuts', () => {
       }),
       event: createKeyboardEvent({ code: 'Space', key: ' ' }),
       key: ' ',
+      mod: false,
+      phase: 'after-typing-target',
+    })).toBeNull()
+
+    expect(getCanvasKeyboardSystemShortcutIntent({
+      config: createCanvasAffordanceConfig({
+        overlays: { shortcutHelp: false },
+      }),
+      event: createKeyboardEvent({
+        code: 'Slash',
+        key: '?',
+        shiftKey: true,
+      }),
+      key: '?',
       mod: false,
       phase: 'after-typing-target',
     })).toBeNull()
@@ -97,6 +128,7 @@ describe('CanvasKeyboardSystemShortcuts', () => {
         { label: 'escape', shortcut: { key: 'Escape' } },
         { label: 'escape', shortcut: { key: 'Escape', shiftKey: true } },
         { label: 'cursor chat', shortcut: { key: '/' } },
+        { label: 'keyboard shortcuts', shortcut: { key: '/', shiftKey: true } },
       ]),
     )
   })

@@ -12,6 +12,7 @@ describe('CanvasCommandPaletteItems', () => {
   it('builds searchable actions from tools, components, commands, and view controls', () => {
     const onToolChange = vi.fn()
     const onInsertComponent = vi.fn()
+    const onOpenShortcutHelp = vi.fn()
     const onDelete = vi.fn()
     const onFitItems = vi.fn()
     const onViewportReset = vi.fn()
@@ -47,6 +48,7 @@ describe('CanvasCommandPaletteItems', () => {
       onCustomCommand,
       onFitItems,
       onInsertComponent,
+      onOpenShortcutHelp,
       onToolChange,
       onViewportReset,
       onZoom,
@@ -59,6 +61,7 @@ describe('CanvasCommandPaletteItems', () => {
         'Add Card',
         'Delete',
         'Publish',
+        'Keyboard shortcuts',
         'Fit view',
       ]),
     )
@@ -71,11 +74,14 @@ describe('CanvasCommandPaletteItems', () => {
       .toBe('Cmd+D / Alt+Drag')
     expect(items.find((item) => item.id === 'viewport:fit')?.shortcut)
       .toBe('0 / 1')
+    expect(items.find((item) => item.id === 'system:shortcut-help')?.shortcut)
+      .toBe('Shift+/')
 
     items.find((item) => item.id === 'tool:select')?.onSelect()
     items.find((item) => item.id === 'component:card')?.onSelect()
     items.find((item) => item.id === 'command:delete')?.onSelect()
     items.find((item) => item.id === 'custom-command:publish')?.onSelect()
+    items.find((item) => item.id === 'system:shortcut-help')?.onSelect()
     items.find((item) => item.id === 'viewport:fit')?.onSelect()
     items.find((item) => item.id === 'viewport:reset-zoom')?.onSelect()
     items.find((item) => item.id === 'viewport:zoom-in')?.onSelect()
@@ -84,6 +90,7 @@ describe('CanvasCommandPaletteItems', () => {
     expect(onInsertComponent).toHaveBeenCalledWith('card')
     expect(onDelete).toHaveBeenCalledTimes(1)
     expect(onCustomCommand).toHaveBeenCalledWith('publish')
+    expect(onOpenShortcutHelp).toHaveBeenCalledTimes(1)
     expect(onFitItems).toHaveBeenCalledWith(['rect-1'])
     expect(onViewportReset).toHaveBeenCalledTimes(1)
     expect(onZoom).toHaveBeenCalledWith('in')
@@ -101,6 +108,7 @@ describe('CanvasCommandPaletteItems', () => {
       onCustomCommand: vi.fn(),
       onFitItems: vi.fn(),
       onInsertComponent: vi.fn(),
+      onOpenShortcutHelp: vi.fn(),
       onToolChange: vi.fn(),
       onViewportReset: vi.fn(),
       onZoom: vi.fn(),

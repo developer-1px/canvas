@@ -72,6 +72,7 @@ export type CanvasAppKeyboardModelInput = {
   interaction: CanvasAppKeyboardInteractionContext
   openCommandPalette: () => void
   openFindReplace: () => void
+  openShortcutHelp: () => void
   viewport: CanvasAppKeyboardViewportContext
   workspace: CanvasWorkspaceKeyboardContext
 }

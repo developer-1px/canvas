@@ -16,6 +16,9 @@ import type {
 import {
   getCanvasCommandPaletteItems,
 } from '../affordances/controls/command-palette/CanvasCommandPaletteItems'
+import {
+  getCanvasShortcutHelpItems,
+} from '../affordances/controls/shortcut-help/CanvasShortcutHelpItems'
 import type { CanvasAppControlModelInput } from './CanvasAppControlConsumerContracts'
 
 type CanvasSelectionCommandAnchor = {
@@ -39,6 +42,7 @@ export function getCanvasAppControlModel({
   commandHandlers,
   onFitItems,
   onInsertComponent,
+  onOpenShortcutHelp,
   onRunCustomCommand,
   onToolChange,
   onViewportReset,
@@ -68,12 +72,20 @@ export function getCanvasAppControlModel({
         onCustomCommand: onRunCustomCommand,
         onFitItems,
         onInsertComponent,
+        onOpenShortcutHelp,
         onToolChange,
         onViewportReset,
         onZoom,
         selection,
       }),
       visible: config.overlays.commandPalette,
+    },
+    shortcutHelp: {
+      items: getCanvasShortcutHelpItems({
+        config,
+        customTools,
+      }),
+      visible: config.overlays.shortcutHelp,
     },
     status: {
       mode: getCanvasAppStatusMode({

@@ -1692,6 +1692,120 @@
   font: 700 12px/1.2 var(--sans);
 }
 
+.shortcut-help-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 72px 14px 14px;
+  background: var(--canvas-overlay);
+  pointer-events: auto;
+}
+
+.shortcut-help {
+  display: grid;
+  gap: 0;
+  width: min(640px, calc(100vw - 28px));
+  max-height: min(620px, calc(100vh - 96px));
+  overflow: hidden;
+  border: 1px solid var(--canvas-floating-border);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--canvas-panel) 96%, transparent);
+  box-shadow: var(--canvas-floating-shadow);
+  backdrop-filter: blur(16px) saturate(1.14);
+}
+
+.shortcut-help-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 48px;
+  padding: 0 12px 0 14px;
+  border-bottom: 1px solid var(--canvas-soft-line);
+}
+
+.shortcut-help-header h2 {
+  margin: 0;
+  color: var(--canvas-ink);
+  font: 800 14px/1 var(--sans);
+}
+
+.shortcut-help-close {
+  min-height: 30px;
+  padding: 0 10px;
+  border: 1px solid var(--canvas-soft-line);
+  border-radius: 6px;
+  color: var(--canvas-ink);
+  background: var(--canvas-paper);
+  font: 750 12px/1 var(--sans);
+}
+
+.shortcut-help-close:hover {
+  background: var(--canvas-control-hover);
+}
+
+.shortcut-help-sections {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 18px;
+  overflow: auto;
+  padding: 14px;
+}
+
+.shortcut-help-section {
+  min-width: 0;
+}
+
+.shortcut-help-section h3 {
+  margin: 0 0 8px;
+  color: var(--canvas-muted);
+  font: 800 11px/1 var(--sans);
+  text-transform: uppercase;
+}
+
+.shortcut-help-list {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+}
+
+.shortcut-help-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 32px;
+  padding: 5px 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--canvas-soft-line) 58%, transparent);
+}
+
+.shortcut-help-row dt {
+  overflow: hidden;
+  color: var(--canvas-ink);
+  font: 700 12px/1.2 var(--sans);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.shortcut-help-row dd {
+  margin: 0;
+}
+
+.shortcut-help-row kbd {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 0 7px;
+  border: 1px solid var(--canvas-soft-line);
+  border-radius: 5px;
+  color: var(--canvas-muted);
+  background: var(--canvas-paper);
+  font: 750 11px/1 var(--sans);
+}
+
 .component-palette {
   top: 116px;
   right: 14px;
@@ -2389,6 +2503,7 @@
 
 .tool-button:focus-visible,
 .command-palette-item:focus-visible,
+.shortcut-help-close:focus-visible,
 .component-button:focus-visible,
 .drawing-swatch:focus-visible,
 .drawing-width-button:focus-visible,
@@ -2512,6 +2627,10 @@
   .find-replace-panel input {
     flex: 1 1 0;
     width: auto;
+  }
+
+  .shortcut-help-sections {
+    grid-template-columns: 1fr;
   }
 
   .component-button {

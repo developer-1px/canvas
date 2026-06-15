@@ -37,12 +37,17 @@ describe('CanvasKeyboardSystemDispatch', () => {
     })
     runCanvasKeyboardSystemIntent({
       handlers,
+      intent: { kind: 'open-shortcut-help', preventDefault: true },
+    })
+    runCanvasKeyboardSystemIntent({
+      handlers,
       intent: { kind: 'temporary-pan', preventDefault: true },
     })
 
     expect(handlers.openCommandPalette).toHaveBeenCalledTimes(1)
     expect(handlers.openCursorChat).toHaveBeenCalledTimes(1)
     expect(handlers.openFindReplace).toHaveBeenCalledTimes(1)
+    expect(handlers.openShortcutHelp).toHaveBeenCalledTimes(1)
     expect(handlers.setSpaceDown).toHaveBeenCalledWith(true)
   })
 
@@ -115,6 +120,7 @@ function createHandlers(
     openCommandPalette: vi.fn(),
     openCursorChat: vi.fn(),
     openFindReplace: vi.fn(),
+    openShortcutHelp: vi.fn(),
     setDraftArrow: vi.fn(),
     setDraftRect: vi.fn(),
     setDraftStroke: vi.fn(),
