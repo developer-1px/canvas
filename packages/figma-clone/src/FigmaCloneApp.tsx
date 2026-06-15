@@ -31,7 +31,6 @@ import {
   DomEditSelectionOverlay,
   type DomEditAffordanceProperty,
   type DomEditAffordanceState,
-  type DomEditFrameGuideConfig,
   type DomEditOverlayLayer,
   type DomEditOverlayLayerVisibility,
 } from '@interactive-os/dom-edit-affordance/react'
@@ -75,6 +74,7 @@ import {
   type FigmaCloneSectionOverflow,
   type FigmaCloneSectionViewport,
 } from './figmaCloneCanvas'
+import { getFigmaCloneDomFrameGuides } from './dom-editor/guideConfig'
 import './FigmaCloneApp.css'
 
 type FigmaCloneSelection =
@@ -107,28 +107,6 @@ const FIGMA_CLONE_GUIDE_LAYER_CONTROLS = [
   label: string
   layer: FigmaCloneGuideLayer
 }>
-
-const FIGMA_CLONE_FRAME_GUIDES = {
-  homePage: {
-    frameNodeId: 'homePage',
-    layoutColumns: { count: 6, gutter: 20, margin: 48 },
-    rulerGuides: [
-      { axis: 'x', id: 'home-copy-guide', offset: 96 },
-      { axis: 'y', id: 'home-hero-baseline', offset: 180 },
-    ],
-  },
-  workspacePage: {
-    frameNodeId: 'workspacePage',
-    layoutColumns: { count: 6, gutter: 16, margin: 32 },
-    rulerGuides: [
-      { axis: 'x', id: 'workspace-nav-guide', offset: 80 },
-      { axis: 'y', id: 'workspace-header-baseline', offset: 132 },
-    ],
-  },
-} satisfies Record<
-  FigmaCloneDomSectionRootId,
-  DomEditFrameGuideConfig<FigmaCloneDomNodeId>
->
 
 const FIGMA_CLONE_AFFORDANCE_CONFIG = {
   gestures: {
@@ -254,9 +232,13 @@ export function FigmaCloneApp() {
   const selectedNodeId = selection.frameId === 'dom' ? selection.nodeId : null
   const selectedSectionRootId =
     selection.frameId === 'dom' ? selection.rootId : null
-  const frameGuides = selection.frameId === 'dom'
-    ? FIGMA_CLONE_FRAME_GUIDES[selection.rootId]
-    : null
+  const frameGuides = useMemo(() => selectedSectionRootId
+    ? getFigmaCloneDomFrameGuides({
+        rootId: selectedSectionRootId,
+        sectionViewport,
+      })
+    : null,
+  [sectionViewport, selectedSectionRootId])
   const toggleOverlayLayer = useCallback((layer: FigmaCloneGuideLayer) => {
     setOverlayLayers((current) => ({
       ...current,
