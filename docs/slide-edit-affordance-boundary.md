@@ -17,6 +17,7 @@
 | Slide rail interaction | `slide-edit-affordance` | active slide, slide order, thumbnail hit target, rail command intent |
 | Placeholder visibility affordance | `slide-edit-affordance` | slide placeholder structure and object hide/show read model |
 | Object layer pane | `slide-edit-affordance` | object row descriptor, selection pane command intent, ARIA tree contract |
+| Object animation build order | `slide-edit-affordance` | object animation type, trigger, timing, and slide-local build order |
 | Layout/theme affordance | `slide-edit-affordance` | layout, master, placeholder mapping, and theme token descriptors |
 | Slide object clipboard | `slide-edit-affordance` | source slide metadata, paste target, and id remap plan |
 | Slide metadata inspector | `slide-edit-affordance` | active slide name, background, notes, size, orientation fields |
@@ -32,6 +33,7 @@
 | `object-bounds` | Object bounds for a slide/object reference |
 | `selection` | Active page id and selected object ids |
 | `command-effect` | Transaction boundary for command effects |
+| `object-animation` | Object animation and build order values scoped to a slide |
 | `layout-theme` | Layout, master, placeholder, and theme token descriptors |
 | `slide-metadata` | Active slide metadata values for inspector descriptors |
 | `slide-transition` | Slide transition and advance timing values for inspector, preview, and export |
@@ -134,6 +136,18 @@
 | Object commands | rename, hide/show, lock/unlock, and reorder row intents produce product-neutral host command effects |
 | ARIA contract | renderers use a `tree` container with `treeitem` rows, roving tabindex, and host-controlled multi-selection |
 | Visibility dependency | rows may expose hidden objects for selection pane access without changing the placeholder/visibility contract |
+
+## Object Animation Build Order Contract
+
+| Area | Contract |
+| --- | --- |
+| Read model | slide id, object id, animation type, trigger, duration, delay, build order |
+| Built-in types | `none`, `fade-in`, `fly-in`; host-specific string descriptors remain allowed |
+| Built-in triggers | `on-click`, `with-previous`; host-specific trigger descriptors remain allowed |
+| Timing | duration and delay clamp to 0..60000 ms |
+| Build order | slide-local object order sorts by numeric order and preserves input order for ties |
+| Updates | field-level type, trigger, duration, delay, and order edits become host command effects |
+| Runtime | host owns animation preview rendering, export mapping, and persistence |
 
 ## Layout, Master, And Theme Contract
 

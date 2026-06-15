@@ -95,6 +95,33 @@ export {
   type SlideEditLayerPaneSlideId,
 } from './SlideEditObjectLayerPane'
 export {
+  createSlideEditObjectAnimationDescriptor,
+  getSlideEditObjectAnimationBuildOrder,
+  getSlideEditObjectAnimationUpdateCommandEffect,
+  normalizeSlideEditObjectAnimationDelayMs,
+  normalizeSlideEditObjectAnimationDurationMs,
+  normalizeSlideEditObjectAnimationOrder,
+  normalizeSlideEditObjectAnimationUpdateCommand,
+  SLIDE_EDIT_DEFAULT_OBJECT_ANIMATION,
+  SLIDE_EDIT_OBJECT_ANIMATION_LIMITS,
+  SLIDE_EDIT_OBJECT_ANIMATION_TRIGGERS,
+  SLIDE_EDIT_OBJECT_ANIMATION_TYPES,
+  sortSlideEditObjectAnimationsByBuildOrder,
+  type SlideEditAnimationObjectId,
+  type SlideEditAnimationSlideId,
+  type SlideEditAnimationTrigger,
+  type SlideEditAnimationType,
+  type SlideEditBuiltInAnimationTrigger,
+  type SlideEditBuiltInAnimationType,
+  type SlideEditObjectAnimationDescriptor,
+  type SlideEditObjectAnimationFieldId,
+  type SlideEditObjectAnimationHostCommandEffect,
+  type SlideEditObjectAnimationTimingLimits,
+  type SlideEditObjectAnimationTriggerDescriptor,
+  type SlideEditObjectAnimationTypeDescriptor,
+  type SlideEditObjectAnimationUpdateCommand,
+} from './SlideEditObjectAnimationBuildOrder'
+export {
   createSlideEditLayoutPlaceholderDescriptor,
   createSlideEditThemeDescriptor,
   getSlideEditLayoutApplyCommandEffect,
@@ -269,6 +296,7 @@ export type SlideEditAdapter<
 
 export type SlideEditAdapterSlotId =
   | 'command-effect'
+  | 'object-animation'
   | 'layout-theme'
   | 'object-bounds'
   | 'selection'
@@ -303,6 +331,11 @@ export const SLIDE_EDIT_ADAPTER_SLOTS = Object.freeze([
     id: 'command-effect',
     owner: 'host',
     purpose: 'Apply command effects through the host document transaction.',
+  },
+  {
+    id: 'object-animation',
+    owner: 'host',
+    purpose: 'Provide object animation and build order values scoped to a slide.',
   },
   {
     id: 'layout-theme',
@@ -370,6 +403,7 @@ export const SLIDE_EDIT_REUSED_CANVAS_CONTRACTS = Object.freeze([
 export type SlideEditOwnedContractId =
   | 'layout-theme-affordance'
   | 'object-inspector'
+  | 'object-animation-build-order'
   | 'object-layer-pane'
   | 'placeholder-visibility-affordance'
   | 'slide-command-effects'
@@ -417,6 +451,11 @@ export const SLIDE_EDIT_OWNED_CONTRACTS = Object.freeze([
     id: 'object-layer-pane',
     owner: 'slide-edit-affordance',
     scope: 'Slide object row descriptors and layer pane command intents.',
+  },
+  {
+    id: 'object-animation-build-order',
+    owner: 'slide-edit-affordance',
+    scope: 'Object animation type, trigger, timing, and slide-local build order.',
   },
   {
     id: 'layout-theme-affordance',
