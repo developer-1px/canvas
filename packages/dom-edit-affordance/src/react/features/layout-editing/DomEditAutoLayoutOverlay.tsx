@@ -1,10 +1,13 @@
 import {
+  useCallback,
   useEffect,
   useLayoutEffect,
   useState,
+  type CSSProperties,
   type MouseEvent,
   type PointerEvent,
   type RefObject,
+  type SetStateAction,
 } from 'react'
 import {
   getDomEditOverlayVisibility,
@@ -50,8 +53,23 @@ import {
   DomEditSizeModeCapsule,
   shouldRenderDomEditSizeModeCapsule,
 } from './DomEditSizeModeCapsule'
+import {
+  DomEditAlignmentEditor,
+  type DomEditAlignmentPreview,
+} from './DomEditAlignmentEditor'
 
 type AutoLayoutAffordanceMode = 'gap' | 'padding'
+
+type DomEditAutoLayoutOverlayTransientState<
+  TNodeId extends DomEditNodeId,
+> = {
+  alignmentPreview: DomEditAlignmentPreview | null
+  hoveredAffordance: AutoLayoutAffordanceMode | null
+  hoveredPaddingKind: DomEditAutoLayoutPaddingDragKind | null
+  isAlignmentEditorOpen: boolean
+  pinnedPaddingSide: DomEditPaddingSide | null
+  selectedNodeId: TNodeId
+}
 
 const DOM_EDIT_PADDING_SIDE_HANDLES = [
   'padding-bottom',
@@ -126,21 +144,93 @@ export function DomEditAutoLayoutOverlay<
   const [activeDragKind, setActiveDragKind] =
     useState<DomEditAutoLayoutDragKind | null>(null)
   const [gapRects, setGapRects] = useState<DomEditAutoLayoutRect[]>([])
-  const [hoveredAffordance, setHoveredAffordance] =
-    useState<AutoLayoutAffordanceMode | null>(null)
-  const [hoveredPaddingKind, setHoveredPaddingKind] =
-    useState<DomEditAutoLayoutPaddingDragKind | null>(null)
-  const [pinnedPaddingSide, setPinnedPaddingSide] =
-    useState<DomEditPaddingSide | null>(null)
+  const [transientState, setTransientState] = useState(() =>
+    createDomEditAutoLayoutOverlayTransientState(selectedNodeId))
+  const scopedTransientState =
+    transientState.selectedNodeId === selectedNodeId
+      ? transientState
+      : createDomEditAutoLayoutOverlayTransientState(selectedNodeId)
+  const {
+    alignmentPreview,
+    hoveredAffordance,
+    hoveredPaddingKind,
+    isAlignmentEditorOpen,
+    pinnedPaddingSide,
+  } = scopedTransientState
   const style = adapter.getStyle(state, selectedNodeId)
   const context = adapter.getLayoutContext(selectedNodeId)
   const isBetweenDistribution = style.distribution === 'space-between'
+  const updateTransientState = useCallback((
+    update: (
+      current: DomEditAutoLayoutOverlayTransientState<TNodeId>,
+    ) => DomEditAutoLayoutOverlayTransientState<TNodeId>,
+  ) => {
+    setTransientState((current) => {
+      const scopedCurrent = current.selectedNodeId === selectedNodeId
+        ? current
+        : createDomEditAutoLayoutOverlayTransientState(selectedNodeId)
 
-  useEffect(() => {
-    setHoveredAffordance(null)
-    setHoveredPaddingKind(null)
-    setPinnedPaddingSide(null)
+      return update(scopedCurrent)
+    })
   }, [selectedNodeId])
+  const setHoveredAffordance = useCallback((
+    action: SetStateAction<AutoLayoutAffordanceMode | null>,
+  ) => {
+    updateTransientState((current) => {
+      const next = resolveDomEditStateAction(current.hoveredAffordance, action)
+
+      return next === current.hoveredAffordance
+        ? current
+        : { ...current, hoveredAffordance: next }
+    })
+  }, [updateTransientState])
+  const setHoveredPaddingKind = useCallback((
+    action: SetStateAction<DomEditAutoLayoutPaddingDragKind | null>,
+  ) => {
+    updateTransientState((current) => {
+      const next = resolveDomEditStateAction(current.hoveredPaddingKind, action)
+
+      return next === current.hoveredPaddingKind
+        ? current
+        : { ...current, hoveredPaddingKind: next }
+    })
+  }, [updateTransientState])
+  const setPinnedPaddingSide = useCallback((
+    action: SetStateAction<DomEditPaddingSide | null>,
+  ) => {
+    updateTransientState((current) => {
+      const next = resolveDomEditStateAction(current.pinnedPaddingSide, action)
+
+      return next === current.pinnedPaddingSide
+        ? current
+        : { ...current, pinnedPaddingSide: next }
+    })
+  }, [updateTransientState])
+  const setIsAlignmentEditorOpen = useCallback((
+    action: SetStateAction<boolean>,
+  ) => {
+    updateTransientState((current) => {
+      const next = resolveDomEditStateAction(
+        current.isAlignmentEditorOpen,
+        action,
+      )
+
+      return next === current.isAlignmentEditorOpen
+        ? current
+        : { ...current, isAlignmentEditorOpen: next }
+    })
+  }, [updateTransientState])
+  const setAlignmentPreview = useCallback((
+    action: SetStateAction<DomEditAlignmentPreview | null>,
+  ) => {
+    updateTransientState((current) => {
+      const next = resolveDomEditStateAction(current.alignmentPreview, action)
+
+      return next === current.alignmentPreview
+        ? current
+        : { ...current, alignmentPreview: next }
+    })
+  }, [updateTransientState])
 
   useLayoutEffect(() => {
     if (!context.showSelfLayout) {
@@ -206,7 +296,13 @@ export function DomEditAutoLayoutOverlay<
     return () => {
       window.removeEventListener('pointermove', trackAutoLayoutAffordance)
     }
-  }, [activeDragKind, context.showGridLayout, context.showSelfLayout])
+  }, [
+    activeDragKind,
+    context.showGridLayout,
+    context.showSelfLayout,
+    setHoveredAffordance,
+    setHoveredPaddingKind,
+  ])
 
   if (
     !context.showSelfLayout &&
@@ -256,6 +352,8 @@ export function DomEditAutoLayoutOverlay<
   })
   const shouldRenderPadding = visibility.paddingHitTargets
   const shouldRenderGap = visibility.gapHitTargets
+  const shouldRenderAlignmentEditor =
+    context.showSelfLayout || context.showGridLayout
   const startDrag = (
     event: PointerEvent<HTMLElement>,
     kind: DomEditAutoLayoutDragKind,
@@ -589,6 +687,58 @@ export function DomEditAutoLayoutOverlay<
               ) : null}
             </>
           ) : null}
+          {shouldRenderAlignmentEditor ? (
+            <>
+              <button
+                aria-expanded={isAlignmentEditorOpen}
+                aria-label="Alignment editor"
+                className="figma-alignment-editor-trigger"
+                style={{
+                  left: rect.x + rect.w + 8,
+                  top: rect.y,
+                }}
+                type="button"
+                onClick={() => setIsAlignmentEditorOpen((current) => !current)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Escape' && isAlignmentEditorOpen) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                    setIsAlignmentEditorOpen(false)
+                    setAlignmentPreview(null)
+                  }
+                }}
+              >
+                Align
+              </button>
+              <div
+                className="figma-alignment-popover-anchor"
+                style={{
+                  left: rect.x + rect.w + 8,
+                  top: rect.y + 30,
+                }}
+              >
+                <DomEditAlignmentEditor
+                  context={context}
+                  isOpen={isAlignmentEditorOpen}
+                  selectedNodeId={selectedNodeId}
+                  style={style}
+                  onChangeAutoLayout={onChangeAutoLayout}
+                  onClose={() => {
+                    setIsAlignmentEditorOpen(false)
+                    setAlignmentPreview(null)
+                  }}
+                  onPreview={setAlignmentPreview}
+                />
+              </div>
+              {alignmentPreview && context.showSelfLayout ? (
+                <DomEditAlignmentPreviewGuide
+                  preview={alignmentPreview}
+                  rect={rect}
+                  style={style}
+                />
+              ) : null}
+            </>
+          ) : null}
           {visibility.gapVisuals ? (
             <div
               className="figma-autolayout-toolbar"
@@ -638,6 +788,131 @@ export function DomEditAutoLayoutOverlay<
       ) : null}
     </>
   )
+}
+
+function DomEditAlignmentPreviewGuide({
+  preview,
+  rect,
+  style,
+}: {
+  preview: DomEditAlignmentPreview
+  rect: DomEditAutoLayoutRect
+  style: DomEditNodeState
+}) {
+  const padding = getDomEditPaddingSides(style)
+  const guideStyle = getDomEditAlignmentPreviewGuideStyle({
+    align: preview.align,
+    padding,
+    rect,
+    direction: style.direction,
+  })
+
+  return (
+    <span
+      aria-hidden="true"
+      className={[
+        'figma-alignment-preview-guide',
+        `figma-alignment-preview-guide--${style.direction === 'row'
+          ? 'horizontal'
+          : 'vertical'}`,
+        `figma-alignment-preview-guide--${preview.align}`,
+      ].join(' ')}
+      style={guideStyle}
+    />
+  )
+}
+
+function createDomEditAutoLayoutOverlayTransientState<
+  TNodeId extends DomEditNodeId,
+>(
+  selectedNodeId: TNodeId,
+): DomEditAutoLayoutOverlayTransientState<TNodeId> {
+  return {
+    alignmentPreview: null,
+    hoveredAffordance: null,
+    hoveredPaddingKind: null,
+    isAlignmentEditorOpen: false,
+    pinnedPaddingSide: null,
+    selectedNodeId,
+  }
+}
+
+function resolveDomEditStateAction<T>(
+  current: T,
+  action: SetStateAction<T>,
+) {
+  return typeof action === 'function'
+    ? (action as (current: T) => T)(current)
+    : action
+}
+
+function getDomEditAlignmentPreviewGuideStyle({
+  align,
+  direction,
+  padding,
+  rect,
+}: {
+  align: DomEditAlignmentPreview['align']
+  direction: DomEditNodeState['direction']
+  padding: DomEditPaddingSides
+  rect: DomEditAutoLayoutRect
+}): CSSProperties {
+  const contentLeft = rect.x + padding.left
+  const contentTop = rect.y + padding.top
+  const contentWidth = Math.max(1, rect.w - padding.left - padding.right)
+  const contentHeight = Math.max(1, rect.h - padding.top - padding.bottom)
+
+  if (direction === 'row') {
+    const top = resolveDomEditAlignmentPreviewPosition({
+      align,
+      end: contentTop + contentHeight,
+      size: contentHeight,
+      start: contentTop,
+    })
+
+    return {
+      height: 1,
+      left: contentLeft,
+      top,
+      width: contentWidth,
+    }
+  }
+
+  const left = resolveDomEditAlignmentPreviewPosition({
+    align,
+    end: contentLeft + contentWidth,
+    size: contentWidth,
+    start: contentLeft,
+  })
+
+  return {
+    height: contentHeight,
+    left,
+    top: contentTop,
+    width: 1,
+  }
+}
+
+function resolveDomEditAlignmentPreviewPosition({
+  align,
+  end,
+  size,
+  start,
+}: {
+  align: DomEditAlignmentPreview['align']
+  end: number
+  size: number
+  start: number
+}) {
+  if (align === 'center' || align === 'stretch') {
+    return start + size / 2
+  }
+
+  if (align === 'end') {
+    return end
+  }
+
+  return start
 }
 
 function getDomEditAutoLayoutAffordanceState({

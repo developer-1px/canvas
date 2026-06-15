@@ -86,6 +86,21 @@ describe('FigmaCloneDomEditModel', () => {
     expect(getFigmaCloneDomEditStyle(state, 'card').direction).toBe('column')
   })
 
+  it('stores distribution values without mutating previous DOM edit state', () => {
+    const state = createFigmaCloneDomEditState()
+    const next = updateFigmaCloneDomAutoLayoutField({
+      field: 'distribution',
+      nodeId: 'workspaceHeroActions',
+      state,
+      value: 'center',
+    })
+
+    expect(getFigmaCloneDomEditStyle(next, 'workspaceHeroActions').distribution)
+      .toBe('center')
+    expect(getFigmaCloneDomEditStyle(state, 'workspaceHeroActions').distribution)
+      .toBe('packed')
+  })
+
   it('stores editable copy outside DOM layout values', () => {
     const state = createFigmaCloneDomTextState()
     const next = updateFigmaCloneDomText({
