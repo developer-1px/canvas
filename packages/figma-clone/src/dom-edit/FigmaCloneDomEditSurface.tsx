@@ -1787,7 +1787,19 @@ function mapFigmaCloneAutoLayoutAlign(
 function mapFigmaCloneAutoLayoutDistribution(
   distribution: ReturnType<typeof getFigmaCloneDomEditStyle>['distribution'],
 ): CSSProperties['justifyContent'] {
-  return distribution === 'space-between' ? 'space-between' : 'flex-start'
+  if (distribution === 'center') {
+    return 'center'
+  }
+
+  if (distribution === 'end') {
+    return 'flex-end'
+  }
+
+  if (distribution === 'space-between') {
+    return 'space-between'
+  }
+
+  return 'flex-start'
 }
 
 function mapFigmaCloneAutoLayoutSize(

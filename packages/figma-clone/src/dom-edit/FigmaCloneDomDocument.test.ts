@@ -3,6 +3,7 @@ import {
   createFigmaCloneDomDocument,
 } from './FigmaCloneDomDocument'
 import {
+  updateFigmaCloneDomAutoLayoutField,
   updateFigmaCloneDomEditField,
   updateFigmaCloneDomText,
 } from './FigmaCloneDomEditModel'
@@ -28,6 +29,27 @@ describe('FigmaCloneDomDocument', () => {
 
     expect(document.history.redo()).toBe(true)
     expect(document.value.state.card.paddingLeft).toBe(40)
+  })
+
+  it('commits DOM auto layout edits through json-document history', () => {
+    const document = createFigmaCloneDomDocument()
+
+    expect(document.replace('', {
+      ...document.value,
+      state: updateFigmaCloneDomAutoLayoutField({
+        field: 'distribution',
+        nodeId: 'workspaceHeroActions',
+        state: document.value.state,
+        value: 'center',
+      }),
+    })).toEqual({ ok: true })
+    expect(document.value.state.workspaceHeroActions.distribution).toBe('center')
+
+    expect(document.history.undo()).toBe(true)
+    expect(document.value.state.workspaceHeroActions.distribution).toBe('packed')
+
+    expect(document.history.redo()).toBe(true)
+    expect(document.value.state.workspaceHeroActions.distribution).toBe('center')
   })
 
   it('commits DOM text edits through json-document history', () => {

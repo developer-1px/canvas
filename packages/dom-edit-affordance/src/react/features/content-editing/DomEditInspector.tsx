@@ -168,10 +168,12 @@ export function DomEditInspector<
           <DomEditSegmentedField
             label="Distribution"
             options={[
-              { label: 'Packed', value: 'packed' },
+              { label: 'Start', value: 'start' },
+              { label: 'Center', value: 'center' },
+              { label: 'End', value: 'end' },
               { label: 'Between', value: 'space-between' },
             ]}
-            value={style.distribution}
+            value={style.distribution === 'packed' ? 'start' : style.distribution}
             onChange={(value) => {
               onChangeAutoLayout(selectedNodeId, 'distribution', value)
             }}

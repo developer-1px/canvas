@@ -63,7 +63,10 @@ export type DomEditAutoLayoutAlign =
   | 'start'
   | 'stretch'
 export type DomEditAutoLayoutDistribution =
+  | 'center'
+  | 'end'
   | 'packed'
+  | 'start'
   | 'space-between'
 export type DomEditAutoLayoutSizeMode =
   | 'fill'
