@@ -42,6 +42,10 @@
     transparent 3px,
     transparent 7px
   );
+  --figma-between-rail: rgba(15, 118, 110, 0.72);
+  --figma-between-rail-hover: rgba(13, 148, 136, 0.92);
+  --figma-between-surface: rgba(15, 118, 110, 0.12);
+  --figma-between-surface-hover: rgba(15, 118, 110, 0.2);
   --figma-green: #15803d;
   position: fixed;
   inset: 0;
@@ -2011,12 +2015,84 @@
 }
 
 .figma-autolayout-gap--between {
-  background: rgba(15, 118, 110, 0.26);
+  background: var(--figma-between-surface);
   cursor: default;
 }
 
 .figma-autolayout-gap--between:hover {
-  background: rgba(15, 118, 110, 0.42);
+  background: var(--figma-between-surface-hover);
+}
+
+.figma-autolayout-gap--between.figma-autolayout-gap--empty,
+.figma-autolayout-gap--between.figma-autolayout-gap--empty:hover {
+  background: transparent;
+}
+
+.figma-autolayout-between-mark,
+.figma-autolayout-between-rail,
+.figma-autolayout-between-tick {
+  position: absolute;
+  pointer-events: none;
+}
+
+.figma-autolayout-between-mark {
+  inset: 0;
+}
+
+.figma-autolayout-between-rail,
+.figma-autolayout-between-tick {
+  border-radius: 999px;
+  background: var(--figma-between-rail);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.72);
+}
+
+.figma-autolayout-gap--between:hover .figma-autolayout-between-rail,
+.figma-autolayout-gap--between:hover .figma-autolayout-between-tick {
+  background: var(--figma-between-rail-hover);
+}
+
+.figma-autolayout-gap--row .figma-autolayout-between-rail {
+  right: 8px;
+  left: 8px;
+  top: calc(50% - 1px);
+  height: 2px;
+}
+
+.figma-autolayout-gap--row .figma-autolayout-between-tick {
+  top: 50%;
+  width: 2px;
+  height: min(18px, calc(100% - 4px));
+  transform: translateY(-50%);
+}
+
+.figma-autolayout-gap--row .figma-autolayout-between-tick--start {
+  left: 3px;
+}
+
+.figma-autolayout-gap--row .figma-autolayout-between-tick--end {
+  right: 3px;
+}
+
+.figma-autolayout-gap--column .figma-autolayout-between-rail {
+  top: 8px;
+  bottom: 8px;
+  left: calc(50% - 1px);
+  width: 2px;
+}
+
+.figma-autolayout-gap--column .figma-autolayout-between-tick {
+  left: 50%;
+  width: min(18px, calc(100% - 4px));
+  height: 2px;
+  transform: translateX(-50%);
+}
+
+.figma-autolayout-gap--column .figma-autolayout-between-tick--start {
+  top: 3px;
+}
+
+.figma-autolayout-gap--column .figma-autolayout-between-tick--end {
+  bottom: 3px;
 }
 
 .figma-flex-wrap-line,
