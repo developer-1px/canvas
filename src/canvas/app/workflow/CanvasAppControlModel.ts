@@ -19,6 +19,9 @@ import {
 import {
   getCanvasShortcutHelpItems,
 } from '../affordances/controls/shortcut-help/CanvasShortcutHelpItems'
+import {
+  getCanvasMinimapReadModel,
+} from '../affordances/controls/minimap/CanvasMinimapModel'
 import type { CanvasAppControlModelInput } from './CanvasAppControlConsumerContracts'
 
 type CanvasSelectionCommandAnchor = {
@@ -35,11 +38,13 @@ export function getCanvasAppControlModel({
   customCommands,
   customTools,
   gesture,
+  itemReadModel,
   scene,
   selection,
   tool,
   viewport,
   commandHandlers,
+  onCenterViewportAtWorldPoint,
   onFitItems,
   onInsertComponent,
   onOpenShortcutHelp,
@@ -47,6 +52,7 @@ export function getCanvasAppControlModel({
   onToolChange,
   onViewportReset,
   onZoom,
+  viewportRect,
 }: CanvasAppControlModelInput) {
   const commandAvailability = getCanvasCommandAvailability({
     canRedo,
@@ -95,6 +101,20 @@ export function getCanvasAppControlModel({
       }),
       selectionLength: selection.length,
       visible: config.overlays.status,
+    },
+    minimap: {
+      model: config.overlays.minimap && viewportRect
+        ? getCanvasMinimapReadModel({
+          items: itemReadModel.getAllItems().map((item) => ({
+            bounds: itemReadModel.getItemBounds(item),
+            id: item.id,
+          })),
+          stageRect: viewportRect,
+          viewport,
+        })
+        : null,
+      visible: config.overlays.minimap,
+      onNavigateToWorldPoint: onCenterViewportAtWorldPoint,
     },
     toolbar: {
       commandAvailability,

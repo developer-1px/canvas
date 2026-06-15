@@ -8,6 +8,9 @@ import {
 import type { Viewport } from '../../../../entities'
 import type { CanvasAppStageElement } from '../../../rendering/stage/CanvasAppStageElement'
 import type { CanvasAppItemReadModel } from '../../../workflow/CanvasAppItemReadModelContracts'
+import {
+  getCanvasMinimapViewportForWorldCenter,
+} from '../../controls/minimap/CanvasMinimapModel'
 
 export type CanvasViewportSetter = (
   next: Viewport | ((current: Viewport) => Viewport),
@@ -22,6 +25,15 @@ type FitCanvasViewportToItemsArgs = {
 
 type ResetCanvasViewportArgs = {
   setViewport: CanvasViewportSetter
+}
+
+type CenterCanvasViewportAtWorldPointArgs = {
+  point: {
+    x: number
+    y: number
+  }
+  setViewport: CanvasViewportSetter
+  stageElement: CanvasAppStageElement
 }
 
 type ZoomCanvasViewportArgs = {
@@ -54,6 +66,26 @@ export function resetCanvasViewport({
   setViewport,
 }: ResetCanvasViewportArgs) {
   setViewport(INITIAL_VIEWPORT)
+}
+
+export function centerCanvasViewportAtWorldPoint({
+  point,
+  setViewport,
+  stageElement,
+}: CenterCanvasViewportAtWorldPointArgs) {
+  const rect = stageElement.getRect()
+
+  if (!rect) {
+    return
+  }
+
+  setViewport((current) =>
+    getCanvasMinimapViewportForWorldCenter({
+      current,
+      stageRect: rect,
+      worldCenter: point,
+    }),
+  )
 }
 
 export function zoomCanvasViewport({

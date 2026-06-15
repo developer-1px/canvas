@@ -8,6 +8,7 @@ import type { Viewport } from '../../../../entities'
 import type { CanvasAppStageElement } from '../../../rendering/stage/CanvasAppStageElement'
 import type { CanvasAppItemReadModel } from '../../../workflow/CanvasAppItemReadModelContracts'
 import {
+  centerCanvasViewportAtWorldPoint,
   fitCanvasViewportToItems,
   resetCanvasViewport,
   zoomCanvasViewport,
@@ -24,6 +25,17 @@ export function useCanvasViewportControls({
   setViewport,
   stageElement,
 }: UseCanvasViewportControlsArgs) {
+  const centerAtWorldPoint = useCallback(
+    (point: { x: number; y: number }) => {
+      centerCanvasViewportAtWorldPoint({
+        point,
+        setViewport,
+        stageElement,
+      })
+    },
+    [setViewport, stageElement],
+  )
+
   const fitToItems = useCallback(
     (ids?: string[]) => {
       fitCanvasViewportToItems({
@@ -52,8 +64,10 @@ export function useCanvasViewportControls({
   )
 
   return {
+    centerAtWorldPoint,
     fitToItems,
     resetViewport,
+    viewportRect: stageElement.getRect(),
     zoom,
   }
 }

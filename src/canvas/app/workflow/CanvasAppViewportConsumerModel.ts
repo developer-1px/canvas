@@ -8,9 +8,11 @@ export function getCanvasAppViewportConsumerModel(
 ): CanvasAppViewportConsumerModel {
   return {
     control: {
+      onCenterViewportAtWorldPoint: viewportControls.centerAtWorldPoint,
       onFitItems: viewportControls.fitToItems,
       onViewportReset: viewportControls.resetViewport,
       onZoom: viewportControls.zoom,
+      viewportRect: viewportControls.viewportRect,
     },
     keyboard: {
       fitToItems: viewportControls.fitToItems,

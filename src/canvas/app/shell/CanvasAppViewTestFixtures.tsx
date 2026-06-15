@@ -14,6 +14,7 @@ export function createViewProps(
     emoteControls?: boolean
     imageControls?: boolean
     inspector?: boolean
+    minimap?: boolean
     sessionTimer?: boolean
     shortcutHelp?: boolean
     spotlight?: boolean
@@ -106,6 +107,23 @@ export function createViewProps(
       styleControls: [],
       visible: visible.inspector ?? true,
       onChangeBounds: noop,
+    },
+    minimap: {
+      model: {
+        contentBounds: { h: 120, w: 200, x: 100, y: 80 },
+        displayBounds: { h: 96, w: 160, x: 8, y: 8 },
+        isEmpty: false,
+        itemRects: [{
+          id: 'rect-1',
+          rect: { h: 24, w: 40, x: 24, y: 20 },
+        }],
+        size: { h: 112, w: 176 },
+        viewportRect: { h: 60, w: 90, x: 20, y: 16 },
+        viewportWorldBounds: { h: 300, w: 450, x: 0, y: 0 },
+        worldBounds: { h: 360, w: 600, x: 0, y: 0 },
+      },
+      visible: visible.minimap ?? true,
+      onNavigateToWorldPoint: noop,
     },
     imageControls: {
       canCopyImage: true,

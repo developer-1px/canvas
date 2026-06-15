@@ -53,6 +53,7 @@ describe('CanvasAppSurfaceModel', () => {
     expect(visibility.toolbar).toBe(true)
     expect(visibility['object-inspector']).toBe(true)
     expect(visibility['zoom-controls']).toBe(true)
+    expect(visibility.minimap).toBe(true)
     expect(visibility['canvas-status']).toBe(true)
   })
 })

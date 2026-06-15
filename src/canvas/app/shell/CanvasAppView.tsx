@@ -16,6 +16,7 @@ import { CanvasSessionTimer } from '../affordances/controls/facilitation/CanvasS
 import { CanvasShortcutHelpOverlay } from '../affordances/controls/shortcut-help/CanvasShortcutHelpOverlay'
 import { CanvasSpotlight } from '../affordances/controls/facilitation/CanvasSpotlight'
 import { CanvasVotingSession } from '../affordances/controls/facilitation/CanvasVotingSession'
+import { CanvasMinimap } from '../affordances/controls/minimap/CanvasMinimap'
 import { CanvasObjectInspector } from '../affordances/editing/inspector/CanvasObjectInspector'
 import { CanvasFindReplacePanel } from '../affordances/editing/search/CanvasFindReplacePanel'
 import { CanvasImageControls } from '../affordances/io/image/CanvasImageControls'
@@ -54,6 +55,7 @@ type InspectorProps = ComponentProps<typeof CanvasObjectInspector>
 type PaletteProps = ComponentProps<typeof CanvasComponentPalette>
 type ZoomControlsProps = ComponentProps<typeof ZoomControls>
 type StatusProps = ComponentProps<typeof CanvasStatus>
+type MinimapProps = ComponentProps<typeof CanvasMinimap>
 type VisibleProps<TProps> = TProps & {
   visible: boolean
 }
@@ -70,6 +72,7 @@ type CanvasAppViewProps = {
   findReplace: FindReplaceProps
   imageControls: VisibleProps<ImageControlsProps>
   inspector: VisibleProps<InspectorProps>
+  minimap: VisibleProps<MinimapProps>
   sessionTimer: SessionTimerProps
   shortcutHelp: ShortcutHelpProps
   spotlight: SpotlightProps
@@ -92,6 +95,7 @@ export function CanvasAppView({
   findReplace,
   imageControls,
   inspector,
+  minimap,
   sessionTimer,
   shortcutHelp,
   spotlight,
@@ -112,6 +116,7 @@ export function CanvasAppView({
     drawingControls
   const { visible: showInspector, ...inspectorProps } = inspector
   const { visible: showImageControls, ...imageControlProps } = imageControls
+  const { visible: showMinimap, ...minimapProps } = minimap
   const { visible: showStampControls, ...stampControlProps } = stampControls
   const { visible: showStickyQuickCreate, ...stickyQuickCreateProps } =
     stickyQuickCreate
@@ -151,6 +156,7 @@ export function CanvasAppView({
     'emote-controls': emoteControls.visible,
     'find-replace-panel': findReplace.open,
     'image-controls': showImageControls,
+    minimap: showMinimap && minimapProps.model !== null,
     'object-inspector': inspectorHasContent,
     'selection-floating-bar': showToolbar &&
       statusProps.selectionLength > 0 &&
@@ -173,7 +179,7 @@ export function CanvasAppView({
     (surfaces['stamp-controls'] && stampControlProps.anchor === null)
   const hasRightRailZone = surfaces['component-palette'] ||
     surfaces['object-inspector']
-  const hasBottomLeftZone = surfaces['zoom-controls']
+  const hasBottomLeftZone = surfaces['zoom-controls'] || surfaces.minimap
   const hasBottomCenterZone = surfaces['emote-controls'] ||
     surfaces['find-replace-panel']
   const hasBottomRightZone = surfaces['canvas-status']
@@ -236,7 +242,11 @@ export function CanvasAppView({
 
       {hasBottomLeftZone ? (
         <div className="canvas-floating-zone canvas-floating-zone-bottom-left">
-          <ZoomControls {...zoomControlProps} />
+          {surfaces['zoom-controls'] ? (
+            <ZoomControls {...zoomControlProps} />
+          ) : null}
+
+          {surfaces.minimap ? <CanvasMinimap {...minimapProps} /> : null}
         </div>
       ) : null}
 
@@ -320,6 +330,7 @@ function isAppControlTarget(target: EventTarget) {
         '.component-palette',
         '.cursor-chat',
         '.find-replace-panel',
+        '.canvas-minimap',
         '.object-inspector',
         '.shortcut-help',
         '.text-editor',

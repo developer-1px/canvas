@@ -116,6 +116,7 @@ const DEMO_CANVAS_FOCUSED_AFFORDANCE_CONFIG = {
     itemOutline: true,
     laserTrail: false,
     marquee: true,
+    minimap: true,
     presence: false,
     presentationMode: true,
     resizeHandles: true,

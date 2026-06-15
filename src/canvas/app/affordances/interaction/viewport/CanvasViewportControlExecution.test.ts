@@ -16,6 +16,7 @@ import type {
 } from '../../../rendering/stage/CanvasAppStageElement'
 import type { CanvasAppItemReadModel } from '../../../workflow/CanvasAppItemReadModelContracts'
 import {
+  centerCanvasViewportAtWorldPoint,
   fitCanvasViewportToItems,
   resetCanvasViewport,
   type CanvasViewportSetter,
@@ -109,6 +110,41 @@ describe('CanvasViewportControlExecution', () => {
     resetCanvasViewport({ setViewport })
 
     expect(setViewport).toHaveBeenCalledWith(INITIAL_VIEWPORT)
+  })
+
+  it('centers the viewport on a world point without changing zoom', () => {
+    const setViewport = vi.fn<CanvasViewportSetter>()
+    const currentViewport = { scale: 2, x: 0, y: 0 }
+
+    centerCanvasViewportAtWorldPoint({
+      point: { x: 140, y: 80 },
+      setViewport,
+      stageElement: createStageElement(createRect()),
+    })
+
+    const viewportUpdate = setViewport.mock.calls[0][0]
+
+    if (typeof viewportUpdate !== 'function') {
+      throw new Error('expected viewport updater')
+    }
+
+    expect(viewportUpdate(currentViewport)).toEqual({
+      scale: 2,
+      x: -30,
+      y: -10,
+    })
+  })
+
+  it('ignores minimap center requests when the stage rect is missing', () => {
+    const setViewport = vi.fn<CanvasViewportSetter>()
+
+    centerCanvasViewportAtWorldPoint({
+      point: { x: 140, y: 80 },
+      setViewport,
+      stageElement: createStageElement(null),
+    })
+
+    expect(setViewport).not.toHaveBeenCalled()
   })
 
   it('zooms around the mounted stage center', () => {

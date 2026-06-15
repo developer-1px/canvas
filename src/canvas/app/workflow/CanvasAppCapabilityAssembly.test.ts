@@ -37,6 +37,10 @@ describe('CanvasAppCapabilityAssembly', () => {
       present: false,
       view: false,
     })
+
+    expect(createCanvasAffordanceConfig(
+      createCanvasAppCapabilityAffordanceConfigInput({ view: false }),
+    ).overlays.minimap).toBe(false)
   })
 
   it('keeps read-only mode viewable while blocking edit and export actions', () => {

@@ -50,6 +50,7 @@ export function getCanvasWorkspaceConsumerModel({
     control: {
       canRedo: document.canRedo,
       canUndo: document.canUndo,
+      itemReadModel,
       scene,
       ...selectionContext,
     },
