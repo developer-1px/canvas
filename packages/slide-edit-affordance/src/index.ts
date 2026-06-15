@@ -6,6 +6,25 @@ import type {
 } from '../../../src/canvas/core'
 import type { CanvasExtensionEffect } from '../../../src/canvas/foundation'
 
+export {
+  getSlideEditFrameGuideGeometry,
+  normalizeSlideEditFrameInsets,
+  type SlideEditFrameBounds,
+  type SlideEditFrameColumnGuide,
+  type SlideEditFrameColumnGuideConfig,
+  type SlideEditFrameGuideAxis,
+  type SlideEditFrameGuideConfig,
+  type SlideEditFrameGuideGeometry,
+  type SlideEditFrameGuideKind,
+  type SlideEditFrameGuideLine,
+  type SlideEditFrameGuideOrientation,
+  type SlideEditFrameGuideSide,
+  type SlideEditFrameInsets,
+  type SlideEditFrameInsetsInput,
+  type SlideEditFrameRegion,
+  type SlideEditFrameRulerGuide,
+} from './SlideEditFrameGuides'
+
 export type SlideEditSlideId = string
 export type SlideEditObjectId = string
 
@@ -181,7 +200,7 @@ export const SLIDE_EDIT_OWNED_CONTRACTS = Object.freeze([
   {
     id: 'slide-frame-affordance',
     owner: 'slide-edit-affordance',
-    scope: 'Page frame guides, page-safe overlays, and page-relative anchors.',
+    scope: 'Center, margin, safe-area, ruler, and column guide geometry.',
   },
   {
     id: 'slide-object-bounds',

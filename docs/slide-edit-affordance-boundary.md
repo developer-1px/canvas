@@ -42,6 +42,25 @@
 | `dom-tree-selection` | DOM ancestry is not the slide object ownership model |
 | `dom-box-model-xray` | Margin/padding/border bands are CSS box-model concepts |
 
+## Frame Guide Contract
+
+| Guide | Input | Output |
+| --- | --- | --- |
+| Center | slide frame bounds | vertical and horizontal center lines |
+| Margin | numeric or side-specific inset config | frame-local margin lines |
+| Safe area | numeric or side-specific inset config | safe-area region and edge lines |
+| Ruler | optional axis/id/offset list | frame-local ruler lines |
+| Column | optional count/gutter/margin config | headless column bands |
+
+## DOM Frame Guide Split
+
+| Reusable From `DomEditFrameGuides` | DOM-Only |
+| --- | --- |
+| frame-local ruler offsets | `DomEditOverlayRect` naming |
+| column width from count/gutter/margin | selected DOM distance labels |
+| invalid out-of-frame guide filtering | React overlay rendering |
+| guide line orientation vocabulary | DOM node id and ancestry |
+
 ## Contract Rules
 
 - Public names stay product-neutral: slide, object, frame, bounds, selection, command, text.

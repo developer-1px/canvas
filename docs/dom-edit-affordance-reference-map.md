@@ -97,3 +97,7 @@ canvas
 - Box-model X-ray must not show edit hit targets.
 - Measure guides must not pollute idle selection.
 - Widget rendering and DOM edit tooling stay separate.
+
+## Slide Frame Guide Boundary
+
+`DomEditFrameGuides`의 frame-local ruler offset, column count/gutter/margin 계산, out-of-frame guide filtering은 slide frame guide 계약에서 참고할 수 있다. `DomEditOverlayRect`, selected DOM distance label, React overlay rendering, DOM node id/ancestry는 DOM edit 전용으로 둔다.
