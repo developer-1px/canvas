@@ -25,6 +25,10 @@ import type {
   DomEditState,
   DomEditViewport,
 } from '../../../shared/model/DomEditTypes'
+import {
+  getDomEditGridChildArea,
+  type DomEditGridChildArea,
+} from './DomEditGridChildGeometry'
 
 type GridOverlayRect = DomEditOverlayRect
 type GridGapRect = DomEditOverlayRect & {
@@ -64,26 +68,37 @@ export function DomEditGridOverlay<
   const [activeDragAxis, setActiveDragAxis] =
     useState<GridGapRect['axis'] | null>(null)
   const [gapRects, setGapRects] = useState<GridGapRect[]>([])
+  const [gridChildArea, setGridChildArea] =
+    useState<DomEditGridChildArea | null>(null)
   const [trackRects, setTrackRects] = useState<GridOverlayRect[]>([])
   const [isGapHovered, setIsGapHovered] = useState(false)
   const context = adapter.getLayoutContext(selectedNodeId)
   const style = adapter.getStyle(state, selectedNodeId)
+  const parentId = adapter.getParentId(selectedNodeId)
+  const shouldShowGridChildArea = context.parentDisplay === 'grid' &&
+    Boolean(parentId) &&
+    baseAffordanceState.mode !== 'measure' &&
+    baseAffordanceState.mode !== 'xray'
 
   useLayoutEffect(() => {
-    if (!context.showGridLayout) {
-      setGapRects([])
-      setTrackRects([])
-      return
-    }
+    const frame = requestAnimationFrame(() => {
+      if (!context.showGridLayout) {
+        setGapRects([])
+        setTrackRects([])
+        return
+      }
 
-    const measurement = measureDomEditGrid({
-      shell: shellRef.current,
-      target,
-      viewport,
+      const measurement = measureDomEditGrid({
+        shell: shellRef.current,
+        target,
+        viewport,
+      })
+
+      setGapRects(measurement.gaps)
+      setTrackRects(measurement.tracks)
     })
 
-    setGapRects(measurement.gaps)
-    setTrackRects(measurement.tracks)
+    return () => cancelAnimationFrame(frame)
   }, [
     context.showGridLayout,
     rect.h,
@@ -93,6 +108,40 @@ export function DomEditGridOverlay<
     shellRef,
     state,
     target,
+    viewport,
+  ])
+
+  useLayoutEffect(() => {
+    if (!shouldShowGridChildArea || !parentId) {
+      const frame = requestAnimationFrame(() => {
+        setGridChildArea(null)
+      })
+
+      return () => cancelAnimationFrame(frame)
+    }
+
+    const frame = requestAnimationFrame(() => {
+      setGridChildArea(measureDomEditGridChildArea({
+        adapter,
+        parentId,
+        selectedNodeId,
+        shell: shellRef.current,
+        viewport,
+      }))
+    })
+
+    return () => cancelAnimationFrame(frame)
+  }, [
+    adapter,
+    parentId,
+    rect.h,
+    rect.w,
+    rect.x,
+    rect.y,
+    selectedNodeId,
+    shellRef,
+    shouldShowGridChildArea,
+    state,
     viewport,
   ])
 
@@ -120,7 +169,9 @@ export function DomEditGridOverlay<
     }
   }, [activeDragAxis, context.showGridLayout])
 
-  if (!context.showGridLayout) {
+  const activeGridChildArea = shouldShowGridChildArea ? gridChildArea : null
+
+  if (!context.showGridLayout && !activeGridChildArea) {
     return null
   }
 
@@ -186,6 +237,9 @@ export function DomEditGridOverlay<
 
   return (
     <>
+      {activeGridChildArea ? (
+        <DomEditGridChildAreaGuide area={activeGridChildArea} />
+      ) : null}
       {visibility.gridGapVisuals ? trackRects.map((track, index) => (
         <span
           key={`${index}:${track.x}:${track.y}`}
@@ -221,6 +275,90 @@ export function DomEditGridOverlay<
       ) : null}
     </>
   )
+}
+
+function DomEditGridChildAreaGuide({
+  area,
+}: {
+  area: DomEditGridChildArea
+}) {
+  const columnLabel = `Col ${area.columnStart + 1} / span ${area.columnSpan}`
+  const rowLabel = `Row ${area.rowStart + 1} / span ${area.rowSpan}`
+  const anchorInset = Math.min(10, area.w / 2, area.h / 2)
+
+  return (
+    <>
+      <span
+        className="figma-grid-child-area"
+        data-grid-child-area="true"
+        data-grid-child-column-span={area.columnSpan}
+        data-grid-child-row-span={area.rowSpan}
+        style={createDomEditOverlayRectStyle(area)}
+      />
+      <span
+        className="figma-grid-child-badge"
+        data-grid-child-badge="column"
+        style={{
+          left: area.x + anchorInset,
+          top: area.y + anchorInset,
+        }}
+      >
+        {columnLabel}
+      </span>
+      <span
+        className="figma-grid-child-badge figma-grid-child-badge--row"
+        data-grid-child-badge="row"
+        style={{
+          left: area.x + area.w - anchorInset,
+          top: area.y + area.h - anchorInset,
+        }}
+      >
+        {rowLabel}
+      </span>
+    </>
+  )
+}
+
+function measureDomEditGridChildArea<
+  TNodeId extends DomEditNodeId,
+  TState extends DomEditState<TNodeId>,
+>({
+  adapter,
+  parentId,
+  selectedNodeId,
+  shell,
+  viewport,
+}: {
+  adapter: DomEditModelAdapter<TNodeId, TState>
+  parentId: TNodeId
+  selectedNodeId: TNodeId
+  shell: HTMLElement | null
+  viewport: DomEditViewport
+}) {
+  const parent = adapter.getElement(parentId)
+  const selected = adapter.getElement(selectedNodeId)
+
+  if (!shell || !parent || !selected) {
+    return null
+  }
+
+  const shellRect = shell.getBoundingClientRect()
+  const child = measureDomEditGridWorldRect({
+    elementRect: selected.getBoundingClientRect(),
+    shellRect,
+    viewport,
+  })
+  const tracks = Array.from(parent.children)
+    .filter((element): element is HTMLElement => element instanceof HTMLElement)
+    .map((element) => element.getBoundingClientRect())
+    .filter((elementRect) => elementRect.width > 0 && elementRect.height > 0)
+    .map((elementRect) => measureDomEditGridWorldRect({
+      elementRect,
+      shellRect,
+      viewport,
+    }))
+
+  return getDomEditGridChildArea({ child, tracks })
 }
 
 function measureDomEditGrid({
