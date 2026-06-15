@@ -83,6 +83,25 @@ export {
   type SlideEditTextParagraphSpacingValues,
 } from './SlideEditTextParagraphSpacing'
 export {
+  createSlideEditTextFontFamilyDescriptor,
+  getSlideEditTextFontFamilyCommandEffect,
+  normalizeSlideEditTextFontFamily,
+  normalizeSlideEditTextFontFamilyOptions,
+  normalizeSlideEditTextFontFamilyUpdateCommand,
+  SLIDE_EDIT_TEXT_FONT_FAMILY_FALLBACK,
+  SLIDE_EDIT_TEXT_FONT_FAMILY_FIELD,
+  type SlideEditTextFontFamily,
+  type SlideEditTextFontFamilyDescriptor,
+  type SlideEditTextFontFamilyFieldDescriptor,
+  type SlideEditTextFontFamilyHostCommandEffect,
+  type SlideEditTextFontFamilyNormalizeInput,
+  type SlideEditTextFontFamilyOption,
+  type SlideEditTextFontFamilySource,
+  type SlideEditTextFontFamilyUpdateCommand,
+  type SlideEditTextFontObjectId,
+  type SlideEditTextFontSlideId,
+} from './SlideEditTextFontFamily'
+export {
   createSlideEditPlaceholderDescriptor,
   getSlideEditObjectVisibilityCommandAvailability,
   getSlideEditObjectVisibilityCommandEffect,
@@ -327,6 +346,7 @@ export type SlideEditAdapterSlotId =
   | 'slide-frame'
   | 'slide-metadata'
   | 'slide-transition'
+  | 'text-font-family'
   | 'text-paragraph-spacing'
   | 'text-measurement'
 
@@ -376,6 +396,11 @@ export const SLIDE_EDIT_ADAPTER_SLOTS = Object.freeze([
     id: 'slide-transition',
     owner: 'host',
     purpose: 'Provide slide transition and advance timing values for inspector, preview, and export.',
+  },
+  {
+    id: 'text-font-family',
+    owner: 'host',
+    purpose: 'Provide selected text object font family values and allowed family options.',
   },
   {
     id: 'text-paragraph-spacing',
@@ -443,6 +468,7 @@ export type SlideEditOwnedContractId =
   | 'slide-object-bounds'
   | 'slide-rail-interaction'
   | 'slide-transition-timing'
+  | 'text-font-family-affordance'
   | 'text-overflow-affordance'
   | 'text-paragraph-spacing-affordance'
 
@@ -512,6 +538,11 @@ export const SLIDE_EDIT_OWNED_CONTRACTS = Object.freeze([
     id: 'text-overflow-affordance',
     owner: 'slide-edit-affordance',
     scope: 'Bounded text measurement, overflow state, and auto-fit hints.',
+  },
+  {
+    id: 'text-font-family-affordance',
+    owner: 'slide-edit-affordance',
+    scope: 'Selected text object font family options, fallback normalization, and update command effects.',
   },
   {
     id: 'text-paragraph-spacing-affordance',
