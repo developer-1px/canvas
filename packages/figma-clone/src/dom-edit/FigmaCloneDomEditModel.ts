@@ -979,6 +979,7 @@ const DEFAULT_STYLES = mapFigmaCloneDomEditState(
     ...EMPTY_STYLE,
     ...HUG_BOX_LAYOUT,
     h: 34,
+    margin: 6,
     padding: 10,
     radius: 10,
     w: 92,

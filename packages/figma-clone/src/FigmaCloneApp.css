@@ -1721,9 +1721,47 @@
   opacity: 0.72;
 }
 
+.figma-margin-ghost {
+  position: absolute;
+  box-sizing: border-box;
+  border: 1px dashed var(--figma-boxmodel-margin-label);
+  background:
+    repeating-linear-gradient(
+      -45deg,
+      transparent 0 5px,
+      rgba(126, 34, 206, 0.16) 5px 9px
+    );
+  pointer-events: none;
+}
+
+.figma-margin-ghost-label {
+  position: absolute;
+  z-index: 8;
+  padding: 1px 5px;
+  border: 1px solid rgba(126, 34, 206, 0.2);
+  border-radius: 3px;
+  background: #ffffff;
+  color: var(--figma-boxmodel-margin-label);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  line-height: 14px;
+  white-space: nowrap;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
 .figma-boxmodel-margin {
   z-index: 3;
   background: var(--figma-boxmodel-margin);
+}
+
+.figma-boxmodel-margin.figma-margin-ghost {
+  background:
+    repeating-linear-gradient(
+      -45deg,
+      transparent 0 5px,
+      rgba(126, 34, 206, 0.16) 5px 9px
+    );
 }
 
 .figma-boxmodel-border {

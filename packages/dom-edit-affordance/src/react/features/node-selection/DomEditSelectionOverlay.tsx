@@ -48,6 +48,7 @@ import type {
   DomEditViewport,
 } from '../../../shared/model/DomEditTypes'
 import { DomEditBoxModelOverlay } from '../box-model-xray/DomEditBoxModelOverlay'
+import { DomEditMarginGhostOverlay } from '../box-model-xray/DomEditMarginGhostOverlay'
 import { DomEditAutoLayoutOverlay } from '../layout-editing/DomEditAutoLayoutOverlay'
 import { DomEditGridOverlay } from '../layout-editing/DomEditGridOverlay'
 import { DomEditGuideOverlay } from '../spatial-inspection/DomEditGuideOverlay'
@@ -578,6 +579,13 @@ export function DomEditSelectionOverlay<
               />
             ) : null}
           </>
+        ) : null}
+        {visibility.measurements && layerVisibility.boxModel ? (
+          <DomEditMarginGhostOverlay
+            owner="selected"
+            rect={rect}
+            target={target}
+          />
         ) : null}
         {layerVisibility.grid ? (
           <DomEditGridOverlay
