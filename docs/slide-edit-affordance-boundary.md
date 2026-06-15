@@ -15,6 +15,7 @@
 | Slide object bounds | `slide-edit-affordance` | selected object bounds through a host adapter |
 | Slide command effects | `slide-edit-affordance` | product-neutral command envelopes routed to the host |
 | Slide rail interaction | `slide-edit-affordance` | active slide, slide order, thumbnail hit target, rail command intent |
+| Placeholder visibility affordance | `slide-edit-affordance` | slide placeholder structure and object hide/show read model |
 | Text measurement | `slide-edit-affordance` | bounded text size, overflow, and auto-fit hints |
 | Object inspector | `slide-edit-affordance` | object-level inspector grouping without DOM layout assumptions |
 
@@ -99,8 +100,26 @@
 | Shrink text | usually a typography/style decision outside CSS intrinsic sizing | text scale can change to keep bounds fixed |
 | Overflow | computed by browser layout and scroll/clipping rules | host measurement reports slide text overflow for indicators and auto-fit commands |
 
+## Placeholder And Object Visibility Contract
+
+| Area | Contract |
+| --- | --- |
+| Placeholder structure | role, title, bounds, locked state, visible state, slide id, placeholder id |
+| Object visibility read model | object id, hidden state, locked state, selectable state, optional placeholder reference |
+| Selection vs visibility | hidden objects can be non-visible while still selectable by a host policy such as selection pane access |
+| Hide/show availability | command availability is derived from selected objects, locked state, and current hidden state |
+| Command effect | hide/show produces product-neutral `slide-command-effect`; host owns storage mutation |
+
+## Visibility vs Selection Pane
+
+| Contract | Owns | Does Not Own |
+| --- | --- | --- |
+| Placeholder visibility affordance | placeholder geometry/state and object hidden/selectable/locked read model | object list row rendering, tree keyboard model, rename UI |
+| Selection pane affordance | consumes the visibility read model to render rows and route select/rename/reorder intents | placeholder semantics or canvas generic item schema |
+
 ## Contract Rules
 
 - Public names stay product-neutral: slide, object, frame, bounds, selection, command, text.
+- Placeholder and visibility state stay slide-domain contracts; they are not added to the generic canvas item schema.
 - Slide-specific affordances depend on `canvas/core` and `canvas/foundation`; those packages do not depend on slide affordances.
 - Host storage, renderer, and product object shapes stay behind adapter slots.

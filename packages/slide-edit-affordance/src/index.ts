@@ -58,6 +58,24 @@ export {
   type SlideEditTextSize,
   type SlideEditTextSlideId,
 } from './SlideEditTextBoxAutoFit'
+export {
+  createSlideEditPlaceholderDescriptor,
+  getSlideEditObjectVisibilityCommandAvailability,
+  getSlideEditObjectVisibilityCommandEffect,
+  getSlideEditObjectVisibilityState,
+  type SlideEditObjectSelectionPolicy,
+  type SlideEditObjectVisibilityCommand,
+  type SlideEditObjectVisibilityCommandAvailability,
+  type SlideEditObjectVisibilityCommandId,
+  type SlideEditObjectVisibilityDescriptor,
+  type SlideEditObjectVisibilityHostCommandEffect,
+  type SlideEditObjectVisibilityState,
+  type SlideEditPlaceholderDescriptor,
+  type SlideEditPlaceholderId,
+  type SlideEditPlaceholderRole,
+  type SlideEditVisibilityObjectId,
+  type SlideEditVisibilitySlideId,
+} from './SlideEditObjectVisibility'
 
 export type SlideEditSlideId = string
 export type SlideEditObjectId = string
@@ -219,6 +237,7 @@ export const SLIDE_EDIT_REUSED_CANVAS_CONTRACTS = Object.freeze([
 
 export type SlideEditOwnedContractId =
   | 'object-inspector'
+  | 'placeholder-visibility-affordance'
   | 'slide-command-effects'
   | 'slide-frame-affordance'
   | 'slide-object-bounds'
@@ -251,6 +270,11 @@ export const SLIDE_EDIT_OWNED_CONTRACTS = Object.freeze([
     id: 'slide-rail-interaction',
     owner: 'slide-edit-affordance',
     scope: 'Slide order, active slide, thumbnail hit target, and rail command intent descriptors.',
+  },
+  {
+    id: 'placeholder-visibility-affordance',
+    owner: 'slide-edit-affordance',
+    scope: 'Slide placeholder structure and object hide/show read model.',
   },
   {
     id: 'text-overflow-affordance',
