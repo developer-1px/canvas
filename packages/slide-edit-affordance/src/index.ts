@@ -76,6 +76,33 @@ export {
   type SlideEditVisibilityObjectId,
   type SlideEditVisibilitySlideId,
 } from './SlideEditObjectVisibility'
+export {
+  createSlideEditLayoutApplyCommandEffect,
+  createSlideEditLayoutDescriptor,
+  createSlideEditThemeTokenSet,
+  getSlideEditLayoutPlaceholderDescriptors,
+  resolveSlideEditLayoutPlaceholderStyle,
+  type SlideEditLayoutApplyCommand,
+  type SlideEditLayoutApplyHostCommandEffect,
+  type SlideEditLayoutApplyPolicy,
+  type SlideEditLayoutDescriptor,
+  type SlideEditLayoutId,
+  type SlideEditLayoutPlaceholderDescriptor,
+  type SlideEditMasterDescriptor,
+  type SlideEditMasterId,
+  type SlideEditResolvedThemeStyle,
+  type SlideEditThemeColorRole,
+  type SlideEditThemeColorToken,
+  type SlideEditThemeColorTokenId,
+  type SlideEditThemeFontRole,
+  type SlideEditThemeFontToken,
+  type SlideEditThemeFontTokenId,
+  type SlideEditThemeId,
+  type SlideEditThemeSpacingToken,
+  type SlideEditThemeSpacingTokenId,
+  type SlideEditThemeStyleTokenRefs,
+  type SlideEditThemeTokenSet,
+} from './SlideEditLayoutTheme'
 
 export type SlideEditSlideId = string
 export type SlideEditObjectId = string
@@ -236,6 +263,7 @@ export const SLIDE_EDIT_REUSED_CANVAS_CONTRACTS = Object.freeze([
 ] as const satisfies readonly SlideEditReusedCanvasContract[])
 
 export type SlideEditOwnedContractId =
+  | 'layout-master-theme-tokens'
   | 'object-inspector'
   | 'placeholder-visibility-affordance'
   | 'slide-command-effects'
@@ -275,6 +303,11 @@ export const SLIDE_EDIT_OWNED_CONTRACTS = Object.freeze([
     id: 'placeholder-visibility-affordance',
     owner: 'slide-edit-affordance',
     scope: 'Slide placeholder structure and object hide/show read model.',
+  },
+  {
+    id: 'layout-master-theme-tokens',
+    owner: 'slide-edit-affordance',
+    scope: 'Layout, master, theme color/font/spacing token, and apply-policy descriptors.',
   },
   {
     id: 'text-overflow-affordance',

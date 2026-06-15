@@ -16,6 +16,7 @@
 | Slide command effects | `slide-edit-affordance` | product-neutral command envelopes routed to the host |
 | Slide rail interaction | `slide-edit-affordance` | active slide, slide order, thumbnail hit target, rail command intent |
 | Placeholder visibility affordance | `slide-edit-affordance` | slide placeholder structure and object hide/show read model |
+| Layout/master/theme tokens | `slide-edit-affordance` | layout, master, and theme token read model |
 | Text measurement | `slide-edit-affordance` | bounded text size, overflow, and auto-fit hints |
 | Object inspector | `slide-edit-affordance` | object-level inspector grouping without DOM layout assumptions |
 
@@ -116,6 +117,17 @@
 | --- | --- | --- |
 | Placeholder visibility affordance | placeholder geometry/state and object hidden/selectable/locked read model | object list row rendering, tree keyboard model, rename UI |
 | Selection pane affordance | consumes the visibility read model to render rows and route select/rename/reorder intents | placeholder semantics or canvas generic item schema |
+
+## Layout/Master/Theme Token Contract
+
+| Area | Contract |
+| --- | --- |
+| Theme tokens | color, font, and spacing descriptors with product-neutral ids and roles |
+| Master | master id, theme id, and title; host owns actual master page storage |
+| Layout | layout id, master id, default style refs, and placeholder descriptors |
+| Placeholder sharing | layout placeholders reuse placeholder id, role, title, bounds, lock, and visibility fields from placeholder visibility affordance |
+| Inherited style | placeholder style refs override layout defaults, then resolve against theme tokens |
+| Apply policy | host chooses `preserve-existing-objects` or `reflow-objects-to-placeholders` |
 
 ## Contract Rules
 
