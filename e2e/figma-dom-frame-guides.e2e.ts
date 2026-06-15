@@ -7,12 +7,17 @@ test('shows frame-local DOM guides and responsive layout columns', async ({
 
   await page.getByRole('button', { name: 'Select layer Workspace page' })
     .click()
+  await page.getByRole('button', { name: 'Select Workspace page section' })
+    .click()
+  await page.getByRole('button', { name: /Desktop/ }).click()
+  await page.getByRole('button', { name: 'Select layer Workspace page' })
+    .click()
   await page.getByRole('button', { name: 'Select layer Revenue stat' }).click()
   await expect(page.locator('[data-figma-dom-node="workspaceStatRevenue"]'))
     .toHaveAttribute('data-selected', 'true')
 
   await expect.poll(() => page.locator('.figma-frame-guide--ruler').count())
-    .toBe(2)
+    .toBe(3)
   await expect.poll(() => page.locator('.figma-frame-guide--x').count())
     .toBeGreaterThan(0)
   await expect.poll(() => page.locator('.figma-frame-guide--y').count())
@@ -20,7 +25,7 @@ test('shows frame-local DOM guides and responsive layout columns', async ({
   await expect.poll(() => page.locator('.figma-frame-guide-distance').count())
     .toBeGreaterThan(0)
   await expect.poll(() => page.locator('.figma-layout-guide-column').count())
-    .toBe(6)
+    .toBe(12)
 
   const firstColumn = page.locator('.figma-layout-guide-column').first()
   const desktopColumnWidth = await readElementWidth(firstColumn)
@@ -33,7 +38,9 @@ test('shows frame-local DOM guides and responsive layout columns', async ({
   await page.getByRole('button', { name: 'Select layer Revenue stat' }).click()
 
   await expect.poll(() => page.locator('.figma-layout-guide-column').count())
-    .toBe(6)
+    .toBe(4)
+  await expect.poll(() => page.locator('.figma-frame-guide--x').count())
+    .toBeGreaterThanOrEqual(2)
   await expect.poll(() => readElementWidth(firstColumn))
     .toBeLessThan(desktopColumnWidth)
 })
