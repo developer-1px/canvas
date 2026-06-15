@@ -24,6 +24,22 @@ export {
   type SlideEditFrameRegion,
   type SlideEditFrameRulerGuide,
 } from './SlideEditFrameGuides'
+export {
+  createSlideEditRailDescriptor,
+  getSlideEditRailKeyboardCommandEffect,
+  getSlideEditRailPointerCommandEffect,
+  SLIDE_EDIT_RAIL_COMMANDS,
+  toSlideEditRailHostCommandEffect,
+  type SlideEditRailCommand,
+  type SlideEditRailCommandDescriptor,
+  type SlideEditRailCommandId,
+  type SlideEditRailDescriptor,
+  type SlideEditRailHostCommandEffect,
+  type SlideEditRailKeyboardIntent,
+  type SlideEditRailPointerIntent,
+  type SlideEditRailSlideId,
+  type SlideEditRailThumbnailDescriptor,
+} from './SlideEditRailInteractions'
 
 export type SlideEditSlideId = string
 export type SlideEditObjectId = string
@@ -188,6 +204,7 @@ export type SlideEditOwnedContractId =
   | 'slide-command-effects'
   | 'slide-frame-affordance'
   | 'slide-object-bounds'
+  | 'slide-rail-interaction'
   | 'text-overflow-affordance'
 
 export type SlideEditOwnedContract = {
@@ -211,6 +228,11 @@ export const SLIDE_EDIT_OWNED_CONTRACTS = Object.freeze([
     id: 'slide-command-effects',
     owner: 'slide-edit-affordance',
     scope: 'Product-neutral command effect envelopes for host transactions.',
+  },
+  {
+    id: 'slide-rail-interaction',
+    owner: 'slide-edit-affordance',
+    scope: 'Slide order, active slide, thumbnail hit target, and rail command intent descriptors.',
   },
   {
     id: 'text-overflow-affordance',
