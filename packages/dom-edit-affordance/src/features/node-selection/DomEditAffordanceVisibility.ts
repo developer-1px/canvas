@@ -1,6 +1,7 @@
 import type { DomEditLayoutContext } from '../../shared/model/DomEditTypes'
 
 export type DomEditAffordanceProperty =
+  | 'align'
   | 'gap'
   | 'geometry'
   | 'margin'
@@ -17,6 +18,7 @@ export type DomEditAffordanceState =
   | { mode: 'xray' }
 
 export type DomEditOverlayVisibility = {
+  alignGuides: boolean
   gapHitTargets: boolean
   gapVisuals: boolean
   geometry: boolean
@@ -41,6 +43,7 @@ export function getDomEditOverlayVisibility({
   const gapActive = isDomEditPropertyActive(affordanceState, 'gap')
   const paddingActive = isDomEditPropertyActive(affordanceState, 'padding')
   const sizeActive = isDomEditPropertyActive(affordanceState, 'size')
+  const alignActive = isDomEditPropertyActive(affordanceState, 'align')
   const spacingActive = gapActive || paddingActive
   const geometryActive =
     affordanceState.mode === 'idle' ||
@@ -48,6 +51,12 @@ export function getDomEditOverlayVisibility({
     isDomEditPropertyActive(affordanceState, 'geometry')
 
   return {
+    alignGuides: context.showSelfLayout &&
+      (affordanceState.mode === 'idle' || alignActive) &&
+      affordanceState.mode !== 'measure' &&
+      affordanceState.mode !== 'xray' &&
+      !spacingActive &&
+      !sizeActive,
     gapHitTargets: context.showSelfLayout &&
       affordanceState.mode !== 'xray' &&
       !paddingActive,
