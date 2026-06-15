@@ -242,6 +242,12 @@ importers:
         specifier: ^4.0.0
         version: 4.4.3
 
+  packages/slide-edit-affordance:
+    dependencies:
+      '@interactive-os/canvas':
+        specifier: ^0.1.1
+        version: link:../..
+
 packages:
 
   '@asamuzakjp/css-color@5.1.11':
