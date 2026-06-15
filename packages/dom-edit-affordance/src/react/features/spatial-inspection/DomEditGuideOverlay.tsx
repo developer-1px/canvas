@@ -28,6 +28,13 @@ import {
   type DomEditSmartGuide,
   type DomEditSmartGuideCandidate,
 } from './DomEditSmartGuides'
+import {
+  getDomEditFrameGuideGeometry,
+  type DomEditFrameGuideConfig,
+  type DomEditFrameGuideDistance,
+  type DomEditFrameGuideLine,
+  type DomEditFrameLayoutColumn,
+} from './DomEditFrameGuides'
 
 type GuideRect = DomEditScaledOverlayRect
 
@@ -51,15 +58,18 @@ export function DomEditGuideOverlay<
   state,
   viewport,
   affordanceState = { mode: 'idle' },
+  frameGuides,
 }: {
   adapter: DomEditModelAdapter<TNodeId, TState>
   affordanceState?: DomEditAffordanceState
+  frameGuides?: DomEditFrameGuideConfig<TNodeId> | null
   rect: GuideRect
   selectedNodeId: TNodeId
   shellRef: RefObject<HTMLElement | null>
   state: TState
   viewport: DomEditViewport
 }) {
+  const [frameRect, setFrameRect] = useState<GuideRect | null>(null)
   const [parentRect, setParentRect] = useState<GuideRect | null>(null)
   const [siblingRects, setSiblingRects] =
     useState<DomEditSmartGuideCandidate[]>([])
@@ -90,6 +100,16 @@ export function DomEditGuideOverlay<
         siblings: activeSiblingRects,
       })
     : []
+  const frameGuideGeometry = frameGuides && frameRect
+    ? getDomEditFrameGuideGeometry({
+        frameRect,
+        layoutColumns: frameGuides.layoutColumns,
+        rulerGuides: frameGuides.rulerGuides,
+        selectedRect: rect,
+      })
+    : null
+  const shouldRenderFrameGuideDistances =
+    shouldRenderDomEditFrameGuideDistances(affordanceState)
 
   useLayoutEffect(() => {
     const nextParentRect = parentId
@@ -109,6 +129,34 @@ export function DomEditGuideOverlay<
   }, [
     adapter,
     parentId,
+    rect.h,
+    rect.w,
+    rect.x,
+    rect.y,
+    selectedNodeId,
+    shellRef,
+    state,
+    viewport,
+  ])
+
+  useLayoutEffect(() => {
+    const nextFrameRect = frameGuides
+      ? measureDomEditNodeOverlayRect({
+          adapter,
+          nodeId: frameGuides.frameNodeId,
+          shell: shellRef.current,
+          state,
+          viewport,
+        })
+      : null
+
+    setFrameRect((current) =>
+      areDomEditOverlayRectsEqual(current, nextFrameRect)
+        ? current
+        : nextFrameRect)
+  }, [
+    adapter,
+    frameGuides,
     rect.h,
     rect.w,
     rect.x,
@@ -240,6 +288,26 @@ export function DomEditGuideOverlay<
           rect={rect}
         />
       ) : null}
+      {frameGuideGeometry?.columns.map((column) => (
+        <DomEditFrameLayoutColumnOverlay
+          key={column.id}
+          column={column}
+        />
+      ))}
+      {frameGuideGeometry?.lines.map((guide) => (
+        <DomEditFrameGuideLineOverlay
+          key={guide.id}
+          guide={guide}
+        />
+      ))}
+      {shouldRenderFrameGuideDistances
+        ? frameGuideGeometry?.distances.map((distance) => (
+          <DomEditFrameGuideDistanceLine
+            key={`${distance.guideId}:${distance.axis}:${distance.point}`}
+            distance={distance}
+          />
+        ))
+        : null}
       {smartGuides.map((guide, index) => (
         <DomEditSmartGuideLine
           key={`${guide.family}:${guide.axis}:${guide.coordinate}:${guide.from}:${guide.length}:${guide.source}:${guide.sourceId ?? 'parent'}:${index}`}
@@ -377,6 +445,86 @@ function isDomEditSmartGuideDragging(
       affordanceState.mode === 'drag-property' &&
       affordanceState.property === 'geometry'
     )
+}
+
+function shouldRenderDomEditFrameGuideDistances(
+  affordanceState: DomEditAffordanceState,
+) {
+  return affordanceState.mode === 'idle' ||
+    affordanceState.mode === 'measure' ||
+    affordanceState.mode === 'transform'
+}
+
+function DomEditFrameLayoutColumnOverlay({
+  column,
+}: {
+  column: DomEditFrameLayoutColumn
+}) {
+  return (
+    <span
+      className="figma-layout-guide-column"
+      style={createDomEditOverlayRectStyle(column)}
+    />
+  )
+}
+
+function DomEditFrameGuideLineOverlay({
+  guide,
+}: {
+  guide: DomEditFrameGuideLine
+}) {
+  const style: CSSProperties = guide.orientation === 'vertical'
+    ? {
+        height: guide.length,
+        left: guide.x,
+        top: guide.y,
+      }
+    : {
+        left: guide.x,
+        top: guide.y,
+        width: guide.length,
+      }
+
+  return (
+    <span
+      className={[
+        'figma-frame-guide',
+        'figma-frame-guide--ruler',
+        `figma-frame-guide--${guide.axis}`,
+        `figma-frame-guide--${guide.orientation}`,
+      ].join(' ')}
+      style={style}
+    />
+  )
+}
+
+function DomEditFrameGuideDistanceLine({
+  distance,
+}: {
+  distance: DomEditFrameGuideDistance
+}) {
+  const style: CSSProperties = distance.orientation === 'vertical'
+    ? {
+        height: distance.length,
+        left: distance.coordinate,
+        top: distance.from,
+      }
+    : {
+        left: distance.from,
+        top: distance.coordinate,
+        width: distance.length,
+      }
+
+  return (
+    <span
+      className={[
+        'figma-frame-guide-distance',
+        `figma-frame-guide-distance--${distance.axis}`,
+        `figma-frame-guide-distance--${distance.orientation}`,
+      ].join(' ')}
+      style={style}
+    />
+  )
 }
 
 function DomEditSmartGuideLine({

@@ -30,6 +30,7 @@ import {
   DomEditSelectionOverlay,
   type DomEditAffordanceProperty,
   type DomEditAffordanceState,
+  type DomEditFrameGuideConfig,
 } from '@interactive-os/dom-edit-affordance/react'
 import type {
   DomEditInteractionAction,
@@ -90,6 +91,28 @@ type FigmaCloneDomDragHistorySession = {
 }
 
 const FIGMA_CLONE_ITEMS = createFigmaCloneCanvasItems()
+
+const FIGMA_CLONE_FRAME_GUIDES = {
+  homePage: {
+    frameNodeId: 'homePage',
+    layoutColumns: { count: 6, gutter: 20, margin: 48 },
+    rulerGuides: [
+      { axis: 'x', id: 'home-copy-guide', offset: 96 },
+      { axis: 'y', id: 'home-hero-baseline', offset: 180 },
+    ],
+  },
+  workspacePage: {
+    frameNodeId: 'workspacePage',
+    layoutColumns: { count: 6, gutter: 16, margin: 32 },
+    rulerGuides: [
+      { axis: 'x', id: 'workspace-nav-guide', offset: 80 },
+      { axis: 'y', id: 'workspace-header-baseline', offset: 132 },
+    ],
+  },
+} satisfies Record<
+  FigmaCloneDomSectionRootId,
+  DomEditFrameGuideConfig<FigmaCloneDomNodeId>
+>
 
 const FIGMA_CLONE_AFFORDANCE_CONFIG = {
   gestures: {
@@ -211,6 +234,9 @@ export function FigmaCloneApp() {
   const selectedNodeId = selection.frameId === 'dom' ? selection.nodeId : null
   const selectedSectionRootId =
     selection.frameId === 'dom' ? selection.rootId : null
+  const frameGuides = selection.frameId === 'dom'
+    ? FIGMA_CLONE_FRAME_GUIDES[selection.rootId]
+    : null
   const isSectionSelected = useCallback(
     (rootId: FigmaCloneDomSectionRootId) =>
       selectedSectionRootId === rootId && selectedNodeId === null,
@@ -288,7 +314,10 @@ export function FigmaCloneApp() {
       return state === current.state ? current : { ...current, state }
     })
   }
-  const changeDomText = (nodeId: FigmaCloneDomNodeId, value: string) => {
+  const changeDomText = useCallback((
+    nodeId: FigmaCloneDomNodeId,
+    value: string,
+  ) => {
     updateDomDocument((current) => {
       const textState = updateFigmaCloneDomText({
         nodeId,
@@ -300,7 +329,7 @@ export function FigmaCloneApp() {
         ? current
         : { ...current, textState }
     })
-  }
+  }, [updateDomDocument])
   const runDomEditCommand = useCallback((action: DomEditInteractionAction) => {
     if (action.type === 'dom-edit.command.undo') {
       domDocument.history.undo()
@@ -317,6 +346,7 @@ export function FigmaCloneApp() {
   const assemblyInput = useMemo<CanvasAppAssemblyInput>(() => ({
     affordanceConfig: FIGMA_CLONE_AFFORDANCE_CONFIG,
     capabilities: CANVAS_APP_READ_ONLY_CAPABILITIES,
+    // eslint-disable-next-line react-hooks/refs
     customItemModules: createFigmaCloneCanvasModules({
       isSectionSelected,
       sectionViewport,
@@ -331,6 +361,7 @@ export function FigmaCloneApp() {
     initialSelection: [],
     workspaceStorageProvider: createFigmaCloneStorageProvider(),
   }), [
+    changeDomText,
     domState,
     domTextState,
     isSectionSelected,
@@ -398,6 +429,7 @@ export function FigmaCloneApp() {
             <DomEditSelectionOverlay
               adapter={FIGMA_CLONE_DOM_EDIT_ADAPTER}
               affordanceState={affordanceState}
+              frameGuides={frameGuides}
               isCanvasPanActive={app.activeMode === 'pan' || app.gesture === 'pan'}
               selectedNodeId={selectedNodeId}
               shellRef={canvasRegionRef as RefObject<HTMLElement | null>}
