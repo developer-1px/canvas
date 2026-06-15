@@ -18,6 +18,7 @@ describe('slide-edit-affordance boundary', () => {
       'command-effect',
       'layout-theme',
       'slide-metadata',
+      'slide-transition',
       'text-measurement',
     ])
     expect(SLIDE_EDIT_ADAPTER_SLOTS.every((slot) => slot.owner === 'host'))

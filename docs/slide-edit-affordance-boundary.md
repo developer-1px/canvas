@@ -20,6 +20,7 @@
 | Layout/theme affordance | `slide-edit-affordance` | layout, master, placeholder mapping, and theme token descriptors |
 | Slide object clipboard | `slide-edit-affordance` | source slide metadata, paste target, and id remap plan |
 | Slide metadata inspector | `slide-edit-affordance` | active slide name, background, notes, size, orientation fields |
+| Slide transition timing | `slide-edit-affordance` | transition type, duration, click/after advance policy |
 | Text measurement | `slide-edit-affordance` | bounded text size, overflow, and auto-fit hints |
 | Object inspector | `slide-edit-affordance` | object-level inspector grouping without DOM layout assumptions |
 
@@ -33,6 +34,7 @@
 | `command-effect` | Transaction boundary for command effects |
 | `layout-theme` | Layout, master, placeholder, and theme token descriptors |
 | `slide-metadata` | Active slide metadata values for inspector descriptors |
+| `slide-transition` | Slide transition and advance timing values for inspector, preview, and export |
 | `text-measurement` | Rendered text size and overflow for bounded text |
 
 ## DOM Affordance References
@@ -181,6 +183,17 @@
 | Display priority | object selection inspector wins when selected object ids are present |
 | Updates | field edits become host `slide-command-effect` payloads |
 | Storage | host owns slide metadata values and persistence |
+
+## Slide Transition Timing Contract
+
+| Area | Contract |
+| --- | --- |
+| Read model | slide id, transition type, duration ms, and advance policy |
+| Built-in types | `none`, `fade`, `push`; host-specific string descriptors remain allowed |
+| Timing | duration clamps to 0..60000 ms; auto-advance `afterMs` is optional |
+| Advance | click advance is explicit and may coexist with optional `afterMs` |
+| Updates | field-level type, duration, and advance edits become host command effects |
+| Runtime | host owns preview rendering, export mapping, and persistence |
 
 ## Contract Rules
 
