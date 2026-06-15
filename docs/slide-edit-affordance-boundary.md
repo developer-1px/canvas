@@ -23,6 +23,7 @@
 | Slide metadata inspector | `slide-edit-affordance` | active slide name, background, notes, size, orientation fields |
 | Slide transition timing | `slide-edit-affordance` | transition type, duration, click/after advance policy |
 | Text font family | `slide-edit-affordance` | selected text object font family options and command effects |
+| Text frame inset | `slide-edit-affordance` | text frame top/right/bottom/left inset metadata and command effects |
 | Text vertical alignment | `slide-edit-affordance` | text frame internal vertical alignment metadata and command effects |
 | Text paragraph spacing | `slide-edit-affordance` | line height and paragraph before/after spacing descriptors |
 | Text measurement | `slide-edit-affordance` | bounded text size, overflow, and auto-fit hints |
@@ -41,6 +42,7 @@
 | `slide-metadata` | Active slide metadata values for inspector descriptors |
 | `slide-transition` | Slide transition and advance timing values for inspector, preview, and export |
 | `text-font-family` | Selected text object font family value and allowed family options |
+| `text-frame-inset` | Selected text object frame inset values for stage, thumbnail, and export |
 | `text-vertical-alignment` | Selected text object vertical alignment value for stage, thumbnail, and export |
 | `text-paragraph-spacing` | Text paragraph spacing and line height values for object inspectors |
 | `text-measurement` | Rendered text size and overflow for bounded text |
@@ -137,6 +139,17 @@
 | Field | `verticalAlignment` segmented-control descriptor |
 | Metadata | `data-slide-text-vertical-align` carries the normalized value |
 | Updates | selected text object id and normalized alignment become host command effects |
+| Runtime | stage, thumbnail, inspector, and export can read the same metadata value |
+
+## Text Frame Inset Contract
+
+| Area | Contract |
+| --- | --- |
+| Values | `top`, `right`, `bottom`, `left` numeric inset values; default is `0 0 0 0` |
+| Fields | one `inset-number` descriptor per side, routed through `update-text-frame-inset` |
+| Metadata | `data-slide-text-frame-inset` carries `top right bottom left` order |
+| Normalization | values clamp to 0..1000 px and round to two decimals |
+| Updates | selected text object id, side, and normalized inset value become host command effects |
 | Runtime | stage, thumbnail, inspector, and export can read the same metadata value |
 
 ## DOM Hug/Fill vs Slide Text Auto-Fit
