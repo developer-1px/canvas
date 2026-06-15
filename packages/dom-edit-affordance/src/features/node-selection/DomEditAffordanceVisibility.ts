@@ -20,6 +20,7 @@ export type DomEditAffordanceState =
 export type DomEditOverlayVisibility = {
   alignGuides: boolean
   axisGuides: boolean
+  directionControls: boolean
   gapHitTargets: boolean
   gapVisuals: boolean
   geometry: boolean
@@ -42,6 +43,7 @@ export function getDomEditOverlayVisibility({
   context: DomEditLayoutContext
 }): DomEditOverlayVisibility {
   const gapActive = isDomEditPropertyActive(affordanceState, 'gap')
+  const gapHovered = isDomEditPropertyHovered(affordanceState, 'gap')
   const paddingActive = isDomEditPropertyActive(affordanceState, 'padding')
   const sizeActive = isDomEditPropertyActive(affordanceState, 'size')
   const alignActive = isDomEditPropertyActive(affordanceState, 'align')
@@ -71,6 +73,15 @@ export function getDomEditOverlayVisibility({
         affordanceState.mode === 'measure' ||
         gapActive
       ) &&
+      affordanceState.mode !== 'xray' &&
+      !paddingActive &&
+      !sizeActive,
+    directionControls: context.showSelfLayout &&
+      (
+        affordanceState.mode === 'idle' ||
+        gapHovered
+      ) &&
+      affordanceState.mode !== 'measure' &&
       affordanceState.mode !== 'xray' &&
       !paddingActive &&
       !sizeActive,
@@ -109,4 +120,12 @@ function isDomEditPropertyActive(
     affordanceState.mode === 'drag-property' ||
     affordanceState.mode === 'hover-property'
   ) && affordanceState.property === property
+}
+
+function isDomEditPropertyHovered(
+  affordanceState: DomEditAffordanceState,
+  property: DomEditAffordanceProperty,
+): boolean {
+  return affordanceState.mode === 'hover-property' &&
+    affordanceState.property === property
 }
