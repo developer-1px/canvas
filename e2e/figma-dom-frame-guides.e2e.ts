@@ -22,6 +22,8 @@ test('shows frame-local DOM guides and responsive layout columns', async ({
     .toBeGreaterThan(0)
   await expect.poll(() => page.locator('.figma-frame-guide--y').count())
     .toBeGreaterThan(0)
+  await expect(page.locator('.figma-frame-guide-distance')).toHaveCount(0)
+  await page.getByRole('button', { name: 'Measure tool' }).click()
   await expect.poll(() => page.locator('.figma-frame-guide-distance').count())
     .toBeGreaterThan(0)
   await expect.poll(() => page.locator('.figma-layout-guide-column').count())

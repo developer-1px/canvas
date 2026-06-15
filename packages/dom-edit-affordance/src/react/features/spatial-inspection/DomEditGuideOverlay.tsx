@@ -498,8 +498,7 @@ function isDomEditSmartGuideDragging(
 function shouldRenderDomEditFrameGuideDistances(
   affordanceState: DomEditAffordanceState,
 ) {
-  return affordanceState.mode === 'idle' ||
-    affordanceState.mode === 'measure' ||
+  return affordanceState.mode === 'measure' ||
     affordanceState.mode === 'transform'
 }
 
