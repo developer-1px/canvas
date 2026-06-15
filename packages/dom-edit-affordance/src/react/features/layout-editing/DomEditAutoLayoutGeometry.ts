@@ -416,7 +416,7 @@ function measureDomEditAutoLayoutGapRect({
   }
 }
 
-function measureDomEditAutoLayoutWorldRect({
+export function measureDomEditAutoLayoutWorldRect({
   elementRect,
   shellRect,
   viewport,

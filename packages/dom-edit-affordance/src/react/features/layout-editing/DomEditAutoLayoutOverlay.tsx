@@ -49,11 +49,16 @@ import {
   getDomEditPaddingLabelPosition,
   getDomEditPaddingOverlayRects,
   measureDomEditAutoLayoutGapRects,
+  measureDomEditAutoLayoutWorldRect,
   type DomEditAutoLayoutDragKind,
   type DomEditAutoLayoutPaddingCornerDragKind,
   type DomEditAutoLayoutPaddingDragKind,
   type DomEditAutoLayoutRect,
 } from './DomEditAutoLayoutGeometry'
+import {
+  getDomEditFlexWrapLayout,
+  type DomEditFlexWrapLayout,
+} from './DomEditFlexWrapGeometry'
 import {
   DomEditSizeModeCapsule,
 } from './DomEditSizeModeCapsule'
@@ -150,6 +155,8 @@ export function DomEditAutoLayoutOverlay<
 }) {
   const [activeDragKind, setActiveDragKind] =
     useState<DomEditAutoLayoutDragKind | null>(null)
+  const [flexWrapLayout, setFlexWrapLayout] =
+    useState<DomEditFlexWrapLayout | null>(null)
   const [gapRects, setGapRects] = useState<DomEditAutoLayoutRect[]>([])
   const [transientState, setTransientState] = useState(() =>
     createDomEditAutoLayoutOverlayTransientState(selectedNodeId))
@@ -254,6 +261,7 @@ export function DomEditAutoLayoutOverlay<
   useLayoutEffect(() => {
     if (!context.showSelfLayout) {
       const frame = requestAnimationFrame(() => {
+        setFlexWrapLayout(null)
         setGapRects([])
       })
 
@@ -262,6 +270,13 @@ export function DomEditAutoLayoutOverlay<
 
     let frame = 0
     const measure = () => {
+      setFlexWrapLayout(measureDomEditFlexWrapLayout({
+        direction: style.direction,
+        gap: style.gap,
+        shell: shellRef.current,
+        target,
+        viewport,
+      }))
       setGapRects(measureDomEditAutoLayoutGapRects({
         direction: style.direction,
         shell: shellRef.current,
@@ -281,6 +296,7 @@ export function DomEditAutoLayoutOverlay<
     rect.y,
     shellRef,
     style.direction,
+    style.gap,
     state,
     target,
     viewport,
@@ -369,6 +385,10 @@ export function DomEditAutoLayoutOverlay<
     affordanceState,
     context,
   })
+  const activeFlexWrapLayout = context.showSelfLayout &&
+    visibility.gapHitTargets
+    ? flexWrapLayout
+    : null
   const shouldRenderPadding = visibility.paddingHitTargets
   const shouldRenderGap = visibility.gapHitTargets
   const shouldRenderAlignmentEditor =
@@ -648,6 +668,9 @@ export function DomEditAutoLayoutOverlay<
           ) : null}
           {context.showSelfLayout && shouldRenderGap ? (
             <>
+              {activeFlexWrapLayout ? (
+                <DomEditFlexWrapGuides layout={activeFlexWrapLayout} />
+              ) : null}
               {gapRects.map((gapRect, index) => (
                 <button
                   key={`${index}:${gapRect.x}:${gapRect.y}`}
@@ -818,6 +841,74 @@ export function DomEditAutoLayoutOverlay<
           ) : null}
         </>
       ) : null}
+    </>
+  )
+}
+
+function DomEditFlexWrapGuides({
+  layout,
+}: {
+  layout: DomEditFlexWrapLayout
+}) {
+  return (
+    <>
+      {layout.lines.map((line) => (
+        <span
+          key={`line:${line.index}`}
+          aria-hidden="true"
+          className="figma-flex-wrap-line"
+          data-flex-wrap-line={line.index + 1}
+          style={{
+            height: line.h,
+            left: line.x,
+            top: line.y,
+            width: line.w,
+          }}
+        />
+      ))}
+      {layout.lines.map((line) => (
+        <span
+          key={`line-label:${line.index}`}
+          className="figma-flex-wrap-line-label"
+          data-flex-wrap-line-label={line.index + 1}
+          style={{
+            left: line.labelX,
+            top: line.labelY,
+          }}
+        >
+          line {line.index + 1}
+        </span>
+      ))}
+      {layout.gaps.map((gap) => (
+        <span
+          key={`gap:${gap.index}`}
+          aria-hidden="true"
+          className={[
+            'figma-flex-wrap-line-gap',
+            `figma-flex-wrap-line-gap--${gap.axis}`,
+          ].join(' ')}
+          data-flex-wrap-line-gap={gap.index + 1}
+          style={{
+            height: gap.h,
+            left: gap.x,
+            top: gap.y,
+            width: gap.w,
+          }}
+        />
+      ))}
+      {layout.gaps.map((gap) => (
+        <span
+          key={`gap-label:${gap.index}`}
+          className="figma-flex-wrap-line-gap-label"
+          data-flex-wrap-line-gap-label={gap.index + 1}
+          style={{
+            left: gap.labelX,
+            top: gap.labelY,
+          }}
+        >
+          {gap.label}
+        </span>
+      ))}
     </>
   )
 }
@@ -1098,4 +1189,51 @@ function getDomEditGapClassName({
     isBetween ? 'figma-autolayout-gap--between' : '',
     !isVisible ? 'figma-autolayout-gap--empty' : '',
   ].filter(Boolean).join(' ')
+}
+
+function measureDomEditFlexWrapLayout({
+  direction,
+  gap,
+  shell,
+  target,
+  viewport,
+}: {
+  direction: DomEditNodeState['direction']
+  gap: number
+  shell: HTMLElement | null
+  target: HTMLElement
+  viewport: DomEditViewport
+}) {
+  if (!shell || !isDomEditFlexWrapEnabled(target)) {
+    return null
+  }
+
+  const shellRect = shell.getBoundingClientRect()
+  const container = measureDomEditAutoLayoutWorldRect({
+    elementRect: target.getBoundingClientRect(),
+    shellRect,
+    viewport,
+  })
+  const children = Array.from(target.children)
+    .map((child) => child.getBoundingClientRect())
+    .filter((childRect) => childRect.width > 0 && childRect.height > 0)
+    .map((childRect) => measureDomEditAutoLayoutWorldRect({
+      elementRect: childRect,
+      shellRect,
+      viewport,
+    }))
+
+  return getDomEditFlexWrapLayout({
+    children,
+    container,
+    direction,
+    gap,
+  })
+}
+
+function isDomEditFlexWrapEnabled(target: HTMLElement) {
+  const computedStyle = target.ownerDocument.defaultView?.getComputedStyle(target)
+  const flexWrap = target.style.flexWrap || computedStyle?.flexWrap
+
+  return flexWrap === 'wrap' || flexWrap === 'wrap-reverse'
 }

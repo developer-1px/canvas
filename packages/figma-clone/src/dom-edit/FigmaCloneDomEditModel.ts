@@ -48,6 +48,11 @@ export type FigmaCloneDomNodeId =
   | 'workspaceHeroCopy'
   | 'workspaceHeroTitle'
   | 'workspaceHeroText'
+  | 'workspaceAudienceTags'
+  | 'workspaceAudienceTagEnterprise'
+  | 'workspaceAudienceTagRenewal'
+  | 'workspaceAudienceTagExpansion'
+  | 'workspaceAudienceTagRisk'
   | 'workspaceHeroActions'
   | 'workspacePrimaryAction'
   | 'workspaceSecondaryAction'
@@ -322,6 +327,16 @@ export const FIGMA_CLONE_DOM_TREE: readonly FigmaCloneDomNode[] = [
                 children: [
                   { id: 'workspaceHeroTitle', label: 'Hero title' },
                   { id: 'workspaceHeroText', label: 'Hero text' },
+                  {
+                    id: 'workspaceAudienceTags',
+                    label: 'Audience tags',
+                    children: [
+                      { id: 'workspaceAudienceTagEnterprise', label: 'Enterprise tag' },
+                      { id: 'workspaceAudienceTagRenewal', label: 'Renewal tag' },
+                      { id: 'workspaceAudienceTagExpansion', label: 'Expansion tag' },
+                      { id: 'workspaceAudienceTagRisk', label: 'Risk tag' },
+                    ],
+                  },
                 ],
               },
               {
@@ -940,7 +955,7 @@ const DEFAULT_STYLES = mapFigmaCloneDomEditState(
     ...HUG_AUTO_LAYOUT_FRAME,
     direction: 'column',
     gap: 6,
-    h: 66,
+    h: 132,
     w: 320,
     widthMode: 'fill',
   },
@@ -957,6 +972,46 @@ const DEFAULT_STYLES = mapFigmaCloneDomEditState(
     h: 36,
     w: 318,
     widthMode: 'fill',
+  },
+  workspaceAudienceTags: {
+    ...EMPTY_STYLE,
+    ...HUG_AUTO_LAYOUT_FRAME,
+    direction: 'row',
+    gap: 8,
+    h: 60,
+    w: 220,
+  },
+  workspaceAudienceTagEnterprise: {
+    ...EMPTY_STYLE,
+    ...HUG_BOX_LAYOUT,
+    h: 26,
+    padding: 8,
+    radius: 13,
+    w: 102,
+  },
+  workspaceAudienceTagRenewal: {
+    ...EMPTY_STYLE,
+    ...HUG_BOX_LAYOUT,
+    h: 26,
+    padding: 8,
+    radius: 13,
+    w: 94,
+  },
+  workspaceAudienceTagExpansion: {
+    ...EMPTY_STYLE,
+    ...HUG_BOX_LAYOUT,
+    h: 26,
+    padding: 8,
+    radius: 13,
+    w: 108,
+  },
+  workspaceAudienceTagRisk: {
+    ...EMPTY_STYLE,
+    ...HUG_BOX_LAYOUT,
+    h: 26,
+    padding: 8,
+    radius: 13,
+    w: 82,
   },
   workspaceHeroActions: {
     ...EMPTY_STYLE,
@@ -2004,6 +2059,10 @@ const DEFAULT_TEXT: FigmaCloneDomTextState = {
   workspaceActivityOneText: 'Mina updated forecast',
   workspaceActivityThreeText: 'Lina shared notes',
   workspaceActivityTwoText: 'Jae flagged churn risk',
+  workspaceAudienceTagEnterprise: 'Enterprise',
+  workspaceAudienceTagExpansion: 'Expansion',
+  workspaceAudienceTagRenewal: 'Renewal',
+  workspaceAudienceTagRisk: 'Risk',
   workspaceBrandMark: 'C',
   workspaceBrandText: 'CoreOS',
   workspaceBreadcrumb: 'Workspace / Growth',
@@ -2427,6 +2486,10 @@ function getFigmaCloneDomContentType(
     nodeId === 'workspaceProfile' ||
     nodeId === 'workspacePrimaryAction' ||
     nodeId === 'workspaceSecondaryAction' ||
+    nodeId === 'workspaceAudienceTagEnterprise' ||
+    nodeId === 'workspaceAudienceTagRenewal' ||
+    nodeId === 'workspaceAudienceTagExpansion' ||
+    nodeId === 'workspaceAudienceTagRisk' ||
     nodeId === 'homeIssueTime' ||
     nodeId === 'homeNavArchive' ||
     nodeId === 'homeNavEssays' ||
