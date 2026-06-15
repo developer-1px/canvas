@@ -26,6 +26,10 @@ import {
 import {
   resolveDomEditSpacingDragValue,
 } from '../../../shared/gesture/DomEditOverlayGesture'
+import {
+  getDomEditFlexParticipationDescriptor,
+  type DomEditFlexParticipationDescriptor,
+} from '../../../features/size-editing/DomEditFlexParticipation'
 import type {
   DomEditAutoLayoutField,
   DomEditField,
@@ -160,6 +164,15 @@ export function DomEditAutoLayoutOverlay<
   } = scopedTransientState
   const style = adapter.getStyle(state, selectedNodeId)
   const context = adapter.getLayoutContext(selectedNodeId)
+  const parentStyle = context.parentId
+    ? adapter.getStyle(state, context.parentId)
+    : null
+  const flexParticipation = getDomEditFlexParticipationDescriptor({
+    heightMode: style.heightMode,
+    parentDirection: parentStyle?.direction ?? null,
+    parentDisplay: context.parentDisplay,
+    widthMode: style.widthMode,
+  })
   const isBetweenDistribution = style.distribution === 'space-between'
   const updateTransientState = useCallback((
     update: (
@@ -780,21 +793,66 @@ export function DomEditAutoLayoutOverlay<
         context,
         isDragging: Boolean(activeDragKind),
       }) ? (
-        <DomEditSizeModeCapsule
-          heightMode={style.heightMode}
-          heightValue={rect.h}
-          rect={rect}
-          showFill={context.showParentParticipation}
-          widthMode={style.widthMode}
-          widthValue={rect.w}
-          onAffordanceStateChange={onAffordanceStateChange}
-          onChangeHeight={(mode) =>
-            onChangeAutoLayout(selectedNodeId, 'heightMode', mode)}
-          onChangeWidth={(mode) =>
-            onChangeAutoLayout(selectedNodeId, 'widthMode', mode)}
-        />
+        <>
+          <DomEditSizeModeCapsule
+            heightMode={style.heightMode}
+            heightValue={rect.h}
+            rect={rect}
+            showFill={context.showParentParticipation}
+            widthMode={style.widthMode}
+            widthValue={rect.w}
+            onAffordanceStateChange={onAffordanceStateChange}
+            onChangeHeight={(mode) =>
+              onChangeAutoLayout(selectedNodeId, 'heightMode', mode)}
+            onChangeWidth={(mode) =>
+              onChangeAutoLayout(selectedNodeId, 'widthMode', mode)}
+          />
+          {flexParticipation ? (
+            <DomEditFlexParticipationGlyph
+              descriptor={flexParticipation}
+              rect={rect}
+            />
+          ) : null}
+        </>
       ) : null}
     </>
+  )
+}
+
+function DomEditFlexParticipationGlyph({
+  descriptor,
+  rect,
+}: {
+  descriptor: DomEditFlexParticipationDescriptor
+  rect: DomEditAutoLayoutRect & { scale: number }
+}) {
+  const isWidth = descriptor.axis === 'width'
+
+  return (
+    <span
+      aria-label={`${descriptor.label} ${descriptor.detail}`}
+      className={[
+        'figma-flex-participation-glyph',
+        `figma-flex-participation-glyph--${descriptor.axis}`,
+      ].join(' ')}
+      data-axis={descriptor.axis}
+      data-kind={descriptor.kind}
+      style={{
+        left: isWidth ? rect.x + rect.w / 2 : rect.x + rect.w + 8,
+        top: isWidth ? rect.y - 8 : rect.y + rect.h / 2,
+        transform: isWidth
+          ? `translate(-50%, -100%) scale(${1 / rect.scale})`
+          : `translateY(-50%) scale(${1 / rect.scale})`,
+      }}
+    >
+      <span
+        className="figma-flex-participation-glyph__bar"
+        aria-hidden="true"
+      />
+      <span className="figma-flex-participation-glyph__detail">
+        {descriptor.detail}
+      </span>
+    </span>
   )
 }
 

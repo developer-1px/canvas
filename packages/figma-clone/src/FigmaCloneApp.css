@@ -1367,6 +1367,7 @@
 .figma-selection-guide-layer--pan-passthrough .figma-alignment-editor-trigger,
 .figma-selection-guide-layer--pan-passthrough .figma-alignment-popover-anchor,
 .figma-selection-guide-layer--pan-passthrough .figma-grid-gap,
+.figma-selection-guide-layer--pan-passthrough .figma-flex-participation-glyph,
 .figma-selection-guide-layer--pan-passthrough .figma-size-mode-capsule {
   pointer-events: none;
 }
@@ -2185,6 +2186,45 @@
   transform: translateX(-50%);
   transform-origin: 50% 0;
   pointer-events: none;
+}
+
+.figma-flex-participation-glyph {
+  position: absolute;
+  z-index: 8;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 22px;
+  padding: 0 7px;
+  border: 1px solid rgba(37, 99, 235, 0.22);
+  border-radius: 6px;
+  background: #ffffff;
+  box-shadow: 0 10px 24px rgba(23, 32, 51, 0.12);
+  color: var(--figma-blue);
+  font-size: 11px;
+  font-weight: 650;
+  pointer-events: none;
+  transform-origin: 0 0;
+  white-space: nowrap;
+}
+
+.figma-flex-participation-glyph__bar {
+  display: inline-block;
+  width: 22px;
+  height: 4px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent 0 2px, var(--figma-blue) 2px calc(100% - 2px), transparent calc(100% - 2px));
+}
+
+.figma-flex-participation-glyph--height .figma-flex-participation-glyph__bar {
+  width: 4px;
+  height: 16px;
+  background: linear-gradient(180deg, transparent 0 2px, var(--figma-blue) 2px calc(100% - 2px), transparent calc(100% - 2px));
+}
+
+.figma-flex-participation-glyph__detail {
+  color: var(--figma-muted);
+  font-weight: 600;
 }
 
 .figma-size-mode-control {
