@@ -20,6 +20,7 @@ describe('slide-edit-affordance boundary', () => {
       'layout-theme',
       'slide-metadata',
       'slide-transition',
+      'text-font-family',
       'text-paragraph-spacing',
       'text-measurement',
     ])

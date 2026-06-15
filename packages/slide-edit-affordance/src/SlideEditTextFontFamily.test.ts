@@ -1,0 +1,151 @@
+import { describe, expect, it } from 'vitest'
+
+import {
+  createSlideEditTextFontFamilyDescriptor,
+  getSlideEditTextFontFamilyCommandEffect,
+  normalizeSlideEditTextFontFamily,
+  normalizeSlideEditTextFontFamilyOptions,
+  SLIDE_EDIT_TEXT_FONT_FAMILY_FALLBACK,
+  SLIDE_EDIT_TEXT_FONT_FAMILY_FIELD,
+  type SlideEditTextFontFamilyOption,
+} from './SlideEditTextFontFamily'
+
+describe('SlideEditTextFontFamily', () => {
+  const options = [
+    {
+      family: 'Body Sans',
+      isDefault: true,
+      label: 'Body Sans',
+      source: 'theme',
+    },
+    {
+      family: 'Title Serif',
+      label: 'Title Serif',
+      source: 'theme',
+    },
+  ] as const satisfies readonly SlideEditTextFontFamilyOption[]
+
+  it('creates a product-neutral selected text font family descriptor', () => {
+    expect(createSlideEditTextFontFamilyDescriptor({
+      fontFamily: 'Title Serif',
+      objectId: 'object-a',
+      options,
+      slideId: 'slide-a',
+    })).toEqual({
+      fallbackFontFamily: 'Body Sans',
+      field: SLIDE_EDIT_TEXT_FONT_FAMILY_FIELD,
+      fontFamily: 'Title Serif',
+      objectId: 'object-a',
+      options,
+      slideId: 'slide-a',
+      surface: 'text-font-family',
+    })
+  })
+
+  it('normalizes host-provided font family options', () => {
+    expect(normalizeSlideEditTextFontFamilyOptions([
+      {
+        family: '  Body Sans  ',
+        label: '  Body  ',
+        source: 'host',
+      },
+      {
+        family: 'Body Sans',
+        label: 'Duplicate',
+        source: 'host',
+      },
+      {
+        family: '',
+        label: 'Missing',
+        source: 'host',
+      },
+    ])).toEqual([
+      {
+        family: 'Body Sans',
+        label: 'Body',
+        source: 'host',
+      },
+    ])
+  })
+
+  it('falls back for unknown or empty font family values', () => {
+    expect(normalizeSlideEditTextFontFamily({
+      fallbackFontFamily: 'Body Sans',
+      fontFamily: 'Unknown',
+      options,
+    })).toBe('Body Sans')
+    expect(normalizeSlideEditTextFontFamily({
+      fallbackFontFamily: 'Missing',
+      fontFamily: 'Unknown',
+      options,
+    })).toBe('Body Sans')
+    expect(normalizeSlideEditTextFontFamily({
+      fontFamily: '  Custom Sans  ',
+      options: [],
+    })).toBe('Custom Sans')
+    expect(normalizeSlideEditTextFontFamily({
+      fontFamily: '',
+      options: [],
+    })).toBe(SLIDE_EDIT_TEXT_FONT_FAMILY_FALLBACK)
+  })
+
+  it('routes selected text object font family changes through host command effects', () => {
+    expect(getSlideEditTextFontFamilyCommandEffect({
+      fieldId: 'fontFamily',
+      id: 'update-text-font-family',
+      objectId: 'object-a',
+      slideId: 'slide-a',
+      value: 'Title Serif',
+    }, {
+      fallbackFontFamily: 'Body Sans',
+      options,
+    })).toEqual({
+      payload: {
+        fieldId: 'fontFamily',
+        id: 'update-text-font-family',
+        objectId: 'object-a',
+        slideId: 'slide-a',
+        value: 'Title Serif',
+      },
+      selection: {
+        objectIds: ['object-a'],
+        slideId: 'slide-a',
+      },
+      type: 'slide-command-effect',
+    })
+
+    expect(getSlideEditTextFontFamilyCommandEffect({
+      fieldId: 'fontFamily',
+      id: 'update-text-font-family',
+      objectId: 'object-a',
+      slideId: 'slide-a',
+      value: 'Unknown',
+    }, {
+      fallbackFontFamily: 'Body Sans',
+      options,
+    }).payload.value).toBe('Body Sans')
+  })
+
+  it('does not expose product names or host storage names in runtime strings', () => {
+    const publicStrings = JSON.stringify({
+      descriptor: createSlideEditTextFontFamilyDescriptor({
+        fontFamily: 'Body Sans',
+        objectId: 'object-a',
+        options,
+        slideId: 'slide-a',
+      }),
+      field: SLIDE_EDIT_TEXT_FONT_FAMILY_FIELD,
+    }).toLowerCase()
+
+    for (const blockedTerm of [
+      'p' + 'pt',
+      'p' + 'ptx',
+      'power' + 'point',
+      'fig' + 'slide',
+      'slide-store',
+      'document-model',
+    ]) {
+      expect(publicStrings).not.toContain(blockedTerm)
+    }
+  })
+})

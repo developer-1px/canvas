@@ -22,6 +22,7 @@
 | Slide object clipboard | `slide-edit-affordance` | source slide metadata, paste target, and id remap plan |
 | Slide metadata inspector | `slide-edit-affordance` | active slide name, background, notes, size, orientation fields |
 | Slide transition timing | `slide-edit-affordance` | transition type, duration, click/after advance policy |
+| Text font family | `slide-edit-affordance` | selected text object font family options and command effects |
 | Text paragraph spacing | `slide-edit-affordance` | line height and paragraph before/after spacing descriptors |
 | Text measurement | `slide-edit-affordance` | bounded text size, overflow, and auto-fit hints |
 | Object inspector | `slide-edit-affordance` | object-level inspector grouping without DOM layout assumptions |
@@ -38,6 +39,7 @@
 | `layout-theme` | Layout, master, placeholder, and theme token descriptors |
 | `slide-metadata` | Active slide metadata values for inspector descriptors |
 | `slide-transition` | Slide transition and advance timing values for inspector, preview, and export |
+| `text-font-family` | Selected text object font family value and allowed family options |
 | `text-paragraph-spacing` | Text paragraph spacing and line height values for object inspectors |
 | `text-measurement` | Rendered text size and overflow for bounded text |
 
@@ -113,6 +115,17 @@
 | Fields | `lineHeightRatio`, `paragraphBefore`, `paragraphAfter` descriptors |
 | Updates | field edits become host command effects with object id and normalized value |
 | Runtime | host owns text layout, preview rendering, export mapping, and persistence |
+
+## Text Font Family Contract
+
+| Area | Contract |
+| --- | --- |
+| Read model | slide id, selected text object id, current font family, fallback, option list |
+| Options | host-provided font family list with label, source, and optional default marker |
+| Field | `fontFamily` select descriptor routes through `update-text-font-family` |
+| Fallback | unknown or empty family normalizes to fallback or first allowed option |
+| Updates | selected object id and normalized font family value become host command effects |
+| Runtime | host owns actual font loading, text layout, export mapping, and persistence |
 
 ## DOM Hug/Fill vs Slide Text Auto-Fit
 
