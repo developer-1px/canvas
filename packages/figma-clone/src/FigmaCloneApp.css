@@ -2289,17 +2289,64 @@
   left: 2px;
 }
 
-.figma-alignment-preview-guide {
+.figma-align-guide {
   position: absolute;
   z-index: 7;
-  background: #ec4899;
-  box-shadow: 0 0 0 1px rgba(236, 72, 153, 0.16);
+  box-sizing: border-box;
+  border-radius: 999px;
+  background: #db2777;
+  box-shadow: 0 0 0 1px rgba(219, 39, 119, 0.16);
   pointer-events: none;
 }
 
-.figma-alignment-preview-guide--stretch {
-  background: #0f766e;
-  box-shadow: 0 0 0 1px rgba(15, 118, 110, 0.18);
+.figma-align-guide--preview {
+  background: #ec4899;
+  box-shadow: 0 0 0 1px rgba(236, 72, 153, 0.18);
+}
+
+.figma-align-guide--stretch {
+  border: 1px solid rgba(219, 39, 119, 0.44);
+  border-radius: 3px;
+  background: rgba(219, 39, 119, 0.1);
+  box-shadow: none;
+}
+
+.figma-align-guide--stretch::before,
+.figma-align-guide--stretch::after {
+  content: '';
+  position: absolute;
+  border-radius: 999px;
+  background: rgba(219, 39, 119, 0.82);
+}
+
+.figma-align-guide--horizontal.figma-align-guide--stretch::before,
+.figma-align-guide--horizontal.figma-align-guide--stretch::after {
+  right: 0;
+  left: 0;
+  height: 2px;
+}
+
+.figma-align-guide--horizontal.figma-align-guide--stretch::before {
+  top: 0;
+}
+
+.figma-align-guide--horizontal.figma-align-guide--stretch::after {
+  bottom: 0;
+}
+
+.figma-align-guide--vertical.figma-align-guide--stretch::before,
+.figma-align-guide--vertical.figma-align-guide--stretch::after {
+  top: 0;
+  bottom: 0;
+  width: 2px;
+}
+
+.figma-align-guide--vertical.figma-align-guide--stretch::before {
+  left: 0;
+}
+
+.figma-align-guide--vertical.figma-align-guide--stretch::after {
+  right: 0;
 }
 
 .figma-grid-track,

@@ -257,6 +257,14 @@ export function DomEditAutoLayoutOverlay<
   const alignmentEditorControlId = useId()
   const alignmentEditorTriggerId = `${alignmentEditorControlId}-trigger`
   const alignmentEditorPanelId = `${alignmentEditorControlId}-panel`
+  const previewAlignment = useCallback((
+    preview: DomEditAlignmentPreview | null,
+  ) => {
+    setAlignmentPreview(preview)
+    onAffordanceStateChange(preview
+      ? { mode: 'hover-property', property: 'align' }
+      : { mode: 'idle' })
+  }, [onAffordanceStateChange, setAlignmentPreview])
 
   useLayoutEffect(() => {
     if (!context.showSelfLayout) {
@@ -399,8 +407,12 @@ export function DomEditAutoLayoutOverlay<
         ? [activeGapRect]
         : []
     : []
+  const alignGuideValue = alignmentPreview?.align ??
+    (style.align === 'auto' ? null : style.align)
   const shouldRenderAlignmentEditor =
     context.showSelfLayout || context.showGridLayout
+  const shouldRenderAlignGuide = visibility.alignGuides &&
+    Boolean(alignGuideValue)
   const startDrag = (
     event: PointerEvent<HTMLElement>,
     kind: DomEditAutoLayoutDragKind,
@@ -520,6 +532,14 @@ export function DomEditAutoLayoutOverlay<
     <>
       {canEditBoxSpacing ? (
         <>
+          {shouldRenderAlignGuide && alignGuideValue ? (
+            <DomEditAlignItemsGuide
+              align={alignGuideValue}
+              isPreview={Boolean(alignmentPreview)}
+              rect={rect}
+              style={style}
+            />
+          ) : null}
           {shouldRenderPadding ? (
             <>
               <div
@@ -798,18 +818,11 @@ export function DomEditAutoLayoutOverlay<
                   onChangeAutoLayout={onChangeAutoLayout}
                   onClose={() => {
                     setIsAlignmentEditorOpen(false)
-                    setAlignmentPreview(null)
+                    previewAlignment(null)
                   }}
-                  onPreview={setAlignmentPreview}
+                  onPreview={previewAlignment}
                 />
               </div>
-              {alignmentPreview && context.showSelfLayout ? (
-                <DomEditAlignmentPreviewGuide
-                  preview={alignmentPreview}
-                  rect={rect}
-                  style={style}
-                />
-              ) : null}
             </>
           ) : null}
           {visibility.gapVisuals ? (
@@ -977,18 +990,21 @@ function DomEditFlexParticipationGlyph({
   )
 }
 
-function DomEditAlignmentPreviewGuide({
-  preview,
+function DomEditAlignItemsGuide({
+  align,
+  isPreview,
   rect,
   style,
 }: {
-  preview: DomEditAlignmentPreview
+  align: DomEditAlignmentPreview['align']
+  isPreview: boolean
   rect: DomEditAutoLayoutRect
   style: DomEditNodeState
 }) {
   const padding = getDomEditPaddingSides(style)
-  const guideStyle = getDomEditAlignmentPreviewGuideStyle({
-    align: preview.align,
+  const axis = style.direction === 'row' ? 'horizontal' : 'vertical'
+  const guideStyle = getDomEditAlignItemsGuideStyle({
+    align,
     padding,
     rect,
     direction: style.direction,
@@ -998,12 +1014,15 @@ function DomEditAlignmentPreviewGuide({
     <span
       aria-hidden="true"
       className={[
-        'figma-alignment-preview-guide',
-        `figma-alignment-preview-guide--${style.direction === 'row'
-          ? 'horizontal'
-          : 'vertical'}`,
-        `figma-alignment-preview-guide--${preview.align}`,
+        'figma-align-guide',
+        isPreview ? 'figma-alignment-preview-guide' : '',
+        isPreview ? 'figma-align-guide--preview' : '',
+        `figma-align-guide--${axis}`,
+        `figma-align-guide--${align}`,
       ].join(' ')}
+      data-align-guide={align}
+      data-align-guide-axis={axis}
+      data-align-guide-preview={isPreview ? 'true' : undefined}
       style={guideStyle}
     />
   )
@@ -1033,7 +1052,7 @@ function resolveDomEditStateAction<T>(
     : action
 }
 
-function getDomEditAlignmentPreviewGuideStyle({
+function getDomEditAlignItemsGuideStyle({
   align,
   direction,
   padding,
@@ -1048,17 +1067,28 @@ function getDomEditAlignmentPreviewGuideStyle({
   const contentTop = rect.y + padding.top
   const contentWidth = Math.max(1, rect.w - padding.left - padding.right)
   const contentHeight = Math.max(1, rect.h - padding.top - padding.bottom)
+  const lineSize = 2
+
+  if (align === 'stretch') {
+    return {
+      height: contentHeight,
+      left: contentLeft,
+      top: contentTop,
+      width: contentWidth,
+    }
+  }
 
   if (direction === 'row') {
     const top = resolveDomEditAlignmentPreviewPosition({
       align,
       end: contentTop + contentHeight,
+      lineSize,
       size: contentHeight,
       start: contentTop,
     })
 
     return {
-      height: 1,
+      height: lineSize,
       left: contentLeft,
       top,
       width: contentWidth,
@@ -1068,6 +1098,7 @@ function getDomEditAlignmentPreviewGuideStyle({
   const left = resolveDomEditAlignmentPreviewPosition({
     align,
     end: contentLeft + contentWidth,
+    lineSize,
     size: contentWidth,
     start: contentLeft,
   })
@@ -1076,27 +1107,29 @@ function getDomEditAlignmentPreviewGuideStyle({
     height: contentHeight,
     left,
     top: contentTop,
-    width: 1,
+    width: lineSize,
   }
 }
 
 function resolveDomEditAlignmentPreviewPosition({
   align,
   end,
+  lineSize,
   size,
   start,
 }: {
   align: DomEditAlignmentPreview['align']
   end: number
+  lineSize: number
   size: number
   start: number
 }) {
-  if (align === 'center' || align === 'stretch') {
-    return start + size / 2
+  if (align === 'center') {
+    return start + size / 2 - lineSize / 2
   }
 
   if (align === 'end') {
-    return end
+    return end - lineSize
   }
 
   return start
