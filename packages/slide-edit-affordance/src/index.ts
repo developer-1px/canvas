@@ -76,6 +76,24 @@ export {
   type SlideEditVisibilityObjectId,
   type SlideEditVisibilitySlideId,
 } from './SlideEditObjectVisibility'
+export {
+  createSlideEditLayerPaneDescriptor,
+  getSlideEditLayerPaneCommandEffect,
+  SLIDE_EDIT_LAYER_PANE_ARIA_CONTRACT,
+  SLIDE_EDIT_LAYER_PANE_COMMANDS,
+  type SlideEditLayerPaneAriaContract,
+  type SlideEditLayerPaneCommand,
+  type SlideEditLayerPaneCommandDescriptor,
+  type SlideEditLayerPaneCommandId,
+  type SlideEditLayerPaneDescriptor,
+  type SlideEditLayerPaneGroupId,
+  type SlideEditLayerPaneHostCommandEffect,
+  type SlideEditLayerPaneIntent,
+  type SlideEditLayerPaneObjectId,
+  type SlideEditLayerPaneObjectInput,
+  type SlideEditLayerPaneRowDescriptor,
+  type SlideEditLayerPaneSlideId,
+} from './SlideEditObjectLayerPane'
 
 export type SlideEditSlideId = string
 export type SlideEditObjectId = string
@@ -237,6 +255,7 @@ export const SLIDE_EDIT_REUSED_CANVAS_CONTRACTS = Object.freeze([
 
 export type SlideEditOwnedContractId =
   | 'object-inspector'
+  | 'object-layer-pane'
   | 'placeholder-visibility-affordance'
   | 'slide-command-effects'
   | 'slide-frame-affordance'
@@ -275,6 +294,11 @@ export const SLIDE_EDIT_OWNED_CONTRACTS = Object.freeze([
     id: 'placeholder-visibility-affordance',
     owner: 'slide-edit-affordance',
     scope: 'Slide placeholder structure and object hide/show read model.',
+  },
+  {
+    id: 'object-layer-pane',
+    owner: 'slide-edit-affordance',
+    scope: 'Slide object row descriptors and layer pane command intents.',
   },
   {
     id: 'text-overflow-affordance',

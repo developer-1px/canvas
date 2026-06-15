@@ -16,6 +16,7 @@
 | Slide command effects | `slide-edit-affordance` | product-neutral command envelopes routed to the host |
 | Slide rail interaction | `slide-edit-affordance` | active slide, slide order, thumbnail hit target, rail command intent |
 | Placeholder visibility affordance | `slide-edit-affordance` | slide placeholder structure and object hide/show read model |
+| Object layer pane | `slide-edit-affordance` | object row descriptor, selection pane command intent, ARIA tree contract |
 | Text measurement | `slide-edit-affordance` | bounded text size, overflow, and auto-fit hints |
 | Object inspector | `slide-edit-affordance` | object-level inspector grouping without DOM layout assumptions |
 
@@ -116,6 +117,16 @@
 | --- | --- | --- |
 | Placeholder visibility affordance | placeholder geometry/state and object hidden/selectable/locked read model | object list row rendering, tree keyboard model, rename UI |
 | Selection pane affordance | consumes the visibility read model to render rows and route select/rename/reorder intents | placeholder semantics or canvas generic item schema |
+
+## Object Layer Pane Contract
+
+| Area | Contract |
+| --- | --- |
+| Row read model | object id, display name, kind label, order, selected, hidden, locked, grouped, group id |
+| Selection interaction | replace, additive, and range row press intents produce host `select-objects` command effects |
+| Object commands | rename, hide/show, lock/unlock, and reorder row intents produce product-neutral host command effects |
+| ARIA contract | renderers use a `tree` container with `treeitem` rows, roving tabindex, and host-controlled multi-selection |
+| Visibility dependency | rows may expose hidden objects for selection pane access without changing the placeholder/visibility contract |
 
 ## Contract Rules
 
