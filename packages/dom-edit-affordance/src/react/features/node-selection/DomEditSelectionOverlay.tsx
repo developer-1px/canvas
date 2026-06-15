@@ -19,6 +19,10 @@ import {
   type DomEditAffordanceState,
 } from '../../../features/node-selection/DomEditAffordanceVisibility'
 import {
+  getDomEditOverlayLayerVisibility,
+  type DomEditOverlayLayerVisibility,
+} from '../../../features/node-selection/DomEditOverlayLayers'
+import {
   resolveDomEditKeyboardCommand,
   type DomEditInteractionAction,
 } from '../../../interaction/DomEditInteractionCommands'
@@ -76,6 +80,7 @@ export function DomEditSelectionOverlay<
   affordanceState: appAffordanceState,
   frameGuides,
   isCanvasPanActive,
+  overlayLayers,
   onAffordanceStateChange,
   onChange,
   onChangeAutoLayout,
@@ -85,6 +90,7 @@ export function DomEditSelectionOverlay<
   affordanceState: DomEditAffordanceState
   frameGuides?: DomEditFrameGuideConfig<TNodeId> | null
   isCanvasPanActive: boolean
+  overlayLayers?: Partial<DomEditOverlayLayerVisibility> | null
   selectedNodeId: TNodeId | null
   shellRef: RefObject<HTMLElement | null>
   state: TState
@@ -352,6 +358,7 @@ export function DomEditSelectionOverlay<
     affordanceState,
     context,
   })
+  const layerVisibility = getDomEditOverlayLayerVisibility(overlayLayers)
   const changeField = (field: DomEditField, value: number) => {
     onChange(selectedNodeId, field, roundDomEditNumber(value))
   }
@@ -454,43 +461,48 @@ export function DomEditSelectionOverlay<
           adapter={adapter}
           affordanceState={affordanceState}
           frameGuides={frameGuides}
+          overlayLayers={layerVisibility}
           rect={rect}
           selectedNodeId={selectedNodeId}
           shellRef={shellRef}
           state={state}
           viewport={viewport}
         />
-        {visibility.xray ? (
+        {visibility.xray && layerVisibility.boxModel ? (
           <DomEditBoxModelOverlay
             rect={rect}
             target={target}
           />
         ) : null}
-        <DomEditGridOverlay
-          adapter={adapter}
-          affordanceState={affordanceState}
-          rect={rect}
-          selectedNodeId={selectedNodeId}
-          shellRef={shellRef}
-          state={state}
-          target={target}
-          viewport={viewport}
-          onChange={onChange}
-          onAffordanceStateChange={onAffordanceStateChange}
-        />
-        <DomEditAutoLayoutOverlay
-          adapter={adapter}
-          affordanceState={affordanceState}
-          rect={rect}
-          selectedNodeId={selectedNodeId}
-          shellRef={shellRef}
-          state={state}
-          target={target}
-          viewport={viewport}
-          onChange={onChange}
-          onChangeAutoLayout={onChangeAutoLayout}
-          onAffordanceStateChange={onAffordanceStateChange}
-        />
+        {layerVisibility.grid ? (
+          <DomEditGridOverlay
+            adapter={adapter}
+            affordanceState={affordanceState}
+            rect={rect}
+            selectedNodeId={selectedNodeId}
+            shellRef={shellRef}
+            state={state}
+            target={target}
+            viewport={viewport}
+            onChange={onChange}
+            onAffordanceStateChange={onAffordanceStateChange}
+          />
+        ) : null}
+        {layerVisibility.flex ? (
+          <DomEditAutoLayoutOverlay
+            adapter={adapter}
+            affordanceState={affordanceState}
+            rect={rect}
+            selectedNodeId={selectedNodeId}
+            shellRef={shellRef}
+            state={state}
+            target={target}
+            viewport={viewport}
+            onChange={onChange}
+            onChangeAutoLayout={onChangeAutoLayout}
+            onAffordanceStateChange={onAffordanceStateChange}
+          />
+        ) : null}
       </DomEditViewportOverlayLayer>
     </div>
   )

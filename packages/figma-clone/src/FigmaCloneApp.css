@@ -179,6 +179,38 @@
   background: #edf0f4;
 }
 
+.figma-guide-layer-control {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding-left: 4px;
+  border-left: 1px solid var(--figma-line);
+}
+
+.figma-guide-layer-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  min-height: 24px;
+  padding: 0 4px;
+  border-radius: 4px;
+  color: var(--figma-muted);
+  font-size: 11px;
+  line-height: 1;
+}
+
+.figma-guide-layer-toggle:focus-within {
+  outline: 2px solid rgba(37, 99, 235, 0.32);
+  outline-offset: 1px;
+}
+
+.figma-guide-layer-toggle input {
+  width: 12px;
+  height: 12px;
+  margin: 0;
+  accent-color: var(--figma-blue);
+}
+
 .figma-viewport-controls span {
   min-width: 44px;
   padding: 0 8px;

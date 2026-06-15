@@ -10,6 +10,10 @@ import {
   type DomEditAffordanceState,
 } from '../../../features/node-selection/DomEditAffordanceVisibility'
 import {
+  getDomEditOverlayLayerVisibility,
+  type DomEditOverlayLayerVisibility,
+} from '../../../features/node-selection/DomEditOverlayLayers'
+import {
   areDomEditOverlayRectsEqual,
   createDomEditOverlayRectStyle,
   getDomEditWorldOverlayRect,
@@ -59,10 +63,12 @@ export function DomEditGuideOverlay<
   viewport,
   affordanceState = { mode: 'idle' },
   frameGuides,
+  overlayLayers,
 }: {
   adapter: DomEditModelAdapter<TNodeId, TState>
   affordanceState?: DomEditAffordanceState
   frameGuides?: DomEditFrameGuideConfig<TNodeId> | null
+  overlayLayers?: Partial<DomEditOverlayLayerVisibility> | null
   rect: GuideRect
   selectedNodeId: TNodeId
   shellRef: RefObject<HTMLElement | null>
@@ -83,14 +89,16 @@ export function DomEditGuideOverlay<
     affordanceState,
     context,
   })
+  const layerVisibility = getDomEditOverlayLayerVisibility(overlayLayers)
   const activeHoveredRect = visibility.measurements && hoveredNodeId
     ? hoveredRect
     : null
   const measurementRect = activeHoveredRect ?? parentRect
-  const distances = measurementRect
+  const distances = measurementRect && layerVisibility.spacing
     ? getDomEditMeasurementDistances(rect, measurementRect)
     : []
-  const shouldRenderSmartGuides = shouldRenderDomEditSmartGuides(affordanceState)
+  const shouldRenderSmartGuides = layerVisibility.spacing &&
+    shouldRenderDomEditSmartGuides(affordanceState)
   const activeSiblingRects = parentId ? siblingRects : []
   const smartGuides = shouldRenderSmartGuides
     ? getDomEditSmartGuides({
@@ -100,7 +108,7 @@ export function DomEditGuideOverlay<
         siblings: activeSiblingRects,
       })
     : []
-  const frameGuideGeometry = frameGuides && frameRect
+  const frameGuideGeometry = layerVisibility.guides && frameGuides && frameRect
     ? getDomEditFrameGuideGeometry({
         frameRect,
         layoutColumns: frameGuides.layoutColumns,
@@ -109,6 +117,7 @@ export function DomEditGuideOverlay<
       })
     : null
   const shouldRenderFrameGuideDistances =
+    layerVisibility.spacing &&
     shouldRenderDomEditFrameGuideDistances(affordanceState)
 
   useLayoutEffect(() => {

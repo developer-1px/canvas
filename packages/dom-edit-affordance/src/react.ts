@@ -28,6 +28,12 @@ export {
   type DomEditAffordanceState,
   type DomEditOverlayVisibility,
 } from './features/node-selection/DomEditAffordanceVisibility'
+export {
+  DEFAULT_DOM_EDIT_OVERLAY_LAYER_VISIBILITY,
+  getDomEditOverlayLayerVisibility,
+  type DomEditOverlayLayer,
+  type DomEditOverlayLayerVisibility,
+} from './features/node-selection/DomEditOverlayLayers'
 export type {
   DomEditAutoLayoutField,
   DomEditField,

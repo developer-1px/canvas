@@ -26,11 +26,14 @@ import {
   type CanvasWorkspaceStorageProvider,
 } from '../../../src/canvas'
 import {
+  DEFAULT_DOM_EDIT_OVERLAY_LAYER_VISIBILITY,
   DomEditInspector,
   DomEditSelectionOverlay,
   type DomEditAffordanceProperty,
   type DomEditAffordanceState,
   type DomEditFrameGuideConfig,
+  type DomEditOverlayLayer,
+  type DomEditOverlayLayerVisibility,
 } from '@interactive-os/dom-edit-affordance/react'
 import type {
   DomEditInteractionAction,
@@ -90,7 +93,20 @@ type FigmaCloneDomDragHistorySession = {
   undoDepth: number
 }
 
+type FigmaCloneGuideLayer = Exclude<DomEditOverlayLayer, 'selection'>
+
 const FIGMA_CLONE_ITEMS = createFigmaCloneCanvasItems()
+
+const FIGMA_CLONE_GUIDE_LAYER_CONTROLS = [
+  { label: 'Flex', layer: 'flex' },
+  { label: 'Grid', layer: 'grid' },
+  { label: 'Spacing', layer: 'spacing' },
+  { label: 'Guides', layer: 'guides' },
+  { label: 'Box', layer: 'boxModel' },
+] satisfies Array<{
+  label: string
+  layer: FigmaCloneGuideLayer
+}>
 
 const FIGMA_CLONE_FRAME_GUIDES = {
   homePage: {
@@ -183,6 +199,10 @@ export function FigmaCloneApp() {
     rootId: 'workspacePage',
     nodeId: null,
   })
+  const [overlayLayers, setOverlayLayers] =
+    useState<DomEditOverlayLayerVisibility>(
+      DEFAULT_DOM_EDIT_OVERLAY_LAYER_VISIBILITY,
+    )
   const [affordanceState, setAffordanceState] =
     useState<DomEditAffordanceState>({ mode: 'idle' })
   const domState = domDocument.value.state
@@ -237,6 +257,13 @@ export function FigmaCloneApp() {
   const frameGuides = selection.frameId === 'dom'
     ? FIGMA_CLONE_FRAME_GUIDES[selection.rootId]
     : null
+  const toggleOverlayLayer = useCallback((layer: FigmaCloneGuideLayer) => {
+    setOverlayLayers((current) => ({
+      ...current,
+      [layer]: !current[layer],
+      selection: true,
+    }))
+  }, [])
   const isSectionSelected = useCallback(
     (rootId: FigmaCloneDomSectionRootId) =>
       selectedSectionRootId === rootId && selectedNodeId === null,
@@ -424,6 +451,10 @@ export function FigmaCloneApp() {
               >
                 <Inspect aria-hidden="true" size={14} />
               </button>
+              <FigmaCloneGuideLayerControls
+                visibility={overlayLayers}
+                onToggle={toggleOverlayLayer}
+              />
             </div>
             {app.stage}
             <DomEditSelectionOverlay
@@ -431,6 +462,7 @@ export function FigmaCloneApp() {
               affordanceState={affordanceState}
               frameGuides={frameGuides}
               isCanvasPanActive={app.activeMode === 'pan' || app.gesture === 'pan'}
+              overlayLayers={overlayLayers}
               selectedNodeId={selectedNodeId}
               shellRef={canvasRegionRef as RefObject<HTMLElement | null>}
               state={domState}
@@ -469,6 +501,30 @@ export function FigmaCloneApp() {
         </main>
       )}
     />
+  )
+}
+
+function FigmaCloneGuideLayerControls({
+  visibility,
+  onToggle,
+}: {
+  visibility: DomEditOverlayLayerVisibility
+  onToggle: (layer: FigmaCloneGuideLayer) => void
+}) {
+  return (
+    <div className="figma-guide-layer-control" role="group" aria-label="Guide layers">
+      {FIGMA_CLONE_GUIDE_LAYER_CONTROLS.map((control) => (
+        <label className="figma-guide-layer-toggle" key={control.layer}>
+          <input
+            aria-label={`${control.label} overlays`}
+            checked={visibility[control.layer]}
+            type="checkbox"
+            onChange={() => onToggle(control.layer)}
+          />
+          <span>{control.label}</span>
+        </label>
+      ))}
+    </div>
   )
 }
 
