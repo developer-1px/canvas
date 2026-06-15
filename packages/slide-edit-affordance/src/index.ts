@@ -127,6 +127,26 @@ export {
   type SlideEditThemeSpacingToken,
   type SlideEditThemeSpacingTokenId,
 } from './SlideEditLayoutTheme'
+export {
+  createSlideEditClipboardAdapterExample,
+  createSlideEditClipboardPasteCommandEffect,
+  createSlideEditClipboardPastePlan,
+  createSlideEditClipboardPayload,
+  getSlideEditClipboardPasteAnchor,
+  type SlideEditClipboardGroupId,
+  type SlideEditClipboardObjectId,
+  type SlideEditClipboardObjectMetadata,
+  type SlideEditClipboardOperation,
+  type SlideEditClipboardPasteCommand,
+  type SlideEditClipboardPasteHostCommandEffect,
+  type SlideEditClipboardPasteObjectMapping,
+  type SlideEditClipboardPastePlan,
+  type SlideEditClipboardPasteTarget,
+  type SlideEditClipboardPayload,
+  type SlideEditClipboardPlaceholderId,
+  type SlideEditClipboardRemapPolicy,
+  type SlideEditClipboardSlideId,
+} from './SlideEditClipboard'
 
 export type SlideEditSlideId = string
 export type SlideEditObjectId = string
@@ -298,6 +318,7 @@ export type SlideEditOwnedContractId =
   | 'object-layer-pane'
   | 'placeholder-visibility-affordance'
   | 'slide-command-effects'
+  | 'slide-object-clipboard'
   | 'slide-frame-affordance'
   | 'slide-object-bounds'
   | 'slide-rail-interaction'
@@ -344,6 +365,11 @@ export const SLIDE_EDIT_OWNED_CONTRACTS = Object.freeze([
     id: 'layout-theme-affordance',
     owner: 'slide-edit-affordance',
     scope: 'Slide layout, master, placeholder mapping, and theme token descriptors.',
+  },
+  {
+    id: 'slide-object-clipboard',
+    owner: 'slide-edit-affordance',
+    scope: 'Multi-slide object clipboard payloads, paste targets, and remap plans.',
   },
   {
     id: 'text-overflow-affordance',

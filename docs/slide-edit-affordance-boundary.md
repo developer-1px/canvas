@@ -18,6 +18,7 @@
 | Placeholder visibility affordance | `slide-edit-affordance` | slide placeholder structure and object hide/show read model |
 | Object layer pane | `slide-edit-affordance` | object row descriptor, selection pane command intent, ARIA tree contract |
 | Layout/theme affordance | `slide-edit-affordance` | layout, master, placeholder mapping, and theme token descriptors |
+| Slide object clipboard | `slide-edit-affordance` | source slide metadata, paste target, and id remap plan |
 | Text measurement | `slide-edit-affordance` | bounded text size, overflow, and auto-fit hints |
 | Object inspector | `slide-edit-affordance` | object-level inspector grouping without DOM layout assumptions |
 
@@ -151,6 +152,23 @@
 | `bounds` / `defaultBounds` | default slot geometry before host object mapping | current placeholder geometry on a concrete slide |
 | `isLocked` | layout slot cannot be casually remapped | placeholder or object is not user-editable |
 | `isVisible` | layout slot may be hidden by default | placeholder/object can be hidden while still represented in controls |
+
+## Slide Object Clipboard Contract
+
+| Area | Contract |
+| --- | --- |
+| Payload | operation, source slide id, selected object ids, opaque host objects, optional group/placeholder metadata |
+| Paste target | active slide origin, viewport center, pointer position, or slide frame offset |
+| Remap plan | host policy rewrites object id, group id, and placeholder binding before paste commit |
+| Paste command | host receives `paste-slide-objects` command effect with target selection ids |
+| Adapter example | minimal adapter can copy a selection payload and paste it into a target slide without product model names |
+
+## Canvas Clipboard vs Slide-Aware Clipboard
+
+| Contract | Owns | Does Not Own |
+| --- | --- | --- |
+| Canvas object clipboard | object clone/paste inside one canvas document and generic object offset behavior | slide id, slide frame, placeholder binding, cross-slide id policy |
+| Slide object clipboard | cross-slide payload metadata, slide-local paste target, and remap plan | host object serialization, final object mutation, format-specific details |
 
 ## Contract Rules
 
