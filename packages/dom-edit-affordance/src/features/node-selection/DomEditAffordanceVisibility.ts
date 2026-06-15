@@ -1,6 +1,7 @@
 import type { DomEditLayoutContext } from '../../shared/model/DomEditTypes'
 
 export type DomEditAffordanceProperty =
+  | 'alignSelf'
   | 'align'
   | 'gap'
   | 'geometry'
@@ -21,6 +22,9 @@ export type DomEditOverlayVisibility = {
   alignGuides: boolean
   axisGuides: boolean
   directionControls: boolean
+  flexChildAlignSelfGuide: boolean
+  flexChildControls: boolean
+  flexChildMargin: boolean
   gapHitTargets: boolean
   gapVisuals: boolean
   geometry: boolean
@@ -47,6 +51,8 @@ export function getDomEditOverlayVisibility({
   const paddingActive = isDomEditPropertyActive(affordanceState, 'padding')
   const sizeActive = isDomEditPropertyActive(affordanceState, 'size')
   const alignActive = isDomEditPropertyActive(affordanceState, 'align')
+  const alignSelfActive = isDomEditPropertyActive(affordanceState, 'alignSelf')
+  const marginActive = isDomEditPropertyActive(affordanceState, 'margin')
   const spacingActive = gapActive || paddingActive
   const canShowGeometry = context.showGeometry && context.position !== 'static'
   const canShowSizeModes =
@@ -59,6 +65,18 @@ export function getDomEditOverlayVisibility({
   const sizeModesActive =
     affordanceState.mode === 'idle' ||
     sizeActive
+  const hasFlexParent = context.parentDisplay === 'flex' &&
+    Boolean(context.parentId)
+  const canShowFlexChildControls = hasFlexParent &&
+    (
+      affordanceState.mode === 'idle' ||
+      alignSelfActive ||
+      marginActive
+    ) &&
+    affordanceState.mode !== 'measure' &&
+    affordanceState.mode !== 'xray' &&
+    !spacingActive &&
+    !sizeActive
 
   return {
     alignGuides: context.showSelfLayout &&
@@ -85,6 +103,9 @@ export function getDomEditOverlayVisibility({
       affordanceState.mode !== 'xray' &&
       !paddingActive &&
       !sizeActive,
+    flexChildAlignSelfGuide: canShowFlexChildControls && alignSelfActive,
+    flexChildControls: canShowFlexChildControls,
+    flexChildMargin: canShowFlexChildControls && !alignSelfActive,
     gapHitTargets: context.showSelfLayout &&
       affordanceState.mode !== 'xray' &&
       !paddingActive,

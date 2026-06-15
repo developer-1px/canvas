@@ -90,7 +90,7 @@ function DomEditSizeModeControl({
   value: number
   onChange: (mode: DomEditSizeMode) => void
 }) {
-  const availableModes = getDomEditAvailableSizeModes({ mode, showFill })
+  const availableModes = getDomEditAvailableSizeModes({ showFill })
   const source = getDomEditSizeSourceDescriptor({
     axis,
     mode,
@@ -156,13 +156,9 @@ function getDomEditSizeModeLabel(mode: DomEditSizeMode) {
 }
 
 function getDomEditAvailableSizeModes({
-  mode,
   showFill,
 }: {
-  mode: DomEditSizeMode
   showFill: boolean
 }): DomEditSizeMode[] {
-  return showFill || mode === 'fill'
-    ? ['fixed', 'hug', 'fill']
-    : ['fixed', 'hug']
+  return showFill ? ['fixed', 'hug', 'fill'] : ['fixed', 'hug']
 }

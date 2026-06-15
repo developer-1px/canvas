@@ -272,6 +272,10 @@ describe('FigmaCloneDomEditModel', () => {
       affordanceState: { mode: 'drag-property', property: 'padding' },
       context,
     })
+    const alignSelfHover = getFigmaCloneDomOverlayVisibility({
+      affordanceState: { mode: 'hover-property', property: 'alignSelf' },
+      context,
+    })
     const transform = getFigmaCloneDomOverlayVisibility({
       affordanceState: { mode: 'transform' },
       context,
@@ -280,6 +284,8 @@ describe('FigmaCloneDomEditModel', () => {
     expect(idle.selection).toBe(true)
     expect(idle.parentReference).toBe(true)
     expect(idle.directionControls).toBe(true)
+    expect(idle.flexChildControls).toBe(true)
+    expect(idle.flexChildMargin).toBe(true)
     expect(idle.geometry).toBe(false)
     expect(idle.sizeModes).toBe(true)
     expect(idle.measurements).toBe(false)
@@ -289,19 +295,25 @@ describe('FigmaCloneDomEditModel', () => {
     expect(measure.measurements).toBe(true)
     expect(measure.geometry).toBe(false)
     expect(measure.directionControls).toBe(false)
+    expect(measure.flexChildControls).toBe(false)
     expect(measure.parentReference).toBe(false)
     expect(measure.sizeModes).toBe(false)
     expect(gapHover.gapVisuals).toBe(true)
     expect(gapHover.geometry).toBe(false)
     expect(gapHover.directionControls).toBe(true)
+    expect(gapHover.flexChildControls).toBe(false)
     expect(gapHover.paddingHitTargets).toBe(false)
     expect(gapHover.sizeModes).toBe(false)
     expect(paddingDrag.paddingVisuals).toBe(true)
     expect(paddingDrag.gapHitTargets).toBe(false)
     expect(paddingDrag.directionControls).toBe(false)
+    expect(paddingDrag.flexChildControls).toBe(false)
     expect(paddingDrag.parentReference).toBe(false)
     expect(paddingDrag.sizeModes).toBe(false)
     expect(paddingDrag.xray).toBe(false)
+    expect(alignSelfHover.flexChildControls).toBe(true)
+    expect(alignSelfHover.flexChildAlignSelfGuide).toBe(true)
+    expect(alignSelfHover.flexChildMargin).toBe(false)
     expect(transform.geometry).toBe(false)
     expect(transform.sizeModes).toBe(false)
   })

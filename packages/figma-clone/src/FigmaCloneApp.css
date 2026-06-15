@@ -2688,6 +2688,54 @@
   font-weight: 600;
 }
 
+.figma-flex-child-align-self {
+  position: absolute;
+  z-index: 9;
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: 1px solid rgba(15, 118, 110, 0.36);
+  border-radius: 4px;
+  background: #ffffff;
+  box-shadow: 0 6px 16px rgba(23, 32, 51, 0.12);
+  cursor: default;
+  pointer-events: auto;
+  transform-origin: 50% 50%;
+}
+
+.figma-flex-child-align-self span {
+  display: block;
+  border-radius: 999px;
+  background: #0f766e;
+}
+
+.figma-flex-child-align-self--row span {
+  width: 10px;
+  height: 2px;
+}
+
+.figma-flex-child-align-self--column span {
+  width: 2px;
+  height: 10px;
+}
+
+.figma-flex-child-align-self-guide {
+  position: absolute;
+  z-index: 4;
+  border-radius: 999px;
+  background: rgba(15, 118, 110, 0.68);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.72);
+  pointer-events: none;
+}
+
+.figma-flex-child-align-self-guide--stretch {
+  border: 1px solid rgba(15, 118, 110, 0.68);
+  border-radius: 4px;
+  background: rgba(15, 118, 110, 0.08);
+}
+
 .figma-size-mode-control {
   position: relative;
   align-items: center;
