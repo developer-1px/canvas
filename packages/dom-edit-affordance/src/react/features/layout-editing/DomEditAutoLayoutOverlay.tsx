@@ -391,6 +391,14 @@ export function DomEditAutoLayoutOverlay<
     : null
   const shouldRenderPadding = visibility.paddingHitTargets
   const shouldRenderGap = visibility.gapHitTargets
+  const showGapVisuals = visibility.gapVisuals || isBetweenDistribution
+  const visibleGapLabelRects = showGapVisuals
+    ? isBetweenDistribution
+      ? gapRects
+      : activeGapRect
+        ? [activeGapRect]
+        : []
+    : []
   const shouldRenderAlignmentEditor =
     context.showSelfLayout || context.showGridLayout
   const startDrag = (
@@ -676,21 +684,27 @@ export function DomEditAutoLayoutOverlay<
                   key={`${index}:${gapRect.x}:${gapRect.y}`}
                   aria-label={
                     isBetweenDistribution
-                      ? `Between space ${index + 1}`
+                      ? `Between space ${index + 1}, ${getDomEditGapRectValue({
+                        direction: style.direction,
+                        rect: gapRect,
+                      })}px actual`
                       : `Edit gap ${index + 1}`
                   }
                   className={getDomEditGapClassName({
                     direction: style.direction,
                     isBetween: isBetweenDistribution,
-                    isVisible: visibility.gapVisuals,
+                    isVisible: showGapVisuals,
                   })}
+                  data-dom-edit-between-lane={
+                    isBetweenDistribution ? `${index + 1}` : undefined
+                  }
                   style={{
                     height: gapRect.h,
                     left: gapRect.x,
                     top: gapRect.y,
                     width: gapRect.w,
                   }}
-                  title={isBetweenDistribution ? 'Between' : 'Gap'}
+                  title={isBetweenDistribution ? 'Between auto spacing' : 'Gap'}
                   type="button"
                   onPointerEnter={() => setHoveredAffordance('gap')}
                   onPointerLeave={() => setHoveredAffordance(null)}
@@ -703,10 +717,23 @@ export function DomEditAutoLayoutOverlay<
 
                     startDrag(event, 'gap')
                   }}
-                />
+                >
+                  {isBetweenDistribution && showGapVisuals ? (
+                    <span
+                      aria-hidden="true"
+                      className="figma-autolayout-between-mark"
+                      data-dom-edit-between-mark="true"
+                    >
+                      <span className="figma-autolayout-between-rail" />
+                      <span className="figma-autolayout-between-tick figma-autolayout-between-tick--start" />
+                      <span className="figma-autolayout-between-tick figma-autolayout-between-tick--end" />
+                    </span>
+                  ) : null}
+                </button>
               ))}
-              {visibility.gapVisuals && activeGapRect ? (
+              {visibleGapLabelRects.map((gapRect, index) => (
                 <span
+                  key={`gap-label:${index}:${gapRect.x}:${gapRect.y}`}
                   className={[
                     'figma-autolayout-value',
                     'figma-autolayout-value--gap',
@@ -722,11 +749,11 @@ export function DomEditAutoLayoutOverlay<
                   {isBetweenDistribution
                     ? `Between ${getDomEditGapRectValue({
                       direction: style.direction,
-                      rect: activeGapRect,
-                    })}`
+                      rect: gapRect,
+                    })}px actual`
                     : `Gap ${style.gap}`}
                 </span>
-              ) : null}
+              ))}
             </>
           ) : null}
           {shouldRenderAlignmentEditor ? (
