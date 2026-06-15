@@ -17,6 +17,7 @@
 | Slide rail interaction | `slide-edit-affordance` | active slide, slide order, thumbnail hit target, rail command intent |
 | Placeholder visibility affordance | `slide-edit-affordance` | slide placeholder structure and object hide/show read model |
 | Object layer pane | `slide-edit-affordance` | object row descriptor, selection pane command intent, ARIA tree contract |
+| Layout/theme affordance | `slide-edit-affordance` | layout, master, placeholder mapping, and theme token descriptors |
 | Text measurement | `slide-edit-affordance` | bounded text size, overflow, and auto-fit hints |
 | Object inspector | `slide-edit-affordance` | object-level inspector grouping without DOM layout assumptions |
 
@@ -28,6 +29,7 @@
 | `object-bounds` | Object bounds for a slide/object reference |
 | `selection` | Active page id and selected object ids |
 | `command-effect` | Transaction boundary for command effects |
+| `layout-theme` | Layout, master, placeholder, and theme token descriptors |
 | `text-measurement` | Rendered text size and overflow for bounded text |
 
 ## DOM Affordance References
@@ -127,6 +129,28 @@
 | Object commands | rename, hide/show, lock/unlock, and reorder row intents produce product-neutral host command effects |
 | ARIA contract | renderers use a `tree` container with `treeitem` rows, roving tabindex, and host-controlled multi-selection |
 | Visibility dependency | rows may expose hidden objects for selection pane access without changing the placeholder/visibility contract |
+
+## Layout, Master, And Theme Contract
+
+| Area | Contract |
+| --- | --- |
+| Theme tokens | product-neutral color, font, and spacing tokens with role labels and token ids |
+| Master | master id, name, theme id, available layout ids, and optional default style token refs |
+| Layout | layout id, master id, name, default style token refs, and placeholder descriptors |
+| Placeholder mapping | placeholder id, role, title, default bounds, locked state, visible state, and optional default style token refs |
+| Style inheritance | theme default style < master default style < layout default style < placeholder default style |
+| Apply layout | host command effect carries whether existing objects are preserved or mapped to placeholders |
+
+## Layout Placeholder vs Placeholder Visibility
+
+| Shared Field | Layout/theme Meaning | Placeholder visibility Meaning |
+| --- | --- | --- |
+| `placeholderId` | stable slot id inside a layout | stable slot id available to a slide object |
+| `role` | semantic slot role such as title/body/media | semantic role for placeholder selection and replacement |
+| `title` | renderer-facing slot label | renderer-facing placeholder label |
+| `bounds` / `defaultBounds` | default slot geometry before host object mapping | current placeholder geometry on a concrete slide |
+| `isLocked` | layout slot cannot be casually remapped | placeholder or object is not user-editable |
+| `isVisible` | layout slot may be hidden by default | placeholder/object can be hidden while still represented in controls |
 
 ## Contract Rules
 

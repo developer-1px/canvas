@@ -94,6 +94,39 @@ export {
   type SlideEditLayerPaneRowDescriptor,
   type SlideEditLayerPaneSlideId,
 } from './SlideEditObjectLayerPane'
+export {
+  createSlideEditLayoutPlaceholderDescriptor,
+  createSlideEditThemeDescriptor,
+  getSlideEditLayoutApplyCommandEffect,
+  getSlideEditLayoutPlaceholderVisibilityDescriptor,
+  getSlideEditResolvedLayoutPlaceholder,
+  SLIDE_EDIT_LAYOUT_COMMANDS,
+  type SlideEditLayoutApplyCommand,
+  type SlideEditLayoutApplyExistingObjectPolicy,
+  type SlideEditLayoutApplyHostCommandEffect,
+  type SlideEditLayoutApplyObjectMapping,
+  type SlideEditLayoutCommandDescriptor,
+  type SlideEditLayoutDescriptor,
+  type SlideEditLayoutId,
+  type SlideEditLayoutObjectId,
+  type SlideEditLayoutPlaceholderDescriptor,
+  type SlideEditLayoutSlideId,
+  type SlideEditMasterDescriptor,
+  type SlideEditMasterId,
+  type SlideEditResolvedLayoutPlaceholder,
+  type SlideEditStyleTokenRefs,
+  type SlideEditThemeColorRole,
+  type SlideEditThemeColorToken,
+  type SlideEditThemeColorTokenId,
+  type SlideEditThemeDescriptor,
+  type SlideEditThemeFontRole,
+  type SlideEditThemeFontToken,
+  type SlideEditThemeFontTokenId,
+  type SlideEditThemeId,
+  type SlideEditThemeSpacingRole,
+  type SlideEditThemeSpacingToken,
+  type SlideEditThemeSpacingTokenId,
+} from './SlideEditLayoutTheme'
 
 export type SlideEditSlideId = string
 export type SlideEditObjectId = string
@@ -173,6 +206,7 @@ export type SlideEditAdapter<
 
 export type SlideEditAdapterSlotId =
   | 'command-effect'
+  | 'layout-theme'
   | 'object-bounds'
   | 'selection'
   | 'slide-frame'
@@ -204,6 +238,11 @@ export const SLIDE_EDIT_ADAPTER_SLOTS = Object.freeze([
     id: 'command-effect',
     owner: 'host',
     purpose: 'Apply command effects through the host document transaction.',
+  },
+  {
+    id: 'layout-theme',
+    owner: 'host',
+    purpose: 'Provide slide layout, master, placeholder, and theme token descriptors.',
   },
   {
     id: 'text-measurement',
@@ -254,6 +293,7 @@ export const SLIDE_EDIT_REUSED_CANVAS_CONTRACTS = Object.freeze([
 ] as const satisfies readonly SlideEditReusedCanvasContract[])
 
 export type SlideEditOwnedContractId =
+  | 'layout-theme-affordance'
   | 'object-inspector'
   | 'object-layer-pane'
   | 'placeholder-visibility-affordance'
@@ -299,6 +339,11 @@ export const SLIDE_EDIT_OWNED_CONTRACTS = Object.freeze([
     id: 'object-layer-pane',
     owner: 'slide-edit-affordance',
     scope: 'Slide object row descriptors and layer pane command intents.',
+  },
+  {
+    id: 'layout-theme-affordance',
+    owner: 'slide-edit-affordance',
+    scope: 'Slide layout, master, placeholder mapping, and theme token descriptors.',
   },
   {
     id: 'text-overflow-affordance',
