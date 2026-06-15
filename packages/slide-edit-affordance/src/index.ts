@@ -170,6 +170,26 @@ export {
   type SlideEditSlideOrientation,
   type SlideEditSlideSizeDescriptor,
 } from './SlideEditSlideMetadataInspector'
+export {
+  createSlideEditTransitionDescriptor,
+  getSlideEditTransitionUpdateCommandEffect,
+  normalizeSlideEditTransitionAdvancePolicy,
+  normalizeSlideEditTransitionDurationMs,
+  normalizeSlideEditTransitionUpdateCommand,
+  SLIDE_EDIT_DEFAULT_TRANSITION,
+  SLIDE_EDIT_TRANSITION_TIMING_LIMITS,
+  SLIDE_EDIT_TRANSITION_TYPES,
+  type SlideEditBuiltInTransitionType,
+  type SlideEditSlideTransitionDescriptor,
+  type SlideEditTransitionAdvancePolicy,
+  type SlideEditTransitionFieldId,
+  type SlideEditTransitionHostCommandEffect,
+  type SlideEditTransitionSlideId,
+  type SlideEditTransitionTimingLimits,
+  type SlideEditTransitionType,
+  type SlideEditTransitionTypeDescriptor,
+  type SlideEditTransitionUpdateCommand,
+} from './SlideEditSlideTransitionTiming'
 
 export type SlideEditSlideId = string
 export type SlideEditObjectId = string
@@ -254,6 +274,7 @@ export type SlideEditAdapterSlotId =
   | 'selection'
   | 'slide-frame'
   | 'slide-metadata'
+  | 'slide-transition'
   | 'text-measurement'
 
 export type SlideEditAdapterSlotDescriptor = {
@@ -292,6 +313,11 @@ export const SLIDE_EDIT_ADAPTER_SLOTS = Object.freeze([
     id: 'slide-metadata',
     owner: 'host',
     purpose: 'Provide active slide metadata values for inspector descriptors.',
+  },
+  {
+    id: 'slide-transition',
+    owner: 'host',
+    purpose: 'Provide slide transition and advance timing values for inspector, preview, and export.',
   },
   {
     id: 'text-measurement',
@@ -352,6 +378,7 @@ export type SlideEditOwnedContractId =
   | 'slide-metadata-inspector'
   | 'slide-object-bounds'
   | 'slide-rail-interaction'
+  | 'slide-transition-timing'
   | 'text-overflow-affordance'
 
 export type SlideEditOwnedContract = {
@@ -405,6 +432,11 @@ export const SLIDE_EDIT_OWNED_CONTRACTS = Object.freeze([
     id: 'slide-metadata-inspector',
     owner: 'slide-edit-affordance',
     scope: 'Active slide metadata fields and host-routed update command effects.',
+  },
+  {
+    id: 'slide-transition-timing',
+    owner: 'slide-edit-affordance',
+    scope: 'Slide transition type, duration, advance timing, and update command effects.',
   },
   {
     id: 'text-overflow-affordance',
