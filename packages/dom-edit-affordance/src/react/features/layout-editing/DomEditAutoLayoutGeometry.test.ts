@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  getDomEditMainAxisGuideRect,
   getDomEditPaddingDelta,
   getDomEditPaddingDragActiveSides,
   getDomEditPaddingDragSide,
@@ -7,6 +8,52 @@ import {
 } from './DomEditAutoLayoutGeometry'
 
 describe('DomEditAutoLayoutGeometry', () => {
+  it('places row main-axis guides inside the padded content lane', () => {
+    expect(getDomEditMainAxisGuideRect({
+      direction: 'row',
+      padding: {
+        bottom: 8,
+        left: 10,
+        right: 20,
+        top: 12,
+      },
+      rect: {
+        h: 80,
+        w: 120,
+        x: 30,
+        y: 40,
+      },
+    })).toEqual({
+      h: 2,
+      w: 90,
+      x: 40,
+      y: 81,
+    })
+  })
+
+  it('places column main-axis guides inside the padded content lane', () => {
+    expect(getDomEditMainAxisGuideRect({
+      direction: 'column',
+      padding: {
+        bottom: 14,
+        left: 18,
+        right: 6,
+        top: 10,
+      },
+      rect: {
+        h: 100,
+        w: 90,
+        x: 20,
+        y: 30,
+      },
+    })).toEqual({
+      h: 76,
+      w: 2,
+      x: 70,
+      y: 40,
+    })
+  })
+
   it('maps side padding handles to axis pairs', () => {
     expect(getDomEditPaddingDragScope('padding-top')).toBe('vertical')
     expect(getDomEditPaddingDragScope('padding-bottom')).toBe('vertical')

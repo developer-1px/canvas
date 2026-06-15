@@ -19,6 +19,7 @@ export type DomEditAffordanceState =
 
 export type DomEditOverlayVisibility = {
   alignGuides: boolean
+  axisGuides: boolean
   gapHitTargets: boolean
   gapVisuals: boolean
   geometry: boolean
@@ -56,6 +57,15 @@ export function getDomEditOverlayVisibility({
       affordanceState.mode !== 'measure' &&
       affordanceState.mode !== 'xray' &&
       !spacingActive &&
+      !sizeActive,
+    axisGuides: context.showSelfLayout &&
+      (
+        affordanceState.mode === 'idle' ||
+        affordanceState.mode === 'measure' ||
+        gapActive
+      ) &&
+      affordanceState.mode !== 'xray' &&
+      !paddingActive &&
       !sizeActive,
     gapHitTargets: context.showSelfLayout &&
       affordanceState.mode !== 'xray' &&

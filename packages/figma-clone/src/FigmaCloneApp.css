@@ -1951,6 +1951,64 @@
   cursor: ew-resize;
 }
 
+.figma-autolayout-axis-guide {
+  position: absolute;
+  z-index: 2;
+  border-radius: 999px;
+  background: rgba(79, 70, 229, 0.68);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.72);
+  pointer-events: none;
+}
+
+.figma-autolayout-axis-guide::before,
+.figma-autolayout-axis-guide::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+}
+
+.figma-autolayout-axis-guide::before {
+  width: 5px;
+  height: 5px;
+  border: 1px solid rgba(79, 70, 229, 0.84);
+  border-radius: 999px;
+  background: #ffffff;
+}
+
+.figma-autolayout-axis-guide--row::before {
+  left: -3px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.figma-autolayout-axis-guide--row::after {
+  right: -7px;
+  top: 50%;
+  width: 0;
+  height: 0;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  border-left: 7px solid rgba(79, 70, 229, 0.76);
+  transform: translateY(-50%);
+}
+
+.figma-autolayout-axis-guide--column::before {
+  left: 50%;
+  top: -3px;
+  transform: translateX(-50%);
+}
+
+.figma-autolayout-axis-guide--column::after {
+  bottom: -7px;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-right: 4px solid transparent;
+  border-left: 4px solid transparent;
+  border-top: 7px solid rgba(79, 70, 229, 0.76);
+  transform: translateX(-50%);
+}
+
 .figma-autolayout-padding-corner {
   z-index: 1;
   border: 1px solid rgba(180, 83, 9, 0.44);
