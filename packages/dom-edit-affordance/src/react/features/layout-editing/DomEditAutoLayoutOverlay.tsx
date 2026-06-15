@@ -64,9 +64,6 @@ import {
   DomEditSizeModeCapsule,
 } from './DomEditSizeModeCapsule'
 import {
-  shouldRenderDomEditSizeModeCapsule,
-} from './DomEditSizeModeCapsuleVisibility'
-import {
   DomEditAlignmentEditor,
   type DomEditAlignmentPreview,
 } from './DomEditAlignmentEditor'
@@ -867,11 +864,7 @@ export function DomEditAutoLayoutOverlay<
           ) : null}
         </>
       ) : null}
-      {shouldRenderDomEditSizeModeCapsule({
-        affordanceState: baseAffordanceState,
-        context,
-        isDragging: Boolean(activeDragKind),
-      }) ? (
+      {visibility.sizeModes && !activeDragKind ? (
         <>
           <DomEditSizeModeCapsule
             heightMode={style.heightMode}

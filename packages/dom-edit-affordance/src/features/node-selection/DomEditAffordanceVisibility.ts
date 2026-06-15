@@ -46,10 +46,17 @@ export function getDomEditOverlayVisibility({
   const sizeActive = isDomEditPropertyActive(affordanceState, 'size')
   const alignActive = isDomEditPropertyActive(affordanceState, 'align')
   const spacingActive = gapActive || paddingActive
+  const canShowGeometry = context.showGeometry && context.position !== 'static'
+  const canShowSizeModes =
+    context.showSelfLayout ||
+    context.showGridLayout ||
+    context.showParentParticipation
   const geometryActive =
-    affordanceState.mode === 'idle' ||
     affordanceState.mode === 'transform' ||
     isDomEditPropertyActive(affordanceState, 'geometry')
+  const sizeModesActive =
+    affordanceState.mode === 'idle' ||
+    sizeActive
 
   return {
     alignGuides: context.showSelfLayout &&
@@ -71,7 +78,7 @@ export function getDomEditOverlayVisibility({
       affordanceState.mode !== 'xray' &&
       !paddingActive,
     gapVisuals: context.showSelfLayout && gapActive,
-    geometry: context.showGeometry &&
+    geometry: canShowGeometry &&
       geometryActive &&
       affordanceState.mode !== 'measure' &&
       affordanceState.mode !== 'xray' &&
@@ -87,14 +94,9 @@ export function getDomEditOverlayVisibility({
     paddingVisuals: (context.showSelfLayout || context.showGridLayout) &&
       paddingActive,
     parentReference: Boolean(context.parentId) &&
-      affordanceState.mode !== 'drag-property',
+      affordanceState.mode === 'idle',
     selection: true,
-    sizeModes: (
-      context.showSelfLayout ||
-      context.showGridLayout ||
-      context.showParentParticipation
-    ) &&
-      sizeActive,
+    sizeModes: canShowSizeModes && sizeModesActive,
     xray: affordanceState.mode === 'xray',
   }
 }
