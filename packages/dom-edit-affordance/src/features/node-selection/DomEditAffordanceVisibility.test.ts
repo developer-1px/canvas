@@ -11,6 +11,7 @@ describe('DomEditAffordanceVisibility', () => {
 
     expect(visibility.selection).toBe(true)
     expect(visibility.parentReference).toBe(true)
+    expect(visibility.directionControls).toBe(true)
     expect(visibility.sizeModes).toBe(true)
     expect(visibility.geometry).toBe(false)
     expect(visibility.measurements).toBe(false)
@@ -33,6 +34,7 @@ describe('DomEditAffordanceVisibility', () => {
     expect(gapDrag.paddingHitTargets).toBe(false)
     expect(gapDrag.geometry).toBe(false)
     expect(gapDrag.measurements).toBe(false)
+    expect(gapDrag.directionControls).toBe(false)
     expect(gapDrag.sizeModes).toBe(false)
 
     expect(paddingDrag.paddingVisuals).toBe(true)
@@ -40,6 +42,7 @@ describe('DomEditAffordanceVisibility', () => {
     expect(paddingDrag.gridGapHitTargets).toBe(false)
     expect(paddingDrag.geometry).toBe(false)
     expect(paddingDrag.measurements).toBe(false)
+    expect(paddingDrag.directionControls).toBe(false)
     expect(paddingDrag.sizeModes).toBe(false)
   })
 
@@ -50,12 +53,14 @@ describe('DomEditAffordanceVisibility', () => {
     expect(measure.measurements).toBe(true)
     expect(measure.parentReference).toBe(false)
     expect(measure.geometry).toBe(false)
+    expect(measure.directionControls).toBe(false)
     expect(measure.sizeModes).toBe(false)
     expect(measure.xray).toBe(false)
 
     expect(xray.xray).toBe(true)
     expect(xray.measurements).toBe(false)
     expect(xray.parentReference).toBe(false)
+    expect(xray.directionControls).toBe(false)
     expect(xray.gapHitTargets).toBe(false)
     expect(xray.paddingHitTargets).toBe(false)
     expect(xray.sizeModes).toBe(false)
@@ -80,6 +85,26 @@ describe('DomEditAffordanceVisibility', () => {
       property: 'gap',
     }).sizeModes).toBe(false)
     expect(getVisibility({ mode: 'transform' }).sizeModes).toBe(false)
+  })
+
+  it('shows direction controls only for idle flex or gap hover states', () => {
+    expect(getVisibility({ mode: 'idle' }).directionControls).toBe(true)
+    expect(getVisibility({
+      mode: 'hover-property',
+      property: 'gap',
+    }).directionControls).toBe(true)
+    expect(getVisibility({
+      mode: 'drag-property',
+      property: 'gap',
+    }).directionControls).toBe(false)
+    expect(getVisibility({
+      mode: 'hover-property',
+      property: 'padding',
+    }).directionControls).toBe(false)
+    expect(getVisibility(
+      { mode: 'idle' },
+      { showSelfLayout: false },
+    ).directionControls).toBe(false)
   })
 })
 

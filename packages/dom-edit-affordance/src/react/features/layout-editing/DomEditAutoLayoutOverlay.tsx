@@ -411,6 +411,7 @@ export function DomEditAutoLayoutOverlay<
     context.showSelfLayout || context.showGridLayout
   const shouldRenderAlignGuide = visibility.alignGuides &&
     Boolean(alignGuideValue)
+  const directionControlOffset = visibility.sizeModes ? 30 : 12
   const mainAxisGuideRect = visibility.axisGuides
     ? getDomEditMainAxisGuideRect({
       direction: style.direction,
@@ -836,12 +837,12 @@ export function DomEditAutoLayoutOverlay<
               </div>
             </>
           ) : null}
-          {visibility.gapVisuals ? (
+          {visibility.directionControls ? (
             <div
               className="figma-autolayout-toolbar"
               style={{
                 left: rect.x + rect.w / 2,
-                top: rect.y + rect.h + 12,
+                top: rect.y + rect.h + directionControlOffset,
               }}
             >
               <button
