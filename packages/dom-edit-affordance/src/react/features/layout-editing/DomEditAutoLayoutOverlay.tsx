@@ -56,8 +56,10 @@ import {
 } from './DomEditAutoLayoutGeometry'
 import {
   DomEditSizeModeCapsule,
-  shouldRenderDomEditSizeModeCapsule,
 } from './DomEditSizeModeCapsule'
+import {
+  shouldRenderDomEditSizeModeCapsule,
+} from './DomEditSizeModeCapsuleVisibility'
 import {
   DomEditAlignmentEditor,
   type DomEditAlignmentPreview,
@@ -797,6 +799,7 @@ export function DomEditAutoLayoutOverlay<
           <DomEditSizeModeCapsule
             heightMode={style.heightMode}
             heightValue={rect.h}
+            parentDisplay={context.parentDisplay}
             rect={rect}
             showFill={context.showParentParticipation}
             widthMode={style.widthMode}
