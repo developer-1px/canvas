@@ -14,6 +14,7 @@
 | Slide frame affordance | `slide-edit-affordance` | page frame, page-safe overlays, page-relative anchors |
 | Slide object bounds | `slide-edit-affordance` | selected object bounds through a host adapter |
 | Slide command effects | `slide-edit-affordance` | product-neutral command envelopes routed to the host |
+| Slide rail interaction | `slide-edit-affordance` | active slide, slide order, thumbnail hit target, rail command intent |
 | Text measurement | `slide-edit-affordance` | bounded text size, overflow, and auto-fit hints |
 | Object inspector | `slide-edit-affordance` | object-level inspector grouping without DOM layout assumptions |
 
@@ -60,6 +61,24 @@
 | column width from count/gutter/margin | selected DOM distance labels |
 | invalid out-of-frame guide filtering | React overlay rendering |
 | guide line orientation vocabulary | DOM node id and ancestry |
+
+## Slide Rail Interaction Contract
+
+| Area | Contract |
+| --- | --- |
+| Active slide | `activeSlideId` only; host owns slide data |
+| Slide order | ordered slide id list |
+| Thumbnail target | thumbnail bounds plus expanded hit target bounds |
+| Commands | `add-slide`, `duplicate-slide`, `delete-slide`, `reorder-slide`, `select-active-slide` |
+| Keyboard intent | select relative, move active, add/duplicate/delete active |
+| Pointer intent | thumbnail press/drop and rail command button press |
+
+## Object Reorder vs Slide Reorder
+
+| Affordance | Owns | Does Not Own |
+| --- | --- | --- |
+| Object reorder | z-order among objects inside a canvas scene or group | slide list order |
+| Slide reorder | ordered slide id list and active slide rail selection | object z-order, layer tree, object storage |
 
 ## Contract Rules
 

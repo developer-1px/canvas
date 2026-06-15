@@ -31,14 +31,9 @@ describe('slide-edit-affordance boundary', () => {
         'transform',
         'snap-guides',
       ])
-    expect(SLIDE_EDIT_OWNED_CONTRACTS.map((contract) => contract.owner))
-      .toEqual([
-        'slide-edit-affordance',
-        'slide-edit-affordance',
-        'slide-edit-affordance',
-        'slide-edit-affordance',
-        'slide-edit-affordance',
-      ])
+    expect(SLIDE_EDIT_OWNED_CONTRACTS.every(
+      (contract) => contract.owner === 'slide-edit-affordance',
+    )).toBe(true)
   })
 
   it('separates reusable DOM affordance references from DOM layout internals', () => {
