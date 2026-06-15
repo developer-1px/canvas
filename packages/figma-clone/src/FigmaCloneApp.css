@@ -1425,6 +1425,45 @@
   background: #dc2626;
 }
 
+.figma-layout-guide-column {
+  position: absolute;
+  z-index: 1;
+  background: rgba(37, 99, 235, 0.045);
+  border-left: 1px solid rgba(37, 99, 235, 0.16);
+  border-right: 1px solid rgba(37, 99, 235, 0.16);
+  pointer-events: none;
+}
+
+.figma-frame-guide {
+  position: absolute;
+  z-index: 2;
+  background: rgba(37, 99, 235, 0.7);
+  pointer-events: none;
+}
+
+.figma-frame-guide--vertical {
+  width: 1px;
+}
+
+.figma-frame-guide--horizontal {
+  height: 1px;
+}
+
+.figma-frame-guide-distance {
+  position: absolute;
+  z-index: 3;
+  background: #dc2626;
+  pointer-events: none;
+}
+
+.figma-frame-guide-distance--vertical {
+  width: 1px;
+}
+
+.figma-frame-guide-distance--horizontal {
+  height: 1px;
+}
+
 .figma-transform-guide {
   position: absolute;
   z-index: 3;

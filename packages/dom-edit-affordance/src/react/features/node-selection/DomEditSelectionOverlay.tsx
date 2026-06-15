@@ -47,6 +47,9 @@ import { DomEditBoxModelOverlay } from '../box-model-xray/DomEditBoxModelOverlay
 import { DomEditAutoLayoutOverlay } from '../layout-editing/DomEditAutoLayoutOverlay'
 import { DomEditGridOverlay } from '../layout-editing/DomEditGridOverlay'
 import { DomEditGuideOverlay } from '../spatial-inspection/DomEditGuideOverlay'
+import type {
+  DomEditFrameGuideConfig,
+} from '../spatial-inspection/DomEditFrameGuides'
 
 type DomEditResizeSessionData = {
   fixedHeight?: boolean
@@ -71,6 +74,7 @@ export function DomEditSelectionOverlay<
   state,
   viewport,
   affordanceState: appAffordanceState,
+  frameGuides,
   isCanvasPanActive,
   onAffordanceStateChange,
   onChange,
@@ -79,6 +83,7 @@ export function DomEditSelectionOverlay<
 }: {
   adapter: DomEditModelAdapter<TNodeId, TState>
   affordanceState: DomEditAffordanceState
+  frameGuides?: DomEditFrameGuideConfig<TNodeId> | null
   isCanvasPanActive: boolean
   selectedNodeId: TNodeId | null
   shellRef: RefObject<HTMLElement | null>
@@ -448,6 +453,7 @@ export function DomEditSelectionOverlay<
         <DomEditGuideOverlay
           adapter={adapter}
           affordanceState={affordanceState}
+          frameGuides={frameGuides}
           rect={rect}
           selectedNodeId={selectedNodeId}
           shellRef={shellRef}

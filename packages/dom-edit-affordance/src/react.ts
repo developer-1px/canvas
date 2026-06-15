@@ -16,6 +16,12 @@ export {
 export {
   DomEditGuideOverlay,
 } from './react/features/spatial-inspection/DomEditGuideOverlay'
+export type {
+  DomEditFrameGuideConfig,
+  DomEditFrameGuideAxis,
+  DomEditFrameLayoutColumns,
+  DomEditFrameRulerGuide,
+} from './react/features/spatial-inspection/DomEditFrameGuides'
 export {
   getDomEditOverlayVisibility,
   type DomEditAffordanceProperty,
