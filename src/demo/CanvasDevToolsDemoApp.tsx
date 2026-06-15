@@ -5,6 +5,7 @@ import {
   Eraser,
   Frame,
   Highlighter,
+  Map as MapIcon,
   Maximize2,
   MessageSquareText,
   Moon,
@@ -47,6 +48,7 @@ import {
 } from '../canvas'
 import { CanvasCommandPalette } from '../canvas/app/affordances/controls/command-palette/CanvasCommandPalette'
 import { CanvasShortcutHelpOverlay } from '../canvas/app/affordances/controls/shortcut-help/CanvasShortcutHelpOverlay'
+import { CanvasMinimap } from '../canvas/app/affordances/controls/minimap/CanvasMinimap'
 import { CanvasObjectInspector } from '../canvas/app/affordances/editing/inspector/CanvasObjectInspector'
 import { EngineSelectionToolbar } from './CanvasDevToolsSelectionToolbar'
 import {
@@ -140,6 +142,7 @@ function CanvasEngineDemoSurface({
     index: 0,
   })
   const [theme, setTheme] = useState<'dark' | 'light'>('light')
+  const [minimapVisible, setMinimapVisible] = useState(true)
   const [contextMenu, setContextMenu] =
     useState<CanvasContextCommandMenuState | null>(null)
   const [, setSelectionPointer] =
@@ -432,6 +435,14 @@ function CanvasEngineDemoSurface({
           />
         ) : null}
         {!presenting ? <EngineTextEditor {...app.textEditor} /> : null}
+        {!presenting && minimapVisible && app.minimap.visible ? (
+          <div className="engine-demo-minimap">
+            <CanvasMinimap
+              model={app.minimap.model}
+              onNavigateToWorldPoint={app.minimap.onNavigateToWorldPoint}
+            />
+          </div>
+        ) : null}
         <CanvasContextCommandMenu
           commandAvailability={app.toolbar.commandAvailability}
           config={app.toolbar.config}
@@ -496,6 +507,14 @@ function CanvasEngineDemoSurface({
           type="button"
         >
           <Maximize2 aria-hidden="true" size={14} strokeWidth={2} />
+        </button>
+        <button
+          aria-label="Toggle minimap"
+          aria-pressed={minimapVisible}
+          onClick={() => setMinimapVisible((current) => !current)}
+          type="button"
+        >
+          <MapIcon aria-hidden="true" size={14} strokeWidth={2} />
         </button>
         {presentationEnabled ? (
           <EnginePresentationControls
@@ -732,6 +751,7 @@ function isEngineDemoControlTarget(target: EventTarget) {
         '.context-command-menu',
         '.command-palette',
         '.engine-demo-controls',
+        '.engine-demo-minimap',
         '.engine-demo-viewport-controls',
         '.engine-sticky-quick-create',
         '.engine-selection-toolbar',

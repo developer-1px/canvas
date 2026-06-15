@@ -17,6 +17,7 @@ export const CANVAS_APP_SURFACE_IDS = [
   'sticky-quick-create',
   'text-editor',
   'zoom-controls',
+  'minimap',
   'object-inspector',
   'canvas-status',
 ] as const
@@ -182,6 +183,12 @@ export const CANVAS_APP_SURFACE_DEFINITIONS: readonly CanvasAppSurfaceDefinition
   {
     concept: 'viewport',
     id: 'zoom-controls',
+    priority: 0,
+    region: 'bottom-left',
+  },
+  {
+    concept: 'viewport',
+    id: 'minimap',
     priority: 0,
     region: 'bottom-left',
   },

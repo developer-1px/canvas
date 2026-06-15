@@ -255,6 +255,7 @@ export function useCanvasAppModel({
     imageControls,
     inspector,
     items: workspace.itemLayer.items,
+    minimap: controls.minimap,
     selection,
     stage: renderCanvasAppStageModel({
       cursorChat: cursorChat.stage,

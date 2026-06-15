@@ -16,6 +16,7 @@ describe('CanvasAffordanceConfig', () => {
       overlays: {
         componentPalette: false,
         inspector: false,
+        minimap: false,
       },
       tools: { marker: false },
     })
@@ -24,6 +25,7 @@ describe('CanvasAffordanceConfig', () => {
     expect(config.commands.delete).toBe(true)
     expect(config.overlays.componentPalette).toBe(false)
     expect(config.overlays.inspector).toBe(false)
+    expect(config.overlays.minimap).toBe(false)
     expect(config.overlays.toolbar).toBe(true)
     expect(config.shortcuts.findReplace).toBe(true)
     expect(config.shortcuts.penTool).toBe(true)

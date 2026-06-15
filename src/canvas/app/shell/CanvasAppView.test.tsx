@@ -15,6 +15,7 @@ describe('CanvasAppView', () => {
           emoteControls: false,
           imageControls: false,
           inspector: false,
+          minimap: false,
           sessionTimer: false,
           shortcutHelp: false,
           spotlight: false,
@@ -35,6 +36,7 @@ describe('CanvasAppView', () => {
     expect(markup).not.toContain('drawing-controls')
     expect(markup).not.toContain('emote-controls')
     expect(markup).not.toContain('image-controls')
+    expect(markup).not.toContain('canvas-minimap')
     expect(markup).not.toContain('object-inspector')
     expect(markup).not.toContain('session-timer')
     expect(markup).not.toContain('shortcut-help')
@@ -59,6 +61,7 @@ describe('CanvasAppView', () => {
     expect(markup).toContain('drawing-controls')
     expect(markup).toContain('emote-controls')
     expect(markup).toContain('image-controls')
+    expect(markup).toContain('canvas-minimap')
     expect(markup).toContain('session-timer')
     expect(markup).toContain('spotlight')
     expect(markup).toContain('selection-floating-bar')

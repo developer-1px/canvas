@@ -9,12 +9,15 @@ import type {
   Tool,
   Viewport,
 } from '../../entities'
+import type { Point } from '../../entities'
 import type { CanvasAppComponentTemplate } from './CanvasAppComponentAssemblyContracts'
+import type { CanvasAppItemReadModel } from './CanvasAppItemReadModelContracts'
 import type {
   CanvasAppCustomCommandState,
   CanvasAppCustomCreationToolState,
 } from '../extensions/CanvasAppExtensionStateContracts'
 import type { CanvasAppControlCommandHandlers } from './CanvasAppControlCommandContracts'
+import type { CanvasAppStageRect } from '../rendering/stage/CanvasAppStageElement'
 
 export type CanvasAppControlModelInput = {
   canRedo: boolean
@@ -25,6 +28,8 @@ export type CanvasAppControlModelInput = {
   customCommands: readonly CanvasAppCustomCommandState[]
   customTools: readonly CanvasAppCustomCreationToolState[]
   gesture: CanvasInteractionKind
+  itemReadModel: CanvasAppItemReadModel
+  onCenterViewportAtWorldPoint: (point: Point) => void
   onFitItems: (ids?: string[]) => void
   onInsertComponent: (component: CanvasComponentKind) => void
   onOpenShortcutHelp: () => void
@@ -36,4 +41,5 @@ export type CanvasAppControlModelInput = {
   selection: string[]
   tool: Tool
   viewport: Viewport
+  viewportRect: CanvasAppStageRect | null
 }

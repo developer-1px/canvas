@@ -30,6 +30,7 @@ describe('CanvasWorkspaceConsumerModel', () => {
     expect(model.control).toMatchObject({
       canRedo: input.document.canRedo,
       canUndo: input.document.canUndo,
+      itemReadModel: input.itemReadModel,
       scene: input.scene,
       selection: input.document.selection,
       viewport: input.viewport,

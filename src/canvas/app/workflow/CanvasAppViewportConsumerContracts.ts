@@ -4,9 +4,15 @@ import type {
 } from 'react'
 import type { CanvasViewportZoomDirection } from '../../core'
 import type { CanvasAffordanceConfig } from '../../engine'
-import type { Viewport } from '../../entities'
+import type {
+  Point,
+  Viewport,
+} from '../../entities'
 import type { CanvasAppItemReadModel } from './CanvasAppItemReadModelContracts'
-import type { CanvasAppStageElement } from '../rendering/stage/CanvasAppStageElement'
+import type {
+  CanvasAppStageElement,
+  CanvasAppStageRect,
+} from '../rendering/stage/CanvasAppStageElement'
 import type { CanvasAppKeyboardViewportContext } from './CanvasAppKeyboardConsumerContracts'
 
 export type CanvasAppViewportModelInput = {
@@ -17,15 +23,19 @@ export type CanvasAppViewportModelInput = {
 }
 
 export type CanvasAppViewportRuntime = {
+  centerAtWorldPoint: (point: Point) => void
   fitToItems: (ids?: string[]) => void
   resetViewport: () => void
+  viewportRect: CanvasAppStageRect | null
   zoom: (direction: CanvasViewportZoomDirection) => void
 }
 
 export type CanvasAppViewportControlContext = {
+  onCenterViewportAtWorldPoint: (point: Point) => void
   onFitItems: (ids?: string[]) => void
   onViewportReset: () => void
   onZoom: (direction: CanvasViewportZoomDirection) => void
+  viewportRect: CanvasAppStageRect | null
 }
 
 export type CanvasAppViewportConsumerModel = {

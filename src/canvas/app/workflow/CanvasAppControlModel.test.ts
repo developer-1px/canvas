@@ -6,6 +6,8 @@ import {
 import type {
   CanvasAppCustomCreationToolState,
 } from '../extensions/CanvasAppExtensionStateContracts'
+import type { CanvasItem } from '../../entities'
+import type { CanvasAppItemReadModel } from './CanvasAppItemReadModelContracts'
 import type { CanvasAppComponentTemplate } from './CanvasAppComponentAssemblyContracts'
 import { getCanvasAppControlModel } from './CanvasAppControlModel'
 
@@ -59,6 +61,8 @@ describe('CanvasAppControlModel', () => {
     expect(model.shortcutHelp.items.map((item) => item.id)).toEqual(
       expect.arrayContaining(['tool:select', 'system:shortcutHelp']),
     )
+    expect(model.minimap.visible).toBe(true)
+    expect(model.minimap.model?.itemRects).toHaveLength(2)
     expect(model.toolbar).toMatchObject({
       commandAvailability: expect.objectContaining({
         alignLeft: true,
@@ -110,6 +114,7 @@ describe('CanvasAppControlModel', () => {
           status: false,
           toolbar: false,
           zoomControls: false,
+          minimap: false,
         },
       }),
       onFitItems,
@@ -125,6 +130,8 @@ describe('CanvasAppControlModel', () => {
     expect(selectedModel.status.visible).toBe(false)
     expect(selectedModel.toolbar.visible).toBe(false)
     expect(selectedModel.zoomControls.visible).toBe(false)
+    expect(selectedModel.minimap.visible).toBe(false)
+    expect(selectedModel.minimap.model).toBeNull()
 
     getCanvasAppControlModel(createInput({
       onFitItems,
@@ -136,6 +143,7 @@ describe('CanvasAppControlModel', () => {
 
   it('wires command callbacks without knowing toolbar rendering details', () => {
     const onAlign = vi.fn()
+    const onCenterViewportAtWorldPoint = vi.fn()
     const onRunCustomCommand = vi.fn()
     const onOpenShortcutHelp = vi.fn()
     const onZoom = vi.fn()
@@ -148,11 +156,13 @@ describe('CanvasAppControlModel', () => {
         label: 'P',
         title: 'Publish',
       }],
+      onCenterViewportAtWorldPoint,
       onRunCustomCommand,
       onOpenShortcutHelp,
       onZoom,
     }))
 
+    model.minimap.onNavigateToWorldPoint({ x: 50, y: 60 })
     model.toolbar.commandHandlers.onAlign('alignLeft')
     model.commandPalette.items
       .find((item) => item.id === 'command:alignLeft')
@@ -172,6 +182,7 @@ describe('CanvasAppControlModel', () => {
 
     expect(onAlign).toHaveBeenCalledTimes(2)
     expect(onAlign).toHaveBeenLastCalledWith('alignLeft')
+    expect(onCenterViewportAtWorldPoint).toHaveBeenCalledWith({ x: 50, y: 60 })
     expect(onRunCustomCommand).toHaveBeenCalledTimes(2)
     expect(onRunCustomCommand).toHaveBeenLastCalledWith('publish')
     expect(onOpenShortcutHelp).toHaveBeenCalledTimes(1)
@@ -192,11 +203,13 @@ function createInput(
     customCommands: [],
     customTools: [createCustomTool()],
     gesture: 'none',
+    itemReadModel: createItemReadModel(),
     scene: createSceneAdapter(),
     selection: [],
     tool: 'select',
     viewport: { scale: 1, x: 0, y: 0 },
     commandHandlers: createCommandHandlers(),
+    onCenterViewportAtWorldPoint: vi.fn(),
     onFitItems: vi.fn(),
     onInsertComponent: vi.fn(),
     onOpenShortcutHelp: vi.fn(),
@@ -204,6 +217,12 @@ function createInput(
     onToolChange: vi.fn(),
     onViewportReset: vi.fn(),
     onZoom: vi.fn(),
+    viewportRect: {
+      height: 600,
+      left: 0,
+      top: 0,
+      width: 900,
+    },
     ...overrides,
   }
 }
@@ -249,6 +268,24 @@ function createCustomTool(): CanvasAppCustomCreationToolState {
     statusLabel: 'Risk',
     title: 'Risk',
   }
+}
+
+function createItemReadModel(): CanvasAppItemReadModel {
+  const items = [
+    { h: 80, id: 'rect-1', w: 120, x: 20, y: 30 },
+    { h: 140, id: 'rect-2', w: 160, x: 260, y: 180 },
+  ] as unknown as CanvasItem[]
+
+  return {
+    findEditableTextItem: vi.fn(() => null),
+    findItem: vi.fn(),
+    getAllIds: vi.fn(() => items.map((item) => item.id)),
+    getAllItems: vi.fn(() => items),
+    getItemBounds: vi.fn((item: CanvasItem) => item),
+    getSelection: vi.fn((ids: string[]) => ids),
+    getSelectionBounds: vi.fn(() => null),
+    getSelectedItems: vi.fn(() => []),
+  } as unknown as CanvasAppItemReadModel
 }
 
 function createSceneAdapter(groups = new Set<string>()): CanvasSceneAdapter {

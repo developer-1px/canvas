@@ -157,6 +157,9 @@ describe('CanvasDemoAssembly', () => {
       .toBe(true)
     expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.zoomControls)
       .toBe(false)
+    expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.minimap).toBe(
+      true,
+    )
     expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.shortcuts.quickCreateSticky)
       .toBe(true)
     expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.shortcuts.lockSelection)
@@ -218,6 +221,7 @@ describe('CanvasDemoAssembly', () => {
     expect(readOnlyAssembly.affordanceConfig.gestures.pan).toBe(true)
     expect(readOnlyAssembly.affordanceConfig.gestures.textEdit).toBe(false)
     expect(readOnlyAssembly.affordanceConfig.overlays.textEditor).toBe(false)
+    expect(readOnlyAssembly.affordanceConfig.overlays.minimap).toBe(true)
     expect(readOnlyAssembly.affordanceConfig.shortcuts.editSelection).toBe(false)
     expect(readOnlyAssembly.affordanceConfig.tools.comment).toBe(false)
     expect(readOnlyAssembly.affordanceConfig.tools.rect).toBe(false)

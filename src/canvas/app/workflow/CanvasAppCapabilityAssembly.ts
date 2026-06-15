@@ -337,6 +337,7 @@ const CANVAS_APP_NO_VIEW_AFFORDANCE_CONFIG = deepFreezeCanvasAppAffordanceConfig
     itemOutline: false,
     laserTrail: false,
     marquee: false,
+    minimap: false,
     presence: false,
     selectionBounds: false,
     sessionTimer: false,

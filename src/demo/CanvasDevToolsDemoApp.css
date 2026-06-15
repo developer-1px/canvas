@@ -98,6 +98,17 @@
   text-align: center;
 }
 
+.engine-demo-minimap {
+  position: absolute;
+  left: clamp(10px, 1.8vw, 18px);
+  bottom: clamp(52px, 5vw, 64px);
+  z-index: 6;
+}
+
+.engine-demo-minimap .canvas-minimap {
+  position: static;
+}
+
 .engine-demo-inspector {
   position: absolute;
   top: 10px;
@@ -326,6 +337,15 @@
 
   .engine-demo-viewport-controls span {
     display: none;
+  }
+
+  .engine-demo-minimap {
+    bottom: 52px;
+  }
+
+  .engine-demo-minimap .canvas-minimap {
+    width: 148px;
+    height: 94px;
   }
 
   .engine-selection-toolbar {

@@ -82,6 +82,7 @@ export type CanvasWorkspaceControlContext =
   CanvasWorkspaceSelectionContext & {
     canRedo: boolean
     canUndo: boolean
+    itemReadModel: CanvasAppItemReadModel
     scene: CanvasSceneAdapter
   }
 

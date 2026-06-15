@@ -96,6 +96,7 @@ type CreateCanvasAppStageElementInput = {
 }
 
 export function useCanvasAppStageElement(): CanvasAppStageElementController {
+  const [, setRevision] = useState(0)
   const [stageElement] = useState(() => {
     let element: Element | null = null
 
@@ -103,6 +104,7 @@ export function useCanvasAppStageElement(): CanvasAppStageElementController {
       getElement: () => element,
       setElement: (nextElement) => {
         element = nextElement
+        setRevision((current) => current + 1)
       },
     })
   })

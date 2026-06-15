@@ -1470,6 +1470,7 @@
 .stamp-controls,
 .voting-session,
 .zoom-controls,
+.canvas-minimap,
 .object-inspector,
 .canvas-status {
   position: absolute;
@@ -1489,6 +1490,45 @@
   box-shadow: none;
 }
 
+.canvas-minimap {
+  box-sizing: border-box;
+  width: 188px;
+  height: 124px;
+  padding: 5px;
+}
+
+.canvas-minimap-map {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+  cursor: pointer;
+  touch-action: none;
+}
+
+.canvas-minimap-world {
+  fill: color-mix(in srgb, var(--canvas-paper) 78%, var(--canvas-panel));
+  stroke: color-mix(in srgb, var(--canvas-line-strong) 58%, transparent);
+  stroke-width: 1;
+}
+
+.canvas-minimap-item {
+  fill: color-mix(in srgb, var(--canvas-blue) 18%, var(--canvas-panel));
+  stroke: color-mix(in srgb, var(--canvas-blue) 54%, transparent);
+  stroke-width: 0.7;
+}
+
+.canvas-minimap[data-empty='true'] .canvas-minimap-item {
+  display: none;
+}
+
+.canvas-minimap-viewport {
+  fill: color-mix(in srgb, var(--canvas-blue) 9%, transparent);
+  stroke: var(--canvas-blue);
+  stroke-width: 1.4;
+  vector-effect: non-scaling-stroke;
+}
+
 .canvas-floating-zone .toolbar,
 .canvas-floating-zone .component-palette,
 .canvas-floating-zone .drawing-controls,
@@ -1500,6 +1540,7 @@
 .canvas-floating-zone .stamp-controls,
 .canvas-floating-zone .voting-session,
 .canvas-floating-zone .zoom-controls,
+.canvas-floating-zone .canvas-minimap,
 .canvas-floating-zone .object-inspector,
 .canvas-floating-zone .canvas-status {
   position: static;
@@ -2640,6 +2681,16 @@
   .zoom-controls {
     left: 10px;
     bottom: 10px;
+  }
+
+  .canvas-floating-zone-bottom-left {
+    flex-direction: column-reverse;
+    align-items: flex-start;
+  }
+
+  .canvas-minimap {
+    width: 148px;
+    height: 94px;
   }
 
   .object-inspector {
