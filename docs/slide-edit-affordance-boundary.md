@@ -80,6 +80,25 @@
 | Object reorder | z-order among objects inside a canvas scene or group | slide list order |
 | Slide reorder | ordered slide id list and active slide rail selection | object z-order, layer tree, object storage |
 
+## Text Box Auto-Fit And Overflow Contract
+
+| Area | Contract |
+| --- | --- |
+| Size mode | `fixed`, `resize-to-fit`, `shrink-text` |
+| Host measurement | host provides rendered text size and overflow state through `text-measurement` |
+| Auto-size target | `resize-to-fit` calculates target bounds from measured text size, optional min size, and optional slide/frame max bounds |
+| Overflow indicator | headless state includes visibility, overflow axis, measured size, line count, and bottom-right indicator bounds |
+| Gesture hook | resize handle double-click can produce a host `resize-text-box-to-fit` command effect |
+
+## DOM Hug/Fill vs Slide Text Auto-Fit
+
+| Concept | DOM edit meaning | Slide edit meaning |
+| --- | --- | --- |
+| Hug content | element participates in CSS layout and can reflow siblings | text box may resize its own bounds to measured text, without reflowing other slide objects |
+| Fill container | element size is resolved by parent layout tracks or flex space | slide text box stays an absolute object; fill is not a shared slide text size mode |
+| Shrink text | usually a typography/style decision outside CSS intrinsic sizing | text scale can change to keep bounds fixed |
+| Overflow | computed by browser layout and scroll/clipping rules | host measurement reports slide text overflow for indicators and auto-fit commands |
+
 ## Contract Rules
 
 - Public names stay product-neutral: slide, object, frame, bounds, selection, command, text.
