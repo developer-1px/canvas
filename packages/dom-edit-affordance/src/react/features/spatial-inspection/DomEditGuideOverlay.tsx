@@ -12,7 +12,9 @@ import {
 import {
   areDomEditOverlayRectsEqual,
   createDomEditOverlayRectStyle,
+  getDomEditWorldOverlayRect,
   measureDomEditNodeOverlayRect,
+  type DomEditOverlayRect,
   type DomEditScaledOverlayRect,
 } from '../../../shared/geometry/DomEditOverlayGeometry'
 import type {
@@ -21,6 +23,11 @@ import type {
   DomEditState,
   DomEditViewport,
 } from '../../../shared/model/DomEditTypes'
+import {
+  getDomEditSmartGuides,
+  type DomEditSmartGuide,
+  type DomEditSmartGuideCandidate,
+} from './DomEditSmartGuides'
 
 type GuideRect = DomEditScaledOverlayRect
 
@@ -54,6 +61,8 @@ export function DomEditGuideOverlay<
   viewport: DomEditViewport
 }) {
   const [parentRect, setParentRect] = useState<GuideRect | null>(null)
+  const [siblingRects, setSiblingRects] =
+    useState<DomEditSmartGuideCandidate[]>([])
   const [hoveredNodeId, setHoveredNodeId] =
     useState<TNodeId | null>(null)
   const [hoveredRect, setHoveredRect] = useState<GuideRect | null>(null)
@@ -70,6 +79,16 @@ export function DomEditGuideOverlay<
   const measurementRect = activeHoveredRect ?? parentRect
   const distances = measurementRect
     ? getDomEditMeasurementDistances(rect, measurementRect)
+    : []
+  const shouldRenderSmartGuides = shouldRenderDomEditSmartGuides(affordanceState)
+  const activeSiblingRects = parentId ? siblingRects : []
+  const smartGuides = shouldRenderSmartGuides
+    ? getDomEditSmartGuides({
+        isDragging: isDomEditSmartGuideDragging(affordanceState),
+        parent: parentRect,
+        selected: rect,
+        siblings: activeSiblingRects,
+      })
     : []
 
   useLayoutEffect(() => {
@@ -97,6 +116,36 @@ export function DomEditGuideOverlay<
     selectedNodeId,
     shellRef,
     state,
+    viewport,
+  ])
+
+  useLayoutEffect(() => {
+    if (!shouldRenderSmartGuides || !parentId) {
+      return
+    }
+
+    const nextSiblingRects = measureDomEditSiblingSmartGuideCandidates({
+      adapter,
+      parentId,
+      selectedNodeId,
+      shell: shellRef.current,
+      viewport,
+    })
+
+    setSiblingRects((current) =>
+      areDomEditSmartGuideCandidatesEqual(current, nextSiblingRects)
+        ? current
+        : nextSiblingRects)
+  }, [
+    adapter,
+    parentId,
+    rect.h,
+    rect.w,
+    rect.x,
+    rect.y,
+    selectedNodeId,
+    shellRef,
+    shouldRenderSmartGuides,
     viewport,
   ])
 
@@ -191,6 +240,12 @@ export function DomEditGuideOverlay<
           rect={rect}
         />
       ) : null}
+      {smartGuides.map((guide, index) => (
+        <DomEditSmartGuideLine
+          key={`${guide.family}:${guide.axis}:${guide.coordinate}:${guide.from}:${guide.length}:${guide.source}:${guide.sourceId ?? 'parent'}:${index}`}
+          guide={guide}
+        />
+      ))}
       <div
         className="figma-guide-selected"
         style={createDomEditOverlayRectStyle(rect)}
@@ -216,6 +271,151 @@ export function DomEditGuideOverlay<
         {context.showGridLayout ? ' Grid' : ''}
       </span>
     </>
+  )
+}
+
+function measureDomEditSiblingSmartGuideCandidates<
+  TNodeId extends DomEditNodeId,
+  TState extends DomEditState<TNodeId>,
+>({
+  adapter,
+  parentId,
+  selectedNodeId,
+  shell,
+  viewport,
+}: {
+  adapter: Pick<
+    DomEditModelAdapter<TNodeId, TState>,
+    'getElement' | 'readNodeId'
+  >
+  parentId: TNodeId
+  selectedNodeId: TNodeId
+  shell: HTMLElement | null
+  viewport: DomEditViewport
+}): DomEditSmartGuideCandidate[] {
+  const parentElement = adapter.getElement(parentId)
+
+  if (!shell || !parentElement) {
+    return []
+  }
+
+  const shellRect = shell.getBoundingClientRect()
+
+  return Array.from(parentElement.children).flatMap((child) => {
+    if (!(child instanceof HTMLElement)) {
+      return []
+    }
+
+    const nodeId = adapter.readNodeId(child)
+
+    if (!nodeId || nodeId === selectedNodeId) {
+      return []
+    }
+
+    const rect = child.getBoundingClientRect()
+
+    if (rect.width <= 0.5 || rect.height <= 0.5) {
+      return []
+    }
+
+    return [{
+      id: nodeId,
+      rect: getDomEditWorldOverlayRect({
+        elementRect: rect,
+        shellRect,
+        viewport,
+      }),
+      source: 'sibling',
+    }]
+  })
+}
+
+function areDomEditSmartGuideCandidatesEqual(
+  current: readonly DomEditSmartGuideCandidate[],
+  next: readonly DomEditSmartGuideCandidate[],
+) {
+  if (current.length !== next.length) {
+    return false
+  }
+
+  return current.every((candidate, index) => {
+    const nextCandidate = next[index]
+
+    return Boolean(nextCandidate) &&
+      candidate.id === nextCandidate.id &&
+      candidate.source === nextCandidate.source &&
+      areDomEditGuideRectsEqual(candidate.rect, nextCandidate.rect)
+  })
+}
+
+function areDomEditGuideRectsEqual(
+  current: DomEditOverlayRect,
+  next: DomEditOverlayRect,
+) {
+  return current.h === next.h &&
+    current.w === next.w &&
+    current.x === next.x &&
+    current.y === next.y
+}
+
+function shouldRenderDomEditSmartGuides(
+  affordanceState: DomEditAffordanceState,
+) {
+  return affordanceState.mode === 'measure' ||
+    affordanceState.mode === 'transform' ||
+    (
+      affordanceState.mode === 'drag-property' &&
+      affordanceState.property === 'geometry'
+    )
+}
+
+function isDomEditSmartGuideDragging(
+  affordanceState: DomEditAffordanceState,
+) {
+  return affordanceState.mode === 'transform' ||
+    (
+      affordanceState.mode === 'drag-property' &&
+      affordanceState.property === 'geometry'
+    )
+}
+
+function DomEditSmartGuideLine({
+  guide,
+}: {
+  guide: DomEditSmartGuide
+}) {
+  const style: CSSProperties = guide.orientation === 'vertical'
+    ? {
+        height: guide.length,
+        left: guide.coordinate,
+        top: guide.from,
+      }
+    : {
+        left: guide.from,
+        top: guide.coordinate,
+        width: guide.length,
+      }
+
+  return (
+    <span
+      className={[
+        'figma-smart-guide',
+        `figma-smart-guide--${guide.axis}`,
+        `figma-smart-guide--${guide.orientation}`,
+        `figma-smart-guide--${guide.family}`,
+        `figma-smart-guide--${guide.pointKind}`,
+        `figma-smart-guide--${guide.emphasis}`,
+        `figma-smart-guide--${guide.source}`,
+        guide.spacingKind
+          ? `figma-smart-guide--${guide.spacingKind}`
+          : '',
+        guide.spacingSource
+          ? `figma-smart-guide--${guide.spacingSource}`
+          : '',
+        guide.sourceId ? 'figma-smart-guide--with-source' : '',
+      ].filter(Boolean).join(' ')}
+      style={style}
+    />
   )
 }
 

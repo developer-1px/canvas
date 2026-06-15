@@ -1432,12 +1432,48 @@
   pointer-events: none;
 }
 
+.figma-smart-guide {
+  position: absolute;
+  z-index: 4;
+  background: #ec4899;
+  pointer-events: none;
+}
+
 .figma-transform-guide--h {
   height: 1px;
 }
 
 .figma-transform-guide--v {
   width: 1px;
+}
+
+.figma-smart-guide--vertical {
+  width: 1px;
+}
+
+.figma-smart-guide--horizontal {
+  height: 1px;
+}
+
+.figma-smart-guide--alignment {
+  background: #ec4899;
+}
+
+.figma-smart-guide--center {
+  background: #a855f7;
+}
+
+.figma-smart-guide--distance {
+  background: #0284c7;
+}
+
+.figma-smart-guide--equal-spacing {
+  background: #059669;
+}
+
+.figma-smart-guide--snap {
+  background: #f43f5e;
+  box-shadow: 0 0 0 1px rgba(244, 63, 94, 0.28);
 }
 
 .figma-transform-guide--selected {
