@@ -359,6 +359,31 @@ function renderWorkspacePage(
             >
               {getFigmaCloneDomText(textState, 'workspaceHeroText')}
             </p>
+            <div
+              className="figma-dom-workspace__tags"
+              {...createDomNodeProps(state, selectedNodeId, 'workspaceAudienceTags')}
+            >
+              {([
+                'workspaceAudienceTagEnterprise',
+                'workspaceAudienceTagRenewal',
+                'workspaceAudienceTagExpansion',
+                'workspaceAudienceTagRisk',
+              ] as const).map((nodeId) => (
+                <span
+                  key={nodeId}
+                  className="figma-dom-workspace__tag"
+                  {...createEditableDomNodeProps(
+                    state,
+                    textState,
+                    selectedNodeId,
+                    nodeId,
+                    onChangeText,
+                  )}
+                >
+                  {getFigmaCloneDomText(textState, nodeId)}
+                </span>
+              ))}
+            </div>
           </div>
           <div
             className="figma-dom-workspace__hero-actions"
@@ -1700,6 +1725,7 @@ function createNodeStyle(
   const fillsParentColumn =
     parentUsesFlex && parentDirection === 'column' && style.heightMode === 'fill'
   const shouldGrowInParent = fillsParentRow || fillsParentColumn
+  const usesAuthoredWrapSize = usesFigmaCloneAuthoredWrapSize(nodeId)
 
   return {
     alignItems: canUseAutoLayout ? mapFigmaCloneAutoLayoutAlign(style.align) : undefined,
@@ -1711,6 +1737,7 @@ function createNodeStyle(
       ? isGridContainer ? 'grid' : 'flex'
       : undefined,
     flexDirection: canUseAutoLayout && !isGridContainer ? style.direction : undefined,
+    flexWrap: nodeId === 'workspaceAudienceTags' ? 'wrap' : undefined,
     flexBasis: shouldGrowInParent ? 0 : undefined,
     flexGrow: shouldGrowInParent ? 1 : undefined,
     flexShrink: style.widthMode === 'hug' || style.heightMode === 'hug'
@@ -1722,7 +1749,9 @@ function createNodeStyle(
       : undefined,
     height: fillsParentColumn
       ? 0
-      : mapFigmaCloneAutoLayoutSize(style.heightMode, style.h),
+      : usesAuthoredWrapSize
+        ? style.h
+        : mapFigmaCloneAutoLayoutSize(style.heightMode, style.h),
     justifyContent: canUseAutoLayout
       ? mapFigmaCloneAutoLayoutDistribution(style.distribution)
       : undefined,
@@ -1737,8 +1766,20 @@ function createNodeStyle(
     paddingTop: style.paddingTop,
     width: fillsParentRow
       ? 0
-      : mapFigmaCloneAutoLayoutSize(style.widthMode, style.w),
+      : usesAuthoredWrapSize
+        ? style.w
+        : mapFigmaCloneAutoLayoutSize(style.widthMode, style.w),
   }
+}
+
+function usesFigmaCloneAuthoredWrapSize(
+  nodeId: FigmaCloneDomNodeId,
+) {
+  return nodeId === 'workspaceAudienceTags' ||
+    nodeId === 'workspaceAudienceTagEnterprise' ||
+    nodeId === 'workspaceAudienceTagRenewal' ||
+    nodeId === 'workspaceAudienceTagExpansion' ||
+    nodeId === 'workspaceAudienceTagRisk'
 }
 
 function getFigmaCloneGridTemplateColumns(
