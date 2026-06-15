@@ -14,6 +14,34 @@
   --figma-line-strong: #c8ccd2;
   --figma-blue: #2563eb;
   --figma-blue-soft: #eaf1ff;
+  --figma-gap-hatch-column: repeating-linear-gradient(
+    0deg,
+    rgba(37, 99, 235, 0.32) 0,
+    rgba(37, 99, 235, 0.32) 3px,
+    transparent 3px,
+    transparent 7px
+  );
+  --figma-gap-hatch-column-hover: repeating-linear-gradient(
+    0deg,
+    rgba(37, 99, 235, 0.48) 0,
+    rgba(37, 99, 235, 0.48) 3px,
+    transparent 3px,
+    transparent 7px
+  );
+  --figma-gap-hatch-row: repeating-linear-gradient(
+    90deg,
+    rgba(37, 99, 235, 0.32) 0,
+    rgba(37, 99, 235, 0.32) 3px,
+    transparent 3px,
+    transparent 7px
+  );
+  --figma-gap-hatch-row-hover: repeating-linear-gradient(
+    90deg,
+    rgba(37, 99, 235, 0.48) 0,
+    rgba(37, 99, 235, 0.48) 3px,
+    transparent 3px,
+    transparent 7px
+  );
   --figma-green: #15803d;
   position: fixed;
   inset: 0;
@@ -1939,7 +1967,7 @@
   padding: 0;
   border: 0;
   border-radius: 3px;
-  background: rgba(37, 99, 235, 0.28);
+  background: rgba(37, 99, 235, 0.14);
   pointer-events: auto;
 }
 
@@ -1952,19 +1980,34 @@
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: rgba(37, 99, 235, 0.12);
+  background: transparent;
 }
 
 .figma-autolayout-gap:hover {
-  background: rgba(37, 99, 235, 0.46);
+  background: rgba(37, 99, 235, 0.2);
 }
 
 .figma-autolayout-gap--row {
+  background: var(--figma-gap-hatch-row), rgba(37, 99, 235, 0.14);
   cursor: ew-resize;
 }
 
 .figma-autolayout-gap--column {
+  background: var(--figma-gap-hatch-column), rgba(37, 99, 235, 0.14);
   cursor: ns-resize;
+}
+
+.figma-autolayout-gap--row:hover {
+  background: var(--figma-gap-hatch-row-hover), rgba(37, 99, 235, 0.2);
+}
+
+.figma-autolayout-gap--column:hover {
+  background: var(--figma-gap-hatch-column-hover), rgba(37, 99, 235, 0.2);
+}
+
+.figma-autolayout-gap--empty,
+.figma-autolayout-gap--empty:hover {
+  background: transparent;
 }
 
 .figma-autolayout-gap--between {
@@ -2260,13 +2303,26 @@
   z-index: 4;
   border: 0;
   border-radius: 4px;
-  background: rgba(37, 99, 235, 0.26);
+  background: rgba(37, 99, 235, 0.14);
   pointer-events: auto;
   cursor: col-resize;
 }
 
+.figma-grid-gap--column {
+  background: var(--figma-gap-hatch-row), rgba(37, 99, 235, 0.14);
+}
+
 .figma-grid-gap--row {
+  background: var(--figma-gap-hatch-column), rgba(37, 99, 235, 0.14);
   cursor: row-resize;
+}
+
+.figma-grid-gap--column:hover {
+  background: var(--figma-gap-hatch-row-hover), rgba(37, 99, 235, 0.2);
+}
+
+.figma-grid-gap--row:hover {
+  background: var(--figma-gap-hatch-column-hover), rgba(37, 99, 235, 0.2);
 }
 
 .figma-grid-gap--empty {
@@ -2278,7 +2334,12 @@
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: rgba(37, 99, 235, 0.12);
+  background: transparent;
+}
+
+.figma-grid-gap--empty,
+.figma-grid-gap--empty:hover {
+  background: transparent;
 }
 
 .figma-grid-child-area {
