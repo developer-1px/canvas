@@ -16,6 +16,7 @@
 | Slide command effects | `slide-edit-affordance` | product-neutral command envelopes routed to the host |
 | Slide rail interaction | `slide-edit-affordance` | active slide, slide order, thumbnail hit target, rail command intent |
 | Placeholder visibility affordance | `slide-edit-affordance` | slide placeholder structure and object hide/show read model |
+| Object layer pane affordance | `slide-edit-affordance` | object rows, ARIA tree interaction, and pane command intents |
 | Text measurement | `slide-edit-affordance` | bounded text size, overflow, and auto-fit hints |
 | Object inspector | `slide-edit-affordance` | object-level inspector grouping without DOM layout assumptions |
 
@@ -116,6 +117,24 @@
 | --- | --- | --- |
 | Placeholder visibility affordance | placeholder geometry/state and object hidden/selectable/locked read model | object list row rendering, tree keyboard model, rename UI |
 | Selection pane affordance | consumes the visibility read model to render rows and route select/rename/reorder intents | placeholder semantics or canvas generic item schema |
+
+## Object Layer Pane Contract
+
+| Area | Contract |
+| --- | --- |
+| Row read model | object id, display name, kind label, order, selected, hidden, locked, grouped, group depth |
+| Visibility dependency | rows consume `Placeholder visibility affordance` state instead of redefining hidden/selectable semantics |
+| Commands | select, additive select, rename, hide/show, lock/unlock, reorder route to host command effects |
+| Host ownership | host owns object storage, persisted names, group membership, and final reorder mutation |
+
+## Object Layer Pane ARIA Contract
+
+| Choice | Reason |
+| --- | --- |
+| `role=tree` | grouped slide objects can be nested and expanded/collapsed |
+| `role=treeitem` rows | row selection, rename action, hidden/locked state, and group level can be exposed per object |
+| multi-selection | additive selection and selection pane retouch require multiple selected rows |
+| not `listbox` | flat listbox cannot represent grouped hierarchy without losing row ownership semantics |
 
 ## Contract Rules
 
