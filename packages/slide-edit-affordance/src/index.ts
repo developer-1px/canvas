@@ -147,6 +147,29 @@ export {
   type SlideEditClipboardRemapPolicy,
   type SlideEditClipboardSlideId,
 } from './SlideEditClipboard'
+export {
+  createSlideEditSlideMetadataInspectorDescriptor,
+  getSlideEditInspectorSurface,
+  getSlideEditSlideMetadataFieldDescriptors,
+  SLIDE_EDIT_INSPECTOR_DISPLAY_PRIORITY,
+  SLIDE_EDIT_SLIDE_METADATA_FIELDS,
+  toSlideEditSlideMetadataHostCommandEffect,
+  type SlideEditInspectorDisplayPriority,
+  type SlideEditInspectorSurfaceId,
+  type SlideEditSlideBackgroundDescriptor,
+  type SlideEditSlideMetadataCommandId,
+  type SlideEditSlideMetadataFieldControl,
+  type SlideEditSlideMetadataFieldDescriptor,
+  type SlideEditSlideMetadataFieldId,
+  type SlideEditSlideMetadataHostCommandEffect,
+  type SlideEditSlideMetadataInspectorDescriptor,
+  type SlideEditSlideMetadataOptionalFieldId,
+  type SlideEditSlideMetadataReadModel,
+  type SlideEditSlideMetadataSlideId,
+  type SlideEditSlideMetadataUpdateCommand,
+  type SlideEditSlideOrientation,
+  type SlideEditSlideSizeDescriptor,
+} from './SlideEditSlideMetadataInspector'
 
 export type SlideEditSlideId = string
 export type SlideEditObjectId = string
@@ -230,6 +253,7 @@ export type SlideEditAdapterSlotId =
   | 'object-bounds'
   | 'selection'
   | 'slide-frame'
+  | 'slide-metadata'
   | 'text-measurement'
 
 export type SlideEditAdapterSlotDescriptor = {
@@ -263,6 +287,11 @@ export const SLIDE_EDIT_ADAPTER_SLOTS = Object.freeze([
     id: 'layout-theme',
     owner: 'host',
     purpose: 'Provide slide layout, master, placeholder, and theme token descriptors.',
+  },
+  {
+    id: 'slide-metadata',
+    owner: 'host',
+    purpose: 'Provide active slide metadata values for inspector descriptors.',
   },
   {
     id: 'text-measurement',
@@ -320,6 +349,7 @@ export type SlideEditOwnedContractId =
   | 'slide-command-effects'
   | 'slide-object-clipboard'
   | 'slide-frame-affordance'
+  | 'slide-metadata-inspector'
   | 'slide-object-bounds'
   | 'slide-rail-interaction'
   | 'text-overflow-affordance'
@@ -370,6 +400,11 @@ export const SLIDE_EDIT_OWNED_CONTRACTS = Object.freeze([
     id: 'slide-object-clipboard',
     owner: 'slide-edit-affordance',
     scope: 'Multi-slide object clipboard payloads, paste targets, and remap plans.',
+  },
+  {
+    id: 'slide-metadata-inspector',
+    owner: 'slide-edit-affordance',
+    scope: 'Active slide metadata fields and host-routed update command effects.',
   },
   {
     id: 'text-overflow-affordance',

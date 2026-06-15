@@ -19,6 +19,7 @@
 | Object layer pane | `slide-edit-affordance` | object row descriptor, selection pane command intent, ARIA tree contract |
 | Layout/theme affordance | `slide-edit-affordance` | layout, master, placeholder mapping, and theme token descriptors |
 | Slide object clipboard | `slide-edit-affordance` | source slide metadata, paste target, and id remap plan |
+| Slide metadata inspector | `slide-edit-affordance` | active slide name, background, notes, size, orientation fields |
 | Text measurement | `slide-edit-affordance` | bounded text size, overflow, and auto-fit hints |
 | Object inspector | `slide-edit-affordance` | object-level inspector grouping without DOM layout assumptions |
 
@@ -31,6 +32,7 @@
 | `selection` | Active page id and selected object ids |
 | `command-effect` | Transaction boundary for command effects |
 | `layout-theme` | Layout, master, placeholder, and theme token descriptors |
+| `slide-metadata` | Active slide metadata values for inspector descriptors |
 | `text-measurement` | Rendered text size and overflow for bounded text |
 
 ## DOM Affordance References
@@ -169,6 +171,16 @@
 | --- | --- | --- |
 | Canvas object clipboard | object clone/paste inside one canvas document and generic object offset behavior | slide id, slide frame, placeholder binding, cross-slide id policy |
 | Slide object clipboard | cross-slide payload metadata, slide-local paste target, and remap plan | host object serialization, final object mutation, format-specific details |
+
+## Slide Metadata Inspector Contract
+
+| Area | Contract |
+| --- | --- |
+| Active slide source | reuses slide rail `activeSlideId` and `slideOrder` |
+| Fields | `name`, `background`, `notes`, optional `size`, optional `orientation` |
+| Display priority | object selection inspector wins when selected object ids are present |
+| Updates | field edits become host `slide-command-effect` payloads |
+| Storage | host owns slide metadata values and persistence |
 
 ## Contract Rules
 
