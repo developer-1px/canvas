@@ -23,6 +23,7 @@
 | Slide metadata inspector | `slide-edit-affordance` | active slide name, background, notes, size, orientation fields |
 | Slide transition timing | `slide-edit-affordance` | transition type, duration, click/after advance policy |
 | Text font family | `slide-edit-affordance` | selected text object font family options and command effects |
+| Text vertical alignment | `slide-edit-affordance` | text frame internal vertical alignment metadata and command effects |
 | Text paragraph spacing | `slide-edit-affordance` | line height and paragraph before/after spacing descriptors |
 | Text measurement | `slide-edit-affordance` | bounded text size, overflow, and auto-fit hints |
 | Object inspector | `slide-edit-affordance` | object-level inspector grouping without DOM layout assumptions |
@@ -40,6 +41,7 @@
 | `slide-metadata` | Active slide metadata values for inspector descriptors |
 | `slide-transition` | Slide transition and advance timing values for inspector, preview, and export |
 | `text-font-family` | Selected text object font family value and allowed family options |
+| `text-vertical-alignment` | Selected text object vertical alignment value for stage, thumbnail, and export |
 | `text-paragraph-spacing` | Text paragraph spacing and line height values for object inspectors |
 | `text-measurement` | Rendered text size and overflow for bounded text |
 
@@ -126,6 +128,16 @@
 | Fallback | unknown or empty family normalizes to fallback or first allowed option |
 | Updates | selected object id and normalized font family value become host command effects |
 | Runtime | host owns actual font loading, text layout, export mapping, and persistence |
+
+## Text Vertical Alignment Contract
+
+| Area | Contract |
+| --- | --- |
+| Values | `top`, `middle`, `bottom`; `top` is the default |
+| Field | `verticalAlignment` segmented-control descriptor |
+| Metadata | `data-slide-text-vertical-align` carries the normalized value |
+| Updates | selected text object id and normalized alignment become host command effects |
+| Runtime | stage, thumbnail, inspector, and export can read the same metadata value |
 
 ## DOM Hug/Fill vs Slide Text Auto-Fit
 
