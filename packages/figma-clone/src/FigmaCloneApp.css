@@ -547,6 +547,11 @@
   color: #344054;
 }
 
+.figma-dom-workspace__activity-list {
+  max-height: 140px;
+  overflow: hidden;
+}
+
 .figma-dom-home {
   overflow: hidden;
   background: #fbfbf8;
@@ -1496,6 +1501,74 @@
 
 .figma-frame-guide-distance--horizontal {
   height: 1px;
+}
+
+.figma-overflow-clip-boundary,
+.figma-overflow-scroll-extent,
+.figma-overflow-selected-full,
+.figma-overflow-selected-visible {
+  position: absolute;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+.figma-overflow-clip-boundary {
+  z-index: 4;
+  border: 1px dashed #f97316;
+  background: rgba(249, 115, 22, 0.035);
+}
+
+.figma-overflow-clip-boundary--scroll {
+  border-color: #0891b2;
+  background: rgba(8, 145, 178, 0.035);
+}
+
+.figma-overflow-scroll-extent {
+  z-index: 1;
+  border: 1px dotted rgba(8, 145, 178, 0.72);
+  background: rgba(8, 145, 178, 0.035);
+}
+
+.figma-overflow-selected-full {
+  z-index: 3;
+  border: 1px dashed rgba(100, 116, 139, 0.8);
+  background: rgba(100, 116, 139, 0.035);
+}
+
+.figma-overflow-selected-visible {
+  z-index: 5;
+  border: 1px solid #f97316;
+  background: rgba(249, 115, 22, 0.08);
+}
+
+.figma-overflow-clip-boundary span,
+.figma-overflow-scroll-extent span,
+.figma-overflow-selected-full span,
+.figma-overflow-selected-visible span {
+  position: absolute;
+  top: -17px;
+  left: -1px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: #ffffff;
+  color: #475569;
+  font-size: 10px;
+  line-height: 14px;
+  white-space: nowrap;
+  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.1);
+}
+
+.figma-overflow-clip-boundary span {
+  color: #c2410c;
+}
+
+.figma-overflow-clip-boundary--scroll span,
+.figma-overflow-scroll-extent span {
+  color: #0e7490;
+}
+
+.figma-overflow-selected-visible span {
+  color: #c2410c;
 }
 
 .figma-transform-guide {

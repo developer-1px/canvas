@@ -51,6 +51,7 @@ import { DomEditBoxModelOverlay } from '../box-model-xray/DomEditBoxModelOverlay
 import { DomEditAutoLayoutOverlay } from '../layout-editing/DomEditAutoLayoutOverlay'
 import { DomEditGridOverlay } from '../layout-editing/DomEditGridOverlay'
 import { DomEditGuideOverlay } from '../spatial-inspection/DomEditGuideOverlay'
+import { DomEditOverflowOverlay } from '../spatial-inspection/DomEditOverflowOverlay'
 import type {
   DomEditFrameGuideConfig,
 } from '../spatial-inspection/DomEditFrameGuides'
@@ -468,6 +469,14 @@ export function DomEditSelectionOverlay<
           state={state}
           viewport={viewport}
         />
+        {layerVisibility.guides && affordanceState.mode !== 'xray' ? (
+          <DomEditOverflowOverlay
+            rect={rect}
+            shellRef={shellRef}
+            target={target}
+            viewport={viewport}
+          />
+        ) : null}
         {visibility.xray && layerVisibility.boxModel ? (
           <DomEditBoxModelOverlay
             rect={rect}
