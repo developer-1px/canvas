@@ -22,6 +22,7 @@
 | Slide object clipboard | `slide-edit-affordance` | source slide metadata, paste target, and id remap plan |
 | Slide metadata inspector | `slide-edit-affordance` | active slide name, background, notes, size, orientation fields |
 | Slide transition timing | `slide-edit-affordance` | transition type, duration, click/after advance policy |
+| Text paragraph spacing | `slide-edit-affordance` | line height and paragraph before/after spacing descriptors |
 | Text measurement | `slide-edit-affordance` | bounded text size, overflow, and auto-fit hints |
 | Object inspector | `slide-edit-affordance` | object-level inspector grouping without DOM layout assumptions |
 
@@ -37,6 +38,7 @@
 | `layout-theme` | Layout, master, placeholder, and theme token descriptors |
 | `slide-metadata` | Active slide metadata values for inspector descriptors |
 | `slide-transition` | Slide transition and advance timing values for inspector, preview, and export |
+| `text-paragraph-spacing` | Text paragraph spacing and line height values for object inspectors |
 | `text-measurement` | Rendered text size and overflow for bounded text |
 
 ## DOM Affordance References
@@ -100,6 +102,17 @@
 | Auto-size target | `resize-to-fit` calculates target bounds from measured text size, optional min size, and optional slide/frame max bounds |
 | Overflow indicator | headless state includes visibility, overflow axis, measured size, line count, and bottom-right indicator bounds |
 | Gesture hook | resize handle double-click can produce a host `resize-text-box-to-fit` command effect |
+
+## Text Paragraph Spacing Contract
+
+| Area | Contract |
+| --- | --- |
+| Read model | slide id, text object id, line-height ratio, paragraph before spacing, paragraph after spacing |
+| Line height | ratio-based numeric subset with 0.5..4 normalization |
+| Paragraph spacing | numeric amount in `px` or `slide-unit`, normalized to 0..1000 |
+| Fields | `lineHeightRatio`, `paragraphBefore`, `paragraphAfter` descriptors |
+| Updates | field edits become host command effects with object id and normalized value |
+| Runtime | host owns text layout, preview rendering, export mapping, and persistence |
 
 ## DOM Hug/Fill vs Slide Text Auto-Fit
 

@@ -59,6 +59,30 @@ export {
   type SlideEditTextSlideId,
 } from './SlideEditTextBoxAutoFit'
 export {
+  createSlideEditTextParagraphSpacingDescriptor,
+  getSlideEditTextParagraphSpacingCommandEffect,
+  normalizeSlideEditTextLineHeightRatio,
+  normalizeSlideEditTextParagraphSpacingAmount,
+  normalizeSlideEditTextParagraphSpacingNumber,
+  normalizeSlideEditTextParagraphSpacingUpdateCommand,
+  SLIDE_EDIT_DEFAULT_TEXT_PARAGRAPH_SPACING,
+  SLIDE_EDIT_TEXT_PARAGRAPH_SPACING_FIELDS,
+  SLIDE_EDIT_TEXT_PARAGRAPH_SPACING_LIMITS,
+  type SlideEditTextParagraphObjectId,
+  type SlideEditTextParagraphSlideId,
+  type SlideEditTextParagraphSpacingAmount,
+  type SlideEditTextParagraphSpacingCommandId,
+  type SlideEditTextParagraphSpacingDescriptor,
+  type SlideEditTextParagraphSpacingFieldControl,
+  type SlideEditTextParagraphSpacingFieldDescriptor,
+  type SlideEditTextParagraphSpacingFieldId,
+  type SlideEditTextParagraphSpacingHostCommandEffect,
+  type SlideEditTextParagraphSpacingNumericLimits,
+  type SlideEditTextParagraphSpacingUnit,
+  type SlideEditTextParagraphSpacingUpdateCommand,
+  type SlideEditTextParagraphSpacingValues,
+} from './SlideEditTextParagraphSpacing'
+export {
   createSlideEditPlaceholderDescriptor,
   getSlideEditObjectVisibilityCommandAvailability,
   getSlideEditObjectVisibilityCommandEffect,
@@ -303,6 +327,7 @@ export type SlideEditAdapterSlotId =
   | 'slide-frame'
   | 'slide-metadata'
   | 'slide-transition'
+  | 'text-paragraph-spacing'
   | 'text-measurement'
 
 export type SlideEditAdapterSlotDescriptor = {
@@ -351,6 +376,11 @@ export const SLIDE_EDIT_ADAPTER_SLOTS = Object.freeze([
     id: 'slide-transition',
     owner: 'host',
     purpose: 'Provide slide transition and advance timing values for inspector, preview, and export.',
+  },
+  {
+    id: 'text-paragraph-spacing',
+    owner: 'host',
+    purpose: 'Provide text paragraph spacing and line height values for object inspectors.',
   },
   {
     id: 'text-measurement',
@@ -414,6 +444,7 @@ export type SlideEditOwnedContractId =
   | 'slide-rail-interaction'
   | 'slide-transition-timing'
   | 'text-overflow-affordance'
+  | 'text-paragraph-spacing-affordance'
 
 export type SlideEditOwnedContract = {
   id: SlideEditOwnedContractId
@@ -481,6 +512,11 @@ export const SLIDE_EDIT_OWNED_CONTRACTS = Object.freeze([
     id: 'text-overflow-affordance',
     owner: 'slide-edit-affordance',
     scope: 'Bounded text measurement, overflow state, and auto-fit hints.',
+  },
+  {
+    id: 'text-paragraph-spacing-affordance',
+    owner: 'slide-edit-affordance',
+    scope: 'Text line height and paragraph before/after spacing descriptors.',
   },
   {
     id: 'object-inspector',
