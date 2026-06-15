@@ -40,6 +40,24 @@ export {
   type SlideEditRailSlideId,
   type SlideEditRailThumbnailDescriptor,
 } from './SlideEditRailInteractions'
+export {
+  getSlideEditTextAutoFitGestureCommandEffect,
+  getSlideEditTextAutoSizeBounds,
+  getSlideEditTextOverflowIndicatorState,
+  SLIDE_EDIT_TEXT_BOX_SIZE_MODES,
+  type SlideEditTextAutoFitCommand,
+  type SlideEditTextAutoFitGestureIntent,
+  type SlideEditTextAutoFitHostCommandEffect,
+  type SlideEditTextBoxMeasurement,
+  type SlideEditTextBoxSizeMode,
+  type SlideEditTextBoxSizeModeDescriptor,
+  type SlideEditTextObjectId,
+  type SlideEditTextOverflowAxis,
+  type SlideEditTextOverflowIndicatorState,
+  type SlideEditTextResizeHandle,
+  type SlideEditTextSize,
+  type SlideEditTextSlideId,
+} from './SlideEditTextBoxAutoFit'
 
 export type SlideEditSlideId = string
 export type SlideEditObjectId = string
