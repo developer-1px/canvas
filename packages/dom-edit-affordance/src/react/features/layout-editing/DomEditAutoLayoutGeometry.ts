@@ -187,6 +187,38 @@ export function getDomEditGapRectValue({
   return Math.round(direction === 'row' ? rect.w : rect.h)
 }
 
+export function getDomEditMainAxisGuideRect({
+  direction,
+  padding,
+  rect,
+}: {
+  direction: DomEditNodeState['direction']
+  padding: DomEditPaddingSides
+  rect: DomEditAutoLayoutRect
+}): DomEditAutoLayoutRect {
+  const contentLeft = rect.x + padding.left
+  const contentTop = rect.y + padding.top
+  const contentWidth = Math.max(1, rect.w - padding.left - padding.right)
+  const contentHeight = Math.max(1, rect.h - padding.top - padding.bottom)
+  const lineSize = 2
+
+  if (direction === 'row') {
+    return {
+      h: lineSize,
+      w: contentWidth,
+      x: contentLeft,
+      y: contentTop + contentHeight / 2 - lineSize / 2,
+    }
+  }
+
+  return {
+    h: contentHeight,
+    w: lineSize,
+    x: contentLeft + contentWidth / 2 - lineSize / 2,
+    y: contentTop,
+  }
+}
+
 export function getDomEditPaddingDelta(
   kind: DomEditAutoLayoutPaddingDragKind,
   dx: number,

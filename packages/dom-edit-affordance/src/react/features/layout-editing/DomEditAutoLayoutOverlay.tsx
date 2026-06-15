@@ -41,6 +41,7 @@ import type {
 } from '../../../shared/model/DomEditTypes'
 import {
   getDomEditGapRectValue,
+  getDomEditMainAxisGuideRect,
   getDomEditPaddingCornerRects,
   getDomEditPaddingDelta,
   getDomEditPaddingDragActiveSides,
@@ -413,6 +414,13 @@ export function DomEditAutoLayoutOverlay<
     context.showSelfLayout || context.showGridLayout
   const shouldRenderAlignGuide = visibility.alignGuides &&
     Boolean(alignGuideValue)
+  const mainAxisGuideRect = visibility.axisGuides
+    ? getDomEditMainAxisGuideRect({
+      direction: style.direction,
+      padding,
+      rect,
+    })
+    : null
   const startDrag = (
     event: PointerEvent<HTMLElement>,
     kind: DomEditAutoLayoutDragKind,
@@ -538,6 +546,12 @@ export function DomEditAutoLayoutOverlay<
               isPreview={Boolean(alignmentPreview)}
               rect={rect}
               style={style}
+            />
+          ) : null}
+          {mainAxisGuideRect ? (
+            <DomEditMainAxisGuide
+              direction={style.direction}
+              rect={mainAxisGuideRect}
             />
           ) : null}
           {shouldRenderPadding ? (
@@ -987,6 +1001,31 @@ function DomEditFlexParticipationGlyph({
         {descriptor.detail}
       </span>
     </span>
+  )
+}
+
+function DomEditMainAxisGuide({
+  direction,
+  rect,
+}: {
+  direction: DomEditNodeState['direction']
+  rect: DomEditAutoLayoutRect
+}) {
+  return (
+    <span
+      aria-hidden="true"
+      className={[
+        'figma-autolayout-axis-guide',
+        `figma-autolayout-axis-guide--${direction}`,
+      ].join(' ')}
+      data-autolayout-axis-guide={direction}
+      style={{
+        height: rect.h,
+        left: rect.x,
+        top: rect.y,
+        width: rect.w,
+      }}
+    />
   )
 }
 
