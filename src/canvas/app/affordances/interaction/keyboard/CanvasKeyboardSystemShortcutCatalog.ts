@@ -9,6 +9,7 @@ export type CanvasKeyboardSystemShortcutIntent =
   | { kind: 'open-command-palette'; preventDefault: true }
   | { kind: 'open-cursor-chat'; preventDefault: true }
   | { kind: 'open-find-replace'; preventDefault: true }
+  | { kind: 'open-shortcut-help'; preventDefault: true }
   | { kind: 'temporary-pan'; preventDefault: true }
   | { kind: 'escape'; preventDefault: false }
 
@@ -63,6 +64,18 @@ const CANVAS_KEYBOARD_CURSOR_CHAT_SHORTCUT = {
   shortcutId: 'cursorChat',
 } satisfies CanvasKeyboardSystemShortcutDescriptor
 
+const CANVAS_KEYBOARD_SHORTCUT_HELP_SHORTCUT = {
+  code: 'Slash',
+  getIntent: () => ({ kind: 'open-shortcut-help', preventDefault: true }),
+  ignoreKey: true,
+  label: 'keyboard shortcuts',
+  overlayId: 'shortcutHelp',
+  phase: 'after-typing-target',
+  reserve: {},
+  shortcut: { key: '/', shiftKey: true },
+  shortcutId: 'shortcutHelp',
+} satisfies CanvasKeyboardSystemShortcutDescriptor
+
 export const CANVAS_KEYBOARD_TEMPORARY_PAN_SHORTCUT = {
   code: 'Space',
   gestureId: 'temporaryPan',
@@ -91,6 +104,7 @@ export const CANVAS_KEYBOARD_SYSTEM_SHORTCUTS:
   CANVAS_KEYBOARD_COMMAND_PALETTE_SHORTCUT,
   CANVAS_KEYBOARD_FIND_REPLACE_SHORTCUT,
   CANVAS_KEYBOARD_CURSOR_CHAT_SHORTCUT,
+  CANVAS_KEYBOARD_SHORTCUT_HELP_SHORTCUT,
   CANVAS_KEYBOARD_TEMPORARY_PAN_SHORTCUT,
   CANVAS_KEYBOARD_ESCAPE_SHORTCUT,
 ]

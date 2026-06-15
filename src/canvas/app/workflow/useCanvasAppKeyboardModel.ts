@@ -11,6 +11,7 @@ export function useCanvasAppKeyboardModel({
   interaction,
   openCommandPalette,
   openFindReplace,
+  openShortcutHelp,
   viewport,
   workspace,
 }: CanvasAppKeyboardModelInput) {
@@ -37,6 +38,7 @@ export function useCanvasAppKeyboardModel({
     openCommandPalette,
     openCursorChat: cursorChat.openCursorChat,
     openFindReplace,
+    openShortcutHelp,
     pasteSelection: command.pasteSelection,
     quickCreateSticky: component.quickCreateSticky,
     redoHistory: command.redoHistory,

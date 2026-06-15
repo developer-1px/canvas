@@ -16,6 +16,7 @@ describe('CanvasAppView', () => {
           imageControls: false,
           inspector: false,
           sessionTimer: false,
+          shortcutHelp: false,
           spotlight: false,
           stampControls: false,
           stickyQuickCreate: false,
@@ -36,6 +37,7 @@ describe('CanvasAppView', () => {
     expect(markup).not.toContain('image-controls')
     expect(markup).not.toContain('object-inspector')
     expect(markup).not.toContain('session-timer')
+    expect(markup).not.toContain('shortcut-help')
     expect(markup).not.toContain('spotlight')
     expect(markup).not.toContain('stamp-controls')
     expect(markup).not.toContain('sticky-quick-create')
@@ -78,6 +80,16 @@ describe('CanvasAppView', () => {
     expect(markup).toContain('command-palette')
     expect(markup).toContain('Search commands')
     expect(markup).toContain('Select')
+  })
+
+  it('renders shortcut help as a modal surface when open', () => {
+    const markup = renderToStaticMarkup(
+      <CanvasAppView {...createViewProps({ shortcutHelp: true })} />,
+    )
+
+    expect(markup).toContain('shortcut-help')
+    expect(markup).toContain('Keyboard shortcuts')
+    expect(markup).toContain('Select Tool')
   })
 
   it('groups desktop chrome in floating zones', () => {

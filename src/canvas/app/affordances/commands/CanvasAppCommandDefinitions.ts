@@ -354,6 +354,17 @@ const CANVAS_APP_COMMAND_DEFINITION_LIST = [
     title: 'Find Replace',
   }),
   systemDefinition({
+    action: { type: 'canvas.system.shortcutHelp' },
+    bindings: [
+      keyboardBinding('shortcutHelp', {
+        key: '/',
+        shiftKey: true,
+      }, { overlayId: 'shortcutHelp' }),
+    ],
+    id: 'system:shortcutHelp',
+    title: 'Keyboard shortcuts',
+  }),
+  systemDefinition({
     action: { type: 'canvas.system.cursorChat' },
     bindings: [
       keyboardBinding('cursorChat', { key: '/' }, {

@@ -80,6 +80,35 @@ describe('CanvasKeyboardShortcutRouter', () => {
     expect(setTool).not.toHaveBeenCalled()
   })
 
+  it('routes shortcut help before custom tool shortcuts', () => {
+    const openShortcutHelp = vi.fn()
+    const setTool = vi.fn()
+    const handlers = createHandlers({
+      customCreationTools: [{
+        ariaLabel: 'Help tool',
+        id: 'custom:help',
+        label: '?',
+        shortcut: { key: '/', shiftKey: true },
+        statusLabel: 'Help',
+        title: 'Help',
+      }],
+      openShortcutHelp,
+      setTool,
+    })
+    const event = createKeyboardEvent({
+      code: 'Slash',
+      key: '?',
+      shiftKey: true,
+    })
+
+    handleCanvasKeyboardShortcut(event, handlers)
+
+    expect(event.preventDefault).toHaveBeenCalled()
+    expect(openShortcutHelp).toHaveBeenCalledTimes(1)
+    expect(setTool).not.toHaveBeenCalled()
+  })
+
+
   it('keeps shifted nudge ahead of custom arrow shortcuts', () => {
     const moveSelection = vi.fn()
     const setTool = vi.fn()
@@ -137,6 +166,7 @@ function createHandlers(
     openCommandPalette: vi.fn(),
     openCursorChat: vi.fn(),
     openFindReplace: vi.fn(),
+    openShortcutHelp: vi.fn(),
     pasteSelection: vi.fn(),
     quickCreateSticky: vi.fn(),
     redoHistory: vi.fn(),

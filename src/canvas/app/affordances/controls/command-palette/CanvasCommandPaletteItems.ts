@@ -53,6 +53,7 @@ export type CanvasCommandPaletteItemsInput = {
   onCustomCommand: (commandId: string) => void
   onFitItems: (ids?: string[]) => void
   onInsertComponent: (component: CanvasComponentKind) => void
+  onOpenShortcutHelp: () => void
   onToolChange: (tool: Tool) => void
   onViewportReset: () => void
   onZoom: (direction: CanvasViewportZoomDirection) => void
@@ -68,6 +69,7 @@ export function getCanvasCommandPaletteItems({
   onCustomCommand,
   onFitItems,
   onInsertComponent,
+  onOpenShortcutHelp,
   onToolChange,
   onViewportReset,
   onZoom,
@@ -92,6 +94,10 @@ export function getCanvasCommandPaletteItems({
       customCommands,
       onCustomCommand,
     }),
+    ...getCanvasCommandPaletteSystemItems({
+      config,
+      onOpenShortcutHelp,
+    }),
     ...getCanvasCommandPaletteViewportItems({
       config,
       onFitItems,
@@ -100,6 +106,29 @@ export function getCanvasCommandPaletteItems({
       selection,
     }),
   ]
+}
+
+function getCanvasCommandPaletteSystemItems({
+  config,
+  onOpenShortcutHelp,
+}: Pick<
+  CanvasCommandPaletteItemsInput,
+  'config' | 'onOpenShortcutHelp'
+>): CanvasCommandPaletteItem[] {
+  if (!config.overlays.shortcutHelp) {
+    return []
+  }
+
+  return [{
+    id: 'system:shortcut-help',
+    section: 'System',
+    shortcut: getCanvasAppCommandMappingShortcut({
+      config,
+      mapping: getCanvasAppCommandMapping('system:shortcutHelp'),
+    }),
+    title: 'Keyboard shortcuts',
+    onSelect: onOpenShortcutHelp,
+  }]
 }
 
 export function filterCanvasCommandPaletteItems(

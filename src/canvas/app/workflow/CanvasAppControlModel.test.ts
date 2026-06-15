@@ -44,6 +44,7 @@ describe('CanvasAppControlModel', () => {
         'Add Card',
         'Delete',
         'Publish',
+        'Keyboard shortcuts',
         'Fit view',
       ]),
     )
@@ -52,6 +53,12 @@ describe('CanvasAppControlModel', () => {
       selectionLength: 2,
       visible: true,
     })
+    expect(model.shortcutHelp).toMatchObject({
+      visible: true,
+    })
+    expect(model.shortcutHelp.items.map((item) => item.id)).toEqual(
+      expect.arrayContaining(['tool:select', 'system:shortcutHelp']),
+    )
     expect(model.toolbar).toMatchObject({
       commandAvailability: expect.objectContaining({
         alignLeft: true,
@@ -99,6 +106,7 @@ describe('CanvasAppControlModel', () => {
         overlays: {
           componentPalette: false,
           commandPalette: false,
+          shortcutHelp: false,
           status: false,
           toolbar: false,
           zoomControls: false,
@@ -113,6 +121,7 @@ describe('CanvasAppControlModel', () => {
     expect(onFitItems).toHaveBeenLastCalledWith(['rect-1'])
     expect(selectedModel.componentPalette.visible).toBe(false)
     expect(selectedModel.commandPalette.visible).toBe(false)
+    expect(selectedModel.shortcutHelp.visible).toBe(false)
     expect(selectedModel.status.visible).toBe(false)
     expect(selectedModel.toolbar.visible).toBe(false)
     expect(selectedModel.zoomControls.visible).toBe(false)
@@ -128,6 +137,7 @@ describe('CanvasAppControlModel', () => {
   it('wires command callbacks without knowing toolbar rendering details', () => {
     const onAlign = vi.fn()
     const onRunCustomCommand = vi.fn()
+    const onOpenShortcutHelp = vi.fn()
     const onZoom = vi.fn()
     const model = getCanvasAppControlModel(createInput({
       commandHandlers: createCommandHandlers({ onAlign }),
@@ -139,6 +149,7 @@ describe('CanvasAppControlModel', () => {
         title: 'Publish',
       }],
       onRunCustomCommand,
+      onOpenShortcutHelp,
       onZoom,
     }))
 
@@ -150,6 +161,9 @@ describe('CanvasAppControlModel', () => {
     model.commandPalette.items
       .find((item) => item.id === 'custom-command:publish')
       ?.onSelect()
+    model.commandPalette.items
+      .find((item) => item.id === 'system:shortcut-help')
+      ?.onSelect()
     model.zoomControls.onZoomIn()
     model.commandPalette.items
       .find((item) => item.id === 'viewport:zoom-out')
@@ -160,6 +174,7 @@ describe('CanvasAppControlModel', () => {
     expect(onAlign).toHaveBeenLastCalledWith('alignLeft')
     expect(onRunCustomCommand).toHaveBeenCalledTimes(2)
     expect(onRunCustomCommand).toHaveBeenLastCalledWith('publish')
+    expect(onOpenShortcutHelp).toHaveBeenCalledTimes(1)
     expect(onZoom).toHaveBeenNthCalledWith(1, 'in')
     expect(onZoom).toHaveBeenNthCalledWith(2, 'out')
     expect(onZoom).toHaveBeenNthCalledWith(3, 'out')
@@ -184,6 +199,7 @@ function createInput(
     commandHandlers: createCommandHandlers(),
     onFitItems: vi.fn(),
     onInsertComponent: vi.fn(),
+    onOpenShortcutHelp: vi.fn(),
     onRunCustomCommand: vi.fn(),
     onToolChange: vi.fn(),
     onViewportReset: vi.fn(),

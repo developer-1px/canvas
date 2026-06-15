@@ -13,6 +13,7 @@ import { CanvasCursorChat } from '../affordances/controls/cursor-chat/CanvasCurs
 import { CanvasDrawingControls } from '../affordances/controls/drawing/CanvasDrawingControls'
 import { CanvasEmoteControls } from '../affordances/controls/emote/CanvasEmoteControls'
 import { CanvasSessionTimer } from '../affordances/controls/facilitation/CanvasSessionTimer'
+import { CanvasShortcutHelpOverlay } from '../affordances/controls/shortcut-help/CanvasShortcutHelpOverlay'
 import { CanvasSpotlight } from '../affordances/controls/facilitation/CanvasSpotlight'
 import { CanvasVotingSession } from '../affordances/controls/facilitation/CanvasVotingSession'
 import { CanvasObjectInspector } from '../affordances/editing/inspector/CanvasObjectInspector'
@@ -39,6 +40,7 @@ type SelectionFloatingBarProps = ComponentProps<
 type CursorChatProps = ComponentProps<typeof CanvasCursorChat>
 type EmoteControlsProps = ComponentProps<typeof CanvasEmoteControls>
 type SessionTimerProps = ComponentProps<typeof CanvasSessionTimer>
+type ShortcutHelpProps = ComponentProps<typeof CanvasShortcutHelpOverlay>
 type SpotlightProps = ComponentProps<typeof CanvasSpotlight>
 type VotingSessionProps = ComponentProps<typeof CanvasVotingSession>
 type TextEditorProps = ComponentProps<typeof CanvasTextEditor>
@@ -69,6 +71,7 @@ type CanvasAppViewProps = {
   imageControls: VisibleProps<ImageControlsProps>
   inspector: VisibleProps<InspectorProps>
   sessionTimer: SessionTimerProps
+  shortcutHelp: ShortcutHelpProps
   spotlight: SpotlightProps
   stage: ReactNode
   stampControls: VisibleProps<StampControlsProps>
@@ -90,6 +93,7 @@ export function CanvasAppView({
   imageControls,
   inspector,
   sessionTimer,
+  shortcutHelp,
   spotlight,
   stage,
   stampControls,
@@ -152,6 +156,7 @@ export function CanvasAppView({
       statusProps.selectionLength > 0 &&
       selectionCommandAnchor !== null,
     'session-timer': sessionTimer.visible,
+    'shortcut-help': shortcutHelp.open,
     'spotlight': spotlight.visible,
     'stamp-controls': showStampControls,
     'sticky-quick-create': showStickyQuickCreate,
@@ -285,6 +290,10 @@ export function CanvasAppView({
         <CanvasCommandPalette {...commandPalette} />
       ) : null}
 
+      {surfaces['shortcut-help'] ? (
+        <CanvasShortcutHelpOverlay {...shortcutHelp} />
+      ) : null}
+
       {surfaces['cursor-chat'] ? <CanvasCursorChat {...cursorChat} /> : null}
 
       {surfaces['sticky-quick-create'] ? (
@@ -312,6 +321,7 @@ function isAppControlTarget(target: EventTarget) {
         '.cursor-chat',
         '.find-replace-panel',
         '.object-inspector',
+        '.shortcut-help',
         '.text-editor',
       ].join(','),
     ) !== null

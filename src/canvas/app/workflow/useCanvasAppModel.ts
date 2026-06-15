@@ -50,11 +50,19 @@ export function useCanvasAppModel({
     [assembly],
   )
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false)
+  const [shortcutHelpOpen, setShortcutHelpOpen] = useState(false)
   const openCommandPalette = useCallback(() => {
     setCommandPaletteOpen(true)
   }, [])
   const closeCommandPalette = useCallback(() => {
     setCommandPaletteOpen(false)
+  }, [])
+  const openShortcutHelp = useCallback(() => {
+    setShortcutHelpOpen(true)
+    setCommandPaletteOpen(false)
+  }, [])
+  const closeShortcutHelp = useCallback(() => {
+    setShortcutHelpOpen(false)
   }, [])
   const affordance = useMemo(
     () => getCanvasAppAffordanceModel(appAssembly.affordance.config),
@@ -184,6 +192,7 @@ export function useCanvasAppModel({
     ...extension.keyboard,
     ...text.keyboard,
     openCommandPalette,
+    openShortcutHelp,
     interaction: {
       ...interaction.keyboard,
       ...text.keyboard.interaction,
@@ -220,6 +229,7 @@ export function useCanvasAppModel({
     ...commands.control,
     ...viewportControls.control,
     ...components.control,
+    onOpenShortcutHelp: openShortcutHelp,
     onToolChange: interaction.control.onToolChange,
   })
   const selection = useCanvasAppSelectionModel({
@@ -264,6 +274,11 @@ export function useCanvasAppModel({
     emoteControls: emotes.view,
     gesture: interaction.stage.gesture,
     sessionTimer: sessionTimer.view,
+    shortcutHelp: {
+      items: controls.shortcutHelp.items,
+      open: shortcutHelpOpen && controls.shortcutHelp.visible,
+      onClose: closeShortcutHelp,
+    },
     spotlight: spotlight.view,
     stampControls,
     stickyQuickCreate: components.control.stickyQuickCreate,

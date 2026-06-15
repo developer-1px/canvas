@@ -138,6 +138,30 @@ describe('CanvasKeyboardShortcutIntent', () => {
       }))).toEqual({ kind: 'none', preventDefault: false })
     })
   })
+
+  it('opens shortcut help only outside typing targets', () => {
+    expect(getCanvasKeyboardShortcutIntent(createInput({
+      event: createKeyboardEvent({
+        code: 'Slash',
+        key: '?',
+        shiftKey: true,
+      }),
+    }))).toEqual({
+      kind: 'open-shortcut-help',
+      preventDefault: true,
+    })
+
+    withTextAreaTarget((target) => {
+      expect(getCanvasKeyboardShortcutIntent(createInput({
+        event: createKeyboardEvent({
+          code: 'Slash',
+          key: '?',
+          shiftKey: true,
+          target,
+        }),
+      }))).toEqual({ kind: 'none', preventDefault: false })
+    })
+  })
 })
 
 function createInput(
