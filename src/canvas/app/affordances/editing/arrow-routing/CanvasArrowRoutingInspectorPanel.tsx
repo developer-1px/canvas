@@ -8,6 +8,10 @@ import type {
   CanvasAppInspectorPanel,
   CanvasAppInspectorPanelContext,
 } from '../inspector/CanvasAppInspectorPanels'
+import {
+  getCanvasRadioTabIndex,
+  handleCanvasRadioGroupKeyDown,
+} from '../../controls/radio/CanvasRadioGroup'
 
 export const CANVAS_ARROW_ROUTING_INSPECTOR_PANEL: CanvasAppInspectorPanel = {
   id: 'arrow-routing-actions',
@@ -57,13 +61,24 @@ function renderCanvasArrowRoutingInspectorPanelContent({
   onChangeRouting: (routing: CanvasArrowRouting) => void
 }) {
   return (
-    <div className="inspector-action-grid">
+    <div
+      className="inspector-action-grid"
+      role="radiogroup"
+      aria-label="Connector routing"
+      onKeyDown={handleCanvasRadioGroupKeyDown}
+    >
       <button
         type="button"
         className="inspector-action-button"
         aria-label="Elbow connector"
+        aria-checked={currentRouting === 'elbow'}
+        role="radio"
+        tabIndex={getCanvasRadioTabIndex({
+          checked: currentRouting === 'elbow',
+          disabled,
+        })}
         title="Elbow connector"
-        disabled={disabled || currentRouting === 'elbow'}
+        disabled={disabled}
         onClick={() => onChangeRouting('elbow')}
       >
         Elbow
@@ -72,8 +87,14 @@ function renderCanvasArrowRoutingInspectorPanelContent({
         type="button"
         className="inspector-action-button"
         aria-label="Straight connector"
+        aria-checked={currentRouting === 'straight'}
+        role="radio"
+        tabIndex={getCanvasRadioTabIndex({
+          checked: currentRouting === 'straight',
+          disabled,
+        })}
         title="Straight connector"
-        disabled={disabled || currentRouting === 'straight'}
+        disabled={disabled}
         onClick={() => onChangeRouting('straight')}
       >
         Straight

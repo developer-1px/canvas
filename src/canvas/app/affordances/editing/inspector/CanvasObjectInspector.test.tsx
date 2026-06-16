@@ -30,8 +30,10 @@ describe('CanvasObjectInspector', () => {
     )
 
     expect(markup).toContain('inspector-style-controls')
+    expect(markup).toContain('role="radiogroup"')
     expect(markup).toContain('aria-label="Fill #FFFFFF"')
-    expect(markup).toContain('aria-pressed="true"')
+    expect(markup).toContain('role="radio"')
+    expect(markup).toContain('aria-checked="true"')
     expect(markup).toContain('background-color:#FFFFFF')
   })
 
@@ -76,8 +78,10 @@ describe('CanvasObjectInspector', () => {
 
     expect(markup).toContain('aria-label="Stroke width"')
     expect(markup).toContain('value="2"')
+    expect(markup).toContain('role="radiogroup"')
     expect(markup).toContain('aria-label="Text align Center"')
-    expect(markup).toContain('aria-pressed="true"')
+    expect(markup).toContain('role="radio"')
+    expect(markup).toContain('aria-checked="true"')
   })
 
   it('renders compact comment thread controls', () => {

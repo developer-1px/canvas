@@ -19,7 +19,10 @@ describe('CanvasLinkPreviewInspectorPanel', () => {
 
     expect(CANVAS_LINK_PREVIEW_INSPECTOR_PANEL.isVisible?.(context)).toBe(true)
     expect(markup).toContain('href="https://www.figma.com/figjam/"')
+    expect(markup).toContain('role="radiogroup"')
     expect(markup).toContain('Display horizontal')
+    expect(markup).toContain('role="radio"')
+    expect(markup).toContain('aria-checked="true"')
     expect(markup).toContain('Display vertical')
     expect(markup).toContain('Open')
     expect(markup).toContain('Text')

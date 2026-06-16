@@ -9,6 +9,10 @@ import {
   getDomEditSizeSourceDescriptor,
 } from '../../../features/size-editing/DomEditSizeSource'
 import type { DomEditAutoLayoutRect } from './DomEditAutoLayoutGeometry'
+import {
+  getDomEditRadioTabIndex,
+  handleDomEditRadioGroupKeyDown,
+} from '../../shared/DomEditRadioGroup'
 
 type DomEditSizeModeAxis = 'height' | 'width'
 type DomEditSizeMode = DomEditNodeState['widthMode']
@@ -106,7 +110,6 @@ function DomEditSizeModeControl({
       data-parent-relative={source.isParentRelative ? 'true' : 'false'}
       data-size-source={source.kind}
       role="group"
-      tabIndex={0}
       title={`${source.axisLabel} ${source.label}`}
       onPointerDown={(event) => {
         event.stopPropagation()
@@ -123,12 +126,21 @@ function DomEditSizeModeControl({
           {source.label}
         </span>
       </span>
-      <span className="figma-size-mode-control__choices">
+      <span
+        className="figma-size-mode-control__choices"
+        role="radiogroup"
+        aria-label={source.ariaLabel}
+        onKeyDown={handleDomEditRadioGroupKeyDown}
+      >
         {availableModes.map((availableMode) => (
           <button
             key={availableMode}
             aria-label={`${source.axisLabel} ${getDomEditSizeModeLabel(availableMode)}`}
-            aria-pressed={availableMode === mode}
+            aria-checked={availableMode === mode}
+            role="radio"
+            tabIndex={getDomEditRadioTabIndex({
+              checked: availableMode === mode,
+            })}
             type="button"
             onClick={(event) => {
               event.stopPropagation()

@@ -1324,7 +1324,8 @@
   border-right: 0;
 }
 
-.figma-segmented-control button[aria-pressed='true'] {
+.figma-segmented-control button[aria-pressed='true'],
+.figma-segmented-control button[aria-checked='true'] {
   background: #eef5ff;
   color: var(--figma-blue);
   font-weight: 650;
@@ -2377,7 +2378,7 @@
   outline: 0;
 }
 
-.figma-alignment-option[aria-pressed='true'] {
+.figma-alignment-option[aria-checked='true'] {
   border-color: rgba(15, 118, 110, 0.36);
   background: #ecfdf5;
   color: #0f766e;
@@ -2701,7 +2702,7 @@
   text-align: center;
 }
 
-.figma-autolayout-toolbar button[aria-pressed='true'] {
+.figma-autolayout-toolbar button[aria-checked='true'] {
   background: #e6faf6;
   color: #0f766e;
   font-weight: 700;
@@ -2894,7 +2895,7 @@
   background: #f1f5f9;
 }
 
-.figma-size-mode-control__choices button[aria-pressed='true'] {
+.figma-size-mode-control__choices button[aria-checked='true'] {
   background: #e8efff;
   color: var(--figma-blue);
   font-weight: 700;

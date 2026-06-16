@@ -4,6 +4,10 @@ import type {
   DomEditNodeId,
   DomEditNodeState,
 } from '../../../shared/model/DomEditTypes'
+import {
+  getDomEditRadioTabIndex,
+  handleDomEditRadioGroupKeyDown,
+} from '../../shared/DomEditRadioGroup'
 
 export function DomEditResizeModeFields<TNodeId extends DomEditNodeId>({
   heightMode,
@@ -64,11 +68,20 @@ export function DomEditSegmentedField<T extends string>({
   return (
     <div className="figma-segmented-field">
       <span>{label}</span>
-      <div className="figma-segmented-control">
+      <div
+        className="figma-segmented-control"
+        role="radiogroup"
+        aria-label={label}
+        onKeyDown={handleDomEditRadioGroupKeyDown}
+      >
         {options.map((option) => (
           <button
-            aria-pressed={option.value === value}
+            aria-checked={option.value === value}
             key={option.value}
+            role="radio"
+            tabIndex={getDomEditRadioTabIndex({
+              checked: option.value === value,
+            })}
             type="button"
             onClick={() => onChange(option.value)}
           >

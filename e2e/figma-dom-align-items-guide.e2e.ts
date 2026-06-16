@@ -9,7 +9,7 @@ test('shows flex cross-axis align-items guides', async ({ page }) => {
     name: 'Alignment editor',
   })
 
-  await workspacePopover.getByRole('button', { name: 'Align stretch' }).hover()
+  await workspacePopover.getByRole('radio', { name: 'Align stretch' }).hover()
   await expect(alignGuide(page)).toHaveAttribute('data-align-guide', 'stretch')
   await expect(alignGuide(page)).toHaveClass(/figma-align-guide--stretch/)
   await expect(alignGuide(page))
@@ -22,26 +22,26 @@ test('shows flex cross-axis align-items guides', async ({ page }) => {
     name: 'Alignment editor',
   })
 
-  await actionsPopover.getByRole('button', { name: 'Align center' }).hover()
+  await actionsPopover.getByRole('radio', { name: 'Align center' }).hover()
   await expect(alignGuide(page)).toHaveAttribute('data-align-guide', 'center')
   await expect(alignGuide(page))
     .toHaveAttribute('data-align-guide-axis', 'horizontal')
   await expectGuideCenterY(page, 'workspaceHeroActions')
 
-  await actionsPopover.getByRole('button', { name: 'Align end' }).hover()
+  await actionsPopover.getByRole('radio', { name: 'Align end' }).hover()
   await expect(alignGuide(page)).toHaveAttribute('data-align-guide', 'end')
   await expect(alignGuide(page))
     .toHaveAttribute('data-align-guide-preview', 'true')
   await expectGuideAtEndY(page, 'workspaceHeroActions')
 
-  await actionsPopover.getByRole('button', { name: 'Align start' }).hover()
+  await actionsPopover.getByRole('radio', { name: 'Align start' }).hover()
   await expect(alignGuide(page)).toHaveAttribute('data-align-guide', 'start')
   await expectGuideAtStartY(page, 'workspaceHeroActions')
 
   await selectLayer(page, 'Select layer Hero copy', 'workspaceHeroCopy')
   await openAlignmentEditor(page)
   await page.getByRole('region', { name: 'Alignment editor' })
-    .getByRole('button', { name: 'Align center' })
+    .getByRole('radio', { name: 'Align center' })
     .hover()
   await expect(alignGuide(page)).toHaveAttribute('data-align-guide', 'center')
   await expect(alignGuide(page))
