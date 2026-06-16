@@ -18,6 +18,7 @@
 | Placeholder visibility affordance | `slide-edit-affordance` | slide placeholder structure and object hide/show read model |
 | Object layer pane | `slide-edit-affordance` | object row descriptor, selection pane command intent, ARIA tree contract |
 | Object animation build order | `slide-edit-affordance` | object animation type, trigger, timing, and slide-local build order |
+| Object opacity | `slide-edit-affordance` | object opacity value, metadata attribute, and host command effect |
 | Layout/theme affordance | `slide-edit-affordance` | layout, master, placeholder mapping, and theme token descriptors |
 | Slide object clipboard | `slide-edit-affordance` | source slide metadata, paste target, and id remap plan |
 | Slide metadata inspector | `slide-edit-affordance` | active slide name, background, notes, size, orientation fields |
@@ -38,6 +39,7 @@
 | `selection` | Active page id and selected object ids |
 | `command-effect` | Transaction boundary for command effects |
 | `object-animation` | Object animation and build order values scoped to a slide |
+| `object-opacity` | Selected object opacity values for inspector, stage, thumbnail, and export |
 | `layout-theme` | Layout, master, placeholder, and theme token descriptors |
 | `slide-metadata` | Active slide metadata values for inspector descriptors |
 | `slide-transition` | Slide transition and advance timing values for inspector, preview, and export |
@@ -199,6 +201,17 @@
 | Build order | slide-local object order sorts by numeric order and preserves input order for ties |
 | Updates | field-level type, trigger, duration, delay, and order edits become host command effects |
 | Runtime | host owns animation preview rendering, export mapping, and persistence |
+
+## Object Opacity Contract
+
+| Area | Contract |
+| --- | --- |
+| Value | `opacity` is a normalized numeric ratio from `0` to `1`; default is `1` |
+| Field | `opacity` slider descriptor routes through `update-object-opacity` |
+| Metadata | `data-slide-object-opacity` carries the normalized value as an attribute string |
+| Normalization | invalid values use `1`; valid values clamp to `0..1` and round to two decimals |
+| Updates | selected object id and normalized opacity value become host command effects |
+| Runtime | stage, thumbnail, presentation, inspector, and export can read the same metadata value |
 
 ## Layout, Master, And Theme Contract
 

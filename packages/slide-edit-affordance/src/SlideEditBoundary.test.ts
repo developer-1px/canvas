@@ -17,6 +17,7 @@ describe('slide-edit-affordance boundary', () => {
       'selection',
       'command-effect',
       'object-animation',
+      'object-opacity',
       'layout-theme',
       'slide-metadata',
       'slide-transition',
