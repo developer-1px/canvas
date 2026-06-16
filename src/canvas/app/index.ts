@@ -108,6 +108,11 @@ export {
   type CanvasViewportSetter,
 } from './affordances/interaction/viewport/CanvasViewportControlExecution'
 export {
+  getCanvasKeyboardSystemShortcutIntent,
+  shouldReleaseCanvasKeyboardTemporaryPan,
+  type CanvasKeyboardSystemShortcutIntent,
+} from './affordances/interaction/keyboard/CanvasKeyboardSystemShortcuts'
+export {
   CanvasAppViewportOverlayLayer,
   type CanvasAppViewportOverlayLayerProps,
 } from './rendering/CanvasAppViewportOverlayLayer'
