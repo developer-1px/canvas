@@ -18,12 +18,14 @@ import {
 } from 'react'
 import { useJSONDocument } from '@interactive-os/json-document/react'
 import {
+  CANVAS_TOOLBAR_ITEM_PROPS,
   CANVAS_APP_READ_ONLY_CAPABILITIES,
   CanvasApp,
   type CanvasAppAssemblyInput,
   type Viewport,
   type CanvasWorkspaceStorage,
   type CanvasWorkspaceStorageProvider,
+  useCanvasToolbarRovingFocus,
 } from '../../../src/canvas'
 import {
   DEFAULT_DOM_EDIT_OVERLAY_LAYER_VISIBILITY,
@@ -159,6 +161,7 @@ export function FigmaCloneApp() {
   const canvasRegionRef = useRef<HTMLElement | null>(null)
   const domDragHistoryRef =
     useRef<FigmaCloneDomDragHistorySession | null>(null)
+  const toolToolbarRovingFocus = useCanvasToolbarRovingFocus<HTMLDivElement>()
   const domDocument = useJSONDocument(
     FIGMA_CLONE_DOM_DOCUMENT_SCHEMA,
     createFigmaCloneDomDocumentValue(),
@@ -396,8 +399,14 @@ export function FigmaCloneApp() {
             ref={canvasRegionRef}
             aria-label="Canvas"
           >
-            <div className="figma-canvas-toolbar" role="toolbar" aria-label="Tools">
+            <div
+              {...toolToolbarRovingFocus}
+              className="figma-canvas-toolbar"
+              role="toolbar"
+              aria-label="Tools"
+            >
               <button
+                {...CANVAS_TOOLBAR_ITEM_PROPS}
                 aria-label="Select tool"
                 aria-pressed={
                   affordanceState.mode !== 'measure' &&
@@ -409,6 +418,7 @@ export function FigmaCloneApp() {
                 <MousePointer2 aria-hidden="true" size={14} />
               </button>
               <button
+                {...CANVAS_TOOLBAR_ITEM_PROPS}
                 aria-label="Measure tool"
                 aria-pressed={affordanceState.mode === 'measure'}
                 title="Measure"
@@ -421,6 +431,7 @@ export function FigmaCloneApp() {
                 <Ruler aria-hidden="true" size={14} />
               </button>
               <button
+                {...CANVAS_TOOLBAR_ITEM_PROPS}
                 aria-label="Toggle box model X-ray"
                 aria-pressed={affordanceState.mode === 'xray'}
                 title="X-ray"
@@ -498,6 +509,7 @@ function FigmaCloneGuideLayerControls({
       {FIGMA_CLONE_GUIDE_LAYER_CONTROLS.map((control) => (
         <label className="figma-guide-layer-toggle" key={control.layer}>
           <input
+            {...CANVAS_TOOLBAR_ITEM_PROPS}
             aria-label={`${control.label} overlays`}
             checked={visibility[control.layer]}
             type="checkbox"
@@ -889,20 +901,38 @@ function FigmaCloneViewportControls({
   onZoomIn: () => void
   onZoomOut: () => void
 }) {
+  const toolbarRovingFocus = useCanvasToolbarRovingFocus<HTMLDivElement>()
+
   return (
     <div
+      {...toolbarRovingFocus}
       className="figma-viewport-controls"
       role="toolbar"
       aria-label="Viewport"
     >
       <span>{Math.round(scale * 100)}%</span>
-      <button aria-label="Zoom out" type="button" onClick={onZoomOut}>
+      <button
+        {...CANVAS_TOOLBAR_ITEM_PROPS}
+        aria-label="Zoom out"
+        type="button"
+        onClick={onZoomOut}
+      >
         <ZoomOut aria-hidden="true" size={14} />
       </button>
-      <button aria-label="Zoom in" type="button" onClick={onZoomIn}>
+      <button
+        {...CANVAS_TOOLBAR_ITEM_PROPS}
+        aria-label="Zoom in"
+        type="button"
+        onClick={onZoomIn}
+      >
         <ZoomIn aria-hidden="true" size={14} />
       </button>
-      <button aria-label="Fit" type="button" onClick={onFit}>
+      <button
+        {...CANVAS_TOOLBAR_ITEM_PROPS}
+        aria-label="Fit"
+        type="button"
+        onClick={onFit}
+      >
         <Maximize2 aria-hidden="true" size={14} />
       </button>
     </div>

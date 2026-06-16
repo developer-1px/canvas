@@ -3,6 +3,10 @@ import {
   type CanvasAffordanceConfig,
 } from '../../../../engine'
 import { FitIcon, MinusIcon, PlusIcon } from '../../../../ui/icons/CanvasIcons'
+import {
+  CANVAS_TOOLBAR_ITEM_PROPS,
+  useCanvasToolbarRovingFocus,
+} from '../toolbar/CanvasToolbarRovingFocus'
 
 type ZoomControlsProps = {
   config: CanvasAffordanceConfig
@@ -21,6 +25,7 @@ export function ZoomControls({
   onZoomIn,
   onZoomOut,
 }: ZoomControlsProps) {
+  const toolbarRovingFocus = useCanvasToolbarRovingFocus<HTMLDivElement>()
   const hasZoomCommand =
     config.commands.zoomOut ||
     config.commands.zoomReset ||
@@ -32,9 +37,15 @@ export function ZoomControls({
   }
 
   return (
-    <div className="zoom-controls" role="toolbar" aria-label="Zoom controls">
+    <div
+      {...toolbarRovingFocus}
+      className="zoom-controls"
+      role="toolbar"
+      aria-label="Zoom controls"
+    >
       {config.commands.zoomOut ? (
         <button
+          {...CANVAS_TOOLBAR_ITEM_PROPS}
           type="button"
           className="tool-button"
           aria-label={CANVAS_COMMAND_AFFORDANCES.zoomOut.ariaLabel}
@@ -46,6 +57,7 @@ export function ZoomControls({
       ) : null}
       {config.commands.zoomReset ? (
         <button
+          {...CANVAS_TOOLBAR_ITEM_PROPS}
           type="button"
           className="zoom-value"
           aria-label={CANVAS_COMMAND_AFFORDANCES.zoomReset.ariaLabel}
@@ -57,6 +69,7 @@ export function ZoomControls({
       ) : null}
       {config.commands.fitView ? (
         <button
+          {...CANVAS_TOOLBAR_ITEM_PROPS}
           type="button"
           className="tool-button"
           aria-label={CANVAS_COMMAND_AFFORDANCES.fitView.ariaLabel}
@@ -68,6 +81,7 @@ export function ZoomControls({
       ) : null}
       {config.commands.zoomIn ? (
         <button
+          {...CANVAS_TOOLBAR_ITEM_PROPS}
           type="button"
           className="tool-button"
           aria-label={CANVAS_COMMAND_AFFORDANCES.zoomIn.ariaLabel}

@@ -45,11 +45,13 @@ import {
   type CSSProperties,
 } from 'react'
 import {
+  CANVAS_TOOLBAR_ITEM_PROPS,
   CanvasHost,
   type CanvasAppProps,
   type CanvasItem,
   type CanvasShapeLikeItem,
   type CanvasShapeType,
+  useCanvasToolbarRovingFocus,
 } from '../canvas'
 
 type CanvasEngineDemoModel =
@@ -342,6 +344,7 @@ export function EngineSelectionToolbar({
   onToggleWidgetPlay: () => void
 }) {
   const [openMenu, setOpenMenu] = useState<string | null>(null)
+  const toolbarRovingFocus = useCanvasToolbarRovingFocus<HTMLDivElement>()
   const {
     anchor,
     ids,
@@ -367,6 +370,7 @@ export function EngineSelectionToolbar({
 
   return (
     <div
+      {...toolbarRovingFocus}
       className="engine-selection-toolbar"
       role="toolbar"
       aria-label="Object actions"
@@ -535,6 +539,7 @@ function EngineSelectionToolbarSlot({
   return (
     <div className="engine-selection-toolbar-item">
       <button
+        {...CANVAS_TOOLBAR_ITEM_PROPS}
         aria-expanded={open}
         aria-haspopup="menu"
         aria-label={getEngineSelectionToolbarLabel(descriptor, context)}
@@ -581,6 +586,7 @@ function EngineSelectionToolbarButton({
 }) {
   return (
     <button
+      {...CANVAS_TOOLBAR_ITEM_PROPS}
       aria-label={getEngineSelectionToolbarLabel(descriptor, context)}
       aria-pressed={getEngineSelectionToolbarPressed(descriptor, context)}
       className="engine-selection-trigger"

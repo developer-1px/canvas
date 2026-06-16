@@ -44,7 +44,9 @@ import {
   type CanvasJsonObject,
   type CanvasStampKind,
   type Tool,
+  CANVAS_TOOLBAR_ITEM_PROPS,
   getCanvasAppWidgetInteractions,
+  useCanvasToolbarRovingFocus,
 } from '../canvas'
 import { CanvasCommandPalette } from '../canvas/app/affordances/controls/command-palette/CanvasCommandPalette'
 import { CanvasShortcutHelpOverlay } from '../canvas/app/affordances/controls/shortcut-help/CanvasShortcutHelpOverlay'
@@ -147,6 +149,9 @@ function CanvasEngineDemoSurface({
     useState<CanvasContextCommandMenuState | null>(null)
   const [, setSelectionPointer] =
     useState<EngineSelectionPointerState | null>(null)
+  const toolToolbarRovingFocus = useCanvasToolbarRovingFocus<HTMLDivElement>()
+  const viewportToolbarRovingFocus =
+    useCanvasToolbarRovingFocus<HTMLDivElement>()
   const presentationEnabled = app.toolbar.config.overlays.presentationMode
   const presentationFrames = getCanvasPresentationFrames(app.items)
   const activePresentationIndex =
@@ -460,12 +465,14 @@ function CanvasEngineDemoSurface({
       ) : null}
       {!presenting ? (
         <div
+          {...toolToolbarRovingFocus}
           className="engine-demo-controls"
           role="toolbar"
           aria-label="Engine affordances"
         >
           {ENGINE_DEMO_TOOLS.map(({ icon: Icon, id, label }) => (
             <button
+              {...CANVAS_TOOLBAR_ITEM_PROPS}
               aria-label={label}
               aria-pressed={app.toolbar.tool === id}
               key={id}
@@ -482,12 +489,14 @@ function CanvasEngineDemoSurface({
         </div>
       ) : null}
       <div
+        {...viewportToolbarRovingFocus}
         className="engine-demo-viewport-controls"
         role="toolbar"
         aria-label="Viewport controls"
       >
         <span aria-label="Canvas scale">{viewportPercent}</span>
         <button
+          {...CANVAS_TOOLBAR_ITEM_PROPS}
           aria-label="Zoom out"
           onClick={app.zoomControls.onZoomOut}
           type="button"
@@ -495,6 +504,7 @@ function CanvasEngineDemoSurface({
           <ZoomOut aria-hidden="true" size={14} strokeWidth={2} />
         </button>
         <button
+          {...CANVAS_TOOLBAR_ITEM_PROPS}
           aria-label="Zoom in"
           onClick={app.zoomControls.onZoomIn}
           type="button"
@@ -502,6 +512,7 @@ function CanvasEngineDemoSurface({
           <ZoomIn aria-hidden="true" size={14} strokeWidth={2} />
         </button>
         <button
+          {...CANVAS_TOOLBAR_ITEM_PROPS}
           aria-label="Fit selection"
           onClick={app.zoomControls.onFit}
           type="button"
@@ -509,6 +520,7 @@ function CanvasEngineDemoSurface({
           <Maximize2 aria-hidden="true" size={14} strokeWidth={2} />
         </button>
         <button
+          {...CANVAS_TOOLBAR_ITEM_PROPS}
           aria-label="Toggle minimap"
           aria-pressed={minimapVisible}
           onClick={() => setMinimapVisible((current) => !current)}
@@ -528,6 +540,7 @@ function CanvasEngineDemoSurface({
           />
         ) : null}
         <button
+          {...CANVAS_TOOLBAR_ITEM_PROPS}
           aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
           aria-pressed={theme === 'dark'}
           onClick={() => setTheme((current) => (current === 'dark' ? 'light' : 'dark'))}
@@ -540,6 +553,7 @@ function CanvasEngineDemoSurface({
           )}
         </button>
         <button
+          {...CANVAS_TOOLBAR_ITEM_PROPS}
           aria-label="Reset viewport"
           onClick={app.zoomControls.onReset}
           type="button"
@@ -547,6 +561,7 @@ function CanvasEngineDemoSurface({
           <RotateCcw aria-hidden="true" size={14} strokeWidth={2} />
         </button>
         <button
+          {...CANVAS_TOOLBAR_ITEM_PROPS}
           aria-label="Unlock all"
           onClick={app.toolbar.commandHandlers.onUnlockAll}
           type="button"
@@ -580,6 +595,7 @@ function EnginePresentationControls({
   if (!active) {
     return (
       <button
+        {...CANVAS_TOOLBAR_ITEM_PROPS}
         aria-label="Enter presentation"
         disabled={count === 0}
         onClick={onEnter}
@@ -593,6 +609,7 @@ function EnginePresentationControls({
   return (
     <>
       <button
+        {...CANVAS_TOOLBAR_ITEM_PROPS}
         aria-label="Previous frame"
         onClick={onPrevious}
         type="button"
@@ -601,6 +618,7 @@ function EnginePresentationControls({
       </button>
       <span aria-label="Presentation frame">{index + 1}/{count}</span>
       <button
+        {...CANVAS_TOOLBAR_ITEM_PROPS}
         aria-label="Next frame"
         onClick={onNext}
         type="button"
@@ -608,6 +626,7 @@ function EnginePresentationControls({
         <ChevronRight aria-hidden="true" size={14} strokeWidth={2} />
       </button>
       <button
+        {...CANVAS_TOOLBAR_ITEM_PROPS}
         aria-label="Exit presentation"
         onClick={onExit}
         type="button"
