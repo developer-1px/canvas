@@ -330,6 +330,41 @@ export function getCanvasSelectedItemGroupIds<
   return groupIds
 }
 
+export function getCanvasFullySelectedItemGroupIds<
+  TItem,
+  TItemId extends string = string,
+  TGroupId extends string = string,
+>({
+  getItemGroupId,
+  getItemId,
+  isItemSelectable = () => true,
+  items,
+  selection,
+}: CanvasSelectionItemGroupsInput<TItem, TItemId, TGroupId>) {
+  const selected = new Set(selection)
+  const groupState = new Map<TGroupId, boolean>()
+  const groupIds: TGroupId[] = []
+
+  items.forEach((item, index) => {
+    const groupId = getItemGroupId(item, index) ?? undefined
+
+    if (groupId === undefined || !isItemSelectable(item, index)) {
+      return
+    }
+
+    if (!groupState.has(groupId)) {
+      groupState.set(groupId, true)
+      groupIds.push(groupId)
+    }
+
+    if (!selected.has(getItemId(item, index))) {
+      groupState.set(groupId, false)
+    }
+  })
+
+  return groupIds.filter((groupId) => groupState.get(groupId) === true)
+}
+
 export function getCanvasItemGroupMemberIds<
   TItem,
   TItemId extends string = string,

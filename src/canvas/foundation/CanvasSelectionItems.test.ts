@@ -4,6 +4,7 @@ import {
   cloneCanvasSelectionItems,
   deleteCanvasSelectionItems,
   getCanvasGroupedItemSelection,
+  getCanvasFullySelectedItemGroupIds,
   getCanvasGroupedItemPointerSelection,
   getCanvasItemGroupMemberIds,
   getCanvasItemGroupMemberIdsForGroup,
@@ -193,6 +194,26 @@ describe('CanvasSelectionItems', () => {
       items: sourceItems,
       selection: ['c', 'b', 'a', 'd'],
     })).toEqual(['group-a', 'group-b'])
+  })
+
+  it('returns fully selected group ids in item order', () => {
+    const sourceItems: TestItem[] = [
+      { groupId: 'group-b', id: 'b1', name: 'Beta 1' },
+      { groupId: 'group-a', id: 'a1', name: 'Alpha 1' },
+      { groupId: 'group-b', hidden: true, id: 'b2', name: 'Beta 2' },
+      { groupId: 'group-a', id: 'a2', name: 'Alpha 2' },
+      { groupId: 'group-c', id: 'c1', name: 'Gamma 1' },
+      { groupId: 'group-c', id: 'c2', name: 'Gamma 2' },
+      { id: 'd', name: 'Delta' },
+    ]
+
+    expect(getCanvasFullySelectedItemGroupIds({
+      getItemGroupId: (item) => item.groupId,
+      getItemId,
+      isItemSelectable: isVisible,
+      items: sourceItems,
+      selection: ['a2', 'b1', 'c1', 'a1', 'd'],
+    })).toEqual(['group-b', 'group-a'])
   })
 
   it('returns group member ids for a target item in item order', () => {

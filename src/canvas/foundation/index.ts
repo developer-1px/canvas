@@ -68,6 +68,7 @@ export {
 export {
   cloneCanvasSelectionItems,
   deleteCanvasSelectionItems,
+  getCanvasFullySelectedItemGroupIds,
   getCanvasGroupedItemSelection,
   getCanvasGroupedItemPointerSelection,
   getCanvasItemGroupMemberIds,
