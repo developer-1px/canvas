@@ -80,6 +80,14 @@ export {
   type CanvasRichClipboardWriteMode,
 } from './affordances/commands/CanvasRichClipboardIO'
 export {
+  centerCanvasViewportAtWorldPoint,
+  fitCanvasViewportToBounds,
+  fitCanvasViewportToItems,
+  resetCanvasViewport,
+  zoomCanvasViewport,
+  type CanvasViewportSetter,
+} from './affordances/interaction/viewport/CanvasViewportControlExecution'
+export {
   CanvasAppViewportOverlayLayer,
   type CanvasAppViewportOverlayLayerProps,
 } from './rendering/CanvasAppViewportOverlayLayer'

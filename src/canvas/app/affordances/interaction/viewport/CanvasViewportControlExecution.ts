@@ -5,7 +5,10 @@ import {
   zoomViewport,
   type CanvasViewportZoomDirection,
 } from '../../../../core'
-import type { Viewport } from '../../../../entities'
+import type {
+  Bounds,
+  Viewport,
+} from '../../../../entities'
 import type {
   CanvasAppStageElement,
   CanvasAppStageRect,
@@ -19,6 +22,12 @@ export type CanvasViewportSetter = (
 type FitCanvasViewportToItemsArgs = {
   ids?: string[]
   itemReadModel: CanvasAppItemReadModel
+  setViewport: CanvasViewportSetter
+  stageElement: CanvasAppStageElement
+}
+
+type FitCanvasViewportToBoundsArgs = {
+  bounds: Bounds | null | undefined
   setViewport: CanvasViewportSetter
   stageElement: CanvasAppStageElement
 }
@@ -52,7 +61,19 @@ export function fitCanvasViewportToItems({
     ids && ids.length > 0
       ? ids
       : itemReadModel.getAllIds()
-  const bounds = itemReadModel.getSelectionBounds(targetIds)
+
+  fitCanvasViewportToBounds({
+    bounds: itemReadModel.getSelectionBounds(targetIds),
+    setViewport,
+    stageElement,
+  })
+}
+
+export function fitCanvasViewportToBounds({
+  bounds,
+  setViewport,
+  stageElement,
+}: FitCanvasViewportToBoundsArgs) {
   const rect = stageElement.getRect()
 
   if (!bounds || !rect) {

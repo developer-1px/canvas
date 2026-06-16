@@ -17,6 +17,7 @@ import type {
 import type { CanvasAppItemReadModel } from '../../../workflow/CanvasAppItemReadModelContracts'
 import {
   centerCanvasViewportAtWorldPoint,
+  fitCanvasViewportToBounds,
   fitCanvasViewportToItems,
   resetCanvasViewport,
   type CanvasViewportSetter,
@@ -42,6 +43,22 @@ describe('CanvasViewportControlExecution', () => {
 
     expect(itemReadModel.getAllIds).not.toHaveBeenCalled()
     expect(itemReadModel.getSelectionBounds).toHaveBeenCalledWith(['item-2'])
+    expect(setViewport).toHaveBeenCalledWith(
+      fitBoundsIntoViewport(bounds, rect),
+    )
+  })
+
+  it('fits the viewport directly to provided bounds', () => {
+    const bounds = { h: 50, w: 100, x: 10, y: 20 }
+    const rect = createRect()
+    const setViewport = vi.fn<CanvasViewportSetter>()
+
+    fitCanvasViewportToBounds({
+      bounds,
+      setViewport,
+      stageElement: createStageElement(rect),
+    })
+
     expect(setViewport).toHaveBeenCalledWith(
       fitBoundsIntoViewport(bounds, rect),
     )
@@ -96,6 +113,25 @@ describe('CanvasViewportControlExecution', () => {
         allIds: ['item-1'],
         bounds: { h: 50, w: 100, x: 10, y: 20 },
       }),
+      setViewport: missingRectSetViewport,
+      stageElement: createStageElement(null),
+    })
+
+    expect(missingBoundsSetViewport).not.toHaveBeenCalled()
+    expect(missingRectSetViewport).not.toHaveBeenCalled()
+  })
+
+  it('ignores direct bounds fit requests when bounds or stage rect are missing', () => {
+    const missingBoundsSetViewport = vi.fn<CanvasViewportSetter>()
+    const missingRectSetViewport = vi.fn<CanvasViewportSetter>()
+
+    fitCanvasViewportToBounds({
+      bounds: null,
+      setViewport: missingBoundsSetViewport,
+      stageElement: createStageElement(createRect()),
+    })
+    fitCanvasViewportToBounds({
+      bounds: { h: 50, w: 100, x: 10, y: 20 },
       setViewport: missingRectSetViewport,
       stageElement: createStageElement(null),
     })
