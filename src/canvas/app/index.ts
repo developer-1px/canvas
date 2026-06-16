@@ -63,6 +63,13 @@ export {
   type CanvasSelectionListRangeInput,
 } from './affordances/controls/selection-list/CanvasSelectionListRange'
 export {
+  getCanvasFloatingAnchorForBounds,
+  type CanvasFloatingAnchor,
+  type CanvasFloatingAnchorForBoundsInput,
+  type CanvasFloatingAnchorPlacement,
+  type CanvasFloatingAnchorSize,
+} from './affordances/controls/floating-anchor/CanvasFloatingAnchor'
+export {
   CANVAS_RICH_CLIPBOARD_DEFAULT_FALLBACK_HTML,
   CANVAS_RICH_CLIPBOARD_JSON_SCRIPT_ATTRIBUTE,
   CANVAS_RICH_CLIPBOARD_ROOT_ATTRIBUTE,
