@@ -27,10 +27,15 @@ export {
 } from './CanvasImageExport'
 export {
   createCanvasImportedImageItem,
+  getCanvasDataImageSourceFromDataTransfer,
   getCanvasImageFileFromDataTransfer,
   getCanvasImageFileFromList,
+  getCanvasImageSourceFromDataTransfer,
+  getCanvasSVGImageSourceFromDataTransfer,
   isCanvasImageBlob,
   readCanvasImageFileSource,
+  resolveCanvasImageSourceNaturalSize,
+  type CanvasImageImportFormat,
   type CanvasImageImportSource,
   type CanvasImportedImageItemInput,
 } from './CanvasImageImport'

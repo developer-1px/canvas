@@ -18,7 +18,9 @@ import {
 import {
   getCanvasImageFileFromDataTransfer,
   getCanvasImageFileFromList,
+  getCanvasImageSourceFromDataTransfer,
   readCanvasImageFileSource,
+  resolveCanvasImageSourceNaturalSize,
   type CanvasImageImportSource,
 } from './CanvasImageImport'
 import {
@@ -146,12 +148,19 @@ export function useCanvasImageControls({
     const handlePaste = (event: ClipboardEvent) => {
       const file = getCanvasImageFileFromDataTransfer(event.clipboardData)
 
-      if (!file) {
+      if (file) {
+        event.preventDefault()
+        void insertImageFile(file)
         return
       }
 
-      event.preventDefault()
-      void insertImageFile(file)
+      const source = getCanvasImageSourceFromDataTransfer(event.clipboardData)
+
+      if (source) {
+        event.preventDefault()
+        void resolveCanvasImageSourceNaturalSize(source)
+          .then((resolvedSource) => insertImageSource(resolvedSource))
+      }
     }
 
     window.addEventListener('paste', handlePaste)
@@ -159,7 +168,7 @@ export function useCanvasImageControls({
     return () => {
       window.removeEventListener('paste', handlePaste)
     }
-  }, [canPasteImage, insertImageFile])
+  }, [canPasteImage, insertImageFile, insertImageSource])
 
   useEffect(() => {
     if (!canUploadImage) {
