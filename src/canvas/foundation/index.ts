@@ -75,6 +75,7 @@ export {
   getCanvasSelectableItemIds,
   getCanvasSelectedItemGroupIds,
   getCanvasSelectedItemIds,
+  getCanvasSelectedItems,
   mapCanvasSelectionItems,
   removeCanvasSelectionIds,
   ungroupCanvasSelectionItems,

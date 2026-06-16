@@ -10,6 +10,7 @@ import {
   getCanvasSelectableItemIds,
   getCanvasSelectedItemGroupIds,
   getCanvasSelectedItemIds,
+  getCanvasSelectedItems,
   mapCanvasSelectionItems,
   removeCanvasSelectionIds,
   ungroupCanvasSelectionItems,
@@ -46,6 +47,18 @@ describe('CanvasSelectionItems', () => {
       items,
       selection: ['d', 'b', 'a'],
     })).toEqual(['a', 'd'])
+  })
+
+  it('returns selected selectable items in item order', () => {
+    expect(getCanvasSelectedItems({
+      getItemId,
+      isItemSelectable: isEditable,
+      items,
+      selection: ['d', 'missing', 'b', 'a', 'd'],
+    })).toMatchObject([
+      { id: 'a' },
+      { id: 'd' },
+    ])
   })
 
   it('deletes selected editable items while preserving selected locked items', () => {

@@ -168,6 +168,21 @@ export function getCanvasSelectedItemIds<
   return ids
 }
 
+export function getCanvasSelectedItems<
+  TItem,
+  TItemId extends string = string,
+>({
+  getItemId,
+  isItemSelectable = () => true,
+  items,
+  selection,
+}: CanvasSelectionItemsInput<TItem, TItemId>) {
+  const selected = new Set(selection)
+
+  return items.filter((item, index) =>
+    selected.has(getItemId(item, index)) && isItemSelectable(item, index))
+}
+
 export function deleteCanvasSelectionItems<
   TItem,
   TItemId extends string = string,
