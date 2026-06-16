@@ -15,12 +15,12 @@ export default defineConfig({
   testDir: './e2e',
   testMatch: '**/*.e2e.ts',
   use: {
-    baseURL: 'http://127.0.0.1:53173',
+    baseURL: 'http://127.0.0.1:53175',
     trace: 'on-first-retry',
   },
   webServer: {
-    command: 'pnpm exec vite --force --host 127.0.0.1 --port 53173',
-    reuseExistingServer: false,
-    url: 'http://127.0.0.1:53173',
+    command: 'pnpm exec vite --force --host 127.0.0.1 --port 53175',
+    reuseExistingServer: !process.env.CI,
+    url: 'http://127.0.0.1:53175',
   },
 })

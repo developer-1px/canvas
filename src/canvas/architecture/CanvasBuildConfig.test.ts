@@ -69,8 +69,8 @@ describe('Canvas build config', () => {
   it('forces e2e dev server dependency optimization for linked packages', () => {
     expect(e2eConfig.webServer).toMatchObject({
       command: expect.stringContaining('--force'),
-      reuseExistingServer: false,
-      url: 'http://127.0.0.1:53173',
+      reuseExistingServer: !process.env.CI,
+      url: 'http://127.0.0.1:53175',
     })
   })
 })
