@@ -145,6 +145,11 @@ export {
   moveCanvasSelection,
   normalizeCanvasRotationDegrees,
   resizeCanvasSelection,
+  resizeCanvasSelectionItems,
+  translateCanvasSelectionItems,
+  type CanvasSelectionBoundsResizeInput,
+  type CanvasSelectionBoundsTransformInput,
+  type CanvasSelectionBoundsTranslateInput,
   type CanvasTransformAdapter,
   type CanvasTransformItem,
 } from './CanvasTransformEngine'

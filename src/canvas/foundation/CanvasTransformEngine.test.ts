@@ -4,6 +4,8 @@ import {
   moveCanvasSelection,
   normalizeCanvasRotationDegrees,
   resizeCanvasSelection,
+  resizeCanvasSelectionItems,
+  translateCanvasSelectionItems,
   type CanvasTransformAdapter,
 } from './CanvasTransformEngine'
 
@@ -60,6 +62,46 @@ describe('CanvasTransformEngine', () => {
     ])
   })
 
+  it('translates selected item bounds through host callbacks', () => {
+    const other = { h: 10, id: 'other', w: 20, x: 30, y: 40 }
+
+    expect(translateCanvasSelectionItems({
+      dx: 5,
+      dy: -3,
+      getItemBounds,
+      getItemId,
+      items: [
+        { h: 10, id: 'selected', w: 20, x: 1, y: 2 },
+        other,
+      ],
+      selection: ['selected'],
+      updateItemBounds,
+    })).toEqual([
+      { h: 10, id: 'selected', w: 20, x: 6, y: -1 },
+      other,
+    ])
+  })
+
+  it('resizes selected item bounds through host callbacks', () => {
+    const other = { h: 10, id: 'other', w: 20, x: 30, y: 40 }
+
+    expect(resizeCanvasSelectionItems({
+      from: { h: 20, w: 40, x: 10, y: 10 },
+      getItemBounds,
+      getItemId,
+      items: [
+        { h: 20, id: 'selected', w: 40, x: 10, y: 10 },
+        other,
+      ],
+      selection: ['selected'],
+      to: { h: 40, w: 60, x: 10, y: 10 },
+      updateItemBounds,
+    })).toEqual([
+      { h: 40, id: 'selected', w: 60, x: 10, y: 10 },
+      other,
+    ])
+  })
+
   it('normalizes rotation degrees for transform hosts', () => {
     expect(normalizeCanvasRotationDegrees(45.1234)).toBe(45.123)
     expect(normalizeCanvasRotationDegrees(-45)).toBe(315)
@@ -68,3 +110,26 @@ describe('CanvasTransformEngine', () => {
     expect(normalizeCanvasRotationDegrees(Number.NaN)).toBe(0)
   })
 })
+
+function getItemBounds(item: TransformTestItem) {
+  return {
+    h: item.h,
+    w: item.w,
+    x: item.x,
+    y: item.y,
+  }
+}
+
+function getItemId(item: TransformTestItem) {
+  return item.id
+}
+
+function updateItemBounds(
+  item: TransformTestItem,
+  bounds: ReturnType<typeof getItemBounds>,
+) {
+  return {
+    ...item,
+    ...bounds,
+  }
+}
