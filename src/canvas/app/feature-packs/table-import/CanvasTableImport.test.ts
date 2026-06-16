@@ -3,7 +3,10 @@ import {
   getCanvasTableCsvSourceFromDataTransfer,
   getCanvasTableCsvSourceFromText,
   getCanvasTableInsertCenter,
+  getCanvasTableSourceFromDataTransfer,
+  getCanvasTableSourceFromHTML,
   insertCanvasTableSource,
+  readCanvasTableFileSource,
 } from './CanvasTableImport'
 
 describe('CanvasTableImport', () => {
@@ -48,6 +51,72 @@ describe('CanvasTableImport', () => {
         ['1', '2'],
       ],
     })
+  })
+
+  it('reads TSV table text before other clipboard table formats', () => {
+    const dataTransfer = {
+      getData: vi.fn((type: string) => ({
+        'text/csv': 'Wrong,Value\n3,4',
+        'text/plain': 'Plain\tValue\n5\t6',
+        'text/tab-separated-values': 'Metric\tValue\nUsers\t42',
+      })[type] ?? ''),
+    } as unknown as DataTransfer
+
+    expect(getCanvasTableSourceFromDataTransfer(dataTransfer)).toEqual({
+      format: 'text-tsv',
+      rows: [
+        ['Metric', 'Value'],
+        ['Users', '42'],
+      ],
+    })
+  })
+
+  it('reads TSV table files into import sources', async () => {
+    const file = Object.assign(
+      new Blob(['Metric\tValue\nUsers\t42'], {
+        type: 'text/tab-separated-values',
+      }),
+      { name: 'metrics.tsv' },
+    )
+
+    await expect(readCanvasTableFileSource(file)).resolves.toEqual({
+      format: 'text-tsv',
+      name: 'metrics.tsv',
+      rows: [
+        ['Metric', 'Value'],
+        ['Users', '42'],
+      ],
+    })
+  })
+
+  it('parses HTML table clipboard markup into import sources', () => {
+    expect(getCanvasTableSourceFromHTML(`
+      <table>
+        <thead>
+          <tr><th>Phase</th><th>Owner</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Design &amp; QA</td>
+            <td>Mina&nbsp;Kim<script>ignored()</script></td>
+          </tr>
+          <tr><td colspan="2">Ship</td></tr>
+        </tbody>
+      </table>
+    `)).toEqual({
+      format: 'text-html',
+      rows: [
+        ['Phase', 'Owner'],
+        ['Design & QA', 'Mina Kim'],
+        ['Ship', ''],
+      ],
+    })
+  })
+
+  it('ignores HTML that is not a useful table', () => {
+    expect(getCanvasTableSourceFromHTML('<p>hello</p>')).toBeNull()
+    expect(getCanvasTableSourceFromHTML('<table><tr><td>One</td></tr></table>'))
+      .toBeNull()
   })
 
   it('inserts imported tables centered on viewport or drop point', () => {

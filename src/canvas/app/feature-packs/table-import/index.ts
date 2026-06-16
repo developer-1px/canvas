@@ -3,13 +3,20 @@ import {
 } from '../CanvasAppFeaturePackManifests'
 
 export {
+  getCanvasTableFileFromDataTransfer,
+  getCanvasTableFileFromList,
   getCanvasTableCsvFileFromDataTransfer,
   getCanvasTableCsvFileFromList,
   getCanvasTableCsvSourceFromDataTransfer,
   getCanvasTableCsvSourceFromText,
   getCanvasTableInsertCenter,
+  getCanvasTableSourceFromDataTransfer,
+  getCanvasTableSourceFromHTML,
+  getCanvasTableSourceFromText,
   insertCanvasTableSource,
   readCanvasTableCsvFileSource,
+  readCanvasTableFileSource,
+  type CanvasTableImportFormat,
   type CanvasTableImportSource,
   type CanvasTableInsertCenterInput,
   type CanvasTableInsertionContext,
