@@ -17,6 +17,7 @@ import {
   getFigmaCloneDomRootId,
   getFigmaCloneDomText,
   isFigmaCloneDomGridContainer,
+  isFigmaCloneDomOutOfFlowNode,
   resolveFigmaCloneDomClickTarget,
   type FigmaCloneDomEditState,
   type FigmaCloneDomNodeId,
@@ -333,6 +334,12 @@ function renderWorkspacePage(
           className="figma-dom-workspace__hero"
           {...createDomNodeProps(state, selectedNodeId, 'workspaceHero')}
         >
+          <span
+            className="figma-dom-workspace__floating-note"
+            {...createDomNodeProps(state, selectedNodeId, 'workspaceFloatingNote')}
+          >
+            {getFigmaCloneDomText(textState, 'workspaceFloatingNote')}
+          </span>
           <div
             className="figma-dom-workspace__hero-copy"
             {...createDomNodeProps(state, selectedNodeId, 'workspaceHeroCopy')}
@@ -1726,6 +1733,7 @@ function createNodeStyle(
     parentUsesFlex && parentDirection === 'column' && style.heightMode === 'fill'
   const shouldGrowInParent = fillsParentRow || fillsParentColumn
   const usesAuthoredWrapSize = usesFigmaCloneAuthoredWrapSize(nodeId)
+  const isOutOfFlow = isFigmaCloneDomOutOfFlowNode(nodeId)
 
   return {
     alignItems: canUseAutoLayout ? mapFigmaCloneAutoLayoutAlign(style.align) : undefined,
@@ -1755,6 +1763,7 @@ function createNodeStyle(
     justifyContent: canUseAutoLayout
       ? mapFigmaCloneAutoLayoutDistribution(style.distribution)
       : undefined,
+    left: isOutOfFlow ? style.x : undefined,
     margin: style.margin,
     minHeight: style.heightMode === 'fill' ? 0 : undefined,
     minWidth: style.widthMode === 'fill' ? 0 : undefined,
@@ -1764,6 +1773,8 @@ function createNodeStyle(
     paddingLeft: style.paddingLeft,
     paddingRight: style.paddingRight,
     paddingTop: style.paddingTop,
+    position: isOutOfFlow ? 'absolute' : undefined,
+    top: isOutOfFlow ? style.y : undefined,
     width: fillsParentRow
       ? 0
       : usesAuthoredWrapSize

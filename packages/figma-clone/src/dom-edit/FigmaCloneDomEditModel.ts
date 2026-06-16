@@ -45,6 +45,7 @@ export type FigmaCloneDomNodeId =
   | 'workspaceSearch'
   | 'workspaceProfile'
   | 'workspaceHero'
+  | 'workspaceFloatingNote'
   | 'workspaceHeroCopy'
   | 'workspaceHeroTitle'
   | 'workspaceHeroText'
@@ -321,6 +322,7 @@ export const FIGMA_CLONE_DOM_TREE: readonly FigmaCloneDomNode[] = [
             id: 'workspaceHero',
             label: 'Hero panel',
             children: [
+              { id: 'workspaceFloatingNote', label: 'Floating note' },
               {
                 id: 'workspaceHeroCopy',
                 label: 'Hero copy',
@@ -949,6 +951,16 @@ const DEFAULT_STYLES = mapFigmaCloneDomEditState(
     radius: 18,
     w: 628,
     widthMode: 'fill',
+  },
+  workspaceFloatingNote: {
+    ...EMPTY_STYLE,
+    ...FIXED_BOX_LAYOUT,
+    h: 32,
+    padding: 10,
+    radius: 10,
+    w: 124,
+    x: 484,
+    y: 14,
   },
   workspaceHeroCopy: {
     ...EMPTY_STYLE,
@@ -2066,6 +2078,7 @@ const DEFAULT_TEXT: FigmaCloneDomTextState = {
   workspaceBrandMark: 'C',
   workspaceBrandText: 'CoreOS',
   workspaceBreadcrumb: 'Workspace / Growth',
+  workspaceFloatingNote: 'Absolute',
   workspaceDealOneTitle: 'Acme rollout',
   workspaceDealOneValue: '$84k',
   workspaceDealThreeTitle: 'Helio expansion',
@@ -2484,6 +2497,7 @@ function getFigmaCloneDomContentType(
     nodeId === 'workspaceNavCustomers' ||
     nodeId === 'workspaceSearch' ||
     nodeId === 'workspaceProfile' ||
+    nodeId === 'workspaceFloatingNote' ||
     nodeId === 'workspacePrimaryAction' ||
     nodeId === 'workspaceSecondaryAction' ||
     nodeId === 'workspaceAudienceTagEnterprise' ||
@@ -2595,9 +2609,19 @@ function getFigmaCloneDomPosition(): FigmaCloneDomPosition {
   return 'static'
 }
 
+export function isFigmaCloneDomOutOfFlowNode(
+  nodeId: FigmaCloneDomNodeId,
+) {
+  return nodeId === 'workspaceFloatingNote'
+}
+
 function getFigmaCloneDomRuntimePosition(
   nodeId: FigmaCloneDomNodeId,
 ): FigmaCloneDomPosition | null {
+  if (isFigmaCloneDomOutOfFlowNode(nodeId)) {
+    return 'absolute'
+  }
+
   if (typeof document === 'undefined') {
     return null
   }

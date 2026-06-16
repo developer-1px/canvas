@@ -11,6 +11,8 @@ import {
   type InteractionKeyTargetKind,
 } from '@interactive-os/interaction/runtime'
 import Moveable, {
+  type OnDrag,
+  type OnDragStart,
   type OnResize,
   type OnResizeStart,
 } from 'react-moveable'
@@ -35,6 +37,7 @@ import {
   type DomEditScaledOverlayRect,
 } from '../../../shared/geometry/DomEditOverlayGeometry'
 import {
+  constrainDomEditMoveableDrag,
   readDomEditMoveableTuple,
   resolveDomEditResizeSize,
 } from '../../../shared/gesture/DomEditOverlayGesture'
@@ -61,6 +64,7 @@ type DomEditResizeSessionData = {
   fixedHeight?: boolean
   fixedWidth?: boolean
   startSize?: number[]
+  startPosition?: number[]
 }
 
 type DomEditXrayHoverTarget<TNodeId extends DomEditNodeId> = {
@@ -489,7 +493,7 @@ export function DomEditSelectionOverlay<
           ref={moveableRef}
           className="figma-dom-moveable"
           container={shellElement ?? undefined}
-          draggable={false}
+          draggable
           isDisplaySnapDigit
           renderDirections={['e', 's', 'se']}
           resizable
@@ -506,6 +510,33 @@ export function DomEditSelectionOverlay<
           useMutationObserver
           useResizeObserver
           zoom={1}
+          onDrag={(event: OnDrag) => {
+            const startPosition = readDomEditMoveableTuple(
+              event.datas.startPosition,
+              [style.x, style.y],
+            )
+            const translate = readDomEditMoveableTuple(
+              event.beforeTranslate,
+              [0, 0],
+            )
+            const nextPosition = constrainDomEditMoveableDrag({
+              current: [
+                startPosition[0] + translate[0] / rect.scale,
+                startPosition[1] + translate[1] / rect.scale,
+              ],
+              isConstrained: event.inputEvent?.shiftKey === true,
+              start: startPosition,
+            })
+
+            changeField('x', nextPosition[0])
+            changeField('y', nextPosition[1])
+          }}
+          onDragStart={(event: OnDragStart) => {
+            startDirectManipulation()
+            event.datas.startPosition = [style.x, style.y]
+            event.set([0, 0])
+          }}
+          onDragEnd={endDirectManipulation}
           onResize={(event: OnResize) => {
             if (!hasDomEditResizeDelta(event.dist, rect.scale)) {
               return

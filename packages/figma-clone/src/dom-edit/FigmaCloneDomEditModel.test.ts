@@ -154,12 +154,15 @@ describe('FigmaCloneDomEditModel', () => {
     expect(getFigmaCloneDomEditStyle(state, 'noticeContent').widthMode).toBe('fill')
     expect(getFigmaCloneDomEditStyle(state, 'workspaceBrandMark').widthMode).toBe('fixed')
     expect(getFigmaCloneDomEditStyle(state, 'workspaceBrandMark').heightMode).toBe('fixed')
+    expect(getFigmaCloneDomEditStyle(state, 'workspaceFloatingNote').widthMode).toBe('fixed')
+    expect(getFigmaCloneDomEditStyle(state, 'workspaceFloatingNote').heightMode).toBe('fixed')
     expect(getFigmaCloneDomEditStyle(state, 'homeBrandMark').widthMode).toBe('fixed')
     expect(getFigmaCloneDomEditStyle(state, 'homeBrandMark').heightMode).toBe('fixed')
     expect(getFigmaCloneDomEditStyle(state, 'avatar').widthMode).toBe('fixed')
     expect(getFigmaCloneDomEditStyle(state, 'avatar').heightMode).toBe('fixed')
     expect(fixedNodes).toEqual([
       'workspaceBrandMark',
+      'workspaceFloatingNote',
       'homeBrandMark',
       'avatar',
       'noticeIcon',
@@ -170,6 +173,7 @@ describe('FigmaCloneDomEditModel', () => {
     const card = getFigmaCloneDomLayoutContext('card')
     const header = getFigmaCloneDomLayoutContext('header')
     const avatar = getFigmaCloneDomLayoutContext('avatar')
+    const floatingNote = getFigmaCloneDomLayoutContext('workspaceFloatingNote')
 
     expect(card.display).toBe('flex')
     expect(card.parentDisplay).toBeNull()
@@ -187,6 +191,10 @@ describe('FigmaCloneDomEditModel', () => {
     expect(avatar.showGeometry).toBe(true)
     expect(avatar.showSelfLayout).toBe(false)
     expect(avatar.showParentParticipation).toBe(true)
+
+    expect(floatingNote.parentDisplay).toBe('flex')
+    expect(floatingNote.position).toBe('absolute')
+    expect(floatingNote.showGeometry).toBe(true)
   })
 
   it('projects grid containers separately from flex auto layout', () => {
