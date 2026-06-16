@@ -43,6 +43,12 @@ export type SlideEditObjectHyperlinkValidation = {
     | 'unsupported-scheme'
 }
 
+export type SlideEditObjectHyperlinkUrlStoragePolicy = {
+  blockedSchemes?: readonly string[]
+  maxLength?: number
+  rejectControlCharacters?: boolean
+}
+
 export type SlideEditObjectHyperlinkMetadata = {
   attribute: typeof SLIDE_EDIT_OBJECT_HYPERLINK_DATA_ATTRIBUTE
   attributeValue: string
@@ -343,6 +349,44 @@ export function toSlideEditObjectHyperlinkAttributeValue(
   return JSON.stringify(normalizedHyperlink)
 }
 
+export function normalizeSlideEditObjectHyperlinkStorageUrl(
+  value: string | null | undefined,
+  {
+    blockedSchemes = [],
+    maxLength,
+    rejectControlCharacters = true,
+  }: SlideEditObjectHyperlinkUrlStoragePolicy = {},
+) {
+  const trimmedValue = value?.trim() ?? ''
+  const normalizedValue = typeof maxLength === 'number'
+    ? trimmedValue.slice(0, Math.max(0, maxLength))
+    : trimmedValue
+
+  if (!normalizedValue) {
+    return null
+  }
+
+  if (
+    rejectControlCharacters &&
+    hasSlideEditObjectHyperlinkControlCharacter(normalizedValue)
+  ) {
+    return null
+  }
+
+  const scheme = getSlideEditObjectHyperlinkScheme(normalizedValue)
+
+  if (
+    scheme &&
+    blockedSchemes.map((blockedScheme) =>
+      blockedScheme.toLowerCase()
+    ).includes(scheme)
+  ) {
+    return null
+  }
+
+  return normalizedValue
+}
+
 function normalizeSlideEditObjectHyperlinkTarget(
   value: string | null | undefined,
 ): SlideEditObjectHyperlinkTarget {
@@ -365,4 +409,12 @@ function normalizeSlideEditObjectHyperlinkUrl(
 
 function getSlideEditObjectHyperlinkScheme(url: string) {
   return url.match(/^([a-z][a-z0-9+.-]*):/i)?.[1]?.toLowerCase() ?? null
+}
+
+function hasSlideEditObjectHyperlinkControlCharacter(value: string) {
+  return [...value].some((char) => {
+    const code = char.charCodeAt(0)
+
+    return code <= 31 || code === 127
+  })
 }

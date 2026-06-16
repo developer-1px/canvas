@@ -298,6 +298,7 @@ export {
   normalizeSlideEditObjectHyperlink,
   normalizeSlideEditObjectHyperlinkCommand,
   normalizeSlideEditObjectHyperlinkFieldValue,
+  normalizeSlideEditObjectHyperlinkStorageUrl,
   shouldEmitSlideEditObjectHyperlinkMetadata,
   SLIDE_EDIT_OBJECT_HYPERLINK_ALLOWED_SCHEMES,
   SLIDE_EDIT_OBJECT_HYPERLINK_DATA_ATTRIBUTE,
@@ -319,6 +320,7 @@ export {
   type SlideEditObjectHyperlinkTarget,
   type SlideEditObjectHyperlinkTargetOption,
   type SlideEditObjectHyperlinkUpdateCommand,
+  type SlideEditObjectHyperlinkUrlStoragePolicy,
   type SlideEditObjectHyperlinkValidation,
 } from './SlideEditObjectHyperlink'
 export {
