@@ -66,6 +66,15 @@ export {
   type CanvasSameTypeSelectionInput,
 } from './CanvasSameTypeSelection'
 export {
+  deleteCanvasSelectionItems,
+  getCanvasSelectableItemIds,
+  getCanvasSelectedItemIds,
+  mapCanvasSelectionItems,
+  type CanvasSelectionItemsChangeInput,
+  type CanvasSelectionItemsInput,
+  type CanvasSelectionMapItemsInput,
+} from './CanvasSelectionItems'
+export {
   alignCanvasSelectionItems,
   canAlignCanvasSelectionItems,
   canDistributeCanvasSelectionItems,
