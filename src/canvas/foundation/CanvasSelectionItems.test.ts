@@ -14,6 +14,7 @@ import {
   getCanvasSelectedItemGroupIds,
   getCanvasSelectedItemIds,
   getCanvasSelectedItems,
+  groupCanvasSelectionItems,
   mapCanvasSelectionItems,
   removeCanvasSelectionIds,
   ungroupCanvasSelectionItems,
@@ -179,6 +180,41 @@ describe('CanvasSelectionItems', () => {
       },
     ])
     expect(createdGroupIds).toEqual(['group-a-copy'])
+  })
+
+  it('groups selected selectable items and returns grouped ids in item order', () => {
+    const result = groupCanvasSelectionItems({
+      getItemId,
+      groupId: 'group-new',
+      groupItem: ({ groupId, item }) => ({ ...item, groupId }),
+      isItemSelectable: isEditable,
+      items: [...items],
+      selection: ['d', 'b', 'a'],
+    })
+
+    expect(result.items).toEqual([
+      { groupId: 'group-new', id: 'a', name: 'Alpha' },
+      { id: 'b', locked: true, name: 'Beta' },
+      { hidden: true, id: 'c', name: 'Gamma' },
+      { groupId: 'group-new', id: 'd', name: 'Delta' },
+    ])
+    expect(result.selection).toEqual(['a', 'd'])
+  })
+
+  it('keeps source items and selection when fewer than two items can be grouped', () => {
+    const sourceItems = [...items]
+    const selection = ['a', 'b']
+    const result = groupCanvasSelectionItems({
+      getItemId,
+      groupId: 'group-new',
+      groupItem: ({ groupId, item }) => ({ ...item, groupId }),
+      isItemSelectable: isEditable,
+      items: sourceItems,
+      selection,
+    })
+
+    expect(result.items).toBe(sourceItems)
+    expect(result.selection).toEqual(selection)
   })
 
   it('returns selected group ids once in item order', () => {

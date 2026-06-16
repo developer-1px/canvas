@@ -62,6 +62,28 @@ export type CanvasSelectionCloneItemsInput<
   getItemGroupId?: (item: TItem, index: number) => TGroupId | null | undefined
 }
 
+export type CanvasSelectionGroupItemInput<
+  TItem,
+  TItemId extends string = string,
+  TGroupId extends string = string,
+> = {
+  groupId: TGroupId
+  id: TItemId
+  index: number
+  item: TItem
+}
+
+export type CanvasSelectionGroupItemsInput<
+  TItem,
+  TItemId extends string = string,
+  TGroupId extends string = string,
+> = CanvasSelectionItemsChangeInput<TItem, TItemId> & {
+  groupId: TGroupId
+  groupItem: (
+    input: CanvasSelectionGroupItemInput<TItem, TItemId, TGroupId>,
+  ) => TItem
+}
+
 export type CanvasSelectionItemGroupsInput<
   TItem,
   TItemId extends string = string,
@@ -310,6 +332,47 @@ export function cloneCanvasSelectionItems<
   })
 
   return clones
+}
+
+export function groupCanvasSelectionItems<
+  TItem,
+  TItemId extends string = string,
+  TGroupId extends string = string,
+>({
+  getItemId,
+  groupId,
+  groupItem,
+  isItemSelectable,
+  items,
+  selection,
+}: CanvasSelectionGroupItemsInput<TItem, TItemId, TGroupId>) {
+  const selectedItemIds = getCanvasSelectedItemIds({
+    getItemId,
+    isItemSelectable,
+    items,
+    selection,
+  })
+
+  if (selectedItemIds.length < 2) {
+    return { items, selection: [...selection] }
+  }
+
+  return {
+    items: mapCanvasSelectionItems({
+      getItemId,
+      isItemSelectable,
+      items,
+      mapItem: (item, index) =>
+        groupItem({
+          groupId,
+          id: getItemId(item, index),
+          index,
+          item,
+        }),
+      selection: selectedItemIds,
+    }),
+    selection: selectedItemIds,
+  }
 }
 
 export function getCanvasSelectedItemGroupIds<
