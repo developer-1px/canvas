@@ -373,7 +373,9 @@ export {
 } from './SlideEditObjectShadow'
 export {
   createSlideEditObjectStrokeLineStyleDescriptor,
+  getSlideEditObjectStrokeLineStyleBorderStyle,
   getSlideEditObjectStrokeLineStyleCommandEffect,
+  getSlideEditObjectStrokeLineStyleDashArray,
   getSlideEditObjectStrokeLineStyleMetadata,
   isSlideEditObjectStrokeLineStyleValue,
   normalizeSlideEditObjectStrokeLineStyle,
@@ -382,6 +384,7 @@ export {
   SLIDE_EDIT_OBJECT_STROKE_LINE_STYLE_DEFAULT,
   SLIDE_EDIT_OBJECT_STROKE_LINE_STYLE_FIELD,
   SLIDE_EDIT_OBJECT_STROKE_LINE_STYLE_OPTIONS,
+  type SlideEditObjectStrokeLineStyleBorderStyle,
   type SlideEditObjectStrokeLineStyleDescriptor,
   type SlideEditObjectStrokeLineStyleFieldDescriptor,
   type SlideEditObjectStrokeLineStyleHostCommandEffect,

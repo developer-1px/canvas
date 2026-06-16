@@ -15,6 +15,11 @@ export type SlideEditObjectStrokeLineStyleOption = {
   label: string
 }
 
+export type SlideEditObjectStrokeLineStyleBorderStyle =
+  | 'dashed'
+  | 'dotted'
+  | 'solid'
+
 export type SlideEditObjectStrokeLineStyleFieldDescriptor = {
   commandId: 'update-object-stroke-line-style'
   control: 'stroke-line-style-segmented-control'
@@ -205,6 +210,48 @@ export function normalizeSlideEditObjectStrokeLineStyle(
   }
 
   return SLIDE_EDIT_OBJECT_STROKE_LINE_STYLE_DEFAULT
+}
+
+export function getSlideEditObjectStrokeLineStyleBorderStyle(
+  value: string | null | undefined,
+): SlideEditObjectStrokeLineStyleBorderStyle {
+  const lineStyle = normalizeSlideEditObjectStrokeLineStyle(value)
+
+  if (lineStyle === 'dash') {
+    return 'dashed'
+  }
+
+  if (lineStyle === 'dot') {
+    return 'dotted'
+  }
+
+  return 'solid'
+}
+
+export function getSlideEditObjectStrokeLineStyleDashArray({
+  strokeWidth,
+  value,
+}: {
+  strokeWidth: number
+  value: string | null | undefined
+}) {
+  const lineStyle = normalizeSlideEditObjectStrokeLineStyle(value)
+  const normalizedWidth = Number.isFinite(strokeWidth)
+    ? Math.max(0, strokeWidth)
+    : 1
+
+  if (lineStyle === 'dash') {
+    return [
+      Math.max(4, normalizedWidth * 3),
+      Math.max(3, normalizedWidth * 2),
+    ].join(' ')
+  }
+
+  if (lineStyle === 'dot') {
+    return `1 ${Math.max(3, normalizedWidth * 2)}`
+  }
+
+  return undefined
 }
 
 export function isSlideEditObjectStrokeLineStyleValue(
