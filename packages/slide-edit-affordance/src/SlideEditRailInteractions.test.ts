@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest'
 
 import {
   createSlideEditRailDescriptor,
+  createSlideEditRailListboxDescriptor,
   getSlideEditRailKeyboardCommandEffect,
+  getSlideEditRailListboxKeyboardIntent,
   getSlideEditRailPointerCommandEffect,
   SLIDE_EDIT_RAIL_COMMANDS,
 } from './SlideEditRailInteractions'
@@ -25,6 +27,13 @@ describe('SlideEditRailInteractions', () => {
 
     expect(descriptor.activeSlideId).toBe('slide-b')
     expect(descriptor.slideOrder).toEqual(slideOrder)
+    expect(descriptor.listbox).toMatchObject({
+      activeOptionId: 'slide-rail-option-1',
+      focusableOptionId: 'slide-rail-option-1',
+      keyboardModel: 'aria-listbox-roving-focus',
+      role: 'listbox',
+      selectionMode: 'single',
+    })
     expect(descriptor.thumbnails[1]).toEqual({
       bounds: {
         h: 72,
@@ -42,6 +51,52 @@ describe('SlideEditRailInteractions', () => {
       isActive: true,
       slideId: 'slide-b',
     })
+  })
+
+  it('derives APG listbox option selected and roving focus state', () => {
+    expect(createSlideEditRailListboxDescriptor({
+      activeSlideId: 'slide-b',
+      slideOrder,
+    })).toEqual({
+      activeOptionId: 'slide-rail-option-1',
+      focusableOptionId: 'slide-rail-option-1',
+      keyboardModel: 'aria-listbox-roving-focus',
+      options: [
+        {
+          id: 'slide-rail-option-0',
+          index: 0,
+          isActive: false,
+          isFocusable: false,
+          isSelected: false,
+          slideId: 'slide-a',
+          tabIndex: -1,
+        },
+        {
+          id: 'slide-rail-option-1',
+          index: 1,
+          isActive: true,
+          isFocusable: true,
+          isSelected: true,
+          slideId: 'slide-b',
+          tabIndex: 0,
+        },
+        {
+          id: 'slide-rail-option-2',
+          index: 2,
+          isActive: false,
+          isFocusable: false,
+          isSelected: false,
+          slideId: 'slide-c',
+          tabIndex: -1,
+        },
+      ],
+      role: 'listbox',
+      selectionMode: 'single',
+    })
+    expect(createSlideEditRailListboxDescriptor({
+      activeSlideId: null,
+      slideOrder,
+    }).focusableOptionId).toBe('slide-rail-option-0')
   })
 
   it('defines rail command descriptors without slide model fields', () => {
@@ -71,6 +126,21 @@ describe('SlideEditRailInteractions', () => {
       selection: {
         objectIds: [],
         slideId: 'slide-c',
+      },
+      type: 'slide-command-effect',
+    })
+    expect(getSlideEditRailKeyboardCommandEffect({
+      boundary: 'first',
+      slideOrder,
+      type: 'select-boundary',
+    })).toEqual({
+      payload: {
+        id: 'select-active-slide',
+        slideId: 'slide-a',
+      },
+      selection: {
+        objectIds: [],
+        slideId: 'slide-a',
       },
       type: 'slide-command-effect',
     })
@@ -105,6 +175,73 @@ describe('SlideEditRailInteractions', () => {
         slideId: 'slide-a',
       },
       type: 'slide-command-effect',
+    })
+  })
+
+  it('maps listbox keys to relative, boundary, and activation intents', () => {
+    expect(getSlideEditRailListboxKeyboardIntent({
+      activeSlideId: 'slide-b',
+      key: 'ArrowDown',
+      slideOrder,
+    })).toEqual({
+      activeSlideId: 'slide-b',
+      direction: 'next',
+      slideOrder,
+      type: 'select-relative',
+    })
+    expect(getSlideEditRailListboxKeyboardIntent({
+      activeSlideId: 'slide-b',
+      key: 'Home',
+      slideOrder,
+    })).toEqual({
+      boundary: 'first',
+      slideOrder,
+      type: 'select-boundary',
+    })
+    expect(getSlideEditRailKeyboardCommandEffect({
+      boundary: 'last',
+      slideOrder,
+      type: 'select-boundary',
+    })).toEqual({
+      payload: {
+        id: 'select-active-slide',
+        slideId: 'slide-c',
+      },
+      selection: {
+        objectIds: [],
+        slideId: 'slide-c',
+      },
+      type: 'slide-command-effect',
+    })
+    expect(getSlideEditRailListboxKeyboardIntent({
+      activeSlideId: 'slide-b',
+      key: ' ',
+      slideOrder,
+    })).toEqual({
+      slideId: 'slide-b',
+      type: 'activate-focused-option',
+    })
+    expect(getSlideEditRailKeyboardCommandEffect({
+      slideId: 'slide-b',
+      type: 'activate-focused-option',
+    })).toEqual({
+      payload: {
+        id: 'select-active-slide',
+        slideId: 'slide-b',
+      },
+      selection: {
+        objectIds: [],
+        slideId: 'slide-b',
+      },
+      type: 'slide-command-effect',
+    })
+    expect(getSlideEditRailListboxKeyboardIntent({
+      activeSlideId: 'slide-b',
+      key: 'Enter',
+      slideOrder,
+    })).not.toEqual({
+      slideId: 'slide-b',
+      type: 'thumbnail-press',
     })
   })
 

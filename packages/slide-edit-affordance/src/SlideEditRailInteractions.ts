@@ -12,10 +12,34 @@ export type SlideEditRailThumbnailDescriptor<
   slideId: TSlideId
 }
 
+export type SlideEditRailListboxOptionDescriptor<
+  TSlideId extends SlideEditRailSlideId = SlideEditRailSlideId,
+> = {
+  id: string
+  index: number
+  isActive: boolean
+  isFocusable: boolean
+  isSelected: boolean
+  slideId: TSlideId
+  tabIndex: -1 | 0
+}
+
+export type SlideEditRailListboxDescriptor<
+  TSlideId extends SlideEditRailSlideId = SlideEditRailSlideId,
+> = {
+  activeOptionId: string | null
+  focusableOptionId: string | null
+  keyboardModel: 'aria-listbox-roving-focus'
+  options: readonly SlideEditRailListboxOptionDescriptor<TSlideId>[]
+  role: 'listbox'
+  selectionMode: 'single'
+}
+
 export type SlideEditRailDescriptor<
   TSlideId extends SlideEditRailSlideId = SlideEditRailSlideId,
 > = {
   activeSlideId: TSlideId | null
+  listbox: SlideEditRailListboxDescriptor<TSlideId>
   slideOrder: readonly TSlideId[]
   thumbnails: readonly SlideEditRailThumbnailDescriptor<TSlideId>[]
 }
@@ -94,10 +118,19 @@ export type SlideEditRailKeyboardIntent<
     type: 'duplicate-active'
   }
   | {
+    slideId: TSlideId | null
+    type: 'activate-focused-option'
+  }
+  | {
     activeSlideId: TSlideId | null
     direction: 'next' | 'previous'
     slideOrder: readonly TSlideId[]
     type: 'move-active'
+  }
+  | {
+    boundary: 'first' | 'last'
+    slideOrder: readonly TSlideId[]
+    type: 'select-boundary'
   }
   | {
     activeSlideId: TSlideId | null
@@ -105,6 +138,14 @@ export type SlideEditRailKeyboardIntent<
     slideOrder: readonly TSlideId[]
     type: 'select-relative'
   }
+
+export type SlideEditRailListboxKeyboardKey =
+  | ' '
+  | 'ArrowDown'
+  | 'ArrowUp'
+  | 'End'
+  | 'Enter'
+  | 'Home'
 
 export type SlideEditRailPointerIntent<
   TSlideId extends SlideEditRailSlideId = SlideEditRailSlideId,
@@ -147,6 +188,10 @@ export function createSlideEditRailDescriptor<
 }): SlideEditRailDescriptor<TSlideId> {
   return {
     activeSlideId,
+    listbox: createSlideEditRailListboxDescriptor({
+      activeSlideId,
+      slideOrder,
+    }),
     slideOrder,
     thumbnails: slideOrder.map((slideId, index) => {
       const bounds = getThumbnailBounds(slideId, index)
@@ -160,6 +205,102 @@ export function createSlideEditRailDescriptor<
       }
     }),
   }
+}
+
+export function createSlideEditRailListboxDescriptor<
+  TSlideId extends SlideEditRailSlideId,
+>({
+  activeSlideId,
+  getOptionId = getDefaultSlideEditRailOptionId,
+  slideOrder,
+}: {
+  activeSlideId: TSlideId | null
+  getOptionId?: (slideId: TSlideId, index: number) => string
+  slideOrder: readonly TSlideId[]
+}): SlideEditRailListboxDescriptor<TSlideId> {
+  const activeIndex = activeSlideId ? slideOrder.indexOf(activeSlideId) : -1
+  const focusableIndex = activeIndex >= 0 ? activeIndex : 0
+  const options = slideOrder.map((slideId, index) => {
+    const isActive = activeSlideId === slideId
+    const isFocusable = index === focusableIndex
+    const tabIndex: -1 | 0 = isFocusable ? 0 : -1
+
+    return {
+      id: getOptionId(slideId, index),
+      index,
+      isActive,
+      isFocusable,
+      isSelected: isActive,
+      slideId,
+      tabIndex,
+    }
+  })
+  const activeOption = options.find((option) => option.isActive) ?? null
+  const focusableOption = options.find((option) => option.isFocusable) ?? null
+
+  return {
+    activeOptionId: activeOption?.id ?? null,
+    focusableOptionId: focusableOption?.id ?? null,
+    keyboardModel: 'aria-listbox-roving-focus',
+    options,
+    role: 'listbox',
+    selectionMode: 'single',
+  }
+}
+
+export function getSlideEditRailListboxKeyboardIntent<
+  TSlideId extends SlideEditRailSlideId,
+>({
+  activeSlideId,
+  key,
+  slideOrder,
+}: {
+  activeSlideId: TSlideId | null
+  key: SlideEditRailListboxKeyboardKey | string
+  slideOrder: readonly TSlideId[]
+}): SlideEditRailKeyboardIntent<TSlideId> | null {
+  if (key === 'ArrowDown') {
+    return {
+      activeSlideId,
+      direction: 'next',
+      slideOrder,
+      type: 'select-relative',
+    }
+  }
+
+  if (key === 'ArrowUp') {
+    return {
+      activeSlideId,
+      direction: 'previous',
+      slideOrder,
+      type: 'select-relative',
+    }
+  }
+
+  if (key === 'Home') {
+    return {
+      boundary: 'first',
+      slideOrder,
+      type: 'select-boundary',
+    }
+  }
+
+  if (key === 'End') {
+    return {
+      boundary: 'last',
+      slideOrder,
+      type: 'select-boundary',
+    }
+  }
+
+  if (key === 'Enter' || key === ' ') {
+    return {
+      slideId: activeSlideId ?? slideOrder[0] ?? null,
+      type: 'activate-focused-option',
+    }
+  }
+
+  return null
 }
 
 export function getSlideEditRailKeyboardCommandEffect<
@@ -187,8 +328,17 @@ export function getSlideEditRailKeyboardCommandEffect<
             slideId: intent.activeSlideId,
           })
         : null
+    case 'activate-focused-option':
+      return intent.slideId
+        ? toSlideEditRailHostCommandEffect({
+            id: 'select-active-slide',
+            slideId: intent.slideId,
+          })
+        : null
     case 'move-active':
       return getSlideEditRailMoveActiveEffect(intent)
+    case 'select-boundary':
+      return getSlideEditRailSelectBoundaryEffect(intent)
     case 'select-relative':
       return getSlideEditRailSelectRelativeEffect(intent)
   }
@@ -301,6 +451,27 @@ function getSlideEditRailSelectRelativeEffect<
     : null
 }
 
+function getSlideEditRailSelectBoundaryEffect<
+  TSlideId extends SlideEditRailSlideId,
+>({
+  boundary,
+  slideOrder,
+}: Extract<
+  SlideEditRailKeyboardIntent<TSlideId>,
+  { type: 'select-boundary' }
+>) {
+  const slideId = boundary === 'first'
+    ? slideOrder[0]
+    : slideOrder[slideOrder.length - 1]
+
+  return slideId
+    ? toSlideEditRailHostCommandEffect({
+        id: 'select-active-slide',
+        slideId,
+      })
+    : null
+}
+
 function getSlideEditRailReorderEffect<
   TSlideId extends SlideEditRailSlideId,
 >({
@@ -347,4 +518,11 @@ function expandSlideEditRailHitTarget(bounds: Bounds, padding: number) {
     x: bounds.x - normalizedPadding,
     y: bounds.y - normalizedPadding,
   }
+}
+
+function getDefaultSlideEditRailOptionId(
+  _slideId: SlideEditRailSlideId,
+  index: number,
+) {
+  return `slide-rail-option-${index}`
 }
