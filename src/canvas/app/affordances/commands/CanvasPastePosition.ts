@@ -3,6 +3,7 @@ import {
   type CanvasCommandOffset,
 } from '../../../engine'
 import type {
+  Bounds,
   CanvasItem,
   Point,
 } from '../../../entities'
@@ -28,19 +29,33 @@ export function getCanvasPasteOffset({
   pasteIndex: number
   viewportCenter: Point | null
 }): CanvasCommandOffset {
+  return getCanvasPasteOffsetForBounds({
+    clipboardBounds: getCanvasItemsBounds(clipboard),
+    pasteIndex,
+    viewportCenter,
+  })
+}
+
+export function getCanvasPasteOffsetForBounds({
+  clipboardBounds,
+  pasteIndex,
+  viewportCenter,
+}: {
+  clipboardBounds: Bounds | null
+  pasteIndex: number
+  viewportCenter: Point | null
+}): CanvasCommandOffset {
   if (pasteIndex > 0 || !viewportCenter) {
     return CANVAS_COMMAND_INSERT_OFFSET
   }
 
-  const bounds = getCanvasItemsBounds(clipboard)
-
-  if (!bounds) {
+  if (!clipboardBounds) {
     return CANVAS_COMMAND_INSERT_OFFSET
   }
 
   return {
-    x: viewportCenter.x - (bounds.x + bounds.w / 2),
-    y: viewportCenter.y - (bounds.y + bounds.h / 2),
+    x: viewportCenter.x - (clipboardBounds.x + clipboardBounds.w / 2),
+    y: viewportCenter.y - (clipboardBounds.y + clipboardBounds.h / 2),
   }
 }
 

@@ -2,6 +2,7 @@ import { describe, expect, test } from 'vitest'
 import type { CanvasItem } from '../../../entities'
 import {
   getCanvasPasteOffset,
+  getCanvasPasteOffsetForBounds,
   getCanvasPastePositionSession,
 } from './CanvasPastePosition'
 
@@ -32,6 +33,26 @@ describe('getCanvasPasteOffset', () => {
       getCanvasPasteOffset({
         clipboard: [item],
         pasteIndex: 1,
+        viewportCenter: { x: 100, y: 100 },
+      }),
+    ).toEqual({ x: 28, y: 28 })
+  })
+
+  test('centers first paste from clipboard bounds without CanvasItem shape', () => {
+    expect(
+      getCanvasPasteOffsetForBounds({
+        clipboardBounds: { h: 20, w: 40, x: 10, y: 20 },
+        pasteIndex: 0,
+        viewportCenter: { x: 100, y: 100 },
+      }),
+    ).toEqual({ x: 70, y: 70 })
+  })
+
+  test('uses insert offset when bounds are missing', () => {
+    expect(
+      getCanvasPasteOffsetForBounds({
+        clipboardBounds: null,
+        pasteIndex: 0,
         viewportCenter: { x: 100, y: 100 },
       }),
     ).toEqual({ x: 28, y: 28 })
