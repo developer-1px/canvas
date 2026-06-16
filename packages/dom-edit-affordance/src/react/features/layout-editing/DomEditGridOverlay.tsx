@@ -342,6 +342,26 @@ function DomEditGridChildAreaGuide({
         data-grid-child-row-span={area.rowSpan}
         style={createDomEditOverlayRectStyle(area)}
       />
+      <DomEditGridChildSpanHandle
+        area={area}
+        axis="column"
+        edge="start"
+      />
+      <DomEditGridChildSpanHandle
+        area={area}
+        axis="column"
+        edge="end"
+      />
+      <DomEditGridChildSpanHandle
+        area={area}
+        axis="row"
+        edge="start"
+      />
+      <DomEditGridChildSpanHandle
+        area={area}
+        axis="row"
+        edge="end"
+      />
       <span
         className="figma-grid-child-badge"
         data-grid-child-badge="column"
@@ -363,6 +383,36 @@ function DomEditGridChildAreaGuide({
         {rowLabel}
       </span>
     </>
+  )
+}
+
+function DomEditGridChildSpanHandle({
+  area,
+  axis,
+  edge,
+}: {
+  area: DomEditGridChildArea
+  axis: GridGapRect['axis']
+  edge: 'end' | 'start'
+}) {
+  return (
+    <button
+      aria-label={`Grid ${axis} ${edge} span handle`}
+      className={[
+        'figma-grid-child-span-handle',
+        `figma-grid-child-span-handle--${axis}`,
+        `figma-grid-child-span-handle--${edge}`,
+      ].join(' ')}
+      data-grid-child-span-axis={axis}
+      data-grid-child-span-edge={edge}
+      style={getDomEditGridChildSpanHandleStyle({ area, axis, edge })}
+      title="Grid span"
+      type="button"
+      onPointerDown={(event) => {
+        event.preventDefault()
+        event.stopPropagation()
+      }}
+    />
   )
 }
 
@@ -459,6 +509,36 @@ function DomEditGridTrackSizeLabel({
       {track.label}
     </span>
   )
+}
+
+function getDomEditGridChildSpanHandleStyle({
+  area,
+  axis,
+  edge,
+}: {
+  area: DomEditGridChildArea
+  axis: GridGapRect['axis']
+  edge: 'end' | 'start'
+}) {
+  const hitSize = 10
+
+  if (axis === 'column') {
+    return {
+      height: area.h,
+      left: edge === 'start' ? area.x : area.x + area.w,
+      top: area.y,
+      transform: 'translateX(-50%)',
+      width: hitSize,
+    }
+  }
+
+  return {
+    height: hitSize,
+    left: area.x,
+    top: edge === 'start' ? area.y : area.y + area.h,
+    transform: 'translateY(-50%)',
+    width: area.w,
+  }
 }
 
 function measureDomEditGridChildArea<
