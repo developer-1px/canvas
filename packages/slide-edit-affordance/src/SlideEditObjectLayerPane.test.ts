@@ -3,9 +3,11 @@ import { describe, expect, it } from 'vitest'
 import {
   createSlideEditLayerPaneDescriptor,
   getSlideEditLayerPaneCommandEffect,
+  getSlideEditLayerPaneDropIndicator,
   getSlideEditLayerPaneKeyboardIntent,
   SLIDE_EDIT_LAYER_PANE_ARIA_CONTRACT,
   SLIDE_EDIT_LAYER_PANE_COMMANDS,
+  SLIDE_EDIT_LAYER_PANE_DROP_INDICATOR_MODEL,
   SLIDE_EDIT_LAYER_PANE_KEYBOARD_INTENT_MODEL,
 } from './SlideEditObjectLayerPane'
 
@@ -370,6 +372,105 @@ describe('SlideEditObjectLayerPane', () => {
     )).toBe(true)
   })
 
+  it('calculates drag drop placement indicators for reorderable layer pane rows', () => {
+    const dragDescriptor = createSlideEditLayerPaneDescriptor({
+      activeObjectId: 'a',
+      slideId: 'slide-drag',
+      selectedObjectIds: ['a'],
+      objects: [
+        {
+          displayName: 'A',
+          kindLabel: 'Text',
+          objectId: 'a',
+          order: 0,
+        },
+        {
+          displayName: 'B',
+          kindLabel: 'Shape',
+          objectId: 'b',
+          order: 1,
+        },
+        {
+          displayName: 'C',
+          kindLabel: 'Image',
+          objectId: 'c',
+          order: 2,
+        },
+        {
+          displayName: 'Locked',
+          isLocked: true,
+          kindLabel: 'Shape',
+          objectId: 'locked',
+          order: 3,
+        },
+        {
+          displayName: 'Group',
+          isGroup: true,
+          kindLabel: 'Group',
+          objectId: 'group',
+          order: 4,
+        },
+      ],
+    })
+
+    expect(SLIDE_EDIT_LAYER_PANE_DROP_INDICATOR_MODEL).toBe(
+      'slide-edit-layer-pane-drop-indicator',
+    )
+    expect(getSlideEditLayerPaneDropIndicator(dragDescriptor, {
+      draggedObjectId: 'c',
+      pointerOffsetY: 2,
+      rowHeight: 20,
+      targetObjectId: 'a',
+    })).toEqual({
+      draggedObjectId: 'c',
+      indicator: 'before',
+      placement: 'before',
+      targetObjectId: 'a',
+      toIndex: 0,
+    })
+    expect(getSlideEditLayerPaneDropIndicator(dragDescriptor, {
+      draggedObjectId: 'a',
+      pointerOffsetY: 18,
+      rowHeight: 20,
+      targetObjectId: 'c',
+    })).toEqual({
+      draggedObjectId: 'a',
+      indicator: 'after',
+      placement: 'after',
+      targetObjectId: 'c',
+      toIndex: 3,
+    })
+    expect(getSlideEditLayerPaneDropIndicator(dragDescriptor, {
+      draggedObjectId: 'a',
+      pointerOffsetY: 2,
+      rowHeight: 20,
+      targetObjectId: 'b',
+    })).toMatchObject({
+      indicator: '',
+      placement: 'none',
+      targetObjectId: null,
+      toIndex: null,
+    })
+    expect(getSlideEditLayerPaneDropIndicator(dragDescriptor, {
+      draggedObjectId: 'a',
+      pointerOffsetY: 18,
+      rowHeight: 20,
+      targetObjectId: 'locked',
+    })).toMatchObject({
+      placement: 'none',
+      toIndex: null,
+    })
+    expect(getSlideEditLayerPaneDropIndicator(dragDescriptor, {
+      draggedObjectId: 'a',
+      pointerOffsetY: 18,
+      rowHeight: 20,
+      targetObjectId: 'group',
+    })).toMatchObject({
+      placement: 'none',
+      toIndex: null,
+    })
+  })
+
   it('converts replace, additive, and range selection intents to host command effects', () => {
     expect(getSlideEditLayerPaneCommandEffect(descriptor, {
       objectId: 'image',
@@ -433,6 +534,17 @@ describe('SlideEditObjectLayerPane', () => {
     })?.payload).toEqual({
       id: 'lock-objects',
       objectIds: ['title'],
+    })
+
+    expect(getSlideEditLayerPaneCommandEffect(descriptor, {
+      objectId: 'title',
+      toIndex: 3,
+      type: 'row-drop',
+    })?.payload).toEqual({
+      fromIndex: 0,
+      id: 'reorder-object',
+      objectId: 'title',
+      toIndex: 3,
     })
 
     expect(getSlideEditLayerPaneCommandEffect(descriptor, {

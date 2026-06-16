@@ -19,6 +19,9 @@ export const SLIDE_EDIT_LAYER_PANE_ARIA_CONTRACT = Object.freeze({
 export const SLIDE_EDIT_LAYER_PANE_KEYBOARD_INTENT_MODEL =
   'slide-edit-layer-pane-keyboard-intent'
 
+export const SLIDE_EDIT_LAYER_PANE_DROP_INDICATOR_MODEL =
+  'slide-edit-layer-pane-drop-indicator'
+
 export type SlideEditLayerPaneObjectInput<
   TObjectId extends SlideEditLayerPaneObjectId = SlideEditLayerPaneObjectId,
   TGroupId extends SlideEditLayerPaneGroupId = SlideEditLayerPaneGroupId,
@@ -74,6 +77,18 @@ export type SlideEditLayerPaneDescriptor<
   rows: readonly SlideEditLayerPaneRowDescriptor<TSlideId, TObjectId, TGroupId>[]
   selectedObjectIds: readonly TObjectId[]
   slideId: TSlideId
+}
+
+export type SlideEditLayerPaneDropPlacement = 'after' | 'before' | 'none'
+
+export type SlideEditLayerPaneDropIndicator<
+  TObjectId extends SlideEditLayerPaneObjectId = SlideEditLayerPaneObjectId,
+> = {
+  draggedObjectId: TObjectId
+  indicator: '' | 'after' | 'before'
+  placement: SlideEditLayerPaneDropPlacement
+  targetObjectId: TObjectId | null
+  toIndex: number | null
 }
 
 export type SlideEditLayerPaneCommandId =
@@ -395,6 +410,70 @@ export function getSlideEditLayerPaneCommandEffect<
   }
 }
 
+export function getSlideEditLayerPaneDropIndicator<
+  TSlideId extends SlideEditLayerPaneSlideId,
+  TObjectId extends SlideEditLayerPaneObjectId,
+  TGroupId extends SlideEditLayerPaneGroupId,
+>(
+  descriptor: SlideEditLayerPaneDescriptor<TSlideId, TObjectId, TGroupId>,
+  {
+    draggedObjectId,
+    pointerOffsetY,
+    rowHeight,
+    targetObjectId,
+  }: {
+    draggedObjectId: TObjectId
+    pointerOffsetY: number
+    rowHeight: number
+    targetObjectId: TObjectId
+  },
+): SlideEditLayerPaneDropIndicator<TObjectId> {
+  const draggedIndex = descriptor.rows.findIndex(
+    (row) => row.objectId === draggedObjectId,
+  )
+  const targetIndex = descriptor.rows.findIndex(
+    (row) => row.objectId === targetObjectId,
+  )
+  const draggedRow = descriptor.rows[draggedIndex]
+  const targetRow = descriptor.rows[targetIndex]
+
+  if (
+    draggedIndex < 0 ||
+    targetIndex < 0 ||
+    draggedObjectId === targetObjectId ||
+    !draggedRow?.isReorderable ||
+    draggedRow.isGroup ||
+    !targetRow?.isReorderable ||
+    targetRow.isGroup ||
+    rowHeight <= 0
+  ) {
+    return toSlideEditLayerPaneEmptyDropIndicator(draggedObjectId)
+  }
+
+  const placement: Exclude<SlideEditLayerPaneDropPlacement, 'none'> =
+    pointerOffsetY < rowHeight / 2 ? 'before' : 'after'
+  const toIndex = normalizeSlideEditLayerPaneIndex(
+    placement === 'before' ? targetIndex : targetIndex + 1,
+    descriptor.rows.length,
+  )
+  const insertionIndex = getSlideEditLayerPaneInsertionIndex(
+    draggedIndex,
+    toIndex,
+  )
+
+  if (insertionIndex === draggedIndex) {
+    return toSlideEditLayerPaneEmptyDropIndicator(draggedObjectId)
+  }
+
+  return {
+    draggedObjectId,
+    indicator: placement,
+    placement,
+    targetObjectId,
+    toIndex,
+  }
+}
+
 function getSlideEditLayerPaneSelectEffect<
   TSlideId extends SlideEditLayerPaneSlideId,
   TObjectId extends SlideEditLayerPaneObjectId,
@@ -531,8 +610,12 @@ function getSlideEditLayerPaneReorderEffect<
     intent.toIndex,
     descriptor.rows.length,
   )
+  const insertionIndex = getSlideEditLayerPaneInsertionIndex(
+    fromIndex,
+    toIndex,
+  )
 
-  if (!row?.isReorderable || fromIndex < 0 || fromIndex === toIndex) {
+  if (!row?.isReorderable || fromIndex < 0 || insertionIndex === fromIndex) {
     return null
   }
 
@@ -741,5 +824,21 @@ function getSlideEditLayerPaneRangeSelection<
 }
 
 function normalizeSlideEditLayerPaneIndex(index: number, length: number) {
-  return Math.max(0, Math.min(index, Math.max(0, length - 1)))
+  return Math.max(0, Math.min(index, Math.max(0, length)))
+}
+
+function getSlideEditLayerPaneInsertionIndex(fromIndex: number, toIndex: number) {
+  return fromIndex < toIndex ? Math.max(0, toIndex - 1) : toIndex
+}
+
+function toSlideEditLayerPaneEmptyDropIndicator<
+  TObjectId extends SlideEditLayerPaneObjectId,
+>(draggedObjectId: TObjectId): SlideEditLayerPaneDropIndicator<TObjectId> {
+  return {
+    draggedObjectId,
+    indicator: '',
+    placement: 'none',
+    targetObjectId: null,
+    toIndex: null,
+  }
 }
