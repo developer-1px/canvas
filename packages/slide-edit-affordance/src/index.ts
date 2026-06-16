@@ -207,6 +207,29 @@ export {
   type SlideEditObjectFillOpacityValue,
 } from './SlideEditObjectFillOpacity'
 export {
+  createSlideEditObjectCornerRadiusDescriptor,
+  getSlideEditObjectCornerRadiusCommandEffect,
+  getSlideEditObjectCornerRadiusMetadata,
+  normalizeSlideEditObjectCornerRadius,
+  normalizeSlideEditObjectCornerRadiusUpdateCommand,
+  SLIDE_EDIT_OBJECT_CORNER_RADIUS_DATA_ATTRIBUTE,
+  SLIDE_EDIT_OBJECT_CORNER_RADIUS_DEFAULT,
+  SLIDE_EDIT_OBJECT_CORNER_RADIUS_FIELD,
+  SLIDE_EDIT_OBJECT_CORNER_RADIUS_LIMITS,
+  toSlideEditObjectCornerRadiusAttributeValue,
+  type SlideEditObjectCornerRadiusDescriptor,
+  type SlideEditObjectCornerRadiusFieldDescriptor,
+  type SlideEditObjectCornerRadiusHostCommandEffect,
+  type SlideEditObjectCornerRadiusMetadata,
+  type SlideEditObjectCornerRadiusNumericLimits,
+  type SlideEditObjectCornerRadiusObjectId,
+  type SlideEditObjectCornerRadiusSlideId,
+  type SlideEditObjectCornerRadiusUnit,
+  type SlideEditObjectCornerRadiusUnsupportedReason,
+  type SlideEditObjectCornerRadiusUpdateCommand,
+  type SlideEditObjectCornerRadiusValue,
+} from './SlideEditObjectCornerRadius'
+export {
   createSlideEditObjectHyperlinkDescriptor,
   getSlideEditObjectHyperlinkCommandEffect,
   getSlideEditObjectHyperlinkMetadata,
@@ -531,6 +554,7 @@ export type SlideEditAdapterSlotId =
   | 'command-effect'
   | 'object-accessibility'
   | 'object-animation'
+  | 'object-corner-radius'
   | 'object-fill-opacity'
   | 'object-hyperlink'
   | 'object-opacity'
@@ -584,6 +608,11 @@ export const SLIDE_EDIT_ADAPTER_SLOTS = Object.freeze([
     id: 'object-animation',
     owner: 'host',
     purpose: 'Provide object animation and build order values scoped to a slide.',
+  },
+  {
+    id: 'object-corner-radius',
+    owner: 'host',
+    purpose: 'Provide selected object corner radius values for rounded shape affordances.',
   },
   {
     id: 'object-fill-opacity',
@@ -698,6 +727,7 @@ export type SlideEditOwnedContractId =
   | 'object-inspector'
   | 'object-accessibility-affordance'
   | 'object-animation-build-order'
+  | 'object-corner-radius-affordance'
   | 'object-fill-opacity-affordance'
   | 'object-hyperlink-affordance'
   | 'object-layer-pane'
@@ -764,6 +794,11 @@ export const SLIDE_EDIT_OWNED_CONTRACTS = Object.freeze([
     id: 'object-animation-build-order',
     owner: 'slide-edit-affordance',
     scope: 'Object animation type, trigger, timing, and slide-local build order.',
+  },
+  {
+    id: 'object-corner-radius-affordance',
+    owner: 'slide-edit-affordance',
+    scope: 'Object corner radius value, bounds, support state, metadata attribute, and update command effects.',
   },
   {
     id: 'object-fill-opacity-affordance',
