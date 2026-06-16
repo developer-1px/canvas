@@ -22,6 +22,31 @@ export type CanvasSelectionMapItemsInput<
   mapItem: (item: TItem, index: number) => TItem
 }
 
+export type CanvasSelectionCloneItemInput<
+  TItem,
+  TItemId extends string = string,
+  TGroupId extends string = string,
+> = {
+  cloneIndex: number
+  index: number
+  item: TItem
+  sourceGroupId?: TGroupId
+  sourceId: TItemId
+  targetGroupId?: TGroupId
+}
+
+export type CanvasSelectionCloneItemsInput<
+  TItem,
+  TItemId extends string = string,
+  TGroupId extends string = string,
+> = CanvasSelectionItemsInput<TItem, TItemId> & {
+  cloneItem: (
+    input: CanvasSelectionCloneItemInput<TItem, TItemId, TGroupId>,
+  ) => TItem
+  createGroupId?: (sourceGroupId: TGroupId) => TGroupId | null | undefined
+  getItemGroupId?: (item: TItem, index: number) => TGroupId | null | undefined
+}
+
 export function getCanvasSelectableItemIds<
   TItem,
   TItemId extends string = string,
@@ -95,4 +120,69 @@ export function mapCanvasSelectionItems<
     selected.has(getItemId(item, index)) && isItemSelectable(item, index)
       ? mapItem(item, index)
       : item)
+}
+
+export function cloneCanvasSelectionItems<
+  TItem,
+  TItemId extends string = string,
+  TGroupId extends string = string,
+>({
+  cloneItem,
+  createGroupId,
+  getItemGroupId,
+  getItemId,
+  isItemSelectable = () => true,
+  items,
+  selection,
+}: CanvasSelectionCloneItemsInput<TItem, TItemId, TGroupId>) {
+  const selected = new Set(selection)
+  const groupIdBySource = new Map<TGroupId, TGroupId | undefined>()
+  const clones: TItem[] = []
+
+  items.forEach((item, index) => {
+    const sourceId = getItemId(item, index)
+
+    if (!selected.has(sourceId) || !isItemSelectable(item, index)) {
+      return
+    }
+
+    const sourceGroupId = getItemGroupId?.(item, index) ?? undefined
+    const targetGroupId = sourceGroupId === undefined
+      ? undefined
+      : getCanvasSelectionCloneTargetGroupId({
+        createGroupId,
+        groupIdBySource,
+        sourceGroupId,
+      })
+
+    clones.push(cloneItem({
+      cloneIndex: clones.length,
+      index,
+      item,
+      sourceGroupId,
+      sourceId,
+      targetGroupId,
+    }))
+  })
+
+  return clones
+}
+
+function getCanvasSelectionCloneTargetGroupId<TGroupId extends string>({
+  createGroupId,
+  groupIdBySource,
+  sourceGroupId,
+}: {
+  createGroupId?: (sourceGroupId: TGroupId) => TGroupId | null | undefined
+  groupIdBySource: Map<TGroupId, TGroupId | undefined>
+  sourceGroupId: TGroupId
+}) {
+  if (!groupIdBySource.has(sourceGroupId)) {
+    groupIdBySource.set(
+      sourceGroupId,
+      createGroupId ? createGroupId(sourceGroupId) ?? undefined : sourceGroupId,
+    )
+  }
+
+  return groupIdBySource.get(sourceGroupId)
 }

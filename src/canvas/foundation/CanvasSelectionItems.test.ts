@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  cloneCanvasSelectionItems,
   deleteCanvasSelectionItems,
   getCanvasSelectableItemIds,
   getCanvasSelectedItemIds,
@@ -8,6 +9,7 @@ import {
 } from './CanvasSelectionItems'
 
 type TestItem = {
+  groupId?: string
   hidden?: boolean
   id: string
   locked?: boolean
@@ -64,6 +66,64 @@ describe('CanvasSelectionItems', () => {
       { id: 'd', locked: true },
     ])
     expect(locked[2]).not.toHaveProperty('locked')
+  })
+
+  it('clones selected editable items with stable group id remaps', () => {
+    const sourceItems: TestItem[] = [
+      { groupId: 'group-a', id: 'a', name: 'Alpha' },
+      { groupId: 'group-a', id: 'b', locked: true, name: 'Beta' },
+      { id: 'c', name: 'Gamma' },
+      { groupId: 'group-a', id: 'd', name: 'Delta' },
+    ]
+    const createdGroupIds: string[] = []
+
+    const clones = cloneCanvasSelectionItems({
+      cloneItem: ({ cloneIndex, item, sourceId, targetGroupId }) => {
+        const clone = {
+          ...item,
+          id: `${sourceId}-copy-${cloneIndex}`,
+          name: `${item.name} Copy`,
+        }
+
+        if (targetGroupId) {
+          clone.groupId = targetGroupId
+        } else {
+          delete clone.groupId
+        }
+
+        return clone
+      },
+      createGroupId: (sourceGroupId) => {
+        const targetGroupId = `${sourceGroupId}-copy`
+
+        createdGroupIds.push(targetGroupId)
+
+        return targetGroupId
+      },
+      getItemGroupId: (item) => item.groupId,
+      getItemId,
+      isItemSelectable: isEditable,
+      items: sourceItems,
+      selection: ['d', 'b', 'c', 'a'],
+    })
+
+    expect(clones).toEqual([
+      {
+        groupId: 'group-a-copy',
+        id: 'a-copy-0',
+        name: 'Alpha Copy',
+      },
+      {
+        id: 'c-copy-1',
+        name: 'Gamma Copy',
+      },
+      {
+        groupId: 'group-a-copy',
+        id: 'd-copy-2',
+        name: 'Delta Copy',
+      },
+    ])
+    expect(createdGroupIds).toEqual(['group-a-copy'])
   })
 })
 

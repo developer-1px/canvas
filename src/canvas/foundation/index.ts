@@ -66,10 +66,13 @@ export {
   type CanvasSameTypeSelectionInput,
 } from './CanvasSameTypeSelection'
 export {
+  cloneCanvasSelectionItems,
   deleteCanvasSelectionItems,
   getCanvasSelectableItemIds,
   getCanvasSelectedItemIds,
   mapCanvasSelectionItems,
+  type CanvasSelectionCloneItemInput,
+  type CanvasSelectionCloneItemsInput,
   type CanvasSelectionItemsChangeInput,
   type CanvasSelectionItemsInput,
   type CanvasSelectionMapItemsInput,
