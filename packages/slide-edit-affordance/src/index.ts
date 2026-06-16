@@ -66,6 +66,7 @@ export {
 export {
   createSlideEditTextParagraphSpacingDescriptor,
   getSlideEditTextParagraphSpacingCommandEffect,
+  getSlideEditTextParagraphSpacingCSSStyle,
   normalizeSlideEditTextLineHeightRatio,
   normalizeSlideEditTextParagraphSpacingAmount,
   normalizeSlideEditTextParagraphSpacingNumber,
@@ -77,6 +78,8 @@ export {
   type SlideEditTextParagraphSlideId,
   type SlideEditTextParagraphSpacingAmount,
   type SlideEditTextParagraphSpacingCommandId,
+  type SlideEditTextParagraphSpacingCSSStyle,
+  type SlideEditTextParagraphSpacingCSSStyleInput,
   type SlideEditTextParagraphSpacingDescriptor,
   type SlideEditTextParagraphSpacingFieldControl,
   type SlideEditTextParagraphSpacingFieldDescriptor,
