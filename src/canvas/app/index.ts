@@ -65,6 +65,13 @@ export {
   type CanvasSelectionListRangeInput,
 } from './affordances/controls/selection-list/CanvasSelectionListRange'
 export {
+  getCanvasContextMenuPosition,
+  type CanvasContextMenuPosition,
+  type CanvasContextMenuPositionInput,
+  type CanvasContextMenuSize,
+  type CanvasContextMenuViewportSize,
+} from './affordances/controls/context-menu/CanvasContextMenuPosition'
+export {
   getCanvasFloatingAnchorForBounds,
   type CanvasFloatingAnchor,
   type CanvasFloatingAnchorForBoundsInput,
