@@ -66,7 +66,7 @@ export function DomEditBoxModelOverlay({
             top: rect.y - metrics.margin.top - 4,
           }}
         >
-          Margin {formatDomEditSides(metrics.margin)}
+          Margin {formatDomEditSides(metrics.margin)} read-only
         </span>
       ) : null}
       {hasAnySide(metrics.padding) ? (
