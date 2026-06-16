@@ -59,6 +59,10 @@ export {
   type CanvasTabsTabInput,
 } from './affordances/controls/tabs/CanvasTabsRovingFocus'
 export {
+  getCanvasSelectionListRangeIds,
+  type CanvasSelectionListRangeInput,
+} from './affordances/controls/selection-list/CanvasSelectionListRange'
+export {
   CANVAS_RICH_CLIPBOARD_DEFAULT_FALLBACK_HTML,
   CANVAS_RICH_CLIPBOARD_JSON_SCRIPT_ATTRIBUTE,
   CANVAS_RICH_CLIPBOARD_ROOT_ATTRIBUTE,

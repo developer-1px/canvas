@@ -1,3 +1,5 @@
+import { getCanvasSelectionListRangeIds } from '../../../src/canvas/app/affordances/controls/selection-list/CanvasSelectionListRange'
+
 export type SlideEditLayerPaneSlideId = string
 export type SlideEditLayerPaneObjectId = string
 export type SlideEditLayerPaneGroupId = string
@@ -915,20 +917,14 @@ function getSlideEditLayerPaneRangeSelection<
   anchorObjectId: TObjectId,
   objectId: TObjectId,
 ) {
-  const anchorIndex = descriptor.rows.findIndex(
-    (row) => row.objectId === anchorObjectId,
-  )
-  const targetIndex = descriptor.rows.findIndex((row) => row.objectId === objectId)
-
-  if (anchorIndex < 0 || targetIndex < 0) {
-    return [objectId]
-  }
-
-  const start = Math.min(anchorIndex, targetIndex)
-  const end = Math.max(anchorIndex, targetIndex)
+  const rangeObjectIds = getCanvasSelectionListRangeIds({
+    anchorId: anchorObjectId,
+    ids: descriptor.rows.map((row) => row.objectId),
+    targetId: objectId,
+  })
 
   return descriptor.rows
-    .slice(start, end + 1)
+    .filter((row) => rangeObjectIds.includes(row.objectId))
     .filter((row) => row.isSelectable)
     .map((row) => row.objectId)
 }
