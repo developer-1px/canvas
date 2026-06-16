@@ -18,6 +18,7 @@
 | Placeholder visibility affordance | `slide-edit-affordance` | slide placeholder structure and object hide/show read model |
 | Object layer pane | `slide-edit-affordance` | object row descriptor, selection pane command intent, ARIA tree contract |
 | Object animation build order | `slide-edit-affordance` | object animation type, trigger, timing, and slide-local build order |
+| Object hyperlink/action | `slide-edit-affordance` | object URL/action metadata, URL policy, and host command effect |
 | Object opacity | `slide-edit-affordance` | object opacity value, metadata attribute, and host command effect |
 | Object shadow/effect | `slide-edit-affordance` | object shadow subset, metadata attribute, and host command effect |
 | Layout/theme affordance | `slide-edit-affordance` | layout, master, placeholder mapping, and theme token descriptors |
@@ -40,6 +41,7 @@
 | `selection` | Active page id and selected object ids |
 | `command-effect` | Transaction boundary for command effects |
 | `object-animation` | Object animation and build order values scoped to a slide |
+| `object-hyperlink` | Selected object hyperlink/action values for inspector, stage, thumbnail, and export |
 | `object-opacity` | Selected object opacity values for inspector, stage, thumbnail, and export |
 | `object-shadow` | Selected object shadow values for inspector, stage, thumbnail, and export |
 | `layout-theme` | Layout, master, placeholder, and theme token descriptors |
@@ -213,6 +215,20 @@
 | Metadata | `data-slide-object-opacity` carries the normalized value as an attribute string |
 | Normalization | invalid values use `1`; valid values clamp to `0..1` and round to two decimals |
 | Updates | selected object id and normalized opacity value become host command effects |
+| Runtime | stage, thumbnail, presentation, inspector, and export can read the same metadata value |
+
+## Object Hyperlink/Action Contract
+
+| Area | Contract |
+| --- | --- |
+| Value | hyperlink uses `url`, `target`, and optional `title` |
+| Default | empty URL is disabled and serializes as `none` |
+| Target | built-in targets are `same-context` and `new-context` |
+| Field | URL, target, and title fields route through `update-object-hyperlink` |
+| Removal | `remove-object-hyperlink` clears action metadata through a host command effect |
+| Metadata | `data-slide-object-hyperlink` carries `none` or a JSON string for normalized action metadata |
+| URL policy | default allowed schemes are `https`, `http`, and `mailto`; hosts can override allowed schemes |
+| Scope | mutates existing slide object action metadata, not link-preview import or media insertion |
 | Runtime | stage, thumbnail, presentation, inspector, and export can read the same metadata value |
 
 ## Object Shadow/Effect Contract
