@@ -9,6 +9,7 @@ export {
   getCanvasTableCsvFileFromList,
   getCanvasTableCsvSourceFromDataTransfer,
   getCanvasTableCsvSourceFromText,
+  getCanvasTableColumnCount,
   getCanvasTableComponentSize,
   getCanvasTableInsertCenter,
   getCanvasTableSourceFromDataTransfer,
@@ -17,6 +18,7 @@ export {
   insertCanvasTableSource,
   readCanvasTableCsvFileSource,
   readCanvasTableFileSource,
+  normalizeCanvasTableRows,
   type CanvasTableComponentSize,
   type CanvasTableComponentSizeInput,
   type CanvasTableComponentSizeOptions,
@@ -24,6 +26,7 @@ export {
   type CanvasTableImportSource,
   type CanvasTableInsertCenterInput,
   type CanvasTableInsertionContext,
+  type CanvasTableRowsNormalizationOptions,
 } from './CanvasTableImport'
 export {
   useCanvasTableImport,

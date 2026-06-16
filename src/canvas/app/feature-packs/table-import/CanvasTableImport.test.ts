@@ -2,10 +2,12 @@ import { describe, expect, it, vi } from 'vitest'
 import {
   getCanvasTableCsvSourceFromDataTransfer,
   getCanvasTableCsvSourceFromText,
+  getCanvasTableColumnCount,
   getCanvasTableInsertCenter,
   getCanvasTableSourceFromDataTransfer,
   getCanvasTableSourceFromHTML,
   insertCanvasTableSource,
+  normalizeCanvasTableRows,
   readCanvasTableFileSource,
 } from './CanvasTableImport'
 
@@ -117,6 +119,47 @@ describe('CanvasTableImport', () => {
     expect(getCanvasTableSourceFromHTML('<p>hello</p>')).toBeNull()
     expect(getCanvasTableSourceFromHTML('<table><tr><td>One</td></tr></table>'))
       .toBeNull()
+  })
+
+  it('normalizes imported rows for consumer table constraints', () => {
+    const rows = normalizeCanvasTableRows([
+      [' Metric ', ' Current ', ' Target ', ' Ignored '],
+      ['Drafts', ' two hours ', 'thirty minutes', 'Ignored'],
+      ['', ' ', ''],
+      ['Review passes', '4', '1', 'Ignored'],
+    ], {
+      maxCellLength: 6,
+      maxColumns: 3,
+      maxRows: 2,
+    })
+
+    expect(rows).toEqual([
+      ['Metric', 'Curren', 'Target'],
+      ['Drafts', 'two ho', 'thirty'],
+    ])
+    expect(getCanvasTableColumnCount(rows)).toBe(3)
+  })
+
+  it('pads rows and applies fallback rows when normalized rows are empty', () => {
+    expect(normalizeCanvasTableRows([
+      ['Name', 'Owner', 'Status'],
+      ['Import', 'Mina'],
+    ])).toEqual([
+      ['Name', 'Owner', 'Status'],
+      ['Import', 'Mina', ''],
+    ])
+
+    expect(normalizeCanvasTableRows([
+      ['  ', ''],
+    ], {
+      fallbackRows: [
+        ['Metric', 'Value'],
+        ['Users', '42'],
+      ],
+    })).toEqual([
+      ['Metric', 'Value'],
+      ['Users', '42'],
+    ])
   })
 
   it('inserts imported tables centered on viewport or drop point', () => {
