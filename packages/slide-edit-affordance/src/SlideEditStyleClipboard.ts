@@ -16,6 +16,25 @@ export type SlideEditStyleClipboardDisabledReason =
   | 'no-compatible-categories'
   | 'no-target-selection'
 
+export type SlideEditStyleClipboardKeyboardIntentKind =
+  | 'copy-formatting'
+  | 'paste-formatting'
+
+export type SlideEditStyleClipboardKeyboardIntent = {
+  commandId: 'copy-object-formatting' | 'paste-object-formatting'
+  kind: SlideEditStyleClipboardKeyboardIntentKind
+  preventDefault: true
+  shortcut: string
+}
+
+export type SlideEditStyleClipboardKeyboardIntentInput = {
+  event: {
+    shiftKey: boolean
+  }
+  key: string
+  mod: boolean
+}
+
 export type SlideEditStyleClipboardCategoryDescriptor<
   TCategoryId extends SlideEditStyleClipboardCategoryId =
     SlideEditStyleClipboardCategoryId,
@@ -204,6 +223,41 @@ export const SLIDE_EDIT_STYLE_CLIPBOARD_BUILT_IN_CATEGORIES = Object.freeze([
 ] as const satisfies readonly SlideEditStyleClipboardCategoryDescriptor<
   SlideEditStyleClipboardBuiltInCategoryId
 >[])
+
+export const SLIDE_EDIT_STYLE_CLIPBOARD_COPY_FORMATTING_SHORTCUT =
+  'Shift+Cmd/Ctrl+C'
+export const SLIDE_EDIT_STYLE_CLIPBOARD_PASTE_FORMATTING_SHORTCUT =
+  'Shift+Cmd/Ctrl+V'
+
+export function getSlideEditStyleClipboardKeyboardIntent({
+  event,
+  key,
+  mod,
+}: SlideEditStyleClipboardKeyboardIntentInput):
+  SlideEditStyleClipboardKeyboardIntent | null {
+  if (!mod || !event.shiftKey) {
+    return null
+  }
+
+  switch (key.toLowerCase()) {
+    case 'c':
+      return {
+        commandId: 'copy-object-formatting',
+        kind: 'copy-formatting',
+        preventDefault: true,
+        shortcut: SLIDE_EDIT_STYLE_CLIPBOARD_COPY_FORMATTING_SHORTCUT,
+      }
+    case 'v':
+      return {
+        commandId: 'paste-object-formatting',
+        kind: 'paste-formatting',
+        preventDefault: true,
+        shortcut: SLIDE_EDIT_STYLE_CLIPBOARD_PASTE_FORMATTING_SHORTCUT,
+      }
+    default:
+      return null
+  }
+}
 
 export function createSlideEditStyleClipboardDescriptor<
   TSlideId extends SlideEditStyleClipboardSlideId,

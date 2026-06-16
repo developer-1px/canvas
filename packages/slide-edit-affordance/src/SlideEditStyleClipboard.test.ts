@@ -6,6 +6,7 @@ import {
   getSlideEditStyleClipboardCategoryDescriptors,
   getSlideEditStyleClipboardCategoryIds,
   getSlideEditStyleClipboardCopyCommandEffect,
+  getSlideEditStyleClipboardKeyboardIntent,
   getSlideEditStyleClipboardPasteAvailability,
   SLIDE_EDIT_STYLE_CLIPBOARD_BUILT_IN_CATEGORIES,
 } from './SlideEditStyleClipboard'
@@ -179,6 +180,46 @@ describe('SlideEditStyleClipboard', () => {
         },
         type: 'slide-command-effect',
       })
+  })
+
+  it('maps style clipboard keyboard shortcuts to formatting intents', () => {
+    expect(getSlideEditStyleClipboardKeyboardIntent({
+      event: { shiftKey: true },
+      key: 'C',
+      mod: true,
+    })).toEqual({
+      commandId: 'copy-object-formatting',
+      kind: 'copy-formatting',
+      preventDefault: true,
+      shortcut: 'Shift+Cmd/Ctrl+C',
+    })
+
+    expect(getSlideEditStyleClipboardKeyboardIntent({
+      event: { shiftKey: true },
+      key: 'v',
+      mod: true,
+    })).toEqual({
+      commandId: 'paste-object-formatting',
+      kind: 'paste-formatting',
+      preventDefault: true,
+      shortcut: 'Shift+Cmd/Ctrl+V',
+    })
+
+    expect(getSlideEditStyleClipboardKeyboardIntent({
+      event: { shiftKey: false },
+      key: 'c',
+      mod: true,
+    })).toBeNull()
+    expect(getSlideEditStyleClipboardKeyboardIntent({
+      event: { shiftKey: true },
+      key: 'c',
+      mod: false,
+    })).toBeNull()
+    expect(getSlideEditStyleClipboardKeyboardIntent({
+      event: { shiftKey: true },
+      key: 'x',
+      mod: true,
+    })).toBeNull()
   })
 
   it('describes per-target paste formatting applicability', () => {
