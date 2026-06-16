@@ -69,6 +69,10 @@ import {
   type DomEditAlignmentPreview,
 } from './DomEditAlignmentEditor'
 import { DomEditMarginGhostOverlay } from '../box-model-xray/DomEditMarginGhostOverlay'
+import {
+  getDomEditRadioTabIndex,
+  handleDomEditRadioGroupKeyDown,
+} from '../../shared/DomEditRadioGroup'
 
 type AutoLayoutAffordanceMode = 'gap' | 'padding'
 type DomEditFlexChildEffectiveAlign =
@@ -884,14 +888,21 @@ export function DomEditAutoLayoutOverlay<
           {visibility.directionControls ? (
             <div
               className="figma-autolayout-toolbar"
+              role="radiogroup"
+              aria-label="Auto layout direction"
               style={{
                 left: rect.x + rect.w / 2,
                 top: rect.y + rect.h + directionControlOffset,
               }}
+              onKeyDown={handleDomEditRadioGroupKeyDown}
             >
               <button
                 aria-label="Horizontal auto layout"
-                aria-pressed={style.direction === 'row'}
+                aria-checked={style.direction === 'row'}
+                role="radio"
+                tabIndex={getDomEditRadioTabIndex({
+                  checked: style.direction === 'row',
+                })}
                 type="button"
                 onClick={() => onChangeAutoLayout(selectedNodeId, 'direction', 'row')}
               >
@@ -899,7 +910,11 @@ export function DomEditAutoLayoutOverlay<
               </button>
               <button
                 aria-label="Vertical auto layout"
-                aria-pressed={style.direction === 'column'}
+                aria-checked={style.direction === 'column'}
+                role="radio"
+                tabIndex={getDomEditRadioTabIndex({
+                  checked: style.direction === 'column',
+                })}
                 type="button"
                 onClick={() => onChangeAutoLayout(selectedNodeId, 'direction', 'column')}
               >

@@ -20,7 +20,10 @@ describe('CanvasArrowRoutingInspectorPanel', () => {
       }),
     )
 
+    expect(markup).toContain('role="radiogroup"')
     expect(markup).toContain('Elbow connector')
+    expect(markup).toContain('role="radio"')
+    expect(markup).toContain('aria-checked="true"')
     expect(markup).toContain('Straight connector')
   })
 

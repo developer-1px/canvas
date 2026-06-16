@@ -28,6 +28,9 @@ describe('DomEditAlignmentEditor', () => {
     expect(markup).toContain('id="alignment-panel"')
     expect(markup).toContain('role="region"')
     expect(markup).toContain('aria-labelledby="alignment-trigger"')
+    expect(markup).toContain('role="radiogroup"')
+    expect(markup).toContain('role="radio"')
+    expect(markup).toContain('aria-checked="true"')
     expect(markup).not.toContain('role="dialog"')
   })
 

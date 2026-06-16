@@ -9,6 +9,10 @@ import type {
   CanvasAppInspectorPanel,
   CanvasAppInspectorPanelContext,
 } from '../../editing/inspector/CanvasAppInspectorPanels'
+import {
+  getCanvasRadioTabIndex,
+  handleCanvasRadioGroupKeyDown,
+} from '../../controls/radio/CanvasRadioGroup'
 
 export const CANVAS_LINK_PREVIEW_INSPECTOR_PANEL: CanvasAppInspectorPanel = {
   id: 'link-preview-actions',
@@ -90,26 +94,45 @@ function renderCanvasLinkPreviewInspectorPanelContent({
 }) {
   return (
     <div className="link-preview-inspector-actions">
-      <button
-        type="button"
-        className="inspector-action-button"
-        aria-label="Display horizontal"
-        title="Display horizontal"
-        disabled={disabled || currentOrientation === 'horizontal'}
-        onClick={() => onChangeOrientation('horizontal')}
+      <div
+        className="inspector-action-grid"
+        role="radiogroup"
+        aria-label="Link preview orientation"
+        onKeyDown={handleCanvasRadioGroupKeyDown}
       >
-        H
-      </button>
-      <button
-        type="button"
-        className="inspector-action-button"
-        aria-label="Display vertical"
-        title="Display vertical"
-        disabled={disabled || currentOrientation === 'vertical'}
-        onClick={() => onChangeOrientation('vertical')}
-      >
-        V
-      </button>
+        <button
+          type="button"
+          className="inspector-action-button"
+          aria-label="Display horizontal"
+          aria-checked={currentOrientation === 'horizontal'}
+          role="radio"
+          tabIndex={getCanvasRadioTabIndex({
+            checked: currentOrientation === 'horizontal',
+            disabled,
+          })}
+          title="Display horizontal"
+          disabled={disabled}
+          onClick={() => onChangeOrientation('horizontal')}
+        >
+          H
+        </button>
+        <button
+          type="button"
+          className="inspector-action-button"
+          aria-label="Display vertical"
+          aria-checked={currentOrientation === 'vertical'}
+          role="radio"
+          tabIndex={getCanvasRadioTabIndex({
+            checked: currentOrientation === 'vertical',
+            disabled,
+          })}
+          title="Display vertical"
+          disabled={disabled}
+          onClick={() => onChangeOrientation('vertical')}
+        >
+          V
+        </button>
+      </div>
       <a
         className="inspector-action-button"
         href={url}

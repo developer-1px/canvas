@@ -10,6 +10,10 @@ import type {
   DomEditNodeId,
   DomEditNodeState,
 } from '../../../shared/model/DomEditTypes'
+import {
+  getDomEditRadioTabIndex,
+  handleDomEditRadioGroupKeyDown,
+} from '../../shared/DomEditRadioGroup'
 
 export type DomEditAlignmentPreview = {
   align: Exclude<DomEditAutoLayoutAlign, 'auto'>
@@ -94,13 +98,22 @@ export function DomEditAlignmentEditor<
       {context.showSelfLayout ? (
         <section>
           <h2>justify-content</h2>
-          <div className="figma-alignment-option-grid">
+          <div
+            className="figma-alignment-option-grid"
+            role="radiogroup"
+            aria-label="justify-content"
+            onKeyDown={handleDomEditRadioGroupKeyDown}
+          >
             {DOM_EDIT_DISTRIBUTION_OPTIONS.map((option) => (
               <button
                 aria-label={`Justify ${option.label.toLowerCase()}`}
-                aria-pressed={distributionValue === option.value}
+                aria-checked={distributionValue === option.value}
                 className="figma-alignment-option"
                 key={option.value}
+                role="radio"
+                tabIndex={getDomEditRadioTabIndex({
+                  checked: distributionValue === option.value,
+                })}
                 type="button"
                 onClick={() => {
                   onChangeAutoLayout(
@@ -119,13 +132,22 @@ export function DomEditAlignmentEditor<
       ) : null}
       <section>
         <h2>align-items</h2>
-        <div className="figma-alignment-option-grid">
+        <div
+          className="figma-alignment-option-grid"
+          role="radiogroup"
+          aria-label="align-items"
+          onKeyDown={handleDomEditRadioGroupKeyDown}
+        >
           {DOM_EDIT_ALIGN_OPTIONS.map((option) => (
             <button
               aria-label={`Align ${option.label.toLowerCase()}`}
-              aria-pressed={style.align === option.value}
+              aria-checked={style.align === option.value}
               className="figma-alignment-option"
               key={option.value}
+              role="radio"
+              tabIndex={getDomEditRadioTabIndex({
+                checked: style.align === option.value,
+              })}
               type="button"
               onBlur={() => onPreview(null)}
               onClick={() => {

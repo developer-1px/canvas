@@ -11,6 +11,10 @@ import type {
   CanvasObjectStyleSwatchControl,
 } from './CanvasObjectStyleInspector'
 import type { CanvasObjectInspectorCommentThread } from './CanvasObjectInspectorCommentThread'
+import {
+  getCanvasRadioTabIndex,
+  handleCanvasRadioGroupKeyDown,
+} from '../../controls/radio/CanvasRadioGroup'
 
 type CanvasObjectInspectorPanel = {
   content: ReactNode
@@ -227,14 +231,24 @@ function CanvasObjectInspectorSwatchStyleControl({
   return (
     <div className="inspector-style-control">
       <div className="inspector-style-label">{control.label}</div>
-      <div className="inspector-swatches">
+      <div
+        className="inspector-swatches"
+        role="radiogroup"
+        aria-label={control.label}
+        onKeyDown={handleCanvasRadioGroupKeyDown}
+      >
         {control.swatches.map((swatch) => (
           <button
             aria-label={`${control.label} ${swatch.color}`}
-            aria-pressed={swatch.selected}
+            aria-checked={swatch.selected}
             className="inspector-swatch"
             disabled={disabled || control.disabled}
             key={swatch.color}
+            role="radio"
+            tabIndex={getCanvasRadioTabIndex({
+              checked: swatch.selected,
+              disabled: disabled || control.disabled,
+            })}
             onClick={() => control.onSelect(swatch.color)}
             style={{ backgroundColor: swatch.color }}
             title={swatch.color}
@@ -304,14 +318,24 @@ function CanvasObjectInspectorSegmentedStyleControl({
   return (
     <div className="inspector-style-control">
       <div className="inspector-style-label">{control.label}</div>
-      <div className="inspector-segments">
+      <div
+        className="inspector-segments"
+        role="radiogroup"
+        aria-label={control.label}
+        onKeyDown={handleCanvasRadioGroupKeyDown}
+      >
         {control.segments.map((segment) => (
           <button
             aria-label={`${control.label} ${segment.label}`}
-            aria-pressed={segment.selected}
+            aria-checked={segment.selected}
             className="inspector-segment"
             disabled={disabled || control.disabled}
             key={segment.value}
+            role="radio"
+            tabIndex={getCanvasRadioTabIndex({
+              checked: segment.selected,
+              disabled: disabled || control.disabled,
+            })}
             onClick={() => control.onSelect(segment.value)}
             type="button"
           >

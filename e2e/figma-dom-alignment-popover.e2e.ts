@@ -12,10 +12,10 @@ test('edits DOM alignment from the canvas popover', async ({ page }) => {
   await trigger.focus()
   await page.keyboard.press('Enter')
 
-  const popover = page.getByRole('dialog', { name: 'Alignment editor' })
+  const popover = page.getByRole('region', { name: 'Alignment editor' })
   await expect(popover).toBeVisible()
 
-  await popover.getByRole('button', { name: 'Justify center' }).focus()
+  await popover.getByRole('radio', { name: 'Justify center' }).focus()
   await page.keyboard.press('Enter')
   await expect.poll(() => readJustifyContent(page, 'workspaceHeroActions'))
     .toBe('center')
@@ -26,10 +26,10 @@ test('edits DOM alignment from the canvas popover', async ({ page }) => {
   await trigger.click()
   await expect(popover).toBeVisible()
 
-  await popover.getByRole('button', { name: 'Align center' }).hover()
+  await popover.getByRole('radio', { name: 'Align center' }).hover()
   await expect(page.locator('.figma-alignment-preview-guide')).toHaveCount(1)
 
-  await popover.getByRole('button', { name: 'Justify between' }).click()
+  await popover.getByRole('radio', { name: 'Justify between' }).click()
   await expect.poll(() => readJustifyContent(page, 'workspaceHeroActions'))
     .toBe('space-between')
   await expect.poll(() => page.locator('.figma-autolayout-gap--between').count())
@@ -45,11 +45,11 @@ test('edits DOM alignment from the canvas popover', async ({ page }) => {
 
   await page.getByRole('button', { name: 'Select layer Content grid' }).click()
   await page.getByRole('button', { name: 'Alignment editor' }).click()
-  await expect(page.getByRole('dialog', { name: 'Alignment editor' }))
+  await expect(page.getByRole('region', { name: 'Alignment editor' }))
     .toBeVisible()
-  await expect(page.getByRole('button', { name: 'Justify between' }))
+  await expect(page.getByRole('radio', { name: 'Justify between' }))
     .toHaveCount(0)
-  await expect(page.getByRole('button', { name: 'Align stretch' }))
+  await expect(page.getByRole('radio', { name: 'Align stretch' }))
     .toBeVisible()
 })
 

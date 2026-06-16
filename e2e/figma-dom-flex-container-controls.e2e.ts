@@ -5,13 +5,13 @@ test('shows flex container controls only for flex containers', async ({
 }) => {
   await page.goto('/')
   await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
-  await expect(horizontalDirection(page)).toHaveAttribute('aria-pressed', 'true')
-  await expect(verticalDirection(page)).toHaveAttribute('aria-pressed', 'false')
+  await expect(horizontalDirection(page)).toHaveAttribute('aria-checked', 'true')
+  await expect(verticalDirection(page)).toHaveAttribute('aria-checked', 'false')
   await expect(page.locator('.figma-autolayout-gap--row')).toHaveCount(1)
 
   await selectLayer(page, 'Select layer Main area', 'workspaceMain')
-  await expect(horizontalDirection(page)).toHaveAttribute('aria-pressed', 'false')
-  await expect(verticalDirection(page)).toHaveAttribute('aria-pressed', 'true')
+  await expect(horizontalDirection(page)).toHaveAttribute('aria-checked', 'false')
+  await expect(verticalDirection(page)).toHaveAttribute('aria-checked', 'true')
   await expect(page.locator('.figma-autolayout-gap--column').first())
     .toBeVisible()
 
@@ -136,7 +136,7 @@ async function readFlexGap(page: Page, nodeId: string) {
 }
 
 function horizontalDirection(page: Page) {
-  return page.getByRole('button', { name: 'Horizontal auto layout' })
+  return page.getByRole('radio', { name: 'Horizontal auto layout' })
 }
 
 function sideHandle(page: Page, side: 'bottom' | 'left' | 'right' | 'top') {
@@ -144,5 +144,5 @@ function sideHandle(page: Page, side: 'bottom' | 'left' | 'right' | 'top') {
 }
 
 function verticalDirection(page: Page) {
-  return page.getByRole('button', { name: 'Vertical auto layout' })
+  return page.getByRole('radio', { name: 'Vertical auto layout' })
 }
