@@ -11,6 +11,11 @@ export type SlideEditTextVerticalAlignmentOption = {
   label: string
 }
 
+export type SlideEditTextVerticalAlignmentFlexAlignItems =
+  | 'center'
+  | 'flex-end'
+  | 'flex-start'
+
 export type SlideEditTextVerticalAlignmentFieldDescriptor = {
   commandId: 'update-text-vertical-alignment'
   control: 'vertical-alignment-segmented-control'
@@ -164,6 +169,19 @@ export function normalizeSlideEditTextVerticalAlignment(
   return isSlideEditTextVerticalAlignmentValue(value)
     ? value
     : SLIDE_EDIT_TEXT_VERTICAL_ALIGNMENT_DEFAULT
+}
+
+export function getSlideEditTextVerticalAlignmentFlexAlignItems(
+  value: string | null | undefined,
+): SlideEditTextVerticalAlignmentFlexAlignItems {
+  switch (normalizeSlideEditTextVerticalAlignment(value)) {
+    case 'bottom':
+      return 'flex-end'
+    case 'middle':
+      return 'center'
+    case 'top':
+      return 'flex-start'
+  }
 }
 
 export function isSlideEditTextVerticalAlignmentValue(

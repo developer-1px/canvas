@@ -109,6 +109,7 @@ export {
 export {
   createSlideEditTextVerticalAlignmentDescriptor,
   getSlideEditTextVerticalAlignmentCommandEffect,
+  getSlideEditTextVerticalAlignmentFlexAlignItems,
   getSlideEditTextVerticalAlignmentMetadata,
   isSlideEditTextVerticalAlignmentValue,
   normalizeSlideEditTextVerticalAlignment,
@@ -119,6 +120,7 @@ export {
   SLIDE_EDIT_TEXT_VERTICAL_ALIGNMENT_OPTIONS,
   type SlideEditTextVerticalAlignmentDescriptor,
   type SlideEditTextVerticalAlignmentFieldDescriptor,
+  type SlideEditTextVerticalAlignmentFlexAlignItems,
   type SlideEditTextVerticalAlignmentHostCommandEffect,
   type SlideEditTextVerticalAlignmentMetadata,
   type SlideEditTextVerticalAlignmentObjectId,
