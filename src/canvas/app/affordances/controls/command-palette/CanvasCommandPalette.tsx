@@ -39,7 +39,9 @@ function CanvasCommandPaletteDialog({
   const [query, setQuery] = useState('')
   const [activeIndex, setActiveIndex] = useState(0)
   const controlId = useId()
+  const dialogRef = useRef<HTMLElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const restoreFocusRef = useRef<HTMLElement | null>(null)
   const listboxId = `${controlId}-listbox`
   const filteredItems = useMemo(
     () =>
@@ -55,9 +57,13 @@ function CanvasCommandPaletteDialog({
     : undefined
 
   useEffect(() => {
+    restoreFocusRef.current = getCanvasCommandPaletteRestoreTarget()
     const focusTimer = window.setTimeout(() => inputRef.current?.focus(), 0)
 
-    return () => window.clearTimeout(focusTimer)
+    return () => {
+      window.clearTimeout(focusTimer)
+      restoreCanvasCommandPaletteFocus(restoreFocusRef.current)
+    }
   }, [])
 
   const runItem = (item: CanvasCommandPaletteItem | undefined) => {
@@ -91,6 +97,14 @@ function CanvasCommandPaletteDialog({
       return
     }
 
+    if (event.key === 'Tab') {
+      trapCanvasCommandPaletteFocus({
+        dialog: dialogRef.current,
+        event,
+      })
+      return
+    }
+
     if (event.key === 'Enter') {
       event.preventDefault()
       event.stopPropagation()
@@ -100,6 +114,7 @@ function CanvasCommandPaletteDialog({
 
   const handleBackdropMouseDown = (event: MouseEvent<HTMLDivElement>) => {
     if (event.target === event.currentTarget) {
+      event.preventDefault()
       onClose()
     }
   }
@@ -110,6 +125,7 @@ function CanvasCommandPaletteDialog({
       onMouseDown={handleBackdropMouseDown}
     >
       <section
+        ref={dialogRef}
         className="command-palette"
         role="dialog"
         aria-label="Command palette"
@@ -178,4 +194,72 @@ function CanvasCommandPaletteDialog({
 
 function getCanvasCommandPaletteOptionId(controlId: string, itemId: string) {
   return `${controlId}-option-${itemId.replace(/[^a-zA-Z0-9_-]/g, '-')}`
+}
+
+function getCanvasCommandPaletteRestoreTarget() {
+  const activeElement = document.activeElement
+
+  return activeElement instanceof HTMLElement && activeElement !== document.body
+    ? activeElement
+    : null
+}
+
+function restoreCanvasCommandPaletteFocus(element: HTMLElement | null) {
+  if (element?.isConnected) {
+    element.focus()
+  }
+}
+
+function trapCanvasCommandPaletteFocus({
+  dialog,
+  event,
+}: {
+  dialog: HTMLElement | null
+  event: KeyboardEvent<HTMLElement>
+}) {
+  if (!dialog) {
+    return
+  }
+
+  const focusableElements = getCanvasCommandPaletteFocusableElements(dialog)
+
+  if (focusableElements.length === 0) {
+    event.preventDefault()
+    return
+  }
+
+  const activeElement = dialog.ownerDocument.activeElement
+  const activeIndex = focusableElements.findIndex((element) =>
+    element === activeElement)
+
+  if (activeIndex < 0) {
+    event.preventDefault()
+    focusableElements[0]?.focus()
+    return
+  }
+
+  const nextIndex = event.shiftKey
+    ? activeIndex - 1
+    : activeIndex + 1
+
+  if (nextIndex >= 0 && nextIndex < focusableElements.length) {
+    return
+  }
+
+  event.preventDefault()
+  focusableElements[
+    event.shiftKey ? focusableElements.length - 1 : 0
+  ]?.focus()
+}
+
+function getCanvasCommandPaletteFocusableElements(dialog: HTMLElement) {
+  return Array.from(dialog.querySelectorAll<HTMLElement>([
+    'a[href]',
+    'button:not([disabled])',
+    'input:not([disabled])',
+    'select:not([disabled])',
+    'textarea:not([disabled])',
+    '[tabindex]:not([tabindex="-1"])',
+  ].join(','))).filter((element) =>
+    element.getAttribute('aria-hidden') !== 'true')
 }
