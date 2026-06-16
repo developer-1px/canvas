@@ -8,6 +8,17 @@ import type {
 } from '../../../entities'
 import { getCanvasItemsBounds } from '../../../host'
 
+export type CanvasPastePositionMemory = {
+  key: string
+  pasteIndex: number
+}
+
+export type CanvasPastePositionSession = {
+  key: string
+  nextMemory: CanvasPastePositionMemory
+  pasteIndex: number
+}
+
 export function getCanvasPasteOffset({
   clipboard,
   pasteIndex,
@@ -30,5 +41,24 @@ export function getCanvasPasteOffset({
   return {
     x: viewportCenter.x - (bounds.x + bounds.w / 2),
     y: viewportCenter.y - (bounds.y + bounds.h / 2),
+  }
+}
+
+export function getCanvasPastePositionSession({
+  key,
+  memory,
+}: {
+  key: string
+  memory: CanvasPastePositionMemory | null | undefined
+}): CanvasPastePositionSession {
+  const pasteIndex = memory?.key === key ? memory.pasteIndex : 0
+
+  return {
+    key,
+    nextMemory: {
+      key,
+      pasteIndex: pasteIndex + 1,
+    },
+    pasteIndex,
   }
 }
