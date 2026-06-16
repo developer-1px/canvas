@@ -216,6 +216,30 @@ export {
   type SlideEditObjectHyperlinkValidation,
 } from './SlideEditObjectHyperlink'
 export {
+  createSlideEditObjectAccessibilityDescriptor,
+  getSlideEditObjectAccessibilityCommandEffect,
+  getSlideEditObjectAccessibilityMetadata,
+  normalizeSlideEditObjectAccessibility,
+  normalizeSlideEditObjectAccessibilityCommand,
+  normalizeSlideEditObjectAccessibilityFieldValue,
+  shouldEmitSlideEditObjectAccessibilityMetadata,
+  SLIDE_EDIT_OBJECT_ACCESSIBILITY_DATA_ATTRIBUTE,
+  SLIDE_EDIT_OBJECT_ACCESSIBILITY_DEFAULT,
+  SLIDE_EDIT_OBJECT_ACCESSIBILITY_FIELDS,
+  toSlideEditObjectAccessibilityAttributeValue,
+  type SlideEditObjectAccessibility,
+  type SlideEditObjectAccessibilityCommand,
+  type SlideEditObjectAccessibilityDescriptor,
+  type SlideEditObjectAccessibilityFieldDescriptor,
+  type SlideEditObjectAccessibilityFieldId,
+  type SlideEditObjectAccessibilityHostCommandEffect,
+  type SlideEditObjectAccessibilityMetadata,
+  type SlideEditObjectAccessibilityObjectId,
+  type SlideEditObjectAccessibilitySlideId,
+  type SlideEditObjectAccessibilityUpdateCommand,
+  type SlideEditObjectAltTextRemoveCommand,
+} from './SlideEditObjectAccessibility'
+export {
   createSlideEditObjectShadowDescriptor,
   getSlideEditObjectShadowCommandEffect,
   getSlideEditObjectShadowMetadata,
@@ -461,6 +485,7 @@ export type SlideEditAdapter<
 
 export type SlideEditAdapterSlotId =
   | 'command-effect'
+  | 'object-accessibility'
   | 'object-animation'
   | 'object-hyperlink'
   | 'object-opacity'
@@ -503,6 +528,11 @@ export const SLIDE_EDIT_ADAPTER_SLOTS = Object.freeze([
     id: 'command-effect',
     owner: 'host',
     purpose: 'Apply command effects through the host document transaction.',
+  },
+  {
+    id: 'object-accessibility',
+    owner: 'host',
+    purpose: 'Provide selected object alt text and decorative state for inspector, stage, thumbnail, and export.',
   },
   {
     id: 'object-animation',
@@ -610,6 +640,7 @@ export const SLIDE_EDIT_REUSED_CANVAS_CONTRACTS = Object.freeze([
 export type SlideEditOwnedContractId =
   | 'layout-theme-affordance'
   | 'object-inspector'
+  | 'object-accessibility-affordance'
   | 'object-animation-build-order'
   | 'object-hyperlink-affordance'
   | 'object-layer-pane'
@@ -665,6 +696,11 @@ export const SLIDE_EDIT_OWNED_CONTRACTS = Object.freeze([
     id: 'object-layer-pane',
     owner: 'slide-edit-affordance',
     scope: 'Slide object row descriptors and layer pane command intents.',
+  },
+  {
+    id: 'object-accessibility-affordance',
+    owner: 'slide-edit-affordance',
+    scope: 'Object alt text, decorative state, metadata attribute, and update command effects.',
   },
   {
     id: 'object-animation-build-order',

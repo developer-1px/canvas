@@ -17,6 +17,7 @@
 | Slide rail interaction | `slide-edit-affordance` | active slide, slide order, thumbnail hit target, rail command intent |
 | Placeholder visibility affordance | `slide-edit-affordance` | slide placeholder structure and object hide/show read model |
 | Object layer pane | `slide-edit-affordance` | object row descriptor, selection pane command intent, ARIA tree contract |
+| Object accessibility | `slide-edit-affordance` | object alt text, decorative state, metadata attribute, and host command effect |
 | Object animation build order | `slide-edit-affordance` | object animation type, trigger, timing, and slide-local build order |
 | Object hyperlink/action | `slide-edit-affordance` | object URL/action metadata, URL policy, and host command effect |
 | Object opacity | `slide-edit-affordance` | object opacity value, metadata attribute, and host command effect |
@@ -40,6 +41,7 @@
 | `object-bounds` | Object bounds for a slide/object reference |
 | `selection` | Active page id and selected object ids |
 | `command-effect` | Transaction boundary for command effects |
+| `object-accessibility` | Selected object alt text and decorative state for inspector, stage, thumbnail, and export |
 | `object-animation` | Object animation and build order values scoped to a slide |
 | `object-hyperlink` | Selected object hyperlink/action values for inspector, stage, thumbnail, and export |
 | `object-opacity` | Selected object opacity values for inspector, stage, thumbnail, and export |
@@ -205,6 +207,19 @@
 | Build order | slide-local object order sorts by numeric order and preserves input order for ties |
 | Updates | field-level type, trigger, duration, delay, and order edits become host command effects |
 | Runtime | host owns animation preview rendering, export mapping, and persistence |
+
+## Object Accessibility Contract
+
+| Area | Contract |
+| --- | --- |
+| Value | accessibility uses `altText` and `decorative` |
+| Default | empty alt text and `decorative: false` serialize as `none` |
+| Decorative | decorative objects normalize to empty alt text while retaining decorative metadata |
+| Field | alt text and decorative fields route through `update-object-accessibility` |
+| Removal | `remove-object-alt-text` clears object description through a host command effect |
+| Metadata | `data-slide-object-accessibility` carries `none` or a JSON string for normalized accessibility metadata |
+| Scope | describes slide content objects, not app chrome, toolbar controls, or UI `aria-label` strings |
+| Runtime | stage, thumbnail, presentation, inspector, and export can read the same metadata value |
 
 ## Object Opacity Contract
 
