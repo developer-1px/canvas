@@ -48,6 +48,17 @@ export const DRAG_THRESHOLD = 3
 
 export type CanvasViewportZoomDirection = 'in' | 'out'
 
+export type CanvasSequentialIdFactoryFormatInput = {
+  index: number
+  prefix: string
+}
+
+export type CanvasSequentialIdFactoryInput = {
+  existingIds?: Iterable<string>
+  formatId?: (input: CanvasSequentialIdFactoryFormatInput) => string
+  startIndex?: number
+}
+
 export function clamp(value: number, min: number, max: number) {
   if (!Number.isFinite(value)) {
     return min
@@ -155,6 +166,29 @@ export function unique<TId extends string>(ids: readonly TId[]): TId[] {
   return Array.from(new Set(ids))
 }
 
+export function createCanvasSequentialIdFactory({
+  existingIds = [],
+  formatId = formatDefaultCanvasSequentialId,
+  startIndex = 1,
+}: CanvasSequentialIdFactoryInput = {}) {
+  const ids = new Set(existingIds)
+  let nextIndex = normalizeCanvasSequentialIdIndex(startIndex)
+
+  return (prefix: string) => {
+    let id = formatId({ index: nextIndex, prefix })
+
+    while (ids.has(id)) {
+      nextIndex += 1
+      id = formatId({ index: nextIndex, prefix })
+    }
+
+    ids.add(id)
+    nextIndex += 1
+
+    return id
+  }
+}
+
 export function zoomViewport(current: Viewport, point: Point, multiplier: number) {
   const currentScale = clamp(current.scale, MIN_SCALE, MAX_SCALE)
   const nextScale = clamp(currentScale * multiplier, MIN_SCALE, MAX_SCALE)
@@ -199,4 +233,17 @@ function getCanvasViewportTransform(viewport: Viewport) {
     x: Number.isFinite(viewport.x) ? viewport.x : 0,
     y: Number.isFinite(viewport.y) ? viewport.y : 0,
   }
+}
+
+function formatDefaultCanvasSequentialId({
+  index,
+  prefix,
+}: CanvasSequentialIdFactoryFormatInput) {
+  return `${prefix}-${index}`
+}
+
+function normalizeCanvasSequentialIdIndex(value: number) {
+  return Number.isFinite(value)
+    ? Math.max(1, Math.floor(value))
+    : 1
 }

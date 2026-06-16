@@ -2,6 +2,7 @@ import { describe, expect, expectTypeOf, it } from 'vitest'
 import {
   CANVAS_FIT_VIEWPORT_PADDING,
   CANVAS_ZOOM_STEPS,
+  createCanvasSequentialIdFactory,
   fitBoundsIntoViewport,
   getCanvasViewportScale,
   getCanvasViewportScreenBounds,
@@ -29,6 +30,27 @@ describe('CanvasCorePrimitives', () => {
 
     expect(deduped).toEqual(['shape-fill', 'line-style'])
     expectTypeOf(deduped).toEqualTypeOf<Array<'shape-fill' | 'line-style'>>()
+  })
+
+  it('creates sequential ids without colliding with existing or generated ids', () => {
+    const createId = createCanvasSequentialIdFactory({
+      existingIds: ['rect-1', 'rect-2'],
+    })
+
+    expect(createId('rect')).toBe('rect-3')
+    expect(createId('rect')).toBe('rect-4')
+    expect(createId('text')).toBe('text-5')
+  })
+
+  it('supports scoped id formats and normalizes invalid start indexes', () => {
+    const createId = createCanvasSequentialIdFactory({
+      existingIds: ['slide-1-text-1'],
+      formatId: ({ index, prefix }) => `slide-1-${prefix}-${index}`,
+      startIndex: 0.2,
+    })
+
+    expect(createId('text')).toBe('slide-1-text-2')
+    expect(createId('image')).toBe('slide-1-image-3')
   })
 
   it('moves zoom controls to the next or previous reference step', () => {
