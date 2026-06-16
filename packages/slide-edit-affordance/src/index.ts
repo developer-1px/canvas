@@ -489,6 +489,8 @@ export {
   createSlideEditColorSwatchPaletteDescriptor,
   getSlideEditColorSwatchCommandEffect,
   getSlideEditColorSwatchId,
+  getSlideEditColorWithAlphaCSS,
+  normalizeSlideEditColorHex,
   normalizeSlideEditColorSwatchValue,
   SLIDE_EDIT_COLOR_SWATCH_CHANNELS,
   SLIDE_EDIT_COLOR_SWATCH_FIELD,

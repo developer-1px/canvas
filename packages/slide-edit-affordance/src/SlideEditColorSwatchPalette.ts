@@ -299,6 +299,44 @@ export function normalizeSlideEditColorSwatchValue(
   return normalizedValue ? normalizedValue : null
 }
 
+export function normalizeSlideEditColorHex(
+  color: string | null | undefined,
+) {
+  const match = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(color?.trim() ?? '')
+
+  if (!match) {
+    return null
+  }
+
+  const hex = match[1]
+  const normalizedHex = hex.length === 3
+    ? [...hex].map((char) => `${char}${char}`).join('')
+    : hex
+
+  return `#${normalizedHex.toLowerCase()}`
+}
+
+export function getSlideEditColorWithAlphaCSS({
+  color,
+  opacity,
+}: {
+  color: string
+  opacity: number
+}) {
+  const normalizedHex = normalizeSlideEditColorHex(color)
+
+  if (!normalizedHex) {
+    return color
+  }
+
+  const hex = normalizedHex.slice(1)
+  const red = Number.parseInt(hex.slice(0, 2), 16)
+  const green = Number.parseInt(hex.slice(2, 4), 16)
+  const blue = Number.parseInt(hex.slice(4, 6), 16)
+
+  return `rgb(${red} ${green} ${blue} / ${normalizeSlideEditColorAlpha(opacity)})`
+}
+
 function createSlideEditThemeColorSwatchSection<
   TColorTokenId extends SlideEditThemeColorTokenId,
 >({
@@ -402,4 +440,14 @@ function getSelectedSlideEditColorSwatchId(
   return sections
     .flatMap((section) => section.swatches)
     .find((swatch) => swatch.selected)?.id
+}
+
+function normalizeSlideEditColorAlpha(value: number) {
+  if (!Number.isFinite(value)) {
+    return 1
+  }
+
+  const rounded = Math.round(value * 100) / 100
+
+  return Math.min(1, Math.max(0, rounded))
 }
