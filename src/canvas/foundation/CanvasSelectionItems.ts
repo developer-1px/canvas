@@ -55,6 +55,27 @@ export type CanvasSelectionItemGroupsInput<
   getItemGroupId: (item: TItem, index: number) => TGroupId | null | undefined
 }
 
+export type CanvasSelectionItemGroupMembersInput<
+  TItem,
+  TItemId extends string = string,
+  TGroupId extends string = string,
+> = Omit<
+  CanvasSelectionItemGroupsInput<TItem, TItemId, TGroupId>,
+  'selection'
+> & {
+  itemId: TItemId
+}
+
+export type CanvasGroupedItemPointerSelectionInput<
+  TItem,
+  TItemId extends string = string,
+  TGroupId extends string = string,
+> = CanvasSelectionItemGroupMembersInput<TItem, TItemId, TGroupId> & {
+  additive: boolean
+  fallbackSelection: readonly TItemId[]
+  selection: readonly TItemId[]
+}
+
 export type CanvasSelectionUngroupItemInput<
   TItem,
   TItemId extends string = string,
@@ -231,6 +252,76 @@ export function getCanvasSelectedItemGroupIds<
   return groupIds
 }
 
+export function getCanvasItemGroupMemberIds<
+  TItem,
+  TItemId extends string = string,
+  TGroupId extends string = string,
+>({
+  getItemGroupId,
+  getItemId,
+  isItemSelectable = () => true,
+  itemId,
+  items,
+}: CanvasSelectionItemGroupMembersInput<TItem, TItemId, TGroupId>) {
+  const groupId = getCanvasItemGroupId({
+    getItemGroupId,
+    getItemId,
+    itemId,
+    items,
+  })
+
+  if (groupId === undefined) {
+    return []
+  }
+
+  const memberIds: TItemId[] = []
+
+  items.forEach((item, index) => {
+    const candidateGroupId = getItemGroupId(item, index) ?? undefined
+
+    if (candidateGroupId === groupId && isItemSelectable(item, index)) {
+      memberIds.push(getItemId(item, index))
+    }
+  })
+
+  return memberIds
+}
+
+export function getCanvasGroupedItemPointerSelection<
+  TItem,
+  TItemId extends string = string,
+  TGroupId extends string = string,
+>({
+  additive,
+  fallbackSelection,
+  selection,
+  ...input
+}: CanvasGroupedItemPointerSelectionInput<TItem, TItemId, TGroupId>) {
+  const memberIds = getCanvasItemGroupMemberIds(input)
+
+  if (memberIds.length === 0) {
+    return [...fallbackSelection]
+  }
+
+  if (!additive) {
+    return memberIds
+  }
+
+  const selected = new Set(selection)
+  const allMembersSelected = memberIds.every((id) => selected.has(id))
+
+  if (allMembersSelected) {
+    const members = new Set(memberIds)
+
+    return selection.filter((id) => !members.has(id))
+  }
+
+  return [
+    ...selection,
+    ...memberIds.filter((id) => !selected.has(id)),
+  ]
+}
+
 export function ungroupCanvasSelectionItems<
   TItem,
   TItemId extends string = string,
@@ -279,6 +370,32 @@ export function ungroupCanvasSelectionItems<
     }),
     selection: nextSelection,
   }
+}
+
+function getCanvasItemGroupId<
+  TItem,
+  TItemId extends string = string,
+  TGroupId extends string = string,
+>({
+  getItemGroupId,
+  getItemId,
+  itemId,
+  items,
+}: {
+  getItemGroupId: (item: TItem, index: number) => TGroupId | null | undefined
+  getItemId: (item: TItem, index: number) => TItemId
+  itemId: TItemId
+  items: readonly TItem[]
+}) {
+  for (let index = 0; index < items.length; index += 1) {
+    const item = items[index]
+
+    if (item && getItemId(item, index) === itemId) {
+      return getItemGroupId(item, index) ?? undefined
+    }
+  }
+
+  return undefined
 }
 
 function getCanvasSelectionCloneTargetGroupId<TGroupId extends string>({
