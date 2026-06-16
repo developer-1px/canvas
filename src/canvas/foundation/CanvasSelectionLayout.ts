@@ -3,6 +3,7 @@ import { unionCanvasRectList } from './CanvasHeadlessGeometry'
 import type {
   CanvasAlignMode,
   CanvasDistributeMode,
+  CanvasReorderMode,
 } from './CanvasCommandTypes'
 
 export type CanvasSelectionLayoutAxis = 'horizontal' | 'vertical'
@@ -47,6 +48,17 @@ export type CanvasSelectionDistributeInput<
   TItemId extends string = string,
 > = CanvasSelectionLayoutChangeInput<TItem, TItemId> & {
   mode: CanvasDistributeMode
+}
+
+export type CanvasSelectionReorderInput<
+  TItem,
+  TItemId extends string = string,
+> = {
+  getItemId: (item: TItem, index: number) => TItemId
+  isItemSelectable?: (item: TItem, index: number) => boolean
+  items: TItem[]
+  mode: CanvasReorderMode
+  selection: readonly TItemId[]
 }
 
 export type CanvasSelectionFlipItemInput<
@@ -195,6 +207,89 @@ export function distributeCanvasSelectionItems<
 
   return input.items.map((item, index) =>
     distributed.get(input.getItemId(item, index)) ?? item)
+}
+
+export function canReorderCanvasSelectionItems<
+  TItem,
+  TItemId extends string = string,
+>({
+  getItemId,
+  isItemSelectable = () => true,
+  items,
+  mode,
+  selection,
+}: Omit<CanvasSelectionReorderInput<TItem, TItemId>, 'items'> & {
+  items: readonly TItem[]
+}) {
+  const next = reorderCanvasSelectionItems({
+    getItemId,
+    isItemSelectable,
+    items: [...items],
+    mode,
+    selection,
+  })
+
+  return !areCanvasSelectionItemOrdersEqual(items, next, getItemId)
+}
+
+export function reorderCanvasSelectionItems<
+  TItem,
+  TItemId extends string = string,
+>({
+  getItemId,
+  isItemSelectable = () => true,
+  items,
+  mode,
+  selection,
+}: CanvasSelectionReorderInput<TItem, TItemId>): TItem[] {
+  const selected = getSelectedCanvasSelectionOrderIds({
+    getItemId,
+    isItemSelectable,
+    items,
+    selection,
+  })
+
+  if (selected.size === 0) {
+    return items
+  }
+
+  if (mode === 'bringToFront') {
+    return [
+      ...items.filter((item, index) => !selected.has(getItemId(item, index))),
+      ...items.filter((item, index) => selected.has(getItemId(item, index))),
+    ]
+  }
+
+  if (mode === 'sendToBack') {
+    return [
+      ...items.filter((item, index) => selected.has(getItemId(item, index))),
+      ...items.filter((item, index) => !selected.has(getItemId(item, index))),
+    ]
+  }
+
+  const next = [...items]
+
+  if (mode === 'bringForward') {
+    for (let index = next.length - 2; index >= 0; index -= 1) {
+      const currentId = getItemId(next[index], index)
+      const nextId = getItemId(next[index + 1], index + 1)
+
+      if (selected.has(currentId) && !selected.has(nextId)) {
+        ;[next[index], next[index + 1]] = [next[index + 1], next[index]]
+      }
+    }
+  } else {
+    for (let index = 1; index < next.length; index += 1) {
+      const currentId = getItemId(next[index], index)
+      const previousId = getItemId(next[index - 1], index - 1)
+
+      if (selected.has(currentId) && !selected.has(previousId)) {
+        ;[next[index - 1], next[index]] = [next[index], next[index - 1]]
+      }
+    }
+  }
+
+  return next
 }
 
 export function flipCanvasSelectionItems<
@@ -351,6 +446,51 @@ function reflectCanvasSelectionLayoutBounds(
   return axis === 'horizontal'
     ? { ...bounds, x: 2 * pivot - (bounds.x + bounds.w) }
     : { ...bounds, y: 2 * pivot - (bounds.y + bounds.h) }
+}
+
+function getSelectedCanvasSelectionOrderIds<
+  TItem,
+  TItemId extends string = string,
+>({
+  getItemId,
+  isItemSelectable,
+  items,
+  selection,
+}: {
+  getItemId: (item: TItem, index: number) => TItemId
+  isItemSelectable: (item: TItem, index: number) => boolean
+  items: readonly TItem[]
+  selection: readonly TItemId[]
+}) {
+  const selectionIds = new Set(selection)
+  const selected = new Set<TItemId>()
+
+  items.forEach((item, index) => {
+    const id = getItemId(item, index)
+
+    if (selectionIds.has(id) && isItemSelectable(item, index)) {
+      selected.add(id)
+    }
+  })
+
+  return selected
+}
+
+function areCanvasSelectionItemOrdersEqual<
+  TItem,
+  TItemId extends string = string,
+>(
+  left: readonly TItem[],
+  right: readonly TItem[],
+  getItemId: (item: TItem, index: number) => TItemId,
+) {
+  return left.length === right.length &&
+    left.every((item, index) => {
+      const rightItem = right[index]
+
+      return rightItem !== undefined &&
+        getItemId(item, index) === getItemId(rightItem, index)
+    })
 }
 
 function getCanvasSelectionAlignedBounds(

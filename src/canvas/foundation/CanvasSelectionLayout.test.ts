@@ -6,9 +6,11 @@ import {
   canAlignCanvasSelectionItems,
   canDistributeCanvasSelectionItems,
   canFlipCanvasSelectionItems,
+  canReorderCanvasSelectionItems,
   canTidyCanvasSelectionItems,
   distributeCanvasSelectionItems,
   flipCanvasSelectionItems,
+  reorderCanvasSelectionItems,
   tidyCanvasSelectionItems,
 } from './CanvasSelectionLayout'
 
@@ -29,6 +31,60 @@ const items: TestItem[] = [
 ]
 
 describe('CanvasSelectionLayout', () => {
+  it('reorders selected items across z-order modes', () => {
+    const orderItems = items.slice(0, 4)
+
+    expect(canReorderCanvasSelectionItems({
+      getItemId,
+      items: orderItems,
+      mode: 'bringForward',
+      selection: ['b'],
+    })).toBe(true)
+    expect(getIds(reorderCanvasSelectionItems({
+      getItemId,
+      items: [...orderItems],
+      mode: 'bringForward',
+      selection: ['b', 'hidden'],
+    }))).toEqual(['a', 'c', 'b', 'hidden'])
+    expect(getIds(reorderCanvasSelectionItems({
+      getItemId,
+      items: [...orderItems],
+      mode: 'sendBackward',
+      selection: ['c'],
+    }))).toEqual(['a', 'c', 'b', 'hidden'])
+    expect(getIds(reorderCanvasSelectionItems({
+      getItemId,
+      items: [...orderItems],
+      mode: 'bringToFront',
+      selection: ['b', 'c'],
+    }))).toEqual(['a', 'hidden', 'b', 'c'])
+    expect(getIds(reorderCanvasSelectionItems({
+      getItemId,
+      items: [...orderItems],
+      mode: 'sendToBack',
+      selection: ['b', 'c'],
+    }))).toEqual(['b', 'c', 'a', 'hidden'])
+  })
+
+  it('excludes unsupported items from reorder', () => {
+    const orderItems = items.slice(0, 4)
+
+    expect(canReorderCanvasSelectionItems({
+      getItemId,
+      isItemSelectable,
+      items: orderItems,
+      mode: 'bringForward',
+      selection: ['hidden'],
+    })).toBe(false)
+    expect(getIds(reorderCanvasSelectionItems({
+      getItemId,
+      isItemSelectable,
+      items: [...orderItems],
+      mode: 'bringToFront',
+      selection: ['b', 'hidden'],
+    }))).toEqual(['a', 'c', 'hidden', 'b'])
+  })
+
   it('aligns selected item bounds to a provided frame', () => {
     expect(canAlignCanvasSelectionItems({
       frame: { h: 100, w: 200, x: 0, y: 0 },
@@ -235,4 +291,8 @@ function updateItemBounds(item: TestItem, rect: Bounds): TestItem {
     ...item,
     rect,
   }
+}
+
+function getIds(items: readonly TestItem[]) {
+  return items.map((item) => item.id)
 }

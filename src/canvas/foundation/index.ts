@@ -70,9 +70,11 @@ export {
   canAlignCanvasSelectionItems,
   canDistributeCanvasSelectionItems,
   canFlipCanvasSelectionItems,
+  canReorderCanvasSelectionItems,
   canTidyCanvasSelectionItems,
   distributeCanvasSelectionItems,
   flipCanvasSelectionItems,
+  reorderCanvasSelectionItems,
   tidyCanvasSelectionItems,
   type CanvasSelectionAlignInput,
   type CanvasSelectionDistributeInput,
@@ -81,6 +83,7 @@ export {
   type CanvasSelectionLayoutAxis,
   type CanvasSelectionLayoutChangeInput,
   type CanvasSelectionLayoutInput,
+  type CanvasSelectionReorderInput,
   type CanvasSelectionTidyInput,
 } from './CanvasSelectionLayout'
 export {
