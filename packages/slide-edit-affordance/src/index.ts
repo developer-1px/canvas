@@ -164,6 +164,27 @@ export {
   type SlideEditVisibilitySlideId,
 } from './SlideEditObjectVisibility'
 export {
+  createSlideEditObjectOpacityDescriptor,
+  getSlideEditObjectOpacityCommandEffect,
+  getSlideEditObjectOpacityMetadata,
+  normalizeSlideEditObjectOpacity,
+  normalizeSlideEditObjectOpacityUpdateCommand,
+  SLIDE_EDIT_OBJECT_OPACITY_DATA_ATTRIBUTE,
+  SLIDE_EDIT_OBJECT_OPACITY_DEFAULT,
+  SLIDE_EDIT_OBJECT_OPACITY_FIELD,
+  SLIDE_EDIT_OBJECT_OPACITY_LIMITS,
+  toSlideEditObjectOpacityAttributeValue,
+  type SlideEditObjectOpacityDescriptor,
+  type SlideEditObjectOpacityFieldDescriptor,
+  type SlideEditObjectOpacityHostCommandEffect,
+  type SlideEditObjectOpacityMetadata,
+  type SlideEditObjectOpacityNumericLimits,
+  type SlideEditObjectOpacityObjectId,
+  type SlideEditObjectOpacitySlideId,
+  type SlideEditObjectOpacityUpdateCommand,
+  type SlideEditObjectOpacityValue,
+} from './SlideEditObjectOpacity'
+export {
   createSlideEditLayerPaneDescriptor,
   getSlideEditLayerPaneCommandEffect,
   SLIDE_EDIT_LAYER_PANE_ARIA_CONTRACT,
@@ -384,6 +405,7 @@ export type SlideEditAdapter<
 export type SlideEditAdapterSlotId =
   | 'command-effect'
   | 'object-animation'
+  | 'object-opacity'
   | 'layout-theme'
   | 'object-bounds'
   | 'selection'
@@ -427,6 +449,11 @@ export const SLIDE_EDIT_ADAPTER_SLOTS = Object.freeze([
     id: 'object-animation',
     owner: 'host',
     purpose: 'Provide object animation and build order values scoped to a slide.',
+  },
+  {
+    id: 'object-opacity',
+    owner: 'host',
+    purpose: 'Provide selected object opacity values for inspector, stage, thumbnail, and export.',
   },
   {
     id: 'layout-theme',
@@ -516,6 +543,7 @@ export type SlideEditOwnedContractId =
   | 'object-inspector'
   | 'object-animation-build-order'
   | 'object-layer-pane'
+  | 'object-opacity-affordance'
   | 'placeholder-visibility-affordance'
   | 'slide-command-effects'
   | 'slide-object-clipboard'
@@ -571,6 +599,11 @@ export const SLIDE_EDIT_OWNED_CONTRACTS = Object.freeze([
     id: 'object-animation-build-order',
     owner: 'slide-edit-affordance',
     scope: 'Object animation type, trigger, timing, and slide-local build order.',
+  },
+  {
+    id: 'object-opacity-affordance',
+    owner: 'slide-edit-affordance',
+    scope: 'Object opacity value, metadata attribute, and update command effects.',
   },
   {
     id: 'layout-theme-affordance',
