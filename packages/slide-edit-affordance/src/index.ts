@@ -185,6 +185,28 @@ export {
   type SlideEditObjectOpacityValue,
 } from './SlideEditObjectOpacity'
 export {
+  createSlideEditObjectFillOpacityDescriptor,
+  getSlideEditObjectFillOpacityCommandEffect,
+  getSlideEditObjectFillOpacityMetadata,
+  normalizeSlideEditObjectFillOpacity,
+  normalizeSlideEditObjectFillOpacityUpdateCommand,
+  SLIDE_EDIT_OBJECT_FILL_OPACITY_DATA_ATTRIBUTE,
+  SLIDE_EDIT_OBJECT_FILL_OPACITY_DEFAULT,
+  SLIDE_EDIT_OBJECT_FILL_OPACITY_FIELD,
+  SLIDE_EDIT_OBJECT_FILL_OPACITY_LIMITS,
+  toSlideEditObjectFillOpacityAttributeValue,
+  type SlideEditObjectFillOpacityDescriptor,
+  type SlideEditObjectFillOpacityFieldDescriptor,
+  type SlideEditObjectFillOpacityHostCommandEffect,
+  type SlideEditObjectFillOpacityMetadata,
+  type SlideEditObjectFillOpacityNumericLimits,
+  type SlideEditObjectFillOpacityObjectId,
+  type SlideEditObjectFillOpacitySlideId,
+  type SlideEditObjectFillOpacityUnsupportedReason,
+  type SlideEditObjectFillOpacityUpdateCommand,
+  type SlideEditObjectFillOpacityValue,
+} from './SlideEditObjectFillOpacity'
+export {
   createSlideEditObjectHyperlinkDescriptor,
   getSlideEditObjectHyperlinkCommandEffect,
   getSlideEditObjectHyperlinkMetadata,
@@ -509,6 +531,7 @@ export type SlideEditAdapterSlotId =
   | 'command-effect'
   | 'object-accessibility'
   | 'object-animation'
+  | 'object-fill-opacity'
   | 'object-hyperlink'
   | 'object-opacity'
   | 'object-shadow'
@@ -561,6 +584,11 @@ export const SLIDE_EDIT_ADAPTER_SLOTS = Object.freeze([
     id: 'object-animation',
     owner: 'host',
     purpose: 'Provide object animation and build order values scoped to a slide.',
+  },
+  {
+    id: 'object-fill-opacity',
+    owner: 'host',
+    purpose: 'Provide selected object fill opacity values separate from whole-object opacity.',
   },
   {
     id: 'object-hyperlink',
@@ -670,6 +698,7 @@ export type SlideEditOwnedContractId =
   | 'object-inspector'
   | 'object-accessibility-affordance'
   | 'object-animation-build-order'
+  | 'object-fill-opacity-affordance'
   | 'object-hyperlink-affordance'
   | 'object-layer-pane'
   | 'object-opacity-affordance'
@@ -735,6 +764,11 @@ export const SLIDE_EDIT_OWNED_CONTRACTS = Object.freeze([
     id: 'object-animation-build-order',
     owner: 'slide-edit-affordance',
     scope: 'Object animation type, trigger, timing, and slide-local build order.',
+  },
+  {
+    id: 'object-fill-opacity-affordance',
+    owner: 'slide-edit-affordance',
+    scope: 'Object fill-only opacity value, bounds, support state, metadata attribute, and update command effects.',
   },
   {
     id: 'object-hyperlink-affordance',

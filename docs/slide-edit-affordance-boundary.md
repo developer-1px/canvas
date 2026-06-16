@@ -19,6 +19,7 @@
 | Object layer pane | `slide-edit-affordance` | object row descriptor, selection pane command intent, ARIA tree contract |
 | Object accessibility | `slide-edit-affordance` | object alt text, decorative state, metadata attribute, and host command effect |
 | Object animation build order | `slide-edit-affordance` | object animation type, trigger, timing, and slide-local build order |
+| Object fill opacity | `slide-edit-affordance` | object fill-only opacity value, support state, and host command effect |
 | Object hyperlink/action | `slide-edit-affordance` | object URL/action metadata, URL policy, and host command effect |
 | Object opacity | `slide-edit-affordance` | object opacity value, metadata attribute, and host command effect |
 | Object shadow/effect | `slide-edit-affordance` | object shadow subset, metadata attribute, and host command effect |
@@ -44,6 +45,7 @@
 | `command-effect` | Transaction boundary for command effects |
 | `object-accessibility` | Selected object alt text and decorative state for inspector, stage, thumbnail, and export |
 | `object-animation` | Object animation and build order values scoped to a slide |
+| `object-fill-opacity` | Selected object fill opacity values separate from whole-object opacity |
 | `object-hyperlink` | Selected object hyperlink/action values for inspector, stage, thumbnail, and export |
 | `object-opacity` | Selected object opacity values for inspector, stage, thumbnail, and export |
 | `object-shadow` | Selected object shadow values for inspector, stage, thumbnail, and export |
@@ -232,6 +234,19 @@
 | Metadata | `data-slide-object-opacity` carries the normalized value as an attribute string |
 | Normalization | invalid values use `1`; valid values clamp to `0..1` and round to two decimals |
 | Updates | selected object id and normalized opacity value become host command effects |
+| Runtime | stage, thumbnail, presentation, inspector, and export can read the same metadata value |
+
+## Object Fill Opacity Contract
+
+| Area | Contract |
+| --- | --- |
+| Value | fill opacity is a normalized numeric ratio from `0` to `1`; default is `1` |
+| Field | `fillOpacity` slider descriptor routes through `update-object-fill-opacity` |
+| Bounds | numeric bounds are `0..1` with `0.01` step |
+| Metadata | `data-slide-object-fill-opacity` carries the normalized value or `unsupported` |
+| Unsupported | objects without fill can expose `isSupported: false` and reason `no-fill` |
+| Independence | only fill alpha changes; object opacity, stroke opacity, and text opacity stay separate |
+| Updates | selected object id and normalized fill opacity value become host command effects |
 | Runtime | stage, thumbnail, presentation, inspector, and export can read the same metadata value |
 
 ## Object Hyperlink/Action Contract
