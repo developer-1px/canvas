@@ -7,6 +7,10 @@ export {
   type CanvasContextCommandMenuState,
 } from './affordances/controls/toolbar/CanvasContextCommandMenu'
 export {
+  CANVAS_TOOLBAR_ITEM_PROPS,
+  useCanvasToolbarRovingFocus,
+} from './affordances/controls/toolbar/CanvasToolbarRovingFocus'
+export {
   CanvasAppViewportOverlayLayer,
   type CanvasAppViewportOverlayLayerProps,
 } from './rendering/CanvasAppViewportOverlayLayer'

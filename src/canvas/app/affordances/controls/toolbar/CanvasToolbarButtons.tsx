@@ -4,6 +4,7 @@ import {
   CANVAS_TOOL_AFFORDANCES,
 } from '../../../../engine'
 import type { CanvasBuiltinTool } from '../../../../entities'
+import { CANVAS_TOOLBAR_ITEM_PROPS } from './CanvasToolbarRovingFocus'
 
 type ToolButtonProps = {
   active: boolean
@@ -20,6 +21,7 @@ export function ToolButton({
 }: ToolButtonProps) {
   return (
     <button
+      {...CANVAS_TOOLBAR_ITEM_PROPS}
       type="button"
       className="tool-button"
       data-active={active}
@@ -48,6 +50,7 @@ export function CustomToolButton({
 }) {
   return (
     <button
+      {...CANVAS_TOOLBAR_ITEM_PROPS}
       type="button"
       className="tool-button custom-tool-button"
       data-active={active}
@@ -80,6 +83,7 @@ export function CommandButton({
 
   return (
     <button
+      {...CANVAS_TOOLBAR_ITEM_PROPS}
       type="button"
       className="tool-button"
       disabled={disabled}
@@ -107,6 +111,7 @@ export function CustomCommandButton({
 }) {
   return (
     <button
+      {...CANVAS_TOOLBAR_ITEM_PROPS}
       type="button"
       className="tool-button custom-command-button"
       disabled={disabled}

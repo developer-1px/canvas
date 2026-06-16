@@ -1,8 +1,10 @@
 export {
+  CANVAS_TOOLBAR_ITEM_PROPS,
   CanvasApp,
   CanvasAppViewportOverlayLayer,
   CanvasContextCommandMenu,
   useCanvasDevToolsAppModel,
+  useCanvasToolbarRovingFocus,
   type CanvasAppAssemblySource,
   type CanvasAppViewportOverlayLayerProps,
   type CanvasContextCommandMenuState,

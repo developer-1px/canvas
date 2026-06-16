@@ -1,3 +1,8 @@
+import {
+  CANVAS_TOOLBAR_ITEM_PROPS,
+  useCanvasToolbarRovingFocus,
+} from '../../controls/toolbar/CanvasToolbarRovingFocus'
+
 type CanvasComponentPaletteProps = {
   components: readonly CanvasComponentPaletteItem[]
   onInsert: (component: string) => void
@@ -16,10 +21,18 @@ export function CanvasComponentPalette({
   components,
   onInsert,
 }: CanvasComponentPaletteProps) {
+  const toolbarRovingFocus = useCanvasToolbarRovingFocus<HTMLDivElement>()
+
   return (
-    <div className="component-palette" role="toolbar" aria-label="Components">
+    <div
+      {...toolbarRovingFocus}
+      className="component-palette"
+      role="toolbar"
+      aria-label="Components"
+    >
       {components.map((component) => (
         <button
+          {...CANVAS_TOOLBAR_ITEM_PROPS}
           key={component.id}
           type="button"
           className="component-button"

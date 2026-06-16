@@ -7,6 +7,7 @@ import {
   renderCanvasToolbarItem,
   type CanvasToolbarItemRenderContext,
 } from './CanvasToolbarItemRenderer'
+import { useCanvasToolbarRovingFocus } from './CanvasToolbarRovingFocus'
 import type { CanvasToolbarGroup } from './CanvasToolbarItems'
 
 type CanvasCommandSurfaceProps = {
@@ -28,12 +29,15 @@ export function CanvasCommandSurface({
   onClick,
   style,
 }: CanvasCommandSurfaceProps) {
+  const toolbarRovingFocus = useCanvasToolbarRovingFocus<HTMLDivElement>()
+
   if (groups.length === 0) {
     return null
   }
 
   return (
     <div
+      {...toolbarRovingFocus}
       className={className}
       role="toolbar"
       aria-label={ariaLabel}
