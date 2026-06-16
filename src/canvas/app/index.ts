@@ -65,7 +65,11 @@ export {
   type CanvasSelectionListRangeInput,
 } from './affordances/controls/selection-list/CanvasSelectionListRange'
 export {
+  getCanvasContextMenuKeyboardIntent,
   getCanvasContextMenuPosition,
+  type CanvasContextMenuKeyboardIntent,
+  type CanvasContextMenuKeyboardIntentInput,
+  type CanvasContextMenuKeyboardIntentKind,
   type CanvasContextMenuPosition,
   type CanvasContextMenuPositionInput,
   type CanvasContextMenuSize,

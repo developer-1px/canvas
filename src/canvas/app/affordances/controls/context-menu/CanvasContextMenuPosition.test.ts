@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { getCanvasContextMenuPosition } from './CanvasContextMenuPosition'
+import {
+  getCanvasContextMenuKeyboardIntent,
+  getCanvasContextMenuPosition,
+} from './CanvasContextMenuPosition'
 
 describe('getCanvasContextMenuPosition', () => {
   it('keeps an in-bounds context menu point unchanged', () => {
@@ -35,5 +38,36 @@ describe('getCanvasContextMenuPosition', () => {
       point: { x: 80, y: 70 },
       viewportSize: { height: 320, width: 480 },
     })).toEqual({ x: 12, y: 12 })
+  })
+})
+
+describe('getCanvasContextMenuKeyboardIntent', () => {
+  it('maps ContextMenu and Shift F10 to an open context menu intent', () => {
+    expect(getCanvasContextMenuKeyboardIntent({
+      event: { shiftKey: false },
+      key: 'ContextMenu',
+    })).toEqual({
+      kind: 'open-context-menu',
+      preventDefault: true,
+    })
+
+    expect(getCanvasContextMenuKeyboardIntent({
+      event: { shiftKey: true },
+      key: 'F10',
+    })).toEqual({
+      kind: 'open-context-menu',
+      preventDefault: true,
+    })
+  })
+
+  it('ignores F10 without Shift and unrelated keys', () => {
+    expect(getCanvasContextMenuKeyboardIntent({
+      event: { shiftKey: false },
+      key: 'F10',
+    })).toBeNull()
+    expect(getCanvasContextMenuKeyboardIntent({
+      event: { shiftKey: true },
+      key: 'Escape',
+    })).toBeNull()
   })
 })

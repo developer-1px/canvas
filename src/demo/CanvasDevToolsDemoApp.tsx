@@ -50,6 +50,7 @@ import {
   type Tool,
   CANVAS_TOOLBAR_ITEM_PROPS,
   getCanvasAppWidgetInteractions,
+  getCanvasContextMenuKeyboardIntent,
   useCanvasToolbarRovingFocus,
 } from '../canvas'
 import { EngineSelectionToolbar } from './CanvasDevToolsSelectionToolbar'
@@ -376,10 +377,12 @@ function CanvasEngineDemoSurface({
       return
     }
 
-    if (
-      event.key !== 'ContextMenu' &&
-      !(event.key === 'F10' && event.shiftKey)
-    ) {
+    const contextMenuKeyboardIntent = getCanvasContextMenuKeyboardIntent({
+      event,
+      key: event.key,
+    })
+
+    if (!contextMenuKeyboardIntent) {
       return
     }
 

@@ -22,7 +22,36 @@ export type CanvasContextMenuPositionInput = {
   viewportSize?: CanvasContextMenuViewportSize | null
 }
 
+export type CanvasContextMenuKeyboardIntentKind = 'open-context-menu'
+
+export type CanvasContextMenuKeyboardIntent = {
+  kind: CanvasContextMenuKeyboardIntentKind
+  preventDefault: true
+}
+
+export type CanvasContextMenuKeyboardIntentInput = {
+  event: {
+    shiftKey: boolean
+  }
+  key: string
+}
+
 const DEFAULT_CANVAS_CONTEXT_MENU_MARGIN = 8
+
+export function getCanvasContextMenuKeyboardIntent({
+  event,
+  key,
+}: CanvasContextMenuKeyboardIntentInput):
+  CanvasContextMenuKeyboardIntent | null {
+  if (key === 'ContextMenu' || (key === 'F10' && event.shiftKey)) {
+    return {
+      kind: 'open-context-menu',
+      preventDefault: true,
+    }
+  }
+
+  return null
+}
 
 export function getCanvasContextMenuPosition({
   margin = DEFAULT_CANVAS_CONTEXT_MENU_MARGIN,
