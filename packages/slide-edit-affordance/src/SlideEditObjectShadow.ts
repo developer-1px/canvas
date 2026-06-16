@@ -337,6 +337,60 @@ export function toSlideEditObjectShadowAttributeValue(
   return JSON.stringify(normalizedShadow)
 }
 
+export function getSlideEditObjectShadowFilter(
+  shadow: Partial<SlideEditObjectShadow> | null | undefined,
+) {
+  const filterCss = getSlideEditObjectShadowFilterCSS(shadow)
+
+  return filterCss ? `drop-shadow(${filterCss})` : undefined
+}
+
+export function getSlideEditObjectShadowFilterCSS(
+  shadow: Partial<SlideEditObjectShadow> | null | undefined,
+) {
+  const normalizedShadow = normalizeSlideEditObjectShadow(shadow)
+
+  if (!normalizedShadow.enabled) {
+    return undefined
+  }
+
+  const radians = (normalizedShadow.angle * Math.PI) / 180
+  const offsetX = formatSlideEditObjectShadowCSSNumber(
+    Math.cos(radians) * normalizedShadow.distance,
+  )
+  const offsetY = formatSlideEditObjectShadowCSSNumber(
+    Math.sin(radians) * normalizedShadow.distance,
+  )
+
+  return [
+    `${offsetX}px`,
+    `${offsetY}px`,
+    `${normalizedShadow.blur}px`,
+    getSlideEditObjectShadowColorCSS(normalizedShadow),
+  ].join(' ')
+}
+
+export function getSlideEditObjectShadowColorCSS(
+  shadow: Partial<SlideEditObjectShadow> | null | undefined,
+) {
+  const normalizedShadow = normalizeSlideEditObjectShadow(shadow)
+  const match = /^#([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i
+    .exec(normalizedShadow.color)
+
+  if (!match) {
+    return normalizedShadow.color
+  }
+
+  const [, red, green, blue] = match
+
+  return [
+    `rgb(${Number.parseInt(red, 16)}`,
+    `${Number.parseInt(green, 16)}`,
+    `${Number.parseInt(blue, 16)}`,
+    `/ ${normalizedShadow.opacity})`,
+  ].join(' ')
+}
+
 function normalizeSlideEditObjectShadowColor(value: string | undefined) {
   const normalizedValue = value?.trim()
 
@@ -357,4 +411,8 @@ function normalizeSlideEditObjectShadowNumber(
   const rounded = Math.round(value * 100) / 100
 
   return Math.min(limits.max, Math.max(limits.min, rounded))
+}
+
+function formatSlideEditObjectShadowCSSNumber(value: number) {
+  return String(Number(value.toFixed(2)))
 }

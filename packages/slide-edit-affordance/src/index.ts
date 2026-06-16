@@ -348,6 +348,9 @@ export {
 export {
   createSlideEditObjectShadowDescriptor,
   getSlideEditObjectShadowCommandEffect,
+  getSlideEditObjectShadowColorCSS,
+  getSlideEditObjectShadowFilter,
+  getSlideEditObjectShadowFilterCSS,
   getSlideEditObjectShadowMetadata,
   normalizeSlideEditObjectShadow,
   normalizeSlideEditObjectShadowFieldValue,
