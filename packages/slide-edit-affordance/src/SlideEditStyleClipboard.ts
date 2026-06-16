@@ -257,6 +257,40 @@ export function getSlideEditStyleClipboardCategoryIds<
   return clipboard.categories.map((category) => category.id)
 }
 
+export function getSlideEditStyleClipboardCategoryDescriptors<
+  TCategoryId extends SlideEditStyleClipboardCategoryId =
+    SlideEditStyleClipboardBuiltInCategoryId,
+>({
+  categoryIds,
+  registry,
+}: {
+  categoryIds: readonly TCategoryId[]
+  registry?: readonly SlideEditStyleClipboardCategoryDescriptor<TCategoryId>[]
+}): SlideEditStyleClipboardCategoryDescriptor<TCategoryId>[] {
+  const descriptorRegistry = registry ??
+    (SLIDE_EDIT_STYLE_CLIPBOARD_BUILT_IN_CATEGORIES as unknown as readonly SlideEditStyleClipboardCategoryDescriptor<
+      TCategoryId
+    >[])
+  const selectedCategoryIds = new Set<TCategoryId>(categoryIds)
+  const emittedCategoryIds = new Set<TCategoryId>()
+  const descriptors: SlideEditStyleClipboardCategoryDescriptor<TCategoryId>[] =
+    []
+
+  for (const descriptor of descriptorRegistry) {
+    if (
+      !selectedCategoryIds.has(descriptor.id) ||
+      emittedCategoryIds.has(descriptor.id)
+    ) {
+      continue
+    }
+
+    emittedCategoryIds.add(descriptor.id)
+    descriptors.push(descriptor)
+  }
+
+  return descriptors
+}
+
 export function getSlideEditStyleClipboardCopyCommandEffect<
   TSlideId extends SlideEditStyleClipboardSlideId,
   TObjectId extends SlideEditStyleClipboardObjectId,

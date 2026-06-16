@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   createSlideEditStyleClipboardDescriptor,
   createSlideEditStyleClipboardPasteCommandEffect,
+  getSlideEditStyleClipboardCategoryDescriptors,
   getSlideEditStyleClipboardCategoryIds,
   getSlideEditStyleClipboardCopyCommandEffect,
   getSlideEditStyleClipboardPasteAvailability,
@@ -117,6 +118,46 @@ describe('SlideEditStyleClipboard', () => {
       'line-style',
       'text-style',
       'object-effect',
+    ])
+  })
+
+  it('selects built-in category descriptors from category ids in registry order', () => {
+    expect(getSlideEditStyleClipboardCategoryDescriptors({
+      categoryIds: ['text-style', 'shape-fill', 'text-style'],
+    })).toEqual([
+      {
+        id: 'shape-fill',
+        label: 'Shape Fill',
+      },
+      {
+        id: 'text-style',
+        label: 'Text Style',
+      },
+    ])
+  })
+
+  it('selects custom category descriptors and ignores unknown ids', () => {
+    expect(getSlideEditStyleClipboardCategoryDescriptors({
+      categoryIds: ['custom-fill', 'unknown', 'custom-fill'],
+      registry: [
+        {
+          id: 'custom-fill',
+          label: 'Custom Fill',
+        },
+        {
+          id: 'custom-stroke',
+          label: 'Custom Stroke',
+        },
+        {
+          id: 'custom-fill',
+          label: 'Duplicate Custom Fill',
+        },
+      ],
+    })).toEqual([
+      {
+        id: 'custom-fill',
+        label: 'Custom Fill',
+      },
     ])
   })
 
