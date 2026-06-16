@@ -10,6 +10,7 @@ export type SlideEditTextFontFamilySource =
 export type SlideEditTextFontFamilyOption<
   TFontFamily extends SlideEditTextFontFamily = SlideEditTextFontFamily,
 > = {
+  cssFontFamily?: string
   family: TFontFamily
   isDefault?: boolean
   label: string
@@ -73,6 +74,10 @@ export type SlideEditTextFontFamilyNormalizeInput<
   fontFamily: TFontFamily | null | undefined
   options?: readonly SlideEditTextFontFamilyOption<TFontFamily>[]
 }
+
+export type SlideEditTextFontFamilyCSSInput<
+  TFontFamily extends SlideEditTextFontFamily = SlideEditTextFontFamily,
+> = SlideEditTextFontFamilyNormalizeInput<TFontFamily>
 
 export const SLIDE_EDIT_TEXT_FONT_FAMILY_FALLBACK = 'sans-serif'
 
@@ -219,7 +224,11 @@ export function normalizeSlideEditTextFontFamilyOptions<
   const seenFamilies = new Set<string>()
 
   return options.flatMap((option) => {
+    const { cssFontFamily: _cssFontFamily, ...optionWithoutCSS } = option
     const family = normalizeSlideEditTextFontFamilyName(option.family)
+    const cssFontFamily = normalizeSlideEditTextFontFamilyCSSValue(
+      _cssFontFamily,
+    )
     const label = option.label.trim()
 
     if (!family || !label || seenFamilies.has(family)) {
@@ -228,12 +237,42 @@ export function normalizeSlideEditTextFontFamilyOptions<
 
     seenFamilies.add(family)
 
-    return [{
-      ...option,
+    const normalizedOption = {
+      ...optionWithoutCSS,
       family: family as TFontFamily,
       label,
-    }]
+    }
+
+    return [
+      cssFontFamily
+        ? {
+          ...normalizedOption,
+          cssFontFamily,
+        }
+        : normalizedOption,
+    ]
   })
+}
+
+export function getSlideEditTextFontFamilyCSS<
+  TFontFamily extends SlideEditTextFontFamily = SlideEditTextFontFamily,
+>({
+  fallbackFontFamily = SLIDE_EDIT_TEXT_FONT_FAMILY_FALLBACK as TFontFamily,
+  fontFamily,
+  options = [],
+}: SlideEditTextFontFamilyCSSInput<TFontFamily>) {
+  const normalizedOptions = normalizeSlideEditTextFontFamilyOptions(options)
+  const normalizedFontFamily = normalizeSlideEditTextFontFamily({
+    fallbackFontFamily,
+    fontFamily,
+    options: normalizedOptions,
+  })
+  const option = normalizedOptions.find((candidate) =>
+    candidate.family === normalizedFontFamily
+  )
+
+  return normalizeSlideEditTextFontFamilyCSSValue(option?.cssFontFamily) ??
+    formatSlideEditTextFontFamilyCSSValue(normalizedFontFamily)
 }
 
 function normalizeSlideEditTextFontFamilyName(
@@ -242,4 +281,31 @@ function normalizeSlideEditTextFontFamilyName(
   const normalized = family?.trim()
 
   return normalized ? normalized : null
+}
+
+function normalizeSlideEditTextFontFamilyCSSValue(
+  family: string | null | undefined,
+) {
+  const normalized = family?.trim()
+
+  return normalized ? normalized : null
+}
+
+function formatSlideEditTextFontFamilyCSSValue(family: string) {
+  if (isSlideEditGenericCSSFontFamily(family) || /^[\w-]+$/.test(family)) {
+    return family
+  }
+
+  return JSON.stringify(family)
+}
+
+function isSlideEditGenericCSSFontFamily(family: string) {
+  return [
+    'cursive',
+    'fantasy',
+    'monospace',
+    'sans-serif',
+    'serif',
+    'system-ui',
+  ].includes(family)
 }

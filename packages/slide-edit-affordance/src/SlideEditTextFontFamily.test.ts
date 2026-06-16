@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   createSlideEditTextFontFamilyDescriptor,
+  getSlideEditTextFontFamilyCSS,
   getSlideEditTextFontFamilyCommandEffect,
   normalizeSlideEditTextFontFamily,
   normalizeSlideEditTextFontFamilyOptions,
@@ -13,12 +14,14 @@ import {
 describe('SlideEditTextFontFamily', () => {
   const options = [
     {
+      cssFontFamily: 'Body Sans, sans-serif',
       family: 'Body Sans',
       isDefault: true,
       label: 'Body Sans',
       source: 'theme',
     },
     {
+      cssFontFamily: 'Title Serif, serif',
       family: 'Title Serif',
       label: 'Title Serif',
       source: 'theme',
@@ -45,6 +48,7 @@ describe('SlideEditTextFontFamily', () => {
   it('normalizes host-provided font family options', () => {
     expect(normalizeSlideEditTextFontFamilyOptions([
       {
+        cssFontFamily: '  Body Sans, sans-serif  ',
         family: '  Body Sans  ',
         label: '  Body  ',
         source: 'host',
@@ -61,6 +65,7 @@ describe('SlideEditTextFontFamily', () => {
       },
     ])).toEqual([
       {
+        cssFontFamily: 'Body Sans, sans-serif',
         family: 'Body Sans',
         label: 'Body',
         source: 'host',
@@ -87,6 +92,30 @@ describe('SlideEditTextFontFamily', () => {
       fontFamily: '',
       options: [],
     })).toBe(SLIDE_EDIT_TEXT_FONT_FAMILY_FALLBACK)
+  })
+
+  it('formats selected font family values for CSS rendering', () => {
+    expect(getSlideEditTextFontFamilyCSS({
+      fallbackFontFamily: 'Body Sans',
+      fontFamily: 'Title Serif',
+      options,
+    })).toBe('Title Serif, serif')
+
+    expect(getSlideEditTextFontFamilyCSS({
+      fallbackFontFamily: 'Body Sans',
+      fontFamily: 'Unknown',
+      options,
+    })).toBe('Body Sans, sans-serif')
+
+    expect(getSlideEditTextFontFamilyCSS({
+      fontFamily: 'Custom Display',
+      options: [],
+    })).toBe('"Custom Display"')
+
+    expect(getSlideEditTextFontFamilyCSS({
+      fontFamily: 'system-ui',
+      options: [],
+    })).toBe('system-ui')
   })
 
   it('routes selected text object font family changes through host command effects', () => {

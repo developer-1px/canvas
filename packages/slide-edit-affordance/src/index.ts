@@ -92,6 +92,7 @@ export {
 } from './SlideEditTextParagraphSpacing'
 export {
   createSlideEditTextFontFamilyDescriptor,
+  getSlideEditTextFontFamilyCSS,
   getSlideEditTextFontFamilyCommandEffect,
   normalizeSlideEditTextFontFamily,
   normalizeSlideEditTextFontFamilyOptions,
@@ -99,6 +100,7 @@ export {
   SLIDE_EDIT_TEXT_FONT_FAMILY_FALLBACK,
   SLIDE_EDIT_TEXT_FONT_FAMILY_FIELD,
   type SlideEditTextFontFamily,
+  type SlideEditTextFontFamilyCSSInput,
   type SlideEditTextFontFamilyDescriptor,
   type SlideEditTextFontFamilyFieldDescriptor,
   type SlideEditTextFontFamilyHostCommandEffect,
