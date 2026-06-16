@@ -2,8 +2,12 @@ import { describe, expect, it } from 'vitest'
 
 import type { Bounds } from '../core'
 import {
+  alignCanvasSelectionItems,
+  canAlignCanvasSelectionItems,
+  canDistributeCanvasSelectionItems,
   canFlipCanvasSelectionItems,
   canTidyCanvasSelectionItems,
+  distributeCanvasSelectionItems,
   flipCanvasSelectionItems,
   tidyCanvasSelectionItems,
 } from './CanvasSelectionLayout'
@@ -25,6 +29,87 @@ const items: TestItem[] = [
 ]
 
 describe('CanvasSelectionLayout', () => {
+  it('aligns selected item bounds to a provided frame', () => {
+    expect(canAlignCanvasSelectionItems({
+      frame: { h: 100, w: 200, x: 0, y: 0 },
+      getItemBounds,
+      getItemId,
+      items,
+      selection: ['a'],
+    })).toBe(true)
+
+    const aligned = alignCanvasSelectionItems({
+      frame: { h: 100, w: 200, x: 0, y: 0 },
+      getItemBounds,
+      getItemId,
+      items,
+      mode: 'alignCenter',
+      selection: ['a'],
+      updateItemBounds,
+    })
+
+    expect(aligned.find((item) => item.id === 'a')?.rect).toMatchObject({ x: 80 })
+    expect(aligned.find((item) => item.id === 'b')?.rect).toEqual(items[1].rect)
+  })
+
+  it('aligns multiple selected item bounds to their selection bounds', () => {
+    const aligned = alignCanvasSelectionItems({
+      getItemBounds,
+      getItemId,
+      items,
+      mode: 'alignRight',
+      selection: ['a', 'b'],
+      updateItemBounds,
+    })
+
+    expect(aligned.find((item) => item.id === 'a')?.rect).toMatchObject({ x: 80 })
+    expect(aligned.find((item) => item.id === 'b')?.rect).toMatchObject({ x: 100 })
+  })
+
+  it('distributes selected item bounds along an axis', () => {
+    expect(canDistributeCanvasSelectionItems({
+      getItemBounds,
+      getItemId,
+      items,
+      selection: ['a', 'b', 'c'],
+    })).toBe(true)
+
+    const distributed = distributeCanvasSelectionItems({
+      getItemBounds,
+      getItemId,
+      items,
+      mode: 'distributeHorizontal',
+      selection: ['a', 'b', 'c'],
+      updateItemBounds,
+    })
+
+    expect(distributed.find((item) => item.id === 'a')?.rect).toMatchObject({ x: 0 })
+    expect(distributed.find((item) => item.id === 'c')?.rect).toMatchObject({ x: 65 })
+    expect(distributed.find((item) => item.id === 'b')?.rect).toMatchObject({ x: 100 })
+  })
+
+  it('blocks align and distribute when selection is too small or unsupported', () => {
+    expect(canAlignCanvasSelectionItems({
+      getItemBounds,
+      getItemId,
+      items,
+      selection: ['a'],
+    })).toBe(false)
+    expect(canAlignCanvasSelectionItems({
+      getItemBounds,
+      getItemId,
+      isItemSelectable,
+      items,
+      selection: ['a', 'hidden'],
+    })).toBe(false)
+    expect(canDistributeCanvasSelectionItems({
+      getItemBounds,
+      getItemId,
+      items,
+      selection: ['a', 'b'],
+    })).toBe(false)
+  })
+
   it('flips selected item bounds around the selection pivot', () => {
     expect(canFlipCanvasSelectionItems({
       getItemBounds,

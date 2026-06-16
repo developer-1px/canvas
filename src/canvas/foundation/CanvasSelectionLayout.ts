@@ -1,5 +1,9 @@
 import type { Bounds } from '../core'
 import { unionCanvasRectList } from './CanvasHeadlessGeometry'
+import type {
+  CanvasAlignMode,
+  CanvasDistributeMode,
+} from './CanvasCommandTypes'
 
 export type CanvasSelectionLayoutAxis = 'horizontal' | 'vertical'
 
@@ -28,6 +32,21 @@ export type CanvasSelectionFlipInput<
 > = CanvasSelectionLayoutChangeInput<TItem, TItemId> & {
   axis: CanvasSelectionLayoutAxis
   flipItem?: (input: CanvasSelectionFlipItemInput<TItem, TItemId>) => TItem
+}
+
+export type CanvasSelectionAlignInput<
+  TItem,
+  TItemId extends string = string,
+> = CanvasSelectionLayoutChangeInput<TItem, TItemId> & {
+  frame?: Bounds
+  mode: CanvasAlignMode
+}
+
+export type CanvasSelectionDistributeInput<
+  TItem,
+  TItemId extends string = string,
+> = CanvasSelectionLayoutChangeInput<TItem, TItemId> & {
+  mode: CanvasDistributeMode
 }
 
 export type CanvasSelectionFlipItemInput<
@@ -66,6 +85,116 @@ export function canFlipCanvasSelectionItems<
   TItemId extends string = string,
 >(input: CanvasSelectionLayoutInput<TItem, TItemId>) {
   return getSelectedCanvasSelectionLayoutEntries(input, 1) !== null
+}
+
+export function canAlignCanvasSelectionItems<
+  TItem,
+  TItemId extends string = string,
+>({
+  frame,
+  ...input
+}: CanvasSelectionLayoutInput<TItem, TItemId> & { frame?: Bounds }) {
+  const minimumSelectionCount = frame ? 1 : 2
+
+  return getSelectedCanvasSelectionLayoutEntries(
+    input,
+    minimumSelectionCount,
+  ) !== null
+}
+
+export function alignCanvasSelectionItems<
+  TItem,
+  TItemId extends string = string,
+>({
+  frame,
+  mode,
+  updateItemBounds,
+  ...input
+}: CanvasSelectionAlignInput<TItem, TItemId>): TItem[] {
+  const selected = getSelectedCanvasSelectionLayoutEntries(
+    input,
+    frame ? 1 : 2,
+  )
+  const alignmentFrame = frame ??
+    (selected ? unionCanvasRectList(selected.map((entry) => entry.bounds)) : null)
+
+  if (!selected || !alignmentFrame) {
+    return input.items
+  }
+
+  const aligned = new Map<TItemId, TItem>()
+
+  selected.forEach((entry) => {
+    aligned.set(entry.id, updateItemBounds(
+      entry.item,
+      getCanvasSelectionAlignedBounds(entry.bounds, alignmentFrame, mode),
+      entry.index,
+    ))
+  })
+
+  return input.items.map((item, index) =>
+    aligned.get(input.getItemId(item, index)) ?? item)
+}
+
+export function canDistributeCanvasSelectionItems<
+  TItem,
+  TItemId extends string = string,
+>(input: CanvasSelectionLayoutInput<TItem, TItemId>) {
+  return getSelectedCanvasSelectionLayoutEntries(input, 3) !== null
+}
+
+export function distributeCanvasSelectionItems<
+  TItem,
+  TItemId extends string = string,
+>({
+  mode,
+  updateItemBounds,
+  ...input
+}: CanvasSelectionDistributeInput<TItem, TItemId>): TItem[] {
+  const selected = getSelectedCanvasSelectionLayoutEntries(input, 3)
+
+  if (!selected) {
+    return input.items
+  }
+
+  const horizontal = mode === 'distributeHorizontal'
+  const sorted = [...selected].sort((left, right) =>
+    horizontal
+      ? left.bounds.x - right.bounds.x
+      : left.bounds.y - right.bounds.y)
+  const first = sorted[0]
+  const last = sorted.at(-1)
+
+  if (!first || !last) {
+    return input.items
+  }
+
+  const start = horizontal ? first.bounds.x : first.bounds.y
+  const end = horizontal
+    ? last.bounds.x + last.bounds.w
+    : last.bounds.y + last.bounds.h
+  const totalSize = sorted.reduce(
+    (sum, entry) => sum + (horizontal ? entry.bounds.w : entry.bounds.h),
+    0,
+  )
+  const gap = (end - start - totalSize) / (sorted.length - 1)
+  let cursor = start
+  const distributed = new Map<TItemId, TItem>()
+
+  sorted.forEach((entry) => {
+    const nextBounds = horizontal
+      ? { ...entry.bounds, x: cursor }
+      : { ...entry.bounds, y: cursor }
+
+    distributed.set(
+      entry.id,
+      updateItemBounds(entry.item, nextBounds, entry.index),
+    )
+    cursor += (horizontal ? entry.bounds.w : entry.bounds.h) + gap
+  })
+
+  return input.items.map((item, index) =>
+    distributed.get(input.getItemId(item, index)) ?? item)
 }
 
 export function flipCanvasSelectionItems<
@@ -222,4 +351,32 @@ function reflectCanvasSelectionLayoutBounds(
   return axis === 'horizontal'
     ? { ...bounds, x: 2 * pivot - (bounds.x + bounds.w) }
     : { ...bounds, y: 2 * pivot - (bounds.y + bounds.h) }
+}
+
+function getCanvasSelectionAlignedBounds(
+  bounds: Bounds,
+  frame: Bounds,
+  mode: CanvasAlignMode,
+): Bounds {
+  if (mode === 'alignLeft') {
+    return { ...bounds, x: frame.x }
+  }
+
+  if (mode === 'alignCenter') {
+    return { ...bounds, x: frame.x + frame.w / 2 - bounds.w / 2 }
+  }
+
+  if (mode === 'alignRight') {
+    return { ...bounds, x: frame.x + frame.w - bounds.w }
+  }
+
+  if (mode === 'alignTop') {
+    return { ...bounds, y: frame.y }
+  }
+
+  if (mode === 'alignMiddle') {
+    return { ...bounds, y: frame.y + frame.h / 2 - bounds.h / 2 }
+  }
+
+  return { ...bounds, y: frame.y + frame.h - bounds.h }
 }

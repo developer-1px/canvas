@@ -66,10 +66,16 @@ export {
   type CanvasSameTypeSelectionInput,
 } from './CanvasSameTypeSelection'
 export {
+  alignCanvasSelectionItems,
+  canAlignCanvasSelectionItems,
+  canDistributeCanvasSelectionItems,
   canFlipCanvasSelectionItems,
   canTidyCanvasSelectionItems,
+  distributeCanvasSelectionItems,
   flipCanvasSelectionItems,
   tidyCanvasSelectionItems,
+  type CanvasSelectionAlignInput,
+  type CanvasSelectionDistributeInput,
   type CanvasSelectionFlipInput,
   type CanvasSelectionFlipItemInput,
   type CanvasSelectionLayoutAxis,
