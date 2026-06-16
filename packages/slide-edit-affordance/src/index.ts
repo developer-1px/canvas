@@ -26,7 +26,9 @@ export {
 } from './SlideEditFrameGuides'
 export {
   createSlideEditRailDescriptor,
+  createSlideEditRailListboxDescriptor,
   getSlideEditRailKeyboardCommandEffect,
+  getSlideEditRailListboxKeyboardIntent,
   getSlideEditRailPointerCommandEffect,
   SLIDE_EDIT_RAIL_COMMANDS,
   toSlideEditRailHostCommandEffect,
@@ -36,6 +38,9 @@ export {
   type SlideEditRailDescriptor,
   type SlideEditRailHostCommandEffect,
   type SlideEditRailKeyboardIntent,
+  type SlideEditRailListboxDescriptor,
+  type SlideEditRailListboxKeyboardKey,
+  type SlideEditRailListboxOptionDescriptor,
   type SlideEditRailPointerIntent,
   type SlideEditRailSlideId,
   type SlideEditRailThumbnailDescriptor,

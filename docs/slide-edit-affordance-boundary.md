@@ -106,9 +106,17 @@
 | Active slide | `activeSlideId` only; host owns slide data |
 | Slide order | ordered slide id list |
 | Thumbnail target | thumbnail bounds plus expanded hit target bounds |
+| Listbox state | active option id, focusable option id, selected option state, and roving tabindex are derived from slide order |
 | Commands | `add-slide`, `duplicate-slide`, `delete-slide`, `reorder-slide`, `select-active-slide` |
-| Keyboard intent | select relative, move active, add/duplicate/delete active |
+| Keyboard intent | select relative, select first/last, activate focused option, move active, add/duplicate/delete active |
 | Pointer intent | thumbnail press/drop and rail command button press |
+
+## Slide Rail APG Listbox Split
+
+| Affordance | Owns | Does Not Own |
+| --- | --- | --- |
+| Rail listbox affordance | `listbox`/`option` roles, single selected state, roving focus policy, ArrowUp/ArrowDown/Home/End/Enter/Space intents | slide data storage, thumbnail rendering, drag reorder implementation, DOM event listeners |
+| Slide rail model | slide order, active slide id, and host command effects | browser focus APIs, product-specific slide preview content, or pointer hit testing beyond thumbnail intent |
 
 ## Object Reorder vs Slide Reorder
 
