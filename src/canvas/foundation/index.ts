@@ -100,6 +100,7 @@ export {
 } from './CanvasSelectionEngine'
 export {
   moveCanvasSelection,
+  normalizeCanvasRotationDegrees,
   resizeCanvasSelection,
   type CanvasTransformAdapter,
   type CanvasTransformItem,

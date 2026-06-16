@@ -72,3 +72,16 @@ export function resizeCanvasSelection<TItem extends CanvasTransformItem>({
     } satisfies ResizeBoundsOptions),
   })
 }
+
+export function normalizeCanvasRotationDegrees(
+  rotation: number | null | undefined,
+) {
+  if (rotation === null || rotation === undefined || !Number.isFinite(rotation)) {
+    return 0
+  }
+
+  const normalized = ((rotation % 360) + 360) % 360
+  const rounded = Number(normalized.toFixed(3))
+
+  return rounded >= 360 || Math.abs(rounded) < 0.001 ? 0 : rounded
+}

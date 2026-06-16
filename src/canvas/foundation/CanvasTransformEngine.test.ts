@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   moveCanvasSelection,
+  normalizeCanvasRotationDegrees,
   resizeCanvasSelection,
   type CanvasTransformAdapter,
 } from './CanvasTransformEngine'
@@ -57,5 +58,13 @@ describe('CanvasTransformEngine', () => {
     })).toEqual([
       { h: 40, id: 'selected', w: 60, x: 10, y: 10 },
     ])
+  })
+
+  it('normalizes rotation degrees for transform hosts', () => {
+    expect(normalizeCanvasRotationDegrees(45.1234)).toBe(45.123)
+    expect(normalizeCanvasRotationDegrees(-45)).toBe(315)
+    expect(normalizeCanvasRotationDegrees(765)).toBe(45)
+    expect(normalizeCanvasRotationDegrees(359.9999)).toBe(0)
+    expect(normalizeCanvasRotationDegrees(Number.NaN)).toBe(0)
   })
 })

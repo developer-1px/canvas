@@ -109,6 +109,7 @@ export {
 } from '../foundation/CanvasSnapEngine'
 export {
   moveCanvasSelection,
+  normalizeCanvasRotationDegrees,
   resizeCanvasSelection,
   type CanvasTransformAdapter,
   type CanvasTransformItem,
