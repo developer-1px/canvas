@@ -16,6 +16,7 @@ describe('slide-edit-affordance boundary', () => {
       'object-bounds',
       'selection',
       'command-effect',
+      'color-swatch-palette',
       'object-accessibility',
       'object-animation',
       'object-corner-radius',
