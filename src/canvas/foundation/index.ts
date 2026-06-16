@@ -66,6 +66,18 @@ export {
   type CanvasSameTypeSelectionInput,
 } from './CanvasSameTypeSelection'
 export {
+  canFlipCanvasSelectionItems,
+  canTidyCanvasSelectionItems,
+  flipCanvasSelectionItems,
+  tidyCanvasSelectionItems,
+  type CanvasSelectionFlipInput,
+  type CanvasSelectionFlipItemInput,
+  type CanvasSelectionLayoutAxis,
+  type CanvasSelectionLayoutChangeInput,
+  type CanvasSelectionLayoutInput,
+  type CanvasSelectionTidyInput,
+} from './CanvasSelectionLayout'
+export {
   CANVAS_COMMAND_INSERT_OFFSET,
   type CanvasAlignMode,
   type CanvasCommandAdapter,
