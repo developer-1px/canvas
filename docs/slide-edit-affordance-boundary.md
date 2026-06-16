@@ -22,6 +22,7 @@
 | Object hyperlink/action | `slide-edit-affordance` | object URL/action metadata, URL policy, and host command effect |
 | Object opacity | `slide-edit-affordance` | object opacity value, metadata attribute, and host command effect |
 | Object shadow/effect | `slide-edit-affordance` | object shadow subset, metadata attribute, and host command effect |
+| Object stroke line style | `slide-edit-affordance` | object stroke solid/dash/dot subset and host command effect |
 | Layout/theme affordance | `slide-edit-affordance` | layout, master, placeholder mapping, and theme token descriptors |
 | Slide object clipboard | `slide-edit-affordance` | source slide metadata, paste target, and id remap plan |
 | Slide metadata inspector | `slide-edit-affordance` | active slide name, background, notes, size, orientation fields |
@@ -46,6 +47,7 @@
 | `object-hyperlink` | Selected object hyperlink/action values for inspector, stage, thumbnail, and export |
 | `object-opacity` | Selected object opacity values for inspector, stage, thumbnail, and export |
 | `object-shadow` | Selected object shadow values for inspector, stage, thumbnail, and export |
+| `object-stroke-line-style` | Selected object stroke line style values for inspector, stage, thumbnail, and export |
 | `layout-theme` | Layout, master, placeholder, and theme token descriptors |
 | `slide-metadata` | Active slide metadata values for inspector descriptors |
 | `slide-transition` | Slide transition and advance timing values for inspector, preview, and export |
@@ -257,6 +259,18 @@
 | Normalization | opacity clamps to `0..1`; blur and distance clamp to non-negative limits; angle clamps to `0..360` |
 | Updates | selected object id, field id, and normalized value become host command effects |
 | Scope | applies to slide content objects, not demo chrome, panel decoration, or app-shell shadows |
+| Runtime | stage, thumbnail, presentation, inspector, and export can read the same metadata value |
+
+## Object Stroke Line Style Contract
+
+| Area | Contract |
+| --- | --- |
+| Value | line style is one of `solid`, `dash`, or `dot`; default is `solid` |
+| Field | `strokeLineStyle` segmented descriptor routes through `update-object-stroke-line-style` |
+| Metadata | `data-slide-object-stroke-line-style` carries the normalized value or `unsupported` |
+| Unsupported | objects without stroke can expose `isSupported: false` and reason `no-stroke` |
+| Scope | applies to stroked slide content objects such as outlines, lines, connectors, and paths |
+| Updates | selected object id and normalized line style become host command effects |
 | Runtime | stage, thumbnail, presentation, inspector, and export can read the same metadata value |
 
 ## Layout, Master, And Theme Contract
