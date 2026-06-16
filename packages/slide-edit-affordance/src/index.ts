@@ -273,7 +273,9 @@ export {
 export {
   createSlideEditObjectCornerRadiusDescriptor,
   getSlideEditObjectCornerRadiusCommandEffect,
+  getSlideEditObjectCornerRadiusCSS,
   getSlideEditObjectCornerRadiusMetadata,
+  getSlideEditObjectCornerRadiusPreviewCSS,
   normalizeSlideEditObjectCornerRadius,
   normalizeSlideEditObjectCornerRadiusUpdateCommand,
   SLIDE_EDIT_OBJECT_CORNER_RADIUS_DATA_ATTRIBUTE,
@@ -287,6 +289,7 @@ export {
   type SlideEditObjectCornerRadiusMetadata,
   type SlideEditObjectCornerRadiusNumericLimits,
   type SlideEditObjectCornerRadiusObjectId,
+  type SlideEditObjectCornerRadiusPreviewSize,
   type SlideEditObjectCornerRadiusSlideId,
   type SlideEditObjectCornerRadiusUnit,
   type SlideEditObjectCornerRadiusUnsupportedReason,
