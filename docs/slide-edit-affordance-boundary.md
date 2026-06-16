@@ -28,6 +28,7 @@
 | Layout/theme affordance | `slide-edit-affordance` | layout, master, placeholder mapping, and theme token descriptors |
 | Slide object clipboard | `slide-edit-affordance` | source slide metadata, paste target, and id remap plan |
 | Slide metadata inspector | `slide-edit-affordance` | active slide name, background, notes, size, orientation fields |
+| Style clipboard | `slide-edit-affordance` | source object style categories, target applicability, and format painter command effects |
 | Slide transition timing | `slide-edit-affordance` | transition type, duration, click/after advance policy |
 | Text font family | `slide-edit-affordance` | selected text object font family options and command effects |
 | Text frame inset | `slide-edit-affordance` | text frame top/right/bottom/left inset metadata and command effects |
@@ -54,6 +55,7 @@
 | `object-stroke-line-style` | Selected object stroke line style values for inspector, stage, thumbnail, and export |
 | `layout-theme` | Layout, master, placeholder, and theme token descriptors |
 | `slide-metadata` | Active slide metadata values for inspector descriptors |
+| `style-clipboard` | Copied style categories and formatting paste availability |
 | `slide-transition` | Slide transition and advance timing values for inspector, preview, and export |
 | `text-font-family` | Selected text object font family value and allowed family options |
 | `text-frame-inset` | Selected text object frame inset values for stage, thumbnail, and export |
@@ -334,6 +336,19 @@
 | Remap plan | host policy rewrites object id, group id, and placeholder binding before paste commit |
 | Paste command | host receives `paste-slide-objects` command effect with target selection ids |
 | Adapter example | minimal adapter can copy a selection payload and paste it into a target slide without product model names |
+
+## Style Clipboard / Format Painter Contract
+
+| Area | Contract |
+| --- | --- |
+| Payload | source slide id, source object id, source kind, copied style category descriptors, and opaque style payloads |
+| Categories | built-in category ids include `shape-fill`, `shape-stroke`, `line-style`, `text-style`, and `object-effect` |
+| Copy command | host receives `copy-object-formatting` with a `slide-style-clipboard` payload |
+| Paste availability | each target object exposes applicable category ids, ignored category ids, support state, and disabled reason |
+| Paste command | host receives `paste-object-formatting` with per-target category applications |
+| Partial apply | unsupported categories are ignored per target instead of blocking compatible categories |
+| Scope | copies style subsets only; it does not clone content, object ids, groups, placeholders, or slide placement |
+| Runtime | host owns mapping category payloads to its shape, text, line, and effect model |
 
 ## Canvas Clipboard vs Slide-Aware Clipboard
 

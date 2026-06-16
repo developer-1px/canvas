@@ -431,6 +431,31 @@ export {
   type SlideEditClipboardSlideId,
 } from './SlideEditClipboard'
 export {
+  createSlideEditStyleClipboardDescriptor,
+  createSlideEditStyleClipboardPasteCommandEffect,
+  getSlideEditStyleClipboardCategoryIds,
+  getSlideEditStyleClipboardCopyCommandEffect,
+  getSlideEditStyleClipboardPasteAvailability,
+  SLIDE_EDIT_STYLE_CLIPBOARD_BUILT_IN_CATEGORIES,
+  type SlideEditStyleClipboardBuiltInCategoryId,
+  type SlideEditStyleClipboardCategoryApplication,
+  type SlideEditStyleClipboardCategoryDescriptor,
+  type SlideEditStyleClipboardCategoryId,
+  type SlideEditStyleClipboardCopyFormattingCommand,
+  type SlideEditStyleClipboardDescriptor,
+  type SlideEditStyleClipboardDisabledReason,
+  type SlideEditStyleClipboardHostCommandEffect,
+  type SlideEditStyleClipboardObjectId,
+  type SlideEditStyleClipboardPasteAvailability,
+  type SlideEditStyleClipboardPasteFormattingCommand,
+  type SlideEditStyleClipboardSlideId,
+  type SlideEditStyleClipboardSource,
+  type SlideEditStyleClipboardSourceKind,
+  type SlideEditStyleClipboardStylePayload,
+  type SlideEditStyleClipboardTargetDescriptor,
+  type SlideEditStyleClipboardTargetInput,
+} from './SlideEditStyleClipboard'
+export {
   createSlideEditSlideMetadataInspectorDescriptor,
   getSlideEditInspectorSurface,
   getSlideEditSlideMetadataFieldDescriptors,
@@ -565,6 +590,7 @@ export type SlideEditAdapterSlotId =
   | 'selection'
   | 'slide-frame'
   | 'slide-metadata'
+  | 'style-clipboard'
   | 'slide-transition'
   | 'text-font-family'
   | 'text-frame-inset'
@@ -648,6 +674,11 @@ export const SLIDE_EDIT_ADAPTER_SLOTS = Object.freeze([
     id: 'slide-metadata',
     owner: 'host',
     purpose: 'Provide active slide metadata values for inspector descriptors.',
+  },
+  {
+    id: 'style-clipboard',
+    owner: 'host',
+    purpose: 'Provide copied style categories and formatting paste availability.',
   },
   {
     id: 'slide-transition',
@@ -742,6 +773,7 @@ export type SlideEditOwnedContractId =
   | 'slide-object-bounds'
   | 'slide-rail-interaction'
   | 'slide-transition-timing'
+  | 'style-clipboard-affordance'
   | 'text-font-family-affordance'
   | 'text-frame-inset-affordance'
   | 'text-overflow-affordance'
@@ -834,6 +866,11 @@ export const SLIDE_EDIT_OWNED_CONTRACTS = Object.freeze([
     id: 'slide-object-clipboard',
     owner: 'slide-edit-affordance',
     scope: 'Multi-slide object clipboard payloads, paste targets, and remap plans.',
+  },
+  {
+    id: 'style-clipboard-affordance',
+    owner: 'slide-edit-affordance',
+    scope: 'Style-only clipboard payloads, category applicability, and format painter command effects.',
   },
   {
     id: 'slide-metadata-inspector',
