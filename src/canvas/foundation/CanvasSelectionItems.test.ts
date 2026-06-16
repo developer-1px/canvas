@@ -3,8 +3,10 @@ import { describe, expect, it } from 'vitest'
 import {
   cloneCanvasSelectionItems,
   deleteCanvasSelectionItems,
+  getCanvasGroupedItemSelection,
   getCanvasGroupedItemPointerSelection,
   getCanvasItemGroupMemberIds,
+  getCanvasItemGroupMemberIdsForGroup,
   getCanvasSelectableItemIds,
   getCanvasSelectedItemGroupIds,
   getCanvasSelectedItemIds,
@@ -161,6 +163,71 @@ describe('CanvasSelectionItems', () => {
       itemId: 'a',
       items: sourceItems,
     })).toEqual(['a', 'd'])
+  })
+
+  it('returns group member ids for an explicit group id in item order', () => {
+    const sourceItems: TestItem[] = [
+      { groupId: 'group-a', id: 'a', name: 'Alpha' },
+      { groupId: 'group-a', hidden: true, id: 'b', name: 'Beta' },
+      { groupId: 'group-b', id: 'c', name: 'Gamma' },
+      { groupId: 'group-a', id: 'd', name: 'Delta' },
+    ]
+
+    expect(getCanvasItemGroupMemberIdsForGroup({
+      getItemGroupId: (item) => item.groupId,
+      getItemId,
+      groupId: 'group-a',
+      isItemSelectable: isVisible,
+      items: sourceItems,
+    })).toEqual(['a', 'd'])
+  })
+
+  it('selects explicit group members on non-additive selection', () => {
+    const sourceItems: TestItem[] = [
+      { groupId: 'group-a', id: 'a', name: 'Alpha' },
+      { groupId: 'group-a', id: 'b', name: 'Beta' },
+      { groupId: 'group-b', id: 'c', name: 'Gamma' },
+      { groupId: 'group-a', id: 'd', name: 'Delta' },
+    ]
+
+    expect(getCanvasGroupedItemSelection({
+      additive: false,
+      fallbackSelection: ['fallback'],
+      getItemGroupId: (item) => item.groupId,
+      getItemId,
+      groupId: 'group-a',
+      items: sourceItems,
+      selection: ['c'],
+    })).toEqual(['a', 'b', 'd'])
+  })
+
+  it('toggles explicit group members on additive selection', () => {
+    const sourceItems: TestItem[] = [
+      { groupId: 'group-a', id: 'a', name: 'Alpha' },
+      { groupId: 'group-a', id: 'b', name: 'Beta' },
+      { id: 'c', name: 'Gamma' },
+      { groupId: 'group-a', id: 'd', name: 'Delta' },
+    ]
+
+    expect(getCanvasGroupedItemSelection({
+      additive: true,
+      fallbackSelection: ['fallback'],
+      getItemGroupId: (item) => item.groupId,
+      getItemId,
+      groupId: 'group-a',
+      items: sourceItems,
+      selection: ['d', 'c', 'a', 'b'],
+    })).toEqual(['c'])
+
+    expect(getCanvasGroupedItemSelection({
+      additive: true,
+      fallbackSelection: ['fallback'],
+      getItemGroupId: (item) => item.groupId,
+      getItemId,
+      groupId: 'group-a',
+      items: sourceItems,
+      selection: ['c', 'd'],
+    })).toEqual(['c', 'd', 'a', 'b'])
   })
 
   it('returns fallback selection when grouped pointer target has no group', () => {

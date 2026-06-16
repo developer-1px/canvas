@@ -66,6 +66,27 @@ export type CanvasSelectionItemGroupMembersInput<
   itemId: TItemId
 }
 
+export type CanvasSelectionItemGroupInput<
+  TItem,
+  TItemId extends string = string,
+  TGroupId extends string = string,
+> = Omit<
+  CanvasSelectionItemGroupsInput<TItem, TItemId, TGroupId>,
+  'selection'
+> & {
+  groupId: TGroupId
+}
+
+export type CanvasGroupedItemSelectionInput<
+  TItem,
+  TItemId extends string = string,
+  TGroupId extends string = string,
+> = CanvasSelectionItemGroupInput<TItem, TItemId, TGroupId> & {
+  additive: boolean
+  fallbackSelection: readonly TItemId[]
+  selection: readonly TItemId[]
+}
+
 export type CanvasGroupedItemPointerSelectionInput<
   TItem,
   TItemId extends string = string,
@@ -274,6 +295,26 @@ export function getCanvasItemGroupMemberIds<
     return []
   }
 
+  return getCanvasItemGroupMemberIdsForGroup({
+    getItemGroupId,
+    getItemId,
+    groupId,
+    isItemSelectable,
+    items,
+  })
+}
+
+export function getCanvasItemGroupMemberIdsForGroup<
+  TItem,
+  TItemId extends string = string,
+  TGroupId extends string = string,
+>({
+  getItemGroupId,
+  getItemId,
+  groupId,
+  isItemSelectable = () => true,
+  items,
+}: CanvasSelectionItemGroupInput<TItem, TItemId, TGroupId>) {
   const memberIds: TItemId[] = []
 
   items.forEach((item, index) => {
@@ -287,6 +328,24 @@ export function getCanvasItemGroupMemberIds<
   return memberIds
 }
 
+export function getCanvasGroupedItemSelection<
+  TItem,
+  TItemId extends string = string,
+  TGroupId extends string = string,
+>({
+  additive,
+  fallbackSelection,
+  selection,
+  ...input
+}: CanvasGroupedItemSelectionInput<TItem, TItemId, TGroupId>) {
+  return getCanvasSelectionFromGroupedMemberIds({
+    additive,
+    fallbackSelection,
+    memberIds: getCanvasItemGroupMemberIdsForGroup(input),
+    selection,
+  })
+}
+
 export function getCanvasGroupedItemPointerSelection<
   TItem,
   TItemId extends string = string,
@@ -297,29 +356,12 @@ export function getCanvasGroupedItemPointerSelection<
   selection,
   ...input
 }: CanvasGroupedItemPointerSelectionInput<TItem, TItemId, TGroupId>) {
-  const memberIds = getCanvasItemGroupMemberIds(input)
-
-  if (memberIds.length === 0) {
-    return [...fallbackSelection]
-  }
-
-  if (!additive) {
-    return memberIds
-  }
-
-  const selected = new Set(selection)
-  const allMembersSelected = memberIds.every((id) => selected.has(id))
-
-  if (allMembersSelected) {
-    const members = new Set(memberIds)
-
-    return selection.filter((id) => !members.has(id))
-  }
-
-  return [
-    ...selection,
-    ...memberIds.filter((id) => !selected.has(id)),
-  ]
+  return getCanvasSelectionFromGroupedMemberIds({
+    additive,
+    fallbackSelection,
+    memberIds: getCanvasItemGroupMemberIds(input),
+    selection,
+  })
 }
 
 export function ungroupCanvasSelectionItems<
@@ -396,6 +438,40 @@ function getCanvasItemGroupId<
   }
 
   return undefined
+}
+
+function getCanvasSelectionFromGroupedMemberIds<TItemId extends string>({
+  additive,
+  fallbackSelection,
+  memberIds,
+  selection,
+}: {
+  additive: boolean
+  fallbackSelection: readonly TItemId[]
+  memberIds: readonly TItemId[]
+  selection: readonly TItemId[]
+}) {
+  if (memberIds.length === 0) {
+    return [...fallbackSelection]
+  }
+
+  if (!additive) {
+    return [...memberIds]
+  }
+
+  const selected = new Set(selection)
+  const allMembersSelected = memberIds.every((id) => selected.has(id))
+
+  if (allMembersSelected) {
+    const members = new Set(memberIds)
+
+    return selection.filter((id) => !members.has(id))
+  }
+
+  return [
+    ...selection,
+    ...memberIds.filter((id) => !selected.has(id)),
+  ]
 }
 
 function getCanvasSelectionCloneTargetGroupId<TGroupId extends string>({
