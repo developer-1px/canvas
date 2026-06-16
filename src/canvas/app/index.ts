@@ -15,6 +15,22 @@ export {
   useCanvasMenuRovingFocus,
 } from './affordances/controls/toolbar/CanvasMenuRovingFocus'
 export {
+  CANVAS_TABS_KEYBOARD_MODEL,
+  createCanvasTabsDescriptor,
+  getCanvasTabsKeyboardIntent,
+  getCanvasTabsPanelAttributes,
+  getCanvasTabsTabAttributes,
+  getCanvasTabsTabIndex,
+  type CanvasTabsActivationMode,
+  type CanvasTabsDescriptor,
+  type CanvasTabsKeyboardIntent,
+  type CanvasTabsPanelAttributes,
+  type CanvasTabsPanelDescriptor,
+  type CanvasTabsTabAttributes,
+  type CanvasTabsTabDescriptor,
+  type CanvasTabsTabInput,
+} from './affordances/controls/tabs/CanvasTabsRovingFocus'
+export {
   CanvasAppViewportOverlayLayer,
   type CanvasAppViewportOverlayLayerProps,
 } from './rendering/CanvasAppViewportOverlayLayer'
