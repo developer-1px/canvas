@@ -61,6 +61,11 @@ export {
   type CanvasCommandSelectionState,
 } from './CanvasCommandSelectionRules'
 export {
+  canSelectSameTypeCanvasItems,
+  selectSameTypeCanvasItems,
+  type CanvasSameTypeSelectionInput,
+} from './CanvasSameTypeSelection'
+export {
   CANVAS_COMMAND_INSERT_OFFSET,
   type CanvasAlignMode,
   type CanvasCommandAdapter,
