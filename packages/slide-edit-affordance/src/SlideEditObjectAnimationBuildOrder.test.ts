@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   createSlideEditObjectAnimationDescriptor,
   getSlideEditObjectAnimationBuildOrder,
+  getSlideEditObjectAnimationCSSStyle,
   getSlideEditObjectAnimationUpdateCommandEffect,
   normalizeSlideEditObjectAnimationDelayMs,
   normalizeSlideEditObjectAnimationDurationMs,
@@ -77,6 +78,24 @@ describe('SlideEditObjectAnimationBuildOrder', () => {
     expect(normalizeSlideEditObjectAnimationOrder(
       SLIDE_EDIT_OBJECT_ANIMATION_LIMITS.maxBuildOrder + 1,
     )).toBe(SLIDE_EDIT_OBJECT_ANIMATION_LIMITS.maxBuildOrder)
+  })
+
+  it('formats normalized animation timing values for CSS rendering', () => {
+    expect(getSlideEditObjectAnimationCSSStyle({
+      delayMs: 125.7,
+      durationMs: 0,
+    })).toEqual({
+      animationDelay: '126ms',
+      animationDuration: '1ms',
+    })
+
+    expect(getSlideEditObjectAnimationCSSStyle({
+      delayMs: Number.POSITIVE_INFINITY,
+      durationMs: 1200.4,
+    })).toEqual({
+      animationDelay: '0ms',
+      animationDuration: '1200ms',
+    })
   })
 
   it('keeps build order stable inside one slide', () => {

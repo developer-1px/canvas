@@ -442,6 +442,7 @@ export {
 export {
   createSlideEditObjectAnimationDescriptor,
   getSlideEditObjectAnimationBuildOrder,
+  getSlideEditObjectAnimationCSSStyle,
   getSlideEditObjectAnimationUpdateCommandEffect,
   normalizeSlideEditObjectAnimationDelayMs,
   normalizeSlideEditObjectAnimationDurationMs,
@@ -458,6 +459,8 @@ export {
   type SlideEditAnimationType,
   type SlideEditBuiltInAnimationTrigger,
   type SlideEditBuiltInAnimationType,
+  type SlideEditObjectAnimationCSSStyle,
+  type SlideEditObjectAnimationCSSStyleInput,
   type SlideEditObjectAnimationDescriptor,
   type SlideEditObjectAnimationFieldId,
   type SlideEditObjectAnimationHostCommandEffect,
