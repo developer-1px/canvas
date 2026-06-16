@@ -218,6 +218,7 @@ export {
   createSlideEditObjectImageCropDescriptor,
   getSlideEditObjectImageCropCommandEffect,
   getSlideEditObjectImageCropMetadata,
+  getSlideEditObjectImageCropPositionCSS,
   normalizeSlideEditObjectImageCrop,
   normalizeSlideEditObjectImageCropCommand,
   normalizeSlideEditObjectImageCropFit,

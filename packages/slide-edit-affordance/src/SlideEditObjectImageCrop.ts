@@ -408,3 +408,11 @@ export function toSlideEditObjectImageCropAttributeValue({
 
   return `${normalizedFit}:${normalizedCrop.x},${normalizedCrop.y}`
 }
+
+export function getSlideEditObjectImageCropPositionCSS(
+  crop: Partial<SlideEditObjectImageCropPosition> | null | undefined,
+) {
+  const normalizedCrop = normalizeSlideEditObjectImageCrop(crop)
+
+  return `${normalizedCrop.x}% ${normalizedCrop.y}%`
+}

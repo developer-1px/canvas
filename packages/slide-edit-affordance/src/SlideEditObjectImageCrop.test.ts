@@ -4,6 +4,7 @@ import {
   createSlideEditObjectImageCropDescriptor,
   getSlideEditObjectImageCropCommandEffect,
   getSlideEditObjectImageCropMetadata,
+  getSlideEditObjectImageCropPositionCSS,
   normalizeSlideEditObjectImageCrop,
   normalizeSlideEditObjectImageCropCommand,
   normalizeSlideEditObjectImageCropFit,
@@ -164,6 +165,17 @@ describe('SlideEditObjectImageCrop', () => {
     })).toBe('contain:25.56,70.22')
   })
 
+  it('formats normalized crop position for CSS rendering', () => {
+    expect(getSlideEditObjectImageCropPositionCSS({
+      x: 25.555,
+      y: 70.222,
+    })).toBe('25.56% 70.22%')
+    expect(getSlideEditObjectImageCropPositionCSS({
+      x: -10,
+      y: Number.NaN,
+    })).toBe('0% 50%')
+  })
+
   it('routes selected image crop and fit updates through host command effects', () => {
     expect(getSlideEditObjectImageCropCommandEffect({
       fieldId: 'fit',
@@ -186,13 +198,18 @@ describe('SlideEditObjectImageCrop', () => {
       type: 'slide-command-effect',
     })
 
-    expect(getSlideEditObjectImageCropCommandEffect({
+    const cropUpdateEffect = getSlideEditObjectImageCropCommandEffect({
       fieldId: 'x',
       id: 'update-object-image-crop',
       objectId: 'object-a',
       slideId: 'slide-a',
       value: 125,
-    }).payload.value).toBe(100)
+    })
+
+    expect(cropUpdateEffect.payload.id).toBe('update-object-image-crop')
+    if (cropUpdateEffect.payload.id === 'update-object-image-crop') {
+      expect(cropUpdateEffect.payload.value).toBe(100)
+    }
 
     expect(normalizeSlideEditObjectImageCropUpdateCommand({
       fieldId: 'fit',
