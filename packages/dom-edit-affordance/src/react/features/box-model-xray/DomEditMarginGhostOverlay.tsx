@@ -71,7 +71,7 @@ function DomEditMarginGhostBand({
         data-margin-label-side={rect.side}
         style={getDomEditMarginGhostLabelStyle(rect)}
       >
-        Margin {Math.round(value)}
+        Margin {Math.round(value)} read-only
       </span>
     </>
   )
