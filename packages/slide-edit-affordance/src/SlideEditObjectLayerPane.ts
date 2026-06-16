@@ -191,6 +191,12 @@ export type SlideEditLayerPaneKeyboardIntent<
       | 'focus-row'
       | 'select-row'
   }
+  | {
+    objectId: TObjectId
+    preventDefault: true
+    rangeAnchorObjectId: TObjectId
+    type: 'range-select-row'
+  }
 
 export function createSlideEditLayerPaneDescriptor<
   TSlideId extends SlideEditLayerPaneSlideId,
@@ -266,9 +272,13 @@ export function getSlideEditLayerPaneKeyboardIntent<
   {
     currentObjectId,
     key,
+    rangeAnchorObjectId = null,
+    shiftKey = false,
   }: {
     currentObjectId: TObjectId
     key: string
+    rangeAnchorObjectId?: TObjectId | null
+    shiftKey?: boolean
   },
 ): SlideEditLayerPaneKeyboardIntent<TObjectId> {
   const rows = descriptor.rows.filter((row) => row.isSelectable)
@@ -276,6 +286,34 @@ export function getSlideEditLayerPaneKeyboardIntent<
 
   if (rows.length === 0 || currentIndex < 0) {
     return { preventDefault: false, type: 'none' }
+  }
+
+  if (shiftKey && key === 'ArrowDown') {
+    return toSlideEditLayerPaneRangeKeyboardIntent(
+      rows[Math.min(currentIndex + 1, rows.length - 1)],
+      rangeAnchorObjectId ?? currentObjectId,
+    )
+  }
+
+  if (shiftKey && key === 'ArrowUp') {
+    return toSlideEditLayerPaneRangeKeyboardIntent(
+      rows[Math.max(currentIndex - 1, 0)],
+      rangeAnchorObjectId ?? currentObjectId,
+    )
+  }
+
+  if (shiftKey && key === 'Home') {
+    return toSlideEditLayerPaneRangeKeyboardIntent(
+      rows[0],
+      rangeAnchorObjectId ?? currentObjectId,
+    )
+  }
+
+  if (shiftKey && key === 'End') {
+    return toSlideEditLayerPaneRangeKeyboardIntent(
+      rows.at(-1),
+      rangeAnchorObjectId ?? currentObjectId,
+    )
   }
 
   if (key === 'ArrowDown') {
@@ -313,6 +351,26 @@ export function getSlideEditLayerPaneKeyboardIntent<
   }
 
   return { preventDefault: false, type: 'none' }
+}
+
+function toSlideEditLayerPaneRangeKeyboardIntent<
+  TSlideId extends SlideEditLayerPaneSlideId,
+  TObjectId extends SlideEditLayerPaneObjectId,
+  TGroupId extends SlideEditLayerPaneGroupId,
+>(
+  row: SlideEditLayerPaneRowDescriptor<TSlideId, TObjectId, TGroupId> | undefined,
+  rangeAnchorObjectId: TObjectId,
+): SlideEditLayerPaneKeyboardIntent<TObjectId> {
+  if (!row) {
+    return { preventDefault: false, type: 'none' }
+  }
+
+  return {
+    objectId: row.objectId,
+    preventDefault: true,
+    rangeAnchorObjectId,
+    type: 'range-select-row',
+  }
 }
 
 export function getSlideEditLayerPaneCommandEffect<

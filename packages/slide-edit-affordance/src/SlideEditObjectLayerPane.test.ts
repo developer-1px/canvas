@@ -296,6 +296,65 @@ describe('SlideEditObjectLayerPane', () => {
     })).toEqual({ preventDefault: false, type: 'none' })
   })
 
+  it('maps Shift keyboard range selection to host-owned intents', () => {
+    const groupedDescriptor = createGroupedLayerPaneDescriptor()
+
+    expect(getSlideEditLayerPaneKeyboardIntent(groupedDescriptor, {
+      currentObjectId: 'child-a',
+      key: 'ArrowDown',
+      rangeAnchorObjectId: 'group-a',
+      shiftKey: true,
+    })).toEqual({
+      objectId: 'group-b',
+      preventDefault: true,
+      rangeAnchorObjectId: 'group-a',
+      type: 'range-select-row',
+    })
+    expect(getSlideEditLayerPaneKeyboardIntent(groupedDescriptor, {
+      currentObjectId: 'group-b',
+      key: 'ArrowUp',
+      rangeAnchorObjectId: 'child-a',
+      shiftKey: true,
+    })).toEqual({
+      objectId: 'child-a',
+      preventDefault: true,
+      rangeAnchorObjectId: 'child-a',
+      type: 'range-select-row',
+    })
+    expect(getSlideEditLayerPaneKeyboardIntent(groupedDescriptor, {
+      currentObjectId: 'child-a',
+      key: 'ArrowDown',
+      shiftKey: true,
+    })).toEqual({
+      objectId: 'group-b',
+      preventDefault: true,
+      rangeAnchorObjectId: 'child-a',
+      type: 'range-select-row',
+    })
+    expect(getSlideEditLayerPaneKeyboardIntent(groupedDescriptor, {
+      currentObjectId: 'group-b',
+      key: 'Home',
+      rangeAnchorObjectId: 'child-a',
+      shiftKey: true,
+    })).toEqual({
+      objectId: 'group-a',
+      preventDefault: true,
+      rangeAnchorObjectId: 'child-a',
+      type: 'range-select-row',
+    })
+    expect(getSlideEditLayerPaneKeyboardIntent(groupedDescriptor, {
+      currentObjectId: 'group-a',
+      key: 'End',
+      rangeAnchorObjectId: 'group-a',
+      shiftKey: true,
+    })).toEqual({
+      objectId: 'loose',
+      preventDefault: true,
+      rangeAnchorObjectId: 'group-a',
+      type: 'range-select-row',
+    })
+  })
+
   it('defines pane command descriptors as host command effects', () => {
     expect(SLIDE_EDIT_LAYER_PANE_COMMANDS.map((command) => command.id)).toEqual([
       'select-objects',
