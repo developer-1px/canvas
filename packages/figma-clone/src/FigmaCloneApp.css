@@ -1683,6 +1683,18 @@
   pointer-events: none;
 }
 
+.figma-smart-guide-label {
+  position: absolute;
+  padding: 2px 4px;
+  border-radius: 4px;
+  background: #111827;
+  color: #ffffff;
+  font-size: 10px;
+  line-height: 1;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
 .figma-transform-guide--h {
   height: 1px;
 }
@@ -1699,6 +1711,18 @@
   height: 1px;
 }
 
+.figma-smart-guide--vertical .figma-smart-guide-label {
+  left: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.figma-smart-guide--horizontal .figma-smart-guide-label {
+  left: 50%;
+  top: -16px;
+  transform: translateX(-50%);
+}
+
 .figma-smart-guide--alignment {
   background: #ec4899;
 }
@@ -1713,6 +1737,14 @@
 
 .figma-smart-guide--equal-spacing {
   background: #059669;
+}
+
+.figma-smart-guide--css-gap .figma-smart-guide-label {
+  background: #1d4ed8;
+}
+
+.figma-smart-guide--margin .figma-smart-guide-label {
+  background: #7e22ce;
 }
 
 .figma-smart-guide--snap {

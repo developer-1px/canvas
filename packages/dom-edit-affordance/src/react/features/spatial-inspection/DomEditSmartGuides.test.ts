@@ -168,6 +168,57 @@ describe('DomEditSmartGuides', () => {
     ]))
   })
 
+  it('marks spacing from the parent gap when rect gaps match CSS gap', () => {
+    const guides = getDomEditSmartGuides({
+      selected: { h: 30, w: 40, x: 70, y: 20 },
+      siblings: [{
+        id: 'left',
+        rect: { h: 30, w: 40, x: 20, y: 20 },
+        source: 'sibling',
+      }],
+      spacingContext: {
+        parentGap: 10,
+      },
+    })
+
+    expect(guides).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        axis: 'x',
+        family: 'distance',
+        length: 10,
+        sourceId: 'left',
+        spacingKind: 'nearest',
+        spacingSource: 'css-gap',
+      }),
+    ]))
+  })
+
+  it('marks spacing as margin-derived when margins expand the parent gap', () => {
+    const guides = getDomEditSmartGuides({
+      selected: { h: 30, w: 40, x: 80, y: 20 },
+      siblings: [{
+        id: 'left',
+        rect: { h: 30, w: 40, x: 20, y: 20 },
+        source: 'sibling',
+      }],
+      spacingContext: {
+        parentGap: 10,
+        selectedMargin: 10,
+      },
+    })
+
+    expect(guides).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        axis: 'x',
+        family: 'distance',
+        length: 20,
+        sourceId: 'left',
+        spacingKind: 'nearest',
+        spacingSource: 'margin',
+      }),
+    ]))
+  })
+
   it('promotes repeated gaps into equal spacing guides', () => {
     const guides = getDomEditSmartGuides({
       selected: { h: 40, w: 40, x: 80, y: 20 },

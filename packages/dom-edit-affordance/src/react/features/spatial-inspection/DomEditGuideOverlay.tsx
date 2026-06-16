@@ -83,6 +83,7 @@ export function DomEditGuideOverlay<
   const style = adapter.getStyle(state, selectedNodeId)
   const contextBadge = getDomEditLayoutContextBadge({ context, style })
   const parentId = adapter.getParentId(selectedNodeId)
+  const parentStyle = parentId ? adapter.getStyle(state, parentId) : null
   const visibility = getDomEditOverlayVisibility({
     affordanceState,
     context,
@@ -104,6 +105,10 @@ export function DomEditGuideOverlay<
         parent: parentRect,
         selected: rect,
         siblings: activeSiblingRects,
+        spacingContext: {
+          parentGap: parentStyle?.gap,
+          selectedMargin: style.margin,
+        },
       })
     : []
   const frameGuideGeometry = layerVisibility.guides && frameGuides && frameRect
@@ -184,6 +189,7 @@ export function DomEditGuideOverlay<
       parentId,
       selectedNodeId,
       shell: shellRef.current,
+      state,
       viewport,
     })
 
@@ -201,6 +207,7 @@ export function DomEditGuideOverlay<
     selectedNodeId,
     shellRef,
     shouldRenderSmartGuides,
+    state,
     viewport,
   ])
 
@@ -398,15 +405,17 @@ function measureDomEditSiblingSmartGuideCandidates<
   parentId,
   selectedNodeId,
   shell,
+  state,
   viewport,
 }: {
   adapter: Pick<
     DomEditModelAdapter<TNodeId, TState>,
-    'getElement' | 'readNodeId'
+    'getElement' | 'getStyle' | 'readNodeId'
   >
   parentId: TNodeId
   selectedNodeId: TNodeId
   shell: HTMLElement | null
+  state: TState
   viewport: DomEditViewport
 }): DomEditSmartGuideCandidate[] {
   const parentElement = adapter.getElement(parentId)
@@ -436,6 +445,7 @@ function measureDomEditSiblingSmartGuideCandidates<
 
     return [{
       id: nodeId,
+      margin: adapter.getStyle(state, nodeId).margin,
       rect: getDomEditWorldOverlayRect({
         elementRect: rect,
         shellRect,
@@ -620,8 +630,21 @@ function DomEditSmartGuideLine({
       data-smart-guide-spacing-source={guide.spacingSource}
       data-smart-guide-target={guide.targetPosition}
       style={style}
-    />
+    >
+      {guide.pointKind === 'spacing' ? (
+        <span
+          className="figma-smart-guide-label"
+          data-smart-guide-label="true"
+        >
+          {formatDomEditSmartGuideLength(guide.length)}
+        </span>
+      ) : null}
+    </span>
   )
+}
+
+function formatDomEditSmartGuideLength(length: number) {
+  return `${Math.round(length)} px`
 }
 
 function getDomEditHoveredMeasurementNodeId<
