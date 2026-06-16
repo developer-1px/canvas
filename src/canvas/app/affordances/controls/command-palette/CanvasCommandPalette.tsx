@@ -1,5 +1,6 @@
 import {
   useEffect,
+  useId,
   useMemo,
   useRef,
   useState,
@@ -37,7 +38,9 @@ function CanvasCommandPaletteDialog({
 }: Omit<CanvasCommandPaletteProps, 'open'>) {
   const [query, setQuery] = useState('')
   const [activeIndex, setActiveIndex] = useState(0)
+  const controlId = useId()
   const inputRef = useRef<HTMLInputElement>(null)
+  const listboxId = `${controlId}-listbox`
   const filteredItems = useMemo(
     () =>
       filterCanvasCommandPaletteItems(items, query)
@@ -46,6 +49,10 @@ function CanvasCommandPaletteDialog({
   )
   const maxActiveIndex = Math.max(0, filteredItems.length - 1)
   const activeItemIndex = Math.min(activeIndex, maxActiveIndex)
+  const activeItem = filteredItems[activeItemIndex]
+  const activeOptionId = activeItem
+    ? getCanvasCommandPaletteOptionId(controlId, activeItem.id)
+    : undefined
 
   useEffect(() => {
     const focusTimer = window.setTimeout(() => inputRef.current?.focus(), 0)
@@ -112,21 +119,33 @@ function CanvasCommandPaletteDialog({
         <input
           ref={inputRef}
           className="command-palette-input"
+          aria-activedescendant={activeOptionId}
+          aria-controls={listboxId}
+          aria-expanded="true"
           aria-label="Search commands"
+          aria-autocomplete="list"
           placeholder="Search commands"
+          role="combobox"
           value={query}
           onChange={(event) => {
             setQuery(event.currentTarget.value)
             setActiveIndex(0)
           }}
         />
-        <div className="command-palette-list" role="listbox">
+        <div
+          className="command-palette-list"
+          id={listboxId}
+          role="listbox"
+          aria-label="Command results"
+        >
           {filteredItems.length > 0 ? (
             filteredItems.map((item, index) => (
               <button
                 key={item.id}
                 type="button"
                 className="command-palette-item"
+                id={getCanvasCommandPaletteOptionId(controlId, item.id)}
+                aria-disabled={item.disabled ? 'true' : undefined}
                 aria-selected={index === activeItemIndex}
                 disabled={item.disabled}
                 role="option"
@@ -155,4 +174,8 @@ function CanvasCommandPaletteDialog({
       </section>
     </div>
   )
+}
+
+function getCanvasCommandPaletteOptionId(controlId: string, itemId: string) {
+  return `${controlId}-option-${itemId.replace(/[^a-zA-Z0-9_-]/g, '-')}`
 }
