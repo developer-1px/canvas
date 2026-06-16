@@ -330,6 +330,7 @@ export {
   normalizeSlideEditObjectAccessibility,
   normalizeSlideEditObjectAccessibilityCommand,
   normalizeSlideEditObjectAccessibilityFieldValue,
+  normalizeSlideEditObjectAltTextStorageValue,
   shouldEmitSlideEditObjectAccessibilityMetadata,
   SLIDE_EDIT_OBJECT_ACCESSIBILITY_DATA_ATTRIBUTE,
   SLIDE_EDIT_OBJECT_ACCESSIBILITY_DEFAULT,
@@ -345,6 +346,7 @@ export {
   type SlideEditObjectAccessibilityObjectId,
   type SlideEditObjectAccessibilitySlideId,
   type SlideEditObjectAccessibilityUpdateCommand,
+  type SlideEditObjectAltTextStoragePolicy,
   type SlideEditObjectAltTextRemoveCommand,
 } from './SlideEditObjectAccessibility'
 export {

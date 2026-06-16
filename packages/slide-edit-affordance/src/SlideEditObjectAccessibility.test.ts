@@ -6,6 +6,7 @@ import {
   getSlideEditObjectAccessibilityMetadata,
   normalizeSlideEditObjectAccessibility,
   normalizeSlideEditObjectAccessibilityFieldValue,
+  normalizeSlideEditObjectAltTextStorageValue,
   shouldEmitSlideEditObjectAccessibilityMetadata,
   SLIDE_EDIT_OBJECT_ACCESSIBILITY_DATA_ATTRIBUTE,
   SLIDE_EDIT_OBJECT_ACCESSIBILITY_DEFAULT,
@@ -98,6 +99,21 @@ describe('SlideEditObjectAccessibility', () => {
       'decorative',
       true,
     )).toBe(true)
+  })
+
+  it('normalizes host storage alt text with configurable policy', () => {
+    expect(normalizeSlideEditObjectAltTextStorageValue(
+      '  Revenue chart summary  ',
+      { maxLength: 13 },
+    )).toBe('Revenue chart')
+    expect(normalizeSlideEditObjectAltTextStorageValue('   ')).toBeNull()
+    expect(normalizeSlideEditObjectAltTextStorageValue(
+      'Revenue\u0007chart',
+    )).toBeNull()
+    expect(normalizeSlideEditObjectAltTextStorageValue(
+      'Revenue\u0007chart',
+      { rejectControlCharacters: false },
+    )).toBe('Revenue\u0007chart')
   })
 
   it('routes alt text updates and removal through host command effects', () => {

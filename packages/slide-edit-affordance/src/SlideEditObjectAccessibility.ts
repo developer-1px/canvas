@@ -6,6 +6,11 @@ export type SlideEditObjectAccessibility = {
   decorative: boolean
 }
 
+export type SlideEditObjectAltTextStoragePolicy = {
+  maxLength?: number
+  rejectControlCharacters?: boolean
+}
+
 export type SlideEditObjectAccessibilityFieldId =
   | 'altText'
   | 'decorative'
@@ -214,6 +219,32 @@ export function normalizeSlideEditObjectAccessibilityFieldValue(
   return normalizeSlideEditObjectAltText(String(value))
 }
 
+export function normalizeSlideEditObjectAltTextStorageValue(
+  value: string | null | undefined,
+  {
+    maxLength,
+    rejectControlCharacters = true,
+  }: SlideEditObjectAltTextStoragePolicy = {},
+) {
+  const trimmedValue = value?.trim() ?? ''
+  const normalizedValue = typeof maxLength === 'number'
+    ? trimmedValue.slice(0, Math.max(0, maxLength))
+    : trimmedValue
+
+  if (!normalizedValue) {
+    return null
+  }
+
+  if (
+    rejectControlCharacters &&
+    hasSlideEditObjectAltTextControlCharacter(normalizedValue)
+  ) {
+    return null
+  }
+
+  return normalizedValue
+}
+
 export function shouldEmitSlideEditObjectAccessibilityMetadata(
   value: Partial<SlideEditObjectAccessibility> | null | undefined,
 ) {
@@ -236,4 +267,12 @@ export function toSlideEditObjectAccessibilityAttributeValue(
 
 function normalizeSlideEditObjectAltText(value: string | null | undefined) {
   return value?.trim() ?? ''
+}
+
+function hasSlideEditObjectAltTextControlCharacter(value: string) {
+  return [...value].some((char) => {
+    const code = char.charCodeAt(0)
+
+    return code <= 31 || code === 127
+  })
 }
