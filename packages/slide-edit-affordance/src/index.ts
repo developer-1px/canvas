@@ -250,6 +250,24 @@ export {
   type SlideEditObjectImageCropUpdateCommand,
 } from './SlideEditObjectImageCrop'
 export {
+  createSlideEditObjectImageReplaceDescriptor,
+  getSlideEditObjectImageReplaceCommandEffect,
+  getSlideEditObjectImageReplaceMetadata,
+  normalizeSlideEditObjectImageReplaceCommand,
+  normalizeSlideEditObjectImageReplaceSource,
+  SLIDE_EDIT_OBJECT_IMAGE_REPLACE_DATA_ATTRIBUTE,
+  SLIDE_EDIT_OBJECT_IMAGE_REPLACE_FIELD,
+  type SlideEditObjectImageReplaceCommand,
+  type SlideEditObjectImageReplaceDescriptor,
+  type SlideEditObjectImageReplaceFieldDescriptor,
+  type SlideEditObjectImageReplaceHostCommandEffect,
+  type SlideEditObjectImageReplaceMetadata,
+  type SlideEditObjectImageReplaceObjectId,
+  type SlideEditObjectImageReplaceSlideId,
+  type SlideEditObjectImageReplaceSource,
+  type SlideEditObjectImageReplaceUnsupportedReason,
+} from './SlideEditObjectImageReplace'
+export {
   createSlideEditObjectCornerRadiusDescriptor,
   getSlideEditObjectCornerRadiusCommandEffect,
   getSlideEditObjectCornerRadiusMetadata,
@@ -658,6 +676,7 @@ export type SlideEditAdapterSlotId =
   | 'object-fill-opacity'
   | 'object-hyperlink'
   | 'object-image-crop'
+  | 'object-image-replace'
   | 'object-opacity'
   | 'object-shadow'
   | 'object-stroke-line-style'
@@ -735,6 +754,11 @@ export const SLIDE_EDIT_ADAPTER_SLOTS = Object.freeze([
     id: 'object-image-crop',
     owner: 'host',
     purpose: 'Provide selected image fit and crop position values for inspector, stage, thumbnail, and export.',
+  },
+  {
+    id: 'object-image-replace',
+    owner: 'host',
+    purpose: 'Provide selected image source replacement metadata for inspector, stage, thumbnail, and export.',
   },
   {
     id: 'object-opacity',
@@ -849,6 +873,7 @@ export type SlideEditOwnedContractId =
   | 'object-fill-opacity-affordance'
   | 'object-hyperlink-affordance'
   | 'object-image-crop-affordance'
+  | 'object-image-replace-affordance'
   | 'object-layer-pane'
   | 'object-opacity-affordance'
   | 'object-shadow-affordance'
@@ -939,6 +964,11 @@ export const SLIDE_EDIT_OWNED_CONTRACTS = Object.freeze([
     id: 'object-image-crop-affordance',
     owner: 'slide-edit-affordance',
     scope: 'Image fit mode, crop position fields, metadata attribute, and update command effects.',
+  },
+  {
+    id: 'object-image-replace-affordance',
+    owner: 'slide-edit-affordance',
+    scope: 'Image source replacement field, support state, metadata attribute, and command effects.',
   },
   {
     id: 'object-opacity-affordance',
