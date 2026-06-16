@@ -4,13 +4,17 @@ import {
   CANVAS_TOOL_AFFORDANCES,
 } from '../../../../engine'
 import type { CanvasBuiltinTool } from '../../../../entities'
+import { CANVAS_MENU_ITEM_PROPS } from './CanvasMenuRovingFocus'
 import { CANVAS_TOOLBAR_ITEM_PROPS } from './CanvasToolbarRovingFocus'
+
+export type CanvasToolbarButtonSurface = 'menu' | 'toolbar'
 
 type ToolButtonProps = {
   active: boolean
   affordance: (typeof CANVAS_TOOL_AFFORDANCES)[CanvasBuiltinTool]
   children: ReactNode
   onClick: () => void
+  surface?: CanvasToolbarButtonSurface
 }
 
 export function ToolButton({
@@ -18,15 +22,16 @@ export function ToolButton({
   affordance,
   children,
   onClick,
+  surface = 'toolbar',
 }: ToolButtonProps) {
   return (
     <button
-      {...CANVAS_TOOLBAR_ITEM_PROPS}
+      {...getCanvasToolbarButtonSurfaceProps({ checked: active, surface })}
       type="button"
       className="tool-button"
       data-active={active}
       aria-label={affordance.ariaLabel}
-      aria-pressed={active}
+      aria-pressed={surface === 'toolbar' ? active : undefined}
       title={affordance.title}
       onClick={onClick}
     >
@@ -40,22 +45,24 @@ export function CustomToolButton({
   ariaLabel,
   label,
   onClick,
+  surface = 'toolbar',
   title,
 }: {
   active: boolean
   ariaLabel: string
   label: string
   onClick: () => void
+  surface?: CanvasToolbarButtonSurface
   title: string
 }) {
   return (
     <button
-      {...CANVAS_TOOLBAR_ITEM_PROPS}
+      {...getCanvasToolbarButtonSurfaceProps({ checked: active, surface })}
       type="button"
       className="tool-button custom-tool-button"
       data-active={active}
       aria-label={ariaLabel}
-      aria-pressed={active}
+      aria-pressed={surface === 'toolbar' ? active : undefined}
       title={title}
       onClick={onClick}
     >
@@ -73,17 +80,19 @@ export function CommandButton({
   command,
   disabled,
   onClick,
+  surface = 'toolbar',
 }: {
   children: ReactNode
   command: keyof typeof CANVAS_COMMAND_AFFORDANCES
   disabled: boolean
   onClick: () => void
+  surface?: CanvasToolbarButtonSurface
 }) {
   const affordance = CANVAS_COMMAND_AFFORDANCES[command]
 
   return (
     <button
-      {...CANVAS_TOOLBAR_ITEM_PROPS}
+      {...getCanvasToolbarButtonSurfaceProps({ surface })}
       type="button"
       className="tool-button"
       disabled={disabled}
@@ -101,17 +110,19 @@ export function CustomCommandButton({
   disabled,
   label,
   onClick,
+  surface = 'toolbar',
   title,
 }: {
   ariaLabel: string
   disabled: boolean
   label: string
   onClick: () => void
+  surface?: CanvasToolbarButtonSurface
   title: string
 }) {
   return (
     <button
-      {...CANVAS_TOOLBAR_ITEM_PROPS}
+      {...getCanvasToolbarButtonSurfaceProps({ surface })}
       type="button"
       className="tool-button custom-command-button"
       disabled={disabled}
@@ -122,4 +133,22 @@ export function CustomCommandButton({
       {label}
     </button>
   )
+}
+
+function getCanvasToolbarButtonSurfaceProps({
+  checked,
+  surface,
+}: {
+  checked?: boolean
+  surface: CanvasToolbarButtonSurface
+}) {
+  if (surface === 'menu') {
+    return {
+      ...CANVAS_MENU_ITEM_PROPS,
+      role: checked === undefined ? 'menuitem' : 'menuitemcheckbox',
+      'aria-checked': checked,
+    } as const
+  }
+
+  return CANVAS_TOOLBAR_ITEM_PROPS
 }

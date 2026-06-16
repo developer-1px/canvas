@@ -268,7 +268,7 @@
   height: 18px;
 }
 
-.engine-selection-menu-group[data-layout='swatches'] button[aria-pressed='true'] .engine-selection-swatch-mark {
+.engine-selection-menu-group[data-layout='swatches'] button[aria-checked='true'] .engine-selection-swatch-mark {
   outline: 2px solid var(--canvas-ink);
   outline-offset: 1px;
 }
