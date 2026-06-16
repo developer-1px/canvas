@@ -138,6 +138,13 @@ export function normalizeBounds(a: Point, b: Point): Bounds {
   }
 }
 
+export function getCanvasBoundsCenter(bounds: Bounds): Point {
+  return {
+    x: bounds.x + bounds.w / 2,
+    y: bounds.y + bounds.h / 2,
+  }
+}
+
 export function fitBoundsIntoViewport(
   bounds: Bounds,
   rect: CanvasViewportRect,

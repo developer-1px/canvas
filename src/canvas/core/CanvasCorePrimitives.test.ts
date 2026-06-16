@@ -4,6 +4,7 @@ import {
   CANVAS_ZOOM_STEPS,
   createCanvasSequentialIdFactory,
   fitBoundsIntoViewport,
+  getCanvasBoundsCenter,
   getCanvasViewportScale,
   getCanvasViewportScreenBounds,
   getCanvasViewportScreenPoint,
@@ -156,5 +157,12 @@ describe('CanvasCorePrimitives', () => {
 
     expect(CANVAS_FIT_VIEWPORT_PADDING).toBe(96)
     expect(viewport.scale).toBe(MAX_SCALE)
+  })
+
+  it('computes the center point for bounds without requiring canvas items', () => {
+    expect(getCanvasBoundsCenter({ h: 20, w: 40, x: 10, y: 30 })).toEqual({
+      x: 30,
+      y: 40,
+    })
   })
 })

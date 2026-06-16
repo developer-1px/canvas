@@ -2,6 +2,7 @@ import type {
   Bounds,
   Point,
 } from '../../../../entities'
+import { getCanvasBoundsCenter } from '../../../../core'
 import type { CanvasSceneAdapter } from '../../../../engine'
 
 export type CanvasArrowEndpointResolution = {
@@ -85,13 +86,6 @@ function getCanvasSceneTargetBounds({
   return scene.getBounds([id]) ??
     scene.entries.find((entry) => entry.id === id)?.bounds ??
     null
-}
-
-function getCanvasBoundsCenter(bounds: Bounds): Point {
-  return {
-    x: bounds.x + bounds.w / 2,
-    y: bounds.y + bounds.h / 2,
-  }
 }
 
 function getCanvasBoundsAnchorPoint({

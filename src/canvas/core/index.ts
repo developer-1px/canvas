@@ -35,6 +35,7 @@ export {
   clamp,
   createCanvasSequentialIdFactory,
   fitBoundsIntoViewport,
+  getCanvasBoundsCenter,
   getCanvasViewportScale,
   getCanvasViewportScreenBounds,
   getCanvasViewportScreenPoint,

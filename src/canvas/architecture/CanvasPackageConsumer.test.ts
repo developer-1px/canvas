@@ -70,7 +70,11 @@ import {
   type CanvasAppAssemblySource as CanvasAppAssemblySourceFromApp,
   type CanvasAppProps as CanvasAppPropsFromApp,
 } from '@interactive-os/canvas/app'
-import { isCanvasCustomToolId, normalizeBounds } from '@interactive-os/canvas/core'
+import {
+  getCanvasBoundsCenter,
+  isCanvasCustomToolId,
+  normalizeBounds,
+} from '@interactive-os/canvas/core'
 import {
   assertCanvasAffordanceConfig as assertCanvasAffordanceConfigFromEngine,
   createCanvasAffordanceConfig,
@@ -489,6 +493,12 @@ describe('Canvas package consumer imports', () => {
     })
     expect(CanvasCore.normalizeBounds({ x: 10, y: 20 }, { x: 2, y: 4 }))
       .toEqual(normalizeBounds({ x: 10, y: 20 }, { x: 2, y: 4 }))
+    expect(getCanvasBoundsCenter({ h: 8, w: 6, x: 2, y: 4 })).toEqual({
+      x: 5,
+      y: 8,
+    })
+    expect(CanvasFoundation.getCanvasBoundsCenter({ h: 8, w: 6, x: 2, y: 4 }))
+      .toEqual(getCanvasBoundsCenter({ h: 8, w: 6, x: 2, y: 4 }))
     const affordanceConfig = createCanvasAffordanceConfig()
     expect(affordanceConfig.tools.select).toBe(true)
     expect(assertCanvasAffordanceConfigFromEngine(affordanceConfig)).toBe(

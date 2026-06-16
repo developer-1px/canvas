@@ -8,6 +8,7 @@ export type {
 export {
   clamp,
   fitBoundsIntoViewport,
+  getCanvasBoundsCenter,
   handlePoint,
   normalizeBounds,
   pointDistance,
