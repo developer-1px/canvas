@@ -88,6 +88,42 @@ describe('DomEditSmartGuides', () => {
     ]))
   })
 
+  it('finds sibling center alignment guides on both axes', () => {
+    const guides = getDomEditSmartGuides({
+      selected: { h: 20, w: 20, x: 40, y: 40 },
+      siblings: [{
+        id: 'centered-sibling',
+        rect: { h: 60, w: 60, x: 20, y: 20 },
+        source: 'sibling',
+      }],
+    })
+
+    expect(guides).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        axis: 'x',
+        coordinate: 50,
+        family: 'alignment',
+        orientation: 'vertical',
+        pointKind: 'center',
+        referencePosition: 'center-x',
+        source: 'sibling',
+        sourceId: 'centered-sibling',
+        targetPosition: 'center-x',
+      }),
+      expect.objectContaining({
+        axis: 'y',
+        coordinate: 50,
+        family: 'alignment',
+        orientation: 'horizontal',
+        pointKind: 'center',
+        referencePosition: 'center-y',
+        source: 'sibling',
+        sourceId: 'centered-sibling',
+        targetPosition: 'center-y',
+      }),
+    ]))
+  })
+
   it('finds nearest horizontal and vertical sibling distances', () => {
     const guides = getDomEditSmartGuides({
       selected: { h: 40, w: 50, x: 100, y: 100 },
