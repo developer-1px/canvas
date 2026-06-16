@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import {
   createCanvasTextPasteItems,
+  getCanvasRichTextPasteSourceFromHTML,
   getCanvasTextPasteInsertPosition,
   getCanvasTextPasteSourcesFromDataTransfer,
   insertCanvasTextPasteSource,
@@ -31,6 +32,53 @@ describe('CanvasTextPasteImport', () => {
     expect(getCanvasTextPasteSourcesFromDataTransfer(dataTransfer)).toEqual([
       '<main>Same</main>',
     ])
+  })
+
+  it('normalizes rich HTML clipboard text into paragraph and run metadata', () => {
+    expect(getCanvasRichTextPasteSourceFromHTML(`
+      <section>
+        <p>Hello <strong>Bold</strong><br><a href="https://example.com">Link</a></p>
+        <ul><li><em>Item</em> <u>Done</u></li></ul>
+      </section>
+    `)).toEqual({
+      format: 'text-html-rich',
+      paragraphs: [
+        {
+          runs: [
+            { text: 'Hello ' },
+            { bold: true, text: 'Bold' },
+          ],
+        },
+        {
+          runs: [
+            {
+              color: '#2563eb',
+              link: 'https://example.com',
+              text: 'Link',
+              underline: true,
+            },
+          ],
+        },
+        {
+          bullet: 'bullet',
+          runs: [
+            { italic: true, text: 'Item' },
+            { text: 'Done', underline: true },
+          ],
+        },
+      ],
+      text: 'Hello Bold\nLink\nItemDone',
+    })
+  })
+
+  it('does not claim plain or conflicting HTML as rich text', () => {
+    expect(getCanvasRichTextPasteSourceFromHTML('<p>Plain text</p>')).toBeNull()
+    expect(getCanvasRichTextPasteSourceFromHTML(
+      '<table><tr><td>Cell</td></tr></table>',
+    )).toBeNull()
+    expect(getCanvasRichTextPasteSourceFromHTML(
+      '<p><img src="data:image/png;base64,aW1hZ2U="></p>',
+    )).toBeNull()
   })
 
   it('uses the first importer that can create canvas items', () => {

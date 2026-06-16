@@ -4,9 +4,14 @@ import {
 
 export {
   createCanvasTextPasteItems,
+  getCanvasRichTextPasteSourceFromDataTransfer,
+  getCanvasRichTextPasteSourceFromHTML,
   getCanvasTextPasteInsertPosition,
   getCanvasTextPasteSourcesFromDataTransfer,
   insertCanvasTextPasteSource,
+  type CanvasRichTextPasteParagraph,
+  type CanvasRichTextPasteRun,
+  type CanvasRichTextPasteSource,
   type CanvasTextPasteImportResult,
   type CanvasTextPasteInsertPositionInput,
   type CanvasTextPasteInsertionContext,
