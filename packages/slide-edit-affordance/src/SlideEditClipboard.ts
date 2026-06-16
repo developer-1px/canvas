@@ -309,6 +309,64 @@ export function createSlideEditClipboardPasteCommandEffect<
   }
 }
 
+export function mapSlideEditClipboardPasteObjects<
+  TSlideId extends SlideEditClipboardSlideId,
+  TObjectId extends SlideEditClipboardObjectId,
+  TObject,
+  TResult,
+  TGroupId extends SlideEditClipboardGroupId = SlideEditClipboardGroupId,
+  TPlaceholderId extends SlideEditClipboardPlaceholderId =
+    SlideEditClipboardPlaceholderId,
+>({
+  getObjectId,
+  pastePlan,
+  payload,
+  transform,
+}: {
+  getObjectId: (object: TObject, index: number) => TObjectId
+  pastePlan: SlideEditClipboardPastePlan<TSlideId, TObjectId, TGroupId, TPlaceholderId>
+  payload: Pick<
+    SlideEditClipboardPayload<
+      TSlideId,
+      TObjectId,
+      TObject,
+      TGroupId,
+      TPlaceholderId
+    >,
+    'objects'
+  >
+  transform: (input: {
+    index: number
+    mapping: SlideEditClipboardPasteObjectMapping<
+      TObjectId,
+      TGroupId,
+      TPlaceholderId
+    >
+    source: TObject
+  }) => TResult | null | undefined
+}): TResult[] {
+  const objectsById = new Map(
+    payload.objects.map((object, index) => [getObjectId(object, index), object]),
+  )
+  const results: TResult[] = []
+
+  pastePlan.mappings.forEach((mapping, index) => {
+    const source = objectsById.get(mapping.sourceObjectId)
+
+    if (!source) {
+      return
+    }
+
+    const result = transform({ index, mapping, source })
+
+    if (result !== null && result !== undefined) {
+      results.push(result)
+    }
+  })
+
+  return results
+}
+
 export function createSlideEditClipboardAdapterExample<
   TSlideId extends SlideEditClipboardSlideId,
   TObjectId extends SlideEditClipboardObjectId,
