@@ -5,6 +5,7 @@ import {
   getSlideEditObjectImageCropCommandEffect,
   getSlideEditObjectImageCropMetadata,
   normalizeSlideEditObjectImageCrop,
+  normalizeSlideEditObjectImageCropCommand,
   normalizeSlideEditObjectImageCropFit,
   normalizeSlideEditObjectImageCropUpdateCommand,
   normalizeSlideEditObjectImageCropValue,
@@ -54,6 +55,12 @@ describe('SlideEditObjectImageCrop', () => {
       control: 'image-fit-select',
       id: 'fit',
       options: SLIDE_EDIT_OBJECT_IMAGE_CROP_FIT_OPTIONS,
+      requiredAdapterSlot: 'command-effect',
+    })
+    expect(SLIDE_EDIT_OBJECT_IMAGE_CROP_FIELDS.reset).toMatchObject({
+      commandId: 'reset-object-image-crop',
+      control: 'image-crop-reset-button',
+      id: 'reset',
       requiredAdapterSlot: 'command-effect',
     })
     expect(SLIDE_EDIT_OBJECT_IMAGE_CROP_FIELDS.x).toMatchObject({
@@ -194,6 +201,47 @@ describe('SlideEditObjectImageCrop', () => {
       slideId: 'slide-a',
       value: 12,
     }).value).toBe('cover')
+  })
+
+  it('routes image crop reset through host command effects', () => {
+    expect(getSlideEditObjectImageCropCommandEffect({
+      id: 'reset-object-image-crop',
+      objectId: 'object-a',
+      slideId: 'slide-a',
+    })).toEqual({
+      payload: {
+        crop: {
+          x: 50,
+          y: 50,
+        },
+        fit: 'cover',
+        id: 'reset-object-image-crop',
+        objectId: 'object-a',
+        slideId: 'slide-a',
+      },
+      selection: {
+        objectIds: ['object-a'],
+        slideId: 'slide-a',
+      },
+      type: 'slide-command-effect',
+    })
+
+    expect(normalizeSlideEditObjectImageCropCommand({
+      crop: {
+        x: -10,
+        y: 120,
+      },
+      fit: 'contain',
+      id: 'reset-object-image-crop',
+      objectId: 'object-a',
+      slideId: 'slide-a',
+    })).toMatchObject({
+      crop: {
+        x: 0,
+        y: 100,
+      },
+      fit: 'contain',
+    })
   })
 
   it('does not expose host renderer names or product terms', () => {

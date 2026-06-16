@@ -10,6 +10,7 @@ export type SlideEditObjectImageCropPosition = {
 
 export type SlideEditObjectImageCropFieldId =
   | 'fit'
+  | 'reset'
   | 'x'
   | 'y'
 
@@ -46,12 +47,21 @@ export type SlideEditObjectImageCropPositionFieldDescriptor = {
   unit: 'percent'
 }
 
+export type SlideEditObjectImageCropResetFieldDescriptor = {
+  commandId: 'reset-object-image-crop'
+  control: 'image-crop-reset-button'
+  id: 'reset'
+  requiredAdapterSlot: 'command-effect'
+}
+
 export type SlideEditObjectImageCropFieldDescriptor =
   | SlideEditObjectImageCropFitFieldDescriptor
   | SlideEditObjectImageCropPositionFieldDescriptor
+  | SlideEditObjectImageCropResetFieldDescriptor
 
 export type SlideEditObjectImageCropFieldsDescriptor = {
   fit: SlideEditObjectImageCropFitFieldDescriptor
+  reset: SlideEditObjectImageCropResetFieldDescriptor
   x: SlideEditObjectImageCropPositionFieldDescriptor
   y: SlideEditObjectImageCropPositionFieldDescriptor
 }
@@ -91,12 +101,56 @@ export type SlideEditObjectImageCropUpdateCommand<
   TObjectId extends SlideEditObjectImageCropObjectId =
     SlideEditObjectImageCropObjectId,
 > = {
-  fieldId: SlideEditObjectImageCropFieldId
+  fieldId: Exclude<SlideEditObjectImageCropFieldId, 'reset'>
   id: 'update-object-image-crop'
   objectId: TObjectId
   slideId: TSlideId
   value: SlideEditObjectImageCropFit | number
 }
+
+export type SlideEditObjectImageCropResetCommand<
+  TSlideId extends SlideEditObjectImageCropSlideId =
+    SlideEditObjectImageCropSlideId,
+  TObjectId extends SlideEditObjectImageCropObjectId =
+    SlideEditObjectImageCropObjectId,
+> = {
+  crop?: Partial<SlideEditObjectImageCropPosition> | null
+  fit?: string | null
+  id: 'reset-object-image-crop'
+  objectId: TObjectId
+  slideId: TSlideId
+}
+
+export type SlideEditObjectImageCropCommand<
+  TSlideId extends SlideEditObjectImageCropSlideId =
+    SlideEditObjectImageCropSlideId,
+  TObjectId extends SlideEditObjectImageCropObjectId =
+    SlideEditObjectImageCropObjectId,
+> =
+  | SlideEditObjectImageCropResetCommand<TSlideId, TObjectId>
+  | SlideEditObjectImageCropUpdateCommand<TSlideId, TObjectId>
+
+export type SlideEditObjectImageCropResetPayload<
+  TSlideId extends SlideEditObjectImageCropSlideId =
+    SlideEditObjectImageCropSlideId,
+  TObjectId extends SlideEditObjectImageCropObjectId =
+    SlideEditObjectImageCropObjectId,
+> = {
+  crop: SlideEditObjectImageCropPosition
+  fit: SlideEditObjectImageCropFit
+  id: 'reset-object-image-crop'
+  objectId: TObjectId
+  slideId: TSlideId
+}
+
+export type SlideEditObjectImageCropCommandPayload<
+  TSlideId extends SlideEditObjectImageCropSlideId =
+    SlideEditObjectImageCropSlideId,
+  TObjectId extends SlideEditObjectImageCropObjectId =
+    SlideEditObjectImageCropObjectId,
+> =
+  | SlideEditObjectImageCropResetPayload<TSlideId, TObjectId>
+  | SlideEditObjectImageCropUpdateCommand<TSlideId, TObjectId>
 
 export type SlideEditObjectImageCropHostCommandEffect<
   TSlideId extends SlideEditObjectImageCropSlideId =
@@ -104,7 +158,7 @@ export type SlideEditObjectImageCropHostCommandEffect<
   TObjectId extends SlideEditObjectImageCropObjectId =
     SlideEditObjectImageCropObjectId,
 > = {
-  payload: SlideEditObjectImageCropUpdateCommand<TSlideId, TObjectId>
+  payload: SlideEditObjectImageCropCommandPayload<TSlideId, TObjectId>
   selection: {
     objectIds: readonly TObjectId[]
     slideId: TSlideId
@@ -144,6 +198,12 @@ export const SLIDE_EDIT_OBJECT_IMAGE_CROP_FIELDS = Object.freeze({
     control: 'image-fit-select',
     id: 'fit',
     options: SLIDE_EDIT_OBJECT_IMAGE_CROP_FIT_OPTIONS,
+    requiredAdapterSlot: 'command-effect',
+  },
+  reset: {
+    commandId: 'reset-object-image-crop',
+    control: 'image-crop-reset-button',
+    id: 'reset',
     requiredAdapterSlot: 'command-effect',
   },
   x: {
@@ -217,10 +277,10 @@ export function getSlideEditObjectImageCropCommandEffect<
   TSlideId extends SlideEditObjectImageCropSlideId,
   TObjectId extends SlideEditObjectImageCropObjectId,
 >(
-  command: SlideEditObjectImageCropUpdateCommand<TSlideId, TObjectId>,
+  command: SlideEditObjectImageCropCommand<TSlideId, TObjectId>,
 ): SlideEditObjectImageCropHostCommandEffect<TSlideId, TObjectId> {
   return {
-    payload: normalizeSlideEditObjectImageCropUpdateCommand(command),
+    payload: normalizeSlideEditObjectImageCropCommand(command),
     selection: {
       objectIds: [command.objectId],
       slideId: command.slideId,
@@ -241,6 +301,29 @@ export function normalizeSlideEditObjectImageCropUpdateCommand<
       ? normalizeSlideEditObjectImageCropFit(String(command.value))
       : normalizeSlideEditObjectImageCropValue(Number(command.value)),
   }
+}
+
+export function normalizeSlideEditObjectImageCropCommand<
+  TSlideId extends SlideEditObjectImageCropSlideId,
+  TObjectId extends SlideEditObjectImageCropObjectId,
+>(
+  command: SlideEditObjectImageCropCommand<TSlideId, TObjectId>,
+): SlideEditObjectImageCropCommandPayload<TSlideId, TObjectId> {
+  if (command.id === 'reset-object-image-crop') {
+    return {
+      crop: normalizeSlideEditObjectImageCrop(
+        command.crop ?? SLIDE_EDIT_OBJECT_IMAGE_CROP_DEFAULT,
+      ),
+      fit: normalizeSlideEditObjectImageCropFit(
+        command.fit ?? SLIDE_EDIT_OBJECT_IMAGE_CROP_DEFAULT_FIT,
+      ),
+      id: 'reset-object-image-crop',
+      objectId: command.objectId,
+      slideId: command.slideId,
+    }
+  }
+
+  return normalizeSlideEditObjectImageCropUpdateCommand(command)
 }
 
 export function getSlideEditObjectImageCropMetadata({
