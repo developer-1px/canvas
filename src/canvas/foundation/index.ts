@@ -19,6 +19,17 @@ export {
   type ResizeBoundsOptions,
 } from '../core'
 export {
+  getCanvasLocalRect,
+  getCanvasRectEdgeDistances,
+  normalizeCanvasRect,
+  padCanvasRect,
+  unionCanvasRectList,
+  unionCanvasRects,
+  type CanvasEdgeDistance,
+  type CanvasRectLike,
+  type CanvasScreenRectLike,
+} from './CanvasHeadlessGeometry'
+export {
   defineCanvasExtension,
   type CanvasExtensionAdapterSlot,
   type CanvasExtensionCommandDescriptor,

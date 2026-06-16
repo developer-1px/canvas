@@ -1,4 +1,4 @@
-import { useCanvasTextPasteImport } from '../affordances/io/text-paste/useCanvasTextPasteImport'
+import { useCanvasTextPasteImport } from '../feature-packs'
 import type { CanvasAppTextPasteImportModelInput } from './CanvasAppIoConsumerContracts'
 
 export function useCanvasAppTextPasteImportModel(

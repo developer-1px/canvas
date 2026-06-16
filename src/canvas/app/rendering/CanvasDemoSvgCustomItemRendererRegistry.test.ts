@@ -8,6 +8,9 @@ import {
   type CanvasDemoSvgCustomItemRendererStrategy,
   type CanvasDemoSvgCustomItemRenderers,
 } from './CanvasDemoSvgCustomItemRendererRegistry'
+import type {
+  CanvasAppCustomItemRendererDescriptor,
+} from './CanvasAppRenderingContracts'
 
 const customItem: CanvasCustomItem = {
   id: 'custom-risk-1',
@@ -36,6 +39,25 @@ describe('CanvasDemoSvgCustomItemRenderer registry', () => {
         renderers,
       }),
     ).toBe(renderRisk)
+  })
+
+  it('accepts custom item render descriptors with a render key strategy', () => {
+    const renderRisk: CanvasDemoSvgCustomItemRendererStrategy = ({ item }) =>
+      String(item.data.severity)
+    const renderer = {
+      getRenderKey: ({ item }) => String(item.data.severity),
+      renderItem: renderRisk,
+    } satisfies CanvasAppCustomItemRendererDescriptor
+    const renderers = createCanvasDemoSvgCustomItemRenderers({
+      'risk-node': renderer,
+    })
+
+    expect(
+      getCanvasDemoSvgCustomItemRenderer({
+        item: customItem,
+        renderers,
+      }),
+    ).toBe(renderer)
   })
 
   it('uses the fallback renderer when a custom presentation is missing', () => {
@@ -68,6 +90,17 @@ describe('CanvasDemoSvgCustomItemRenderer registry', () => {
       } as unknown as CanvasDemoSvgCustomItemRenderers),
     ).toThrow(
       'Canvas app custom item renderer risk-node requires render strategy',
+    )
+
+    expect(() =>
+      createCanvasDemoSvgCustomItemRenderers({
+        'risk-node': {
+          getRenderKey: undefined,
+          renderItem: () => null,
+        },
+      } as unknown as CanvasDemoSvgCustomItemRenderers),
+    ).toThrow(
+      'Canvas app custom item renderer risk-node requires render key strategy',
     )
   })
 })

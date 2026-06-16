@@ -6,6 +6,18 @@ import {
   createCanvasAppComponentPresentationRenderers,
   defineCanvasAppCustomItemModule,
 } from './index'
+import {
+  createCanvasAppExtensionBundle,
+} from '../extensions/CanvasAppExtensionBundle'
+import {
+  CANVAS_APP_BOARD_IO_FEATURE_PACK_MANIFEST,
+  DEFAULT_CANVAS_APP_FEATURE_PACK_VIEW_RENDERERS,
+  createCanvasAppAiLabsFeaturePackManifest,
+  createCanvasAppDomEditStyleFeaturePackManifest,
+  createCanvasAppFeaturePack,
+  createCanvasAppFeaturePackManifest,
+  createCanvasAppViewFeaturePack,
+} from '../feature-packs'
 import type {
   CanvasAppComponentRendererStrategy,
   CanvasAppCustomItemRendererStrategy,
@@ -243,6 +255,154 @@ describe('CanvasAppAssembly seams', () => {
       createItemLayerInput({ items: DEFAULT_CANVAS_APP_ASSEMBLY.initialItems }),
     )).toBe(DEFAULT_CANVAS_APP_ASSEMBLY.initialItems.length)
     expect(assembly.stageAdapter.renderStage).toBe(stageAdapter.renderStage)
+  })
+
+  it('assembles view feature packs at the app assembly seam', () => {
+    const assembly = createCanvasAppAssembly({
+      disabledViewFeaturePackIds: ['toolbar', 'component-authoring'],
+    })
+
+    expect(assembly.featurePackViewRenderers.toolbar).toBeUndefined()
+    expect(assembly.featurePackViewRenderers.contextCommandMenu).toBeUndefined()
+    expect(assembly.featurePackViewRenderers.selectionFloatingBar)
+      .toBeUndefined()
+    expect(assembly.featurePackViewRenderers.componentPalette).toBeUndefined()
+    expect(assembly.featurePackViewRenderers.stickyQuickCreate).toBeUndefined()
+    expect(assembly.featurePackViewRenderers.status).toBe(
+      DEFAULT_CANVAS_APP_FEATURE_PACK_VIEW_RENDERERS.status,
+    )
+
+    const renderStatus = () => null
+    const statusOnlyAssembly = createCanvasAppAssembly({
+      viewFeaturePacks: [
+        createCanvasAppViewFeaturePack({
+          id: 'status-only',
+          label: 'Status only',
+          viewRenderers: {
+            status: renderStatus,
+          },
+        }),
+      ],
+    })
+
+    expect(statusOnlyAssembly.featurePackViewRenderers.status)
+      .toBe(renderStatus)
+    expect(statusOnlyAssembly.featurePackViewRenderers.toolbar).toBeUndefined()
+
+    const directAssembly = createCanvasAppAssembly({
+      featurePackViewRenderers: {
+        status: renderStatus,
+      },
+    })
+
+    expect(directAssembly.featurePackViewRenderers.status).toBe(renderStatus)
+    expect(Object.isFrozen(directAssembly.featurePackViewRenderers)).toBe(true)
+  })
+
+  it('assembles feature pack manifests as installable app assembly units', () => {
+    const disabledAssembly = createCanvasAppAssembly({
+      disabledFeaturePackIds: ['toolbar', 'media-import'],
+    })
+
+    expect(disabledAssembly.featurePackViewRenderers.toolbar).toBeUndefined()
+    expect(disabledAssembly.featurePackViewRenderers.contextCommandMenu)
+      .toBeUndefined()
+    expect(disabledAssembly.featurePackViewRenderers.status).toBe(
+      DEFAULT_CANVAS_APP_FEATURE_PACK_VIEW_RENDERERS.status,
+    )
+    expect(disabledAssembly.installedFeaturePackIds).not.toContain('toolbar')
+    expect(disabledAssembly.installedFeaturePackIds).not.toContain(
+      'media-import',
+    )
+    expect(disabledAssembly.installedFeaturePackIds).toContain('table-import')
+    expect(disabledAssembly.inspectorPanels.map((panel) => panel.id))
+      .not.toContain('link-preview-actions')
+    expect(disabledAssembly.inspectorPanels.map((panel) => panel.id))
+      .toContain('arrow-routing-actions')
+
+    const renderStatus = () => null
+    const customAssembly = createCanvasAppAssembly({
+      featurePackManifests: [
+        createCanvasAppFeaturePackManifest({
+          extensionFeaturePack: createCanvasAppFeaturePack({
+            extensionBundle: createCanvasAppExtensionBundle({
+              customCommands: [{
+                id: 'status-pack-command',
+                label: 'Status pack',
+                run: () => undefined,
+                title: 'Status pack',
+              }],
+            }),
+            id: 'status-pack',
+            label: 'Status pack',
+          }),
+          id: 'status-pack',
+          label: 'Status pack',
+          viewFeaturePack: createCanvasAppViewFeaturePack({
+            id: 'status-pack',
+            label: 'Status pack',
+            viewRenderers: {
+              status: renderStatus,
+            },
+          }),
+        }),
+      ],
+    })
+
+    expect(customAssembly.featurePackViewRenderers.status).toBe(renderStatus)
+    expect(customAssembly.featurePackViewRenderers.toolbar).toBeUndefined()
+    expect(customAssembly.installedFeaturePackIds).toEqual(['status-pack'])
+    expect(customAssembly.customCommands.map((command) => command.id))
+      .toContain('status-pack-command')
+    expect(customAssembly.inspectorPanels).toEqual([])
+  })
+
+  it('adds optional feature pack manifests without replacing defaults', () => {
+    const aiLabsManifest = createCanvasAppAiLabsFeaturePackManifest({
+      provider: {
+        complete: () => ({ text: 'Summary' }),
+        id: 'test-ai',
+      },
+      requestReview: () => ({ kind: 'cancel' }),
+    })
+    const domEditStyleManifest =
+      createCanvasAppDomEditStyleFeaturePackManifest({
+        id: 'risk-dom-card-style',
+        itemKind: 'risk',
+        targetId: 'card',
+      })
+
+    const assembly = createCanvasAppAssembly({
+      additionalFeaturePackManifests: [
+        aiLabsManifest,
+        domEditStyleManifest,
+        CANVAS_APP_BOARD_IO_FEATURE_PACK_MANIFEST,
+      ],
+    })
+
+    expect(assembly.installedFeaturePackIds).toContain('toolbar')
+    expect(assembly.installedFeaturePackIds).toContain('ai-labs')
+    expect(assembly.installedFeaturePackIds).toContain('risk-dom-card-style')
+    expect(assembly.installedFeaturePackIds).toContain('board-io')
+    expect(assembly.featurePackViewRenderers.toolbar).toBe(
+      DEFAULT_CANVAS_APP_FEATURE_PACK_VIEW_RENDERERS.toolbar,
+    )
+    expect(assembly.customCommands.map((command) => command.id))
+      .toContain('ai-labs-summarize-selection')
+    expect(assembly.inspectorPanels.map((panel) => panel.id))
+      .toContain('risk-dom-card-style')
+
+    const disabledAssembly = createCanvasAppAssembly({
+      additionalFeaturePackManifests: [aiLabsManifest],
+      disabledFeaturePackIds: ['ai-labs'],
+    })
+
+    expect(disabledAssembly.installedFeaturePackIds).not.toContain('ai-labs')
+    expect(disabledAssembly.customCommands.map((command) => command.id))
+      .not.toContain('ai-labs-summarize-selection')
+    expect(disabledAssembly.featurePackViewRenderers.toolbar).toBe(
+      DEFAULT_CANVAS_APP_FEATURE_PACK_VIEW_RENDERERS.toolbar,
+    )
   })
 
   it('accepts workspace storage provider at the app assembly seam', () => {

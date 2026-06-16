@@ -1,5 +1,5 @@
-import type { CanvasAppCustomCommand } from '../affordances/commands/CanvasAppCustomCommands'
-import type { CanvasAppInspectorPanel } from '../affordances/editing/inspector/CanvasAppInspectorPanels'
+import type { CanvasAppCustomCommand } from './custom-commands'
+import type { CanvasAppInspectorPanel } from './inspector-panels'
 import type {
   CanvasAppCustomItemValidators,
 } from './custom-item-modules/CanvasAppCustomItemValidatorContracts'
@@ -7,11 +7,11 @@ import {
   appendUniqueCanvasAppFoundationExtensions,
   snapshotCanvasAppFoundationExtensions,
   type CanvasAppFoundationExtension,
-} from './CanvasAppFoundationExtensionDescriptors'
+} from './foundation-extensions'
 import type { CanvasAppCustomItemRenderers } from '../rendering/CanvasAppRenderingContracts'
 import type { CanvasAppCustomCreationTool } from './custom-tools/CanvasAppCustomCreationTools'
-import type { CanvasMediaImporter } from '../affordances/io/media/CanvasMediaImporters'
-import type { CanvasTextPasteImporter } from '../affordances/io/text-paste/CanvasTextPasteImporters'
+import type { CanvasMediaImporter } from '../feature-packs/media-import'
+import type { CanvasTextPasteImporter } from '../feature-packs/text-paste-import'
 import {
   snapshotCanvasAppDescriptorArray,
   snapshotCanvasAppRecord,

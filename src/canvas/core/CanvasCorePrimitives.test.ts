@@ -3,6 +3,10 @@ import {
   CANVAS_FIT_VIEWPORT_PADDING,
   CANVAS_ZOOM_STEPS,
   fitBoundsIntoViewport,
+  getCanvasViewportScale,
+  getCanvasViewportScreenBounds,
+  getCanvasViewportScreenPoint,
+  getCanvasViewportWorldBounds,
   getCanvasViewportWorldPoint,
   getCanvasViewportZoomStep,
   getCanvasViewportZoomStepMultiplier,
@@ -46,6 +50,53 @@ describe('CanvasCorePrimitives', () => {
         { x: 120, y: 80 },
       ),
     ).toEqual({ x: 1200, y: 800 })
+  })
+
+  it('projects world points to finite viewport coordinates', () => {
+    expect(
+      getCanvasViewportScreenPoint(
+        { scale: 2, x: 10, y: 20 },
+        { x: 20, y: 30 },
+      ),
+    ).toEqual({ x: 50, y: 80 })
+    expect(
+      getCanvasViewportScreenPoint(
+        { scale: Number.NaN, x: Number.NaN, y: Number.NaN },
+        { x: 120, y: 80 },
+      ),
+    ).toEqual({ x: 12, y: 8 })
+  })
+
+  it('projects viewport rects into visible world bounds', () => {
+    expect(
+      getCanvasViewportWorldBounds(
+        { scale: 2, x: -200, y: -100 },
+        { height: 600, width: 900 },
+      ),
+    ).toEqual({
+      h: 300,
+      w: 450,
+      x: 100,
+      y: 50,
+    })
+  })
+
+  it('projects world bounds into viewport bounds', () => {
+    expect(
+      getCanvasViewportScreenBounds(
+        { scale: 2, x: 5, y: 7 },
+        { h: 30, w: 80, x: 10, y: 20 },
+      ),
+    ).toEqual({
+      h: 60,
+      w: 160,
+      x: 25,
+      y: 47,
+    })
+  })
+
+  it('normalizes invalid viewport scale through the shared scale contract', () => {
+    expect(getCanvasViewportScale({ scale: Number.NaN })).toBe(MIN_SCALE)
   })
 
   it('keeps zoom viewport math finite when persisted scale is invalid', () => {

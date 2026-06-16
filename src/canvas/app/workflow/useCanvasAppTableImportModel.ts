@@ -1,4 +1,4 @@
-import { useCanvasTableImport } from '../affordances/io/table/useCanvasTableImport'
+import { useCanvasTableImport } from '../feature-packs'
 import type { CanvasAppTableImportModelInput } from './CanvasAppIoConsumerContracts'
 
 export function useCanvasAppTableImportModel(

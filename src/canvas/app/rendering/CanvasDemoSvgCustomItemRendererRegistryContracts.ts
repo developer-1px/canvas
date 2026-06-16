@@ -5,6 +5,7 @@ export function assertCanvasDemoSvgCustomItemRenderers(
   renderers: CanvasAppCustomItemRenderers,
 ) {
   assertCanvasAppRendererRegistry({
+    allowRenderDescriptors: true,
     label: 'custom item renderer',
     renderers,
   })

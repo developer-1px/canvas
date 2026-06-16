@@ -16,7 +16,7 @@ describe('Canvas App inspector workflow boundaries', () => {
       'src/canvas/app/workflow/useCanvasAppCustomFocusModel.ts',
     )
     const customFocusHookFile = getSourceFile(
-      'src/canvas/app/affordances/interaction/focus/useCanvasAppCustomFocus.ts',
+      'src/canvas/app/extensions/custom-focus/useCanvasAppCustomFocus.ts',
     )
     const objectInspectorHookFile = getSourceFile(
       'src/canvas/app/affordances/editing/inspector/useCanvasObjectInspector.ts',
@@ -58,7 +58,7 @@ describe('Canvas App inspector workflow boundaries', () => {
     expect(inspectorModelFile.source).toContain('inspectorPanels')
     expect(inspectorModelFile.source).toContain('itemReadModel')
     expect(customFocusModelFile.source).toContain(
-      "from '../affordances/interaction/focus/useCanvasAppCustomFocus'",
+      "from '../extensions/custom-focus'",
     )
     expect(customFocusModelFile.source).toContain('customFocus')
     expect(customFocusHookFile.source).toContain(
@@ -72,7 +72,7 @@ describe('Canvas App inspector workflow boundaries', () => {
       'export type CanvasAppInspectorModelInput',
     )
     expect(consumerContractsFile.source).toContain(
-      "from '../affordances/editing/inspector/CanvasAppInspectorPanels'",
+      "from '../extensions/inspector-panels'",
     )
     expect(objectInspectorHookFile.source).toContain(
       "from './CanvasObjectInspectorModel'",
@@ -102,10 +102,10 @@ describe('Canvas App inspector workflow boundaries', () => {
 
   it('keeps App inspector panel execution behind a named module', () => {
     const descriptorFile = getSourceFile(
-      'src/canvas/app/affordances/editing/inspector/CanvasAppInspectorPanels.ts',
+      'src/canvas/app/extensions/inspector-panels/CanvasAppInspectorPanels.ts',
     )
     const executionFile = getSourceFile(
-      'src/canvas/app/affordances/editing/inspector/CanvasAppInspectorPanelExecution.ts',
+      'src/canvas/app/extensions/inspector-panels/CanvasAppInspectorPanelExecution.ts',
     )
     const objectInspectorHook = getSourceFile(
       'src/canvas/app/affordances/editing/inspector/useCanvasObjectInspector.ts',
@@ -120,7 +120,7 @@ describe('Canvas App inspector workflow boundaries', () => {
     expect(descriptorFile.source).not.toContain('CanvasWorkflowContract')
     expect(descriptorFile.source).not.toContain("from '../../host'")
     expect(descriptorFile.source).toContain(
-      "from '../../../workspace/document/CanvasAppDocumentContracts'",
+      "from '../../workspace/document/CanvasAppDocumentContracts'",
     )
     expect(descriptorFile.source).toContain(
       'export type CanvasAppInspectorPanelCommitItemsChange',
@@ -132,20 +132,20 @@ describe('Canvas App inspector workflow boundaries', () => {
     expect(executionFile.source).toContain('panel.isVisible(context)')
     expect(executionFile.source).toContain('catch')
     expect(objectInspectorHook.source).not.toContain(
-      "from './CanvasAppInspectorPanelExecution'",
+      'CanvasAppInspectorPanelExecution',
     )
     expect(objectInspectorModel.source).toContain(
-      "from './CanvasAppInspectorPanelExecution'",
+      "from '../../../extensions/inspector-panels'",
     )
   })
 
 
   it('keeps App inspector panel contracts behind a named module', () => {
     const descriptorFile = getSourceFile(
-      'src/canvas/app/affordances/editing/inspector/CanvasAppInspectorPanels.ts',
+      'src/canvas/app/extensions/inspector-panels/CanvasAppInspectorPanels.ts',
     )
     const contractsFile = getSourceFile(
-      'src/canvas/app/affordances/editing/inspector/CanvasAppInspectorPanelContracts.ts',
+      'src/canvas/app/extensions/inspector-panels/CanvasAppInspectorPanelContracts.ts',
     )
 
     expect(descriptorFile.source).not.toContain(

@@ -2,6 +2,7 @@ import {
   isValidElement,
   type ReactElement,
 } from 'react'
+import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
 import { CanvasInlineTextEditingContext } from '../affordances/editing/text-editor/CanvasInlineTextEditingContext'
 import type {
@@ -10,11 +11,28 @@ import type {
 } from '../rendering/CanvasAppRenderingContracts'
 import type { CanvasAppPointerInput } from '../affordances/interaction/pointer/CanvasAppPointerInput'
 import {
+  createCanvasAppStageExternalOverlaySlot,
   renderCanvasAppStageModel,
   type CanvasAppStageModelInput,
 } from './CanvasAppStageModel'
 
 describe('CanvasAppStageModel', () => {
+  it('renders product external overlays after the canvas stage', () => {
+    const slot = createCanvasAppStageExternalOverlaySlot(
+      <div className="canvas-stage">Stage</div>,
+    )
+
+    const markup = renderToStaticMarkup(
+      <>
+        {slot.render(<div className="product-overlay">Overlay</div>)}
+      </>,
+    )
+
+    expect(markup).toContain(
+      '<div class="canvas-stage">Stage</div><div class="product-overlay">Overlay</div>',
+    )
+  })
+
   it('renders item layer children through the stage adapter', () => {
     let stageInput: CanvasAppStageRenderInput | null = null
     const input = createStageModelInput({

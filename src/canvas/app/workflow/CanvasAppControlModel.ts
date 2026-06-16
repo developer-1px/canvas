@@ -1,28 +1,29 @@
-import { isCanvasCustomToolId } from '../../core'
 import {
-  CANVAS_GESTURE_STATUS_LABELS,
-  CANVAS_TOOL_AFFORDANCES,
+  getCanvasViewportScreenPoint,
+} from '../../core'
+import {
   getCanvasCommandAvailability,
 } from '../../engine'
 import type {
-  CanvasInteractionKind,
   Bounds,
-  Tool,
   Viewport,
 } from '../../entities'
-import type {
-  CanvasAppCustomCreationToolState,
-} from '../extensions/CanvasAppExtensionStateContracts'
 import {
   getCanvasCommandPaletteItems,
-} from '../affordances/controls/command-palette/CanvasCommandPaletteItems'
+} from '../feature-packs'
 import {
   getCanvasShortcutHelpItems,
-} from '../affordances/controls/shortcut-help/CanvasShortcutHelpItems'
+} from '../feature-packs'
+import {
+  getCanvasStatusModel,
+} from '../feature-packs'
 import {
   getCanvasMinimapReadModel,
-} from '../affordances/controls/minimap/CanvasMinimapModel'
+} from '../feature-packs'
 import type { CanvasAppControlModelInput } from './CanvasAppControlConsumerContracts'
+import type {
+  CanvasAppViewportFocusControls,
+} from './CanvasAppViewportConsumerContracts'
 
 type CanvasSelectionCommandAnchor = {
   placement: 'above' | 'below'
@@ -94,12 +95,12 @@ export function getCanvasAppControlModel({
       visible: config.overlays.shortcutHelp,
     },
     status: {
-      mode: getCanvasAppStatusMode({
+      ...getCanvasStatusModel({
         customTools,
         gesture,
+        selectionLength: selection.length,
         tool,
       }),
-      selectionLength: selection.length,
       visible: config.overlays.status,
     },
     minimap: {
@@ -131,6 +132,12 @@ export function getCanvasAppControlModel({
       onToolChange,
       onCustomCommand: onRunCustomCommand,
     },
+    viewportFocus: getCanvasAppViewportFocusControls({
+      onCenterViewportAtWorldPoint,
+      onFitItems,
+      selection,
+      viewportRect,
+    }),
     zoomControls: {
       config,
       scale: viewport.scale,
@@ -145,6 +152,25 @@ export function getCanvasAppControlModel({
   }
 }
 
+function getCanvasAppViewportFocusControls({
+  onCenterViewportAtWorldPoint,
+  onFitItems,
+  selection,
+  viewportRect,
+}: Pick<
+  CanvasAppControlModelInput,
+  'onCenterViewportAtWorldPoint' | 'onFitItems' | 'selection' | 'viewportRect'
+>): CanvasAppViewportFocusControls {
+  return {
+    centerAtWorldPoint: onCenterViewportAtWorldPoint,
+    fitAll: () => onFitItems(undefined),
+    fitItems: (ids) => onFitItems([...ids]),
+    fitSelection: () =>
+      onFitItems(selection.length > 0 ? [...selection] : undefined),
+    viewportRect,
+  }
+}
+
 function getCanvasSelectionCommandAnchor({
   bounds,
   viewport,
@@ -156,38 +182,23 @@ function getCanvasSelectionCommandAnchor({
     return null
   }
 
-  const top = viewport.y + bounds.y * viewport.scale
-  const bottom = viewport.y + (bounds.y + bounds.h) * viewport.scale
+  const top = getCanvasViewportScreenPoint(viewport, {
+    x: bounds.x,
+    y: bounds.y,
+  }).y
+  const bottom = getCanvasViewportScreenPoint(viewport, {
+    x: bounds.x,
+    y: bounds.y + bounds.h,
+  }).y
+  const center = getCanvasViewportScreenPoint(viewport, {
+    x: bounds.x + bounds.w / 2,
+    y: bounds.y + bounds.h / 2,
+  })
   const placement = top < 128 ? 'below' : 'above'
 
   return {
-    x: viewport.x + (bounds.x + bounds.w / 2) * viewport.scale,
+    x: center.x,
     y: placement === 'below' ? bottom : top,
     placement,
   }
-}
-
-function getCanvasAppStatusMode({
-  customTools,
-  gesture,
-  tool,
-}: {
-  customTools: readonly CanvasAppCustomCreationToolState[]
-  gesture: CanvasInteractionKind
-  tool: Tool
-}) {
-  const gestureLabel = CANVAS_GESTURE_STATUS_LABELS[gesture]
-
-  if (gestureLabel) {
-    return gestureLabel
-  }
-
-  if (isCanvasCustomToolId(tool)) {
-    return (
-      customTools.find((customTool) => customTool.id === tool)
-        ?.statusLabel ?? 'Canvas'
-    )
-  }
-
-  return CANVAS_TOOL_AFFORDANCES[tool].statusLabel
 }

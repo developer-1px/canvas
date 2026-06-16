@@ -11,19 +11,16 @@ import {
   DEFAULT_CANVAS_APP_COMPONENT_PRESENTATION_RENDERERS,
   DEFAULT_CANVAS_APP_CUSTOM_ITEM_RENDERERS,
 } from '../rendering/CanvasAppRendererRegistries'
-import { createCanvasAppExtensionBundle } from '../extensions/CanvasAppExtensionBundle'
 import {
-  CANVAS_CHECKLIST_INSPECTOR_PANEL,
-} from '../affordances/editing/component-panels/checklist/CanvasChecklistInspectorPanel'
+  createCanvasAppExtensionBundle,
+  mergeCanvasAppExtensionBundle,
+} from '../extensions/CanvasAppExtensionBundle'
 import {
-  CANVAS_ARROW_ROUTING_INSPECTOR_PANEL,
-} from '../affordances/editing/arrow-routing/CanvasArrowRoutingInspectorPanel'
-import {
-  CANVAS_KANBAN_INSPECTOR_PANEL,
-} from '../affordances/editing/component-panels/kanban/CanvasKanbanInspectorPanel'
-import {
-  CANVAS_LINK_PREVIEW_INSPECTOR_PANEL,
-} from '../affordances/io/link-preview/CanvasLinkPreviewInspectorPanel'
+  DEFAULT_CANVAS_APP_FEATURE_PACK_EXTENSION_BUNDLE,
+  DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS,
+  DEFAULT_CANVAS_APP_FEATURE_PACK_VIEW_RENDERERS,
+  getCanvasAppInstalledFeaturePackManifestIds,
+} from '../feature-packs'
 import { DEFAULT_CANVAS_APP_ITEM_LAYER_ADAPTER } from '../rendering/CanvasAppItemLayerAdapter'
 import { DEFAULT_CANVAS_APP_STAGE_ADAPTER } from '../rendering/CanvasAppStageAdapter'
 import { DEFAULT_CANVAS_WORKSPACE_STORAGE_PROVIDER } from '../workspace/document/CanvasWorkspacePersistence'
@@ -41,23 +38,30 @@ const DEFAULT_CANVAS_APP_INITIAL_SELECTION = [
   'component-card',
 ]
 
+export const DEFAULT_CANVAS_APP_BASE_EXTENSION_BUNDLE =
+  createCanvasAppExtensionBundle({
+    customItemRenderers: DEFAULT_CANVAS_APP_CUSTOM_ITEM_RENDERERS,
+    foundationExtensions: [CANVAS_STICKY_NOTE_EXTENSION],
+  })
+
+const DEFAULT_CANVAS_APP_EXTENSION_BUNDLE = mergeCanvasAppExtensionBundle({
+  current: DEFAULT_CANVAS_APP_BASE_EXTENSION_BUNDLE,
+  entries: DEFAULT_CANVAS_APP_FEATURE_PACK_EXTENSION_BUNDLE,
+  owner: 'app assembly',
+})
+
 export const DEFAULT_CANVAS_APP_ASSEMBLY: CanvasAppAssembly =
   snapshotCanvasAppAssembly({
-    ...createCanvasAppExtensionBundle({
-      customItemRenderers: DEFAULT_CANVAS_APP_CUSTOM_ITEM_RENDERERS,
-      foundationExtensions: [CANVAS_STICKY_NOTE_EXTENSION],
-      inspectorPanels: [
-        CANVAS_LINK_PREVIEW_INSPECTOR_PANEL,
-        CANVAS_ARROW_ROUTING_INSPECTOR_PANEL,
-        CANVAS_CHECKLIST_INSPECTOR_PANEL,
-        CANVAS_KANBAN_INSPECTOR_PANEL,
-      ],
-    }),
+    ...DEFAULT_CANVAS_APP_EXTENSION_BUNDLE,
     affordanceConfig: DEFAULT_CANVAS_AFFORDANCE_CONFIG,
     capabilities: CANVAS_APP_EDITOR_CAPABILITIES,
     componentLibrary: CANVAS_COMPONENT_LIBRARY,
     componentPresentationRenderers:
       DEFAULT_CANVAS_APP_COMPONENT_PRESENTATION_RENDERERS,
+    featurePackViewRenderers: DEFAULT_CANVAS_APP_FEATURE_PACK_VIEW_RENDERERS,
+    installedFeaturePackIds: getCanvasAppInstalledFeaturePackManifestIds(
+      DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS,
+    ),
     initialItems: INITIAL_ITEMS,
     initialSelection: DEFAULT_CANVAS_APP_INITIAL_SELECTION,
     itemAdapters: CANVAS_ITEM_ENGINE_ADAPTERS,

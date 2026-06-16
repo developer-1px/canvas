@@ -12,8 +12,8 @@ import {
 } from '../../foundation'
 import {
   getCanvasAppFoundationExtensionRendererSlots,
-} from '../extensions/CanvasAppFoundationExtensionRendererSlots'
-import { getCanvasAppFoundationExtensionTools } from '../extensions/CanvasAppFoundationExtensionTools'
+} from '../extensions/foundation-extensions'
+import { getCanvasAppFoundationExtensionTools } from '../extensions/foundation-extensions'
 import {
   DEFAULT_CANVAS_APP_COMPONENT_PRESENTATION_RENDERERS,
   DEFAULT_CANVAS_APP_CUSTOM_ITEM_RENDERERS,
@@ -22,17 +22,11 @@ import { DEFAULT_CANVAS_APP_ITEM_LAYER_ADAPTER } from '../rendering/CanvasAppIte
 import { DEFAULT_CANVAS_APP_STAGE_ADAPTER } from '../rendering/CanvasAppStageAdapter'
 import { DEFAULT_CANVAS_WORKSPACE_STORAGE_PROVIDER } from '../workspace/document/CanvasWorkspacePersistence'
 import {
-  CANVAS_ARROW_ROUTING_INSPECTOR_PANEL,
-} from '../affordances/editing/arrow-routing/CanvasArrowRoutingInspectorPanel'
-import {
-  CANVAS_CHECKLIST_INSPECTOR_PANEL,
-} from '../affordances/editing/component-panels/checklist/CanvasChecklistInspectorPanel'
-import {
-  CANVAS_KANBAN_INSPECTOR_PANEL,
-} from '../affordances/editing/component-panels/kanban/CanvasKanbanInspectorPanel'
-import {
-  CANVAS_LINK_PREVIEW_INSPECTOR_PANEL,
-} from '../affordances/io/link-preview/CanvasLinkPreviewInspectorPanel'
+  DEFAULT_CANVAS_APP_FEATURE_PACK_EXTENSION_BUNDLE,
+  DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS,
+  DEFAULT_CANVAS_APP_FEATURE_PACK_VIEW_RENDERERS,
+  getCanvasAppInstalledFeaturePackManifestIds,
+} from '../feature-packs'
 import { DEFAULT_CANVAS_APP_ASSEMBLY } from './CanvasAppDefaultAssembly'
 
 describe('CanvasAppDefaultAssembly', () => {
@@ -45,6 +39,14 @@ describe('CanvasAppDefaultAssembly', () => {
     )
     expect(DEFAULT_CANVAS_APP_ASSEMBLY.componentPresentationRenderers).toEqual(
       DEFAULT_CANVAS_APP_COMPONENT_PRESENTATION_RENDERERS,
+    )
+    expect(DEFAULT_CANVAS_APP_ASSEMBLY.featurePackViewRenderers).toEqual(
+      DEFAULT_CANVAS_APP_FEATURE_PACK_VIEW_RENDERERS,
+    )
+    expect(DEFAULT_CANVAS_APP_ASSEMBLY.installedFeaturePackIds).toEqual(
+      getCanvasAppInstalledFeaturePackManifestIds(
+        DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS,
+      ),
     )
     expect(DEFAULT_CANVAS_APP_ASSEMBLY.customItemRenderers).toEqual(
       DEFAULT_CANVAS_APP_CUSTOM_ITEM_RENDERERS,
@@ -67,12 +69,9 @@ describe('CanvasAppDefaultAssembly', () => {
       id: CANVAS_STICKY_NOTE_RENDERER_SLOT_ID,
       surface: 'item-layer',
     }])
-    expect(DEFAULT_CANVAS_APP_ASSEMBLY.inspectorPanels).toEqual([
-      CANVAS_LINK_PREVIEW_INSPECTOR_PANEL,
-      CANVAS_ARROW_ROUTING_INSPECTOR_PANEL,
-      CANVAS_CHECKLIST_INSPECTOR_PANEL,
-      CANVAS_KANBAN_INSPECTOR_PANEL,
-    ])
+    expect(DEFAULT_CANVAS_APP_ASSEMBLY.inspectorPanels).toEqual(
+      DEFAULT_CANVAS_APP_FEATURE_PACK_EXTENSION_BUNDLE.inspectorPanels,
+    )
     expect(DEFAULT_CANVAS_APP_ASSEMBLY.initialItems).toEqual(INITIAL_ITEMS)
     expect(DEFAULT_CANVAS_APP_ASSEMBLY.initialSelection).toEqual([
       'component-sticky',
@@ -99,5 +98,11 @@ describe('CanvasAppDefaultAssembly', () => {
     )).toBe(true)
     expect(Object.isFrozen(DEFAULT_CANVAS_APP_ASSEMBLY.initialItems)).toBe(true)
     expect(Object.isFrozen(DEFAULT_CANVAS_APP_ASSEMBLY.itemAdapters)).toBe(true)
+    expect(Object.isFrozen(
+      DEFAULT_CANVAS_APP_ASSEMBLY.featurePackViewRenderers,
+    )).toBe(true)
+    expect(Object.isFrozen(
+      DEFAULT_CANVAS_APP_ASSEMBLY.installedFeaturePackIds,
+    )).toBe(true)
   })
 })

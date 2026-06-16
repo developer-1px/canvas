@@ -10,16 +10,28 @@ import type { CanvasAppExtensionAssemblyInput } from './CanvasAppExtensionAssemb
 
 export type CanvasAppExtensionAssembly = CanvasAppExtensionBundle
 
+export type CanvasAppExtensionAssemblyOptions = {
+  featurePackExtensionBundle?: CanvasAppExtensionBundle
+}
+
 export function createCanvasAppExtensionAssembly(
   input: CanvasAppExtensionAssemblyInput,
   defaults: CanvasAppExtensionAssembly,
+  options: CanvasAppExtensionAssemblyOptions = {},
 ): CanvasAppExtensionAssembly {
+  const featurePackExtensionAssembly = options.featurePackExtensionBundle
+    ? mergeCanvasAppExtensionBundle({
+      current: defaults,
+      entries: options.featurePackExtensionBundle,
+      owner: 'app assembly',
+    })
+    : defaults
   const customItemModuleAssembly = createCanvasAppCustomItemModuleAssembly(
     input.customItemModules,
     { disabledModuleIds: input.disabledCustomItemModuleIds },
   )
   const moduleExtensionAssembly = mergeCanvasAppExtensionBundle({
-    current: defaults,
+    current: featurePackExtensionAssembly,
     entries: customItemModuleAssembly,
     owner: 'app assembly',
   })

@@ -124,6 +124,12 @@ describe('CanvasAppControlModel', () => {
     selectedModel.zoomControls.onFit()
 
     expect(onFitItems).toHaveBeenLastCalledWith(['rect-1'])
+    selectedModel.viewportFocus.fitSelection()
+    expect(onFitItems).toHaveBeenLastCalledWith(['rect-1'])
+    selectedModel.viewportFocus.fitItems(['rect-2'])
+    expect(onFitItems).toHaveBeenLastCalledWith(['rect-2'])
+    selectedModel.viewportFocus.fitAll()
+    expect(onFitItems).toHaveBeenLastCalledWith(undefined)
     expect(selectedModel.componentPalette.visible).toBe(false)
     expect(selectedModel.commandPalette.visible).toBe(false)
     expect(selectedModel.shortcutHelp.visible).toBe(false)
@@ -136,7 +142,7 @@ describe('CanvasAppControlModel', () => {
     getCanvasAppControlModel(createInput({
       onFitItems,
       selection: [],
-    })).zoomControls.onFit()
+    })).viewportFocus.fitSelection()
 
     expect(onFitItems).toHaveBeenLastCalledWith(undefined)
   })
@@ -163,6 +169,7 @@ describe('CanvasAppControlModel', () => {
     }))
 
     model.minimap.onNavigateToWorldPoint({ x: 50, y: 60 })
+    model.viewportFocus.centerAtWorldPoint({ x: 70, y: 80 })
     model.toolbar.commandHandlers.onAlign('alignLeft')
     model.commandPalette.items
       .find((item) => item.id === 'command:alignLeft')
@@ -183,6 +190,7 @@ describe('CanvasAppControlModel', () => {
     expect(onAlign).toHaveBeenCalledTimes(2)
     expect(onAlign).toHaveBeenLastCalledWith('alignLeft')
     expect(onCenterViewportAtWorldPoint).toHaveBeenCalledWith({ x: 50, y: 60 })
+    expect(onCenterViewportAtWorldPoint).toHaveBeenCalledWith({ x: 70, y: 80 })
     expect(onRunCustomCommand).toHaveBeenCalledTimes(2)
     expect(onRunCustomCommand).toHaveBeenLastCalledWith('publish')
     expect(onOpenShortcutHelp).toHaveBeenCalledTimes(1)

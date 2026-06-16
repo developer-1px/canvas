@@ -11,8 +11,17 @@ import {
 } from './CanvasAppCapabilityAssembly'
 import { createCanvasAppCollaborationAssembly } from './CanvasAppCollaborationAssembly'
 import { createCanvasAppComponentAssembly } from './CanvasAppComponentAssembly'
-import { DEFAULT_CANVAS_APP_ASSEMBLY } from './CanvasAppDefaultAssembly'
+import {
+  DEFAULT_CANVAS_APP_ASSEMBLY,
+  DEFAULT_CANVAS_APP_BASE_EXTENSION_BUNDLE,
+} from './CanvasAppDefaultAssembly'
 import { createCanvasAppExtensionAssembly } from './CanvasAppExtensionAssembly'
+import {
+  createCanvasAppFeaturePackAssembly,
+} from './CanvasAppFeaturePackAssembly'
+import {
+  DEFAULT_CANVAS_APP_FEATURE_PACK_EXTENSION_BUNDLE,
+} from '../feature-packs'
 import { createCanvasAppWorkspaceAssembly } from './CanvasAppWorkspaceAssembly'
 import { snapshotCanvasAppAssembly } from './CanvasAppAssemblySnapshot'
 
@@ -31,9 +40,24 @@ export function createCanvasAppAssembly(
     input,
     DEFAULT_CANVAS_APP_ASSEMBLY,
   )
+  const featurePackAssembly = createCanvasAppFeaturePackAssembly(
+    input,
+    {
+      featurePackExtensionBundle:
+        DEFAULT_CANVAS_APP_FEATURE_PACK_EXTENSION_BUNDLE,
+      installedFeaturePackIds:
+        DEFAULT_CANVAS_APP_ASSEMBLY.installedFeaturePackIds,
+      featurePackViewRenderers:
+        DEFAULT_CANVAS_APP_ASSEMBLY.featurePackViewRenderers,
+    },
+  )
   const extensionAssembly = createCanvasAppExtensionAssembly(
     input,
-    DEFAULT_CANVAS_APP_ASSEMBLY,
+    DEFAULT_CANVAS_APP_BASE_EXTENSION_BUNDLE,
+    {
+      featurePackExtensionBundle:
+        featurePackAssembly.featurePackExtensionBundle,
+    },
   )
   const workspaceAssembly = createCanvasAppWorkspaceAssembly(
     input,
@@ -62,7 +86,6 @@ export function createCanvasAppAssembly(
     input,
     DEFAULT_CANVAS_APP_ASSEMBLY,
   )
-
   const assembly: CanvasAppAssembly = {
     ...extensionAssembly,
     affordanceConfig: affordanceAssembly.affordanceConfig,
@@ -70,6 +93,8 @@ export function createCanvasAppAssembly(
     componentLibrary: componentAssembly.componentLibrary,
     componentPresentationRenderers:
       componentAssembly.componentPresentationRenderers,
+    featurePackViewRenderers: featurePackAssembly.featurePackViewRenderers,
+    installedFeaturePackIds: featurePackAssembly.installedFeaturePackIds,
     initialItems: workspaceAssembly.initialItems,
     initialSelection: workspaceAssembly.initialSelection,
     itemAdapters: adapterAssembly.itemAdapters,

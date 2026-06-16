@@ -4,6 +4,10 @@ import type {
   Viewport,
 } from '../../../../entities'
 import {
+  getCanvasViewportScale,
+  getCanvasViewportScreenBounds,
+} from '../../../../core'
+import {
   getCanvasEditableTextBounds,
   getCommittedCanvasEditableTextValue,
   isCanvasTextItem,
@@ -72,14 +76,16 @@ export function getCanvasTextEditorStyle({
     return undefined
   }
   const bounds = getCanvasEditableTextBounds(editingItem)
+  const screenBounds = getCanvasViewportScreenBounds(viewport, bounds)
+  const scale = getCanvasViewportScale(viewport)
 
   return {
-    left: viewport.x + bounds.x * viewport.scale,
-    top: viewport.y + bounds.y * viewport.scale,
-    width: bounds.w * viewport.scale,
-    height: bounds.h * viewport.scale,
-    minHeight: bounds.h * viewport.scale,
-    fontSize: getCanvasTextEditorFontSize(editingItem) * viewport.scale,
+    left: screenBounds.x,
+    top: screenBounds.y,
+    width: screenBounds.w,
+    height: screenBounds.h,
+    minHeight: screenBounds.h,
+    fontSize: getCanvasTextEditorFontSize(editingItem) * scale,
   }
 }
 

@@ -8,8 +8,25 @@ import {
   CanvasFoundation as CanvasFoundationFromPackage,
   CanvasHost,
   CanvasRenderer,
+  CANVAS_APP_BOARD_IO_FEATURE_PACK_MANIFEST,
   createCanvasAppAssembly,
+  createCanvasAppExtensionBundle,
+  createCanvasAppAiLabsFeaturePackManifest,
+  createCanvasAppDomEditStyleFeaturePackManifest,
+  createCanvasAppFeaturePack,
+  createCanvasAppFeaturePackExtensionBundle,
+  createCanvasAppFeaturePackManifest,
+  createCanvasAppFeaturePackViewRenderers,
+  createCanvasAppViewFeaturePack,
   defineCanvasAppCustomItemModule,
+  DEFAULT_CANVAS_APP_VIEW_FEATURE_PACKS,
+  DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS,
+  DEFAULT_CANVAS_APP_VIEW_FEATURE_PACK_MANIFESTS,
+  getCanvasAppInstalledFeaturePacks,
+  getCanvasAppInstalledFeaturePackManifestIds,
+  getCanvasAppInstalledFeaturePackManifests,
+  getCanvasAppInstalledViewFeaturePacks,
+  getCanvasAppManifestViewFeaturePacks,
   getCanvasAppFoundationExtensionCommands,
   getCanvasAppFoundationExtensionRendererSlots,
   getCanvasAppFoundationExtensionTools,
@@ -18,7 +35,13 @@ import {
   type CanvasAppComponentLibrary,
   type CanvasAppComponentTemplate,
   type CanvasAppComponentRendererStrategy,
+  type CanvasAppFeaturePack,
+  type CanvasAppFeaturePackAssemblyInput,
+  type CanvasAppFeaturePackManifest,
+  type CanvasAppFeaturePackViewRenderers,
   type CanvasAppCustomItemModule,
+  type CanvasAppCustomItemRenderKeyStrategy,
+  type CanvasAppCustomItemRendererDescriptor,
   type CanvasAppCustomItemRendererStrategy,
   type CanvasAppCustomItemValidator,
   type CanvasAppFoundationExtension,
@@ -28,9 +51,11 @@ import {
   type CanvasAppItemLayerAdapter,
   type CanvasAppProps,
   type CanvasAppPointerInput,
+  type CanvasAppStageExternalOverlaySlot,
   type CanvasAppStageAdapter,
   type CanvasAppStageMount,
   type CanvasAppItemsChange,
+  type CanvasAppViewFeaturePack,
   type CanvasWorkspaceStorageProvider,
   type CanvasCustomItem,
   type CanvasEditableTextItem,
@@ -117,6 +142,14 @@ describe('Canvas package consumer imports', () => {
       })
     const renderCustomItem: CanvasAppCustomItemRendererStrategy = ({ item }) =>
       item.title
+    const getCustomItemRenderKey: CanvasAppCustomItemRenderKeyStrategy = ({
+      item,
+    }) => item.id
+    const customItemRendererDescriptor:
+      CanvasAppCustomItemRendererDescriptor = {
+        getRenderKey: getCustomItemRenderKey,
+        renderItem: renderCustomItem,
+      }
     const itemLayerAdapter: CanvasAppItemLayerAdapter = {
       renderItems: ({ items }) => items.length,
     }
@@ -153,6 +186,72 @@ describe('Canvas package consumer imports', () => {
       shiftKey: false,
       stopPropagation: () => undefined,
     }
+    const externalOverlaySlot: CanvasAppStageExternalOverlaySlot = {
+      render: (overlays) => overlays,
+    }
+    const featurePack: CanvasAppFeaturePack = createCanvasAppFeaturePack({
+      extensionBundle: createCanvasAppExtensionBundle({
+        customCommands: [{
+          id: 'smoke-command',
+          label: 'Smoke',
+          run: () => undefined,
+          title: 'Smoke',
+        }],
+      }),
+      id: 'smoke-pack',
+      label: 'Smoke pack',
+    })
+    const installedFeaturePacks = getCanvasAppInstalledFeaturePacks([
+      featurePack,
+    ])
+    const featurePackBundle = createCanvasAppFeaturePackExtensionBundle(
+      installedFeaturePacks,
+    )
+    const renderStatus = () => null
+    const viewFeaturePack: CanvasAppViewFeaturePack =
+      createCanvasAppViewFeaturePack({
+        id: 'smoke-view-pack',
+        label: 'Smoke view pack',
+        viewRenderers: {
+          status: renderStatus,
+        },
+      })
+    const installedViewFeaturePacks = getCanvasAppInstalledViewFeaturePacks([
+      viewFeaturePack,
+    ])
+    const viewRenderers: CanvasAppFeaturePackViewRenderers =
+      createCanvasAppFeaturePackViewRenderers(installedViewFeaturePacks)
+    const defaultViewFeaturePackIds =
+      DEFAULT_CANVAS_APP_VIEW_FEATURE_PACKS.map((pack) => pack.id)
+    const defaultFeaturePackManifestIds =
+      getCanvasAppInstalledFeaturePackManifestIds(
+        DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS,
+      )
+    const defaultViewFeaturePackManifestIds =
+      DEFAULT_CANVAS_APP_VIEW_FEATURE_PACK_MANIFESTS.map(
+        (manifest) => manifest.id,
+      )
+    const viewManifest: CanvasAppFeaturePackManifest =
+      createCanvasAppFeaturePackManifest({
+        id: 'smoke-view-pack',
+        label: 'Status pack',
+        viewFeaturePack,
+      })
+    const aiLabsManifest = createCanvasAppAiLabsFeaturePackManifest({
+      provider: {
+        complete: () => ({ text: 'Summary' }),
+        id: 'consumer-ai',
+      },
+      requestReview: () => ({ kind: 'cancel' }),
+    })
+    const domEditStyleManifest =
+      createCanvasAppDomEditStyleFeaturePackManifest({
+        id: 'smoke-dom-card-style',
+        itemKind: 'smoke',
+        targetId: 'card',
+      })
+    const manifestViewFeaturePacks =
+      getCanvasAppManifestViewFeaturePacks([viewManifest])
 
     const assembly = createCanvasAppAssembly({
       componentLibrary,
@@ -160,6 +259,7 @@ describe('Canvas package consumer imports', () => {
         'smoke-card': renderComponent,
       }),
       customItemModules: [module],
+      disabledViewFeaturePackIds: ['toolbar'],
       foundationExtensions: [foundationExtension],
       initialItems: [rect],
       initialSelection: [rect.id],
@@ -175,8 +275,11 @@ describe('Canvas package consumer imports', () => {
           },
         },
         customItemModules: [module],
+        disabledFeaturePackIds: ['toolbar'],
       },
     } satisfies CanvasAppProps
+    const featurePackAssemblyInput =
+      shellInputProps.assemblyInput satisfies CanvasAppFeaturePackAssemblyInput
     const shellInputSource =
       shellInputProps satisfies CanvasAppAssemblySource
     const shellSubpathProps = {
@@ -248,12 +351,46 @@ describe('Canvas package consumer imports', () => {
     expect(assembly.workspaceStorageProvider).toBe(workspaceStorageProvider)
     expect(stageMount.ref).toBeTypeOf('function')
     expect(pointerInput.pointerId).toBe(1)
+    expect(externalOverlaySlot.render('external-overlay')).toBe(
+      'external-overlay',
+    )
+    expect(installedFeaturePacks.map((pack) => pack.id)).toEqual([
+      'smoke-pack',
+    ])
+    expect(featurePackBundle.customCommands.map((command) => command.id))
+      .toEqual(['smoke-command'])
+    expect(assembly.featurePackViewRenderers.toolbar).toBeUndefined()
+    expect(featurePackAssemblyInput.disabledFeaturePackIds).toEqual([
+      'toolbar',
+    ])
+    expect(viewRenderers.status).toBe(renderStatus)
+    expect(defaultFeaturePackManifestIds).toContain('table-import')
+    expect(getCanvasAppInstalledFeaturePackManifestIds([
+      aiLabsManifest,
+      domEditStyleManifest,
+      CANVAS_APP_BOARD_IO_FEATURE_PACK_MANIFEST,
+    ])).toEqual([
+      'ai-labs',
+      'smoke-dom-card-style',
+      'board-io',
+    ])
+    expect(getCanvasAppInstalledFeaturePackManifests([
+      viewManifest,
+    ])).toEqual([viewManifest])
+    expect(defaultViewFeaturePackIds).toContain('toolbar')
+    expect(defaultViewFeaturePackManifestIds).toContain('toolbar')
+    expect(manifestViewFeaturePacks).toEqual([viewFeaturePack])
+    expect(defaultViewFeaturePackIds).toContain('component-authoring')
     expect(createCanvasAppComponentPresentationRenderers({
       'smoke-card': renderComponent,
     })['smoke-card']).toBe(renderComponent)
     expect(createCanvasAppCustomItemRenderers({
       'smoke-node': renderCustomItem,
     })['smoke-node']).toBe(renderCustomItem)
+    expect(customItemRendererDescriptor.renderItem).toBe(renderCustomItem)
+    expect(customItemRendererDescriptor.getRenderKey({ item: customItem })).toBe(
+      customItem.id,
+    )
     expect(CanvasAppAuthoring.createCanvasAppAssembly({
       customItemModules: [module],
     }).customItemValidators.smoke(customItem)).toBe(true)
@@ -294,6 +431,41 @@ describe('Canvas package consumer imports', () => {
       .toBeTypeOf('function')
     expect(CanvasAppAuthoring.getCanvasAppFoundationExtensionTools)
       .toBeTypeOf('function')
+    expect(CanvasAppAuthoring.createCanvasAppExtensionBundle)
+      .toBeTypeOf('function')
+    expect(CanvasAppAuthoring.createCanvasAppFeaturePack).toBeTypeOf(
+      'function',
+    )
+    expect(CanvasAppAuthoring.createCanvasAppFeaturePackExtensionBundle)
+      .toBeTypeOf('function')
+    expect(CanvasAppAuthoring.createCanvasAppFeaturePackManifest)
+      .toBeTypeOf('function')
+    expect(CanvasAppAuthoring.createCanvasAppAiLabsFeaturePackManifest)
+      .toBeTypeOf('function')
+    expect(CanvasAppAuthoring.createCanvasAppDomEditStyleFeaturePackManifest)
+      .toBeTypeOf('function')
+    expect(CanvasAppAuthoring.CANVAS_APP_BOARD_IO_FEATURE_PACK_MANIFEST)
+      .toBeTypeOf('object')
+    expect(CanvasAppAuthoring.createCanvasAppFeaturePackViewRenderers)
+      .toBeTypeOf('function')
+    expect(CanvasAppAuthoring.createCanvasAppViewFeaturePack)
+      .toBeTypeOf('function')
+    expect(CanvasAppAuthoring.assertCanvasAppFeaturePackViewRenderers)
+      .toBeTypeOf('function')
+    expect(CanvasAppAuthoring.getCanvasAppInstalledFeaturePacks)
+      .toBeTypeOf('function')
+    expect(CanvasAppAuthoring.getCanvasAppInstalledFeaturePackManifestIds)
+      .toBeTypeOf('function')
+    expect(CanvasAppAuthoring.getCanvasAppInstalledViewFeaturePacks)
+      .toBeTypeOf('function')
+    expect(CanvasAppAuthoring.getCanvasAppManifestViewFeaturePacks)
+      .toBeTypeOf('function')
+    expect(CanvasAppAuthoring.DEFAULT_CANVAS_APP_FEATURE_PACKS)
+      .toBeTypeOf('object')
+    expect(CanvasAppAuthoring.DEFAULT_CANVAS_APP_VIEW_FEATURE_PACK_MANIFESTS)
+      .toBeTypeOf('object')
+    expect(CanvasAppAuthoring.DEFAULT_CANVAS_APP_VIEW_FEATURE_PACKS)
+      .toBeTypeOf('object')
     expect(CanvasAppAuthoring.defineCanvasAppCustomItemModule).toBeTypeOf(
       'function',
     )

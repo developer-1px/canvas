@@ -26,10 +26,16 @@ describe('Canvas host drawing boundaries', () => {
       'src/canvas/app/rendering/CanvasDemoSvgDrawingItemRenderer.tsx',
     )
     const arrowRoutingInspectorFile = getSourceFile(
-      'src/canvas/app/affordances/editing/arrow-routing/CanvasArrowRoutingInspectorPanel.tsx',
+      'src/canvas/app/feature-packs/arrow-routing-inspector/CanvasArrowRoutingInspectorPanel.tsx',
     )
     const defaultAssemblyFile = getSourceFile(
       'src/canvas/app/workflow/CanvasAppDefaultAssembly.ts',
+    )
+    const defaultFeaturePacksFile = getSourceFile(
+      'src/canvas/app/feature-packs/CanvasAppDefaultFeaturePacks.ts',
+    )
+    const arrowRoutingIndexFile = getSourceFile(
+      'src/canvas/app/feature-packs/arrow-routing-inspector/index.ts',
     )
 
     expect(drawingGeometryModule.source).toContain(
@@ -60,11 +66,27 @@ describe('Canvas host drawing boundaries', () => {
     expect(arrowRoutingInspectorFile.source).toContain(
       'replaceCanvasArrowRoutings',
     )
+    expect(defaultAssemblyFile.source).toContain("from '../feature-packs'")
     expect(defaultAssemblyFile.source).toContain(
-      "from '../affordances/editing/arrow-routing/CanvasArrowRoutingInspectorPanel'",
+      'DEFAULT_CANVAS_APP_FEATURE_PACK_EXTENSION_BUNDLE',
     )
-    expect(defaultAssemblyFile.source).toContain(
+    expect(defaultAssemblyFile.source).not.toContain(
       'CANVAS_ARROW_ROUTING_INSPECTOR_PANEL',
+    )
+    expect(defaultFeaturePacksFile.source).toContain(
+      "from './arrow-routing-inspector'",
+    )
+    expect(defaultFeaturePacksFile.source).toContain(
+      'CANVAS_APP_ARROW_ROUTING_INSPECTOR_FEATURE_PACK',
+    )
+    expect(defaultFeaturePacksFile.source).not.toContain(
+      'CANVAS_ARROW_ROUTING_INSPECTOR_PANEL',
+    )
+    expect(arrowRoutingIndexFile.source).toContain(
+      'CANVAS_ARROW_ROUTING_INSPECTOR_PANEL',
+    )
+    expect(arrowRoutingIndexFile.source).toContain(
+      'CANVAS_APP_ARROW_ROUTING_INSPECTOR_FEATURE_PACK',
     )
     for (const hostConsumer of [
       treeBoundsFile,
@@ -165,7 +187,7 @@ describe('Canvas host drawing boundaries', () => {
       'src/canvas/host/operations/CanvasItemTransformOperations.ts',
     )
     const stampInsertionFile = getSourceFile(
-      'src/canvas/app/affordances/authoring/stamp/CanvasStampInsertion.ts',
+      'src/canvas/app/feature-packs/stamp-authoring/CanvasStampInsertion.ts',
     )
 
     expect(itemSchemaFile.source).toContain(

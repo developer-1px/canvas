@@ -36,6 +36,10 @@ export function snapshotCanvasAppCustomItemModule(
     )
   }
 
+  if (module.getRenderKey) {
+    snapshot.getRenderKey = module.getRenderKey
+  }
+
   if (module.inspectorPanels) {
     snapshot.inspectorPanels = snapshotCanvasAppDescriptorArray(
       module.inspectorPanels,

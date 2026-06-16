@@ -1,7 +1,7 @@
 import {
   useRef,
 } from 'react'
-import { useCanvasFindReplaceModel } from './useCanvasFindReplaceModel'
+import { useCanvasFindReplaceModel } from '../feature-packs'
 import { useCanvasTextEditorModel } from './useCanvasTextEditorModel'
 import { getCanvasAppTextConsumerModel } from './CanvasAppTextConsumerModel'
 import type { CanvasAppTextModelInput } from './CanvasAppTextConsumerContracts'

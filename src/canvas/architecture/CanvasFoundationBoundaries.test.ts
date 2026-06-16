@@ -47,6 +47,8 @@ describe('Canvas foundation boundaries', () => {
       .toBe(true)
     expect(paths.has('src/canvas/foundation/CanvasGestureEngine.ts')).toBe(true)
     expect(paths.has('src/canvas/foundation/CanvasGridSnap.ts')).toBe(true)
+    expect(paths.has('src/canvas/foundation/CanvasHeadlessGeometry.ts'))
+      .toBe(true)
     expect(paths.has('src/canvas/foundation/CanvasSceneAdapter.ts')).toBe(true)
     expect(paths.has('src/canvas/foundation/CanvasSelectionEngine.ts')).toBe(true)
     expect(paths.has('src/canvas/foundation/CanvasSnapEngine.ts')).toBe(true)

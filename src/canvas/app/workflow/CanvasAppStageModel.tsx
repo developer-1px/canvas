@@ -7,9 +7,28 @@ import type {
 } from '../rendering/CanvasAppRenderingContracts'
 import type { CanvasAppEventInput } from '../affordances/interaction/pointer/CanvasAppPointerInput'
 import { CanvasInlineTextEditingContext } from '../affordances/editing/text-editor/CanvasInlineTextEditingContext'
-import type { CanvasAppStageModelInput } from './CanvasAppStageConsumerContracts'
+import type {
+  CanvasAppStageExternalOverlaySlot,
+  CanvasAppStageModelInput,
+} from './CanvasAppStageConsumerContracts'
 
-export type { CanvasAppStageModelInput } from './CanvasAppStageConsumerContracts'
+export type {
+  CanvasAppStageExternalOverlaySlot,
+  CanvasAppStageModelInput,
+} from './CanvasAppStageConsumerContracts'
+
+export function createCanvasAppStageExternalOverlaySlot(
+  stage: ReactNode,
+): CanvasAppStageExternalOverlaySlot {
+  return {
+    render: (overlays) => (
+      <>
+        {stage}
+        {overlays}
+      </>
+    ),
+  }
+}
 
 export function renderCanvasAppStageModel({
   blurTextEditor,

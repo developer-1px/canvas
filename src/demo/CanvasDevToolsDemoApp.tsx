@@ -35,7 +35,11 @@ import {
 } from 'react'
 import {
   CanvasApp,
+  CanvasCommandPalette,
   CanvasContextCommandMenu,
+  CanvasMinimap,
+  CanvasObjectInspector,
+  CanvasShortcutHelpOverlay,
   type CanvasAppAssemblyInput,
   type CanvasAppProps,
   type CanvasAppWidgetInteractions,
@@ -48,10 +52,6 @@ import {
   getCanvasAppWidgetInteractions,
   useCanvasToolbarRovingFocus,
 } from '../canvas'
-import { CanvasCommandPalette } from '../canvas/app/affordances/controls/command-palette/CanvasCommandPalette'
-import { CanvasShortcutHelpOverlay } from '../canvas/app/affordances/controls/shortcut-help/CanvasShortcutHelpOverlay'
-import { CanvasMinimap } from '../canvas/app/affordances/controls/minimap/CanvasMinimap'
-import { CanvasObjectInspector } from '../canvas/app/affordances/editing/inspector/CanvasObjectInspector'
 import { EngineSelectionToolbar } from './CanvasDevToolsSelectionToolbar'
 import {
   getCanvasPresentationFrames,

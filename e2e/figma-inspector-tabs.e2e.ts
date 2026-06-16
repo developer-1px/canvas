@@ -41,3 +41,99 @@ test('exposes figma clone inspector modes as keyboard tabs', async ({
   await expect(designTab).toBeFocused()
   await expect(designTab).toHaveAttribute('aria-selected', 'true')
 })
+
+test('syncs figma clone component edits across instances', async ({
+  page,
+}) => {
+  await page.goto('/')
+
+  const layers = page.getByRole('complementary', { name: 'Layers' })
+  const inspector = page.getByRole('complementary', { name: 'Design' })
+  const search = layers.getByRole('searchbox', { name: 'Search layers' })
+
+  await search.fill('stat card revenue')
+  await page.getByRole('button', { name: 'Select layer Revenue stat' }).click()
+
+  await expect(inspector).toContainText('Stat card')
+  await expect(inspector).toContainText(
+    'Layout and style edits sync across stat instances.',
+  )
+
+  await inspector.getByLabel('Pad').fill('20')
+
+  await search.fill('stat card conversion')
+  await page.getByRole('button', {
+    name: 'Select layer Conversion stat',
+  }).click()
+
+  await expect(inspector.getByLabel('Pad')).toHaveValue('20')
+})
+
+test('stores figma clone review notes and copies source references', async ({
+  context,
+  page,
+}) => {
+  await context.grantPermissions(['clipboard-write'])
+  await page.goto('/')
+
+  const layers = page.getByRole('complementary', { name: 'Layers' })
+  const inspector = page.getByRole('complementary', { name: 'Design' })
+  const search = layers.getByRole('searchbox', { name: 'Search layers' })
+
+  await search.fill('stat card revenue')
+  await page.getByRole('button', { name: 'Select layer Revenue stat' }).click()
+
+  const revenueNote = inspector.getByLabel('Review note for Revenue stat')
+  await revenueNote.fill('Check responsive density before handoff.')
+
+  await search.fill('stat card')
+  await layers.getByRole('button', {
+    name: 'Select Stat card Conversion variant',
+  }).click()
+  await expect(
+    inspector.getByLabel('Review note for Conversion stat'),
+  ).toHaveValue('')
+
+  await layers.getByRole('button', {
+    name: 'Select Stat card Revenue variant',
+  }).click()
+  await expect(revenueNote).toHaveValue(
+    'Check responsive density before handoff.',
+  )
+
+  await inspector.getByRole('tab', { name: 'Dev' }).click()
+
+  await expect(inspector).toContainText(
+    'FigmaCloneDomEditSurface.tsx#workspaceStatRevenue',
+  )
+  await inspector.getByRole('button', { name: 'Copy source reference' }).click()
+  await expect(inspector).toContainText('Copied source')
+})
+
+test('edits figma clone CSS declarations in the dev inspector', async ({
+  page,
+}) => {
+  await page.goto('/')
+
+  const layers = page.getByRole('complementary', { name: 'Layers' })
+  const inspector = page.getByRole('complementary', { name: 'Design' })
+  const search = layers.getByRole('searchbox', { name: 'Search layers' })
+
+  await search.fill('stat card')
+  await layers.getByRole('button', {
+    name: 'Select Stat card Revenue variant',
+  }).click()
+  await inspector.getByRole('tab', { name: 'Dev' }).click()
+
+  await expect(inspector).toContainText('CSS')
+  await expect(inspector.getByLabel('CSS padding')).toHaveValue('14')
+
+  await inspector.getByLabel('CSS padding').fill('22')
+  await expect(inspector.getByLabel('CSS padding')).toHaveValue('22')
+
+  await layers.getByRole('button', {
+    name: 'Select Stat card Tickets variant',
+  }).click()
+
+  await expect(inspector.getByLabel('CSS padding')).toHaveValue('22')
+})

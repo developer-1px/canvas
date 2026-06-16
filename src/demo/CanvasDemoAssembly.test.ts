@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { createCanvasAppAssembly } from '../canvas'
 import {
   DEMO_CANVAS_AI_LABS_ASSEMBLY_INPUT,
+  DEMO_CANVAS_AI_LABS_FEATURE_PACK_MANIFEST,
   DEMO_CANVAS_AI_LABS_SUMMARIZE_SELECTION_COMMAND,
   DEMO_CANVAS_APP_ASSEMBLY,
   DEMO_CANVAS_APP_ASSEMBLY_INPUT,
@@ -255,6 +256,9 @@ describe('CanvasDemoAssembly', () => {
     )
 
     expect(DEMO_CANVAS_APP_ASSEMBLY.customCommands).toEqual([])
+    expect(labsAssembly.installedFeaturePackIds).toContain(
+      DEMO_CANVAS_AI_LABS_FEATURE_PACK_MANIFEST.id,
+    )
     expect(labsAssembly.customCommands.map((command) => command.id)).toEqual([
       DEMO_CANVAS_AI_LABS_SUMMARIZE_SELECTION_COMMAND.id,
     ])

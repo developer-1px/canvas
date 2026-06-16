@@ -60,14 +60,62 @@ export function getCanvasViewportWorldPoint(
   viewport: Viewport,
   point: Point,
 ): Point {
-  const scale = clamp(viewport.scale, MIN_SCALE, MAX_SCALE)
-  const viewportX = Number.isFinite(viewport.x) ? viewport.x : 0
-  const viewportY = Number.isFinite(viewport.y) ? viewport.y : 0
+  const { scale, x: viewportX, y: viewportY } = getCanvasViewportTransform(
+    viewport,
+  )
 
   return {
     x: (point.x - viewportX) / scale,
     y: (point.y - viewportY) / scale,
   }
+}
+
+export function getCanvasViewportScreenPoint(
+  viewport: Viewport,
+  point: Point,
+): Point {
+  const { scale, x: viewportX, y: viewportY } = getCanvasViewportTransform(
+    viewport,
+  )
+
+  return {
+    x: viewportX + point.x * scale,
+    y: viewportY + point.y * scale,
+  }
+}
+
+export function getCanvasViewportWorldBounds(
+  viewport: Viewport,
+  rect: CanvasViewportRect,
+): Bounds {
+  const scale = getCanvasViewportScale(viewport)
+  const topLeft = getCanvasViewportWorldPoint(viewport, { x: 0, y: 0 })
+
+  return {
+    h: Math.max(1, rect.height / scale),
+    w: Math.max(1, rect.width / scale),
+    x: topLeft.x,
+    y: topLeft.y,
+  }
+}
+
+export function getCanvasViewportScreenBounds(
+  viewport: Viewport,
+  bounds: Bounds,
+): Bounds {
+  const scale = getCanvasViewportScale(viewport)
+  const topLeft = getCanvasViewportScreenPoint(viewport, bounds)
+
+  return {
+    h: bounds.h * scale,
+    w: bounds.w * scale,
+    x: topLeft.x,
+    y: topLeft.y,
+  }
+}
+
+export function getCanvasViewportScale(viewport: Pick<Viewport, 'scale'>) {
+  return clamp(viewport.scale, MIN_SCALE, MAX_SCALE)
 }
 
 export function normalizeBounds(a: Point, b: Point): Bounds {
@@ -143,4 +191,12 @@ export function getCanvasViewportZoomStepMultiplier(
   const currentScale = clamp(scale, MIN_SCALE, MAX_SCALE)
 
   return getCanvasViewportZoomStep(currentScale, direction) / currentScale
+}
+
+function getCanvasViewportTransform(viewport: Viewport) {
+  return {
+    scale: getCanvasViewportScale(viewport),
+    x: Number.isFinite(viewport.x) ? viewport.x : 0,
+    y: Number.isFinite(viewport.y) ? viewport.y : 0,
+  }
 }

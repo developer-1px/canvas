@@ -1,7 +1,7 @@
 import type { CanvasAffordanceConfigInput } from '../../engine'
 import {
   mergeCanvasAppAffordanceConfigInput,
-} from '../extensions/facilitation/CanvasAppFacilitationBundle'
+} from '../feature-packs'
 import {
   assertCanvasAppDescriptorObject,
 } from '../extensions/CanvasAppDescriptorContracts'

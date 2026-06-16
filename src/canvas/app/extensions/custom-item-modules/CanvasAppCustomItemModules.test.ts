@@ -3,6 +3,9 @@ import { createCanvasAppCustomItemModuleAssembly } from './CanvasAppCustomItemMo
 import { defineCanvasAppCustomItemModule } from './CanvasAppCustomItemModules'
 import type { CanvasAppCustomItemModule } from './CanvasAppCustomItemModules'
 import type { CanvasAppCustomCreationToolContext } from '../custom-tools/CanvasAppCustomCreationTools'
+import type {
+  CanvasAppCustomItemRendererDescriptor,
+} from '../../rendering/CanvasAppRenderingContracts'
 
 describe('CanvasAppCustomItemModules assembly seam', () => {
   it('collects product-owned custom item parts behind one module seam', () => {
@@ -86,6 +89,19 @@ describe('CanvasAppCustomItemModules assembly seam', () => {
     expect(assembly.textPasteImporters.map((importer) => importer.id)).toEqual([
       'risk-paste',
     ])
+  })
+
+  it('assembles opt-in custom item render keys with the renderer', () => {
+    const getRenderKey = () => 'risk-render-key'
+    const module = defineRiskModule({ getRenderKey })
+
+    const assembly = createCanvasAppCustomItemModuleAssembly([module])
+    const renderer = assembly.customItemRenderers['risk-node']
+
+    expect(renderer).toEqual({
+      getRenderKey,
+      renderItem: renderRisk,
+    } satisfies CanvasAppCustomItemRendererDescriptor)
   })
 
 

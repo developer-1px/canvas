@@ -1,8 +1,14 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import type { CanvasCustomItem } from '../../entities'
-import { renderCanvasDemoSvgCustomItem } from './CanvasDemoSvgCustomItemRendererExecution'
+import {
+  renderCanvasDemoSvgCustomItem,
+  shouldReuseCanvasDemoSvgCustomItemRender,
+} from './CanvasDemoSvgCustomItemRendererExecution'
 import type { CanvasDemoSvgCustomItemRenderers } from './CanvasDemoSvgCustomItemRendererRegistry'
+import type {
+  CanvasAppCustomItemRendererDescriptor,
+} from './CanvasAppRenderingContracts'
 
 const customItem: CanvasCustomItem = {
   id: 'custom-risk-1',
@@ -27,6 +33,58 @@ describe('CanvasDemoSvgCustomItemRendererExecution', () => {
 
     expect(markup).toContain('class="risk-node"')
     expect(markup).toContain('high')
+  })
+
+  it('renders descriptor custom item renderers', () => {
+    const markup = renderCustomItem({
+      'risk-node': {
+        getRenderKey: ({ item }) => String(item.data.severity),
+        renderItem: ({ item }) => (
+          <g className="risk-node">{String(item.data.severity)}</g>
+        ),
+      },
+    })
+
+    expect(markup).toContain('class="risk-node"')
+    expect(markup).toContain('high')
+  })
+
+  it('reuses descriptor renders only when the render key is stable', () => {
+    const renderer = {
+      getRenderKey: ({ item }) => String(item.data.severity),
+      renderItem: ({ item }) => String(item.data.severity),
+    } satisfies CanvasAppCustomItemRendererDescriptor
+
+    expect(shouldReuseCanvasDemoSvgCustomItemRender({
+      next: {
+        item: {
+          ...customItem,
+          data: { severity: 'high' },
+        },
+        renderer,
+      },
+      previous: { item: customItem, renderer },
+    })).toBe(true)
+    expect(shouldReuseCanvasDemoSvgCustomItemRender({
+      next: {
+        item: {
+          ...customItem,
+          data: { severity: 'low' },
+        },
+        renderer,
+      },
+      previous: { item: customItem, renderer },
+    })).toBe(false)
+    expect(shouldReuseCanvasDemoSvgCustomItemRender({
+      next: { item: customItem, renderer },
+      previous: {
+        item: customItem,
+        renderer: {
+          ...renderer,
+          getRenderKey: () => 'other',
+        },
+      },
+    })).toBe(false)
   })
 
   it('falls back when a custom item renderer is missing', () => {

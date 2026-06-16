@@ -18,6 +18,9 @@ import type {
   CommitCanvasItemsChange,
   CommitCanvasSelection,
 } from '../../workflow/CanvasWorkflowContract'
+import type {
+  CanvasAppExternalPasteHandler,
+} from '../../workflow/CanvasAppCommandConsumerContracts'
 import type { CanvasAppStageElement } from '../../rendering/stage/CanvasAppStageElement'
 import type { CanvasStandardCommand } from './CanvasStandardCommandContracts'
 import { executeCanvasStandardCommand } from './CanvasStandardCommandExecution'
@@ -33,6 +36,7 @@ type UseCanvasCommandsArgs = {
   createId: (prefix: string) => string
   getClipboardItems: CanvasDocumentClipboard['getClipboardItems']
   items: CanvasItem[]
+  pasteExternal?: CanvasAppExternalPasteHandler
   redo: () => string[] | undefined
   selection: string[]
   setEditing: Dispatch<SetStateAction<EditingText | null>>
@@ -52,6 +56,7 @@ export function useCanvasCommands({
   createId,
   getClipboardItems,
   items,
+  pasteExternal,
   redo,
   selection,
   setEditing,
@@ -75,6 +80,7 @@ export function useCanvasCommands({
     createId,
     getClipboardItems,
     items,
+    pasteExternal,
     selection,
     setEditing,
     setClipboardItems,

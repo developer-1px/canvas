@@ -2,9 +2,11 @@ import {
   CANVAS_APP_COMMENT_ONLY_CAPABILITIES,
   CANVAS_APP_EDITOR_CAPABILITIES,
   CANVAS_APP_READ_ONLY_CAPABILITIES,
+  createCanvasAppAiLabsFeaturePackManifest,
   createCanvasAppAiLabsDemoSummaryProvider,
   createCanvasAppAiLabsSummarizeSelectionCommand,
   createCanvasAppAssembly,
+  type CreateCanvasAppAiLabsSummarizeSelectionCommandInput,
   type CanvasAppAssemblyInput,
   type CanvasWorkspaceStorage,
   type CanvasWorkspaceStorageProvider,
@@ -210,18 +212,29 @@ export const DEMO_CANVAS_APP_ASSEMBLY_INPUT = {
   capabilities: CANVAS_APP_EDITOR_CAPABILITIES,
 } satisfies CanvasAppAssemblyInput
 
+const DEMO_CANVAS_AI_LABS_COMMAND_INPUT = {
+  provider: createCanvasAppAiLabsDemoSummaryProvider(),
+  requestReview: () => ({
+    kind: 'cancel',
+    reason: 'demo fixture requires a host review UI',
+  }),
+} satisfies CreateCanvasAppAiLabsSummarizeSelectionCommandInput
+
 export const DEMO_CANVAS_AI_LABS_SUMMARIZE_SELECTION_COMMAND =
-  createCanvasAppAiLabsSummarizeSelectionCommand({
-    provider: createCanvasAppAiLabsDemoSummaryProvider(),
-    requestReview: () => ({
-      kind: 'cancel',
-      reason: 'demo fixture requires a host review UI',
-    }),
-  })
+  createCanvasAppAiLabsSummarizeSelectionCommand(
+    DEMO_CANVAS_AI_LABS_COMMAND_INPUT,
+  )
+
+export const DEMO_CANVAS_AI_LABS_FEATURE_PACK_MANIFEST =
+  createCanvasAppAiLabsFeaturePackManifest(
+    DEMO_CANVAS_AI_LABS_COMMAND_INPUT,
+  )
 
 export const DEMO_CANVAS_AI_LABS_ASSEMBLY_INPUT = {
   ...DEMO_CANVAS_APP_ASSEMBLY_INPUT,
-  customCommands: [DEMO_CANVAS_AI_LABS_SUMMARIZE_SELECTION_COMMAND],
+  additionalFeaturePackManifests: [
+    DEMO_CANVAS_AI_LABS_FEATURE_PACK_MANIFEST,
+  ],
 } satisfies CanvasAppAssemblyInput
 
 export const DEMO_CANVAS_READ_ONLY_ASSEMBLY_INPUT = {

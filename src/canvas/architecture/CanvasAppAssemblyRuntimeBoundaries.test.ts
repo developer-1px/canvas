@@ -89,7 +89,19 @@ describe('Canvas App Assembly runtime boundaries', () => {
       "from './CanvasAppAdapterAssembly'",
     )
     expect(assemblyFile.source).toContain(
+      "from './CanvasAppFeaturePackAssembly'",
+    )
+    expect(assemblyFile.source).toContain(
       'createCanvasAppAdapterAssembly',
+    )
+    expect(assemblyFile.source).toContain(
+      'createCanvasAppFeaturePackAssembly',
+    )
+    expect(assemblyFile.source).toContain(
+      'DEFAULT_CANVAS_APP_BASE_EXTENSION_BUNDLE',
+    )
+    expect(assemblyFile.source).toContain(
+      'featurePackAssembly.featurePackExtensionBundle',
     )
     expect(assemblyFile.source).not.toContain(
       'input.itemAdapters ?? DEFAULT_CANVAS_APP_ASSEMBLY.itemAdapters',
@@ -158,6 +170,28 @@ describe('Canvas App Assembly runtime boundaries', () => {
       'createCanvasAppExtensionBundle',
     )
     expect(defaultAssemblyFile.source).toContain(
+      'mergeCanvasAppExtensionBundle',
+    )
+    expect(defaultAssemblyFile.source).toContain(
+      'DEFAULT_CANVAS_APP_FEATURE_PACK_EXTENSION_BUNDLE',
+    )
+    expect(defaultAssemblyFile.source).toContain(
+      'DEFAULT_CANVAS_APP_FEATURE_PACK_VIEW_RENDERERS',
+    )
+    expect(defaultAssemblyFile.source).toContain(
+      "from '../feature-packs'",
+    )
+    for (const featurePackImplementation of [
+      'CANVAS_LINK_PREVIEW_INSPECTOR_PANEL',
+      'CANVAS_ARROW_ROUTING_INSPECTOR_PANEL',
+      'CANVAS_CHECKLIST_INSPECTOR_PANEL',
+      'CANVAS_KANBAN_INSPECTOR_PANEL',
+    ]) {
+      expect(defaultAssemblyFile.source).not.toContain(
+        featurePackImplementation,
+      )
+    }
+    expect(defaultAssemblyFile.source).toContain(
       'DEFAULT_CANVAS_APP_INITIAL_SELECTION',
     )
     expect(defaultAssemblyFile.source).toContain(
@@ -172,6 +206,52 @@ describe('Canvas App Assembly runtime boundaries', () => {
       'customCreationTools: []',
     )
     expect(defaultAssemblyFile.source).not.toContain('inspectorPanels: []')
+  })
+
+
+  it('keeps installed feature pack ids on the assembly model seam', () => {
+    const assemblyModelFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppAssemblyModel.ts',
+    )
+    const assemblyModelContractsFile = getSourceFile(
+      'src/canvas/app/workflow/CanvasAppAssemblyModelContracts.ts',
+    )
+    const appModelFile = getSourceFile(
+      'src/canvas/app/workflow/useCanvasAppModel.ts',
+    )
+    const runtimeFeaturePackModelFile = getSourceFile(
+      'src/canvas/app/feature-packs/CanvasAppFeaturePackRuntimeModel.ts',
+    )
+
+    expect(assemblyModelContractsFile.source).toContain(
+      'CanvasAppAssemblyFeaturePackModel',
+    )
+    expect(assemblyModelContractsFile.source).toContain('installedIds')
+    expect(assemblyModelFile.source).toContain('featurePackViewRenderers')
+    expect(assemblyModelFile.source).toContain('installedFeaturePackIds')
+    expect(assemblyModelFile.source).toContain('featurePack: {')
+    expect(appModelFile.source).toContain(
+      'featurePackViewRenderers: appAssembly.featurePack.viewRenderers',
+    )
+    expect(appModelFile.source).toContain(
+      'installedFeaturePackIds = appAssembly.featurePack.installedIds',
+    )
+    expect(appModelFile.source).toContain(
+      'useCanvasAppTransientFeaturePackModel',
+    )
+    expect(appModelFile.source).toContain('installedFeaturePackIds,')
+    expect(runtimeFeaturePackModelFile.source).toContain(
+      'installedFeaturePackIds',
+    )
+    expect(runtimeFeaturePackModelFile.source).toContain(
+      'featurePack.featurePackId',
+    )
+    expect(runtimeFeaturePackModelFile.source).not.toContain(
+      'viewRenderers[featurePack.viewRendererId]',
+    )
+    expect(runtimeFeaturePackModelFile.source).not.toContain(
+      'viewRendererId',
+    )
   })
 
 })

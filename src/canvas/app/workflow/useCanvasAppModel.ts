@@ -6,17 +6,19 @@ import {
 import { getCanvasAppAffordanceModel } from './CanvasAppAffordanceModel'
 import { getCanvasAppAssemblyModel } from './CanvasAppAssemblyModel'
 import { getCanvasAppControlModel } from './CanvasAppControlModel'
-import { renderCanvasAppStageModel } from './CanvasAppStageModel'
+import {
+  createCanvasAppStageExternalOverlaySlot,
+  renderCanvasAppStageModel,
+} from './CanvasAppStageModel'
 import { useCanvasAppCommandModel } from './useCanvasAppCommandModel'
 import { useCanvasAppComponentModel } from './useCanvasAppComponentModel'
 import { useCanvasAppCustomFocusModel } from './useCanvasAppCustomFocusModel'
-import { useCanvasCursorChatModel } from '../affordances/controls/cursor-chat/useCanvasCursorChatModel'
-import { useCanvasAppDrawingModel } from './useCanvasAppDrawingModel'
-import { useCanvasEmoteModel } from '../affordances/controls/emote/useCanvasEmoteModel'
+import {
+  getCanvasAppRuntimeFeatureConfig,
+  useCanvasAppToolFeaturePackModel,
+  useCanvasAppTransientFeaturePackModel,
+} from '../feature-packs'
 import { useCanvasAppExtensionModel } from './useCanvasAppExtensionModel'
-import { useCanvasSessionTimerModel } from '../affordances/controls/facilitation/useCanvasSessionTimerModel'
-import { useCanvasSpotlightModel } from '../affordances/controls/facilitation/useCanvasSpotlightModel'
-import { useCanvasVotingSessionModel } from '../affordances/controls/facilitation/useCanvasVotingSessionModel'
 import { useCanvasAppInspectorModel } from './useCanvasAppInspectorModel'
 import { useCanvasAppImageModel } from './useCanvasAppImageModel'
 import { useCanvasAppKeyboardModel } from './useCanvasAppKeyboardModel'
@@ -68,30 +70,38 @@ export function useCanvasAppModel({
     () => getCanvasAppAffordanceModel(appAssembly.affordance.config),
     [appAssembly],
   )
+  const installedFeaturePackIds = appAssembly.featurePack.installedIds
+  const installedFeaturePackIdSet = useMemo(
+    () => new Set(installedFeaturePackIds),
+    [installedFeaturePackIds],
+  )
   const stageElement = useCanvasAppStageElementModel()
   const workspace = useCanvasWorkspaceModel(appAssembly.workspace)
   const providedPresence = presence ?? appAssembly.collaboration.presenceProvider({
     selection: workspace.interaction.selection,
     viewport: workspace.interaction.viewport,
   })
-  const cursorChat = useCanvasCursorChatModel({
-    ...affordance.keyboard,
-    ...stageElement.pointer,
-  })
-  const sessionTimer = useCanvasSessionTimerModel(affordance.facilitation)
-  const spotlight = useCanvasSpotlightModel({
-    ...affordance.facilitation,
-    followerCount: providedPresence.length,
-  })
-  const votingSession = useCanvasVotingSessionModel(affordance.facilitation)
-  const emotes = useCanvasEmoteModel({
-    ...affordance.interaction,
-    stageElement: stageElement.pointer.stageElement,
-    viewport: workspace.stage.viewport,
+  const featurePackTransients = useCanvasAppTransientFeaturePackModel({
+    cursorChat: {
+      ...affordance.keyboard,
+      ...stageElement.pointer,
+    },
+    emote: {
+      ...affordance.interaction,
+      stageElement: stageElement.pointer.stageElement,
+      viewport: workspace.stage.viewport,
+    },
+    installedFeaturePackIds,
+    sessionTimer: affordance.facilitation,
+    spotlight: {
+      ...affordance.facilitation,
+      followerCount: providedPresence.length,
+    },
+    votingSession: affordance.facilitation,
   })
   const interaction = useCanvasInteractionModel({
     ...affordance.interaction,
-    emoteBursts: emotes.overlay.bursts,
+    emoteBursts: featurePackTransients.emotes.overlay.bursts,
     presence: providedPresence,
     ...workspace.interaction,
   })
@@ -106,27 +116,61 @@ export function useCanvasAppModel({
     ...appAssembly.inspector,
   })
 
-  const imageControls = useCanvasAppImageModel({
+  const {
+    pasteClipboardImage,
+    ...imageControls
+  } = useCanvasAppImageModel({
     ...affordance.image,
+    config: getCanvasAppRuntimeFeatureConfig({
+      config: affordance.image.config,
+      disabledConfig: {
+        commands: {
+          copy: false,
+          paste: false,
+        },
+        overlays: {
+          imageControls: false,
+        },
+      },
+      enabled: installedFeaturePackIdSet.has('image-io'),
+    }),
     ...workspace.image,
     ...stageElement.image,
   })
 
   const stampControls = useCanvasAppStampModel({
     ...affordance.stamp,
-    votingSession: votingSession.stamp,
+    votingSession: featurePackTransients.votingSession.stamp,
     ...workspace.stamp,
     ...stageElement.stamp,
   })
 
   useCanvasAppTableImportModel({
     ...affordance.table,
+    config: getCanvasAppRuntimeFeatureConfig({
+      config: affordance.table.config,
+      disabledConfig: {
+        commands: {
+          paste: false,
+        },
+      },
+      enabled: installedFeaturePackIdSet.has('table-import'),
+    }),
     ...workspace.table,
     ...stageElement.table,
   })
 
   useCanvasAppLinkPreviewImportModel({
     ...affordance.linkPreview,
+    config: getCanvasAppRuntimeFeatureConfig({
+      config: affordance.linkPreview.config,
+      disabledConfig: {
+        commands: {
+          paste: false,
+        },
+      },
+      enabled: installedFeaturePackIdSet.has('media-import'),
+    }),
     mediaImporters: appAssembly.extension.mediaImporters,
     ...workspace.linkPreview,
     ...stageElement.linkPreview,
@@ -134,6 +178,15 @@ export function useCanvasAppModel({
 
   useCanvasAppTextPasteImportModel({
     ...affordance.textPaste,
+    config: getCanvasAppRuntimeFeatureConfig({
+      config: affordance.textPaste.config,
+      disabledConfig: {
+        commands: {
+          paste: false,
+        },
+      },
+      enabled: installedFeaturePackIdSet.has('text-paste-import'),
+    }),
     ...appAssembly.extension,
     ...workspace.textPaste,
     ...stageElement.textPaste,
@@ -155,6 +208,7 @@ export function useCanvasAppModel({
     ...affordance.command,
     createId: workspace.command.createId,
     document: workspace.command.document,
+    pasteExternal: pasteClipboardImage,
     ...text.command,
     ...stageElement.command,
     workspace: workspace.command.workspace,
@@ -166,9 +220,12 @@ export function useCanvasAppModel({
     ...stageElement.viewport,
   })
 
-  const drawing = useCanvasAppDrawingModel({
-    ...affordance.drawing,
-    tool: interaction.control.tool,
+  const featurePackTools = useCanvasAppToolFeaturePackModel({
+    drawing: {
+      ...affordance.drawing,
+      tool: interaction.control.tool,
+    },
+    installedFeaturePackIds,
   })
 
   const components = useCanvasAppComponentModel({
@@ -187,7 +244,7 @@ export function useCanvasAppModel({
   useCanvasAppKeyboardModel({
     command: commands.keyboard,
     component: components.keyboard,
-    cursorChat: cursorChat.keyboard,
+    cursorChat: featurePackTransients.cursorChat.keyboard,
     ...affordance.keyboard,
     ...extension.keyboard,
     ...text.keyboard,
@@ -208,7 +265,7 @@ export function useCanvasAppModel({
     },
     ...affordance.pointer,
     createId: workspace.pointer.createId,
-    ...drawing.pointer,
+    ...featurePackTools.drawing.pointer,
     ...extension.pointer,
     interaction: interaction.pointer,
     ...appAssembly.pointer,
@@ -238,8 +295,21 @@ export function useCanvasAppModel({
     disabled: inspector.disabled,
     label: inspector.label,
     setEditing: text.command.setEditing,
-    votingSession: votingSession.stamp,
+    votingSession: featurePackTransients.votingSession.stamp,
     workspace: workspace.selection,
+  })
+  const stage = renderCanvasAppStageModel({
+    cursorChat: featurePackTransients.cursorChat.stage,
+    emote: featurePackTransients.emotes.stage,
+    ...text.stage,
+    itemLayer: workspace.itemLayer,
+    pointer,
+    rendering: appAssembly.rendering,
+    stage: {
+      ...interaction.stage,
+      ...stageElement.stage,
+      ...workspace.stage,
+    },
   })
 
   return {
@@ -251,41 +321,32 @@ export function useCanvasAppModel({
       onClose: closeCommandPalette,
     },
     componentPalette: controls.componentPalette,
-    drawingControls: drawing.control,
+    drawingControls: featurePackTools.drawing.control,
+    featurePackViewRenderers: appAssembly.featurePack.viewRenderers,
     imageControls,
     inspector,
     items: workspace.itemLayer.items,
     minimap: controls.minimap,
     selection,
-    stage: renderCanvasAppStageModel({
-      cursorChat: cursorChat.stage,
-      emote: emotes.stage,
-      ...text.stage,
-      itemLayer: workspace.itemLayer,
-      pointer,
-      rendering: appAssembly.rendering,
-      stage: {
-        ...interaction.stage,
-        ...stageElement.stage,
-        ...workspace.stage,
-      },
-    }),
+    stage,
+    stageOverlaySlot: createCanvasAppStageExternalOverlaySlot(stage),
     viewport: workspace.stage.viewport,
-    cursorChat: cursorChat.view,
-    emoteControls: emotes.view,
+    cursorChat: featurePackTransients.cursorChat.view,
+    emoteControls: featurePackTransients.emotes.view,
     gesture: interaction.stage.gesture,
-    sessionTimer: sessionTimer.view,
+    sessionTimer: featurePackTransients.sessionTimer.view,
     shortcutHelp: {
       items: controls.shortcutHelp.items,
       open: shortcutHelpOpen && controls.shortcutHelp.visible,
       onClose: closeShortcutHelp,
     },
-    spotlight: spotlight.view,
+    spotlight: featurePackTransients.spotlight.view,
     stampControls,
     stickyQuickCreate: components.control.stickyQuickCreate,
     status: controls.status,
     toolbar: controls.toolbar,
-    votingSession: votingSession.view,
+    viewportFocus: controls.viewportFocus,
+    votingSession: featurePackTransients.votingSession.view,
     zoomControls: controls.zoomControls,
   }
 }

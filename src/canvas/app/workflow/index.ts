@@ -13,6 +13,10 @@ export type {
 export type {
   CanvasAppExtensionAssemblyInput,
 } from './CanvasAppExtensionAssemblyTypes'
+export type {
+  CanvasAppFeaturePackAssembly,
+  CanvasAppFeaturePackAssemblyInput,
+} from './CanvasAppFeaturePackAssembly'
 export {
   CANVAS_APP_COMMENT_ONLY_CAPABILITIES,
   CANVAS_APP_EDITOR_CAPABILITIES,
@@ -32,26 +36,26 @@ export type {
 export type {
   CanvasAppCustomCommand,
   CanvasAppCustomCommandContext,
-} from '../affordances/commands/CanvasAppCustomCommands'
+} from '../extensions/custom-commands'
 export type {
   CanvasAppCustomCommandState,
   CanvasAppCustomCreationToolState,
 } from '../extensions/CanvasAppExtensionStateContracts'
 export type {
   CanvasAppFoundationExtension,
-} from '../extensions/CanvasAppFoundationExtensionDescriptors'
+} from '../extensions/foundation-extensions'
 export {
   getCanvasAppFoundationExtensionCommands,
   type CanvasAppFoundationExtensionCommand,
-} from '../extensions/CanvasAppFoundationExtensionCommands'
+} from '../extensions/foundation-extensions'
 export {
   getCanvasAppFoundationExtensionRendererSlots,
   type CanvasAppFoundationExtensionRendererSlot,
-} from '../extensions/CanvasAppFoundationExtensionRendererSlots'
+} from '../extensions/foundation-extensions'
 export {
   getCanvasAppFoundationExtensionTools,
   type CanvasAppFoundationExtensionTool,
-} from '../extensions/CanvasAppFoundationExtensionTools'
+} from '../extensions/foundation-extensions'
 export {
   createCanvasAppCustomItemModuleAssembly,
   type CanvasAppCustomItemModuleAssembly,
@@ -69,25 +73,25 @@ export type {
 } from '../affordances/interaction/pointer/CanvasAppPointerInput'
 export type {
   CanvasAppCustomFocus,
-} from '../affordances/interaction/focus/CanvasAppCustomFocus'
+} from '../extensions/custom-focus'
 export {
   dispatchCanvasAppCustomFocus,
   dispatchCanvasAppCustomFocusClear,
-} from '../affordances/interaction/focus/CanvasAppCustomFocus'
+} from '../extensions/custom-focus'
 export type {
   CanvasAppInspectorPanel,
   CanvasAppInspectorPanelContext,
   CanvasAppInspectorPanelView,
-} from '../affordances/editing/inspector/CanvasAppInspectorPanels'
+} from '../extensions/inspector-panels'
 export type {
   CanvasMediaImporter,
   CanvasMediaImporterContext,
   CanvasMediaImportSource,
-} from '../affordances/io/media/CanvasMediaImporters'
+} from '../feature-packs'
 export type {
   CanvasTextPasteImporter,
   CanvasTextPasteImporterContext,
-} from '../affordances/io/text-paste/CanvasTextPasteImporters'
+} from '../feature-packs'
 export type {
   CanvasAppCustomCreationTool,
   CanvasAppCustomCreationToolContext,
@@ -107,11 +111,18 @@ export type {
   CanvasAppItemLayerRenderInput,
   CanvasAppComponentRendererStrategy,
   CanvasAppCustomItemRendererStrategy,
+  CanvasAppCustomItemRenderKey,
+  CanvasAppCustomItemRenderKeyStrategy,
+  CanvasAppCustomItemRendererDescriptor,
+  CanvasAppCustomItemRendererEntry,
   CanvasAppCustomItemRenderers,
   CanvasAppStageAdapter,
   CanvasAppStageMount,
   CanvasAppStageRenderInput,
 } from '../rendering/CanvasAppRenderingContracts'
+export type {
+  CanvasAppStageExternalOverlaySlot,
+} from './CanvasAppStageModel'
 export {
   assertCanvasAppExtensionId,
   assertCanvasAppExtensionRecordKeys,

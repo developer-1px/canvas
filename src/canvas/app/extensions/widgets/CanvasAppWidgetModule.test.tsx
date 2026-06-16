@@ -57,6 +57,11 @@ describe('CanvasAppWidgetModule', () => {
       y: 60,
     })
     expect(module.validateItem(item!)).toBe(true)
+    expect(assembly.customItemRenderers['metric-widget-widget'])
+      .toMatchObject({
+        getRenderKey: expect.any(Function),
+        renderItem: module.renderItem,
+      })
 
     const markup = renderToStaticMarkup(
       <svg>{module.renderItem({ item: item! })}</svg>,

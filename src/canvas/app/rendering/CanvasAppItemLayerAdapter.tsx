@@ -15,6 +15,10 @@ export type {
   CanvasAppComponentRendererStrategy,
   CanvasAppComponentPresentationRenderers,
   CanvasAppCustomItemRendererStrategy,
+  CanvasAppCustomItemRenderKey,
+  CanvasAppCustomItemRenderKeyStrategy,
+  CanvasAppCustomItemRendererDescriptor,
+  CanvasAppCustomItemRendererEntry,
   CanvasAppCustomItemRenderers,
 } from './CanvasAppRenderingContracts'
 

@@ -115,13 +115,18 @@ describe('Canvas package facade boundaries', () => {
     expect(appFacadeFile.source).toContain("from './authoring'")
     for (const authoringContract of [
       'createCanvasAppAssembly',
+      'createCanvasAppExtensionBundle',
+      'createCanvasAppFeaturePack',
+      'createCanvasAppFeaturePackExtensionBundle',
       'defineCanvasAppCustomItemModule',
+      'getCanvasAppInstalledFeaturePacks',
       'createCanvasAppComponentPresentationRenderers',
       'createCanvasAppCustomItemRenderers',
       'CanvasAppCommitItemsChange',
       'CanvasAppComponentLibrary',
       'CanvasAppComponentTemplate',
       'CanvasAppCustomCommand',
+      'CanvasAppFeaturePack',
       'CanvasAppItemsChange',
       'CanvasAppCustomItemModuleCreationTool',
       'CanvasAppInspectorPanel',

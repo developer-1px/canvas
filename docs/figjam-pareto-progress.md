@@ -211,7 +211,7 @@ Current cleanup pass:
 | 2026-05-31 | `pnpm test` | Passed after #23: 256 files / 959 tests |
 | 2026-05-31 | `pnpm build` | Passed after #23 |
 | 2026-05-31 | `pnpm exec vitest run src/canvas/app/affordances/interaction/keyboard/CanvasKeyboardCommandDispatch.test.ts src/canvas/app/affordances/interaction/keyboard/CanvasKeyboardShortcutDispatch.test.ts src/canvas/app/affordances/interaction/keyboard/CanvasKeyboardCommandShortcuts.test.ts src/canvas/app/affordances/interaction/keyboard/CanvasKeyboardCommandShortcutCatalog.test.ts src/canvas/app/affordances/interaction/keyboard/CanvasKeyboardShortcutListeners.test.ts src/canvas/app/affordances/interaction/keyboard/CanvasKeyboardShortcutRouter.test.ts src/canvas/app/workflow/CanvasWorkspaceConsumerModel.test.ts src/canvas/app/workflow/CanvasAppSelectionModel.test.ts` | Passed: 8 files / 26 tests |
-| 2026-05-31 | `pnpm exec vitest run src/demo/CanvasDemoAssembly.test.ts src/canvas/app/affordances/authoring/component/CanvasStickyQuickCreateExecution.test.ts src/canvas/host/component/CanvasStickyComponent.test.ts` | Passed: 3 files / 12 tests |
+| 2026-05-31 | `pnpm exec vitest run src/demo/CanvasDemoAssembly.test.ts src/canvas/app/feature-packs/component-authoring/CanvasStickyQuickCreateExecution.test.ts src/canvas/host/component/CanvasStickyComponent.test.ts` | Passed: 3 files / 12 tests |
 | 2026-05-31 | `pnpm exec tsc -b --pretty false` | Passed after #14 |
 | 2026-05-31 | `pnpm test:e2e` | Passed after #14 sticky quick-create coverage: 10 tests |
 | 2026-05-31 | `pnpm lint` | Passed after #14 |
@@ -254,7 +254,7 @@ Current cleanup pass:
 | 2026-05-31 | `pnpm exec tsc -b --pretty false` | Passed after #20 |
 | 2026-05-31 | `pnpm lint` | Passed after #20 |
 | 2026-05-31 | `pnpm build` | Passed after #20 |
-| 2026-05-31 | `pnpm exec vitest run src/canvas/app/workflow/CanvasAppSelectionModel.test.ts src/canvas/app/affordances/controls/facilitation/useCanvasVotingSessionModel.test.ts src/canvas/app/affordances/authoring/stamp/useCanvasStampControls.test.tsx src/demo/CanvasEngineDemoDesignContract.test.ts` | Passed after #21: 4 files / 20 tests |
+| 2026-05-31 | `pnpm exec vitest run src/canvas/app/workflow/CanvasAppSelectionModel.test.ts src/canvas/app/feature-packs/facilitation/useCanvasVotingSessionModel.test.ts src/canvas/app/feature-packs/stamp-authoring/useCanvasStampControls.test.tsx src/demo/CanvasEngineDemoDesignContract.test.ts` | Passed after #21: 4 files / 20 tests |
 | 2026-05-31 | `pnpm exec playwright test -g "voting session\|reaction stamps\|minimal canvas affordance\|mobile viewport"` | Passed after #21 focused e2e: 4 tests |
 | 2026-05-31 | `pnpm exec tsc -b --pretty false` | Passed after #21 |
 | 2026-05-31 | `pnpm test:e2e` | Passed after #21 voting session coverage: 14 tests |
