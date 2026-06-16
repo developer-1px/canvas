@@ -1,6 +1,7 @@
 export type {
   Bounds,
   CanvasSelectionIds,
+  CanvasBoundsAnchor,
   Point,
   ResizeHandle,
   Viewport,
@@ -8,6 +9,8 @@ export type {
 export {
   clamp,
   fitBoundsIntoViewport,
+  getCanvasBoundsAnchorPoint,
+  getCanvasBoundsAnchorPoints,
   getCanvasBoundsCenter,
   handlePoint,
   normalizeBounds,

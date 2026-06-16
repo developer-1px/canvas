@@ -34,14 +34,14 @@ export function resolveCanvasArrowEndpoints({
 
   return {
     end: endBounds
-      ? getCanvasBoundsAnchorPoint({
+      ? getCanvasBoundsEdgeAnchorPoint({
           bounds: endBounds,
           toward: startTarget,
         })
       : end,
     endAttachedTo,
     start: startBounds
-      ? getCanvasBoundsAnchorPoint({
+      ? getCanvasBoundsEdgeAnchorPoint({
           bounds: startBounds,
           toward: endTarget,
         })
@@ -88,7 +88,7 @@ function getCanvasSceneTargetBounds({
     null
 }
 
-function getCanvasBoundsAnchorPoint({
+function getCanvasBoundsEdgeAnchorPoint({
   bounds,
   toward,
 }: {

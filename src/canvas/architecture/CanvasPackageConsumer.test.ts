@@ -71,6 +71,8 @@ import {
   type CanvasAppProps as CanvasAppPropsFromApp,
 } from '@interactive-os/canvas/app'
 import {
+  getCanvasBoundsAnchorPoint,
+  getCanvasBoundsAnchorPoints,
   getCanvasBoundsCenter,
   isCanvasCustomToolId,
   normalizeBounds,
@@ -499,6 +501,10 @@ describe('Canvas package consumer imports', () => {
     })
     expect(CanvasFoundation.getCanvasBoundsCenter({ h: 8, w: 6, x: 2, y: 4 }))
       .toEqual(getCanvasBoundsCenter({ h: 8, w: 6, x: 2, y: 4 }))
+    expect(getCanvasBoundsAnchorPoint({ h: 8, w: 6, x: 2, y: 4 }, 'top'))
+      .toEqual({ x: 5, y: 4 })
+    expect(CanvasFoundation.getCanvasBoundsAnchorPoints({ h: 8, w: 6, x: 2, y: 4 }).bottom)
+      .toEqual(getCanvasBoundsAnchorPoints({ h: 8, w: 6, x: 2, y: 4 }).bottom)
     const affordanceConfig = createCanvasAffordanceConfig()
     expect(affordanceConfig.tools.select).toBe(true)
     expect(assertCanvasAffordanceConfigFromEngine(affordanceConfig)).toBe(

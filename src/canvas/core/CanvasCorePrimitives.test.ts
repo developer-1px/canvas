@@ -4,6 +4,8 @@ import {
   CANVAS_ZOOM_STEPS,
   createCanvasSequentialIdFactory,
   fitBoundsIntoViewport,
+  getCanvasBoundsAnchorPoint,
+  getCanvasBoundsAnchorPoints,
   getCanvasBoundsCenter,
   getCanvasViewportScale,
   getCanvasViewportScreenBounds,
@@ -163,6 +165,23 @@ describe('CanvasCorePrimitives', () => {
     expect(getCanvasBoundsCenter({ h: 20, w: 40, x: 10, y: 30 })).toEqual({
       x: 30,
       y: 40,
+    })
+  })
+
+  it('computes named connector anchor points for bounds', () => {
+    const bounds = { h: 20, w: 40, x: 10, y: 30 }
+
+    expect(getCanvasBoundsAnchorPoint(bounds, 'left')).toEqual({ x: 10, y: 40 })
+    expect(getCanvasBoundsAnchorPoint(bounds, 'right')).toEqual({ x: 50, y: 40 })
+    expect(getCanvasBoundsAnchorPoint(bounds, 'top')).toEqual({ x: 30, y: 30 })
+    expect(getCanvasBoundsAnchorPoint(bounds, 'bottom')).toEqual({ x: 30, y: 50 })
+    expect(getCanvasBoundsAnchorPoint(bounds, 'center')).toEqual({ x: 30, y: 40 })
+    expect(getCanvasBoundsAnchorPoints(bounds)).toEqual({
+      bottom: { x: 30, y: 50 },
+      center: { x: 30, y: 40 },
+      left: { x: 10, y: 40 },
+      right: { x: 50, y: 40 },
+      top: { x: 30, y: 30 },
     })
   })
 })

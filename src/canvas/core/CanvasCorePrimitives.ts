@@ -59,6 +59,8 @@ export type CanvasSequentialIdFactoryInput = {
   startIndex?: number
 }
 
+export type CanvasBoundsAnchor = 'bottom' | 'center' | 'left' | 'right' | 'top'
+
 export function clamp(value: number, min: number, max: number) {
   if (!Number.isFinite(value)) {
     return min
@@ -142,6 +144,38 @@ export function getCanvasBoundsCenter(bounds: Bounds): Point {
   return {
     x: bounds.x + bounds.w / 2,
     y: bounds.y + bounds.h / 2,
+  }
+}
+
+export function getCanvasBoundsAnchorPoint(
+  bounds: Bounds,
+  anchor: CanvasBoundsAnchor,
+): Point {
+  const center = getCanvasBoundsCenter(bounds)
+
+  switch (anchor) {
+    case 'bottom':
+      return { x: center.x, y: bounds.y + bounds.h }
+    case 'center':
+      return center
+    case 'left':
+      return { x: bounds.x, y: center.y }
+    case 'right':
+      return { x: bounds.x + bounds.w, y: center.y }
+    case 'top':
+      return { x: center.x, y: bounds.y }
+  }
+}
+
+export function getCanvasBoundsAnchorPoints(
+  bounds: Bounds,
+): Record<CanvasBoundsAnchor, Point> {
+  return {
+    bottom: getCanvasBoundsAnchorPoint(bounds, 'bottom'),
+    center: getCanvasBoundsAnchorPoint(bounds, 'center'),
+    left: getCanvasBoundsAnchorPoint(bounds, 'left'),
+    right: getCanvasBoundsAnchorPoint(bounds, 'right'),
+    top: getCanvasBoundsAnchorPoint(bounds, 'top'),
   }
 }
 
