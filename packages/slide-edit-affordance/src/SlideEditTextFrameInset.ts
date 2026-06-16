@@ -241,3 +241,16 @@ export function toSlideEditTextFrameInsetAttributeValue(
     inset.left,
   ].join(' ')
 }
+
+export function getSlideEditTextFrameInsetPaddingCSS(
+  inset: Partial<SlideEditTextFrameInset> | null | undefined,
+) {
+  const normalizedInset = normalizeSlideEditTextFrameInset(inset)
+
+  return [
+    normalizedInset.top,
+    normalizedInset.right,
+    normalizedInset.bottom,
+    normalizedInset.left,
+  ].map((value) => `${value}px`).join(' ')
+}

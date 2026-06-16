@@ -131,6 +131,7 @@ export {
   createSlideEditTextFrameInsetDescriptor,
   getSlideEditTextFrameInsetCommandEffect,
   getSlideEditTextFrameInsetMetadata,
+  getSlideEditTextFrameInsetPaddingCSS,
   normalizeSlideEditTextFrameInset,
   normalizeSlideEditTextFrameInsetUpdateCommand,
   normalizeSlideEditTextFrameInsetValue,
