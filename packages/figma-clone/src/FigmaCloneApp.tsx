@@ -100,6 +100,14 @@ type FigmaCloneGuideLayer = Exclude<DomEditOverlayLayer, 'selection'>
 
 type FigmaCloneInspectorTab = 'design' | 'dev'
 
+type FigmaCloneLayerTreeHandlers = {
+  onSelectNode: (nodeId: FigmaCloneDomNodeId) => void
+  onSelectSection: (rootId: FigmaCloneDomSectionRootId) => void
+}
+
+const FIGMA_CLONE_LAYER_TREE_BUTTON_SELECTOR =
+  '[data-figma-layer-tree-button]'
+
 const FIGMA_CLONE_ITEMS = createFigmaCloneCanvasItems()
 
 const FIGMA_CLONE_GUIDE_LAYER_CONTROLS = [
@@ -539,6 +547,8 @@ function FigmaCloneLayersPanel({
   const activeRootId = selection.frameId === 'dom' && selection.nodeId
     ? getFigmaCloneDomRootId(selection.nodeId)
     : null
+  const selectedTreeItemId = getFigmaCloneSelectedLayerTreeItemId(selection)
+  const topLevelSize = FIGMA_CLONE_DOM_SECTION_ROOT_IDS.length + 1
 
   return (
     <aside className="figma-layers" aria-label="Layers">
@@ -546,40 +556,89 @@ function FigmaCloneLayersPanel({
         <Layers aria-hidden="true" size={14} />
         <h1>Layers</h1>
       </header>
-      <div className="figma-layer-list">
-        <button
-          aria-label="Select React widget frame"
-          className={`figma-layer-row${selection.frameId === 'widget' ? ' figma-layer-row--selected' : ''}`}
-          type="button"
-          onClick={onSelectWidgetFrame}
+      <div className="figma-layer-list" role="tree" aria-label="Layers">
+        <div
+          aria-level={1}
+          aria-posinset={1}
+          aria-selected={selection.frameId === 'widget'}
+          aria-setsize={topLevelSize}
+          role="treeitem"
+          aria-label="React widget"
         >
-          <ChevronRight aria-hidden="true" size={12} />
-          <span>React widget</span>
-        </button>
+          <button
+            aria-label="Select React widget frame"
+            className={`figma-layer-row${selection.frameId === 'widget' ? ' figma-layer-row--selected' : ''}`}
+            data-figma-layer-kind="widget"
+            data-figma-layer-tree-button
+            data-figma-layer-tree-id="widget"
+            tabIndex={selectedTreeItemId === 'widget' ? 0 : -1}
+            type="button"
+            onClick={onSelectWidgetFrame}
+            onKeyDown={(event) =>
+              handleFigmaCloneLayerTreeKeyDown(event, {
+                onSelectNode,
+                onSelectSection,
+              })}
+          >
+            <ChevronRight aria-hidden="true" size={12} />
+            <span>React widget</span>
+          </button>
+        </div>
         {FIGMA_CLONE_DOM_SECTION_ROOT_IDS.map((rootId) => {
           const rootNode = FIGMA_CLONE_DOM_NODE_BY_ID[rootId]
           const isSelectedSection = selection.frameId === 'dom' &&
             selection.rootId === rootId &&
             selection.nodeId === null
+          const sectionTreeItemId = getFigmaCloneSectionTreeItemId(rootId)
 
           return (
-            <div className="figma-layer-section" key={rootId}>
+            <div
+              aria-expanded="true"
+              aria-level={1}
+              aria-posinset={
+                FIGMA_CLONE_DOM_SECTION_ROOT_IDS.indexOf(rootId) + 2
+              }
+              aria-selected={isSelectedSection}
+              aria-setsize={topLevelSize}
+              className="figma-layer-section"
+              key={rootId}
+              role="treeitem"
+              aria-label={`${rootNode.label} section`}
+            >
               <button
                 aria-label={`Select ${rootNode.label} section`}
                 className={`figma-layer-row${isSelectedSection ? ' figma-layer-row--selected' : ''}`}
+                data-figma-layer-expanded="true"
+                data-figma-layer-has-children="true"
+                data-figma-layer-kind="section"
+                data-figma-layer-section-root-id={rootId}
+                data-figma-layer-tree-button
+                data-figma-layer-tree-id={sectionTreeItemId}
+                tabIndex={selectedTreeItemId === sectionTreeItemId ? 0 : -1}
                 type="button"
                 onClick={() => onSelectSection(rootId)}
+                onKeyDown={(event) =>
+                  handleFigmaCloneLayerTreeKeyDown(event, {
+                    onSelectNode,
+                    onSelectSection,
+                  })}
               >
                 <ChevronDown aria-hidden="true" size={12} />
                 <span>Section · {rootNode.label}</span>
               </button>
-              <div className="figma-layer-tree">
+              <div className="figma-layer-tree" role="group">
                 <FigmaCloneLayerNode
                   activeRootId={activeRootId}
                   node={rootNode}
+                  parentTreeItemId={sectionTreeItemId}
+                  posInSet={1}
+                  rootId={rootId}
                   selectedNodeId={selection.frameId === 'dom'
                     ? selection.nodeId
                     : null}
+                  selectedTreeItemId={selectedTreeItemId}
+                  setSize={1}
+                  onSelectSection={onSelectSection}
                   onSelectNode={onSelectNode}
                 />
               </div>
@@ -594,27 +653,64 @@ function FigmaCloneLayersPanel({
 function FigmaCloneLayerNode({
   activeRootId,
   node,
+  parentTreeItemId,
+  posInSet,
+  rootId,
   selectedNodeId,
+  selectedTreeItemId,
+  setSize,
+  onSelectSection,
   onSelectNode,
 }: {
   activeRootId: FigmaCloneDomNodeId | null
   node: FigmaCloneDomNode
+  parentTreeItemId: string
+  posInSet: number
+  rootId: FigmaCloneDomSectionRootId
   selectedNodeId: FigmaCloneDomNodeId | null
+  selectedTreeItemId: string
+  setSize: number
+  onSelectSection: (rootId: FigmaCloneDomSectionRootId) => void
   onSelectNode: (nodeId: FigmaCloneDomNodeId) => void
 }) {
   const depth = getFigmaCloneDomNodeDepth(node.id)
   const isTopLevel = depth === 0
-  const isExpanded = Boolean(node.children?.length) &&
+  const hasChildren = Boolean(node.children?.length)
+  const isExpanded = hasChildren &&
     (!isTopLevel || activeRootId === node.id)
+  const treeItemId = getFigmaCloneNodeTreeItemId(node.id)
 
   return (
-    <>
+    <div
+      aria-expanded={hasChildren ? isExpanded : undefined}
+      aria-level={depth + 2}
+      aria-posinset={posInSet}
+      aria-selected={selectedNodeId === node.id}
+      aria-setsize={setSize}
+      role="treeitem"
+      aria-label={node.label}
+    >
       <button
         aria-label={`Select layer ${node.label}`}
         className={`figma-layer-row figma-layer-row--node${selectedNodeId === node.id ? ' figma-layer-row--selected' : ''}`}
+        data-figma-layer-depth={depth}
+        data-figma-layer-expanded={isExpanded}
+        data-figma-layer-has-children={hasChildren}
+        data-figma-layer-kind="node"
+        data-figma-layer-node-id={node.id}
+        data-figma-layer-parent-tree-id={parentTreeItemId}
+        data-figma-layer-root-id={rootId}
+        data-figma-layer-tree-button
+        data-figma-layer-tree-id={treeItemId}
         style={{ paddingLeft: 24 + depth * 12 }}
+        tabIndex={selectedTreeItemId === treeItemId ? 0 : -1}
         type="button"
         onClick={() => onSelectNode(node.id)}
+        onKeyDown={(event) =>
+          handleFigmaCloneLayerTreeKeyDown(event, {
+            onSelectNode,
+            onSelectSection,
+          })}
       >
         {isExpanded ? (
           <ChevronDown aria-hidden="true" size={12} />
@@ -625,17 +721,216 @@ function FigmaCloneLayerNode({
         )}
         <span>{node.label}</span>
       </button>
-      {isExpanded ? node.children?.map((child) => (
-        <FigmaCloneLayerNode
-          key={child.id}
-          activeRootId={activeRootId}
-          node={child}
-          selectedNodeId={selectedNodeId}
-          onSelectNode={onSelectNode}
-        />
-      )) : null}
-    </>
+      {isExpanded ? (
+        <div className="figma-layer-tree" role="group">
+          {node.children?.map((child, index) => (
+            <FigmaCloneLayerNode
+              key={child.id}
+              activeRootId={activeRootId}
+              node={child}
+              parentTreeItemId={treeItemId}
+              posInSet={index + 1}
+              rootId={rootId}
+              selectedNodeId={selectedNodeId}
+              selectedTreeItemId={selectedTreeItemId}
+              setSize={node.children?.length ?? 0}
+              onSelectSection={onSelectSection}
+              onSelectNode={onSelectNode}
+            />
+          ))}
+        </div>
+      ) : null}
+    </div>
   )
+}
+
+function handleFigmaCloneLayerTreeKeyDown(
+  event: KeyboardEvent<HTMLButtonElement>,
+  handlers: FigmaCloneLayerTreeHandlers,
+) {
+  if (event.altKey || event.ctrlKey || event.metaKey) {
+    return
+  }
+
+  const buttons = getFigmaCloneLayerTreeButtons(event.currentTarget)
+  const currentIndex = buttons.indexOf(event.currentTarget)
+
+  if (currentIndex < 0) {
+    return
+  }
+
+  if (event.key === 'ArrowDown') {
+    event.preventDefault()
+    focusFigmaCloneLayerTreeButton(buttons, currentIndex + 1)
+    return
+  }
+
+  if (event.key === 'ArrowUp') {
+    event.preventDefault()
+    focusFigmaCloneLayerTreeButton(buttons, currentIndex - 1)
+    return
+  }
+
+  if (event.key === 'Home') {
+    event.preventDefault()
+    focusFigmaCloneLayerTreeButton(buttons, 0)
+    return
+  }
+
+  if (event.key === 'End') {
+    event.preventDefault()
+    focusFigmaCloneLayerTreeButton(buttons, buttons.length - 1)
+    return
+  }
+
+  if (event.key === 'ArrowRight') {
+    event.preventDefault()
+    moveFigmaCloneLayerTreeRight(event.currentTarget, buttons, handlers)
+    return
+  }
+
+  if (event.key === 'ArrowLeft') {
+    event.preventDefault()
+    moveFigmaCloneLayerTreeLeft(event.currentTarget, buttons, handlers)
+  }
+}
+
+function getFigmaCloneLayerTreeButtons(button: HTMLButtonElement) {
+  const tree = button.closest('[role="tree"]')
+
+  if (!tree) {
+    return []
+  }
+
+  return Array.from(
+    tree.querySelectorAll<HTMLButtonElement>(
+      FIGMA_CLONE_LAYER_TREE_BUTTON_SELECTOR,
+    ),
+  )
+}
+
+function focusFigmaCloneLayerTreeButton(
+  buttons: readonly HTMLButtonElement[],
+  nextIndex: number,
+) {
+  const nextButton = buttons.at(
+    Math.max(0, Math.min(buttons.length - 1, nextIndex)),
+  )
+
+  if (!nextButton) {
+    return
+  }
+
+  buttons.forEach((button) => {
+    button.tabIndex = button === nextButton ? 0 : -1
+  })
+  nextButton.focus()
+}
+
+function moveFigmaCloneLayerTreeRight(
+  button: HTMLButtonElement,
+  buttons: readonly HTMLButtonElement[],
+  { onSelectNode }: FigmaCloneLayerTreeHandlers,
+) {
+  if (button.dataset.figmaLayerHasChildren !== 'true') {
+    return
+  }
+
+  if (button.dataset.figmaLayerExpanded === 'true') {
+    focusFigmaCloneLayerTreeChild(button, buttons)
+    return
+  }
+
+  const nodeId = button.dataset.figmaLayerNodeId
+
+  if (isFigmaCloneDomNodeId(nodeId)) {
+    onSelectNode(nodeId)
+  }
+}
+
+function moveFigmaCloneLayerTreeLeft(
+  button: HTMLButtonElement,
+  buttons: readonly HTMLButtonElement[],
+  { onSelectSection }: FigmaCloneLayerTreeHandlers,
+) {
+  const isExpandedNode = button.dataset.figmaLayerKind === 'node' &&
+    button.dataset.figmaLayerExpanded === 'true'
+  const isRootNode = button.dataset.figmaLayerDepth === '0'
+  const rootId = button.dataset.figmaLayerRootId
+
+  if (isExpandedNode && isRootNode && isFigmaCloneDomSectionRootId(rootId)) {
+    onSelectSection(rootId)
+    return
+  }
+
+  focusFigmaCloneLayerTreeParent(button, buttons)
+}
+
+function focusFigmaCloneLayerTreeChild(
+  button: HTMLButtonElement,
+  buttons: readonly HTMLButtonElement[],
+) {
+  const treeItemId = button.dataset.figmaLayerTreeId
+  const childIndex = buttons.findIndex((candidate) =>
+    candidate.dataset.figmaLayerParentTreeId === treeItemId
+  )
+
+  if (childIndex >= 0) {
+    focusFigmaCloneLayerTreeButton(buttons, childIndex)
+  }
+}
+
+function focusFigmaCloneLayerTreeParent(
+  button: HTMLButtonElement,
+  buttons: readonly HTMLButtonElement[],
+) {
+  const parentTreeItemId = button.dataset.figmaLayerParentTreeId
+
+  if (!parentTreeItemId) {
+    return
+  }
+
+  const parentIndex = buttons.findIndex((candidate) =>
+    candidate.dataset.figmaLayerTreeId === parentTreeItemId
+  )
+
+  if (parentIndex >= 0) {
+    focusFigmaCloneLayerTreeButton(buttons, parentIndex)
+  }
+}
+
+function getFigmaCloneSelectedLayerTreeItemId(
+  selection: FigmaCloneSelection,
+) {
+  if (selection.frameId === 'widget') {
+    return 'widget'
+  }
+
+  if (selection.nodeId) {
+    return getFigmaCloneNodeTreeItemId(selection.nodeId)
+  }
+
+  return getFigmaCloneSectionTreeItemId(selection.rootId)
+}
+
+function getFigmaCloneSectionTreeItemId(rootId: FigmaCloneDomSectionRootId) {
+  return `section:${rootId}`
+}
+
+function getFigmaCloneNodeTreeItemId(nodeId: FigmaCloneDomNodeId) {
+  return `node:${nodeId}`
+}
+
+function isFigmaCloneDomSectionRootId(
+  value: string | undefined,
+): value is FigmaCloneDomSectionRootId {
+  return FIGMA_CLONE_DOM_SECTION_ROOT_IDS.some((rootId) => rootId === value)
+}
+
+function isFigmaCloneDomNodeId(
+  value: string | undefined,
+): value is FigmaCloneDomNodeId {
+  return Boolean(value && value in FIGMA_CLONE_DOM_NODE_BY_ID)
 }
 
 function FigmaCloneInspectorPanel({
