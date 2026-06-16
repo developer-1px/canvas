@@ -2,6 +2,7 @@ import { describe, expect, expectTypeOf, it } from 'vitest'
 import {
   CANVAS_FIT_VIEWPORT_PADDING,
   CANVAS_ZOOM_STEPS,
+  clampCanvasBoundsToFrame,
   createCanvasSequentialIdFactory,
   fitBoundsIntoViewport,
   getCanvasBoundsAnchorPoint,
@@ -182,6 +183,36 @@ describe('CanvasCorePrimitives', () => {
       left: { x: 10, y: 40 },
       right: { x: 50, y: 40 },
       top: { x: 30, y: 30 },
+    })
+  })
+
+  it('clamps bounds size and position into a frame', () => {
+    expect(
+      clampCanvasBoundsToFrame({
+        bounds: { h: 1000, w: 1000, x: -20, y: 120 },
+        frame: { h: 120, w: 200, x: 10, y: 20 },
+        minHeight: 24,
+        minWidth: 24,
+      }),
+    ).toEqual({
+      h: 120,
+      w: 200,
+      x: 10,
+      y: 20,
+    })
+
+    expect(
+      clampCanvasBoundsToFrame({
+        bounds: { h: 4, w: 6, x: 190, y: 130 },
+        frame: { h: 120, w: 200, x: 10, y: 20 },
+        minHeight: 24,
+        minWidth: 24,
+      }),
+    ).toEqual({
+      h: 24,
+      w: 24,
+      x: 186,
+      y: 116,
     })
   })
 })

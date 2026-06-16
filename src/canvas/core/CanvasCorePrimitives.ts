@@ -61,6 +61,13 @@ export type CanvasSequentialIdFactoryInput = {
 
 export type CanvasBoundsAnchor = 'bottom' | 'center' | 'left' | 'right' | 'top'
 
+export type ClampCanvasBoundsToFrameInput = {
+  bounds: Bounds
+  frame: Bounds
+  minHeight?: number
+  minWidth?: number
+}
+
 export function clamp(value: number, min: number, max: number) {
   if (!Number.isFinite(value)) {
     return min
@@ -176,6 +183,27 @@ export function getCanvasBoundsAnchorPoints(
     left: getCanvasBoundsAnchorPoint(bounds, 'left'),
     right: getCanvasBoundsAnchorPoint(bounds, 'right'),
     top: getCanvasBoundsAnchorPoint(bounds, 'top'),
+  }
+}
+
+export function clampCanvasBoundsToFrame({
+  bounds,
+  frame,
+  minHeight = 1,
+  minWidth = 1,
+}: ClampCanvasBoundsToFrameInput): Bounds {
+  const maxWidth = Math.max(0, frame.w)
+  const maxHeight = Math.max(0, frame.h)
+  const boundedMinWidth = clamp(minWidth, 0, maxWidth)
+  const boundedMinHeight = clamp(minHeight, 0, maxHeight)
+  const w = clamp(bounds.w, boundedMinWidth, maxWidth)
+  const h = clamp(bounds.h, boundedMinHeight, maxHeight)
+
+  return {
+    h,
+    w,
+    x: clamp(bounds.x, frame.x, frame.x + maxWidth - w),
+    y: clamp(bounds.y, frame.y, frame.y + maxHeight - h),
   }
 }
 

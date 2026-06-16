@@ -2,12 +2,14 @@ export type {
   Bounds,
   CanvasSelectionIds,
   CanvasBoundsAnchor,
+  ClampCanvasBoundsToFrameInput,
   Point,
   ResizeHandle,
   Viewport,
 } from '../core'
 export {
   clamp,
+  clampCanvasBoundsToFrame,
   fitBoundsIntoViewport,
   getCanvasBoundsAnchorPoint,
   getCanvasBoundsAnchorPoints,
