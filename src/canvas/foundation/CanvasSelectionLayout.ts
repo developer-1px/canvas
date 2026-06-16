@@ -96,6 +96,22 @@ export type CanvasItemTargetPlacementMoveResult<TItem> = {
   toIndex: number
 }
 
+export type CanvasItemTargetPlacementInsertInput<
+  TItem,
+  TItemId extends string = string,
+> = {
+  getItemId: (item: TItem, index: number) => TItemId
+  item: TItem
+  items: readonly TItem[]
+  placement: CanvasItemTargetPlacement
+  targetItemId: TItemId
+}
+
+export type CanvasItemTargetPlacementInsertResult<TItem> = {
+  index: number
+  items: TItem[]
+}
+
 export type CanvasSelectionFlipItemInput<
   TItem,
   TItemId extends string = string,
@@ -413,6 +429,36 @@ export function moveCanvasItemToTargetPlacement<
         items: result.items,
         toIndex,
       }
+}
+
+export function insertCanvasItemAtTargetPlacement<
+  TItem,
+  TItemId extends string = string,
+>({
+  getItemId,
+  item,
+  items,
+  placement,
+  targetItemId,
+}: CanvasItemTargetPlacementInsertInput<TItem, TItemId>):
+  CanvasItemTargetPlacementInsertResult<TItem> | null {
+  const targetIndex = items.findIndex((candidate, index) =>
+    getItemId(candidate, index) === targetItemId)
+
+  if (targetIndex < 0) {
+    return null
+  }
+
+  const index = targetIndex + (placement === 'after' ? 1 : 0)
+
+  return {
+    index,
+    items: [
+      ...items.slice(0, index),
+      item,
+      ...items.slice(index),
+    ],
+  }
 }
 
 export function flipCanvasSelectionItems<

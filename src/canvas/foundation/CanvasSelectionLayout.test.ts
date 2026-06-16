@@ -10,6 +10,7 @@ import {
   canTidyCanvasSelectionItems,
   distributeCanvasSelectionItems,
   flipCanvasSelectionItems,
+  insertCanvasItemAtTargetPlacement,
   moveCanvasItemToTargetPlacement,
   moveCanvasSelectionItemsToIndex,
   reorderCanvasSelectionItems,
@@ -254,6 +255,66 @@ describe('CanvasSelectionLayout', () => {
       items: orderItems,
       placement: 'after',
       targetItemId: 'b',
+    })).toBeNull()
+  })
+
+  it('inserts an item before or after a target item', () => {
+    const orderItems = items.slice(0, 4)
+    const item: TestItem = {
+      id: 'x',
+      kind: 'shape',
+      rect: { h: 10, w: 10, x: 0, y: 0 },
+    }
+
+    expect(insertCanvasItemAtTargetPlacement({
+      getItemId,
+      item,
+      items: orderItems,
+      placement: 'before',
+      targetItemId: 'b',
+    })).toMatchObject({
+      index: 1,
+      items: [
+        { id: 'a' },
+        { id: 'x' },
+        { id: 'b' },
+        { id: 'c' },
+        { id: 'hidden' },
+      ],
+    })
+
+    expect(insertCanvasItemAtTargetPlacement({
+      getItemId,
+      item,
+      items: orderItems,
+      placement: 'after',
+      targetItemId: 'hidden',
+    })).toMatchObject({
+      index: 4,
+      items: [
+        { id: 'a' },
+        { id: 'b' },
+        { id: 'c' },
+        { id: 'hidden' },
+        { id: 'x' },
+      ],
+    })
+  })
+
+  it('returns null when target placement insert target is missing', () => {
+    const orderItems = items.slice(0, 4)
+    const item: TestItem = {
+      id: 'x',
+      kind: 'shape',
+      rect: { h: 10, w: 10, x: 0, y: 0 },
+    }
+
+    expect(insertCanvasItemAtTargetPlacement({
+      getItemId,
+      item,
+      items: orderItems,
+      placement: 'after',
+      targetItemId: 'missing',
     })).toBeNull()
   })
 
