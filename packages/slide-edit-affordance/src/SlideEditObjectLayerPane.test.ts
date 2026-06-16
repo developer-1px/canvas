@@ -357,6 +357,56 @@ describe('SlideEditObjectLayerPane', () => {
     })
   })
 
+  it('maps Alt keyboard row reorder to host-owned intents', () => {
+    const groupedDescriptor = createGroupedLayerPaneDescriptor()
+
+    expect(getSlideEditLayerPaneKeyboardIntent(groupedDescriptor, {
+      altKey: true,
+      currentObjectId: 'child-a',
+      key: 'ArrowDown',
+    })).toEqual({
+      objectId: 'child-a',
+      preventDefault: true,
+      toIndex: 4,
+      type: 'reorder-row',
+    })
+    expect(getSlideEditLayerPaneKeyboardIntent(groupedDescriptor, {
+      altKey: true,
+      currentObjectId: 'loose',
+      key: 'ArrowUp',
+    })).toEqual({
+      objectId: 'loose',
+      preventDefault: true,
+      toIndex: 3,
+      type: 'reorder-row',
+    })
+    expect(getSlideEditLayerPaneKeyboardIntent(groupedDescriptor, {
+      altKey: true,
+      currentObjectId: 'group-a',
+      key: 'ArrowDown',
+    })).toEqual({
+      objectId: 'group-a',
+      preventDefault: true,
+      toIndex: 4,
+      type: 'reorder-row',
+    })
+    expect(getSlideEditLayerPaneKeyboardIntent(groupedDescriptor, {
+      altKey: true,
+      currentObjectId: 'group-a',
+      key: 'ArrowUp',
+    })).toEqual({ preventDefault: false, type: 'none' })
+    expect(getSlideEditLayerPaneKeyboardIntent(groupedDescriptor, {
+      altKey: true,
+      currentObjectId: 'loose',
+      key: 'ArrowDown',
+    })).toEqual({ preventDefault: false, type: 'none' })
+    expect(getSlideEditLayerPaneKeyboardIntent(groupedDescriptor, {
+      altKey: true,
+      currentObjectId: 'child-b',
+      key: 'ArrowDown',
+    })).toEqual({ preventDefault: false, type: 'none' })
+  })
+
   it('defines pane command descriptors as host command effects', () => {
     expect(SLIDE_EDIT_LAYER_PANE_COMMANDS.map((command) => command.id)).toEqual([
       'select-objects',

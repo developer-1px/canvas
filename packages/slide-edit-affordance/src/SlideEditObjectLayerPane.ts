@@ -209,6 +209,12 @@ export type SlideEditLayerPaneKeyboardIntent<
   | {
     objectId: TObjectId
     preventDefault: true
+    toIndex: number
+    type: 'reorder-row'
+  }
+  | {
+    objectId: TObjectId
+    preventDefault: true
     rangeAnchorObjectId: TObjectId
     type: 'range-select-row'
   }
@@ -285,11 +291,13 @@ export function getSlideEditLayerPaneKeyboardIntent<
 >(
   descriptor: SlideEditLayerPaneDescriptor<TSlideId, TObjectId, TGroupId>,
   {
+    altKey = false,
     currentObjectId,
     key,
     rangeAnchorObjectId = null,
     shiftKey = false,
   }: {
+    altKey?: boolean
     currentObjectId: TObjectId
     key: string
     rangeAnchorObjectId?: TObjectId | null
@@ -301,6 +309,22 @@ export function getSlideEditLayerPaneKeyboardIntent<
 
   if (rows.length === 0 || currentIndex < 0) {
     return { preventDefault: false, type: 'none' }
+  }
+
+  if (altKey && key === 'ArrowUp') {
+    return getSlideEditLayerPaneKeyboardReorderIntent(
+      descriptor,
+      currentObjectId,
+      'up',
+    )
+  }
+
+  if (altKey && key === 'ArrowDown') {
+    return getSlideEditLayerPaneKeyboardReorderIntent(
+      descriptor,
+      currentObjectId,
+      'down',
+    )
   }
 
   if (shiftKey && key === 'ArrowDown') {
@@ -407,6 +431,62 @@ export function getSlideEditLayerPaneCommandEffect<
       return getSlideEditLayerPaneLockEffect(descriptor, intent.objectId)
     case 'row-drop':
       return getSlideEditLayerPaneReorderEffect(descriptor, intent)
+  }
+}
+
+function getSlideEditLayerPaneKeyboardReorderIntent<
+  TSlideId extends SlideEditLayerPaneSlideId,
+  TObjectId extends SlideEditLayerPaneObjectId,
+  TGroupId extends SlideEditLayerPaneGroupId,
+>(
+  descriptor: SlideEditLayerPaneDescriptor<TSlideId, TObjectId, TGroupId>,
+  currentObjectId: TObjectId,
+  direction: 'down' | 'up',
+): SlideEditLayerPaneKeyboardIntent<TObjectId> {
+  const currentIndex = descriptor.rows.findIndex(
+    (row) => row.objectId === currentObjectId,
+  )
+  const currentRow = descriptor.rows[currentIndex]
+
+  if (!currentRow?.isSelectable || !currentRow.isReorderable) {
+    return { preventDefault: false, type: 'none' }
+  }
+
+  const targetEntries = direction === 'up'
+    ? descriptor.rows
+        .slice(0, currentIndex)
+        .map((row, index) => ({ index, row }))
+        .reverse()
+    : descriptor.rows
+        .slice(currentIndex + 1)
+        .map((row, offset) => ({ index: currentIndex + 1 + offset, row }))
+  const target = targetEntries.find(({ row }) =>
+    row.isSelectable &&
+      row.isReorderable &&
+      !isSlideEditLayerPaneDescendantRow(descriptor, row, currentObjectId))
+
+  if (!target) {
+    return { preventDefault: false, type: 'none' }
+  }
+
+  const toIndex = normalizeSlideEditLayerPaneIndex(
+    direction === 'up' ? target.index : target.index + 1,
+    descriptor.rows.length,
+  )
+  const insertionIndex = getSlideEditLayerPaneInsertionIndex(
+    currentIndex,
+    toIndex,
+  )
+
+  if (insertionIndex === currentIndex) {
+    return { preventDefault: false, type: 'none' }
+  }
+
+  return {
+    objectId: currentObjectId,
+    preventDefault: true,
+    toIndex,
+    type: 'reorder-row',
   }
 }
 
