@@ -10,6 +10,7 @@ import {
   canTidyCanvasSelectionItems,
   distributeCanvasSelectionItems,
   flipCanvasSelectionItems,
+  moveCanvasSelectionItemsToIndex,
   reorderCanvasSelectionItems,
   tidyCanvasSelectionItems,
 } from './CanvasSelectionLayout'
@@ -83,6 +84,112 @@ describe('CanvasSelectionLayout', () => {
       mode: 'bringToFront',
       selection: ['b', 'hidden'],
     }))).toEqual(['a', 'c', 'hidden', 'b'])
+  })
+
+  it('moves selected item blocks to an absolute drop index', () => {
+    const orderItems = items.slice(0, 4)
+
+    expect(moveCanvasSelectionItemsToIndex({
+      getItemId,
+      items: orderItems,
+      selection: ['b', 'c'],
+      toIndex: orderItems.length,
+    })).toMatchObject({
+      changed: true,
+      items: [
+        { id: 'a' },
+        { id: 'hidden' },
+        { id: 'b' },
+        { id: 'c' },
+      ],
+    })
+
+    expect(moveCanvasSelectionItemsToIndex({
+      getItemId,
+      items: orderItems,
+      selection: ['b', 'c'],
+      toIndex: 0,
+    })).toMatchObject({
+      changed: true,
+      items: [
+        { id: 'b' },
+        { id: 'c' },
+        { id: 'a' },
+        { id: 'hidden' },
+      ],
+    })
+  })
+
+  it('excludes unsupported items from drop-index moves', () => {
+    const orderItems = items.slice(0, 4)
+
+    expect(moveCanvasSelectionItemsToIndex({
+      getItemId,
+      isItemSelectable,
+      items: orderItems,
+      selection: ['b', 'hidden'],
+      toIndex: orderItems.length,
+    })).toMatchObject({
+      changed: true,
+      items: [
+        { id: 'a' },
+        { id: 'c' },
+        { id: 'hidden' },
+        { id: 'b' },
+      ],
+    })
+  })
+
+  it('reports no-op drop-index moves', () => {
+    const orderItems = items.slice(0, 4)
+
+    expect(moveCanvasSelectionItemsToIndex({
+      getItemId,
+      items: orderItems,
+      selection: ['b', 'c'],
+      toIndex: 3,
+    })).toMatchObject({
+      changed: false,
+      items: [
+        { id: 'a' },
+        { id: 'b' },
+        { id: 'c' },
+        { id: 'hidden' },
+      ],
+    })
+
+    expect(moveCanvasSelectionItemsToIndex({
+      getItemId,
+      items: orderItems,
+      selection: ['missing'],
+      toIndex: 0,
+    })).toMatchObject({
+      changed: false,
+      items: [
+        { id: 'a' },
+        { id: 'b' },
+        { id: 'c' },
+        { id: 'hidden' },
+      ],
+    })
+  })
+
+  it('clamps out-of-range drop-index moves', () => {
+    const orderItems = items.slice(0, 4)
+
+    expect(getIds(moveCanvasSelectionItemsToIndex({
+      getItemId,
+      items: orderItems,
+      selection: ['b'],
+      toIndex: -10,
+    }).items)).toEqual(['b', 'a', 'c', 'hidden'])
+
+    expect(getIds(moveCanvasSelectionItemsToIndex({
+      getItemId,
+      items: orderItems,
+      selection: ['b'],
+      toIndex: 99,
+    }).items)).toEqual(['a', 'c', 'hidden', 'b'])
   })
 
   it('aligns selected item bounds to a provided frame', () => {

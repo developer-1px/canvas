@@ -99,6 +99,7 @@ export {
   canTidyCanvasSelectionItems,
   distributeCanvasSelectionItems,
   flipCanvasSelectionItems,
+  moveCanvasSelectionItemsToIndex,
   reorderCanvasSelectionItems,
   tidyCanvasSelectionItems,
   type CanvasSelectionAlignInput,
@@ -108,6 +109,8 @@ export {
   type CanvasSelectionLayoutAxis,
   type CanvasSelectionLayoutChangeInput,
   type CanvasSelectionLayoutInput,
+  type CanvasSelectionMoveToIndexInput,
+  type CanvasSelectionMoveToIndexResult,
   type CanvasSelectionReorderInput,
   type CanvasSelectionTidyInput,
 } from './CanvasSelectionLayout'

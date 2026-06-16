@@ -61,6 +61,22 @@ export type CanvasSelectionReorderInput<
   selection: readonly TItemId[]
 }
 
+export type CanvasSelectionMoveToIndexInput<
+  TItem,
+  TItemId extends string = string,
+> = {
+  getItemId: (item: TItem, index: number) => TItemId
+  isItemSelectable?: (item: TItem, index: number) => boolean
+  items: readonly TItem[]
+  selection: readonly TItemId[]
+  toIndex: number
+}
+
+export type CanvasSelectionMoveToIndexResult<TItem> = {
+  changed: boolean
+  items: TItem[]
+}
+
 export type CanvasSelectionFlipItemInput<
   TItem,
   TItemId extends string = string,
@@ -292,6 +308,51 @@ export function reorderCanvasSelectionItems<
   return next
 }
 
+export function moveCanvasSelectionItemsToIndex<
+  TItem,
+  TItemId extends string = string,
+>({
+  getItemId,
+  isItemSelectable = () => true,
+  items,
+  selection,
+  toIndex,
+}: CanvasSelectionMoveToIndexInput<TItem, TItemId>):
+  CanvasSelectionMoveToIndexResult<TItem> {
+  const selected = getSelectedCanvasSelectionOrderIds({
+    getItemId,
+    isItemSelectable,
+    items,
+    selection,
+  })
+
+  if (selected.size === 0) {
+    return { changed: false, items: [...items] }
+  }
+
+  const boundedToIndex = clampCanvasSelectionItemIndex(toIndex, items.length)
+  const selectedBeforeDropIndex = items
+    .slice(0, boundedToIndex)
+    .filter((item, index) => selected.has(getItemId(item, index)))
+    .length
+  const block = items.filter((item, index) => selected.has(getItemId(item, index)))
+  const remaining = items.filter((item, index) => !selected.has(getItemId(item, index)))
+  const insertionIndex = clampCanvasSelectionItemIndex(
+    boundedToIndex - selectedBeforeDropIndex,
+    remaining.length,
+  )
+  const next = [
+    ...remaining.slice(0, insertionIndex),
+    ...block,
+    ...remaining.slice(insertionIndex),
+  ]
+
+  return {
+    changed: !areCanvasSelectionItemOrdersEqual(items, next, getItemId),
+    items: next,
+  }
+}
+
 export function flipCanvasSelectionItems<
   TItem,
   TItemId extends string = string,
@@ -491,6 +552,10 @@ function areCanvasSelectionItemOrdersEqual<
       return rightItem !== undefined &&
         getItemId(item, index) === getItemId(rightItem, index)
     })
+}
+
+function clampCanvasSelectionItemIndex(index: number, length: number) {
+  return Math.max(0, Math.min(length, index))
 }
 
 function getCanvasSelectionAlignedBounds(
