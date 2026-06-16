@@ -14,6 +14,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type KeyboardEvent,
   type RefObject,
 } from 'react'
 import { useJSONDocument } from '@interactive-os/json-document/react'
@@ -96,6 +97,8 @@ type FigmaCloneDomDragHistorySession = {
 }
 
 type FigmaCloneGuideLayer = Exclude<DomEditOverlayLayer, 'selection'>
+
+type FigmaCloneInspectorTab = 'design' | 'dev'
 
 const FIGMA_CLONE_ITEMS = createFigmaCloneCanvasItems()
 
@@ -674,61 +677,169 @@ function FigmaCloneInspectorPanel({
   onChangeSectionViewportField: (field: 'h' | 'w', value: number) => void
   onSelectDocumentRoot: () => void
 }) {
+  const [activeTab, setActiveTab] = useState<FigmaCloneInspectorTab>('design')
+
   return (
     <aside className="figma-inspector" aria-label="Design">
-      <header>
-        <button aria-selected="true" type="button">Design</button>
-        <button aria-selected="false" type="button">Dev</button>
+      <header role="tablist" aria-label="Inspector panels">
+        <FigmaCloneInspectorTabButton
+          activeTab={activeTab}
+          tab="design"
+          onActivate={setActiveTab}
+        />
+        <FigmaCloneInspectorTabButton
+          activeTab={activeTab}
+          tab="dev"
+          onActivate={setActiveTab}
+        />
       </header>
-      {selection.frameId === 'widget' ? (
-        <section className="figma-panel-section">
-          <h2>React widget</h2>
-          <dl className="figma-meta">
-            <div>
-              <dt>Kind</dt>
-              <dd>React</dd>
-            </div>
-            <div>
-              <dt>Edit</dt>
-              <dd>Widget data</dd>
-            </div>
-          </dl>
-        </section>
-      ) : selection.nodeId === null ? (
-        <FigmaCloneSectionInspector
-          viewport={sectionViewport}
-          onApplyPreset={onApplySectionViewportPreset}
-          onChangeField={onChangeSectionViewportField}
-          onChangeFrameMode={onChangeSectionFrameMode}
-          onChangeOverflow={onChangeSectionOverflow}
-          onSelectDocumentRoot={onSelectDocumentRoot}
-        />
+      {activeTab === 'design' ? (
+        <div
+          aria-labelledby="figma-inspector-design-tab"
+          id="figma-inspector-design-panel"
+          role="tabpanel"
+        >
+          {selection.frameId === 'widget' ? (
+            <section className="figma-panel-section">
+              <h2>React widget</h2>
+              <dl className="figma-meta">
+                <div>
+                  <dt>Kind</dt>
+                  <dd>React</dd>
+                </div>
+                <div>
+                  <dt>Edit</dt>
+                  <dd>Widget data</dd>
+                </div>
+              </dl>
+            </section>
+          ) : selection.nodeId === null ? (
+            <FigmaCloneSectionInspector
+              viewport={sectionViewport}
+              onApplyPreset={onApplySectionViewportPreset}
+              onChangeField={onChangeSectionViewportField}
+              onChangeFrameMode={onChangeSectionFrameMode}
+              onChangeOverflow={onChangeSectionOverflow}
+              onSelectDocumentRoot={onSelectDocumentRoot}
+            />
+          ) : (
+            <DomEditInspector
+              adapter={FIGMA_CLONE_DOM_EDIT_ADAPTER}
+              canEditText={canFigmaCloneDomNodeEditText}
+              getText={(nodeId) => getFigmaCloneDomText(domTextState, nodeId)}
+              selectedNodeId={selection.nodeId}
+              state={domState}
+              viewport={viewport}
+              onChangeAutoLayout={onChangeDomAutoLayoutField}
+              onChange={onChangeDomField}
+              onChangeText={onChangeDomText}
+            />
+          )}
+        </div>
       ) : (
-        <DomEditInspector
-          adapter={FIGMA_CLONE_DOM_EDIT_ADAPTER}
-          canEditText={canFigmaCloneDomNodeEditText}
-          getText={(nodeId) => getFigmaCloneDomText(domTextState, nodeId)}
-          selectedNodeId={selection.nodeId}
-          state={domState}
-          viewport={viewport}
-          onChangeAutoLayout={onChangeDomAutoLayoutField}
-          onChange={onChangeDomField}
-          onChangeText={onChangeDomText}
-        />
+        <div
+          aria-labelledby="figma-inspector-dev-tab"
+          id="figma-inspector-dev-panel"
+          role="tabpanel"
+        >
+          <section className="figma-panel-section">
+            <h2>Source</h2>
+            <code>{getFigmaCloneInspectorSourceLabel(selection)}</code>
+          </section>
+        </div>
       )}
-      {selection.frameId === 'dom' && selection.nodeId ? (
-        <section className="figma-panel-section">
-          <h2>Source</h2>
-          <code>{FIGMA_CLONE_DOM_NODE_BY_ID[selection.nodeId].label}</code>
-        </section>
-      ) : selection.frameId === 'dom' ? (
-        <section className="figma-panel-section">
-          <h2>Source</h2>
-          <code>{FIGMA_CLONE_DOM_NODE_BY_ID[selection.rootId].label} section</code>
-        </section>
-      ) : null}
     </aside>
   )
+}
+
+function FigmaCloneInspectorTabButton({
+  activeTab,
+  tab,
+  onActivate,
+}: {
+  activeTab: FigmaCloneInspectorTab
+  tab: FigmaCloneInspectorTab
+  onActivate: (tab: FigmaCloneInspectorTab) => void
+}) {
+  const selected = activeTab === tab
+  const label = getFigmaCloneInspectorTabLabel(tab)
+
+  return (
+    <button
+      aria-controls={`figma-inspector-${tab}-panel`}
+      aria-selected={selected}
+      id={`figma-inspector-${tab}-tab`}
+      role="tab"
+      tabIndex={selected ? 0 : -1}
+      type="button"
+      onClick={() => onActivate(tab)}
+      onKeyDown={(event) =>
+        handleFigmaCloneInspectorTabKeyDown(event, tab, onActivate)}
+    >
+      {label}
+    </button>
+  )
+}
+
+function handleFigmaCloneInspectorTabKeyDown(
+  event: KeyboardEvent<HTMLButtonElement>,
+  tab: FigmaCloneInspectorTab,
+  onActivate: (tab: FigmaCloneInspectorTab) => void,
+) {
+  const nextTab = getFigmaCloneInspectorKeyboardTab(event.key, tab)
+
+  if (!nextTab) {
+    return
+  }
+
+  event.preventDefault()
+  onActivate(nextTab)
+  requestAnimationFrame(() => {
+    document.getElementById(`figma-inspector-${nextTab}-tab`)?.focus()
+  })
+}
+
+function getFigmaCloneInspectorKeyboardTab(
+  key: string,
+  tab: FigmaCloneInspectorTab,
+): FigmaCloneInspectorTab | null {
+  if (key === 'ArrowLeft' || key === 'ArrowUp') {
+    return tab === 'design' ? 'dev' : 'design'
+  }
+
+  if (key === 'ArrowRight' || key === 'ArrowDown') {
+    return tab === 'design' ? 'dev' : 'design'
+  }
+
+  if (key === 'Home') {
+    return 'design'
+  }
+
+  if (key === 'End') {
+    return 'dev'
+  }
+
+  if (key === 'Enter' || key === ' ') {
+    return tab
+  }
+
+  return null
+}
+
+function getFigmaCloneInspectorTabLabel(tab: FigmaCloneInspectorTab) {
+  return tab === 'design' ? 'Design' : 'Dev'
+}
+
+function getFigmaCloneInspectorSourceLabel(selection: FigmaCloneSelection) {
+  if (selection.frameId === 'widget') {
+    return 'React widget'
+  }
+
+  if (selection.nodeId) {
+    return FIGMA_CLONE_DOM_NODE_BY_ID[selection.nodeId].label
+  }
+
+  return `${FIGMA_CLONE_DOM_NODE_BY_ID[selection.rootId].label} section`
 }
 
 function FigmaCloneSectionInspector({
