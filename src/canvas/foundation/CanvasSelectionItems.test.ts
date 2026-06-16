@@ -5,6 +5,7 @@ import {
   deleteCanvasSelectionItems,
   getCanvasGroupedItemSelection,
   getCanvasFullySelectedItemGroupIds,
+  getCanvasGroupExpandedSelectionIds,
   getCanvasGroupedItemPointerSelection,
   getCanvasItemGroupIndexRange,
   getCanvasItemGroupMemberIds,
@@ -285,6 +286,32 @@ describe('CanvasSelectionItems', () => {
       isItemSelectable: isVisible,
       items: sourceItems,
     })).toEqual(['a', 'd'])
+  })
+
+  it('expands group row selection ids to selectable item ids and dedupes in order', () => {
+    const sourceItems: TestItem[] = [
+      { groupId: 'group-a', id: 'a', name: 'Alpha' },
+      { groupId: 'group-b', id: 'b', name: 'Beta' },
+      { groupId: 'group-a', hidden: true, id: 'c', name: 'Gamma' },
+      { groupId: 'group-a', id: 'd', name: 'Delta' },
+      { id: 'loose', name: 'Loose' },
+    ]
+
+    expect(getCanvasGroupExpandedSelectionIds({
+      getItemGroupId: (item) => item.groupId,
+      getItemId,
+      getSelectionGroupId: (id) =>
+        id.startsWith('group-row:') ? id.slice('group-row:'.length) : null,
+      isItemSelectable: isVisible,
+      items: sourceItems,
+      selection: [
+        'group-row:group-a',
+        'loose',
+        'missing',
+        'group-row:missing',
+        'a',
+      ],
+    })).toEqual(['a', 'd', 'loose'])
   })
 
   it('returns the first and last selectable index for an explicit group id', () => {

@@ -114,6 +114,18 @@ export type CanvasSelectionItemGroupInput<
   groupId: TGroupId
 }
 
+export type CanvasGroupExpandedSelectionIdsInput<
+  TItem,
+  TItemId extends string = string,
+  TGroupId extends string = string,
+> = Omit<
+  CanvasSelectionItemGroupsInput<TItem, TItemId, TGroupId>,
+  'selection'
+> & {
+  getSelectionGroupId: (id: TItemId) => TGroupId | null | undefined
+  selection: readonly TItemId[]
+}
+
 export type CanvasItemGroupIndexRangeInput<
   TItem,
   TGroupId extends string = string,
@@ -441,6 +453,61 @@ export function getCanvasFullySelectedItemGroupIds<
   })
 
   return groupIds.filter((groupId) => groupState.get(groupId) === true)
+}
+
+export function getCanvasGroupExpandedSelectionIds<
+  TItem,
+  TItemId extends string = string,
+  TGroupId extends string = string,
+>({
+  getItemGroupId,
+  getItemId,
+  getSelectionGroupId,
+  isItemSelectable = () => true,
+  items,
+  selection,
+}: CanvasGroupExpandedSelectionIdsInput<TItem, TItemId, TGroupId>) {
+  const itemIds = new Set<TItemId>()
+
+  items.forEach((item, index) => {
+    if (isItemSelectable(item, index)) {
+      itemIds.add(getItemId(item, index))
+    }
+  })
+
+  const expanded: TItemId[] = []
+  const seen = new Set<TItemId>()
+  const pushId = (id: TItemId) => {
+    if (seen.has(id)) {
+      return
+    }
+
+    seen.add(id)
+    expanded.push(id)
+  }
+
+  for (const id of selection) {
+    const groupId = getSelectionGroupId(id) ?? undefined
+
+    if (groupId !== undefined) {
+      for (const memberId of getCanvasItemGroupMemberIdsForGroup({
+        getItemGroupId,
+        getItemId,
+        groupId,
+        isItemSelectable,
+        items,
+      })) {
+        pushId(memberId)
+      }
+      continue
+    }
+
+    if (itemIds.has(id)) {
+      pushId(id)
+    }
+  }
+
+  return expanded
 }
 
 export function getCanvasItemGroupMemberIds<
