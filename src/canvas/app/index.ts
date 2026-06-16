@@ -111,6 +111,11 @@ export {
   type CanvasDataTransferImportActionValue,
 } from './affordances/commands/CanvasDataTransferImportActionPlan'
 export {
+  getCanvasImportedImageSize,
+  type CanvasImportedImageSize,
+  type CanvasImportedImageSizeOptions,
+} from './feature-packs/image-io/CanvasImageImport'
+export {
   centerCanvasViewportAtWorldPoint,
   fitCanvasViewportToBounds,
   fitCanvasViewportToItems,

@@ -31,6 +31,7 @@ export {
   getCanvasImageFileFromDataTransfer,
   getCanvasImageFileFromList,
   getCanvasImageSourceFromDataTransfer,
+  getCanvasImportedImageSize,
   getCanvasSVGImageSourceFromDataTransfer,
   isCanvasImageBlob,
   readCanvasImageFileSource,
@@ -38,6 +39,8 @@ export {
   type CanvasImageImportFormat,
   type CanvasImageImportSource,
   type CanvasImportedImageItemInput,
+  type CanvasImportedImageSize,
+  type CanvasImportedImageSizeOptions,
 } from './CanvasImageImport'
 export {
   getCanvasImageInsertCenter,

@@ -31,6 +31,16 @@ export type CanvasImportedImageItemInput = {
   source: CanvasImageImportSource
 }
 
+export type CanvasImportedImageSize = {
+  h: number
+  w: number
+}
+
+export type CanvasImportedImageSizeOptions = {
+  fallbackSize?: Partial<CanvasImportedImageSize>
+  maxSize?: Partial<CanvasImportedImageSize>
+}
+
 const DEFAULT_IMAGE_WIDTH = 320
 const DEFAULT_IMAGE_HEIGHT = 220
 const MAX_IMAGE_WIDTH = 520
@@ -168,21 +178,30 @@ export function isCanvasImageBlob(
   return isCanvasImageMimeType(blob.type)
 }
 
-function getCanvasImportedImageSize({
+export function getCanvasImportedImageSize({
   naturalHeight,
   naturalWidth,
-}: CanvasImageImportSource) {
+}: Pick<CanvasImageImportSource, 'naturalHeight' | 'naturalWidth'>,
+options: CanvasImportedImageSizeOptions = {},
+): CanvasImportedImageSize {
+  const fallbackWidth =
+    options.fallbackSize?.w ?? DEFAULT_IMAGE_WIDTH
+  const fallbackHeight =
+    options.fallbackSize?.h ?? DEFAULT_IMAGE_HEIGHT
+  const maxWidth = options.maxSize?.w ?? MAX_IMAGE_WIDTH
+  const maxHeight = options.maxSize?.h ?? MAX_IMAGE_HEIGHT
+
   if (!naturalWidth || !naturalHeight) {
     return {
-      h: DEFAULT_IMAGE_HEIGHT,
-      w: DEFAULT_IMAGE_WIDTH,
+      h: Math.max(1, fallbackHeight),
+      w: Math.max(1, fallbackWidth),
     }
   }
 
   const scale = Math.min(
     1,
-    MAX_IMAGE_WIDTH / naturalWidth,
-    MAX_IMAGE_HEIGHT / naturalHeight,
+    maxWidth / naturalWidth,
+    maxHeight / naturalHeight,
   )
 
   return {

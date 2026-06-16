@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import {
   createCanvasImportedImageItem,
+  getCanvasImportedImageSize,
   getCanvasDataImageSourceFromDataTransfer,
   getCanvasSVGImageSourceFromDataTransfer,
 } from './CanvasImageImport'
@@ -46,6 +47,33 @@ describe('CanvasImageImport', () => {
       w: 320,
       x: 40,
       y: 90,
+    })
+  })
+
+  it('exposes imported image display size calculation with custom bounds', () => {
+    expect(getCanvasImportedImageSize({
+      naturalHeight: 1200,
+      naturalWidth: 1600,
+    })).toEqual({
+      h: 360,
+      w: 480,
+    })
+
+    expect(getCanvasImportedImageSize({}, {
+      fallbackSize: { h: 100, w: 140 },
+    })).toEqual({
+      h: 100,
+      w: 140,
+    })
+
+    expect(getCanvasImportedImageSize({
+      naturalHeight: 120,
+      naturalWidth: 160,
+    }, {
+      maxSize: { h: 90, w: 90 },
+    })).toEqual({
+      h: 68,
+      w: 90,
     })
   })
 
