@@ -6,6 +6,12 @@ import {
   getCanvasViewportWorldPoint,
 } from '../../../core'
 import { createCanvasTableComponentItem } from '../../../host'
+export {
+  getCanvasTableComponentSize,
+  type CanvasTableComponentSize,
+  type CanvasTableComponentSizeInput,
+  type CanvasTableComponentSizeOptions,
+} from '../../../host'
 import type { CanvasAppStageElement } from '../../rendering/stage/CanvasAppStageElement'
 import type { CommitCanvasItemsChange } from '../../workflow/CanvasWorkflowContract'
 
