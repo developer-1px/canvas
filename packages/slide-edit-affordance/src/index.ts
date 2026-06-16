@@ -597,6 +597,7 @@ export {
 } from './SlideEditSlideMetadataInspector'
 export {
   createSlideEditTransitionDescriptor,
+  getSlideEditTransitionCSSStyle,
   getSlideEditTransitionUpdateCommandEffect,
   normalizeSlideEditTransitionAdvancePolicy,
   normalizeSlideEditTransitionDurationMs,
@@ -607,6 +608,8 @@ export {
   type SlideEditBuiltInTransitionType,
   type SlideEditSlideTransitionDescriptor,
   type SlideEditTransitionAdvancePolicy,
+  type SlideEditTransitionCSSStyle,
+  type SlideEditTransitionCSSStyleInput,
   type SlideEditTransitionFieldId,
   type SlideEditTransitionHostCommandEffect,
   type SlideEditTransitionSlideId,

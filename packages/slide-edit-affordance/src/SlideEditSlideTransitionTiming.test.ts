@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   createSlideEditTransitionDescriptor,
+  getSlideEditTransitionCSSStyle,
   getSlideEditTransitionUpdateCommandEffect,
   normalizeSlideEditTransitionAdvancePolicy,
   normalizeSlideEditTransitionDurationMs,
@@ -58,6 +59,24 @@ describe('SlideEditSlideTransitionTiming', () => {
     })).toEqual({
       afterMs: 2500,
       onClick: true,
+    })
+  })
+
+  it('formats normalized transition timing values for CSS rendering', () => {
+    expect(getSlideEditTransitionCSSStyle({
+      durationMs: 0,
+    })).toEqual({
+      animationDuration: '1ms',
+    })
+
+    expect(getSlideEditTransitionCSSStyle({
+      durationMs: 1499.7,
+    })).toEqual({
+      animationDuration: '1500ms',
+    })
+
+    expect(getSlideEditTransitionCSSStyle(null)).toEqual({
+      animationDuration: '1ms',
     })
   })
 

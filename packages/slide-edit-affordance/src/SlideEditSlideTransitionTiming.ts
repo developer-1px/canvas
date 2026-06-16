@@ -34,6 +34,14 @@ export type SlideEditSlideTransitionDescriptor<
   type: TTransitionType
 }
 
+export type SlideEditTransitionCSSStyle = {
+  animationDuration: string
+}
+
+export type SlideEditTransitionCSSStyleInput = {
+  durationMs?: number | null
+}
+
 export type SlideEditTransitionFieldId =
   | 'advance'
   | 'durationMs'
@@ -194,6 +202,17 @@ export function normalizeSlideEditTransitionDurationMs(
     limits.maxDurationMs,
     SLIDE_EDIT_DEFAULT_TRANSITION.durationMs,
   )
+}
+
+export function getSlideEditTransitionCSSStyle(
+  transition: SlideEditTransitionCSSStyleInput | null | undefined,
+): SlideEditTransitionCSSStyle {
+  return {
+    animationDuration: `${Math.max(
+      1,
+      normalizeSlideEditTransitionDurationMs(transition?.durationMs),
+    )}ms`,
+  }
 }
 
 function normalizeOptionalSlideEditTransitionAfterMs(
