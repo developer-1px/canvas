@@ -80,16 +80,17 @@ export function getDomEditOverlayVisibility({
 
   return {
     alignGuides: context.showSelfLayout &&
-      (affordanceState.mode === 'idle' || alignActive) &&
+      alignActive &&
       affordanceState.mode !== 'measure' &&
       affordanceState.mode !== 'xray' &&
       !spacingActive &&
       !sizeActive,
     axisGuides: context.showSelfLayout &&
       (
-        affordanceState.mode === 'idle' ||
         affordanceState.mode === 'measure' ||
-        gapActive
+        gapActive ||
+        gapHovered ||
+        alignActive
       ) &&
       affordanceState.mode !== 'xray' &&
       !paddingActive &&

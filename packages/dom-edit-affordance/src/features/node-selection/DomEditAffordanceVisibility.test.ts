@@ -11,6 +11,8 @@ describe('DomEditAffordanceVisibility', () => {
 
     expect(visibility.selection).toBe(true)
     expect(visibility.parentReference).toBe(true)
+    expect(visibility.alignGuides).toBe(false)
+    expect(visibility.axisGuides).toBe(false)
     expect(visibility.directionControls).toBe(true)
     expect(visibility.flexChildControls).toBe(true)
     expect(visibility.flexChildMargin).toBe(true)
@@ -56,6 +58,8 @@ describe('DomEditAffordanceVisibility', () => {
     const xray = getVisibility({ mode: 'xray' })
 
     expect(measure.measurements).toBe(true)
+    expect(measure.axisGuides).toBe(true)
+    expect(measure.alignGuides).toBe(false)
     expect(measure.parentReference).toBe(false)
     expect(measure.geometry).toBe(false)
     expect(measure.directionControls).toBe(false)
@@ -112,6 +116,31 @@ describe('DomEditAffordanceVisibility', () => {
       { mode: 'idle' },
       { showSelfLayout: false },
     ).directionControls).toBe(false)
+  })
+
+  it('gates flex axis and alignment guides to active layout states', () => {
+    expect(getVisibility({ mode: 'idle' }).axisGuides).toBe(false)
+    expect(getVisibility({ mode: 'idle' }).alignGuides).toBe(false)
+    expect(getVisibility({
+      mode: 'hover-property',
+      property: 'gap',
+    }).axisGuides).toBe(true)
+    expect(getVisibility({
+      mode: 'drag-property',
+      property: 'gap',
+    }).axisGuides).toBe(true)
+    expect(getVisibility({
+      mode: 'hover-property',
+      property: 'align',
+    }).axisGuides).toBe(true)
+    expect(getVisibility({
+      mode: 'hover-property',
+      property: 'align',
+    }).alignGuides).toBe(true)
+    expect(getVisibility({
+      mode: 'hover-property',
+      property: 'padding',
+    }).axisGuides).toBe(false)
   })
 
   it('shows flex child controls only for flex parent participation', () => {

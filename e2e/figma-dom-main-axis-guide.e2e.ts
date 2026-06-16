@@ -6,16 +6,20 @@ test('shows flex main-axis flow guides inside content lanes', async ({
   await page.goto('/')
   await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
 
-  await selectLayer(page, 'Select layer Hero panel', 'workspaceHero')
+  await selectLayer(page, 'Select layer Hero actions', 'workspaceHeroActions')
+  await expect(axisGuide(page)).toHaveCount(0)
+  await page.locator('.figma-autolayout-gap').first().hover()
   await expect(axisGuide(page)).toHaveCount(1)
   await expect(axisGuide(page)).toHaveAttribute(
     'data-autolayout-axis-guide',
     'row',
   )
   await expect(axisGuide(page)).toHaveClass(/figma-autolayout-axis-guide--row/)
-  await expectHorizontalGuideInside(page, 'workspaceHero')
+  await expectHorizontalGuideInside(page, 'workspaceHeroActions')
 
   await selectLayer(page, 'Select layer Hero copy', 'workspaceHeroCopy')
+  await expect(axisGuide(page)).toHaveCount(0)
+  await page.locator('.figma-autolayout-gap').first().hover()
   await expect(axisGuide(page)).toHaveCount(1)
   await expect(axisGuide(page)).toHaveAttribute(
     'data-autolayout-axis-guide',
@@ -30,6 +34,19 @@ test('shows flex main-axis flow guides inside content lanes', async ({
 
   await selectLayer(page, 'Select layer Hero title', 'workspaceHeroTitle')
   await expect(axisGuide(page)).toHaveCount(0)
+})
+
+test('shows flex main-axis guides in measure state', async ({ page }) => {
+  await page.goto('/')
+  await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
+  await selectLayer(page, 'Select layer Hero panel', 'workspaceHero')
+  await page.getByRole('button', { name: 'Measure tool' }).click()
+
+  await expect(axisGuide(page)).toHaveCount(1)
+  await expect(axisGuide(page)).toHaveAttribute(
+    'data-autolayout-axis-guide',
+    'row',
+  )
 })
 
 test('keeps main-axis guides visible while gap affordances are active', async ({
@@ -64,8 +81,8 @@ async function expectHorizontalGuideInside(page: Page, nodeId: string) {
   const nodeBox = await getRequiredBox(domNode(page, nodeId))
   const guideBox = await getRequiredBox(axisGuide(page))
 
-  expect(guideBox.x).toBeGreaterThan(nodeBox.x)
-  expect(right(guideBox)).toBeLessThan(right(nodeBox))
+  expect(Math.abs(guideBox.x - nodeBox.x)).toBeLessThanOrEqual(1.5)
+  expect(Math.abs(right(guideBox) - right(nodeBox))).toBeLessThanOrEqual(1.5)
   expect(guideBox.width).toBeLessThan(nodeBox.width)
   expect(guideBox.height).toBeLessThanOrEqual(3)
 }
