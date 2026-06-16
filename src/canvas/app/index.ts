@@ -104,6 +104,16 @@ export {
   type CanvasRichClipboardWriteMode,
 } from './affordances/commands/CanvasRichClipboardIO'
 export {
+  createCanvasPastePositionKey,
+  getCanvasPasteOffset,
+  getCanvasPasteOffsetForBounds,
+  getCanvasPastePositionSession,
+  type CanvasPastePositionKeyInput,
+  type CanvasPastePositionKeySegment,
+  type CanvasPastePositionMemory,
+  type CanvasPastePositionSession,
+} from './affordances/commands/CanvasPastePosition'
+export {
   createCanvasDataTransferImportActionPlan,
   type CanvasDataTransferImportActionPlanInput,
   type CanvasDataTransferImportActionResolver,

@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest'
 import type { CanvasItem } from '../../../entities'
 import {
+  createCanvasPastePositionKey,
   getCanvasPasteOffset,
   getCanvasPasteOffsetForBounds,
   getCanvasPastePositionSession,
@@ -59,16 +60,40 @@ describe('getCanvasPasteOffset', () => {
   })
 
   test('continues paste index for the same paste position key', () => {
+    const key = createCanvasPastePositionKey({
+      segments: [
+        'copy',
+        'slide:1',
+        'slide:2',
+        ['a,b', 'c'],
+        ['object:1', ''],
+      ],
+    })
+
+    expect(key).toBe('["copy","slide:1","slide:2",["a,b","c"],["object:1",""]]')
     expect(
       getCanvasPastePositionSession({
-        key: 'copy:a:slide-1',
-        memory: { key: 'copy:a:slide-1', pasteIndex: 2 },
+        key,
+        memory: { key, pasteIndex: 2 },
       }),
     ).toEqual({
-      key: 'copy:a:slide-1',
-      nextMemory: { key: 'copy:a:slide-1', pasteIndex: 3 },
+      key,
+      nextMemory: { key, pasteIndex: 3 },
       pasteIndex: 2,
     })
+  })
+
+  test('keeps paste position key segments collision-resistant', () => {
+    expect(createCanvasPastePositionKey({
+      segments: ['copy:a', 'slide-1'],
+    })).not.toBe(createCanvasPastePositionKey({
+      segments: ['copy', 'a:slide-1'],
+    }))
+    expect(createCanvasPastePositionKey({
+      segments: ['copy', ['a,b', 'c']],
+    })).not.toBe(createCanvasPastePositionKey({
+      segments: ['copy', ['a', 'b,c']],
+    }))
   })
 
   test('starts paste index at zero for a new paste position key', () => {

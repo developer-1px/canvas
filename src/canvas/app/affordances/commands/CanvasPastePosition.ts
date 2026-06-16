@@ -20,6 +20,19 @@ export type CanvasPastePositionSession = {
   pasteIndex: number
 }
 
+export type CanvasPastePositionKeySegment = string | readonly string[]
+
+export type CanvasPastePositionKeyInput = {
+  segments: readonly CanvasPastePositionKeySegment[]
+}
+
+export function createCanvasPastePositionKey({
+  segments,
+}: CanvasPastePositionKeyInput) {
+  return JSON.stringify(segments.map((segment) =>
+    Array.isArray(segment) ? [...segment] : segment))
+}
+
 export function getCanvasPasteOffset({
   clipboard,
   pasteIndex,
