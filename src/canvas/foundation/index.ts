@@ -73,6 +73,7 @@ export {
   getCanvasItemGroupMemberIds,
   getCanvasItemGroupMemberIdsForGroup,
   getCanvasSelectableItemIds,
+  getCanvasSingleItemSelection,
   getCanvasSelectedItemGroupIds,
   getCanvasSelectedItemIds,
   getCanvasSelectedItems,
@@ -92,6 +93,7 @@ export {
   type CanvasSelectionRemoveIdsInput,
   type CanvasSelectionUngroupItemInput,
   type CanvasSelectionUngroupItemsInput,
+  type CanvasSingleItemSelectionInput,
 } from './CanvasSelectionItems'
 export {
   alignCanvasSelectionItems,

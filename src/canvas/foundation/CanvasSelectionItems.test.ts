@@ -8,6 +8,7 @@ import {
   getCanvasItemGroupMemberIds,
   getCanvasItemGroupMemberIdsForGroup,
   getCanvasSelectableItemIds,
+  getCanvasSingleItemSelection,
   getCanvasSelectedItemGroupIds,
   getCanvasSelectedItemIds,
   getCanvasSelectedItems,
@@ -80,6 +81,26 @@ describe('CanvasSelectionItems', () => {
       ids: new Set(['a', 'd']),
       selection: ['a', 'b', 'd'],
     })).toEqual(['b'])
+  })
+
+  it('selects or toggles a single item id', () => {
+    expect(getCanvasSingleItemSelection({
+      additive: false,
+      itemId: 'd',
+      selection: ['a', 'b'],
+    })).toEqual(['d'])
+
+    expect(getCanvasSingleItemSelection({
+      additive: true,
+      itemId: 'd',
+      selection: ['a', 'b'],
+    })).toEqual(['a', 'b', 'd'])
+
+    expect(getCanvasSingleItemSelection({
+      additive: true,
+      itemId: 'b',
+      selection: ['a', 'b', 'd', 'b'],
+    })).toEqual(['a', 'd'])
   })
 
   it('maps selected editable items and leaves unsupported items unchanged', () => {
