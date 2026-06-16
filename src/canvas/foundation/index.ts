@@ -69,13 +69,18 @@ export {
   cloneCanvasSelectionItems,
   deleteCanvasSelectionItems,
   getCanvasSelectableItemIds,
+  getCanvasSelectedItemGroupIds,
   getCanvasSelectedItemIds,
   mapCanvasSelectionItems,
+  ungroupCanvasSelectionItems,
   type CanvasSelectionCloneItemInput,
   type CanvasSelectionCloneItemsInput,
+  type CanvasSelectionItemGroupsInput,
   type CanvasSelectionItemsChangeInput,
   type CanvasSelectionItemsInput,
   type CanvasSelectionMapItemsInput,
+  type CanvasSelectionUngroupItemInput,
+  type CanvasSelectionUngroupItemsInput,
 } from './CanvasSelectionItems'
 export {
   alignCanvasSelectionItems,

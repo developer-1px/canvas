@@ -47,6 +47,36 @@ export type CanvasSelectionCloneItemsInput<
   getItemGroupId?: (item: TItem, index: number) => TGroupId | null | undefined
 }
 
+export type CanvasSelectionItemGroupsInput<
+  TItem,
+  TItemId extends string = string,
+  TGroupId extends string = string,
+> = CanvasSelectionItemsInput<TItem, TItemId> & {
+  getItemGroupId: (item: TItem, index: number) => TGroupId | null | undefined
+}
+
+export type CanvasSelectionUngroupItemInput<
+  TItem,
+  TItemId extends string = string,
+  TGroupId extends string = string,
+> = {
+  groupId: TGroupId
+  id: TItemId
+  index: number
+  item: TItem
+}
+
+export type CanvasSelectionUngroupItemsInput<
+  TItem,
+  TItemId extends string = string,
+  TGroupId extends string = string,
+> = CanvasSelectionItemsChangeInput<TItem, TItemId> & {
+  getItemGroupId: (item: TItem, index: number) => TGroupId | null | undefined
+  ungroupItem: (
+    input: CanvasSelectionUngroupItemInput<TItem, TItemId, TGroupId>,
+  ) => TItem
+}
+
 export function getCanvasSelectableItemIds<
   TItem,
   TItemId extends string = string,
@@ -166,6 +196,89 @@ export function cloneCanvasSelectionItems<
   })
 
   return clones
+}
+
+export function getCanvasSelectedItemGroupIds<
+  TItem,
+  TItemId extends string = string,
+  TGroupId extends string = string,
+>({
+  getItemGroupId,
+  getItemId,
+  isItemSelectable = () => true,
+  items,
+  selection,
+}: CanvasSelectionItemGroupsInput<TItem, TItemId, TGroupId>) {
+  const selected = new Set(selection)
+  const seen = new Set<TGroupId>()
+  const groupIds: TGroupId[] = []
+
+  items.forEach((item, index) => {
+    const id = getItemId(item, index)
+    const groupId = getItemGroupId(item, index) ?? undefined
+
+    if (
+      selected.has(id) &&
+      groupId !== undefined &&
+      isItemSelectable(item, index) &&
+      !seen.has(groupId)
+    ) {
+      seen.add(groupId)
+      groupIds.push(groupId)
+    }
+  })
+
+  return groupIds
+}
+
+export function ungroupCanvasSelectionItems<
+  TItem,
+  TItemId extends string = string,
+  TGroupId extends string = string,
+>({
+  getItemGroupId,
+  getItemId,
+  isItemSelectable,
+  items,
+  selection,
+  ungroupItem,
+}: CanvasSelectionUngroupItemsInput<TItem, TItemId, TGroupId>) {
+  const groupIds = getCanvasSelectedItemGroupIds({
+    getItemGroupId,
+    getItemId,
+    isItemSelectable,
+    items,
+    selection,
+  })
+
+  if (groupIds.length === 0) {
+    return { items, selection: [] }
+  }
+
+  const selectedGroupIds = new Set(groupIds)
+  const nextSelection: TItemId[] = []
+
+  return {
+    items: items.map((item, index) => {
+      const groupId = getItemGroupId(item, index) ?? undefined
+
+      if (groupId === undefined || !selectedGroupIds.has(groupId)) {
+        return item
+      }
+
+      const id = getItemId(item, index)
+
+      nextSelection.push(id)
+
+      return ungroupItem({
+        groupId,
+        id,
+        index,
+        item,
+      })
+    }),
+    selection: nextSelection,
+  }
 }
 
 function getCanvasSelectionCloneTargetGroupId<TGroupId extends string>({
