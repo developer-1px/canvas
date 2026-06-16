@@ -27,12 +27,21 @@ export type DomEditSmartGuidePointPosition =
 
 export type DomEditSmartGuideSpacingKind = 'equal' | 'nearest'
 
-export type DomEditSmartGuideSpacingSource = 'visual-gap'
+export type DomEditSmartGuideSpacingSource =
+  | 'css-gap'
+  | 'margin'
+  | 'visual-gap'
 
 export type DomEditSmartGuideCandidate = {
   id?: string
+  margin?: number
   rect: DomEditOverlayRect
   source: DomEditSmartGuideSource
+}
+
+export type DomEditSmartGuideSpacingContext = {
+  parentGap?: number | null
+  selectedMargin?: number
 }
 
 export type DomEditSmartGuide = {
@@ -64,6 +73,7 @@ type DomEditSmartGuidePoint = {
 
 type DomEditSmartGuideRectEntry = {
   id?: string
+  margin: number
   rect: DomEditOverlayRect
   role: 'reference' | 'selected'
   source?: DomEditSmartGuideSource
@@ -85,6 +95,7 @@ export function getDomEditSmartGuides({
   parent,
   selected,
   siblings = [],
+  spacingContext = {},
   spacingTolerance = DEFAULT_DOM_EDIT_SMART_GUIDE_THRESHOLD,
   threshold = DEFAULT_DOM_EDIT_SMART_GUIDE_THRESHOLD,
 }: {
@@ -92,6 +103,7 @@ export function getDomEditSmartGuides({
   parent?: DomEditOverlayRect | null
   selected: DomEditOverlayRect
   siblings?: readonly DomEditSmartGuideCandidate[]
+  spacingContext?: DomEditSmartGuideSpacingContext
   spacingTolerance?: number
   threshold?: number
 }): DomEditSmartGuide[] {
@@ -110,11 +122,16 @@ export function getDomEditSmartGuides({
 
   return dedupeDomEditSmartGuides([
     ...getClosestDomEditAlignmentGuidesByAxis(alignmentGuides),
-    ...getDomEditNearestDistanceGuides({ selected, siblings }),
+    ...getDomEditNearestDistanceGuides({
+      selected,
+      siblings,
+      spacingContext,
+    }),
     ...getDomEditEqualSpacingGuides({
       isDragging,
       selected,
       siblings,
+      spacingContext,
       spacingTolerance,
     }),
   ])
@@ -185,11 +202,16 @@ function getDomEditCandidateAlignmentGuides({
 function getDomEditNearestDistanceGuides({
   selected,
   siblings,
+  spacingContext,
 }: {
   selected: DomEditOverlayRect
   siblings: readonly DomEditSmartGuideCandidate[]
+  spacingContext: DomEditSmartGuideSpacingContext
 }): DomEditSmartGuide[] {
-  const selectedEntry = getDomEditSelectedRectEntry(selected)
+  const selectedEntry = getDomEditSelectedRectEntry(
+    selected,
+    spacingContext.selectedMargin,
+  )
   const closestGapByAxis = new Map<DomEditSmartGuideAxis, DomEditSmartGuideGap>()
 
   for (const sibling of siblings) {
@@ -214,6 +236,7 @@ function getDomEditNearestDistanceGuides({
     createDomEditSpacingGuide({
       family: 'distance',
       gap,
+      spacingContext,
       spacingKind: 'nearest',
     }))
 }
@@ -222,11 +245,13 @@ function getDomEditEqualSpacingGuides({
   isDragging,
   selected,
   siblings,
+  spacingContext,
   spacingTolerance,
 }: {
   isDragging: boolean
   selected: DomEditOverlayRect
   siblings: readonly DomEditSmartGuideCandidate[]
+  spacingContext: DomEditSmartGuideSpacingContext
   spacingTolerance: number
 }): DomEditSmartGuide[] {
   if (siblings.length < 2) {
@@ -234,7 +259,7 @@ function getDomEditEqualSpacingGuides({
   }
 
   const entries = [
-    getDomEditSelectedRectEntry(selected),
+    getDomEditSelectedRectEntry(selected, spacingContext.selectedMargin),
     ...siblings.map(getDomEditReferenceRectEntry),
   ]
 
@@ -256,6 +281,7 @@ function getDomEditEqualSpacingGuides({
           emphasis: isDragging ? 'snap' : 'normal',
           family: 'equal-spacing',
           gap,
+          spacingContext,
           spacingKind: 'equal',
         }))
     })
@@ -324,8 +350,10 @@ function getDomEditSmartGuidePoints(
 
 function getDomEditSelectedRectEntry(
   rect: DomEditOverlayRect,
+  margin = 0,
 ): DomEditSmartGuideRectEntry {
   return {
+    margin,
     rect,
     role: 'selected',
   }
@@ -336,6 +364,7 @@ function getDomEditReferenceRectEntry(
 ): DomEditSmartGuideRectEntry {
   return {
     id: candidate.id,
+    margin: candidate.margin ?? 0,
     rect: candidate.rect,
     role: 'reference',
     source: candidate.source,
@@ -419,12 +448,14 @@ function createDomEditSpacingGuide({
   emphasis = 'normal',
   family,
   gap,
+  spacingContext,
   spacingKind,
 }: {
   distance?: number
   emphasis?: DomEditSmartGuideEmphasis
   family: Extract<DomEditSmartGuideFamily, 'distance' | 'equal-spacing'>
   gap: DomEditSmartGuideGap
+  spacingContext: DomEditSmartGuideSpacingContext
   spacingKind: DomEditSmartGuideSpacingKind
 }): DomEditSmartGuide {
   const sourceEntry = getDomEditGapSourceEntry(gap)
@@ -443,8 +474,42 @@ function createDomEditSpacingGuide({
     source: sourceEntry.source ?? 'sibling',
     ...(sourceId ? { sourceId } : {}),
     spacingKind,
-    spacingSource: 'visual-gap',
+    spacingSource: getDomEditSpacingSource(gap, spacingContext),
   }
+}
+
+function getDomEditSpacingSource(
+  gap: DomEditSmartGuideGap,
+  spacingContext: DomEditSmartGuideSpacingContext,
+): DomEditSmartGuideSpacingSource {
+  const parentGap = spacingContext.parentGap ?? 0
+  const marginContribution = gap.before.margin + gap.after.margin
+
+  if (
+    marginContribution > 0 &&
+    isCloseDomEditSmartGuideSpacingValue(
+      gap.value,
+      parentGap + marginContribution,
+    )
+  ) {
+    return 'margin'
+  }
+
+  if (
+    parentGap > 0 &&
+    isCloseDomEditSmartGuideSpacingValue(gap.value, parentGap)
+  ) {
+    return 'css-gap'
+  }
+
+  return 'visual-gap'
+}
+
+function isCloseDomEditSmartGuideSpacingValue(
+  actual: number,
+  expected: number,
+) {
+  return Math.abs(actual - expected) <= DEFAULT_DOM_EDIT_SMART_GUIDE_THRESHOLD
 }
 
 function getDomEditGapSourceEntry(
