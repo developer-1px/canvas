@@ -26,6 +26,7 @@ describe('slide-edit-affordance boundary', () => {
       'object-stroke-line-style',
       'layout-theme',
       'slide-metadata',
+      'style-clipboard',
       'slide-transition',
       'text-font-family',
       'text-frame-inset',
