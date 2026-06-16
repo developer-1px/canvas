@@ -609,6 +609,16 @@ function DomEditSmartGuideLine({
           : '',
         guide.sourceId ? 'figma-smart-guide--with-source' : '',
       ].filter(Boolean).join(' ')}
+      data-smart-guide-axis={guide.axis}
+      data-smart-guide-emphasis={guide.emphasis}
+      data-smart-guide-family={guide.family}
+      data-smart-guide-point={guide.pointKind}
+      data-smart-guide-reference={guide.referencePosition}
+      data-smart-guide-source={guide.source}
+      data-smart-guide-source-id={guide.sourceId}
+      data-smart-guide-spacing-kind={guide.spacingKind}
+      data-smart-guide-spacing-source={guide.spacingSource}
+      data-smart-guide-target={guide.targetPosition}
       style={style}
     />
   )
