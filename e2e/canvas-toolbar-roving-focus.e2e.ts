@@ -23,13 +23,6 @@ test('keeps engine demo toolbars on one tab stop with arrow navigation', async (
     page,
     page.getByRole('toolbar', { name: 'Object actions' }),
   )
-
-  await page.locator('.engine-demo-workspace').focus()
-  await page.keyboard.press('Shift+F10')
-  await expectToolbarRovingFocus(
-    page,
-    page.getByRole('toolbar', { name: 'Canvas context commands' }),
-  )
 })
 
 test('keeps figma clone toolbars on one tab stop with arrow navigation', async ({

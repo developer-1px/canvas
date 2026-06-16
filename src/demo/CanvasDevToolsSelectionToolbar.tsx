@@ -41,16 +41,20 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 import {
+  useId,
+  useRef,
   useState,
   type CSSProperties,
 } from 'react'
 import {
+  CANVAS_MENU_ITEM_PROPS,
   CANVAS_TOOLBAR_ITEM_PROPS,
   CanvasHost,
   type CanvasAppProps,
   type CanvasItem,
   type CanvasShapeLikeItem,
   type CanvasShapeType,
+  useCanvasMenuRovingFocus,
   useCanvasToolbarRovingFocus,
 } from '../canvas'
 
@@ -344,6 +348,7 @@ export function EngineSelectionToolbar({
   onToggleWidgetPlay: () => void
 }) {
   const [openMenu, setOpenMenu] = useState<string | null>(null)
+  const controlId = useId()
   const toolbarRovingFocus = useCanvasToolbarRovingFocus<HTMLDivElement>()
   const {
     anchor,
@@ -384,6 +389,7 @@ export function EngineSelectionToolbar({
       {descriptors.map((descriptor) => (
         <EngineSelectionToolbarSlot
           context={context}
+          controlId={controlId}
           descriptor={descriptor}
           key={descriptor.id}
           open={openMenu === descriptor.id}
@@ -507,15 +513,19 @@ function isEngineSelectionSwatchStyleControl(
 
 function EngineSelectionToolbarSlot({
   context,
+  controlId,
   descriptor,
   onOpenChange,
   open,
 }: {
   context: EngineSelectionToolbarContext
+  controlId: string
   descriptor: EngineSelectionToolbarDescriptor
   onOpenChange: (id: string | null) => void
   open: boolean
 }) {
+  const triggerRef = useRef<HTMLButtonElement>(null)
+
   if (descriptor.kind === 'button') {
     return (
       <div className="engine-selection-toolbar-item">
@@ -535,11 +545,20 @@ function EngineSelectionToolbarSlot({
   const disabled =
     isEngineSelectionToolbarDisabled(descriptor, context) ||
     menuGroups.length === 0
+  const menuId = `${controlId}-${descriptor.id}-menu`
+  const triggerId = `${controlId}-${descriptor.id}-trigger`
+  const closeMenu = () => {
+    onOpenChange(null)
+    triggerRef.current?.focus()
+  }
 
   return (
     <div className="engine-selection-toolbar-item">
       <button
         {...CANVAS_TOOLBAR_ITEM_PROPS}
+        ref={triggerRef}
+        id={triggerId}
+        aria-controls={menuId}
         aria-expanded={open}
         aria-haspopup="menu"
         aria-label={getEngineSelectionToolbarLabel(descriptor, context)}
@@ -567,8 +586,10 @@ function EngineSelectionToolbarSlot({
         <EngineSelectionMenu
           context={context}
           groups={menuGroups}
+          id={menuId}
           label={getEngineSelectionToolbarLabel(descriptor, context)}
-          onClose={() => onOpenChange(null)}
+          labelledBy={triggerId}
+          onClose={closeMenu}
         />
       ) : null}
     </div>
@@ -611,46 +632,70 @@ function EngineSelectionToolbarButton({
 function EngineSelectionMenu({
   context,
   groups,
+  id,
   label,
+  labelledBy,
   onClose,
 }: {
   context: EngineSelectionToolbarContext
   groups: readonly EngineSelectionToolbarMenuGroup[]
+  id: string
   label: string
+  labelledBy: string
   onClose: () => void
 }) {
+  const menuRovingFocus = useCanvasMenuRovingFocus<HTMLDivElement>({
+    onClose,
+  })
+
   return (
-    <div className="engine-selection-menu" role="group" aria-label={label}>
+    <div
+      {...menuRovingFocus}
+      className="engine-selection-menu"
+      id={id}
+      role="menu"
+      aria-label={label}
+      aria-labelledby={labelledBy}
+    >
       {groups.map((group) => (
         <div
           className="engine-selection-menu-group"
           data-layout={group.layout ?? 'row'}
           key={group.id}
+          role="group"
         >
-          {group.items.map((item) => (
-            <button
-              aria-label={getEngineSelectionToolbarLabel(item, context)}
-              aria-pressed={getEngineSelectionToolbarPressed(item, context)}
-              data-has-swatch={hasEngineSelectionSwatch(item, context)}
-              data-tone={item.tone}
-              disabled={isEngineSelectionToolbarDisabled(item, context)}
-              key={item.id}
-              onClick={() => {
-                runEngineSelectionToolbarAction(item, context)
-                onClose()
-              }}
-              title={item.title ?? getEngineSelectionToolbarLabel(
-                item,
-                context,
-              )}
-              type="button"
-            >
-              <EngineSelectionToolbarGlyph
-                context={context}
-                descriptor={item}
-              />
-            </button>
-          ))}
+          {group.items.map((item) => {
+            const pressed = getEngineSelectionToolbarPressed(item, context)
+
+            return (
+              <button
+                {...CANVAS_MENU_ITEM_PROPS}
+                aria-label={getEngineSelectionToolbarLabel(item, context)}
+                aria-checked={pressed}
+                data-has-swatch={hasEngineSelectionSwatch(item, context)}
+                data-tone={item.tone}
+                disabled={isEngineSelectionToolbarDisabled(item, context)}
+                key={item.id}
+                role={pressed === undefined
+                  ? 'menuitem'
+                  : 'menuitemcheckbox'}
+                onClick={() => {
+                  runEngineSelectionToolbarAction(item, context)
+                  onClose()
+                }}
+                title={item.title ?? getEngineSelectionToolbarLabel(
+                  item,
+                  context,
+                )}
+                type="button"
+              >
+                <EngineSelectionToolbarGlyph
+                  context={context}
+                  descriptor={item}
+                />
+              </button>
+            )
+          })}
         </div>
       ))}
     </div>

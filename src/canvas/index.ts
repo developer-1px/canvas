@@ -1,9 +1,11 @@
 export {
+  CANVAS_MENU_ITEM_PROPS,
   CANVAS_TOOLBAR_ITEM_PROPS,
   CanvasApp,
   CanvasAppViewportOverlayLayer,
   CanvasContextCommandMenu,
   useCanvasDevToolsAppModel,
+  useCanvasMenuRovingFocus,
   useCanvasToolbarRovingFocus,
   type CanvasAppAssemblySource,
   type CanvasAppViewportOverlayLayerProps,

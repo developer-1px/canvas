@@ -6,7 +6,7 @@ import {
   type CanvasAffordanceConfig,
   type CanvasCommandAvailability,
 } from '../../../../engine'
-import { CanvasCommandSurface } from './CanvasCommandSurface'
+import { CanvasCommandMenuSurface } from './CanvasCommandMenuSurface'
 import {
   getCanvasCommandSurfaceGroups,
   type CanvasToolbarCustomCommand,
@@ -77,7 +77,7 @@ export function CanvasContextCommandMenu({
   })
 
   return (
-    <CanvasCommandSurface
+    <CanvasCommandMenuSurface
       ariaLabel="Canvas context commands"
       className="context-command-menu"
       context={{
@@ -86,7 +86,7 @@ export function CanvasContextCommandMenu({
         onToolChange: noopToolChange,
       }}
       groups={groups}
-      onClick={onClose}
+      onClose={onClose}
       style={{
         '--canvas-context-menu-x': `${menu.x}px`,
         '--canvas-context-menu-y': `${menu.y}px`,

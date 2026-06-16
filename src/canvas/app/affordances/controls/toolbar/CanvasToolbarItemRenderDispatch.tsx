@@ -46,6 +46,7 @@ import {
 } from '../../../../ui/icons/CanvasIcons'
 import {
   CommandButton,
+  type CanvasToolbarButtonSurface,
   CustomCommandButton,
   CustomToolButton,
   ToolButton,
@@ -58,6 +59,7 @@ export type CanvasToolbarItemRenderContext = {
   commandHandlers: CanvasToolbarCommandHandlers
   onCustomCommand: (commandId: string) => void
   onToolChange: (tool: Tool) => void
+  surface?: CanvasToolbarButtonSurface
 }
 
 type CanvasToolbarItemKind = CanvasToolbarItem['kind']
@@ -155,6 +157,7 @@ function renderCanvasToolbarBuiltinToolItem({
       key={item.tool}
       active={item.active}
       affordance={CANVAS_TOOL_AFFORDANCES[item.tool]}
+      surface={context.surface}
       onClick={() => context.onToolChange(item.tool)}
     >
       <Icon />
@@ -175,6 +178,7 @@ function renderCanvasToolbarCustomToolItem({
       active={item.active}
       ariaLabel={item.ariaLabel}
       label={item.label}
+      surface={context.surface}
       title={item.title}
       onClick={() => context.onToolChange(item.tool)}
     />
@@ -194,6 +198,7 @@ function renderCanvasToolbarCustomCommandItem({
       ariaLabel={item.ariaLabel}
       disabled={item.disabled}
       label={item.label}
+      surface={context.surface}
       title={item.title}
       onClick={() => context.onCustomCommand(item.id)}
     />
@@ -214,6 +219,7 @@ function renderCanvasToolbarCommandItem({
       key={item.command}
       command={item.command}
       disabled={item.disabled}
+      surface={context.surface}
       onClick={() =>
         runCanvasToolbarCommandAction({
           action: item.action,

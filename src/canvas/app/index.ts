@@ -11,6 +11,10 @@ export {
   useCanvasToolbarRovingFocus,
 } from './affordances/controls/toolbar/CanvasToolbarRovingFocus'
 export {
+  CANVAS_MENU_ITEM_PROPS,
+  useCanvasMenuRovingFocus,
+} from './affordances/controls/toolbar/CanvasMenuRovingFocus'
+export {
   CanvasAppViewportOverlayLayer,
   type CanvasAppViewportOverlayLayerProps,
 } from './rendering/CanvasAppViewportOverlayLayer'
