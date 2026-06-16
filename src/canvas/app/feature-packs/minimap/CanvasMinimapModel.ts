@@ -32,6 +32,7 @@ export type CanvasMinimapReadModel = {
   displayBounds: Bounds
   isEmpty: boolean
   itemRects: readonly CanvasMinimapItemRect[]
+  scale: number
   size: CanvasMinimapSize
   viewportRect: Bounds
   viewportWorldBounds: Bounds
@@ -72,6 +73,7 @@ export function getCanvasMinimapReadModel({
     size,
     worldBounds,
   })
+  const scale = getCanvasMinimapScale(worldBounds, displayBounds)
 
   return {
     contentBounds,
@@ -85,6 +87,7 @@ export function getCanvasMinimapReadModel({
         worldBounds,
       }),
     })),
+    scale,
     size,
     viewportRect: worldBoundsToMinimapRect({
       displayBounds,
@@ -119,11 +122,9 @@ export function getCanvasMinimapWorldPoint({
   model: CanvasMinimapReadModel
   point: Point
 }): Point {
-  const scale = getCanvasMinimapScale(model.worldBounds, model.displayBounds)
-
   return {
-    x: model.worldBounds.x + (point.x - model.displayBounds.x) / scale,
-    y: model.worldBounds.y + (point.y - model.displayBounds.y) / scale,
+    x: model.worldBounds.x + (point.x - model.displayBounds.x) / model.scale,
+    y: model.worldBounds.y + (point.y - model.displayBounds.y) / model.scale,
   }
 }
 

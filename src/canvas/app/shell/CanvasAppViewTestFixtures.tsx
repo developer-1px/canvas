@@ -117,6 +117,7 @@ export function createViewProps(
           id: 'rect-1',
           rect: { h: 24, w: 40, x: 24, y: 20 },
         }],
+        scale: 160 / 600,
         size: { h: 112, w: 176 },
         viewportRect: { h: 60, w: 90, x: 20, y: 16 },
         viewportWorldBounds: { h: 300, w: 450, x: 0, y: 0 },

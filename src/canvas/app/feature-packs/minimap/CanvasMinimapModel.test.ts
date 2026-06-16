@@ -33,6 +33,12 @@ describe('CanvasMinimapModel', () => {
       y: 50,
     })
     expect(model.itemRects).toHaveLength(2)
+    expect(model.scale).toBe(
+      Math.min(
+        model.displayBounds.w / model.worldBounds.w,
+        model.displayBounds.h / model.worldBounds.h,
+      ),
+    )
     expect(model.viewportRect.w).toBeGreaterThan(0)
     expect(model.viewportRect.h).toBeGreaterThan(0)
   })
