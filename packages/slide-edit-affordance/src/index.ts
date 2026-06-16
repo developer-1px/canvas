@@ -212,6 +212,38 @@ export {
   type SlideEditObjectFillOpacityValue,
 } from './SlideEditObjectFillOpacity'
 export {
+  createSlideEditObjectImageCropDescriptor,
+  getSlideEditObjectImageCropCommandEffect,
+  getSlideEditObjectImageCropMetadata,
+  normalizeSlideEditObjectImageCrop,
+  normalizeSlideEditObjectImageCropFit,
+  normalizeSlideEditObjectImageCropUpdateCommand,
+  normalizeSlideEditObjectImageCropValue,
+  SLIDE_EDIT_OBJECT_IMAGE_CROP_DATA_ATTRIBUTE,
+  SLIDE_EDIT_OBJECT_IMAGE_CROP_DEFAULT,
+  SLIDE_EDIT_OBJECT_IMAGE_CROP_DEFAULT_FIT,
+  SLIDE_EDIT_OBJECT_IMAGE_CROP_FIELDS,
+  SLIDE_EDIT_OBJECT_IMAGE_CROP_FIT_OPTIONS,
+  SLIDE_EDIT_OBJECT_IMAGE_CROP_LIMITS,
+  toSlideEditObjectImageCropAttributeValue,
+  type SlideEditObjectImageCropDescriptor,
+  type SlideEditObjectImageCropFieldDescriptor,
+  type SlideEditObjectImageCropFieldId,
+  type SlideEditObjectImageCropFieldsDescriptor,
+  type SlideEditObjectImageCropFit,
+  type SlideEditObjectImageCropFitFieldDescriptor,
+  type SlideEditObjectImageCropFitOption,
+  type SlideEditObjectImageCropHostCommandEffect,
+  type SlideEditObjectImageCropMetadata,
+  type SlideEditObjectImageCropNumericLimits,
+  type SlideEditObjectImageCropObjectId,
+  type SlideEditObjectImageCropPosition,
+  type SlideEditObjectImageCropPositionFieldDescriptor,
+  type SlideEditObjectImageCropSlideId,
+  type SlideEditObjectImageCropUnsupportedReason,
+  type SlideEditObjectImageCropUpdateCommand,
+} from './SlideEditObjectImageCrop'
+export {
   createSlideEditObjectCornerRadiusDescriptor,
   getSlideEditObjectCornerRadiusCommandEffect,
   getSlideEditObjectCornerRadiusMetadata,
@@ -619,6 +651,7 @@ export type SlideEditAdapterSlotId =
   | 'object-corner-radius'
   | 'object-fill-opacity'
   | 'object-hyperlink'
+  | 'object-image-crop'
   | 'object-opacity'
   | 'object-shadow'
   | 'object-stroke-line-style'
@@ -691,6 +724,11 @@ export const SLIDE_EDIT_ADAPTER_SLOTS = Object.freeze([
     id: 'object-hyperlink',
     owner: 'host',
     purpose: 'Provide selected object hyperlink/action values for inspector, stage, thumbnail, and export.',
+  },
+  {
+    id: 'object-image-crop',
+    owner: 'host',
+    purpose: 'Provide selected image fit and crop position values for inspector, stage, thumbnail, and export.',
   },
   {
     id: 'object-opacity',
@@ -804,6 +842,7 @@ export type SlideEditOwnedContractId =
   | 'object-corner-radius-affordance'
   | 'object-fill-opacity-affordance'
   | 'object-hyperlink-affordance'
+  | 'object-image-crop-affordance'
   | 'object-layer-pane'
   | 'object-opacity-affordance'
   | 'object-shadow-affordance'
@@ -889,6 +928,11 @@ export const SLIDE_EDIT_OWNED_CONTRACTS = Object.freeze([
     id: 'object-hyperlink-affordance',
     owner: 'slide-edit-affordance',
     scope: 'Object hyperlink/action fields, metadata attribute, URL policy, and update command effects.',
+  },
+  {
+    id: 'object-image-crop-affordance',
+    owner: 'slide-edit-affordance',
+    scope: 'Image fit mode, crop position fields, metadata attribute, and update command effects.',
   },
   {
     id: 'object-opacity-affordance',

@@ -22,6 +22,7 @@ describe('slide-edit-affordance boundary', () => {
       'object-corner-radius',
       'object-fill-opacity',
       'object-hyperlink',
+      'object-image-crop',
       'object-opacity',
       'object-shadow',
       'object-stroke-line-style',
