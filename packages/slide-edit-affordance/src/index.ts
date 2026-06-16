@@ -411,6 +411,29 @@ export {
   type SlideEditThemeSpacingTokenId,
 } from './SlideEditLayoutTheme'
 export {
+  createSlideEditColorSwatchPaletteDescriptor,
+  getSlideEditColorSwatchCommandEffect,
+  getSlideEditColorSwatchId,
+  normalizeSlideEditColorSwatchValue,
+  SLIDE_EDIT_COLOR_SWATCH_CHANNELS,
+  SLIDE_EDIT_COLOR_SWATCH_FIELD,
+  type SlideEditColorSwatchApplyCommand,
+  type SlideEditColorSwatchBuiltInChannelId,
+  type SlideEditColorSwatchChannelDescriptor,
+  type SlideEditColorSwatchChannelId,
+  type SlideEditColorSwatchDisabledReason,
+  type SlideEditColorSwatchFieldDescriptor,
+  type SlideEditColorSwatchHostCommandEffect,
+  type SlideEditColorSwatchItem,
+  type SlideEditColorSwatchObjectId,
+  type SlideEditColorSwatchPaletteDescriptor,
+  type SlideEditColorSwatchSection,
+  type SlideEditColorSwatchSelection,
+  type SlideEditColorSwatchSlideId,
+  type SlideEditColorSwatchSource,
+  type SlideEditColorSwatchState,
+} from './SlideEditColorSwatchPalette'
+export {
   createSlideEditClipboardAdapterExample,
   createSlideEditClipboardPasteCommandEffect,
   createSlideEditClipboardPastePlan,
@@ -577,6 +600,7 @@ export type SlideEditAdapter<
 
 export type SlideEditAdapterSlotId =
   | 'command-effect'
+  | 'color-swatch-palette'
   | 'object-accessibility'
   | 'object-animation'
   | 'object-corner-radius'
@@ -624,6 +648,11 @@ export const SLIDE_EDIT_ADAPTER_SLOTS = Object.freeze([
     id: 'command-effect',
     owner: 'host',
     purpose: 'Apply command effects through the host document transaction.',
+  },
+  {
+    id: 'color-swatch-palette',
+    owner: 'host',
+    purpose: 'Provide theme and recent color swatches for object style channels.',
   },
   {
     id: 'object-accessibility',
@@ -756,6 +785,7 @@ export const SLIDE_EDIT_REUSED_CANVAS_CONTRACTS = Object.freeze([
 export type SlideEditOwnedContractId =
   | 'layout-theme-affordance'
   | 'object-inspector'
+  | 'color-swatch-palette-affordance'
   | 'object-accessibility-affordance'
   | 'object-animation-build-order'
   | 'object-corner-radius-affordance'
@@ -806,6 +836,11 @@ export const SLIDE_EDIT_OWNED_CONTRACTS = Object.freeze([
     id: 'slide-rail-interaction',
     owner: 'slide-edit-affordance',
     scope: 'Slide order, active slide, thumbnail hit target, and rail command intent descriptors.',
+  },
+  {
+    id: 'color-swatch-palette-affordance',
+    owner: 'slide-edit-affordance',
+    scope: 'Theme and recent color swatch descriptors for fill, stroke, text, and line channels.',
   },
   {
     id: 'placeholder-visibility-affordance',

@@ -15,6 +15,7 @@
 | Slide object bounds | `slide-edit-affordance` | selected object bounds through a host adapter |
 | Slide command effects | `slide-edit-affordance` | product-neutral command envelopes routed to the host |
 | Slide rail interaction | `slide-edit-affordance` | active slide, slide order, thumbnail hit target, rail command intent |
+| Color swatch palette | `slide-edit-affordance` | theme/recent color swatches, channel state, and color apply command effect |
 | Placeholder visibility affordance | `slide-edit-affordance` | slide placeholder structure and object hide/show read model |
 | Object layer pane | `slide-edit-affordance` | object row descriptor, selection pane command intent, ARIA tree contract |
 | Object accessibility | `slide-edit-affordance` | object alt text, decorative state, metadata attribute, and host command effect |
@@ -45,6 +46,7 @@
 | `object-bounds` | Object bounds for a slide/object reference |
 | `selection` | Active page id and selected object ids |
 | `command-effect` | Transaction boundary for command effects |
+| `color-swatch-palette` | Theme and recent color swatches for object style channels |
 | `object-accessibility` | Selected object alt text and decorative state for inspector, stage, thumbnail, and export |
 | `object-animation` | Object animation and build order values scoped to a slide |
 | `object-corner-radius` | Selected object corner radius values for rounded shape affordances |
@@ -315,6 +317,19 @@
 | Placeholder mapping | placeholder id, role, title, default bounds, locked state, visible state, and optional default style token refs |
 | Style inheritance | theme default style < master default style < layout default style < placeholder default style |
 | Apply layout | host command effect carries whether existing objects are preserved or mapped to placeholders |
+
+## Color Swatch Palette Contract
+
+| Area | Contract |
+| --- | --- |
+| Channel | built-in channel ids include `fill`, `stroke`, `text`, and `line-stroke` |
+| Theme swatches | theme color tokens become swatch items with token id, role, label, and color value |
+| Recent swatches | recent color strings become deduplicated swatch items without requiring raw color input |
+| State | descriptor exposes selected swatch id, mixed state, disabled state, and disabled reason |
+| Field | `colorSwatch` palette descriptor routes through `apply-color-swatch` |
+| Updates | selected object ids, channel id, and swatch source/value become host command effects |
+| Scope | applies color choices to object style channels; raw color picker UI remains host-owned |
+| Runtime | host maps theme token ids and recent color values to its fill, stroke, text, or line model |
 
 ## Layout Placeholder vs Placeholder Visibility
 
