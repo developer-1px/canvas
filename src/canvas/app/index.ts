@@ -59,6 +59,27 @@ export {
   type CanvasTabsTabInput,
 } from './affordances/controls/tabs/CanvasTabsRovingFocus'
 export {
+  CANVAS_RICH_CLIPBOARD_DEFAULT_FALLBACK_HTML,
+  CANVAS_RICH_CLIPBOARD_JSON_SCRIPT_ATTRIBUTE,
+  CANVAS_RICH_CLIPBOARD_ROOT_ATTRIBUTE,
+  createCanvasRichClipboardHTML,
+  getCanvasRichClipboardJSONFromHTML,
+  parseCanvasRichClipboardPayload,
+  readCanvasRichClipboardFromDataTransfer,
+  stringifyCanvasRichClipboardPayload,
+  writeCanvasRichClipboardPayload,
+  type CanvasRichClipboardClipboard,
+  type CanvasRichClipboardDataTransfer,
+  type CanvasRichClipboardDataTransferInput,
+  type CanvasRichClipboardHTMLInput,
+  type CanvasRichClipboardItemConstructor,
+  type CanvasRichClipboardParsePayload,
+  type CanvasRichClipboardReadFormat,
+  type CanvasRichClipboardReadResult,
+  type CanvasRichClipboardWriteInput,
+  type CanvasRichClipboardWriteMode,
+} from './affordances/commands/CanvasRichClipboardIO'
+export {
   CanvasAppViewportOverlayLayer,
   type CanvasAppViewportOverlayLayerProps,
 } from './rendering/CanvasAppViewportOverlayLayer'
