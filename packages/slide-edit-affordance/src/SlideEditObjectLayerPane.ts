@@ -442,9 +442,8 @@ export function getSlideEditLayerPaneDropIndicator<
     targetIndex < 0 ||
     draggedObjectId === targetObjectId ||
     !draggedRow?.isReorderable ||
-    draggedRow.isGroup ||
     !targetRow?.isReorderable ||
-    targetRow.isGroup ||
+    isSlideEditLayerPaneDescendantRow(descriptor, targetRow, draggedObjectId) ||
     rowHeight <= 0
   ) {
     return toSlideEditLayerPaneEmptyDropIndicator(draggedObjectId)
@@ -785,6 +784,37 @@ function findSlideEditLayerPaneRow<
   objectId: TObjectId,
 ) {
   return descriptor.rows.find((row) => row.objectId === objectId) ?? null
+}
+
+function isSlideEditLayerPaneDescendantRow<
+  TSlideId extends SlideEditLayerPaneSlideId,
+  TObjectId extends SlideEditLayerPaneObjectId,
+  TGroupId extends SlideEditLayerPaneGroupId,
+>(
+  descriptor: SlideEditLayerPaneDescriptor<TSlideId, TObjectId, TGroupId>,
+  row: SlideEditLayerPaneRowDescriptor<TSlideId, TObjectId, TGroupId>,
+  ancestorObjectId: TObjectId,
+) {
+  let parentObjectId = row.parentObjectId ?? null
+  const visited = new Set<TObjectId>()
+
+  while (parentObjectId) {
+    if (parentObjectId === ancestorObjectId) {
+      return true
+    }
+
+    if (visited.has(parentObjectId)) {
+      return false
+    }
+
+    visited.add(parentObjectId)
+    parentObjectId = findSlideEditLayerPaneRow(
+      descriptor,
+      parentObjectId,
+    )?.parentObjectId ?? null
+  }
+
+  return false
 }
 
 function toggleSlideEditLayerPaneSelection<TObjectId extends string>(

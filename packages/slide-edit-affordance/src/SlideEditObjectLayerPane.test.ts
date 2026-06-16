@@ -405,10 +405,19 @@ describe('SlideEditObjectLayerPane', () => {
         },
         {
           displayName: 'Group',
+          isExpanded: true,
           isGroup: true,
           kindLabel: 'Group',
           objectId: 'group',
           order: 4,
+        },
+        {
+          displayName: 'Group child',
+          groupId: 'group',
+          kindLabel: 'Text',
+          objectId: 'group-child',
+          order: 5,
+          parentObjectId: 'group',
         },
       ],
     })
@@ -465,6 +474,30 @@ describe('SlideEditObjectLayerPane', () => {
       pointerOffsetY: 18,
       rowHeight: 20,
       targetObjectId: 'group',
+    })).toEqual({
+      draggedObjectId: 'a',
+      indicator: 'after',
+      placement: 'after',
+      targetObjectId: 'group',
+      toIndex: 5,
+    })
+    expect(getSlideEditLayerPaneDropIndicator(dragDescriptor, {
+      draggedObjectId: 'group',
+      pointerOffsetY: 2,
+      rowHeight: 20,
+      targetObjectId: 'a',
+    })).toEqual({
+      draggedObjectId: 'group',
+      indicator: 'before',
+      placement: 'before',
+      targetObjectId: 'a',
+      toIndex: 0,
+    })
+    expect(getSlideEditLayerPaneDropIndicator(dragDescriptor, {
+      draggedObjectId: 'group',
+      pointerOffsetY: 18,
+      rowHeight: 20,
+      targetObjectId: 'group-child',
     })).toMatchObject({
       placement: 'none',
       toIndex: null,
