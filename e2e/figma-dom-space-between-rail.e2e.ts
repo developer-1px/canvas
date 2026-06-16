@@ -44,11 +44,12 @@ test('keeps space-between lanes read-only on pointer drag', async ({ page }) => 
   await page.goto('/')
   await page.getByRole('button', { name: 'Select layer Workspace page' })
     .click()
-  await selectLayer(page, 'Select layer Hero panel', 'workspaceHero')
+  await selectLayer(page, 'Select layer Deal row 1', 'workspaceDealOne')
 
-  const lane = betweenLanes(page).first()
+  const lane = visibleBetweenLanes(page).first()
+  await expect(lane).not.toHaveCount(0)
   const initialBackground = await readBackgroundColor(lane)
-  const initialGap = await readFlexGap(page, 'workspaceHero')
+  const initialGap = await readFlexGap(page, 'workspaceDealOne')
 
   await lane.hover()
   await expect.poll(() => readCursor(lane)).toBe('default')
@@ -61,7 +62,7 @@ test('keeps space-between lanes read-only on pointer drag', async ({ page }) => 
   await page.mouse.move(centerX(laneBox) + 40, centerY(laneBox))
   await page.mouse.up()
 
-  await expect.poll(() => readFlexGap(page, 'workspaceHero')).toBe(initialGap)
+  await expect.poll(() => readFlexGap(page, 'workspaceDealOne')).toBe(initialGap)
   await expect(betweenLabels(page).first())
     .toContainText(/Between \d+px actual/)
 })
@@ -100,6 +101,12 @@ async function getRequiredBox(locator: Locator) {
 
 function betweenLanes(page: Page) {
   return page.locator('.figma-autolayout-gap--between')
+}
+
+function visibleBetweenLanes(page: Page) {
+  return page.locator(
+    '.figma-autolayout-gap--between:not(.figma-autolayout-gap--empty)',
+  )
 }
 
 function betweenMarks(page: Page) {
