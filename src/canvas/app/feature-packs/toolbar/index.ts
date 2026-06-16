@@ -17,7 +17,9 @@ export { CanvasSelectionFloatingBar } from './CanvasSelectionFloatingBar'
 export { CanvasToolbar } from './CanvasToolbar'
 export {
   CANVAS_MENU_ITEM_PROPS,
+  getCanvasMenuRovingKeyIndex,
   useCanvasMenuRovingFocus,
+  type CanvasMenuRovingKeyIndexInput,
 } from './CanvasMenuRovingFocus'
 export {
   CANVAS_TOOLBAR_COMMAND_GROUPS,

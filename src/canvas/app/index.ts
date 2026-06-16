@@ -26,7 +26,9 @@ export {
 } from './feature-packs/toolbar'
 export {
   CANVAS_MENU_ITEM_PROPS,
+  getCanvasMenuRovingKeyIndex,
   useCanvasMenuRovingFocus,
+  type CanvasMenuRovingKeyIndexInput,
 } from './feature-packs/toolbar'
 export {
   CANVAS_MODAL_FOCUS_LIFECYCLE_MODEL,

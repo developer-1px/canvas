@@ -16,6 +16,12 @@ type CanvasMenuItem = HTMLElement & {
   disabled?: boolean
 }
 
+export type CanvasMenuRovingKeyIndexInput = {
+  count: number
+  currentIndex: number
+  key: string
+}
+
 export function useCanvasMenuRovingFocus<
   TElement extends HTMLElement = HTMLElement,
 >({
@@ -103,7 +109,7 @@ export function useCanvasMenuRovingFocus<
     const items = syncItems()
     const currentIndex = items.findIndex((item) =>
       item === event.currentTarget.ownerDocument.activeElement)
-    const nextIndex = getCanvasMenuKeyIndex({
+    const nextIndex = getCanvasMenuRovingKeyIndex({
       count: items.length,
       currentIndex,
       key: event.key,
@@ -167,15 +173,11 @@ function getCanvasMenuActiveIndex({
   return Math.max(0, Math.min(preferredIndex, count - 1))
 }
 
-function getCanvasMenuKeyIndex({
+export function getCanvasMenuRovingKeyIndex({
   count,
   currentIndex,
   key,
-}: {
-  count: number
-  currentIndex: number
-  key: string
-}) {
+}: CanvasMenuRovingKeyIndexInput) {
   if (count === 0 || currentIndex < 0) {
     return null
   }
