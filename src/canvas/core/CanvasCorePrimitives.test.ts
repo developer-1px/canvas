@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, expectTypeOf, it } from 'vitest'
 import {
   CANVAS_FIT_VIEWPORT_PADDING,
   CANVAS_ZOOM_STEPS,
@@ -12,6 +12,7 @@ import {
   getCanvasViewportZoomStepMultiplier,
   MAX_SCALE,
   MIN_SCALE,
+  unique,
   zoomViewport,
 } from './CanvasCorePrimitives'
 
@@ -20,6 +21,14 @@ describe('CanvasCorePrimitives', () => {
     expect(CANVAS_ZOOM_STEPS).toEqual([0.1, 0.25, 0.5, 1, 2, 4, 8])
     expect(MIN_SCALE).toBe(0.1)
     expect(MAX_SCALE).toBe(8)
+  })
+
+  it('dedupes ids while preserving literal id types', () => {
+    const ids = ['shape-fill', 'shape-fill', 'line-style'] as const
+    const deduped = unique(ids)
+
+    expect(deduped).toEqual(['shape-fill', 'line-style'])
+    expectTypeOf(deduped).toEqualTypeOf<Array<'shape-fill' | 'line-style'>>()
   })
 
   it('moves zoom controls to the next or previous reference step', () => {

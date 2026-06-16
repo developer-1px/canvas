@@ -151,7 +151,7 @@ export function pointDistance(a: Point, b: Point) {
   return Math.hypot(a.x - b.x, a.y - b.y)
 }
 
-export function unique(ids: string[]) {
+export function unique<TId extends string>(ids: readonly TId[]): TId[] {
   return Array.from(new Set(ids))
 }
 
