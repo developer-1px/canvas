@@ -16,13 +16,13 @@ import type {
 } from '../../extensions/CanvasAppExtensionStateContracts'
 import {
   CANVAS_TOOLBAR_COMMAND_GROUPS,
-} from '../toolbar'
+} from '../toolbar/CanvasToolbarCommandCatalog'
 import type {
   CanvasToolbarCommandHandlers,
-} from '../toolbar'
+} from '../toolbar/CanvasToolbarCommandContracts'
 import {
   runCanvasToolbarCommandAction,
-} from '../toolbar'
+} from '../toolbar/CanvasToolbarCommandDispatch'
 import {
   getCanvasAppCommandMapping,
   getCanvasAppCommandMappingShortcut,
