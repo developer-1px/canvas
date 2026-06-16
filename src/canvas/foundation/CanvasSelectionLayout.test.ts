@@ -10,6 +10,7 @@ import {
   canTidyCanvasSelectionItems,
   distributeCanvasSelectionItems,
   flipCanvasSelectionItems,
+  moveCanvasItemToTargetPlacement,
   moveCanvasSelectionItemsToIndex,
   reorderCanvasSelectionItems,
   tidyCanvasSelectionItems,
@@ -190,6 +191,70 @@ describe('CanvasSelectionLayout', () => {
       selection: ['b'],
       toIndex: 99,
     }).items)).toEqual(['a', 'c', 'hidden', 'b'])
+  })
+
+  it('moves an item before or after a target item', () => {
+    const orderItems = items.slice(0, 4)
+
+    expect(moveCanvasItemToTargetPlacement({
+      getItemId,
+      itemId: 'a',
+      items: orderItems,
+      placement: 'after',
+      targetItemId: 'hidden',
+    })).toMatchObject({
+      fromIndex: 0,
+      items: [
+        { id: 'b' },
+        { id: 'c' },
+        { id: 'hidden' },
+        { id: 'a' },
+      ],
+      toIndex: 3,
+    })
+
+    expect(moveCanvasItemToTargetPlacement({
+      getItemId,
+      itemId: 'hidden',
+      items: orderItems,
+      placement: 'before',
+      targetItemId: 'b',
+    })).toMatchObject({
+      fromIndex: 3,
+      items: [
+        { id: 'a' },
+        { id: 'hidden' },
+        { id: 'b' },
+        { id: 'c' },
+      ],
+      toIndex: 1,
+    })
+  })
+
+  it('returns null for target placement no-ops', () => {
+    const orderItems = items.slice(0, 4)
+
+    expect(moveCanvasItemToTargetPlacement({
+      getItemId,
+      itemId: 'b',
+      items: orderItems,
+      placement: 'before',
+      targetItemId: 'c',
+    })).toBeNull()
+    expect(moveCanvasItemToTargetPlacement({
+      getItemId,
+      itemId: 'b',
+      items: orderItems,
+      placement: 'after',
+      targetItemId: 'b',
+    })).toBeNull()
+    expect(moveCanvasItemToTargetPlacement({
+      getItemId,
+      itemId: 'missing',
+      items: orderItems,
+      placement: 'after',
+      targetItemId: 'b',
+    })).toBeNull()
   })
 
   it('aligns selected item bounds to a provided frame', () => {

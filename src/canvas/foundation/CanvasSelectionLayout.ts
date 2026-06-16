@@ -77,6 +77,25 @@ export type CanvasSelectionMoveToIndexResult<TItem> = {
   items: TItem[]
 }
 
+export type CanvasItemTargetPlacement = 'after' | 'before'
+
+export type CanvasItemTargetPlacementMoveInput<
+  TItem,
+  TItemId extends string = string,
+> = {
+  getItemId: (item: TItem, index: number) => TItemId
+  itemId: TItemId
+  items: readonly TItem[]
+  placement: CanvasItemTargetPlacement
+  targetItemId: TItemId
+}
+
+export type CanvasItemTargetPlacementMoveResult<TItem> = {
+  fromIndex: number
+  items: TItem[]
+  toIndex: number
+}
+
 export type CanvasSelectionFlipItemInput<
   TItem,
   TItemId extends string = string,
@@ -351,6 +370,49 @@ export function moveCanvasSelectionItemsToIndex<
     changed: !areCanvasSelectionItemOrdersEqual(items, next, getItemId),
     items: next,
   }
+}
+
+export function moveCanvasItemToTargetPlacement<
+  TItem,
+  TItemId extends string = string,
+>({
+  getItemId,
+  itemId,
+  items,
+  placement,
+  targetItemId,
+}: CanvasItemTargetPlacementMoveInput<TItem, TItemId>):
+  CanvasItemTargetPlacementMoveResult<TItem> | null {
+  const fromIndex = items.findIndex((item, index) =>
+    getItemId(item, index) === itemId)
+  const targetIndex = items.findIndex((item, index) =>
+    getItemId(item, index) === targetItemId)
+
+  if (fromIndex < 0 || targetIndex < 0 || fromIndex === targetIndex) {
+    return null
+  }
+
+  const result = moveCanvasSelectionItemsToIndex({
+    getItemId,
+    items,
+    selection: [itemId],
+    toIndex: targetIndex + (placement === 'after' ? 1 : 0),
+  })
+
+  if (!result.changed) {
+    return null
+  }
+
+  const toIndex = result.items.findIndex((item, index) =>
+    getItemId(item, index) === itemId)
+
+  return toIndex < 0
+    ? null
+    : {
+        fromIndex,
+        items: result.items,
+        toIndex,
+      }
 }
 
 export function flipCanvasSelectionItems<
