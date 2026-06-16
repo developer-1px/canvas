@@ -19,6 +19,7 @@
 | Object layer pane | `slide-edit-affordance` | object row descriptor, selection pane command intent, ARIA tree contract |
 | Object animation build order | `slide-edit-affordance` | object animation type, trigger, timing, and slide-local build order |
 | Object opacity | `slide-edit-affordance` | object opacity value, metadata attribute, and host command effect |
+| Object shadow/effect | `slide-edit-affordance` | object shadow subset, metadata attribute, and host command effect |
 | Layout/theme affordance | `slide-edit-affordance` | layout, master, placeholder mapping, and theme token descriptors |
 | Slide object clipboard | `slide-edit-affordance` | source slide metadata, paste target, and id remap plan |
 | Slide metadata inspector | `slide-edit-affordance` | active slide name, background, notes, size, orientation fields |
@@ -40,6 +41,7 @@
 | `command-effect` | Transaction boundary for command effects |
 | `object-animation` | Object animation and build order values scoped to a slide |
 | `object-opacity` | Selected object opacity values for inspector, stage, thumbnail, and export |
+| `object-shadow` | Selected object shadow values for inspector, stage, thumbnail, and export |
 | `layout-theme` | Layout, master, placeholder, and theme token descriptors |
 | `slide-metadata` | Active slide metadata values for inspector descriptors |
 | `slide-transition` | Slide transition and advance timing values for inspector, preview, and export |
@@ -211,6 +213,19 @@
 | Metadata | `data-slide-object-opacity` carries the normalized value as an attribute string |
 | Normalization | invalid values use `1`; valid values clamp to `0..1` and round to two decimals |
 | Updates | selected object id and normalized opacity value become host command effects |
+| Runtime | stage, thumbnail, presentation, inspector, and export can read the same metadata value |
+
+## Object Shadow/Effect Contract
+
+| Area | Contract |
+| --- | --- |
+| Value | shadow uses `enabled`, `color`, `opacity`, `blur`, `angle`, and `distance` |
+| Default | `enabled` is `false`; disabled metadata serializes as `none` |
+| Field | each field routes through `update-object-shadow` |
+| Metadata | `data-slide-object-shadow` carries `none` or a JSON string for the normalized shadow subset |
+| Normalization | opacity clamps to `0..1`; blur and distance clamp to non-negative limits; angle clamps to `0..360` |
+| Updates | selected object id, field id, and normalized value become host command effects |
+| Scope | applies to slide content objects, not demo chrome, panel decoration, or app-shell shadows |
 | Runtime | stage, thumbnail, presentation, inspector, and export can read the same metadata value |
 
 ## Layout, Master, And Theme Contract

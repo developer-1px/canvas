@@ -185,6 +185,32 @@ export {
   type SlideEditObjectOpacityValue,
 } from './SlideEditObjectOpacity'
 export {
+  createSlideEditObjectShadowDescriptor,
+  getSlideEditObjectShadowCommandEffect,
+  getSlideEditObjectShadowMetadata,
+  normalizeSlideEditObjectShadow,
+  normalizeSlideEditObjectShadowFieldValue,
+  normalizeSlideEditObjectShadowUpdateCommand,
+  shouldEmitSlideEditObjectShadowMetadata,
+  SLIDE_EDIT_OBJECT_SHADOW_DATA_ATTRIBUTE,
+  SLIDE_EDIT_OBJECT_SHADOW_DEFAULT,
+  SLIDE_EDIT_OBJECT_SHADOW_FIELDS,
+  SLIDE_EDIT_OBJECT_SHADOW_LIMITS,
+  toSlideEditObjectShadowAttributeValue,
+  type SlideEditObjectShadow,
+  type SlideEditObjectShadowDescriptor,
+  type SlideEditObjectShadowFieldControl,
+  type SlideEditObjectShadowFieldDescriptor,
+  type SlideEditObjectShadowFieldId,
+  type SlideEditObjectShadowHostCommandEffect,
+  type SlideEditObjectShadowLimits,
+  type SlideEditObjectShadowMetadata,
+  type SlideEditObjectShadowNumericLimits,
+  type SlideEditObjectShadowObjectId,
+  type SlideEditObjectShadowSlideId,
+  type SlideEditObjectShadowUpdateCommand,
+} from './SlideEditObjectShadow'
+export {
   createSlideEditLayerPaneDescriptor,
   getSlideEditLayerPaneCommandEffect,
   SLIDE_EDIT_LAYER_PANE_ARIA_CONTRACT,
@@ -406,6 +432,7 @@ export type SlideEditAdapterSlotId =
   | 'command-effect'
   | 'object-animation'
   | 'object-opacity'
+  | 'object-shadow'
   | 'layout-theme'
   | 'object-bounds'
   | 'selection'
@@ -454,6 +481,11 @@ export const SLIDE_EDIT_ADAPTER_SLOTS = Object.freeze([
     id: 'object-opacity',
     owner: 'host',
     purpose: 'Provide selected object opacity values for inspector, stage, thumbnail, and export.',
+  },
+  {
+    id: 'object-shadow',
+    owner: 'host',
+    purpose: 'Provide selected object shadow values for inspector, stage, thumbnail, and export.',
   },
   {
     id: 'layout-theme',
@@ -544,6 +576,7 @@ export type SlideEditOwnedContractId =
   | 'object-animation-build-order'
   | 'object-layer-pane'
   | 'object-opacity-affordance'
+  | 'object-shadow-affordance'
   | 'placeholder-visibility-affordance'
   | 'slide-command-effects'
   | 'slide-object-clipboard'
@@ -604,6 +637,11 @@ export const SLIDE_EDIT_OWNED_CONTRACTS = Object.freeze([
     id: 'object-opacity-affordance',
     owner: 'slide-edit-affordance',
     scope: 'Object opacity value, metadata attribute, and update command effects.',
+  },
+  {
+    id: 'object-shadow-affordance',
+    owner: 'slide-edit-affordance',
+    scope: 'Object shadow fields, metadata attribute, and update command effects.',
   },
   {
     id: 'layout-theme-affordance',
