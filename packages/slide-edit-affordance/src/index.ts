@@ -266,6 +266,28 @@ export {
   type SlideEditObjectShadowUpdateCommand,
 } from './SlideEditObjectShadow'
 export {
+  createSlideEditObjectStrokeLineStyleDescriptor,
+  getSlideEditObjectStrokeLineStyleCommandEffect,
+  getSlideEditObjectStrokeLineStyleMetadata,
+  isSlideEditObjectStrokeLineStyleValue,
+  normalizeSlideEditObjectStrokeLineStyle,
+  normalizeSlideEditObjectStrokeLineStyleUpdateCommand,
+  SLIDE_EDIT_OBJECT_STROKE_LINE_STYLE_DATA_ATTRIBUTE,
+  SLIDE_EDIT_OBJECT_STROKE_LINE_STYLE_DEFAULT,
+  SLIDE_EDIT_OBJECT_STROKE_LINE_STYLE_FIELD,
+  SLIDE_EDIT_OBJECT_STROKE_LINE_STYLE_OPTIONS,
+  type SlideEditObjectStrokeLineStyleDescriptor,
+  type SlideEditObjectStrokeLineStyleFieldDescriptor,
+  type SlideEditObjectStrokeLineStyleHostCommandEffect,
+  type SlideEditObjectStrokeLineStyleMetadata,
+  type SlideEditObjectStrokeLineStyleObjectId,
+  type SlideEditObjectStrokeLineStyleOption,
+  type SlideEditObjectStrokeLineStyleSlideId,
+  type SlideEditObjectStrokeLineStyleUnsupportedReason,
+  type SlideEditObjectStrokeLineStyleUpdateCommand,
+  type SlideEditObjectStrokeLineStyleValue,
+} from './SlideEditObjectStrokeLineStyle'
+export {
   createSlideEditLayerPaneDescriptor,
   getSlideEditLayerPaneCommandEffect,
   SLIDE_EDIT_LAYER_PANE_ARIA_CONTRACT,
@@ -490,6 +512,7 @@ export type SlideEditAdapterSlotId =
   | 'object-hyperlink'
   | 'object-opacity'
   | 'object-shadow'
+  | 'object-stroke-line-style'
   | 'layout-theme'
   | 'object-bounds'
   | 'selection'
@@ -553,6 +576,11 @@ export const SLIDE_EDIT_ADAPTER_SLOTS = Object.freeze([
     id: 'object-shadow',
     owner: 'host',
     purpose: 'Provide selected object shadow values for inspector, stage, thumbnail, and export.',
+  },
+  {
+    id: 'object-stroke-line-style',
+    owner: 'host',
+    purpose: 'Provide selected object stroke line style values for inspector, stage, thumbnail, and export.',
   },
   {
     id: 'layout-theme',
@@ -646,6 +674,7 @@ export type SlideEditOwnedContractId =
   | 'object-layer-pane'
   | 'object-opacity-affordance'
   | 'object-shadow-affordance'
+  | 'object-stroke-line-style-affordance'
   | 'placeholder-visibility-affordance'
   | 'slide-command-effects'
   | 'slide-object-clipboard'
@@ -721,6 +750,11 @@ export const SLIDE_EDIT_OWNED_CONTRACTS = Object.freeze([
     id: 'object-shadow-affordance',
     owner: 'slide-edit-affordance',
     scope: 'Object shadow fields, metadata attribute, and update command effects.',
+  },
+  {
+    id: 'object-stroke-line-style-affordance',
+    owner: 'slide-edit-affordance',
+    scope: 'Object stroke solid, dash, and dot line style descriptors and update command effects.',
   },
   {
     id: 'layout-theme-affordance',

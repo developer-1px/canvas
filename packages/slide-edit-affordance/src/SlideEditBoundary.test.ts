@@ -21,6 +21,7 @@ describe('slide-edit-affordance boundary', () => {
       'object-hyperlink',
       'object-opacity',
       'object-shadow',
+      'object-stroke-line-style',
       'layout-theme',
       'slide-metadata',
       'slide-transition',
