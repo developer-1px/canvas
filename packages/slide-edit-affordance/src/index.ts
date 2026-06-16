@@ -185,6 +185,37 @@ export {
   type SlideEditObjectOpacityValue,
 } from './SlideEditObjectOpacity'
 export {
+  createSlideEditObjectHyperlinkDescriptor,
+  getSlideEditObjectHyperlinkCommandEffect,
+  getSlideEditObjectHyperlinkMetadata,
+  getSlideEditObjectHyperlinkValidation,
+  normalizeSlideEditObjectHyperlink,
+  normalizeSlideEditObjectHyperlinkCommand,
+  normalizeSlideEditObjectHyperlinkFieldValue,
+  shouldEmitSlideEditObjectHyperlinkMetadata,
+  SLIDE_EDIT_OBJECT_HYPERLINK_ALLOWED_SCHEMES,
+  SLIDE_EDIT_OBJECT_HYPERLINK_DATA_ATTRIBUTE,
+  SLIDE_EDIT_OBJECT_HYPERLINK_DEFAULT,
+  SLIDE_EDIT_OBJECT_HYPERLINK_FIELDS,
+  SLIDE_EDIT_OBJECT_HYPERLINK_TARGET_OPTIONS,
+  toSlideEditObjectHyperlinkAttributeValue,
+  type SlideEditObjectHyperlink,
+  type SlideEditObjectHyperlinkCommand,
+  type SlideEditObjectHyperlinkDescriptor,
+  type SlideEditObjectHyperlinkFieldControl,
+  type SlideEditObjectHyperlinkFieldDescriptor,
+  type SlideEditObjectHyperlinkFieldId,
+  type SlideEditObjectHyperlinkHostCommandEffect,
+  type SlideEditObjectHyperlinkMetadata,
+  type SlideEditObjectHyperlinkObjectId,
+  type SlideEditObjectHyperlinkRemoveCommand,
+  type SlideEditObjectHyperlinkSlideId,
+  type SlideEditObjectHyperlinkTarget,
+  type SlideEditObjectHyperlinkTargetOption,
+  type SlideEditObjectHyperlinkUpdateCommand,
+  type SlideEditObjectHyperlinkValidation,
+} from './SlideEditObjectHyperlink'
+export {
   createSlideEditObjectShadowDescriptor,
   getSlideEditObjectShadowCommandEffect,
   getSlideEditObjectShadowMetadata,
@@ -431,6 +462,7 @@ export type SlideEditAdapter<
 export type SlideEditAdapterSlotId =
   | 'command-effect'
   | 'object-animation'
+  | 'object-hyperlink'
   | 'object-opacity'
   | 'object-shadow'
   | 'layout-theme'
@@ -476,6 +508,11 @@ export const SLIDE_EDIT_ADAPTER_SLOTS = Object.freeze([
     id: 'object-animation',
     owner: 'host',
     purpose: 'Provide object animation and build order values scoped to a slide.',
+  },
+  {
+    id: 'object-hyperlink',
+    owner: 'host',
+    purpose: 'Provide selected object hyperlink/action values for inspector, stage, thumbnail, and export.',
   },
   {
     id: 'object-opacity',
@@ -574,6 +611,7 @@ export type SlideEditOwnedContractId =
   | 'layout-theme-affordance'
   | 'object-inspector'
   | 'object-animation-build-order'
+  | 'object-hyperlink-affordance'
   | 'object-layer-pane'
   | 'object-opacity-affordance'
   | 'object-shadow-affordance'
@@ -632,6 +670,11 @@ export const SLIDE_EDIT_OWNED_CONTRACTS = Object.freeze([
     id: 'object-animation-build-order',
     owner: 'slide-edit-affordance',
     scope: 'Object animation type, trigger, timing, and slide-local build order.',
+  },
+  {
+    id: 'object-hyperlink-affordance',
+    owner: 'slide-edit-affordance',
+    scope: 'Object hyperlink/action fields, metadata attribute, URL policy, and update command effects.',
   },
   {
     id: 'object-opacity-affordance',
