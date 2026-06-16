@@ -1,10 +1,13 @@
 import {
-  useEffect,
   useMemo,
   useRef,
   type KeyboardEvent,
   type MouseEvent,
 } from 'react'
+import {
+  trapCanvasModalTabFocus,
+  useCanvasModalFocusLifecycle,
+} from '../modal/CanvasModalFocusLifecycle'
 import {
   groupCanvasShortcutHelpItems,
   type CanvasShortcutHelpItem,
@@ -33,24 +36,12 @@ function CanvasShortcutHelpDialog({
   onClose,
 }: Omit<CanvasShortcutHelpOverlayProps, 'open'>) {
   const closeButtonRef = useRef<HTMLButtonElement>(null)
-  const previousFocusRef = useRef<HTMLElement | null>(null)
+  const dialogRef = useRef<HTMLElement>(null)
   const sections = useMemo(() => groupCanvasShortcutHelpItems(items), [items])
 
-  useEffect(() => {
-    previousFocusRef.current = document.activeElement instanceof HTMLElement
-      ? document.activeElement
-      : null
-
-    const focusTimer = window.setTimeout(
-      () => closeButtonRef.current?.focus(),
-      0,
-    )
-
-    return () => {
-      window.clearTimeout(focusTimer)
-      previousFocusRef.current?.focus()
-    }
-  }, [])
+  useCanvasModalFocusLifecycle({
+    initialFocusRef: closeButtonRef,
+  })
 
   const handleBackdropMouseDown = (event: MouseEvent<HTMLDivElement>) => {
     if (event.target === event.currentTarget) {
@@ -63,6 +54,14 @@ function CanvasShortcutHelpDialog({
       event.preventDefault()
       event.stopPropagation()
       onClose()
+      return
+    }
+
+    if (event.key === 'Tab') {
+      trapCanvasModalTabFocus({
+        event,
+        root: dialogRef.current,
+      })
     }
   }
 
@@ -72,6 +71,7 @@ function CanvasShortcutHelpDialog({
       onMouseDown={handleBackdropMouseDown}
     >
       <section
+        ref={dialogRef}
         className="shortcut-help"
         role="dialog"
         aria-label="Keyboard shortcuts"

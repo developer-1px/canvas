@@ -15,6 +15,20 @@ export {
   useCanvasMenuRovingFocus,
 } from './affordances/controls/toolbar/CanvasMenuRovingFocus'
 export {
+  CANVAS_MODAL_FOCUS_LIFECYCLE_MODEL,
+  CANVAS_MODAL_FOCUSABLE_SELECTOR,
+  focusCanvasModalElement,
+  getCanvasModalFocusableElements,
+  getCanvasModalNextFocusIndex,
+  getCanvasModalRestoreFocusTarget,
+  restoreCanvasModalFocus,
+  trapCanvasModalTabFocus,
+  useCanvasModalFocusLifecycle,
+  type CanvasModalFocusRef,
+  type CanvasModalFocusTarget,
+  type CanvasModalTabFocusEvent,
+} from './affordances/controls/modal/CanvasModalFocusLifecycle'
+export {
   CANVAS_TABS_KEYBOARD_MODEL,
   createCanvasTabsDescriptor,
   getCanvasTabsKeyboardIntent,
