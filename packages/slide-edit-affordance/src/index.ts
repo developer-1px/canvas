@@ -536,6 +536,7 @@ export {
   createSlideEditClipboardPayload,
   getSlideEditClipboardPasteAnchor,
   mapSlideEditClipboardPasteObjects,
+  normalizeSlideEditClipboardSelectedObjectIds,
   type SlideEditClipboardGroupId,
   type SlideEditClipboardObjectId,
   type SlideEditClipboardObjectMetadata,

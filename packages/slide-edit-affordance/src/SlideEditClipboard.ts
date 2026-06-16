@@ -152,6 +152,34 @@ export type SlideEditClipboardPasteHostCommandEffect<
   type: 'slide-command-effect'
 }
 
+export function normalizeSlideEditClipboardSelectedObjectIds<
+  TObjectId extends SlideEditClipboardObjectId,
+  TObject,
+>({
+  getObjectId,
+  objects,
+  selectedObjectIds,
+}: {
+  getObjectId: (object: TObject, index: number) => TObjectId
+  objects: readonly TObject[]
+  selectedObjectIds?: readonly unknown[] | null
+}): TObjectId[] {
+  const objectIds = objects.map(getObjectId)
+
+  if (!selectedObjectIds) {
+    return objectIds
+  }
+
+  const availableObjectIds = new Set<TObjectId>(objectIds)
+  const normalizedObjectIds = selectedObjectIds.flatMap((objectId) =>
+    typeof objectId === 'string' && availableObjectIds.has(objectId as TObjectId)
+      ? [objectId as TObjectId]
+      : []
+  )
+
+  return normalizedObjectIds.length > 0 ? normalizedObjectIds : objectIds
+}
+
 export function createSlideEditClipboardPayload<
   TSlideId extends SlideEditClipboardSlideId,
   TObjectId extends SlideEditClipboardObjectId,

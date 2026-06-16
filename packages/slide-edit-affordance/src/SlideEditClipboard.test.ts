@@ -7,6 +7,7 @@ import {
   createSlideEditClipboardPayload,
   getSlideEditClipboardPasteAnchor,
   mapSlideEditClipboardPasteObjects,
+  normalizeSlideEditClipboardSelectedObjectIds,
   type SlideEditClipboardRemapPolicy,
 } from './SlideEditClipboard'
 
@@ -32,6 +33,28 @@ describe('SlideEditClipboard', () => {
       sourcePlaceholderId === 'logo-slot' ? 'target-logo-slot' : null
     ),
   }
+
+  it('normalizes selected object ids against clipboard objects while preserving candidate order', () => {
+    expect(normalizeSlideEditClipboardSelectedObjectIds({
+      getObjectId: (object) => object.id,
+      objects,
+      selectedObjectIds: ['logo', 'missing', 42, 'card'],
+    })).toEqual(['logo', 'card'])
+  })
+
+  it('falls back to all object ids when clipboard selection candidates are missing or invalid', () => {
+    expect(normalizeSlideEditClipboardSelectedObjectIds({
+      getObjectId: (object) => object.id,
+      objects,
+      selectedObjectIds: null,
+    })).toEqual(['card', 'logo'])
+
+    expect(normalizeSlideEditClipboardSelectedObjectIds({
+      getObjectId: (object) => object.id,
+      objects,
+      selectedObjectIds: ['missing'],
+    })).toEqual(['card', 'logo'])
+  })
 
   it('creates copy and cut payloads with source slide and optional metadata', () => {
     expect(createSlideEditClipboardPayload({
