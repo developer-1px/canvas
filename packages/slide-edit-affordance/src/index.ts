@@ -420,6 +420,7 @@ export {
   getSlideEditLayerPaneCommandEffect,
   getSlideEditLayerPaneDropIndicator,
   getSlideEditLayerPaneKeyboardIntent,
+  getSlideEditLayerPaneResolvedFocusObjectId,
   SLIDE_EDIT_LAYER_PANE_ARIA_CONTRACT,
   SLIDE_EDIT_LAYER_PANE_COMMANDS,
   SLIDE_EDIT_LAYER_PANE_DROP_INDICATOR_MODEL,

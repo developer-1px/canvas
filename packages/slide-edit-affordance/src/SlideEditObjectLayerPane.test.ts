@@ -5,6 +5,7 @@ import {
   getSlideEditLayerPaneCommandEffect,
   getSlideEditLayerPaneDropIndicator,
   getSlideEditLayerPaneKeyboardIntent,
+  getSlideEditLayerPaneResolvedFocusObjectId,
   SLIDE_EDIT_LAYER_PANE_ARIA_CONTRACT,
   SLIDE_EDIT_LAYER_PANE_COMMANDS,
   SLIDE_EDIT_LAYER_PANE_DROP_INDICATOR_MODEL,
@@ -129,6 +130,46 @@ describe('SlideEditObjectLayerPane', () => {
     expect(SLIDE_EDIT_LAYER_PANE_KEYBOARD_INTENT_MODEL).toBe(
       'slide-edit-layer-pane-keyboard-intent',
     )
+  })
+
+  it('resolves layer pane focus from preferred and default rows', () => {
+    expect(getSlideEditLayerPaneResolvedFocusObjectId(descriptor, {
+      preferredObjectId: 'note',
+    })).toBe('note')
+
+    expect(getSlideEditLayerPaneResolvedFocusObjectId(descriptor, {
+      defaultObjectId: 'image',
+      preferredObjectId: 'missing',
+    })).toBe('image')
+  })
+
+  it('falls back from layer pane focus to selected row, first row, and null', () => {
+    expect(getSlideEditLayerPaneResolvedFocusObjectId(descriptor, {
+      defaultObjectId: 'missing',
+      preferredObjectId: 'also-missing',
+    })).toBe('title')
+
+    expect(getSlideEditLayerPaneResolvedFocusObjectId(
+      createSlideEditLayerPaneDescriptor({
+        objects: [
+          {
+            displayName: 'Loose object',
+            kindLabel: 'Image',
+            objectId: 'loose',
+          },
+        ],
+        selectedObjectIds: [],
+        slideId: 'slide-empty-selection',
+      }),
+    )).toBe('loose')
+
+    expect(getSlideEditLayerPaneResolvedFocusObjectId(
+      createSlideEditLayerPaneDescriptor({
+        objects: [],
+        selectedObjectIds: [],
+        slideId: 'slide-empty',
+      }),
+    )).toBeNull()
   })
 
   it('calculates tree row aria state for grouped layer panes', () => {

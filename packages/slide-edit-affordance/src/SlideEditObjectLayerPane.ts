@@ -286,6 +286,39 @@ export function createSlideEditLayerPaneDescriptor<
   }
 }
 
+export function getSlideEditLayerPaneResolvedFocusObjectId<
+  TSlideId extends SlideEditLayerPaneSlideId,
+  TObjectId extends SlideEditLayerPaneObjectId,
+  TGroupId extends SlideEditLayerPaneGroupId,
+>(
+  descriptor: SlideEditLayerPaneDescriptor<TSlideId, TObjectId, TGroupId>,
+  {
+    defaultObjectId = null,
+    preferredObjectId = descriptor.activeObjectId,
+  }: {
+    defaultObjectId?: TObjectId | null
+    preferredObjectId?: TObjectId | null
+  } = {},
+): TObjectId | null {
+  if (
+    preferredObjectId !== null &&
+    findSlideEditLayerPaneRow(descriptor, preferredObjectId)
+  ) {
+    return preferredObjectId
+  }
+
+  if (
+    defaultObjectId !== null &&
+    findSlideEditLayerPaneRow(descriptor, defaultObjectId)
+  ) {
+    return defaultObjectId
+  }
+
+  const selectedRow = descriptor.rows.find((row) => row.isSelected)
+
+  return selectedRow?.objectId ?? descriptor.rows[0]?.objectId ?? null
+}
+
 export function getSlideEditLayerPaneKeyboardIntent<
   TSlideId extends SlideEditLayerPaneSlideId,
   TObjectId extends SlideEditLayerPaneObjectId,
