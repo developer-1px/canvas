@@ -6,6 +6,7 @@ import {
   getCanvasGroupedItemSelection,
   getCanvasFullySelectedItemGroupIds,
   getCanvasGroupedItemPointerSelection,
+  getCanvasItemGroupIndexRange,
   getCanvasItemGroupMemberIds,
   getCanvasItemGroupMemberIdsForGroup,
   getCanvasSelectableItemIds,
@@ -248,6 +249,28 @@ describe('CanvasSelectionItems', () => {
       isItemSelectable: isVisible,
       items: sourceItems,
     })).toEqual(['a', 'd'])
+  })
+
+  it('returns the first and last selectable index for an explicit group id', () => {
+    const sourceItems: TestItem[] = [
+      { groupId: 'group-a', id: 'a', name: 'Alpha' },
+      { groupId: 'group-b', id: 'b', name: 'Beta' },
+      { groupId: 'group-a', hidden: true, id: 'c', name: 'Gamma' },
+      { groupId: 'group-a', id: 'd', name: 'Delta' },
+    ]
+
+    expect(getCanvasItemGroupIndexRange({
+      getItemGroupId: (item) => item.groupId,
+      groupId: 'group-a',
+      isItemSelectable: isVisible,
+      items: sourceItems,
+    })).toEqual({ firstIndex: 0, lastIndex: 3 })
+
+    expect(getCanvasItemGroupIndexRange({
+      getItemGroupId: (item) => item.groupId,
+      groupId: 'group-missing',
+      items: sourceItems,
+    })).toBeNull()
   })
 
   it('selects explicit group members on non-additive selection', () => {

@@ -92,6 +92,21 @@ export type CanvasSelectionItemGroupInput<
   groupId: TGroupId
 }
 
+export type CanvasItemGroupIndexRangeInput<
+  TItem,
+  TGroupId extends string = string,
+> = {
+  getItemGroupId: (item: TItem, index: number) => TGroupId | null | undefined
+  groupId: TGroupId
+  isItemSelectable?: (item: TItem, index: number) => boolean
+  items: readonly TItem[]
+}
+
+export type CanvasItemGroupIndexRange = {
+  firstIndex: number
+  lastIndex: number
+}
+
 export type CanvasGroupedItemSelectionInput<
   TItem,
   TItemId extends string = string,
@@ -418,6 +433,36 @@ export function getCanvasItemGroupMemberIdsForGroup<
   })
 
   return memberIds
+}
+
+export function getCanvasItemGroupIndexRange<
+  TItem,
+  TGroupId extends string = string,
+>({
+  getItemGroupId,
+  groupId,
+  isItemSelectable = () => true,
+  items,
+}: CanvasItemGroupIndexRangeInput<TItem, TGroupId>):
+  CanvasItemGroupIndexRange | null {
+  let firstIndex: number | null = null
+  let lastIndex: number | null = null
+
+  items.forEach((item, index) => {
+    if (
+      getItemGroupId(item, index) !== groupId ||
+      !isItemSelectable(item, index)
+    ) {
+      return
+    }
+
+    firstIndex ??= index
+    lastIndex = index
+  })
+
+  return firstIndex === null || lastIndex === null
+    ? null
+    : { firstIndex, lastIndex }
 }
 
 export function getCanvasGroupedItemSelection<
