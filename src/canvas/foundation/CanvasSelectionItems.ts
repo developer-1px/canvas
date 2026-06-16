@@ -15,6 +15,13 @@ export type CanvasSelectionItemsChangeInput<
   items: TItem[]
 }
 
+export type CanvasSelectionRemoveIdsInput<
+  TItemId extends string = string,
+> = {
+  ids: ReadonlySet<TItemId> | readonly TItemId[]
+  selection: readonly TItemId[]
+}
+
 export type CanvasSelectionMapItemsInput<
   TItem,
   TItemId extends string = string,
@@ -174,6 +181,17 @@ export function deleteCanvasSelectionItems<
 
   return items.filter((item, index) =>
     !selected.has(getItemId(item, index)) || !isItemSelectable(item, index))
+}
+
+export function removeCanvasSelectionIds<
+  TItemId extends string = string,
+>({
+  ids,
+  selection,
+}: CanvasSelectionRemoveIdsInput<TItemId>) {
+  const removed = ids instanceof Set ? ids : new Set(ids)
+
+  return selection.filter((id) => !removed.has(id))
 }
 
 export function mapCanvasSelectionItems<

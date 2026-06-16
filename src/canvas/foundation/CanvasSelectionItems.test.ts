@@ -11,6 +11,7 @@ import {
   getCanvasSelectedItemGroupIds,
   getCanvasSelectedItemIds,
   mapCanvasSelectionItems,
+  removeCanvasSelectionIds,
   ungroupCanvasSelectionItems,
 } from './CanvasSelectionItems'
 
@@ -54,6 +55,18 @@ describe('CanvasSelectionItems', () => {
       items: [...items],
       selection: ['a', 'b', 'd'],
     }).map(getItemId)).toEqual(['b', 'c'])
+  })
+
+  it('removes ids from selection while preserving remaining order', () => {
+    expect(removeCanvasSelectionIds({
+      ids: ['b', 'missing'],
+      selection: ['a', 'b', 'd'],
+    })).toEqual(['a', 'd'])
+
+    expect(removeCanvasSelectionIds({
+      ids: new Set(['a', 'd']),
+      selection: ['a', 'b', 'd'],
+    })).toEqual(['b'])
   })
 
   it('maps selected editable items and leaves unsupported items unchanged', () => {

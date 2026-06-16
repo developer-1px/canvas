@@ -76,6 +76,7 @@ export {
   getCanvasSelectedItemGroupIds,
   getCanvasSelectedItemIds,
   mapCanvasSelectionItems,
+  removeCanvasSelectionIds,
   ungroupCanvasSelectionItems,
   type CanvasGroupedItemPointerSelectionInput,
   type CanvasGroupedItemSelectionInput,
@@ -87,6 +88,7 @@ export {
   type CanvasSelectionItemsChangeInput,
   type CanvasSelectionItemsInput,
   type CanvasSelectionMapItemsInput,
+  type CanvasSelectionRemoveIdsInput,
   type CanvasSelectionUngroupItemInput,
   type CanvasSelectionUngroupItemsInput,
 } from './CanvasSelectionItems'
