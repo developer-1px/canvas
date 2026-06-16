@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test, type Locator, type Page } from '@playwright/test'
 
 test('shows overflow clip, visible, full, and scroll extent guides', async ({
   page,
@@ -19,6 +19,19 @@ test('shows overflow clip, visible, full, and scroll extent guides', async ({
   await expect(page.locator('.figma-overflow-clip-boundary--scroll'))
     .toHaveCount(1)
   await expect(page.locator('.figma-overflow-scroll-extent')).toHaveCount(1)
+  await expectOverflowClipMatchesBrowser(page)
+
+  await page.getByRole('button', { name: 'Zoom in' }).click()
+  await expectOverflowClipMatchesBrowser(page)
+
+  await page.keyboard.press('h')
+  await expect(page.locator('.canvas-stage')).toHaveAttribute(
+    'data-mode',
+    'pan',
+  )
+  await panCanvas(page, { x: 56, y: 28 })
+  await expectOverflowClipMatchesBrowser(page)
+  await page.keyboard.press('v')
 
   await page.getByRole('button', { name: 'Select Workspace page section' })
     .click()
@@ -49,4 +62,47 @@ test('shows overflow clip, visible, full, and scroll extent guides', async ({
 async function readElementHeight(page: Page, selector: string) {
   return page.locator(selector).evaluate((element) =>
     element.getBoundingClientRect().height)
+}
+
+async function expectOverflowClipMatchesBrowser(page: Page) {
+  await expectOverlayMatchesElement(
+    page.locator('.figma-overflow-clip-boundary').first(),
+    page.locator('.figma-dom-browser').first(),
+  )
+}
+
+async function expectOverlayMatchesElement(overlay: Locator, target: Locator) {
+  const overlayBox = await getRequiredBox(overlay)
+  const targetBox = await getRequiredBox(target)
+
+  expectClose(overlayBox.x, targetBox.x)
+  expectClose(overlayBox.y, targetBox.y)
+  expectClose(overlayBox.width, targetBox.width)
+  expectClose(overlayBox.height, targetBox.height)
+}
+
+async function panCanvas(
+  page: Page,
+  delta: { x: number; y: number },
+) {
+  const stageBox = await getRequiredBox(page.locator('.canvas-stage'))
+  const x = stageBox.x + 120
+  const y = stageBox.y + 120
+
+  await page.mouse.move(x, y)
+  await page.mouse.down()
+  await page.mouse.move(x + delta.x, y + delta.y, { steps: 6 })
+  await page.mouse.up()
+}
+
+async function getRequiredBox(locator: Locator) {
+  const box = await locator.boundingBox()
+
+  expect(box).not.toBeNull()
+
+  return box!
+}
+
+function expectClose(actual: number, expected: number) {
+  expect(Math.abs(actual - expected)).toBeLessThanOrEqual(1)
 }
