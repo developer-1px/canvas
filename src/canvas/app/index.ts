@@ -104,6 +104,13 @@ export {
   type CanvasRichClipboardWriteMode,
 } from './affordances/commands/CanvasRichClipboardIO'
 export {
+  createCanvasDataTransferImportActionPlan,
+  type CanvasDataTransferImportActionPlanInput,
+  type CanvasDataTransferImportActionResolver,
+  type CanvasDataTransferImportActionResolverMode,
+  type CanvasDataTransferImportActionValue,
+} from './affordances/commands/CanvasDataTransferImportActionPlan'
+export {
   centerCanvasViewportAtWorldPoint,
   fitCanvasViewportToBounds,
   fitCanvasViewportToItems,
