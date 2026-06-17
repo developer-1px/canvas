@@ -1,11 +1,18 @@
 import { describe, expect, it, vi } from 'vitest'
 import {
+  CANVAS_KEYBOARD_TOOL_DISPATCH_MODEL,
   isCanvasKeyboardToolIntent,
   runCanvasKeyboardToolIntent,
   type CanvasKeyboardToolHandlers,
 } from './CanvasKeyboardToolDispatch'
 
 describe('CanvasKeyboardToolDispatch', () => {
+  it('exports tool dispatch metadata for host DOM contracts', () => {
+    expect(CANVAS_KEYBOARD_TOOL_DISPATCH_MODEL).toBe(
+      'canvas-keyboard-tool-dispatch',
+    )
+  })
+
   it('recognizes tool intents and ignores non-tool intents', () => {
     expect(isCanvasKeyboardToolIntent({
       kind: 'set-tool',

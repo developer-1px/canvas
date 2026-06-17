@@ -8,6 +8,9 @@ export type CanvasKeyboardToolHandlers = {
   setTool: (tool: Tool) => void
 }
 
+export const CANVAS_KEYBOARD_TOOL_DISPATCH_MODEL =
+  'canvas-keyboard-tool-dispatch'
+
 const CANVAS_KEYBOARD_TOOL_INTENT_DISPATCH =
   createCanvasKeyboardIntentDispatchTable<
     CanvasKeyboardShortcutIntent,

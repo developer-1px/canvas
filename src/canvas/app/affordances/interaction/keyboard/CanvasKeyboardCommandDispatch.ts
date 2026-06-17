@@ -26,6 +26,9 @@ export type CanvasKeyboardCommandHandlers = {
   unlockAll: () => void
 }
 
+export const CANVAS_KEYBOARD_COMMAND_DISPATCH_MODEL =
+  'canvas-keyboard-command-dispatch'
+
 const CANVAS_KEYBOARD_COMMAND_INTENT_DISPATCH =
   createCanvasKeyboardIntentDispatchTable<
     CanvasKeyboardCommandShortcutIntent,

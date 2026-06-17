@@ -87,6 +87,18 @@ export {
   type CanvasEditableFieldKeyboardIntentInput,
 } from './affordances/controls/editable-field/CanvasEditableFieldKeyboard'
 export {
+  CANVAS_KEYBOARD_COMMAND_DISPATCH_MODEL,
+  isCanvasKeyboardCommandIntent,
+  runCanvasKeyboardCommandIntent,
+  type CanvasKeyboardCommandHandlers,
+  type CanvasKeyboardCommandIntent,
+} from './affordances/interaction/keyboard/CanvasKeyboardCommandDispatch'
+export {
+  CANVAS_KEYBOARD_COMMAND_INTENT_MODEL,
+  getCanvasKeyboardBuiltinCommandShortcutIntent,
+  getCanvasKeyboardReservedCommandShortcuts,
+} from './affordances/interaction/keyboard/CanvasKeyboardCommandShortcuts'
+export {
   CANVAS_KEYBOARD_NUDGE_INTENT_MODEL,
   CANVAS_KEYBOARD_NUDGE_KEYS,
   CANVAS_KEYBOARD_NUDGE_LARGE_STEP,
@@ -95,6 +107,29 @@ export {
   getCanvasKeyboardNudgeShortcutIntent,
   getCanvasKeyboardReservedNudgeShortcuts,
 } from './affordances/interaction/keyboard/CanvasKeyboardNudgeShortcuts'
+export {
+  CANVAS_KEYBOARD_TOOL_DISPATCH_MODEL,
+  isCanvasKeyboardToolIntent,
+  runCanvasKeyboardToolIntent,
+  type CanvasKeyboardToolHandlers,
+  type CanvasKeyboardToolIntent,
+} from './affordances/interaction/keyboard/CanvasKeyboardToolDispatch'
+export {
+  getCanvasKeyboardToolShortcutIntent,
+  type CanvasKeyboardToolShortcutIntentInput,
+} from './affordances/interaction/keyboard/CanvasKeyboardToolShortcutIntent'
+export {
+  isCanvasKeyboardViewportIntent,
+  runCanvasKeyboardViewportIntent,
+  type CanvasKeyboardViewportHandlers,
+  type CanvasKeyboardViewportIntent,
+} from './affordances/interaction/keyboard/CanvasKeyboardViewportDispatch'
+export {
+  CANVAS_KEYBOARD_VIEWPORT_INTENT_MODEL,
+  CANVAS_KEYBOARD_VIEWPORT_MODEL,
+  getCanvasKeyboardReservedViewportShortcuts,
+  getCanvasKeyboardViewportShortcutIntent,
+} from './affordances/interaction/keyboard/CanvasKeyboardViewportShortcuts'
 export {
   CANVAS_RADIO_GROUP_FOCUS_MODEL,
   CANVAS_RADIO_GROUP_KEYBOARD_MODEL,
@@ -292,12 +327,6 @@ export {
   isCanvasKeyboardTypingTarget,
   type CanvasKeyboardShortcutIntentInput,
 } from './affordances/interaction/keyboard/CanvasKeyboardShortcutIntent'
-export {
-  isCanvasKeyboardToolIntent,
-  runCanvasKeyboardToolIntent,
-  type CanvasKeyboardToolHandlers,
-  type CanvasKeyboardToolIntent,
-} from './affordances/interaction/keyboard/CanvasKeyboardToolDispatch'
 export {
   getCanvasKeyboardSystemShortcutIntent,
   shouldReleaseCanvasKeyboardTemporaryPan,
