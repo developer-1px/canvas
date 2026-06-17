@@ -202,6 +202,14 @@ export {
   type CanvasKeyboardSystemShortcutIntent,
 } from './affordances/interaction/keyboard/CanvasKeyboardSystemShortcuts'
 export {
+  captureCanvasPointer,
+  captureCanvasPointerFromEvent,
+  releaseCanvasPointerCapture,
+  type CanvasPointerCaptureEvent,
+  type CanvasPointerCaptureInput,
+  type CanvasPointerCaptureTarget,
+} from './affordances/interaction/pointer/CanvasPointerCapture'
+export {
   CanvasAppViewportOverlayLayer,
   type CanvasAppViewportOverlayLayerProps,
 } from './rendering/CanvasAppViewportOverlayLayer'
