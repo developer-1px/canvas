@@ -848,7 +848,7 @@ function toSlideEditLayerPaneKeyboardIntent<
     | null,
   type: Extract<
     SlideEditLayerPaneKeyboardIntent<TObjectId>['type'],
-    'focus-parent-row' | 'focus-row' | 'select-row'
+    'focus-parent-row' | 'focus-row' | 'rename-row' | 'select-row'
   >,
 ): SlideEditLayerPaneKeyboardIntent<TObjectId> {
   if (!row?.isSelectable) {
