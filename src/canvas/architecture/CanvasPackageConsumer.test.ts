@@ -90,6 +90,8 @@ import { createCanvasComponentLibrary } from '@interactive-os/canvas/host'
 import {
   CANVAS_SVG_ARROW_MARKER_IRI,
   CanvasSvgStage,
+  createCanvasCssBoundsTransform,
+  createCanvasSvgBoundsTransform,
   createCanvasSvgFreehandPathData,
   createCanvasSvgPathData,
 } from '@interactive-os/canvas/renderer'
@@ -639,6 +641,14 @@ describe('Canvas package consumer imports', () => {
     expect(CANVAS_SVG_ARROW_MARKER_IRI).toBe('url(#canvas-arrow-head)')
     expect(createCanvasSvgPathData([{ x: 1, y: 2 }, { x: 3, y: 4 }]))
       .toBe('M 1 2 L 3 4')
+    expect(createCanvasCssBoundsTransform({
+      flipX: true,
+      rotation: 15,
+    })).toBe('rotate(15deg) scaleX(-1)')
+    expect(createCanvasSvgBoundsTransform({
+      bounds: { h: 20, w: 40, x: 10, y: 20 },
+      flipY: true,
+    })).toBe('translate(30 30) scale(1 -1) translate(-30 -30)')
     expect(createCanvasSvgFreehandPathData([
       { x: 1, y: 2 },
       { x: 3, y: 4 },
@@ -646,6 +656,9 @@ describe('Canvas package consumer imports', () => {
     ])).toBe('M 1 2 Q 3 4 4 3 L 5 2')
     expect(CanvasRenderer.CANVAS_SVG_ARROW_MARKER_IRI)
       .toBe(CANVAS_SVG_ARROW_MARKER_IRI)
+    expect(CanvasRenderer.createCanvasCssBoundsTransform({
+      flipX: true,
+    })).toBe('scaleX(-1)')
     expect(CanvasRenderer.createCanvasSvgFreehandPathData([
       { x: 1, y: 2 },
       { x: 3, y: 4 },
