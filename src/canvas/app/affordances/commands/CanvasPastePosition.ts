@@ -14,6 +14,8 @@ export type CanvasPastePositionMemory = {
   pasteIndex: number
 }
 
+export const CANVAS_PASTE_POSITION_MODEL = 'canvas-paste-position'
+
 export type CanvasPastePositionSession = {
   key: string
   nextMemory: CanvasPastePositionMemory

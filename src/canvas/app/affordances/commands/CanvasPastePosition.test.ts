@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest'
 import type { CanvasItem } from '../../../entities'
 import {
+  CANVAS_PASTE_POSITION_MODEL,
   createCanvasPastePositionKey,
   getCanvasPasteOffset,
   getCanvasPasteOffsetForBounds,
@@ -19,6 +20,10 @@ const item: CanvasItem = {
 }
 
 describe('getCanvasPasteOffset', () => {
+  test('exports the paste position model contract', () => {
+    expect(CANVAS_PASTE_POSITION_MODEL).toBe('canvas-paste-position')
+  })
+
   test('centers first paste in the viewport', () => {
     expect(
       getCanvasPasteOffset({
