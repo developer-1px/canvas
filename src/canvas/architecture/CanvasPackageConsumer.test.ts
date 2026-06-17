@@ -47,6 +47,7 @@ import {
   getCanvasAppManifestViewFeaturePacks,
   measureCanvasTextBlocks,
   getCanvasPointerTransformModifierState,
+  getCanvasMenuRovingActiveIndex,
   getCanvasSelectionListModifierState,
   getCanvasWorldClientPoint,
   isCanvasControlTarget,
@@ -83,6 +84,7 @@ import {
   type CanvasAppItemsChange,
   type CanvasAppViewFeaturePack,
   type CanvasInteractionTargetSelectorInput,
+  type CanvasMenuRovingActiveIndexInput,
   type CanvasPointerTransformModifierInput,
   type CanvasPointerTransformModifierState,
   type CanvasSelectionListModifierInput,
@@ -484,6 +486,11 @@ describe('Canvas package consumer imports', () => {
       getCanvasSelectionListModifierState(selectionListModifierInput)
     const selectionListModifierMode: CanvasSelectionListSelectionMode =
       selectionListModifierState.mode
+    const menuRovingActiveIndexInput: CanvasMenuRovingActiveIndexInput = {
+      count: 4,
+      focusedIndex: -1,
+      preferredIndex: 9,
+    }
     const commandPaletteKeyboardInput: CanvasCommandPaletteKeyboardIntentInput =
       {
         activeIndex: 0,
@@ -558,6 +565,10 @@ describe('Canvas package consumer imports', () => {
     expect(CanvasAppFacade.getCanvasSelectionListModifierState(
       selectionListModifierInput,
     )).toEqual(selectionListModifierState)
+    expect(getCanvasMenuRovingActiveIndex(menuRovingActiveIndexInput)).toBe(3)
+    expect(CanvasAppFacade.getCanvasMenuRovingActiveIndex(
+      menuRovingActiveIndexInput,
+    )).toBe(3)
     expect(CanvasAppFacade.getCanvasCommandPaletteKeyboardIntent(
       commandPaletteKeyboardInput,
     )).toEqual({

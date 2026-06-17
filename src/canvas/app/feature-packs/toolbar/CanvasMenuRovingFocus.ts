@@ -22,17 +22,27 @@ export type CanvasMenuRovingKeyIndexInput = {
   key: string
 }
 
+export type CanvasMenuRovingActiveIndexInput = {
+  count: number
+  focusedIndex: number
+  preferredIndex: number
+}
+
+export type CanvasMenuRovingFocusOptions = {
+  autoFocus?: boolean
+  initialActiveIndex?: number
+  onClose?: () => void
+}
+
 export function useCanvasMenuRovingFocus<
   TElement extends HTMLElement = HTMLElement,
 >({
   autoFocus = true,
+  initialActiveIndex = 0,
   onClose,
-}: {
-  autoFocus?: boolean
-  onClose?: () => void
-} = {}) {
+}: CanvasMenuRovingFocusOptions = {}) {
   const rootRef = useRef<TElement | null>(null)
-  const activeIndexRef = useRef(0)
+  const activeIndexRef = useRef(initialActiveIndex)
   const didAutoFocusRef = useRef(false)
 
   const syncItems = useCallback((preferredIndex?: number) => {
@@ -46,7 +56,7 @@ export function useCanvasMenuRovingFocus<
     const enabledItems = items.filter(isCanvasMenuItemEnabled)
     const focusedIndex = enabledItems.findIndex((item) =>
       item === root.ownerDocument.activeElement)
-    const activeIndex = getCanvasMenuActiveIndex({
+    const activeIndex = getCanvasMenuRovingActiveIndex({
       count: enabledItems.length,
       focusedIndex,
       preferredIndex: preferredIndex ?? activeIndexRef.current,
@@ -72,11 +82,11 @@ export function useCanvasMenuRovingFocus<
       return
     }
 
-    const items = syncItems()
+    const items = syncItems(initialActiveIndex)
 
     didAutoFocusRef.current = true
     items[activeIndexRef.current]?.focus()
-  }, [autoFocus, syncItems])
+  }, [autoFocus, initialActiveIndex, syncItems])
 
   const setRoot = useCallback((root: TElement | null) => {
     rootRef.current = root
@@ -86,9 +96,10 @@ export function useCanvasMenuRovingFocus<
       return
     }
 
-    syncItems()
+    activeIndexRef.current = initialActiveIndex
+    syncItems(initialActiveIndex)
     focusInitialItem()
-  }, [focusInitialItem, syncItems])
+  }, [focusInitialItem, initialActiveIndex, syncItems])
 
   useLayoutEffect(() => {
     syncItems()
@@ -153,15 +164,11 @@ function isCanvasMenuItemEnabled(item: CanvasMenuItem) {
   return !item.disabled && item.getAttribute('aria-disabled') !== 'true'
 }
 
-function getCanvasMenuActiveIndex({
+export function getCanvasMenuRovingActiveIndex({
   count,
   focusedIndex,
   preferredIndex,
-}: {
-  count: number
-  focusedIndex: number
-  preferredIndex: number
-}) {
+}: CanvasMenuRovingActiveIndexInput) {
   if (count === 0) {
     return 0
   }

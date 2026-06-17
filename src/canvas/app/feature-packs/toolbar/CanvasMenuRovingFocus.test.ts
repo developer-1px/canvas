@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { getCanvasMenuRovingKeyIndex } from './CanvasMenuRovingFocus'
+import {
+  getCanvasMenuRovingActiveIndex,
+  getCanvasMenuRovingKeyIndex,
+} from './CanvasMenuRovingFocus'
 
 describe('CanvasMenuRovingFocus', () => {
   it('moves menu focus indexes with arrow keys and wraps', () => {
@@ -54,5 +57,31 @@ describe('CanvasMenuRovingFocus', () => {
       currentIndex: 0,
       key: 'Tab',
     })).toBeNull()
+  })
+
+  it('resolves active index from focused item before preferred index', () => {
+    expect(getCanvasMenuRovingActiveIndex({
+      count: 4,
+      focusedIndex: 2,
+      preferredIndex: 1,
+    })).toBe(2)
+  })
+
+  it('clamps preferred active index to enabled item bounds', () => {
+    expect(getCanvasMenuRovingActiveIndex({
+      count: 4,
+      focusedIndex: -1,
+      preferredIndex: 99,
+    })).toBe(3)
+    expect(getCanvasMenuRovingActiveIndex({
+      count: 4,
+      focusedIndex: -1,
+      preferredIndex: -99,
+    })).toBe(0)
+    expect(getCanvasMenuRovingActiveIndex({
+      count: 0,
+      focusedIndex: -1,
+      preferredIndex: 2,
+    })).toBe(0)
   })
 })

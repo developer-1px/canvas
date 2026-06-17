@@ -29,8 +29,11 @@ export {
 } from './feature-packs/toolbar'
 export {
   CANVAS_MENU_ITEM_PROPS,
+  getCanvasMenuRovingActiveIndex,
   getCanvasMenuRovingKeyIndex,
   useCanvasMenuRovingFocus,
+  type CanvasMenuRovingActiveIndexInput,
+  type CanvasMenuRovingFocusOptions,
   type CanvasMenuRovingKeyIndexInput,
 } from './feature-packs/toolbar'
 export {
