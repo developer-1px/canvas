@@ -1,10 +1,15 @@
 import { describe, expect, it } from 'vitest'
 import {
+  CANVAS_INLINE_EDIT_DOM_MODEL,
   getCanvasInlineEditKeyboardIntent,
   inlineEditHistoryDirectionFromKeydown,
 } from './CanvasInlineEditDom'
 
 describe('CanvasInlineEditDom', () => {
+  it('exports the inline edit DOM model contract', () => {
+    expect(CANVAS_INLINE_EDIT_DOM_MODEL).toBe('canvas-inline-edit-dom')
+  })
+
   it('maps undo and redo shortcuts to history intents', () => {
     expect(getCanvasInlineEditKeyboardIntent({
       altKey: false,

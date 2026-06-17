@@ -1,5 +1,7 @@
 export type InlineEditHistoryDirection = 'undo' | 'redo'
 
+export const CANVAS_INLINE_EDIT_DOM_MODEL = 'canvas-inline-edit-dom'
+
 export type CanvasInlineEditKeyboardIntent =
   | {
     historyDirection: InlineEditHistoryDirection
