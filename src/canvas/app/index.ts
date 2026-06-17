@@ -228,6 +228,11 @@ export {
   type CanvasTextMeasurementStyle,
 } from './affordances/editing/text-editor/CanvasTextMeasurementDom'
 export {
+  getCanvasInlineEditKeyboardIntent,
+  type CanvasInlineEditKeyboardIntent,
+  type CanvasInlineEditKeyboardIntentInput,
+} from './affordances/editing/text-editor/CanvasInlineEditDom'
+export {
   getCanvasImportedImageSize,
   type CanvasImportedImageSize,
   type CanvasImportedImageSizeOptions,

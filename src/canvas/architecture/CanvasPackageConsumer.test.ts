@@ -46,6 +46,7 @@ import {
   getCanvasAppInstalledViewFeaturePacks,
   getCanvasAppManifestViewFeaturePacks,
   getCanvasFindInputKeyboardIntent,
+  getCanvasInlineEditKeyboardIntent,
   measureCanvasTextBlocks,
   getCanvasPointerTransformModifierState,
   getCanvasResizeHandleDoubleClickIntent,
@@ -87,6 +88,7 @@ import {
   type CanvasAppItemsChange,
   type CanvasAppViewFeaturePack,
   type CanvasInteractionTargetSelectorInput,
+  type CanvasInlineEditKeyboardIntentInput,
   type CanvasFindInputKeyboardIntentInput,
   type CanvasMenuRovingActiveIndexInput,
   type CanvasMenuTriggerKeyboardIntentInput,
@@ -518,6 +520,13 @@ describe('Canvas package consumer imports', () => {
       key: 'Enter',
       shiftKey: true,
     }
+    const inlineEditKeyboardInput: CanvasInlineEditKeyboardIntentInput = {
+      altKey: false,
+      ctrlKey: false,
+      key: 'Enter',
+      metaKey: false,
+      shiftKey: false,
+    }
     const commandPaletteKeyboardInput: CanvasCommandPaletteKeyboardIntentInput =
       {
         activeIndex: 0,
@@ -630,6 +639,19 @@ describe('Canvas package consumer imports', () => {
       direction: -1,
       kind: 'find-match',
       preventDefault: true,
+    })
+    expect(getCanvasInlineEditKeyboardIntent(inlineEditKeyboardInput))
+      .toEqual({
+        inputType: 'insertParagraph',
+        kind: 'line-break',
+        preventDefault: false,
+      })
+    expect(CanvasAppFacade.getCanvasInlineEditKeyboardIntent(
+      inlineEditKeyboardInput,
+    )).toEqual({
+      inputType: 'insertParagraph',
+      kind: 'line-break',
+      preventDefault: false,
     })
     expect(CanvasAppFacade.getCanvasCommandPaletteKeyboardIntent(
       commandPaletteKeyboardInput,

@@ -8,8 +8,8 @@ import {
   type PointerEvent,
 } from 'react'
 import {
+  getCanvasInlineEditKeyboardIntent,
   inlineEditHistoryDirectionFromInputType,
-  inlineEditHistoryDirectionFromKeydown,
   inlineEditSingleLineText,
   insertInlineEditText,
   isInlineEditLineBreakInput,
@@ -56,41 +56,41 @@ export function CanvasContentEditableText({
     if (active) {
       editor.setEditorElement(element)
       const handleNativeKeyDown = (event: KeyboardEvent) => {
-        if (inlineEditHistoryDirectionFromKeydown(event)) {
+        const intent = getCanvasInlineEditKeyboardIntent({
+          altEnterInsertsLineBreak: true,
+          altKey: event.altKey,
+          commitOnEnter: editor.commitOnEnter,
+          ctrlKey: event.ctrlKey,
+          key: event.key,
+          lineBreakMode: 'manual',
+          metaKey: event.metaKey,
+          multiline,
+          shiftKey: event.shiftKey,
+        })
+
+        if (intent.kind === 'history' || intent.kind === 'none') {
           return
         }
 
-        const shortcutModifier = event.metaKey || event.ctrlKey
-
-        if (
-          !editor.commitOnEnter &&
-          multiline &&
-          event.key === 'Enter' &&
-          !shortcutModifier
-        ) {
+        if (intent.preventDefault) {
           event.preventDefault()
           event.stopImmediatePropagation()
+        }
+
+        if (intent.kind === 'line-break') {
           insertInlineEditText(element, '\n')
           editor.onChange({ id, value: element.textContent ?? '' })
           return
         }
 
-        if (
-          editor.commitOnEnter &&
-          event.key === 'Enter' &&
-          !event.shiftKey &&
-          !shortcutModifier
-        ) {
-          event.preventDefault()
-          event.stopImmediatePropagation()
+        if (intent.kind === 'commit') {
           committedEnterRef.current = true
           editor.onCommit()
+          return
         }
 
-        if (event.key === 'Escape') {
-          event.preventDefault()
-          event.stopImmediatePropagation()
-          element.blur()
+        if (intent.kind === 'cancel') {
+          editor.onCancel()
         }
       }
 
@@ -171,37 +171,39 @@ export function CanvasContentEditableText({
       return
     }
 
-    if (inlineEditHistoryDirectionFromKeydown(event.nativeEvent)) {
+    const intent = getCanvasInlineEditKeyboardIntent({
+      altEnterInsertsLineBreak: true,
+      altKey: event.altKey,
+      commitOnEnter: editor?.commitOnEnter,
+      ctrlKey: event.ctrlKey,
+      key: event.key,
+      lineBreakMode: 'manual',
+      metaKey: event.metaKey,
+      multiline,
+      shiftKey: event.shiftKey,
+    })
+
+    if (intent.kind === 'history' || intent.kind === 'none') {
       return
     }
 
-    const shortcutModifier = event.metaKey || event.ctrlKey
-
-    if (
-      !editor?.commitOnEnter &&
-      multiline &&
-      event.key === 'Enter' &&
-      !shortcutModifier
-    ) {
+    if (intent.preventDefault) {
       event.preventDefault()
+    }
+
+    if (intent.kind === 'line-break') {
       insertLineBreak(event.currentTarget)
       return
     }
 
-    if (
-      editor?.commitOnEnter &&
-      event.key === 'Enter' &&
-      !event.shiftKey &&
-      !shortcutModifier
-    ) {
-      event.preventDefault()
+    if (intent.kind === 'commit') {
       committedEnterRef.current = true
       editor.onCommit()
+      return
     }
 
-    if (event.key === 'Escape') {
-      event.preventDefault()
-      event.currentTarget.blur()
+    if (intent.kind === 'cancel') {
+      editor?.onCancel()
     }
   }
 
