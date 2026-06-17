@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   getCanvasMenuRovingActiveIndex,
   getCanvasMenuRovingKeyIndex,
+  getCanvasMenuTriggerKeyboardIntent,
 } from './CanvasMenuRovingFocus'
 
 describe('CanvasMenuRovingFocus', () => {
@@ -83,5 +84,21 @@ describe('CanvasMenuRovingFocus', () => {
       focusedIndex: -1,
       preferredIndex: 2,
     })).toBe(0)
+  })
+
+  it('maps menu trigger open keys to open-menu intent', () => {
+    for (const key of ['ArrowDown', 'Enter', ' ']) {
+      expect(getCanvasMenuTriggerKeyboardIntent({ key })).toEqual({
+        kind: 'open-menu',
+        preventDefault: true,
+      })
+    }
+  })
+
+  it('ignores unrelated menu trigger keys', () => {
+    expect(getCanvasMenuTriggerKeyboardIntent({ key: 'Tab' })).toEqual({
+      kind: 'none',
+      preventDefault: false,
+    })
   })
 })

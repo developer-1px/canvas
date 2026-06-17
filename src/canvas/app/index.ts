@@ -31,10 +31,13 @@ export {
   CANVAS_MENU_ITEM_PROPS,
   getCanvasMenuRovingActiveIndex,
   getCanvasMenuRovingKeyIndex,
+  getCanvasMenuTriggerKeyboardIntent,
   useCanvasMenuRovingFocus,
   type CanvasMenuRovingActiveIndexInput,
   type CanvasMenuRovingFocusOptions,
   type CanvasMenuRovingKeyIndexInput,
+  type CanvasMenuTriggerKeyboardIntent,
+  type CanvasMenuTriggerKeyboardIntentInput,
 } from './feature-packs/toolbar'
 export {
   CANVAS_MODAL_FOCUS_LIFECYCLE_MODEL,

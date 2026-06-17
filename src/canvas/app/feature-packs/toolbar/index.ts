@@ -19,10 +19,13 @@ export {
   CANVAS_MENU_ITEM_PROPS,
   getCanvasMenuRovingActiveIndex,
   getCanvasMenuRovingKeyIndex,
+  getCanvasMenuTriggerKeyboardIntent,
   useCanvasMenuRovingFocus,
   type CanvasMenuRovingActiveIndexInput,
   type CanvasMenuRovingFocusOptions,
   type CanvasMenuRovingKeyIndexInput,
+  type CanvasMenuTriggerKeyboardIntent,
+  type CanvasMenuTriggerKeyboardIntentInput,
 } from './CanvasMenuRovingFocus'
 export {
   CANVAS_TOOLBAR_COMMAND_GROUPS,

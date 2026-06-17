@@ -28,6 +28,20 @@ export type CanvasMenuRovingActiveIndexInput = {
   preferredIndex: number
 }
 
+export type CanvasMenuTriggerKeyboardIntentInput = {
+  key: string
+}
+
+export type CanvasMenuTriggerKeyboardIntent =
+  | {
+      kind: 'open-menu'
+      preventDefault: true
+    }
+  | {
+      kind: 'none'
+      preventDefault: false
+    }
+
 export type CanvasMenuRovingFocusOptions = {
   autoFocus?: boolean
   initialActiveIndex?: number
@@ -206,4 +220,20 @@ export function getCanvasMenuRovingKeyIndex({
   }
 
   return null
+}
+
+export function getCanvasMenuTriggerKeyboardIntent({
+  key,
+}: CanvasMenuTriggerKeyboardIntentInput): CanvasMenuTriggerKeyboardIntent {
+  if (key === 'ArrowDown' || key === 'Enter' || key === ' ') {
+    return {
+      kind: 'open-menu',
+      preventDefault: true,
+    }
+  }
+
+  return {
+    kind: 'none',
+    preventDefault: false,
+  }
 }
