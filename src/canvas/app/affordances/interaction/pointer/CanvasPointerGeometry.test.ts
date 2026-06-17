@@ -2,7 +2,9 @@ import { describe, expect, it, vi } from 'vitest'
 import {
   getCanvasPointerLocalGeometry,
   getCanvasPointerLocalPoint,
+  getCanvasWorldClientPoint,
   type CanvasPointerLocalTarget,
+  type CanvasWorldClientPointStageElement,
 } from './CanvasPointerGeometry'
 
 describe('CanvasPointerGeometry', () => {
@@ -56,6 +58,33 @@ describe('CanvasPointerGeometry', () => {
       target: null,
     })).toBeNull()
   })
+
+  it('projects a world point to a browser client point with stage offset', () => {
+    expect(getCanvasWorldClientPoint({
+      point: { x: 40, y: 50 },
+      stageElement: createStageElement({
+        height: 400,
+        left: 100,
+        top: 80,
+        width: 600,
+      }),
+      viewport: { scale: 2, x: 10, y: 20 },
+    })).toEqual({
+      x: 190,
+      y: 200,
+    })
+  })
+
+  it('projects a world point without stage offset when rect is missing', () => {
+    expect(getCanvasWorldClientPoint({
+      point: { x: 40, y: 50 },
+      stageElement: createStageElement(null),
+      viewport: { scale: 2, x: 10, y: 20 },
+    })).toEqual({
+      x: 90,
+      y: 120,
+    })
+  })
 })
 
 function createLocalTarget(rect: {
@@ -66,5 +95,13 @@ function createLocalTarget(rect: {
 }): CanvasPointerLocalTarget {
   return {
     getBoundingClientRect: vi.fn(() => rect),
+  }
+}
+
+function createStageElement(
+  rect: ReturnType<CanvasWorldClientPointStageElement['getRect']>,
+): CanvasWorldClientPointStageElement {
+  return {
+    getRect: vi.fn(() => rect),
   }
 }

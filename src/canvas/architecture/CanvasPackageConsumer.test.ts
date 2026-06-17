@@ -46,6 +46,7 @@ import {
   getCanvasAppInstalledViewFeaturePacks,
   getCanvasAppManifestViewFeaturePacks,
   measureCanvasTextBlocks,
+  getCanvasWorldClientPoint,
   isCanvasControlTarget,
   getCanvasAppFoundationExtensionCommands,
   getCanvasAppFoundationExtensionRendererSlots,
@@ -81,6 +82,8 @@ import {
   type CanvasAppViewFeaturePack,
   type CanvasInteractionTargetSelectorInput,
   type CanvasWorkspaceStorageProvider,
+  type CanvasWorldClientPointInput,
+  type CanvasWorldClientPointStageElement,
   type CanvasCustomItem,
   type CanvasEditableTextItem,
   type CanvasItem,
@@ -444,6 +447,19 @@ describe('Canvas package consumer imports', () => {
       selectors: 'button',
       target: null,
     }
+    const worldClientStageElement: CanvasWorldClientPointStageElement = {
+      getRect: () => ({
+        height: 400,
+        left: 100,
+        top: 200,
+        width: 600,
+      }),
+    }
+    const worldClientPointInput: CanvasWorldClientPointInput = {
+      point: { x: 4, y: 5 },
+      stageElement: worldClientStageElement,
+      viewport: { scale: 2, x: 10, y: 20 },
+    }
 
     expect(CanvasApp).toBeTypeOf('function')
     expect('useCanvasAppModel' in CanvasPackage).toBe(false)
@@ -485,6 +501,16 @@ describe('Canvas package consumer imports', () => {
     )).toBe(false)
     expect(isCanvasWheelPassthroughTarget(null)).toBe(false)
     expect(CanvasAppFacade.isCanvasWheelPassthroughTarget(null)).toBe(false)
+    expect(getCanvasWorldClientPoint(worldClientPointInput)).toEqual({
+      x: 118,
+      y: 230,
+    })
+    expect(CanvasAppFacade.getCanvasWorldClientPoint(
+      worldClientPointInput,
+    )).toEqual({
+      x: 118,
+      y: 230,
+    })
     expect(CanvasAppAuthoring.createCanvasAppAssembly).toBeTypeOf('function')
     expect(CanvasAppAuthoring.getCanvasAppFoundationExtensionCommands)
       .toBeTypeOf('function')

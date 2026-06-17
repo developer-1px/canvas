@@ -252,11 +252,14 @@ export {
 export {
   getCanvasPointerLocalGeometry,
   getCanvasPointerLocalPoint,
+  getCanvasWorldClientPoint,
   type CanvasPointerClientPosition,
   type CanvasPointerLocalGeometry,
   type CanvasPointerLocalGeometryInput,
   type CanvasPointerLocalRect,
   type CanvasPointerLocalTarget,
+  type CanvasWorldClientPointInput,
+  type CanvasWorldClientPointStageElement,
 } from './affordances/interaction/pointer/CanvasPointerGeometry'
 export {
   CanvasAppViewportOverlayLayer,
