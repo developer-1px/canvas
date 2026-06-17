@@ -47,6 +47,8 @@ export type CanvasRichTextPasteSource = {
   text: string
 }
 
+export const CANVAS_TEXT_PASTE_IMPORT_MODEL = 'canvas-text-paste-import'
+
 const CANVAS_TEXT_PASTE_DATA_TYPES = [
   'text/plain',
   'text/html',

@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import {
+  CANVAS_MEDIA_IMPORT_MODEL,
   createCanvasMediaImportItems,
   getCanvasMediaInsertPosition,
   getCanvasMediaSourceFromDataTransfer,
@@ -9,6 +10,10 @@ import {
 import type { CanvasMediaImporter } from './CanvasMediaImporters'
 
 describe('CanvasMediaImport', () => {
+  it('exposes a stable model metadata value', () => {
+    expect(CANVAS_MEDIA_IMPORT_MODEL).toBe('canvas-media-import')
+  })
+
   it('extracts URL sources from plain URLs and embed snippets', () => {
     expect(getCanvasMediaSourceFromText(
       'https://www.figma.com/figjam/',

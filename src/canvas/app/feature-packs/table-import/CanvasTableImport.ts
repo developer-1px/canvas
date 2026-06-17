@@ -46,6 +46,8 @@ export type CanvasTableInsertCenterInput = {
   viewport: Viewport
 }
 
+export const CANVAS_TABLE_IMPORT_MODEL = 'canvas-table-import'
+
 const CANVAS_CSV_MIME_TYPES = new Set([
   'application/vnd.ms-excel',
   'text/comma-separated-values',

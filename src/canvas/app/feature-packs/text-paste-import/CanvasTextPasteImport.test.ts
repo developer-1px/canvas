@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import {
+  CANVAS_TEXT_PASTE_IMPORT_MODEL,
   createCanvasTextPasteItems,
   getCanvasRichTextPasteSourceFromHTML,
   getCanvasTextPasteInsertPosition,
@@ -9,6 +10,10 @@ import {
 import type { CanvasTextPasteImporter } from './CanvasTextPasteImporters'
 
 describe('CanvasTextPasteImport', () => {
+  it('exposes a stable model metadata value', () => {
+    expect(CANVAS_TEXT_PASTE_IMPORT_MODEL).toBe('canvas-text-paste-import')
+  })
+
   it('reads plain text before HTML clipboard text as fallback sources', () => {
     const dataTransfer = {
       getData: vi.fn((type: string) =>

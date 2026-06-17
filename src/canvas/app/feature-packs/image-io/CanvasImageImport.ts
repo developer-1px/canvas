@@ -41,6 +41,8 @@ export type CanvasImportedImageSizeOptions = {
   maxSize?: Partial<CanvasImportedImageSize>
 }
 
+export const CANVAS_IMAGE_IMPORT_MODEL = 'canvas-image-import'
+
 const DEFAULT_IMAGE_WIDTH = 320
 const DEFAULT_IMAGE_HEIGHT = 220
 const MAX_IMAGE_WIDTH = 520

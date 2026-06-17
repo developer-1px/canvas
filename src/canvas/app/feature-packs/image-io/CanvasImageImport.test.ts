@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import {
+  CANVAS_IMAGE_IMPORT_MODEL,
   createCanvasImportedImageItem,
   getCanvasImportedImageSize,
   getCanvasDataImageSourceFromDataTransfer,
@@ -7,6 +8,10 @@ import {
 } from './CanvasImageImport'
 
 describe('CanvasImageImport', () => {
+  it('exposes a stable model metadata value', () => {
+    expect(CANVAS_IMAGE_IMPORT_MODEL).toBe('canvas-image-import')
+  })
+
   it('creates a centered image item from imported source metadata', () => {
     const item = createCanvasImportedImageItem({
       center: { x: 100, y: 200 },

@@ -17,6 +17,8 @@ import type {
   CanvasMediaImportSource,
 } from './CanvasMediaImporters'
 
+export const CANVAS_MEDIA_IMPORT_MODEL = 'canvas-media-import'
+
 export type CanvasMediaInsertionContext = {
   commitItemsChange: CommitCanvasItemsChange
   createId: (prefix: string) => string

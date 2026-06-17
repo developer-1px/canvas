@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import {
+  CANVAS_TABLE_IMPORT_MODEL,
   getCanvasTableCsvSourceFromDataTransfer,
   getCanvasTableCsvSourceFromText,
   getCanvasTableColumnCount,
@@ -12,6 +13,10 @@ import {
 } from './CanvasTableImport'
 
 describe('CanvasTableImport', () => {
+  it('exposes a stable model metadata value', () => {
+    expect(CANVAS_TABLE_IMPORT_MODEL).toBe('canvas-table-import')
+  })
+
   it('parses CSV and spreadsheet clipboard text into import sources', () => {
     expect(getCanvasTableCsvSourceFromText(
       'Name,Owner\n"Import, CSV",Mina\nReview,Ari',
