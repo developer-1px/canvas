@@ -1,13 +1,18 @@
+import {
+  cancelCanvasAnimationFrameTask,
+  scheduleCanvasAnimationFrameTask,
+  type CanvasAnimationFrameTaskCancel,
+  type CanvasAnimationFrameTaskRequest,
+} from '../../interaction/frame/CanvasAnimationFrameTask'
+
 export type CanvasFocusableElement = {
   focus: (options?: FocusOptions) => void
   select?: () => void
 }
 
-export type CanvasAnimationFrameRequest = (
-  callback: FrameRequestCallback,
-) => number
+export type CanvasAnimationFrameRequest = CanvasAnimationFrameTaskRequest
 
-export type CanvasAnimationFrameCancel = (handle: number) => void
+export type CanvasAnimationFrameCancel = CanvasAnimationFrameTaskCancel
 
 export type CanvasFocusElementInput<
   TElement extends CanvasFocusableElement = CanvasFocusableElement,
@@ -53,44 +58,28 @@ export function focusCanvasElementOnNextFrame<
   TElement extends CanvasFocusableElement = CanvasFocusableElement,
 >({
   preventScroll = true,
-  requestAnimationFrame = getCanvasAnimationFrameRequest(),
+  requestAnimationFrame,
   resolveElement,
   select = false,
 }: CanvasDeferredFocusInput<TElement>) {
-  if (!requestAnimationFrame) {
-    return null
-  }
-
-  return requestAnimationFrame(() => {
-    focusCanvasElement({
-      element: resolveElement(),
-      preventScroll,
-      select,
-    })
+  return scheduleCanvasAnimationFrameTask({
+    requestAnimationFrame,
+    task: () => {
+      focusCanvasElement({
+        element: resolveElement(),
+        preventScroll,
+        select,
+      })
+    },
   })
 }
 
 export function cancelCanvasDeferredFocus({
-  cancelAnimationFrame = getCanvasAnimationFrameCancel(),
+  cancelAnimationFrame,
   frame,
 }: CanvasDeferredFocusCancelInput) {
-  if (frame === null || !cancelAnimationFrame) {
-    return false
-  }
-
-  cancelAnimationFrame(frame)
-
-  return true
-}
-
-function getCanvasAnimationFrameRequest(): CanvasAnimationFrameRequest | null {
-  return typeof requestAnimationFrame === 'undefined'
-    ? null
-    : requestAnimationFrame
-}
-
-function getCanvasAnimationFrameCancel(): CanvasAnimationFrameCancel | null {
-  return typeof cancelAnimationFrame === 'undefined'
-    ? null
-    : cancelAnimationFrame
+  return cancelCanvasAnimationFrameTask({
+    cancelAnimationFrame,
+    frame,
+  })
 }

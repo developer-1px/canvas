@@ -9,6 +9,7 @@ import {
   CanvasHost,
   CanvasRenderer,
   CANVAS_APP_BOARD_IO_FEATURE_PACK_MANIFEST,
+  cancelCanvasAnimationFrameTask,
   cancelCanvasDeferredFocus,
   focusCanvasElement,
   focusCanvasElementOnNextFrame,
@@ -25,6 +26,7 @@ import {
   downloadCanvasBlobFile,
   downloadCanvasTextFile,
   setCanvasDataTransferText,
+  scheduleCanvasAnimationFrameTask,
   writeCanvasClipboardText,
   defineCanvasAppCustomItemModule,
   DEFAULT_CANVAS_APP_VIEW_FEATURE_PACKS,
@@ -706,6 +708,14 @@ describe('Canvas package consumer imports', () => {
       cancelAnimationFrame: null,
       frame: 1,
     })).toBe(false)
+    expect(scheduleCanvasAnimationFrameTask({
+      requestAnimationFrame: null,
+      task: () => undefined,
+    })).toBeNull()
+    expect(cancelCanvasAnimationFrameTask({
+      cancelAnimationFrame: null,
+      frame: 1,
+    })).toBe(false)
     expect(CanvasAppFacade.focusCanvasElement({
       element: null,
     })).toBe(false)
@@ -713,6 +723,10 @@ describe('Canvas package consumer imports', () => {
       cancelAnimationFrame: null,
       frame: 1,
     })).toBe(false)
+    expect(CanvasAppFacade.scheduleCanvasAnimationFrameTask({
+      requestAnimationFrame: null,
+      task: () => undefined,
+    })).toBeNull()
     expect(CANVAS_SVG_ARROW_MARKER_IRI).toBe('url(#canvas-arrow-head)')
     expect(createCanvasSvgPathData([{ x: 1, y: 2 }, { x: 3, y: 4 }]))
       .toBe('M 1 2 L 3 4')

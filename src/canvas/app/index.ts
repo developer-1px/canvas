@@ -72,6 +72,15 @@ export {
   type CanvasFocusElementInput,
 } from './affordances/controls/focus/CanvasDeferredFocus'
 export {
+  cancelCanvasAnimationFrameTask,
+  scheduleCanvasAnimationFrameTask,
+  type CanvasAnimationFrameTask,
+  type CanvasAnimationFrameTaskCancel,
+  type CanvasAnimationFrameTaskCancelInput,
+  type CanvasAnimationFrameTaskRequest,
+  type CanvasAnimationFrameTaskScheduleInput,
+} from './affordances/interaction/frame/CanvasAnimationFrameTask'
+export {
   getCanvasSelectionListRangeIds,
   type CanvasSelectionListRangeInput,
 } from './affordances/controls/selection-list/CanvasSelectionListRange'
