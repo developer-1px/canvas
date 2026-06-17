@@ -15,6 +15,11 @@ import {
   handleDomEditRadioGroupKeyDown,
 } from '../../shared/DomEditRadioGroup'
 
+export const CANVAS_DOM_ALIGNMENT_POPOVER_MODEL =
+  'canvas-dom-alignment-popover'
+export const CANVAS_DOM_ALIGNMENT_PREVIEW_GUIDE_MODEL =
+  'canvas-dom-alignment-preview-guide'
+
 export type DomEditAlignmentPreview = {
   align: Exclude<DomEditAutoLayoutAlign, 'auto'>
 }
@@ -91,6 +96,7 @@ export function DomEditAlignmentEditor<
     <div
       id={id}
       className="figma-alignment-popover"
+      data-dom-edit-alignment-popover-model={CANVAS_DOM_ALIGNMENT_POPOVER_MODEL}
       role="region"
       aria-labelledby={labelledBy}
       onKeyDown={handleKeyDown}

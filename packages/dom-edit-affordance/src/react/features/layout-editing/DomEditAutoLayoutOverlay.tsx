@@ -65,6 +65,7 @@ import {
   DomEditSizeModeCapsule,
 } from './DomEditSizeModeCapsule'
 import {
+  CANVAS_DOM_ALIGNMENT_PREVIEW_GUIDE_MODEL,
   DomEditAlignmentEditor,
   type DomEditAlignmentPreview,
 } from './DomEditAlignmentEditor'
@@ -1173,6 +1174,9 @@ function DomEditAlignItemsGuide({
       data-align-guide={align}
       data-align-guide-axis={axis}
       data-align-guide-preview={isPreview ? 'true' : undefined}
+      data-dom-edit-alignment-preview-guide-model={
+        isPreview ? CANVAS_DOM_ALIGNMENT_PREVIEW_GUIDE_MODEL : undefined
+      }
       style={guideStyle}
     />
   )

@@ -7,9 +7,22 @@ import type {
   DomEditState,
 } from '../../../shared/model/DomEditTypes'
 import { DomEditAutoLayoutOverlay } from './DomEditAutoLayoutOverlay'
-import { DomEditAlignmentEditor } from './DomEditAlignmentEditor'
+import {
+  CANVAS_DOM_ALIGNMENT_POPOVER_MODEL,
+  CANVAS_DOM_ALIGNMENT_PREVIEW_GUIDE_MODEL,
+  DomEditAlignmentEditor,
+} from './DomEditAlignmentEditor'
 
 describe('DomEditAlignmentEditor', () => {
+  it('exposes stable alignment affordance metadata values', () => {
+    expect(CANVAS_DOM_ALIGNMENT_POPOVER_MODEL).toBe(
+      'canvas-dom-alignment-popover',
+    )
+    expect(CANVAS_DOM_ALIGNMENT_PREVIEW_GUIDE_MODEL).toBe(
+      'canvas-dom-alignment-preview-guide',
+    )
+  })
+
   it('renders the alignment popover as a labelled disclosure region', () => {
     const markup = renderToStaticMarkup(
       <DomEditAlignmentEditor
@@ -26,6 +39,9 @@ describe('DomEditAlignmentEditor', () => {
     )
 
     expect(markup).toContain('id="alignment-panel"')
+    expect(markup).toContain(
+      `data-dom-edit-alignment-popover-model="${CANVAS_DOM_ALIGNMENT_POPOVER_MODEL}"`,
+    )
     expect(markup).toContain('role="region"')
     expect(markup).toContain('aria-labelledby="alignment-trigger"')
     expect(markup).toContain('role="radiogroup"')
