@@ -70,6 +70,11 @@ export {
   type CanvasTabsTabInput,
 } from './affordances/controls/tabs/CanvasTabsRovingFocus'
 export {
+  getCanvasEditableFieldKeyboardIntent,
+  type CanvasEditableFieldKeyboardIntent,
+  type CanvasEditableFieldKeyboardIntentInput,
+} from './affordances/controls/editable-field/CanvasEditableFieldKeyboard'
+export {
   cancelCanvasDeferredFocus,
   focusCanvasElement,
   focusCanvasElementBySelectorOnNextFrame,

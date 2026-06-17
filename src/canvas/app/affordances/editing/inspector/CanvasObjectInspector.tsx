@@ -15,6 +15,7 @@ import {
   getCanvasRadioTabIndex,
   handleCanvasRadioGroupKeyDown,
 } from '../../controls/radio/CanvasRadioGroup'
+import { getCanvasEditableFieldKeyboardIntent } from '../../controls/editable-field/CanvasEditableFieldKeyboard'
 
 type CanvasObjectInspectorPanel = {
   content: ReactNode
@@ -86,12 +87,20 @@ export function CanvasObjectInspector({
       return
     }
 
-    if (event.key === 'Enter') {
+    const intent = getCanvasEditableFieldKeyboardIntent({
+      key: event.key,
+    })
+
+    if (intent.preventDefault) {
+      event.preventDefault()
+    }
+
+    if (intent.kind === 'commit') {
       event.currentTarget.blur()
       return
     }
 
-    if (event.key === 'Escape') {
+    if (intent.kind === 'cancel') {
       event.currentTarget.value = formatBoundsValue(bounds[field])
       event.currentTarget.blur()
     }
@@ -275,12 +284,20 @@ function CanvasObjectInspectorNumberStyleControl({
     }
   }
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter') {
+    const intent = getCanvasEditableFieldKeyboardIntent({
+      key: event.key,
+    })
+
+    if (intent.preventDefault) {
+      event.preventDefault()
+    }
+
+    if (intent.kind === 'commit') {
       event.currentTarget.blur()
       return
     }
 
-    if (event.key === 'Escape') {
+    if (intent.kind === 'cancel') {
       event.currentTarget.value = formatStyleNumberValue(control.value)
       event.currentTarget.blur()
     }

@@ -11,6 +11,7 @@ import type {
   CanvasAppInspectorPanel,
   CanvasAppInspectorPanelContext,
 } from '../../extensions/inspector-panels'
+import { getCanvasEditableFieldKeyboardIntent } from '../../affordances/controls/editable-field/CanvasEditableFieldKeyboard'
 
 export type CanvasDomEditStyleChannel =
   | 'gap'
@@ -250,12 +251,20 @@ function renderCanvasDomEditStyleField({
     })
   }
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter') {
+    const intent = getCanvasEditableFieldKeyboardIntent({
+      key: event.key,
+    })
+
+    if (intent.preventDefault) {
+      event.preventDefault()
+    }
+
+    if (intent.kind === 'commit') {
       event.currentTarget.blur()
       return
     }
 
-    if (event.key === 'Escape') {
+    if (intent.kind === 'cancel') {
       event.currentTarget.value = String(value)
       event.currentTarget.blur()
     }

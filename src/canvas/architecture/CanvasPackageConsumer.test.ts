@@ -33,6 +33,7 @@ import {
   getCanvasDataTransferText,
   downloadCanvasBlobFile,
   downloadCanvasTextFile,
+  getCanvasEditableFieldKeyboardIntent,
   setCanvasDataTransferText,
   scheduleCanvasAnimationFrameTask,
   writeCanvasClipboardText,
@@ -87,6 +88,7 @@ import {
   type CanvasControlTargetInput,
   type CanvasAppItemsChange,
   type CanvasAppViewFeaturePack,
+  type CanvasEditableFieldKeyboardIntentInput,
   type CanvasInteractionTargetSelectorInput,
   type CanvasInlineEditKeyboardIntentInput,
   type CanvasFindInputKeyboardIntentInput,
@@ -520,6 +522,9 @@ describe('Canvas package consumer imports', () => {
       key: 'Enter',
       shiftKey: true,
     }
+    const editableFieldKeyboardInput: CanvasEditableFieldKeyboardIntentInput = {
+      key: 'Escape',
+    }
     const inlineEditKeyboardInput: CanvasInlineEditKeyboardIntentInput = {
       altKey: false,
       ctrlKey: false,
@@ -638,6 +643,17 @@ describe('Canvas package consumer imports', () => {
     )).toEqual({
       direction: -1,
       kind: 'find-match',
+      preventDefault: true,
+    })
+    expect(getCanvasEditableFieldKeyboardIntent(editableFieldKeyboardInput))
+      .toEqual({
+        kind: 'cancel',
+        preventDefault: true,
+      })
+    expect(CanvasAppFacade.getCanvasEditableFieldKeyboardIntent(
+      editableFieldKeyboardInput,
+    )).toEqual({
+      kind: 'cancel',
       preventDefault: true,
     })
     expect(getCanvasInlineEditKeyboardIntent(inlineEditKeyboardInput))
