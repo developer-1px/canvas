@@ -1,11 +1,18 @@
 import { describe, expect, it } from 'vitest'
 import {
+  CANVAS_POINTER_CLICK_MEMORY_MODEL,
   getCanvasResizeHandleDoubleClickIntent,
   recordCanvasItemPointerClick,
   type CanvasPointerClickMemory,
 } from './CanvasPointerClickMemory'
 
 describe('CanvasPointerClickMemory', () => {
+  it('exports the pointer click memory model contract', () => {
+    expect(CANVAS_POINTER_CLICK_MEMORY_MODEL).toBe(
+      'canvas-pointer-click-memory',
+    )
+  })
+
   it('records the next click and detects a near repeated item click', () => {
     const first = recordCanvasItemPointerClick({
       itemId: 'rect-1',

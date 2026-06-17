@@ -1,6 +1,9 @@
 import { pointDistance } from '../../../../core'
 import type { Point } from '../../../../entities'
 
+export const CANVAS_POINTER_CLICK_MEMORY_MODEL =
+  'canvas-pointer-click-memory'
+
 export type CanvasPointerClickMemory = {
   id: string
   point: Point
