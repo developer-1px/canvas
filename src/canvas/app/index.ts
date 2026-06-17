@@ -350,6 +350,7 @@ export {
   type CanvasResizeHandleDoubleClickIntentResult,
 } from './affordances/interaction/pointer/CanvasPointerClickMemory'
 export {
+  CANVAS_RESIZE_POINTER_MODIFIERS_MODEL,
   getCanvasPointerTransformModifierState,
   type CanvasPointerTransformModifierInput,
   type CanvasPointerTransformModifierState,

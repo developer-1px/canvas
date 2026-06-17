@@ -38,6 +38,9 @@ export type CanvasPointerTransformModifierState = {
   resizeFromCenter: boolean
 }
 
+export const CANVAS_RESIZE_POINTER_MODIFIERS_MODEL =
+  'canvas-resize-pointer-modifiers'
+
 export type CanvasAppPointerSource = CanvasAppEventInput &
   CanvasAppScreenPointInput &
   CanvasAppPointerIdInput & {
