@@ -39,6 +39,8 @@ export type CanvasMinimapReadModel = {
   worldBounds: Bounds
 }
 
+export const CANVAS_MINIMAP_READ_MODEL = 'canvas-minimap-read-model'
+
 export const CANVAS_MINIMAP_DEFAULT_SIZE = Object.freeze({
   h: 112,
   w: 176,

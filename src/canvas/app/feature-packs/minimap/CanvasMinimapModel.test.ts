@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  CANVAS_MINIMAP_READ_MODEL,
   getCanvasMinimapPointFromViewportOffset,
   getCanvasMinimapReadModel,
   getCanvasMinimapViewportForWorldCenter,
@@ -13,6 +14,10 @@ describe('CanvasMinimapModel', () => {
     top: 0,
     width: 900,
   }
+
+  it('exposes a stable read model metadata value', () => {
+    expect(CANVAS_MINIMAP_READ_MODEL).toBe('canvas-minimap-read-model')
+  })
 
   it('projects item bounds and the current viewport into minimap coordinates', () => {
     const model = getCanvasMinimapReadModel({

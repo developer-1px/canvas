@@ -12,6 +12,7 @@ export {
   type CanvasMinimapProps,
 } from './CanvasMinimap'
 export {
+  CANVAS_MINIMAP_READ_MODEL,
   CANVAS_MINIMAP_DEFAULT_SIZE,
   getCanvasMinimapPointFromViewportOffset,
   getCanvasMinimapReadModel,
