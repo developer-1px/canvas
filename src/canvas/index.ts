@@ -16,6 +16,7 @@ export {
   getCanvasDataTransferText,
   setCanvasDataTransferDropEffect,
   setCanvasDataTransferText,
+  measureCanvasTextBlocks,
   writeCanvasClipboardText,
   focusCanvasModalElement,
   getCanvasModalFocusableElements,
@@ -42,6 +43,7 @@ export {
   type CanvasDataTransferDropEffectInput,
   type CanvasDataTransferTextInput,
   type CanvasDataTransferTextWriteInput,
+  type CanvasTextBlockMeasurementInput,
   type CanvasContextCommandMenuState,
   type CanvasAppProps,
   type CanvasFileDownloadAnchor,
@@ -61,6 +63,11 @@ export {
   type CanvasTabsTabInput,
   type CanvasTextFileDownloadInput,
   type CanvasTextDataTransfer,
+  type CanvasTextMeasurementBlock,
+  type CanvasTextMeasurementDocument,
+  type CanvasTextMeasurementElement,
+  type CanvasTextMeasurementSize,
+  type CanvasTextMeasurementStyle,
 } from './app'
 export {
   assertCanvasAppExtensionId,

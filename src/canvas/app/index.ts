@@ -147,6 +147,15 @@ export {
   type CanvasTextFileDownloadInput,
 } from './affordances/commands/CanvasFileDownload'
 export {
+  measureCanvasTextBlocks,
+  type CanvasTextBlockMeasurementInput,
+  type CanvasTextMeasurementBlock,
+  type CanvasTextMeasurementDocument,
+  type CanvasTextMeasurementElement,
+  type CanvasTextMeasurementSize,
+  type CanvasTextMeasurementStyle,
+} from './affordances/editing/text-editor/CanvasTextMeasurementDom'
+export {
   getCanvasImportedImageSize,
   type CanvasImportedImageSize,
   type CanvasImportedImageSizeOptions,

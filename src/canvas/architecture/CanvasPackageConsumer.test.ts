@@ -32,6 +32,7 @@ import {
   getCanvasAppInstalledFeaturePackManifests,
   getCanvasAppInstalledViewFeaturePacks,
   getCanvasAppManifestViewFeaturePacks,
+  measureCanvasTextBlocks,
   getCanvasAppFoundationExtensionCommands,
   getCanvasAppFoundationExtensionRendererSlots,
   getCanvasAppFoundationExtensionTools,
@@ -683,6 +684,14 @@ describe('Canvas package consumer imports', () => {
     expect(CanvasAppFacade.getCanvasDataTransferText({
       dataTransfer: null,
     })).toBe('')
+    expect(measureCanvasTextBlocks({
+      blocks: [{ text: 'smoke' }],
+      document: null,
+    })).toBeNull()
+    expect(CanvasAppFacade.measureCanvasTextBlocks({
+      blocks: [{ text: 'smoke' }],
+      document: null,
+    })).toBeNull()
     expect(CANVAS_SVG_ARROW_MARKER_IRI).toBe('url(#canvas-arrow-head)')
     expect(createCanvasSvgPathData([{ x: 1, y: 2 }, { x: 3, y: 4 }]))
       .toBe('M 1 2 L 3 4')
