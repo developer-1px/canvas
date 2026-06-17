@@ -51,7 +51,10 @@ export {
   type CanvasToolbarCommandItemsInput,
 } from './CanvasToolbarCommandItems'
 export {
+  CANVAS_TOOLBAR_FOCUS_MODEL,
   CANVAS_TOOLBAR_ITEM_PROPS,
+  CANVAS_TOOLBAR_KEYBOARD_MODEL,
+  CANVAS_TOOLBAR_ROVING_FOCUS_MODEL,
   useCanvasToolbarRovingFocus,
 } from './CanvasToolbarRovingFocus'
 export {

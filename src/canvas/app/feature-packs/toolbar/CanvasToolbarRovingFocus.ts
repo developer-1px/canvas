@@ -10,6 +10,11 @@ export const CANVAS_TOOLBAR_ITEM_PROPS = {
   'data-canvas-toolbar-item': '',
 } as const
 
+export const CANVAS_TOOLBAR_ROVING_FOCUS_MODEL =
+  'canvas-toolbar-roving-focus'
+export const CANVAS_TOOLBAR_FOCUS_MODEL = 'roving-tabindex'
+export const CANVAS_TOOLBAR_KEYBOARD_MODEL = 'arrow-home-end'
+
 const CANVAS_TOOLBAR_ITEM_SELECTOR = '[data-canvas-toolbar-item]'
 
 type CanvasToolbarRovingItem = HTMLElement & {

@@ -24,7 +24,10 @@ export {
   CanvasObjectInspector,
 } from './affordances/editing/inspector/CanvasObjectInspector'
 export {
+  CANVAS_TOOLBAR_FOCUS_MODEL,
   CANVAS_TOOLBAR_ITEM_PROPS,
+  CANVAS_TOOLBAR_KEYBOARD_MODEL,
+  CANVAS_TOOLBAR_ROVING_FOCUS_MODEL,
   useCanvasToolbarRovingFocus,
 } from './feature-packs/toolbar'
 export {
