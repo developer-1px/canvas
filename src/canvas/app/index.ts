@@ -210,6 +210,15 @@ export {
   type CanvasPointerCaptureTarget,
 } from './affordances/interaction/pointer/CanvasPointerCapture'
 export {
+  getCanvasPointerLocalGeometry,
+  getCanvasPointerLocalPoint,
+  type CanvasPointerClientPosition,
+  type CanvasPointerLocalGeometry,
+  type CanvasPointerLocalGeometryInput,
+  type CanvasPointerLocalRect,
+  type CanvasPointerLocalTarget,
+} from './affordances/interaction/pointer/CanvasPointerGeometry'
+export {
   CanvasAppViewportOverlayLayer,
   type CanvasAppViewportOverlayLayerProps,
 } from './rendering/CanvasAppViewportOverlayLayer'
