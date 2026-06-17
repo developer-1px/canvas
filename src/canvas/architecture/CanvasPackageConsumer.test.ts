@@ -47,6 +47,7 @@ import {
   getCanvasAppManifestViewFeaturePacks,
   measureCanvasTextBlocks,
   getCanvasPointerTransformModifierState,
+  getCanvasResizeHandleDoubleClickIntent,
   getCanvasMenuRovingActiveIndex,
   getCanvasSelectionListModifierState,
   getCanvasWorldClientPoint,
@@ -85,6 +86,8 @@ import {
   type CanvasAppViewFeaturePack,
   type CanvasInteractionTargetSelectorInput,
   type CanvasMenuRovingActiveIndexInput,
+  type CanvasPointerClickMemory,
+  type CanvasResizeHandleDoubleClickIntentInput,
   type CanvasPointerTransformModifierInput,
   type CanvasPointerTransformModifierState,
   type CanvasSelectionListModifierInput,
@@ -476,6 +479,19 @@ describe('Canvas package consumer imports', () => {
     }
     const pointerTransformModifierState: CanvasPointerTransformModifierState =
       getCanvasPointerTransformModifierState(pointerTransformModifierInput)
+    const resizeHandleLastClick: CanvasPointerClickMemory = {
+      id: 'selection:se',
+      point: { x: 20, y: 30 },
+      time: 1000,
+    }
+    const resizeHandleDoubleClickInput:
+      CanvasResizeHandleDoubleClickIntentInput = {
+        handle: 'se',
+        handleId: 'selection:se',
+        lastClick: resizeHandleLastClick,
+        point: { x: 22, y: 32 },
+        time: 1200,
+      }
     const selectionListModifierInput: CanvasSelectionListModifierInput = {
       ctrlKey: false,
       hasRangeAnchor: true,
@@ -556,6 +572,18 @@ describe('Canvas package consumer imports', () => {
     expect(CanvasAppFacade.getCanvasPointerTransformModifierState(
       pointerTransformModifierInput,
     )).toEqual(pointerTransformModifierState)
+    expect(getCanvasResizeHandleDoubleClickIntent(
+      resizeHandleDoubleClickInput,
+    ).intent).toEqual({
+      handle: 'se',
+      kind: 'auto-size-selection',
+    })
+    expect(CanvasAppFacade.getCanvasResizeHandleDoubleClickIntent(
+      resizeHandleDoubleClickInput,
+    ).intent).toEqual({
+      handle: 'se',
+      kind: 'auto-size-selection',
+    })
     expect(selectionListModifierState).toEqual({
       additive: false,
       mode: 'range',

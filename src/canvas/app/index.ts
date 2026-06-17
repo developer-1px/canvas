@@ -260,6 +260,14 @@ export {
   type CanvasPointerCaptureTarget,
 } from './affordances/interaction/pointer/CanvasPointerCapture'
 export {
+  getCanvasResizeHandleDoubleClickIntent,
+  recordCanvasItemPointerClick,
+  type CanvasPointerClickMemory,
+  type CanvasResizeHandleDoubleClickIntent,
+  type CanvasResizeHandleDoubleClickIntentInput,
+  type CanvasResizeHandleDoubleClickIntentResult,
+} from './affordances/interaction/pointer/CanvasPointerClickMemory'
+export {
   getCanvasPointerTransformModifierState,
   type CanvasPointerTransformModifierInput,
   type CanvasPointerTransformModifierState,
