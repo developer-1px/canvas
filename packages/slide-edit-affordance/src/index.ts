@@ -53,6 +53,13 @@ export {
   type SlideEditDeckNavigationSlideId,
 } from './SlideEditDeckNavigationKeyboard'
 export {
+  getSlideEditTextFormattingKeyboardIntent,
+  type SlideEditTextFormattingKeyboardIntent,
+  type SlideEditTextFormattingKeyboardIntentInput,
+  type SlideEditTextFormattingKeyboardIntentKind,
+  type SlideEditTextFormattingKeyboardShortcut,
+} from './SlideEditTextFormattingKeyboard'
+export {
   getSlideEditTextAutoFitGestureCommandEffect,
   getSlideEditTextAutoSizeBounds,
   getSlideEditTextOverflowIndicatorState,
