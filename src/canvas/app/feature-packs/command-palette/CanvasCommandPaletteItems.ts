@@ -28,6 +28,9 @@ import {
   getCanvasAppCommandMappingShortcut,
 } from '../../affordances/commands/CanvasAppCommandRegistry'
 
+export const CANVAS_COMMAND_PALETTE_ITEMS_MODEL =
+  'canvas-command-palette-items'
+
 export type CanvasCommandPaletteItem = {
   disabled?: boolean
   id: string

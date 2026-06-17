@@ -4,11 +4,18 @@ import {
   type CanvasCommandAvailability,
 } from '../../../engine'
 import {
+  CANVAS_COMMAND_PALETTE_ITEMS_MODEL,
   filterCanvasCommandPaletteItems,
   getCanvasCommandPaletteItems,
 } from './CanvasCommandPaletteItems'
 
 describe('CanvasCommandPaletteItems', () => {
+  it('exposes a stable items model metadata value', () => {
+    expect(CANVAS_COMMAND_PALETTE_ITEMS_MODEL).toBe(
+      'canvas-command-palette-items',
+    )
+  })
+
   it('builds searchable actions from tools, components, commands, and view controls', () => {
     const onToolChange = vi.fn()
     const onInsertComponent = vi.fn()

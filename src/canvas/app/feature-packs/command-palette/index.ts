@@ -9,6 +9,7 @@ import { CanvasCommandPalette } from './CanvasCommandPalette'
 
 export { CanvasCommandPalette } from './CanvasCommandPalette'
 export {
+  CANVAS_COMMAND_PALETTE_ITEMS_MODEL,
   filterCanvasCommandPaletteItems,
   getCanvasCommandPaletteItems,
   type CanvasCommandPaletteComponent,
