@@ -6,6 +6,7 @@ import {
   type CanvasAffordanceConfig,
   type CanvasCommandAvailability,
 } from '../../../engine'
+import { isCanvasTargetWithinSelector } from '../../affordances/interaction/dom/CanvasInteractionTarget'
 import { CanvasCommandMenuSurface } from './CanvasCommandMenuSurface'
 import {
   getCanvasCommandSurfaceGroups,
@@ -48,8 +49,10 @@ export function CanvasContextCommandMenu({
       }
     }
     const handlePointerDown = (event: PointerEvent) => {
-      if (event.target instanceof Element &&
-        event.target.closest('.context-command-menu')) {
+      if (isCanvasTargetWithinSelector({
+        selectors: '.context-command-menu',
+        target: event.target,
+      })) {
         return
       }
 
