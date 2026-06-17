@@ -187,6 +187,7 @@ export type SlideEditLayerPaneKeyboardKey =
   | 'ArrowRight'
   | 'ArrowUp'
   | 'End'
+  | 'F2'
   | 'Enter'
   | 'Home'
   | ' '
@@ -206,6 +207,7 @@ export type SlideEditLayerPaneKeyboardIntent<
       | 'expand-row'
       | 'focus-parent-row'
       | 'focus-row'
+      | 'rename-row'
       | 'select-row'
   }
   | {
@@ -344,6 +346,12 @@ export function getSlideEditLayerPaneKeyboardIntent<
 
   if (rows.length === 0 || currentIndex < 0) {
     return { preventDefault: false, type: 'none' }
+  }
+
+  if (!altKey && !shiftKey && key === 'F2') {
+    return rows[currentIndex].isRenamable
+      ? toSlideEditLayerPaneKeyboardIntent(rows[currentIndex], 'rename-row')
+      : { preventDefault: false, type: 'none' }
   }
 
   if (altKey && key === 'ArrowUp') {

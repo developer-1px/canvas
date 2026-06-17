@@ -294,6 +294,14 @@ describe('SlideEditObjectLayerPane', () => {
       type: 'select-row',
     })
     expect(getSlideEditLayerPaneKeyboardIntent(groupedDescriptor, {
+      currentObjectId: 'child-a',
+      key: 'F2',
+    })).toEqual({
+      objectId: 'child-a',
+      preventDefault: true,
+      type: 'rename-row',
+    })
+    expect(getSlideEditLayerPaneKeyboardIntent(groupedDescriptor, {
       currentObjectId: 'group-b',
       key: 'ArrowRight',
     })).toEqual({
@@ -336,6 +344,53 @@ describe('SlideEditObjectLayerPane', () => {
     expect(getSlideEditLayerPaneKeyboardIntent(groupedDescriptor, {
       currentObjectId: 'group-a',
       key: 'Delete',
+    })).toEqual({ preventDefault: false, type: 'none' })
+  })
+
+  it('maps F2 only for renamable layer pane rows', () => {
+    const descriptor = createSlideEditLayerPaneDescriptor({
+      activeObjectId: 'renamable',
+      slideId: 'slide-rename',
+      selectedObjectIds: ['renamable'],
+      objects: [
+        {
+          displayName: 'Renamable',
+          kindLabel: 'Text',
+          objectId: 'renamable',
+        },
+        {
+          displayName: 'Fixed',
+          isRenamable: false,
+          kindLabel: 'Placeholder',
+          objectId: 'fixed',
+        },
+      ],
+    })
+
+    expect(getSlideEditLayerPaneKeyboardIntent(descriptor, {
+      currentObjectId: 'renamable',
+      key: 'F2',
+    })).toEqual({
+      objectId: 'renamable',
+      preventDefault: true,
+      type: 'rename-row',
+    })
+
+    expect(getSlideEditLayerPaneKeyboardIntent(descriptor, {
+      currentObjectId: 'fixed',
+      key: 'F2',
+    })).toEqual({ preventDefault: false, type: 'none' })
+
+    expect(getSlideEditLayerPaneKeyboardIntent(descriptor, {
+      altKey: true,
+      currentObjectId: 'renamable',
+      key: 'F2',
+    })).toEqual({ preventDefault: false, type: 'none' })
+
+    expect(getSlideEditLayerPaneKeyboardIntent(descriptor, {
+      currentObjectId: 'renamable',
+      key: 'F2',
+      shiftKey: true,
     })).toEqual({ preventDefault: false, type: 'none' })
   })
 
