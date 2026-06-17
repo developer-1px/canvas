@@ -34,6 +34,7 @@ import {
   downloadCanvasBlobFile,
   downloadCanvasTextFile,
   getCanvasEditableFieldKeyboardIntent,
+  getCanvasPresentationKeyboardIntent,
   setCanvasDataTransferText,
   scheduleCanvasAnimationFrameTask,
   writeCanvasClipboardText,
@@ -91,6 +92,7 @@ import {
   type CanvasAppItemsChange,
   type CanvasAppViewFeaturePack,
   type CanvasEditableFieldKeyboardIntentInput,
+  type CanvasPresentationKeyboardIntentInput,
   type CanvasInteractionTargetSelectorInput,
   type CanvasInlineEditKeyboardIntentInput,
   type CanvasFindInputKeyboardIntentInput,
@@ -529,6 +531,9 @@ describe('Canvas package consumer imports', () => {
     const editableFieldKeyboardInput: CanvasEditableFieldKeyboardIntentInput = {
       key: 'Escape',
     }
+    const presentationKeyboardInput: CanvasPresentationKeyboardIntentInput = {
+      key: 'PageDown',
+    }
     const modalBackdropPointerTarget = {} as EventTarget
     const modalBackdropPointerInput: CanvasModalBackdropPointerIntentInput = {
       currentTarget: modalBackdropPointerTarget,
@@ -666,6 +671,19 @@ describe('Canvas package consumer imports', () => {
       editableFieldKeyboardInput,
     )).toEqual({
       kind: 'cancel',
+      preventDefault: true,
+    })
+    expect(getCanvasPresentationKeyboardIntent(presentationKeyboardInput))
+      .toEqual({
+        direction: 1,
+        kind: 'navigate',
+        preventDefault: true,
+      })
+    expect(CanvasAppFacade.getCanvasPresentationKeyboardIntent(
+      presentationKeyboardInput,
+    )).toEqual({
+      direction: 1,
+      kind: 'navigate',
       preventDefault: true,
     })
     expect(getCanvasModalBackdropPointerIntent(modalBackdropPointerInput))

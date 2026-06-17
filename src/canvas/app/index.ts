@@ -81,6 +81,11 @@ export {
   type CanvasEditableFieldKeyboardIntentInput,
 } from './affordances/controls/editable-field/CanvasEditableFieldKeyboard'
 export {
+  getCanvasPresentationKeyboardIntent,
+  type CanvasPresentationKeyboardIntent,
+  type CanvasPresentationKeyboardIntentInput,
+} from './affordances/controls/presentation/CanvasPresentationKeyboard'
+export {
   cancelCanvasDeferredFocus,
   focusCanvasElement,
   focusCanvasElementBySelectorOnNextFrame,
