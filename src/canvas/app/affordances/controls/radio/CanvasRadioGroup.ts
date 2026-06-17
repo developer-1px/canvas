@@ -1,5 +1,9 @@
 import type { KeyboardEvent } from 'react'
 
+export const CANVAS_RADIO_GROUP_MODEL = 'canvas-radio-group'
+export const CANVAS_RADIO_GROUP_FOCUS_MODEL = 'roving-tabindex'
+export const CANVAS_RADIO_GROUP_KEYBOARD_MODEL = 'arrow-home-end'
+
 type CanvasRadioItem = HTMLElement & {
   disabled?: boolean
 }

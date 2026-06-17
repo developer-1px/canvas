@@ -87,6 +87,13 @@ export {
   type CanvasEditableFieldKeyboardIntentInput,
 } from './affordances/controls/editable-field/CanvasEditableFieldKeyboard'
 export {
+  CANVAS_RADIO_GROUP_FOCUS_MODEL,
+  CANVAS_RADIO_GROUP_KEYBOARD_MODEL,
+  CANVAS_RADIO_GROUP_MODEL,
+  getCanvasRadioTabIndex,
+  handleCanvasRadioGroupKeyDown,
+} from './affordances/controls/radio/CanvasRadioGroup'
+export {
   getCanvasPresentationKeyboardIntent,
   type CanvasPresentationKeyboardIntent,
   type CanvasPresentationKeyboardIntentInput,
