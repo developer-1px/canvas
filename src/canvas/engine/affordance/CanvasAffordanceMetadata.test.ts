@@ -90,6 +90,16 @@ describe('CanvasAffordanceMetadata', () => {
     expect(CANVAS_TOOL_AFFORDANCES.diamond.title).toBe('Diamond')
     expect(CANVAS_TOOL_AFFORDANCES.highlight.shortcut).toBe('Shift+M')
     expect(CANVAS_TOOL_AFFORDANCES.section.shortcut).toBe('Shift+S')
+    expect(CANVAS_TOOL_AFFORDANCES.arrow.model).toBe('canvas-arrow-tool')
+    expect(CANVAS_TOOL_AFFORDANCES.highlight.model).toBe(
+      'canvas-highlighter-tool',
+    )
+    expect(CANVAS_TOOL_AFFORDANCES.laser.model).toBe(
+      'canvas-laser-pointer-tool',
+    )
+    expect(CANVAS_TOOL_AFFORDANCES.sticky.model).toBe(
+      'canvas-sticky-note-tool',
+    )
     expect(CANVAS_TOOL_AFFORDANCES.highlight.title).toBe(
       'Highlighter (Shift+M)',
     )

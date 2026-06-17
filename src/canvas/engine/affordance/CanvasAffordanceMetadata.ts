@@ -10,6 +10,7 @@ import type {
 export type CanvasToolAffordance = Readonly<{
   ariaLabel: string
   keyboardShortcut?: CanvasToolKeyboardShortcut
+  model: string
   shortcut?: string
   statusLabel: string
   title: string
@@ -53,6 +54,7 @@ export const CANVAS_TOOL_AFFORDANCES = Object.freeze({
       shiftInsensitive: true,
       shortcutId: 'arrowTool',
     },
+    model: 'canvas-arrow-tool',
     statusLabel: 'Arrow',
   }),
   comment: createCanvasToolAffordance({
@@ -62,6 +64,7 @@ export const CANVAS_TOOL_AFFORDANCES = Object.freeze({
       shiftInsensitive: true,
       shortcutId: 'commentTool',
     },
+    model: 'canvas-comment-tool',
     statusLabel: 'Comment',
   }),
   highlight: createCanvasToolAffordance({
@@ -71,6 +74,7 @@ export const CANVAS_TOOL_AFFORDANCES = Object.freeze({
       shiftKey: true,
       shortcutId: 'highlighterTool',
     },
+    model: 'canvas-highlighter-tool',
     statusLabel: 'Highlight',
   }),
   eraser: createCanvasToolAffordance({
@@ -80,10 +84,12 @@ export const CANVAS_TOOL_AFFORDANCES = Object.freeze({
       shiftInsensitive: true,
       shortcutId: 'eraserTool',
     },
+    model: 'canvas-eraser-tool',
     statusLabel: 'Eraser',
   }),
   diamond: createCanvasToolAffordance({
     ariaLabel: 'Diamond tool',
+    model: 'canvas-diamond-tool',
     statusLabel: 'Diamond',
   }),
   ellipse: createCanvasToolAffordance({
@@ -93,6 +99,7 @@ export const CANVAS_TOOL_AFFORDANCES = Object.freeze({
       shiftInsensitive: true,
       shortcutId: 'ellipseTool',
     },
+    model: 'canvas-ellipse-tool',
     statusLabel: 'Ellipse',
   }),
   laser: createCanvasToolAffordance({
@@ -102,6 +109,7 @@ export const CANVAS_TOOL_AFFORDANCES = Object.freeze({
       shiftInsensitive: true,
       shortcutId: 'laserTool',
     },
+    model: 'canvas-laser-pointer-tool',
     statusLabel: 'Laser',
   }),
   marker: createCanvasToolAffordance({
@@ -110,6 +118,7 @@ export const CANVAS_TOOL_AFFORDANCES = Object.freeze({
       key: 'm',
       shortcutId: 'markerTool',
     },
+    model: 'canvas-marker-tool',
     statusLabel: 'Marker',
   }),
   pen: createCanvasToolAffordance({
@@ -119,6 +128,7 @@ export const CANVAS_TOOL_AFFORDANCES = Object.freeze({
       shiftKey: true,
       shortcutId: 'penTool',
     },
+    model: 'canvas-pen-tool',
     statusLabel: 'Pen',
   }),
   pan: createCanvasToolAffordance({
@@ -128,6 +138,7 @@ export const CANVAS_TOOL_AFFORDANCES = Object.freeze({
       shiftInsensitive: true,
       shortcutId: 'panTool',
     },
+    model: 'canvas-pan-tool',
     statusLabel: 'Pan',
   }),
   rect: createCanvasToolAffordance({
@@ -137,6 +148,7 @@ export const CANVAS_TOOL_AFFORDANCES = Object.freeze({
       shiftInsensitive: true,
       shortcutId: 'rectTool',
     },
+    model: 'canvas-rect-tool',
     statusLabel: 'Rect',
   }),
   select: createCanvasToolAffordance({
@@ -146,6 +158,7 @@ export const CANVAS_TOOL_AFFORDANCES = Object.freeze({
       shiftInsensitive: true,
       shortcutId: 'selectTool',
     },
+    model: 'canvas-select-tool',
     statusLabel: 'Select',
   }),
   section: createCanvasToolAffordance({
@@ -155,6 +168,7 @@ export const CANVAS_TOOL_AFFORDANCES = Object.freeze({
       shiftKey: true,
       shortcutId: 'sectionTool',
     },
+    model: 'canvas-section-tool',
     statusLabel: 'Section',
   }),
   sticky: createCanvasToolAffordance({
@@ -163,6 +177,7 @@ export const CANVAS_TOOL_AFFORDANCES = Object.freeze({
       key: 's',
       shortcutId: 'stickyTool',
     },
+    model: 'canvas-sticky-note-tool',
     statusLabel: 'Sticky',
   }),
   text: createCanvasToolAffordance({
@@ -172,6 +187,7 @@ export const CANVAS_TOOL_AFFORDANCES = Object.freeze({
       shiftInsensitive: true,
       shortcutId: 'textTool',
     },
+    model: 'canvas-text-tool',
     statusLabel: 'Text',
   }),
 } satisfies Readonly<Record<CanvasBuiltinTool, CanvasToolAffordance>>)
@@ -179,10 +195,12 @@ export const CANVAS_TOOL_AFFORDANCES = Object.freeze({
 function createCanvasToolAffordance({
   ariaLabel,
   keyboardShortcut,
+  model,
   statusLabel,
 }: {
   ariaLabel: string
   keyboardShortcut?: CanvasToolKeyboardShortcut
+  model: string
   statusLabel: string
 }): CanvasToolAffordance {
   const frozenKeyboardShortcut = keyboardShortcut
@@ -198,6 +216,7 @@ function createCanvasToolAffordance({
       keyboardShortcut: frozenKeyboardShortcut,
       shortcut,
     } : {}),
+    model,
     statusLabel,
     title: shortcut
       ? `${getCanvasToolAffordanceTitleLabel(ariaLabel)} (${shortcut})`
