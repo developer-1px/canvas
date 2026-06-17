@@ -7,6 +7,7 @@ import {
   getSlideEditRailListboxKeyboardIntent,
   getSlideEditRailPointerCommandEffect,
   SLIDE_EDIT_RAIL_COMMANDS,
+  SLIDE_EDIT_RAIL_KEYBOARD_KEYS,
 } from './SlideEditRailInteractions'
 
 describe('SlideEditRailInteractions', () => {
@@ -110,6 +111,9 @@ describe('SlideEditRailInteractions', () => {
     expect(SLIDE_EDIT_RAIL_COMMANDS.every(
       (command) => command.requiredAdapterSlot === 'command-effect',
     )).toBe(true)
+    expect(SLIDE_EDIT_RAIL_KEYBOARD_KEYS).toBe(
+      'ArrowUp ArrowDown Home End Enter Space',
+    )
   })
 
   it('converts keyboard intents to host command effects', () => {

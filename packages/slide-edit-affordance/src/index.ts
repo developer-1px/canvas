@@ -31,6 +31,7 @@ export {
   getSlideEditRailListboxKeyboardIntent,
   getSlideEditRailPointerCommandEffect,
   SLIDE_EDIT_RAIL_COMMANDS,
+  SLIDE_EDIT_RAIL_KEYBOARD_KEYS,
   toSlideEditRailHostCommandEffect,
   type SlideEditRailCommand,
   type SlideEditRailCommandDescriptor,
