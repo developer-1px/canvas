@@ -1,8 +1,15 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
-import { CanvasObjectInspector } from './CanvasObjectInspector'
+import {
+  CANVAS_COMMENT_THREAD_MODEL,
+  CanvasObjectInspector,
+} from './CanvasObjectInspector'
 
 describe('CanvasObjectInspector', () => {
+  it('exposes a stable comment thread model metadata value', () => {
+    expect(CANVAS_COMMENT_THREAD_MODEL).toBe('canvas-comment-thread')
+  })
+
   it('renders style swatches for selected object colors', () => {
     const markup = renderToStaticMarkup(
       <CanvasObjectInspector
@@ -109,6 +116,9 @@ describe('CanvasObjectInspector', () => {
     )
 
     expect(markup).toContain('aria-label="Comment thread"')
+    expect(markup).toContain(
+      `data-canvas-comment-thread-model="${CANVAS_COMMENT_THREAD_MODEL}"`,
+    )
     expect(markup).toContain('Needs follow-up')
     expect(markup).toContain('Resolve')
   })

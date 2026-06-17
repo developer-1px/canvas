@@ -21,6 +21,7 @@ export {
   CanvasMinimap,
 } from './feature-packs/minimap'
 export {
+  CANVAS_COMMENT_THREAD_MODEL,
   CanvasObjectInspector,
 } from './affordances/editing/inspector/CanvasObjectInspector'
 export {

@@ -32,6 +32,8 @@ type CanvasObjectInspectorProps = {
   onChangeBounds: (bounds: Bounds) => void
 }
 
+export const CANVAS_COMMENT_THREAD_MODEL = 'canvas-comment-thread'
+
 type BoundsField = keyof Bounds
 
 const FIELDS: Array<{ id: BoundsField; label: string; min?: number }> = [
@@ -167,6 +169,7 @@ function CanvasObjectInspectorCommentThreadView({
     <section
       aria-label="Comment thread"
       className="inspector-comment-thread"
+      data-canvas-comment-thread-model={CANVAS_COMMENT_THREAD_MODEL}
       data-resolved={thread.resolved ? 'true' : 'false'}
     >
       <div className="inspector-comment-thread-header">
