@@ -439,6 +439,7 @@ export {
   SLIDE_EDIT_LAYER_PANE_COMMANDS,
   SLIDE_EDIT_LAYER_PANE_DROP_INDICATOR_MODEL,
   SLIDE_EDIT_LAYER_PANE_KEYBOARD_INTENT_MODEL,
+  SLIDE_EDIT_LAYER_PANE_KEYBOARD_KEYS,
   type SlideEditLayerPaneAriaContract,
   type SlideEditLayerPaneCommand,
   type SlideEditLayerPaneCommandDescriptor,

@@ -21,6 +21,9 @@ export const SLIDE_EDIT_LAYER_PANE_ARIA_CONTRACT = Object.freeze({
 export const SLIDE_EDIT_LAYER_PANE_KEYBOARD_INTENT_MODEL =
   'slide-edit-layer-pane-keyboard-intent'
 
+export const SLIDE_EDIT_LAYER_PANE_KEYBOARD_KEYS =
+  'arrow-left-right-up-down-home-end-enter-space-shift-range-alt-reorder-f2-rename'
+
 export const SLIDE_EDIT_LAYER_PANE_DROP_INDICATOR_MODEL =
   'slide-edit-layer-pane-drop-indicator'
 

@@ -10,6 +10,7 @@ import {
   SLIDE_EDIT_LAYER_PANE_COMMANDS,
   SLIDE_EDIT_LAYER_PANE_DROP_INDICATOR_MODEL,
   SLIDE_EDIT_LAYER_PANE_KEYBOARD_INTENT_MODEL,
+  SLIDE_EDIT_LAYER_PANE_KEYBOARD_KEYS,
 } from './SlideEditObjectLayerPane'
 
 function createGroupedLayerPaneDescriptor() {
@@ -129,6 +130,9 @@ describe('SlideEditObjectLayerPane', () => {
     })
     expect(SLIDE_EDIT_LAYER_PANE_KEYBOARD_INTENT_MODEL).toBe(
       'slide-edit-layer-pane-keyboard-intent',
+    )
+    expect(SLIDE_EDIT_LAYER_PANE_KEYBOARD_KEYS).toBe(
+      'arrow-left-right-up-down-home-end-enter-space-shift-range-alt-reorder-f2-rename',
     )
   })
 
