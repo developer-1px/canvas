@@ -22,7 +22,7 @@ export type CanvasEventListenerInput<TEvent extends Event = Event> = {
 }
 
 export type CanvasEventListenersInput = {
-  listeners: readonly CanvasEventListenerInput[]
+  listeners: readonly CanvasEventListenerInput<never>[]
 }
 
 export function bindCanvasEventListener<TEvent extends Event = Event>({

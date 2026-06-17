@@ -68,20 +68,27 @@ describe('CanvasEventListener', () => {
     const target = createEventTarget()
     const first = vi.fn()
     const second = vi.fn()
+    const keyboardListener = vi.fn((event: KeyboardEvent) => event.type)
+    const pointerListener = vi.fn((event: PointerEvent) => event.type)
 
     const cleanup = bindCanvasEventListeners({
       listeners: [
         { listener: first, target, type: 'keydown' },
         { listener: second, target, type: 'keyup' },
+        { listener: keyboardListener, target, type: 'keydown' },
+        { listener: pointerListener, target, type: 'pointerdown' },
       ],
     })
 
     target.dispatch('keydown', new Event('keydown'))
     target.dispatch('keyup', new Event('keyup'))
+    target.dispatch('pointerdown', new Event('pointerdown'))
 
     expect(first).toHaveBeenCalledTimes(1)
     expect(second).toHaveBeenCalledTimes(1)
-    expect(target.listenerCount()).toBe(2)
+    expect(keyboardListener).toHaveBeenCalledTimes(1)
+    expect(pointerListener).toHaveBeenCalledTimes(1)
+    expect(target.listenerCount()).toBe(4)
 
     expect(cleanup()).toBe(true)
     expect(cleanup()).toBe(false)
