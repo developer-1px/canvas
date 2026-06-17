@@ -45,6 +45,7 @@ import {
   getCanvasAppInstalledFeaturePackManifests,
   getCanvasAppInstalledViewFeaturePacks,
   getCanvasAppManifestViewFeaturePacks,
+  getCanvasFindInputKeyboardIntent,
   measureCanvasTextBlocks,
   getCanvasPointerTransformModifierState,
   getCanvasResizeHandleDoubleClickIntent,
@@ -86,6 +87,7 @@ import {
   type CanvasAppItemsChange,
   type CanvasAppViewFeaturePack,
   type CanvasInteractionTargetSelectorInput,
+  type CanvasFindInputKeyboardIntentInput,
   type CanvasMenuRovingActiveIndexInput,
   type CanvasMenuTriggerKeyboardIntentInput,
   type CanvasPointerClickMemory,
@@ -512,6 +514,10 @@ describe('Canvas package consumer imports', () => {
     const menuTriggerKeyboardInput: CanvasMenuTriggerKeyboardIntentInput = {
       key: 'Enter',
     }
+    const findInputKeyboardInput: CanvasFindInputKeyboardIntentInput = {
+      key: 'Enter',
+      shiftKey: true,
+    }
     const commandPaletteKeyboardInput: CanvasCommandPaletteKeyboardIntentInput =
       {
         activeIndex: 0,
@@ -611,6 +617,18 @@ describe('Canvas package consumer imports', () => {
       menuTriggerKeyboardInput,
     )).toEqual({
       kind: 'open-menu',
+      preventDefault: true,
+    })
+    expect(getCanvasFindInputKeyboardIntent(findInputKeyboardInput)).toEqual({
+      direction: -1,
+      kind: 'find-match',
+      preventDefault: true,
+    })
+    expect(CanvasAppFacade.getCanvasFindInputKeyboardIntent(
+      findInputKeyboardInput,
+    )).toEqual({
+      direction: -1,
+      kind: 'find-match',
       preventDefault: true,
     })
     expect(CanvasAppFacade.getCanvasCommandPaletteKeyboardIntent(

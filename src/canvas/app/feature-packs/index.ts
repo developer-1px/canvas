@@ -104,7 +104,10 @@ export {
   type CanvasAppFacilitationBundleOptions,
 } from './facilitation'
 export {
+  getCanvasFindInputKeyboardIntent,
   useCanvasFindReplaceModel,
+  type CanvasFindInputKeyboardIntent,
+  type CanvasFindInputKeyboardIntentInput,
 } from './find-replace'
 export {
   useCanvasImageControls,

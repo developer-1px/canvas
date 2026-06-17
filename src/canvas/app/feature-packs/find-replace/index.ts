@@ -8,6 +8,11 @@ import {
 import { CanvasFindReplacePanel } from './CanvasFindReplacePanel'
 
 export { CanvasFindReplacePanel } from './CanvasFindReplacePanel'
+export {
+  getCanvasFindInputKeyboardIntent,
+  type CanvasFindInputKeyboardIntent,
+  type CanvasFindInputKeyboardIntentInput,
+} from './CanvasFindReplaceKeyboard'
 export { getCanvasFindReplaceModel } from './CanvasFindReplaceModel'
 export { useCanvasFindReplaceModel } from './useCanvasFindReplaceModel'
 
