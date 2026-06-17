@@ -180,6 +180,7 @@ export {
   type CanvasSceneEntry,
 } from './CanvasSceneAdapter'
 export {
+  CANVAS_MARQUEE_SELECTION_MODEL,
   getCanvasItemPointerSelection,
   getCanvasMarqueeSelection,
   type CanvasItemPointerSelection,

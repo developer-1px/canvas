@@ -2,6 +2,8 @@ import type { Bounds } from '../core'
 import { unique } from '../core'
 import type { CanvasSceneAdapter } from './CanvasSceneAdapter'
 
+export const CANVAS_MARQUEE_SELECTION_MODEL = 'canvas-marquee-selection'
+
 export type CanvasItemPointerSelection = {
   alreadySelected: boolean
   dragItemId: string

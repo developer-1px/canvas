@@ -92,6 +92,7 @@ export {
   type CanvasSceneEntry,
 } from '../foundation/CanvasSceneAdapter'
 export {
+  CANVAS_MARQUEE_SELECTION_MODEL,
   getCanvasItemPointerSelection,
   getCanvasMarqueeSelection,
   type CanvasItemPointerSelection,
