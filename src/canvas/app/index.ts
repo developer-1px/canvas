@@ -87,6 +87,15 @@ export {
   type CanvasEditableFieldKeyboardIntentInput,
 } from './affordances/controls/editable-field/CanvasEditableFieldKeyboard'
 export {
+  CANVAS_KEYBOARD_NUDGE_INTENT_MODEL,
+  CANVAS_KEYBOARD_NUDGE_KEYS,
+  CANVAS_KEYBOARD_NUDGE_LARGE_STEP,
+  CANVAS_KEYBOARD_NUDGE_MODEL,
+  CANVAS_KEYBOARD_NUDGE_STEP,
+  getCanvasKeyboardNudgeShortcutIntent,
+  getCanvasKeyboardReservedNudgeShortcuts,
+} from './affordances/interaction/keyboard/CanvasKeyboardNudgeShortcuts'
+export {
   CANVAS_RADIO_GROUP_FOCUS_MODEL,
   CANVAS_RADIO_GROUP_KEYBOARD_MODEL,
   CANVAS_RADIO_GROUP_MODEL,
