@@ -9,6 +9,9 @@ import {
   CanvasHost,
   CanvasRenderer,
   CANVAS_APP_BOARD_IO_FEATURE_PACK_MANIFEST,
+  cancelCanvasDeferredFocus,
+  focusCanvasElement,
+  focusCanvasElementOnNextFrame,
   createCanvasAppAssembly,
   createCanvasAppExtensionBundle,
   createCanvasAppAiLabsFeaturePackManifest,
@@ -692,6 +695,24 @@ describe('Canvas package consumer imports', () => {
       blocks: [{ text: 'smoke' }],
       document: null,
     })).toBeNull()
+    expect(focusCanvasElement({
+      element: null,
+    })).toBe(false)
+    expect(focusCanvasElementOnNextFrame({
+      requestAnimationFrame: null,
+      resolveElement: () => null,
+    })).toBeNull()
+    expect(cancelCanvasDeferredFocus({
+      cancelAnimationFrame: null,
+      frame: 1,
+    })).toBe(false)
+    expect(CanvasAppFacade.focusCanvasElement({
+      element: null,
+    })).toBe(false)
+    expect(CanvasAppFacade.cancelCanvasDeferredFocus({
+      cancelAnimationFrame: null,
+      frame: 1,
+    })).toBe(false)
     expect(CANVAS_SVG_ARROW_MARKER_IRI).toBe('url(#canvas-arrow-head)')
     expect(createCanvasSvgPathData([{ x: 1, y: 2 }, { x: 3, y: 4 }]))
       .toBe('M 1 2 L 3 4')

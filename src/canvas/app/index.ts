@@ -61,6 +61,17 @@ export {
   type CanvasTabsTabInput,
 } from './affordances/controls/tabs/CanvasTabsRovingFocus'
 export {
+  cancelCanvasDeferredFocus,
+  focusCanvasElement,
+  focusCanvasElementOnNextFrame,
+  type CanvasAnimationFrameCancel,
+  type CanvasAnimationFrameRequest,
+  type CanvasDeferredFocusCancelInput,
+  type CanvasDeferredFocusInput,
+  type CanvasFocusableElement,
+  type CanvasFocusElementInput,
+} from './affordances/controls/focus/CanvasDeferredFocus'
+export {
   getCanvasSelectionListRangeIds,
   type CanvasSelectionListRangeInput,
 } from './affordances/controls/selection-list/CanvasSelectionListRange'
