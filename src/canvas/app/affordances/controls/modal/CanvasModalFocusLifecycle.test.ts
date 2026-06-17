@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import {
   focusCanvasModalElement,
   getCanvasModalFocusableElements,
+  getCanvasModalBackdropPointerIntent,
   getCanvasModalKeyboardIntent,
   getCanvasModalNextFocusIndex,
   restoreCanvasModalFocus,
@@ -9,6 +10,24 @@ import {
 } from './CanvasModalFocusLifecycle'
 
 describe('CanvasModalFocusLifecycle', () => {
+  it('maps backdrop pointer targets to dismiss intent only for the backdrop itself', () => {
+    const backdrop = {}
+    const child = {}
+
+    expect(getCanvasModalBackdropPointerIntent({
+      currentTarget: backdrop as EventTarget,
+      target: backdrop as EventTarget,
+    })).toEqual({ kind: 'dismiss' })
+    expect(getCanvasModalBackdropPointerIntent({
+      currentTarget: backdrop as EventTarget,
+      target: child as EventTarget,
+    })).toEqual({ kind: 'none' })
+    expect(getCanvasModalBackdropPointerIntent({
+      currentTarget: null,
+      target: null,
+    })).toEqual({ kind: 'none' })
+  })
+
   it('maps modal keyboard keys to close and trap focus intents', () => {
     expect(getCanvasModalKeyboardIntent({ key: 'Escape' })).toEqual({
       kind: 'close',

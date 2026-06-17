@@ -7,6 +7,7 @@ import {
   type MouseEvent,
 } from 'react'
 import {
+  getCanvasModalBackdropPointerIntent,
   getCanvasModalKeyboardIntent,
   trapCanvasModalTabFocus,
   useCanvasModalFocusLifecycle,
@@ -131,7 +132,12 @@ function CanvasCommandPaletteDialog({
   }
 
   const handleBackdropMouseDown = (event: MouseEvent<HTMLDivElement>) => {
-    if (event.target === event.currentTarget) {
+    const backdropPointerIntent = getCanvasModalBackdropPointerIntent({
+      currentTarget: event.currentTarget,
+      target: event.target,
+    })
+
+    if (backdropPointerIntent.kind === 'dismiss') {
       event.preventDefault()
       onClose()
     }

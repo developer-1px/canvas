@@ -29,6 +29,15 @@ export type CanvasModalTabFocusEvent = {
   stopPropagation: () => void
 }
 
+export type CanvasModalBackdropPointerIntentInput = {
+  currentTarget: EventTarget | null
+  target: EventTarget | null
+}
+
+export type CanvasModalBackdropPointerIntent =
+  | { kind: 'dismiss' }
+  | { kind: 'none' }
+
 export type CanvasModalKeyboardIntentInput = {
   key: string
 }
@@ -140,6 +149,15 @@ export function restoreCanvasModalFocus(
   } = {},
 ) {
   return focusCanvasModalElement(element, { preventScroll })
+}
+
+export function getCanvasModalBackdropPointerIntent({
+  currentTarget,
+  target,
+}: CanvasModalBackdropPointerIntentInput): CanvasModalBackdropPointerIntent {
+  return currentTarget && target === currentTarget
+    ? { kind: 'dismiss' }
+    : { kind: 'none' }
 }
 
 export function getCanvasModalKeyboardIntent({
