@@ -185,7 +185,13 @@ export {
   type CanvasTextFileDownloadInput,
 } from './affordances/commands/CanvasFileDownload'
 export {
+  measureCanvasElementOverflow,
   measureCanvasTextBlocks,
+  type CanvasElementOverflowAxis,
+  type CanvasElementOverflowMeasurement,
+  type CanvasElementOverflowMeasurementInput,
+  type CanvasElementOverflowRect,
+  type CanvasElementOverflowTarget,
   type CanvasTextBlockMeasurementInput,
   type CanvasTextMeasurementBlock,
   type CanvasTextMeasurementDocument,

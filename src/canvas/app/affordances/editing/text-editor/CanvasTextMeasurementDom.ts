@@ -3,6 +3,40 @@ export type CanvasTextMeasurementSize = {
   w: number
 }
 
+export type CanvasElementOverflowAxis = 'horizontal' | 'vertical'
+
+export type CanvasElementOverflowRect = {
+  bottom: number
+  height: number
+  left: number
+  right: number
+  top: number
+  width: number
+}
+
+export type CanvasElementOverflowTarget = {
+  clientHeight: number
+  clientWidth: number
+  getBoundingClientRect?: () => CanvasElementOverflowRect
+  scrollHeight: number
+  scrollWidth: number
+}
+
+export type CanvasElementOverflowMeasurement = {
+  clientSize: CanvasTextMeasurementSize
+  containerSize: CanvasTextMeasurementSize | null
+  elementSize: CanvasTextMeasurementSize
+  hasOverflow: boolean
+  overflowAxis: readonly CanvasElementOverflowAxis[]
+  scrollSize: CanvasTextMeasurementSize
+}
+
+export type CanvasElementOverflowMeasurementInput = {
+  container?: CanvasElementOverflowTarget | null
+  element?: CanvasElementOverflowTarget | null
+  epsilon?: number
+}
+
 export type CanvasTextMeasurementElement = {
   appendChild: (child: CanvasTextMeasurementElement) => unknown
   getBoundingClientRect: () => Pick<DOMRect, 'height' | 'width'>
@@ -110,10 +144,85 @@ export function measureCanvasTextBlocks({
   }
 }
 
+export function measureCanvasElementOverflow({
+  container,
+  element,
+  epsilon = 0,
+}: CanvasElementOverflowMeasurementInput):
+  CanvasElementOverflowMeasurement | null {
+  const elementRect = element?.getBoundingClientRect?.()
+
+  if (
+    !element ||
+    !elementRect ||
+    !isCanvasTextMeasurementNumber(element.clientHeight) ||
+    !isCanvasTextMeasurementNumber(element.clientWidth) ||
+    !isCanvasTextMeasurementNumber(element.scrollHeight) ||
+    !isCanvasTextMeasurementNumber(element.scrollWidth)
+  ) {
+    return null
+  }
+
+  const safeEpsilon = isCanvasTextMeasurementNumber(epsilon)
+    ? Math.max(0, epsilon)
+    : 0
+  const containerRect = container?.getBoundingClientRect?.() ?? null
+  const overflowAxis: CanvasElementOverflowAxis[] = []
+
+  if (
+    element.scrollWidth > element.clientWidth + safeEpsilon ||
+    (containerRect
+      ? elementRect.width > containerRect.width + safeEpsilon ||
+        elementRect.left < containerRect.left - safeEpsilon ||
+        elementRect.right > containerRect.right + safeEpsilon
+      : false)
+  ) {
+    overflowAxis.push('horizontal')
+  }
+
+  if (
+    element.scrollHeight > element.clientHeight + safeEpsilon ||
+    (containerRect
+      ? elementRect.height > containerRect.height + safeEpsilon ||
+        elementRect.top < containerRect.top - safeEpsilon ||
+        elementRect.bottom > containerRect.bottom + safeEpsilon
+      : false)
+  ) {
+    overflowAxis.push('vertical')
+  }
+
+  return {
+    clientSize: {
+      h: element.clientHeight,
+      w: element.clientWidth,
+    },
+    containerSize: containerRect
+      ? {
+          h: containerRect.height,
+          w: containerRect.width,
+        }
+      : null,
+    elementSize: {
+      h: elementRect.height,
+      w: elementRect.width,
+    },
+    hasOverflow: overflowAxis.length > 0,
+    overflowAxis,
+    scrollSize: {
+      h: element.scrollHeight,
+      w: element.scrollWidth,
+    },
+  }
+}
+
 function formatCanvasTextMeasurementStyleValue(
   value: number | string | undefined,
 ) {
   return value === undefined ? undefined : String(value)
+}
+
+function isCanvasTextMeasurementNumber(value: unknown): value is number {
+  return typeof value === 'number' && Number.isFinite(value)
 }
 
 function getCanvasTextMeasurementDocument():

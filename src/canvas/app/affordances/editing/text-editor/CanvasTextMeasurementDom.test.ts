@@ -1,6 +1,9 @@
 import { describe, expect, it, vi } from 'vitest'
 import {
+  measureCanvasElementOverflow,
   measureCanvasTextBlocks,
+  type CanvasElementOverflowRect,
+  type CanvasElementOverflowTarget,
   type CanvasTextMeasurementElement,
 } from './CanvasTextMeasurementDom'
 
@@ -94,6 +97,84 @@ describe('CanvasTextMeasurementDom', () => {
   })
 })
 
+describe('measureCanvasElementOverflow', () => {
+  it('detects scroll overflow on both axes', () => {
+    expect(measureCanvasElementOverflow({
+      element: createOverflowTarget({
+        clientHeight: 80,
+        clientWidth: 100,
+        rect: createRect({ height: 80, width: 100 }),
+        scrollHeight: 84,
+        scrollWidth: 112,
+      }),
+      epsilon: 1,
+    })).toEqual({
+      clientSize: { h: 80, w: 100 },
+      containerSize: null,
+      elementSize: { h: 80, w: 100 },
+      hasOverflow: true,
+      overflowAxis: ['horizontal', 'vertical'],
+      scrollSize: { h: 84, w: 112 },
+    })
+  })
+
+  it('detects rendered element overflow against a container rect', () => {
+    expect(measureCanvasElementOverflow({
+      container: createOverflowTarget({
+        rect: createRect({
+          height: 100,
+          left: 20,
+          top: 40,
+          width: 120,
+        }),
+      }),
+      element: createOverflowTarget({
+        rect: createRect({
+          height: 104,
+          left: 18,
+          top: 42,
+          width: 124,
+        }),
+      }),
+      epsilon: 1,
+    })).toMatchObject({
+      containerSize: { h: 100, w: 120 },
+      elementSize: { h: 104, w: 124 },
+      hasOverflow: true,
+      overflowAxis: ['horizontal', 'vertical'],
+    })
+  })
+
+  it('ignores overflow within epsilon and returns null for missing targets', () => {
+    expect(measureCanvasElementOverflow({
+      container: createOverflowTarget({
+        rect: createRect({ height: 100, width: 100 }),
+      }),
+      element: createOverflowTarget({
+        clientHeight: 100,
+        clientWidth: 100,
+        rect: createRect({ height: 100.4, width: 100.4 }),
+        scrollHeight: 100.4,
+        scrollWidth: 100.4,
+      }),
+      epsilon: 0.5,
+    })).toMatchObject({
+      hasOverflow: false,
+      overflowAxis: [],
+    })
+
+    expect(measureCanvasElementOverflow({ element: null })).toBeNull()
+    expect(measureCanvasElementOverflow({
+      element: {
+        clientHeight: 100,
+        clientWidth: 100,
+        scrollHeight: 100,
+        scrollWidth: 100,
+      },
+    })).toBeNull()
+  })
+})
+
 function createElement(
   tagName: 'div' | 'span',
 ): CanvasTextMeasurementElement & {
@@ -117,4 +198,47 @@ function createElement(
   }
 
   return element
+}
+
+function createOverflowTarget({
+  clientHeight = 100,
+  clientWidth = 100,
+  rect = createRect({ height: clientHeight, width: clientWidth }),
+  scrollHeight = clientHeight,
+  scrollWidth = clientWidth,
+}: {
+  clientHeight?: number
+  clientWidth?: number
+  rect?: CanvasElementOverflowRect
+  scrollHeight?: number
+  scrollWidth?: number
+}): CanvasElementOverflowTarget {
+  return {
+    clientHeight,
+    clientWidth,
+    getBoundingClientRect: vi.fn(() => rect),
+    scrollHeight,
+    scrollWidth,
+  }
+}
+
+function createRect({
+  height,
+  left = 0,
+  top = 0,
+  width,
+}: {
+  height: number
+  left?: number
+  top?: number
+  width: number
+}): CanvasElementOverflowRect {
+  return {
+    bottom: top + height,
+    height,
+    left,
+    right: left + width,
+    top,
+    width,
+  }
 }
