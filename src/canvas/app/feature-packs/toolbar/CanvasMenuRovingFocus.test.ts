@@ -5,6 +5,7 @@ import {
   getCanvasMenuRovingKeyIndex,
   CANVAS_MENU_KEYBOARD_KEYS,
   CANVAS_MENU_ROVING_FOCUS_MODEL,
+  CANVAS_SELECTION_TOOLBAR_DROPDOWN_MENU_MODEL,
   getCanvasMenuTriggerKeyboardIntent,
 } from './CanvasMenuRovingFocus'
 
@@ -14,6 +15,9 @@ describe('CanvasMenuRovingFocus', () => {
     expect(CANVAS_MENU_FOCUS_MODEL).toBe('enabled-menuitem-roving')
     expect(CANVAS_MENU_KEYBOARD_KEYS).toBe(
       'arrow-left-right-up-down-home-end-enter-space-escape',
+    )
+    expect(CANVAS_SELECTION_TOOLBAR_DROPDOWN_MENU_MODEL).toBe(
+      'canvas-selection-toolbar-dropdown-menu',
     )
   })
 

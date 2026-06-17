@@ -20,6 +20,7 @@ export {
   CANVAS_MENU_ITEM_PROPS,
   CANVAS_MENU_KEYBOARD_KEYS,
   CANVAS_MENU_ROVING_FOCUS_MODEL,
+  CANVAS_SELECTION_TOOLBAR_DROPDOWN_MENU_MODEL,
   getCanvasMenuRovingActiveIndex,
   getCanvasMenuRovingKeyIndex,
   getCanvasMenuTriggerKeyboardIntent,

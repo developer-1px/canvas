@@ -14,6 +14,8 @@ export const CANVAS_MENU_ROVING_FOCUS_MODEL = 'canvas-menu-roving-focus'
 export const CANVAS_MENU_FOCUS_MODEL = 'enabled-menuitem-roving'
 export const CANVAS_MENU_KEYBOARD_KEYS =
   'arrow-left-right-up-down-home-end-enter-space-escape'
+export const CANVAS_SELECTION_TOOLBAR_DROPDOWN_MENU_MODEL =
+  'canvas-selection-toolbar-dropdown-menu'
 
 const CANVAS_MENU_ITEM_SELECTOR = '[data-canvas-menu-item]'
 
