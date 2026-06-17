@@ -189,6 +189,11 @@ export {
   type CanvasImportedImageSizeOptions,
 } from './feature-packs/image-io/CanvasImageImport'
 export {
+  getCanvasClientViewportSize,
+  type CanvasClientViewportSize,
+  type CanvasClientViewportSource,
+} from './affordances/interaction/viewport/CanvasClientViewportSize'
+export {
   centerCanvasViewportAtWorldPoint,
   fitCanvasViewportToBounds,
   fitCanvasViewportToItems,
