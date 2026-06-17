@@ -46,6 +46,13 @@ export {
   type SlideEditRailThumbnailDescriptor,
 } from './SlideEditRailInteractions'
 export {
+  getSlideEditDeckNavigationKeyboardIntent,
+  type SlideEditDeckNavigationKeyboardDirection,
+  type SlideEditDeckNavigationKeyboardIntent,
+  type SlideEditDeckNavigationKeyboardIntentInput,
+  type SlideEditDeckNavigationSlideId,
+} from './SlideEditDeckNavigationKeyboard'
+export {
   getSlideEditTextAutoFitGestureCommandEffect,
   getSlideEditTextAutoSizeBounds,
   getSlideEditTextOverflowIndicatorState,
