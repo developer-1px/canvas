@@ -18,6 +18,8 @@ import {
   createCanvasAppFeaturePackManifest,
   createCanvasAppFeaturePackViewRenderers,
   createCanvasAppViewFeaturePack,
+  downloadCanvasBlobFile,
+  downloadCanvasTextFile,
   defineCanvasAppCustomItemModule,
   DEFAULT_CANVAS_APP_VIEW_FEATURE_PACKS,
   DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS,
@@ -640,6 +642,26 @@ describe('Canvas package consumer imports', () => {
     expect(createCanvasComponentLibrary({
       templates: CanvasHost.DEFAULT_CANVAS_COMPONENT_TEMPLATES,
     }).templates.length).toBe(CanvasHost.DEFAULT_CANVAS_COMPONENT_TEMPLATES.length)
+    expect(downloadCanvasBlobFile({
+      blob: new Blob(['smoke']),
+      document: null,
+      filename: 'smoke.txt',
+      url: null,
+    })).toBe(false)
+    expect(downloadCanvasTextFile({
+      content: 'smoke',
+      document: null,
+      filename: 'smoke.txt',
+      type: 'text/plain',
+      url: null,
+    })).toBe(false)
+    expect(CanvasAppFacade.downloadCanvasTextFile({
+      content: 'smoke',
+      document: null,
+      filename: 'smoke.txt',
+      type: 'text/plain',
+      url: null,
+    })).toBe(false)
     expect(CANVAS_SVG_ARROW_MARKER_IRI).toBe('url(#canvas-arrow-head)')
     expect(createCanvasSvgPathData([{ x: 1, y: 2 }, { x: 3, y: 4 }]))
       .toBe('M 1 2 L 3 4')

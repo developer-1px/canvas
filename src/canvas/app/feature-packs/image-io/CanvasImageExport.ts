@@ -2,6 +2,7 @@ import type {
   Bounds,
   CanvasItem,
 } from '../../../entities'
+import { downloadCanvasBlobFile } from '../../affordances/commands/CanvasFileDownload'
 import { writeCanvasImageBlobToClipboard } from './CanvasImageClipboard'
 import {
   createCanvasItemsImageExport,
@@ -128,7 +129,10 @@ export async function downloadCanvasSelectionImage({
     return false
   }
 
-  downloadCanvasImageBlob(exportPayload.blob, exportPayload.filename)
+  downloadCanvasBlobFile({
+    blob: exportPayload.blob,
+    filename: exportPayload.filename,
+  })
   return true
 }
 
@@ -229,14 +233,4 @@ function loadCanvasImageFromSvg(svg: string) {
     }, { once: true })
     image.src = url
   })
-}
-
-function downloadCanvasImageBlob(blob: Blob, filename: string) {
-  const url = URL.createObjectURL(blob)
-  const anchor = document.createElement('a')
-
-  anchor.href = url
-  anchor.download = filename
-  anchor.click()
-  window.setTimeout(() => URL.revokeObjectURL(url), 0)
 }

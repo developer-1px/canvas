@@ -121,6 +121,16 @@ export {
   type CanvasDataTransferImportActionValue,
 } from './affordances/commands/CanvasDataTransferImportActionPlan'
 export {
+  downloadCanvasBlobFile,
+  downloadCanvasTextFile,
+  type CanvasBlobFileDownloadInput,
+  type CanvasFileDownloadAnchor,
+  type CanvasFileDownloadDocument,
+  type CanvasFileDownloadTimer,
+  type CanvasFileDownloadUrlApi,
+  type CanvasTextFileDownloadInput,
+} from './affordances/commands/CanvasFileDownload'
+export {
   getCanvasImportedImageSize,
   type CanvasImportedImageSize,
   type CanvasImportedImageSizeOptions,
