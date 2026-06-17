@@ -15,6 +15,11 @@ export {
   type CanvasCommandPaletteItem,
   type CanvasCommandPaletteItemsInput,
 } from './CanvasCommandPaletteItems'
+export {
+  getCanvasCommandPaletteKeyboardIntent,
+  type CanvasCommandPaletteKeyboardIntent,
+  type CanvasCommandPaletteKeyboardIntentInput,
+} from './CanvasCommandPaletteKeyboard'
 
 export const CANVAS_APP_COMMAND_PALETTE_VIEW_FEATURE_PACK =
   createCanvasAppViewFeaturePack({

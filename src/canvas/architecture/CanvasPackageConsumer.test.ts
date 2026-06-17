@@ -103,6 +103,7 @@ import {
   createCanvasAppCustomItemRenderers,
   type CanvasAppAssemblySource as CanvasAppAssemblySourceFromApp,
   type CanvasAppProps as CanvasAppPropsFromApp,
+  type CanvasCommandPaletteKeyboardIntentInput,
 } from '@interactive-os/canvas/app'
 import {
   clampCanvasBoundsToFrame,
@@ -483,6 +484,12 @@ describe('Canvas package consumer imports', () => {
       getCanvasSelectionListModifierState(selectionListModifierInput)
     const selectionListModifierMode: CanvasSelectionListSelectionMode =
       selectionListModifierState.mode
+    const commandPaletteKeyboardInput: CanvasCommandPaletteKeyboardIntentInput =
+      {
+        activeIndex: 0,
+        itemCount: 2,
+        key: 'ArrowDown',
+      }
 
     expect(CanvasApp).toBeTypeOf('function')
     expect('useCanvasAppModel' in CanvasPackage).toBe(false)
@@ -551,6 +558,13 @@ describe('Canvas package consumer imports', () => {
     expect(CanvasAppFacade.getCanvasSelectionListModifierState(
       selectionListModifierInput,
     )).toEqual(selectionListModifierState)
+    expect(CanvasAppFacade.getCanvasCommandPaletteKeyboardIntent(
+      commandPaletteKeyboardInput,
+    )).toEqual({
+      activeIndex: 1,
+      kind: 'move-active',
+      preventDefault: true,
+    })
     expect(CanvasAppAuthoring.createCanvasAppAssembly).toBeTypeOf('function')
     expect(CanvasAppAuthoring.getCanvasAppFoundationExtensionCommands)
       .toBeTypeOf('function')

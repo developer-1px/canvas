@@ -10,6 +10,9 @@ export {
 } from './feature-packs/toolbar'
 export {
   CanvasCommandPalette,
+  getCanvasCommandPaletteKeyboardIntent,
+  type CanvasCommandPaletteKeyboardIntent,
+  type CanvasCommandPaletteKeyboardIntentInput,
 } from './feature-packs/command-palette'
 export {
   CanvasShortcutHelpOverlay,

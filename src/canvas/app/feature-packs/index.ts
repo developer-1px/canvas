@@ -77,10 +77,13 @@ export {
   CANVAS_APP_BOARD_IO_FEATURE_PACK_MANIFEST,
 } from './board-io'
 export {
+  getCanvasCommandPaletteKeyboardIntent,
   getCanvasCommandPaletteItems,
   type CanvasCommandPaletteComponent,
   type CanvasCommandPaletteItem,
   type CanvasCommandPaletteItemsInput,
+  type CanvasCommandPaletteKeyboardIntent,
+  type CanvasCommandPaletteKeyboardIntentInput,
 } from './command-palette'
 export {
   useCanvasComponentInsertion,

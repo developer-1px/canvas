@@ -14,6 +14,9 @@ import {
   filterCanvasCommandPaletteItems,
   type CanvasCommandPaletteItem,
 } from './CanvasCommandPaletteItems'
+import {
+  getCanvasCommandPaletteKeyboardIntent,
+} from './CanvasCommandPaletteKeyboard'
 
 type CanvasCommandPaletteProps = {
   items: readonly CanvasCommandPaletteItem[]
@@ -79,17 +82,18 @@ function CanvasCommandPaletteDialog({
       return
     }
 
-    if (event.key === 'ArrowDown') {
-      event.preventDefault()
-      event.stopPropagation()
-      setActiveIndex(() => Math.min(activeItemIndex + 1, maxActiveIndex))
-      return
-    }
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      const keyboardIntent = getCanvasCommandPaletteKeyboardIntent({
+        activeIndex: activeItemIndex,
+        itemCount: filteredItems.length,
+        key: event.key,
+      })
 
-    if (event.key === 'ArrowUp') {
       event.preventDefault()
       event.stopPropagation()
-      setActiveIndex(() => Math.max(0, activeItemIndex - 1))
+      if (keyboardIntent.kind === 'move-active') {
+        setActiveIndex(keyboardIntent.activeIndex)
+      }
       return
     }
 
@@ -102,9 +106,20 @@ function CanvasCommandPaletteDialog({
     }
 
     if (event.key === 'Enter') {
-      event.preventDefault()
-      event.stopPropagation()
-      runItem(filteredItems[activeItemIndex])
+      const keyboardIntent = getCanvasCommandPaletteKeyboardIntent({
+        activeIndex: activeItemIndex,
+        itemCount: filteredItems.length,
+        key: event.key,
+      })
+
+      if (keyboardIntent.preventDefault) {
+        event.preventDefault()
+        event.stopPropagation()
+      }
+
+      if (keyboardIntent.kind === 'run-active') {
+        runItem(filteredItems[keyboardIntent.activeIndex])
+      }
     }
   }
 
