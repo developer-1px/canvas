@@ -271,6 +271,12 @@ export {
   type CanvasKeyboardShortcutIntentInput,
 } from './affordances/interaction/keyboard/CanvasKeyboardShortcutIntent'
 export {
+  isCanvasKeyboardToolIntent,
+  runCanvasKeyboardToolIntent,
+  type CanvasKeyboardToolHandlers,
+  type CanvasKeyboardToolIntent,
+} from './affordances/interaction/keyboard/CanvasKeyboardToolDispatch'
+export {
   getCanvasKeyboardSystemShortcutIntent,
   shouldReleaseCanvasKeyboardTemporaryPan,
   type CanvasKeyboardSystemShortcutIntent,

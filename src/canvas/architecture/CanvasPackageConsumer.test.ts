@@ -120,9 +120,12 @@ import {
   createCanvasAppComponentPresentationRenderers,
   createCanvasAppAssembly as createCanvasAppAssemblyFromApp,
   createCanvasAppCustomItemRenderers,
+  isCanvasKeyboardToolIntent,
+  runCanvasKeyboardToolIntent,
   type CanvasAppAssemblySource as CanvasAppAssemblySourceFromApp,
   type CanvasAppProps as CanvasAppPropsFromApp,
   type CanvasCommandPaletteKeyboardIntentInput,
+  type CanvasKeyboardToolHandlers,
 } from '@interactive-os/canvas/app'
 import {
   clampCanvasBoundsToFrame,
@@ -626,6 +629,35 @@ describe('Canvas package consumer imports', () => {
       handle: 'se',
       kind: 'auto-size-selection',
     })
+    expect(isCanvasKeyboardToolIntent({
+      kind: 'set-tool',
+      preventDefault: false,
+      tool: 'rect',
+    })).toBe(true)
+    expect(CanvasAppFacade.isCanvasKeyboardToolIntent({
+      kind: 'set-tool',
+      preventDefault: false,
+      tool: 'rect',
+    })).toBe(true)
+    const toolHandlers: CanvasKeyboardToolHandlers = {
+      setTool: (tool) => tool,
+    }
+    expect(runCanvasKeyboardToolIntent({
+      handlers: toolHandlers,
+      intent: {
+        kind: 'set-tool',
+        preventDefault: false,
+        tool: 'rect',
+      },
+    })).toBeUndefined()
+    expect(CanvasAppFacade.runCanvasKeyboardToolIntent({
+      handlers: toolHandlers,
+      intent: {
+        kind: 'set-tool',
+        preventDefault: false,
+        tool: 'rect',
+      },
+    })).toBeUndefined()
     expect(selectionListModifierState).toEqual({
       additive: false,
       mode: 'range',
