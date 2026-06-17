@@ -127,6 +127,16 @@ export {
   type CanvasDataTransferImportActionValue,
 } from './affordances/commands/CanvasDataTransferImportActionPlan'
 export {
+  CANVAS_DATA_TRANSFER_TEXT_MIME_TYPE,
+  getCanvasDataTransferText,
+  setCanvasDataTransferDropEffect,
+  setCanvasDataTransferText,
+  type CanvasDataTransferDropEffectInput,
+  type CanvasDataTransferTextInput,
+  type CanvasDataTransferTextWriteInput,
+  type CanvasTextDataTransfer,
+} from './affordances/commands/CanvasDataTransferText'
+export {
   downloadCanvasBlobFile,
   downloadCanvasTextFile,
   type CanvasBlobFileDownloadInput,

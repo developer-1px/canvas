@@ -13,6 +13,9 @@ export {
   CanvasShortcutHelpOverlay,
   downloadCanvasBlobFile,
   downloadCanvasTextFile,
+  getCanvasDataTransferText,
+  setCanvasDataTransferDropEffect,
+  setCanvasDataTransferText,
   writeCanvasClipboardText,
   focusCanvasModalElement,
   getCanvasModalFocusableElements,
@@ -36,6 +39,9 @@ export {
   type CanvasClipboardTextClipboard,
   type CanvasClipboardTextWriteInput,
   type CanvasClipboardTextWriteMode,
+  type CanvasDataTransferDropEffectInput,
+  type CanvasDataTransferTextInput,
+  type CanvasDataTransferTextWriteInput,
   type CanvasContextCommandMenuState,
   type CanvasAppProps,
   type CanvasFileDownloadAnchor,
@@ -54,6 +60,7 @@ export {
   type CanvasTabsTabDescriptor,
   type CanvasTabsTabInput,
   type CanvasTextFileDownloadInput,
+  type CanvasTextDataTransfer,
 } from './app'
 export {
   assertCanvasAppExtensionId,
