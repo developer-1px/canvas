@@ -9,6 +9,8 @@ import {
   CanvasHost,
   CanvasRenderer,
   CANVAS_APP_BOARD_IO_FEATURE_PACK_MANIFEST,
+  CANVAS_CONTROL_TARGET_SELECTOR,
+  CANVAS_WHEEL_PASSTHROUGH_SELECTOR,
   bindCanvasEventListener,
   bindCanvasEventListeners,
   cancelCanvasAnimationFrameTask,
@@ -44,9 +46,12 @@ import {
   getCanvasAppInstalledViewFeaturePacks,
   getCanvasAppManifestViewFeaturePacks,
   measureCanvasTextBlocks,
+  isCanvasControlTarget,
   getCanvasAppFoundationExtensionCommands,
   getCanvasAppFoundationExtensionRendererSlots,
   getCanvasAppFoundationExtensionTools,
+  isCanvasTargetWithinSelector,
+  isCanvasWheelPassthroughTarget,
   type CanvasAppAssemblySource,
   type CanvasAppCommitItemsChange,
   type CanvasAppComponentLibrary,
@@ -71,8 +76,10 @@ import {
   type CanvasAppStageExternalOverlaySlot,
   type CanvasAppStageAdapter,
   type CanvasAppStageMount,
+  type CanvasControlTargetInput,
   type CanvasAppItemsChange,
   type CanvasAppViewFeaturePack,
+  type CanvasInteractionTargetSelectorInput,
   type CanvasWorkspaceStorageProvider,
   type CanvasCustomItem,
   type CanvasEditableTextItem,
@@ -432,6 +439,12 @@ describe('Canvas package consumer imports', () => {
   })
 
   it('keeps package subpaths usable as public facades', async () => {
+    const nullControlTargetInput: CanvasControlTargetInput = { target: null }
+    const nullSelectorTargetInput: CanvasInteractionTargetSelectorInput = {
+      selectors: 'button',
+      target: null,
+    }
+
     expect(CanvasApp).toBeTypeOf('function')
     expect('useCanvasAppModel' in CanvasPackage).toBe(false)
     expect('DEFAULT_CANVAS_APP_ASSEMBLY' in CanvasPackage).toBe(false)
@@ -455,6 +468,23 @@ describe('Canvas package consumer imports', () => {
     )
     expect(CanvasAppFacade.createCanvasAppCustomItemModuleAssembly)
       .toBeTypeOf('function')
+    expect(CANVAS_CONTROL_TARGET_SELECTOR).toContain('button')
+    expect(CanvasAppFacade.CANVAS_CONTROL_TARGET_SELECTOR).toContain('button')
+    expect(CANVAS_WHEEL_PASSTHROUGH_SELECTOR).toContain(
+      'data-canvas-wheel-passthrough',
+    )
+    expect(CanvasAppFacade.CANVAS_WHEEL_PASSTHROUGH_SELECTOR).toContain(
+      'data-canvas-wheel-passthrough',
+    )
+    expect(isCanvasControlTarget(nullControlTargetInput)).toBe(false)
+    expect(CanvasAppFacade.isCanvasControlTarget(nullControlTargetInput))
+      .toBe(false)
+    expect(isCanvasTargetWithinSelector(nullSelectorTargetInput)).toBe(false)
+    expect(CanvasAppFacade.isCanvasTargetWithinSelector(
+      nullSelectorTargetInput,
+    )).toBe(false)
+    expect(isCanvasWheelPassthroughTarget(null)).toBe(false)
+    expect(CanvasAppFacade.isCanvasWheelPassthroughTarget(null)).toBe(false)
     expect(CanvasAppAuthoring.createCanvasAppAssembly).toBeTypeOf('function')
     expect(CanvasAppAuthoring.getCanvasAppFoundationExtensionCommands)
       .toBeTypeOf('function')

@@ -105,6 +105,15 @@ export {
   type CanvasEventListenerTarget,
 } from './affordances/interaction/dom/CanvasEventListener'
 export {
+  CANVAS_CONTROL_TARGET_SELECTOR,
+  CANVAS_WHEEL_PASSTHROUGH_SELECTOR,
+  isCanvasControlTarget,
+  isCanvasTargetWithinSelector,
+  isCanvasWheelPassthroughTarget,
+  type CanvasControlTargetInput,
+  type CanvasInteractionTargetSelectorInput,
+} from './affordances/interaction/dom/CanvasInteractionTarget'
+export {
   getCanvasSelectionListRangeIds,
   type CanvasSelectionListRangeInput,
 } from './affordances/controls/selection-list/CanvasSelectionListRange'
