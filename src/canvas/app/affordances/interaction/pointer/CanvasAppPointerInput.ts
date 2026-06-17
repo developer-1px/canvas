@@ -27,6 +27,17 @@ export type CanvasAppPointerScreenInput =
 
 export type CanvasAppEventSource = CanvasAppEventInput
 
+export type CanvasPointerTransformModifierInput = {
+  altKey: boolean
+  shiftKey: boolean
+}
+
+export type CanvasPointerTransformModifierState = {
+  constrainAngle: boolean
+  preserveAspectRatio: boolean
+  resizeFromCenter: boolean
+}
+
 export type CanvasAppPointerSource = CanvasAppEventInput &
   CanvasAppScreenPointInput &
   CanvasAppPointerIdInput & {
@@ -60,5 +71,16 @@ export function createCanvasAppPointerInput(
     preventDefault: () => event.preventDefault(),
     shiftKey: event.shiftKey,
     stopPropagation: () => event.stopPropagation(),
+  }
+}
+
+export function getCanvasPointerTransformModifierState({
+  altKey,
+  shiftKey,
+}: CanvasPointerTransformModifierInput): CanvasPointerTransformModifierState {
+  return {
+    constrainAngle: shiftKey,
+    preserveAspectRatio: shiftKey,
+    resizeFromCenter: altKey,
   }
 }

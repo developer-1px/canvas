@@ -46,6 +46,7 @@ import {
   getCanvasAppInstalledViewFeaturePacks,
   getCanvasAppManifestViewFeaturePacks,
   measureCanvasTextBlocks,
+  getCanvasPointerTransformModifierState,
   getCanvasWorldClientPoint,
   isCanvasControlTarget,
   getCanvasAppFoundationExtensionCommands,
@@ -81,6 +82,8 @@ import {
   type CanvasAppItemsChange,
   type CanvasAppViewFeaturePack,
   type CanvasInteractionTargetSelectorInput,
+  type CanvasPointerTransformModifierInput,
+  type CanvasPointerTransformModifierState,
   type CanvasWorkspaceStorageProvider,
   type CanvasWorldClientPointInput,
   type CanvasWorldClientPointStageElement,
@@ -460,6 +463,12 @@ describe('Canvas package consumer imports', () => {
       stageElement: worldClientStageElement,
       viewport: { scale: 2, x: 10, y: 20 },
     }
+    const pointerTransformModifierInput: CanvasPointerTransformModifierInput = {
+      altKey: true,
+      shiftKey: true,
+    }
+    const pointerTransformModifierState: CanvasPointerTransformModifierState =
+      getCanvasPointerTransformModifierState(pointerTransformModifierInput)
 
     expect(CanvasApp).toBeTypeOf('function')
     expect('useCanvasAppModel' in CanvasPackage).toBe(false)
@@ -511,6 +520,14 @@ describe('Canvas package consumer imports', () => {
       x: 118,
       y: 230,
     })
+    expect(pointerTransformModifierState).toEqual({
+      constrainAngle: true,
+      preserveAspectRatio: true,
+      resizeFromCenter: true,
+    })
+    expect(CanvasAppFacade.getCanvasPointerTransformModifierState(
+      pointerTransformModifierInput,
+    )).toEqual(pointerTransformModifierState)
     expect(CanvasAppAuthoring.createCanvasAppAssembly).toBeTypeOf('function')
     expect(CanvasAppAuthoring.getCanvasAppFoundationExtensionCommands)
       .toBeTypeOf('function')

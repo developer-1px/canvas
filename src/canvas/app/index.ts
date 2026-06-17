@@ -250,6 +250,11 @@ export {
   type CanvasPointerCaptureTarget,
 } from './affordances/interaction/pointer/CanvasPointerCapture'
 export {
+  getCanvasPointerTransformModifierState,
+  type CanvasPointerTransformModifierInput,
+  type CanvasPointerTransformModifierState,
+} from './affordances/interaction/pointer/CanvasAppPointerInput'
+export {
   getCanvasPointerLocalGeometry,
   getCanvasPointerLocalPoint,
   getCanvasWorldClientPoint,

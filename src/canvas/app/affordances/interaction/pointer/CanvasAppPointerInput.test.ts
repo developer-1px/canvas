@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import {
   createCanvasAppEventInput,
   createCanvasAppPointerInput,
+  getCanvasPointerTransformModifierState,
 } from './CanvasAppPointerInput'
 
 describe('CanvasAppPointerInput', () => {
@@ -52,5 +53,24 @@ describe('CanvasAppPointerInput', () => {
 
     expect(preventDefault).toHaveBeenCalledOnce()
     expect(stopPropagation).toHaveBeenCalledOnce()
+  })
+
+  it('normalizes pointer transform modifier state', () => {
+    expect(getCanvasPointerTransformModifierState({
+      altKey: true,
+      shiftKey: true,
+    })).toEqual({
+      constrainAngle: true,
+      preserveAspectRatio: true,
+      resizeFromCenter: true,
+    })
+    expect(getCanvasPointerTransformModifierState({
+      altKey: false,
+      shiftKey: false,
+    })).toEqual({
+      constrainAngle: false,
+      preserveAspectRatio: false,
+      resizeFromCenter: false,
+    })
   })
 })
