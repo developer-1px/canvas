@@ -9,6 +9,8 @@ import {
   CanvasHost,
   CanvasRenderer,
   CANVAS_APP_BOARD_IO_FEATURE_PACK_MANIFEST,
+  bindCanvasEventListener,
+  bindCanvasEventListeners,
   cancelCanvasAnimationFrameTask,
   cancelCanvasDeferredFocus,
   focusCanvasElement,
@@ -727,6 +729,19 @@ describe('Canvas package consumer imports', () => {
       requestAnimationFrame: null,
       task: () => undefined,
     })).toBeNull()
+    expect(bindCanvasEventListener({
+      listener: () => undefined,
+      target: null,
+      type: 'resize',
+    })()).toBe(false)
+    expect(bindCanvasEventListeners({
+      listeners: [],
+    })()).toBe(false)
+    expect(CanvasAppFacade.bindCanvasEventListener({
+      listener: () => undefined,
+      target: null,
+      type: 'resize',
+    })()).toBe(false)
     expect(CANVAS_SVG_ARROW_MARKER_IRI).toBe('url(#canvas-arrow-head)')
     expect(createCanvasSvgPathData([{ x: 1, y: 2 }, { x: 3, y: 4 }]))
       .toBe('M 1 2 L 3 4')

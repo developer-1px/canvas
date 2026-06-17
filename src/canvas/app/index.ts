@@ -81,6 +81,14 @@ export {
   type CanvasAnimationFrameTaskScheduleInput,
 } from './affordances/interaction/frame/CanvasAnimationFrameTask'
 export {
+  bindCanvasEventListener,
+  bindCanvasEventListeners,
+  type CanvasEventListenerCleanup,
+  type CanvasEventListenerInput,
+  type CanvasEventListenersInput,
+  type CanvasEventListenerTarget,
+} from './affordances/interaction/dom/CanvasEventListener'
+export {
   getCanvasSelectionListRangeIds,
   type CanvasSelectionListRangeInput,
 } from './affordances/controls/selection-list/CanvasSelectionListRange'
