@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   CANVAS_TABS_KEYBOARD_MODEL,
+  CANVAS_TABS_ROVING_FOCUS_MODEL,
   createCanvasTabsDescriptor,
   getCanvasTabsKeyboardIntent,
 } from './CanvasTabsRovingFocus'
@@ -24,6 +25,10 @@ const tabs = [
 ] as const
 
 describe('CanvasTabsRovingFocus', () => {
+  it('exposes a stable roving focus model metadata value', () => {
+    expect(CANVAS_TABS_ROVING_FOCUS_MODEL).toBe('canvas-tabs-roving-focus')
+  })
+
   it('creates APG tab and tabpanel relationships', () => {
     const descriptor = createCanvasTabsDescriptor({
       activeId: 'selection',

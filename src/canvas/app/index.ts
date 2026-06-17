@@ -67,6 +67,7 @@ export {
 } from './affordances/controls/modal/CanvasModalFocusLifecycle'
 export {
   CANVAS_TABS_KEYBOARD_MODEL,
+  CANVAS_TABS_ROVING_FOCUS_MODEL,
   createCanvasTabsDescriptor,
   getCanvasTabsKeyboardIntent,
   getCanvasTabsPanelAttributes,

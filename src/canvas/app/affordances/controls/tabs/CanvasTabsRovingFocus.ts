@@ -1,3 +1,4 @@
+export const CANVAS_TABS_ROVING_FOCUS_MODEL = 'canvas-tabs-roving-focus'
 export const CANVAS_TABS_KEYBOARD_MODEL = 'arrow-home-end-enter-space'
 
 export type CanvasTabsActivationMode = 'automatic' | 'manual'
