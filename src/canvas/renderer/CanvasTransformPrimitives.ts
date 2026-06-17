@@ -1,4 +1,5 @@
 import type { Bounds } from '../core'
+import { formatCanvasSvgNumber } from './CanvasSvgStringPrimitives'
 
 export type CanvasCssBoundsTransformInput = {
   flipX?: boolean
@@ -17,7 +18,7 @@ export function createCanvasCssBoundsTransform({
 }: CanvasCssBoundsTransformInput) {
   const safeRotation = normalizeCanvasTransformRotation(rotation)
   const transforms = [
-    safeRotation ? `rotate(${formatCanvasTransformNumber(safeRotation)}deg)` : '',
+    safeRotation ? `rotate(${formatCanvasSvgNumber(safeRotation)}deg)` : '',
     flipX ? 'scaleX(-1)' : '',
     flipY ? 'scaleY(-1)' : '',
   ].filter(Boolean)
@@ -43,17 +44,13 @@ export function createCanvasSvgBoundsTransform({
   const centerY = bounds.y + bounds.h / 2
 
   return [
-    `translate(${formatCanvasTransformNumber(centerX)} ${formatCanvasTransformNumber(centerY)})`,
-    safeRotation ? `rotate(${formatCanvasTransformNumber(safeRotation)})` : '',
+    `translate(${formatCanvasSvgNumber(centerX)} ${formatCanvasSvgNumber(centerY)})`,
+    safeRotation ? `rotate(${formatCanvasSvgNumber(safeRotation)})` : '',
     scaleX !== 1 || scaleY !== 1 ? `scale(${scaleX} ${scaleY})` : '',
-    `translate(${formatCanvasTransformNumber(-centerX)} ${formatCanvasTransformNumber(-centerY)})`,
+    `translate(${formatCanvasSvgNumber(-centerX)} ${formatCanvasSvgNumber(-centerY)})`,
   ].filter(Boolean).join(' ')
 }
 
 function normalizeCanvasTransformRotation(value: number) {
   return Number.isFinite(value) ? value : 0
-}
-
-function formatCanvasTransformNumber(value: number) {
-  return Object.is(value, -0) ? '0' : `${Number(value.toFixed(3))}`
 }

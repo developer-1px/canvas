@@ -94,6 +94,8 @@ import {
   createCanvasSvgBoundsTransform,
   createCanvasSvgFreehandPathData,
   createCanvasSvgPathData,
+  escapeCanvasXmlAttribute,
+  formatCanvasSvgNumber,
 } from '@interactive-os/canvas/renderer'
 
 describe('Canvas package consumer imports', () => {
@@ -641,6 +643,8 @@ describe('Canvas package consumer imports', () => {
     expect(CANVAS_SVG_ARROW_MARKER_IRI).toBe('url(#canvas-arrow-head)')
     expect(createCanvasSvgPathData([{ x: 1, y: 2 }, { x: 3, y: 4 }]))
       .toBe('M 1 2 L 3 4')
+    expect(formatCanvasSvgNumber(1.2345)).toBe('1.234')
+    expect(escapeCanvasXmlAttribute('A&B "C"')).toBe('A&amp;B &quot;C&quot;')
     expect(createCanvasCssBoundsTransform({
       flipX: true,
       rotation: 15,
