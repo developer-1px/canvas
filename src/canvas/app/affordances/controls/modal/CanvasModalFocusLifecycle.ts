@@ -29,6 +29,27 @@ export type CanvasModalTabFocusEvent = {
   stopPropagation: () => void
 }
 
+export type CanvasModalKeyboardIntentInput = {
+  key: string
+}
+
+export type CanvasModalKeyboardIntent =
+  | {
+      kind: 'close'
+      preventDefault: true
+      stopPropagation: true
+    }
+  | {
+      kind: 'trap-focus'
+      preventDefault: true
+      stopPropagation: true
+    }
+  | {
+      kind: 'none'
+      preventDefault: false
+      stopPropagation: false
+    }
+
 export function useCanvasModalFocusLifecycle<
   TInitialFocusElement extends HTMLElement = HTMLElement,
 >({
@@ -119,6 +140,32 @@ export function restoreCanvasModalFocus(
   } = {},
 ) {
   return focusCanvasModalElement(element, { preventScroll })
+}
+
+export function getCanvasModalKeyboardIntent({
+  key,
+}: CanvasModalKeyboardIntentInput): CanvasModalKeyboardIntent {
+  if (key === 'Escape') {
+    return {
+      kind: 'close',
+      preventDefault: true,
+      stopPropagation: true,
+    }
+  }
+
+  if (key === 'Tab') {
+    return {
+      kind: 'trap-focus',
+      preventDefault: true,
+      stopPropagation: true,
+    }
+  }
+
+  return {
+    kind: 'none',
+    preventDefault: false,
+    stopPropagation: false,
+  }
 }
 
 export function trapCanvasModalTabFocus({

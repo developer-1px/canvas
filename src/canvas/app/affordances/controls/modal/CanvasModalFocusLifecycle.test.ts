@@ -2,12 +2,31 @@ import { describe, expect, it, vi } from 'vitest'
 import {
   focusCanvasModalElement,
   getCanvasModalFocusableElements,
+  getCanvasModalKeyboardIntent,
   getCanvasModalNextFocusIndex,
   restoreCanvasModalFocus,
   trapCanvasModalTabFocus,
 } from './CanvasModalFocusLifecycle'
 
 describe('CanvasModalFocusLifecycle', () => {
+  it('maps modal keyboard keys to close and trap focus intents', () => {
+    expect(getCanvasModalKeyboardIntent({ key: 'Escape' })).toEqual({
+      kind: 'close',
+      preventDefault: true,
+      stopPropagation: true,
+    })
+    expect(getCanvasModalKeyboardIntent({ key: 'Tab' })).toEqual({
+      kind: 'trap-focus',
+      preventDefault: true,
+      stopPropagation: true,
+    })
+    expect(getCanvasModalKeyboardIntent({ key: 'Enter' })).toEqual({
+      kind: 'none',
+      preventDefault: false,
+      stopPropagation: false,
+    })
+  })
+
   it('wraps modal focus indexes in both Tab directions', () => {
     expect(getCanvasModalNextFocusIndex({
       count: 3,

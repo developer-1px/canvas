@@ -5,6 +5,7 @@ import {
   type MouseEvent,
 } from 'react'
 import {
+  getCanvasModalKeyboardIntent,
   trapCanvasModalTabFocus,
   useCanvasModalFocusLifecycle,
 } from '../../affordances/controls/modal/CanvasModalFocusLifecycle'
@@ -50,14 +51,20 @@ function CanvasShortcutHelpDialog({
   }
 
   const handleKeyDown = (event: KeyboardEvent<HTMLElement>) => {
-    if (event.key === 'Escape') {
-      event.preventDefault()
-      event.stopPropagation()
+    const modalKeyboardIntent = getCanvasModalKeyboardIntent({ key: event.key })
+
+    if (modalKeyboardIntent.kind === 'close') {
+      if (modalKeyboardIntent.preventDefault) {
+        event.preventDefault()
+      }
+      if (modalKeyboardIntent.stopPropagation) {
+        event.stopPropagation()
+      }
       onClose()
       return
     }
 
-    if (event.key === 'Tab') {
+    if (modalKeyboardIntent.kind === 'trap-focus') {
       trapCanvasModalTabFocus({
         event,
         root: dialogRef.current,

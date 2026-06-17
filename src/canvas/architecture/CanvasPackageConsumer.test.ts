@@ -48,6 +48,7 @@ import {
   getCanvasAppManifestViewFeaturePacks,
   getCanvasFindInputKeyboardIntent,
   getCanvasInlineEditKeyboardIntent,
+  getCanvasModalKeyboardIntent,
   measureCanvasTextBlocks,
   getCanvasPointerTransformModifierState,
   getCanvasResizeHandleDoubleClickIntent,
@@ -94,6 +95,7 @@ import {
   type CanvasFindInputKeyboardIntentInput,
   type CanvasMenuRovingActiveIndexInput,
   type CanvasMenuTriggerKeyboardIntentInput,
+  type CanvasModalKeyboardIntentInput,
   type CanvasPointerClickMemory,
   type CanvasResizeHandleDoubleClickIntentInput,
   type CanvasPointerTransformModifierInput,
@@ -525,6 +527,9 @@ describe('Canvas package consumer imports', () => {
     const editableFieldKeyboardInput: CanvasEditableFieldKeyboardIntentInput = {
       key: 'Escape',
     }
+    const modalKeyboardInput: CanvasModalKeyboardIntentInput = {
+      key: 'Tab',
+    }
     const inlineEditKeyboardInput: CanvasInlineEditKeyboardIntentInput = {
       altKey: false,
       ctrlKey: false,
@@ -655,6 +660,18 @@ describe('Canvas package consumer imports', () => {
     )).toEqual({
       kind: 'cancel',
       preventDefault: true,
+    })
+    expect(getCanvasModalKeyboardIntent(modalKeyboardInput)).toEqual({
+      kind: 'trap-focus',
+      preventDefault: true,
+      stopPropagation: true,
+    })
+    expect(CanvasAppFacade.getCanvasModalKeyboardIntent(
+      modalKeyboardInput,
+    )).toEqual({
+      kind: 'trap-focus',
+      preventDefault: true,
+      stopPropagation: true,
     })
     expect(getCanvasInlineEditKeyboardIntent(inlineEditKeyboardInput))
       .toEqual({

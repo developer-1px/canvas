@@ -7,6 +7,7 @@ import {
   type MouseEvent,
 } from 'react'
 import {
+  getCanvasModalKeyboardIntent,
   trapCanvasModalTabFocus,
   useCanvasModalFocusLifecycle,
 } from '../../affordances/controls/modal/CanvasModalFocusLifecycle'
@@ -75,10 +76,24 @@ function CanvasCommandPaletteDialog({
   }
 
   const handleKeyDown = (event: KeyboardEvent<HTMLElement>) => {
-    if (event.key === 'Escape') {
-      event.preventDefault()
-      event.stopPropagation()
+    const modalKeyboardIntent = getCanvasModalKeyboardIntent({ key: event.key })
+
+    if (modalKeyboardIntent.kind === 'close') {
+      if (modalKeyboardIntent.preventDefault) {
+        event.preventDefault()
+      }
+      if (modalKeyboardIntent.stopPropagation) {
+        event.stopPropagation()
+      }
       onClose()
+      return
+    }
+
+    if (modalKeyboardIntent.kind === 'trap-focus') {
+      trapCanvasModalTabFocus({
+        event,
+        root: dialogRef.current,
+      })
       return
     }
 
@@ -94,14 +109,6 @@ function CanvasCommandPaletteDialog({
       if (keyboardIntent.kind === 'move-active') {
         setActiveIndex(keyboardIntent.activeIndex)
       }
-      return
-    }
-
-    if (event.key === 'Tab') {
-      trapCanvasModalTabFocus({
-        event,
-        root: dialogRef.current,
-      })
       return
     }
 

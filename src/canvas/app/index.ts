@@ -44,6 +44,7 @@ export {
   CANVAS_MODAL_FOCUSABLE_SELECTOR,
   focusCanvasModalElement,
   getCanvasModalFocusableElements,
+  getCanvasModalKeyboardIntent,
   getCanvasModalNextFocusIndex,
   getCanvasModalRestoreFocusTarget,
   restoreCanvasModalFocus,
@@ -51,6 +52,8 @@ export {
   useCanvasModalFocusLifecycle,
   type CanvasModalFocusRef,
   type CanvasModalFocusTarget,
+  type CanvasModalKeyboardIntent,
+  type CanvasModalKeyboardIntentInput,
   type CanvasModalTabFocusEvent,
 } from './affordances/controls/modal/CanvasModalFocusLifecycle'
 export {
