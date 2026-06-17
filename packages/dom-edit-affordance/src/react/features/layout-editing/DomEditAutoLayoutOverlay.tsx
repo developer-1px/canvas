@@ -65,10 +65,12 @@ import {
   DomEditSizeModeCapsule,
 } from './DomEditSizeModeCapsule'
 import {
-  CANVAS_DOM_ALIGNMENT_PREVIEW_GUIDE_MODEL,
   DomEditAlignmentEditor,
   type DomEditAlignmentPreview,
 } from './DomEditAlignmentEditor'
+import {
+  CANVAS_DOM_ALIGNMENT_PREVIEW_GUIDE_MODEL,
+} from '../../../features/layout-editing/DomEditAlignmentMetadata'
 import { DomEditMarginGhostOverlay } from '../box-model-xray/DomEditMarginGhostOverlay'
 import {
   getDomEditRadioTabIndex,

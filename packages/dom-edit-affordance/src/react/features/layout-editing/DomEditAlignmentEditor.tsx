@@ -14,11 +14,13 @@ import {
   getDomEditRadioTabIndex,
   handleDomEditRadioGroupKeyDown,
 } from '../../shared/DomEditRadioGroup'
-
-export const CANVAS_DOM_ALIGNMENT_POPOVER_MODEL =
-  'canvas-dom-alignment-popover'
-export const CANVAS_DOM_ALIGNMENT_PREVIEW_GUIDE_MODEL =
-  'canvas-dom-alignment-preview-guide'
+import {
+  CANVAS_DOM_ALIGNMENT_POPOVER_MODEL,
+} from '../../../features/layout-editing/DomEditAlignmentMetadata'
+export {
+  CANVAS_DOM_ALIGNMENT_POPOVER_MODEL,
+  CANVAS_DOM_ALIGNMENT_PREVIEW_GUIDE_MODEL,
+} from '../../../features/layout-editing/DomEditAlignmentMetadata'
 
 export type DomEditAlignmentPreview = {
   align: Exclude<DomEditAutoLayoutAlign, 'auto'>

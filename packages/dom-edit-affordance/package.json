@@ -5,6 +5,7 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
+    "./metadata": "./src/metadata.ts",
     "./react": "./src/react.ts",
     "./canvas": "./src/canvas.ts",
     "./interaction": "./src/interaction.ts",

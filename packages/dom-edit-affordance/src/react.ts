@@ -7,7 +7,9 @@ export {
 export {
   CANVAS_DOM_ALIGNMENT_POPOVER_MODEL,
   CANVAS_DOM_ALIGNMENT_PREVIEW_GUIDE_MODEL,
-  type DomEditAlignmentPreview,
+} from './metadata'
+export type {
+  DomEditAlignmentPreview,
 } from './react/features/layout-editing/DomEditAlignmentEditor'
 export {
   DomEditAutoLayoutOverlay,
