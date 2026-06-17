@@ -4,6 +4,37 @@ export type CanvasSelectionListRangeInput<TId extends string = string> = {
   targetId?: TId | null
 }
 
+export type CanvasSelectionListModifierInput = {
+  ctrlKey: boolean
+  hasRangeAnchor?: boolean
+  metaKey: boolean
+  shiftKey: boolean
+}
+
+export type CanvasSelectionListSelectionMode = 'additive' | 'range' | 'replace'
+
+export type CanvasSelectionListModifierState = {
+  additive: boolean
+  mode: CanvasSelectionListSelectionMode
+  range: boolean
+}
+
+export function getCanvasSelectionListModifierState({
+  ctrlKey,
+  hasRangeAnchor = true,
+  metaKey,
+  shiftKey,
+}: CanvasSelectionListModifierInput): CanvasSelectionListModifierState {
+  const range = shiftKey && hasRangeAnchor
+  const additive = !range && (metaKey || ctrlKey)
+
+  return {
+    additive,
+    mode: range ? 'range' : additive ? 'additive' : 'replace',
+    range,
+  }
+}
+
 export function getCanvasSelectionListRangeIds<TId extends string>({
   anchorId,
   ids,

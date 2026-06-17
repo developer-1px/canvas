@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { getCanvasSelectionListRangeIds } from './CanvasSelectionListRange'
+import {
+  getCanvasSelectionListModifierState,
+  getCanvasSelectionListRangeIds,
+} from './CanvasSelectionListRange'
 
 const ids = ['title', 'note', 'image', 'footer'] as const
 
@@ -44,5 +47,38 @@ describe('CanvasSelectionListRange', () => {
       ids: ['title', 'image'],
       targetId: 'missing',
     })).toEqual([])
+  })
+
+  it('normalizes selection list modifier state', () => {
+    expect(getCanvasSelectionListModifierState({
+      ctrlKey: false,
+      metaKey: false,
+      shiftKey: true,
+    })).toEqual({
+      additive: false,
+      mode: 'range',
+      range: true,
+    })
+
+    expect(getCanvasSelectionListModifierState({
+      ctrlKey: false,
+      hasRangeAnchor: false,
+      metaKey: true,
+      shiftKey: true,
+    })).toEqual({
+      additive: true,
+      mode: 'additive',
+      range: false,
+    })
+
+    expect(getCanvasSelectionListModifierState({
+      ctrlKey: false,
+      metaKey: false,
+      shiftKey: false,
+    })).toEqual({
+      additive: false,
+      mode: 'replace',
+      range: false,
+    })
   })
 })

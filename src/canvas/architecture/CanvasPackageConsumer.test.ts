@@ -47,6 +47,7 @@ import {
   getCanvasAppManifestViewFeaturePacks,
   measureCanvasTextBlocks,
   getCanvasPointerTransformModifierState,
+  getCanvasSelectionListModifierState,
   getCanvasWorldClientPoint,
   isCanvasControlTarget,
   getCanvasAppFoundationExtensionCommands,
@@ -84,6 +85,9 @@ import {
   type CanvasInteractionTargetSelectorInput,
   type CanvasPointerTransformModifierInput,
   type CanvasPointerTransformModifierState,
+  type CanvasSelectionListModifierInput,
+  type CanvasSelectionListModifierState,
+  type CanvasSelectionListSelectionMode,
   type CanvasWorkspaceStorageProvider,
   type CanvasWorldClientPointInput,
   type CanvasWorldClientPointStageElement,
@@ -469,6 +473,16 @@ describe('Canvas package consumer imports', () => {
     }
     const pointerTransformModifierState: CanvasPointerTransformModifierState =
       getCanvasPointerTransformModifierState(pointerTransformModifierInput)
+    const selectionListModifierInput: CanvasSelectionListModifierInput = {
+      ctrlKey: false,
+      hasRangeAnchor: true,
+      metaKey: true,
+      shiftKey: true,
+    }
+    const selectionListModifierState: CanvasSelectionListModifierState =
+      getCanvasSelectionListModifierState(selectionListModifierInput)
+    const selectionListModifierMode: CanvasSelectionListSelectionMode =
+      selectionListModifierState.mode
 
     expect(CanvasApp).toBeTypeOf('function')
     expect('useCanvasAppModel' in CanvasPackage).toBe(false)
@@ -528,6 +542,15 @@ describe('Canvas package consumer imports', () => {
     expect(CanvasAppFacade.getCanvasPointerTransformModifierState(
       pointerTransformModifierInput,
     )).toEqual(pointerTransformModifierState)
+    expect(selectionListModifierState).toEqual({
+      additive: false,
+      mode: 'range',
+      range: true,
+    })
+    expect(selectionListModifierMode).toBe('range')
+    expect(CanvasAppFacade.getCanvasSelectionListModifierState(
+      selectionListModifierInput,
+    )).toEqual(selectionListModifierState)
     expect(CanvasAppAuthoring.createCanvasAppAssembly).toBeTypeOf('function')
     expect(CanvasAppAuthoring.getCanvasAppFoundationExtensionCommands)
       .toBeTypeOf('function')

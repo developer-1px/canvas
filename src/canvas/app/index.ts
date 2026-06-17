@@ -114,8 +114,12 @@ export {
   type CanvasInteractionTargetSelectorInput,
 } from './affordances/interaction/dom/CanvasInteractionTarget'
 export {
+  getCanvasSelectionListModifierState,
   getCanvasSelectionListRangeIds,
+  type CanvasSelectionListModifierInput,
+  type CanvasSelectionListModifierState,
   type CanvasSelectionListRangeInput,
+  type CanvasSelectionListSelectionMode,
 } from './affordances/controls/selection-list/CanvasSelectionListRange'
 export {
   getCanvasContextMenuKeyboardIntent,
