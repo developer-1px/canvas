@@ -81,6 +81,16 @@ export {
   type CanvasAnimationFrameTaskScheduleInput,
 } from './affordances/interaction/frame/CanvasAnimationFrameTask'
 export {
+  cancelCanvasTimeoutTask,
+  scheduleCanvasTimeoutTask,
+  type CanvasTimeoutTask,
+  type CanvasTimeoutTaskCancel,
+  type CanvasTimeoutTaskCancelInput,
+  type CanvasTimeoutTaskHandle,
+  type CanvasTimeoutTaskSchedule,
+  type CanvasTimeoutTaskScheduleInput,
+} from './affordances/interaction/frame/CanvasTimeoutTask'
+export {
   bindCanvasEventListener,
   bindCanvasEventListeners,
   type CanvasEventListenerCleanup,
