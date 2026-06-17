@@ -1,12 +1,21 @@
 import { describe, expect, it } from 'vitest'
 import { createCanvasAffordanceConfig } from '../../../../engine'
 import {
+  CANVAS_KEYBOARD_TEMPORARY_PAN_MODEL,
+  CANVAS_KEYBOARD_TEMPORARY_PAN_SHORTCUT_LABEL,
   getCanvasKeyboardReservedSystemShortcuts,
   getCanvasKeyboardSystemShortcutIntent,
   shouldReleaseCanvasKeyboardTemporaryPan,
 } from './CanvasKeyboardSystemShortcuts'
 
 describe('CanvasKeyboardSystemShortcuts', () => {
+  it('exports temporary pan metadata for host DOM contracts', () => {
+    expect(CANVAS_KEYBOARD_TEMPORARY_PAN_MODEL).toBe(
+      'canvas-temporary-pan-shortcut',
+    )
+    expect(CANVAS_KEYBOARD_TEMPORARY_PAN_SHORTCUT_LABEL).toBe('Space')
+  })
+
   it('resolves find replace before typing-target suppression', () => {
     expect(getCanvasKeyboardSystemShortcutIntent({
       config: createCanvasAffordanceConfig(),
