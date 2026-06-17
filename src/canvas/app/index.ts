@@ -28,7 +28,10 @@ export {
   useCanvasToolbarRovingFocus,
 } from './feature-packs/toolbar'
 export {
+  CANVAS_MENU_FOCUS_MODEL,
   CANVAS_MENU_ITEM_PROPS,
+  CANVAS_MENU_KEYBOARD_KEYS,
+  CANVAS_MENU_ROVING_FOCUS_MODEL,
   getCanvasMenuRovingActiveIndex,
   getCanvasMenuRovingKeyIndex,
   getCanvasMenuTriggerKeyboardIntent,

@@ -1,11 +1,22 @@
 import { describe, expect, it } from 'vitest'
 import {
+  CANVAS_MENU_FOCUS_MODEL,
   getCanvasMenuRovingActiveIndex,
   getCanvasMenuRovingKeyIndex,
+  CANVAS_MENU_KEYBOARD_KEYS,
+  CANVAS_MENU_ROVING_FOCUS_MODEL,
   getCanvasMenuTriggerKeyboardIntent,
 } from './CanvasMenuRovingFocus'
 
 describe('CanvasMenuRovingFocus', () => {
+  it('exports menu roving focus metadata for host DOM contracts', () => {
+    expect(CANVAS_MENU_ROVING_FOCUS_MODEL).toBe('canvas-menu-roving-focus')
+    expect(CANVAS_MENU_FOCUS_MODEL).toBe('enabled-menuitem-roving')
+    expect(CANVAS_MENU_KEYBOARD_KEYS).toBe(
+      'arrow-left-right-up-down-home-end-enter-space-escape',
+    )
+  })
+
   it('moves menu focus indexes with arrow keys and wraps', () => {
     expect(getCanvasMenuRovingKeyIndex({
       count: 3,

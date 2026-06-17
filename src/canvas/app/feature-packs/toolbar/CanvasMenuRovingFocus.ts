@@ -10,6 +10,11 @@ export const CANVAS_MENU_ITEM_PROPS = {
   'data-canvas-menu-item': '',
 } as const
 
+export const CANVAS_MENU_ROVING_FOCUS_MODEL = 'canvas-menu-roving-focus'
+export const CANVAS_MENU_FOCUS_MODEL = 'enabled-menuitem-roving'
+export const CANVAS_MENU_KEYBOARD_KEYS =
+  'arrow-left-right-up-down-home-end-enter-space-escape'
+
 const CANVAS_MENU_ITEM_SELECTOR = '[data-canvas-menu-item]'
 
 type CanvasMenuItem = HTMLElement & {
