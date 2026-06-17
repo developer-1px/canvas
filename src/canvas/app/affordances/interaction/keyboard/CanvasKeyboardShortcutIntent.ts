@@ -104,6 +104,8 @@ export function isCanvasKeyboardTypingTarget(target: EventTarget | null) {
       target instanceof HTMLInputElement) ||
     (typeof HTMLTextAreaElement !== 'undefined' &&
       target instanceof HTMLTextAreaElement) ||
+    (typeof HTMLSelectElement !== 'undefined' &&
+      target instanceof HTMLSelectElement) ||
     (typeof HTMLElement !== 'undefined' &&
       target instanceof HTMLElement &&
       target.isContentEditable)

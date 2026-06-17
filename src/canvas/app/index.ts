@@ -224,6 +224,10 @@ export {
   type CanvasViewportSetter,
 } from './affordances/interaction/viewport/CanvasViewportControlExecution'
 export {
+  isCanvasKeyboardTypingTarget,
+  type CanvasKeyboardShortcutIntentInput,
+} from './affordances/interaction/keyboard/CanvasKeyboardShortcutIntent'
+export {
   getCanvasKeyboardSystemShortcutIntent,
   shouldReleaseCanvasKeyboardTemporaryPan,
   type CanvasKeyboardSystemShortcutIntent,

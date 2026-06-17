@@ -17,6 +17,7 @@ import {
   focusCanvasElement,
   focusCanvasElementBySelectorOnNextFrame,
   focusCanvasElementOnNextFrame,
+  isCanvasKeyboardTypingTarget,
   resolveCanvasElementBySelector,
   createCanvasAppAssembly,
   createCanvasAppExtensionBundle,
@@ -737,6 +738,8 @@ describe('Canvas package consumer imports', () => {
       root: null,
       selector: '[data-canvas-focus-target]',
     })).toBeNull()
+    expect(isCanvasKeyboardTypingTarget(null)).toBe(false)
+    expect(CanvasAppFacade.isCanvasKeyboardTypingTarget(null)).toBe(false)
     expect(CanvasAppFacade.cancelCanvasDeferredFocus({
       cancelAnimationFrame: null,
       frame: 1,

@@ -37,6 +37,7 @@ export {
   getCanvasModalNextFocusIndex,
   getCanvasModalRestoreFocusTarget,
   getCanvasClientViewportSize,
+  isCanvasKeyboardTypingTarget,
   restoreCanvasModalFocus,
   trapCanvasModalTabFocus,
   createCanvasTabsDescriptor,
