@@ -19,6 +19,11 @@ export type CanvasViewportSetter = (
   next: Viewport | ((current: Viewport) => Viewport),
 ) => void
 
+export const CANVAS_WHEEL_VIEWPORT_MODEL = 'canvas-wheel-viewport'
+export const CANVAS_WHEEL_VIEWPORT_PAN_MODE = 'ordinary-wheel'
+export const CANVAS_WHEEL_VIEWPORT_HORIZONTAL_PAN_MODIFIER = 'Shift'
+export const CANVAS_WHEEL_VIEWPORT_ZOOM_MODIFIER = 'Ctrl/Meta'
+
 type FitCanvasViewportToItemsArgs = {
   ids?: string[]
   itemReadModel: CanvasAppItemReadModel

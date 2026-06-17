@@ -16,6 +16,10 @@ import type {
 } from '../../../rendering/stage/CanvasAppStageElement'
 import type { CanvasAppItemReadModel } from '../../../workflow/CanvasAppItemReadModelContracts'
 import {
+  CANVAS_WHEEL_VIEWPORT_HORIZONTAL_PAN_MODIFIER,
+  CANVAS_WHEEL_VIEWPORT_MODEL,
+  CANVAS_WHEEL_VIEWPORT_PAN_MODE,
+  CANVAS_WHEEL_VIEWPORT_ZOOM_MODIFIER,
   centerCanvasViewportAtWorldPoint,
   fitCanvasViewportToBounds,
   fitCanvasViewportToItems,
@@ -25,6 +29,13 @@ import {
 } from './CanvasViewportControlExecution'
 
 describe('CanvasViewportControlExecution', () => {
+  it('exports wheel viewport metadata for host DOM contracts', () => {
+    expect(CANVAS_WHEEL_VIEWPORT_MODEL).toBe('canvas-wheel-viewport')
+    expect(CANVAS_WHEEL_VIEWPORT_PAN_MODE).toBe('ordinary-wheel')
+    expect(CANVAS_WHEEL_VIEWPORT_HORIZONTAL_PAN_MODIFIER).toBe('Shift')
+    expect(CANVAS_WHEEL_VIEWPORT_ZOOM_MODIFIER).toBe('Ctrl/Meta')
+  })
+
   it('fits the viewport to the provided item ids', () => {
     const bounds = { h: 50, w: 100, x: 10, y: 20 }
     const rect = createRect()
