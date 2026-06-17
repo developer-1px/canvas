@@ -76,8 +76,10 @@ import {
   getCanvasBoundsAnchorPoint,
   getCanvasBoundsAnchorPoints,
   getCanvasBoundsCenter,
+  getCanvasPointBounds,
   isCanvasCustomToolId,
   normalizeBounds,
+  normalizeCanvasPointsToLocalBounds,
 } from '@interactive-os/canvas/core'
 import {
   assertCanvasAffordanceConfig as assertCanvasAffordanceConfigFromEngine,
@@ -521,6 +523,31 @@ describe('Canvas package consumer imports', () => {
       { x: 20, y: -4 },
       { h: 8, w: 6, x: 2, y: 4 },
     )).toEqual({ x: 8, y: 4 })
+    expect(getCanvasPointBounds([
+      { x: 2, y: 4 },
+      { x: 8, y: 12 },
+    ])).toEqual({ h: 8, w: 6, x: 2, y: 4 })
+    expect(CanvasFoundation.getCanvasPointBounds([
+      { x: 2, y: 4 },
+      { x: 8, y: 12 },
+    ])).toEqual(getCanvasPointBounds([
+      { x: 2, y: 4 },
+      { x: 8, y: 12 },
+    ]))
+    expect(normalizeCanvasPointsToLocalBounds({
+      frame: { h: 8, w: 6, x: 2, y: 4 },
+      points: [{ x: -4, y: 20 }],
+    })).toEqual({
+      bounds: { h: 1, w: 1, x: 2, y: 11 },
+      points: [{ x: 0, y: 1 }],
+    })
+    expect(CanvasFoundation.normalizeCanvasPointsToLocalBounds({
+      fallbackPoint: { x: 5, y: 8 },
+      frame: { h: 8, w: 6, x: 2, y: 4 },
+      minHeight: 2,
+      minWidth: 2,
+      points: [],
+    }).bounds).toEqual({ h: 2, w: 2, x: 4, y: 7 })
     const affordanceConfig = createCanvasAffordanceConfig()
     expect(affordanceConfig.tools.select).toBe(true)
     expect(assertCanvasAffordanceConfigFromEngine(affordanceConfig)).toBe(

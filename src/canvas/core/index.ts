@@ -40,6 +40,7 @@ export {
   getCanvasBoundsAnchorPoint,
   getCanvasBoundsAnchorPoints,
   getCanvasBoundsCenter,
+  getCanvasPointBounds,
   getCanvasViewportScale,
   getCanvasViewportScreenBounds,
   getCanvasViewportScreenPoint,
@@ -49,6 +50,7 @@ export {
   getCanvasViewportZoomStepMultiplier,
   handlePoint,
   normalizeBounds,
+  normalizeCanvasPointsToLocalBounds,
   pointDistance,
   resizeBounds,
   scaleItemBounds,
@@ -60,5 +62,7 @@ export {
   type CanvasSequentialIdFactoryInput,
   type CanvasViewportZoomDirection,
   type CanvasViewportRect,
+  type NormalizedCanvasLocalPoints,
+  type NormalizeCanvasPointsToLocalBoundsInput,
   type ResizeBoundsOptions,
 } from './CanvasCorePrimitives'

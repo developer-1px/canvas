@@ -15,14 +15,18 @@ export {
   getCanvasBoundsAnchorPoint,
   getCanvasBoundsAnchorPoints,
   getCanvasBoundsCenter,
+  getCanvasPointBounds,
   handlePoint,
   normalizeBounds,
+  normalizeCanvasPointsToLocalBounds,
   pointDistance,
   resizeBounds,
   scaleItemBounds,
   unique,
   zoomViewport,
   type CanvasViewportRect,
+  type NormalizedCanvasLocalPoints,
+  type NormalizeCanvasPointsToLocalBoundsInput,
   type ResizeBoundsOptions,
 } from '../core'
 export {

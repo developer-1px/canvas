@@ -68,6 +68,20 @@ export type ClampCanvasBoundsToFrameInput = {
   minWidth?: number
 }
 
+export type NormalizeCanvasPointsToLocalBoundsInput = {
+  fallbackPoint?: Point
+  frame?: Bounds
+  minHeight?: number
+  minWidth?: number
+  padding?: number
+  points: readonly Point[]
+}
+
+export type NormalizedCanvasLocalPoints = {
+  bounds: Bounds
+  points: Point[]
+}
+
 export function clamp(value: number, min: number, max: number) {
   if (!Number.isFinite(value)) {
     return min
@@ -161,6 +175,31 @@ export function clampCanvasPointToBounds(point: Point, bounds: Bounds): Point {
   }
 }
 
+export function getCanvasPointBounds(
+  points: readonly Point[],
+  fallbackPoint: Point = { x: 0, y: 0 },
+): Bounds {
+  const [first = fallbackPoint] = points
+  let minX = first.x
+  let minY = first.y
+  let maxX = first.x
+  let maxY = first.y
+
+  for (const point of points.slice(1)) {
+    minX = Math.min(minX, point.x)
+    minY = Math.min(minY, point.y)
+    maxX = Math.max(maxX, point.x)
+    maxY = Math.max(maxY, point.y)
+  }
+
+  return {
+    h: maxY - minY,
+    w: maxX - minX,
+    x: minX,
+    y: minY,
+  }
+}
+
 export function getCanvasBoundsAnchorPoint(
   bounds: Bounds,
   anchor: CanvasBoundsAnchor,
@@ -211,6 +250,50 @@ export function clampCanvasBoundsToFrame({
     w,
     x: clamp(bounds.x, frame.x, frame.x + maxWidth - w),
     y: clamp(bounds.y, frame.y, frame.y + maxHeight - h),
+  }
+}
+
+export function normalizeCanvasPointsToLocalBounds({
+  fallbackPoint = { x: 0, y: 0 },
+  frame,
+  minHeight = 1,
+  minWidth = 1,
+  padding = 0,
+  points,
+}: NormalizeCanvasPointsToLocalBoundsInput): NormalizedCanvasLocalPoints {
+  const sourcePoints = points.length > 0
+    ? points
+    : [fallbackPoint]
+  const safePoints = frame
+    ? sourcePoints.map((point) => clampCanvasPointToBounds(point, frame))
+    : sourcePoints.map((point) => ({ ...point }))
+  const rawBounds = getCanvasPointBounds(safePoints, fallbackPoint)
+  const safePadding = Math.max(0, Number.isFinite(padding) ? padding : 0)
+  const safeMinWidth = Math.max(0, Number.isFinite(minWidth) ? minWidth : 0)
+  const safeMinHeight = Math.max(0, Number.isFinite(minHeight) ? minHeight : 0)
+  const width = Math.max(safeMinWidth, rawBounds.w + safePadding * 2)
+  const height = Math.max(safeMinHeight, rawBounds.h + safePadding * 2)
+  const bounds = {
+    h: height,
+    w: width,
+    x: rawBounds.x - Math.max(safePadding, (width - rawBounds.w) / 2),
+    y: rawBounds.y - Math.max(safePadding, (height - rawBounds.h) / 2),
+  }
+  const localBounds = frame
+    ? clampCanvasBoundsToFrame({
+        bounds,
+        frame,
+        minHeight: safeMinHeight,
+        minWidth: safeMinWidth,
+      })
+    : bounds
+
+  return {
+    bounds: localBounds,
+    points: safePoints.map((point) => ({
+      x: point.x - localBounds.x,
+      y: point.y - localBounds.y,
+    })),
   }
 }
 

@@ -9,6 +9,7 @@ import {
   getCanvasBoundsAnchorPoint,
   getCanvasBoundsAnchorPoints,
   getCanvasBoundsCenter,
+  getCanvasPointBounds,
   getCanvasViewportScale,
   getCanvasViewportScreenBounds,
   getCanvasViewportScreenPoint,
@@ -18,6 +19,7 @@ import {
   getCanvasViewportZoomStepMultiplier,
   MAX_SCALE,
   MIN_SCALE,
+  normalizeCanvasPointsToLocalBounds,
   unique,
   zoomViewport,
 } from './CanvasCorePrimitives'
@@ -189,6 +191,77 @@ describe('CanvasCorePrimitives', () => {
     ).toEqual({
       x: 100,
       y: 80,
+    })
+  })
+
+  it('computes point-list bounds without requiring canvas items', () => {
+    expect(
+      getCanvasPointBounds([
+        { x: 30, y: 90 },
+        { x: 10, y: 20 },
+        { x: 80, y: 40 },
+      ]),
+    ).toEqual({
+      h: 70,
+      w: 70,
+      x: 10,
+      y: 20,
+    })
+
+    expect(getCanvasPointBounds([], { x: 12, y: 34 })).toEqual({
+      h: 0,
+      w: 0,
+      x: 12,
+      y: 34,
+    })
+  })
+
+  it('normalizes world points into padded local bounds inside a frame', () => {
+    expect(
+      normalizeCanvasPointsToLocalBounds({
+        frame: { h: 100, w: 100, x: 0, y: 0 },
+        minHeight: 16,
+        minWidth: 16,
+        padding: 8,
+        points: [
+          { x: -20, y: 40 },
+          { x: 30, y: 90 },
+        ],
+      }),
+    ).toEqual({
+      bounds: {
+        h: 66,
+        w: 46,
+        x: 0,
+        y: 32,
+      },
+      points: [
+        { x: 0, y: 8 },
+        { x: 30, y: 58 },
+      ],
+    })
+  })
+
+  it('normalizes empty point lists through a fallback point', () => {
+    expect(
+      normalizeCanvasPointsToLocalBounds({
+        fallbackPoint: { x: 50, y: 60 },
+        frame: { h: 100, w: 100, x: 0, y: 0 },
+        minHeight: 16,
+        minWidth: 16,
+        padding: 8,
+        points: [],
+      }),
+    ).toEqual({
+      bounds: {
+        h: 16,
+        w: 16,
+        x: 42,
+        y: 52,
+      },
+      points: [
+        { x: 8, y: 8 },
+      ],
     })
   })
 
