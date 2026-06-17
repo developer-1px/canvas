@@ -15,7 +15,9 @@ import {
   cancelCanvasDeferredFocus,
   captureCanvasPointer,
   focusCanvasElement,
+  focusCanvasElementBySelectorOnNextFrame,
   focusCanvasElementOnNextFrame,
+  resolveCanvasElementBySelector,
   createCanvasAppAssembly,
   createCanvasAppExtensionBundle,
   createCanvasAppAiLabsFeaturePackManifest,
@@ -707,6 +709,15 @@ describe('Canvas package consumer imports', () => {
       requestAnimationFrame: null,
       resolveElement: () => null,
     })).toBeNull()
+    expect(focusCanvasElementBySelectorOnNextFrame({
+      requestAnimationFrame: null,
+      root: null,
+      selector: '[data-canvas-focus-target]',
+    })).toBeNull()
+    expect(resolveCanvasElementBySelector({
+      root: null,
+      selector: '[data-canvas-focus-target]',
+    })).toBeNull()
     expect(cancelCanvasDeferredFocus({
       cancelAnimationFrame: null,
       frame: 1,
@@ -722,6 +733,10 @@ describe('Canvas package consumer imports', () => {
     expect(CanvasAppFacade.focusCanvasElement({
       element: null,
     })).toBe(false)
+    expect(CanvasAppFacade.resolveCanvasElementBySelector({
+      root: null,
+      selector: '[data-canvas-focus-target]',
+    })).toBeNull()
     expect(CanvasAppFacade.cancelCanvasDeferredFocus({
       cancelAnimationFrame: null,
       frame: 1,

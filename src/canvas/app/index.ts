@@ -63,11 +63,17 @@ export {
 export {
   cancelCanvasDeferredFocus,
   focusCanvasElement,
+  focusCanvasElementBySelectorOnNextFrame,
   focusCanvasElementOnNextFrame,
+  resolveCanvasElementBySelector,
   type CanvasAnimationFrameCancel,
   type CanvasAnimationFrameRequest,
   type CanvasDeferredFocusCancelInput,
   type CanvasDeferredFocusInput,
+  type CanvasDeferredSelectorFocusInput,
+  type CanvasElementSelectorInput,
+  type CanvasElementSelectorMatch,
+  type CanvasElementSelectorRoot,
   type CanvasFocusableElement,
   type CanvasFocusElementInput,
 } from './affordances/controls/focus/CanvasDeferredFocus'
