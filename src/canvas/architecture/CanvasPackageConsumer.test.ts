@@ -72,6 +72,7 @@ import {
 } from '@interactive-os/canvas/app'
 import {
   clampCanvasBoundsToFrame,
+  clampCanvasPointToBounds,
   getCanvasBoundsAnchorPoint,
   getCanvasBoundsAnchorPoints,
   getCanvasBoundsCenter,
@@ -514,6 +515,12 @@ describe('Canvas package consumer imports', () => {
       bounds: { h: 20, w: 20, x: 100, y: 100 },
       frame: { h: 8, w: 6, x: 2, y: 4 },
     })).toEqual({ h: 8, w: 6, x: 2, y: 4 })
+    expect(clampCanvasPointToBounds({ x: -4, y: 20 }, { h: 8, w: 6, x: 2, y: 4 }))
+      .toEqual({ x: 2, y: 12 })
+    expect(CanvasFoundation.clampCanvasPointToBounds(
+      { x: 20, y: -4 },
+      { h: 8, w: 6, x: 2, y: 4 },
+    )).toEqual({ x: 8, y: 4 })
     const affordanceConfig = createCanvasAffordanceConfig()
     expect(affordanceConfig.tools.select).toBe(true)
     expect(assertCanvasAffordanceConfigFromEngine(affordanceConfig)).toBe(

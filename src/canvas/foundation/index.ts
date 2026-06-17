@@ -10,6 +10,7 @@ export type {
 export {
   clamp,
   clampCanvasBoundsToFrame,
+  clampCanvasPointToBounds,
   fitBoundsIntoViewport,
   getCanvasBoundsAnchorPoint,
   getCanvasBoundsAnchorPoints,

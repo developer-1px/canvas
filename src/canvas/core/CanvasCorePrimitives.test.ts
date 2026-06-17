@@ -3,6 +3,7 @@ import {
   CANVAS_FIT_VIEWPORT_PADDING,
   CANVAS_ZOOM_STEPS,
   clampCanvasBoundsToFrame,
+  clampCanvasPointToBounds,
   createCanvasSequentialIdFactory,
   fitBoundsIntoViewport,
   getCanvasBoundsAnchorPoint,
@@ -166,6 +167,28 @@ describe('CanvasCorePrimitives', () => {
     expect(getCanvasBoundsCenter({ h: 20, w: 40, x: 10, y: 30 })).toEqual({
       x: 30,
       y: 40,
+    })
+  })
+
+  it('clamps a point into bounds without requiring canvas items', () => {
+    expect(
+      clampCanvasPointToBounds(
+        { x: -20, y: 200 },
+        { h: 120, w: 200, x: 10, y: 20 },
+      ),
+    ).toEqual({
+      x: 10,
+      y: 140,
+    })
+
+    expect(
+      clampCanvasPointToBounds(
+        { x: 100, y: 80 },
+        { h: 120, w: 200, x: 10, y: 20 },
+      ),
+    ).toEqual({
+      x: 100,
+      y: 80,
     })
   })
 

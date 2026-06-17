@@ -154,6 +154,13 @@ export function getCanvasBoundsCenter(bounds: Bounds): Point {
   }
 }
 
+export function clampCanvasPointToBounds(point: Point, bounds: Bounds): Point {
+  return {
+    x: clamp(point.x, bounds.x, bounds.x + bounds.w),
+    y: clamp(point.y, bounds.y, bounds.y + bounds.h),
+  }
+}
+
 export function getCanvasBoundsAnchorPoint(
   bounds: Bounds,
   anchor: CanvasBoundsAnchor,

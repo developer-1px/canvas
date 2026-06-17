@@ -34,6 +34,7 @@ export {
   RESIZE_HANDLES,
   clamp,
   clampCanvasBoundsToFrame,
+  clampCanvasPointToBounds,
   createCanvasSequentialIdFactory,
   fitBoundsIntoViewport,
   getCanvasBoundsAnchorPoint,
