@@ -104,6 +104,12 @@ export {
   type CanvasRichClipboardWriteMode,
 } from './affordances/commands/CanvasRichClipboardIO'
 export {
+  writeCanvasClipboardText,
+  type CanvasClipboardTextClipboard,
+  type CanvasClipboardTextWriteInput,
+  type CanvasClipboardTextWriteMode,
+} from './affordances/commands/CanvasClipboardTextIO'
+export {
   createCanvasPastePositionKey,
   getCanvasPasteOffset,
   getCanvasPasteOffsetForBounds,

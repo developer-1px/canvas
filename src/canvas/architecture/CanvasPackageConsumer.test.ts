@@ -20,6 +20,7 @@ import {
   createCanvasAppViewFeaturePack,
   downloadCanvasBlobFile,
   downloadCanvasTextFile,
+  writeCanvasClipboardText,
   defineCanvasAppCustomItemModule,
   DEFAULT_CANVAS_APP_VIEW_FEATURE_PACKS,
   DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS,
@@ -416,7 +417,7 @@ describe('Canvas package consumer imports', () => {
     )
   })
 
-  it('keeps package subpaths usable as public facades', () => {
+  it('keeps package subpaths usable as public facades', async () => {
     expect(CanvasApp).toBeTypeOf('function')
     expect('useCanvasAppModel' in CanvasPackage).toBe(false)
     expect('DEFAULT_CANVAS_APP_ASSEMBLY' in CanvasPackage).toBe(false)
@@ -662,6 +663,14 @@ describe('Canvas package consumer imports', () => {
       type: 'text/plain',
       url: null,
     })).toBe(false)
+    await expect(writeCanvasClipboardText({
+      clipboard: null,
+      text: 'smoke',
+    })).resolves.toBe('unavailable')
+    await expect(CanvasAppFacade.writeCanvasClipboardText({
+      clipboard: null,
+      text: 'smoke',
+    })).resolves.toBe('unavailable')
     expect(CANVAS_SVG_ARROW_MARKER_IRI).toBe('url(#canvas-arrow-head)')
     expect(createCanvasSvgPathData([{ x: 1, y: 2 }, { x: 3, y: 4 }]))
       .toBe('M 1 2 L 3 4')
