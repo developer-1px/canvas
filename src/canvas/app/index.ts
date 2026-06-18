@@ -597,8 +597,17 @@ export {
   type CanvasAppStageRect,
   type CreateCanvasAppStageElementInput,
 } from './rendering/stage/CanvasAppStageElement'
-export type {
-  CanvasAppAssemblySource,
+export {
+  applyCanvasAppAssemblySourceFeaturePackMarketplaceHostUpdate,
+  type CanvasAppAssemblyInputSource,
+  type CanvasAppAssemblyRequiredInputSource,
+  type CanvasAppAssemblySource,
+  type CanvasAppAssemblySourceFeaturePackMarketplaceHostUpdateAppliedResult,
+  type CanvasAppAssemblySourceFeaturePackMarketplaceHostUpdateHeldResult,
+  type CanvasAppAssemblySourceFeaturePackMarketplaceHostUpdateInput,
+  type CanvasAppAssemblySourceFeaturePackMarketplaceHostUpdateResult,
+  type CanvasAppAssemblySourceValue,
+  type CanvasAppPrebuiltAssemblySource,
 } from './shell/CanvasAppAssemblySource'
 export {
   DEFAULT_CANVAS_APP_ASSEMBLY,

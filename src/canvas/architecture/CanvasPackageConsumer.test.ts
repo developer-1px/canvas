@@ -17,6 +17,7 @@ import {
   CANVAS_WHEEL_VIEWPORT_ZOOM_MODIFIER,
   CANVAS_WHEEL_PASSTHROUGH_SELECTOR,
   CANVAS_RICH_CLIPBOARD_JSON_SCRIPT_ATTRIBUTE,
+  applyCanvasAppAssemblySourceFeaturePackMarketplaceHostUpdate,
   applyCanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdate,
   applyCanvasAppFeaturePackRuntimeStatePatch,
   bindCanvasEventListener,
@@ -185,7 +186,15 @@ import {
   getCanvasAppFoundationExtensionTools,
   isCanvasTargetWithinSelector,
   isCanvasWheelPassthroughTarget,
+  type CanvasAppAssemblyInputSource,
+  type CanvasAppAssemblyRequiredInputSource,
   type CanvasAppAssemblySource,
+  type CanvasAppAssemblySourceFeaturePackMarketplaceHostUpdateAppliedResult,
+  type CanvasAppAssemblySourceFeaturePackMarketplaceHostUpdateHeldResult,
+  type CanvasAppAssemblySourceFeaturePackMarketplaceHostUpdateInput,
+  type CanvasAppAssemblySourceFeaturePackMarketplaceHostUpdateResult,
+  type CanvasAppAssemblySourceValue,
+  type CanvasAppPrebuiltAssemblySource,
   type CanvasAppCommitItemsChange,
   type CanvasAppComponentLibrary,
   type CanvasAppComponentDefinition,
@@ -407,6 +416,8 @@ import {
   startCanvasPointerPanInteraction as startCanvasPointerPanInteractionFromApp,
   isCanvasKeyboardToolIntent,
   runCanvasKeyboardToolIntent,
+  type CanvasAppAssemblySourceFeaturePackMarketplaceHostUpdateResult
+    as CanvasAppAssemblySourceFeaturePackMarketplaceHostUpdateResultFromApp,
   type CanvasAppAssemblySource as CanvasAppAssemblySourceFromApp,
   type CanvasAppProps as CanvasAppPropsFromApp,
   type CanvasCommandPaletteKeyboardIntentInput,
@@ -1614,6 +1625,59 @@ describe('Canvas package consumer imports', () => {
     const shellAssemblyProps = {
       assembly,
     } satisfies CanvasAppProps
+    const shellPrebuiltSource =
+      shellAssemblyProps satisfies CanvasAppPrebuiltAssemblySource
+    const shellInputSourceValue =
+      shellInputProps satisfies CanvasAppAssemblySourceValue
+    const shellMarketplaceHostUpdateSourceInput:
+      CanvasAppAssemblySourceFeaturePackMarketplaceHostUpdateInput<
+        SmokeUninstallCleanupEffect,
+        SmokeUninstallCleanupExecutionValue
+      > = {
+        hostUpdate: featurePackMarketplaceAssemblyApplyTransactionResult
+          .hostUpdate,
+        source: shellPrebuiltSource,
+      }
+    const shellMarketplaceHostUpdateSourceResult:
+      CanvasAppAssemblySourceFeaturePackMarketplaceHostUpdateResult<
+        SmokeUninstallCleanupEffect,
+        SmokeUninstallCleanupExecutionValue
+      > =
+        applyCanvasAppAssemblySourceFeaturePackMarketplaceHostUpdate(
+          shellMarketplaceHostUpdateSourceInput,
+        )
+    const shellSubpathMarketplaceHostUpdateSourceResult:
+      CanvasAppAssemblySourceFeaturePackMarketplaceHostUpdateResultFromApp<
+        SmokeUninstallCleanupEffect,
+        SmokeUninstallCleanupExecutionValue
+      > =
+        CanvasAppFacade
+          .applyCanvasAppAssemblySourceFeaturePackMarketplaceHostUpdate(
+            shellMarketplaceHostUpdateSourceInput,
+          )
+    const shellMarketplaceHostUpdateSourceAppliedResult:
+      CanvasAppAssemblySourceFeaturePackMarketplaceHostUpdateAppliedResult<
+        SmokeUninstallCleanupEffect,
+        SmokeUninstallCleanupExecutionValue
+      > | null =
+        shellMarketplaceHostUpdateSourceResult.applied
+          ? shellMarketplaceHostUpdateSourceResult
+          : null
+    const shellMarketplaceHostUpdateSourceHeldResult:
+      CanvasAppAssemblySourceFeaturePackMarketplaceHostUpdateHeldResult<
+        SmokeUninstallCleanupEffect,
+        SmokeUninstallCleanupExecutionValue
+      > | null =
+        shellMarketplaceHostUpdateSourceResult.applied
+          ? null
+          : shellMarketplaceHostUpdateSourceResult
+    const shellMarketplaceHostUpdateInputSource:
+      CanvasAppAssemblyRequiredInputSource | null =
+        shellMarketplaceHostUpdateSourceResult.applied
+          ? shellMarketplaceHostUpdateSourceResult.source
+          : null
+    const shellOptionalInputSource:
+      CanvasAppAssemblyInputSource = shellInputSourceValue
 
     expect(assembly.initialItems).toEqual([rect])
     expect(CanvasComponentPalette).toBeTypeOf('function')
@@ -1666,6 +1730,28 @@ describe('Canvas package consumer imports', () => {
       shellInputProps.assemblyInput,
     )
     expect(shellAssemblyProps.assembly).toBe(assembly)
+    expect(shellOptionalInputSource.assemblyInput).toBe(
+      shellInputProps.assemblyInput,
+    )
+    expect(shellMarketplaceHostUpdateSourceResult.status).toBe('applied')
+    expect(shellMarketplaceHostUpdateSourceResult.applied).toBe(true)
+    expect(shellMarketplaceHostUpdateSourceAppliedResult)
+      .toBe(shellMarketplaceHostUpdateSourceResult)
+    expect(shellMarketplaceHostUpdateSourceHeldResult).toBeNull()
+    expect(shellMarketplaceHostUpdateSourceResult.application.hostUpdate)
+      .toBe(featurePackMarketplaceAssemblyApplyTransactionResult.hostUpdate)
+    expect(shellMarketplaceHostUpdateInputSource?.assemblyInput)
+      .toEqual(featurePackMarketplaceAssemblyAppliedInput)
+    expect(shellMarketplaceHostUpdateSourceResult.source)
+      .toEqual({
+        assemblyInput: featurePackMarketplaceAssemblyAppliedInput,
+      })
+    expect(shellSubpathMarketplaceHostUpdateSourceResult.source)
+      .toEqual(shellMarketplaceHostUpdateSourceResult.source)
+    expect(CanvasPackage.applyCanvasAppAssemblySourceFeaturePackMarketplaceHostUpdate)
+      .toBe(applyCanvasAppAssemblySourceFeaturePackMarketplaceHostUpdate)
+    expect(CanvasAppFacade.applyCanvasAppAssemblySourceFeaturePackMarketplaceHostUpdate)
+      .toBe(applyCanvasAppAssemblySourceFeaturePackMarketplaceHostUpdate)
     const entityItem: CanvasEntityItem = rect
 
     expect(entityItem.id).toBe('rect-1')
