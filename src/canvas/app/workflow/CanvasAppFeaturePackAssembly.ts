@@ -348,6 +348,12 @@ export type CanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlanStatus =
   | 'needs-cleanup-handler'
   | 'ready'
 
+export type CanvasAppFeaturePackMarketplaceAssemblyApplyExecutionResultStatus =
+  | 'blocked'
+  | 'cleanup-failed'
+  | 'completed'
+  | 'needs-cleanup-handler'
+
 export type CanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlanInput<
   TEffect,
 > = Readonly<{
@@ -366,6 +372,37 @@ export type CanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan<
     TEffect
   >
   | CanvasAppFeaturePackMarketplaceAssemblyApplyReadyExecutionPlan<TEffect>
+
+export type CanvasAppFeaturePackMarketplaceAssemblyApplyExecutionResultInput<
+  TEffect,
+  TResult,
+> = Readonly<{
+  executeCleanupEffect:
+    CanvasAppFeaturePackMarketplaceUninstallCleanupEffectExecutor<
+      TEffect,
+      TResult
+    >
+  executionPlan:
+    CanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan<TEffect>
+}>
+
+export type CanvasAppFeaturePackMarketplaceAssemblyApplyExecutionResult<
+  TEffect,
+  TResult,
+> =
+  | CanvasAppFeaturePackMarketplaceAssemblyApplyBlockedExecutionResult
+  | CanvasAppFeaturePackMarketplaceAssemblyApplyCleanupFailedExecutionResult<
+    TEffect,
+    TResult
+  >
+  | CanvasAppFeaturePackMarketplaceAssemblyApplyCompletedExecutionResult<
+    TEffect,
+    TResult
+  >
+  | CanvasAppFeaturePackMarketplaceAssemblyApplyNeedsCleanupHandlerExecutionResult<
+    TEffect,
+    TResult
+  >
 
 export type CanvasAppFeaturePackMarketplaceAssemblyApplyReadyExecutionPlan<
   TEffect,
@@ -396,6 +433,52 @@ export type CanvasAppFeaturePackMarketplaceAssemblyApplyBlockedExecutionPlan =
     updateMode: 'blocked'
   }>
 
+export type CanvasAppFeaturePackMarketplaceAssemblyApplyBlockedExecutionResult =
+  Readonly<{
+    actionKind: CanvasAppFeaturePackMarketplacePrimaryAction['kind']
+    applyResult: CanvasAppFeaturePackMarketplaceAssemblyApplyBlockedResult
+    blockedReasonCount: number
+    currentModel: CanvasAppFeaturePackMarketplaceAssemblyModel
+    executionPlan:
+      CanvasAppFeaturePackMarketplaceAssemblyApplyBlockedExecutionPlan
+    marketplaceBlockedReasonCount: number
+    status: 'blocked'
+    totalBlockedReasonCount: number
+    uninstallDataPlan:
+      CanvasAppFeaturePackMarketplaceAssemblyUninstallDataPlan
+    updateMode: 'blocked'
+  }>
+
+export type CanvasAppFeaturePackMarketplaceAssemblyApplyCompletedExecutionResult<
+  TEffect,
+  TResult,
+> =
+  CanvasAppFeaturePackMarketplaceAssemblyApplyRunnableExecutionResult<
+    TEffect,
+    TResult,
+    'completed'
+  >
+
+export type CanvasAppFeaturePackMarketplaceAssemblyApplyCleanupFailedExecutionResult<
+  TEffect,
+  TResult,
+> =
+  CanvasAppFeaturePackMarketplaceAssemblyApplyRunnableExecutionResult<
+    TEffect,
+    TResult,
+    'cleanup-failed'
+  >
+
+export type CanvasAppFeaturePackMarketplaceAssemblyApplyNeedsCleanupHandlerExecutionResult<
+  TEffect,
+  TResult,
+> =
+  CanvasAppFeaturePackMarketplaceAssemblyApplyRunnableExecutionResult<
+    TEffect,
+    TResult,
+    'needs-cleanup-handler'
+  >
+
 type CanvasAppFeaturePackMarketplaceAssemblyApplyRunnableExecutionPlan<
   TEffect,
   TStatus extends 'needs-cleanup-handler' | 'ready',
@@ -405,6 +488,34 @@ type CanvasAppFeaturePackMarketplaceAssemblyApplyRunnableExecutionPlan<
   cleanupEffectPlan:
     CanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan<TEffect>
   currentModel: CanvasAppFeaturePackMarketplaceAssemblyModel
+  nextAssemblyInput: CanvasAppFeaturePackAssemblyInput
+  nextModel: CanvasAppFeaturePackMarketplaceAssemblyModel
+  status: TStatus
+  uninstallDataPlan: CanvasAppFeaturePackMarketplaceAssemblyUninstallDataPlan
+  updateMode: Exclude<
+    CanvasAppFeaturePackMarketplaceAssemblyApplyUpdateMode,
+    'blocked'
+  >
+}>
+
+type CanvasAppFeaturePackMarketplaceAssemblyApplyRunnableExecutionResult<
+  TEffect,
+  TResult,
+  TStatus extends 'cleanup-failed' | 'completed' | 'needs-cleanup-handler',
+> = Readonly<{
+  actionKind: CanvasAppFeaturePackMarketplacePrimaryAction['kind']
+  applyResult: CanvasAppFeaturePackMarketplaceAssemblyApplyReadyResult
+  cleanupExecutionResult:
+    CanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlanExecutionResult<
+      TEffect,
+      TResult
+    >
+  currentModel: CanvasAppFeaturePackMarketplaceAssemblyModel
+  executionPlan:
+    | CanvasAppFeaturePackMarketplaceAssemblyApplyNeedsCleanupHandlerExecutionPlan<
+      TEffect
+    >
+    | CanvasAppFeaturePackMarketplaceAssemblyApplyReadyExecutionPlan<TEffect>
   nextAssemblyInput: CanvasAppFeaturePackAssemblyInput
   nextModel: CanvasAppFeaturePackMarketplaceAssemblyModel
   status: TStatus
@@ -615,6 +726,61 @@ export function createCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan<
       : 'ready',
     uninstallDataPlan: applyResult.uninstallDataPlan,
     updateMode: applyResult.updateMode,
+  })
+}
+
+export async function executeCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan<
+  TEffect,
+  TResult,
+>({
+  executeCleanupEffect,
+  executionPlan,
+}: CanvasAppFeaturePackMarketplaceAssemblyApplyExecutionResultInput<
+  TEffect,
+  TResult
+>):
+  Promise<
+    CanvasAppFeaturePackMarketplaceAssemblyApplyExecutionResult<
+      TEffect,
+      TResult
+    >
+  > {
+  if (executionPlan.status === 'blocked') {
+    return Object.freeze({
+      actionKind: executionPlan.actionKind,
+      applyResult: executionPlan.applyResult,
+      blockedReasonCount: executionPlan.blockedReasonCount,
+      currentModel: executionPlan.currentModel,
+      executionPlan,
+      marketplaceBlockedReasonCount:
+        executionPlan.marketplaceBlockedReasonCount,
+      status: 'blocked',
+      totalBlockedReasonCount: executionPlan.totalBlockedReasonCount,
+      uninstallDataPlan: executionPlan.uninstallDataPlan,
+      updateMode: 'blocked',
+    })
+  }
+
+  const cleanupExecutionResult =
+    await executeCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan({
+      cleanupEffectPlan: executionPlan.cleanupEffectPlan,
+      executeEffect: executeCleanupEffect,
+    })
+
+  return Object.freeze({
+    actionKind: executionPlan.actionKind,
+    applyResult: executionPlan.applyResult,
+    cleanupExecutionResult,
+    currentModel: executionPlan.currentModel,
+    executionPlan,
+    nextAssemblyInput: executionPlan.nextAssemblyInput,
+    nextModel: executionPlan.nextModel,
+    status:
+      getCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionResultStatus(
+        cleanupExecutionResult.status,
+      ),
+    uninstallDataPlan: executionPlan.uninstallDataPlan,
+    updateMode: executionPlan.updateMode,
   })
 }
 
@@ -1014,6 +1180,24 @@ function getCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlanExecutionSt
   }
 
   return 'succeeded'
+}
+
+function getCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionResultStatus(
+  cleanupExecutionStatus:
+    CanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlanExecutionStatus,
+): Exclude<
+  CanvasAppFeaturePackMarketplaceAssemblyApplyExecutionResultStatus,
+  'blocked'
+> {
+  if (cleanupExecutionStatus === 'failed') {
+    return 'cleanup-failed'
+  }
+
+  if (cleanupExecutionStatus === 'needs-handler') {
+    return 'needs-cleanup-handler'
+  }
+
+  return 'completed'
 }
 
 function getCanvasAppFeaturePackMarketplaceAssemblyUninstallDataPlan(

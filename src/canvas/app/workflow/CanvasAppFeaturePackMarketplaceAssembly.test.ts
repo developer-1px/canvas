@@ -9,6 +9,7 @@ import { createCanvasAppAssembly } from './CanvasAppAssembly'
 import {
   createCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan,
   createCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan,
+  executeCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan,
   executeCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan,
   getCanvasAppFeaturePackMarketplaceAssemblyApplyResult,
   getCanvasAppFeaturePackMarketplaceAssemblyApplyPlan,
@@ -476,15 +477,79 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
     expect(executionPlan.applyResult).toBe(applyResult)
     expect(executionPlan.nextModel).toBe(applyResult.nextModel)
 
-    expect(createCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan({
+    const applyExecutionResult =
+      await executeCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan({
+        executeCleanupEffect: ({ effect, scopeId }) => ({
+          applied: true as const,
+          effectKind: effect.kind,
+          scopeId,
+        }),
+        executionPlan,
+      })
+
+    expect(applyExecutionResult).toMatchObject({
+      actionKind: 'uninstall',
+      cleanupExecutionResult: {
+        status: 'succeeded',
+        succeededScopeIds: ['addon-data'],
+      },
+      nextAssemblyInput: applyResult.nextModel.assemblyInput,
+      status: 'completed',
+      updateMode: 'full-rebuild',
+    })
+    expect(applyExecutionResult.applyResult).toBe(applyResult)
+    expect(applyExecutionResult.executionPlan).toBe(executionPlan)
+    expect(applyExecutionResult.nextModel).toBe(applyResult.nextModel)
+
+    const needsHandlerExecutionPlan =
+      createCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan({
       applyResult,
-    })).toMatchObject({
+    })
+
+    expect(needsHandlerExecutionPlan).toMatchObject({
       cleanupEffectPlan: {
         missingHandlerScopeIds: ['addon-data'],
         status: 'needs-handler',
       },
       status: 'needs-cleanup-handler',
     })
+
+    const needsHandlerApplyExecutionResult =
+      await executeCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan({
+        executeCleanupEffect: ({ effect, scopeId }) => ({
+          applied: true as const,
+          effectKind: effect.kind,
+          scopeId,
+        }),
+        executionPlan: needsHandlerExecutionPlan,
+      })
+
+    expect(needsHandlerApplyExecutionResult).toMatchObject({
+      cleanupExecutionResult: {
+        skippedScopeIds: ['addon-data'],
+        status: 'needs-handler',
+      },
+      status: 'needs-cleanup-handler',
+    })
+
+    const cleanupError = new Error('cleanup failed')
+    const failedApplyExecutionResult =
+      await executeCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan({
+        executeCleanupEffect: () => {
+          throw cleanupError
+        },
+        executionPlan,
+      })
+
+    expect(failedApplyExecutionResult).toMatchObject({
+      cleanupExecutionResult: {
+        failedScopeIds: ['addon-data'],
+        status: 'failed',
+      },
+      status: 'cleanup-failed',
+    })
+    expect(failedApplyExecutionResult.cleanupExecutionResult.failedResults[0]
+      ?.error).toBe(cleanupError)
   })
 
   it('keeps non-remove uninstall data out of cleanup effects', async () => {
@@ -734,7 +799,7 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
     expect(assembly.enabledFeaturePackIds).toEqual([])
   })
 
-  it('keeps uninstall data policy on blocked apply plans', () => {
+  it('keeps uninstall data policy on blocked apply plans', async () => {
     const runtimeManifest = createCanvasAppFeaturePackManifest({
       id: 'runtime-pack',
       label: 'Runtime pack',
@@ -859,6 +924,32 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
     })
     expect(executionPlan.applyResult).toBe(applyResult)
     expect('cleanupEffectPlan' in executionPlan).toBe(false)
+
+    let cleanupExecuted = false
+    const applyExecutionResult =
+      await executeCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan({
+        executeCleanupEffect: () => {
+          cleanupExecuted = true
+          return {
+            kind: 'remove-scope-data' as const,
+            scopeId: 'runtime-data',
+          }
+        },
+        executionPlan,
+      })
+
+    expect(applyExecutionResult).toMatchObject({
+      actionKind: 'uninstall',
+      blockedReasonCount: 1,
+      currentModel: model,
+      marketplaceBlockedReasonCount: 0,
+      status: 'blocked',
+      totalBlockedReasonCount: 1,
+      updateMode: 'blocked',
+    })
+    expect(applyExecutionResult.applyResult).toBe(applyResult)
+    expect(applyExecutionResult.executionPlan).toBe(executionPlan)
+    expect(cleanupExecuted).toBe(false)
   })
 
   it('keeps blocked marketplace actions from changing assembly input', () => {
