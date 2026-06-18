@@ -176,6 +176,53 @@ export type SlideEditTextParagraphSpacingHostCommandEffect<
   type: 'slide-command-effect'
 }
 
+export type SlideEditTextParagraphSpacingDataTransfer = Pick<
+  DataTransfer,
+  'getData'
+>
+
+export type SlideEditTextParagraphSpacingPasteFieldValue =
+  | {
+    fieldId: 'lineHeightRatio'
+    value: number
+  }
+  | {
+    fieldId: 'paragraphAfter'
+    value: SlideEditTextParagraphSpacingAmount
+  }
+  | {
+    fieldId: 'paragraphBefore'
+    value: SlideEditTextParagraphSpacingAmount
+  }
+
+export type SlideEditTextParagraphSpacingJSONPasteValues = {
+  lineHeightRatio?: number
+  paragraphAfter?: SlideEditTextParagraphSpacingAmount
+  paragraphBefore?: SlideEditTextParagraphSpacingAmount
+}
+
+export type SlideEditTextParagraphSpacingJSONPasteValue = {
+  fields: readonly SlideEditTextParagraphSpacingPasteFieldValue[]
+  surface: 'text-paragraph-spacing'
+  values: SlideEditTextParagraphSpacingJSONPasteValues
+}
+
+export type SlideEditTextParagraphSpacingJSONPasteInput = {
+  dataTransfer: SlideEditTextParagraphSpacingDataTransfer | null
+  jsonMimeType?: string
+}
+
+export type SlideEditTextParagraphSpacingPasteCommandsInput<
+  TSlideId extends SlideEditTextParagraphSlideId =
+    SlideEditTextParagraphSlideId,
+  TObjectId extends SlideEditTextParagraphObjectId =
+    SlideEditTextParagraphObjectId,
+> = {
+  objectId: TObjectId
+  pasteValue: SlideEditTextParagraphSpacingJSONPasteValue
+  slideId: TSlideId
+}
+
 export type SlideEditTextParagraphSpacingNumericLimits = {
   maxLineHeightRatio: number
   maxSpacing: number
@@ -189,6 +236,44 @@ export const SLIDE_EDIT_TEXT_PARAGRAPH_SPACING_LIMITS = Object.freeze({
   minLineHeightRatio: 0.5,
   minSpacing: 0,
 } as const satisfies SlideEditTextParagraphSpacingNumericLimits)
+
+export const SLIDE_EDIT_TEXT_PARAGRAPH_SPACING_JSON_MIME_TYPE =
+  'application/vnd.interactive-os.slide-edit.text-paragraph-spacing+json'
+
+export const SLIDE_EDIT_TEXT_PARAGRAPH_SPACING_JSON_TYPES = Object.freeze([
+  'application/json',
+  'text/json',
+  'text/plain',
+] as const)
+
+export const SLIDE_EDIT_TEXT_PARAGRAPH_SPACING_JSON_WRAPPER_KEYS =
+  Object.freeze([
+    'textParagraphSpacing',
+    'paragraphSpacing',
+    'paragraphStyle',
+    'paragraph',
+    'spacing',
+  ] as const)
+
+const SLIDE_EDIT_TEXT_PARAGRAPH_SPACING_LINE_HEIGHT_JSON_KEYS =
+  Object.freeze([
+    'lineHeight',
+    'lineHeightRatio',
+  ] as const)
+
+const SLIDE_EDIT_TEXT_PARAGRAPH_SPACING_BEFORE_JSON_KEYS = Object.freeze([
+  'spacingBefore',
+  'paragraphBefore',
+  'before',
+  'marginTop',
+] as const)
+
+const SLIDE_EDIT_TEXT_PARAGRAPH_SPACING_AFTER_JSON_KEYS = Object.freeze([
+  'spacingAfter',
+  'paragraphAfter',
+  'after',
+  'marginBottom',
+] as const)
 
 export const SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_DEFAULT = 'none'
 
@@ -434,6 +519,80 @@ export function normalizeSlideEditTextParagraphSpacingUpdateCommand<
   }
 }
 
+export function getSlideEditTextParagraphSpacingJSONPasteValue({
+  dataTransfer,
+  jsonMimeType = SLIDE_EDIT_TEXT_PARAGRAPH_SPACING_JSON_MIME_TYPE,
+}: SlideEditTextParagraphSpacingJSONPasteInput):
+  SlideEditTextParagraphSpacingJSONPasteValue | null {
+  if (!dataTransfer) {
+    return null
+  }
+
+  if (jsonMimeType) {
+    const customText = dataTransfer.getData(jsonMimeType)
+
+    if (customText.trim()) {
+      const customValue = parseSlideEditTextParagraphSpacingJSON(customText)
+      const customPasteValue =
+        getSlideEditTextParagraphSpacingDirectPasteValue(customValue)
+
+      if (customPasteValue !== null) {
+        return customPasteValue
+      }
+    }
+  }
+
+  for (const type of SLIDE_EDIT_TEXT_PARAGRAPH_SPACING_JSON_TYPES) {
+    const text = dataTransfer.getData(type)
+
+    if (!text.trim()) {
+      continue
+    }
+
+    const value = parseSlideEditTextParagraphSpacingJSON(text)
+    const pasteValue =
+      getSlideEditTextParagraphSpacingWrappedPasteValue(value)
+
+    if (pasteValue !== null) {
+      return pasteValue
+    }
+  }
+
+  return null
+}
+
+export function getSlideEditTextParagraphSpacingPasteCommands<
+  TSlideId extends SlideEditTextParagraphSlideId,
+  TObjectId extends SlideEditTextParagraphObjectId,
+>({
+  objectId,
+  pasteValue,
+  slideId,
+}: SlideEditTextParagraphSpacingPasteCommandsInput<TSlideId, TObjectId>):
+  readonly SlideEditTextParagraphSpacingUpdateCommand<TSlideId, TObjectId>[] {
+  return pasteValue.fields.map((field) => {
+    switch (field.fieldId) {
+      case 'lineHeightRatio':
+        return {
+          fieldId: field.fieldId,
+          id: 'update-text-paragraph-spacing',
+          objectId,
+          slideId,
+          value: field.value,
+        }
+      case 'paragraphAfter':
+      case 'paragraphBefore':
+        return {
+          fieldId: field.fieldId,
+          id: 'update-text-paragraph-spacing',
+          objectId,
+          slideId,
+          value: field.value,
+        }
+    }
+  })
+}
+
 export function normalizeSlideEditTextLineHeightRatio(
   value: number | null | undefined,
 ) {
@@ -502,6 +661,208 @@ function getSlideEditTextParagraphSpacingAmountCSS(
   amount: Partial<SlideEditTextParagraphSpacingAmount> | null | undefined,
 ) {
   return `${normalizeSlideEditTextParagraphSpacingAmount(amount).value}px`
+}
+
+function getSlideEditTextParagraphSpacingDirectPasteValue(
+  value: unknown,
+): SlideEditTextParagraphSpacingJSONPasteValue | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null
+  }
+
+  const record = value as Record<string, unknown>
+  const fields: SlideEditTextParagraphSpacingPasteFieldValue[] = []
+  const values: SlideEditTextParagraphSpacingJSONPasteValues = {}
+  const lineHeightRatio = getSlideEditTextParagraphSpacingLineHeightJSONValue(
+    record,
+  )
+  const paragraphBefore = getSlideEditTextParagraphSpacingAmountJSONValue(
+    record,
+    SLIDE_EDIT_TEXT_PARAGRAPH_SPACING_BEFORE_JSON_KEYS,
+  )
+  const paragraphAfter = getSlideEditTextParagraphSpacingAmountJSONValue(
+    record,
+    SLIDE_EDIT_TEXT_PARAGRAPH_SPACING_AFTER_JSON_KEYS,
+  )
+
+  if (lineHeightRatio !== null) {
+    fields.push({
+      fieldId: 'lineHeightRatio',
+      value: lineHeightRatio,
+    })
+    values.lineHeightRatio = lineHeightRatio
+  }
+
+  if (paragraphBefore !== null) {
+    fields.push({
+      fieldId: 'paragraphBefore',
+      value: paragraphBefore,
+    })
+    values.paragraphBefore = paragraphBefore
+  }
+
+  if (paragraphAfter !== null) {
+    fields.push({
+      fieldId: 'paragraphAfter',
+      value: paragraphAfter,
+    })
+    values.paragraphAfter = paragraphAfter
+  }
+
+  return fields.length > 0
+    ? {
+      fields,
+      surface: 'text-paragraph-spacing',
+      values,
+    }
+    : null
+}
+
+function getSlideEditTextParagraphSpacingWrappedPasteValue(
+  value: unknown,
+): SlideEditTextParagraphSpacingJSONPasteValue | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null
+  }
+
+  const record = value as Record<string, unknown>
+
+  for (const key of SLIDE_EDIT_TEXT_PARAGRAPH_SPACING_JSON_WRAPPER_KEYS) {
+    if (!Object.hasOwn(record, key)) {
+      continue
+    }
+
+    const pasteValue = getSlideEditTextParagraphSpacingDirectPasteValue(
+      record[key],
+    )
+
+    if (pasteValue !== null) {
+      return pasteValue
+    }
+  }
+
+  return null
+}
+
+function getSlideEditTextParagraphSpacingLineHeightJSONValue(
+  record: Record<string, unknown>,
+) {
+  for (const key of SLIDE_EDIT_TEXT_PARAGRAPH_SPACING_LINE_HEIGHT_JSON_KEYS) {
+    if (!Object.hasOwn(record, key)) {
+      continue
+    }
+
+    const numericValue = getSlideEditTextParagraphSpacingJSONNumber(
+      record[key],
+      {
+        allowPx: false,
+      },
+    )
+
+    if (numericValue !== null) {
+      return normalizeSlideEditTextLineHeightRatio(numericValue)
+    }
+  }
+
+  return null
+}
+
+function getSlideEditTextParagraphSpacingAmountJSONValue(
+  record: Record<string, unknown>,
+  keys: readonly string[],
+): SlideEditTextParagraphSpacingAmount | null {
+  for (const key of keys) {
+    if (!Object.hasOwn(record, key)) {
+      continue
+    }
+
+    const amount = getSlideEditTextParagraphSpacingJSONAmount(record[key])
+
+    if (amount !== null) {
+      return amount
+    }
+  }
+
+  return null
+}
+
+function getSlideEditTextParagraphSpacingJSONAmount(
+  value: unknown,
+): SlideEditTextParagraphSpacingAmount | null {
+  if (value && typeof value === 'object' && !Array.isArray(value)) {
+    const record = value as Record<string, unknown>
+    const numericValue = getSlideEditTextParagraphSpacingJSONNumber(
+      record.value,
+      {
+        allowPx: true,
+      },
+    )
+
+    return numericValue === null
+      ? null
+      : normalizeSlideEditTextParagraphSpacingAmount({
+        unit: record.unit === 'slide-unit' ? 'slide-unit' : 'px',
+        value: numericValue,
+      })
+  }
+
+  const numericValue = getSlideEditTextParagraphSpacingJSONNumber(value, {
+    allowPx: true,
+  })
+
+  return numericValue === null
+    ? null
+    : normalizeSlideEditTextParagraphSpacingAmount({
+      unit: 'px',
+      value: numericValue,
+    })
+}
+
+function getSlideEditTextParagraphSpacingJSONNumber(
+  value: unknown,
+  {
+    allowPx,
+  }: {
+    allowPx: boolean
+  },
+) {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value
+  }
+
+  if (typeof value !== 'string') {
+    return null
+  }
+
+  const trimmedValue = value.trim()
+
+  if (!trimmedValue) {
+    return null
+  }
+
+  const numericText = allowPx && trimmedValue.toLowerCase().endsWith('px')
+    ? trimmedValue.slice(0, -2).trim()
+    : trimmedValue
+
+  if (!allowPx && trimmedValue.toLowerCase().endsWith('px')) {
+    return null
+  }
+
+  const numericValue = Number(numericText)
+
+  return Number.isFinite(numericValue) ? numericValue : null
+}
+
+function parseSlideEditTextParagraphSpacingJSON(value: string) {
+  if (!value.trim()) {
+    return null
+  }
+
+  try {
+    return JSON.parse(value) as unknown
+  } catch {
+    return null
+  }
 }
 
 function normalizeSlideEditTextParagraphSpacingUnit(

@@ -148,6 +148,8 @@
 | Line height | ratio-based numeric subset with 0.5..4 normalization |
 | Paragraph spacing | numeric amount in `px` or `slide-unit`, normalized to 0..1000 |
 | Fields | `lineHeightRatio`, `paragraphBefore`, `paragraphAfter` descriptors |
+| JSON candidates | custom MIME, `application/json`, `text/json`, and `text/plain` are checked in order |
+| JSON payloads | generic JSON requires `textParagraphSpacing`, `paragraphSpacing`, `paragraphStyle`, `paragraph`, or `spacing`; custom MIME may carry direct field aliases |
 | Updates | field edits become host command effects with object id and normalized value |
 | Runtime | host owns text layout, preview rendering, export mapping, and persistence |
 
