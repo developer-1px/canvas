@@ -10,6 +10,7 @@ import {
   createCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan,
   createCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan,
   executeCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan,
+  executeCanvasAppFeaturePackMarketplaceAssemblyApplyTransaction,
   executeCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan,
   getCanvasAppFeaturePackMarketplaceAssemblyApplyCommitPlan,
   getCanvasAppFeaturePackMarketplaceAssemblyApplyCommitResult,
@@ -572,10 +573,74 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
     expect(commitResult.previousModel).toBe(model)
     expect(commitResult.nextModel).toBe(applyResult.nextModel)
 
+    const transactionCleanupExecutions: string[] = []
+    const transactionResult =
+      await executeCanvasAppFeaturePackMarketplaceAssemblyApplyTransaction({
+        action: uninstallAction,
+        cleanupHandlers: [{
+          createEffect: ({ featurePackIds, scopeId }) => ({
+            featurePackIds: [...featurePackIds],
+            kind: 'remove-scope-data' as const,
+            scopeId,
+          }),
+          scopeId: 'addon-data',
+        }],
+        executeCleanupEffect: ({ effect, scopeId }) => {
+          transactionCleanupExecutions.push(scopeId)
+
+          return {
+            applied: true as const,
+            effectKind: effect.kind,
+            scopeId,
+          }
+        },
+        model,
+      })
+
+    expect(transactionResult).toMatchObject({
+      actionKind: 'uninstall',
+      commitResult: {
+        committed: true,
+        status: 'committed',
+      },
+      status: 'committed',
+      summary: {
+        status: 'completed',
+      },
+      updateMode: 'full-rebuild',
+    })
+    expect(transactionResult.action).toBe(uninstallAction)
+    expect(transactionResult.model).toBe(model)
+    expect(transactionResult.executionPlan.applyResult).toBe(
+      transactionResult.applyResult,
+    )
+    expect(transactionResult.executionResult.executionPlan).toBe(
+      transactionResult.executionPlan,
+    )
+    expect(transactionResult.commitPlan.executionResult).toBe(
+      transactionResult.executionResult,
+    )
+    expect(transactionResult.commitResult.commitPlan).toBe(
+      transactionResult.commitPlan,
+    )
+    expect(transactionResult.commitResult.committed).toBe(true)
+    if (!transactionResult.commitResult.committed) {
+      throw new Error('Expected committed transaction result')
+    }
+
+    if (!('nextModel' in transactionResult.applyResult)) {
+      throw new Error('Expected ready transaction apply result')
+    }
+
+    expect(transactionResult.commitResult.nextModel).toBe(
+      transactionResult.applyResult.nextModel,
+    )
+    expect(transactionCleanupExecutions).toEqual(['addon-data'])
+
     const needsHandlerExecutionPlan =
       createCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan({
-      applyResult,
-    })
+        applyResult,
+      })
 
     expect(needsHandlerExecutionPlan).toMatchObject({
       cleanupEffectPlan: {
@@ -651,6 +716,48 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
     expect(needsHandlerCommitResult.currentModel).toBe(model)
     expect('nextModel' in needsHandlerCommitResult).toBe(false)
     expect('nextAssemblyInput' in needsHandlerCommitResult).toBe(false)
+
+    let needsHandlerCleanupExecuted = false
+    const needsHandlerTransactionResult =
+      await executeCanvasAppFeaturePackMarketplaceAssemblyApplyTransaction({
+        action: uninstallAction,
+        executeCleanupEffect: () => {
+          needsHandlerCleanupExecuted = true
+
+          return {
+            applied: true as const,
+            effectKind: 'remove-scope-data' as const,
+            scopeId: 'addon-data',
+          }
+        },
+        model,
+      })
+
+    expect(needsHandlerTransactionResult).toMatchObject({
+      actionKind: 'uninstall',
+      commitResult: {
+        committed: false,
+        holdReason: 'needs-cleanup-handler',
+        status: 'held',
+      },
+      executionPlan: {
+        status: 'needs-cleanup-handler',
+      },
+      executionResult: {
+        status: 'needs-cleanup-handler',
+      },
+      status: 'held',
+      summary: {
+        status: 'needs-cleanup-handler',
+      },
+    })
+    expect(needsHandlerCleanupExecuted).toBe(false)
+    expect(needsHandlerTransactionResult.commitResult.commitPlan).toBe(
+      needsHandlerTransactionResult.commitPlan,
+    )
+    expect('nextModel' in needsHandlerTransactionResult.commitResult).toBe(
+      false,
+    )
 
     const cleanupError = new Error('cleanup failed')
     const failedApplyExecutionResult =
@@ -1174,6 +1281,58 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
     expect(commitResult.commitPlan).toBe(commitPlan)
     expect(commitResult.currentModel).toBe(model)
     expect('nextAssemblyInput' in commitResult).toBe(false)
+
+    let transactionCleanupExecuted = false
+    const blockedTransactionResult =
+      await executeCanvasAppFeaturePackMarketplaceAssemblyApplyTransaction({
+        action: uninstallAction,
+        cleanupHandlers: [{
+          createEffect: ({ scopeId }) => ({
+            kind: 'remove-scope-data' as const,
+            scopeId,
+          }),
+          scopeId: 'runtime-data',
+        }],
+        executeCleanupEffect: () => {
+          transactionCleanupExecuted = true
+
+          return {
+            kind: 'remove-scope-data' as const,
+            scopeId: 'runtime-data',
+          }
+        },
+        model,
+      })
+
+    expect(blockedTransactionResult).toMatchObject({
+      actionKind: 'uninstall',
+      commitResult: {
+        committed: false,
+        holdReason: 'blocked',
+        status: 'held',
+      },
+      executionPlan: {
+        status: 'blocked',
+      },
+      executionResult: {
+        status: 'blocked',
+      },
+      status: 'held',
+      summary: {
+        cleanup: {
+          status: 'not-run',
+        },
+        status: 'blocked',
+      },
+      updateMode: 'blocked',
+    })
+    expect(blockedTransactionResult.action).toBe(uninstallAction)
+    expect(blockedTransactionResult.model).toBe(model)
+    expect(transactionCleanupExecuted).toBe(false)
+    expect(blockedTransactionResult.commitResult.commitPlan).toBe(
+      blockedTransactionResult.commitPlan,
+    )
+    expect('nextModel' in blockedTransactionResult.commitResult).toBe(false)
   })
 
   it('keeps blocked marketplace actions from changing assembly input', () => {

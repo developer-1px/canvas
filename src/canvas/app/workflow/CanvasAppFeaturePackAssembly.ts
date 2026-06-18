@@ -603,6 +603,47 @@ export type CanvasAppFeaturePackMarketplaceAssemblyApplyHeldCommitResult<
   updateMode: CanvasAppFeaturePackMarketplaceAssemblyApplyUpdateMode
 }>
 
+export type CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionInput<
+  TEffect,
+  TResult,
+> = Readonly<{
+  action: CanvasAppFeaturePackMarketplacePrimaryAction
+  cleanupHandlers?:
+    readonly CanvasAppFeaturePackMarketplaceUninstallCleanupScopeHandler<
+      TEffect
+    >[]
+  executeCleanupEffect:
+    CanvasAppFeaturePackMarketplaceUninstallCleanupEffectExecutor<
+      TEffect,
+      TResult
+    >
+  model: CanvasAppFeaturePackMarketplaceAssemblyModel
+}>
+
+export type CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionResult<
+  TEffect,
+  TResult,
+> = Readonly<{
+  action: CanvasAppFeaturePackMarketplacePrimaryAction
+  actionKind: CanvasAppFeaturePackMarketplacePrimaryAction['kind']
+  applyResult: CanvasAppFeaturePackMarketplaceAssemblyApplyResult
+  commitPlan:
+    CanvasAppFeaturePackMarketplaceAssemblyApplyCommitPlan<TEffect, TResult>
+  commitResult:
+    CanvasAppFeaturePackMarketplaceAssemblyApplyCommitResult<TEffect, TResult>
+  executionPlan:
+    CanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan<TEffect>
+  executionResult:
+    CanvasAppFeaturePackMarketplaceAssemblyApplyExecutionResult<
+      TEffect,
+      TResult
+    >
+  model: CanvasAppFeaturePackMarketplaceAssemblyModel
+  status: CanvasAppFeaturePackMarketplaceAssemblyApplyCommitResultStatus
+  summary: CanvasAppFeaturePackMarketplaceAssemblyApplyExecutionSummary
+  updateMode: CanvasAppFeaturePackMarketplaceAssemblyApplyUpdateMode
+}>
+
 export type CanvasAppFeaturePackMarketplaceAssemblyApplyReadyExecutionPlan<
   TEffect,
 > =
@@ -1106,6 +1147,61 @@ export function getCanvasAppFeaturePackMarketplaceAssemblyApplyCommitResult<
     status: 'held',
     summary: commitPlan.summary,
     uninstallDataPlan: commitPlan.uninstallDataPlan,
+    updateMode: commitPlan.updateMode,
+  })
+}
+
+export async function executeCanvasAppFeaturePackMarketplaceAssemblyApplyTransaction<
+  TEffect,
+  TResult,
+>({
+  action,
+  cleanupHandlers = [],
+  executeCleanupEffect,
+  model,
+}: CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionInput<
+  TEffect,
+  TResult
+>): Promise<
+  CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionResult<
+    TEffect,
+    TResult
+  >
+> {
+  const applyResult = getCanvasAppFeaturePackMarketplaceAssemblyApplyResult({
+    action,
+    model,
+  })
+  const executionPlan =
+    createCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan({
+      applyResult,
+      cleanupHandlers,
+    })
+  const executionResult =
+    await executeCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan({
+      executeCleanupEffect,
+      executionPlan,
+    })
+  const commitPlan =
+    getCanvasAppFeaturePackMarketplaceAssemblyApplyCommitPlan({
+      executionResult,
+    })
+  const commitResult =
+    getCanvasAppFeaturePackMarketplaceAssemblyApplyCommitResult({
+      commitPlan,
+    })
+
+  return Object.freeze({
+    action,
+    actionKind: executionResult.actionKind,
+    applyResult,
+    commitPlan,
+    commitResult,
+    executionPlan,
+    executionResult,
+    model,
+    status: commitResult.status,
+    summary: commitPlan.summary,
     updateMode: commitPlan.updateMode,
   })
 }
