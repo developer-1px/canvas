@@ -1,10 +1,16 @@
-import type { CanvasCustomItem, CanvasItem } from '../../canvas';
+import type {
+  CanvasAppComponentDefinition,
+  CanvasCustomItem,
+  CanvasItem,
+  CanvasStoryImportGroup,
+} from '../../canvas';
 import {
   CANVAS_APP_STORY_IMPORT_FEATURE_PACK_MANIFEST,
   CANVAS_STORY_PREVIEW_GROUP_KIND,
   CANVAS_STORY_PREVIEW_GROUP_PRESENTATION,
   CANVAS_STORY_PREVIEW_ITEM_KIND,
   CANVAS_STORY_PREVIEW_ITEM_PRESENTATION,
+  createCanvasStoryImportComponentDefinitions,
   createCanvasStoryImportItems,
 } from '../../canvas';
 import {
@@ -90,6 +96,7 @@ export function createStoryBoard(
   options: StoryBoardOptions = {},
 ) {
   const sections = groupStoryEntries(entries, options.sectionForStory);
+  const componentDefinitions: CanvasAppComponentDefinition[] = [];
   const items: CanvasItem[] = [];
   let y = BOARD_TOP;
   const effectiveSize = (entry: StoryRecord) => sizeOverrides?.get(entry.id) ?? entry.size;
@@ -118,10 +125,14 @@ export function createStoryBoard(
     });
 
     items.push(...layout.items);
+    componentDefinitions.push(...layout.componentDefinitions);
     y = layout.bottom + SECTION_GAP;
   }
 
-  return { items };
+  return {
+    componentDefinitions,
+    items,
+  };
 }
 
 function buildComponentBlocks(
@@ -297,6 +308,7 @@ function defaultSectionForStory(entry: StoryRecord) {
 }
 
 function layoutSectionBlocks(blocks: ComponentBlock[], startY: number, rowGap = ROW_GAP) {
+  const componentDefinitions: CanvasAppComponentDefinition[] = [];
   const items: CanvasCustomItem[] = [];
   const rows: ComponentBlockRow[] = [];
   let currentRow: ComponentBlock[] = [];
@@ -323,7 +335,7 @@ function layoutSectionBlocks(blocks: ComponentBlock[], startY: number, rowGap = 
     let x = BOARD_X;
 
     for (const block of row.blocks) {
-      pushBlockItems(items, block, x, y, row.h);
+      pushBlockItems(items, componentDefinitions, block, x, y, row.h);
       x += block.w + CARD_GAP;
     }
 
@@ -332,6 +344,7 @@ function layoutSectionBlocks(blocks: ComponentBlock[], startY: number, rowGap = 
 
   return {
     bottom: rows.length > 0 ? y - rowGap : startY,
+    componentDefinitions,
     items,
   };
 }
@@ -345,28 +358,56 @@ function createComponentBlockRow(blocks: ComponentBlock[]): ComponentBlockRow {
 
 function pushBlockItems(
   items: CanvasCustomItem[],
+  componentDefinitions: CanvasAppComponentDefinition[],
   block: ComponentBlock,
   x: number,
   y: number,
   rowHeight: number,
 ) {
   const cellHeight = Math.max(block.h, rowHeight);
-  items.push(...createCanvasStoryImportItems({
-    groups: [{
-      h: cellHeight,
-      id: toId(block.key),
-      label: block.label,
-      stories: block.variants.map((variant) => ({
-        h: block.label ? variant.size.h : cellHeight,
-        id: variant.entry.id,
-        title: variant.entry.name,
-        w: variant.size.w,
-        x: x + variant.x,
-        y: y + variant.y,
-      })),
-      w: block.w,
-      x,
-      y,
-    }],
-  }))
+  const group = createStoryImportGroup(block, x, y, cellHeight);
+
+  items.push(...createCanvasStoryImportItems({ groups: [group] }));
+  componentDefinitions.push(
+    ...createCanvasStoryImportComponentDefinitions({ groups: [group] }),
+  );
+}
+
+function createStoryImportGroup(
+  block: ComponentBlock,
+  x: number,
+  y: number,
+  cellHeight: number,
+): CanvasStoryImportGroup {
+  return {
+    h: cellHeight,
+    id: toId(block.key),
+    label: block.label,
+    source: createStoryImportSource(block),
+    stories: block.variants.map((variant) => ({
+      h: block.label ? variant.size.h : cellHeight,
+      id: variant.entry.id,
+      title: variant.entry.name,
+      w: variant.size.w,
+      x: x + variant.x,
+      y: y + variant.y,
+    })),
+    w: block.w,
+    x,
+    y,
+  };
+}
+
+function createStoryImportSource(block: ComponentBlock) {
+  const firstEntry = block.variants[0]?.entry;
+
+  if (!firstEntry || !block.label) {
+    return undefined;
+  }
+
+  return {
+    exportName: block.label,
+    importPath: firstEntry.path,
+    layer: firstEntry.area,
+  };
 }

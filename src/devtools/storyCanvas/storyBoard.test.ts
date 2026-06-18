@@ -50,6 +50,31 @@ describe('storyBoard', () => {
       'story-button-default',
       'story-button-hover',
     ]);
+    expect(board.componentDefinitions).toEqual([
+      {
+        id: 'story-import-src-components-button-stories-tsx-src-components-button-tsx',
+        instances: [
+          {
+            label: 'Default',
+            slots: {
+              root: 'story-button-default',
+            },
+          },
+          {
+            label: 'Hover',
+            slots: {
+              root: 'story-button-hover',
+            },
+          },
+        ],
+        label: 'Button',
+        source: {
+          exportName: 'Button',
+          importPath: '/src/components/Button.tsx',
+          layer: 'components',
+        },
+      },
+    ]);
   });
 });
 

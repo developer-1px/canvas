@@ -559,10 +559,11 @@ export default function StoryCanvasPage({ preset = 'default' }: { preset?: Story
     affordanceConfig: STORY_CANVAS_AFFORDANCE_CONFIG,
     capabilities: CANVAS_APP_READ_ONLY_CAPABILITIES,
     featurePackProfile: STORY_CANVAS_FEATURE_PACK_PROFILE,
+    componentDefinitions: board.componentDefinitions,
     initialItems: board.items,
     initialSelection: [],
     workspaceStorageProvider: storageProvider,
-  }), [board.items, storageProvider, storyPreviewManifest]);
+  }), [board.componentDefinitions, board.items, storageProvider, storyPreviewManifest]);
   // Key changes remount the canvas: filter changes, hug measurements landing,
   // and explicit zoom jumps (Shift+1/2/0) which apply a new stored viewport.
   const [focusNonce, setFocusNonce] = useState(0);
