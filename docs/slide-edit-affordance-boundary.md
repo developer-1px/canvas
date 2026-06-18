@@ -184,6 +184,9 @@
 | Options | host-provided font family list with label, source, and optional default marker |
 | Field | `fontFamily` select descriptor routes through `update-text-font-family` |
 | Fallback | unknown or empty family normalizes to fallback or first allowed option |
+| Custom MIME | `application/vnd.interactive-os.slide-edit.text-font-family+json` may carry a direct JSON string or explicit wrapper |
+| General JSON | `application/json` and `text/plain` require an explicit field key such as `textFontFamily`, `fontFamily`, `font`, `family`, or `value` |
+| Plain text | generic `text/plain` direct strings such as `"Georgia"` are not interpreted as font family |
 | Updates | selected object id and normalized font family value become host command effects |
 | Runtime | host owns actual font loading, text layout, export mapping, and persistence |
 

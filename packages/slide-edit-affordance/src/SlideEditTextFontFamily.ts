@@ -21,6 +21,8 @@ export type SlideEditTextFontFamilyFieldDescriptor = {
   commandId: 'update-text-font-family'
   control: 'font-family-select'
   id: 'fontFamily'
+  jsonKeys: readonly string[]
+  jsonMimeType: string
   requiredAdapterSlot: 'command-effect'
 }
 
@@ -79,12 +81,24 @@ export type SlideEditTextFontFamilyCSSInput<
   TFontFamily extends SlideEditTextFontFamily = SlideEditTextFontFamily,
 > = SlideEditTextFontFamilyNormalizeInput<TFontFamily>
 
+export type SlideEditTextFontFamilyDataTransfer = Pick<DataTransfer, 'getData'>
+
+export type SlideEditTextFontFamilyJSONPasteInput<
+  TFontFamily extends SlideEditTextFontFamily = SlideEditTextFontFamily,
+> = Omit<SlideEditTextFontFamilyNormalizeInput<TFontFamily>, 'fontFamily'> & {
+  dataTransfer: SlideEditTextFontFamilyDataTransfer | null
+  jsonMimeType?: string
+}
+
 export const SLIDE_EDIT_TEXT_FONT_FAMILY_FALLBACK = 'sans-serif'
 
 export const SLIDE_EDIT_TEXT_FONT_FAMILY_FIELD = Object.freeze({
   commandId: 'update-text-font-family',
   control: 'font-family-select',
   id: 'fontFamily',
+  jsonKeys: ['textFontFamily', 'fontFamily', 'font', 'family', 'value'],
+  jsonMimeType:
+    'application/vnd.interactive-os.slide-edit.text-font-family+json',
   requiredAdapterSlot: 'command-effect',
 } as const satisfies SlideEditTextFontFamilyFieldDescriptor)
 
@@ -275,6 +289,54 @@ export function getSlideEditTextFontFamilyCSS<
     formatSlideEditTextFontFamilyCSSValue(normalizedFontFamily)
 }
 
+export function getSlideEditTextFontFamilyJSONPasteValue<
+  TFontFamily extends SlideEditTextFontFamily = SlideEditTextFontFamily,
+>({
+  dataTransfer,
+  fallbackFontFamily = SLIDE_EDIT_TEXT_FONT_FAMILY_FALLBACK as TFontFamily,
+  jsonMimeType = SLIDE_EDIT_TEXT_FONT_FAMILY_FIELD.jsonMimeType,
+  options = [],
+}: SlideEditTextFontFamilyJSONPasteInput<TFontFamily>): TFontFamily | null {
+  if (!dataTransfer) {
+    return null
+  }
+
+  const normalizeInput = {
+    fallbackFontFamily,
+    options,
+  }
+
+  if (jsonMimeType) {
+    const customValue = parseSlideEditTextFontFamilyJSON(
+      dataTransfer.getData(jsonMimeType),
+    )
+    const normalizedCustomValue =
+      getSlideEditTextFontFamilyCandidateValue(customValue, normalizeInput) ??
+      getSlideEditTextFontFamilyExplicitJSONValue(
+        customValue,
+        normalizeInput,
+      )
+
+    if (normalizedCustomValue !== null) {
+      return normalizedCustomValue
+    }
+  }
+
+  for (const type of ['application/json', 'text/plain']) {
+    const value = parseSlideEditTextFontFamilyJSON(dataTransfer.getData(type))
+    const explicitValue = getSlideEditTextFontFamilyExplicitJSONValue(
+      value,
+      normalizeInput,
+    )
+
+    if (explicitValue !== null) {
+      return explicitValue
+    }
+  }
+
+  return null
+}
+
 function normalizeSlideEditTextFontFamilyName(
   family: SlideEditTextFontFamily | null | undefined,
 ) {
@@ -308,4 +370,62 @@ function isSlideEditGenericCSSFontFamily(family: string) {
     'serif',
     'system-ui',
   ].includes(family)
+}
+
+function getSlideEditTextFontFamilyCandidateValue<
+  TFontFamily extends SlideEditTextFontFamily,
+>(
+  value: unknown,
+  normalizeInput: Omit<
+    SlideEditTextFontFamilyNormalizeInput<TFontFamily>,
+    'fontFamily'
+  >,
+) {
+  if (typeof value !== 'string') {
+    return null
+  }
+
+  return normalizeSlideEditTextFontFamily({
+    ...normalizeInput,
+    fontFamily: value as TFontFamily,
+  })
+}
+
+function getSlideEditTextFontFamilyExplicitJSONValue<
+  TFontFamily extends SlideEditTextFontFamily,
+>(
+  value: unknown,
+  normalizeInput: Omit<
+    SlideEditTextFontFamilyNormalizeInput<TFontFamily>,
+    'fontFamily'
+  >,
+) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null
+  }
+
+  const record = value as Record<string, unknown>
+
+  for (const key of SLIDE_EDIT_TEXT_FONT_FAMILY_FIELD.jsonKeys) {
+    if (Object.hasOwn(record, key)) {
+      return getSlideEditTextFontFamilyCandidateValue(
+        record[key],
+        normalizeInput,
+      )
+    }
+  }
+
+  return null
+}
+
+function parseSlideEditTextFontFamilyJSON(value: string) {
+  if (!value.trim()) {
+    return null
+  }
+
+  try {
+    return JSON.parse(value) as unknown
+  } catch {
+    return null
+  }
 }

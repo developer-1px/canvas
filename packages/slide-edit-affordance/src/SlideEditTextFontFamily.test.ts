@@ -4,12 +4,16 @@ import {
   createSlideEditTextFontFamilyDescriptor,
   getSlideEditTextFontFamilyCSS,
   getSlideEditTextFontFamilyCommandEffect,
+  getSlideEditTextFontFamilyJSONPasteValue,
   normalizeSlideEditTextFontFamily,
   normalizeSlideEditTextFontFamilyOptions,
   SLIDE_EDIT_TEXT_FONT_FAMILY_FALLBACK,
   SLIDE_EDIT_TEXT_FONT_FAMILY_FIELD,
   type SlideEditTextFontFamilyOption,
 } from './SlideEditTextFontFamily'
+import {
+  getSlideEditTextFontFamilyJSONPasteValue as getSlideEditTextFontFamilyJSONPasteValueFromPackage,
+} from './index'
 
 describe('SlideEditTextFontFamily', () => {
   const options = [
@@ -118,6 +122,90 @@ describe('SlideEditTextFontFamily', () => {
     })).toBe('system-ui')
   })
 
+  it('reads custom MIME direct font family JSON strings first', () => {
+    expect(getSlideEditTextFontFamilyJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_TEXT_FONT_FAMILY_FIELD.jsonMimeType]: '"Title Serif"',
+        'text/plain': '{"fontFamily":"Body Sans"}',
+      }),
+      fallbackFontFamily: 'Body Sans',
+      options,
+    })).toBe('Title Serif')
+    expect(getSlideEditTextFontFamilyJSONPasteValueFromPackage({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_TEXT_FONT_FAMILY_FIELD.jsonMimeType]: '"Body Sans"',
+      }),
+      fallbackFontFamily: 'Body Sans',
+      options,
+    })).toBe('Body Sans')
+  })
+
+  it('reads custom MIME and general JSON font family wrappers', () => {
+    expect(getSlideEditTextFontFamilyJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_TEXT_FONT_FAMILY_FIELD.jsonMimeType]:
+          '{"value":"Title Serif"}',
+      }),
+      fallbackFontFamily: 'Body Sans',
+      options,
+    })).toBe('Title Serif')
+
+    for (const [payload, expected] of [
+      [{ textFontFamily: 'Title Serif' }, 'Title Serif'],
+      [{ fontFamily: 'Body Sans' }, 'Body Sans'],
+      [{ font: 'Unknown' }, 'Body Sans'],
+      [{ family: 'Title Serif' }, 'Title Serif'],
+      [{ value: 'Custom Sans' }, 'Custom Sans'],
+    ] as const) {
+      expect(getSlideEditTextFontFamilyJSONPasteValue({
+        dataTransfer: createDataTransfer({
+          'text/plain': JSON.stringify(payload),
+        }),
+        fallbackFontFamily: 'Body Sans',
+        options: expected === 'Custom Sans' ? [] : options,
+      })).toBe(expected)
+    }
+
+    expect(getSlideEditTextFontFamilyJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'application/json': '{"fontFamily":"Title Serif"}',
+      }),
+      fallbackFontFamily: 'Body Sans',
+      options,
+    })).toBe('Title Serif')
+  })
+
+  it('does not treat unrelated JSON or direct text/plain values as font family', () => {
+    expect(getSlideEditTextFontFamilyJSONPasteValue({
+      dataTransfer: null,
+      options,
+    })).toBeNull()
+    expect(getSlideEditTextFontFamilyJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '"Title Serif"',
+      }),
+      options,
+    })).toBeNull()
+    expect(getSlideEditTextFontFamilyJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': 'not json',
+      }),
+      options,
+    })).toBeNull()
+    expect(getSlideEditTextFontFamilyJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"unrelated":"Title Serif"}',
+      }),
+      options,
+    })).toBeNull()
+    expect(getSlideEditTextFontFamilyJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"fontFamily":18}',
+      }),
+      options,
+    })).toBeNull()
+  })
+
   it('routes selected text object font family changes through host command effects', () => {
     expect(getSlideEditTextFontFamilyCommandEffect({
       fieldId: 'fontFamily',
@@ -178,3 +266,9 @@ describe('SlideEditTextFontFamily', () => {
     }
   })
 })
+
+function createDataTransfer(values: Record<string, string>) {
+  return {
+    getData: (type: string) => values[type] ?? '',
+  }
+}
