@@ -14,7 +14,10 @@ import type {
   CanvasAppStageAdapter,
 } from '../rendering/CanvasAppRenderingContracts'
 import type { CanvasAppItemAdapters } from './CanvasAppAdapterContracts'
-import type { CanvasAppComponentLibrary } from './CanvasAppComponentAssemblyContracts'
+import type {
+  CanvasAppComponentDefinitionRegistry,
+  CanvasAppComponentLibrary,
+} from './CanvasAppComponentAssemblyContracts'
 import type {
   CanvasAppAdapterAssemblyInput,
   CanvasAppAffordanceAssemblyInput,
@@ -34,6 +37,7 @@ import type { CanvasAppExtensionAssemblyInput } from './CanvasAppExtensionAssemb
 export type CanvasAppAssembly = CanvasAppExtensionBundle & {
   affordanceConfig: CanvasAffordanceConfig
   capabilities: CanvasAppCapabilitySnapshot
+  componentDefinitionRegistry: CanvasAppComponentDefinitionRegistry
   componentLibrary: CanvasAppComponentLibrary
   componentPresentationRenderers: CanvasAppComponentPresentationRenderers
   featurePackViewRenderers:

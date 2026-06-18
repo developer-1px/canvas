@@ -1,4 +1,5 @@
 import {
+  createCanvasComponentDefinitionRegistry,
   createCanvasComponentLibrary,
   normalizeCanvasItems,
 } from '../../host'
@@ -27,6 +28,10 @@ export function snapshotCanvasAppAssembly(
       assembly.affordanceConfig,
     ),
     capabilities: Object.freeze({ ...assembly.capabilities }),
+    componentDefinitionRegistry:
+      snapshotCanvasAppComponentDefinitionRegistry(
+        assembly.componentDefinitionRegistry,
+      ),
     componentLibrary: snapshotCanvasAppComponentLibrary(
       assembly.componentLibrary,
     ),
@@ -63,6 +68,14 @@ function snapshotCanvasAppAffordanceConfig(
     shortcuts: snapshotCanvasAppRecord(config.shortcuts),
     tools: snapshotCanvasAppRecord(config.tools),
   }) as CanvasAppAssembly['affordanceConfig']
+}
+
+function snapshotCanvasAppComponentDefinitionRegistry(
+  componentDefinitionRegistry: CanvasAppAssembly['componentDefinitionRegistry'],
+): CanvasAppAssembly['componentDefinitionRegistry'] {
+  return createCanvasComponentDefinitionRegistry({
+    definitions: componentDefinitionRegistry.definitions,
+  })
 }
 
 function snapshotCanvasAppComponentLibrary(

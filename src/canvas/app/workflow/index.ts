@@ -34,6 +34,14 @@ export type {
   CanvasAppPresenceProviderContext,
 } from './CanvasAppCollaborationAssembly'
 export type {
+  CanvasAppComponentDefinition,
+  CanvasAppComponentDefinitionRegistry,
+  CanvasAppComponentLibrary,
+  CanvasAppComponentPresentation,
+  CanvasAppComponentTemplate,
+  CanvasAppCreateComponentItemInput,
+} from './CanvasAppComponentAssemblyContracts'
+export type {
   CanvasAppCustomCommand,
   CanvasAppCustomCommandContext,
 } from '../extensions/custom-commands'

@@ -89,6 +89,7 @@ import {
   type CanvasAppAssemblySource,
   type CanvasAppCommitItemsChange,
   type CanvasAppComponentLibrary,
+  type CanvasAppComponentDefinition,
   type CanvasAppComponentTemplate,
   type CanvasAppComponentRendererStrategy,
   type CanvasAppFeaturePack,
@@ -246,6 +247,26 @@ describe('Canvas package consumer imports', () => {
       createCanvasComponentLibrary({
         templates: [componentTemplate],
       })
+    const appComponentDefinition: CanvasAppComponentDefinition = {
+      id: 'consumer-card',
+      instances: [
+        {
+          label: 'One',
+          slots: {
+            root: 'consumer-card-one',
+            title: 'consumer-card-one-title',
+          },
+        },
+        {
+          label: 'Two',
+          slots: {
+            root: 'consumer-card-two',
+            title: 'consumer-card-two-title',
+          },
+        },
+      ],
+      label: 'Consumer card',
+    }
     const renderCustomItem: CanvasAppCustomItemRendererStrategy = ({ item }) =>
       item.title
     const getCustomItemRenderKey: CanvasAppCustomItemRenderKeyStrategy = ({
@@ -400,6 +421,7 @@ describe('Canvas package consumer imports', () => {
       viewManifest.category
 
     const assembly = createCanvasAppAssembly({
+      componentDefinitions: [appComponentDefinition],
       componentLibrary,
       componentPresentationRenderers: createCanvasAppComponentPresentationRenderers({
         'smoke-card': renderComponent,
@@ -635,6 +657,12 @@ describe('Canvas package consumer imports', () => {
     expect(createCanvasAppComponentPresentationRenderers({
       'smoke-card': renderComponent,
     })['smoke-card']).toBe(renderComponent)
+    expect(assembly.componentDefinitionRegistry.getBinding(
+      'consumer-card-one-title',
+    )?.slotItemIds).toEqual([
+      'consumer-card-one-title',
+      'consumer-card-two-title',
+    ])
     expect(createCanvasAppCustomItemRenderers({
       'smoke-node': renderCustomItem,
     })['smoke-node']).toBe(renderCustomItem)

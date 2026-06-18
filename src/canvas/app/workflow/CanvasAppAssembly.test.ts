@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { createCanvasComponentLibrary } from '../../host'
+import {
+  createCanvasComponentDefinitionRegistry,
+  createCanvasComponentLibrary,
+} from '../../host'
 import {
   DEFAULT_CANVAS_APP_ASSEMBLY,
   createCanvasAppAssembly,
@@ -19,8 +22,10 @@ import {
   createCanvasAppFeaturePackProfile,
   createCanvasAppViewFeaturePack,
 } from '../feature-packs'
+import { getCanvasAppAssemblyModel } from './CanvasAppAssemblyModel'
 import type {
   CanvasAppComponentRendererStrategy,
+  CanvasAppComponentDefinition,
   CanvasAppCustomItemRendererStrategy,
   CanvasAppItemLayerAdapter,
   CanvasAppPresenceProvider,
@@ -134,6 +139,26 @@ describe('CanvasAppAssembly seams', () => {
       createCanvasAppComponentPresentationRenderers({
         'risk-card': renderRisk,
       })
+    const componentDefinitions = [{
+      id: 'risk-card',
+      instances: [
+        {
+          label: 'Primary',
+          slots: {
+            root: 'risk-card-primary',
+            title: 'risk-card-primary-title',
+          },
+        },
+        {
+          label: 'Secondary',
+          slots: {
+            root: 'risk-card-secondary',
+            title: 'risk-card-secondary-title',
+          },
+        },
+      ],
+      label: 'Risk card',
+    }] satisfies readonly CanvasAppComponentDefinition[]
     const renderRiskItem: CanvasAppCustomItemRendererStrategy = ({ item }) =>
       item.title
     const mediaImporter: CanvasMediaImporter = {
@@ -182,13 +207,26 @@ describe('CanvasAppAssembly seams', () => {
     })
 
     const assembly = createCanvasAppAssembly({
+      componentDefinitions,
       componentLibrary,
       componentPresentationRenderers,
       customItemModules: [riskModule],
       initialItems: [],
     })
+    const assemblyModel = getCanvasAppAssemblyModel(assembly)
 
     expect(assembly.componentLibrary.getPresentation('risk')).toBe('risk-card')
+    expect(assembly.componentDefinitionRegistry.getBinding(
+      'risk-card-primary-title',
+    )?.slotItemIds).toEqual([
+      'risk-card-primary-title',
+      'risk-card-secondary-title',
+    ])
+    expect(assemblyModel.component.componentDefinitionRegistry)
+      .toBe(assembly.componentDefinitionRegistry)
+    expect(assemblyModel.control.componentSets.map(
+      (componentSet) => componentSet.id,
+    )).toEqual(['risk-card'])
     expect(assembly.componentPresentationRenderers['risk-card']).toBe(renderRisk)
     expect(assembly.customItemRenderers['risk-node']).toBe(renderRiskItem)
     expect(assembly.customItemValidators.risk({
@@ -237,6 +275,32 @@ describe('CanvasAppAssembly seams', () => {
 
     expect(assembly.componentPresentationRenderers['risk-card']).toBe(renderRisk)
     expect(assembly.componentPresentationRenderers['note-card']).toBeDefined()
+  })
+
+  it('accepts a product-specific component definition registry', () => {
+    const componentDefinitionRegistry = createCanvasComponentDefinitionRegistry({
+      definitions: [{
+        id: 'score-card',
+        instances: [{
+          label: 'Score',
+          slots: {
+            root: 'score-card-root',
+            value: 'score-card-value',
+          },
+        }],
+        label: 'Score card',
+      }],
+    })
+
+    const assembly = createCanvasAppAssembly({
+      componentDefinitionRegistry,
+    })
+
+    expect(assembly.componentDefinitionRegistry.getBinding('score-card-value'))
+      .toMatchObject({
+        componentId: 'score-card',
+        slotId: 'value',
+      })
   })
 
   it('accepts rendering adapters at the app assembly seam', () => {

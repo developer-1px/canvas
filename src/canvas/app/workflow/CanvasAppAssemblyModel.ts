@@ -4,6 +4,7 @@ import type { CanvasAppAssemblyModel } from './CanvasAppAssemblyModelContracts'
 export function getCanvasAppAssemblyModel({
   affordanceConfig,
   capabilities,
+  componentDefinitionRegistry,
   componentLibrary,
   componentPresentationRenderers,
   customCommands,
@@ -35,10 +36,12 @@ export function getCanvasAppAssemblyModel({
       presenceProvider,
     },
     component: {
+      componentDefinitionRegistry,
       componentLibrary,
       creationAdapter: itemAdapters.creation,
     },
     control: {
+      componentSets: componentDefinitionRegistry.listSets(),
       components: componentLibrary.templates,
     },
     extension: {

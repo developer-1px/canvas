@@ -90,6 +90,8 @@ export function createCanvasAppAssembly(
     ...extensionAssembly,
     affordanceConfig: affordanceAssembly.affordanceConfig,
     capabilities: capabilityAssembly.capabilities,
+    componentDefinitionRegistry:
+      componentAssembly.componentDefinitionRegistry,
     componentLibrary: componentAssembly.componentLibrary,
     componentPresentationRenderers:
       componentAssembly.componentPresentationRenderers,

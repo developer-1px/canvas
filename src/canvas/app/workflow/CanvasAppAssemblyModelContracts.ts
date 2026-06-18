@@ -6,9 +6,13 @@ import type {
 } from '../../engine'
 import type { CanvasItem } from '../../entities'
 import type {
+  CanvasAppComponentDefinitionRegistry,
   CanvasAppComponentLibrary,
   CanvasAppComponentTemplate,
 } from './CanvasAppComponentAssemblyContracts'
+import type {
+  CanvasComponentSetSummary,
+} from '../../host'
 import type {
   CanvasAppCustomCommand,
 } from '../extensions/custom-commands'
@@ -43,11 +47,13 @@ export type CanvasAppAssemblyCommandModel = {
 }
 
 export type CanvasAppAssemblyComponentModel = {
+  componentDefinitionRegistry: CanvasAppComponentDefinitionRegistry
   componentLibrary: CanvasAppComponentLibrary
   creationAdapter: CanvasCreationAdapter<CanvasItem>
 }
 
 export type CanvasAppAssemblyControlModel = {
+  componentSets: readonly CanvasComponentSetSummary[]
   components: readonly CanvasAppComponentTemplate[]
 }
 

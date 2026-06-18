@@ -50,6 +50,19 @@ describe('CanvasAppAssembly snapshots', () => {
         },
       ],
     })
+    const componentDefinitions = [{
+      id: 'risk-card',
+      instances: [
+        {
+          label: 'Primary',
+          slots: {
+            root: 'risk-card-primary',
+            title: 'risk-card-primary-title',
+          },
+        },
+      ],
+      label: 'Risk card',
+    }]
     const customCommandRun = () => undefined
     const customCommand = {
       id: 'publish',
@@ -152,6 +165,7 @@ describe('CanvasAppAssembly snapshots', () => {
     const assembly = createCanvasAppAssembly({
       affordanceConfig,
       capabilities,
+      componentDefinitions,
       componentLibrary,
       componentPresentationRenderers,
       customCommands: [customCommand],
@@ -170,6 +184,11 @@ describe('CanvasAppAssembly snapshots', () => {
     })
 
     capabilities.editDocument = true
+    componentDefinitions.push({
+      ...componentDefinitions[0],
+      id: 'mutated-card',
+    })
+    componentDefinitions[0].instances[0].slots.root = 'mutated-root'
     componentLibrary.getPresentation = () => 'mutated-card'
     componentLibrary.getTemplate = () => ({
       ...componentLibrary.templates[0],
@@ -206,6 +225,12 @@ describe('CanvasAppAssembly snapshots', () => {
 
     expect(assembly.affordanceConfig.tools.marker).toBe(false)
     expect(assembly.capabilities.editDocument).toBe(false)
+    expect(assembly.componentDefinitionRegistry.definitions.map(
+      (definition) => definition.id,
+    )).toEqual(['risk-card'])
+    expect(assembly.componentDefinitionRegistry.getBinding(
+      'risk-card-primary',
+    )?.currentItemId).toBe('risk-card-primary')
     expect(assembly.componentLibrary.getPresentation('risk')).toBe('risk-card')
     expect(assembly.componentLibrary.getTemplate('risk')).toMatchObject({
       id: 'risk',
@@ -274,6 +299,10 @@ describe('CanvasAppAssembly snapshots', () => {
     expect(Object.isFrozen(assembly.affordanceConfig.commands)).toBe(true)
     expect(Object.isFrozen(assembly.affordanceConfig.tools)).toBe(true)
     expect(Object.isFrozen(assembly.capabilities)).toBe(true)
+    expect(Object.isFrozen(assembly.componentDefinitionRegistry)).toBe(true)
+    expect(Object.isFrozen(
+      assembly.componentDefinitionRegistry.definitions,
+    )).toBe(true)
     expect(Object.isFrozen(assembly.componentLibrary)).toBe(true)
     expect(Object.isFrozen(assembly.componentLibrary.templates)).toBe(true)
     expect(Object.isFrozen(assembly.componentLibrary.templates[0])).toBe(true)

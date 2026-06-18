@@ -560,6 +560,8 @@ export {
   type CanvasAppCapabilitySnapshot,
   type CanvasAppCommitItemsChange,
   type CanvasAppCommitSelection,
+  type CanvasAppComponentDefinition,
+  type CanvasAppComponentDefinitionRegistry,
   type CanvasAppComponentLibrary,
   type CanvasAppComponentPresentation,
   type CanvasAppComponentPresentationRenderers,

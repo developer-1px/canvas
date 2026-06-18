@@ -1,5 +1,8 @@
 import {
+  createCanvasComponentDefinitionRegistry,
   createCanvasComponentLibrary,
+  type CanvasComponentDefinition,
+  type CanvasComponentDefinitionRegistry,
 } from '../../host'
 import type {
   CanvasComponentItem,
@@ -19,10 +22,14 @@ import type {
 } from '../rendering/CanvasAppRenderingContracts'
 
 export type CanvasAppComponentAssemblyContract = {
+  componentDefinitionRegistry: CanvasAppComponentDefinitionRegistry
   componentLibrary: CanvasAppComponentLibrary
   componentPresentationRenderers: CanvasAppComponentPresentationRenderers
 }
 
+export type CanvasAppComponentDefinition = CanvasComponentDefinition
+export type CanvasAppComponentDefinitionRegistry =
+  CanvasComponentDefinitionRegistry
 export type CanvasAppComponentPresentation = string
 
 export type CanvasAppComponentTemplate = {
@@ -58,9 +65,11 @@ export type CanvasAppComponentLibrary = {
 }
 
 export function assertCanvasAppComponentAssembly({
+  componentDefinitionRegistry,
   componentLibrary,
   componentPresentationRenderers,
 }: CanvasAppComponentAssemblyContract) {
+  assertCanvasAppComponentDefinitionRegistry(componentDefinitionRegistry)
   assertCanvasAppComponentLibrary(componentLibrary)
   assertCanvasAppComponentPresentationRenderers(componentPresentationRenderers)
   assertCanvasComponentPresentationRendererCoverage({
@@ -72,7 +81,10 @@ export function assertCanvasAppComponentAssembly({
 function assertCanvasComponentPresentationRendererCoverage({
   componentLibrary,
   componentPresentationRenderers,
-}: CanvasAppComponentAssemblyContract) {
+}: Pick<
+  CanvasAppComponentAssemblyContract,
+  'componentLibrary' | 'componentPresentationRenderers'
+>) {
   for (const template of componentLibrary.templates) {
     if (!Object.hasOwn(componentPresentationRenderers, template.presentation)) {
       throw new Error(
@@ -80,6 +92,47 @@ function assertCanvasComponentPresentationRendererCoverage({
       )
     }
   }
+}
+
+function assertCanvasAppComponentDefinitionRegistry(
+  componentDefinitionRegistry: CanvasAppComponentDefinitionRegistry,
+) {
+  assertCanvasAppDescriptorObject(
+    componentDefinitionRegistry,
+    'component definition registry',
+  )
+  assertCanvasAppArray(
+    componentDefinitionRegistry.definitions,
+    'component definition registry definitions',
+  )
+  assertCanvasAppDescriptorFunctionField({
+    field: 'getBinding',
+    owner: 'component definition registry',
+    value: componentDefinitionRegistry.getBinding,
+  })
+  assertCanvasAppDescriptorFunctionField({
+    field: 'getSyncItemIds',
+    owner: 'component definition registry',
+    value: componentDefinitionRegistry.getSyncItemIds,
+  })
+  assertCanvasAppDescriptorFunctionField({
+    field: 'isRootItem',
+    owner: 'component definition registry',
+    value: componentDefinitionRegistry.isRootItem,
+  })
+  assertCanvasAppDescriptorFunctionField({
+    field: 'listSets',
+    owner: 'component definition registry',
+    value: componentDefinitionRegistry.listSets,
+  })
+  assertCanvasAppDescriptorFunctionField({
+    field: 'syncItems',
+    owner: 'component definition registry',
+    value: componentDefinitionRegistry.syncItems,
+  })
+  createCanvasComponentDefinitionRegistry({
+    definitions: componentDefinitionRegistry.definitions,
+  })
 }
 
 function assertCanvasAppComponentLibrary(

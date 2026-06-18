@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  CANVAS_COMPONENT_DEFINITION_REGISTRY,
   CANVAS_COMPONENT_LIBRARY,
   CANVAS_ITEM_ENGINE_ADAPTERS,
   INITIAL_ITEMS,
@@ -37,6 +38,10 @@ describe('CanvasAppDefaultAssembly', () => {
     expect(DEFAULT_CANVAS_APP_ASSEMBLY.componentLibrary).toEqual(
       CANVAS_COMPONENT_LIBRARY,
     )
+    expect(DEFAULT_CANVAS_APP_ASSEMBLY.componentDefinitionRegistry.definitions)
+      .toEqual(CANVAS_COMPONENT_DEFINITION_REGISTRY.definitions)
+    expect(DEFAULT_CANVAS_APP_ASSEMBLY.componentDefinitionRegistry.listSets())
+      .toEqual([])
     expect(DEFAULT_CANVAS_APP_ASSEMBLY.componentPresentationRenderers).toEqual(
       DEFAULT_CANVAS_APP_COMPONENT_PRESENTATION_RENDERERS,
     )

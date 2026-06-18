@@ -33,6 +33,8 @@ export type {
   CanvasAppPresenceProviderContext,
 } from '../workflow/CanvasAppCollaborationAssembly'
 export type {
+  CanvasAppComponentDefinition,
+  CanvasAppComponentDefinitionRegistry,
   CanvasAppComponentLibrary,
   CanvasAppComponentPresentation,
   CanvasAppComponentTemplate,

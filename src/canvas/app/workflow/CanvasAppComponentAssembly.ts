@@ -1,4 +1,7 @@
 import {
+  createCanvasComponentDefinitionRegistry,
+} from '../../host'
+import {
   createCanvasAppComponentPresentationRenderers,
 } from '../rendering/CanvasAppRendererRegistries'
 import type { CanvasAppComponentAssemblyInput } from './CanvasAppAssemblyInputTypes'
@@ -11,6 +14,12 @@ export function createCanvasAppComponentAssembly(
   defaults: CanvasAppComponentAssemblyContract,
 ): CanvasAppComponentAssemblyContract {
   return {
+    componentDefinitionRegistry: input.componentDefinitionRegistry ??
+      (input.componentDefinitions
+        ? createCanvasComponentDefinitionRegistry({
+          definitions: input.componentDefinitions,
+        })
+        : defaults.componentDefinitionRegistry),
     componentLibrary: input.componentLibrary ?? defaults.componentLibrary,
     componentPresentationRenderers: createCanvasAppComponentPresentationRenderers(
       input.componentPresentationRenderers,
