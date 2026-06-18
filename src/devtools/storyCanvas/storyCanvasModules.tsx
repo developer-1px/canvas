@@ -1,7 +1,12 @@
 import { useSyncExternalStore, type CSSProperties } from 'react';
 import {
+  CANVAS_STORY_CANVAS_SUITE_ID,
+  DEFAULT_CANVAS_APP_FEATURE_PACK_SUITE_MANIFESTS,
   type CanvasAppAssemblyInput,
-  createCanvasStoryPreviewItemModules,
+  createCanvasAppFeaturePackProfile,
+  createCanvasStoryPreviewItemsFeaturePackManifest,
+  type CanvasAppFeaturePackManifest,
+  type CanvasAppFeaturePackProfile,
   type CanvasStoryPreviewGroupRenderInput,
   type CanvasStoryPreviewItemRenderInput,
 } from '../../canvas';
@@ -128,6 +133,15 @@ export const STORY_CANVAS_AFFORDANCE_CONFIG: CanvasAppAssemblyInput['affordanceC
   },
 };
 
+export const STORY_CANVAS_FEATURE_PACK_PROFILE: CanvasAppFeaturePackProfile =
+  createCanvasAppFeaturePackProfile({
+    id: 'story-canvas-runtime',
+    installedFeaturePackIds: ['zoom-controls'],
+    installedSuiteIds: [CANVAS_STORY_CANVAS_SUITE_ID],
+    label: 'Story canvas runtime',
+    suiteManifests: DEFAULT_CANVAS_APP_FEATURE_PACK_SUITE_MANIFESTS,
+  });
+
 type StoryViewState = {
   elementSelection: StoryElementSelection | null;
   favoriteStoryIds: Set<string>;
@@ -197,7 +211,7 @@ function StoryCanvasCardContainer({
   );
 }
 
-export function createStoryPreviewModules({
+export function createStoryPreviewFeaturePackManifest({
   onSelectElement,
   onSelectStory,
   onToggleFavorite,
@@ -209,8 +223,8 @@ export function createStoryPreviewModules({
   onSelectElement: (storyId: string, element: LayerElement | null, snapshot?: CanvasViewportLayerSnapshot | null) => void;
   onSelectStory: (storyId: string) => void;
   onToggleFavorite: (storyId: string) => void;
-}) {
-  return createCanvasStoryPreviewItemModules({
+}): CanvasAppFeaturePackManifest {
+  return createCanvasStoryPreviewItemsFeaturePackManifest({
     renderGroupItem: renderStoryGroupItem,
     renderPreviewItem: ({ item, storyId }: CanvasStoryPreviewItemRenderInput) => {
       const story = storyRecordById.get(storyId);

@@ -71,7 +71,8 @@ import StoryLayersPanel, {
 } from './StoryLayersPanel';
 import {
   STORY_CANVAS_AFFORDANCE_CONFIG,
-  createStoryPreviewModules,
+  STORY_CANVAS_FEATURE_PACK_PROFILE,
+  createStoryPreviewFeaturePackManifest,
   createStoryViewStore,
 } from './storyCanvasModules';
 import {
@@ -476,7 +477,7 @@ export default function StoryCanvasPage({ preset = 'default' }: { preset?: Story
   useEffect(() => {
     storyViewStore.setState({ elementSelection, favoriteStoryIds, selectedStoryId, treeHover });
   }, [elementSelection, favoriteStoryIds, selectedStoryId, storyViewStore, treeHover]);
-  const storyPreviewModules = useMemo(() => createStoryPreviewModules({
+  const storyPreviewManifest = useMemo(() => createStoryPreviewFeaturePackManifest({
     onSelectElement: handleSelectElement,
     onSelectStory: handleSelectStory,
     onToggleFavorite: handleToggleFavorite,
@@ -550,13 +551,14 @@ export default function StoryCanvasPage({ preset = 'default' }: { preset?: Story
   }, [elementSelection, scheduleUrlStateReplace, selectedPagePath, selectedStoryId]);
 
   const assemblyInput = useMemo<CanvasAppAssemblyInput>(() => ({
+    additionalFeaturePackManifests: [storyPreviewManifest],
     affordanceConfig: STORY_CANVAS_AFFORDANCE_CONFIG,
     capabilities: CANVAS_APP_READ_ONLY_CAPABILITIES,
-    customItemModules: storyPreviewModules,
+    featurePackProfile: STORY_CANVAS_FEATURE_PACK_PROFILE,
     initialItems: board.items,
     initialSelection: [],
     workspaceStorageProvider: storageProvider,
-  }), [board.items, storageProvider, storyPreviewModules]);
+  }), [board.items, storageProvider, storyPreviewManifest]);
   // Key changes remount the canvas: filter changes, hug measurements landing,
   // and explicit zoom jumps (Shift+1/2/0) which apply a new stored viewport.
   const [focusNonce, setFocusNonce] = useState(0);
