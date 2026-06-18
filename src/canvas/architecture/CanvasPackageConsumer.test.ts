@@ -477,6 +477,52 @@ describe('Canvas package consumer imports', () => {
       componentDefinitionRegistry: CANVAS_COMPONENT_DEFINITION_REGISTRY,
       currentItems: [rect],
     }
+    type HostTransformItem = {
+      id: string
+      kind: 'ppt-shape'
+      slideId: string
+      x: number
+    }
+    const hostTransformItem: HostTransformItem = {
+      id: 'ppt-transform-1',
+      kind: 'ppt-shape',
+      slideId: 'slide-1',
+      x: 10,
+    }
+    const hostItemsChange: CanvasAppItemsChange<HostTransformItem> = {
+      items: [hostTransformItem],
+      type: 'replace-changed',
+    }
+    const hostItemsChangeTransformer:
+      CanvasAppItemsChangeTransformer<HostTransformItem> = {
+        id: 'host-transform',
+        transform: ({ change }) =>
+          change.type === 'replace-changed'
+            ? {
+                ...change,
+                items: change.items.map((item) => ({
+                  ...item,
+                  x: item.x + 3,
+                })),
+              }
+            : change,
+      }
+    const hostTransformContext:
+      CanvasAppItemsChangeTransformContext<HostTransformItem> = {
+        change: hostItemsChange,
+        componentDefinitionRegistry: CANVAS_COMPONENT_DEFINITION_REGISTRY,
+        currentItems: [hostTransformItem],
+      }
+    const hostTransformedItemsChange =
+      transformCanvasAppItemsChange<HostTransformItem>({
+        ...hostTransformContext,
+        transformers: [hostItemsChangeTransformer],
+      })
+    const hostFacadeTransformedItemsChange =
+      CanvasAppFacade.transformCanvasAppItemsChange<HostTransformItem>({
+        ...hostTransformContext,
+        transformers: [hostItemsChangeTransformer],
+      })
     const commitAppItemsChange: CanvasAppCommitItemsChange = () => true
     const validateCustomItem: CanvasAppCustomItemValidator = (item) =>
       item.data.severity === 'high'
@@ -1666,6 +1712,19 @@ describe('Canvas package consumer imports', () => {
       ...componentSyncContext,
       transformers: [componentSyncTransformer],
     })).toBe(appItemsChange)
+
+    if (hostTransformedItemsChange.type !== 'replace-changed') {
+      throw new Error('Expected root host transformer replace-changed result')
+    }
+
+    if (hostFacadeTransformedItemsChange.type !== 'replace-changed') {
+      throw new Error('Expected app host transformer replace-changed result')
+    }
+
+    expect(hostTransformedItemsChange.items[0]?.slideId).toBe('slide-1')
+    expect(hostTransformedItemsChange.items[0]?.x).toBe(13)
+    expect(hostFacadeTransformedItemsChange.items[0]?.kind)
+      .toBe('ppt-shape')
     const emptyComponentInspectorModel: CanvasComponentInspectorPanelModel | null =
       getCanvasComponentInspectorPanelModel({
         bounds: null,

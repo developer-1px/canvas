@@ -25,6 +25,53 @@ describe('CanvasAppItemsChangeTransformers', () => {
       type: 'replace-changed',
     })
   })
+
+  it('preserves host item types through transformer pipelines', () => {
+    type HostItem = {
+      id: string
+      kind: 'ppt-shape'
+      slideId: string
+      x: number
+    }
+    const hostItem: HostItem = {
+      id: 'shape-1',
+      kind: 'ppt-shape',
+      slideId: 'slide-1',
+      x: 10,
+    }
+    const transformer: CanvasAppItemsChangeTransformer<HostItem> = {
+      id: 'host-transformer',
+      transform: ({ change }) =>
+        change.type === 'replace-changed'
+          ? {
+              ...change,
+              items: change.items.map((item) => ({
+                ...item,
+                x: item.x + 5,
+              })),
+            }
+          : change,
+    }
+
+    const result = transformCanvasAppItemsChange<HostItem>({
+      change: {
+        items: [hostItem],
+        type: 'replace-changed',
+      },
+      componentDefinitionRegistry: CANVAS_COMPONENT_DEFINITION_REGISTRY,
+      currentItems: [hostItem],
+      transformers: [transformer],
+    })
+
+    if (result.type !== 'replace-changed') {
+      throw new Error('Expected host replace-changed result')
+    }
+
+    const transformedHostItem: HostItem = result.items[0]!
+
+    expect(transformedHostItem.slideId).toBe('slide-1')
+    expect(transformedHostItem.x).toBe(15)
+  })
 })
 
 function createTransformer(
