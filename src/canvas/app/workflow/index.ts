@@ -19,10 +19,15 @@ export type {
   CanvasAppFeaturePackMarketplaceActionAssemblyInput,
   CanvasAppFeaturePackMarketplaceActionAssemblyPlan,
   CanvasAppFeaturePackMarketplaceAssemblyActionInput,
+  CanvasAppFeaturePackMarketplaceAssemblyApplyBlockedPlan,
+  CanvasAppFeaturePackMarketplaceAssemblyApplyPlan,
+  CanvasAppFeaturePackMarketplaceAssemblyApplyReadyPlan,
+  CanvasAppFeaturePackMarketplaceAssemblyApplyUpdateMode,
   CanvasAppFeaturePackMarketplaceAssemblyModel,
   CanvasAppFeaturePackMarketplaceAssemblyModelInput,
 } from './CanvasAppFeaturePackAssembly'
 export {
+  getCanvasAppFeaturePackMarketplaceAssemblyApplyPlan,
   getCanvasAppFeaturePackMarketplaceAssemblyActionInput,
   getCanvasAppFeaturePackMarketplaceAssemblyActionPlan,
   getCanvasAppFeaturePackMarketplaceAssemblyModel,

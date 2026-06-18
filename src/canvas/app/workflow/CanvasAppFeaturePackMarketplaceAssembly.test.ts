@@ -7,6 +7,7 @@ import {
 } from '../feature-packs'
 import { createCanvasAppAssembly } from './CanvasAppAssembly'
 import {
+  getCanvasAppFeaturePackMarketplaceAssemblyApplyPlan,
   getCanvasAppFeaturePackMarketplaceAssemblyActionInput,
   getCanvasAppFeaturePackMarketplaceAssemblyActionPlan,
   getCanvasAppFeaturePackMarketplaceAssemblyModel,
@@ -134,6 +135,92 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
     expect(assembly.enabledFeaturePackIds).toEqual(['base-pack'])
   })
 
+  it('marks runtime-toggle actions with partial surfaces as partial updates', () => {
+    const overlayManifest = createCanvasAppFeaturePackManifest({
+      id: 'overlay-pack',
+      label: 'Overlay pack',
+      lifecycle: {
+        partialUpdate: ['overlay'],
+        runtimeToggleable: true,
+      },
+    })
+    const model = getCanvasAppFeaturePackMarketplaceAssemblyModel({
+      assemblyInput: {
+        featurePackManifests: [overlayManifest],
+      },
+      profiles: [],
+      suiteManifests: [],
+    })
+    const overlayItem = model.marketplaceModel.packs.items[0]
+
+    if (!overlayItem) {
+      throw new Error('Expected overlay pack item')
+    }
+
+    const primaryAction =
+      getCanvasAppFeaturePackMarketplacePrimaryAction(overlayItem)
+    const applyPlan = getCanvasAppFeaturePackMarketplaceAssemblyApplyPlan({
+      action: primaryAction,
+      model,
+    })
+
+    expect(primaryAction.kind).toBe('disable')
+    expect(applyPlan.status).toBe('ready')
+    if (applyPlan.status !== 'ready') {
+      throw new Error('Expected ready apply plan')
+    }
+
+    expect(applyPlan.updateMode).toBe('partial-update')
+    expect(applyPlan.partialUpdateSurfaceIds).toEqual(['overlay'])
+    expect(applyPlan.assemblyInput.featurePackStates).toEqual([{
+      id: 'overlay-pack',
+      status: 'disabled',
+    }])
+  })
+
+  it('marks install actions without partial surfaces as full rebuilds', () => {
+    const addonManifest = createCanvasAppFeaturePackManifest({
+      id: 'addon-pack',
+      label: 'Addon pack',
+    })
+    const model = getCanvasAppFeaturePackMarketplaceAssemblyModel({
+      assemblyInput: {
+        featurePackManifests: [addonManifest],
+        featurePackStates: [{
+          id: 'addon-pack',
+          status: 'uninstalled',
+        }],
+      },
+      profiles: [],
+      suiteManifests: [],
+    })
+    const addonItem = model.marketplaceModel.packs.items[0]
+
+    if (!addonItem) {
+      throw new Error('Expected addon pack item')
+    }
+
+    const primaryAction =
+      getCanvasAppFeaturePackMarketplacePrimaryAction(addonItem)
+    const applyPlan = getCanvasAppFeaturePackMarketplaceAssemblyApplyPlan({
+      action: primaryAction,
+      model,
+    })
+
+    expect(primaryAction.kind).toBe('install')
+    expect(applyPlan.status).toBe('ready')
+    if (applyPlan.status !== 'ready') {
+      throw new Error('Expected ready apply plan')
+    }
+
+    expect(applyPlan.updateMode).toBe('full-rebuild')
+    expect(applyPlan.partialUpdateSurfaceIds).toEqual([])
+    expect(applyPlan.assemblyInput.featurePackStates).toEqual([{
+      id: 'addon-pack',
+      status: 'disabled',
+    }])
+  })
+
   it('applies suite marketplace actions from the assembly model', () => {
     const runtimeManifest = createCanvasAppFeaturePackManifest({
       id: 'runtime-pack',
@@ -231,6 +318,10 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
       action: primaryAction,
       model,
     })
+    const applyPlan = getCanvasAppFeaturePackMarketplaceAssemblyApplyPlan({
+      action: primaryAction,
+      model,
+    })
 
     expect(primaryAction.kind).toBe('install')
     expect(primaryAction.ready).toBe(false)
@@ -239,7 +330,14 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
       status: 'blocked',
       totalBlockedReasonCount: 1,
     })
+    expect(applyPlan).toMatchObject({
+      marketplaceBlockedReasonCount: 1,
+      status: 'blocked',
+      totalBlockedReasonCount: 1,
+      updateMode: 'blocked',
+    })
     expect('assemblyInput' in actionPlan).toBe(false)
+    expect('assemblyInput' in applyPlan).toBe(false)
     expect(() =>
       getCanvasAppFeaturePackMarketplaceAssemblyActionInput({
         action: primaryAction,

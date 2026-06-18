@@ -108,6 +108,28 @@ export type CanvasAppFeaturePackMarketplaceAssemblyActionInput = Readonly<{
   model: CanvasAppFeaturePackMarketplaceAssemblyModel
 }>
 
+export type CanvasAppFeaturePackMarketplaceAssemblyApplyUpdateMode =
+  | 'blocked'
+  | 'full-rebuild'
+  | 'partial-update'
+
+export type CanvasAppFeaturePackMarketplaceAssemblyApplyPlan =
+  | CanvasAppFeaturePackMarketplaceAssemblyApplyBlockedPlan
+  | CanvasAppFeaturePackMarketplaceAssemblyApplyReadyPlan
+
+export type CanvasAppFeaturePackMarketplaceAssemblyApplyReadyPlan =
+  CanvasAppFeaturePackMarketplaceActionAssemblyReadyPlan & Readonly<{
+    updateMode: Exclude<
+      CanvasAppFeaturePackMarketplaceAssemblyApplyUpdateMode,
+      'blocked'
+    >
+  }>
+
+export type CanvasAppFeaturePackMarketplaceAssemblyApplyBlockedPlan =
+  CanvasAppFeaturePackMarketplaceActionAssemblyBlockedPlan & Readonly<{
+    updateMode: 'blocked'
+  }>
+
 export function createCanvasAppFeaturePackAssembly(
   input: CanvasAppFeaturePackAssemblyInput,
   defaults: CanvasAppFeaturePackAssembly,
@@ -230,6 +252,26 @@ export function getCanvasAppFeaturePackMarketplaceAssemblyModel({
       profiles: profiles ?? assemblyInput.featurePackProfiles,
       suiteManifests,
     }),
+  })
+}
+
+export function getCanvasAppFeaturePackMarketplaceAssemblyApplyPlan(
+  input: CanvasAppFeaturePackMarketplaceAssemblyActionInput,
+): CanvasAppFeaturePackMarketplaceAssemblyApplyPlan {
+  const actionPlan = getCanvasAppFeaturePackMarketplaceAssemblyActionPlan(input)
+
+  if (actionPlan.status === 'blocked') {
+    return Object.freeze({
+      ...actionPlan,
+      updateMode: 'blocked',
+    })
+  }
+
+  return Object.freeze({
+    ...actionPlan,
+    updateMode: actionPlan.partialUpdateSurfaceIds.length > 0
+      ? 'partial-update'
+      : 'full-rebuild',
   })
 }
 
