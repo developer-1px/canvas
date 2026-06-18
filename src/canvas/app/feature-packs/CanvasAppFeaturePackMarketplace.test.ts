@@ -33,6 +33,15 @@ describe('CanvasAppFeaturePackMarketplace', () => {
     expect(model.sections[0]?.items).toBe(model.profiles.items)
     expect(model.sections[1]?.items).toBe(model.suites.items)
     expect(model.sections[2]?.items).toBe(model.packs.items)
+    expect(model.sections[2]?.summary).toEqual({
+      blockedActionCount: 1,
+      enabledItemCount: 1,
+      installedItemCount: 1,
+      itemCount: 1,
+      paidItemCount: 0,
+      privateItemCount: 0,
+      readyActionCount: 1,
+    })
     expect(model.profiles.items[0]?.profileId)
       .toBe(CANVAS_APP_CORE_ONLY_FEATURE_PACK_PROFILE.id)
     expect(model.packs.items[0]?.featurePackId).toBe('zoom-controls')
@@ -93,6 +102,28 @@ describe('CanvasAppFeaturePackMarketplace', () => {
       featurePackId: 'addon-pack',
       priceLabel: undefined,
       vendor: 'Internal',
+    })
+    expect(model.packs.sections).toBeUndefined()
+    expect(model.sections[0]?.summary).toEqual({
+      activeItemCount: 1,
+      blockedActionCount: 0,
+      itemCount: 1,
+      readyActionCount: 0,
+    })
+    expect(model.sections[1]?.summary).toEqual({
+      blockedActionCount: 3,
+      enabledItemCount: 0,
+      itemCount: 1,
+      readyActionCount: 1,
+    })
+    expect(model.sections[2]?.summary).toEqual({
+      blockedActionCount: 3,
+      enabledItemCount: 1,
+      installedItemCount: 1,
+      itemCount: 2,
+      paidItemCount: 0,
+      privateItemCount: 1,
+      readyActionCount: 1,
     })
     expect(model.profiles.items[0]?.actions[0]?.installOptions).toEqual({
       featurePackStates: [

@@ -122,6 +122,7 @@ import {
   type CanvasAppFeaturePack,
   type CanvasAppFeaturePackMarketplaceActionModel,
   type CanvasAppFeaturePackMarketplaceModel,
+  type CanvasAppFeaturePackMarketplacePackSectionSummary,
   type CanvasAppFeaturePackMarketplaceListing,
   type CanvasAppFeaturePackMarketplaceListingEntitlement,
   type CanvasAppFeaturePackProfileMarketplaceActionModel,
@@ -511,6 +512,14 @@ describe('Canvas package consumer imports', () => {
         profiles: [partialUpdateProfile],
         suiteManifests: [partialUpdateSuiteManifest],
       })
+    const featurePackMarketplacePackSection =
+      featurePackMarketplaceModel.sections[2]
+    if (featurePackMarketplacePackSection?.kind !== 'packs') {
+      throw new Error('Expected feature pack marketplace packs section')
+    }
+    const featurePackMarketplacePackSectionSummary:
+      CanvasAppFeaturePackMarketplacePackSectionSummary =
+        featurePackMarketplacePackSection.summary
     const featurePackMarketplaceListingMap =
       getCanvasAppFeaturePackMarketplaceListingMap({
         listings: [partialUpdateListing],
@@ -1013,6 +1022,15 @@ describe('Canvas package consumer imports', () => {
       featurePackId: 'smoke-partial-pack',
       priceLabel: '$9/mo',
       vendor: 'Interactive OS',
+    })
+    expect(featurePackMarketplacePackSectionSummary).toEqual({
+      blockedActionCount: 0,
+      enabledItemCount: 1,
+      installedItemCount: 1,
+      itemCount: 1,
+      paidItemCount: 1,
+      privateItemCount: 0,
+      readyActionCount: 2,
     })
     expect(featurePackProfileMarketplaceActionModel.items[0]?.profileId)
       .toBe('smoke-partial-profile')
