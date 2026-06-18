@@ -2,14 +2,22 @@ import { describe, expect, it } from 'vitest'
 
 import {
   createSlideEditTextRunFormattingDescriptor,
+  getSlideEditTextRunColorCommandEffect,
+  getSlideEditTextRunColorJSONPasteValue,
   getSlideEditTextRunFormattingCommandEffect,
   getSlideEditTextRunFormattingJSONPasteValue,
+  getSlideEditTextRunSizeCommandEffect,
+  getSlideEditTextRunSizeJSONPasteValue,
   getSlideEditTextFormattingKeyboardIntent,
+  normalizeSlideEditTextRunColorValue,
   normalizeSlideEditTextRunFormattingValue,
+  normalizeSlideEditTextRunSizeValue,
   SLIDE_EDIT_TEXT_RUN_FORMATTING_FIELDS,
 } from './SlideEditTextFormattingKeyboard'
 import {
   createSlideEditTextRunFormattingDescriptor as createSlideEditTextRunFormattingDescriptorFromPackage,
+  getSlideEditTextRunColorJSONPasteValue as getSlideEditTextRunColorJSONPasteValueFromPackage,
+  getSlideEditTextRunSizeJSONPasteValue as getSlideEditTextRunSizeJSONPasteValueFromPackage,
   getSlideEditTextFormattingKeyboardIntent as getSlideEditTextFormattingKeyboardIntentFromPackage,
 } from './index'
 
@@ -88,6 +96,16 @@ describe('SlideEditTextFormattingKeyboard', () => {
     })).toMatchObject({
       surface: 'text-run-formatting',
     })
+    expect(getSlideEditTextRunSizeJSONPasteValueFromPackage({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_TEXT_RUN_FORMATTING_FIELDS[3].jsonMimeType]: '18',
+      }),
+    })).toBe(18)
+    expect(getSlideEditTextRunColorJSONPasteValueFromPackage({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_TEXT_RUN_FORMATTING_FIELDS[4].jsonMimeType]: '"#ABC"',
+      }),
+    })).toBe('#aabbcc')
   })
 
   it('creates product-neutral text run formatting descriptors', () => {
@@ -101,7 +119,7 @@ describe('SlideEditTextFormattingKeyboard', () => {
       surface: 'text-run-formatting',
     })
     expect(SLIDE_EDIT_TEXT_RUN_FORMATTING_FIELDS.map((field) => field.id))
-      .toEqual(['bold', 'italic', 'underline'])
+      .toEqual(['bold', 'italic', 'underline', 'size', 'color'])
   })
 
   it('normalizes boolean run formatting values and rejects invalid values', () => {
@@ -110,6 +128,19 @@ describe('SlideEditTextFormattingKeyboard', () => {
     expect(normalizeSlideEditTextRunFormattingValue('true')).toBeNull()
     expect(normalizeSlideEditTextRunFormattingValue(1)).toBeNull()
     expect(normalizeSlideEditTextRunFormattingValue(null)).toBeNull()
+  })
+
+  it('normalizes run size and color values independently from text object style', () => {
+    expect(normalizeSlideEditTextRunSizeValue('18.456')).toBe(18.46)
+    expect(normalizeSlideEditTextRunSizeValue(0)).toBe(1)
+    expect(normalizeSlideEditTextRunSizeValue(999)).toBe(400)
+    expect(normalizeSlideEditTextRunSizeValue('large')).toBeNull()
+
+    expect(normalizeSlideEditTextRunColorValue(' #ABC ')).toBe('#aabbcc')
+    expect(normalizeSlideEditTextRunColorValue('ABCDEF')).toBe('#abcdef')
+    expect(normalizeSlideEditTextRunColorValue('currentColor'))
+      .toBe('currentColor')
+    expect(normalizeSlideEditTextRunColorValue('')).toBeNull()
   })
 
   it('routes run formatting commands through host command effects', () => {
@@ -135,6 +166,45 @@ describe('SlideEditTextFormattingKeyboard', () => {
     })
   })
 
+  it('routes run size and color commands through host command effects', () => {
+    expect(getSlideEditTextRunSizeCommandEffect({
+      objectIds: ['object-a', 'object-b'],
+      slideId: 'slide-a',
+      value: 999,
+    })).toEqual({
+      payload: {
+        fieldId: 'size',
+        id: 'update-text-run-formatting',
+        objectIds: ['object-a', 'object-b'],
+        slideId: 'slide-a',
+        value: 400,
+      },
+      selection: {
+        objectIds: ['object-a', 'object-b'],
+        slideId: 'slide-a',
+      },
+      type: 'slide-command-effect',
+    })
+    expect(getSlideEditTextRunColorCommandEffect({
+      objectIds: ['object-a'],
+      slideId: 'slide-a',
+      value: '#ABC',
+    })).toEqual({
+      payload: {
+        fieldId: 'color',
+        id: 'update-text-run-formatting',
+        objectIds: ['object-a'],
+        slideId: 'slide-a',
+        value: '#aabbcc',
+      },
+      selection: {
+        objectIds: ['object-a'],
+        slideId: 'slide-a',
+      },
+      type: 'slide-command-effect',
+    })
+  })
+
   it('reads custom MIME direct JSON boolean values', () => {
     expect(getSlideEditTextRunFormattingJSONPasteValue({
       dataTransfer: createDataTransfer({
@@ -149,6 +219,24 @@ describe('SlideEditTextFormattingKeyboard', () => {
       }),
       fieldId: 'bold',
     })).toBe(false)
+  })
+
+  it('reads custom MIME direct JSON run size and color values', () => {
+    expect(getSlideEditTextRunSizeJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_TEXT_RUN_FORMATTING_FIELDS[3].jsonMimeType]: '999',
+      }),
+    })).toBe(400)
+    expect(getSlideEditTextRunSizeJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_TEXT_RUN_FORMATTING_FIELDS[3].jsonMimeType]: '"18.456"',
+      }),
+    })).toBe(18.46)
+    expect(getSlideEditTextRunColorJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_TEXT_RUN_FORMATTING_FIELDS[4].jsonMimeType]: '"#ABC"',
+      }),
+    })).toBe('#aabbcc')
   })
 
   it('reads explicit run formatting fields from general JSON payloads', () => {
@@ -181,6 +269,29 @@ describe('SlideEditTextFormattingKeyboard', () => {
     })).toBe(true)
   })
 
+  it('reads explicit run size and color fields from fallback MIME payloads', () => {
+    expect(getSlideEditTextRunSizeJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"textRunSize":"22.234"}',
+      }),
+    })).toBe(22.23)
+    expect(getSlideEditTextRunSizeJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'application/json': '{"runSize":0}',
+      }),
+    })).toBe(1)
+    expect(getSlideEditTextRunColorJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/json': '{"textRunColor":"ABCDEF"}',
+      }),
+    })).toBe('#abcdef')
+    expect(getSlideEditTextRunColorJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"color":"currentColor"}',
+      }),
+    })).toBe('currentColor')
+  })
+
   it('does not treat generic text/plain direct values as run formatting', () => {
     expect(getSlideEditTextRunFormattingJSONPasteValue({
       dataTransfer: createDataTransfer({
@@ -211,6 +322,16 @@ describe('SlideEditTextFormattingKeyboard', () => {
         'text/plain': 'not json',
       }),
       fieldId: 'bold',
+    })).toBeNull()
+    expect(getSlideEditTextRunSizeJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '18',
+      }),
+    })).toBeNull()
+    expect(getSlideEditTextRunColorJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '"#ABC"',
+      }),
     })).toBeNull()
   })
 })

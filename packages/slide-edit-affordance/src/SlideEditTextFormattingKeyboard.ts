@@ -1,4 +1,5 @@
 import { SLIDE_EDIT_TEXT_JSON_PASTE_TYPES } from './SlideEditTextJSONPaste'
+import { normalizeSlideEditColorHex } from './SlideEditColorSwatchPalette'
 
 export type SlideEditTextFormattingKeyboardIntentKind =
   | 'toggle-bold'
@@ -7,8 +8,37 @@ export type SlideEditTextFormattingKeyboardIntentKind =
 
 export type SlideEditTextRunFormattingFieldId =
   | 'bold'
+  | 'color'
+  | 'italic'
+  | 'size'
+  | 'underline'
+
+export type SlideEditTextRunFormattingBooleanFieldId =
+  | 'bold'
   | 'italic'
   | 'underline'
+
+export type SlideEditTextRunSizeValue = number
+
+export type SlideEditTextRunColorValue = string
+
+export type SlideEditTextRunFormattingValue<
+  TFieldId extends SlideEditTextRunFormattingFieldId =
+    SlideEditTextRunFormattingFieldId,
+> = TFieldId extends 'size'
+  ? SlideEditTextRunSizeValue
+  : TFieldId extends 'color'
+    ? SlideEditTextRunColorValue
+    : boolean
+
+export type SlideEditTextRunSizeLimits = {
+  defaultValue: number
+  max: number
+  min: number
+  precision: number
+  step: number
+  unit: 'px'
+}
 
 export type SlideEditTextFormattingKeyboardShortcut =
   | 'Cmd/Ctrl+B'
@@ -33,11 +63,15 @@ export type SlideEditTextRunFormattingDataTransfer = Pick<DataTransfer, 'getData
 
 export type SlideEditTextRunFormattingFieldDescriptor = {
   commandId: 'update-text-run-formatting'
-  control: 'toggle'
+  control: 'color-swatch' | 'font-size-stepper' | 'toggle'
   id: SlideEditTextRunFormattingFieldId
   jsonKeys: readonly string[]
   jsonMimeType: string
+  max?: number
+  min?: number
   requiredAdapterSlot: 'command-effect'
+  step?: number
+  unit?: 'px'
 }
 
 export type SlideEditTextRunFormattingDescriptor<
@@ -53,19 +87,27 @@ export type SlideEditTextRunFormattingDescriptor<
 export type SlideEditTextRunFormattingUpdateCommand<
   TSlideId extends string = string,
   TObjectId extends string = string,
+  TFieldId extends SlideEditTextRunFormattingFieldId =
+    SlideEditTextRunFormattingFieldId,
 > = {
-  fieldId: SlideEditTextRunFormattingFieldId
+  fieldId: TFieldId
   id: 'update-text-run-formatting'
   objectIds: readonly TObjectId[]
   slideId: TSlideId
-  value: boolean
+  value: SlideEditTextRunFormattingValue<TFieldId>
 }
 
 export type SlideEditTextRunFormattingHostCommandEffect<
   TSlideId extends string = string,
   TObjectId extends string = string,
+  TFieldId extends SlideEditTextRunFormattingFieldId =
+    SlideEditTextRunFormattingFieldId,
 > = {
-  payload: SlideEditTextRunFormattingUpdateCommand<TSlideId, TObjectId>
+  payload: SlideEditTextRunFormattingUpdateCommand<
+    TSlideId,
+    TObjectId,
+    TFieldId
+  >
   selection: {
     objectIds: readonly TObjectId[]
     slideId: TSlideId
@@ -79,8 +121,49 @@ export type SlideEditTextRunFormattingJSONPasteInput = {
   jsonMimeType?: string
 }
 
+export type SlideEditTextRunSizeJSONPasteInput = {
+  dataTransfer: SlideEditTextRunFormattingDataTransfer | null
+  jsonMimeType?: string
+}
+
+export type SlideEditTextRunColorJSONPasteInput =
+  SlideEditTextRunSizeJSONPasteInput
+
+export type SlideEditTextRunStyleCommandEffectInput<
+  TSlideId extends string = string,
+  TObjectId extends string = string,
+> = {
+  objectIds: readonly TObjectId[]
+  slideId: TSlideId
+}
+
+export type SlideEditTextRunSizeCommandEffectInput<
+  TSlideId extends string = string,
+  TObjectId extends string = string,
+> = SlideEditTextRunStyleCommandEffectInput<TSlideId, TObjectId> & {
+  value: unknown
+}
+
+export type SlideEditTextRunColorCommandEffectInput<
+  TSlideId extends string = string,
+  TObjectId extends string = string,
+> = SlideEditTextRunStyleCommandEffectInput<TSlideId, TObjectId> & {
+  value: string
+}
+
 const SLIDE_EDIT_TEXT_RUN_FORMATTING_MIME_PREFIX =
   'application/vnd.interactive-os.slide-edit.text-run'
+
+export const SLIDE_EDIT_TEXT_RUN_SIZE_DEFAULT = 16
+
+export const SLIDE_EDIT_TEXT_RUN_SIZE_LIMITS = Object.freeze({
+  defaultValue: SLIDE_EDIT_TEXT_RUN_SIZE_DEFAULT,
+  max: 400,
+  min: 1,
+  precision: 2,
+  step: 0.5,
+  unit: 'px',
+} as const satisfies SlideEditTextRunSizeLimits)
 
 export const SLIDE_EDIT_TEXT_RUN_FORMATTING_FIELDS = Object.freeze([
   {
@@ -106,6 +189,26 @@ export const SLIDE_EDIT_TEXT_RUN_FORMATTING_FIELDS = Object.freeze([
     jsonKeys: ['textRunUnderline', 'runUnderline', 'underline', 'value'],
     jsonMimeType:
       `${SLIDE_EDIT_TEXT_RUN_FORMATTING_MIME_PREFIX}-underline+json`,
+    requiredAdapterSlot: 'command-effect',
+  },
+  {
+    commandId: 'update-text-run-formatting',
+    control: 'font-size-stepper',
+    id: 'size',
+    jsonKeys: ['textRunSize', 'runSize', 'size', 'fontSize', 'value'],
+    jsonMimeType: `${SLIDE_EDIT_TEXT_RUN_FORMATTING_MIME_PREFIX}-size+json`,
+    max: SLIDE_EDIT_TEXT_RUN_SIZE_LIMITS.max,
+    min: SLIDE_EDIT_TEXT_RUN_SIZE_LIMITS.min,
+    requiredAdapterSlot: 'command-effect',
+    step: SLIDE_EDIT_TEXT_RUN_SIZE_LIMITS.step,
+    unit: 'px',
+  },
+  {
+    commandId: 'update-text-run-formatting',
+    control: 'color-swatch',
+    id: 'color',
+    jsonKeys: ['textRunColor', 'runColor', 'color', 'value'],
+    jsonMimeType: `${SLIDE_EDIT_TEXT_RUN_FORMATTING_MIME_PREFIX}-color+json`,
     requiredAdapterSlot: 'command-effect',
   },
 ] as const satisfies readonly SlideEditTextRunFormattingFieldDescriptor[])
@@ -176,11 +279,23 @@ export function createSlideEditTextRunFormattingDescriptor<
 export function getSlideEditTextRunFormattingCommandEffect<
   TSlideId extends string,
   TObjectId extends string,
+  TFieldId extends SlideEditTextRunFormattingFieldId,
 >(
-  command: SlideEditTextRunFormattingUpdateCommand<TSlideId, TObjectId>,
-): SlideEditTextRunFormattingHostCommandEffect<TSlideId, TObjectId> {
+  command: SlideEditTextRunFormattingUpdateCommand<
+    TSlideId,
+    TObjectId,
+    TFieldId
+  >,
+): SlideEditTextRunFormattingHostCommandEffect<
+  TSlideId,
+  TObjectId,
+  TFieldId
+> {
+  const normalizedCommand =
+    normalizeSlideEditTextRunFormattingUpdateCommand(command)
+
   return {
-    payload: command,
+    payload: normalizedCommand,
     selection: {
       objectIds: command.objectIds,
       slideId: command.slideId,
@@ -189,11 +304,70 @@ export function getSlideEditTextRunFormattingCommandEffect<
   }
 }
 
-export function getSlideEditTextRunFormattingJSONPasteValue({
+export function getSlideEditTextRunSizeCommandEffect<
+  TSlideId extends string,
+  TObjectId extends string,
+>({
+  objectIds,
+  slideId,
+  value,
+}: SlideEditTextRunSizeCommandEffectInput<TSlideId, TObjectId>) {
+  return getSlideEditTextRunFormattingCommandEffect({
+    fieldId: 'size',
+    id: 'update-text-run-formatting',
+    objectIds,
+    slideId,
+    value: normalizeSlideEditTextRunSize(value),
+  })
+}
+
+export function getSlideEditTextRunColorCommandEffect<
+  TSlideId extends string,
+  TObjectId extends string,
+>({
+  objectIds,
+  slideId,
+  value,
+}: SlideEditTextRunColorCommandEffectInput<TSlideId, TObjectId>) {
+  return getSlideEditTextRunFormattingCommandEffect({
+    fieldId: 'color',
+    id: 'update-text-run-formatting',
+    objectIds,
+    slideId,
+    value: normalizeSlideEditTextRunColorValue(value) ?? value,
+  })
+}
+
+export function normalizeSlideEditTextRunFormattingUpdateCommand<
+  TSlideId extends string,
+  TObjectId extends string,
+  TFieldId extends SlideEditTextRunFormattingFieldId,
+>(
+  command: SlideEditTextRunFormattingUpdateCommand<
+    TSlideId,
+    TObjectId,
+    TFieldId
+  >,
+): SlideEditTextRunFormattingUpdateCommand<TSlideId, TObjectId, TFieldId> {
+  const normalizedValue = normalizeSlideEditTextRunFormattingFieldValue(
+    command.fieldId,
+    command.value,
+  )
+
+  return {
+    ...command,
+    value: normalizedValue ?? command.value,
+  } as SlideEditTextRunFormattingUpdateCommand<TSlideId, TObjectId, TFieldId>
+}
+
+export function getSlideEditTextRunFormattingJSONPasteValue<
+  TFieldId extends SlideEditTextRunFormattingFieldId,
+>({
   dataTransfer,
   fieldId,
   jsonMimeType = getSlideEditTextRunFormattingField(fieldId)?.jsonMimeType,
-}: SlideEditTextRunFormattingJSONPasteInput): boolean | null {
+}: SlideEditTextRunFormattingJSONPasteInput & { fieldId: TFieldId }):
+  SlideEditTextRunFormattingValue<TFieldId> | null {
   if (!dataTransfer) {
     return null
   }
@@ -203,7 +377,7 @@ export function getSlideEditTextRunFormattingJSONPasteValue({
       dataTransfer.getData(jsonMimeType),
     )
     const normalizedCustomValue =
-      normalizeSlideEditTextRunFormattingValue(customValue)
+      normalizeSlideEditTextRunFormattingFieldValue(fieldId, customValue)
 
     if (normalizedCustomValue !== null) {
       return normalizedCustomValue
@@ -223,10 +397,71 @@ export function getSlideEditTextRunFormattingJSONPasteValue({
   return null
 }
 
+export function getSlideEditTextRunSizeJSONPasteValue(
+  input: SlideEditTextRunSizeJSONPasteInput,
+): SlideEditTextRunSizeValue | null {
+  return getSlideEditTextRunFormattingJSONPasteValue({
+    ...input,
+    fieldId: 'size',
+  })
+}
+
+export function getSlideEditTextRunColorJSONPasteValue(
+  input: SlideEditTextRunColorJSONPasteInput,
+): SlideEditTextRunColorValue | null {
+  return getSlideEditTextRunFormattingJSONPasteValue({
+    ...input,
+    fieldId: 'color',
+  })
+}
+
 export function normalizeSlideEditTextRunFormattingValue(
   value: unknown,
 ): boolean | null {
   return typeof value === 'boolean' ? value : null
+}
+
+export function normalizeSlideEditTextRunSizeValue(
+  value: unknown,
+): SlideEditTextRunSizeValue | null {
+  const numericValue = getSlideEditTextRunSizeNumber(value)
+
+  if (numericValue === null) {
+    return null
+  }
+
+  const factor = 10 ** SLIDE_EDIT_TEXT_RUN_SIZE_LIMITS.precision
+  const rounded = Math.round(numericValue * factor) / factor
+
+  return Math.min(
+    SLIDE_EDIT_TEXT_RUN_SIZE_LIMITS.max,
+    Math.max(SLIDE_EDIT_TEXT_RUN_SIZE_LIMITS.min, rounded),
+  )
+}
+
+export function normalizeSlideEditTextRunSize(
+  value: unknown,
+): SlideEditTextRunSizeValue {
+  return normalizeSlideEditTextRunSizeValue(value) ??
+    SLIDE_EDIT_TEXT_RUN_SIZE_DEFAULT
+}
+
+export function normalizeSlideEditTextRunColorValue(
+  value: unknown,
+): SlideEditTextRunColorValue | null {
+  if (typeof value !== 'string') {
+    return null
+  }
+
+  const trimmedValue = value.trim()
+
+  if (!trimmedValue) {
+    return null
+  }
+
+  return normalizeSlideEditColorHex(trimmedValue) ??
+    normalizeSlideEditColorHex(`#${trimmedValue}`) ??
+    trimmedValue
 }
 
 function getSlideEditTextRunFormattingField(
@@ -255,11 +490,52 @@ function getSlideEditTextRunFormattingExplicitJSONValue(
 
   for (const key of descriptor.jsonKeys) {
     if (Object.hasOwn(record, key)) {
-      return normalizeSlideEditTextRunFormattingValue(record[key])
+      return normalizeSlideEditTextRunFormattingFieldValue(fieldId, record[key])
     }
   }
 
   return null
+}
+
+function normalizeSlideEditTextRunFormattingFieldValue<
+  TFieldId extends SlideEditTextRunFormattingFieldId,
+>(
+  fieldId: TFieldId,
+  value: unknown,
+): SlideEditTextRunFormattingValue<TFieldId> | null {
+  switch (fieldId) {
+    case 'color':
+      return normalizeSlideEditTextRunColorValue(value) as
+        SlideEditTextRunFormattingValue<TFieldId> | null
+    case 'size':
+      return normalizeSlideEditTextRunSizeValue(value) as
+        SlideEditTextRunFormattingValue<TFieldId> | null
+    case 'bold':
+    case 'italic':
+    case 'underline':
+      return normalizeSlideEditTextRunFormattingValue(value) as
+        SlideEditTextRunFormattingValue<TFieldId> | null
+  }
+}
+
+function getSlideEditTextRunSizeNumber(value: unknown) {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value
+  }
+
+  if (typeof value !== 'string') {
+    return null
+  }
+
+  const trimmedValue = value.trim()
+
+  if (!trimmedValue) {
+    return null
+  }
+
+  const numericValue = Number(trimmedValue)
+
+  return Number.isFinite(numericValue) ? numericValue : null
 }
 
 function parseSlideEditTextRunFormattingJSON(value: string) {
