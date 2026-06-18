@@ -15,6 +15,8 @@ export {
 } from './CanvasComponentInsertionExecution'
 export {
   CanvasComponentPalette,
+  type CanvasComponentPaletteItem,
+  type CanvasComponentPaletteProps,
 } from './CanvasComponentPalette'
 export {
   CanvasStickyQuickCreateControl,

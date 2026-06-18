@@ -139,9 +139,12 @@ export {
   type CanvasCommandPaletteKeyboardIntentInput,
 } from './command-palette'
 export {
+  CanvasComponentPalette,
   useCanvasComponentInsertion,
   useCanvasStickyQuickCreate,
   useCanvasStickyQuickCreateControlPoints,
+  type CanvasComponentPaletteItem,
+  type CanvasComponentPaletteProps,
 } from './component-authoring'
 export {
   CANVAS_COMPONENT_INSPECTOR_PANEL,

@@ -7,12 +7,16 @@ import type {
   CanvasAppCustomCreationToolState,
 } from '../extensions/CanvasAppExtensionStateContracts'
 import type { CanvasItem } from '../../entities'
+import type {
+  CanvasComponentSetSummary,
+} from '../../host'
 import type { CanvasAppItemReadModel } from './CanvasAppItemReadModelContracts'
 import type { CanvasAppComponentTemplate } from './CanvasAppComponentAssemblyContracts'
 import { getCanvasAppControlModel } from './CanvasAppControlModel'
 
 describe('CanvasAppControlModel', () => {
   it('builds control props from component, command, selection, and viewport state', () => {
+    const componentSets = [createComponentSet()]
     const components = [createComponentTemplate()]
     const customTools = [createCustomTool()]
     const customCommands = [
@@ -27,6 +31,7 @@ describe('CanvasAppControlModel', () => {
     const model = getCanvasAppControlModel(createInput({
       canRedo: false,
       canUndo: true,
+      componentSets,
       components,
       customCommands,
       customTools,
@@ -37,6 +42,7 @@ describe('CanvasAppControlModel', () => {
     }))
 
     expect(model.componentPalette.components).toBe(components)
+    expect(model.componentPalette.componentSets).toBe(componentSets)
     expect(model.componentPalette.visible).toBe(true)
     expect(model.commandPalette.visible).toBe(true)
     expect(model.commandPalette.items.map((item) => item.title)).toEqual(
@@ -206,6 +212,7 @@ function createInput(
   return {
     canRedo: true,
     canUndo: true,
+    componentSets: [createComponentSet()],
     components: [createComponentTemplate()],
     config: createCanvasAffordanceConfig(),
     customCommands: [],
@@ -265,6 +272,42 @@ function createComponentTemplate(): CanvasAppComponentTemplate {
     stroke: '#cccccc',
     title: 'Card',
     w: 160,
+  }
+}
+
+function createComponentSet(): CanvasComponentSetSummary {
+  return {
+    id: 'score-card',
+    instances: [{
+      itemIds: ['score-card-a', 'score-card-value-a'],
+      label: 'Score card A',
+      rootItemId: 'score-card-a',
+      slots: [
+        {
+          itemId: 'score-card-a',
+          label: 'Root',
+          slotId: 'root',
+        },
+        {
+          itemId: 'score-card-value-a',
+          label: 'Value',
+          slotId: 'value',
+        },
+      ],
+    }],
+    label: 'Score card',
+    parts: [
+      {
+        itemIds: ['score-card-a'],
+        label: 'Root',
+        slotId: 'root',
+      },
+      {
+        itemIds: ['score-card-value-a'],
+        label: 'Value',
+        slotId: 'value',
+      },
+    ],
   }
 }
 

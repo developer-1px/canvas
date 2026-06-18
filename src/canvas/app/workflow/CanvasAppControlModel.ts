@@ -34,6 +34,7 @@ type CanvasSelectionCommandAnchor = {
 export function getCanvasAppControlModel({
   canRedo,
   canUndo,
+  componentSets,
   components,
   config,
   customCommands,
@@ -64,6 +65,7 @@ export function getCanvasAppControlModel({
   })
   return {
     componentPalette: {
+      componentSets,
       components,
       visible: config.overlays.componentPalette,
       onInsert: onInsertComponent,

@@ -57,6 +57,7 @@ describe('CanvasAppView', () => {
     )
 
     expect(markup).toContain('component-palette')
+    expect(markup).toContain('Score card')
     expect(markup).toContain('cursor-chat')
     expect(markup).toContain('drawing-controls')
     expect(markup).toContain('emote-controls')

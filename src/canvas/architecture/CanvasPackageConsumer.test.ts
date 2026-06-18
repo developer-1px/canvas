@@ -44,6 +44,7 @@ import {
   CANVAS_APP_COMPONENT_INSPECTOR_FEATURE_PACK_MANIFEST,
   CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST,
   CANVAS_APP_COMPONENT_SYNC_FEATURE_PACK_MANIFEST,
+  CanvasComponentPalette,
   CANVAS_COMPONENT_INSPECTOR_PANEL,
   CANVAS_COMPONENT_SYNC_ITEMS_CHANGE_TRANSFORMER,
   CANVAS_APP_STORY_IMPORT_FEATURE_PACK_MANIFEST,
@@ -78,6 +79,8 @@ import {
   transformCanvasAppItemsChange,
   getCanvasFindInputKeyboardIntent,
   getCanvasInlineEditKeyboardIntent,
+  getCanvasContextMenuKeyboardIntent,
+  getCanvasContextMenuPosition,
   getCanvasModalBackdropPointerIntent,
   getCanvasModalKeyboardIntent,
   measureCanvasTextBlocks,
@@ -99,6 +102,8 @@ import {
   type CanvasAppComponentDefinition,
   type CanvasAppComponentTemplate,
   type CanvasAppComponentRendererStrategy,
+  type CanvasComponentPaletteItem,
+  type CanvasComponentPaletteProps,
   type CanvasComponentInspectorPanelModel,
   type CanvasAppFeaturePack,
   type CanvasAppFeaturePackAssemblyInput,
@@ -134,6 +139,8 @@ import {
   type CanvasPresentationKeyboardIntentInput,
   type CanvasInteractionTargetSelectorInput,
   type CanvasInlineEditKeyboardIntentInput,
+  type CanvasContextMenuKeyboardIntentInput,
+  type CanvasContextMenuPositionInput,
   type CanvasFindInputKeyboardIntentInput,
   type CanvasMenuRovingActiveIndexInput,
   type CanvasMenuTriggerKeyboardIntentInput,
@@ -259,6 +266,14 @@ describe('Canvas package consumer imports', () => {
       stroke: '#cccccc',
       title: 'Smoke card',
       w: 160,
+    }
+    const componentPaletteItem: CanvasComponentPaletteItem = {
+      accent: componentTemplate.accent,
+      fill: componentTemplate.fill,
+      id: componentTemplate.id,
+      label: componentTemplate.label,
+      stroke: componentTemplate.stroke,
+      title: componentTemplate.title,
     }
     const componentLibrary: CanvasAppComponentLibrary =
       createCanvasComponentLibrary({
@@ -452,6 +467,11 @@ describe('Canvas package consumer imports', () => {
       stageAdapter,
       workspaceStorageProvider,
     })
+    const componentPaletteProps: CanvasComponentPaletteProps = {
+      componentSets: assembly.componentDefinitionRegistry.listSets(),
+      components: [componentPaletteItem],
+      onInsert: () => undefined,
+    }
     const shellInputProps = {
       assemblyInput: {
         affordanceConfig: {
@@ -478,6 +498,15 @@ describe('Canvas package consumer imports', () => {
     } satisfies CanvasAppProps
 
     expect(assembly.initialItems).toEqual([rect])
+    expect(CanvasComponentPalette).toBeTypeOf('function')
+    expect(CanvasPackage.CanvasComponentPalette).toBe(CanvasComponentPalette)
+    expect(CanvasAppFacade.CanvasComponentPalette).toBe(CanvasComponentPalette)
+    expect(CanvasAppAuthoring.CanvasComponentPalette).toBe(
+      CanvasComponentPalette,
+    )
+    expect(componentPaletteProps.componentSets?.[0]?.parts.map(
+      (part) => part.slotId,
+    )).toEqual(['root', 'title'])
     expect(assembly.foundationExtensions.map((extension) => extension.id))
       .toContain('canvas.smoke')
     const foundationTools: readonly CanvasAppFoundationExtensionTool[] =
@@ -843,6 +872,15 @@ describe('Canvas package consumer imports', () => {
       metaKey: false,
       shiftKey: false,
     }
+    const contextMenuKeyboardInput: CanvasContextMenuKeyboardIntentInput = {
+      event: { shiftKey: true },
+      key: 'F10',
+    }
+    const contextMenuPositionInput: CanvasContextMenuPositionInput = {
+      menuSize: { height: 100, width: 160 },
+      point: { x: 790, y: 590 },
+      viewportSize: { height: 600, width: 800 },
+    }
     const commandPaletteKeyboardInput: CanvasCommandPaletteKeyboardIntentInput =
       {
         activeIndex: 0,
@@ -1008,6 +1046,27 @@ describe('Canvas package consumer imports', () => {
       direction: 1,
       kind: 'navigate',
       preventDefault: true,
+    })
+    expect(getCanvasContextMenuKeyboardIntent(contextMenuKeyboardInput))
+      .toEqual({
+        kind: 'open-context-menu',
+        preventDefault: true,
+      })
+    expect(CanvasAppFacade.getCanvasContextMenuKeyboardIntent(
+      contextMenuKeyboardInput,
+    )).toEqual({
+      kind: 'open-context-menu',
+      preventDefault: true,
+    })
+    expect(getCanvasContextMenuPosition(contextMenuPositionInput)).toEqual({
+      x: 632,
+      y: 492,
+    })
+    expect(CanvasAppFacade.getCanvasContextMenuPosition(
+      contextMenuPositionInput,
+    )).toEqual({
+      x: 632,
+      y: 492,
     })
     expect(getCanvasModalBackdropPointerIntent(modalBackdropPointerInput))
       .toEqual({ kind: 'dismiss' })

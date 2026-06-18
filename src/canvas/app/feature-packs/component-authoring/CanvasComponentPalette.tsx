@@ -2,13 +2,17 @@ import {
   CANVAS_TOOLBAR_ITEM_PROPS,
   useCanvasToolbarRovingFocus,
 } from '../toolbar'
+import type {
+  CanvasComponentSetSummary,
+} from '../../../host'
 
-type CanvasComponentPaletteProps = {
+export type CanvasComponentPaletteProps = {
+  componentSets?: readonly CanvasComponentSetSummary[]
   components: readonly CanvasComponentPaletteItem[]
   onInsert: (component: string) => void
 }
 
-type CanvasComponentPaletteItem = {
+export type CanvasComponentPaletteItem = {
   accent: string
   fill: string
   id: string
@@ -18,6 +22,7 @@ type CanvasComponentPaletteItem = {
 }
 
 export function CanvasComponentPalette({
+  componentSets = [],
   components,
   onInsert,
 }: CanvasComponentPaletteProps) {
@@ -25,25 +30,63 @@ export function CanvasComponentPalette({
 
   return (
     <div
-      {...toolbarRovingFocus}
       className="component-palette"
-      role="toolbar"
       aria-label="Components"
     >
-      {components.map((component) => (
-        <button
-          {...CANVAS_TOOLBAR_ITEM_PROPS}
-          key={component.id}
-          type="button"
-          className="component-button"
-          aria-label={component.title}
-          title={component.title}
-          onClick={() => onInsert(component.id)}
-        >
-          <ComponentButtonMark component={component} />
-        </button>
-      ))}
+      <div
+        {...toolbarRovingFocus}
+        className="component-palette-toolbar"
+        role="toolbar"
+        aria-label="Component templates"
+      >
+        {components.map((component) => (
+          <button
+            {...CANVAS_TOOLBAR_ITEM_PROPS}
+            key={component.id}
+            type="button"
+            className="component-button"
+            aria-label={component.title}
+            title={component.title}
+            onClick={() => onInsert(component.id)}
+          >
+            <ComponentButtonMark component={component} />
+          </button>
+        ))}
+      </div>
+      {componentSets.length > 0 ? (
+        <div className="component-palette-sets" aria-label="Component parts">
+          {componentSets.map((componentSet) => (
+            <ComponentSetParts
+              componentSet={componentSet}
+              key={componentSet.id}
+            />
+          ))}
+        </div>
+      ) : null}
     </div>
+  )
+}
+
+function ComponentSetParts({
+  componentSet,
+}: {
+  componentSet: CanvasComponentSetSummary
+}) {
+  return (
+    <section className="component-palette-set">
+      <div className="component-palette-set-title">
+        <span>{componentSet.label}</span>
+        <small>{componentSet.instances.length}</small>
+      </div>
+      <ol className="component-palette-parts">
+        {componentSet.parts.map((part) => (
+          <li className="component-palette-part" key={part.slotId}>
+            <span>{part.label}</span>
+            <small>{part.itemIds.length}</small>
+          </li>
+        ))}
+      </ol>
+    </section>
   )
 }
 

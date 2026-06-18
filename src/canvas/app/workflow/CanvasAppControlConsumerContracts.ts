@@ -10,6 +10,9 @@ import type {
   Viewport,
 } from '../../entities'
 import type { Point } from '../../entities'
+import type {
+  CanvasComponentSetSummary,
+} from '../../host'
 import type { CanvasAppComponentTemplate } from './CanvasAppComponentAssemblyContracts'
 import type { CanvasAppItemReadModel } from './CanvasAppItemReadModelContracts'
 import type {
@@ -22,6 +25,7 @@ import type { CanvasAppStageRect } from '../rendering/stage/CanvasAppStageElemen
 export type CanvasAppControlModelInput = {
   canRedo: boolean
   canUndo: boolean
+  componentSets: readonly CanvasComponentSetSummary[]
   commandHandlers: CanvasAppControlCommandHandlers
   components: readonly CanvasAppComponentTemplate[]
   config: CanvasAffordanceConfig

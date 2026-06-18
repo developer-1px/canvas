@@ -43,6 +43,39 @@ export function createViewProps(
       onClose: noop,
     },
     componentPalette: {
+      componentSets: [{
+        id: 'score-card',
+        instances: [{
+          itemIds: ['score-card-a', 'score-card-value-a'],
+          label: 'Score card A',
+          rootItemId: 'score-card-a',
+          slots: [
+            {
+              itemId: 'score-card-a',
+              label: 'Root',
+              slotId: 'root',
+            },
+            {
+              itemId: 'score-card-value-a',
+              label: 'Value',
+              slotId: 'value',
+            },
+          ],
+        }],
+        label: 'Score card',
+        parts: [
+          {
+            itemIds: ['score-card-a'],
+            label: 'Root',
+            slotId: 'root',
+          },
+          {
+            itemIds: ['score-card-value-a'],
+            label: 'Value',
+            slotId: 'value',
+          },
+        ],
+      }],
       components: [{
         accent: '#111111',
         fill: '#ffffff',
