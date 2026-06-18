@@ -14,6 +14,7 @@ import {
   getCanvasAppManifestViewFeaturePacks,
   getCanvasAppInstalledFeaturePackManifestIds,
   getCanvasAppFeaturePackMarketplaceModel,
+  getCanvasAppFeaturePackMarketplacePrimaryAction,
   getCanvasAppResolvedFeaturePackStates,
   type CanvasAppFeaturePackProfile,
   type CanvasAppFeaturePackProfileId,
@@ -21,6 +22,7 @@ import {
   type CanvasAppFeaturePackManifest,
   type CanvasAppFeaturePackInstallOptions,
   type CanvasAppFeaturePackMarketplaceListingInput,
+  type CanvasAppFeaturePackMarketplaceItem,
   type CanvasAppFeaturePackMarketplaceModel,
   type CanvasAppFeaturePackMarketplacePrimaryAction,
   type CanvasAppFeaturePackManifestOrphanedDataScopeId,
@@ -305,6 +307,11 @@ export type CanvasAppFeaturePackMarketplaceAssemblyModel = Readonly<{
 
 export type CanvasAppFeaturePackMarketplaceAssemblyActionInput = Readonly<{
   action: CanvasAppFeaturePackMarketplacePrimaryAction
+  model: CanvasAppFeaturePackMarketplaceAssemblyModel
+}>
+
+export type CanvasAppFeaturePackMarketplaceAssemblyItemInput = Readonly<{
+  item: CanvasAppFeaturePackMarketplaceItem
   model: CanvasAppFeaturePackMarketplaceAssemblyModel
 }>
 
@@ -1941,6 +1948,49 @@ export function getCanvasAppFeaturePackMarketplaceAssemblyActionInput({
   return getCanvasAppFeaturePackMarketplaceActionAssemblyInput({
     action,
     assemblyInput: model.assemblyInput,
+  })
+}
+
+export function getCanvasAppFeaturePackMarketplaceAssemblyItemAction({
+  item,
+}: CanvasAppFeaturePackMarketplaceAssemblyItemInput):
+  CanvasAppFeaturePackMarketplacePrimaryAction {
+  return getCanvasAppFeaturePackMarketplacePrimaryAction(item)
+}
+
+export function getCanvasAppFeaturePackMarketplaceAssemblyItemActionPlan(
+  input: CanvasAppFeaturePackMarketplaceAssemblyItemInput,
+): CanvasAppFeaturePackMarketplaceActionAssemblyPlan {
+  return getCanvasAppFeaturePackMarketplaceAssemblyActionPlan({
+    action: getCanvasAppFeaturePackMarketplaceAssemblyItemAction(input),
+    model: input.model,
+  })
+}
+
+export function getCanvasAppFeaturePackMarketplaceAssemblyItemActionInput(
+  input: CanvasAppFeaturePackMarketplaceAssemblyItemInput,
+): CanvasAppFeaturePackAssemblyInput {
+  return getCanvasAppFeaturePackMarketplaceAssemblyActionInput({
+    action: getCanvasAppFeaturePackMarketplaceAssemblyItemAction(input),
+    model: input.model,
+  })
+}
+
+export function getCanvasAppFeaturePackMarketplaceAssemblyItemApplyPlan(
+  input: CanvasAppFeaturePackMarketplaceAssemblyItemInput,
+): CanvasAppFeaturePackMarketplaceAssemblyApplyPlan {
+  return getCanvasAppFeaturePackMarketplaceAssemblyApplyPlan({
+    action: getCanvasAppFeaturePackMarketplaceAssemblyItemAction(input),
+    model: input.model,
+  })
+}
+
+export function getCanvasAppFeaturePackMarketplaceAssemblyItemApplyResult(
+  input: CanvasAppFeaturePackMarketplaceAssemblyItemInput,
+): CanvasAppFeaturePackMarketplaceAssemblyApplyResult {
+  return getCanvasAppFeaturePackMarketplaceAssemblyApplyResult({
+    action: getCanvasAppFeaturePackMarketplaceAssemblyItemAction(input),
+    model: input.model,
   })
 }
 

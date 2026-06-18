@@ -22,6 +22,11 @@ import {
   getCanvasAppFeaturePackMarketplaceAssemblyApplyPlan,
   getCanvasAppFeaturePackMarketplaceAssemblyActionInput,
   getCanvasAppFeaturePackMarketplaceAssemblyActionPlan,
+  getCanvasAppFeaturePackMarketplaceAssemblyItemAction,
+  getCanvasAppFeaturePackMarketplaceAssemblyItemActionInput,
+  getCanvasAppFeaturePackMarketplaceAssemblyItemActionPlan,
+  getCanvasAppFeaturePackMarketplaceAssemblyItemApplyPlan,
+  getCanvasAppFeaturePackMarketplaceAssemblyItemApplyResult,
   getCanvasAppFeaturePackMarketplaceAssemblyModel,
 } from './CanvasAppFeaturePackAssembly'
 
@@ -148,6 +153,138 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
       'addon-pack',
     ])
     expect(assembly.enabledFeaturePackIds).toEqual(['base-pack'])
+  })
+
+  it('applies marketplace items through their primary action', () => {
+    const overlayManifest = createCanvasAppFeaturePackManifest({
+      id: 'overlay-pack',
+      label: 'Overlay pack',
+      lifecycle: {
+        partialUpdate: ['overlay'],
+        runtimeToggleable: true,
+      },
+    })
+    const model = getCanvasAppFeaturePackMarketplaceAssemblyModel({
+      assemblyInput: {
+        featurePackManifests: [overlayManifest],
+      },
+      profiles: [],
+      suiteManifests: [],
+    })
+    const overlayItem = model.marketplaceModel.packs.items[0]
+
+    if (!overlayItem) {
+      throw new Error('Expected overlay pack item')
+    }
+
+    const itemInput = {
+      item: overlayItem,
+      model,
+    }
+    const primaryAction =
+      getCanvasAppFeaturePackMarketplaceAssemblyItemAction(itemInput)
+    const actionPlan =
+      getCanvasAppFeaturePackMarketplaceAssemblyItemActionPlan(itemInput)
+    const assemblyInput =
+      getCanvasAppFeaturePackMarketplaceAssemblyItemActionInput(itemInput)
+    const applyPlan =
+      getCanvasAppFeaturePackMarketplaceAssemblyItemApplyPlan(itemInput)
+    const applyResult =
+      getCanvasAppFeaturePackMarketplaceAssemblyItemApplyResult(itemInput)
+
+    expect(primaryAction)
+      .toBe(getCanvasAppFeaturePackMarketplacePrimaryAction(overlayItem))
+    expect(primaryAction.kind).toBe('disable')
+    expect(actionPlan.status).toBe('ready')
+    if (actionPlan.status !== 'ready') {
+      throw new Error('Expected ready item action plan')
+    }
+
+    expect(actionPlan.action).toBe(primaryAction)
+    expect(actionPlan.assemblyInput).toEqual(assemblyInput)
+    expect(assemblyInput.featurePackStates).toEqual([{
+      id: 'overlay-pack',
+      status: 'disabled',
+    }])
+    expect(applyPlan.status).toBe('ready')
+    if (applyPlan.status !== 'ready') {
+      throw new Error('Expected ready item apply plan')
+    }
+
+    expect(applyPlan.action).toBe(primaryAction)
+    expect(applyPlan.updateMode).toBe('partial-update')
+    expect(applyResult.status).toBe('ready')
+    if (applyResult.status !== 'ready') {
+      throw new Error('Expected ready item apply result')
+    }
+
+    expect(applyResult.action).toBe(primaryAction)
+    expect(applyResult.currentModel).toBe(model)
+    expect(applyResult.nextModel.marketplaceModel.packs.items[0])
+      .toMatchObject({
+        featurePackId: 'overlay-pack',
+        primaryActionKind: 'enable',
+        status: 'disabled',
+      })
+  })
+
+  it('keeps blocked marketplace item primary actions blocked', () => {
+    const paidManifest = createCanvasAppFeaturePackManifest({
+      id: 'paid-pack',
+      label: 'Paid pack',
+    })
+    const model = getCanvasAppFeaturePackMarketplaceAssemblyModel({
+      assemblyInput: {
+        featurePackManifests: [paidManifest],
+        featurePackStates: [{
+          id: 'paid-pack',
+          status: 'uninstalled',
+        }],
+      },
+      listings: [{
+        access: 'private',
+        distribution: 'available',
+        featurePackId: 'paid-pack',
+      }],
+      profiles: [],
+      suiteManifests: [],
+    })
+    const paidItem = model.marketplaceModel.packs.items[0]
+
+    if (!paidItem) {
+      throw new Error('Expected paid pack item')
+    }
+
+    const itemInput = {
+      item: paidItem,
+      model,
+    }
+    const primaryAction =
+      getCanvasAppFeaturePackMarketplaceAssemblyItemAction(itemInput)
+    const applyPlan =
+      getCanvasAppFeaturePackMarketplaceAssemblyItemApplyPlan(itemInput)
+    const applyResult =
+      getCanvasAppFeaturePackMarketplaceAssemblyItemApplyResult(itemInput)
+
+    expect(primaryAction)
+      .toBe(getCanvasAppFeaturePackMarketplacePrimaryAction(paidItem))
+    expect(applyPlan).toMatchObject({
+      actionKind: 'install',
+      blockedReasonCount: 0,
+      changedFeaturePackIds: ['paid-pack'],
+      marketplaceBlockedReasonCount: 1,
+      status: 'blocked',
+      totalBlockedReasonCount: 1,
+      updateMode: 'blocked',
+    })
+    expect(applyResult).toMatchObject({
+      currentModel: model,
+      status: 'blocked',
+      updateMode: 'blocked',
+    })
+    expect(() =>
+      getCanvasAppFeaturePackMarketplaceAssemblyItemActionInput(itemInput)
+    ).toThrow('Canvas app feature pack marketplace action is not ready: install')
   })
 
   it('marks runtime-toggle actions with partial surfaces as partial updates', () => {
