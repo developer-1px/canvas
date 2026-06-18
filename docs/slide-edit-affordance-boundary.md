@@ -32,6 +32,7 @@
 | Style clipboard | `slide-edit-affordance` | source object style categories, target applicability, and format painter command effects |
 | Slide transition timing | `slide-edit-affordance` | transition type, duration, click/after advance policy |
 | Text font family | `slide-edit-affordance` | selected text object font family options and command effects |
+| Text font size | `slide-edit-affordance` | selected text object font size limits, metadata, JSON paste, and command effects |
 | Text font weight | `slide-edit-affordance` | selected text object font weight JSON paste and command effects |
 | Text frame inset | `slide-edit-affordance` | text frame top/right/bottom/left inset metadata and command effects |
 | Text run formatting | `slide-edit-affordance` | selected text run bold/italic/underline JSON paste and command effects |
@@ -185,6 +186,21 @@
 | Fallback | unknown or empty family normalizes to fallback or first allowed option |
 | Updates | selected object id and normalized font family value become host command effects |
 | Runtime | host owns actual font loading, text layout, export mapping, and persistence |
+
+## Text Font Size JSON Paste Contract
+
+| Area | Contract |
+| --- | --- |
+| Value | numeric font size in `px`; default is `16` |
+| Bounds | values clamp to `1..400`, round to two decimals, and expose step `0.5` |
+| Field | `fontSize` stepper descriptor routes through `update-text-font-size` |
+| CSS | helper returns a stable pixel string such as `18px` |
+| Metadata | `data-slide-text-font-size` carries the normalized numeric value |
+| Custom MIME | `application/vnd.interactive-os.slide-edit.text-font-size+json` may carry a direct JSON number |
+| General JSON | `application/json` and `text/plain` require an explicit field key such as `textFontSize`, `fontSize`, `size`, or `value` |
+| Plain text | generic `text/plain` direct numbers such as `18` are not interpreted as font size |
+| Updates | selected slide id, text object id, field id, and normalized font size value become host command effects |
+| Scope | font size field values only; text measurement and auto-fit remain separate affordances |
 
 ## Text Font Weight JSON Paste Contract
 
