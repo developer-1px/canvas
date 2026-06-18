@@ -115,6 +115,12 @@ export {
   getCanvasAppFeaturePackMarketplaceActionAssemblyPlan,
   getCanvasAppFeaturePackMarketplaceActionAssemblyInput,
 } from '../workflow/CanvasAppFeaturePackAssembly'
+export {
+  createCanvasStoryCanvasFeaturePackAssemblyInput,
+  getCanvasStoryCanvasFeaturePackMarketplaceAssemblyModel,
+  type CanvasStoryCanvasFeaturePackAssemblyInput,
+  type CanvasStoryCanvasFeaturePackMarketplaceAssemblyModelInput,
+} from '../workflow/CanvasAppStoryCanvasAssembly'
 export type {
   CanvasAppStageExternalOverlaySlot,
 } from '../workflow/CanvasAppStageConsumerContracts'

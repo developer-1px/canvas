@@ -49,6 +49,7 @@ import {
   createCanvasAppFeaturePackMarketplaceListing,
   createCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan,
   createCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan,
+  createCanvasStoryCanvasFeaturePackAssemblyInput,
   executeCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan,
   executeCanvasAppFeaturePackMarketplaceAssemblyItemApplyTransaction,
   executeCanvasAppFeaturePackMarketplaceAssemblyApplyTransaction,
@@ -70,6 +71,7 @@ import {
   getCanvasAppFeaturePackMarketplaceAssemblyModel,
   getCanvasAppFeaturePackMarketplaceActionAssemblyPlan,
   getCanvasAppFeaturePackMarketplaceActionAssemblyInput,
+  getCanvasStoryCanvasFeaturePackMarketplaceAssemblyModel,
   centerCanvasViewportAtWorldPoint,
   createCanvasAppStageElement,
   createCanvasClipboardCommandEffectPlan,
@@ -1195,6 +1197,38 @@ describe('Canvas package consumer imports', () => {
       createCanvasStoryCanvasFeaturePackManifests(
         storyCanvasFeaturePackManifestsInput,
       )
+    const storyCanvasAssemblyInput =
+      createCanvasStoryCanvasFeaturePackAssemblyInput({
+        assemblyInput: {
+          additionalFeaturePackManifests: storyCanvasFeaturePackManifests,
+          featurePackStates: [
+            {
+              id: CANVAS_STORY_PREVIEW_ITEMS_FEATURE_PACK_ID,
+              status: 'uninstalled',
+            },
+            {
+              id: CANVAS_APP_STORY_IMPORT_FEATURE_PACK_MANIFEST.id,
+              status: 'uninstalled',
+            },
+          ],
+        },
+        ...storyCanvasFeaturePackManifestsInput,
+      })
+    const storyCanvasMarketplaceAssemblyModel =
+      getCanvasStoryCanvasFeaturePackMarketplaceAssemblyModel({
+        assemblyInput: storyCanvasAssemblyInput,
+        ...storyCanvasFeaturePackManifestsInput,
+      })
+    const storyCanvasMarketplaceAssemblySuiteItem =
+      storyCanvasMarketplaceAssemblyModel.marketplaceModel.suites.items.find(
+        (item) => item.suiteId === CANVAS_STORY_CANVAS_SUITE_ID,
+      )
+    const storyCanvasMarketplaceAssemblyPrimaryAction =
+      storyCanvasMarketplaceAssemblySuiteItem
+        ? getCanvasAppFeaturePackMarketplacePrimaryAction(
+          storyCanvasMarketplaceAssemblySuiteItem,
+        )
+        : null
     const viewManifestCategory: CanvasAppFeaturePackManifestCategory =
       viewManifest.category
     const featurePackManifestOrphanedDataPolicy:
@@ -2479,6 +2513,38 @@ describe('Canvas package consumer imports', () => {
         CANVAS_STORY_PREVIEW_ITEMS_FEATURE_PACK_ID,
         CANVAS_APP_STORY_IMPORT_FEATURE_PACK_MANIFEST.id,
       ])
+    expect(storyCanvasAssemblyInput.additionalFeaturePackManifests?.map(
+      (manifest) => manifest.id,
+    )).toEqual([
+      CANVAS_STORY_PREVIEW_ITEMS_FEATURE_PACK_ID,
+      CANVAS_APP_STORY_IMPORT_FEATURE_PACK_MANIFEST.id,
+    ])
+    expect(storyCanvasMarketplaceAssemblySuiteItem).toMatchObject({
+      missingFeaturePackIds: [],
+      primaryActionKind: 'install',
+      status: 'uninstalled',
+    })
+    expect(storyCanvasMarketplaceAssemblyPrimaryAction).toMatchObject({
+      changedFeaturePackIds: [
+        CANVAS_STORY_PREVIEW_ITEMS_FEATURE_PACK_ID,
+        CANVAS_APP_STORY_IMPORT_FEATURE_PACK_MANIFEST.id,
+      ],
+      kind: 'install',
+      ready: true,
+      status: 'ready',
+    })
+    expect(CanvasPackage.createCanvasStoryCanvasFeaturePackAssemblyInput)
+      .toBe(createCanvasStoryCanvasFeaturePackAssemblyInput)
+    expect(CanvasAppFacade.createCanvasStoryCanvasFeaturePackAssemblyInput)
+      .toBe(createCanvasStoryCanvasFeaturePackAssemblyInput)
+    expect(CanvasAppAuthoring.createCanvasStoryCanvasFeaturePackAssemblyInput)
+      .toBe(createCanvasStoryCanvasFeaturePackAssemblyInput)
+    expect(CanvasPackage.getCanvasStoryCanvasFeaturePackMarketplaceAssemblyModel)
+      .toBe(getCanvasStoryCanvasFeaturePackMarketplaceAssemblyModel)
+    expect(CanvasAppFacade.getCanvasStoryCanvasFeaturePackMarketplaceAssemblyModel)
+      .toBe(getCanvasStoryCanvasFeaturePackMarketplaceAssemblyModel)
+    expect(CanvasAppAuthoring.getCanvasStoryCanvasFeaturePackMarketplaceAssemblyModel)
+      .toBe(getCanvasStoryCanvasFeaturePackMarketplaceAssemblyModel)
     expect(CANVAS_APP_CORE_ONLY_FEATURE_PACK_PROFILE.installedFeaturePackIds)
       .toEqual([])
     expect(DEFAULT_CANVAS_APP_EDITOR_FEATURE_PACK_PROFILE.enabledFeaturePackIds)
