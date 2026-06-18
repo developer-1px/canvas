@@ -66,6 +66,7 @@ describe('Canvas App folder structure', () => {
       'shortcut-help',
       'stamp-authoring',
       'status-bar',
+      'story-canvas',
       'story-import',
       'story-preview',
       'table-import',
@@ -83,7 +84,7 @@ describe('Canvas App folder structure', () => {
         ),
       ).toBe(true)
       expect(getSourceFile(indexPath).source).toMatch(
-        /FeaturePackManifest|createCanvasAppFeaturePackManifest|createCanvasStoryPreviewItemsFeaturePack/,
+        /FEATURE_PACK_MANIFEST|FeaturePackManifest|createCanvasAppFeaturePackManifest|createCanvasStoryPreviewItemsFeaturePack/,
       )
     }
   })

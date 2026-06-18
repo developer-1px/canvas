@@ -372,6 +372,10 @@ export {
   type CanvasStoryImportStory,
 } from './story-import'
 export {
+  createCanvasStoryCanvasFeaturePackManifests,
+  type CanvasStoryCanvasFeaturePackManifestsInput,
+} from './story-canvas'
+export {
   CANVAS_APP_TABLE_IMPORT_FEATURE_PACK_MANIFEST,
   useCanvasTableImport,
   type CanvasTableImportInput,

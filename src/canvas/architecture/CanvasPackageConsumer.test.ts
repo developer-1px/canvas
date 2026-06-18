@@ -34,6 +34,7 @@ import {
   getCanvasAppFeaturePackMarketplaceActionAssemblyInput,
   createCanvasAppFeaturePackViewRenderers,
   createCanvasAppViewFeaturePack,
+  createCanvasStoryCanvasFeaturePackManifests,
   createCanvasStoryPreviewItemsFeaturePackManifest,
   getCanvasDataTransferText,
   downloadCanvasBlobFile,
@@ -59,6 +60,7 @@ import {
   CANVAS_COMPONENT_SYSTEM_SUITE_ID,
   CANVAS_STORY_CANVAS_FEATURE_PACK_SUITE_MANIFEST,
   CANVAS_STORY_CANVAS_SUITE_ID,
+  CANVAS_STORY_PREVIEW_ITEMS_FEATURE_PACK_ID,
   DEFAULT_CANVAS_APP_VIEW_FEATURE_PACKS,
   DEFAULT_CANVAS_APP_EDITOR_FEATURE_PACK_PROFILE,
   DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS,
@@ -158,6 +160,7 @@ import {
   type CanvasAppFeaturePackSuiteId,
   type CanvasAppFeaturePackSuiteManifest,
   type CanvasAppFeaturePackViewRenderers,
+  type CanvasStoryCanvasFeaturePackManifestsInput,
   type CanvasAppCustomItemModule,
   type CanvasAppCustomItemRenderKeyStrategy,
   type CanvasAppCustomItemRendererDescriptor,
@@ -654,10 +657,19 @@ describe('Canvas package consumer imports', () => {
         featurePackIds: ['smoke-pack'],
         profile: smokeSuiteProfile,
       }
-    const storyPreviewManifest = createCanvasStoryPreviewItemsFeaturePackManifest({
+    const storyCanvasFeaturePackManifestsInput:
+      CanvasStoryCanvasFeaturePackManifestsInput = {
       renderGroupItem: ({ groupLabel }) => groupLabel,
       renderPreviewItem: ({ storyId }) => storyId,
-    })
+    }
+    const storyPreviewManifest =
+      createCanvasStoryPreviewItemsFeaturePackManifest(
+        storyCanvasFeaturePackManifestsInput,
+      )
+    const storyCanvasFeaturePackManifests =
+      createCanvasStoryCanvasFeaturePackManifests(
+        storyCanvasFeaturePackManifestsInput,
+      )
     const viewManifestCategory: CanvasAppFeaturePackManifestCategory =
       viewManifest.category
 
@@ -989,6 +1001,11 @@ describe('Canvas package consumer imports', () => {
     })[0]?.instances[0]?.slots.root).toBe('story-consumer-widget-default')
     expect(storyPreviewManifest.extensionFeaturePack?.id)
       .toBe('story-preview-items')
+    expect(storyCanvasFeaturePackManifests.map((manifest) => manifest.id))
+      .toEqual([
+        CANVAS_STORY_PREVIEW_ITEMS_FEATURE_PACK_ID,
+        CANVAS_APP_STORY_IMPORT_FEATURE_PACK_MANIFEST.id,
+      ])
     expect(CANVAS_APP_CORE_ONLY_FEATURE_PACK_PROFILE.installedFeaturePackIds)
       .toEqual([])
     expect(DEFAULT_CANVAS_APP_EDITOR_FEATURE_PACK_PROFILE.enabledFeaturePackIds)
@@ -1570,6 +1587,12 @@ describe('Canvas package consumer imports', () => {
     expect(CanvasAppAuthoring.createCanvasAppFeaturePackExtensionBundle)
       .toBeTypeOf('function')
     expect(CanvasAppAuthoring.createCanvasAppFeaturePackManifest)
+      .toBeTypeOf('function')
+    expect(CanvasAppAuthoring.createCanvasStoryCanvasFeaturePackManifests)
+      .toBeTypeOf('function')
+    expect(CanvasAppFacade.createCanvasStoryCanvasFeaturePackManifests)
+      .toBeTypeOf('function')
+    expect(CanvasPackage.createCanvasStoryCanvasFeaturePackManifests)
       .toBeTypeOf('function')
     expect(CanvasAppAuthoring.getCanvasAppFeaturePackCatalog)
       .toBeTypeOf('function')
