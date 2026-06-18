@@ -1,4 +1,5 @@
 import {
+  getCanvasPointBounds,
   normalizeBounds,
   scaleItemBounds,
   type Bounds,
@@ -152,7 +153,7 @@ export function scaleCanvasDrawingItem<TItem extends CanvasDrawingItem>({
     return syncCanvasDrawingItemBounds({
       ...item,
       points: scalePointsToBounds({
-        from: getPointBounds(item.points),
+        from: getCanvasPointBounds(item.points),
         points: item.points,
         to: insetBounds(targetBounds, item.strokeWidth / 2),
       }),
@@ -160,7 +161,7 @@ export function scaleCanvasDrawingItem<TItem extends CanvasDrawingItem>({
   }
 
   if (isCanvasPathDrawingItem(item)) {
-    const sourcePathBounds = getPointBounds(
+    const sourcePathBounds = getCanvasPointBounds(
       getCanvasPathSegmentPoints(item.segments),
     )
 
@@ -191,14 +192,14 @@ export function scaleCanvasDrawingItem<TItem extends CanvasDrawingItem>({
 function getCanvasStrokeDrawingItemBounds(
   item: CanvasStrokeDrawingItem,
 ) {
-  return padBounds(getPointBounds(item.points), item.strokeWidth / 2)
+  return padBounds(getCanvasPointBounds(item.points), item.strokeWidth / 2)
 }
 
 function getCanvasPathDrawingItemBounds(
   item: CanvasPathDrawingItem,
 ) {
   return padBounds(
-    getPointBounds(getCanvasPathSegmentPoints(item.segments)),
+    getCanvasPointBounds(getCanvasPathSegmentPoints(item.segments)),
     item.strokeWidth / 2,
   )
 }
@@ -212,28 +213,6 @@ function getCanvasArrowDrawingItemBounds(item: ArrowItem) {
   return item.text?.trim()
     ? unionBounds(arrowBounds, getCanvasArrowLabelBounds(item))
     : arrowBounds
-}
-
-function getPointBounds(points: Point[]) {
-  const [first = { x: 0, y: 0 }] = points
-  let minX = first.x
-  let minY = first.y
-  let maxX = first.x
-  let maxY = first.y
-
-  for (const point of points.slice(1)) {
-    minX = Math.min(minX, point.x)
-    minY = Math.min(minY, point.y)
-    maxX = Math.max(maxX, point.x)
-    maxY = Math.max(maxY, point.y)
-  }
-
-  return {
-    x: minX,
-    y: minY,
-    w: maxX - minX,
-    h: maxY - minY,
-  }
 }
 
 function translatePoint(point: Point, dx: number, dy: number): Point {
