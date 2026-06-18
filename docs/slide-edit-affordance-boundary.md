@@ -16,6 +16,7 @@
 | Slide command effects | `slide-edit-affordance` | product-neutral command envelopes routed to the host |
 | Slide rail interaction | `slide-edit-affordance` | active slide, slide order, thumbnail hit target, rail command intent |
 | Color swatch palette | `slide-edit-affordance` | theme/recent color swatches, channel state, and color apply command effect |
+| Comment thread patch | `slide-edit-affordance` | comment/thread JSON paste parsing, common patch normalization, and host command effect |
 | Placeholder visibility affordance | `slide-edit-affordance` | slide placeholder structure and object hide/show read model |
 | Object layer pane | `slide-edit-affordance` | object row descriptor, selection pane command intent, ARIA tree contract |
 | Object accessibility | `slide-edit-affordance` | object alt text, decorative state, metadata attribute, and host command effect |
@@ -486,6 +487,19 @@
 | JSON payloads | generic JSON requires `imageReplace`, `imageSource`, `objectImage`, or `replacementImage` wrapper; custom MIME may carry direct source JSON |
 | Selection | exactly one supported image target can produce a command effect |
 | No-op | locked, hidden, mixed, and unsupported targets return unavailable route metadata |
+
+## Comment Thread Patch Contract
+
+| Area | Contract |
+| --- | --- |
+| JSON candidates | comment-thread custom MIME, `application/json`, `text/json`, and `text/plain` are checked in order |
+| JSON payloads | custom MIME may carry direct payload; generic JSON requires `comment`, `commentThread`, or `reviewComment` wrapper |
+| Fields | `body`/`text`, `resolved`, `createdAt`, `thread`, `messages`, and `replies` normalize into one comment patch |
+| Messages | string messages and `{ id, authorName, createdAt, body/text }` objects are accepted |
+| Body sync | when body is present, the first thread message body is synchronized with it |
+| Host policy | body length, reply length, message id creation, storage mutation, and hidden/locked target policy stay host-owned |
+| Metadata | command effect metadata carries target ids, fields, message count, resolved state, format, and payload length |
+| No-op | missing selected comment, hidden/locked target, parse failure, direct generic JSON, or missing patch fields returns `null` |
 
 ## Slide Object Clipboard Contract
 
