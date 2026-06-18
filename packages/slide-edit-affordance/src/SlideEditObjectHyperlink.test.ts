@@ -21,6 +21,8 @@ import {
 } from './SlideEditObjectHyperlink'
 import {
   getSlideEditObjectHyperlinkJSONPasteValue as getSlideEditObjectHyperlinkJSONPasteValueFromPackage,
+  normalizeSlideEditObjectHyperlinkStorageUrl as normalizeSlideEditObjectHyperlinkStorageUrlFromPackage,
+  type SlideEditObjectHyperlinkUrlStoragePolicy,
 } from './index'
 
 describe('SlideEditObjectHyperlink', () => {
@@ -136,12 +138,14 @@ describe('SlideEditObjectHyperlink', () => {
   })
 
   it('normalizes host storage URLs with configurable policy', () => {
-    expect(normalizeSlideEditObjectHyperlinkStorageUrl(
+    const storagePolicy = {
+      blockedSchemes: ['javascript', 'data', 'vbscript'],
+      maxLength: 12,
+    } satisfies SlideEditObjectHyperlinkUrlStoragePolicy
+
+    expect(normalizeSlideEditObjectHyperlinkStorageUrlFromPackage(
       '  example.com/reference  ',
-      {
-        blockedSchemes: ['javascript', 'data', 'vbscript'],
-        maxLength: 12,
-      },
+      storagePolicy,
     )).toBe('example.com/')
     expect(normalizeSlideEditObjectHyperlinkStorageUrl(
       'javascript:alert(1)',
