@@ -250,6 +250,16 @@ export function getCanvasDataImageSourceFromDataTransfer(
     )
 }
 
+export function getCanvasHTMLDataImageSourcesFromDataTransfer(
+  dataTransfer: DataTransfer | null,
+): readonly CanvasImageImportSource[] {
+  if (!dataTransfer) {
+    return []
+  }
+
+  return getCanvasHTMLDataImageSources(dataTransfer.getData('text/html'))
+}
+
 export function getCanvasImageSourceFromDataTransfer(
   dataTransfer: DataTransfer | null,
 ): CanvasImageImportSource | null {
@@ -359,6 +369,34 @@ function getCanvasDataImageSourceFromHTML(value: string) {
     'data-url-html-img',
     image.alt || image.title || undefined,
   )
+}
+
+function getCanvasHTMLDataImageSources(value: string) {
+  const seenDataUrls = new Set<string>()
+  const sources: CanvasImageImportSource[] = []
+
+  for (const image of getCanvasHTMLImageSources(value)) {
+    const source = isCanvasSVGDataUrl(image.src)
+      ? getCanvasSVGImageSourceFromMarkup(
+          image.src,
+          'svg-html-img',
+          image.alt || image.title || undefined,
+        )
+      : getCanvasDataImageSourceFromDataUrl(
+          image.src,
+          'data-url-html-img',
+          image.alt || image.title || undefined,
+        )
+
+    if (!source || seenDataUrls.has(source.dataUrl)) {
+      continue
+    }
+
+    seenDataUrls.add(source.dataUrl)
+    sources.push(source)
+  }
+
+  return sources
 }
 
 function getCanvasDataImageSourceFromDataUrl(
@@ -505,24 +543,33 @@ function getCanvasHTMLImageSource(
   value: string,
   options: { svgOnly?: boolean } = {},
 ) {
+  return getCanvasHTMLImageSources(value, options)[0] ?? null
+}
+
+function getCanvasHTMLImageSources(
+  value: string,
+  options: { svgOnly?: boolean } = {},
+) {
   if (!value) {
-    return null
+    return []
   }
 
   if (typeof DOMParser !== 'undefined') {
     const doc = new DOMParser().parseFromString(value, 'text/html')
-    const image = Array.from(
-      doc.querySelectorAll<HTMLImageElement>('img[src^="data:image/"]'),
-    ).find((item) => !options.svgOnly || isCanvasSVGDataUrl(item.src))
 
-    return image?.src
-      ? {
-          alt: image.alt,
-          src: image.src,
-          title: image.title,
-        }
-      : null
+    return Array.from(doc.querySelectorAll<HTMLImageElement>('img[src]'))
+      .map((image) => ({
+        alt: image.alt,
+        src: image.getAttribute('src')?.trim() ?? '',
+        title: image.title,
+      }))
+      .filter((image) =>
+        /^data:image\//i.test(image.src) &&
+        (!options.svgOnly || isCanvasSVGDataUrl(image.src)),
+      )
   }
+
+  const images: Array<{ alt: string; src: string; title: string }> = []
 
   for (const match of value.matchAll(/<img\b([^>]*)>/gi)) {
     const attributes = match[1]
@@ -532,15 +579,15 @@ function getCanvasHTMLImageSource(
       src?.trim().match(/^data:image\//i) &&
       (!options.svgOnly || isCanvasSVGDataUrl(src))
     ) {
-      return {
+      images.push({
         alt: getCanvasHTMLAttribute(attributes, 'alt') ?? '',
         src,
         title: getCanvasHTMLAttribute(attributes, 'title') ?? '',
-      }
+      })
     }
   }
 
-  return null
+  return images
 }
 
 function getCanvasInlineSVGFromHTML(value: string) {

@@ -4,6 +4,7 @@ import {
   createCanvasImportedImageItem,
   getCanvasImportedImageSize,
   getCanvasDataImageSourceFromDataTransfer,
+  getCanvasHTMLDataImageSourcesFromDataTransfer,
   getCanvasSVGImageSourceFromDataTransfer,
   routeCanvasImagePasteReplace,
 } from './CanvasImageImport'
@@ -145,6 +146,74 @@ describe('CanvasImageImport', () => {
     expect(getCanvasDataImageSourceFromDataTransfer(createDataTransfer({
       'text/plain': `data:image/svg+xml,${encodeURIComponent('<svg></svg>')}`,
     }))).toBeNull()
+  })
+
+  it('collects multiple HTML data image sources in document order', () => {
+    const svgDataUrl = `data:image/svg+xml,${
+      encodeURIComponent(
+        '<svg width="16" height="12" onload="alert(1)"><script>alert(1)</script><rect width="16" height="12"/></svg>',
+      )
+    }`
+    const sources = getCanvasHTMLDataImageSourcesFromDataTransfer(
+      createDataTransfer({
+        'text/html': [
+          '<section>',
+          '<img alt="Copied Chart" src="data:image/png;base64,aW1hZ2Ux">',
+          `<img title="Icon" src="${svgDataUrl}">`,
+          '<img alt="Duplicate" src="data:image/png;base64,aW1hZ2Ux">',
+          '<img src="data:text/plain,hello">',
+          '<img src="https://example.com/image.png">',
+          '<img title="Photo.jpeg" src="data:image/jpg;base64,aW1hZ2Uy">',
+          '</section>',
+        ].join(''),
+      }),
+    )
+    const decodedSvg = decodeURIComponent(sources[1]?.dataUrl.split(',')[1] ?? '')
+
+    expect(sources).toMatchObject([
+      {
+        dataUrl: 'data:image/png;base64,aW1hZ2Ux',
+        format: 'data-url-html-img',
+        mimeType: 'image/png',
+        name: 'Copied Chart.png',
+      },
+      {
+        format: 'svg-html-img',
+        mimeType: 'image/svg+xml',
+        name: 'Icon.svg',
+        naturalHeight: 12,
+        naturalWidth: 16,
+      },
+      {
+        dataUrl: 'data:image/jpg;base64,aW1hZ2Uy',
+        format: 'data-url-html-img',
+        mimeType: 'image/jpeg',
+        name: 'Photo.jpg',
+      },
+    ])
+    expect(sources).toHaveLength(3)
+    expect(decodedSvg).not.toContain('<script')
+    expect(decodedSvg).not.toContain('onload=')
+  })
+
+  it('returns one HTML data image source for a single image fixture', () => {
+    expect(getCanvasHTMLDataImageSourcesFromDataTransfer(createDataTransfer({
+      'text/html': '<figure><img alt="One" src="data:image/webp;base64,aW1hZ2U="></figure>',
+    }))).toEqual([{
+      dataUrl: 'data:image/webp;base64,aW1hZ2U=',
+      format: 'data-url-html-img',
+      mimeType: 'image/webp',
+      name: 'One.webp',
+    }])
+  })
+
+  it('ignores HTML data URLs that are not image sources', () => {
+    expect(getCanvasHTMLDataImageSourcesFromDataTransfer(createDataTransfer({
+      'text/html': [
+        '<img src="data:text/plain,hello">',
+        '<img src="https://example.com/image.png">',
+      ].join(''),
+    }))).toEqual([])
   })
 
   it('routes a single pasted image source to a host replace target', () => {

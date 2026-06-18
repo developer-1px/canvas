@@ -28,6 +28,7 @@ export {
 export {
   createCanvasImportedImageItem,
   getCanvasDataImageSourceFromDataTransfer,
+  getCanvasHTMLDataImageSourcesFromDataTransfer,
   getCanvasImageFileFromDataTransfer,
   getCanvasImageFileFromList,
   getCanvasImageSourceFromDataTransfer,
