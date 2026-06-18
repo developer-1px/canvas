@@ -500,6 +500,14 @@ export {
   CanvasAppViewportOverlayLayer,
   type CanvasAppViewportOverlayLayerProps,
 } from './rendering/CanvasAppViewportOverlayLayer'
+export {
+  createCanvasAppStageElement,
+  useCanvasAppStageElement,
+  type CanvasAppStageElement,
+  type CanvasAppStageElementController,
+  type CanvasAppStageRect,
+  type CreateCanvasAppStageElementInput,
+} from './rendering/stage/CanvasAppStageElement'
 export type {
   CanvasAppAssemblySource,
 } from './shell/CanvasAppAssemblySource'

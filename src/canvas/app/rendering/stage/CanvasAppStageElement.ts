@@ -93,7 +93,7 @@ export type CanvasAppStageElementController = CanvasAppStageElement & {
   mount: CanvasAppStageElementMount
 }
 
-type CreateCanvasAppStageElementInput = {
+export type CreateCanvasAppStageElementInput = {
   getElement: () => CanvasAppStageDomElement | null
   setElement: RefCallback<Element>
 }

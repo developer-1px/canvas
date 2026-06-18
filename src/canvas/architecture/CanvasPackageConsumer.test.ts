@@ -37,6 +37,7 @@ import {
   getCanvasAppFeaturePackMarketplaceActionAssemblyPlan,
   getCanvasAppFeaturePackMarketplaceActionAssemblyInput,
   centerCanvasViewportAtWorldPoint,
+  createCanvasAppStageElement,
   createCanvasExternalClipboardImagePasteActionResolver,
   createCanvasExternalClipboardPasteActionPlan,
   createCanvasPlainTextPasteSource,
@@ -62,6 +63,7 @@ import {
   previewCanvasPointerPanInteraction,
   resetCanvasViewport,
   startCanvasPointerPanInteraction,
+  useCanvasAppStageElement,
   zoomCanvasViewport,
   defineCanvasAppCustomItemModule,
   CANVAS_APP_CORE_ONLY_FEATURE_PACK_PROFILE,
@@ -204,7 +206,10 @@ import {
   type CanvasAppItemLayerAdapter,
   type CanvasAppProps,
   type CanvasAppPointerInput,
+  type CanvasAppStageElement,
+  type CanvasAppStageElementController,
   type CanvasAppStageExternalOverlaySlot,
+  type CanvasAppStageRect,
   type CanvasAppStageAdapter,
   type CanvasAppStageMount,
   type CanvasControlTargetInput,
@@ -241,6 +246,7 @@ import {
   type CanvasWorldClientPointInput,
   type CanvasWorldClientPointStageElement,
   type CanvasCustomItem,
+  type CreateCanvasAppStageElementInput,
   type CanvasEditableTextItem,
   type CanvasItem,
 } from '@interactive-os/canvas'
@@ -1452,6 +1458,52 @@ describe('Canvas package consumer imports', () => {
       getViewportCenter: () => ({ x: 100, y: 120 }),
     }
     const appFacadeViewport = { scale: 2, x: 10, y: 20 }
+    const packageStageRect: CanvasAppStageRect = {
+      height: 120,
+      left: 20,
+      top: 30,
+      width: 240,
+    }
+    const packageStageCapturedPointers = new Set<number>()
+    const packageStageWheelListeners =
+      new Set<(event: globalThis.WheelEvent) => void>()
+    const packageStageParentElement = {
+      addEventListener: (
+        _type: 'wheel',
+        listener: (event: globalThis.WheelEvent) => void,
+      ) => {
+        packageStageWheelListeners.add(listener)
+      },
+      removeEventListener: (
+        _type: 'wheel',
+        listener: (event: globalThis.WheelEvent) => void,
+      ) => {
+        packageStageWheelListeners.delete(listener)
+      },
+    } as Element
+    const packageStageDomElement = {
+      addEventListener: () => undefined,
+      contains: () => true,
+      getBoundingClientRect: () => packageStageRect,
+      hasPointerCapture: (pointerId: number) =>
+        packageStageCapturedPointers.has(pointerId),
+      parentElement: packageStageParentElement,
+      releasePointerCapture: (pointerId: number) => {
+        packageStageCapturedPointers.delete(pointerId)
+      },
+      removeEventListener: () => undefined,
+      setPointerCapture: (pointerId: number) => {
+        packageStageCapturedPointers.add(pointerId)
+      },
+    } as NonNullable<ReturnType<CreateCanvasAppStageElementInput['getElement']>>
+    const packageStageElementInput: CreateCanvasAppStageElementInput = {
+      getElement: () => packageStageDomElement,
+      setElement: () => undefined,
+    }
+    const packageStageElementController: CanvasAppStageElementController =
+      createCanvasAppStageElement(packageStageElementInput)
+    const packageStageElement: CanvasAppStageElement =
+      packageStageElementController
     const viewportControlStageElement = {
       getRect: () => ({
         height: 100,
@@ -1490,6 +1542,26 @@ describe('Canvas package consumer imports', () => {
     )
     expect(CanvasAppFacade.createCanvasAppCustomItemModuleAssembly)
       .toBeTypeOf('function')
+    expect(useCanvasAppStageElement).toBeTypeOf('function')
+    expect(CanvasAppFacade.useCanvasAppStageElement)
+      .toBe(useCanvasAppStageElement)
+    expect(CanvasAppFacade.createCanvasAppStageElement)
+      .toBe(createCanvasAppStageElement)
+    expect(packageStageElementController.mount.ref).toBeTypeOf('function')
+    expect(packageStageElement.getRect()).toEqual(packageStageRect)
+    expect(packageStageElement.getScreenPoint({ clientX: 70, clientY: 90 }))
+      .toEqual({ x: 50, y: 60 })
+    expect(packageStageElement.getViewportCenter({ scale: 2, x: 10, y: 20 }))
+      .toEqual({ x: 55, y: 20 })
+    packageStageElement.capturePointer(9)
+    expect([...packageStageCapturedPointers]).toEqual([9])
+    packageStageElement.releasePointer(9)
+    expect([...packageStageCapturedPointers]).toEqual([])
+    const cleanupPackageStageWheelListener =
+      packageStageElement.addWheelListener(() => undefined)
+    expect(packageStageWheelListeners.size).toBe(1)
+    cleanupPackageStageWheelListener()
+    expect(packageStageWheelListeners.size).toBe(0)
     expect(CANVAS_CONTROL_TARGET_SELECTOR).toContain('button')
     expect(CanvasAppFacade.CANVAS_CONTROL_TARGET_SELECTOR).toContain('button')
     expect(CANVAS_WHEEL_PASSTHROUGH_SELECTOR).toContain(

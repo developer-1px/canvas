@@ -99,7 +99,8 @@ describe('CanvasAppStageElement', () => {
   })
 
   it('owns wheel listener registration and cleanup', () => {
-    const { element, parentWheelListeners } = createStageElementFake()
+    const { element, parentWheelListenerOptions, parentWheelListeners } =
+      createStageElementFake()
     const stageElement = createCanvasAppStageElement({
       getElement: () => element,
       setElement: () => undefined,
@@ -113,6 +114,10 @@ describe('CanvasAppStageElement', () => {
     const cleanup = stageElement.addWheelListener(handler)
 
     expect(parentWheelListeners.size).toBe(1)
+    expect(parentWheelListenerOptions).toEqual([{
+      capture: true,
+      passive: false,
+    }])
 
     for (const listener of parentWheelListeners) {
       listener(wheelEvent)
@@ -215,12 +220,17 @@ function createStageElementFake(
   const capturedPointers = new Set<number>()
   const wheelListeners = new Set<(event: globalThis.WheelEvent) => void>()
   const parentWheelListeners = new Set<(event: globalThis.WheelEvent) => void>()
+  const parentWheelListenerOptions: AddEventListenerOptions[] = []
   const parentElement = {
     addEventListener: (
       _type: 'wheel',
       listener: (event: globalThis.WheelEvent) => void,
+      options?: AddEventListenerOptions,
     ) => {
       parentWheelListeners.add(listener)
+      if (options) {
+        parentWheelListenerOptions.push(options)
+      }
     },
     removeEventListener: (
       _type: 'wheel',
@@ -251,6 +261,7 @@ function createStageElementFake(
   return {
     capturedPointers,
     element,
+    parentWheelListenerOptions,
     parentWheelListeners,
     wheelListeners,
   }
