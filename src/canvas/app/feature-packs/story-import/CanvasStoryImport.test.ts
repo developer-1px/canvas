@@ -1,13 +1,24 @@
 import { describe, expect, it } from 'vitest'
 import {
+  createCanvasDataTransferImportActionPlanFromRegistry,
+  createCanvasDataTransferImportRegistry,
+  getCanvasDataTransferImportRegistryMetadata,
+} from '../../affordances/commands/CanvasDataTransferImportRegistry'
+import {
   CANVAS_STORY_PREVIEW_GROUP_KIND,
   CANVAS_STORY_PREVIEW_GROUP_PRESENTATION,
   CANVAS_STORY_PREVIEW_ITEM_KIND,
   CANVAS_STORY_PREVIEW_ITEM_PRESENTATION,
 } from '../story-preview'
 import {
+  CANVAS_STORY_IMPORT_JSON_KIND,
+  CANVAS_STORY_IMPORT_JSON_MIME_TYPE,
+  CANVAS_STORY_IMPORT_JSON_VERSION,
+  createCanvasStoryImportActionFromDataTransfer,
   createCanvasStoryImportComponentDefinitions,
+  createCanvasStoryImportDataTransferActionResolver,
   createCanvasStoryImportItems,
+  parseCanvasStoryImportJSONPayload,
 } from './CanvasStoryImport'
 
 describe('CanvasStoryImport', () => {
@@ -250,4 +261,144 @@ describe('CanvasStoryImport', () => {
       'Duplicate canvas story import component definition: story-import-component-card',
     )
   })
+
+  it('creates a story import action from DataTransfer JSON candidates', () => {
+    const payload = {
+      input: createStoryImportInput(),
+      kind: CANVAS_STORY_IMPORT_JSON_KIND,
+      version: CANVAS_STORY_IMPORT_JSON_VERSION,
+    }
+    const getData = (format: string) => {
+      if (format === CANVAS_STORY_IMPORT_JSON_MIME_TYPE) {
+        return '{'
+      }
+
+      if (format === 'application/json') {
+        return JSON.stringify(payload)
+      }
+
+      return ''
+    }
+    const action = createCanvasStoryImportActionFromDataTransfer({
+      dataTransfer: { getData },
+    })
+
+    expect(action).toMatchObject({
+      kind: 'story-import',
+      readResult: {
+        candidateIndex: 1,
+        mimeType: 'application/json',
+        source: 'application-json',
+      },
+    })
+    expect(action?.items.map((item) => item.id)).toEqual([
+      'group-component-card',
+      'story-card-default',
+    ])
+    expect(action?.componentDefinitions).toEqual([
+      {
+        id: 'story-import-component-card',
+        instances: [{
+          label: 'Default',
+          slots: {
+            root: 'story-card-default',
+          },
+        }],
+        label: 'ComponentCard',
+        source: {
+          exportName: 'ComponentCard',
+          importPath: 'src/widgets/component-card',
+          layer: 'widgets',
+        },
+      },
+    ])
+  })
+
+  it('creates a registry resolver for story import DataTransfer actions', () => {
+    const resolver = createCanvasStoryImportDataTransferActionResolver({
+      order: 8,
+      scope: ['clipboard-paste', 'stage-drop'],
+      title: 'Import stories',
+    })
+    const registry = createCanvasDataTransferImportRegistry({
+      resolvers: [resolver],
+    })
+    const dataTransfer = {
+      getData: (format: string) =>
+        format === CANVAS_STORY_IMPORT_JSON_MIME_TYPE
+          ? JSON.stringify(createStoryImportInput())
+          : '',
+    }
+
+    expect(getCanvasDataTransferImportRegistryMetadata({
+      registry,
+      scope: 'clipboard-paste',
+    })).toEqual([{
+      id: 'story-import',
+      mode: 'exclusive',
+      order: 0,
+      scope: 'clipboard-paste',
+      supportedFormats: [
+        CANVAS_STORY_IMPORT_JSON_MIME_TYPE,
+        'application/json',
+        'text/json',
+        'text/plain',
+      ],
+      title: 'Import stories',
+    }])
+    expect(createCanvasDataTransferImportActionPlanFromRegistry({
+      dataTransfer,
+      registry,
+      scope: 'stage-drop',
+    })[0]?.items.map((item) => item.id)).toEqual([
+      'group-component-card',
+      'story-card-default',
+    ])
+    expect(createCanvasDataTransferImportActionPlanFromRegistry({
+      dataTransfer,
+      registry,
+      scope: 'other-scope',
+    })).toEqual([])
+  })
+
+  it('parses raw story import inputs and rejects unrelated JSON payloads', () => {
+    expect(parseCanvasStoryImportJSONPayload(createStoryImportInput()).groups)
+      .toHaveLength(1)
+    expect(() => parseCanvasStoryImportJSONPayload({
+      groups: [{
+        id: 'broken',
+        stories: [],
+      }],
+    })).toThrow('Invalid canvas story import group h')
+    expect(() => parseCanvasStoryImportJSONPayload({
+      input: createStoryImportInput(),
+      kind: 'other-import',
+    })).toThrow('Invalid canvas story import payload kind')
+  })
 })
+
+function createStoryImportInput() {
+  return {
+    groups: [{
+      h: 120,
+      id: 'component-card',
+      label: 'ComponentCard',
+      source: {
+        exportName: 'ComponentCard',
+        importPath: 'src/widgets/component-card',
+        layer: 'widgets',
+      },
+      stories: [{
+        h: 80,
+        id: 'card-default',
+        title: 'Default',
+        w: 160,
+        x: 24,
+        y: 24,
+      }],
+      w: 220,
+      x: 40,
+      y: 64,
+    }],
+  }
+}

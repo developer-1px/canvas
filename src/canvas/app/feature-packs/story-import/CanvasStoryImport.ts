@@ -7,6 +7,16 @@ import {
   type CanvasComponentSource,
 } from '../../../host'
 import {
+  readCanvasDataTransferJSONCandidate,
+  type CanvasDataTransferJSONCandidate,
+  type CanvasDataTransferJSONCandidateReadResult,
+  type CanvasTextDataTransfer,
+} from '../../affordances/commands/CanvasDataTransferText'
+import type {
+  CanvasDataTransferImportRegistryResolver,
+  CanvasDataTransferImportRegistryScope,
+} from '../../affordances/commands/CanvasDataTransferImportRegistry'
+import {
   CANVAS_STORY_PREVIEW_GROUP_KIND,
   CANVAS_STORY_PREVIEW_GROUP_PRESENTATION,
   CANVAS_STORY_PREVIEW_ITEM_KIND,
@@ -14,6 +24,11 @@ import {
   type CanvasStoryPreviewGroupData,
   type CanvasStoryPreviewItemData,
 } from '../story-preview'
+
+export const CANVAS_STORY_IMPORT_JSON_KIND = 'canvas-story-import'
+export const CANVAS_STORY_IMPORT_JSON_MIME_TYPE =
+  'application/vnd.interactive-os.canvas.story-import+json'
+export const CANVAS_STORY_IMPORT_JSON_VERSION = 1
 
 export type CanvasStoryImportStory = Readonly<{
   h: number
@@ -40,6 +55,82 @@ export type CanvasStoryImportGroup = Readonly<{
 export type CanvasStoryImportInput = Readonly<{
   groups: readonly CanvasStoryImportGroup[]
 }>
+
+export type CanvasStoryImportJSONPayload =
+  | CanvasStoryImportInput
+  | Readonly<{
+    input: CanvasStoryImportInput
+    kind: typeof CANVAS_STORY_IMPORT_JSON_KIND
+    version?: typeof CANVAS_STORY_IMPORT_JSON_VERSION
+  }>
+
+export type CanvasStoryImportDataTransferJSONCandidate =
+  CanvasDataTransferJSONCandidate & Readonly<{
+    source:
+      | 'application-json'
+      | 'story-import-json'
+      | 'text-json'
+      | 'text-plain'
+  }>
+
+export type CanvasStoryImportDataTransferReadResult =
+  CanvasDataTransferJSONCandidateReadResult<
+    CanvasStoryImportInput,
+    CanvasStoryImportDataTransferJSONCandidate
+  >
+
+export type CanvasStoryImportAction = Readonly<{
+  componentDefinitions: readonly CanvasComponentDefinition[]
+  input: CanvasStoryImportInput
+  items: readonly CanvasCustomItem[]
+  kind: 'story-import'
+  readResult?: CanvasStoryImportDataTransferReadResult
+}>
+
+export type CanvasStoryImportActionInput = Readonly<{
+  input: CanvasStoryImportInput
+  readResult?: CanvasStoryImportDataTransferReadResult
+}>
+
+export type CanvasStoryImportDataTransferReadInput = Readonly<{
+  candidates?: readonly CanvasStoryImportDataTransferJSONCandidate[]
+  dataTransfer: CanvasTextDataTransfer | null
+}>
+
+export type CanvasStoryImportDataTransferActionInput =
+  CanvasStoryImportDataTransferReadInput
+
+export type CanvasStoryImportDataTransferActionResolverInput<
+  TScope extends CanvasDataTransferImportRegistryScope =
+    CanvasDataTransferImportRegistryScope,
+> = Readonly<{
+  candidates?: readonly CanvasStoryImportDataTransferJSONCandidate[]
+  id?: string
+  mode?: 'append' | 'exclusive'
+  order?: number
+  scope: TScope | readonly TScope[]
+  title?: string
+}>
+
+export const DEFAULT_CANVAS_STORY_IMPORT_DATA_TRANSFER_JSON_CANDIDATES:
+  readonly CanvasStoryImportDataTransferJSONCandidate[] = Object.freeze([
+    Object.freeze({
+      mimeType: CANVAS_STORY_IMPORT_JSON_MIME_TYPE,
+      source: 'story-import-json',
+    }),
+    Object.freeze({
+      mimeType: 'application/json',
+      source: 'application-json',
+    }),
+    Object.freeze({
+      mimeType: 'text/json',
+      source: 'text-json',
+    }),
+    Object.freeze({
+      mimeType: 'text/plain',
+      source: 'text-plain',
+    }),
+  ])
 
 export function createCanvasStoryImportItems({
   groups,
@@ -89,6 +180,91 @@ export function createCanvasStoryImportComponentDefinitions({
   }
 
   return Object.freeze(definitions)
+}
+
+export function parseCanvasStoryImportJSONPayload(
+  json: unknown,
+): CanvasStoryImportInput {
+  const input = unwrapCanvasStoryImportJSONPayload(json)
+
+  assertCanvasStoryImportInput(input)
+
+  return input
+}
+
+export function readCanvasStoryImportDataTransfer({
+  candidates = DEFAULT_CANVAS_STORY_IMPORT_DATA_TRANSFER_JSON_CANDIDATES,
+  dataTransfer,
+}: CanvasStoryImportDataTransferReadInput):
+  CanvasStoryImportDataTransferReadResult | null {
+  return readCanvasDataTransferJSONCandidate<
+    CanvasStoryImportInput,
+    CanvasStoryImportDataTransferJSONCandidate
+  >({
+    candidates,
+    dataTransfer,
+    parseValue: ({ json }) => parseCanvasStoryImportJSONPayload(json),
+  })
+}
+
+export function createCanvasStoryImportAction({
+  input,
+  readResult,
+}: CanvasStoryImportActionInput): CanvasStoryImportAction {
+  assertCanvasStoryImportInput(input)
+
+  return Object.freeze({
+    componentDefinitions: createCanvasStoryImportComponentDefinitions(input),
+    input,
+    items: createCanvasStoryImportItems(input),
+    kind: 'story-import',
+    readResult,
+  })
+}
+
+export function createCanvasStoryImportActionFromDataTransfer(
+  input: CanvasStoryImportDataTransferActionInput,
+): CanvasStoryImportAction | null {
+  const readResult = readCanvasStoryImportDataTransfer(input)
+
+  if (!readResult) {
+    return null
+  }
+
+  return createCanvasStoryImportAction({
+    input: readResult.value,
+    readResult,
+  })
+}
+
+export function createCanvasStoryImportDataTransferActionResolver<
+  TScope extends CanvasDataTransferImportRegistryScope =
+    CanvasDataTransferImportRegistryScope,
+>({
+  candidates,
+  id = 'story-import',
+  mode = 'exclusive',
+  order,
+  scope,
+  title = 'Story import',
+}: CanvasStoryImportDataTransferActionResolverInput<TScope>):
+  CanvasDataTransferImportRegistryResolver<CanvasStoryImportAction, TScope> {
+  return Object.freeze({
+    id,
+    mode,
+    order,
+    resolve: ({ dataTransfer }) =>
+      createCanvasStoryImportActionFromDataTransfer({
+        candidates,
+        dataTransfer,
+      }),
+    scope,
+    supportedFormats: Object.freeze([
+      ...(candidates ?? DEFAULT_CANVAS_STORY_IMPORT_DATA_TRANSFER_JSON_CANDIDATES)
+        .map((candidate) => candidate.mimeType),
+    ]),
+    title,
+  })
 }
 
 function createCanvasStoryImportComponentDefinition(
@@ -171,4 +347,147 @@ function assertCanvasStoryImportUniqueComponentDefinitionId(
   }
 
   definitionIds.add(definitionId)
+}
+
+function unwrapCanvasStoryImportJSONPayload(
+  json: unknown,
+): CanvasStoryImportInput {
+  assertCanvasJsonObject(json, 'canvas story import payload')
+
+  if ('kind' in json) {
+    if (json.kind !== CANVAS_STORY_IMPORT_JSON_KIND) {
+      throw new Error('Invalid canvas story import payload kind')
+    }
+
+    if (
+      'version' in json &&
+      json.version !== CANVAS_STORY_IMPORT_JSON_VERSION
+    ) {
+      throw new Error('Invalid canvas story import payload version')
+    }
+
+    if (!('input' in json)) {
+      throw new Error('Missing canvas story import payload input')
+    }
+
+    return json.input as CanvasStoryImportInput
+  }
+
+  return json as CanvasStoryImportInput
+}
+
+function assertCanvasStoryImportInput(
+  input: CanvasStoryImportInput,
+) {
+  assertCanvasJsonObject(input, 'canvas story import input')
+
+  if (!Array.isArray(input.groups)) {
+    throw new Error('Invalid canvas story import groups')
+  }
+
+  input.groups.forEach(assertCanvasStoryImportGroup)
+}
+
+function assertCanvasStoryImportGroup(
+  group: unknown,
+) {
+  assertCanvasJsonObject(group, 'canvas story import group')
+  assertCanvasStoryImportString(group.id, 'canvas story import group id')
+  assertCanvasStoryImportFiniteNumber(group.h, 'canvas story import group h')
+  assertCanvasStoryImportFiniteNumber(group.w, 'canvas story import group w')
+  assertCanvasStoryImportFiniteNumber(group.x, 'canvas story import group x')
+  assertCanvasStoryImportFiniteNumber(group.y, 'canvas story import group y')
+
+  if (
+    group.count !== undefined &&
+    !Number.isFinite(group.count)
+  ) {
+    throw new Error('Invalid canvas story import group count')
+  }
+
+  if (
+    group.label !== undefined &&
+    group.label !== null &&
+    typeof group.label !== 'string'
+  ) {
+    throw new Error('Invalid canvas story import group label')
+  }
+
+  if (
+    group.title !== undefined &&
+    typeof group.title !== 'string'
+  ) {
+    throw new Error('Invalid canvas story import group title')
+  }
+
+  if (group.source !== undefined) {
+    assertCanvasStoryImportSource(group.source)
+  }
+
+  if (!Array.isArray(group.stories)) {
+    throw new Error('Invalid canvas story import group stories')
+  }
+
+  group.stories.forEach(assertCanvasStoryImportStory)
+}
+
+function assertCanvasStoryImportStory(
+  story: unknown,
+) {
+  assertCanvasJsonObject(story, 'canvas story import story')
+  assertCanvasStoryImportString(story.id, 'canvas story import story id')
+  assertCanvasStoryImportString(story.title, 'canvas story import story title')
+  assertCanvasStoryImportFiniteNumber(story.h, 'canvas story import story h')
+  assertCanvasStoryImportFiniteNumber(story.w, 'canvas story import story w')
+  assertCanvasStoryImportFiniteNumber(story.x, 'canvas story import story x')
+  assertCanvasStoryImportFiniteNumber(story.y, 'canvas story import story y')
+}
+
+function assertCanvasStoryImportSource(
+  source: unknown,
+) {
+  assertCanvasJsonObject(source, 'canvas story import source')
+  assertCanvasStoryImportString(
+    source.exportName,
+    'canvas story import source exportName',
+  )
+  assertCanvasStoryImportString(
+    source.importPath,
+    'canvas story import source importPath',
+  )
+  assertCanvasStoryImportString(
+    source.layer,
+    'canvas story import source layer',
+  )
+}
+
+function assertCanvasJsonObject(
+  value: unknown,
+  label: string,
+): asserts value is Record<string, unknown> {
+  if (
+    typeof value !== 'object' ||
+    value === null ||
+    Array.isArray(value)
+  ) {
+    throw new Error(`Invalid ${label}`)
+  }
+}
+
+function assertCanvasStoryImportString(
+  value: unknown,
+  label: string,
+): asserts value is string {
+  if (typeof value !== 'string' || value.trim() === '') {
+    throw new Error(`Invalid ${label}`)
+  }
+}
+
+function assertCanvasStoryImportFiniteNumber(
+  value: unknown,
+  label: string,
+): asserts value is number {
+  if (!Number.isFinite(value)) {
+    throw new Error(`Invalid ${label}`)
+  }
 }

@@ -389,10 +389,27 @@ export {
 } from './story-preview'
 export {
   CANVAS_APP_STORY_IMPORT_FEATURE_PACK_MANIFEST,
+  CANVAS_STORY_IMPORT_JSON_KIND,
+  CANVAS_STORY_IMPORT_JSON_MIME_TYPE,
+  CANVAS_STORY_IMPORT_JSON_VERSION,
+  DEFAULT_CANVAS_STORY_IMPORT_DATA_TRANSFER_JSON_CANDIDATES,
+  createCanvasStoryImportAction,
+  createCanvasStoryImportActionFromDataTransfer,
   createCanvasStoryImportComponentDefinitions,
+  createCanvasStoryImportDataTransferActionResolver,
   createCanvasStoryImportItems,
+  parseCanvasStoryImportJSONPayload,
+  readCanvasStoryImportDataTransfer,
+  type CanvasStoryImportAction,
+  type CanvasStoryImportActionInput,
+  type CanvasStoryImportDataTransferActionInput,
+  type CanvasStoryImportDataTransferActionResolverInput,
+  type CanvasStoryImportDataTransferJSONCandidate,
+  type CanvasStoryImportDataTransferReadInput,
+  type CanvasStoryImportDataTransferReadResult,
   type CanvasStoryImportGroup,
   type CanvasStoryImportInput,
+  type CanvasStoryImportJSONPayload,
   type CanvasStoryImportStory,
 } from './story-import'
 export {

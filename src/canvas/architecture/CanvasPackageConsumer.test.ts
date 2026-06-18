@@ -6,6 +6,7 @@ import type {
   CanvasDataTransferImportActionPlanRunInput,
   CanvasDataTransferImportActionPlanRunResult,
   CanvasDataTransferJSONCandidateReadResult,
+  CanvasStoryImportAction,
   CanvasWheelViewportEvent,
   CanvasWheelViewportSetter,
   RunCanvasWheelViewportArgs,
@@ -136,6 +137,9 @@ import {
   CANVAS_COMPONENT_INSPECTOR_PANEL,
   CANVAS_COMPONENT_SYNC_ITEMS_CHANGE_TRANSFORMER,
   CANVAS_APP_STORY_IMPORT_FEATURE_PACK_MANIFEST,
+  CANVAS_STORY_IMPORT_JSON_KIND,
+  CANVAS_STORY_IMPORT_JSON_MIME_TYPE,
+  CANVAS_STORY_IMPORT_JSON_VERSION,
   CANVAS_APP_STORY_VIEWER_FEATURE_PACK_PROFILE,
   CANVAS_COMPONENT_SYSTEM_FEATURE_PACK_SUITE_MANIFEST,
   CANVAS_COMPONENT_SYSTEM_SUITE_ID,
@@ -149,7 +153,9 @@ import {
   DEFAULT_CANVAS_APP_VIEW_FEATURE_PACK_MANIFESTS,
   createCanvasAppFeaturePackProfile,
   createCanvasAppFeaturePackSuiteManifest,
+  createCanvasStoryImportActionFromDataTransfer,
   createCanvasStoryImportComponentDefinitions,
+  createCanvasStoryImportDataTransferActionResolver,
   createCanvasStoryImportItems,
   getCanvasAppEnabledFeaturePackIds,
   getCanvasAppEnabledFeaturePackManifestIds,
@@ -178,6 +184,8 @@ import {
   getCanvasAppManifestViewFeaturePacks,
   getCanvasAppResolvedFeaturePackStates,
   getCanvasComponentInspectorPanelModel,
+  parseCanvasStoryImportJSONPayload,
+  readCanvasStoryImportDataTransfer,
   syncCanvasComponentItemsChange,
   transformCanvasAppItemsChange,
   commitCanvasAppHostItemsChange,
@@ -2171,6 +2179,103 @@ describe('Canvas package consumer imports', () => {
         y: 0,
       }],
     })[0]?.instances[0]?.slots.root).toBe('story-consumer-widget-default')
+    const packageStoryImportInput = {
+      groups: [{
+        h: 96,
+        id: 'consumer-action-widget',
+        label: 'ConsumerActionWidget',
+        source: {
+          exportName: 'ConsumerActionWidget',
+          importPath: 'src/widgets/consumer-action-widget',
+          layer: 'widgets',
+        },
+        stories: [{
+          h: 80,
+          id: 'consumer-action-widget-default',
+          title: 'Default',
+          w: 144,
+          x: 12,
+          y: 16,
+        }],
+        w: 180,
+        x: 8,
+        y: 10,
+      }],
+    }
+    const packageStoryDataTransfer = {
+      getData: (format: string) => {
+        if (format === CANVAS_STORY_IMPORT_JSON_MIME_TYPE) {
+          return '{'
+        }
+
+        if (format === 'application/json') {
+          return JSON.stringify({
+            input: packageStoryImportInput,
+            kind: CANVAS_STORY_IMPORT_JSON_KIND,
+            version: CANVAS_STORY_IMPORT_JSON_VERSION,
+          })
+        }
+
+        return ''
+      },
+    }
+    const packageStoryAction: CanvasStoryImportAction | null =
+      createCanvasStoryImportActionFromDataTransfer({
+        dataTransfer: packageStoryDataTransfer,
+      })
+    const packageStoryReadResult = readCanvasStoryImportDataTransfer({
+      dataTransfer: packageStoryDataTransfer,
+    })
+
+    expect(
+      parseCanvasStoryImportJSONPayload(packageStoryImportInput).groups[0]?.id,
+    ).toBe('consumer-action-widget')
+    expect(packageStoryReadResult?.value.groups[0]?.id)
+      .toBe('consumer-action-widget')
+    expect(packageStoryAction).toMatchObject({
+      kind: 'story-import',
+      readResult: {
+        candidateIndex: 1,
+        mimeType: 'application/json',
+        source: 'application-json',
+      },
+    })
+    expect(packageStoryAction?.items.map((item) => item.id)).toEqual([
+      'group-consumer-action-widget',
+      'story-consumer-action-widget-default',
+    ])
+    expect(packageStoryAction?.componentDefinitions[0]?.source).toEqual({
+      exportName: 'ConsumerActionWidget',
+      importPath: 'src/widgets/consumer-action-widget',
+      layer: 'widgets',
+    })
+    expect(createCanvasStoryImportDataTransferActionResolver({
+      scope: 'clipboard-paste',
+    }).supportedFormats).toContain(CANVAS_STORY_IMPORT_JSON_MIME_TYPE)
+    expect(CanvasPackage.createCanvasStoryImportActionFromDataTransfer)
+      .toBe(createCanvasStoryImportActionFromDataTransfer)
+    expect(CanvasAppFacade.createCanvasStoryImportActionFromDataTransfer)
+      .toBe(createCanvasStoryImportActionFromDataTransfer)
+    expect(CanvasAppAuthoring.createCanvasStoryImportActionFromDataTransfer)
+      .toBe(createCanvasStoryImportActionFromDataTransfer)
+    expect(CanvasPackage.createCanvasStoryImportDataTransferActionResolver)
+      .toBe(createCanvasStoryImportDataTransferActionResolver)
+    expect(CanvasAppFacade.createCanvasStoryImportDataTransferActionResolver)
+      .toBe(createCanvasStoryImportDataTransferActionResolver)
+    expect(CanvasAppAuthoring.createCanvasStoryImportDataTransferActionResolver)
+      .toBe(createCanvasStoryImportDataTransferActionResolver)
+    expect(CanvasPackage.parseCanvasStoryImportJSONPayload)
+      .toBe(parseCanvasStoryImportJSONPayload)
+    expect(CanvasAppFacade.parseCanvasStoryImportJSONPayload)
+      .toBe(parseCanvasStoryImportJSONPayload)
+    expect(CanvasAppAuthoring.parseCanvasStoryImportJSONPayload)
+      .toBe(parseCanvasStoryImportJSONPayload)
+    expect(CanvasPackage.readCanvasStoryImportDataTransfer)
+      .toBe(readCanvasStoryImportDataTransfer)
+    expect(CanvasAppFacade.readCanvasStoryImportDataTransfer)
+      .toBe(readCanvasStoryImportDataTransfer)
+    expect(CanvasAppAuthoring.readCanvasStoryImportDataTransfer)
+      .toBe(readCanvasStoryImportDataTransfer)
     expect(storyPreviewManifest.extensionFeaturePack?.id)
       .toBe('story-preview-items')
     expect(storyCanvasFeaturePackManifests.map((manifest) => manifest.id))
