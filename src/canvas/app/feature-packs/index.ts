@@ -230,6 +230,7 @@ export {
 } from './story-preview'
 export {
   CANVAS_APP_STORY_IMPORT_FEATURE_PACK_MANIFEST,
+  createCanvasStoryImportComponentDefinitions,
   createCanvasStoryImportItems,
   type CanvasStoryImportGroup,
   type CanvasStoryImportInput,

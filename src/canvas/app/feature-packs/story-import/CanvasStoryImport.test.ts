@@ -6,6 +6,7 @@ import {
   CANVAS_STORY_PREVIEW_ITEM_PRESENTATION,
 } from '../story-preview'
 import {
+  createCanvasStoryImportComponentDefinitions,
   createCanvasStoryImportItems,
 } from './CanvasStoryImport'
 
@@ -86,6 +87,86 @@ describe('CanvasStoryImport', () => {
     expect(items.map((item) => item.id)).toEqual(['story-standalone'])
   })
 
+  it('creates component definitions from labeled story groups', () => {
+    const definitions = createCanvasStoryImportComponentDefinitions({
+      groups: [
+        {
+          h: 120,
+          id: 'component-card',
+          label: 'ComponentCard',
+          source: {
+            exportName: 'ComponentCard',
+            importPath: 'src/widgets/component-card',
+            layer: 'widgets',
+          },
+          stories: [
+            {
+              h: 80,
+              id: 'card-default',
+              title: 'Default',
+              w: 160,
+              x: 24,
+              y: 24,
+            },
+            {
+              h: 80,
+              id: 'card-active',
+              title: 'Active',
+              w: 160,
+              x: 204,
+              y: 24,
+            },
+          ],
+          w: 380,
+          x: 40,
+          y: 64,
+        },
+        {
+          h: 96,
+          id: 'standalone-card',
+          label: null,
+          stories: [{
+            h: 96,
+            id: 'standalone',
+            title: 'Standalone',
+            w: 192,
+            x: 80,
+            y: 120,
+          }],
+          w: 192,
+          x: 80,
+          y: 120,
+        },
+      ],
+    })
+
+    expect(definitions).toEqual([
+      {
+        id: 'story-import-component-card',
+        instances: [
+          {
+            label: 'Default',
+            slots: {
+              root: 'story-card-default',
+            },
+          },
+          {
+            label: 'Active',
+            slots: {
+              root: 'story-card-active',
+            },
+          },
+        ],
+        label: 'ComponentCard',
+        source: {
+          exportName: 'ComponentCard',
+          importPath: 'src/widgets/component-card',
+          layer: 'widgets',
+        },
+      },
+    ])
+  })
+
   it('rejects duplicate generated item ids', () => {
     expect(() =>
       createCanvasStoryImportItems({
@@ -125,5 +206,48 @@ describe('CanvasStoryImport', () => {
         ],
       }),
     ).toThrow('Duplicate canvas story import item: story-duplicate')
+  })
+
+  it('rejects duplicate generated component definition ids', () => {
+    expect(() =>
+      createCanvasStoryImportComponentDefinitions({
+        groups: [
+          {
+            h: 80,
+            id: 'component-card',
+            label: 'ComponentCard',
+            stories: [{
+              h: 80,
+              id: 'default',
+              title: 'Default',
+              w: 120,
+              x: 0,
+              y: 0,
+            }],
+            w: 120,
+            x: 0,
+            y: 0,
+          },
+          {
+            h: 80,
+            id: 'component-card',
+            label: 'ComponentCard Copy',
+            stories: [{
+              h: 80,
+              id: 'copy',
+              title: 'Copy',
+              w: 120,
+              x: 0,
+              y: 0,
+            }],
+            w: 120,
+            x: 0,
+            y: 0,
+          },
+        ],
+      }),
+    ).toThrow(
+      'Duplicate canvas story import component definition: story-import-component-card',
+    )
   })
 })

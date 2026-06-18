@@ -3,6 +3,7 @@ import {
 } from '../CanvasAppFeaturePackManifests'
 
 export {
+  createCanvasStoryImportComponentDefinitions,
   createCanvasStoryImportItems,
   type CanvasStoryImportGroup,
   type CanvasStoryImportInput,

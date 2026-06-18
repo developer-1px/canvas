@@ -230,6 +230,7 @@ export {
   createCanvasStoryPreviewItemModules,
   createCanvasStoryPreviewItemsFeaturePack,
   createCanvasStoryPreviewItemsFeaturePackManifest,
+  createCanvasStoryImportComponentDefinitions,
   createCanvasStoryImportItems,
   createCanvasAppViewFeaturePack,
   createCanvasAppFacilitationAffordanceConfigInput,

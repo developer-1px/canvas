@@ -60,6 +60,7 @@ import {
   DEFAULT_CANVAS_APP_VIEW_FEATURE_PACK_MANIFESTS,
   createCanvasAppFeaturePackProfile,
   createCanvasAppFeaturePackSuiteManifest,
+  createCanvasStoryImportComponentDefinitions,
   createCanvasStoryImportItems,
   getCanvasAppEnabledFeaturePackIds,
   getCanvasAppEnabledFeaturePackManifestIds,
@@ -729,6 +730,24 @@ describe('Canvas package consumer imports', () => {
         y: 0,
       }],
     }).map((item) => item.id)).toEqual(['story-consumer-story-default'])
+    expect(createCanvasStoryImportComponentDefinitions({
+      groups: [{
+        h: 80,
+        id: 'consumer-widget',
+        label: 'ConsumerWidget',
+        stories: [{
+          h: 80,
+          id: 'consumer-widget-default',
+          title: 'Default',
+          w: 120,
+          x: 0,
+          y: 0,
+        }],
+        w: 120,
+        x: 0,
+        y: 0,
+      }],
+    })[0]?.instances[0]?.slots.root).toBe('story-consumer-widget-default')
     expect(storyPreviewManifest.extensionFeaturePack?.id)
       .toBe('story-preview-items')
     expect(CANVAS_APP_CORE_ONLY_FEATURE_PACK_PROFILE.installedFeaturePackIds)

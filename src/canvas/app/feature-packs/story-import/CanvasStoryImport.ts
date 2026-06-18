@@ -2,6 +2,11 @@ import type {
   CanvasCustomItem,
 } from '../../../entities'
 import {
+  CANVAS_COMPONENT_DEFINITION_ROOT_SLOT_ID,
+  type CanvasComponentDefinition,
+  type CanvasComponentSource,
+} from '../../../host'
+import {
   CANVAS_STORY_PREVIEW_GROUP_KIND,
   CANVAS_STORY_PREVIEW_GROUP_PRESENTATION,
   CANVAS_STORY_PREVIEW_ITEM_KIND,
@@ -24,6 +29,7 @@ export type CanvasStoryImportGroup = Readonly<{
   h: number
   id: string
   label?: string | null
+  source?: CanvasComponentSource
   stories: readonly CanvasStoryImportStory[]
   title?: string
   w: number
@@ -58,6 +64,48 @@ export function createCanvasStoryImportItems({
   }
 
   return Object.freeze(items)
+}
+
+export function createCanvasStoryImportComponentDefinitions({
+  groups,
+}: CanvasStoryImportInput): readonly CanvasComponentDefinition[] {
+  const definitions: CanvasComponentDefinition[] = []
+  const definitionIds = new Set<string>()
+
+  for (const group of groups) {
+    const label = group.label ?? null
+
+    if (!label || group.stories.length === 0) {
+      continue
+    }
+
+    const definition = createCanvasStoryImportComponentDefinition(group, label)
+
+    assertCanvasStoryImportUniqueComponentDefinitionId(
+      definitionIds,
+      definition.id,
+    )
+    definitions.push(definition)
+  }
+
+  return Object.freeze(definitions)
+}
+
+function createCanvasStoryImportComponentDefinition(
+  group: CanvasStoryImportGroup,
+  label: string,
+): CanvasComponentDefinition {
+  return {
+    id: `story-import-${group.id}`,
+    instances: group.stories.map((story) => ({
+      label: story.title,
+      slots: {
+        [CANVAS_COMPONENT_DEFINITION_ROOT_SLOT_ID]: `story-${story.id}`,
+      },
+    })),
+    label,
+    source: group.source,
+  }
 }
 
 function createCanvasStoryPreviewGroupItem(
@@ -110,4 +158,17 @@ function assertCanvasStoryImportUniqueItemId(
   }
 
   itemIds.add(itemId)
+}
+
+function assertCanvasStoryImportUniqueComponentDefinitionId(
+  definitionIds: Set<string>,
+  definitionId: string,
+) {
+  if (definitionIds.has(definitionId)) {
+    throw new Error(
+      `Duplicate canvas story import component definition: ${definitionId}`,
+    )
+  }
+
+  definitionIds.add(definitionId)
 }
