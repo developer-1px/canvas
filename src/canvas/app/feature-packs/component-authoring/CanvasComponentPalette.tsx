@@ -9,6 +9,7 @@ import type {
 export type CanvasComponentPaletteProps = {
   componentSets?: readonly CanvasComponentSetSummary[]
   components: readonly CanvasComponentPaletteItem[]
+  onFocusItems?: (itemIds: readonly string[]) => void
   onInsert: (component: string) => void
 }
 
@@ -24,6 +25,7 @@ export type CanvasComponentPaletteItem = {
 export function CanvasComponentPalette({
   componentSets = [],
   components,
+  onFocusItems,
   onInsert,
 }: CanvasComponentPaletteProps) {
   const toolbarRovingFocus = useCanvasToolbarRovingFocus<HTMLDivElement>()
@@ -59,6 +61,7 @@ export function CanvasComponentPalette({
             <ComponentSetParts
               componentSet={componentSet}
               key={componentSet.id}
+              onFocusItems={onFocusItems}
             />
           ))}
         </div>
@@ -69,8 +72,10 @@ export function CanvasComponentPalette({
 
 function ComponentSetParts({
   componentSet,
+  onFocusItems,
 }: {
   componentSet: CanvasComponentSetSummary
+  onFocusItems?: (itemIds: readonly string[]) => void
 }) {
   return (
     <section className="component-palette-set">
@@ -80,9 +85,23 @@ function ComponentSetParts({
       </div>
       <ol className="component-palette-parts">
         {componentSet.parts.map((part) => (
-          <li className="component-palette-part" key={part.slotId}>
-            <span>{part.label}</span>
-            <small>{part.itemIds.length}</small>
+          <li key={part.slotId}>
+            {onFocusItems ? (
+              <button
+                className="component-palette-part"
+                type="button"
+                aria-label={`${componentSet.label} ${part.label}`}
+                onClick={() => onFocusItems(part.itemIds)}
+              >
+                <span>{part.label}</span>
+                <small>{part.itemIds.length}</small>
+              </button>
+            ) : (
+              <span className="component-palette-part">
+                <span>{part.label}</span>
+                <small>{part.itemIds.length}</small>
+              </span>
+            )}
           </li>
         ))}
       </ol>

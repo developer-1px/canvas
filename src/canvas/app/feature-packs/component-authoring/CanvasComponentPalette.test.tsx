@@ -39,6 +39,7 @@ describe('CanvasComponentPalette', () => {
             },
           ],
         }]}
+        onFocusItems={vi.fn()}
         components={[{
           accent: '#2563eb',
           fill: '#dbeafe',
@@ -57,6 +58,29 @@ describe('CanvasComponentPalette', () => {
     expect(markup).toContain('Score card')
     expect(markup).toContain('Root')
     expect(markup).toContain('Value')
+    expect(markup).toContain('aria-label="Score card Root"')
     expect(markup).toContain('>2<')
+  })
+
+  it('renders part rows as read-only summaries without a focus callback', () => {
+    const markup = renderToStaticMarkup(
+      <CanvasComponentPalette
+        componentSets={[{
+          id: 'score-card',
+          instances: [],
+          label: 'Score card',
+          parts: [{
+            itemIds: ['score-card-root'],
+            label: 'Root',
+            slotId: 'root',
+          }],
+        }]}
+        components={[]}
+        onInsert={vi.fn()}
+      />,
+    )
+
+    expect(markup).toContain('Score card')
+    expect(markup).not.toContain('aria-label="Score card Root"')
   })
 })

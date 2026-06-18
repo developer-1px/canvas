@@ -85,6 +85,7 @@ export function createViewProps(
         title: 'Card',
       }],
       visible: visible.componentPalette ?? true,
+      onFocusItems: noop,
       onInsert: noop,
     },
     cursorChat: {

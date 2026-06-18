@@ -68,6 +68,7 @@ export function getCanvasAppControlModel({
       componentSets,
       components,
       visible: config.overlays.componentPalette,
+      onFocusItems: (itemIds: readonly string[]) => onFitItems([...itemIds]),
       onInsert: onInsertComponent,
     },
     commandPalette: {

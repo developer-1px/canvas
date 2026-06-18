@@ -2473,9 +2473,31 @@
 }
 
 .component-palette-part {
+  width: 100%;
   min-height: 22px;
+  padding: 0;
+  border: 0;
+  text-align: left;
   color: var(--canvas-text-secondary);
+  background: transparent;
   font: 600 11px/1.2 var(--sans);
+}
+
+button.component-palette-part {
+  margin: 0 -3px;
+  padding: 0 3px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button.component-palette-part:hover {
+  color: var(--canvas-ink);
+  background: var(--canvas-surface-muted);
+}
+
+button.component-palette-part:focus-visible {
+  outline: 2px solid var(--canvas-blue);
+  outline-offset: 1px;
 }
 
 .stamp-button {

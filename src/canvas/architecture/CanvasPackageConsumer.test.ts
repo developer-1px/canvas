@@ -470,6 +470,7 @@ describe('Canvas package consumer imports', () => {
     const componentPaletteProps: CanvasComponentPaletteProps = {
       componentSets: assembly.componentDefinitionRegistry.listSets(),
       components: [componentPaletteItem],
+      onFocusItems: () => undefined,
       onInsert: () => undefined,
     }
     const shellInputProps = {

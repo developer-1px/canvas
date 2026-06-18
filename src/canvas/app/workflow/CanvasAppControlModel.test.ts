@@ -18,6 +18,7 @@ describe('CanvasAppControlModel', () => {
   it('builds control props from component, command, selection, and viewport state', () => {
     const componentSets = [createComponentSet()]
     const components = [createComponentTemplate()]
+    const onFitItems = vi.fn()
     const customTools = [createCustomTool()]
     const customCommands = [
       {
@@ -35,6 +36,7 @@ describe('CanvasAppControlModel', () => {
       components,
       customCommands,
       customTools,
+      onFitItems,
       scene: createSceneAdapter(new Set(['group-1'])),
       selection: ['rect-1', 'group-1'],
       tool: 'custom:risk',
@@ -43,6 +45,8 @@ describe('CanvasAppControlModel', () => {
 
     expect(model.componentPalette.components).toBe(components)
     expect(model.componentPalette.componentSets).toBe(componentSets)
+    model.componentPalette.onFocusItems(['score-card-value-a'])
+    expect(onFitItems).toHaveBeenLastCalledWith(['score-card-value-a'])
     expect(model.componentPalette.visible).toBe(true)
     expect(model.commandPalette.visible).toBe(true)
     expect(model.commandPalette.items.map((item) => item.title)).toEqual(
