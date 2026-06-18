@@ -5,6 +5,8 @@ import {
 export {
   getCanvasTableFileFromDataTransfer,
   getCanvasTableFileFromList,
+  getCanvasTableFilesFromDataTransfer,
+  getCanvasTableFilesFromList,
   getCanvasTableCsvFileFromDataTransfer,
   getCanvasTableCsvFileFromList,
   getCanvasTableCsvSourceFromDataTransfer,

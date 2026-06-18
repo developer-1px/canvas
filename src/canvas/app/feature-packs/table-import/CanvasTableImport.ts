@@ -245,6 +245,12 @@ export function getCanvasTableFileFromList(files: FileList | null) {
   return Array.from(files ?? []).find(isCanvasTableTextFile) ?? null
 }
 
+export function getCanvasTableFilesFromList(files: FileList | null) {
+  return dedupeCanvasTableFiles(
+    Array.from(files ?? []).filter(isCanvasTableTextFile),
+  )
+}
+
 export function getCanvasTableCsvFileFromDataTransfer(
   dataTransfer: DataTransfer | null,
 ) {
@@ -255,6 +261,19 @@ export function getCanvasTableFileFromDataTransfer(
   dataTransfer: DataTransfer | null,
 ) {
   return getCanvasTableFileFromList(dataTransfer?.files ?? null)
+}
+
+export function getCanvasTableFilesFromDataTransfer(
+  dataTransfer: DataTransfer | null,
+) {
+  if (!dataTransfer) {
+    return []
+  }
+
+  return dedupeCanvasTableFiles([
+    ...getCanvasTableFilesFromList(dataTransfer.files ?? null),
+    ...getCanvasTableFilesFromDataTransferItems(dataTransfer.items ?? null),
+  ])
 }
 
 export function getCanvasTableCsvSourceFromDataTransfer(
@@ -449,6 +468,78 @@ function isCanvasTableTsvFile(file: Blob & { name?: string }) {
 
 function isCanvasTableTextFile(file: Blob & { name?: string }) {
   return isCanvasTableCsvFile(file) || isCanvasTableTsvFile(file)
+}
+
+function getCanvasTableFilesFromDataTransferItems(
+  items: DataTransferItemList | null,
+) {
+  const files: File[] = []
+
+  for (let index = 0; index < (items?.length ?? 0); index += 1) {
+    const item = getCanvasDataTransferItemAt(items, index)
+
+    if (item?.kind !== 'file') {
+      continue
+    }
+
+    const file = item.getAsFile()
+
+    if (file && isCanvasTableTextFile(file)) {
+      files.push(file)
+    }
+  }
+
+  return files
+}
+
+function getCanvasDataTransferItemAt(
+  items: DataTransferItemList | null,
+  index: number,
+) {
+  const item = items?.[index]
+
+  if (item) {
+    return item
+  }
+
+  const itemList = items as (
+    DataTransferItemList & {
+      item?: (index: number) => DataTransferItem | null
+    }
+  ) | null
+
+  return typeof itemList?.item === 'function' ? itemList.item(index) : null
+}
+
+function dedupeCanvasTableFiles<T extends Blob & { name?: string }>(
+  files: readonly T[],
+) {
+  const seenKeys = new Set<string>()
+  const dedupedFiles: T[] = []
+
+  for (const file of files) {
+    const key = getCanvasTableFileDedupeKey(file)
+
+    if (seenKeys.has(key)) {
+      continue
+    }
+
+    seenKeys.add(key)
+    dedupedFiles.push(file)
+  }
+
+  return dedupedFiles
+}
+
+function getCanvasTableFileDedupeKey(
+  file: Blob & { lastModified?: number; name?: string },
+) {
+  return [
+    file.name ?? '',
+    file.type,
+    file.size,
+    file.lastModified ?? '',
+  ].join('\u0000')
 }
 
 function isCanvasTableImportRows(rows: readonly (readonly string[])[]) {

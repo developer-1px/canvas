@@ -4,6 +4,9 @@ import {
   getCanvasTableCsvSourceFromDataTransfer,
   getCanvasTableCsvSourceFromText,
   getCanvasTableColumnCount,
+  getCanvasTableFileFromDataTransfer,
+  getCanvasTableFilesFromDataTransfer,
+  getCanvasTableFilesFromList,
   getCanvasTableInsertCenter,
   getCanvasTableSourceFromDataTransfer,
   getCanvasTableSourceFromHTML,
@@ -96,6 +99,81 @@ describe('CanvasTableImport', () => {
         ['Users', '42'],
       ],
     })
+  })
+
+  it('keeps the single DataTransfer file helper focused on DataTransfer.files', () => {
+    const csvFile = createTableFile('metrics.csv', 'text/csv')
+    const tsvFile = createTableFile('drop.tsv', 'text/tab-separated-values')
+    const ignoredFile = createTableFile('notes.txt', 'text/plain')
+    const dataTransfer = createDataTransferWithFiles({
+      files: [ignoredFile, csvFile],
+      items: [createFileItem(tsvFile)],
+    })
+
+    expect(getCanvasTableFileFromDataTransfer(dataTransfer)).toBe(csvFile)
+  })
+
+  it('collects CSV and TSV files from clipboard DataTransfer.files', () => {
+    const csvFile = createTableFile('metrics.csv', 'text/csv', 1)
+    const tsvFile = createTableFile('roadmap.tsv', 'text/tab-separated-values', 2)
+    const extensionCsvFile = createTableFile('fallback.csv', 'text/plain', 3)
+    const ignoredFile = createTableFile('notes.txt', 'text/plain', 4)
+
+    expect(getCanvasTableFilesFromList(createFileList([
+      ignoredFile,
+      csvFile,
+      tsvFile,
+      extensionCsvFile,
+    ]))).toEqual([
+      csvFile,
+      tsvFile,
+      extensionCsvFile,
+    ])
+    expect(getCanvasTableFilesFromDataTransfer(createDataTransferWithFiles({
+      files: [ignoredFile, csvFile, tsvFile, extensionCsvFile],
+    }))).toEqual([
+      csvFile,
+      tsvFile,
+      extensionCsvFile,
+    ])
+  })
+
+  it('collects CSV and TSV files from drop DataTransfer items', () => {
+    const csvFile = createTableFile('drop.csv', 'text/csv', 1)
+    const tsvFile = createTableFile('drop.tsv', 'text/plain', 2)
+    const ignoredFile = createTableFile('image.png', 'image/png', 3)
+    const dataTransfer = createDataTransferWithFiles({
+      files: [],
+      items: [
+        createStringItem(),
+        createFileItem(csvFile),
+        createFileItem(tsvFile),
+        createFileItem(ignoredFile),
+      ],
+    })
+
+    expect(getCanvasTableFilesFromDataTransfer(dataTransfer)).toEqual([
+      csvFile,
+      tsvFile,
+    ])
+  })
+
+  it('dedupes files reported by both DataTransfer.files and items', () => {
+    const csvFile = createTableFile('metrics.csv', 'text/csv', 1)
+    const duplicateCsvFile = createTableFile('metrics.csv', 'text/csv', 1)
+    const tsvFile = createTableFile('metrics.tsv', 'text/tab-separated-values', 2)
+    const dataTransfer = createDataTransferWithFiles({
+      files: [csvFile],
+      items: [
+        createFileItem(duplicateCsvFile),
+        createFileItem(tsvFile),
+      ],
+    })
+
+    expect(getCanvasTableFilesFromDataTransfer(dataTransfer)).toEqual([
+      csvFile,
+      tsvFile,
+    ])
   })
 
   it('parses HTML table clipboard markup into import sources', () => {
@@ -439,3 +517,56 @@ describe('CanvasTableImport', () => {
     })).toEqual({ x: 100, y: 120 })
   })
 })
+
+function createTableFile(
+  name: string,
+  type: string,
+  lastModified = 0,
+) {
+  return Object.assign(new Blob(['Metric,Value\nUsers,42'], { type }), {
+    lastModified,
+    name,
+  }) as File
+}
+
+function createFileList(files: readonly File[]): FileList {
+  return Object.assign([...files], {
+    item: (index: number) => files[index] ?? null,
+  }) as unknown as FileList
+}
+
+function createDataTransferWithFiles({
+  files = [],
+  items = [],
+}: {
+  files?: readonly File[]
+  items?: readonly DataTransferItem[]
+}): DataTransfer {
+  return {
+    files: createFileList(files),
+    getData: vi.fn(() => ''),
+    items: createDataTransferItemList(items),
+  } as unknown as DataTransfer
+}
+
+function createDataTransferItemList(
+  items: readonly DataTransferItem[],
+): DataTransferItemList {
+  return Object.assign([...items], {
+    item: (index: number) => items[index] ?? null,
+  }) as unknown as DataTransferItemList
+}
+
+function createFileItem(file: File): DataTransferItem {
+  return {
+    getAsFile: vi.fn(() => file),
+    kind: 'file',
+  } as unknown as DataTransferItem
+}
+
+function createStringItem(): DataTransferItem {
+  return {
+    getAsFile: vi.fn(() => null),
+    kind: 'string',
+  } as unknown as DataTransferItem
+}

@@ -37,6 +37,17 @@
 | Exclusions | Non-image data URLs, remote URLs, and inline `<svg>` nodes are not included in the HTML data image batch |
 | Runtime | Host apps own batch placement, replacement policy, layout, persistence, and selection after import |
 
+## Table Import File Batch Contract
+
+| Area | Contract |
+| --- | --- |
+| File sources | `DataTransfer.files` and `DataTransfer.items[].getAsFile()` may produce a batch of CSV/TSV table files |
+| Type rules | CSV/TSV detection uses the same MIME type and extension rules as the existing single table file helper |
+| Order | Files from `DataTransfer.files` keep priority and order; file items are appended in item order |
+| Dedupe | Dedupe uses `name`, `type`, `size`, and `lastModified` metadata and keeps the first occurrence |
+| Exclusions | Non-CSV/TSV files and non-file DataTransfer items are ignored |
+| Runtime | Host apps own reading each file source, batch placement, replacement policy, layout, persistence, and selection after import |
+
 ## Table Import Markdown Contract
 
 | Area | Contract |
@@ -153,7 +164,7 @@
 | `src/canvas/app/feature-packs/shortcut-help` | Shortcut help item projection, grouping, overlay view를 폴더째 설치형 pack으로 제공한다 |
 | `src/canvas/app/feature-packs/stamp-authoring` | Reaction stamp catalog, controls, insertion, voting quota hook integration을 폴더째 설치형 pack으로 제공한다 |
 | `src/canvas/app/feature-packs/status-bar` | Gesture/tool status projection과 selection count view를 폴더째 설치형 pack으로 제공한다 |
-| `src/canvas/app/feature-packs/table-import` | CSV/TSV/Markdown/HTML paste/drop/file import, table insert position, table component creation request를 폴더째 설치형 pack으로 제공한다 |
+| `src/canvas/app/feature-packs/table-import` | CSV/TSV/Markdown/HTML paste/drop/file import, CSV/TSV file batch source, table insert position, table component creation request를 폴더째 설치형 pack으로 제공한다 |
 | `src/canvas/app/feature-packs/text-paste-import` | Plain/HTML/Markdown text paste sources, unordered/ordered rich text list metadata, importer contract, item creation, paste DOM listener를 폴더째 설치형 pack으로 제공한다 |
 | `src/canvas/app/feature-packs/toolbar` | Toolbar, context command menu, selection floating bar, command/tool item grammar와 dispatch를 폴더째 설치형 pack으로 제공한다 |
 | `src/canvas/app/feature-packs/zoom-controls` | Zoom in/out/reset/fit command overlay view를 폴더째 설치형 pack으로 제공한다 |
