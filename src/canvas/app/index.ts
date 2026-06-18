@@ -967,6 +967,7 @@ export {
   type CanvasAppFeaturePackManifestContributionsInput,
   type CanvasAppFeaturePackManifestLifecycle,
   type CanvasAppFeaturePackManifestLifecycleInput,
+  type CanvasAppFeaturePackManifestOrphanedDataScopeId,
   type CanvasAppFeaturePackManifestOrphanedDataPolicy,
   type CanvasAppFeaturePackViewRenderers,
   type CanvasAppFeaturePackProfile,

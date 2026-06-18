@@ -18,6 +18,7 @@ describe('CanvasAppFeaturePackActions', () => {
       id: 'overlay-pack',
       label: 'Overlay pack',
       lifecycle: {
+        orphanedDataScopeIds: ['overlay-data'],
         orphanedDataPolicy: 'remove',
         partialUpdate: ['overlay'],
         runtimeToggleable: true,
@@ -85,6 +86,7 @@ describe('CanvasAppFeaturePackActions', () => {
         status: 'ready',
         uninstallPolicyEntries: [{
           featurePackId: 'overlay-pack',
+          orphanedDataScopeIds: ['overlay-data'],
           orphanedDataPolicy: 'remove',
         }],
       },

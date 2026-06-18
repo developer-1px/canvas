@@ -252,6 +252,7 @@ describe('CanvasAppFeaturePackStateTransitionPlan', () => {
       id: 'runtime-pack',
       label: 'Runtime pack',
       lifecycle: {
+        orphanedDataScopeIds: ['runtime-data'],
         orphanedDataPolicy: 'host-managed',
       },
       provides: ['runtime-capability'],
@@ -298,6 +299,7 @@ describe('CanvasAppFeaturePackStateTransitionPlan', () => {
       uninstallFeaturePackIds: ['runtime-pack'],
       uninstallPolicyEntries: [{
         featurePackId: 'runtime-pack',
+        orphanedDataScopeIds: ['runtime-data'],
         orphanedDataPolicy: 'host-managed',
       }],
     })

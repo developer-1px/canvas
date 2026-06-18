@@ -55,6 +55,7 @@ describe('CanvasAppFeaturePackProfileActions', () => {
       id: 'legacy-pack',
       label: 'Legacy pack',
       lifecycle: {
+        orphanedDataScopeIds: ['legacy-data'],
         orphanedDataPolicy: 'host-managed',
       },
     })
@@ -111,6 +112,7 @@ describe('CanvasAppFeaturePackProfileActions', () => {
     ])
     expect(action?.uninstallPolicyEntries).toEqual([{
       featurePackId: 'legacy-pack',
+      orphanedDataScopeIds: ['legacy-data'],
       orphanedDataPolicy: 'host-managed',
     }])
     expect(action?.installOptions).toEqual({

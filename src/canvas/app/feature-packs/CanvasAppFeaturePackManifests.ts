@@ -95,6 +95,7 @@ export type CanvasAppFeaturePackManifestContributionsInput = Readonly<{
 export type CanvasAppFeaturePackManifestLifecycle = Readonly<{
   hotReloadable: boolean
   installable: boolean
+  orphanedDataScopeIds: readonly CanvasAppFeaturePackManifestOrphanedDataScopeId[]
   orphanedDataPolicy: CanvasAppFeaturePackManifestOrphanedDataPolicy
   partialUpdate: readonly CanvasAppFeaturePackContributionSurface[]
   runtimeToggleable: boolean
@@ -104,6 +105,7 @@ export type CanvasAppFeaturePackManifestLifecycle = Readonly<{
 export type CanvasAppFeaturePackManifestLifecycleInput = Readonly<{
   hotReloadable?: boolean
   installable?: boolean
+  orphanedDataScopeIds?: readonly CanvasAppFeaturePackManifestOrphanedDataScopeId[]
   orphanedDataPolicy?: CanvasAppFeaturePackManifestOrphanedDataPolicy
   partialUpdate?: readonly CanvasAppFeaturePackContributionSurface[]
   runtimeToggleable?: boolean
@@ -114,6 +116,9 @@ export type CanvasAppFeaturePackManifestOrphanedDataPolicy =
   | 'host-managed'
   | 'preserve'
   | 'remove'
+
+export type CanvasAppFeaturePackManifestOrphanedDataScopeId =
+  CanvasAppFeaturePackId
 
 export type CanvasAppFeaturePackManifestCompatibility = Readonly<{
   documentSchemaVersion?: string
@@ -566,6 +571,10 @@ function createCanvasAppFeaturePackManifestLifecycle(
   return Object.freeze({
     hotReloadable: input?.hotReloadable ?? false,
     installable: input?.installable ?? true,
+    orphanedDataScopeIds: snapshotCanvasAppFeaturePackManifestIds(
+      input?.orphanedDataScopeIds ?? [],
+      'feature pack manifest orphaned data scope',
+    ),
     orphanedDataPolicy: input?.orphanedDataPolicy ?? 'preserve',
     partialUpdate: snapshotCanvasAppFeaturePackContributionSurfaces(
       input?.partialUpdate ?? [],
@@ -687,6 +696,16 @@ function assertCanvasAppFeaturePackManifestLifecycle({
     throw new Error(`Expected ${owner} lifecycle partialUpdate array`)
   }
 
+  if (!Array.isArray(lifecycle.orphanedDataScopeIds)) {
+    throw new Error(
+      `Expected ${owner} lifecycle orphanedDataScopeIds array`,
+    )
+  }
+
+  snapshotCanvasAppFeaturePackManifestIds(
+    lifecycle.orphanedDataScopeIds,
+    `${owner} lifecycle orphaned data scope`,
+  )
   snapshotCanvasAppFeaturePackContributionSurfaces(lifecycle.partialUpdate)
   assertCanvasAppFeaturePackManifestOrphanedDataPolicy({
     owner,

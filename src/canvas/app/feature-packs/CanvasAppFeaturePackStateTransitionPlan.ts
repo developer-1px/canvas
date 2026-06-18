@@ -3,6 +3,7 @@ import {
   type CanvasAppFeaturePackContributionSurface,
   type CanvasAppFeaturePackManifest,
   type CanvasAppFeaturePackManifestInstallOptions,
+  type CanvasAppFeaturePackManifestOrphanedDataScopeId,
   type CanvasAppFeaturePackManifestOrphanedDataPolicy,
 } from './CanvasAppFeaturePackManifests'
 import {
@@ -65,6 +66,8 @@ export type CanvasAppFeaturePackStateTransitionChange = Readonly<{
 export type CanvasAppFeaturePackStateTransitionUninstallPolicyEntry =
   Readonly<{
     featurePackId: CanvasAppFeaturePackId
+    orphanedDataScopeIds:
+      readonly CanvasAppFeaturePackManifestOrphanedDataScopeId[]
     orphanedDataPolicy: CanvasAppFeaturePackManifestOrphanedDataPolicy
   }>
 
@@ -583,6 +586,7 @@ function getCanvasAppFeaturePackStateTransitionUninstallPolicyEntries({
 
     return [Object.freeze({
       featurePackId: id,
+      orphanedDataScopeIds: manifest.lifecycle.orphanedDataScopeIds,
       orphanedDataPolicy: manifest.lifecycle.orphanedDataPolicy,
     })]
   }))

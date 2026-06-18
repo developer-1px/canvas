@@ -15,6 +15,7 @@ describe('CanvasAppFeaturePackSuiteActions', () => {
       id: 'overlay-pack',
       label: 'Overlay pack',
       lifecycle: {
+        orphanedDataScopeIds: ['overlay-data'],
         orphanedDataPolicy: 'remove',
         partialUpdate: ['overlay'],
         runtimeToggleable: true,
@@ -24,6 +25,7 @@ describe('CanvasAppFeaturePackSuiteActions', () => {
       id: 'inspector-pack',
       label: 'Inspector pack',
       lifecycle: {
+        orphanedDataScopeIds: ['inspector-data'],
         orphanedDataPolicy: 'host-managed',
         partialUpdate: ['inspector'],
         runtimeToggleable: true,
@@ -119,10 +121,12 @@ describe('CanvasAppFeaturePackSuiteActions', () => {
         uninstallPolicyEntries: [
           {
             featurePackId: 'overlay-pack',
+            orphanedDataScopeIds: ['overlay-data'],
             orphanedDataPolicy: 'remove',
           },
           {
             featurePackId: 'inspector-pack',
+            orphanedDataScopeIds: ['inspector-data'],
             orphanedDataPolicy: 'host-managed',
           },
         ],

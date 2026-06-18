@@ -206,6 +206,7 @@ import {
   type CanvasAppFeaturePackAssemblyInput,
   type CanvasAppFeaturePackManifest,
   type CanvasAppFeaturePackManifestCategory,
+  type CanvasAppFeaturePackManifestOrphanedDataScopeId,
   type CanvasAppFeaturePackManifestOrphanedDataPolicy,
   type CanvasAppFeaturePackProfile,
   type CanvasAppFeaturePackProfileRuntimeStatesInput,
@@ -643,6 +644,7 @@ describe('Canvas package consumer imports', () => {
         id: 'smoke-partial-pack',
         label: 'Partial pack',
         lifecycle: {
+          orphanedDataScopeIds: ['smoke-partial-data'],
           orphanedDataPolicy: 'host-managed',
           partialUpdate: ['overlay'],
           runtimeToggleable: true,
@@ -907,14 +909,19 @@ describe('Canvas package consumer imports', () => {
     const featurePackManifestOrphanedDataPolicy:
       CanvasAppFeaturePackManifestOrphanedDataPolicy =
         partialUpdateManifest.lifecycle.orphanedDataPolicy
+    const featurePackManifestOrphanedDataScopeId:
+      CanvasAppFeaturePackManifestOrphanedDataScopeId =
+        partialUpdateManifest.lifecycle.orphanedDataScopeIds[0]!
     const featurePackStateTransitionUninstallPolicyEntry:
       CanvasAppFeaturePackStateTransitionUninstallPolicyEntry = {
         featurePackId: 'smoke-partial-pack',
+        orphanedDataScopeIds: [featurePackManifestOrphanedDataScopeId],
         orphanedDataPolicy: featurePackManifestOrphanedDataPolicy,
       }
     const featurePackProfileMarketplaceUninstallPolicyEntry:
       CanvasAppFeaturePackProfileMarketplaceUninstallPolicyEntry = {
         featurePackId: 'smoke-partial-pack',
+        orphanedDataScopeIds: [featurePackManifestOrphanedDataScopeId],
         orphanedDataPolicy: featurePackManifestOrphanedDataPolicy,
       }
 
@@ -1525,8 +1532,10 @@ describe('Canvas package consumer imports', () => {
     expect(featurePackStateTransitionPlan.uninstallPolicyEntries).toEqual([])
     expect(featurePackStateTransitionPlan.status).toBe('ready')
     expect(featurePackManifestOrphanedDataPolicy).toBe('host-managed')
+    expect(featurePackManifestOrphanedDataScopeId).toBe('smoke-partial-data')
     expect(featurePackProfileMarketplaceUninstallPolicyEntry).toEqual({
       featurePackId: 'smoke-partial-pack',
+      orphanedDataScopeIds: ['smoke-partial-data'],
       orphanedDataPolicy: 'host-managed',
     })
     expect(defaultViewFeaturePackIds).toContain('toolbar')

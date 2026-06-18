@@ -278,6 +278,7 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
       id: 'addon-pack',
       label: 'Addon pack',
       lifecycle: {
+        orphanedDataScopeIds: ['addon-data'],
         orphanedDataPolicy: 'remove',
       },
     })
@@ -321,6 +322,7 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
       status: 'ready',
       uninstallPolicyEntries: [{
         featurePackId: 'addon-pack',
+        orphanedDataScopeIds: ['addon-data'],
         orphanedDataPolicy: 'remove',
       }],
     })
@@ -329,6 +331,7 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
       status: 'ready',
       uninstallPolicyEntries: [{
         featurePackId: 'addon-pack',
+        orphanedDataScopeIds: ['addon-data'],
         orphanedDataPolicy: 'remove',
       }],
       updateMode: 'full-rebuild',
@@ -338,6 +341,7 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
       status: 'ready',
       uninstallPolicyEntries: [{
         featurePackId: 'addon-pack',
+        orphanedDataScopeIds: ['addon-data'],
         orphanedDataPolicy: 'remove',
       }],
       updateMode: 'full-rebuild',
@@ -422,6 +426,7 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
       id: 'runtime-pack',
       label: 'Runtime pack',
       lifecycle: {
+        orphanedDataScopeIds: ['runtime-data'],
         orphanedDataPolicy: 'host-managed',
       },
       provides: ['runtime-capability'],
@@ -466,6 +471,7 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
     })
     const policyEntries = [{
       featurePackId: 'runtime-pack',
+      orphanedDataScopeIds: ['runtime-data'],
       orphanedDataPolicy: 'host-managed',
     }]
 

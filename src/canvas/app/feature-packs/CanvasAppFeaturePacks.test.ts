@@ -686,6 +686,7 @@ describe('CanvasAppFeaturePacks', () => {
       label: 'Publish pack',
       lifecycle: {
         hotReloadable: true,
+        orphanedDataScopeIds: ['publish-data'],
         orphanedDataPolicy: 'host-managed',
         partialUpdate: ['command'],
         runtimeToggleable: true,
@@ -699,6 +700,7 @@ describe('CanvasAppFeaturePacks', () => {
     expect(defaultManifest.category).toBe('view')
     expect(defaultManifest.version).toBe('0.1.0')
     expect(defaultManifest.lifecycle.installable).toBe(true)
+    expect(defaultManifest.lifecycle.orphanedDataScopeIds).toEqual([])
     expect(defaultManifest.lifecycle.orphanedDataPolicy).toBe('preserve')
     expect(defaultManifest.lifecycle.runtimeToggleable).toBe(false)
     expect(defaultManifest.compatibility.engineVersion).toBe('0.1.x')
@@ -708,6 +710,7 @@ describe('CanvasAppFeaturePacks', () => {
     expect(customManifest.lifecycle).toEqual({
       hotReloadable: true,
       installable: true,
+      orphanedDataScopeIds: ['publish-data'],
       orphanedDataPolicy: 'host-managed',
       partialUpdate: ['command'],
       runtimeToggleable: true,
@@ -740,6 +743,17 @@ describe('CanvasAppFeaturePacks', () => {
       }),
     ).toThrow(
       'Invalid feature pack manifest bad-policy-pack lifecycle orphanedDataPolicy: unknown',
+    )
+    expect(() =>
+      createCanvasAppFeaturePackManifest({
+        id: 'duplicate-data-scopes-pack',
+        label: 'Duplicate data scopes pack',
+        lifecycle: {
+          orphanedDataScopeIds: ['publish-data', 'publish-data'],
+        },
+      }),
+    ).toThrow(
+      'Duplicate feature pack manifest orphaned data scope: publish-data',
     )
   })
 
