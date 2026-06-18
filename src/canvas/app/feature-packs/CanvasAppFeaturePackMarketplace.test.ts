@@ -43,6 +43,8 @@ describe('CanvasAppFeaturePackMarketplace', () => {
       itemCount: 1,
       paidItemCount: 0,
       partiallyUpdatedItemCount: 0,
+      primaryBlockedItemCount: 1,
+      primaryReadyItemCount: 0,
       privateItemCount: 0,
       readyActionCount: 1,
       rollbackAvailableItemCount: 0,
@@ -127,6 +129,8 @@ describe('CanvasAppFeaturePackMarketplace', () => {
       activeItemCount: 1,
       blockedActionCount: 0,
       itemCount: 1,
+      primaryBlockedItemCount: 0,
+      primaryReadyItemCount: 0,
       readyActionCount: 0,
     })
     expect(model.sections[0]?.facets).toEqual([
@@ -139,6 +143,8 @@ describe('CanvasAppFeaturePackMarketplace', () => {
       blockedActionCount: 3,
       enabledItemCount: 0,
       itemCount: 1,
+      primaryBlockedItemCount: 1,
+      primaryReadyItemCount: 0,
       readyActionCount: 1,
     })
     expect(model.sections[1]?.facets).toEqual([
@@ -155,6 +161,8 @@ describe('CanvasAppFeaturePackMarketplace', () => {
       itemCount: 2,
       paidItemCount: 0,
       partiallyUpdatedItemCount: 0,
+      primaryBlockedItemCount: 2,
+      primaryReadyItemCount: 0,
       privateItemCount: 1,
       readyActionCount: 1,
       rollbackAvailableItemCount: 0,

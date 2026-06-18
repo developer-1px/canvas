@@ -162,6 +162,8 @@ export type CanvasAppFeaturePackMarketplaceActionSectionSummary =
   Readonly<{
     blockedActionCount: number
     itemCount: number
+    primaryBlockedItemCount: number
+    primaryReadyItemCount: number
     readyActionCount: number
   }>
 
@@ -377,13 +379,7 @@ function getCanvasAppFeaturePackMarketplacePackSectionSummary(
 }
 
 function getCanvasAppFeaturePackMarketplaceActionSectionSummary(
-  items: readonly {
-    actions: readonly {
-      applicable: boolean
-      ready: boolean
-      status: 'active' | 'blocked' | 'ready'
-    }[]
-  }[],
+  items: readonly CanvasAppFeaturePackMarketplaceSectionActionItem[],
 ): CanvasAppFeaturePackMarketplaceActionSectionSummary {
   const actions = items.flatMap((item) => item.actions)
 
@@ -392,6 +388,12 @@ function getCanvasAppFeaturePackMarketplaceActionSectionSummary(
       action.applicable && action.status === 'blocked'
     ).length,
     itemCount: items.length,
+    primaryBlockedItemCount: items.filter((item) =>
+      isCanvasAppFeaturePackMarketplacePrimaryActionBlocked(item)
+    ).length,
+    primaryReadyItemCount: items.filter((item) =>
+      isCanvasAppFeaturePackMarketplacePrimaryActionReady(item)
+    ).length,
     readyActionCount: actions.filter((action) => action.ready).length,
   })
 }
@@ -664,6 +666,21 @@ function hasCanvasAppFeaturePackMarketplaceBlockedAction(
   )
 }
 
+function isCanvasAppFeaturePackMarketplacePrimaryActionReady(
+  item: CanvasAppFeaturePackMarketplaceSectionActionItem,
+) {
+  return getCanvasAppFeaturePackMarketplaceItemPrimaryAction(item)?.ready === true
+}
+
+function isCanvasAppFeaturePackMarketplacePrimaryActionBlocked(
+  item: CanvasAppFeaturePackMarketplaceSectionActionItem,
+) {
+  const primaryAction = getCanvasAppFeaturePackMarketplaceItemPrimaryAction(item)
+
+  return primaryAction?.applicable === true &&
+    primaryAction.status === 'blocked'
+}
+
 function createCanvasAppFeaturePackMarketplaceSectionFacet<
   TKind extends CanvasAppFeaturePackMarketplaceSectionFacetKind,
 >({
@@ -681,10 +698,18 @@ function createCanvasAppFeaturePackMarketplaceSectionFacet<
 
 type CanvasAppFeaturePackMarketplaceSectionActionItem = Readonly<{
   actions: readonly CanvasAppFeaturePackMarketplaceSectionAction[]
+  primaryActionKind: string
 }>
 
 type CanvasAppFeaturePackMarketplaceSectionAction = Readonly<{
   applicable: boolean
+  kind: string
   ready: boolean
   status: 'active' | 'blocked' | 'ready'
 }>
+
+function getCanvasAppFeaturePackMarketplaceItemPrimaryAction(
+  item: CanvasAppFeaturePackMarketplaceSectionActionItem,
+) {
+  return item.actions.find((action) => action.kind === item.primaryActionKind)
+}

@@ -1066,6 +1066,8 @@ describe('Canvas package consumer imports', () => {
       itemCount: 1,
       paidItemCount: 1,
       partiallyUpdatedItemCount: 0,
+      primaryBlockedItemCount: 0,
+      primaryReadyItemCount: 1,
       privateItemCount: 0,
       readyActionCount: 2,
       rollbackAvailableItemCount: 0,
