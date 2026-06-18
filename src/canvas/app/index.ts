@@ -274,6 +274,18 @@ export {
   type CanvasDataTransferImportActionValue,
 } from './affordances/commands/CanvasDataTransferImportActionPlan'
 export {
+  createCanvasDataTransferImportActionPlanFromRegistry,
+  createCanvasDataTransferImportRegistry,
+  getCanvasDataTransferImportRegistryMetadata,
+  type CanvasDataTransferImportRegistry,
+  type CanvasDataTransferImportRegistryActionPlanInput,
+  type CanvasDataTransferImportRegistryInput,
+  type CanvasDataTransferImportRegistryResolver,
+  type CanvasDataTransferImportRegistryResolverMetadata,
+  type CanvasDataTransferImportRegistryResolveInput,
+  type CanvasDataTransferImportRegistryScope,
+} from './affordances/commands/CanvasDataTransferImportRegistry'
+export {
   CANVAS_DATA_TRANSFER_TEXT_MIME_TYPE,
   getCanvasDataTransferText,
   setCanvasDataTransferDropEffect,

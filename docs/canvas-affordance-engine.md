@@ -27,6 +27,17 @@
 | Collision policy | Plain URLs stay plain text so media import can claim them; Markdown tables stay out of rich text so table import can claim them |
 | Runtime | Host text models own conversion from rich text source paragraphs into their own text body/list schema |
 
+## DataTransfer Import Registry Contract
+
+| Area | Contract |
+| --- | --- |
+| Registry role | Host apps register UI-free DataTransfer import resolvers with generic action payloads |
+| Scope | Each resolver declares a scope such as `paste` or `drop`; each scope can expose a different resolver subset |
+| Order | Resolver `order` sorts execution inside a scope; registration order is the fallback |
+| Mode | Resolver `mode` reuses `createCanvasDataTransferImportActionPlan` semantics: `append` accumulates and `exclusive` replaces earlier fallbacks when it returns actions |
+| Metadata | Registry metadata exposes id, title, supported formats, mode, scope, and actual execution order for UI/debug/tests |
+| Runtime | Host apps own concrete action payloads, item creation, placement, persistence, and command dispatch |
+
 ## Image HTML Data Source Batch Contract
 
 | Area | Contract |
