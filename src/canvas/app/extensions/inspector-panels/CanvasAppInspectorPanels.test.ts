@@ -1,4 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
+import {
+  CANVAS_COMPONENT_DEFINITION_REGISTRY,
+} from '../../../host'
 import { getCanvasAppInspectorPanelViews } from './CanvasAppInspectorPanelExecution'
 import { assertCanvasAppInspectorPanels } from './CanvasAppInspectorPanelContracts'
 import type {
@@ -9,6 +12,7 @@ import type {
 const context: CanvasAppInspectorPanelContext = {
   bounds: { x: 0, y: 0, w: 100, h: 80 },
   commitItemsChange: vi.fn(),
+  componentDefinitionRegistry: CANVAS_COMPONENT_DEFINITION_REGISTRY,
   customFocus: null,
   disabled: false,
   label: 'Card',

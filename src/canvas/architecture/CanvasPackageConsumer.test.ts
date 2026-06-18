@@ -41,7 +41,9 @@ import {
   writeCanvasClipboardText,
   defineCanvasAppCustomItemModule,
   CANVAS_APP_CORE_ONLY_FEATURE_PACK_PROFILE,
+  CANVAS_APP_COMPONENT_INSPECTOR_FEATURE_PACK_MANIFEST,
   CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST,
+  CANVAS_COMPONENT_INSPECTOR_PANEL,
   CANVAS_APP_STORY_IMPORT_FEATURE_PACK_MANIFEST,
   CANVAS_APP_STORY_VIEWER_FEATURE_PACK_PROFILE,
   CANVAS_COMPONENT_SYSTEM_FEATURE_PACK_SUITE_MANIFEST,
@@ -69,6 +71,7 @@ import {
   getCanvasAppFeaturePackSuiteFeaturePackIds,
   getCanvasAppManifestViewFeaturePacks,
   getCanvasAppResolvedFeaturePackStates,
+  getCanvasComponentInspectorPanelModel,
   getCanvasFindInputKeyboardIntent,
   getCanvasInlineEditKeyboardIntent,
   getCanvasModalBackdropPointerIntent,
@@ -92,6 +95,7 @@ import {
   type CanvasAppComponentDefinition,
   type CanvasAppComponentTemplate,
   type CanvasAppComponentRendererStrategy,
+  type CanvasComponentInspectorPanelModel,
   type CanvasAppFeaturePack,
   type CanvasAppFeaturePackAssemblyInput,
   type CanvasAppFeaturePackManifest,
@@ -575,11 +579,43 @@ describe('Canvas package consumer imports', () => {
     expect(
       CanvasAppAuthoring.CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST.id,
     ).toBe(CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST.id)
+    expect(CANVAS_APP_COMPONENT_INSPECTOR_FEATURE_PACK_MANIFEST.id)
+      .toBe('component-inspector')
+    expect(
+      CanvasPackage.CANVAS_APP_COMPONENT_INSPECTOR_FEATURE_PACK_MANIFEST.id,
+    ).toBe(CANVAS_APP_COMPONENT_INSPECTOR_FEATURE_PACK_MANIFEST.id)
+    expect(
+      CanvasAppFacade.CANVAS_APP_COMPONENT_INSPECTOR_FEATURE_PACK_MANIFEST.id,
+    ).toBe(CANVAS_APP_COMPONENT_INSPECTOR_FEATURE_PACK_MANIFEST.id)
+    expect(
+      CanvasAppAuthoring.CANVAS_APP_COMPONENT_INSPECTOR_FEATURE_PACK_MANIFEST.id,
+    ).toBe(CANVAS_APP_COMPONENT_INSPECTOR_FEATURE_PACK_MANIFEST.id)
+    expect(CANVAS_COMPONENT_INSPECTOR_PANEL.id).toBe('component-binding')
+    expect(CanvasAppFacade.CANVAS_COMPONENT_INSPECTOR_PANEL.id)
+      .toBe(CANVAS_COMPONENT_INSPECTOR_PANEL.id)
+    expect(CanvasAppAuthoring.getCanvasComponentInspectorPanelModel)
+      .toBe(getCanvasComponentInspectorPanelModel)
+    const emptyComponentInspectorModel: CanvasComponentInspectorPanelModel | null =
+      getCanvasComponentInspectorPanelModel({
+        bounds: null,
+        commitItemsChange: commitAppItemsChange,
+        componentDefinitionRegistry: CANVAS_COMPONENT_DEFINITION_REGISTRY,
+        customFocus: null,
+        disabled: false,
+        items: [],
+        label: null,
+        selectedItems: [],
+        selection: [],
+      })
+
+    expect(emptyComponentInspectorModel).toBeNull()
     expect(DEFAULT_CANVAS_APP_FEATURE_PACK_SUITE_MANIFESTS).toContain(
       CANVAS_COMPONENT_SYSTEM_FEATURE_PACK_SUITE_MANIFEST,
     )
     expect(CANVAS_COMPONENT_SYSTEM_FEATURE_PACK_SUITE_MANIFEST.featurePackIds)
       .toContain(CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST.id)
+    expect(CANVAS_COMPONENT_SYSTEM_FEATURE_PACK_SUITE_MANIFEST.featurePackIds)
+      .toContain(CANVAS_APP_COMPONENT_INSPECTOR_FEATURE_PACK_MANIFEST.id)
     expect(CANVAS_STORY_CANVAS_SUITE_ID).toBe('story-canvas')
     expect(DEFAULT_CANVAS_APP_FEATURE_PACK_SUITE_MANIFESTS).toContain(
       CANVAS_STORY_CANVAS_FEATURE_PACK_SUITE_MANIFEST,

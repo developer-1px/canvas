@@ -113,6 +113,8 @@ export function useCanvasAppModel({
     ...affordance.inspector,
     ...customFocus,
     ...workspace.inspector,
+    componentDefinitionRegistry:
+      appAssembly.component.componentDefinitionRegistry,
     ...appAssembly.inspector,
   })
 

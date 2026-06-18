@@ -3,6 +3,7 @@ import type { CanvasAppInspectorModelInput } from './CanvasAppInspectorConsumerC
 
 export function useCanvasAppInspectorModel({
   commitItemsChange,
+  componentDefinitionRegistry,
   config,
   customFocus,
   inspectorPanels,
@@ -13,6 +14,7 @@ export function useCanvasAppInspectorModel({
   return {
     ...useCanvasObjectInspector({
       commitItemsChange,
+      componentDefinitionRegistry,
       config,
       customFocus,
       inspectorPanels,

@@ -251,6 +251,7 @@ describe('CanvasAppAssembly seams', () => {
       'risk-paste',
     ])
     expect(assembly.inspectorPanels.map((panel) => panel.id)).toEqual([
+      'component-binding',
       'link-preview-actions',
       'arrow-routing-actions',
       'checklist-actions',

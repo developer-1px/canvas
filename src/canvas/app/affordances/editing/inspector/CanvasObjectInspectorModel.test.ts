@@ -4,6 +4,9 @@ import type {
   CanvasItem,
 } from '../../../../entities'
 import { createCanvasAffordanceConfig } from '../../../../engine'
+import {
+  CANVAS_COMPONENT_DEFINITION_REGISTRY,
+} from '../../../../host'
 import { getCanvasObjectInspectorModel } from './CanvasObjectInspectorModel'
 
 describe('CanvasObjectInspectorModel', () => {
@@ -40,10 +43,17 @@ describe('CanvasObjectInspectorModel', () => {
       inspectorPanels: [
         {
           id: 'meta',
-          render: ({ bounds, customFocus, disabled, label, selection }) =>
+          render: ({
+            bounds,
+            componentDefinitionRegistry,
+            customFocus,
+            disabled,
+            label,
+            selection,
+          }) =>
             `${label}:${disabled}:${selection.join(',')}:${bounds?.w}:${
               customFocus?.targetId ?? 'none'
-            }`,
+            }:${componentDefinitionRegistry.definitions.length}`,
         },
       ],
       customFocus: {
@@ -57,7 +67,7 @@ describe('CanvasObjectInspectorModel', () => {
 
     expect(model.customPanels).toEqual([
       {
-        content: 'Card:false:component-1:30:field:title',
+        content: 'Card:false:component-1:30:field:title:0',
         id: 'meta',
       },
     ])
@@ -210,6 +220,7 @@ describe('CanvasObjectInspectorModel', () => {
 function createModel({
   bounds = null,
   commitItemsChange = vi.fn(),
+  componentDefinitionRegistry = CANVAS_COMPONENT_DEFINITION_REGISTRY,
   config = createCanvasAffordanceConfig(),
   customFocus = null,
   inspectorPanels = [],
@@ -221,6 +232,9 @@ function createModel({
   commitItemsChange?: Parameters<
     typeof getCanvasObjectInspectorModel
   >[0]['commitItemsChange']
+  componentDefinitionRegistry?: Parameters<
+    typeof getCanvasObjectInspectorModel
+  >[0]['componentDefinitionRegistry']
   config?: Parameters<
     typeof getCanvasObjectInspectorModel
   >[0]['config']
@@ -237,6 +251,7 @@ function createModel({
   return getCanvasObjectInspectorModel({
     bounds,
     commitItemsChange,
+    componentDefinitionRegistry,
     config,
     customFocus,
     inspectorPanels,

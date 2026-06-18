@@ -66,6 +66,7 @@ export function useCanvasDevToolsAppModel({
   })
   const inspector = useCanvasAppInspectorModel({
     ...workspace.inspector,
+    componentDefinitionRegistry: assembly.componentDefinitionRegistry,
     config: assembly.affordanceConfig,
     customFocus,
     inspectorPanels: assembly.inspectorPanels,

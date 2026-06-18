@@ -9,6 +9,9 @@ import type {
 import type {
   CanvasAppCustomFocus,
 } from '../custom-focus'
+import type {
+  CanvasComponentDefinitionRegistry,
+} from '../../../host'
 
 export type CanvasAppInspectorPanelCommitItemsChange =
   CanvasAppCommitItemsChange
@@ -16,6 +19,7 @@ export type CanvasAppInspectorPanelCommitItemsChange =
 export type CanvasAppInspectorPanelContext = {
   bounds: Bounds | null
   commitItemsChange: CanvasAppInspectorPanelCommitItemsChange
+  componentDefinitionRegistry: CanvasComponentDefinitionRegistry
   customFocus?: CanvasAppCustomFocus | null
   disabled: boolean
   items?: CanvasItem[]

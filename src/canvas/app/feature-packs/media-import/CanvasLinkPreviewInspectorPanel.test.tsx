@@ -1,6 +1,7 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
 import {
+  CANVAS_COMPONENT_DEFINITION_REGISTRY,
   createCanvasLinkPreviewComponentItem,
 } from '../../../host'
 import type { CanvasAppInspectorPanelContext } from '../../extensions/inspector-panels'
@@ -97,6 +98,7 @@ function createContext(
   return {
     bounds: linkPreviewItem,
     commitItemsChange: vi.fn(() => true),
+    componentDefinitionRegistry: CANVAS_COMPONENT_DEFINITION_REGISTRY,
     disabled: false,
     items: [createRectItem(), linkPreviewItem],
     label: 'Link preview',

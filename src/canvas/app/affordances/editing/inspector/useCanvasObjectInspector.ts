@@ -1,5 +1,8 @@
 import { useMemo } from 'react'
 import type { CanvasAffordanceConfig } from '../../../../engine'
+import type {
+  CanvasComponentDefinitionRegistry,
+} from '../../../../host'
 import type { CommitCanvasItemsChange } from '../../../workflow/CanvasWorkflowContract'
 import type { CanvasAppItemReadModel } from '../../../workflow/CanvasAppItemReadModelContracts'
 import type { CanvasAppCustomFocus } from '../../../extensions/custom-focus'
@@ -8,6 +11,7 @@ import { getCanvasObjectInspectorModel } from './CanvasObjectInspectorModel'
 
 type UseCanvasObjectInspectorArgs = {
   config: CanvasAffordanceConfig
+  componentDefinitionRegistry: CanvasComponentDefinitionRegistry
   itemReadModel: CanvasAppItemReadModel
   inspectorPanels: readonly CanvasAppInspectorPanel[]
   selected: Set<string>
@@ -18,6 +22,7 @@ type UseCanvasObjectInspectorArgs = {
 
 export function useCanvasObjectInspector({
   commitItemsChange,
+  componentDefinitionRegistry,
   config,
   customFocus,
   itemReadModel,
@@ -42,6 +47,7 @@ export function useCanvasObjectInspector({
       getCanvasObjectInspectorModel({
         bounds,
         commitItemsChange,
+        componentDefinitionRegistry,
         config,
         customFocus,
         inspectorPanels,
@@ -52,6 +58,7 @@ export function useCanvasObjectInspector({
     [
       bounds,
       commitItemsChange,
+      componentDefinitionRegistry,
       config,
       customFocus,
       inspectorPanels,
