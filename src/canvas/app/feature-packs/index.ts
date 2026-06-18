@@ -15,6 +15,11 @@ export {
   DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS,
 } from './CanvasAppDefaultFeaturePackManifests'
 export {
+  CANVAS_STORY_CANVAS_FEATURE_PACK_SUITE_MANIFEST,
+  CANVAS_STORY_CANVAS_SUITE_ID,
+  DEFAULT_CANVAS_APP_FEATURE_PACK_SUITE_MANIFESTS,
+} from './CanvasAppDefaultFeaturePackSuites'
+export {
   CANVAS_APP_COMMAND_PALETTE_FEATURE_PACK_MANIFEST,
   CANVAS_APP_COMMAND_PALETTE_VIEW_FEATURE_PACK,
   CANVAS_APP_COMPONENT_AUTHORING_FEATURE_PACK_MANIFEST,
@@ -49,10 +54,20 @@ export {
   assertCanvasAppFeaturePackManifest,
   assertCanvasAppFeaturePackManifests,
   createCanvasAppFeaturePackManifest,
+  getCanvasAppEnabledFeaturePackManifestIds,
+  getCanvasAppEnabledFeaturePackManifests,
   getCanvasAppInstalledFeaturePackManifestIds,
   getCanvasAppInstalledFeaturePackManifests,
   getCanvasAppManifestExtensionFeaturePacks,
   getCanvasAppManifestViewFeaturePacks,
+  type CanvasAppFeaturePackContributionSurface,
+  type CanvasAppFeaturePackManifestCategory,
+  type CanvasAppFeaturePackManifestCompatibility,
+  type CanvasAppFeaturePackManifestCompatibilityInput,
+  type CanvasAppFeaturePackManifestContributions,
+  type CanvasAppFeaturePackManifestContributionsInput,
+  type CanvasAppFeaturePackManifestLifecycle,
+  type CanvasAppFeaturePackManifestLifecycleInput,
   type CanvasAppFeaturePackManifest,
   type CanvasAppFeaturePackManifestInput,
 } from './CanvasAppFeaturePackManifests'
@@ -62,12 +77,39 @@ export {
   assertCanvasAppFeaturePacks,
   createCanvasAppFeaturePack,
   createCanvasAppFeaturePackExtensionBundle,
+  getCanvasAppEnabledFeaturePackIds,
+  getCanvasAppInstalledFeaturePackIds,
   getCanvasAppInstalledFeaturePacks,
+  getCanvasAppResolvedFeaturePackStates,
   type CanvasAppFeaturePack,
   type CanvasAppFeaturePackId,
   type CanvasAppFeaturePackInput,
   type CanvasAppFeaturePackInstallOptions,
+  type CanvasAppFeaturePackRuntimeState,
+  type CanvasAppFeaturePackRuntimeStateInput,
+  type CanvasAppFeaturePackRuntimeStateStatus,
 } from './CanvasAppFeaturePacks'
+export {
+  assertCanvasAppFeaturePackSuiteIds,
+  assertCanvasAppFeaturePackSuiteManifest,
+  assertCanvasAppFeaturePackSuiteManifests,
+  createCanvasAppFeaturePackSuiteManifest,
+  getCanvasAppFeaturePackSuiteFeaturePackIds,
+  type CanvasAppFeaturePackSuiteId,
+  type CanvasAppFeaturePackSuiteManifest,
+  type CanvasAppFeaturePackSuiteManifestInput,
+} from './CanvasAppFeaturePackSuites'
+export {
+  CANVAS_APP_CORE_ONLY_FEATURE_PACK_PROFILE,
+  CANVAS_APP_MINIMAL_VIEWER_FEATURE_PACK_PROFILE,
+  CANVAS_APP_STORY_VIEWER_FEATURE_PACK_PROFILE,
+  DEFAULT_CANVAS_APP_EDITOR_FEATURE_PACK_PROFILE,
+  DEFAULT_CANVAS_APP_FEATURE_PACK_PROFILES,
+  createCanvasAppFeaturePackProfile,
+  type CanvasAppFeaturePackProfile,
+  type CanvasAppFeaturePackProfileId,
+  type CanvasAppFeaturePackProfileInput,
+} from './CanvasAppFeaturePackProfiles'
 export {
   createCanvasAppAiLabsFeaturePackManifest,
   type CanvasAppAiLabsFeaturePackManifestInput,
@@ -143,6 +185,23 @@ export {
 export {
   getCanvasStatusModel,
 } from './status-bar'
+export {
+  CANVAS_STORY_PREVIEW_GROUP_KIND,
+  CANVAS_STORY_PREVIEW_GROUP_PRESENTATION,
+  CANVAS_STORY_PREVIEW_ITEMS_FEATURE_PACK_ID,
+  CANVAS_STORY_PREVIEW_ITEM_KIND,
+  CANVAS_STORY_PREVIEW_ITEM_PRESENTATION,
+  createCanvasStoryPreviewItemModules,
+  createCanvasStoryPreviewItemsFeaturePack,
+  createCanvasStoryPreviewItemsFeaturePackManifest,
+  isCanvasStoryPreviewGroupItem,
+  isCanvasStoryPreviewItem,
+  type CanvasStoryPreviewGroupData,
+  type CanvasStoryPreviewGroupRenderInput,
+  type CanvasStoryPreviewItemData,
+  type CanvasStoryPreviewItemRenderInput,
+  type CanvasStoryPreviewItemsFeaturePackInput,
+} from './story-preview'
 export {
   CANVAS_APP_TABLE_IMPORT_FEATURE_PACK_MANIFEST,
   useCanvasTableImport,

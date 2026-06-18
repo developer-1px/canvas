@@ -31,6 +31,7 @@ export type CanvasAppFeaturePackAssemblyInput = {
   disabledViewFeaturePackIds?: CanvasAppFeaturePackInstallOptions[
     'disabledFeaturePackIds'
   ]
+  featurePackStates?: CanvasAppFeaturePackInstallOptions['featurePackStates']
   featurePackManifests?: readonly CanvasAppFeaturePackManifest[]
   featurePackViewRenderers?: CanvasAppFeaturePackViewRenderers
   viewFeaturePacks?: readonly CanvasAppViewFeaturePack[]
@@ -51,6 +52,7 @@ export function createCanvasAppFeaturePackAssembly(
           featurePackManifests,
           {
             disabledFeaturePackIds: input.disabledFeaturePackIds,
+            featurePackStates: input.featurePackStates,
           },
         ),
       ),
@@ -58,6 +60,7 @@ export function createCanvasAppFeaturePackAssembly(
         featurePackManifests,
         {
           disabledFeaturePackIds: input.disabledFeaturePackIds,
+          featurePackStates: input.featurePackStates,
         },
       ),
       featurePackViewRenderers: snapshotCanvasAppFeaturePackViewRenderers(
@@ -69,7 +72,8 @@ export function createCanvasAppFeaturePackAssembly(
   if (
     input.featurePackManifests ||
     input.additionalFeaturePackManifests ||
-    input.disabledFeaturePackIds
+    input.disabledFeaturePackIds ||
+    input.featurePackStates
   ) {
     const featurePackManifests =
       getCanvasAppAssemblyFeaturePackManifests(input)
@@ -78,17 +82,20 @@ export function createCanvasAppFeaturePackAssembly(
       featurePackExtensionBundle: createCanvasAppFeaturePackExtensionBundle(
         getCanvasAppManifestExtensionFeaturePacks(featurePackManifests, {
           disabledFeaturePackIds: input.disabledFeaturePackIds,
+          featurePackStates: input.featurePackStates,
         }),
       ),
       installedFeaturePackIds: getCanvasAppInstalledFeaturePackManifestIds(
         featurePackManifests,
         {
           disabledFeaturePackIds: input.disabledFeaturePackIds,
+          featurePackStates: input.featurePackStates,
         },
       ),
       featurePackViewRenderers: createCanvasAppFeaturePackViewRenderers(
         getCanvasAppManifestViewFeaturePacks(featurePackManifests, {
           disabledFeaturePackIds: input.disabledFeaturePackIds,
+          featurePackStates: input.featurePackStates,
         }),
       ),
     }

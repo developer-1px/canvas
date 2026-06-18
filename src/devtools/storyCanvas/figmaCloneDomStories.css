@@ -1,0 +1,26 @@
+.story-figma-dom-home {
+  box-sizing: border-box;
+  background: #eef1f5;
+  color: #172033;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+}
+
+.story-figma-dom-home--page {
+  padding: 28px;
+  width: 1336px;
+}
+
+.story-figma-dom-home--focus {
+  padding: 24px;
+  width: 1180px;
+}
+
+.story-figma-dom-home__frame {
+  position: relative;
+  width: 100%;
+}
+
+.story-figma-dom-home__frame > .figma-dom-frame {
+  align-items: flex-start;
+  justify-content: flex-start;
+}

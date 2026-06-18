@@ -29,6 +29,32 @@ export type CanvasAppFeaturePackInput = Readonly<{
 
 export type CanvasAppFeaturePackInstallOptions = Readonly<{
   disabledFeaturePackIds?: readonly CanvasAppFeaturePackId[]
+  featurePackStates?: readonly CanvasAppFeaturePackRuntimeStateInput[]
+}>
+
+export type CanvasAppFeaturePackRuntimeStateStatus =
+  | 'activation-failed'
+  | 'available'
+  | 'disabled'
+  | 'enabled'
+  | 'installed'
+  | 'partially-updated'
+  | 'rollback-available'
+  | 'uninstalled'
+  | 'updating'
+
+export type CanvasAppFeaturePackRuntimeState = Readonly<{
+  enabled: boolean
+  id: CanvasAppFeaturePackId
+  installed: boolean
+  status: CanvasAppFeaturePackRuntimeStateStatus
+}>
+
+export type CanvasAppFeaturePackRuntimeStateInput = Readonly<{
+  enabled?: boolean
+  id: CanvasAppFeaturePackId
+  installed?: boolean
+  status?: CanvasAppFeaturePackRuntimeStateStatus
 }>
 
 export function createCanvasAppFeaturePack(
@@ -48,13 +74,84 @@ export function getCanvasAppInstalledFeaturePacks(
   options: CanvasAppFeaturePackInstallOptions = {},
 ) {
   assertCanvasAppFeaturePacks(featurePacks)
-  const disabledIds = getCanvasAppDisabledFeaturePackIdSet(
-    options.disabledFeaturePackIds ?? [],
+  const enabledIds = getCanvasAppEnabledFeaturePackIdSet(
+    featurePacks.map((featurePack) => featurePack.id),
+    options,
   )
 
   return Object.freeze(
-    featurePacks.filter((featurePack) => !disabledIds.has(featurePack.id)),
+    featurePacks.filter((featurePack) => enabledIds.has(featurePack.id)),
   ) as readonly CanvasAppFeaturePack[]
+}
+
+export function getCanvasAppResolvedFeaturePackStates(
+  featurePackIds: readonly CanvasAppFeaturePackId[],
+  options: CanvasAppFeaturePackInstallOptions = {},
+): readonly CanvasAppFeaturePackRuntimeState[] {
+  assertCanvasAppFeaturePackIds(featurePackIds)
+  const stateMap = createDefaultCanvasAppFeaturePackRuntimeStateMap(
+    featurePackIds,
+  )
+
+  for (const id of options.disabledFeaturePackIds ?? []) {
+    assertCanvasAppExtensionId({
+      id,
+      label: 'disabled feature pack',
+    })
+    assertCanvasAppKnownFeaturePackStateId({
+      featurePackIds,
+      id,
+      label: 'disabled feature pack',
+    })
+    stateMap.set(id, createCanvasAppFeaturePackRuntimeState({
+      id,
+      status: 'uninstalled',
+    }))
+  }
+
+  for (const stateInput of options.featurePackStates ?? []) {
+    const state = createCanvasAppFeaturePackRuntimeState(stateInput)
+    assertCanvasAppKnownFeaturePackStateId({
+      featurePackIds,
+      id: state.id,
+      label: 'feature pack state',
+    })
+    stateMap.set(state.id, state)
+  }
+
+  return Object.freeze(
+    featurePackIds.map((id) => {
+      const state = stateMap.get(id)
+
+      if (!state) {
+        throw new Error(`Missing canvas app feature pack state: ${id}`)
+      }
+
+      return state
+    }),
+  )
+}
+
+export function getCanvasAppInstalledFeaturePackIds(
+  featurePackIds: readonly CanvasAppFeaturePackId[],
+  options: CanvasAppFeaturePackInstallOptions = {},
+): readonly CanvasAppFeaturePackId[] {
+  return Object.freeze(
+    getCanvasAppResolvedFeaturePackStates(featurePackIds, options)
+      .filter((state) => state.installed)
+      .map((state) => state.id),
+  )
+}
+
+export function getCanvasAppEnabledFeaturePackIds(
+  featurePackIds: readonly CanvasAppFeaturePackId[],
+  options: CanvasAppFeaturePackInstallOptions = {},
+): readonly CanvasAppFeaturePackId[] {
+  return Object.freeze(
+    getCanvasAppResolvedFeaturePackStates(featurePackIds, options)
+      .filter((state) => state.enabled)
+      .map((state) => state.id),
+  )
 }
 
 export function createCanvasAppFeaturePackExtensionBundle(
@@ -128,15 +225,119 @@ function assertCanvasAppFeaturePackInput(
   assertCanvasAppFeaturePack(input)
 }
 
-function getCanvasAppDisabledFeaturePackIdSet(
-  disabledFeaturePackIds: readonly CanvasAppFeaturePackId[],
+function getCanvasAppEnabledFeaturePackIdSet(
+  featurePackIds: readonly CanvasAppFeaturePackId[],
+  options: CanvasAppFeaturePackInstallOptions,
 ) {
-  for (const id of disabledFeaturePackIds) {
-    assertCanvasAppExtensionId({
+  return new Set(getCanvasAppEnabledFeaturePackIds(featurePackIds, options))
+}
+
+function createDefaultCanvasAppFeaturePackRuntimeStateMap(
+  featurePackIds: readonly CanvasAppFeaturePackId[],
+) {
+  return new Map(
+    featurePackIds.map((id) => [
       id,
-      label: 'disabled feature pack',
-    })
+      createCanvasAppFeaturePackRuntimeState({
+        id,
+        status: 'enabled',
+      }),
+    ]),
+  )
+}
+
+function createCanvasAppFeaturePackRuntimeState(
+  input: CanvasAppFeaturePackRuntimeStateInput,
+): CanvasAppFeaturePackRuntimeState {
+  assertCanvasAppExtensionId({
+    id: input.id,
+    label: 'feature pack state',
+  })
+
+  const status = input.status ?? getCanvasAppFeaturePackStatusFromFlags({
+    enabled: input.enabled,
+    installed: input.installed,
+  })
+  const statusFlags = getCanvasAppFeaturePackStatusFlags(status)
+  const installed = input.installed ?? statusFlags.installed
+  const enabled = input.enabled ?? statusFlags.enabled
+
+  if (enabled && !installed) {
+    throw new Error(`Feature pack state ${input.id} cannot be enabled when uninstalled`)
   }
 
-  return new Set(disabledFeaturePackIds)
+  return Object.freeze({
+    enabled,
+    id: input.id,
+    installed,
+    status,
+  })
+}
+
+function getCanvasAppFeaturePackStatusFromFlags({
+  enabled,
+  installed,
+}: {
+  enabled?: boolean
+  installed?: boolean
+}): CanvasAppFeaturePackRuntimeStateStatus {
+  if (enabled) {
+    return 'enabled'
+  }
+
+  if (installed) {
+    return 'disabled'
+  }
+
+  return 'uninstalled'
+}
+
+function getCanvasAppFeaturePackStatusFlags(
+  status: CanvasAppFeaturePackRuntimeStateStatus,
+) {
+  if (status === 'available' || status === 'uninstalled') {
+    return {
+      enabled: false,
+      installed: false,
+    }
+  }
+
+  if (
+    status === 'disabled' ||
+    status === 'activation-failed' ||
+    status === 'installed' ||
+    status === 'rollback-available'
+  ) {
+    return {
+      enabled: false,
+      installed: true,
+    }
+  }
+
+  if (
+    status === 'enabled' ||
+    status === 'partially-updated' ||
+    status === 'updating'
+  ) {
+    return {
+      enabled: true,
+      installed: true,
+    }
+  }
+
+  throw new Error(`Invalid canvas app feature pack status: ${status}`)
+}
+
+function assertCanvasAppKnownFeaturePackStateId({
+  featurePackIds,
+  id,
+  label,
+}: {
+  featurePackIds: readonly CanvasAppFeaturePackId[]
+  id: CanvasAppFeaturePackId
+  label: string
+}) {
+  if (!featurePackIds.includes(id)) {
+    throw new Error(`Unknown canvas app ${label}: ${id}`)
+  }
 }

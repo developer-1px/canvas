@@ -17,7 +17,14 @@ import {
   DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS,
 } from './CanvasAppDefaultFeaturePackManifests'
 import {
+  CANVAS_STORY_CANVAS_FEATURE_PACK_SUITE_MANIFEST,
+  CANVAS_STORY_CANVAS_SUITE_ID,
+  DEFAULT_CANVAS_APP_FEATURE_PACK_SUITE_MANIFESTS,
+} from './CanvasAppDefaultFeaturePackSuites'
+import {
   createCanvasAppFeaturePackManifest,
+  getCanvasAppEnabledFeaturePackManifestIds,
+  getCanvasAppEnabledFeaturePackManifests,
   getCanvasAppInstalledFeaturePackManifestIds,
   getCanvasAppManifestExtensionFeaturePacks,
   getCanvasAppManifestViewFeaturePacks,
@@ -25,8 +32,22 @@ import {
 import {
   createCanvasAppFeaturePack,
   createCanvasAppFeaturePackExtensionBundle,
+  getCanvasAppEnabledFeaturePackIds,
+  getCanvasAppInstalledFeaturePackIds,
   getCanvasAppInstalledFeaturePacks,
+  getCanvasAppResolvedFeaturePackStates,
 } from './CanvasAppFeaturePacks'
+import {
+  CANVAS_APP_CORE_ONLY_FEATURE_PACK_PROFILE,
+  CANVAS_APP_MINIMAL_VIEWER_FEATURE_PACK_PROFILE,
+  CANVAS_APP_STORY_VIEWER_FEATURE_PACK_PROFILE,
+  DEFAULT_CANVAS_APP_EDITOR_FEATURE_PACK_PROFILE,
+  createCanvasAppFeaturePackProfile,
+} from './CanvasAppFeaturePackProfiles'
+import {
+  createCanvasAppFeaturePackSuiteManifest,
+  getCanvasAppFeaturePackSuiteFeaturePackIds,
+} from './CanvasAppFeaturePackSuites'
 import {
   getCanvasAppRuntimeFeatureConfig,
 } from './CanvasAppFeaturePackRuntimeModel'
@@ -43,6 +64,9 @@ import {
 import {
   createCanvasAppDomEditStyleFeaturePackManifest,
 } from './dom-edit-style'
+import {
+  CANVAS_STORY_PREVIEW_ITEMS_FEATURE_PACK_ID,
+} from './story-preview'
 
 describe('CanvasAppFeaturePacks', () => {
   it('installs feature pack extension bundles in pack order', () => {
@@ -97,6 +121,94 @@ describe('CanvasAppFeaturePacks', () => {
     expect(createCanvasAppFeaturePackExtensionBundle(packs, {
       disabledFeaturePackIds: ['publish-pack'],
     }).customCommands.map((command) => command.id)).toEqual(['archive'])
+  })
+
+  it('resolves installed and enabled feature pack states separately', () => {
+    const packs = [
+      createCanvasAppFeaturePack({
+        extensionBundle: createCanvasAppExtensionBundle({
+          customCommands: [createCommand('publish')],
+        }),
+        id: 'publish-pack',
+        label: 'Publish pack',
+      }),
+      createCanvasAppFeaturePack({
+        extensionBundle: createCanvasAppExtensionBundle({
+          customCommands: [createCommand('archive')],
+        }),
+        id: 'archive-pack',
+        label: 'Archive pack',
+      }),
+    ]
+    const packIds = packs.map((pack) => pack.id)
+
+    expect(getCanvasAppResolvedFeaturePackStates(packIds)).toEqual([
+      {
+        enabled: true,
+        id: 'publish-pack',
+        installed: true,
+        status: 'enabled',
+      },
+      {
+        enabled: true,
+        id: 'archive-pack',
+        installed: true,
+        status: 'enabled',
+      },
+    ])
+    expect(getCanvasAppInstalledFeaturePackIds(packIds, {
+      featurePackStates: [
+        {
+          id: 'publish-pack',
+          status: 'disabled',
+        },
+      ],
+    })).toEqual(['publish-pack', 'archive-pack'])
+    expect(getCanvasAppEnabledFeaturePackIds(packIds, {
+      featurePackStates: [
+        {
+          id: 'publish-pack',
+          status: 'disabled',
+        },
+      ],
+    })).toEqual(['archive-pack'])
+    expect(getCanvasAppInstalledFeaturePacks(packs, {
+      featurePackStates: [
+        {
+          id: 'publish-pack',
+          status: 'disabled',
+        },
+      ],
+    }).map((pack) => pack.id)).toEqual(['archive-pack'])
+    expect(createCanvasAppFeaturePackExtensionBundle(packs, {
+      featurePackStates: [
+        {
+          id: 'publish-pack',
+          status: 'disabled',
+        },
+      ],
+    }).customCommands.map((command) => command.id)).toEqual(['archive'])
+    expect(() =>
+      getCanvasAppResolvedFeaturePackStates(packIds, {
+        featurePackStates: [
+          {
+            enabled: true,
+            id: 'publish-pack',
+            installed: false,
+          },
+        ],
+      }),
+    ).toThrow('cannot be enabled when uninstalled')
+    expect(() =>
+      getCanvasAppResolvedFeaturePackStates(packIds, {
+        featurePackStates: [
+          {
+            id: 'missing-pack',
+            status: 'enabled',
+          },
+        ],
+      }),
+    ).toThrow('Unknown canvas app feature pack state: missing-pack')
   })
 
   it('rejects duplicate feature pack ids and duplicate installed entries', () => {
@@ -250,6 +362,248 @@ describe('CanvasAppFeaturePacks', () => {
     expect(getCanvasAppInstalledFeaturePackManifestIds(
       DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS,
     )).toContain('text-paste-import')
+  })
+
+  it('stores marketplace-ready manifest metadata with defaults and overrides', () => {
+    const publishPack = createCanvasAppFeaturePack({
+      extensionBundle: createCanvasAppExtensionBundle({
+        customCommands: [createCommand('publish')],
+      }),
+      id: 'publish-pack',
+      label: 'Publish pack',
+    })
+    const defaultManifest = createCanvasAppFeaturePackManifest({
+      extensionFeaturePack: publishPack,
+      id: 'publish-pack',
+      label: 'Publish pack',
+    })
+    const customManifest = createCanvasAppFeaturePackManifest({
+      category: 'automation',
+      compatibility: {
+        documentSchemaVersion: '2',
+        engineVersion: '^1.0.0',
+        featureStateVersion: '3',
+      },
+      conflicts: ['legacy-publish-pack'],
+      contributes: {
+        surfaces: ['command', 'runtime-model'],
+      },
+      extensionFeaturePack: publishPack,
+      id: 'publish-pack',
+      label: 'Publish pack',
+      lifecycle: {
+        hotReloadable: true,
+        partialUpdate: ['command'],
+        runtimeToggleable: true,
+      },
+      optionalRequires: ['audit-pack'],
+      provides: ['publish-capability'],
+      requires: ['workflow-pack'],
+      version: '1.2.3',
+    })
+
+    expect(defaultManifest.category).toBe('view')
+    expect(defaultManifest.version).toBe('0.1.0')
+    expect(defaultManifest.lifecycle.installable).toBe(true)
+    expect(defaultManifest.lifecycle.runtimeToggleable).toBe(false)
+    expect(defaultManifest.compatibility.engineVersion).toBe('0.1.x')
+    expect(defaultManifest.contributes.surfaces).toEqual([])
+    expect(customManifest.category).toBe('automation')
+    expect(customManifest.version).toBe('1.2.3')
+    expect(customManifest.lifecycle).toEqual({
+      hotReloadable: true,
+      installable: true,
+      partialUpdate: ['command'],
+      runtimeToggleable: true,
+      uninstallable: true,
+    })
+    expect(customManifest.contributes.surfaces).toEqual([
+      'command',
+      'runtime-model',
+    ])
+    expect(customManifest.requires).toEqual(['workflow-pack'])
+    expect(customManifest.optionalRequires).toEqual(['audit-pack'])
+    expect(customManifest.conflicts).toEqual(['legacy-publish-pack'])
+    expect(customManifest.provides).toEqual(['publish-capability'])
+    expect(() =>
+      createCanvasAppFeaturePackManifest({
+        contributes: {
+          surfaces: ['command', 'command'],
+        },
+        id: 'duplicate-surfaces-pack',
+        label: 'Duplicate surfaces pack',
+      }),
+    ).toThrow('Duplicate feature pack contribution surface: command')
+  })
+
+  it('derives installed and enabled manifest ids separately', () => {
+    const publish = createCommand('publish')
+    const renderStatus = () => null
+    const extensionFeaturePack = createCanvasAppFeaturePack({
+      extensionBundle: createCanvasAppExtensionBundle({
+        customCommands: [publish],
+      }),
+      id: 'publish-pack',
+      label: 'Publish pack',
+    })
+    const viewFeaturePack = createCanvasAppViewFeaturePack({
+      id: 'status-pack',
+      label: 'Status pack',
+      viewRenderers: {
+        status: renderStatus,
+      },
+    })
+    const manifests = [
+      createCanvasAppFeaturePackManifest({
+        extensionFeaturePack,
+        id: 'publish-pack',
+        label: 'Publish pack',
+      }),
+      createCanvasAppFeaturePackManifest({
+        id: 'status-pack',
+        label: 'Status pack',
+        viewFeaturePack,
+      }),
+    ]
+    const options = {
+      featurePackStates: [
+        {
+          id: 'publish-pack',
+          status: 'disabled',
+        },
+      ],
+    } as const
+
+    expect(getCanvasAppInstalledFeaturePackManifestIds(
+      manifests,
+      options,
+    )).toEqual(['publish-pack', 'status-pack'])
+    expect(getCanvasAppEnabledFeaturePackManifestIds(
+      manifests,
+      options,
+    )).toEqual(['status-pack'])
+    expect(getCanvasAppEnabledFeaturePackManifests(
+      manifests,
+      options,
+    ).map((manifest) => manifest.id)).toEqual(['status-pack'])
+    expect(getCanvasAppManifestExtensionFeaturePacks(
+      manifests,
+      options,
+    )).toEqual([])
+    expect(getCanvasAppManifestViewFeaturePacks(
+      manifests,
+      options,
+    )).toEqual([viewFeaturePack])
+  })
+
+  it('defines feature pack suite manifests as profile install units', () => {
+    const suiteManifest = createCanvasAppFeaturePackSuiteManifest({
+      featurePackIds: [
+        'smoke-preview-items',
+        'smoke-story-import',
+      ],
+      id: 'smoke-story-canvas',
+      label: 'Smoke story canvas',
+    })
+
+    expect(getCanvasAppFeaturePackSuiteFeaturePackIds(
+      [suiteManifest],
+      ['smoke-story-canvas'],
+    )).toEqual([
+      'smoke-preview-items',
+      'smoke-story-import',
+    ])
+    expect(DEFAULT_CANVAS_APP_FEATURE_PACK_SUITE_MANIFESTS.map(
+      (manifest) => manifest.id,
+    )).toEqual([CANVAS_STORY_CANVAS_SUITE_ID])
+    expect(CANVAS_STORY_CANVAS_FEATURE_PACK_SUITE_MANIFEST.featurePackIds)
+      .toEqual([CANVAS_STORY_PREVIEW_ITEMS_FEATURE_PACK_ID])
+    expect(() =>
+      getCanvasAppFeaturePackSuiteFeaturePackIds(
+        [suiteManifest],
+        ['missing-story-canvas'],
+      ),
+    ).toThrow('Unknown canvas app feature pack suite: missing-story-canvas')
+    expect(() =>
+      createCanvasAppFeaturePackSuiteManifest({
+        featurePackIds: ['smoke-preview-items', 'smoke-preview-items'],
+        id: 'duplicate-story-canvas',
+        label: 'Duplicate story canvas',
+      }),
+    ).toThrow(
+      'Duplicate canvas app feature pack suite feature pack: smoke-preview-items',
+    )
+  })
+
+  it('defines feature pack profile skeletons', () => {
+    expect(CANVAS_APP_CORE_ONLY_FEATURE_PACK_PROFILE).toEqual({
+      enabledFeaturePackIds: [],
+      enabledSuiteIds: [],
+      id: 'core-only',
+      installedFeaturePackIds: [],
+      installedSuiteIds: [],
+      label: 'Core only',
+    })
+    expect(CANVAS_APP_MINIMAL_VIEWER_FEATURE_PACK_PROFILE).toEqual({
+      enabledFeaturePackIds: ['zoom-controls'],
+      enabledSuiteIds: [],
+      id: 'minimal-viewer',
+      installedFeaturePackIds: ['zoom-controls'],
+      installedSuiteIds: [],
+      label: 'Minimal viewer',
+    })
+    expect(CANVAS_APP_STORY_VIEWER_FEATURE_PACK_PROFILE).toEqual({
+      enabledFeaturePackIds: [CANVAS_STORY_PREVIEW_ITEMS_FEATURE_PACK_ID],
+      enabledSuiteIds: [CANVAS_STORY_CANVAS_SUITE_ID],
+      id: 'story-viewer',
+      installedFeaturePackIds: [CANVAS_STORY_PREVIEW_ITEMS_FEATURE_PACK_ID],
+      installedSuiteIds: [CANVAS_STORY_CANVAS_SUITE_ID],
+      label: 'Story viewer',
+    })
+    expect(DEFAULT_CANVAS_APP_EDITOR_FEATURE_PACK_PROFILE.id).toBe('editor')
+    expect(DEFAULT_CANVAS_APP_EDITOR_FEATURE_PACK_PROFILE.installedFeaturePackIds)
+      .toContain('toolbar')
+    expect(DEFAULT_CANVAS_APP_EDITOR_FEATURE_PACK_PROFILE.enabledFeaturePackIds)
+      .toContain('toolbar')
+    expect(() =>
+      createCanvasAppFeaturePackProfile({
+        enabledFeaturePackIds: ['toolbar'],
+        id: 'broken-profile',
+        installedFeaturePackIds: [],
+        label: 'Broken profile',
+      }),
+    ).toThrow('Feature pack profile broken-profile enables uninstalled pack: toolbar')
+    expect(createCanvasAppFeaturePackProfile({
+      id: 'story-and-zoom',
+      installedFeaturePackIds: ['zoom-controls'],
+      installedSuiteIds: [CANVAS_STORY_CANVAS_SUITE_ID],
+      label: 'Story and zoom',
+      suiteManifests: DEFAULT_CANVAS_APP_FEATURE_PACK_SUITE_MANIFESTS,
+    })).toEqual({
+      enabledFeaturePackIds: [
+        CANVAS_STORY_PREVIEW_ITEMS_FEATURE_PACK_ID,
+        'zoom-controls',
+      ],
+      enabledSuiteIds: [CANVAS_STORY_CANVAS_SUITE_ID],
+      id: 'story-and-zoom',
+      installedFeaturePackIds: [
+        CANVAS_STORY_PREVIEW_ITEMS_FEATURE_PACK_ID,
+        'zoom-controls',
+      ],
+      installedSuiteIds: [CANVAS_STORY_CANVAS_SUITE_ID],
+      label: 'Story and zoom',
+    })
+    expect(() =>
+      createCanvasAppFeaturePackProfile({
+        enabledSuiteIds: [CANVAS_STORY_CANVAS_SUITE_ID],
+        id: 'broken-suite-profile',
+        installedSuiteIds: [],
+        label: 'Broken suite profile',
+        suiteManifests: DEFAULT_CANVAS_APP_FEATURE_PACK_SUITE_MANIFESTS,
+      }),
+    ).toThrow(
+      'Feature pack profile broken-suite-profile enables uninstalled suite: story-canvas',
+    )
   })
 
   it('derives optional feature pack manifests from pack factories', () => {

@@ -14,6 +14,9 @@ import type {
   CanvasAppFeaturePackId,
   CanvasAppFeaturePackInstallOptions,
 } from './CanvasAppFeaturePacks'
+import {
+  getCanvasAppEnabledFeaturePackIds,
+} from './CanvasAppFeaturePacks'
 import type { CanvasCommandPalette } from './command-palette'
 import type {
   CanvasComponentPalette,
@@ -138,12 +141,15 @@ export function getCanvasAppInstalledViewFeaturePacks(
   options: CanvasAppFeaturePackInstallOptions = {},
 ) {
   assertCanvasAppViewFeaturePacks(featurePacks)
-  const disabledIds = getCanvasAppDisabledViewFeaturePackIdSet(
-    options.disabledFeaturePackIds ?? [],
+  const enabledIds = new Set(
+    getCanvasAppEnabledFeaturePackIds(
+      featurePacks.map((featurePack) => featurePack.id),
+      options,
+    ),
   )
 
   return Object.freeze(
-    featurePacks.filter((featurePack) => !disabledIds.has(featurePack.id)),
+    featurePacks.filter((featurePack) => enabledIds.has(featurePack.id)),
   ) as readonly CanvasAppViewFeaturePack[]
 }
 
@@ -224,17 +230,4 @@ export function assertCanvasAppFeaturePackViewRenderers(
   renderers: unknown,
 ): asserts renderers is CanvasAppFeaturePackViewRenderers {
   assertCanvasAppDescriptorObject(renderers, 'feature pack view renderers')
-}
-
-function getCanvasAppDisabledViewFeaturePackIdSet(
-  disabledFeaturePackIds: readonly CanvasAppFeaturePackId[],
-) {
-  for (const id of disabledFeaturePackIds) {
-    assertCanvasAppExtensionId({
-      id,
-      label: 'disabled view feature pack',
-    })
-  }
-
-  return new Set(disabledFeaturePackIds)
 }

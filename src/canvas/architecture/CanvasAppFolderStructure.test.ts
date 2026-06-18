@@ -62,6 +62,7 @@ describe('Canvas App folder structure', () => {
       'shortcut-help',
       'stamp-authoring',
       'status-bar',
+      'story-preview',
       'table-import',
       'text-paste-import',
       'toolbar',
@@ -77,7 +78,7 @@ describe('Canvas App folder structure', () => {
         ),
       ).toBe(true)
       expect(getSourceFile(indexPath).source).toMatch(
-        /FeaturePackManifest|createCanvasAppFeaturePackManifest/,
+        /FeaturePackManifest|createCanvasAppFeaturePackManifest|createCanvasStoryPreviewItemsFeaturePack/,
       )
     }
   })
@@ -116,10 +117,13 @@ describe('Canvas App folder structure', () => {
 
     expect(rootFeaturePackFiles).toEqual([
       'src/canvas/app/feature-packs/CanvasAppDefaultFeaturePackManifests.ts',
+      'src/canvas/app/feature-packs/CanvasAppDefaultFeaturePackSuites.ts',
       'src/canvas/app/feature-packs/CanvasAppDefaultFeaturePacks.ts',
       'src/canvas/app/feature-packs/CanvasAppDefaultViewFeaturePacks.ts',
       'src/canvas/app/feature-packs/CanvasAppFeaturePackManifests.ts',
+      'src/canvas/app/feature-packs/CanvasAppFeaturePackProfiles.ts',
       'src/canvas/app/feature-packs/CanvasAppFeaturePackRuntimeModel.ts',
+      'src/canvas/app/feature-packs/CanvasAppFeaturePackSuites.ts',
       'src/canvas/app/feature-packs/CanvasAppFeaturePackViews.tsx',
       'src/canvas/app/feature-packs/CanvasAppFeaturePacks.test.ts',
       'src/canvas/app/feature-packs/CanvasAppFeaturePacks.ts',

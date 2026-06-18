@@ -26,6 +26,7 @@ import {
 } from './FigmaCloneDomEditModel'
 
 export function FigmaCloneDomEditSurface({
+  interactionMode = 'edit',
   isSectionSelected,
   rootId,
   sectionViewport,
@@ -36,6 +37,7 @@ export function FigmaCloneDomEditSurface({
   onSelectNode,
   onChangeText,
 }: {
+  interactionMode?: 'edit' | 'preview'
   isSectionSelected: boolean
   rootId: FigmaCloneDomNodeId
   sectionViewport: FigmaCloneSectionViewport
@@ -52,6 +54,7 @@ export function FigmaCloneDomEditSurface({
       : null
   const isMockFrame = sectionViewport.frameMode === 'mock'
   const shouldPassThroughCanvasEvent = (target: EventTarget | null) =>
+    interactionMode === 'preview' ||
     isDomEditCanvasPanTarget(target) ||
     (
       target instanceof Element &&

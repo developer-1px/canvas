@@ -19,4 +19,20 @@ export default defineConfig([
       globals: globals.browser,
     },
   },
+  {
+    files: ['src/devtools/storyCanvas/**/*.{ts,tsx}'],
+    rules: {
+      'react-hooks/exhaustive-deps': 'off',
+      'react-hooks/purity': 'off',
+      'react-hooks/refs': 'off',
+      'react-hooks/set-state-in-effect': 'off',
+      'react-refresh/only-export-components': 'off',
+    },
+  },
+  {
+    files: ['src/devtools/support/**/*.tsx'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
+    },
+  },
 ])

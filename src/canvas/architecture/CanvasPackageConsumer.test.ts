@@ -30,6 +30,7 @@ import {
   createCanvasAppFeaturePackManifest,
   createCanvasAppFeaturePackViewRenderers,
   createCanvasAppViewFeaturePack,
+  createCanvasStoryPreviewItemsFeaturePackManifest,
   getCanvasDataTransferText,
   downloadCanvasBlobFile,
   downloadCanvasTextFile,
@@ -39,14 +40,28 @@ import {
   scheduleCanvasAnimationFrameTask,
   writeCanvasClipboardText,
   defineCanvasAppCustomItemModule,
+  CANVAS_APP_CORE_ONLY_FEATURE_PACK_PROFILE,
+  CANVAS_APP_STORY_VIEWER_FEATURE_PACK_PROFILE,
+  CANVAS_STORY_CANVAS_FEATURE_PACK_SUITE_MANIFEST,
+  CANVAS_STORY_CANVAS_SUITE_ID,
   DEFAULT_CANVAS_APP_VIEW_FEATURE_PACKS,
+  DEFAULT_CANVAS_APP_EDITOR_FEATURE_PACK_PROFILE,
   DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS,
+  DEFAULT_CANVAS_APP_FEATURE_PACK_SUITE_MANIFESTS,
   DEFAULT_CANVAS_APP_VIEW_FEATURE_PACK_MANIFESTS,
+  createCanvasAppFeaturePackProfile,
+  createCanvasAppFeaturePackSuiteManifest,
+  getCanvasAppEnabledFeaturePackIds,
+  getCanvasAppEnabledFeaturePackManifestIds,
+  getCanvasAppEnabledFeaturePackManifests,
   getCanvasAppInstalledFeaturePacks,
+  getCanvasAppInstalledFeaturePackIds,
   getCanvasAppInstalledFeaturePackManifestIds,
   getCanvasAppInstalledFeaturePackManifests,
   getCanvasAppInstalledViewFeaturePacks,
+  getCanvasAppFeaturePackSuiteFeaturePackIds,
   getCanvasAppManifestViewFeaturePacks,
+  getCanvasAppResolvedFeaturePackStates,
   getCanvasFindInputKeyboardIntent,
   getCanvasInlineEditKeyboardIntent,
   getCanvasModalBackdropPointerIntent,
@@ -72,6 +87,11 @@ import {
   type CanvasAppFeaturePack,
   type CanvasAppFeaturePackAssemblyInput,
   type CanvasAppFeaturePackManifest,
+  type CanvasAppFeaturePackManifestCategory,
+  type CanvasAppFeaturePackProfile,
+  type CanvasAppFeaturePackRuntimeState,
+  type CanvasAppFeaturePackSuiteId,
+  type CanvasAppFeaturePackSuiteManifest,
   type CanvasAppFeaturePackViewRenderers,
   type CanvasAppCustomItemModule,
   type CanvasAppCustomItemRenderKeyStrategy,
@@ -323,6 +343,41 @@ describe('Canvas package consumer imports', () => {
       })
     const manifestViewFeaturePacks =
       getCanvasAppManifestViewFeaturePacks([viewManifest])
+    const disabledFeaturePackStates:
+      readonly CanvasAppFeaturePackRuntimeState[] =
+        getCanvasAppResolvedFeaturePackStates(['smoke-pack'], {
+          featurePackStates: [{
+            id: 'smoke-pack',
+            status: 'disabled',
+          }],
+        })
+    const smokeProfile: CanvasAppFeaturePackProfile =
+      createCanvasAppFeaturePackProfile({
+        enabledFeaturePackIds: [],
+        id: 'smoke-profile',
+        installedFeaturePackIds: ['smoke-pack'],
+        label: 'Smoke profile',
+      })
+    const smokeSuiteId: CanvasAppFeaturePackSuiteId = 'smoke-suite'
+    const smokeSuite: CanvasAppFeaturePackSuiteManifest =
+      createCanvasAppFeaturePackSuiteManifest({
+        featurePackIds: ['smoke-pack'],
+        id: smokeSuiteId,
+        label: 'Smoke suite',
+      })
+    const smokeSuiteProfile: CanvasAppFeaturePackProfile =
+      createCanvasAppFeaturePackProfile({
+        id: 'smoke-suite-profile',
+        installedSuiteIds: [smokeSuiteId],
+        label: 'Smoke suite profile',
+        suiteManifests: [smokeSuite],
+      })
+    const storyPreviewManifest = createCanvasStoryPreviewItemsFeaturePackManifest({
+      renderGroupItem: ({ groupLabel }) => groupLabel,
+      renderPreviewItem: ({ storyId }) => storyId,
+    })
+    const viewManifestCategory: CanvasAppFeaturePackManifestCategory =
+      viewManifest.category
 
     const assembly = createCanvasAppAssembly({
       componentLibrary,
@@ -430,6 +485,43 @@ describe('Canvas package consumer imports', () => {
     ])
     expect(featurePackBundle.customCommands.map((command) => command.id))
       .toEqual(['smoke-command'])
+    expect(disabledFeaturePackStates).toEqual([{
+      enabled: false,
+      id: 'smoke-pack',
+      installed: true,
+      status: 'disabled',
+    }])
+    expect(getCanvasAppInstalledFeaturePackIds(['smoke-pack'], {
+      featurePackStates: [{
+        id: 'smoke-pack',
+        status: 'disabled',
+      }],
+    })).toEqual(['smoke-pack'])
+    expect(getCanvasAppEnabledFeaturePackIds(['smoke-pack'], {
+      featurePackStates: [{
+        id: 'smoke-pack',
+        status: 'disabled',
+      }],
+    })).toEqual([])
+    expect(smokeProfile.enabledFeaturePackIds).toEqual([])
+    expect(smokeSuiteProfile.installedFeaturePackIds).toEqual(['smoke-pack'])
+    expect(getCanvasAppFeaturePackSuiteFeaturePackIds(
+      [smokeSuite],
+      [smokeSuiteId],
+    )).toEqual(['smoke-pack'])
+    expect(CANVAS_STORY_CANVAS_SUITE_ID).toBe('story-canvas')
+    expect(DEFAULT_CANVAS_APP_FEATURE_PACK_SUITE_MANIFESTS).toContain(
+      CANVAS_STORY_CANVAS_FEATURE_PACK_SUITE_MANIFEST,
+    )
+    expect(CANVAS_APP_STORY_VIEWER_FEATURE_PACK_PROFILE.installedSuiteIds)
+      .toEqual([CANVAS_STORY_CANVAS_SUITE_ID])
+    expect(storyPreviewManifest.extensionFeaturePack?.id)
+      .toBe('story-preview-items')
+    expect(CANVAS_APP_CORE_ONLY_FEATURE_PACK_PROFILE.installedFeaturePackIds)
+      .toEqual([])
+    expect(DEFAULT_CANVAS_APP_EDITOR_FEATURE_PACK_PROFILE.enabledFeaturePackIds)
+      .toContain('toolbar')
+    expect(viewManifestCategory).toBe('view')
     expect(assembly.featurePackViewRenderers.toolbar).toBeUndefined()
     expect(featurePackAssemblyInput.disabledFeaturePackIds).toEqual([
       'toolbar',
@@ -448,6 +540,18 @@ describe('Canvas package consumer imports', () => {
     expect(getCanvasAppInstalledFeaturePackManifests([
       viewManifest,
     ])).toEqual([viewManifest])
+    expect(getCanvasAppEnabledFeaturePackManifestIds([viewManifest], {
+      featurePackStates: [{
+        id: 'smoke-view-pack',
+        status: 'disabled',
+      }],
+    })).toEqual([])
+    expect(getCanvasAppEnabledFeaturePackManifests([viewManifest], {
+      featurePackStates: [{
+        id: 'smoke-view-pack',
+        status: 'disabled',
+      }],
+    })).toEqual([])
     expect(defaultViewFeaturePackIds).toContain('toolbar')
     expect(defaultViewFeaturePackManifestIds).toContain('toolbar')
     expect(manifestViewFeaturePacks).toEqual([viewFeaturePack])
