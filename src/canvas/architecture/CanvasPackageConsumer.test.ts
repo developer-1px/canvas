@@ -151,6 +151,8 @@ import {
   DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS,
   DEFAULT_CANVAS_APP_FEATURE_PACK_SUITE_MANIFESTS,
   DEFAULT_CANVAS_APP_VIEW_FEATURE_PACK_MANIFESTS,
+  EMPTY_CANVAS_STORY_IMPORT_HOST_STATE,
+  commitCanvasStoryImportActionHostState,
   commitCanvasStoryImportActionHostUpdate,
   createCanvasAppFeaturePackProfile,
   createCanvasAppFeaturePackSuiteManifest,
@@ -185,11 +187,15 @@ import {
   getCanvasAppManifestViewFeaturePacks,
   getCanvasAppResolvedFeaturePackStates,
   getCanvasComponentInspectorPanelModel,
+  getCanvasStoryImportDataTransferActions,
   getCanvasStoryImportActionHostUpdate,
   getCanvasStoryImportActionItemsChange,
+  getCanvasStoryImportHostAssemblyInput,
+  hasCanvasStoryImportDataTransferAction,
   mergeCanvasStoryImportComponentDefinitions,
   parseCanvasStoryImportJSONPayload,
   readCanvasStoryImportDataTransfer,
+  runCanvasStoryImportDataTransferHostStateImport,
   syncCanvasComponentItemsChange,
   transformCanvasAppItemsChange,
   commitCanvasAppHostItemsChange,
@@ -2293,6 +2299,32 @@ describe('Canvas package consumer imports', () => {
             commitHostUpdate: () => true,
           }).committed,
       })
+    let packageStoryImportState = EMPTY_CANVAS_STORY_IMPORT_HOST_STATE
+    const packageStoryHostStateResult =
+      runCanvasStoryImportDataTransferHostStateImport({
+        baseComponentDefinitions: [],
+        commitImportState: (state) => {
+          packageStoryImportState = state
+        },
+        currentImportState: packageStoryImportState,
+        currentItems: [],
+        dataTransfer: packageStoryDataTransfer,
+        scope: 'clipboard-paste',
+      })
+    const packageStoryAssemblyInput = getCanvasStoryImportHostAssemblyInput({
+      baseComponentDefinitions: [],
+      baseItems: [],
+      importState: packageStoryImportState,
+    })
+    const packageStoryHostStateDuplicateResult =
+      commitCanvasStoryImportActionHostState({
+        action: packageStoryAction,
+        commitImportState: (state) => {
+          packageStoryImportState = state
+        },
+        currentImportState: packageStoryImportState,
+        currentItems: packageStoryAssemblyInput.items,
+      })
 
     expect(getCanvasStoryImportActionItemsChange({
       action: packageStoryAction,
@@ -2328,6 +2360,31 @@ describe('Canvas package consumer imports', () => {
       consumedAction: packageStoryAction,
       consumedActionIndex: 0,
     })
+    expect(packageStoryHostStateResult).toMatchObject({
+      attemptedActionCount: 1,
+      consumed: true,
+      consumedActionIndex: 0,
+    })
+    expect(packageStoryAssemblyInput.items.map((item) => item.id)).toEqual([
+      'group-consumer-action-widget',
+      'story-consumer-action-widget-default',
+    ])
+    expect(packageStoryAssemblyInput.componentDefinitions.map((definition) =>
+      definition.id
+    )).toEqual(['story-import-consumer-action-widget'])
+    expect(packageStoryHostStateDuplicateResult).toMatchObject({
+      committed: false,
+      holdReason: 'host-update-not-committed',
+      status: 'held',
+    })
+    expect(hasCanvasStoryImportDataTransferAction({
+      dataTransfer: packageStoryDataTransfer,
+      scope: 'clipboard-paste',
+    })).toBe(true)
+    expect(getCanvasStoryImportDataTransferActions({
+      dataTransfer: packageStoryDataTransfer,
+      scope: 'clipboard-paste',
+    })).toHaveLength(1)
     expect(createCanvasStoryImportDataTransferActionResolver({
       scope: 'clipboard-paste',
     }).supportedFormats).toContain(CANVAS_STORY_IMPORT_JSON_MIME_TYPE)
@@ -2343,6 +2400,18 @@ describe('Canvas package consumer imports', () => {
       .toBe(createCanvasStoryImportDataTransferActionResolver)
     expect(CanvasAppAuthoring.createCanvasStoryImportDataTransferActionResolver)
       .toBe(createCanvasStoryImportDataTransferActionResolver)
+    expect(CanvasPackage.EMPTY_CANVAS_STORY_IMPORT_HOST_STATE)
+      .toBe(EMPTY_CANVAS_STORY_IMPORT_HOST_STATE)
+    expect(CanvasAppFacade.EMPTY_CANVAS_STORY_IMPORT_HOST_STATE)
+      .toBe(EMPTY_CANVAS_STORY_IMPORT_HOST_STATE)
+    expect(CanvasAppAuthoring.EMPTY_CANVAS_STORY_IMPORT_HOST_STATE)
+      .toBe(EMPTY_CANVAS_STORY_IMPORT_HOST_STATE)
+    expect(CanvasPackage.commitCanvasStoryImportActionHostState)
+      .toBe(commitCanvasStoryImportActionHostState)
+    expect(CanvasAppFacade.commitCanvasStoryImportActionHostState)
+      .toBe(commitCanvasStoryImportActionHostState)
+    expect(CanvasAppAuthoring.commitCanvasStoryImportActionHostState)
+      .toBe(commitCanvasStoryImportActionHostState)
     expect(CanvasPackage.commitCanvasStoryImportActionHostUpdate)
       .toBe(commitCanvasStoryImportActionHostUpdate)
     expect(CanvasAppFacade.commitCanvasStoryImportActionHostUpdate)
@@ -2355,6 +2424,30 @@ describe('Canvas package consumer imports', () => {
       .toBe(getCanvasStoryImportActionHostUpdate)
     expect(CanvasAppAuthoring.getCanvasStoryImportActionHostUpdate)
       .toBe(getCanvasStoryImportActionHostUpdate)
+    expect(CanvasPackage.getCanvasStoryImportDataTransferActions)
+      .toBe(getCanvasStoryImportDataTransferActions)
+    expect(CanvasAppFacade.getCanvasStoryImportDataTransferActions)
+      .toBe(getCanvasStoryImportDataTransferActions)
+    expect(CanvasAppAuthoring.getCanvasStoryImportDataTransferActions)
+      .toBe(getCanvasStoryImportDataTransferActions)
+    expect(CanvasPackage.getCanvasStoryImportHostAssemblyInput)
+      .toBe(getCanvasStoryImportHostAssemblyInput)
+    expect(CanvasAppFacade.getCanvasStoryImportHostAssemblyInput)
+      .toBe(getCanvasStoryImportHostAssemblyInput)
+    expect(CanvasAppAuthoring.getCanvasStoryImportHostAssemblyInput)
+      .toBe(getCanvasStoryImportHostAssemblyInput)
+    expect(CanvasPackage.hasCanvasStoryImportDataTransferAction)
+      .toBe(hasCanvasStoryImportDataTransferAction)
+    expect(CanvasAppFacade.hasCanvasStoryImportDataTransferAction)
+      .toBe(hasCanvasStoryImportDataTransferAction)
+    expect(CanvasAppAuthoring.hasCanvasStoryImportDataTransferAction)
+      .toBe(hasCanvasStoryImportDataTransferAction)
+    expect(CanvasPackage.runCanvasStoryImportDataTransferHostStateImport)
+      .toBe(runCanvasStoryImportDataTransferHostStateImport)
+    expect(CanvasAppFacade.runCanvasStoryImportDataTransferHostStateImport)
+      .toBe(runCanvasStoryImportDataTransferHostStateImport)
+    expect(CanvasAppAuthoring.runCanvasStoryImportDataTransferHostStateImport)
+      .toBe(runCanvasStoryImportDataTransferHostStateImport)
     expect(CanvasPackage.getCanvasStoryImportActionItemsChange)
       .toBe(getCanvasStoryImportActionItemsChange)
     expect(CanvasAppFacade.getCanvasStoryImportActionItemsChange)

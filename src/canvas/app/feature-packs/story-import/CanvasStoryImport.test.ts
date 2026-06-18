@@ -14,15 +14,21 @@ import {
   CANVAS_STORY_IMPORT_JSON_KIND,
   CANVAS_STORY_IMPORT_JSON_MIME_TYPE,
   CANVAS_STORY_IMPORT_JSON_VERSION,
+  EMPTY_CANVAS_STORY_IMPORT_HOST_STATE,
+  commitCanvasStoryImportActionHostState,
   commitCanvasStoryImportActionHostUpdate,
   createCanvasStoryImportActionFromDataTransfer,
   createCanvasStoryImportComponentDefinitions,
   createCanvasStoryImportDataTransferActionResolver,
   createCanvasStoryImportItems,
+  getCanvasStoryImportHostAssemblyInput,
+  hasCanvasStoryImportDataTransferAction,
   getCanvasStoryImportActionHostUpdate,
   getCanvasStoryImportActionItemsChange,
   mergeCanvasStoryImportComponentDefinitions,
   parseCanvasStoryImportJSONPayload,
+  runCanvasStoryImportDataTransferHostStateImport,
+  type CanvasStoryImportHostState,
 } from './CanvasStoryImport'
 
 describe('CanvasStoryImport', () => {
@@ -503,6 +509,106 @@ describe('CanvasStoryImport', () => {
     expect(commitHostUpdate).toHaveBeenCalledWith(result.update)
   })
 
+  it('commits story import actions into reusable host import state', () => {
+    const action = createCanvasStoryImportActionFromDataTransfer({
+      dataTransfer: {
+        getData: (format) =>
+          format === CANVAS_STORY_IMPORT_JSON_MIME_TYPE
+            ? JSON.stringify(createStoryImportInput())
+            : '',
+      },
+    })
+
+    if (!action) {
+      throw new Error('Expected story import action')
+    }
+
+    const baseItem = createTextItem('story-existing')
+    const baseDefinition = {
+      id: 'story-import-component-card',
+      instances: [{
+        label: 'Old',
+        slots: {
+          root: 'story-existing',
+        },
+      }],
+      label: 'Old card',
+    }
+    let importState: CanvasStoryImportHostState =
+      EMPTY_CANVAS_STORY_IMPORT_HOST_STATE
+    const result = commitCanvasStoryImportActionHostState({
+      action,
+      baseComponentDefinitions: [baseDefinition],
+      commitImportState: (state) => {
+        importState = state
+      },
+      currentComponentDefinitions: [baseDefinition],
+      currentImportState: importState,
+      currentItems: [baseItem],
+    })
+    const assemblyInput = getCanvasStoryImportHostAssemblyInput({
+      baseComponentDefinitions: [baseDefinition],
+      baseItems: [baseItem],
+      importState,
+    })
+
+    expect(result).toMatchObject({
+      action,
+      committed: true,
+      status: 'committed',
+    })
+    expect(importState.items.map((item) => item.id)).toEqual([
+      'group-component-card',
+      'story-card-default',
+    ])
+    expect(assemblyInput.items.map((item) => item.id)).toEqual([
+      'story-existing',
+      'group-component-card',
+      'story-card-default',
+    ])
+    expect(assemblyInput.componentDefinitions).toEqual([
+      action.componentDefinitions[0],
+    ])
+  })
+
+  it('runs story import DataTransfer actions into host import state and holds duplicate item ids', () => {
+    let importState: CanvasStoryImportHostState =
+      EMPTY_CANVAS_STORY_IMPORT_HOST_STATE
+    const dataTransfer = {
+      getData: (format: string) =>
+        format === CANVAS_STORY_IMPORT_JSON_MIME_TYPE
+          ? JSON.stringify(createStoryImportInput())
+          : '',
+    } as DataTransfer
+
+    expect(hasCanvasStoryImportDataTransferAction({
+      dataTransfer,
+      scope: 'stage-drop',
+    })).toBe(true)
+
+    const result = runCanvasStoryImportDataTransferHostStateImport({
+      commitImportState: (state) => {
+        importState = state
+      },
+      currentImportState: importState,
+      currentItems: [createTextItem('story-card-default')],
+      dataTransfer,
+      scope: 'stage-drop',
+    })
+
+    expect(result).toMatchObject({
+      attemptedActionCount: 1,
+      consumed: false,
+      consumedActionIndex: -1,
+    })
+    expect(result.actionResults[0]).toMatchObject({
+      committed: false,
+      holdReason: 'host-update-not-committed',
+      status: 'held',
+    })
+    expect(importState).toBe(EMPTY_CANVAS_STORY_IMPORT_HOST_STATE)
+  })
+
   it('merges new story import component definitions after existing definitions', () => {
     const merge = mergeCanvasStoryImportComponentDefinitions({
       currentComponentDefinitions: [{
@@ -571,5 +677,17 @@ function createStoryImportInput() {
       x: 40,
       y: 64,
     }],
+  }
+}
+
+function createTextItem(id: string) {
+  return {
+    h: 80,
+    id,
+    text: id,
+    type: 'text' as const,
+    w: 160,
+    x: 0,
+    y: 0,
   }
 }

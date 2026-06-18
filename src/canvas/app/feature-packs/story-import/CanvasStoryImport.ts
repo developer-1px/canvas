@@ -1,4 +1,5 @@
 import type {
+  CanvasItem,
   CanvasCustomItem,
 } from '../../../entities'
 import {
@@ -12,10 +13,17 @@ import {
   type CanvasDataTransferJSONCandidateReadResult,
   type CanvasTextDataTransfer,
 } from '../../affordances/commands/CanvasDataTransferText'
+import {
+  createCanvasDataTransferImportActionPlanFromRegistry,
+  createCanvasDataTransferImportRegistry,
+} from '../../affordances/commands/CanvasDataTransferImportRegistry'
 import type {
   CanvasDataTransferImportRegistryResolver,
   CanvasDataTransferImportRegistryScope,
 } from '../../affordances/commands/CanvasDataTransferImportRegistry'
+import {
+  runCanvasDataTransferImportActionPlan,
+} from '../../affordances/commands/CanvasDataTransferImportActionPlan'
 import type {
   CanvasAppDocumentSelectionHistory,
   CanvasAppItemsChange,
@@ -156,6 +164,64 @@ export type CanvasStoryImportComponentDefinitionMergeResult = Readonly<{
   replacedComponentDefinitionIds: readonly string[]
 }>
 
+export type CanvasStoryImportHostState = Readonly<{
+  componentDefinitions: readonly CanvasComponentDefinition[]
+  items: readonly CanvasItem[]
+}>
+
+export type CanvasStoryImportHostAssemblyInput = Readonly<{
+  componentDefinitions: readonly CanvasComponentDefinition[]
+  items: CanvasItem[]
+}>
+
+export type CanvasStoryImportHostAssemblyInputSource = Readonly<{
+  baseComponentDefinitions: readonly CanvasComponentDefinition[]
+  baseItems: readonly CanvasItem[]
+  importState: CanvasStoryImportHostState
+}>
+
+export type CommitCanvasStoryImportActionHostStateInput = Readonly<{
+  action: CanvasStoryImportAction
+  baseComponentDefinitions?: readonly CanvasComponentDefinition[]
+  commitImportState: (state: CanvasStoryImportHostState) => void
+  currentComponentDefinitions?: readonly CanvasComponentDefinition[]
+  currentImportState: CanvasStoryImportHostState
+  currentItems: readonly CanvasItem[]
+  selection?: CanvasAppDocumentSelectionHistory
+}>
+
+export type CanvasStoryImportDataTransferHostStateImportInput<
+  TScope extends CanvasDataTransferImportRegistryScope =
+    CanvasDataTransferImportRegistryScope,
+> = Readonly<{
+  baseComponentDefinitions?: readonly CanvasComponentDefinition[]
+  candidates?: readonly CanvasStoryImportDataTransferJSONCandidate[]
+  commitImportState: (state: CanvasStoryImportHostState) => void
+  currentComponentDefinitions?: readonly CanvasComponentDefinition[]
+  currentImportState: CanvasStoryImportHostState
+  currentItems: readonly CanvasItem[]
+  dataTransfer: DataTransfer | null
+  resolverScope?: TScope | readonly TScope[]
+  scope: TScope
+}>
+
+export type CanvasStoryImportDataTransferActionsInput<
+  TScope extends CanvasDataTransferImportRegistryScope =
+    CanvasDataTransferImportRegistryScope,
+> = Readonly<{
+  candidates?: readonly CanvasStoryImportDataTransferJSONCandidate[]
+  dataTransfer: DataTransfer | null
+  resolverScope?: TScope | readonly TScope[]
+  scope: TScope
+}>
+
+export type CanvasStoryImportDataTransferHostStateImportResult = Readonly<{
+  actionResults: readonly CanvasStoryImportActionHostUpdateCommitResult[]
+  attemptedActionCount: number
+  consumed: boolean
+  consumedActionIndex: number
+}>
+
 export type CanvasStoryImportDataTransferReadInput = Readonly<{
   candidates?: readonly CanvasStoryImportDataTransferJSONCandidate[]
   dataTransfer: CanvasTextDataTransfer | null
@@ -195,6 +261,12 @@ export const DEFAULT_CANVAS_STORY_IMPORT_DATA_TRANSFER_JSON_CANDIDATES:
       source: 'text-plain',
     }),
   ])
+
+export const EMPTY_CANVAS_STORY_IMPORT_HOST_STATE:
+  CanvasStoryImportHostState = Object.freeze({
+    componentDefinitions: Object.freeze([]),
+    items: Object.freeze([]),
+  })
 
 export function createCanvasStoryImportItems({
   groups,
@@ -353,6 +425,69 @@ export function commitCanvasStoryImportActionHostUpdate({
   })
 }
 
+export function getCanvasStoryImportHostAssemblyInput({
+  baseComponentDefinitions,
+  baseItems,
+  importState,
+}: CanvasStoryImportHostAssemblyInputSource):
+  CanvasStoryImportHostAssemblyInput {
+  const baseItemIds = new Set(baseItems.map((item) => item.id))
+
+  return Object.freeze({
+    componentDefinitions: getCanvasStoryImportMergedHostComponentDefinitions({
+      baseComponentDefinitions,
+      importedComponentDefinitions: importState.componentDefinitions,
+    }),
+    items: [
+      ...baseItems,
+      ...importState.items.filter((item) => !baseItemIds.has(item.id)),
+    ],
+  })
+}
+
+export function commitCanvasStoryImportActionHostState({
+  action,
+  baseComponentDefinitions = [],
+  commitImportState,
+  currentComponentDefinitions,
+  currentImportState,
+  currentItems,
+  selection,
+}: CommitCanvasStoryImportActionHostStateInput):
+  CanvasStoryImportActionHostUpdateCommitResult {
+  return commitCanvasStoryImportActionHostUpdate({
+    action,
+    commitHostUpdate: (update) => {
+      if (
+        getCanvasStoryImportDuplicateHostItemIds({
+          currentItems,
+          update,
+        }).length > 0
+      ) {
+        return false
+      }
+
+      commitImportState(Object.freeze({
+        componentDefinitions:
+          getCanvasStoryImportNextImportedComponentDefinitions({
+            baseComponentDefinitions,
+            currentImportedComponentDefinitions:
+              currentImportState.componentDefinitions,
+            importedComponentDefinitions: update.componentDefinitions,
+          }),
+        items: Object.freeze([
+          ...currentImportState.items,
+          ...update.itemsChange.items,
+        ]),
+      }))
+
+      return true
+    },
+    currentComponentDefinitions,
+    selection,
+  })
+}
+
 export function createCanvasStoryImportActionFromDataTransfer(
   input: CanvasStoryImportDataTransferActionInput,
 ): CanvasStoryImportAction | null {
@@ -415,6 +550,104 @@ export function mergeCanvasStoryImportComponentDefinitions({
   })
 }
 
+export function getCanvasStoryImportDataTransferActions<
+  TScope extends CanvasDataTransferImportRegistryScope =
+    CanvasDataTransferImportRegistryScope,
+>({
+  candidates,
+  dataTransfer,
+  resolverScope,
+  scope,
+}: CanvasStoryImportDataTransferActionsInput<TScope>):
+  readonly CanvasStoryImportAction[] {
+  const registry = createCanvasDataTransferImportRegistry({
+    resolvers: [
+      createCanvasStoryImportDataTransferActionResolver({
+        candidates,
+        scope: resolverScope ?? scope,
+      }),
+    ],
+  })
+
+  return createCanvasDataTransferImportActionPlanFromRegistry({
+    dataTransfer,
+    registry,
+    scope,
+  })
+}
+
+export function hasCanvasStoryImportDataTransferAction<
+  TScope extends CanvasDataTransferImportRegistryScope =
+    CanvasDataTransferImportRegistryScope,
+>(
+  input: CanvasStoryImportDataTransferActionsInput<TScope>,
+) {
+  return getCanvasStoryImportDataTransferActions(input).length > 0
+}
+
+export function runCanvasStoryImportDataTransferHostStateImport<
+  TScope extends CanvasDataTransferImportRegistryScope =
+    CanvasDataTransferImportRegistryScope,
+>({
+  baseComponentDefinitions = [],
+  candidates,
+  commitImportState,
+  currentComponentDefinitions = baseComponentDefinitions,
+  currentImportState,
+  currentItems,
+  dataTransfer,
+  resolverScope,
+  scope,
+}: CanvasStoryImportDataTransferHostStateImportInput<TScope>):
+  CanvasStoryImportDataTransferHostStateImportResult {
+  const actions = getCanvasStoryImportDataTransferActions({
+    candidates,
+    dataTransfer,
+    resolverScope,
+    scope,
+  })
+  const actionResults: CanvasStoryImportActionHostUpdateCommitResult[] = []
+  let nextCurrentComponentDefinitions = currentComponentDefinitions
+  let nextCurrentImportState = currentImportState
+  let nextCurrentItems = currentItems
+  const runResult = runCanvasDataTransferImportActionPlan({
+    actions,
+    runAction: (action) => {
+      const actionResult = commitCanvasStoryImportActionHostState({
+        action,
+        baseComponentDefinitions,
+        commitImportState: (state) => {
+          nextCurrentImportState = state
+          commitImportState(state)
+        },
+        currentComponentDefinitions: nextCurrentComponentDefinitions,
+        currentImportState: nextCurrentImportState,
+        currentItems: nextCurrentItems,
+      })
+
+      actionResults.push(actionResult)
+
+      if (actionResult.committed) {
+        nextCurrentComponentDefinitions =
+          actionResult.update.nextComponentDefinitions
+        nextCurrentItems = [
+          ...nextCurrentItems,
+          ...actionResult.update.itemsChange.items,
+        ]
+      }
+
+      return actionResult.committed
+    },
+  })
+
+  return Object.freeze({
+    actionResults: Object.freeze(actionResults),
+    attemptedActionCount: runResult.attemptedActions.length,
+    consumed: runResult.consumed,
+    consumedActionIndex: runResult.consumedActionIndex,
+  })
+}
+
 export function createCanvasStoryImportDataTransferActionResolver<
   TScope extends CanvasDataTransferImportRegistryScope =
     CanvasDataTransferImportRegistryScope,
@@ -452,6 +685,91 @@ function getCanvasStoryImportActionSelection(
     after: action.items.map((item) => item.id),
     before: [],
   }
+}
+
+function getCanvasStoryImportMergedHostComponentDefinitions({
+  baseComponentDefinitions,
+  importedComponentDefinitions,
+}: Readonly<{
+  baseComponentDefinitions: readonly CanvasComponentDefinition[]
+  importedComponentDefinitions: readonly CanvasComponentDefinition[]
+}>): readonly CanvasComponentDefinition[] {
+  const importedDefinitionById = new Map(
+    importedComponentDefinitions.map((definition) => [
+      definition.id,
+      definition,
+    ]),
+  )
+  const nextDefinitions = baseComponentDefinitions.map((definition) =>
+    importedDefinitionById.get(definition.id) ?? definition
+  )
+  const baseDefinitionIds = new Set(
+    baseComponentDefinitions.map((definition) => definition.id),
+  )
+
+  for (const definition of importedComponentDefinitions) {
+    if (!baseDefinitionIds.has(definition.id)) {
+      nextDefinitions.push(definition)
+    }
+  }
+
+  return Object.freeze(nextDefinitions)
+}
+
+function getCanvasStoryImportNextImportedComponentDefinitions({
+  baseComponentDefinitions,
+  currentImportedComponentDefinitions,
+  importedComponentDefinitions,
+}: Readonly<{
+  baseComponentDefinitions: readonly CanvasComponentDefinition[]
+  currentImportedComponentDefinitions: readonly CanvasComponentDefinition[]
+  importedComponentDefinitions: readonly CanvasComponentDefinition[]
+}>): readonly CanvasComponentDefinition[] {
+  const importedDefinitionById = new Map(
+    currentImportedComponentDefinitions.map((definition) => [
+      definition.id,
+      definition,
+    ]),
+  )
+
+  for (const definition of importedComponentDefinitions) {
+    importedDefinitionById.set(definition.id, definition)
+  }
+
+  const baseDefinitionIds = new Set(
+    baseComponentDefinitions.map((definition) => definition.id),
+  )
+  const nextImportedDefinitions = currentImportedComponentDefinitions
+    .filter((definition) =>
+      importedDefinitionById.get(definition.id) === definition
+    )
+
+  for (const definition of importedComponentDefinitions) {
+    if (
+      baseDefinitionIds.has(definition.id) ||
+      !nextImportedDefinitions.some((candidate) =>
+        candidate.id === definition.id
+      )
+    ) {
+      nextImportedDefinitions.push(definition)
+    }
+  }
+
+  return Object.freeze(nextImportedDefinitions)
+}
+
+function getCanvasStoryImportDuplicateHostItemIds({
+  currentItems,
+  update,
+}: Readonly<{
+  currentItems: readonly CanvasItem[]
+  update: CanvasStoryImportActionHostUpdateResult
+}>): readonly string[] {
+  const currentItemIds = new Set(currentItems.map((item) => item.id))
+
+  return Object.freeze(update.itemsChange.items
+    .map((item) => item.id)
+    .filter((itemId) => currentItemIds.has(itemId)))
 }
 
 function createCanvasStoryImportComponentDefinition(
