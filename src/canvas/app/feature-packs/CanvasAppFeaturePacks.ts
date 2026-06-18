@@ -32,6 +32,25 @@ export type CanvasAppFeaturePackInstallOptions = Readonly<{
   featurePackStates?: readonly CanvasAppFeaturePackRuntimeStateInput[]
 }>
 
+export type CanvasAppFeaturePackRuntimeStatePatchInput = Readonly<{
+  featurePackIds: readonly CanvasAppFeaturePackId[]
+  featurePackStates: readonly CanvasAppFeaturePackRuntimeStateInput[]
+  options?: CanvasAppFeaturePackInstallOptions
+}>
+
+export type CanvasAppFeaturePackRuntimeStatePatch = Readonly<{
+  changedFeaturePackIds: readonly CanvasAppFeaturePackId[]
+  featurePackStates: readonly CanvasAppFeaturePackRuntimeStateInput[]
+  options: CanvasAppFeaturePackInstallOptions
+  stateChanges: readonly CanvasAppFeaturePackRuntimeStatePatchChange[]
+}>
+
+export type CanvasAppFeaturePackRuntimeStatePatchChange = Readonly<{
+  from: CanvasAppFeaturePackRuntimeState
+  id: CanvasAppFeaturePackId
+  to: CanvasAppFeaturePackRuntimeState
+}>
+
 export type CanvasAppFeaturePackRuntimeStateStatus =
   | 'activation-failed'
   | 'available'
@@ -132,6 +151,45 @@ export function getCanvasAppResolvedFeaturePackStates(
   )
 }
 
+export function applyCanvasAppFeaturePackRuntimeStatePatch(
+  input: CanvasAppFeaturePackRuntimeStatePatchInput,
+): CanvasAppFeaturePackRuntimeStatePatch {
+  assertCanvasAppFeaturePackIds(input.featurePackIds)
+  assertCanvasAppArray(
+    input.featurePackStates,
+    'feature pack runtime state patch states',
+  )
+
+  const currentStates = getCanvasAppResolvedFeaturePackStates(
+    input.featurePackIds,
+    input.options,
+  )
+  const nextStates = getCanvasAppResolvedFeaturePackStates(
+    input.featurePackIds,
+    {
+      featurePackStates: [
+        ...getCanvasAppFeaturePackRuntimeStateInputs(currentStates),
+        ...input.featurePackStates,
+      ],
+    },
+  )
+  const featurePackStates =
+    getCanvasAppFeaturePackRuntimeStateInputs(nextStates)
+  const stateChanges = getCanvasAppFeaturePackRuntimeStatePatchChanges({
+    currentStates,
+    nextStates,
+  })
+
+  return Object.freeze({
+    changedFeaturePackIds: Object.freeze(stateChanges.map((change) => change.id)),
+    featurePackStates,
+    options: Object.freeze({
+      featurePackStates,
+    }),
+    stateChanges,
+  })
+}
+
 export function getCanvasAppInstalledFeaturePackIds(
   featurePackIds: readonly CanvasAppFeaturePackId[],
   options: CanvasAppFeaturePackInstallOptions = {},
@@ -230,6 +288,48 @@ function getCanvasAppEnabledFeaturePackIdSet(
   options: CanvasAppFeaturePackInstallOptions,
 ) {
   return new Set(getCanvasAppEnabledFeaturePackIds(featurePackIds, options))
+}
+
+function getCanvasAppFeaturePackRuntimeStateInputs(
+  states: readonly CanvasAppFeaturePackRuntimeState[],
+): readonly CanvasAppFeaturePackRuntimeStateInput[] {
+  return Object.freeze(states.map((state) => Object.freeze({
+    id: state.id,
+    status: state.status,
+  })))
+}
+
+function getCanvasAppFeaturePackRuntimeStatePatchChanges({
+  currentStates,
+  nextStates,
+}: {
+  currentStates: readonly CanvasAppFeaturePackRuntimeState[]
+  nextStates: readonly CanvasAppFeaturePackRuntimeState[]
+}): readonly CanvasAppFeaturePackRuntimeStatePatchChange[] {
+  const currentStateById = new Map(
+    currentStates.map((state) => [state.id, state]),
+  )
+
+  return Object.freeze(nextStates.flatMap((nextState) => {
+    const currentState = currentStateById.get(nextState.id)
+
+    if (
+      !currentState ||
+      (
+        currentState.enabled === nextState.enabled &&
+        currentState.installed === nextState.installed &&
+        currentState.status === nextState.status
+      )
+    ) {
+      return []
+    }
+
+    return [Object.freeze({
+      from: currentState,
+      id: nextState.id,
+      to: nextState,
+    })]
+  }))
 }
 
 function createDefaultCanvasAppFeaturePackRuntimeStateMap(

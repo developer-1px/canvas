@@ -160,6 +160,7 @@ export {
   type CanvasAppFeaturePackManifestInput,
 } from './CanvasAppFeaturePackManifests'
 export {
+  applyCanvasAppFeaturePackRuntimeStatePatch,
   assertCanvasAppFeaturePackIds,
   assertCanvasAppFeaturePack,
   assertCanvasAppFeaturePacks,
@@ -175,6 +176,9 @@ export {
   type CanvasAppFeaturePackInstallOptions,
   type CanvasAppFeaturePackRuntimeState,
   type CanvasAppFeaturePackRuntimeStateInput,
+  type CanvasAppFeaturePackRuntimeStatePatch,
+  type CanvasAppFeaturePackRuntimeStatePatchChange,
+  type CanvasAppFeaturePackRuntimeStatePatchInput,
   type CanvasAppFeaturePackRuntimeStateStatus,
 } from './CanvasAppFeaturePacks'
 export {

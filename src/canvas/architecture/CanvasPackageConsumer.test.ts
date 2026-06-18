@@ -11,6 +11,7 @@ import {
   CANVAS_APP_BOARD_IO_FEATURE_PACK_MANIFEST,
   CANVAS_CONTROL_TARGET_SELECTOR,
   CANVAS_WHEEL_PASSTHROUGH_SELECTOR,
+  applyCanvasAppFeaturePackRuntimeStatePatch,
   bindCanvasEventListener,
   bindCanvasEventListeners,
   cancelCanvasAnimationFrameTask,
@@ -133,6 +134,7 @@ import {
   type CanvasAppFeaturePackProfile,
   type CanvasAppFeaturePackProfileRuntimeStatesInput,
   type CanvasAppFeaturePackRuntimeState,
+  type CanvasAppFeaturePackRuntimeStatePatch,
   type CanvasAppFeaturePackSuiteId,
   type CanvasAppFeaturePackSuiteManifest,
   type CanvasAppFeaturePackViewRenderers,
@@ -521,6 +523,17 @@ describe('Canvas package consumer imports', () => {
             status: 'disabled',
           }],
         })
+    const runtimeStatePatch: CanvasAppFeaturePackRuntimeStatePatch =
+      applyCanvasAppFeaturePackRuntimeStatePatch({
+        featurePackIds: ['smoke-pack'],
+        featurePackStates: [{
+          id: 'smoke-pack',
+          status: 'enabled',
+        }],
+        options: {
+          disabledFeaturePackIds: ['smoke-pack'],
+        },
+      })
     const smokeProfile: CanvasAppFeaturePackProfile =
       createCanvasAppFeaturePackProfile({
         enabledFeaturePackIds: [],
@@ -692,6 +705,13 @@ describe('Canvas package consumer imports', () => {
       installed: true,
       status: 'disabled',
     }])
+    expect(runtimeStatePatch.changedFeaturePackIds).toEqual(['smoke-pack'])
+    expect(runtimeStatePatch.options).toEqual({
+      featurePackStates: [{
+        id: 'smoke-pack',
+        status: 'enabled',
+      }],
+    })
     expect(getCanvasAppInstalledFeaturePackIds(['smoke-pack'], {
       featurePackStates: [{
         id: 'smoke-pack',
@@ -1367,6 +1387,12 @@ describe('Canvas package consumer imports', () => {
     expect(CanvasAppFacade.getCanvasAppFeaturePackStateTransitionPlan)
       .toBeTypeOf('function')
     expect(CanvasPackage.getCanvasAppFeaturePackStateTransitionPlan)
+      .toBeTypeOf('function')
+    expect(CanvasAppAuthoring.applyCanvasAppFeaturePackRuntimeStatePatch)
+      .toBeTypeOf('function')
+    expect(CanvasAppFacade.applyCanvasAppFeaturePackRuntimeStatePatch)
+      .toBeTypeOf('function')
+    expect(CanvasPackage.applyCanvasAppFeaturePackRuntimeStatePatch)
       .toBeTypeOf('function')
     expect(CanvasAppAuthoring.createCanvasAppAiLabsFeaturePackManifest)
       .toBeTypeOf('function')

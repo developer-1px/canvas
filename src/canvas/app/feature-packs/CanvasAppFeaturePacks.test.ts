@@ -32,6 +32,7 @@ import {
   getCanvasAppManifestViewFeaturePacks,
 } from './CanvasAppFeaturePackManifests'
 import {
+  applyCanvasAppFeaturePackRuntimeStatePatch,
   createCanvasAppFeaturePack,
   createCanvasAppFeaturePackExtensionBundle,
   getCanvasAppEnabledFeaturePackIds,
@@ -230,6 +231,100 @@ describe('CanvasAppFeaturePacks', () => {
             status: 'enabled',
           },
         ],
+      }),
+    ).toThrow('Unknown canvas app feature pack state: missing-pack')
+  })
+
+  it('applies feature pack runtime state patches to canonical options', () => {
+    const patch = applyCanvasAppFeaturePackRuntimeStatePatch({
+      featurePackIds: ['draft-pack', 'publish-pack'],
+      featurePackStates: [{
+        id: 'publish-pack',
+        status: 'uninstalled',
+      }],
+      options: {
+        featurePackStates: [{
+          id: 'draft-pack',
+          status: 'disabled',
+        }],
+      },
+    })
+
+    expect(patch.changedFeaturePackIds).toEqual(['publish-pack'])
+    expect(patch.featurePackStates).toEqual([
+      {
+        id: 'draft-pack',
+        status: 'disabled',
+      },
+      {
+        id: 'publish-pack',
+        status: 'uninstalled',
+      },
+    ])
+    expect(patch.options).toEqual({
+      featurePackStates: [
+        {
+          id: 'draft-pack',
+          status: 'disabled',
+        },
+        {
+          id: 'publish-pack',
+          status: 'uninstalled',
+        },
+      ],
+    })
+    expect(patch.stateChanges).toEqual([{
+      from: {
+        enabled: true,
+        id: 'publish-pack',
+        installed: true,
+        status: 'enabled',
+      },
+      id: 'publish-pack',
+      to: {
+        enabled: false,
+        id: 'publish-pack',
+        installed: false,
+        status: 'uninstalled',
+      },
+    }])
+  })
+
+  it('normalizes legacy disabled feature pack ids when applying a patch', () => {
+    const patch = applyCanvasAppFeaturePackRuntimeStatePatch({
+      featurePackIds: ['draft-pack', 'publish-pack'],
+      featurePackStates: [{
+        id: 'draft-pack',
+        status: 'enabled',
+      }],
+      options: {
+        disabledFeaturePackIds: ['draft-pack'],
+      },
+    })
+
+    expect(patch.changedFeaturePackIds).toEqual(['draft-pack'])
+    expect(patch.options).toEqual({
+      featurePackStates: [
+        {
+          id: 'draft-pack',
+          status: 'enabled',
+        },
+        {
+          id: 'publish-pack',
+          status: 'enabled',
+        },
+      ],
+    })
+  })
+
+  it('rejects runtime state patches for unknown feature packs', () => {
+    expect(() =>
+      applyCanvasAppFeaturePackRuntimeStatePatch({
+        featurePackIds: ['draft-pack'],
+        featurePackStates: [{
+          id: 'missing-pack',
+          status: 'enabled',
+        }],
       }),
     ).toThrow('Unknown canvas app feature pack state: missing-pack')
   })
