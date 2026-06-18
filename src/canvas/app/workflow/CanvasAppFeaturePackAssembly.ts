@@ -62,6 +62,10 @@ export type CanvasAppFeaturePackMarketplaceActionAssemblyReadyPlan =
     action: CanvasAppFeaturePackMarketplacePrimaryAction
     actionKind: CanvasAppFeaturePackMarketplacePrimaryAction['kind']
     assemblyInput: CanvasAppFeaturePackAssemblyInput
+    changedFeaturePackIds:
+      CanvasAppFeaturePackMarketplacePrimaryAction['changedFeaturePackIds']
+    partialUpdateSurfaceIds:
+      CanvasAppFeaturePackMarketplacePrimaryAction['partialUpdateSurfaceIds']
     status: 'ready'
   }>
 
@@ -70,7 +74,11 @@ export type CanvasAppFeaturePackMarketplaceActionAssemblyBlockedPlan =
     action: CanvasAppFeaturePackMarketplacePrimaryAction
     actionKind: CanvasAppFeaturePackMarketplacePrimaryAction['kind']
     blockedReasonCount: number
+    changedFeaturePackIds:
+      CanvasAppFeaturePackMarketplacePrimaryAction['changedFeaturePackIds']
     marketplaceBlockedReasonCount: number
+    partialUpdateSurfaceIds:
+      CanvasAppFeaturePackMarketplacePrimaryAction['partialUpdateSurfaceIds']
     status: 'blocked'
     totalBlockedReasonCount: number
   }>
@@ -197,7 +205,9 @@ export function getCanvasAppFeaturePackMarketplaceActionAssemblyPlan({
       action,
       actionKind: action.kind,
       blockedReasonCount,
+      changedFeaturePackIds: action.changedFeaturePackIds,
       marketplaceBlockedReasonCount,
+      partialUpdateSurfaceIds: action.partialUpdateSurfaceIds,
       status: 'blocked',
       totalBlockedReasonCount:
         blockedReasonCount + marketplaceBlockedReasonCount,
@@ -211,6 +221,8 @@ export function getCanvasAppFeaturePackMarketplaceActionAssemblyPlan({
       ...assemblyInput,
       featurePackStates: action.installOptions.featurePackStates,
     }),
+    changedFeaturePackIds: action.changedFeaturePackIds,
+    partialUpdateSurfaceIds: action.partialUpdateSurfaceIds,
     status: 'ready',
   })
 }

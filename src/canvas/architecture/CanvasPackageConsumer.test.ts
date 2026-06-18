@@ -1157,6 +1157,10 @@ describe('Canvas package consumer imports', () => {
     }
 
     expect(featurePackMarketplaceActionAssemblyPlan.actionKind).toBe('disable')
+    expect(featurePackMarketplaceActionAssemblyPlan.changedFeaturePackIds)
+      .toEqual(['smoke-partial-pack'])
+    expect(featurePackMarketplaceActionAssemblyPlan.partialUpdateSurfaceIds)
+      .toEqual(['overlay'])
     expect(featurePackMarketplaceActionAssemblyPlan.assemblyInput)
       .toEqual(featurePackMarketplaceAppliedAssemblyInput)
     expect(featurePackMarketplaceAppliedAssemblyInput.featurePackStates)

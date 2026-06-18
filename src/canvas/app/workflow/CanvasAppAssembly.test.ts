@@ -732,6 +732,8 @@ describe('CanvasAppAssembly seams', () => {
     }
 
     expect(assemblyPlan.actionKind).toBe('disable')
+    expect(assemblyPlan.changedFeaturePackIds).toEqual(['status-pack'])
+    expect(assemblyPlan.partialUpdateSurfaceIds).toEqual(['command'])
     expect(assemblyPlan.assemblyInput).toEqual(assemblyInput)
     expect(Object.isFrozen(assemblyPlan)).toBe(true)
     expect(assemblyInput).toEqual({
@@ -781,7 +783,9 @@ describe('CanvasAppAssembly seams', () => {
     expect(blockedPlan).toMatchObject({
       actionKind: 'install',
       blockedReasonCount: 0,
+      changedFeaturePackIds: ['paid-pack'],
       marketplaceBlockedReasonCount: 1,
+      partialUpdateSurfaceIds: [],
       status: 'blocked',
       totalBlockedReasonCount: 1,
     })
