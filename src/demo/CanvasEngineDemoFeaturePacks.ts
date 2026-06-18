@@ -5,7 +5,7 @@ import type {
   CanvasAppFeaturePackMarketplaceTarget,
 } from '../canvas'
 import {
-  executeCanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransaction,
+  executeCanvasAppAssemblySourceFeaturePackMarketplaceTargetControlApplyTransaction,
   getCanvasAppFeaturePackMarketplaceAssemblyModel,
   getCanvasAppFeaturePackMarketplaceTargetControl,
 } from '../canvas'
@@ -49,7 +49,7 @@ export type CanvasEngineDemoFeaturePackSwitchApplicationResult = Readonly<{
   enabled: boolean
   featurePackId: EngineDemoFeaturePackSwitchId
   source: CanvasAppAssemblySource
-  status: 'applied' | 'held' | 'unchanged'
+  status: 'applied' | 'held' | 'missing' | 'unchanged'
 }>
 
 export function createCanvasEngineDemoFeaturePackAssemblySource(
@@ -117,12 +117,12 @@ export async function applyCanvasEngineDemoFeaturePackSwitchToAssemblySource({
   }
 
   const result =
-    await executeCanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransaction(
+    await executeCanvasAppAssemblySourceFeaturePackMarketplaceTargetControlApplyTransaction(
       {
+        control: currentControl,
         executeCleanupEffect: () => undefined,
         model,
         source: currentSource,
-        target: createCanvasEngineDemoFeaturePackSwitchTarget(featurePackId),
       },
     )
 

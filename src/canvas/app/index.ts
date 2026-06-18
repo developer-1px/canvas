@@ -629,6 +629,7 @@ export {
 export {
   applyCanvasAppAssemblySourceFeaturePackMarketplaceHostUpdate,
   executeCanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransaction,
+  executeCanvasAppAssemblySourceFeaturePackMarketplaceTargetControlApplyTransaction,
   type CanvasAppAssemblyInputSource,
   type CanvasAppAssemblyRequiredInputSource,
   type CanvasAppAssemblySource,
@@ -640,6 +641,9 @@ export {
   type CanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransactionHeldResult,
   type CanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransactionInput,
   type CanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransactionResult,
+  type CanvasAppAssemblySourceFeaturePackMarketplaceTargetControlApplyTransactionInput,
+  type CanvasAppAssemblySourceFeaturePackMarketplaceTargetControlApplyTransactionMissingResult,
+  type CanvasAppAssemblySourceFeaturePackMarketplaceTargetControlApplyTransactionResult,
   type CanvasAppAssemblySourceValue,
   type CanvasAppPrebuiltAssemblySource,
 } from './shell/CanvasAppAssemblySource'

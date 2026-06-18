@@ -10,6 +10,9 @@ import {
   type CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionResult,
   type CanvasAppFeaturePackMarketplaceAssemblyTargetApplyTransactionInput,
 } from '../workflow'
+import {
+  type CanvasAppFeaturePackMarketplaceTargetControl,
+} from '../feature-packs'
 
 export type CanvasAppAssemblySource =
   | CanvasAppPrebuiltAssemblySource
@@ -148,6 +151,45 @@ export type CanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransactionR
     TEffect,
     TResult
   >
+
+export type CanvasAppAssemblySourceFeaturePackMarketplaceTargetControlApplyTransactionInput<
+  TEffect,
+  TResult,
+> = Omit<
+  CanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransactionInput<
+    TEffect,
+    TResult
+  >,
+  'target'
+> & Readonly<{
+  control: CanvasAppFeaturePackMarketplaceTargetControl
+}>
+
+export type CanvasAppAssemblySourceFeaturePackMarketplaceTargetControlApplyTransactionResult<
+  TEffect,
+  TResult,
+> =
+  | CanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransactionResult<
+    TEffect,
+    TResult
+  >
+  | CanvasAppAssemblySourceFeaturePackMarketplaceTargetControlApplyTransactionMissingResult
+
+export type CanvasAppAssemblySourceFeaturePackMarketplaceTargetControlApplyTransactionMissingResult =
+  Readonly<{
+    actionKind: null
+    applied: false
+    control: CanvasAppFeaturePackMarketplaceTargetControl
+    holdReason: 'missing-target'
+    hostUpdate: null
+    source: CanvasAppAssemblySource
+    sourceResult: null
+    status: 'missing'
+    target: CanvasAppFeaturePackMarketplaceTargetControl['target']
+    transactionResult: null
+    update: null
+    updateMode: 'blocked'
+  }>
 
 export type CanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransactionAppliedResult<
   TEffect,
@@ -338,6 +380,50 @@ export async function executeCanvasAppAssemblySourceFeaturePackMarketplaceTarget
     update: null,
     updateMode: sourceResult.updateMode,
   })
+}
+
+export async function executeCanvasAppAssemblySourceFeaturePackMarketplaceTargetControlApplyTransaction<
+  TEffect,
+  TResult,
+>({
+  control,
+  ...input
+}: CanvasAppAssemblySourceFeaturePackMarketplaceTargetControlApplyTransactionInput<
+  TEffect,
+  TResult
+>): Promise<
+  CanvasAppAssemblySourceFeaturePackMarketplaceTargetControlApplyTransactionResult<
+    TEffect,
+    TResult
+  >
+> {
+  if (control.item === null || control.actionKind === null) {
+    const source = input.source ?? Object.freeze({
+      assemblyInput: input.model.assemblyInput,
+    })
+
+    return Object.freeze({
+      actionKind: null,
+      applied: false,
+      control,
+      holdReason: 'missing-target',
+      hostUpdate: null,
+      source,
+      sourceResult: null,
+      status: 'missing',
+      target: control.target,
+      transactionResult: null,
+      update: null,
+      updateMode: 'blocked',
+    })
+  }
+
+  return executeCanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransaction(
+    {
+      ...input,
+      target: control.target,
+    },
+  )
 }
 
 export type CanvasAppAssemblySourceValue = {

@@ -7,11 +7,13 @@ import {
 import {
   createCanvasAppAiLabsFeaturePackManifest,
   createCanvasAppFeaturePackManifest,
+  getCanvasAppFeaturePackMarketplaceTargetControl,
   getCanvasAppFeaturePackMarketplacePrimaryAction,
 } from '../feature-packs'
 import {
   applyCanvasAppAssemblySourceFeaturePackMarketplaceHostUpdate,
   executeCanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransaction,
+  executeCanvasAppAssemblySourceFeaturePackMarketplaceTargetControlApplyTransaction,
   resolveCanvasAppAssemblySource,
   type CanvasAppPrebuiltAssemblySource,
 } from './CanvasAppAssemblySource'
@@ -206,6 +208,160 @@ describe('CanvasAppAssemblySource', () => {
         id: 'shell-target-addon-pack',
         status: 'disabled',
       }])
+  })
+
+  it('executes ready marketplace target control transactions as assembly input sources', async () => {
+    const addonManifest = createCanvasAppFeaturePackManifest({
+      id: 'shell-control-addon-pack',
+      label: 'Shell control addon pack',
+    })
+    const model = getCanvasAppFeaturePackMarketplaceAssemblyModel({
+      assemblyInput: {
+        featurePackManifests: [addonManifest],
+        featurePackStates: [{
+          id: 'shell-control-addon-pack',
+          status: 'uninstalled',
+        }],
+      },
+      profiles: [],
+      suiteManifests: [],
+    })
+    const control = getCanvasAppFeaturePackMarketplaceTargetControl({
+      model: model.marketplaceModel,
+      target: {
+        featurePackId: 'shell-control-addon-pack',
+        kind: 'pack',
+      },
+    })
+    const sourceTransactionResult =
+      await executeCanvasAppAssemblySourceFeaturePackMarketplaceTargetControlApplyTransaction({
+        control,
+        executeCleanupEffect: () => ({ kind: 'not-run' as const }),
+        model,
+      })
+
+    expect(control).toMatchObject({
+      actionKind: 'install',
+      ready: true,
+      status: 'ready',
+    })
+    expect(sourceTransactionResult.status).toBe('applied')
+    expect(sourceTransactionResult.applied).toBe(true)
+    expect(sourceTransactionResult.actionKind).toBe('install')
+    expect(sourceTransactionResult.transactionResult?.status).toBe('committed')
+    expect(sourceTransactionResult.source.assemblyInput?.featurePackStates)
+      .toEqual([{
+        id: 'shell-control-addon-pack',
+        status: 'disabled',
+      }])
+  })
+
+  it('keeps blocked marketplace target control transactions on the held source path', async () => {
+    const paidManifest = createCanvasAppFeaturePackManifest({
+      id: 'shell-control-private-pack',
+      label: 'Shell control private pack',
+    })
+    const model = getCanvasAppFeaturePackMarketplaceAssemblyModel({
+      assemblyInput: {
+        featurePackManifests: [paidManifest],
+        featurePackStates: [{
+          id: 'shell-control-private-pack',
+          status: 'uninstalled',
+        }],
+      },
+      listings: [{
+        access: 'private',
+        distribution: 'available',
+        featurePackId: 'shell-control-private-pack',
+      }],
+      profiles: [],
+      suiteManifests: [],
+    })
+    const control = getCanvasAppFeaturePackMarketplaceTargetControl({
+      model: model.marketplaceModel,
+      target: {
+        featurePackId: 'shell-control-private-pack',
+        kind: 'pack',
+      },
+    })
+    const prebuiltSource = {
+      assembly: DEFAULT_CANVAS_APP_ASSEMBLY,
+    } satisfies CanvasAppPrebuiltAssemblySource
+    const sourceTransactionResult =
+      await executeCanvasAppAssemblySourceFeaturePackMarketplaceTargetControlApplyTransaction({
+        control,
+        executeCleanupEffect: () => ({ kind: 'not-run' as const }),
+        model,
+        source: prebuiltSource,
+      })
+
+    expect(control).toMatchObject({
+      actionKind: 'install',
+      ready: false,
+      status: 'blocked',
+    })
+    expect(sourceTransactionResult.status).toBe('held')
+    expect(sourceTransactionResult.applied).toBe(false)
+    expect(sourceTransactionResult.actionKind).toBe('install')
+    expect(sourceTransactionResult.holdReason).toBe('blocked')
+    expect(sourceTransactionResult.transactionResult.status).toBe('held')
+    expect(sourceTransactionResult.source).toBe(prebuiltSource)
+    expect(resolveCanvasAppAssemblySource(sourceTransactionResult.source))
+      .toBe(DEFAULT_CANVAS_APP_ASSEMBLY)
+  })
+
+  it('preserves current sources for missing marketplace target controls', async () => {
+    const model = getCanvasAppFeaturePackMarketplaceAssemblyModel({
+      assemblyInput: {
+        featurePackManifests: [],
+      },
+      profiles: [],
+      suiteManifests: [],
+    })
+    const control = getCanvasAppFeaturePackMarketplaceTargetControl({
+      model: model.marketplaceModel,
+      target: {
+        featurePackId: 'missing-control-pack',
+        kind: 'pack',
+      },
+    })
+    const prebuiltSource = {
+      assembly: DEFAULT_CANVAS_APP_ASSEMBLY,
+    } satisfies CanvasAppPrebuiltAssemblySource
+    const sourceTransactionResult =
+      await executeCanvasAppAssemblySourceFeaturePackMarketplaceTargetControlApplyTransaction({
+        control,
+        executeCleanupEffect: () => ({ kind: 'not-run' as const }),
+        model,
+        source: prebuiltSource,
+      })
+
+    expect(control).toMatchObject({
+      actionKind: null,
+      item: null,
+      ready: false,
+      status: 'missing',
+    })
+    expect(sourceTransactionResult).toMatchObject({
+      actionKind: null,
+      applied: false,
+      control,
+      holdReason: 'missing-target',
+      hostUpdate: null,
+      source: prebuiltSource,
+      sourceResult: null,
+      status: 'missing',
+      target: {
+        featurePackId: 'missing-control-pack',
+        kind: 'pack',
+      },
+      transactionResult: null,
+      update: null,
+      updateMode: 'blocked',
+    })
+    expect(resolveCanvasAppAssemblySource(sourceTransactionResult.source))
+      .toBe(DEFAULT_CANVAS_APP_ASSEMBLY)
+    expect(Object.isFrozen(sourceTransactionResult)).toBe(true)
   })
 
   it('keeps current assembly input source for held marketplace host updates', async () => {
