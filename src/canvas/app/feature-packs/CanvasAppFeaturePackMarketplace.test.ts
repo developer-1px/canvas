@@ -36,13 +36,17 @@ describe('CanvasAppFeaturePackMarketplace', () => {
     expect(model.sections[1]?.items).toBe(model.suites.items)
     expect(model.sections[2]?.items).toBe(model.packs.items)
     expect(model.sections[2]?.summary).toEqual({
+      activationFailedItemCount: 0,
       blockedActionCount: 1,
       enabledItemCount: 1,
       installedItemCount: 1,
       itemCount: 1,
       paidItemCount: 0,
+      partiallyUpdatedItemCount: 0,
       privateItemCount: 0,
       readyActionCount: 1,
+      rollbackAvailableItemCount: 0,
+      updatingItemCount: 0,
     })
     expect(model.sections[2]?.facets).toEqual([
       { count: 1, kind: 'all', label: 'All' },
@@ -50,6 +54,10 @@ describe('CanvasAppFeaturePackMarketplace', () => {
       { count: 1, kind: 'enabled', label: 'Enabled' },
       { count: 0, kind: 'paid', label: 'Paid' },
       { count: 0, kind: 'private', label: 'Private' },
+      { count: 0, kind: 'updating', label: 'Updating' },
+      { count: 0, kind: 'partially-updated', label: 'Partially updated' },
+      { count: 0, kind: 'activation-failed', label: 'Activation failed' },
+      { count: 0, kind: 'rollback-available', label: 'Rollback available' },
       { count: 1, kind: 'ready', label: 'Ready' },
       { count: 1, kind: 'blocked', label: 'Blocked' },
     ])
@@ -140,13 +148,17 @@ describe('CanvasAppFeaturePackMarketplace', () => {
       { count: 1, kind: 'blocked', label: 'Blocked' },
     ])
     expect(model.sections[2]?.summary).toEqual({
+      activationFailedItemCount: 0,
       blockedActionCount: 3,
       enabledItemCount: 1,
       installedItemCount: 1,
       itemCount: 2,
       paidItemCount: 0,
+      partiallyUpdatedItemCount: 0,
       privateItemCount: 1,
       readyActionCount: 1,
+      rollbackAvailableItemCount: 0,
+      updatingItemCount: 0,
     })
     expect(model.sections[2]?.facets).toEqual([
       { count: 2, kind: 'all', label: 'All' },
@@ -154,6 +166,10 @@ describe('CanvasAppFeaturePackMarketplace', () => {
       { count: 1, kind: 'enabled', label: 'Enabled' },
       { count: 0, kind: 'paid', label: 'Paid' },
       { count: 1, kind: 'private', label: 'Private' },
+      { count: 0, kind: 'updating', label: 'Updating' },
+      { count: 0, kind: 'partially-updated', label: 'Partially updated' },
+      { count: 0, kind: 'activation-failed', label: 'Activation failed' },
+      { count: 0, kind: 'rollback-available', label: 'Rollback available' },
       { count: 1, kind: 'ready', label: 'Ready' },
       { count: 2, kind: 'blocked', label: 'Blocked' },
     ])
@@ -236,5 +252,91 @@ describe('CanvasAppFeaturePackMarketplace', () => {
         },
       ],
     })
+  })
+
+  it('surfaces pack lifecycle status facets for update and rollback states', () => {
+    const updatingManifest = createCanvasAppFeaturePackManifest({
+      id: 'updating-pack',
+      label: 'Updating pack',
+    })
+    const partialManifest = createCanvasAppFeaturePackManifest({
+      id: 'partial-pack',
+      label: 'Partial pack',
+    })
+    const failedManifest = createCanvasAppFeaturePackManifest({
+      id: 'failed-pack',
+      label: 'Failed pack',
+    })
+    const rollbackManifest = createCanvasAppFeaturePackManifest({
+      id: 'rollback-pack',
+      label: 'Rollback pack',
+    })
+    const model = getCanvasAppFeaturePackMarketplaceModel({
+      manifests: [
+        updatingManifest,
+        partialManifest,
+        failedManifest,
+        rollbackManifest,
+      ],
+      options: {
+        featurePackStates: [
+          {
+            id: 'updating-pack',
+            status: 'updating',
+          },
+          {
+            id: 'partial-pack',
+            status: 'partially-updated',
+          },
+          {
+            id: 'failed-pack',
+            status: 'activation-failed',
+          },
+          {
+            id: 'rollback-pack',
+            status: 'rollback-available',
+          },
+        ],
+      },
+    })
+    const packSection = model.sections[2]
+
+    if (packSection?.kind !== 'packs') {
+      throw new Error('Expected packs section')
+    }
+
+    expect(packSection.summary).toMatchObject({
+      activationFailedItemCount: 1,
+      partiallyUpdatedItemCount: 1,
+      rollbackAvailableItemCount: 1,
+      updatingItemCount: 1,
+    })
+    expect(packSection.facets.filter((facet) =>
+      facet.kind === 'updating' ||
+      facet.kind === 'partially-updated' ||
+      facet.kind === 'activation-failed' ||
+      facet.kind === 'rollback-available'
+    )).toEqual([
+      { count: 1, kind: 'updating', label: 'Updating' },
+      { count: 1, kind: 'partially-updated', label: 'Partially updated' },
+      { count: 1, kind: 'activation-failed', label: 'Activation failed' },
+      { count: 1, kind: 'rollback-available', label: 'Rollback available' },
+    ])
+    expect(getCanvasAppFeaturePackMarketplaceSectionFacetItems({
+      facetKind: 'updating',
+      section: packSection,
+    }).map((item) => item.featurePackId)).toEqual(['updating-pack'])
+    expect(getCanvasAppFeaturePackMarketplaceSectionFacetItems({
+      facetKind: 'partially-updated',
+      section: packSection,
+    }).map((item) => item.featurePackId)).toEqual(['partial-pack'])
+    expect(getCanvasAppFeaturePackMarketplaceSectionFacetItems({
+      facetKind: 'activation-failed',
+      section: packSection,
+    }).map((item) => item.featurePackId)).toEqual(['failed-pack'])
+    expect(getCanvasAppFeaturePackMarketplaceSectionFacetItems({
+      facetKind: 'rollback-available',
+      section: packSection,
+    }).map((item) => item.featurePackId)).toEqual(['rollback-pack'])
   })
 })

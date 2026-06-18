@@ -94,13 +94,17 @@ export type CanvasAppFeaturePackMarketplaceSuiteSectionFacetKind =
   | 'ready'
 
 export type CanvasAppFeaturePackMarketplacePackSectionFacetKind =
+  | 'activation-failed'
   | 'all'
   | 'blocked'
   | 'enabled'
   | 'installed'
   | 'paid'
+  | 'partially-updated'
   | 'private'
   | 'ready'
+  | 'rollback-available'
+  | 'updating'
 
 export type CanvasAppFeaturePackMarketplaceSectionFacetKind =
   | CanvasAppFeaturePackMarketplacePackSectionFacetKind
@@ -173,10 +177,14 @@ export type CanvasAppFeaturePackMarketplaceSuiteSectionSummary =
 
 export type CanvasAppFeaturePackMarketplacePackSectionSummary =
   CanvasAppFeaturePackMarketplaceActionSectionSummary & Readonly<{
+    activationFailedItemCount: number
     enabledItemCount: number
     installedItemCount: number
     paidItemCount: number
+    partiallyUpdatedItemCount: number
     privateItemCount: number
+    rollbackAvailableItemCount: number
+    updatingItemCount: number
 }>
 
 export function getCanvasAppFeaturePackMarketplaceModel({
@@ -348,12 +356,22 @@ function getCanvasAppFeaturePackMarketplacePackSectionSummary(
   items: readonly CanvasAppFeaturePackMarketplaceActionItem[],
 ): CanvasAppFeaturePackMarketplacePackSectionSummary {
   return Object.freeze({
+    activationFailedItemCount: items.filter((item) =>
+      item.status === 'activation-failed'
+    ).length,
     enabledItemCount: items.filter((item) => item.enabled).length,
     installedItemCount: items.filter((item) => item.installed).length,
     paidItemCount: items.filter((item) => item.listing.access === 'paid').length,
+    partiallyUpdatedItemCount: items.filter((item) =>
+      item.status === 'partially-updated'
+    ).length,
     privateItemCount: items.filter((item) =>
       item.listing.access === 'private'
     ).length,
+    rollbackAvailableItemCount: items.filter((item) =>
+      item.status === 'rollback-available'
+    ).length,
+    updatingItemCount: items.filter((item) => item.status === 'updating').length,
     ...getCanvasAppFeaturePackMarketplaceActionSectionSummary(items),
   })
 }
@@ -498,6 +516,26 @@ function getCanvasAppFeaturePackMarketplacePackSectionFacets({
       label: 'Private',
     }),
     createCanvasAppFeaturePackMarketplaceSectionFacet({
+      count: summary.updatingItemCount,
+      kind: 'updating',
+      label: 'Updating',
+    }),
+    createCanvasAppFeaturePackMarketplaceSectionFacet({
+      count: summary.partiallyUpdatedItemCount,
+      kind: 'partially-updated',
+      label: 'Partially updated',
+    }),
+    createCanvasAppFeaturePackMarketplaceSectionFacet({
+      count: summary.activationFailedItemCount,
+      kind: 'activation-failed',
+      label: 'Activation failed',
+    }),
+    createCanvasAppFeaturePackMarketplaceSectionFacet({
+      count: summary.rollbackAvailableItemCount,
+      kind: 'rollback-available',
+      label: 'Rollback available',
+    }),
+    createCanvasAppFeaturePackMarketplaceSectionFacet({
       count: getCanvasAppFeaturePackMarketplaceReadyItemCount(items),
       kind: 'ready',
       label: 'Ready',
@@ -577,6 +615,15 @@ function isCanvasAppFeaturePackMarketplacePackSectionFacetItem({
 
   if (facetKind === 'private') {
     return item.listing.access === 'private'
+  }
+
+  if (
+    facetKind === 'activation-failed' ||
+    facetKind === 'partially-updated' ||
+    facetKind === 'rollback-available' ||
+    facetKind === 'updating'
+  ) {
+    return item.status === facetKind
   }
 
   return isCanvasAppFeaturePackMarketplaceCommonSectionFacetItem({

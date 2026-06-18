@@ -1059,13 +1059,17 @@ describe('Canvas package consumer imports', () => {
       vendor: 'Interactive OS',
     })
     expect(featurePackMarketplacePackSectionSummary).toEqual({
+      activationFailedItemCount: 0,
       blockedActionCount: 0,
       enabledItemCount: 1,
       installedItemCount: 1,
       itemCount: 1,
       paidItemCount: 1,
+      partiallyUpdatedItemCount: 0,
       privateItemCount: 0,
       readyActionCount: 2,
+      rollbackAvailableItemCount: 0,
+      updatingItemCount: 0,
     })
     expect(featurePackMarketplacePackSectionFacetKinds).toEqual([
       'all',
@@ -1073,6 +1077,10 @@ describe('Canvas package consumer imports', () => {
       'enabled',
       'paid',
       'private',
+      'updating',
+      'partially-updated',
+      'activation-failed',
+      'rollback-available',
       'ready',
       'blocked',
     ])
@@ -1082,6 +1090,10 @@ describe('Canvas package consumer imports', () => {
       { count: 1, kind: 'enabled', label: 'Enabled' },
       { count: 1, kind: 'paid', label: 'Paid' },
       { count: 0, kind: 'private', label: 'Private' },
+      { count: 0, kind: 'updating', label: 'Updating' },
+      { count: 0, kind: 'partially-updated', label: 'Partially updated' },
+      { count: 0, kind: 'activation-failed', label: 'Activation failed' },
+      { count: 0, kind: 'rollback-available', label: 'Rollback available' },
       { count: 1, kind: 'ready', label: 'Ready' },
       { count: 0, kind: 'blocked', label: 'Blocked' },
     ])
