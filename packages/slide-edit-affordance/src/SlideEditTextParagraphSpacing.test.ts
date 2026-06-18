@@ -1,16 +1,26 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  createSlideEditTextParagraphBulletDescriptor,
   createSlideEditTextParagraphSpacingDescriptor,
+  getSlideEditTextParagraphBulletCommandEffect,
+  getSlideEditTextParagraphBulletJSONPasteValue,
   getSlideEditTextParagraphSpacingCommandEffect,
   getSlideEditTextParagraphSpacingCSSStyle,
+  normalizeSlideEditTextParagraphBulletValue,
   normalizeSlideEditTextLineHeightRatio,
   normalizeSlideEditTextParagraphSpacingAmount,
   normalizeSlideEditTextParagraphSpacingNumber,
   SLIDE_EDIT_DEFAULT_TEXT_PARAGRAPH_SPACING,
+  SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_DEFAULT,
+  SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_FIELD,
+  SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_VALUES,
   SLIDE_EDIT_TEXT_PARAGRAPH_SPACING_FIELDS,
   SLIDE_EDIT_TEXT_PARAGRAPH_SPACING_LIMITS,
 } from './SlideEditTextParagraphSpacing'
+import {
+  createSlideEditTextParagraphBulletDescriptor as createSlideEditTextParagraphBulletDescriptorFromPackage,
+} from './index'
 
 describe('SlideEditTextParagraphSpacing', () => {
   it('creates a product-neutral text paragraph spacing descriptor', () => {
@@ -41,6 +51,124 @@ describe('SlideEditTextParagraphSpacing', () => {
       'update-text-paragraph-spacing',
       'update-text-paragraph-spacing',
     ])
+  })
+
+  it('creates a product-neutral text paragraph bullet descriptor', () => {
+    expect(createSlideEditTextParagraphBulletDescriptor({
+      objectId: 'object-a',
+      slideId: 'slide-a',
+    })).toEqual({
+      field: SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_FIELD,
+      objectId: 'object-a',
+      slideId: 'slide-a',
+      surface: 'text-paragraph-bullet',
+      value: SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_DEFAULT,
+    })
+    expect(SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_VALUES).toEqual([
+      'none',
+      'bullet',
+      'numbered',
+    ])
+    expect(createSlideEditTextParagraphBulletDescriptorFromPackage({
+      objectId: 'object-a',
+      slideId: 'slide-a',
+      value: 'bullet',
+    })).toMatchObject({
+      surface: 'text-paragraph-bullet',
+      value: 'bullet',
+    })
+  })
+
+  it('normalizes paragraph bullet values and rejects invalid values', () => {
+    expect(normalizeSlideEditTextParagraphBulletValue('bullet')).toBe('bullet')
+    expect(normalizeSlideEditTextParagraphBulletValue('numbered')).toBe(
+      'numbered',
+    )
+    expect(normalizeSlideEditTextParagraphBulletValue('none')).toBe('none')
+    expect(normalizeSlideEditTextParagraphBulletValue('ordered')).toBeNull()
+    expect(normalizeSlideEditTextParagraphBulletValue(true)).toBeNull()
+    expect(normalizeSlideEditTextParagraphBulletValue(null)).toBeNull()
+  })
+
+  it('routes paragraph bullet updates through host command effects', () => {
+    expect(getSlideEditTextParagraphBulletCommandEffect({
+      fieldId: 'paragraphBullet',
+      id: 'update-text-paragraph-bullet',
+      objectId: 'object-a',
+      slideId: 'slide-a',
+      value: 'numbered',
+    })).toEqual({
+      payload: {
+        fieldId: 'paragraphBullet',
+        id: 'update-text-paragraph-bullet',
+        objectId: 'object-a',
+        slideId: 'slide-a',
+        value: 'numbered',
+      },
+      selection: {
+        objectIds: ['object-a'],
+        slideId: 'slide-a',
+      },
+      type: 'slide-command-effect',
+    })
+  })
+
+  it('reads custom MIME direct paragraph bullet JSON values', () => {
+    expect(getSlideEditTextParagraphBulletJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_FIELD.jsonMimeType]: '"bullet"',
+        'text/plain': 'ignored',
+      }),
+    })).toBe('bullet')
+    expect(getSlideEditTextParagraphBulletJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_FIELD.jsonMimeType]: '"none"',
+      }),
+    })).toBe('none')
+  })
+
+  it('reads explicit paragraph bullet fields from general JSON payloads', () => {
+    for (const [payload, expected] of [
+      [{ paragraphBullet: 'bullet' }, 'bullet'],
+      [{ textParagraphBullet: 'numbered' }, 'numbered'],
+      [{ bullet: 'bullet' }, 'bullet'],
+      [{ list: 'numbered' }, 'numbered'],
+      [{ value: 'none' }, 'none'],
+    ] as const) {
+      expect(getSlideEditTextParagraphBulletJSONPasteValue({
+        dataTransfer: createDataTransfer({
+          'text/plain': JSON.stringify(payload),
+        }),
+      })).toBe(expected)
+    }
+    expect(getSlideEditTextParagraphBulletJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'application/json': '{"textParagraphBullet":"bullet"}',
+      }),
+    })).toBe('bullet')
+  })
+
+  it('does not treat generic text/plain direct values as paragraph bullet', () => {
+    expect(getSlideEditTextParagraphBulletJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '"bullet"',
+      }),
+    })).toBeNull()
+    expect(getSlideEditTextParagraphBulletJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': 'bullet',
+      }),
+    })).toBeNull()
+    expect(getSlideEditTextParagraphBulletJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"bullet":true}',
+      }),
+    })).toBeNull()
+    expect(getSlideEditTextParagraphBulletJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"list":"ordered"}',
+      }),
+    })).toBeNull()
   })
 
   it('routes field updates through host command effects', () => {
@@ -167,3 +295,9 @@ describe('SlideEditTextParagraphSpacing', () => {
     }
   })
 })
+
+function createDataTransfer(values: Record<string, string>) {
+  return {
+    getData: (type: string) => values[type] ?? '',
+  }
+}

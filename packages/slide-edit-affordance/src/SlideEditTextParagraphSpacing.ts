@@ -1,6 +1,76 @@
 export type SlideEditTextParagraphSlideId = string
 export type SlideEditTextParagraphObjectId = string
 
+export type SlideEditTextParagraphBulletValue =
+  | 'bullet'
+  | 'none'
+  | 'numbered'
+
+export type SlideEditTextParagraphBulletOption = {
+  id: SlideEditTextParagraphBulletValue
+  label: string
+}
+
+export type SlideEditTextParagraphBulletFieldDescriptor = {
+  commandId: 'update-text-paragraph-bullet'
+  control: 'paragraph-bullet-segmented-control'
+  id: 'paragraphBullet'
+  jsonKeys: readonly string[]
+  jsonMimeType: string
+  options: readonly SlideEditTextParagraphBulletOption[]
+  requiredAdapterSlot: 'command-effect'
+}
+
+export type SlideEditTextParagraphBulletDescriptor<
+  TSlideId extends SlideEditTextParagraphSlideId =
+    SlideEditTextParagraphSlideId,
+  TObjectId extends SlideEditTextParagraphObjectId =
+    SlideEditTextParagraphObjectId,
+> = {
+  field: SlideEditTextParagraphBulletFieldDescriptor
+  objectId: TObjectId
+  slideId: TSlideId
+  surface: 'text-paragraph-bullet'
+  value: SlideEditTextParagraphBulletValue
+}
+
+export type SlideEditTextParagraphBulletUpdateCommand<
+  TSlideId extends SlideEditTextParagraphSlideId =
+    SlideEditTextParagraphSlideId,
+  TObjectId extends SlideEditTextParagraphObjectId =
+    SlideEditTextParagraphObjectId,
+> = {
+  fieldId: 'paragraphBullet'
+  id: 'update-text-paragraph-bullet'
+  objectId: TObjectId
+  slideId: TSlideId
+  value: SlideEditTextParagraphBulletValue
+}
+
+export type SlideEditTextParagraphBulletHostCommandEffect<
+  TSlideId extends SlideEditTextParagraphSlideId =
+    SlideEditTextParagraphSlideId,
+  TObjectId extends SlideEditTextParagraphObjectId =
+    SlideEditTextParagraphObjectId,
+> = {
+  payload: SlideEditTextParagraphBulletUpdateCommand<TSlideId, TObjectId>
+  selection: {
+    objectIds: readonly TObjectId[]
+    slideId: TSlideId
+  }
+  type: 'slide-command-effect'
+}
+
+export type SlideEditTextParagraphBulletDataTransfer = Pick<
+  DataTransfer,
+  'getData'
+>
+
+export type SlideEditTextParagraphBulletJSONPasteInput = {
+  dataTransfer: SlideEditTextParagraphBulletDataTransfer | null
+  jsonMimeType?: string
+}
+
 export type SlideEditTextParagraphSpacingUnit =
   | 'px'
   | 'slide-unit'
@@ -120,6 +190,40 @@ export const SLIDE_EDIT_TEXT_PARAGRAPH_SPACING_LIMITS = Object.freeze({
   minSpacing: 0,
 } as const satisfies SlideEditTextParagraphSpacingNumericLimits)
 
+export const SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_DEFAULT = 'none'
+
+export const SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_VALUES = Object.freeze([
+  'none',
+  'bullet',
+  'numbered',
+] as const satisfies readonly SlideEditTextParagraphBulletValue[])
+
+export const SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_OPTIONS = Object.freeze([
+  {
+    id: 'none',
+    label: 'None',
+  },
+  {
+    id: 'bullet',
+    label: 'Bullet',
+  },
+  {
+    id: 'numbered',
+    label: 'Numbered',
+  },
+] as const satisfies readonly SlideEditTextParagraphBulletOption[])
+
+export const SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_FIELD = Object.freeze({
+  commandId: 'update-text-paragraph-bullet',
+  control: 'paragraph-bullet-segmented-control',
+  id: 'paragraphBullet',
+  jsonKeys: ['paragraphBullet', 'textParagraphBullet', 'bullet', 'list', 'value'],
+  jsonMimeType:
+    'application/vnd.interactive-os.slide-edit.text-paragraph-bullet+json',
+  options: SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_OPTIONS,
+  requiredAdapterSlot: 'command-effect',
+} as const satisfies SlideEditTextParagraphBulletFieldDescriptor)
+
 export const SLIDE_EDIT_TEXT_PARAGRAPH_SPACING_FIELDS = Object.freeze([
   {
     commandId: 'update-text-paragraph-spacing',
@@ -163,6 +267,100 @@ export const SLIDE_EDIT_DEFAULT_TEXT_PARAGRAPH_SPACING = Object.freeze({
     value: 0,
   },
 } as const satisfies SlideEditTextParagraphSpacingValues)
+
+export function createSlideEditTextParagraphBulletDescriptor<
+  TSlideId extends SlideEditTextParagraphSlideId,
+  TObjectId extends SlideEditTextParagraphObjectId,
+>({
+  field = SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_FIELD,
+  objectId,
+  slideId,
+  value = SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_DEFAULT,
+}: {
+  field?: SlideEditTextParagraphBulletFieldDescriptor
+  objectId: TObjectId
+  slideId: TSlideId
+  value?: unknown
+}): SlideEditTextParagraphBulletDescriptor<TSlideId, TObjectId> {
+  return {
+    field,
+    objectId,
+    slideId,
+    surface: 'text-paragraph-bullet',
+    value: normalizeSlideEditTextParagraphBulletValue(value) ??
+      SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_DEFAULT,
+  }
+}
+
+export function getSlideEditTextParagraphBulletCommandEffect<
+  TSlideId extends SlideEditTextParagraphSlideId,
+  TObjectId extends SlideEditTextParagraphObjectId,
+>(
+  command: SlideEditTextParagraphBulletUpdateCommand<TSlideId, TObjectId>,
+): SlideEditTextParagraphBulletHostCommandEffect<TSlideId, TObjectId> {
+  return {
+    payload: normalizeSlideEditTextParagraphBulletUpdateCommand(command),
+    selection: {
+      objectIds: [command.objectId],
+      slideId: command.slideId,
+    },
+    type: 'slide-command-effect',
+  }
+}
+
+export function normalizeSlideEditTextParagraphBulletUpdateCommand<
+  TSlideId extends SlideEditTextParagraphSlideId,
+  TObjectId extends SlideEditTextParagraphObjectId,
+>(
+  command: SlideEditTextParagraphBulletUpdateCommand<TSlideId, TObjectId>,
+): SlideEditTextParagraphBulletUpdateCommand<TSlideId, TObjectId> {
+  return {
+    ...command,
+    value: normalizeSlideEditTextParagraphBulletValue(command.value) ??
+      SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_DEFAULT,
+  }
+}
+
+export function getSlideEditTextParagraphBulletJSONPasteValue({
+  dataTransfer,
+  jsonMimeType = SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_FIELD.jsonMimeType,
+}: SlideEditTextParagraphBulletJSONPasteInput): SlideEditTextParagraphBulletValue | null {
+  if (!dataTransfer) {
+    return null
+  }
+
+  if (jsonMimeType) {
+    const customValue = parseSlideEditTextParagraphBulletJSON(
+      dataTransfer.getData(jsonMimeType),
+    )
+    const normalizedCustomValue =
+      normalizeSlideEditTextParagraphBulletValue(customValue)
+
+    if (normalizedCustomValue !== null) {
+      return normalizedCustomValue
+    }
+  }
+
+  for (const type of ['application/json', 'text/plain']) {
+    const value = parseSlideEditTextParagraphBulletJSON(
+      dataTransfer.getData(type),
+    )
+    const explicitValue =
+      getSlideEditTextParagraphBulletExplicitJSONValue(value)
+
+    if (explicitValue !== null) {
+      return explicitValue
+    }
+  }
+
+  return null
+}
+
+export function normalizeSlideEditTextParagraphBulletValue(
+  value: unknown,
+): SlideEditTextParagraphBulletValue | null {
+  return isSlideEditTextParagraphBulletValue(value) ? value : null
+}
 
 export function createSlideEditTextParagraphSpacingDescriptor<
   TSlideId extends SlideEditTextParagraphSlideId,
@@ -310,4 +508,43 @@ function normalizeSlideEditTextParagraphSpacingUnit(
   unit: SlideEditTextParagraphSpacingUnit | null | undefined,
 ): SlideEditTextParagraphSpacingUnit {
   return unit === 'slide-unit' ? unit : 'px'
+}
+
+function isSlideEditTextParagraphBulletValue(
+  value: unknown,
+): value is SlideEditTextParagraphBulletValue {
+  return typeof value === 'string' &&
+    SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_VALUES.includes(
+      value as SlideEditTextParagraphBulletValue,
+    )
+}
+
+function getSlideEditTextParagraphBulletExplicitJSONValue(
+  value: unknown,
+): SlideEditTextParagraphBulletValue | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null
+  }
+
+  const record = value as Record<string, unknown>
+
+  for (const key of SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_FIELD.jsonKeys) {
+    if (Object.hasOwn(record, key)) {
+      return normalizeSlideEditTextParagraphBulletValue(record[key])
+    }
+  }
+
+  return null
+}
+
+function parseSlideEditTextParagraphBulletJSON(value: string) {
+  if (!value.trim()) {
+    return null
+  }
+
+  try {
+    return JSON.parse(value) as unknown
+  } catch {
+    return null
+  }
 }

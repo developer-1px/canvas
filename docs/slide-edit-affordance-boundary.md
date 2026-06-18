@@ -35,6 +35,7 @@
 | Text frame inset | `slide-edit-affordance` | text frame top/right/bottom/left inset metadata and command effects |
 | Text run formatting | `slide-edit-affordance` | selected text run bold/italic/underline JSON paste and command effects |
 | Text vertical alignment | `slide-edit-affordance` | text frame internal vertical alignment metadata and command effects |
+| Text paragraph bullet/list | `slide-edit-affordance` | selected text paragraph bullet/list state JSON paste and command effects |
 | Text paragraph spacing | `slide-edit-affordance` | line height and paragraph before/after spacing descriptors |
 | Text measurement | `slide-edit-affordance` | bounded text size, overflow, and auto-fit hints |
 | Object inspector | `slide-edit-affordance` | object-level inspector grouping without DOM layout assumptions |
@@ -146,6 +147,18 @@
 | Fields | `lineHeightRatio`, `paragraphBefore`, `paragraphAfter` descriptors |
 | Updates | field edits become host command effects with object id and normalized value |
 | Runtime | host owns text layout, preview rendering, export mapping, and persistence |
+
+## Text Paragraph Bullet/List JSON Paste Contract
+
+| Area | Contract |
+| --- | --- |
+| Values | `none`, `bullet`, and `numbered`; unknown list values are rejected |
+| Field | `paragraphBullet` segmented-control descriptor routes through `update-text-paragraph-bullet` |
+| Custom MIME | `application/vnd.interactive-os.slide-edit.text-paragraph-bullet+json` may carry a direct JSON string value |
+| General JSON | `application/json` and `text/plain` require an explicit field key such as `paragraphBullet`, `textParagraphBullet`, `bullet`, `list`, or `value` |
+| Plain text | generic `text/plain` direct values such as `"bullet"` are not interpreted as list state |
+| Updates | selected slide id, text object id, field id, and normalized list value become host command effects |
+| Scope | complements rich text paste paragraph metadata without owning host text storage or HTML import rules |
 
 ## Text Font Family Contract
 
