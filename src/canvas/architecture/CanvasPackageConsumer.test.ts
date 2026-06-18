@@ -32,6 +32,7 @@ import {
   createCanvasAppFeaturePackMarketplaceListing,
   getCanvasAppFeaturePackMarketplaceActionAssemblyPlan,
   getCanvasAppFeaturePackMarketplaceActionAssemblyInput,
+  routeCanvasMediaSourceObjectHyperlink,
   createCanvasAppFeaturePackViewRenderers,
   createCanvasAppViewFeaturePack,
   createCanvasStoryCanvasFeaturePackManifests,
@@ -161,6 +162,7 @@ import {
   type CanvasAppFeaturePackSuiteManifest,
   type CanvasAppFeaturePackViewRenderers,
   type CanvasStoryCanvasFeaturePackManifestsInput,
+  type CanvasMediaObjectHyperlinkRoute,
   type CanvasAppCustomItemModule,
   type CanvasAppCustomItemRenderKeyStrategy,
   type CanvasAppCustomItemRendererDescriptor,
@@ -1594,6 +1596,12 @@ describe('Canvas package consumer imports', () => {
       .toBeTypeOf('function')
     expect(CanvasPackage.createCanvasStoryCanvasFeaturePackManifests)
       .toBeTypeOf('function')
+    expect(CanvasAppAuthoring.routeCanvasMediaSourceObjectHyperlink)
+      .toBeTypeOf('function')
+    expect(CanvasAppFacade.routeCanvasMediaSourceObjectHyperlink)
+      .toBeTypeOf('function')
+    expect(CanvasPackage.routeCanvasMediaSourceObjectHyperlink)
+      .toBeTypeOf('function')
     expect(CanvasAppAuthoring.getCanvasAppFeaturePackCatalog)
       .toBeTypeOf('function')
     expect(CanvasAppFacade.getCanvasAppFeaturePackCatalog)
@@ -1921,6 +1929,28 @@ describe('Canvas package consumer imports', () => {
     })).toEqual({
       'consumer-card-one-title': 1,
       'consumer-card-two-title': 1,
+    })
+    const mediaObjectHyperlinkRoute: CanvasMediaObjectHyperlinkRoute =
+      routeCanvasMediaSourceObjectHyperlink({
+        getTarget: ({ selection }) => ({
+          id: selection[0] ?? 'consumer-card-one',
+          selection,
+        }),
+        selection: ['consumer-card-one'],
+        source: { url: 'https://example.com/reference' },
+      })
+
+    expect(mediaObjectHyperlinkRoute).toMatchObject({
+      intent: {
+        kind: 'object-hyperlink-update',
+        target: {
+          id: 'consumer-card-one',
+          selection: ['consumer-card-one'],
+        },
+        url: 'https://example.com/reference',
+      },
+      kind: 'object-hyperlink',
+      status: 'routed',
     })
     expect(downloadCanvasBlobFile({
       blob: new Blob(['smoke']),

@@ -6,6 +6,7 @@ import {
   getCanvasMediaSourceFromDataTransfer,
   getCanvasMediaSourceFromText,
   insertCanvasMediaSource,
+  routeCanvasMediaSourceObjectHyperlink,
 } from './CanvasMediaImport'
 import type { CanvasMediaImporter } from './CanvasMediaImporters'
 
@@ -162,6 +163,126 @@ describe('CanvasMediaImport', () => {
         before: ['rect-1'],
       },
     )
+  })
+
+  it('routes a media URL source to a host object hyperlink target', () => {
+    const getTarget = vi.fn(() => ({
+      id: 'shape-1',
+      selection: ['shape-1'],
+    }))
+
+    const route = routeCanvasMediaSourceObjectHyperlink({
+      getTarget,
+      selection: ['shape-1'],
+      source: { title: 'Docs', url: ' https://example.com/docs ' },
+    })
+
+    expect(route).toEqual({
+      intent: {
+        kind: 'object-hyperlink-update',
+        target: {
+          id: 'shape-1',
+          selection: ['shape-1'],
+        },
+        url: 'https://example.com/docs',
+      },
+      kind: 'object-hyperlink',
+      source: {
+        title: 'Docs',
+        url: 'https://example.com/docs',
+      },
+      status: 'routed',
+    })
+    expect(Object.isFrozen(route)).toBe(true)
+    expect(getTarget).toHaveBeenCalledWith({
+      selection: ['shape-1'],
+      source: {
+        title: 'Docs',
+        url: 'https://example.com/docs',
+      },
+      url: 'https://example.com/docs',
+    })
+  })
+
+  it('falls back to media insertion when no hyperlink target is available', () => {
+    expect(routeCanvasMediaSourceObjectHyperlink({
+      getTarget: () => null,
+      selection: [],
+      source: { url: 'https://example.com/docs' },
+    })).toEqual({
+      kind: 'media-insert',
+      reason: 'no-target',
+      source: { url: 'https://example.com/docs' },
+      status: 'fallback',
+      url: 'https://example.com/docs',
+    })
+  })
+
+  it('lets hosts control disabled state, URL policy, and selection targets', () => {
+    const normalizeUrl = vi.fn((url: string) =>
+      url.startsWith('mailto:') ? url : null
+    )
+    const getTarget = vi.fn(({ selection }) =>
+      selection.length === 1
+        ? { id: selection[0]!, selection }
+        : null
+    )
+
+    expect(routeCanvasMediaSourceObjectHyperlink({
+      disabled: true,
+      getTarget,
+      normalizeUrl,
+      selection: ['shape-1'],
+      source: { url: 'mailto:team@example.com' },
+    })).toEqual({
+      kind: 'media-insert',
+      reason: 'disabled',
+      source: { url: 'mailto:team@example.com' },
+      status: 'fallback',
+    })
+    expect(getTarget).not.toHaveBeenCalled()
+
+    expect(routeCanvasMediaSourceObjectHyperlink({
+      getTarget,
+      normalizeUrl,
+      selection: ['shape-1'],
+      source: { url: 'https://example.com/docs' },
+    })).toEqual({
+      kind: 'media-insert',
+      reason: 'invalid-url',
+      source: { url: 'https://example.com/docs' },
+      status: 'fallback',
+    })
+
+    expect(routeCanvasMediaSourceObjectHyperlink({
+      getTarget,
+      normalizeUrl,
+      selection: ['shape-1'],
+      source: { url: 'mailto:team@example.com' },
+    })).toMatchObject({
+      intent: {
+        kind: 'object-hyperlink-update',
+        target: {
+          id: 'shape-1',
+          selection: ['shape-1'],
+        },
+        url: 'mailto:team@example.com',
+      },
+      kind: 'object-hyperlink',
+      status: 'routed',
+    })
+
+    expect(routeCanvasMediaSourceObjectHyperlink({
+      getTarget,
+      normalizeUrl,
+      selection: ['shape-1', 'shape-2'],
+      source: { url: 'mailto:team@example.com' },
+    })).toMatchObject({
+      kind: 'media-insert',
+      reason: 'no-target',
+      status: 'fallback',
+      url: 'mailto:team@example.com',
+    })
   })
 
   it('derives insert position from screen coordinates or viewport center', () => {

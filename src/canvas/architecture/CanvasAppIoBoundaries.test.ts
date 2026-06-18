@@ -153,8 +153,14 @@ describe('Canvas App IO boundaries', () => {
     expect(linkPreviewImportHookFile.source).toContain(
       'insertCanvasMediaSource',
     )
+    expect(linkPreviewImportHookFile.source).toContain(
+      'isCanvasKeyboardTypingTarget',
+    )
     expect(mediaImportFile.source).toContain(
       'export function insertCanvasMediaSource',
+    )
+    expect(mediaImportFile.source).toContain(
+      'export function routeCanvasMediaSourceObjectHyperlink',
     )
     expect(mediaImportFile.source).toContain(
       'export function getCanvasMediaInsertPosition',
@@ -189,6 +195,9 @@ describe('Canvas App IO boundaries', () => {
     )
     expect(mediaImportIndexFile.source).toContain(
       'CANVAS_APP_MEDIA_IMPORT_FEATURE_PACK',
+    )
+    expect(mediaImportIndexFile.source).toContain(
+      'routeCanvasMediaSourceObjectHyperlink',
     )
     expect(hostLinkPreviewFile.source).toContain(
       'export function createCanvasLinkPreviewComponentItem',

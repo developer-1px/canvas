@@ -448,6 +448,7 @@ export {
   createCanvasStoryImportItems,
   createCanvasAppViewFeaturePack,
   createCanvasAppFacilitationAffordanceConfigInput,
+  routeCanvasMediaSourceObjectHyperlink,
   getCanvasFindInputKeyboardIntent,
   CANVAS_APP_CORE_ONLY_FEATURE_PACK_PROFILE,
   CANVAS_APP_STORY_VIEWER_FEATURE_PACK_PROFILE,
@@ -842,4 +843,8 @@ export {
   type CanvasStoryPreviewItemData,
   type CanvasStoryPreviewItemRenderInput,
   type CanvasStoryPreviewItemsFeaturePackInput,
+  type CanvasMediaObjectHyperlinkRoute,
+  type CanvasMediaObjectHyperlinkRouteInput,
+  type CanvasMediaObjectHyperlinkTarget,
+  type CanvasMediaObjectHyperlinkUpdateIntent,
 } from './authoring'

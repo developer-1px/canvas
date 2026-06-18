@@ -36,6 +36,57 @@ export type CanvasMediaImportResult = {
   items: CanvasItem[]
 }
 
+export type CanvasMediaObjectHyperlinkTarget = Readonly<{
+  id: string
+  selection: readonly string[]
+}>
+
+export type CanvasMediaObjectHyperlinkTargetInput = Readonly<{
+  selection: readonly string[]
+  source: CanvasMediaImportSource
+  url: string
+}>
+
+export type CanvasMediaObjectHyperlinkUpdateIntent = Readonly<{
+  kind: 'object-hyperlink-update'
+  target: CanvasMediaObjectHyperlinkTarget
+  url: string
+}>
+
+export type CanvasMediaObjectHyperlinkRoute =
+  | CanvasMediaObjectHyperlinkFallbackRoute
+  | CanvasMediaObjectHyperlinkRoutedRoute
+
+export type CanvasMediaObjectHyperlinkRoutedRoute = Readonly<{
+  intent: CanvasMediaObjectHyperlinkUpdateIntent
+  kind: 'object-hyperlink'
+  source: CanvasMediaImportSource
+  status: 'routed'
+}>
+
+export type CanvasMediaObjectHyperlinkFallbackReason =
+  | 'disabled'
+  | 'invalid-url'
+  | 'no-target'
+
+export type CanvasMediaObjectHyperlinkFallbackRoute = Readonly<{
+  kind: 'media-insert'
+  reason: CanvasMediaObjectHyperlinkFallbackReason
+  source: CanvasMediaImportSource
+  status: 'fallback'
+  url?: string
+}>
+
+export type CanvasMediaObjectHyperlinkRouteInput = Readonly<{
+  disabled?: boolean
+  getTarget: (
+    input: CanvasMediaObjectHyperlinkTargetInput
+  ) => CanvasMediaObjectHyperlinkTarget | null
+  normalizeUrl?: (url: string) => string | null
+  selection: readonly string[]
+  source: CanvasMediaImportSource
+}>
+
 const CANVAS_URL_PATTERN = /https?:\/\/[^\s"'<>]+/i
 
 const CANVAS_LINK_PREVIEW_MEDIA_IMPORTER: CanvasMediaImporter = {
@@ -90,6 +141,59 @@ export function insertCanvasMediaSource({
   )
 }
 
+export function routeCanvasMediaSourceObjectHyperlink({
+  disabled = false,
+  getTarget,
+  normalizeUrl = normalizeCanvasLinkPreviewUrl,
+  selection,
+  source,
+}: CanvasMediaObjectHyperlinkRouteInput): CanvasMediaObjectHyperlinkRoute {
+  if (disabled) {
+    return createCanvasMediaObjectHyperlinkFallbackRoute({
+      reason: 'disabled',
+      source,
+    })
+  }
+
+  const url = normalizeUrl(source.url)
+
+  if (!url) {
+    return createCanvasMediaObjectHyperlinkFallbackRoute({
+      reason: 'invalid-url',
+      source,
+    })
+  }
+
+  const normalizedSource = Object.freeze({
+    ...source,
+    url,
+  })
+  const target = getTarget({
+    selection,
+    source: normalizedSource,
+    url,
+  })
+
+  if (!target) {
+    return createCanvasMediaObjectHyperlinkFallbackRoute({
+      reason: 'no-target',
+      source: normalizedSource,
+      url,
+    })
+  }
+
+  return Object.freeze({
+    intent: Object.freeze({
+      kind: 'object-hyperlink-update',
+      target,
+      url,
+    }),
+    kind: 'object-hyperlink',
+    source: normalizedSource,
+    status: 'routed',
+  })
+}
+
 export function createCanvasMediaImportItems({
   createId,
   importers,
@@ -137,6 +241,24 @@ export function createCanvasMediaImportItems({
   }
 
   return null
+}
+
+function createCanvasMediaObjectHyperlinkFallbackRoute({
+  reason,
+  source,
+  url,
+}: {
+  reason: CanvasMediaObjectHyperlinkFallbackReason
+  source: CanvasMediaImportSource
+  url?: string
+}): CanvasMediaObjectHyperlinkFallbackRoute {
+  return Object.freeze({
+    kind: 'media-insert',
+    reason,
+    source,
+    status: 'fallback',
+    ...(url ? { url } : {}),
+  })
 }
 
 export function getCanvasMediaInsertPosition({

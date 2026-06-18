@@ -320,11 +320,17 @@ export {
 export {
   assertCanvasMediaImporter,
   assertCanvasMediaImporters,
+  routeCanvasMediaSourceObjectHyperlink,
   useCanvasLinkPreviewImport,
   type CanvasLinkPreviewImportInput,
   type CanvasMediaImporter,
   type CanvasMediaImporterContext,
   type CanvasMediaImportSource,
+  type CanvasMediaObjectHyperlinkFallbackReason,
+  type CanvasMediaObjectHyperlinkRoute,
+  type CanvasMediaObjectHyperlinkRouteInput,
+  type CanvasMediaObjectHyperlinkTarget,
+  type CanvasMediaObjectHyperlinkUpdateIntent,
 } from './media-import'
 export {
   getCanvasMinimapReadModel,

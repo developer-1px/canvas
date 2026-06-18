@@ -253,6 +253,7 @@ export {
   getCanvasAppEnabledFeaturePackIds,
   getCanvasAppEnabledFeaturePackManifestIds,
   getCanvasAppEnabledFeaturePackManifests,
+  routeCanvasMediaSourceObjectHyperlink,
   getCanvasAppFeaturePackMarketplaceActionModel,
   getCanvasAppFeaturePackMarketplaceModel,
   getCanvasAppFeaturePackMarketplacePrimaryActionDiagnostic,
@@ -443,6 +444,10 @@ export {
   type CanvasStoryPreviewItemData,
   type CanvasStoryPreviewItemRenderInput,
   type CanvasStoryPreviewItemsFeaturePackInput,
+  type CanvasMediaObjectHyperlinkRoute,
+  type CanvasMediaObjectHyperlinkRouteInput,
+  type CanvasMediaObjectHyperlinkTarget,
+  type CanvasMediaObjectHyperlinkUpdateIntent,
 } from '../feature-packs'
 export type {
   CanvasWorkspaceStorage,

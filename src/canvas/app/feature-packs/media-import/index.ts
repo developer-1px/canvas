@@ -17,9 +17,18 @@ export {
   getCanvasMediaSourceFromDataTransfer,
   getCanvasMediaSourceFromText,
   insertCanvasMediaSource,
+  routeCanvasMediaSourceObjectHyperlink,
   type CanvasMediaImportResult,
   type CanvasMediaInsertPositionInput,
   type CanvasMediaInsertionContext,
+  type CanvasMediaObjectHyperlinkFallbackReason,
+  type CanvasMediaObjectHyperlinkFallbackRoute,
+  type CanvasMediaObjectHyperlinkRoute,
+  type CanvasMediaObjectHyperlinkRouteInput,
+  type CanvasMediaObjectHyperlinkRoutedRoute,
+  type CanvasMediaObjectHyperlinkTarget,
+  type CanvasMediaObjectHyperlinkTargetInput,
+  type CanvasMediaObjectHyperlinkUpdateIntent,
 } from './CanvasMediaImport'
 export {
   assertCanvasMediaImporter,
