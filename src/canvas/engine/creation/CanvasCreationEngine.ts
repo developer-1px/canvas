@@ -69,10 +69,23 @@ export type CanvasCreationAdapter<TItem extends CanvasCreationItem> = {
   createText: (input: { id: string; point: Point }) => CanvasCreatedText<TItem>
 }
 
+export type CanvasCreatedRectSize = Readonly<{
+  h: number
+  w: number
+}>
+
+export type CanvasCreatedRectBoundsInput = {
+  currentWorld: Point
+  defaultSize?: CanvasCreatedRectSize
+  dragThreshold?: number
+  startWorld: Point
+}
+
 const DEFAULT_RECT_SIZE = {
   w: 168,
   h: 112,
 }
+const DEFAULT_RECT_DRAG_THRESHOLD = 6
 
 const DEFAULT_ARROW_OFFSET = {
   x: 144,
@@ -86,21 +99,20 @@ const DEFAULT_DRAWING_OFFSET = {
 
 export function getCanvasCreatedRectBounds({
   currentWorld,
+  defaultSize = DEFAULT_RECT_SIZE,
+  dragThreshold = DEFAULT_RECT_DRAG_THRESHOLD,
   startWorld,
-}: {
-  currentWorld: Point
-  startWorld: Point
-}): Bounds {
+}: CanvasCreatedRectBoundsInput): Bounds {
   const rawBounds = normalizeBounds(startWorld, currentWorld)
 
-  if (rawBounds.w > 6 && rawBounds.h > 6) {
+  if (rawBounds.w > dragThreshold && rawBounds.h > dragThreshold) {
     return rawBounds
   }
 
   return {
     x: startWorld.x,
     y: startWorld.y,
-    ...DEFAULT_RECT_SIZE,
+    ...defaultSize,
   }
 }
 

@@ -59,6 +59,8 @@ export {
   type CanvasCreatedArrowRouting,
   type CanvasCreatedDrawingStyle,
   type CanvasCreatedPathSegment,
+  type CanvasCreatedRectBoundsInput,
+  type CanvasCreatedRectSize,
   type CanvasCreatedShapeKind,
   type CanvasCreatedText,
   type CanvasCreationAdapter,

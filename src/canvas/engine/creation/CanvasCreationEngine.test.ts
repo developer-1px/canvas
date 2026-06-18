@@ -9,6 +9,7 @@ import {
   getCanvasCreatedArrowEnd,
   getCanvasCreatedDrawingPoints,
   getCanvasCreatedPathSegments,
+  getCanvasCreatedRectBounds,
   type CanvasCreationAdapter,
 } from './CanvasCreationEngine'
 
@@ -216,6 +217,60 @@ describe('CanvasCreationEngine drawing tools', () => {
       id: 'ellipse-1',
       shapeType: 'ellipse',
       type: 'shape',
+    })
+  })
+
+  test('uses the default rect size when the pointer barely moves', () => {
+    expect(
+      getCanvasCreatedRectBounds({
+        currentWorld: { x: 12, y: 22 },
+        startWorld: { x: 10, y: 20 },
+      }),
+    ).toEqual({
+      h: 112,
+      w: 168,
+      x: 10,
+      y: 20,
+    })
+  })
+
+  test('accepts host-provided default rect size and drag threshold', () => {
+    expect(
+      getCanvasCreatedRectBounds({
+        currentWorld: { x: 13, y: 23 },
+        defaultSize: { h: 120, w: 360 },
+        startWorld: { x: 10, y: 20 },
+      }),
+    ).toEqual({
+      h: 120,
+      w: 360,
+      x: 10,
+      y: 20,
+    })
+
+    expect(
+      getCanvasCreatedRectBounds({
+        currentWorld: { x: 18, y: 29 },
+        dragThreshold: 12,
+        startWorld: { x: 10, y: 20 },
+      }),
+    ).toEqual({
+      h: 112,
+      w: 168,
+      x: 10,
+      y: 20,
+    })
+
+    expect(
+      getCanvasCreatedRectBounds({
+        currentWorld: { x: 18, y: 29 },
+        startWorld: { x: 10, y: 20 },
+      }),
+    ).toEqual({
+      h: 9,
+      w: 8,
+      x: 10,
+      y: 20,
     })
   })
 
