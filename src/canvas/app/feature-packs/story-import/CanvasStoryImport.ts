@@ -16,6 +16,10 @@ import type {
   CanvasDataTransferImportRegistryResolver,
   CanvasDataTransferImportRegistryScope,
 } from '../../affordances/commands/CanvasDataTransferImportRegistry'
+import type {
+  CanvasAppDocumentSelectionHistory,
+  CanvasAppItemsChange,
+} from '../../workspace/document/CanvasAppDocumentContracts'
 import {
   CANVAS_STORY_PREVIEW_GROUP_KIND,
   CANVAS_STORY_PREVIEW_GROUP_PRESENTATION,
@@ -87,9 +91,41 @@ export type CanvasStoryImportAction = Readonly<{
   readResult?: CanvasStoryImportDataTransferReadResult
 }>
 
+export type CanvasStoryImportActionItemsChange = Extract<
+  CanvasAppItemsChange<CanvasCustomItem>,
+  { type: 'add' }
+>
+
 export type CanvasStoryImportActionInput = Readonly<{
   input: CanvasStoryImportInput
   readResult?: CanvasStoryImportDataTransferReadResult
+}>
+
+export type CanvasStoryImportActionHostUpdateInput = Readonly<{
+  action: CanvasStoryImportAction
+  currentComponentDefinitions?: readonly CanvasComponentDefinition[]
+  selection?: CanvasAppDocumentSelectionHistory
+}>
+
+export type CanvasStoryImportActionHostUpdateResult = Readonly<{
+  action: CanvasStoryImportAction
+  addedComponentDefinitionIds: readonly string[]
+  componentDefinitions: readonly CanvasComponentDefinition[]
+  itemsChange: CanvasStoryImportActionItemsChange
+  nextComponentDefinitions: readonly CanvasComponentDefinition[]
+  replacedComponentDefinitionIds: readonly string[]
+  selection: CanvasAppDocumentSelectionHistory
+}>
+
+export type CanvasStoryImportComponentDefinitionMergeInput = Readonly<{
+  currentComponentDefinitions?: readonly CanvasComponentDefinition[]
+  importedComponentDefinitions: readonly CanvasComponentDefinition[]
+}>
+
+export type CanvasStoryImportComponentDefinitionMergeResult = Readonly<{
+  addedComponentDefinitionIds: readonly string[]
+  nextComponentDefinitions: readonly CanvasComponentDefinition[]
+  replacedComponentDefinitionIds: readonly string[]
 }>
 
 export type CanvasStoryImportDataTransferReadInput = Readonly<{
@@ -222,6 +258,42 @@ export function createCanvasStoryImportAction({
   })
 }
 
+export function getCanvasStoryImportActionItemsChange({
+  action,
+}: Pick<CanvasStoryImportActionHostUpdateInput, 'action'>):
+  CanvasStoryImportActionItemsChange {
+  return {
+    items: [...action.items],
+    type: 'add' as const,
+  }
+}
+
+export function getCanvasStoryImportActionHostUpdate({
+  action,
+  currentComponentDefinitions = [],
+  selection,
+}: CanvasStoryImportActionHostUpdateInput):
+  CanvasStoryImportActionHostUpdateResult {
+  const componentDefinitionMerge =
+    mergeCanvasStoryImportComponentDefinitions({
+      currentComponentDefinitions,
+      importedComponentDefinitions: action.componentDefinitions,
+    })
+
+  return Object.freeze({
+    action,
+    addedComponentDefinitionIds:
+      componentDefinitionMerge.addedComponentDefinitionIds,
+    componentDefinitions: action.componentDefinitions,
+    itemsChange: getCanvasStoryImportActionItemsChange({ action }),
+    nextComponentDefinitions:
+      componentDefinitionMerge.nextComponentDefinitions,
+    replacedComponentDefinitionIds:
+      componentDefinitionMerge.replacedComponentDefinitionIds,
+    selection: selection ?? getCanvasStoryImportActionSelection(action),
+  })
+}
+
 export function createCanvasStoryImportActionFromDataTransfer(
   input: CanvasStoryImportDataTransferActionInput,
 ): CanvasStoryImportAction | null {
@@ -234,6 +306,53 @@ export function createCanvasStoryImportActionFromDataTransfer(
   return createCanvasStoryImportAction({
     input: readResult.value,
     readResult,
+  })
+}
+
+export function mergeCanvasStoryImportComponentDefinitions({
+  currentComponentDefinitions = [],
+  importedComponentDefinitions,
+}: CanvasStoryImportComponentDefinitionMergeInput):
+  CanvasStoryImportComponentDefinitionMergeResult {
+  const importedDefinitionById = new Map(
+    importedComponentDefinitions.map((definition) => [
+      definition.id,
+      definition,
+    ]),
+  )
+  const replacedComponentDefinitionIds: string[] = []
+  const seenComponentDefinitionIds = new Set<string>()
+  const nextComponentDefinitions = currentComponentDefinitions.map(
+    (definition) => {
+      const importedDefinition = importedDefinitionById.get(definition.id)
+
+      seenComponentDefinitionIds.add(definition.id)
+
+      if (!importedDefinition) {
+        return definition
+      }
+
+      replacedComponentDefinitionIds.push(definition.id)
+
+      return importedDefinition
+    },
+  )
+  const addedComponentDefinitionIds: string[] = []
+
+  for (const importedDefinition of importedComponentDefinitions) {
+    if (seenComponentDefinitionIds.has(importedDefinition.id)) {
+      continue
+    }
+
+    addedComponentDefinitionIds.push(importedDefinition.id)
+    nextComponentDefinitions.push(importedDefinition)
+  }
+
+  return Object.freeze({
+    addedComponentDefinitionIds: Object.freeze(addedComponentDefinitionIds),
+    nextComponentDefinitions: Object.freeze(nextComponentDefinitions),
+    replacedComponentDefinitionIds:
+      Object.freeze(replacedComponentDefinitionIds),
   })
 }
 
@@ -265,6 +384,15 @@ export function createCanvasStoryImportDataTransferActionResolver<
     ]),
     title,
   })
+}
+
+function getCanvasStoryImportActionSelection(
+  action: CanvasStoryImportAction,
+): CanvasAppDocumentSelectionHistory {
+  return {
+    after: action.items.map((item) => item.id),
+    before: [],
+  }
 }
 
 function createCanvasStoryImportComponentDefinition(

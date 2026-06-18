@@ -184,6 +184,9 @@ import {
   getCanvasAppManifestViewFeaturePacks,
   getCanvasAppResolvedFeaturePackStates,
   getCanvasComponentInspectorPanelModel,
+  getCanvasStoryImportActionHostUpdate,
+  getCanvasStoryImportActionItemsChange,
+  mergeCanvasStoryImportComponentDefinitions,
   parseCanvasStoryImportJSONPayload,
   readCanvasStoryImportDataTransfer,
   syncCanvasComponentItemsChange,
@@ -2249,6 +2252,46 @@ describe('Canvas package consumer imports', () => {
       importPath: 'src/widgets/consumer-action-widget',
       layer: 'widgets',
     })
+    if (!packageStoryAction) {
+      throw new Error('Expected package story import action')
+    }
+
+    const packageStoryUpdate = getCanvasStoryImportActionHostUpdate({
+      action: packageStoryAction,
+      currentComponentDefinitions: [{
+        id: 'story-import-consumer-action-widget',
+        instances: [{
+          label: 'Previous',
+          slots: {
+            root: 'story-previous',
+          },
+        }],
+        label: 'PreviousWidget',
+      }],
+    })
+    const packageStoryMerge = mergeCanvasStoryImportComponentDefinitions({
+      currentComponentDefinitions: [],
+      importedComponentDefinitions: packageStoryAction.componentDefinitions,
+    })
+
+    expect(getCanvasStoryImportActionItemsChange({
+      action: packageStoryAction,
+    }).type).toBe('add')
+    expect(packageStoryUpdate.itemsChange.items.map((item) => item.id))
+      .toEqual([
+        'group-consumer-action-widget',
+        'story-consumer-action-widget-default',
+      ])
+    expect(packageStoryUpdate.selection.after).toEqual([
+      'group-consumer-action-widget',
+      'story-consumer-action-widget-default',
+    ])
+    expect(packageStoryUpdate.replacedComponentDefinitionIds).toEqual([
+      'story-import-consumer-action-widget',
+    ])
+    expect(packageStoryMerge.addedComponentDefinitionIds).toEqual([
+      'story-import-consumer-action-widget',
+    ])
     expect(createCanvasStoryImportDataTransferActionResolver({
       scope: 'clipboard-paste',
     }).supportedFormats).toContain(CANVAS_STORY_IMPORT_JSON_MIME_TYPE)
@@ -2264,6 +2307,24 @@ describe('Canvas package consumer imports', () => {
       .toBe(createCanvasStoryImportDataTransferActionResolver)
     expect(CanvasAppAuthoring.createCanvasStoryImportDataTransferActionResolver)
       .toBe(createCanvasStoryImportDataTransferActionResolver)
+    expect(CanvasPackage.getCanvasStoryImportActionHostUpdate)
+      .toBe(getCanvasStoryImportActionHostUpdate)
+    expect(CanvasAppFacade.getCanvasStoryImportActionHostUpdate)
+      .toBe(getCanvasStoryImportActionHostUpdate)
+    expect(CanvasAppAuthoring.getCanvasStoryImportActionHostUpdate)
+      .toBe(getCanvasStoryImportActionHostUpdate)
+    expect(CanvasPackage.getCanvasStoryImportActionItemsChange)
+      .toBe(getCanvasStoryImportActionItemsChange)
+    expect(CanvasAppFacade.getCanvasStoryImportActionItemsChange)
+      .toBe(getCanvasStoryImportActionItemsChange)
+    expect(CanvasAppAuthoring.getCanvasStoryImportActionItemsChange)
+      .toBe(getCanvasStoryImportActionItemsChange)
+    expect(CanvasPackage.mergeCanvasStoryImportComponentDefinitions)
+      .toBe(mergeCanvasStoryImportComponentDefinitions)
+    expect(CanvasAppFacade.mergeCanvasStoryImportComponentDefinitions)
+      .toBe(mergeCanvasStoryImportComponentDefinitions)
+    expect(CanvasAppAuthoring.mergeCanvasStoryImportComponentDefinitions)
+      .toBe(mergeCanvasStoryImportComponentDefinitions)
     expect(CanvasPackage.parseCanvasStoryImportJSONPayload)
       .toBe(parseCanvasStoryImportJSONPayload)
     expect(CanvasAppFacade.parseCanvasStoryImportJSONPayload)

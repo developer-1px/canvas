@@ -18,6 +18,9 @@ import {
   createCanvasStoryImportComponentDefinitions,
   createCanvasStoryImportDataTransferActionResolver,
   createCanvasStoryImportItems,
+  getCanvasStoryImportActionHostUpdate,
+  getCanvasStoryImportActionItemsChange,
+  mergeCanvasStoryImportComponentDefinitions,
   parseCanvasStoryImportJSONPayload,
 } from './CanvasStoryImport'
 
@@ -359,6 +362,103 @@ describe('CanvasStoryImport', () => {
       registry,
       scope: 'other-scope',
     })).toEqual([])
+  })
+
+  it('creates host update payloads from story import actions', () => {
+    const action = createCanvasStoryImportActionFromDataTransfer({
+      dataTransfer: {
+        getData: (format) =>
+          format === CANVAS_STORY_IMPORT_JSON_MIME_TYPE
+            ? JSON.stringify(createStoryImportInput())
+            : '',
+      },
+    })
+
+    if (!action) {
+      throw new Error('Expected story import action')
+    }
+
+    const currentDefinition = {
+      id: 'story-import-component-card',
+      instances: [{
+        label: 'Old',
+        slots: {
+          root: 'story-old-card',
+        },
+      }],
+      label: 'Old card',
+    }
+    const unrelatedDefinition = {
+      id: 'existing-component',
+      instances: [{
+        label: 'Existing',
+        slots: {
+          root: 'existing-root',
+        },
+      }],
+      label: 'Existing component',
+    }
+    const update = getCanvasStoryImportActionHostUpdate({
+      action,
+      currentComponentDefinitions: [
+        unrelatedDefinition,
+        currentDefinition,
+      ],
+    })
+
+    expect(getCanvasStoryImportActionItemsChange({ action })).toEqual({
+      items: action.items,
+      type: 'add',
+    })
+    expect(update.itemsChange).toEqual({
+      items: action.items,
+      type: 'add',
+    })
+    expect(update.selection).toEqual({
+      after: [
+        'group-component-card',
+        'story-card-default',
+      ],
+      before: [],
+    })
+    expect(update.nextComponentDefinitions).toEqual([
+      unrelatedDefinition,
+      action.componentDefinitions[0],
+    ])
+    expect(update.addedComponentDefinitionIds).toEqual([])
+    expect(update.replacedComponentDefinitionIds).toEqual([
+      'story-import-component-card',
+    ])
+    expect(Object.isFrozen(update)).toBe(true)
+  })
+
+  it('merges new story import component definitions after existing definitions', () => {
+    const merge = mergeCanvasStoryImportComponentDefinitions({
+      currentComponentDefinitions: [{
+        id: 'existing-component',
+        instances: [{
+          label: 'Existing',
+          slots: {
+            root: 'existing-root',
+          },
+        }],
+        label: 'Existing component',
+      }],
+      importedComponentDefinitions: createCanvasStoryImportComponentDefinitions({
+        groups: [createStoryImportInput().groups[0]],
+      }),
+    })
+
+    expect(merge.nextComponentDefinitions.map((definition) => definition.id))
+      .toEqual([
+        'existing-component',
+        'story-import-component-card',
+      ])
+    expect(merge.addedComponentDefinitionIds).toEqual([
+      'story-import-component-card',
+    ])
+    expect(merge.replacedComponentDefinitionIds).toEqual([])
+    expect(Object.isFrozen(merge.nextComponentDefinitions)).toBe(true)
   })
 
   it('parses raw story import inputs and rejects unrelated JSON payloads', () => {
