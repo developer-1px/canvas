@@ -241,6 +241,10 @@ import {
   type CanvasAppFeaturePackMarketplaceAssemblyApplyRuntimeStatePatchInput,
   type CanvasAppFeaturePackMarketplaceAssemblyApplyRuntimeStatePatchResult,
   type CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionInput,
+  type CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionBaseResult,
+  type CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionHostUpdateHeldResult,
+  type CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionHostUpdateReadyResult,
+  type CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionHostUpdateResult,
   type CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionResult,
   type CanvasAppFeaturePackMarketplaceAssemblyApplyUpdateMode,
   type CanvasAppFeaturePackMarketplaceAssemblyModel,
@@ -1363,6 +1367,32 @@ describe('Canvas package consumer imports', () => {
         await executeCanvasAppFeaturePackMarketplaceAssemblyApplyTransaction(
           featurePackMarketplaceAssemblyApplyTransactionInput,
         )
+    const featurePackMarketplaceAssemblyApplyTransactionBaseResult:
+      CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionBaseResult<
+        SmokeUninstallCleanupEffect,
+        SmokeUninstallCleanupExecutionValue
+      > = featurePackMarketplaceAssemblyApplyTransactionResult
+    const featurePackMarketplaceAssemblyApplyTransactionHostUpdate:
+      CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionHostUpdateResult<
+        SmokeUninstallCleanupEffect,
+        SmokeUninstallCleanupExecutionValue
+      > = featurePackMarketplaceAssemblyApplyTransactionResult.hostUpdate
+    const featurePackMarketplaceAssemblyApplyTransactionHostUpdateReadyResult:
+      CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionHostUpdateReadyResult<
+        SmokeUninstallCleanupEffect,
+        SmokeUninstallCleanupExecutionValue
+      > | null =
+        featurePackMarketplaceAssemblyApplyTransactionHostUpdate.ready
+          ? featurePackMarketplaceAssemblyApplyTransactionHostUpdate
+          : null
+    const featurePackMarketplaceAssemblyApplyTransactionHostUpdateHeldResult:
+      CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionHostUpdateHeldResult<
+        SmokeUninstallCleanupEffect,
+        SmokeUninstallCleanupExecutionValue
+      > | null =
+        featurePackMarketplaceAssemblyApplyTransactionHostUpdate.ready
+          ? null
+          : featurePackMarketplaceAssemblyApplyTransactionHostUpdate
     const featurePackMarketplaceAssemblyApplyHostUpdateInput:
       CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateInput<
         SmokeUninstallCleanupEffect,
@@ -2230,6 +2260,24 @@ describe('Canvas package consumer imports', () => {
     expect(featurePackMarketplaceAssemblyApplyTransactionResult
       .runtimeStatePatch.patch.changedFeaturePackIds)
       .toEqual(['smoke-partial-pack'])
+    expect(featurePackMarketplaceAssemblyApplyTransactionBaseResult)
+      .toBe(featurePackMarketplaceAssemblyApplyTransactionResult)
+    expect(featurePackMarketplaceAssemblyApplyTransactionHostUpdate.status)
+      .toBe('ready')
+    expect(featurePackMarketplaceAssemblyApplyTransactionHostUpdate.ready)
+      .toBe(true)
+    expect(featurePackMarketplaceAssemblyApplyTransactionHostUpdateReadyResult)
+      .toBe(featurePackMarketplaceAssemblyApplyTransactionHostUpdate)
+    expect(featurePackMarketplaceAssemblyApplyTransactionHostUpdateHeldResult)
+      .toBeNull()
+    expect(
+      'transactionResult' in
+        featurePackMarketplaceAssemblyApplyTransactionHostUpdate,
+    ).toBe(false)
+    expect(featurePackMarketplaceAssemblyApplyTransactionHostUpdate
+      .runtimeStatePatch)
+      .toBe(featurePackMarketplaceAssemblyApplyTransactionResult
+        .runtimeStatePatch)
     expect(featurePackMarketplaceAssemblyApplyHostUpdate.status)
       .toBe('ready')
     expect(featurePackMarketplaceAssemblyApplyHostUpdate.ready).toBe(true)
@@ -2260,6 +2308,8 @@ describe('Canvas package consumer imports', () => {
       kind: 'replace-assembly-input',
       updateMode: 'partial-update',
     })
+    expect(featurePackMarketplaceAssemblyApplyTransactionHostUpdate.update)
+      .toEqual(featurePackMarketplaceAssemblyApplyHostUpdate.update)
     expect(featurePackMarketplaceAssemblyApplyHostUpdate.update
       .runtimeStatePatch)
       .toBe(featurePackMarketplaceAssemblyApplyTransactionResult

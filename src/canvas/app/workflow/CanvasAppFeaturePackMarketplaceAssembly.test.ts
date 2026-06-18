@@ -704,6 +704,35 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
         id: 'addon-pack',
         status: 'uninstalled',
       }])
+    expect(transactionResult.hostUpdate).toMatchObject({
+      actionKind: 'uninstall',
+      currentAssemblyInput: model.assemblyInput,
+      nextAssemblyInput: applyResult.nextModel.assemblyInput,
+      ready: true,
+      status: 'ready',
+      update: {
+        assemblyInput: applyResult.nextModel.assemblyInput,
+        featurePackStates: [{
+          id: 'addon-pack',
+          status: 'uninstalled',
+        }],
+        kind: 'replace-assembly-input',
+        runtimeStatePatch: {
+          changedFeaturePackIds: ['addon-pack'],
+        },
+        updateMode: 'full-rebuild',
+      },
+      updateMode: 'full-rebuild',
+    })
+    expect('transactionResult' in transactionResult.hostUpdate).toBe(false)
+    expect(transactionResult.hostUpdate.runtimeStatePatch)
+      .toBe(transactionResult.runtimeStatePatch)
+    if (!transactionResult.hostUpdate.ready) {
+      throw new Error('Expected ready transaction host update')
+    }
+
+    expect(transactionResult.hostUpdate.update.runtimeStatePatch)
+      .toBe(transactionResult.runtimeStatePatch.patch)
     const hostUpdate =
       getCanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdate({
         transactionResult,
@@ -733,6 +762,7 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
     expect(hostUpdate.runtimeStatePatch).toBe(
       transactionResult.runtimeStatePatch,
     )
+    expect(hostUpdate.update).toEqual(transactionResult.hostUpdate.update)
     if (!hostUpdate.ready) {
       throw new Error('Expected ready host update')
     }
@@ -899,6 +929,19 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
       'nextFeaturePackStates' in
         needsHandlerTransactionResult.runtimeStatePatch,
     ).toBe(false)
+    expect(needsHandlerTransactionResult.hostUpdate).toMatchObject({
+      actionKind: 'uninstall',
+      currentAssemblyInput: model.assemblyInput,
+      holdReason: 'needs-cleanup-handler',
+      ready: false,
+      status: 'held',
+      update: null,
+      updateMode: 'full-rebuild',
+    })
+    expect('transactionResult' in needsHandlerTransactionResult.hostUpdate)
+      .toBe(false)
+    expect(needsHandlerTransactionResult.hostUpdate.runtimeStatePatch)
+      .toBe(needsHandlerTransactionResult.runtimeStatePatch)
     const needsHandlerHostUpdate =
       getCanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdate({
         transactionResult: needsHandlerTransactionResult,
@@ -917,6 +960,8 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
       .toBe(needsHandlerTransactionResult)
     expect(needsHandlerHostUpdate.runtimeStatePatch)
       .toBe(needsHandlerTransactionResult.runtimeStatePatch)
+    expect(needsHandlerHostUpdate.update)
+      .toBe(needsHandlerTransactionResult.hostUpdate.update)
     expect('nextAssemblyInput' in needsHandlerHostUpdate).toBe(false)
     expect('nextModel' in needsHandlerTransactionResult.commitResult).toBe(
       false,
@@ -1528,6 +1573,19 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
     expect(
       'nextFeaturePackStates' in blockedTransactionResult.runtimeStatePatch,
     ).toBe(false)
+    expect(blockedTransactionResult.hostUpdate).toMatchObject({
+      actionKind: 'uninstall',
+      currentAssemblyInput: model.assemblyInput,
+      holdReason: 'blocked',
+      ready: false,
+      status: 'held',
+      update: null,
+      updateMode: 'blocked',
+    })
+    expect('transactionResult' in blockedTransactionResult.hostUpdate)
+      .toBe(false)
+    expect(blockedTransactionResult.hostUpdate.runtimeStatePatch)
+      .toBe(blockedTransactionResult.runtimeStatePatch)
     const blockedHostUpdate =
       getCanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdate({
         transactionResult: blockedTransactionResult,
@@ -1545,6 +1603,8 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
     expect(blockedHostUpdate.transactionResult).toBe(blockedTransactionResult)
     expect(blockedHostUpdate.runtimeStatePatch)
       .toBe(blockedTransactionResult.runtimeStatePatch)
+    expect(blockedHostUpdate.update)
+      .toBe(blockedTransactionResult.hostUpdate.update)
     expect('nextAssemblyInput' in blockedHostUpdate).toBe(false)
     expect('nextModel' in blockedTransactionResult.commitResult).toBe(false)
   })

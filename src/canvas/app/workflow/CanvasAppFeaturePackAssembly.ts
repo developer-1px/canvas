@@ -625,6 +625,21 @@ export type CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionInput<
 export type CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionResult<
   TEffect,
   TResult,
+> =
+  CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionBaseResult<
+    TEffect,
+    TResult
+  > & Readonly<{
+    hostUpdate:
+      CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionHostUpdateResult<
+        TEffect,
+        TResult
+      >
+  }>
+
+export type CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionBaseResult<
+  TEffect,
+  TResult,
 > = Readonly<{
   action: CanvasAppFeaturePackMarketplacePrimaryAction
   actionKind: CanvasAppFeaturePackMarketplacePrimaryAction['kind']
@@ -717,7 +732,7 @@ export type CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateInput<
   TResult,
 > = Readonly<{
   transactionResult:
-    CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionResult<
+    CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionBaseResult<
       TEffect,
       TResult
     >
@@ -735,6 +750,41 @@ export type CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateResult<
     TEffect,
     TResult
   >
+
+export type CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionHostUpdateResult<
+  TEffect,
+  TResult,
+> =
+  | CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionHostUpdateReadyResult<
+    TEffect,
+    TResult
+  >
+  | CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionHostUpdateHeldResult<
+    TEffect,
+    TResult
+  >
+
+export type CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionHostUpdateReadyResult<
+  TEffect,
+  TResult,
+> = Omit<
+  CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateReadyResult<
+    TEffect,
+    TResult
+  >,
+  'transactionResult'
+>
+
+export type CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionHostUpdateHeldResult<
+  TEffect,
+  TResult,
+> = Omit<
+  CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateHeldResult<
+    TEffect,
+    TResult
+  >,
+  'transactionResult'
+>
 
 export type CanvasAppFeaturePackMarketplaceAssemblyApplyHostAssemblyInputUpdate =
   Readonly<{
@@ -763,7 +813,7 @@ export type CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateReadyResult<
     >
   status: 'ready'
   transactionResult:
-    CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionResult<
+    CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionBaseResult<
       TEffect,
       TResult
     >
@@ -794,7 +844,7 @@ export type CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateHeldResult<
     >
   status: 'held'
   transactionResult:
-    CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionResult<
+    CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionBaseResult<
       TEffect,
       TResult
     >
@@ -1352,21 +1402,55 @@ export async function executeCanvasAppFeaturePackMarketplaceAssemblyApplyTransac
     getCanvasAppFeaturePackMarketplaceAssemblyApplyRuntimeStatePatch({
       commitResult,
     })
+  const transactionResult =
+    Object.freeze({
+      action,
+      actionKind: executionResult.actionKind,
+      applyResult,
+      commitPlan,
+      commitResult,
+      executionPlan,
+      executionResult,
+      model,
+      runtimeStatePatch,
+      status: commitResult.status,
+      summary: commitPlan.summary,
+      updateMode: commitPlan.updateMode,
+    }) satisfies
+      CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionBaseResult<
+        TEffect,
+        TResult
+      >
+  const hostUpdate =
+    getCanvasAppFeaturePackMarketplaceAssemblyApplyTransactionHostUpdate(
+      getCanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdate({
+        transactionResult,
+      }),
+    )
 
   return Object.freeze({
-    action,
-    actionKind: executionResult.actionKind,
-    applyResult,
-    commitPlan,
-    commitResult,
-    executionPlan,
-    executionResult,
-    model,
-    runtimeStatePatch,
-    status: commitResult.status,
-    summary: commitPlan.summary,
-    updateMode: commitPlan.updateMode,
+    ...transactionResult,
+    hostUpdate,
   })
+}
+
+function getCanvasAppFeaturePackMarketplaceAssemblyApplyTransactionHostUpdate<
+  TEffect,
+  TResult,
+>(
+  hostUpdate:
+    CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateResult<
+      TEffect,
+      TResult
+    >,
+): CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionHostUpdateResult<
+    TEffect,
+    TResult
+  > {
+  const { transactionResult, ...transactionHostUpdate } = hostUpdate
+  void transactionResult
+
+  return Object.freeze(transactionHostUpdate)
 }
 
 export function getCanvasAppFeaturePackMarketplaceAssemblyApplyRuntimeStatePatch<
@@ -1405,7 +1489,7 @@ export function getCanvasAppFeaturePackMarketplaceAssemblyApplyRuntimeStatePatch
   const nextFeaturePackStates =
     getCanvasAppFeaturePackMarketplaceAssemblyFeaturePackStates(
       commitResult.nextModel,
-    )
+  )
 
   return Object.freeze({
     actionKind: commitResult.actionKind,
