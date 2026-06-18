@@ -33,6 +33,7 @@
 | Slide transition timing | `slide-edit-affordance` | transition type, duration, click/after advance policy |
 | Text font family | `slide-edit-affordance` | selected text object font family options and command effects |
 | Text frame inset | `slide-edit-affordance` | text frame top/right/bottom/left inset metadata and command effects |
+| Text run formatting | `slide-edit-affordance` | selected text run bold/italic/underline JSON paste and command effects |
 | Text vertical alignment | `slide-edit-affordance` | text frame internal vertical alignment metadata and command effects |
 | Text paragraph spacing | `slide-edit-affordance` | line height and paragraph before/after spacing descriptors |
 | Text measurement | `slide-edit-affordance` | bounded text size, overflow, and auto-fit hints |
@@ -156,6 +157,18 @@
 | Fallback | unknown or empty family normalizes to fallback or first allowed option |
 | Updates | selected object id and normalized font family value become host command effects |
 | Runtime | host owns actual font loading, text layout, export mapping, and persistence |
+
+## Text Run Formatting JSON Paste Contract
+
+| Area | Contract |
+| --- | --- |
+| Fields | built-in fields are `bold`, `italic`, and `underline` |
+| Values | each field accepts boolean values only; strings and numeric truthy values are rejected |
+| Custom MIME | `application/vnd.interactive-os.slide-edit.text-run-{field}+json` may carry a direct JSON boolean |
+| General JSON | `application/json` and `text/plain` require an explicit field key such as `textRunItalic`, `runItalic`, `italic`, or `value` |
+| Plain text | generic `text/plain` direct values such as `true` are not interpreted as run formatting |
+| Updates | selected slide id, object ids, field id, and boolean value become `update-text-run-formatting` command effects |
+| Scope | complements keyboard toggle intents and rich text paste run metadata without owning host text storage |
 
 ## Text Vertical Alignment Contract
 

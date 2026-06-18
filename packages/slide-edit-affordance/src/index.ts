@@ -54,11 +54,23 @@ export {
   type SlideEditDeckNavigationSlideId,
 } from './SlideEditDeckNavigationKeyboard'
 export {
+  createSlideEditTextRunFormattingDescriptor,
+  getSlideEditTextRunFormattingCommandEffect,
+  getSlideEditTextRunFormattingJSONPasteValue,
   getSlideEditTextFormattingKeyboardIntent,
+  normalizeSlideEditTextRunFormattingValue,
+  SLIDE_EDIT_TEXT_RUN_FORMATTING_FIELDS,
   type SlideEditTextFormattingKeyboardIntent,
   type SlideEditTextFormattingKeyboardIntentInput,
   type SlideEditTextFormattingKeyboardIntentKind,
   type SlideEditTextFormattingKeyboardShortcut,
+  type SlideEditTextRunFormattingDataTransfer,
+  type SlideEditTextRunFormattingDescriptor,
+  type SlideEditTextRunFormattingFieldDescriptor,
+  type SlideEditTextRunFormattingFieldId,
+  type SlideEditTextRunFormattingHostCommandEffect,
+  type SlideEditTextRunFormattingJSONPasteInput,
+  type SlideEditTextRunFormattingUpdateCommand,
 } from './SlideEditTextFormattingKeyboard'
 export {
   getSlideEditTextAutoFitGestureCommandEffect,
