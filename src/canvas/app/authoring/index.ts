@@ -127,6 +127,8 @@ export type {
 } from '../workspace/document/CanvasAppDocumentContracts'
 export type {
   CanvasPlainTextPasteSource,
+  CanvasRichTextPasteFormat,
+  CanvasRichTextPasteHeadingLevel,
   CanvasRichTextPasteListType,
   CanvasRichTextPasteParagraph,
   CanvasRichTextPasteRun,
@@ -271,6 +273,7 @@ export {
   routeCanvasTableImportTargetReplace,
   routeCanvasTextPasteReplace,
   createCanvasPlainTextPasteSource,
+  getCanvasRichTextPasteSourceFromMarkdown,
   getCanvasTextPasteSourceCandidatesFromDataTransfer,
   getCanvasTextPasteSourceText,
   CANVAS_MEDIA_SOURCE_JSON_MIME_TYPE,

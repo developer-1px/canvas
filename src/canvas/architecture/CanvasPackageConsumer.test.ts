@@ -169,6 +169,8 @@ import {
   type CanvasImagePasteReplaceRoute,
   type CanvasMediaObjectHyperlinkRoute,
   type CanvasTableImportTargetReplaceRoute,
+  type CanvasRichTextPasteFormat,
+  type CanvasRichTextPasteHeadingLevel,
   type CanvasRichTextPasteListType,
   type CanvasRichTextPasteParagraph,
   type CanvasRichTextPasteRun,
@@ -2051,6 +2053,24 @@ describe('Canvas package consumer imports', () => {
     }
 
     expect(richTextSource.paragraphs[0]?.bullet).toBe('numbered')
+    const richTextFormat: CanvasRichTextPasteFormat = 'text-markdown-rich'
+    const richTextHeadingLevel: CanvasRichTextPasteHeadingLevel = 2
+    const markdownRichTextSource: CanvasRichTextPasteSource = {
+      format: richTextFormat,
+      paragraphs: [{
+        headingLevel: richTextHeadingLevel,
+        runs: [{ text: 'Consumer heading' }],
+      }],
+      text: 'Consumer heading',
+    }
+
+    expect(markdownRichTextSource).toMatchObject({
+      format: richTextFormat,
+      paragraphs: [{
+        headingLevel: richTextHeadingLevel,
+      }],
+      text: 'Consumer heading',
+    })
     const tableImportTargetReplaceRoute: CanvasTableImportTargetReplaceRoute =
       routeCanvasTableImportTargetReplace({
         getTarget: ({ selection }) => ({

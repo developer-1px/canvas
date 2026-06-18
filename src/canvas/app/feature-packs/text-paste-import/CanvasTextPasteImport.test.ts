@@ -4,6 +4,7 @@ import {
   createCanvasPlainTextPasteSource,
   createCanvasTextPasteItems,
   getCanvasRichTextPasteSourceFromHTML,
+  getCanvasRichTextPasteSourceFromMarkdown,
   getCanvasTextPasteInsertPosition,
   getCanvasTextPasteSourceCandidatesFromDataTransfer,
   getCanvasTextPasteSourcesFromDataTransfer,
@@ -70,6 +71,109 @@ describe('CanvasTextPasteImport', () => {
           text: 'Plain fallback',
         },
       ])
+  })
+
+  it('creates Markdown rich text candidates from text/markdown clipboard text', () => {
+    const markdown = [
+      '# Plan',
+      '',
+      '- **Ship** _fast_',
+      '1. [Docs](https://example.com)',
+      'Use `code`',
+    ].join('\n')
+    const dataTransfer = {
+      getData: vi.fn((type: string) =>
+        type === 'text/markdown'
+          ? markdown
+          : type === 'text/plain'
+            ? markdown
+            : '',
+      ),
+    } as unknown as DataTransfer
+
+    expect(getCanvasTextPasteSourceCandidatesFromDataTransfer(dataTransfer))
+      .toEqual([
+        {
+          format: 'text-markdown-rich',
+          paragraphs: [
+            {
+              headingLevel: 1,
+              runs: [
+                { text: 'Plan' },
+              ],
+            },
+            {
+              bullet: 'bullet',
+              runs: [
+                { bold: true, text: 'Ship' },
+                { text: ' ' },
+                { italic: true, text: 'fast' },
+              ],
+            },
+            {
+              bullet: 'numbered',
+              runs: [
+                {
+                  color: '#2563eb',
+                  link: 'https://example.com',
+                  text: 'Docs',
+                  underline: true,
+                },
+              ],
+            },
+            {
+              runs: [
+                { text: 'Use ' },
+                { code: true, text: 'code' },
+              ],
+            },
+          ],
+          text: 'Plan\nShip fast\nDocs\nUse code',
+        },
+        {
+          format: 'text-plain',
+          text: markdown,
+        },
+      ])
+  })
+
+  it('creates Markdown rich text candidates from clear Markdown text/plain payloads', () => {
+    expect(getCanvasTextPasteSourceCandidatesFromDataTransfer({
+      getData: vi.fn((type: string) =>
+        type === 'text/plain'
+          ? '## Notes\n\n- _One_\n- Two'
+          : '',
+      ),
+    } as unknown as DataTransfer)).toEqual([
+      {
+        format: 'text-markdown-rich',
+        paragraphs: [
+          {
+            headingLevel: 2,
+            runs: [
+              { text: 'Notes' },
+            ],
+          },
+          {
+            bullet: 'bullet',
+            runs: [
+              { italic: true, text: 'One' },
+            ],
+          },
+          {
+            bullet: 'bullet',
+            runs: [
+              { text: 'Two' },
+            ],
+          },
+        ],
+        text: 'Notes\nOne\nTwo',
+      },
+      {
+        format: 'text-plain',
+        text: '## Notes\n\n- _One_\n- Two',
+      },
+    ])
   })
 
   it('normalizes rich HTML clipboard text into paragraph and run metadata', () => {
@@ -267,6 +371,26 @@ describe('CanvasTextPasteImport', () => {
     expect(getCanvasRichTextPasteSourceFromHTML(
       '<p><img src="data:image/png;base64,aW1hZ2U="></p>',
     )).toBeNull()
+  })
+
+  it('does not claim plain URLs or Markdown tables as Markdown rich text', () => {
+    expect(getCanvasRichTextPasteSourceFromMarkdown('https://example.com/path'))
+      .toBeNull()
+    expect(getCanvasRichTextPasteSourceFromMarkdown([
+      '| Metric | Value |',
+      '| --- | ---: |',
+      '| Users | 42 |',
+    ].join('\n'))).toBeNull()
+    expect(getCanvasTextPasteSourceCandidatesFromDataTransfer({
+      getData: vi.fn((type: string) =>
+        type === 'text/plain' ? 'https://example.com/path' : '',
+      ),
+    } as unknown as DataTransfer)).toEqual([
+      {
+        format: 'text-plain',
+        text: 'https://example.com/path',
+      },
+    ])
   })
 
   it('routes a plain text paste source to a host text replace target', () => {
