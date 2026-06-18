@@ -917,6 +917,27 @@ export {
   type SlideEditColorSwatchState,
 } from './SlideEditColorSwatchPalette'
 export {
+  getSlideEditTextBodyJSONPasteValue,
+  getSlideEditTextBodyPasteCommandEffect,
+  SLIDE_EDIT_TEXT_BODY_JSON_MIME_TYPE,
+  SLIDE_EDIT_TEXT_BODY_JSON_TYPES,
+  SLIDE_EDIT_TEXT_BODY_JSON_WRAPPER_KEYS,
+  type SlideEditTextBody,
+  type SlideEditTextBodyDataTransfer,
+  type SlideEditTextBodyJSONPasteInput,
+  type SlideEditTextBodyJSONPasteValue,
+  type SlideEditTextBodyObjectId,
+  type SlideEditTextBodyParagraph,
+  type SlideEditTextBodyPasteCommandEffectInput,
+  type SlideEditTextBodyReplaceCommand,
+  type SlideEditTextBodyReplaceCommandMetadata,
+  type SlideEditTextBodyReplaceHostCommandEffect,
+  type SlideEditTextBodyReplaceTarget,
+  type SlideEditTextBodyRun,
+  type SlideEditTextBodySlideId,
+  type SlideEditTextBodyStoragePolicy,
+} from './SlideEditTextBody'
+export {
   createSlideEditClipboardAdapterExample,
   createSlideEditClipboardPasteCommandEffect,
   createSlideEditClipboardPastePlan,
