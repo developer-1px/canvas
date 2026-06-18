@@ -6,6 +6,7 @@ import {
   getCanvasAppFeaturePackMarketplaceSectionControlModel,
   getCanvasAppFeaturePackMarketplaceSectionControlModels,
   getCanvasAppFeaturePackMarketplaceSelectionControlModel,
+  getCanvasAppFeaturePackMarketplaceSelectionExecutionModel,
   getCanvasAppFeaturePackMarketplaceSelectionTargetControl,
   getCanvasAppFeaturePackMarketplaceSectionFacetTargetControls,
   getCanvasAppFeaturePackMarketplaceSectionTargetControls,
@@ -653,6 +654,131 @@ describe('CanvasAppFeaturePackMarketplace', () => {
       selectedFacetKind: 'all',
       selectedSectionKind: 'profiles',
       status: 'fallback',
+    })
+  })
+
+  it('summarizes selected marketplace controls by execution readiness', () => {
+    const publicManifest = createCanvasAppFeaturePackManifest({
+      id: 'public-addon-pack',
+      label: 'Public addon pack',
+    })
+    const privateManifest = createCanvasAppFeaturePackManifest({
+      id: 'private-addon-pack',
+      label: 'Private addon pack',
+    })
+    const model = getCanvasAppFeaturePackMarketplaceModel({
+      listings: [{
+        access: 'private',
+        distribution: 'available',
+        featurePackId: 'private-addon-pack',
+      }],
+      manifests: [publicManifest, privateManifest],
+      options: {
+        featurePackStates: [
+          {
+            id: 'public-addon-pack',
+            status: 'uninstalled',
+          },
+          {
+            id: 'private-addon-pack',
+            status: 'uninstalled',
+          },
+        ],
+      },
+      profiles: [],
+      suiteManifests: [],
+    })
+    const readySelection =
+      getCanvasAppFeaturePackMarketplaceSelectionControlModel({
+        facetKind: 'ready',
+        model,
+        sectionKind: 'packs',
+      })
+    const readyExecution =
+      getCanvasAppFeaturePackMarketplaceSelectionExecutionModel(
+        readySelection,
+      )
+
+    expect(readySelection.controls.map((control) => control.label))
+      .toEqual(['Public addon pack'])
+    expect(readyExecution).toMatchObject({
+      disabled: false,
+      ready: true,
+      status: 'ready',
+      summary: {
+        blockedControlCount: 0,
+        controlCount: 1,
+        heldControlCount: 0,
+        readyControlCount: 1,
+        totalBlockedReasonCount: 0,
+      },
+    })
+    expect(readyExecution.controls).toBe(readySelection.controls)
+    expect(readyExecution.selection).toBe(readySelection)
+    expect(readyExecution.readyControls).toEqual(readySelection.controls)
+    expect(readyExecution.readyTargets).toEqual([{
+      featurePackId: 'public-addon-pack',
+      kind: 'pack',
+    }])
+    expect(Object.isFrozen(readyExecution)).toBe(true)
+    expect(Object.isFrozen(readyExecution.summary)).toBe(true)
+    expect(Object.isFrozen(readyExecution.readyControls)).toBe(true)
+
+    const privateSelection =
+      getCanvasAppFeaturePackMarketplaceSelectionControlModel({
+        facetKind: 'private',
+        model,
+        sectionKind: 'packs',
+      })
+    const privateExecution =
+      getCanvasAppFeaturePackMarketplaceSelectionExecutionModel(
+        privateSelection,
+      )
+
+    expect(privateExecution).toMatchObject({
+      disabled: true,
+      ready: false,
+      status: 'held',
+      summary: {
+        blockedControlCount: 1,
+        controlCount: 1,
+        heldControlCount: 1,
+        readyControlCount: 0,
+        totalBlockedReasonCount: 1,
+      },
+    })
+    expect(privateExecution.heldTargets).toEqual([{
+      featurePackId: 'private-addon-pack',
+      kind: 'pack',
+    }])
+    expect(privateExecution.blockedTargets).toEqual([{
+      featurePackId: 'private-addon-pack',
+      kind: 'pack',
+    }])
+
+    const emptySelection =
+      getCanvasAppFeaturePackMarketplaceSelectionControlModel({
+        facetKind: 'all',
+        model,
+        sectionKind: 'profiles',
+      })
+    const emptyExecution =
+      getCanvasAppFeaturePackMarketplaceSelectionExecutionModel(
+        emptySelection,
+      )
+
+    expect(emptyExecution).toMatchObject({
+      disabled: true,
+      ready: false,
+      status: 'empty',
+      summary: {
+        blockedControlCount: 0,
+        controlCount: 0,
+        heldControlCount: 0,
+        readyControlCount: 0,
+        totalBlockedReasonCount: 0,
+      },
+      targets: [],
     })
   })
 

@@ -189,6 +189,7 @@ import {
   getCanvasAppFeaturePackMarketplacePrimaryActionDiagnostic,
   getCanvasAppFeaturePackMarketplacePrimaryAction,
   getCanvasAppFeaturePackMarketplaceSelectionControlModel,
+  getCanvasAppFeaturePackMarketplaceSelectionExecutionModel,
   getCanvasAppFeaturePackMarketplaceSelectionTargetControl,
   getCanvasAppFeaturePackMarketplaceSectionControlModel,
   getCanvasAppFeaturePackMarketplaceSectionControlModels,
@@ -366,6 +367,7 @@ import {
   type CanvasAppFeaturePackMarketplacePrimaryActionDiagnostic,
   type CanvasAppFeaturePackMarketplaceSelectionControlModel,
   type CanvasAppFeaturePackMarketplaceSelectionControlModelInput,
+  type CanvasAppFeaturePackMarketplaceSelectionExecutionModel,
   type CanvasAppFeaturePackMarketplaceSelectionFallbackReason,
   type CanvasAppFeaturePackMarketplaceSelectionTargetControlInput,
   type CanvasAppFeaturePackMarketplaceSectionControlModel,
@@ -512,6 +514,8 @@ import {
     as CanvasAppAssemblySourceFeaturePackMarketplaceTargetControlApplyTransactionResultFromApp,
   type CanvasAppFeaturePackMarketplaceSelectionControlModel
     as CanvasAppFeaturePackMarketplaceSelectionControlModelFromApp,
+  type CanvasAppFeaturePackMarketplaceSelectionExecutionModel
+    as CanvasAppFeaturePackMarketplaceSelectionExecutionModelFromApp,
   type CanvasAppAssemblySource as CanvasAppAssemblySourceFromApp,
   type CanvasAppProps as CanvasAppPropsFromApp,
   type CanvasCommandPaletteKeyboardIntentInput,
@@ -1131,6 +1135,16 @@ describe('Canvas package consumer imports', () => {
         CanvasAppFacade.getCanvasAppFeaturePackMarketplaceSelectionControlModel(
           featurePackMarketplaceSelectionControlModelInput,
         )
+    const featurePackMarketplaceSelectionExecutionModel:
+      CanvasAppFeaturePackMarketplaceSelectionExecutionModel =
+        getCanvasAppFeaturePackMarketplaceSelectionExecutionModel(
+          featurePackMarketplaceSelectionControlModel,
+        )
+    const featurePackMarketplaceSelectionExecutionModelFromApp:
+      CanvasAppFeaturePackMarketplaceSelectionExecutionModelFromApp =
+        CanvasAppFacade.getCanvasAppFeaturePackMarketplaceSelectionExecutionModel(
+          featurePackMarketplaceSelectionControlModelFromApp,
+        )
     const featurePackMarketplaceSelectionFallbackReasons:
       readonly CanvasAppFeaturePackMarketplaceSelectionFallbackReason[] =
         getCanvasAppFeaturePackMarketplaceSelectionControlModel({
@@ -1151,6 +1165,17 @@ describe('Canvas package consumer imports', () => {
         getCanvasAppFeaturePackMarketplaceSelectionTargetControl(
           featurePackMarketplaceSelectionTargetControlInput,
         )
+    expect(featurePackMarketplaceSelectionExecutionModel.status)
+      .toBe('ready')
+    expect(featurePackMarketplaceSelectionExecutionModel.summary.readyControlCount)
+      .toBeGreaterThan(0)
+    expect(featurePackMarketplaceSelectionExecutionModel.readyTargets)
+      .toContainEqual({
+        featurePackId: 'smoke-partial-pack',
+        kind: 'pack',
+      })
+    expect(featurePackMarketplaceSelectionExecutionModelFromApp.status)
+      .toBe(featurePackMarketplaceSelectionExecutionModel.status)
     const featurePackMarketplaceMissingTargetControlStatus:
       CanvasAppFeaturePackMarketplaceTargetControlStatus =
         getCanvasAppFeaturePackMarketplaceTargetControl({
@@ -4813,6 +4838,12 @@ describe('Canvas package consumer imports', () => {
       .toBe(getCanvasAppFeaturePackMarketplaceSelectionControlModel)
     expect(CanvasPackage.getCanvasAppFeaturePackMarketplaceSelectionControlModel)
       .toBe(getCanvasAppFeaturePackMarketplaceSelectionControlModel)
+    expect(CanvasAppAuthoring.getCanvasAppFeaturePackMarketplaceSelectionExecutionModel)
+      .toBe(getCanvasAppFeaturePackMarketplaceSelectionExecutionModel)
+    expect(CanvasAppFacade.getCanvasAppFeaturePackMarketplaceSelectionExecutionModel)
+      .toBe(getCanvasAppFeaturePackMarketplaceSelectionExecutionModel)
+    expect(CanvasPackage.getCanvasAppFeaturePackMarketplaceSelectionExecutionModel)
+      .toBe(getCanvasAppFeaturePackMarketplaceSelectionExecutionModel)
     expect(CanvasAppAuthoring.getCanvasAppFeaturePackMarketplaceSelectionTargetControl)
       .toBe(getCanvasAppFeaturePackMarketplaceSelectionTargetControl)
     expect(CanvasAppFacade.getCanvasAppFeaturePackMarketplaceSelectionTargetControl)

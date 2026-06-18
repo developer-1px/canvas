@@ -317,6 +317,37 @@ export type CanvasAppFeaturePackMarketplaceSelectionControlModel =
     status: CanvasAppFeaturePackMarketplaceSelectionControlModelStatus
   }>
 
+export type CanvasAppFeaturePackMarketplaceSelectionExecutionStatus =
+  | 'empty'
+  | 'held'
+  | 'ready'
+
+export type CanvasAppFeaturePackMarketplaceSelectionExecutionSummary =
+  Readonly<{
+    blockedControlCount: number
+    controlCount: number
+    heldControlCount: number
+    readyControlCount: number
+    totalBlockedReasonCount: number
+  }>
+
+export type CanvasAppFeaturePackMarketplaceSelectionExecutionModel =
+  Readonly<{
+    blockedControls: readonly CanvasAppFeaturePackMarketplaceTargetControl[]
+    blockedTargets: readonly CanvasAppFeaturePackMarketplaceTarget[]
+    controls: readonly CanvasAppFeaturePackMarketplaceTargetControl[]
+    disabled: boolean
+    heldControls: readonly CanvasAppFeaturePackMarketplaceTargetControl[]
+    heldTargets: readonly CanvasAppFeaturePackMarketplaceTarget[]
+    ready: boolean
+    readyControls: readonly CanvasAppFeaturePackMarketplaceTargetControl[]
+    readyTargets: readonly CanvasAppFeaturePackMarketplaceTarget[]
+    selection: CanvasAppFeaturePackMarketplaceSelectionControlModel
+    status: CanvasAppFeaturePackMarketplaceSelectionExecutionStatus
+    summary: CanvasAppFeaturePackMarketplaceSelectionExecutionSummary
+    targets: readonly CanvasAppFeaturePackMarketplaceTarget[]
+  }>
+
 export type CanvasAppFeaturePackMarketplaceActionSectionSummary =
   Readonly<{
     blockedActionCount: number
@@ -595,6 +626,62 @@ export function getCanvasAppFeaturePackMarketplaceSelectionTargetControl({
   return selection.controls.find((control) =>
     isCanvasAppFeaturePackMarketplaceSameTarget(control.target, target)
   ) ?? null
+}
+
+export function getCanvasAppFeaturePackMarketplaceSelectionExecutionModel(
+  selection: CanvasAppFeaturePackMarketplaceSelectionControlModel,
+): CanvasAppFeaturePackMarketplaceSelectionExecutionModel {
+  const controls = selection.controls
+  const readyControls = Object.freeze(
+    controls.filter((control) => control.ready),
+  )
+  const heldControls = Object.freeze(
+    controls.filter((control) => !control.ready),
+  )
+  const blockedControls = Object.freeze(
+    heldControls.filter((control) => control.totalBlockedReasonCount > 0),
+  )
+  const targets = Object.freeze(
+    controls.map((control) => control.target),
+  )
+  const readyTargets = Object.freeze(
+    readyControls.map((control) => control.target),
+  )
+  const heldTargets = Object.freeze(
+    heldControls.map((control) => control.target),
+  )
+  const blockedTargets = Object.freeze(
+    blockedControls.map((control) => control.target),
+  )
+  const summary = Object.freeze({
+    blockedControlCount: blockedControls.length,
+    controlCount: controls.length,
+    heldControlCount: heldControls.length,
+    readyControlCount: readyControls.length,
+    totalBlockedReasonCount: blockedControls.reduce(
+      (total, control) => total + control.totalBlockedReasonCount,
+      0,
+    ),
+  })
+
+  return Object.freeze({
+    blockedControls,
+    blockedTargets,
+    controls,
+    disabled: readyControls.length === 0,
+    heldControls,
+    heldTargets,
+    ready: readyControls.length > 0,
+    readyControls,
+    readyTargets,
+    selection,
+    status: getCanvasAppFeaturePackMarketplaceSelectionExecutionStatus({
+      controlCount: controls.length,
+      readyControlCount: readyControls.length,
+    }),
+    summary,
+    targets,
+  })
 }
 
 export function getCanvasAppFeaturePackMarketplaceTargetItem({
@@ -960,6 +1047,20 @@ function isCanvasAppFeaturePackMarketplaceSameTarget(
   return left.kind === 'suite' &&
     right.kind === 'suite' &&
     left.suiteId === right.suiteId
+}
+
+function getCanvasAppFeaturePackMarketplaceSelectionExecutionStatus({
+  controlCount,
+  readyControlCount,
+}: {
+  controlCount: number
+  readyControlCount: number
+}): CanvasAppFeaturePackMarketplaceSelectionExecutionStatus {
+  if (controlCount === 0) {
+    return 'empty'
+  }
+
+  return readyControlCount > 0 ? 'ready' : 'held'
 }
 
 function isCanvasAppFeaturePackMarketplacePackItem(
