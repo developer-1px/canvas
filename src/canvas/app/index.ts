@@ -568,6 +568,7 @@ export {
   type CanvasAppFeaturePackMarketplaceAssemblyApplyUpdateMode,
   type CanvasAppFeaturePackMarketplaceAssemblyModel,
   type CanvasAppFeaturePackMarketplaceAssemblyModelInput,
+  type CanvasAppFeaturePackMarketplaceAssemblyUninstallDataPlan,
   useCanvasDevToolsAppModel,
   useCanvasAppModel,
 } from './workflow'

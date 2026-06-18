@@ -28,6 +28,7 @@ export type {
   CanvasAppFeaturePackMarketplaceAssemblyApplyUpdateMode,
   CanvasAppFeaturePackMarketplaceAssemblyModel,
   CanvasAppFeaturePackMarketplaceAssemblyModelInput,
+  CanvasAppFeaturePackMarketplaceAssemblyUninstallDataPlan,
 } from './CanvasAppFeaturePackAssembly'
 export {
   getCanvasAppFeaturePackMarketplaceAssemblyApplyResult,

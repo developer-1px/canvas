@@ -184,6 +184,7 @@ import {
   type CanvasAppFeaturePackMarketplaceAssemblyApplyPlan,
   type CanvasAppFeaturePackMarketplaceAssemblyApplyUpdateMode,
   type CanvasAppFeaturePackMarketplaceAssemblyModel,
+  type CanvasAppFeaturePackMarketplaceAssemblyUninstallDataPlan,
   type CanvasAppFeaturePackMarketplaceModel,
   type CanvasAppFeaturePackMarketplacePackSectionFacetKind,
   type CanvasAppFeaturePackMarketplacePackSectionFacetItemsInput,
@@ -809,6 +810,9 @@ describe('Canvas package consumer imports', () => {
     const featurePackMarketplaceAssemblyApplyUpdateMode:
       CanvasAppFeaturePackMarketplaceAssemblyApplyUpdateMode =
         featurePackMarketplaceAssemblyApplyPlan.updateMode
+    const featurePackMarketplaceAssemblyUninstallDataPlan:
+      CanvasAppFeaturePackMarketplaceAssemblyUninstallDataPlan =
+        featurePackMarketplaceAssemblyApplyPlan.uninstallDataPlan
     const featurePackMarketplaceAssemblyAppliedInput =
       getCanvasAppFeaturePackMarketplaceAssemblyActionInput(
         featurePackMarketplaceAssemblyActionInput,
@@ -1433,6 +1437,8 @@ describe('Canvas package consumer imports', () => {
       .toEqual(['overlay'])
     expect(featurePackMarketplaceActionAssemblyPlan.uninstallPolicyEntries)
       .toEqual([])
+    expect(featurePackMarketplaceActionAssemblyPlan.uninstallDataPlan)
+      .toEqual(featurePackMarketplaceAssemblyUninstallDataPlan)
     expect(featurePackMarketplaceActionAssemblyPlan.assemblyInput)
       .toEqual(featurePackMarketplaceAppliedAssemblyInput)
     expect(featurePackMarketplaceAppliedAssemblyInput.featurePackStates)
@@ -1463,6 +1469,16 @@ describe('Canvas package consumer imports', () => {
       .toEqual(featurePackMarketplaceAssemblyAppliedInput)
     expect(featurePackMarketplaceAssemblyApplyPlan.uninstallPolicyEntries)
       .toEqual([])
+    expect(featurePackMarketplaceAssemblyUninstallDataPlan).toEqual({
+      entries: [],
+      hostManagedFeaturePackIds: [],
+      hostManagedScopeIds: [],
+      preserveFeaturePackIds: [],
+      preserveScopeIds: [],
+      removeFeaturePackIds: [],
+      removeScopeIds: [],
+      unscopedFeaturePackIds: [],
+    })
     expect(featurePackMarketplaceAssemblyApplyResult.status).toBe('ready')
     if (featurePackMarketplaceAssemblyApplyResult.status !== 'ready') {
       throw new Error('Expected ready feature pack marketplace apply result')
@@ -1474,6 +1490,8 @@ describe('Canvas package consumer imports', () => {
       .toEqual(featurePackMarketplaceAssemblyAppliedInput)
     expect(featurePackMarketplaceAssemblyApplyResult.uninstallPolicyEntries)
       .toEqual([])
+    expect(featurePackMarketplaceAssemblyApplyResult.uninstallDataPlan)
+      .toEqual(featurePackMarketplaceAssemblyUninstallDataPlan)
     expect(featurePackMarketplaceAssemblyApplyResult.nextModel.marketplaceModel
       .packs.items[0]?.status).toBe('disabled')
     expect(featurePackMarketplaceAssemblyAppliedInput.featurePackStates)

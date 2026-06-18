@@ -320,6 +320,20 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
     expect(actionPlan).toMatchObject({
       actionKind: 'uninstall',
       status: 'ready',
+      uninstallDataPlan: {
+        entries: [{
+          featurePackId: 'addon-pack',
+          orphanedDataScopeIds: ['addon-data'],
+          orphanedDataPolicy: 'remove',
+        }],
+        hostManagedFeaturePackIds: [],
+        hostManagedScopeIds: [],
+        preserveFeaturePackIds: [],
+        preserveScopeIds: [],
+        removeFeaturePackIds: ['addon-pack'],
+        removeScopeIds: ['addon-data'],
+        unscopedFeaturePackIds: [],
+      },
       uninstallPolicyEntries: [{
         featurePackId: 'addon-pack',
         orphanedDataScopeIds: ['addon-data'],
@@ -329,6 +343,11 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
     expect(applyPlan).toMatchObject({
       actionKind: 'uninstall',
       status: 'ready',
+      uninstallDataPlan: {
+        removeFeaturePackIds: ['addon-pack'],
+        removeScopeIds: ['addon-data'],
+        unscopedFeaturePackIds: [],
+      },
       uninstallPolicyEntries: [{
         featurePackId: 'addon-pack',
         orphanedDataScopeIds: ['addon-data'],
@@ -339,6 +358,11 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
     expect(applyResult).toMatchObject({
       actionKind: 'uninstall',
       status: 'ready',
+      uninstallDataPlan: {
+        removeFeaturePackIds: ['addon-pack'],
+        removeScopeIds: ['addon-data'],
+        unscopedFeaturePackIds: [],
+      },
       uninstallPolicyEntries: [{
         featurePackId: 'addon-pack',
         orphanedDataScopeIds: ['addon-data'],
@@ -355,6 +379,58 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
       id: 'addon-pack',
       status: 'uninstalled',
     }])
+  })
+
+  it('keeps unscoped uninstall packs visible in the data plan', () => {
+    const addonManifest = createCanvasAppFeaturePackManifest({
+      id: 'addon-pack',
+      label: 'Addon pack',
+      lifecycle: {
+        orphanedDataPolicy: 'preserve',
+      },
+    })
+    const model = getCanvasAppFeaturePackMarketplaceAssemblyModel({
+      assemblyInput: {
+        featurePackManifests: [addonManifest],
+      },
+      profiles: [],
+      suiteManifests: [],
+    })
+    const addonItem = model.marketplaceModel.packs.items[0]
+
+    if (!addonItem) {
+      throw new Error('Expected addon pack item')
+    }
+
+    const uninstallAction = addonItem.actions.find((action) =>
+      action.kind === 'uninstall',
+    )
+
+    if (!uninstallAction) {
+      throw new Error('Expected uninstall action')
+    }
+
+    const applyPlan = getCanvasAppFeaturePackMarketplaceAssemblyApplyPlan({
+      action: uninstallAction,
+      model,
+    })
+
+    expect(applyPlan).toMatchObject({
+      actionKind: 'uninstall',
+      status: 'ready',
+      uninstallDataPlan: {
+        entries: [{
+          featurePackId: 'addon-pack',
+          orphanedDataScopeIds: [],
+          orphanedDataPolicy: 'preserve',
+        }],
+        preserveFeaturePackIds: ['addon-pack'],
+        preserveScopeIds: [],
+        removeFeaturePackIds: [],
+        removeScopeIds: [],
+        unscopedFeaturePackIds: ['addon-pack'],
+      },
+    })
   })
 
   it('applies suite marketplace actions from the assembly model', () => {
@@ -485,11 +561,25 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
     expect(actionPlan).toMatchObject({
       actionKind: 'uninstall',
       status: 'blocked',
+      uninstallDataPlan: {
+        hostManagedFeaturePackIds: ['runtime-pack'],
+        hostManagedScopeIds: ['runtime-data'],
+        preserveFeaturePackIds: [],
+        preserveScopeIds: [],
+        removeFeaturePackIds: [],
+        removeScopeIds: [],
+        unscopedFeaturePackIds: [],
+      },
       uninstallPolicyEntries: policyEntries,
     })
     expect(applyPlan).toMatchObject({
       actionKind: 'uninstall',
       status: 'blocked',
+      uninstallDataPlan: {
+        hostManagedFeaturePackIds: ['runtime-pack'],
+        hostManagedScopeIds: ['runtime-data'],
+        unscopedFeaturePackIds: [],
+      },
       uninstallPolicyEntries: policyEntries,
       updateMode: 'blocked',
     })
@@ -497,6 +587,11 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
       actionKind: 'uninstall',
       currentModel: model,
       status: 'blocked',
+      uninstallDataPlan: {
+        hostManagedFeaturePackIds: ['runtime-pack'],
+        hostManagedScopeIds: ['runtime-data'],
+        unscopedFeaturePackIds: [],
+      },
       uninstallPolicyEntries: policyEntries,
       updateMode: 'blocked',
     })

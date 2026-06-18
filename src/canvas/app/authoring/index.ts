@@ -21,6 +21,7 @@ export type {
   CanvasAppFeaturePackMarketplaceAssemblyApplyUpdateMode,
   CanvasAppFeaturePackMarketplaceAssemblyModel,
   CanvasAppFeaturePackMarketplaceAssemblyModelInput,
+  CanvasAppFeaturePackMarketplaceAssemblyUninstallDataPlan,
 } from '../workflow/CanvasAppFeaturePackAssembly'
 export {
   getCanvasAppFeaturePackMarketplaceAssemblyApplyResult,

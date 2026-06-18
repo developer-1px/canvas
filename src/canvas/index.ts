@@ -543,6 +543,7 @@ export {
   type CanvasAppFeaturePackMarketplaceAssemblyApplyUpdateMode,
   type CanvasAppFeaturePackMarketplaceAssemblyModel,
   type CanvasAppFeaturePackMarketplaceAssemblyModelInput,
+  type CanvasAppFeaturePackMarketplaceAssemblyUninstallDataPlan,
   type CanvasAppFeaturePackMarketplacePackSection,
   type CanvasAppFeaturePackMarketplacePackSectionFacetKind,
   type CanvasAppFeaturePackMarketplacePackSectionFacetItemsInput,
