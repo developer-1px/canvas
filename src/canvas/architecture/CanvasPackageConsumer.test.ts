@@ -75,6 +75,7 @@ import {
   getCanvasAppFeaturePackProfileById,
   getCanvasAppFeaturePackProfileRuntimeStates,
   getCanvasAppFeaturePackCatalog,
+  getCanvasAppFeaturePackInstallPlan,
   getCanvasAppFeaturePackSuiteFeaturePackIds,
   getCanvasAppManifestViewFeaturePacks,
   getCanvasAppResolvedFeaturePackStates,
@@ -112,6 +113,8 @@ import {
   type CanvasAppFeaturePack,
   type CanvasAppFeaturePackCatalog,
   type CanvasAppFeaturePackCatalogItem,
+  type CanvasAppFeaturePackInstallPlan,
+  type CanvasAppFeaturePackInstallPlanInput,
   type CanvasAppFeaturePackAssemblyInput,
   type CanvasAppFeaturePackManifest,
   type CanvasAppFeaturePackManifestCategory,
@@ -427,6 +430,18 @@ describe('Canvas package consumer imports', () => {
       })
     const featurePackCatalogItem: CanvasAppFeaturePackCatalogItem | undefined =
       featurePackCatalog.items[0]
+    const featurePackInstallPlanInput: CanvasAppFeaturePackInstallPlanInput = {
+      manifests: [viewManifest],
+      options: {
+        featurePackStates: [{
+          id: 'smoke-view-pack',
+          status: 'disabled',
+        }],
+      },
+      targetFeaturePackIds: ['smoke-view-pack'],
+    }
+    const featurePackInstallPlan: CanvasAppFeaturePackInstallPlan =
+      getCanvasAppFeaturePackInstallPlan(featurePackInstallPlanInput)
     const disabledFeaturePackStates:
       readonly CanvasAppFeaturePackRuntimeState[] =
         getCanvasAppResolvedFeaturePackStates(['smoke-pack'], {
@@ -837,6 +852,11 @@ describe('Canvas package consumer imports', () => {
     expect(featurePackCatalogItem?.status).toBe('disabled')
     expect(featurePackCatalogItem?.enabled).toBe(false)
     expect(featurePackCatalogItem?.blockedReasons).toEqual([])
+    expect(featurePackInstallPlan.enableFeaturePackIds).toEqual([
+      'smoke-view-pack',
+    ])
+    expect(featurePackInstallPlan.installFeaturePackIds).toEqual([])
+    expect(featurePackInstallPlan.status).toBe('ready')
     expect(defaultViewFeaturePackIds).toContain('toolbar')
     expect(defaultViewFeaturePackManifestIds).toContain('toolbar')
     expect(manifestViewFeaturePacks).toEqual([viewFeaturePack])
@@ -1201,6 +1221,12 @@ describe('Canvas package consumer imports', () => {
     expect(CanvasAppFacade.getCanvasAppFeaturePackCatalog)
       .toBeTypeOf('function')
     expect(CanvasPackage.getCanvasAppFeaturePackCatalog)
+      .toBeTypeOf('function')
+    expect(CanvasAppAuthoring.getCanvasAppFeaturePackInstallPlan)
+      .toBeTypeOf('function')
+    expect(CanvasAppFacade.getCanvasAppFeaturePackInstallPlan)
+      .toBeTypeOf('function')
+    expect(CanvasPackage.getCanvasAppFeaturePackInstallPlan)
       .toBeTypeOf('function')
     expect(CanvasAppAuthoring.createCanvasAppAiLabsFeaturePackManifest)
       .toBeTypeOf('function')

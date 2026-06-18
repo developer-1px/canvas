@@ -68,6 +68,18 @@ export {
   type CanvasAppFeaturePackCatalogRequiredBlockReasonKind,
 } from './CanvasAppFeaturePackCatalog'
 export {
+  getCanvasAppFeaturePackInstallPlan,
+  type CanvasAppFeaturePackInstallPlan,
+  type CanvasAppFeaturePackInstallPlanBlockedReason,
+  type CanvasAppFeaturePackInstallPlanConflictReason,
+  type CanvasAppFeaturePackInstallPlanConflictScope,
+  type CanvasAppFeaturePackInstallPlanInput,
+  type CanvasAppFeaturePackInstallPlanMissingRequiredReason,
+  type CanvasAppFeaturePackInstallPlanMode,
+  type CanvasAppFeaturePackInstallPlanStatus,
+  type CanvasAppFeaturePackInstallPlanUnknownTargetReason,
+} from './CanvasAppFeaturePackInstallPlan'
+export {
   assertCanvasAppFeaturePackManifest,
   assertCanvasAppFeaturePackManifests,
   createCanvasAppFeaturePackManifest,
