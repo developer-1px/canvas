@@ -13,6 +13,7 @@
 | Snap guides | `canvas/foundation` | alignment and spacing guide contracts |
 | Slide frame affordance | `slide-edit-affordance` | page frame, page-safe overlays, page-relative anchors |
 | Slide object bounds | `slide-edit-affordance` | selected object bounds through a host adapter |
+| Object transform patch | `slide-edit-affordance` | object transform JSON paste parsing, bounds clamp planning, and host command effect |
 | Slide command effects | `slide-edit-affordance` | product-neutral command envelopes routed to the host |
 | Slide rail interaction | `slide-edit-affordance` | active slide, slide order, thumbnail hit target, rail command intent |
 | Color swatch palette | `slide-edit-affordance` | theme/recent color swatches, channel state, and color apply command effect |
@@ -53,6 +54,7 @@
 | --- | --- |
 | `slide-frame` | Editable page frame in canvas coordinates |
 | `object-bounds` | Object bounds for a slide/object reference |
+| `object-transform` | Selected object transform values, min-size policy, frame clamp policy, and special-object transform adapter |
 | `selection` | Active page id and selected object ids |
 | `command-effect` | Transaction boundary for command effects |
 | `color-swatch-palette` | Theme and recent color swatches for object style channels |
@@ -133,6 +135,20 @@
 | --- | --- | --- |
 | Object reorder | z-order among objects inside a canvas scene or group | slide list order |
 | Slide reorder | ordered slide id list and active slide rail selection | object z-order, layer tree, object storage |
+
+## Object Transform JSON Paste Contract
+
+| Area | Contract |
+| --- | --- |
+| Fields | `x`, `y`, `w`, `h`, and `rotation`; partial JSON preserves the target object's current fields |
+| JSON candidates | object-transform custom MIME, `application/json`, `text/json`, and `text/plain` are checked in order |
+| JSON payloads | custom MIME may carry direct transform JSON; generic JSON requires `objectTransform`, `objectGeometry`, `transform`, `geometry`, `bounds`, or `objectBounds` wrapper |
+| Geometry aliases | `left`/`top` map to `x`/`y`; `width`/`height` map to `w`/`h`; `rotate`/`angle` map to `rotation` |
+| Bounds policy | host-provided frame bounds and min size clamp the normalized target transform before command effect creation |
+| Target scope | each supported target object receives its own `update-object-transform` command effect |
+| Host adapter | connector, line, group, or product-specific geometry can be converted or rejected through a host transform normalizer |
+| No-op | invalid JSON, unwrapped generic JSON, no numeric fields, locked/hidden/non-transformable targets, and host adapter rejection do not apply a transform |
+| Runtime | host owns actual object mutation, connector endpoint recomputation, group transform semantics, persistence, and export mapping |
 
 ## Text Box Auto-Fit And Overflow Contract
 
