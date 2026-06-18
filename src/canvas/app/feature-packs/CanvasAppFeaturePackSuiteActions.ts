@@ -4,6 +4,8 @@ import {
   type CanvasAppFeaturePackManifestInstallOptions,
 } from './CanvasAppFeaturePackManifests'
 import {
+  applyCanvasAppFeaturePackRuntimeStatePatch,
+  type CanvasAppFeaturePackInstallOptions,
   type CanvasAppFeaturePackId,
   type CanvasAppFeaturePackRuntimeState,
   type CanvasAppFeaturePackRuntimeStateInput,
@@ -53,6 +55,7 @@ export type CanvasAppFeaturePackSuiteMarketplaceAction = Readonly<{
   blockedReasons: readonly CanvasAppFeaturePackStateTransitionBlockedReason[]
   changedFeaturePackIds: readonly CanvasAppFeaturePackId[]
   featurePackStates: readonly CanvasAppFeaturePackRuntimeStateInput[]
+  installOptions: CanvasAppFeaturePackInstallOptions
   kind: CanvasAppFeaturePackSuiteMarketplaceActionKind
   partialUpdateSurfaceIds: readonly CanvasAppFeaturePackContributionSurface[]
   ready: boolean
@@ -227,6 +230,11 @@ function getCanvasAppFeaturePackSuiteMarketplaceAction({
     options,
     targetFeaturePackIds: suiteManifest.featurePackIds,
   })
+  const runtimeStatePatch = applyCanvasAppFeaturePackRuntimeStatePatch({
+    featurePackIds: manifests.map((manifest) => manifest.id),
+    featurePackStates: transitionPlan.featurePackStates,
+    options,
+  })
   const applicable = isCanvasAppFeaturePackSuiteMarketplaceActionApplicable({
     kind,
     memberState,
@@ -235,6 +243,7 @@ function getCanvasAppFeaturePackSuiteMarketplaceAction({
 
   return createCanvasAppFeaturePackSuiteMarketplaceAction({
     applicable,
+    installOptions: runtimeStatePatch.options,
     kind,
     transitionPlan,
   })
@@ -242,10 +251,12 @@ function getCanvasAppFeaturePackSuiteMarketplaceAction({
 
 function createCanvasAppFeaturePackSuiteMarketplaceAction({
   applicable,
+  installOptions,
   kind,
   transitionPlan,
 }: {
   applicable: boolean
+  installOptions: CanvasAppFeaturePackInstallOptions
   kind: CanvasAppFeaturePackSuiteMarketplaceActionKind
   transitionPlan: CanvasAppFeaturePackStateTransitionPlan
 }): CanvasAppFeaturePackSuiteMarketplaceAction {
@@ -254,6 +265,7 @@ function createCanvasAppFeaturePackSuiteMarketplaceAction({
     blockedReasons: transitionPlan.blockedReasons,
     changedFeaturePackIds: transitionPlan.changedFeaturePackIds,
     featurePackStates: transitionPlan.featurePackStates,
+    installOptions,
     kind,
     partialUpdateSurfaceIds: transitionPlan.partialUpdateSurfaceIds,
     ready: applicable && transitionPlan.ready,

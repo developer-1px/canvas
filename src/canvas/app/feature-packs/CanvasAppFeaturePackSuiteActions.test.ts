@@ -212,6 +212,19 @@ describe('CanvasAppFeaturePackSuiteActions', () => {
         ready: true,
         status: 'ready',
       })
+    expect(item?.actions.find((action) => action.kind === 'enable')
+      ?.installOptions).toEqual({
+      featurePackStates: [
+        {
+          id: 'runtime-pack',
+          status: 'enabled',
+        },
+        {
+          id: 'addon-pack',
+          status: 'enabled',
+        },
+      ],
+    })
   })
 
   it('reports partial suite state and missing member blockers', () => {

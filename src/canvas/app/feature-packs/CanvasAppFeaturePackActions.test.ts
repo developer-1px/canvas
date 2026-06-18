@@ -155,6 +155,13 @@ describe('CanvasAppFeaturePackActions', () => {
         status: 'blocked',
       },
     ])
+    expect(item?.actions.find((action) => action.kind === 'enable')
+      ?.installOptions).toEqual({
+      featurePackStates: [{
+        id: 'command-pack',
+        status: 'enabled',
+      }],
+    })
   })
 
   it('keeps catalog and transition blockers available per action', () => {

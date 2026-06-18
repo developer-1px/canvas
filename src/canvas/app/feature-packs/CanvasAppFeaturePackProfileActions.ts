@@ -15,6 +15,8 @@ import {
   type CanvasAppFeaturePackProfileId,
 } from './CanvasAppFeaturePackProfiles'
 import {
+  applyCanvasAppFeaturePackRuntimeStatePatch,
+  type CanvasAppFeaturePackInstallOptions,
   type CanvasAppFeaturePackId,
   type CanvasAppFeaturePackRuntimeState,
   type CanvasAppFeaturePackRuntimeStateInput,
@@ -52,6 +54,7 @@ export type CanvasAppFeaturePackProfileMarketplaceAction = Readonly<{
   blockedReasons: readonly CanvasAppFeaturePackProfileMarketplaceBlockedReason[]
   changedFeaturePackIds: readonly CanvasAppFeaturePackId[]
   featurePackStates: readonly CanvasAppFeaturePackRuntimeStateInput[]
+  installOptions: CanvasAppFeaturePackInstallOptions
   kind: CanvasAppFeaturePackProfileMarketplaceActionKind
   partialUpdateSurfaceIds: readonly CanvasAppFeaturePackContributionSurface[]
   ready: boolean
@@ -176,6 +179,7 @@ export function getCanvasAppFeaturePackProfileMarketplaceActionModel({
         currentStates,
         manifestById,
         manifests,
+        options,
         profile,
       }),
     )),
@@ -186,11 +190,13 @@ function createCanvasAppFeaturePackProfileMarketplaceActionItem({
   currentStates,
   manifestById,
   manifests,
+  options,
   profile,
 }: {
   currentStates: readonly CanvasAppFeaturePackRuntimeState[]
   manifestById: ReadonlyMap<CanvasAppFeaturePackId, CanvasAppFeaturePackManifest>
   manifests: readonly CanvasAppFeaturePackManifest[]
+  options: CanvasAppFeaturePackManifestInstallOptions
   profile: CanvasAppFeaturePackProfile
 }): CanvasAppFeaturePackProfileMarketplaceActionItem {
   const targetFeaturePackStates =
@@ -227,6 +233,11 @@ function createCanvasAppFeaturePackProfileMarketplaceActionItem({
       context,
       ids: partialUpdateFeaturePackIds,
     })
+  const runtimeStatePatch = applyCanvasAppFeaturePackRuntimeStatePatch({
+    featurePackIds: manifests.map((manifest) => manifest.id),
+    featurePackStates: targetFeaturePackStates,
+    options,
+  })
   const blockedReasons = Object.freeze([
     ...getCanvasAppFeaturePackProfileMarketplaceUnknownPackReasons(context),
     ...getCanvasAppFeaturePackProfileMarketplaceLifecycleReasons({
@@ -248,6 +259,7 @@ function createCanvasAppFeaturePackProfileMarketplaceActionItem({
     blockedReasons,
     changedFeaturePackIds,
     featurePackStates: targetFeaturePackStates,
+    installOptions: runtimeStatePatch.options,
     kind: 'apply',
     partialUpdateSurfaceIds,
     ready: status === 'ready',

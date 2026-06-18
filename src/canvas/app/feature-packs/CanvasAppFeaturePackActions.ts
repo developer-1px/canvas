@@ -9,6 +9,8 @@ import {
   type CanvasAppFeaturePackManifestInstallOptions,
 } from './CanvasAppFeaturePackManifests'
 import {
+  applyCanvasAppFeaturePackRuntimeStatePatch,
+  type CanvasAppFeaturePackInstallOptions,
   type CanvasAppFeaturePackId,
   type CanvasAppFeaturePackRuntimeStateInput,
   type CanvasAppFeaturePackRuntimeStateStatus,
@@ -45,6 +47,7 @@ export type CanvasAppFeaturePackMarketplaceAction = Readonly<{
   blockedReasons: readonly CanvasAppFeaturePackStateTransitionBlockedReason[]
   changedFeaturePackIds: readonly CanvasAppFeaturePackId[]
   featurePackStates: readonly CanvasAppFeaturePackRuntimeStateInput[]
+  installOptions: CanvasAppFeaturePackInstallOptions
   kind: CanvasAppFeaturePackMarketplaceActionKind
   partialUpdateSurfaceIds: readonly CanvasAppFeaturePackContributionSurface[]
   ready: boolean
@@ -125,12 +128,18 @@ function getCanvasAppFeaturePackMarketplaceAction({
     options,
     targetFeaturePackIds: [catalogItem.id],
   })
+  const runtimeStatePatch = applyCanvasAppFeaturePackRuntimeStatePatch({
+    featurePackIds: manifests.map((manifest) => manifest.id),
+    featurePackStates: transitionPlan.featurePackStates,
+    options,
+  })
 
   return createCanvasAppFeaturePackMarketplaceAction({
     applicable: isCanvasAppFeaturePackMarketplaceActionApplicable({
       catalogItem,
       kind,
     }),
+    installOptions: runtimeStatePatch.options,
     kind,
     transitionPlan,
   })
@@ -138,10 +147,12 @@ function getCanvasAppFeaturePackMarketplaceAction({
 
 function createCanvasAppFeaturePackMarketplaceAction({
   applicable,
+  installOptions,
   kind,
   transitionPlan,
 }: {
   applicable: boolean
+  installOptions: CanvasAppFeaturePackInstallOptions
   kind: CanvasAppFeaturePackMarketplaceActionKind
   transitionPlan: CanvasAppFeaturePackStateTransitionPlan
 }): CanvasAppFeaturePackMarketplaceAction {
@@ -150,6 +161,7 @@ function createCanvasAppFeaturePackMarketplaceAction({
     blockedReasons: transitionPlan.blockedReasons,
     changedFeaturePackIds: transitionPlan.changedFeaturePackIds,
     featurePackStates: transitionPlan.featurePackStates,
+    installOptions,
     kind,
     partialUpdateSurfaceIds: transitionPlan.partialUpdateSurfaceIds,
     ready: applicable && transitionPlan.ready,

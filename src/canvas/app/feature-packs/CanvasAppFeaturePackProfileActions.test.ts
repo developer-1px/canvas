@@ -106,6 +106,22 @@ describe('CanvasAppFeaturePackProfileActions', () => {
         status: 'uninstalled',
       },
     ])
+    expect(action?.installOptions).toEqual({
+      featurePackStates: [
+        {
+          id: 'base-pack',
+          status: 'enabled',
+        },
+        {
+          id: 'inspector-pack',
+          status: 'enabled',
+        },
+        {
+          id: 'legacy-pack',
+          status: 'uninstalled',
+        },
+      ],
+    })
   })
 
   it('exposes unknown profile packs as blockers instead of throwing', () => {

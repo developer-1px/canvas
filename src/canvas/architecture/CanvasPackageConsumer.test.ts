@@ -958,12 +958,27 @@ describe('Canvas package consumer imports', () => {
       'disable',
       'uninstall',
     ])
+    expect(featurePackMarketplaceActionModel.items[0]?.actions.find(
+      (action) => action.kind === 'disable',
+    )?.installOptions).toEqual({
+      featurePackStates: [{
+        id: 'smoke-partial-pack',
+        status: 'disabled',
+      }],
+    })
     expect(featurePackProfileMarketplaceActionModel.items[0]?.profileId)
       .toBe('smoke-partial-profile')
     expect(featurePackProfileMarketplaceActionModel.items[0]?.primaryActionKind)
       .toBe('apply')
     expect(featurePackProfileMarketplaceActionModel.items[0]?.actions[0]?.kind)
       .toBe('apply')
+    expect(featurePackProfileMarketplaceActionModel.items[0]?.actions[0]
+      ?.installOptions).toEqual({
+      featurePackStates: [{
+        id: 'smoke-partial-pack',
+        status: 'enabled',
+      }],
+    })
     expect(featurePackSuiteMarketplaceActionModel.items[0]?.suiteId)
       .toBe('smoke-partial-suite')
     expect(featurePackSuiteMarketplaceActionModel.items[0]?.primaryActionKind)
@@ -976,6 +991,14 @@ describe('Canvas package consumer imports', () => {
       'disable',
       'uninstall',
     ])
+    expect(featurePackSuiteMarketplaceActionModel.items[0]?.actions.find(
+      (action) => action.kind === 'disable',
+    )?.installOptions).toEqual({
+      featurePackStates: [{
+        id: 'smoke-partial-pack',
+        status: 'disabled',
+      }],
+    })
     expect(featurePackPartialUpdatePlan.surfaceIds).toEqual(['overlay'])
     expect(featurePackPartialUpdatePlan.entries[0]?.runtimeToggleable)
       .toBe(true)
