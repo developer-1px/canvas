@@ -113,4 +113,17 @@ describe('getCanvasPasteOffset', () => {
       pasteIndex: 0,
     })
   })
+
+  test('starts paste index at zero when paste memory is missing', () => {
+    expect(
+      getCanvasPastePositionSession({
+        key: 'copy:a:slide-1',
+        memory: null,
+      }),
+    ).toEqual({
+      key: 'copy:a:slide-1',
+      nextMemory: { key: 'copy:a:slide-1', pasteIndex: 1 },
+      pasteIndex: 0,
+    })
+  })
 })
