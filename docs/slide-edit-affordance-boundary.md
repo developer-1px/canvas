@@ -255,7 +255,11 @@
 | Fields | one `inset-number` descriptor per side, routed through `update-text-frame-inset` |
 | Metadata | `data-slide-text-frame-inset` carries `top right bottom left` order |
 | Normalization | values clamp to 0..1000 px and round to two decimals |
+| JSON candidates | custom MIME, `application/json`, `text/json`, and `text/plain` are checked in order |
+| JSON payloads | generic JSON requires `textFrameInset`, `textInset`, `textPadding`, `inset`, or `padding`; custom MIME may carry a direct number, TRBL array, or side object |
+| Array order | array payloads use `top`, `right`, `bottom`, `left`; invalid side values are skipped |
 | Updates | selected text object id, side, and normalized inset value become host command effects |
+| No-op | empty target object lists produce an empty command list so hosts can continue paste fallback |
 | Runtime | stage, thumbnail, inspector, and export can read the same metadata value |
 
 ## DOM Hug/Fill vs Slide Text Auto-Fit

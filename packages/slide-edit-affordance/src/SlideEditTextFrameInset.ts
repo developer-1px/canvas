@@ -73,6 +73,35 @@ export type SlideEditTextFrameInsetHostCommandEffect<
   type: 'slide-command-effect'
 }
 
+export type SlideEditTextFrameInsetDataTransfer = Pick<DataTransfer, 'getData'>
+
+export type SlideEditTextFrameInsetPasteFieldValue = {
+  fieldId: SlideEditTextFrameInsetSide
+  value: number
+}
+
+export type SlideEditTextFrameInsetJSONPasteValue = {
+  fields: readonly SlideEditTextFrameInsetPasteFieldValue[]
+  inset: Partial<SlideEditTextFrameInset>
+  surface: 'text-frame-inset'
+}
+
+export type SlideEditTextFrameInsetJSONPasteInput = {
+  dataTransfer: SlideEditTextFrameInsetDataTransfer | null
+  jsonMimeType?: string
+}
+
+export type SlideEditTextFrameInsetPasteCommandsInput<
+  TSlideId extends SlideEditTextFrameInsetSlideId =
+    SlideEditTextFrameInsetSlideId,
+  TObjectId extends SlideEditTextFrameInsetObjectId =
+    SlideEditTextFrameInsetObjectId,
+> = {
+  objectIds: readonly TObjectId[]
+  pasteValue: SlideEditTextFrameInsetJSONPasteValue
+  slideId: TSlideId
+}
+
 export type SlideEditTextFrameInsetNumericLimits = {
   max: number
   min: number
@@ -136,6 +165,30 @@ export const SLIDE_EDIT_TEXT_FRAME_INSET_FIELDS = Object.freeze([
   },
 ] as const satisfies readonly SlideEditTextFrameInsetFieldDescriptor[])
 
+export const SLIDE_EDIT_TEXT_FRAME_INSET_JSON_MIME_TYPE =
+  'application/vnd.interactive-os.slide-edit.text-frame-inset+json'
+
+export const SLIDE_EDIT_TEXT_FRAME_INSET_JSON_TYPES = Object.freeze([
+  'application/json',
+  'text/json',
+  'text/plain',
+] as const)
+
+export const SLIDE_EDIT_TEXT_FRAME_INSET_JSON_WRAPPER_KEYS = Object.freeze([
+  'textFrameInset',
+  'textInset',
+  'textPadding',
+  'inset',
+  'padding',
+] as const)
+
+const SLIDE_EDIT_TEXT_FRAME_INSET_SIDES = Object.freeze([
+  'top',
+  'right',
+  'bottom',
+  'left',
+] as const satisfies readonly SlideEditTextFrameInsetSide[])
+
 export function createSlideEditTextFrameInsetDescriptor<
   TSlideId extends SlideEditTextFrameInsetSlideId,
   TObjectId extends SlideEditTextFrameInsetObjectId,
@@ -176,6 +229,67 @@ export function getSlideEditTextFrameInsetCommandEffect<
     },
     type: 'slide-command-effect',
   }
+}
+
+export function getSlideEditTextFrameInsetJSONPasteValue({
+  dataTransfer,
+  jsonMimeType = SLIDE_EDIT_TEXT_FRAME_INSET_JSON_MIME_TYPE,
+}: SlideEditTextFrameInsetJSONPasteInput):
+  SlideEditTextFrameInsetJSONPasteValue | null {
+  if (!dataTransfer) {
+    return null
+  }
+
+  if (jsonMimeType) {
+    const customText = dataTransfer.getData(jsonMimeType)
+
+    if (customText.trim()) {
+      const customValue = parseSlideEditTextFrameInsetJSON(customText)
+      const customPasteValue =
+        getSlideEditTextFrameInsetDirectPasteValue(customValue)
+
+      if (customPasteValue !== null) {
+        return customPasteValue
+      }
+    }
+  }
+
+  for (const type of SLIDE_EDIT_TEXT_FRAME_INSET_JSON_TYPES) {
+    const text = dataTransfer.getData(type)
+
+    if (!text.trim()) {
+      continue
+    }
+
+    const value = parseSlideEditTextFrameInsetJSON(text)
+    const pasteValue = getSlideEditTextFrameInsetWrappedPasteValue(value)
+
+    if (pasteValue !== null) {
+      return pasteValue
+    }
+  }
+
+  return null
+}
+
+export function getSlideEditTextFrameInsetPasteCommands<
+  TSlideId extends SlideEditTextFrameInsetSlideId,
+  TObjectId extends SlideEditTextFrameInsetObjectId,
+>({
+  objectIds,
+  pasteValue,
+  slideId,
+}: SlideEditTextFrameInsetPasteCommandsInput<TSlideId, TObjectId>):
+  readonly SlideEditTextFrameInsetUpdateCommand<TSlideId, TObjectId>[] {
+  return objectIds.flatMap((objectId) =>
+    pasteValue.fields.map((field) => ({
+      fieldId: field.fieldId,
+      id: 'update-text-frame-inset',
+      objectId,
+      slideId,
+      value: field.value,
+    }))
+  )
 }
 
 export function normalizeSlideEditTextFrameInsetUpdateCommand<
@@ -253,4 +367,152 @@ export function getSlideEditTextFrameInsetPaddingCSS(
     normalizedInset.bottom,
     normalizedInset.left,
   ].map((value) => `${value}px`).join(' ')
+}
+
+function getSlideEditTextFrameInsetDirectPasteValue(
+  value: unknown,
+): SlideEditTextFrameInsetJSONPasteValue | null {
+  const numericValue = getSlideEditTextFrameInsetJSONNumber(value)
+
+  if (numericValue !== null) {
+    return createSlideEditTextFrameInsetPasteValue(
+      SLIDE_EDIT_TEXT_FRAME_INSET_SIDES.map((side) => ({
+        fieldId: side,
+        value: numericValue,
+      })),
+    )
+  }
+
+  if (Array.isArray(value)) {
+    return createSlideEditTextFrameInsetPasteValue(
+      SLIDE_EDIT_TEXT_FRAME_INSET_SIDES.flatMap((side, index) => {
+        const sideValue = getSlideEditTextFrameInsetJSONValue(value[index])
+
+        return sideValue === null
+          ? []
+          : [
+            {
+              fieldId: side,
+              value: sideValue,
+            },
+          ]
+      }),
+    )
+  }
+
+  if (!value || typeof value !== 'object') {
+    return null
+  }
+
+  const record = value as Record<string, unknown>
+
+  return createSlideEditTextFrameInsetPasteValue(
+    SLIDE_EDIT_TEXT_FRAME_INSET_SIDES.flatMap((side) => {
+      if (!Object.hasOwn(record, side)) {
+        return []
+      }
+
+      const sideValue = getSlideEditTextFrameInsetJSONValue(record[side])
+
+      return sideValue === null
+        ? []
+        : [
+          {
+            fieldId: side,
+            value: sideValue,
+          },
+        ]
+    }),
+  )
+}
+
+function getSlideEditTextFrameInsetWrappedPasteValue(
+  value: unknown,
+): SlideEditTextFrameInsetJSONPasteValue | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null
+  }
+
+  const record = value as Record<string, unknown>
+
+  for (const key of SLIDE_EDIT_TEXT_FRAME_INSET_JSON_WRAPPER_KEYS) {
+    if (!Object.hasOwn(record, key)) {
+      continue
+    }
+
+    const pasteValue = getSlideEditTextFrameInsetDirectPasteValue(record[key])
+
+    if (pasteValue !== null) {
+      return pasteValue
+    }
+  }
+
+  return null
+}
+
+function createSlideEditTextFrameInsetPasteValue(
+  fields: readonly SlideEditTextFrameInsetPasteFieldValue[],
+): SlideEditTextFrameInsetJSONPasteValue | null {
+  if (fields.length === 0) {
+    return null
+  }
+
+  const inset: Partial<SlideEditTextFrameInset> = {}
+  const normalizedFields = fields.map((field) => ({
+    fieldId: field.fieldId,
+    value: normalizeSlideEditTextFrameInsetValue(field.value),
+  }))
+
+  for (const field of normalizedFields) {
+    inset[field.fieldId] = field.value
+  }
+
+  return {
+    fields: normalizedFields,
+    inset,
+    surface: 'text-frame-inset',
+  }
+}
+
+function getSlideEditTextFrameInsetJSONValue(value: unknown) {
+  const numericValue = getSlideEditTextFrameInsetJSONNumber(value)
+
+  return numericValue === null
+    ? null
+    : normalizeSlideEditTextFrameInsetValue(numericValue)
+}
+
+function getSlideEditTextFrameInsetJSONNumber(value: unknown) {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value
+  }
+
+  if (typeof value !== 'string') {
+    return null
+  }
+
+  const trimmedValue = value.trim()
+
+  if (!trimmedValue) {
+    return null
+  }
+
+  const numericText = trimmedValue.toLowerCase().endsWith('px')
+    ? trimmedValue.slice(0, -2).trim()
+    : trimmedValue
+  const numericValue = Number(numericText)
+
+  return Number.isFinite(numericValue) ? numericValue : null
+}
+
+function parseSlideEditTextFrameInsetJSON(value: string) {
+  if (!value.trim()) {
+    return null
+  }
+
+  try {
+    return JSON.parse(value) as unknown
+  } catch {
+    return null
+  }
 }
