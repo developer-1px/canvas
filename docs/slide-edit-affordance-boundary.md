@@ -324,6 +324,8 @@
 | Field | `opacity` slider descriptor routes through `update-object-opacity` |
 | Metadata | `data-slide-object-opacity` carries the normalized value as an attribute string |
 | Normalization | invalid values use `1`; valid values clamp to `0..1` and round to two decimals |
+| JSON candidates | custom MIME, `application/json`, `text/json`, and `text/plain` are checked in order |
+| JSON payloads | generic JSON requires `objectOpacity` or `objectOpacityValue`; custom MIME may carry a direct number, numeric string, `opacity`, or `value` |
 | Updates | selected object id and normalized opacity value become host command effects |
 | Runtime | stage, thumbnail, presentation, inspector, and export can read the same metadata value |
 
