@@ -64,6 +64,14 @@ export {
   type CanvasAppFeaturePackMarketplaceActionModel,
 } from './CanvasAppFeaturePackActions'
 export {
+  getCanvasAppFeaturePackSuiteMarketplaceActionModel,
+  type CanvasAppFeaturePackSuiteMarketplaceAction,
+  type CanvasAppFeaturePackSuiteMarketplaceActionItem,
+  type CanvasAppFeaturePackSuiteMarketplaceActionKind,
+  type CanvasAppFeaturePackSuiteMarketplaceActionModel,
+  type CanvasAppFeaturePackSuiteMarketplaceStatus,
+} from './CanvasAppFeaturePackSuiteActions'
+export {
   getCanvasAppFeaturePackCatalog,
   type CanvasAppFeaturePackCatalog,
   type CanvasAppFeaturePackCatalogBlockedReason,

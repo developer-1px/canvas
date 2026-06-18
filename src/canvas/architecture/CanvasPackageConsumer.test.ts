@@ -75,6 +75,7 @@ import {
   getCanvasAppFeaturePackProfileById,
   getCanvasAppFeaturePackProfileRuntimeStates,
   getCanvasAppFeaturePackMarketplaceActionModel,
+  getCanvasAppFeaturePackSuiteMarketplaceActionModel,
   getCanvasAppFeaturePackCatalog,
   getCanvasAppFeaturePackInstallPlan,
   getCanvasAppFeaturePackPartialUpdatePlan,
@@ -115,6 +116,7 @@ import {
   type CanvasComponentInspectorPanelModel,
   type CanvasAppFeaturePack,
   type CanvasAppFeaturePackMarketplaceActionModel,
+  type CanvasAppFeaturePackSuiteMarketplaceActionModel,
   type CanvasAppFeaturePackCatalog,
   type CanvasAppFeaturePackCatalogItem,
   type CanvasAppFeaturePackInstallPlan,
@@ -423,6 +425,12 @@ describe('Canvas package consumer imports', () => {
           runtimeToggleable: true,
         },
       })
+    const partialUpdateSuiteManifest: CanvasAppFeaturePackSuiteManifest =
+      createCanvasAppFeaturePackSuiteManifest({
+        featurePackIds: ['smoke-partial-pack'],
+        id: 'smoke-partial-suite',
+        label: 'Smoke partial suite',
+      })
     const aiLabsManifest = createCanvasAppAiLabsFeaturePackManifest({
       provider: {
         complete: () => ({ text: 'Summary' }),
@@ -468,6 +476,12 @@ describe('Canvas package consumer imports', () => {
       CanvasAppFeaturePackMarketplaceActionModel =
         getCanvasAppFeaturePackMarketplaceActionModel({
           manifests: [partialUpdateManifest],
+        })
+    const featurePackSuiteMarketplaceActionModel:
+      CanvasAppFeaturePackSuiteMarketplaceActionModel =
+        getCanvasAppFeaturePackSuiteMarketplaceActionModel({
+          manifests: [partialUpdateManifest],
+          suiteManifests: [partialUpdateSuiteManifest],
         })
     const featurePackPartialUpdatePlan:
       CanvasAppFeaturePackPartialUpdatePlan =
@@ -910,6 +924,18 @@ describe('Canvas package consumer imports', () => {
       'disable',
       'uninstall',
     ])
+    expect(featurePackSuiteMarketplaceActionModel.items[0]?.suiteId)
+      .toBe('smoke-partial-suite')
+    expect(featurePackSuiteMarketplaceActionModel.items[0]?.primaryActionKind)
+      .toBe('disable')
+    expect(featurePackSuiteMarketplaceActionModel.items[0]?.actions.map(
+      (action) => action.kind,
+    )).toEqual([
+      'install',
+      'enable',
+      'disable',
+      'uninstall',
+    ])
     expect(featurePackPartialUpdatePlan.surfaceIds).toEqual(['overlay'])
     expect(featurePackPartialUpdatePlan.entries[0]?.runtimeToggleable)
       .toBe(true)
@@ -1291,6 +1317,12 @@ describe('Canvas package consumer imports', () => {
     expect(CanvasAppFacade.getCanvasAppFeaturePackMarketplaceActionModel)
       .toBeTypeOf('function')
     expect(CanvasPackage.getCanvasAppFeaturePackMarketplaceActionModel)
+      .toBeTypeOf('function')
+    expect(CanvasAppAuthoring.getCanvasAppFeaturePackSuiteMarketplaceActionModel)
+      .toBeTypeOf('function')
+    expect(CanvasAppFacade.getCanvasAppFeaturePackSuiteMarketplaceActionModel)
+      .toBeTypeOf('function')
+    expect(CanvasPackage.getCanvasAppFeaturePackSuiteMarketplaceActionModel)
       .toBeTypeOf('function')
     expect(CanvasAppAuthoring.getCanvasAppFeaturePackInstallPlan)
       .toBeTypeOf('function')
