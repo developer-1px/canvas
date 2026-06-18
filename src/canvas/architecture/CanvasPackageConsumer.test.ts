@@ -1369,6 +1369,17 @@ describe('Canvas package consumer imports', () => {
         itemCount: 2,
         key: 'ArrowDown',
       }
+    const appFacadeHtmlImageDataTransfer = {
+      getData: (type: string) =>
+        type === 'text/html'
+          ? '<figure><img alt="One" src="data:image/webp;base64,aW1hZ2U="></figure>'
+          : '',
+    } as unknown as DataTransfer
+    const appFacadeStageElement = {
+      getScreenPoint: () => ({ x: 410, y: 260 }),
+      getViewportCenter: () => ({ x: 100, y: 120 }),
+    }
+    const appFacadeViewport = { scale: 2, x: 10, y: 20 }
 
     expect(CanvasApp).toBeTypeOf('function')
     expect('useCanvasAppModel' in CanvasPackage).toBe(false)
@@ -1633,6 +1644,96 @@ describe('Canvas package consumer imports', () => {
       .toBeTypeOf('function')
     expect(CanvasPackage.routeCanvasTextPasteReplace)
       .toBeTypeOf('function')
+    expect(CanvasAppFacade.CANVAS_IMAGE_IMPORT_MODEL).toBe(
+      'canvas-image-import',
+    )
+    expect(CanvasAppFacade.getCanvasImageFilesFromDataTransfer(null)).toEqual(
+      [],
+    )
+    expect(
+      CanvasAppFacade.getCanvasHTMLDataImageSourcesFromDataTransfer(
+        appFacadeHtmlImageDataTransfer,
+      ),
+    ).toEqual([{
+      dataUrl: 'data:image/webp;base64,aW1hZ2U=',
+      format: 'data-url-html-img',
+      mimeType: 'image/webp',
+      name: 'One.webp',
+    }])
+    expect(CanvasAppFacade.getCanvasImageInsertCenter({
+      event: { clientX: 410, clientY: 260 },
+      stageElement: appFacadeStageElement as never,
+      viewport: appFacadeViewport,
+    })).toEqual({ x: 200, y: 120 })
+    expect(CanvasAppFacade.CANVAS_TABLE_IMPORT_MODEL).toBe(
+      'canvas-table-import',
+    )
+    expect(CanvasAppFacade.getCanvasTableFilesFromDataTransfer(null)).toEqual(
+      [],
+    )
+    expect(CanvasAppFacade.getCanvasTableSourceFromText(
+      'Name,Owner\nImport,Mina',
+      { format: 'text-csv' },
+    )).toEqual({
+      format: 'text-csv',
+      rows: [
+        ['Name', 'Owner'],
+        ['Import', 'Mina'],
+      ],
+    })
+    expect(CanvasAppFacade.getCanvasTableInsertCenter({
+      event: { clientX: 410, clientY: 260 },
+      stageElement: appFacadeStageElement as never,
+      viewport: appFacadeViewport,
+    })).toEqual({ x: 200, y: 120 })
+    expect(CanvasAppFacade.CANVAS_TEXT_PASTE_IMPORT_MODEL).toBe(
+      'canvas-text-paste-import',
+    )
+    expect(CanvasAppFacade.getCanvasRichTextPasteSourceFromHTML(
+      '<p style="text-align: center; line-height: 1.5; margin-top: 8px; margin-bottom: 12px"><span style="font-size: 16px"><strong>Hello</strong></span></p>',
+    )).toMatchObject({
+      format: 'text-html-rich',
+      paragraphs: [{
+        align: 'center',
+        lineHeight: 1.5,
+        runs: [{
+          bold: true,
+          fontSize: 16,
+          text: 'Hello',
+        }],
+        spacingAfter: 12,
+        spacingBefore: 8,
+      }],
+      text: 'Hello',
+    })
+    expect(CanvasAppFacade.getCanvasTextPasteSourcesFromDataTransfer(null))
+      .toEqual([])
+    expect(CanvasAppFacade.getCanvasTextPasteInsertPosition({
+      event: { clientX: 410, clientY: 260 },
+      stageElement: appFacadeStageElement as never,
+      viewport: appFacadeViewport,
+    })).toEqual({ x: 200, y: 120 })
+    expect(() => CanvasAppFacade.assertCanvasTextPasteImporter({
+      createItems: () => [],
+      id: 'consumer-text',
+    })).not.toThrow()
+    expect(CanvasAppFacade.CANVAS_MEDIA_IMPORT_MODEL).toBe(
+      'canvas-media-import',
+    )
+    expect(CanvasAppFacade.getCanvasMediaSourceFromText(
+      '<iframe src="https://www.youtube.com/embed/demo"></iframe>',
+    )).toEqual({
+      url: 'https://www.youtube.com/embed/demo',
+    })
+    expect(CanvasAppFacade.getCanvasMediaInsertPosition({
+      event: { clientX: 410, clientY: 260 },
+      stageElement: appFacadeStageElement as never,
+      viewport: appFacadeViewport,
+    })).toEqual({ x: 200, y: 120 })
+    expect(() => CanvasAppFacade.assertCanvasMediaImporter({
+      createItems: () => [],
+      id: 'consumer-media',
+    })).not.toThrow()
     expect(CanvasAppAuthoring.getCanvasAppFeaturePackCatalog)
       .toBeTypeOf('function')
     expect(CanvasAppFacade.getCanvasAppFeaturePackCatalog)

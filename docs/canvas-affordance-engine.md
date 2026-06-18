@@ -38,6 +38,17 @@
 | Metadata | Registry metadata exposes id, title, supported formats, mode, scope, and actual execution order for UI/debug/tests |
 | Runtime | Host apps own concrete action payloads, item creation, placement, persistence, and command dispatch |
 
+## App Package Host Affordance Surface Contract
+
+| 영역 | 계약 |
+| --- | --- |
+| Public entry | Host App은 내부 `canvas/app/feature-packs/*` 경로 대신 `@interactive-os/canvas/app` facade에서 UI-free affordance helper를 import한다 |
+| Import source | Image, table, text, media import source parser와 batch file extractor는 `canvas/app`에서 직접 접근 가능해야 한다 |
+| Model metadata | Image/table/text/media import model id는 Host App registry와 debug UI가 내부 파일 경로를 열지 않고 참조할 수 있게 `canvas/app`에서 제공한다 |
+| Insertion helpers | Pointer/drop 위치 계산과 source-to-item insertion helper는 Host 저장 모델을 주입받는 함수로 열고 concrete CanvasItem storage에는 의존하지 않는다 |
+| Descriptor validation | Text/media importer descriptor validator는 feature pack 설치 단위에서 재사용할 수 있게 `canvas/app` public surface에 둔다 |
+| Export map | 이 계약은 새 package subpath를 늘리지 않고 기존 `canvas/app` facade를 확장하며, package manifest export map은 별도 이슈가 있을 때만 변경한다 |
+
 ## Image HTML Data Source Batch Contract
 
 | Area | Contract |
