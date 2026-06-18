@@ -16,6 +16,7 @@
 | Slide command effects | `slide-edit-affordance` | product-neutral command envelopes routed to the host |
 | Slide rail interaction | `slide-edit-affordance` | active slide, slide order, thumbnail hit target, rail command intent |
 | Color swatch palette | `slide-edit-affordance` | theme/recent color swatches, channel state, and color apply command effect |
+| Comment thread patch | `slide-edit-affordance` | comment/thread JSON paste parsing, common patch normalization, and host command effect |
 | Placeholder visibility affordance | `slide-edit-affordance` | slide placeholder structure and object hide/show read model |
 | Table rows patch | `slide-edit-affordance` | table rows JSON paste parsing, row matrix normalization, and host command effect |
 | Object layer pane | `slide-edit-affordance` | object row descriptor, selection pane command intent, ARIA tree contract |
