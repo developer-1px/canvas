@@ -336,6 +336,8 @@
 | Bounds | numeric bounds are `0..1` with `0.01` step |
 | Metadata | `data-slide-object-fill-opacity` carries the normalized value or `unsupported` |
 | Unsupported | objects without fill can expose `isSupported: false` and reason `no-fill` |
+| JSON candidates | custom MIME, `application/json`, `text/json`, and `text/plain` are checked in order |
+| JSON payloads | generic JSON requires `objectFillOpacity`, `shapeFillOpacity`, or `fillOpacity`; custom MIME may carry a direct number, numeric string, `fillOpacity`, `opacity`, or `value` |
 | Independence | only fill alpha changes; object opacity, stroke opacity, and text opacity stay separate |
 | Updates | selected object id and normalized fill opacity value become host command effects |
 | Runtime | stage, thumbnail, presentation, inspector, and export can read the same metadata value |

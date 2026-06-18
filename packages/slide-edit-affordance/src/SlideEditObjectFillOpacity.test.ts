@@ -3,14 +3,20 @@ import { describe, expect, it } from 'vitest'
 import {
   createSlideEditObjectFillOpacityDescriptor,
   getSlideEditObjectFillOpacityCommandEffect,
+  getSlideEditObjectFillOpacityJSONPasteValue,
   getSlideEditObjectFillOpacityMetadata,
+  getSlideEditObjectFillOpacityPasteCommand,
   normalizeSlideEditObjectFillOpacity,
   SLIDE_EDIT_OBJECT_FILL_OPACITY_DATA_ATTRIBUTE,
   SLIDE_EDIT_OBJECT_FILL_OPACITY_DEFAULT,
   SLIDE_EDIT_OBJECT_FILL_OPACITY_FIELD,
+  SLIDE_EDIT_OBJECT_FILL_OPACITY_JSON_MIME_TYPE,
   SLIDE_EDIT_OBJECT_FILL_OPACITY_LIMITS,
   toSlideEditObjectFillOpacityAttributeValue,
 } from './SlideEditObjectFillOpacity'
+import {
+  getSlideEditObjectFillOpacityJSONPasteValue as getSlideEditObjectFillOpacityJSONPasteValueFromPackage,
+} from './index'
 
 describe('SlideEditObjectFillOpacity', () => {
   it('creates a supported fill opacity descriptor with fully opaque as default', () => {
@@ -133,6 +139,119 @@ describe('SlideEditObjectFillOpacity', () => {
     }).payload.value).toBe(1)
   })
 
+  it('reads custom MIME direct fill opacity JSON values first', () => {
+    expect(getSlideEditObjectFillOpacityJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_OBJECT_FILL_OPACITY_JSON_MIME_TYPE]: '"0.62"',
+        'application/json': '{"fillOpacity":0.2}',
+      }),
+    })).toEqual({
+      value: 0.62,
+    })
+    expect(getSlideEditObjectFillOpacityJSONPasteValueFromPackage({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_OBJECT_FILL_OPACITY_JSON_MIME_TYPE]:
+          '{"opacity":"0.335"}',
+      }),
+    })).toEqual({
+      value: 0.34,
+    })
+  })
+
+  it('reads explicit fill opacity wrappers from general JSON candidates', () => {
+    expect(getSlideEditObjectFillOpacityJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'application/json': '{"objectFillOpacity":{"value":"0.62"}}',
+      }),
+    })).toEqual({
+      value: 0.62,
+    })
+    expect(getSlideEditObjectFillOpacityJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/json': '{"shapeFillOpacity":0.335}',
+      }),
+    })).toEqual({
+      value: 0.34,
+    })
+    expect(getSlideEditObjectFillOpacityJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"fillOpacity":{"value":1.2}}',
+      }),
+    })).toEqual({
+      value: 1,
+    })
+    expect(getSlideEditObjectFillOpacityJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"fillOpacity":0}',
+      }),
+    })).toEqual({
+      value: 0,
+    })
+  })
+
+  it('converts fill opacity paste values into host commands', () => {
+    const pasteValue = getSlideEditObjectFillOpacityJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"fillOpacity":"0.62"}',
+      }),
+    })
+
+    expect(getSlideEditObjectFillOpacityPasteCommand({
+      objectId: 'object-a',
+      pasteValue: pasteValue!,
+      slideId: 'slide-a',
+    })).toEqual({
+      fieldId: 'fillOpacity',
+      id: 'update-object-fill-opacity',
+      objectId: 'object-a',
+      slideId: 'slide-a',
+      value: 0.62,
+    })
+    expect(getSlideEditObjectFillOpacityCommandEffect(
+      getSlideEditObjectFillOpacityPasteCommand({
+        objectId: 'object-a',
+        pasteValue: pasteValue!,
+        slideId: 'slide-a',
+      }),
+    ).type).toBe('slide-command-effect')
+  })
+
+  it('ignores invalid, object opacity, and unrelated fill opacity JSON', () => {
+    expect(getSlideEditObjectFillOpacityJSONPasteValue({
+      dataTransfer: null,
+    })).toBeNull()
+    expect(getSlideEditObjectFillOpacityJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '0.62',
+      }),
+    })).toBeNull()
+    expect(getSlideEditObjectFillOpacityJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"opacity":0.62}',
+      }),
+    })).toBeNull()
+    expect(getSlideEditObjectFillOpacityJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"unrelated":0.62}',
+      }),
+    })).toBeNull()
+    expect(getSlideEditObjectFillOpacityJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"fillOpacity":"transparent"}',
+      }),
+    })).toBeNull()
+    expect(getSlideEditObjectFillOpacityJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_OBJECT_FILL_OPACITY_JSON_MIME_TYPE]: 'not json',
+      }),
+    })).toBeNull()
+    expect(getSlideEditObjectFillOpacityJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_OBJECT_FILL_OPACITY_JSON_MIME_TYPE]: '"Infinity"',
+      }),
+    })).toBeNull()
+  })
+
   it('does not collapse fill opacity into object opacity or product terms', () => {
     const publicStrings = JSON.stringify({
       descriptor: createSlideEditObjectFillOpacityDescriptor({
@@ -160,3 +279,9 @@ describe('SlideEditObjectFillOpacity', () => {
     }
   })
 })
+
+function createDataTransfer(values: Record<string, string>) {
+  return {
+    getData: (type: string) => values[type] ?? '',
+  }
+}
