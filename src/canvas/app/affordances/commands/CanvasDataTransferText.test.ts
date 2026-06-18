@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import {
   getCanvasDataTransferText,
+  readCanvasDataTransferJSONCandidate,
   setCanvasDataTransferDropEffect,
   setCanvasDataTransferText,
   type CanvasTextDataTransfer,
@@ -56,5 +57,127 @@ describe('CanvasDataTransferText', () => {
       dataTransfer: null,
       dropEffect: 'move',
     })).toBe(false)
+  })
+
+  it('reads the first JSON candidate accepted by the host parser', () => {
+    const getData = vi.fn((format: string) => {
+      if (format === 'application/vnd.host.card+json') {
+        return '{'
+      }
+
+      if (format === 'application/json') {
+        return JSON.stringify({ kind: 'ignored-card', title: 'Draft' })
+      }
+
+      if (format === 'text/plain') {
+        return JSON.stringify({ kind: 'host-card', title: 'Final' })
+      }
+
+      return ''
+    })
+
+    const result = readCanvasDataTransferJSONCandidate({
+      candidates: [
+        {
+          mimeType: 'application/vnd.host.card+json',
+          source: 'custom',
+        },
+        {
+          mimeType: 'application/json',
+          source: 'generic-json',
+        },
+        {
+          mimeType: 'text/plain',
+          source: 'plain-text',
+        },
+      ],
+      dataTransfer: { getData },
+      parseValue: ({ json, source }) => {
+        if (
+          typeof json !== 'object' ||
+          json === null ||
+          !('kind' in json) ||
+          json.kind !== 'host-card' ||
+          !('title' in json)
+        ) {
+          throw new Error('Invalid host card JSON')
+        }
+
+        return {
+          source,
+          title: String(json.title),
+        }
+      },
+    })
+
+    expect(result).toEqual({
+      candidate: {
+        mimeType: 'text/plain',
+        source: 'plain-text',
+      },
+      candidateIndex: 2,
+      mimeType: 'text/plain',
+      rawText: JSON.stringify({ kind: 'host-card', title: 'Final' }),
+      source: 'plain-text',
+      value: {
+        source: 'plain-text',
+        title: 'Final',
+      },
+    })
+    expect(Object.isFrozen(result)).toBe(true)
+    expect(getData).toHaveBeenCalledTimes(3)
+    expect(getData.mock.calls.map(([format]) => format)).toEqual([
+      'application/vnd.host.card+json',
+      'application/json',
+      'text/plain',
+    ])
+  })
+
+  it('returns parsed JSON when no host parser is provided', () => {
+    expect(readCanvasDataTransferJSONCandidate({
+      candidates: [{
+        mimeType: 'application/json',
+        source: 'generic-json',
+      }],
+      dataTransfer: {
+        getData: (format) =>
+          format === 'application/json' ? '{"ok":true}' : '',
+      },
+    })).toMatchObject({
+      candidateIndex: 0,
+      mimeType: 'application/json',
+      source: 'generic-json',
+      value: {
+        ok: true,
+      },
+    })
+  })
+
+  it('returns null when JSON candidates are unavailable or invalid', () => {
+    expect(readCanvasDataTransferJSONCandidate({
+      candidates: [{
+        mimeType: 'application/json',
+      }],
+      dataTransfer: null,
+    })).toBeNull()
+    expect(readCanvasDataTransferJSONCandidate({
+      candidates: [
+        { mimeType: 'application/json' },
+        { mimeType: 'text/plain' },
+      ],
+      dataTransfer: {
+        getData: () => '   ',
+      },
+    })).toBeNull()
+    expect(readCanvasDataTransferJSONCandidate({
+      candidates: [
+        { mimeType: 'application/json' },
+        { mimeType: 'text/plain' },
+      ],
+      dataTransfer: {
+        getData: (format) =>
+          format === 'application/json' ? '   ' : 'not-json',
+      },
+    })).toBeNull()
   })
 })

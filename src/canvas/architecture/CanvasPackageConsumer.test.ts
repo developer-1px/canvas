@@ -5,6 +5,7 @@ import * as CanvasAppFacade from '@interactive-os/canvas/app'
 import type {
   CanvasDataTransferImportActionPlanRunInput,
   CanvasDataTransferImportActionPlanRunResult,
+  CanvasDataTransferJSONCandidateReadResult,
   CanvasWheelViewportEvent,
   CanvasWheelViewportSetter,
   RunCanvasWheelViewportArgs,
@@ -93,6 +94,7 @@ import {
   createCanvasStoryCanvasFeaturePackManifests,
   createCanvasStoryPreviewItemsFeaturePackManifest,
   getCanvasDataTransferText,
+  readCanvasDataTransferJSONCandidate,
   getCanvasEraserHitStrokeIds,
   getCanvasExternalClipboardPasteCommandRoute,
   getCanvasRichClipboardJSONFromHTML,
@@ -4768,6 +4770,67 @@ describe('Canvas package consumer imports', () => {
       .toBe(duplicateCanvasClipboardSelection)
     expect(CanvasAppFacade.pasteCanvasClipboardSelection)
       .toBe(pasteCanvasClipboardSelection)
+    const packageJsonDataTransfer = {
+      getData: (format: string) => {
+        if (format === 'application/vnd.host.card+json') {
+          return '{'
+        }
+
+        if (format === 'application/json') {
+          return JSON.stringify({ kind: 'host-card', title: 'Package' })
+        }
+
+        return ''
+      },
+    }
+    const packageJsonCandidateResult:
+      CanvasDataTransferJSONCandidateReadResult<{
+        title: string
+      }> | null = readCanvasDataTransferJSONCandidate({
+        candidates: [
+          {
+            mimeType: 'application/vnd.host.card+json',
+            source: 'custom',
+          },
+          {
+            mimeType: 'application/json',
+            source: 'generic-json',
+          },
+          {
+            mimeType: 'text/plain',
+            source: 'plain-text',
+          },
+        ],
+        dataTransfer: packageJsonDataTransfer,
+        parseValue: ({ json }) => {
+          if (
+            typeof json !== 'object' ||
+            json === null ||
+            !('kind' in json) ||
+            json.kind !== 'host-card' ||
+            !('title' in json)
+          ) {
+            throw new Error('Invalid package host card')
+          }
+
+          return {
+            title: String(json.title),
+          }
+        },
+      })
+
+    expect(packageJsonCandidateResult).toMatchObject({
+      candidateIndex: 1,
+      mimeType: 'application/json',
+      source: 'generic-json',
+      value: {
+        title: 'Package',
+      },
+    })
+    expect(CanvasAppFacade.readCanvasDataTransferJSONCandidate)
+      .toBe(readCanvasDataTransferJSONCandidate)
+    expect(CanvasPackage.readCanvasDataTransferJSONCandidate)
+      .toBe(readCanvasDataTransferJSONCandidate)
     expect(setCanvasDataTransferText({
       dataTransfer: null,
       text: 'smoke',
