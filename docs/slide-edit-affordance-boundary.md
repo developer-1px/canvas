@@ -533,6 +533,18 @@
 | Selection | exactly one supported image target can produce a command effect |
 | No-op | locked, hidden, mixed, and unsupported targets return unavailable route metadata |
 
+## Object Image Crop JSON Paste Contract
+
+| Area | Contract |
+| --- | --- |
+| Fields | `fit`, `x`, and `y`; `x`/`y` may be direct fields or nested under `crop` |
+| JSON candidates | image-crop custom MIME, `application/json`, `text/json`, and `text/plain` are checked in order |
+| JSON payloads | custom MIME may carry direct `{ fit, crop: { x, y } }` or `{ fit, x, y }`; generic JSON requires `imageCrop`, `objectImageCrop`, or `crop` wrapper |
+| Source fields | paste values expose applied field ids and source field paths such as `fit`, `crop.x`, and wrapper metadata |
+| Updates | each supported image target receives one `update-object-image-crop` command effect per pasted field |
+| No-op | parse failure, unwrapped generic JSON, missing fields, locked target, hidden target, and unsupported target do not apply a crop update |
+| Runtime | host owns image object detection, actual crop storage mutation, undo/redo grouping, and rendering/export mapping |
+
 ## Comment Thread Patch Contract
 
 | Area | Contract |
