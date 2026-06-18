@@ -20,6 +20,7 @@ export {
   insertCanvasTableSource,
   readCanvasTableCsvFileSource,
   readCanvasTableFileSource,
+  readCanvasTableFileSources,
   normalizeCanvasTableRows,
   routeCanvasTableImportTargetReplace,
   type CanvasTableComponentSize,

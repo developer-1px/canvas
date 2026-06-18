@@ -13,6 +13,7 @@ import {
   getCanvasTableSourceFromText,
   insertCanvasTableSource,
   normalizeCanvasTableRows,
+  readCanvasTableFileSources,
   readCanvasTableFileSource,
   routeCanvasTableImportTargetReplace,
 } from './CanvasTableImport'
@@ -99,6 +100,42 @@ describe('CanvasTableImport', () => {
         ['Users', '42'],
       ],
     })
+  })
+
+  it('reads multiple table files into source arrays', async () => {
+    const csvFile = createTableFile('metrics.csv', 'text/csv', 1)
+    const ignoredFile = createTableFile('notes.txt', 'text/plain', 2)
+    const failedFile = createFailingTableFile('broken.csv', 'text/csv')
+    const tsvFile = createTableFile(
+      'roadmap.tsv',
+      'text/tab-separated-values',
+      3,
+      'Phase\tOwner\nImport\tMina',
+    )
+
+    await expect(readCanvasTableFileSources([
+      csvFile,
+      ignoredFile,
+      failedFile,
+      tsvFile,
+    ])).resolves.toEqual([
+      {
+        format: 'text-csv',
+        name: 'metrics.csv',
+        rows: [
+          ['Metric', 'Value'],
+          ['Users', '42'],
+        ],
+      },
+      {
+        format: 'text-tsv',
+        name: 'roadmap.tsv',
+        rows: [
+          ['Phase', 'Owner'],
+          ['Import', 'Mina'],
+        ],
+      },
+    ])
   })
 
   it('keeps the single DataTransfer file helper focused on DataTransfer.files', () => {
@@ -522,11 +559,23 @@ function createTableFile(
   name: string,
   type: string,
   lastModified = 0,
+  text = 'Metric,Value\nUsers,42',
 ) {
-  return Object.assign(new Blob(['Metric,Value\nUsers,42'], { type }), {
+  return Object.assign(new Blob([text], { type }), {
     lastModified,
     name,
   }) as File
+}
+
+function createFailingTableFile(
+  name: string,
+  type: string,
+) {
+  return {
+    name,
+    text: vi.fn(() => Promise.reject(new Error('read failed'))),
+    type,
+  } as unknown as File
 }
 
 function createFileList(files: readonly File[]): FileList {

@@ -53,6 +53,7 @@ import {
   createCanvasRichClipboardHTML,
   createCanvasPlainTextPasteSource,
   routeCanvasImagePasteReplace,
+  readCanvasTableFileSources,
   routeCanvasMediaSourceObjectHyperlink,
   routeCanvasTableImportTargetReplace,
   routeCanvasTextPasteReplace,
@@ -2386,6 +2387,31 @@ describe('Canvas package consumer imports', () => {
     expect(CanvasAppFacade.getCanvasTableFilesFromDataTransfer(null)).toEqual(
       [],
     )
+    expect(CanvasAppAuthoring.readCanvasTableFileSources)
+      .toBe(readCanvasTableFileSources)
+    expect(CanvasAppFacade.readCanvasTableFileSources)
+      .toBe(readCanvasTableFileSources)
+    expect(CanvasPackage.readCanvasTableFileSources)
+      .toBe(readCanvasTableFileSources)
+    await expect(readCanvasTableFileSources([
+      Object.assign(new Blob(['Name,Owner\nImport,Mina'], {
+        type: 'text/csv',
+      }), {
+        name: 'consumer.csv',
+      }),
+      Object.assign(new Blob(['ignored'], {
+        type: 'text/plain',
+      }), {
+        name: 'notes.txt',
+      }),
+    ])).resolves.toEqual([{
+      format: 'text-csv',
+      name: 'consumer.csv',
+      rows: [
+        ['Name', 'Owner'],
+        ['Import', 'Mina'],
+      ],
+    }])
     expect(CanvasAppFacade.getCanvasTableSourceFromText(
       'Name,Owner\nImport,Mina',
       { format: 'text-csv' },

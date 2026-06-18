@@ -293,6 +293,7 @@ export {
   getCanvasMediaSourceFromDataTransfer,
   getCanvasMediaSourceFromJSONDataTransfer,
   getCanvasMediaSourceFromText,
+  readCanvasTableFileSources,
   routeCanvasMediaSourceObjectHyperlink,
   routeCanvasTableImportTargetReplace,
   routeCanvasTextPasteReplace,

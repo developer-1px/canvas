@@ -401,6 +401,7 @@ export {
 } from './story-canvas'
 export {
   CANVAS_APP_TABLE_IMPORT_FEATURE_PACK_MANIFEST,
+  readCanvasTableFileSources,
   routeCanvasTableImportTargetReplace,
   useCanvasTableImport,
   type CanvasTableImportSource,

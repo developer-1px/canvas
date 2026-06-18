@@ -390,6 +390,7 @@ export {
   normalizeCanvasTableRows,
   readCanvasTableCsvFileSource,
   readCanvasTableFileSource,
+  readCanvasTableFileSources,
   type CanvasTableComponentSize,
   type CanvasTableComponentSizeInput,
   type CanvasTableComponentSizeOptions,

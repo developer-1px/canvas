@@ -237,6 +237,26 @@ export async function readCanvasTableFileSource(
   })
 }
 
+export async function readCanvasTableFileSources(
+  files: readonly (Blob & { name?: string })[],
+): Promise<CanvasTableImportSource[]> {
+  const sources: CanvasTableImportSource[] = []
+
+  for (const file of files) {
+    try {
+      const source = await readCanvasTableFileSource(file)
+
+      if (source) {
+        sources.push(source)
+      }
+    } catch {
+      continue
+    }
+  }
+
+  return sources
+}
+
 export function getCanvasTableCsvFileFromList(files: FileList | null) {
   return Array.from(files ?? []).find(isCanvasTableCsvFile) ?? null
 }
