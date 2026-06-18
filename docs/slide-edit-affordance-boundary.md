@@ -442,6 +442,11 @@
 | Placeholder mapping | placeholder id, role, title, default bounds, locked state, visible state, and optional default style token refs |
 | Style inheritance | theme default style < master default style < layout default style < placeholder default style |
 | Apply layout | host command effect carries whether existing objects are preserved or mapped to placeholders |
+| Layout JSON candidates | layout-placeholder custom MIME, `application/json`, `text/json`, and `text/plain` are checked in order |
+| Layout JSON payloads | direct or wrapped `layoutId`, `themeId`, `hiddenPlaceholderIds`, `visiblePlaceholderIds`, and `placeholderVisibility` are normalized |
+| Placeholder visibility | known placeholder ids become `set-placeholder-visibility` command effects; unknown ids are filtered out |
+| Theme id | known theme id is returned as validated metadata; host owns product-specific theme application |
+| No-op | parse failure, unknown ids only, or missing applicable fields produce `null` |
 
 ## Color Swatch Palette Contract
 

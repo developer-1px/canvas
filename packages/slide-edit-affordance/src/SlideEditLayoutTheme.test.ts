@@ -4,13 +4,19 @@ import {
   createSlideEditLayoutPlaceholderDescriptor,
   createSlideEditThemeDescriptor,
   getSlideEditLayoutApplyCommandEffect,
+  getSlideEditLayoutJSONPasteCommandEffects,
+  getSlideEditLayoutJSONPasteValue,
   getSlideEditLayoutPlaceholderVisibilityDescriptor,
   getSlideEditResolvedLayoutPlaceholder,
   SLIDE_EDIT_LAYOUT_COMMANDS,
+  SLIDE_EDIT_LAYOUT_JSON_MIME_TYPE,
   type SlideEditLayoutDescriptor,
   type SlideEditLayoutPlaceholderDescriptor,
   type SlideEditMasterDescriptor,
 } from './SlideEditLayoutTheme'
+import {
+  getSlideEditLayoutJSONPasteValue as getSlideEditLayoutJSONPasteValueFromPackage,
+} from './index'
 
 describe('SlideEditLayoutTheme', () => {
   const theme = createSlideEditThemeDescriptor({
@@ -280,10 +286,223 @@ describe('SlideEditLayoutTheme', () => {
     }).payload.objectMappings).toEqual([])
   })
 
+  it('reads layout placeholder custom MIME JSON values first', () => {
+    expect(getSlideEditLayoutJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_LAYOUT_JSON_MIME_TYPE]: JSON.stringify({
+          hiddenPlaceholderIds: [' body-slot '],
+          layoutId: ' layout-title-body ',
+          themeId: ' theme-a ',
+          visiblePlaceholderIds: ['title-slot'],
+        }),
+        'application/json': '{"layoutId":"ignored-layout"}',
+      }),
+    })).toEqual({
+      layoutId: 'layout-title-body',
+      placeholderVisibility: [
+        {
+          isVisible: false,
+          placeholderId: 'body-slot',
+          sourceField: 'hiddenPlaceholderIds',
+        },
+        {
+          isVisible: true,
+          placeholderId: 'title-slot',
+          sourceField: 'visiblePlaceholderIds',
+        },
+      ],
+      surface: 'layout-placeholder',
+      themeId: 'theme-a',
+    })
+
+    expect(getSlideEditLayoutJSONPasteValueFromPackage({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_LAYOUT_JSON_MIME_TYPE]:
+          '{"layoutId":"layout-title-body"}',
+      }),
+    })).toMatchObject({
+      layoutId: 'layout-title-body',
+      surface: 'layout-placeholder',
+    })
+  })
+
+  it('reads wrapped placeholder visibility object and array payloads', () => {
+    expect(getSlideEditLayoutJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/json': JSON.stringify({
+          layoutPlaceholder: {
+            placeholderVisibility: {
+              'body-slot': false,
+              'title-slot': true,
+            },
+          },
+        }),
+      }),
+    })).toEqual({
+      placeholderVisibility: [
+        {
+          isVisible: false,
+          placeholderId: 'body-slot',
+          sourceField: 'placeholderVisibility.body-slot',
+        },
+        {
+          isVisible: true,
+          placeholderId: 'title-slot',
+          sourceField: 'placeholderVisibility.title-slot',
+        },
+      ],
+      surface: 'layout-placeholder',
+    })
+
+    expect(getSlideEditLayoutJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': JSON.stringify({
+          placeholderLayout: {
+            placeholderVisibility: [
+              {
+                isVisible: false,
+                placeholderId: 'body-slot',
+              },
+              {
+                id: 'title-slot',
+                visible: true,
+              },
+            ],
+          },
+        }),
+      }),
+    })).toMatchObject({
+      placeholderVisibility: [
+        {
+          isVisible: false,
+          placeholderId: 'body-slot',
+        },
+        {
+          isVisible: true,
+          placeholderId: 'title-slot',
+        },
+      ],
+    })
+  })
+
+  it('plans layout apply and filtered placeholder visibility command effects', () => {
+    const pasteValue = getSlideEditLayoutJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'application/json': JSON.stringify({
+          hiddenPlaceholderIds: ['body-slot', 'unknown-slot'],
+          layoutId: 'layout-title-body',
+          themeId: 'theme-a',
+          visiblePlaceholderIds: ['title-slot'],
+        }),
+      }),
+    })!
+
+    expect(getSlideEditLayoutJSONPasteCommandEffects({
+      existingObjectPolicy: 'map-existing-objects-to-placeholders',
+      layouts: [layout],
+      objectMappings: [
+        {
+          boundsSource: 'layout-placeholder',
+          objectId: 'object-title',
+          placeholderId: 'title-slot',
+        },
+      ],
+      pasteValue,
+      selectedObjectIds: ['object-title'],
+      slideId: 'slide-a',
+      themes: [theme],
+    })).toEqual({
+      applyLayoutEffect: {
+        payload: {
+          existingObjectPolicy: 'map-existing-objects-to-placeholders',
+          id: 'apply-layout',
+          layoutId: 'layout-title-body',
+          objectMappings: [
+            {
+              boundsSource: 'layout-placeholder',
+              objectId: 'object-title',
+              placeholderId: 'title-slot',
+            },
+          ],
+        },
+        selection: {
+          objectIds: ['object-title'],
+          slideId: 'slide-a',
+        },
+        type: 'slide-command-effect',
+      },
+      placeholderVisibilityEffects: [
+        {
+          payload: {
+            id: 'set-placeholder-visibility',
+            isVisible: false,
+            placeholderId: 'body-slot',
+          },
+          selection: {
+            placeholderIds: ['body-slot'],
+            slideId: 'slide-a',
+          },
+          type: 'slide-command-effect',
+        },
+        {
+          payload: {
+            id: 'set-placeholder-visibility',
+            isVisible: true,
+            placeholderId: 'title-slot',
+          },
+          selection: {
+            placeholderIds: ['title-slot'],
+            slideId: 'slide-a',
+          },
+          type: 'slide-command-effect',
+        },
+      ],
+      themeId: 'theme-a',
+    })
+  })
+
+  it('filters unknown layout theme and placeholder ids from paste planning', () => {
+    expect(getSlideEditLayoutJSONPasteCommandEffects({
+      layouts: [layout],
+      pasteValue: {
+        layoutId: 'missing-layout',
+        placeholderVisibility: [
+          {
+            isVisible: false,
+            placeholderId: 'missing-slot',
+            sourceField: 'hiddenPlaceholderIds',
+          },
+        ],
+        surface: 'layout-placeholder',
+        themeId: 'missing-theme',
+      },
+      slideId: 'slide-a',
+      themes: [theme],
+    })).toBeNull()
+
+    expect(getSlideEditLayoutJSONPasteValue({
+      dataTransfer: null,
+    })).toBeNull()
+    expect(getSlideEditLayoutJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'application/json': '{"notLayout":true}',
+      }),
+    })).toBeNull()
+    expect(getSlideEditLayoutJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_LAYOUT_JSON_MIME_TYPE]: 'not json',
+      }),
+    })).toBeNull()
+  })
+
   it('defines layout command descriptors as host command effects', () => {
     expect(SLIDE_EDIT_LAYOUT_COMMANDS).toEqual([
       {
         id: 'apply-layout',
+        requiredAdapterSlot: 'command-effect',
+      },
+      {
+        id: 'set-placeholder-visibility',
         requiredAdapterSlot: 'command-effect',
       },
     ])
@@ -303,3 +522,9 @@ describe('SlideEditLayoutTheme', () => {
     }
   })
 })
+
+function createDataTransfer(values: Record<string, string>) {
+  return {
+    getData: (type: string) => values[type] ?? '',
+  }
+}

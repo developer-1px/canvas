@@ -249,8 +249,28 @@ export type SlideEditLayoutApplyHostCommandEffect<
   type: 'slide-command-effect'
 }
 
+export type SlideEditLayoutPlaceholderVisibilityCommand<
+  TPlaceholderId extends SlideEditPlaceholderId = SlideEditPlaceholderId,
+> = {
+  id: 'set-placeholder-visibility'
+  isVisible: boolean
+  placeholderId: TPlaceholderId
+}
+
+export type SlideEditLayoutPlaceholderVisibilityHostCommandEffect<
+  TSlideId extends SlideEditLayoutSlideId = SlideEditLayoutSlideId,
+  TPlaceholderId extends SlideEditPlaceholderId = SlideEditPlaceholderId,
+> = {
+  payload: SlideEditLayoutPlaceholderVisibilityCommand<TPlaceholderId>
+  selection: {
+    placeholderIds: readonly TPlaceholderId[]
+    slideId: TSlideId
+  }
+  type: 'slide-command-effect'
+}
+
 export type SlideEditLayoutCommandDescriptor = {
-  id: 'apply-layout'
+  id: 'apply-layout' | 'set-placeholder-visibility'
   requiredAdapterSlot: 'command-effect'
 }
 
@@ -259,7 +279,96 @@ export const SLIDE_EDIT_LAYOUT_COMMANDS = Object.freeze([
     id: 'apply-layout',
     requiredAdapterSlot: 'command-effect',
   },
+  {
+    id: 'set-placeholder-visibility',
+    requiredAdapterSlot: 'command-effect',
+  },
 ] as const satisfies readonly SlideEditLayoutCommandDescriptor[])
+
+export type SlideEditLayoutDataTransfer = Pick<DataTransfer, 'getData'>
+
+export type SlideEditLayoutPlaceholderVisibilityPasteValue<
+  TPlaceholderId extends SlideEditPlaceholderId = SlideEditPlaceholderId,
+> = {
+  isVisible: boolean
+  placeholderId: TPlaceholderId
+  sourceField: string
+}
+
+export type SlideEditLayoutJSONPasteValue<
+  TLayoutId extends SlideEditLayoutId = SlideEditLayoutId,
+  TThemeId extends SlideEditThemeId = SlideEditThemeId,
+  TPlaceholderId extends SlideEditPlaceholderId = SlideEditPlaceholderId,
+> = {
+  layoutId?: TLayoutId
+  placeholderVisibility: readonly SlideEditLayoutPlaceholderVisibilityPasteValue<
+    TPlaceholderId
+  >[]
+  surface: 'layout-placeholder'
+  themeId?: TThemeId
+}
+
+export type SlideEditLayoutJSONPasteInput = {
+  dataTransfer: SlideEditLayoutDataTransfer | null
+  jsonMimeType?: string
+}
+
+export type SlideEditLayoutJSONPasteCommandEffectsInput<
+  TSlideId extends SlideEditLayoutSlideId = SlideEditLayoutSlideId,
+  TThemeId extends SlideEditThemeId = SlideEditThemeId,
+  TLayoutId extends SlideEditLayoutId = SlideEditLayoutId,
+  TMasterId extends SlideEditMasterId = SlideEditMasterId,
+  TObjectId extends SlideEditLayoutObjectId = SlideEditLayoutObjectId,
+  TPlaceholderId extends SlideEditPlaceholderId = SlideEditPlaceholderId,
+> = {
+  activeLayoutId?: TLayoutId | null
+  existingObjectPolicy?: SlideEditLayoutApplyExistingObjectPolicy
+  layouts: readonly SlideEditLayoutDescriptor<TLayoutId, TMasterId, TPlaceholderId>[]
+  objectMappings?: readonly SlideEditLayoutApplyObjectMapping<
+    TObjectId,
+    TPlaceholderId
+  >[]
+  pasteValue: SlideEditLayoutJSONPasteValue<TLayoutId, TThemeId, TPlaceholderId>
+  selectedObjectIds?: readonly TObjectId[]
+  slideId: TSlideId
+  themes: readonly SlideEditThemeDescriptor<TThemeId>[]
+}
+
+export type SlideEditLayoutJSONPasteCommandEffects<
+  TSlideId extends SlideEditLayoutSlideId = SlideEditLayoutSlideId,
+  TThemeId extends SlideEditThemeId = SlideEditThemeId,
+  TLayoutId extends SlideEditLayoutId = SlideEditLayoutId,
+  TObjectId extends SlideEditLayoutObjectId = SlideEditLayoutObjectId,
+  TPlaceholderId extends SlideEditPlaceholderId = SlideEditPlaceholderId,
+> = {
+  applyLayoutEffect: SlideEditLayoutApplyHostCommandEffect<
+    TSlideId,
+    TLayoutId,
+    TObjectId,
+    TPlaceholderId
+  > | null
+  placeholderVisibilityEffects: readonly SlideEditLayoutPlaceholderVisibilityHostCommandEffect<
+    TSlideId,
+    TPlaceholderId
+  >[]
+  themeId: TThemeId | null
+}
+
+export const SLIDE_EDIT_LAYOUT_JSON_MIME_TYPE =
+  'application/vnd.interactive-os.slide-edit.layout-placeholder+json'
+
+export const SLIDE_EDIT_LAYOUT_JSON_TYPES = Object.freeze([
+  'application/json',
+  'text/json',
+  'text/plain',
+] as const)
+
+export const SLIDE_EDIT_LAYOUT_JSON_WRAPPER_KEYS = Object.freeze([
+  'slideLayout',
+  'layout',
+  'layoutPlaceholder',
+  'placeholderLayout',
+] as const)
 
 export function createSlideEditThemeDescriptor<
   TThemeId extends SlideEditThemeId,
@@ -464,6 +573,121 @@ export function getSlideEditLayoutApplyCommandEffect<
   }
 }
 
+export function getSlideEditLayoutJSONPasteValue({
+  dataTransfer,
+  jsonMimeType = SLIDE_EDIT_LAYOUT_JSON_MIME_TYPE,
+}: SlideEditLayoutJSONPasteInput):
+  SlideEditLayoutJSONPasteValue | null {
+  if (!dataTransfer) {
+    return null
+  }
+
+  if (jsonMimeType) {
+    const customText = dataTransfer.getData(jsonMimeType)
+
+    if (customText.trim()) {
+      const customValue = parseSlideEditLayoutJSON(customText)
+      const customPasteValue = getSlideEditLayoutAnyJSONPasteValue(customValue)
+
+      if (customPasteValue !== null) {
+        return customPasteValue
+      }
+    }
+  }
+
+  for (const type of SLIDE_EDIT_LAYOUT_JSON_TYPES) {
+    const text = dataTransfer.getData(type)
+
+    if (!text.trim()) {
+      continue
+    }
+
+    const value = parseSlideEditLayoutJSON(text)
+    const pasteValue = getSlideEditLayoutAnyJSONPasteValue(value)
+
+    if (pasteValue !== null) {
+      return pasteValue
+    }
+  }
+
+  return null
+}
+
+export function getSlideEditLayoutJSONPasteCommandEffects<
+  TSlideId extends SlideEditLayoutSlideId,
+  TThemeId extends SlideEditThemeId,
+  TLayoutId extends SlideEditLayoutId,
+  TMasterId extends SlideEditMasterId,
+  TObjectId extends SlideEditLayoutObjectId,
+  TPlaceholderId extends SlideEditPlaceholderId,
+>({
+  activeLayoutId = null,
+  existingObjectPolicy = 'preserve-existing-objects',
+  layouts,
+  objectMappings = [],
+  pasteValue,
+  selectedObjectIds = [],
+  slideId,
+  themes,
+}: SlideEditLayoutJSONPasteCommandEffectsInput<
+  TSlideId,
+  TThemeId,
+  TLayoutId,
+  TMasterId,
+  TObjectId,
+  TPlaceholderId
+>): SlideEditLayoutJSONPasteCommandEffects<
+  TSlideId,
+  TThemeId,
+  TLayoutId,
+  TObjectId,
+  TPlaceholderId
+> | null {
+  const layout = pasteValue.layoutId
+    ? findSlideEditLayoutById(layouts, pasteValue.layoutId)
+    : null
+  const placeholderLayout =
+    layout ??
+    (activeLayoutId ? findSlideEditLayoutById(layouts, activeLayoutId) : null) ??
+    (layouts.length === 1 ? layouts[0]! : null)
+  const applyLayoutEffect = layout
+    ? getSlideEditLayoutApplyCommandEffect({
+        existingObjectPolicy,
+        layoutId: layout.layoutId,
+        objectMappings,
+        selectedObjectIds,
+        slideId,
+      })
+    : null
+  const themeId = pasteValue.themeId &&
+    themes.some((theme) => theme.themeId === pasteValue.themeId)
+    ? pasteValue.themeId
+    : null
+  const placeholderVisibilityEffects = placeholderLayout
+    ? getSlideEditLayoutPlaceholderVisibilityPasteCommandEffects({
+        pasteValue,
+        placeholderIds: placeholderLayout.placeholders.map(
+          (placeholder) => placeholder.placeholderId,
+        ),
+        slideId,
+      })
+    : []
+
+  if (
+    !applyLayoutEffect &&
+    !themeId &&
+    placeholderVisibilityEffects.length === 0
+  ) {
+    return null
+  }
+
+  return {
+    applyLayoutEffect,
+    placeholderVisibilityEffects,
+    themeId,
+  }
+}
+
 function mergeSlideEditStyleTokenRefs<
   TColorTokenId extends SlideEditThemeColorTokenId,
   TFontTokenId extends SlideEditThemeFontTokenId,
@@ -493,4 +717,272 @@ function mergeSlideEditStyleTokenRefs<
       ...style?.spacingTokenIds,
     },
   }), {})
+}
+
+function getSlideEditLayoutAnyJSONPasteValue(
+  value: unknown,
+): SlideEditLayoutJSONPasteValue | null {
+  return getSlideEditLayoutDirectJSONPasteValue(value) ??
+    getSlideEditLayoutWrappedJSONPasteValue(value)
+}
+
+function getSlideEditLayoutDirectJSONPasteValue(
+  value: unknown,
+): SlideEditLayoutJSONPasteValue | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null
+  }
+
+  const record = value as Record<string, unknown>
+  const layoutId = getSlideEditLayoutJSONText(record.layoutId)
+  const themeId = getSlideEditLayoutJSONText(record.themeId)
+  const placeholderVisibility = getSlideEditLayoutPlaceholderVisibilityValues(
+    record,
+  )
+
+  if (!layoutId && !themeId && placeholderVisibility.length === 0) {
+    return null
+  }
+
+  return {
+    ...(layoutId ? { layoutId } : {}),
+    placeholderVisibility,
+    surface: 'layout-placeholder',
+    ...(themeId ? { themeId } : {}),
+  }
+}
+
+function getSlideEditLayoutWrappedJSONPasteValue(
+  value: unknown,
+): SlideEditLayoutJSONPasteValue | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null
+  }
+
+  const record = value as Record<string, unknown>
+
+  for (const key of SLIDE_EDIT_LAYOUT_JSON_WRAPPER_KEYS) {
+    if (!Object.hasOwn(record, key)) {
+      continue
+    }
+
+    const pasteValue = getSlideEditLayoutDirectJSONPasteValue(record[key])
+
+    if (pasteValue !== null) {
+      return pasteValue
+    }
+  }
+
+  return null
+}
+
+function getSlideEditLayoutPlaceholderVisibilityPasteCommandEffects<
+  TSlideId extends SlideEditLayoutSlideId,
+  TPlaceholderId extends SlideEditPlaceholderId,
+>({
+  pasteValue,
+  placeholderIds,
+  slideId,
+}: {
+  pasteValue: SlideEditLayoutJSONPasteValue<
+    SlideEditLayoutId,
+    SlideEditThemeId,
+    TPlaceholderId
+  >
+  placeholderIds: readonly TPlaceholderId[]
+  slideId: TSlideId
+}) {
+  const allowedPlaceholderIds = new Set<TPlaceholderId>(placeholderIds)
+
+  return pasteValue.placeholderVisibility
+    .filter((value) => allowedPlaceholderIds.has(value.placeholderId))
+    .map((value) => ({
+      payload: {
+        id: 'set-placeholder-visibility',
+        isVisible: value.isVisible,
+        placeholderId: value.placeholderId,
+      },
+      selection: {
+        placeholderIds: [value.placeholderId],
+        slideId,
+      },
+      type: 'slide-command-effect',
+    } as const satisfies SlideEditLayoutPlaceholderVisibilityHostCommandEffect<
+      TSlideId,
+      TPlaceholderId
+    >))
+}
+
+function getSlideEditLayoutPlaceholderVisibilityValues(
+  record: Record<string, unknown>,
+): SlideEditLayoutPlaceholderVisibilityPasteValue[] {
+  const visibilityById = new Map<
+    SlideEditPlaceholderId,
+    SlideEditLayoutPlaceholderVisibilityPasteValue
+  >()
+
+  addSlideEditLayoutPlaceholderVisibilityIds({
+    isVisible: false,
+    sourceField: 'hiddenPlaceholderIds',
+    value: record.hiddenPlaceholderIds,
+    visibilityById,
+  })
+  addSlideEditLayoutPlaceholderVisibilityIds({
+    isVisible: true,
+    sourceField: 'visiblePlaceholderIds',
+    value: record.visiblePlaceholderIds,
+    visibilityById,
+  })
+  addSlideEditLayoutPlaceholderVisibilityEntries({
+    sourceField: 'placeholderVisibility',
+    value: record.placeholderVisibility,
+    visibilityById,
+  })
+
+  return Array.from(visibilityById.values())
+}
+
+function addSlideEditLayoutPlaceholderVisibilityIds({
+  isVisible,
+  sourceField,
+  value,
+  visibilityById,
+}: {
+  isVisible: boolean
+  sourceField: string
+  value: unknown
+  visibilityById: Map<
+    SlideEditPlaceholderId,
+    SlideEditLayoutPlaceholderVisibilityPasteValue
+  >
+}) {
+  if (!Array.isArray(value)) {
+    return
+  }
+
+  for (const item of value) {
+    const placeholderId = getSlideEditLayoutJSONText(item)
+
+    if (!placeholderId) {
+      continue
+    }
+
+    visibilityById.set(placeholderId, {
+      isVisible,
+      placeholderId,
+      sourceField,
+    })
+  }
+}
+
+function addSlideEditLayoutPlaceholderVisibilityEntries({
+  sourceField,
+  value,
+  visibilityById,
+}: {
+  sourceField: string
+  value: unknown
+  visibilityById: Map<
+    SlideEditPlaceholderId,
+    SlideEditLayoutPlaceholderVisibilityPasteValue
+  >
+}) {
+  if (!value || typeof value !== 'object') {
+    return
+  }
+
+  if (Array.isArray(value)) {
+    addSlideEditLayoutPlaceholderVisibilityArrayEntries({
+      sourceField,
+      value,
+      visibilityById,
+    })
+    return
+  }
+
+  for (const [placeholderId, isVisible] of Object.entries(value)) {
+    const normalizedPlaceholderId = getSlideEditLayoutJSONText(placeholderId)
+
+    if (!normalizedPlaceholderId || typeof isVisible !== 'boolean') {
+      continue
+    }
+
+    visibilityById.set(normalizedPlaceholderId, {
+      isVisible,
+      placeholderId: normalizedPlaceholderId,
+      sourceField: `${sourceField}.${normalizedPlaceholderId}`,
+    })
+  }
+}
+
+function addSlideEditLayoutPlaceholderVisibilityArrayEntries({
+  sourceField,
+  value,
+  visibilityById,
+}: {
+  sourceField: string
+  value: readonly unknown[]
+  visibilityById: Map<
+    SlideEditPlaceholderId,
+    SlideEditLayoutPlaceholderVisibilityPasteValue
+  >
+}) {
+  for (const [index, item] of value.entries()) {
+    if (!item || typeof item !== 'object' || Array.isArray(item)) {
+      continue
+    }
+
+    const record = item as Record<string, unknown>
+    const placeholderId =
+      getSlideEditLayoutJSONText(record.placeholderId) ??
+      getSlideEditLayoutJSONText(record.id)
+    const isVisible = typeof record.isVisible === 'boolean'
+      ? record.isVisible
+      : typeof record.visible === 'boolean'
+      ? record.visible
+      : null
+
+    if (!placeholderId || isVisible === null) {
+      continue
+    }
+
+    visibilityById.set(placeholderId, {
+      isVisible,
+      placeholderId,
+      sourceField: `${sourceField}.${index}`,
+    })
+  }
+}
+
+function findSlideEditLayoutById<
+  TLayoutId extends SlideEditLayoutId,
+  TMasterId extends SlideEditMasterId,
+  TPlaceholderId extends SlideEditPlaceholderId,
+>(
+  layouts: readonly SlideEditLayoutDescriptor<TLayoutId, TMasterId, TPlaceholderId>[],
+  layoutId: TLayoutId,
+) {
+  return layouts.find((layout) => layout.layoutId === layoutId) ?? null
+}
+
+function getSlideEditLayoutJSONText(value: unknown) {
+  if (typeof value !== 'string') {
+    return null
+  }
+
+  const text = value.trim()
+
+  return text || null
+}
+
+function parseSlideEditLayoutJSON(value: string) {
+  if (!value.trim()) {
+    return null
+  }
+
+  try {
+    return JSON.parse(value) as unknown
+  } catch {
+    return null
+  }
 }
