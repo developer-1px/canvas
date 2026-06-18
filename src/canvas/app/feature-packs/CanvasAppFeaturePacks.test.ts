@@ -17,6 +17,8 @@ import {
   DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS,
 } from './CanvasAppDefaultFeaturePackManifests'
 import {
+  CANVAS_COMPONENT_SYSTEM_FEATURE_PACK_SUITE_MANIFEST,
+  CANVAS_COMPONENT_SYSTEM_SUITE_ID,
   CANVAS_STORY_CANVAS_FEATURE_PACK_SUITE_MANIFEST,
   CANVAS_STORY_CANVAS_SUITE_ID,
   DEFAULT_CANVAS_APP_FEATURE_PACK_SUITE_MANIFESTS,
@@ -66,6 +68,12 @@ import {
 import {
   createCanvasAppDomEditStyleFeaturePackManifest,
 } from './dom-edit-style'
+import {
+  CANVAS_APP_COMPONENT_AUTHORING_FEATURE_PACK_MANIFEST,
+} from './component-authoring'
+import {
+  CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST,
+} from './component-library'
 import {
   CANVAS_STORY_PREVIEW_ITEMS_FEATURE_PACK_ID,
 } from './story-preview'
@@ -367,6 +375,9 @@ describe('CanvasAppFeaturePacks', () => {
     expect(getCanvasAppInstalledFeaturePackManifestIds(
       DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS,
     )).toContain('text-paste-import')
+    expect(getCanvasAppInstalledFeaturePackManifestIds(
+      DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS,
+    )).toContain(CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST.id)
   })
 
   it('stores marketplace-ready manifest metadata with defaults and overrides', () => {
@@ -520,7 +531,15 @@ describe('CanvasAppFeaturePacks', () => {
     ])
     expect(DEFAULT_CANVAS_APP_FEATURE_PACK_SUITE_MANIFESTS.map(
       (manifest) => manifest.id,
-    )).toEqual([CANVAS_STORY_CANVAS_SUITE_ID])
+    )).toEqual([
+      CANVAS_COMPONENT_SYSTEM_SUITE_ID,
+      CANVAS_STORY_CANVAS_SUITE_ID,
+    ])
+    expect(CANVAS_COMPONENT_SYSTEM_FEATURE_PACK_SUITE_MANIFEST.featurePackIds)
+      .toEqual([
+        CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST.id,
+        CANVAS_APP_COMPONENT_AUTHORING_FEATURE_PACK_MANIFEST.id,
+      ])
     expect(CANVAS_STORY_CANVAS_FEATURE_PACK_SUITE_MANIFEST.featurePackIds)
       .toEqual([
         CANVAS_STORY_PREVIEW_ITEMS_FEATURE_PACK_ID,
@@ -575,10 +594,18 @@ describe('CanvasAppFeaturePacks', () => {
       label: 'Story viewer',
     })
     expect(DEFAULT_CANVAS_APP_EDITOR_FEATURE_PACK_PROFILE.id).toBe('editor')
+    expect(DEFAULT_CANVAS_APP_EDITOR_FEATURE_PACK_PROFILE.installedSuiteIds)
+      .toEqual([CANVAS_COMPONENT_SYSTEM_SUITE_ID])
+    expect(DEFAULT_CANVAS_APP_EDITOR_FEATURE_PACK_PROFILE.enabledSuiteIds)
+      .toEqual([CANVAS_COMPONENT_SYSTEM_SUITE_ID])
     expect(DEFAULT_CANVAS_APP_EDITOR_FEATURE_PACK_PROFILE.installedFeaturePackIds)
       .toContain('toolbar')
     expect(DEFAULT_CANVAS_APP_EDITOR_FEATURE_PACK_PROFILE.enabledFeaturePackIds)
       .toContain('toolbar')
+    expect(DEFAULT_CANVAS_APP_EDITOR_FEATURE_PACK_PROFILE.installedFeaturePackIds)
+      .toContain(CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST.id)
+    expect(DEFAULT_CANVAS_APP_EDITOR_FEATURE_PACK_PROFILE.enabledFeaturePackIds)
+      .toContain(CANVAS_APP_COMPONENT_AUTHORING_FEATURE_PACK_MANIFEST.id)
     expect(() =>
       createCanvasAppFeaturePackProfile({
         enabledFeaturePackIds: ['toolbar'],

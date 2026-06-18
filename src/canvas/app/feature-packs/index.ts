@@ -15,6 +15,8 @@ export {
   DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS,
 } from './CanvasAppDefaultFeaturePackManifests'
 export {
+  CANVAS_COMPONENT_SYSTEM_FEATURE_PACK_SUITE_MANIFEST,
+  CANVAS_COMPONENT_SYSTEM_SUITE_ID,
   CANVAS_STORY_CANVAS_FEATURE_PACK_SUITE_MANIFEST,
   CANVAS_STORY_CANVAS_SUITE_ID,
   DEFAULT_CANVAS_APP_FEATURE_PACK_SUITE_MANIFESTS,
@@ -137,6 +139,9 @@ export {
   useCanvasStickyQuickCreate,
   useCanvasStickyQuickCreateControlPoints,
 } from './component-authoring'
+export {
+  CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST,
+} from './component-library'
 export {
   createCanvasAppDomEditStyleFeaturePackManifest,
   type CanvasAppDomEditStyleFeaturePackManifestInput,

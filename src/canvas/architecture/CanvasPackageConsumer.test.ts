@@ -41,8 +41,11 @@ import {
   writeCanvasClipboardText,
   defineCanvasAppCustomItemModule,
   CANVAS_APP_CORE_ONLY_FEATURE_PACK_PROFILE,
+  CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST,
   CANVAS_APP_STORY_IMPORT_FEATURE_PACK_MANIFEST,
   CANVAS_APP_STORY_VIEWER_FEATURE_PACK_PROFILE,
+  CANVAS_COMPONENT_SYSTEM_FEATURE_PACK_SUITE_MANIFEST,
+  CANVAS_COMPONENT_SYSTEM_SUITE_ID,
   CANVAS_STORY_CANVAS_FEATURE_PACK_SUITE_MANIFEST,
   CANVAS_STORY_CANVAS_SUITE_ID,
   DEFAULT_CANVAS_APP_VIEW_FEATURE_PACKS,
@@ -530,6 +533,24 @@ describe('Canvas package consumer imports', () => {
       [smokeSuiteProfile],
       'smoke-suite-profile',
     )).toBe(smokeSuiteProfile)
+    expect(CANVAS_COMPONENT_SYSTEM_SUITE_ID).toBe('component-system')
+    expect(CanvasPackage.CANVAS_COMPONENT_SYSTEM_SUITE_ID).toBe(
+      CANVAS_COMPONENT_SYSTEM_SUITE_ID,
+    )
+    expect(CanvasAppFacade.CANVAS_COMPONENT_SYSTEM_SUITE_ID).toBe(
+      CANVAS_COMPONENT_SYSTEM_SUITE_ID,
+    )
+    expect(CanvasAppAuthoring.CANVAS_COMPONENT_SYSTEM_SUITE_ID).toBe(
+      CANVAS_COMPONENT_SYSTEM_SUITE_ID,
+    )
+    expect(
+      CanvasAppAuthoring.CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST.id,
+    ).toBe(CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST.id)
+    expect(DEFAULT_CANVAS_APP_FEATURE_PACK_SUITE_MANIFESTS).toContain(
+      CANVAS_COMPONENT_SYSTEM_FEATURE_PACK_SUITE_MANIFEST,
+    )
+    expect(CANVAS_COMPONENT_SYSTEM_FEATURE_PACK_SUITE_MANIFEST.featurePackIds)
+      .toContain(CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST.id)
     expect(CANVAS_STORY_CANVAS_SUITE_ID).toBe('story-canvas')
     expect(DEFAULT_CANVAS_APP_FEATURE_PACK_SUITE_MANIFESTS).toContain(
       CANVAS_STORY_CANVAS_FEATURE_PACK_SUITE_MANIFEST,
@@ -562,6 +583,10 @@ describe('Canvas package consumer imports', () => {
       .toEqual([])
     expect(DEFAULT_CANVAS_APP_EDITOR_FEATURE_PACK_PROFILE.enabledFeaturePackIds)
       .toContain('toolbar')
+    expect(DEFAULT_CANVAS_APP_EDITOR_FEATURE_PACK_PROFILE.installedSuiteIds)
+      .toContain(CANVAS_COMPONENT_SYSTEM_SUITE_ID)
+    expect(DEFAULT_CANVAS_APP_EDITOR_FEATURE_PACK_PROFILE.enabledFeaturePackIds)
+      .toContain(CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST.id)
     expect(viewManifestCategory).toBe('view')
     expect(assembly.featurePackViewRenderers.toolbar).toBeUndefined()
     expect(featurePackAssemblyInput.disabledFeaturePackIds).toEqual([
@@ -569,6 +594,9 @@ describe('Canvas package consumer imports', () => {
     ])
     expect(viewRenderers.status).toBe(renderStatus)
     expect(defaultFeaturePackManifestIds).toContain('table-import')
+    expect(defaultFeaturePackManifestIds).toContain(
+      CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST.id,
+    )
     expect(getCanvasAppInstalledFeaturePackManifestIds([
       aiLabsManifest,
       domEditStyleManifest,
