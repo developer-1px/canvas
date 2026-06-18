@@ -938,6 +938,26 @@ export {
   type SlideEditTextBodyStoragePolicy,
 } from './SlideEditTextBody'
 export {
+  getSlideEditTableRowsJSONPasteValue,
+  getSlideEditTableRowsPasteCommandEffect,
+  SLIDE_EDIT_TABLE_ROWS_JSON_MIME_TYPE,
+  SLIDE_EDIT_TABLE_ROWS_JSON_TYPES,
+  SLIDE_EDIT_TABLE_ROWS_JSON_WRAPPER_KEYS,
+  type SlideEditTableRowsDataTransfer,
+  type SlideEditTableRowsJSONPasteInput,
+  type SlideEditTableRowsJSONPasteValue,
+  type SlideEditTableRowsMatrix,
+  type SlideEditTableRowsNormalizeCellInput,
+  type SlideEditTableRowsObjectId,
+  type SlideEditTableRowsPasteCommandEffectInput,
+  type SlideEditTableRowsReplaceCommand,
+  type SlideEditTableRowsReplaceCommandMetadata,
+  type SlideEditTableRowsReplaceHostCommandEffect,
+  type SlideEditTableRowsReplaceTarget,
+  type SlideEditTableRowsSlideId,
+  type SlideEditTableRowsStoragePolicy,
+} from './SlideEditTableRows'
+export {
   createSlideEditClipboardAdapterExample,
   createSlideEditClipboardPasteCommandEffect,
   createSlideEditClipboardPastePlan,

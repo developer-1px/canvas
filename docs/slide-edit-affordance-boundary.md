@@ -17,6 +17,7 @@
 | Slide rail interaction | `slide-edit-affordance` | active slide, slide order, thumbnail hit target, rail command intent |
 | Color swatch palette | `slide-edit-affordance` | theme/recent color swatches, channel state, and color apply command effect |
 | Placeholder visibility affordance | `slide-edit-affordance` | slide placeholder structure and object hide/show read model |
+| Table rows patch | `slide-edit-affordance` | table rows JSON paste parsing, row matrix normalization, and host command effect |
 | Object layer pane | `slide-edit-affordance` | object row descriptor, selection pane command intent, ARIA tree contract |
 | Object accessibility | `slide-edit-affordance` | object alt text, decorative state, metadata attribute, and host command effect |
 | Object animation build order | `slide-edit-affordance` | object animation type, trigger, timing, and slide-local build order |
@@ -413,6 +414,42 @@
 | `bounds` / `defaultBounds` | default slot geometry before host object mapping | current placeholder geometry on a concrete slide |
 | `isLocked` | layout slot cannot be casually remapped | placeholder or object is not user-editable |
 | `isVisible` | layout slot may be hidden by default | placeholder/object can be hidden while still represented in controls |
+
+## Object Image Replace Contract
+
+| Area | Contract |
+| --- | --- |
+| Field | `source` file-input descriptor routes through `replace-object-image` |
+| Source fields | `src`, `mimeType`, `name`, `altText`, `naturalWidth`, and `naturalHeight` are normalized before host application |
+| JSON candidates | custom MIME and wrapped `application/json` are checked in order |
+| JSON payloads | generic JSON requires `imageReplace`, `imageSource`, `objectImage`, or `replacementImage` wrapper; custom MIME may carry direct source JSON |
+| Selection | exactly one supported image target can produce a command effect |
+| No-op | locked, hidden, mixed, and unsupported targets return unavailable route metadata |
+
+## Comment Thread Patch Contract
+
+| Area | Contract |
+| --- | --- |
+| JSON candidates | comment-thread custom MIME, `application/json`, `text/json`, and `text/plain` are checked in order |
+| JSON payloads | custom MIME may carry direct payload; generic JSON requires `comment`, `commentThread`, or `reviewComment` wrapper |
+| Fields | `body`/`text`, `resolved`, `createdAt`, `thread`, `messages`, and `replies` normalize into one comment patch |
+| Messages | string messages and `{ id, authorName, createdAt, body/text }` objects are accepted |
+| Body sync | when body is present, the first thread message body is synchronized with it |
+| Host policy | body length, reply length, message id creation, storage mutation, and hidden/locked target policy stay host-owned |
+| Metadata | command effect metadata carries target ids, fields, message count, resolved state, format, and payload length |
+| No-op | missing selected comment, hidden/locked target, parse failure, direct generic JSON, or missing patch fields returns `null` |
+
+## Table Rows Patch Contract
+
+| Area | Contract |
+| --- | --- |
+| JSON candidates | table-rows custom MIME, `application/json`, `text/json`, and `text/plain` are checked in order |
+| JSON payloads | custom MIME may carry direct rows/object payload; generic JSON requires `tableRows`, `table`, or `rows` wrapper |
+| Row shapes | `columns`/`headers` + rows, two-dimensional rows, and object row arrays normalize into one string matrix |
+| Headers | `columns` or `headers` become a header row before body rows |
+| Host policy | max row, max column, max cell length, cell normalization, and final table schema conversion stay host-owned |
+| Metadata | command effect metadata carries target ids, row count, column count, format, and payload length |
+| No-op | missing/hidden/locked/non-table target, parse failure, direct generic JSON, or empty rows returns `null` |
 
 ## Slide Object Clipboard Contract
 
