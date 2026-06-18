@@ -104,6 +104,7 @@ describe('SlideEditTextParagraphAlign', () => {
     expect(getSlideEditTextParagraphAlignJSONPasteValue({
       dataTransfer: createDataTransfer({
         [SLIDE_EDIT_TEXT_PARAGRAPH_ALIGN_FIELD.jsonMimeType]: '"right"',
+        'text/json': '{"paragraphAlign":"center"}',
         'text/plain': '{"paragraphAlign":"left"}',
       }),
     })).toBe('right')
@@ -126,6 +127,11 @@ describe('SlideEditTextParagraphAlign', () => {
     expect(getSlideEditTextParagraphAlignJSONPasteValue({
       dataTransfer: createDataTransfer({
         'application/json': '{"paragraphAlign":"center"}',
+      }),
+    })).toBe('center')
+    expect(getSlideEditTextParagraphAlignJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/json': '{"paragraphAlign":"center"}',
       }),
     })).toBe('center')
   })
@@ -152,6 +158,11 @@ describe('SlideEditTextParagraphAlign', () => {
     expect(getSlideEditTextParagraphAlignJSONPasteValue({
       dataTransfer: createDataTransfer({
         'text/plain': '{"unrelated":"left"}',
+      }),
+    })).toBeNull()
+    expect(getSlideEditTextParagraphAlignJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/json': 'not json',
       }),
     })).toBeNull()
   })

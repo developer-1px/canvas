@@ -126,6 +126,7 @@ describe('SlideEditTextFontFamily', () => {
     expect(getSlideEditTextFontFamilyJSONPasteValue({
       dataTransfer: createDataTransfer({
         [SLIDE_EDIT_TEXT_FONT_FAMILY_FIELD.jsonMimeType]: '"Title Serif"',
+        'text/json': '{"fontFamily":"Body Sans"}',
         'text/plain': '{"fontFamily":"Body Sans"}',
       }),
       fallbackFontFamily: 'Body Sans',
@@ -173,6 +174,13 @@ describe('SlideEditTextFontFamily', () => {
       fallbackFontFamily: 'Body Sans',
       options,
     })).toBe('Title Serif')
+    expect(getSlideEditTextFontFamilyJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/json': '{"fontFamily":"Inter"}',
+      }),
+      fallbackFontFamily: 'Body Sans',
+      options: [],
+    })).toBe('Inter')
   })
 
   it('does not treat unrelated JSON or direct text/plain values as font family', () => {
@@ -201,6 +209,12 @@ describe('SlideEditTextFontFamily', () => {
     expect(getSlideEditTextFontFamilyJSONPasteValue({
       dataTransfer: createDataTransfer({
         'text/plain': '{"fontFamily":18}',
+      }),
+      options,
+    })).toBeNull()
+    expect(getSlideEditTextFontFamilyJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/json': '{"unrelated":"Title Serif"}',
       }),
       options,
     })).toBeNull()

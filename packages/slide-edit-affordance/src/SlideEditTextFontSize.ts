@@ -1,3 +1,5 @@
+import { SLIDE_EDIT_TEXT_JSON_PASTE_TYPES } from './SlideEditTextJSONPaste'
+
 export type SlideEditTextFontSizeSlideId = string
 export type SlideEditTextFontSizeObjectId = string
 export type SlideEditTextFontSizeValue = number
@@ -109,11 +111,8 @@ export const SLIDE_EDIT_TEXT_FONT_SIZE_FIELD = Object.freeze({
   unit: 'px',
 } as const satisfies SlideEditTextFontSizeFieldDescriptor)
 
-export const SLIDE_EDIT_TEXT_FONT_SIZE_JSON_TYPES = Object.freeze([
-  'application/json',
-  'text/json',
-  'text/plain',
-] as const)
+export const SLIDE_EDIT_TEXT_FONT_SIZE_JSON_TYPES =
+  SLIDE_EDIT_TEXT_JSON_PASTE_TYPES
 
 export function createSlideEditTextFontSizeDescriptor<
   TSlideId extends SlideEditTextFontSizeSlideId,

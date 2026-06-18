@@ -1,3 +1,5 @@
+import { SLIDE_EDIT_TEXT_JSON_PASTE_TYPES } from './SlideEditTextJSONPaste'
+
 export type SlideEditTextFrameInsetSlideId = string
 export type SlideEditTextFrameInsetObjectId = string
 
@@ -168,11 +170,8 @@ export const SLIDE_EDIT_TEXT_FRAME_INSET_FIELDS = Object.freeze([
 export const SLIDE_EDIT_TEXT_FRAME_INSET_JSON_MIME_TYPE =
   'application/vnd.interactive-os.slide-edit.text-frame-inset+json'
 
-export const SLIDE_EDIT_TEXT_FRAME_INSET_JSON_TYPES = Object.freeze([
-  'application/json',
-  'text/json',
-  'text/plain',
-] as const)
+export const SLIDE_EDIT_TEXT_FRAME_INSET_JSON_TYPES =
+  SLIDE_EDIT_TEXT_JSON_PASTE_TYPES
 
 export const SLIDE_EDIT_TEXT_FRAME_INSET_JSON_WRAPPER_KEYS = Object.freeze([
   'textFrameInset',

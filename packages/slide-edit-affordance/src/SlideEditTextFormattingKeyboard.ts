@@ -1,3 +1,5 @@
+import { SLIDE_EDIT_TEXT_JSON_PASTE_TYPES } from './SlideEditTextJSONPaste'
+
 export type SlideEditTextFormattingKeyboardIntentKind =
   | 'toggle-bold'
   | 'toggle-italic'
@@ -208,7 +210,7 @@ export function getSlideEditTextRunFormattingJSONPasteValue({
     }
   }
 
-  for (const type of ['application/json', 'text/plain']) {
+  for (const type of SLIDE_EDIT_TEXT_JSON_PASTE_TYPES) {
     const value = parseSlideEditTextRunFormattingJSON(dataTransfer.getData(type))
     const explicitValue =
       getSlideEditTextRunFormattingExplicitJSONValue(fieldId, value)

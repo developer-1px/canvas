@@ -121,6 +121,7 @@ describe('SlideEditTextParagraphSpacing', () => {
     expect(getSlideEditTextParagraphBulletJSONPasteValue({
       dataTransfer: createDataTransfer({
         [SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_FIELD.jsonMimeType]: '"bullet"',
+        'text/json': '{"paragraphBullet":"numbered"}',
         'text/plain': 'ignored',
       }),
     })).toBe('bullet')
@@ -150,6 +151,11 @@ describe('SlideEditTextParagraphSpacing', () => {
         'application/json': '{"textParagraphBullet":"bullet"}',
       }),
     })).toBe('bullet')
+    expect(getSlideEditTextParagraphBulletJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/json': '{"paragraphBullet":"bullet"}',
+      }),
+    })).toBe('bullet')
   })
 
   it('does not treat generic text/plain direct values as paragraph bullet', () => {
@@ -171,6 +177,11 @@ describe('SlideEditTextParagraphSpacing', () => {
     expect(getSlideEditTextParagraphBulletJSONPasteValue({
       dataTransfer: createDataTransfer({
         'text/plain': '{"list":"ordered"}',
+      }),
+    })).toBeNull()
+    expect(getSlideEditTextParagraphBulletJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/json': '"bullet"',
       }),
     })).toBeNull()
   })

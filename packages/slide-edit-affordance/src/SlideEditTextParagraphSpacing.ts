@@ -1,3 +1,5 @@
+import { SLIDE_EDIT_TEXT_JSON_PASTE_TYPES } from './SlideEditTextJSONPaste'
+
 export type SlideEditTextParagraphSlideId = string
 export type SlideEditTextParagraphObjectId = string
 
@@ -240,11 +242,8 @@ export const SLIDE_EDIT_TEXT_PARAGRAPH_SPACING_LIMITS = Object.freeze({
 export const SLIDE_EDIT_TEXT_PARAGRAPH_SPACING_JSON_MIME_TYPE =
   'application/vnd.interactive-os.slide-edit.text-paragraph-spacing+json'
 
-export const SLIDE_EDIT_TEXT_PARAGRAPH_SPACING_JSON_TYPES = Object.freeze([
-  'application/json',
-  'text/json',
-  'text/plain',
-] as const)
+export const SLIDE_EDIT_TEXT_PARAGRAPH_SPACING_JSON_TYPES =
+  SLIDE_EDIT_TEXT_JSON_PASTE_TYPES
 
 export const SLIDE_EDIT_TEXT_PARAGRAPH_SPACING_JSON_WRAPPER_KEYS =
   Object.freeze([
@@ -426,7 +425,7 @@ export function getSlideEditTextParagraphBulletJSONPasteValue({
     }
   }
 
-  for (const type of ['application/json', 'text/plain']) {
+  for (const type of SLIDE_EDIT_TEXT_JSON_PASTE_TYPES) {
     const value = parseSlideEditTextParagraphBulletJSON(
       dataTransfer.getData(type),
     )

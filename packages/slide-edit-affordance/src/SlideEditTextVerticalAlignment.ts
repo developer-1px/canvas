@@ -1,3 +1,5 @@
+import { SLIDE_EDIT_TEXT_JSON_PASTE_TYPES } from './SlideEditTextJSONPaste'
+
 export type SlideEditTextVerticalAlignmentSlideId = string
 export type SlideEditTextVerticalAlignmentObjectId = string
 
@@ -128,11 +130,8 @@ export const SLIDE_EDIT_TEXT_VERTICAL_ALIGNMENT_FIELD = Object.freeze({
 export const SLIDE_EDIT_TEXT_VERTICAL_ALIGNMENT_JSON_MIME_TYPE =
   'application/vnd.interactive-os.slide-edit.text-vertical-alignment+json'
 
-export const SLIDE_EDIT_TEXT_VERTICAL_ALIGNMENT_JSON_TYPES = Object.freeze([
-  'application/json',
-  'text/json',
-  'text/plain',
-] as const)
+export const SLIDE_EDIT_TEXT_VERTICAL_ALIGNMENT_JSON_TYPES =
+  SLIDE_EDIT_TEXT_JSON_PASTE_TYPES
 
 export const SLIDE_EDIT_TEXT_VERTICAL_ALIGNMENT_JSON_KEYS = Object.freeze([
   'textVerticalAlign',

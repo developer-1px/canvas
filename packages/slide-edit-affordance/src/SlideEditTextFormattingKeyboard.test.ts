@@ -173,6 +173,12 @@ describe('SlideEditTextFormattingKeyboard', () => {
       }),
       fieldId: 'italic',
     })).toBe(true)
+    expect(getSlideEditTextRunFormattingJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/json': '{"runItalic":true}',
+      }),
+      fieldId: 'italic',
+    })).toBe(true)
   })
 
   it('does not treat generic text/plain direct values as run formatting', () => {

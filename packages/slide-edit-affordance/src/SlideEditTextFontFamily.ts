@@ -1,3 +1,5 @@
+import { SLIDE_EDIT_TEXT_JSON_PASTE_TYPES } from './SlideEditTextJSONPaste'
+
 export type SlideEditTextFontSlideId = string
 export type SlideEditTextFontObjectId = string
 export type SlideEditTextFontFamily = string
@@ -322,7 +324,7 @@ export function getSlideEditTextFontFamilyJSONPasteValue<
     }
   }
 
-  for (const type of ['application/json', 'text/plain']) {
+  for (const type of SLIDE_EDIT_TEXT_JSON_PASTE_TYPES) {
     const value = parseSlideEditTextFontFamilyJSON(dataTransfer.getData(type))
     const explicitValue = getSlideEditTextFontFamilyExplicitJSONValue(
       value,

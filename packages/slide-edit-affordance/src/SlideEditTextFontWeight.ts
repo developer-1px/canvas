@@ -1,3 +1,5 @@
+import { SLIDE_EDIT_TEXT_JSON_PASTE_TYPES } from './SlideEditTextJSONPaste'
+
 export type SlideEditTextFontWeightSlideId = string
 export type SlideEditTextFontWeightObjectId = string
 
@@ -114,11 +116,8 @@ export const SLIDE_EDIT_TEXT_FONT_WEIGHT_FIELD = Object.freeze({
   requiredAdapterSlot: 'command-effect',
 } as const satisfies SlideEditTextFontWeightFieldDescriptor)
 
-export const SLIDE_EDIT_TEXT_FONT_WEIGHT_JSON_TYPES = Object.freeze([
-  'application/json',
-  'text/json',
-  'text/plain',
-] as const)
+export const SLIDE_EDIT_TEXT_FONT_WEIGHT_JSON_TYPES =
+  SLIDE_EDIT_TEXT_JSON_PASTE_TYPES
 
 export function createSlideEditTextFontWeightDescriptor<
   TSlideId extends SlideEditTextFontWeightSlideId,

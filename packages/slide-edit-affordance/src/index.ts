@@ -7,6 +7,10 @@ import type {
 import type { CanvasExtensionEffect } from '../../../src/canvas/foundation'
 
 export {
+  SLIDE_EDIT_TEXT_JSON_PASTE_TYPES,
+  type SlideEditTextJSONPasteType,
+} from './SlideEditTextJSONPaste'
+export {
   getSlideEditFrameGuideGeometry,
   normalizeSlideEditFrameInsets,
   type SlideEditFrameBounds,

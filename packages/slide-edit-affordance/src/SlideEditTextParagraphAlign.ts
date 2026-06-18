@@ -1,3 +1,5 @@
+import { SLIDE_EDIT_TEXT_JSON_PASTE_TYPES } from './SlideEditTextJSONPaste'
+
 export type SlideEditTextParagraphAlignSlideId = string
 export type SlideEditTextParagraphAlignObjectId = string
 
@@ -198,7 +200,7 @@ export function getSlideEditTextParagraphAlignJSONPasteValue({
     }
   }
 
-  for (const type of ['application/json', 'text/plain']) {
+  for (const type of SLIDE_EDIT_TEXT_JSON_PASTE_TYPES) {
     const value = parseSlideEditTextParagraphAlignJSON(
       dataTransfer.getData(type),
     )
