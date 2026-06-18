@@ -44,6 +44,7 @@ import {
   getCanvasAppFeaturePackMarketplaceAssemblyApplyCommitPlan,
   getCanvasAppFeaturePackMarketplaceAssemblyApplyCommitResult,
   getCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionSummary,
+  getCanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdate,
   getCanvasAppFeaturePackMarketplaceAssemblyApplyRuntimeStatePatch,
   getCanvasAppFeaturePackMarketplaceAssemblyApplyResult,
   getCanvasAppFeaturePackMarketplaceAssemblyApplyPlan,
@@ -220,6 +221,11 @@ import {
   type CanvasAppFeaturePackMarketplaceAssemblyApplyExecutionSummaryInput,
   type CanvasAppFeaturePackMarketplaceAssemblyApplyCleanupFailedExecutionResult,
   type CanvasAppFeaturePackMarketplaceAssemblyApplyCompletedExecutionResult,
+  type CanvasAppFeaturePackMarketplaceAssemblyApplyHostAssemblyInputUpdate,
+  type CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateHeldResult,
+  type CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateInput,
+  type CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateReadyResult,
+  type CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateResult,
   type CanvasAppFeaturePackMarketplaceAssemblyApplyNeedsCleanupHandlerExecutionPlan,
   type CanvasAppFeaturePackMarketplaceAssemblyApplyNeedsCleanupHandlerExecutionResult,
   type CanvasAppFeaturePackMarketplaceAssemblyApplyResult,
@@ -1302,6 +1308,43 @@ describe('Canvas package consumer imports', () => {
         await executeCanvasAppFeaturePackMarketplaceAssemblyApplyTransaction(
           featurePackMarketplaceAssemblyApplyTransactionInput,
         )
+    const featurePackMarketplaceAssemblyApplyHostUpdateInput:
+      CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateInput<
+        SmokeUninstallCleanupEffect,
+        SmokeUninstallCleanupExecutionValue
+      > = {
+        transactionResult: featurePackMarketplaceAssemblyApplyTransactionResult,
+      }
+    const featurePackMarketplaceAssemblyApplyHostUpdate:
+      CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateResult<
+        SmokeUninstallCleanupEffect,
+        SmokeUninstallCleanupExecutionValue
+      > =
+        getCanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdate(
+          featurePackMarketplaceAssemblyApplyHostUpdateInput,
+        )
+    const featurePackMarketplaceAssemblyApplyHostUpdateReadyResult:
+      CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateReadyResult<
+        SmokeUninstallCleanupEffect,
+        SmokeUninstallCleanupExecutionValue
+      > | null =
+        featurePackMarketplaceAssemblyApplyHostUpdate.ready
+          ? featurePackMarketplaceAssemblyApplyHostUpdate
+          : null
+    const featurePackMarketplaceAssemblyApplyHostUpdateHeldResult:
+      CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateHeldResult<
+        SmokeUninstallCleanupEffect,
+        SmokeUninstallCleanupExecutionValue
+      > | null =
+        featurePackMarketplaceAssemblyApplyHostUpdate.ready
+          ? null
+          : featurePackMarketplaceAssemblyApplyHostUpdate
+    const featurePackMarketplaceAssemblyApplyHostAssemblyInputUpdate:
+      CanvasAppFeaturePackMarketplaceAssemblyApplyHostAssemblyInputUpdate
+        | null =
+          featurePackMarketplaceAssemblyApplyHostUpdate.ready
+            ? featurePackMarketplaceAssemblyApplyHostUpdate.update
+            : null
     const featurePackMarketplaceAssemblyApplyReadyExecutionPlan:
       CanvasAppFeaturePackMarketplaceAssemblyApplyReadyExecutionPlan<
         SmokeUninstallCleanupEffect
@@ -2119,6 +2162,40 @@ describe('Canvas package consumer imports', () => {
     expect(featurePackMarketplaceAssemblyApplyTransactionResult
       .runtimeStatePatch.patch.changedFeaturePackIds)
       .toEqual(['smoke-partial-pack'])
+    expect(featurePackMarketplaceAssemblyApplyHostUpdate.status)
+      .toBe('ready')
+    expect(featurePackMarketplaceAssemblyApplyHostUpdate.ready).toBe(true)
+    if (!featurePackMarketplaceAssemblyApplyHostUpdate.ready) {
+      throw new Error('Expected ready feature pack marketplace host update')
+    }
+
+    expect(featurePackMarketplaceAssemblyApplyHostUpdateReadyResult)
+      .toBe(featurePackMarketplaceAssemblyApplyHostUpdate)
+    expect(featurePackMarketplaceAssemblyApplyHostUpdateHeldResult).toBeNull()
+    expect(featurePackMarketplaceAssemblyApplyHostUpdate.transactionResult)
+      .toBe(featurePackMarketplaceAssemblyApplyTransactionResult)
+    expect(featurePackMarketplaceAssemblyApplyHostUpdate.runtimeStatePatch)
+      .toBe(featurePackMarketplaceAssemblyApplyTransactionResult
+        .runtimeStatePatch)
+    expect(featurePackMarketplaceAssemblyApplyHostUpdate.currentAssemblyInput)
+      .toBe(featurePackMarketplaceAssemblyModel.assemblyInput)
+    expect(featurePackMarketplaceAssemblyApplyHostUpdate.nextAssemblyInput)
+      .toEqual(featurePackMarketplaceAssemblyAppliedInput)
+    expect(featurePackMarketplaceAssemblyApplyHostAssemblyInputUpdate)
+      .toBe(featurePackMarketplaceAssemblyApplyHostUpdate.update)
+    expect(featurePackMarketplaceAssemblyApplyHostUpdate.update).toMatchObject({
+      assemblyInput: featurePackMarketplaceAssemblyAppliedInput,
+      featurePackStates: [{
+        id: 'smoke-partial-pack',
+        status: 'disabled',
+      }],
+      kind: 'replace-assembly-input',
+      updateMode: 'partial-update',
+    })
+    expect(featurePackMarketplaceAssemblyApplyHostUpdate.update
+      .runtimeStatePatch)
+      .toBe(featurePackMarketplaceAssemblyApplyTransactionResult
+        .runtimeStatePatch.patch)
     expect(featurePackMarketplaceAssemblyApplyTransactionResult.summary.status)
       .toBe('completed')
     expect(CanvasPackage.executeCanvasAppFeaturePackMarketplaceAssemblyApplyTransaction)
@@ -2127,6 +2204,12 @@ describe('Canvas package consumer imports', () => {
       .toBe(executeCanvasAppFeaturePackMarketplaceAssemblyApplyTransaction)
     expect(CanvasAppAuthoring.executeCanvasAppFeaturePackMarketplaceAssemblyApplyTransaction)
       .toBe(executeCanvasAppFeaturePackMarketplaceAssemblyApplyTransaction)
+    expect(CanvasPackage.getCanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdate)
+      .toBe(getCanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdate)
+    expect(CanvasAppFacade.getCanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdate)
+      .toBe(getCanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdate)
+    expect(CanvasAppAuthoring.getCanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdate)
+      .toBe(getCanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdate)
     expect(featurePackMarketplaceAssemblyApplyReadyExecutionPlan)
       .toMatchObject({
         actionKind: 'disable',

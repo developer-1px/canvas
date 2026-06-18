@@ -15,6 +15,7 @@ import {
   getCanvasAppFeaturePackMarketplaceAssemblyApplyCommitPlan,
   getCanvasAppFeaturePackMarketplaceAssemblyApplyCommitResult,
   getCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionSummary,
+  getCanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdate,
   getCanvasAppFeaturePackMarketplaceAssemblyApplyRuntimeStatePatch,
   getCanvasAppFeaturePackMarketplaceAssemblyApplyResult,
   getCanvasAppFeaturePackMarketplaceAssemblyApplyPlan,
@@ -703,6 +704,43 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
         id: 'addon-pack',
         status: 'uninstalled',
       }])
+    const hostUpdate =
+      getCanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdate({
+        transactionResult,
+      })
+
+    expect(hostUpdate).toMatchObject({
+      actionKind: 'uninstall',
+      currentAssemblyInput: model.assemblyInput,
+      nextAssemblyInput: applyResult.nextModel.assemblyInput,
+      ready: true,
+      status: 'ready',
+      update: {
+        assemblyInput: applyResult.nextModel.assemblyInput,
+        featurePackStates: [{
+          id: 'addon-pack',
+          status: 'uninstalled',
+        }],
+        kind: 'replace-assembly-input',
+        runtimeStatePatch: {
+          changedFeaturePackIds: ['addon-pack'],
+        },
+        updateMode: 'full-rebuild',
+      },
+      updateMode: 'full-rebuild',
+    })
+    expect(hostUpdate.transactionResult).toBe(transactionResult)
+    expect(hostUpdate.runtimeStatePatch).toBe(
+      transactionResult.runtimeStatePatch,
+    )
+    if (!hostUpdate.ready) {
+      throw new Error('Expected ready host update')
+    }
+
+    expect(hostUpdate.update.assemblyInput)
+      .toBe(transactionResult.commitResult.nextAssemblyInput)
+    expect(hostUpdate.update.runtimeStatePatch)
+      .toBe(transactionResult.runtimeStatePatch.patch)
     expect(getCanvasAppFeaturePackMarketplaceAssemblyApplyRuntimeStatePatch({
       commitResult: transactionResult.commitResult,
     })).toMatchObject({
@@ -861,6 +899,25 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
       'nextFeaturePackStates' in
         needsHandlerTransactionResult.runtimeStatePatch,
     ).toBe(false)
+    const needsHandlerHostUpdate =
+      getCanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdate({
+        transactionResult: needsHandlerTransactionResult,
+      })
+
+    expect(needsHandlerHostUpdate).toMatchObject({
+      actionKind: 'uninstall',
+      currentAssemblyInput: model.assemblyInput,
+      holdReason: 'needs-cleanup-handler',
+      ready: false,
+      status: 'held',
+      update: null,
+      updateMode: 'full-rebuild',
+    })
+    expect(needsHandlerHostUpdate.transactionResult)
+      .toBe(needsHandlerTransactionResult)
+    expect(needsHandlerHostUpdate.runtimeStatePatch)
+      .toBe(needsHandlerTransactionResult.runtimeStatePatch)
+    expect('nextAssemblyInput' in needsHandlerHostUpdate).toBe(false)
     expect('nextModel' in needsHandlerTransactionResult.commitResult).toBe(
       false,
     )
@@ -1471,6 +1528,24 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
     expect(
       'nextFeaturePackStates' in blockedTransactionResult.runtimeStatePatch,
     ).toBe(false)
+    const blockedHostUpdate =
+      getCanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdate({
+        transactionResult: blockedTransactionResult,
+      })
+
+    expect(blockedHostUpdate).toMatchObject({
+      actionKind: 'uninstall',
+      currentAssemblyInput: model.assemblyInput,
+      holdReason: 'blocked',
+      ready: false,
+      status: 'held',
+      update: null,
+      updateMode: 'blocked',
+    })
+    expect(blockedHostUpdate.transactionResult).toBe(blockedTransactionResult)
+    expect(blockedHostUpdate.runtimeStatePatch)
+      .toBe(blockedTransactionResult.runtimeStatePatch)
+    expect('nextAssemblyInput' in blockedHostUpdate).toBe(false)
     expect('nextModel' in blockedTransactionResult.commitResult).toBe(false)
   })
 

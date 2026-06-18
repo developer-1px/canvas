@@ -712,6 +712,96 @@ export type CanvasAppFeaturePackMarketplaceAssemblyApplyRuntimeStatePatchHeldRes
   updateMode: CanvasAppFeaturePackMarketplaceAssemblyApplyUpdateMode
 }>
 
+export type CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateInput<
+  TEffect,
+  TResult,
+> = Readonly<{
+  transactionResult:
+    CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionResult<
+      TEffect,
+      TResult
+    >
+}>
+
+export type CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateResult<
+  TEffect,
+  TResult,
+> =
+  | CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateReadyResult<
+    TEffect,
+    TResult
+  >
+  | CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateHeldResult<
+    TEffect,
+    TResult
+  >
+
+export type CanvasAppFeaturePackMarketplaceAssemblyApplyHostAssemblyInputUpdate =
+  Readonly<{
+    assemblyInput: CanvasAppFeaturePackAssemblyInput
+    featurePackStates: readonly CanvasAppFeaturePackRuntimeStateInput[]
+    kind: 'replace-assembly-input'
+    runtimeStatePatch: CanvasAppFeaturePackRuntimeStatePatch
+    updateMode: Exclude<
+      CanvasAppFeaturePackMarketplaceAssemblyApplyUpdateMode,
+      'blocked'
+    >
+  }>
+
+export type CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateReadyResult<
+  TEffect,
+  TResult,
+> = Readonly<{
+  actionKind: CanvasAppFeaturePackMarketplacePrimaryAction['kind']
+  currentAssemblyInput: CanvasAppFeaturePackAssemblyInput
+  nextAssemblyInput: CanvasAppFeaturePackAssemblyInput
+  ready: true
+  runtimeStatePatch:
+    CanvasAppFeaturePackMarketplaceAssemblyApplyRuntimeStatePatchAppliedResult<
+      TEffect,
+      TResult
+    >
+  status: 'ready'
+  transactionResult:
+    CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionResult<
+      TEffect,
+      TResult
+    >
+  update:
+    CanvasAppFeaturePackMarketplaceAssemblyApplyHostAssemblyInputUpdate
+  updateMode: Exclude<
+    CanvasAppFeaturePackMarketplaceAssemblyApplyUpdateMode,
+    'blocked'
+  >
+}>
+
+export type CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateHeldResult<
+  TEffect,
+  TResult,
+> = Readonly<{
+  actionKind: CanvasAppFeaturePackMarketplacePrimaryAction['kind']
+  currentAssemblyInput: CanvasAppFeaturePackAssemblyInput
+  holdReason:
+    CanvasAppFeaturePackMarketplaceAssemblyApplyHeldCommitResult<
+      TEffect,
+      TResult
+    >['holdReason']
+  ready: false
+  runtimeStatePatch:
+    CanvasAppFeaturePackMarketplaceAssemblyApplyRuntimeStatePatchHeldResult<
+      TEffect,
+      TResult
+    >
+  status: 'held'
+  transactionResult:
+    CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionResult<
+      TEffect,
+      TResult
+    >
+  update: null
+  updateMode: CanvasAppFeaturePackMarketplaceAssemblyApplyUpdateMode
+}>
+
 export type CanvasAppFeaturePackMarketplaceAssemblyApplyReadyExecutionPlan<
   TEffect,
 > =
@@ -1333,6 +1423,69 @@ export function getCanvasAppFeaturePackMarketplaceAssemblyApplyRuntimeStatePatch
     }),
     patched: true,
     status: 'patched',
+    updateMode: commitResult.updateMode,
+  })
+}
+
+export function getCanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdate<
+  TEffect,
+  TResult,
+>({
+  transactionResult,
+}: CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateInput<
+  TEffect,
+  TResult
+>):
+  CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateResult<
+    TEffect,
+    TResult
+  > {
+  const { commitResult, runtimeStatePatch } = transactionResult
+
+  if (!commitResult.committed) {
+    if (runtimeStatePatch.patched) {
+      throw new Error(
+        'Canvas app marketplace transaction host update expected held runtime state patch',
+      )
+    }
+
+    return Object.freeze({
+      actionKind: transactionResult.actionKind,
+      currentAssemblyInput: commitResult.currentAssemblyInput,
+      holdReason: commitResult.holdReason,
+      ready: false,
+      runtimeStatePatch,
+      status: 'held',
+      transactionResult,
+      update: null,
+      updateMode: transactionResult.updateMode,
+    })
+  }
+
+  if (!runtimeStatePatch.patched) {
+    throw new Error(
+      'Canvas app marketplace transaction host update expected patched runtime state patch',
+    )
+  }
+
+  const update: CanvasAppFeaturePackMarketplaceAssemblyApplyHostAssemblyInputUpdate
+    = Object.freeze({
+      assemblyInput: commitResult.nextAssemblyInput,
+      featurePackStates: runtimeStatePatch.nextFeaturePackStates,
+      kind: 'replace-assembly-input',
+      runtimeStatePatch: runtimeStatePatch.patch,
+      updateMode: commitResult.updateMode,
+    })
+
+  return Object.freeze({
+    actionKind: transactionResult.actionKind,
+    currentAssemblyInput: commitResult.previousAssemblyInput,
+    nextAssemblyInput: commitResult.nextAssemblyInput,
+    ready: true,
+    runtimeStatePatch,
+    status: 'ready',
+    transactionResult,
+    update,
     updateMode: commitResult.updateMode,
   })
 }
