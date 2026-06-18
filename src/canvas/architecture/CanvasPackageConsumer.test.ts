@@ -76,6 +76,7 @@ import {
   getCanvasAppFeaturePackProfileById,
   getCanvasAppFeaturePackProfileRuntimeStates,
   getCanvasAppFeaturePackMarketplaceActionModel,
+  getCanvasAppFeaturePackMarketplaceModel,
   getCanvasAppFeaturePackProfileMarketplaceActionModel,
   getCanvasAppFeaturePackSuiteMarketplaceActionModel,
   getCanvasAppFeaturePackCatalog,
@@ -118,6 +119,7 @@ import {
   type CanvasComponentInspectorPanelModel,
   type CanvasAppFeaturePack,
   type CanvasAppFeaturePackMarketplaceActionModel,
+  type CanvasAppFeaturePackMarketplaceModel,
   type CanvasAppFeaturePackProfileMarketplaceActionModel,
   type CanvasAppFeaturePackSuiteMarketplaceActionModel,
   type CanvasAppFeaturePackCatalog,
@@ -487,6 +489,12 @@ describe('Canvas package consumer imports', () => {
         getCanvasAppFeaturePackMarketplaceActionModel({
           manifests: [partialUpdateManifest],
         })
+    const featurePackMarketplaceModel: CanvasAppFeaturePackMarketplaceModel =
+      getCanvasAppFeaturePackMarketplaceModel({
+        manifests: [partialUpdateManifest],
+        profiles: [partialUpdateProfile],
+        suiteManifests: [partialUpdateSuiteManifest],
+      })
     const featurePackProfileMarketplaceActionModel:
       CanvasAppFeaturePackProfileMarketplaceActionModel =
         getCanvasAppFeaturePackProfileMarketplaceActionModel({
@@ -966,6 +974,14 @@ describe('Canvas package consumer imports', () => {
         status: 'disabled',
       }],
     })
+    expect(featurePackMarketplaceModel.sections.map((section) => section.kind))
+      .toEqual([
+        'profiles',
+        'suites',
+        'packs',
+      ])
+    expect(featurePackMarketplaceModel.packs.items[0]?.featurePackId)
+      .toBe('smoke-partial-pack')
     expect(featurePackProfileMarketplaceActionModel.items[0]?.profileId)
       .toBe('smoke-partial-profile')
     expect(featurePackProfileMarketplaceActionModel.items[0]?.primaryActionKind)
@@ -1380,6 +1396,12 @@ describe('Canvas package consumer imports', () => {
     expect(CanvasAppFacade.getCanvasAppFeaturePackMarketplaceActionModel)
       .toBeTypeOf('function')
     expect(CanvasPackage.getCanvasAppFeaturePackMarketplaceActionModel)
+      .toBeTypeOf('function')
+    expect(CanvasAppAuthoring.getCanvasAppFeaturePackMarketplaceModel)
+      .toBeTypeOf('function')
+    expect(CanvasAppFacade.getCanvasAppFeaturePackMarketplaceModel)
+      .toBeTypeOf('function')
+    expect(CanvasPackage.getCanvasAppFeaturePackMarketplaceModel)
       .toBeTypeOf('function')
     expect(CanvasAppAuthoring.getCanvasAppFeaturePackProfileMarketplaceActionModel)
       .toBeTypeOf('function')
