@@ -16,6 +16,8 @@ import {
 } from './SlideEditColorSwatchPalette'
 import {
   getSlideEditColorSwatchJSONPasteValue as getSlideEditColorSwatchJSONPasteValueFromPackage,
+  getSlideEditColorWithAlphaCSS as getSlideEditColorWithAlphaCSSFromPackage,
+  normalizeSlideEditColorHex as normalizeSlideEditColorHexFromPackage,
 } from './index'
 
 describe('SlideEditColorSwatchPalette', () => {
@@ -172,13 +174,13 @@ describe('SlideEditColorSwatchPalette', () => {
   })
 
   it('normalizes hex colors for shared renderer comparisons', () => {
-    expect(normalizeSlideEditColorHex(' #ABC ')).toBe('#aabbcc')
+    expect(normalizeSlideEditColorHexFromPackage(' #ABC ')).toBe('#aabbcc')
     expect(normalizeSlideEditColorHex('#ABCDEF')).toBe('#abcdef')
     expect(normalizeSlideEditColorHex('currentColor')).toBeNull()
   })
 
   it('maps hex colors and alpha to CSS color values', () => {
-    expect(getSlideEditColorWithAlphaCSS({
+    expect(getSlideEditColorWithAlphaCSSFromPackage({
       color: '#abc',
       opacity: 0.335,
     })).toBe('rgb(170 187 204 / 0.34)')
