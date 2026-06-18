@@ -2,14 +2,18 @@ import { describe, expect, it } from 'vitest'
 
 import type { Bounds } from '../core'
 import {
+  alignCanvasRectList,
   alignCanvasSelectionItems,
   canAlignCanvasSelectionItems,
   canDistributeCanvasSelectionItems,
   canFlipCanvasSelectionItems,
   canReorderCanvasSelectionItems,
   canTidyCanvasSelectionItems,
+  distributeCanvasRectList,
   distributeCanvasSelectionItems,
   flipCanvasSelectionItems,
+  getCanvasAlignedBounds,
+  getCanvasAlignmentDelta,
   insertCanvasItemAtTargetPlacement,
   moveCanvasItemToTargetPlacement,
   moveCanvasSelectionItemsToIndex,
@@ -319,6 +323,29 @@ describe('CanvasSelectionLayout', () => {
   })
 
   it('aligns selected item bounds to a provided frame', () => {
+    expect(getCanvasAlignedBounds({
+      bounds: { h: 20, w: 40, x: 0, y: 0 },
+      frame: { h: 100, w: 200, x: 0, y: 0 },
+      mode: 'alignCenter',
+    })).toEqual({ h: 20, w: 40, x: 80, y: 0 })
+    expect(getCanvasAlignmentDelta({
+      bounds: { h: 20, w: 40, x: 0, y: 0 },
+      frame: { h: 100, w: 200, x: 0, y: 0 },
+      mode: 'alignBottom',
+    })).toEqual({ x: 0, y: 80 })
+    expect(alignCanvasRectList({
+      entries: [{
+        bounds: { h: 20, w: 40, x: 0, y: 0 },
+        id: 'a',
+      }],
+      frame: { h: 100, w: 200, x: 0, y: 0 },
+      mode: 'alignCenter',
+    })).toEqual([{
+      bounds: { h: 20, w: 40, x: 80, y: 0 },
+      delta: { x: 80, y: 0 },
+      id: 'a',
+    }])
+
     expect(canAlignCanvasSelectionItems({
       frame: { h: 100, w: 200, x: 0, y: 0 },
       getItemBounds,
@@ -356,6 +383,31 @@ describe('CanvasSelectionLayout', () => {
   })
 
   it('distributes selected item bounds along an axis', () => {
+    expect(distributeCanvasRectList({
+      entries: [
+        { bounds: { h: 20, w: 40, x: 0, y: 0 }, id: 'a' },
+        { bounds: { h: 30, w: 20, x: 100, y: 10 }, id: 'b' },
+        { bounds: { h: 10, w: 10, x: 20, y: 80 }, id: 'c' },
+      ],
+      mode: 'distributeHorizontal',
+    })).toEqual([
+      {
+        bounds: { h: 20, w: 40, x: 0, y: 0 },
+        delta: { x: 0, y: 0 },
+        id: 'a',
+      },
+      {
+        bounds: { h: 30, w: 20, x: 100, y: 10 },
+        delta: { x: 0, y: 0 },
+        id: 'b',
+      },
+      {
+        bounds: { h: 10, w: 10, x: 65, y: 80 },
+        delta: { x: 45, y: 0 },
+        id: 'c',
+      },
+    ])
+
     expect(canDistributeCanvasSelectionItems({
       getItemBounds,
       getItemId,

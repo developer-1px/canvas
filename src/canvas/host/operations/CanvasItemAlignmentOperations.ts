@@ -1,4 +1,9 @@
-import type { Bounds } from '../../core'
+import {
+  distributeCanvasRectList,
+  getCanvasAlignmentDelta,
+  type CanvasAlignMode,
+  type CanvasDistributeMode,
+} from '../../foundation'
 import type { CanvasItem } from '../model'
 import {
   flattenCanvasItems,
@@ -18,21 +23,14 @@ import {
 } from './CanvasItemOperationTree'
 import { isCanvasItemLocked } from './CanvasItemLockOperations'
 
-export type CanvasAlignMode =
-  | 'alignBottom'
-  | 'alignCenter'
-  | 'alignLeft'
-  | 'alignMiddle'
-  | 'alignRight'
-  | 'alignTop'
-
-export type CanvasDistributeMode =
-  | 'distributeHorizontal'
-  | 'distributeVertical'
-
 export type CanvasTidyOptions = {
   gap?: number
 }
+
+export type {
+  CanvasAlignMode,
+  CanvasDistributeMode,
+} from '../../foundation'
 
 export function alignCanvasSelection(
   items: CanvasItem[],
@@ -56,7 +54,11 @@ export function alignCanvasSelection(
       entry.item.id,
       translateCanvasItemByDelta(
         entry.item,
-        getAlignmentDelta(getItemBounds(entry.item), bounds, mode),
+        getCanvasAlignmentDelta({
+          bounds: getItemBounds(entry.item),
+          frame: bounds,
+          mode,
+        }),
       ),
     ]),
   )
@@ -77,34 +79,27 @@ export function distributeCanvasSelection(
     return items
   }
 
-  const horizontal = mode === 'distributeHorizontal'
-  const sorted = [...entries].sort((a, b) => {
-    const aBounds = getItemBounds(a.item)
-    const bBounds = getItemBounds(b.item)
-
-    return horizontal ? aBounds.x - bBounds.x : aBounds.y - bBounds.y
+  const plans = distributeCanvasRectList({
+    entries: entries.map((entry) => ({
+      bounds: getItemBounds(entry.item),
+      id: entry.item.id,
+    })),
+    mode,
   })
-  const boundsList = sorted.map((entry) => getItemBounds(entry.item))
-  const first = boundsList[0]
-  const last = boundsList[boundsList.length - 1]
-  const start = horizontal ? first.x : first.y
-  const end = horizontal ? last.x + last.w : last.y + last.h
-  const totalSize = boundsList.reduce(
-    (sum, bounds) => sum + (horizontal ? bounds.w : bounds.h),
-    0,
-  )
-  const gap = (end - start - totalSize) / (sorted.length - 1)
-  let cursor = start
+  const planById = new Map(plans.map((plan) => [plan.id, plan]))
   const distributed = new Map<string, CanvasItem>()
 
-  sorted.forEach((entry, index) => {
-    const itemBounds = boundsList[index]
-    const delta = horizontal
-      ? { x: cursor - itemBounds.x, y: 0 }
-      : { x: 0, y: cursor - itemBounds.y }
+  entries.forEach((entry) => {
+    const plan = planById.get(entry.item.id)
 
-    distributed.set(entry.item.id, translateCanvasItemByDelta(entry.item, delta))
-    cursor += (horizontal ? itemBounds.w : itemBounds.h) + gap
+    if (!plan) {
+      return
+    }
+
+    distributed.set(
+      entry.item.id,
+      translateCanvasItemByDelta(entry.item, plan.delta),
+    )
   })
 
   return replaceCanvasChildrenAtPath(items, entries[0].parentPath, (children) =>
@@ -213,40 +208,6 @@ function getSelectedTidyEntries(items: CanvasItem[], ids: string[]) {
 
 function isTidyCanvasItem(item: CanvasItem) {
   return !isCanvasDrawingItem(item)
-}
-
-function getAlignmentDelta(
-  itemBounds: Bounds,
-  bounds: Bounds,
-  mode: CanvasAlignMode,
-) {
-  if (mode === 'alignLeft') {
-    return { x: bounds.x - itemBounds.x, y: 0 }
-  }
-
-  if (mode === 'alignCenter') {
-    return {
-      x: bounds.x + bounds.w / 2 - (itemBounds.x + itemBounds.w / 2),
-      y: 0,
-    }
-  }
-
-  if (mode === 'alignRight') {
-    return { x: bounds.x + bounds.w - (itemBounds.x + itemBounds.w), y: 0 }
-  }
-
-  if (mode === 'alignTop') {
-    return { x: 0, y: bounds.y - itemBounds.y }
-  }
-
-  if (mode === 'alignMiddle') {
-    return {
-      x: 0,
-      y: bounds.y + bounds.h / 2 - (itemBounds.y + itemBounds.h / 2),
-    }
-  }
-
-  return { x: 0, y: bounds.y + bounds.h - (itemBounds.y + itemBounds.h) }
 }
 
 function translateCanvasItemByDelta(

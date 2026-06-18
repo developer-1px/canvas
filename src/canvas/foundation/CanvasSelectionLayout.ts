@@ -8,6 +8,38 @@ import type {
 
 export type CanvasSelectionLayoutAxis = 'horizontal' | 'vertical'
 
+export type CanvasLayoutDelta = {
+  x: number
+  y: number
+}
+
+export type CanvasRectLayoutEntry<TItemId extends string = string> = {
+  bounds: Bounds
+  id: TItemId
+}
+
+export type CanvasRectLayoutPlanEntry<TItemId extends string = string> =
+  CanvasRectLayoutEntry<TItemId> & {
+    delta: CanvasLayoutDelta
+  }
+
+export type CanvasRectAlignmentInput = {
+  bounds: Bounds
+  frame: Bounds
+  mode: CanvasAlignMode
+}
+
+export type CanvasRectListAlignmentInput<TItemId extends string = string> = {
+  entries: readonly CanvasRectLayoutEntry<TItemId>[]
+  frame: Bounds
+  mode: CanvasAlignMode
+}
+
+export type CanvasRectListDistributionInput<TItemId extends string = string> = {
+  entries: readonly CanvasRectLayoutEntry<TItemId>[]
+  mode: CanvasDistributeMode
+}
+
 export type CanvasSelectionLayoutInput<
   TItem,
   TItemId extends string = string,
@@ -187,10 +219,28 @@ export function alignCanvasSelectionItems<
 
   const aligned = new Map<TItemId, TItem>()
 
+  const rectPlans = alignCanvasRectList({
+    entries: selected.map((entry) => ({
+      bounds: entry.bounds,
+      id: entry.id,
+    })),
+    frame: alignmentFrame,
+    mode,
+  })
+  const rectPlanById = new Map(
+    rectPlans.map((plan) => [plan.id, plan.bounds]),
+  )
+
   selected.forEach((entry) => {
+    const bounds = rectPlanById.get(entry.id)
+
+    if (!bounds) {
+      return
+    }
+
     aligned.set(entry.id, updateItemBounds(
       entry.item,
-      getCanvasSelectionAlignedBounds(entry.bounds, alignmentFrame, mode),
+      bounds,
       entry.index,
     ))
   })
@@ -220,8 +270,105 @@ export function distributeCanvasSelectionItems<
     return input.items
   }
 
+  const rectPlans = distributeCanvasRectList({
+    entries: selected.map((entry) => ({
+      bounds: entry.bounds,
+      id: entry.id,
+    })),
+    mode,
+  })
+  const rectPlanById = new Map(
+    rectPlans.map((plan) => [plan.id, plan.bounds]),
+  )
+  const distributed = new Map<TItemId, TItem>()
+
+  selected.forEach((entry) => {
+    const bounds = rectPlanById.get(entry.id)
+
+    if (!bounds) {
+      return
+    }
+
+    distributed.set(
+      entry.id,
+      updateItemBounds(entry.item, bounds, entry.index),
+    )
+  })
+
+  return input.items.map((item, index) =>
+    distributed.get(input.getItemId(item, index)) ?? item)
+}
+
+export function getCanvasAlignedBounds({
+  bounds,
+  frame,
+  mode,
+}: CanvasRectAlignmentInput): Bounds {
+  if (mode === 'alignLeft') {
+    return { ...bounds, x: frame.x }
+  }
+
+  if (mode === 'alignCenter') {
+    return { ...bounds, x: frame.x + frame.w / 2 - bounds.w / 2 }
+  }
+
+  if (mode === 'alignRight') {
+    return { ...bounds, x: frame.x + frame.w - bounds.w }
+  }
+
+  if (mode === 'alignTop') {
+    return { ...bounds, y: frame.y }
+  }
+
+  if (mode === 'alignMiddle') {
+    return { ...bounds, y: frame.y + frame.h / 2 - bounds.h / 2 }
+  }
+
+  return { ...bounds, y: frame.y + frame.h - bounds.h }
+}
+
+export function getCanvasAlignmentDelta(
+  input: CanvasRectAlignmentInput,
+): CanvasLayoutDelta {
+  return getCanvasLayoutDelta(
+    input.bounds,
+    getCanvasAlignedBounds(input),
+  )
+}
+
+export function alignCanvasRectList<TItemId extends string = string>({
+  entries,
+  frame,
+  mode,
+}: CanvasRectListAlignmentInput<TItemId>): CanvasRectLayoutPlanEntry<TItemId>[] {
+  return entries.map((entry) => {
+    const bounds = getCanvasAlignedBounds({
+      bounds: entry.bounds,
+      frame,
+      mode,
+    })
+
+    return {
+      ...entry,
+      bounds,
+      delta: getCanvasLayoutDelta(entry.bounds, bounds),
+    }
+  })
+}
+
+export function distributeCanvasRectList<TItemId extends string = string>({
+  entries,
+  mode,
+}: CanvasRectListDistributionInput<TItemId>): CanvasRectLayoutPlanEntry<TItemId>[] {
+  if (entries.length < 3) {
+    return entries.map((entry) => ({
+      ...entry,
+      delta: { x: 0, y: 0 },
+    }))
+  }
+
   const horizontal = mode === 'distributeHorizontal'
-  const sorted = [...selected].sort((left, right) =>
+  const sorted = [...entries].sort((left, right) =>
     horizontal
       ? left.bounds.x - right.bounds.x
       : left.bounds.y - right.bounds.y)
@@ -229,7 +376,10 @@ export function distributeCanvasSelectionItems<
   const last = sorted.at(-1)
 
   if (!first || !last) {
-    return input.items
+    return entries.map((entry) => ({
+      ...entry,
+      delta: { x: 0, y: 0 },
+    }))
   }
 
   const start = horizontal ? first.bounds.x : first.bounds.y
@@ -241,23 +391,27 @@ export function distributeCanvasSelectionItems<
     0,
   )
   const gap = (end - start - totalSize) / (sorted.length - 1)
+  const distributed = new Map<TItemId, Bounds>()
   let cursor = start
-  const distributed = new Map<TItemId, TItem>()
 
   sorted.forEach((entry) => {
-    const nextBounds = horizontal
+    const bounds = horizontal
       ? { ...entry.bounds, x: cursor }
       : { ...entry.bounds, y: cursor }
 
-    distributed.set(
-      entry.id,
-      updateItemBounds(entry.item, nextBounds, entry.index),
-    )
+    distributed.set(entry.id, bounds)
     cursor += (horizontal ? entry.bounds.w : entry.bounds.h) + gap
   })
 
-  return input.items.map((item, index) =>
-    distributed.get(input.getItemId(item, index)) ?? item)
+  return entries.map((entry) => {
+    const bounds = distributed.get(entry.id) ?? entry.bounds
+
+    return {
+      ...entry,
+      bounds,
+      delta: getCanvasLayoutDelta(entry.bounds, bounds),
+    }
+  })
 }
 
 export function canReorderCanvasSelectionItems<
@@ -666,30 +820,12 @@ function clampCanvasSelectionItemIndex(index: number, length: number) {
   return Math.max(0, Math.min(length, index))
 }
 
-function getCanvasSelectionAlignedBounds(
+function getCanvasLayoutDelta(
   bounds: Bounds,
-  frame: Bounds,
-  mode: CanvasAlignMode,
-): Bounds {
-  if (mode === 'alignLeft') {
-    return { ...bounds, x: frame.x }
+  nextBounds: Bounds,
+): CanvasLayoutDelta {
+  return {
+    x: nextBounds.x - bounds.x,
+    y: nextBounds.y - bounds.y,
   }
-
-  if (mode === 'alignCenter') {
-    return { ...bounds, x: frame.x + frame.w / 2 - bounds.w / 2 }
-  }
-
-  if (mode === 'alignRight') {
-    return { ...bounds, x: frame.x + frame.w - bounds.w }
-  }
-
-  if (mode === 'alignTop') {
-    return { ...bounds, y: frame.y }
-  }
-
-  if (mode === 'alignMiddle') {
-    return { ...bounds, y: frame.y + frame.h / 2 - bounds.h / 2 }
-  }
-
-  return { ...bounds, y: frame.y + frame.h - bounds.h }
 }

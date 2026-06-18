@@ -2196,6 +2196,27 @@ describe('Canvas package consumer imports', () => {
       hasSelectedGroup: false,
       selection: ['rect-1', 'rect-2'],
     }).alignLeft).toBe(true)
+    expect(CanvasFoundation.getCanvasAlignmentDelta({
+      bounds: { h: 20, w: 40, x: 0, y: 0 },
+      frame: { h: 100, w: 200, x: 0, y: 0 },
+      mode: 'alignBottom',
+    })).toEqual({ x: 0, y: 80 })
+    expect(CanvasFoundation.alignCanvasRectList({
+      entries: [{ bounds: { h: 20, w: 40, x: 0, y: 0 }, id: 'rect-1' }],
+      frame: { h: 100, w: 200, x: 0, y: 0 },
+      mode: 'alignCenter',
+    })[0]?.bounds).toEqual({ h: 20, w: 40, x: 80, y: 0 })
+    expect(CanvasFoundation.distributeCanvasRectList({
+      entries: [
+        { bounds: { h: 20, w: 40, x: 0, y: 0 }, id: 'rect-1' },
+        { bounds: { h: 30, w: 20, x: 100, y: 10 }, id: 'rect-2' },
+        { bounds: { h: 10, w: 10, x: 20, y: 80 }, id: 'rect-3' },
+      ],
+      mode: 'distributeHorizontal',
+    })[2]?.delta).toEqual({ x: 45, y: 0 })
+    expect(CanvasFoundationFromPackage.getCanvasAlignmentDelta).toBe(
+      CanvasFoundation.getCanvasAlignmentDelta,
+    )
     const scene = CanvasFoundation.createCanvasSceneAdapter([{
       bounds: { h: 20, w: 20, x: 0, y: 0 },
       id: 'rect-1',
