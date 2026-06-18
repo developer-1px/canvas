@@ -15,6 +15,7 @@ import {
   CANVAS_WHEEL_VIEWPORT_PAN_MODE,
   CANVAS_WHEEL_VIEWPORT_ZOOM_MODIFIER,
   CANVAS_WHEEL_PASSTHROUGH_SELECTOR,
+  CANVAS_RICH_CLIPBOARD_JSON_SCRIPT_ATTRIBUTE,
   applyCanvasAppFeaturePackRuntimeStatePatch,
   bindCanvasEventListener,
   bindCanvasEventListeners,
@@ -40,6 +41,7 @@ import {
   createCanvasAppStageElement,
   createCanvasExternalClipboardImagePasteActionResolver,
   createCanvasExternalClipboardPasteActionPlan,
+  createCanvasRichClipboardHTML,
   createCanvasPlainTextPasteSource,
   routeCanvasImagePasteReplace,
   routeCanvasMediaSourceObjectHyperlink,
@@ -51,6 +53,7 @@ import {
   createCanvasStoryPreviewItemsFeaturePackManifest,
   getCanvasDataTransferText,
   getCanvasExternalClipboardPasteCommandRoute,
+  getCanvasRichClipboardJSONFromHTML,
   setCanvasDataTransferDropEffect,
   downloadCanvasBlobFile,
   downloadCanvasTextFile,
@@ -58,8 +61,11 @@ import {
   getCanvasEditableFieldKeyboardIntent,
   getCanvasPresentationKeyboardIntent,
   setCanvasDataTransferText,
+  stringifyCanvasRichClipboardPayload,
+  readCanvasRichClipboardFromDataTransfer,
   scheduleCanvasAnimationFrameTask,
   writeCanvasClipboardText,
+  writeCanvasRichClipboardPayload,
   previewCanvasPointerPanInteraction,
   resetCanvasViewport,
   startCanvasPointerPanInteraction,
@@ -240,6 +246,10 @@ import {
   type CanvasPointerPanInteraction,
   type CanvasPointerPanPreviewResult,
   type CanvasPointerPanStartResult,
+  type CanvasRichClipboardDataTransfer,
+  type CanvasRichClipboardExtraItems,
+  type CanvasRichClipboardHTMLInput,
+  type CanvasRichClipboardReadResult,
   type CanvasResizeHandleDoubleClickIntentInput,
   type CanvasPointerTransformModifierInput,
   type CanvasPointerTransformModifierState,
@@ -1527,6 +1537,40 @@ describe('Canvas package consumer imports', () => {
         x: 0,
         y: 0,
       }
+    const packageRichClipboardJSON = stringifyCanvasRichClipboardPayload({
+      kind: 'card',
+    })
+    const packageRichClipboardHTMLInput: CanvasRichClipboardHTMLInput = {
+      json: packageRichClipboardJSON,
+    }
+    const packageRichClipboardHTML = createCanvasRichClipboardHTML(
+      packageRichClipboardHTMLInput,
+    )
+    const packageRichClipboardExtraItems: CanvasRichClipboardExtraItems = {
+      'text/csv': 'label,value\nCard,1',
+    }
+    const packageRichClipboardDataTransfer: CanvasRichClipboardDataTransfer = {
+      getData: (type) => {
+        if (type === 'text/html') {
+          return packageRichClipboardHTML
+        }
+
+        return ''
+      },
+    }
+    const packageRichClipboardResult:
+      CanvasRichClipboardReadResult<{ kind: 'card' }> | null =
+        readCanvasRichClipboardFromDataTransfer({
+          dataTransfer: packageRichClipboardDataTransfer,
+          jsonMimeType: 'application/vnd.example.card+json',
+          parsePayload: (value) =>
+            typeof value === 'object' &&
+              value !== null &&
+              'kind' in value &&
+              value.kind === 'card'
+              ? { kind: 'card' as const }
+              : null,
+        })
     const viewportControlStageElement = {
       getRect: () => ({
         height: 100,
@@ -1577,6 +1621,20 @@ describe('Canvas package consumer imports', () => {
       x: 140,
       y: 60,
     })
+    expect(CANVAS_RICH_CLIPBOARD_JSON_SCRIPT_ATTRIBUTE)
+      .toBe('data-canvas-rich-clipboard-json')
+    expect(CanvasAppFacade.writeCanvasRichClipboardPayload)
+      .toBe(writeCanvasRichClipboardPayload)
+    expect(CanvasAppFacade.readCanvasRichClipboardFromDataTransfer)
+      .toBe(readCanvasRichClipboardFromDataTransfer)
+    expect(getCanvasRichClipboardJSONFromHTML(packageRichClipboardHTML))
+      .toBe(packageRichClipboardJSON)
+    expect(packageRichClipboardResult).toEqual({
+      format: 'text-html',
+      payload: { kind: 'card' },
+    })
+    expect(packageRichClipboardExtraItems['text/csv'])
+      .toBe('label,value\nCard,1')
     expect(packageStageElementController.mount.ref).toBeTypeOf('function')
     expect(packageStageElement.getRect()).toEqual(packageStageRect)
     expect(packageStageElement.getScreenPoint({ clientX: 70, clientY: 90 }))

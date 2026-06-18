@@ -242,6 +242,8 @@ export {
   type CanvasRichClipboardClipboard,
   type CanvasRichClipboardDataTransfer,
   type CanvasRichClipboardDataTransferInput,
+  type CanvasRichClipboardExtraItems,
+  type CanvasRichClipboardExtraItemValue,
   type CanvasRichClipboardHTMLInput,
   type CanvasRichClipboardItemConstructor,
   type CanvasRichClipboardParsePayload,
