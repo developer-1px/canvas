@@ -7,6 +7,9 @@ import {
   createCanvasAppFeaturePackManifest,
 } from '../CanvasAppFeaturePackManifests'
 
+export const CANVAS_COMPONENT_RUNTIME_FEATURE_PACK_CAPABILITY =
+  'component-runtime'
+
 export const CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST =
   createCanvasAppFeaturePackManifest({
     category: 'foundation',
@@ -20,6 +23,7 @@ export const CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST =
       partialUpdate: ['runtime-model'],
       runtimeToggleable: true,
     },
+    provides: [CANVAS_COMPONENT_RUNTIME_FEATURE_PACK_CAPABILITY],
     runtimeFeaturePacks: {
       componentDefinitionRegistry: CANVAS_COMPONENT_DEFINITION_REGISTRY,
       componentLibrary: CANVAS_COMPONENT_LIBRARY,

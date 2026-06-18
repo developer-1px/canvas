@@ -79,6 +79,7 @@ import {
 } from './component-sync'
 import {
   CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST,
+  CANVAS_COMPONENT_RUNTIME_FEATURE_PACK_CAPABILITY,
 } from './component-library'
 import {
   CANVAS_APP_COMPONENT_SOURCE_OUTLINE_FEATURE_PACK_MANIFEST,
@@ -398,6 +399,8 @@ describe('CanvasAppFeaturePacks', () => {
     expect(getCanvasAppInstalledFeaturePackManifestIds(
       DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS,
     )).toContain(CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST.id)
+    expect(CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST.provides)
+      .toContain(CANVAS_COMPONENT_RUNTIME_FEATURE_PACK_CAPABILITY)
     expect(getCanvasAppInstalledFeaturePackManifestIds(
       DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS,
     )).toContain(CANVAS_APP_COMPONENT_SOURCE_OUTLINE_FEATURE_PACK_MANIFEST.id)
@@ -411,7 +414,7 @@ describe('CanvasAppFeaturePacks', () => {
           partialUpdate: ['overlay'],
           runtimeToggleable: true,
         },
-        requires: [CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST.id],
+        requires: [CANVAS_COMPONENT_RUNTIME_FEATURE_PACK_CAPABILITY],
       })
     expect(CANVAS_APP_COMPONENT_AUTHORING_FEATURE_PACK_MANIFEST)
       .toMatchObject({

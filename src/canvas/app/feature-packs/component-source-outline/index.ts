@@ -2,7 +2,7 @@ import {
   createCanvasAppFeaturePackManifest,
 } from '../CanvasAppFeaturePackManifests'
 import {
-  CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST,
+  CANVAS_COMPONENT_RUNTIME_FEATURE_PACK_CAPABILITY,
 } from '../component-library'
 
 export const CANVAS_APP_COMPONENT_SOURCE_OUTLINE_FEATURE_PACK_MANIFEST =
@@ -18,5 +18,5 @@ export const CANVAS_APP_COMPONENT_SOURCE_OUTLINE_FEATURE_PACK_MANIFEST =
       partialUpdate: ['overlay'],
       runtimeToggleable: true,
     },
-    requires: [CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST.id],
+    requires: [CANVAS_COMPONENT_RUNTIME_FEATURE_PACK_CAPABILITY],
   })

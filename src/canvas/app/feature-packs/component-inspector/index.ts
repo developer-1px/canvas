@@ -8,7 +8,7 @@ import {
   createCanvasAppFeaturePack,
 } from '../CanvasAppFeaturePacks'
 import {
-  CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST,
+  CANVAS_COMPONENT_RUNTIME_FEATURE_PACK_CAPABILITY,
 } from '../component-library'
 import {
   CANVAS_COMPONENT_INSPECTOR_PANEL,
@@ -43,5 +43,5 @@ export const CANVAS_APP_COMPONENT_INSPECTOR_FEATURE_PACK_MANIFEST =
       partialUpdate: ['inspector'],
       runtimeToggleable: true,
     },
-    requires: [CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST.id],
+    requires: [CANVAS_COMPONENT_RUNTIME_FEATURE_PACK_CAPABILITY],
   })
