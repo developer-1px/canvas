@@ -54,7 +54,7 @@ function createEngineDemoFeaturePackStates(
   return ENGINE_DEMO_FEATURE_PACK_SWITCH_IDS.map(
     (id): CanvasAppFeaturePackRuntimeStateInput => ({
       id,
-      status: featurePackSwitchState[id] ? 'enabled' : 'uninstalled',
+      status: featurePackSwitchState[id] ? 'enabled' : 'disabled',
     }),
   )
 }

@@ -20,6 +20,7 @@ import {
   DEFAULT_CANVAS_APP_FEATURE_PACK_EXTENSION_BUNDLE,
   DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS,
   DEFAULT_CANVAS_APP_FEATURE_PACK_VIEW_RENDERERS,
+  getCanvasAppEnabledFeaturePackManifestIds,
   getCanvasAppInstalledFeaturePackManifestIds,
 } from '../feature-packs'
 import { DEFAULT_CANVAS_APP_ITEM_LAYER_ADAPTER } from '../rendering/CanvasAppItemLayerAdapter'
@@ -60,6 +61,9 @@ export const DEFAULT_CANVAS_APP_ASSEMBLY: CanvasAppAssembly =
     componentLibrary: CANVAS_COMPONENT_LIBRARY,
     componentPresentationRenderers:
       DEFAULT_CANVAS_APP_COMPONENT_PRESENTATION_RENDERERS,
+    enabledFeaturePackIds: getCanvasAppEnabledFeaturePackManifestIds(
+      DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS,
+    ),
     featurePackViewRenderers: DEFAULT_CANVAS_APP_FEATURE_PACK_VIEW_RENDERERS,
     installedFeaturePackIds: getCanvasAppInstalledFeaturePackManifestIds(
       DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS,

@@ -73,6 +73,7 @@ export type CanvasAppAssemblyExtensionModel = {
 }
 
 export type CanvasAppAssemblyFeaturePackModel = {
+  enabledIds: readonly CanvasAppFeaturePackId[]
   installedIds: readonly CanvasAppFeaturePackId[]
   viewRenderers: CanvasAppFeaturePackViewRenderers
 }

@@ -42,6 +42,8 @@ export type CanvasAppAssembly = CanvasAppExtensionBundle & {
   componentPresentationRenderers: CanvasAppComponentPresentationRenderers
   featurePackViewRenderers:
     CanvasAppFeaturePackAssembly['featurePackViewRenderers']
+  enabledFeaturePackIds:
+    CanvasAppFeaturePackAssembly['enabledFeaturePackIds']
   installedFeaturePackIds:
     CanvasAppFeaturePackAssembly['installedFeaturePackIds']
   initialItems: CanvasItem[]

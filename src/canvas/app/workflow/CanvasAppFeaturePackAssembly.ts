@@ -7,6 +7,7 @@ import {
   createCanvasAppFeaturePackViewRenderers,
   getCanvasAppFeaturePackProfileById,
   getCanvasAppFeaturePackProfileRuntimeStates,
+  getCanvasAppEnabledFeaturePackManifestIds,
   getCanvasAppManifestExtensionFeaturePacks,
   getCanvasAppManifestViewFeaturePacks,
   getCanvasAppInstalledFeaturePackManifestIds,
@@ -23,6 +24,7 @@ import type {
 } from '../extensions/CanvasAppExtensionBundle'
 
 export type CanvasAppFeaturePackAssembly = {
+  enabledFeaturePackIds: readonly CanvasAppFeaturePackId[]
   featurePackExtensionBundle: CanvasAppExtensionBundle
   installedFeaturePackIds: readonly CanvasAppFeaturePackId[]
   featurePackViewRenderers: CanvasAppFeaturePackViewRenderers
@@ -59,6 +61,10 @@ export function createCanvasAppFeaturePackAssembly(
     )
 
     return {
+      enabledFeaturePackIds: getCanvasAppEnabledFeaturePackManifestIds(
+        featurePackManifests,
+        installOptions,
+      ),
       featurePackExtensionBundle: createCanvasAppFeaturePackExtensionBundle(
         getCanvasAppManifestExtensionFeaturePacks(
           featurePackManifests,
@@ -91,6 +97,10 @@ export function createCanvasAppFeaturePackAssembly(
     )
 
     return {
+      enabledFeaturePackIds: getCanvasAppEnabledFeaturePackManifestIds(
+        featurePackManifests,
+        installOptions,
+      ),
       featurePackExtensionBundle: createCanvasAppFeaturePackExtensionBundle(
         getCanvasAppManifestExtensionFeaturePacks(
           featurePackManifests,
@@ -112,6 +122,7 @@ export function createCanvasAppFeaturePackAssembly(
 
   if (input.viewFeaturePacks || input.disabledViewFeaturePackIds) {
     return {
+      enabledFeaturePackIds: defaults.enabledFeaturePackIds,
       featurePackExtensionBundle: defaults.featurePackExtensionBundle,
       installedFeaturePackIds: defaults.installedFeaturePackIds,
       featurePackViewRenderers: createCanvasAppFeaturePackViewRenderers(
@@ -199,6 +210,12 @@ export function snapshotCanvasAppInstalledFeaturePackIds(
   installedFeaturePackIds: readonly CanvasAppFeaturePackId[],
 ): readonly CanvasAppFeaturePackId[] {
   return Object.freeze([...installedFeaturePackIds])
+}
+
+export function snapshotCanvasAppEnabledFeaturePackIds(
+  enabledFeaturePackIds: readonly CanvasAppFeaturePackId[],
+): readonly CanvasAppFeaturePackId[] {
+  return Object.freeze([...enabledFeaturePackIds])
 }
 
 export function snapshotCanvasAppFeaturePackViewRenderers(

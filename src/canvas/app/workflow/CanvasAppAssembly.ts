@@ -43,6 +43,8 @@ export function createCanvasAppAssembly(
   const featurePackAssembly = createCanvasAppFeaturePackAssembly(
     input,
     {
+      enabledFeaturePackIds:
+        DEFAULT_CANVAS_APP_ASSEMBLY.enabledFeaturePackIds,
       featurePackExtensionBundle:
         DEFAULT_CANVAS_APP_FEATURE_PACK_EXTENSION_BUNDLE,
       installedFeaturePackIds:
@@ -95,6 +97,7 @@ export function createCanvasAppAssembly(
     componentLibrary: componentAssembly.componentLibrary,
     componentPresentationRenderers:
       componentAssembly.componentPresentationRenderers,
+    enabledFeaturePackIds: featurePackAssembly.enabledFeaturePackIds,
     featurePackViewRenderers: featurePackAssembly.featurePackViewRenderers,
     installedFeaturePackIds: featurePackAssembly.installedFeaturePackIds,
     initialItems: workspaceAssembly.initialItems,

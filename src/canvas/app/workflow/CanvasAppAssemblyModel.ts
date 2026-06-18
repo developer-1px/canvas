@@ -11,6 +11,7 @@ export function getCanvasAppAssemblyModel({
   customCreationTools,
   customItemRenderers,
   customItemValidators,
+  enabledFeaturePackIds,
   featurePackViewRenderers,
   installedFeaturePackIds,
   inspectorPanels,
@@ -53,6 +54,7 @@ export function getCanvasAppAssemblyModel({
       textPasteImporters,
     },
     featurePack: {
+      enabledIds: enabledFeaturePackIds,
       installedIds: installedFeaturePackIds,
       viewRenderers: featurePackViewRenderers,
     },

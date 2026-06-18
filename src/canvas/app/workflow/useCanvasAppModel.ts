@@ -75,19 +75,19 @@ export function useCanvasAppModel({
     () => getCanvasAppAffordanceModel(appAssembly.affordance.config),
     [appAssembly],
   )
-  const installedFeaturePackIds = appAssembly.featurePack.installedIds
-  const installedFeaturePackIdSet = useMemo(
-    () => new Set(installedFeaturePackIds),
-    [installedFeaturePackIds],
+  const enabledFeaturePackIds = appAssembly.featurePack.enabledIds
+  const enabledFeaturePackIdSet = useMemo(
+    () => new Set(enabledFeaturePackIds),
+    [enabledFeaturePackIds],
   )
   const componentPartSources = useMemo(
     () =>
-      installedFeaturePackIdSet.has(
+      enabledFeaturePackIdSet.has(
         CANVAS_APP_COMPONENT_SOURCE_OUTLINE_FEATURE_PACK_MANIFEST.id,
       )
         ? createCanvasComponentPartSourceInputs(appAssembly.control.componentSets)
         : [],
-    [appAssembly.control.componentSets, installedFeaturePackIdSet],
+    [appAssembly.control.componentSets, enabledFeaturePackIdSet],
   )
   const stageElement = useCanvasAppStageElementModel()
   const workspace = useCanvasWorkspaceModel(appAssembly.workspace)
@@ -105,7 +105,7 @@ export function useCanvasAppModel({
       stageElement: stageElement.pointer.stageElement,
       viewport: workspace.stage.viewport,
     },
-    installedFeaturePackIds,
+    installedFeaturePackIds: enabledFeaturePackIds,
     sessionTimer: affordance.facilitation,
     spotlight: {
       ...affordance.facilitation,
@@ -149,7 +149,7 @@ export function useCanvasAppModel({
           imageControls: false,
         },
       },
-      enabled: installedFeaturePackIdSet.has('image-io'),
+      enabled: enabledFeaturePackIdSet.has('image-io'),
     }),
     ...workspace.image,
     ...stageElement.image,
@@ -171,7 +171,7 @@ export function useCanvasAppModel({
           paste: false,
         },
       },
-      enabled: installedFeaturePackIdSet.has('table-import'),
+      enabled: enabledFeaturePackIdSet.has('table-import'),
     }),
     ...workspace.table,
     ...stageElement.table,
@@ -186,7 +186,7 @@ export function useCanvasAppModel({
           paste: false,
         },
       },
-      enabled: installedFeaturePackIdSet.has('media-import'),
+      enabled: enabledFeaturePackIdSet.has('media-import'),
     }),
     mediaImporters: appAssembly.extension.mediaImporters,
     ...workspace.linkPreview,
@@ -202,7 +202,7 @@ export function useCanvasAppModel({
           paste: false,
         },
       },
-      enabled: installedFeaturePackIdSet.has('text-paste-import'),
+      enabled: enabledFeaturePackIdSet.has('text-paste-import'),
     }),
     ...appAssembly.extension,
     ...workspace.textPaste,
@@ -242,7 +242,7 @@ export function useCanvasAppModel({
       ...affordance.drawing,
       tool: interaction.control.tool,
     },
-    installedFeaturePackIds,
+    installedFeaturePackIds: enabledFeaturePackIds,
   })
 
   const components = useCanvasAppComponentModel({

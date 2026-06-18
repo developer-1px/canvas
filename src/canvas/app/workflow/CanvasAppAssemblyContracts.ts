@@ -36,6 +36,7 @@ export function assertCanvasAppAssembly(assembly: CanvasAppAssembly) {
   assertCanvasAppCustomItemRenderers(assembly.customItemRenderers)
   assertCanvasAppCustomItemValidators(assembly.customItemValidators)
   assertCanvasAppFeaturePackViewRenderers(assembly.featurePackViewRenderers)
+  assertCanvasAppFeaturePackIds(assembly.enabledFeaturePackIds)
   assertCanvasAppFeaturePackIds(assembly.installedFeaturePackIds)
   assertCanvasAppFoundationExtensions(assembly.foundationExtensions)
   assertCanvasAppInspectorPanels(assembly.inspectorPanels)

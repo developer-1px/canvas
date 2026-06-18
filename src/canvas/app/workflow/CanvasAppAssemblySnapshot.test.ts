@@ -314,6 +314,7 @@ describe('CanvasAppAssembly snapshots', () => {
     expect(Object.isFrozen(assembly.mediaImporters[0])).toBe(true)
     expect(Object.isFrozen(assembly.componentPresentationRenderers)).toBe(true)
     expect(Object.isFrozen(assembly.customItemValidators)).toBe(true)
+    expect(Object.isFrozen(assembly.enabledFeaturePackIds)).toBe(true)
     expect(Object.isFrozen(assembly.installedFeaturePackIds)).toBe(true)
     expect(Object.isFrozen(assembly.initialItems)).toBe(true)
     expect(Object.isFrozen(assembly.initialItems[0])).toBe(true)

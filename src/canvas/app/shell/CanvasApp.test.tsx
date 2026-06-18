@@ -17,7 +17,7 @@ describe('CanvasApp', () => {
     const withAuthoringOnly = captureCanvasAppStage({
       featurePackStates: [
         { id: 'component-library', status: 'enabled' },
-        { id: 'component-source-outline', status: 'uninstalled' },
+        { id: 'component-source-outline', status: 'disabled' },
         { id: 'component-authoring', status: 'enabled' },
       ],
     })

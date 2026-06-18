@@ -27,7 +27,7 @@ describe('CanvasDevToolsDemoApp', () => {
       },
       {
         id: 'component-source-outline',
-        status: 'uninstalled',
+        status: 'disabled',
       },
       {
         id: 'component-inspector',

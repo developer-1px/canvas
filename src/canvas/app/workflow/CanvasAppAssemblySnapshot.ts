@@ -13,6 +13,7 @@ import type {
 } from './CanvasAppAssemblyTypes'
 import { snapshotCanvasAppAssemblyAdapters } from './CanvasAppAdapterSnapshot'
 import {
+  snapshotCanvasAppEnabledFeaturePackIds,
   snapshotCanvasAppInstalledFeaturePackIds,
   snapshotCanvasAppFeaturePackViewRenderers,
 } from './CanvasAppFeaturePackAssembly'
@@ -40,6 +41,9 @@ export function snapshotCanvasAppAssembly(
     ),
     featurePackViewRenderers: snapshotCanvasAppFeaturePackViewRenderers(
       assembly.featurePackViewRenderers,
+    ),
+    enabledFeaturePackIds: snapshotCanvasAppEnabledFeaturePackIds(
+      assembly.enabledFeaturePackIds,
     ),
     installedFeaturePackIds: snapshotCanvasAppInstalledFeaturePackIds(
       assembly.installedFeaturePackIds,

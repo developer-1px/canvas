@@ -390,7 +390,15 @@ describe('CanvasAppAssembly seams', () => {
     expect(disabledAssembly.installedFeaturePackIds).not.toContain(
       'component-sync',
     )
+    expect(disabledAssembly.enabledFeaturePackIds).not.toContain('toolbar')
+    expect(disabledAssembly.enabledFeaturePackIds).not.toContain(
+      'media-import',
+    )
+    expect(disabledAssembly.enabledFeaturePackIds).not.toContain(
+      'component-sync',
+    )
     expect(disabledAssembly.installedFeaturePackIds).toContain('table-import')
+    expect(disabledAssembly.enabledFeaturePackIds).toContain('table-import')
     expect(disabledAssembly.itemsChangeTransformers.map(
       (transformer) => transformer.id,
     )).not.toContain('component-sync-items-change')
@@ -431,6 +439,7 @@ describe('CanvasAppAssembly seams', () => {
     expect(customAssembly.featurePackViewRenderers.status).toBe(renderStatus)
     expect(customAssembly.featurePackViewRenderers.toolbar).toBeUndefined()
     expect(customAssembly.installedFeaturePackIds).toEqual(['status-pack'])
+    expect(customAssembly.enabledFeaturePackIds).toEqual(['status-pack'])
     expect(customAssembly.customCommands.map((command) => command.id))
       .toContain('status-pack-command')
     expect(customAssembly.inspectorPanels).toEqual([])
@@ -442,6 +451,7 @@ describe('CanvasAppAssembly seams', () => {
     })
 
     expect(minimalAssembly.installedFeaturePackIds).toEqual(['zoom-controls'])
+    expect(minimalAssembly.enabledFeaturePackIds).toEqual(['zoom-controls'])
     expect(minimalAssembly.featurePackViewRenderers.zoomControls).toBe(
       DEFAULT_CANVAS_APP_FEATURE_PACK_VIEW_RENDERERS.zoomControls,
     )
@@ -487,6 +497,7 @@ describe('CanvasAppAssembly seams', () => {
     expect(disabledStatusAssembly.installedFeaturePackIds).toEqual([
       'status-pack',
     ])
+    expect(disabledStatusAssembly.enabledFeaturePackIds).toEqual([])
     expect(disabledStatusAssembly.featurePackViewRenderers.status)
       .toBeUndefined()
     expect(disabledStatusAssembly.customCommands.map((command) => command.id))
@@ -504,6 +515,9 @@ describe('CanvasAppAssembly seams', () => {
     expect(explicitEnabledAssembly.installedFeaturePackIds).toEqual([
       'status-pack',
     ])
+    expect(explicitEnabledAssembly.enabledFeaturePackIds).toEqual([
+      'status-pack',
+    ])
     expect(explicitEnabledAssembly.featurePackViewRenderers.status)
       .toBe(renderStatus)
     expect(explicitEnabledAssembly.customCommands.map((command) => command.id))
@@ -518,6 +532,8 @@ describe('CanvasAppAssembly seams', () => {
     })
 
     expect(explicitlyUninstalledMinimalAssembly.installedFeaturePackIds)
+      .toEqual([])
+    expect(explicitlyUninstalledMinimalAssembly.enabledFeaturePackIds)
       .toEqual([])
     expect(explicitlyUninstalledMinimalAssembly.featurePackViewRenderers
       .zoomControls).toBeUndefined()

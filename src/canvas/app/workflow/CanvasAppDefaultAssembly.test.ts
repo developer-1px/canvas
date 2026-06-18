@@ -26,6 +26,7 @@ import {
   DEFAULT_CANVAS_APP_FEATURE_PACK_EXTENSION_BUNDLE,
   DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS,
   DEFAULT_CANVAS_APP_FEATURE_PACK_VIEW_RENDERERS,
+  getCanvasAppEnabledFeaturePackManifestIds,
   getCanvasAppInstalledFeaturePackManifestIds,
 } from '../feature-packs'
 import { DEFAULT_CANVAS_APP_ASSEMBLY } from './CanvasAppDefaultAssembly'
@@ -47,6 +48,11 @@ describe('CanvasAppDefaultAssembly', () => {
     )
     expect(DEFAULT_CANVAS_APP_ASSEMBLY.featurePackViewRenderers).toEqual(
       DEFAULT_CANVAS_APP_FEATURE_PACK_VIEW_RENDERERS,
+    )
+    expect(DEFAULT_CANVAS_APP_ASSEMBLY.enabledFeaturePackIds).toEqual(
+      getCanvasAppEnabledFeaturePackManifestIds(
+        DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS,
+      ),
     )
     expect(DEFAULT_CANVAS_APP_ASSEMBLY.installedFeaturePackIds).toEqual(
       getCanvasAppInstalledFeaturePackManifestIds(
@@ -108,6 +114,9 @@ describe('CanvasAppDefaultAssembly', () => {
     expect(Object.isFrozen(DEFAULT_CANVAS_APP_ASSEMBLY.itemAdapters)).toBe(true)
     expect(Object.isFrozen(
       DEFAULT_CANVAS_APP_ASSEMBLY.featurePackViewRenderers,
+    )).toBe(true)
+    expect(Object.isFrozen(
+      DEFAULT_CANVAS_APP_ASSEMBLY.enabledFeaturePackIds,
     )).toBe(true)
     expect(Object.isFrozen(
       DEFAULT_CANVAS_APP_ASSEMBLY.installedFeaturePackIds,
