@@ -5,6 +5,8 @@ import {
   useRef,
   useState,
   type MouseEvent,
+  type ClipboardEvent,
+  type DragEvent,
 } from 'react';
 import { useTranslation } from '../support/storyCanvasLanguage';
 import {
@@ -105,6 +107,12 @@ import {
 import { hashString } from './hashString';
 import { useBodyAttributes } from './useBodyAttributes';
 import { useDebouncedValue } from './useDebouncedValue';
+import {
+  EMPTY_STORY_CANVAS_IMPORT_STATE,
+  getStoryCanvasImportedAssemblyInput,
+  hasStoryCanvasDataTransferImport,
+  runStoryCanvasDataTransferImport,
+} from './storyCanvasImport';
 import {
   closestStoryCanvasElement,
   queryStoryCanvasElement,
@@ -222,6 +230,14 @@ function bridgePageForPreset(preset: StoryCanvasPreset) {
   if (preset === 'foundation') return '/devtools/foundation';
   if (preset === 'entities') return '/devtools/entities';
   return '/devtools/story-canvas';
+}
+
+function isStoryCanvasImportEventIgnored(target: EventTarget | null) {
+  return target instanceof Element &&
+    Boolean(closestStoryCanvasElement(
+      target,
+      'input, textarea, select, [contenteditable="true"]',
+    ));
 }
 
 export default function StoryCanvasPage({ preset = 'default' }: { preset?: StoryCanvasPreset }) {
@@ -485,12 +501,20 @@ export default function StoryCanvasPage({ preset = 'default' }: { preset?: Story
     storyRecordById,
     store: storyViewStore,
   }), [handleSelectElement, handleSelectStory, handleToggleFavorite, storyRecordById, storyViewStore]);
+  const [storyImportState, setStoryImportState] = useState(
+    EMPTY_STORY_CANVAS_IMPORT_STATE,
+  );
+  const storyCanvasAssembly = useMemo(() => getStoryCanvasImportedAssemblyInput({
+    baseComponentDefinitions: board.componentDefinitions,
+    baseItems: board.items,
+    importState: storyImportState,
+  }), [board.componentDefinitions, board.items, storyImportState]);
 
   // The canvas remounts when the visible board changes (key below). The
   // storage provider keeps the latest viewport/selection snapshot so a
   // remount restores the designer's zoom and position instead of resetting.
-  const boardItemsRef = useRef(board.items);
-  boardItemsRef.current = board.items;
+  const boardItemsRef = useRef(storyCanvasAssembly.items);
+  boardItemsRef.current = storyCanvasAssembly.items;
   const viewportRef = useRef(initialUrlState.view?.viewport ?? INITIAL_STORY_CANVAS_VIEWPORT);
   const selectedPagePathRef = useRef(selectedPagePath);
   const selectedStoryIdRef = useRef(selectedStoryId);
@@ -559,17 +583,21 @@ export default function StoryCanvasPage({ preset = 'default' }: { preset?: Story
     affordanceConfig: STORY_CANVAS_AFFORDANCE_CONFIG,
     capabilities: CANVAS_APP_READ_ONLY_CAPABILITIES,
     featurePackProfile: STORY_CANVAS_FEATURE_PACK_PROFILE,
-    componentDefinitions: board.componentDefinitions,
-    initialItems: board.items,
+    componentDefinitions: storyCanvasAssembly.componentDefinitions,
+    initialItems: storyCanvasAssembly.items,
     initialSelection: [],
     workspaceStorageProvider: storageProvider,
-  }), [board.componentDefinitions, board.items, storageProvider, storyPreviewManifest]);
+  }), [storageProvider, storyCanvasAssembly.componentDefinitions, storyCanvasAssembly.items, storyPreviewManifest]);
+  const storyImportKey = useMemo(
+    () => `${hashString(storyImportState.items.map((item) => item.id).join('|'))}-${hashString(storyImportState.componentDefinitions.map((definition) => definition.id).join('|'))}`,
+    [storyImportState.componentDefinitions, storyImportState.items],
+  );
   // Key changes remount the canvas: filter changes, hug measurements landing,
   // and explicit zoom jumps (Shift+1/2/0) which apply a new stored viewport.
   const [focusNonce, setFocusNonce] = useState(0);
   const canvasKey = useMemo(
-    () => `${filteredStories.length}-${hashString(filteredStories.map((story) => story.id).join('|'))}-m${sizeOverrides.size}-f${focusNonce}-${canvasLanguage}`,
-    [canvasLanguage, filteredStories, focusNonce, sizeOverrides.size],
+    () => `${filteredStories.length}-${hashString(filteredStories.map((story) => story.id).join('|'))}-m${sizeOverrides.size}-i${storyImportKey}-f${focusNonce}-${canvasLanguage}`,
+    [canvasLanguage, filteredStories, focusNonce, sizeOverrides.size, storyImportKey],
   );
   // Memoized element: page re-renders (search keystrokes, copy toast, note
   // typing) must not re-render the canvas and its ~400 live previews.
@@ -917,6 +945,76 @@ export default function StoryCanvasPage({ preset = 'default' }: { preset?: Story
       zoom: Number(stage.style.getPropertyValue('--canvas-zoom')) || 1,
     });
   }, [selectedStoryId]);
+  const handleStoryCanvasImportDataTransfer = useCallback((
+    dataTransfer: DataTransfer | null,
+    scope: 'clipboard-paste' | 'stage-drop',
+  ) => {
+    let committedSelection: readonly string[] | null = null;
+    const result = runStoryCanvasDataTransferImport({
+      baseComponentDefinitions: board.componentDefinitions,
+      commitImportState: (state) => {
+        setStoryImportState(state);
+      },
+      currentComponentDefinitions: storyCanvasAssembly.componentDefinitions,
+      currentImportState: storyImportState,
+      currentItems: storyCanvasAssembly.items,
+      dataTransfer,
+      scope,
+    });
+
+    for (const actionResult of result.actionResults) {
+      if (actionResult.committed) {
+        committedSelection = actionResult.update.selection.after;
+        break;
+      }
+    }
+
+    if (result.consumed) {
+      canvasSelectionRef.current = [...(committedSelection ?? [])];
+      setFocusNonce((nonce) => nonce + 1);
+      scheduleUrlStateReplace(URL_VIEW_WRITE_DELAY_MS);
+    }
+
+    return result.consumed;
+  }, [
+    board.componentDefinitions,
+    scheduleUrlStateReplace,
+    storyCanvasAssembly.componentDefinitions,
+    storyCanvasAssembly.items,
+    storyImportState,
+  ]);
+  const handleStagePaste = useCallback((event: ClipboardEvent<HTMLElement>) => {
+    if (isStoryCanvasImportEventIgnored(event.target)) return;
+
+    if (handleStoryCanvasImportDataTransfer(
+      event.clipboardData,
+      'clipboard-paste',
+    )) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+  }, [handleStoryCanvasImportDataTransfer]);
+  const handleStageDragOver = useCallback((event: DragEvent<HTMLElement>) => {
+    if (isStoryCanvasImportEventIgnored(event.target)) return;
+
+    if (hasStoryCanvasDataTransferImport({
+      dataTransfer: event.dataTransfer,
+      scope: 'stage-drop',
+    })) {
+      event.preventDefault();
+    }
+  }, []);
+  const handleStageDrop = useCallback((event: DragEvent<HTMLElement>) => {
+    if (isStoryCanvasImportEventIgnored(event.target)) return;
+
+    if (handleStoryCanvasImportDataTransfer(
+      event.dataTransfer,
+      'stage-drop',
+    )) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+  }, [handleStoryCanvasImportDataTransfer]);
 
   return (
     <StoryCanvasShell panelsHidden={panelsHidden}>
@@ -953,8 +1051,11 @@ export default function StoryCanvasPage({ preset = 'default' }: { preset?: Story
             && closestStoryCanvasElement(event.target, 'button, [role="button"], .story-canvas-toolbar, .story-canvas-empty')) return;
           if (selectedStoryId) setSelectedStoryId(null);
         }}
+        onDragOver={handleStageDragOver}
+        onDrop={handleStageDrop}
         onMouseLeave={() => setFrameDistances(null)}
         onMouseMove={handleStageMouseMove}
+        onPaste={handleStagePaste}
         onPointerDownCapture={(event) => {
           stagePointerRef.current = { x: event.clientX, y: event.clientY };
         }}
