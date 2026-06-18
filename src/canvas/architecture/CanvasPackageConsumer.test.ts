@@ -42,6 +42,7 @@ import {
   createCanvasStoryCanvasFeaturePackManifests,
   createCanvasStoryPreviewItemsFeaturePackManifest,
   getCanvasDataTransferText,
+  setCanvasDataTransferDropEffect,
   downloadCanvasBlobFile,
   downloadCanvasTextFile,
   getCanvasEditableFieldKeyboardIntent,
@@ -2238,9 +2239,17 @@ describe('Canvas package consumer imports', () => {
     expect(getCanvasDataTransferText({
       dataTransfer: null,
     })).toBe('')
+    expect(setCanvasDataTransferDropEffect({
+      dataTransfer: null,
+      dropEffect: 'move',
+    })).toBe(false)
     expect(CanvasAppFacade.getCanvasDataTransferText({
       dataTransfer: null,
     })).toBe('')
+    expect(CanvasAppFacade.setCanvasDataTransferDropEffect({
+      dataTransfer: null,
+      dropEffect: 'move',
+    })).toBe(false)
     expect(measureCanvasTextBlocks({
       blocks: [{ text: 'smoke' }],
       document: null,
