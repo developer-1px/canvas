@@ -300,6 +300,10 @@
 | Row read model | object id, display name, kind label, order, selected, hidden, locked, grouped, group id |
 | Selection interaction | replace, additive, and range row press intents produce host `select-objects` command effects |
 | Object commands | rename, hide/show, lock/unlock, and reorder row intents produce product-neutral host command effects |
+| Layer JSON candidates | object-layer custom MIME, `application/json`, `text/json`, and `text/plain` are checked in order |
+| Layer JSON payloads | direct `position`/`toIndex` and `objectLayer`, `layerOrder`, or `zOrder` wrappers route through `reorder-object` |
+| Layer aliases | `front`/`bring-to-front`, `back`/`send-to-back`, `forward`/`bring-forward`, and `backward`/`send-backward` normalize to one movement model |
+| Layer no-op | no active/single selected row, locked row, non-reorderable row, invalid payload, and unchanged order produce `null` |
 | Rename JSON candidates | object-name/object-metadata custom MIME, `application/json`, `text/json`, and `text/plain` are checked in order |
 | Rename JSON payloads | generic JSON requires `objectMetadata`, `objectName`, or `layerName` wrapper; custom MIME may carry direct `{ "name": "..." }` |
 | Rename no-op | no active/single selected row, non-renamable row, empty name, and missing rename payload produce `null` |

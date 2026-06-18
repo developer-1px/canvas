@@ -5,6 +5,8 @@ import {
   getSlideEditLayerPaneCommandEffect,
   getSlideEditLayerPaneDropIndicator,
   getSlideEditLayerPaneKeyboardIntent,
+  getSlideEditLayerPaneObjectLayerJSONPasteValue,
+  getSlideEditLayerPaneObjectLayerPasteCommandEffect,
   getSlideEditLayerPaneRenameJSONPasteValue,
   getSlideEditLayerPaneRenamePasteCommandEffect,
   getSlideEditLayerPaneResolvedFocusObjectId,
@@ -13,10 +15,12 @@ import {
   SLIDE_EDIT_LAYER_PANE_DROP_INDICATOR_MODEL,
   SLIDE_EDIT_LAYER_PANE_KEYBOARD_INTENT_MODEL,
   SLIDE_EDIT_LAYER_PANE_KEYBOARD_KEYS,
+  SLIDE_EDIT_LAYER_PANE_OBJECT_LAYER_JSON_MIME_TYPE,
   SLIDE_EDIT_LAYER_PANE_OBJECT_METADATA_JSON_MIME_TYPE,
   SLIDE_EDIT_LAYER_PANE_OBJECT_NAME_JSON_MIME_TYPE,
 } from './SlideEditObjectLayerPane'
 import {
+  getSlideEditLayerPaneObjectLayerJSONPasteValue as getSlideEditLayerPaneObjectLayerJSONPasteValueFromPackage,
   getSlideEditLayerPaneRenameJSONPasteValue as getSlideEditLayerPaneRenameJSONPasteValueFromPackage,
 } from './index'
 
@@ -747,6 +751,201 @@ describe('SlideEditObjectLayerPane', () => {
       objectId: 'image',
       toIndex: 0,
     })
+  })
+
+  it('reads object-layer custom MIME direct z-order JSON first', () => {
+    expect(getSlideEditLayerPaneObjectLayerJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_LAYER_PANE_OBJECT_LAYER_JSON_MIME_TYPE]:
+          '{"position":" bringToFront "}',
+        'application/json': '{"objectLayer":{"position":"back"}}',
+      }),
+    })).toEqual({
+      position: 'front',
+      sourceField: 'position',
+      surface: 'object-layer-pane-order',
+      type: 'position',
+    })
+
+    expect(getSlideEditLayerPaneObjectLayerJSONPasteValueFromPackage({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_LAYER_PANE_OBJECT_LAYER_JSON_MIME_TYPE]:
+          '{"toIndex":2.4}',
+      }),
+    })).toEqual({
+      sourceField: 'toIndex',
+      surface: 'object-layer-pane-order',
+      toIndex: 2,
+      type: 'to-index',
+    })
+  })
+
+  it('reads direct and wrapped layer order JSON payloads', () => {
+    expect(getSlideEditLayerPaneObjectLayerJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'application/json': '{"objectLayer":{"position":"send-to-back"}}',
+      }),
+    })).toEqual({
+      position: 'back',
+      sourceField: 'objectLayer.position',
+      surface: 'object-layer-pane-order',
+      type: 'position',
+    })
+
+    expect(getSlideEditLayerPaneObjectLayerJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/json': '{"layerOrder":{"toIndex":0}}',
+      }),
+    })).toEqual({
+      sourceField: 'layerOrder.toIndex',
+      surface: 'object-layer-pane-order',
+      toIndex: 0,
+      type: 'to-index',
+    })
+
+    expect(getSlideEditLayerPaneObjectLayerJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"zOrder":{"position":"sendBackward"}}',
+      }),
+    })).toMatchObject({
+      position: 'backward',
+      sourceField: 'zOrder.position',
+    })
+
+    expect(getSlideEditLayerPaneObjectLayerJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'application/json': '{"position":"bring-forward"}',
+      }),
+    })).toMatchObject({
+      position: 'forward',
+      sourceField: 'position',
+    })
+  })
+
+  it('converts layer order paste values to reorder command effects', () => {
+    const frontPasteValue = getSlideEditLayerPaneObjectLayerJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'application/json': '{"objectLayer":{"position":"front"}}',
+      }),
+    })!
+    const toIndexPasteValue = getSlideEditLayerPaneObjectLayerJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'application/json': '{"layerOrder":{"toIndex":0}}',
+      }),
+    })!
+
+    expect(getSlideEditLayerPaneObjectLayerPasteCommandEffect({
+      descriptor,
+      pasteValue: frontPasteValue,
+    })).toEqual({
+      payload: {
+        fromIndex: 0,
+        id: 'reorder-object',
+        objectId: 'title',
+        toIndex: 3,
+      },
+      selection: {
+        objectIds: ['title'],
+        slideId: 'slide-a',
+      },
+      type: 'slide-command-effect',
+    })
+
+    expect(getSlideEditLayerPaneObjectLayerPasteCommandEffect({
+      descriptor,
+      objectId: 'image',
+      pasteValue: toIndexPasteValue,
+    })?.payload).toEqual({
+      fromIndex: 2,
+      id: 'reorder-object',
+      objectId: 'image',
+      toIndex: 0,
+    })
+  })
+
+  it('ignores unavailable object layer paste routes', () => {
+    const frontPasteValue = getSlideEditLayerPaneObjectLayerJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_LAYER_PANE_OBJECT_LAYER_JSON_MIME_TYPE]:
+          '{"position":"front"}',
+      }),
+    })!
+    const invalidTargetDescriptor = createSlideEditLayerPaneDescriptor({
+      activeObjectId: null,
+      slideId: 'slide-layer-invalid',
+      selectedObjectIds: ['a', 'b'],
+      objects: [
+        {
+          displayName: 'A',
+          kindLabel: 'Text',
+          objectId: 'a',
+        },
+        {
+          displayName: 'B',
+          kindLabel: 'Text',
+          objectId: 'b',
+        },
+      ],
+    })
+    const lockedDescriptor = createSlideEditLayerPaneDescriptor({
+      activeObjectId: 'locked',
+      slideId: 'slide-layer-locked',
+      selectedObjectIds: ['locked'],
+      objects: [
+        {
+          displayName: 'Locked',
+          isLocked: true,
+          isReorderable: true,
+          kindLabel: 'Shape',
+          objectId: 'locked',
+        },
+      ],
+    })
+    const topDescriptor = createSlideEditLayerPaneDescriptor({
+      activeObjectId: 'top',
+      slideId: 'slide-layer-top',
+      selectedObjectIds: ['top'],
+      objects: [
+        {
+          displayName: 'Bottom',
+          kindLabel: 'Text',
+          objectId: 'bottom',
+          order: 0,
+        },
+        {
+          displayName: 'Top',
+          kindLabel: 'Text',
+          objectId: 'top',
+          order: 1,
+        },
+      ],
+    })
+
+    expect(getSlideEditLayerPaneObjectLayerPasteCommandEffect({
+      descriptor: invalidTargetDescriptor,
+      pasteValue: frontPasteValue,
+    })).toBeNull()
+    expect(getSlideEditLayerPaneObjectLayerPasteCommandEffect({
+      descriptor: lockedDescriptor,
+      pasteValue: frontPasteValue,
+    })).toBeNull()
+    expect(getSlideEditLayerPaneObjectLayerPasteCommandEffect({
+      descriptor: topDescriptor,
+      pasteValue: frontPasteValue,
+    })).toBeNull()
+    expect(getSlideEditLayerPaneObjectLayerJSONPasteValue({
+      dataTransfer: null,
+    })).toBeNull()
+    expect(getSlideEditLayerPaneObjectLayerJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'application/json': '{"position":"sideways"}',
+      }),
+    })).toBeNull()
+    expect(getSlideEditLayerPaneObjectLayerJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_LAYER_PANE_OBJECT_LAYER_JSON_MIME_TYPE]: 'not json',
+      }),
+    })).toBeNull()
   })
 
   it('reads object-name custom MIME direct rename JSON first', () => {

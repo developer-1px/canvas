@@ -143,6 +143,22 @@ export const SLIDE_EDIT_LAYER_PANE_RENAME_JSON_WRAPPER_KEYS = Object.freeze([
   'layerName',
 ] as const)
 
+export const SLIDE_EDIT_LAYER_PANE_OBJECT_LAYER_JSON_MIME_TYPE =
+  'application/vnd.interactive-os.slide-edit.object-layer+json'
+
+export const SLIDE_EDIT_LAYER_PANE_OBJECT_LAYER_JSON_TYPES = Object.freeze([
+  'application/json',
+  'text/json',
+  'text/plain',
+] as const)
+
+export const SLIDE_EDIT_LAYER_PANE_OBJECT_LAYER_JSON_WRAPPER_KEYS =
+  Object.freeze([
+    'objectLayer',
+    'layerOrder',
+    'zOrder',
+  ] as const)
+
 export type SlideEditLayerPaneCommand<
   TObjectId extends SlideEditLayerPaneObjectId = SlideEditLayerPaneObjectId,
 > =
@@ -200,6 +216,41 @@ export type SlideEditLayerPaneRenamePasteCommandEffectInput<
   descriptor: SlideEditLayerPaneDescriptor<TSlideId, TObjectId, TGroupId>
   objectId?: TObjectId | null
   pasteValue: SlideEditLayerPaneRenameJSONPasteValue
+}
+
+export type SlideEditLayerPaneObjectLayerPosition =
+  | 'back'
+  | 'backward'
+  | 'forward'
+  | 'front'
+
+export type SlideEditLayerPaneObjectLayerJSONPasteValue =
+  | {
+    position: SlideEditLayerPaneObjectLayerPosition
+    sourceField: string
+    surface: 'object-layer-pane-order'
+    type: 'position'
+  }
+  | {
+    sourceField: string
+    surface: 'object-layer-pane-order'
+    toIndex: number
+    type: 'to-index'
+  }
+
+export type SlideEditLayerPaneObjectLayerJSONPasteInput = {
+  dataTransfer: SlideEditLayerPaneDataTransfer | null
+  jsonMimeType?: string
+}
+
+export type SlideEditLayerPaneObjectLayerPasteCommandEffectInput<
+  TSlideId extends SlideEditLayerPaneSlideId = SlideEditLayerPaneSlideId,
+  TObjectId extends SlideEditLayerPaneObjectId = SlideEditLayerPaneObjectId,
+  TGroupId extends SlideEditLayerPaneGroupId = SlideEditLayerPaneGroupId,
+> = {
+  descriptor: SlideEditLayerPaneDescriptor<TSlideId, TObjectId, TGroupId>
+  objectId?: TObjectId | null
+  pasteValue: SlideEditLayerPaneObjectLayerJSONPasteValue
 }
 
 export type SlideEditLayerPaneIntent<
@@ -600,6 +651,91 @@ export function getSlideEditLayerPaneRenamePasteCommandEffect<
   })
 }
 
+export function getSlideEditLayerPaneObjectLayerJSONPasteValue({
+  dataTransfer,
+  jsonMimeType = SLIDE_EDIT_LAYER_PANE_OBJECT_LAYER_JSON_MIME_TYPE,
+}: SlideEditLayerPaneObjectLayerJSONPasteInput):
+  SlideEditLayerPaneObjectLayerJSONPasteValue | null {
+  if (!dataTransfer) {
+    return null
+  }
+
+  if (jsonMimeType) {
+    const customText = dataTransfer.getData(jsonMimeType)
+
+    if (customText.trim()) {
+      const customValue = parseSlideEditLayerPaneJSON(customText)
+      const customPasteValue =
+        getSlideEditLayerPaneObjectLayerAnyJSONPasteValue(customValue)
+
+      if (customPasteValue !== null) {
+        return customPasteValue
+      }
+    }
+  }
+
+  for (const type of SLIDE_EDIT_LAYER_PANE_OBJECT_LAYER_JSON_TYPES) {
+    const text = dataTransfer.getData(type)
+
+    if (!text.trim()) {
+      continue
+    }
+
+    const value = parseSlideEditLayerPaneJSON(text)
+    const pasteValue =
+      getSlideEditLayerPaneObjectLayerAnyJSONPasteValue(value)
+
+    if (pasteValue !== null) {
+      return pasteValue
+    }
+  }
+
+  return null
+}
+
+export function getSlideEditLayerPaneObjectLayerPasteCommandEffect<
+  TSlideId extends SlideEditLayerPaneSlideId,
+  TObjectId extends SlideEditLayerPaneObjectId,
+  TGroupId extends SlideEditLayerPaneGroupId,
+>({
+  descriptor,
+  objectId = getSlideEditLayerPaneSinglePasteTargetObjectId(descriptor),
+  pasteValue,
+}: SlideEditLayerPaneObjectLayerPasteCommandEffectInput<
+  TSlideId,
+  TObjectId,
+  TGroupId
+>): SlideEditLayerPaneHostCommandEffect<TSlideId, TObjectId> | null {
+  if (objectId === null) {
+    return null
+  }
+
+  const row = findSlideEditLayerPaneRow(descriptor, objectId)
+  const fromIndex = descriptor.rows.findIndex(
+    (candidate) => candidate.objectId === objectId,
+  )
+
+  if (!row?.isReorderable || row.isLocked || fromIndex < 0) {
+    return null
+  }
+
+  const toIndex = getSlideEditLayerPaneObjectLayerToIndex(
+    pasteValue,
+    fromIndex,
+    descriptor.rows.length,
+  )
+
+  if (toIndex === null) {
+    return null
+  }
+
+  return getSlideEditLayerPaneCommandEffect(descriptor, {
+    objectId,
+    toIndex,
+    type: 'row-drop',
+  })
+}
+
 function getSlideEditLayerPaneRenameDirectJSONPasteValue(
   value: unknown,
   wrapper?: string,
@@ -685,6 +821,16 @@ function getSlideEditLayerPaneRenamePasteTargetObjectId<
 >(
   descriptor: SlideEditLayerPaneDescriptor<TSlideId, TObjectId, TGroupId>,
 ): TObjectId | null {
+  return getSlideEditLayerPaneSinglePasteTargetObjectId(descriptor)
+}
+
+function getSlideEditLayerPaneSinglePasteTargetObjectId<
+  TSlideId extends SlideEditLayerPaneSlideId,
+  TObjectId extends SlideEditLayerPaneObjectId,
+  TGroupId extends SlideEditLayerPaneGroupId,
+>(
+  descriptor: SlideEditLayerPaneDescriptor<TSlideId, TObjectId, TGroupId>,
+): TObjectId | null {
   if (
     descriptor.activeObjectId !== null &&
     findSlideEditLayerPaneRow(descriptor, descriptor.activeObjectId)
@@ -703,7 +849,143 @@ function getSlideEditLayerPaneRenamePasteTargetObjectId<
   return null
 }
 
+function getSlideEditLayerPaneObjectLayerAnyJSONPasteValue(
+  value: unknown,
+): SlideEditLayerPaneObjectLayerJSONPasteValue | null {
+  return getSlideEditLayerPaneObjectLayerDirectJSONPasteValue(value) ??
+    getSlideEditLayerPaneObjectLayerWrappedJSONPasteValue(value)
+}
+
+function getSlideEditLayerPaneObjectLayerDirectJSONPasteValue(
+  value: unknown,
+  wrapper?: string,
+): SlideEditLayerPaneObjectLayerJSONPasteValue | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null
+  }
+
+  const record = value as Record<string, unknown>
+  const toIndex = getSlideEditLayerPaneObjectLayerToIndexValue(
+    record.toIndex,
+  )
+
+  if (toIndex !== null) {
+    return {
+      sourceField: wrapper ? `${wrapper}.toIndex` : 'toIndex',
+      surface: 'object-layer-pane-order',
+      toIndex,
+      type: 'to-index',
+    }
+  }
+
+  const position = getSlideEditLayerPaneObjectLayerPositionValue(
+    record.position,
+  )
+
+  if (position !== null) {
+    return {
+      position,
+      sourceField: wrapper ? `${wrapper}.position` : 'position',
+      surface: 'object-layer-pane-order',
+      type: 'position',
+    }
+  }
+
+  return null
+}
+
+function getSlideEditLayerPaneObjectLayerWrappedJSONPasteValue(
+  value: unknown,
+): SlideEditLayerPaneObjectLayerJSONPasteValue | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null
+  }
+
+  const record = value as Record<string, unknown>
+
+  for (const key of SLIDE_EDIT_LAYER_PANE_OBJECT_LAYER_JSON_WRAPPER_KEYS) {
+    if (!Object.hasOwn(record, key)) {
+      continue
+    }
+
+    const pasteValue = getSlideEditLayerPaneObjectLayerDirectJSONPasteValue(
+      record[key],
+      key,
+    )
+
+    if (pasteValue !== null) {
+      return pasteValue
+    }
+  }
+
+  return null
+}
+
+function getSlideEditLayerPaneObjectLayerToIndexValue(value: unknown) {
+  return typeof value === 'number' && Number.isFinite(value)
+    ? Math.round(value)
+    : null
+}
+
+function getSlideEditLayerPaneObjectLayerPositionValue(
+  value: unknown,
+): SlideEditLayerPaneObjectLayerPosition | null {
+  if (typeof value !== 'string') {
+    return null
+  }
+
+  const normalized = value
+    .trim()
+    .replace(/([a-z])([A-Z])/g, '$1-$2')
+    .replace(/[\s_]+/g, '-')
+    .toLowerCase()
+
+  switch (normalized) {
+    case 'bring-to-front':
+    case 'front':
+    case 'to-front':
+      return 'front'
+    case 'back':
+    case 'send-to-back':
+    case 'to-back':
+      return 'back'
+    case 'bring-forward':
+    case 'forward':
+      return 'forward'
+    case 'backward':
+    case 'send-backward':
+      return 'backward'
+    default:
+      return null
+  }
+}
+
+function getSlideEditLayerPaneObjectLayerToIndex(
+  pasteValue: SlideEditLayerPaneObjectLayerJSONPasteValue,
+  fromIndex: number,
+  rowCount: number,
+) {
+  if (pasteValue.type === 'to-index') {
+    return pasteValue.toIndex
+  }
+
+  switch (pasteValue.position) {
+    case 'front':
+      return rowCount
+    case 'back':
+      return 0
+    case 'forward':
+      return fromIndex + 2
+    case 'backward':
+      return fromIndex - 1
+  }
+}
+
 function parseSlideEditLayerPaneRenameJSON(value: string) {
+  return parseSlideEditLayerPaneJSON(value)
+}
+
+function parseSlideEditLayerPaneJSON(value: string) {
   if (!value.trim()) {
     return null
   }
