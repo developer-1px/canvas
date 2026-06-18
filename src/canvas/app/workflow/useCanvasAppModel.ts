@@ -105,7 +105,7 @@ export function useCanvasAppModel({
       stageElement: stageElement.pointer.stageElement,
       viewport: workspace.stage.viewport,
     },
-    installedFeaturePackIds: enabledFeaturePackIds,
+    enabledFeaturePackIds,
     sessionTimer: affordance.facilitation,
     spotlight: {
       ...affordance.facilitation,
@@ -242,7 +242,7 @@ export function useCanvasAppModel({
       ...affordance.drawing,
       tool: interaction.control.tool,
     },
-    installedFeaturePackIds: enabledFeaturePackIds,
+    enabledFeaturePackIds,
   })
 
   const components = useCanvasAppComponentModel({

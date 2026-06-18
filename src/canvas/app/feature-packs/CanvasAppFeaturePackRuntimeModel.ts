@@ -42,7 +42,7 @@ type VotingSessionModelInput =
 export type CanvasAppTransientFeaturePackModelInput = {
   cursorChat: CursorChatModelInput
   emote: EmoteModelInput
-  installedFeaturePackIds: readonly CanvasAppFeaturePackId[]
+  enabledFeaturePackIds: readonly CanvasAppFeaturePackId[]
   sessionTimer: SessionTimerModelInput
   spotlight: SpotlightModelInput
   votingSession: VotingSessionModelInput
@@ -50,13 +50,13 @@ export type CanvasAppTransientFeaturePackModelInput = {
 
 export type CanvasAppToolFeaturePackModelInput = {
   drawing: DrawingModelInput
-  installedFeaturePackIds: readonly CanvasAppFeaturePackId[]
+  enabledFeaturePackIds: readonly CanvasAppFeaturePackId[]
 }
 
 export function useCanvasAppTransientFeaturePackModel({
   cursorChat,
   emote,
-  installedFeaturePackIds,
+  enabledFeaturePackIds,
   sessionTimer,
   spotlight,
   votingSession,
@@ -77,8 +77,8 @@ export function useCanvasAppTransientFeaturePackModel({
       config: cursorChat.config,
       disabledConfig: cursorChatFeaturePack.disabledConfig,
       enabled: isCanvasAppRuntimeFeaturePackEnabled({
+        enabledFeaturePackIds,
         featurePack: cursorChatFeaturePack,
-        installedFeaturePackIds,
       }),
     }),
   })
@@ -88,8 +88,8 @@ export function useCanvasAppTransientFeaturePackModel({
       config: sessionTimer.config,
       disabledConfig: sessionTimerFeaturePack.disabledConfig,
       enabled: isCanvasAppRuntimeFeaturePackEnabled({
+        enabledFeaturePackIds,
         featurePack: sessionTimerFeaturePack,
-        installedFeaturePackIds,
       }),
     }),
   })
@@ -99,8 +99,8 @@ export function useCanvasAppTransientFeaturePackModel({
       config: spotlight.config,
       disabledConfig: spotlightFeaturePack.disabledConfig,
       enabled: isCanvasAppRuntimeFeaturePackEnabled({
+        enabledFeaturePackIds,
         featurePack: spotlightFeaturePack,
-        installedFeaturePackIds,
       }),
     }),
   })
@@ -110,8 +110,8 @@ export function useCanvasAppTransientFeaturePackModel({
       config: votingSession.config,
       disabledConfig: votingSessionFeaturePack.disabledConfig,
       enabled: isCanvasAppRuntimeFeaturePackEnabled({
+        enabledFeaturePackIds,
         featurePack: votingSessionFeaturePack,
-        installedFeaturePackIds,
       }),
     }),
   })
@@ -121,8 +121,8 @@ export function useCanvasAppTransientFeaturePackModel({
       config: emote.config,
       disabledConfig: emoteFeaturePack.disabledConfig,
       enabled: isCanvasAppRuntimeFeaturePackEnabled({
+        enabledFeaturePackIds,
         featurePack: emoteFeaturePack,
-        installedFeaturePackIds,
       }),
     }),
   })
@@ -138,7 +138,7 @@ export function useCanvasAppTransientFeaturePackModel({
 
 export function useCanvasAppToolFeaturePackModel({
   drawing,
-  installedFeaturePackIds,
+  enabledFeaturePackIds,
 }: CanvasAppToolFeaturePackModelInput) {
   const drawingFeaturePack = CANVAS_APP_DRAWING_TOOLS_RUNTIME_FEATURE_PACK
 
@@ -149,8 +149,8 @@ export function useCanvasAppToolFeaturePackModel({
         config: drawing.config,
         disabledConfig: drawingFeaturePack.disabledConfig,
         enabled: isCanvasAppRuntimeFeaturePackEnabled({
+          enabledFeaturePackIds,
           featurePack: drawingFeaturePack,
-          installedFeaturePackIds,
         }),
       }),
     }),
@@ -195,11 +195,11 @@ export function getCanvasAppRuntimeFeatureConfig({
 }
 
 function isCanvasAppRuntimeFeaturePackEnabled({
+  enabledFeaturePackIds,
   featurePack,
-  installedFeaturePackIds,
 }: {
+  enabledFeaturePackIds: readonly CanvasAppFeaturePackId[]
   featurePack: CanvasAppRuntimeFeaturePackDescriptor
-  installedFeaturePackIds: readonly CanvasAppFeaturePackId[]
 }) {
-  return installedFeaturePackIds.includes(featurePack.featurePackId)
+  return enabledFeaturePackIds.includes(featurePack.featurePackId)
 }

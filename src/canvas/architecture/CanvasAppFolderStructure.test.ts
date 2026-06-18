@@ -201,7 +201,7 @@ describe('Canvas App folder structure', () => {
     expect(runtimeModelFile.source).toContain(
       'CANVAS_APP_FACILITATION_RUNTIME_FEATURE_PACKS',
     )
-    expect(runtimeModelFile.source).toContain('installedFeaturePackIds')
+    expect(runtimeModelFile.source).toContain('enabledFeaturePackIds')
     expect(runtimeModelFile.source).not.toContain(
       'viewRenderers[featurePack.viewRendererId]',
     )

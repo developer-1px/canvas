@@ -241,11 +241,9 @@ describe('Canvas App Assembly runtime boundaries', () => {
     expect(appModelFile.source).toContain(
       'useCanvasAppTransientFeaturePackModel',
     )
-    expect(appModelFile.source).toContain(
-      'installedFeaturePackIds: enabledFeaturePackIds',
-    )
+    expect(appModelFile.source).toContain('enabledFeaturePackIds,')
     expect(runtimeFeaturePackModelFile.source).toContain(
-      'installedFeaturePackIds',
+      'enabledFeaturePackIds',
     )
     expect(runtimeFeaturePackModelFile.source).toContain(
       'featurePack.featurePackId',
