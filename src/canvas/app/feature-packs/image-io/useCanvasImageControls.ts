@@ -10,6 +10,10 @@ import type { CanvasAppItemReadModel } from '../../workflow/CanvasAppItemReadMod
 import type {
   CommitCanvasItemsChange,
 } from '../../workflow/CanvasWorkflowContract'
+import {
+  createCanvasExternalClipboardImagePasteActionResolver,
+  createCanvasExternalClipboardPasteActionPlan,
+} from '../../affordances/commands/CanvasExternalClipboardPasteActionPlan'
 import { readCanvasClipboardImageSource } from './CanvasImageClipboard'
 import {
   copyCanvasSelectionImageToClipboard,
@@ -115,7 +119,14 @@ export function useCanvasImageControls({
       return false
     }
 
-    const source = await readCanvasClipboardImageSource()
+    const [source] = await createCanvasExternalClipboardPasteActionPlan({
+      resolvers: [
+        createCanvasExternalClipboardImagePasteActionResolver({
+          createAction: (source: CanvasImageImportSource) => source,
+          readImageSource: readCanvasClipboardImageSource,
+        }),
+      ],
+    })
 
     return source ? insertImageSource(source) : false
   }, [canPasteImage, insertImageSource])

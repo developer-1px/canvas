@@ -32,6 +32,8 @@ import {
   createCanvasAppFeaturePackMarketplaceListing,
   getCanvasAppFeaturePackMarketplaceActionAssemblyPlan,
   getCanvasAppFeaturePackMarketplaceActionAssemblyInput,
+  createCanvasExternalClipboardImagePasteActionResolver,
+  createCanvasExternalClipboardPasteActionPlan,
   createCanvasPlainTextPasteSource,
   routeCanvasImagePasteReplace,
   routeCanvasMediaSourceObjectHyperlink,
@@ -42,6 +44,7 @@ import {
   createCanvasStoryCanvasFeaturePackManifests,
   createCanvasStoryPreviewItemsFeaturePackManifest,
   getCanvasDataTransferText,
+  getCanvasExternalClipboardPasteCommandRoute,
   setCanvasDataTransferDropEffect,
   downloadCanvasBlobFile,
   downloadCanvasTextFile,
@@ -273,7 +276,7 @@ import {
 } from '@interactive-os/canvas/renderer'
 
 describe('Canvas package consumer imports', () => {
-  it('supports assembling a canvas app from package exports', () => {
+  it('supports assembling a canvas app from package exports', async () => {
     const rect: CanvasItem = {
       fill: '#fff',
       h: 80,
@@ -2233,6 +2236,29 @@ describe('Canvas package consumer imports', () => {
       clipboard: null,
       text: 'smoke',
     })).resolves.toBe('unavailable')
+    await expect(createCanvasExternalClipboardPasteActionPlan({
+      resolvers: [
+        createCanvasExternalClipboardImagePasteActionResolver({
+          createAction: (source: string) => ({
+            kind: 'image',
+            source,
+          }),
+          readImageSource: async () => null,
+        }),
+      ],
+    })).resolves.toEqual([])
+    await expect(CanvasAppFacade.createCanvasExternalClipboardPasteActionPlan({
+      resolvers: [],
+    })).resolves.toEqual([])
+    expect(getCanvasExternalClipboardPasteCommandRoute({
+      clipboard: null,
+      hasInternalClipboard: false,
+      trigger: 'keyboard-shortcut',
+    })).toBe('native-paste-event')
+    expect(CanvasAppFacade.getCanvasExternalClipboardPasteCommandRoute({
+      clipboard: null,
+      hasInternalClipboard: false,
+    })).toBe('none')
     expect(setCanvasDataTransferText({
       dataTransfer: null,
       text: 'smoke',

@@ -286,6 +286,22 @@ export {
   type CanvasDataTransferImportRegistryScope,
 } from './affordances/commands/CanvasDataTransferImportRegistry'
 export {
+  canReadCanvasExternalClipboard,
+  createCanvasExternalClipboardImagePasteActionResolver,
+  createCanvasExternalClipboardPasteActionPlan,
+  getCanvasExternalClipboardPasteCommandRoute,
+  type CanvasExternalClipboardImagePasteActionResolverInput,
+  type CanvasExternalClipboardPasteActionPlanInput,
+  type CanvasExternalClipboardPasteActionResolveValue,
+  type CanvasExternalClipboardPasteActionResolver,
+  type CanvasExternalClipboardPasteActionResolverInput,
+  type CanvasExternalClipboardPasteCommandRoute,
+  type CanvasExternalClipboardPasteCommandRouteInput,
+  type CanvasExternalClipboardPasteCommandTrigger,
+  type CanvasExternalClipboardReadClipboard,
+  type CanvasExternalClipboardReadSupportInput,
+} from './affordances/commands/CanvasExternalClipboardPasteActionPlan'
+export {
   CANVAS_DATA_TRANSFER_TEXT_MIME_TYPE,
   getCanvasDataTransferText,
   setCanvasDataTransferDropEffect,
