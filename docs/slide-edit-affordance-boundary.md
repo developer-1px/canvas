@@ -32,6 +32,7 @@
 | Style clipboard | `slide-edit-affordance` | source object style categories, target applicability, and format painter command effects |
 | Slide transition timing | `slide-edit-affordance` | transition type, duration, click/after advance policy |
 | Text font family | `slide-edit-affordance` | selected text object font family options and command effects |
+| Text font weight | `slide-edit-affordance` | selected text object font weight JSON paste and command effects |
 | Text frame inset | `slide-edit-affordance` | text frame top/right/bottom/left inset metadata and command effects |
 | Text run formatting | `slide-edit-affordance` | selected text run bold/italic/underline JSON paste and command effects |
 | Text vertical alignment | `slide-edit-affordance` | text frame internal vertical alignment metadata and command effects |
@@ -184,6 +185,20 @@
 | Fallback | unknown or empty family normalizes to fallback or first allowed option |
 | Updates | selected object id and normalized font family value become host command effects |
 | Runtime | host owns actual font loading, text layout, export mapping, and persistence |
+
+## Text Font Weight JSON Paste Contract
+
+| Area | Contract |
+| --- | --- |
+| Values | `regular`, `semibold`, and `bold`; unknown values fall back to `regular` outside paste parsing |
+| Field | `fontWeight` segmented-control descriptor routes through `update-text-font-weight` |
+| Boolean wrapper | explicit JSON `bold: true` maps to `bold`; `bold: false` maps to `regular` |
+| CSS | helper returns stable CSS font-weight values `400`, `600`, and `700` |
+| Custom MIME | `application/vnd.interactive-os.slide-edit.text-font-weight+json` may carry a direct JSON string value |
+| General JSON | `application/json` and `text/plain` require an explicit field key such as `textFontWeight`, `fontWeight`, `weight`, `bold`, or `value` |
+| Plain text | generic `text/plain` direct values such as `"bold"` or `true` are not interpreted as font weight |
+| Updates | selected slide id, text object id, field id, and normalized font weight value become host command effects |
+| Scope | text font weight field values only; keyboard bold toggle and text run formatting remain separate affordances |
 
 ## Text Run Formatting JSON Paste Contract
 
