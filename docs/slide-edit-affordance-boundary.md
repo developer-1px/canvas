@@ -35,6 +35,7 @@
 | Text frame inset | `slide-edit-affordance` | text frame top/right/bottom/left inset metadata and command effects |
 | Text run formatting | `slide-edit-affordance` | selected text run bold/italic/underline JSON paste and command effects |
 | Text vertical alignment | `slide-edit-affordance` | text frame internal vertical alignment metadata and command effects |
+| Text paragraph align | `slide-edit-affordance` | selected text paragraph horizontal align JSON paste and command effects |
 | Text paragraph bullet/list | `slide-edit-affordance` | selected text paragraph bullet/list state JSON paste and command effects |
 | Text paragraph spacing | `slide-edit-affordance` | line height and paragraph before/after spacing descriptors |
 | Text measurement | `slide-edit-affordance` | bounded text size, overflow, and auto-fit hints |
@@ -147,6 +148,19 @@
 | Fields | `lineHeightRatio`, `paragraphBefore`, `paragraphAfter` descriptors |
 | Updates | field edits become host command effects with object id and normalized value |
 | Runtime | host owns text layout, preview rendering, export mapping, and persistence |
+
+## Text Paragraph Align JSON Paste Contract
+
+| Area | Contract |
+| --- | --- |
+| Values | `left`, `center`, and `right`; unknown values fall back to `left` outside paste parsing |
+| Field | `paragraphAlign` segmented-control descriptor routes through `update-text-paragraph-align` |
+| CSS | helper returns stable `text-align` values matching the normalized align value |
+| Custom MIME | `application/vnd.interactive-os.slide-edit.text-paragraph-align+json` may carry a direct JSON string value |
+| General JSON | `application/json` and `text/plain` require an explicit field key such as `textParagraphAlign`, `paragraphAlign`, `textAlign`, `align`, or `value` |
+| Plain text | generic `text/plain` direct values such as `"center"` are not interpreted as paragraph align |
+| Updates | selected slide id, text object id, field id, and normalized align value become host command effects |
+| Scope | horizontal paragraph alignment only; text frame vertical alignment remains a separate affordance |
 
 ## Text Paragraph Bullet/List JSON Paste Contract
 
