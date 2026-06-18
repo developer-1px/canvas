@@ -53,6 +53,7 @@ import {
   executeCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan,
   executeCanvasAppFeaturePackMarketplaceAssemblyItemApplyTransaction,
   executeCanvasAppFeaturePackMarketplaceAssemblyApplyTransaction,
+  executeCanvasAppFeaturePackMarketplaceAssemblyTargetApplyTransaction,
   executeCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan,
   getCanvasAppFeaturePackMarketplaceAssemblyApplyCommitPlan,
   getCanvasAppFeaturePackMarketplaceAssemblyApplyCommitResult,
@@ -69,6 +70,12 @@ import {
   getCanvasAppFeaturePackMarketplaceAssemblyItemApplyPlan,
   getCanvasAppFeaturePackMarketplaceAssemblyItemApplyResult,
   getCanvasAppFeaturePackMarketplaceAssemblyModel,
+  getCanvasAppFeaturePackMarketplaceAssemblyTargetAction,
+  getCanvasAppFeaturePackMarketplaceAssemblyTargetActionInput,
+  getCanvasAppFeaturePackMarketplaceAssemblyTargetActionPlan,
+  getCanvasAppFeaturePackMarketplaceAssemblyTargetApplyPlan,
+  getCanvasAppFeaturePackMarketplaceAssemblyTargetApplyResult,
+  getCanvasAppFeaturePackMarketplaceAssemblyTargetItem,
   getCanvasAppFeaturePackMarketplaceActionAssemblyPlan,
   getCanvasAppFeaturePackMarketplaceActionAssemblyInput,
   getCanvasStoryCanvasFeaturePackMarketplaceAssemblyModel,
@@ -313,6 +320,8 @@ import {
   type CanvasAppFeaturePackMarketplaceAssemblyItemInput,
   type CanvasAppFeaturePackMarketplaceAssemblyItemApplyTransactionInput,
   type CanvasAppFeaturePackMarketplaceAssemblyModel,
+  type CanvasAppFeaturePackMarketplaceAssemblyTargetApplyTransactionInput,
+  type CanvasAppFeaturePackMarketplaceAssemblyTargetInput,
   type CanvasAppFeaturePackMarketplaceAssemblyUninstallDataPlan,
   type CanvasAppFeaturePackMarketplaceUninstallCleanupEffect,
   type CanvasAppFeaturePackMarketplaceUninstallCleanupEffectExecutionResult,
@@ -1065,6 +1074,14 @@ describe('Canvas package consumer imports', () => {
           .items[0]!,
         model: featurePackMarketplaceAssemblyModel,
       }
+    const featurePackMarketplaceAssemblyTargetInput:
+      CanvasAppFeaturePackMarketplaceAssemblyTargetInput = {
+        model: featurePackMarketplaceAssemblyModel,
+        target: {
+          featurePackId: 'smoke-partial-pack',
+          kind: 'pack',
+        },
+      }
     const featurePackMarketplaceAssemblyActionPlan =
       getCanvasAppFeaturePackMarketplaceAssemblyActionPlan(
         featurePackMarketplaceAssemblyActionInput,
@@ -1073,9 +1090,21 @@ describe('Canvas package consumer imports', () => {
       getCanvasAppFeaturePackMarketplaceAssemblyItemAction(
         featurePackMarketplaceAssemblyItemInput,
       )
+    const featurePackMarketplaceAssemblyTargetItem =
+      getCanvasAppFeaturePackMarketplaceAssemblyTargetItem(
+        featurePackMarketplaceAssemblyTargetInput,
+      )
+    const featurePackMarketplaceAssemblyTargetAction =
+      getCanvasAppFeaturePackMarketplaceAssemblyTargetAction(
+        featurePackMarketplaceAssemblyTargetInput,
+      )
     const featurePackMarketplaceAssemblyItemActionPlan =
       getCanvasAppFeaturePackMarketplaceAssemblyItemActionPlan(
         featurePackMarketplaceAssemblyItemInput,
+      )
+    const featurePackMarketplaceAssemblyTargetActionPlan =
+      getCanvasAppFeaturePackMarketplaceAssemblyTargetActionPlan(
+        featurePackMarketplaceAssemblyTargetInput,
       )
     const featurePackMarketplaceAssemblyApplyPlan:
       CanvasAppFeaturePackMarketplaceAssemblyApplyPlan =
@@ -1086,6 +1115,10 @@ describe('Canvas package consumer imports', () => {
       getCanvasAppFeaturePackMarketplaceAssemblyItemApplyPlan(
         featurePackMarketplaceAssemblyItemInput,
       )
+    const featurePackMarketplaceAssemblyTargetApplyPlan =
+      getCanvasAppFeaturePackMarketplaceAssemblyTargetApplyPlan(
+        featurePackMarketplaceAssemblyTargetInput,
+      )
     const featurePackMarketplaceAssemblyApplyResult:
       CanvasAppFeaturePackMarketplaceAssemblyApplyResult =
         getCanvasAppFeaturePackMarketplaceAssemblyApplyResult(
@@ -1094,6 +1127,10 @@ describe('Canvas package consumer imports', () => {
     const featurePackMarketplaceAssemblyItemApplyResult =
       getCanvasAppFeaturePackMarketplaceAssemblyItemApplyResult(
         featurePackMarketplaceAssemblyItemInput,
+      )
+    const featurePackMarketplaceAssemblyTargetApplyResult =
+      getCanvasAppFeaturePackMarketplaceAssemblyTargetApplyResult(
+        featurePackMarketplaceAssemblyTargetInput,
       )
     const featurePackMarketplaceAssemblyApplyUpdateMode:
       CanvasAppFeaturePackMarketplaceAssemblyApplyUpdateMode =
@@ -1108,6 +1145,10 @@ describe('Canvas package consumer imports', () => {
     const featurePackMarketplaceAssemblyItemAppliedInput =
       getCanvasAppFeaturePackMarketplaceAssemblyItemActionInput(
         featurePackMarketplaceAssemblyItemInput,
+      )
+    const featurePackMarketplaceAssemblyTargetAppliedInput =
+      getCanvasAppFeaturePackMarketplaceAssemblyTargetActionInput(
+        featurePackMarketplaceAssemblyTargetInput,
       )
     const featurePackMarketplaceListingMap =
       getCanvasAppFeaturePackMarketplaceListingMap({
@@ -1256,6 +1297,30 @@ describe('Canvas package consumer imports', () => {
           suiteId: CANVAS_STORY_CANVAS_SUITE_ID,
         },
       })
+    const storyCanvasMarketplaceAssemblySuiteTargetInput:
+      CanvasAppFeaturePackMarketplaceAssemblyTargetInput = {
+        model: storyCanvasMarketplaceAssemblyModel,
+        target: {
+          kind: 'suite',
+          suiteId: CANVAS_STORY_CANVAS_SUITE_ID,
+        },
+      }
+    const storyCanvasMarketplaceAssemblySuiteTargetItem =
+      getCanvasAppFeaturePackMarketplaceAssemblyTargetItem(
+        storyCanvasMarketplaceAssemblySuiteTargetInput,
+      )
+    const storyCanvasMarketplaceAssemblySuiteTargetAction =
+      getCanvasAppFeaturePackMarketplaceAssemblyTargetAction(
+        storyCanvasMarketplaceAssemblySuiteTargetInput,
+      )
+    const storyCanvasMarketplaceAssemblySuiteTargetApplyPlan =
+      getCanvasAppFeaturePackMarketplaceAssemblyTargetApplyPlan(
+        storyCanvasMarketplaceAssemblySuiteTargetInput,
+      )
+    const storyCanvasMarketplaceAssemblySuiteTargetApplyResult =
+      getCanvasAppFeaturePackMarketplaceAssemblyTargetApplyResult(
+        storyCanvasMarketplaceAssemblySuiteTargetInput,
+      )
     const viewManifestCategory: CanvasAppFeaturePackManifestCategory =
       viewManifest.category
     const featurePackManifestOrphanedDataPolicy:
@@ -1592,6 +1657,28 @@ describe('Canvas package consumer imports', () => {
       > =
         await executeCanvasAppFeaturePackMarketplaceAssemblyItemApplyTransaction(
           featurePackMarketplaceAssemblyItemApplyTransactionInput,
+        )
+    const featurePackMarketplaceAssemblyTargetApplyTransactionInput:
+      CanvasAppFeaturePackMarketplaceAssemblyTargetApplyTransactionInput<
+        SmokeUninstallCleanupEffect,
+        SmokeUninstallCleanupExecutionValue
+      > = {
+        cleanupHandlers: [featurePackMarketplaceUninstallCleanupScopeHandler],
+        executeCleanupEffect:
+          featurePackMarketplaceUninstallCleanupEffectExecutor,
+        model: featurePackMarketplaceAssemblyModel,
+        target: {
+          featurePackId: 'smoke-partial-pack',
+          kind: 'pack',
+        },
+      }
+    const featurePackMarketplaceAssemblyTargetApplyTransactionResult:
+      CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionResult<
+        SmokeUninstallCleanupEffect,
+        SmokeUninstallCleanupExecutionValue
+      > =
+        await executeCanvasAppFeaturePackMarketplaceAssemblyTargetApplyTransaction(
+          featurePackMarketplaceAssemblyTargetApplyTransactionInput,
         )
     const featurePackMarketplaceAssemblyApplyTransactionBaseResult:
       CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionBaseResult<
@@ -2570,6 +2657,26 @@ describe('Canvas package consumer imports', () => {
       ready: true,
       status: 'ready',
     })
+    expect(storyCanvasMarketplaceAssemblySuiteTargetItem)
+      .toBe(storyCanvasMarketplaceAssemblySuiteItem)
+    expect(storyCanvasMarketplaceAssemblySuiteTargetAction)
+      .toBe(storyCanvasMarketplaceAssemblyPrimaryAction)
+    expect(storyCanvasMarketplaceAssemblySuiteTargetApplyPlan).toMatchObject({
+      actionKind: 'install',
+      changedFeaturePackIds: [
+        CANVAS_STORY_PREVIEW_ITEMS_FEATURE_PACK_ID,
+        CANVAS_APP_STORY_IMPORT_FEATURE_PACK_MANIFEST.id,
+      ],
+      status: 'ready',
+      updateMode: 'full-rebuild',
+    })
+    expect(storyCanvasMarketplaceAssemblySuiteTargetApplyResult)
+      .toMatchObject({
+        action: storyCanvasMarketplaceAssemblyPrimaryAction,
+        currentModel: storyCanvasMarketplaceAssemblyModel,
+        status: 'ready',
+        updateMode: 'full-rebuild',
+      })
     expect(CanvasPackage.createCanvasStoryCanvasFeaturePackAssemblyInput)
       .toBe(createCanvasStoryCanvasFeaturePackAssemblyInput)
     expect(CanvasAppFacade.createCanvasStoryCanvasFeaturePackAssemblyInput)
@@ -2782,6 +2889,10 @@ describe('Canvas package consumer imports', () => {
       .toBe(getCanvasAppFeaturePackMarketplacePrimaryAction(
         featurePackMarketplaceAssemblyItemInput.item,
       ))
+    expect(featurePackMarketplaceAssemblyTargetItem)
+      .toBe(featurePackMarketplaceAssemblyItemInput.item)
+    expect(featurePackMarketplaceAssemblyTargetAction)
+      .toBe(featurePackMarketplaceAssemblyItemAction)
     expect(featurePackMarketplaceAssemblyItemAction.kind).toBe('disable')
     expect(featurePackMarketplaceAssemblyItemActionPlan.status).toBe('ready')
     if (featurePackMarketplaceAssemblyItemActionPlan.status !== 'ready') {
@@ -2792,9 +2903,13 @@ describe('Canvas package consumer imports', () => {
 
     expect(featurePackMarketplaceAssemblyItemActionPlan.action)
       .toBe(featurePackMarketplaceAssemblyItemAction)
+    expect(featurePackMarketplaceAssemblyTargetActionPlan)
+      .toEqual(featurePackMarketplaceAssemblyItemActionPlan)
     expect(featurePackMarketplaceAssemblyItemActionPlan.assemblyInput)
       .toEqual(featurePackMarketplaceAssemblyItemAppliedInput)
     expect(featurePackMarketplaceAssemblyItemAppliedInput)
+      .toEqual(featurePackMarketplaceAssemblyAppliedInput)
+    expect(featurePackMarketplaceAssemblyTargetAppliedInput)
       .toEqual(featurePackMarketplaceAssemblyAppliedInput)
     expect(featurePackMarketplaceAssemblyApplyPlan.status).toBe('ready')
     if (featurePackMarketplaceAssemblyApplyPlan.status !== 'ready') {
@@ -2810,6 +2925,8 @@ describe('Canvas package consumer imports', () => {
       status: 'ready',
       updateMode: 'partial-update',
     })
+    expect(featurePackMarketplaceAssemblyTargetApplyPlan)
+      .toEqual(featurePackMarketplaceAssemblyItemApplyPlan)
     expect(featurePackMarketplaceAssemblyItemApplyResult.status).toBe('ready')
     if (featurePackMarketplaceAssemblyItemApplyResult.status !== 'ready') {
       throw new Error(
@@ -2821,6 +2938,8 @@ describe('Canvas package consumer imports', () => {
       .toBe(featurePackMarketplaceAssemblyModel)
     expect(featurePackMarketplaceAssemblyItemApplyResult.nextModel.assemblyInput)
       .toEqual(featurePackMarketplaceAssemblyAppliedInput)
+    expect(featurePackMarketplaceAssemblyTargetApplyResult)
+      .toEqual(featurePackMarketplaceAssemblyItemApplyResult)
     expect(featurePackMarketplaceAssemblyApplyPlan.uninstallPolicyEntries)
       .toEqual([])
     expect(featurePackMarketplaceAssemblyUninstallDataPlan).toEqual({
@@ -3140,6 +3259,16 @@ describe('Canvas package consumer imports', () => {
       .hostUpdate.update)
       .toEqual(featurePackMarketplaceAssemblyApplyTransactionResult
         .hostUpdate.update)
+    expect(featurePackMarketplaceAssemblyTargetApplyTransactionResult.action)
+      .toBe(featurePackMarketplaceAssemblyItemAction)
+    expect(featurePackMarketplaceAssemblyTargetApplyTransactionResult.status)
+      .toBe('committed')
+    expect(featurePackMarketplaceAssemblyTargetApplyTransactionResult
+      .hostUpdate.ready).toBe(true)
+    expect(featurePackMarketplaceAssemblyTargetApplyTransactionResult
+      .hostUpdate.update)
+      .toEqual(featurePackMarketplaceAssemblyApplyTransactionResult
+        .hostUpdate.update)
     expect(CanvasPackage.executeCanvasAppFeaturePackMarketplaceAssemblyApplyTransaction)
       .toBe(executeCanvasAppFeaturePackMarketplaceAssemblyApplyTransaction)
     expect(CanvasAppFacade.executeCanvasAppFeaturePackMarketplaceAssemblyApplyTransaction)
@@ -3152,6 +3281,12 @@ describe('Canvas package consumer imports', () => {
       .toBe(executeCanvasAppFeaturePackMarketplaceAssemblyItemApplyTransaction)
     expect(CanvasAppAuthoring.executeCanvasAppFeaturePackMarketplaceAssemblyItemApplyTransaction)
       .toBe(executeCanvasAppFeaturePackMarketplaceAssemblyItemApplyTransaction)
+    expect(CanvasPackage.executeCanvasAppFeaturePackMarketplaceAssemblyTargetApplyTransaction)
+      .toBe(executeCanvasAppFeaturePackMarketplaceAssemblyTargetApplyTransaction)
+    expect(CanvasAppFacade.executeCanvasAppFeaturePackMarketplaceAssemblyTargetApplyTransaction)
+      .toBe(executeCanvasAppFeaturePackMarketplaceAssemblyTargetApplyTransaction)
+    expect(CanvasAppAuthoring.executeCanvasAppFeaturePackMarketplaceAssemblyTargetApplyTransaction)
+      .toBe(executeCanvasAppFeaturePackMarketplaceAssemblyTargetApplyTransaction)
     expect(CanvasPackage.getCanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdate)
       .toBe(getCanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdate)
     expect(CanvasAppFacade.getCanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdate)
@@ -4260,6 +4395,42 @@ describe('Canvas package consumer imports', () => {
       .toBeTypeOf('function')
     expect(CanvasPackage.getCanvasAppFeaturePackMarketplaceAssemblyItemApplyResult)
       .toBeTypeOf('function')
+    expect(CanvasAppAuthoring.getCanvasAppFeaturePackMarketplaceAssemblyTargetItem)
+      .toBe(getCanvasAppFeaturePackMarketplaceAssemblyTargetItem)
+    expect(CanvasAppFacade.getCanvasAppFeaturePackMarketplaceAssemblyTargetItem)
+      .toBe(getCanvasAppFeaturePackMarketplaceAssemblyTargetItem)
+    expect(CanvasPackage.getCanvasAppFeaturePackMarketplaceAssemblyTargetItem)
+      .toBe(getCanvasAppFeaturePackMarketplaceAssemblyTargetItem)
+    expect(CanvasAppAuthoring.getCanvasAppFeaturePackMarketplaceAssemblyTargetAction)
+      .toBe(getCanvasAppFeaturePackMarketplaceAssemblyTargetAction)
+    expect(CanvasAppFacade.getCanvasAppFeaturePackMarketplaceAssemblyTargetAction)
+      .toBe(getCanvasAppFeaturePackMarketplaceAssemblyTargetAction)
+    expect(CanvasPackage.getCanvasAppFeaturePackMarketplaceAssemblyTargetAction)
+      .toBe(getCanvasAppFeaturePackMarketplaceAssemblyTargetAction)
+    expect(CanvasAppAuthoring.getCanvasAppFeaturePackMarketplaceAssemblyTargetActionInput)
+      .toBe(getCanvasAppFeaturePackMarketplaceAssemblyTargetActionInput)
+    expect(CanvasAppFacade.getCanvasAppFeaturePackMarketplaceAssemblyTargetActionInput)
+      .toBe(getCanvasAppFeaturePackMarketplaceAssemblyTargetActionInput)
+    expect(CanvasPackage.getCanvasAppFeaturePackMarketplaceAssemblyTargetActionInput)
+      .toBe(getCanvasAppFeaturePackMarketplaceAssemblyTargetActionInput)
+    expect(CanvasAppAuthoring.getCanvasAppFeaturePackMarketplaceAssemblyTargetActionPlan)
+      .toBe(getCanvasAppFeaturePackMarketplaceAssemblyTargetActionPlan)
+    expect(CanvasAppFacade.getCanvasAppFeaturePackMarketplaceAssemblyTargetActionPlan)
+      .toBe(getCanvasAppFeaturePackMarketplaceAssemblyTargetActionPlan)
+    expect(CanvasPackage.getCanvasAppFeaturePackMarketplaceAssemblyTargetActionPlan)
+      .toBe(getCanvasAppFeaturePackMarketplaceAssemblyTargetActionPlan)
+    expect(CanvasAppAuthoring.getCanvasAppFeaturePackMarketplaceAssemblyTargetApplyPlan)
+      .toBe(getCanvasAppFeaturePackMarketplaceAssemblyTargetApplyPlan)
+    expect(CanvasAppFacade.getCanvasAppFeaturePackMarketplaceAssemblyTargetApplyPlan)
+      .toBe(getCanvasAppFeaturePackMarketplaceAssemblyTargetApplyPlan)
+    expect(CanvasPackage.getCanvasAppFeaturePackMarketplaceAssemblyTargetApplyPlan)
+      .toBe(getCanvasAppFeaturePackMarketplaceAssemblyTargetApplyPlan)
+    expect(CanvasAppAuthoring.getCanvasAppFeaturePackMarketplaceAssemblyTargetApplyResult)
+      .toBe(getCanvasAppFeaturePackMarketplaceAssemblyTargetApplyResult)
+    expect(CanvasAppFacade.getCanvasAppFeaturePackMarketplaceAssemblyTargetApplyResult)
+      .toBe(getCanvasAppFeaturePackMarketplaceAssemblyTargetApplyResult)
+    expect(CanvasPackage.getCanvasAppFeaturePackMarketplaceAssemblyTargetApplyResult)
+      .toBe(getCanvasAppFeaturePackMarketplaceAssemblyTargetApplyResult)
     expect(CanvasAppAuthoring.getCanvasAppFeaturePackMarketplacePrimaryAction)
       .toBeTypeOf('function')
     expect(CanvasAppFacade.getCanvasAppFeaturePackMarketplacePrimaryAction)

@@ -12,6 +12,7 @@ import {
   createCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan,
   executeCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan,
   executeCanvasAppFeaturePackMarketplaceAssemblyItemApplyTransaction,
+  executeCanvasAppFeaturePackMarketplaceAssemblyTargetApplyTransaction,
   executeCanvasAppFeaturePackMarketplaceAssemblyApplyTransaction,
   executeCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan,
   getCanvasAppFeaturePackMarketplaceAssemblyApplyCommitPlan,
@@ -28,6 +29,12 @@ import {
   getCanvasAppFeaturePackMarketplaceAssemblyItemActionPlan,
   getCanvasAppFeaturePackMarketplaceAssemblyItemApplyPlan,
   getCanvasAppFeaturePackMarketplaceAssemblyItemApplyResult,
+  getCanvasAppFeaturePackMarketplaceAssemblyTargetAction,
+  getCanvasAppFeaturePackMarketplaceAssemblyTargetActionInput,
+  getCanvasAppFeaturePackMarketplaceAssemblyTargetActionPlan,
+  getCanvasAppFeaturePackMarketplaceAssemblyTargetApplyPlan,
+  getCanvasAppFeaturePackMarketplaceAssemblyTargetApplyResult,
+  getCanvasAppFeaturePackMarketplaceAssemblyTargetItem,
   getCanvasAppFeaturePackMarketplaceAssemblyModel,
 } from './CanvasAppFeaturePackAssembly'
 
@@ -182,27 +189,50 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
       item: overlayItem,
       model,
     }
+    const targetInput = {
+      model,
+      target: {
+        featurePackId: 'overlay-pack',
+        kind: 'pack' as const,
+      },
+    }
     const primaryAction =
       getCanvasAppFeaturePackMarketplaceAssemblyItemAction(itemInput)
+    const targetItem =
+      getCanvasAppFeaturePackMarketplaceAssemblyTargetItem(targetInput)
+    const targetPrimaryAction =
+      getCanvasAppFeaturePackMarketplaceAssemblyTargetAction(targetInput)
     const actionPlan =
       getCanvasAppFeaturePackMarketplaceAssemblyItemActionPlan(itemInput)
+    const targetActionPlan =
+      getCanvasAppFeaturePackMarketplaceAssemblyTargetActionPlan(targetInput)
     const assemblyInput =
       getCanvasAppFeaturePackMarketplaceAssemblyItemActionInput(itemInput)
+    const targetAssemblyInput =
+      getCanvasAppFeaturePackMarketplaceAssemblyTargetActionInput(targetInput)
     const applyPlan =
       getCanvasAppFeaturePackMarketplaceAssemblyItemApplyPlan(itemInput)
+    const targetApplyPlan =
+      getCanvasAppFeaturePackMarketplaceAssemblyTargetApplyPlan(targetInput)
     const applyResult =
       getCanvasAppFeaturePackMarketplaceAssemblyItemApplyResult(itemInput)
+    const targetApplyResult =
+      getCanvasAppFeaturePackMarketplaceAssemblyTargetApplyResult(targetInput)
 
     expect(primaryAction)
       .toBe(getCanvasAppFeaturePackMarketplacePrimaryAction(overlayItem))
+    expect(targetItem).toBe(overlayItem)
+    expect(targetPrimaryAction).toBe(primaryAction)
     expect(primaryAction.kind).toBe('disable')
     expect(actionPlan.status).toBe('ready')
     if (actionPlan.status !== 'ready') {
       throw new Error('Expected ready item action plan')
     }
 
+    expect(targetActionPlan).toEqual(actionPlan)
     expect(actionPlan.action).toBe(primaryAction)
     expect(actionPlan.assemblyInput).toEqual(assemblyInput)
+    expect(targetAssemblyInput).toEqual(assemblyInput)
     expect(assemblyInput.featurePackStates).toEqual([{
       id: 'overlay-pack',
       status: 'disabled',
@@ -212,6 +242,7 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
       throw new Error('Expected ready item apply plan')
     }
 
+    expect(targetApplyPlan).toEqual(applyPlan)
     expect(applyPlan.action).toBe(primaryAction)
     expect(applyPlan.updateMode).toBe('partial-update')
     expect(applyResult.status).toBe('ready')
@@ -219,6 +250,7 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
       throw new Error('Expected ready item apply result')
     }
 
+    expect(targetApplyResult).toEqual(applyResult)
     expect(applyResult.action).toBe(primaryAction)
     expect(applyResult.currentModel).toBe(model)
     expect(applyResult.nextModel.marketplaceModel.packs.items[0])
@@ -286,6 +318,24 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
     expect(() =>
       getCanvasAppFeaturePackMarketplaceAssemblyItemActionInput(itemInput)
     ).toThrow('Canvas app feature pack marketplace action is not ready: install')
+    expect(getCanvasAppFeaturePackMarketplaceAssemblyTargetItem({
+      model,
+      target: {
+        featurePackId: 'missing-pack',
+        kind: 'pack',
+      },
+    })).toBeNull()
+    expect(() =>
+      getCanvasAppFeaturePackMarketplaceAssemblyTargetAction({
+        model,
+        target: {
+          featurePackId: 'missing-pack',
+          kind: 'pack',
+        },
+      })
+    ).toThrow(
+      'Unknown canvas app feature pack marketplace assembly target: pack:missing-pack',
+    )
   })
 
   it('executes marketplace item transactions through their primary action', async () => {
@@ -314,6 +364,13 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
       item: overlayItem,
       model: readyModel,
     }
+    const readyTargetInput = {
+      model: readyModel,
+      target: {
+        featurePackId: 'overlay-pack',
+        kind: 'pack' as const,
+      },
+    }
     const readyPrimaryAction =
       getCanvasAppFeaturePackMarketplaceAssemblyItemAction(readyItemInput)
     const readyTransactionResult =
@@ -321,9 +378,20 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
         ...readyItemInput,
         executeCleanupEffect: () => undefined,
       })
+    const readyTargetTransactionResult =
+      await executeCanvasAppFeaturePackMarketplaceAssemblyTargetApplyTransaction({
+        ...readyTargetInput,
+        executeCleanupEffect: () => undefined,
+      })
 
     expect(readyTransactionResult.action).toBe(readyPrimaryAction)
+    expect(readyTargetTransactionResult.action).toBe(readyPrimaryAction)
     expect(readyTransactionResult).toMatchObject({
+      actionKind: 'disable',
+      status: 'committed',
+      updateMode: 'partial-update',
+    })
+    expect(readyTargetTransactionResult).toMatchObject({
       actionKind: 'disable',
       status: 'committed',
       updateMode: 'partial-update',
@@ -334,9 +402,23 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
       status: 'ready',
       updateMode: 'partial-update',
     })
+    expect(readyTargetTransactionResult.hostUpdate).toMatchObject({
+      actionKind: 'disable',
+      ready: true,
+      status: 'ready',
+      updateMode: 'partial-update',
+    })
     expect(readyTransactionResult.commitResult.status).toBe('committed')
+    expect(readyTargetTransactionResult.commitResult.status).toBe('committed')
     expect(readyTransactionResult.runtimeStatePatch.status).toBe('patched')
+    expect(readyTargetTransactionResult.runtimeStatePatch.status)
+      .toBe('patched')
     expect(readyTransactionResult.hostUpdate.update?.assemblyInput
+      .featurePackStates).toEqual([{
+        id: 'overlay-pack',
+        status: 'disabled',
+      }])
+    expect(readyTargetTransactionResult.hostUpdate.update?.assemblyInput
       .featurePackStates).toEqual([{
         id: 'overlay-pack',
         status: 'disabled',
@@ -372,6 +454,13 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
       item: paidItem,
       model: blockedModel,
     }
+    const blockedTargetInput = {
+      model: blockedModel,
+      target: {
+        featurePackId: 'paid-pack',
+        kind: 'pack' as const,
+      },
+    }
     const blockedPrimaryAction =
       getCanvasAppFeaturePackMarketplaceAssemblyItemAction(blockedItemInput)
     const blockedTransactionResult =
@@ -379,9 +468,20 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
         ...blockedItemInput,
         executeCleanupEffect: () => undefined,
       })
+    const blockedTargetTransactionResult =
+      await executeCanvasAppFeaturePackMarketplaceAssemblyTargetApplyTransaction({
+        ...blockedTargetInput,
+        executeCleanupEffect: () => undefined,
+      })
 
     expect(blockedTransactionResult.action).toBe(blockedPrimaryAction)
+    expect(blockedTargetTransactionResult.action).toBe(blockedPrimaryAction)
     expect(blockedTransactionResult).toMatchObject({
+      actionKind: 'install',
+      status: 'held',
+      updateMode: 'blocked',
+    })
+    expect(blockedTargetTransactionResult).toMatchObject({
       actionKind: 'install',
       status: 'held',
       updateMode: 'blocked',
@@ -393,8 +493,18 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
       update: null,
       updateMode: 'blocked',
     })
+    expect(blockedTargetTransactionResult.hostUpdate).toMatchObject({
+      actionKind: 'install',
+      ready: false,
+      status: 'held',
+      update: null,
+      updateMode: 'blocked',
+    })
     expect(blockedTransactionResult.commitResult.status).toBe('held')
+    expect(blockedTargetTransactionResult.commitResult.status).toBe('held')
     expect(blockedTransactionResult.runtimeStatePatch.status).toBe('held')
+    expect(blockedTargetTransactionResult.runtimeStatePatch.status)
+      .toBe('held')
   })
 
   it('marks runtime-toggle actions with partial surfaces as partial updates', () => {
