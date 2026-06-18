@@ -25,6 +25,7 @@ import {
 import {
   assertCanvasAppFeaturePackIds,
   type CanvasAppFeaturePackId,
+  type CanvasAppFeaturePackRuntimeStateInput,
 } from './CanvasAppFeaturePacks'
 
 export type CanvasAppFeaturePackProfileId = string
@@ -46,6 +47,11 @@ export type CanvasAppFeaturePackProfileInput = Readonly<{
   installedSuiteIds?: readonly CanvasAppFeaturePackSuiteId[]
   label: string
   suiteManifests?: readonly CanvasAppFeaturePackSuiteManifest[]
+}>
+
+export type CanvasAppFeaturePackProfileRuntimeStatesInput = Readonly<{
+  featurePackIds: readonly CanvasAppFeaturePackId[]
+  profile: CanvasAppFeaturePackProfile
 }>
 
 export function createCanvasAppFeaturePackProfile(
@@ -98,6 +104,106 @@ export function createCanvasAppFeaturePackProfile(
     installedFeaturePackIds,
     installedSuiteIds,
     label: input.label,
+  })
+}
+
+export function getCanvasAppFeaturePackProfileRuntimeStates({
+  featurePackIds,
+  profile,
+}: CanvasAppFeaturePackProfileRuntimeStatesInput): readonly CanvasAppFeaturePackRuntimeStateInput[] {
+  assertCanvasAppFeaturePackIds(featurePackIds)
+  assertCanvasAppFeaturePackProfile(profile)
+  assertCanvasAppFeaturePackProfileKnownIds({
+    featurePackIds,
+    profile,
+  })
+  const installedIds = new Set(profile.installedFeaturePackIds)
+  const enabledIds = new Set(profile.enabledFeaturePackIds)
+
+  return Object.freeze(
+    featurePackIds.map((id): CanvasAppFeaturePackRuntimeStateInput => {
+      if (!installedIds.has(id)) {
+        return {
+          id,
+          status: 'uninstalled',
+        }
+      }
+
+      return {
+        id,
+        status: enabledIds.has(id) ? 'enabled' : 'disabled',
+      }
+    }),
+  )
+}
+
+export function getCanvasAppFeaturePackProfileById(
+  profiles: readonly CanvasAppFeaturePackProfile[],
+  profileId: CanvasAppFeaturePackProfileId,
+): CanvasAppFeaturePackProfile {
+  assertCanvasAppFeaturePackProfiles(profiles)
+  assertCanvasAppExtensionId({
+    id: profileId,
+    label: 'feature pack profile id',
+  })
+  const profile = profiles.find((candidate) => candidate.id === profileId)
+
+  if (!profile) {
+    throw new Error(`Unknown canvas app feature pack profile: ${profileId}`)
+  }
+
+  return profile
+}
+
+export function assertCanvasAppFeaturePackProfiles(
+  profiles: unknown,
+): asserts profiles is readonly CanvasAppFeaturePackProfile[] {
+  if (!Array.isArray(profiles)) {
+    throw new Error('Expected feature pack profiles array')
+  }
+
+  const ids = new Set<string>()
+
+  for (const profile of profiles) {
+    assertCanvasAppFeaturePackProfile(profile)
+
+    if (ids.has(profile.id)) {
+      throw new Error(`Duplicate canvas app feature pack profile: ${profile.id}`)
+    }
+
+    ids.add(profile.id)
+  }
+}
+
+export function assertCanvasAppFeaturePackProfile(
+  profile: unknown,
+): asserts profile is CanvasAppFeaturePackProfile {
+  assertCanvasAppDescriptorStringField({
+    field: 'id',
+    owner: 'feature pack profile',
+    value: typeof profile === 'object' && profile !== null
+      ? (profile as { id?: unknown }).id
+      : undefined,
+  })
+  const typedProfile = profile as CanvasAppFeaturePackProfile
+
+  assertCanvasAppFeaturePackProfileInput({
+    enabledFeaturePackIds: typedProfile.enabledFeaturePackIds,
+    enabledSuiteIds: typedProfile.enabledSuiteIds,
+    id: typedProfile.id,
+    installedFeaturePackIds: typedProfile.installedFeaturePackIds,
+    installedSuiteIds: typedProfile.installedSuiteIds,
+    label: typedProfile.label,
+  })
+  assertCanvasAppFeaturePackProfileEnabledSuiteIds({
+    enabledSuiteIds: typedProfile.enabledSuiteIds,
+    installedSuiteIds: typedProfile.installedSuiteIds,
+    profileId: typedProfile.id,
+  })
+  assertCanvasAppFeaturePackProfileEnabledIds({
+    enabledFeaturePackIds: typedProfile.enabledFeaturePackIds,
+    installedFeaturePackIds: typedProfile.installedFeaturePackIds,
+    profileId: typedProfile.id,
   })
 }
 
@@ -218,4 +324,30 @@ function snapshotCanvasAppFeaturePackProfileIds(
   }
 
   return Object.freeze(ids)
+}
+
+function assertCanvasAppFeaturePackProfileKnownIds({
+  featurePackIds,
+  profile,
+}: {
+  featurePackIds: readonly CanvasAppFeaturePackId[]
+  profile: CanvasAppFeaturePackProfile
+}) {
+  const knownIds = new Set(featurePackIds)
+
+  for (const id of profile.installedFeaturePackIds) {
+    if (!knownIds.has(id)) {
+      throw new Error(
+        `Feature pack profile ${profile.id} installs unknown pack: ${id}`,
+      )
+    }
+  }
+
+  for (const id of profile.enabledFeaturePackIds) {
+    if (!knownIds.has(id)) {
+      throw new Error(
+        `Feature pack profile ${profile.id} enables unknown pack: ${id}`,
+      )
+    }
+  }
 }

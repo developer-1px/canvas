@@ -59,6 +59,8 @@ import {
   getCanvasAppInstalledFeaturePackManifestIds,
   getCanvasAppInstalledFeaturePackManifests,
   getCanvasAppInstalledViewFeaturePacks,
+  getCanvasAppFeaturePackProfileById,
+  getCanvasAppFeaturePackProfileRuntimeStates,
   getCanvasAppFeaturePackSuiteFeaturePackIds,
   getCanvasAppManifestViewFeaturePacks,
   getCanvasAppResolvedFeaturePackStates,
@@ -89,6 +91,7 @@ import {
   type CanvasAppFeaturePackManifest,
   type CanvasAppFeaturePackManifestCategory,
   type CanvasAppFeaturePackProfile,
+  type CanvasAppFeaturePackProfileRuntimeStatesInput,
   type CanvasAppFeaturePackRuntimeState,
   type CanvasAppFeaturePackSuiteId,
   type CanvasAppFeaturePackSuiteManifest,
@@ -372,6 +375,11 @@ describe('Canvas package consumer imports', () => {
         label: 'Smoke suite profile',
         suiteManifests: [smokeSuite],
       })
+    const smokeProfileStatesInput:
+      CanvasAppFeaturePackProfileRuntimeStatesInput = {
+        featurePackIds: ['smoke-pack'],
+        profile: smokeSuiteProfile,
+      }
     const storyPreviewManifest = createCanvasStoryPreviewItemsFeaturePackManifest({
       renderGroupItem: ({ groupLabel }) => groupLabel,
       renderPreviewItem: ({ storyId }) => storyId,
@@ -402,6 +410,7 @@ describe('Canvas package consumer imports', () => {
         },
         customItemModules: [module],
         disabledFeaturePackIds: ['toolbar'],
+        featurePackProfileId: 'minimal-viewer',
       },
     } satisfies CanvasAppProps
     const featurePackAssemblyInput =
@@ -509,6 +518,16 @@ describe('Canvas package consumer imports', () => {
       [smokeSuite],
       [smokeSuiteId],
     )).toEqual(['smoke-pack'])
+    expect(getCanvasAppFeaturePackProfileRuntimeStates(
+      smokeProfileStatesInput,
+    )).toEqual([{
+      id: 'smoke-pack',
+      status: 'enabled',
+    }])
+    expect(getCanvasAppFeaturePackProfileById(
+      [smokeSuiteProfile],
+      'smoke-suite-profile',
+    )).toBe(smokeSuiteProfile)
     expect(CANVAS_STORY_CANVAS_SUITE_ID).toBe('story-canvas')
     expect(DEFAULT_CANVAS_APP_FEATURE_PACK_SUITE_MANIFESTS).toContain(
       CANVAS_STORY_CANVAS_FEATURE_PACK_SUITE_MANIFEST,

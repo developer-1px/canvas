@@ -1,12 +1,17 @@
 import {
   DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS,
+  DEFAULT_CANVAS_APP_FEATURE_PACK_PROFILES,
   createCanvasAppFeaturePackExtensionBundle,
   DEFAULT_CANVAS_APP_VIEW_FEATURE_PACKS,
   assertCanvasAppFeaturePackViewRenderers,
   createCanvasAppFeaturePackViewRenderers,
+  getCanvasAppFeaturePackProfileById,
+  getCanvasAppFeaturePackProfileRuntimeStates,
   getCanvasAppManifestExtensionFeaturePacks,
   getCanvasAppManifestViewFeaturePacks,
   getCanvasAppInstalledFeaturePackManifestIds,
+  type CanvasAppFeaturePackProfile,
+  type CanvasAppFeaturePackProfileId,
   type CanvasAppFeaturePackId,
   type CanvasAppFeaturePackManifest,
   type CanvasAppFeaturePackInstallOptions,
@@ -33,6 +38,9 @@ export type CanvasAppFeaturePackAssemblyInput = {
   ]
   featurePackStates?: CanvasAppFeaturePackInstallOptions['featurePackStates']
   featurePackManifests?: readonly CanvasAppFeaturePackManifest[]
+  featurePackProfile?: CanvasAppFeaturePackProfile
+  featurePackProfileId?: CanvasAppFeaturePackProfileId
+  featurePackProfiles?: readonly CanvasAppFeaturePackProfile[]
   featurePackViewRenderers?: CanvasAppFeaturePackViewRenderers
   viewFeaturePacks?: readonly CanvasAppViewFeaturePack[]
 }
@@ -45,23 +53,21 @@ export function createCanvasAppFeaturePackAssembly(
     assertCanvasAppFeaturePackViewRenderers(input.featurePackViewRenderers)
     const featurePackManifests =
       getCanvasAppAssemblyFeaturePackManifests(input)
+    const installOptions = getCanvasAppAssemblyFeaturePackInstallOptions(
+      input,
+      featurePackManifests,
+    )
 
     return {
       featurePackExtensionBundle: createCanvasAppFeaturePackExtensionBundle(
         getCanvasAppManifestExtensionFeaturePacks(
           featurePackManifests,
-          {
-            disabledFeaturePackIds: input.disabledFeaturePackIds,
-            featurePackStates: input.featurePackStates,
-          },
+          installOptions,
         ),
       ),
       installedFeaturePackIds: getCanvasAppInstalledFeaturePackManifestIds(
         featurePackManifests,
-        {
-          disabledFeaturePackIds: input.disabledFeaturePackIds,
-          featurePackStates: input.featurePackStates,
-        },
+        installOptions,
       ),
       featurePackViewRenderers: snapshotCanvasAppFeaturePackViewRenderers(
         input.featurePackViewRenderers,
@@ -73,30 +79,33 @@ export function createCanvasAppFeaturePackAssembly(
     input.featurePackManifests ||
     input.additionalFeaturePackManifests ||
     input.disabledFeaturePackIds ||
+    input.featurePackProfile ||
+    input.featurePackProfileId ||
     input.featurePackStates
   ) {
     const featurePackManifests =
       getCanvasAppAssemblyFeaturePackManifests(input)
+    const installOptions = getCanvasAppAssemblyFeaturePackInstallOptions(
+      input,
+      featurePackManifests,
+    )
 
     return {
       featurePackExtensionBundle: createCanvasAppFeaturePackExtensionBundle(
-        getCanvasAppManifestExtensionFeaturePacks(featurePackManifests, {
-          disabledFeaturePackIds: input.disabledFeaturePackIds,
-          featurePackStates: input.featurePackStates,
-        }),
+        getCanvasAppManifestExtensionFeaturePacks(
+          featurePackManifests,
+          installOptions,
+        ),
       ),
       installedFeaturePackIds: getCanvasAppInstalledFeaturePackManifestIds(
         featurePackManifests,
-        {
-          disabledFeaturePackIds: input.disabledFeaturePackIds,
-          featurePackStates: input.featurePackStates,
-        },
+        installOptions,
       ),
       featurePackViewRenderers: createCanvasAppFeaturePackViewRenderers(
-        getCanvasAppManifestViewFeaturePacks(featurePackManifests, {
-          disabledFeaturePackIds: input.disabledFeaturePackIds,
-          featurePackStates: input.featurePackStates,
-        }),
+        getCanvasAppManifestViewFeaturePacks(
+          featurePackManifests,
+          installOptions,
+        ),
       ),
     }
   }
@@ -133,6 +142,57 @@ function getCanvasAppAssemblyFeaturePackManifests(
     ...baseFeaturePackManifests,
     ...additionalFeaturePackManifests,
   ])
+}
+
+function getCanvasAppAssemblyFeaturePackInstallOptions(
+  input: CanvasAppFeaturePackAssemblyInput,
+  featurePackManifests: readonly CanvasAppFeaturePackManifest[],
+): CanvasAppFeaturePackInstallOptions {
+  const profile = getCanvasAppAssemblyFeaturePackProfile(input)
+
+  if (!profile) {
+    return {
+      disabledFeaturePackIds: input.disabledFeaturePackIds,
+      featurePackStates: input.featurePackStates,
+    }
+  }
+
+  return {
+    featurePackStates: [
+      ...getCanvasAppFeaturePackProfileRuntimeStates({
+        featurePackIds: featurePackManifests.map((manifest) => manifest.id),
+        profile,
+      }),
+      ...(input.disabledFeaturePackIds ?? []).map((id) => ({
+        id,
+        status: 'uninstalled' as const,
+      })),
+      ...(input.featurePackStates ?? []),
+    ],
+  }
+}
+
+function getCanvasAppAssemblyFeaturePackProfile(
+  input: CanvasAppFeaturePackAssemblyInput,
+): CanvasAppFeaturePackProfile | undefined {
+  if (input.featurePackProfile && input.featurePackProfileId) {
+    throw new Error(
+      'Canvas app assembly accepts featurePackProfile or featurePackProfileId, not both',
+    )
+  }
+
+  if (input.featurePackProfile) {
+    return input.featurePackProfile
+  }
+
+  if (!input.featurePackProfileId) {
+    return undefined
+  }
+
+  return getCanvasAppFeaturePackProfileById(
+    input.featurePackProfiles ?? DEFAULT_CANVAS_APP_FEATURE_PACK_PROFILES,
+    input.featurePackProfileId,
+  )
 }
 
 export function snapshotCanvasAppInstalledFeaturePackIds(

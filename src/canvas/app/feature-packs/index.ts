@@ -105,10 +105,15 @@ export {
   CANVAS_APP_STORY_VIEWER_FEATURE_PACK_PROFILE,
   DEFAULT_CANVAS_APP_EDITOR_FEATURE_PACK_PROFILE,
   DEFAULT_CANVAS_APP_FEATURE_PACK_PROFILES,
+  assertCanvasAppFeaturePackProfile,
+  assertCanvasAppFeaturePackProfiles,
   createCanvasAppFeaturePackProfile,
+  getCanvasAppFeaturePackProfileById,
+  getCanvasAppFeaturePackProfileRuntimeStates,
   type CanvasAppFeaturePackProfile,
   type CanvasAppFeaturePackProfileId,
   type CanvasAppFeaturePackProfileInput,
+  type CanvasAppFeaturePackProfileRuntimeStatesInput,
 } from './CanvasAppFeaturePackProfiles'
 export {
   createCanvasAppAiLabsFeaturePackManifest,

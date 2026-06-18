@@ -43,6 +43,8 @@ import {
   CANVAS_APP_STORY_VIEWER_FEATURE_PACK_PROFILE,
   DEFAULT_CANVAS_APP_EDITOR_FEATURE_PACK_PROFILE,
   createCanvasAppFeaturePackProfile,
+  getCanvasAppFeaturePackProfileById,
+  getCanvasAppFeaturePackProfileRuntimeStates,
 } from './CanvasAppFeaturePackProfiles'
 import {
   createCanvasAppFeaturePackSuiteManifest,
@@ -603,6 +605,34 @@ describe('CanvasAppFeaturePacks', () => {
       }),
     ).toThrow(
       'Feature pack profile broken-suite-profile enables uninstalled suite: story-canvas',
+    )
+    expect(getCanvasAppFeaturePackProfileById(
+      [CANVAS_APP_STORY_VIEWER_FEATURE_PACK_PROFILE],
+      'story-viewer',
+    )).toBe(CANVAS_APP_STORY_VIEWER_FEATURE_PACK_PROFILE)
+    expect(getCanvasAppFeaturePackProfileRuntimeStates({
+      featurePackIds: [
+        CANVAS_STORY_PREVIEW_ITEMS_FEATURE_PACK_ID,
+        'zoom-controls',
+      ],
+      profile: CANVAS_APP_STORY_VIEWER_FEATURE_PACK_PROFILE,
+    })).toEqual([
+      {
+        id: CANVAS_STORY_PREVIEW_ITEMS_FEATURE_PACK_ID,
+        status: 'enabled',
+      },
+      {
+        id: 'zoom-controls',
+        status: 'uninstalled',
+      },
+    ])
+    expect(() =>
+      getCanvasAppFeaturePackProfileRuntimeStates({
+        featurePackIds: ['zoom-controls'],
+        profile: CANVAS_APP_STORY_VIEWER_FEATURE_PACK_PROFILE,
+      }),
+    ).toThrow(
+      'Feature pack profile story-viewer installs unknown pack: story-preview-items',
     )
   })
 

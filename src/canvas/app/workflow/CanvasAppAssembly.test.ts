@@ -16,6 +16,7 @@ import {
   createCanvasAppDomEditStyleFeaturePackManifest,
   createCanvasAppFeaturePack,
   createCanvasAppFeaturePackManifest,
+  createCanvasAppFeaturePackProfile,
   createCanvasAppViewFeaturePack,
 } from '../feature-packs'
 import type {
@@ -355,6 +356,93 @@ describe('CanvasAppAssembly seams', () => {
     expect(customAssembly.customCommands.map((command) => command.id))
       .toContain('status-pack-command')
     expect(customAssembly.inspectorPanels).toEqual([])
+  })
+
+  it('assembles feature pack profiles as installable app assembly units', () => {
+    const minimalAssembly = createCanvasAppAssembly({
+      featurePackProfileId: 'minimal-viewer',
+    })
+
+    expect(minimalAssembly.installedFeaturePackIds).toEqual(['zoom-controls'])
+    expect(minimalAssembly.featurePackViewRenderers.zoomControls).toBe(
+      DEFAULT_CANVAS_APP_FEATURE_PACK_VIEW_RENDERERS.zoomControls,
+    )
+    expect(minimalAssembly.featurePackViewRenderers.toolbar).toBeUndefined()
+    expect(minimalAssembly.inspectorPanels).toEqual([])
+
+    const renderStatus = () => null
+    const statusManifest = createCanvasAppFeaturePackManifest({
+      extensionFeaturePack: createCanvasAppFeaturePack({
+        extensionBundle: createCanvasAppExtensionBundle({
+          customCommands: [{
+            id: 'status-pack-command',
+            label: 'Status pack',
+            run: () => undefined,
+            title: 'Status pack',
+          }],
+        }),
+        id: 'status-pack',
+        label: 'Status pack',
+      }),
+      id: 'status-pack',
+      label: 'Status pack',
+      viewFeaturePack: createCanvasAppViewFeaturePack({
+        id: 'status-pack',
+        label: 'Status pack',
+        viewRenderers: {
+          status: renderStatus,
+        },
+      }),
+    })
+    const disabledStatusProfile = createCanvasAppFeaturePackProfile({
+      enabledFeaturePackIds: [],
+      id: 'disabled-status',
+      installedFeaturePackIds: ['status-pack'],
+      label: 'Disabled status',
+    })
+
+    const disabledStatusAssembly = createCanvasAppAssembly({
+      featurePackManifests: [statusManifest],
+      featurePackProfile: disabledStatusProfile,
+    })
+
+    expect(disabledStatusAssembly.installedFeaturePackIds).toEqual([
+      'status-pack',
+    ])
+    expect(disabledStatusAssembly.featurePackViewRenderers.status)
+      .toBeUndefined()
+    expect(disabledStatusAssembly.customCommands.map((command) => command.id))
+      .toEqual([])
+
+    const explicitEnabledAssembly = createCanvasAppAssembly({
+      featurePackManifests: [statusManifest],
+      featurePackProfile: disabledStatusProfile,
+      featurePackStates: [{
+        id: 'status-pack',
+        status: 'enabled',
+      }],
+    })
+
+    expect(explicitEnabledAssembly.installedFeaturePackIds).toEqual([
+      'status-pack',
+    ])
+    expect(explicitEnabledAssembly.featurePackViewRenderers.status)
+      .toBe(renderStatus)
+    expect(explicitEnabledAssembly.customCommands.map((command) => command.id))
+      .toEqual(['status-pack-command'])
+
+    const explicitlyUninstalledMinimalAssembly = createCanvasAppAssembly({
+      featurePackProfileId: 'minimal-viewer',
+      featurePackStates: [{
+        id: 'zoom-controls',
+        status: 'uninstalled',
+      }],
+    })
+
+    expect(explicitlyUninstalledMinimalAssembly.installedFeaturePackIds)
+      .toEqual([])
+    expect(explicitlyUninstalledMinimalAssembly.featurePackViewRenderers
+      .zoomControls).toBeUndefined()
   })
 
   it('adds optional feature pack manifests without replacing defaults', () => {
