@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   applyCanvasEngineDemoFeaturePackSwitchToAssemblySource,
   createCanvasEngineDemoFeaturePackAssemblySource,
+  getCanvasEngineDemoFeaturePackSwitchControls,
   getCanvasEngineDemoFeaturePackSwitchState,
 } from './CanvasEngineDemoFeaturePacks'
 
@@ -22,6 +23,53 @@ describe('CanvasDevToolsDemoApp', () => {
       'component-source-outline': false,
       'component-sync': true,
     })
+    expect(getCanvasEngineDemoFeaturePackSwitchControls({
+      featurePackStates: [{
+        id: 'component-source-outline',
+        status: 'disabled',
+      }],
+    }).map((control) => ({
+      actionKind: control.actionKind,
+      active: control.active,
+      disabled: control.disabled,
+      featurePackId: control.featurePackId,
+      label: control.label,
+      target: control.target,
+    }))).toEqual([
+      {
+        actionKind: 'enable',
+        active: false,
+        disabled: false,
+        featurePackId: 'component-source-outline',
+        label: 'Component source outline',
+        target: {
+          featurePackId: 'component-source-outline',
+          kind: 'pack',
+        },
+      },
+      {
+        actionKind: 'disable',
+        active: true,
+        disabled: false,
+        featurePackId: 'component-inspector',
+        label: 'Component inspector',
+        target: {
+          featurePackId: 'component-inspector',
+          kind: 'pack',
+        },
+      },
+      {
+        actionKind: 'disable',
+        active: true,
+        disabled: false,
+        featurePackId: 'component-sync',
+        label: 'Component sync',
+        target: {
+          featurePackId: 'component-sync',
+          kind: 'pack',
+        },
+      },
+    ])
   })
 
   it('applies engine feature pack switches through marketplace target source transactions', async () => {

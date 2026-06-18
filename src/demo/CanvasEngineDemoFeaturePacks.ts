@@ -1,12 +1,13 @@
 import type {
   CanvasAppAssemblySource,
   CanvasAppAssemblyInput,
+  CanvasAppFeaturePackMarketplaceTargetControl,
   CanvasAppFeaturePackMarketplaceTarget,
 } from '../canvas'
 import {
   executeCanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransaction,
   getCanvasAppFeaturePackMarketplaceAssemblyModel,
-  getCanvasAppFeaturePackMarketplaceTargetItem,
+  getCanvasAppFeaturePackMarketplaceTargetControl,
 } from '../canvas'
 
 export type EngineDemoFeaturePackSwitchId =
@@ -18,6 +19,11 @@ export type EngineDemoFeaturePackSwitchState = Record<
   EngineDemoFeaturePackSwitchId,
   boolean
 >
+
+export type EngineDemoFeaturePackSwitchControl =
+  CanvasAppFeaturePackMarketplaceTargetControl & Readonly<{
+    featurePackId: EngineDemoFeaturePackSwitchId
+  }>
 
 export const ENGINE_DEMO_FEATURE_PACK_SWITCH_IDS = Object.freeze([
   'component-source-outline',
@@ -57,19 +63,28 @@ export function createCanvasEngineDemoFeaturePackAssemblySource(
 export function getCanvasEngineDemoFeaturePackSwitchState(
   assemblyInput?: CanvasAppAssemblyInput,
 ): EngineDemoFeaturePackSwitchState {
+  return Object.freeze(Object.fromEntries(
+    getCanvasEngineDemoFeaturePackSwitchControls(assemblyInput)
+      .map((control) => [control.featurePackId, control.active]),
+  )) as EngineDemoFeaturePackSwitchState
+}
+
+export function getCanvasEngineDemoFeaturePackSwitchControls(
+  assemblyInput?: CanvasAppAssemblyInput,
+): readonly EngineDemoFeaturePackSwitchControl[] {
   const model = getCanvasAppFeaturePackMarketplaceAssemblyModel({
     assemblyInput,
   })
 
-  return Object.freeze(Object.fromEntries(
-    ENGINE_DEMO_FEATURE_PACK_SWITCH_IDS.map((featurePackId) => [
-      featurePackId,
-      Boolean(getCanvasEngineDemoFeaturePackSwitchItemEnabled({
-        featurePackId,
+  return Object.freeze(ENGINE_DEMO_FEATURE_PACK_SWITCH_IDS.map(
+    (featurePackId) => createCanvasEngineDemoFeaturePackSwitchControl({
+      control: getCanvasAppFeaturePackMarketplaceTargetControl({
         model: model.marketplaceModel,
-      })),
-    ]),
-  )) as EngineDemoFeaturePackSwitchState
+        target: createCanvasEngineDemoFeaturePackSwitchTarget(featurePackId),
+      }),
+      featurePackId,
+    }),
+  ))
 }
 
 export async function applyCanvasEngineDemoFeaturePackSwitchToAssemblySource({
@@ -81,14 +96,17 @@ export async function applyCanvasEngineDemoFeaturePackSwitchToAssemblySource({
   const model = getCanvasAppFeaturePackMarketplaceAssemblyModel({
     assemblyInput: source?.assemblyInput,
   })
-  const currentEnabled = getCanvasEngineDemoFeaturePackSwitchItemEnabled({
+  const currentControl = createCanvasEngineDemoFeaturePackSwitchControl({
+    control: getCanvasAppFeaturePackMarketplaceTargetControl({
+      model: model.marketplaceModel,
+      target: createCanvasEngineDemoFeaturePackSwitchTarget(featurePackId),
+    }),
     featurePackId,
-    model: model.marketplaceModel,
   })
   const currentSource = source ??
     createCanvasEngineDemoFeaturePackAssemblySource(model.assemblyInput)
 
-  if (currentEnabled === enabled) {
+  if (currentControl.active === enabled) {
     return Object.freeze({
       applied: false,
       enabled,
@@ -117,6 +135,19 @@ export async function applyCanvasEngineDemoFeaturePackSwitchToAssemblySource({
   })
 }
 
+function createCanvasEngineDemoFeaturePackSwitchControl({
+  control,
+  featurePackId,
+}: {
+  control: CanvasAppFeaturePackMarketplaceTargetControl
+  featurePackId: EngineDemoFeaturePackSwitchId
+}): EngineDemoFeaturePackSwitchControl {
+  return Object.freeze({
+    ...control,
+    featurePackId,
+  })
+}
+
 function createCanvasEngineDemoFeaturePackSwitchTarget(
   featurePackId: EngineDemoFeaturePackSwitchId,
 ): CanvasAppFeaturePackMarketplaceTarget {
@@ -124,21 +155,4 @@ function createCanvasEngineDemoFeaturePackSwitchTarget(
     featurePackId,
     kind: 'pack',
   })
-}
-
-function getCanvasEngineDemoFeaturePackSwitchItemEnabled({
-  featurePackId,
-  model,
-}: {
-  featurePackId: EngineDemoFeaturePackSwitchId
-  model: Parameters<typeof getCanvasAppFeaturePackMarketplaceTargetItem>[0][
-    'model'
-  ]
-}): boolean {
-  const item = getCanvasAppFeaturePackMarketplaceTargetItem({
-    model,
-    target: createCanvasEngineDemoFeaturePackSwitchTarget(featurePackId),
-  })
-
-  return item !== null && 'enabled' in item ? item.enabled : false
 }

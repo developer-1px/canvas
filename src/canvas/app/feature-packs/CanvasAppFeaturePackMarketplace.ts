@@ -214,6 +214,28 @@ export type CanvasAppFeaturePackMarketplacePrimaryActionDiagnostic =
       readonly CanvasAppFeaturePackStateTransitionUninstallPolicyEntry[]
   }>
 
+export type CanvasAppFeaturePackMarketplaceTargetControlStatus =
+  | CanvasAppFeaturePackMarketplacePrimaryActionStatus
+  | 'missing'
+
+export type CanvasAppFeaturePackMarketplaceTargetControl = Readonly<{
+  action: CanvasAppFeaturePackMarketplacePrimaryAction | null
+  actionKind: CanvasAppFeaturePackMarketplacePrimaryActionKind | null
+  active: boolean
+  diagnostic: CanvasAppFeaturePackMarketplacePrimaryActionDiagnostic | null
+  disabled: boolean
+  installed: boolean
+  item: CanvasAppFeaturePackMarketplaceItem | null
+  label: string
+  ready: boolean
+  status: CanvasAppFeaturePackMarketplaceTargetControlStatus
+  target: CanvasAppFeaturePackMarketplaceTarget
+  totalBlockedReasonCount: number
+}>
+
+export type CanvasAppFeaturePackMarketplaceTargetControlInput =
+  CanvasAppFeaturePackMarketplaceTargetItemInput
+
 export type CanvasAppFeaturePackMarketplaceSectionPrimaryActionDiagnosticModel =
   Readonly<{
     all: readonly CanvasAppFeaturePackMarketplacePrimaryActionDiagnostic[]
@@ -414,6 +436,69 @@ export function getCanvasAppFeaturePackMarketplaceTargetPrimaryActionDiagnostic(
     : null
 }
 
+export function getCanvasAppFeaturePackMarketplaceTargetControl(
+  input: CanvasAppFeaturePackMarketplaceTargetControlInput,
+): CanvasAppFeaturePackMarketplaceTargetControl {
+  const item = getCanvasAppFeaturePackMarketplaceTargetItem(input)
+
+  return item
+    ? getCanvasAppFeaturePackMarketplaceItemTargetControl(item)
+    : createMissingCanvasAppFeaturePackMarketplaceTargetControl(input.target)
+}
+
+export function getCanvasAppFeaturePackMarketplaceSectionTargetControls(
+  section: CanvasAppFeaturePackMarketplaceSection,
+): readonly CanvasAppFeaturePackMarketplaceTargetControl[] {
+  return Object.freeze(
+    section.items.map(getCanvasAppFeaturePackMarketplaceItemTargetControl),
+  )
+}
+
+export function getCanvasAppFeaturePackMarketplaceItemTargetControl(
+  item: CanvasAppFeaturePackMarketplaceItem,
+): CanvasAppFeaturePackMarketplaceTargetControl {
+  const diagnostic =
+    getCanvasAppFeaturePackMarketplacePrimaryActionDiagnostic(item)
+
+  return Object.freeze({
+    action: diagnostic.action,
+    actionKind: diagnostic.actionKind,
+    active: isCanvasAppFeaturePackMarketplaceItemActive(item),
+    diagnostic,
+    disabled: !diagnostic.ready,
+    installed: isCanvasAppFeaturePackMarketplaceItemInstalled(item),
+    item,
+    label: getCanvasAppFeaturePackMarketplaceItemLabel(item),
+    ready: diagnostic.ready,
+    status: diagnostic.status,
+    target: getCanvasAppFeaturePackMarketplaceItemTarget(item),
+    totalBlockedReasonCount: diagnostic.totalBlockedReasonCount,
+  })
+}
+
+export function getCanvasAppFeaturePackMarketplaceItemTarget(
+  item: CanvasAppFeaturePackMarketplaceItem,
+): CanvasAppFeaturePackMarketplaceTarget {
+  if (isCanvasAppFeaturePackMarketplacePackItem(item)) {
+    return Object.freeze({
+      featurePackId: item.featurePackId,
+      kind: 'pack',
+    })
+  }
+
+  if (isCanvasAppFeaturePackMarketplaceProfileItem(item)) {
+    return Object.freeze({
+      kind: 'profile',
+      profileId: item.profileId,
+    })
+  }
+
+  return Object.freeze({
+    kind: 'suite',
+    suiteId: item.suiteId,
+  })
+}
+
 export function getCanvasAppFeaturePackMarketplacePrimaryAction(
   item: CanvasAppFeaturePackProfileMarketplaceActionItem,
 ): CanvasAppFeaturePackProfileMarketplaceAction
@@ -480,6 +565,118 @@ export function getCanvasAppFeaturePackMarketplaceSectionPrimaryActionDiagnostic
     )),
     ready: Object.freeze(all.filter((diagnostic) => diagnostic.ready)),
   })
+}
+
+function createMissingCanvasAppFeaturePackMarketplaceTargetControl(
+  target: CanvasAppFeaturePackMarketplaceTarget,
+): CanvasAppFeaturePackMarketplaceTargetControl {
+  return Object.freeze({
+    action: null,
+    actionKind: null,
+    active: false,
+    diagnostic: null,
+    disabled: true,
+    installed: false,
+    item: null,
+    label: getCanvasAppFeaturePackMarketplaceTargetFallbackLabel(target),
+    ready: false,
+    status: 'missing',
+    target: snapshotCanvasAppFeaturePackMarketplaceTarget(target),
+    totalBlockedReasonCount: 0,
+  })
+}
+
+function getCanvasAppFeaturePackMarketplaceItemLabel(
+  item: CanvasAppFeaturePackMarketplaceItem,
+): string {
+  if (isCanvasAppFeaturePackMarketplacePackItem(item)) {
+    return item.catalogItem.label
+  }
+
+  return item.label
+}
+
+function isCanvasAppFeaturePackMarketplaceItemActive(
+  item: CanvasAppFeaturePackMarketplaceItem,
+): boolean {
+  if (isCanvasAppFeaturePackMarketplacePackItem(item)) {
+    return item.enabled
+  }
+
+  if (isCanvasAppFeaturePackMarketplaceProfileItem(item)) {
+    return item.active
+  }
+
+  return item.status === 'enabled'
+}
+
+function isCanvasAppFeaturePackMarketplaceItemInstalled(
+  item: CanvasAppFeaturePackMarketplaceItem,
+): boolean {
+  if (isCanvasAppFeaturePackMarketplacePackItem(item)) {
+    return item.installed
+  }
+
+  if (isCanvasAppFeaturePackMarketplaceProfileItem(item)) {
+    const installedIds = new Set(item.currentInstalledFeaturePackIds)
+
+    return item.missingFeaturePackIds.length === 0 &&
+      item.targetInstalledFeaturePackIds.every((id) => installedIds.has(id))
+  }
+
+  const installedIds = new Set(item.installedFeaturePackIds)
+
+  return item.missingFeaturePackIds.length === 0 &&
+    item.featurePackIds.every((id) => installedIds.has(id))
+}
+
+function getCanvasAppFeaturePackMarketplaceTargetFallbackLabel(
+  target: CanvasAppFeaturePackMarketplaceTarget,
+): string {
+  if (target.kind === 'pack') {
+    return target.featurePackId
+  }
+
+  if (target.kind === 'profile') {
+    return target.profileId
+  }
+
+  return target.suiteId
+}
+
+function snapshotCanvasAppFeaturePackMarketplaceTarget(
+  target: CanvasAppFeaturePackMarketplaceTarget,
+): CanvasAppFeaturePackMarketplaceTarget {
+  if (target.kind === 'pack') {
+    return Object.freeze({
+      featurePackId: target.featurePackId,
+      kind: 'pack',
+    })
+  }
+
+  if (target.kind === 'profile') {
+    return Object.freeze({
+      kind: 'profile',
+      profileId: target.profileId,
+    })
+  }
+
+  return Object.freeze({
+    kind: 'suite',
+    suiteId: target.suiteId,
+  })
+}
+
+function isCanvasAppFeaturePackMarketplacePackItem(
+  item: CanvasAppFeaturePackMarketplaceItem,
+): item is CanvasAppFeaturePackMarketplaceActionItem {
+  return 'featurePackId' in item
+}
+
+function isCanvasAppFeaturePackMarketplaceProfileItem(
+  item: CanvasAppFeaturePackMarketplaceItem,
+): item is CanvasAppFeaturePackProfileMarketplaceActionItem {
+  return 'profileId' in item
 }
 
 function getCanvasAppFeaturePackMarketplaceProfileSectionSummary(

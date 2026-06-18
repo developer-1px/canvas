@@ -58,12 +58,11 @@ import {
 } from '../canvas'
 import { EngineSelectionToolbar } from './CanvasDevToolsSelectionToolbar'
 import {
-  DEFAULT_ENGINE_DEMO_FEATURE_PACK_SWITCH_STATE,
   applyCanvasEngineDemoFeaturePackSwitchToAssemblySource,
   createCanvasEngineDemoFeaturePackAssemblySource,
-  getCanvasEngineDemoFeaturePackSwitchState,
+  getCanvasEngineDemoFeaturePackSwitchControls,
+  type EngineDemoFeaturePackSwitchControl,
   type EngineDemoFeaturePackSwitchId,
-  type EngineDemoFeaturePackSwitchState,
 } from './CanvasEngineDemoFeaturePacks'
 import {
   getCanvasPresentationFrames,
@@ -166,10 +165,10 @@ export function CanvasDevToolsDemoApp({
   const runtimeAssemblyInput = featurePackSwitches
     ? featurePackAssemblySource.assemblyInput
     : assemblyInput
-  const featurePackSwitchState = useMemo(
+  const featurePackSwitchControls = useMemo(
     () => featurePackSwitches
-      ? getCanvasEngineDemoFeaturePackSwitchState(runtimeAssemblyInput)
-      : DEFAULT_ENGINE_DEMO_FEATURE_PACK_SWITCH_STATE,
+      ? getCanvasEngineDemoFeaturePackSwitchControls(runtimeAssemblyInput)
+      : [],
     [featurePackSwitches, runtimeAssemblyInput],
   )
   const widgetInteractions = useMemo(
@@ -199,10 +198,7 @@ export function CanvasDevToolsDemoApp({
       renderApp={(app) => (
         <CanvasEngineDemoSurface
           app={app}
-          featurePackSwitches={
-            featurePackSwitches ? ENGINE_DEMO_FEATURE_PACK_SWITCHES : []
-          }
-          featurePackSwitchState={featurePackSwitchState}
+          featurePackSwitchControls={featurePackSwitchControls}
           onFeaturePackSwitchChange={handleFeaturePackSwitchChange}
           widgetInteractions={widgetInteractions}
         />
@@ -213,14 +209,12 @@ export function CanvasDevToolsDemoApp({
 
 function CanvasEngineDemoSurface({
   app,
-  featurePackSwitches,
-  featurePackSwitchState,
+  featurePackSwitchControls,
   onFeaturePackSwitchChange,
   widgetInteractions,
 }: {
   app: CanvasEngineDemoModel
-  featurePackSwitches: readonly typeof ENGINE_DEMO_FEATURE_PACK_SWITCHES[number][]
-  featurePackSwitchState: EngineDemoFeaturePackSwitchState
+  featurePackSwitchControls: readonly EngineDemoFeaturePackSwitchControl[]
   onFeaturePackSwitchChange: (
     id: EngineDemoFeaturePackSwitchId,
     enabled: boolean,
@@ -556,10 +550,9 @@ function CanvasEngineDemoSurface({
           <CanvasObjectInspector {...inspectorProps} />
         </div>
       ) : null}
-      {!presenting && featurePackSwitches.length > 0 ? (
+      {!presenting && featurePackSwitchControls.length > 0 ? (
         <EngineFeaturePackSwitchToolbar
-          switches={featurePackSwitches}
-          state={featurePackSwitchState}
+          controls={featurePackSwitchControls}
           onChange={onFeaturePackSwitchChange}
         />
       ) : null}
@@ -676,12 +669,10 @@ function CanvasEngineDemoSurface({
 }
 
 function EngineFeaturePackSwitchToolbar({
-  switches,
-  state,
+  controls,
   onChange,
 }: {
-  switches: readonly typeof ENGINE_DEMO_FEATURE_PACK_SWITCHES[number][]
-  state: EngineDemoFeaturePackSwitchState
+  controls: readonly EngineDemoFeaturePackSwitchControl[]
   onChange: (id: EngineDemoFeaturePackSwitchId, enabled: boolean) => void
 }) {
   return (
@@ -690,18 +681,21 @@ function EngineFeaturePackSwitchToolbar({
       role="toolbar"
       aria-label="Feature packs"
     >
-      {switches.map(({ icon: Icon, id, label }) => {
-        const enabled = state[id]
+      {controls.map((control) => {
+        const switchDefinition =
+          getEngineDemoFeaturePackSwitchDefinition(control.featurePackId)
+        const Icon = switchDefinition.icon
 
         return (
           <button
             {...CANVAS_TOOLBAR_ITEM_PROPS}
-            aria-label={`Toggle ${label}`}
-            aria-pressed={enabled}
-            data-feature-pack={id}
-            key={id}
-            onClick={() => onChange(id, !enabled)}
-            title={label}
+            aria-label={`Toggle ${control.label}`}
+            aria-pressed={control.active}
+            data-feature-pack={control.featurePackId}
+            disabled={control.disabled}
+            key={control.featurePackId}
+            onClick={() => onChange(control.featurePackId, !control.active)}
+            title={control.label}
             type="button"
           >
             <Icon aria-hidden="true" size={14} strokeWidth={2} />
@@ -710,6 +704,20 @@ function EngineFeaturePackSwitchToolbar({
       })}
     </div>
   )
+}
+
+function getEngineDemoFeaturePackSwitchDefinition(
+  id: EngineDemoFeaturePackSwitchId,
+) {
+  const definition = ENGINE_DEMO_FEATURE_PACK_SWITCHES.find((candidate) =>
+    candidate.id === id
+  )
+
+  if (!definition) {
+    throw new Error(`Unknown engine demo feature pack switch: ${id}`)
+  }
+
+  return definition
 }
 
 function EnginePresentationControls({

@@ -182,10 +182,14 @@ import {
   getCanvasAppFeaturePackProfileRuntimeStates,
   getCanvasAppFeaturePackMarketplaceActionModel,
   getCanvasAppFeaturePackMarketplaceModel,
+  getCanvasAppFeaturePackMarketplaceItemTarget,
+  getCanvasAppFeaturePackMarketplaceItemTargetControl,
   getCanvasAppFeaturePackMarketplacePrimaryActionDiagnostic,
   getCanvasAppFeaturePackMarketplacePrimaryAction,
   getCanvasAppFeaturePackMarketplaceSectionPrimaryActionDiagnosticModel,
   getCanvasAppFeaturePackMarketplaceSectionFacetItems,
+  getCanvasAppFeaturePackMarketplaceSectionTargetControls,
+  getCanvasAppFeaturePackMarketplaceTargetControl,
   getCanvasAppFeaturePackMarketplaceTargetItem,
   getCanvasAppFeaturePackMarketplaceTargetPrimaryAction,
   getCanvasAppFeaturePackMarketplaceTargetPrimaryActionDiagnostic,
@@ -348,6 +352,9 @@ import {
   type CanvasAppFeaturePackMarketplacePrimaryAction,
   type CanvasAppFeaturePackMarketplacePrimaryActionDiagnostic,
   type CanvasAppFeaturePackMarketplaceSectionPrimaryActionDiagnosticModel,
+  type CanvasAppFeaturePackMarketplaceTargetControl,
+  type CanvasAppFeaturePackMarketplaceTargetControlInput,
+  type CanvasAppFeaturePackMarketplaceTargetControlStatus,
   type CanvasAppFeaturePackMarketplaceListing,
   type CanvasAppFeaturePackMarketplaceListingEntitlement,
   type CanvasAppFeaturePackProfileMarketplaceActionModel,
@@ -1042,6 +1049,38 @@ describe('Canvas package consumer imports', () => {
         getCanvasAppFeaturePackMarketplacePrimaryActionDiagnostic(
           featurePackMarketplaceModel.packs.items[0]!,
         )
+    const featurePackMarketplaceTargetControlInput:
+      CanvasAppFeaturePackMarketplaceTargetControlInput = {
+        model: featurePackMarketplaceModel,
+        target: {
+          featurePackId: 'smoke-partial-pack',
+          kind: 'pack',
+        },
+      }
+    const featurePackMarketplaceTargetControl:
+      CanvasAppFeaturePackMarketplaceTargetControl =
+        getCanvasAppFeaturePackMarketplaceTargetControl(
+          featurePackMarketplaceTargetControlInput,
+        )
+    const featurePackMarketplaceItemTargetControl:
+      CanvasAppFeaturePackMarketplaceTargetControl =
+        getCanvasAppFeaturePackMarketplaceItemTargetControl(
+          featurePackMarketplaceModel.packs.items[0]!,
+        )
+    const featurePackMarketplaceSectionTargetControls:
+      readonly CanvasAppFeaturePackMarketplaceTargetControl[] =
+        getCanvasAppFeaturePackMarketplaceSectionTargetControls(
+          featurePackMarketplacePackSection,
+        )
+    const featurePackMarketplaceMissingTargetControlStatus:
+      CanvasAppFeaturePackMarketplaceTargetControlStatus =
+        getCanvasAppFeaturePackMarketplaceTargetControl({
+          model: featurePackMarketplaceModel,
+          target: {
+            featurePackId: 'missing-pack',
+            kind: 'pack',
+          },
+        }).status
     const featurePackMarketplaceActionAssemblyInput:
       CanvasAppFeaturePackMarketplaceActionAssemblyInput = {
         action: featurePackMarketplacePrimaryAction,
@@ -2907,6 +2946,36 @@ describe('Canvas package consumer imports', () => {
       totalBlockedReasonCount: 0,
       uninstallPolicyEntries: [],
     })
+    expect(getCanvasAppFeaturePackMarketplaceItemTarget(
+      featurePackMarketplaceModel.packs.items[0]!,
+    )).toEqual({
+      featurePackId: 'smoke-partial-pack',
+      kind: 'pack',
+    })
+    expect(featurePackMarketplaceTargetControl).toMatchObject({
+      action: featurePackMarketplacePrimaryAction,
+      actionKind: 'disable',
+      active: true,
+      disabled: false,
+      installed: true,
+      label: 'Partial pack',
+      ready: true,
+      status: 'ready',
+      target: {
+        featurePackId: 'smoke-partial-pack',
+        kind: 'pack',
+      },
+      totalBlockedReasonCount: 0,
+    })
+    expect(featurePackMarketplaceItemTargetControl)
+      .toEqual(featurePackMarketplaceTargetControl)
+    expect(featurePackMarketplaceSectionTargetControls.map((control) =>
+      control.target
+    )).toEqual([{
+      featurePackId: 'smoke-partial-pack',
+      kind: 'pack',
+    }])
+    expect(featurePackMarketplaceMissingTargetControlStatus).toBe('missing')
     expect(featurePackMarketplaceActionAssemblyPlan.status).toBe('ready')
     if (featurePackMarketplaceActionAssemblyPlan.status !== 'ready') {
       throw new Error('Expected ready feature pack marketplace assembly plan')
@@ -4378,6 +4447,30 @@ describe('Canvas package consumer imports', () => {
       .toBe(getCanvasAppFeaturePackMarketplaceTargetPrimaryActionDiagnostic)
     expect(CanvasPackage.getCanvasAppFeaturePackMarketplaceTargetPrimaryActionDiagnostic)
       .toBe(getCanvasAppFeaturePackMarketplaceTargetPrimaryActionDiagnostic)
+    expect(CanvasAppAuthoring.getCanvasAppFeaturePackMarketplaceItemTarget)
+      .toBe(getCanvasAppFeaturePackMarketplaceItemTarget)
+    expect(CanvasAppFacade.getCanvasAppFeaturePackMarketplaceItemTarget)
+      .toBe(getCanvasAppFeaturePackMarketplaceItemTarget)
+    expect(CanvasPackage.getCanvasAppFeaturePackMarketplaceItemTarget)
+      .toBe(getCanvasAppFeaturePackMarketplaceItemTarget)
+    expect(CanvasAppAuthoring.getCanvasAppFeaturePackMarketplaceItemTargetControl)
+      .toBe(getCanvasAppFeaturePackMarketplaceItemTargetControl)
+    expect(CanvasAppFacade.getCanvasAppFeaturePackMarketplaceItemTargetControl)
+      .toBe(getCanvasAppFeaturePackMarketplaceItemTargetControl)
+    expect(CanvasPackage.getCanvasAppFeaturePackMarketplaceItemTargetControl)
+      .toBe(getCanvasAppFeaturePackMarketplaceItemTargetControl)
+    expect(CanvasAppAuthoring.getCanvasAppFeaturePackMarketplaceTargetControl)
+      .toBe(getCanvasAppFeaturePackMarketplaceTargetControl)
+    expect(CanvasAppFacade.getCanvasAppFeaturePackMarketplaceTargetControl)
+      .toBe(getCanvasAppFeaturePackMarketplaceTargetControl)
+    expect(CanvasPackage.getCanvasAppFeaturePackMarketplaceTargetControl)
+      .toBe(getCanvasAppFeaturePackMarketplaceTargetControl)
+    expect(CanvasAppAuthoring.getCanvasAppFeaturePackMarketplaceSectionTargetControls)
+      .toBe(getCanvasAppFeaturePackMarketplaceSectionTargetControls)
+    expect(CanvasAppFacade.getCanvasAppFeaturePackMarketplaceSectionTargetControls)
+      .toBe(getCanvasAppFeaturePackMarketplaceSectionTargetControls)
+    expect(CanvasPackage.getCanvasAppFeaturePackMarketplaceSectionTargetControls)
+      .toBe(getCanvasAppFeaturePackMarketplaceSectionTargetControls)
     expect(CanvasAppAuthoring.getCanvasAppFeaturePackMarketplaceActionAssemblyInput)
       .toBeTypeOf('function')
     expect(CanvasAppFacade.getCanvasAppFeaturePackMarketplaceActionAssemblyInput)

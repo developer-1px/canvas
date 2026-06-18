@@ -3,9 +3,12 @@ import { describe, expect, it } from 'vitest'
 import {
   getCanvasAppFeaturePackMarketplacePrimaryActionDiagnostic,
   getCanvasAppFeaturePackMarketplacePrimaryAction,
+  getCanvasAppFeaturePackMarketplaceSectionTargetControls,
   getCanvasAppFeaturePackMarketplaceSectionPrimaryActionDiagnosticModel,
   getCanvasAppFeaturePackMarketplaceSectionFacetItems,
+  getCanvasAppFeaturePackMarketplaceTargetControl,
   getCanvasAppFeaturePackMarketplaceModel,
+  getCanvasAppFeaturePackMarketplaceItemTargetControl,
   getCanvasAppFeaturePackMarketplaceTargetItem,
   getCanvasAppFeaturePackMarketplaceTargetPrimaryAction,
   getCanvasAppFeaturePackMarketplaceTargetPrimaryActionDiagnostic,
@@ -306,6 +309,100 @@ describe('CanvasAppFeaturePackMarketplace', () => {
       uninstallPolicyEntries: [],
     })
     expect(Object.isFrozen(addonPackPrimaryActionDiagnostic)).toBe(true)
+    const profileControl =
+      getCanvasAppFeaturePackMarketplaceItemTargetControl(profileItem)
+    const suiteControl =
+      getCanvasAppFeaturePackMarketplaceItemTargetControl(suiteItem)
+    const addonPackControl = getCanvasAppFeaturePackMarketplaceTargetControl({
+      model,
+      target: {
+        featurePackId: 'addon-pack',
+        kind: 'pack',
+      },
+    })
+    const missingPackControl = getCanvasAppFeaturePackMarketplaceTargetControl({
+      model,
+      target: {
+        featurePackId: 'missing-pack',
+        kind: 'pack',
+      },
+    })
+
+    expect(profileControl).toMatchObject({
+      action: profilePrimaryAction,
+      actionKind: 'apply',
+      active: true,
+      disabled: true,
+      installed: true,
+      item: profileItem,
+      label: 'Runtime profile',
+      ready: false,
+      status: 'active',
+      target: {
+        kind: 'profile',
+        profileId: 'runtime-profile',
+      },
+      totalBlockedReasonCount: 0,
+    })
+    expect(suiteControl).toMatchObject({
+      action: suitePrimaryAction,
+      actionKind: 'install',
+      active: false,
+      disabled: true,
+      installed: false,
+      item: suiteItem,
+      label: 'Addon suite',
+      ready: false,
+      status: 'blocked',
+      target: {
+        kind: 'suite',
+        suiteId: 'addon-suite',
+      },
+      totalBlockedReasonCount: 1,
+    })
+    expect(addonPackControl).toMatchObject({
+      action: addonPackPrimaryAction,
+      actionKind: 'install',
+      active: false,
+      disabled: true,
+      installed: false,
+      item: addonPackItem,
+      label: 'Addon pack',
+      ready: false,
+      status: 'blocked',
+      target: {
+        featurePackId: 'addon-pack',
+        kind: 'pack',
+      },
+      totalBlockedReasonCount: 1,
+    })
+    expect(missingPackControl).toEqual({
+      action: null,
+      actionKind: null,
+      active: false,
+      diagnostic: null,
+      disabled: true,
+      installed: false,
+      item: null,
+      label: 'missing-pack',
+      ready: false,
+      status: 'missing',
+      target: {
+        featurePackId: 'missing-pack',
+        kind: 'pack',
+      },
+      totalBlockedReasonCount: 0,
+    })
+    expect(Object.isFrozen(profileControl)).toBe(true)
+    expect(Object.isFrozen(profileControl.target)).toBe(true)
+    expect(Object.isFrozen(missingPackControl)).toBe(true)
+    expect(Object.isFrozen(missingPackControl.target)).toBe(true)
+    expect(getCanvasAppFeaturePackMarketplaceSectionTargetControls(
+      packSection,
+    ).map((control) => control.label)).toEqual([
+      'Runtime pack',
+      'Addon pack',
+    ])
     const packSectionPrimaryActionDiagnosticModel =
       getCanvasAppFeaturePackMarketplaceSectionPrimaryActionDiagnosticModel(
         packSection,
