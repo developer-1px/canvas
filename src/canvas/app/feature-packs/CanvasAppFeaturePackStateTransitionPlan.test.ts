@@ -5,6 +5,12 @@ import {
 import {
   createCanvasAppFeaturePackManifest,
 } from './CanvasAppFeaturePackManifests'
+import {
+  CANVAS_APP_COMPONENT_AUTHORING_FEATURE_PACK_MANIFEST,
+} from './component-authoring'
+import {
+  CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST,
+} from './component-library'
 
 describe('CanvasAppFeaturePackStateTransitionPlan', () => {
   it('plans enable transitions with dependency closure and partial surfaces', () => {
@@ -134,6 +140,61 @@ describe('CanvasAppFeaturePackStateTransitionPlan', () => {
       partialUpdateSurfaceIds: [],
       status: 'ready',
     })
+  })
+
+  it('enables the component runtime when component authoring is enabled', () => {
+    const plan = getCanvasAppFeaturePackStateTransitionPlan({
+      manifests: [
+        CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST,
+        CANVAS_APP_COMPONENT_AUTHORING_FEATURE_PACK_MANIFEST,
+      ],
+      operation: 'enable',
+      options: {
+        featurePackStates: [
+          {
+            id: CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST.id,
+            status: 'uninstalled',
+          },
+          {
+            id: CANVAS_APP_COMPONENT_AUTHORING_FEATURE_PACK_MANIFEST.id,
+            status: 'uninstalled',
+          },
+        ],
+      },
+      targetFeaturePackIds: [
+        CANVAS_APP_COMPONENT_AUTHORING_FEATURE_PACK_MANIFEST.id,
+      ],
+    })
+
+    expect(CANVAS_APP_COMPONENT_AUTHORING_FEATURE_PACK_MANIFEST.requires)
+      .toEqual(['component-runtime'])
+    expect(plan).toMatchObject({
+      changedFeaturePackIds: [
+        CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST.id,
+        CANVAS_APP_COMPONENT_AUTHORING_FEATURE_PACK_MANIFEST.id,
+      ],
+      enableFeaturePackIds: [
+        CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST.id,
+        CANVAS_APP_COMPONENT_AUTHORING_FEATURE_PACK_MANIFEST.id,
+      ],
+      installFeaturePackIds: [
+        CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST.id,
+        CANVAS_APP_COMPONENT_AUTHORING_FEATURE_PACK_MANIFEST.id,
+      ],
+      partialUpdateSurfaceIds: ['runtime-model', 'view-renderer'],
+      ready: true,
+      status: 'ready',
+    })
+    expect(plan.featurePackStates).toEqual([
+      {
+        id: CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST.id,
+        status: 'enabled',
+      },
+      {
+        id: CANVAS_APP_COMPONENT_AUTHORING_FEATURE_PACK_MANIFEST.id,
+        status: 'enabled',
+      },
+    ])
   })
 
   it('blocks disabling a provider required by an enabled pack', () => {

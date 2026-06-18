@@ -5,6 +5,9 @@ import {
 import {
   createCanvasAppViewFeaturePack,
 } from '../CanvasAppFeaturePackViews'
+import {
+  CANVAS_COMPONENT_RUNTIME_FEATURE_PACK_CAPABILITY,
+} from '../component-library'
 import { CanvasComponentPalette } from './CanvasComponentPalette'
 import {
   CanvasStickyQuickCreateControl,
@@ -59,5 +62,6 @@ export const CANVAS_APP_COMPONENT_AUTHORING_FEATURE_PACK_MANIFEST =
       partialUpdate: ['view-renderer'],
       runtimeToggleable: true,
     },
+    requires: [CANVAS_COMPONENT_RUNTIME_FEATURE_PACK_CAPABILITY],
     viewFeaturePack: CANVAS_APP_COMPONENT_AUTHORING_VIEW_FEATURE_PACK,
   })

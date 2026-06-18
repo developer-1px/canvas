@@ -5,6 +5,12 @@ import {
 import {
   createCanvasAppFeaturePackManifest,
 } from './CanvasAppFeaturePackManifests'
+import {
+  CANVAS_APP_COMPONENT_AUTHORING_FEATURE_PACK_MANIFEST,
+} from './component-authoring'
+import {
+  CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST,
+} from './component-library'
 
 describe('CanvasAppFeaturePackActions', () => {
   it('describes actions for an enabled runtime-toggleable pack', () => {
@@ -183,6 +189,74 @@ describe('CanvasAppFeaturePackActions', () => {
         status: 'enabled',
       }],
     })
+  })
+
+  it('includes the component runtime dependency in component authoring actions', () => {
+    const item = getCanvasAppFeaturePackMarketplaceActionModel({
+      manifests: [
+        CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST,
+        CANVAS_APP_COMPONENT_AUTHORING_FEATURE_PACK_MANIFEST,
+      ],
+      options: {
+        featurePackStates: [
+          {
+            id: CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST.id,
+            status: 'uninstalled',
+          },
+          {
+            id: CANVAS_APP_COMPONENT_AUTHORING_FEATURE_PACK_MANIFEST.id,
+            status: 'uninstalled',
+          },
+        ],
+      },
+    }).items.find((candidate) =>
+      candidate.featurePackId ===
+        CANVAS_APP_COMPONENT_AUTHORING_FEATURE_PACK_MANIFEST.id
+    )
+
+    expect(item).toMatchObject({
+      featurePackId: CANVAS_APP_COMPONENT_AUTHORING_FEATURE_PACK_MANIFEST.id,
+      primaryActionKind: 'install',
+      status: 'uninstalled',
+    })
+    expect(item?.actions.find((action) => action.kind === 'install'))
+      .toMatchObject({
+        changedFeaturePackIds: [
+          CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST.id,
+          CANVAS_APP_COMPONENT_AUTHORING_FEATURE_PACK_MANIFEST.id,
+        ],
+        featurePackStates: [
+          {
+            id: CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST.id,
+            status: 'disabled',
+          },
+          {
+            id: CANVAS_APP_COMPONENT_AUTHORING_FEATURE_PACK_MANIFEST.id,
+            status: 'disabled',
+          },
+        ],
+        partialUpdateSurfaceIds: [],
+        ready: true,
+      })
+    expect(item?.actions.find((action) => action.kind === 'enable'))
+      .toMatchObject({
+        changedFeaturePackIds: [
+          CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST.id,
+          CANVAS_APP_COMPONENT_AUTHORING_FEATURE_PACK_MANIFEST.id,
+        ],
+        featurePackStates: [
+          {
+            id: CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST.id,
+            status: 'enabled',
+          },
+          {
+            id: CANVAS_APP_COMPONENT_AUTHORING_FEATURE_PACK_MANIFEST.id,
+            status: 'enabled',
+          },
+        ],
+        partialUpdateSurfaceIds: ['runtime-model', 'view-renderer'],
+        ready: true,
+      })
   })
 
   it('blocks install actions when marketplace listing access is not granted', () => {
