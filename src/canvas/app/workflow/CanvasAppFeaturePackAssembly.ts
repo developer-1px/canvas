@@ -53,6 +53,28 @@ export type CanvasAppFeaturePackMarketplaceActionAssemblyInput = Readonly<{
   assemblyInput?: CanvasAppFeaturePackAssemblyInput
 }>
 
+export type CanvasAppFeaturePackMarketplaceActionAssemblyPlan =
+  | CanvasAppFeaturePackMarketplaceActionAssemblyBlockedPlan
+  | CanvasAppFeaturePackMarketplaceActionAssemblyReadyPlan
+
+export type CanvasAppFeaturePackMarketplaceActionAssemblyReadyPlan =
+  Readonly<{
+    action: CanvasAppFeaturePackMarketplacePrimaryAction
+    actionKind: CanvasAppFeaturePackMarketplacePrimaryAction['kind']
+    assemblyInput: CanvasAppFeaturePackAssemblyInput
+    status: 'ready'
+  }>
+
+export type CanvasAppFeaturePackMarketplaceActionAssemblyBlockedPlan =
+  Readonly<{
+    action: CanvasAppFeaturePackMarketplacePrimaryAction
+    actionKind: CanvasAppFeaturePackMarketplacePrimaryAction['kind']
+    blockedReasonCount: number
+    marketplaceBlockedReasonCount: number
+    status: 'blocked'
+    totalBlockedReasonCount: number
+  }>
+
 export function createCanvasAppFeaturePackAssembly(
   input: CanvasAppFeaturePackAssemblyInput,
   defaults: CanvasAppFeaturePackAssembly,
@@ -148,15 +170,48 @@ export function getCanvasAppFeaturePackMarketplaceActionAssemblyInput({
   assemblyInput = {},
 }: CanvasAppFeaturePackMarketplaceActionAssemblyInput):
   CanvasAppFeaturePackAssemblyInput {
-  if (!action.ready) {
+  const plan = getCanvasAppFeaturePackMarketplaceActionAssemblyPlan({
+    action,
+    assemblyInput,
+  })
+
+  if (plan.status !== 'ready') {
     throw new Error(
       `Canvas app feature pack marketplace action is not ready: ${action.kind}`,
     )
   }
 
+  return plan.assemblyInput
+}
+
+export function getCanvasAppFeaturePackMarketplaceActionAssemblyPlan({
+  action,
+  assemblyInput = {},
+}: CanvasAppFeaturePackMarketplaceActionAssemblyInput):
+  CanvasAppFeaturePackMarketplaceActionAssemblyPlan {
+  if (!action.ready) {
+    const blockedReasonCount = action.blockedReasons.length
+    const marketplaceBlockedReasonCount = action.marketplaceBlockedReasons.length
+
+    return Object.freeze({
+      action,
+      actionKind: action.kind,
+      blockedReasonCount,
+      marketplaceBlockedReasonCount,
+      status: 'blocked',
+      totalBlockedReasonCount:
+        blockedReasonCount + marketplaceBlockedReasonCount,
+    })
+  }
+
   return Object.freeze({
-    ...assemblyInput,
-    featurePackStates: action.installOptions.featurePackStates,
+    action,
+    actionKind: action.kind,
+    assemblyInput: Object.freeze({
+      ...assemblyInput,
+      featurePackStates: action.installOptions.featurePackStates,
+    }),
+    status: 'ready',
   })
 }
 

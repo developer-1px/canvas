@@ -7,6 +7,7 @@ import {
   DEFAULT_CANVAS_APP_ASSEMBLY,
   createCanvasAppAssembly,
   createCanvasAppComponentPresentationRenderers,
+  getCanvasAppFeaturePackMarketplaceActionAssemblyPlan,
   getCanvasAppFeaturePackMarketplaceActionAssemblyInput,
   defineCanvasAppCustomItemModule,
 } from './index'
@@ -710,15 +711,29 @@ describe('CanvasAppAssembly seams', () => {
     const primaryAction = getCanvasAppFeaturePackMarketplacePrimaryAction(
       marketplaceModel.packs.items[0]!,
     )
-    const assemblyInput = getCanvasAppFeaturePackMarketplaceActionAssemblyInput({
+    const actionAssemblyInput = {
       action: primaryAction,
       assemblyInput: {
         featurePackManifests: [statusManifest],
       },
-    })
+    }
+    const assemblyPlan =
+      getCanvasAppFeaturePackMarketplaceActionAssemblyPlan(actionAssemblyInput)
+    const assemblyInput =
+      getCanvasAppFeaturePackMarketplaceActionAssemblyInput(
+        actionAssemblyInput,
+      )
     const assembly = createCanvasAppAssembly(assemblyInput)
 
     expect(primaryAction.kind).toBe('disable')
+    expect(assemblyPlan.status).toBe('ready')
+    if (assemblyPlan.status !== 'ready') {
+      throw new Error('Expected ready action assembly plan')
+    }
+
+    expect(assemblyPlan.actionKind).toBe('disable')
+    expect(assemblyPlan.assemblyInput).toEqual(assemblyInput)
+    expect(Object.isFrozen(assemblyPlan)).toBe(true)
     expect(assemblyInput).toEqual({
       featurePackManifests: [statusManifest],
       featurePackStates: [{
@@ -754,8 +769,24 @@ describe('CanvasAppAssembly seams', () => {
     const primaryAction = getCanvasAppFeaturePackMarketplacePrimaryAction(
       marketplaceModel.packs.items[0]!,
     )
+    const blockedPlan =
+      getCanvasAppFeaturePackMarketplaceActionAssemblyPlan({
+        action: primaryAction,
+        assemblyInput: {
+          featurePackManifests: [paidManifest],
+        },
+      })
 
     expect(primaryAction.ready).toBe(false)
+    expect(blockedPlan).toMatchObject({
+      actionKind: 'install',
+      blockedReasonCount: 0,
+      marketplaceBlockedReasonCount: 1,
+      status: 'blocked',
+      totalBlockedReasonCount: 1,
+    })
+    expect('assemblyInput' in blockedPlan).toBe(false)
+    expect(Object.isFrozen(blockedPlan)).toBe(true)
     expect(() =>
       getCanvasAppFeaturePackMarketplaceActionAssemblyInput({
         action: primaryAction,

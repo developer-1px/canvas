@@ -17,8 +17,10 @@ export type {
   CanvasAppFeaturePackAssembly,
   CanvasAppFeaturePackAssemblyInput,
   CanvasAppFeaturePackMarketplaceActionAssemblyInput,
+  CanvasAppFeaturePackMarketplaceActionAssemblyPlan,
 } from './CanvasAppFeaturePackAssembly'
 export {
+  getCanvasAppFeaturePackMarketplaceActionAssemblyPlan,
   getCanvasAppFeaturePackMarketplaceActionAssemblyInput,
 } from './CanvasAppFeaturePackAssembly'
 export {
