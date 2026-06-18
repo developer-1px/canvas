@@ -37,6 +37,24 @@ export type CanvasAppFeaturePackMarketplaceListing = Readonly<{
   vendor?: string
 }>
 
+export type CanvasAppFeaturePackMarketplaceListingEntitlementReason =
+  Readonly<{
+    access: CanvasAppFeaturePackMarketplaceListingAccess
+    featurePackId: CanvasAppFeaturePackId
+    kind: 'marketplace-entitlement-required'
+  }>
+
+export type CanvasAppFeaturePackMarketplaceListingDistributionReason =
+  Readonly<{
+    distribution: CanvasAppFeaturePackMarketplaceListingDistribution
+    featurePackId: CanvasAppFeaturePackId
+    kind: 'marketplace-distribution-unavailable'
+  }>
+
+export type CanvasAppFeaturePackMarketplaceListingBlockedReason =
+  | CanvasAppFeaturePackMarketplaceListingDistributionReason
+  | CanvasAppFeaturePackMarketplaceListingEntitlementReason
+
 export type CanvasAppFeaturePackMarketplaceListingInput = Readonly<{
   access?: CanvasAppFeaturePackMarketplaceListingAccess
   distribution?: CanvasAppFeaturePackMarketplaceListingDistribution
@@ -114,6 +132,24 @@ export function getCanvasAppFeaturePackMarketplaceListingMap({
   return listingById
 }
 
+export function getCanvasAppFeaturePackMarketplaceListingBlockedReasons({
+  installed,
+  listing,
+}: {
+  installed: boolean
+  listing: CanvasAppFeaturePackMarketplaceListing
+}): readonly CanvasAppFeaturePackMarketplaceListingBlockedReason[] {
+  return Object.freeze([
+    ...getCanvasAppFeaturePackMarketplaceListingEntitlementBlockedReasons(
+      listing,
+    ),
+    ...getCanvasAppFeaturePackMarketplaceListingDistributionBlockedReasons({
+      installed,
+      listing,
+    }),
+  ])
+}
+
 function assertCanvasAppFeaturePackMarketplaceListingInput(
   input: CanvasAppFeaturePackMarketplaceListingInput,
 ) {
@@ -181,4 +217,36 @@ function getCanvasAppFeaturePackMarketplaceListingDefaultEntitlement(
   }
 
   return 'granted'
+}
+
+function getCanvasAppFeaturePackMarketplaceListingEntitlementBlockedReasons(
+  listing: CanvasAppFeaturePackMarketplaceListing,
+): readonly CanvasAppFeaturePackMarketplaceListingEntitlementReason[] {
+  if (listing.entitlement === 'granted') {
+    return []
+  }
+
+  return [Object.freeze({
+    access: listing.access,
+    featurePackId: listing.featurePackId,
+    kind: 'marketplace-entitlement-required',
+  })]
+}
+
+function getCanvasAppFeaturePackMarketplaceListingDistributionBlockedReasons({
+  installed,
+  listing,
+}: {
+  installed: boolean
+  listing: CanvasAppFeaturePackMarketplaceListing
+}): readonly CanvasAppFeaturePackMarketplaceListingDistributionReason[] {
+  if (installed || listing.distribution === 'available') {
+    return []
+  }
+
+  return [Object.freeze({
+    distribution: listing.distribution,
+    featurePackId: listing.featurePackId,
+    kind: 'marketplace-distribution-unavailable',
+  })]
 }

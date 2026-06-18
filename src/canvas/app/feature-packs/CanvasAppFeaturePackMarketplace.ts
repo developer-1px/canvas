@@ -80,11 +80,13 @@ export function getCanvasAppFeaturePackMarketplaceModel({
   suiteManifests?: readonly CanvasAppFeaturePackSuiteManifest[]
 }): CanvasAppFeaturePackMarketplaceModel {
   const profileActions = getCanvasAppFeaturePackProfileMarketplaceActionModel({
+    listings,
     manifests,
     options,
     profiles,
   })
   const suiteActions = getCanvasAppFeaturePackSuiteMarketplaceActionModel({
+    listings,
     manifests,
     options,
     suiteManifests,

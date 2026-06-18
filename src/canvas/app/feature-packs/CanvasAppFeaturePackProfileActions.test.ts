@@ -149,6 +149,57 @@ describe('CanvasAppFeaturePackProfileActions', () => {
     })
   })
 
+  it('blocks profile apply when a paid target listing is not granted', () => {
+    const paidManifest = createCanvasAppFeaturePackManifest({
+      id: 'paid-pack',
+      label: 'Paid pack',
+      lifecycle: {
+        partialUpdate: ['command'],
+        runtimeToggleable: true,
+      },
+    })
+    const profile = createCanvasAppFeaturePackProfile({
+      id: 'paid-profile',
+      installedFeaturePackIds: ['paid-pack'],
+      label: 'Paid profile',
+    })
+
+    const item = getCanvasAppFeaturePackProfileMarketplaceActionModel({
+      listings: [{
+        access: 'paid',
+        distribution: 'coming-soon',
+        featurePackId: 'paid-pack',
+      }],
+      manifests: [paidManifest],
+      options: {
+        featurePackStates: [{
+          id: 'paid-pack',
+          status: 'uninstalled',
+        }],
+      },
+      profiles: [profile],
+    }).items[0]
+
+    expect(item?.status).toBe('blocked')
+    expect(item?.actions[0]).toMatchObject({
+      applicable: true,
+      marketplaceBlockedReasons: [
+        {
+          access: 'paid',
+          featurePackId: 'paid-pack',
+          kind: 'marketplace-entitlement-required',
+        },
+        {
+          distribution: 'coming-soon',
+          featurePackId: 'paid-pack',
+          kind: 'marketplace-distribution-unavailable',
+        },
+      ],
+      ready: false,
+      status: 'blocked',
+    })
+  })
+
   it('blocks profile targets that violate required feature pack graph', () => {
     const baseManifest = createCanvasAppFeaturePackManifest({
       id: 'base-pack',

@@ -227,6 +227,95 @@ describe('CanvasAppFeaturePackSuiteActions', () => {
     })
   })
 
+  it('blocks suite install when a paid member listing is not granted', () => {
+    const paidManifest = createCanvasAppFeaturePackManifest({
+      id: 'paid-pack',
+      label: 'Paid pack',
+      lifecycle: {
+        partialUpdate: ['command'],
+        runtimeToggleable: true,
+      },
+    })
+    const suiteManifest = createCanvasAppFeaturePackSuiteManifest({
+      featurePackIds: ['paid-pack'],
+      id: 'paid-suite',
+      label: 'Paid suite',
+    })
+
+    const item = getCanvasAppFeaturePackSuiteMarketplaceActionModel({
+      listings: [{
+        access: 'paid',
+        distribution: 'coming-soon',
+        featurePackId: 'paid-pack',
+      }],
+      manifests: [paidManifest],
+      options: {
+        featurePackStates: [{
+          id: 'paid-pack',
+          status: 'uninstalled',
+        }],
+      },
+      suiteManifests: [suiteManifest],
+    }).items[0]
+
+    expect(item?.actions.find((action) => action.kind === 'install'))
+      .toMatchObject({
+        applicable: true,
+        marketplaceBlockedReasons: [
+          {
+            access: 'paid',
+            featurePackId: 'paid-pack',
+            kind: 'marketplace-entitlement-required',
+          },
+          {
+            distribution: 'coming-soon',
+            featurePackId: 'paid-pack',
+            kind: 'marketplace-distribution-unavailable',
+          },
+        ],
+        ready: false,
+        status: 'blocked',
+      })
+  })
+
+  it('keeps suite disable and uninstall available for installed paid members', () => {
+    const paidManifest = createCanvasAppFeaturePackManifest({
+      id: 'paid-pack',
+      label: 'Paid pack',
+      lifecycle: {
+        partialUpdate: ['command'],
+        runtimeToggleable: true,
+      },
+    })
+    const suiteManifest = createCanvasAppFeaturePackSuiteManifest({
+      featurePackIds: ['paid-pack'],
+      id: 'paid-suite',
+      label: 'Paid suite',
+    })
+
+    const item = getCanvasAppFeaturePackSuiteMarketplaceActionModel({
+      listings: [{
+        access: 'paid',
+        featurePackId: 'paid-pack',
+      }],
+      manifests: [paidManifest],
+      suiteManifests: [suiteManifest],
+    }).items[0]
+
+    expect(item?.actions.find((action) => action.kind === 'disable'))
+      .toMatchObject({
+        marketplaceBlockedReasons: [],
+        ready: true,
+        status: 'ready',
+      })
+    expect(item?.actions.find((action) => action.kind === 'uninstall'))
+      .toMatchObject({
+        marketplaceBlockedReasons: [],
+        ready: true,
+        status: 'ready',
+      })
+  })
+
   it('reports partial suite state and missing member blockers', () => {
     const runtimeManifest = createCanvasAppFeaturePackManifest({
       id: 'runtime-pack',
