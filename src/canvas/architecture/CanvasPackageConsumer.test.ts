@@ -117,6 +117,8 @@ import {
   getCanvasModalBackdropPointerIntent,
   getCanvasModalKeyboardIntent,
   measureCanvasTextBlocks,
+  getCanvasPointerLocalGeometry,
+  getCanvasPointerLocalPoint,
   getCanvasPointerTransformModifierState,
   getCanvasResizeHandleDoubleClickIntent,
   getCanvasMenuRovingActiveIndex,
@@ -215,6 +217,8 @@ import {
   type CanvasModalBackdropPointerIntentInput,
   type CanvasModalKeyboardIntentInput,
   type CanvasPointerClickMemory,
+  type CanvasPointerLocalGeometry,
+  type CanvasPointerLocalGeometryInput,
   type CanvasPointerPanInteraction,
   type CanvasPointerPanPreviewResult,
   type CanvasPointerPanStartResult,
@@ -1338,6 +1342,19 @@ describe('Canvas package consumer imports', () => {
       stageElement: worldClientStageElement,
       viewport: { scale: 2, x: 10, y: 20 },
     }
+    const pointerLocalGeometryInput: CanvasPointerLocalGeometryInput = {
+      event: { clientX: 150, clientY: 260 },
+      target: {
+        getBoundingClientRect: () => ({
+          height: 300,
+          left: 100,
+          top: 200,
+          width: 400,
+        }),
+      },
+    }
+    const pointerLocalGeometry: CanvasPointerLocalGeometry | null =
+      getCanvasPointerLocalGeometry(pointerLocalGeometryInput)
     const pointerTransformModifierInput: CanvasPointerTransformModifierInput = {
       altKey: true,
       shiftKey: true,
@@ -1477,6 +1494,23 @@ describe('Canvas package consumer imports', () => {
       x: 118,
       y: 230,
     })
+    expect(pointerLocalGeometry).toEqual({
+      point: { x: 50, y: 60 },
+      rect: {
+        height: 300,
+        left: 100,
+        top: 200,
+        width: 400,
+      },
+    })
+    expect(CanvasAppFacade.getCanvasPointerLocalGeometry(
+      pointerLocalGeometryInput,
+    )).toEqual(pointerLocalGeometry)
+    expect(getCanvasPointerLocalPoint(pointerLocalGeometryInput))
+      .toEqual({ x: 50, y: 60 })
+    expect(CanvasAppFacade.getCanvasPointerLocalPoint(
+      pointerLocalGeometryInput,
+    )).toEqual({ x: 50, y: 60 })
     expect(pointerTransformModifierState).toEqual({
       constrainAngle: true,
       preserveAspectRatio: true,
