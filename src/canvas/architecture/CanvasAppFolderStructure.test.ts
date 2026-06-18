@@ -134,6 +134,8 @@ describe('Canvas App folder structure', () => {
       'src/canvas/app/feature-packs/CanvasAppFeaturePackPartialUpdatePlan.ts',
       'src/canvas/app/feature-packs/CanvasAppFeaturePackProfiles.ts',
       'src/canvas/app/feature-packs/CanvasAppFeaturePackRuntimeModel.ts',
+      'src/canvas/app/feature-packs/CanvasAppFeaturePackStateTransitionPlan.test.ts',
+      'src/canvas/app/feature-packs/CanvasAppFeaturePackStateTransitionPlan.ts',
       'src/canvas/app/feature-packs/CanvasAppFeaturePackSuites.ts',
       'src/canvas/app/feature-packs/CanvasAppFeaturePackViews.tsx',
       'src/canvas/app/feature-packs/CanvasAppFeaturePacks.test.ts',

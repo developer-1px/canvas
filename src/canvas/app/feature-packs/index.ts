@@ -92,6 +92,20 @@ export {
   type CanvasAppFeaturePackPartialUpdatePlanUnknownTargetReason,
 } from './CanvasAppFeaturePackPartialUpdatePlan'
 export {
+  getCanvasAppFeaturePackStateTransitionPlan,
+  type CanvasAppFeaturePackStateTransitionBlockedReason,
+  type CanvasAppFeaturePackStateTransitionChange,
+  type CanvasAppFeaturePackStateTransitionDependencyReason,
+  type CanvasAppFeaturePackStateTransitionInstallPlanReason,
+  type CanvasAppFeaturePackStateTransitionLifecycleReason,
+  type CanvasAppFeaturePackStateTransitionOperation,
+  type CanvasAppFeaturePackStateTransitionPartialUpdateReason,
+  type CanvasAppFeaturePackStateTransitionPlan,
+  type CanvasAppFeaturePackStateTransitionPlanInput,
+  type CanvasAppFeaturePackStateTransitionPlanStatus,
+  type CanvasAppFeaturePackStateTransitionUnknownTargetReason,
+} from './CanvasAppFeaturePackStateTransitionPlan'
+export {
   assertCanvasAppFeaturePackManifest,
   assertCanvasAppFeaturePackManifests,
   createCanvasAppFeaturePackManifest,

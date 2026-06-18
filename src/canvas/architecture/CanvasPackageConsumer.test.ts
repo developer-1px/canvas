@@ -77,6 +77,7 @@ import {
   getCanvasAppFeaturePackCatalog,
   getCanvasAppFeaturePackInstallPlan,
   getCanvasAppFeaturePackPartialUpdatePlan,
+  getCanvasAppFeaturePackStateTransitionPlan,
   getCanvasAppFeaturePackSuiteFeaturePackIds,
   getCanvasAppManifestViewFeaturePacks,
   getCanvasAppResolvedFeaturePackStates,
@@ -118,6 +119,8 @@ import {
   type CanvasAppFeaturePackInstallPlanInput,
   type CanvasAppFeaturePackPartialUpdatePlan,
   type CanvasAppFeaturePackPartialUpdatePlanInput,
+  type CanvasAppFeaturePackStateTransitionPlan,
+  type CanvasAppFeaturePackStateTransitionPlanInput,
   type CanvasAppFeaturePackAssemblyInput,
   type CanvasAppFeaturePackManifest,
   type CanvasAppFeaturePackManifestCategory,
@@ -463,6 +466,17 @@ describe('Canvas package consumer imports', () => {
       CanvasAppFeaturePackPartialUpdatePlan =
         getCanvasAppFeaturePackPartialUpdatePlan(
           featurePackPartialUpdatePlanInput,
+        )
+    const featurePackStateTransitionPlanInput:
+      CanvasAppFeaturePackStateTransitionPlanInput = {
+        manifests: [partialUpdateManifest],
+        operation: 'disable',
+        targetFeaturePackIds: ['smoke-partial-pack'],
+      }
+    const featurePackStateTransitionPlan:
+      CanvasAppFeaturePackStateTransitionPlan =
+        getCanvasAppFeaturePackStateTransitionPlan(
+          featurePackStateTransitionPlanInput,
         )
     const disabledFeaturePackStates:
       readonly CanvasAppFeaturePackRuntimeState[] =
@@ -883,6 +897,13 @@ describe('Canvas package consumer imports', () => {
     expect(featurePackPartialUpdatePlan.entries[0]?.runtimeToggleable)
       .toBe(true)
     expect(featurePackPartialUpdatePlan.status).toBe('ready')
+    expect(featurePackStateTransitionPlan.featurePackStates).toEqual([{
+      id: 'smoke-partial-pack',
+      status: 'disabled',
+    }])
+    expect(featurePackStateTransitionPlan.partialUpdateSurfaceIds)
+      .toEqual(['overlay'])
+    expect(featurePackStateTransitionPlan.status).toBe('ready')
     expect(defaultViewFeaturePackIds).toContain('toolbar')
     expect(defaultViewFeaturePackManifestIds).toContain('toolbar')
     expect(manifestViewFeaturePacks).toEqual([viewFeaturePack])
@@ -1259,6 +1280,12 @@ describe('Canvas package consumer imports', () => {
     expect(CanvasAppFacade.getCanvasAppFeaturePackPartialUpdatePlan)
       .toBeTypeOf('function')
     expect(CanvasPackage.getCanvasAppFeaturePackPartialUpdatePlan)
+      .toBeTypeOf('function')
+    expect(CanvasAppAuthoring.getCanvasAppFeaturePackStateTransitionPlan)
+      .toBeTypeOf('function')
+    expect(CanvasAppFacade.getCanvasAppFeaturePackStateTransitionPlan)
+      .toBeTypeOf('function')
+    expect(CanvasPackage.getCanvasAppFeaturePackStateTransitionPlan)
       .toBeTypeOf('function')
     expect(CanvasAppAuthoring.createCanvasAppAiLabsFeaturePackManifest)
       .toBeTypeOf('function')
