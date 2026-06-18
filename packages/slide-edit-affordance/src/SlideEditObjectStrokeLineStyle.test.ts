@@ -17,7 +17,10 @@ import {
   SLIDE_EDIT_OBJECT_STROKE_LINE_STYLE_OPTIONS,
 } from './SlideEditObjectStrokeLineStyle'
 import {
+  getSlideEditObjectStrokeLineStyleBorderStyle as getSlideEditObjectStrokeLineStyleBorderStyleFromPackage,
+  getSlideEditObjectStrokeLineStyleDashArray as getSlideEditObjectStrokeLineStyleDashArrayFromPackage,
   getSlideEditObjectStrokeLineStyleJSONPasteValue as getSlideEditObjectStrokeLineStyleJSONPasteValueFromPackage,
+  type SlideEditObjectStrokeLineStyleBorderStyle,
 } from './index'
 
 describe('SlideEditObjectStrokeLineStyle', () => {
@@ -98,14 +101,17 @@ describe('SlideEditObjectStrokeLineStyle', () => {
   })
 
   it('maps line styles to CSS border styles', () => {
-    expect(getSlideEditObjectStrokeLineStyleBorderStyle('dash')).toBe('dashed')
+    const dashedStyle: SlideEditObjectStrokeLineStyleBorderStyle =
+      getSlideEditObjectStrokeLineStyleBorderStyleFromPackage('dash')
+
+    expect(dashedStyle).toBe('dashed')
     expect(getSlideEditObjectStrokeLineStyleBorderStyle('dot')).toBe('dotted')
     expect(getSlideEditObjectStrokeLineStyleBorderStyle('solid')).toBe('solid')
     expect(getSlideEditObjectStrokeLineStyleBorderStyle('long-dash')).toBe('solid')
   })
 
   it('maps line styles and stroke width to SVG dash arrays', () => {
-    expect(getSlideEditObjectStrokeLineStyleDashArray({
+    expect(getSlideEditObjectStrokeLineStyleDashArrayFromPackage({
       strokeWidth: 2,
       value: 'dash',
     })).toBe('6 4')
