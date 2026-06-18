@@ -686,6 +686,7 @@ describe('CanvasAppFeaturePacks', () => {
       label: 'Publish pack',
       lifecycle: {
         hotReloadable: true,
+        orphanedDataPolicy: 'host-managed',
         partialUpdate: ['command'],
         runtimeToggleable: true,
       },
@@ -698,6 +699,7 @@ describe('CanvasAppFeaturePacks', () => {
     expect(defaultManifest.category).toBe('view')
     expect(defaultManifest.version).toBe('0.1.0')
     expect(defaultManifest.lifecycle.installable).toBe(true)
+    expect(defaultManifest.lifecycle.orphanedDataPolicy).toBe('preserve')
     expect(defaultManifest.lifecycle.runtimeToggleable).toBe(false)
     expect(defaultManifest.compatibility.engineVersion).toBe('0.1.x')
     expect(defaultManifest.contributes.surfaces).toEqual([])
@@ -706,6 +708,7 @@ describe('CanvasAppFeaturePacks', () => {
     expect(customManifest.lifecycle).toEqual({
       hotReloadable: true,
       installable: true,
+      orphanedDataPolicy: 'host-managed',
       partialUpdate: ['command'],
       runtimeToggleable: true,
       uninstallable: true,
@@ -727,6 +730,17 @@ describe('CanvasAppFeaturePacks', () => {
         label: 'Duplicate surfaces pack',
       }),
     ).toThrow('Duplicate feature pack contribution surface: command')
+    expect(() =>
+      createCanvasAppFeaturePackManifest({
+        id: 'bad-policy-pack',
+        label: 'Bad policy pack',
+        lifecycle: {
+          orphanedDataPolicy: 'unknown' as never,
+        },
+      }),
+    ).toThrow(
+      'Invalid feature pack manifest bad-policy-pack lifecycle orphanedDataPolicy: unknown',
+    )
   })
 
   it('derives installed and enabled manifest ids separately', () => {

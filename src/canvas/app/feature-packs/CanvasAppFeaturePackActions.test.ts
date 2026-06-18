@@ -18,6 +18,7 @@ describe('CanvasAppFeaturePackActions', () => {
       id: 'overlay-pack',
       label: 'Overlay pack',
       lifecycle: {
+        orphanedDataPolicy: 'remove',
         partialUpdate: ['overlay'],
         runtimeToggleable: true,
       },
@@ -46,6 +47,7 @@ describe('CanvasAppFeaturePackActions', () => {
       partialUpdateSurfaceIds: action.partialUpdateSurfaceIds,
       ready: action.ready,
       status: action.status,
+      uninstallPolicyEntries: action.uninstallPolicyEntries,
     }))).toEqual([
       {
         applicable: false,
@@ -54,6 +56,7 @@ describe('CanvasAppFeaturePackActions', () => {
         partialUpdateSurfaceIds: [],
         ready: false,
         status: 'blocked',
+        uninstallPolicyEntries: [],
       },
       {
         applicable: false,
@@ -62,6 +65,7 @@ describe('CanvasAppFeaturePackActions', () => {
         partialUpdateSurfaceIds: [],
         ready: false,
         status: 'blocked',
+        uninstallPolicyEntries: [],
       },
       {
         applicable: true,
@@ -70,6 +74,7 @@ describe('CanvasAppFeaturePackActions', () => {
         partialUpdateSurfaceIds: ['overlay'],
         ready: true,
         status: 'ready',
+        uninstallPolicyEntries: [],
       },
       {
         applicable: true,
@@ -78,6 +83,10 @@ describe('CanvasAppFeaturePackActions', () => {
         partialUpdateSurfaceIds: [],
         ready: true,
         status: 'ready',
+        uninstallPolicyEntries: [{
+          featurePackId: 'overlay-pack',
+          orphanedDataPolicy: 'remove',
+        }],
       },
     ])
   })

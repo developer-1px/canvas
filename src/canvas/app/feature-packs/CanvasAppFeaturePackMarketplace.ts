@@ -10,6 +10,9 @@ import {
   type CanvasAppFeaturePackManifestInstallOptions,
 } from './CanvasAppFeaturePackManifests'
 import {
+  type CanvasAppFeaturePackStateTransitionUninstallPolicyEntry,
+} from './CanvasAppFeaturePackStateTransitionPlan'
+import {
   type CanvasAppFeaturePackMarketplaceListingInput,
 } from './CanvasAppFeaturePackMarketplaceListings'
 import {
@@ -180,6 +183,8 @@ export type CanvasAppFeaturePackMarketplacePrimaryActionDiagnostic =
     ready: boolean
     status: CanvasAppFeaturePackMarketplacePrimaryActionStatus
     totalBlockedReasonCount: number
+    uninstallPolicyEntries:
+      readonly CanvasAppFeaturePackStateTransitionUninstallPolicyEntry[]
   }>
 
 export type CanvasAppFeaturePackMarketplaceSectionPrimaryActionDiagnosticModel =
@@ -389,6 +394,7 @@ export function getCanvasAppFeaturePackMarketplacePrimaryActionDiagnostic(
     status: action.status,
     totalBlockedReasonCount:
       blockedReasonCount + marketplaceBlockedReasonCount,
+    uninstallPolicyEntries: action.uninstallPolicyEntries,
   })
 }
 

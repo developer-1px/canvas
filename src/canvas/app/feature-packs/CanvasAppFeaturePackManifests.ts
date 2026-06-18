@@ -95,6 +95,7 @@ export type CanvasAppFeaturePackManifestContributionsInput = Readonly<{
 export type CanvasAppFeaturePackManifestLifecycle = Readonly<{
   hotReloadable: boolean
   installable: boolean
+  orphanedDataPolicy: CanvasAppFeaturePackManifestOrphanedDataPolicy
   partialUpdate: readonly CanvasAppFeaturePackContributionSurface[]
   runtimeToggleable: boolean
   uninstallable: boolean
@@ -103,10 +104,16 @@ export type CanvasAppFeaturePackManifestLifecycle = Readonly<{
 export type CanvasAppFeaturePackManifestLifecycleInput = Readonly<{
   hotReloadable?: boolean
   installable?: boolean
+  orphanedDataPolicy?: CanvasAppFeaturePackManifestOrphanedDataPolicy
   partialUpdate?: readonly CanvasAppFeaturePackContributionSurface[]
   runtimeToggleable?: boolean
   uninstallable?: boolean
 }>
+
+export type CanvasAppFeaturePackManifestOrphanedDataPolicy =
+  | 'host-managed'
+  | 'preserve'
+  | 'remove'
 
 export type CanvasAppFeaturePackManifestCompatibility = Readonly<{
   documentSchemaVersion?: string
@@ -152,6 +159,12 @@ const CANVAS_APP_FEATURE_PACK_CATEGORIES =
     'review',
     'suite',
     'view',
+  ] as const)
+const CANVAS_APP_FEATURE_PACK_ORPHANED_DATA_POLICIES =
+  Object.freeze([
+    'host-managed',
+    'preserve',
+    'remove',
   ] as const)
 
 export function createCanvasAppFeaturePackManifest<TRuntimeFeaturePacks>(
@@ -553,6 +566,7 @@ function createCanvasAppFeaturePackManifestLifecycle(
   return Object.freeze({
     hotReloadable: input?.hotReloadable ?? false,
     installable: input?.installable ?? true,
+    orphanedDataPolicy: input?.orphanedDataPolicy ?? 'preserve',
     partialUpdate: snapshotCanvasAppFeaturePackContributionSurfaces(
       input?.partialUpdate ?? [],
     ),
@@ -674,6 +688,10 @@ function assertCanvasAppFeaturePackManifestLifecycle({
   }
 
   snapshotCanvasAppFeaturePackContributionSurfaces(lifecycle.partialUpdate)
+  assertCanvasAppFeaturePackManifestOrphanedDataPolicy({
+    owner,
+    policy: lifecycle.orphanedDataPolicy,
+  })
 }
 
 function assertCanvasAppFeaturePackManifestCompatibility({
@@ -700,6 +718,25 @@ function assertCanvasAppFeaturePackManifestCompatibility({
     ) {
       throw new Error(`Expected ${owner} compatibility ${field} string`)
     }
+  }
+}
+
+function assertCanvasAppFeaturePackManifestOrphanedDataPolicy({
+  owner,
+  policy,
+}: {
+  owner: string
+  policy: unknown
+}) {
+  if (
+    typeof policy !== 'string' ||
+    !CANVAS_APP_FEATURE_PACK_ORPHANED_DATA_POLICIES.includes(
+      policy as CanvasAppFeaturePackManifestOrphanedDataPolicy,
+    )
+  ) {
+    throw new Error(
+      `Invalid ${owner} lifecycle orphanedDataPolicy: ${String(policy)}`,
+    )
   }
 }
 

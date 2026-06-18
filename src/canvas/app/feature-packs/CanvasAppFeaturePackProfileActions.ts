@@ -3,6 +3,7 @@ import {
   type CanvasAppFeaturePackContributionSurface,
   type CanvasAppFeaturePackManifest,
   type CanvasAppFeaturePackManifestInstallOptions,
+  type CanvasAppFeaturePackManifestOrphanedDataPolicy,
 } from './CanvasAppFeaturePackManifests'
 import {
   getCanvasAppFeaturePackMarketplaceListingBlockedReasons,
@@ -69,6 +70,8 @@ export type CanvasAppFeaturePackProfileMarketplaceAction = Readonly<{
   ready: boolean
   stateChanges: readonly CanvasAppFeaturePackProfileMarketplaceStateChange[]
   status: CanvasAppFeaturePackProfileMarketplaceStatus
+  uninstallPolicyEntries:
+    readonly CanvasAppFeaturePackProfileMarketplaceUninstallPolicyEntry[]
 }>
 
 export type CanvasAppFeaturePackProfileMarketplaceStateChange = Readonly<{
@@ -76,6 +79,12 @@ export type CanvasAppFeaturePackProfileMarketplaceStateChange = Readonly<{
   id: CanvasAppFeaturePackId
   to: CanvasAppFeaturePackRuntimeState
 }>
+
+export type CanvasAppFeaturePackProfileMarketplaceUninstallPolicyEntry =
+  Readonly<{
+    featurePackId: CanvasAppFeaturePackId
+    orphanedDataPolicy: CanvasAppFeaturePackManifestOrphanedDataPolicy
+  }>
 
 export type CanvasAppFeaturePackProfileMarketplaceBlockScope =
   | 'enabled'
@@ -293,6 +302,11 @@ function createCanvasAppFeaturePackProfileMarketplaceActionItem({
     ready: status === 'ready',
     stateChanges,
     status,
+    uninstallPolicyEntries:
+      getCanvasAppFeaturePackProfileMarketplaceUninstallPolicyEntries({
+        context,
+        stateChanges,
+      }),
   } satisfies CanvasAppFeaturePackProfileMarketplaceAction)
 
   return Object.freeze({
@@ -692,6 +706,31 @@ function getCanvasAppFeaturePackProfileMarketplacePartialUpdateSurfaceIds({
     manifests: context.manifests,
     targetFeaturePackIds: ids,
   }).surfaceIds
+}
+
+function getCanvasAppFeaturePackProfileMarketplaceUninstallPolicyEntries({
+  context,
+  stateChanges,
+}: {
+  context: CanvasAppFeaturePackProfileMarketplaceContext
+  stateChanges: readonly CanvasAppFeaturePackProfileMarketplaceStateChange[]
+}): readonly CanvasAppFeaturePackProfileMarketplaceUninstallPolicyEntry[] {
+  return Object.freeze(stateChanges.flatMap((change) => {
+    if (!change.from.installed || change.to.installed) {
+      return []
+    }
+
+    const manifest = context.manifestById.get(change.id)
+
+    if (!manifest) {
+      return []
+    }
+
+    return [Object.freeze({
+      featurePackId: change.id,
+      orphanedDataPolicy: manifest.lifecycle.orphanedDataPolicy,
+    })]
+  }))
 }
 
 function getCanvasAppFeaturePackProfileMarketplaceStatus({

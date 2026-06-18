@@ -54,6 +54,9 @@ describe('CanvasAppFeaturePackProfileActions', () => {
     const legacyManifest = createCanvasAppFeaturePackManifest({
       id: 'legacy-pack',
       label: 'Legacy pack',
+      lifecycle: {
+        orphanedDataPolicy: 'host-managed',
+      },
     })
     const profile = createCanvasAppFeaturePackProfile({
       enabledFeaturePackIds: ['base-pack', 'inspector-pack'],
@@ -106,6 +109,10 @@ describe('CanvasAppFeaturePackProfileActions', () => {
         status: 'uninstalled',
       },
     ])
+    expect(action?.uninstallPolicyEntries).toEqual([{
+      featurePackId: 'legacy-pack',
+      orphanedDataPolicy: 'host-managed',
+    }])
     expect(action?.installOptions).toEqual({
       featurePackStates: [
         {

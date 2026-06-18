@@ -29,6 +29,7 @@ import {
   type CanvasAppFeaturePackStateTransitionOperation,
   type CanvasAppFeaturePackStateTransitionPlan,
   type CanvasAppFeaturePackStateTransitionPlanStatus,
+  type CanvasAppFeaturePackStateTransitionUninstallPolicyEntry,
 } from './CanvasAppFeaturePackStateTransitionPlan'
 
 export type CanvasAppFeaturePackMarketplaceActionKind =
@@ -63,6 +64,8 @@ export type CanvasAppFeaturePackMarketplaceAction = Readonly<{
   ready: boolean
   stateChanges: readonly CanvasAppFeaturePackStateTransitionChange[]
   status: CanvasAppFeaturePackStateTransitionPlanStatus
+  uninstallPolicyEntries:
+    readonly CanvasAppFeaturePackStateTransitionUninstallPolicyEntry[]
 }>
 
 const CANVAS_APP_FEATURE_PACK_MARKETPLACE_ACTION_KINDS = Object.freeze([
@@ -230,6 +233,7 @@ function createCanvasAppFeaturePackMarketplaceAction({
     ready: status === 'ready',
     stateChanges: transitionPlan.stateChanges,
     status,
+    uninstallPolicyEntries: transitionPlan.uninstallPolicyEntries,
   })
 }
 

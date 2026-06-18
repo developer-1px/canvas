@@ -15,6 +15,7 @@ describe('CanvasAppFeaturePackSuiteActions', () => {
       id: 'overlay-pack',
       label: 'Overlay pack',
       lifecycle: {
+        orphanedDataPolicy: 'remove',
         partialUpdate: ['overlay'],
         runtimeToggleable: true,
       },
@@ -23,6 +24,7 @@ describe('CanvasAppFeaturePackSuiteActions', () => {
       id: 'inspector-pack',
       label: 'Inspector pack',
       lifecycle: {
+        orphanedDataPolicy: 'host-managed',
         partialUpdate: ['inspector'],
         runtimeToggleable: true,
       },
@@ -69,6 +71,7 @@ describe('CanvasAppFeaturePackSuiteActions', () => {
       partialUpdateSurfaceIds: action.partialUpdateSurfaceIds,
       ready: action.ready,
       status: action.status,
+      uninstallPolicyEntries: action.uninstallPolicyEntries,
     }))).toEqual([
       {
         applicable: false,
@@ -77,6 +80,7 @@ describe('CanvasAppFeaturePackSuiteActions', () => {
         partialUpdateSurfaceIds: [],
         ready: false,
         status: 'blocked',
+        uninstallPolicyEntries: [],
       },
       {
         applicable: false,
@@ -85,6 +89,7 @@ describe('CanvasAppFeaturePackSuiteActions', () => {
         partialUpdateSurfaceIds: [],
         ready: false,
         status: 'blocked',
+        uninstallPolicyEntries: [],
       },
       {
         applicable: true,
@@ -99,6 +104,7 @@ describe('CanvasAppFeaturePackSuiteActions', () => {
         ],
         ready: true,
         status: 'ready',
+        uninstallPolicyEntries: [],
       },
       {
         applicable: true,
@@ -110,6 +116,16 @@ describe('CanvasAppFeaturePackSuiteActions', () => {
         partialUpdateSurfaceIds: [],
         ready: true,
         status: 'ready',
+        uninstallPolicyEntries: [
+          {
+            featurePackId: 'overlay-pack',
+            orphanedDataPolicy: 'remove',
+          },
+          {
+            featurePackId: 'inspector-pack',
+            orphanedDataPolicy: 'host-managed',
+          },
+        ],
       },
     ])
   })

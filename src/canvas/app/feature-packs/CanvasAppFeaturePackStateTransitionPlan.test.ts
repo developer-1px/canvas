@@ -64,6 +64,7 @@ describe('CanvasAppFeaturePackStateTransitionPlan', () => {
       ready: true,
       status: 'ready',
     })
+    expect(plan.uninstallPolicyEntries).toEqual([])
     expect(plan.featurePackStates).toEqual([
       {
         id: 'runtime-pack',
@@ -139,6 +140,7 @@ describe('CanvasAppFeaturePackStateTransitionPlan', () => {
       installFeaturePackIds: ['runtime-pack', 'inspector-pack'],
       partialUpdateSurfaceIds: [],
       status: 'ready',
+      uninstallPolicyEntries: [],
     })
   })
 
@@ -249,6 +251,9 @@ describe('CanvasAppFeaturePackStateTransitionPlan', () => {
     const runtimeManifest = createCanvasAppFeaturePackManifest({
       id: 'runtime-pack',
       label: 'Runtime pack',
+      lifecycle: {
+        orphanedDataPolicy: 'host-managed',
+      },
       provides: ['runtime-capability'],
     })
     const inspectorManifest = createCanvasAppFeaturePackManifest({
@@ -291,6 +296,10 @@ describe('CanvasAppFeaturePackStateTransitionPlan', () => {
       ready: false,
       status: 'blocked',
       uninstallFeaturePackIds: ['runtime-pack'],
+      uninstallPolicyEntries: [{
+        featurePackId: 'runtime-pack',
+        orphanedDataPolicy: 'host-managed',
+      }],
     })
   })
 

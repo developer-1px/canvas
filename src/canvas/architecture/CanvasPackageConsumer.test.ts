@@ -206,12 +206,15 @@ import {
   type CanvasAppFeaturePackAssemblyInput,
   type CanvasAppFeaturePackManifest,
   type CanvasAppFeaturePackManifestCategory,
+  type CanvasAppFeaturePackManifestOrphanedDataPolicy,
   type CanvasAppFeaturePackProfile,
   type CanvasAppFeaturePackProfileRuntimeStatesInput,
+  type CanvasAppFeaturePackProfileMarketplaceUninstallPolicyEntry,
   type CanvasAppFeaturePackRuntimeState,
   type CanvasAppFeaturePackRuntimeStatePatch,
   type CanvasAppFeaturePackSuiteId,
   type CanvasAppFeaturePackSuiteManifest,
+  type CanvasAppFeaturePackStateTransitionUninstallPolicyEntry,
   type CanvasAppFeaturePackViewRenderers,
   type CanvasStoryCanvasFeaturePackManifestsInput,
   type CanvasImagePasteReplaceRoute,
@@ -640,6 +643,7 @@ describe('Canvas package consumer imports', () => {
         id: 'smoke-partial-pack',
         label: 'Partial pack',
         lifecycle: {
+          orphanedDataPolicy: 'host-managed',
           partialUpdate: ['overlay'],
           runtimeToggleable: true,
         },
@@ -900,6 +904,19 @@ describe('Canvas package consumer imports', () => {
       )
     const viewManifestCategory: CanvasAppFeaturePackManifestCategory =
       viewManifest.category
+    const featurePackManifestOrphanedDataPolicy:
+      CanvasAppFeaturePackManifestOrphanedDataPolicy =
+        partialUpdateManifest.lifecycle.orphanedDataPolicy
+    const featurePackStateTransitionUninstallPolicyEntry:
+      CanvasAppFeaturePackStateTransitionUninstallPolicyEntry = {
+        featurePackId: 'smoke-partial-pack',
+        orphanedDataPolicy: featurePackManifestOrphanedDataPolicy,
+      }
+    const featurePackProfileMarketplaceUninstallPolicyEntry:
+      CanvasAppFeaturePackProfileMarketplaceUninstallPolicyEntry = {
+        featurePackId: 'smoke-partial-pack',
+        orphanedDataPolicy: featurePackManifestOrphanedDataPolicy,
+      }
 
     const assembly = createCanvasAppAssembly({
       componentDefinitions: [appComponentDefinition],
@@ -1395,6 +1412,7 @@ describe('Canvas package consumer imports', () => {
       ready: true,
       status: 'ready',
       totalBlockedReasonCount: 0,
+      uninstallPolicyEntries: [],
     })
     expect(featurePackMarketplaceActionAssemblyPlan.status).toBe('ready')
     if (featurePackMarketplaceActionAssemblyPlan.status !== 'ready') {
@@ -1483,6 +1501,11 @@ describe('Canvas package consumer imports', () => {
         status: 'disabled',
       }],
     })
+    expect(featurePackSuiteMarketplaceActionModel.items[0]?.actions.find(
+      (action) => action.kind === 'uninstall',
+    )?.uninstallPolicyEntries).toEqual([
+      featurePackStateTransitionUninstallPolicyEntry,
+    ])
     expect(featurePackPartialUpdatePlan.surfaceIds).toEqual(['overlay'])
     expect(featurePackPartialUpdatePlan.entries[0]?.runtimeToggleable)
       .toBe(true)
@@ -1493,7 +1516,13 @@ describe('Canvas package consumer imports', () => {
     }])
     expect(featurePackStateTransitionPlan.partialUpdateSurfaceIds)
       .toEqual(['overlay'])
+    expect(featurePackStateTransitionPlan.uninstallPolicyEntries).toEqual([])
     expect(featurePackStateTransitionPlan.status).toBe('ready')
+    expect(featurePackManifestOrphanedDataPolicy).toBe('host-managed')
+    expect(featurePackProfileMarketplaceUninstallPolicyEntry).toEqual({
+      featurePackId: 'smoke-partial-pack',
+      orphanedDataPolicy: 'host-managed',
+    })
     expect(defaultViewFeaturePackIds).toContain('toolbar')
     expect(defaultViewFeaturePackManifestIds).toContain('toolbar')
     expect(manifestViewFeaturePacks).toEqual([viewFeaturePack])

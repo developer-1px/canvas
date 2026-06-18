@@ -238,6 +238,7 @@ describe('CanvasAppFeaturePackMarketplace', () => {
       ready: false,
       status: 'blocked',
       totalBlockedReasonCount: 1,
+      uninstallPolicyEntries: [],
     })
     expect(Object.isFrozen(addonPackPrimaryActionDiagnostic)).toBe(true)
     const packSectionPrimaryActionDiagnosticModel =

@@ -3,6 +3,7 @@ import {
   type CanvasAppFeaturePackContributionSurface,
   type CanvasAppFeaturePackManifest,
   type CanvasAppFeaturePackManifestInstallOptions,
+  type CanvasAppFeaturePackManifestOrphanedDataPolicy,
 } from './CanvasAppFeaturePackManifests'
 import {
   assertCanvasAppFeaturePackIds,
@@ -50,6 +51,8 @@ export type CanvasAppFeaturePackStateTransitionPlan = Readonly<{
   stateChanges: readonly CanvasAppFeaturePackStateTransitionChange[]
   status: CanvasAppFeaturePackStateTransitionPlanStatus
   targetFeaturePackIds: readonly CanvasAppFeaturePackId[]
+  uninstallPolicyEntries:
+    readonly CanvasAppFeaturePackStateTransitionUninstallPolicyEntry[]
   uninstallFeaturePackIds: readonly CanvasAppFeaturePackId[]
 }>
 
@@ -58,6 +61,12 @@ export type CanvasAppFeaturePackStateTransitionChange = Readonly<{
   id: CanvasAppFeaturePackId
   to: CanvasAppFeaturePackRuntimeState
 }>
+
+export type CanvasAppFeaturePackStateTransitionUninstallPolicyEntry =
+  Readonly<{
+    featurePackId: CanvasAppFeaturePackId
+    orphanedDataPolicy: CanvasAppFeaturePackManifestOrphanedDataPolicy
+  }>
 
 export type CanvasAppFeaturePackStateTransitionInstallPlanReason = Readonly<{
   kind: 'install-plan-blocked'
@@ -169,6 +178,11 @@ export function getCanvasAppFeaturePackStateTransitionPlan(
     stateChanges,
     status,
     targetFeaturePackIds: Object.freeze([...input.targetFeaturePackIds]),
+    uninstallPolicyEntries:
+      getCanvasAppFeaturePackStateTransitionUninstallPolicyEntries({
+        context,
+        ids: transition.uninstallFeaturePackIds,
+      }),
     uninstallFeaturePackIds: transition.uninstallFeaturePackIds,
   })
 }
@@ -551,6 +565,27 @@ function getCanvasAppFeaturePackStateTransitionPartialUpdateSurfaceIds({
     manifests: context.manifests,
     targetFeaturePackIds: ids,
   }).surfaceIds
+}
+
+function getCanvasAppFeaturePackStateTransitionUninstallPolicyEntries({
+  context,
+  ids,
+}: {
+  context: CanvasAppFeaturePackStateTransitionContext
+  ids: readonly CanvasAppFeaturePackId[]
+}): readonly CanvasAppFeaturePackStateTransitionUninstallPolicyEntry[] {
+  return Object.freeze(ids.flatMap((id) => {
+    const manifest = context.manifestById.get(id)
+
+    if (!manifest) {
+      return []
+    }
+
+    return [Object.freeze({
+      featurePackId: id,
+      orphanedDataPolicy: manifest.lifecycle.orphanedDataPolicy,
+    })]
+  }))
 }
 
 function isCanvasAppFeaturePackStateTransitionOperation(

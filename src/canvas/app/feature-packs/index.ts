@@ -124,6 +124,7 @@ export {
   type CanvasAppFeaturePackProfileMarketplaceRequiredReasonKind,
   type CanvasAppFeaturePackProfileMarketplaceStateChange,
   type CanvasAppFeaturePackProfileMarketplaceStatus,
+  type CanvasAppFeaturePackProfileMarketplaceUninstallPolicyEntry,
   type CanvasAppFeaturePackProfileMarketplaceUnknownPackReason,
 } from './CanvasAppFeaturePackProfileActions'
 export {
@@ -181,6 +182,7 @@ export {
   type CanvasAppFeaturePackStateTransitionPlan,
   type CanvasAppFeaturePackStateTransitionPlanInput,
   type CanvasAppFeaturePackStateTransitionPlanStatus,
+  type CanvasAppFeaturePackStateTransitionUninstallPolicyEntry,
   type CanvasAppFeaturePackStateTransitionUnknownTargetReason,
 } from './CanvasAppFeaturePackStateTransitionPlan'
 export {
@@ -201,6 +203,7 @@ export {
   type CanvasAppFeaturePackManifestContributionsInput,
   type CanvasAppFeaturePackManifestLifecycle,
   type CanvasAppFeaturePackManifestLifecycleInput,
+  type CanvasAppFeaturePackManifestOrphanedDataPolicy,
   type CanvasAppFeaturePackManifest,
   type CanvasAppFeaturePackManifestInput,
 } from './CanvasAppFeaturePackManifests'
