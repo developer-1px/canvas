@@ -23,7 +23,7 @@ export type CanvasWheelViewportEvent = {
   shiftKey: boolean
 }
 
-type RunCanvasWheelViewportArgs = {
+export type RunCanvasWheelViewportArgs = {
   config: CanvasAffordanceConfig
   event: CanvasWheelViewportEvent
   rect: CanvasAppStageRect

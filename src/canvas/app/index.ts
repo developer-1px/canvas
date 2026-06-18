@@ -524,6 +524,12 @@ export {
   type CanvasViewportSetter,
 } from './affordances/interaction/viewport/CanvasViewportControlExecution'
 export {
+  runCanvasWheelViewport,
+  type CanvasWheelViewportEvent,
+  type CanvasWheelViewportSetter,
+  type RunCanvasWheelViewportArgs,
+} from './affordances/interaction/viewport/CanvasWheelViewportExecution'
+export {
   isCanvasKeyboardTypingTarget,
   type CanvasKeyboardShortcutIntentInput,
 } from './affordances/interaction/keyboard/CanvasKeyboardShortcutIntent'

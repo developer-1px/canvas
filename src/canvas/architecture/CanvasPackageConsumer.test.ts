@@ -5,6 +5,9 @@ import * as CanvasAppFacade from '@interactive-os/canvas/app'
 import type {
   CanvasDataTransferImportActionPlanRunInput,
   CanvasDataTransferImportActionPlanRunResult,
+  CanvasWheelViewportEvent,
+  CanvasWheelViewportSetter,
+  RunCanvasWheelViewportArgs,
 } from '@interactive-os/canvas/app'
 import {
   CanvasCore,
@@ -109,6 +112,7 @@ import {
   previewCanvasPointerLaserInteraction,
   previewCanvasPointerPanInteraction,
   resetCanvasViewport,
+  runCanvasWheelViewport,
   startCanvasPointerLaserInteraction,
   startCanvasPointerPanInteraction,
   useCanvasAppStageElement,
@@ -3115,6 +3119,40 @@ describe('Canvas package consumer imports', () => {
       viewportState = typeof next === 'function' ? next(viewportState) : next
       viewportUpdates.push(viewportState)
     }
+    let wheelViewportPreventDefaultCount = 0
+    let wheelViewportState = { scale: 1, x: 0, y: 0 }
+    const wheelViewportUpdates: Array<{ scale: number; x: number; y: number }> =
+      []
+    const setWheelViewport: CanvasWheelViewportSetter = (next) => {
+      wheelViewportState =
+        typeof next === 'function' ? next(wheelViewportState) : next
+      wheelViewportUpdates.push(wheelViewportState)
+    }
+    const wheelViewportEvent: CanvasWheelViewportEvent = {
+      clientX: 120,
+      clientY: 90,
+      ctrlKey: false,
+      deltaMode: 0,
+      deltaX: 10,
+      deltaY: 20,
+      metaKey: false,
+      preventDefault: () => {
+        wheelViewportPreventDefaultCount += 1
+      },
+      shiftKey: false,
+    }
+    const wheelViewportRunInput: RunCanvasWheelViewportArgs = {
+      config: createCanvasAffordanceConfig(),
+      event: wheelViewportEvent,
+      rect: {
+        height: 100,
+        left: 20,
+        top: 30,
+        width: 200,
+      },
+      setViewport: setWheelViewport,
+    }
+    CanvasAppFacade.runCanvasWheelViewport(wheelViewportRunInput)
 
     expect(CanvasApp).toBeTypeOf('function')
     expect('useCanvasAppModel' in CanvasPackage).toBe(false)
@@ -3270,6 +3308,13 @@ describe('Canvas package consumer imports', () => {
     expect(CanvasAppFacade.fitCanvasViewportToBounds)
       .toBe(fitCanvasViewportToBounds)
     expect(CanvasAppFacade.zoomCanvasViewport).toBe(zoomCanvasViewport)
+    expect(CanvasPackage.runCanvasWheelViewport).toBe(runCanvasWheelViewport)
+    expect(CanvasAppFacade.runCanvasWheelViewport).toBe(runCanvasWheelViewport)
+    expect(wheelViewportPreventDefaultCount).toBe(1)
+    expect(wheelViewportState).toEqual({ scale: 1, x: -10, y: -20 })
+    expect(wheelViewportUpdates).toEqual([
+      { scale: 1, x: -10, y: -20 },
+    ])
     expect(pointerTransformModifierState).toEqual({
       constrainAngle: true,
       preserveAspectRatio: true,

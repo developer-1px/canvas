@@ -117,6 +117,7 @@ export {
   releaseCanvasPointerCapture,
   recordCanvasItemPointerClick,
   resetCanvasViewport,
+  runCanvasWheelViewport,
   scheduleCanvasAnimationFrameTask,
   scheduleCanvasTimeoutTask,
   useCanvasModalFocusLifecycle,
@@ -310,7 +311,10 @@ export {
   type CanvasTextMeasurementSize,
   type CanvasTextMeasurementStyle,
   type CanvasViewportSetter,
+  type CanvasWheelViewportEvent,
+  type CanvasWheelViewportSetter,
   type CreateCanvasAppStageElementInput,
+  type RunCanvasWheelViewportArgs,
 } from './app'
 export {
   assertCanvasAppExtensionId,
