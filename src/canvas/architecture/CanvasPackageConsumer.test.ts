@@ -51,6 +51,12 @@ import {
   getCanvasAppFeaturePackMarketplaceActionAssemblyInput,
   centerCanvasViewportAtWorldPoint,
   createCanvasAppStageElement,
+  createCanvasClipboardCommandEffectPlan,
+  cloneCanvasClipboardItems,
+  copyCanvasClipboardSelection,
+  cutCanvasClipboardSelection,
+  duplicateCanvasClipboardSelection,
+  pasteCanvasClipboardSelection,
   createCanvasDraftStroke,
   createCanvasLaserTrailOverlay,
   createCanvasExternalClipboardImagePasteActionResolver,
@@ -85,6 +91,8 @@ import {
   scheduleCanvasAnimationFrameTask,
   writeCanvasClipboardText,
   writeCanvasRichClipboardPayload,
+  applyCanvasClipboardCommandEffect,
+  executeCanvasClipboardCommand,
   previewCanvasPointerLaserInteraction,
   previewCanvasPointerPanInteraction,
   resetCanvasViewport,
@@ -292,6 +300,13 @@ import {
   type CanvasAppStageAdapter,
   type CanvasAppStageMount,
   type CanvasControlTargetInput,
+  type CanvasClipboardCommand,
+  type CanvasClipboardCommandEffect,
+  type CanvasClipboardCommandEffectContext,
+  type CanvasClipboardCommandEffectPlanContext,
+  type CanvasClipboardCommandExecutionContext,
+  type CanvasClipboardCommandExecutionResult,
+  type CanvasClipboardEditingUpdate,
   type CanvasAppItemsChange,
   type CanvasAppItemsChangeTransformContext,
   type CanvasAppItemsChangeTransformer,
@@ -338,6 +353,7 @@ import {
   type CreateCanvasAppStageElementInput,
   type CanvasEditableTextItem,
   type CanvasItem,
+  type RunCanvasClipboardCommand,
 } from '@interactive-os/canvas'
 import * as CanvasFoundation from '@interactive-os/canvas/foundation'
 import {
@@ -368,6 +384,7 @@ import {
 import {
   assertCanvasAffordanceConfig as assertCanvasAffordanceConfigFromEngine,
   createCanvasAffordanceConfig,
+  type CanvasCommandAdapter,
 } from '@interactive-os/canvas/engine'
 import type { CanvasItem as CanvasEntityItem } from '@interactive-os/canvas/entities'
 import {
@@ -3428,6 +3445,164 @@ describe('Canvas package consumer imports', () => {
       clipboard: null,
       hasInternalClipboard: false,
     })).toBe('none')
+    const clipboardRect: CanvasItem = {
+      fill: '#fff',
+      h: 80,
+      id: 'clipboard-rect-1',
+      stroke: '#111',
+      type: 'rect',
+      w: 120,
+      x: 10,
+      y: 20,
+    }
+    const clipboardCommandAdapter: CanvasCommandAdapter<CanvasItem> = {
+      alignSelection: ({ items }) => items,
+      cloneSelection: ({ ids, items }) =>
+        items.filter((item) => ids.includes(item.id)),
+      deleteSelection: ({ items, selection }) =>
+        items.filter((item) => !selection.includes(item.id)),
+      distributeSelection: ({ items }) => items,
+      groupSelection: ({ items, selection }) => ({ items, selection }),
+      lockSelection: ({ items, selection }) => ({ items, selection }),
+      nudgeSelection: ({ items }) => items,
+      pasteItems: ({ clipboard }) => clipboard,
+      reorderSelection: ({ items }) => items,
+      selectAll: ({ items }) => items.map((item) => item.id),
+      ungroupSelection: ({ items, selection }) => ({ items, selection }),
+      unlockAll: ({ items, selection }) => ({ items, selection }),
+    }
+    const clipboardStageElement: CanvasAppStageElement = {
+      addWheelListener: () => () => undefined,
+      capturePointer: () => undefined,
+      getRect: () => null,
+      getScreenPoint: () => ({ x: 0, y: 0 }),
+      getViewportCenter: () => ({ x: 0, y: 0 }),
+      releasePointer: () => undefined,
+    }
+    const clipboardPlanContext: CanvasClipboardCommandEffectPlanContext = {
+      commandAdapter: clipboardCommandAdapter,
+      config: createCanvasAffordanceConfig(),
+      createId: (prefix) => `${prefix}-consumer`,
+      getClipboardItems: () => [],
+      items: [clipboardRect],
+      selection: [clipboardRect.id],
+      stageElement: clipboardStageElement,
+      viewport: { scale: 1, x: 0, y: 0 },
+    }
+    const clipboardCommand: CanvasClipboardCommand = {
+      kind: 'copy',
+      pasteIndex: 2,
+    }
+    const clipboardEffect =
+      createCanvasClipboardCommandEffectPlan({
+        command: clipboardCommand,
+        context: clipboardPlanContext,
+      })
+
+    if (!clipboardEffect) {
+      throw new Error('Expected clipboard copy command effect')
+    }
+
+    const publicClipboardEffect: CanvasClipboardCommandEffect =
+      clipboardEffect
+    const copiedSelections: string[][] = []
+    const clipboardEffectContext: CanvasClipboardCommandEffectContext = {
+      commitItemsChange: () => true,
+      commitSelection: () => true,
+      copyItemsToClipboard: (selection) => {
+        copiedSelections.push(selection)
+
+        return true
+      },
+      selection: [clipboardRect.id],
+      setClipboardItems: () => undefined,
+      setEditing: (editing: CanvasClipboardEditingUpdate) => {
+        if (editing === null) {
+          return
+        }
+      },
+    }
+    const clipboardApplyResult: CanvasClipboardCommandExecutionResult =
+      applyCanvasClipboardCommandEffect({
+        context: clipboardEffectContext,
+        effect: publicClipboardEffect,
+      })
+    const clipboardExecutionContext: CanvasClipboardCommandExecutionContext = {
+      ...clipboardPlanContext,
+      ...clipboardEffectContext,
+    }
+    const clipboardExecutionResult: CanvasClipboardCommandExecutionResult =
+      executeCanvasClipboardCommand({
+        command: { kind: 'copy', pasteIndex: 3 },
+        context: clipboardExecutionContext,
+      })
+    const clipboardCommands: CanvasClipboardCommand[] = []
+    const runClipboardCommand: RunCanvasClipboardCommand = (command) => {
+      clipboardCommands.push(command)
+
+      return []
+    }
+
+    expect(publicClipboardEffect).toEqual({ kind: 'copy-selection' })
+    expect(clipboardApplyResult).toEqual({
+      clonedItems: [],
+      executed: true,
+      nextPasteIndex: 0,
+    })
+    expect(clipboardExecutionResult).toEqual(clipboardApplyResult)
+    expect(CanvasAppFacade.createCanvasClipboardCommandEffectPlan)
+      .toBe(createCanvasClipboardCommandEffectPlan)
+    expect(CanvasAppFacade.applyCanvasClipboardCommandEffect)
+      .toBe(applyCanvasClipboardCommandEffect)
+    expect(CanvasAppFacade.executeCanvasClipboardCommand)
+      .toBe(executeCanvasClipboardCommand)
+    expect(cloneCanvasClipboardItems({
+      ids: [clipboardRect.id],
+      offset: { x: 1, y: 2 },
+      runClipboardCommand,
+    })).toEqual([])
+    copyCanvasClipboardSelection({
+      pasteIndex: 4,
+      runClipboardCommand,
+    })
+    cutCanvasClipboardSelection({
+      pasteIndex: 5,
+      runClipboardCommand,
+    })
+    duplicateCanvasClipboardSelection({
+      offset: { x: 6, y: 7 },
+      runClipboardCommand,
+      selection: [clipboardRect.id],
+    })
+    pasteCanvasClipboardSelection({
+      pasteIndex: 6,
+      runClipboardCommand,
+    })
+    expect(clipboardCommands).toEqual([
+      { ids: [clipboardRect.id], kind: 'clone', offset: { x: 1, y: 2 } },
+      { kind: 'copy', pasteIndex: 4 },
+      { kind: 'cut', pasteIndex: 5 },
+      {
+        kind: 'duplicate',
+        offset: { x: 6, y: 7 },
+        sourceIds: [clipboardRect.id],
+      },
+      { kind: 'paste', pasteIndex: 6 },
+    ])
+    expect(copiedSelections).toEqual([
+      [clipboardRect.id],
+      [clipboardRect.id],
+    ])
+    expect(CanvasAppFacade.cloneCanvasClipboardItems)
+      .toBe(cloneCanvasClipboardItems)
+    expect(CanvasAppFacade.copyCanvasClipboardSelection)
+      .toBe(copyCanvasClipboardSelection)
+    expect(CanvasAppFacade.cutCanvasClipboardSelection)
+      .toBe(cutCanvasClipboardSelection)
+    expect(CanvasAppFacade.duplicateCanvasClipboardSelection)
+      .toBe(duplicateCanvasClipboardSelection)
+    expect(CanvasAppFacade.pasteCanvasClipboardSelection)
+      .toBe(pasteCanvasClipboardSelection)
     expect(setCanvasDataTransferText({
       dataTransfer: null,
       text: 'smoke',

@@ -268,6 +268,34 @@ export {
   type CanvasPastePositionMemory,
   type CanvasPastePositionSession,
 } from './affordances/commands/CanvasPastePosition'
+export type {
+  CanvasClipboardCommand,
+} from './affordances/commands/CanvasClipboardCommandContracts'
+export {
+  cloneCanvasClipboardItems,
+  copyCanvasClipboardSelection,
+  cutCanvasClipboardSelection,
+  duplicateCanvasClipboardSelection,
+  pasteCanvasClipboardSelection,
+  type RunCanvasClipboardCommand,
+} from './affordances/commands/CanvasClipboardCommandHandlers'
+export {
+  createCanvasClipboardCommandEffectPlan,
+  type CanvasClipboardCommandEffectPlanContext,
+} from './affordances/commands/CanvasClipboardCommandEffectPlan'
+export {
+  applyCanvasClipboardCommandEffect,
+} from './affordances/commands/CanvasClipboardCommandEffects'
+export type {
+  CanvasClipboardCommandEffect,
+  CanvasClipboardCommandEffectContext,
+  CanvasClipboardCommandExecutionResult,
+  CanvasClipboardEditingUpdate,
+} from './affordances/commands/CanvasClipboardCommandEffectContracts'
+export {
+  executeCanvasClipboardCommand,
+  type CanvasClipboardCommandExecutionContext,
+} from './affordances/commands/CanvasClipboardCommandExecution'
 export {
   createCanvasDataTransferImportActionPlan,
   type CanvasDataTransferImportActionPlanInput,
