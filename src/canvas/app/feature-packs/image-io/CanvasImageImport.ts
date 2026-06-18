@@ -313,7 +313,7 @@ export function getCanvasHTMLDataImageSourcesFromDataTransfer(
     return []
   }
 
-  return getCanvasHTMLDataImageSources(
+  return getCanvasHTMLDataImageSourcesFromHTML(
     dataTransfer.getData(CANVAS_IMAGE_SOURCE_HTML_MIME_TYPE),
   )
 }
@@ -509,7 +509,9 @@ async function readCanvasBlobAsDataUrlWithoutFileReader(blob: Blob) {
   }`
 }
 
-function getCanvasDataImageSourceFromHTML(value: string) {
+export function getCanvasDataImageSourceFromHTML(
+  value: string,
+): CanvasImageImportSource | null {
   const image = getCanvasHTMLImageSource(value)
 
   if (!image || isCanvasSVGDataUrl(image.src)) {
@@ -523,7 +525,9 @@ function getCanvasDataImageSourceFromHTML(value: string) {
   )
 }
 
-function getCanvasHTMLDataImageSources(value: string) {
+export function getCanvasHTMLDataImageSourcesFromHTML(
+  value: string,
+): readonly CanvasImageImportSource[] {
   const seenDataUrls = new Set<string>()
   const sources: CanvasImageImportSource[] = []
 
@@ -570,7 +574,9 @@ function getCanvasDataImageSourceFromDataUrl(
   }
 }
 
-function getCanvasSVGImageSourceFromHTML(value: string) {
+export function getCanvasSVGImageSourceFromHTML(
+  value: string,
+): CanvasImageImportSource | null {
   const image = getCanvasHTMLImageSource(value, { svgOnly: true })
 
   if (image) {

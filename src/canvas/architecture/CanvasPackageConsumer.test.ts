@@ -4188,10 +4188,12 @@ describe('Canvas package consumer imports', () => {
         itemCount: 2,
         key: 'ArrowDown',
       }
+    const appFacadeHtmlImageSourceHTML =
+      '<figure><img alt="One" src="data:image/webp;base64,aW1hZ2U="></figure>'
     const appFacadeHtmlImageDataTransfer = {
       getData: (type: string) =>
         type === 'text/html'
-          ? '<figure><img alt="One" src="data:image/webp;base64,aW1hZ2U="></figure>'
+          ? appFacadeHtmlImageSourceHTML
           : '',
     } as unknown as DataTransfer
     const appFacadeStageElement = {
@@ -4770,6 +4772,33 @@ describe('Canvas package consumer imports', () => {
     expect(CanvasAppFacade.getCanvasImageFilesFromDataTransfer(null)).toEqual(
       [],
     )
+    expect(CanvasAppFacade.getCanvasDataImageSourceFromHTML(
+      appFacadeHtmlImageSourceHTML,
+    )).toEqual({
+      dataUrl: 'data:image/webp;base64,aW1hZ2U=',
+      format: 'data-url-html-img',
+      mimeType: 'image/webp',
+      name: 'One.webp',
+    })
+    expect(CanvasPackage.getCanvasHTMLDataImageSourcesFromHTML(
+      appFacadeHtmlImageSourceHTML,
+    )).toEqual([{
+      dataUrl: 'data:image/webp;base64,aW1hZ2U=',
+      format: 'data-url-html-img',
+      mimeType: 'image/webp',
+      name: 'One.webp',
+    }])
+    expect(CanvasPackage.getCanvasSVGImageSourceFromHTML(
+      `<img alt="Icon" src="data:image/svg+xml,${
+        encodeURIComponent('<svg width="32" height="24"></svg>')
+      }">`,
+    )).toMatchObject({
+      format: 'svg-html-img',
+      mimeType: 'image/svg+xml',
+      name: 'Icon.svg',
+      naturalHeight: 24,
+      naturalWidth: 32,
+    })
     expect(
       CanvasAppFacade.getCanvasHTMLDataImageSourcesFromDataTransfer(
         appFacadeHtmlImageDataTransfer,

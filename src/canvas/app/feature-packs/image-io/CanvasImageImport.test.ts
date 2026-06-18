@@ -4,13 +4,16 @@ import {
   CANVAS_IMAGE_IMPORT_MODEL,
   CANVAS_IMAGE_SOURCE_IMPORT_SUPPORTED_FORMATS,
   createCanvasImportedImageItem,
+  getCanvasDataImageSourceFromHTML,
   getCanvasImportedImageSize,
   getCanvasDataImageSourceFromDataTransfer,
+  getCanvasHTMLDataImageSourcesFromHTML,
   getCanvasHTMLDataImageSourcesFromDataTransfer,
   getCanvasImageFileFromDataTransfer,
   getCanvasImageFilesFromDataTransfer,
   getCanvasImageFilesFromList,
   getCanvasImageSourceFromDataTransfer,
+  getCanvasSVGImageSourceFromHTML,
   getCanvasSVGImageSourceFromDataTransfer,
   readCanvasImageFileSources,
   routeCanvasImagePasteReplace,
@@ -248,8 +251,19 @@ describe('CanvasImageImport', () => {
   })
 
   it('reads inline HTML SVG and SVG data image clipboard sources', () => {
+    const inlineSVGHTML =
+      '<section><svg viewBox="0 0 90 60"><circle cx="30" cy="30" r="20"/></svg></section>'
+    const svgDataImageHTML =
+      `<img alt="Icon" src="data:image/svg+xml,${encodeURIComponent('<svg width="32" height="24"></svg>')}">`
+
+    expect(getCanvasSVGImageSourceFromHTML(inlineSVGHTML)).toMatchObject({
+      format: 'svg-html-inline',
+      mimeType: 'image/svg+xml',
+      naturalHeight: 60,
+      naturalWidth: 90,
+    })
     expect(getCanvasSVGImageSourceFromDataTransfer(createDataTransfer({
-      'text/html': '<section><svg viewBox="0 0 90 60"><circle cx="30" cy="30" r="20"/></svg></section>',
+      'text/html': inlineSVGHTML,
     }))).toMatchObject({
       format: 'svg-html-inline',
       mimeType: 'image/svg+xml',
@@ -257,8 +271,15 @@ describe('CanvasImageImport', () => {
       naturalWidth: 90,
     })
 
+    expect(getCanvasSVGImageSourceFromHTML(svgDataImageHTML)).toMatchObject({
+      format: 'svg-html-img',
+      mimeType: 'image/svg+xml',
+      name: 'Icon.svg',
+      naturalHeight: 24,
+      naturalWidth: 32,
+    })
     expect(getCanvasSVGImageSourceFromDataTransfer(createDataTransfer({
-      'text/html': `<img alt="Icon" src="data:image/svg+xml,${encodeURIComponent('<svg width="32" height="24"></svg>')}">`,
+      'text/html': svgDataImageHTML,
     }))).toMatchObject({
       format: 'svg-html-img',
       mimeType: 'image/svg+xml',
@@ -269,14 +290,17 @@ describe('CanvasImageImport', () => {
   })
 
   it('reads HTML and plain data URL images without claiming SVG images', () => {
-    expect(getCanvasDataImageSourceFromDataTransfer(createDataTransfer({
-      'text/html': '<figure><img alt="Copied Chart" src="data:image/png;base64,aW1hZ2U="></figure>',
-    }))).toEqual({
+    const html = '<figure><img alt="Copied Chart" src="data:image/png;base64,aW1hZ2U="></figure>'
+
+    expect(getCanvasDataImageSourceFromHTML(html)).toEqual({
       dataUrl: 'data:image/png;base64,aW1hZ2U=',
       format: 'data-url-html-img',
       mimeType: 'image/png',
       name: 'Copied Chart.png',
     })
+    expect(getCanvasDataImageSourceFromDataTransfer(createDataTransfer({
+      'text/html': html,
+    }))).toEqual(getCanvasDataImageSourceFromHTML(html))
 
     expect(getCanvasDataImageSourceFromDataTransfer(createDataTransfer({
       'text/plain': 'data:image/jpg;base64,aW1hZ2U=',
@@ -298,20 +322,17 @@ describe('CanvasImageImport', () => {
         '<svg width="16" height="12" onload="alert(1)"><script>alert(1)</script><rect width="16" height="12"/></svg>',
       )
     }`
-    const sources = getCanvasHTMLDataImageSourcesFromDataTransfer(
-      createDataTransfer({
-        'text/html': [
-          '<section>',
-          '<img alt="Copied Chart" src="data:image/png;base64,aW1hZ2Ux">',
-          `<img title="Icon" src="${svgDataUrl}">`,
-          '<img alt="Duplicate" src="data:image/png;base64,aW1hZ2Ux">',
-          '<img src="data:text/plain,hello">',
-          '<img src="https://example.com/image.png">',
-          '<img title="Photo.jpeg" src="data:image/jpg;base64,aW1hZ2Uy">',
-          '</section>',
-        ].join(''),
-      }),
-    )
+    const html = [
+      '<section>',
+      '<img alt="Copied Chart" src="data:image/png;base64,aW1hZ2Ux">',
+      `<img title="Icon" src="${svgDataUrl}">`,
+      '<img alt="Duplicate" src="data:image/png;base64,aW1hZ2Ux">',
+      '<img src="data:text/plain,hello">',
+      '<img src="https://example.com/image.png">',
+      '<img title="Photo.jpeg" src="data:image/jpg;base64,aW1hZ2Uy">',
+      '</section>',
+    ].join('')
+    const sources = getCanvasHTMLDataImageSourcesFromHTML(html)
     const decodedSvg = decodeURIComponent(sources[1]?.dataUrl.split(',')[1] ?? '')
 
     expect(sources).toMatchObject([
@@ -338,25 +359,34 @@ describe('CanvasImageImport', () => {
     expect(sources).toHaveLength(3)
     expect(decodedSvg).not.toContain('<script')
     expect(decodedSvg).not.toContain('onload=')
+    expect(getCanvasHTMLDataImageSourcesFromDataTransfer(createDataTransfer({
+      'text/html': html,
+    }))).toEqual(sources)
   })
 
   it('returns one HTML data image source for a single image fixture', () => {
-    expect(getCanvasHTMLDataImageSourcesFromDataTransfer(createDataTransfer({
-      'text/html': '<figure><img alt="One" src="data:image/webp;base64,aW1hZ2U="></figure>',
-    }))).toEqual([{
+    const html = '<figure><img alt="One" src="data:image/webp;base64,aW1hZ2U="></figure>'
+
+    expect(getCanvasHTMLDataImageSourcesFromHTML(html)).toEqual([{
       dataUrl: 'data:image/webp;base64,aW1hZ2U=',
       format: 'data-url-html-img',
       mimeType: 'image/webp',
       name: 'One.webp',
     }])
+    expect(getCanvasHTMLDataImageSourcesFromDataTransfer(createDataTransfer({
+      'text/html': html,
+    }))).toEqual(getCanvasHTMLDataImageSourcesFromHTML(html))
   })
 
   it('ignores HTML data URLs that are not image sources', () => {
+    const html = [
+      '<img src="data:text/plain,hello">',
+      '<img src="https://example.com/image.png">',
+    ].join('')
+
+    expect(getCanvasHTMLDataImageSourcesFromHTML(html)).toEqual([])
     expect(getCanvasHTMLDataImageSourcesFromDataTransfer(createDataTransfer({
-      'text/html': [
-        '<img src="data:text/plain,hello">',
-        '<img src="https://example.com/image.png">',
-      ].join(''),
+      'text/html': html,
     }))).toEqual([])
   })
 
@@ -479,6 +509,10 @@ describe('CanvasImageImport', () => {
       status: 'fallback',
     })
     expect(Object.isFrozen(route)).toBe(true)
+    expect(route.kind).toBe('image-insert')
+    if (route.kind !== 'image-insert') {
+      throw new Error('Expected image insert fallback route')
+    }
     expect(Object.isFrozen(route.sources)).toBe(true)
   })
 
