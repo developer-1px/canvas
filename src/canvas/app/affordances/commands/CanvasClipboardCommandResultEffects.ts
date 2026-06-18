@@ -1,11 +1,14 @@
+import type { CanvasCommandItem } from '../../../engine'
 import type { CanvasItem } from '../../../entities'
 import type {
   CanvasClipboardCommandEffect,
 } from './CanvasClipboardCommandEffectContracts'
 
-export type CanvasClipboardDuplicateResult = {
-  clones: CanvasItem[]
-  items: CanvasItem[]
+export type CanvasClipboardDuplicateResult<
+  TItem extends CanvasCommandItem = CanvasItem,
+> = {
+  clones: TItem[]
+  items: TItem[]
   selection: string[]
 }
 
@@ -14,31 +17,36 @@ export type CanvasClipboardDeleteResult = {
   selection: string[]
 }
 
-export function createCanvasClipboardCopySelectionEffect():
-  CanvasClipboardCommandEffect {
+export function createCanvasClipboardCopySelectionEffect<
+  TItem extends CanvasCommandItem = CanvasItem,
+>(): CanvasClipboardCommandEffect<TItem> {
   return {
     kind: 'copy-selection',
   }
 }
 
-export function createCanvasClipboardCloneResultEffect({
+export function createCanvasClipboardCloneResultEffect<
+  TItem extends CanvasCommandItem = CanvasItem,
+>({
   clonedItems,
 }: {
-  clonedItems: CanvasItem[]
-}): CanvasClipboardCommandEffect {
+  clonedItems: TItem[]
+}): CanvasClipboardCommandEffect<TItem> {
   return {
     clonedItems,
     kind: 'clone-result',
   }
 }
 
-export function createCanvasClipboardDuplicateResultEffect({
+export function createCanvasClipboardDuplicateResultEffect<
+  TItem extends CanvasCommandItem = CanvasItem,
+>({
   beforeItems,
   result,
 }: {
-  beforeItems: CanvasItem[]
-  result: CanvasClipboardDuplicateResult
-}): CanvasClipboardCommandEffect {
+  beforeItems: TItem[]
+  result: CanvasClipboardDuplicateResult<TItem>
+}): CanvasClipboardCommandEffect<TItem> {
   return {
     afterItems: result.items,
     afterSelection: result.selection,
@@ -48,13 +56,15 @@ export function createCanvasClipboardDuplicateResultEffect({
   }
 }
 
-export function createCanvasClipboardPasteResultEffect({
+export function createCanvasClipboardPasteResultEffect<
+  TItem extends CanvasCommandItem = CanvasItem,
+>({
   items,
   pasteIndex,
 }: {
-  items: CanvasItem[]
+  items: TItem[]
   pasteIndex: number
-}): CanvasClipboardCommandEffect {
+}): CanvasClipboardCommandEffect<TItem> {
   return createCanvasClipboardAddItemsResultEffect({
     afterSelection: items.map((item) => item.id),
     items,
@@ -63,13 +73,15 @@ export function createCanvasClipboardPasteResultEffect({
   })
 }
 
-export function createCanvasClipboardCutSelectionResultEffect({
+export function createCanvasClipboardCutSelectionResultEffect<
+  TItem extends CanvasCommandItem = CanvasItem,
+>({
   copyBeforeDelete,
   deletion,
 }: {
   copyBeforeDelete: boolean
   deletion: CanvasClipboardDeleteResult
-}): CanvasClipboardCommandEffect {
+}): CanvasClipboardCommandEffect<TItem> {
   return {
     clearEditingIds: deletion.clearEditingIds,
     copyBeforeDelete,
@@ -78,29 +90,33 @@ export function createCanvasClipboardCutSelectionResultEffect({
   }
 }
 
-export function createCanvasClipboardCutCopyOnlyResultEffect({
+export function createCanvasClipboardCutCopyOnlyResultEffect<
+  TItem extends CanvasCommandItem = CanvasItem,
+>({
   copyBeforeDelete,
 }: {
   copyBeforeDelete: boolean
-}): CanvasClipboardCommandEffect {
+}): CanvasClipboardCommandEffect<TItem> {
   return {
     copyBeforeDelete,
     kind: 'cut-copy-only',
   }
 }
 
-function createCanvasClipboardAddItemsResultEffect({
+function createCanvasClipboardAddItemsResultEffect<
+  TItem extends CanvasCommandItem = CanvasItem,
+>({
   afterSelection,
   items,
   nextPasteIndex,
   updateClipboardItems,
 }: {
   afterSelection: string[]
-  items: CanvasItem[]
+  items: TItem[]
   nextPasteIndex?: number
-  updateClipboardItems?: CanvasItem[]
-}): CanvasClipboardCommandEffect {
-  const effect: CanvasClipboardCommandEffect = {
+  updateClipboardItems?: TItem[]
+}): CanvasClipboardCommandEffect<TItem> {
+  const effect: CanvasClipboardCommandEffect<TItem> = {
     afterSelection,
     items,
     kind: 'add-items',

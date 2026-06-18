@@ -1,4 +1,8 @@
 import type {
+  CanvasCommandItem,
+} from '../../../engine'
+import type { CanvasItem } from '../../../entities'
+import type {
   CanvasClipboardCommandEffect,
   CanvasClipboardCommandEffectContext,
   CanvasClipboardCommandExecutionResult,
@@ -12,20 +16,21 @@ export const EMPTY_CLIPBOARD_COMMAND_RESULT:
 
 type CanvasClipboardCommandEffectApplier<
   TKind extends CanvasClipboardCommandEffect['kind'],
-> = (args: {
-  context: CanvasClipboardCommandEffectContext
-  effect: Extract<CanvasClipboardCommandEffect, { kind: TKind }>
-}) => CanvasClipboardCommandExecutionResult
+> = <TItem extends CanvasCommandItem = CanvasItem>(args: {
+  context: CanvasClipboardCommandEffectContext<TItem>
+  effect: Extract<CanvasClipboardCommandEffect<TItem>, { kind: TKind }>
+}) => CanvasClipboardCommandExecutionResult<TItem>
 
 type CanvasClipboardCommandEffectAppliers = {
   [TKind in CanvasClipboardCommandEffect['kind']]:
     CanvasClipboardCommandEffectApplier<TKind>
 }
 
-type CanvasClipboardCommandAnyEffectApplier = (args: {
-  context: CanvasClipboardCommandEffectContext
-  effect: CanvasClipboardCommandEffect
-}) => CanvasClipboardCommandExecutionResult
+type CanvasClipboardCommandAnyEffectApplier =
+  <TItem extends CanvasCommandItem = CanvasItem>(args: {
+  context: CanvasClipboardCommandEffectContext<TItem>
+  effect: CanvasClipboardCommandEffect<TItem>
+}) => CanvasClipboardCommandExecutionResult<TItem>
 
 const CANVAS_CLIPBOARD_COMMAND_EFFECT_APPLIERS = Object.freeze({
   'add-items': ({ context, effect }) =>
@@ -44,25 +49,29 @@ const CANVAS_CLIPBOARD_COMMAND_EFFECT_APPLIERS = Object.freeze({
     applyCanvasClipboardTransformItemsEffect({ context, effect }),
 } satisfies CanvasClipboardCommandEffectAppliers)
 
-export function applyCanvasClipboardCommandEffect({
+export function applyCanvasClipboardCommandEffect<
+  TItem extends CanvasCommandItem = CanvasItem,
+>({
   context,
   effect,
 }: {
-  context: CanvasClipboardCommandEffectContext
-  effect: CanvasClipboardCommandEffect
-}): CanvasClipboardCommandExecutionResult {
+  context: CanvasClipboardCommandEffectContext<TItem>
+  effect: CanvasClipboardCommandEffect<TItem>
+}): CanvasClipboardCommandExecutionResult<TItem> {
   const applier = CANVAS_CLIPBOARD_COMMAND_EFFECT_APPLIERS[
     effect.kind
   ] as CanvasClipboardCommandAnyEffectApplier
 
-  return applier({ context, effect })
+  return applier<TItem>({ context, effect })
 }
 
-function applyCanvasClipboardCopySelectionEffect(
-  context: CanvasClipboardCommandEffectContext,
-): CanvasClipboardCommandExecutionResult {
+function applyCanvasClipboardCopySelectionEffect<
+  TItem extends CanvasCommandItem = CanvasItem,
+>(
+  context: CanvasClipboardCommandEffectContext<TItem>,
+): CanvasClipboardCommandExecutionResult<TItem> {
   if (!context.copyItemsToClipboard(context.selection)) {
-    return EMPTY_CLIPBOARD_COMMAND_RESULT
+    return createEmptyCanvasClipboardCommandResult()
   }
 
   return {
@@ -72,13 +81,15 @@ function applyCanvasClipboardCopySelectionEffect(
   }
 }
 
-function applyCanvasClipboardAddItemsEffect({
+function applyCanvasClipboardAddItemsEffect<
+  TItem extends CanvasCommandItem = CanvasItem,
+>({
   context,
   effect,
 }: {
-  context: CanvasClipboardCommandEffectContext
-  effect: Extract<CanvasClipboardCommandEffect, { kind: 'add-items' }>
-}): CanvasClipboardCommandExecutionResult {
+  context: CanvasClipboardCommandEffectContext<TItem>
+  effect: Extract<CanvasClipboardCommandEffect<TItem>, { kind: 'add-items' }>
+}): CanvasClipboardCommandExecutionResult<TItem> {
   const didCommit = context.commitItemsChange(
     { type: 'add', items: effect.items },
     {
@@ -88,7 +99,7 @@ function applyCanvasClipboardAddItemsEffect({
   )
 
   if (!didCommit) {
-    return EMPTY_CLIPBOARD_COMMAND_RESULT
+    return createEmptyCanvasClipboardCommandResult()
   }
 
   if (effect.updateClipboardItems) {
@@ -102,13 +113,18 @@ function applyCanvasClipboardAddItemsEffect({
   }
 }
 
-function applyCanvasClipboardTransformItemsEffect({
+function applyCanvasClipboardTransformItemsEffect<
+  TItem extends CanvasCommandItem = CanvasItem,
+>({
   context,
   effect,
 }: {
-  context: CanvasClipboardCommandEffectContext
-  effect: Extract<CanvasClipboardCommandEffect, { kind: 'transform-items' }>
-}): CanvasClipboardCommandExecutionResult {
+  context: CanvasClipboardCommandEffectContext<TItem>
+  effect: Extract<
+    CanvasClipboardCommandEffect<TItem>,
+    { kind: 'transform-items' }
+  >
+}): CanvasClipboardCommandExecutionResult<TItem> {
   const didCommit = context.commitItemsChange(
     {
       afterItems: effect.afterItems,
@@ -126,16 +142,21 @@ function applyCanvasClipboardTransformItemsEffect({
         clonedItems: effect.clonedItems,
         executed: true,
       }
-    : EMPTY_CLIPBOARD_COMMAND_RESULT
+    : createEmptyCanvasClipboardCommandResult()
 }
 
-function applyCanvasClipboardCutSelectionEffect({
+function applyCanvasClipboardCutSelectionEffect<
+  TItem extends CanvasCommandItem = CanvasItem,
+>({
   context,
   effect,
 }: {
-  context: CanvasClipboardCommandEffectContext
-  effect: Extract<CanvasClipboardCommandEffect, { kind: 'cut-selection' }>
-}): CanvasClipboardCommandExecutionResult {
+  context: CanvasClipboardCommandEffectContext<TItem>
+  effect: Extract<
+    CanvasClipboardCommandEffect<TItem>,
+    { kind: 'cut-selection' }
+  >
+}): CanvasClipboardCommandExecutionResult<TItem> {
   const copied = copyCanvasClipboardSelectionForCut({ context, effect })
   const didCommit = context.commitItemsChange(
     { type: 'remove-selection', selection: context.selection },
@@ -162,17 +183,22 @@ function applyCanvasClipboardCutSelectionEffect({
   }
 }
 
-function applyCanvasClipboardCutCopyOnlyEffect({
+function applyCanvasClipboardCutCopyOnlyEffect<
+  TItem extends CanvasCommandItem = CanvasItem,
+>({
   context,
   effect,
 }: {
-  context: CanvasClipboardCommandEffectContext
-  effect: Extract<CanvasClipboardCommandEffect, { kind: 'cut-copy-only' }>
-}): CanvasClipboardCommandExecutionResult {
+  context: CanvasClipboardCommandEffectContext<TItem>
+  effect: Extract<
+    CanvasClipboardCommandEffect<TItem>,
+    { kind: 'cut-copy-only' }
+  >
+}): CanvasClipboardCommandExecutionResult<TItem> {
   const copied = copyCanvasClipboardSelectionForCut({ context, effect })
 
   return copied.nextPasteIndex === undefined
-    ? EMPTY_CLIPBOARD_COMMAND_RESULT
+    ? createEmptyCanvasClipboardCommandResult()
     : {
         clonedItems: [],
         executed: true,
@@ -180,15 +206,26 @@ function applyCanvasClipboardCutCopyOnlyEffect({
       }
 }
 
-function copyCanvasClipboardSelectionForCut({
+function copyCanvasClipboardSelectionForCut<
+  TItem extends CanvasCommandItem = CanvasItem,
+>({
   context,
   effect,
 }: {
-  context: CanvasClipboardCommandEffectContext
+  context: CanvasClipboardCommandEffectContext<TItem>
   effect: { copyBeforeDelete: boolean }
 }): { nextPasteIndex?: number } {
   return effect.copyBeforeDelete &&
     context.copyItemsToClipboard(context.selection)
     ? { nextPasteIndex: 0 }
     : {}
+}
+
+function createEmptyCanvasClipboardCommandResult<
+  TItem extends CanvasCommandItem = CanvasItem,
+>(): CanvasClipboardCommandExecutionResult<TItem> {
+  return {
+    clonedItems: [],
+    executed: false,
+  }
 }

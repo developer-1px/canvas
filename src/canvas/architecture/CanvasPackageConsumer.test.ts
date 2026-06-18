@@ -316,6 +316,7 @@ import {
   type CanvasClipboardCommandExecutionContext,
   type CanvasClipboardCommandExecutionResult,
   type CanvasClipboardEditingUpdate,
+  type CanvasClipboardItemsChange,
   type CanvasAppItemsChange,
   type CanvasAppItemsChangeTransformContext,
   type CanvasAppItemsChangeTransformer,
@@ -3640,6 +3641,96 @@ describe('Canvas package consumer imports', () => {
         command: { kind: 'copy', pasteIndex: 3 },
         context: clipboardExecutionContext,
       })
+    type HostClipboardItem = {
+      id: string
+      kind: 'ppt-shape'
+      slideId: string
+      x: number
+      y: number
+    }
+    const hostClipboardItem: HostClipboardItem = {
+      id: 'ppt-shape-1',
+      kind: 'ppt-shape',
+      slideId: 'slide-1',
+      x: 0,
+      y: 0,
+    }
+    const hostClipboardClone: HostClipboardItem = {
+      ...hostClipboardItem,
+      id: 'ppt-shape-copy',
+      x: 28,
+      y: 28,
+    }
+    const hostClipboardCommandAdapter: CanvasCommandAdapter<HostClipboardItem> =
+      {
+        alignSelection: ({ items }) => items,
+        cloneSelection: () => [hostClipboardClone],
+        deleteSelection: ({ items, selection }) =>
+          items.filter((item) => !selection.includes(item.id)),
+        distributeSelection: ({ items }) => items,
+        groupSelection: ({ items, selection }) => ({ items, selection }),
+        lockSelection: ({ items, selection }) => ({ items, selection }),
+        nudgeSelection: ({ items }) => items,
+        pasteItems: ({ clipboard }) => clipboard,
+        reorderSelection: ({ items }) => items,
+        selectAll: ({ items }) => items.map((item) => item.id),
+        ungroupSelection: ({ items, selection }) => ({ items, selection }),
+        unlockAll: ({ items, selection }) => ({ items, selection }),
+      }
+    const hostClipboardPlanContext:
+      CanvasClipboardCommandEffectPlanContext<HostClipboardItem> = {
+        commandAdapter: hostClipboardCommandAdapter,
+        config: createCanvasAffordanceConfig(),
+        createId: (prefix) => `${prefix}-host`,
+        getClipboardItems: () => [],
+        items: [hostClipboardItem],
+        selection: [hostClipboardItem.id],
+        stageElement: clipboardStageElement,
+        viewport: { scale: 1, x: 0, y: 0 },
+      }
+    const hostClipboardEffect:
+      CanvasClipboardCommandEffect<HostClipboardItem> | null =
+        createCanvasClipboardCommandEffectPlan({
+          command: { kind: 'duplicate' },
+          context: hostClipboardPlanContext,
+        })
+
+    if (hostClipboardEffect?.kind !== 'transform-items') {
+      throw new Error('Expected host clipboard transform effect')
+    }
+
+    const hostClipboardChanges:
+      CanvasClipboardItemsChange<HostClipboardItem>[] = []
+    const hostClipboardEffectContext:
+      CanvasClipboardCommandEffectContext<HostClipboardItem> = {
+        commitItemsChange: (change) => {
+          hostClipboardChanges.push(change)
+
+          return true
+        },
+        commitSelection: () => true,
+        copyItemsToClipboard: () => true,
+        selection: [hostClipboardItem.id],
+        setClipboardItems: () => true,
+        setEditing: () => undefined,
+      }
+    const hostClipboardApplyResult:
+      CanvasClipboardCommandExecutionResult<HostClipboardItem> =
+        applyCanvasClipboardCommandEffect({
+          context: hostClipboardEffectContext,
+          effect: hostClipboardEffect,
+        })
+    const hostClipboardExecutionContext:
+      CanvasClipboardCommandExecutionContext<HostClipboardItem> = {
+        ...hostClipboardPlanContext,
+        ...hostClipboardEffectContext,
+      }
+    const hostClipboardExecutionResult:
+      CanvasClipboardCommandExecutionResult<HostClipboardItem> =
+        executeCanvasClipboardCommand({
+          command: { kind: 'duplicate' },
+          context: hostClipboardExecutionContext,
+        })
     const clipboardCommands: CanvasClipboardCommand[] = []
     const runClipboardCommand: RunCanvasClipboardCommand = (command) => {
       clipboardCommands.push(command)
@@ -3654,6 +3745,16 @@ describe('Canvas package consumer imports', () => {
       nextPasteIndex: 0,
     })
     expect(clipboardExecutionResult).toEqual(clipboardApplyResult)
+    expect(hostClipboardEffect.clonedItems[0]?.slideId).toBe('slide-1')
+    expect(hostClipboardApplyResult.clonedItems[0]?.kind).toBe('ppt-shape')
+    expect(hostClipboardExecutionResult.clonedItems[0]?.slideId).toBe(
+      'slide-1',
+    )
+    expect(hostClipboardChanges[0]).toEqual({
+      afterItems: [hostClipboardItem, hostClipboardClone],
+      beforeItems: [hostClipboardItem],
+      type: 'transform',
+    })
     expect(CanvasAppFacade.createCanvasClipboardCommandEffectPlan)
       .toBe(createCanvasClipboardCommandEffectPlan)
     expect(CanvasAppFacade.applyCanvasClipboardCommandEffect)

@@ -5,16 +5,18 @@ import {
   duplicateCanvasCommand,
   type CanvasAffordanceConfig,
   type CanvasCommandAdapter,
+  type CanvasCommandItem,
 } from '../../../engine'
 import type {
   CanvasItem,
   Viewport,
 } from '../../../entities'
 import type { CanvasAppStageElement } from '../../rendering/stage/CanvasAppStageElement'
-import type { CanvasDocumentClipboard } from '../../workflow/CanvasWorkflowContract'
 import type { CanvasClipboardCommand } from './CanvasClipboardCommandContracts'
 import type {
   CanvasClipboardCommandEffect,
+  CanvasClipboardGetItemBounds,
+  CanvasClipboardGetItems,
 } from './CanvasClipboardCommandEffectContracts'
 import {
   createCanvasClipboardCloneResultEffect,
@@ -24,14 +26,20 @@ import {
   createCanvasClipboardDuplicateResultEffect,
   createCanvasClipboardPasteResultEffect,
 } from './CanvasClipboardCommandResultEffects'
-import { getCanvasPasteOffset } from './CanvasPastePosition'
+import {
+  getCanvasPasteOffset,
+  getCanvasPasteOffsetForBounds,
+} from './CanvasPastePosition'
 
-export type CanvasClipboardCommandEffectPlanContext = {
-  commandAdapter: CanvasCommandAdapter<CanvasItem>
+export type CanvasClipboardCommandEffectPlanContext<
+  TItem extends CanvasCommandItem = CanvasItem,
+> = {
+  commandAdapter: CanvasCommandAdapter<TItem>
   config: CanvasAffordanceConfig
   createId: (prefix: string) => string
-  getClipboardItems: CanvasDocumentClipboard['getClipboardItems']
-  items: CanvasItem[]
+  getClipboardBounds?: CanvasClipboardGetItemBounds<TItem>
+  getClipboardItems: CanvasClipboardGetItems<TItem>
+  items: TItem[]
   selection: string[]
   stageElement: CanvasAppStageElement
   viewport: Viewport
@@ -39,20 +47,21 @@ export type CanvasClipboardCommandEffectPlanContext = {
 
 type CanvasClipboardCommandEffectPlanner<
   TKind extends CanvasClipboardCommand['kind'],
-> = (args: {
+> = <TItem extends CanvasCommandItem = CanvasItem>(args: {
   command: Extract<CanvasClipboardCommand, { kind: TKind }>
-  context: CanvasClipboardCommandEffectPlanContext
-}) => CanvasClipboardCommandEffect | null
+  context: CanvasClipboardCommandEffectPlanContext<TItem>
+}) => CanvasClipboardCommandEffect<TItem> | null
 
 type CanvasClipboardCommandEffectPlanners = {
   [TKind in CanvasClipboardCommand['kind']]:
     CanvasClipboardCommandEffectPlanner<TKind>
 }
 
-type CanvasClipboardCommandAnyEffectPlanner = (args: {
+type CanvasClipboardCommandAnyEffectPlanner =
+  <TItem extends CanvasCommandItem = CanvasItem>(args: {
   command: CanvasClipboardCommand
-  context: CanvasClipboardCommandEffectPlanContext
-}) => CanvasClipboardCommandEffect | null
+  context: CanvasClipboardCommandEffectPlanContext<TItem>
+}) => CanvasClipboardCommandEffect<TItem> | null
 
 const CANVAS_CLIPBOARD_COMMAND_EFFECT_PLANNERS = Object.freeze({
   clone: ({ command, context }) => planCanvasCloneCommand(command, context),
@@ -63,24 +72,26 @@ const CANVAS_CLIPBOARD_COMMAND_EFFECT_PLANNERS = Object.freeze({
   paste: ({ command, context }) => planCanvasPasteCommand(command, context),
 } satisfies CanvasClipboardCommandEffectPlanners)
 
-export function createCanvasClipboardCommandEffectPlan({
+export function createCanvasClipboardCommandEffectPlan<
+  TItem extends CanvasCommandItem = CanvasItem,
+>({
   command,
   context,
 }: {
   command: CanvasClipboardCommand
-  context: CanvasClipboardCommandEffectPlanContext
-}): CanvasClipboardCommandEffect | null {
+  context: CanvasClipboardCommandEffectPlanContext<TItem>
+}): CanvasClipboardCommandEffect<TItem> | null {
   const planner = CANVAS_CLIPBOARD_COMMAND_EFFECT_PLANNERS[
     command.kind
   ] as CanvasClipboardCommandAnyEffectPlanner
 
-  return planner({ command, context })
+  return planner<TItem>({ command, context })
 }
 
-function planCanvasCloneCommand(
+function planCanvasCloneCommand<TItem extends CanvasCommandItem = CanvasItem>(
   command: Extract<CanvasClipboardCommand, { kind: 'clone' }>,
-  context: CanvasClipboardCommandEffectPlanContext,
-): CanvasClipboardCommandEffect {
+  context: CanvasClipboardCommandEffectPlanContext<TItem>,
+): CanvasClipboardCommandEffect<TItem> {
   return createCanvasClipboardCloneResultEffect({
     clonedItems: cloneCanvasCommandItems({
       adapter: context.commandAdapter,
@@ -92,10 +103,12 @@ function planCanvasCloneCommand(
   })
 }
 
-function planCanvasDuplicateCommand(
+function planCanvasDuplicateCommand<
+  TItem extends CanvasCommandItem = CanvasItem,
+>(
   command: Extract<CanvasClipboardCommand, { kind: 'duplicate' }>,
-  context: CanvasClipboardCommandEffectPlanContext,
-): CanvasClipboardCommandEffect | null {
+  context: CanvasClipboardCommandEffectPlanContext<TItem>,
+): CanvasClipboardCommandEffect<TItem> | null {
   const result = duplicateCanvasCommand({
     adapter: context.commandAdapter,
     config: context.config,
@@ -114,27 +127,27 @@ function planCanvasDuplicateCommand(
     : null
 }
 
-function planCanvasCopyCommand(
-  context: CanvasClipboardCommandEffectPlanContext,
-): CanvasClipboardCommandEffect | null {
+function planCanvasCopyCommand<TItem extends CanvasCommandItem = CanvasItem>(
+  context: CanvasClipboardCommandEffectPlanContext<TItem>,
+): CanvasClipboardCommandEffect<TItem> | null {
   return context.config.commands.copy
-    ? createCanvasClipboardCopySelectionEffect()
+    ? createCanvasClipboardCopySelectionEffect<TItem>()
     : null
 }
 
-function planCanvasPasteCommand(
+function planCanvasPasteCommand<TItem extends CanvasCommandItem = CanvasItem>(
   command: Extract<CanvasClipboardCommand, { kind: 'paste' }>,
-  context: CanvasClipboardCommandEffectPlanContext,
-): CanvasClipboardCommandEffect | null {
+  context: CanvasClipboardCommandEffectPlanContext<TItem>,
+): CanvasClipboardCommandEffect<TItem> | null {
   if (!context.config.commands.paste) {
     return null
   }
 
   const clipboard = context.getClipboardItems()
-  const offset = getCanvasPasteOffset({
+  const offset = getCanvasClipboardPasteOffset({
     clipboard,
+    context,
     pasteIndex: command.pasteIndex,
-    viewportCenter: context.stageElement.getViewportCenter(context.viewport),
   })
   const clones = context.commandAdapter.pasteItems({
     clipboard,
@@ -150,9 +163,9 @@ function planCanvasPasteCommand(
     : null
 }
 
-function planCanvasCutCommand(
-  context: CanvasClipboardCommandEffectPlanContext,
-): CanvasClipboardCommandEffect | null {
+function planCanvasCutCommand<TItem extends CanvasCommandItem = CanvasItem>(
+  context: CanvasClipboardCommandEffectPlanContext<TItem>,
+): CanvasClipboardCommandEffect<TItem> | null {
   if (!context.config.commands.cut) {
     return null
   }
@@ -166,9 +179,37 @@ function planCanvasCutCommand(
   const copyBeforeDelete = context.config.commands.copy
 
   return deletion
-    ? createCanvasClipboardCutSelectionResultEffect({
+    ? createCanvasClipboardCutSelectionResultEffect<TItem>({
         copyBeforeDelete,
         deletion,
       })
-    : createCanvasClipboardCutCopyOnlyResultEffect({ copyBeforeDelete })
+    : createCanvasClipboardCutCopyOnlyResultEffect<TItem>({ copyBeforeDelete })
+}
+
+function getCanvasClipboardPasteOffset<
+  TItem extends CanvasCommandItem = CanvasItem,
+>({
+  clipboard,
+  context,
+  pasteIndex,
+}: {
+  clipboard: TItem[]
+  context: CanvasClipboardCommandEffectPlanContext<TItem>
+  pasteIndex: number
+}) {
+  const viewportCenter = context.stageElement.getViewportCenter(
+    context.viewport,
+  )
+
+  return context.getClipboardBounds
+    ? getCanvasPasteOffsetForBounds({
+        clipboardBounds: context.getClipboardBounds(clipboard),
+        pasteIndex,
+        viewportCenter,
+      })
+    : getCanvasPasteOffset({
+        clipboard: clipboard as unknown as CanvasItem[],
+        pasteIndex,
+        viewportCenter,
+      })
 }

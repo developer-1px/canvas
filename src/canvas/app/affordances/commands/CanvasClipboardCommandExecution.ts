@@ -2,27 +2,34 @@ import {
   createCanvasClipboardCommandEffectPlan,
   type CanvasClipboardCommandEffectPlanContext,
 } from './CanvasClipboardCommandEffectPlan'
+import type {
+  CanvasCommandItem,
+} from '../../../engine'
+import type { CanvasItem } from '../../../entities'
 import type { CanvasClipboardCommand } from './CanvasClipboardCommandContracts'
 import type {
   CanvasClipboardCommandEffectContext,
   CanvasClipboardCommandExecutionResult,
 } from './CanvasClipboardCommandEffectContracts'
 import {
-  EMPTY_CLIPBOARD_COMMAND_RESULT,
   applyCanvasClipboardCommandEffect,
 } from './CanvasClipboardCommandEffects'
 
-export type CanvasClipboardCommandExecutionContext =
-  CanvasClipboardCommandEffectPlanContext &
-  CanvasClipboardCommandEffectContext
+export type CanvasClipboardCommandExecutionContext<
+  TItem extends CanvasCommandItem = CanvasItem,
+> =
+  CanvasClipboardCommandEffectPlanContext<TItem> &
+  CanvasClipboardCommandEffectContext<TItem>
 
-export function executeCanvasClipboardCommand({
+export function executeCanvasClipboardCommand<
+  TItem extends CanvasCommandItem = CanvasItem,
+>({
   command,
   context,
 }: {
   command: CanvasClipboardCommand
-  context: CanvasClipboardCommandExecutionContext
-}): CanvasClipboardCommandExecutionResult {
+  context: CanvasClipboardCommandExecutionContext<TItem>
+}): CanvasClipboardCommandExecutionResult<TItem> {
   const effect = createCanvasClipboardCommandEffectPlan({
     command,
     context,
@@ -30,5 +37,8 @@ export function executeCanvasClipboardCommand({
 
   return effect
     ? applyCanvasClipboardCommandEffect({ context, effect })
-    : EMPTY_CLIPBOARD_COMMAND_RESULT
+    : {
+        clonedItems: [],
+        executed: false,
+      }
 }

@@ -1,54 +1,100 @@
 import type {
+  Bounds,
   CanvasItem,
   EditingText,
 } from '../../../entities'
-import type {
-  CanvasDocumentClipboard,
-  CommitCanvasItemsChange,
-  CommitCanvasSelection,
-} from '../../workflow/CanvasWorkflowContract'
+import type { CanvasCommandItem } from '../../../engine'
+
+export type CanvasClipboardItemsChange<
+  TItem extends CanvasCommandItem = CanvasItem,
+> =
+  | { type: 'add'; items: TItem[] }
+  | { type: 'remove-selection'; selection: string[] }
+  | { type: 'transform'; afterItems: TItem[]; beforeItems: TItem[] }
+
+export type CanvasClipboardSelectionHistory = {
+  after: string[]
+  before: string[]
+}
+
+export type CanvasClipboardSelectionUpdate =
+  | string[]
+  | ((current: string[]) => string[])
+
+export type CanvasClipboardCommitItemsChange<
+  TItem extends CanvasCommandItem = CanvasItem,
+> = (
+  change: CanvasClipboardItemsChange<TItem>,
+  selection?: CanvasClipboardSelectionHistory,
+) => boolean
+
+export type CanvasClipboardCommitSelection = (
+  action: CanvasClipboardSelectionUpdate,
+) => boolean
+
+export type CanvasClipboardCopyItemsToClipboard = (
+  selection: string[],
+) => boolean
+
+export type CanvasClipboardGetItems<
+  TItem extends CanvasCommandItem = CanvasItem,
+> = () => TItem[]
+
+export type CanvasClipboardGetItemBounds<
+  TItem extends CanvasCommandItem = CanvasItem,
+> = (items: TItem[]) => Bounds | null
+
+export type CanvasClipboardSetItems<
+  TItem extends CanvasCommandItem = CanvasItem,
+> = (items: TItem[]) => boolean
 
 export type CanvasClipboardEditingUpdate =
   | EditingText
   | null
   | ((current: EditingText | null) => EditingText | null)
 
-export type CanvasClipboardCommandExecutionResult = {
-  clonedItems: CanvasItem[]
+export type CanvasClipboardCommandExecutionResult<
+  TItem extends CanvasCommandItem = CanvasItem,
+> = {
+  clonedItems: TItem[]
   executed: boolean
   nextPasteIndex?: number
 }
 
-export type CanvasClipboardCommandEffectContext = {
-  commitItemsChange: CommitCanvasItemsChange
-  commitSelection: CommitCanvasSelection
-  copyItemsToClipboard: CanvasDocumentClipboard['copyItemsToClipboard']
+export type CanvasClipboardCommandEffectContext<
+  TItem extends CanvasCommandItem = CanvasItem,
+> = {
+  commitItemsChange: CanvasClipboardCommitItemsChange<TItem>
+  commitSelection: CanvasClipboardCommitSelection
+  copyItemsToClipboard: CanvasClipboardCopyItemsToClipboard
   selection: string[]
-  setClipboardItems: CanvasDocumentClipboard['setClipboardItems']
+  setClipboardItems: CanvasClipboardSetItems<TItem>
   setEditing: (editing: CanvasClipboardEditingUpdate) => void
 }
 
-export type CanvasClipboardCommandEffect =
+export type CanvasClipboardCommandEffect<
+  TItem extends CanvasCommandItem = CanvasItem,
+> =
   | {
-      clonedItems: CanvasItem[]
+      clonedItems: TItem[]
       kind: 'clone-result'
     }
   | {
       kind: 'copy-selection'
     }
   | {
-      afterItems: CanvasItem[]
+      afterItems: TItem[]
       afterSelection: string[]
-      beforeItems: CanvasItem[]
-      clonedItems: CanvasItem[]
+      beforeItems: TItem[]
+      clonedItems: TItem[]
       kind: 'transform-items'
     }
   | {
       afterSelection: string[]
-      items: CanvasItem[]
+      items: TItem[]
       kind: 'add-items'
       nextPasteIndex?: number
-      updateClipboardItems?: CanvasItem[]
+      updateClipboardItems?: TItem[]
     }
   | {
       clearEditingIds: readonly string[]

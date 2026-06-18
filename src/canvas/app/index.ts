@@ -287,10 +287,19 @@ export {
   applyCanvasClipboardCommandEffect,
 } from './affordances/commands/CanvasClipboardCommandEffects'
 export type {
+  CanvasClipboardCommitItemsChange,
+  CanvasClipboardCommitSelection,
   CanvasClipboardCommandEffect,
   CanvasClipboardCommandEffectContext,
   CanvasClipboardCommandExecutionResult,
+  CanvasClipboardCopyItemsToClipboard,
   CanvasClipboardEditingUpdate,
+  CanvasClipboardGetItemBounds,
+  CanvasClipboardGetItems,
+  CanvasClipboardItemsChange,
+  CanvasClipboardSelectionHistory,
+  CanvasClipboardSelectionUpdate,
+  CanvasClipboardSetItems,
 } from './affordances/commands/CanvasClipboardCommandEffectContracts'
 export {
   executeCanvasClipboardCommand,
