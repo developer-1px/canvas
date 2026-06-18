@@ -31,6 +31,7 @@ import {
 
 const EMPTY_CANVAS_OVERLAYS: CanvasOverlayState = {
   alignmentGuides: [],
+  componentPartSourceOutlines: [],
   draftArrow: null,
   draftRect: null,
   draftStroke: null,

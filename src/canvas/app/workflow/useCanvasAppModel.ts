@@ -38,7 +38,11 @@ import {
   assertCanvasAppAssembly,
 } from './CanvasAppAssembly'
 import type { CanvasAppAssembly } from './CanvasAppAssemblyTypes'
-import type { CanvasPresenceOverlay } from '../../engine'
+import type {
+  CanvasComponentPartSourceInput,
+  CanvasPresenceOverlay,
+} from '../../engine'
+import type { CanvasComponentSetSummary } from '../../host'
 
 export function useCanvasAppModel({
   assembly = DEFAULT_CANVAS_APP_ASSEMBLY,
@@ -75,6 +79,13 @@ export function useCanvasAppModel({
     () => new Set(installedFeaturePackIds),
     [installedFeaturePackIds],
   )
+  const componentPartSources = useMemo(
+    () =>
+      installedFeaturePackIdSet.has('component-authoring')
+        ? createCanvasComponentPartSourceInputs(appAssembly.control.componentSets)
+        : [],
+    [appAssembly.control.componentSets, installedFeaturePackIdSet],
+  )
   const stageElement = useCanvasAppStageElementModel()
   const workspace = useCanvasWorkspaceModel(appAssembly.workspace)
   const providedPresence = presence ?? appAssembly.collaboration.presenceProvider({
@@ -101,6 +112,7 @@ export function useCanvasAppModel({
   })
   const interaction = useCanvasInteractionModel({
     ...affordance.interaction,
+    componentPartSources,
     emoteBursts: featurePackTransients.emotes.overlay.bursts,
     presence: providedPresence,
     ...workspace.interaction,
@@ -351,4 +363,19 @@ export function useCanvasAppModel({
     votingSession: featurePackTransients.votingSession.view,
     zoomControls: controls.zoomControls,
   }
+}
+
+function createCanvasComponentPartSourceInputs(
+  componentSets: readonly CanvasComponentSetSummary[],
+): readonly CanvasComponentPartSourceInput[] {
+  return componentSets.flatMap((componentSet) =>
+    componentSet.parts.map((part) => ({
+      componentId: componentSet.id,
+      componentLabel: componentSet.label,
+      id: `${componentSet.id}:${part.slotId}`,
+      itemIds: part.itemIds,
+      label: part.label,
+      slotId: part.slotId,
+    })),
+  )
 }

@@ -395,6 +395,17 @@ describe('CanvasAppFeaturePacks', () => {
     expect(getCanvasAppInstalledFeaturePackManifestIds(
       DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS,
     )).toContain(CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST.id)
+    expect(CANVAS_APP_COMPONENT_AUTHORING_FEATURE_PACK_MANIFEST)
+      .toMatchObject({
+        category: 'authoring',
+        contributes: {
+          surfaces: ['overlay', 'view-renderer'],
+        },
+        lifecycle: {
+          partialUpdate: ['overlay', 'view-renderer'],
+          runtimeToggleable: true,
+        },
+      })
   })
 
   it('stores marketplace-ready manifest metadata with defaults and overrides', () => {

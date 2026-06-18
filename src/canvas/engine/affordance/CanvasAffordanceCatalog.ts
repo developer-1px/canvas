@@ -80,6 +80,7 @@ export const CANVAS_AFFORDANCE_CONFIG_DEFAULTS = Object.freeze({
   overlays: Object.freeze({
     alignmentGuides: true,
     commandPalette: true,
+    componentPartSourceOutline: true,
     componentPalette: true,
     draftArrow: true,
     draftRect: true,

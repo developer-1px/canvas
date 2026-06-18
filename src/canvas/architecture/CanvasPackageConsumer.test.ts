@@ -135,6 +135,7 @@ import {
   type CanvasAppItemsChangeTransformContext,
   type CanvasAppItemsChangeTransformer,
   type CanvasAppViewFeaturePack,
+  type CanvasComponentPartSourceInput,
   type CanvasEditableFieldKeyboardIntentInput,
   type CanvasPresentationKeyboardIntentInput,
   type CanvasInteractionTargetSelectorInput,
@@ -473,6 +474,14 @@ describe('Canvas package consumer imports', () => {
       onFocusItems: () => undefined,
       onInsert: () => undefined,
     }
+    const componentPartSourceInput: CanvasComponentPartSourceInput = {
+      componentId: 'smoke-card',
+      componentLabel: 'Smoke card',
+      id: 'smoke-card:title',
+      itemIds: ['rect-1'],
+      label: 'Title',
+      slotId: 'title',
+    }
     const shellInputProps = {
       assemblyInput: {
         affordanceConfig: {
@@ -508,6 +517,7 @@ describe('Canvas package consumer imports', () => {
     expect(componentPaletteProps.componentSets?.[0]?.parts.map(
       (part) => part.slotId,
     )).toEqual(['root', 'title'])
+    expect(componentPartSourceInput.itemIds).toEqual(['rect-1'])
     expect(assembly.foundationExtensions.map((extension) => extension.id))
       .toContain('canvas.smoke')
     const foundationTools: readonly CanvasAppFoundationExtensionTool[] =

@@ -55,6 +55,29 @@ describe('CanvasDemoAssembly', () => {
     expect(DEMO_CANVAS_APP_ASSEMBLY.initialSelection).toEqual([
       'engine-shape',
     ])
+    expect(
+      DEMO_CANVAS_APP_ASSEMBLY.componentDefinitionRegistry.listSets(),
+    ).toMatchObject([
+      {
+        id: 'demo-sticky-notes',
+        label: 'Sticky notes',
+        parts: [
+          {
+            itemIds: [
+              'engine-sticky',
+              'engine-sticky-next',
+              'engine-sticky-note',
+            ],
+            slotId: 'root',
+          },
+        ],
+        source: {
+          exportName: 'StickyNote',
+          importPath: 'src/widgets/sticky-note',
+          layer: 'widgets',
+        },
+      },
+    ])
     expect(DEMO_CANVAS_APP_ASSEMBLY.initialItems.map((item) => item.type))
       .toEqual([
         'component',
@@ -131,6 +154,10 @@ describe('CanvasDemoAssembly', () => {
     expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.grid).toBe(false)
     expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays.itemOutline)
       .toBe(true)
+    expect(
+      DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays
+        .componentPartSourceOutline,
+    ).toBe(true)
     expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.tools.pen).toBe(true)
     expect(DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.shortcuts.penTool)
       .toBe(true)

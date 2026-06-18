@@ -48,7 +48,16 @@ export const CANVAS_APP_COMPONENT_AUTHORING_VIEW_FEATURE_PACK =
 
 export const CANVAS_APP_COMPONENT_AUTHORING_FEATURE_PACK_MANIFEST =
   createCanvasAppFeaturePackManifest({
+    category: 'authoring',
+    contributes: {
+      surfaces: ['overlay', 'view-renderer'],
+    },
     id: 'component-authoring',
     label: 'Component authoring',
+    lifecycle: {
+      hotReloadable: true,
+      partialUpdate: ['overlay', 'view-renderer'],
+      runtimeToggleable: true,
+    },
     viewFeaturePack: CANVAS_APP_COMPONENT_AUTHORING_VIEW_FEATURE_PACK,
   })

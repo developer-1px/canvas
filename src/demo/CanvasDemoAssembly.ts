@@ -8,6 +8,7 @@ import {
   createCanvasAppAssembly,
   type CreateCanvasAppAiLabsSummarizeSelectionCommandInput,
   type CanvasAppAssemblyInput,
+  type CanvasAppComponentDefinition,
   type CanvasWorkspaceStorage,
   type CanvasWorkspaceStorageProvider,
 } from '../canvas'
@@ -72,6 +73,39 @@ const DEMO_CANVAS_STORAGE: CanvasWorkspaceStorage = {
 
 const DEMO_CANVAS_STORAGE_PROVIDER: CanvasWorkspaceStorageProvider = () =>
   DEMO_CANVAS_STORAGE
+
+const DEMO_CANVAS_COMPONENT_DEFINITIONS = Object.freeze([
+  {
+    id: 'demo-sticky-notes',
+    instances: [
+      {
+        label: 'Post-it',
+        slots: {
+          root: 'engine-sticky',
+        },
+      },
+      {
+        label: 'Quick create',
+        slots: {
+          root: 'engine-sticky-next',
+        },
+      },
+      {
+        label: 'Note',
+        slots: {
+          root: 'engine-sticky-note',
+        },
+      },
+    ],
+    label: 'Sticky notes',
+    source: {
+      exportName: 'StickyNote',
+      importPath: 'src/widgets/sticky-note',
+      layer: 'widgets',
+    },
+    syncDescription: 'Sticky note style edits sync across instances.',
+  },
+]) satisfies readonly CanvasAppComponentDefinition[]
 
 const DEMO_CANVAS_FOCUSED_AFFORDANCE_CONFIG = {
   gestures: {
@@ -201,6 +235,7 @@ const DEMO_CANVAS_FOCUSED_AFFORDANCE_CONFIG = {
 
 const DEMO_CANVAS_BASE_ASSEMBLY_INPUT = {
   affordanceConfig: DEMO_CANVAS_FOCUSED_AFFORDANCE_CONFIG,
+  componentDefinitions: DEMO_CANVAS_COMPONENT_DEFINITIONS,
   customItemModules: DEMO_CUSTOM_ITEM_MODULES,
   initialItems: DEMO_CANVAS_SEED_ITEMS,
   initialSelection: DEMO_CANVAS_INITIAL_SELECTION,

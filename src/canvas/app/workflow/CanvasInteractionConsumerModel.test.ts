@@ -128,6 +128,7 @@ function createInteractionRuntime({
 function createOverlays(): CanvasOverlayState {
   return {
     alignmentGuides: [],
+    componentPartSourceOutlines: [],
     draftArrow: null,
     draftRect: null,
     draftStroke: null,

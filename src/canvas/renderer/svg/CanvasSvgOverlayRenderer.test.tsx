@@ -134,11 +134,42 @@ describe('CanvasSvgOverlayRenderer', () => {
     expect(markup).toContain('class="draft-rect"')
     expect(markup).toContain('M 70 30 L 120 60 L 70 90 L 20 60 Z')
   })
+
+  it('renders component part source outlines as independent interaction overlays', () => {
+    const markup = renderToStaticMarkup(
+      <svg>
+        <CanvasSvgInteractionOverlays
+          overlays={{
+            ...createOverlayState(),
+            componentPartSourceOutlines: [{
+              bounds: { h: 86, w: 220, x: 40, y: 24 },
+              componentId: 'stat-card',
+              componentLabel: 'Stat card',
+              id: 'stat-card:value',
+              itemIds: ['stat-revenue-value', 'stat-conversion-value'],
+              label: 'Value',
+              slotId: 'value',
+            }],
+          }}
+          viewport={{ scale: 1, x: 0, y: 0 }}
+          onResizePointerDown={vi.fn()}
+        />
+      </svg>,
+    )
+
+    expect(markup).toContain('component-part-source-outlines')
+    expect(markup).toContain('component-part-source-outline')
+    expect(markup).toContain('data-component="stat-card"')
+    expect(markup).toContain('data-slot="value"')
+    expect(markup).toContain('x="40"')
+    expect(markup).toContain('width="220"')
+  })
 })
 
 function createOverlayState(): CanvasOverlayState {
   return {
     alignmentGuides: [],
+    componentPartSourceOutlines: [],
     draftArrow: null,
     draftRect: null,
     draftStroke: null,

@@ -76,6 +76,8 @@ export {
 } from '../foundation/CanvasGestureEngine'
 export {
   createCanvasOverlayState,
+  type CanvasComponentPartSourceInput,
+  type CanvasComponentPartSourceOutline,
   type CanvasDraftArrowOverlay,
   type CanvasDraftShapeOverlay,
   type CanvasDraftStrokeOverlay,

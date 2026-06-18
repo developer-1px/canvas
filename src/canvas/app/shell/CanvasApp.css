@@ -1292,6 +1292,14 @@
   stroke-dasharray: 6 4;
 }
 
+.component-part-source-outline {
+  fill: color-mix(in srgb, var(--canvas-plum-line) 7%, transparent);
+  stroke: var(--canvas-plum-line);
+  stroke-dasharray: 7 4;
+  stroke-width: 1.7;
+  pointer-events: none;
+}
+
 .presence-cursor {
   pointer-events: none;
 }

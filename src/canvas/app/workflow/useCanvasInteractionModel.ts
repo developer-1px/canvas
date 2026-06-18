@@ -12,6 +12,7 @@ import {
   EMPTY_CANVAS_SNAP_GUIDES,
   createCanvasOverlayState,
   type CanvasAffordanceConfig,
+  type CanvasComponentPartSourceInput,
   type CanvasDraftArrowOverlay,
   type CanvasDraftShapeOverlay,
   type CanvasEmoteBurstOverlay,
@@ -25,6 +26,7 @@ import type { Interaction } from '../affordances/interaction/pointer/CanvasInter
 import { getCanvasInteractionConsumerModel } from './CanvasInteractionConsumerModel'
 
 type UseCanvasInteractionModelArgs = {
+  componentPartSources?: readonly CanvasComponentPartSourceInput[]
   config: CanvasAffordanceConfig
   emoteBursts?: readonly CanvasEmoteBurstOverlay[]
   presence?: readonly CanvasPresenceOverlay[]
@@ -34,6 +36,7 @@ type UseCanvasInteractionModelArgs = {
 }
 
 export function useCanvasInteractionModel({
+  componentPartSources,
   config,
   emoteBursts,
   presence,
@@ -60,6 +63,7 @@ export function useCanvasInteractionModel({
   const overlays = useMemo(
     () =>
       createCanvasOverlayState({
+        componentPartSources,
         config,
         draftArrow,
         draftRect,
@@ -75,6 +79,7 @@ export function useCanvasInteractionModel({
       }),
     [
       config,
+      componentPartSources,
       draftArrow,
       draftRect,
       draftStroke,

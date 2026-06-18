@@ -62,8 +62,23 @@ export type CanvasPresenceOverlay = {
   selectionBounds?: Bounds
 }
 
+export type CanvasComponentPartSourceInput = {
+  componentId: string
+  componentLabel: string
+  id: string
+  itemIds: readonly string[]
+  label: string
+  slotId: string
+}
+
+export type CanvasComponentPartSourceOutline =
+  CanvasComponentPartSourceInput & {
+    bounds: Bounds
+  }
+
 export type CanvasOverlayState = {
   alignmentGuides: CanvasSnapGuides['alignmentGuides']
+  componentPartSourceOutlines: readonly CanvasComponentPartSourceOutline[]
   draftArrow: CanvasDraftArrowOverlay | null
   draftRect: CanvasDraftShapeOverlay | null
   draftStroke: CanvasDraftStrokeOverlay | null
@@ -79,6 +94,7 @@ export type CanvasOverlayState = {
 }
 
 export function createCanvasOverlayState({
+  componentPartSources = [],
   config,
   draftArrow,
   draftRect,
@@ -92,6 +108,7 @@ export function createCanvasOverlayState({
   snapGuides,
   viewport,
 }: {
+  componentPartSources?: readonly CanvasComponentPartSourceInput[]
   config: CanvasAffordanceConfig
   draftArrow: CanvasDraftArrowOverlay | null
   draftRect: CanvasDraftShapeOverlay | null
@@ -111,6 +128,12 @@ export function createCanvasOverlayState({
   return {
     alignmentGuides: config.overlays.alignmentGuides
       ? snapGuides.alignmentGuides
+      : [],
+    componentPartSourceOutlines: config.overlays.componentPartSourceOutline
+      ? getCanvasComponentPartSourceOutlines({
+          scene,
+          sources: componentPartSources,
+        })
       : [],
     draftArrow: config.overlays.draftArrow ? draftArrow : null,
     draftRect: config.overlays.draftRect ? draftRect : null,
@@ -139,4 +162,21 @@ export function createCanvasOverlayState({
       ? snapGuides.spacingGuides
       : [],
   }
+}
+
+function getCanvasComponentPartSourceOutlines({
+  scene,
+  sources,
+}: {
+  scene: CanvasSceneAdapter
+  sources: readonly CanvasComponentPartSourceInput[]
+}): CanvasComponentPartSourceOutline[] {
+  return sources.flatMap((source) => {
+    const bounds = scene.getBounds([...source.itemIds])
+
+    return bounds ? [{
+      ...source,
+      bounds,
+    }] : []
+  })
 }

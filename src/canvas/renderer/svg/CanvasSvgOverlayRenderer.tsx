@@ -173,6 +173,24 @@ export function CanvasSvgInteractionOverlays({
         </g>
       ) : null}
 
+      {overlays.componentPartSourceOutlines.length > 0 ? (
+        <g className="component-part-source-outlines">
+          {overlays.componentPartSourceOutlines.map((outline) => (
+            <rect
+              key={outline.id}
+              className="component-part-source-outline"
+              data-component={outline.componentId}
+              data-slot={outline.slotId}
+              x={outline.bounds.x}
+              y={outline.bounds.y}
+              width={outline.bounds.w}
+              height={outline.bounds.h}
+              vectorEffect="non-scaling-stroke"
+            />
+          ))}
+        </g>
+      ) : null}
+
       {overlays.selectionBounds ? (
         <rect
           className="selection-bounds"

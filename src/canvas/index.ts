@@ -516,6 +516,8 @@ export {
   type CanvasBoardSvgExportScope,
 } from './app/authoring'
 export type {
+  CanvasComponentPartSourceInput,
+  CanvasComponentPartSourceOutline,
   CanvasPresenceOverlay,
 } from './engine'
 export type {

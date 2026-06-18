@@ -18,6 +18,7 @@ describe('CanvasAppStageAdapter', () => {
       gesture: 'none',
       overlays: {
         alignmentGuides: [],
+        componentPartSourceOutlines: [],
         draftArrow: null,
         draftRect: null,
         draftStroke: null,
