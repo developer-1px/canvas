@@ -26,6 +26,12 @@ import {
   CANVAS_WHEEL_VIEWPORT_ZOOM_MODIFIER,
   CANVAS_WHEEL_PASSTHROUGH_SELECTOR,
   CANVAS_RICH_CLIPBOARD_JSON_SCRIPT_ATTRIBUTE,
+  CANVAS_RICH_TEXT_PASTE_SUPPORTED_FORMATS,
+  CANVAS_TABLE_CSV_MIME_TYPES,
+  CANVAS_TABLE_FILE_IMPORT_SUPPORTED_FORMATS,
+  CANVAS_TABLE_IMPORT_SUPPORTED_FORMATS,
+  CANVAS_TABLE_TSV_MIME_TYPES,
+  CANVAS_TEXT_PASTE_SUPPORTED_FORMATS,
   applyCanvasAppAssemblySourceFeaturePackMarketplaceHostUpdate,
   applyCanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdate,
   applyCanvasAppFeaturePackRuntimeStatePatch,
@@ -4734,6 +4740,29 @@ describe('Canvas package consumer imports', () => {
     expect(CanvasAppFacade.CANVAS_TABLE_IMPORT_MODEL).toBe(
       'canvas-table-import',
     )
+    expect(CanvasAppAuthoring.CANVAS_TABLE_IMPORT_SUPPORTED_FORMATS).toEqual(
+      CANVAS_TABLE_IMPORT_SUPPORTED_FORMATS,
+    )
+    expect(CanvasAppFacade.CANVAS_TABLE_IMPORT_SUPPORTED_FORMATS).toEqual([
+      'text/tab-separated-values',
+      'text/csv',
+      'text/html',
+      'text/markdown',
+      'text/x-markdown',
+      'text/plain',
+    ])
+    expect(CanvasPackage.CANVAS_TABLE_IMPORT_SUPPORTED_FORMATS).toEqual(
+      CanvasAppFacade.CANVAS_TABLE_IMPORT_SUPPORTED_FORMATS,
+    )
+    expect(CanvasAppFacade.CANVAS_TABLE_FILE_IMPORT_SUPPORTED_FORMATS).toEqual(
+      CANVAS_TABLE_FILE_IMPORT_SUPPORTED_FORMATS,
+    )
+    expect(CanvasPackage.CANVAS_TABLE_CSV_MIME_TYPES).toEqual(
+      CANVAS_TABLE_CSV_MIME_TYPES,
+    )
+    expect(CanvasPackage.CANVAS_TABLE_TSV_MIME_TYPES).toEqual(
+      CANVAS_TABLE_TSV_MIME_TYPES,
+    )
     expect(CanvasAppFacade.getCanvasTableFilesFromDataTransfer(null)).toEqual(
       [],
     )
@@ -4779,6 +4808,19 @@ describe('Canvas package consumer imports', () => {
     })).toEqual({ x: 200, y: 120 })
     expect(CanvasAppFacade.CANVAS_TEXT_PASTE_IMPORT_MODEL).toBe(
       'canvas-text-paste-import',
+    )
+    expect(CanvasAppAuthoring.CANVAS_TEXT_PASTE_SUPPORTED_FORMATS).toEqual(
+      CANVAS_TEXT_PASTE_SUPPORTED_FORMATS,
+    )
+    expect(CanvasAppFacade.CANVAS_TEXT_PASTE_SUPPORTED_FORMATS).toEqual([
+      'text/plain',
+      'text/html',
+    ])
+    expect(CanvasPackage.CANVAS_TEXT_PASTE_SUPPORTED_FORMATS).toEqual(
+      CanvasAppFacade.CANVAS_TEXT_PASTE_SUPPORTED_FORMATS,
+    )
+    expect(CanvasAppFacade.CANVAS_RICH_TEXT_PASTE_SUPPORTED_FORMATS).toEqual(
+      CANVAS_RICH_TEXT_PASTE_SUPPORTED_FORMATS,
     )
     expect(CanvasAppFacade.getCanvasRichTextPasteSourceFromHTML(
       '<p style="text-align: center; line-height: 1.5; margin-top: 8px; margin-bottom: 12px"><span style="font-size: 16px"><strong>Hello</strong></span></p>',
