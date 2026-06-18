@@ -112,10 +112,14 @@ export {
 export {
   CANVAS_TABLE_COMPONENT_KIND,
   createCanvasTableComponentItem,
+  getCanvasTableComponentSize,
   getCanvasTableGrid,
   isCanvasTableComponentItem,
   normalizeCanvasTableRows,
   type CanvasTableComponentRows,
+  type CanvasTableComponentSize,
+  type CanvasTableComponentSizeInput,
+  type CanvasTableComponentSizeOptions,
   type CanvasTableGrid,
   type CreateCanvasTableComponentItemInput,
 } from './component/CanvasTableComponent'

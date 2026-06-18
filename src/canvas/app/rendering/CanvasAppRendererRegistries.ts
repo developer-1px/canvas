@@ -4,8 +4,8 @@ import type {
 import type {
   CanvasAppComponentPresentationRenderers,
   CanvasAppComponentRendererStrategy,
+  CanvasAppCustomItemRendererEntry,
   CanvasAppCustomItemRenderers,
-  CanvasAppCustomItemRendererStrategy,
 } from './CanvasAppRenderingContracts'
 import {
   DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS,
@@ -70,7 +70,7 @@ export function getCanvasAppCustomItemRenderer({
 }: {
   item: CanvasCustomItem
   renderers: CanvasAppCustomItemRenderers
-}): CanvasAppCustomItemRendererStrategy {
+}): CanvasAppCustomItemRendererEntry {
   return getCanvasDemoSvgCustomItemRenderer({
     item,
     renderers,

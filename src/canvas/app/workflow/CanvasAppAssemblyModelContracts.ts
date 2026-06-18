@@ -11,7 +11,7 @@ import type {
 } from './CanvasAppComponentAssemblyContracts'
 import type {
   CanvasAppCustomCommand,
-} from '../affordances/commands/CanvasAppCustomCommands'
+} from '../extensions/custom-commands'
 import type { CanvasWorkspaceStorageProvider } from '../workspace/document/CanvasWorkspacePersistence'
 import type {
   CanvasAppCustomItemValidators,
@@ -22,10 +22,14 @@ import type {
   CanvasAppItemLayerAdapter,
   CanvasAppStageAdapter,
 } from '../rendering/CanvasAppRenderingContracts'
-import type { CanvasAppInspectorPanel } from '../affordances/editing/inspector/CanvasAppInspectorPanels'
+import type { CanvasAppInspectorPanel } from '../extensions/inspector-panels'
 import type { CanvasAppCustomCreationTool } from '../extensions/custom-tools/CanvasAppCustomCreationTools'
-import type { CanvasMediaImporter } from '../affordances/io/media/CanvasMediaImporters'
-import type { CanvasTextPasteImporter } from '../affordances/io/text-paste/CanvasTextPasteImporters'
+import type {
+  CanvasAppFeaturePackId,
+  CanvasAppFeaturePackViewRenderers,
+  CanvasMediaImporter,
+  CanvasTextPasteImporter,
+} from '../feature-packs'
 import type { CanvasAppCapabilitySnapshot } from './CanvasAppCapabilityAssembly'
 import type { CanvasAppPresenceProvider } from './CanvasAppCollaborationAssembly'
 
@@ -56,6 +60,11 @@ export type CanvasAppAssemblyExtensionModel = {
   customCreationTools: readonly CanvasAppCustomCreationTool[]
   mediaImporters: readonly CanvasMediaImporter[]
   textPasteImporters: readonly CanvasTextPasteImporter[]
+}
+
+export type CanvasAppAssemblyFeaturePackModel = {
+  installedIds: readonly CanvasAppFeaturePackId[]
+  viewRenderers: CanvasAppFeaturePackViewRenderers
 }
 
 export type CanvasAppAssemblyInspectorModel = {
@@ -94,6 +103,7 @@ export type CanvasAppAssemblyModel = {
   component: CanvasAppAssemblyComponentModel
   control: CanvasAppAssemblyControlModel
   extension: CanvasAppAssemblyExtensionModel
+  featurePack: CanvasAppAssemblyFeaturePackModel
   inspector: CanvasAppAssemblyInspectorModel
   pointer: CanvasAppAssemblyPointerModel
   rendering: CanvasAppAssemblyRenderingModel

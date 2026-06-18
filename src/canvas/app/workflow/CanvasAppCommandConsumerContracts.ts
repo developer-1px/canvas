@@ -91,11 +91,14 @@ export type CanvasAppCommandWorkspaceModel = {
   viewport: Viewport
 }
 
+export type CanvasAppExternalPasteHandler = () => boolean | Promise<boolean>
+
 export type CanvasAppCommandModelInput = {
   commandAdapter: CanvasCommandAdapter<CanvasItem>
   config: CanvasAffordanceConfig
   createId: (prefix: string) => string
   document: CanvasAppCommandDocumentModel
+  pasteExternal?: CanvasAppExternalPasteHandler
   setEditing: Dispatch<SetStateAction<EditingText | null>>
   stageElement: CanvasAppStageElement
   workspace: CanvasAppCommandWorkspaceModel

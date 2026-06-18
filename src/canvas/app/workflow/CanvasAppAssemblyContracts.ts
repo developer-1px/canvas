@@ -1,13 +1,17 @@
 import { assertCanvasAffordanceConfig } from '../../engine'
-import { assertCanvasAppCustomCommands } from '../affordances/commands/CanvasAppCustomCommandContracts'
+import { assertCanvasAppCustomCommands } from '../extensions/custom-commands'
 import { assertCanvasAppDescriptorObject } from '../extensions/CanvasAppDescriptorContracts'
-import { assertCanvasAppInspectorPanels } from '../affordances/editing/inspector/CanvasAppInspectorPanelContracts'
+import { assertCanvasAppInspectorPanels } from '../extensions/inspector-panels'
 import { assertCanvasAppCustomItemValidators } from '../extensions/custom-item-modules/CanvasAppCustomItemValidatorContracts'
-import { assertCanvasAppFoundationExtensions } from '../extensions/CanvasAppFoundationExtensionDescriptors'
+import { assertCanvasAppFoundationExtensions } from '../extensions/foundation-extensions'
 import { assertCanvasAppCustomItemRenderers } from '../rendering/CanvasAppRendererRegistries'
 import { assertCanvasAppCustomCreationTools } from '../extensions/custom-tools/CanvasAppCustomCreationToolContracts'
-import { assertCanvasMediaImporters } from '../affordances/io/media/CanvasMediaImporters'
-import { assertCanvasTextPasteImporters } from '../affordances/io/text-paste/CanvasTextPasteImporters'
+import {
+  assertCanvasAppFeaturePackIds,
+  assertCanvasAppFeaturePackViewRenderers,
+  assertCanvasMediaImporters,
+  assertCanvasTextPasteImporters,
+} from '../feature-packs'
 import { assertCanvasAppAssemblyAdapters } from './CanvasAppAdapterContracts'
 import type { CanvasAppAssembly } from './CanvasAppAssemblyTypes'
 import {
@@ -28,6 +32,8 @@ export function assertCanvasAppAssembly(assembly: CanvasAppAssembly) {
   assertCanvasAppCustomCreationTools(assembly.customCreationTools)
   assertCanvasAppCustomItemRenderers(assembly.customItemRenderers)
   assertCanvasAppCustomItemValidators(assembly.customItemValidators)
+  assertCanvasAppFeaturePackViewRenderers(assembly.featurePackViewRenderers)
+  assertCanvasAppFeaturePackIds(assembly.installedFeaturePackIds)
   assertCanvasAppFoundationExtensions(assembly.foundationExtensions)
   assertCanvasAppInspectorPanels(assembly.inspectorPanels)
   assertCanvasMediaImporters(assembly.mediaImporters)

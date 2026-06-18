@@ -16,6 +16,18 @@ export type SlideEditTextParagraphSpacingValues = {
   paragraphBefore: SlideEditTextParagraphSpacingAmount
 }
 
+export type SlideEditTextParagraphSpacingCSSStyle = {
+  lineHeight: number
+  marginBottom: string
+  marginTop: string
+}
+
+export type SlideEditTextParagraphSpacingCSSStyleInput = {
+  lineHeightRatio?: number | null
+  paragraphAfter?: Partial<SlideEditTextParagraphSpacingAmount> | null
+  paragraphBefore?: Partial<SlideEditTextParagraphSpacingAmount> | null
+}
+
 export type SlideEditTextParagraphSpacingFieldId =
   | 'lineHeightRatio'
   | 'paragraphAfter'
@@ -272,6 +284,26 @@ export function normalizeSlideEditTextParagraphSpacingNumber({
   const rounded = Math.round(value * factor) / factor
 
   return Math.min(max, Math.max(min, rounded))
+}
+
+export function getSlideEditTextParagraphSpacingCSSStyle(
+  spacing: SlideEditTextParagraphSpacingCSSStyleInput | null | undefined,
+): SlideEditTextParagraphSpacingCSSStyle {
+  return {
+    lineHeight: normalizeSlideEditTextLineHeightRatio(spacing?.lineHeightRatio),
+    marginBottom: getSlideEditTextParagraphSpacingAmountCSS(
+      spacing?.paragraphAfter,
+    ),
+    marginTop: getSlideEditTextParagraphSpacingAmountCSS(
+      spacing?.paragraphBefore,
+    ),
+  }
+}
+
+function getSlideEditTextParagraphSpacingAmountCSS(
+  amount: Partial<SlideEditTextParagraphSpacingAmount> | null | undefined,
+) {
+  return `${normalizeSlideEditTextParagraphSpacingAmount(amount).value}px`
 }
 
 function normalizeSlideEditTextParagraphSpacingUnit(

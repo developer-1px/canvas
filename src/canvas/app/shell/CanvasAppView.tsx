@@ -7,55 +7,53 @@ import {
   useCallback,
   useState,
 } from 'react'
-import { CanvasComponentPalette } from '../affordances/authoring/component/CanvasComponentPalette'
-import { CanvasCommandPalette } from '../affordances/controls/command-palette/CanvasCommandPalette'
-import { CanvasCursorChat } from '../affordances/controls/cursor-chat/CanvasCursorChat'
-import { CanvasDrawingControls } from '../affordances/controls/drawing/CanvasDrawingControls'
-import { CanvasEmoteControls } from '../affordances/controls/emote/CanvasEmoteControls'
-import { CanvasSessionTimer } from '../affordances/controls/facilitation/CanvasSessionTimer'
-import { CanvasShortcutHelpOverlay } from '../affordances/controls/shortcut-help/CanvasShortcutHelpOverlay'
-import { CanvasSpotlight } from '../affordances/controls/facilitation/CanvasSpotlight'
-import { CanvasVotingSession } from '../affordances/controls/facilitation/CanvasVotingSession'
-import { CanvasMinimap } from '../affordances/controls/minimap/CanvasMinimap'
-import { CanvasObjectInspector } from '../affordances/editing/inspector/CanvasObjectInspector'
-import { CanvasFindReplacePanel } from '../affordances/editing/search/CanvasFindReplacePanel'
-import { CanvasImageControls } from '../affordances/io/image/CanvasImageControls'
-import { CanvasStampControls } from '../affordances/authoring/stamp/CanvasStampControls'
-import { CanvasStickyQuickCreateControl } from '../affordances/authoring/component/CanvasStickyQuickCreateControl'
-import { CanvasTextEditor } from '../affordances/editing/text-editor/CanvasTextEditor'
-import { CanvasToolbar } from '../affordances/controls/toolbar/CanvasToolbar'
 import {
-  CanvasContextCommandMenu,
-  type CanvasContextCommandMenuState,
-} from '../affordances/controls/toolbar/CanvasContextCommandMenu'
-import { CanvasSelectionFloatingBar } from '../affordances/controls/toolbar/CanvasSelectionFloatingBar'
-import { CanvasStatus } from '../affordances/controls/status/CanvasStatus'
-import { ZoomControls } from '../affordances/controls/zoom/ZoomControls'
+  DEFAULT_CANVAS_APP_FEATURE_PACK_VIEW_RENDERERS,
+  type CanvasAppCommandPaletteProps,
+  type CanvasAppComponentPaletteProps,
+  type CanvasAppContextCommandMenuState,
+  type CanvasAppCursorChatProps,
+  type CanvasAppDrawingControlsProps,
+  type CanvasAppEmoteControlsProps,
+  type CanvasAppFeaturePackViewRenderers,
+  type CanvasAppFindReplacePanelProps,
+  type CanvasAppImageControlsProps,
+  type CanvasAppMinimapProps,
+  type CanvasAppSelectionFloatingBarProps,
+  type CanvasAppSessionTimerProps,
+  type CanvasAppShortcutHelpOverlayProps,
+  type CanvasAppSpotlightProps,
+  type CanvasAppStampControlsProps,
+  type CanvasAppStatusProps,
+  type CanvasAppStickyQuickCreateControlProps,
+  type CanvasAppToolbarProps,
+  type CanvasAppVotingSessionProps,
+  type CanvasAppZoomControlsProps,
+} from '../feature-packs'
+import { CanvasObjectInspector } from '../affordances/editing/inspector/CanvasObjectInspector'
+import { CanvasTextEditor } from '../affordances/editing/text-editor/CanvasTextEditor'
 import { getCanvasAppSurfaceVisibility } from './CanvasAppSurfaceModel'
 
-type ToolbarProps = ComponentProps<typeof CanvasToolbar>
-type CommandPaletteProps = ComponentProps<typeof CanvasCommandPalette>
-type SelectionFloatingBarProps = ComponentProps<
-  typeof CanvasSelectionFloatingBar
->
-type CursorChatProps = ComponentProps<typeof CanvasCursorChat>
-type EmoteControlsProps = ComponentProps<typeof CanvasEmoteControls>
-type SessionTimerProps = ComponentProps<typeof CanvasSessionTimer>
-type ShortcutHelpProps = ComponentProps<typeof CanvasShortcutHelpOverlay>
-type SpotlightProps = ComponentProps<typeof CanvasSpotlight>
-type VotingSessionProps = ComponentProps<typeof CanvasVotingSession>
+type ToolbarProps = CanvasAppToolbarProps
+type CommandPaletteProps = CanvasAppCommandPaletteProps
+type SelectionFloatingBarProps = CanvasAppSelectionFloatingBarProps
+type CursorChatProps = CanvasAppCursorChatProps
+type EmoteControlsProps = CanvasAppEmoteControlsProps
+type SessionTimerProps = CanvasAppSessionTimerProps
+type ShortcutHelpProps = CanvasAppShortcutHelpOverlayProps
+type SpotlightProps = CanvasAppSpotlightProps
+type VotingSessionProps = CanvasAppVotingSessionProps
 type TextEditorProps = ComponentProps<typeof CanvasTextEditor>
-type DrawingControlsProps = ComponentProps<typeof CanvasDrawingControls>
-type FindReplaceProps = ComponentProps<typeof CanvasFindReplacePanel>
-type ImageControlsProps = ComponentProps<typeof CanvasImageControls>
-type StampControlsProps = ComponentProps<typeof CanvasStampControls>
-type StickyQuickCreateProps =
-  ComponentProps<typeof CanvasStickyQuickCreateControl>
+type DrawingControlsProps = CanvasAppDrawingControlsProps
+type FindReplaceProps = CanvasAppFindReplacePanelProps
+type ImageControlsProps = CanvasAppImageControlsProps
+type StampControlsProps = CanvasAppStampControlsProps
+type StickyQuickCreateProps = CanvasAppStickyQuickCreateControlProps
 type InspectorProps = ComponentProps<typeof CanvasObjectInspector>
-type PaletteProps = ComponentProps<typeof CanvasComponentPalette>
-type ZoomControlsProps = ComponentProps<typeof ZoomControls>
-type StatusProps = ComponentProps<typeof CanvasStatus>
-type MinimapProps = ComponentProps<typeof CanvasMinimap>
+type PaletteProps = CanvasAppComponentPaletteProps
+type ZoomControlsProps = CanvasAppZoomControlsProps
+type StatusProps = CanvasAppStatusProps
+type MinimapProps = CanvasAppMinimapProps
 type VisibleProps<TProps> = TProps & {
   visible: boolean
 }
@@ -69,6 +67,7 @@ type CanvasAppViewProps = {
   cursorChat: CursorChatProps
   drawingControls: VisibleProps<DrawingControlsProps>
   emoteControls: EmoteControlsProps
+  featurePackViewRenderers?: CanvasAppFeaturePackViewRenderers
   findReplace: FindReplaceProps
   imageControls: VisibleProps<ImageControlsProps>
   inspector: VisibleProps<InspectorProps>
@@ -92,6 +91,7 @@ export function CanvasAppView({
   cursorChat,
   drawingControls,
   emoteControls,
+  featurePackViewRenderers = DEFAULT_CANVAS_APP_FEATURE_PACK_VIEW_RENDERERS,
   findReplace,
   imageControls,
   inspector,
@@ -129,7 +129,8 @@ export function CanvasAppView({
   const { visible: showZoomControls, ...zoomControlProps } = zoomControls
   const { visible: showStatus, ...statusProps } = status
   const [contextMenu, setContextMenu] =
-    useState<CanvasContextCommandMenuState | null>(null)
+    useState<CanvasAppContextCommandMenuState | null>(null)
+  const featurePackViews = featurePackViewRenderers
   const inspectorHasContent = showInspector && (
     inspectorProps.customPanels.length > 0 ||
     inspectorProps.styleControls.length > 0 ||
@@ -147,29 +148,48 @@ export function CanvasAppView({
     setContextMenu({ x: event.clientX, y: event.clientY })
   }, [setContextMenu])
   const surfaces = getCanvasAppSurfaceVisibility({
-    'canvas-status': showStatus,
-    'command-palette': commandPalette.open,
-    'component-palette': showComponentPalette,
-    'context-command-menu': showToolbar && contextMenu !== null,
-    'cursor-chat': cursorChat.visible,
-    'drawing-controls': showDrawingControls,
-    'emote-controls': emoteControls.visible,
-    'find-replace-panel': findReplace.open,
-    'image-controls': showImageControls,
-    minimap: showMinimap && minimapProps.model !== null,
+    'canvas-status': showStatus && featurePackViews.status !== undefined,
+    'command-palette': commandPalette.open &&
+      featurePackViews.commandPalette !== undefined,
+    'component-palette': showComponentPalette &&
+      featurePackViews.componentPalette !== undefined,
+    'context-command-menu': showToolbar &&
+      contextMenu !== null &&
+      featurePackViews.contextCommandMenu !== undefined,
+    'cursor-chat': cursorChat.visible &&
+      featurePackViews.cursorChat !== undefined,
+    'drawing-controls': showDrawingControls &&
+      featurePackViews.drawingControls !== undefined,
+    'emote-controls': emoteControls.visible &&
+      featurePackViews.emoteControls !== undefined,
+    'find-replace-panel': findReplace.open &&
+      featurePackViews.findReplacePanel !== undefined,
+    'image-controls': showImageControls &&
+      featurePackViews.imageControls !== undefined,
+    minimap: showMinimap &&
+      minimapProps.model !== null &&
+      featurePackViews.minimap !== undefined,
     'object-inspector': inspectorHasContent,
     'selection-floating-bar': showToolbar &&
       statusProps.selectionLength > 0 &&
-      selectionCommandAnchor !== null,
-    'session-timer': sessionTimer.visible,
-    'shortcut-help': shortcutHelp.open,
-    'spotlight': spotlight.visible,
-    'stamp-controls': showStampControls,
-    'sticky-quick-create': showStickyQuickCreate,
+      selectionCommandAnchor !== null &&
+      featurePackViews.selectionFloatingBar !== undefined,
+    'session-timer': sessionTimer.visible &&
+      featurePackViews.sessionTimer !== undefined,
+    'shortcut-help': shortcutHelp.open &&
+      featurePackViews.shortcutHelp !== undefined,
+    'spotlight': spotlight.visible &&
+      featurePackViews.spotlight !== undefined,
+    'stamp-controls': showStampControls &&
+      featurePackViews.stampControls !== undefined,
+    'sticky-quick-create': showStickyQuickCreate &&
+      featurePackViews.stickyQuickCreate !== undefined,
     'text-editor': showTextEditor,
-    'toolbar': showToolbar,
-    'voting-session': votingSession.visible,
-    'zoom-controls': showZoomControls,
+    'toolbar': showToolbar && featurePackViews.toolbar !== undefined,
+    'voting-session': votingSession.visible &&
+      featurePackViews.votingSession !== undefined,
+    'zoom-controls': showZoomControls &&
+      featurePackViews.zoomControls !== undefined,
   })
   const hasTopLeftZone = surfaces.toolbar ||
     surfaces['image-controls'] ||
@@ -190,17 +210,19 @@ export function CanvasAppView({
 
       {hasTopLeftZone ? (
         <div className="canvas-floating-zone canvas-floating-zone-top-left">
-          {surfaces.toolbar ? <CanvasToolbar {...toolbarProps} /> : null}
+          {surfaces.toolbar && featurePackViews.toolbar
+            ? featurePackViews.toolbar(toolbarProps)
+            : null}
 
           {surfaces['image-controls'] || surfaces['drawing-controls'] ? (
             <div className="canvas-floating-row canvas-floating-row-authoring">
-              {surfaces['image-controls'] ? (
-                <CanvasImageControls {...imageControlProps} />
-              ) : null}
+              {surfaces['image-controls'] && featurePackViews.imageControls
+                ? featurePackViews.imageControls(imageControlProps)
+                : null}
 
-              {surfaces['drawing-controls'] ? (
-                <CanvasDrawingControls {...drawingControlProps} />
-              ) : null}
+              {surfaces['drawing-controls'] && featurePackViews.drawingControls
+                ? featurePackViews.drawingControls(drawingControlProps)
+                : null}
             </div>
           ) : null}
         </div>
@@ -208,23 +230,27 @@ export function CanvasAppView({
 
       {surfaces.spotlight ? (
         <div className="canvas-floating-zone canvas-floating-zone-top-center">
-          <CanvasSpotlight {...spotlight} />
+          {featurePackViews.spotlight
+            ? featurePackViews.spotlight(spotlight)
+            : null}
         </div>
       ) : null}
 
       {hasTopRightZone ? (
         <div className="canvas-floating-zone canvas-floating-zone-top-right">
-          {surfaces['session-timer'] ? (
-            <CanvasSessionTimer {...sessionTimer} />
-          ) : null}
+          {surfaces['session-timer'] && featurePackViews.sessionTimer
+            ? featurePackViews.sessionTimer(sessionTimer)
+            : null}
 
-          {surfaces['voting-session'] ? (
-            <CanvasVotingSession {...votingSession} />
-          ) : null}
+          {surfaces['voting-session'] && featurePackViews.votingSession
+            ? featurePackViews.votingSession(votingSession)
+            : null}
 
-          {surfaces['stamp-controls'] && stampControlProps.anchor === null ? (
-            <CanvasStampControls {...stampControlProps} />
-          ) : null}
+          {surfaces['stamp-controls'] &&
+          stampControlProps.anchor === null &&
+          featurePackViews.stampControls
+            ? featurePackViews.stampControls(stampControlProps)
+            : null}
         </div>
       ) : null}
 
@@ -234,81 +260,90 @@ export function CanvasAppView({
             <CanvasObjectInspector {...inspectorProps} />
           ) : null}
 
-          {surfaces['component-palette'] ? (
-            <CanvasComponentPalette {...componentPaletteProps} />
-          ) : null}
+          {surfaces['component-palette'] && featurePackViews.componentPalette
+            ? featurePackViews.componentPalette(componentPaletteProps)
+            : null}
         </div>
       ) : null}
 
       {hasBottomLeftZone ? (
         <div className="canvas-floating-zone canvas-floating-zone-bottom-left">
-          {surfaces['zoom-controls'] ? (
-            <ZoomControls {...zoomControlProps} />
-          ) : null}
+          {surfaces['zoom-controls'] && featurePackViews.zoomControls
+            ? featurePackViews.zoomControls(zoomControlProps)
+            : null}
 
-          {surfaces.minimap ? <CanvasMinimap {...minimapProps} /> : null}
+          {surfaces.minimap && featurePackViews.minimap
+            ? featurePackViews.minimap(minimapProps)
+            : null}
         </div>
       ) : null}
 
       {hasBottomCenterZone ? (
         <div className="canvas-floating-zone canvas-floating-zone-bottom-center">
-          {surfaces['emote-controls'] ? (
-            <CanvasEmoteControls {...emoteControls} />
-          ) : null}
+          {surfaces['emote-controls'] && featurePackViews.emoteControls
+            ? featurePackViews.emoteControls(emoteControls)
+            : null}
 
-          {surfaces['find-replace-panel'] ? (
-            <CanvasFindReplacePanel {...findReplace} />
-          ) : null}
+          {surfaces['find-replace-panel'] && featurePackViews.findReplacePanel
+            ? featurePackViews.findReplacePanel(findReplace)
+            : null}
         </div>
       ) : null}
 
       {hasBottomRightZone ? (
         <div className="canvas-floating-zone canvas-floating-zone-bottom-right">
-          <CanvasStatus {...statusProps} />
+          {featurePackViews.status
+            ? featurePackViews.status(statusProps)
+            : null}
         </div>
       ) : null}
 
-      {surfaces['stamp-controls'] && stampControlProps.anchor !== null ? (
-        <CanvasStampControls {...stampControlProps} />
-      ) : null}
+      {surfaces['stamp-controls'] &&
+      stampControlProps.anchor !== null &&
+      featurePackViews.stampControls
+        ? featurePackViews.stampControls(stampControlProps)
+        : null}
 
-      {surfaces['selection-floating-bar'] ? (
-        <CanvasSelectionFloatingBar
-          anchor={selectionCommandAnchor}
-          commandAvailability={toolbarProps.commandAvailability}
-          config={toolbarProps.config}
-          customCommands={toolbarProps.customCommands}
-          commandHandlers={toolbarProps.commandHandlers}
-          visible={true}
-          onCustomCommand={toolbarProps.onCustomCommand}
-        />
-      ) : null}
+      {surfaces['selection-floating-bar'] &&
+      featurePackViews.selectionFloatingBar
+        ? featurePackViews.selectionFloatingBar({
+          anchor: selectionCommandAnchor,
+          commandAvailability: toolbarProps.commandAvailability,
+          config: toolbarProps.config,
+          customCommands: toolbarProps.customCommands,
+          commandHandlers: toolbarProps.commandHandlers,
+          visible: true,
+          onCustomCommand: toolbarProps.onCustomCommand,
+        })
+        : null}
 
-      {surfaces['context-command-menu'] ? (
-        <CanvasContextCommandMenu
-          commandAvailability={toolbarProps.commandAvailability}
-          config={toolbarProps.config}
-          customCommands={toolbarProps.customCommands}
-          commandHandlers={toolbarProps.commandHandlers}
-          menu={contextMenu}
-          onClose={closeContextMenu}
-          onCustomCommand={toolbarProps.onCustomCommand}
-        />
-      ) : null}
+      {surfaces['context-command-menu'] && featurePackViews.contextCommandMenu
+        ? featurePackViews.contextCommandMenu({
+          commandAvailability: toolbarProps.commandAvailability,
+          config: toolbarProps.config,
+          customCommands: toolbarProps.customCommands,
+          commandHandlers: toolbarProps.commandHandlers,
+          menu: contextMenu,
+          onClose: closeContextMenu,
+          onCustomCommand: toolbarProps.onCustomCommand,
+        })
+        : null}
 
-      {surfaces['command-palette'] ? (
-        <CanvasCommandPalette {...commandPalette} />
-      ) : null}
+      {surfaces['command-palette'] && featurePackViews.commandPalette
+        ? featurePackViews.commandPalette(commandPalette)
+        : null}
 
-      {surfaces['shortcut-help'] ? (
-        <CanvasShortcutHelpOverlay {...shortcutHelp} />
-      ) : null}
+      {surfaces['shortcut-help'] && featurePackViews.shortcutHelp
+        ? featurePackViews.shortcutHelp(shortcutHelp)
+        : null}
 
-      {surfaces['cursor-chat'] ? <CanvasCursorChat {...cursorChat} /> : null}
+      {surfaces['cursor-chat'] && featurePackViews.cursorChat
+        ? featurePackViews.cursorChat(cursorChat)
+        : null}
 
-      {surfaces['sticky-quick-create'] ? (
-        <CanvasStickyQuickCreateControl {...stickyQuickCreateProps} />
-      ) : null}
+      {surfaces['sticky-quick-create'] && featurePackViews.stickyQuickCreate
+        ? featurePackViews.stickyQuickCreate(stickyQuickCreateProps)
+        : null}
 
       {surfaces['text-editor'] ? <CanvasTextEditor {...textEditorProps} /> : null}
     </main>

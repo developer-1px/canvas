@@ -2,17 +2,18 @@ import type {
   Bounds,
   CanvasJsonObject,
 } from '../../../entities'
-import type { CanvasAppCustomCommand } from '../../affordances/commands/CanvasAppCustomCommands'
-import type { CanvasAppInspectorPanel } from '../../affordances/editing/inspector/CanvasAppInspectorPanels'
+import type { CanvasAppCustomCommand } from '../custom-commands'
+import type { CanvasAppInspectorPanel } from '../inspector-panels'
 import type {
+  CanvasAppCustomItemRenderKeyStrategy,
   CanvasAppCustomItemRendererStrategy,
 } from '../../rendering/CanvasAppRenderingContracts'
 import type {
   CanvasTextPasteImporter,
-} from '../../affordances/io/text-paste/CanvasTextPasteImporters'
+} from '../../feature-packs/text-paste-import'
 import type {
   CanvasMediaImporter,
-} from '../../affordances/io/media/CanvasMediaImporters'
+} from '../../feature-packs/media-import'
 import {
   type CanvasAppCustomCreationToolContext,
   type CanvasAppCustomToolShortcut,
@@ -52,6 +53,7 @@ export type CanvasAppCustomItemModule = {
   inspectorPanels?: readonly CanvasAppInspectorPanel[]
   mediaImporters?: readonly CanvasMediaImporter[]
   presentation: string
+  getRenderKey?: CanvasAppCustomItemRenderKeyStrategy
   renderItem: CanvasAppCustomItemRendererStrategy
   textPasteImporters?: readonly CanvasTextPasteImporter[]
   validateItem: CanvasAppCustomItemValidator

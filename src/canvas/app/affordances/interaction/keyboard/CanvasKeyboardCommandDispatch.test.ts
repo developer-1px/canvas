@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import {
+  CANVAS_KEYBOARD_COMMAND_DISPATCH_MODEL,
   isCanvasKeyboardCommandIntent,
   runCanvasKeyboardCommandIntent,
   type CanvasKeyboardCommandHandlers,
@@ -7,6 +8,12 @@ import {
 } from './CanvasKeyboardCommandDispatch'
 
 describe('CanvasKeyboardCommandDispatch', () => {
+  it('exports command dispatch metadata for host DOM contracts', () => {
+    expect(CANVAS_KEYBOARD_COMMAND_DISPATCH_MODEL).toBe(
+      'canvas-keyboard-command-dispatch',
+    )
+  })
+
   it('recognizes document command intents and ignores non-command intents', () => {
     expect(isCanvasKeyboardCommandIntent({
       kind: 'delete-selection',

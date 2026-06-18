@@ -40,6 +40,7 @@ describe('Canvas foundation architecture plan', () => {
       '`src/canvas/foundation/CanvasFirstPartyExtensions.ts` | First-party extension',
       '`src/canvas/foundation/CanvasGestureEngine.ts` | Foundation',
       '`src/canvas/foundation/CanvasGridSnap.ts` | Foundation',
+      '`src/canvas/foundation/CanvasHeadlessGeometry.ts` | Foundation',
       '`src/canvas/foundation/CanvasSnapEngine.ts` | Foundation',
       '`src/canvas/foundation/CanvasSnapGeometry.ts` | Foundation',
       '`src/canvas/foundation/CanvasSnapGuides.ts` | Foundation',

@@ -12,6 +12,8 @@ import { hasCanvasInteractionMoved } from './CanvasPointerInteractionMovement'
 
 const CANVAS_LASER_POINT_DISTANCE = 3
 const CANVAS_LASER_TRAIL_MAX_POINTS = 80
+export const CANVAS_LASER_TRAIL_OVERLAY_MODEL =
+  'canvas-laser-trail-overlay'
 
 export type CanvasPointerLaserInteraction = Extract<
   Interaction,

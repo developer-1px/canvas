@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest'
 import { createCanvasSceneAdapter } from './CanvasSceneAdapter'
 import {
+  CANVAS_MARQUEE_SELECTION_MODEL,
   getCanvasItemPointerSelection,
   getCanvasMarqueeSelection,
 } from './CanvasSelectionEngine'
@@ -30,6 +31,10 @@ const scene = createCanvasSceneAdapter([
 ])
 
 describe('CanvasSelectionEngine pointer policy', () => {
+  test('exposes a stable marquee selection model metadata value', () => {
+    expect(CANVAS_MARQUEE_SELECTION_MODEL).toBe('canvas-marquee-selection')
+  })
+
   test('selects the parent group when clicking an unselected child', () => {
     expect(
       getCanvasItemPointerSelection({

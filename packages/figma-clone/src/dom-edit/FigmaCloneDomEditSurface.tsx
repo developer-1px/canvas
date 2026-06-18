@@ -16,6 +16,7 @@ import {
   getFigmaCloneDomParentId,
   getFigmaCloneDomRootId,
   getFigmaCloneDomText,
+  isFigmaCloneDomComponentRootNode,
   isFigmaCloneDomGridContainer,
   isFigmaCloneDomOutOfFlowNode,
   resolveFigmaCloneDomClickTarget,
@@ -1649,6 +1650,8 @@ function createDomNodeProps(
 ) {
   return {
     'data-dom-edit-node': nodeId,
+    'data-figma-component-root':
+      isFigmaCloneDomComponentRootNode(nodeId) ? 'true' : 'false',
     'data-figma-dom-node': nodeId,
     'data-selected': selectedNodeId === nodeId ? 'true' : 'false',
     style: createNodeStyle(state, nodeId),

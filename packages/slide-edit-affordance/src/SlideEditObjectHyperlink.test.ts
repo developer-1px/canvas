@@ -7,6 +7,7 @@ import {
   getSlideEditObjectHyperlinkValidation,
   normalizeSlideEditObjectHyperlink,
   normalizeSlideEditObjectHyperlinkFieldValue,
+  normalizeSlideEditObjectHyperlinkStorageUrl,
   shouldEmitSlideEditObjectHyperlinkMetadata,
   SLIDE_EDIT_OBJECT_HYPERLINK_ALLOWED_SCHEMES,
   SLIDE_EDIT_OBJECT_HYPERLINK_DATA_ATTRIBUTE,
@@ -126,6 +127,31 @@ describe('SlideEditObjectHyperlink', () => {
     )).toBe('new-context')
     expect(normalizeSlideEditObjectHyperlinkFieldValue('target', 'popup'))
       .toBe('same-context')
+  })
+
+  it('normalizes host storage URLs with configurable policy', () => {
+    expect(normalizeSlideEditObjectHyperlinkStorageUrl(
+      '  example.com/reference  ',
+      {
+        blockedSchemes: ['javascript', 'data', 'vbscript'],
+        maxLength: 12,
+      },
+    )).toBe('example.com/')
+    expect(normalizeSlideEditObjectHyperlinkStorageUrl(
+      'javascript:alert(1)',
+      {
+        blockedSchemes: ['javascript', 'data', 'vbscript'],
+      },
+    )).toBeNull()
+    expect(normalizeSlideEditObjectHyperlinkStorageUrl(
+      'https://example.com/\u0007bad',
+    )).toBeNull()
+    expect(normalizeSlideEditObjectHyperlinkStorageUrl(
+      'ftp://example.com/file',
+      {
+        blockedSchemes: ['javascript', 'data', 'vbscript'],
+      },
+    )).toBe('ftp://example.com/file')
   })
 
   it('routes URL updates and removal through host command effects', () => {

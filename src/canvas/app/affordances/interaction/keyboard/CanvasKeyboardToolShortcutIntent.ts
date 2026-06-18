@@ -8,6 +8,10 @@ import {
   matchesCanvasAppCustomToolShortcut,
 } from '../../../extensions/custom-tools/CanvasAppCustomCreationToolContracts'
 
+export {
+  CANVAS_KEYBOARD_TOOL_DISPATCH_MODEL,
+} from './CanvasKeyboardToolDispatch'
+
 export type CanvasKeyboardToolShortcutIntentInput = {
   config: CanvasAffordanceConfig
   customCreationTools: readonly CanvasAppCustomCreationToolState[]

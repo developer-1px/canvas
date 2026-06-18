@@ -2,7 +2,7 @@ import {
   useCanvasComponentInsertion,
   useCanvasStickyQuickCreate,
   useCanvasStickyQuickCreateControlPoints,
-} from '../affordances/authoring/component/useCanvasComponentInsertion'
+} from '../feature-packs'
 import type {
   CanvasAppComponentModel,
   CanvasAppComponentModelInput,

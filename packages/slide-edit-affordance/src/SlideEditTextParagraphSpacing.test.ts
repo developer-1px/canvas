@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   createSlideEditTextParagraphSpacingDescriptor,
   getSlideEditTextParagraphSpacingCommandEffect,
+  getSlideEditTextParagraphSpacingCSSStyle,
   normalizeSlideEditTextLineHeightRatio,
   normalizeSlideEditTextParagraphSpacingAmount,
   normalizeSlideEditTextParagraphSpacingNumber,
@@ -110,6 +111,30 @@ describe('SlideEditTextParagraphSpacing', () => {
       precision: 1,
       value: 10.49,
     })).toBe(10)
+  })
+
+  it('formats normalized paragraph spacing values for CSS rendering', () => {
+    expect(getSlideEditTextParagraphSpacingCSSStyle({
+      lineHeightRatio: 1.234,
+      paragraphAfter: {
+        unit: 'px',
+        value: 8.126,
+      },
+      paragraphBefore: {
+        unit: 'slide-unit',
+        value: 4.234,
+      },
+    })).toEqual({
+      lineHeight: 1.23,
+      marginBottom: '8.13px',
+      marginTop: '4.23px',
+    })
+
+    expect(getSlideEditTextParagraphSpacingCSSStyle(null)).toEqual({
+      lineHeight: 1,
+      marginBottom: '0px',
+      marginTop: '0px',
+    })
   })
 
   it('does not expose product names or host storage names in runtime strings', () => {

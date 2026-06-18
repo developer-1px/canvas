@@ -3,11 +3,11 @@ import type {
   CanvasCustomItem,
   CanvasJsonObject,
 } from '../../../entities'
-import type { CanvasAppCustomCommand } from '../../affordances/commands/CanvasAppCustomCommands'
-import type { CanvasAppInspectorPanel } from '../../affordances/editing/inspector/CanvasAppInspectorPanels'
+import type { CanvasAppCustomCommand } from '../custom-commands'
+import type { CanvasAppInspectorPanel } from '../inspector-panels'
 import type {
   CanvasTextPasteImporter,
-} from '../../affordances/io/text-paste/CanvasTextPasteImporters'
+} from '../../feature-packs/text-paste-import'
 import {
   defineCanvasAppCustomItemModule,
   type CanvasAppCustomItemModuleCreationTool,
@@ -193,6 +193,7 @@ function defineCanvasAppWidgetModule<
           title,
         })],
     id,
+    getRenderKey: getCanvasAppWidgetRenderKey,
     inspectorPanels,
     presentation,
     renderItem: ({ item }) => {
@@ -269,6 +270,20 @@ function defineCanvasAppWidgetModule<
     ...module,
     widgetInteraction,
   })
+}
+
+function getCanvasAppWidgetRenderKey({ item }: { item: CanvasCustomItem }) {
+  return [
+    item.id,
+    item.x,
+    item.y,
+    item.w,
+    item.h,
+    item.hidden === true ? 1 : 0,
+    item.locked === true ? 1 : 0,
+    item.title,
+    JSON.stringify(item.data),
+  ].join('|')
 }
 
 export function getCanvasAppWidgetInteractions(

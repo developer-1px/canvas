@@ -1,12 +1,31 @@
 import { describe, expect, it } from 'vitest'
 import { createCanvasAffordanceConfig } from '../../../../engine'
 import {
+  CANVAS_KEYBOARD_NUDGE_INTENT_MODEL,
+  CANVAS_KEYBOARD_NUDGE_KEYS,
+  CANVAS_KEYBOARD_NUDGE_LARGE_STEP,
+  CANVAS_KEYBOARD_NUDGE_MODEL,
+  CANVAS_KEYBOARD_NUDGE_STEP,
   getCanvasKeyboardNudgeShortcutIntent,
   getCanvasKeyboardReservedNudgeShortcuts,
 } from './CanvasKeyboardNudgeShortcuts'
 import type { CanvasKeyboardCommandShortcutIntentInput } from './CanvasKeyboardCommandShortcutIntent'
 
 describe('CanvasKeyboardNudgeShortcuts', () => {
+  it('exports nudge shortcut metadata for host DOM contracts', () => {
+    expect(CANVAS_KEYBOARD_NUDGE_MODEL).toBe(
+      'canvas-keyboard-nudge-shortcuts',
+    )
+    expect(CANVAS_KEYBOARD_NUDGE_INTENT_MODEL).toBe(
+      'canvas-keyboard-nudge-shortcut-intent',
+    )
+    expect(CANVAS_KEYBOARD_NUDGE_KEYS).toBe(
+      'ArrowLeft ArrowRight ArrowUp ArrowDown Shift+ArrowLeft Shift+ArrowRight Shift+ArrowUp Shift+ArrowDown',
+    )
+    expect(CANVAS_KEYBOARD_NUDGE_STEP).toBe(1)
+    expect(CANVAS_KEYBOARD_NUDGE_LARGE_STEP).toBe(10)
+  })
+
   it('maps arrow keys to nudge intents', () => {
     expect(getCanvasKeyboardNudgeShortcutIntent(createInput({
       event: createKeyboardEvent({ key: 'ArrowRight' }),

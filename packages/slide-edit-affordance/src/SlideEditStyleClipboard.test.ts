@@ -3,8 +3,10 @@ import { describe, expect, it } from 'vitest'
 import {
   createSlideEditStyleClipboardDescriptor,
   createSlideEditStyleClipboardPasteCommandEffect,
+  getSlideEditStyleClipboardCategoryDescriptors,
   getSlideEditStyleClipboardCategoryIds,
   getSlideEditStyleClipboardCopyCommandEffect,
+  getSlideEditStyleClipboardKeyboardIntent,
   getSlideEditStyleClipboardPasteAvailability,
   SLIDE_EDIT_STYLE_CLIPBOARD_BUILT_IN_CATEGORIES,
 } from './SlideEditStyleClipboard'
@@ -120,6 +122,46 @@ describe('SlideEditStyleClipboard', () => {
     ])
   })
 
+  it('selects built-in category descriptors from category ids in registry order', () => {
+    expect(getSlideEditStyleClipboardCategoryDescriptors({
+      categoryIds: ['text-style', 'shape-fill', 'text-style'],
+    })).toEqual([
+      {
+        id: 'shape-fill',
+        label: 'Shape Fill',
+      },
+      {
+        id: 'text-style',
+        label: 'Text Style',
+      },
+    ])
+  })
+
+  it('selects custom category descriptors and ignores unknown ids', () => {
+    expect(getSlideEditStyleClipboardCategoryDescriptors({
+      categoryIds: ['custom-fill', 'unknown', 'custom-fill'],
+      registry: [
+        {
+          id: 'custom-fill',
+          label: 'Custom Fill',
+        },
+        {
+          id: 'custom-stroke',
+          label: 'Custom Stroke',
+        },
+        {
+          id: 'custom-fill',
+          label: 'Duplicate Custom Fill',
+        },
+      ],
+    })).toEqual([
+      {
+        id: 'custom-fill',
+        label: 'Custom Fill',
+      },
+    ])
+  })
+
   it('routes copy formatting intent through a host command effect', () => {
     expect(getSlideEditStyleClipboardCopyCommandEffect(createClipboard()))
       .toMatchObject({
@@ -138,6 +180,46 @@ describe('SlideEditStyleClipboard', () => {
         },
         type: 'slide-command-effect',
       })
+  })
+
+  it('maps style clipboard keyboard shortcuts to formatting intents', () => {
+    expect(getSlideEditStyleClipboardKeyboardIntent({
+      event: { shiftKey: true },
+      key: 'C',
+      mod: true,
+    })).toEqual({
+      commandId: 'copy-object-formatting',
+      kind: 'copy-formatting',
+      preventDefault: true,
+      shortcut: 'Shift+Cmd/Ctrl+C',
+    })
+
+    expect(getSlideEditStyleClipboardKeyboardIntent({
+      event: { shiftKey: true },
+      key: 'v',
+      mod: true,
+    })).toEqual({
+      commandId: 'paste-object-formatting',
+      kind: 'paste-formatting',
+      preventDefault: true,
+      shortcut: 'Shift+Cmd/Ctrl+V',
+    })
+
+    expect(getSlideEditStyleClipboardKeyboardIntent({
+      event: { shiftKey: false },
+      key: 'c',
+      mod: true,
+    })).toBeNull()
+    expect(getSlideEditStyleClipboardKeyboardIntent({
+      event: { shiftKey: true },
+      key: 'c',
+      mod: false,
+    })).toBeNull()
+    expect(getSlideEditStyleClipboardKeyboardIntent({
+      event: { shiftKey: true },
+      key: 'x',
+      mod: true,
+    })).toBeNull()
   })
 
   it('describes per-target paste formatting applicability', () => {

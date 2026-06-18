@@ -16,6 +16,25 @@ export type SlideEditStyleClipboardDisabledReason =
   | 'no-compatible-categories'
   | 'no-target-selection'
 
+export type SlideEditStyleClipboardKeyboardIntentKind =
+  | 'copy-formatting'
+  | 'paste-formatting'
+
+export type SlideEditStyleClipboardKeyboardIntent = {
+  commandId: 'copy-object-formatting' | 'paste-object-formatting'
+  kind: SlideEditStyleClipboardKeyboardIntentKind
+  preventDefault: true
+  shortcut: string
+}
+
+export type SlideEditStyleClipboardKeyboardIntentInput = {
+  event: {
+    shiftKey: boolean
+  }
+  key: string
+  mod: boolean
+}
+
 export type SlideEditStyleClipboardCategoryDescriptor<
   TCategoryId extends SlideEditStyleClipboardCategoryId =
     SlideEditStyleClipboardCategoryId,
@@ -205,6 +224,41 @@ export const SLIDE_EDIT_STYLE_CLIPBOARD_BUILT_IN_CATEGORIES = Object.freeze([
   SlideEditStyleClipboardBuiltInCategoryId
 >[])
 
+export const SLIDE_EDIT_STYLE_CLIPBOARD_COPY_FORMATTING_SHORTCUT =
+  'Shift+Cmd/Ctrl+C'
+export const SLIDE_EDIT_STYLE_CLIPBOARD_PASTE_FORMATTING_SHORTCUT =
+  'Shift+Cmd/Ctrl+V'
+
+export function getSlideEditStyleClipboardKeyboardIntent({
+  event,
+  key,
+  mod,
+}: SlideEditStyleClipboardKeyboardIntentInput):
+  SlideEditStyleClipboardKeyboardIntent | null {
+  if (!mod || !event.shiftKey) {
+    return null
+  }
+
+  switch (key.toLowerCase()) {
+    case 'c':
+      return {
+        commandId: 'copy-object-formatting',
+        kind: 'copy-formatting',
+        preventDefault: true,
+        shortcut: SLIDE_EDIT_STYLE_CLIPBOARD_COPY_FORMATTING_SHORTCUT,
+      }
+    case 'v':
+      return {
+        commandId: 'paste-object-formatting',
+        kind: 'paste-formatting',
+        preventDefault: true,
+        shortcut: SLIDE_EDIT_STYLE_CLIPBOARD_PASTE_FORMATTING_SHORTCUT,
+      }
+    default:
+      return null
+  }
+}
+
 export function createSlideEditStyleClipboardDescriptor<
   TSlideId extends SlideEditStyleClipboardSlideId,
   TObjectId extends SlideEditStyleClipboardObjectId,
@@ -255,6 +309,40 @@ export function getSlideEditStyleClipboardCategoryIds<
   >,
 ) {
   return clipboard.categories.map((category) => category.id)
+}
+
+export function getSlideEditStyleClipboardCategoryDescriptors<
+  TCategoryId extends SlideEditStyleClipboardCategoryId =
+    SlideEditStyleClipboardBuiltInCategoryId,
+>({
+  categoryIds,
+  registry,
+}: {
+  categoryIds: readonly TCategoryId[]
+  registry?: readonly SlideEditStyleClipboardCategoryDescriptor<TCategoryId>[]
+}): SlideEditStyleClipboardCategoryDescriptor<TCategoryId>[] {
+  const descriptorRegistry = registry ??
+    (SLIDE_EDIT_STYLE_CLIPBOARD_BUILT_IN_CATEGORIES as unknown as readonly SlideEditStyleClipboardCategoryDescriptor<
+      TCategoryId
+    >[])
+  const selectedCategoryIds = new Set<TCategoryId>(categoryIds)
+  const emittedCategoryIds = new Set<TCategoryId>()
+  const descriptors: SlideEditStyleClipboardCategoryDescriptor<TCategoryId>[] =
+    []
+
+  for (const descriptor of descriptorRegistry) {
+    if (
+      !selectedCategoryIds.has(descriptor.id) ||
+      emittedCategoryIds.has(descriptor.id)
+    ) {
+      continue
+    }
+
+    emittedCategoryIds.add(descriptor.id)
+    descriptors.push(descriptor)
+  }
+
+  return descriptors
 }
 
 export function getSlideEditStyleClipboardCopyCommandEffect<

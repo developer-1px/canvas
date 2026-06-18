@@ -38,6 +38,14 @@ export type CanvasAppViewportControlContext = {
   viewportRect: CanvasAppStageRect | null
 }
 
+export type CanvasAppViewportFocusControls = {
+  centerAtWorldPoint: (point: Point) => void
+  fitAll: () => void
+  fitItems: (ids: readonly string[]) => void
+  fitSelection: () => void
+  viewportRect: CanvasAppStageRect | null
+}
+
 export type CanvasAppViewportConsumerModel = {
   control: CanvasAppViewportControlContext
   keyboard: CanvasAppKeyboardViewportContext

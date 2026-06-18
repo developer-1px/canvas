@@ -75,6 +75,27 @@ describe('CanvasAppView', () => {
     expect(markup).toContain('zoom-controls')
   })
 
+  it('omits optional feature-pack surfaces when view renderers are uninstalled', () => {
+    const markup = renderToStaticMarkup(
+      <CanvasAppView
+        {...createViewProps({
+          commandPalette: true,
+          shortcutHelp: true,
+        })}
+        featurePackViewRenderers={{}}
+      />,
+    )
+
+    expect(markup).not.toContain('command-palette')
+    expect(markup).not.toContain('component-palette')
+    expect(markup).not.toContain('cursor-chat')
+    expect(markup).not.toContain('canvas-status')
+    expect(markup).not.toContain('zoom-controls')
+    expect(markup).toContain('object-inspector')
+    expect(markup).toContain('text-editor')
+    expect(markup).toContain('canvas-stage')
+  })
+
   it('renders the command palette as a modal surface when open', () => {
     const markup = renderToStaticMarkup(
       <CanvasAppView {...createViewProps({ commandPalette: true })} />,

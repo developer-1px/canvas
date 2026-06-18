@@ -1,3 +1,5 @@
+import { getCanvasSelectionListRangeIds } from '../../../src/canvas/app/affordances/controls/selection-list/CanvasSelectionListRange'
+
 export type SlideEditLayerPaneSlideId = string
 export type SlideEditLayerPaneObjectId = string
 export type SlideEditLayerPaneGroupId = string
@@ -16,12 +18,22 @@ export const SLIDE_EDIT_LAYER_PANE_ARIA_CONTRACT = Object.freeze({
   selectionModel: 'host-controlled-multi-select',
 } as const satisfies SlideEditLayerPaneAriaContract)
 
+export const SLIDE_EDIT_LAYER_PANE_KEYBOARD_INTENT_MODEL =
+  'slide-edit-layer-pane-keyboard-intent'
+
+export const SLIDE_EDIT_LAYER_PANE_KEYBOARD_KEYS =
+  'arrow-left-right-up-down-home-end-enter-space-shift-range-alt-reorder-f2-rename'
+
+export const SLIDE_EDIT_LAYER_PANE_DROP_INDICATOR_MODEL =
+  'slide-edit-layer-pane-drop-indicator'
+
 export type SlideEditLayerPaneObjectInput<
   TObjectId extends SlideEditLayerPaneObjectId = SlideEditLayerPaneObjectId,
   TGroupId extends SlideEditLayerPaneGroupId = SlideEditLayerPaneGroupId,
 > = {
   displayName: string
   groupId?: TGroupId | null
+  isExpanded?: boolean
   isGroup?: boolean
   isHidden?: boolean
   isLocked?: boolean
@@ -47,6 +59,7 @@ export type SlideEditLayerPaneRowDescriptor<
   isGrouped: boolean
   isGroup: boolean
   isHidden: boolean
+  ariaExpanded?: boolean
   isLocked: boolean
   isRenamable: boolean
   isReorderable: boolean
@@ -69,6 +82,18 @@ export type SlideEditLayerPaneDescriptor<
   rows: readonly SlideEditLayerPaneRowDescriptor<TSlideId, TObjectId, TGroupId>[]
   selectedObjectIds: readonly TObjectId[]
   slideId: TSlideId
+}
+
+export type SlideEditLayerPaneDropPlacement = 'after' | 'before' | 'none'
+
+export type SlideEditLayerPaneDropIndicator<
+  TObjectId extends SlideEditLayerPaneObjectId = SlideEditLayerPaneObjectId,
+> = {
+  draggedObjectId: TObjectId
+  indicator: '' | 'after' | 'before'
+  placement: SlideEditLayerPaneDropPlacement
+  targetObjectId: TObjectId | null
+  toIndex: number | null
 }
 
 export type SlideEditLayerPaneCommandId =
@@ -159,6 +184,48 @@ export type SlideEditLayerPaneIntent<
     type: 'row-drop'
   }
 
+export type SlideEditLayerPaneKeyboardKey =
+  | 'ArrowDown'
+  | 'ArrowLeft'
+  | 'ArrowRight'
+  | 'ArrowUp'
+  | 'End'
+  | 'F2'
+  | 'Enter'
+  | 'Home'
+  | ' '
+
+export type SlideEditLayerPaneKeyboardIntent<
+  TObjectId extends SlideEditLayerPaneObjectId = SlideEditLayerPaneObjectId,
+> =
+  | {
+    preventDefault: false
+    type: 'none'
+  }
+  | {
+    objectId: TObjectId
+    preventDefault: true
+    type:
+      | 'collapse-row'
+      | 'expand-row'
+      | 'focus-parent-row'
+      | 'focus-row'
+      | 'rename-row'
+      | 'select-row'
+  }
+  | {
+    objectId: TObjectId
+    preventDefault: true
+    toIndex: number
+    type: 'reorder-row'
+  }
+  | {
+    objectId: TObjectId
+    preventDefault: true
+    rangeAnchorObjectId: TObjectId
+    type: 'range-select-row'
+  }
+
 export function createSlideEditLayerPaneDescriptor<
   TSlideId extends SlideEditLayerPaneSlideId,
   TObjectId extends SlideEditLayerPaneObjectId,
@@ -181,13 +248,22 @@ export function createSlideEditLayerPaneDescriptor<
       order: object.order ?? index,
     }))
     .sort((a, b) => a.order - b.order)
-    .map(({ object, order }, index, sorted) => {
-      const ariaLevel = object.parentObjectId ? 2 : 1
+    .map(({ object, order }, _index, sorted) => {
+      const parentObjectId = object.parentObjectId ?? null
+      const siblingRows = sorted.filter(
+        (candidate) => (candidate.object.parentObjectId ?? null) === parentObjectId,
+      )
+      const ariaLevel = getSlideEditLayerPaneAriaLevel(sorted, object)
 
       return {
         ariaLevel,
-        ariaPosInSet: index + 1,
-        ariaSetSize: sorted.length,
+        ariaExpanded: object.isGroup === true
+          ? object.isExpanded !== false
+          : undefined,
+        ariaPosInSet: siblingRows.findIndex(
+          (candidate) => candidate.object.objectId === object.objectId,
+        ) + 1,
+        ariaSetSize: siblingRows.length,
         displayName: object.displayName,
         groupId: object.groupId ?? null,
         isGrouped: Boolean(object.groupId),
@@ -201,7 +277,7 @@ export function createSlideEditLayerPaneDescriptor<
         kindLabel: object.kindLabel,
         objectId: object.objectId,
         order,
-        parentObjectId: object.parentObjectId ?? null,
+        parentObjectId,
         slideId,
       } satisfies SlideEditLayerPaneRowDescriptor<TSlideId, TObjectId, TGroupId>
     })
@@ -212,6 +288,173 @@ export function createSlideEditLayerPaneDescriptor<
     rows,
     selectedObjectIds,
     slideId,
+  }
+}
+
+export function getSlideEditLayerPaneResolvedFocusObjectId<
+  TSlideId extends SlideEditLayerPaneSlideId,
+  TObjectId extends SlideEditLayerPaneObjectId,
+  TGroupId extends SlideEditLayerPaneGroupId,
+>(
+  descriptor: SlideEditLayerPaneDescriptor<TSlideId, TObjectId, TGroupId>,
+  {
+    defaultObjectId = null,
+    preferredObjectId = descriptor.activeObjectId,
+  }: {
+    defaultObjectId?: TObjectId | null
+    preferredObjectId?: TObjectId | null
+  } = {},
+): TObjectId | null {
+  if (
+    preferredObjectId !== null &&
+    findSlideEditLayerPaneRow(descriptor, preferredObjectId)
+  ) {
+    return preferredObjectId
+  }
+
+  if (
+    defaultObjectId !== null &&
+    findSlideEditLayerPaneRow(descriptor, defaultObjectId)
+  ) {
+    return defaultObjectId
+  }
+
+  const selectedRow = descriptor.rows.find((row) => row.isSelected)
+
+  return selectedRow?.objectId ?? descriptor.rows[0]?.objectId ?? null
+}
+
+export function getSlideEditLayerPaneKeyboardIntent<
+  TSlideId extends SlideEditLayerPaneSlideId,
+  TObjectId extends SlideEditLayerPaneObjectId,
+  TGroupId extends SlideEditLayerPaneGroupId,
+>(
+  descriptor: SlideEditLayerPaneDescriptor<TSlideId, TObjectId, TGroupId>,
+  {
+    altKey = false,
+    currentObjectId,
+    key,
+    rangeAnchorObjectId = null,
+    shiftKey = false,
+  }: {
+    altKey?: boolean
+    currentObjectId: TObjectId
+    key: string
+    rangeAnchorObjectId?: TObjectId | null
+    shiftKey?: boolean
+  },
+): SlideEditLayerPaneKeyboardIntent<TObjectId> {
+  const rows = descriptor.rows.filter((row) => row.isSelectable)
+  const currentIndex = rows.findIndex((row) => row.objectId === currentObjectId)
+
+  if (rows.length === 0 || currentIndex < 0) {
+    return { preventDefault: false, type: 'none' }
+  }
+
+  if (!altKey && !shiftKey && key === 'F2') {
+    return rows[currentIndex].isRenamable
+      ? toSlideEditLayerPaneKeyboardIntent(rows[currentIndex], 'rename-row')
+      : { preventDefault: false, type: 'none' }
+  }
+
+  if (altKey && key === 'ArrowUp') {
+    return getSlideEditLayerPaneKeyboardReorderIntent(
+      descriptor,
+      currentObjectId,
+      'up',
+    )
+  }
+
+  if (altKey && key === 'ArrowDown') {
+    return getSlideEditLayerPaneKeyboardReorderIntent(
+      descriptor,
+      currentObjectId,
+      'down',
+    )
+  }
+
+  if (shiftKey && key === 'ArrowDown') {
+    return toSlideEditLayerPaneRangeKeyboardIntent(
+      rows[Math.min(currentIndex + 1, rows.length - 1)],
+      rangeAnchorObjectId ?? currentObjectId,
+    )
+  }
+
+  if (shiftKey && key === 'ArrowUp') {
+    return toSlideEditLayerPaneRangeKeyboardIntent(
+      rows[Math.max(currentIndex - 1, 0)],
+      rangeAnchorObjectId ?? currentObjectId,
+    )
+  }
+
+  if (shiftKey && key === 'Home') {
+    return toSlideEditLayerPaneRangeKeyboardIntent(
+      rows[0],
+      rangeAnchorObjectId ?? currentObjectId,
+    )
+  }
+
+  if (shiftKey && key === 'End') {
+    return toSlideEditLayerPaneRangeKeyboardIntent(
+      rows.at(-1),
+      rangeAnchorObjectId ?? currentObjectId,
+    )
+  }
+
+  if (key === 'ArrowDown') {
+    return toSlideEditLayerPaneKeyboardIntent(
+      rows[Math.min(currentIndex + 1, rows.length - 1)],
+      'focus-row',
+    )
+  }
+
+  if (key === 'ArrowUp') {
+    return toSlideEditLayerPaneKeyboardIntent(
+      rows[Math.max(currentIndex - 1, 0)],
+      'focus-row',
+    )
+  }
+
+  if (key === 'Home') {
+    return toSlideEditLayerPaneKeyboardIntent(rows[0], 'focus-row')
+  }
+
+  if (key === 'End') {
+    return toSlideEditLayerPaneKeyboardIntent(rows.at(-1), 'focus-row')
+  }
+
+  if (key === 'Enter' || key === ' ') {
+    return toSlideEditLayerPaneKeyboardIntent(rows[currentIndex], 'select-row')
+  }
+
+  if (key === 'ArrowRight') {
+    return getSlideEditLayerPaneArrowRightIntent(descriptor, rows[currentIndex])
+  }
+
+  if (key === 'ArrowLeft') {
+    return getSlideEditLayerPaneArrowLeftIntent(descriptor, rows[currentIndex])
+  }
+
+  return { preventDefault: false, type: 'none' }
+}
+
+function toSlideEditLayerPaneRangeKeyboardIntent<
+  TSlideId extends SlideEditLayerPaneSlideId,
+  TObjectId extends SlideEditLayerPaneObjectId,
+  TGroupId extends SlideEditLayerPaneGroupId,
+>(
+  row: SlideEditLayerPaneRowDescriptor<TSlideId, TObjectId, TGroupId> | undefined,
+  rangeAnchorObjectId: TObjectId,
+): SlideEditLayerPaneKeyboardIntent<TObjectId> {
+  if (!row) {
+    return { preventDefault: false, type: 'none' }
+  }
+
+  return {
+    objectId: row.objectId,
+    preventDefault: true,
+    rangeAnchorObjectId,
+    type: 'range-select-row',
   }
 }
 
@@ -234,6 +477,125 @@ export function getSlideEditLayerPaneCommandEffect<
       return getSlideEditLayerPaneLockEffect(descriptor, intent.objectId)
     case 'row-drop':
       return getSlideEditLayerPaneReorderEffect(descriptor, intent)
+  }
+}
+
+function getSlideEditLayerPaneKeyboardReorderIntent<
+  TSlideId extends SlideEditLayerPaneSlideId,
+  TObjectId extends SlideEditLayerPaneObjectId,
+  TGroupId extends SlideEditLayerPaneGroupId,
+>(
+  descriptor: SlideEditLayerPaneDescriptor<TSlideId, TObjectId, TGroupId>,
+  currentObjectId: TObjectId,
+  direction: 'down' | 'up',
+): SlideEditLayerPaneKeyboardIntent<TObjectId> {
+  const currentIndex = descriptor.rows.findIndex(
+    (row) => row.objectId === currentObjectId,
+  )
+  const currentRow = descriptor.rows[currentIndex]
+
+  if (!currentRow?.isSelectable || !currentRow.isReorderable) {
+    return { preventDefault: false, type: 'none' }
+  }
+
+  const targetEntries = direction === 'up'
+    ? descriptor.rows
+        .slice(0, currentIndex)
+        .map((row, index) => ({ index, row }))
+        .reverse()
+    : descriptor.rows
+        .slice(currentIndex + 1)
+        .map((row, offset) => ({ index: currentIndex + 1 + offset, row }))
+  const target = targetEntries.find(({ row }) =>
+    row.isSelectable &&
+      row.isReorderable &&
+      !isSlideEditLayerPaneDescendantRow(descriptor, row, currentObjectId))
+
+  if (!target) {
+    return { preventDefault: false, type: 'none' }
+  }
+
+  const toIndex = normalizeSlideEditLayerPaneIndex(
+    direction === 'up' ? target.index : target.index + 1,
+    descriptor.rows.length,
+  )
+  const insertionIndex = getSlideEditLayerPaneInsertionIndex(
+    currentIndex,
+    toIndex,
+  )
+
+  if (insertionIndex === currentIndex) {
+    return { preventDefault: false, type: 'none' }
+  }
+
+  return {
+    objectId: currentObjectId,
+    preventDefault: true,
+    toIndex,
+    type: 'reorder-row',
+  }
+}
+
+export function getSlideEditLayerPaneDropIndicator<
+  TSlideId extends SlideEditLayerPaneSlideId,
+  TObjectId extends SlideEditLayerPaneObjectId,
+  TGroupId extends SlideEditLayerPaneGroupId,
+>(
+  descriptor: SlideEditLayerPaneDescriptor<TSlideId, TObjectId, TGroupId>,
+  {
+    draggedObjectId,
+    pointerOffsetY,
+    rowHeight,
+    targetObjectId,
+  }: {
+    draggedObjectId: TObjectId
+    pointerOffsetY: number
+    rowHeight: number
+    targetObjectId: TObjectId
+  },
+): SlideEditLayerPaneDropIndicator<TObjectId> {
+  const draggedIndex = descriptor.rows.findIndex(
+    (row) => row.objectId === draggedObjectId,
+  )
+  const targetIndex = descriptor.rows.findIndex(
+    (row) => row.objectId === targetObjectId,
+  )
+  const draggedRow = descriptor.rows[draggedIndex]
+  const targetRow = descriptor.rows[targetIndex]
+
+  if (
+    draggedIndex < 0 ||
+    targetIndex < 0 ||
+    draggedObjectId === targetObjectId ||
+    !draggedRow?.isReorderable ||
+    !targetRow?.isReorderable ||
+    isSlideEditLayerPaneDescendantRow(descriptor, targetRow, draggedObjectId) ||
+    rowHeight <= 0
+  ) {
+    return toSlideEditLayerPaneEmptyDropIndicator(draggedObjectId)
+  }
+
+  const placement: Exclude<SlideEditLayerPaneDropPlacement, 'none'> =
+    pointerOffsetY < rowHeight / 2 ? 'before' : 'after'
+  const toIndex = normalizeSlideEditLayerPaneIndex(
+    placement === 'before' ? targetIndex : targetIndex + 1,
+    descriptor.rows.length,
+  )
+  const insertionIndex = getSlideEditLayerPaneInsertionIndex(
+    draggedIndex,
+    toIndex,
+  )
+
+  if (insertionIndex === draggedIndex) {
+    return toSlideEditLayerPaneEmptyDropIndicator(draggedObjectId)
+  }
+
+  return {
+    draggedObjectId,
+    indicator: placement,
+    placement,
+    targetObjectId,
+    toIndex,
   }
 }
 
@@ -373,8 +735,12 @@ function getSlideEditLayerPaneReorderEffect<
     intent.toIndex,
     descriptor.rows.length,
   )
+  const insertionIndex = getSlideEditLayerPaneInsertionIndex(
+    fromIndex,
+    toIndex,
+  )
 
-  if (!row?.isReorderable || fromIndex < 0 || fromIndex === toIndex) {
+  if (!row?.isReorderable || fromIndex < 0 || insertionIndex === fromIndex) {
     return null
   }
 
@@ -413,6 +779,128 @@ function toSlideEditLayerPaneHostCommandEffect<
   }
 }
 
+function getSlideEditLayerPaneArrowRightIntent<
+  TSlideId extends SlideEditLayerPaneSlideId,
+  TObjectId extends SlideEditLayerPaneObjectId,
+  TGroupId extends SlideEditLayerPaneGroupId,
+>(
+  descriptor: SlideEditLayerPaneDescriptor<TSlideId, TObjectId, TGroupId>,
+  row:
+    | SlideEditLayerPaneRowDescriptor<TSlideId, TObjectId, TGroupId>
+    | undefined,
+): SlideEditLayerPaneKeyboardIntent<TObjectId> {
+  if (!row?.isGroup) {
+    return { preventDefault: false, type: 'none' }
+  }
+
+  if (row.ariaExpanded === false) {
+    return {
+      objectId: row.objectId,
+      preventDefault: true,
+      type: 'expand-row',
+    }
+  }
+
+  const child = descriptor.rows.find(
+    (candidate) =>
+      candidate.parentObjectId === row.objectId && candidate.isSelectable,
+  )
+
+  return toSlideEditLayerPaneKeyboardIntent(child, 'focus-row')
+}
+
+function getSlideEditLayerPaneArrowLeftIntent<
+  TSlideId extends SlideEditLayerPaneSlideId,
+  TObjectId extends SlideEditLayerPaneObjectId,
+  TGroupId extends SlideEditLayerPaneGroupId,
+>(
+  descriptor: SlideEditLayerPaneDescriptor<TSlideId, TObjectId, TGroupId>,
+  row:
+    | SlideEditLayerPaneRowDescriptor<TSlideId, TObjectId, TGroupId>
+    | undefined,
+): SlideEditLayerPaneKeyboardIntent<TObjectId> {
+  if (!row) {
+    return { preventDefault: false, type: 'none' }
+  }
+
+  if (row.isGroup && row.ariaExpanded === true) {
+    return {
+      objectId: row.objectId,
+      preventDefault: true,
+      type: 'collapse-row',
+    }
+  }
+
+  if (row.parentObjectId) {
+    const parent = findSlideEditLayerPaneRow(descriptor, row.parentObjectId)
+
+    return toSlideEditLayerPaneKeyboardIntent(parent, 'focus-parent-row')
+  }
+
+  return { preventDefault: false, type: 'none' }
+}
+
+function toSlideEditLayerPaneKeyboardIntent<
+  TSlideId extends SlideEditLayerPaneSlideId,
+  TObjectId extends SlideEditLayerPaneObjectId,
+  TGroupId extends SlideEditLayerPaneGroupId,
+>(
+  row:
+    | SlideEditLayerPaneRowDescriptor<TSlideId, TObjectId, TGroupId>
+    | undefined
+    | null,
+  type: Extract<
+    SlideEditLayerPaneKeyboardIntent<TObjectId>['type'],
+    'focus-parent-row' | 'focus-row' | 'rename-row' | 'select-row'
+  >,
+): SlideEditLayerPaneKeyboardIntent<TObjectId> {
+  if (!row?.isSelectable) {
+    return { preventDefault: false, type: 'none' }
+  }
+
+  return {
+    objectId: row.objectId,
+    preventDefault: true,
+    type,
+  }
+}
+
+function getSlideEditLayerPaneAriaLevel<
+  TObjectId extends SlideEditLayerPaneObjectId,
+  TGroupId extends SlideEditLayerPaneGroupId,
+>(
+  sorted: readonly {
+    object: SlideEditLayerPaneObjectInput<TObjectId, TGroupId>
+    order: number
+  }[],
+  object: SlideEditLayerPaneObjectInput<TObjectId, TGroupId>,
+) {
+  let level = 1
+  let parentObjectId = object.parentObjectId ?? null
+  const visited = new Set<TObjectId>()
+
+  while (parentObjectId) {
+    if (visited.has(parentObjectId)) {
+      break
+    }
+
+    visited.add(parentObjectId)
+    level += 1
+
+    const parent = sorted.find(
+      (candidate) => candidate.object.objectId === parentObjectId,
+    )
+
+    if (!parent) {
+      break
+    }
+
+    parentObjectId = parent.object.parentObjectId ?? null
+  }
+
+  return level
+}
+
 function findSlideEditLayerPaneRow<
   TSlideId extends SlideEditLayerPaneSlideId,
   TObjectId extends SlideEditLayerPaneObjectId,
@@ -422,6 +910,37 @@ function findSlideEditLayerPaneRow<
   objectId: TObjectId,
 ) {
   return descriptor.rows.find((row) => row.objectId === objectId) ?? null
+}
+
+function isSlideEditLayerPaneDescendantRow<
+  TSlideId extends SlideEditLayerPaneSlideId,
+  TObjectId extends SlideEditLayerPaneObjectId,
+  TGroupId extends SlideEditLayerPaneGroupId,
+>(
+  descriptor: SlideEditLayerPaneDescriptor<TSlideId, TObjectId, TGroupId>,
+  row: SlideEditLayerPaneRowDescriptor<TSlideId, TObjectId, TGroupId>,
+  ancestorObjectId: TObjectId,
+) {
+  let parentObjectId = row.parentObjectId ?? null
+  const visited = new Set<TObjectId>()
+
+  while (parentObjectId) {
+    if (parentObjectId === ancestorObjectId) {
+      return true
+    }
+
+    if (visited.has(parentObjectId)) {
+      return false
+    }
+
+    visited.add(parentObjectId)
+    parentObjectId = findSlideEditLayerPaneRow(
+      descriptor,
+      parentObjectId,
+    )?.parentObjectId ?? null
+  }
+
+  return false
 }
 
 function toggleSlideEditLayerPaneSelection<TObjectId extends string>(
@@ -442,24 +961,34 @@ function getSlideEditLayerPaneRangeSelection<
   anchorObjectId: TObjectId,
   objectId: TObjectId,
 ) {
-  const anchorIndex = descriptor.rows.findIndex(
-    (row) => row.objectId === anchorObjectId,
-  )
-  const targetIndex = descriptor.rows.findIndex((row) => row.objectId === objectId)
-
-  if (anchorIndex < 0 || targetIndex < 0) {
-    return [objectId]
-  }
-
-  const start = Math.min(anchorIndex, targetIndex)
-  const end = Math.max(anchorIndex, targetIndex)
+  const rangeObjectIds = getCanvasSelectionListRangeIds({
+    anchorId: anchorObjectId,
+    ids: descriptor.rows.map((row) => row.objectId),
+    targetId: objectId,
+  })
 
   return descriptor.rows
-    .slice(start, end + 1)
+    .filter((row) => rangeObjectIds.includes(row.objectId))
     .filter((row) => row.isSelectable)
     .map((row) => row.objectId)
 }
 
 function normalizeSlideEditLayerPaneIndex(index: number, length: number) {
-  return Math.max(0, Math.min(index, Math.max(0, length - 1)))
+  return Math.max(0, Math.min(index, Math.max(0, length)))
+}
+
+function getSlideEditLayerPaneInsertionIndex(fromIndex: number, toIndex: number) {
+  return fromIndex < toIndex ? Math.max(0, toIndex - 1) : toIndex
+}
+
+function toSlideEditLayerPaneEmptyDropIndicator<
+  TObjectId extends SlideEditLayerPaneObjectId,
+>(draggedObjectId: TObjectId): SlideEditLayerPaneDropIndicator<TObjectId> {
+  return {
+    draggedObjectId,
+    indicator: '',
+    placement: 'none',
+    targetObjectId: null,
+    toIndex: null,
+  }
 }

@@ -2,8 +2,8 @@ import { useMemo } from 'react'
 import type { CanvasAffordanceConfig } from '../../../../engine'
 import type { CommitCanvasItemsChange } from '../../../workflow/CanvasWorkflowContract'
 import type { CanvasAppItemReadModel } from '../../../workflow/CanvasAppItemReadModelContracts'
-import type { CanvasAppCustomFocus } from '../../interaction/focus/CanvasAppCustomFocus'
-import type { CanvasAppInspectorPanel } from './CanvasAppInspectorPanels'
+import type { CanvasAppCustomFocus } from '../../../extensions/custom-focus'
+import type { CanvasAppInspectorPanel } from '../../../extensions/inspector-panels'
 import { getCanvasObjectInspectorModel } from './CanvasObjectInspectorModel'
 
 type UseCanvasObjectInspectorArgs = {

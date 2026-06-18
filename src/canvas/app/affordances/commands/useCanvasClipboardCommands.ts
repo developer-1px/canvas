@@ -15,11 +15,9 @@ import type {
   Point,
   Viewport,
 } from '../../../entities'
-import { readCanvasClipboardImageSource } from '../io/image/CanvasImageClipboard'
-import {
-  getCanvasImageInsertCenter,
-  insertCanvasImageSource,
-} from '../io/image/CanvasImageInsertion'
+import type {
+  CanvasAppExternalPasteHandler,
+} from '../../workflow/CanvasAppCommandConsumerContracts'
 import type { CanvasAppStageElement } from '../../rendering/stage/CanvasAppStageElement'
 import type {
   CanvasDocumentClipboard,
@@ -45,6 +43,7 @@ type UseCanvasClipboardCommandsArgs = {
   createId: (prefix: string) => string
   getClipboardItems: CanvasDocumentClipboard['getClipboardItems']
   items: CanvasItem[]
+  pasteExternal?: CanvasAppExternalPasteHandler
   selection: string[]
   setEditing: Dispatch<SetStateAction<EditingText | null>>
   setClipboardItems: CanvasDocumentClipboard['setClipboardItems']
@@ -61,6 +60,7 @@ export function useCanvasClipboardCommands({
   createId,
   getClipboardItems,
   items,
+  pasteExternal,
   selection,
   setEditing,
   setClipboardItems,
@@ -148,45 +148,25 @@ export function useCanvasClipboardCommands({
     [runClipboardCommand, selection],
   )
 
-  const pasteClipboardImage = useCallback(async () => {
-    if (!config.commands.paste) {
-      return false
-    }
-
-    const source = await readCanvasClipboardImageSource()
-
-    if (!source) {
-      return false
-    }
-
-    return insertCanvasImageSource({
-      center: getCanvasImageInsertCenter({ stageElement, viewport }),
-      context: {
-        commitItemsChange,
-        createId,
-        selection,
-      },
-      source,
+  const pasteDocumentSelection = useCallback(() => {
+    pasteCanvasClipboardSelection({
+      pasteIndex: pasteIndexRef.current,
+      runClipboardCommand,
     })
-  }, [
-    commitItemsChange,
-    config.commands.paste,
-    createId,
-    selection,
-    stageElement,
-    viewport,
-  ])
+  }, [runClipboardCommand])
 
   const pasteSelection = useCallback(() => {
-    void pasteClipboardImage().then((pastedImage) => {
-      if (!pastedImage) {
-        pasteCanvasClipboardSelection({
-          pasteIndex: pasteIndexRef.current,
-          runClipboardCommand,
-        })
+    if (!pasteExternal) {
+      pasteDocumentSelection()
+      return
+    }
+
+    void Promise.resolve(pasteExternal()).then((pastedExternal) => {
+      if (!pastedExternal) {
+        pasteDocumentSelection()
       }
     })
-  }, [pasteClipboardImage, runClipboardCommand])
+  }, [pasteDocumentSelection, pasteExternal])
 
   return useMemo(
     () => ({

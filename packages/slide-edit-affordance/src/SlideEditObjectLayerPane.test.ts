@@ -3,9 +3,64 @@ import { describe, expect, it } from 'vitest'
 import {
   createSlideEditLayerPaneDescriptor,
   getSlideEditLayerPaneCommandEffect,
+  getSlideEditLayerPaneDropIndicator,
+  getSlideEditLayerPaneKeyboardIntent,
+  getSlideEditLayerPaneResolvedFocusObjectId,
   SLIDE_EDIT_LAYER_PANE_ARIA_CONTRACT,
   SLIDE_EDIT_LAYER_PANE_COMMANDS,
+  SLIDE_EDIT_LAYER_PANE_DROP_INDICATOR_MODEL,
+  SLIDE_EDIT_LAYER_PANE_KEYBOARD_INTENT_MODEL,
+  SLIDE_EDIT_LAYER_PANE_KEYBOARD_KEYS,
 } from './SlideEditObjectLayerPane'
+
+function createGroupedLayerPaneDescriptor() {
+  return createSlideEditLayerPaneDescriptor({
+    activeObjectId: 'child-a',
+    slideId: 'slide-tree',
+    selectedObjectIds: ['child-a'],
+    objects: [
+      {
+        displayName: 'Group A',
+        isExpanded: true,
+        isGroup: true,
+        kindLabel: 'Group',
+        objectId: 'group-a',
+        order: 0,
+      },
+      {
+        displayName: 'Child A',
+        groupId: 'group-a',
+        kindLabel: 'Text',
+        objectId: 'child-a',
+        order: 1,
+        parentObjectId: 'group-a',
+      },
+      {
+        displayName: 'Child B',
+        groupId: 'group-a',
+        isSelectable: false,
+        kindLabel: 'Shape',
+        objectId: 'child-b',
+        order: 2,
+        parentObjectId: 'group-a',
+      },
+      {
+        displayName: 'Group B',
+        isExpanded: false,
+        isGroup: true,
+        kindLabel: 'Group',
+        objectId: 'group-b',
+        order: 3,
+      },
+      {
+        displayName: 'Loose object',
+        kindLabel: 'Image',
+        objectId: 'loose',
+        order: 4,
+      },
+    ],
+  })
+}
 
 describe('SlideEditObjectLayerPane', () => {
   const descriptor = createSlideEditLayerPaneDescriptor({
@@ -73,6 +128,383 @@ describe('SlideEditObjectLayerPane', () => {
       rowRole: 'treeitem',
       selectionModel: 'host-controlled-multi-select',
     })
+    expect(SLIDE_EDIT_LAYER_PANE_KEYBOARD_INTENT_MODEL).toBe(
+      'slide-edit-layer-pane-keyboard-intent',
+    )
+    expect(SLIDE_EDIT_LAYER_PANE_KEYBOARD_KEYS).toBe(
+      'arrow-left-right-up-down-home-end-enter-space-shift-range-alt-reorder-f2-rename',
+    )
+  })
+
+  it('resolves layer pane focus from preferred and default rows', () => {
+    expect(getSlideEditLayerPaneResolvedFocusObjectId(descriptor, {
+      preferredObjectId: 'note',
+    })).toBe('note')
+
+    expect(getSlideEditLayerPaneResolvedFocusObjectId(descriptor, {
+      defaultObjectId: 'image',
+      preferredObjectId: 'missing',
+    })).toBe('image')
+  })
+
+  it('falls back from layer pane focus to selected row, first row, and null', () => {
+    expect(getSlideEditLayerPaneResolvedFocusObjectId(descriptor, {
+      defaultObjectId: 'missing',
+      preferredObjectId: 'also-missing',
+    })).toBe('title')
+
+    expect(getSlideEditLayerPaneResolvedFocusObjectId(
+      createSlideEditLayerPaneDescriptor({
+        objects: [
+          {
+            displayName: 'Loose object',
+            kindLabel: 'Image',
+            objectId: 'loose',
+          },
+        ],
+        selectedObjectIds: [],
+        slideId: 'slide-empty-selection',
+      }),
+    )).toBe('loose')
+
+    expect(getSlideEditLayerPaneResolvedFocusObjectId(
+      createSlideEditLayerPaneDescriptor({
+        objects: [],
+        selectedObjectIds: [],
+        slideId: 'slide-empty',
+      }),
+    )).toBeNull()
+  })
+
+  it('calculates tree row aria state for grouped layer panes', () => {
+    const groupedDescriptor = createGroupedLayerPaneDescriptor()
+
+    expect(groupedDescriptor.rows.map((row) => ({
+      ariaExpanded: row.ariaExpanded,
+      ariaLevel: row.ariaLevel,
+      ariaPosInSet: row.ariaPosInSet,
+      ariaSetSize: row.ariaSetSize,
+      isSelected: row.isSelected,
+      objectId: row.objectId,
+    }))).toEqual([
+      {
+        ariaExpanded: true,
+        ariaLevel: 1,
+        ariaPosInSet: 1,
+        ariaSetSize: 3,
+        isSelected: false,
+        objectId: 'group-a',
+      },
+      {
+        ariaExpanded: undefined,
+        ariaLevel: 2,
+        ariaPosInSet: 1,
+        ariaSetSize: 2,
+        isSelected: true,
+        objectId: 'child-a',
+      },
+      {
+        ariaExpanded: undefined,
+        ariaLevel: 2,
+        ariaPosInSet: 2,
+        ariaSetSize: 2,
+        isSelected: false,
+        objectId: 'child-b',
+      },
+      {
+        ariaExpanded: false,
+        ariaLevel: 1,
+        ariaPosInSet: 2,
+        ariaSetSize: 3,
+        isSelected: false,
+        objectId: 'group-b',
+      },
+      {
+        ariaExpanded: undefined,
+        ariaLevel: 1,
+        ariaPosInSet: 3,
+        ariaSetSize: 3,
+        isSelected: false,
+        objectId: 'loose',
+      },
+    ])
+  })
+
+  it('maps layer pane tree keyboard events to host-owned intents', () => {
+    const groupedDescriptor = createGroupedLayerPaneDescriptor()
+
+    expect(getSlideEditLayerPaneKeyboardIntent(groupedDescriptor, {
+      currentObjectId: 'group-a',
+      key: 'ArrowDown',
+    })).toEqual({
+      objectId: 'child-a',
+      preventDefault: true,
+      type: 'focus-row',
+    })
+    expect(getSlideEditLayerPaneKeyboardIntent(groupedDescriptor, {
+      currentObjectId: 'child-a',
+      key: 'ArrowDown',
+    })).toEqual({
+      objectId: 'group-b',
+      preventDefault: true,
+      type: 'focus-row',
+    })
+    expect(getSlideEditLayerPaneKeyboardIntent(groupedDescriptor, {
+      currentObjectId: 'group-b',
+      key: 'ArrowUp',
+    })).toEqual({
+      objectId: 'child-a',
+      preventDefault: true,
+      type: 'focus-row',
+    })
+    expect(getSlideEditLayerPaneKeyboardIntent(groupedDescriptor, {
+      currentObjectId: 'group-b',
+      key: 'Home',
+    })).toEqual({
+      objectId: 'group-a',
+      preventDefault: true,
+      type: 'focus-row',
+    })
+    expect(getSlideEditLayerPaneKeyboardIntent(groupedDescriptor, {
+      currentObjectId: 'group-a',
+      key: 'End',
+    })).toEqual({
+      objectId: 'loose',
+      preventDefault: true,
+      type: 'focus-row',
+    })
+    expect(getSlideEditLayerPaneKeyboardIntent(groupedDescriptor, {
+      currentObjectId: 'loose',
+      key: 'ArrowDown',
+    })).toEqual({
+      objectId: 'loose',
+      preventDefault: true,
+      type: 'focus-row',
+    })
+    expect(getSlideEditLayerPaneKeyboardIntent(groupedDescriptor, {
+      currentObjectId: 'child-a',
+      key: 'Enter',
+    })).toEqual({
+      objectId: 'child-a',
+      preventDefault: true,
+      type: 'select-row',
+    })
+    expect(getSlideEditLayerPaneKeyboardIntent(groupedDescriptor, {
+      currentObjectId: 'group-a',
+      key: ' ',
+    })).toEqual({
+      objectId: 'group-a',
+      preventDefault: true,
+      type: 'select-row',
+    })
+    expect(getSlideEditLayerPaneKeyboardIntent(groupedDescriptor, {
+      currentObjectId: 'child-a',
+      key: 'F2',
+    })).toEqual({
+      objectId: 'child-a',
+      preventDefault: true,
+      type: 'rename-row',
+    })
+    expect(getSlideEditLayerPaneKeyboardIntent(groupedDescriptor, {
+      currentObjectId: 'group-b',
+      key: 'ArrowRight',
+    })).toEqual({
+      objectId: 'group-b',
+      preventDefault: true,
+      type: 'expand-row',
+    })
+    expect(getSlideEditLayerPaneKeyboardIntent(groupedDescriptor, {
+      currentObjectId: 'group-a',
+      key: 'ArrowRight',
+    })).toEqual({
+      objectId: 'child-a',
+      preventDefault: true,
+      type: 'focus-row',
+    })
+    expect(getSlideEditLayerPaneKeyboardIntent(groupedDescriptor, {
+      currentObjectId: 'group-a',
+      key: 'ArrowLeft',
+    })).toEqual({
+      objectId: 'group-a',
+      preventDefault: true,
+      type: 'collapse-row',
+    })
+    expect(getSlideEditLayerPaneKeyboardIntent(groupedDescriptor, {
+      currentObjectId: 'child-a',
+      key: 'ArrowLeft',
+    })).toEqual({
+      objectId: 'group-a',
+      preventDefault: true,
+      type: 'focus-parent-row',
+    })
+    expect(getSlideEditLayerPaneKeyboardIntent(groupedDescriptor, {
+      currentObjectId: 'loose',
+      key: 'ArrowLeft',
+    })).toEqual({ preventDefault: false, type: 'none' })
+    expect(getSlideEditLayerPaneKeyboardIntent(groupedDescriptor, {
+      currentObjectId: 'child-b',
+      key: 'ArrowDown',
+    })).toEqual({ preventDefault: false, type: 'none' })
+    expect(getSlideEditLayerPaneKeyboardIntent(groupedDescriptor, {
+      currentObjectId: 'group-a',
+      key: 'Delete',
+    })).toEqual({ preventDefault: false, type: 'none' })
+  })
+
+  it('maps F2 only for renamable layer pane rows', () => {
+    const descriptor = createSlideEditLayerPaneDescriptor({
+      activeObjectId: 'renamable',
+      slideId: 'slide-rename',
+      selectedObjectIds: ['renamable'],
+      objects: [
+        {
+          displayName: 'Renamable',
+          kindLabel: 'Text',
+          objectId: 'renamable',
+        },
+        {
+          displayName: 'Fixed',
+          isRenamable: false,
+          kindLabel: 'Placeholder',
+          objectId: 'fixed',
+        },
+      ],
+    })
+
+    expect(getSlideEditLayerPaneKeyboardIntent(descriptor, {
+      currentObjectId: 'renamable',
+      key: 'F2',
+    })).toEqual({
+      objectId: 'renamable',
+      preventDefault: true,
+      type: 'rename-row',
+    })
+
+    expect(getSlideEditLayerPaneKeyboardIntent(descriptor, {
+      currentObjectId: 'fixed',
+      key: 'F2',
+    })).toEqual({ preventDefault: false, type: 'none' })
+
+    expect(getSlideEditLayerPaneKeyboardIntent(descriptor, {
+      altKey: true,
+      currentObjectId: 'renamable',
+      key: 'F2',
+    })).toEqual({ preventDefault: false, type: 'none' })
+
+    expect(getSlideEditLayerPaneKeyboardIntent(descriptor, {
+      currentObjectId: 'renamable',
+      key: 'F2',
+      shiftKey: true,
+    })).toEqual({ preventDefault: false, type: 'none' })
+  })
+
+  it('maps Shift keyboard range selection to host-owned intents', () => {
+    const groupedDescriptor = createGroupedLayerPaneDescriptor()
+
+    expect(getSlideEditLayerPaneKeyboardIntent(groupedDescriptor, {
+      currentObjectId: 'child-a',
+      key: 'ArrowDown',
+      rangeAnchorObjectId: 'group-a',
+      shiftKey: true,
+    })).toEqual({
+      objectId: 'group-b',
+      preventDefault: true,
+      rangeAnchorObjectId: 'group-a',
+      type: 'range-select-row',
+    })
+    expect(getSlideEditLayerPaneKeyboardIntent(groupedDescriptor, {
+      currentObjectId: 'group-b',
+      key: 'ArrowUp',
+      rangeAnchorObjectId: 'child-a',
+      shiftKey: true,
+    })).toEqual({
+      objectId: 'child-a',
+      preventDefault: true,
+      rangeAnchorObjectId: 'child-a',
+      type: 'range-select-row',
+    })
+    expect(getSlideEditLayerPaneKeyboardIntent(groupedDescriptor, {
+      currentObjectId: 'child-a',
+      key: 'ArrowDown',
+      shiftKey: true,
+    })).toEqual({
+      objectId: 'group-b',
+      preventDefault: true,
+      rangeAnchorObjectId: 'child-a',
+      type: 'range-select-row',
+    })
+    expect(getSlideEditLayerPaneKeyboardIntent(groupedDescriptor, {
+      currentObjectId: 'group-b',
+      key: 'Home',
+      rangeAnchorObjectId: 'child-a',
+      shiftKey: true,
+    })).toEqual({
+      objectId: 'group-a',
+      preventDefault: true,
+      rangeAnchorObjectId: 'child-a',
+      type: 'range-select-row',
+    })
+    expect(getSlideEditLayerPaneKeyboardIntent(groupedDescriptor, {
+      currentObjectId: 'group-a',
+      key: 'End',
+      rangeAnchorObjectId: 'group-a',
+      shiftKey: true,
+    })).toEqual({
+      objectId: 'loose',
+      preventDefault: true,
+      rangeAnchorObjectId: 'group-a',
+      type: 'range-select-row',
+    })
+  })
+
+  it('maps Alt keyboard row reorder to host-owned intents', () => {
+    const groupedDescriptor = createGroupedLayerPaneDescriptor()
+
+    expect(getSlideEditLayerPaneKeyboardIntent(groupedDescriptor, {
+      altKey: true,
+      currentObjectId: 'child-a',
+      key: 'ArrowDown',
+    })).toEqual({
+      objectId: 'child-a',
+      preventDefault: true,
+      toIndex: 4,
+      type: 'reorder-row',
+    })
+    expect(getSlideEditLayerPaneKeyboardIntent(groupedDescriptor, {
+      altKey: true,
+      currentObjectId: 'loose',
+      key: 'ArrowUp',
+    })).toEqual({
+      objectId: 'loose',
+      preventDefault: true,
+      toIndex: 3,
+      type: 'reorder-row',
+    })
+    expect(getSlideEditLayerPaneKeyboardIntent(groupedDescriptor, {
+      altKey: true,
+      currentObjectId: 'group-a',
+      key: 'ArrowDown',
+    })).toEqual({
+      objectId: 'group-a',
+      preventDefault: true,
+      toIndex: 4,
+      type: 'reorder-row',
+    })
+    expect(getSlideEditLayerPaneKeyboardIntent(groupedDescriptor, {
+      altKey: true,
+      currentObjectId: 'group-a',
+      key: 'ArrowUp',
+    })).toEqual({ preventDefault: false, type: 'none' })
+    expect(getSlideEditLayerPaneKeyboardIntent(groupedDescriptor, {
+      altKey: true,
+      currentObjectId: 'loose',
+      key: 'ArrowDown',
+    })).toEqual({ preventDefault: false, type: 'none' })
+    expect(getSlideEditLayerPaneKeyboardIntent(groupedDescriptor, {
+      altKey: true,
+      currentObjectId: 'child-b',
+      key: 'ArrowDown',
+    })).toEqual({ preventDefault: false, type: 'none' })
   })
 
   it('defines pane command descriptors as host command effects', () => {
@@ -88,6 +520,138 @@ describe('SlideEditObjectLayerPane', () => {
     expect(SLIDE_EDIT_LAYER_PANE_COMMANDS.every(
       (command) => command.requiredAdapterSlot === 'command-effect',
     )).toBe(true)
+  })
+
+  it('calculates drag drop placement indicators for reorderable layer pane rows', () => {
+    const dragDescriptor = createSlideEditLayerPaneDescriptor({
+      activeObjectId: 'a',
+      slideId: 'slide-drag',
+      selectedObjectIds: ['a'],
+      objects: [
+        {
+          displayName: 'A',
+          kindLabel: 'Text',
+          objectId: 'a',
+          order: 0,
+        },
+        {
+          displayName: 'B',
+          kindLabel: 'Shape',
+          objectId: 'b',
+          order: 1,
+        },
+        {
+          displayName: 'C',
+          kindLabel: 'Image',
+          objectId: 'c',
+          order: 2,
+        },
+        {
+          displayName: 'Locked',
+          isLocked: true,
+          kindLabel: 'Shape',
+          objectId: 'locked',
+          order: 3,
+        },
+        {
+          displayName: 'Group',
+          isExpanded: true,
+          isGroup: true,
+          kindLabel: 'Group',
+          objectId: 'group',
+          order: 4,
+        },
+        {
+          displayName: 'Group child',
+          groupId: 'group',
+          kindLabel: 'Text',
+          objectId: 'group-child',
+          order: 5,
+          parentObjectId: 'group',
+        },
+      ],
+    })
+
+    expect(SLIDE_EDIT_LAYER_PANE_DROP_INDICATOR_MODEL).toBe(
+      'slide-edit-layer-pane-drop-indicator',
+    )
+    expect(getSlideEditLayerPaneDropIndicator(dragDescriptor, {
+      draggedObjectId: 'c',
+      pointerOffsetY: 2,
+      rowHeight: 20,
+      targetObjectId: 'a',
+    })).toEqual({
+      draggedObjectId: 'c',
+      indicator: 'before',
+      placement: 'before',
+      targetObjectId: 'a',
+      toIndex: 0,
+    })
+    expect(getSlideEditLayerPaneDropIndicator(dragDescriptor, {
+      draggedObjectId: 'a',
+      pointerOffsetY: 18,
+      rowHeight: 20,
+      targetObjectId: 'c',
+    })).toEqual({
+      draggedObjectId: 'a',
+      indicator: 'after',
+      placement: 'after',
+      targetObjectId: 'c',
+      toIndex: 3,
+    })
+    expect(getSlideEditLayerPaneDropIndicator(dragDescriptor, {
+      draggedObjectId: 'a',
+      pointerOffsetY: 2,
+      rowHeight: 20,
+      targetObjectId: 'b',
+    })).toMatchObject({
+      indicator: '',
+      placement: 'none',
+      targetObjectId: null,
+      toIndex: null,
+    })
+    expect(getSlideEditLayerPaneDropIndicator(dragDescriptor, {
+      draggedObjectId: 'a',
+      pointerOffsetY: 18,
+      rowHeight: 20,
+      targetObjectId: 'locked',
+    })).toMatchObject({
+      placement: 'none',
+      toIndex: null,
+    })
+    expect(getSlideEditLayerPaneDropIndicator(dragDescriptor, {
+      draggedObjectId: 'a',
+      pointerOffsetY: 18,
+      rowHeight: 20,
+      targetObjectId: 'group',
+    })).toEqual({
+      draggedObjectId: 'a',
+      indicator: 'after',
+      placement: 'after',
+      targetObjectId: 'group',
+      toIndex: 5,
+    })
+    expect(getSlideEditLayerPaneDropIndicator(dragDescriptor, {
+      draggedObjectId: 'group',
+      pointerOffsetY: 2,
+      rowHeight: 20,
+      targetObjectId: 'a',
+    })).toEqual({
+      draggedObjectId: 'group',
+      indicator: 'before',
+      placement: 'before',
+      targetObjectId: 'a',
+      toIndex: 0,
+    })
+    expect(getSlideEditLayerPaneDropIndicator(dragDescriptor, {
+      draggedObjectId: 'group',
+      pointerOffsetY: 18,
+      rowHeight: 20,
+      targetObjectId: 'group-child',
+    })).toMatchObject({
+      placement: 'none',
+      toIndex: null,
+    })
   })
 
   it('converts replace, additive, and range selection intents to host command effects', () => {
@@ -153,6 +717,17 @@ describe('SlideEditObjectLayerPane', () => {
     })?.payload).toEqual({
       id: 'lock-objects',
       objectIds: ['title'],
+    })
+
+    expect(getSlideEditLayerPaneCommandEffect(descriptor, {
+      objectId: 'title',
+      toIndex: 3,
+      type: 'row-drop',
+    })?.payload).toEqual({
+      fromIndex: 0,
+      id: 'reorder-object',
+      objectId: 'title',
+      toIndex: 3,
     })
 
     expect(getSlideEditLayerPaneCommandEffect(descriptor, {

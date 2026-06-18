@@ -1,4 +1,4 @@
-import { useCanvasAppCustomFocus } from '../affordances/interaction/focus/useCanvasAppCustomFocus'
+import { useCanvasAppCustomFocus } from '../extensions/custom-focus'
 
 export function useCanvasAppCustomFocusModel({
   selection,

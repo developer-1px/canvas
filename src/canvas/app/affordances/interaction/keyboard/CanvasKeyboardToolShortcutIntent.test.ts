@@ -6,9 +6,18 @@ import {
 import type {
   CanvasAppCustomCreationToolState,
 } from '../../../extensions/CanvasAppExtensionStateContracts'
-import { getCanvasKeyboardToolShortcutIntent } from './CanvasKeyboardToolShortcutIntent'
+import {
+  CANVAS_KEYBOARD_TOOL_DISPATCH_MODEL,
+  getCanvasKeyboardToolShortcutIntent,
+} from './CanvasKeyboardToolShortcutIntent'
 
 describe('CanvasKeyboardToolShortcutIntent', () => {
+  it('re-exports tool dispatch metadata for host shortcut entrypoints', () => {
+    expect(CANVAS_KEYBOARD_TOOL_DISPATCH_MODEL).toBe(
+      'canvas-keyboard-tool-dispatch',
+    )
+  })
+
   it('keeps built-in tool shortcuts ahead of custom tools', () => {
     const tool = getCanvasKeyboardToolShortcutIntent(createInput({
       customCreationTools: [

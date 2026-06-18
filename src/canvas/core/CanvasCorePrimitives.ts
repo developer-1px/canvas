@@ -48,6 +48,40 @@ export const DRAG_THRESHOLD = 3
 
 export type CanvasViewportZoomDirection = 'in' | 'out'
 
+export type CanvasSequentialIdFactoryFormatInput = {
+  index: number
+  prefix: string
+}
+
+export type CanvasSequentialIdFactoryInput = {
+  existingIds?: Iterable<string>
+  formatId?: (input: CanvasSequentialIdFactoryFormatInput) => string
+  startIndex?: number
+}
+
+export type CanvasBoundsAnchor = 'bottom' | 'center' | 'left' | 'right' | 'top'
+
+export type ClampCanvasBoundsToFrameInput = {
+  bounds: Bounds
+  frame: Bounds
+  minHeight?: number
+  minWidth?: number
+}
+
+export type NormalizeCanvasPointsToLocalBoundsInput = {
+  fallbackPoint?: Point
+  frame?: Bounds
+  minHeight?: number
+  minWidth?: number
+  padding?: number
+  points: readonly Point[]
+}
+
+export type NormalizedCanvasLocalPoints = {
+  bounds: Bounds
+  points: Point[]
+}
+
 export function clamp(value: number, min: number, max: number) {
   if (!Number.isFinite(value)) {
     return min
@@ -60,14 +94,62 @@ export function getCanvasViewportWorldPoint(
   viewport: Viewport,
   point: Point,
 ): Point {
-  const scale = clamp(viewport.scale, MIN_SCALE, MAX_SCALE)
-  const viewportX = Number.isFinite(viewport.x) ? viewport.x : 0
-  const viewportY = Number.isFinite(viewport.y) ? viewport.y : 0
+  const { scale, x: viewportX, y: viewportY } = getCanvasViewportTransform(
+    viewport,
+  )
 
   return {
     x: (point.x - viewportX) / scale,
     y: (point.y - viewportY) / scale,
   }
+}
+
+export function getCanvasViewportScreenPoint(
+  viewport: Viewport,
+  point: Point,
+): Point {
+  const { scale, x: viewportX, y: viewportY } = getCanvasViewportTransform(
+    viewport,
+  )
+
+  return {
+    x: viewportX + point.x * scale,
+    y: viewportY + point.y * scale,
+  }
+}
+
+export function getCanvasViewportWorldBounds(
+  viewport: Viewport,
+  rect: CanvasViewportRect,
+): Bounds {
+  const scale = getCanvasViewportScale(viewport)
+  const topLeft = getCanvasViewportWorldPoint(viewport, { x: 0, y: 0 })
+
+  return {
+    h: Math.max(1, rect.height / scale),
+    w: Math.max(1, rect.width / scale),
+    x: topLeft.x,
+    y: topLeft.y,
+  }
+}
+
+export function getCanvasViewportScreenBounds(
+  viewport: Viewport,
+  bounds: Bounds,
+): Bounds {
+  const scale = getCanvasViewportScale(viewport)
+  const topLeft = getCanvasViewportScreenPoint(viewport, bounds)
+
+  return {
+    h: bounds.h * scale,
+    w: bounds.w * scale,
+    x: topLeft.x,
+    y: topLeft.y,
+  }
+}
+
+export function getCanvasViewportScale(viewport: Pick<Viewport, 'scale'>) {
+  return clamp(viewport.scale, MIN_SCALE, MAX_SCALE)
 }
 
 export function normalizeBounds(a: Point, b: Point): Bounds {
@@ -76,6 +158,142 @@ export function normalizeBounds(a: Point, b: Point): Bounds {
     y: Math.min(a.y, b.y),
     w: Math.abs(a.x - b.x),
     h: Math.abs(a.y - b.y),
+  }
+}
+
+export function getCanvasBoundsCenter(bounds: Bounds): Point {
+  return {
+    x: bounds.x + bounds.w / 2,
+    y: bounds.y + bounds.h / 2,
+  }
+}
+
+export function clampCanvasPointToBounds(point: Point, bounds: Bounds): Point {
+  return {
+    x: clamp(point.x, bounds.x, bounds.x + bounds.w),
+    y: clamp(point.y, bounds.y, bounds.y + bounds.h),
+  }
+}
+
+export function getCanvasPointBounds(
+  points: readonly Point[],
+  fallbackPoint: Point = { x: 0, y: 0 },
+): Bounds {
+  const [first = fallbackPoint] = points
+  let minX = first.x
+  let minY = first.y
+  let maxX = first.x
+  let maxY = first.y
+
+  for (const point of points.slice(1)) {
+    minX = Math.min(minX, point.x)
+    minY = Math.min(minY, point.y)
+    maxX = Math.max(maxX, point.x)
+    maxY = Math.max(maxY, point.y)
+  }
+
+  return {
+    h: maxY - minY,
+    w: maxX - minX,
+    x: minX,
+    y: minY,
+  }
+}
+
+export function getCanvasBoundsAnchorPoint(
+  bounds: Bounds,
+  anchor: CanvasBoundsAnchor,
+): Point {
+  const center = getCanvasBoundsCenter(bounds)
+
+  switch (anchor) {
+    case 'bottom':
+      return { x: center.x, y: bounds.y + bounds.h }
+    case 'center':
+      return center
+    case 'left':
+      return { x: bounds.x, y: center.y }
+    case 'right':
+      return { x: bounds.x + bounds.w, y: center.y }
+    case 'top':
+      return { x: center.x, y: bounds.y }
+  }
+}
+
+export function getCanvasBoundsAnchorPoints(
+  bounds: Bounds,
+): Record<CanvasBoundsAnchor, Point> {
+  return {
+    bottom: getCanvasBoundsAnchorPoint(bounds, 'bottom'),
+    center: getCanvasBoundsAnchorPoint(bounds, 'center'),
+    left: getCanvasBoundsAnchorPoint(bounds, 'left'),
+    right: getCanvasBoundsAnchorPoint(bounds, 'right'),
+    top: getCanvasBoundsAnchorPoint(bounds, 'top'),
+  }
+}
+
+export function clampCanvasBoundsToFrame({
+  bounds,
+  frame,
+  minHeight = 1,
+  minWidth = 1,
+}: ClampCanvasBoundsToFrameInput): Bounds {
+  const maxWidth = Math.max(0, frame.w)
+  const maxHeight = Math.max(0, frame.h)
+  const boundedMinWidth = clamp(minWidth, 0, maxWidth)
+  const boundedMinHeight = clamp(minHeight, 0, maxHeight)
+  const w = clamp(bounds.w, boundedMinWidth, maxWidth)
+  const h = clamp(bounds.h, boundedMinHeight, maxHeight)
+
+  return {
+    h,
+    w,
+    x: clamp(bounds.x, frame.x, frame.x + maxWidth - w),
+    y: clamp(bounds.y, frame.y, frame.y + maxHeight - h),
+  }
+}
+
+export function normalizeCanvasPointsToLocalBounds({
+  fallbackPoint = { x: 0, y: 0 },
+  frame,
+  minHeight = 1,
+  minWidth = 1,
+  padding = 0,
+  points,
+}: NormalizeCanvasPointsToLocalBoundsInput): NormalizedCanvasLocalPoints {
+  const sourcePoints = points.length > 0
+    ? points
+    : [fallbackPoint]
+  const safePoints = frame
+    ? sourcePoints.map((point) => clampCanvasPointToBounds(point, frame))
+    : sourcePoints.map((point) => ({ ...point }))
+  const rawBounds = getCanvasPointBounds(safePoints, fallbackPoint)
+  const safePadding = Math.max(0, Number.isFinite(padding) ? padding : 0)
+  const safeMinWidth = Math.max(0, Number.isFinite(minWidth) ? minWidth : 0)
+  const safeMinHeight = Math.max(0, Number.isFinite(minHeight) ? minHeight : 0)
+  const width = Math.max(safeMinWidth, rawBounds.w + safePadding * 2)
+  const height = Math.max(safeMinHeight, rawBounds.h + safePadding * 2)
+  const bounds = {
+    h: height,
+    w: width,
+    x: rawBounds.x - Math.max(safePadding, (width - rawBounds.w) / 2),
+    y: rawBounds.y - Math.max(safePadding, (height - rawBounds.h) / 2),
+  }
+  const localBounds = frame
+    ? clampCanvasBoundsToFrame({
+        bounds,
+        frame,
+        minHeight: safeMinHeight,
+        minWidth: safeMinWidth,
+      })
+    : bounds
+
+  return {
+    bounds: localBounds,
+    points: safePoints.map((point) => ({
+      x: point.x - localBounds.x,
+      y: point.y - localBounds.y,
+    })),
   }
 }
 
@@ -103,8 +321,31 @@ export function pointDistance(a: Point, b: Point) {
   return Math.hypot(a.x - b.x, a.y - b.y)
 }
 
-export function unique(ids: string[]) {
+export function unique<TId extends string>(ids: readonly TId[]): TId[] {
   return Array.from(new Set(ids))
+}
+
+export function createCanvasSequentialIdFactory({
+  existingIds = [],
+  formatId = formatDefaultCanvasSequentialId,
+  startIndex = 1,
+}: CanvasSequentialIdFactoryInput = {}) {
+  const ids = new Set(existingIds)
+  let nextIndex = normalizeCanvasSequentialIdIndex(startIndex)
+
+  return (prefix: string) => {
+    let id = formatId({ index: nextIndex, prefix })
+
+    while (ids.has(id)) {
+      nextIndex += 1
+      id = formatId({ index: nextIndex, prefix })
+    }
+
+    ids.add(id)
+    nextIndex += 1
+
+    return id
+  }
 }
 
 export function zoomViewport(current: Viewport, point: Point, multiplier: number) {
@@ -143,4 +384,25 @@ export function getCanvasViewportZoomStepMultiplier(
   const currentScale = clamp(scale, MIN_SCALE, MAX_SCALE)
 
   return getCanvasViewportZoomStep(currentScale, direction) / currentScale
+}
+
+function getCanvasViewportTransform(viewport: Viewport) {
+  return {
+    scale: getCanvasViewportScale(viewport),
+    x: Number.isFinite(viewport.x) ? viewport.x : 0,
+    y: Number.isFinite(viewport.y) ? viewport.y : 0,
+  }
+}
+
+function formatDefaultCanvasSequentialId({
+  index,
+  prefix,
+}: CanvasSequentialIdFactoryFormatInput) {
+  return `${prefix}-${index}`
+}
+
+function normalizeCanvasSequentialIdIndex(value: number) {
+  return Number.isFinite(value)
+    ? Math.max(1, Math.floor(value))
+    : 1
 }

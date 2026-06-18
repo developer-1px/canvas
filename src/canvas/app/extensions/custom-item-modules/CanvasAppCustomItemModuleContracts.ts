@@ -1,16 +1,17 @@
-import { assertCanvasAppCustomCommands } from '../../affordances/commands/CanvasAppCustomCommandContracts'
+import { assertCanvasAppCustomCommands } from '../custom-commands'
 import {
   assertCanvasAppArray,
   assertCanvasAppDescriptorObject,
+  assertCanvasAppOptionalDescriptorFunctionField,
 } from '../CanvasAppDescriptorContracts'
 import { assertCanvasAppExtensionId } from '../CanvasAppExtensionIds'
-import { assertCanvasAppInspectorPanels } from '../../affordances/editing/inspector/CanvasAppInspectorPanelContracts'
+import { assertCanvasAppInspectorPanels } from '../inspector-panels'
 import {
   assertCanvasTextPasteImporters,
-} from '../../affordances/io/text-paste/CanvasTextPasteImporters'
+} from '../../feature-packs/text-paste-import'
 import {
   assertCanvasMediaImporters,
-} from '../../affordances/io/media/CanvasMediaImporters'
+} from '../../feature-packs/media-import'
 import { assertCanvasAppCustomCreationTools } from '../custom-tools/CanvasAppCustomCreationToolContracts'
 import type { CanvasAppCustomItemModuleAssembly } from './CanvasAppCustomItemModuleAssembly'
 import type {
@@ -64,6 +65,11 @@ export function assertCanvasAppCustomItemModule(
     fn: module.renderItem,
     label: 'renderer',
     moduleId: module.id,
+  })
+  assertCanvasAppOptionalDescriptorFunctionField({
+    field: 'render key strategy',
+    owner: `custom item module ${module.id}`,
+    value: module.getRenderKey,
   })
   assertCanvasAppCustomItemModuleFunction({
     fn: module.validateItem,

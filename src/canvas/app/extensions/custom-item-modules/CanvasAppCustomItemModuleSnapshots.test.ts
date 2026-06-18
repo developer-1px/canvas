@@ -99,9 +99,9 @@ describe('CanvasAppCustomItemModules snapshots', () => {
       presentation: 'risk-node',
       title: 'Risk',
     })
-    expect(assembly.customItemRenderers['risk-node']?.({
+    expectCustomItemRenderer(assembly.customItemRenderers['risk-node'])({
       item: createRiskItem(),
-    })).toBe('risk')
+    })
     expect(assembly.customItemValidators.risk(createRiskItem())).toBe(true)
     expect(assembly.inspectorPanels[0]?.render({
       bounds: null,
@@ -263,4 +263,18 @@ function createRiskItem() {
     h: 80,
     data: { severity: 'high' },
   } as const
+}
+
+function expectCustomItemRenderer(
+  renderer: ReturnType<typeof createCanvasAppCustomItemModuleAssembly>[
+    'customItemRenderers'
+  ][string] | undefined,
+) {
+  if (typeof renderer !== 'function') {
+    throw new Error('Expected function custom item renderer')
+  }
+
+  return (input: Parameters<typeof renderer>[0]) => {
+    expect(renderer(input)).toBe('risk')
+  }
 }

@@ -33,6 +33,7 @@ extensions.
 | `src/canvas/foundation/CanvasFirstPartyExtensions.ts` | First-party extension | tracer bullet added | Holds the first concrete first-party extension descriptor without Host/App/UI/Renderer imports. |
 | `src/canvas/foundation/CanvasGestureEngine.ts` | Foundation | promoted | Owns pointer input to gesture classification over a structural gesture config contract. |
 | `src/canvas/foundation/CanvasGridSnap.ts` | Foundation | promoted | Owns grid snap calculations over a structural grid snap config contract. |
+| `src/canvas/foundation/CanvasHeadlessGeometry.ts` | Foundation | promoted | Owns measured rect union, padding, local coordinate conversion, and edge-distance calculations for selection/measurement overlays without DOM or product data ownership. |
 | `src/canvas/foundation/CanvasSceneAdapter.ts` | Foundation | promoted | Owns scene entries, parent/path/bounds read contracts, and scene-derived bounds without Demo item variants. |
 | `src/canvas/foundation/CanvasSelectionEngine.ts` | Foundation | promoted | Owns pointer click and marquee selection policy over `CanvasSceneAdapter`. |
 | `src/canvas/foundation/CanvasSnapEngine.ts` | Foundation | promoted | Owns move snap planning over structural snap config and `CanvasSceneAdapter`. |

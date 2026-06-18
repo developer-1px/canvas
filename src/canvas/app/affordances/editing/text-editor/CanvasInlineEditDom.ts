@@ -1,4 +1,41 @@
-type InlineEditHistoryDirection = 'undo' | 'redo'
+export type InlineEditHistoryDirection = 'undo' | 'redo'
+
+export const CANVAS_INLINE_EDIT_DOM_MODEL = 'canvas-inline-edit-dom'
+
+export type CanvasInlineEditKeyboardIntent =
+  | {
+    historyDirection: InlineEditHistoryDirection
+    kind: 'history'
+    preventDefault: false
+  }
+  | {
+    inputType: 'insertParagraph'
+    kind: 'line-break'
+    preventDefault: boolean
+  }
+  | {
+    kind: 'commit'
+    preventDefault: true
+    source: 'enter' | 'shortcut-enter'
+  }
+  | {
+    kind: 'cancel'
+    preventDefault: true
+  }
+  | {
+    kind: 'none'
+    preventDefault: false
+  }
+
+export type CanvasInlineEditKeyboardIntentInput = Pick<
+  KeyboardEvent,
+  'altKey' | 'ctrlKey' | 'key' | 'metaKey' | 'shiftKey'
+> & {
+  altEnterInsertsLineBreak?: boolean
+  commitOnEnter?: boolean
+  lineBreakMode?: 'manual' | 'native'
+  multiline?: boolean
+}
 
 type InlineEditTextPosition = {
   node: Text
@@ -39,6 +76,86 @@ export function inlineEditHistoryDirectionFromKeydown(
   }
 
   return null
+}
+
+export function getCanvasInlineEditKeyboardIntent({
+  altEnterInsertsLineBreak = false,
+  altKey,
+  commitOnEnter = false,
+  ctrlKey,
+  key,
+  lineBreakMode = 'native',
+  metaKey,
+  multiline = true,
+  shiftKey,
+}: CanvasInlineEditKeyboardIntentInput): CanvasInlineEditKeyboardIntent {
+  const historyDirection = inlineEditHistoryDirectionFromKeydown({
+    altKey,
+    ctrlKey,
+    key,
+    metaKey,
+    shiftKey,
+  })
+
+  if (historyDirection) {
+    return {
+      historyDirection,
+      kind: 'history',
+      preventDefault: false,
+    }
+  }
+
+  if (key === 'Escape') {
+    return {
+      kind: 'cancel',
+      preventDefault: true,
+    }
+  }
+
+  if (key !== 'Enter') {
+    return {
+      kind: 'none',
+      preventDefault: false,
+    }
+  }
+
+  const shortcutModifier = metaKey || ctrlKey
+
+  if (shortcutModifier) {
+    return {
+      kind: 'commit',
+      preventDefault: true,
+      source: 'shortcut-enter',
+    }
+  }
+
+  if (altKey && !altEnterInsertsLineBreak) {
+    return {
+      kind: 'none',
+      preventDefault: false,
+    }
+  }
+
+  if (commitOnEnter && !shiftKey) {
+    return {
+      kind: 'commit',
+      preventDefault: true,
+      source: 'enter',
+    }
+  }
+
+  if (multiline) {
+    return {
+      inputType: 'insertParagraph',
+      kind: 'line-break',
+      preventDefault: lineBreakMode === 'manual',
+    }
+  }
+
+  return {
+    kind: 'none',
+    preventDefault: false,
+  }
 }
 
 export function isInlineEditLineBreakInput(inputType: string): boolean {

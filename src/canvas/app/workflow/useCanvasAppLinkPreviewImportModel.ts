@@ -1,4 +1,4 @@
-import { useCanvasLinkPreviewImport } from '../affordances/io/link-preview/useCanvasLinkPreviewImport'
+import { useCanvasLinkPreviewImport } from '../feature-packs'
 import type {
   CanvasAppLinkPreviewImportModelInput,
 } from './CanvasAppIoConsumerContracts'

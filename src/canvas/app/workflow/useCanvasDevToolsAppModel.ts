@@ -6,10 +6,10 @@ import type {
 } from '../../engine'
 import {
   useCanvasTextPasteImport,
-} from '../affordances/io/text-paste/useCanvasTextPasteImport'
+} from '../feature-packs'
 import {
   useCanvasAppCustomFocus,
-} from '../affordances/interaction/focus/useCanvasAppCustomFocus'
+} from '../extensions/custom-focus'
 import {
   useCanvasAppStageElement,
 } from '../rendering/stage/CanvasAppStageElement'

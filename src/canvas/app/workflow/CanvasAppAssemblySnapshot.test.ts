@@ -27,8 +27,13 @@ describe('CanvasAppAssembly snapshots', () => {
       item.title
     const renderMutatedRisk: CanvasAppComponentRendererStrategy = () =>
       'mutated'
+    const renderStatus = () => null
+    const renderMutatedStatus = () => null
     const componentPresentationRenderers = {
       'risk-card': renderRisk,
+    }
+    const featurePackViewRenderers = {
+      status: renderStatus,
     }
     const componentLibrary = createCanvasComponentLibrary({
       templates: [
@@ -150,6 +155,7 @@ describe('CanvasAppAssembly snapshots', () => {
       componentLibrary,
       componentPresentationRenderers,
       customCommands: [customCommand],
+      featurePackViewRenderers,
       foundationExtensions: [foundationExtension],
       customItemModules: [riskModule],
       initialItems,
@@ -170,6 +176,7 @@ describe('CanvasAppAssembly snapshots', () => {
       title: 'Mutated risk',
     })
     componentPresentationRenderers['risk-card'] = renderMutatedRisk
+    featurePackViewRenderers.status = renderMutatedStatus
     customCommand.title = 'Mutated publish'
     customCommand.run = () => {
       throw new Error('mutated command')
@@ -207,6 +214,7 @@ describe('CanvasAppAssembly snapshots', () => {
     expect(assembly.componentPresentationRenderers['risk-card']).toBe(
       renderRisk,
     )
+    expect(assembly.featurePackViewRenderers.status).toBe(renderStatus)
     expect(assembly.customCommands[0]).toMatchObject({
       id: 'publish',
       title: 'Publish risk',
@@ -277,6 +285,7 @@ describe('CanvasAppAssembly snapshots', () => {
     expect(Object.isFrozen(assembly.mediaImporters[0])).toBe(true)
     expect(Object.isFrozen(assembly.componentPresentationRenderers)).toBe(true)
     expect(Object.isFrozen(assembly.customItemValidators)).toBe(true)
+    expect(Object.isFrozen(assembly.installedFeaturePackIds)).toBe(true)
     expect(Object.isFrozen(assembly.initialItems)).toBe(true)
     expect(Object.isFrozen(assembly.initialItems[0])).toBe(true)
     expect(Object.isFrozen(assembly.initialSelection)).toBe(true)

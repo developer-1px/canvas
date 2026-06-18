@@ -90,11 +90,17 @@ export function getCanvasAppCustomItemModuleExtensionBundle(
 }
 
 export function getCanvasAppCustomItemModuleRenderers({
+  getRenderKey,
   presentation,
   renderItem,
 }: CanvasAppCustomItemModule): CanvasAppCustomItemRenderers {
   return {
-    [presentation]: renderItem,
+    [presentation]: getRenderKey
+      ? Object.freeze({
+          getRenderKey,
+          renderItem,
+        })
+      : renderItem,
   }
 }
 

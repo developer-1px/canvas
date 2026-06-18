@@ -3,6 +3,9 @@ import { describe, expect, it } from 'vitest'
 import {
   createSlideEditObjectShadowDescriptor,
   getSlideEditObjectShadowCommandEffect,
+  getSlideEditObjectShadowColorCSS,
+  getSlideEditObjectShadowFilter,
+  getSlideEditObjectShadowFilterCSS,
   getSlideEditObjectShadowMetadata,
   normalizeSlideEditObjectShadow,
   normalizeSlideEditObjectShadowFieldValue,
@@ -111,6 +114,33 @@ describe('SlideEditObjectShadow', () => {
       .toBe(0.34)
     expect(normalizeSlideEditObjectShadowFieldValue('enabled', 'true'))
       .toBe(false)
+  })
+
+  it('maps enabled object shadows to CSS filter values', () => {
+    const shadow = {
+      angle: 30,
+      blur: 16,
+      color: '#123456',
+      distance: 8,
+      enabled: true,
+      opacity: 0.4,
+    }
+
+    expect(getSlideEditObjectShadowFilterCSS(shadow))
+      .toBe('6.93px 4px 16px rgb(18 52 86 / 0.4)')
+    expect(getSlideEditObjectShadowFilter(shadow))
+      .toBe('drop-shadow(6.93px 4px 16px rgb(18 52 86 / 0.4))')
+  })
+
+  it('omits disabled object shadow filters and preserves custom colors', () => {
+    expect(getSlideEditObjectShadowFilter({
+      enabled: false,
+    })).toBeUndefined()
+    expect(getSlideEditObjectShadowColorCSS({
+      color: 'color-mix(in srgb, black 40%, transparent)',
+      enabled: true,
+      opacity: 0.5,
+    })).toBe('color-mix(in srgb, black 40%, transparent)')
   })
 
   it('routes selected object shadow updates through host command effects', () => {

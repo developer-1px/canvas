@@ -14,19 +14,22 @@ describe('Canvas App IO boundaries', () => {
       'src/canvas/app/workflow/useCanvasAppImageModel.ts',
     )
     const imageControlsFile = getSourceFile(
-      'src/canvas/app/affordances/io/image/CanvasImageControls.tsx',
+      'src/canvas/app/feature-packs/image-io/CanvasImageControls.tsx',
     )
     const imageInsertionFile = getSourceFile(
-      'src/canvas/app/affordances/io/image/CanvasImageInsertion.ts',
+      'src/canvas/app/feature-packs/image-io/CanvasImageInsertion.ts',
     )
     const imageImportFile = getSourceFile(
-      'src/canvas/app/affordances/io/image/CanvasImageImport.ts',
+      'src/canvas/app/feature-packs/image-io/CanvasImageImport.ts',
     )
     const imageClipboardFile = getSourceFile(
-      'src/canvas/app/affordances/io/image/CanvasImageClipboard.ts',
+      'src/canvas/app/feature-packs/image-io/CanvasImageClipboard.ts',
     )
     const imageExportFile = getSourceFile(
-      'src/canvas/app/affordances/io/image/CanvasImageExport.ts',
+      'src/canvas/app/feature-packs/image-io/CanvasImageExport.ts',
+    )
+    const clipboardCommandsFile = getSourceFile(
+      'src/canvas/app/affordances/commands/useCanvasClipboardCommands.ts',
     )
     const stageElementFile = getSourceFile(
       'src/canvas/app/rendering/stage/CanvasAppStageElement.ts',
@@ -39,8 +42,10 @@ describe('Canvas App IO boundaries', () => {
     )
     expect(appModelFile.source).not.toMatch(browserImageHow)
     expect(imageModelFile.source).toContain(
-      "from '../affordances/io/image/useCanvasImageControls'",
+      "from '../feature-packs'",
     )
+    expect(clipboardCommandsFile.source).not.toContain('CanvasImage')
+    expect(clipboardCommandsFile.source).toContain('pasteExternal')
     expect(imageControlsFile.source).not.toMatch(browserImageHow)
     expect(imageInsertionFile.source).toContain(
       'export function insertCanvasImageSource',
@@ -70,10 +75,10 @@ describe('Canvas App IO boundaries', () => {
       'src/canvas/app/workflow/useCanvasAppTableImportModel.ts',
     )
     const tableImportHookFile = getSourceFile(
-      'src/canvas/app/affordances/io/table/useCanvasTableImport.ts',
+      'src/canvas/app/feature-packs/table-import/useCanvasTableImport.ts',
     )
     const tableImportFile = getSourceFile(
-      'src/canvas/app/affordances/io/table/CanvasTableImport.ts',
+      'src/canvas/app/feature-packs/table-import/CanvasTableImport.ts',
     )
     const hostTableFile = getSourceFile(
       'src/canvas/host/component/CanvasTableComponent.ts',
@@ -86,7 +91,7 @@ describe('Canvas App IO boundaries', () => {
     )
     expect(appModelFile.source).not.toMatch(browserTableHow)
     expect(tableModelFile.source).toContain(
-      "from '../affordances/io/table/useCanvasTableImport'",
+      "from '../feature-packs'",
     )
     expect(tableImportHookFile.source).toContain('window.addEventListener')
     expect(tableImportHookFile.source).toContain('ClipboardEvent')
@@ -109,16 +114,22 @@ describe('Canvas App IO boundaries', () => {
       'src/canvas/app/workflow/useCanvasAppLinkPreviewImportModel.ts',
     )
     const linkPreviewImportHookFile = getSourceFile(
-      'src/canvas/app/affordances/io/link-preview/useCanvasLinkPreviewImport.ts',
+      'src/canvas/app/feature-packs/media-import/useCanvasLinkPreviewImport.ts',
     )
     const mediaImportFile = getSourceFile(
-      'src/canvas/app/affordances/io/media/CanvasMediaImport.ts',
+      'src/canvas/app/feature-packs/media-import/CanvasMediaImport.ts',
     )
     const linkPreviewInspectorPanelFile = getSourceFile(
-      'src/canvas/app/affordances/io/link-preview/CanvasLinkPreviewInspectorPanel.tsx',
+      'src/canvas/app/feature-packs/media-import/CanvasLinkPreviewInspectorPanel.tsx',
     )
     const defaultAssemblyFile = getSourceFile(
       'src/canvas/app/workflow/CanvasAppDefaultAssembly.ts',
+    )
+    const defaultFeaturePacksFile = getSourceFile(
+      'src/canvas/app/feature-packs/CanvasAppDefaultFeaturePacks.ts',
+    )
+    const mediaImportIndexFile = getSourceFile(
+      'src/canvas/app/feature-packs/media-import/index.ts',
     )
     const hostLinkPreviewFile = getSourceFile(
       'src/canvas/host/component/CanvasLinkPreviewComponent.ts',
@@ -132,7 +143,7 @@ describe('Canvas App IO boundaries', () => {
     expect(appModelFile.source).toContain('mediaImporters')
     expect(appModelFile.source).not.toMatch(browserLinkPreviewHow)
     expect(linkPreviewModelFile.source).toContain(
-      "from '../affordances/io/link-preview/useCanvasLinkPreviewImport'",
+      "from '../feature-packs'",
     )
     expect(linkPreviewImportHookFile.source).toContain(
       'window.addEventListener',
@@ -157,11 +168,27 @@ describe('Canvas App IO boundaries', () => {
     expect(linkPreviewInspectorPanelFile.source).toContain(
       'replaceCanvasLinkPreviewComponentsOrientation',
     )
+    expect(defaultAssemblyFile.source).toContain("from '../feature-packs'")
     expect(defaultAssemblyFile.source).toContain(
-      "from '../affordances/io/link-preview/CanvasLinkPreviewInspectorPanel'",
+      'DEFAULT_CANVAS_APP_FEATURE_PACK_EXTENSION_BUNDLE',
     )
-    expect(defaultAssemblyFile.source).toContain(
+    expect(defaultAssemblyFile.source).not.toContain(
       'CANVAS_LINK_PREVIEW_INSPECTOR_PANEL',
+    )
+    expect(defaultFeaturePacksFile.source).toContain(
+      "from './media-import'",
+    )
+    expect(defaultFeaturePacksFile.source).toContain(
+      'CANVAS_APP_MEDIA_IMPORT_FEATURE_PACK',
+    )
+    expect(defaultFeaturePacksFile.source).not.toContain(
+      'CANVAS_LINK_PREVIEW_INSPECTOR_PANEL',
+    )
+    expect(mediaImportIndexFile.source).toContain(
+      'CANVAS_LINK_PREVIEW_INSPECTOR_PANEL',
+    )
+    expect(mediaImportIndexFile.source).toContain(
+      'CANVAS_APP_MEDIA_IMPORT_FEATURE_PACK',
     )
     expect(hostLinkPreviewFile.source).toContain(
       'export function createCanvasLinkPreviewComponentItem',
@@ -184,13 +211,13 @@ describe('Canvas App IO boundaries', () => {
       'src/canvas/app/workflow/useCanvasAppTextPasteImportModel.ts',
     )
     const textPasteHookFile = getSourceFile(
-      'src/canvas/app/affordances/io/text-paste/useCanvasTextPasteImport.ts',
+      'src/canvas/app/feature-packs/text-paste-import/useCanvasTextPasteImport.ts',
     )
     const textPasteImportFile = getSourceFile(
-      'src/canvas/app/affordances/io/text-paste/CanvasTextPasteImport.ts',
+      'src/canvas/app/feature-packs/text-paste-import/CanvasTextPasteImport.ts',
     )
     const textPasteImporterFile = getSourceFile(
-      'src/canvas/app/affordances/io/text-paste/CanvasTextPasteImporters.ts',
+      'src/canvas/app/feature-packs/text-paste-import/CanvasTextPasteImporters.ts',
     )
     const browserTextPasteHow =
       /\b(DataTransfer|ClipboardEvent|window\.addEventListener)\b/
@@ -200,7 +227,7 @@ describe('Canvas App IO boundaries', () => {
     )
     expect(appModelFile.source).not.toMatch(browserTextPasteHow)
     expect(textPasteModelFile.source).toContain(
-      "from '../affordances/io/text-paste/useCanvasTextPasteImport'",
+      "from '../feature-packs'",
     )
     expect(textPasteHookFile.source).toContain('window.addEventListener')
     expect(textPasteHookFile.source).toContain('ClipboardEvent')

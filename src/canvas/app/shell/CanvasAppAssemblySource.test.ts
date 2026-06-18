@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { DEFAULT_CANVAS_APP_ASSEMBLY } from '../workflow'
+import {
+  createCanvasAppAiLabsFeaturePackManifest,
+} from '../feature-packs'
 import { resolveCanvasAppAssemblySource } from './CanvasAppAssemblySource'
 
 describe('CanvasAppAssemblySource', () => {
@@ -17,6 +20,47 @@ describe('CanvasAppAssemblySource', () => {
     expect(assembly.affordanceConfig.overlays.toolbar).toBe(false)
     expect(assembly.affordanceConfig.tools.select).toBe(true)
     expect(Object.isFrozen(assembly)).toBe(true)
+  })
+
+  it('installs optional feature pack manifests through assembly input', () => {
+    const aiLabsManifest = createCanvasAppAiLabsFeaturePackManifest({
+      provider: {
+        complete: () => ({ text: 'Summary' }),
+        id: 'shell-ai',
+      },
+      requestReview: () => ({ kind: 'cancel' }),
+    })
+    const assembly = resolveCanvasAppAssemblySource({
+      assemblyInput: {
+        additionalFeaturePackManifests: [aiLabsManifest],
+      },
+    })
+
+    expect(assembly.installedFeaturePackIds).toContain('toolbar')
+    expect(assembly.installedFeaturePackIds).toContain('ai-labs')
+    expect(assembly.customCommands.map((command) => command.id))
+      .toContain('ai-labs-summarize-selection')
+  })
+
+  it('uninstalls optional feature pack manifests through assembly input', () => {
+    const aiLabsManifest = createCanvasAppAiLabsFeaturePackManifest({
+      provider: {
+        complete: () => ({ text: 'Summary' }),
+        id: 'shell-ai',
+      },
+      requestReview: () => ({ kind: 'cancel' }),
+    })
+    const assembly = resolveCanvasAppAssemblySource({
+      assemblyInput: {
+        additionalFeaturePackManifests: [aiLabsManifest],
+        disabledFeaturePackIds: ['ai-labs'],
+      },
+    })
+
+    expect(assembly.installedFeaturePackIds).not.toContain('ai-labs')
+    expect(assembly.installedFeaturePackIds).toContain('toolbar')
+    expect(assembly.customCommands.map((command) => command.id))
+      .not.toContain('ai-labs-summarize-selection')
   })
 
   it('preserves prebuilt assemblies for advanced hosts', () => {

@@ -4,6 +4,8 @@ import {
   createSlideEditColorSwatchPaletteDescriptor,
   getSlideEditColorSwatchCommandEffect,
   getSlideEditColorSwatchId,
+  getSlideEditColorWithAlphaCSS,
+  normalizeSlideEditColorHex,
   normalizeSlideEditColorSwatchValue,
   SLIDE_EDIT_COLOR_SWATCH_CHANNELS,
   SLIDE_EDIT_COLOR_SWATCH_FIELD,
@@ -154,6 +156,27 @@ describe('SlideEditColorSwatchPalette', () => {
       value: null,
     })
     expect(normalizeSlideEditColorSwatchValue('  #ABCDEF  ')).toBe('#ABCDEF')
+  })
+
+  it('normalizes hex colors for shared renderer comparisons', () => {
+    expect(normalizeSlideEditColorHex(' #ABC ')).toBe('#aabbcc')
+    expect(normalizeSlideEditColorHex('#ABCDEF')).toBe('#abcdef')
+    expect(normalizeSlideEditColorHex('currentColor')).toBeNull()
+  })
+
+  it('maps hex colors and alpha to CSS color values', () => {
+    expect(getSlideEditColorWithAlphaCSS({
+      color: '#abc',
+      opacity: 0.335,
+    })).toBe('rgb(170 187 204 / 0.34)')
+    expect(getSlideEditColorWithAlphaCSS({
+      color: '#123456',
+      opacity: 2,
+    })).toBe('rgb(18 52 86 / 1)')
+    expect(getSlideEditColorWithAlphaCSS({
+      color: 'color-mix(in srgb, black 40%, transparent)',
+      opacity: 0.5,
+    })).toBe('color-mix(in srgb, black 40%, transparent)')
   })
 
   it('expresses mixed and disabled channel state', () => {

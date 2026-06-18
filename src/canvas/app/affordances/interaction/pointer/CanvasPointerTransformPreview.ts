@@ -20,7 +20,10 @@ import {
   isCanvasArrowDrawingItem,
   syncCanvasDrawingItemBounds,
 } from '../../../../host'
-import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
+import {
+  getCanvasPointerTransformModifierState,
+  type CanvasAppPointerInput,
+} from './CanvasAppPointerInput'
 import {
   findCanvasSceneTargetAtPoint,
   resolveCanvasArrowEndpoints,
@@ -168,14 +171,15 @@ export function previewCanvasPointerTransform({
     config,
     point: currentWorld,
   })
+  const modifierState = getCanvasPointerTransformModifierState(input)
   const nextItems = resizeCanvasSelection({
     adapter: transformAdapter,
     bounds: interaction.bounds,
     handle: interaction.handle,
     items: interaction.startItems,
     point: snappedCurrentWorld,
-    preserveAspectRatio: input.shiftKey,
-    resizeFromCenter: input.altKey,
+    preserveAspectRatio: modifierState.preserveAspectRatio,
+    resizeFromCenter: modifierState.resizeFromCenter,
     selection: interaction.ids,
   })
 

@@ -6,18 +6,21 @@ import {
   createSlideEditClipboardPastePlan,
   createSlideEditClipboardPayload,
   getSlideEditClipboardPasteAnchor,
+  mapSlideEditClipboardPasteObjects,
+  normalizeSlideEditClipboardSelectedObjectIds,
   type SlideEditClipboardRemapPolicy,
 } from './SlideEditClipboard'
 
 type HostObject = {
+  id: string
   kind: 'image' | 'shape'
   name: string
 }
 
 describe('SlideEditClipboard', () => {
   const objects: HostObject[] = [
-    { kind: 'shape', name: 'Card' },
-    { kind: 'image', name: 'Logo' },
+    { id: 'card', kind: 'shape', name: 'Card' },
+    { id: 'logo', kind: 'image', name: 'Logo' },
   ]
   const remapPolicy: SlideEditClipboardRemapPolicy<
     string,
@@ -30,6 +33,28 @@ describe('SlideEditClipboard', () => {
       sourcePlaceholderId === 'logo-slot' ? 'target-logo-slot' : null
     ),
   }
+
+  it('normalizes selected object ids against clipboard objects while preserving candidate order', () => {
+    expect(normalizeSlideEditClipboardSelectedObjectIds({
+      getObjectId: (object) => object.id,
+      objects,
+      selectedObjectIds: ['logo', 'missing', 42, 'card'],
+    })).toEqual(['logo', 'card'])
+  })
+
+  it('falls back to all object ids when clipboard selection candidates are missing or invalid', () => {
+    expect(normalizeSlideEditClipboardSelectedObjectIds({
+      getObjectId: (object) => object.id,
+      objects,
+      selectedObjectIds: null,
+    })).toEqual(['card', 'logo'])
+
+    expect(normalizeSlideEditClipboardSelectedObjectIds({
+      getObjectId: (object) => object.id,
+      objects,
+      selectedObjectIds: ['missing'],
+    })).toEqual(['card', 'logo'])
+  })
 
   it('creates copy and cut payloads with source slide and optional metadata', () => {
     expect(createSlideEditClipboardPayload({
@@ -209,6 +234,104 @@ describe('SlideEditClipboard', () => {
         slideId: 'slide-b',
       },
     })).toBeNull()
+  })
+
+  it('maps paste mappings to source objects for host object transforms', () => {
+    const payload = createSlideEditClipboardPayload({
+      metadata: [
+        {
+          groupId: 'group-a',
+          objectId: 'card',
+        },
+        {
+          groupId: 'group-a',
+          objectId: 'logo',
+        },
+      ],
+      objects,
+      selectedObjectIds: ['card', 'logo'],
+      sourceSlideId: 'slide-a',
+    })
+    const pastePlan = createSlideEditClipboardPastePlan({
+      payload,
+      remapPolicy,
+      slideFrame: { h: 720, w: 1280, x: 100, y: 40 },
+      target: {
+        kind: 'slide-frame-offset',
+        offset: { x: 24, y: 32 },
+        slideId: 'slide-b',
+      },
+    })
+
+    expect(pastePlan).not.toBeNull()
+    if (!pastePlan) {
+      throw new Error('Expected paste plan')
+    }
+
+    expect(mapSlideEditClipboardPasteObjects({
+      getObjectId: (object) => object.id,
+      pastePlan,
+      payload,
+      transform: ({ index, mapping, source }) => ({
+        index,
+        kind: source.kind,
+        name: `${source.name} Copy`,
+        targetId: mapping.targetObjectId,
+      }),
+    })).toEqual([
+      {
+        index: 0,
+        kind: 'shape',
+        name: 'Card Copy',
+        targetId: 'slide-b-card',
+      },
+      {
+        index: 1,
+        kind: 'image',
+        name: 'Logo Copy',
+        targetId: 'slide-b-logo',
+      },
+    ])
+  })
+
+  it('skips missing source objects and null transform results while mapping paste objects', () => {
+    const payload = createSlideEditClipboardPayload({
+      metadata: [
+        {
+          objectId: 'card',
+        },
+        {
+          objectId: 'missing',
+        },
+        {
+          objectId: 'logo',
+        },
+      ],
+      objects,
+      selectedObjectIds: ['card', 'missing', 'logo'],
+      sourceSlideId: 'slide-a',
+    })
+    const pastePlan = createSlideEditClipboardPastePlan({
+      payload,
+      remapPolicy,
+      slideFrame: { h: 720, w: 1280, x: 100, y: 40 },
+      target: {
+        kind: 'active-slide',
+        slideId: 'slide-b',
+      },
+    })
+
+    expect(pastePlan).not.toBeNull()
+    if (!pastePlan) {
+      throw new Error('Expected paste plan')
+    }
+
+    expect(mapSlideEditClipboardPasteObjects({
+      getObjectId: (object) => object.id,
+      pastePlan,
+      payload,
+      transform: ({ source }) => source.kind === 'image' ? null : source.name,
+    })).toEqual(['Card'])
   })
 
   it('provides a product-neutral minimal adapter example', () => {

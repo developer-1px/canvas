@@ -6,7 +6,10 @@ import {
 import type {
   CanvasAppCustomCreationToolState,
 } from '../../../extensions/CanvasAppExtensionStateContracts'
-import { getCanvasKeyboardShortcutIntent } from './CanvasKeyboardShortcutIntent'
+import {
+  getCanvasKeyboardShortcutIntent,
+  isCanvasKeyboardTypingTarget,
+} from './CanvasKeyboardShortcutIntent'
 
 describe('CanvasKeyboardShortcutIntent', () => {
   it('resolves custom creation tool shortcuts through the external tool seam', () => {
@@ -162,6 +165,29 @@ describe('CanvasKeyboardShortcutIntent', () => {
       }))).toEqual({ kind: 'none', preventDefault: false })
     })
   })
+
+  it('detects native editing controls and contenteditable targets', () => {
+    withTypingTargetConstructor('HTMLInputElement', (target) => {
+      expect(isCanvasKeyboardTypingTarget(target)).toBe(true)
+    })
+    withTypingTargetConstructor('HTMLTextAreaElement', (target) => {
+      expect(isCanvasKeyboardTypingTarget(target)).toBe(true)
+    })
+    withTypingTargetConstructor('HTMLSelectElement', (target) => {
+      expect(isCanvasKeyboardTypingTarget(target)).toBe(true)
+    })
+    withTypingTargetConstructor('HTMLElement', (target) => {
+      target.isContentEditable = true
+
+      expect(isCanvasKeyboardTypingTarget(target)).toBe(true)
+    })
+    withTypingTargetConstructor('HTMLElement', (target) => {
+      target.isContentEditable = false
+
+      expect(isCanvasKeyboardTypingTarget(target)).toBe(false)
+    })
+    expect(isCanvasKeyboardTypingTarget(null)).toBe(false)
+  })
 })
 
 function createInput(
@@ -206,16 +232,30 @@ function createKeyboardEvent(
 }
 
 function withTextAreaTarget(run: (target: EventTarget) => void) {
-  const previous = globalThis.HTMLTextAreaElement
+  withTypingTargetConstructor('HTMLTextAreaElement', run)
+}
 
-  class TestTextArea extends EventTarget {}
+function withTypingTargetConstructor<
+  TKey extends
+    | 'HTMLElement'
+    | 'HTMLInputElement'
+    | 'HTMLSelectElement'
+    | 'HTMLTextAreaElement',
+>(
+  key: TKey,
+  run: (target: EventTarget & { isContentEditable?: boolean }) => void,
+) {
+  const previous = globalThis[key]
 
-  globalThis.HTMLTextAreaElement =
-    TestTextArea as unknown as typeof HTMLTextAreaElement
+  class TestTarget extends EventTarget {
+    isContentEditable = false
+  }
+
+  globalThis[key] = TestTarget as never
 
   try {
-    run(new TestTextArea())
+    run(new TestTarget())
   } finally {
-    globalThis.HTMLTextAreaElement = previous
+    globalThis[key] = previous as never
   }
 }

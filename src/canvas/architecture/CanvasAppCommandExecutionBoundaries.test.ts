@@ -7,10 +7,10 @@ import {
 describe('Canvas App command execution boundaries', () => {
   it('keeps App custom command execution behind a named module', () => {
     const descriptorFile = getSourceFile(
-      'src/canvas/app/affordances/commands/CanvasAppCustomCommands.ts',
+      'src/canvas/app/extensions/custom-commands/CanvasAppCustomCommands.ts',
     )
     const executionFile = getSourceFile(
-      'src/canvas/app/affordances/commands/CanvasAppCustomCommandExecution.ts',
+      'src/canvas/app/extensions/custom-commands/CanvasAppCustomCommandExecution.ts',
     )
     const extensionStateContractsFile = getSourceFile(
       'src/canvas/app/extensions/CanvasAppExtensionStateContracts.ts',
@@ -52,13 +52,13 @@ describe('Canvas App command execution boundaries', () => {
       'export type CanvasAppCustomCommandState',
     )
     expect(executionFile.source).toContain(
-      "from '../../extensions/CanvasAppExtensionStateContracts'",
+      "from '../CanvasAppExtensionStateContracts'",
     )
     expect(extensionStateContractsFile.source).toContain(
       'export type CanvasAppCustomCommandState',
     )
     expect(extensionModelFile.source).toContain(
-      "from '../affordances/commands/CanvasAppCustomCommandExecution'",
+      "from '../extensions/custom-commands'",
     )
     expect(extensionModelFile.source).toContain(
       "from './CanvasAppExtensionConsumerModel'",
@@ -98,7 +98,7 @@ describe('Canvas App command execution boundaries', () => {
       "from '../extensions/CanvasAppExtensionStateContracts'",
     )
     expect(extensionConsumerContractsFile.source).toContain(
-      "from '../affordances/commands/CanvasAppCustomCommands'",
+      "from '../extensions/custom-commands'",
     )
     expect(extensionConsumerContractsFile.source).not.toContain(
       'CanvasAppCustomCommandExecution',

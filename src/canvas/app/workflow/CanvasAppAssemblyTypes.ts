@@ -5,6 +5,10 @@ import type { CanvasItem } from '../../entities'
 import type { CanvasWorkspaceStorageProvider } from '../workspace/document/CanvasWorkspacePersistence'
 import type { CanvasAppExtensionBundle } from '../extensions/CanvasAppExtensionBundle'
 import type {
+  CanvasAppFeaturePackAssembly,
+  CanvasAppFeaturePackAssemblyInput,
+} from './CanvasAppFeaturePackAssembly'
+import type {
   CanvasAppComponentPresentationRenderers,
   CanvasAppItemLayerAdapter,
   CanvasAppStageAdapter,
@@ -32,6 +36,10 @@ export type CanvasAppAssembly = CanvasAppExtensionBundle & {
   capabilities: CanvasAppCapabilitySnapshot
   componentLibrary: CanvasAppComponentLibrary
   componentPresentationRenderers: CanvasAppComponentPresentationRenderers
+  featurePackViewRenderers:
+    CanvasAppFeaturePackAssembly['featurePackViewRenderers']
+  installedFeaturePackIds:
+    CanvasAppFeaturePackAssembly['installedFeaturePackIds']
   initialItems: CanvasItem[]
   initialSelection: readonly string[]
   itemAdapters: CanvasAppItemAdapters
@@ -48,4 +56,5 @@ export type CanvasAppAssemblyInput =
   CanvasAppAffordanceAssemblyInput &
   CanvasAppComponentAssemblyInput &
   CanvasAppAdapterAssemblyInput &
-  CanvasAppWorkspaceAssemblyInput
+  CanvasAppWorkspaceAssemblyInput &
+  CanvasAppFeaturePackAssemblyInput

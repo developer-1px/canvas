@@ -35,7 +35,11 @@ import {
 } from 'react'
 import {
   CanvasApp,
+  CanvasCommandPalette,
   CanvasContextCommandMenu,
+  CanvasMinimap,
+  CanvasObjectInspector,
+  CanvasShortcutHelpOverlay,
   type CanvasAppAssemblyInput,
   type CanvasAppProps,
   type CanvasAppWidgetInteractions,
@@ -46,12 +50,9 @@ import {
   type Tool,
   CANVAS_TOOLBAR_ITEM_PROPS,
   getCanvasAppWidgetInteractions,
+  getCanvasContextMenuKeyboardIntent,
   useCanvasToolbarRovingFocus,
 } from '../canvas'
-import { CanvasCommandPalette } from '../canvas/app/affordances/controls/command-palette/CanvasCommandPalette'
-import { CanvasShortcutHelpOverlay } from '../canvas/app/affordances/controls/shortcut-help/CanvasShortcutHelpOverlay'
-import { CanvasMinimap } from '../canvas/app/affordances/controls/minimap/CanvasMinimap'
-import { CanvasObjectInspector } from '../canvas/app/affordances/editing/inspector/CanvasObjectInspector'
 import { EngineSelectionToolbar } from './CanvasDevToolsSelectionToolbar'
 import {
   getCanvasPresentationFrames,
@@ -376,10 +377,12 @@ function CanvasEngineDemoSurface({
       return
     }
 
-    if (
-      event.key !== 'ContextMenu' &&
-      !(event.key === 'F10' && event.shiftKey)
-    ) {
+    const contextMenuKeyboardIntent = getCanvasContextMenuKeyboardIntent({
+      event,
+      key: event.key,
+    })
+
+    if (!contextMenuKeyboardIntent) {
       return
     }
 

@@ -5,12 +5,18 @@ import {
   canFigmaCloneDomFillParent,
   createFigmaCloneDomEditState,
   createFigmaCloneDomTextState,
+  getFigmaCloneDomComponentBinding,
   getFigmaCloneDomEditStyle,
   getFigmaCloneDomLayoutContext,
   getFigmaCloneDomRootId,
   getFigmaCloneDomText,
   getFigmaCloneDomToggledAxisSizeMode,
+  isFigmaCloneDomComponentRootNode,
+  listFigmaCloneDomComponentSets,
+  listFigmaCloneStoryImports,
   updateFigmaCloneDomAutoLayoutField,
+  updateFigmaCloneDomComponentAutoLayoutField,
+  updateFigmaCloneDomComponentEditField,
   updateFigmaCloneDomEditField,
   updateFigmaCloneDomText,
 } from './FigmaCloneDomEditModel'
@@ -99,6 +105,120 @@ describe('FigmaCloneDomEditModel', () => {
       .toBe('center')
     expect(getFigmaCloneDomEditStyle(state, 'workspaceHeroActions').distribution)
       .toBe('packed')
+  })
+
+  it('binds repeated DOM nodes as component slots', () => {
+    const binding = getFigmaCloneDomComponentBinding('workspaceStatRevenueValue')
+
+    expect(binding).toMatchObject({
+      componentId: 'workspace-stat-card',
+      componentLabel: 'Stat card',
+      instanceCount: 3,
+      instanceLabel: 'Revenue',
+      slotLabel: 'value',
+    })
+    expect(binding?.slotNodeIds).toEqual([
+      'workspaceStatRevenueValue',
+      'workspaceStatConversionValue',
+      'workspaceStatTicketsValue',
+    ])
+  })
+
+  it('lists component sets by page with variants', () => {
+    const components = listFigmaCloneDomComponentSets()
+
+    expect(components.map((component) => ({
+      id: component.id,
+      pageRootId: component.pageRootId,
+      parts: component.parts.map((part) => part.label),
+      source: component.source.layer,
+      variants: component.instances.map((instance) => instance.label),
+    }))).toEqual([
+      {
+        id: 'workspace-stat-card',
+        pageRootId: 'workspacePage',
+        parts: ['Root', 'Label', 'Value', 'Delta'],
+        source: 'widgets',
+        variants: ['Revenue', 'Conversion', 'Tickets'],
+      },
+      {
+        id: 'workspace-deal-row',
+        pageRootId: 'workspacePage',
+        parts: ['Root', 'Title', 'Value'],
+        source: 'features',
+        variants: ['Deal 1', 'Deal 2', 'Deal 3'],
+      },
+      {
+        id: 'home-meta-card',
+        pageRootId: 'homePage',
+        parts: ['Root', 'Label', 'Value', 'Note'],
+        source: 'shared',
+        variants: ['Byline', 'Category', 'Reading time'],
+      },
+    ])
+  })
+
+  it('lists importable stories with their component sets', () => {
+    expect(listFigmaCloneStoryImports()).toEqual([
+      {
+        componentIds: ['workspace-stat-card', 'workspace-deal-row'],
+        id: 'workspace-dashboard-story',
+        label: 'Workspace dashboard',
+        rootId: 'workspacePage',
+        source: 'src/stories/workspace-dashboard.stories.tsx',
+      },
+      {
+        componentIds: ['home-meta-card'],
+        id: 'editorial-home-story',
+        label: 'Editorial home',
+        rootId: 'homePage',
+        source: 'src/stories/editorial-home.stories.tsx',
+      },
+    ])
+  })
+
+  it('marks only component roots as component import outlines', () => {
+    expect(isFigmaCloneDomComponentRootNode('workspaceStatRevenue')).toBe(true)
+    expect(isFigmaCloneDomComponentRootNode('workspaceStatRevenueValue'))
+      .toBe(false)
+  })
+
+  it('syncs component box edits across matching slots', () => {
+    const state = createFigmaCloneDomEditState()
+    const next = updateFigmaCloneDomComponentEditField({
+      field: 'padding',
+      nodeId: 'workspaceStatRevenue',
+      state,
+      value: 20,
+    })
+
+    expect(getFigmaCloneDomEditStyle(next, 'workspaceStatRevenue').padding)
+      .toBe(20)
+    expect(getFigmaCloneDomEditStyle(next, 'workspaceStatConversion').padding)
+      .toBe(20)
+    expect(getFigmaCloneDomEditStyle(next, 'workspaceStatTickets').padding)
+      .toBe(20)
+    expect(getFigmaCloneDomEditStyle(next, 'workspaceDealOne').padding)
+      .toBe(12)
+  })
+
+  it('syncs component auto-layout edits across matching slots', () => {
+    const state = createFigmaCloneDomEditState()
+    const next = updateFigmaCloneDomComponentAutoLayoutField({
+      field: 'distribution',
+      nodeId: 'workspaceDealOne',
+      state,
+      value: 'center',
+    })
+
+    expect(getFigmaCloneDomEditStyle(next, 'workspaceDealOne').distribution)
+      .toBe('center')
+    expect(getFigmaCloneDomEditStyle(next, 'workspaceDealTwo').distribution)
+      .toBe('center')
+    expect(getFigmaCloneDomEditStyle(next, 'workspaceDealThree').distribution)
+      .toBe('center')
+    expect(getFigmaCloneDomEditStyle(state, 'workspaceDealTwo').distribution)
+      .toBe('space-between')
   })
 
   it('stores editable copy outside DOM layout values', () => {

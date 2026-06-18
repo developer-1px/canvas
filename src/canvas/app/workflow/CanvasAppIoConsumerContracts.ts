@@ -1,7 +1,9 @@
 import type { CanvasAffordanceConfig } from '../../engine'
 import type { Viewport } from '../../entities'
-import type { CanvasMediaImporter } from '../affordances/io/media/CanvasMediaImporters'
-import type { CanvasTextPasteImporter } from '../affordances/io/text-paste/CanvasTextPasteImporters'
+import type {
+  CanvasMediaImporter,
+  CanvasTextPasteImporter,
+} from '../feature-packs'
 import type { CanvasAppItemReadModel } from './CanvasAppItemReadModelContracts'
 import type { CanvasAppStageElement } from '../rendering/stage/CanvasAppStageElement'
 import type { CommitCanvasItemsChange } from './CanvasWorkflowContract'

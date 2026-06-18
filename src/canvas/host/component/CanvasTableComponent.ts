@@ -20,6 +20,22 @@ export type CanvasTableGrid = {
   columns: readonly string[]
 }
 
+export type CanvasTableComponentSize = {
+  h: number
+  w: number
+}
+
+export type CanvasTableComponentSizeInput = {
+  columnCount: number
+  rowCount: number
+}
+
+export type CanvasTableComponentSizeOptions = {
+  cellSize?: Partial<CanvasTableComponentSize>
+  maxSize?: Partial<CanvasTableComponentSize>
+  minSize?: Partial<CanvasTableComponentSize>
+}
+
 const CANVAS_TABLE_DEFAULT_COLUMN = 'Column'
 const CANVAS_TABLE_DEFAULT_TITLE = 'Table'
 const CANVAS_TABLE_MAX_COLUMNS = 8
@@ -117,23 +133,29 @@ export function normalizeCanvasTableRows(
   }
 }
 
-function getCanvasTableComponentSize({
+export function getCanvasTableComponentSize({
   columnCount,
   rowCount,
-}: {
-  columnCount: number
-  rowCount: number
-}) {
+}: CanvasTableComponentSizeInput,
+options: CanvasTableComponentSizeOptions = {},
+): CanvasTableComponentSize {
+  const cellWidth = options.cellSize?.w ?? CANVAS_TABLE_COLUMN_WIDTH
+  const cellHeight = options.cellSize?.h ?? CANVAS_TABLE_ROW_HEIGHT
+  const minWidth = options.minSize?.w ?? CANVAS_TABLE_MIN_WIDTH
+  const minHeight = options.minSize?.h ?? CANVAS_TABLE_MIN_HEIGHT
+  const maxWidth = options.maxSize?.w ?? CANVAS_TABLE_MAX_WIDTH
+  const maxHeight = options.maxSize?.h ?? CANVAS_TABLE_MAX_HEIGHT
+
   return {
     h: clampCanvasTableDimension(
-      rowCount * CANVAS_TABLE_ROW_HEIGHT,
-      CANVAS_TABLE_MIN_HEIGHT,
-      CANVAS_TABLE_MAX_HEIGHT,
+      rowCount * cellHeight,
+      minHeight,
+      maxHeight,
     ),
     w: clampCanvasTableDimension(
-      columnCount * CANVAS_TABLE_COLUMN_WIDTH,
-      CANVAS_TABLE_MIN_WIDTH,
-      CANVAS_TABLE_MAX_WIDTH,
+      columnCount * cellWidth,
+      minWidth,
+      maxWidth,
     ),
   }
 }

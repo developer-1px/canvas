@@ -12,6 +12,15 @@ import type {
   CanvasKeyboardCommandShortcutIntentInput,
 } from './CanvasKeyboardCommandShortcutIntent'
 
+export const CANVAS_KEYBOARD_NUDGE_MODEL =
+  'canvas-keyboard-nudge-shortcuts'
+export const CANVAS_KEYBOARD_NUDGE_INTENT_MODEL =
+  'canvas-keyboard-nudge-shortcut-intent'
+export const CANVAS_KEYBOARD_NUDGE_KEYS =
+  'ArrowLeft ArrowRight ArrowUp ArrowDown Shift+ArrowLeft Shift+ArrowRight Shift+ArrowUp Shift+ArrowDown'
+export const CANVAS_KEYBOARD_NUDGE_STEP = 1
+export const CANVAS_KEYBOARD_NUDGE_LARGE_STEP = 10
+
 export function getCanvasKeyboardNudgeShortcutIntent(
   input: CanvasKeyboardCommandShortcutIntentInput,
 ): CanvasKeyboardCommandShortcutIntent | null {

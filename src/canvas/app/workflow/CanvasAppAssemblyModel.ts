@@ -10,6 +10,8 @@ export function getCanvasAppAssemblyModel({
   customCreationTools,
   customItemRenderers,
   customItemValidators,
+  featurePackViewRenderers,
+  installedFeaturePackIds,
   inspectorPanels,
   initialItems,
   initialSelection,
@@ -44,6 +46,10 @@ export function getCanvasAppAssemblyModel({
       customCreationTools,
       mediaImporters,
       textPasteImporters,
+    },
+    featurePack: {
+      installedIds: installedFeaturePackIds,
+      viewRenderers: featurePackViewRenderers,
     },
     inspector: {
       inspectorPanels,

@@ -12,7 +12,7 @@ import type {
 } from '../../../engine'
 import type {
   CanvasToolbarCommandGroupId,
-} from '../controls/toolbar/CanvasToolbarCommandCatalog'
+} from '../../feature-packs/toolbar/CanvasToolbarCommandCatalog'
 
 export type CanvasAppCommandDefinitionSection =
   | 'Commands'

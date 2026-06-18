@@ -1,12 +1,23 @@
 import { describe, expect, it } from 'vitest'
 import { createCanvasAffordanceConfig } from '../../../../engine'
 import {
+  CANVAS_KEYBOARD_VIEWPORT_INTENT_MODEL,
+  CANVAS_KEYBOARD_VIEWPORT_MODEL,
   getCanvasKeyboardReservedViewportShortcuts,
   getCanvasKeyboardViewportShortcutIntent,
 } from './CanvasKeyboardViewportShortcuts'
 import type { CanvasKeyboardCommandShortcutIntentInput } from './CanvasKeyboardCommandShortcutIntent'
 
 describe('CanvasKeyboardViewportShortcuts', () => {
+  it('exports viewport shortcut metadata for host DOM contracts', () => {
+    expect(CANVAS_KEYBOARD_VIEWPORT_MODEL).toBe(
+      'canvas-keyboard-viewport-shortcuts',
+    )
+    expect(CANVAS_KEYBOARD_VIEWPORT_INTENT_MODEL).toBe(
+      'canvas-keyboard-viewport-shortcut-intent',
+    )
+  })
+
   it('maps zoom shortcuts to viewport intents', () => {
     expect(getCanvasKeyboardViewportShortcutIntent(createInput({
       event: createKeyboardEvent({ key: '+', metaKey: true }),

@@ -83,6 +83,7 @@ describe('Canvas App viewport workflow boundaries', () => {
       'CanvasAppViewportModelInput',
       'CanvasAppViewportRuntime',
       'CanvasAppViewportControlContext',
+      'CanvasAppViewportFocusControls',
       'CanvasAppViewportConsumerModel',
     ]) {
       expect(viewportConsumerContractsFile.source).toContain(

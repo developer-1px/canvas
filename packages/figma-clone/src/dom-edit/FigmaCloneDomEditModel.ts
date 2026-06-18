@@ -215,6 +215,229 @@ export type FigmaCloneDomAutoLayout = DomEditAutoLayout
 export type FigmaCloneDomEditNodeState = DomEditNodeState
 export type FigmaCloneDomEditState = DomEditState<FigmaCloneDomNodeId>
 export type FigmaCloneDomTextState = DomEditTextState<FigmaCloneDomNodeId>
+export type FigmaCloneDomComponentId =
+  | 'home-meta-card'
+  | 'workspace-deal-row'
+  | 'workspace-stat-card'
+
+export type FigmaCloneDomComponentSourceLayer =
+  | 'features'
+  | 'shared'
+  | 'widgets'
+
+export type FigmaCloneDomComponentSource = {
+  exportName: string
+  importPath: string
+  layer: FigmaCloneDomComponentSourceLayer
+}
+
+type FigmaCloneDomComponentInstance = {
+  label: string
+  slots: Record<string, FigmaCloneDomNodeId>
+}
+
+type FigmaCloneDomComponentDefinition = {
+  id: FigmaCloneDomComponentId
+  instances: readonly FigmaCloneDomComponentInstance[]
+  label: string
+  source: FigmaCloneDomComponentSource
+  syncDescription: string
+}
+
+export type FigmaCloneDomComponentBinding = {
+  componentId: FigmaCloneDomComponentId
+  componentLabel: string
+  currentNodeId: FigmaCloneDomNodeId
+  instanceCount: number
+  instanceLabel: string
+  slotLabel: string
+  slotNodeIds: readonly FigmaCloneDomNodeId[]
+  syncDescription: string
+}
+
+export type FigmaCloneDomComponentSlotSummary = {
+  label: string
+  nodeId: FigmaCloneDomNodeId
+}
+
+export type FigmaCloneDomComponentInstanceSummary = {
+  label: string
+  nodeIds: readonly FigmaCloneDomNodeId[]
+  rootNodeId: FigmaCloneDomNodeId
+  slots: readonly FigmaCloneDomComponentSlotSummary[]
+}
+
+export type FigmaCloneDomComponentPartSummary = {
+  label: string
+  nodeIds: readonly FigmaCloneDomNodeId[]
+  slotLabel: string
+}
+
+export type FigmaCloneDomComponentSetSummary = {
+  id: FigmaCloneDomComponentId
+  instances: readonly FigmaCloneDomComponentInstanceSummary[]
+  label: string
+  pageLabel: string
+  pageRootId: FigmaCloneDomSectionRootId
+  parts: readonly FigmaCloneDomComponentPartSummary[]
+  source: FigmaCloneDomComponentSource
+  syncDescription: string
+}
+
+export type FigmaCloneStoryImportId =
+  | 'editorial-home-story'
+  | 'workspace-dashboard-story'
+
+export type FigmaCloneStoryImportSummary = {
+  componentIds: readonly FigmaCloneDomComponentId[]
+  id: FigmaCloneStoryImportId
+  label: string
+  rootId: FigmaCloneDomSectionRootId
+  source: string
+}
+
+const FIGMA_CLONE_DOM_COMPONENT_DEFINITIONS = [
+  {
+    id: 'workspace-stat-card',
+    label: 'Stat card',
+    source: {
+      exportName: 'WorkspaceStatCard',
+      importPath: 'src/widgets/workspace-stat-card',
+      layer: 'widgets',
+    },
+    syncDescription: 'Layout and style edits sync across stat instances.',
+    instances: [
+      {
+        label: 'Revenue',
+        slots: {
+          delta: 'workspaceStatRevenueDelta',
+          label: 'workspaceStatRevenueLabel',
+          root: 'workspaceStatRevenue',
+          value: 'workspaceStatRevenueValue',
+        },
+      },
+      {
+        label: 'Conversion',
+        slots: {
+          delta: 'workspaceStatConversionDelta',
+          label: 'workspaceStatConversionLabel',
+          root: 'workspaceStatConversion',
+          value: 'workspaceStatConversionValue',
+        },
+      },
+      {
+        label: 'Tickets',
+        slots: {
+          delta: 'workspaceStatTicketsDelta',
+          label: 'workspaceStatTicketsLabel',
+          root: 'workspaceStatTickets',
+          value: 'workspaceStatTicketsValue',
+        },
+      },
+    ],
+  },
+  {
+    id: 'workspace-deal-row',
+    label: 'Deal row',
+    source: {
+      exportName: 'WorkspaceDealRow',
+      importPath: 'src/features/pipeline/deal-row',
+      layer: 'features',
+    },
+    syncDescription: 'Layout and style edits sync across deal row instances.',
+    instances: [
+      {
+        label: 'Deal 1',
+        slots: {
+          root: 'workspaceDealOne',
+          title: 'workspaceDealOneTitle',
+          value: 'workspaceDealOneValue',
+        },
+      },
+      {
+        label: 'Deal 2',
+        slots: {
+          root: 'workspaceDealTwo',
+          title: 'workspaceDealTwoTitle',
+          value: 'workspaceDealTwoValue',
+        },
+      },
+      {
+        label: 'Deal 3',
+        slots: {
+          root: 'workspaceDealThree',
+          title: 'workspaceDealThreeTitle',
+          value: 'workspaceDealThreeValue',
+        },
+      },
+    ],
+  },
+  {
+    id: 'home-meta-card',
+    label: 'Article meta card',
+    source: {
+      exportName: 'ArticleMetaCard',
+      importPath: 'src/shared/article-meta-card',
+      layer: 'shared',
+    },
+    syncDescription: 'Layout and style edits sync across meta card instances.',
+    instances: [
+      {
+        label: 'Byline',
+        slots: {
+          label: 'homeBylineLabel',
+          note: 'homeBylineNote',
+          root: 'homeByline',
+          value: 'homeBylineValue',
+        },
+      },
+      {
+        label: 'Category',
+        slots: {
+          label: 'homeCategoryLabel',
+          note: 'homeCategoryNote',
+          root: 'homeCategory',
+          value: 'homeCategoryValue',
+        },
+      },
+      {
+        label: 'Reading time',
+        slots: {
+          label: 'homeReadTimeLabel',
+          note: 'homeReadTimeNote',
+          root: 'homeReadTime',
+          value: 'homeReadTimeValue',
+        },
+      },
+    ],
+  },
+] satisfies readonly FigmaCloneDomComponentDefinition[]
+
+const FIGMA_CLONE_STORY_IMPORTS = [
+  {
+    componentIds: ['workspace-stat-card', 'workspace-deal-row'],
+    id: 'workspace-dashboard-story',
+    label: 'Workspace dashboard',
+    rootId: 'workspacePage',
+    source: 'src/stories/workspace-dashboard.stories.tsx',
+  },
+  {
+    componentIds: ['home-meta-card'],
+    id: 'editorial-home-story',
+    label: 'Editorial home',
+    rootId: 'homePage',
+    source: 'src/stories/editorial-home.stories.tsx',
+  },
+] satisfies readonly FigmaCloneStoryImportSummary[]
+
+const FIGMA_CLONE_DOM_COMPONENT_PART_ORDER = [
+  'root',
+  'label',
+  'title',
+  'value',
+  'delta',
+  'note',
+] as const
 
 const EMPTY_STYLE: FigmaCloneDomEditStyle = {
   gap: 0,
@@ -2206,6 +2429,28 @@ export function updateFigmaCloneDomEditField({
   }
 }
 
+export function updateFigmaCloneDomComponentEditField({
+  field,
+  nodeId,
+  state,
+  value,
+}: {
+  field: FigmaCloneDomEditField
+  nodeId: FigmaCloneDomNodeId
+  state: FigmaCloneDomEditState
+  value: number
+}): FigmaCloneDomEditState {
+  return getFigmaCloneDomComponentSyncNodeIds(nodeId).reduce(
+    (current, syncNodeId) => updateFigmaCloneDomEditField({
+      field,
+      nodeId: syncNodeId,
+      state: current,
+      value,
+    }),
+    state,
+  )
+}
+
 export function updateFigmaCloneDomAutoLayoutField({
   field,
   nodeId,
@@ -2230,6 +2475,168 @@ export function updateFigmaCloneDomAutoLayoutField({
       [field]: value,
     },
   }
+}
+
+export function updateFigmaCloneDomComponentAutoLayoutField({
+  field,
+  nodeId,
+  state,
+  value,
+}: {
+  field: FigmaCloneDomAutoLayoutField
+  nodeId: FigmaCloneDomNodeId
+  state: FigmaCloneDomEditState
+  value: FigmaCloneDomEditNodeState[FigmaCloneDomAutoLayoutField]
+}): FigmaCloneDomEditState {
+  return getFigmaCloneDomComponentSyncNodeIds(nodeId).reduce(
+    (current, syncNodeId) => updateFigmaCloneDomAutoLayoutField({
+      field,
+      nodeId: syncNodeId,
+      state: current,
+      value,
+    }),
+    state,
+  )
+}
+
+export function getFigmaCloneDomComponentBinding(
+  nodeId: FigmaCloneDomNodeId,
+): FigmaCloneDomComponentBinding | null {
+  for (const definition of FIGMA_CLONE_DOM_COMPONENT_DEFINITIONS) {
+    for (const instance of definition.instances) {
+      for (const [slotLabel, slotNodeId] of Object.entries(instance.slots)) {
+        if (slotNodeId !== nodeId) {
+          continue
+        }
+
+        return {
+          componentId: definition.id,
+          componentLabel: definition.label,
+          currentNodeId: nodeId,
+          instanceCount: definition.instances.length,
+          instanceLabel: instance.label,
+          slotLabel,
+          slotNodeIds: getFigmaCloneDomComponentSlotNodeIds(
+            definition,
+            slotLabel,
+          ),
+          syncDescription: definition.syncDescription,
+        }
+      }
+    }
+  }
+
+  return null
+}
+
+export function getFigmaCloneDomComponentSyncNodeIds(
+  nodeId: FigmaCloneDomNodeId,
+): readonly FigmaCloneDomNodeId[] {
+  return getFigmaCloneDomComponentBinding(nodeId)?.slotNodeIds ?? [nodeId]
+}
+
+export function isFigmaCloneDomComponentRootNode(
+  nodeId: FigmaCloneDomNodeId,
+): boolean {
+  return FIGMA_CLONE_DOM_COMPONENT_DEFINITIONS.some((definition) =>
+    definition.instances.some((instance) => instance.slots.root === nodeId))
+}
+
+export function listFigmaCloneDomComponentSets():
+  readonly FigmaCloneDomComponentSetSummary[] {
+  return FIGMA_CLONE_DOM_COMPONENT_DEFINITIONS.map((definition) => {
+    const instances = definition.instances.map((instance) => {
+      const slots = Object.entries(instance.slots).map(([label, nodeId]) => ({
+        label,
+        nodeId,
+      }))
+      const rootNodeId = instance.slots.root ?? slots[0]?.nodeId
+
+      if (!rootNodeId) {
+        throw new Error(`Missing root slot for ${definition.id}`)
+      }
+
+      return {
+        label: instance.label,
+        nodeIds: slots.map((slot) => slot.nodeId),
+        rootNodeId,
+        slots,
+      }
+    })
+    const firstRootNodeId = instances[0]?.rootNodeId
+
+    if (!firstRootNodeId) {
+      throw new Error(`Missing instances for ${definition.id}`)
+    }
+
+    const pageRootId = getFigmaCloneDomRootId(firstRootNodeId)
+
+    return {
+      id: definition.id,
+      instances,
+      label: definition.label,
+      pageLabel: FIGMA_CLONE_DOM_NODE_BY_ID[pageRootId].label,
+      pageRootId,
+      parts: getFigmaCloneDomComponentParts(definition),
+      source: definition.source,
+      syncDescription: definition.syncDescription,
+    }
+  })
+}
+
+export function listFigmaCloneStoryImports():
+  readonly FigmaCloneStoryImportSummary[] {
+  return FIGMA_CLONE_STORY_IMPORTS
+}
+
+function getFigmaCloneDomComponentParts(
+  definition: FigmaCloneDomComponentDefinition,
+): FigmaCloneDomComponentPartSummary[] {
+  const slotLabels = Array.from(
+    new Set(definition.instances.flatMap((instance) =>
+      Object.keys(instance.slots))),
+  ).sort(compareFigmaCloneDomComponentPartLabels)
+
+  return slotLabels.map((slotLabel) => ({
+    label: formatFigmaCloneDomComponentSlotLabel(slotLabel),
+    nodeIds: getFigmaCloneDomComponentSlotNodeIds(definition, slotLabel),
+    slotLabel,
+  }))
+}
+
+function compareFigmaCloneDomComponentPartLabels(left: string, right: string) {
+  const leftIndex = FIGMA_CLONE_DOM_COMPONENT_PART_ORDER.indexOf(
+    left as typeof FIGMA_CLONE_DOM_COMPONENT_PART_ORDER[number],
+  )
+  const rightIndex = FIGMA_CLONE_DOM_COMPONENT_PART_ORDER.indexOf(
+    right as typeof FIGMA_CLONE_DOM_COMPONENT_PART_ORDER[number],
+  )
+  const normalizedLeft = leftIndex === -1
+    ? FIGMA_CLONE_DOM_COMPONENT_PART_ORDER.length
+    : leftIndex
+  const normalizedRight = rightIndex === -1
+    ? FIGMA_CLONE_DOM_COMPONENT_PART_ORDER.length
+    : rightIndex
+
+  return normalizedLeft === normalizedRight
+    ? left.localeCompare(right)
+    : normalizedLeft - normalizedRight
+}
+
+function getFigmaCloneDomComponentSlotNodeIds(
+  definition: FigmaCloneDomComponentDefinition,
+  slotLabel: string,
+): FigmaCloneDomNodeId[] {
+  return definition.instances.flatMap((instance) => {
+    const slotNodeId = instance.slots[slotLabel]
+    return slotNodeId ? [slotNodeId] : []
+  })
+}
+
+function formatFigmaCloneDomComponentSlotLabel(slotLabel: string) {
+  const label = slotLabel.replace(/[-_]/g, ' ')
+
+  return label ? label[0].toUpperCase() + label.slice(1) : 'Part'
 }
 
 export function canFigmaCloneDomFillParent(

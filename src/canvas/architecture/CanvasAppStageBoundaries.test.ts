@@ -201,6 +201,9 @@ describe('Canvas App stage boundaries', () => {
       'export function renderCanvasAppStageModel',
     )
     expect(stageModelFile.source).toContain(
+      'export function createCanvasAppStageExternalOverlaySlot',
+    )
+    expect(stageModelFile.source).toContain(
       "from './CanvasAppStageConsumerContracts'",
     )
     expect(stageModelFile.source).not.toContain('Pick<')
@@ -212,6 +215,9 @@ describe('Canvas App stage boundaries', () => {
     )
     expect(stageConsumerContractsFile.source).toContain(
       'export type CanvasAppStageModelInput',
+    )
+    expect(stageConsumerContractsFile.source).toContain(
+      'export type CanvasAppStageExternalOverlaySlot',
     )
     expect(stageConsumerContractsFile.source).toContain(
       'export type CanvasAppStageItemLayerContext',

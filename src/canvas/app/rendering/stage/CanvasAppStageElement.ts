@@ -9,6 +9,9 @@ import type {
   Point,
   Viewport,
 } from '../../../entities'
+import {
+  isCanvasWheelPassthroughTarget,
+} from '../../affordances/interaction/dom/CanvasInteractionTarget'
 
 export type CanvasAppStageRect = {
   height: number
@@ -225,18 +228,6 @@ function isCanvasStageWheelEvent(
 
   return target instanceof Element &&
     Boolean(target.closest('.canvas-viewport-overlay-layer'))
-}
-
-function isCanvasWheelPassthroughTarget(target: Node): boolean {
-  if (typeof Element === 'undefined') {
-    return false
-  }
-
-  const element = target instanceof Element
-    ? target
-    : target.parentElement
-
-  return Boolean(element?.closest('[data-canvas-wheel-passthrough="true"]'))
 }
 
 const CANVAS_STAGE_SNAPSHOT_PADDING = 24

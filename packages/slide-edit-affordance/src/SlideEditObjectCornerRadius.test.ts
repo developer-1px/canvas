@@ -3,7 +3,9 @@ import { describe, expect, it } from 'vitest'
 import {
   createSlideEditObjectCornerRadiusDescriptor,
   getSlideEditObjectCornerRadiusCommandEffect,
+  getSlideEditObjectCornerRadiusCSS,
   getSlideEditObjectCornerRadiusMetadata,
+  getSlideEditObjectCornerRadiusPreviewCSS,
   normalizeSlideEditObjectCornerRadius,
   SLIDE_EDIT_OBJECT_CORNER_RADIUS_DATA_ATTRIBUTE,
   SLIDE_EDIT_OBJECT_CORNER_RADIUS_DEFAULT,
@@ -100,6 +102,26 @@ describe('SlideEditObjectCornerRadius', () => {
     expect(normalizeSlideEditObjectCornerRadius(12.345)).toBe(12.35)
     expect(normalizeSlideEditObjectCornerRadius(1200)).toBe(1000)
     expect(toSlideEditObjectCornerRadiusAttributeValue(14)).toBe('14')
+  })
+
+  it('formats normalized corner radius values for CSS rendering', () => {
+    expect(getSlideEditObjectCornerRadiusCSS(12.345)).toBe('12.35px')
+    expect(getSlideEditObjectCornerRadiusCSS(Number.NaN)).toBe('0px')
+    expect(getSlideEditObjectCornerRadiusPreviewCSS({
+      h: 80,
+      value: 20,
+      w: 160,
+    })).toBe('25%')
+    expect(getSlideEditObjectCornerRadiusPreviewCSS({
+      h: 80,
+      value: 80,
+      w: 160,
+    })).toBe('50%')
+    expect(getSlideEditObjectCornerRadiusPreviewCSS({
+      h: Number.NaN,
+      value: 0.25,
+      w: 0,
+    })).toBe('25%')
   })
 
   it('routes selected object corner radius updates through host command effects', () => {

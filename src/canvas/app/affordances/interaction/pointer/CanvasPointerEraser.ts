@@ -7,6 +7,7 @@ import {
   type CanvasPointerGesture,
   type CanvasSceneAdapter,
 } from '../../../../engine'
+import { removeCanvasSelectionIds } from '../../../../foundation'
 import {
   getCanvasEraserHitItemIds,
   getCanvasMergedEraserHitIds,
@@ -181,7 +182,7 @@ export function commitCanvasPointerEraserInteraction({
     },
     {
       before: selection,
-      after: selection.filter((id) => !erased.has(id)),
+      after: removeCanvasSelectionIds({ ids: erased, selection }),
     },
   )
 }

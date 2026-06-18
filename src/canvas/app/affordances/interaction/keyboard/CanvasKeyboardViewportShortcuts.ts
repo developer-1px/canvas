@@ -12,6 +12,11 @@ import type {
   CanvasKeyboardCommandShortcutIntentInput,
 } from './CanvasKeyboardCommandShortcutIntent'
 
+export const CANVAS_KEYBOARD_VIEWPORT_MODEL =
+  'canvas-keyboard-viewport-shortcuts'
+export const CANVAS_KEYBOARD_VIEWPORT_INTENT_MODEL =
+  'canvas-keyboard-viewport-shortcut-intent'
+
 export function getCanvasKeyboardViewportShortcutIntent(
   input: CanvasKeyboardCommandShortcutIntentInput,
 ): CanvasKeyboardCommandShortcutIntent | null {

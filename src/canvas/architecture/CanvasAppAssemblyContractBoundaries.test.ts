@@ -57,6 +57,9 @@ describe('Canvas App Assembly contract boundaries', () => {
       "from './CanvasAppExtensionAssemblyTypes'",
     )
     expect(typeContractFile.source).toContain(
+      "from './CanvasAppFeaturePackAssembly'",
+    )
+    expect(typeContractFile.source).toContain(
       "from './CanvasAppAssemblyInputTypes'",
     )
     expect(typeContractFile.source).toContain(
@@ -67,7 +70,8 @@ describe('Canvas App Assembly contract boundaries', () => {
       'CanvasAppAffordanceAssemblyInput &',
       'CanvasAppComponentAssemblyInput &',
       'CanvasAppAdapterAssemblyInput &',
-      'CanvasAppWorkspaceAssemblyInput',
+      'CanvasAppWorkspaceAssemblyInput &',
+      'CanvasAppFeaturePackAssemblyInput',
     ]) {
       expect(typeContractFile.source).toContain(assemblyInputContract)
     }
@@ -95,13 +99,31 @@ describe('Canvas App Assembly contract boundaries', () => {
     expect(typeContractFile.source).not.toContain('snapshotCanvasAppAssembly')
     expect(snapshotFile.source).toContain("from './CanvasAppAssemblyTypes'")
     expect(contractsFile.source).toContain("from './CanvasAppAssemblyTypes'")
+    expect(contractsFile.source).toContain(
+      'assertCanvasAppFeaturePackViewRenderers',
+    )
     expect(modelFile.source).toContain("from './CanvasAppAssemblyTypes'")
+    expect(modelFile.source).toContain('featurePackViewRenderers')
     expect(defaultAssemblyFile.source).toContain(
       "from './CanvasAppAssemblyTypes'",
     )
     expect(getSourceFile(
       'src/canvas/app/workflow/CanvasAppExtensionAssembly.ts',
     ).source).toContain("from './CanvasAppExtensionAssemblyTypes'")
+    expect(getSourceFile(
+      'src/canvas/app/workflow/CanvasAppFeaturePackAssembly.ts',
+    ).source).toContain('export type CanvasAppFeaturePackAssemblyInput')
+    expect(getSourceFile(
+      'src/canvas/app/workflow/CanvasAppFeaturePackAssembly.ts',
+    ).source).toContain('featurePackManifests?')
+    expect(getSourceFile(
+      'src/canvas/app/workflow/CanvasAppFeaturePackAssembly.ts',
+    ).source).toContain('additionalFeaturePackManifests?')
+    expect(getSourceFile(
+      'src/canvas/app/workflow/CanvasAppFeaturePackAssembly.ts',
+    ).source).toContain('disabledFeaturePackIds?')
+    expect(typeContractFile.source).toContain('installedFeaturePackIds')
+    expect(contractsFile.source).toContain('assertCanvasAppFeaturePackIds')
   })
 
 

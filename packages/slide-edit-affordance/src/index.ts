@@ -31,6 +31,7 @@ export {
   getSlideEditRailListboxKeyboardIntent,
   getSlideEditRailPointerCommandEffect,
   SLIDE_EDIT_RAIL_COMMANDS,
+  SLIDE_EDIT_RAIL_KEYBOARD_KEYS,
   toSlideEditRailHostCommandEffect,
   type SlideEditRailCommand,
   type SlideEditRailCommandDescriptor,
@@ -45,6 +46,20 @@ export {
   type SlideEditRailSlideId,
   type SlideEditRailThumbnailDescriptor,
 } from './SlideEditRailInteractions'
+export {
+  getSlideEditDeckNavigationKeyboardIntent,
+  type SlideEditDeckNavigationKeyboardDirection,
+  type SlideEditDeckNavigationKeyboardIntent,
+  type SlideEditDeckNavigationKeyboardIntentInput,
+  type SlideEditDeckNavigationSlideId,
+} from './SlideEditDeckNavigationKeyboard'
+export {
+  getSlideEditTextFormattingKeyboardIntent,
+  type SlideEditTextFormattingKeyboardIntent,
+  type SlideEditTextFormattingKeyboardIntentInput,
+  type SlideEditTextFormattingKeyboardIntentKind,
+  type SlideEditTextFormattingKeyboardShortcut,
+} from './SlideEditTextFormattingKeyboard'
 export {
   getSlideEditTextAutoFitGestureCommandEffect,
   getSlideEditTextAutoSizeBounds,
@@ -66,6 +81,7 @@ export {
 export {
   createSlideEditTextParagraphSpacingDescriptor,
   getSlideEditTextParagraphSpacingCommandEffect,
+  getSlideEditTextParagraphSpacingCSSStyle,
   normalizeSlideEditTextLineHeightRatio,
   normalizeSlideEditTextParagraphSpacingAmount,
   normalizeSlideEditTextParagraphSpacingNumber,
@@ -77,6 +93,8 @@ export {
   type SlideEditTextParagraphSlideId,
   type SlideEditTextParagraphSpacingAmount,
   type SlideEditTextParagraphSpacingCommandId,
+  type SlideEditTextParagraphSpacingCSSStyle,
+  type SlideEditTextParagraphSpacingCSSStyleInput,
   type SlideEditTextParagraphSpacingDescriptor,
   type SlideEditTextParagraphSpacingFieldControl,
   type SlideEditTextParagraphSpacingFieldDescriptor,
@@ -89,6 +107,7 @@ export {
 } from './SlideEditTextParagraphSpacing'
 export {
   createSlideEditTextFontFamilyDescriptor,
+  getSlideEditTextFontFamilyCSS,
   getSlideEditTextFontFamilyCommandEffect,
   normalizeSlideEditTextFontFamily,
   normalizeSlideEditTextFontFamilyOptions,
@@ -96,6 +115,7 @@ export {
   SLIDE_EDIT_TEXT_FONT_FAMILY_FALLBACK,
   SLIDE_EDIT_TEXT_FONT_FAMILY_FIELD,
   type SlideEditTextFontFamily,
+  type SlideEditTextFontFamilyCSSInput,
   type SlideEditTextFontFamilyDescriptor,
   type SlideEditTextFontFamilyFieldDescriptor,
   type SlideEditTextFontFamilyHostCommandEffect,
@@ -109,6 +129,7 @@ export {
 export {
   createSlideEditTextVerticalAlignmentDescriptor,
   getSlideEditTextVerticalAlignmentCommandEffect,
+  getSlideEditTextVerticalAlignmentFlexAlignItems,
   getSlideEditTextVerticalAlignmentMetadata,
   isSlideEditTextVerticalAlignmentValue,
   normalizeSlideEditTextVerticalAlignment,
@@ -119,6 +140,7 @@ export {
   SLIDE_EDIT_TEXT_VERTICAL_ALIGNMENT_OPTIONS,
   type SlideEditTextVerticalAlignmentDescriptor,
   type SlideEditTextVerticalAlignmentFieldDescriptor,
+  type SlideEditTextVerticalAlignmentFlexAlignItems,
   type SlideEditTextVerticalAlignmentHostCommandEffect,
   type SlideEditTextVerticalAlignmentMetadata,
   type SlideEditTextVerticalAlignmentObjectId,
@@ -131,6 +153,7 @@ export {
   createSlideEditTextFrameInsetDescriptor,
   getSlideEditTextFrameInsetCommandEffect,
   getSlideEditTextFrameInsetMetadata,
+  getSlideEditTextFrameInsetPaddingCSS,
   normalizeSlideEditTextFrameInset,
   normalizeSlideEditTextFrameInsetUpdateCommand,
   normalizeSlideEditTextFrameInsetValue,
@@ -212,9 +235,68 @@ export {
   type SlideEditObjectFillOpacityValue,
 } from './SlideEditObjectFillOpacity'
 export {
+  createSlideEditObjectImageCropDescriptor,
+  getSlideEditObjectImageCropCommandEffect,
+  getSlideEditObjectImageCropMetadata,
+  getSlideEditObjectImageCropPositionCSS,
+  normalizeSlideEditObjectImageCrop,
+  normalizeSlideEditObjectImageCropCommand,
+  normalizeSlideEditObjectImageCropFit,
+  normalizeSlideEditObjectImageCropUpdateCommand,
+  normalizeSlideEditObjectImageCropValue,
+  SLIDE_EDIT_OBJECT_IMAGE_CROP_DATA_ATTRIBUTE,
+  SLIDE_EDIT_OBJECT_IMAGE_CROP_DEFAULT,
+  SLIDE_EDIT_OBJECT_IMAGE_CROP_DEFAULT_FIT,
+  SLIDE_EDIT_OBJECT_IMAGE_CROP_FIELDS,
+  SLIDE_EDIT_OBJECT_IMAGE_CROP_FIT_OPTIONS,
+  SLIDE_EDIT_OBJECT_IMAGE_CROP_LIMITS,
+  toSlideEditObjectImageCropAttributeValue,
+  type SlideEditObjectImageCropCommand,
+  type SlideEditObjectImageCropCommandPayload,
+  type SlideEditObjectImageCropDescriptor,
+  type SlideEditObjectImageCropFieldDescriptor,
+  type SlideEditObjectImageCropFieldId,
+  type SlideEditObjectImageCropFieldsDescriptor,
+  type SlideEditObjectImageCropFit,
+  type SlideEditObjectImageCropFitFieldDescriptor,
+  type SlideEditObjectImageCropFitOption,
+  type SlideEditObjectImageCropHostCommandEffect,
+  type SlideEditObjectImageCropMetadata,
+  type SlideEditObjectImageCropNumericLimits,
+  type SlideEditObjectImageCropObjectId,
+  type SlideEditObjectImageCropPosition,
+  type SlideEditObjectImageCropPositionFieldDescriptor,
+  type SlideEditObjectImageCropResetCommand,
+  type SlideEditObjectImageCropResetFieldDescriptor,
+  type SlideEditObjectImageCropResetPayload,
+  type SlideEditObjectImageCropSlideId,
+  type SlideEditObjectImageCropUnsupportedReason,
+  type SlideEditObjectImageCropUpdateCommand,
+} from './SlideEditObjectImageCrop'
+export {
+  createSlideEditObjectImageReplaceDescriptor,
+  getSlideEditObjectImageReplaceCommandEffect,
+  getSlideEditObjectImageReplaceMetadata,
+  normalizeSlideEditObjectImageReplaceCommand,
+  normalizeSlideEditObjectImageReplaceSource,
+  SLIDE_EDIT_OBJECT_IMAGE_REPLACE_DATA_ATTRIBUTE,
+  SLIDE_EDIT_OBJECT_IMAGE_REPLACE_FIELD,
+  type SlideEditObjectImageReplaceCommand,
+  type SlideEditObjectImageReplaceDescriptor,
+  type SlideEditObjectImageReplaceFieldDescriptor,
+  type SlideEditObjectImageReplaceHostCommandEffect,
+  type SlideEditObjectImageReplaceMetadata,
+  type SlideEditObjectImageReplaceObjectId,
+  type SlideEditObjectImageReplaceSlideId,
+  type SlideEditObjectImageReplaceSource,
+  type SlideEditObjectImageReplaceUnsupportedReason,
+} from './SlideEditObjectImageReplace'
+export {
   createSlideEditObjectCornerRadiusDescriptor,
   getSlideEditObjectCornerRadiusCommandEffect,
+  getSlideEditObjectCornerRadiusCSS,
   getSlideEditObjectCornerRadiusMetadata,
+  getSlideEditObjectCornerRadiusPreviewCSS,
   normalizeSlideEditObjectCornerRadius,
   normalizeSlideEditObjectCornerRadiusUpdateCommand,
   SLIDE_EDIT_OBJECT_CORNER_RADIUS_DATA_ATTRIBUTE,
@@ -228,6 +310,7 @@ export {
   type SlideEditObjectCornerRadiusMetadata,
   type SlideEditObjectCornerRadiusNumericLimits,
   type SlideEditObjectCornerRadiusObjectId,
+  type SlideEditObjectCornerRadiusPreviewSize,
   type SlideEditObjectCornerRadiusSlideId,
   type SlideEditObjectCornerRadiusUnit,
   type SlideEditObjectCornerRadiusUnsupportedReason,
@@ -242,6 +325,7 @@ export {
   normalizeSlideEditObjectHyperlink,
   normalizeSlideEditObjectHyperlinkCommand,
   normalizeSlideEditObjectHyperlinkFieldValue,
+  normalizeSlideEditObjectHyperlinkStorageUrl,
   shouldEmitSlideEditObjectHyperlinkMetadata,
   SLIDE_EDIT_OBJECT_HYPERLINK_ALLOWED_SCHEMES,
   SLIDE_EDIT_OBJECT_HYPERLINK_DATA_ATTRIBUTE,
@@ -263,6 +347,7 @@ export {
   type SlideEditObjectHyperlinkTarget,
   type SlideEditObjectHyperlinkTargetOption,
   type SlideEditObjectHyperlinkUpdateCommand,
+  type SlideEditObjectHyperlinkUrlStoragePolicy,
   type SlideEditObjectHyperlinkValidation,
 } from './SlideEditObjectHyperlink'
 export {
@@ -272,6 +357,7 @@ export {
   normalizeSlideEditObjectAccessibility,
   normalizeSlideEditObjectAccessibilityCommand,
   normalizeSlideEditObjectAccessibilityFieldValue,
+  normalizeSlideEditObjectAltTextStorageValue,
   shouldEmitSlideEditObjectAccessibilityMetadata,
   SLIDE_EDIT_OBJECT_ACCESSIBILITY_DATA_ATTRIBUTE,
   SLIDE_EDIT_OBJECT_ACCESSIBILITY_DEFAULT,
@@ -287,11 +373,15 @@ export {
   type SlideEditObjectAccessibilityObjectId,
   type SlideEditObjectAccessibilitySlideId,
   type SlideEditObjectAccessibilityUpdateCommand,
+  type SlideEditObjectAltTextStoragePolicy,
   type SlideEditObjectAltTextRemoveCommand,
 } from './SlideEditObjectAccessibility'
 export {
   createSlideEditObjectShadowDescriptor,
   getSlideEditObjectShadowCommandEffect,
+  getSlideEditObjectShadowColorCSS,
+  getSlideEditObjectShadowFilter,
+  getSlideEditObjectShadowFilterCSS,
   getSlideEditObjectShadowMetadata,
   normalizeSlideEditObjectShadow,
   normalizeSlideEditObjectShadowFieldValue,
@@ -317,7 +407,9 @@ export {
 } from './SlideEditObjectShadow'
 export {
   createSlideEditObjectStrokeLineStyleDescriptor,
+  getSlideEditObjectStrokeLineStyleBorderStyle,
   getSlideEditObjectStrokeLineStyleCommandEffect,
+  getSlideEditObjectStrokeLineStyleDashArray,
   getSlideEditObjectStrokeLineStyleMetadata,
   isSlideEditObjectStrokeLineStyleValue,
   normalizeSlideEditObjectStrokeLineStyle,
@@ -326,6 +418,7 @@ export {
   SLIDE_EDIT_OBJECT_STROKE_LINE_STYLE_DEFAULT,
   SLIDE_EDIT_OBJECT_STROKE_LINE_STYLE_FIELD,
   SLIDE_EDIT_OBJECT_STROKE_LINE_STYLE_OPTIONS,
+  type SlideEditObjectStrokeLineStyleBorderStyle,
   type SlideEditObjectStrokeLineStyleDescriptor,
   type SlideEditObjectStrokeLineStyleFieldDescriptor,
   type SlideEditObjectStrokeLineStyleHostCommandEffect,
@@ -340,16 +433,26 @@ export {
 export {
   createSlideEditLayerPaneDescriptor,
   getSlideEditLayerPaneCommandEffect,
+  getSlideEditLayerPaneDropIndicator,
+  getSlideEditLayerPaneKeyboardIntent,
+  getSlideEditLayerPaneResolvedFocusObjectId,
   SLIDE_EDIT_LAYER_PANE_ARIA_CONTRACT,
   SLIDE_EDIT_LAYER_PANE_COMMANDS,
+  SLIDE_EDIT_LAYER_PANE_DROP_INDICATOR_MODEL,
+  SLIDE_EDIT_LAYER_PANE_KEYBOARD_INTENT_MODEL,
+  SLIDE_EDIT_LAYER_PANE_KEYBOARD_KEYS,
   type SlideEditLayerPaneAriaContract,
   type SlideEditLayerPaneCommand,
   type SlideEditLayerPaneCommandDescriptor,
   type SlideEditLayerPaneCommandId,
   type SlideEditLayerPaneDescriptor,
+  type SlideEditLayerPaneDropIndicator,
+  type SlideEditLayerPaneDropPlacement,
   type SlideEditLayerPaneGroupId,
   type SlideEditLayerPaneHostCommandEffect,
   type SlideEditLayerPaneIntent,
+  type SlideEditLayerPaneKeyboardIntent,
+  type SlideEditLayerPaneKeyboardKey,
   type SlideEditLayerPaneObjectId,
   type SlideEditLayerPaneObjectInput,
   type SlideEditLayerPaneRowDescriptor,
@@ -358,6 +461,7 @@ export {
 export {
   createSlideEditObjectAnimationDescriptor,
   getSlideEditObjectAnimationBuildOrder,
+  getSlideEditObjectAnimationCSSStyle,
   getSlideEditObjectAnimationUpdateCommandEffect,
   normalizeSlideEditObjectAnimationDelayMs,
   normalizeSlideEditObjectAnimationDurationMs,
@@ -374,6 +478,8 @@ export {
   type SlideEditAnimationType,
   type SlideEditBuiltInAnimationTrigger,
   type SlideEditBuiltInAnimationType,
+  type SlideEditObjectAnimationCSSStyle,
+  type SlideEditObjectAnimationCSSStyleInput,
   type SlideEditObjectAnimationDescriptor,
   type SlideEditObjectAnimationFieldId,
   type SlideEditObjectAnimationHostCommandEffect,
@@ -419,6 +525,8 @@ export {
   createSlideEditColorSwatchPaletteDescriptor,
   getSlideEditColorSwatchCommandEffect,
   getSlideEditColorSwatchId,
+  getSlideEditColorWithAlphaCSS,
+  normalizeSlideEditColorHex,
   normalizeSlideEditColorSwatchValue,
   SLIDE_EDIT_COLOR_SWATCH_CHANNELS,
   SLIDE_EDIT_COLOR_SWATCH_FIELD,
@@ -444,6 +552,8 @@ export {
   createSlideEditClipboardPastePlan,
   createSlideEditClipboardPayload,
   getSlideEditClipboardPasteAnchor,
+  mapSlideEditClipboardPasteObjects,
+  normalizeSlideEditClipboardSelectedObjectIds,
   type SlideEditClipboardGroupId,
   type SlideEditClipboardObjectId,
   type SlideEditClipboardObjectMetadata,
@@ -461,10 +571,14 @@ export {
 export {
   createSlideEditStyleClipboardDescriptor,
   createSlideEditStyleClipboardPasteCommandEffect,
+  getSlideEditStyleClipboardCategoryDescriptors,
   getSlideEditStyleClipboardCategoryIds,
   getSlideEditStyleClipboardCopyCommandEffect,
+  getSlideEditStyleClipboardKeyboardIntent,
   getSlideEditStyleClipboardPasteAvailability,
   SLIDE_EDIT_STYLE_CLIPBOARD_BUILT_IN_CATEGORIES,
+  SLIDE_EDIT_STYLE_CLIPBOARD_COPY_FORMATTING_SHORTCUT,
+  SLIDE_EDIT_STYLE_CLIPBOARD_PASTE_FORMATTING_SHORTCUT,
   type SlideEditStyleClipboardBuiltInCategoryId,
   type SlideEditStyleClipboardCategoryApplication,
   type SlideEditStyleClipboardCategoryDescriptor,
@@ -473,6 +587,9 @@ export {
   type SlideEditStyleClipboardDescriptor,
   type SlideEditStyleClipboardDisabledReason,
   type SlideEditStyleClipboardHostCommandEffect,
+  type SlideEditStyleClipboardKeyboardIntent,
+  type SlideEditStyleClipboardKeyboardIntentInput,
+  type SlideEditStyleClipboardKeyboardIntentKind,
   type SlideEditStyleClipboardObjectId,
   type SlideEditStyleClipboardPasteAvailability,
   type SlideEditStyleClipboardPasteFormattingCommand,
@@ -508,6 +625,7 @@ export {
 } from './SlideEditSlideMetadataInspector'
 export {
   createSlideEditTransitionDescriptor,
+  getSlideEditTransitionCSSStyle,
   getSlideEditTransitionUpdateCommandEffect,
   normalizeSlideEditTransitionAdvancePolicy,
   normalizeSlideEditTransitionDurationMs,
@@ -518,6 +636,8 @@ export {
   type SlideEditBuiltInTransitionType,
   type SlideEditSlideTransitionDescriptor,
   type SlideEditTransitionAdvancePolicy,
+  type SlideEditTransitionCSSStyle,
+  type SlideEditTransitionCSSStyleInput,
   type SlideEditTransitionFieldId,
   type SlideEditTransitionHostCommandEffect,
   type SlideEditTransitionSlideId,
@@ -611,6 +731,8 @@ export type SlideEditAdapterSlotId =
   | 'object-corner-radius'
   | 'object-fill-opacity'
   | 'object-hyperlink'
+  | 'object-image-crop'
+  | 'object-image-replace'
   | 'object-opacity'
   | 'object-shadow'
   | 'object-stroke-line-style'
@@ -683,6 +805,16 @@ export const SLIDE_EDIT_ADAPTER_SLOTS = Object.freeze([
     id: 'object-hyperlink',
     owner: 'host',
     purpose: 'Provide selected object hyperlink/action values for inspector, stage, thumbnail, and export.',
+  },
+  {
+    id: 'object-image-crop',
+    owner: 'host',
+    purpose: 'Provide selected image fit and crop position values for inspector, stage, thumbnail, and export.',
+  },
+  {
+    id: 'object-image-replace',
+    owner: 'host',
+    purpose: 'Provide selected image source replacement metadata for inspector, stage, thumbnail, and export.',
   },
   {
     id: 'object-opacity',
@@ -796,6 +928,8 @@ export type SlideEditOwnedContractId =
   | 'object-corner-radius-affordance'
   | 'object-fill-opacity-affordance'
   | 'object-hyperlink-affordance'
+  | 'object-image-crop-affordance'
+  | 'object-image-replace-affordance'
   | 'object-layer-pane'
   | 'object-opacity-affordance'
   | 'object-shadow-affordance'
@@ -881,6 +1015,16 @@ export const SLIDE_EDIT_OWNED_CONTRACTS = Object.freeze([
     id: 'object-hyperlink-affordance',
     owner: 'slide-edit-affordance',
     scope: 'Object hyperlink/action fields, metadata attribute, URL policy, and update command effects.',
+  },
+  {
+    id: 'object-image-crop-affordance',
+    owner: 'slide-edit-affordance',
+    scope: 'Image fit mode, crop position fields, metadata attribute, and update command effects.',
+  },
+  {
+    id: 'object-image-replace-affordance',
+    owner: 'slide-edit-affordance',
+    scope: 'Image source replacement field, support state, metadata attribute, and command effects.',
   },
   {
     id: 'object-opacity-affordance',

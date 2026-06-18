@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { createCanvasAffordanceConfig } from '../../../../engine'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import {
+  CANVAS_LASER_TRAIL_OVERLAY_MODEL,
   previewCanvasPointerLaserInteraction,
   startCanvasPointerLaserInteraction,
 } from './CanvasPointerLaser'
@@ -9,6 +10,12 @@ import {
 const input = createPointerInput()
 
 describe('CanvasPointerLaser', () => {
+  it('exports the laser trail overlay model contract', () => {
+    expect(CANVAS_LASER_TRAIL_OVERLAY_MODEL).toBe(
+      'canvas-laser-trail-overlay',
+    )
+  })
+
   it('starts an ephemeral laser interaction with an initial trail', () => {
     expect(startCanvasPointerLaserInteraction({
       config: createCanvasAffordanceConfig(),

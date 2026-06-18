@@ -5,8 +5,10 @@ import {
   type CanvasCommandAvailability,
 } from '../../engine'
 import { getCanvasKeyboardCommandShortcutIntent } from '../affordances/interaction/keyboard/CanvasKeyboardCommandShortcutIntent'
-import { getCanvasToolbarCommandGroups } from '../affordances/controls/toolbar/CanvasToolbarCommandItems'
-import { getCanvasToolbarToolItems } from '../affordances/controls/toolbar/CanvasToolbarToolItems'
+import {
+  getCanvasToolbarCommandGroups,
+  getCanvasToolbarToolItems,
+} from '../feature-packs'
 import {
   CANVAS_APP_COMMENT_ONLY_CAPABILITIES,
   CANVAS_APP_READ_ONLY_CAPABILITIES,

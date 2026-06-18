@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest'
 import {
   createSlideEditObjectStrokeLineStyleDescriptor,
   getSlideEditObjectStrokeLineStyleCommandEffect,
+  getSlideEditObjectStrokeLineStyleBorderStyle,
+  getSlideEditObjectStrokeLineStyleDashArray,
   getSlideEditObjectStrokeLineStyleMetadata,
   isSlideEditObjectStrokeLineStyleValue,
   normalizeSlideEditObjectStrokeLineStyle,
@@ -87,6 +89,32 @@ describe('SlideEditObjectStrokeLineStyle', () => {
     expect(normalizeSlideEditObjectStrokeLineStyle(null)).toBe('solid')
     expect(isSlideEditObjectStrokeLineStyleValue('dot')).toBe(true)
     expect(isSlideEditObjectStrokeLineStyleValue('none')).toBe(false)
+  })
+
+  it('maps line styles to CSS border styles', () => {
+    expect(getSlideEditObjectStrokeLineStyleBorderStyle('dash')).toBe('dashed')
+    expect(getSlideEditObjectStrokeLineStyleBorderStyle('dot')).toBe('dotted')
+    expect(getSlideEditObjectStrokeLineStyleBorderStyle('solid')).toBe('solid')
+    expect(getSlideEditObjectStrokeLineStyleBorderStyle('long-dash')).toBe('solid')
+  })
+
+  it('maps line styles and stroke width to SVG dash arrays', () => {
+    expect(getSlideEditObjectStrokeLineStyleDashArray({
+      strokeWidth: 2,
+      value: 'dash',
+    })).toBe('6 4')
+    expect(getSlideEditObjectStrokeLineStyleDashArray({
+      strokeWidth: 2,
+      value: 'dot',
+    })).toBe('1 4')
+    expect(getSlideEditObjectStrokeLineStyleDashArray({
+      strokeWidth: 2,
+      value: 'solid',
+    })).toBeUndefined()
+    expect(getSlideEditObjectStrokeLineStyleDashArray({
+      strokeWidth: Number.NaN,
+      value: 'dash',
+    })).toBe('4 3')
   })
 
   it('routes selected object line style updates through host command effects', () => {

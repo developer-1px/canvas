@@ -1,0 +1,22 @@
+import {
+  DEFAULT_CANVAS_APP_EXTENSION_FEATURE_PACK_MANIFESTS,
+} from './CanvasAppDefaultFeaturePacks'
+import {
+  DEFAULT_CANVAS_APP_VIEW_FEATURE_PACK_MANIFESTS,
+} from './CanvasAppDefaultViewFeaturePacks'
+import {
+  CANVAS_APP_TABLE_IMPORT_FEATURE_PACK_MANIFEST,
+} from './table-import'
+import {
+  CANVAS_APP_TEXT_PASTE_IMPORT_FEATURE_PACK_MANIFEST,
+} from './text-paste-import'
+import type {
+  CanvasAppFeaturePackManifest,
+} from './CanvasAppFeaturePackManifests'
+
+export const DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS = Object.freeze([
+  ...DEFAULT_CANVAS_APP_VIEW_FEATURE_PACK_MANIFESTS,
+  CANVAS_APP_TABLE_IMPORT_FEATURE_PACK_MANIFEST,
+  CANVAS_APP_TEXT_PASTE_IMPORT_FEATURE_PACK_MANIFEST,
+  ...DEFAULT_CANVAS_APP_EXTENSION_FEATURE_PACK_MANIFESTS,
+]) satisfies readonly CanvasAppFeaturePackManifest[]

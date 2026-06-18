@@ -1,10 +1,18 @@
 import { describe, expect, it, vi } from 'vitest'
 import {
+  CANVAS_RESIZE_POINTER_MODIFIERS_MODEL,
   createCanvasAppEventInput,
   createCanvasAppPointerInput,
+  getCanvasPointerTransformModifierState,
 } from './CanvasAppPointerInput'
 
 describe('CanvasAppPointerInput', () => {
+  it('exposes a stable resize pointer modifiers model metadata value', () => {
+    expect(CANVAS_RESIZE_POINTER_MODIFIERS_MODEL).toBe(
+      'canvas-resize-pointer-modifiers',
+    )
+  })
+
   it('projects React pointer events into the app pointer interface', () => {
     const preventDefault = vi.fn()
     const stopPropagation = vi.fn()
@@ -52,5 +60,24 @@ describe('CanvasAppPointerInput', () => {
 
     expect(preventDefault).toHaveBeenCalledOnce()
     expect(stopPropagation).toHaveBeenCalledOnce()
+  })
+
+  it('normalizes pointer transform modifier state', () => {
+    expect(getCanvasPointerTransformModifierState({
+      altKey: true,
+      shiftKey: true,
+    })).toEqual({
+      constrainAngle: true,
+      preserveAspectRatio: true,
+      resizeFromCenter: true,
+    })
+    expect(getCanvasPointerTransformModifierState({
+      altKey: false,
+      shiftKey: false,
+    })).toEqual({
+      constrainAngle: false,
+      preserveAspectRatio: false,
+      resizeFromCenter: false,
+    })
   })
 })

@@ -6,6 +6,18 @@ export type {
   CanvasAppAssembly,
   CanvasAppAssemblyInput,
 } from '../workflow/CanvasAppAssemblyTypes'
+export type {
+  CanvasAppFeaturePackAssembly,
+  CanvasAppFeaturePackAssemblyInput,
+} from '../workflow/CanvasAppFeaturePackAssembly'
+export type {
+  CanvasAppStageExternalOverlaySlot,
+} from '../workflow/CanvasAppStageConsumerContracts'
+export {
+  createCanvasAppExtensionBundle,
+  type CanvasAppExtensionBundle,
+  type CanvasAppExtensionBundleInput,
+} from '../extensions/CanvasAppExtensionBundle'
 export {
   CANVAS_APP_COMMENT_ONLY_CAPABILITIES,
   CANVAS_APP_EDITOR_CAPABILITIES,
@@ -29,7 +41,7 @@ export type {
 export type {
   CanvasAppCustomCommand,
   CanvasAppCustomCommandContext,
-} from '../affordances/commands/CanvasAppCustomCommands'
+} from '../extensions/custom-commands'
 export {
   defineCanvasAppCustomItemModule,
   type CanvasAppCustomItemModule,
@@ -62,26 +74,28 @@ export type {
 } from '../affordances/interaction/pointer/CanvasAppPointerInput'
 export type {
   CanvasAppCustomFocus,
-} from '../affordances/interaction/focus/CanvasAppCustomFocus'
+} from '../extensions/custom-focus'
 export {
   dispatchCanvasAppCustomFocus,
   dispatchCanvasAppCustomFocusClear,
-} from '../affordances/interaction/focus/CanvasAppCustomFocus'
+} from '../extensions/custom-focus'
 export type {
   CanvasAppInspectorPanel,
   CanvasAppInspectorPanelContext,
   CanvasAppInspectorPanelView,
-} from '../affordances/editing/inspector/CanvasAppInspectorPanels'
+} from '../extensions/inspector-panels'
 export {
+  createCanvasAppDomEditStyleFeaturePackManifest,
   createCanvasDomEditStyleInspectorPanel,
   getCanvasDomEditStyle,
   getCanvasDomEditStyleProperties,
   setCanvasDomEditStyleValue,
+  type CanvasAppDomEditStyleFeaturePackManifestInput,
   type CanvasDomEditStyle,
   type CanvasDomEditStyleChannel,
   type CanvasDomEditStyleLimit,
   type CanvasDomEditStyleOptions,
-} from '../affordances/editing/dom/CanvasDomEditStyle'
+} from '../feature-packs/dom-edit-style'
 export type {
   CanvasAppCustomCreationToolContext,
   CanvasAppCustomToolShortcut,
@@ -101,8 +115,9 @@ export type {
 export type {
   CanvasTextPasteImporter,
   CanvasTextPasteImporterContext,
-} from '../affordances/io/text-paste/CanvasTextPasteImporters'
+} from '../feature-packs/text-paste-import'
 export {
+  CANVAS_APP_BOARD_IO_FEATURE_PACK_MANIFEST,
   CANVAS_BOARD_EXPORT_KIND,
   CANVAS_BOARD_EXPORT_VERSION,
   CANVAS_BOARD_IO_PLUGIN_ID,
@@ -128,7 +143,102 @@ export {
   type CanvasBoardSvgExportFileNameContext,
   type CanvasBoardSvgExportInput,
   type CanvasBoardSvgExportScope,
-} from '../affordances/io/board/CanvasBoardIoPlugin'
+} from '../feature-packs/board-io'
+export {
+  CANVAS_APP_COMMAND_PALETTE_FEATURE_PACK_MANIFEST,
+  CANVAS_APP_COMMAND_PALETTE_VIEW_FEATURE_PACK,
+  CANVAS_APP_COMPONENT_AUTHORING_FEATURE_PACK_MANIFEST,
+  CANVAS_APP_COMPONENT_AUTHORING_VIEW_FEATURE_PACK,
+  CANVAS_APP_CURSOR_CHAT_FEATURE_PACK_MANIFEST,
+  CANVAS_APP_CURSOR_CHAT_VIEW_FEATURE_PACK,
+  CANVAS_APP_DRAWING_TOOLS_FEATURE_PACK_MANIFEST,
+  CANVAS_APP_DRAWING_TOOLS_VIEW_FEATURE_PACK,
+  CANVAS_APP_FACILITATION_FEATURE_PACK_MANIFEST,
+  CANVAS_APP_FACILITATION_VIEW_FEATURE_PACK,
+  CANVAS_APP_FIND_REPLACE_FEATURE_PACK_MANIFEST,
+  CANVAS_APP_FIND_REPLACE_VIEW_FEATURE_PACK,
+  CANVAS_APP_IMAGE_IO_FEATURE_PACK_MANIFEST,
+  CANVAS_APP_IMAGE_IO_VIEW_FEATURE_PACK,
+  CANVAS_APP_MINIMAP_FEATURE_PACK_MANIFEST,
+  CANVAS_APP_MINIMAP_VIEW_FEATURE_PACK,
+  CANVAS_APP_SHORTCUT_HELP_FEATURE_PACK_MANIFEST,
+  CANVAS_APP_SHORTCUT_HELP_VIEW_FEATURE_PACK,
+  CANVAS_APP_STAMP_AUTHORING_FEATURE_PACK_MANIFEST,
+  CANVAS_APP_STAMP_AUTHORING_VIEW_FEATURE_PACK,
+  CANVAS_APP_STATUS_BAR_FEATURE_PACK_MANIFEST,
+  CANVAS_APP_STATUS_BAR_VIEW_FEATURE_PACK,
+  CANVAS_APP_TABLE_IMPORT_FEATURE_PACK_MANIFEST,
+  CANVAS_APP_TEXT_PASTE_IMPORT_FEATURE_PACK_MANIFEST,
+  CANVAS_APP_TOOLBAR_FEATURE_PACK_MANIFEST,
+  CANVAS_APP_TOOLBAR_VIEW_FEATURE_PACK,
+  CANVAS_APP_ZOOM_CONTROLS_FEATURE_PACK_MANIFEST,
+  CANVAS_APP_ZOOM_CONTROLS_VIEW_FEATURE_PACK,
+  CANVAS_APP_ARROW_ROUTING_INSPECTOR_FEATURE_PACK_MANIFEST,
+  CANVAS_APP_ARROW_ROUTING_INSPECTOR_FEATURE_PACK,
+  CANVAS_APP_CHECKLIST_INSPECTOR_FEATURE_PACK_MANIFEST,
+  CANVAS_APP_CHECKLIST_INSPECTOR_FEATURE_PACK,
+  CANVAS_APP_KANBAN_INSPECTOR_FEATURE_PACK_MANIFEST,
+  CANVAS_APP_KANBAN_INSPECTOR_FEATURE_PACK,
+  CANVAS_APP_MEDIA_IMPORT_FEATURE_PACK_MANIFEST,
+  CANVAS_APP_MEDIA_IMPORT_FEATURE_PACK,
+  DEFAULT_CANVAS_APP_FEATURE_PACK_EXTENSION_BUNDLE,
+  DEFAULT_CANVAS_APP_FEATURE_PACK_VIEW_RENDERERS,
+  DEFAULT_CANVAS_APP_EXTENSION_FEATURE_PACK_MANIFESTS,
+  DEFAULT_CANVAS_APP_FEATURE_PACKS,
+  DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS,
+  DEFAULT_CANVAS_APP_VIEW_FEATURE_PACK_MANIFESTS,
+  DEFAULT_CANVAS_APP_VIEW_FEATURE_PACKS,
+  assertCanvasAppFeaturePackViewRenderers,
+  assertCanvasAppFeaturePackIds,
+  assertCanvasAppFeaturePack,
+  assertCanvasAppFeaturePackManifest,
+  assertCanvasAppFeaturePackManifests,
+  assertCanvasAppFeaturePacks,
+  assertCanvasAppViewFeaturePack,
+  assertCanvasAppViewFeaturePacks,
+  createCanvasAppFeaturePack,
+  createCanvasAppFeaturePackExtensionBundle,
+  createCanvasAppFeaturePackManifest,
+  createCanvasAppFeaturePackViewRenderers,
+  createCanvasAppViewFeaturePack,
+  getCanvasFindInputKeyboardIntent,
+  getCanvasAppInstalledFeaturePacks,
+  getCanvasAppInstalledFeaturePackManifestIds,
+  getCanvasAppInstalledFeaturePackManifests,
+  getCanvasAppInstalledViewFeaturePacks,
+  getCanvasAppManifestExtensionFeaturePacks,
+  getCanvasAppManifestViewFeaturePacks,
+  type CanvasAppCommandPaletteProps,
+  type CanvasAppComponentPaletteProps,
+  type CanvasAppContextCommandMenuState,
+  type CanvasAppCursorChatProps,
+  type CanvasAppDrawingControlsProps,
+  type CanvasAppEmoteControlsProps,
+  type CanvasAppFeaturePack,
+  type CanvasAppFeaturePackId,
+  type CanvasAppFeaturePackInput,
+  type CanvasAppFeaturePackInstallOptions,
+  type CanvasAppFeaturePackManifest,
+  type CanvasAppFeaturePackManifestInput,
+  type CanvasAppFeaturePackViewRenderers,
+  type CanvasFindInputKeyboardIntent,
+  type CanvasFindInputKeyboardIntentInput,
+  type CanvasAppFindReplacePanelProps,
+  type CanvasAppImageControlsProps,
+  type CanvasAppMinimapProps,
+  type CanvasAppSelectionFloatingBarProps,
+  type CanvasAppSessionTimerProps,
+  type CanvasAppShortcutHelpOverlayProps,
+  type CanvasAppSpotlightProps,
+  type CanvasAppStampControlsProps,
+  type CanvasAppStatusProps,
+  type CanvasAppStickyQuickCreateControlProps,
+  type CanvasAppToolbarProps,
+  type CanvasAppViewFeaturePack,
+  type CanvasAppViewFeaturePackInput,
+  type CanvasAppVotingSessionProps,
+  type CanvasAppZoomControlsProps,
+} from '../feature-packs'
 export type {
   CanvasWorkspaceStorage,
   CanvasWorkspaceStorageProvider,
@@ -142,6 +252,10 @@ export type {
   CanvasAppComponentRendererStrategy,
   CanvasAppItemLayerAdapter,
   CanvasAppItemLayerRenderInput,
+  CanvasAppCustomItemRenderKey,
+  CanvasAppCustomItemRenderKeyStrategy,
+  CanvasAppCustomItemRendererDescriptor,
+  CanvasAppCustomItemRendererEntry,
   CanvasAppCustomItemRendererStrategy,
   CanvasAppCustomItemRenderers,
   CanvasAppStageAdapter,
@@ -155,19 +269,19 @@ export {
 } from '../extensions/CanvasAppExtensionIds'
 export type {
   CanvasAppFoundationExtension,
-} from '../extensions/CanvasAppFoundationExtensionDescriptors'
+} from '../extensions/foundation-extensions'
 export {
   getCanvasAppFoundationExtensionCommands,
   type CanvasAppFoundationExtensionCommand,
-} from '../extensions/CanvasAppFoundationExtensionCommands'
+} from '../extensions/foundation-extensions'
 export {
   getCanvasAppFoundationExtensionRendererSlots,
   type CanvasAppFoundationExtensionRendererSlot,
-} from '../extensions/CanvasAppFoundationExtensionRendererSlots'
+} from '../extensions/foundation-extensions'
 export {
   getCanvasAppFoundationExtensionTools,
   type CanvasAppFoundationExtensionTool,
-} from '../extensions/CanvasAppFoundationExtensionTools'
+} from '../extensions/foundation-extensions'
 export {
   CANVAS_APP_FACILITATION_AFFORDANCE_CONFIG,
   CANVAS_APP_FACILITATION_BUNDLE_ID,
@@ -176,17 +290,19 @@ export {
   mergeCanvasAppAffordanceConfigInput,
   withCanvasAppFacilitationBundle,
   type CanvasAppFacilitationBundleOptions,
-} from '../extensions/facilitation/CanvasAppFacilitationBundle'
+} from '../feature-packs/facilitation'
 export {
   CANVAS_APP_AI_AUTOMATION_LABS_DATA_POLICY,
   CANVAS_APP_AI_LABS_SUMMARIZE_SELECTION_COMMAND_ID,
   CANVAS_APP_AI_LABS_SUMMARIZE_SELECTION_OPERATION_ID,
   commitCanvasAppAiAutomationDraft,
   createCanvasAppAiAutomationProviderRequest,
+  createCanvasAppAiLabsFeaturePackManifest,
   createCanvasAppAiLabsDemoSummaryProvider,
   createCanvasAppAiLabsSummarizeSelectionCommand,
   createCanvasAppAiLabsSummarizeSelectionDraft,
   runCanvasAppAiLabsSummarizeSelectionCommand,
+  type CanvasAppAiLabsFeaturePackManifestInput,
   type CanvasAppAiAutomationDraft,
   type CanvasAppAiAutomationProvider,
   type CanvasAppAiAutomationProviderDataPolicy,
@@ -196,4 +312,5 @@ export {
   type CanvasAppAiAutomationReviewDecision,
   type CanvasAppAiAutomationReviewRequest,
   type CanvasAppAiAutomationReviewResult,
-} from '../extensions/ai-labs/CanvasAppAiAutomationLabs'
+  type CreateCanvasAppAiLabsSummarizeSelectionCommandInput,
+} from '../feature-packs/ai-labs'

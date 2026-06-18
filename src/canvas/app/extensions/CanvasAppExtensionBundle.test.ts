@@ -6,14 +6,14 @@ import {
   mergeCanvasAppExtensionBundle,
   snapshotCanvasAppExtensionBundle,
 } from './CanvasAppExtensionBundle'
-import type { CanvasAppFoundationExtension } from './CanvasAppFoundationExtensionDescriptors'
-import { getCanvasAppFoundationExtensionCommands } from './CanvasAppFoundationExtensionCommands'
+import type { CanvasAppFoundationExtension } from './foundation-extensions'
+import { getCanvasAppFoundationExtensionCommands } from './foundation-extensions'
 import {
   getCanvasAppFoundationExtensionRendererSlots,
-} from './CanvasAppFoundationExtensionRendererSlots'
-import { getCanvasAppFoundationExtensionTools } from './CanvasAppFoundationExtensionTools'
-import type { CanvasMediaImporter } from '../affordances/io/media/CanvasMediaImporters'
-import type { CanvasTextPasteImporter } from '../affordances/io/text-paste/CanvasTextPasteImporters'
+} from './foundation-extensions'
+import { getCanvasAppFoundationExtensionTools } from './foundation-extensions'
+import type { CanvasMediaImporter } from '../feature-packs/media-import'
+import type { CanvasTextPasteImporter } from '../feature-packs/text-paste-import'
 
 describe('CanvasAppExtensionBundle', () => {
   it('creates empty extension bundles', () => {

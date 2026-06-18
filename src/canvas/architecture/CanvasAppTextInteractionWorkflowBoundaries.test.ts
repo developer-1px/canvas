@@ -25,10 +25,10 @@ describe('Canvas App text interaction workflow boundaries', () => {
       'src/canvas/app/affordances/editing/text-editor/CanvasTextEditingModel.ts',
     )
     const findReplaceHookFile = getSourceFile(
-      'src/canvas/app/workflow/useCanvasFindReplaceModel.ts',
+      'src/canvas/app/feature-packs/find-replace/useCanvasFindReplaceModel.ts',
     )
     const findReplaceModelFile = getSourceFile(
-      'src/canvas/app/workflow/CanvasFindReplaceModel.ts',
+      'src/canvas/app/feature-packs/find-replace/CanvasFindReplaceModel.ts',
     )
 
     expect(appModelFile.source).toContain("from './useCanvasAppTextModel'")
@@ -54,7 +54,7 @@ describe('Canvas App text interaction workflow boundaries', () => {
       "from './useCanvasTextEditorModel'",
     )
     expect(textModelFile.source).toContain(
-      "from './useCanvasFindReplaceModel'",
+      "from '../feature-packs'",
     )
     expect(textModelFile.source).toContain(
       "from './CanvasAppTextConsumerModel'",

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   CANVAS_TABLE_COMPONENT_KIND,
   createCanvasTableComponentItem,
+  getCanvasTableComponentSize,
   getCanvasTableGrid,
   isCanvasTableComponentItem,
   normalizeCanvasTableRows,
@@ -59,6 +60,40 @@ describe('CanvasTableComponent', () => {
         ['Extra 8', '', ''],
         ['Extra 9', '', ''],
       ],
+    })
+  })
+
+  it('calculates table component size with default and custom constraints', () => {
+    expect(getCanvasTableComponentSize({
+      columnCount: 2,
+      rowCount: 3,
+    })).toEqual({
+      h: 132,
+      w: 224,
+    })
+
+    expect(getCanvasTableComponentSize({
+      columnCount: 1,
+      rowCount: 1,
+    }, {
+      cellSize: { h: 46, w: 150 },
+      maxSize: { h: 560, w: 980 },
+      minSize: { h: 120, w: 260 },
+    })).toEqual({
+      h: 120,
+      w: 260,
+    })
+
+    expect(getCanvasTableComponentSize({
+      columnCount: 12,
+      rowCount: 20,
+    }, {
+      cellSize: { h: 46, w: 150 },
+      maxSize: { h: 560, w: 980 },
+      minSize: { h: 120, w: 260 },
+    })).toEqual({
+      h: 560,
+      w: 980,
     })
   })
 

@@ -16,6 +16,11 @@ export type SlideEditObjectCornerRadiusNumericLimits = {
   min: number
 }
 
+export type SlideEditObjectCornerRadiusPreviewSize = {
+  h: number | null | undefined
+  w: number | null | undefined
+}
+
 export type SlideEditObjectCornerRadiusFieldDescriptor = {
   commandId: 'update-object-corner-radius'
   control: 'corner-radius-slider'
@@ -213,4 +218,37 @@ export function toSlideEditObjectCornerRadiusAttributeValue(
   value: number | null | undefined,
 ) {
   return String(normalizeSlideEditObjectCornerRadius(value))
+}
+
+export function getSlideEditObjectCornerRadiusCSS(
+  value: number | null | undefined,
+) {
+  return `${normalizeSlideEditObjectCornerRadius(value)}px`
+}
+
+export function getSlideEditObjectCornerRadiusPreviewCSS({
+  h,
+  value,
+  w,
+}: SlideEditObjectCornerRadiusPreviewSize & {
+  value: number | null | undefined
+}) {
+  const minSize = Math.max(1, Math.min(
+    normalizeSlideEditObjectCornerRadiusPreviewSide(w),
+    normalizeSlideEditObjectCornerRadiusPreviewSide(h),
+  ))
+  const percent = Math.min(
+    50,
+    (normalizeSlideEditObjectCornerRadius(value) / minSize) * 100,
+  )
+
+  return `${Math.round(percent * 100) / 100}%`
+}
+
+function normalizeSlideEditObjectCornerRadiusPreviewSide(
+  value: number | null | undefined,
+) {
+  return typeof value === 'number' && Number.isFinite(value) && value > 0
+    ? value
+    : 1
 }

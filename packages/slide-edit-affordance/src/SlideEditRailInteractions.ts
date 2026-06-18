@@ -64,6 +64,9 @@ export const SLIDE_EDIT_RAIL_COMMANDS = Object.freeze([
   { id: 'select-active-slide', requiredAdapterSlot: 'command-effect' },
 ] as const satisfies readonly SlideEditRailCommandDescriptor[])
 
+export const SLIDE_EDIT_RAIL_KEYBOARD_KEYS =
+  'ArrowUp ArrowDown Home End Enter Space'
+
 export type SlideEditRailCommand<
   TSlideId extends SlideEditRailSlideId = SlideEditRailSlideId,
 > =

@@ -1,12 +1,19 @@
 import { describe, expect, it } from 'vitest'
 import { createCanvasAffordanceConfig } from '../../../../engine'
 import {
+  CANVAS_KEYBOARD_COMMAND_INTENT_MODEL,
   getCanvasKeyboardBuiltinCommandShortcutIntent,
   getCanvasKeyboardReservedCommandShortcuts,
 } from './CanvasKeyboardCommandShortcuts'
 import type { CanvasKeyboardCommandShortcutIntentInput } from './CanvasKeyboardCommandShortcutIntent'
 
 describe('CanvasKeyboardCommandShortcuts', () => {
+  it('exports command shortcut metadata for host DOM contracts', () => {
+    expect(CANVAS_KEYBOARD_COMMAND_INTENT_MODEL).toBe(
+      'canvas-keyboard-command-shortcut-intent',
+    )
+  })
+
   it('resolves built-in command shortcuts from descriptors', () => {
     expect(getCanvasKeyboardBuiltinCommandShortcutIntent(createInput({
       event: createKeyboardEvent({ key: 'Enter' }),

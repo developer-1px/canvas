@@ -16,6 +16,11 @@ import {
 
 export type { CanvasKeyboardSystemShortcutIntent } from './CanvasKeyboardSystemShortcutCatalog'
 
+export const CANVAS_KEYBOARD_TEMPORARY_PAN_MODEL =
+  'canvas-temporary-pan-shortcut'
+export const CANVAS_KEYBOARD_TEMPORARY_PAN_SHORTCUT_LABEL =
+  CANVAS_KEYBOARD_TEMPORARY_PAN_SHORTCUT.shortcut.key
+
 type CanvasKeyboardSystemShortcutInput = {
   config: CanvasAffordanceConfig
   event: globalThis.KeyboardEvent

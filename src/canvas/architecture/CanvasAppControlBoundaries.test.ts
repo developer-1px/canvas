@@ -64,10 +64,18 @@ describe('Canvas App control boundaries', () => {
     expect(controlModelFile.source).not.toContain(
       'getCanvasCommandSelectionState',
     )
+    const statusBarModelFile = getSourceFile(
+      'src/canvas/app/feature-packs/status-bar/CanvasStatusModel.ts',
+    )
     expect(controlModelFile.source).toContain(
+      "from '../feature-packs'",
+    )
+    expect(controlModelFile.source).not.toContain('CANVAS_TOOL_AFFORDANCES')
+    expect(controlModelFile.source).not.toContain(
       'CANVAS_GESTURE_STATUS_LABELS',
     )
-    expect(controlModelFile.source).toContain('CANVAS_TOOL_AFFORDANCES')
+    expect(statusBarModelFile.source).toContain('CANVAS_TOOL_AFFORDANCES')
+    expect(statusBarModelFile.source).toContain('CANVAS_GESTURE_STATUS_LABELS')
   })
 
 })

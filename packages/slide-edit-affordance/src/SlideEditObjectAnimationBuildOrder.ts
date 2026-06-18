@@ -53,6 +53,16 @@ export type SlideEditObjectAnimationDescriptor<
   type: TAnimationType
 }
 
+export type SlideEditObjectAnimationCSSStyle = {
+  animationDelay: string
+  animationDuration: string
+}
+
+export type SlideEditObjectAnimationCSSStyleInput = {
+  delayMs?: number | null
+  durationMs?: number | null
+}
+
 export type SlideEditObjectAnimationFieldId =
   | 'delayMs'
   | 'durationMs'
@@ -343,6 +353,20 @@ export function normalizeSlideEditObjectAnimationOrder(
     SLIDE_EDIT_OBJECT_ANIMATION_LIMITS.minBuildOrder,
     SLIDE_EDIT_OBJECT_ANIMATION_LIMITS.maxBuildOrder,
   )
+}
+
+export function getSlideEditObjectAnimationCSSStyle(
+  animation: SlideEditObjectAnimationCSSStyleInput | null | undefined,
+): SlideEditObjectAnimationCSSStyle {
+  return {
+    animationDelay: `${normalizeSlideEditObjectAnimationDelayMs(
+      animation?.delayMs,
+    )}ms`,
+    animationDuration: `${Math.max(
+      1,
+      normalizeSlideEditObjectAnimationDurationMs(animation?.durationMs),
+    )}ms`,
+  }
 }
 
 function clampIntegerAnimationValue(

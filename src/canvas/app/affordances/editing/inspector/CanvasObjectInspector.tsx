@@ -15,6 +15,7 @@ import {
   getCanvasRadioTabIndex,
   handleCanvasRadioGroupKeyDown,
 } from '../../controls/radio/CanvasRadioGroup'
+import { getCanvasEditableFieldKeyboardIntent } from '../../controls/editable-field/CanvasEditableFieldKeyboard'
 
 type CanvasObjectInspectorPanel = {
   content: ReactNode
@@ -30,6 +31,8 @@ type CanvasObjectInspectorProps = {
   styleControls: readonly CanvasObjectStyleControl[]
   onChangeBounds: (bounds: Bounds) => void
 }
+
+export const CANVAS_COMMENT_THREAD_MODEL = 'canvas-comment-thread'
 
 type BoundsField = keyof Bounds
 
@@ -86,12 +89,20 @@ export function CanvasObjectInspector({
       return
     }
 
-    if (event.key === 'Enter') {
+    const intent = getCanvasEditableFieldKeyboardIntent({
+      key: event.key,
+    })
+
+    if (intent.preventDefault) {
+      event.preventDefault()
+    }
+
+    if (intent.kind === 'commit') {
       event.currentTarget.blur()
       return
     }
 
-    if (event.key === 'Escape') {
+    if (intent.kind === 'cancel') {
       event.currentTarget.value = formatBoundsValue(bounds[field])
       event.currentTarget.blur()
     }
@@ -158,6 +169,7 @@ function CanvasObjectInspectorCommentThreadView({
     <section
       aria-label="Comment thread"
       className="inspector-comment-thread"
+      data-canvas-comment-thread-model={CANVAS_COMMENT_THREAD_MODEL}
       data-resolved={thread.resolved ? 'true' : 'false'}
     >
       <div className="inspector-comment-thread-header">
@@ -275,12 +287,20 @@ function CanvasObjectInspectorNumberStyleControl({
     }
   }
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter') {
+    const intent = getCanvasEditableFieldKeyboardIntent({
+      key: event.key,
+    })
+
+    if (intent.preventDefault) {
+      event.preventDefault()
+    }
+
+    if (intent.kind === 'commit') {
       event.currentTarget.blur()
       return
     }
 
-    if (event.key === 'Escape') {
+    if (intent.kind === 'cancel') {
       event.currentTarget.value = formatStyleNumberValue(control.value)
       event.currentTarget.blur()
     }

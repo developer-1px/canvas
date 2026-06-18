@@ -5,20 +5,34 @@ import {
   zoomViewport,
   type CanvasViewportZoomDirection,
 } from '../../../../core'
-import type { Viewport } from '../../../../entities'
-import type { CanvasAppStageElement } from '../../../rendering/stage/CanvasAppStageElement'
+import type {
+  Bounds,
+  Viewport,
+} from '../../../../entities'
+import type {
+  CanvasAppStageElement,
+  CanvasAppStageRect,
+} from '../../../rendering/stage/CanvasAppStageElement'
 import type { CanvasAppItemReadModel } from '../../../workflow/CanvasAppItemReadModelContracts'
-import {
-  getCanvasMinimapViewportForWorldCenter,
-} from '../../controls/minimap/CanvasMinimapModel'
 
 export type CanvasViewportSetter = (
   next: Viewport | ((current: Viewport) => Viewport),
 ) => void
 
+export const CANVAS_WHEEL_VIEWPORT_MODEL = 'canvas-wheel-viewport'
+export const CANVAS_WHEEL_VIEWPORT_PAN_MODE = 'ordinary-wheel'
+export const CANVAS_WHEEL_VIEWPORT_HORIZONTAL_PAN_MODIFIER = 'Shift'
+export const CANVAS_WHEEL_VIEWPORT_ZOOM_MODIFIER = 'Ctrl/Meta'
+
 type FitCanvasViewportToItemsArgs = {
   ids?: string[]
   itemReadModel: CanvasAppItemReadModel
+  setViewport: CanvasViewportSetter
+  stageElement: CanvasAppStageElement
+}
+
+type FitCanvasViewportToBoundsArgs = {
+  bounds: Bounds | null | undefined
   setViewport: CanvasViewportSetter
   stageElement: CanvasAppStageElement
 }
@@ -52,7 +66,19 @@ export function fitCanvasViewportToItems({
     ids && ids.length > 0
       ? ids
       : itemReadModel.getAllIds()
-  const bounds = itemReadModel.getSelectionBounds(targetIds)
+
+  fitCanvasViewportToBounds({
+    bounds: itemReadModel.getSelectionBounds(targetIds),
+    setViewport,
+    stageElement,
+  })
+}
+
+export function fitCanvasViewportToBounds({
+  bounds,
+  setViewport,
+  stageElement,
+}: FitCanvasViewportToBoundsArgs) {
   const rect = stageElement.getRect()
 
   if (!bounds || !rect) {
@@ -80,12 +106,28 @@ export function centerCanvasViewportAtWorldPoint({
   }
 
   setViewport((current) =>
-    getCanvasMinimapViewportForWorldCenter({
+    getCanvasViewportForWorldCenter({
       current,
       stageRect: rect,
       worldCenter: point,
     }),
   )
+}
+
+function getCanvasViewportForWorldCenter({
+  current,
+  stageRect,
+  worldCenter,
+}: {
+  current: Viewport
+  stageRect: CanvasAppStageRect
+  worldCenter: { x: number; y: number }
+}): Viewport {
+  return {
+    scale: current.scale,
+    x: stageRect.width / 2 - worldCenter.x * current.scale,
+    y: stageRect.height / 2 - worldCenter.y * current.scale,
+  }
 }
 
 export function zoomCanvasViewport({

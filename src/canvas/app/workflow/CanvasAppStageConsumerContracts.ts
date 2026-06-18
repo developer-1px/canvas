@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import type { CanvasOverlayState } from '../../engine'
 import type {
   CanvasInteractionKind,
@@ -37,6 +38,10 @@ export type CanvasAppStageContext = {
   overlays: CanvasOverlayState
   stageElement: CanvasAppStageMount
   viewport: Viewport
+}
+
+export type CanvasAppStageExternalOverlaySlot = {
+  render: (overlays: ReactNode) => ReactNode
 }
 
 export type CanvasAppStageModelInput = {

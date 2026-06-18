@@ -5,6 +5,13 @@ export {
   DomEditSelectionOverlay,
 } from './react/features/node-selection/DomEditSelectionOverlay'
 export {
+  CANVAS_DOM_ALIGNMENT_POPOVER_MODEL,
+  CANVAS_DOM_ALIGNMENT_PREVIEW_GUIDE_MODEL,
+} from './metadata'
+export type {
+  DomEditAlignmentPreview,
+} from './react/features/layout-editing/DomEditAlignmentEditor'
+export {
   DomEditAutoLayoutOverlay,
 } from './react/features/layout-editing/DomEditAutoLayoutOverlay'
 export {

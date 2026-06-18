@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   createSlideEditTextVerticalAlignmentDescriptor,
   getSlideEditTextVerticalAlignmentCommandEffect,
+  getSlideEditTextVerticalAlignmentFlexAlignItems,
   getSlideEditTextVerticalAlignmentMetadata,
   normalizeSlideEditTextVerticalAlignment,
   SLIDE_EDIT_TEXT_VERTICAL_ALIGNMENT_DATA_ATTRIBUTE,
@@ -49,6 +50,17 @@ describe('SlideEditTextVerticalAlignment', () => {
     expect(normalizeSlideEditTextVerticalAlignment('bottom')).toBe('bottom')
     expect(normalizeSlideEditTextVerticalAlignment('center')).toBe('top')
     expect(normalizeSlideEditTextVerticalAlignment(null)).toBe('top')
+  })
+
+  it('maps normalized alignment values to flex align-items CSS', () => {
+    expect(getSlideEditTextVerticalAlignmentFlexAlignItems('top'))
+      .toBe('flex-start')
+    expect(getSlideEditTextVerticalAlignmentFlexAlignItems('middle'))
+      .toBe('center')
+    expect(getSlideEditTextVerticalAlignmentFlexAlignItems('bottom'))
+      .toBe('flex-end')
+    expect(getSlideEditTextVerticalAlignmentFlexAlignItems('center'))
+      .toBe('flex-start')
   })
 
   it('routes selected text object alignment updates through host command effects', () => {

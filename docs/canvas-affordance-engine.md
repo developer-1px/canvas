@@ -41,11 +41,20 @@
 | `src/canvas/app/extensions/CanvasAppExtensionBundle.ts` | Custom command/tool/item renderer/validator/inspector output slot과 slot별 중복 병합/snapshot/defaulting 규칙을 소유하고 Assembly output 계약에 합성된다 |
 | `src/canvas/app/extensions/CanvasAppExtensionStateContracts.ts` | Custom command state와 custom creation tool state의 consumer-facing shape를 execution/runtime helper와 분리한다 |
 | `src/canvas/app/extensions/CanvasAppDescriptorSnapshot.ts` | 외부 등록 descriptor의 copy/freeze 규칙을 Assembly와 Custom Item Module snapshot이 공유하게 한다 |
-| `src/canvas/app/cursor/useCanvasCursorChatModel.ts` | 문서 item을 만들지 않는 cursor chat open/point/value 생명주기를 App transient state로 숨긴다 |
-| `src/canvas/app/emote/useCanvasEmoteModel.ts` | live reaction emote burst의 pointer 위치, burst 생명주기, UI release 계약을 문서 item 밖의 App transient state로 숨긴다 |
-| `src/canvas/app/facilitation/useCanvasSessionTimerModel.ts` | 회의 진행용 session timer 상태와 countdown 생명주기를 문서 item 밖의 App transient state로 숨긴다 |
-| `src/canvas/app/facilitation/useCanvasSpotlightModel.ts` | 회의 진행용 spotlight start/stop과 follower count 표시를 문서 item 밖의 App transient state로 숨긴다 |
-| `src/canvas/app/facilitation/useCanvasVotingSessionModel.ts` | 회의 진행용 voting session prompt/status/quota를 문서 item 밖의 App transient state로 숨긴다 |
+| `src/canvas/app/extensions/foundation-extensions` | Foundation extension descriptor, command/tool/renderer-slot discovery와 snapshot 규칙을 extension SDK pack으로 제공한다 |
+| `src/canvas/app/feature-packs/CanvasAppFeaturePacks.ts` | Feature pack descriptor, disabled pack id, install된 pack들의 extension bundle 병합을 marketplace식 install/uninstall 단위로 제공한다 |
+| `src/canvas/app/feature-packs/CanvasAppFeaturePackManifests.ts` | 한 feature pack 폴더가 extension/view/runtime contribution과 installed id를 대표하는 marketplace manifest 계약과 extraction helper를 제공한다 |
+| `src/canvas/app/feature-packs/CanvasAppDefaultFeaturePackManifests.ts` | 기본 App marketplace의 통합 feature pack manifest 목록을 소유한다 |
+| `src/canvas/app/feature-packs/CanvasAppDefaultFeaturePacks.ts` | 기본 App이 설치하는 extension feature pack set을 각 pack 폴더 manifest에서 파생한다 |
+| `src/canvas/app/feature-packs/CanvasAppDefaultViewFeaturePacks.ts` | 기본 App이 설치하는 view feature pack set과 renderer registry를 각 pack 폴더 manifest에서 파생한다 |
+| `src/canvas/app/feature-packs/index.ts` | App workflow와 public facade가 쓰는 feature pack marketplace entry. Workflow는 개별 pack 폴더 대신 이 root entry를 import한다 |
+| `src/canvas/app/feature-packs/CanvasAppFeaturePackRuntimeModel.ts` | Cursor chat, facilitation, drawing runtime을 각 pack 폴더 descriptor에서 받아 stable hook order로 조립하고 manifest-derived installed id 기준으로 disabled runtime config를 만든다 |
+| `src/canvas/app/feature-packs/CanvasAppFeaturePackViews.tsx` | View feature pack descriptor, slot prop contract, disabled pack merge 규칙을 concrete renderer 구현과 분리한다 |
+| `src/canvas/app/feature-packs/cursor-chat/useCanvasCursorChatModel.ts` | 문서 item을 만들지 않는 cursor chat open/point/value 생명주기를 App transient state로 숨긴다 |
+| `src/canvas/app/feature-packs/facilitation/useCanvasEmoteModel.ts` | live reaction emote burst의 pointer 위치, burst 생명주기, UI release 계약을 문서 item 밖의 App transient state로 숨긴다 |
+| `src/canvas/app/feature-packs/facilitation/useCanvasSessionTimerModel.ts` | 회의 진행용 session timer 상태와 countdown 생명주기를 문서 item 밖의 App transient state로 숨긴다 |
+| `src/canvas/app/feature-packs/facilitation/useCanvasSpotlightModel.ts` | 회의 진행용 spotlight start/stop과 follower count 표시를 문서 item 밖의 App transient state로 숨긴다 |
+| `src/canvas/app/feature-packs/facilitation/useCanvasVotingSessionModel.ts` | 회의 진행용 voting session prompt/status/quota를 문서 item 밖의 App transient state로 숨긴다 |
 | `src/canvas/app/stage/CanvasAppStageElement.ts` | stage DOM element의 bounds, pointer capture, wheel listener를 caller Interface 뒤에 숨기고 mount ref bridge는 Controller로 분리한다 |
 | `src/canvas/app/rendering` | Demo `CanvasItem` tree를 SVG item layer로 바꾸는 App-owned Adapter |
 | `src/canvas/app/rendering/CanvasAppRenderingContracts.ts` | 외부 조립자가 쓰는 App-owned renderer authoring Interface를 Demo SVG registry type name과 분리한다 |
@@ -71,13 +80,16 @@
 | `src/canvas/app/affordances/commands/CanvasClipboardCommandExecution.ts` | Clipboard command effect plan 생성과 clipboard/document effect 적용을 조립한다 |
 | `src/canvas/app/affordances/commands/CanvasClipboardCommandEffectPlan.ts` | Copy, cut, paste, duplicate, clone command를 clone result/add item/copy/cut effect descriptor로 변환하고 paste offset 계산을 소유한다 |
 | `src/canvas/app/affordances/commands/CanvasClipboardCommandEffects.ts` | Clipboard command effect descriptor를 Host clipboard, document commit/selection/editing update와 실행 결과로 적용한다 |
-| `src/canvas/app/affordances/commands/CanvasAppCustomCommands.ts` | Engine command union을 수정하지 않고 제품별 business action을 toolbar command로 등록하는 descriptor를 제공한다 |
-| `src/canvas/app/affordances/commands/CanvasAppCustomCommandContracts.ts` | Custom command descriptor shape와 id registry contract를 검증한다 |
-| `src/canvas/app/affordances/commands/CanvasAppCustomCommandExecution.ts` | Custom command toolbar state, availability, run 호출과 실패 containment를 소유한다 |
-| `src/canvas/app/affordances/controls/toolbar/CanvasToolbarItems.ts` | Feature toggle, availability, built-in/custom tool, built-in/custom command 상태를 toolbar item group grammar로 변환한다 |
-| `src/canvas/app/affordances/controls/toolbar/CanvasToolbarCommandItems.ts` | Built-in toolbar command group, feature toggle, availability를 command item group grammar로 변환한다 |
-| `src/canvas/app/affordances/editing/inspector/CanvasAppInspectorPanels.ts` | 기본 bounds inspector를 수정하지 않고 제품별 선택 항목 패널을 등록하는 descriptor를 제공한다 |
-| `src/canvas/app/affordances/editing/inspector/CanvasAppInspectorPanelContracts.ts` | Inspector panel descriptor shape와 id registry contract를 검증한다 |
+| `src/canvas/app/extensions/custom-commands` | Custom command descriptor, contract, runtime state/runner를 extension SDK pack으로 제공한다 |
+| `src/canvas/app/extensions/custom-commands/CanvasAppCustomCommands.ts` | Engine command union을 수정하지 않고 제품별 business action을 toolbar command로 등록하는 descriptor를 제공한다 |
+| `src/canvas/app/extensions/custom-commands/CanvasAppCustomCommandContracts.ts` | Custom command descriptor shape와 id registry contract를 검증한다 |
+| `src/canvas/app/extensions/custom-commands/CanvasAppCustomCommandExecution.ts` | Custom command toolbar state, availability, run 호출과 실패 containment를 소유한다 |
+| `src/canvas/app/extensions/custom-focus` | Custom widget/inspector가 canvas 밖 DOM focus target을 알리는 event bridge를 extension SDK pack으로 제공한다 |
+| `src/canvas/app/feature-packs/toolbar/CanvasToolbarItems.ts` | Feature toggle, availability, built-in/custom tool, built-in/custom command 상태를 toolbar item group grammar로 변환한다 |
+| `src/canvas/app/feature-packs/toolbar/CanvasToolbarCommandItems.ts` | Built-in toolbar command group, feature toggle, availability를 command item group grammar로 변환한다 |
+| `src/canvas/app/extensions/inspector-panels` | Inspector panel descriptor, contract, visibility/render runner를 extension SDK pack으로 제공한다 |
+| `src/canvas/app/extensions/inspector-panels/CanvasAppInspectorPanels.ts` | 기본 bounds inspector를 수정하지 않고 제품별 선택 항목 패널을 등록하는 descriptor를 제공한다 |
+| `src/canvas/app/extensions/inspector-panels/CanvasAppInspectorPanelContracts.ts` | Inspector panel descriptor shape와 id registry contract를 검증한다 |
 | `src/canvas/app/extensions/custom-item-modules/CanvasAppCustomItemModules.ts` | 제품별 item kind에 필요한 creation tool, renderer, validator, inspector, command descriptor와 define 계약을 소유한다 |
 | `src/canvas/app/extensions/custom-item-modules/CanvasAppCustomItemModuleAssembly.ts` | Custom item module descriptor list와 disabled module ids를 Extension Bundle output으로 조립하고 duplicate/unknown/snapshot 규칙을 적용한다 |
 | `src/canvas/app/extensions/custom-item-modules/CanvasAppCustomItemModuleContracts.ts` | Custom item module descriptor, disabled module id, duplicate module id, assembled tool shortcut contract를 검증한다 |
@@ -88,10 +100,33 @@
 | `src/canvas/app/extensions/custom-tools/CanvasAppCustomCreationTools.ts` | 내부 Tool union에 구체 id를 추가하지 않고 제품별 생성 도구를 등록하는 descriptor를 제공한다 |
 | `src/canvas/app/extensions/custom-tools/CanvasAppCustomCreationToolContracts.ts` | Custom creation tool descriptor shape와 reserved/duplicate shortcut conflict를 검증한다 |
 | `src/canvas/app/extensions/custom-tools/CanvasAppCustomCreationToolRuntime.ts` | Custom creation tool id 변환, toolbar state, lookup, shortcut matching을 소유한다 |
+| `src/canvas/app/feature-packs/ai-labs` | AI summarize command, provider data policy, review-before-apply automation draft와 provider/review 옵션 manifest factory를 폴더째 설치형 pack으로 제공한다 |
+| `src/canvas/app/feature-packs/arrow-routing-inspector` | 선택한 connector의 elbow/straight routing action을 폴더째 설치형 inspector pack으로 제공한다 |
+| `src/canvas/app/feature-packs/board-io` | Board JSON/SVG export/import plugin, host storage/file-name adapter 계약, runtime-only manifest를 폴더째 설치형 pack으로 제공한다 |
+| `src/canvas/app/feature-packs/checklist-inspector` | 선택한 checklist의 item check/text/add/remove action을 폴더째 설치형 inspector pack으로 제공한다 |
+| `src/canvas/app/feature-packs/command-palette` | Command palette view, searchable item builder, command/tool/component/custom action projection을 폴더째 설치형 pack으로 제공한다 |
+| `src/canvas/app/feature-packs/component-authoring` | Component palette insertion과 sticky quick-create UI/hook/execution을 폴더째 설치형 pack으로 제공한다 |
+| `src/canvas/app/feature-packs/cursor-chat` | Cursor-anchored transient chat state, pointer tracking, textarea view를 폴더째 설치형 pack으로 제공한다 |
+| `src/canvas/app/feature-packs/dom-edit-style` | Custom item DOM layout style reader/writer와 item/target 옵션 inspector manifest factory를 폴더째 설치형 pack으로 제공한다 |
+| `src/canvas/app/feature-packs/drawing-tools` | Pen/marker/highlighter style state와 Drawing Controls view를 폴더째 설치형 pack으로 제공한다 |
+| `src/canvas/app/feature-packs/facilitation` | Emote, session timer, voting, spotlight, facilitation affordance config를 폴더째 설치형 pack으로 제공한다 |
+| `src/canvas/app/feature-packs/find-replace` | Document text search state, replace-all action, Find/Replace panel을 폴더째 설치형 pack으로 제공한다 |
+| `src/canvas/app/feature-packs/image-io` | Image upload, paste, copy, download, clipboard/file import, SVG/PNG export를 폴더째 설치형 pack으로 제공한다 |
+| `src/canvas/app/feature-packs/kanban-inspector` | 선택한 Queue/Kanban의 card text/add/remove/reorder action을 폴더째 설치형 inspector pack으로 제공한다 |
+| `src/canvas/app/feature-packs/media-import` | URL/embed paste/drop, media importer contract, link-preview fallback, link-preview inspector actions를 폴더째 설치형 pack으로 제공한다 |
+| `src/canvas/app/feature-packs/minimap` | Canvas item/viewport overview read-model, minimap view, minimap navigation projection을 폴더째 설치형 pack으로 제공한다 |
+| `src/canvas/app/feature-packs/shortcut-help` | Shortcut help item projection, grouping, overlay view를 폴더째 설치형 pack으로 제공한다 |
+| `src/canvas/app/feature-packs/stamp-authoring` | Reaction stamp catalog, controls, insertion, voting quota hook integration을 폴더째 설치형 pack으로 제공한다 |
+| `src/canvas/app/feature-packs/status-bar` | Gesture/tool status projection과 selection count view를 폴더째 설치형 pack으로 제공한다 |
+| `src/canvas/app/feature-packs/table-import` | CSV/TSV paste/drop/file import, table insert position, table component creation request를 폴더째 설치형 pack으로 제공한다 |
+| `src/canvas/app/feature-packs/text-paste-import` | Plain/HTML text paste sources, importer contract, item creation, paste DOM listener를 폴더째 설치형 pack으로 제공한다 |
+| `src/canvas/app/feature-packs/toolbar` | Toolbar, context command menu, selection floating bar, command/tool item grammar와 dispatch를 폴더째 설치형 pack으로 제공한다 |
+| `src/canvas/app/feature-packs/zoom-controls` | Zoom in/out/reset/fit command overlay view를 폴더째 설치형 pack으로 제공한다 |
 | `src/canvas/app/workflow/CanvasAppAssembly.ts` | Host item adapter, component library, custom command, custom item module, inspector panel, initial items, SVG presentation registry 같은 제품별 의미를 외부 조립 seam으로 제공한다 |
 | `src/canvas/app/workflow/CanvasAppAssemblyTypes.ts` | App Assembly input/output type 계약을 runtime 조립 구현과 분리해 소유한다 |
 | `src/canvas/app/workflow/CanvasAppAssemblyInputTypes.ts` | Affordance/component/adapter/workspace child assembly input field 계약을 runtime 조립 구현과 분리해 소유한다 |
 | `src/canvas/app/workflow/CanvasAppExtensionAssemblyTypes.ts` | 외부 extension input field 계약을 runtime extension 조립 구현과 분리해 소유하고 Assembly input 계약에 합성된다 |
+| `src/canvas/app/workflow/CanvasAppFeaturePackAssembly.ts` | Feature pack manifest list, additional manifest list, disabled manifest id를 App Assembly input에서 installed ids, extension bundle, shell renderer set으로 함께 조립한다 |
 | `src/canvas/app/workflow/CanvasAppAdapterAssembly.ts` | Item, item layer, stage adapter fallback을 조립한다 |
 | `src/canvas/app/workflow/CanvasAppAffordanceAssembly.ts` | 제품별 affordance feature toggle override와 default affordance config fallback을 조립한다 |
 | `src/canvas/app/workflow/CanvasAppAssemblyContracts.ts` | 조립된 assembly output의 component library resolver, renderer coverage, custom extension registry, initial item, adapter shape를 검증한다 |
@@ -104,25 +139,26 @@
 | `src/canvas/app/workflow/index.ts` | App Shell이 사용하는 workflow public entry |
 | `src/canvas/app/workflow/useCanvasAppModel.ts` | command, pointer, keyboard, viewport, text editing wiring과 control별 view props 조립을 App Shell에 숨긴다 |
 | `src/canvas/app/workflow/CanvasAppControlModel.ts` | component palette, toolbar, status, zoom controls props와 command availability/status/selected fit target 규칙을 만든다 |
-| `src/canvas/app/workflow/useCanvasAppDrawingModel.ts` | Pen/marker/highlighter tool별 stroke style 상태와 Drawing Controls view props, pointer creation style input을 조립한다 |
+| `src/canvas/app/feature-packs/drawing-tools/useCanvasAppDrawingModel.ts` | Pen/marker/highlighter tool별 stroke style 상태와 Drawing Controls view props, pointer creation style input을 drawing tools pack 뒤에 숨긴다 |
 | `src/canvas/app/workflow/useCanvasAppExtensionModel.ts` | 외부 custom command/tool descriptor를 toolbar state, custom tool state, custom command run callback으로 바꾼다 |
-| `src/canvas/app/table/CanvasTableImport.ts` | CSV/TSV text, `.csv` file IO, insert center 계산, table component 생성 요청을 table import deep module 뒤에 숨긴다 |
-| `src/canvas/app/table/useCanvasTableImport.ts` | paste/drop DOM listener와 typing target guard를 table import workflow로 연결하고 App Shell에 노출하지 않는다 |
-| `src/canvas/app/checklist/CanvasChecklistInspectorPanel.tsx` | 선택한 checklist의 item check/text/add/remove action을 App checklist affordance 뒤에 숨긴다 |
-| `src/canvas/app/kanban/CanvasKanbanInspectorPanel.tsx` | 선택한 Queue/Kanban의 card text/add/remove/reorder action을 App kanban affordance 뒤에 숨긴다 |
-| `src/canvas/app/affordances/io/media/CanvasMediaImport.ts` | URL/embed text parsing, insert center 계산, media/link-preview item 생성 요청을 media import deep module 뒤에 숨긴다 |
-| `src/canvas/app/affordances/io/link-preview/useCanvasLinkPreviewImport.ts` | paste/drop DOM listener와 typing target guard를 link preview import workflow로 연결하고 App Shell에 노출하지 않는다 |
-| `src/canvas/app/link/CanvasLinkPreviewInspectorPanel.tsx` | 선택한 link preview의 open/source text 변환과 orientation action을 App link preview affordance 뒤에 숨긴다 |
-| `src/canvas/app/drawing/CanvasArrowRoutingInspectorPanel.tsx` | 선택한 connector의 elbow/straight routing action을 App drawing affordance 뒤에 숨긴다 |
+| `src/canvas/app/feature-packs/table-import/CanvasTableImport.ts` | CSV/TSV text, `.csv` file IO, insert center 계산, table component 생성 요청을 table import deep module 뒤에 숨긴다 |
+| `src/canvas/app/feature-packs/table-import/useCanvasTableImport.ts` | paste/drop DOM listener와 typing target guard를 table import workflow로 연결하고 App Shell에 노출하지 않는다 |
+| `src/canvas/app/feature-packs/checklist-inspector/CanvasChecklistInspectorPanel.tsx` | 선택한 checklist의 item check/text/add/remove action을 App checklist inspector pack 뒤에 숨긴다 |
+| `src/canvas/app/feature-packs/kanban-inspector/CanvasKanbanInspectorPanel.tsx` | 선택한 Queue/Kanban의 card text/add/remove/reorder action을 App kanban inspector pack 뒤에 숨긴다 |
+| `src/canvas/app/feature-packs/dom-edit-style/CanvasDomEditStyle.tsx` | Custom item DOM layout style reader/writer와 inspector panel factory를 dom-edit-style pack 뒤에 숨긴다 |
+| `src/canvas/app/feature-packs/media-import/CanvasMediaImport.ts` | URL/embed text parsing, insert center 계산, media/link-preview item 생성 요청을 media import deep module 뒤에 숨긴다 |
+| `src/canvas/app/feature-packs/media-import/useCanvasLinkPreviewImport.ts` | paste/drop DOM listener와 typing target guard를 link preview import workflow로 연결하고 App Shell에 노출하지 않는다 |
+| `src/canvas/app/feature-packs/media-import/CanvasLinkPreviewInspectorPanel.tsx` | 선택한 link preview의 open/source text 변환과 orientation action을 App link preview affordance 뒤에 숨긴다 |
+| `src/canvas/app/feature-packs/arrow-routing-inspector/CanvasArrowRoutingInspectorPanel.tsx` | 선택한 connector의 elbow/straight routing action을 App arrow routing inspector pack 뒤에 숨긴다 |
 | `src/canvas/app/workflow/CanvasAppStageModel.tsx` | stage와 item layer Adapter 호출 순서, text editor blur, context menu 차단, render 실패 containment를 소유한다 |
 | `src/canvas/app/workflow/CanvasWorkflowContract.ts` | App workflow hook들이 공유하는 document commit, selection, clipboard contract |
-| `src/canvas/app/workflow/useCanvasFindReplaceModel.ts` | document text search 상태와 Find/Replace control props를 App Shell에 숨긴다 |
+| `src/canvas/app/feature-packs/find-replace/useCanvasFindReplaceModel.ts` | document text search 상태와 Find/Replace control props를 find-replace pack 뒤에 숨긴다 |
 | `src/canvas/app/workflow/useCanvasInteractionModel.ts` | tool, gesture, marquee, draft, laser trail, snap guide, overlay 상태 생명주기를 App Shell에 숨긴다 |
 | `src/canvas/app/workflow/useCanvasTextEditorModel.ts` | text editing state, editable item lookup, text editor props를 App Shell에 숨긴다 |
 | `src/canvas/app/workflow/useCanvasWorkspaceModel.ts` | 저장된 workspace snapshot, document history, viewport, read model, id 생성을 App Shell에 숨긴다 |
 | `src/canvas/app/authoring/index.ts` | `canvas/app/authoring` subpath로 외부 조립자가 쓰는 assembly input과 custom descriptor 계약을 모으고 App runtime hook/default/validator를 제외한다 |
 | `src/canvas/app/workflow/CanvasWorkspaceConsumerContracts.ts` | Workspace document/read/viewport fan-out의 입력과 consumer별 출력 Interface를 명시한다 |
-| `src/canvas/app/affordances/editing/inspector/CanvasAppInspectorPanelExecution.ts` | Inspector panel visibility/render 호출과 실패 시 omit containment를 소유한다 |
+| `src/canvas/app/extensions/inspector-panels/CanvasAppInspectorPanelExecution.ts` | Inspector panel visibility/render 호출과 실패 시 omit containment를 소유한다 |
 | `src/canvas/app/keyboard/CanvasKeyboardShortcutIntent.ts` | Keydown 입력, typing target suppression, temporary pan, escape, command/tool shortcut precedence를 실행 가능한 keyboard intent로 조립한다 |
 | `src/canvas/app/keyboard/CanvasKeyboardCommandShortcutIntent.ts` | Built-in command, viewport, nudge keyboard shortcut grammar를 feature toggle과 selection 기준으로 keyboard intent로 변환한다 |
 | `src/canvas/app/keyboard/CanvasKeyboardToolShortcutIntent.ts` | Built-in tool shortcut precedence와 custom creation tool shortcut matching을 소유한다 |
@@ -139,8 +175,8 @@
 | `src/canvas/app/pointer/CanvasPointerLaser.ts` | Built-in laser pointer gesture의 document-free transient trail interaction을 소유한다 |
 | `src/canvas/app/pointer/CanvasPointerCommentCreation.ts` | Comment tool click을 Canvas Comment Item 생성과 optional clicked-item attachment로 변환한다 |
 | `src/canvas/app/pointer/CanvasPointerComponentCreation.ts` | Sticky note tool click을 Component Library `sticky` template 기반 component item 생성과 생성 직후 text edit 진입으로 변환한다 |
-| `src/canvas/app/components/CanvasComponentInsertionExecution.ts` | Component palette insertion과 sticky quick-create의 연결 sticky 생성, connector 생성, 컨트롤 위치 계산을 소유한다 |
-| `src/canvas/app/stamp/CanvasStampInsertion.ts` | Stamp 삽입 위치, 선택 경계 기반 contextual reaction bar anchor, 선택 유지, attached stamp 겹침 방지를 소유한다 |
+| `src/canvas/app/feature-packs/component-authoring/CanvasComponentInsertionExecution.ts` | Component palette insertion과 sticky quick-create의 연결 sticky 생성, connector 생성, 컨트롤 위치 계산을 소유한다 |
+| `src/canvas/app/feature-packs/stamp-authoring/CanvasStampInsertion.ts` | Stamp 삽입 위치, 선택 경계 기반 contextual reaction bar anchor, 선택 유지, attached stamp 겹침 방지를 소유한다 |
 | `src/canvas/app/pointer/CanvasPointerInteractionMovement.ts` | Drag threshold 기반 moved 판정을 pointer interaction Module들이 공유한다 |
 | `src/canvas/app/pointer/CanvasPointerInteractionLifecycle.ts` | Pointer-up/cancel 시 active interaction을 문서 변경, selection 변경, edit 진입, cancel rollback으로 확정하거나 되돌린다 |
 | `src/canvas/core` | Host item과 renderer를 모르는 geometry, viewport, id, primitive math 같은 재사용 계약 |
@@ -176,14 +212,16 @@
 | `src/canvas/renderer/svg` | Demo item을 모르는 SVG stage/overlay adapter |
 | `src/canvas/index.ts` | 외부 조립자와 Demo가 사용하는 Canvas package public entry |
 | `src/canvas/ui` | Toolbar, palette, status, editor controls |
-| `src/canvas/app/affordances/controls/cursor-chat/CanvasCursorChat.tsx` | cursor 위치에 붙는 transient chat textarea를 순수 view props로 렌더링한다 |
-| `src/canvas/app/affordances/controls/emote/CanvasEmoteControls.tsx` | live reaction emote buttons를 순수 view props로 렌더링한다 |
-| `src/canvas/app/affordances/controls/facilitation/CanvasSessionTimer.tsx` | session timer 표시와 preset/control 버튼을 순수 view props로 렌더링한다 |
-| `src/canvas/app/affordances/controls/facilitation/CanvasSpotlight.tsx` | spotlight entry, follower count, stop control을 순수 view props로 렌더링한다 |
-| `src/canvas/app/affordances/controls/facilitation/CanvasVotingSession.tsx` | voting session prompt, quota, status controls를 순수 view props로 렌더링한다 |
-| `src/canvas/app/affordances/controls/drawing/CanvasDrawingControls.tsx` | Drawing style controls를 순수 view props로 렌더링한다 |
-| `src/canvas/app/affordances/authoring/stamp/CanvasStampControls.tsx` | Stamp reaction controls를 순수 view props와 optional anchor로 렌더링한다 |
-| `src/canvas/app/affordances/authoring/component/CanvasStickyQuickCreateControl.tsx` | Selected sticky 주변의 방향별 quick-create control을 순수 view props로 렌더링한다 |
+| `src/canvas/app/feature-packs/cursor-chat/CanvasCursorChat.tsx` | cursor 위치에 붙는 transient chat textarea를 순수 view props로 렌더링한다 |
+| `src/canvas/app/feature-packs/facilitation/CanvasEmoteControls.tsx` | live reaction emote buttons를 순수 view props로 렌더링한다 |
+| `src/canvas/app/feature-packs/facilitation/CanvasSessionTimer.tsx` | session timer 표시와 preset/control 버튼을 순수 view props로 렌더링한다 |
+| `src/canvas/app/feature-packs/facilitation/CanvasSpotlight.tsx` | spotlight entry, follower count, stop control을 순수 view props로 렌더링한다 |
+| `src/canvas/app/feature-packs/facilitation/CanvasVotingSession.tsx` | voting session prompt, quota, status controls를 순수 view props로 렌더링한다 |
+| `src/canvas/app/feature-packs/drawing-tools/CanvasDrawingControls.tsx` | Drawing style controls를 drawing tools pack의 순수 view props로 렌더링한다 |
+| `src/canvas/app/feature-packs/status-bar/CanvasStatus.tsx` | Gesture/tool status와 selection count를 status-bar pack의 순수 view props로 렌더링한다 |
+| `src/canvas/app/feature-packs/zoom-controls/ZoomControls.tsx` | Zoom command controls를 zoom-controls pack의 순수 view props로 렌더링한다 |
+| `src/canvas/app/feature-packs/stamp-authoring/CanvasStampControls.tsx` | Stamp reaction controls를 순수 view props와 optional anchor로 렌더링한다 |
+| `src/canvas/app/feature-packs/component-authoring/CanvasStickyQuickCreateControl.tsx` | Selected sticky 주변의 방향별 quick-create control을 순수 view props로 렌더링한다 |
 | `src/demo/CanvasDemoAssembly.ts` | canvas Module 밖에서 demo-specific custom item modules와 demo entry 초기 선택 상태를 조립한다 |
 | `src/demo/custom-items` | demo-specific custom item module 구현과 해당 표현 스타일. `<name>/index.ts` convention으로 자동 수집한다 |
 
@@ -202,6 +240,8 @@ type CanvasAffordanceConfig = {
 규칙:
 
 - Toggle이 꺼진 기능은 시각 entry point, shortcut, pointer gesture, command API에서 모두 꺼진다.
+- Feature pack이 uninstall되면 manifest-derived installed ids에서 빠지고, App runtime은 해당 id로 paste/drop 같은 UI 없는 listener도 disabled config로 끈다.
+- Host는 `CanvasApp`의 `assemblyInput.additionalFeaturePackManifests`와 `disabledFeaturePackIds`로 기본 App marketplace에 optional pack을 설치하거나 해제한다.
 - Snap 계열 gesture와 guide overlay도 toggle로 독립 제어한다.
 - Toggle이 꺼져도 문서 상태는 손상하지 않는다.
 - Toggle 기본값은 모두 on이다. App workflow가 필요한 것만 끈다.

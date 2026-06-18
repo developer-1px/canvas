@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   createSlideEditTextFrameInsetDescriptor,
+  getSlideEditTextFrameInsetPaddingCSS,
   getSlideEditTextFrameInsetCommandEffect,
   getSlideEditTextFrameInsetMetadata,
   normalizeSlideEditTextFrameInset,
@@ -53,6 +54,21 @@ describe('SlideEditTextFrameInset', () => {
       right: 2,
       top: 1,
     }).attribute).toBe('data-slide-text-frame-inset')
+  })
+
+  it('formats normalized inset as CSS padding in metadata order', () => {
+    expect(getSlideEditTextFrameInsetPaddingCSS({
+      bottom: 3,
+      left: 4,
+      right: 2,
+      top: 1,
+    })).toBe('1px 2px 3px 4px')
+    expect(getSlideEditTextFrameInsetPaddingCSS({
+      bottom: Number.POSITIVE_INFINITY,
+      left: 5.678,
+      right: -2,
+      top: 1,
+    })).toBe('1px 0px 0px 5.68px')
   })
 
   it('normalizes inset numeric boundaries before host application', () => {

@@ -31,8 +31,23 @@ export type CanvasAppCustomItemRendererStrategy = (input: {
   item: CanvasCustomItem
 }) => ReactNode
 
+export type CanvasAppCustomItemRenderKey = boolean | number | string | null
+
+export type CanvasAppCustomItemRenderKeyStrategy = (input: {
+  item: CanvasCustomItem
+}) => CanvasAppCustomItemRenderKey
+
+export type CanvasAppCustomItemRendererDescriptor = {
+  getRenderKey: CanvasAppCustomItemRenderKeyStrategy
+  renderItem: CanvasAppCustomItemRendererStrategy
+}
+
+export type CanvasAppCustomItemRendererEntry =
+  | CanvasAppCustomItemRendererDescriptor
+  | CanvasAppCustomItemRendererStrategy
+
 export type CanvasAppCustomItemRenderers = Readonly<
-  Record<string, CanvasAppCustomItemRendererStrategy>
+  Record<string, CanvasAppCustomItemRendererEntry>
 >
 
 export type CanvasAppStageMount = {

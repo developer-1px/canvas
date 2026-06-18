@@ -1,7 +1,7 @@
 import type { CanvasAffordanceConfig } from '../../engine'
 import type { CanvasAppItemReadModel } from './CanvasAppItemReadModelContracts'
-import type { CanvasAppInspectorPanel } from '../affordances/editing/inspector/CanvasAppInspectorPanels'
-import type { CanvasAppCustomFocus } from '../affordances/interaction/focus/CanvasAppCustomFocus'
+import type { CanvasAppInspectorPanel } from '../extensions/inspector-panels'
+import type { CanvasAppCustomFocus } from '../extensions/custom-focus'
 import type { CommitCanvasItemsChange } from './CanvasWorkflowContract'
 
 export type CanvasAppInspectorModelInput = {
