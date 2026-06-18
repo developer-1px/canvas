@@ -25,7 +25,10 @@ import {
   ZoomOut,
 } from 'lucide-react'
 import {
+  useCallback,
+  useEffect,
   useMemo,
+  useRef,
   useState,
   type CSSProperties,
   type KeyboardEvent as ReactKeyboardEvent,
@@ -56,7 +59,9 @@ import {
 import { EngineSelectionToolbar } from './CanvasDevToolsSelectionToolbar'
 import {
   DEFAULT_ENGINE_DEMO_FEATURE_PACK_SWITCH_STATE,
-  createCanvasEngineDemoAssemblyInput,
+  applyCanvasEngineDemoFeaturePackSwitchToAssemblySource,
+  createCanvasEngineDemoFeaturePackAssemblySource,
+  getCanvasEngineDemoFeaturePackSwitchState,
   type EngineDemoFeaturePackSwitchId,
   type EngineDemoFeaturePackSwitchState,
 } from './CanvasEngineDemoFeaturePacks'
@@ -142,21 +147,51 @@ export function CanvasDevToolsDemoApp({
   assemblyInput?: CanvasAppAssemblyInput
   featurePackSwitches?: boolean
 }) {
-  const [featurePackSwitchState, setFeaturePackSwitchState] = useState(
-    DEFAULT_ENGINE_DEMO_FEATURE_PACK_SWITCH_STATE,
-  )
-  const runtimeAssemblyInput = useMemo(
-    () => createCanvasEngineDemoAssemblyInput({
+  const [featurePackAssemblyState, setFeaturePackAssemblyState] = useState(
+    () => ({
       assemblyInput,
-      featurePackSwitchState,
-      featurePackSwitches,
+      source: createCanvasEngineDemoFeaturePackAssemblySource(assemblyInput),
     }),
-    [assemblyInput, featurePackSwitchState, featurePackSwitches],
+  )
+  const featurePackAssemblySource =
+    featurePackAssemblyState.assemblyInput === assemblyInput
+      ? featurePackAssemblyState.source
+      : createCanvasEngineDemoFeaturePackAssemblySource(assemblyInput)
+  const featurePackAssemblySourceRef = useRef(featurePackAssemblySource)
+
+  useEffect(() => {
+    featurePackAssemblySourceRef.current = featurePackAssemblySource
+  }, [featurePackAssemblySource])
+
+  const runtimeAssemblyInput = featurePackSwitches
+    ? featurePackAssemblySource.assemblyInput
+    : assemblyInput
+  const featurePackSwitchState = useMemo(
+    () => featurePackSwitches
+      ? getCanvasEngineDemoFeaturePackSwitchState(runtimeAssemblyInput)
+      : DEFAULT_ENGINE_DEMO_FEATURE_PACK_SWITCH_STATE,
+    [featurePackSwitches, runtimeAssemblyInput],
   )
   const widgetInteractions = useMemo(
     () => getCanvasAppWidgetInteractions(runtimeAssemblyInput?.customItemModules),
     [runtimeAssemblyInput],
   )
+  const handleFeaturePackSwitchChange = useCallback((
+    id: EngineDemoFeaturePackSwitchId,
+    enabled: boolean,
+  ) => {
+    void applyCanvasEngineDemoFeaturePackSwitchToAssemblySource({
+      enabled,
+      featurePackId: id,
+      source: featurePackAssemblySourceRef.current,
+    }).then((result) => {
+      featurePackAssemblySourceRef.current = result.source
+      setFeaturePackAssemblyState({
+        assemblyInput,
+        source: result.source,
+      })
+    })
+  }, [assemblyInput])
 
   return (
     <CanvasApp
@@ -168,12 +203,7 @@ export function CanvasDevToolsDemoApp({
             featurePackSwitches ? ENGINE_DEMO_FEATURE_PACK_SWITCHES : []
           }
           featurePackSwitchState={featurePackSwitchState}
-          onFeaturePackSwitchChange={(id, enabled) => {
-            setFeaturePackSwitchState((current) => ({
-              ...current,
-              [id]: enabled,
-            }))
-          }}
+          onFeaturePackSwitchChange={handleFeaturePackSwitchChange}
           widgetInteractions={widgetInteractions}
         />
       )}
