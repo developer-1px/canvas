@@ -18,6 +18,7 @@
 | Color swatch palette | `slide-edit-affordance` | theme/recent color swatches, channel state, and color apply command effect |
 | Comment thread patch | `slide-edit-affordance` | comment/thread JSON paste parsing, common patch normalization, and host command effect |
 | Placeholder visibility affordance | `slide-edit-affordance` | slide placeholder structure and object hide/show read model |
+| Table rows patch | `slide-edit-affordance` | table rows JSON paste parsing, row matrix normalization, and host command effect |
 | Object layer pane | `slide-edit-affordance` | object row descriptor, selection pane command intent, ARIA tree contract |
 | Object accessibility | `slide-edit-affordance` | object alt text, decorative state, metadata attribute, and host command effect |
 | Object animation build order | `slide-edit-affordance` | object animation type, trigger, timing, and slide-local build order |
@@ -500,6 +501,18 @@
 | Host policy | body length, reply length, message id creation, storage mutation, and hidden/locked target policy stay host-owned |
 | Metadata | command effect metadata carries target ids, fields, message count, resolved state, format, and payload length |
 | No-op | missing selected comment, hidden/locked target, parse failure, direct generic JSON, or missing patch fields returns `null` |
+
+## Table Rows Patch Contract
+
+| Area | Contract |
+| --- | --- |
+| JSON candidates | table-rows custom MIME, `application/json`, `text/json`, and `text/plain` are checked in order |
+| JSON payloads | custom MIME may carry direct rows/object payload; generic JSON requires `tableRows`, `table`, or `rows` wrapper |
+| Row shapes | `columns`/`headers` + rows, two-dimensional rows, and object row arrays normalize into one string matrix |
+| Headers | `columns` or `headers` become a header row before body rows |
+| Host policy | max row, max column, max cell length, cell normalization, and final table schema conversion stay host-owned |
+| Metadata | command effect metadata carries target ids, row count, column count, format, and payload length |
+| No-op | missing/hidden/locked/non-table target, parse failure, direct generic JSON, or empty rows returns `null` |
 
 ## Slide Object Clipboard Contract
 
