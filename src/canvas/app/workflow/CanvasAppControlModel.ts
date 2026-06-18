@@ -20,6 +20,9 @@ import {
 import {
   getCanvasMinimapReadModel,
 } from '../feature-packs'
+import {
+  getCanvasFloatingAnchorForBounds,
+} from '../affordances/controls/floating-anchor/CanvasFloatingAnchor'
 import type { CanvasAppControlModelInput } from './CanvasAppControlConsumerContracts'
 import type {
   CanvasAppViewportFocusControls,
@@ -30,6 +33,12 @@ type CanvasSelectionCommandAnchor = {
   x: number
   y: number
 }
+
+const CANVAS_SELECTION_COMMAND_ANCHOR_FLOATING_SIZE = {
+  height: 40,
+  width: 320,
+}
+const CANVAS_SELECTION_COMMAND_ANCHOR_SCREEN_MARGIN = 14
 
 export function getCanvasAppControlModel({
   canRedo,
@@ -128,6 +137,7 @@ export function getCanvasAppControlModel({
       commandHandlers,
       selectionCommandAnchor: getCanvasSelectionCommandAnchor({
         bounds: scene.getBounds(selection),
+        stageRect: viewportRect,
         viewport,
       }),
       tool,
@@ -176,32 +186,34 @@ function getCanvasAppViewportFocusControls({
 
 function getCanvasSelectionCommandAnchor({
   bounds,
+  stageRect,
   viewport,
 }: {
   bounds: Bounds | null
+  stageRect: CanvasAppControlModelInput['viewportRect']
   viewport: Viewport
 }): CanvasSelectionCommandAnchor | null {
-  if (!bounds) {
+  const anchor = getCanvasFloatingAnchorForBounds({
+    bounds,
+    floatingSize: CANVAS_SELECTION_COMMAND_ANCHOR_FLOATING_SIZE,
+    screenGap: 0,
+    screenMargin: CANVAS_SELECTION_COMMAND_ANCHOR_SCREEN_MARGIN,
+    stageRect,
+    viewport,
+  })
+
+  if (!anchor) {
     return null
   }
 
-  const top = getCanvasViewportScreenPoint(viewport, {
-    x: bounds.x,
-    y: bounds.y,
-  }).y
-  const bottom = getCanvasViewportScreenPoint(viewport, {
-    x: bounds.x,
-    y: bounds.y + bounds.h,
-  }).y
-  const center = getCanvasViewportScreenPoint(viewport, {
-    x: bounds.x + bounds.w / 2,
-    y: bounds.y + bounds.h / 2,
+  const screenPoint = getCanvasViewportScreenPoint(viewport, {
+    x: anchor.x,
+    y: anchor.y,
   })
-  const placement = top < 128 ? 'below' : 'above'
 
   return {
-    x: center.x,
-    y: placement === 'below' ? bottom : top,
-    placement,
+    placement: anchor.placement,
+    x: screenPoint.x,
+    y: screenPoint.y,
   }
 }

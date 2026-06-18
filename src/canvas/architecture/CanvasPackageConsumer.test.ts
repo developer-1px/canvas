@@ -121,6 +121,7 @@ import {
   syncCanvasComponentItemsChange,
   transformCanvasAppItemsChange,
   getCanvasFindInputKeyboardIntent,
+  getCanvasFloatingAnchorForBounds,
   getCanvasInlineEditKeyboardIntent,
   getCanvasContextMenuKeyboardIntent,
   getCanvasContextMenuPosition,
@@ -150,6 +151,10 @@ import {
   type CanvasComponentPaletteItem,
   type CanvasComponentPaletteProps,
   type CanvasComponentInspectorPanelModel,
+  type CanvasFloatingAnchor,
+  type CanvasFloatingAnchorForBoundsInput,
+  type CanvasFloatingAnchorPlacement,
+  type CanvasFloatingAnchorSize,
   type CanvasAppFeaturePack,
   type CanvasAppFeaturePackMarketplaceActionModel,
   type CanvasAppFeaturePackMarketplaceActionAssemblyInput,
@@ -1504,6 +1509,24 @@ describe('Canvas package consumer imports', () => {
       createCanvasAppStageElement(packageStageElementInput)
     const packageStageElement: CanvasAppStageElement =
       packageStageElementController
+    const packageFloatingAnchorSize: CanvasFloatingAnchorSize = {
+      height: 40,
+      width: 160,
+    }
+    const packageFloatingAnchorInput: CanvasFloatingAnchorForBoundsInput = {
+      bounds: { h: 30, w: 80, x: 100, y: 20 },
+      floatingSize: packageFloatingAnchorSize,
+      stageRect: { height: 400, width: 600 },
+      viewport: { scale: 1, x: 0, y: 0 },
+    }
+    const packageFloatingAnchorPlacement: CanvasFloatingAnchorPlacement =
+      'below'
+    const packageFloatingAnchor: CanvasFloatingAnchor =
+      getCanvasFloatingAnchorForBounds(packageFloatingAnchorInput) ?? {
+        placement: 'above',
+        x: 0,
+        y: 0,
+      }
     const viewportControlStageElement = {
       getRect: () => ({
         height: 100,
@@ -1547,6 +1570,13 @@ describe('Canvas package consumer imports', () => {
       .toBe(useCanvasAppStageElement)
     expect(CanvasAppFacade.createCanvasAppStageElement)
       .toBe(createCanvasAppStageElement)
+    expect(CanvasAppFacade.getCanvasFloatingAnchorForBounds)
+      .toBe(getCanvasFloatingAnchorForBounds)
+    expect(packageFloatingAnchor).toEqual({
+      placement: packageFloatingAnchorPlacement,
+      x: 140,
+      y: 60,
+    })
     expect(packageStageElementController.mount.ref).toBeTypeOf('function')
     expect(packageStageElement.getRect()).toEqual(packageStageRect)
     expect(packageStageElement.getScreenPoint({ clientX: 70, clientY: 90 }))

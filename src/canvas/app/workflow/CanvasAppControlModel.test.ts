@@ -6,7 +6,10 @@ import {
 import type {
   CanvasAppCustomCreationToolState,
 } from '../extensions/CanvasAppExtensionStateContracts'
-import type { CanvasItem } from '../../entities'
+import type {
+  Bounds,
+  CanvasItem,
+} from '../../entities'
 import type {
   CanvasComponentSetSummary,
 } from '../../host'
@@ -155,6 +158,31 @@ describe('CanvasAppControlModel', () => {
     })).viewportFocus.fitSelection()
 
     expect(onFitItems).toHaveBeenLastCalledWith(undefined)
+  })
+
+  it('anchors the selection toolbar through the floating anchor primitive', () => {
+    const model = getCanvasAppControlModel(createInput({
+      scene: createSceneAdapter(new Set(), {
+        h: 30,
+        w: 80,
+        x: 100,
+        y: 20,
+      }),
+      selection: ['rect-1'],
+      viewport: { scale: 1, x: 0, y: 0 },
+      viewportRect: {
+        height: 400,
+        left: 0,
+        top: 0,
+        width: 600,
+      },
+    }))
+
+    expect(model.toolbar.selectionCommandAnchor).toEqual({
+      placement: 'below',
+      x: 174,
+      y: 50,
+    })
   })
 
   it('wires command callbacks without knowing toolbar rendering details', () => {
@@ -343,10 +371,13 @@ function createItemReadModel(): CanvasAppItemReadModel {
   } as unknown as CanvasAppItemReadModel
 }
 
-function createSceneAdapter(groups = new Set<string>()): CanvasSceneAdapter {
+function createSceneAdapter(
+  groups = new Set<string>(),
+  bounds: Bounds | null = null,
+): CanvasSceneAdapter {
   return {
     entries: [],
-    getBounds: vi.fn(),
+    getBounds: vi.fn(() => bounds),
     getParentId: vi.fn(),
     getSelectedAncestorId: vi.fn(),
     isGroup: (id) => groups.has(id),
