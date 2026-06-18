@@ -13,13 +13,17 @@ export type {
   CanvasAppFeaturePackMarketplaceActionAssemblyPlan,
   CanvasAppFeaturePackMarketplaceAssemblyActionInput,
   CanvasAppFeaturePackMarketplaceAssemblyApplyBlockedPlan,
+  CanvasAppFeaturePackMarketplaceAssemblyApplyBlockedResult,
   CanvasAppFeaturePackMarketplaceAssemblyApplyPlan,
   CanvasAppFeaturePackMarketplaceAssemblyApplyReadyPlan,
+  CanvasAppFeaturePackMarketplaceAssemblyApplyReadyResult,
+  CanvasAppFeaturePackMarketplaceAssemblyApplyResult,
   CanvasAppFeaturePackMarketplaceAssemblyApplyUpdateMode,
   CanvasAppFeaturePackMarketplaceAssemblyModel,
   CanvasAppFeaturePackMarketplaceAssemblyModelInput,
 } from '../workflow/CanvasAppFeaturePackAssembly'
 export {
+  getCanvasAppFeaturePackMarketplaceAssemblyApplyResult,
   getCanvasAppFeaturePackMarketplaceAssemblyApplyPlan,
   getCanvasAppFeaturePackMarketplaceAssemblyActionInput,
   getCanvasAppFeaturePackMarketplaceAssemblyActionPlan,

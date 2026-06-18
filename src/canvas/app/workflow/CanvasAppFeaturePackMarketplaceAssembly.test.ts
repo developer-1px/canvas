@@ -7,6 +7,7 @@ import {
 } from '../feature-packs'
 import { createCanvasAppAssembly } from './CanvasAppAssembly'
 import {
+  getCanvasAppFeaturePackMarketplaceAssemblyApplyResult,
   getCanvasAppFeaturePackMarketplaceAssemblyApplyPlan,
   getCanvasAppFeaturePackMarketplaceAssemblyActionInput,
   getCanvasAppFeaturePackMarketplaceAssemblyActionPlan,
@@ -60,6 +61,9 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
     expect(model.assemblyInput.featurePackStates).toEqual(
       model.installOptions.featurePackStates,
     )
+    expect(model.listings).toEqual([])
+    expect(model.profiles).toEqual([addonProfile])
+    expect(model.suiteManifests).toEqual([])
     expect(model.marketplaceModel.packs.items.map((item) => item.status))
       .toEqual(['uninstalled', 'enabled'])
     expect(model.marketplaceModel.profiles.items[0]?.status).toBe('active')
@@ -163,6 +167,10 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
       action: primaryAction,
       model,
     })
+    const applyResult = getCanvasAppFeaturePackMarketplaceAssemblyApplyResult({
+      action: primaryAction,
+      model,
+    })
 
     expect(primaryAction.kind).toBe('disable')
     expect(applyPlan.status).toBe('ready')
@@ -176,6 +184,22 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
       id: 'overlay-pack',
       status: 'disabled',
     }])
+    expect(applyResult.status).toBe('ready')
+    if (applyResult.status !== 'ready') {
+      throw new Error('Expected ready apply result')
+    }
+
+    expect(applyResult.currentModel).toBe(model)
+    expect(applyResult.updateMode).toBe('partial-update')
+    expect(applyResult.nextModel.assemblyInput).toEqual(
+      applyPlan.assemblyInput,
+    )
+    expect(applyResult.nextModel.marketplaceModel.packs.items[0])
+      .toMatchObject({
+        featurePackId: 'overlay-pack',
+        primaryActionKind: 'enable',
+        status: 'disabled',
+      })
   })
 
   it('marks install actions without partial surfaces as full rebuilds', () => {
@@ -191,6 +215,12 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
           status: 'uninstalled',
         }],
       },
+      listings: [{
+        access: 'paid',
+        entitlement: 'granted',
+        featurePackId: 'addon-pack',
+        priceLabel: '$4/mo',
+      }],
       profiles: [],
       suiteManifests: [],
     })
@@ -203,6 +233,10 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
     const primaryAction =
       getCanvasAppFeaturePackMarketplacePrimaryAction(addonItem)
     const applyPlan = getCanvasAppFeaturePackMarketplaceAssemblyApplyPlan({
+      action: primaryAction,
+      model,
+    })
+    const applyResult = getCanvasAppFeaturePackMarketplaceAssemblyApplyResult({
       action: primaryAction,
       model,
     })
@@ -219,6 +253,24 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
       id: 'addon-pack',
       status: 'disabled',
     }])
+    expect(applyResult.status).toBe('ready')
+    if (applyResult.status !== 'ready') {
+      throw new Error('Expected ready apply result')
+    }
+
+    expect(applyResult.updateMode).toBe('full-rebuild')
+    expect(applyResult.nextModel.listings).toEqual(model.listings)
+    expect(applyResult.nextModel.marketplaceModel.packs.items[0])
+      .toMatchObject({
+        featurePackId: 'addon-pack',
+        listing: {
+          access: 'paid',
+          entitlement: 'granted',
+          priceLabel: '$4/mo',
+        },
+        primaryActionKind: 'enable',
+        status: 'disabled',
+      })
   })
 
   it('applies suite marketplace actions from the assembly model', () => {
@@ -322,6 +374,10 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
       action: primaryAction,
       model,
     })
+    const applyResult = getCanvasAppFeaturePackMarketplaceAssemblyApplyResult({
+      action: primaryAction,
+      model,
+    })
 
     expect(primaryAction.kind).toBe('install')
     expect(primaryAction.ready).toBe(false)
@@ -336,8 +392,16 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
       totalBlockedReasonCount: 1,
       updateMode: 'blocked',
     })
+    expect(applyResult).toMatchObject({
+      currentModel: model,
+      marketplaceBlockedReasonCount: 1,
+      status: 'blocked',
+      totalBlockedReasonCount: 1,
+      updateMode: 'blocked',
+    })
     expect('assemblyInput' in actionPlan).toBe(false)
     expect('assemblyInput' in applyPlan).toBe(false)
+    expect('nextModel' in applyResult).toBe(false)
     expect(() =>
       getCanvasAppFeaturePackMarketplaceAssemblyActionInput({
         action: primaryAction,

@@ -1,6 +1,7 @@
 import {
   DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS,
   DEFAULT_CANVAS_APP_FEATURE_PACK_PROFILES,
+  DEFAULT_CANVAS_APP_FEATURE_PACK_SUITE_MANIFESTS,
   createCanvasAppFeaturePackExtensionBundle,
   DEFAULT_CANVAS_APP_VIEW_FEATURE_PACKS,
   assertCanvasAppFeaturePackViewRenderers,
@@ -100,7 +101,10 @@ export type CanvasAppFeaturePackMarketplaceAssemblyModel = Readonly<{
   assemblyInput: CanvasAppFeaturePackAssemblyInput
   featurePackManifests: readonly CanvasAppFeaturePackManifest[]
   installOptions: CanvasAppFeaturePackInstallOptions
+  listings: readonly CanvasAppFeaturePackMarketplaceListingInput[]
   marketplaceModel: CanvasAppFeaturePackMarketplaceModel
+  profiles: readonly CanvasAppFeaturePackProfile[]
+  suiteManifests: readonly CanvasAppFeaturePackSuiteManifest[]
 }>
 
 export type CanvasAppFeaturePackMarketplaceAssemblyActionInput = Readonly<{
@@ -128,6 +132,21 @@ export type CanvasAppFeaturePackMarketplaceAssemblyApplyReadyPlan =
 export type CanvasAppFeaturePackMarketplaceAssemblyApplyBlockedPlan =
   CanvasAppFeaturePackMarketplaceActionAssemblyBlockedPlan & Readonly<{
     updateMode: 'blocked'
+  }>
+
+export type CanvasAppFeaturePackMarketplaceAssemblyApplyResult =
+  | CanvasAppFeaturePackMarketplaceAssemblyApplyBlockedResult
+  | CanvasAppFeaturePackMarketplaceAssemblyApplyReadyResult
+
+export type CanvasAppFeaturePackMarketplaceAssemblyApplyReadyResult =
+  CanvasAppFeaturePackMarketplaceAssemblyApplyReadyPlan & Readonly<{
+    currentModel: CanvasAppFeaturePackMarketplaceAssemblyModel
+    nextModel: CanvasAppFeaturePackMarketplaceAssemblyModel
+  }>
+
+export type CanvasAppFeaturePackMarketplaceAssemblyApplyBlockedResult =
+  CanvasAppFeaturePackMarketplaceAssemblyApplyBlockedPlan & Readonly<{
+    currentModel: CanvasAppFeaturePackMarketplaceAssemblyModel
   }>
 
 export function createCanvasAppFeaturePackAssembly(
@@ -240,17 +259,53 @@ export function getCanvasAppFeaturePackMarketplaceAssemblyModel({
       assemblyInput,
       installOptions,
     })
+  const marketplaceListings =
+    snapshotCanvasAppFeaturePackMarketplaceListings(listings)
+  const marketplaceProfiles = snapshotCanvasAppFeaturePackProfiles(
+    profiles ?? assemblyInput.featurePackProfiles ??
+      DEFAULT_CANVAS_APP_FEATURE_PACK_PROFILES,
+  )
+  const marketplaceSuiteManifests = snapshotCanvasAppFeaturePackSuiteManifests(
+    suiteManifests ?? DEFAULT_CANVAS_APP_FEATURE_PACK_SUITE_MANIFESTS,
+  )
 
   return Object.freeze({
     assemblyInput: canonicalAssemblyInput,
     featurePackManifests,
     installOptions,
+    listings: marketplaceListings,
     marketplaceModel: getCanvasAppFeaturePackMarketplaceModel({
-      listings,
+      listings: marketplaceListings,
       manifests: featurePackManifests,
       options: installOptions,
-      profiles: profiles ?? assemblyInput.featurePackProfiles,
-      suiteManifests,
+      profiles: marketplaceProfiles,
+      suiteManifests: marketplaceSuiteManifests,
+    }),
+    profiles: marketplaceProfiles,
+    suiteManifests: marketplaceSuiteManifests,
+  })
+}
+
+export function getCanvasAppFeaturePackMarketplaceAssemblyApplyResult(
+  input: CanvasAppFeaturePackMarketplaceAssemblyActionInput,
+): CanvasAppFeaturePackMarketplaceAssemblyApplyResult {
+  const applyPlan = getCanvasAppFeaturePackMarketplaceAssemblyApplyPlan(input)
+
+  if (applyPlan.status === 'blocked') {
+    return Object.freeze({
+      ...applyPlan,
+      currentModel: input.model,
+    })
+  }
+
+  return Object.freeze({
+    ...applyPlan,
+    currentModel: input.model,
+    nextModel: getCanvasAppFeaturePackMarketplaceAssemblyModel({
+      assemblyInput: applyPlan.assemblyInput,
+      listings: input.model.listings,
+      profiles: input.model.profiles,
+      suiteManifests: input.model.suiteManifests,
     }),
   })
 }
@@ -492,6 +547,24 @@ function snapshotCanvasAppFeaturePackRuntimeStateInputs(
       status: state.status,
     })
   ))
+}
+
+function snapshotCanvasAppFeaturePackMarketplaceListings(
+  listings: readonly CanvasAppFeaturePackMarketplaceListingInput[],
+): readonly CanvasAppFeaturePackMarketplaceListingInput[] {
+  return Object.freeze([...listings])
+}
+
+function snapshotCanvasAppFeaturePackProfiles(
+  profiles: readonly CanvasAppFeaturePackProfile[],
+): readonly CanvasAppFeaturePackProfile[] {
+  return Object.freeze([...profiles])
+}
+
+function snapshotCanvasAppFeaturePackSuiteManifests(
+  suiteManifests: readonly CanvasAppFeaturePackSuiteManifest[],
+): readonly CanvasAppFeaturePackSuiteManifest[] {
+  return Object.freeze([...suiteManifests])
 }
 
 export function snapshotCanvasAppInstalledFeaturePackIds(

@@ -36,6 +36,7 @@ import {
   createCanvasAppFeaturePackExtensionBundle,
   createCanvasAppFeaturePackManifest,
   createCanvasAppFeaturePackMarketplaceListing,
+  getCanvasAppFeaturePackMarketplaceAssemblyApplyResult,
   getCanvasAppFeaturePackMarketplaceAssemblyApplyPlan,
   getCanvasAppFeaturePackMarketplaceAssemblyActionInput,
   getCanvasAppFeaturePackMarketplaceAssemblyActionPlan,
@@ -179,6 +180,7 @@ import {
   type CanvasAppFeaturePackMarketplaceActionAssemblyInput,
   type CanvasAppFeaturePackMarketplaceActionAssemblyPlan,
   type CanvasAppFeaturePackMarketplaceAssemblyActionInput,
+  type CanvasAppFeaturePackMarketplaceAssemblyApplyResult,
   type CanvasAppFeaturePackMarketplaceAssemblyApplyPlan,
   type CanvasAppFeaturePackMarketplaceAssemblyApplyUpdateMode,
   type CanvasAppFeaturePackMarketplaceAssemblyModel,
@@ -791,6 +793,11 @@ describe('Canvas package consumer imports', () => {
     const featurePackMarketplaceAssemblyApplyPlan:
       CanvasAppFeaturePackMarketplaceAssemblyApplyPlan =
         getCanvasAppFeaturePackMarketplaceAssemblyApplyPlan(
+          featurePackMarketplaceAssemblyActionInput,
+        )
+    const featurePackMarketplaceAssemblyApplyResult:
+      CanvasAppFeaturePackMarketplaceAssemblyApplyResult =
+        getCanvasAppFeaturePackMarketplaceAssemblyApplyResult(
           featurePackMarketplaceAssemblyActionInput,
         )
     const featurePackMarketplaceAssemblyApplyUpdateMode:
@@ -1427,6 +1434,17 @@ describe('Canvas package consumer imports', () => {
       .toBe('partial-update')
     expect(featurePackMarketplaceAssemblyApplyPlan.assemblyInput)
       .toEqual(featurePackMarketplaceAssemblyAppliedInput)
+    expect(featurePackMarketplaceAssemblyApplyResult.status).toBe('ready')
+    if (featurePackMarketplaceAssemblyApplyResult.status !== 'ready') {
+      throw new Error('Expected ready feature pack marketplace apply result')
+    }
+
+    expect(featurePackMarketplaceAssemblyApplyResult.updateMode)
+      .toBe('partial-update')
+    expect(featurePackMarketplaceAssemblyApplyResult.nextModel.assemblyInput)
+      .toEqual(featurePackMarketplaceAssemblyAppliedInput)
+    expect(featurePackMarketplaceAssemblyApplyResult.nextModel.marketplaceModel
+      .packs.items[0]?.status).toBe('disabled')
     expect(featurePackMarketplaceAssemblyAppliedInput.featurePackStates)
       .toEqual([{
         id: 'smoke-partial-pack',
@@ -2310,6 +2328,12 @@ describe('Canvas package consumer imports', () => {
     expect(CanvasAppFacade.getCanvasAppFeaturePackMarketplaceAssemblyModel)
       .toBeTypeOf('function')
     expect(CanvasPackage.getCanvasAppFeaturePackMarketplaceAssemblyModel)
+      .toBeTypeOf('function')
+    expect(CanvasAppAuthoring.getCanvasAppFeaturePackMarketplaceAssemblyApplyResult)
+      .toBeTypeOf('function')
+    expect(CanvasAppFacade.getCanvasAppFeaturePackMarketplaceAssemblyApplyResult)
+      .toBeTypeOf('function')
+    expect(CanvasPackage.getCanvasAppFeaturePackMarketplaceAssemblyApplyResult)
       .toBeTypeOf('function')
     expect(CanvasAppAuthoring.getCanvasAppFeaturePackMarketplaceAssemblyApplyPlan)
       .toBeTypeOf('function')
