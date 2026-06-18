@@ -198,9 +198,10 @@ export function getCanvasAppManifestExtensionFeaturePacks(
   options: CanvasAppFeaturePackManifestInstallOptions = {},
 ): readonly CanvasAppFeaturePack[] {
   return Object.freeze(
-    getCanvasAppEnabledFeaturePackManifests(manifests, options).flatMap((manifest) =>
-      manifest.extensionFeaturePack ? [manifest.extensionFeaturePack] : [],
-    ),
+    getCanvasAppFilteredEnabledFeaturePackManifests(manifests, options)
+      .flatMap((manifest) =>
+        manifest.extensionFeaturePack ? [manifest.extensionFeaturePack] : [],
+      ),
   )
 }
 
@@ -209,9 +210,10 @@ export function getCanvasAppManifestViewFeaturePacks(
   options: CanvasAppFeaturePackManifestInstallOptions = {},
 ): readonly CanvasAppViewFeaturePack[] {
   return Object.freeze(
-    getCanvasAppEnabledFeaturePackManifests(manifests, options).flatMap((manifest) =>
-      manifest.viewFeaturePack ? [manifest.viewFeaturePack] : [],
-    ),
+    getCanvasAppFilteredEnabledFeaturePackManifests(manifests, options)
+      .flatMap((manifest) =>
+        manifest.viewFeaturePack ? [manifest.viewFeaturePack] : [],
+      ),
   )
 }
 
@@ -225,12 +227,37 @@ export function getCanvasAppInstalledFeaturePackManifests(
     options,
   ))
 
+  assertCanvasAppFeaturePackManifestGraph({
+    manifests,
+    stateIds: installedIds,
+    stateLabel: 'installed',
+  })
+
   return Object.freeze(
     manifests.filter((manifest) => installedIds.has(manifest.id)),
   )
 }
 
 export function getCanvasAppEnabledFeaturePackManifests(
+  manifests: readonly CanvasAppFeaturePackManifest[],
+  options: CanvasAppFeaturePackManifestInstallOptions = {},
+): readonly CanvasAppFeaturePackManifest[] {
+  const enabledManifests = getCanvasAppFilteredEnabledFeaturePackManifests(
+    manifests,
+    options,
+  )
+  const enabledIds = new Set(enabledManifests.map((manifest) => manifest.id))
+
+  assertCanvasAppFeaturePackManifestGraph({
+    manifests,
+    stateIds: enabledIds,
+    stateLabel: 'enabled',
+  })
+
+  return enabledManifests
+}
+
+function getCanvasAppFilteredEnabledFeaturePackManifests(
   manifests: readonly CanvasAppFeaturePackManifest[],
   options: CanvasAppFeaturePackManifestInstallOptions = {},
 ): readonly CanvasAppFeaturePackManifest[] {
@@ -461,6 +488,48 @@ function getCanvasAppFeaturePackManifestIds(
   manifests: readonly CanvasAppFeaturePackManifest[],
 ): readonly CanvasAppFeaturePackId[] {
   return Object.freeze(manifests.map((manifest) => manifest.id))
+}
+
+function assertCanvasAppFeaturePackManifestGraph({
+  manifests,
+  stateIds,
+  stateLabel,
+}: {
+  manifests: readonly CanvasAppFeaturePackManifest[]
+  stateIds: ReadonlySet<CanvasAppFeaturePackId>
+  stateLabel: 'enabled' | 'installed'
+}) {
+  const manifestIds = new Set(
+    manifests.map((manifest) => manifest.id),
+  )
+
+  for (const manifest of manifests) {
+    if (!stateIds.has(manifest.id)) {
+      continue
+    }
+
+    for (const requiredId of manifest.requires) {
+      if (!manifestIds.has(requiredId)) {
+        throw new Error(
+          `Feature pack ${manifest.id} requires unknown pack: ${requiredId}`,
+        )
+      }
+
+      if (!stateIds.has(requiredId)) {
+        throw new Error(
+          `Feature pack ${manifest.id} requires ${stateLabel} pack: ${requiredId}`,
+        )
+      }
+    }
+
+    for (const conflictId of manifest.conflicts) {
+      if (stateIds.has(conflictId)) {
+        throw new Error(
+          `Feature pack ${manifest.id} conflicts with ${stateLabel} pack: ${conflictId}`,
+        )
+      }
+    }
+  }
 }
 
 function createCanvasAppFeaturePackManifestContributions(

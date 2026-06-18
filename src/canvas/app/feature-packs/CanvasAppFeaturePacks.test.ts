@@ -426,6 +426,99 @@ describe('CanvasAppFeaturePacks', () => {
       })
   })
 
+  it('validates required feature pack manifests at install and enable time', () => {
+    const coreManifest = createCanvasAppFeaturePackManifest({
+      id: 'core-pack',
+      label: 'Core pack',
+    })
+    const addonManifest = createCanvasAppFeaturePackManifest({
+      id: 'addon-pack',
+      label: 'Addon pack',
+      requires: ['core-pack'],
+    })
+    const unknownDependencyManifest = createCanvasAppFeaturePackManifest({
+      id: 'unknown-addon',
+      label: 'Unknown addon',
+      requires: ['missing-pack'],
+    })
+
+    expect(getCanvasAppInstalledFeaturePackManifestIds([
+      coreManifest,
+      addonManifest,
+    ])).toEqual(['core-pack', 'addon-pack'])
+    expect(() =>
+      getCanvasAppInstalledFeaturePackManifestIds([addonManifest]),
+    ).toThrow('Feature pack addon-pack requires unknown pack: core-pack')
+    expect(() =>
+      getCanvasAppInstalledFeaturePackManifestIds([
+        coreManifest,
+        addonManifest,
+      ], {
+        featurePackStates: [{
+          id: 'core-pack',
+          status: 'uninstalled',
+        }],
+      }),
+    ).toThrow('Feature pack addon-pack requires installed pack: core-pack')
+    expect(() =>
+      getCanvasAppEnabledFeaturePackManifestIds([
+        coreManifest,
+        addonManifest,
+      ], {
+        featurePackStates: [{
+          id: 'core-pack',
+          status: 'disabled',
+        }],
+      }),
+    ).toThrow('Feature pack addon-pack requires enabled pack: core-pack')
+    expect(() =>
+      getCanvasAppEnabledFeaturePackManifestIds([unknownDependencyManifest]),
+    ).toThrow('Feature pack unknown-addon requires unknown pack: missing-pack')
+  })
+
+  it('validates conflicting feature pack manifests at install and enable time', () => {
+    const modernManifest = createCanvasAppFeaturePackManifest({
+      conflicts: ['legacy-pack'],
+      id: 'modern-pack',
+      label: 'Modern pack',
+    })
+    const legacyManifest = createCanvasAppFeaturePackManifest({
+      id: 'legacy-pack',
+      label: 'Legacy pack',
+    })
+
+    expect(() =>
+      getCanvasAppInstalledFeaturePackManifestIds([
+        modernManifest,
+        legacyManifest,
+      ]),
+    ).toThrow('Feature pack modern-pack conflicts with installed pack: legacy-pack')
+    expect(getCanvasAppInstalledFeaturePackManifestIds([
+      modernManifest,
+      legacyManifest,
+    ], {
+      featurePackStates: [{
+        id: 'legacy-pack',
+        status: 'uninstalled',
+      }],
+    })).toEqual(['modern-pack'])
+    expect(() =>
+      getCanvasAppEnabledFeaturePackManifestIds([
+        modernManifest,
+        legacyManifest,
+      ]),
+    ).toThrow('Feature pack modern-pack conflicts with enabled pack: legacy-pack')
+    expect(getCanvasAppEnabledFeaturePackManifestIds([
+      modernManifest,
+      legacyManifest,
+    ], {
+      featurePackStates: [{
+        id: 'legacy-pack',
+        status: 'disabled',
+      }],
+    })).toEqual(['modern-pack'])
+  })
+
   it('stores marketplace-ready manifest metadata with defaults and overrides', () => {
     const publishPack = createCanvasAppFeaturePack({
       extensionBundle: createCanvasAppExtensionBundle({
