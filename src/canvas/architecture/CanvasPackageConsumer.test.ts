@@ -17,6 +17,7 @@ import {
   CANVAS_WHEEL_VIEWPORT_ZOOM_MODIFIER,
   CANVAS_WHEEL_PASSTHROUGH_SELECTOR,
   CANVAS_RICH_CLIPBOARD_JSON_SCRIPT_ATTRIBUTE,
+  applyCanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdate,
   applyCanvasAppFeaturePackRuntimeStatePatch,
   bindCanvasEventListener,
   bindCanvasEventListeners,
@@ -225,6 +226,13 @@ import {
   type CanvasAppFeaturePackMarketplaceAssemblyApplyCleanupFailedExecutionResult,
   type CanvasAppFeaturePackMarketplaceAssemblyApplyCompletedExecutionResult,
   type CanvasAppFeaturePackMarketplaceAssemblyApplyHostAssemblyInputUpdate,
+  type CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateApplicationHeldSource,
+  type CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateApplicationInput,
+  type CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateApplicationReadySource,
+  type CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateApplicationResult,
+  type CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateApplicationSource,
+  type CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateAppliedResult,
+  type CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateHeldApplicationResult,
   type CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateHeldResult,
   type CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateInput,
   type CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateReadyResult,
@@ -1430,6 +1438,74 @@ describe('Canvas package consumer imports', () => {
           featurePackMarketplaceAssemblyApplyHostUpdate.ready
             ? featurePackMarketplaceAssemblyApplyHostUpdate.update
             : null
+    const featurePackMarketplaceAssemblyApplyEmbeddedHostUpdateApplicationInput:
+      CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateApplicationInput<
+        SmokeUninstallCleanupEffect,
+        SmokeUninstallCleanupExecutionValue
+      > = {
+        hostUpdate: featurePackMarketplaceAssemblyApplyTransactionResult
+          .hostUpdate,
+      }
+    const featurePackMarketplaceAssemblyApplyStandaloneHostUpdateApplicationInput:
+      CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateApplicationInput<
+        SmokeUninstallCleanupEffect,
+        SmokeUninstallCleanupExecutionValue
+      > = {
+        hostUpdate: featurePackMarketplaceAssemblyApplyHostUpdate,
+      }
+    const featurePackMarketplaceAssemblyApplyHostUpdateApplicationSource:
+      CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateApplicationSource<
+        SmokeUninstallCleanupEffect,
+        SmokeUninstallCleanupExecutionValue
+      > = featurePackMarketplaceAssemblyApplyTransactionResult.hostUpdate
+    const featurePackMarketplaceAssemblyApplyHostUpdateApplicationReadySource:
+      CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateApplicationReadySource<
+        SmokeUninstallCleanupEffect,
+        SmokeUninstallCleanupExecutionValue
+      > | null =
+        featurePackMarketplaceAssemblyApplyHostUpdateApplicationSource.ready
+          ? featurePackMarketplaceAssemblyApplyHostUpdateApplicationSource
+          : null
+    const featurePackMarketplaceAssemblyApplyHostUpdateApplicationHeldSource:
+      CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateApplicationHeldSource<
+        SmokeUninstallCleanupEffect,
+        SmokeUninstallCleanupExecutionValue
+      > | null =
+        featurePackMarketplaceAssemblyApplyHostUpdateApplicationSource.ready
+          ? null
+          : featurePackMarketplaceAssemblyApplyHostUpdateApplicationSource
+    const featurePackMarketplaceAssemblyApplyEmbeddedHostUpdateApplication:
+      CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateApplicationResult<
+        SmokeUninstallCleanupEffect,
+        SmokeUninstallCleanupExecutionValue
+      > = applyCanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdate(
+        featurePackMarketplaceAssemblyApplyEmbeddedHostUpdateApplicationInput,
+      )
+    const featurePackMarketplaceAssemblyApplyStandaloneHostUpdateApplication:
+      CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateApplicationResult<
+        SmokeUninstallCleanupEffect,
+        SmokeUninstallCleanupExecutionValue
+      > =
+        CanvasAppFacade
+          .applyCanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdate(
+            featurePackMarketplaceAssemblyApplyStandaloneHostUpdateApplicationInput,
+          )
+    const featurePackMarketplaceAssemblyApplyHostUpdateAppliedResult:
+      CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateAppliedResult<
+        SmokeUninstallCleanupEffect,
+        SmokeUninstallCleanupExecutionValue
+      > | null =
+        featurePackMarketplaceAssemblyApplyEmbeddedHostUpdateApplication.applied
+          ? featurePackMarketplaceAssemblyApplyEmbeddedHostUpdateApplication
+          : null
+    const featurePackMarketplaceAssemblyApplyHostUpdateHeldApplicationResult:
+      CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateHeldApplicationResult<
+        SmokeUninstallCleanupEffect,
+        SmokeUninstallCleanupExecutionValue
+      > | null =
+        featurePackMarketplaceAssemblyApplyEmbeddedHostUpdateApplication.applied
+          ? null
+          : featurePackMarketplaceAssemblyApplyEmbeddedHostUpdateApplication
     const featurePackMarketplaceAssemblyApplyReadyExecutionPlan:
       CanvasAppFeaturePackMarketplaceAssemblyApplyReadyExecutionPlan<
         SmokeUninstallCleanupEffect
@@ -2314,6 +2390,35 @@ describe('Canvas package consumer imports', () => {
       .runtimeStatePatch)
       .toBe(featurePackMarketplaceAssemblyApplyTransactionResult
         .runtimeStatePatch.patch)
+    expect(featurePackMarketplaceAssemblyApplyHostUpdateApplicationReadySource)
+      .toBe(featurePackMarketplaceAssemblyApplyTransactionResult.hostUpdate)
+    expect(featurePackMarketplaceAssemblyApplyHostUpdateApplicationHeldSource)
+      .toBeNull()
+    expect(featurePackMarketplaceAssemblyApplyEmbeddedHostUpdateApplication
+      .status)
+      .toBe('applied')
+    expect(featurePackMarketplaceAssemblyApplyEmbeddedHostUpdateApplication
+      .applied)
+      .toBe(true)
+    expect(featurePackMarketplaceAssemblyApplyHostUpdateAppliedResult)
+      .toBe(featurePackMarketplaceAssemblyApplyEmbeddedHostUpdateApplication)
+    expect(featurePackMarketplaceAssemblyApplyHostUpdateHeldApplicationResult)
+      .toBeNull()
+    expect(featurePackMarketplaceAssemblyApplyEmbeddedHostUpdateApplication
+      .assemblyInput)
+      .toEqual(featurePackMarketplaceAssemblyAppliedInput)
+    expect(featurePackMarketplaceAssemblyApplyEmbeddedHostUpdateApplication
+      .update)
+      .toEqual(featurePackMarketplaceAssemblyApplyHostUpdate.update)
+    expect(featurePackMarketplaceAssemblyApplyEmbeddedHostUpdateApplication
+      .hostUpdate)
+      .toBe(featurePackMarketplaceAssemblyApplyTransactionResult.hostUpdate)
+    expect(featurePackMarketplaceAssemblyApplyStandaloneHostUpdateApplication
+      .assemblyInput)
+      .toEqual(featurePackMarketplaceAssemblyAppliedInput)
+    expect(featurePackMarketplaceAssemblyApplyStandaloneHostUpdateApplication
+      .hostUpdate)
+      .toBe(featurePackMarketplaceAssemblyApplyHostUpdate)
     expect(featurePackMarketplaceAssemblyApplyTransactionResult.summary.status)
       .toBe('completed')
     expect(CanvasPackage.executeCanvasAppFeaturePackMarketplaceAssemblyApplyTransaction)
@@ -2328,6 +2433,12 @@ describe('Canvas package consumer imports', () => {
       .toBe(getCanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdate)
     expect(CanvasAppAuthoring.getCanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdate)
       .toBe(getCanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdate)
+    expect(CanvasPackage.applyCanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdate)
+      .toBe(applyCanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdate)
+    expect(CanvasAppFacade.applyCanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdate)
+      .toBe(applyCanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdate)
+    expect(CanvasAppAuthoring.applyCanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdate)
+      .toBe(applyCanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdate)
     expect(featurePackMarketplaceAssemblyApplyReadyExecutionPlan)
       .toMatchObject({
         actionKind: 'disable',

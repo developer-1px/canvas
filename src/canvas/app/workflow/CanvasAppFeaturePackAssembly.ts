@@ -751,6 +751,114 @@ export type CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateResult<
     TResult
   >
 
+export type CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateApplicationInput<
+  TEffect,
+  TResult,
+> = Readonly<{
+  hostUpdate:
+    CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateApplicationSource<
+      TEffect,
+      TResult
+    >
+}>
+
+export type CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateApplicationSource<
+  TEffect,
+  TResult,
+> =
+  | CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateApplicationReadySource<
+    TEffect,
+    TResult
+  >
+  | CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateApplicationHeldSource<
+    TEffect,
+    TResult
+  >
+
+export type CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateApplicationReadySource<
+  TEffect,
+  TResult,
+> =
+  | CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateReadyResult<
+    TEffect,
+    TResult
+  >
+  | CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionHostUpdateReadyResult<
+    TEffect,
+    TResult
+  >
+
+export type CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateApplicationHeldSource<
+  TEffect,
+  TResult,
+> =
+  | CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateHeldResult<
+    TEffect,
+    TResult
+  >
+  | CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionHostUpdateHeldResult<
+    TEffect,
+    TResult
+  >
+
+export type CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateApplicationResult<
+  TEffect,
+  TResult,
+> =
+  | CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateAppliedResult<
+    TEffect,
+    TResult
+  >
+  | CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateHeldApplicationResult<
+    TEffect,
+    TResult
+  >
+
+export type CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateAppliedResult<
+  TEffect,
+  TResult,
+> = Readonly<{
+  actionKind: CanvasAppFeaturePackMarketplacePrimaryAction['kind']
+  applied: true
+  assemblyInput: CanvasAppFeaturePackAssemblyInput
+  currentAssemblyInput: CanvasAppFeaturePackAssemblyInput
+  hostUpdate:
+    CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateApplicationReadySource<
+      TEffect,
+      TResult
+    >
+  nextAssemblyInput: CanvasAppFeaturePackAssemblyInput
+  status: 'applied'
+  update: CanvasAppFeaturePackMarketplaceAssemblyApplyHostAssemblyInputUpdate
+  updateMode: Exclude<
+    CanvasAppFeaturePackMarketplaceAssemblyApplyUpdateMode,
+    'blocked'
+  >
+}>
+
+export type CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateHeldApplicationResult<
+  TEffect,
+  TResult,
+> = Readonly<{
+  actionKind: CanvasAppFeaturePackMarketplacePrimaryAction['kind']
+  applied: false
+  assemblyInput: CanvasAppFeaturePackAssemblyInput
+  currentAssemblyInput: CanvasAppFeaturePackAssemblyInput
+  holdReason:
+    CanvasAppFeaturePackMarketplaceAssemblyApplyHeldCommitResult<
+      TEffect,
+      TResult
+    >['holdReason']
+  hostUpdate:
+    CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateApplicationHeldSource<
+      TEffect,
+      TResult
+    >
+  status: 'held'
+  update: null
+  updateMode: CanvasAppFeaturePackMarketplaceAssemblyApplyUpdateMode
+}>
+
 export type CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionHostUpdateResult<
   TEffect,
   TResult,
@@ -1571,6 +1679,46 @@ export function getCanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdate<
     transactionResult,
     update,
     updateMode: commitResult.updateMode,
+  })
+}
+
+export function applyCanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdate<
+  TEffect,
+  TResult,
+>({
+  hostUpdate,
+}: CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateApplicationInput<
+  TEffect,
+  TResult
+>):
+  CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateApplicationResult<
+    TEffect,
+    TResult
+  > {
+  if (hostUpdate.ready) {
+    return Object.freeze({
+      actionKind: hostUpdate.actionKind,
+      applied: true,
+      assemblyInput: hostUpdate.nextAssemblyInput,
+      currentAssemblyInput: hostUpdate.currentAssemblyInput,
+      hostUpdate,
+      nextAssemblyInput: hostUpdate.nextAssemblyInput,
+      status: 'applied',
+      update: hostUpdate.update,
+      updateMode: hostUpdate.updateMode,
+    })
+  }
+
+  return Object.freeze({
+    actionKind: hostUpdate.actionKind,
+    applied: false,
+    assemblyInput: hostUpdate.currentAssemblyInput,
+    currentAssemblyInput: hostUpdate.currentAssemblyInput,
+    holdReason: hostUpdate.holdReason,
+    hostUpdate,
+    status: 'held',
+    update: null,
+    updateMode: hostUpdate.updateMode,
   })
 }
 
