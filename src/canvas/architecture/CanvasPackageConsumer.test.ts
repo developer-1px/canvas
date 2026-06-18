@@ -268,6 +268,7 @@ import {
   createCanvasSvgFreehandPathData,
   createCanvasSvgPathData,
   escapeCanvasXmlAttribute,
+  escapeCanvasXmlText,
   formatCanvasSvgNumber,
 } from '@interactive-os/canvas/renderer'
 
@@ -2328,6 +2329,7 @@ describe('Canvas package consumer imports', () => {
     expect(createCanvasSvgPathData([{ x: 1, y: 2 }, { x: 3, y: 4 }]))
       .toBe('M 1 2 L 3 4')
     expect(formatCanvasSvgNumber(1.2345)).toBe('1.234')
+    expect(escapeCanvasXmlText('A&B <C>')).toBe('A&amp;B &lt;C&gt;')
     expect(escapeCanvasXmlAttribute('A&B "C"')).toBe('A&amp;B &quot;C&quot;')
     expect(createCanvasCssBoundsTransform({
       flipX: true,
