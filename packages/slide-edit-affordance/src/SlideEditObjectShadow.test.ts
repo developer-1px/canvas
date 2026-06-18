@@ -5,6 +5,8 @@ import {
   getSlideEditObjectShadowCommandEffect,
   getSlideEditObjectShadowFilter,
   getSlideEditObjectShadowJSONPasteValue,
+  getSlideEditObjectShadowJSONPasteValueFromText,
+  getSlideEditObjectShadowJSONPasteValueFromValue,
   getSlideEditObjectShadowMetadata,
   getSlideEditObjectShadowPasteCommands,
   normalizeSlideEditObjectShadow,
@@ -21,6 +23,8 @@ import {
   getSlideEditObjectShadowFilter as getSlideEditObjectShadowFilterFromPackage,
   getSlideEditObjectShadowFilterCSS as getSlideEditObjectShadowFilterCSSFromPackage,
   getSlideEditObjectShadowJSONPasteValue as getSlideEditObjectShadowJSONPasteValueFromPackage,
+  getSlideEditObjectShadowJSONPasteValueFromText as getSlideEditObjectShadowJSONPasteValueFromTextFromPackage,
+  getSlideEditObjectShadowJSONPasteValueFromValue as getSlideEditObjectShadowJSONPasteValueFromValueFromPackage,
 } from './index'
 
 describe('SlideEditObjectShadow', () => {
@@ -295,6 +299,88 @@ describe('SlideEditObjectShadow', () => {
         },
       ],
     })
+  })
+
+  it('reads object shadow JSON paste values from parsed values and text', () => {
+    expect(getSlideEditObjectShadowJSONPasteValueFromValue({
+      enabled: true,
+      opacity: 1.2,
+    })).toEqual({
+      fields: [
+        {
+          fieldId: 'enabled',
+          value: true,
+        },
+        {
+          fieldId: 'opacity',
+          value: 1,
+        },
+      ],
+      shadow: {
+        ...SLIDE_EDIT_OBJECT_SHADOW_DEFAULT,
+        enabled: true,
+        opacity: 1,
+      },
+      surface: 'object-shadow',
+    })
+    expect(getSlideEditObjectShadowJSONPasteValueFromText(
+      '{"value":{"blur":-4,"distance":12}}',
+    )).toMatchObject({
+      fields: [
+        {
+          fieldId: 'blur',
+          value: 0,
+        },
+        {
+          fieldId: 'distance',
+          value: 12,
+        },
+      ],
+    })
+    expect(getSlideEditObjectShadowJSONPasteValueFromValue(
+      {
+        objectShadow: {
+          angle: 390,
+        },
+      },
+      { mode: 'wrapped' },
+    )).toMatchObject({
+      fields: [
+        {
+          fieldId: 'angle',
+          value: 360,
+        },
+      ],
+    })
+    expect(getSlideEditObjectShadowJSONPasteValueFromTextFromPackage(
+      '{"shadow":{"enabled":true}}',
+      { mode: 'wrapped' },
+    )).toMatchObject({
+      fields: [
+        {
+          fieldId: 'enabled',
+          value: true,
+        },
+      ],
+    })
+    expect(getSlideEditObjectShadowJSONPasteValueFromValueFromPackage({
+      color: ' #123456 ',
+    })).toMatchObject({
+      fields: [
+        {
+          fieldId: 'color',
+          value: '#123456',
+        },
+      ],
+    })
+    expect(getSlideEditObjectShadowJSONPasteValueFromText('not json'))
+      .toBeNull()
+    expect(getSlideEditObjectShadowJSONPasteValueFromValue(
+      {
+        boxShadow: '0 4px 12px black',
+      },
+      { mode: 'wrapped' },
+    )).toBeNull()
   })
 
   it('converts paste values into object shadow update commands', () => {

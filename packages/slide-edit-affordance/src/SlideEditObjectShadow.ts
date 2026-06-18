@@ -96,6 +96,14 @@ export type SlideEditObjectShadowJSONPasteInput = {
   jsonMimeType?: string
 }
 
+export type SlideEditObjectShadowJSONPasteValueMode =
+  | 'direct'
+  | 'wrapped'
+
+export type SlideEditObjectShadowJSONPasteValueOptions = {
+  mode?: SlideEditObjectShadowJSONPasteValueMode
+}
+
 export type SlideEditObjectShadowPasteCommandsInput<
   TSlideId extends SlideEditObjectShadowSlideId = SlideEditObjectShadowSlideId,
   TObjectId extends SlideEditObjectShadowObjectId =
@@ -278,9 +286,9 @@ export function getSlideEditObjectShadowJSONPasteValue({
     const customText = dataTransfer.getData(jsonMimeType)
 
     if (customText.trim()) {
-      const customValue = parseSlideEditObjectShadowJSON(customText)
-      const customPasteValue =
-        getSlideEditObjectShadowDirectPasteValue(customValue)
+      const customPasteValue = getSlideEditObjectShadowJSONPasteValueFromText(
+        customText,
+      )
 
       if (customPasteValue !== null) {
         return customPasteValue
@@ -295,8 +303,10 @@ export function getSlideEditObjectShadowJSONPasteValue({
       continue
     }
 
-    const value = parseSlideEditObjectShadowJSON(text)
-    const pasteValue = getSlideEditObjectShadowWrappedPasteValue(value)
+    const pasteValue = getSlideEditObjectShadowJSONPasteValueFromText(
+      text,
+      { mode: 'wrapped' },
+    )
 
     if (pasteValue !== null) {
       return pasteValue
@@ -304,6 +314,27 @@ export function getSlideEditObjectShadowJSONPasteValue({
   }
 
   return null
+}
+
+export function getSlideEditObjectShadowJSONPasteValueFromText(
+  text: string,
+  options?: SlideEditObjectShadowJSONPasteValueOptions,
+): SlideEditObjectShadowJSONPasteValue | null {
+  return getSlideEditObjectShadowJSONPasteValueFromValue(
+    parseSlideEditObjectShadowJSON(text),
+    options,
+  )
+}
+
+export function getSlideEditObjectShadowJSONPasteValueFromValue(
+  value: unknown,
+  {
+    mode = 'direct',
+  }: SlideEditObjectShadowJSONPasteValueOptions = {},
+): SlideEditObjectShadowJSONPasteValue | null {
+  return mode === 'wrapped'
+    ? getSlideEditObjectShadowWrappedPasteValue(value)
+    : getSlideEditObjectShadowDirectPasteValue(value)
 }
 
 export function getSlideEditObjectShadowPasteCommands<
