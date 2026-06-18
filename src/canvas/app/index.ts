@@ -473,6 +473,15 @@ export {
   type CanvasPointerPanStartResult,
 } from './affordances/interaction/pointer/CanvasPointerPanInteraction'
 export {
+  getCanvasEraserHitItemIds,
+  getCanvasEraserHitStrokeIds,
+  getCanvasMergedEraserHitIds,
+  getNextCanvasEraserPoints,
+  type CanvasEraserStrokeHitTestInput,
+  type CanvasEraserStrokeHitTestStroke,
+  type CanvasNextEraserPointsInput,
+} from './affordances/interaction/pointer/CanvasEraserHitTesting'
+export {
   getCanvasResizeHandleDoubleClickIntent,
   recordCanvasItemPointerClick,
   type CanvasPointerClickMemory,

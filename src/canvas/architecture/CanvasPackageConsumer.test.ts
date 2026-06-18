@@ -52,8 +52,10 @@ import {
   createCanvasStoryCanvasFeaturePackManifests,
   createCanvasStoryPreviewItemsFeaturePackManifest,
   getCanvasDataTransferText,
+  getCanvasEraserHitStrokeIds,
   getCanvasExternalClipboardPasteCommandRoute,
   getCanvasRichClipboardJSONFromHTML,
+  getNextCanvasEraserPoints,
   setCanvasDataTransferDropEffect,
   downloadCanvasBlobFile,
   downloadCanvasTextFile,
@@ -236,6 +238,7 @@ import {
   type CanvasContextMenuKeyboardIntentInput,
   type CanvasContextMenuPositionInput,
   type CanvasFindInputKeyboardIntentInput,
+  type CanvasEraserStrokeHitTestStroke,
   type CanvasMenuRovingActiveIndexInput,
   type CanvasMenuTriggerKeyboardIntentInput,
   type CanvasModalBackdropPointerIntentInput,
@@ -1541,6 +1544,16 @@ describe('Canvas package consumer imports', () => {
         x: 0,
         y: 0,
       }
+    const packageEraserStrokes: CanvasEraserStrokeHitTestStroke[] = [{
+      id: 'freeform-1',
+      points: [{ x: 0, y: 0 }, { x: 100, y: 0 }],
+      strokeWidth: 4,
+    }]
+    const packageEraserPoints = getNextCanvasEraserPoints({
+      currentWorld: { x: 0, y: 10 },
+      pointDistance: 5,
+      points: [{ x: 0, y: 0 }],
+    })
     const packageRichClipboardJSON = stringifyCanvasRichClipboardPayload({
       kind: 'card',
     })
@@ -1625,6 +1638,18 @@ describe('Canvas package consumer imports', () => {
       x: 140,
       y: 60,
     })
+    expect(getCanvasEraserHitStrokeIds({
+      points: [{ x: 50, y: 6 }],
+      radius: 6,
+      strokes: packageEraserStrokes,
+    })).toEqual(['freeform-1'])
+    expect(packageEraserPoints).toEqual([
+      { x: 0, y: 0 },
+      { x: 0, y: 5 },
+      { x: 0, y: 10 },
+    ])
+    expect(CanvasAppFacade.getCanvasEraserHitStrokeIds)
+      .toBe(getCanvasEraserHitStrokeIds)
     expect(CANVAS_RICH_CLIPBOARD_JSON_SCRIPT_ATTRIBUTE)
       .toBe('data-canvas-rich-clipboard-json')
     expect(CanvasAppFacade.writeCanvasRichClipboardPayload)

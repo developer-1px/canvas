@@ -11,14 +11,13 @@ import { removeCanvasSelectionIds } from '../../../../foundation'
 import {
   getCanvasEraserHitItemIds,
   getCanvasMergedEraserHitIds,
+  getNextCanvasEraserPoints,
 } from './CanvasEraserHitTesting'
 import type { CanvasAppItemReadModel } from '../../../workflow/CanvasAppItemReadModelContracts'
 import type { CommitCanvasItemsChange } from '../../../workflow/CanvasWorkflowContract'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import type { Interaction } from './CanvasInteractionState'
 import { hasCanvasInteractionMoved } from './CanvasPointerInteractionMovement'
-
-const CANVAS_ERASER_POINT_DISTANCE = 4
 
 export type CanvasPointerEraserInteraction = Extract<
   Interaction,
@@ -185,47 +184,4 @@ export function commitCanvasPointerEraserInteraction({
       after: removeCanvasSelectionIds({ ids: erased, selection }),
     },
   )
-}
-
-function getNextCanvasEraserPoints({
-  currentWorld,
-  points,
-}: {
-  currentWorld: Point
-  points: Point[]
-}) {
-  const lastPoint = points[points.length - 1]
-
-  if (!lastPoint) {
-    return [currentWorld]
-  }
-
-  const distance = getCanvasPointDistance(lastPoint, currentWorld)
-
-  if (distance < CANVAS_ERASER_POINT_DISTANCE) {
-    return points
-  }
-
-  const nextPoints = [...points]
-
-  for (
-    let offset = CANVAS_ERASER_POINT_DISTANCE;
-    offset < distance;
-    offset += CANVAS_ERASER_POINT_DISTANCE
-  ) {
-    const ratio = offset / distance
-
-    nextPoints.push({
-      x: lastPoint.x + (currentWorld.x - lastPoint.x) * ratio,
-      y: lastPoint.y + (currentWorld.y - lastPoint.y) * ratio,
-    })
-  }
-
-  nextPoints.push(currentWorld)
-
-  return nextPoints
-}
-
-function getCanvasPointDistance(left: Point, right: Point) {
-  return Math.hypot(left.x - right.x, left.y - right.y)
 }

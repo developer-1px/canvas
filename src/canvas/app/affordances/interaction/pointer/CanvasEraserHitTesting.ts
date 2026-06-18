@@ -7,6 +7,32 @@ import {
 import type { CanvasAppItemReadModel } from '../../../workflow/CanvasAppItemReadModelContracts'
 
 const CANVAS_ERASER_RADIUS = 14
+const CANVAS_ERASER_POINT_DISTANCE = 4
+
+export type CanvasEraserStrokeHitTestStroke<
+  TId extends string = string,
+> = Readonly<{
+  id: TId
+  locked?: boolean
+  points: readonly Point[]
+  strokeWidth: number
+  visible?: boolean
+}>
+
+export type CanvasEraserStrokeHitTestInput<
+  TId extends string = string,
+> = Readonly<{
+  points: readonly Point[]
+  radius?: number
+  strokes: readonly CanvasEraserStrokeHitTestStroke<TId>[]
+  targetStrokeId?: TId
+}>
+
+export type CanvasNextEraserPointsInput = Readonly<{
+  currentWorld: Point
+  pointDistance?: number
+  points: readonly Point[]
+}>
 
 export function getCanvasEraserHitItemIds({
   itemReadModel,
@@ -22,55 +48,101 @@ export function getCanvasEraserHitItemIds({
   targetItemId?: string
 }) {
   const sceneIds = new Set(scene.entries.map((entry) => entry.id))
-  const targetItem = targetItemId ? itemReadModel.findItem(targetItemId) : null
-  const targetIds =
-    targetItem &&
-    sceneIds.has(targetItem.id) &&
-    isCanvasStrokeDrawingItem(targetItem)
-      ? [targetItem.id]
-      : []
 
-  return getCanvasMergedEraserHitIds(
-    targetIds,
-    itemReadModel
+  return getCanvasEraserHitStrokeIds({
+    points,
+    radius,
+    strokes: itemReadModel
       .getAllItems()
-      .filter(
-        (item): item is CanvasStrokeDrawingItem =>
-          sceneIds.has(item.id) && isCanvasStrokeDrawingItem(item),
-      )
       .flatMap((item) =>
-        isCanvasEraserHittingStroke({
-          item,
-          points,
-          radius,
-        })
-          ? [item.id]
-          : [],
-      ),
-  )
+        sceneIds.has(item.id) && isCanvasStrokeDrawingItem(item)
+          ? [toCanvasEraserStrokeHitTestStroke(item)]
+          : []),
+    targetStrokeId: targetItemId,
+  })
 }
 
-export function getCanvasMergedEraserHitIds(
-  left: readonly string[],
-  right: readonly string[],
+export function getCanvasMergedEraserHitIds<TId extends string = string>(
+  left: readonly TId[],
+  right: readonly TId[],
 ) {
   return Array.from(new Set([...left, ...right]))
 }
 
+export function getCanvasEraserHitStrokeIds<TId extends string = string>({
+  points,
+  radius = CANVAS_ERASER_RADIUS,
+  strokes,
+  targetStrokeId,
+}: CanvasEraserStrokeHitTestInput<TId>): TId[] {
+  const hitTestableStrokes = strokes.filter(isCanvasEraserStrokeHitTestable)
+  const targetIds: TId[] = targetStrokeId &&
+    hitTestableStrokes.some((stroke) => stroke.id === targetStrokeId)
+    ? [targetStrokeId]
+    : []
+  const hitIds = hitTestableStrokes.flatMap((stroke) =>
+    isCanvasEraserHittingStroke({
+      points,
+      radius,
+      stroke,
+    })
+      ? [stroke.id]
+      : [])
+
+  return getCanvasMergedEraserHitIds(targetIds, hitIds)
+}
+
+export function getNextCanvasEraserPoints({
+  currentWorld,
+  pointDistance = CANVAS_ERASER_POINT_DISTANCE,
+  points,
+}: CanvasNextEraserPointsInput): Point[] {
+  const lastPoint = points[points.length - 1]
+
+  if (!lastPoint) {
+    return [currentWorld]
+  }
+
+  const distance = getCanvasPointDistance(lastPoint, currentWorld)
+
+  if (distance < pointDistance) {
+    return [...points]
+  }
+
+  const nextPoints = [...points]
+
+  for (
+    let offset = pointDistance;
+    offset < distance;
+    offset += pointDistance
+  ) {
+    const ratio = offset / distance
+
+    nextPoints.push({
+      x: lastPoint.x + (currentWorld.x - lastPoint.x) * ratio,
+      y: lastPoint.y + (currentWorld.y - lastPoint.y) * ratio,
+    })
+  }
+
+  nextPoints.push(currentWorld)
+
+  return nextPoints
+}
+
 function isCanvasEraserHittingStroke({
-  item,
+  stroke,
   points,
   radius,
 }: {
-  item: CanvasStrokeDrawingItem
-  points: Point[]
+  points: readonly Point[]
   radius: number
+  stroke: CanvasEraserStrokeHitTestStroke
 }) {
   return points.some((point) =>
     isCanvasPointNearStroke({
       point,
-      radius: radius + item.strokeWidth / 2,
-      strokePoints: item.points,
+      radius: radius + stroke.strokeWidth / 2,
+      strokePoints: stroke.points,
     }),
   )
 }
@@ -82,7 +154,7 @@ function isCanvasPointNearStroke({
 }: {
   point: Point
   radius: number
-  strokePoints: Point[]
+  strokePoints: readonly Point[]
 }) {
   const [first, second, ...rest] = strokePoints
 
@@ -130,4 +202,21 @@ function getCanvasPointToSegmentDistance(
 
 function getCanvasPointDistance(left: Point, right: Point) {
   return Math.hypot(left.x - right.x, left.y - right.y)
+}
+
+function isCanvasEraserStrokeHitTestable<TId extends string>(
+  stroke: CanvasEraserStrokeHitTestStroke<TId>,
+) {
+  return stroke.visible !== false && stroke.locked !== true
+}
+
+function toCanvasEraserStrokeHitTestStroke(
+  item: CanvasStrokeDrawingItem,
+): CanvasEraserStrokeHitTestStroke {
+  return {
+    id: item.id,
+    locked: item.locked,
+    points: item.points,
+    strokeWidth: item.strokeWidth,
+  }
 }
