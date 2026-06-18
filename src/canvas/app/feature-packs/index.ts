@@ -350,6 +350,8 @@ export {
   type CanvasFindInputKeyboardIntentInput,
 } from './find-replace'
 export {
+  CANVAS_IMAGE_FILE_IMPORT_SUPPORTED_FORMATS,
+  CANVAS_IMAGE_SOURCE_IMPORT_SUPPORTED_FORMATS,
   routeCanvasImagePasteReplace,
   useCanvasImageControls,
   type CanvasImageControlsInput,

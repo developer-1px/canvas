@@ -26,6 +26,8 @@ import {
   CANVAS_WHEEL_VIEWPORT_ZOOM_MODIFIER,
   CANVAS_WHEEL_PASSTHROUGH_SELECTOR,
   CANVAS_RICH_CLIPBOARD_JSON_SCRIPT_ATTRIBUTE,
+  CANVAS_IMAGE_FILE_IMPORT_SUPPORTED_FORMATS,
+  CANVAS_IMAGE_SOURCE_IMPORT_SUPPORTED_FORMATS,
   CANVAS_RICH_TEXT_PASTE_SUPPORTED_FORMATS,
   CANVAS_TABLE_CSV_MIME_TYPES,
   CANVAS_TABLE_FILE_IMPORT_SUPPORTED_FORMATS,
@@ -4718,6 +4720,25 @@ describe('Canvas package consumer imports', () => {
       .toBeTypeOf('function')
     expect(CanvasAppFacade.CANVAS_IMAGE_IMPORT_MODEL).toBe(
       'canvas-image-import',
+    )
+    expect(CanvasAppAuthoring.CANVAS_IMAGE_FILE_IMPORT_SUPPORTED_FORMATS)
+      .toEqual(CANVAS_IMAGE_FILE_IMPORT_SUPPORTED_FORMATS)
+    expect(CanvasAppFacade.CANVAS_IMAGE_FILE_IMPORT_SUPPORTED_FORMATS)
+      .toEqual([
+        'Files',
+        'image/*',
+      ])
+    expect(CanvasPackage.CANVAS_IMAGE_FILE_IMPORT_SUPPORTED_FORMATS).toEqual(
+      CanvasAppFacade.CANVAS_IMAGE_FILE_IMPORT_SUPPORTED_FORMATS,
+    )
+    expect(CanvasAppFacade.CANVAS_IMAGE_SOURCE_IMPORT_SUPPORTED_FORMATS)
+      .toEqual([
+        'image/svg+xml',
+        'text/html',
+        'text/plain',
+      ])
+    expect(CanvasPackage.CANVAS_IMAGE_SOURCE_IMPORT_SUPPORTED_FORMATS).toEqual(
+      CANVAS_IMAGE_SOURCE_IMPORT_SUPPORTED_FORMATS,
     )
     expect(CanvasAppFacade.getCanvasImageFilesFromDataTransfer(null)).toEqual(
       [],

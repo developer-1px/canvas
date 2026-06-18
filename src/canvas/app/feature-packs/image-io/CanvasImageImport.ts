@@ -6,6 +6,9 @@ import {
   createCanvasImageItem,
   isCanvasImageMimeType,
 } from '../../../host'
+import {
+  CANVAS_DATA_TRANSFER_TEXT_MIME_TYPE,
+} from '../../affordances/commands/CanvasDataTransferText'
 
 export type CanvasImageImportSource = {
   dataUrl: string
@@ -91,6 +94,22 @@ export type CanvasImagePasteReplaceRouteInput = Readonly<{
 }>
 
 export const CANVAS_IMAGE_IMPORT_MODEL = 'canvas-image-import'
+
+export const CANVAS_IMAGE_FILE_IMPORT_SUPPORTED_FORMATS = Object.freeze([
+  'Files',
+  'image/*',
+] as const)
+export const CANVAS_IMAGE_SOURCE_IMPORT_SUPPORTED_FORMATS = Object.freeze([
+  'image/svg+xml',
+  'text/html',
+  CANVAS_DATA_TRANSFER_TEXT_MIME_TYPE,
+] as const)
+const CANVAS_IMAGE_SOURCE_SVG_MIME_TYPE =
+  CANVAS_IMAGE_SOURCE_IMPORT_SUPPORTED_FORMATS[0]
+const CANVAS_IMAGE_SOURCE_HTML_MIME_TYPE =
+  CANVAS_IMAGE_SOURCE_IMPORT_SUPPORTED_FORMATS[1]
+const CANVAS_IMAGE_SOURCE_TEXT_MIME_TYPE =
+  CANVAS_IMAGE_SOURCE_IMPORT_SUPPORTED_FORMATS[2]
 
 const DEFAULT_IMAGE_WIDTH = 320
 const DEFAULT_IMAGE_HEIGHT = 220
@@ -249,7 +268,7 @@ export function getCanvasSVGImageSourceFromDataTransfer(
   }
 
   const svgMimeSource = getCanvasSVGImageSourceFromMarkup(
-    dataTransfer.getData('image/svg+xml'),
+    dataTransfer.getData(CANVAS_IMAGE_SOURCE_SVG_MIME_TYPE),
     'svg-mime',
   )
 
@@ -258,7 +277,7 @@ export function getCanvasSVGImageSourceFromDataTransfer(
   }
 
   const htmlSource = getCanvasSVGImageSourceFromHTML(
-    dataTransfer.getData('text/html'),
+    dataTransfer.getData(CANVAS_IMAGE_SOURCE_HTML_MIME_TYPE),
   )
 
   if (htmlSource) {
@@ -266,7 +285,7 @@ export function getCanvasSVGImageSourceFromDataTransfer(
   }
 
   return getCanvasSVGImageSourceFromMarkup(
-    dataTransfer.getData('text/plain'),
+    dataTransfer.getData(CANVAS_IMAGE_SOURCE_TEXT_MIME_TYPE),
     'svg-plain',
   )
 }
@@ -278,9 +297,11 @@ export function getCanvasDataImageSourceFromDataTransfer(
     return null
   }
 
-  return getCanvasDataImageSourceFromHTML(dataTransfer.getData('text/html')) ??
+  return getCanvasDataImageSourceFromHTML(
+    dataTransfer.getData(CANVAS_IMAGE_SOURCE_HTML_MIME_TYPE),
+  ) ??
     getCanvasDataImageSourceFromDataUrl(
-      dataTransfer.getData('text/plain'),
+      dataTransfer.getData(CANVAS_IMAGE_SOURCE_TEXT_MIME_TYPE),
       'data-url-plain',
     )
 }
@@ -292,7 +313,9 @@ export function getCanvasHTMLDataImageSourcesFromDataTransfer(
     return []
   }
 
-  return getCanvasHTMLDataImageSources(dataTransfer.getData('text/html'))
+  return getCanvasHTMLDataImageSources(
+    dataTransfer.getData(CANVAS_IMAGE_SOURCE_HTML_MIME_TYPE),
+  )
 }
 
 export function getCanvasImageSourceFromDataTransfer(

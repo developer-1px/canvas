@@ -444,6 +444,8 @@ export {
   getCanvasAppEnabledFeaturePackIds,
   getCanvasAppEnabledFeaturePackManifestIds,
   getCanvasAppEnabledFeaturePackManifests,
+  CANVAS_IMAGE_FILE_IMPORT_SUPPORTED_FORMATS,
+  CANVAS_IMAGE_SOURCE_IMPORT_SUPPORTED_FORMATS,
   routeCanvasImagePasteReplace,
   getCanvasMediaSourceFromDataTransfer,
   getCanvasMediaSourceFromJSONDataTransfer,

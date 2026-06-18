@@ -1,6 +1,8 @@
 import { describe, expect, it, vi } from 'vitest'
 import {
+  CANVAS_IMAGE_FILE_IMPORT_SUPPORTED_FORMATS,
   CANVAS_IMAGE_IMPORT_MODEL,
+  CANVAS_IMAGE_SOURCE_IMPORT_SUPPORTED_FORMATS,
   createCanvasImportedImageItem,
   getCanvasImportedImageSize,
   getCanvasDataImageSourceFromDataTransfer,
@@ -8,6 +10,7 @@ import {
   getCanvasImageFileFromDataTransfer,
   getCanvasImageFilesFromDataTransfer,
   getCanvasImageFilesFromList,
+  getCanvasImageSourceFromDataTransfer,
   getCanvasSVGImageSourceFromDataTransfer,
   readCanvasImageFileSources,
   routeCanvasImagePasteReplace,
@@ -16,6 +19,45 @@ import {
 describe('CanvasImageImport', () => {
   it('exposes a stable model metadata value', () => {
     expect(CANVAS_IMAGE_IMPORT_MODEL).toBe('canvas-image-import')
+  })
+
+  it('exposes supported clipboard and file formats in reader priority order', () => {
+    expect(CANVAS_IMAGE_FILE_IMPORT_SUPPORTED_FORMATS).toEqual([
+      'Files',
+      'image/*',
+    ])
+    expect(CANVAS_IMAGE_SOURCE_IMPORT_SUPPORTED_FORMATS).toEqual([
+      'image/svg+xml',
+      'text/html',
+      'text/plain',
+    ])
+  })
+
+  it('reads every advertised image source format through the DataTransfer reader', () => {
+    const fixtures = {
+      'image/svg+xml': {
+        format: 'svg-mime',
+        text: '<svg width="120" height="80"><rect width="120" height="80"/></svg>',
+      },
+      'text/html': {
+        format: 'data-url-html-img',
+        text: '<figure><img alt="Copied Chart" src="data:image/png;base64,aW1hZ2U="></figure>',
+      },
+      'text/plain': {
+        format: 'data-url-plain',
+        text: 'data:image/jpg;base64,aW1hZ2U=',
+      },
+    } as const
+
+    for (const type of CANVAS_IMAGE_SOURCE_IMPORT_SUPPORTED_FORMATS) {
+      const fixture = fixtures[type]
+
+      expect(getCanvasImageSourceFromDataTransfer(createDataTransfer({
+        [type]: fixture.text,
+      }))).toMatchObject({
+        format: fixture.format,
+      })
+    }
   })
 
   it('creates a centered image item from imported source metadata', () => {

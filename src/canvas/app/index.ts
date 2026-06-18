@@ -424,7 +424,9 @@ export {
   type CanvasInlineEditKeyboardIntentInput,
 } from './affordances/editing/text-editor/CanvasInlineEditDom'
 export {
+  CANVAS_IMAGE_FILE_IMPORT_SUPPORTED_FORMATS,
   CANVAS_IMAGE_IMPORT_MODEL,
+  CANVAS_IMAGE_SOURCE_IMPORT_SUPPORTED_FORMATS,
   createCanvasImportedImageItem,
   getCanvasDataImageSourceFromDataTransfer,
   getCanvasHTMLDataImageSourcesFromDataTransfer,

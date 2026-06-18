@@ -26,6 +26,8 @@ export {
   type CanvasImageExportStageSnapshot,
 } from './CanvasImageExport'
 export {
+  CANVAS_IMAGE_FILE_IMPORT_SUPPORTED_FORMATS,
+  CANVAS_IMAGE_SOURCE_IMPORT_SUPPORTED_FORMATS,
   createCanvasImportedImageItem,
   getCanvasDataImageSourceFromDataTransfer,
   getCanvasHTMLDataImageSourcesFromDataTransfer,
