@@ -313,9 +313,16 @@ export {
   type CanvasFindInputKeyboardIntentInput,
 } from './find-replace'
 export {
+  routeCanvasImagePasteReplace,
   useCanvasImageControls,
   type CanvasImageControlsInput,
   type CanvasImageControlsModel,
+  type CanvasImageImportSource,
+  type CanvasImagePasteReplaceFallbackReason,
+  type CanvasImagePasteReplaceIntent,
+  type CanvasImagePasteReplaceRoute,
+  type CanvasImagePasteReplaceRouteInput,
+  type CanvasImagePasteReplaceTarget,
 } from './image-io'
 export {
   assertCanvasMediaImporter,

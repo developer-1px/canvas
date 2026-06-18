@@ -22,6 +22,9 @@ describe('Canvas App IO boundaries', () => {
     const imageImportFile = getSourceFile(
       'src/canvas/app/feature-packs/image-io/CanvasImageImport.ts',
     )
+    const imageIndexFile = getSourceFile(
+      'src/canvas/app/feature-packs/image-io/index.ts',
+    )
     const imageClipboardFile = getSourceFile(
       'src/canvas/app/feature-packs/image-io/CanvasImageClipboard.ts',
     )
@@ -55,6 +58,10 @@ describe('Canvas App IO boundaries', () => {
     )
     expect(imageImportFile.source).toContain('FileReader')
     expect(imageImportFile.source).toContain('readAsDataURL')
+    expect(imageImportFile.source).toContain(
+      'export function routeCanvasImagePasteReplace',
+    )
+    expect(imageIndexFile.source).toContain('routeCanvasImagePasteReplace')
     expect(imageClipboardFile.source).toContain('navigator.clipboard')
     expect(imageClipboardFile.source).toContain('ClipboardItem')
     expect(imageExportFile.source).toContain('getSelectionSvgSnapshot')

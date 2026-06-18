@@ -5,6 +5,7 @@ import {
   getCanvasImportedImageSize,
   getCanvasDataImageSourceFromDataTransfer,
   getCanvasSVGImageSourceFromDataTransfer,
+  routeCanvasImagePasteReplace,
 } from './CanvasImageImport'
 
 describe('CanvasImageImport', () => {
@@ -144,6 +145,176 @@ describe('CanvasImageImport', () => {
     expect(getCanvasDataImageSourceFromDataTransfer(createDataTransfer({
       'text/plain': `data:image/svg+xml,${encodeURIComponent('<svg></svg>')}`,
     }))).toBeNull()
+  })
+
+  it('routes a single pasted image source to a host replace target', () => {
+    const source = {
+      dataUrl: 'data:image/png;base64,aW1hZ2U=',
+      format: 'file' as const,
+      mimeType: 'image/png',
+      name: 'screen.png',
+      naturalHeight: 720,
+      naturalWidth: 1040,
+    }
+    const getTarget = vi.fn(() => ({
+      id: 'image-1',
+      selection: ['image-1'],
+    }))
+    const route = routeCanvasImagePasteReplace({
+      getTarget,
+      selection: ['image-1'],
+      sources: [source],
+    })
+
+    expect(route).toEqual({
+      intent: {
+        kind: 'image-replace',
+        source,
+        target: {
+          id: 'image-1',
+          selection: ['image-1'],
+        },
+      },
+      kind: 'image-replace',
+      source,
+      status: 'routed',
+    })
+    expect(Object.isFrozen(route)).toBe(true)
+    expect(getTarget).toHaveBeenCalledWith({
+      selection: ['image-1'],
+      source,
+    })
+  })
+
+  it('routes SVG MIME and HTML data image sources with metadata', () => {
+    const getTarget = vi.fn(({ selection }) => ({
+      id: selection[0] ?? 'image-1',
+      selection,
+    }))
+    const svgRoute = routeCanvasImagePasteReplace({
+      getTarget,
+      selection: ['image-1'],
+      sources: [{
+        dataUrl: 'data:image/svg+xml;charset=utf-8,%3Csvg%3E%3C%2Fsvg%3E',
+        format: 'svg-mime',
+        mimeType: 'image/svg+xml',
+        name: 'clipboard.svg',
+        naturalHeight: 80,
+        naturalWidth: 120,
+      }],
+    })
+    const dataRoute = routeCanvasImagePasteReplace({
+      getTarget,
+      selection: ['image-2'],
+      sources: [{
+        dataUrl: 'data:image/png;base64,aW1hZ2U=',
+        format: 'data-url-html-img',
+        mimeType: 'image/png',
+        name: 'Copied Chart.png',
+      }],
+    })
+
+    expect(svgRoute).toMatchObject({
+      intent: {
+        source: {
+          format: 'svg-mime',
+          mimeType: 'image/svg+xml',
+          name: 'clipboard.svg',
+          naturalHeight: 80,
+          naturalWidth: 120,
+        },
+        target: {
+          id: 'image-1',
+          selection: ['image-1'],
+        },
+      },
+      kind: 'image-replace',
+      status: 'routed',
+    })
+    expect(dataRoute).toMatchObject({
+      intent: {
+        source: {
+          format: 'data-url-html-img',
+          mimeType: 'image/png',
+          name: 'Copied Chart.png',
+        },
+        target: {
+          id: 'image-2',
+          selection: ['image-2'],
+        },
+      },
+      kind: 'image-replace',
+      status: 'routed',
+    })
+  })
+
+  it('falls back to image insertion when no replace target is available', () => {
+    const source = {
+      dataUrl: 'data:image/png;base64,aW1hZ2U=',
+      mimeType: 'image/png',
+    }
+    const route = routeCanvasImagePasteReplace({
+      getTarget: () => null,
+      selection: [],
+      sources: [source],
+    })
+
+    expect(route).toEqual({
+      kind: 'image-insert',
+      reason: 'no-target',
+      sources: [source],
+      status: 'fallback',
+    })
+    expect(Object.isFrozen(route)).toBe(true)
+    expect(Object.isFrozen(route.sources)).toBe(true)
+  })
+
+  it('keeps disabled, empty, and batch paste sources on insert fallback', () => {
+    const source = {
+      dataUrl: 'data:image/png;base64,aW1hZ2U=',
+      mimeType: 'image/png',
+    }
+    const nextSource = {
+      dataUrl: 'data:image/jpeg;base64,aW1hZ2U=',
+      mimeType: 'image/jpeg',
+    }
+    const getTarget = vi.fn(() => ({
+      id: 'image-1',
+      selection: ['image-1'],
+    }))
+
+    expect(routeCanvasImagePasteReplace({
+      disabled: true,
+      getTarget,
+      selection: ['image-1'],
+      sources: [source],
+    })).toEqual({
+      kind: 'image-insert',
+      reason: 'disabled',
+      sources: [source],
+      status: 'fallback',
+    })
+    expect(routeCanvasImagePasteReplace({
+      getTarget,
+      selection: ['image-1'],
+      sources: [],
+    })).toEqual({
+      kind: 'image-insert',
+      reason: 'no-source',
+      sources: [],
+      status: 'fallback',
+    })
+    expect(routeCanvasImagePasteReplace({
+      getTarget,
+      selection: ['image-1'],
+      sources: [source, nextSource],
+    })).toEqual({
+      kind: 'image-insert',
+      reason: 'batch',
+      sources: [source, nextSource],
+      status: 'fallback',
+    })
+    expect(getTarget).not.toHaveBeenCalled()
   })
 
   it('ignores non-image clipboard HTML and text', () => {

@@ -41,6 +41,55 @@ export type CanvasImportedImageSizeOptions = {
   maxSize?: Partial<CanvasImportedImageSize>
 }
 
+export type CanvasImagePasteReplaceTarget = Readonly<{
+  id: string
+  selection: readonly string[]
+}>
+
+export type CanvasImagePasteReplaceTargetInput = Readonly<{
+  selection: readonly string[]
+  source: CanvasImageImportSource
+}>
+
+export type CanvasImagePasteReplaceIntent = Readonly<{
+  kind: 'image-replace'
+  source: CanvasImageImportSource
+  target: CanvasImagePasteReplaceTarget
+}>
+
+export type CanvasImagePasteReplaceRoute =
+  | CanvasImagePasteReplaceFallbackRoute
+  | CanvasImagePasteReplaceRoutedRoute
+
+export type CanvasImagePasteReplaceRoutedRoute = Readonly<{
+  intent: CanvasImagePasteReplaceIntent
+  kind: 'image-replace'
+  source: CanvasImageImportSource
+  status: 'routed'
+}>
+
+export type CanvasImagePasteReplaceFallbackReason =
+  | 'batch'
+  | 'disabled'
+  | 'no-source'
+  | 'no-target'
+
+export type CanvasImagePasteReplaceFallbackRoute = Readonly<{
+  kind: 'image-insert'
+  reason: CanvasImagePasteReplaceFallbackReason
+  sources: readonly CanvasImageImportSource[]
+  status: 'fallback'
+}>
+
+export type CanvasImagePasteReplaceRouteInput = Readonly<{
+  disabled?: boolean
+  getTarget: (
+    input: CanvasImagePasteReplaceTargetInput
+  ) => CanvasImagePasteReplaceTarget | null
+  selection: readonly string[]
+  sources: readonly CanvasImageImportSource[]
+}>
+
 export const CANVAS_IMAGE_IMPORT_MODEL = 'canvas-image-import'
 
 const DEFAULT_IMAGE_WIDTH = 320
@@ -67,6 +116,58 @@ export function createCanvasImportedImageItem({
     w: size.w,
     x: center.x - size.w / 2,
     y: center.y - size.h / 2,
+  })
+}
+
+export function routeCanvasImagePasteReplace({
+  disabled = false,
+  getTarget,
+  selection,
+  sources,
+}: CanvasImagePasteReplaceRouteInput): CanvasImagePasteReplaceRoute {
+  if (disabled) {
+    return createCanvasImagePasteReplaceFallbackRoute({
+      reason: 'disabled',
+      sources,
+    })
+  }
+
+  if (sources.length === 0) {
+    return createCanvasImagePasteReplaceFallbackRoute({
+      reason: 'no-source',
+      sources,
+    })
+  }
+
+  if (sources.length > 1) {
+    return createCanvasImagePasteReplaceFallbackRoute({
+      reason: 'batch',
+      sources,
+    })
+  }
+
+  const source = sources[0]!
+  const target = getTarget({
+    selection,
+    source,
+  })
+
+  if (!target) {
+    return createCanvasImagePasteReplaceFallbackRoute({
+      reason: 'no-target',
+      sources,
+    })
+  }
+
+  return Object.freeze({
+    intent: Object.freeze({
+      kind: 'image-replace',
+      source,
+      target,
+    }),
+    kind: 'image-replace',
+    source,
+    status: 'routed',
   })
 }
 
@@ -210,6 +311,21 @@ options: CanvasImportedImageSizeOptions = {},
     h: Math.max(1, Math.round(naturalHeight * scale)),
     w: Math.max(1, Math.round(naturalWidth * scale)),
   }
+}
+
+function createCanvasImagePasteReplaceFallbackRoute({
+  reason,
+  sources,
+}: {
+  reason: CanvasImagePasteReplaceFallbackReason
+  sources: readonly CanvasImageImportSource[]
+}): CanvasImagePasteReplaceFallbackRoute {
+  return Object.freeze({
+    kind: 'image-insert',
+    reason,
+    sources: Object.freeze([...sources]),
+    status: 'fallback',
+  })
 }
 
 function readCanvasBlobAsDataUrl(blob: Blob) {

@@ -32,6 +32,7 @@ import {
   createCanvasAppFeaturePackMarketplaceListing,
   getCanvasAppFeaturePackMarketplaceActionAssemblyPlan,
   getCanvasAppFeaturePackMarketplaceActionAssemblyInput,
+  routeCanvasImagePasteReplace,
   routeCanvasMediaSourceObjectHyperlink,
   createCanvasAppFeaturePackViewRenderers,
   createCanvasAppViewFeaturePack,
@@ -162,6 +163,7 @@ import {
   type CanvasAppFeaturePackSuiteManifest,
   type CanvasAppFeaturePackViewRenderers,
   type CanvasStoryCanvasFeaturePackManifestsInput,
+  type CanvasImagePasteReplaceRoute,
   type CanvasMediaObjectHyperlinkRoute,
   type CanvasAppCustomItemModule,
   type CanvasAppCustomItemRenderKeyStrategy,
@@ -1596,6 +1598,12 @@ describe('Canvas package consumer imports', () => {
       .toBeTypeOf('function')
     expect(CanvasPackage.createCanvasStoryCanvasFeaturePackManifests)
       .toBeTypeOf('function')
+    expect(CanvasAppAuthoring.routeCanvasImagePasteReplace)
+      .toBeTypeOf('function')
+    expect(CanvasAppFacade.routeCanvasImagePasteReplace)
+      .toBeTypeOf('function')
+    expect(CanvasPackage.routeCanvasImagePasteReplace)
+      .toBeTypeOf('function')
     expect(CanvasAppAuthoring.routeCanvasMediaSourceObjectHyperlink)
       .toBeTypeOf('function')
     expect(CanvasAppFacade.routeCanvasMediaSourceObjectHyperlink)
@@ -1950,6 +1958,36 @@ describe('Canvas package consumer imports', () => {
         url: 'https://example.com/reference',
       },
       kind: 'object-hyperlink',
+      status: 'routed',
+    })
+    const imagePasteReplaceRoute: CanvasImagePasteReplaceRoute =
+      routeCanvasImagePasteReplace({
+        getTarget: ({ selection }) => ({
+          id: selection[0] ?? 'consumer-image-one',
+          selection,
+        }),
+        selection: ['consumer-image-one'],
+        sources: [{
+          dataUrl: 'data:image/png;base64,aW1hZ2U=',
+          mimeType: 'image/png',
+          name: 'consumer-image.png',
+        }],
+      })
+
+    expect(imagePasteReplaceRoute).toMatchObject({
+      intent: {
+        kind: 'image-replace',
+        source: {
+          dataUrl: 'data:image/png;base64,aW1hZ2U=',
+          mimeType: 'image/png',
+          name: 'consumer-image.png',
+        },
+        target: {
+          id: 'consumer-image-one',
+          selection: ['consumer-image-one'],
+        },
+      },
+      kind: 'image-replace',
       status: 'routed',
     })
     expect(downloadCanvasBlobFile({
