@@ -62,6 +62,7 @@ describe('Canvas App folder structure', () => {
       'shortcut-help',
       'stamp-authoring',
       'status-bar',
+      'story-import',
       'story-preview',
       'table-import',
       'text-paste-import',

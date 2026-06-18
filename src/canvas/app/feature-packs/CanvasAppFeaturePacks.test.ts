@@ -69,6 +69,9 @@ import {
 import {
   CANVAS_STORY_PREVIEW_ITEMS_FEATURE_PACK_ID,
 } from './story-preview'
+import {
+  CANVAS_APP_STORY_IMPORT_FEATURE_PACK_MANIFEST,
+} from './story-import'
 
 describe('CanvasAppFeaturePacks', () => {
   it('installs feature pack extension bundles in pack order', () => {
@@ -519,7 +522,10 @@ describe('CanvasAppFeaturePacks', () => {
       (manifest) => manifest.id,
     )).toEqual([CANVAS_STORY_CANVAS_SUITE_ID])
     expect(CANVAS_STORY_CANVAS_FEATURE_PACK_SUITE_MANIFEST.featurePackIds)
-      .toEqual([CANVAS_STORY_PREVIEW_ITEMS_FEATURE_PACK_ID])
+      .toEqual([
+        CANVAS_STORY_PREVIEW_ITEMS_FEATURE_PACK_ID,
+        CANVAS_APP_STORY_IMPORT_FEATURE_PACK_MANIFEST.id,
+      ])
     expect(() =>
       getCanvasAppFeaturePackSuiteFeaturePackIds(
         [suiteManifest],
@@ -555,10 +561,16 @@ describe('CanvasAppFeaturePacks', () => {
       label: 'Minimal viewer',
     })
     expect(CANVAS_APP_STORY_VIEWER_FEATURE_PACK_PROFILE).toEqual({
-      enabledFeaturePackIds: [CANVAS_STORY_PREVIEW_ITEMS_FEATURE_PACK_ID],
+      enabledFeaturePackIds: [
+        CANVAS_STORY_PREVIEW_ITEMS_FEATURE_PACK_ID,
+        CANVAS_APP_STORY_IMPORT_FEATURE_PACK_MANIFEST.id,
+      ],
       enabledSuiteIds: [CANVAS_STORY_CANVAS_SUITE_ID],
       id: 'story-viewer',
-      installedFeaturePackIds: [CANVAS_STORY_PREVIEW_ITEMS_FEATURE_PACK_ID],
+      installedFeaturePackIds: [
+        CANVAS_STORY_PREVIEW_ITEMS_FEATURE_PACK_ID,
+        CANVAS_APP_STORY_IMPORT_FEATURE_PACK_MANIFEST.id,
+      ],
       installedSuiteIds: [CANVAS_STORY_CANVAS_SUITE_ID],
       label: 'Story viewer',
     })
@@ -584,12 +596,14 @@ describe('CanvasAppFeaturePacks', () => {
     })).toEqual({
       enabledFeaturePackIds: [
         CANVAS_STORY_PREVIEW_ITEMS_FEATURE_PACK_ID,
+        CANVAS_APP_STORY_IMPORT_FEATURE_PACK_MANIFEST.id,
         'zoom-controls',
       ],
       enabledSuiteIds: [CANVAS_STORY_CANVAS_SUITE_ID],
       id: 'story-and-zoom',
       installedFeaturePackIds: [
         CANVAS_STORY_PREVIEW_ITEMS_FEATURE_PACK_ID,
+        CANVAS_APP_STORY_IMPORT_FEATURE_PACK_MANIFEST.id,
         'zoom-controls',
       ],
       installedSuiteIds: [CANVAS_STORY_CANVAS_SUITE_ID],
@@ -613,12 +627,17 @@ describe('CanvasAppFeaturePacks', () => {
     expect(getCanvasAppFeaturePackProfileRuntimeStates({
       featurePackIds: [
         CANVAS_STORY_PREVIEW_ITEMS_FEATURE_PACK_ID,
+        CANVAS_APP_STORY_IMPORT_FEATURE_PACK_MANIFEST.id,
         'zoom-controls',
       ],
       profile: CANVAS_APP_STORY_VIEWER_FEATURE_PACK_PROFILE,
     })).toEqual([
       {
         id: CANVAS_STORY_PREVIEW_ITEMS_FEATURE_PACK_ID,
+        status: 'enabled',
+      },
+      {
+        id: CANVAS_APP_STORY_IMPORT_FEATURE_PACK_MANIFEST.id,
         status: 'enabled',
       },
       {

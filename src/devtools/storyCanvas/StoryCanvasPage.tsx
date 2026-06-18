@@ -9,6 +9,7 @@ import {
 import { useTranslation } from '../support/storyCanvasLanguage';
 import {
   CANVAS_APP_READ_ONLY_CAPABILITIES,
+  CANVAS_APP_STORY_IMPORT_FEATURE_PACK_MANIFEST,
   CanvasApp,
   type CanvasAppAssemblyInput,
   type CanvasItem,
@@ -551,7 +552,10 @@ export default function StoryCanvasPage({ preset = 'default' }: { preset?: Story
   }, [elementSelection, scheduleUrlStateReplace, selectedPagePath, selectedStoryId]);
 
   const assemblyInput = useMemo<CanvasAppAssemblyInput>(() => ({
-    additionalFeaturePackManifests: [storyPreviewManifest],
+    additionalFeaturePackManifests: [
+      storyPreviewManifest,
+      CANVAS_APP_STORY_IMPORT_FEATURE_PACK_MANIFEST,
+    ],
     affordanceConfig: STORY_CANVAS_AFFORDANCE_CONFIG,
     capabilities: CANVAS_APP_READ_ONLY_CAPABILITIES,
     featurePackProfile: STORY_CANVAS_FEATURE_PACK_PROFILE,

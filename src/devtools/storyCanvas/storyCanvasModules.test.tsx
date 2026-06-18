@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  CANVAS_APP_STORY_IMPORT_FEATURE_PACK_MANIFEST,
   CANVAS_STORY_CANVAS_SUITE_ID,
   CANVAS_STORY_PREVIEW_GROUP_PRESENTATION,
   CANVAS_STORY_PREVIEW_ITEMS_FEATURE_PACK_ID,
@@ -37,10 +38,12 @@ describe('storyCanvasModules', () => {
     ]);
     expect(STORY_CANVAS_FEATURE_PACK_PROFILE.installedFeaturePackIds).toEqual([
       CANVAS_STORY_PREVIEW_ITEMS_FEATURE_PACK_ID,
+      CANVAS_APP_STORY_IMPORT_FEATURE_PACK_MANIFEST.id,
       'zoom-controls',
     ]);
     expect(STORY_CANVAS_FEATURE_PACK_PROFILE.enabledFeaturePackIds).toEqual([
       CANVAS_STORY_PREVIEW_ITEMS_FEATURE_PACK_ID,
+      CANVAS_APP_STORY_IMPORT_FEATURE_PACK_MANIFEST.id,
       'zoom-controls',
     ]);
   });

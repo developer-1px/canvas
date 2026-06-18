@@ -1,0 +1,113 @@
+import type {
+  CanvasCustomItem,
+} from '../../../entities'
+import {
+  CANVAS_STORY_PREVIEW_GROUP_KIND,
+  CANVAS_STORY_PREVIEW_GROUP_PRESENTATION,
+  CANVAS_STORY_PREVIEW_ITEM_KIND,
+  CANVAS_STORY_PREVIEW_ITEM_PRESENTATION,
+  type CanvasStoryPreviewGroupData,
+  type CanvasStoryPreviewItemData,
+} from '../story-preview'
+
+export type CanvasStoryImportStory = Readonly<{
+  h: number
+  id: string
+  title: string
+  w: number
+  x: number
+  y: number
+}>
+
+export type CanvasStoryImportGroup = Readonly<{
+  count?: number
+  h: number
+  id: string
+  label?: string | null
+  stories: readonly CanvasStoryImportStory[]
+  title?: string
+  w: number
+  x: number
+  y: number
+}>
+
+export type CanvasStoryImportInput = Readonly<{
+  groups: readonly CanvasStoryImportGroup[]
+}>
+
+export function createCanvasStoryImportItems({
+  groups,
+}: CanvasStoryImportInput): readonly CanvasCustomItem[] {
+  const items: CanvasCustomItem[] = []
+  const itemIds = new Set<string>()
+
+  for (const group of groups) {
+    if (group.label) {
+      const groupItem = createCanvasStoryPreviewGroupItem(group)
+
+      assertCanvasStoryImportUniqueItemId(itemIds, groupItem.id)
+      items.push(groupItem)
+    }
+
+    for (const story of group.stories) {
+      const storyItem = createCanvasStoryPreviewItem(story)
+
+      assertCanvasStoryImportUniqueItemId(itemIds, storyItem.id)
+      items.push(storyItem)
+    }
+  }
+
+  return Object.freeze(items)
+}
+
+function createCanvasStoryPreviewGroupItem(
+  group: CanvasStoryImportGroup,
+): CanvasCustomItem & { data: CanvasStoryPreviewGroupData } {
+  const groupLabel = group.label ?? group.title ?? group.id
+
+  return {
+    data: {
+      count: group.count ?? group.stories.length,
+      groupLabel,
+    },
+    h: group.h,
+    id: `group-${group.id}`,
+    kind: CANVAS_STORY_PREVIEW_GROUP_KIND,
+    presentation: CANVAS_STORY_PREVIEW_GROUP_PRESENTATION,
+    title: group.title ?? groupLabel,
+    type: 'custom',
+    w: group.w,
+    x: group.x,
+    y: group.y,
+  }
+}
+
+function createCanvasStoryPreviewItem(
+  story: CanvasStoryImportStory,
+): CanvasCustomItem & { data: CanvasStoryPreviewItemData } {
+  return {
+    data: {
+      storyId: story.id,
+    },
+    h: story.h,
+    id: `story-${story.id}`,
+    kind: CANVAS_STORY_PREVIEW_ITEM_KIND,
+    presentation: CANVAS_STORY_PREVIEW_ITEM_PRESENTATION,
+    title: story.title,
+    type: 'custom',
+    w: story.w,
+    x: story.x,
+    y: story.y,
+  }
+}
+
+function assertCanvasStoryImportUniqueItemId(
+  itemIds: Set<string>,
+  itemId: string,
+) {
+  if (itemIds.has(itemId)) {
+    throw new Error(`Duplicate canvas story import item: ${itemId}`)
+  }
+
+  itemIds.add(itemId)
+}

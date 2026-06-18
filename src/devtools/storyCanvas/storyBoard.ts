@@ -1,9 +1,11 @@
 import type { CanvasCustomItem, CanvasItem } from '../../canvas';
 import {
+  CANVAS_APP_STORY_IMPORT_FEATURE_PACK_MANIFEST,
   CANVAS_STORY_PREVIEW_GROUP_KIND,
   CANVAS_STORY_PREVIEW_GROUP_PRESENTATION,
   CANVAS_STORY_PREVIEW_ITEM_KIND,
   CANVAS_STORY_PREVIEW_ITEM_PRESENTATION,
+  createCanvasStoryImportItems,
 } from '../../canvas';
 import {
   PREVIEW_INSET,
@@ -16,6 +18,8 @@ import {
   type StoryRecord,
 } from './storyData';
 
+export const STORY_IMPORT_FEATURE_PACK_ID =
+  CANVAS_APP_STORY_IMPORT_FEATURE_PACK_MANIFEST.id;
 export const STORY_WIDGET_KIND = CANVAS_STORY_PREVIEW_ITEM_KIND;
 export const STORY_WIDGET_PRESENTATION = CANVAS_STORY_PREVIEW_ITEM_PRESENTATION;
 export const STORY_GROUP_KIND = CANVAS_STORY_PREVIEW_GROUP_KIND;
@@ -347,34 +351,22 @@ function pushBlockItems(
   rowHeight: number,
 ) {
   const cellHeight = Math.max(block.h, rowHeight);
-
-  if (block.label) {
-    items.push({
-      data: { count: block.variants.length, groupLabel: block.label },
+  items.push(...createCanvasStoryImportItems({
+    groups: [{
       h: cellHeight,
-      id: `group-${toId(block.key)}`,
-      kind: STORY_GROUP_KIND,
-      presentation: STORY_GROUP_PRESENTATION,
-      title: block.label,
-      type: 'custom',
+      id: toId(block.key),
+      label: block.label,
+      stories: block.variants.map((variant) => ({
+        h: block.label ? variant.size.h : cellHeight,
+        id: variant.entry.id,
+        title: variant.entry.name,
+        w: variant.size.w,
+        x: x + variant.x,
+        y: y + variant.y,
+      })),
       w: block.w,
       x,
       y,
-    });
-  }
-
-  for (const variant of block.variants) {
-    items.push({
-      data: { storyId: variant.entry.id },
-      h: block.label ? variant.size.h : cellHeight,
-      id: `story-${variant.entry.id}`,
-      kind: STORY_WIDGET_KIND,
-      presentation: STORY_WIDGET_PRESENTATION,
-      title: variant.entry.name,
-      type: 'custom',
-      w: variant.size.w,
-      x: x + variant.x,
-      y: y + variant.y,
-    });
-  }
+    }],
+  }))
 }

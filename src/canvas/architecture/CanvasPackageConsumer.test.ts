@@ -41,6 +41,7 @@ import {
   writeCanvasClipboardText,
   defineCanvasAppCustomItemModule,
   CANVAS_APP_CORE_ONLY_FEATURE_PACK_PROFILE,
+  CANVAS_APP_STORY_IMPORT_FEATURE_PACK_MANIFEST,
   CANVAS_APP_STORY_VIEWER_FEATURE_PACK_PROFILE,
   CANVAS_STORY_CANVAS_FEATURE_PACK_SUITE_MANIFEST,
   CANVAS_STORY_CANVAS_SUITE_ID,
@@ -51,6 +52,7 @@ import {
   DEFAULT_CANVAS_APP_VIEW_FEATURE_PACK_MANIFESTS,
   createCanvasAppFeaturePackProfile,
   createCanvasAppFeaturePackSuiteManifest,
+  createCanvasStoryImportItems,
   getCanvasAppEnabledFeaturePackIds,
   getCanvasAppEnabledFeaturePackManifestIds,
   getCanvasAppEnabledFeaturePackManifests,
@@ -534,6 +536,26 @@ describe('Canvas package consumer imports', () => {
     )
     expect(CANVAS_APP_STORY_VIEWER_FEATURE_PACK_PROFILE.installedSuiteIds)
       .toEqual([CANVAS_STORY_CANVAS_SUITE_ID])
+    expect(CANVAS_APP_STORY_VIEWER_FEATURE_PACK_PROFILE.installedFeaturePackIds)
+      .toContain(CANVAS_APP_STORY_IMPORT_FEATURE_PACK_MANIFEST.id)
+    expect(createCanvasStoryImportItems({
+      groups: [{
+        h: 80,
+        id: 'consumer-story',
+        label: null,
+        stories: [{
+          h: 80,
+          id: 'consumer-story-default',
+          title: 'Consumer story',
+          w: 120,
+          x: 0,
+          y: 0,
+        }],
+        w: 120,
+        x: 0,
+        y: 0,
+      }],
+    }).map((item) => item.id)).toEqual(['story-consumer-story-default'])
     expect(storyPreviewManifest.extensionFeaturePack?.id)
       .toBe('story-preview-items')
     expect(CANVAS_APP_CORE_ONLY_FEATURE_PACK_PROFILE.installedFeaturePackIds)
