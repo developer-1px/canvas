@@ -24,6 +24,7 @@ import {
 import {
   DEFAULT_CANVAS_APP_FEATURE_PACK_PROFILES,
   type CanvasAppFeaturePackProfile,
+  type CanvasAppFeaturePackProfileId,
 } from './CanvasAppFeaturePackProfiles'
 import {
   getCanvasAppFeaturePackSuiteMarketplaceActionModel,
@@ -35,6 +36,7 @@ import {
   DEFAULT_CANVAS_APP_FEATURE_PACK_SUITE_MANIFESTS,
 } from './CanvasAppDefaultFeaturePackSuites'
 import {
+  type CanvasAppFeaturePackSuiteId,
   type CanvasAppFeaturePackSuiteManifest,
 } from './CanvasAppFeaturePackSuites'
 import {
@@ -159,6 +161,31 @@ export type CanvasAppFeaturePackMarketplaceItem =
   | CanvasAppFeaturePackMarketplaceActionItem
   | CanvasAppFeaturePackProfileMarketplaceActionItem
   | CanvasAppFeaturePackSuiteMarketplaceActionItem
+
+export type CanvasAppFeaturePackMarketplaceTarget =
+  | CanvasAppFeaturePackMarketplacePackTarget
+  | CanvasAppFeaturePackMarketplaceProfileTarget
+  | CanvasAppFeaturePackMarketplaceSuiteTarget
+
+export type CanvasAppFeaturePackMarketplacePackTarget = Readonly<{
+  featurePackId: CanvasAppFeaturePackId
+  kind: 'pack'
+}>
+
+export type CanvasAppFeaturePackMarketplaceProfileTarget = Readonly<{
+  kind: 'profile'
+  profileId: CanvasAppFeaturePackProfileId
+}>
+
+export type CanvasAppFeaturePackMarketplaceSuiteTarget = Readonly<{
+  kind: 'suite'
+  suiteId: CanvasAppFeaturePackSuiteId
+}>
+
+export type CanvasAppFeaturePackMarketplaceTargetItemInput = Readonly<{
+  model: CanvasAppFeaturePackMarketplaceModel
+  target: CanvasAppFeaturePackMarketplaceTarget
+}>
 
 export type CanvasAppFeaturePackMarketplacePrimaryAction =
   | CanvasAppFeaturePackMarketplaceAction
@@ -345,6 +372,46 @@ export function getCanvasAppFeaturePackMarketplaceSectionFacetItems(
   }
 
   throw new Error('Unknown canvas app feature pack marketplace section')
+}
+
+export function getCanvasAppFeaturePackMarketplaceTargetItem({
+  model,
+  target,
+}: CanvasAppFeaturePackMarketplaceTargetItemInput):
+  CanvasAppFeaturePackMarketplaceItem | null {
+  if (target.kind === 'pack') {
+    return model.packs.items.find((item) =>
+      item.featurePackId === target.featurePackId
+    ) ?? null
+  }
+
+  if (target.kind === 'profile') {
+    return model.profiles.items.find((item) =>
+      item.profileId === target.profileId
+    ) ?? null
+  }
+
+  return model.suites.items.find((item) =>
+    item.suiteId === target.suiteId
+  ) ?? null
+}
+
+export function getCanvasAppFeaturePackMarketplaceTargetPrimaryAction(
+  input: CanvasAppFeaturePackMarketplaceTargetItemInput,
+): CanvasAppFeaturePackMarketplacePrimaryAction | null {
+  const item = getCanvasAppFeaturePackMarketplaceTargetItem(input)
+
+  return item ? getCanvasAppFeaturePackMarketplacePrimaryAction(item) : null
+}
+
+export function getCanvasAppFeaturePackMarketplaceTargetPrimaryActionDiagnostic(
+  input: CanvasAppFeaturePackMarketplaceTargetItemInput,
+): CanvasAppFeaturePackMarketplacePrimaryActionDiagnostic | null {
+  const item = getCanvasAppFeaturePackMarketplaceTargetItem(input)
+
+  return item
+    ? getCanvasAppFeaturePackMarketplacePrimaryActionDiagnostic(item)
+    : null
 }
 
 export function getCanvasAppFeaturePackMarketplacePrimaryAction(

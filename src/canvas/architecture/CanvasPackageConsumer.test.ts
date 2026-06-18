@@ -178,6 +178,9 @@ import {
   getCanvasAppFeaturePackMarketplacePrimaryAction,
   getCanvasAppFeaturePackMarketplaceSectionPrimaryActionDiagnosticModel,
   getCanvasAppFeaturePackMarketplaceSectionFacetItems,
+  getCanvasAppFeaturePackMarketplaceTargetItem,
+  getCanvasAppFeaturePackMarketplaceTargetPrimaryAction,
+  getCanvasAppFeaturePackMarketplaceTargetPrimaryActionDiagnostic,
   getCanvasAppFeaturePackProfileMarketplaceActionModel,
   getCanvasAppFeaturePackSuiteMarketplaceActionModel,
   getCanvasAppFeaturePackCatalog,
@@ -1229,6 +1232,30 @@ describe('Canvas package consumer imports', () => {
           storyCanvasMarketplaceAssemblySuiteItem,
         )
         : null
+    const storyCanvasMarketplaceAssemblyTargetItem =
+      getCanvasAppFeaturePackMarketplaceTargetItem({
+        model: storyCanvasMarketplaceAssemblyModel.marketplaceModel,
+        target: {
+          kind: 'suite',
+          suiteId: CANVAS_STORY_CANVAS_SUITE_ID,
+        },
+      })
+    const storyCanvasMarketplaceAssemblyTargetPrimaryAction =
+      getCanvasAppFeaturePackMarketplaceTargetPrimaryAction({
+        model: storyCanvasMarketplaceAssemblyModel.marketplaceModel,
+        target: {
+          kind: 'suite',
+          suiteId: CANVAS_STORY_CANVAS_SUITE_ID,
+        },
+      })
+    const storyCanvasMarketplaceAssemblyTargetDiagnostic =
+      getCanvasAppFeaturePackMarketplaceTargetPrimaryActionDiagnostic({
+        model: storyCanvasMarketplaceAssemblyModel.marketplaceModel,
+        target: {
+          kind: 'suite',
+          suiteId: CANVAS_STORY_CANVAS_SUITE_ID,
+        },
+      })
     const viewManifestCategory: CanvasAppFeaturePackManifestCategory =
       viewManifest.category
     const featurePackManifestOrphanedDataPolicy:
@@ -2530,6 +2557,16 @@ describe('Canvas package consumer imports', () => {
         CANVAS_APP_STORY_IMPORT_FEATURE_PACK_MANIFEST.id,
       ],
       kind: 'install',
+      ready: true,
+      status: 'ready',
+    })
+    expect(storyCanvasMarketplaceAssemblyTargetItem)
+      .toBe(storyCanvasMarketplaceAssemblySuiteItem)
+    expect(storyCanvasMarketplaceAssemblyTargetPrimaryAction)
+      .toBe(storyCanvasMarketplaceAssemblyPrimaryAction)
+    expect(storyCanvasMarketplaceAssemblyTargetDiagnostic).toMatchObject({
+      action: storyCanvasMarketplaceAssemblyPrimaryAction,
+      actionKind: 'install',
       ready: true,
       status: 'ready',
     })
@@ -4133,6 +4170,24 @@ describe('Canvas package consumer imports', () => {
       .toBeTypeOf('function')
     expect(CanvasPackage.getCanvasAppFeaturePackMarketplaceModel)
       .toBeTypeOf('function')
+    expect(CanvasAppAuthoring.getCanvasAppFeaturePackMarketplaceTargetItem)
+      .toBe(getCanvasAppFeaturePackMarketplaceTargetItem)
+    expect(CanvasAppFacade.getCanvasAppFeaturePackMarketplaceTargetItem)
+      .toBe(getCanvasAppFeaturePackMarketplaceTargetItem)
+    expect(CanvasPackage.getCanvasAppFeaturePackMarketplaceTargetItem)
+      .toBe(getCanvasAppFeaturePackMarketplaceTargetItem)
+    expect(CanvasAppAuthoring.getCanvasAppFeaturePackMarketplaceTargetPrimaryAction)
+      .toBe(getCanvasAppFeaturePackMarketplaceTargetPrimaryAction)
+    expect(CanvasAppFacade.getCanvasAppFeaturePackMarketplaceTargetPrimaryAction)
+      .toBe(getCanvasAppFeaturePackMarketplaceTargetPrimaryAction)
+    expect(CanvasPackage.getCanvasAppFeaturePackMarketplaceTargetPrimaryAction)
+      .toBe(getCanvasAppFeaturePackMarketplaceTargetPrimaryAction)
+    expect(CanvasAppAuthoring.getCanvasAppFeaturePackMarketplaceTargetPrimaryActionDiagnostic)
+      .toBe(getCanvasAppFeaturePackMarketplaceTargetPrimaryActionDiagnostic)
+    expect(CanvasAppFacade.getCanvasAppFeaturePackMarketplaceTargetPrimaryActionDiagnostic)
+      .toBe(getCanvasAppFeaturePackMarketplaceTargetPrimaryActionDiagnostic)
+    expect(CanvasPackage.getCanvasAppFeaturePackMarketplaceTargetPrimaryActionDiagnostic)
+      .toBe(getCanvasAppFeaturePackMarketplaceTargetPrimaryActionDiagnostic)
     expect(CanvasAppAuthoring.getCanvasAppFeaturePackMarketplaceActionAssemblyInput)
       .toBeTypeOf('function')
     expect(CanvasAppFacade.getCanvasAppFeaturePackMarketplaceActionAssemblyInput)

@@ -6,6 +6,9 @@ import {
   getCanvasAppFeaturePackMarketplaceSectionPrimaryActionDiagnosticModel,
   getCanvasAppFeaturePackMarketplaceSectionFacetItems,
   getCanvasAppFeaturePackMarketplaceModel,
+  getCanvasAppFeaturePackMarketplaceTargetItem,
+  getCanvasAppFeaturePackMarketplaceTargetPrimaryAction,
+  getCanvasAppFeaturePackMarketplaceTargetPrimaryActionDiagnostic,
 } from './CanvasAppFeaturePackMarketplace'
 import {
   createCanvasAppFeaturePackManifest,
@@ -213,6 +216,34 @@ describe('CanvasAppFeaturePackMarketplace', () => {
       getCanvasAppFeaturePackMarketplacePrimaryAction(suiteItem)
     const addonPackPrimaryAction =
       getCanvasAppFeaturePackMarketplacePrimaryAction(addonPackItem)
+    const profileTargetItem = getCanvasAppFeaturePackMarketplaceTargetItem({
+      model,
+      target: {
+        kind: 'profile',
+        profileId: 'runtime-profile',
+      },
+    })
+    const suiteTargetItem = getCanvasAppFeaturePackMarketplaceTargetItem({
+      model,
+      target: {
+        kind: 'suite',
+        suiteId: 'addon-suite',
+      },
+    })
+    const addonPackTargetItem = getCanvasAppFeaturePackMarketplaceTargetItem({
+      model,
+      target: {
+        featurePackId: 'addon-pack',
+        kind: 'pack',
+      },
+    })
+    const missingPackTargetItem = getCanvasAppFeaturePackMarketplaceTargetItem({
+      model,
+      target: {
+        featurePackId: 'missing-pack',
+        kind: 'pack',
+      },
+    })
 
     expect(profilePrimaryAction.kind).toBe('apply')
     expect(profilePrimaryAction.status).toBe('active')
@@ -223,11 +254,45 @@ describe('CanvasAppFeaturePackMarketplace', () => {
     expect(addonPackPrimaryAction.marketplaceBlockedReasons.map(
       (reason) => reason.kind,
     )).toEqual(['marketplace-entitlement-required'])
+    expect(profileTargetItem).toBe(profileItem)
+    expect(suiteTargetItem).toBe(suiteItem)
+    expect(addonPackTargetItem).toBe(addonPackItem)
+    expect(missingPackTargetItem).toBeNull()
+    expect(getCanvasAppFeaturePackMarketplaceTargetPrimaryAction({
+      model,
+      target: {
+        featurePackId: 'addon-pack',
+        kind: 'pack',
+      },
+    })).toBe(addonPackPrimaryAction)
+    expect(getCanvasAppFeaturePackMarketplaceTargetPrimaryAction({
+      model,
+      target: {
+        kind: 'suite',
+        suiteId: 'missing-suite',
+      },
+    })).toBeNull()
     const addonPackPrimaryActionDiagnostic =
       getCanvasAppFeaturePackMarketplacePrimaryActionDiagnostic(addonPackItem)
+    const addonPackTargetDiagnostic =
+      getCanvasAppFeaturePackMarketplaceTargetPrimaryActionDiagnostic({
+        model,
+        target: {
+          featurePackId: 'addon-pack',
+          kind: 'pack',
+        },
+      })
 
     expect(addonPackPrimaryActionDiagnostic.action)
       .toBe(addonPackPrimaryAction)
+    expect(addonPackTargetDiagnostic).toEqual(addonPackPrimaryActionDiagnostic)
+    expect(getCanvasAppFeaturePackMarketplaceTargetPrimaryActionDiagnostic({
+      model,
+      target: {
+        kind: 'profile',
+        profileId: 'missing-profile',
+      },
+    })).toBeNull()
     expect(addonPackPrimaryActionDiagnostic).toMatchObject({
       actionKind: 'install',
       applicable: true,
