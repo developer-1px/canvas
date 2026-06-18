@@ -3,12 +3,18 @@ import { describe, expect, it } from 'vitest'
 import {
   createSlideEditObjectImageReplaceDescriptor,
   getSlideEditObjectImageReplaceCommandEffect,
+  getSlideEditObjectImageReplaceJSONPasteValue,
   getSlideEditObjectImageReplaceMetadata,
+  getSlideEditObjectImageReplacePasteCommandEffect,
   normalizeSlideEditObjectImageReplaceCommand,
   normalizeSlideEditObjectImageReplaceSource,
   SLIDE_EDIT_OBJECT_IMAGE_REPLACE_DATA_ATTRIBUTE,
   SLIDE_EDIT_OBJECT_IMAGE_REPLACE_FIELD,
+  SLIDE_EDIT_OBJECT_IMAGE_REPLACE_JSON_MIME_TYPE,
 } from './SlideEditObjectImageReplace'
+import {
+  getSlideEditObjectImageReplaceJSONPasteValue as getSlideEditObjectImageReplaceJSONPasteValueFromPackage,
+} from './index'
 
 describe('SlideEditObjectImageReplace', () => {
   it('creates a supported image replace descriptor', () => {
@@ -72,6 +78,13 @@ describe('SlideEditObjectImageReplace', () => {
       attributeValue: 'unsupported',
       isSupported: false,
       unsupportedReason: 'mixed-selection',
+    })
+    expect(getSlideEditObjectImageReplaceMetadata({
+      isSupported: false,
+      unsupportedReason: 'hidden-object',
+    })).toMatchObject({
+      attributeValue: 'unsupported',
+      unsupportedReason: 'hidden-object',
     })
   })
 
@@ -137,6 +150,229 @@ describe('SlideEditObjectImageReplace', () => {
     }).source.mimeType).toBe('image/unknown')
   })
 
+  it('reads custom MIME direct image source JSON values first', () => {
+    expect(getSlideEditObjectImageReplaceJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_OBJECT_IMAGE_REPLACE_JSON_MIME_TYPE]: JSON.stringify({
+          alt: '  Hero  ',
+          dataUrl: ' data:image/png;base64,aW1hZ2U= ',
+          fileName: ' hero.png ',
+          naturalSize: {
+            height: 120.4,
+            width: 220.5,
+          },
+          type: 'IMAGE/PNG',
+        }),
+        'application/json':
+          '{"imageSource":{"src":"data:image/jpeg;base64,Zm9v"}}',
+      }),
+    })).toEqual({
+      source: {
+        altText: 'Hero',
+        mimeType: 'image/png',
+        name: 'hero.png',
+        naturalHeight: 120,
+        naturalWidth: 221,
+        src: 'data:image/png;base64,aW1hZ2U=',
+      },
+      sourceFields: {
+        altText: 'alt',
+        mimeType: 'type',
+        name: 'fileName',
+        naturalHeight: 'naturalSize.height',
+        naturalWidth: 'naturalSize.width',
+        src: 'dataUrl',
+      },
+      surface: 'object-image-replace',
+    })
+    expect(getSlideEditObjectImageReplaceJSONPasteValueFromPackage({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_OBJECT_IMAGE_REPLACE_JSON_MIME_TYPE]:
+          '{"src":"data:image/svg+xml;base64,PHN2Zy8+"}',
+      }),
+    })).toMatchObject({
+      source: {
+        mimeType: 'image/svg+xml',
+        src: 'data:image/svg+xml;base64,PHN2Zy8+',
+      },
+    })
+  })
+
+  it('reads wrapped application/json image source payloads', () => {
+    expect(getSlideEditObjectImageReplaceJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'application/json': JSON.stringify({
+          imageSource: {
+            altText: 'Remote',
+            mimeType: 'image/png',
+            name: 'remote.png',
+            naturalHeight: 200,
+            naturalWidth: 300,
+            url: 'https://example.com/remote.png',
+          },
+        }),
+      }),
+    })).toEqual({
+      source: {
+        altText: 'Remote',
+        mimeType: 'image/png',
+        name: 'remote.png',
+        naturalHeight: 200,
+        naturalWidth: 300,
+        src: 'https://example.com/remote.png',
+      },
+      sourceFields: {
+        altText: 'altText',
+        mimeType: 'mimeType',
+        name: 'name',
+        naturalHeight: 'naturalHeight',
+        naturalWidth: 'naturalWidth',
+        src: 'url',
+        wrapper: 'imageSource',
+      },
+      surface: 'object-image-replace',
+    })
+  })
+
+  it('converts a valid image source paste into a replace command effect', () => {
+    const pasteValue = getSlideEditObjectImageReplaceJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'application/json': JSON.stringify({
+          imageReplace: {
+            src: 'data:image/png;base64,aW1hZ2U=',
+          },
+        }),
+      }),
+    })
+
+    expect(getSlideEditObjectImageReplacePasteCommandEffect({
+      pasteValue: pasteValue!,
+      slideId: 'slide-a',
+      targets: [
+        {
+          objectId: 'image-a',
+        },
+      ],
+    })).toEqual({
+      appliedTarget: {
+        commandId: 'replace-object-image',
+        effectType: 'slide-command-effect',
+        objectId: 'image-a',
+        sourceFields: {
+          src: 'src',
+          wrapper: 'imageReplace',
+        },
+      },
+      effect: {
+        payload: {
+          id: 'replace-object-image',
+          objectId: 'image-a',
+          slideId: 'slide-a',
+          source: {
+            altText: undefined,
+            mimeType: 'image/png',
+            name: undefined,
+            naturalHeight: undefined,
+            naturalWidth: undefined,
+            src: 'data:image/png;base64,aW1hZ2U=',
+          },
+        },
+        selection: {
+          objectIds: ['image-a'],
+          slideId: 'slide-a',
+        },
+        type: 'slide-command-effect',
+      },
+      pasteValue: pasteValue,
+      status: 'available',
+    })
+  })
+
+  it('reports image source paste unavailable reasons', () => {
+    const pasteValue = getSlideEditObjectImageReplaceJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_OBJECT_IMAGE_REPLACE_JSON_MIME_TYPE]:
+          '{"src":"data:image/png;base64,aW1hZ2U="}',
+      }),
+    })!
+
+    expect(getSlideEditObjectImageReplacePasteCommandEffect({
+      pasteValue,
+      slideId: 'slide-a',
+      targets: [
+        {
+          objectId: 'image-a',
+        },
+        {
+          objectId: 'image-b',
+        },
+      ],
+    })).toMatchObject({
+      reason: 'mixed-selection',
+      status: 'unavailable',
+    })
+    expect(getSlideEditObjectImageReplacePasteCommandEffect({
+      pasteValue,
+      slideId: 'slide-a',
+      targets: [
+        {
+          isLocked: true,
+          objectId: 'image-a',
+        },
+      ],
+    })).toMatchObject({
+      reason: 'locked-object',
+      status: 'unavailable',
+    })
+    expect(getSlideEditObjectImageReplacePasteCommandEffect({
+      pasteValue,
+      slideId: 'slide-a',
+      targets: [
+        {
+          isHidden: true,
+          objectId: 'image-a',
+        },
+      ],
+    })).toMatchObject({
+      reason: 'hidden-object',
+      status: 'unavailable',
+    })
+    expect(getSlideEditObjectImageReplacePasteCommandEffect({
+      pasteValue,
+      slideId: 'slide-a',
+      targets: [
+        {
+          isSupported: false,
+          objectId: 'shape-a',
+        },
+      ],
+    })).toMatchObject({
+      reason: 'unsupported-object',
+      status: 'unavailable',
+    })
+  })
+
+  it('ignores invalid and direct generic image source JSON payloads', () => {
+    expect(getSlideEditObjectImageReplaceJSONPasteValue({
+      dataTransfer: null,
+    })).toBeNull()
+    expect(getSlideEditObjectImageReplaceJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'application/json': '{"src":"data:image/png;base64,aW1hZ2U="}',
+      }),
+    })).toBeNull()
+    expect(getSlideEditObjectImageReplaceJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'application/json': '{"imageSource":{"alt":"missing source"}}',
+      }),
+    })).toBeNull()
+    expect(getSlideEditObjectImageReplaceJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_OBJECT_IMAGE_REPLACE_JSON_MIME_TYPE]: 'not json',
+      }),
+    })).toBeNull()
+  })
+
   it('does not expose host renderer names or product terms', () => {
     const publicStrings = JSON.stringify({
       descriptor: createSlideEditObjectImageReplaceDescriptor({
@@ -162,3 +398,9 @@ describe('SlideEditObjectImageReplace', () => {
     }
   })
 })
+
+function createDataTransfer(values: Record<string, string>) {
+  return {
+    getData: (type: string) => values[type] ?? '',
+  }
+}

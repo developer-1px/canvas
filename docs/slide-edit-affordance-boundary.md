@@ -23,6 +23,7 @@
 | Object corner radius | `slide-edit-affordance` | object corner radius value, support state, numeric bounds, and host command effect |
 | Object fill opacity | `slide-edit-affordance` | object fill-only opacity value, support state, and host command effect |
 | Object hyperlink/action | `slide-edit-affordance` | object URL/action metadata, URL policy, and host command effect |
+| Object image replace | `slide-edit-affordance` | selected image source replacement support state, JSON paste, and host command effect |
 | Object opacity | `slide-edit-affordance` | object opacity value, metadata attribute, and host command effect |
 | Object shadow/effect | `slide-edit-affordance` | object shadow subset, metadata attribute, and host command effect |
 | Object stroke line style | `slide-edit-affordance` | object stroke solid/dash/dot subset and host command effect |
@@ -458,6 +459,17 @@
 | `bounds` / `defaultBounds` | default slot geometry before host object mapping | current placeholder geometry on a concrete slide |
 | `isLocked` | layout slot cannot be casually remapped | placeholder or object is not user-editable |
 | `isVisible` | layout slot may be hidden by default | placeholder/object can be hidden while still represented in controls |
+
+## Object Image Replace Contract
+
+| Area | Contract |
+| --- | --- |
+| Field | `source` file-input descriptor routes through `replace-object-image` |
+| Source fields | `src`, `mimeType`, `name`, `altText`, `naturalWidth`, and `naturalHeight` are normalized before host application |
+| JSON candidates | custom MIME and wrapped `application/json` are checked in order |
+| JSON payloads | generic JSON requires `imageReplace`, `imageSource`, `objectImage`, or `replacementImage` wrapper; custom MIME may carry direct source JSON |
+| Selection | exactly one supported image target can produce a command effect |
+| No-op | locked, hidden, mixed, and unsupported targets return unavailable route metadata |
 
 ## Slide Object Clipboard Contract
 
