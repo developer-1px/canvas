@@ -52,6 +52,7 @@ describe('Canvas App folder structure', () => {
       'component-authoring',
       'component-inspector',
       'component-library',
+      'component-source-outline',
       'component-sync',
       'cursor-chat',
       'dom-edit-style',

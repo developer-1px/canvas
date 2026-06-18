@@ -136,7 +136,11 @@ export const STORY_CANVAS_AFFORDANCE_CONFIG: CanvasAppAssemblyInput['affordanceC
 export const STORY_CANVAS_FEATURE_PACK_PROFILE: CanvasAppFeaturePackProfile =
   createCanvasAppFeaturePackProfile({
     id: 'story-canvas-runtime',
-    installedFeaturePackIds: ['zoom-controls'],
+    installedFeaturePackIds: [
+      'component-library',
+      'component-source-outline',
+      'zoom-controls',
+    ],
     installedSuiteIds: [CANVAS_STORY_CANVAS_SUITE_ID],
     label: 'Story canvas runtime',
     suiteManifests: DEFAULT_CANVAS_APP_FEATURE_PACK_SUITE_MANIFESTS,

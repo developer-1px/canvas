@@ -14,6 +14,7 @@ import { useCanvasAppCommandModel } from './useCanvasAppCommandModel'
 import { useCanvasAppComponentModel } from './useCanvasAppComponentModel'
 import { useCanvasAppCustomFocusModel } from './useCanvasAppCustomFocusModel'
 import {
+  CANVAS_APP_COMPONENT_SOURCE_OUTLINE_FEATURE_PACK_MANIFEST,
   getCanvasAppRuntimeFeatureConfig,
   useCanvasAppToolFeaturePackModel,
   useCanvasAppTransientFeaturePackModel,
@@ -81,7 +82,9 @@ export function useCanvasAppModel({
   )
   const componentPartSources = useMemo(
     () =>
-      installedFeaturePackIdSet.has('component-authoring')
+      installedFeaturePackIdSet.has(
+        CANVAS_APP_COMPONENT_SOURCE_OUTLINE_FEATURE_PACK_MANIFEST.id,
+      )
         ? createCanvasComponentPartSourceInputs(appAssembly.control.componentSets)
         : [],
     [appAssembly.control.componentSets, installedFeaturePackIdSet],

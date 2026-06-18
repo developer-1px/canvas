@@ -81,6 +81,9 @@ import {
   CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST,
 } from './component-library'
 import {
+  CANVAS_APP_COMPONENT_SOURCE_OUTLINE_FEATURE_PACK_MANIFEST,
+} from './component-source-outline'
+import {
   CANVAS_STORY_PREVIEW_ITEMS_FEATURE_PACK_ID,
 } from './story-preview'
 import {
@@ -395,14 +398,29 @@ describe('CanvasAppFeaturePacks', () => {
     expect(getCanvasAppInstalledFeaturePackManifestIds(
       DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS,
     )).toContain(CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST.id)
+    expect(getCanvasAppInstalledFeaturePackManifestIds(
+      DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS,
+    )).toContain(CANVAS_APP_COMPONENT_SOURCE_OUTLINE_FEATURE_PACK_MANIFEST.id)
+    expect(CANVAS_APP_COMPONENT_SOURCE_OUTLINE_FEATURE_PACK_MANIFEST)
+      .toMatchObject({
+        category: 'inspection',
+        contributes: {
+          surfaces: ['overlay'],
+        },
+        lifecycle: {
+          partialUpdate: ['overlay'],
+          runtimeToggleable: true,
+        },
+        requires: [CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST.id],
+      })
     expect(CANVAS_APP_COMPONENT_AUTHORING_FEATURE_PACK_MANIFEST)
       .toMatchObject({
         category: 'authoring',
         contributes: {
-          surfaces: ['overlay', 'view-renderer'],
+          surfaces: ['view-renderer'],
         },
         lifecycle: {
-          partialUpdate: ['overlay', 'view-renderer'],
+          partialUpdate: ['view-renderer'],
           runtimeToggleable: true,
         },
       })
@@ -566,6 +584,7 @@ describe('CanvasAppFeaturePacks', () => {
     expect(CANVAS_COMPONENT_SYSTEM_FEATURE_PACK_SUITE_MANIFEST.featurePackIds)
       .toEqual([
         CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST.id,
+        CANVAS_APP_COMPONENT_SOURCE_OUTLINE_FEATURE_PACK_MANIFEST.id,
         CANVAS_APP_COMPONENT_SYNC_FEATURE_PACK_MANIFEST.id,
         CANVAS_APP_COMPONENT_INSPECTOR_FEATURE_PACK_MANIFEST.id,
         CANVAS_APP_COMPONENT_AUTHORING_FEATURE_PACK_MANIFEST.id,

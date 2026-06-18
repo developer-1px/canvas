@@ -159,6 +159,9 @@ export {
   CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST,
 } from './component-library'
 export {
+  CANVAS_APP_COMPONENT_SOURCE_OUTLINE_FEATURE_PACK_MANIFEST,
+} from './component-source-outline'
+export {
   createCanvasAppDomEditStyleFeaturePackManifest,
   type CanvasAppDomEditStyleFeaturePackManifestInput,
 } from './dom-edit-style'
