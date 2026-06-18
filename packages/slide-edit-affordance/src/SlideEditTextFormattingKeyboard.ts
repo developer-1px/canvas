@@ -472,10 +472,12 @@ function getSlideEditTextRunFormattingField(
   )
 }
 
-function getSlideEditTextRunFormattingExplicitJSONValue(
-  fieldId: SlideEditTextRunFormattingFieldId,
+function getSlideEditTextRunFormattingExplicitJSONValue<
+  TFieldId extends SlideEditTextRunFormattingFieldId,
+>(
+  fieldId: TFieldId,
   value: unknown,
-) {
+): SlideEditTextRunFormattingValue<TFieldId> | null {
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
     return null
   }
