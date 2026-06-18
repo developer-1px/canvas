@@ -49,6 +49,9 @@ export type CanvasAppFeaturePackMarketplaceSection =
   | CanvasAppFeaturePackMarketplaceSuiteSection
 
 export type CanvasAppFeaturePackMarketplaceProfileSection = Readonly<{
+  facets: readonly CanvasAppFeaturePackMarketplaceSectionFacet<
+    CanvasAppFeaturePackMarketplaceProfileSectionFacetKind
+  >[]
   items: readonly CanvasAppFeaturePackProfileMarketplaceActionItem[]
   kind: 'profiles'
   label: string
@@ -56,6 +59,9 @@ export type CanvasAppFeaturePackMarketplaceProfileSection = Readonly<{
 }>
 
 export type CanvasAppFeaturePackMarketplaceSuiteSection = Readonly<{
+  facets: readonly CanvasAppFeaturePackMarketplaceSectionFacet<
+    CanvasAppFeaturePackMarketplaceSuiteSectionFacetKind
+  >[]
   items: readonly CanvasAppFeaturePackSuiteMarketplaceActionItem[]
   kind: 'suites'
   label: string
@@ -63,10 +69,48 @@ export type CanvasAppFeaturePackMarketplaceSuiteSection = Readonly<{
 }>
 
 export type CanvasAppFeaturePackMarketplacePackSection = Readonly<{
+  facets: readonly CanvasAppFeaturePackMarketplaceSectionFacet<
+    CanvasAppFeaturePackMarketplacePackSectionFacetKind
+  >[]
   items: readonly CanvasAppFeaturePackMarketplaceActionItem[]
   kind: 'packs'
   label: string
   summary: CanvasAppFeaturePackMarketplacePackSectionSummary
+}>
+
+export type CanvasAppFeaturePackMarketplaceProfileSectionFacetKind =
+  | 'active'
+  | 'all'
+  | 'blocked'
+  | 'ready'
+
+export type CanvasAppFeaturePackMarketplaceSuiteSectionFacetKind =
+  | 'all'
+  | 'blocked'
+  | 'enabled'
+  | 'ready'
+
+export type CanvasAppFeaturePackMarketplacePackSectionFacetKind =
+  | 'all'
+  | 'blocked'
+  | 'enabled'
+  | 'installed'
+  | 'paid'
+  | 'private'
+  | 'ready'
+
+export type CanvasAppFeaturePackMarketplaceSectionFacetKind =
+  | CanvasAppFeaturePackMarketplacePackSectionFacetKind
+  | CanvasAppFeaturePackMarketplaceProfileSectionFacetKind
+  | CanvasAppFeaturePackMarketplaceSuiteSectionFacetKind
+
+export type CanvasAppFeaturePackMarketplaceSectionFacet<
+  TKind extends CanvasAppFeaturePackMarketplaceSectionFacetKind =
+    CanvasAppFeaturePackMarketplaceSectionFacetKind,
+> = Readonly<{
+  count: number
+  kind: TKind
+  label: string
 }>
 
 export type CanvasAppFeaturePackMarketplaceActionSectionSummary =
@@ -124,34 +168,50 @@ export function getCanvasAppFeaturePackMarketplaceModel({
     manifests,
     options,
   })
+  const profileSummary =
+    getCanvasAppFeaturePackMarketplaceProfileSectionSummary(
+      profileActions.items,
+    )
+  const suiteSummary = getCanvasAppFeaturePackMarketplaceSuiteSectionSummary(
+    suiteActions.items,
+  )
+  const packSummary = getCanvasAppFeaturePackMarketplacePackSectionSummary(
+    packActions.items,
+  )
 
   return Object.freeze({
     packs: packActions,
     profiles: profileActions,
     sections: Object.freeze([
       Object.freeze({
+        facets: getCanvasAppFeaturePackMarketplaceProfileSectionFacets({
+          items: profileActions.items,
+          summary: profileSummary,
+        }),
         items: profileActions.items,
         kind: 'profiles',
         label: 'Profiles',
-        summary: getCanvasAppFeaturePackMarketplaceProfileSectionSummary(
-          profileActions.items,
-        ),
+        summary: profileSummary,
       }),
       Object.freeze({
+        facets: getCanvasAppFeaturePackMarketplaceSuiteSectionFacets({
+          items: suiteActions.items,
+          summary: suiteSummary,
+        }),
         items: suiteActions.items,
         kind: 'suites',
         label: 'Suites',
-        summary: getCanvasAppFeaturePackMarketplaceSuiteSectionSummary(
-          suiteActions.items,
-        ),
+        summary: suiteSummary,
       }),
       Object.freeze({
+        facets: getCanvasAppFeaturePackMarketplacePackSectionFacets({
+          items: packActions.items,
+          summary: packSummary,
+        }),
         items: packActions.items,
         kind: 'packs',
         label: 'Feature packs',
-        summary: getCanvasAppFeaturePackMarketplacePackSectionSummary(
-          packActions.items,
-        ),
+        summary: packSummary,
       }),
     ]),
     suites: suiteActions,
@@ -209,3 +269,159 @@ function getCanvasAppFeaturePackMarketplaceActionSectionSummary(
     readyActionCount: actions.filter((action) => action.ready).length,
   })
 }
+
+function getCanvasAppFeaturePackMarketplaceProfileSectionFacets({
+  items,
+  summary,
+}: {
+  items: readonly CanvasAppFeaturePackProfileMarketplaceActionItem[]
+  summary: CanvasAppFeaturePackMarketplaceProfileSectionSummary
+}): readonly CanvasAppFeaturePackMarketplaceSectionFacet<
+  CanvasAppFeaturePackMarketplaceProfileSectionFacetKind
+>[] {
+  return Object.freeze([
+    createCanvasAppFeaturePackMarketplaceSectionFacet({
+      count: summary.itemCount,
+      kind: 'all',
+      label: 'All',
+    }),
+    createCanvasAppFeaturePackMarketplaceSectionFacet({
+      count: summary.activeItemCount,
+      kind: 'active',
+      label: 'Active',
+    }),
+    createCanvasAppFeaturePackMarketplaceSectionFacet({
+      count: getCanvasAppFeaturePackMarketplaceReadyItemCount(items),
+      kind: 'ready',
+      label: 'Ready',
+    }),
+    createCanvasAppFeaturePackMarketplaceSectionFacet({
+      count: getCanvasAppFeaturePackMarketplaceBlockedItemCount(items),
+      kind: 'blocked',
+      label: 'Blocked',
+    }),
+  ])
+}
+
+function getCanvasAppFeaturePackMarketplaceSuiteSectionFacets({
+  items,
+  summary,
+}: {
+  items: readonly CanvasAppFeaturePackSuiteMarketplaceActionItem[]
+  summary: CanvasAppFeaturePackMarketplaceSuiteSectionSummary
+}): readonly CanvasAppFeaturePackMarketplaceSectionFacet<
+  CanvasAppFeaturePackMarketplaceSuiteSectionFacetKind
+>[] {
+  return Object.freeze([
+    createCanvasAppFeaturePackMarketplaceSectionFacet({
+      count: summary.itemCount,
+      kind: 'all',
+      label: 'All',
+    }),
+    createCanvasAppFeaturePackMarketplaceSectionFacet({
+      count: summary.enabledItemCount,
+      kind: 'enabled',
+      label: 'Enabled',
+    }),
+    createCanvasAppFeaturePackMarketplaceSectionFacet({
+      count: getCanvasAppFeaturePackMarketplaceReadyItemCount(items),
+      kind: 'ready',
+      label: 'Ready',
+    }),
+    createCanvasAppFeaturePackMarketplaceSectionFacet({
+      count: getCanvasAppFeaturePackMarketplaceBlockedItemCount(items),
+      kind: 'blocked',
+      label: 'Blocked',
+    }),
+  ])
+}
+
+function getCanvasAppFeaturePackMarketplacePackSectionFacets({
+  items,
+  summary,
+}: {
+  items: readonly CanvasAppFeaturePackMarketplaceActionItem[]
+  summary: CanvasAppFeaturePackMarketplacePackSectionSummary
+}): readonly CanvasAppFeaturePackMarketplaceSectionFacet<
+  CanvasAppFeaturePackMarketplacePackSectionFacetKind
+>[] {
+  return Object.freeze([
+    createCanvasAppFeaturePackMarketplaceSectionFacet({
+      count: summary.itemCount,
+      kind: 'all',
+      label: 'All',
+    }),
+    createCanvasAppFeaturePackMarketplaceSectionFacet({
+      count: summary.installedItemCount,
+      kind: 'installed',
+      label: 'Installed',
+    }),
+    createCanvasAppFeaturePackMarketplaceSectionFacet({
+      count: summary.enabledItemCount,
+      kind: 'enabled',
+      label: 'Enabled',
+    }),
+    createCanvasAppFeaturePackMarketplaceSectionFacet({
+      count: summary.paidItemCount,
+      kind: 'paid',
+      label: 'Paid',
+    }),
+    createCanvasAppFeaturePackMarketplaceSectionFacet({
+      count: summary.privateItemCount,
+      kind: 'private',
+      label: 'Private',
+    }),
+    createCanvasAppFeaturePackMarketplaceSectionFacet({
+      count: getCanvasAppFeaturePackMarketplaceReadyItemCount(items),
+      kind: 'ready',
+      label: 'Ready',
+    }),
+    createCanvasAppFeaturePackMarketplaceSectionFacet({
+      count: getCanvasAppFeaturePackMarketplaceBlockedItemCount(items),
+      kind: 'blocked',
+      label: 'Blocked',
+    }),
+  ])
+}
+
+function getCanvasAppFeaturePackMarketplaceReadyItemCount(
+  items: readonly CanvasAppFeaturePackMarketplaceSectionActionItem[],
+) {
+  return items.filter((item) => item.actions.some((action) => action.ready))
+    .length
+}
+
+function getCanvasAppFeaturePackMarketplaceBlockedItemCount(
+  items: readonly CanvasAppFeaturePackMarketplaceSectionActionItem[],
+) {
+  return items.filter((item) =>
+    item.actions.some((action) =>
+      action.applicable && action.status === 'blocked'
+    )
+  ).length
+}
+
+function createCanvasAppFeaturePackMarketplaceSectionFacet<
+  TKind extends CanvasAppFeaturePackMarketplaceSectionFacetKind,
+>({
+  count,
+  kind,
+  label,
+}: CanvasAppFeaturePackMarketplaceSectionFacet<TKind>):
+  CanvasAppFeaturePackMarketplaceSectionFacet<TKind> {
+  return Object.freeze({
+    count,
+    kind,
+    label,
+  })
+}
+
+type CanvasAppFeaturePackMarketplaceSectionActionItem = Readonly<{
+  actions: readonly CanvasAppFeaturePackMarketplaceSectionAction[]
+}>
+
+type CanvasAppFeaturePackMarketplaceSectionAction = Readonly<{
+  applicable: boolean
+  ready: boolean
+  status: 'active' | 'blocked' | 'ready'
+}>

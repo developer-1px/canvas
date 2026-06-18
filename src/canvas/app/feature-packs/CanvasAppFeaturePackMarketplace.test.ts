@@ -42,6 +42,15 @@ describe('CanvasAppFeaturePackMarketplace', () => {
       privateItemCount: 0,
       readyActionCount: 1,
     })
+    expect(model.sections[2]?.facets).toEqual([
+      { count: 1, kind: 'all', label: 'All' },
+      { count: 1, kind: 'installed', label: 'Installed' },
+      { count: 1, kind: 'enabled', label: 'Enabled' },
+      { count: 0, kind: 'paid', label: 'Paid' },
+      { count: 0, kind: 'private', label: 'Private' },
+      { count: 1, kind: 'ready', label: 'Ready' },
+      { count: 1, kind: 'blocked', label: 'Blocked' },
+    ])
     expect(model.profiles.items[0]?.profileId)
       .toBe(CANVAS_APP_CORE_ONLY_FEATURE_PACK_PROFILE.id)
     expect(model.packs.items[0]?.featurePackId).toBe('zoom-controls')
@@ -110,12 +119,24 @@ describe('CanvasAppFeaturePackMarketplace', () => {
       itemCount: 1,
       readyActionCount: 0,
     })
+    expect(model.sections[0]?.facets).toEqual([
+      { count: 1, kind: 'all', label: 'All' },
+      { count: 1, kind: 'active', label: 'Active' },
+      { count: 0, kind: 'ready', label: 'Ready' },
+      { count: 0, kind: 'blocked', label: 'Blocked' },
+    ])
     expect(model.sections[1]?.summary).toEqual({
       blockedActionCount: 3,
       enabledItemCount: 0,
       itemCount: 1,
       readyActionCount: 1,
     })
+    expect(model.sections[1]?.facets).toEqual([
+      { count: 1, kind: 'all', label: 'All' },
+      { count: 0, kind: 'enabled', label: 'Enabled' },
+      { count: 1, kind: 'ready', label: 'Ready' },
+      { count: 1, kind: 'blocked', label: 'Blocked' },
+    ])
     expect(model.sections[2]?.summary).toEqual({
       blockedActionCount: 3,
       enabledItemCount: 1,
@@ -125,6 +146,15 @@ describe('CanvasAppFeaturePackMarketplace', () => {
       privateItemCount: 1,
       readyActionCount: 1,
     })
+    expect(model.sections[2]?.facets).toEqual([
+      { count: 2, kind: 'all', label: 'All' },
+      { count: 1, kind: 'installed', label: 'Installed' },
+      { count: 1, kind: 'enabled', label: 'Enabled' },
+      { count: 0, kind: 'paid', label: 'Paid' },
+      { count: 1, kind: 'private', label: 'Private' },
+      { count: 1, kind: 'ready', label: 'Ready' },
+      { count: 2, kind: 'blocked', label: 'Blocked' },
+    ])
     expect(model.profiles.items[0]?.actions[0]?.installOptions).toEqual({
       featurePackStates: [
         {

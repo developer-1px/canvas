@@ -122,6 +122,7 @@ import {
   type CanvasAppFeaturePack,
   type CanvasAppFeaturePackMarketplaceActionModel,
   type CanvasAppFeaturePackMarketplaceModel,
+  type CanvasAppFeaturePackMarketplacePackSectionFacetKind,
   type CanvasAppFeaturePackMarketplacePackSectionSummary,
   type CanvasAppFeaturePackMarketplaceListing,
   type CanvasAppFeaturePackMarketplaceListingEntitlement,
@@ -520,6 +521,9 @@ describe('Canvas package consumer imports', () => {
     const featurePackMarketplacePackSectionSummary:
       CanvasAppFeaturePackMarketplacePackSectionSummary =
         featurePackMarketplacePackSection.summary
+    const featurePackMarketplacePackSectionFacetKinds:
+      readonly CanvasAppFeaturePackMarketplacePackSectionFacetKind[] =
+        featurePackMarketplacePackSection.facets.map((facet) => facet.kind)
     const featurePackMarketplaceListingMap =
       getCanvasAppFeaturePackMarketplaceListingMap({
         listings: [partialUpdateListing],
@@ -1032,6 +1036,24 @@ describe('Canvas package consumer imports', () => {
       privateItemCount: 0,
       readyActionCount: 2,
     })
+    expect(featurePackMarketplacePackSectionFacetKinds).toEqual([
+      'all',
+      'installed',
+      'enabled',
+      'paid',
+      'private',
+      'ready',
+      'blocked',
+    ])
+    expect(featurePackMarketplacePackSection.facets).toEqual([
+      { count: 1, kind: 'all', label: 'All' },
+      { count: 1, kind: 'installed', label: 'Installed' },
+      { count: 1, kind: 'enabled', label: 'Enabled' },
+      { count: 1, kind: 'paid', label: 'Paid' },
+      { count: 0, kind: 'private', label: 'Private' },
+      { count: 1, kind: 'ready', label: 'Ready' },
+      { count: 0, kind: 'blocked', label: 'Blocked' },
+    ])
     expect(featurePackProfileMarketplaceActionModel.items[0]?.profileId)
       .toBe('smoke-partial-profile')
     expect(featurePackProfileMarketplaceActionModel.items[0]?.primaryActionKind)
