@@ -232,6 +232,9 @@ describe('Canvas App IO boundaries', () => {
     const textPasteImportFile = getSourceFile(
       'src/canvas/app/feature-packs/text-paste-import/CanvasTextPasteImport.ts',
     )
+    const textPasteIndexFile = getSourceFile(
+      'src/canvas/app/feature-packs/text-paste-import/index.ts',
+    )
     const textPasteImporterFile = getSourceFile(
       'src/canvas/app/feature-packs/text-paste-import/CanvasTextPasteImporters.ts',
     )
@@ -247,10 +250,15 @@ describe('Canvas App IO boundaries', () => {
     )
     expect(textPasteHookFile.source).toContain('window.addEventListener')
     expect(textPasteHookFile.source).toContain('ClipboardEvent')
+    expect(textPasteHookFile.source).toContain('isCanvasKeyboardTypingTarget')
     expect(textPasteImportFile.source).toContain('DataTransfer')
     expect(textPasteImportFile.source).toContain(
       'export function insertCanvasTextPasteSource',
     )
+    expect(textPasteImportFile.source).toContain(
+      'export function routeCanvasTextPasteReplace',
+    )
+    expect(textPasteIndexFile.source).toContain('routeCanvasTextPasteReplace')
     expect(textPasteImporterFile.source).toContain(
       'export type CanvasTextPasteImporter',
     )

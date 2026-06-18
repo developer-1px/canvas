@@ -32,8 +32,10 @@ import {
   createCanvasAppFeaturePackMarketplaceListing,
   getCanvasAppFeaturePackMarketplaceActionAssemblyPlan,
   getCanvasAppFeaturePackMarketplaceActionAssemblyInput,
+  createCanvasPlainTextPasteSource,
   routeCanvasImagePasteReplace,
   routeCanvasMediaSourceObjectHyperlink,
+  routeCanvasTextPasteReplace,
   createCanvasAppFeaturePackViewRenderers,
   createCanvasAppViewFeaturePack,
   createCanvasStoryCanvasFeaturePackManifests,
@@ -165,6 +167,7 @@ import {
   type CanvasStoryCanvasFeaturePackManifestsInput,
   type CanvasImagePasteReplaceRoute,
   type CanvasMediaObjectHyperlinkRoute,
+  type CanvasTextPasteReplaceRoute,
   type CanvasAppCustomItemModule,
   type CanvasAppCustomItemRenderKeyStrategy,
   type CanvasAppCustomItemRendererDescriptor,
@@ -1610,6 +1613,12 @@ describe('Canvas package consumer imports', () => {
       .toBeTypeOf('function')
     expect(CanvasPackage.routeCanvasMediaSourceObjectHyperlink)
       .toBeTypeOf('function')
+    expect(CanvasAppAuthoring.routeCanvasTextPasteReplace)
+      .toBeTypeOf('function')
+    expect(CanvasAppFacade.routeCanvasTextPasteReplace)
+      .toBeTypeOf('function')
+    expect(CanvasPackage.routeCanvasTextPasteReplace)
+      .toBeTypeOf('function')
     expect(CanvasAppAuthoring.getCanvasAppFeaturePackCatalog)
       .toBeTypeOf('function')
     expect(CanvasAppFacade.getCanvasAppFeaturePackCatalog)
@@ -1989,6 +1998,33 @@ describe('Canvas package consumer imports', () => {
       },
       kind: 'image-replace',
       status: 'routed',
+    })
+    const textPasteReplaceRoute: CanvasTextPasteReplaceRoute =
+      routeCanvasTextPasteReplace({
+        getTarget: ({ selection }) => ({
+          id: selection[0] ?? 'consumer-text-one',
+          selection,
+        }),
+        selection: ['consumer-text-one'],
+        source: createCanvasPlainTextPasteSource('Consumer text')!,
+      })
+
+    expect(textPasteReplaceRoute).toMatchObject({
+      intent: {
+        kind: 'text-replace',
+        source: {
+          format: 'text-plain',
+          text: 'Consumer text',
+        },
+        target: {
+          id: 'consumer-text-one',
+          selection: ['consumer-text-one'],
+        },
+        text: 'Consumer text',
+      },
+      kind: 'text-replace',
+      status: 'routed',
+      text: 'Consumer text',
     })
     expect(downloadCanvasBlobFile({
       blob: new Blob(['smoke']),

@@ -3,18 +3,32 @@ import {
 } from '../CanvasAppFeaturePackManifests'
 
 export {
+  createCanvasPlainTextPasteSource,
   createCanvasTextPasteItems,
   getCanvasRichTextPasteSourceFromDataTransfer,
   getCanvasRichTextPasteSourceFromHTML,
   getCanvasTextPasteInsertPosition,
+  getCanvasTextPasteSourceCandidatesFromDataTransfer,
+  getCanvasTextPasteSourceText,
   getCanvasTextPasteSourcesFromDataTransfer,
   insertCanvasTextPasteSource,
+  routeCanvasTextPasteReplace,
+  type CanvasPlainTextPasteSource,
   type CanvasRichTextPasteParagraph,
   type CanvasRichTextPasteRun,
   type CanvasRichTextPasteSource,
   type CanvasTextPasteImportResult,
   type CanvasTextPasteInsertPositionInput,
   type CanvasTextPasteInsertionContext,
+  type CanvasTextPasteReplaceFallbackReason,
+  type CanvasTextPasteReplaceFallbackRoute,
+  type CanvasTextPasteReplaceIntent,
+  type CanvasTextPasteReplaceRoute,
+  type CanvasTextPasteReplaceRouteInput,
+  type CanvasTextPasteReplaceRoutedRoute,
+  type CanvasTextPasteReplaceTarget,
+  type CanvasTextPasteReplaceTargetInput,
+  type CanvasTextPasteSource,
 } from './CanvasTextPasteImport'
 export {
   assertCanvasTextPasteImporter,

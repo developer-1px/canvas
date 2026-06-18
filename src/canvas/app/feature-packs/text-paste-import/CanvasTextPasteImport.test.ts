@@ -1,11 +1,14 @@
 import { describe, expect, it, vi } from 'vitest'
 import {
   CANVAS_TEXT_PASTE_IMPORT_MODEL,
+  createCanvasPlainTextPasteSource,
   createCanvasTextPasteItems,
   getCanvasRichTextPasteSourceFromHTML,
   getCanvasTextPasteInsertPosition,
+  getCanvasTextPasteSourceCandidatesFromDataTransfer,
   getCanvasTextPasteSourcesFromDataTransfer,
   insertCanvasTextPasteSource,
+  routeCanvasTextPasteReplace,
 } from './CanvasTextPasteImport'
 import type { CanvasTextPasteImporter } from './CanvasTextPasteImporters'
 
@@ -37,6 +40,36 @@ describe('CanvasTextPasteImport', () => {
     expect(getCanvasTextPasteSourcesFromDataTransfer(dataTransfer)).toEqual([
       '<main>Same</main>',
     ])
+  })
+
+  it('creates common text paste source candidates with rich source first', () => {
+    const dataTransfer = {
+      getData: vi.fn((type: string) =>
+        type === 'text/html'
+          ? '<p>Hello <strong>Bold</strong></p>'
+          : 'Plain fallback',
+      ),
+    } as unknown as DataTransfer
+
+    expect(getCanvasTextPasteSourceCandidatesFromDataTransfer(dataTransfer))
+      .toEqual([
+        {
+          format: 'text-html-rich',
+          paragraphs: [
+            {
+              runs: [
+                { text: 'Hello ' },
+                { bold: true, text: 'Bold' },
+              ],
+            },
+          ],
+          text: 'Hello Bold',
+        },
+        {
+          format: 'text-plain',
+          text: 'Plain fallback',
+        },
+      ])
   })
 
   it('normalizes rich HTML clipboard text into paragraph and run metadata', () => {
@@ -84,6 +117,144 @@ describe('CanvasTextPasteImport', () => {
     expect(getCanvasRichTextPasteSourceFromHTML(
       '<p><img src="data:image/png;base64,aW1hZ2U="></p>',
     )).toBeNull()
+  })
+
+  it('routes a plain text paste source to a host text replace target', () => {
+    const source = createCanvasPlainTextPasteSource('  Hello text  ')
+    const getTarget = vi.fn(() => ({
+      id: 'text-1',
+      selection: ['text-1'],
+    }))
+
+    expect(source).toEqual({
+      format: 'text-plain',
+      text: 'Hello text',
+    })
+
+    const route = routeCanvasTextPasteReplace({
+      getTarget,
+      selection: ['text-1'],
+      source: source!,
+    })
+
+    expect(route).toEqual({
+      intent: {
+        kind: 'text-replace',
+        source,
+        target: {
+          id: 'text-1',
+          selection: ['text-1'],
+        },
+        text: 'Hello text',
+      },
+      kind: 'text-replace',
+      source,
+      status: 'routed',
+      text: 'Hello text',
+    })
+    expect(Object.isFrozen(route)).toBe(true)
+    expect(getTarget).toHaveBeenCalledWith({
+      selection: ['text-1'],
+      source,
+      text: 'Hello text',
+    })
+  })
+
+  it('routes a rich HTML paste source with paragraph metadata', () => {
+    const source = getCanvasRichTextPasteSourceFromHTML(`
+      <p>Hello <strong>Bold</strong></p>
+    `)
+    const route = routeCanvasTextPasteReplace({
+      getTarget: ({ selection }) => ({
+        id: selection[0] ?? 'text-1',
+        selection,
+      }),
+      selection: ['text-1'],
+      source: source!,
+    })
+
+    expect(route).toMatchObject({
+      intent: {
+        kind: 'text-replace',
+        source: {
+          format: 'text-html-rich',
+          paragraphs: [
+            {
+              runs: [
+                { text: 'Hello ' },
+                { bold: true, text: 'Bold' },
+              ],
+            },
+          ],
+          text: 'Hello Bold',
+        },
+        target: {
+          id: 'text-1',
+          selection: ['text-1'],
+        },
+        text: 'Hello Bold',
+      },
+      kind: 'text-replace',
+      status: 'routed',
+      text: 'Hello Bold',
+    })
+  })
+
+  it('falls back to text insertion when replace target is unavailable', () => {
+    const source = createCanvasPlainTextPasteSource('Hello text')!
+    const route = routeCanvasTextPasteReplace({
+      getTarget: () => null,
+      selection: [],
+      source,
+    })
+
+    expect(route).toEqual({
+      kind: 'text-insert',
+      reason: 'no-target',
+      source,
+      status: 'fallback',
+      text: 'Hello text',
+    })
+    expect(Object.isFrozen(route)).toBe(true)
+  })
+
+  it('lets hosts disable text replacement before target lookup', () => {
+    const getTarget = vi.fn(() => ({
+      id: 'text-1',
+      selection: ['text-1'],
+    }))
+    const source = {
+      format: 'text-plain' as const,
+      text: '   ',
+    }
+
+    expect(routeCanvasTextPasteReplace({
+      disabled: true,
+      getTarget,
+      selection: ['text-1'],
+      source: createCanvasPlainTextPasteSource('Hello text')!,
+    })).toEqual({
+      kind: 'text-insert',
+      reason: 'disabled',
+      source: {
+        format: 'text-plain',
+        text: 'Hello text',
+      },
+      status: 'fallback',
+      text: 'Hello text',
+    })
+    expect(routeCanvasTextPasteReplace({
+      getTarget,
+      selection: ['text-1'],
+      source,
+    })).toEqual({
+      kind: 'text-insert',
+      reason: 'empty-source',
+      source,
+      status: 'fallback',
+      text: '   ',
+    })
+    expect(getTarget).not.toHaveBeenCalled()
   })
 
   it('uses the first importer that can create canvas items', () => {

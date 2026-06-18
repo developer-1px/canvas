@@ -47,6 +47,67 @@ export type CanvasRichTextPasteSource = {
   text: string
 }
 
+export type CanvasPlainTextPasteSource = Readonly<{
+  format: 'text-plain'
+  text: string
+}>
+
+export type CanvasTextPasteSource =
+  | CanvasPlainTextPasteSource
+  | CanvasRichTextPasteSource
+
+export type CanvasTextPasteReplaceTarget = Readonly<{
+  id: string
+  selection: readonly string[]
+}>
+
+export type CanvasTextPasteReplaceTargetInput = Readonly<{
+  selection: readonly string[]
+  source: CanvasTextPasteSource
+  text: string
+}>
+
+export type CanvasTextPasteReplaceIntent = Readonly<{
+  kind: 'text-replace'
+  source: CanvasTextPasteSource
+  target: CanvasTextPasteReplaceTarget
+  text: string
+}>
+
+export type CanvasTextPasteReplaceRoute =
+  | CanvasTextPasteReplaceFallbackRoute
+  | CanvasTextPasteReplaceRoutedRoute
+
+export type CanvasTextPasteReplaceRoutedRoute = Readonly<{
+  intent: CanvasTextPasteReplaceIntent
+  kind: 'text-replace'
+  source: CanvasTextPasteSource
+  status: 'routed'
+  text: string
+}>
+
+export type CanvasTextPasteReplaceFallbackReason =
+  | 'disabled'
+  | 'empty-source'
+  | 'no-target'
+
+export type CanvasTextPasteReplaceFallbackRoute = Readonly<{
+  kind: 'text-insert'
+  reason: CanvasTextPasteReplaceFallbackReason
+  source: CanvasTextPasteSource
+  status: 'fallback'
+  text: string
+}>
+
+export type CanvasTextPasteReplaceRouteInput = Readonly<{
+  disabled?: boolean
+  getTarget: (
+    input: CanvasTextPasteReplaceTargetInput
+  ) => CanvasTextPasteReplaceTarget | null
+  selection: readonly string[]
+  source: CanvasTextPasteSource
+}>
+
 export const CANVAS_TEXT_PASTE_IMPORT_MODEL = 'canvas-text-paste-import'
 
 const CANVAS_TEXT_PASTE_DATA_TYPES = [
@@ -107,6 +168,77 @@ export function insertCanvasTextPasteSource({
       before: context.selection,
     },
   )
+}
+
+export function createCanvasPlainTextPasteSource(
+  text: string,
+): CanvasPlainTextPasteSource | null {
+  const normalizedText = text.trim()
+
+  return normalizedText
+    ? Object.freeze({
+        format: 'text-plain',
+        text: normalizedText,
+      })
+    : null
+}
+
+export function getCanvasTextPasteSourceText(
+  source: CanvasTextPasteSource,
+): string {
+  return source.text
+}
+
+export function routeCanvasTextPasteReplace({
+  disabled = false,
+  getTarget,
+  selection,
+  source,
+}: CanvasTextPasteReplaceRouteInput): CanvasTextPasteReplaceRoute {
+  const text = getCanvasTextPasteSourceText(source)
+
+  if (disabled) {
+    return createCanvasTextPasteReplaceFallbackRoute({
+      reason: 'disabled',
+      source,
+      text,
+    })
+  }
+
+  if (!text.trim()) {
+    return createCanvasTextPasteReplaceFallbackRoute({
+      reason: 'empty-source',
+      source,
+      text,
+    })
+  }
+
+  const target = getTarget({
+    selection,
+    source,
+    text,
+  })
+
+  if (!target) {
+    return createCanvasTextPasteReplaceFallbackRoute({
+      reason: 'no-target',
+      source,
+      text,
+    })
+  }
+
+  return Object.freeze({
+    intent: Object.freeze({
+      kind: 'text-replace',
+      source,
+      target,
+      text,
+    }),
+    kind: 'text-replace',
+    source,
+    status: 'routed',
+    text,
+  })
 }
 
 export function createCanvasTextPasteItems({
@@ -173,6 +305,38 @@ export function getCanvasTextPasteSourcesFromDataTransfer(
   return sources
 }
 
+export function getCanvasTextPasteSourceCandidatesFromDataTransfer(
+  dataTransfer: DataTransfer | null,
+): CanvasTextPasteSource[] {
+  if (!dataTransfer) {
+    return []
+  }
+
+  const sources: CanvasTextPasteSource[] = []
+  const richSource = getCanvasRichTextPasteSourceFromDataTransfer(dataTransfer)
+
+  if (richSource) {
+    sources.push(richSource)
+  }
+
+  const fallbackTexts = richSource
+    ? [dataTransfer.getData('text/plain').trim()]
+    : getCanvasTextPasteSourcesFromDataTransfer(dataTransfer)
+
+  for (const text of fallbackTexts) {
+    const plainSource = createCanvasPlainTextPasteSource(text)
+
+    if (
+      plainSource &&
+      !sources.some((source) => source.text === plainSource.text)
+    ) {
+      sources.push(plainSource)
+    }
+  }
+
+  return sources
+}
+
 export function getCanvasRichTextPasteSourceFromDataTransfer(
   dataTransfer: DataTransfer | null,
 ) {
@@ -220,6 +384,24 @@ export function getCanvasTextPasteInsertPosition({
   }
 
   return stageElement.getViewportCenter(viewport) ?? { x: 0, y: 0 }
+}
+
+function createCanvasTextPasteReplaceFallbackRoute({
+  reason,
+  source,
+  text,
+}: {
+  reason: CanvasTextPasteReplaceFallbackReason
+  source: CanvasTextPasteSource
+  text: string
+}): CanvasTextPasteReplaceFallbackRoute {
+  return Object.freeze({
+    kind: 'text-insert',
+    reason,
+    source,
+    status: 'fallback',
+    text,
+  })
 }
 
 function getCanvasRichTextParagraphsFromDOM(value: string) {

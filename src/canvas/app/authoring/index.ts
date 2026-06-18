@@ -126,8 +126,15 @@ export type {
   CanvasAppTextSearchOptions,
 } from '../workspace/document/CanvasAppDocumentContracts'
 export type {
+  CanvasPlainTextPasteSource,
+  CanvasRichTextPasteSource,
   CanvasTextPasteImporter,
   CanvasTextPasteImporterContext,
+  CanvasTextPasteReplaceIntent,
+  CanvasTextPasteReplaceRoute,
+  CanvasTextPasteReplaceRouteInput,
+  CanvasTextPasteReplaceTarget,
+  CanvasTextPasteSource,
 } from '../feature-packs/text-paste-import'
 export {
   CANVAS_APP_BOARD_IO_FEATURE_PACK_MANIFEST,
@@ -255,6 +262,10 @@ export {
   getCanvasAppEnabledFeaturePackManifests,
   routeCanvasImagePasteReplace,
   routeCanvasMediaSourceObjectHyperlink,
+  routeCanvasTextPasteReplace,
+  createCanvasPlainTextPasteSource,
+  getCanvasTextPasteSourceCandidatesFromDataTransfer,
+  getCanvasTextPasteSourceText,
   getCanvasAppFeaturePackMarketplaceActionModel,
   getCanvasAppFeaturePackMarketplaceModel,
   getCanvasAppFeaturePackMarketplacePrimaryActionDiagnostic,
