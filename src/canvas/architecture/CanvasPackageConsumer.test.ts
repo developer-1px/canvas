@@ -10,6 +10,10 @@ import {
   CanvasRenderer,
   CANVAS_APP_BOARD_IO_FEATURE_PACK_MANIFEST,
   CANVAS_CONTROL_TARGET_SELECTOR,
+  CANVAS_WHEEL_VIEWPORT_HORIZONTAL_PAN_MODIFIER,
+  CANVAS_WHEEL_VIEWPORT_MODEL,
+  CANVAS_WHEEL_VIEWPORT_PAN_MODE,
+  CANVAS_WHEEL_VIEWPORT_ZOOM_MODIFIER,
   CANVAS_WHEEL_PASSTHROUGH_SELECTOR,
   applyCanvasAppFeaturePackRuntimeStatePatch,
   bindCanvasEventListener,
@@ -32,6 +36,7 @@ import {
   createCanvasAppFeaturePackMarketplaceListing,
   getCanvasAppFeaturePackMarketplaceActionAssemblyPlan,
   getCanvasAppFeaturePackMarketplaceActionAssemblyInput,
+  centerCanvasViewportAtWorldPoint,
   createCanvasExternalClipboardImagePasteActionResolver,
   createCanvasExternalClipboardPasteActionPlan,
   createCanvasPlainTextPasteSource,
@@ -48,13 +53,16 @@ import {
   setCanvasDataTransferDropEffect,
   downloadCanvasBlobFile,
   downloadCanvasTextFile,
+  fitCanvasViewportToBounds,
   getCanvasEditableFieldKeyboardIntent,
   getCanvasPresentationKeyboardIntent,
   setCanvasDataTransferText,
   scheduleCanvasAnimationFrameTask,
   writeCanvasClipboardText,
   previewCanvasPointerPanInteraction,
+  resetCanvasViewport,
   startCanvasPointerPanInteraction,
+  zoomCanvasViewport,
   defineCanvasAppCustomItemModule,
   CANVAS_APP_CORE_ONLY_FEATURE_PACK_PROFILE,
   CANVAS_APP_COMPONENT_INSPECTOR_FEATURE_PACK_MANIFEST,
@@ -228,6 +236,7 @@ import {
   type CanvasSelectionListModifierInput,
   type CanvasSelectionListModifierState,
   type CanvasSelectionListSelectionMode,
+  type CanvasViewportSetter,
   type CanvasWorkspaceStorageProvider,
   type CanvasWorldClientPointInput,
   type CanvasWorldClientPointStageElement,
@@ -1443,6 +1452,20 @@ describe('Canvas package consumer imports', () => {
       getViewportCenter: () => ({ x: 100, y: 120 }),
     }
     const appFacadeViewport = { scale: 2, x: 10, y: 20 }
+    const viewportControlStageElement = {
+      getRect: () => ({
+        height: 100,
+        left: 0,
+        top: 0,
+        width: 200,
+      }),
+    } as Parameters<typeof centerCanvasViewportAtWorldPoint>[0]['stageElement']
+    const viewportUpdates: Array<{ scale: number; x: number; y: number }> = []
+    let viewportState = { scale: 1, x: 0, y: 0 }
+    const setViewport: CanvasViewportSetter = (next) => {
+      viewportState = typeof next === 'function' ? next(viewportState) : next
+      viewportUpdates.push(viewportState)
+    }
 
     expect(CanvasApp).toBeTypeOf('function')
     expect('useCanvasAppModel' in CanvasPackage).toBe(false)
@@ -1475,6 +1498,15 @@ describe('Canvas package consumer imports', () => {
     expect(CanvasAppFacade.CANVAS_WHEEL_PASSTHROUGH_SELECTOR).toContain(
       'data-canvas-wheel-passthrough',
     )
+    expect(CANVAS_WHEEL_VIEWPORT_MODEL).toBe('canvas-wheel-viewport')
+    expect(CanvasAppFacade.CANVAS_WHEEL_VIEWPORT_MODEL)
+      .toBe(CANVAS_WHEEL_VIEWPORT_MODEL)
+    expect(CanvasAppFacade.CANVAS_WHEEL_VIEWPORT_PAN_MODE)
+      .toBe(CANVAS_WHEEL_VIEWPORT_PAN_MODE)
+    expect(CanvasAppFacade.CANVAS_WHEEL_VIEWPORT_HORIZONTAL_PAN_MODIFIER)
+      .toBe(CANVAS_WHEEL_VIEWPORT_HORIZONTAL_PAN_MODIFIER)
+    expect(CanvasAppFacade.CANVAS_WHEEL_VIEWPORT_ZOOM_MODIFIER)
+      .toBe(CANVAS_WHEEL_VIEWPORT_ZOOM_MODIFIER)
     expect(isCanvasControlTarget(nullControlTargetInput)).toBe(false)
     expect(CanvasAppFacade.isCanvasControlTarget(nullControlTargetInput))
       .toBe(false)
@@ -1511,6 +1543,31 @@ describe('Canvas package consumer imports', () => {
     expect(CanvasAppFacade.getCanvasPointerLocalPoint(
       pointerLocalGeometryInput,
     )).toEqual({ x: 50, y: 60 })
+    resetCanvasViewport({ setViewport })
+    expect(viewportState).toEqual({ scale: 1, x: 0, y: 0 })
+    centerCanvasViewportAtWorldPoint({
+      point: { x: 10, y: 20 },
+      setViewport,
+      stageElement: viewportControlStageElement,
+    })
+    expect(viewportState).toEqual({ scale: 1, x: 90, y: 30 })
+    CanvasAppFacade.zoomCanvasViewport({
+      direction: 'in',
+      setViewport,
+      stageElement: viewportControlStageElement,
+    })
+    fitCanvasViewportToBounds({
+      bounds: { h: 50, w: 50, x: 0, y: 0 },
+      setViewport,
+      stageElement: viewportControlStageElement,
+    })
+    expect(viewportUpdates.length).toBe(4)
+    expect(CanvasAppFacade.resetCanvasViewport).toBe(resetCanvasViewport)
+    expect(CanvasAppFacade.centerCanvasViewportAtWorldPoint)
+      .toBe(centerCanvasViewportAtWorldPoint)
+    expect(CanvasAppFacade.fitCanvasViewportToBounds)
+      .toBe(fitCanvasViewportToBounds)
+    expect(CanvasAppFacade.zoomCanvasViewport).toBe(zoomCanvasViewport)
     expect(pointerTransformModifierState).toEqual({
       constrainAngle: true,
       preserveAspectRatio: true,

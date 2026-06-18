@@ -435,6 +435,10 @@ export {
   type CanvasClientViewportSource,
 } from './affordances/interaction/viewport/CanvasClientViewportSize'
 export {
+  CANVAS_WHEEL_VIEWPORT_HORIZONTAL_PAN_MODIFIER,
+  CANVAS_WHEEL_VIEWPORT_MODEL,
+  CANVAS_WHEEL_VIEWPORT_PAN_MODE,
+  CANVAS_WHEEL_VIEWPORT_ZOOM_MODIFIER,
   centerCanvasViewportAtWorldPoint,
   fitCanvasViewportToBounds,
   fitCanvasViewportToItems,
