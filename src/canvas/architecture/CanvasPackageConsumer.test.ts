@@ -74,6 +74,7 @@ import {
   getCanvasAppInstalledViewFeaturePacks,
   getCanvasAppFeaturePackProfileById,
   getCanvasAppFeaturePackProfileRuntimeStates,
+  getCanvasAppFeaturePackMarketplaceActionModel,
   getCanvasAppFeaturePackCatalog,
   getCanvasAppFeaturePackInstallPlan,
   getCanvasAppFeaturePackPartialUpdatePlan,
@@ -113,6 +114,7 @@ import {
   type CanvasComponentPaletteProps,
   type CanvasComponentInspectorPanelModel,
   type CanvasAppFeaturePack,
+  type CanvasAppFeaturePackMarketplaceActionModel,
   type CanvasAppFeaturePackCatalog,
   type CanvasAppFeaturePackCatalogItem,
   type CanvasAppFeaturePackInstallPlan,
@@ -462,6 +464,11 @@ describe('Canvas package consumer imports', () => {
         manifests: [partialUpdateManifest],
         targetFeaturePackIds: ['smoke-partial-pack'],
       }
+    const featurePackMarketplaceActionModel:
+      CanvasAppFeaturePackMarketplaceActionModel =
+        getCanvasAppFeaturePackMarketplaceActionModel({
+          manifests: [partialUpdateManifest],
+        })
     const featurePackPartialUpdatePlan:
       CanvasAppFeaturePackPartialUpdatePlan =
         getCanvasAppFeaturePackPartialUpdatePlan(
@@ -893,6 +900,16 @@ describe('Canvas package consumer imports', () => {
     ])
     expect(featurePackInstallPlan.installFeaturePackIds).toEqual([])
     expect(featurePackInstallPlan.status).toBe('ready')
+    expect(featurePackMarketplaceActionModel.items[0]?.primaryActionKind)
+      .toBe('disable')
+    expect(featurePackMarketplaceActionModel.items[0]?.actions.map(
+      (action) => action.kind,
+    )).toEqual([
+      'install',
+      'enable',
+      'disable',
+      'uninstall',
+    ])
     expect(featurePackPartialUpdatePlan.surfaceIds).toEqual(['overlay'])
     expect(featurePackPartialUpdatePlan.entries[0]?.runtimeToggleable)
       .toBe(true)
@@ -1268,6 +1285,12 @@ describe('Canvas package consumer imports', () => {
     expect(CanvasAppFacade.getCanvasAppFeaturePackCatalog)
       .toBeTypeOf('function')
     expect(CanvasPackage.getCanvasAppFeaturePackCatalog)
+      .toBeTypeOf('function')
+    expect(CanvasAppAuthoring.getCanvasAppFeaturePackMarketplaceActionModel)
+      .toBeTypeOf('function')
+    expect(CanvasAppFacade.getCanvasAppFeaturePackMarketplaceActionModel)
+      .toBeTypeOf('function')
+    expect(CanvasPackage.getCanvasAppFeaturePackMarketplaceActionModel)
       .toBeTypeOf('function')
     expect(CanvasAppAuthoring.getCanvasAppFeaturePackInstallPlan)
       .toBeTypeOf('function')

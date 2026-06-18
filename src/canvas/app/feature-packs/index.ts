@@ -57,6 +57,13 @@ export {
   DEFAULT_CANVAS_APP_VIEW_FEATURE_PACKS,
 } from './CanvasAppDefaultViewFeaturePacks'
 export {
+  getCanvasAppFeaturePackMarketplaceActionModel,
+  type CanvasAppFeaturePackMarketplaceAction,
+  type CanvasAppFeaturePackMarketplaceActionItem,
+  type CanvasAppFeaturePackMarketplaceActionKind,
+  type CanvasAppFeaturePackMarketplaceActionModel,
+} from './CanvasAppFeaturePackActions'
+export {
   getCanvasAppFeaturePackCatalog,
   type CanvasAppFeaturePackCatalog,
   type CanvasAppFeaturePackCatalogBlockedReason,
