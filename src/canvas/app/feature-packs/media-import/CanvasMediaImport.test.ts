@@ -1,9 +1,11 @@
 import { describe, expect, it, vi } from 'vitest'
 import {
   CANVAS_MEDIA_IMPORT_MODEL,
+  CANVAS_MEDIA_SOURCE_JSON_MIME_TYPE,
   createCanvasMediaImportItems,
   getCanvasMediaInsertPosition,
   getCanvasMediaSourceFromDataTransfer,
+  getCanvasMediaSourceFromJSONDataTransfer,
   getCanvasMediaSourceFromText,
   insertCanvasMediaSource,
   routeCanvasMediaSourceObjectHyperlink,
@@ -40,6 +42,75 @@ describe('CanvasMediaImport', () => {
     expect(getCanvasMediaSourceFromDataTransfer(dataTransfer)).toEqual({
       url: 'https://docs.example.com/reference',
     })
+  })
+
+  it('reads custom MIME direct media source JSON with title metadata', () => {
+    const dataTransfer = createDataTransfer({
+      [CANVAS_MEDIA_SOURCE_JSON_MIME_TYPE]: JSON.stringify({
+        title: 'Design Brief',
+        url: ' https://example.com/brief ',
+      }),
+      'text/plain': 'https://fallback.example.com',
+    })
+
+    expect(getCanvasMediaSourceFromDataTransfer(dataTransfer)).toEqual({
+      title: 'Design Brief',
+      url: 'https://example.com/brief',
+    })
+  })
+
+  it('reads wrapped application/json media source payloads', () => {
+    expect(getCanvasMediaSourceFromJSONDataTransfer(createDataTransfer({
+      'application/json': JSON.stringify({
+        mediaSource: {
+          href: 'https://example.com/embed',
+          name: 'Embed',
+        },
+      }),
+    }))).toEqual({
+      title: 'Embed',
+      url: 'https://example.com/embed',
+    })
+    expect(getCanvasMediaSourceFromJSONDataTransfer(createDataTransfer({
+      'application/json': JSON.stringify({
+        linkPreview: {
+          label: 'Preview',
+          src: '<iframe src="https://video.example.com/embed"></iframe>',
+        },
+      }),
+    }))).toEqual({
+      title: 'Preview',
+      url: 'https://video.example.com/embed',
+    })
+  })
+
+  it('preserves existing URL paste priority before generic JSON media wrappers', () => {
+    const dataTransfer = createDataTransfer({
+      'application/json': JSON.stringify({
+        linkCard: {
+          title: 'JSON Link',
+          url: 'https://json.example.com',
+        },
+      }),
+      'text/uri-list': 'https://uri-list.example.com',
+    })
+
+    expect(getCanvasMediaSourceFromDataTransfer(dataTransfer)).toEqual({
+      url: 'https://uri-list.example.com/',
+    })
+  })
+
+  it('ignores invalid and direct generic media source JSON payloads', () => {
+    expect(getCanvasMediaSourceFromJSONDataTransfer(null)).toBeNull()
+    expect(getCanvasMediaSourceFromJSONDataTransfer(createDataTransfer({
+      'application/json': '{"url":"https://direct.example.com"}',
+    }))).toBeNull()
+    expect(getCanvasMediaSourceFromJSONDataTransfer(createDataTransfer({
+      'application/json': '{"mediaSource":{"url":"not a url"}}',
+    }))).toBeNull()
+    expect(getCanvasMediaSourceFromJSONDataTransfer(createDataTransfer({
+      [CANVAS_MEDIA_SOURCE_JSON_MIME_TYPE]: 'not json',
+    }))).toBeNull()
   })
 
   it('uses the first media importer that can create canvas items', () => {
@@ -308,3 +379,9 @@ describe('CanvasMediaImport', () => {
     })).toEqual({ x: 100, y: 120 })
   })
 })
+
+function createDataTransfer(values: Record<string, string>) {
+  return {
+    getData: (type: string) => values[type] ?? '',
+  } as unknown as DataTransfer
+}

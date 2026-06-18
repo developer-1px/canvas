@@ -87,7 +87,36 @@ export type CanvasMediaObjectHyperlinkRouteInput = Readonly<{
   source: CanvasMediaImportSource
 }>
 
+export type CanvasMediaSourceDataTransfer = Pick<DataTransfer, 'getData'>
+
 const CANVAS_URL_PATTERN = /https?:\/\/[^\s"'<>]+/i
+
+export const CANVAS_MEDIA_SOURCE_JSON_MIME_TYPE =
+  'application/vnd.interactive-os.canvas.media-source+json'
+
+export const CANVAS_MEDIA_SOURCE_JSON_TYPES = Object.freeze([
+  'application/json',
+] as const)
+
+export const CANVAS_MEDIA_SOURCE_JSON_WRAPPER_KEYS = Object.freeze([
+  'media',
+  'mediaSource',
+  'linkCard',
+  'linkPreview',
+  'embed',
+] as const)
+
+const CANVAS_MEDIA_SOURCE_JSON_URL_KEYS = Object.freeze([
+  'url',
+  'href',
+  'src',
+] as const)
+
+const CANVAS_MEDIA_SOURCE_JSON_TITLE_KEYS = Object.freeze([
+  'title',
+  'name',
+  'label',
+] as const)
 
 const CANVAS_LINK_PREVIEW_MEDIA_IMPORTER: CanvasMediaImporter = {
   id: 'link-preview',
@@ -276,16 +305,41 @@ export function getCanvasMediaInsertPosition({
 }
 
 export function getCanvasMediaSourceFromDataTransfer(
-  dataTransfer: DataTransfer | null,
+  dataTransfer: CanvasMediaSourceDataTransfer | null,
 ) {
   if (!dataTransfer) {
     return null
   }
 
-  return getCanvasMediaSourceFromText(
+  const customJSONSource = getCanvasMediaSourceFromCustomJSONDataTransfer(
+    dataTransfer,
+  )
+
+  if (customJSONSource) {
+    return customJSONSource
+  }
+
+  const textSource = getCanvasMediaSourceFromText(
     dataTransfer.getData('text/uri-list') ||
       dataTransfer.getData('text/plain'),
   )
+
+  if (textSource) {
+    return textSource
+  }
+
+  return getCanvasMediaSourceFromWrappedJSONDataTransfer(dataTransfer)
+}
+
+export function getCanvasMediaSourceFromJSONDataTransfer(
+  dataTransfer: CanvasMediaSourceDataTransfer | null,
+): CanvasMediaImportSource | null {
+  if (!dataTransfer) {
+    return null
+  }
+
+  return getCanvasMediaSourceFromCustomJSONDataTransfer(dataTransfer) ??
+    getCanvasMediaSourceFromWrappedJSONDataTransfer(dataTransfer)
 }
 
 export function getCanvasMediaSourceFromText(
@@ -296,6 +350,129 @@ export function getCanvasMediaSourceFromText(
   )
 
   return url ? { url } : null
+}
+
+function getCanvasMediaSourceFromCustomJSONDataTransfer(
+  dataTransfer: CanvasMediaSourceDataTransfer,
+) {
+  const text = dataTransfer.getData(CANVAS_MEDIA_SOURCE_JSON_MIME_TYPE)
+
+  if (!text.trim()) {
+    return null
+  }
+
+  const value = parseCanvasMediaSourceJSON(text)
+
+  return getCanvasMediaSourceFromDirectJSONValue(value) ??
+    getCanvasMediaSourceFromWrappedJSONValue(value)
+}
+
+function getCanvasMediaSourceFromWrappedJSONDataTransfer(
+  dataTransfer: CanvasMediaSourceDataTransfer,
+) {
+  for (const type of CANVAS_MEDIA_SOURCE_JSON_TYPES) {
+    const text = dataTransfer.getData(type)
+
+    if (!text.trim()) {
+      continue
+    }
+
+    const source = getCanvasMediaSourceFromWrappedJSONValue(
+      parseCanvasMediaSourceJSON(text),
+    )
+
+    if (source) {
+      return source
+    }
+  }
+
+  return null
+}
+
+function getCanvasMediaSourceFromWrappedJSONValue(
+  value: unknown,
+): CanvasMediaImportSource | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null
+  }
+
+  const record = value as Record<string, unknown>
+
+  for (const key of CANVAS_MEDIA_SOURCE_JSON_WRAPPER_KEYS) {
+    if (!Object.hasOwn(record, key)) {
+      continue
+    }
+
+    const source = getCanvasMediaSourceFromDirectJSONValue(record[key])
+
+    if (source) {
+      return source
+    }
+  }
+
+  return null
+}
+
+function getCanvasMediaSourceFromDirectJSONValue(
+  value: unknown,
+): CanvasMediaImportSource | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null
+  }
+
+  const record = value as Record<string, unknown>
+  const urlText = getCanvasMediaSourceJSONText(
+    record,
+    CANVAS_MEDIA_SOURCE_JSON_URL_KEYS,
+  )
+  const source = urlText ? getCanvasMediaSourceFromText(urlText) : null
+
+  if (!source) {
+    return null
+  }
+
+  const title = getCanvasMediaSourceJSONText(
+    record,
+    CANVAS_MEDIA_SOURCE_JSON_TITLE_KEYS,
+  )
+
+  return title
+    ? {
+      ...source,
+      title,
+    }
+    : source
+}
+
+function getCanvasMediaSourceJSONText(
+  record: Record<string, unknown>,
+  keys: readonly string[],
+) {
+  for (const key of keys) {
+    if (!Object.hasOwn(record, key) || typeof record[key] !== 'string') {
+      continue
+    }
+
+    const value = record[key].trim()
+
+    if (value) {
+      return value
+    }
+  }
+
+  return null
+}
+
+function parseCanvasMediaSourceJSON(value: string) {
+  if (!value.trim()) {
+    return null
+  }
+
+  try {
+    return JSON.parse(value) as unknown
+  } catch {
+    return null
+  }
 }
 
 function extractCanvasMediaUrlText(text: string) {

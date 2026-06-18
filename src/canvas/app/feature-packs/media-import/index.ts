@@ -12,9 +12,13 @@ import {
 } from './CanvasLinkPreviewInspectorPanel'
 
 export {
+  CANVAS_MEDIA_SOURCE_JSON_MIME_TYPE,
+  CANVAS_MEDIA_SOURCE_JSON_TYPES,
+  CANVAS_MEDIA_SOURCE_JSON_WRAPPER_KEYS,
   createCanvasMediaImportItems,
   getCanvasMediaInsertPosition,
   getCanvasMediaSourceFromDataTransfer,
+  getCanvasMediaSourceFromJSONDataTransfer,
   getCanvasMediaSourceFromText,
   insertCanvasMediaSource,
   routeCanvasMediaSourceObjectHyperlink,
@@ -29,6 +33,7 @@ export {
   type CanvasMediaObjectHyperlinkTarget,
   type CanvasMediaObjectHyperlinkTargetInput,
   type CanvasMediaObjectHyperlinkUpdateIntent,
+  type CanvasMediaSourceDataTransfer,
 } from './CanvasMediaImport'
 export {
   assertCanvasMediaImporter,
