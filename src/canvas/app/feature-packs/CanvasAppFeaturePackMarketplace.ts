@@ -113,6 +113,34 @@ export type CanvasAppFeaturePackMarketplaceSectionFacet<
   label: string
 }>
 
+export type CanvasAppFeaturePackMarketplaceProfileSectionFacetItemsInput =
+  Readonly<{
+    facetKind: CanvasAppFeaturePackMarketplaceProfileSectionFacetKind
+    section: CanvasAppFeaturePackMarketplaceProfileSection
+  }>
+
+export type CanvasAppFeaturePackMarketplaceSuiteSectionFacetItemsInput =
+  Readonly<{
+    facetKind: CanvasAppFeaturePackMarketplaceSuiteSectionFacetKind
+    section: CanvasAppFeaturePackMarketplaceSuiteSection
+  }>
+
+export type CanvasAppFeaturePackMarketplacePackSectionFacetItemsInput =
+  Readonly<{
+    facetKind: CanvasAppFeaturePackMarketplacePackSectionFacetKind
+    section: CanvasAppFeaturePackMarketplacePackSection
+  }>
+
+export type CanvasAppFeaturePackMarketplaceSectionFacetItemsInput =
+  | CanvasAppFeaturePackMarketplacePackSectionFacetItemsInput
+  | CanvasAppFeaturePackMarketplaceProfileSectionFacetItemsInput
+  | CanvasAppFeaturePackMarketplaceSuiteSectionFacetItemsInput
+
+export type CanvasAppFeaturePackMarketplaceSectionFacetItems =
+  | readonly CanvasAppFeaturePackMarketplaceActionItem[]
+  | readonly CanvasAppFeaturePackProfileMarketplaceActionItem[]
+  | readonly CanvasAppFeaturePackSuiteMarketplaceActionItem[]
+
 export type CanvasAppFeaturePackMarketplaceActionSectionSummary =
   Readonly<{
     blockedActionCount: number
@@ -218,6 +246,48 @@ export function getCanvasAppFeaturePackMarketplaceModel({
   })
 }
 
+export function getCanvasAppFeaturePackMarketplaceSectionFacetItems(
+  input: CanvasAppFeaturePackMarketplaceProfileSectionFacetItemsInput,
+): readonly CanvasAppFeaturePackProfileMarketplaceActionItem[]
+export function getCanvasAppFeaturePackMarketplaceSectionFacetItems(
+  input: CanvasAppFeaturePackMarketplaceSuiteSectionFacetItemsInput,
+): readonly CanvasAppFeaturePackSuiteMarketplaceActionItem[]
+export function getCanvasAppFeaturePackMarketplaceSectionFacetItems(
+  input: CanvasAppFeaturePackMarketplacePackSectionFacetItemsInput,
+): readonly CanvasAppFeaturePackMarketplaceActionItem[]
+export function getCanvasAppFeaturePackMarketplaceSectionFacetItems(
+  input: CanvasAppFeaturePackMarketplaceSectionFacetItemsInput,
+): CanvasAppFeaturePackMarketplaceSectionFacetItems {
+  if (isCanvasAppFeaturePackMarketplaceProfileSectionFacetItemsInput(input)) {
+    return Object.freeze(input.section.items.filter((item) =>
+      isCanvasAppFeaturePackMarketplaceProfileSectionFacetItem({
+        facetKind: input.facetKind,
+        item,
+      })
+    ))
+  }
+
+  if (isCanvasAppFeaturePackMarketplaceSuiteSectionFacetItemsInput(input)) {
+    return Object.freeze(input.section.items.filter((item) =>
+      isCanvasAppFeaturePackMarketplaceSuiteSectionFacetItem({
+        facetKind: input.facetKind,
+        item,
+      })
+    ))
+  }
+
+  if (isCanvasAppFeaturePackMarketplacePackSectionFacetItemsInput(input)) {
+    return Object.freeze(input.section.items.filter((item) =>
+      isCanvasAppFeaturePackMarketplacePackSectionFacetItem({
+        facetKind: input.facetKind,
+        item,
+      })
+    ))
+  }
+
+  throw new Error('Unknown canvas app feature pack marketplace section')
+}
+
 function getCanvasAppFeaturePackMarketplaceProfileSectionSummary(
   items: readonly CanvasAppFeaturePackProfileMarketplaceActionItem[],
 ): CanvasAppFeaturePackMarketplaceProfileSectionSummary {
@@ -268,6 +338,24 @@ function getCanvasAppFeaturePackMarketplaceActionSectionSummary(
     itemCount: items.length,
     readyActionCount: actions.filter((action) => action.ready).length,
   })
+}
+
+function isCanvasAppFeaturePackMarketplaceProfileSectionFacetItemsInput(
+  input: CanvasAppFeaturePackMarketplaceSectionFacetItemsInput,
+): input is CanvasAppFeaturePackMarketplaceProfileSectionFacetItemsInput {
+  return input.section.kind === 'profiles'
+}
+
+function isCanvasAppFeaturePackMarketplaceSuiteSectionFacetItemsInput(
+  input: CanvasAppFeaturePackMarketplaceSectionFacetItemsInput,
+): input is CanvasAppFeaturePackMarketplaceSuiteSectionFacetItemsInput {
+  return input.section.kind === 'suites'
+}
+
+function isCanvasAppFeaturePackMarketplacePackSectionFacetItemsInput(
+  input: CanvasAppFeaturePackMarketplaceSectionFacetItemsInput,
+): input is CanvasAppFeaturePackMarketplacePackSectionFacetItemsInput {
+  return input.section.kind === 'packs'
 }
 
 function getCanvasAppFeaturePackMarketplaceProfileSectionFacets({
@@ -387,18 +475,108 @@ function getCanvasAppFeaturePackMarketplacePackSectionFacets({
 function getCanvasAppFeaturePackMarketplaceReadyItemCount(
   items: readonly CanvasAppFeaturePackMarketplaceSectionActionItem[],
 ) {
-  return items.filter((item) => item.actions.some((action) => action.ready))
-    .length
+  return items.filter(hasCanvasAppFeaturePackMarketplaceReadyAction).length
 }
 
 function getCanvasAppFeaturePackMarketplaceBlockedItemCount(
   items: readonly CanvasAppFeaturePackMarketplaceSectionActionItem[],
 ) {
-  return items.filter((item) =>
-    item.actions.some((action) =>
-      action.applicable && action.status === 'blocked'
-    )
-  ).length
+  return items.filter(hasCanvasAppFeaturePackMarketplaceBlockedAction).length
+}
+
+function isCanvasAppFeaturePackMarketplaceProfileSectionFacetItem({
+  facetKind,
+  item,
+}: {
+  facetKind: CanvasAppFeaturePackMarketplaceProfileSectionFacetKind
+  item: CanvasAppFeaturePackProfileMarketplaceActionItem
+}) {
+  if (facetKind === 'active') {
+    return item.active
+  }
+
+  return isCanvasAppFeaturePackMarketplaceCommonSectionFacetItem({
+    facetKind,
+    item,
+  })
+}
+
+function isCanvasAppFeaturePackMarketplaceSuiteSectionFacetItem({
+  facetKind,
+  item,
+}: {
+  facetKind: CanvasAppFeaturePackMarketplaceSuiteSectionFacetKind
+  item: CanvasAppFeaturePackSuiteMarketplaceActionItem
+}) {
+  if (facetKind === 'enabled') {
+    return item.status === 'enabled'
+  }
+
+  return isCanvasAppFeaturePackMarketplaceCommonSectionFacetItem({
+    facetKind,
+    item,
+  })
+}
+
+function isCanvasAppFeaturePackMarketplacePackSectionFacetItem({
+  facetKind,
+  item,
+}: {
+  facetKind: CanvasAppFeaturePackMarketplacePackSectionFacetKind
+  item: CanvasAppFeaturePackMarketplaceActionItem
+}) {
+  if (facetKind === 'installed') {
+    return item.installed
+  }
+
+  if (facetKind === 'enabled') {
+    return item.enabled
+  }
+
+  if (facetKind === 'paid') {
+    return item.listing.access === 'paid'
+  }
+
+  if (facetKind === 'private') {
+    return item.listing.access === 'private'
+  }
+
+  return isCanvasAppFeaturePackMarketplaceCommonSectionFacetItem({
+    facetKind,
+    item,
+  })
+}
+
+function isCanvasAppFeaturePackMarketplaceCommonSectionFacetItem({
+  facetKind,
+  item,
+}: {
+  facetKind: 'all' | 'blocked' | 'ready'
+  item: CanvasAppFeaturePackMarketplaceSectionActionItem
+}) {
+  if (facetKind === 'all') {
+    return true
+  }
+
+  if (facetKind === 'ready') {
+    return hasCanvasAppFeaturePackMarketplaceReadyAction(item)
+  }
+
+  return hasCanvasAppFeaturePackMarketplaceBlockedAction(item)
+}
+
+function hasCanvasAppFeaturePackMarketplaceReadyAction(
+  item: CanvasAppFeaturePackMarketplaceSectionActionItem,
+) {
+  return item.actions.some((action) => action.ready)
+}
+
+function hasCanvasAppFeaturePackMarketplaceBlockedAction(
+  item: CanvasAppFeaturePackMarketplaceSectionActionItem,
+) {
+  return item.actions.some((action) =>
+    action.applicable && action.status === 'blocked'
+  )
 }
 
 function createCanvasAppFeaturePackMarketplaceSectionFacet<

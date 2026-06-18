@@ -65,20 +65,26 @@ export {
 } from './CanvasAppFeaturePackActions'
 export {
   getCanvasAppFeaturePackMarketplaceModel,
+  getCanvasAppFeaturePackMarketplaceSectionFacetItems,
   type CanvasAppFeaturePackMarketplaceActionSectionSummary,
   type CanvasAppFeaturePackMarketplaceModel,
   type CanvasAppFeaturePackMarketplacePackSection,
   type CanvasAppFeaturePackMarketplacePackSectionFacetKind,
+  type CanvasAppFeaturePackMarketplacePackSectionFacetItemsInput,
   type CanvasAppFeaturePackMarketplacePackSectionSummary,
   type CanvasAppFeaturePackMarketplaceProfileSection,
   type CanvasAppFeaturePackMarketplaceProfileSectionFacetKind,
+  type CanvasAppFeaturePackMarketplaceProfileSectionFacetItemsInput,
   type CanvasAppFeaturePackMarketplaceProfileSectionSummary,
   type CanvasAppFeaturePackMarketplaceSection,
   type CanvasAppFeaturePackMarketplaceSectionFacet,
+  type CanvasAppFeaturePackMarketplaceSectionFacetItems,
+  type CanvasAppFeaturePackMarketplaceSectionFacetItemsInput,
   type CanvasAppFeaturePackMarketplaceSectionFacetKind,
   type CanvasAppFeaturePackMarketplaceSectionKind,
   type CanvasAppFeaturePackMarketplaceSuiteSection,
   type CanvasAppFeaturePackMarketplaceSuiteSectionFacetKind,
+  type CanvasAppFeaturePackMarketplaceSuiteSectionFacetItemsInput,
   type CanvasAppFeaturePackMarketplaceSuiteSectionSummary,
 } from './CanvasAppFeaturePackMarketplace'
 export {

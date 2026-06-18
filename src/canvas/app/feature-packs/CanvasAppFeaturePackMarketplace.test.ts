@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  getCanvasAppFeaturePackMarketplaceSectionFacetItems,
   getCanvasAppFeaturePackMarketplaceModel,
 } from './CanvasAppFeaturePackMarketplace'
 import {
@@ -155,6 +156,49 @@ describe('CanvasAppFeaturePackMarketplace', () => {
       { count: 1, kind: 'ready', label: 'Ready' },
       { count: 2, kind: 'blocked', label: 'Blocked' },
     ])
+    const profileSection = model.sections[0]
+    const suiteSection = model.sections[1]
+    const packSection = model.sections[2]
+
+    if (profileSection?.kind !== 'profiles') {
+      throw new Error('Expected profiles section')
+    }
+
+    if (suiteSection?.kind !== 'suites') {
+      throw new Error('Expected suites section')
+    }
+
+    if (packSection?.kind !== 'packs') {
+      throw new Error('Expected packs section')
+    }
+
+    expect(getCanvasAppFeaturePackMarketplaceSectionFacetItems({
+      facetKind: 'active',
+      section: profileSection,
+    }).map((item) => item.profileId)).toEqual(['runtime-profile'])
+    expect(getCanvasAppFeaturePackMarketplaceSectionFacetItems({
+      facetKind: 'blocked',
+      section: suiteSection,
+    }).map((item) => item.suiteId)).toEqual(['addon-suite'])
+    expect(getCanvasAppFeaturePackMarketplaceSectionFacetItems({
+      facetKind: 'ready',
+      section: packSection,
+    }).map((item) => item.featurePackId)).toEqual(['runtime-pack'])
+    expect(getCanvasAppFeaturePackMarketplaceSectionFacetItems({
+      facetKind: 'private',
+      section: packSection,
+    }).map((item) => item.featurePackId)).toEqual(['addon-pack'])
+    const blockedPackItems =
+      getCanvasAppFeaturePackMarketplaceSectionFacetItems({
+        facetKind: 'blocked',
+        section: packSection,
+      })
+
+    expect(blockedPackItems.map((item) => item.featurePackId)).toEqual([
+      'runtime-pack',
+      'addon-pack',
+    ])
+    expect(Object.isFrozen(blockedPackItems)).toBe(true)
     expect(model.profiles.items[0]?.actions[0]?.installOptions).toEqual({
       featurePackStates: [
         {

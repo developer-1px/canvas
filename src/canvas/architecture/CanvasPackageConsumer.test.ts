@@ -78,6 +78,7 @@ import {
   getCanvasAppFeaturePackProfileRuntimeStates,
   getCanvasAppFeaturePackMarketplaceActionModel,
   getCanvasAppFeaturePackMarketplaceModel,
+  getCanvasAppFeaturePackMarketplaceSectionFacetItems,
   getCanvasAppFeaturePackProfileMarketplaceActionModel,
   getCanvasAppFeaturePackSuiteMarketplaceActionModel,
   getCanvasAppFeaturePackCatalog,
@@ -123,6 +124,7 @@ import {
   type CanvasAppFeaturePackMarketplaceActionModel,
   type CanvasAppFeaturePackMarketplaceModel,
   type CanvasAppFeaturePackMarketplacePackSectionFacetKind,
+  type CanvasAppFeaturePackMarketplacePackSectionFacetItemsInput,
   type CanvasAppFeaturePackMarketplacePackSectionSummary,
   type CanvasAppFeaturePackMarketplaceListing,
   type CanvasAppFeaturePackMarketplaceListingEntitlement,
@@ -524,6 +526,15 @@ describe('Canvas package consumer imports', () => {
     const featurePackMarketplacePackSectionFacetKinds:
       readonly CanvasAppFeaturePackMarketplacePackSectionFacetKind[] =
         featurePackMarketplacePackSection.facets.map((facet) => facet.kind)
+    const featurePackMarketplaceReadyPackFacetInput:
+      CanvasAppFeaturePackMarketplacePackSectionFacetItemsInput = {
+        facetKind: 'ready',
+        section: featurePackMarketplacePackSection,
+      }
+    const featurePackMarketplaceReadyPackFacetItems =
+      getCanvasAppFeaturePackMarketplaceSectionFacetItems(
+        featurePackMarketplaceReadyPackFacetInput,
+      )
     const featurePackMarketplaceListingMap =
       getCanvasAppFeaturePackMarketplaceListingMap({
         listings: [partialUpdateListing],
@@ -1054,6 +1065,9 @@ describe('Canvas package consumer imports', () => {
       { count: 1, kind: 'ready', label: 'Ready' },
       { count: 0, kind: 'blocked', label: 'Blocked' },
     ])
+    expect(featurePackMarketplaceReadyPackFacetItems.map(
+      (item) => item.featurePackId,
+    )).toEqual(['smoke-partial-pack'])
     expect(featurePackProfileMarketplaceActionModel.items[0]?.profileId)
       .toBe('smoke-partial-profile')
     expect(featurePackProfileMarketplaceActionModel.items[0]?.primaryActionKind)
