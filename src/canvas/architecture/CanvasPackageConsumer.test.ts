@@ -74,6 +74,7 @@ import {
   getCanvasAppInstalledViewFeaturePacks,
   getCanvasAppFeaturePackProfileById,
   getCanvasAppFeaturePackProfileRuntimeStates,
+  getCanvasAppFeaturePackCatalog,
   getCanvasAppFeaturePackSuiteFeaturePackIds,
   getCanvasAppManifestViewFeaturePacks,
   getCanvasAppResolvedFeaturePackStates,
@@ -109,6 +110,8 @@ import {
   type CanvasComponentPaletteProps,
   type CanvasComponentInspectorPanelModel,
   type CanvasAppFeaturePack,
+  type CanvasAppFeaturePackCatalog,
+  type CanvasAppFeaturePackCatalogItem,
   type CanvasAppFeaturePackAssemblyInput,
   type CanvasAppFeaturePackManifest,
   type CanvasAppFeaturePackManifestCategory,
@@ -415,6 +418,15 @@ describe('Canvas package consumer imports', () => {
       })
     const manifestViewFeaturePacks =
       getCanvasAppManifestViewFeaturePacks([viewManifest])
+    const featurePackCatalog: CanvasAppFeaturePackCatalog =
+      getCanvasAppFeaturePackCatalog([viewManifest], {
+        featurePackStates: [{
+          id: 'smoke-view-pack',
+          status: 'disabled',
+        }],
+      })
+    const featurePackCatalogItem: CanvasAppFeaturePackCatalogItem | undefined =
+      featurePackCatalog.items[0]
     const disabledFeaturePackStates:
       readonly CanvasAppFeaturePackRuntimeState[] =
         getCanvasAppResolvedFeaturePackStates(['smoke-pack'], {
@@ -822,6 +834,9 @@ describe('Canvas package consumer imports', () => {
         status: 'disabled',
       }],
     })).toEqual([])
+    expect(featurePackCatalogItem?.status).toBe('disabled')
+    expect(featurePackCatalogItem?.enabled).toBe(false)
+    expect(featurePackCatalogItem?.blockedReasons).toEqual([])
     expect(defaultViewFeaturePackIds).toContain('toolbar')
     expect(defaultViewFeaturePackManifestIds).toContain('toolbar')
     expect(manifestViewFeaturePacks).toEqual([viewFeaturePack])
@@ -1180,6 +1195,12 @@ describe('Canvas package consumer imports', () => {
     expect(CanvasAppAuthoring.createCanvasAppFeaturePackExtensionBundle)
       .toBeTypeOf('function')
     expect(CanvasAppAuthoring.createCanvasAppFeaturePackManifest)
+      .toBeTypeOf('function')
+    expect(CanvasAppAuthoring.getCanvasAppFeaturePackCatalog)
+      .toBeTypeOf('function')
+    expect(CanvasAppFacade.getCanvasAppFeaturePackCatalog)
+      .toBeTypeOf('function')
+    expect(CanvasPackage.getCanvasAppFeaturePackCatalog)
       .toBeTypeOf('function')
     expect(CanvasAppAuthoring.createCanvasAppAiLabsFeaturePackManifest)
       .toBeTypeOf('function')

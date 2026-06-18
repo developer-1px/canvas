@@ -57,6 +57,17 @@ export {
   DEFAULT_CANVAS_APP_VIEW_FEATURE_PACKS,
 } from './CanvasAppDefaultViewFeaturePacks'
 export {
+  getCanvasAppFeaturePackCatalog,
+  type CanvasAppFeaturePackCatalog,
+  type CanvasAppFeaturePackCatalogBlockedReason,
+  type CanvasAppFeaturePackCatalogBlockScope,
+  type CanvasAppFeaturePackCatalogConflictBlockReason,
+  type CanvasAppFeaturePackCatalogConflictBlockReasonKind,
+  type CanvasAppFeaturePackCatalogItem,
+  type CanvasAppFeaturePackCatalogRequiredBlockReason,
+  type CanvasAppFeaturePackCatalogRequiredBlockReasonKind,
+} from './CanvasAppFeaturePackCatalog'
+export {
   assertCanvasAppFeaturePackManifest,
   assertCanvasAppFeaturePackManifests,
   createCanvasAppFeaturePackManifest,

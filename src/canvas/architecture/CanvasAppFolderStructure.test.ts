@@ -125,6 +125,8 @@ describe('Canvas App folder structure', () => {
       'src/canvas/app/feature-packs/CanvasAppDefaultFeaturePackSuites.ts',
       'src/canvas/app/feature-packs/CanvasAppDefaultFeaturePacks.ts',
       'src/canvas/app/feature-packs/CanvasAppDefaultViewFeaturePacks.ts',
+      'src/canvas/app/feature-packs/CanvasAppFeaturePackCatalog.test.ts',
+      'src/canvas/app/feature-packs/CanvasAppFeaturePackCatalog.ts',
       'src/canvas/app/feature-packs/CanvasAppFeaturePackManifests.ts',
       'src/canvas/app/feature-packs/CanvasAppFeaturePackProfiles.ts',
       'src/canvas/app/feature-packs/CanvasAppFeaturePackRuntimeModel.ts',
