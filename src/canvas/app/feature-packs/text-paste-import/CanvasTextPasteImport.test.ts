@@ -317,6 +317,91 @@ describe('CanvasTextPasteImport', () => {
     }
   })
 
+  it('reads font size and paragraph spacing metadata through the DOMParser path', () => {
+    class FakeTextNode {
+      nodeType = 3
+
+      constructor(readonly textContent: string) {}
+    }
+
+    class FakeElement {
+      children: FakeElement[]
+      nodeType = 1
+
+      constructor(
+        readonly tagName: string,
+        readonly childNodes: Array<FakeElement | FakeTextNode> = [],
+        private readonly attributes: Record<string, string> = {},
+      ) {
+        this.children = childNodes.filter(
+          (child): child is FakeElement => child instanceof FakeElement,
+        )
+      }
+
+      getAttribute(name: string) {
+        return this.attributes[name] ?? null
+      }
+
+      querySelectorAll() {
+        return []
+      }
+    }
+
+    const text = (value: string) => new FakeTextNode(value)
+    const element = (
+      tagName: string,
+      childNodes: Array<FakeElement | FakeTextNode> = [],
+      attributes: Record<string, string> = {},
+    ) => new FakeElement(tagName.toUpperCase(), childNodes, attributes)
+    const body = element('body', [
+      element('p', [
+        element('span', [text('Large ')], {
+          style: 'font-size: 18px',
+        }),
+        element('strong', [text('Bold')], {
+          style: 'font-size: 20px',
+        }),
+      ], {
+        style: [
+          'text-align: center',
+          'line-height: 140%',
+          'margin-top: 12px',
+          'margin-bottom: 8px',
+        ].join('; '),
+      }),
+    ])
+
+    vi.stubGlobal('Element', FakeElement)
+    vi.stubGlobal('DOMParser', class {
+      parseFromString() {
+        return {
+          body,
+        }
+      }
+    })
+
+    try {
+      expect(getCanvasRichTextPasteSourceFromHTML('<fixture />')).toEqual({
+        format: 'text-html-rich',
+        paragraphs: [
+          {
+            align: 'center',
+            lineHeight: 1.4,
+            runs: [
+              { fontSize: 18, text: 'Large ' },
+              { bold: true, fontSize: 20, text: 'Bold' },
+            ],
+            spacingAfter: 8,
+            spacingBefore: 12,
+          },
+        ],
+        text: 'Large Bold',
+      })
+    } finally {
+      vi.unstubAllGlobals()
+    }
+  })
+
   it('preserves ordered list paragraphs through the string fallback path', () => {
     vi.stubGlobal('DOMParser', undefined)
 
@@ -357,6 +442,35 @@ describe('CanvasTextPasteImport', () => {
           },
         ],
         text: 'Intro Bold\nFirst\nSecond\nBullet',
+      })
+    } finally {
+      vi.unstubAllGlobals()
+    }
+  })
+
+  it('reads inline style metadata through the string fallback path', () => {
+    vi.stubGlobal('DOMParser', undefined)
+
+    try {
+      expect(getCanvasRichTextPasteSourceFromHTML(`
+        <p style="text-align: right; line-height: 1.25; margin-top: 4px; margin-bottom: 6px">
+          <span style="font-size: 16px">Sized</span> <em>Text</em>
+        </p>
+      `)).toEqual({
+        format: 'text-html-rich',
+        paragraphs: [
+          {
+            align: 'right',
+            lineHeight: 1.25,
+            runs: [
+              { fontSize: 16, text: 'Sized' },
+              { italic: true, text: 'Text' },
+            ],
+            spacingAfter: 6,
+            spacingBefore: 4,
+          },
+        ],
+        text: 'SizedText',
       })
     } finally {
       vi.unstubAllGlobals()

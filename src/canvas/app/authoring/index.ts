@@ -131,6 +131,7 @@ export type {
   CanvasRichTextPasteHeadingLevel,
   CanvasRichTextPasteListType,
   CanvasRichTextPasteParagraph,
+  CanvasRichTextPasteParagraphAlign,
   CanvasRichTextPasteRun,
   CanvasRichTextPasteSource,
   CanvasTextPasteImporter,

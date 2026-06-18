@@ -421,6 +421,7 @@ export {
   type CanvasRichTextPasteHeadingLevel,
   type CanvasRichTextPasteListType,
   type CanvasRichTextPasteParagraph,
+  type CanvasRichTextPasteParagraphAlign,
   type CanvasRichTextPasteRun,
   type CanvasRichTextPasteSource,
   type CanvasTextPasteImporter,

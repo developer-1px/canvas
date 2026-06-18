@@ -31,12 +31,18 @@ export type CanvasRichTextPasteRun = {
   bold?: boolean
   color?: string
   code?: boolean
+  fontSize?: number
   italic?: boolean
   link?: string
   text: string
   underline?: boolean
 }
 
+export type CanvasRichTextPasteParagraphAlign =
+  | 'center'
+  | 'justify'
+  | 'left'
+  | 'right'
 export type CanvasRichTextPasteListType = 'bullet' | 'numbered'
 export type CanvasRichTextPasteFormat =
   | 'text-html-rich'
@@ -44,9 +50,13 @@ export type CanvasRichTextPasteFormat =
 export type CanvasRichTextPasteHeadingLevel = 1 | 2 | 3 | 4 | 5 | 6
 
 export type CanvasRichTextPasteParagraph = {
+  align?: CanvasRichTextPasteParagraphAlign
   bullet?: CanvasRichTextPasteListType
   headingLevel?: CanvasRichTextPasteHeadingLevel
+  lineHeight?: number
   runs: readonly CanvasRichTextPasteRun[]
+  spacingAfter?: number
+  spacingBefore?: number
 }
 
 export type CanvasRichTextPasteSource = {
@@ -495,9 +505,11 @@ function getCanvasRichTextParagraphFromBlock(
 
   const runs = getCanvasRichTextRunsFromNode(node, {})
   const bullet = tagName === 'li' ? listType ?? 'bullet' : undefined
+  const paragraphStyle = getCanvasRichTextParagraphStyleFromElement(node)
 
   return runs.length > 0
     ? [{
+        ...paragraphStyle,
         ...(bullet ? { bullet } : {}),
         runs,
       }]
@@ -534,6 +546,7 @@ function getCanvasRichTextRunsFromNode(
     : undefined
   const nextStyle = {
     ...style,
+    ...getCanvasRichTextRunStyleFromElement(node),
     ...(['b', 'strong'].includes(tagName) ? { bold: true } : {}),
     ...(['em', 'i'].includes(tagName) ? { italic: true } : {}),
     ...(['a', 'u'].includes(tagName) ? { underline: true } : {}),
@@ -552,15 +565,21 @@ function getCanvasRichTextParagraphsFromString(value: string) {
   const paragraphs: CanvasRichTextPasteParagraph[] = []
   let runs: CanvasRichTextPasteRun[] = []
   let bullet: CanvasRichTextPasteListType | undefined
+  let paragraphStyle: Partial<CanvasRichTextPasteParagraph> = {}
   let boldDepth = 0
   let italicDepth = 0
   let underlineDepth = 0
   const linkStack: string[] = []
   const listStack: CanvasRichTextPasteListType[] = []
+  const runStyleStack: Array<{
+    style: Partial<CanvasRichTextPasteRun>
+    tagName: string
+  }> = []
 
   const flushParagraph = () => {
     if (runs.length > 0) {
       paragraphs.push({
+        ...paragraphStyle,
         ...(bullet ? { bullet } : {}),
         runs,
       })
@@ -578,6 +597,8 @@ function getCanvasRichTextParagraphsFromString(value: string) {
         const link = linkStack.at(-1)
 
         runs.push({
+          ...mergeCanvasRichTextRunStyles(runStyleStack.map((item) =>
+            item.style)),
           ...(boldDepth > 0 ? { bold: true } : {}),
           ...(italicDepth > 0 ? { italic: true } : {}),
           ...(underlineDepth > 0 || link ? { underline: true } : {}),
@@ -608,12 +629,21 @@ function getCanvasRichTextParagraphsFromString(value: string) {
         listStack.pop()
       } else if (isCanvasRichTextBlockName(tag.name)) {
         flushParagraph()
+        paragraphStyle = {}
         if (tag.name === 'li') {
           bullet = undefined
         }
       }
+      popCanvasRichTextRunStyle(runStyleStack, tag.name)
       continue
     }
+
+    const runStyle = getCanvasRichTextRunStyleFromAttributes(tag.attributes)
+
+    runStyleStack.push({
+      style: runStyle,
+      tagName: tag.name,
+    })
 
     if (tag.name === 'br') {
       flushParagraph()
@@ -623,8 +653,14 @@ function getCanvasRichTextParagraphsFromString(value: string) {
     } else if (tag.name === 'li') {
       flushParagraph()
       bullet = listStack.at(-1) ?? 'bullet'
+      paragraphStyle = getCanvasRichTextParagraphStyleFromAttributes(
+        tag.attributes,
+      )
     } else if (isCanvasRichTextBlockName(tag.name)) {
       flushParagraph()
+      paragraphStyle = getCanvasRichTextParagraphStyleFromAttributes(
+        tag.attributes,
+      )
     } else if (tag.name === 'b' || tag.name === 'strong') {
       boldDepth += 1
     } else if (tag.name === 'em' || tag.name === 'i') {
@@ -641,6 +677,10 @@ function getCanvasRichTextParagraphsFromString(value: string) {
 
     if (tag.selfClosing && tag.name === 'a') {
       linkStack.pop()
+    }
+
+    if (tag.selfClosing) {
+      popCanvasRichTextRunStyle(runStyleStack, tag.name)
     }
   }
 
@@ -801,10 +841,7 @@ function normalizeCanvasRichTextParagraphs(
         if (index > 0) {
           if (runs.length > 0) {
             splitParagraphs.push({
-              ...(paragraph.bullet ? { bullet: paragraph.bullet } : {}),
-              ...(paragraph.headingLevel
-                ? { headingLevel: paragraph.headingLevel }
-                : {}),
+              ...getCanvasRichTextParagraphMetadata(paragraph),
               runs,
             })
           }
@@ -822,8 +859,7 @@ function normalizeCanvasRichTextParagraphs(
 
     if (runs.length > 0) {
       splitParagraphs.push({
-        ...(paragraph.bullet ? { bullet: paragraph.bullet } : {}),
-        ...(paragraph.headingLevel ? { headingLevel: paragraph.headingLevel } : {}),
+        ...getCanvasRichTextParagraphMetadata(paragraph),
         runs,
       })
     }
@@ -837,14 +873,204 @@ function hasCanvasRichTextFormatting(
 ) {
   return paragraphs.some((paragraph) =>
     Boolean(paragraph.bullet) ||
+    paragraph.align !== undefined ||
     paragraph.headingLevel !== undefined ||
+    paragraph.lineHeight !== undefined ||
+    paragraph.spacingAfter !== undefined ||
+    paragraph.spacingBefore !== undefined ||
     paragraph.runs.some((run) =>
       run.bold === true ||
       run.code === true ||
+      run.fontSize !== undefined ||
       run.italic === true ||
       run.underline === true ||
       Boolean(run.color) ||
       Boolean(run.link)))
+}
+
+function getCanvasRichTextParagraphMetadata(
+  paragraph: CanvasRichTextPasteParagraph,
+): Omit<CanvasRichTextPasteParagraph, 'runs'> {
+  return {
+    ...(paragraph.align ? { align: paragraph.align } : {}),
+    ...(paragraph.bullet ? { bullet: paragraph.bullet } : {}),
+    ...(paragraph.headingLevel ? { headingLevel: paragraph.headingLevel } : {}),
+    ...(paragraph.lineHeight !== undefined
+      ? { lineHeight: paragraph.lineHeight }
+      : {}),
+    ...(paragraph.spacingAfter !== undefined
+      ? { spacingAfter: paragraph.spacingAfter }
+      : {}),
+    ...(paragraph.spacingBefore !== undefined
+      ? { spacingBefore: paragraph.spacingBefore }
+      : {}),
+  }
+}
+
+function getCanvasRichTextRunStyleFromElement(
+  element: Element,
+): Partial<CanvasRichTextPasteRun> {
+  return getCanvasRichTextRunStyleFromAttributes(
+    element.getAttribute('style') ?? '',
+  )
+}
+
+function getCanvasRichTextRunStyleFromAttributes(
+  attributes: string,
+): Partial<CanvasRichTextPasteRun> {
+  const style = parseCanvasRichTextStyleAttribute(
+    getCanvasHTMLAttribute(attributes, 'style') ?? attributes,
+  )
+  const fontSize = parseCanvasRichTextFontSize(style['font-size'])
+
+  return {
+    ...(fontSize !== undefined ? { fontSize } : {}),
+  }
+}
+
+function getCanvasRichTextParagraphStyleFromElement(
+  element: Element,
+): Partial<CanvasRichTextPasteParagraph> {
+  return getCanvasRichTextParagraphStyleFromAttributes(
+    element.getAttribute('style') ?? '',
+  )
+}
+
+function getCanvasRichTextParagraphStyleFromAttributes(
+  attributes: string,
+): Partial<CanvasRichTextPasteParagraph> {
+  const style = parseCanvasRichTextStyleAttribute(
+    getCanvasHTMLAttribute(attributes, 'style') ?? attributes,
+  )
+  const align = parseCanvasRichTextParagraphAlign(style['text-align'])
+  const lineHeight = parseCanvasRichTextLineHeight(style['line-height'])
+  const spacingBefore = parseCanvasRichTextPixelLength(style['margin-top'])
+  const spacingAfter = parseCanvasRichTextPixelLength(style['margin-bottom'])
+
+  return {
+    ...(align ? { align } : {}),
+    ...(lineHeight !== undefined ? { lineHeight } : {}),
+    ...(spacingAfter !== undefined ? { spacingAfter } : {}),
+    ...(spacingBefore !== undefined ? { spacingBefore } : {}),
+  }
+}
+
+function parseCanvasRichTextStyleAttribute(value: string | null | undefined) {
+  return Object.fromEntries(
+    (value ?? '')
+      .split(';')
+      .map((entry) => entry.split(':'))
+      .flatMap(([property, ...valueParts]) => {
+        const name = property?.trim().toLowerCase()
+        const propertyValue = valueParts.join(':').trim()
+
+        return name && propertyValue ? [[name, propertyValue]] : []
+      }),
+  ) as Record<string, string>
+}
+
+function parseCanvasRichTextParagraphAlign(
+  value: string | undefined,
+): CanvasRichTextPasteParagraphAlign | undefined {
+  const normalized = value?.trim().toLowerCase()
+
+  return normalized === 'left' ||
+    normalized === 'center' ||
+    normalized === 'right' ||
+    normalized === 'justify'
+    ? normalized
+    : undefined
+}
+
+function parseCanvasRichTextFontSize(value: string | undefined) {
+  const px = parseCanvasRichTextPixelLength(value)
+
+  if (px !== undefined) {
+    return px
+  }
+
+  const match = value?.trim().match(/^(\d+(?:\.\d+)?)pt$/i)
+  const pt = Number.parseFloat(match?.[1] ?? '')
+
+  return Number.isFinite(pt) && pt > 0
+    ? normalizeCanvasRichTextNumber(pt * (4 / 3))
+    : undefined
+}
+
+function parseCanvasRichTextLineHeight(value: string | undefined) {
+  const normalized = value?.trim().toLowerCase()
+
+  if (!normalized || normalized === 'normal') {
+    return undefined
+  }
+
+  const percentMatch = normalized.match(/^(\d+(?:\.\d+)?)%$/)
+  const percent = Number.parseFloat(percentMatch?.[1] ?? '')
+
+  if (Number.isFinite(percent) && percent > 0) {
+    return normalizeCanvasRichTextNumber(percent / 100)
+  }
+
+  const ratio = Number.parseFloat(normalized)
+
+  return Number.isFinite(ratio) &&
+    ratio > 0 &&
+    /^(\d+(?:\.\d+)?)$/.test(normalized)
+    ? normalizeCanvasRichTextNumber(ratio)
+    : undefined
+}
+
+function parseCanvasRichTextPixelLength(value: string | undefined) {
+  const normalized = value?.trim().toLowerCase()
+
+  if (!normalized) {
+    return undefined
+  }
+
+  if (normalized === '0') {
+    return 0
+  }
+
+  const match = normalized.match(/^(\d+(?:\.\d+)?)px$/)
+  const parsed = Number.parseFloat(match?.[1] ?? '')
+
+  return Number.isFinite(parsed) && parsed >= 0
+    ? normalizeCanvasRichTextNumber(parsed)
+    : undefined
+}
+
+function normalizeCanvasRichTextNumber(value: number) {
+  return Number.parseFloat(value.toFixed(3))
+}
+
+function mergeCanvasRichTextRunStyles(
+  styles: readonly Partial<CanvasRichTextPasteRun>[],
+) {
+  return styles.reduce<Partial<CanvasRichTextPasteRun>>(
+    (merged, style) => ({
+      ...merged,
+      ...style,
+    }),
+    {},
+  )
+}
+
+function popCanvasRichTextRunStyle(
+  stack: Array<{ style: Partial<CanvasRichTextPasteRun>; tagName: string }>,
+  tagName: string,
+) {
+  let index = -1
+
+  for (let candidate = stack.length - 1; candidate >= 0; candidate -= 1) {
+    if (stack[candidate]?.tagName === tagName) {
+      index = candidate
+      break
+    }
+  }
+
+  if (index >= 0) {
+    stack.splice(index, 1)
+  }
 }
 
 function isCanvasRichTextBlock(node: Element) {
