@@ -11,6 +11,7 @@ import {
   createCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan,
   createCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan,
   executeCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan,
+  executeCanvasAppFeaturePackMarketplaceAssemblyItemApplyTransaction,
   executeCanvasAppFeaturePackMarketplaceAssemblyApplyTransaction,
   executeCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan,
   getCanvasAppFeaturePackMarketplaceAssemblyApplyCommitPlan,
@@ -285,6 +286,115 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
     expect(() =>
       getCanvasAppFeaturePackMarketplaceAssemblyItemActionInput(itemInput)
     ).toThrow('Canvas app feature pack marketplace action is not ready: install')
+  })
+
+  it('executes marketplace item transactions through their primary action', async () => {
+    const overlayManifest = createCanvasAppFeaturePackManifest({
+      id: 'overlay-pack',
+      label: 'Overlay pack',
+      lifecycle: {
+        partialUpdate: ['overlay'],
+        runtimeToggleable: true,
+      },
+    })
+    const readyModel = getCanvasAppFeaturePackMarketplaceAssemblyModel({
+      assemblyInput: {
+        featurePackManifests: [overlayManifest],
+      },
+      profiles: [],
+      suiteManifests: [],
+    })
+    const overlayItem = readyModel.marketplaceModel.packs.items[0]
+
+    if (!overlayItem) {
+      throw new Error('Expected overlay pack item')
+    }
+
+    const readyItemInput = {
+      item: overlayItem,
+      model: readyModel,
+    }
+    const readyPrimaryAction =
+      getCanvasAppFeaturePackMarketplaceAssemblyItemAction(readyItemInput)
+    const readyTransactionResult =
+      await executeCanvasAppFeaturePackMarketplaceAssemblyItemApplyTransaction({
+        ...readyItemInput,
+        executeCleanupEffect: () => undefined,
+      })
+
+    expect(readyTransactionResult.action).toBe(readyPrimaryAction)
+    expect(readyTransactionResult).toMatchObject({
+      actionKind: 'disable',
+      status: 'committed',
+      updateMode: 'partial-update',
+    })
+    expect(readyTransactionResult.hostUpdate).toMatchObject({
+      actionKind: 'disable',
+      ready: true,
+      status: 'ready',
+      updateMode: 'partial-update',
+    })
+    expect(readyTransactionResult.commitResult.status).toBe('committed')
+    expect(readyTransactionResult.runtimeStatePatch.status).toBe('patched')
+    expect(readyTransactionResult.hostUpdate.update?.assemblyInput
+      .featurePackStates).toEqual([{
+        id: 'overlay-pack',
+        status: 'disabled',
+      }])
+
+    const paidManifest = createCanvasAppFeaturePackManifest({
+      id: 'paid-pack',
+      label: 'Paid pack',
+    })
+    const blockedModel = getCanvasAppFeaturePackMarketplaceAssemblyModel({
+      assemblyInput: {
+        featurePackManifests: [paidManifest],
+        featurePackStates: [{
+          id: 'paid-pack',
+          status: 'uninstalled',
+        }],
+      },
+      listings: [{
+        access: 'private',
+        distribution: 'available',
+        featurePackId: 'paid-pack',
+      }],
+      profiles: [],
+      suiteManifests: [],
+    })
+    const paidItem = blockedModel.marketplaceModel.packs.items[0]
+
+    if (!paidItem) {
+      throw new Error('Expected paid pack item')
+    }
+
+    const blockedItemInput = {
+      item: paidItem,
+      model: blockedModel,
+    }
+    const blockedPrimaryAction =
+      getCanvasAppFeaturePackMarketplaceAssemblyItemAction(blockedItemInput)
+    const blockedTransactionResult =
+      await executeCanvasAppFeaturePackMarketplaceAssemblyItemApplyTransaction({
+        ...blockedItemInput,
+        executeCleanupEffect: () => undefined,
+      })
+
+    expect(blockedTransactionResult.action).toBe(blockedPrimaryAction)
+    expect(blockedTransactionResult).toMatchObject({
+      actionKind: 'install',
+      status: 'held',
+      updateMode: 'blocked',
+    })
+    expect(blockedTransactionResult.hostUpdate).toMatchObject({
+      actionKind: 'install',
+      ready: false,
+      status: 'held',
+      update: null,
+      updateMode: 'blocked',
+    })
+    expect(blockedTransactionResult.commitResult.status).toBe('held')
+    expect(blockedTransactionResult.runtimeStatePatch.status).toBe('held')
   })
 
   it('marks runtime-toggle actions with partial surfaces as partial updates', () => {

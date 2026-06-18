@@ -48,6 +48,7 @@ import {
   createCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan,
   createCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan,
   executeCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan,
+  executeCanvasAppFeaturePackMarketplaceAssemblyItemApplyTransaction,
   executeCanvasAppFeaturePackMarketplaceAssemblyApplyTransaction,
   executeCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan,
   getCanvasAppFeaturePackMarketplaceAssemblyApplyCommitPlan,
@@ -285,6 +286,7 @@ import {
   type CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionResult,
   type CanvasAppFeaturePackMarketplaceAssemblyApplyUpdateMode,
   type CanvasAppFeaturePackMarketplaceAssemblyItemInput,
+  type CanvasAppFeaturePackMarketplaceAssemblyItemApplyTransactionInput,
   type CanvasAppFeaturePackMarketplaceAssemblyModel,
   type CanvasAppFeaturePackMarketplaceAssemblyUninstallDataPlan,
   type CanvasAppFeaturePackMarketplaceUninstallCleanupEffect,
@@ -1490,6 +1492,25 @@ describe('Canvas package consumer imports', () => {
       > =
         await executeCanvasAppFeaturePackMarketplaceAssemblyApplyTransaction(
           featurePackMarketplaceAssemblyApplyTransactionInput,
+        )
+    const featurePackMarketplaceAssemblyItemApplyTransactionInput:
+      CanvasAppFeaturePackMarketplaceAssemblyItemApplyTransactionInput<
+        SmokeUninstallCleanupEffect,
+        SmokeUninstallCleanupExecutionValue
+      > = {
+        cleanupHandlers: [featurePackMarketplaceUninstallCleanupScopeHandler],
+        executeCleanupEffect:
+          featurePackMarketplaceUninstallCleanupEffectExecutor,
+        item: featurePackMarketplaceAssemblyItemInput.item,
+        model: featurePackMarketplaceAssemblyModel,
+      }
+    const featurePackMarketplaceAssemblyItemApplyTransactionResult:
+      CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionResult<
+        SmokeUninstallCleanupEffect,
+        SmokeUninstallCleanupExecutionValue
+      > =
+        await executeCanvasAppFeaturePackMarketplaceAssemblyItemApplyTransaction(
+          featurePackMarketplaceAssemblyItemApplyTransactionInput,
         )
     const featurePackMarketplaceAssemblyApplyTransactionBaseResult:
       CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionBaseResult<
@@ -2703,12 +2724,28 @@ describe('Canvas package consumer imports', () => {
       .toBe(featurePackMarketplaceAssemblyApplyHostUpdate)
     expect(featurePackMarketplaceAssemblyApplyTransactionResult.summary.status)
       .toBe('completed')
+    expect(featurePackMarketplaceAssemblyItemApplyTransactionResult.action)
+      .toBe(featurePackMarketplaceAssemblyItemAction)
+    expect(featurePackMarketplaceAssemblyItemApplyTransactionResult.status)
+      .toBe('committed')
+    expect(featurePackMarketplaceAssemblyItemApplyTransactionResult
+      .hostUpdate.ready).toBe(true)
+    expect(featurePackMarketplaceAssemblyItemApplyTransactionResult
+      .hostUpdate.update)
+      .toEqual(featurePackMarketplaceAssemblyApplyTransactionResult
+        .hostUpdate.update)
     expect(CanvasPackage.executeCanvasAppFeaturePackMarketplaceAssemblyApplyTransaction)
       .toBe(executeCanvasAppFeaturePackMarketplaceAssemblyApplyTransaction)
     expect(CanvasAppFacade.executeCanvasAppFeaturePackMarketplaceAssemblyApplyTransaction)
       .toBe(executeCanvasAppFeaturePackMarketplaceAssemblyApplyTransaction)
     expect(CanvasAppAuthoring.executeCanvasAppFeaturePackMarketplaceAssemblyApplyTransaction)
       .toBe(executeCanvasAppFeaturePackMarketplaceAssemblyApplyTransaction)
+    expect(CanvasPackage.executeCanvasAppFeaturePackMarketplaceAssemblyItemApplyTransaction)
+      .toBe(executeCanvasAppFeaturePackMarketplaceAssemblyItemApplyTransaction)
+    expect(CanvasAppFacade.executeCanvasAppFeaturePackMarketplaceAssemblyItemApplyTransaction)
+      .toBe(executeCanvasAppFeaturePackMarketplaceAssemblyItemApplyTransaction)
+    expect(CanvasAppAuthoring.executeCanvasAppFeaturePackMarketplaceAssemblyItemApplyTransaction)
+      .toBe(executeCanvasAppFeaturePackMarketplaceAssemblyItemApplyTransaction)
     expect(CanvasPackage.getCanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdate)
       .toBe(getCanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdate)
     expect(CanvasAppFacade.getCanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdate)

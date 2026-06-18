@@ -629,6 +629,19 @@ export type CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionInput<
   model: CanvasAppFeaturePackMarketplaceAssemblyModel
 }>
 
+export type CanvasAppFeaturePackMarketplaceAssemblyItemApplyTransactionInput<
+  TEffect,
+  TResult,
+> = Omit<
+  CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionInput<
+    TEffect,
+    TResult
+  >,
+  'action'
+> & Readonly<{
+  item: CanvasAppFeaturePackMarketplaceItem
+}>
+
 export type CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionResult<
   TEffect,
   TResult,
@@ -1546,6 +1559,34 @@ export async function executeCanvasAppFeaturePackMarketplaceAssemblyApplyTransac
   return Object.freeze({
     ...transactionResult,
     hostUpdate,
+  })
+}
+
+export async function executeCanvasAppFeaturePackMarketplaceAssemblyItemApplyTransaction<
+  TEffect,
+  TResult,
+>({
+  cleanupHandlers = [],
+  executeCleanupEffect,
+  item,
+  model,
+}: CanvasAppFeaturePackMarketplaceAssemblyItemApplyTransactionInput<
+  TEffect,
+  TResult
+>): Promise<
+  CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionResult<
+    TEffect,
+    TResult
+  >
+> {
+  return executeCanvasAppFeaturePackMarketplaceAssemblyApplyTransaction({
+    action: getCanvasAppFeaturePackMarketplaceAssemblyItemAction({
+      item,
+      model,
+    }),
+    cleanupHandlers,
+    executeCleanupEffect,
+    model,
   })
 }
 
