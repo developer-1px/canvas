@@ -269,6 +269,15 @@ export type SlideEditLayoutPlaceholderVisibilityHostCommandEffect<
   type: 'slide-command-effect'
 }
 
+export type SlideEditLayoutPlaceholderVisibilityCommandEffectInput<
+  TSlideId extends SlideEditLayoutSlideId = SlideEditLayoutSlideId,
+  TPlaceholderId extends SlideEditPlaceholderId = SlideEditPlaceholderId,
+> = {
+  isVisible: boolean
+  placeholderId: TPlaceholderId
+  slideId: TSlideId
+}
+
 export type SlideEditLayoutCommandDescriptor = {
   id: 'apply-layout' | 'set-placeholder-visibility'
   requiredAdapterSlot: 'command-effect'
@@ -573,6 +582,34 @@ export function getSlideEditLayoutApplyCommandEffect<
   }
 }
 
+export function getSlideEditLayoutPlaceholderVisibilityCommandEffect<
+  TSlideId extends SlideEditLayoutSlideId,
+  TPlaceholderId extends SlideEditPlaceholderId,
+>({
+  isVisible,
+  placeholderId,
+  slideId,
+}: SlideEditLayoutPlaceholderVisibilityCommandEffectInput<
+  TSlideId,
+  TPlaceholderId
+>): SlideEditLayoutPlaceholderVisibilityHostCommandEffect<
+  TSlideId,
+  TPlaceholderId
+> {
+  return {
+    payload: {
+      id: 'set-placeholder-visibility',
+      isVisible,
+      placeholderId,
+    },
+    selection: {
+      placeholderIds: [placeholderId],
+      slideId,
+    },
+    type: 'slide-command-effect',
+  }
+}
+
 export function getSlideEditLayoutJSONPasteValue({
   dataTransfer,
   jsonMimeType = SLIDE_EDIT_LAYOUT_JSON_MIME_TYPE,
@@ -796,21 +833,12 @@ function getSlideEditLayoutPlaceholderVisibilityPasteCommandEffects<
 
   return pasteValue.placeholderVisibility
     .filter((value) => allowedPlaceholderIds.has(value.placeholderId))
-    .map((value) => ({
-      payload: {
-        id: 'set-placeholder-visibility',
+    .map((value) =>
+      getSlideEditLayoutPlaceholderVisibilityCommandEffect({
         isVisible: value.isVisible,
         placeholderId: value.placeholderId,
-      },
-      selection: {
-        placeholderIds: [value.placeholderId],
         slideId,
-      },
-      type: 'slide-command-effect',
-    } as const satisfies SlideEditLayoutPlaceholderVisibilityHostCommandEffect<
-      TSlideId,
-      TPlaceholderId
-    >))
+      }))
 }
 
 function getSlideEditLayoutPlaceholderVisibilityValues(

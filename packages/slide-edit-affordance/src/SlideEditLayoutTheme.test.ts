@@ -6,6 +6,7 @@ import {
   getSlideEditLayoutApplyCommandEffect,
   getSlideEditLayoutJSONPasteCommandEffects,
   getSlideEditLayoutJSONPasteValue,
+  getSlideEditLayoutPlaceholderVisibilityCommandEffect,
   getSlideEditLayoutPlaceholderVisibilityDescriptor,
   getSlideEditResolvedLayoutPlaceholder,
   SLIDE_EDIT_LAYOUT_COMMANDS,
@@ -15,6 +16,7 @@ import {
   type SlideEditMasterDescriptor,
 } from './SlideEditLayoutTheme'
 import {
+  getSlideEditLayoutPlaceholderVisibilityCommandEffect as getSlideEditLayoutPlaceholderVisibilityCommandEffectFromPackage,
   getSlideEditLayoutJSONPasteValue as getSlideEditLayoutJSONPasteValueFromPackage,
 } from './index'
 
@@ -459,6 +461,56 @@ describe('SlideEditLayoutTheme', () => {
       ],
       themeId: 'theme-a',
     })
+  })
+
+  it('creates single placeholder visibility command effects', () => {
+    const effect = getSlideEditLayoutPlaceholderVisibilityCommandEffect({
+      isVisible: false,
+      placeholderId: 'body-slot',
+      slideId: 'slide-a',
+    })
+
+    expect(effect).toEqual({
+      payload: {
+        id: 'set-placeholder-visibility',
+        isVisible: false,
+        placeholderId: 'body-slot',
+      },
+      selection: {
+        placeholderIds: ['body-slot'],
+        slideId: 'slide-a',
+      },
+      type: 'slide-command-effect',
+    })
+    expect(getSlideEditLayoutPlaceholderVisibilityCommandEffectFromPackage({
+      isVisible: true,
+      placeholderId: 'title-slot',
+      slideId: 'slide-a',
+    })).toEqual({
+      payload: {
+        id: 'set-placeholder-visibility',
+        isVisible: true,
+        placeholderId: 'title-slot',
+      },
+      selection: {
+        placeholderIds: ['title-slot'],
+        slideId: 'slide-a',
+      },
+      type: 'slide-command-effect',
+    })
+    expect(getSlideEditLayoutJSONPasteCommandEffects({
+      layouts: [layout],
+      pasteValue: {
+        placeholderVisibility: [{
+          isVisible: false,
+          placeholderId: 'body-slot',
+          sourceField: 'hiddenPlaceholderIds',
+        }],
+        surface: 'layout-placeholder',
+      },
+      slideId: 'slide-a',
+      themes: [theme],
+    })?.placeholderVisibilityEffects).toEqual([effect])
   })
 
   it('filters unknown layout theme and placeholder ids from paste planning', () => {
