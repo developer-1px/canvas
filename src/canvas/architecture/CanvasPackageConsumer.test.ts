@@ -38,6 +38,7 @@ import {
   createCanvasAppFeaturePackMarketplaceListing,
   createCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan,
   createCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan,
+  executeCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan,
   getCanvasAppFeaturePackMarketplaceAssemblyApplyResult,
   getCanvasAppFeaturePackMarketplaceAssemblyApplyPlan,
   getCanvasAppFeaturePackMarketplaceAssemblyActionInput,
@@ -195,10 +196,19 @@ import {
   type CanvasAppFeaturePackMarketplaceAssemblyModel,
   type CanvasAppFeaturePackMarketplaceAssemblyUninstallDataPlan,
   type CanvasAppFeaturePackMarketplaceUninstallCleanupEffect,
+  type CanvasAppFeaturePackMarketplaceUninstallCleanupEffectExecutionResult,
+  type CanvasAppFeaturePackMarketplaceUninstallCleanupEffectExecutor,
+  type CanvasAppFeaturePackMarketplaceUninstallCleanupEffectFailedExecutionResult,
   type CanvasAppFeaturePackMarketplaceUninstallCleanupEffectInput,
   type CanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan,
+  type CanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlanExecutionInput,
+  type CanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlanExecutionResult,
+  type CanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlanExecutionStatus,
   type CanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlanInput,
   type CanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlanStatus,
+  type CanvasAppFeaturePackMarketplaceUninstallCleanupEffectSkippedExecutionResult,
+  type CanvasAppFeaturePackMarketplaceUninstallCleanupEffectSucceededExecutionResult,
+  type CanvasAppFeaturePackMarketplaceUninstallCleanupExecutionResult,
   type CanvasAppFeaturePackMarketplaceUninstallCleanupScopeHandler,
   type CanvasAppFeaturePackMarketplaceModel,
   type CanvasAppFeaturePackMarketplacePackSectionFacetKind,
@@ -948,6 +958,10 @@ describe('Canvas package consumer imports', () => {
       kind: 'cleanup-scope'
       scopeId: CanvasAppFeaturePackManifestOrphanedDataScopeId
     }>
+    type SmokeUninstallCleanupExecutionValue = Readonly<{
+      cleaned: true
+      scopeId: CanvasAppFeaturePackManifestOrphanedDataScopeId
+    }>
     const featurePackMarketplaceRemoveUninstallDataPlan:
       CanvasAppFeaturePackMarketplaceAssemblyUninstallDataPlan = {
         entries: [{
@@ -1001,6 +1015,69 @@ describe('Canvas package consumer imports', () => {
     const featurePackMarketplaceUninstallCleanupEffectPlanStatus:
       CanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlanStatus =
         featurePackMarketplaceUninstallCleanupEffectPlan.status
+    const featurePackMarketplaceUninstallCleanupEffectExecutor:
+      CanvasAppFeaturePackMarketplaceUninstallCleanupEffectExecutor<
+        SmokeUninstallCleanupEffect,
+        SmokeUninstallCleanupExecutionValue
+      > = ({ scopeId }) => ({
+        cleaned: true,
+        scopeId,
+      })
+    const featurePackMarketplaceUninstallCleanupEffectPlanExecutionInput:
+      CanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlanExecutionInput<
+        SmokeUninstallCleanupEffect,
+        SmokeUninstallCleanupExecutionValue
+      > = {
+        cleanupEffectPlan: featurePackMarketplaceUninstallCleanupEffectPlan,
+        executeEffect: featurePackMarketplaceUninstallCleanupEffectExecutor,
+      }
+    const featurePackMarketplaceUninstallCleanupEffectPlanExecutionResult:
+      CanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlanExecutionResult<
+        SmokeUninstallCleanupEffect,
+        SmokeUninstallCleanupExecutionValue
+      > =
+        await executeCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan(
+          featurePackMarketplaceUninstallCleanupEffectPlanExecutionInput,
+        )
+    const featurePackMarketplaceUninstallCleanupEffectPlanExecutionStatus:
+      CanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlanExecutionStatus =
+        featurePackMarketplaceUninstallCleanupEffectPlanExecutionResult.status
+    const featurePackMarketplaceUninstallCleanupExecutionResult:
+      CanvasAppFeaturePackMarketplaceUninstallCleanupExecutionResult<
+        SmokeUninstallCleanupEffect,
+        SmokeUninstallCleanupExecutionValue
+      > =
+        featurePackMarketplaceUninstallCleanupEffectPlanExecutionResult
+          .results[0]!
+    const featurePackMarketplaceUninstallCleanupEffectExecutionResult:
+      CanvasAppFeaturePackMarketplaceUninstallCleanupEffectExecutionResult<
+        SmokeUninstallCleanupEffect,
+        SmokeUninstallCleanupExecutionValue
+      > =
+        featurePackMarketplaceUninstallCleanupEffectPlanExecutionResult
+          .effectResults[0]!
+    const featurePackMarketplaceUninstallCleanupEffectSucceededExecutionResult:
+      CanvasAppFeaturePackMarketplaceUninstallCleanupEffectSucceededExecutionResult<
+        SmokeUninstallCleanupEffect,
+        SmokeUninstallCleanupExecutionValue
+      > | null =
+        featurePackMarketplaceUninstallCleanupEffectExecutionResult.status ===
+            'succeeded'
+          ? featurePackMarketplaceUninstallCleanupEffectExecutionResult
+          : null
+    const featurePackMarketplaceUninstallCleanupEffectFailedExecutionResult:
+      CanvasAppFeaturePackMarketplaceUninstallCleanupEffectFailedExecutionResult<
+        SmokeUninstallCleanupEffect
+      > | null =
+        featurePackMarketplaceUninstallCleanupEffectExecutionResult.status ===
+            'failed'
+          ? featurePackMarketplaceUninstallCleanupEffectExecutionResult
+          : null
+    const featurePackMarketplaceUninstallCleanupEffectSkippedExecutionResult:
+      CanvasAppFeaturePackMarketplaceUninstallCleanupEffectSkippedExecutionResult
+        | null =
+          featurePackMarketplaceUninstallCleanupEffectPlanExecutionResult
+            .skippedResults[0] ?? null
     const featurePackMarketplaceAssemblyApplyExecutionPlanInput:
       CanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlanInput<
         SmokeUninstallCleanupEffect
@@ -1599,6 +1676,15 @@ describe('Canvas package consumer imports', () => {
       .createCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan)
       .toBe(createCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan)
     expect(CanvasPackage
+      .executeCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan)
+      .toBe(executeCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan)
+    expect(CanvasAppFacade
+      .executeCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan)
+      .toBe(executeCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan)
+    expect(CanvasAppAuthoring
+      .executeCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan)
+      .toBe(executeCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan)
+    expect(CanvasPackage
       .createCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan)
       .toBe(createCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan)
     expect(CanvasAppFacade
@@ -1609,6 +1695,30 @@ describe('Canvas package consumer imports', () => {
       .toBe(createCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan)
     expect(featurePackMarketplaceUninstallCleanupEffectPlanStatus)
       .toBe('ready')
+    expect(featurePackMarketplaceUninstallCleanupEffectPlanExecutionStatus)
+      .toBe('succeeded')
+    expect(featurePackMarketplaceUninstallCleanupExecutionResult.status)
+      .toBe('succeeded')
+    expect(featurePackMarketplaceUninstallCleanupEffectSucceededExecutionResult)
+      .toMatchObject({
+        scopeId: featurePackManifestOrphanedDataScopeId,
+        status: 'succeeded',
+        value: {
+          cleaned: true,
+          scopeId: featurePackManifestOrphanedDataScopeId,
+        },
+      })
+    expect(featurePackMarketplaceUninstallCleanupEffectFailedExecutionResult)
+      .toBeNull()
+    expect(featurePackMarketplaceUninstallCleanupEffectSkippedExecutionResult)
+      .toBeNull()
+    expect(featurePackMarketplaceUninstallCleanupEffectPlanExecutionResult)
+      .toMatchObject({
+        failedScopeIds: [],
+        skippedScopeIds: [],
+        status: 'succeeded',
+        succeededScopeIds: [featurePackManifestOrphanedDataScopeId],
+      })
     expect(featurePackMarketplaceAssemblyApplyExecutionPlanStatus)
       .toBe('ready')
     expect(featurePackMarketplaceAssemblyApplyReadyExecutionPlan)

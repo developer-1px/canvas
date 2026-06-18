@@ -9,6 +9,7 @@ import { createCanvasAppAssembly } from './CanvasAppAssembly'
 import {
   createCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan,
   createCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan,
+  executeCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan,
   getCanvasAppFeaturePackMarketplaceAssemblyApplyResult,
   getCanvasAppFeaturePackMarketplaceAssemblyApplyPlan,
   getCanvasAppFeaturePackMarketplaceAssemblyActionInput,
@@ -275,7 +276,7 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
       })
   })
 
-  it('carries uninstall data policy through ready apply plans', () => {
+  it('carries uninstall data policy through ready apply plans', async () => {
     const addonManifest = createCanvasAppFeaturePackManifest({
       id: 'addon-pack',
       label: 'Addon pack',
@@ -410,6 +411,39 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
       status: 'ready',
     })
 
+    const cleanupExecutionResult =
+      await executeCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan({
+        cleanupEffectPlan: cleanupPlan,
+        executeEffect: ({ effect, scopeId }) => ({
+          applied: true as const,
+          effectKind: effect.kind,
+          scopeId,
+        }),
+      })
+
+    expect(cleanupExecutionResult).toMatchObject({
+      effectResults: [{
+        featurePackIds: ['addon-pack'],
+        scopeId: 'addon-data',
+        status: 'succeeded',
+        value: {
+          applied: true,
+          effectKind: 'remove-scope-data',
+          scopeId: 'addon-data',
+        },
+      }],
+      failedScopeIds: [],
+      results: [{
+        featurePackIds: ['addon-pack'],
+        scopeId: 'addon-data',
+        status: 'succeeded',
+      }],
+      skippedScopeIds: [],
+      status: 'succeeded',
+      succeededScopeIds: ['addon-data'],
+    })
+    expect(cleanupExecutionResult.cleanupEffectPlan).toBe(cleanupPlan)
+
     const executionPlan =
       createCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan({
         applyResult,
@@ -453,7 +487,7 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
     })
   })
 
-  it('keeps non-remove uninstall data out of cleanup effects', () => {
+  it('keeps non-remove uninstall data out of cleanup effects', async () => {
     const cleanupPlan =
       createCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan({
         handlers: [{
@@ -533,6 +567,55 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
     })
     expect(cleanupPlan.effects.map((effect) => effect.scopeId))
       .toEqual(['remove-data'])
+
+    const cleanupExecutionResult =
+      await executeCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan({
+        cleanupEffectPlan: cleanupPlan,
+        executeEffect: ({ effect, scopeId }) => ({
+          effectKind: effect.kind,
+          scopeId,
+        }),
+      })
+
+    expect(cleanupExecutionResult).toMatchObject({
+      failedScopeIds: [],
+      skippedResults: [{
+        featurePackIds: ['missing-pack'],
+        reason: 'missing-handler',
+        scopeId: 'missing-data',
+        status: 'skipped',
+      }],
+      skippedScopeIds: ['missing-data'],
+      status: 'needs-handler',
+      succeededResults: [{
+        featurePackIds: ['remove-pack'],
+        scopeId: 'remove-data',
+        status: 'succeeded',
+        value: {
+          effectKind: 'remove-scope-data',
+          scopeId: 'remove-data',
+        },
+      }],
+      succeededScopeIds: ['remove-data'],
+    })
+
+    const cleanupError = new Error('cleanup failed')
+    const failedCleanupExecutionResult =
+      await executeCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan({
+        cleanupEffectPlan: cleanupPlan,
+        executeEffect: () => {
+          throw cleanupError
+        },
+      })
+
+    expect(failedCleanupExecutionResult).toMatchObject({
+      failedScopeIds: ['remove-data'],
+      skippedScopeIds: ['missing-data'],
+      status: 'failed',
+      succeededScopeIds: [],
+    })
+    expect(failedCleanupExecutionResult.failedResults[0]?.error)
+      .toBe(cleanupError)
   })
 
   it('keeps unscoped uninstall packs visible in the data plan', () => {
