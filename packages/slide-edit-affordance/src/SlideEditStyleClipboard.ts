@@ -7,6 +7,7 @@ export type SlideEditStyleClipboardBuiltInCategoryId =
   | 'object-effect'
   | 'shape-fill'
   | 'shape-stroke'
+  | 'text-run-style'
   | 'text-style'
 
 export type SlideEditStyleClipboardCategoryId = string
@@ -64,6 +65,14 @@ export type SlideEditStyleClipboardStylePayload<
   categoryId: TCategoryId
   value: TStyle
 }
+
+export type SlideEditStyleClipboardTextRunStylePayload = Readonly<{
+  bold?: boolean
+  color?: string
+  italic?: boolean
+  size?: number
+  underline?: boolean
+}>
 
 export type SlideEditStyleClipboardDescriptor<
   TSlideId extends SlideEditStyleClipboardSlideId =
@@ -217,6 +226,10 @@ export const SLIDE_EDIT_STYLE_CLIPBOARD_BUILT_IN_CATEGORIES = Object.freeze([
     label: 'Text Style',
   },
   {
+    id: 'text-run-style',
+    label: 'Text Run Style',
+  },
+  {
     id: 'object-effect',
     label: 'Object Effect',
   },
@@ -293,6 +306,18 @@ export function createSlideEditStyleClipboardDescriptor<
     styles: styles.filter((style) => categoryIds.has(style.categoryId)),
     type: 'slide-style-clipboard',
   }
+}
+
+export function createSlideEditStyleClipboardTextRunStylePayload(
+  value: SlideEditStyleClipboardTextRunStylePayload = {},
+): SlideEditStyleClipboardStylePayload<
+  'text-run-style',
+  SlideEditStyleClipboardTextRunStylePayload
+> {
+  return Object.freeze({
+    categoryId: 'text-run-style',
+    value: Object.freeze({ ...value }),
+  })
 }
 
 export function getSlideEditStyleClipboardCategoryIds<

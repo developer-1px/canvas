@@ -571,6 +571,7 @@ export {
 export {
   createSlideEditStyleClipboardDescriptor,
   createSlideEditStyleClipboardPasteCommandEffect,
+  createSlideEditStyleClipboardTextRunStylePayload,
   getSlideEditStyleClipboardCategoryDescriptors,
   getSlideEditStyleClipboardCategoryIds,
   getSlideEditStyleClipboardCopyCommandEffect,
@@ -599,6 +600,7 @@ export {
   type SlideEditStyleClipboardStylePayload,
   type SlideEditStyleClipboardTargetDescriptor,
   type SlideEditStyleClipboardTargetInput,
+  type SlideEditStyleClipboardTextRunStylePayload,
 } from './SlideEditStyleClipboard'
 export {
   createSlideEditSlideMetadataInspectorDescriptor,

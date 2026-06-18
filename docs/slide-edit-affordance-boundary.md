@@ -365,7 +365,7 @@
 | Area | Contract |
 | --- | --- |
 | Payload | source slide id, source object id, source kind, copied style category descriptors, and opaque style payloads |
-| Categories | built-in category ids include `shape-fill`, `shape-stroke`, `line-style`, `text-style`, and `object-effect` |
+| Categories | built-in category ids include `shape-fill`, `shape-stroke`, `line-style`, `text-style`, `text-run-style`, and `object-effect` |
 | Copy command | host receives `copy-object-formatting` with a `slide-style-clipboard` payload |
 | Paste availability | each target object exposes applicable category ids, ignored category ids, support state, and disabled reason |
 | Paste command | host receives `paste-object-formatting` with per-target category applications |

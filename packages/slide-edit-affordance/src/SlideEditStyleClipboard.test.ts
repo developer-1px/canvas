@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   createSlideEditStyleClipboardDescriptor,
   createSlideEditStyleClipboardPasteCommandEffect,
+  createSlideEditStyleClipboardTextRunStylePayload,
   getSlideEditStyleClipboardCategoryDescriptors,
   getSlideEditStyleClipboardCategoryIds,
   getSlideEditStyleClipboardCopyCommandEffect,
@@ -15,6 +16,7 @@ type TestCategoryId =
   | 'object-effect'
   | 'shape-fill'
   | 'shape-stroke'
+  | 'text-run-style'
   | 'text-style'
 
 type TestStyle = {
@@ -118,13 +120,19 @@ describe('SlideEditStyleClipboard', () => {
       'shape-stroke',
       'line-style',
       'text-style',
+      'text-run-style',
       'object-effect',
     ])
   })
 
   it('selects built-in category descriptors from category ids in registry order', () => {
     expect(getSlideEditStyleClipboardCategoryDescriptors({
-      categoryIds: ['text-style', 'shape-fill', 'text-style'],
+      categoryIds: [
+        'text-run-style',
+        'text-style',
+        'shape-fill',
+        'text-style',
+      ],
     })).toEqual([
       {
         id: 'shape-fill',
@@ -134,7 +142,34 @@ describe('SlideEditStyleClipboard', () => {
         id: 'text-style',
         label: 'Text Style',
       },
+      {
+        id: 'text-run-style',
+        label: 'Text Run Style',
+      },
     ])
+  })
+
+  it('creates text run style payloads without product model terms', () => {
+    expect(createSlideEditStyleClipboardTextRunStylePayload({
+      bold: true,
+      color: '#2563eb',
+      italic: true,
+      size: 18,
+      underline: true,
+    })).toEqual({
+      categoryId: 'text-run-style',
+      value: {
+        bold: true,
+        color: '#2563eb',
+        italic: true,
+        size: 18,
+        underline: true,
+      },
+    })
+    expect(createSlideEditStyleClipboardTextRunStylePayload()).toEqual({
+      categoryId: 'text-run-style',
+      value: {},
+    })
   })
 
   it('selects custom category descriptors and ignores unknown ids', () => {
@@ -313,6 +348,91 @@ describe('SlideEditStyleClipboard', () => {
         slideId: 'slide-b',
       },
       type: 'slide-command-effect',
+    })
+  })
+
+  it('keeps text style and text run style as independent paste categories', () => {
+    const clipboard = createSlideEditStyleClipboardDescriptor({
+      categories: getSlideEditStyleClipboardCategoryDescriptors({
+        categoryIds: ['text-style', 'text-run-style'],
+      }),
+      source: {
+        kind: 'text-box',
+        objectId: 'source-text',
+        slideId: 'slide-a',
+      },
+      styles: [
+        {
+          categoryId: 'text-style',
+          value: {},
+        },
+        createSlideEditStyleClipboardTextRunStylePayload({
+          bold: true,
+          color: '#111827',
+        }),
+      ],
+    })
+
+    expect(getSlideEditStyleClipboardPasteAvailability({
+      clipboard,
+      targets: [
+        {
+          objectId: 'target-frame',
+          supportedCategoryIds: ['text-style'],
+        },
+        {
+          objectId: 'target-run',
+          supportedCategoryIds: ['text-run-style'],
+        },
+      ],
+    })).toMatchObject({
+      canPaste: true,
+      targets: [
+        {
+          applicableCategoryIds: ['text-style'],
+          ignoredCategoryIds: ['text-run-style'],
+          objectId: 'target-frame',
+        },
+        {
+          applicableCategoryIds: ['text-run-style'],
+          ignoredCategoryIds: ['text-style'],
+          objectId: 'target-run',
+        },
+      ],
+    })
+    expect(createSlideEditStyleClipboardPasteCommandEffect({
+      clipboard,
+      targetSlideId: 'slide-b',
+      targets: [
+        {
+          objectId: 'target-frame',
+          supportedCategoryIds: ['text-style'],
+        },
+        {
+          objectId: 'target-run',
+          supportedCategoryIds: ['text-run-style'],
+        },
+      ],
+    })).toMatchObject({
+      payload: {
+        categoryApplications: [
+          {
+            appliedCategoryIds: ['text-style'],
+            ignoredCategoryIds: ['text-run-style'],
+            objectId: 'target-frame',
+          },
+          {
+            appliedCategoryIds: ['text-run-style'],
+            ignoredCategoryIds: ['text-style'],
+            objectId: 'target-run',
+          },
+        ],
+        id: 'paste-object-formatting',
+      },
+      selection: {
+        objectIds: ['target-frame', 'target-run'],
+        slideId: 'slide-b',
+      },
     })
   })
 
