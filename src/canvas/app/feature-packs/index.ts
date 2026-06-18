@@ -80,6 +80,18 @@ export {
   type CanvasAppFeaturePackInstallPlanUnknownTargetReason,
 } from './CanvasAppFeaturePackInstallPlan'
 export {
+  getCanvasAppFeaturePackPartialUpdatePlan,
+  type CanvasAppFeaturePackPartialUpdateOperation,
+  type CanvasAppFeaturePackPartialUpdatePlan,
+  type CanvasAppFeaturePackPartialUpdatePlanBlockedReason,
+  type CanvasAppFeaturePackPartialUpdatePlanEmptySurfaceReason,
+  type CanvasAppFeaturePackPartialUpdatePlanEntry,
+  type CanvasAppFeaturePackPartialUpdatePlanInput,
+  type CanvasAppFeaturePackPartialUpdatePlanOperationUnavailableReason,
+  type CanvasAppFeaturePackPartialUpdatePlanStatus,
+  type CanvasAppFeaturePackPartialUpdatePlanUnknownTargetReason,
+} from './CanvasAppFeaturePackPartialUpdatePlan'
+export {
   assertCanvasAppFeaturePackManifest,
   assertCanvasAppFeaturePackManifests,
   createCanvasAppFeaturePackManifest,

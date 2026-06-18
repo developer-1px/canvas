@@ -76,6 +76,7 @@ import {
   getCanvasAppFeaturePackProfileRuntimeStates,
   getCanvasAppFeaturePackCatalog,
   getCanvasAppFeaturePackInstallPlan,
+  getCanvasAppFeaturePackPartialUpdatePlan,
   getCanvasAppFeaturePackSuiteFeaturePackIds,
   getCanvasAppManifestViewFeaturePacks,
   getCanvasAppResolvedFeaturePackStates,
@@ -115,6 +116,8 @@ import {
   type CanvasAppFeaturePackCatalogItem,
   type CanvasAppFeaturePackInstallPlan,
   type CanvasAppFeaturePackInstallPlanInput,
+  type CanvasAppFeaturePackPartialUpdatePlan,
+  type CanvasAppFeaturePackPartialUpdatePlanInput,
   type CanvasAppFeaturePackAssemblyInput,
   type CanvasAppFeaturePackManifest,
   type CanvasAppFeaturePackManifestCategory,
@@ -406,6 +409,15 @@ describe('Canvas package consumer imports', () => {
         label: 'Status pack',
         viewFeaturePack,
       })
+    const partialUpdateManifest: CanvasAppFeaturePackManifest =
+      createCanvasAppFeaturePackManifest({
+        id: 'smoke-partial-pack',
+        label: 'Partial pack',
+        lifecycle: {
+          partialUpdate: ['overlay'],
+          runtimeToggleable: true,
+        },
+      })
     const aiLabsManifest = createCanvasAppAiLabsFeaturePackManifest({
       provider: {
         complete: () => ({ text: 'Summary' }),
@@ -442,6 +454,16 @@ describe('Canvas package consumer imports', () => {
     }
     const featurePackInstallPlan: CanvasAppFeaturePackInstallPlan =
       getCanvasAppFeaturePackInstallPlan(featurePackInstallPlanInput)
+    const featurePackPartialUpdatePlanInput:
+      CanvasAppFeaturePackPartialUpdatePlanInput = {
+        manifests: [partialUpdateManifest],
+        targetFeaturePackIds: ['smoke-partial-pack'],
+      }
+    const featurePackPartialUpdatePlan:
+      CanvasAppFeaturePackPartialUpdatePlan =
+        getCanvasAppFeaturePackPartialUpdatePlan(
+          featurePackPartialUpdatePlanInput,
+        )
     const disabledFeaturePackStates:
       readonly CanvasAppFeaturePackRuntimeState[] =
         getCanvasAppResolvedFeaturePackStates(['smoke-pack'], {
@@ -857,6 +879,10 @@ describe('Canvas package consumer imports', () => {
     ])
     expect(featurePackInstallPlan.installFeaturePackIds).toEqual([])
     expect(featurePackInstallPlan.status).toBe('ready')
+    expect(featurePackPartialUpdatePlan.surfaceIds).toEqual(['overlay'])
+    expect(featurePackPartialUpdatePlan.entries[0]?.runtimeToggleable)
+      .toBe(true)
+    expect(featurePackPartialUpdatePlan.status).toBe('ready')
     expect(defaultViewFeaturePackIds).toContain('toolbar')
     expect(defaultViewFeaturePackManifestIds).toContain('toolbar')
     expect(manifestViewFeaturePacks).toEqual([viewFeaturePack])
@@ -1227,6 +1253,12 @@ describe('Canvas package consumer imports', () => {
     expect(CanvasAppFacade.getCanvasAppFeaturePackInstallPlan)
       .toBeTypeOf('function')
     expect(CanvasPackage.getCanvasAppFeaturePackInstallPlan)
+      .toBeTypeOf('function')
+    expect(CanvasAppAuthoring.getCanvasAppFeaturePackPartialUpdatePlan)
+      .toBeTypeOf('function')
+    expect(CanvasAppFacade.getCanvasAppFeaturePackPartialUpdatePlan)
+      .toBeTypeOf('function')
+    expect(CanvasPackage.getCanvasAppFeaturePackPartialUpdatePlan)
       .toBeTypeOf('function')
     expect(CanvasAppAuthoring.createCanvasAppAiLabsFeaturePackManifest)
       .toBeTypeOf('function')
