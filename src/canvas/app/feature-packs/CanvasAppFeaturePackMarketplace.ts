@@ -157,6 +157,11 @@ export type CanvasAppFeaturePackMarketplaceSectionFacetItems =
   | readonly CanvasAppFeaturePackProfileMarketplaceActionItem[]
   | readonly CanvasAppFeaturePackSuiteMarketplaceActionItem[]
 
+export type CanvasAppFeaturePackMarketplaceSectionSummary =
+  | CanvasAppFeaturePackMarketplacePackSectionSummary
+  | CanvasAppFeaturePackMarketplaceProfileSectionSummary
+  | CanvasAppFeaturePackMarketplaceSuiteSectionSummary
+
 export type CanvasAppFeaturePackMarketplaceItem =
   | CanvasAppFeaturePackMarketplaceActionItem
   | CanvasAppFeaturePackProfileMarketplaceActionItem
@@ -242,6 +247,16 @@ export type CanvasAppFeaturePackMarketplaceSectionPrimaryActionDiagnosticModel =
     blocked: readonly CanvasAppFeaturePackMarketplacePrimaryActionDiagnostic[]
     ready: readonly CanvasAppFeaturePackMarketplacePrimaryActionDiagnostic[]
   }>
+
+export type CanvasAppFeaturePackMarketplaceSectionControlModel = Readonly<{
+  controls: readonly CanvasAppFeaturePackMarketplaceTargetControl[]
+  diagnostics: CanvasAppFeaturePackMarketplaceSectionPrimaryActionDiagnosticModel
+  facets: readonly CanvasAppFeaturePackMarketplaceSectionFacet[]
+  kind: CanvasAppFeaturePackMarketplaceSectionKind
+  label: string
+  section: CanvasAppFeaturePackMarketplaceSection
+  summary: CanvasAppFeaturePackMarketplaceSectionSummary
+}>
 
 export type CanvasAppFeaturePackMarketplaceActionSectionSummary =
   Readonly<{
@@ -365,6 +380,9 @@ export function getCanvasAppFeaturePackMarketplaceSectionFacetItems(
 ): readonly CanvasAppFeaturePackMarketplaceActionItem[]
 export function getCanvasAppFeaturePackMarketplaceSectionFacetItems(
   input: CanvasAppFeaturePackMarketplaceSectionFacetItemsInput,
+): CanvasAppFeaturePackMarketplaceSectionFacetItems
+export function getCanvasAppFeaturePackMarketplaceSectionFacetItems(
+  input: CanvasAppFeaturePackMarketplaceSectionFacetItemsInput,
 ): CanvasAppFeaturePackMarketplaceSectionFacetItems {
   if (isCanvasAppFeaturePackMarketplaceProfileSectionFacetItemsInput(input)) {
     return Object.freeze(input.section.items.filter((item) =>
@@ -394,6 +412,40 @@ export function getCanvasAppFeaturePackMarketplaceSectionFacetItems(
   }
 
   throw new Error('Unknown canvas app feature pack marketplace section')
+}
+
+export function getCanvasAppFeaturePackMarketplaceSectionControlModels(
+  model: CanvasAppFeaturePackMarketplaceModel,
+): readonly CanvasAppFeaturePackMarketplaceSectionControlModel[] {
+  return Object.freeze(
+    model.sections.map(getCanvasAppFeaturePackMarketplaceSectionControlModel),
+  )
+}
+
+export function getCanvasAppFeaturePackMarketplaceSectionControlModel(
+  section: CanvasAppFeaturePackMarketplaceSection,
+): CanvasAppFeaturePackMarketplaceSectionControlModel {
+  return Object.freeze({
+    controls: getCanvasAppFeaturePackMarketplaceSectionTargetControls(section),
+    diagnostics:
+      getCanvasAppFeaturePackMarketplaceSectionPrimaryActionDiagnosticModel(
+        section,
+      ),
+    facets: section.facets,
+    kind: section.kind,
+    label: section.label,
+    section,
+    summary: section.summary,
+  })
+}
+
+export function getCanvasAppFeaturePackMarketplaceSectionFacetTargetControls(
+  input: CanvasAppFeaturePackMarketplaceSectionFacetItemsInput,
+): readonly CanvasAppFeaturePackMarketplaceTargetControl[] {
+  return Object.freeze(
+    getCanvasAppFeaturePackMarketplaceSectionFacetItems(input)
+      .map(getCanvasAppFeaturePackMarketplaceItemTargetControl),
+  )
 }
 
 export function getCanvasAppFeaturePackMarketplaceTargetItem({

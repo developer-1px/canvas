@@ -3,6 +3,9 @@ import { describe, expect, it } from 'vitest'
 import {
   getCanvasAppFeaturePackMarketplacePrimaryActionDiagnostic,
   getCanvasAppFeaturePackMarketplacePrimaryAction,
+  getCanvasAppFeaturePackMarketplaceSectionControlModel,
+  getCanvasAppFeaturePackMarketplaceSectionControlModels,
+  getCanvasAppFeaturePackMarketplaceSectionFacetTargetControls,
   getCanvasAppFeaturePackMarketplaceSectionTargetControls,
   getCanvasAppFeaturePackMarketplaceSectionPrimaryActionDiagnosticModel,
   getCanvasAppFeaturePackMarketplaceSectionFacetItems,
@@ -403,6 +406,69 @@ describe('CanvasAppFeaturePackMarketplace', () => {
       'Runtime pack',
       'Addon pack',
     ])
+    const sectionControlModels =
+      getCanvasAppFeaturePackMarketplaceSectionControlModels(model)
+    const packSectionControlModel =
+      getCanvasAppFeaturePackMarketplaceSectionControlModel(packSection)
+
+    expect(sectionControlModels.map((sectionModel) =>
+      sectionModel.kind
+    )).toEqual(['profiles', 'suites', 'packs'])
+    expect(sectionControlModels[2]).toEqual(packSectionControlModel)
+    expect(packSectionControlModel).toMatchObject({
+      controls: [
+        {
+          active: true,
+          actionKind: 'disable',
+          installed: true,
+          label: 'Runtime pack',
+          ready: false,
+          status: 'blocked',
+          target: {
+            featurePackId: 'runtime-pack',
+            kind: 'pack',
+          },
+        },
+        {
+          active: false,
+          actionKind: 'install',
+          installed: false,
+          label: 'Addon pack',
+          ready: false,
+          status: 'blocked',
+          target: {
+            featurePackId: 'addon-pack',
+            kind: 'pack',
+          },
+        },
+      ],
+      kind: 'packs',
+      label: 'Feature packs',
+      section: packSection,
+      summary: packSection.summary,
+    })
+    expect(packSectionControlModel.facets).toBe(packSection.facets)
+    expect(packSectionControlModel.diagnostics.all.map((diagnostic) =>
+      diagnostic.actionKind
+    )).toEqual(['disable', 'install'])
+    expect(getCanvasAppFeaturePackMarketplaceSectionFacetTargetControls({
+      facetKind: 'private',
+      section: packSection,
+    }).map((control) => control.target)).toEqual([{
+      featurePackId: 'addon-pack',
+      kind: 'pack',
+    }])
+    expect(getCanvasAppFeaturePackMarketplaceSectionFacetTargetControls({
+      facetKind: 'ready',
+      section: packSection,
+    }).map((control) => control.target)).toEqual([{
+      featurePackId: 'runtime-pack',
+      kind: 'pack',
+    }])
+    expect(Object.isFrozen(sectionControlModels)).toBe(true)
+    expect(Object.isFrozen(packSectionControlModel)).toBe(true)
+    expect(Object.isFrozen(packSectionControlModel.controls)).toBe(true)
+    expect(Object.isFrozen(packSectionControlModel.diagnostics)).toBe(true)
     const packSectionPrimaryActionDiagnosticModel =
       getCanvasAppFeaturePackMarketplaceSectionPrimaryActionDiagnosticModel(
         packSection,
