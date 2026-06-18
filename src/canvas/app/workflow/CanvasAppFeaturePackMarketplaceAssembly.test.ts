@@ -11,6 +11,7 @@ import {
   createCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan,
   executeCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan,
   executeCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan,
+  getCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionSummary,
   getCanvasAppFeaturePackMarketplaceAssemblyApplyResult,
   getCanvasAppFeaturePackMarketplaceAssemblyApplyPlan,
   getCanvasAppFeaturePackMarketplaceAssemblyActionInput,
@@ -501,6 +502,33 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
     expect(applyExecutionResult.executionPlan).toBe(executionPlan)
     expect(applyExecutionResult.nextModel).toBe(applyResult.nextModel)
 
+    expect(getCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionSummary({
+      executionResult: applyExecutionResult,
+    })).toMatchObject({
+      actionKind: 'uninstall',
+      blockedReasonCount: 0,
+      changedFeaturePackIds: ['addon-pack'],
+      cleanup: {
+        effectCount: 1,
+        failedScopeCount: 0,
+        failedScopeIds: [],
+        handledScopeCount: 1,
+        handledScopeIds: ['addon-data'],
+        missingHandlerScopeCount: 0,
+        missingHandlerScopeIds: [],
+        skippedScopeCount: 0,
+        skippedScopeIds: [],
+        status: 'succeeded',
+        succeededScopeCount: 1,
+        succeededScopeIds: ['addon-data'],
+      },
+      marketplaceBlockedReasonCount: 0,
+      partialUpdateSurfaceIds: [],
+      status: 'completed',
+      totalBlockedReasonCount: 0,
+      updateMode: 'full-rebuild',
+    })
+
     const needsHandlerExecutionPlan =
       createCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan({
       applyResult,
@@ -531,6 +559,19 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
       },
       status: 'needs-cleanup-handler',
     })
+    expect(getCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionSummary({
+      executionResult: needsHandlerApplyExecutionResult,
+    })).toMatchObject({
+      cleanup: {
+        effectCount: 0,
+        missingHandlerScopeCount: 1,
+        missingHandlerScopeIds: ['addon-data'],
+        skippedScopeCount: 1,
+        skippedScopeIds: ['addon-data'],
+        status: 'needs-handler',
+      },
+      status: 'needs-cleanup-handler',
+    })
 
     const cleanupError = new Error('cleanup failed')
     const failedApplyExecutionResult =
@@ -550,6 +591,16 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
     })
     expect(failedApplyExecutionResult.cleanupExecutionResult.failedResults[0]
       ?.error).toBe(cleanupError)
+    expect(getCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionSummary({
+      executionResult: failedApplyExecutionResult,
+    })).toMatchObject({
+      cleanup: {
+        failedScopeCount: 1,
+        failedScopeIds: ['addon-data'],
+        status: 'failed',
+      },
+      status: 'cleanup-failed',
+    })
   })
 
   it('keeps non-remove uninstall data out of cleanup effects', async () => {
@@ -950,6 +1001,26 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
     expect(applyExecutionResult.applyResult).toBe(applyResult)
     expect(applyExecutionResult.executionPlan).toBe(executionPlan)
     expect(cleanupExecuted).toBe(false)
+    expect(getCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionSummary({
+      executionResult: applyExecutionResult,
+    })).toMatchObject({
+      actionKind: 'uninstall',
+      blockedReasonCount: 1,
+      changedFeaturePackIds: ['runtime-pack'],
+      cleanup: {
+        effectCount: 0,
+        failedScopeCount: 0,
+        handledScopeCount: 0,
+        missingHandlerScopeCount: 0,
+        skippedScopeCount: 0,
+        status: 'not-run',
+        succeededScopeCount: 0,
+      },
+      marketplaceBlockedReasonCount: 0,
+      status: 'blocked',
+      totalBlockedReasonCount: 1,
+      updateMode: 'blocked',
+    })
   })
 
   it('keeps blocked marketplace actions from changing assembly input', () => {
