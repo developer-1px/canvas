@@ -34,6 +34,7 @@
 | Slide metadata inspector | `slide-edit-affordance` | active slide name, background, notes, size, orientation fields |
 | Style clipboard | `slide-edit-affordance` | source object style categories, target applicability, and format painter command effects |
 | Slide transition timing | `slide-edit-affordance` | transition type, duration, click/after advance policy |
+| Text body patch | `slide-edit-affordance` | text body JSON paste parsing, paragraph/run normalization, and host command effect |
 | Text font family | `slide-edit-affordance` | selected text object font family options and command effects |
 | Text font size | `slide-edit-affordance` | selected text object font size limits, metadata, JSON paste, and command effects |
 | Text font weight | `slide-edit-affordance` | selected text object font weight JSON paste and command effects |
@@ -184,6 +185,17 @@
 | Plain text | generic `text/plain` direct values such as `"bullet"` are not interpreted as list state |
 | Updates | selected slide id, text object id, field id, and normalized list value become host command effects |
 | Scope | complements rich text paste paragraph metadata without owning host text storage or HTML import rules |
+
+## Text Body Patch Contract
+
+| Area | Contract |
+| --- | --- |
+| JSON candidates | text-body custom MIME, `application/json`, `text/json`, and `text/plain` are checked in order |
+| JSON payloads | custom MIME may carry direct string/object payload; generic JSON requires `textBody`, `body`, `content`, `text`, or `plainText` wrapper |
+| Body shapes | string payloads split into paragraphs; `{ paragraphs: [...] }` payloads preserve paragraph/run structure |
+| Host policy | max paragraph, max runs, max text length, and final text body schema conversion stay host-owned |
+| Metadata | command effect metadata carries target ids, paragraph count, run count, format, and payload length |
+| No-op | missing/hidden/locked/non-text target, host normalizer rejection, parse failure, direct generic JSON, or empty body returns `null` |
 
 ## Text Font Family Contract
 
