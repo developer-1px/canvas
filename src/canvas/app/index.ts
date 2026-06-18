@@ -460,6 +460,13 @@ export {
   type CanvasPointerCaptureTarget,
 } from './affordances/interaction/pointer/CanvasPointerCapture'
 export {
+  previewCanvasPointerPanInteraction,
+  startCanvasPointerPanInteraction,
+  type CanvasPointerPanInteraction,
+  type CanvasPointerPanPreviewResult,
+  type CanvasPointerPanStartResult,
+} from './affordances/interaction/pointer/CanvasPointerPanInteraction'
+export {
   getCanvasResizeHandleDoubleClickIntent,
   recordCanvasItemPointerClick,
   type CanvasPointerClickMemory,

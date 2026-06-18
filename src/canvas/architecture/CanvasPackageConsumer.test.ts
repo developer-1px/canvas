@@ -53,6 +53,8 @@ import {
   setCanvasDataTransferText,
   scheduleCanvasAnimationFrameTask,
   writeCanvasClipboardText,
+  previewCanvasPointerPanInteraction,
+  startCanvasPointerPanInteraction,
   defineCanvasAppCustomItemModule,
   CANVAS_APP_CORE_ONLY_FEATURE_PACK_PROFILE,
   CANVAS_APP_COMPONENT_INSPECTOR_FEATURE_PACK_MANIFEST,
@@ -213,6 +215,9 @@ import {
   type CanvasModalBackdropPointerIntentInput,
   type CanvasModalKeyboardIntentInput,
   type CanvasPointerClickMemory,
+  type CanvasPointerPanInteraction,
+  type CanvasPointerPanPreviewResult,
+  type CanvasPointerPanStartResult,
   type CanvasResizeHandleDoubleClickIntentInput,
   type CanvasPointerTransformModifierInput,
   type CanvasPointerTransformModifierState,
@@ -232,6 +237,8 @@ import {
   createCanvasAppComponentPresentationRenderers,
   createCanvasAppAssembly as createCanvasAppAssemblyFromApp,
   createCanvasAppCustomItemRenderers,
+  previewCanvasPointerPanInteraction as previewCanvasPointerPanInteractionFromApp,
+  startCanvasPointerPanInteraction as startCanvasPointerPanInteractionFromApp,
   isCanvasKeyboardToolIntent,
   runCanvasKeyboardToolIntent,
   type CanvasAppAssemblySource as CanvasAppAssemblySourceFromApp,
@@ -412,6 +419,40 @@ describe('Canvas package consumer imports', () => {
       shiftKey: false,
       stopPropagation: () => undefined,
     }
+    const panStartResult: CanvasPointerPanStartResult =
+      startCanvasPointerPanInteraction({
+        input: pointerInput,
+        startScreen: { x: 10, y: 20 },
+        viewport: { scale: 1, x: 100, y: 200 },
+      })
+    const panInteraction: CanvasPointerPanInteraction =
+      panStartResult.interaction
+    const panPreviewResult: CanvasPointerPanPreviewResult =
+      previewCanvasPointerPanInteraction({
+        config: createCanvasAffordanceConfig(),
+        currentScreen: { x: 25, y: 15 },
+        interaction: panInteraction,
+      })
+
+    expect(panStartResult.capturePointer).toBe(true)
+    expect(startCanvasPointerPanInteractionFromApp({
+      input: pointerInput,
+      startScreen: { x: 10, y: 20 },
+      viewport: { scale: 1, x: 100, y: 200 },
+    })).toEqual(panStartResult)
+    expect(panPreviewResult).toMatchObject({
+      kind: 'preview',
+      viewport: { scale: 1, x: 115, y: 195 },
+    })
+    expect(previewCanvasPointerPanInteractionFromApp({
+      config: createCanvasAffordanceConfig({ gestures: { pan: false } }),
+      currentScreen: { x: 25, y: 15 },
+      interaction: panInteraction,
+    })).toEqual({ kind: 'none' })
+    expect(CanvasPackage.startCanvasPointerPanInteraction)
+      .toBe(startCanvasPointerPanInteraction)
+    expect(CanvasAppFacade.previewCanvasPointerPanInteraction)
+      .toBe(previewCanvasPointerPanInteraction)
     const externalOverlaySlot: CanvasAppStageExternalOverlaySlot = {
       render: (overlays) => overlays,
     }
