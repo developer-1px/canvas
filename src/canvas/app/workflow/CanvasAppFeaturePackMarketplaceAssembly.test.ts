@@ -15,6 +15,7 @@ import {
   getCanvasAppFeaturePackMarketplaceAssemblyApplyCommitPlan,
   getCanvasAppFeaturePackMarketplaceAssemblyApplyCommitResult,
   getCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionSummary,
+  getCanvasAppFeaturePackMarketplaceAssemblyApplyRuntimeStatePatch,
   getCanvasAppFeaturePackMarketplaceAssemblyApplyResult,
   getCanvasAppFeaturePackMarketplaceAssemblyApplyPlan,
   getCanvasAppFeaturePackMarketplaceAssemblyActionInput,
@@ -573,6 +574,55 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
     expect(commitResult.previousModel).toBe(model)
     expect(commitResult.nextModel).toBe(applyResult.nextModel)
 
+    const runtimeStatePatch =
+      getCanvasAppFeaturePackMarketplaceAssemblyApplyRuntimeStatePatch({
+        commitResult,
+      })
+
+    expect(runtimeStatePatch).toMatchObject({
+      actionKind: 'uninstall',
+      currentFeaturePackStates: [{
+        id: 'addon-pack',
+        status: 'enabled',
+      }],
+      nextFeaturePackStates: [{
+        id: 'addon-pack',
+        status: 'uninstalled',
+      }],
+      patch: {
+        changedFeaturePackIds: ['addon-pack'],
+        featurePackStates: [{
+          id: 'addon-pack',
+          status: 'uninstalled',
+        }],
+        options: {
+          featurePackStates: [{
+            id: 'addon-pack',
+            status: 'uninstalled',
+          }],
+        },
+        stateChanges: [{
+          from: {
+            enabled: true,
+            id: 'addon-pack',
+            installed: true,
+            status: 'enabled',
+          },
+          id: 'addon-pack',
+          to: {
+            enabled: false,
+            id: 'addon-pack',
+            installed: false,
+            status: 'uninstalled',
+          },
+        }],
+      },
+      patched: true,
+      status: 'patched',
+      updateMode: 'full-rebuild',
+    })
+    expect(runtimeStatePatch.commitResult).toBe(commitResult)
+
     const transactionCleanupExecutions: string[] = []
     const transactionResult =
       await executeCanvasAppFeaturePackMarketplaceAssemblyApplyTransaction({
@@ -636,6 +686,12 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
       transactionResult.applyResult.nextModel,
     )
     expect(transactionCleanupExecutions).toEqual(['addon-data'])
+    expect(getCanvasAppFeaturePackMarketplaceAssemblyApplyRuntimeStatePatch({
+      commitResult: transactionResult.commitResult,
+    })).toMatchObject({
+      patched: true,
+      status: 'patched',
+    })
 
     const needsHandlerExecutionPlan =
       createCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan({
@@ -716,6 +772,27 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
     expect(needsHandlerCommitResult.currentModel).toBe(model)
     expect('nextModel' in needsHandlerCommitResult).toBe(false)
     expect('nextAssemblyInput' in needsHandlerCommitResult).toBe(false)
+    const needsHandlerRuntimeStatePatch =
+      getCanvasAppFeaturePackMarketplaceAssemblyApplyRuntimeStatePatch({
+        commitResult: needsHandlerCommitResult,
+      })
+
+    expect(needsHandlerRuntimeStatePatch).toMatchObject({
+      actionKind: 'uninstall',
+      currentFeaturePackStates: [{
+        id: 'addon-pack',
+        status: 'enabled',
+      }],
+      holdReason: 'needs-cleanup-handler',
+      patch: null,
+      patched: false,
+      status: 'held',
+      updateMode: 'full-rebuild',
+    })
+    expect(needsHandlerRuntimeStatePatch.commitResult)
+      .toBe(needsHandlerCommitResult)
+    expect('nextFeaturePackStates' in needsHandlerRuntimeStatePatch)
+      .toBe(false)
 
     let needsHandlerCleanupExecuted = false
     const needsHandlerTransactionResult =
@@ -1281,6 +1358,28 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
     expect(commitResult.commitPlan).toBe(commitPlan)
     expect(commitResult.currentModel).toBe(model)
     expect('nextAssemblyInput' in commitResult).toBe(false)
+    const runtimeStatePatch =
+      getCanvasAppFeaturePackMarketplaceAssemblyApplyRuntimeStatePatch({
+        commitResult,
+      })
+
+    expect(runtimeStatePatch).toMatchObject({
+      actionKind: 'uninstall',
+      currentFeaturePackStates: [{
+        id: 'runtime-pack',
+        status: 'enabled',
+      }, {
+        id: 'addon-pack',
+        status: 'enabled',
+      }],
+      holdReason: 'blocked',
+      patch: null,
+      patched: false,
+      status: 'held',
+      updateMode: 'blocked',
+    })
+    expect(runtimeStatePatch.commitResult).toBe(commitResult)
+    expect('nextFeaturePackStates' in runtimeStatePatch).toBe(false)
 
     let transactionCleanupExecuted = false
     const blockedTransactionResult =

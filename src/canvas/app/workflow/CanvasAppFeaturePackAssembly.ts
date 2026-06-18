@@ -4,6 +4,7 @@ import {
   DEFAULT_CANVAS_APP_FEATURE_PACK_SUITE_MANIFESTS,
   createCanvasAppFeaturePackExtensionBundle,
   DEFAULT_CANVAS_APP_VIEW_FEATURE_PACKS,
+  applyCanvasAppFeaturePackRuntimeStatePatch,
   assertCanvasAppFeaturePackViewRenderers,
   createCanvasAppFeaturePackViewRenderers,
   getCanvasAppFeaturePackProfileById,
@@ -23,6 +24,7 @@ import {
   type CanvasAppFeaturePackMarketplaceModel,
   type CanvasAppFeaturePackMarketplacePrimaryAction,
   type CanvasAppFeaturePackManifestOrphanedDataScopeId,
+  type CanvasAppFeaturePackRuntimeStatePatch,
   type CanvasAppFeaturePackRuntimeStateInput,
   type CanvasAppFeaturePackSuiteManifest,
   type CanvasAppFeaturePackViewRenderers,
@@ -644,6 +646,67 @@ export type CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionResult<
   updateMode: CanvasAppFeaturePackMarketplaceAssemblyApplyUpdateMode
 }>
 
+export type CanvasAppFeaturePackMarketplaceAssemblyApplyRuntimeStatePatchInput<
+  TEffect,
+  TResult,
+> = Readonly<{
+  commitResult:
+    CanvasAppFeaturePackMarketplaceAssemblyApplyCommitResult<TEffect, TResult>
+}>
+
+export type CanvasAppFeaturePackMarketplaceAssemblyApplyRuntimeStatePatchResult<
+  TEffect,
+  TResult,
+> =
+  | CanvasAppFeaturePackMarketplaceAssemblyApplyRuntimeStatePatchAppliedResult<
+    TEffect,
+    TResult
+  >
+  | CanvasAppFeaturePackMarketplaceAssemblyApplyRuntimeStatePatchHeldResult<
+    TEffect,
+    TResult
+  >
+
+export type CanvasAppFeaturePackMarketplaceAssemblyApplyRuntimeStatePatchAppliedResult<
+  TEffect,
+  TResult,
+> = Readonly<{
+  actionKind: CanvasAppFeaturePackMarketplacePrimaryAction['kind']
+  commitResult:
+    CanvasAppFeaturePackMarketplaceAssemblyApplyCommittedResult<TEffect, TResult>
+  currentFeaturePackStates: readonly CanvasAppFeaturePackRuntimeStateInput[]
+  nextFeaturePackStates: readonly CanvasAppFeaturePackRuntimeStateInput[]
+  patch: CanvasAppFeaturePackRuntimeStatePatch
+  patched: true
+  status: 'patched'
+  updateMode: Exclude<
+    CanvasAppFeaturePackMarketplaceAssemblyApplyUpdateMode,
+    'blocked'
+  >
+}>
+
+export type CanvasAppFeaturePackMarketplaceAssemblyApplyRuntimeStatePatchHeldResult<
+  TEffect,
+  TResult,
+> = Readonly<{
+  actionKind: CanvasAppFeaturePackMarketplacePrimaryAction['kind']
+  commitResult:
+    CanvasAppFeaturePackMarketplaceAssemblyApplyHeldCommitResult<
+      TEffect,
+      TResult
+    >
+  currentFeaturePackStates: readonly CanvasAppFeaturePackRuntimeStateInput[]
+  holdReason:
+    CanvasAppFeaturePackMarketplaceAssemblyApplyHeldCommitResult<
+      TEffect,
+      TResult
+    >['holdReason']
+  patch: null
+  patched: false
+  status: 'held'
+  updateMode: CanvasAppFeaturePackMarketplaceAssemblyApplyUpdateMode
+}>
+
 export type CanvasAppFeaturePackMarketplaceAssemblyApplyReadyExecutionPlan<
   TEffect,
 > =
@@ -1203,6 +1266,64 @@ export async function executeCanvasAppFeaturePackMarketplaceAssemblyApplyTransac
     status: commitResult.status,
     summary: commitPlan.summary,
     updateMode: commitPlan.updateMode,
+  })
+}
+
+export function getCanvasAppFeaturePackMarketplaceAssemblyApplyRuntimeStatePatch<
+  TEffect,
+  TResult,
+>({
+  commitResult,
+}: CanvasAppFeaturePackMarketplaceAssemblyApplyRuntimeStatePatchInput<
+  TEffect,
+  TResult
+>):
+  CanvasAppFeaturePackMarketplaceAssemblyApplyRuntimeStatePatchResult<
+    TEffect,
+    TResult
+  > {
+  if (!commitResult.committed) {
+    return Object.freeze({
+      actionKind: commitResult.actionKind,
+      commitResult,
+      currentFeaturePackStates:
+        getCanvasAppFeaturePackMarketplaceAssemblyFeaturePackStates(
+          commitResult.currentModel,
+        ),
+      holdReason: commitResult.holdReason,
+      patch: null,
+      patched: false,
+      status: 'held',
+      updateMode: commitResult.updateMode,
+    })
+  }
+
+  const currentFeaturePackStates =
+    getCanvasAppFeaturePackMarketplaceAssemblyFeaturePackStates(
+      commitResult.previousModel,
+    )
+  const nextFeaturePackStates =
+    getCanvasAppFeaturePackMarketplaceAssemblyFeaturePackStates(
+      commitResult.nextModel,
+    )
+
+  return Object.freeze({
+    actionKind: commitResult.actionKind,
+    commitResult,
+    currentFeaturePackStates,
+    nextFeaturePackStates,
+    patch: applyCanvasAppFeaturePackRuntimeStatePatch({
+      featurePackIds: commitResult.nextModel.featurePackManifests.map((
+        manifest,
+      ) => manifest.id),
+      featurePackStates: nextFeaturePackStates,
+      options: {
+        featurePackStates: currentFeaturePackStates,
+      },
+    }),
+    patched: true,
+    status: 'patched',
+    updateMode: commitResult.updateMode,
   })
 }
 
@@ -1841,6 +1962,14 @@ function getCanvasAppFeaturePackMarketplaceAssemblyInstallOptions({
       })),
     ),
   })
+}
+
+function getCanvasAppFeaturePackMarketplaceAssemblyFeaturePackStates(
+  model: CanvasAppFeaturePackMarketplaceAssemblyModel,
+): readonly CanvasAppFeaturePackRuntimeStateInput[] {
+  return snapshotCanvasAppFeaturePackRuntimeStateInputs(
+    model.assemblyInput.featurePackStates ?? [],
+  )
 }
 
 function getCanvasAppAssemblyFeaturePackManifests(
