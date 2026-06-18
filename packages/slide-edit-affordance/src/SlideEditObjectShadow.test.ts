@@ -3,9 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   createSlideEditObjectShadowDescriptor,
   getSlideEditObjectShadowCommandEffect,
-  getSlideEditObjectShadowColorCSS,
   getSlideEditObjectShadowFilter,
-  getSlideEditObjectShadowFilterCSS,
   getSlideEditObjectShadowJSONPasteValue,
   getSlideEditObjectShadowMetadata,
   getSlideEditObjectShadowPasteCommands,
@@ -19,6 +17,9 @@ import {
   toSlideEditObjectShadowAttributeValue,
 } from './SlideEditObjectShadow'
 import {
+  getSlideEditObjectShadowColorCSS as getSlideEditObjectShadowColorCSSFromPackage,
+  getSlideEditObjectShadowFilter as getSlideEditObjectShadowFilterFromPackage,
+  getSlideEditObjectShadowFilterCSS as getSlideEditObjectShadowFilterCSSFromPackage,
   getSlideEditObjectShadowJSONPasteValue as getSlideEditObjectShadowJSONPasteValueFromPackage,
 } from './index'
 
@@ -132,9 +133,9 @@ describe('SlideEditObjectShadow', () => {
       opacity: 0.4,
     }
 
-    expect(getSlideEditObjectShadowFilterCSS(shadow))
+    expect(getSlideEditObjectShadowFilterCSSFromPackage(shadow))
       .toBe('6.93px 4px 16px rgb(18 52 86 / 0.4)')
-    expect(getSlideEditObjectShadowFilter(shadow))
+    expect(getSlideEditObjectShadowFilterFromPackage(shadow))
       .toBe('drop-shadow(6.93px 4px 16px rgb(18 52 86 / 0.4))')
   })
 
@@ -142,7 +143,7 @@ describe('SlideEditObjectShadow', () => {
     expect(getSlideEditObjectShadowFilter({
       enabled: false,
     })).toBeUndefined()
-    expect(getSlideEditObjectShadowColorCSS({
+    expect(getSlideEditObjectShadowColorCSSFromPackage({
       color: 'color-mix(in srgb, black 40%, transparent)',
       enabled: true,
       opacity: 0.5,
