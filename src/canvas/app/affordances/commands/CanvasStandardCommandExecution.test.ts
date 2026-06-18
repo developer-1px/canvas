@@ -7,9 +7,13 @@ import type {
   CanvasItem,
   EditingText,
 } from '../../../entities'
-import { executeCanvasStandardCommand } from './CanvasStandardCommandExecution'
+import {
+  executeCanvasStandardCommand,
+  type CanvasStandardCommandExecutionContext,
+} from './CanvasStandardCommandExecution'
 import type {
   CanvasEditingUpdate,
+  CanvasStandardCommandItemsChange,
 } from './CanvasStandardCommandDocumentEffectContracts'
 
 const rect1 = createRectItem('rect-1')
@@ -144,6 +148,66 @@ describe('CanvasStandardCommandExecution', () => {
     expect(context.commitItemsChange).not.toHaveBeenCalled()
     expect(context.commitSelection).not.toHaveBeenCalled()
   })
+
+  it('preserves host item types in executed item changes', () => {
+    type HostStandardItem = {
+      id: string
+      kind: 'ppt-shape'
+      slideId: string
+      x: number
+      y: number
+    }
+    const hostItem: HostStandardItem = {
+      id: 'shape-1',
+      kind: 'ppt-shape',
+      slideId: 'slide-1',
+      x: 0,
+      y: 0,
+    }
+    const changes: CanvasStandardCommandItemsChange<HostStandardItem>[] = []
+    const context: CanvasStandardCommandExecutionContext<HostStandardItem> = {
+      commandAdapter: createHostCommandAdapter<HostStandardItem>({
+        nudgeSelection: ({ dx, dy, items, selection }) =>
+          items.map((item) =>
+            selection.includes(item.id)
+              ? { ...item, x: item.x + dx, y: item.y + dy }
+              : item,
+          ),
+      }),
+      commitItemsChange: (change) => {
+        changes.push(change)
+
+        return true
+      },
+      commitSelection: vi.fn(() => true),
+      config: createCanvasAffordanceConfig(),
+      createId: vi.fn((prefix: string) => `${prefix}-1`),
+      items: [hostItem],
+      redo: vi.fn(() => undefined),
+      selection: [hostItem.id],
+      setEditing: vi.fn(),
+      setSelection: vi.fn(),
+      undo: vi.fn(() => undefined),
+    }
+
+    const executed = executeCanvasStandardCommand<HostStandardItem>({
+      command: { dx: 5, dy: 7, kind: 'nudge' },
+      context,
+    })
+
+    expect(executed).toBe(true)
+    const change = changes[0]
+
+    if (change?.type !== 'replace-changed') {
+      throw new Error('Expected host item replace-changed change')
+    }
+
+    const nudgedHostItem: HostStandardItem = change.items[0]!
+
+    expect(nudgedHostItem.slideId).toBe('slide-1')
+    expect(nudgedHostItem.x).toBe(5)
+    expect(nudgedHostItem.y).toBe(7)
+  })
 })
 
 function createContext(
@@ -211,6 +275,27 @@ function createCommandAdapter(
       items: items.map((item) => ({ ...item, locked: false })),
       selection,
     }),
+    ...overrides,
+  }
+}
+
+function createHostCommandAdapter<TItem extends { id: string }>(
+  overrides: Partial<CanvasCommandAdapter<TItem>> = {},
+): CanvasCommandAdapter<TItem> {
+  return {
+    alignSelection: ({ items }) => items,
+    cloneSelection: () => [],
+    deleteSelection: ({ items, selection }) =>
+      items.filter((item) => !selection.includes(item.id)),
+    distributeSelection: ({ items }) => items,
+    groupSelection: ({ items, selection }) => ({ items, selection }),
+    lockSelection: ({ items, selection }) => ({ items, selection }),
+    nudgeSelection: ({ items }) => items,
+    pasteItems: () => [],
+    reorderSelection: ({ items }) => items,
+    selectAll: ({ items }) => items.map((item) => item.id),
+    ungroupSelection: ({ items, selection }) => ({ items, selection }),
+    unlockAll: ({ items, selection }) => ({ items, selection }),
     ...overrides,
   }
 }

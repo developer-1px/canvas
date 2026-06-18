@@ -1,39 +1,53 @@
+import type { CanvasCommandItem } from '../../../engine'
+import type { CanvasItem } from '../../../entities'
 import type {
   CanvasStandardCommandDocumentEffect,
   CanvasStandardCommandDocumentEffectContext,
   CanvasStandardCommandItemsChange,
 } from './CanvasStandardCommandDocumentEffectContracts'
 
-type CanvasStandardReplaceChangedChange = Extract<
-  CanvasStandardCommandItemsChange,
+type CanvasStandardReplaceChangedChange<
+  TItem extends CanvasCommandItem = CanvasItem,
+> = Extract<
+  CanvasStandardCommandItemsChange<TItem>,
   { type: 'replace-changed' }
 >
-type CanvasStandardRemoveSelectionChange = Extract<
-  CanvasStandardCommandItemsChange,
+type CanvasStandardRemoveSelectionChange<
+  TItem extends CanvasCommandItem = CanvasItem,
+> = Extract<
+  CanvasStandardCommandItemsChange<TItem>,
   { type: 'remove-selection' }
 >
-type CanvasStandardGroupSelectionChange = Extract<
-  CanvasStandardCommandItemsChange,
+type CanvasStandardGroupSelectionChange<
+  TItem extends CanvasCommandItem = CanvasItem,
+> = Extract<
+  CanvasStandardCommandItemsChange<TItem>,
   { type: 'group-selection' }
 >
-type CanvasStandardUngroupSelectionChange = Extract<
-  CanvasStandardCommandItemsChange,
+type CanvasStandardUngroupSelectionChange<
+  TItem extends CanvasCommandItem = CanvasItem,
+> = Extract<
+  CanvasStandardCommandItemsChange<TItem>,
   { type: 'ungroup-selection' }
 >
-type CanvasStandardReorderSelectionChange = Extract<
-  CanvasStandardCommandItemsChange,
+type CanvasStandardReorderSelectionChange<
+  TItem extends CanvasCommandItem = CanvasItem,
+> = Extract<
+  CanvasStandardCommandItemsChange<TItem>,
   { type: 'reorder-selection' }
 >
 
-export function createCanvasStandardReplaceChangedEffect({
+export function createCanvasStandardReplaceChangedEffect<
+  TItem extends CanvasCommandItem = CanvasItem,
+>({
   afterSelection,
   fallbackSelection,
   items,
 }: {
   afterSelection?: string[]
   fallbackSelection?: string[]
-  items: CanvasStandardReplaceChangedChange['items']
-}): CanvasStandardCommandDocumentEffect {
+  items: CanvasStandardReplaceChangedChange<TItem>['items']
+}): CanvasStandardCommandDocumentEffect<TItem> {
   return {
     afterSelection,
     change: { type: 'replace-changed', items },
@@ -42,15 +56,17 @@ export function createCanvasStandardReplaceChangedEffect({
   }
 }
 
-export function createCanvasStandardRemoveSelectionEffect({
+export function createCanvasStandardRemoveSelectionEffect<
+  TItem extends CanvasCommandItem = CanvasItem,
+>({
   afterSelection,
   clearEditingIds,
   selection,
 }: {
   afterSelection: string[]
   clearEditingIds: readonly string[]
-  selection: CanvasStandardRemoveSelectionChange['selection']
-}): CanvasStandardCommandDocumentEffect {
+  selection: CanvasStandardRemoveSelectionChange<TItem>['selection']
+}): CanvasStandardCommandDocumentEffect<TItem> {
   return {
     afterSelection,
     change: { type: 'remove-selection', selection },
@@ -60,15 +76,17 @@ export function createCanvasStandardRemoveSelectionEffect({
   }
 }
 
-export function createCanvasStandardGroupSelectionEffect({
+export function createCanvasStandardGroupSelectionEffect<
+  TItem extends CanvasCommandItem = CanvasItem,
+>({
   afterSelection,
   groupId,
   selection,
 }: {
   afterSelection: string[]
-  groupId: CanvasStandardGroupSelectionChange['groupId']
-  selection: CanvasStandardGroupSelectionChange['selection']
-}): CanvasStandardCommandDocumentEffect {
+  groupId: CanvasStandardGroupSelectionChange<TItem>['groupId']
+  selection: CanvasStandardGroupSelectionChange<TItem>['selection']
+}): CanvasStandardCommandDocumentEffect<TItem> {
   return {
     afterSelection,
     change: { type: 'group-selection', groupId, selection },
@@ -77,13 +95,15 @@ export function createCanvasStandardGroupSelectionEffect({
   }
 }
 
-export function createCanvasStandardUngroupSelectionEffect({
+export function createCanvasStandardUngroupSelectionEffect<
+  TItem extends CanvasCommandItem = CanvasItem,
+>({
   afterSelection,
   selection,
 }: {
   afterSelection: string[]
-  selection: CanvasStandardUngroupSelectionChange['selection']
-}): CanvasStandardCommandDocumentEffect {
+  selection: CanvasStandardUngroupSelectionChange<TItem>['selection']
+}): CanvasStandardCommandDocumentEffect<TItem> {
   return {
     afterSelection,
     change: { type: 'ungroup-selection', selection },
@@ -92,15 +112,17 @@ export function createCanvasStandardUngroupSelectionEffect({
   }
 }
 
-export function createCanvasStandardReorderSelectionEffect({
+export function createCanvasStandardReorderSelectionEffect<
+  TItem extends CanvasCommandItem = CanvasItem,
+>({
   afterSelection,
   mode,
   selection,
 }: {
   afterSelection: string[]
-  mode: CanvasStandardReorderSelectionChange['mode']
-  selection: CanvasStandardReorderSelectionChange['selection']
-}): CanvasStandardCommandDocumentEffect {
+  mode: CanvasStandardReorderSelectionChange<TItem>['mode']
+  selection: CanvasStandardReorderSelectionChange<TItem>['selection']
+}): CanvasStandardCommandDocumentEffect<TItem> {
   return {
     afterSelection,
     change: { type: 'reorder-selection', mode, selection },
@@ -108,27 +130,31 @@ export function createCanvasStandardReorderSelectionEffect({
   }
 }
 
-export function createCanvasStandardHistoryEffect({
+export function createCanvasStandardHistoryEffect<
+  TItem extends CanvasCommandItem = CanvasItem,
+>({
   direction,
 }: {
   direction: 'redo' | 'undo'
-}): CanvasStandardCommandDocumentEffect {
+}): CanvasStandardCommandDocumentEffect<TItem> {
   return { direction, kind: 'history' }
 }
 
-export function createCanvasStandardSelectionEffect({
+export function createCanvasStandardSelectionEffect<
+  TItem extends CanvasCommandItem = CanvasItem,
+>({
   selection,
 }: {
   selection: string[]
-}): CanvasStandardCommandDocumentEffect {
+}): CanvasStandardCommandDocumentEffect<TItem> {
   return { kind: 'selection', selection }
 }
 
 type CanvasStandardDocumentEffectApplier<
   TKind extends CanvasStandardCommandDocumentEffect['kind'],
-> = (args: {
-  context: CanvasStandardCommandDocumentEffectContext
-  effect: Extract<CanvasStandardCommandDocumentEffect, { kind: TKind }>
+> = <TItem extends CanvasCommandItem = CanvasItem>(args: {
+  context: CanvasStandardCommandDocumentEffectContext<TItem>
+  effect: Extract<CanvasStandardCommandDocumentEffect<TItem>, { kind: TKind }>
 }) => boolean
 
 type CanvasStandardDocumentEffectAppliers = {
@@ -136,9 +162,10 @@ type CanvasStandardDocumentEffectAppliers = {
     CanvasStandardDocumentEffectApplier<TKind>
 }
 
-type CanvasStandardDocumentAnyEffectApplier = (args: {
-  context: CanvasStandardCommandDocumentEffectContext
-  effect: CanvasStandardCommandDocumentEffect
+type CanvasStandardDocumentAnyEffectApplier =
+  <TItem extends CanvasCommandItem = CanvasItem>(args: {
+  context: CanvasStandardCommandDocumentEffectContext<TItem>
+  effect: CanvasStandardCommandDocumentEffect<TItem>
 }) => boolean
 
 const CANVAS_STANDARD_DOCUMENT_EFFECT_APPLIERS = Object.freeze({
@@ -162,21 +189,25 @@ const CANVAS_STANDARD_DOCUMENT_EFFECT_APPLIERS = Object.freeze({
     }),
 } satisfies CanvasStandardDocumentEffectAppliers)
 
-export function applyCanvasStandardDocumentEffect({
+export function applyCanvasStandardDocumentEffect<
+  TItem extends CanvasCommandItem = CanvasItem,
+>({
   context,
   effect,
 }: {
-  context: CanvasStandardCommandDocumentEffectContext
-  effect: CanvasStandardCommandDocumentEffect
+  context: CanvasStandardCommandDocumentEffectContext<TItem>
+  effect: CanvasStandardCommandDocumentEffect<TItem>
 }) {
   const applier = CANVAS_STANDARD_DOCUMENT_EFFECT_APPLIERS[
     effect.kind
   ] as CanvasStandardDocumentAnyEffectApplier
 
-  return applier({ context, effect })
+  return applier<TItem>({ context, effect })
 }
 
-export function applyCanvasStandardItemsChangeEffect({
+export function applyCanvasStandardItemsChangeEffect<
+  TItem extends CanvasCommandItem = CanvasItem,
+>({
   afterSelection,
   change,
   clearEditingIds,
@@ -184,9 +215,9 @@ export function applyCanvasStandardItemsChangeEffect({
   fallbackSelection,
 }: {
   afterSelection?: string[]
-  change: CanvasStandardCommandItemsChange
+  change: CanvasStandardCommandItemsChange<TItem>
   clearEditingIds?: readonly string[]
-  context: CanvasStandardCommandDocumentEffectContext
+  context: CanvasStandardCommandDocumentEffectContext<TItem>
   fallbackSelection?: string[]
 }) {
   const didCommit = context.commitItemsChange(
@@ -208,19 +239,21 @@ export function applyCanvasStandardItemsChangeEffect({
   return true
 }
 
-export function applyCanvasStandardSelectionEffect({
+export function applyCanvasStandardSelectionEffect<
+  TItem extends CanvasCommandItem = CanvasItem,
+>({
   context,
   selection,
 }: {
-  context: CanvasStandardCommandDocumentEffectContext
+  context: CanvasStandardCommandDocumentEffectContext<TItem>
   selection: string[]
 }) {
   context.commitSelection(selection)
   return true
 }
 
-function clearCanvasEditing(
-  context: CanvasStandardCommandDocumentEffectContext,
+function clearCanvasEditing<TItem extends CanvasCommandItem = CanvasItem>(
+  context: CanvasStandardCommandDocumentEffectContext<TItem>,
   clearEditingIds: readonly string[],
 ) {
   context.setEditing((current) =>
@@ -228,11 +261,13 @@ function clearCanvasEditing(
   )
 }
 
-export function applyCanvasStandardHistoryEffect({
+export function applyCanvasStandardHistoryEffect<
+  TItem extends CanvasCommandItem = CanvasItem,
+>({
   context,
   direction,
 }: {
-  context: CanvasStandardCommandDocumentEffectContext
+  context: CanvasStandardCommandDocumentEffectContext<TItem>
   direction: 'redo' | 'undo'
 }) {
   const restoredSelection =

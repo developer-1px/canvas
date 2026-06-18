@@ -8,6 +8,9 @@ import {
   createCanvasStandardCommandEffectPlan,
   type CanvasStandardCommandEffectPlanContext,
 } from './CanvasStandardCommandEffectPlan'
+import type {
+  CanvasStandardCommandDocumentEffect,
+} from './CanvasStandardCommandDocumentEffectContracts'
 
 const rect1 = createRectItem('rect-1')
 const rect2 = createRectItem('rect-2', { x: 120 })
@@ -90,6 +93,54 @@ describe('CanvasStandardCommandEffectPlan', () => {
       }),
     ).toBeNull()
   })
+
+  it('preserves host item types in planned effects', () => {
+    type HostStandardItem = {
+      id: string
+      kind: 'ppt-shape'
+      slideId: string
+      x: number
+      y: number
+    }
+    const hostItem: HostStandardItem = {
+      id: 'shape-1',
+      kind: 'ppt-shape',
+      slideId: 'slide-1',
+      x: 0,
+      y: 0,
+    }
+    const context: CanvasStandardCommandEffectPlanContext<HostStandardItem> = {
+      commandAdapter: createHostCommandAdapter<HostStandardItem>({
+        nudgeSelection: ({ dx, dy, items, selection }) =>
+          items.map((item) =>
+            selection.includes(item.id)
+              ? { ...item, x: item.x + dx, y: item.y + dy }
+              : item,
+          ),
+      }),
+      config: createCanvasAffordanceConfig(),
+      createId: vi.fn((prefix: string) => `${prefix}-1`),
+      items: [hostItem],
+      selection: [hostItem.id],
+    }
+    const effect:
+      CanvasStandardCommandDocumentEffect<HostStandardItem> | null =
+        createCanvasStandardCommandEffectPlan({
+          command: { dx: 4, dy: 8, kind: 'nudge' },
+          context,
+        })
+
+    if (effect?.kind !== 'items-change' ||
+        effect.change.type !== 'replace-changed') {
+      throw new Error('Expected host item replace-changed effect')
+    }
+
+    const nudgedHostItem: HostStandardItem = effect.change.items[0]!
+
+    expect(nudgedHostItem.slideId).toBe('slide-1')
+    expect(nudgedHostItem.x).toBe(4)
+    expect(nudgedHostItem.y).toBe(8)
+  })
 })
 
 function createContext(
@@ -151,6 +202,27 @@ function createCommandAdapter(
       items: items.map((item) => ({ ...item, locked: false })),
       selection,
     }),
+    ...overrides,
+  }
+}
+
+function createHostCommandAdapter<TItem extends { id: string }>(
+  overrides: Partial<CanvasCommandAdapter<TItem>> = {},
+): CanvasCommandAdapter<TItem> {
+  return {
+    alignSelection: ({ items }) => items,
+    cloneSelection: () => [],
+    deleteSelection: ({ items, selection }) =>
+      items.filter((item) => !selection.includes(item.id)),
+    distributeSelection: ({ items }) => items,
+    groupSelection: ({ items, selection }) => ({ items, selection }),
+    lockSelection: ({ items, selection }) => ({ items, selection }),
+    nudgeSelection: ({ items }) => items,
+    pasteItems: () => [],
+    reorderSelection: ({ items }) => items,
+    selectAll: ({ items }) => items.map((item) => item.id),
+    ungroupSelection: ({ items, selection }) => ({ items, selection }),
+    unlockAll: ({ items, selection }) => ({ items, selection }),
     ...overrides,
   }
 }

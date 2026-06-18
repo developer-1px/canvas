@@ -305,6 +305,26 @@ export {
   executeCanvasClipboardCommand,
   type CanvasClipboardCommandExecutionContext,
 } from './affordances/commands/CanvasClipboardCommandExecution'
+export type {
+  CanvasStandardCommand,
+} from './affordances/commands/CanvasStandardCommandContracts'
+export {
+  createCanvasStandardCommandEffectPlan,
+  type CanvasStandardCommandEffectPlanContext,
+} from './affordances/commands/CanvasStandardCommandEffectPlan'
+export {
+  applyCanvasStandardDocumentEffect,
+} from './affordances/commands/CanvasStandardCommandDocumentEffects'
+export type {
+  CanvasEditingUpdate,
+  CanvasStandardCommandDocumentEffect,
+  CanvasStandardCommandDocumentEffectContext,
+  CanvasStandardCommandItemsChange,
+} from './affordances/commands/CanvasStandardCommandDocumentEffectContracts'
+export {
+  executeCanvasStandardCommand,
+  type CanvasStandardCommandExecutionContext,
+} from './affordances/commands/CanvasStandardCommandExecution'
 export {
   createCanvasDataTransferImportActionPlan,
   type CanvasDataTransferImportActionPlanInput,

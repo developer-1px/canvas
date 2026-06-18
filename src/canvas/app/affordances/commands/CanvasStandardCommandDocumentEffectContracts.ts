@@ -1,4 +1,8 @@
-import type { EditingText } from '../../../entities'
+import type { CanvasCommandItem } from '../../../engine'
+import type {
+  CanvasItem,
+  EditingText,
+} from '../../../entities'
 import type { CanvasAppItemsChange } from '../../workspace/document/CanvasAppDocumentContracts'
 import type {
   CommitCanvasItemsChange,
@@ -10,8 +14,10 @@ export type CanvasEditingUpdate =
   | null
   | ((current: EditingText | null) => EditingText | null)
 
-export type CanvasStandardCommandDocumentEffectContext = {
-  commitItemsChange: CommitCanvasItemsChange
+export type CanvasStandardCommandDocumentEffectContext<
+  TItem extends CanvasCommandItem = CanvasItem,
+> = {
+  commitItemsChange: CommitCanvasItemsChange<TItem>
   commitSelection: CommitCanvasSelection
   redo: () => string[] | undefined
   selection: string[]
@@ -20,12 +26,16 @@ export type CanvasStandardCommandDocumentEffectContext = {
   undo: () => string[] | undefined
 }
 
-export type CanvasStandardCommandItemsChange = CanvasAppItemsChange
+export type CanvasStandardCommandItemsChange<
+  TItem extends CanvasCommandItem = CanvasItem,
+> = CanvasAppItemsChange<TItem>
 
-export type CanvasStandardCommandDocumentEffect =
+export type CanvasStandardCommandDocumentEffect<
+  TItem extends CanvasCommandItem = CanvasItem,
+> =
   | {
       afterSelection?: string[]
-      change: CanvasStandardCommandItemsChange
+      change: CanvasStandardCommandItemsChange<TItem>
       clearEditingIds?: readonly string[]
       fallbackSelection?: string[]
       kind: 'items-change'

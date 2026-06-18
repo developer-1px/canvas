@@ -4,6 +4,7 @@ import type {
   CanvasSelectionIds,
 } from '../../../core'
 import type { CanvasItem } from '../../../entities'
+import type { CanvasCommandItem } from '../../../foundation'
 
 export type CanvasAppItemsReorderMode =
   | 'bringForward'
@@ -11,11 +12,13 @@ export type CanvasAppItemsReorderMode =
   | 'sendBackward'
   | 'sendToBack'
 
-export type CanvasAppItemsChange =
-  | { type: 'add'; items: CanvasItem[] }
+export type CanvasAppItemsChange<
+  TItem extends CanvasCommandItem = CanvasItem,
+> =
+  | { type: 'add'; items: TItem[] }
   | { type: 'group-selection'; groupId: string; selection: CanvasSelectionIds }
   | { type: 'remove-selection'; selection: CanvasSelectionIds }
-  | { type: 'replace-changed'; items: CanvasItem[] }
+  | { type: 'replace-changed'; items: TItem[] }
   | {
       type: 'reorder-selection'
       mode: CanvasAppItemsReorderMode
@@ -28,7 +31,7 @@ export type CanvasAppItemsChange =
       to: Bounds
     }
   | { type: 'set-text'; id: string; text: string }
-  | { type: 'transform'; afterItems: CanvasItem[]; beforeItems: CanvasItem[] }
+  | { type: 'transform'; afterItems: TItem[]; beforeItems: TItem[] }
   | { type: 'ungroup-selection'; selection: CanvasSelectionIds }
 
 export type CanvasAppDocumentSelectionHistory = {
@@ -73,8 +76,10 @@ export type CanvasAppDocumentTextSearch = {
   ) => boolean
 }
 
-export type CanvasAppCommitItemsChange = (
-  change: CanvasAppItemsChange,
+export type CanvasAppCommitItemsChange<
+  TItem extends CanvasCommandItem = CanvasItem,
+> = (
+  change: CanvasAppItemsChange<TItem>,
   selection?: CanvasAppDocumentSelectionHistory,
 ) => boolean
 

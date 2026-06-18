@@ -1,4 +1,7 @@
-import type { CanvasReorderMode } from '../../../engine'
+import type {
+  CanvasCommandItem,
+  CanvasReorderMode,
+} from '../../../engine'
 import type { CanvasItem } from '../../../entities'
 import {
   createCanvasStandardGroupSelectionEffect,
@@ -12,8 +15,10 @@ import type {
   CanvasStandardCommandDocumentEffect,
 } from './CanvasStandardCommandDocumentEffectContracts'
 
-export type CanvasStandardChangedItemsResult = {
-  items: CanvasItem[]
+export type CanvasStandardChangedItemsResult<
+  TItem extends CanvasCommandItem = CanvasItem,
+> = {
+  items: TItem[]
   selection: string[]
 }
 
@@ -21,77 +26,91 @@ export type CanvasStandardSelectionResult = {
   selection: string[]
 }
 
-export type CanvasStandardRemoveSelectionResult =
-  CanvasStandardChangedItemsResult & {
+export type CanvasStandardRemoveSelectionResult<
+  TItem extends CanvasCommandItem = CanvasItem,
+> =
+  CanvasStandardChangedItemsResult<TItem> & {
     clearEditingIds: readonly string[]
   }
 
-export function createCanvasStandardChangedItemsResultEffect({
+export function createCanvasStandardChangedItemsResultEffect<
+  TItem extends CanvasCommandItem = CanvasItem,
+>({
   fallbackSelection,
   result,
 }: {
   fallbackSelection?: string[]
-  result: CanvasStandardChangedItemsResult
-}): CanvasStandardCommandDocumentEffect {
-  return createCanvasStandardReplaceChangedEffect({
+  result: CanvasStandardChangedItemsResult<TItem>
+}): CanvasStandardCommandDocumentEffect<TItem> {
+  return createCanvasStandardReplaceChangedEffect<TItem>({
     afterSelection: result.selection,
     fallbackSelection,
     items: result.items,
   })
 }
 
-export function createCanvasStandardRemoveSelectionResultEffect({
+export function createCanvasStandardRemoveSelectionResultEffect<
+  TItem extends CanvasCommandItem = CanvasItem,
+>({
   result,
   selection,
 }: {
-  result: CanvasStandardRemoveSelectionResult
+  result: CanvasStandardRemoveSelectionResult<TItem>
   selection: string[]
-}): CanvasStandardCommandDocumentEffect {
-  return createCanvasStandardRemoveSelectionEffect({
+}): CanvasStandardCommandDocumentEffect<TItem> {
+  return createCanvasStandardRemoveSelectionEffect<TItem>({
     afterSelection: result.selection,
     clearEditingIds: result.clearEditingIds,
     selection,
   })
 }
 
-export function createCanvasStandardGroupSelectionResultEffect({
+export function createCanvasStandardGroupSelectionResultEffect<
+  TItem extends CanvasCommandItem = CanvasItem,
+>({
   groupId,
   result,
   selection,
 }: {
   groupId: string
-  result: CanvasStandardChangedItemsResult
+  result: CanvasStandardChangedItemsResult<TItem>
   selection: string[]
-}): CanvasStandardCommandDocumentEffect {
-  return createCanvasStandardGroupSelectionEffect({
+}): CanvasStandardCommandDocumentEffect<TItem> {
+  return createCanvasStandardGroupSelectionEffect<TItem>({
     afterSelection: result.selection,
     groupId,
     selection,
   })
 }
 
-export function createCanvasStandardUngroupSelectionResultEffect({
+export function createCanvasStandardUngroupSelectionResultEffect<
+  TItem extends CanvasCommandItem = CanvasItem,
+>({
   result,
   selection,
 }: {
   result: CanvasStandardSelectionResult
   selection: string[]
-}): CanvasStandardCommandDocumentEffect {
-  return createCanvasStandardUngroupSelectionEffect({
+}): CanvasStandardCommandDocumentEffect<TItem> {
+  return createCanvasStandardUngroupSelectionEffect<TItem>({
     afterSelection: result.selection,
     selection,
   })
 }
 
-export function createCanvasStandardNudgeResultEffect({
+export function createCanvasStandardNudgeResultEffect<
+  TItem extends CanvasCommandItem = CanvasItem,
+>({
   items,
 }: {
-  items: CanvasItem[]
-}): CanvasStandardCommandDocumentEffect {
-  return createCanvasStandardReplaceChangedEffect({ items })
+  items: TItem[]
+}): CanvasStandardCommandDocumentEffect<TItem> {
+  return createCanvasStandardReplaceChangedEffect<TItem>({ items })
 }
 
-export function createCanvasStandardReorderSelectionResultEffect({
+export function createCanvasStandardReorderSelectionResultEffect<
+  TItem extends CanvasCommandItem = CanvasItem,
+>({
   mode,
   result,
   selection,
@@ -99,18 +118,20 @@ export function createCanvasStandardReorderSelectionResultEffect({
   mode: CanvasReorderMode
   result: CanvasStandardSelectionResult
   selection: string[]
-}): CanvasStandardCommandDocumentEffect {
-  return createCanvasStandardReorderSelectionEffect({
+}): CanvasStandardCommandDocumentEffect<TItem> {
+  return createCanvasStandardReorderSelectionEffect<TItem>({
     afterSelection: result.selection,
     mode,
     selection,
   })
 }
 
-export function createCanvasStandardSelectAllResultEffect({
+export function createCanvasStandardSelectAllResultEffect<
+  TItem extends CanvasCommandItem = CanvasItem,
+>({
   selection,
 }: {
   selection: string[]
-}): CanvasStandardCommandDocumentEffect {
-  return createCanvasStandardSelectionEffect({ selection })
+}): CanvasStandardCommandDocumentEffect<TItem> {
+  return createCanvasStandardSelectionEffect<TItem>({ selection })
 }

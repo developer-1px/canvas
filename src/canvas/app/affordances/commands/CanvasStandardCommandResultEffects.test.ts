@@ -6,6 +6,9 @@ import {
   createCanvasStandardRemoveSelectionResultEffect,
   createCanvasStandardReorderSelectionResultEffect,
 } from './CanvasStandardCommandResultEffects'
+import type {
+  CanvasStandardCommandDocumentEffect,
+} from './CanvasStandardCommandDocumentEffectContracts'
 
 const rect1 = createRectItem('rect-1')
 const rect2 = createRectItem('rect-2')
@@ -76,6 +79,35 @@ describe('CanvasStandardCommandResultEffects', () => {
       },
       kind: 'items-change',
     })
+  })
+
+  it('preserves host item types in changed item effects', () => {
+    type HostStandardItem = {
+      id: string
+      kind: 'ppt-shape'
+      slideId: string
+    }
+    const hostItem: HostStandardItem = {
+      id: 'shape-1',
+      kind: 'ppt-shape',
+      slideId: 'slide-1',
+    }
+    const effect: CanvasStandardCommandDocumentEffect<HostStandardItem> =
+      createCanvasStandardChangedItemsResultEffect({
+        result: {
+          items: [hostItem],
+          selection: [hostItem.id],
+        },
+      })
+
+    if (effect.kind !== 'items-change' ||
+        effect.change.type !== 'replace-changed') {
+      throw new Error('Expected host item replace-changed effect')
+    }
+
+    const changedHostItem: HostStandardItem = effect.change.items[0]!
+
+    expect(changedHostItem.slideId).toBe('slide-1')
   })
 })
 

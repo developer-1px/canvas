@@ -12,6 +12,7 @@ import {
   type CanvasAffordanceConfig,
   type CanvasAlignMode,
   type CanvasCommandAdapter,
+  type CanvasCommandItem,
   type CanvasDistributeMode,
   type CanvasReorderMode,
 } from '../../../engine'
@@ -31,30 +32,33 @@ import {
   createCanvasStandardUngroupSelectionResultEffect,
 } from './CanvasStandardCommandResultEffects'
 
-export type CanvasStandardCommandEffectPlanContext = {
-  commandAdapter: CanvasCommandAdapter<CanvasItem>
+export type CanvasStandardCommandEffectPlanContext<
+  TItem extends CanvasCommandItem = CanvasItem,
+> = {
+  commandAdapter: CanvasCommandAdapter<TItem>
   config: CanvasAffordanceConfig
   createId: (prefix: string) => string
-  items: CanvasItem[]
+  items: TItem[]
   selection: string[]
 }
 
 type CanvasStandardCommandEffectPlanner<
   TKind extends CanvasStandardCommand['kind'],
-> = (args: {
+> = <TItem extends CanvasCommandItem = CanvasItem>(args: {
   command: Extract<CanvasStandardCommand, { kind: TKind }>
-  context: CanvasStandardCommandEffectPlanContext
-}) => CanvasStandardCommandDocumentEffect | null
+  context: CanvasStandardCommandEffectPlanContext<TItem>
+}) => CanvasStandardCommandDocumentEffect<TItem> | null
 
 type CanvasStandardCommandEffectPlanners = {
   [TKind in CanvasStandardCommand['kind']]:
     CanvasStandardCommandEffectPlanner<TKind>
 }
 
-type CanvasStandardCommandAnyEffectPlanner = (args: {
+type CanvasStandardCommandAnyEffectPlanner =
+  <TItem extends CanvasCommandItem = CanvasItem>(args: {
   command: CanvasStandardCommand
-  context: CanvasStandardCommandEffectPlanContext
-}) => CanvasStandardCommandDocumentEffect | null
+  context: CanvasStandardCommandEffectPlanContext<TItem>
+}) => CanvasStandardCommandDocumentEffect<TItem> | null
 
 const CANVAS_STANDARD_COMMAND_EFFECT_PLANNERS = Object.freeze({
   align: ({ command, context }) =>
@@ -74,24 +78,28 @@ const CANVAS_STANDARD_COMMAND_EFFECT_PLANNERS = Object.freeze({
   'unlock-all': ({ context }) => planCanvasUnlockAllCommand(context),
 } satisfies CanvasStandardCommandEffectPlanners)
 
-export function createCanvasStandardCommandEffectPlan({
+export function createCanvasStandardCommandEffectPlan<
+  TItem extends CanvasCommandItem = CanvasItem,
+>({
   command,
   context,
 }: {
   command: CanvasStandardCommand
-  context: CanvasStandardCommandEffectPlanContext
-}): CanvasStandardCommandDocumentEffect | null {
+  context: CanvasStandardCommandEffectPlanContext<TItem>
+}): CanvasStandardCommandDocumentEffect<TItem> | null {
   const planner = CANVAS_STANDARD_COMMAND_EFFECT_PLANNERS[
     command.kind
   ] as CanvasStandardCommandAnyEffectPlanner
 
-  return planner({ command, context })
+  return planner<TItem>({ command, context })
 }
 
-function planCanvasAlignCommand(
+function planCanvasAlignCommand<
+  TItem extends CanvasCommandItem = CanvasItem,
+>(
   mode: CanvasAlignMode,
-  context: CanvasStandardCommandEffectPlanContext,
-): CanvasStandardCommandDocumentEffect | null {
+  context: CanvasStandardCommandEffectPlanContext<TItem>,
+): CanvasStandardCommandDocumentEffect<TItem> | null {
   const result = alignCanvasCommand({
     adapter: context.commandAdapter,
     config: context.config,
@@ -101,14 +109,16 @@ function planCanvasAlignCommand(
   })
 
   return result
-    ? createCanvasStandardChangedItemsResultEffect({ result })
+    ? createCanvasStandardChangedItemsResultEffect<TItem>({ result })
     : null
 }
 
-function planCanvasDistributeCommand(
+function planCanvasDistributeCommand<
+  TItem extends CanvasCommandItem = CanvasItem,
+>(
   mode: CanvasDistributeMode,
-  context: CanvasStandardCommandEffectPlanContext,
-): CanvasStandardCommandDocumentEffect | null {
+  context: CanvasStandardCommandEffectPlanContext<TItem>,
+): CanvasStandardCommandDocumentEffect<TItem> | null {
   const result = distributeCanvasCommand({
     adapter: context.commandAdapter,
     config: context.config,
@@ -118,13 +128,15 @@ function planCanvasDistributeCommand(
   })
 
   return result
-    ? createCanvasStandardChangedItemsResultEffect({ result })
+    ? createCanvasStandardChangedItemsResultEffect<TItem>({ result })
     : null
 }
 
-function planCanvasDeleteCommand(
-  context: CanvasStandardCommandEffectPlanContext,
-): CanvasStandardCommandDocumentEffect | null {
+function planCanvasDeleteCommand<
+  TItem extends CanvasCommandItem = CanvasItem,
+>(
+  context: CanvasStandardCommandEffectPlanContext<TItem>,
+): CanvasStandardCommandDocumentEffect<TItem> | null {
   const result = deleteCanvasCommand({
     adapter: context.commandAdapter,
     config: context.config,
@@ -133,16 +145,18 @@ function planCanvasDeleteCommand(
   })
 
   return result
-    ? createCanvasStandardRemoveSelectionResultEffect({
+    ? createCanvasStandardRemoveSelectionResultEffect<TItem>({
         result,
         selection: context.selection,
       })
     : null
 }
 
-function planCanvasGroupCommand(
-  context: CanvasStandardCommandEffectPlanContext,
-): CanvasStandardCommandDocumentEffect | null {
+function planCanvasGroupCommand<
+  TItem extends CanvasCommandItem = CanvasItem,
+>(
+  context: CanvasStandardCommandEffectPlanContext<TItem>,
+): CanvasStandardCommandDocumentEffect<TItem> | null {
   const groupId = context.createId('group')
   const result = groupCanvasCommand({
     adapter: context.commandAdapter,
@@ -153,7 +167,7 @@ function planCanvasGroupCommand(
   })
 
   return result
-    ? createCanvasStandardGroupSelectionResultEffect({
+    ? createCanvasStandardGroupSelectionResultEffect<TItem>({
         groupId,
         result,
         selection: context.selection,
@@ -161,9 +175,11 @@ function planCanvasGroupCommand(
     : null
 }
 
-function planCanvasUngroupCommand(
-  context: CanvasStandardCommandEffectPlanContext,
-): CanvasStandardCommandDocumentEffect | null {
+function planCanvasUngroupCommand<
+  TItem extends CanvasCommandItem = CanvasItem,
+>(
+  context: CanvasStandardCommandEffectPlanContext<TItem>,
+): CanvasStandardCommandDocumentEffect<TItem> | null {
   const result = ungroupCanvasCommand({
     adapter: context.commandAdapter,
     config: context.config,
@@ -172,16 +188,18 @@ function planCanvasUngroupCommand(
   })
 
   return result
-    ? createCanvasStandardUngroupSelectionResultEffect({
+    ? createCanvasStandardUngroupSelectionResultEffect<TItem>({
         result,
         selection: context.selection,
       })
     : null
 }
 
-function planCanvasLockCommand(
-  context: CanvasStandardCommandEffectPlanContext,
-): CanvasStandardCommandDocumentEffect | null {
+function planCanvasLockCommand<
+  TItem extends CanvasCommandItem = CanvasItem,
+>(
+  context: CanvasStandardCommandEffectPlanContext<TItem>,
+): CanvasStandardCommandDocumentEffect<TItem> | null {
   const result = lockCanvasCommand({
     adapter: context.commandAdapter,
     config: context.config,
@@ -190,16 +208,18 @@ function planCanvasLockCommand(
   })
 
   return result
-    ? createCanvasStandardChangedItemsResultEffect({
+    ? createCanvasStandardChangedItemsResultEffect<TItem>({
         fallbackSelection: result.selection,
         result,
       })
     : null
 }
 
-function planCanvasUnlockAllCommand(
-  context: CanvasStandardCommandEffectPlanContext,
-): CanvasStandardCommandDocumentEffect | null {
+function planCanvasUnlockAllCommand<
+  TItem extends CanvasCommandItem = CanvasItem,
+>(
+  context: CanvasStandardCommandEffectPlanContext<TItem>,
+): CanvasStandardCommandDocumentEffect<TItem> | null {
   const result = unlockAllCanvasCommand({
     adapter: context.commandAdapter,
     config: context.config,
@@ -208,33 +228,39 @@ function planCanvasUnlockAllCommand(
   })
 
   return result
-    ? createCanvasStandardChangedItemsResultEffect({
+    ? createCanvasStandardChangedItemsResultEffect<TItem>({
         fallbackSelection: result.selection,
         result,
       })
     : null
 }
 
-function planCanvasUndoCommand(
-  context: CanvasStandardCommandEffectPlanContext,
-): CanvasStandardCommandDocumentEffect | null {
+function planCanvasUndoCommand<
+  TItem extends CanvasCommandItem = CanvasItem,
+>(
+  context: CanvasStandardCommandEffectPlanContext<TItem>,
+): CanvasStandardCommandDocumentEffect<TItem> | null {
   return context.config.commands.undo
-    ? createCanvasStandardHistoryEffect({ direction: 'undo' })
+    ? createCanvasStandardHistoryEffect<TItem>({ direction: 'undo' })
     : null
 }
 
-function planCanvasRedoCommand(
-  context: CanvasStandardCommandEffectPlanContext,
-): CanvasStandardCommandDocumentEffect | null {
+function planCanvasRedoCommand<
+  TItem extends CanvasCommandItem = CanvasItem,
+>(
+  context: CanvasStandardCommandEffectPlanContext<TItem>,
+): CanvasStandardCommandDocumentEffect<TItem> | null {
   return context.config.commands.redo
-    ? createCanvasStandardHistoryEffect({ direction: 'redo' })
+    ? createCanvasStandardHistoryEffect<TItem>({ direction: 'redo' })
     : null
 }
 
-function planCanvasNudgeCommand(
+function planCanvasNudgeCommand<
+  TItem extends CanvasCommandItem = CanvasItem,
+>(
   command: Extract<CanvasStandardCommand, { kind: 'nudge' }>,
-  context: CanvasStandardCommandEffectPlanContext,
-): CanvasStandardCommandDocumentEffect | null {
+  context: CanvasStandardCommandEffectPlanContext<TItem>,
+): CanvasStandardCommandDocumentEffect<TItem> | null {
   const result = nudgeCanvasCommand({
     adapter: context.commandAdapter,
     config: context.config,
@@ -245,14 +271,16 @@ function planCanvasNudgeCommand(
   })
 
   return result
-    ? createCanvasStandardNudgeResultEffect({ items: result })
+    ? createCanvasStandardNudgeResultEffect<TItem>({ items: result })
     : null
 }
 
-function planCanvasReorderCommand(
+function planCanvasReorderCommand<
+  TItem extends CanvasCommandItem = CanvasItem,
+>(
   mode: CanvasReorderMode,
-  context: CanvasStandardCommandEffectPlanContext,
-): CanvasStandardCommandDocumentEffect | null {
+  context: CanvasStandardCommandEffectPlanContext<TItem>,
+): CanvasStandardCommandDocumentEffect<TItem> | null {
   const result = reorderCanvasCommand({
     adapter: context.commandAdapter,
     config: context.config,
@@ -262,7 +290,7 @@ function planCanvasReorderCommand(
   })
 
   return result
-    ? createCanvasStandardReorderSelectionResultEffect({
+    ? createCanvasStandardReorderSelectionResultEffect<TItem>({
         mode,
         result,
         selection: context.selection,
@@ -270,9 +298,11 @@ function planCanvasReorderCommand(
     : null
 }
 
-function planCanvasSelectAllCommand(
-  context: CanvasStandardCommandEffectPlanContext,
-): CanvasStandardCommandDocumentEffect | null {
+function planCanvasSelectAllCommand<
+  TItem extends CanvasCommandItem = CanvasItem,
+>(
+  context: CanvasStandardCommandEffectPlanContext<TItem>,
+): CanvasStandardCommandDocumentEffect<TItem> | null {
   const nextSelection = selectAllCanvasCommand({
     adapter: context.commandAdapter,
     config: context.config,
@@ -280,6 +310,8 @@ function planCanvasSelectAllCommand(
   })
 
   return nextSelection
-    ? createCanvasStandardSelectAllResultEffect({ selection: nextSelection })
+    ? createCanvasStandardSelectAllResultEffect<TItem>({
+        selection: nextSelection,
+      })
     : null
 }

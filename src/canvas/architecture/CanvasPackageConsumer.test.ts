@@ -56,6 +56,7 @@ import {
   centerCanvasViewportAtWorldPoint,
   createCanvasAppStageElement,
   createCanvasClipboardCommandEffectPlan,
+  createCanvasStandardCommandEffectPlan,
   cloneCanvasClipboardItems,
   copyCanvasClipboardSelection,
   cutCanvasClipboardSelection,
@@ -96,7 +97,9 @@ import {
   writeCanvasClipboardText,
   writeCanvasRichClipboardPayload,
   applyCanvasClipboardCommandEffect,
+  applyCanvasStandardDocumentEffect,
   executeCanvasClipboardCommand,
+  executeCanvasStandardCommand,
   previewCanvasPointerLaserInteraction,
   previewCanvasPointerPanInteraction,
   resetCanvasViewport,
@@ -328,6 +331,12 @@ import {
   type CanvasClipboardCommandExecutionResult,
   type CanvasClipboardEditingUpdate,
   type CanvasClipboardItemsChange,
+  type CanvasStandardCommand,
+  type CanvasStandardCommandDocumentEffect,
+  type CanvasStandardCommandDocumentEffectContext,
+  type CanvasStandardCommandEffectPlanContext,
+  type CanvasStandardCommandExecutionContext,
+  type CanvasStandardCommandItemsChange,
   type CanvasAppItemsChange,
   type CanvasAppItemsChangeTransformContext,
   type CanvasAppItemsChangeTransformer,
@@ -3909,6 +3918,72 @@ describe('Canvas package consumer imports', () => {
           command: { kind: 'duplicate' },
           context: hostClipboardExecutionContext,
         })
+    const hostStandardCommandAdapter: CanvasCommandAdapter<HostClipboardItem> =
+      {
+        ...hostClipboardCommandAdapter,
+        nudgeSelection: ({ dx, dy, items, selection }) =>
+          items.map((item) =>
+            selection.includes(item.id)
+              ? { ...item, x: item.x + dx, y: item.y + dy }
+              : item,
+          ),
+      }
+    const hostStandardCommand: CanvasStandardCommand = {
+      dx: 9,
+      dy: 4,
+      kind: 'nudge',
+    }
+    const hostStandardPlanContext:
+      CanvasStandardCommandEffectPlanContext<HostClipboardItem> = {
+        commandAdapter: hostStandardCommandAdapter,
+        config: createCanvasAffordanceConfig(),
+        createId: (prefix) => `${prefix}-standard`,
+        items: [hostClipboardItem],
+        selection: [hostClipboardItem.id],
+      }
+    const hostStandardEffect:
+      CanvasStandardCommandDocumentEffect<HostClipboardItem> | null =
+        createCanvasStandardCommandEffectPlan({
+          command: hostStandardCommand,
+          context: hostStandardPlanContext,
+        })
+
+    if (
+      hostStandardEffect?.kind !== 'items-change' ||
+      hostStandardEffect.change.type !== 'replace-changed'
+    ) {
+      throw new Error('Expected host standard replace-changed effect')
+    }
+
+    const hostStandardChanges:
+      CanvasStandardCommandItemsChange<HostClipboardItem>[] = []
+    const hostStandardEffectContext:
+      CanvasStandardCommandDocumentEffectContext<HostClipboardItem> = {
+        commitItemsChange: (change) => {
+          hostStandardChanges.push(change)
+
+          return true
+        },
+        commitSelection: () => true,
+        redo: () => undefined,
+        selection: [hostClipboardItem.id],
+        setEditing: () => undefined,
+        setSelection: () => undefined,
+        undo: () => undefined,
+      }
+    const hostStandardApplyResult = applyCanvasStandardDocumentEffect({
+      context: hostStandardEffectContext,
+      effect: hostStandardEffect,
+    })
+    const hostStandardExecutionContext:
+      CanvasStandardCommandExecutionContext<HostClipboardItem> = {
+        ...hostStandardPlanContext,
+        ...hostStandardEffectContext,
+      }
+    const hostStandardExecutionResult = executeCanvasStandardCommand({
+      command: hostStandardCommand,
+      context: hostStandardExecutionContext,
+    })
     const clipboardCommands: CanvasClipboardCommand[] = []
     const runClipboardCommand: RunCanvasClipboardCommand = (command) => {
       clipboardCommands.push(command)
@@ -3928,6 +4003,23 @@ describe('Canvas package consumer imports', () => {
     expect(hostClipboardExecutionResult.clonedItems[0]?.slideId).toBe(
       'slide-1',
     )
+    expect(hostStandardEffect.change.items[0]?.slideId).toBe('slide-1')
+    expect(hostStandardEffect.change.items[0]?.x).toBe(9)
+    expect(hostStandardApplyResult).toBe(true)
+    expect(hostStandardExecutionResult).toBe(true)
+    const hostStandardApplyChange = hostStandardChanges[0]
+    const hostStandardExecutionChange = hostStandardChanges[1]
+
+    if (
+      hostStandardApplyChange?.type !== 'replace-changed' ||
+      hostStandardExecutionChange?.type !== 'replace-changed'
+    ) {
+      throw new Error('Expected host standard replace-changed changes')
+    }
+
+    expect(hostStandardApplyChange.items[0]?.kind).toBe('ppt-shape')
+    expect(hostStandardExecutionChange.items[0]?.slideId).toBe('slide-1')
+    expect(hostStandardExecutionChange.items[0]?.y).toBe(4)
     expect(hostClipboardChanges[0]).toEqual({
       afterItems: [hostClipboardItem, hostClipboardClone],
       beforeItems: [hostClipboardItem],
@@ -3939,6 +4031,18 @@ describe('Canvas package consumer imports', () => {
       .toBe(applyCanvasClipboardCommandEffect)
     expect(CanvasAppFacade.executeCanvasClipboardCommand)
       .toBe(executeCanvasClipboardCommand)
+    expect(CanvasPackage.createCanvasStandardCommandEffectPlan)
+      .toBe(createCanvasStandardCommandEffectPlan)
+    expect(CanvasAppFacade.createCanvasStandardCommandEffectPlan)
+      .toBe(createCanvasStandardCommandEffectPlan)
+    expect(CanvasPackage.applyCanvasStandardDocumentEffect)
+      .toBe(applyCanvasStandardDocumentEffect)
+    expect(CanvasAppFacade.applyCanvasStandardDocumentEffect)
+      .toBe(applyCanvasStandardDocumentEffect)
+    expect(CanvasPackage.executeCanvasStandardCommand)
+      .toBe(executeCanvasStandardCommand)
+    expect(CanvasAppFacade.executeCanvasStandardCommand)
+      .toBe(executeCanvasStandardCommand)
     expect(cloneCanvasClipboardItems({
       ids: [clipboardRect.id],
       offset: { x: 1, y: 2 },

@@ -1,3 +1,5 @@
+import type { CanvasCommandItem } from '../../../engine'
+import type { CanvasItem } from '../../../entities'
 import {
   applyCanvasStandardDocumentEffect,
 } from './CanvasStandardCommandDocumentEffects'
@@ -10,16 +12,20 @@ import {
 } from './CanvasStandardCommandEffectPlan'
 import type { CanvasStandardCommand } from './CanvasStandardCommandContracts'
 
-export type CanvasStandardCommandExecutionContext =
-  CanvasStandardCommandDocumentEffectContext &
-  CanvasStandardCommandEffectPlanContext
+export type CanvasStandardCommandExecutionContext<
+  TItem extends CanvasCommandItem = CanvasItem,
+> =
+  CanvasStandardCommandDocumentEffectContext<TItem> &
+  CanvasStandardCommandEffectPlanContext<TItem>
 
-export function executeCanvasStandardCommand({
+export function executeCanvasStandardCommand<
+  TItem extends CanvasCommandItem = CanvasItem,
+>({
   command,
   context,
 }: {
   command: CanvasStandardCommand
-  context: CanvasStandardCommandExecutionContext
+  context: CanvasStandardCommandExecutionContext<TItem>
 }) {
   const effect = createCanvasStandardCommandEffectPlan({
     command,
