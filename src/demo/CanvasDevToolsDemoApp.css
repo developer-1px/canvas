@@ -66,7 +66,23 @@
   background: color-mix(in srgb, var(--canvas-panel) 88%, transparent);
 }
 
+.engine-demo-feature-packs {
+  position: absolute;
+  left: clamp(10px, 1.8vw, 18px);
+  top: clamp(10px, 1.8vw, 18px);
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-height: 32px;
+  padding: 2px;
+  border-radius: 5px;
+  outline: 1px solid color-mix(in srgb, var(--canvas-line) 30%, transparent);
+  background: color-mix(in srgb, var(--canvas-panel) 88%, transparent);
+}
+
 .engine-demo-controls button,
+.engine-demo-feature-packs button,
 .engine-demo-viewport-controls button {
   display: inline-grid;
   place-items: center;
@@ -84,6 +100,9 @@
 .engine-demo-controls button:hover,
 .engine-demo-controls button:focus-visible,
 .engine-demo-controls button[aria-pressed='true'],
+.engine-demo-feature-packs button:hover,
+.engine-demo-feature-packs button:focus-visible,
+.engine-demo-feature-packs button[aria-pressed='true'],
 .engine-demo-viewport-controls button:hover,
 .engine-demo-viewport-controls button:focus-visible {
   color: var(--canvas-ink);

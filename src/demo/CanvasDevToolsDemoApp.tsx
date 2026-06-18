@@ -55,6 +55,12 @@ import {
 } from '../canvas'
 import { EngineSelectionToolbar } from './CanvasDevToolsSelectionToolbar'
 import {
+  DEFAULT_ENGINE_DEMO_FEATURE_PACK_SWITCH_STATE,
+  createCanvasEngineDemoAssemblyInput,
+  type EngineDemoFeaturePackSwitchId,
+  type EngineDemoFeaturePackSwitchState,
+} from './CanvasEngineDemoFeaturePacks'
+import {
   getCanvasPresentationFrames,
   getNextCanvasPresentationFrameIndex,
 } from './CanvasDevToolsPresentationMode'
@@ -80,6 +86,28 @@ const ENGINE_DEMO_TOOLS = [
 ] as const satisfies readonly {
   icon: typeof MousePointer2
   id: Tool
+  label: string
+}[]
+
+const ENGINE_DEMO_FEATURE_PACK_SWITCHES = [
+  {
+    icon: Frame,
+    id: 'component-source-outline',
+    label: 'Source outlines',
+  },
+  {
+    icon: Square,
+    id: 'component-inspector',
+    label: 'Component inspector',
+  },
+  {
+    icon: RotateCcw,
+    id: 'component-sync',
+    label: 'Component sync',
+  },
+] as const satisfies readonly {
+  icon: typeof MousePointer2
+  id: EngineDemoFeaturePackSwitchId
   label: string
 }[]
 
@@ -109,20 +137,43 @@ const ENGINE_SELECTION_STAMPS = [
 
 export function CanvasDevToolsDemoApp({
   assemblyInput,
+  featurePackSwitches = false,
 }: {
   assemblyInput?: CanvasAppAssemblyInput
+  featurePackSwitches?: boolean
 }) {
+  const [featurePackSwitchState, setFeaturePackSwitchState] = useState(
+    DEFAULT_ENGINE_DEMO_FEATURE_PACK_SWITCH_STATE,
+  )
+  const runtimeAssemblyInput = useMemo(
+    () => createCanvasEngineDemoAssemblyInput({
+      assemblyInput,
+      featurePackSwitchState,
+      featurePackSwitches,
+    }),
+    [assemblyInput, featurePackSwitchState, featurePackSwitches],
+  )
   const widgetInteractions = useMemo(
-    () => getCanvasAppWidgetInteractions(assemblyInput?.customItemModules),
-    [assemblyInput],
+    () => getCanvasAppWidgetInteractions(runtimeAssemblyInput?.customItemModules),
+    [runtimeAssemblyInput],
   )
 
   return (
     <CanvasApp
-      assemblyInput={assemblyInput}
+      assemblyInput={runtimeAssemblyInput}
       renderApp={(app) => (
         <CanvasEngineDemoSurface
           app={app}
+          featurePackSwitches={
+            featurePackSwitches ? ENGINE_DEMO_FEATURE_PACK_SWITCHES : []
+          }
+          featurePackSwitchState={featurePackSwitchState}
+          onFeaturePackSwitchChange={(id, enabled) => {
+            setFeaturePackSwitchState((current) => ({
+              ...current,
+              [id]: enabled,
+            }))
+          }}
           widgetInteractions={widgetInteractions}
         />
       )}
@@ -132,9 +183,18 @@ export function CanvasDevToolsDemoApp({
 
 function CanvasEngineDemoSurface({
   app,
+  featurePackSwitches,
+  featurePackSwitchState,
+  onFeaturePackSwitchChange,
   widgetInteractions,
 }: {
   app: CanvasEngineDemoModel
+  featurePackSwitches: readonly typeof ENGINE_DEMO_FEATURE_PACK_SWITCHES[number][]
+  featurePackSwitchState: EngineDemoFeaturePackSwitchState
+  onFeaturePackSwitchChange: (
+    id: EngineDemoFeaturePackSwitchId,
+    enabled: boolean,
+  ) => void
   widgetInteractions: CanvasAppWidgetInteractions
 }) {
   const viewportPercent = `${Math.round(app.zoomControls.scale * 100)}%`
@@ -466,6 +526,13 @@ function CanvasEngineDemoSurface({
           <CanvasObjectInspector {...inspectorProps} />
         </div>
       ) : null}
+      {!presenting && featurePackSwitches.length > 0 ? (
+        <EngineFeaturePackSwitchToolbar
+          switches={featurePackSwitches}
+          state={featurePackSwitchState}
+          onChange={onFeaturePackSwitchChange}
+        />
+      ) : null}
       {!presenting ? (
         <div
           {...toolToolbarRovingFocus}
@@ -575,6 +642,43 @@ function CanvasEngineDemoSurface({
       {!presenting ? <CanvasCommandPalette {...app.commandPalette} /> : null}
       {!presenting ? <CanvasShortcutHelpOverlay {...app.shortcutHelp} /> : null}
     </main>
+  )
+}
+
+function EngineFeaturePackSwitchToolbar({
+  switches,
+  state,
+  onChange,
+}: {
+  switches: readonly typeof ENGINE_DEMO_FEATURE_PACK_SWITCHES[number][]
+  state: EngineDemoFeaturePackSwitchState
+  onChange: (id: EngineDemoFeaturePackSwitchId, enabled: boolean) => void
+}) {
+  return (
+    <div
+      className="engine-demo-feature-packs"
+      role="toolbar"
+      aria-label="Feature packs"
+    >
+      {switches.map(({ icon: Icon, id, label }) => {
+        const enabled = state[id]
+
+        return (
+          <button
+            {...CANVAS_TOOLBAR_ITEM_PROPS}
+            aria-label={`Toggle ${label}`}
+            aria-pressed={enabled}
+            data-feature-pack={id}
+            key={id}
+            onClick={() => onChange(id, !enabled)}
+            title={label}
+            type="button"
+          >
+            <Icon aria-hidden="true" size={14} strokeWidth={2} />
+          </button>
+        )
+      })}
+    </div>
   )
 }
 
@@ -773,6 +877,7 @@ function isEngineDemoControlTarget(target: EventTarget) {
         '.context-command-menu',
         '.command-palette',
         '.engine-demo-controls',
+        '.engine-demo-feature-packs',
         '.engine-demo-minimap',
         '.engine-demo-viewport-controls',
         '.engine-sticky-quick-create',

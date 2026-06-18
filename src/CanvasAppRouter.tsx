@@ -95,7 +95,10 @@ function FigmaCloneRoute() {
 
 function CanvasEngineRoute() {
   return (
-    <CanvasDevToolsDemoApp assemblyInput={DEMO_CANVAS_APP_ASSEMBLY_INPUT} />
+    <CanvasDevToolsDemoApp
+      assemblyInput={DEMO_CANVAS_APP_ASSEMBLY_INPUT}
+      featurePackSwitches
+    />
   )
 }
 
