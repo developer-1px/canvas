@@ -32,6 +32,7 @@
 | Object stroke line style | `slide-edit-affordance` | object stroke solid/dash/dot subset and host command effect |
 | Layout/theme affordance | `slide-edit-affordance` | layout, master, placeholder mapping, and theme token descriptors |
 | Slide object clipboard | `slide-edit-affordance` | source slide metadata, paste target, and id remap plan |
+| Markdown deck source import | `slide-edit-affordance` | markdown outline detection, slide source normalization, and product-neutral deck descriptor |
 | Slide metadata inspector | `slide-edit-affordance` | active slide name, background, notes, size, orientation fields |
 | Style clipboard | `slide-edit-affordance` | source object style categories, target applicability, and format painter command effects |
 | Slide transition timing | `slide-edit-affordance` | transition type, duration, click/after advance policy |
@@ -67,6 +68,7 @@
 | `object-shadow` | Selected object shadow values for inspector, stage, thumbnail, and export |
 | `object-stroke-line-style` | Selected object stroke line style values for inspector, stage, thumbnail, and export |
 | `layout-theme` | Layout, master, placeholder, and theme token descriptors |
+| `deck-source-import` | Mapping from product-neutral slide source descriptors to host slide/object creation |
 | `slide-metadata` | Active slide metadata values for inspector descriptors |
 | `style-clipboard` | Copied style categories and formatting paste availability |
 | `slide-transition` | Slide transition and advance timing values for inspector, preview, and export |
@@ -128,6 +130,19 @@
 | --- | --- | --- |
 | Rail listbox affordance | `listbox`/`option` roles, single selected state, roving focus policy, ArrowUp/ArrowDown/Home/End/Enter/Space intents | slide data storage, thumbnail rendering, drag reorder implementation, DOM event listeners |
 | Slide rail model | slide order, active slide id, and host command effects | browser focus APIs, product-specific slide preview content, or pointer hit testing beyond thumbnail intent |
+
+## Markdown Deck Source Import Contract
+
+| Area | Contract |
+| --- | --- |
+| Input | `text/markdown`, `text/x-markdown`, or `text/plain` clipboard text, or direct markdown string |
+| Heading mode | `# deck title` plus at least two `## slide title` sections becomes a deck source |
+| Separator mode | standalone `---` or `***` lines split at least two non-empty slide segments |
+| Slide source | each slide exposes title, index, raw slide markdown, body blocks, and speaker notes blocks |
+| Blocks | paragraph, bullet list, and ordered list blocks are structured with normalized text and source markdown |
+| Speaker notes | `Notes:`, `Speaker notes:`, and `Presenter notes:` move following content into slide notes |
+| Collision policy | standalone Markdown tables and single-slide rich text are ignored so table/text paste affordances can claim them |
+| Runtime | host owns slide id creation, layout choice, object creation, theme mapping, persistence, and export mapping |
 
 ## Object Reorder vs Slide Reorder
 

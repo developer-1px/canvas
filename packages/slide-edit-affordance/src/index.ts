@@ -58,6 +58,22 @@ export {
   type SlideEditDeckNavigationSlideId,
 } from './SlideEditDeckNavigationKeyboard'
 export {
+  getSlideEditMarkdownDeckSource,
+  getSlideEditMarkdownDeckSourceFromDataTransfer,
+  SLIDE_EDIT_MARKDOWN_DECK_SOURCE_MIME_TYPES,
+  type SlideEditMarkdownDeckSource,
+  type SlideEditMarkdownDeckSourceDataTransfer,
+  type SlideEditMarkdownDeckSourceDataTransferInput,
+  type SlideEditMarkdownDeckSourceInput,
+  type SlideEditMarkdownDeckSourceMode,
+  type SlideEditMarkdownSlideBlock,
+  type SlideEditMarkdownSlideListBlock,
+  type SlideEditMarkdownSlideListItem,
+  type SlideEditMarkdownSlideListKind,
+  type SlideEditMarkdownSlideParagraphBlock,
+  type SlideEditMarkdownSlideSource,
+} from './SlideEditMarkdownDeckSource'
+export {
   createSlideEditTextRunFormattingDescriptor,
   getSlideEditTextRunFormattingCommandEffect,
   getSlideEditTextRunFormattingJSONPasteValue,
