@@ -6,6 +6,7 @@ import {
   getCanvasAppFeaturePackMarketplaceSectionControlModel,
   getCanvasAppFeaturePackMarketplaceSectionControlModels,
   getCanvasAppFeaturePackMarketplaceSelectionControlModel,
+  getCanvasAppFeaturePackMarketplaceSelectionTargetControl,
   getCanvasAppFeaturePackMarketplaceSectionFacetTargetControls,
   getCanvasAppFeaturePackMarketplaceSectionTargetControls,
   getCanvasAppFeaturePackMarketplaceSectionPrimaryActionDiagnosticModel,
@@ -595,6 +596,20 @@ describe('CanvasAppFeaturePackMarketplace', () => {
         featurePackId: 'addon-pack',
         kind: 'pack',
       }])
+    expect(getCanvasAppFeaturePackMarketplaceSelectionTargetControl({
+      selection: selectedPackModel,
+      target: {
+        featurePackId: 'addon-pack',
+        kind: 'pack',
+      },
+    })?.label).toBe('Addon pack')
+    expect(getCanvasAppFeaturePackMarketplaceSelectionTargetControl({
+      selection: selectedPackModel,
+      target: {
+        featurePackId: 'runtime-pack',
+        kind: 'pack',
+      },
+    })).toBeNull()
     expect(selectedPackModel.sectionControlModel?.controls.map((control) =>
       control.label
     )).toEqual(['Runtime pack', 'Addon pack'])

@@ -7,11 +7,13 @@ import {
 import {
   createCanvasAppAiLabsFeaturePackManifest,
   createCanvasAppFeaturePackManifest,
+  getCanvasAppFeaturePackMarketplaceSelectionControlModel,
   getCanvasAppFeaturePackMarketplaceTargetControl,
   getCanvasAppFeaturePackMarketplacePrimaryAction,
 } from '../feature-packs'
 import {
   applyCanvasAppAssemblySourceFeaturePackMarketplaceHostUpdate,
+  executeCanvasAppAssemblySourceFeaturePackMarketplaceSelectionTargetControlApplyTransaction,
   executeCanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransaction,
   executeCanvasAppAssemblySourceFeaturePackMarketplaceTargetControlApplyTransaction,
   resolveCanvasAppAssemblySource,
@@ -362,6 +364,178 @@ describe('CanvasAppAssemblySource', () => {
     expect(resolveCanvasAppAssemblySource(sourceTransactionResult.source))
       .toBe(DEFAULT_CANVAS_APP_ASSEMBLY)
     expect(Object.isFrozen(sourceTransactionResult)).toBe(true)
+  })
+
+  it('executes ready marketplace selection target control transactions as assembly input sources', async () => {
+    const addonManifest = createCanvasAppFeaturePackManifest({
+      id: 'shell-selection-addon-pack',
+      label: 'Shell selection addon pack',
+    })
+    const model = getCanvasAppFeaturePackMarketplaceAssemblyModel({
+      assemblyInput: {
+        featurePackManifests: [addonManifest],
+        featurePackStates: [{
+          id: 'shell-selection-addon-pack',
+          status: 'uninstalled',
+        }],
+      },
+      profiles: [],
+      suiteManifests: [],
+    })
+    const selection = getCanvasAppFeaturePackMarketplaceSelectionControlModel({
+      facetKind: 'all',
+      model: model.marketplaceModel,
+      sectionKind: 'packs',
+    })
+    const sourceTransactionResult =
+      await executeCanvasAppAssemblySourceFeaturePackMarketplaceSelectionTargetControlApplyTransaction({
+        executeCleanupEffect: () => ({ kind: 'not-run' as const }),
+        model,
+        selection,
+        target: {
+          featurePackId: 'shell-selection-addon-pack',
+          kind: 'pack',
+        },
+      })
+
+    expect(selection).toMatchObject({
+      selectedFacetKind: 'all',
+      selectedSectionKind: 'packs',
+      status: 'selected',
+    })
+    expect(sourceTransactionResult.status).toBe('applied')
+    expect(sourceTransactionResult.applied).toBe(true)
+    expect(sourceTransactionResult.actionKind).toBe('install')
+    expect(sourceTransactionResult.transactionResult?.status).toBe('committed')
+    expect(sourceTransactionResult.source.assemblyInput?.featurePackStates)
+      .toEqual([{
+        id: 'shell-selection-addon-pack',
+        status: 'disabled',
+      }])
+  })
+
+  it('keeps blocked marketplace selection target control transactions on the held source path', async () => {
+    const paidManifest = createCanvasAppFeaturePackManifest({
+      id: 'shell-selection-private-pack',
+      label: 'Shell selection private pack',
+    })
+    const model = getCanvasAppFeaturePackMarketplaceAssemblyModel({
+      assemblyInput: {
+        featurePackManifests: [paidManifest],
+        featurePackStates: [{
+          id: 'shell-selection-private-pack',
+          status: 'uninstalled',
+        }],
+      },
+      listings: [{
+        access: 'private',
+        distribution: 'available',
+        featurePackId: 'shell-selection-private-pack',
+      }],
+      profiles: [],
+      suiteManifests: [],
+    })
+    const selection = getCanvasAppFeaturePackMarketplaceSelectionControlModel({
+      facetKind: 'all',
+      model: model.marketplaceModel,
+      sectionKind: 'packs',
+    })
+    const prebuiltSource = {
+      assembly: DEFAULT_CANVAS_APP_ASSEMBLY,
+    } satisfies CanvasAppPrebuiltAssemblySource
+    const sourceTransactionResult =
+      await executeCanvasAppAssemblySourceFeaturePackMarketplaceSelectionTargetControlApplyTransaction({
+        executeCleanupEffect: () => ({ kind: 'not-run' as const }),
+        model,
+        selection,
+        source: prebuiltSource,
+        target: {
+          featurePackId: 'shell-selection-private-pack',
+          kind: 'pack',
+        },
+      })
+
+    expect(sourceTransactionResult.status).toBe('held')
+    expect(sourceTransactionResult.applied).toBe(false)
+    expect(sourceTransactionResult.actionKind).toBe('install')
+    expect(sourceTransactionResult.holdReason).toBe('blocked')
+    expect(sourceTransactionResult.transactionResult.status).toBe('held')
+    expect(sourceTransactionResult.source).toBe(prebuiltSource)
+    expect(resolveCanvasAppAssemblySource(sourceTransactionResult.source))
+      .toBe(DEFAULT_CANVAS_APP_ASSEMBLY)
+  })
+
+  it('preserves current sources when marketplace selection target controls are not selected', async () => {
+    const runtimeManifest = createCanvasAppFeaturePackManifest({
+      id: 'shell-selection-runtime-pack',
+      label: 'Shell selection runtime pack',
+    })
+    const privateManifest = createCanvasAppFeaturePackManifest({
+      id: 'shell-selection-filtered-private-pack',
+      label: 'Shell selection filtered private pack',
+    })
+    const model = getCanvasAppFeaturePackMarketplaceAssemblyModel({
+      assemblyInput: {
+        featurePackManifests: [runtimeManifest, privateManifest],
+        featurePackStates: [{
+          id: 'shell-selection-filtered-private-pack',
+          status: 'uninstalled',
+        }],
+      },
+      listings: [{
+        access: 'private',
+        distribution: 'available',
+        featurePackId: 'shell-selection-filtered-private-pack',
+      }],
+      profiles: [],
+      suiteManifests: [],
+    })
+    const selection = getCanvasAppFeaturePackMarketplaceSelectionControlModel({
+      facetKind: 'private',
+      model: model.marketplaceModel,
+      sectionKind: 'packs',
+    })
+    const prebuiltSource = {
+      assembly: DEFAULT_CANVAS_APP_ASSEMBLY,
+    } satisfies CanvasAppPrebuiltAssemblySource
+    const sourceTransactionResult =
+      await executeCanvasAppAssemblySourceFeaturePackMarketplaceSelectionTargetControlApplyTransaction({
+        executeCleanupEffect: () => ({ kind: 'not-run' as const }),
+        model,
+        selection,
+        source: prebuiltSource,
+        target: {
+          featurePackId: 'shell-selection-runtime-pack',
+          kind: 'pack',
+        },
+      })
+
+    expect(selection.controls.map((control) => control.target)).toEqual([{
+      featurePackId: 'shell-selection-filtered-private-pack',
+      kind: 'pack',
+    }])
+    expect(sourceTransactionResult).toMatchObject({
+      actionKind: null,
+      applied: false,
+      control: null,
+      holdReason: 'missing-selection-target',
+      hostUpdate: null,
+      selection,
+      source: prebuiltSource,
+      sourceResult: null,
+      status: 'missing-selection-target',
+      target: {
+        featurePackId: 'shell-selection-runtime-pack',
+        kind: 'pack',
+      },
+      transactionResult: null,
+      update: null,
+      updateMode: 'blocked',
+    })
+    expect(resolveCanvasAppAssemblySource(sourceTransactionResult.source))
+      .toBe(DEFAULT_CANVAS_APP_ASSEMBLY)
+    expect(Object.isFrozen(sourceTransactionResult)).toBe(true)
+    expect(Object.isFrozen(sourceTransactionResult.target)).toBe(true)
   })
 
   it('keeps current assembly input source for held marketplace host updates', async () => {

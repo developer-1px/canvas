@@ -5,8 +5,10 @@ import type {
   CanvasAppFeaturePackMarketplaceTarget,
 } from '../canvas'
 import {
-  executeCanvasAppAssemblySourceFeaturePackMarketplaceTargetControlApplyTransaction,
+  executeCanvasAppAssemblySourceFeaturePackMarketplaceSelectionTargetControlApplyTransaction,
   getCanvasAppFeaturePackMarketplaceAssemblyModel,
+  getCanvasAppFeaturePackMarketplaceSelectionControlModel,
+  getCanvasAppFeaturePackMarketplaceSelectionTargetControl,
   getCanvasAppFeaturePackMarketplaceTargetControl,
 } from '../canvas'
 
@@ -49,7 +51,12 @@ export type CanvasEngineDemoFeaturePackSwitchApplicationResult = Readonly<{
   enabled: boolean
   featurePackId: EngineDemoFeaturePackSwitchId
   source: CanvasAppAssemblySource
-  status: 'applied' | 'held' | 'missing' | 'unchanged'
+  status:
+    | 'applied'
+    | 'held'
+    | 'missing'
+    | 'missing-selection-target'
+    | 'unchanged'
 }>
 
 export function createCanvasEngineDemoFeaturePackAssemblySource(
@@ -75,15 +82,28 @@ export function getCanvasEngineDemoFeaturePackSwitchControls(
   const model = getCanvasAppFeaturePackMarketplaceAssemblyModel({
     assemblyInput,
   })
+  const selection = getCanvasAppFeaturePackMarketplaceSelectionControlModel({
+    facetKind: 'all',
+    model: model.marketplaceModel,
+    sectionKind: 'packs',
+  })
 
   return Object.freeze(ENGINE_DEMO_FEATURE_PACK_SWITCH_IDS.map(
-    (featurePackId) => createCanvasEngineDemoFeaturePackSwitchControl({
-      control: getCanvasAppFeaturePackMarketplaceTargetControl({
-        model: model.marketplaceModel,
-        target: createCanvasEngineDemoFeaturePackSwitchTarget(featurePackId),
-      }),
-      featurePackId,
-    }),
+    (featurePackId) => {
+      const target =
+        createCanvasEngineDemoFeaturePackSwitchTarget(featurePackId)
+
+      return createCanvasEngineDemoFeaturePackSwitchControl({
+        control: getCanvasAppFeaturePackMarketplaceSelectionTargetControl({
+          selection,
+          target,
+        }) ?? getCanvasAppFeaturePackMarketplaceTargetControl({
+          model: model.marketplaceModel,
+          target,
+        }),
+        featurePackId,
+      })
+    },
   ))
 }
 
@@ -96,10 +116,19 @@ export async function applyCanvasEngineDemoFeaturePackSwitchToAssemblySource({
   const model = getCanvasAppFeaturePackMarketplaceAssemblyModel({
     assemblyInput: source?.assemblyInput,
   })
+  const selection = getCanvasAppFeaturePackMarketplaceSelectionControlModel({
+    facetKind: 'all',
+    model: model.marketplaceModel,
+    sectionKind: 'packs',
+  })
+  const target = createCanvasEngineDemoFeaturePackSwitchTarget(featurePackId)
   const currentControl = createCanvasEngineDemoFeaturePackSwitchControl({
-    control: getCanvasAppFeaturePackMarketplaceTargetControl({
+    control: getCanvasAppFeaturePackMarketplaceSelectionTargetControl({
+      selection,
+      target,
+    }) ?? getCanvasAppFeaturePackMarketplaceTargetControl({
       model: model.marketplaceModel,
-      target: createCanvasEngineDemoFeaturePackSwitchTarget(featurePackId),
+      target,
     }),
     featurePackId,
   })
@@ -117,12 +146,13 @@ export async function applyCanvasEngineDemoFeaturePackSwitchToAssemblySource({
   }
 
   const result =
-    await executeCanvasAppAssemblySourceFeaturePackMarketplaceTargetControlApplyTransaction(
+    await executeCanvasAppAssemblySourceFeaturePackMarketplaceSelectionTargetControlApplyTransaction(
       {
-        control: currentControl,
         executeCleanupEffect: () => undefined,
         model,
+        selection,
         source: currentSource,
+        target,
       },
     )
 

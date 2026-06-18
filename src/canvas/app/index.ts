@@ -628,6 +628,7 @@ export {
 } from './rendering/stage/CanvasAppStageElement'
 export {
   applyCanvasAppAssemblySourceFeaturePackMarketplaceHostUpdate,
+  executeCanvasAppAssemblySourceFeaturePackMarketplaceSelectionTargetControlApplyTransaction,
   executeCanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransaction,
   executeCanvasAppAssemblySourceFeaturePackMarketplaceTargetControlApplyTransaction,
   type CanvasAppAssemblyInputSource,
@@ -637,6 +638,9 @@ export {
   type CanvasAppAssemblySourceFeaturePackMarketplaceHostUpdateHeldResult,
   type CanvasAppAssemblySourceFeaturePackMarketplaceHostUpdateInput,
   type CanvasAppAssemblySourceFeaturePackMarketplaceHostUpdateResult,
+  type CanvasAppAssemblySourceFeaturePackMarketplaceSelectionTargetControlApplyTransactionInput,
+  type CanvasAppAssemblySourceFeaturePackMarketplaceSelectionTargetControlApplyTransactionMissingResult,
+  type CanvasAppAssemblySourceFeaturePackMarketplaceSelectionTargetControlApplyTransactionResult,
   type CanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransactionAppliedResult,
   type CanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransactionHeldResult,
   type CanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransactionInput,
@@ -892,6 +896,7 @@ export {
   getCanvasAppFeaturePackMarketplacePrimaryActionDiagnostic,
   getCanvasAppFeaturePackMarketplacePrimaryAction,
   getCanvasAppFeaturePackMarketplaceSelectionControlModel,
+  getCanvasAppFeaturePackMarketplaceSelectionTargetControl,
   getCanvasAppFeaturePackMarketplaceSectionControlModel,
   getCanvasAppFeaturePackMarketplaceSectionControlModels,
   getCanvasAppFeaturePackMarketplaceSectionFacetTargetControls,
@@ -1121,6 +1126,7 @@ export {
   type CanvasAppFeaturePackMarketplaceSelectionControlModelInput,
   type CanvasAppFeaturePackMarketplaceSelectionControlModelStatus,
   type CanvasAppFeaturePackMarketplaceSelectionFallbackReason,
+  type CanvasAppFeaturePackMarketplaceSelectionTargetControlInput,
   type CanvasAppFeaturePackMarketplaceSection,
   type CanvasAppFeaturePackMarketplaceSectionSelectionControl,
   type CanvasAppFeaturePackMarketplaceSectionFacet,

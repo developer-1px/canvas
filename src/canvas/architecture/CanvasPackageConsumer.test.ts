@@ -50,6 +50,7 @@ import {
   createCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan,
   createCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan,
   createCanvasStoryCanvasFeaturePackAssemblyInput,
+  executeCanvasAppAssemblySourceFeaturePackMarketplaceSelectionTargetControlApplyTransaction,
   executeCanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransaction,
   executeCanvasAppAssemblySourceFeaturePackMarketplaceTargetControlApplyTransaction,
   executeCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan,
@@ -188,6 +189,7 @@ import {
   getCanvasAppFeaturePackMarketplacePrimaryActionDiagnostic,
   getCanvasAppFeaturePackMarketplacePrimaryAction,
   getCanvasAppFeaturePackMarketplaceSelectionControlModel,
+  getCanvasAppFeaturePackMarketplaceSelectionTargetControl,
   getCanvasAppFeaturePackMarketplaceSectionControlModel,
   getCanvasAppFeaturePackMarketplaceSectionControlModels,
   getCanvasAppFeaturePackMarketplaceSectionFacetTargetControls,
@@ -251,6 +253,9 @@ import {
   type CanvasAppAssemblySourceFeaturePackMarketplaceHostUpdateHeldResult,
   type CanvasAppAssemblySourceFeaturePackMarketplaceHostUpdateInput,
   type CanvasAppAssemblySourceFeaturePackMarketplaceHostUpdateResult,
+  type CanvasAppAssemblySourceFeaturePackMarketplaceSelectionTargetControlApplyTransactionInput,
+  type CanvasAppAssemblySourceFeaturePackMarketplaceSelectionTargetControlApplyTransactionMissingResult,
+  type CanvasAppAssemblySourceFeaturePackMarketplaceSelectionTargetControlApplyTransactionResult,
   type CanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransactionInput,
   type CanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransactionResult,
   type CanvasAppAssemblySourceFeaturePackMarketplaceTargetControlApplyTransactionInput,
@@ -362,6 +367,7 @@ import {
   type CanvasAppFeaturePackMarketplaceSelectionControlModel,
   type CanvasAppFeaturePackMarketplaceSelectionControlModelInput,
   type CanvasAppFeaturePackMarketplaceSelectionFallbackReason,
+  type CanvasAppFeaturePackMarketplaceSelectionTargetControlInput,
   type CanvasAppFeaturePackMarketplaceSectionControlModel,
   type CanvasAppFeaturePackMarketplaceSectionPrimaryActionDiagnosticModel,
   type CanvasAppFeaturePackMarketplaceSectionSummary,
@@ -498,6 +504,8 @@ import {
   runCanvasKeyboardToolIntent,
   type CanvasAppAssemblySourceFeaturePackMarketplaceHostUpdateResult
     as CanvasAppAssemblySourceFeaturePackMarketplaceHostUpdateResultFromApp,
+  type CanvasAppAssemblySourceFeaturePackMarketplaceSelectionTargetControlApplyTransactionResult
+    as CanvasAppAssemblySourceFeaturePackMarketplaceSelectionTargetControlApplyTransactionResultFromApp,
   type CanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransactionResult
     as CanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransactionResultFromApp,
   type CanvasAppAssemblySourceFeaturePackMarketplaceTargetControlApplyTransactionResult
@@ -1130,6 +1138,19 @@ describe('Canvas package consumer imports', () => {
           model: featurePackMarketplaceModel,
           sectionKind: 'profiles',
         }).fallbackReasons
+    const featurePackMarketplaceSelectionTargetControlInput:
+      CanvasAppFeaturePackMarketplaceSelectionTargetControlInput = {
+        selection: featurePackMarketplaceSelectionControlModel,
+        target: {
+          featurePackId: 'smoke-partial-pack',
+          kind: 'pack',
+        },
+      }
+    const featurePackMarketplaceSelectionTargetControl:
+      CanvasAppFeaturePackMarketplaceTargetControl | null =
+        getCanvasAppFeaturePackMarketplaceSelectionTargetControl(
+          featurePackMarketplaceSelectionTargetControlInput,
+        )
     const featurePackMarketplaceMissingTargetControlStatus:
       CanvasAppFeaturePackMarketplaceTargetControlStatus =
         getCanvasAppFeaturePackMarketplaceTargetControl({
@@ -2112,6 +2133,68 @@ describe('Canvas package consumer imports', () => {
           .executeCanvasAppAssemblySourceFeaturePackMarketplaceTargetControlApplyTransaction(
             shellMarketplaceTargetControlSourceTransactionInput,
           )
+    const shellMarketplaceSelectionTargetControlSourceTransactionInput:
+      CanvasAppAssemblySourceFeaturePackMarketplaceSelectionTargetControlApplyTransactionInput<
+        SmokeUninstallCleanupEffect,
+        SmokeUninstallCleanupExecutionValue
+      > = {
+        cleanupHandlers: [featurePackMarketplaceUninstallCleanupScopeHandler],
+        executeCleanupEffect:
+          featurePackMarketplaceUninstallCleanupEffectExecutor,
+        model: featurePackMarketplaceAssemblyModel,
+        selection: featurePackMarketplaceSelectionControlModel,
+        source: shellPrebuiltSource,
+        target: {
+          featurePackId: 'smoke-partial-pack',
+          kind: 'pack',
+        },
+      }
+    const shellMarketplaceSelectionTargetControlSourceTransactionResult:
+      CanvasAppAssemblySourceFeaturePackMarketplaceSelectionTargetControlApplyTransactionResult<
+        SmokeUninstallCleanupEffect,
+        SmokeUninstallCleanupExecutionValue
+      > =
+        await executeCanvasAppAssemblySourceFeaturePackMarketplaceSelectionTargetControlApplyTransaction(
+          shellMarketplaceSelectionTargetControlSourceTransactionInput,
+        )
+    const shellSubpathMarketplaceSelectionTargetControlSourceTransactionResult:
+      CanvasAppAssemblySourceFeaturePackMarketplaceSelectionTargetControlApplyTransactionResultFromApp<
+        SmokeUninstallCleanupEffect,
+        SmokeUninstallCleanupExecutionValue
+      > =
+        await CanvasAppFacade
+          .executeCanvasAppAssemblySourceFeaturePackMarketplaceSelectionTargetControlApplyTransaction(
+            shellMarketplaceSelectionTargetControlSourceTransactionInput,
+          )
+    const shellMarketplaceMissingSelectionTargetControlSourceTransactionResult =
+      await executeCanvasAppAssemblySourceFeaturePackMarketplaceSelectionTargetControlApplyTransaction(
+        {
+          executeCleanupEffect:
+            featurePackMarketplaceUninstallCleanupEffectExecutor,
+          model: featurePackMarketplaceAssemblyModel,
+          selection: getCanvasAppFeaturePackMarketplaceSelectionControlModel({
+            facetKind: 'private',
+            model: featurePackMarketplaceModel,
+            sectionKind: 'packs',
+          }),
+          source: shellPrebuiltSource,
+          target: {
+            featurePackId: 'smoke-partial-pack',
+            kind: 'pack',
+          },
+        },
+      )
+
+    if (
+      shellMarketplaceMissingSelectionTargetControlSourceTransactionResult
+        .status !== 'missing-selection-target'
+    ) {
+      throw new Error('Expected missing selection target source transaction')
+    }
+
+    const shellMarketplaceMissingSelectionTargetControlSourceTransactionMissingResult:
+      CanvasAppAssemblySourceFeaturePackMarketplaceSelectionTargetControlApplyTransactionMissingResult =
+        shellMarketplaceMissingSelectionTargetControlSourceTransactionResult
     const shellMarketplaceMissingTargetControl =
       getCanvasAppFeaturePackMarketplaceTargetControl({
         model: featurePackMarketplaceModel,
@@ -2266,6 +2349,34 @@ describe('Canvas package consumer imports', () => {
       .toEqual(shellMarketplaceTargetSourceTransactionResult.source)
     expect(shellSubpathMarketplaceTargetControlSourceTransactionResult.source)
       .toEqual(shellMarketplaceTargetControlSourceTransactionResult.source)
+    expect(shellMarketplaceSelectionTargetControlSourceTransactionResult.status)
+      .toBe('applied')
+    expect(shellMarketplaceSelectionTargetControlSourceTransactionResult.applied)
+      .toBe(true)
+    expect(shellMarketplaceSelectionTargetControlSourceTransactionResult.actionKind)
+      .toBe('disable')
+    expect(shellMarketplaceSelectionTargetControlSourceTransactionResult.source)
+      .toEqual(shellMarketplaceTargetControlSourceTransactionResult.source)
+    expect(shellSubpathMarketplaceSelectionTargetControlSourceTransactionResult.source)
+      .toEqual(shellMarketplaceSelectionTargetControlSourceTransactionResult.source)
+    expect(shellMarketplaceMissingSelectionTargetControlSourceTransactionMissingResult)
+      .toMatchObject({
+        actionKind: null,
+        applied: false,
+        control: null,
+        holdReason: 'missing-selection-target',
+        hostUpdate: null,
+        source: shellPrebuiltSource,
+        sourceResult: null,
+        status: 'missing-selection-target',
+        target: {
+          featurePackId: 'smoke-partial-pack',
+          kind: 'pack',
+        },
+        transactionResult: null,
+        update: null,
+        updateMode: 'blocked',
+      })
     expect(shellMarketplaceMissingTargetControlSourceTransactionMissingResult)
       .toMatchObject({
         actionKind: null,
@@ -2292,6 +2403,10 @@ describe('Canvas package consumer imports', () => {
       .toBe(executeCanvasAppAssemblySourceFeaturePackMarketplaceTargetControlApplyTransaction)
     expect(CanvasAppFacade.executeCanvasAppAssemblySourceFeaturePackMarketplaceTargetControlApplyTransaction)
       .toBe(executeCanvasAppAssemblySourceFeaturePackMarketplaceTargetControlApplyTransaction)
+    expect(CanvasPackage.executeCanvasAppAssemblySourceFeaturePackMarketplaceSelectionTargetControlApplyTransaction)
+      .toBe(executeCanvasAppAssemblySourceFeaturePackMarketplaceSelectionTargetControlApplyTransaction)
+    expect(CanvasAppFacade.executeCanvasAppAssemblySourceFeaturePackMarketplaceSelectionTargetControlApplyTransaction)
+      .toBe(executeCanvasAppAssemblySourceFeaturePackMarketplaceSelectionTargetControlApplyTransaction)
     const entityItem: CanvasEntityItem = rect
 
     expect(entityItem.id).toBe('rect-1')
@@ -3176,6 +3291,8 @@ describe('Canvas package consumer imports', () => {
       .toEqual(featurePackMarketplaceSelectionControlModel.controls)
     expect(featurePackMarketplaceSelectionFallbackReasons)
       .toEqual(['missing-facet'])
+    expect(featurePackMarketplaceSelectionTargetControl)
+      .toEqual(featurePackMarketplaceTargetControl)
     expect(featurePackMarketplaceMissingTargetControlStatus).toBe('missing')
     expect(featurePackMarketplaceActionAssemblyPlan.status).toBe('ready')
     if (featurePackMarketplaceActionAssemblyPlan.status !== 'ready') {
@@ -4696,6 +4813,12 @@ describe('Canvas package consumer imports', () => {
       .toBe(getCanvasAppFeaturePackMarketplaceSelectionControlModel)
     expect(CanvasPackage.getCanvasAppFeaturePackMarketplaceSelectionControlModel)
       .toBe(getCanvasAppFeaturePackMarketplaceSelectionControlModel)
+    expect(CanvasAppAuthoring.getCanvasAppFeaturePackMarketplaceSelectionTargetControl)
+      .toBe(getCanvasAppFeaturePackMarketplaceSelectionTargetControl)
+    expect(CanvasAppFacade.getCanvasAppFeaturePackMarketplaceSelectionTargetControl)
+      .toBe(getCanvasAppFeaturePackMarketplaceSelectionTargetControl)
+    expect(CanvasPackage.getCanvasAppFeaturePackMarketplaceSelectionTargetControl)
+      .toBe(getCanvasAppFeaturePackMarketplaceSelectionTargetControl)
     expect(CanvasAppAuthoring.getCanvasAppFeaturePackMarketplaceActionAssemblyInput)
       .toBeTypeOf('function')
     expect(CanvasAppFacade.getCanvasAppFeaturePackMarketplaceActionAssemblyInput)

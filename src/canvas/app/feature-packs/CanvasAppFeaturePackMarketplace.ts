@@ -265,6 +265,12 @@ export type CanvasAppFeaturePackMarketplaceSelectionControlModelInput =
     sectionKind?: CanvasAppFeaturePackMarketplaceSectionKind | string
   }>
 
+export type CanvasAppFeaturePackMarketplaceSelectionTargetControlInput =
+  Readonly<{
+    selection: CanvasAppFeaturePackMarketplaceSelectionControlModel
+    target: CanvasAppFeaturePackMarketplaceTarget
+  }>
+
 export type CanvasAppFeaturePackMarketplaceSelectionControlModelStatus =
   | 'empty'
   | 'fallback'
@@ -579,6 +585,16 @@ export function getCanvasAppFeaturePackMarketplaceSelectionControlModel({
     selectedSectionKind: selectedSection.kind,
     status: fallbackReasons.length > 0 ? 'fallback' : 'selected',
   })
+}
+
+export function getCanvasAppFeaturePackMarketplaceSelectionTargetControl({
+  selection,
+  target,
+}: CanvasAppFeaturePackMarketplaceSelectionTargetControlInput):
+  CanvasAppFeaturePackMarketplaceTargetControl | null {
+  return selection.controls.find((control) =>
+    isCanvasAppFeaturePackMarketplaceSameTarget(control.target, target)
+  ) ?? null
 }
 
 export function getCanvasAppFeaturePackMarketplaceTargetItem({
@@ -923,6 +939,27 @@ function snapshotCanvasAppFeaturePackMarketplaceTarget(
     kind: 'suite',
     suiteId: target.suiteId,
   })
+}
+
+function isCanvasAppFeaturePackMarketplaceSameTarget(
+  left: CanvasAppFeaturePackMarketplaceTarget,
+  right: CanvasAppFeaturePackMarketplaceTarget,
+): boolean {
+  if (left.kind !== right.kind) {
+    return false
+  }
+
+  if (left.kind === 'pack' && right.kind === 'pack') {
+    return left.featurePackId === right.featurePackId
+  }
+
+  if (left.kind === 'profile' && right.kind === 'profile') {
+    return left.profileId === right.profileId
+  }
+
+  return left.kind === 'suite' &&
+    right.kind === 'suite' &&
+    left.suiteId === right.suiteId
 }
 
 function isCanvasAppFeaturePackMarketplacePackItem(

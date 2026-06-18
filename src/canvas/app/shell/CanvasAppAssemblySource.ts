@@ -11,6 +11,9 @@ import {
   type CanvasAppFeaturePackMarketplaceAssemblyTargetApplyTransactionInput,
 } from '../workflow'
 import {
+  getCanvasAppFeaturePackMarketplaceSelectionTargetControl,
+  type CanvasAppFeaturePackMarketplaceSelectionControlModel,
+  type CanvasAppFeaturePackMarketplaceTarget,
   type CanvasAppFeaturePackMarketplaceTargetControl,
 } from '../feature-packs'
 
@@ -186,6 +189,47 @@ export type CanvasAppAssemblySourceFeaturePackMarketplaceTargetControlApplyTrans
     sourceResult: null
     status: 'missing'
     target: CanvasAppFeaturePackMarketplaceTargetControl['target']
+    transactionResult: null
+    update: null
+    updateMode: 'blocked'
+  }>
+
+export type CanvasAppAssemblySourceFeaturePackMarketplaceSelectionTargetControlApplyTransactionInput<
+  TEffect,
+  TResult,
+> = Omit<
+  CanvasAppAssemblySourceFeaturePackMarketplaceTargetControlApplyTransactionInput<
+    TEffect,
+    TResult
+  >,
+  'control'
+> & Readonly<{
+  selection: CanvasAppFeaturePackMarketplaceSelectionControlModel
+  target: CanvasAppFeaturePackMarketplaceTarget
+}>
+
+export type CanvasAppAssemblySourceFeaturePackMarketplaceSelectionTargetControlApplyTransactionResult<
+  TEffect,
+  TResult,
+> =
+  | CanvasAppAssemblySourceFeaturePackMarketplaceTargetControlApplyTransactionResult<
+    TEffect,
+    TResult
+  >
+  | CanvasAppAssemblySourceFeaturePackMarketplaceSelectionTargetControlApplyTransactionMissingResult
+
+export type CanvasAppAssemblySourceFeaturePackMarketplaceSelectionTargetControlApplyTransactionMissingResult =
+  Readonly<{
+    actionKind: null
+    applied: false
+    control: null
+    holdReason: 'missing-selection-target'
+    hostUpdate: null
+    selection: CanvasAppFeaturePackMarketplaceSelectionControlModel
+    source: CanvasAppAssemblySource
+    sourceResult: null
+    status: 'missing-selection-target'
+    target: CanvasAppFeaturePackMarketplaceTarget
     transactionResult: null
     update: null
     updateMode: 'blocked'
@@ -426,6 +470,59 @@ export async function executeCanvasAppAssemblySourceFeaturePackMarketplaceTarget
   )
 }
 
+export async function executeCanvasAppAssemblySourceFeaturePackMarketplaceSelectionTargetControlApplyTransaction<
+  TEffect,
+  TResult,
+>({
+  selection,
+  target,
+  ...input
+}: CanvasAppAssemblySourceFeaturePackMarketplaceSelectionTargetControlApplyTransactionInput<
+  TEffect,
+  TResult
+>): Promise<
+  CanvasAppAssemblySourceFeaturePackMarketplaceSelectionTargetControlApplyTransactionResult<
+    TEffect,
+    TResult
+  >
+> {
+  const control = getCanvasAppFeaturePackMarketplaceSelectionTargetControl({
+    selection,
+    target,
+  })
+
+  if (!control) {
+    const source = input.source ?? Object.freeze({
+      assemblyInput: input.model.assemblyInput,
+    })
+
+    return Object.freeze({
+      actionKind: null,
+      applied: false,
+      control: null,
+      holdReason: 'missing-selection-target',
+      hostUpdate: null,
+      selection,
+      source,
+      sourceResult: null,
+      status: 'missing-selection-target',
+      target: snapshotCanvasAppAssemblySourceFeaturePackMarketplaceTarget(
+        target,
+      ),
+      transactionResult: null,
+      update: null,
+      updateMode: 'blocked',
+    })
+  }
+
+  return executeCanvasAppAssemblySourceFeaturePackMarketplaceTargetControlApplyTransaction(
+    {
+      ...input,
+      control,
+    },
+  )
+}
+
 export type CanvasAppAssemblySourceValue = {
   assembly?: CanvasAppAssembly
   assemblyInput?: CanvasAppAssemblyInput
@@ -442,4 +539,27 @@ export function resolveCanvasAppAssemblySource({
   }
 
   return assembly ?? createCanvasAppAssembly(assemblyInput)
+}
+
+function snapshotCanvasAppAssemblySourceFeaturePackMarketplaceTarget(
+  target: CanvasAppFeaturePackMarketplaceTarget,
+): CanvasAppFeaturePackMarketplaceTarget {
+  if (target.kind === 'pack') {
+    return Object.freeze({
+      featurePackId: target.featurePackId,
+      kind: 'pack',
+    })
+  }
+
+  if (target.kind === 'profile') {
+    return Object.freeze({
+      kind: 'profile',
+      profileId: target.profileId,
+    })
+  }
+
+  return Object.freeze({
+    kind: 'suite',
+    suiteId: target.suiteId,
+  })
 }
