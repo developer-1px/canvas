@@ -5,7 +5,11 @@ import {
   getCanvasImportedImageSize,
   getCanvasDataImageSourceFromDataTransfer,
   getCanvasHTMLDataImageSourcesFromDataTransfer,
+  getCanvasImageFileFromDataTransfer,
+  getCanvasImageFilesFromDataTransfer,
+  getCanvasImageFilesFromList,
   getCanvasSVGImageSourceFromDataTransfer,
+  readCanvasImageFileSources,
   routeCanvasImagePasteReplace,
 } from './CanvasImageImport'
 
@@ -82,6 +86,104 @@ describe('CanvasImageImport', () => {
       h: 68,
       w: 90,
     })
+  })
+
+  it('keeps the single DataTransfer image file helper focused on DataTransfer.files', () => {
+    const pngFile = createImageFile('screen.png', 'image/png', 1)
+    const dropFile = createImageFile('drop.webp', 'image/webp', 2)
+    const ignoredFile = createImageFile('notes.txt', 'text/plain', 3)
+    const dataTransfer = createDataTransferWithFiles({
+      files: [ignoredFile, pngFile],
+      items: [createFileItem(dropFile)],
+    })
+
+    expect(getCanvasImageFileFromDataTransfer(dataTransfer)).toBe(pngFile)
+  })
+
+  it('collects image files from clipboard DataTransfer.files', () => {
+    const pngFile = createImageFile('screen.png', 'image/png', 1)
+    const jpegFile = createImageFile('photo.jpg', 'image/jpeg', 2)
+    const svgFile = createImageFile('icon.svg', 'image/svg+xml', 3)
+    const ignoredFile = createImageFile('notes.txt', 'text/plain', 4)
+
+    expect(getCanvasImageFilesFromList(createFileList([
+      ignoredFile,
+      pngFile,
+      jpegFile,
+      svgFile,
+    ]))).toEqual([
+      pngFile,
+      jpegFile,
+      svgFile,
+    ])
+    expect(getCanvasImageFilesFromDataTransfer(createDataTransferWithFiles({
+      files: [ignoredFile, pngFile, jpegFile, svgFile],
+    }))).toEqual([
+      pngFile,
+      jpegFile,
+      svgFile,
+    ])
+  })
+
+  it('collects image files from drop DataTransfer items', () => {
+    const pngFile = createImageFile('drop.png', 'image/png', 1)
+    const webpFile = createImageFile('drop.webp', 'image/webp', 2)
+    const ignoredFile = createImageFile('table.csv', 'text/csv', 3)
+    const dataTransfer = createDataTransferWithFiles({
+      files: [],
+      items: [
+        createStringItem(),
+        createFileItem(pngFile),
+        createFileItem(webpFile),
+        createFileItem(ignoredFile),
+      ],
+    })
+
+    expect(getCanvasImageFilesFromDataTransfer(dataTransfer)).toEqual([
+      pngFile,
+      webpFile,
+    ])
+  })
+
+  it('dedupes image files reported by both DataTransfer.files and items', () => {
+    const pngFile = createImageFile('screen.png', 'image/png', 1)
+    const duplicatePngFile = createImageFile('screen.png', 'image/png', 1)
+    const webpFile = createImageFile('screen.webp', 'image/webp', 2)
+    const dataTransfer = createDataTransferWithFiles({
+      files: [pngFile],
+      items: [
+        createFileItem(duplicatePngFile),
+        createFileItem(webpFile),
+      ],
+    })
+
+    expect(getCanvasImageFilesFromDataTransfer(dataTransfer)).toEqual([
+      pngFile,
+      webpFile,
+    ])
+  })
+
+  it('reads multiple image files into source arrays', async () => {
+    const pngFile = createImageFile('screen.png', 'image/png', 1)
+    const ignoredFile = createImageFile('notes.txt', 'text/plain', 2)
+    const webpFile = createImageFile('screen.webp', 'image/webp', 3)
+
+    await expect(readCanvasImageFileSources([
+      pngFile,
+      ignoredFile,
+      webpFile,
+    ])).resolves.toMatchObject([
+      {
+        dataUrl: 'data:image/png;base64,aW1hZ2U=',
+        mimeType: 'image/png',
+        name: 'screen.png',
+      },
+      {
+        dataUrl: 'data:image/webp;base64,aW1hZ2U=',
+        mimeType: 'image/webp',
+        name: 'screen.webp',
+      },
+    ])
   })
 
   it('reads SVG MIME clipboard markup as a sanitized image source', () => {
@@ -404,4 +506,57 @@ function createDataTransfer(
   return {
     getData: vi.fn((type: string) => values[type] ?? ''),
   } as unknown as DataTransfer
+}
+
+function createImageFile(
+  name: string,
+  type: string,
+  lastModified = 0,
+) {
+  return Object.assign(new Blob(['image'], { type }), {
+    lastModified,
+    name,
+  }) as File
+}
+
+function createFileList(files: readonly File[]): FileList {
+  return Object.assign([...files], {
+    item: (index: number) => files[index] ?? null,
+  }) as unknown as FileList
+}
+
+function createDataTransferWithFiles({
+  files = [],
+  items = [],
+}: {
+  files?: readonly File[]
+  items?: readonly DataTransferItem[]
+}): DataTransfer {
+  return {
+    files: createFileList(files),
+    getData: vi.fn(() => ''),
+    items: createDataTransferItemList(items),
+  } as unknown as DataTransfer
+}
+
+function createDataTransferItemList(
+  items: readonly DataTransferItem[],
+): DataTransferItemList {
+  return Object.assign([...items], {
+    item: (index: number) => items[index] ?? null,
+  }) as unknown as DataTransferItemList
+}
+
+function createFileItem(file: File): DataTransferItem {
+  return {
+    getAsFile: vi.fn(() => file),
+    kind: 'file',
+  } as unknown as DataTransferItem
+}
+
+function createStringItem(): DataTransferItem {
+  return {
+    getAsFile: vi.fn(() => null),
+    kind: 'string',
+  } as unknown as DataTransferItem
 }

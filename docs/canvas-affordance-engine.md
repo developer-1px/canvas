@@ -37,6 +37,17 @@
 | Exclusions | Non-image data URLs, remote URLs, and inline `<svg>` nodes are not included in the HTML data image batch |
 | Runtime | Host apps own batch placement, replacement policy, layout, persistence, and selection after import |
 
+## Image File Batch Contract
+
+| Area | Contract |
+| --- | --- |
+| File sources | `DataTransfer.files` and `DataTransfer.items[].getAsFile()` may produce a batch of image files |
+| Type rules | Image detection uses the same `isCanvasImageBlob` MIME rule as the existing single image file helper |
+| Source reading | `readCanvasImageFileSources` reads a file batch through the existing single file source reader and skips non-image files |
+| Order | Files from `DataTransfer.files` keep priority and order; file items are appended in item order |
+| Dedupe | Dedupe uses `name`, `type`, `size`, and `lastModified` metadata and keeps the first occurrence |
+| Runtime | Host apps own batch placement, replacement policy, layout, persistence, and selection after import |
+
 ## Table Import File Batch Contract
 
 | Area | Contract |
@@ -157,7 +168,7 @@
 | `src/canvas/app/feature-packs/drawing-tools` | Pen/marker/highlighter style state와 Drawing Controls view를 폴더째 설치형 pack으로 제공한다 |
 | `src/canvas/app/feature-packs/facilitation` | Emote, session timer, voting, spotlight, facilitation affordance config를 폴더째 설치형 pack으로 제공한다 |
 | `src/canvas/app/feature-packs/find-replace` | Document text search state, replace-all action, Find/Replace panel을 폴더째 설치형 pack으로 제공한다 |
-| `src/canvas/app/feature-packs/image-io` | Image upload, paste, copy, download, clipboard/file import, HTML data image batch source, SVG/PNG export를 폴더째 설치형 pack으로 제공한다 |
+| `src/canvas/app/feature-packs/image-io` | Image upload, paste, copy, download, clipboard/file import, image file batch source, HTML data image batch source, SVG/PNG export를 폴더째 설치형 pack으로 제공한다 |
 | `src/canvas/app/feature-packs/kanban-inspector` | 선택한 Queue/Kanban의 card text/add/remove/reorder action을 폴더째 설치형 inspector pack으로 제공한다 |
 | `src/canvas/app/feature-packs/media-import` | URL/embed paste/drop, media importer contract, link-preview fallback, link-preview inspector actions를 폴더째 설치형 pack으로 제공한다 |
 | `src/canvas/app/feature-packs/minimap` | Canvas item/viewport overview read-model, minimap view, minimap navigation projection을 폴더째 설치형 pack으로 제공한다 |
