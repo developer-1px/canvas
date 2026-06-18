@@ -25,6 +25,9 @@ import {
   type DomEditStyle,
   type DomEditTextState,
 } from '@interactive-os/dom-edit-affordance'
+import {
+  createCanvasComponentDefinitionRegistry,
+} from '../../../../src/canvas/host'
 
 export type FigmaCloneDomNodeId =
   | 'workspacePage'
@@ -412,6 +415,11 @@ const FIGMA_CLONE_DOM_COMPONENT_DEFINITIONS = [
     ],
   },
 ] satisfies readonly FigmaCloneDomComponentDefinition[]
+
+const FIGMA_CLONE_DOM_COMPONENT_REGISTRY =
+  createCanvasComponentDefinitionRegistry<FigmaCloneDomNodeId>({
+    definitions: FIGMA_CLONE_DOM_COMPONENT_DEFINITIONS,
+  })
 
 const FIGMA_CLONE_STORY_IMPORTS = [
   {
@@ -2502,44 +2510,34 @@ export function updateFigmaCloneDomComponentAutoLayoutField({
 export function getFigmaCloneDomComponentBinding(
   nodeId: FigmaCloneDomNodeId,
 ): FigmaCloneDomComponentBinding | null {
-  for (const definition of FIGMA_CLONE_DOM_COMPONENT_DEFINITIONS) {
-    for (const instance of definition.instances) {
-      for (const [slotLabel, slotNodeId] of Object.entries(instance.slots)) {
-        if (slotNodeId !== nodeId) {
-          continue
-        }
+  const binding = FIGMA_CLONE_DOM_COMPONENT_REGISTRY.getBinding(nodeId)
 
-        return {
-          componentId: definition.id,
-          componentLabel: definition.label,
-          currentNodeId: nodeId,
-          instanceCount: definition.instances.length,
-          instanceLabel: instance.label,
-          slotLabel,
-          slotNodeIds: getFigmaCloneDomComponentSlotNodeIds(
-            definition,
-            slotLabel,
-          ),
-          syncDescription: definition.syncDescription,
-        }
-      }
-    }
+  if (!binding) {
+    return null
   }
 
-  return null
+  return {
+    componentId: binding.componentId as FigmaCloneDomComponentId,
+    componentLabel: binding.componentLabel,
+    currentNodeId: binding.currentItemId,
+    instanceCount: binding.instanceCount,
+    instanceLabel: binding.instanceLabel,
+    slotLabel: binding.slotId,
+    slotNodeIds: binding.slotItemIds,
+    syncDescription: binding.syncDescription ?? '',
+  }
 }
 
 export function getFigmaCloneDomComponentSyncNodeIds(
   nodeId: FigmaCloneDomNodeId,
 ): readonly FigmaCloneDomNodeId[] {
-  return getFigmaCloneDomComponentBinding(nodeId)?.slotNodeIds ?? [nodeId]
+  return FIGMA_CLONE_DOM_COMPONENT_REGISTRY.getSyncItemIds(nodeId)
 }
 
 export function isFigmaCloneDomComponentRootNode(
   nodeId: FigmaCloneDomNodeId,
 ): boolean {
-  return FIGMA_CLONE_DOM_COMPONENT_DEFINITIONS.some((definition) =>
-    definition.instances.some((instance) => instance.slots.root === nodeId))
+  return FIGMA_CLONE_DOM_COMPONENT_REGISTRY.isRootItem(nodeId)
 }
 
 export function listFigmaCloneDomComponentDefinitions():
@@ -2549,42 +2547,42 @@ export function listFigmaCloneDomComponentDefinitions():
 
 export function listFigmaCloneDomComponentSets():
   readonly FigmaCloneDomComponentSetSummary[] {
-  return FIGMA_CLONE_DOM_COMPONENT_DEFINITIONS.map((definition) => {
-    const instances = definition.instances.map((instance) => {
-      const slots = Object.entries(instance.slots).map(([label, nodeId]) => ({
-        label,
-        nodeId,
-      }))
-      const rootNodeId = instance.slots.root ?? slots[0]?.nodeId
-
-      if (!rootNodeId) {
-        throw new Error(`Missing root slot for ${definition.id}`)
-      }
-
-      return {
-        label: instance.label,
-        nodeIds: slots.map((slot) => slot.nodeId),
-        rootNodeId,
-        slots,
-      }
-    })
-    const firstRootNodeId = instances[0]?.rootNodeId
+  return FIGMA_CLONE_DOM_COMPONENT_REGISTRY.listSets().map((componentSet) => {
+    const firstRootNodeId = componentSet.instances[0]?.rootItemId
 
     if (!firstRootNodeId) {
-      throw new Error(`Missing instances for ${definition.id}`)
+      throw new Error(`Missing instances for ${componentSet.id}`)
     }
 
     const pageRootId = getFigmaCloneDomRootId(firstRootNodeId)
 
     return {
-      id: definition.id,
-      instances,
-      label: definition.label,
+      id: componentSet.id as FigmaCloneDomComponentId,
+      instances: componentSet.instances.map((instance) => ({
+        label: instance.label,
+        nodeIds: instance.itemIds,
+        rootNodeId: instance.rootItemId,
+        slots: instance.slots.map((slot) => ({
+          label: slot.slotId,
+          nodeId: slot.itemId,
+        })),
+      })),
+      label: componentSet.label,
       pageLabel: FIGMA_CLONE_DOM_NODE_BY_ID[pageRootId].label,
       pageRootId,
-      parts: getFigmaCloneDomComponentParts(definition),
-      source: definition.source,
-      syncDescription: definition.syncDescription,
+      parts: componentSet.parts
+        .map((part) => ({
+          label: formatFigmaCloneDomComponentSlotLabel(part.slotId),
+          nodeIds: part.itemIds,
+          slotLabel: part.slotId,
+        }))
+        .sort((left, right) =>
+          compareFigmaCloneDomComponentPartLabels(
+            left.slotLabel,
+            right.slotLabel,
+          )),
+      source: componentSet.source as FigmaCloneDomComponentSource,
+      syncDescription: componentSet.syncDescription ?? '',
     }
   })
 }
@@ -2592,21 +2590,6 @@ export function listFigmaCloneDomComponentSets():
 export function listFigmaCloneStoryImports():
   readonly FigmaCloneStoryImportSummary[] {
   return FIGMA_CLONE_STORY_IMPORTS
-}
-
-function getFigmaCloneDomComponentParts(
-  definition: FigmaCloneDomComponentDefinition,
-): FigmaCloneDomComponentPartSummary[] {
-  const slotLabels = Array.from(
-    new Set(definition.instances.flatMap((instance) =>
-      Object.keys(instance.slots))),
-  ).sort(compareFigmaCloneDomComponentPartLabels)
-
-  return slotLabels.map((slotLabel) => ({
-    label: formatFigmaCloneDomComponentSlotLabel(slotLabel),
-    nodeIds: getFigmaCloneDomComponentSlotNodeIds(definition, slotLabel),
-    slotLabel,
-  }))
 }
 
 function compareFigmaCloneDomComponentPartLabels(left: string, right: string) {
@@ -2626,16 +2609,6 @@ function compareFigmaCloneDomComponentPartLabels(left: string, right: string) {
   return normalizedLeft === normalizedRight
     ? left.localeCompare(right)
     : normalizedLeft - normalizedRight
-}
-
-function getFigmaCloneDomComponentSlotNodeIds(
-  definition: FigmaCloneDomComponentDefinition,
-  slotLabel: string,
-): FigmaCloneDomNodeId[] {
-  return definition.instances.flatMap((instance) => {
-    const slotNodeId = instance.slots[slotLabel]
-    return slotNodeId ? [slotNodeId] : []
-  })
 }
 
 function formatFigmaCloneDomComponentSlotLabel(slotLabel: string) {
