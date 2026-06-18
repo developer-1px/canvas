@@ -171,7 +171,14 @@ import {
   createCanvasAffordanceConfig,
 } from '@interactive-os/canvas/engine'
 import type { CanvasItem as CanvasEntityItem } from '@interactive-os/canvas/entities'
-import { createCanvasComponentLibrary } from '@interactive-os/canvas/host'
+import {
+  CANVAS_COMPONENT_DEFINITION_REGISTRY,
+  CANVAS_COMPONENT_DEFINITION_ROOT_SLOT_ID,
+  createCanvasComponentDefinitionRegistry,
+  createCanvasComponentLibrary,
+  type CanvasComponentDefinition,
+  type CanvasComponentDefinitionRegistry,
+} from '@interactive-os/canvas/host'
 import {
   CANVAS_SVG_ARROW_MARKER_IRI,
   CanvasSvgStage,
@@ -1130,6 +1137,46 @@ describe('Canvas package consumer imports', () => {
     expect(createCanvasComponentLibrary({
       templates: CanvasHost.DEFAULT_CANVAS_COMPONENT_TEMPLATES,
     }).templates.length).toBe(CanvasHost.DEFAULT_CANVAS_COMPONENT_TEMPLATES.length)
+    const componentDefinition: CanvasComponentDefinition = {
+      id: 'consumer-card',
+      instances: [
+        {
+          label: 'One',
+          slots: {
+            root: 'consumer-card-one',
+            title: 'consumer-card-one-title',
+          },
+        },
+        {
+          label: 'Two',
+          slots: {
+            root: 'consumer-card-two',
+            title: 'consumer-card-two-title',
+          },
+        },
+      ],
+      label: 'Consumer card',
+    }
+    const componentRegistry: CanvasComponentDefinitionRegistry =
+      createCanvasComponentDefinitionRegistry({
+        definitions: [componentDefinition],
+      })
+
+    expect(CANVAS_COMPONENT_DEFINITION_ROOT_SLOT_ID).toBe('root')
+    expect(CANVAS_COMPONENT_DEFINITION_REGISTRY.listSets()).toEqual([])
+    expect(componentRegistry.getBinding('consumer-card-one-title')?.slotItemIds)
+      .toEqual(['consumer-card-one-title', 'consumer-card-two-title'])
+    expect(componentRegistry.syncItems({
+      itemId: 'consumer-card-one-title',
+      state: {} as Record<string, number>,
+      update: (current, itemId) => ({
+        ...current,
+        [itemId]: 1,
+      }),
+    })).toEqual({
+      'consumer-card-one-title': 1,
+      'consumer-card-two-title': 1,
+    })
     expect(downloadCanvasBlobFile({
       blob: new Blob(['smoke']),
       document: null,

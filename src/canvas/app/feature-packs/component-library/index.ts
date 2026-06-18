@@ -1,4 +1,5 @@
 import {
+  CANVAS_COMPONENT_DEFINITION_REGISTRY,
   CANVAS_COMPONENT_LIBRARY,
   DEFAULT_CANVAS_COMPONENT_TEMPLATES,
 } from '../../../host'
@@ -20,6 +21,7 @@ export const CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST =
       runtimeToggleable: true,
     },
     runtimeFeaturePacks: {
+      componentDefinitionRegistry: CANVAS_COMPONENT_DEFINITION_REGISTRY,
       componentLibrary: CANVAS_COMPONENT_LIBRARY,
       templates: DEFAULT_CANVAS_COMPONENT_TEMPLATES,
     },

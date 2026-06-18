@@ -52,6 +52,24 @@ export {
   type CreateCanvasComponentLibraryInput,
 } from './component/CanvasComponentLibrary'
 export {
+  CANVAS_COMPONENT_DEFINITION_REGISTRY,
+  CANVAS_COMPONENT_DEFINITION_ROOT_SLOT_ID,
+  createCanvasComponentDefinitionRegistry,
+  type CanvasComponentBinding,
+  type CanvasComponentDefinition,
+  type CanvasComponentDefinitionId,
+  type CanvasComponentDefinitionInstance,
+  type CanvasComponentDefinitionRegistry,
+  type CanvasComponentInstanceSummary,
+  type CanvasComponentLinkedItemSyncInput,
+  type CanvasComponentPartSummary,
+  type CanvasComponentSetSummary,
+  type CanvasComponentSlotId,
+  type CanvasComponentSlotSummary,
+  type CanvasComponentSource,
+  type CreateCanvasComponentDefinitionRegistryInput,
+} from './component/CanvasComponentDefinitionRegistry'
+export {
   CANVAS_CHECKLIST_COMPONENT_KIND,
   addCanvasChecklistItem,
   getCanvasChecklistCheckedItems,
