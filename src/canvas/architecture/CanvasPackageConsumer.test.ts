@@ -2,6 +2,10 @@ import { describe, expect, it } from 'vitest'
 import * as CanvasPackage from '@interactive-os/canvas'
 import * as CanvasAppAuthoring from '@interactive-os/canvas/app/authoring'
 import * as CanvasAppFacade from '@interactive-os/canvas/app'
+import type {
+  CanvasDataTransferImportActionPlanRunInput,
+  CanvasDataTransferImportActionPlanRunResult,
+} from '@interactive-os/canvas/app'
 import {
   CanvasCore,
   CanvasEngine,
@@ -4156,6 +4160,52 @@ describe('Canvas package consumer imports', () => {
     await expect(CanvasAppFacade.createCanvasExternalClipboardPasteActionPlan({
       resolvers: [],
     })).resolves.toEqual([])
+    const dataTransferImportConsumedEvents: string[] = []
+    const runDataTransferImportActionPlan =
+      CanvasAppFacade.runCanvasDataTransferImportActionPlan
+    type DataTransferImportAction =
+      | { kind: 'clipboard-image'; source: string }
+      | { kind: 'clipboard-text'; source: string }
+      | { kind: 'stage-drop-media'; source: string }
+    const clipboardPasteImageAction: DataTransferImportAction = {
+      kind: 'clipboard-image',
+      source: 'clipboard.png',
+    }
+    const clipboardPasteRunInput:
+      CanvasDataTransferImportActionPlanRunInput<DataTransferImportAction> = {
+        actions: [
+          {
+            kind: 'clipboard-text',
+            source: 'plain',
+          },
+          clipboardPasteImageAction,
+        ],
+        onConsumed: (result) => {
+          dataTransferImportConsumedEvents.push(
+            `paste:${result.consumedAction.kind}`,
+          )
+        },
+        runAction: (action) => action.kind === 'clipboard-image',
+    }
+    const clipboardPasteRunResult:
+      CanvasDataTransferImportActionPlanRunResult<DataTransferImportAction> =
+        runDataTransferImportActionPlan(clipboardPasteRunInput)
+    const stageDropMediaAction: DataTransferImportAction = {
+      kind: 'stage-drop-media',
+      source: 'drop.mov',
+    }
+    const stageDropRunResult =
+      runDataTransferImportActionPlan<DataTransferImportAction>({
+        actions: [
+          stageDropMediaAction,
+        ],
+        onConsumed: (result) => {
+          dataTransferImportConsumedEvents.push(
+            `drop:${result.consumedAction.kind}`,
+          )
+        },
+        runAction: (action) => action.kind === 'stage-drop-media',
+      })
     expect(getCanvasExternalClipboardPasteCommandRoute({
       clipboard: null,
       hasInternalClipboard: false,
@@ -4165,6 +4215,28 @@ describe('Canvas package consumer imports', () => {
       clipboard: null,
       hasInternalClipboard: false,
     })).toBe('none')
+    expect(clipboardPasteRunResult).toEqual({
+      attemptedActions: [
+        {
+          kind: 'clipboard-text',
+          source: 'plain',
+        },
+        clipboardPasteImageAction,
+      ],
+      consumed: true,
+      consumedAction: clipboardPasteImageAction,
+      consumedActionIndex: 1,
+    })
+    expect(stageDropRunResult).toEqual({
+      attemptedActions: [stageDropMediaAction],
+      consumed: true,
+      consumedAction: stageDropMediaAction,
+      consumedActionIndex: 0,
+    })
+    expect(dataTransferImportConsumedEvents).toEqual([
+      'paste:clipboard-image',
+      'drop:stage-drop-media',
+    ])
     const clipboardRect: CanvasItem = {
       fill: '#fff',
       h: 80,

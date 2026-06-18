@@ -338,7 +338,13 @@ export {
 } from './affordances/commands/CanvasStandardCommandExecution'
 export {
   createCanvasDataTransferImportActionPlan,
+  runCanvasDataTransferImportActionPlan,
+  type CanvasDataTransferImportActionPlanConsumedResult,
   type CanvasDataTransferImportActionPlanInput,
+  type CanvasDataTransferImportActionPlanRunAction,
+  type CanvasDataTransferImportActionPlanRunInput,
+  type CanvasDataTransferImportActionPlanRunResult,
+  type CanvasDataTransferImportActionPlanUnconsumedResult,
   type CanvasDataTransferImportActionResolver,
   type CanvasDataTransferImportActionResolverMode,
   type CanvasDataTransferImportActionValue,
