@@ -390,7 +390,13 @@ export {
 } from './story-canvas'
 export {
   CANVAS_APP_TABLE_IMPORT_FEATURE_PACK_MANIFEST,
+  routeCanvasTableImportTargetReplace,
   useCanvasTableImport,
+  type CanvasTableImportSource,
+  type CanvasTableImportTargetReplaceIntent,
+  type CanvasTableImportTargetReplaceRoute,
+  type CanvasTableImportTargetReplaceRouteInput,
+  type CanvasTableImportTargetReplaceTarget,
   type CanvasTableImportInput,
 } from './table-import'
 export {

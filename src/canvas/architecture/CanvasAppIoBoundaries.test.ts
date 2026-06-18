@@ -87,6 +87,9 @@ describe('Canvas App IO boundaries', () => {
     const tableImportFile = getSourceFile(
       'src/canvas/app/feature-packs/table-import/CanvasTableImport.ts',
     )
+    const tableImportIndexFile = getSourceFile(
+      'src/canvas/app/feature-packs/table-import/index.ts',
+    )
     const hostTableFile = getSourceFile(
       'src/canvas/host/component/CanvasTableComponent.ts',
     )
@@ -106,6 +109,12 @@ describe('Canvas App IO boundaries', () => {
     expect(tableImportFile.source).toContain('FileReader')
     expect(tableImportFile.source).toContain('readAsText')
     expect(tableImportFile.source).toContain('createCanvasTableComponentItem')
+    expect(tableImportFile.source).toContain(
+      'export function routeCanvasTableImportTargetReplace',
+    )
+    expect(tableImportIndexFile.source).toContain(
+      'routeCanvasTableImportTargetReplace',
+    )
     expect(hostTableFile.source).toContain(
       'export function createCanvasTableComponentItem',
     )

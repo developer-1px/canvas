@@ -7,9 +7,11 @@ import {
   getCanvasTableInsertCenter,
   getCanvasTableSourceFromDataTransfer,
   getCanvasTableSourceFromHTML,
+  getCanvasTableSourceFromText,
   insertCanvasTableSource,
   normalizeCanvasTableRows,
   readCanvasTableFileSource,
+  routeCanvasTableImportTargetReplace,
 } from './CanvasTableImport'
 
 describe('CanvasTableImport', () => {
@@ -120,6 +122,37 @@ describe('CanvasTableImport', () => {
     })
   })
 
+  it('parses Markdown table clipboard text into import sources', () => {
+    expect(getCanvasTableSourceFromText(`
+      | Metric | Value |
+      | :--- | ---: |
+      | Users | 42 |
+      | Teams | 7 |
+    `, {
+      format: 'text-markdown',
+    })).toEqual({
+      format: 'text-markdown',
+      rows: [
+        ['Metric', 'Value'],
+        ['Users', '42'],
+        ['Teams', '7'],
+      ],
+    })
+    expect(getCanvasTableSourceFromDataTransfer({
+      getData: vi.fn((type: string) =>
+        type === 'text/plain'
+          ? '| Metric | Value |\n| --- | --- |\n| Users | 42 |'
+          : '',
+      ),
+    } as unknown as DataTransfer)).toEqual({
+      format: 'text-markdown',
+      rows: [
+        ['Metric', 'Value'],
+        ['Users', '42'],
+      ],
+    })
+  })
+
   it('ignores HTML that is not a useful table', () => {
     expect(getCanvasTableSourceFromHTML('<p>hello</p>')).toBeNull()
     expect(getCanvasTableSourceFromHTML('<table><tr><td>One</td></tr></table>'))
@@ -143,6 +176,129 @@ describe('CanvasTableImport', () => {
       ['Drafts', 'two ho', 'thirty'],
     ])
     expect(getCanvasTableColumnCount(rows)).toBe(3)
+  })
+
+  it('routes selected table-like targets to rows replacement intent', () => {
+    const sources = [
+      getCanvasTableSourceFromText('Metric\tValue\nUsers\t42', {
+        format: 'text-tsv',
+      })!,
+      getCanvasTableSourceFromText('Name,Owner\nImport,Mina', {
+        format: 'text-csv',
+      })!,
+      getCanvasTableSourceFromHTML(
+        '<table><tr><th>A</th><th>B</th></tr><tr><td>1</td><td>2</td></tr></table>',
+      )!,
+      getCanvasTableSourceFromText(
+        '| Phase | Owner |\n| --- | --- |\n| Import | Mina |',
+        { format: 'text-markdown' },
+      )!,
+    ]
+    const getTarget = vi.fn(({ selection }) => ({
+      id: selection[0] ?? 'table-1',
+      selection,
+    }))
+
+    for (const source of sources) {
+      const route = routeCanvasTableImportTargetReplace({
+        getTarget,
+        selection: ['table-1'],
+        source,
+      })
+
+      expect(route).toMatchObject({
+        intent: {
+          kind: 'table-rows-replace',
+          rows: source.rows,
+          source,
+          target: {
+            id: 'table-1',
+            selection: ['table-1'],
+          },
+        },
+        kind: 'table-rows-replace',
+        rows: source.rows,
+        status: 'routed',
+      })
+      expect(Object.isFrozen(route)).toBe(true)
+    }
+  })
+
+  it('falls back to table insertion when no table target is available', () => {
+    const source = getCanvasTableSourceFromText('Metric,Value\nUsers,42', {
+      format: 'text-csv',
+    })!
+    const route = routeCanvasTableImportTargetReplace({
+      getTarget: () => null,
+      selection: [],
+      source,
+    })
+
+    expect(route).toEqual({
+      kind: 'table-insert',
+      reason: 'no-target',
+      rows: source.rows,
+      source,
+      status: 'fallback',
+    })
+    expect(Object.isFrozen(route)).toBe(true)
+  })
+
+  it('lets hosts disable or normalize table replacement before target lookup', () => {
+    const source = getCanvasTableSourceFromText('A,B\n1,2\n3,4', {
+      format: 'text-csv',
+    })!
+    const getTarget = vi.fn(() => ({
+      id: 'table-1',
+      selection: ['table-1'],
+    }))
+
+    expect(routeCanvasTableImportTargetReplace({
+      disabled: true,
+      getTarget,
+      selection: ['table-1'],
+      source,
+    })).toEqual({
+      kind: 'table-insert',
+      reason: 'disabled',
+      rows: source.rows,
+      source,
+      status: 'fallback',
+    })
+    expect(routeCanvasTableImportTargetReplace({
+      getTarget,
+      normalizeRows: () => [],
+      selection: ['table-1'],
+      source,
+    })).toEqual({
+      kind: 'table-insert',
+      reason: 'empty-source',
+      rows: [],
+      source,
+      status: 'fallback',
+    })
+    expect(routeCanvasTableImportTargetReplace({
+      getTarget,
+      normalizeRows: ({ source }) => normalizeCanvasTableRows(source.rows, {
+        maxRows: 2,
+      }),
+      selection: ['table-1'],
+      source,
+    })).toMatchObject({
+      intent: {
+        rows: [
+          ['A', 'B'],
+          ['1', '2'],
+        ],
+      },
+      kind: 'table-rows-replace',
+      rows: [
+        ['A', 'B'],
+        ['1', '2'],
+      ],
+      status: 'routed',
+    })
+    expect(getTarget).toHaveBeenCalledTimes(1)
   })
 
   it('pads rows and applies fallback rows when normalized rows are empty', () => {

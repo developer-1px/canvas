@@ -35,6 +35,7 @@ import {
   createCanvasPlainTextPasteSource,
   routeCanvasImagePasteReplace,
   routeCanvasMediaSourceObjectHyperlink,
+  routeCanvasTableImportTargetReplace,
   routeCanvasTextPasteReplace,
   createCanvasAppFeaturePackViewRenderers,
   createCanvasAppViewFeaturePack,
@@ -167,6 +168,7 @@ import {
   type CanvasStoryCanvasFeaturePackManifestsInput,
   type CanvasImagePasteReplaceRoute,
   type CanvasMediaObjectHyperlinkRoute,
+  type CanvasTableImportTargetReplaceRoute,
   type CanvasTextPasteReplaceRoute,
   type CanvasAppCustomItemModule,
   type CanvasAppCustomItemRenderKeyStrategy,
@@ -1613,6 +1615,12 @@ describe('Canvas package consumer imports', () => {
       .toBeTypeOf('function')
     expect(CanvasPackage.routeCanvasMediaSourceObjectHyperlink)
       .toBeTypeOf('function')
+    expect(CanvasAppAuthoring.routeCanvasTableImportTargetReplace)
+      .toBeTypeOf('function')
+    expect(CanvasAppFacade.routeCanvasTableImportTargetReplace)
+      .toBeTypeOf('function')
+    expect(CanvasPackage.routeCanvasTableImportTargetReplace)
+      .toBeTypeOf('function')
     expect(CanvasAppAuthoring.routeCanvasTextPasteReplace)
       .toBeTypeOf('function')
     expect(CanvasAppFacade.routeCanvasTextPasteReplace)
@@ -2025,6 +2033,37 @@ describe('Canvas package consumer imports', () => {
       kind: 'text-replace',
       status: 'routed',
       text: 'Consumer text',
+    })
+    const tableImportTargetReplaceRoute: CanvasTableImportTargetReplaceRoute =
+      routeCanvasTableImportTargetReplace({
+        getTarget: ({ selection }) => ({
+          id: selection[0] ?? 'consumer-table-one',
+          selection,
+        }),
+        selection: ['consumer-table-one'],
+        source: {
+          format: 'text-tsv',
+          rows: [
+            ['Metric', 'Value'],
+            ['Users', '42'],
+          ],
+        },
+      })
+
+    expect(tableImportTargetReplaceRoute).toMatchObject({
+      intent: {
+        kind: 'table-rows-replace',
+        rows: [
+          ['Metric', 'Value'],
+          ['Users', '42'],
+        ],
+        target: {
+          id: 'consumer-table-one',
+          selection: ['consumer-table-one'],
+        },
+      },
+      kind: 'table-rows-replace',
+      status: 'routed',
     })
     expect(downloadCanvasBlobFile({
       blob: new Blob(['smoke']),

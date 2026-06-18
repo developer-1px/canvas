@@ -16,6 +16,7 @@ import type { CanvasAppStageElement } from '../../rendering/stage/CanvasAppStage
 import type { CommitCanvasItemsChange } from '../../workflow/CanvasWorkflowContract'
 
 export type CanvasTableImportFormat =
+  | 'text-markdown'
   | 'text-csv'
   | 'text-delimited'
   | 'text-html'
@@ -33,6 +34,61 @@ export type CanvasTableRowsNormalizationOptions = {
   maxColumns?: number
   maxRows?: number
 }
+
+export type CanvasTableImportTargetReplaceTarget = Readonly<{
+  id: string
+  selection: readonly string[]
+}>
+
+export type CanvasTableImportTargetReplaceTargetInput = Readonly<{
+  rows: readonly (readonly string[])[]
+  selection: readonly string[]
+  source: CanvasTableImportSource
+}>
+
+export type CanvasTableImportTargetReplaceIntent = Readonly<{
+  kind: 'table-rows-replace'
+  rows: readonly (readonly string[])[]
+  source: CanvasTableImportSource
+  target: CanvasTableImportTargetReplaceTarget
+}>
+
+export type CanvasTableImportTargetReplaceRoute =
+  | CanvasTableImportTargetReplaceFallbackRoute
+  | CanvasTableImportTargetReplaceRoutedRoute
+
+export type CanvasTableImportTargetReplaceRoutedRoute = Readonly<{
+  intent: CanvasTableImportTargetReplaceIntent
+  kind: 'table-rows-replace'
+  rows: readonly (readonly string[])[]
+  source: CanvasTableImportSource
+  status: 'routed'
+}>
+
+export type CanvasTableImportTargetReplaceFallbackReason =
+  | 'disabled'
+  | 'empty-source'
+  | 'no-target'
+
+export type CanvasTableImportTargetReplaceFallbackRoute = Readonly<{
+  kind: 'table-insert'
+  reason: CanvasTableImportTargetReplaceFallbackReason
+  rows: readonly (readonly string[])[]
+  source: CanvasTableImportSource
+  status: 'fallback'
+}>
+
+export type CanvasTableImportTargetReplaceRouteInput = Readonly<{
+  disabled?: boolean
+  getTarget: (
+    input: CanvasTableImportTargetReplaceTargetInput
+  ) => CanvasTableImportTargetReplaceTarget | null
+  normalizeRows?: (
+    input: Readonly<{ source: CanvasTableImportSource }>
+  ) => readonly (readonly string[])[] | null
+  selection: readonly string[]
+  source: CanvasTableImportSource
+}>
 
 export type CanvasTableInsertionContext = {
   commitItemsChange: CommitCanvasItemsChange
@@ -86,6 +142,60 @@ export function insertCanvasTableSource({
       after: [item.id],
     },
   )
+}
+
+export function routeCanvasTableImportTargetReplace({
+  disabled = false,
+  getTarget,
+  normalizeRows = ({ source }) => source.rows,
+  selection,
+  source,
+}: CanvasTableImportTargetReplaceRouteInput):
+  CanvasTableImportTargetReplaceRoute {
+  const rows = normalizeRows({ source }) ?? []
+
+  if (disabled) {
+    return createCanvasTableImportTargetReplaceFallbackRoute({
+      reason: 'disabled',
+      rows,
+      source,
+    })
+  }
+
+  if (!isCanvasTableImportRows(rows)) {
+    return createCanvasTableImportTargetReplaceFallbackRoute({
+      reason: 'empty-source',
+      rows,
+      source,
+    })
+  }
+
+  const target = getTarget({
+    rows,
+    selection,
+    source,
+  })
+
+  if (!target) {
+    return createCanvasTableImportTargetReplaceFallbackRoute({
+      reason: 'no-target',
+      rows,
+      source,
+    })
+  }
+
+  return Object.freeze({
+    intent: Object.freeze({
+      kind: 'table-rows-replace',
+      rows,
+      source,
+      target,
+    }),
+    kind: 'table-rows-replace',
+    rows,
+    source,
+    status: 'routed',
+  })
 }
 
 export function getCanvasTableInsertCenter({
@@ -191,7 +301,9 @@ export function getCanvasTableSourceFromDataTransfer(
   }
 
   return getCanvasTableSourceFromText(dataTransfer.getData('text/plain'), {
-    format: 'text-delimited',
+    format: getCanvasTablePlainTextImportFormat(
+      dataTransfer.getData('text/plain'),
+    ),
   })
 }
 
@@ -292,6 +404,24 @@ function getCanvasTableImportTitle({ name }: CanvasTableImportSource) {
   return name.replace(/\.[^.]+$/, '') || 'Table'
 }
 
+function createCanvasTableImportTargetReplaceFallbackRoute({
+  reason,
+  rows,
+  source,
+}: {
+  reason: CanvasTableImportTargetReplaceFallbackReason
+  rows: readonly (readonly string[])[]
+  source: CanvasTableImportSource
+}): CanvasTableImportTargetReplaceFallbackRoute {
+  return Object.freeze({
+    kind: 'table-insert',
+    reason,
+    rows,
+    source,
+    status: 'fallback',
+  })
+}
+
 function isCanvasTableCsvFile(file: Blob & { name?: string }) {
   const mimeType = file.type.toLowerCase()
   const name = file.name?.toLowerCase() ?? ''
@@ -366,6 +496,21 @@ function parseCanvasTableTextRows(
   text: string,
   format?: CanvasTableImportFormat,
 ) {
+  if (
+    format === 'text-markdown' ||
+    (
+      format !== 'text-csv' &&
+      format !== 'text-tsv' &&
+      isCanvasMarkdownTableText(text)
+    )
+  ) {
+    const markdownRows = parseCanvasMarkdownTableRows(text)
+
+    if (markdownRows.length > 0) {
+      return markdownRows
+    }
+  }
+
   const delimiter = format === 'text-tsv'
     ? '\t'
     : format === 'text-csv'
@@ -378,6 +523,55 @@ function parseCanvasTableTextRows(
   return rows
     .map((row) => row.map((cell) => cell.trim()))
     .filter((row) => row.some((cell) => cell.length > 0))
+}
+
+function getCanvasTablePlainTextImportFormat(
+  text: string,
+): CanvasTableImportFormat {
+  return isCanvasMarkdownTableText(text) ? 'text-markdown' : 'text-delimited'
+}
+
+function isCanvasMarkdownTableText(text: string) {
+  return text
+    .trim()
+    .split(/\r?\n/)
+    .filter((line) => line.trim().length > 0)
+    .some((line) => line.includes('|'))
+}
+
+function parseCanvasMarkdownTableRows(text: string) {
+  const lines = text
+    .trim()
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0)
+  const rows: string[][] = []
+
+  for (const line of lines) {
+    if (!line.includes('|')) {
+      return []
+    }
+
+    const cells = line
+      .replace(/^\|/, '')
+      .replace(/\|$/, '')
+      .split('|')
+      .map((cell) => cell.trim())
+
+    if (cells.length < 2) {
+      return []
+    }
+
+    if (!isCanvasMarkdownTableDividerRow(cells)) {
+      rows.push(cells)
+    }
+  }
+
+  return rows
+}
+
+function isCanvasMarkdownTableDividerRow(cells: readonly string[]) {
+  return cells.every((cell) => /^:?-{3,}:?$/.test(cell.trim()))
 }
 
 function parseCanvasDelimitedRows(text: string, delimiter: string) {

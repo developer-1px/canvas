@@ -262,6 +262,7 @@ export {
   getCanvasAppEnabledFeaturePackManifests,
   routeCanvasImagePasteReplace,
   routeCanvasMediaSourceObjectHyperlink,
+  routeCanvasTableImportTargetReplace,
   routeCanvasTextPasteReplace,
   createCanvasPlainTextPasteSource,
   getCanvasTextPasteSourceCandidatesFromDataTransfer,
@@ -465,6 +466,11 @@ export {
   type CanvasMediaObjectHyperlinkRouteInput,
   type CanvasMediaObjectHyperlinkTarget,
   type CanvasMediaObjectHyperlinkUpdateIntent,
+  type CanvasTableImportSource,
+  type CanvasTableImportTargetReplaceIntent,
+  type CanvasTableImportTargetReplaceRoute,
+  type CanvasTableImportTargetReplaceRouteInput,
+  type CanvasTableImportTargetReplaceTarget,
 } from '../feature-packs'
 export type {
   CanvasWorkspaceStorage,
