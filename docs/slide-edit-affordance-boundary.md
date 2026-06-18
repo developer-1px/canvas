@@ -370,6 +370,8 @@
 | Removal | `remove-object-hyperlink` clears action metadata through a host command effect |
 | Metadata | `data-slide-object-hyperlink` carries `none` or a JSON string for normalized action metadata |
 | URL policy | default allowed schemes are `https`, `http`, and `mailto`; hosts can override allowed schemes |
+| JSON candidates | custom MIME, `application/json`, `text/json`, and `text/plain` are checked in order |
+| JSON payloads | generic JSON requires `objectHyperlink`, `hyperlink`, or `link`; custom MIME may carry a direct URL string, `url`, `href`, or `value`; `null`, `false`, and empty wrapped values remove the hyperlink |
 | Scope | mutates existing slide object action metadata, not link-preview import or media insertion |
 | Runtime | stage, thumbnail, presentation, inspector, and export can read the same metadata value |
 
