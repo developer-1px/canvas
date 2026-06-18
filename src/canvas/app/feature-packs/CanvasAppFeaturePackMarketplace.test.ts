@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   getCanvasAppFeaturePackMarketplacePrimaryActionDiagnostic,
   getCanvasAppFeaturePackMarketplacePrimaryAction,
+  getCanvasAppFeaturePackMarketplaceSectionPrimaryActionDiagnosticModel,
   getCanvasAppFeaturePackMarketplaceSectionFacetItems,
   getCanvasAppFeaturePackMarketplaceModel,
 } from './CanvasAppFeaturePackMarketplace'
@@ -239,6 +240,27 @@ describe('CanvasAppFeaturePackMarketplace', () => {
       totalBlockedReasonCount: 1,
     })
     expect(Object.isFrozen(addonPackPrimaryActionDiagnostic)).toBe(true)
+    const packSectionPrimaryActionDiagnosticModel =
+      getCanvasAppFeaturePackMarketplaceSectionPrimaryActionDiagnosticModel(
+        packSection,
+      )
+
+    expect(packSectionPrimaryActionDiagnosticModel.all.map((diagnostic) =>
+      diagnostic.actionKind
+    )).toEqual(['disable', 'install'])
+    expect(packSectionPrimaryActionDiagnosticModel.ready.map((diagnostic) =>
+      diagnostic.changedFeaturePackIds,
+    )).toEqual([])
+    expect(packSectionPrimaryActionDiagnosticModel.blocked.map((diagnostic) =>
+      diagnostic.changedFeaturePackIds,
+    )).toEqual([['runtime-pack'], ['addon-pack']])
+    expect(Object.isFrozen(packSectionPrimaryActionDiagnosticModel)).toBe(true)
+    expect(Object.isFrozen(packSectionPrimaryActionDiagnosticModel.all))
+      .toBe(true)
+    expect(Object.isFrozen(packSectionPrimaryActionDiagnosticModel.ready))
+      .toBe(true)
+    expect(Object.isFrozen(packSectionPrimaryActionDiagnosticModel.blocked))
+      .toBe(true)
     expect(getCanvasAppFeaturePackMarketplaceSectionFacetItems({
       facetKind: 'active',
       section: profileSection,

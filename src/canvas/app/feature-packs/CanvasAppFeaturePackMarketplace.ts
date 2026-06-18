@@ -182,6 +182,13 @@ export type CanvasAppFeaturePackMarketplacePrimaryActionDiagnostic =
     totalBlockedReasonCount: number
   }>
 
+export type CanvasAppFeaturePackMarketplaceSectionPrimaryActionDiagnosticModel =
+  Readonly<{
+    all: readonly CanvasAppFeaturePackMarketplacePrimaryActionDiagnostic[]
+    blocked: readonly CanvasAppFeaturePackMarketplacePrimaryActionDiagnostic[]
+    ready: readonly CanvasAppFeaturePackMarketplacePrimaryActionDiagnostic[]
+  }>
+
 export type CanvasAppFeaturePackMarketplaceActionSectionSummary =
   Readonly<{
     blockedActionCount: number
@@ -385,6 +392,23 @@ export function getCanvasAppFeaturePackMarketplacePrimaryActionDiagnostic(
   })
 }
 
+export function getCanvasAppFeaturePackMarketplaceSectionPrimaryActionDiagnosticModel(
+  section: CanvasAppFeaturePackMarketplaceSection,
+): CanvasAppFeaturePackMarketplaceSectionPrimaryActionDiagnosticModel {
+  const items: readonly CanvasAppFeaturePackMarketplaceItem[] = section.items
+  const all = Object.freeze(items.map((item) =>
+    getCanvasAppFeaturePackMarketplacePrimaryActionDiagnostic(item)
+  ))
+
+  return Object.freeze({
+    all,
+    blocked: Object.freeze(all.filter(
+      isCanvasAppFeaturePackMarketplaceBlockedPrimaryActionDiagnostic,
+    )),
+    ready: Object.freeze(all.filter((diagnostic) => diagnostic.ready)),
+  })
+}
+
 function getCanvasAppFeaturePackMarketplaceProfileSectionSummary(
   items: readonly CanvasAppFeaturePackProfileMarketplaceActionItem[],
 ): CanvasAppFeaturePackMarketplaceProfileSectionSummary {
@@ -445,6 +469,12 @@ function getCanvasAppFeaturePackMarketplaceActionSectionSummary(
     ).length,
     readyActionCount: actions.filter((action) => action.ready).length,
   })
+}
+
+function isCanvasAppFeaturePackMarketplaceBlockedPrimaryActionDiagnostic(
+  diagnostic: CanvasAppFeaturePackMarketplacePrimaryActionDiagnostic,
+) {
+  return diagnostic.applicable && diagnostic.status === 'blocked'
 }
 
 function isCanvasAppFeaturePackMarketplaceProfileSectionFacetItemsInput(
