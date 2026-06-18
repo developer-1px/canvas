@@ -1424,6 +1424,8 @@ describe('Canvas package consumer imports', () => {
       .toEqual(['smoke-partial-pack'])
     expect(featurePackMarketplaceActionAssemblyPlan.partialUpdateSurfaceIds)
       .toEqual(['overlay'])
+    expect(featurePackMarketplaceActionAssemblyPlan.uninstallPolicyEntries)
+      .toEqual([])
     expect(featurePackMarketplaceActionAssemblyPlan.assemblyInput)
       .toEqual(featurePackMarketplaceAppliedAssemblyInput)
     expect(featurePackMarketplaceAppliedAssemblyInput.featurePackStates)
@@ -1452,6 +1454,8 @@ describe('Canvas package consumer imports', () => {
       .toBe('partial-update')
     expect(featurePackMarketplaceAssemblyApplyPlan.assemblyInput)
       .toEqual(featurePackMarketplaceAssemblyAppliedInput)
+    expect(featurePackMarketplaceAssemblyApplyPlan.uninstallPolicyEntries)
+      .toEqual([])
     expect(featurePackMarketplaceAssemblyApplyResult.status).toBe('ready')
     if (featurePackMarketplaceAssemblyApplyResult.status !== 'ready') {
       throw new Error('Expected ready feature pack marketplace apply result')
@@ -1461,6 +1465,8 @@ describe('Canvas package consumer imports', () => {
       .toBe('partial-update')
     expect(featurePackMarketplaceAssemblyApplyResult.nextModel.assemblyInput)
       .toEqual(featurePackMarketplaceAssemblyAppliedInput)
+    expect(featurePackMarketplaceAssemblyApplyResult.uninstallPolicyEntries)
+      .toEqual([])
     expect(featurePackMarketplaceAssemblyApplyResult.nextModel.marketplaceModel
       .packs.items[0]?.status).toBe('disabled')
     expect(featurePackMarketplaceAssemblyAppliedInput.featurePackStates)

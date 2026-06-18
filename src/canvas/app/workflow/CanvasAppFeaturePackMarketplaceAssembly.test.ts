@@ -273,6 +273,86 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
       })
   })
 
+  it('carries uninstall data policy through ready apply plans', () => {
+    const addonManifest = createCanvasAppFeaturePackManifest({
+      id: 'addon-pack',
+      label: 'Addon pack',
+      lifecycle: {
+        orphanedDataPolicy: 'remove',
+      },
+    })
+    const model = getCanvasAppFeaturePackMarketplaceAssemblyModel({
+      assemblyInput: {
+        featurePackManifests: [addonManifest],
+      },
+      profiles: [],
+      suiteManifests: [],
+    })
+    const addonItem = model.marketplaceModel.packs.items[0]
+
+    if (!addonItem) {
+      throw new Error('Expected addon pack item')
+    }
+
+    const uninstallAction = addonItem.actions.find((action) =>
+      action.kind === 'uninstall',
+    )
+
+    if (!uninstallAction) {
+      throw new Error('Expected uninstall action')
+    }
+
+    const actionPlan = getCanvasAppFeaturePackMarketplaceAssemblyActionPlan({
+      action: uninstallAction,
+      model,
+    })
+    const applyPlan = getCanvasAppFeaturePackMarketplaceAssemblyApplyPlan({
+      action: uninstallAction,
+      model,
+    })
+    const applyResult = getCanvasAppFeaturePackMarketplaceAssemblyApplyResult({
+      action: uninstallAction,
+      model,
+    })
+
+    expect(uninstallAction.ready).toBe(true)
+    expect(actionPlan).toMatchObject({
+      actionKind: 'uninstall',
+      status: 'ready',
+      uninstallPolicyEntries: [{
+        featurePackId: 'addon-pack',
+        orphanedDataPolicy: 'remove',
+      }],
+    })
+    expect(applyPlan).toMatchObject({
+      actionKind: 'uninstall',
+      status: 'ready',
+      uninstallPolicyEntries: [{
+        featurePackId: 'addon-pack',
+        orphanedDataPolicy: 'remove',
+      }],
+      updateMode: 'full-rebuild',
+    })
+    expect(applyResult).toMatchObject({
+      actionKind: 'uninstall',
+      status: 'ready',
+      uninstallPolicyEntries: [{
+        featurePackId: 'addon-pack',
+        orphanedDataPolicy: 'remove',
+      }],
+      updateMode: 'full-rebuild',
+    })
+
+    if (applyResult.status !== 'ready') {
+      throw new Error('Expected ready apply result')
+    }
+
+    expect(applyResult.nextModel.assemblyInput.featurePackStates).toEqual([{
+      id: 'addon-pack',
+      status: 'uninstalled',
+    }])
+  })
+
   it('applies suite marketplace actions from the assembly model', () => {
     const runtimeManifest = createCanvasAppFeaturePackManifest({
       id: 'runtime-pack',
@@ -335,6 +415,88 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
       'addon-pack',
     ])
     expect(assembly.enabledFeaturePackIds).toEqual([])
+  })
+
+  it('keeps uninstall data policy on blocked apply plans', () => {
+    const runtimeManifest = createCanvasAppFeaturePackManifest({
+      id: 'runtime-pack',
+      label: 'Runtime pack',
+      lifecycle: {
+        orphanedDataPolicy: 'host-managed',
+      },
+      provides: ['runtime-capability'],
+    })
+    const addonManifest = createCanvasAppFeaturePackManifest({
+      id: 'addon-pack',
+      label: 'Addon pack',
+      requires: ['runtime-capability'],
+    })
+    const model = getCanvasAppFeaturePackMarketplaceAssemblyModel({
+      assemblyInput: {
+        featurePackManifests: [runtimeManifest, addonManifest],
+      },
+      profiles: [],
+      suiteManifests: [],
+    })
+    const runtimeItem = model.marketplaceModel.packs.items[0]
+
+    if (!runtimeItem) {
+      throw new Error('Expected runtime pack item')
+    }
+
+    const uninstallAction = runtimeItem.actions.find((action) =>
+      action.kind === 'uninstall',
+    )
+
+    if (!uninstallAction) {
+      throw new Error('Expected uninstall action')
+    }
+
+    const actionPlan = getCanvasAppFeaturePackMarketplaceAssemblyActionPlan({
+      action: uninstallAction,
+      model,
+    })
+    const applyPlan = getCanvasAppFeaturePackMarketplaceAssemblyApplyPlan({
+      action: uninstallAction,
+      model,
+    })
+    const applyResult = getCanvasAppFeaturePackMarketplaceAssemblyApplyResult({
+      action: uninstallAction,
+      model,
+    })
+    const policyEntries = [{
+      featurePackId: 'runtime-pack',
+      orphanedDataPolicy: 'host-managed',
+    }]
+
+    expect(uninstallAction.ready).toBe(false)
+    expect(uninstallAction.blockedReasons).toContainEqual({
+      dependentFeaturePackId: 'addon-pack',
+      featurePackId: 'runtime-pack',
+      kind: 'required-by-installed-pack',
+      requiredId: 'runtime-capability',
+    })
+    expect(actionPlan).toMatchObject({
+      actionKind: 'uninstall',
+      status: 'blocked',
+      uninstallPolicyEntries: policyEntries,
+    })
+    expect(applyPlan).toMatchObject({
+      actionKind: 'uninstall',
+      status: 'blocked',
+      uninstallPolicyEntries: policyEntries,
+      updateMode: 'blocked',
+    })
+    expect(applyResult).toMatchObject({
+      actionKind: 'uninstall',
+      currentModel: model,
+      status: 'blocked',
+      uninstallPolicyEntries: policyEntries,
+      updateMode: 'blocked',
+    })
+    expect('assemblyInput' in actionPlan).toBe(false)
+    expect('assemblyInput' in applyPlan).toBe(false)
+    expect('nextModel' in applyResult).toBe(false)
   })
 
   it('keeps blocked marketplace actions from changing assembly input', () => {

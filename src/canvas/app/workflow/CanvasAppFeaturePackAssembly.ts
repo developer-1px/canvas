@@ -74,6 +74,8 @@ export type CanvasAppFeaturePackMarketplaceActionAssemblyReadyPlan =
     partialUpdateSurfaceIds:
       CanvasAppFeaturePackMarketplacePrimaryAction['partialUpdateSurfaceIds']
     status: 'ready'
+    uninstallPolicyEntries:
+      CanvasAppFeaturePackMarketplacePrimaryAction['uninstallPolicyEntries']
   }>
 
 export type CanvasAppFeaturePackMarketplaceActionAssemblyBlockedPlan =
@@ -88,6 +90,8 @@ export type CanvasAppFeaturePackMarketplaceActionAssemblyBlockedPlan =
       CanvasAppFeaturePackMarketplacePrimaryAction['partialUpdateSurfaceIds']
     status: 'blocked'
     totalBlockedReasonCount: number
+    uninstallPolicyEntries:
+      CanvasAppFeaturePackMarketplacePrimaryAction['uninstallPolicyEntries']
   }>
 
 export type CanvasAppFeaturePackMarketplaceAssemblyModelInput = Readonly<{
@@ -390,6 +394,7 @@ export function getCanvasAppFeaturePackMarketplaceActionAssemblyPlan({
       status: 'blocked',
       totalBlockedReasonCount:
         blockedReasonCount + marketplaceBlockedReasonCount,
+      uninstallPolicyEntries: action.uninstallPolicyEntries,
     })
   }
 
@@ -403,6 +408,7 @@ export function getCanvasAppFeaturePackMarketplaceActionAssemblyPlan({
     changedFeaturePackIds: action.changedFeaturePackIds,
     partialUpdateSurfaceIds: action.partialUpdateSurfaceIds,
     status: 'ready',
+    uninstallPolicyEntries: action.uninstallPolicyEntries,
   })
 }
 
