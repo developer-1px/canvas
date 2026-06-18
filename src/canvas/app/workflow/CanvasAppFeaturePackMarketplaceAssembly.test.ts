@@ -12,6 +12,7 @@ import {
   executeCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan,
   executeCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan,
   getCanvasAppFeaturePackMarketplaceAssemblyApplyCommitPlan,
+  getCanvasAppFeaturePackMarketplaceAssemblyApplyCommitResult,
   getCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionSummary,
   getCanvasAppFeaturePackMarketplaceAssemblyApplyResult,
   getCanvasAppFeaturePackMarketplaceAssemblyApplyPlan,
@@ -551,6 +552,25 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
     }
 
     expect(commitPlan.nextModel).toBe(applyResult.nextModel)
+    const commitResult =
+      getCanvasAppFeaturePackMarketplaceAssemblyApplyCommitResult({
+        commitPlan,
+      })
+
+    expect(commitResult).toMatchObject({
+      actionKind: 'uninstall',
+      committed: true,
+      nextAssemblyInput: applyResult.nextModel.assemblyInput,
+      previousAssemblyInput: model.assemblyInput,
+      status: 'committed',
+      summary: {
+        status: 'completed',
+      },
+      updateMode: 'full-rebuild',
+    })
+    expect(commitResult.commitPlan).toBe(commitPlan)
+    expect(commitResult.previousModel).toBe(model)
+    expect(commitResult.nextModel).toBe(applyResult.nextModel)
 
     const needsHandlerExecutionPlan =
       createCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan({
@@ -611,6 +631,26 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
       },
     })
     expect('nextModel' in needsHandlerCommitPlan).toBe(false)
+    const needsHandlerCommitResult =
+      getCanvasAppFeaturePackMarketplaceAssemblyApplyCommitResult({
+        commitPlan: needsHandlerCommitPlan,
+      })
+
+    expect(needsHandlerCommitResult).toMatchObject({
+      actionKind: 'uninstall',
+      committed: false,
+      currentAssemblyInput: model.assemblyInput,
+      holdReason: 'needs-cleanup-handler',
+      status: 'held',
+      summary: {
+        status: 'needs-cleanup-handler',
+      },
+      updateMode: 'full-rebuild',
+    })
+    expect(needsHandlerCommitResult.commitPlan).toBe(needsHandlerCommitPlan)
+    expect(needsHandlerCommitResult.currentModel).toBe(model)
+    expect('nextModel' in needsHandlerCommitResult).toBe(false)
+    expect('nextAssemblyInput' in needsHandlerCommitResult).toBe(false)
 
     const cleanupError = new Error('cleanup failed')
     const failedApplyExecutionResult =
@@ -656,6 +696,23 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
       },
     })
     expect('nextAssemblyInput' in failedCommitPlan).toBe(false)
+    const failedCommitResult =
+      getCanvasAppFeaturePackMarketplaceAssemblyApplyCommitResult({
+        commitPlan: failedCommitPlan,
+      })
+
+    expect(failedCommitResult).toMatchObject({
+      committed: false,
+      holdReason: 'cleanup-failed',
+      status: 'held',
+      summary: {
+        status: 'cleanup-failed',
+      },
+      updateMode: 'full-rebuild',
+    })
+    expect(failedCommitResult.commitPlan).toBe(failedCommitPlan)
+    expect(failedCommitResult.currentModel).toBe(model)
+    expect('nextModel' in failedCommitResult).toBe(false)
   })
 
   it('keeps non-remove uninstall data out of cleanup effects', async () => {
@@ -1095,6 +1152,28 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
     })
     expect(commitPlan.executionResult).toBe(applyExecutionResult)
     expect('nextModel' in commitPlan).toBe(false)
+    const commitResult =
+      getCanvasAppFeaturePackMarketplaceAssemblyApplyCommitResult({
+        commitPlan,
+      })
+
+    expect(commitResult).toMatchObject({
+      actionKind: 'uninstall',
+      committed: false,
+      currentAssemblyInput: model.assemblyInput,
+      holdReason: 'blocked',
+      status: 'held',
+      summary: {
+        cleanup: {
+          status: 'not-run',
+        },
+        status: 'blocked',
+      },
+      updateMode: 'blocked',
+    })
+    expect(commitResult.commitPlan).toBe(commitPlan)
+    expect(commitResult.currentModel).toBe(model)
+    expect('nextAssemblyInput' in commitResult).toBe(false)
   })
 
   it('keeps blocked marketplace actions from changing assembly input', () => {

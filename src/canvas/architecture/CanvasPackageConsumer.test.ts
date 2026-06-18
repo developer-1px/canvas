@@ -41,6 +41,7 @@ import {
   executeCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan,
   executeCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan,
   getCanvasAppFeaturePackMarketplaceAssemblyApplyCommitPlan,
+  getCanvasAppFeaturePackMarketplaceAssemblyApplyCommitResult,
   getCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionSummary,
   getCanvasAppFeaturePackMarketplaceAssemblyApplyResult,
   getCanvasAppFeaturePackMarketplaceAssemblyApplyPlan,
@@ -201,6 +202,10 @@ import {
   type CanvasAppFeaturePackMarketplaceAssemblyApplyCommitPlan,
   type CanvasAppFeaturePackMarketplaceAssemblyApplyCommitPlanInput,
   type CanvasAppFeaturePackMarketplaceAssemblyApplyCommitPlanStatus,
+  type CanvasAppFeaturePackMarketplaceAssemblyApplyCommitResult,
+  type CanvasAppFeaturePackMarketplaceAssemblyApplyCommitResultInput,
+  type CanvasAppFeaturePackMarketplaceAssemblyApplyCommitResultStatus,
+  type CanvasAppFeaturePackMarketplaceAssemblyApplyCommittedResult,
   type CanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan,
   type CanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlanInput,
   type CanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlanStatus,
@@ -219,6 +224,7 @@ import {
   type CanvasAppFeaturePackMarketplaceAssemblyApplyPlan,
   type CanvasAppFeaturePackMarketplaceAssemblyApplyReadyExecutionPlan,
   type CanvasAppFeaturePackMarketplaceAssemblyApplyReadyCommitPlan,
+  type CanvasAppFeaturePackMarketplaceAssemblyApplyHeldCommitResult,
   type CanvasAppFeaturePackMarketplaceAssemblyApplyUpdateMode,
   type CanvasAppFeaturePackMarketplaceAssemblyModel,
   type CanvasAppFeaturePackMarketplaceAssemblyUninstallDataPlan,
@@ -1203,6 +1209,40 @@ describe('Canvas package consumer imports', () => {
         featurePackMarketplaceAssemblyApplyCommitPlan.canCommit
           ? null
           : featurePackMarketplaceAssemblyApplyCommitPlan
+    const featurePackMarketplaceAssemblyApplyCommitResultInput:
+      CanvasAppFeaturePackMarketplaceAssemblyApplyCommitResultInput<
+        SmokeUninstallCleanupEffect,
+        SmokeUninstallCleanupExecutionValue
+      > = {
+        commitPlan: featurePackMarketplaceAssemblyApplyCommitPlan,
+      }
+    const featurePackMarketplaceAssemblyApplyCommitResult:
+      CanvasAppFeaturePackMarketplaceAssemblyApplyCommitResult<
+        SmokeUninstallCleanupEffect,
+        SmokeUninstallCleanupExecutionValue
+      > =
+        getCanvasAppFeaturePackMarketplaceAssemblyApplyCommitResult(
+          featurePackMarketplaceAssemblyApplyCommitResultInput,
+        )
+    const featurePackMarketplaceAssemblyApplyCommitResultStatus:
+      CanvasAppFeaturePackMarketplaceAssemblyApplyCommitResultStatus =
+        featurePackMarketplaceAssemblyApplyCommitResult.status
+    const featurePackMarketplaceAssemblyApplyCommittedResult:
+      CanvasAppFeaturePackMarketplaceAssemblyApplyCommittedResult<
+        SmokeUninstallCleanupEffect,
+        SmokeUninstallCleanupExecutionValue
+      > | null =
+        featurePackMarketplaceAssemblyApplyCommitResult.committed
+          ? featurePackMarketplaceAssemblyApplyCommitResult
+          : null
+    const featurePackMarketplaceAssemblyApplyHeldCommitResult:
+      CanvasAppFeaturePackMarketplaceAssemblyApplyHeldCommitResult<
+        SmokeUninstallCleanupEffect,
+        SmokeUninstallCleanupExecutionValue
+      > | null =
+        featurePackMarketplaceAssemblyApplyCommitResult.committed
+          ? null
+          : featurePackMarketplaceAssemblyApplyCommitResult
     const featurePackMarketplaceAssemblyApplyReadyExecutionPlan:
       CanvasAppFeaturePackMarketplaceAssemblyApplyReadyExecutionPlan<
         SmokeUninstallCleanupEffect
@@ -1862,6 +1902,15 @@ describe('Canvas package consumer imports', () => {
     expect(CanvasAppAuthoring
       .getCanvasAppFeaturePackMarketplaceAssemblyApplyCommitPlan)
       .toBe(getCanvasAppFeaturePackMarketplaceAssemblyApplyCommitPlan)
+    expect(CanvasPackage
+      .getCanvasAppFeaturePackMarketplaceAssemblyApplyCommitResult)
+      .toBe(getCanvasAppFeaturePackMarketplaceAssemblyApplyCommitResult)
+    expect(CanvasAppFacade
+      .getCanvasAppFeaturePackMarketplaceAssemblyApplyCommitResult)
+      .toBe(getCanvasAppFeaturePackMarketplaceAssemblyApplyCommitResult)
+    expect(CanvasAppAuthoring
+      .getCanvasAppFeaturePackMarketplaceAssemblyApplyCommitResult)
+      .toBe(getCanvasAppFeaturePackMarketplaceAssemblyApplyCommitResult)
     expect(featurePackMarketplaceUninstallCleanupEffectPlanStatus)
       .toBe('ready')
     expect(featurePackMarketplaceUninstallCleanupEffectPlanExecutionStatus)
@@ -1927,6 +1976,27 @@ describe('Canvas package consumer imports', () => {
         updateMode: 'partial-update',
       })
     expect(featurePackMarketplaceAssemblyApplyCommitHoldPlan).toBeNull()
+    expect(featurePackMarketplaceAssemblyApplyCommitResultStatus)
+      .toBe('committed')
+    expect(featurePackMarketplaceAssemblyApplyCommittedResult)
+      .toMatchObject({
+        committed: true,
+        nextAssemblyInput: featurePackMarketplaceAssemblyAppliedInput,
+        previousAssemblyInput:
+          featurePackMarketplaceAssemblyModel.assemblyInput,
+        status: 'committed',
+        summary: {
+          status: 'completed',
+        },
+        updateMode: 'partial-update',
+      })
+    expect(featurePackMarketplaceAssemblyApplyCommittedResult?.commitPlan)
+      .toBe(featurePackMarketplaceAssemblyApplyCommitPlan)
+    expect(featurePackMarketplaceAssemblyApplyCommittedResult?.previousModel)
+      .toBe(featurePackMarketplaceAssemblyModel)
+    expect(featurePackMarketplaceAssemblyApplyCommittedResult?.nextModel)
+      .toBe(featurePackMarketplaceAssemblyApplyResult.nextModel)
+    expect(featurePackMarketplaceAssemblyApplyHeldCommitResult).toBeNull()
     expect(featurePackMarketplaceAssemblyApplyReadyExecutionPlan)
       .toMatchObject({
         actionKind: 'disable',

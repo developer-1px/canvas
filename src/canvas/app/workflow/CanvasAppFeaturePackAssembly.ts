@@ -364,6 +364,10 @@ export type CanvasAppFeaturePackMarketplaceAssemblyApplyCommitPlanStatus =
   | 'needs-cleanup-handler'
   | 'ready-to-commit'
 
+export type CanvasAppFeaturePackMarketplaceAssemblyApplyCommitResultStatus =
+  | 'committed'
+  | 'held'
+
 export type CanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlanInput<
   TEffect,
 > = Readonly<{
@@ -487,6 +491,27 @@ export type CanvasAppFeaturePackMarketplaceAssemblyApplyCommitPlan<
   >
   | CanvasAppFeaturePackMarketplaceAssemblyApplyReadyCommitPlan<TEffect, TResult>
 
+export type CanvasAppFeaturePackMarketplaceAssemblyApplyCommitResultInput<
+  TEffect,
+  TResult,
+> = Readonly<{
+  commitPlan:
+    CanvasAppFeaturePackMarketplaceAssemblyApplyCommitPlan<TEffect, TResult>
+}>
+
+export type CanvasAppFeaturePackMarketplaceAssemblyApplyCommitResult<
+  TEffect,
+  TResult,
+> =
+  | CanvasAppFeaturePackMarketplaceAssemblyApplyCommittedResult<
+    TEffect,
+    TResult
+  >
+  | CanvasAppFeaturePackMarketplaceAssemblyApplyHeldCommitResult<
+    TEffect,
+    TResult
+  >
+
 export type CanvasAppFeaturePackMarketplaceAssemblyApplyReadyCommitPlan<
   TEffect,
   TResult,
@@ -531,6 +556,48 @@ export type CanvasAppFeaturePackMarketplaceAssemblyApplyCommitHoldPlan<
     CanvasAppFeaturePackMarketplaceAssemblyApplyCommitPlanStatus,
     'ready-to-commit'
   >
+  summary: CanvasAppFeaturePackMarketplaceAssemblyApplyExecutionSummary
+  uninstallDataPlan: CanvasAppFeaturePackMarketplaceAssemblyUninstallDataPlan
+  updateMode: CanvasAppFeaturePackMarketplaceAssemblyApplyUpdateMode
+}>
+
+export type CanvasAppFeaturePackMarketplaceAssemblyApplyCommittedResult<
+  TEffect,
+  TResult,
+> = Readonly<{
+  actionKind: CanvasAppFeaturePackMarketplacePrimaryAction['kind']
+  commitPlan:
+    CanvasAppFeaturePackMarketplaceAssemblyApplyReadyCommitPlan<TEffect, TResult>
+  committed: true
+  nextAssemblyInput: CanvasAppFeaturePackAssemblyInput
+  nextModel: CanvasAppFeaturePackMarketplaceAssemblyModel
+  previousAssemblyInput: CanvasAppFeaturePackAssemblyInput
+  previousModel: CanvasAppFeaturePackMarketplaceAssemblyModel
+  status: 'committed'
+  summary: CanvasAppFeaturePackMarketplaceAssemblyApplyExecutionSummary
+  uninstallDataPlan: CanvasAppFeaturePackMarketplaceAssemblyUninstallDataPlan
+  updateMode: Exclude<
+    CanvasAppFeaturePackMarketplaceAssemblyApplyUpdateMode,
+    'blocked'
+  >
+}>
+
+export type CanvasAppFeaturePackMarketplaceAssemblyApplyHeldCommitResult<
+  TEffect,
+  TResult,
+> = Readonly<{
+  actionKind: CanvasAppFeaturePackMarketplacePrimaryAction['kind']
+  commitPlan:
+    CanvasAppFeaturePackMarketplaceAssemblyApplyCommitHoldPlan<TEffect, TResult>
+  committed: false
+  currentAssemblyInput: CanvasAppFeaturePackAssemblyInput
+  currentModel: CanvasAppFeaturePackMarketplaceAssemblyModel
+  holdReason:
+    CanvasAppFeaturePackMarketplaceAssemblyApplyCommitHoldPlan<
+      TEffect,
+      TResult
+    >['status']
+  status: 'held'
   summary: CanvasAppFeaturePackMarketplaceAssemblyApplyExecutionSummary
   uninstallDataPlan: CanvasAppFeaturePackMarketplaceAssemblyUninstallDataPlan
   updateMode: CanvasAppFeaturePackMarketplaceAssemblyApplyUpdateMode
@@ -1001,6 +1068,45 @@ export function getCanvasAppFeaturePackMarketplaceAssemblyApplyCommitPlan<
     summary,
     uninstallDataPlan: executionResult.uninstallDataPlan,
     updateMode: executionResult.updateMode,
+  })
+}
+
+export function getCanvasAppFeaturePackMarketplaceAssemblyApplyCommitResult<
+  TEffect,
+  TResult,
+>({
+  commitPlan,
+}: CanvasAppFeaturePackMarketplaceAssemblyApplyCommitResultInput<
+  TEffect,
+  TResult
+>): CanvasAppFeaturePackMarketplaceAssemblyApplyCommitResult<TEffect, TResult> {
+  if (commitPlan.canCommit) {
+    return Object.freeze({
+      actionKind: commitPlan.actionKind,
+      commitPlan,
+      committed: true,
+      nextAssemblyInput: commitPlan.nextAssemblyInput,
+      nextModel: commitPlan.nextModel,
+      previousAssemblyInput: commitPlan.currentModel.assemblyInput,
+      previousModel: commitPlan.currentModel,
+      status: 'committed',
+      summary: commitPlan.summary,
+      uninstallDataPlan: commitPlan.uninstallDataPlan,
+      updateMode: commitPlan.updateMode,
+    })
+  }
+
+  return Object.freeze({
+    actionKind: commitPlan.actionKind,
+    commitPlan,
+    committed: false,
+    currentAssemblyInput: commitPlan.currentModel.assemblyInput,
+    currentModel: commitPlan.currentModel,
+    holdReason: commitPlan.status,
+    status: 'held',
+    summary: commitPlan.summary,
+    uninstallDataPlan: commitPlan.uninstallDataPlan,
+    updateMode: commitPlan.updateMode,
   })
 }
 
