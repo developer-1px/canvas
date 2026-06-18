@@ -16,6 +16,10 @@ export type {
 export type {
   CanvasAppFeaturePackAssembly,
   CanvasAppFeaturePackAssemblyInput,
+  CanvasAppFeaturePackMarketplaceActionAssemblyInput,
+} from './CanvasAppFeaturePackAssembly'
+export {
+  getCanvasAppFeaturePackMarketplaceActionAssemblyInput,
 } from './CanvasAppFeaturePackAssembly'
 export {
   CANVAS_APP_COMMENT_ONLY_CAPABILITIES,

@@ -16,6 +16,7 @@ import {
   type CanvasAppFeaturePackId,
   type CanvasAppFeaturePackManifest,
   type CanvasAppFeaturePackInstallOptions,
+  type CanvasAppFeaturePackMarketplacePrimaryAction,
   type CanvasAppFeaturePackViewRenderers,
   type CanvasAppViewFeaturePack,
 } from '../feature-packs'
@@ -46,6 +47,11 @@ export type CanvasAppFeaturePackAssemblyInput = {
   featurePackViewRenderers?: CanvasAppFeaturePackViewRenderers
   viewFeaturePacks?: readonly CanvasAppViewFeaturePack[]
 }
+
+export type CanvasAppFeaturePackMarketplaceActionAssemblyInput = Readonly<{
+  action: CanvasAppFeaturePackMarketplacePrimaryAction
+  assemblyInput?: CanvasAppFeaturePackAssemblyInput
+}>
 
 export function createCanvasAppFeaturePackAssembly(
   input: CanvasAppFeaturePackAssemblyInput,
@@ -135,6 +141,23 @@ export function createCanvasAppFeaturePackAssembly(
   }
 
   return defaults
+}
+
+export function getCanvasAppFeaturePackMarketplaceActionAssemblyInput({
+  action,
+  assemblyInput = {},
+}: CanvasAppFeaturePackMarketplaceActionAssemblyInput):
+  CanvasAppFeaturePackAssemblyInput {
+  if (!action.ready) {
+    throw new Error(
+      `Canvas app feature pack marketplace action is not ready: ${action.kind}`,
+    )
+  }
+
+  return Object.freeze({
+    ...assemblyInput,
+    featurePackStates: action.installOptions.featurePackStates,
+  })
 }
 
 function getCanvasAppAssemblyFeaturePackManifests(

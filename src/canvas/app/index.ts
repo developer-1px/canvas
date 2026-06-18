@@ -386,8 +386,10 @@ export {
   assertCanvasAppAssembly,
   assertCanvasAppExtensionRecordKeys,
   createCanvasAppCustomItemModuleAssembly,
+  getCanvasAppFeaturePackMarketplaceActionAssemblyInput,
   type CanvasAppCustomItemModuleAssembly,
   type CanvasAppCustomItemModuleAssemblyOptions,
+  type CanvasAppFeaturePackMarketplaceActionAssemblyInput,
   useCanvasDevToolsAppModel,
   useCanvasAppModel,
 } from './workflow'

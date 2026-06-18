@@ -9,6 +9,10 @@ export type {
 export type {
   CanvasAppFeaturePackAssembly,
   CanvasAppFeaturePackAssemblyInput,
+  CanvasAppFeaturePackMarketplaceActionAssemblyInput,
+} from '../workflow/CanvasAppFeaturePackAssembly'
+export {
+  getCanvasAppFeaturePackMarketplaceActionAssemblyInput,
 } from '../workflow/CanvasAppFeaturePackAssembly'
 export type {
   CanvasAppStageExternalOverlaySlot,

@@ -7,6 +7,7 @@ import {
   DEFAULT_CANVAS_APP_ASSEMBLY,
   createCanvasAppAssembly,
   createCanvasAppComponentPresentationRenderers,
+  getCanvasAppFeaturePackMarketplaceActionAssemblyInput,
   defineCanvasAppCustomItemModule,
 } from './index'
 import {
@@ -19,6 +20,8 @@ import {
   createCanvasAppDomEditStyleFeaturePackManifest,
   createCanvasAppFeaturePack,
   createCanvasAppFeaturePackManifest,
+  getCanvasAppFeaturePackMarketplaceModel,
+  getCanvasAppFeaturePackMarketplacePrimaryAction,
   createCanvasAppFeaturePackProfile,
   createCanvasAppViewFeaturePack,
 } from '../feature-packs'
@@ -678,6 +681,89 @@ describe('CanvasAppAssembly seams', () => {
 
     expect(assembly.customCreationTools).toEqual([])
     expect(assembly.customItemValidators).toEqual({})
+  })
+
+  it('applies ready marketplace actions to feature pack assembly input', () => {
+    const statusManifest = createCanvasAppFeaturePackManifest({
+      extensionFeaturePack: createCanvasAppFeaturePack({
+        extensionBundle: createCanvasAppExtensionBundle({
+          customCommands: [{
+            id: 'status-pack-command',
+            label: 'Status pack',
+            run: () => undefined,
+            title: 'Status pack',
+          }],
+        }),
+        id: 'status-pack',
+        label: 'Status pack',
+      }),
+      id: 'status-pack',
+      label: 'Status pack',
+      lifecycle: {
+        partialUpdate: ['command'],
+        runtimeToggleable: true,
+      },
+    })
+    const marketplaceModel = getCanvasAppFeaturePackMarketplaceModel({
+      manifests: [statusManifest],
+    })
+    const primaryAction = getCanvasAppFeaturePackMarketplacePrimaryAction(
+      marketplaceModel.packs.items[0]!,
+    )
+    const assemblyInput = getCanvasAppFeaturePackMarketplaceActionAssemblyInput({
+      action: primaryAction,
+      assemblyInput: {
+        featurePackManifests: [statusManifest],
+      },
+    })
+    const assembly = createCanvasAppAssembly(assemblyInput)
+
+    expect(primaryAction.kind).toBe('disable')
+    expect(assemblyInput).toEqual({
+      featurePackManifests: [statusManifest],
+      featurePackStates: [{
+        id: 'status-pack',
+        status: 'disabled',
+      }],
+    })
+    expect(Object.isFrozen(assemblyInput)).toBe(true)
+    expect(assembly.installedFeaturePackIds).toEqual(['status-pack'])
+    expect(assembly.enabledFeaturePackIds).toEqual([])
+    expect(assembly.customCommands.map((command) => command.id)).toEqual([])
+  })
+
+  it('rejects blocked marketplace actions before assembly input is changed', () => {
+    const paidManifest = createCanvasAppFeaturePackManifest({
+      id: 'paid-pack',
+      label: 'Paid pack',
+    })
+    const marketplaceModel = getCanvasAppFeaturePackMarketplaceModel({
+      listings: [{
+        access: 'private',
+        distribution: 'available',
+        featurePackId: 'paid-pack',
+      }],
+      manifests: [paidManifest],
+      options: {
+        featurePackStates: [{
+          id: 'paid-pack',
+          status: 'uninstalled',
+        }],
+      },
+    })
+    const primaryAction = getCanvasAppFeaturePackMarketplacePrimaryAction(
+      marketplaceModel.packs.items[0]!,
+    )
+
+    expect(primaryAction.ready).toBe(false)
+    expect(() =>
+      getCanvasAppFeaturePackMarketplaceActionAssemblyInput({
+        action: primaryAction,
+        assemblyInput: {
+          featurePackManifests: [paidManifest],
+        },
+      })
+    ).toThrow('Canvas app feature pack marketplace action is not ready: install')
   })
 })
 
