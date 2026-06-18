@@ -11,6 +11,7 @@ import {
   createCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan,
   executeCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan,
   executeCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan,
+  getCanvasAppFeaturePackMarketplaceAssemblyApplyCommitPlan,
   getCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionSummary,
   getCanvasAppFeaturePackMarketplaceAssemblyApplyResult,
   getCanvasAppFeaturePackMarketplaceAssemblyApplyPlan,
@@ -528,6 +529,28 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
       totalBlockedReasonCount: 0,
       updateMode: 'full-rebuild',
     })
+    const commitPlan =
+      getCanvasAppFeaturePackMarketplaceAssemblyApplyCommitPlan({
+        executionResult: applyExecutionResult,
+      })
+
+    expect(commitPlan).toMatchObject({
+      actionKind: 'uninstall',
+      canCommit: true,
+      nextAssemblyInput: applyResult.nextModel.assemblyInput,
+      status: 'ready-to-commit',
+      summary: {
+        status: 'completed',
+      },
+      updateMode: 'full-rebuild',
+    })
+    expect(commitPlan.executionResult).toBe(applyExecutionResult)
+
+    if (!commitPlan.canCommit) {
+      throw new Error('Expected ready commit plan')
+    }
+
+    expect(commitPlan.nextModel).toBe(applyResult.nextModel)
 
     const needsHandlerExecutionPlan =
       createCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan({
@@ -572,6 +595,22 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
       },
       status: 'needs-cleanup-handler',
     })
+    const needsHandlerCommitPlan =
+      getCanvasAppFeaturePackMarketplaceAssemblyApplyCommitPlan({
+        executionResult: needsHandlerApplyExecutionResult,
+      })
+
+    expect(needsHandlerCommitPlan).toMatchObject({
+      canCommit: false,
+      status: 'needs-cleanup-handler',
+      summary: {
+        cleanup: {
+          missingHandlerScopeIds: ['addon-data'],
+        },
+        status: 'needs-cleanup-handler',
+      },
+    })
+    expect('nextModel' in needsHandlerCommitPlan).toBe(false)
 
     const cleanupError = new Error('cleanup failed')
     const failedApplyExecutionResult =
@@ -601,6 +640,22 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
       },
       status: 'cleanup-failed',
     })
+    const failedCommitPlan =
+      getCanvasAppFeaturePackMarketplaceAssemblyApplyCommitPlan({
+        executionResult: failedApplyExecutionResult,
+      })
+
+    expect(failedCommitPlan).toMatchObject({
+      canCommit: false,
+      status: 'cleanup-failed',
+      summary: {
+        cleanup: {
+          failedScopeIds: ['addon-data'],
+        },
+        status: 'cleanup-failed',
+      },
+    })
+    expect('nextAssemblyInput' in failedCommitPlan).toBe(false)
   })
 
   it('keeps non-remove uninstall data out of cleanup effects', async () => {
@@ -1021,6 +1076,25 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
       totalBlockedReasonCount: 1,
       updateMode: 'blocked',
     })
+    const commitPlan =
+      getCanvasAppFeaturePackMarketplaceAssemblyApplyCommitPlan({
+        executionResult: applyExecutionResult,
+      })
+
+    expect(commitPlan).toMatchObject({
+      actionKind: 'uninstall',
+      canCommit: false,
+      status: 'blocked',
+      summary: {
+        cleanup: {
+          status: 'not-run',
+        },
+        status: 'blocked',
+      },
+      updateMode: 'blocked',
+    })
+    expect(commitPlan.executionResult).toBe(applyExecutionResult)
+    expect('nextModel' in commitPlan).toBe(false)
   })
 
   it('keeps blocked marketplace actions from changing assembly input', () => {
