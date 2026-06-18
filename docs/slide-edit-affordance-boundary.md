@@ -349,6 +349,8 @@
 | Bounds | default bounds are `0..1000` with `1` step and `px` unit |
 | Metadata | `data-slide-object-corner-radius` carries the normalized value or `unsupported` |
 | Unsupported | non-rounded-shape selections can expose `isSupported: false` and reason `unsupported-shape` |
+| JSON candidates | custom MIME, `application/json`, `text/json`, and `text/plain` are checked in order |
+| JSON payloads | generic JSON requires `objectCornerRadius`, `shapeCornerRadius`, or `cornerRadius`; custom MIME may carry a direct number, numeric string, `cornerRadius`, `radius`, or `value` |
 | Mapping | host maps the value to DOM border radius, SVG radii, or another renderer-specific shape model |
 | Updates | selected object id and normalized corner radius value become host command effects |
 | Runtime | stage, thumbnail, presentation, inspector, and export can read the same metadata value |
