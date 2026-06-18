@@ -50,6 +50,7 @@ import {
   createCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan,
   createCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan,
   createCanvasStoryCanvasFeaturePackAssemblyInput,
+  executeCanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransaction,
   executeCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan,
   executeCanvasAppFeaturePackMarketplaceAssemblyItemApplyTransaction,
   executeCanvasAppFeaturePackMarketplaceAssemblyApplyTransaction,
@@ -241,6 +242,8 @@ import {
   type CanvasAppAssemblySourceFeaturePackMarketplaceHostUpdateHeldResult,
   type CanvasAppAssemblySourceFeaturePackMarketplaceHostUpdateInput,
   type CanvasAppAssemblySourceFeaturePackMarketplaceHostUpdateResult,
+  type CanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransactionInput,
+  type CanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransactionResult,
   type CanvasAppAssemblySourceValue,
   type CanvasAppPrebuiltAssemblySource,
   type CanvasAppCommitItemsChange,
@@ -475,6 +478,8 @@ import {
   runCanvasKeyboardToolIntent,
   type CanvasAppAssemblySourceFeaturePackMarketplaceHostUpdateResult
     as CanvasAppAssemblySourceFeaturePackMarketplaceHostUpdateResultFromApp,
+  type CanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransactionResult
+    as CanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransactionResultFromApp,
   type CanvasAppAssemblySource as CanvasAppAssemblySourceFromApp,
   type CanvasAppProps as CanvasAppPropsFromApp,
   type CanvasCommandPaletteKeyboardIntentInput,
@@ -1949,6 +1954,38 @@ describe('Canvas package consumer imports', () => {
           .applyCanvasAppAssemblySourceFeaturePackMarketplaceHostUpdate(
             shellMarketplaceHostUpdateSourceInput,
           )
+    const shellMarketplaceTargetSourceTransactionInput:
+      CanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransactionInput<
+        SmokeUninstallCleanupEffect,
+        SmokeUninstallCleanupExecutionValue
+      > = {
+        cleanupHandlers: [featurePackMarketplaceUninstallCleanupScopeHandler],
+        executeCleanupEffect:
+          featurePackMarketplaceUninstallCleanupEffectExecutor,
+        model: featurePackMarketplaceAssemblyModel,
+        source: shellPrebuiltSource,
+        target: {
+          featurePackId: 'smoke-partial-pack',
+          kind: 'pack',
+        },
+      }
+    const shellMarketplaceTargetSourceTransactionResult:
+      CanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransactionResult<
+        SmokeUninstallCleanupEffect,
+        SmokeUninstallCleanupExecutionValue
+      > =
+        await executeCanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransaction(
+          shellMarketplaceTargetSourceTransactionInput,
+        )
+    const shellSubpathMarketplaceTargetSourceTransactionResult:
+      CanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransactionResultFromApp<
+        SmokeUninstallCleanupEffect,
+        SmokeUninstallCleanupExecutionValue
+      > =
+        await CanvasAppFacade
+          .executeCanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransaction(
+            shellMarketplaceTargetSourceTransactionInput,
+          )
     const shellMarketplaceHostUpdateSourceAppliedResult:
       CanvasAppAssemblySourceFeaturePackMarketplaceHostUpdateAppliedResult<
         SmokeUninstallCleanupEffect,
@@ -2046,6 +2083,24 @@ describe('Canvas package consumer imports', () => {
       .toBe(applyCanvasAppAssemblySourceFeaturePackMarketplaceHostUpdate)
     expect(CanvasAppFacade.applyCanvasAppAssemblySourceFeaturePackMarketplaceHostUpdate)
       .toBe(applyCanvasAppAssemblySourceFeaturePackMarketplaceHostUpdate)
+    expect(shellMarketplaceTargetSourceTransactionResult.status)
+      .toBe('applied')
+    expect(shellMarketplaceTargetSourceTransactionResult.applied).toBe(true)
+    expect(shellMarketplaceTargetSourceTransactionResult.transactionResult.action)
+      .toBe(featurePackMarketplaceAssemblyTargetAction)
+    expect(shellMarketplaceTargetSourceTransactionResult.source)
+      .toEqual(shellMarketplaceHostUpdateSourceResult.source)
+    expect(shellMarketplaceTargetSourceTransactionResult.sourceResult.source)
+      .toEqual(shellMarketplaceHostUpdateSourceResult.source)
+    expect(shellMarketplaceTargetSourceTransactionResult.hostUpdate.update)
+      .toEqual(featurePackMarketplaceAssemblyApplyTransactionResult
+        .hostUpdate.update)
+    expect(shellSubpathMarketplaceTargetSourceTransactionResult.source)
+      .toEqual(shellMarketplaceTargetSourceTransactionResult.source)
+    expect(CanvasPackage.executeCanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransaction)
+      .toBe(executeCanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransaction)
+    expect(CanvasAppFacade.executeCanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransaction)
+      .toBe(executeCanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransaction)
     const entityItem: CanvasEntityItem = rect
 
     expect(entityItem.id).toBe('rect-1')

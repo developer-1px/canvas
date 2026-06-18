@@ -628,6 +628,7 @@ export {
 } from './rendering/stage/CanvasAppStageElement'
 export {
   applyCanvasAppAssemblySourceFeaturePackMarketplaceHostUpdate,
+  executeCanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransaction,
   type CanvasAppAssemblyInputSource,
   type CanvasAppAssemblyRequiredInputSource,
   type CanvasAppAssemblySource,
@@ -635,6 +636,10 @@ export {
   type CanvasAppAssemblySourceFeaturePackMarketplaceHostUpdateHeldResult,
   type CanvasAppAssemblySourceFeaturePackMarketplaceHostUpdateInput,
   type CanvasAppAssemblySourceFeaturePackMarketplaceHostUpdateResult,
+  type CanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransactionAppliedResult,
+  type CanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransactionHeldResult,
+  type CanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransactionInput,
+  type CanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransactionResult,
   type CanvasAppAssemblySourceValue,
   type CanvasAppPrebuiltAssemblySource,
 } from './shell/CanvasAppAssemblySource'

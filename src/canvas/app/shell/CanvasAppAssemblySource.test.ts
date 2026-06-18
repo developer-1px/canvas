@@ -11,6 +11,7 @@ import {
 } from '../feature-packs'
 import {
   applyCanvasAppAssemblySourceFeaturePackMarketplaceHostUpdate,
+  executeCanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransaction,
   resolveCanvasAppAssemblySource,
   type CanvasAppPrebuiltAssemblySource,
 } from './CanvasAppAssemblySource'
@@ -152,6 +153,61 @@ describe('CanvasAppAssemblySource', () => {
     }])
   })
 
+  it('executes ready marketplace target transactions as assembly input sources', async () => {
+    const addonManifest = createCanvasAppFeaturePackManifest({
+      id: 'shell-target-addon-pack',
+      label: 'Shell target addon pack',
+    })
+    const model = getCanvasAppFeaturePackMarketplaceAssemblyModel({
+      assemblyInput: {
+        featurePackManifests: [addonManifest],
+        featurePackStates: [{
+          id: 'shell-target-addon-pack',
+          status: 'uninstalled',
+        }],
+      },
+      profiles: [],
+      suiteManifests: [],
+    })
+    const sourceTransactionResult =
+      await executeCanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransaction({
+        executeCleanupEffect: () => ({ kind: 'not-run' as const }),
+        model,
+        target: {
+          featurePackId: 'shell-target-addon-pack',
+          kind: 'pack',
+        },
+      })
+
+    expect(sourceTransactionResult.status).toBe('applied')
+    expect(sourceTransactionResult.applied).toBe(true)
+    expect(sourceTransactionResult.actionKind).toBe('install')
+    expect(sourceTransactionResult.updateMode).toBe('full-rebuild')
+    expect(sourceTransactionResult.transactionResult.status).toBe('committed')
+    expect(sourceTransactionResult.sourceResult.status).toBe('applied')
+    expect(sourceTransactionResult.sourceResult.hostUpdate)
+      .toBe(sourceTransactionResult.transactionResult.hostUpdate)
+    expect(sourceTransactionResult.hostUpdate)
+      .toBe(sourceTransactionResult.transactionResult.hostUpdate)
+    expect(sourceTransactionResult.source).toEqual({
+      assemblyInput: sourceTransactionResult.transactionResult.hostUpdate
+        .nextAssemblyInput,
+    })
+    expect(Object.isFrozen(sourceTransactionResult)).toBe(true)
+    expect(Object.isFrozen(sourceTransactionResult.source)).toBe(true)
+
+    const nextAssembly =
+      resolveCanvasAppAssemblySource(sourceTransactionResult.source)
+
+    expect(nextAssembly.installedFeaturePackIds)
+      .toContain('shell-target-addon-pack')
+    expect(sourceTransactionResult.source.assemblyInput.featurePackStates)
+      .toEqual([{
+        id: 'shell-target-addon-pack',
+        status: 'disabled',
+      }])
+  })
+
   it('keeps current assembly input source for held marketplace host updates', async () => {
     const transactionResult = await getBlockedShellMarketplaceTransaction()
     const sourceResult =
@@ -193,6 +249,56 @@ describe('CanvasAppAssemblySource', () => {
     expect(sourceResult.applied).toBe(false)
     expect(sourceResult.source).toBe(prebuiltSource)
     expect(resolveCanvasAppAssemblySource(sourceResult.source))
+      .toBe(DEFAULT_CANVAS_APP_ASSEMBLY)
+  })
+
+  it('preserves current sources for held marketplace target source transactions', async () => {
+    const paidManifest = createCanvasAppFeaturePackManifest({
+      id: 'shell-private-pack',
+      label: 'Shell private pack',
+    })
+    const model = getCanvasAppFeaturePackMarketplaceAssemblyModel({
+      assemblyInput: {
+        featurePackManifests: [paidManifest],
+        featurePackStates: [{
+          id: 'shell-private-pack',
+          status: 'uninstalled',
+        }],
+      },
+      listings: [{
+        access: 'private',
+        distribution: 'available',
+        featurePackId: 'shell-private-pack',
+      }],
+      profiles: [],
+      suiteManifests: [],
+    })
+    const prebuiltSource = {
+      assembly: DEFAULT_CANVAS_APP_ASSEMBLY,
+    } satisfies CanvasAppPrebuiltAssemblySource
+    const sourceTransactionResult =
+      await executeCanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransaction({
+        executeCleanupEffect: () => ({ kind: 'not-run' as const }),
+        model,
+        source: prebuiltSource,
+        target: {
+          featurePackId: 'shell-private-pack',
+          kind: 'pack',
+        },
+      })
+
+    expect(sourceTransactionResult.status).toBe('held')
+    expect(sourceTransactionResult.applied).toBe(false)
+    expect(sourceTransactionResult.holdReason).toBe('blocked')
+    expect(sourceTransactionResult.actionKind).toBe('install')
+    expect(sourceTransactionResult.updateMode).toBe('blocked')
+    expect(sourceTransactionResult.update).toBeNull()
+    expect(sourceTransactionResult.transactionResult.status).toBe('held')
+    expect(sourceTransactionResult.hostUpdate.ready).toBe(false)
+    expect(sourceTransactionResult.sourceResult.status).toBe('held')
+    expect(sourceTransactionResult.sourceResult.source).toBe(prebuiltSource)
+    expect(sourceTransactionResult.source).toBe(prebuiltSource)
+    expect(resolveCanvasAppAssemblySource(sourceTransactionResult.source))
       .toBe(DEFAULT_CANVAS_APP_ASSEMBLY)
   })
 })

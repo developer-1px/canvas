@@ -1,11 +1,14 @@
 import {
   applyCanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdate,
   createCanvasAppAssembly,
+  executeCanvasAppFeaturePackMarketplaceAssemblyTargetApplyTransaction,
   type CanvasAppAssembly,
   type CanvasAppAssemblyInput,
   type CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateApplicationSource,
   type CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateAppliedResult,
   type CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateHeldApplicationResult,
+  type CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionResult,
+  type CanvasAppFeaturePackMarketplaceAssemblyTargetApplyTransactionInput,
 } from '../workflow'
 
 export type CanvasAppAssemblySource =
@@ -123,6 +126,108 @@ export type CanvasAppAssemblySourceFeaturePackMarketplaceHostUpdateHeldResult<
     >['updateMode']
 }>
 
+export type CanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransactionInput<
+  TEffect,
+  TResult,
+> = CanvasAppFeaturePackMarketplaceAssemblyTargetApplyTransactionInput<
+  TEffect,
+  TResult
+> & Readonly<{
+  source?: CanvasAppAssemblySource
+}>
+
+export type CanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransactionResult<
+  TEffect,
+  TResult,
+> =
+  | CanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransactionAppliedResult<
+    TEffect,
+    TResult
+  >
+  | CanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransactionHeldResult<
+    TEffect,
+    TResult
+  >
+
+export type CanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransactionAppliedResult<
+  TEffect,
+  TResult,
+> = Readonly<{
+  actionKind:
+    CanvasAppAssemblySourceFeaturePackMarketplaceHostUpdateAppliedResult<
+      TEffect,
+      TResult
+    >['actionKind']
+  applied: true
+  hostUpdate:
+    CanvasAppAssemblySourceFeaturePackMarketplaceHostUpdateAppliedResult<
+      TEffect,
+      TResult
+    >['hostUpdate']
+  source: CanvasAppAssemblyRequiredInputSource
+  sourceResult:
+    CanvasAppAssemblySourceFeaturePackMarketplaceHostUpdateAppliedResult<
+      TEffect,
+      TResult
+    >
+  status: 'applied'
+  transactionResult:
+    CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionResult<
+      TEffect,
+      TResult
+    >
+  update:
+    CanvasAppAssemblySourceFeaturePackMarketplaceHostUpdateAppliedResult<
+      TEffect,
+      TResult
+    >['update']
+  updateMode:
+    CanvasAppAssemblySourceFeaturePackMarketplaceHostUpdateAppliedResult<
+      TEffect,
+      TResult
+    >['updateMode']
+}>
+
+export type CanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransactionHeldResult<
+  TEffect,
+  TResult,
+> = Readonly<{
+  actionKind:
+    CanvasAppAssemblySourceFeaturePackMarketplaceHostUpdateHeldResult<
+      TEffect,
+      TResult
+    >['actionKind']
+  applied: false
+  holdReason:
+    CanvasAppAssemblySourceFeaturePackMarketplaceHostUpdateHeldResult<
+      TEffect,
+      TResult
+    >['holdReason']
+  hostUpdate:
+    CanvasAppAssemblySourceFeaturePackMarketplaceHostUpdateHeldResult<
+      TEffect,
+      TResult
+    >['hostUpdate']
+  source: CanvasAppAssemblySource
+  sourceResult:
+    CanvasAppAssemblySourceFeaturePackMarketplaceHostUpdateHeldResult<
+      TEffect,
+      TResult
+    >
+  status: 'held'
+  transactionResult:
+    CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionResult<
+      TEffect,
+      TResult
+    >
+  update: null
+  updateMode:
+    CanvasAppAssemblySourceFeaturePackMarketplaceHostUpdateHeldResult<
+      TEffect,
+      TResult
+    >['updateMode']
+}>
+
 export function applyCanvasAppAssemblySourceFeaturePackMarketplaceHostUpdate<
   TEffect,
   TResult,
@@ -173,6 +278,65 @@ export function applyCanvasAppAssemblySourceFeaturePackMarketplaceHostUpdate<
     status: 'held',
     update: null,
     updateMode: application.updateMode,
+  })
+}
+
+export async function executeCanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransaction<
+  TEffect,
+  TResult,
+>({
+  cleanupHandlers,
+  executeCleanupEffect,
+  model,
+  source,
+  target,
+}: CanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransactionInput<
+  TEffect,
+  TResult
+>): Promise<
+  CanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransactionResult<
+    TEffect,
+    TResult
+  >
+> {
+  const transactionResult =
+    await executeCanvasAppFeaturePackMarketplaceAssemblyTargetApplyTransaction({
+      cleanupHandlers,
+      executeCleanupEffect,
+      model,
+      target,
+    })
+  const sourceResult =
+    applyCanvasAppAssemblySourceFeaturePackMarketplaceHostUpdate({
+      hostUpdate: transactionResult.hostUpdate,
+      source,
+    })
+
+  if (sourceResult.applied) {
+    return Object.freeze({
+      actionKind: sourceResult.actionKind,
+      applied: true,
+      hostUpdate: sourceResult.hostUpdate,
+      source: sourceResult.source,
+      sourceResult,
+      status: 'applied',
+      transactionResult,
+      update: sourceResult.update,
+      updateMode: sourceResult.updateMode,
+    })
+  }
+
+  return Object.freeze({
+    actionKind: sourceResult.actionKind,
+    applied: false,
+    holdReason: sourceResult.holdReason,
+    hostUpdate: sourceResult.hostUpdate,
+    source: sourceResult.source,
+    sourceResult,
+    status: 'held',
+    transactionResult,
+    update: null,
+    updateMode: sourceResult.updateMode,
   })
 }
 
