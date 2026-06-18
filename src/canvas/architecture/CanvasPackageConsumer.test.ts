@@ -75,6 +75,7 @@ import {
   getCanvasAppFeaturePackProfileById,
   getCanvasAppFeaturePackProfileRuntimeStates,
   getCanvasAppFeaturePackMarketplaceActionModel,
+  getCanvasAppFeaturePackProfileMarketplaceActionModel,
   getCanvasAppFeaturePackSuiteMarketplaceActionModel,
   getCanvasAppFeaturePackCatalog,
   getCanvasAppFeaturePackInstallPlan,
@@ -116,6 +117,7 @@ import {
   type CanvasComponentInspectorPanelModel,
   type CanvasAppFeaturePack,
   type CanvasAppFeaturePackMarketplaceActionModel,
+  type CanvasAppFeaturePackProfileMarketplaceActionModel,
   type CanvasAppFeaturePackSuiteMarketplaceActionModel,
   type CanvasAppFeaturePackCatalog,
   type CanvasAppFeaturePackCatalogItem,
@@ -431,6 +433,12 @@ describe('Canvas package consumer imports', () => {
         id: 'smoke-partial-suite',
         label: 'Smoke partial suite',
       })
+    const partialUpdateProfile: CanvasAppFeaturePackProfile =
+      createCanvasAppFeaturePackProfile({
+        id: 'smoke-partial-profile',
+        installedFeaturePackIds: ['smoke-partial-pack'],
+        label: 'Smoke partial profile',
+      })
     const aiLabsManifest = createCanvasAppAiLabsFeaturePackManifest({
       provider: {
         complete: () => ({ text: 'Summary' }),
@@ -476,6 +484,12 @@ describe('Canvas package consumer imports', () => {
       CanvasAppFeaturePackMarketplaceActionModel =
         getCanvasAppFeaturePackMarketplaceActionModel({
           manifests: [partialUpdateManifest],
+        })
+    const featurePackProfileMarketplaceActionModel:
+      CanvasAppFeaturePackProfileMarketplaceActionModel =
+        getCanvasAppFeaturePackProfileMarketplaceActionModel({
+          manifests: [partialUpdateManifest],
+          profiles: [partialUpdateProfile],
         })
     const featurePackSuiteMarketplaceActionModel:
       CanvasAppFeaturePackSuiteMarketplaceActionModel =
@@ -924,6 +938,12 @@ describe('Canvas package consumer imports', () => {
       'disable',
       'uninstall',
     ])
+    expect(featurePackProfileMarketplaceActionModel.items[0]?.profileId)
+      .toBe('smoke-partial-profile')
+    expect(featurePackProfileMarketplaceActionModel.items[0]?.primaryActionKind)
+      .toBe('apply')
+    expect(featurePackProfileMarketplaceActionModel.items[0]?.actions[0]?.kind)
+      .toBe('apply')
     expect(featurePackSuiteMarketplaceActionModel.items[0]?.suiteId)
       .toBe('smoke-partial-suite')
     expect(featurePackSuiteMarketplaceActionModel.items[0]?.primaryActionKind)
@@ -1317,6 +1337,12 @@ describe('Canvas package consumer imports', () => {
     expect(CanvasAppFacade.getCanvasAppFeaturePackMarketplaceActionModel)
       .toBeTypeOf('function')
     expect(CanvasPackage.getCanvasAppFeaturePackMarketplaceActionModel)
+      .toBeTypeOf('function')
+    expect(CanvasAppAuthoring.getCanvasAppFeaturePackProfileMarketplaceActionModel)
+      .toBeTypeOf('function')
+    expect(CanvasAppFacade.getCanvasAppFeaturePackProfileMarketplaceActionModel)
+      .toBeTypeOf('function')
+    expect(CanvasPackage.getCanvasAppFeaturePackProfileMarketplaceActionModel)
       .toBeTypeOf('function')
     expect(CanvasAppAuthoring.getCanvasAppFeaturePackSuiteMarketplaceActionModel)
       .toBeTypeOf('function')

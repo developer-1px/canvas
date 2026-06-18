@@ -64,6 +64,24 @@ export {
   type CanvasAppFeaturePackMarketplaceActionModel,
 } from './CanvasAppFeaturePackActions'
 export {
+  getCanvasAppFeaturePackProfileMarketplaceActionModel,
+  type CanvasAppFeaturePackProfileMarketplaceAction,
+  type CanvasAppFeaturePackProfileMarketplaceActionItem,
+  type CanvasAppFeaturePackProfileMarketplaceActionKind,
+  type CanvasAppFeaturePackProfileMarketplaceActionModel,
+  type CanvasAppFeaturePackProfileMarketplaceBlockScope,
+  type CanvasAppFeaturePackProfileMarketplaceBlockedReason,
+  type CanvasAppFeaturePackProfileMarketplaceConflictReason,
+  type CanvasAppFeaturePackProfileMarketplaceConflictReasonKind,
+  type CanvasAppFeaturePackProfileMarketplaceLifecycleReason,
+  type CanvasAppFeaturePackProfileMarketplacePartialUpdateReason,
+  type CanvasAppFeaturePackProfileMarketplaceRequiredReason,
+  type CanvasAppFeaturePackProfileMarketplaceRequiredReasonKind,
+  type CanvasAppFeaturePackProfileMarketplaceStateChange,
+  type CanvasAppFeaturePackProfileMarketplaceStatus,
+  type CanvasAppFeaturePackProfileMarketplaceUnknownPackReason,
+} from './CanvasAppFeaturePackProfileActions'
+export {
   getCanvasAppFeaturePackSuiteMarketplaceActionModel,
   type CanvasAppFeaturePackSuiteMarketplaceAction,
   type CanvasAppFeaturePackSuiteMarketplaceActionItem,
