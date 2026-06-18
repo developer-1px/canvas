@@ -1,7 +1,9 @@
 import { describe, expect, it, vi } from 'vitest'
 import {
   CANVAS_MEDIA_IMPORT_MODEL,
+  CANVAS_MEDIA_SOURCE_IMPORT_SUPPORTED_FORMATS,
   CANVAS_MEDIA_SOURCE_JSON_MIME_TYPE,
+  CANVAS_MEDIA_SOURCE_URI_LIST_MIME_TYPE,
   createCanvasMediaImportItems,
   getCanvasMediaInsertPosition,
   getCanvasMediaSourceFromDataTransfer,
@@ -15,6 +17,40 @@ import type { CanvasMediaImporter } from './CanvasMediaImporters'
 describe('CanvasMediaImport', () => {
   it('exposes a stable model metadata value', () => {
     expect(CANVAS_MEDIA_IMPORT_MODEL).toBe('canvas-media-import')
+  })
+
+  it('exposes supported clipboard formats in reader priority order', () => {
+    expect(CANVAS_MEDIA_SOURCE_IMPORT_SUPPORTED_FORMATS).toEqual([
+      CANVAS_MEDIA_SOURCE_JSON_MIME_TYPE,
+      CANVAS_MEDIA_SOURCE_URI_LIST_MIME_TYPE,
+      'text/plain',
+      'application/json',
+    ])
+  })
+
+  it('reads every advertised media source format through the DataTransfer reader', () => {
+    const fixtures = {
+      [CANVAS_MEDIA_SOURCE_JSON_MIME_TYPE]: JSON.stringify({
+        title: 'Custom',
+        url: 'https://custom.example.com',
+      }),
+      [CANVAS_MEDIA_SOURCE_URI_LIST_MIME_TYPE]: 'https://uri.example.com',
+      'text/plain': 'https://plain.example.com',
+      'application/json': JSON.stringify({
+        mediaSource: {
+          title: 'Wrapped',
+          url: 'https://wrapped.example.com',
+        },
+      }),
+    }
+
+    for (const type of CANVAS_MEDIA_SOURCE_IMPORT_SUPPORTED_FORMATS) {
+      expect(getCanvasMediaSourceFromDataTransfer(createDataTransfer({
+        [type]: fixtures[type],
+      }))).toMatchObject({
+        url: expect.stringContaining('https://'),
+      })
+    }
   })
 
   it('extracts URL sources from plain URLs and embed snippets', () => {

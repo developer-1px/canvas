@@ -364,9 +364,11 @@ export {
   type CanvasImagePasteReplaceTarget,
 } from './image-io'
 export {
+  CANVAS_MEDIA_SOURCE_IMPORT_SUPPORTED_FORMATS,
   CANVAS_MEDIA_SOURCE_JSON_MIME_TYPE,
   CANVAS_MEDIA_SOURCE_JSON_TYPES,
   CANVAS_MEDIA_SOURCE_JSON_WRAPPER_KEYS,
+  CANVAS_MEDIA_SOURCE_URI_LIST_MIME_TYPE,
   assertCanvasMediaImporter,
   assertCanvasMediaImporters,
   getCanvasMediaSourceFromDataTransfer,

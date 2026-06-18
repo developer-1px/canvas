@@ -10,6 +10,9 @@ import {
   createCanvasLinkPreviewComponentItem,
   normalizeCanvasLinkPreviewUrl,
 } from '../../../host'
+import {
+  CANVAS_DATA_TRANSFER_TEXT_MIME_TYPE,
+} from '../../affordances/commands/CanvasDataTransferText'
 import type { CanvasAppStageElement } from '../../rendering/stage/CanvasAppStageElement'
 import type { CommitCanvasItemsChange } from '../../workflow/CanvasWorkflowContract'
 import type {
@@ -96,6 +99,15 @@ export const CANVAS_MEDIA_SOURCE_JSON_MIME_TYPE =
 
 export const CANVAS_MEDIA_SOURCE_JSON_TYPES = Object.freeze([
   'application/json',
+] as const)
+
+export const CANVAS_MEDIA_SOURCE_URI_LIST_MIME_TYPE = 'text/uri-list'
+
+export const CANVAS_MEDIA_SOURCE_IMPORT_SUPPORTED_FORMATS = Object.freeze([
+  CANVAS_MEDIA_SOURCE_JSON_MIME_TYPE,
+  CANVAS_MEDIA_SOURCE_URI_LIST_MIME_TYPE,
+  CANVAS_DATA_TRANSFER_TEXT_MIME_TYPE,
+  ...CANVAS_MEDIA_SOURCE_JSON_TYPES,
 ] as const)
 
 export const CANVAS_MEDIA_SOURCE_JSON_WRAPPER_KEYS = Object.freeze([
@@ -320,8 +332,8 @@ export function getCanvasMediaSourceFromDataTransfer(
   }
 
   const textSource = getCanvasMediaSourceFromText(
-    dataTransfer.getData('text/uri-list') ||
-      dataTransfer.getData('text/plain'),
+    dataTransfer.getData(CANVAS_MEDIA_SOURCE_URI_LIST_MIME_TYPE) ||
+      dataTransfer.getData(CANVAS_DATA_TRANSFER_TEXT_MIME_TYPE),
   )
 
   if (textSource) {

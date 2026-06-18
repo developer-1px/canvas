@@ -28,6 +28,9 @@ import {
   CANVAS_RICH_CLIPBOARD_JSON_SCRIPT_ATTRIBUTE,
   CANVAS_IMAGE_FILE_IMPORT_SUPPORTED_FORMATS,
   CANVAS_IMAGE_SOURCE_IMPORT_SUPPORTED_FORMATS,
+  CANVAS_MEDIA_SOURCE_IMPORT_SUPPORTED_FORMATS,
+  CANVAS_MEDIA_SOURCE_JSON_MIME_TYPE,
+  CANVAS_MEDIA_SOURCE_URI_LIST_MIME_TYPE,
   CANVAS_RICH_TEXT_PASTE_SUPPORTED_FORMATS,
   CANVAS_TABLE_CSV_MIME_TYPES,
   CANVAS_TABLE_FILE_IMPORT_SUPPORTED_FORMATS,
@@ -4706,6 +4709,21 @@ describe('Canvas package consumer imports', () => {
       .toBeTypeOf('function')
     expect(CanvasPackage.routeCanvasMediaSourceObjectHyperlink)
       .toBeTypeOf('function')
+    expect(CanvasAppAuthoring.CANVAS_MEDIA_SOURCE_IMPORT_SUPPORTED_FORMATS)
+      .toEqual(CANVAS_MEDIA_SOURCE_IMPORT_SUPPORTED_FORMATS)
+    expect(CanvasAppFacade.CANVAS_MEDIA_SOURCE_IMPORT_SUPPORTED_FORMATS)
+      .toEqual([
+        CANVAS_MEDIA_SOURCE_JSON_MIME_TYPE,
+        CANVAS_MEDIA_SOURCE_URI_LIST_MIME_TYPE,
+        'text/plain',
+        'application/json',
+      ])
+    expect(CanvasPackage.CANVAS_MEDIA_SOURCE_IMPORT_SUPPORTED_FORMATS).toEqual(
+      CanvasAppFacade.CANVAS_MEDIA_SOURCE_IMPORT_SUPPORTED_FORMATS,
+    )
+    expect(CanvasPackage.CANVAS_MEDIA_SOURCE_URI_LIST_MIME_TYPE).toBe(
+      CANVAS_MEDIA_SOURCE_URI_LIST_MIME_TYPE,
+    )
     expect(CanvasAppAuthoring.routeCanvasTableImportTargetReplace)
       .toBeTypeOf('function')
     expect(CanvasAppFacade.routeCanvasTableImportTargetReplace)
