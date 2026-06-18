@@ -113,6 +113,7 @@ describe('SlideEditTextFontSize', () => {
     expect(getSlideEditTextFontSizeJSONPasteValue({
       dataTransfer: createDataTransfer({
         [SLIDE_EDIT_TEXT_FONT_SIZE_FIELD.jsonMimeType]: '24.126',
+        'text/json': '{"fontSize":18}',
         'text/plain': '{"fontSize":18}',
       }),
     })).toBe(24.13)
@@ -136,6 +137,11 @@ describe('SlideEditTextFontSize', () => {
         'application/json': '{"fontSize":32}',
       }),
     })).toBe(32)
+    expect(getSlideEditTextFontSizeJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/json': '{"fontSize":42}',
+      }),
+    })).toBe(42)
   })
 
   it('does not treat unrelated JSON or direct text/plain values as font size', () => {
@@ -160,6 +166,11 @@ describe('SlideEditTextFontSize', () => {
     expect(getSlideEditTextFontSizeJSONPasteValue({
       dataTransfer: createDataTransfer({
         'text/plain': '{"unrelated":18}',
+      }),
+    })).toBeNull()
+    expect(getSlideEditTextFontSizeJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/json': 'not json',
       }),
     })).toBeNull()
   })

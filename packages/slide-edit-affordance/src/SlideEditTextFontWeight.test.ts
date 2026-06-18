@@ -109,6 +109,7 @@ describe('SlideEditTextFontWeight', () => {
     expect(getSlideEditTextFontWeightJSONPasteValue({
       dataTransfer: createDataTransfer({
         [SLIDE_EDIT_TEXT_FONT_WEIGHT_FIELD.jsonMimeType]: '"bold"',
+        'text/json': '{"fontWeight":"regular"}',
         'text/plain': '{"fontWeight":"regular"}',
       }),
     })).toBe('bold')
@@ -132,6 +133,11 @@ describe('SlideEditTextFontWeight', () => {
     expect(getSlideEditTextFontWeightJSONPasteValue({
       dataTransfer: createDataTransfer({
         'application/json': '{"fontWeight":"bold"}',
+      }),
+    })).toBe('bold')
+    expect(getSlideEditTextFontWeightJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/json': '{"fontWeight":"bold"}',
       }),
     })).toBe('bold')
   })
@@ -158,6 +164,11 @@ describe('SlideEditTextFontWeight', () => {
     expect(getSlideEditTextFontWeightJSONPasteValue({
       dataTransfer: createDataTransfer({
         'text/plain': '{"unrelated":"bold"}',
+      }),
+    })).toBeNull()
+    expect(getSlideEditTextFontWeightJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/json': 'not json',
       }),
     })).toBeNull()
   })

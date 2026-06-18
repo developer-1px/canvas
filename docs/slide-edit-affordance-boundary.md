@@ -200,7 +200,7 @@
 | CSS | helper returns a stable pixel string such as `18px` |
 | Metadata | `data-slide-text-font-size` carries the normalized numeric value |
 | Custom MIME | `application/vnd.interactive-os.slide-edit.text-font-size+json` may carry a direct JSON number |
-| General JSON | `application/json` and `text/plain` require an explicit field key such as `textFontSize`, `fontSize`, `size`, or `value` |
+| General JSON | `application/json`, `text/json`, and `text/plain` require an explicit field key such as `textFontSize`, `fontSize`, `size`, or `value` |
 | Plain text | generic `text/plain` direct numbers such as `18` are not interpreted as font size |
 | Updates | selected slide id, text object id, field id, and normalized font size value become host command effects |
 | Scope | font size field values only; text measurement and auto-fit remain separate affordances |
@@ -214,7 +214,7 @@
 | Boolean wrapper | explicit JSON `bold: true` maps to `bold`; `bold: false` maps to `regular` |
 | CSS | helper returns stable CSS font-weight values `400`, `600`, and `700` |
 | Custom MIME | `application/vnd.interactive-os.slide-edit.text-font-weight+json` may carry a direct JSON string value |
-| General JSON | `application/json` and `text/plain` require an explicit field key such as `textFontWeight`, `fontWeight`, `weight`, `bold`, or `value` |
+| General JSON | `application/json`, `text/json`, and `text/plain` require an explicit field key such as `textFontWeight`, `fontWeight`, `weight`, `bold`, or `value` |
 | Plain text | generic `text/plain` direct values such as `"bold"` or `true` are not interpreted as font weight |
 | Updates | selected slide id, text object id, field id, and normalized font weight value become host command effects |
 | Scope | text font weight field values only; keyboard bold toggle and text run formatting remain separate affordances |
