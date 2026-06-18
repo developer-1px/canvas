@@ -478,6 +478,10 @@ export {
 } from './story-canvas'
 export {
   CANVAS_APP_TABLE_IMPORT_FEATURE_PACK_MANIFEST,
+  CANVAS_TABLE_CSV_MIME_TYPES,
+  CANVAS_TABLE_FILE_IMPORT_SUPPORTED_FORMATS,
+  CANVAS_TABLE_IMPORT_SUPPORTED_FORMATS,
+  CANVAS_TABLE_TSV_MIME_TYPES,
   readCanvasTableFileSources,
   routeCanvasTableImportTargetReplace,
   useCanvasTableImport,
@@ -490,6 +494,8 @@ export {
 } from './table-import'
 export {
   CANVAS_APP_TEXT_PASTE_IMPORT_FEATURE_PACK_MANIFEST,
+  CANVAS_RICH_TEXT_PASTE_SUPPORTED_FORMATS,
+  CANVAS_TEXT_PASTE_SUPPORTED_FORMATS,
   assertCanvasTextPasteImporter,
   assertCanvasTextPasteImporters,
   createCanvasPlainTextPasteSource,

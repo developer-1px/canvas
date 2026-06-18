@@ -6,6 +6,9 @@ import {
   getCanvasViewportWorldPoint,
 } from '../../../core'
 import { createCanvasTableComponentItem } from '../../../host'
+import {
+  CANVAS_DATA_TRANSFER_TEXT_MIME_TYPE,
+} from '../../affordances/commands/CanvasDataTransferText'
 export {
   getCanvasTableComponentSize,
   type CanvasTableComponentSize,
@@ -104,14 +107,29 @@ export type CanvasTableInsertCenterInput = {
 
 export const CANVAS_TABLE_IMPORT_MODEL = 'canvas-table-import'
 
-const CANVAS_CSV_MIME_TYPES = new Set([
+export const CANVAS_TABLE_CSV_MIME_TYPES = Object.freeze([
   'application/vnd.ms-excel',
   'text/comma-separated-values',
   'text/csv',
-])
-const CANVAS_TSV_MIME_TYPES = new Set([
+] as const)
+export const CANVAS_TABLE_TSV_MIME_TYPES = Object.freeze([
   'text/tab-separated-values',
-])
+] as const)
+export const CANVAS_TABLE_IMPORT_SUPPORTED_FORMATS = Object.freeze([
+  'text/tab-separated-values',
+  'text/csv',
+  'text/html',
+  'text/markdown',
+  'text/x-markdown',
+  CANVAS_DATA_TRANSFER_TEXT_MIME_TYPE,
+] as const)
+export const CANVAS_TABLE_FILE_IMPORT_SUPPORTED_FORMATS = Object.freeze([
+  'Files',
+  ...CANVAS_TABLE_CSV_MIME_TYPES,
+  ...CANVAS_TABLE_TSV_MIME_TYPES,
+] as const)
+const CANVAS_CSV_MIME_TYPES = new Set<string>(CANVAS_TABLE_CSV_MIME_TYPES)
+const CANVAS_TSV_MIME_TYPES = new Set<string>(CANVAS_TABLE_TSV_MIME_TYPES)
 const CANVAS_HTML_TABLE_SPAN_MAX = 100
 
 export function insertCanvasTableSource({

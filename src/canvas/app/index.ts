@@ -451,7 +451,11 @@ export {
   type CanvasImageInsertionContext,
 } from './feature-packs/image-io/CanvasImageInsertion'
 export {
+  CANVAS_TABLE_CSV_MIME_TYPES,
+  CANVAS_TABLE_FILE_IMPORT_SUPPORTED_FORMATS,
   CANVAS_TABLE_IMPORT_MODEL,
+  CANVAS_TABLE_IMPORT_SUPPORTED_FORMATS,
+  CANVAS_TABLE_TSV_MIME_TYPES,
   getCanvasTableColumnCount,
   getCanvasTableComponentSize,
   getCanvasTableCsvFileFromDataTransfer,
@@ -480,6 +484,8 @@ export {
   type CanvasTableRowsNormalizationOptions,
 } from './feature-packs/table-import/CanvasTableImport'
 export {
+  CANVAS_RICH_TEXT_PASTE_SUPPORTED_FORMATS,
+  CANVAS_TEXT_PASTE_SUPPORTED_FORMATS,
   CANVAS_TEXT_PASTE_IMPORT_MODEL,
   createCanvasTextPasteItems,
   getCanvasRichTextPasteSourceFromDataTransfer,

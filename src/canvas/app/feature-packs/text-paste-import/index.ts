@@ -3,6 +3,8 @@ import {
 } from '../CanvasAppFeaturePackManifests'
 
 export {
+  CANVAS_RICH_TEXT_PASTE_SUPPORTED_FORMATS,
+  CANVAS_TEXT_PASTE_SUPPORTED_FORMATS,
   createCanvasPlainTextPasteSource,
   createCanvasTextPasteItems,
   getCanvasRichTextPasteSourceFromDataTransfer,

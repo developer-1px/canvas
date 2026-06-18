@@ -6,6 +6,9 @@ import type {
 import {
   getCanvasViewportWorldPoint,
 } from '../../../core'
+import {
+  CANVAS_DATA_TRANSFER_TEXT_MIME_TYPE,
+} from '../../affordances/commands/CanvasDataTransferText'
 import type { CanvasAppStageElement } from '../../rendering/stage/CanvasAppStageElement'
 import type { CommitCanvasItemsChange } from '../../workflow/CanvasWorkflowContract'
 import type { CanvasTextPasteImporter } from './CanvasTextPasteImporters'
@@ -128,15 +131,19 @@ export type CanvasTextPasteReplaceRouteInput = Readonly<{
 
 export const CANVAS_TEXT_PASTE_IMPORT_MODEL = 'canvas-text-paste-import'
 
-const CANVAS_TEXT_PASTE_DATA_TYPES = [
-  'text/plain',
+export const CANVAS_TEXT_PASTE_SUPPORTED_FORMATS = Object.freeze([
+  CANVAS_DATA_TRANSFER_TEXT_MIME_TYPE,
   'text/html',
-] as const
-const CANVAS_MARKDOWN_RICH_TEXT_DATA_TYPES = [
+] as const)
+export const CANVAS_RICH_TEXT_PASTE_SUPPORTED_FORMATS = Object.freeze([
+  'text/html',
   'text/markdown',
   'text/x-markdown',
-  'text/plain',
-] as const
+  CANVAS_DATA_TRANSFER_TEXT_MIME_TYPE,
+] as const)
+const CANVAS_MARKDOWN_RICH_TEXT_DATA_TYPES =
+  CANVAS_RICH_TEXT_PASTE_SUPPORTED_FORMATS.filter((type) =>
+    type !== 'text/html')
 const CANVAS_RICH_TEXT_BLOCK_TAGS = new Set([
   'article',
   'blockquote',
@@ -317,7 +324,7 @@ export function getCanvasTextPasteSourcesFromDataTransfer(
 
   const sources: string[] = []
 
-  for (const type of CANVAS_TEXT_PASTE_DATA_TYPES) {
+  for (const type of CANVAS_TEXT_PASTE_SUPPORTED_FORMATS) {
     const text = dataTransfer.getData(type).trim()
 
     if (text && !sources.includes(text)) {

@@ -1,6 +1,10 @@
 import { describe, expect, it, vi } from 'vitest'
 import {
+  CANVAS_TABLE_CSV_MIME_TYPES,
+  CANVAS_TABLE_FILE_IMPORT_SUPPORTED_FORMATS,
   CANVAS_TABLE_IMPORT_MODEL,
+  CANVAS_TABLE_IMPORT_SUPPORTED_FORMATS,
+  CANVAS_TABLE_TSV_MIME_TYPES,
   getCanvasTableCsvSourceFromDataTransfer,
   getCanvasTableCsvSourceFromText,
   getCanvasTableColumnCount,
@@ -21,6 +25,91 @@ import {
 describe('CanvasTableImport', () => {
   it('exposes a stable model metadata value', () => {
     expect(CANVAS_TABLE_IMPORT_MODEL).toBe('canvas-table-import')
+  })
+
+  it('exposes supported clipboard and file formats in reader priority order', () => {
+    expect(CANVAS_TABLE_IMPORT_SUPPORTED_FORMATS).toEqual([
+      'text/tab-separated-values',
+      'text/csv',
+      'text/html',
+      'text/markdown',
+      'text/x-markdown',
+      'text/plain',
+    ])
+    expect(CANVAS_TABLE_FILE_IMPORT_SUPPORTED_FORMATS).toEqual([
+      'Files',
+      'application/vnd.ms-excel',
+      'text/comma-separated-values',
+      'text/csv',
+      'text/tab-separated-values',
+    ])
+  })
+
+  it('reads every advertised clipboard table format through the DataTransfer reader', () => {
+    const fixtures = {
+      'text/csv': {
+        format: 'text-csv',
+        rows: [
+          ['Name', 'Owner'],
+          ['Import', 'Mina'],
+        ],
+        text: 'Name,Owner\nImport,Mina',
+      },
+      'text/html': {
+        format: 'text-html',
+        rows: [
+          ['Phase', 'Owner'],
+          ['Build', 'Ari'],
+        ],
+        text: '<table><tr><th>Phase</th><th>Owner</th></tr><tr><td>Build</td><td>Ari</td></tr></table>',
+      },
+      'text/markdown': {
+        format: 'text-markdown',
+        rows: [
+          ['Metric', 'Value'],
+          ['Users', '42'],
+        ],
+        text: '| Metric | Value |\n| --- | --- |\n| Users | 42 |',
+      },
+      'text/plain': {
+        format: 'text-delimited',
+        rows: [
+          ['Metric', 'Value'],
+          ['Users', '42'],
+        ],
+        text: 'Metric\tValue\nUsers\t42',
+      },
+      'text/tab-separated-values': {
+        format: 'text-tsv',
+        rows: [
+          ['Metric', 'Value'],
+          ['Users', '42'],
+        ],
+        text: 'Metric\tValue\nUsers\t42',
+      },
+      'text/x-markdown': {
+        format: 'text-markdown',
+        rows: [
+          ['Phase', 'Owner'],
+          ['Import', 'Mina'],
+        ],
+        text: '| Phase | Owner |\n| --- | --- |\n| Import | Mina |',
+      },
+    } as const
+
+    for (const type of CANVAS_TABLE_IMPORT_SUPPORTED_FORMATS) {
+      const fixture = fixtures[type]
+      const dataTransfer = {
+        getData: vi.fn((requestedType: string) =>
+          requestedType === type ? fixture.text : '',
+        ),
+      } as unknown as DataTransfer
+
+      expect(getCanvasTableSourceFromDataTransfer(dataTransfer)).toEqual({
+        format: fixture.format,
+        rows: fixture.rows,
+      })
+    }
   })
 
   it('parses CSV and spreadsheet clipboard text into import sources', () => {
@@ -100,6 +189,38 @@ describe('CanvasTableImport', () => {
         ['Users', '42'],
       ],
     })
+  })
+
+  it('reads every advertised table file MIME type through the file reader', async () => {
+    for (const type of CANVAS_TABLE_CSV_MIME_TYPES) {
+      await expect(readCanvasTableFileSource(createTableFile(
+        'metrics.csv',
+        type,
+      ))).resolves.toEqual({
+        format: 'text-csv',
+        name: 'metrics.csv',
+        rows: [
+          ['Metric', 'Value'],
+          ['Users', '42'],
+        ],
+      })
+    }
+
+    for (const type of CANVAS_TABLE_TSV_MIME_TYPES) {
+      await expect(readCanvasTableFileSource(createTableFile(
+        'metrics.tsv',
+        type,
+        0,
+        'Metric\tValue\nUsers\t42',
+      ))).resolves.toEqual({
+        format: 'text-tsv',
+        name: 'metrics.tsv',
+        rows: [
+          ['Metric', 'Value'],
+          ['Users', '42'],
+        ],
+      })
+    }
   })
 
   it('reads multiple table files into source arrays', async () => {

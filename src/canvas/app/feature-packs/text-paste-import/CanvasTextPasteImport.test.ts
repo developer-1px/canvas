@@ -1,5 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import {
+  CANVAS_RICH_TEXT_PASTE_SUPPORTED_FORMATS,
+  CANVAS_TEXT_PASTE_SUPPORTED_FORMATS,
   CANVAS_TEXT_PASTE_IMPORT_MODEL,
   createCanvasPlainTextPasteSource,
   createCanvasTextPasteItems,
@@ -18,6 +20,19 @@ describe('CanvasTextPasteImport', () => {
     expect(CANVAS_TEXT_PASTE_IMPORT_MODEL).toBe('canvas-text-paste-import')
   })
 
+  it('exposes supported clipboard formats in reader priority order', () => {
+    expect(CANVAS_TEXT_PASTE_SUPPORTED_FORMATS).toEqual([
+      'text/plain',
+      'text/html',
+    ])
+    expect(CANVAS_RICH_TEXT_PASTE_SUPPORTED_FORMATS).toEqual([
+      'text/html',
+      'text/markdown',
+      'text/x-markdown',
+      'text/plain',
+    ])
+  })
+
   it('reads plain text before HTML clipboard text as fallback sources', () => {
     const dataTransfer = {
       getData: vi.fn((type: string) =>
@@ -31,6 +46,22 @@ describe('CanvasTextPasteImport', () => {
       '<main>Plain HTML</main>',
       '<section>Rich HTML</section>',
     ])
+  })
+
+  it('uses the public fallback text format order when reading clipboard strings', () => {
+    const dataTransfer = {
+      getData: vi.fn((type: string) =>
+        CANVAS_TEXT_PASTE_SUPPORTED_FORMATS.includes(type as never)
+          ? `Source for ${type}`
+          : '',
+      ),
+    } as unknown as DataTransfer
+
+    expect(getCanvasTextPasteSourcesFromDataTransfer(dataTransfer)).toEqual(
+      CANVAS_TEXT_PASTE_SUPPORTED_FORMATS.map((type) => `Source for ${type}`),
+    )
+    expect(dataTransfer.getData).toHaveBeenNthCalledWith(1, 'text/plain')
+    expect(dataTransfer.getData).toHaveBeenNthCalledWith(2, 'text/html')
   })
 
   it('deduplicates identical clipboard text sources', () => {
@@ -135,6 +166,42 @@ describe('CanvasTextPasteImport', () => {
           text: markdown,
         },
       ])
+  })
+
+  it('creates Markdown rich text candidates from advertised Markdown formats', () => {
+    const markdownTypes = CANVAS_RICH_TEXT_PASTE_SUPPORTED_FORMATS
+      .filter((type) => type === 'text/markdown' || type === 'text/x-markdown')
+
+    for (const markdownType of markdownTypes) {
+      expect(getCanvasTextPasteSourceCandidatesFromDataTransfer({
+        getData: vi.fn((type: string) =>
+          type === markdownType
+            ? '# Plan\n\n- **Ship** _fast_'
+            : '',
+        ),
+      } as unknown as DataTransfer)).toEqual([
+        {
+          format: 'text-markdown-rich',
+          paragraphs: [
+            {
+              headingLevel: 1,
+              runs: [
+                { text: 'Plan' },
+              ],
+            },
+            {
+              bullet: 'bullet',
+              runs: [
+                { bold: true, text: 'Ship' },
+                { text: ' ' },
+                { italic: true, text: 'fast' },
+              ],
+            },
+          ],
+          text: 'Plan\nShip fast',
+        },
+      ])
+    }
   })
 
   it('creates Markdown rich text candidates from clear Markdown text/plain payloads', () => {
