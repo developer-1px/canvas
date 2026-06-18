@@ -376,6 +376,9 @@
 | Field | each field routes through `update-object-shadow` |
 | Metadata | `data-slide-object-shadow` carries `none` or a JSON string for the normalized shadow subset |
 | Normalization | opacity clamps to `0..1`; blur and distance clamp to non-negative limits; angle clamps to `0..360` |
+| JSON candidates | custom MIME, `application/json`, `text/json`, and `text/plain` are checked in order |
+| JSON wrappers | generic JSON requires `objectShadow`, `objectEffectShadow`, or `shadow`; CSS `box-shadow` strings are ignored |
+| Direct values | custom `null`/`false` disables shadow, `true` enables the default shadow, and object subsets update only included fields |
 | Updates | selected object id, field id, and normalized value become host command effects |
 | Scope | applies to slide content objects, not demo chrome, panel decoration, or app-shell shadows |
 | Runtime | stage, thumbnail, presentation, inspector, and export can read the same metadata value |

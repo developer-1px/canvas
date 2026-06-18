@@ -6,15 +6,21 @@ import {
   getSlideEditObjectShadowColorCSS,
   getSlideEditObjectShadowFilter,
   getSlideEditObjectShadowFilterCSS,
+  getSlideEditObjectShadowJSONPasteValue,
   getSlideEditObjectShadowMetadata,
+  getSlideEditObjectShadowPasteCommands,
   normalizeSlideEditObjectShadow,
   normalizeSlideEditObjectShadowFieldValue,
   shouldEmitSlideEditObjectShadowMetadata,
   SLIDE_EDIT_OBJECT_SHADOW_DATA_ATTRIBUTE,
   SLIDE_EDIT_OBJECT_SHADOW_DEFAULT,
   SLIDE_EDIT_OBJECT_SHADOW_FIELDS,
+  SLIDE_EDIT_OBJECT_SHADOW_JSON_MIME_TYPE,
   toSlideEditObjectShadowAttributeValue,
 } from './SlideEditObjectShadow'
+import {
+  getSlideEditObjectShadowJSONPasteValue as getSlideEditObjectShadowJSONPasteValueFromPackage,
+} from './index'
 
 describe('SlideEditObjectShadow', () => {
   it('creates a disabled object shadow descriptor by default', () => {
@@ -166,6 +172,192 @@ describe('SlideEditObjectShadow', () => {
     })
   })
 
+  it('reads custom MIME direct shadow values before general JSON wrappers', () => {
+    expect(getSlideEditObjectShadowJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_OBJECT_SHADOW_JSON_MIME_TYPE]: 'true',
+        'application/json': '{"shadow":false}',
+      }),
+    })).toEqual({
+      fields: [
+        {
+          fieldId: 'enabled',
+          value: true,
+        },
+      ],
+      shadow: {
+        ...SLIDE_EDIT_OBJECT_SHADOW_DEFAULT,
+        enabled: true,
+      },
+      surface: 'object-shadow',
+    })
+    expect(getSlideEditObjectShadowJSONPasteValueFromPackage({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_OBJECT_SHADOW_JSON_MIME_TYPE]: 'false',
+      }),
+    })).toMatchObject({
+      fields: [
+        {
+          fieldId: 'enabled',
+          value: false,
+        },
+      ],
+    })
+  })
+
+  it('reads custom MIME shadow wrappers and normalizes object subsets', () => {
+    expect(getSlideEditObjectShadowJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_OBJECT_SHADOW_JSON_MIME_TYPE]:
+          '{"value":{"enabled":true,"opacity":1.2,"blur":-4}}',
+      }),
+    })).toEqual({
+      fields: [
+        {
+          fieldId: 'enabled',
+          value: true,
+        },
+        {
+          fieldId: 'opacity',
+          value: 1,
+        },
+        {
+          fieldId: 'blur',
+          value: 0,
+        },
+      ],
+      shadow: {
+        ...SLIDE_EDIT_OBJECT_SHADOW_DEFAULT,
+        blur: 0,
+        enabled: true,
+        opacity: 1,
+      },
+      surface: 'object-shadow',
+    })
+    expect(getSlideEditObjectShadowJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_OBJECT_SHADOW_JSON_MIME_TYPE]:
+          '{"shadow":{"color":" #123456 ","distance":1001}}',
+      }),
+    })).toMatchObject({
+      fields: [
+        {
+          fieldId: 'color',
+          value: '#123456',
+        },
+        {
+          fieldId: 'distance',
+          value: 1000,
+        },
+      ],
+    })
+  })
+
+  it('reads explicit object shadow wrappers from general JSON candidates', () => {
+    expect(getSlideEditObjectShadowJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'application/json': '{"objectShadow":{"enabled":true}}',
+      }),
+    })).toMatchObject({
+      fields: [
+        {
+          fieldId: 'enabled',
+          value: true,
+        },
+      ],
+    })
+    expect(getSlideEditObjectShadowJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/json': '{"objectEffectShadow":null}',
+      }),
+    })).toMatchObject({
+      fields: [
+        {
+          fieldId: 'enabled',
+          value: false,
+        },
+      ],
+    })
+    expect(getSlideEditObjectShadowJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"shadow":{"angle":390,"distance":8}}',
+      }),
+    })).toMatchObject({
+      fields: [
+        {
+          fieldId: 'angle',
+          value: 360,
+        },
+        {
+          fieldId: 'distance',
+          value: 8,
+        },
+      ],
+    })
+  })
+
+  it('converts paste values into object shadow update commands', () => {
+    const pasteValue = getSlideEditObjectShadowJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"shadow":{"enabled":true,"blur":16}}',
+      }),
+    })
+
+    expect(getSlideEditObjectShadowPasteCommands({
+      objectId: 'object-a',
+      pasteValue: pasteValue!,
+      slideId: 'slide-a',
+    })).toEqual([
+      {
+        fieldId: 'enabled',
+        id: 'update-object-shadow',
+        objectId: 'object-a',
+        slideId: 'slide-a',
+        value: true,
+      },
+      {
+        fieldId: 'blur',
+        id: 'update-object-shadow',
+        objectId: 'object-a',
+        slideId: 'slide-a',
+        value: 16,
+      },
+    ])
+    expect(getSlideEditObjectShadowCommandEffect(
+      getSlideEditObjectShadowPasteCommands({
+        objectId: 'object-a',
+        pasteValue: pasteValue!,
+        slideId: 'slide-a',
+      })[0],
+    ).type).toBe('slide-command-effect')
+  })
+
+  it('ignores invalid, unrelated, and CSS box-shadow JSON candidates', () => {
+    expect(getSlideEditObjectShadowJSONPasteValue({
+      dataTransfer: null,
+    })).toBeNull()
+    expect(getSlideEditObjectShadowJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '"0 4px 12px rgb(0 0 0 / 0.2)"',
+      }),
+    })).toBeNull()
+    expect(getSlideEditObjectShadowJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"boxShadow":"0 4px 12px black"}',
+      }),
+    })).toBeNull()
+    expect(getSlideEditObjectShadowJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_OBJECT_SHADOW_JSON_MIME_TYPE]: 'not json',
+      }),
+    })).toBeNull()
+    expect(getSlideEditObjectShadowJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': 'not json',
+      }),
+    })).toBeNull()
+  })
+
   it('distinguishes content object shadow from demo chrome shadow strings', () => {
     const publicStrings = JSON.stringify({
       descriptor: createSlideEditObjectShadowDescriptor({
@@ -192,3 +384,9 @@ describe('SlideEditObjectShadow', () => {
     }
   })
 })
+
+function createDataTransfer(values: Record<string, string>) {
+  return {
+    getData: (type: string) => values[type] ?? '',
+  }
+}
