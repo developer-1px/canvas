@@ -139,6 +139,10 @@
 | Auto-size target | `resize-to-fit` calculates target bounds from measured text size, optional min size, and optional slide/frame max bounds |
 | Overflow indicator | headless state includes visibility, overflow axis, measured size, line count, and bottom-right indicator bounds |
 | Gesture hook | resize handle double-click can produce a host `resize-text-box-to-fit` command effect |
+| JSON candidates | custom MIME, `application/json`, `text/json`, and `text/plain` are checked in order |
+| JSON payloads | generic JSON requires `textAutoFit`, `autoFit`, `textBoxAutoFit`, or `textOverflow` wrapper; custom MIME may carry direct auto-fit JSON |
+| Handles | `handle`/`resizeHandle` normalize to a resize handle and default to `se` |
+| No-op | locked, hidden, missing-measurement, and unsupported targets are returned as skipped target metadata |
 
 ## Text Paragraph Spacing Contract
 

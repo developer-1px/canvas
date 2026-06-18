@@ -1,5 +1,7 @@
 import type { Bounds } from '../../../src/canvas/core'
 
+import { SLIDE_EDIT_TEXT_JSON_PASTE_TYPES } from './SlideEditTextJSONPaste'
+
 export type SlideEditTextSlideId = string
 export type SlideEditTextObjectId = string
 
@@ -116,6 +118,113 @@ export type SlideEditTextAutoFitHostCommandEffect<
   type: 'slide-command-effect'
 }
 
+export type SlideEditTextAutoFitDataTransfer = Pick<DataTransfer, 'getData'>
+
+export type SlideEditTextAutoFitMode = 'resize-to-fit'
+
+export type SlideEditTextAutoFitSourceFields = {
+  handle?: string
+  mode: string
+  wrapper?: string
+}
+
+export type SlideEditTextAutoFitJSONPasteValue = {
+  handle: SlideEditTextResizeHandle
+  mode: SlideEditTextAutoFitMode
+  sourceFields: SlideEditTextAutoFitSourceFields
+  surface: 'text-auto-fit'
+}
+
+export type SlideEditTextAutoFitJSONPasteInput = {
+  dataTransfer: SlideEditTextAutoFitDataTransfer | null
+  jsonMimeType?: string
+}
+
+export type SlideEditTextAutoFitPasteTarget<
+  TObjectId extends SlideEditTextObjectId = SlideEditTextObjectId,
+> = SlideEditTextAutoSizeInput & {
+  isHidden?: boolean
+  isLocked?: boolean
+  objectId: TObjectId
+}
+
+export type SlideEditTextAutoFitPasteSkipReason =
+  | 'hidden-target'
+  | 'locked-target'
+  | 'missing-measurement'
+  | 'unsupported-target'
+
+export type SlideEditTextAutoFitPasteSkippedTarget<
+  TObjectId extends SlideEditTextObjectId = SlideEditTextObjectId,
+> = {
+  objectId: TObjectId
+  reason: SlideEditTextAutoFitPasteSkipReason
+}
+
+export type SlideEditTextAutoFitPasteAppliedTarget<
+  TObjectId extends SlideEditTextObjectId = SlideEditTextObjectId,
+> = {
+  bounds: Bounds
+  commandId: 'resize-text-box-to-fit'
+  effectType: 'slide-command-effect'
+  handle: SlideEditTextResizeHandle
+  mode: SlideEditTextAutoFitMode
+  objectId: TObjectId
+  sourceFields: SlideEditTextAutoFitSourceFields
+}
+
+export type SlideEditTextAutoFitTargetSupportInput<
+  TObjectId extends SlideEditTextObjectId = SlideEditTextObjectId,
+> = {
+  pasteValue: SlideEditTextAutoFitJSONPasteValue
+  target: SlideEditTextAutoFitPasteTarget<TObjectId>
+}
+
+export type SlideEditTextAutoFitPasteCommandEffectsInput<
+  TSlideId extends SlideEditTextSlideId = SlideEditTextSlideId,
+  TObjectId extends SlideEditTextObjectId = SlideEditTextObjectId,
+> = {
+  isTargetSupported?: (
+    input: SlideEditTextAutoFitTargetSupportInput<TObjectId>,
+  ) => boolean
+  pasteValue: SlideEditTextAutoFitJSONPasteValue
+  slideId: TSlideId
+  targets: readonly SlideEditTextAutoFitPasteTarget<TObjectId>[]
+}
+
+export type SlideEditTextAutoFitPasteCommandEffectsResult<
+  TSlideId extends SlideEditTextSlideId = SlideEditTextSlideId,
+  TObjectId extends SlideEditTextObjectId = SlideEditTextObjectId,
+> = {
+  appliedTargets: readonly SlideEditTextAutoFitPasteAppliedTarget<TObjectId>[]
+  effects: readonly SlideEditTextAutoFitHostCommandEffect<TSlideId, TObjectId>[]
+  pasteValue: SlideEditTextAutoFitJSONPasteValue
+  skippedTargets: readonly SlideEditTextAutoFitPasteSkippedTarget<TObjectId>[]
+}
+
+export const SLIDE_EDIT_TEXT_AUTO_FIT_JSON_MIME_TYPE =
+  'application/vnd.interactive-os.slide-edit.text-auto-fit+json'
+
+export const SLIDE_EDIT_TEXT_AUTO_FIT_JSON_TYPES =
+  SLIDE_EDIT_TEXT_JSON_PASTE_TYPES
+
+export const SLIDE_EDIT_TEXT_AUTO_FIT_JSON_WRAPPER_KEYS = Object.freeze([
+  'textAutoFit',
+  'autoFit',
+  'textBoxAutoFit',
+  'textOverflow',
+] as const)
+
+const SLIDE_EDIT_TEXT_AUTO_FIT_MODE_KEYS = Object.freeze([
+  'mode',
+  'value',
+] as const)
+
+const SLIDE_EDIT_TEXT_AUTO_FIT_HANDLE_KEYS = Object.freeze([
+  'handle',
+  'resizeHandle',
+] as const)
+
 export function getSlideEditTextAutoSizeBounds({
   bounds,
   maxBounds,
@@ -216,6 +325,178 @@ export function getSlideEditTextAutoFitGestureCommandEffect<
   }
 }
 
+export function getSlideEditTextAutoFitJSONPasteValue({
+  dataTransfer,
+  jsonMimeType = SLIDE_EDIT_TEXT_AUTO_FIT_JSON_MIME_TYPE,
+}: SlideEditTextAutoFitJSONPasteInput):
+  SlideEditTextAutoFitJSONPasteValue | null {
+  if (!dataTransfer) {
+    return null
+  }
+
+  if (jsonMimeType) {
+    const customText = dataTransfer.getData(jsonMimeType)
+
+    if (customText.trim()) {
+      const customValue = parseSlideEditTextAutoFitJSON(customText)
+      const customPasteValue =
+        getSlideEditTextAutoFitDirectPasteValue(customValue)
+
+      if (customPasteValue !== null) {
+        return customPasteValue
+      }
+    }
+  }
+
+  for (const type of SLIDE_EDIT_TEXT_AUTO_FIT_JSON_TYPES) {
+    const text = dataTransfer.getData(type)
+
+    if (!text.trim()) {
+      continue
+    }
+
+    const value = parseSlideEditTextAutoFitJSON(text)
+    const pasteValue = getSlideEditTextAutoFitWrappedPasteValue(value)
+
+    if (pasteValue !== null) {
+      return pasteValue
+    }
+  }
+
+  return null
+}
+
+export function getSlideEditTextAutoFitPasteCommandEffects<
+  TSlideId extends SlideEditTextSlideId,
+  TObjectId extends SlideEditTextObjectId,
+>({
+  isTargetSupported,
+  pasteValue,
+  slideId,
+  targets,
+}: SlideEditTextAutoFitPasteCommandEffectsInput<TSlideId, TObjectId>):
+  SlideEditTextAutoFitPasteCommandEffectsResult<TSlideId, TObjectId> {
+  const appliedTargets: SlideEditTextAutoFitPasteAppliedTarget<TObjectId>[] = []
+  const effects: SlideEditTextAutoFitHostCommandEffect<TSlideId, TObjectId>[] =
+    []
+  const skippedTargets: SlideEditTextAutoFitPasteSkippedTarget<TObjectId>[] = []
+
+  for (const target of targets) {
+    if (target.isLocked) {
+      skippedTargets.push({
+        objectId: target.objectId,
+        reason: 'locked-target',
+      })
+      continue
+    }
+
+    if (target.isHidden) {
+      skippedTargets.push({
+        objectId: target.objectId,
+        reason: 'hidden-target',
+      })
+      continue
+    }
+
+    if (!target.measurement) {
+      skippedTargets.push({
+        objectId: target.objectId,
+        reason: 'missing-measurement',
+      })
+      continue
+    }
+
+    if (
+      isTargetSupported &&
+      !isTargetSupported({
+        pasteValue,
+        target,
+      })
+    ) {
+      skippedTargets.push({
+        objectId: target.objectId,
+        reason: 'unsupported-target',
+      })
+      continue
+    }
+
+    const effect = getSlideEditTextAutoFitGestureCommandEffect({
+      bounds: target.bounds,
+      handle: pasteValue.handle,
+      maxBounds: target.maxBounds,
+      measurement: target.measurement,
+      minSize: target.minSize,
+      objectId: target.objectId,
+      sizeMode: pasteValue.mode,
+      slideId,
+      type: 'resize-handle-double-click',
+    })
+
+    if (!effect) {
+      skippedTargets.push({
+        objectId: target.objectId,
+        reason: 'missing-measurement',
+      })
+      continue
+    }
+
+    effects.push(effect)
+    appliedTargets.push({
+      bounds: effect.payload.bounds,
+      commandId: effect.payload.id,
+      effectType: effect.type,
+      handle: effect.payload.handle,
+      mode: pasteValue.mode,
+      objectId: target.objectId,
+      sourceFields: pasteValue.sourceFields,
+    })
+  }
+
+  return {
+    appliedTargets,
+    effects,
+    pasteValue,
+    skippedTargets,
+  }
+}
+
+export function normalizeSlideEditTextAutoFitMode(
+  value: unknown,
+): SlideEditTextAutoFitMode | null {
+  if (value === true) {
+    return 'resize-to-fit'
+  }
+
+  if (typeof value !== 'string') {
+    return null
+  }
+
+  switch (value.trim().toLowerCase()) {
+    case 'auto':
+    case 'fit':
+    case 'resize':
+    case 'resize-to-fit':
+    case 'resizeshapetofittext':
+      return 'resize-to-fit'
+    default:
+      return null
+  }
+}
+
+export function normalizeSlideEditTextAutoFitHandle(
+  value: unknown,
+): SlideEditTextResizeHandle {
+  if (typeof value !== 'string') {
+    return 'se'
+  }
+
+  const normalizedValue = value.trim().toLowerCase()
+
+  return isSlideEditTextResizeHandle(normalizedValue)
+    ? normalizedValue
+    : 'se'
+}
+
 function getSlideEditTextMaximumSize(
   bounds: Bounds,
   maxBounds: Bounds | undefined,
@@ -309,4 +590,132 @@ function clampSlideEditTextSize(
   const normalizedValue = Number.isFinite(value) ? Math.max(0, value) : minimum
 
   return Math.max(minimum, Math.min(maximum, normalizedValue))
+}
+
+function getSlideEditTextAutoFitDirectPasteValue(
+  value: unknown,
+  wrapper?: string,
+): SlideEditTextAutoFitJSONPasteValue | null {
+  const directMode = normalizeSlideEditTextAutoFitMode(value)
+
+  if (directMode !== null) {
+    return {
+      handle: 'se',
+      mode: directMode,
+      sourceFields: {
+        mode: 'value',
+        ...(wrapper ? { wrapper } : {}),
+      },
+      surface: 'text-auto-fit',
+    }
+  }
+
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null
+  }
+
+  const record = value as Record<string, unknown>
+  const modeField = getSlideEditTextAutoFitModeField(record)
+
+  if (!modeField) {
+    return null
+  }
+
+  const handleField = getSlideEditTextAutoFitHandleField(record)
+
+  return {
+    handle: normalizeSlideEditTextAutoFitHandle(
+      handleField ? record[handleField] : null,
+    ),
+    mode: modeField.mode,
+    sourceFields: {
+      ...(handleField ? { handle: handleField } : {}),
+      mode: modeField.field,
+      ...(wrapper ? { wrapper } : {}),
+    },
+    surface: 'text-auto-fit',
+  }
+}
+
+function getSlideEditTextAutoFitWrappedPasteValue(
+  value: unknown,
+): SlideEditTextAutoFitJSONPasteValue | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null
+  }
+
+  const record = value as Record<string, unknown>
+
+  for (const key of SLIDE_EDIT_TEXT_AUTO_FIT_JSON_WRAPPER_KEYS) {
+    if (!Object.hasOwn(record, key)) {
+      continue
+    }
+
+    const pasteValue = getSlideEditTextAutoFitDirectPasteValue(
+      record[key],
+      key,
+    )
+
+    if (pasteValue !== null) {
+      return pasteValue
+    }
+  }
+
+  return null
+}
+
+function getSlideEditTextAutoFitModeField(record: Record<string, unknown>) {
+  for (const field of SLIDE_EDIT_TEXT_AUTO_FIT_MODE_KEYS) {
+    if (!Object.hasOwn(record, field)) {
+      continue
+    }
+
+    const mode = normalizeSlideEditTextAutoFitMode(record[field])
+
+    if (mode !== null) {
+      return {
+        field,
+        mode,
+      }
+    }
+  }
+
+  return null
+}
+
+function getSlideEditTextAutoFitHandleField(record: Record<string, unknown>) {
+  for (const field of SLIDE_EDIT_TEXT_AUTO_FIT_HANDLE_KEYS) {
+    if (Object.hasOwn(record, field)) {
+      return field
+    }
+  }
+
+  return null
+}
+
+function isSlideEditTextResizeHandle(
+  value: unknown,
+): value is SlideEditTextResizeHandle {
+  return [
+    'e',
+    'n',
+    'ne',
+    'nw',
+    's',
+    'se',
+    'sw',
+    'w',
+  ].includes(value as SlideEditTextResizeHandle)
+}
+
+function parseSlideEditTextAutoFitJSON(value: string) {
+  if (!value.trim()) {
+    return null
+  }
+
+  try {
+    return JSON.parse(value) as unknown
+  } catch {
+    return null
+  }
 }
