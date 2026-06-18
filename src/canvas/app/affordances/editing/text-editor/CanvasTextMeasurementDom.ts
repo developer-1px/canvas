@@ -1,3 +1,9 @@
+import {
+  getCanvasElementRect,
+  type CanvasElementRect,
+  type CanvasElementRectTarget,
+} from '../../../rendering/stage/CanvasAppStageElement'
+
 export type CanvasTextMeasurementSize = {
   h: number
   w: number
@@ -14,10 +20,9 @@ export type CanvasElementOverflowRect = {
   width: number
 }
 
-export type CanvasElementOverflowTarget = {
+export type CanvasElementOverflowTarget = CanvasElementRectTarget & {
   clientHeight: number
   clientWidth: number
-  getBoundingClientRect?: () => CanvasElementOverflowRect
   scrollHeight: number
   scrollWidth: number
 }
@@ -37,9 +42,8 @@ export type CanvasElementOverflowMeasurementInput = {
   epsilon?: number
 }
 
-export type CanvasTextMeasurementElement = {
+export type CanvasTextMeasurementElement = CanvasElementRectTarget & {
   appendChild: (child: CanvasTextMeasurementElement) => unknown
-  getBoundingClientRect: () => Pick<DOMRect, 'height' | 'width'>
   remove: () => void
   style: {
     display?: string
@@ -133,7 +137,11 @@ export function measureCanvasTextBlocks({
   document.body.appendChild(measurer)
 
   try {
-    const rect = measurer.getBoundingClientRect()
+    const rect = getCanvasElementRect(measurer)
+
+    if (!rect) {
+      return null
+    }
 
     return {
       h: rect.height,
@@ -150,7 +158,7 @@ export function measureCanvasElementOverflow({
   epsilon = 0,
 }: CanvasElementOverflowMeasurementInput):
   CanvasElementOverflowMeasurement | null {
-  const elementRect = element?.getBoundingClientRect?.()
+  const elementRect = getCanvasElementOverflowRect(element)
 
   if (
     !element ||
@@ -166,7 +174,7 @@ export function measureCanvasElementOverflow({
   const safeEpsilon = isCanvasTextMeasurementNumber(epsilon)
     ? Math.max(0, epsilon)
     : 0
-  const containerRect = container?.getBoundingClientRect?.() ?? null
+  const containerRect = getCanvasElementOverflowRect(container)
   const overflowAxis: CanvasElementOverflowAxis[] = []
 
   if (
@@ -223,6 +231,33 @@ function formatCanvasTextMeasurementStyleValue(
 
 function isCanvasTextMeasurementNumber(value: unknown): value is number {
   return typeof value === 'number' && Number.isFinite(value)
+}
+
+function getCanvasElementOverflowRect(
+  target?: CanvasElementRectTarget | null,
+): CanvasElementOverflowRect | null {
+  const rect = getCanvasElementRect(target)
+
+  if (!rect) {
+    return null
+  }
+
+  return {
+    bottom: getCanvasElementRectEdge(rect, 'bottom', rect.top + rect.height),
+    height: rect.height,
+    left: rect.left,
+    right: getCanvasElementRectEdge(rect, 'right', rect.left + rect.width),
+    top: rect.top,
+    width: rect.width,
+  }
+}
+
+function getCanvasElementRectEdge(
+  rect: CanvasElementRect,
+  edge: 'bottom' | 'right',
+  fallback: number,
+) {
+  return isCanvasTextMeasurementNumber(rect[edge]) ? rect[edge] : fallback
 }
 
 function getCanvasTextMeasurementDocument():

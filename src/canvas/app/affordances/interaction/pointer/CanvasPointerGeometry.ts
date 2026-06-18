@@ -6,21 +6,18 @@ import {
   getCanvasViewportScreenPoint,
   getCanvasViewportWorldPoint,
 } from '../../../../core'
-import type { CanvasAppStageElement } from '../../../rendering/stage/CanvasAppStageElement'
+import {
+  getCanvasElementRect,
+  type CanvasAppStageElement,
+  type CanvasElementRectTarget,
+} from '../../../rendering/stage/CanvasAppStageElement'
 
 export type CanvasPointerClientPosition = {
   clientX: number
   clientY: number
 }
 
-export type CanvasPointerLocalTarget = {
-  getBoundingClientRect?: () => {
-    height: number
-    left: number
-    top: number
-    width: number
-  }
-}
+export type CanvasPointerLocalTarget = CanvasElementRectTarget
 
 export type CanvasPointerLocalRect = {
   height: number
@@ -39,10 +36,9 @@ export type CanvasPointerLocalGeometryInput = {
   target?: CanvasPointerLocalTarget | null
 }
 
-export type CanvasWorldClientPointStageElement = Pick<
-  CanvasAppStageElement,
-  'getRect'
->
+export type CanvasWorldClientPointStageElement = {
+  getRect: CanvasAppStageElement['getRect']
+}
 
 export type CanvasWorldClientPointInput = {
   point: Point
@@ -61,7 +57,7 @@ export function getCanvasPointerLocalGeometry({
   event,
   target,
 }: CanvasPointerLocalGeometryInput): CanvasPointerLocalGeometry | null {
-  const rect = target?.getBoundingClientRect?.()
+  const rect = getCanvasElementRect(target)
 
   if (!rect) {
     return null

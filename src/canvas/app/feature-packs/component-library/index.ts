@@ -1,7 +1,7 @@
 import {
   CANVAS_COMPONENT_DEFINITION_REGISTRY,
-  CANVAS_COMPONENT_LIBRARY,
   DEFAULT_CANVAS_COMPONENT_TEMPLATES,
+  createCanvasComponentLibrary,
 } from '../../../host'
 import {
   createCanvasAppFeaturePackManifest,
@@ -9,6 +9,10 @@ import {
 
 export const CANVAS_COMPONENT_RUNTIME_FEATURE_PACK_CAPABILITY =
   'component-runtime'
+
+const CANVAS_APP_COMPONENT_RUNTIME_LIBRARY = createCanvasComponentLibrary({
+  templates: DEFAULT_CANVAS_COMPONENT_TEMPLATES,
+})
 
 export const CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST =
   createCanvasAppFeaturePackManifest({
@@ -26,7 +30,7 @@ export const CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST =
     provides: [CANVAS_COMPONENT_RUNTIME_FEATURE_PACK_CAPABILITY],
     runtimeFeaturePacks: {
       componentDefinitionRegistry: CANVAS_COMPONENT_DEFINITION_REGISTRY,
-      componentLibrary: CANVAS_COMPONENT_LIBRARY,
+      componentLibrary: CANVAS_APP_COMPONENT_RUNTIME_LIBRARY,
       templates: DEFAULT_CANVAS_COMPONENT_TEMPLATES,
     },
   })

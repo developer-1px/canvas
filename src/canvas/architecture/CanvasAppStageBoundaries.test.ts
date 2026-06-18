@@ -153,6 +153,7 @@ describe('Canvas App stage boundaries', () => {
     const packageFacadeFile = getSourceFile('src/canvas/index.ts')
     const mainFile = getSourceFile('src/main.tsx')
     const rootFile = getSourceFile('src/CanvasRoot.tsx')
+    const routerFile = getSourceFile('src/CanvasAppRouter.tsx')
 
     expect(shellFile.source).toContain('resolveCanvasAppAssemblySource')
     expect(assemblySourceFile.source).toContain(
@@ -164,10 +165,13 @@ describe('Canvas App stage boundaries', () => {
     expect(appFacadeFile.source).toContain('CanvasAppAssemblySource')
     expect(packageFacadeFile.source).toContain('CanvasAppAssemblySource')
     expect(mainFile.source).toContain('<CanvasRoot')
-    expect(rootFile.source).toContain('CanvasDevToolsDemoApp')
-    expect(rootFile.source).toContain('assemblyInput=')
+    expect(rootFile.source).toContain('CanvasAppRouter')
+    expect(rootFile.source).not.toContain('CanvasDevToolsDemoApp')
+    expect(routerFile.source).toContain('CanvasDevToolsDemoApp')
+    expect(routerFile.source).toContain('assemblyInput=')
     expect(mainFile.source).not.toContain('createCanvasAppAssembly')
     expect(rootFile.source).not.toContain('createCanvasAppAssembly')
+    expect(routerFile.source).not.toContain('createCanvasAppAssembly')
   })
 
 

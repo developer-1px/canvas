@@ -27,6 +27,11 @@ export type CanvasAppComponentAssemblyContract = {
   componentPresentationRenderers: CanvasAppComponentPresentationRenderers
 }
 
+type CanvasComponentPresentationRendererCoverageInput = {
+  componentLibrary: CanvasAppComponentLibrary
+  componentPresentationRenderers: CanvasAppComponentPresentationRenderers
+}
+
 export type CanvasAppComponentDefinition = CanvasComponentDefinition
 export type CanvasAppComponentDefinitionRegistry =
   CanvasComponentDefinitionRegistry
@@ -81,10 +86,7 @@ export function assertCanvasAppComponentAssembly({
 function assertCanvasComponentPresentationRendererCoverage({
   componentLibrary,
   componentPresentationRenderers,
-}: Pick<
-  CanvasAppComponentAssemblyContract,
-  'componentLibrary' | 'componentPresentationRenderers'
->) {
+}: CanvasComponentPresentationRendererCoverageInput) {
   for (const template of componentLibrary.templates) {
     if (!Object.hasOwn(componentPresentationRenderers, template.presentation)) {
       throw new Error(

@@ -1,8 +1,10 @@
-export type CanvasPointerCaptureTarget = {
-  hasPointerCapture?: (pointerId: number) => boolean
-  releasePointerCapture?: (pointerId: number) => void
-  setPointerCapture?: (pointerId: number) => void
-}
+import {
+  captureCanvasPointerTarget,
+  releaseCanvasPointerTarget,
+  type CanvasPointerCaptureTarget,
+} from '../../../rendering/stage/CanvasAppStageElement'
+
+export type { CanvasPointerCaptureTarget }
 
 export type CanvasPointerCaptureInput = {
   pointerId: number
@@ -18,42 +20,14 @@ export function captureCanvasPointer({
   pointerId,
   target,
 }: CanvasPointerCaptureInput) {
-  if (!target?.setPointerCapture) {
-    return false
-  }
-
-  if (target.hasPointerCapture?.(pointerId)) {
-    return false
-  }
-
-  try {
-    target.setPointerCapture(pointerId)
-  } catch {
-    return false
-  }
-
-  return true
+  return captureCanvasPointerTarget({ pointerId, target })
 }
 
 export function releaseCanvasPointerCapture({
   pointerId,
   target,
 }: CanvasPointerCaptureInput) {
-  if (!target?.releasePointerCapture) {
-    return false
-  }
-
-  if (target.hasPointerCapture && !target.hasPointerCapture(pointerId)) {
-    return false
-  }
-
-  try {
-    target.releasePointerCapture(pointerId)
-  } catch {
-    return false
-  }
-
-  return true
+  return releaseCanvasPointerTarget({ pointerId, target })
 }
 
 export function captureCanvasPointerFromEvent({

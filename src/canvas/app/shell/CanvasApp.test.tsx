@@ -2,7 +2,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import type {
   CanvasAppStageRenderInput,
-} from '../rendering/CanvasAppRenderingContracts'
+} from '../workflow'
 import CanvasApp from './CanvasApp'
 
 describe('CanvasApp', () => {

@@ -24,6 +24,7 @@ const demoModules = import.meta.glob('../../demo/**/*.{ts,tsx,css}', {
 const appEntryModules = import.meta.glob([
   '../../main.tsx',
   '../../CanvasRoot.tsx',
+  '../../CanvasAppRouter.tsx',
 ], {
   eager: true,
   import: 'default',

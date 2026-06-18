@@ -20,6 +20,21 @@ export type CanvasAppStageRect = {
   width: number
 }
 
+export type CanvasElementRect = CanvasAppStageRect & {
+  bottom?: number
+  right?: number
+}
+
+export type CanvasElementRectTarget = {
+  getBoundingClientRect?: () => CanvasElementRect
+}
+
+export type CanvasPointerCaptureTarget = {
+  hasPointerCapture?: (pointerId: number) => boolean
+  releasePointerCapture?: (pointerId: number) => void
+  setPointerCapture?: (pointerId: number) => void
+}
+
 export type CanvasAppStageSvgSnapshot = {
   height: number
   svg: string
@@ -96,6 +111,60 @@ export type CanvasAppStageElementController = CanvasAppStageElement & {
 export type CreateCanvasAppStageElementInput = {
   getElement: () => CanvasAppStageDomElement | null
   setElement: RefCallback<Element>
+}
+
+export function getCanvasElementRect(
+  target?: CanvasElementRectTarget | null,
+) {
+  return target?.getBoundingClientRect?.() ?? null
+}
+
+export function captureCanvasPointerTarget({
+  pointerId,
+  target,
+}: {
+  pointerId: number
+  target?: CanvasPointerCaptureTarget | null
+}) {
+  if (!target?.setPointerCapture) {
+    return false
+  }
+
+  if (target.hasPointerCapture?.(pointerId)) {
+    return false
+  }
+
+  try {
+    target.setPointerCapture(pointerId)
+  } catch {
+    return false
+  }
+
+  return true
+}
+
+export function releaseCanvasPointerTarget({
+  pointerId,
+  target,
+}: {
+  pointerId: number
+  target?: CanvasPointerCaptureTarget | null
+}) {
+  if (!target?.releasePointerCapture) {
+    return false
+  }
+
+  if (target.hasPointerCapture && !target.hasPointerCapture(pointerId)) {
+    return false
+  }
+
+  try {
+    target.releasePointerCapture(pointerId)
+  } catch {
+    return false
+  }
+
+  return true
 }
 
 export function useCanvasAppStageElement(): CanvasAppStageElementController {
