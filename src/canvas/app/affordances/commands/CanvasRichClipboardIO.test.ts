@@ -138,17 +138,29 @@ describe('CanvasRichClipboardIO', () => {
         },
       },
       clipboardItem: testClipboardItem,
+      extraItems: {
+        ' text/tab-separated-values ': 'A\tB\n1\t2',
+        'text/csv': new Blob(['A,B\n1,2'], { type: 'text/csv' }),
+        'text/plain': 'ignored plain text override',
+      },
       html: '<section></section>',
       json: '{"ok":true}',
       jsonMimeType,
+      plainText: 'fallback text',
       selectionSvg: '<svg></svg>',
     })).toBe('clipboard-item')
     expect(Object.keys(writes[0] ?? {}).sort()).toEqual([
       'application/vnd.example.selection+json',
       'image/svg+xml',
+      'text/csv',
       'text/html',
       'text/plain',
+      'text/tab-separated-values',
     ])
+    expect(await writes[0]['text/tab-separated-values'].text())
+      .toBe('A\tB\n1\t2')
+    expect(await writes[0]['text/csv'].text()).toBe('A,B\n1,2')
+    expect(await writes[0]['text/plain'].text()).toBe('fallback text')
     expect(textWrites).toEqual([])
 
     expect(await writeCanvasRichClipboardPayload({

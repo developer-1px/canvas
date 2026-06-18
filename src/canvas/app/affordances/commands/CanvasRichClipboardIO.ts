@@ -25,6 +25,12 @@ export type CanvasRichClipboardItemConstructor = new (
   items: Record<string, Blob>,
 ) => ClipboardItem
 
+export type CanvasRichClipboardExtraItemValue = Blob | string
+
+export type CanvasRichClipboardExtraItems = Readonly<
+  Record<string, CanvasRichClipboardExtraItemValue>
+>
+
 export type CanvasRichClipboardParsePayload<TPayload> = (
   value: unknown,
 ) => TPayload | null
@@ -46,6 +52,7 @@ export type CanvasRichClipboardDataTransferInput<TPayload> = {
 export type CanvasRichClipboardWriteInput = {
   clipboard?: CanvasRichClipboardClipboard | null
   clipboardItem?: CanvasRichClipboardItemConstructor
+  extraItems?: CanvasRichClipboardExtraItems
   html: string
   json: string
   jsonMimeType: string
@@ -184,6 +191,7 @@ export function readCanvasRichClipboardFromDataTransfer<TPayload>({
 export async function writeCanvasRichClipboardPayload({
   clipboard = getCanvasRichClipboardNavigatorClipboard(),
   clipboardItem = getCanvasRichClipboardItemConstructor(),
+  extraItems,
   html,
   json,
   jsonMimeType,
@@ -197,6 +205,19 @@ export async function writeCanvasRichClipboardPayload({
         [jsonMimeType]: new Blob([json], { type: jsonMimeType }),
         'text/html': new Blob([html], { type: 'text/html' }),
         'text/plain': new Blob([plainText], { type: 'text/plain' }),
+      }
+
+      for (const [mimeType, value] of Object.entries(extraItems ?? {})) {
+        const normalizedMimeType = mimeType.trim()
+
+        if (!normalizedMimeType || items[normalizedMimeType]) {
+          continue
+        }
+
+        items[normalizedMimeType] = getCanvasRichClipboardItemBlob(
+          normalizedMimeType,
+          value,
+        )
       }
 
       if (selectionSvg !== undefined && selectionSvg !== null) {
@@ -222,6 +243,15 @@ export async function writeCanvasRichClipboardPayload({
   }
 
   return 'unavailable'
+}
+
+function getCanvasRichClipboardItemBlob(
+  mimeType: string,
+  value: CanvasRichClipboardExtraItemValue,
+) {
+  return value instanceof Blob
+    ? value
+    : new Blob([value], { type: mimeType })
 }
 
 function escapeCanvasRichClipboardScriptJSON(value: string) {
