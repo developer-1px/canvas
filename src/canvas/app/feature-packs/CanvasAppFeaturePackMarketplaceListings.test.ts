@@ -15,6 +15,7 @@ describe('CanvasAppFeaturePackMarketplaceListings', () => {
     })).toEqual({
       access: 'free',
       distribution: 'available',
+      entitlement: 'granted',
       featurePackId: 'zoom-controls',
       priceLabel: undefined,
       vendor: undefined,
@@ -30,6 +31,7 @@ describe('CanvasAppFeaturePackMarketplaceListings', () => {
       listings: [{
         access: 'paid',
         distribution: 'coming-soon',
+        entitlement: 'granted',
         featurePackId: 'ai-pack',
         priceLabel: '$9/mo',
         vendor: 'Interactive OS',
@@ -40,6 +42,7 @@ describe('CanvasAppFeaturePackMarketplaceListings', () => {
     expect(listingById.get('ai-pack')).toEqual({
       access: 'paid',
       distribution: 'coming-soon',
+      entitlement: 'granted',
       featurePackId: 'ai-pack',
       priceLabel: '$9/mo',
       vendor: 'Interactive OS',

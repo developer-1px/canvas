@@ -24,9 +24,14 @@ export type CanvasAppFeaturePackMarketplaceListingDistribution =
   | 'deprecated'
   | 'unavailable'
 
+export type CanvasAppFeaturePackMarketplaceListingEntitlement =
+  | 'granted'
+  | 'required'
+
 export type CanvasAppFeaturePackMarketplaceListing = Readonly<{
   access: CanvasAppFeaturePackMarketplaceListingAccess
   distribution: CanvasAppFeaturePackMarketplaceListingDistribution
+  entitlement: CanvasAppFeaturePackMarketplaceListingEntitlement
   featurePackId: CanvasAppFeaturePackId
   priceLabel?: string
   vendor?: string
@@ -35,6 +40,7 @@ export type CanvasAppFeaturePackMarketplaceListing = Readonly<{
 export type CanvasAppFeaturePackMarketplaceListingInput = Readonly<{
   access?: CanvasAppFeaturePackMarketplaceListingAccess
   distribution?: CanvasAppFeaturePackMarketplaceListingDistribution
+  entitlement?: CanvasAppFeaturePackMarketplaceListingEntitlement
   featurePackId: CanvasAppFeaturePackId
   priceLabel?: string
   vendor?: string
@@ -48,6 +54,10 @@ export function createCanvasAppFeaturePackMarketplaceListing(
   return Object.freeze({
     access: input.access ?? 'free',
     distribution: input.distribution ?? 'available',
+    entitlement: input.entitlement ??
+      getCanvasAppFeaturePackMarketplaceListingDefaultEntitlement(
+        input.access ?? 'free',
+      ),
     featurePackId: input.featurePackId,
     priceLabel: input.priceLabel,
     vendor: input.vendor,
@@ -136,6 +146,16 @@ function assertCanvasAppFeaturePackMarketplaceListingInput(
     )
   }
 
+  if (
+    input.entitlement !== undefined &&
+    input.entitlement !== 'granted' &&
+    input.entitlement !== 'required'
+  ) {
+    throw new Error(
+      `Invalid canvas app feature pack marketplace listing entitlement: ${input.entitlement}`,
+    )
+  }
+
   if (input.priceLabel !== undefined) {
     assertCanvasAppDescriptorStringField({
       field: 'priceLabel',
@@ -151,4 +171,14 @@ function assertCanvasAppFeaturePackMarketplaceListingInput(
       value: input.vendor,
     })
   }
+}
+
+function getCanvasAppFeaturePackMarketplaceListingDefaultEntitlement(
+  access: CanvasAppFeaturePackMarketplaceListingAccess,
+): CanvasAppFeaturePackMarketplaceListingEntitlement {
+  if (access === 'paid' || access === 'private') {
+    return 'required'
+  }
+
+  return 'granted'
 }

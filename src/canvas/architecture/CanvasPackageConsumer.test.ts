@@ -123,6 +123,7 @@ import {
   type CanvasAppFeaturePackMarketplaceActionModel,
   type CanvasAppFeaturePackMarketplaceModel,
   type CanvasAppFeaturePackMarketplaceListing,
+  type CanvasAppFeaturePackMarketplaceListingEntitlement,
   type CanvasAppFeaturePackProfileMarketplaceActionModel,
   type CanvasAppFeaturePackSuiteMarketplaceActionModel,
   type CanvasAppFeaturePackCatalog,
@@ -454,6 +455,9 @@ describe('Canvas package consumer imports', () => {
         priceLabel: '$9/mo',
         vendor: 'Interactive OS',
       })
+    const partialUpdateListingEntitlement:
+      CanvasAppFeaturePackMarketplaceListingEntitlement =
+        partialUpdateListing.entitlement
     const aiLabsManifest = createCanvasAppAiLabsFeaturePackManifest({
       provider: {
         complete: () => ({ text: 'Summary' }),
@@ -999,11 +1003,13 @@ describe('Canvas package consumer imports', () => {
       ])
     expect(featurePackMarketplaceListingMap.get('smoke-partial-pack'))
       .toEqual(partialUpdateListing)
+    expect(partialUpdateListingEntitlement).toBe('required')
     expect(featurePackMarketplaceModel.packs.items[0]?.featurePackId)
       .toBe('smoke-partial-pack')
     expect(featurePackMarketplaceModel.packs.items[0]?.listing).toEqual({
       access: 'paid',
       distribution: 'available',
+      entitlement: 'required',
       featurePackId: 'smoke-partial-pack',
       priceLabel: '$9/mo',
       vendor: 'Interactive OS',

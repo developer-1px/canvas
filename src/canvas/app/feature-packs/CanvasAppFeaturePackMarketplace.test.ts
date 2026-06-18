@@ -89,6 +89,7 @@ describe('CanvasAppFeaturePackMarketplace', () => {
     expect(model.packs.items[1]?.listing).toEqual({
       access: 'private',
       distribution: 'available',
+      entitlement: 'required',
       featurePackId: 'addon-pack',
       priceLabel: undefined,
       vendor: 'Internal',

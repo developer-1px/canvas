@@ -90,6 +90,7 @@ describe('CanvasAppFeaturePackActions', () => {
       listings: [{
         access: 'paid',
         distribution: 'available',
+        entitlement: 'granted',
         featurePackId: 'command-pack',
         priceLabel: '$9/mo',
         vendor: 'Interactive OS',
@@ -109,6 +110,7 @@ describe('CanvasAppFeaturePackActions', () => {
       listing: {
         access: 'paid',
         distribution: 'available',
+        entitlement: 'granted',
         featurePackId: 'command-pack',
         priceLabel: '$9/mo',
         vendor: 'Interactive OS',
@@ -181,6 +183,90 @@ describe('CanvasAppFeaturePackActions', () => {
         status: 'enabled',
       }],
     })
+  })
+
+  it('blocks install actions when marketplace listing access is not granted', () => {
+    const manifest = createCanvasAppFeaturePackManifest({
+      id: 'paid-pack',
+      label: 'Paid pack',
+      lifecycle: {
+        partialUpdate: ['command'],
+        runtimeToggleable: true,
+      },
+    })
+
+    const item = getCanvasAppFeaturePackMarketplaceActionModel({
+      listings: [{
+        access: 'paid',
+        distribution: 'coming-soon',
+        featurePackId: 'paid-pack',
+      }],
+      manifests: [manifest],
+      options: {
+        featurePackStates: [{
+          id: 'paid-pack',
+          status: 'uninstalled',
+        }],
+      },
+    }).items[0]
+    const installAction = item?.actions.find((action) =>
+      action.kind === 'install',
+    )
+
+    expect(item?.listing).toMatchObject({
+      access: 'paid',
+      distribution: 'coming-soon',
+      entitlement: 'required',
+    })
+    expect(installAction).toMatchObject({
+      applicable: true,
+      marketplaceBlockedReasons: [
+        {
+          access: 'paid',
+          featurePackId: 'paid-pack',
+          kind: 'marketplace-entitlement-required',
+        },
+        {
+          distribution: 'coming-soon',
+          featurePackId: 'paid-pack',
+          kind: 'marketplace-distribution-unavailable',
+        },
+      ],
+      ready: false,
+      status: 'blocked',
+    })
+  })
+
+  it('keeps disable and uninstall actions available for installed paid packs', () => {
+    const manifest = createCanvasAppFeaturePackManifest({
+      id: 'paid-pack',
+      label: 'Paid pack',
+      lifecycle: {
+        partialUpdate: ['command'],
+        runtimeToggleable: true,
+      },
+    })
+
+    const item = getCanvasAppFeaturePackMarketplaceActionModel({
+      listings: [{
+        access: 'paid',
+        featurePackId: 'paid-pack',
+      }],
+      manifests: [manifest],
+    }).items[0]
+
+    expect(item?.actions.find((action) => action.kind === 'disable'))
+      .toMatchObject({
+        marketplaceBlockedReasons: [],
+        ready: true,
+        status: 'ready',
+      })
+    expect(item?.actions.find((action) => action.kind === 'uninstall'))
+      .toMatchObject({
+        marketplaceBlockedReasons: [],
+        ready: true,
+        status: 'ready',
+      })
   })
 
   it('keeps catalog and transition blockers available per action', () => {

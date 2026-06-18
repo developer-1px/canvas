@@ -62,6 +62,9 @@ export {
   type CanvasAppFeaturePackMarketplaceActionItem,
   type CanvasAppFeaturePackMarketplaceActionKind,
   type CanvasAppFeaturePackMarketplaceActionModel,
+  type CanvasAppFeaturePackMarketplaceListingBlockedReason,
+  type CanvasAppFeaturePackMarketplaceListingDistributionReason,
+  type CanvasAppFeaturePackMarketplaceListingEntitlementReason,
 } from './CanvasAppFeaturePackActions'
 export {
   getCanvasAppFeaturePackMarketplaceModel,
@@ -78,6 +81,7 @@ export {
   type CanvasAppFeaturePackMarketplaceListing,
   type CanvasAppFeaturePackMarketplaceListingAccess,
   type CanvasAppFeaturePackMarketplaceListingDistribution,
+  type CanvasAppFeaturePackMarketplaceListingEntitlement,
   type CanvasAppFeaturePackMarketplaceListingInput,
 } from './CanvasAppFeaturePackMarketplaceListings'
 export {
