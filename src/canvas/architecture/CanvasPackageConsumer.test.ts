@@ -151,6 +151,7 @@ import {
   DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS,
   DEFAULT_CANVAS_APP_FEATURE_PACK_SUITE_MANIFESTS,
   DEFAULT_CANVAS_APP_VIEW_FEATURE_PACK_MANIFESTS,
+  commitCanvasStoryImportActionHostUpdate,
   createCanvasAppFeaturePackProfile,
   createCanvasAppFeaturePackSuiteManifest,
   createCanvasStoryImportActionFromDataTransfer,
@@ -2273,6 +2274,25 @@ describe('Canvas package consumer imports', () => {
       currentComponentDefinitions: [],
       importedComponentDefinitions: packageStoryAction.componentDefinitions,
     })
+    const packageStoryCommittedUpdates:
+      ReturnType<typeof getCanvasStoryImportActionHostUpdate>[] = []
+    const packageStoryCommitResult = commitCanvasStoryImportActionHostUpdate({
+      action: packageStoryAction,
+      commitHostUpdate: (update) => {
+        packageStoryCommittedUpdates.push(update)
+
+        return true
+      },
+    })
+    const packageStoryRunResult =
+      CanvasAppFacade.runCanvasDataTransferImportActionPlan({
+        actions: [packageStoryAction],
+        runAction: (action) =>
+          commitCanvasStoryImportActionHostUpdate({
+            action,
+            commitHostUpdate: () => true,
+          }).committed,
+      })
 
     expect(getCanvasStoryImportActionItemsChange({
       action: packageStoryAction,
@@ -2292,6 +2312,22 @@ describe('Canvas package consumer imports', () => {
     expect(packageStoryMerge.addedComponentDefinitionIds).toEqual([
       'story-import-consumer-action-widget',
     ])
+    expect(packageStoryCommitResult).toMatchObject({
+      action: packageStoryAction,
+      committed: true,
+      status: 'committed',
+    })
+    expect(packageStoryCommittedUpdates[0]?.itemsChange.items.map((item) =>
+      item.id
+    )).toEqual([
+      'group-consumer-action-widget',
+      'story-consumer-action-widget-default',
+    ])
+    expect(packageStoryRunResult).toMatchObject({
+      consumed: true,
+      consumedAction: packageStoryAction,
+      consumedActionIndex: 0,
+    })
     expect(createCanvasStoryImportDataTransferActionResolver({
       scope: 'clipboard-paste',
     }).supportedFormats).toContain(CANVAS_STORY_IMPORT_JSON_MIME_TYPE)
@@ -2307,6 +2343,12 @@ describe('Canvas package consumer imports', () => {
       .toBe(createCanvasStoryImportDataTransferActionResolver)
     expect(CanvasAppAuthoring.createCanvasStoryImportDataTransferActionResolver)
       .toBe(createCanvasStoryImportDataTransferActionResolver)
+    expect(CanvasPackage.commitCanvasStoryImportActionHostUpdate)
+      .toBe(commitCanvasStoryImportActionHostUpdate)
+    expect(CanvasAppFacade.commitCanvasStoryImportActionHostUpdate)
+      .toBe(commitCanvasStoryImportActionHostUpdate)
+    expect(CanvasAppAuthoring.commitCanvasStoryImportActionHostUpdate)
+      .toBe(commitCanvasStoryImportActionHostUpdate)
     expect(CanvasPackage.getCanvasStoryImportActionHostUpdate)
       .toBe(getCanvasStoryImportActionHostUpdate)
     expect(CanvasAppFacade.getCanvasStoryImportActionHostUpdate)

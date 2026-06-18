@@ -117,6 +117,34 @@ export type CanvasStoryImportActionHostUpdateResult = Readonly<{
   selection: CanvasAppDocumentSelectionHistory
 }>
 
+export type CanvasStoryImportActionHostUpdateCommitter = (
+  update: CanvasStoryImportActionHostUpdateResult,
+) => boolean
+
+export type CommitCanvasStoryImportActionHostUpdateInput =
+  CanvasStoryImportActionHostUpdateInput & Readonly<{
+    commitHostUpdate: CanvasStoryImportActionHostUpdateCommitter
+  }>
+
+export type CanvasStoryImportActionHostUpdateCommittedResult = Readonly<{
+  action: CanvasStoryImportAction
+  committed: true
+  status: 'committed'
+  update: CanvasStoryImportActionHostUpdateResult
+}>
+
+export type CanvasStoryImportActionHostUpdateHeldResult = Readonly<{
+  action: CanvasStoryImportAction
+  committed: false
+  holdReason: 'host-update-not-committed'
+  status: 'held'
+  update: CanvasStoryImportActionHostUpdateResult
+}>
+
+export type CanvasStoryImportActionHostUpdateCommitResult =
+  | CanvasStoryImportActionHostUpdateCommittedResult
+  | CanvasStoryImportActionHostUpdateHeldResult
+
 export type CanvasStoryImportComponentDefinitionMergeInput = Readonly<{
   currentComponentDefinitions?: readonly CanvasComponentDefinition[]
   importedComponentDefinitions: readonly CanvasComponentDefinition[]
@@ -291,6 +319,37 @@ export function getCanvasStoryImportActionHostUpdate({
     replacedComponentDefinitionIds:
       componentDefinitionMerge.replacedComponentDefinitionIds,
     selection: selection ?? getCanvasStoryImportActionSelection(action),
+  })
+}
+
+export function commitCanvasStoryImportActionHostUpdate({
+  action,
+  commitHostUpdate,
+  currentComponentDefinitions,
+  selection,
+}: CommitCanvasStoryImportActionHostUpdateInput):
+  CanvasStoryImportActionHostUpdateCommitResult {
+  const update = getCanvasStoryImportActionHostUpdate({
+    action,
+    currentComponentDefinitions,
+    selection,
+  })
+
+  if (commitHostUpdate(update)) {
+    return Object.freeze({
+      action,
+      committed: true,
+      status: 'committed',
+      update,
+    })
+  }
+
+  return Object.freeze({
+    action,
+    committed: false,
+    holdReason: 'host-update-not-committed',
+    status: 'held',
+    update,
   })
 }
 

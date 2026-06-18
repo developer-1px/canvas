@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import {
   createCanvasDataTransferImportActionPlanFromRegistry,
   createCanvasDataTransferImportRegistry,
@@ -14,6 +14,7 @@ import {
   CANVAS_STORY_IMPORT_JSON_KIND,
   CANVAS_STORY_IMPORT_JSON_MIME_TYPE,
   CANVAS_STORY_IMPORT_JSON_VERSION,
+  commitCanvasStoryImportActionHostUpdate,
   createCanvasStoryImportActionFromDataTransfer,
   createCanvasStoryImportComponentDefinitions,
   createCanvasStoryImportDataTransferActionResolver,
@@ -430,6 +431,76 @@ describe('CanvasStoryImport', () => {
       'story-import-component-card',
     ])
     expect(Object.isFrozen(update)).toBe(true)
+  })
+
+  it('commits story import action host updates through a host callback', () => {
+    const action = createCanvasStoryImportActionFromDataTransfer({
+      dataTransfer: {
+        getData: (format) =>
+          format === CANVAS_STORY_IMPORT_JSON_MIME_TYPE
+            ? JSON.stringify(createStoryImportInput())
+            : '',
+      },
+    })
+
+    if (!action) {
+      throw new Error('Expected story import action')
+    }
+
+    const commitHostUpdate = vi.fn(() => true)
+    const result = commitCanvasStoryImportActionHostUpdate({
+      action,
+      commitHostUpdate,
+      currentComponentDefinitions: [],
+    })
+
+    expect(result).toMatchObject({
+      action,
+      committed: true,
+      status: 'committed',
+    })
+    expect(result.update.itemsChange.items.map((item) => item.id)).toEqual([
+      'group-component-card',
+      'story-card-default',
+    ])
+    expect(result.update.addedComponentDefinitionIds).toEqual([
+      'story-import-component-card',
+    ])
+    expect(commitHostUpdate).toHaveBeenCalledWith(result.update)
+    expect(Object.isFrozen(result)).toBe(true)
+  })
+
+  it('holds story import action host update commits when the host callback rejects them', () => {
+    const action = createCanvasStoryImportActionFromDataTransfer({
+      dataTransfer: {
+        getData: (format) =>
+          format === CANVAS_STORY_IMPORT_JSON_MIME_TYPE
+            ? JSON.stringify(createStoryImportInput())
+            : '',
+      },
+    })
+
+    if (!action) {
+      throw new Error('Expected story import action')
+    }
+
+    const commitHostUpdate = vi.fn(() => false)
+    const result = commitCanvasStoryImportActionHostUpdate({
+      action,
+      commitHostUpdate,
+      currentComponentDefinitions: action.componentDefinitions,
+    })
+
+    expect(result).toMatchObject({
+      action,
+      committed: false,
+      holdReason: 'host-update-not-committed',
+      status: 'held',
+    })
+    expect(result.update.replacedComponentDefinitionIds).toEqual([
+      'story-import-component-card',
+    ])
+    expect(commitHostUpdate).toHaveBeenCalledWith(result.update)
   })
 
   it('merges new story import component definitions after existing definitions', () => {
