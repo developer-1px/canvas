@@ -275,6 +275,7 @@ export {
 export {
   getCanvasEditableTextPatchOperation,
   getCanvasEditableTextPatchField,
+  getCanvasEditableTextPatchUpdates,
   getCanvasEditableTextBounds,
   getCanvasEditableTextValue,
   getCommittedCanvasEditableTextValue,

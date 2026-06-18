@@ -12,6 +12,14 @@ import type {
   ReplaceCanvasDocumentTextArgs,
   RestoreCanvasDocumentSelectionArgs,
 } from './CanvasDocumentRuntimeContracts'
+import {
+  transformCanvasAppItemsChange,
+} from '../../extensions/items-change-transformers'
+import {
+  CANVAS_COMPONENT_DEFINITION_REGISTRY,
+} from '../../../host'
+
+const EMPTY_CANVAS_APP_ITEMS_CHANGE_TRANSFORMERS = Object.freeze([])
 
 export function replaceCanvasDocumentLiveItems({
   action,
@@ -35,11 +43,25 @@ export function readCanvasCommittedDocumentState(
 
 export function commitCanvasDocumentItemsChange({
   change,
+  componentDefinitionRegistry,
   currentItems,
   document,
+  itemsChangeTransformers,
   selection,
 }: CommitCanvasDocumentItemsChangeArgs): CanvasDocumentCommittedState | null {
-  const didCommit = document.commitItemsChange(change, currentItems, selection)
+  const transformedChange = transformCanvasAppItemsChange({
+    change,
+    componentDefinitionRegistry:
+      componentDefinitionRegistry ?? CANVAS_COMPONENT_DEFINITION_REGISTRY,
+    currentItems,
+    transformers:
+      itemsChangeTransformers ?? EMPTY_CANVAS_APP_ITEMS_CHANGE_TRANSFORMERS,
+  })
+  const didCommit = document.commitItemsChange(
+    transformedChange,
+    currentItems,
+    selection,
+  )
 
   return didCommit
     ? readCanvasCommittedDocumentState(document)

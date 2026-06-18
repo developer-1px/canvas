@@ -13,6 +13,7 @@ import type {
   CanvasAppComponentRendererStrategy,
   CanvasAppCustomCommand,
   CanvasAppInspectorPanel,
+  CanvasAppItemsChangeTransformer,
   CanvasAppItemLayerAdapter,
   CanvasAppStageAdapter,
   CanvasWorkspaceStorageProvider,
@@ -196,6 +197,16 @@ describe('CanvasAppAssembly validation', () => {
         ],
       }),
     ).toThrow('Canvas app inspector panel risk-meta requires render')
+
+    expect(() =>
+      createCanvasAppAssembly({
+        itemsChangeTransformers: [
+          {
+            id: 'risk-sync',
+          } as unknown as CanvasAppItemsChangeTransformer,
+        ],
+      }),
+    ).toThrow('Canvas app items change transformer risk-sync requires transform')
 
     expect(() =>
       createCanvasAppAssembly({

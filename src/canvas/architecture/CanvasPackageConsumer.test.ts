@@ -43,7 +43,9 @@ import {
   CANVAS_APP_CORE_ONLY_FEATURE_PACK_PROFILE,
   CANVAS_APP_COMPONENT_INSPECTOR_FEATURE_PACK_MANIFEST,
   CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST,
+  CANVAS_APP_COMPONENT_SYNC_FEATURE_PACK_MANIFEST,
   CANVAS_COMPONENT_INSPECTOR_PANEL,
+  CANVAS_COMPONENT_SYNC_ITEMS_CHANGE_TRANSFORMER,
   CANVAS_APP_STORY_IMPORT_FEATURE_PACK_MANIFEST,
   CANVAS_APP_STORY_VIEWER_FEATURE_PACK_PROFILE,
   CANVAS_COMPONENT_SYSTEM_FEATURE_PACK_SUITE_MANIFEST,
@@ -72,6 +74,8 @@ import {
   getCanvasAppManifestViewFeaturePacks,
   getCanvasAppResolvedFeaturePackStates,
   getCanvasComponentInspectorPanelModel,
+  syncCanvasComponentItemsChange,
+  transformCanvasAppItemsChange,
   getCanvasFindInputKeyboardIntent,
   getCanvasInlineEditKeyboardIntent,
   getCanvasModalBackdropPointerIntent,
@@ -123,6 +127,8 @@ import {
   type CanvasAppStageMount,
   type CanvasControlTargetInput,
   type CanvasAppItemsChange,
+  type CanvasAppItemsChangeTransformContext,
+  type CanvasAppItemsChangeTransformer,
   type CanvasAppViewFeaturePack,
   type CanvasEditableFieldKeyboardIntentInput,
   type CanvasPresentationKeyboardIntentInput,
@@ -223,6 +229,13 @@ describe('Canvas package consumer imports', () => {
     const appItemsChange: CanvasAppItemsChange = {
       items: [rect],
       type: 'add',
+    }
+    const componentSyncTransformer: CanvasAppItemsChangeTransformer =
+      CANVAS_COMPONENT_SYNC_ITEMS_CHANGE_TRANSFORMER
+    const componentSyncContext: CanvasAppItemsChangeTransformContext = {
+      change: appItemsChange,
+      componentDefinitionRegistry: CANVAS_COMPONENT_DEFINITION_REGISTRY,
+      currentItems: [rect],
     }
     const commitAppItemsChange: CanvasAppCommitItemsChange = () => true
     const validateCustomItem: CanvasAppCustomItemValidator = (item) =>
@@ -595,6 +608,38 @@ describe('Canvas package consumer imports', () => {
       .toBe(CANVAS_COMPONENT_INSPECTOR_PANEL.id)
     expect(CanvasAppAuthoring.getCanvasComponentInspectorPanelModel)
       .toBe(getCanvasComponentInspectorPanelModel)
+    expect(CANVAS_APP_COMPONENT_SYNC_FEATURE_PACK_MANIFEST.id)
+      .toBe('component-sync')
+    expect(CanvasPackage.CANVAS_APP_COMPONENT_SYNC_FEATURE_PACK_MANIFEST.id)
+      .toBe(CANVAS_APP_COMPONENT_SYNC_FEATURE_PACK_MANIFEST.id)
+    expect(CanvasAppFacade.CANVAS_APP_COMPONENT_SYNC_FEATURE_PACK_MANIFEST.id)
+      .toBe(CANVAS_APP_COMPONENT_SYNC_FEATURE_PACK_MANIFEST.id)
+    expect(
+      CanvasAppAuthoring.CANVAS_APP_COMPONENT_SYNC_FEATURE_PACK_MANIFEST.id,
+    ).toBe(CANVAS_APP_COMPONENT_SYNC_FEATURE_PACK_MANIFEST.id)
+    expect(componentSyncTransformer.id).toBe('component-sync-items-change')
+    expect(CanvasPackage.CANVAS_COMPONENT_SYNC_ITEMS_CHANGE_TRANSFORMER.id)
+      .toBe(componentSyncTransformer.id)
+    expect(CanvasAppFacade.CANVAS_COMPONENT_SYNC_ITEMS_CHANGE_TRANSFORMER.id)
+      .toBe(componentSyncTransformer.id)
+    expect(CanvasAppAuthoring.CANVAS_COMPONENT_SYNC_ITEMS_CHANGE_TRANSFORMER.id)
+      .toBe(componentSyncTransformer.id)
+    expect(syncCanvasComponentItemsChange(componentSyncContext))
+      .toBe(appItemsChange)
+    expect(CanvasPackage.syncCanvasComponentItemsChange(componentSyncContext))
+      .toBe(appItemsChange)
+    expect(transformCanvasAppItemsChange({
+      ...componentSyncContext,
+      transformers: [componentSyncTransformer],
+    })).toBe(appItemsChange)
+    expect(CanvasAppFacade.transformCanvasAppItemsChange({
+      ...componentSyncContext,
+      transformers: [componentSyncTransformer],
+    })).toBe(appItemsChange)
+    expect(CanvasAppAuthoring.transformCanvasAppItemsChange({
+      ...componentSyncContext,
+      transformers: [componentSyncTransformer],
+    })).toBe(appItemsChange)
     const emptyComponentInspectorModel: CanvasComponentInspectorPanelModel | null =
       getCanvasComponentInspectorPanelModel({
         bounds: null,
@@ -614,6 +659,8 @@ describe('Canvas package consumer imports', () => {
     )
     expect(CANVAS_COMPONENT_SYSTEM_FEATURE_PACK_SUITE_MANIFEST.featurePackIds)
       .toContain(CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST.id)
+    expect(CANVAS_COMPONENT_SYSTEM_FEATURE_PACK_SUITE_MANIFEST.featurePackIds)
+      .toContain(CANVAS_APP_COMPONENT_SYNC_FEATURE_PACK_MANIFEST.id)
     expect(CANVAS_COMPONENT_SYSTEM_FEATURE_PACK_SUITE_MANIFEST.featurePackIds)
       .toContain(CANVAS_APP_COMPONENT_INSPECTOR_FEATURE_PACK_MANIFEST.id)
     expect(CANVAS_STORY_CANVAS_SUITE_ID).toBe('story-canvas')

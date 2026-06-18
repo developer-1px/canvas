@@ -75,6 +75,9 @@ import {
   CANVAS_APP_COMPONENT_INSPECTOR_FEATURE_PACK_MANIFEST,
 } from './component-inspector'
 import {
+  CANVAS_APP_COMPONENT_SYNC_FEATURE_PACK_MANIFEST,
+} from './component-sync'
+import {
   CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST,
 } from './component-library'
 import {
@@ -259,6 +262,7 @@ describe('CanvasAppFeaturePacks', () => {
         (manifest) => manifest.id,
       ),
     ).toEqual([
+      'component-sync',
       'component-inspector',
       'media-import',
       'arrow-routing-inspector',
@@ -266,11 +270,18 @@ describe('CanvasAppFeaturePacks', () => {
       'kanban-inspector',
     ])
     expect(DEFAULT_CANVAS_APP_FEATURE_PACKS.map((pack) => pack.id)).toEqual([
+      'component-sync',
       'component-inspector',
       'media-import',
       'arrow-routing-inspector',
       'checklist-inspector',
       'kanban-inspector',
+    ])
+    expect(
+      DEFAULT_CANVAS_APP_FEATURE_PACK_EXTENSION_BUNDLE
+        .itemsChangeTransformers.map((transformer) => transformer.id),
+    ).toEqual([
+      'component-sync-items-change',
     ])
     expect(
       DEFAULT_CANVAS_APP_FEATURE_PACK_EXTENSION_BUNDLE.inspectorPanels.map(
@@ -544,6 +555,7 @@ describe('CanvasAppFeaturePacks', () => {
     expect(CANVAS_COMPONENT_SYSTEM_FEATURE_PACK_SUITE_MANIFEST.featurePackIds)
       .toEqual([
         CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST.id,
+        CANVAS_APP_COMPONENT_SYNC_FEATURE_PACK_MANIFEST.id,
         CANVAS_APP_COMPONENT_INSPECTOR_FEATURE_PACK_MANIFEST.id,
         CANVAS_APP_COMPONENT_AUTHORING_FEATURE_PACK_MANIFEST.id,
       ])
@@ -615,6 +627,8 @@ describe('CanvasAppFeaturePacks', () => {
       .toContain(CANVAS_APP_COMPONENT_AUTHORING_FEATURE_PACK_MANIFEST.id)
     expect(DEFAULT_CANVAS_APP_EDITOR_FEATURE_PACK_PROFILE.enabledFeaturePackIds)
       .toContain(CANVAS_APP_COMPONENT_INSPECTOR_FEATURE_PACK_MANIFEST.id)
+    expect(DEFAULT_CANVAS_APP_EDITOR_FEATURE_PACK_PROFILE.enabledFeaturePackIds)
+      .toContain(CANVAS_APP_COMPONENT_SYNC_FEATURE_PACK_MANIFEST.id)
     expect(() =>
       createCanvasAppFeaturePackProfile({
         enabledFeaturePackIds: ['toolbar'],

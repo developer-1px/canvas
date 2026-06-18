@@ -250,6 +250,13 @@ describe('CanvasAppAssembly seams', () => {
     expect(assembly.textPasteImporters.map((importer) => importer.id)).toEqual([
       'risk-paste',
     ])
+    expect(assembly.itemsChangeTransformers.map(
+      (transformer) => transformer.id,
+    )).toEqual([
+      'component-sync-items-change',
+    ])
+    expect(assemblyModel.workspace.itemsChangeTransformers)
+      .toBe(assembly.itemsChangeTransformers)
     expect(assembly.inspectorPanels.map((panel) => panel.id)).toEqual([
       'component-binding',
       'link-preview-actions',
@@ -367,7 +374,7 @@ describe('CanvasAppAssembly seams', () => {
 
   it('assembles feature pack manifests as installable app assembly units', () => {
     const disabledAssembly = createCanvasAppAssembly({
-      disabledFeaturePackIds: ['toolbar', 'media-import'],
+      disabledFeaturePackIds: ['toolbar', 'media-import', 'component-sync'],
     })
 
     expect(disabledAssembly.featurePackViewRenderers.toolbar).toBeUndefined()
@@ -380,7 +387,13 @@ describe('CanvasAppAssembly seams', () => {
     expect(disabledAssembly.installedFeaturePackIds).not.toContain(
       'media-import',
     )
+    expect(disabledAssembly.installedFeaturePackIds).not.toContain(
+      'component-sync',
+    )
     expect(disabledAssembly.installedFeaturePackIds).toContain('table-import')
+    expect(disabledAssembly.itemsChangeTransformers.map(
+      (transformer) => transformer.id,
+    )).not.toContain('component-sync-items-change')
     expect(disabledAssembly.inspectorPanels.map((panel) => panel.id))
       .not.toContain('link-preview-actions')
     expect(disabledAssembly.inspectorPanels.map((panel) => panel.id))

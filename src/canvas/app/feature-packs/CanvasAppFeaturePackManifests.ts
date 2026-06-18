@@ -71,6 +71,7 @@ export type CanvasAppFeaturePackManifestCategory =
 export type CanvasAppFeaturePackContributionSurface =
   | 'asset'
   | 'command'
+  | 'document-change'
   | 'documentation'
   | 'exporter'
   | 'importer'
@@ -127,6 +128,7 @@ const CANVAS_APP_FEATURE_PACK_CONTRIBUTION_SURFACES =
   Object.freeze([
     'asset',
     'command',
+    'document-change',
     'documentation',
     'exporter',
     'importer',

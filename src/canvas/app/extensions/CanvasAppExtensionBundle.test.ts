@@ -12,6 +12,9 @@ import {
   getCanvasAppFoundationExtensionRendererSlots,
 } from './foundation-extensions'
 import { getCanvasAppFoundationExtensionTools } from './foundation-extensions'
+import type {
+  CanvasAppItemsChangeTransformer,
+} from './items-change-transformers'
 import type { CanvasMediaImporter } from '../feature-packs/media-import'
 import type { CanvasTextPasteImporter } from '../feature-packs/text-paste-import'
 
@@ -24,6 +27,7 @@ describe('CanvasAppExtensionBundle', () => {
       customItemValidators: {},
       foundationExtensions: [],
       inspectorPanels: [],
+      itemsChangeTransformers: [],
       mediaImporters: [],
       textPasteImporters: [],
     })
@@ -41,6 +45,7 @@ describe('CanvasAppExtensionBundle', () => {
       },
       foundationExtensions: [createFoundationExtension('canvas.risk')],
       inspectorPanels: [createPanel('risk-panel')],
+      itemsChangeTransformers: [createItemsChangeTransformer('risk-sync')],
       mediaImporters: [createMediaImporter('risk-media')],
       textPasteImporters: [createTextPasteImporter('risk-paste')],
     })
@@ -55,6 +60,7 @@ describe('CanvasAppExtensionBundle', () => {
       },
       foundationExtensions: [createFoundationExtension('canvas.note')],
       inspectorPanels: [createPanel('note-panel')],
+      itemsChangeTransformers: [createItemsChangeTransformer('note-sync')],
       mediaImporters: [createMediaImporter('note-media')],
       textPasteImporters: [createTextPasteImporter('note-paste')],
     })
@@ -80,6 +86,12 @@ describe('CanvasAppExtensionBundle', () => {
     expect(merged.inspectorPanels.map((panel) => panel.id)).toEqual([
       'risk-panel',
       'note-panel',
+    ])
+    expect(merged.itemsChangeTransformers.map(
+      (transformer) => transformer.id,
+    )).toEqual([
+      'risk-sync',
+      'note-sync',
     ])
     expect(merged.mediaImporters.map((importer) => importer.id)).toEqual([
       'risk-media',
@@ -207,6 +219,20 @@ describe('CanvasAppExtensionBundle', () => {
     expect(() =>
       mergeCanvasAppExtensionBundle({
         current: createCanvasAppExtensionBundle({
+          itemsChangeTransformers: [createItemsChangeTransformer('risk-sync')],
+        }),
+        entries: createCanvasAppExtensionBundle({
+          itemsChangeTransformers: [createItemsChangeTransformer('risk-sync')],
+        }),
+        owner: 'app assembly',
+      }),
+    ).toThrow(
+      'Duplicate canvas app assembly items change transformer: risk-sync',
+    )
+
+    expect(() =>
+      mergeCanvasAppExtensionBundle({
+        current: createCanvasAppExtensionBundle({
           mediaImporters: [createMediaImporter('embed')],
         }),
         entries: createCanvasAppExtensionBundle({
@@ -236,6 +262,7 @@ describe('CanvasAppExtensionBundle', () => {
     const renderRisk = () => null
     const validateRisk = () => true
     const panel = createPanel('risk-panel')
+    const itemsChangeTransformer = createItemsChangeTransformer('risk-sync')
     const mediaImporter = createMediaImporter('risk-media')
     const textPasteImporter = createTextPasteImporter('risk-paste')
     const foundationExtension = createFoundationExtension('canvas.risk')
@@ -250,6 +277,7 @@ describe('CanvasAppExtensionBundle', () => {
       },
       foundationExtensions: [foundationExtension],
       inspectorPanels: [panel],
+      itemsChangeTransformers: [itemsChangeTransformer],
       mediaImporters: [mediaImporter],
       textPasteImporters: [textPasteImporter],
     })
@@ -262,6 +290,7 @@ describe('CanvasAppExtensionBundle', () => {
     foundationExtension.requiredAdapters = ['renderer']
     foundationExtension.tools = []
     panel.id = 'mutated-panel'
+    itemsChangeTransformer.id = 'mutated-sync'
     mediaImporter.createItems = () => []
     textPasteImporter.createItems = () => []
 
@@ -310,6 +339,7 @@ describe('CanvasAppExtensionBundle', () => {
     expect(snapshot.customItemRenderers.risk).toBe(renderRisk)
     expect(snapshot.customItemValidators.risk).toBe(validateRisk)
     expect(snapshot.inspectorPanels[0]?.id).toBe('risk-panel')
+    expect(snapshot.itemsChangeTransformers[0]?.id).toBe('risk-sync')
     expect(snapshot.mediaImporters[0]?.createItems({} as never)).toBeNull()
     expect(snapshot.textPasteImporters[0]?.createItems({} as never)).toBeNull()
     expect(Object.isFrozen(snapshot)).toBe(true)
@@ -339,6 +369,7 @@ describe('CanvasAppExtensionBundle', () => {
     expect(Object.isFrozen(snapshot.customItemRenderers)).toBe(true)
     expect(Object.isFrozen(snapshot.customItemValidators)).toBe(true)
     expect(Object.isFrozen(snapshot.inspectorPanels[0])).toBe(true)
+    expect(Object.isFrozen(snapshot.itemsChangeTransformers[0])).toBe(true)
     expect(Object.isFrozen(snapshot.mediaImporters[0])).toBe(true)
     expect(Object.isFrozen(snapshot.textPasteImporters[0])).toBe(true)
   })
@@ -442,6 +473,15 @@ function createPanel(id: string) {
   return {
     id,
     render: () => null,
+  }
+}
+
+function createItemsChangeTransformer(
+  id: string,
+): CanvasAppItemsChangeTransformer {
+  return {
+    id,
+    transform: ({ change }) => change,
   }
 }
 

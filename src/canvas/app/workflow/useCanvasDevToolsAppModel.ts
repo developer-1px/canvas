@@ -56,9 +56,11 @@ export function useCanvasDevToolsAppModel({
   )
   const stageElement = useCanvasAppStageElement()
   const workspace = useCanvasWorkspaceModel({
+    componentDefinitionRegistry: assembly.componentDefinitionRegistry,
     customItemValidators: assembly.customItemValidators,
     initialItems: assembly.initialItems,
     initialSelection: assembly.initialSelection,
+    itemsChangeTransformers: assembly.itemsChangeTransformers,
     storageProvider: assembly.workspaceStorageProvider,
   })
   const customFocus = useCanvasAppCustomFocus({

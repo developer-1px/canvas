@@ -27,6 +27,9 @@ import type {
   CanvasAppStageAdapter,
 } from '../rendering/CanvasAppRenderingContracts'
 import type { CanvasAppInspectorPanel } from '../extensions/inspector-panels'
+import type {
+  CanvasAppItemsChangeTransformer,
+} from '../extensions/items-change-transformers'
 import type { CanvasAppCustomCreationTool } from '../extensions/custom-tools/CanvasAppCustomCreationTools'
 import type {
   CanvasAppFeaturePackId,
@@ -64,6 +67,7 @@ export type CanvasAppAssemblyCollaborationModel = {
 export type CanvasAppAssemblyExtensionModel = {
   customCommands: readonly CanvasAppCustomCommand[]
   customCreationTools: readonly CanvasAppCustomCreationTool[]
+  itemsChangeTransformers: readonly CanvasAppItemsChangeTransformer[]
   mediaImporters: readonly CanvasMediaImporter[]
   textPasteImporters: readonly CanvasTextPasteImporter[]
 }
@@ -96,9 +100,11 @@ export type CanvasAppAssemblyRenderingModel = {
 }
 
 export type CanvasAppAssemblyWorkspaceModel = {
+  componentDefinitionRegistry: CanvasAppComponentDefinitionRegistry
   customItemValidators: CanvasAppCustomItemValidators
   initialItems: CanvasItem[]
   initialSelection: readonly string[]
+  itemsChangeTransformers: readonly CanvasAppItemsChangeTransformer[]
   storageProvider: CanvasWorkspaceStorageProvider
 }
 

@@ -8,10 +8,15 @@ import {
 } from 'react'
 import type { CanvasItem } from '../../../entities'
 import {
+  CANVAS_COMPONENT_DEFINITION_REGISTRY,
+  type CanvasComponentDefinitionRegistry,
   createCanvasDocumentController,
   type CanvasDocumentController,
   type CanvasItemValidationOptions,
 } from '../../../host'
+import type {
+  CanvasAppItemsChangeTransformer,
+} from '../../extensions/items-change-transformers'
 import type {
   CommitCanvasItemsChange,
   CommitCanvasSelection,
@@ -27,10 +32,19 @@ import {
   undoCanvasDocumentHistory,
 } from './CanvasDocumentRuntime'
 
+export type CanvasDocumentTransformOptions = {
+  componentDefinitionRegistry?: CanvasComponentDefinitionRegistry
+  itemsChangeTransformers?: readonly CanvasAppItemsChangeTransformer[]
+}
+
+const EMPTY_CANVAS_APP_ITEMS_CHANGE_TRANSFORMERS =
+  Object.freeze([]) satisfies readonly CanvasAppItemsChangeTransformer[]
+
 export function useCanvasDocument(
   initialItems: CanvasItem[],
   initialSelection: string[] = [],
   validation: CanvasItemValidationOptions = {},
+  transformOptions: CanvasDocumentTransformOptions = {},
 ) {
   const [document] = useState<CanvasDocumentController>(() =>
     createCanvasDocumentController(initialItems, initialSelection, validation),
@@ -40,6 +54,12 @@ export function useCanvasDocument(
   const [historyAvailability, setHistoryAvailability] =
     useState(() => document.readHistoryAvailability())
   const itemsRef = useRef(items)
+  const componentDefinitionRegistry =
+    transformOptions.componentDefinitionRegistry ??
+    CANVAS_COMPONENT_DEFINITION_REGISTRY
+  const itemsChangeTransformers =
+    transformOptions.itemsChangeTransformers ??
+    EMPTY_CANVAS_APP_ITEMS_CHANGE_TRANSFORMERS
 
   useEffect(() => {
     return document.subscribeSelection(() => {
@@ -74,8 +94,10 @@ export function useCanvasDocument(
     (change, selection) => {
       const committedState = commitCanvasDocumentItemsChange({
         change,
+        componentDefinitionRegistry,
         currentItems: itemsRef.current,
         document,
+        itemsChangeTransformers,
         selection,
       })
 
@@ -95,7 +117,12 @@ export function useCanvasDocument(
 
       return true
     },
-    [document, syncCommittedState],
+    [
+      componentDefinitionRegistry,
+      document,
+      itemsChangeTransformers,
+      syncCommittedState,
+    ],
   )
 
   const setSelection: Dispatch<SetStateAction<string[]>> = useCallback(

@@ -42,6 +42,7 @@ export function createCanvasAppExtensionAssembly(
       customCommands: input.customCommands,
       foundationExtensions: input.foundationExtensions,
       inspectorPanels: input.inspectorPanels,
+      itemsChangeTransformers: input.itemsChangeTransformers,
       mediaImporters: input.mediaImporters,
       textPasteImporters: input.textPasteImporters,
     }),

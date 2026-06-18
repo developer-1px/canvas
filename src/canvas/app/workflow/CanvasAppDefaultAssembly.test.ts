@@ -77,6 +77,9 @@ describe('CanvasAppDefaultAssembly', () => {
     expect(DEFAULT_CANVAS_APP_ASSEMBLY.inspectorPanels).toEqual(
       DEFAULT_CANVAS_APP_FEATURE_PACK_EXTENSION_BUNDLE.inspectorPanels,
     )
+    expect(DEFAULT_CANVAS_APP_ASSEMBLY.itemsChangeTransformers).toEqual(
+      DEFAULT_CANVAS_APP_FEATURE_PACK_EXTENSION_BUNDLE.itemsChangeTransformers,
+    )
     expect(DEFAULT_CANVAS_APP_ASSEMBLY.initialItems).toEqual(INITIAL_ITEMS)
     expect(DEFAULT_CANVAS_APP_ASSEMBLY.initialSelection).toEqual([
       'component-sticky',

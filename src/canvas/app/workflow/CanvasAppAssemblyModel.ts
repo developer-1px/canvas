@@ -14,6 +14,7 @@ export function getCanvasAppAssemblyModel({
   featurePackViewRenderers,
   installedFeaturePackIds,
   inspectorPanels,
+  itemsChangeTransformers,
   initialItems,
   initialSelection,
   itemAdapters,
@@ -47,6 +48,7 @@ export function getCanvasAppAssemblyModel({
     extension: {
       customCommands,
       customCreationTools,
+      itemsChangeTransformers,
       mediaImporters,
       textPasteImporters,
     },
@@ -72,9 +74,11 @@ export function getCanvasAppAssemblyModel({
       stageAdapter,
     },
     workspace: {
+      componentDefinitionRegistry,
       customItemValidators,
       initialItems,
       initialSelection,
+      itemsChangeTransformers,
       storageProvider: workspaceStorageProvider,
     },
   }

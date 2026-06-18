@@ -1,6 +1,12 @@
 import type { CanvasSelectionIds } from '../../../core'
 import type { CanvasItem } from '../../../entities'
 import type {
+  CanvasComponentDefinitionRegistry,
+} from '../../../host'
+import type {
+  CanvasAppItemsChangeTransformer,
+} from '../../extensions/items-change-transformers'
+import type {
   CanvasAppDocumentSelectionHistory,
   CanvasAppDocumentTextSearch,
   CanvasAppItemsChange,
@@ -31,8 +37,10 @@ export type ReplaceCanvasDocumentLiveItemsArgs = {
 
 export type CommitCanvasDocumentItemsChangeArgs = {
   change: CanvasAppItemsChange
+  componentDefinitionRegistry?: CanvasComponentDefinitionRegistry
   currentItems: CanvasItem[]
   document: CanvasDocumentRuntimeController
+  itemsChangeTransformers?: readonly CanvasAppItemsChangeTransformer[]
   selection?: CanvasAppDocumentSelectionHistory
 }
 

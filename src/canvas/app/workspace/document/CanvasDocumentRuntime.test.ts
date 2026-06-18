@@ -81,6 +81,42 @@ describe('CanvasDocumentRuntime', () => {
     expect(failedDocument.readHistoryAvailability).not.toHaveBeenCalled()
   })
 
+  it('transforms item changes before committing them to the document', () => {
+    const currentItems = [createRectItem('rect-1')]
+    const committedItems = [createRectItem('rect-2')]
+    const document = createDocument({
+      commitItemsChange: vi.fn(() => true),
+      readItems: vi.fn(() => committedItems),
+    })
+
+    expect(commitCanvasDocumentItemsChange({
+      change: {
+        items: [createRectItem('rect-1')],
+        type: 'replace-changed',
+      },
+      currentItems,
+      document,
+      itemsChangeTransformers: [{
+        id: 'replace-rect',
+        transform: ({ change }) =>
+          change.type === 'replace-changed'
+            ? {
+                ...change,
+                items: [createRectItem('rect-2')],
+              }
+            : change,
+      }],
+    })?.items).toBe(committedItems)
+    expect(document.commitItemsChange).toHaveBeenCalledWith(
+      {
+        items: [createRectItem('rect-2')],
+        type: 'replace-changed',
+      },
+      currentItems,
+      undefined,
+    )
+  })
+
   it('resolves selection actions against current document selection', () => {
     const currentItems = [createRectItem('rect-1')]
     const document = createDocument({

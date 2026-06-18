@@ -4,6 +4,10 @@ import {
 } from 'react'
 import type { CanvasItem } from '../../entities'
 import {
+  CANVAS_COMPONENT_DEFINITION_REGISTRY,
+  type CanvasComponentDefinitionRegistry,
+} from '../../host'
+import {
   readStoredCanvasWorkspace,
   type CanvasWorkspaceStorageProvider,
   useCanvasWorkspacePersistence,
@@ -11,6 +15,9 @@ import {
 import type {
   CanvasAppCustomItemValidators,
 } from '../extensions/custom-item-modules/CanvasAppCustomItemValidatorContracts'
+import type {
+  CanvasAppItemsChangeTransformer,
+} from '../extensions/items-change-transformers'
 import { useCanvasDocument } from '../workspace/document/useCanvasDocument'
 import { getCanvasWorkspaceConsumerModel } from './CanvasWorkspaceConsumerModel'
 import {
@@ -20,14 +27,18 @@ import {
 } from './CanvasWorkspaceRuntimeModel'
 
 export function useCanvasWorkspaceModel({
+  componentDefinitionRegistry = CANVAS_COMPONENT_DEFINITION_REGISTRY,
   customItemValidators,
   initialItems,
   initialSelection,
+  itemsChangeTransformers = [],
   storageProvider,
 }: {
+  componentDefinitionRegistry?: CanvasComponentDefinitionRegistry
   customItemValidators?: CanvasAppCustomItemValidators
   initialItems: CanvasItem[]
   initialSelection: readonly string[]
+  itemsChangeTransformers?: readonly CanvasAppItemsChangeTransformer[]
   storageProvider: CanvasWorkspaceStorageProvider
 }) {
   const validation = useMemo(
@@ -50,6 +61,10 @@ export function useCanvasWorkspaceModel({
     initialState.items,
     initialState.selection,
     validation,
+    {
+      componentDefinitionRegistry,
+      itemsChangeTransformers,
+    },
   )
   const [viewport, setViewport] = useState(() => initialState.viewport)
   const {

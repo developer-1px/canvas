@@ -87,6 +87,11 @@ export type {
   CanvasAppInspectorPanelView,
 } from '../extensions/inspector-panels'
 export {
+  transformCanvasAppItemsChange,
+  type CanvasAppItemsChangeTransformContext,
+  type CanvasAppItemsChangeTransformer,
+} from '../extensions/items-change-transformers'
+export {
   createCanvasAppDomEditStyleFeaturePackManifest,
   createCanvasDomEditStyleInspectorPanel,
   getCanvasDomEditStyle,
@@ -154,7 +159,10 @@ export {
   CANVAS_APP_COMPONENT_INSPECTOR_FEATURE_PACK_MANIFEST,
   CANVAS_APP_COMPONENT_INSPECTOR_FEATURE_PACK,
   CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST,
+  CANVAS_APP_COMPONENT_SYNC_FEATURE_PACK_MANIFEST,
+  CANVAS_APP_COMPONENT_SYNC_FEATURE_PACK,
   CANVAS_COMPONENT_INSPECTOR_PANEL,
+  CANVAS_COMPONENT_SYNC_ITEMS_CHANGE_TRANSFORMER,
   CANVAS_APP_CURSOR_CHAT_FEATURE_PACK_MANIFEST,
   CANVAS_APP_CURSOR_CHAT_VIEW_FEATURE_PACK,
   CANVAS_APP_DRAWING_TOOLS_FEATURE_PACK_MANIFEST,
@@ -245,6 +253,7 @@ export {
   getCanvasAppManifestViewFeaturePacks,
   getCanvasAppResolvedFeaturePackStates,
   getCanvasComponentInspectorPanelModel,
+  syncCanvasComponentItemsChange,
   CANVAS_APP_CORE_ONLY_FEATURE_PACK_PROFILE,
   CANVAS_APP_MINIMAL_VIEWER_FEATURE_PACK_PROFILE,
   CANVAS_APP_STORY_VIEWER_FEATURE_PACK_PROFILE,

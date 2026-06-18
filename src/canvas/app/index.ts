@@ -68,6 +68,11 @@ export {
   type CanvasModalTabFocusEvent,
 } from './affordances/controls/modal/CanvasModalFocusLifecycle'
 export {
+  transformCanvasAppItemsChange,
+  type CanvasAppItemsChangeTransformContext,
+  type CanvasAppItemsChangeTransformer,
+} from './extensions/items-change-transformers'
+export {
   CANVAS_TABS_KEYBOARD_MODEL,
   CANVAS_TABS_ROVING_FOCUS_MODEL,
   createCanvasTabsDescriptor,
@@ -472,6 +477,7 @@ export {
   getCanvasAppManifestViewFeaturePacks,
   getCanvasAppResolvedFeaturePackStates,
   getCanvasComponentInspectorPanelModel,
+  syncCanvasComponentItemsChange,
   defineCanvasAppCustomItemModule,
   defineCanvasAppHtmlWidgetModule,
   defineCanvasAppReactWidgetModule,
@@ -497,7 +503,10 @@ export {
   CANVAS_APP_COMPONENT_INSPECTOR_FEATURE_PACK_MANIFEST,
   CANVAS_APP_COMPONENT_INSPECTOR_FEATURE_PACK,
   CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST,
+  CANVAS_APP_COMPONENT_SYNC_FEATURE_PACK_MANIFEST,
+  CANVAS_APP_COMPONENT_SYNC_FEATURE_PACK,
   CANVAS_COMPONENT_INSPECTOR_PANEL,
+  CANVAS_COMPONENT_SYNC_ITEMS_CHANGE_TRANSFORMER,
   CANVAS_APP_CURSOR_CHAT_FEATURE_PACK_MANIFEST,
   CANVAS_APP_CURSOR_CHAT_VIEW_FEATURE_PACK,
   CANVAS_APP_DRAWING_TOOLS_FEATURE_PACK_MANIFEST,

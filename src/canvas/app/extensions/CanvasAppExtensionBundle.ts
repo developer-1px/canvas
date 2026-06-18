@@ -1,6 +1,9 @@
 import type { CanvasAppCustomCommand } from './custom-commands'
 import type { CanvasAppInspectorPanel } from './inspector-panels'
 import type {
+  CanvasAppItemsChangeTransformer,
+} from './items-change-transformers'
+import type {
   CanvasAppCustomItemValidators,
 } from './custom-item-modules/CanvasAppCustomItemValidatorContracts'
 import {
@@ -30,6 +33,7 @@ export type CanvasAppExtensionBundle = {
   customItemValidators: CanvasAppCustomItemValidators
   foundationExtensions: readonly CanvasAppFoundationExtension[]
   inspectorPanels: readonly CanvasAppInspectorPanel[]
+  itemsChangeTransformers: readonly CanvasAppItemsChangeTransformer[]
   mediaImporters: readonly CanvasMediaImporter[]
   textPasteImporters: readonly CanvasTextPasteImporter[]
 }
@@ -41,6 +45,7 @@ export type CanvasAppExtensionBundleInput = {
   customItemValidators?: CanvasAppCustomItemValidators
   foundationExtensions?: readonly CanvasAppFoundationExtension[]
   inspectorPanels?: readonly CanvasAppInspectorPanel[]
+  itemsChangeTransformers?: readonly CanvasAppItemsChangeTransformer[]
   mediaImporters?: readonly CanvasMediaImporter[]
   textPasteImporters?: readonly CanvasTextPasteImporter[]
 }
@@ -53,6 +58,7 @@ export function createEmptyCanvasAppExtensionBundle(): CanvasAppExtensionBundle 
     customItemValidators: {},
     foundationExtensions: [],
     inspectorPanels: [],
+    itemsChangeTransformers: [],
     mediaImporters: [],
     textPasteImporters: [],
   }
@@ -65,6 +71,7 @@ export function createCanvasAppExtensionBundle({
   customItemValidators = {},
   foundationExtensions = [],
   inspectorPanels = [],
+  itemsChangeTransformers = [],
   mediaImporters = [],
   textPasteImporters = [],
 }: CanvasAppExtensionBundleInput = {}): CanvasAppExtensionBundle {
@@ -75,6 +82,7 @@ export function createCanvasAppExtensionBundle({
     customItemValidators,
     foundationExtensions,
     inspectorPanels,
+    itemsChangeTransformers,
     mediaImporters,
     textPasteImporters,
   }
@@ -125,6 +133,12 @@ export function mergeCanvasAppExtensionBundle({
       label: 'inspector panel',
       owner,
     }),
+    itemsChangeTransformers: appendUniqueCanvasAppExtensionEntries({
+      current: current.itemsChangeTransformers,
+      entries: entries.itemsChangeTransformers,
+      label: 'items change transformer',
+      owner,
+    }),
     mediaImporters: appendUniqueCanvasAppExtensionEntries({
       current: current.mediaImporters,
       entries: entries.mediaImporters,
@@ -154,6 +168,9 @@ export function snapshotCanvasAppExtensionBundle(
     customItemRenderers: snapshotCanvasAppRecord(bundle.customItemRenderers),
     customItemValidators: snapshotCanvasAppRecord(bundle.customItemValidators),
     inspectorPanels: snapshotCanvasAppDescriptorArray(bundle.inspectorPanels),
+    itemsChangeTransformers: snapshotCanvasAppDescriptorArray(
+      bundle.itemsChangeTransformers,
+    ),
     mediaImporters: snapshotCanvasAppDescriptorArray(
       bundle.mediaImporters,
     ),
