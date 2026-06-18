@@ -1,4 +1,4 @@
-import { pointDistance } from '../../../../core'
+import { pointDistance as getPointDistance } from '../../../../core'
 import type { Point } from '../../../../entities'
 import {
   EMPTY_CANVAS_SNAP_GUIDES,
@@ -40,6 +40,28 @@ export type CanvasPointerLaserPreviewResult =
       snapGuides: typeof EMPTY_CANVAS_SNAP_GUIDES
     }
 
+export type CanvasPointerLaserStartInput = Readonly<{
+  config: CanvasAffordanceConfig
+  input: CanvasAppPointerInput
+  pointerGesture: CanvasPointerGesture
+  startScreen: Point
+  startWorld: Point
+}>
+
+export type CanvasPointerLaserPreviewInput = Readonly<{
+  config: CanvasAffordanceConfig
+  currentScreen: Point
+  currentWorld: Point
+  interaction: Interaction
+}>
+
+export type CanvasNextLaserTrailPointsInput = Readonly<{
+  currentWorld: Point
+  maxPoints?: number
+  pointDistance?: number
+  points: Point[]
+}>
+
 export function isCanvasPointerLaserGesture(
   gesture: CanvasPointerGesture,
 ): gesture is 'laser' {
@@ -58,13 +80,7 @@ export function startCanvasPointerLaserInteraction({
   pointerGesture,
   startScreen,
   startWorld,
-}: {
-  config: CanvasAffordanceConfig
-  input: CanvasAppPointerInput
-  pointerGesture: CanvasPointerGesture
-  startScreen: Point
-  startWorld: Point
-}): CanvasPointerLaserStartResult {
+}: CanvasPointerLaserStartInput): CanvasPointerLaserStartResult {
   if (!isCanvasPointerLaserGesture(pointerGesture)) {
     return null
   }
@@ -98,12 +114,7 @@ export function previewCanvasPointerLaserInteraction({
   currentScreen,
   currentWorld,
   interaction,
-}: {
-  config: CanvasAffordanceConfig
-  currentScreen: Point
-  currentWorld: Point
-  interaction: Interaction
-}): CanvasPointerLaserPreviewResult | null {
+}: CanvasPointerLaserPreviewInput): CanvasPointerLaserPreviewResult | null {
   if (!isCanvasPointerLaserInteraction(interaction)) {
     return null
   }
@@ -134,7 +145,7 @@ export function previewCanvasPointerLaserInteraction({
   }
 }
 
-function createCanvasLaserTrailOverlay(
+export function createCanvasLaserTrailOverlay(
   points: Point[],
 ): CanvasLaserTrailOverlay {
   return {
@@ -142,22 +153,21 @@ function createCanvasLaserTrailOverlay(
   }
 }
 
-function getNextCanvasLaserTrailPoints({
+export function getNextCanvasLaserTrailPoints({
   currentWorld,
+  maxPoints = CANVAS_LASER_TRAIL_MAX_POINTS,
+  pointDistance = CANVAS_LASER_POINT_DISTANCE,
   points,
-}: {
-  currentWorld: Point
-  points: Point[]
-}) {
+}: CanvasNextLaserTrailPointsInput) {
   const lastPoint = points[points.length - 1]
 
   if (!lastPoint) {
     return [currentWorld]
   }
 
-  if (pointDistance(lastPoint, currentWorld) < CANVAS_LASER_POINT_DISTANCE) {
+  if (getPointDistance(lastPoint, currentWorld) < pointDistance) {
     return points
   }
 
-  return [...points, currentWorld].slice(-CANVAS_LASER_TRAIL_MAX_POINTS)
+  return [...points, currentWorld].slice(-maxPoints)
 }

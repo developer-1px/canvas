@@ -9,6 +9,13 @@ import {
 
 const DRAWING_POINT_DISTANCE = 2
 
+export type CanvasNextDrawingPointsInput = Readonly<{
+  currentWorld: Point
+  points: Point[]
+  shiftKey: boolean
+  startWorld: Point
+}>
+
 export function createCanvasDraftStroke(
   kind: CanvasDrawingStrokeKind,
   points: Point[],
@@ -26,12 +33,7 @@ export function getNextCanvasDrawingPoints({
   points,
   shiftKey,
   startWorld,
-}: {
-  currentWorld: Point
-  points: Point[]
-  shiftKey: boolean
-  startWorld: Point
-}) {
+}: CanvasNextDrawingPointsInput): Point[] {
   if (shiftKey) {
     return [startWorld, currentWorld]
   }

@@ -8,6 +8,7 @@ import {
   CanvasFoundation as CanvasFoundationFromPackage,
   CanvasHost,
   CanvasRenderer,
+  CANVAS_LASER_TRAIL_OVERLAY_MODEL,
   CANVAS_APP_BOARD_IO_FEATURE_PACK_MANIFEST,
   CANVAS_CONTROL_TARGET_SELECTOR,
   CANVAS_WHEEL_VIEWPORT_HORIZONTAL_PAN_MODIFIER,
@@ -39,6 +40,8 @@ import {
   getCanvasAppFeaturePackMarketplaceActionAssemblyInput,
   centerCanvasViewportAtWorldPoint,
   createCanvasAppStageElement,
+  createCanvasDraftStroke,
+  createCanvasLaserTrailOverlay,
   createCanvasExternalClipboardImagePasteActionResolver,
   createCanvasExternalClipboardPasteActionPlan,
   createCanvasRichClipboardHTML,
@@ -55,7 +58,9 @@ import {
   getCanvasEraserHitStrokeIds,
   getCanvasExternalClipboardPasteCommandRoute,
   getCanvasRichClipboardJSONFromHTML,
+  getNextCanvasDrawingPoints,
   getNextCanvasEraserPoints,
+  getNextCanvasLaserTrailPoints,
   setCanvasDataTransferDropEffect,
   downloadCanvasBlobFile,
   downloadCanvasTextFile,
@@ -68,8 +73,10 @@ import {
   scheduleCanvasAnimationFrameTask,
   writeCanvasClipboardText,
   writeCanvasRichClipboardPayload,
+  previewCanvasPointerLaserInteraction,
   previewCanvasPointerPanInteraction,
   resetCanvasViewport,
+  startCanvasPointerLaserInteraction,
   startCanvasPointerPanInteraction,
   useCanvasAppStageElement,
   zoomCanvasViewport,
@@ -239,14 +246,19 @@ import {
   type CanvasContextMenuPositionInput,
   type CanvasFindInputKeyboardIntentInput,
   type CanvasEraserStrokeHitTestStroke,
+  type CanvasNextDrawingPointsInput,
   type CanvasMenuRovingActiveIndexInput,
   type CanvasMenuTriggerKeyboardIntentInput,
   type CanvasModalBackdropPointerIntentInput,
   type CanvasModalKeyboardIntentInput,
   type CanvasPointerClickMemory,
+  type CanvasNextLaserTrailPointsInput,
   type CanvasPointerLocalGeometry,
   type CanvasPointerLocalGeometryInput,
   type CanvasPointerPanInteraction,
+  type CanvasPointerLaserInteraction,
+  type CanvasPointerLaserPreviewResult,
+  type CanvasPointerLaserStartResult,
   type CanvasPointerPanPreviewResult,
   type CanvasPointerPanStartResult,
   type CanvasRichClipboardDataTransfer,
@@ -474,6 +486,42 @@ describe('Canvas package consumer imports', () => {
         currentScreen: { x: 25, y: 15 },
         interaction: panInteraction,
       })
+    const drawingPointsInput: CanvasNextDrawingPointsInput = {
+      currentWorld: { x: 30, y: 40 },
+      points: [{ x: 10, y: 20 }],
+      shiftKey: false,
+      startWorld: { x: 10, y: 20 },
+    }
+    const drawingPoints = getNextCanvasDrawingPoints(drawingPointsInput)
+    const draftStroke = createCanvasDraftStroke('path', drawingPoints)
+    const laserStartResult: CanvasPointerLaserStartResult =
+      startCanvasPointerLaserInteraction({
+        config: createCanvasAffordanceConfig(),
+        input: pointerInput,
+        pointerGesture: 'laser',
+        startScreen: { x: 10, y: 20 },
+        startWorld: { x: 30, y: 40 },
+      })
+
+    if (!laserStartResult || laserStartResult.kind !== 'interaction') {
+      throw new Error('Expected package laser start to create an interaction')
+    }
+
+    const laserInteraction: CanvasPointerLaserInteraction =
+      laserStartResult.interaction
+    const laserPreviewResult: CanvasPointerLaserPreviewResult | null =
+      previewCanvasPointerLaserInteraction({
+        config: createCanvasAffordanceConfig(),
+        currentScreen: { x: 20, y: 40 },
+        currentWorld: { x: 50, y: 70 },
+        interaction: laserInteraction,
+      })
+    const laserTrailPointsInput: CanvasNextLaserTrailPointsInput = {
+      currentWorld: { x: 9, y: 0 },
+      maxPoints: 2,
+      pointDistance: 3,
+      points: [{ x: 0, y: 0 }, { x: 3, y: 0 }],
+    }
 
     expect(panStartResult.capturePointer).toBe(true)
     expect(startCanvasPointerPanInteractionFromApp({
@@ -494,6 +542,38 @@ describe('Canvas package consumer imports', () => {
       .toBe(startCanvasPointerPanInteraction)
     expect(CanvasAppFacade.previewCanvasPointerPanInteraction)
       .toBe(previewCanvasPointerPanInteraction)
+    expect(CANVAS_LASER_TRAIL_OVERLAY_MODEL)
+      .toBe('canvas-laser-trail-overlay')
+    expect(drawingPoints).toEqual([{ x: 10, y: 20 }, { x: 30, y: 40 }])
+    expect(draftStroke).toEqual({
+      kind: 'path',
+      opacity: 1,
+      points: drawingPoints,
+      stroke: '#334155',
+      strokeWidth: 3,
+    })
+    expect(laserStartResult.laserTrail).toEqual({
+      points: [{ x: 30, y: 40 }],
+    })
+    expect(laserPreviewResult).toMatchObject({
+      kind: 'preview',
+      laserTrail: {
+        points: [{ x: 30, y: 40 }, { x: 50, y: 70 }],
+      },
+    })
+    expect(createCanvasLaserTrailOverlay([{ x: 1, y: 2 }])).toEqual({
+      points: [{ x: 1, y: 2 }],
+    })
+    expect(getNextCanvasLaserTrailPoints(laserTrailPointsInput)).toEqual([
+      { x: 3, y: 0 },
+      { x: 9, y: 0 },
+    ])
+    expect(CanvasPackage.startCanvasPointerLaserInteraction)
+      .toBe(startCanvasPointerLaserInteraction)
+    expect(CanvasAppFacade.previewCanvasPointerLaserInteraction)
+      .toBe(previewCanvasPointerLaserInteraction)
+    expect(CanvasAppFacade.getNextCanvasDrawingPoints)
+      .toBe(getNextCanvasDrawingPoints)
     const externalOverlaySlot: CanvasAppStageExternalOverlaySlot = {
       render: (overlays) => overlays,
     }
@@ -1358,6 +1438,76 @@ describe('Canvas package consumer imports', () => {
     expect(createCanvasAppAssemblyFromApp().initialItems.length).toBeGreaterThan(
       0,
     )
+  })
+
+  it('keeps Host document persistence outside public pointer affordance primitives', () => {
+    const pointerInput: CanvasAppPointerInput = {
+      altKey: false,
+      button: 0,
+      clientX: 10,
+      clientY: 20,
+      ctrlKey: false,
+      metaKey: false,
+      pointerId: 1,
+      preventDefault: () => undefined,
+      shiftKey: false,
+      stopPropagation: () => undefined,
+    }
+    const draftStroke = createCanvasDraftStroke('marker', [
+      { x: 10, y: 20 },
+      { x: 30, y: 40 },
+    ])
+    const laserStartResult = startCanvasPointerLaserInteraction({
+      config: createCanvasAffordanceConfig(),
+      input: pointerInput,
+      pointerGesture: 'laser',
+      startScreen: { x: 10, y: 20 },
+      startWorld: { x: 30, y: 40 },
+    })
+
+    if (!laserStartResult || laserStartResult.kind !== 'interaction') {
+      throw new Error('Expected laser start to return transient interaction')
+    }
+
+    const laserPreviewResult = previewCanvasPointerLaserInteraction({
+      config: createCanvasAffordanceConfig(),
+      currentScreen: { x: 20, y: 40 },
+      currentWorld: { x: 50, y: 70 },
+      interaction: laserStartResult.interaction,
+    })
+
+    if (!laserPreviewResult || laserPreviewResult.kind !== 'preview') {
+      throw new Error('Expected laser preview to return transient overlay')
+    }
+
+    expect(Object.keys(draftStroke).sort()).toEqual([
+      'kind',
+      'opacity',
+      'points',
+      'stroke',
+      'strokeWidth',
+    ])
+    expect(Object.keys(laserStartResult).sort()).toEqual([
+      'capturePointer',
+      'gesture',
+      'interaction',
+      'kind',
+      'laserTrail',
+    ])
+    expect(Object.keys(laserPreviewResult).sort()).toEqual([
+      'interaction',
+      'kind',
+      'laserTrail',
+      'snapGuides',
+    ])
+    expect(getCanvasEraserHitStrokeIds({
+      points: [{ x: 50, y: 4 }],
+      strokes: [{
+        id: 'host-stroke',
+        points: [{ x: 0, y: 0 }, { x: 100, y: 0 }],
+        strokeWidth: 4,
+      }],
+    })).toEqual(['host-stroke'])
   })
 
   it('keeps package subpaths usable as public facades', async () => {

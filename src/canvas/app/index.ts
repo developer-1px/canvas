@@ -473,6 +473,26 @@ export {
   type CanvasPointerPanStartResult,
 } from './affordances/interaction/pointer/CanvasPointerPanInteraction'
 export {
+  createCanvasDraftStroke,
+  getNextCanvasDrawingPoints,
+  type CanvasNextDrawingPointsInput,
+} from './affordances/interaction/pointer/CanvasPointerDrawing'
+export {
+  CANVAS_LASER_TRAIL_OVERLAY_MODEL,
+  createCanvasLaserTrailOverlay,
+  getNextCanvasLaserTrailPoints,
+  isCanvasPointerLaserGesture,
+  isCanvasPointerLaserInteraction,
+  previewCanvasPointerLaserInteraction,
+  startCanvasPointerLaserInteraction,
+  type CanvasNextLaserTrailPointsInput,
+  type CanvasPointerLaserInteraction,
+  type CanvasPointerLaserPreviewInput,
+  type CanvasPointerLaserPreviewResult,
+  type CanvasPointerLaserStartInput,
+  type CanvasPointerLaserStartResult,
+} from './affordances/interaction/pointer/CanvasPointerLaser'
+export {
   getCanvasEraserHitItemIds,
   getCanvasEraserHitStrokeIds,
   getCanvasMergedEraserHitIds,
