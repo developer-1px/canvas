@@ -415,7 +415,9 @@ function getCanvasMediaSourceFromWrappedJSONValue(
       continue
     }
 
-    const source = getCanvasMediaSourceFromDirectJSONValue(record[key])
+    const wrappedValue = record[key]
+    const source = getCanvasMediaSourceFromDirectJSONValue(wrappedValue) ??
+      getCanvasMediaSourceFromStringJSONValue(wrappedValue)
 
     if (source) {
       return source
@@ -454,6 +456,16 @@ function getCanvasMediaSourceFromDirectJSONValue(
       title,
     }
     : source
+}
+
+function getCanvasMediaSourceFromStringJSONValue(
+  value: unknown,
+): CanvasMediaImportSource | null {
+  if (typeof value !== 'string' || value.trim() === '') {
+    return null
+  }
+
+  return getCanvasMediaSourceFromText(value)
 }
 
 function getCanvasMediaSourceJSONText(

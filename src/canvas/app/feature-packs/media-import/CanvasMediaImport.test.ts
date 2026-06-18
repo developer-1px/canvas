@@ -120,6 +120,23 @@ describe('CanvasMediaImport', () => {
     })
   })
 
+  it('reads URL string media source JSON wrappers', () => {
+    expect(getCanvasMediaSourceFromJSONDataTransfer(createDataTransfer({
+      'application/json': JSON.stringify({
+        media: 'https://example.com/report',
+      }),
+    }))).toEqual({
+      url: 'https://example.com/report',
+    })
+    expect(getCanvasMediaSourceFromJSONDataTransfer(createDataTransfer({
+      'application/json': JSON.stringify({
+        mediaSource: ' <iframe src="https://video.example.com/embed"></iframe> ',
+      }),
+    }))).toEqual({
+      url: 'https://video.example.com/embed',
+    })
+  })
+
   it('preserves existing URL paste priority before generic JSON media wrappers', () => {
     const dataTransfer = createDataTransfer({
       'application/json': JSON.stringify({
@@ -144,6 +161,23 @@ describe('CanvasMediaImport', () => {
     expect(getCanvasMediaSourceFromJSONDataTransfer(createDataTransfer({
       'application/json': '{"mediaSource":{"url":"not a url"}}',
     }))).toBeNull()
+    expect(getCanvasMediaSourceFromJSONDataTransfer(createDataTransfer({
+      'application/json': JSON.stringify({
+        media: 'not a url',
+      }),
+    }))).toBeNull()
+    expect(getCanvasMediaSourceFromJSONDataTransfer(createDataTransfer({
+      'application/json': JSON.stringify({
+        mediaSource: '   ',
+      }),
+    }))).toBeNull()
+    for (const value of [[], 42, true]) {
+      expect(getCanvasMediaSourceFromJSONDataTransfer(createDataTransfer({
+        'application/json': JSON.stringify({
+          media: value,
+        }),
+      }))).toBeNull()
+    }
     expect(getCanvasMediaSourceFromJSONDataTransfer(createDataTransfer({
       [CANVAS_MEDIA_SOURCE_JSON_MIME_TYPE]: 'not json',
     }))).toBeNull()
