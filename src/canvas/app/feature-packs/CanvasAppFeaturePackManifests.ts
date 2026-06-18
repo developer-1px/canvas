@@ -499,8 +499,13 @@ function assertCanvasAppFeaturePackManifestGraph({
   stateIds: ReadonlySet<CanvasAppFeaturePackId>
   stateLabel: 'enabled' | 'installed'
 }) {
-  const manifestIds = new Set(
-    manifests.map((manifest) => manifest.id),
+  const knownIds = new Set(
+    manifests.flatMap((manifest) => [manifest.id, ...manifest.provides]),
+  )
+  const satisfiedIds = new Set(
+    manifests
+      .filter((manifest) => stateIds.has(manifest.id))
+      .flatMap((manifest) => [manifest.id, ...manifest.provides]),
   )
 
   for (const manifest of manifests) {
@@ -509,13 +514,13 @@ function assertCanvasAppFeaturePackManifestGraph({
     }
 
     for (const requiredId of manifest.requires) {
-      if (!manifestIds.has(requiredId)) {
+      if (!knownIds.has(requiredId)) {
         throw new Error(
           `Feature pack ${manifest.id} requires unknown pack: ${requiredId}`,
         )
       }
 
-      if (!stateIds.has(requiredId)) {
+      if (!satisfiedIds.has(requiredId)) {
         throw new Error(
           `Feature pack ${manifest.id} requires ${stateLabel} pack: ${requiredId}`,
         )
@@ -523,7 +528,7 @@ function assertCanvasAppFeaturePackManifestGraph({
     }
 
     for (const conflictId of manifest.conflicts) {
-      if (stateIds.has(conflictId)) {
+      if (satisfiedIds.has(conflictId)) {
         throw new Error(
           `Feature pack ${manifest.id} conflicts with ${stateLabel} pack: ${conflictId}`,
         )

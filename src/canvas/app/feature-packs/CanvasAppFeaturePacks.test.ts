@@ -476,6 +476,46 @@ describe('CanvasAppFeaturePacks', () => {
     ).toThrow('Feature pack unknown-addon requires unknown pack: missing-pack')
   })
 
+  it('treats provided feature pack capabilities as required graph ids', () => {
+    const providerManifest = createCanvasAppFeaturePackManifest({
+      id: 'workflow-provider',
+      label: 'Workflow provider',
+      provides: ['workflow-capability'],
+    })
+    const addonManifest = createCanvasAppFeaturePackManifest({
+      id: 'workflow-addon',
+      label: 'Workflow addon',
+      requires: ['workflow-capability'],
+    })
+
+    expect(getCanvasAppInstalledFeaturePackManifestIds([
+      providerManifest,
+      addonManifest,
+    ])).toEqual(['workflow-provider', 'workflow-addon'])
+    expect(getCanvasAppEnabledFeaturePackManifestIds([
+      providerManifest,
+      addonManifest,
+    ])).toEqual(['workflow-provider', 'workflow-addon'])
+    expect(() =>
+      getCanvasAppInstalledFeaturePackManifestIds([addonManifest]),
+    ).toThrow(
+      'Feature pack workflow-addon requires unknown pack: workflow-capability',
+    )
+    expect(() =>
+      getCanvasAppEnabledFeaturePackManifestIds([
+        providerManifest,
+        addonManifest,
+      ], {
+        featurePackStates: [{
+          id: 'workflow-provider',
+          status: 'disabled',
+        }],
+      }),
+    ).toThrow(
+      'Feature pack workflow-addon requires enabled pack: workflow-capability',
+    )
+  })
+
   it('validates conflicting feature pack manifests at install and enable time', () => {
     const modernManifest = createCanvasAppFeaturePackManifest({
       conflicts: ['legacy-pack'],
