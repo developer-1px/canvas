@@ -304,6 +304,10 @@
 | Layer JSON payloads | direct `position`/`toIndex` and `objectLayer`, `layerOrder`, or `zOrder` wrappers route through `reorder-object` |
 | Layer aliases | `front`/`bring-to-front`, `back`/`send-to-back`, `forward`/`bring-forward`, and `backward`/`send-backward` normalize to one movement model |
 | Layer no-op | no active/single selected row, locked row, non-reorderable row, invalid payload, and unchanged order produce `null` |
+| State JSON candidates | object-state custom MIME, `application/json`, `text/json`, and `text/plain` are checked in order |
+| State JSON payloads | direct `visible`/`hidden`/`locked` and `objectState`, `objectVisibility`, `layerState`, or `selectionState` wrappers route through hide/show/lock/unlock commands |
+| State ordering | unlock is planned before show; hide is planned before lock |
+| State no-op | no active/single selected row, invalid payload, missing state fields, and already-applied state produce `null` |
 | Rename JSON candidates | object-name/object-metadata custom MIME, `application/json`, `text/json`, and `text/plain` are checked in order |
 | Rename JSON payloads | generic JSON requires `objectMetadata`, `objectName`, or `layerName` wrapper; custom MIME may carry direct `{ "name": "..." }` |
 | Rename no-op | no active/single selected row, non-renamable row, empty name, and missing rename payload produce `null` |

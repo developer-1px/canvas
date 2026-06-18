@@ -7,6 +7,8 @@ import {
   getSlideEditLayerPaneKeyboardIntent,
   getSlideEditLayerPaneObjectLayerJSONPasteValue,
   getSlideEditLayerPaneObjectLayerPasteCommandEffect,
+  getSlideEditLayerPaneObjectStateJSONPasteValue,
+  getSlideEditLayerPaneObjectStatePasteCommandEffects,
   getSlideEditLayerPaneRenameJSONPasteValue,
   getSlideEditLayerPaneRenamePasteCommandEffect,
   getSlideEditLayerPaneResolvedFocusObjectId,
@@ -18,9 +20,11 @@ import {
   SLIDE_EDIT_LAYER_PANE_OBJECT_LAYER_JSON_MIME_TYPE,
   SLIDE_EDIT_LAYER_PANE_OBJECT_METADATA_JSON_MIME_TYPE,
   SLIDE_EDIT_LAYER_PANE_OBJECT_NAME_JSON_MIME_TYPE,
+  SLIDE_EDIT_LAYER_PANE_OBJECT_STATE_JSON_MIME_TYPE,
 } from './SlideEditObjectLayerPane'
 import {
   getSlideEditLayerPaneObjectLayerJSONPasteValue as getSlideEditLayerPaneObjectLayerJSONPasteValueFromPackage,
+  getSlideEditLayerPaneObjectStateJSONPasteValue as getSlideEditLayerPaneObjectStateJSONPasteValueFromPackage,
   getSlideEditLayerPaneRenameJSONPasteValue as getSlideEditLayerPaneRenameJSONPasteValueFromPackage,
 } from './index'
 
@@ -944,6 +948,242 @@ describe('SlideEditObjectLayerPane', () => {
     expect(getSlideEditLayerPaneObjectLayerJSONPasteValue({
       dataTransfer: createDataTransfer({
         [SLIDE_EDIT_LAYER_PANE_OBJECT_LAYER_JSON_MIME_TYPE]: 'not json',
+      }),
+    })).toBeNull()
+  })
+
+  it('reads object-state custom MIME direct state JSON first', () => {
+    expect(getSlideEditLayerPaneObjectStateJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_LAYER_PANE_OBJECT_STATE_JSON_MIME_TYPE]:
+          '{"visible":false,"locked":true}',
+        'application/json':
+          '{"objectState":{"visible":true,"locked":false}}',
+      }),
+    })).toEqual({
+      lock: {
+        isLocked: true,
+        sourceField: 'locked',
+      },
+      surface: 'object-layer-pane-state',
+      visibility: {
+        isHidden: true,
+        sourceField: 'visible',
+      },
+    })
+
+    expect(getSlideEditLayerPaneObjectStateJSONPasteValueFromPackage({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_LAYER_PANE_OBJECT_STATE_JSON_MIME_TYPE]:
+          '{"hidden":true}',
+      }),
+    })).toEqual({
+      surface: 'object-layer-pane-state',
+      visibility: {
+        isHidden: true,
+        sourceField: 'hidden',
+      },
+    })
+  })
+
+  it('reads direct and wrapped visible locked state JSON payloads', () => {
+    expect(getSlideEditLayerPaneObjectStateJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'application/json':
+          '{"objectState":{"visible":false,"locked":true}}',
+      }),
+    })).toEqual({
+      lock: {
+        isLocked: true,
+        sourceField: 'objectState.locked',
+      },
+      surface: 'object-layer-pane-state',
+      visibility: {
+        isHidden: true,
+        sourceField: 'objectState.visible',
+      },
+    })
+
+    expect(getSlideEditLayerPaneObjectStateJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/json': '{"objectVisibility":{"hidden":true}}',
+      }),
+    })).toMatchObject({
+      visibility: {
+        isHidden: true,
+        sourceField: 'objectVisibility.hidden',
+      },
+    })
+
+    expect(getSlideEditLayerPaneObjectStateJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"layerState":{"locked":false}}',
+      }),
+    })).toMatchObject({
+      lock: {
+        isLocked: false,
+        sourceField: 'layerState.locked',
+      },
+    })
+
+    expect(getSlideEditLayerPaneObjectStateJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'application/json': '{"selectionState":{"visible":true}}',
+      }),
+    })).toMatchObject({
+      visibility: {
+        isHidden: false,
+        sourceField: 'selectionState.visible',
+      },
+    })
+  })
+
+  it('plans unlock before show for visible unlocked state paste', () => {
+    const stateDescriptor = createSlideEditLayerPaneDescriptor({
+      activeObjectId: 'logo',
+      slideId: 'slide-state',
+      selectedObjectIds: ['logo'],
+      objects: [
+        {
+          displayName: 'Logo',
+          isHidden: true,
+          isLocked: true,
+          kindLabel: 'Image',
+          objectId: 'logo',
+        },
+      ],
+    })
+    const pasteValue = getSlideEditLayerPaneObjectStateJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'application/json':
+          '{"objectState":{"locked":false,"visible":true}}',
+      }),
+    })!
+
+    expect(getSlideEditLayerPaneObjectStatePasteCommandEffects({
+      descriptor: stateDescriptor,
+      pasteValue,
+    })).toEqual([
+      {
+        payload: {
+          id: 'unlock-objects',
+          objectIds: ['logo'],
+        },
+        selection: {
+          objectIds: ['logo'],
+          slideId: 'slide-state',
+        },
+        type: 'slide-command-effect',
+      },
+      {
+        payload: {
+          id: 'show-objects',
+          objectIds: ['logo'],
+        },
+        selection: {
+          objectIds: ['logo'],
+          slideId: 'slide-state',
+        },
+        type: 'slide-command-effect',
+      },
+    ])
+  })
+
+  it('plans hide before lock for hidden locked state paste', () => {
+    const pasteValue = getSlideEditLayerPaneObjectStateJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'application/json':
+          '{"selectionState":{"visible":false,"locked":true}}',
+      }),
+    })!
+
+    expect(getSlideEditLayerPaneObjectStatePasteCommandEffects({
+      descriptor,
+      pasteValue,
+    })).toEqual([
+      {
+        payload: {
+          id: 'hide-objects',
+          objectIds: ['title'],
+        },
+        selection: {
+          objectIds: ['title'],
+          slideId: 'slide-a',
+        },
+        type: 'slide-command-effect',
+      },
+      {
+        payload: {
+          id: 'lock-objects',
+          objectIds: ['title'],
+        },
+        selection: {
+          objectIds: ['title'],
+          slideId: 'slide-a',
+        },
+        type: 'slide-command-effect',
+      },
+    ])
+  })
+
+  it('ignores unavailable object state paste routes', () => {
+    const pasteValue = getSlideEditLayerPaneObjectStateJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_LAYER_PANE_OBJECT_STATE_JSON_MIME_TYPE]:
+          '{"hidden":true,"locked":true}',
+      }),
+    })!
+    const multiSelectionDescriptor = createSlideEditLayerPaneDescriptor({
+      activeObjectId: null,
+      slideId: 'slide-state-multi',
+      selectedObjectIds: ['a', 'b'],
+      objects: [
+        {
+          displayName: 'A',
+          kindLabel: 'Text',
+          objectId: 'a',
+        },
+        {
+          displayName: 'B',
+          kindLabel: 'Text',
+          objectId: 'b',
+        },
+      ],
+    })
+    const alreadyAppliedDescriptor = createSlideEditLayerPaneDescriptor({
+      activeObjectId: 'applied',
+      slideId: 'slide-state-applied',
+      selectedObjectIds: ['applied'],
+      objects: [
+        {
+          displayName: 'Applied',
+          isHidden: true,
+          isLocked: true,
+          kindLabel: 'Shape',
+          objectId: 'applied',
+        },
+      ],
+    })
+
+    expect(getSlideEditLayerPaneObjectStatePasteCommandEffects({
+      descriptor: multiSelectionDescriptor,
+      pasteValue,
+    })).toBeNull()
+    expect(getSlideEditLayerPaneObjectStatePasteCommandEffects({
+      descriptor: alreadyAppliedDescriptor,
+      pasteValue,
+    })).toBeNull()
+    expect(getSlideEditLayerPaneObjectStateJSONPasteValue({
+      dataTransfer: null,
+    })).toBeNull()
+    expect(getSlideEditLayerPaneObjectStateJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'application/json': '{"objectState":{"visible":"yes"}}',
+      }),
+    })).toBeNull()
+    expect(getSlideEditLayerPaneObjectStateJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_LAYER_PANE_OBJECT_STATE_JSON_MIME_TYPE]: 'not json',
       }),
     })).toBeNull()
   })

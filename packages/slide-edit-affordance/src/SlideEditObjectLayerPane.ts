@@ -159,6 +159,23 @@ export const SLIDE_EDIT_LAYER_PANE_OBJECT_LAYER_JSON_WRAPPER_KEYS =
     'zOrder',
   ] as const)
 
+export const SLIDE_EDIT_LAYER_PANE_OBJECT_STATE_JSON_MIME_TYPE =
+  'application/vnd.interactive-os.slide-edit.object-state+json'
+
+export const SLIDE_EDIT_LAYER_PANE_OBJECT_STATE_JSON_TYPES = Object.freeze([
+  'application/json',
+  'text/json',
+  'text/plain',
+] as const)
+
+export const SLIDE_EDIT_LAYER_PANE_OBJECT_STATE_JSON_WRAPPER_KEYS =
+  Object.freeze([
+    'objectState',
+    'objectVisibility',
+    'layerState',
+    'selectionState',
+  ] as const)
+
 export type SlideEditLayerPaneCommand<
   TObjectId extends SlideEditLayerPaneObjectId = SlideEditLayerPaneObjectId,
 > =
@@ -251,6 +268,37 @@ export type SlideEditLayerPaneObjectLayerPasteCommandEffectInput<
   descriptor: SlideEditLayerPaneDescriptor<TSlideId, TObjectId, TGroupId>
   objectId?: TObjectId | null
   pasteValue: SlideEditLayerPaneObjectLayerJSONPasteValue
+}
+
+export type SlideEditLayerPaneObjectStateVisibilityValue = {
+  isHidden: boolean
+  sourceField: string
+}
+
+export type SlideEditLayerPaneObjectStateLockValue = {
+  isLocked: boolean
+  sourceField: string
+}
+
+export type SlideEditLayerPaneObjectStateJSONPasteValue = {
+  lock?: SlideEditLayerPaneObjectStateLockValue
+  surface: 'object-layer-pane-state'
+  visibility?: SlideEditLayerPaneObjectStateVisibilityValue
+}
+
+export type SlideEditLayerPaneObjectStateJSONPasteInput = {
+  dataTransfer: SlideEditLayerPaneDataTransfer | null
+  jsonMimeType?: string
+}
+
+export type SlideEditLayerPaneObjectStatePasteCommandEffectsInput<
+  TSlideId extends SlideEditLayerPaneSlideId = SlideEditLayerPaneSlideId,
+  TObjectId extends SlideEditLayerPaneObjectId = SlideEditLayerPaneObjectId,
+  TGroupId extends SlideEditLayerPaneGroupId = SlideEditLayerPaneGroupId,
+> = {
+  descriptor: SlideEditLayerPaneDescriptor<TSlideId, TObjectId, TGroupId>
+  objectId?: TObjectId | null
+  pasteValue: SlideEditLayerPaneObjectStateJSONPasteValue
 }
 
 export type SlideEditLayerPaneIntent<
@@ -736,6 +784,108 @@ export function getSlideEditLayerPaneObjectLayerPasteCommandEffect<
   })
 }
 
+export function getSlideEditLayerPaneObjectStateJSONPasteValue({
+  dataTransfer,
+  jsonMimeType = SLIDE_EDIT_LAYER_PANE_OBJECT_STATE_JSON_MIME_TYPE,
+}: SlideEditLayerPaneObjectStateJSONPasteInput):
+  SlideEditLayerPaneObjectStateJSONPasteValue | null {
+  if (!dataTransfer) {
+    return null
+  }
+
+  if (jsonMimeType) {
+    const customText = dataTransfer.getData(jsonMimeType)
+
+    if (customText.trim()) {
+      const customValue = parseSlideEditLayerPaneJSON(customText)
+      const customPasteValue =
+        getSlideEditLayerPaneObjectStateAnyJSONPasteValue(customValue)
+
+      if (customPasteValue !== null) {
+        return customPasteValue
+      }
+    }
+  }
+
+  for (const type of SLIDE_EDIT_LAYER_PANE_OBJECT_STATE_JSON_TYPES) {
+    const text = dataTransfer.getData(type)
+
+    if (!text.trim()) {
+      continue
+    }
+
+    const value = parseSlideEditLayerPaneJSON(text)
+    const pasteValue =
+      getSlideEditLayerPaneObjectStateAnyJSONPasteValue(value)
+
+    if (pasteValue !== null) {
+      return pasteValue
+    }
+  }
+
+  return null
+}
+
+export function getSlideEditLayerPaneObjectStatePasteCommandEffects<
+  TSlideId extends SlideEditLayerPaneSlideId,
+  TObjectId extends SlideEditLayerPaneObjectId,
+  TGroupId extends SlideEditLayerPaneGroupId,
+>({
+  descriptor,
+  objectId = getSlideEditLayerPaneSinglePasteTargetObjectId(descriptor),
+  pasteValue,
+}: SlideEditLayerPaneObjectStatePasteCommandEffectsInput<
+  TSlideId,
+  TObjectId,
+  TGroupId
+>): readonly SlideEditLayerPaneHostCommandEffect<TSlideId, TObjectId>[] | null {
+  if (objectId === null) {
+    return null
+  }
+
+  const row = findSlideEditLayerPaneRow(descriptor, objectId)
+
+  if (!row) {
+    return null
+  }
+
+  const effects: SlideEditLayerPaneHostCommandEffect<TSlideId, TObjectId>[] = []
+  const currentHidden = row.isHidden
+  let currentLocked = row.isLocked
+
+  if (pasteValue.lock?.isLocked === false && currentLocked) {
+    effects.push(getSlideEditLayerPaneObjectStateCommandEffect({
+      commandId: 'unlock-objects',
+      descriptor,
+      objectId,
+    }))
+    currentLocked = false
+  }
+
+  if (
+    pasteValue.visibility &&
+    pasteValue.visibility.isHidden !== currentHidden
+  ) {
+    effects.push(getSlideEditLayerPaneObjectStateCommandEffect({
+      commandId: pasteValue.visibility.isHidden
+        ? 'hide-objects'
+        : 'show-objects',
+      descriptor,
+      objectId,
+    }))
+  }
+
+  if (pasteValue.lock?.isLocked === true && !currentLocked) {
+    effects.push(getSlideEditLayerPaneObjectStateCommandEffect({
+      commandId: 'lock-objects',
+      descriptor,
+      objectId,
+    }))
+  }
+
+  return effects.length > 0 ? effects : null
+}
+
 function getSlideEditLayerPaneRenameDirectJSONPasteValue(
   value: unknown,
   wrapper?: string,
@@ -978,6 +1128,127 @@ function getSlideEditLayerPaneObjectLayerToIndex(
       return fromIndex + 2
     case 'backward':
       return fromIndex - 1
+  }
+}
+
+function getSlideEditLayerPaneObjectStateCommandEffect<
+  TSlideId extends SlideEditLayerPaneSlideId,
+  TObjectId extends SlideEditLayerPaneObjectId,
+  TGroupId extends SlideEditLayerPaneGroupId,
+>({
+  commandId,
+  descriptor,
+  objectId,
+}: {
+  commandId: Extract<
+    SlideEditLayerPaneCommandId,
+    'hide-objects' | 'lock-objects' | 'show-objects' | 'unlock-objects'
+  >
+  descriptor: SlideEditLayerPaneDescriptor<TSlideId, TObjectId, TGroupId>
+  objectId: TObjectId
+}) {
+  return toSlideEditLayerPaneHostCommandEffect({
+    descriptor,
+    payload: {
+      id: commandId,
+      objectIds: [objectId],
+    },
+    selectionObjectIds: [objectId],
+  })
+}
+
+function getSlideEditLayerPaneObjectStateAnyJSONPasteValue(
+  value: unknown,
+): SlideEditLayerPaneObjectStateJSONPasteValue | null {
+  return getSlideEditLayerPaneObjectStateDirectJSONPasteValue(value) ??
+    getSlideEditLayerPaneObjectStateWrappedJSONPasteValue(value)
+}
+
+function getSlideEditLayerPaneObjectStateDirectJSONPasteValue(
+  value: unknown,
+  wrapper?: string,
+): SlideEditLayerPaneObjectStateJSONPasteValue | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null
+  }
+
+  const record = value as Record<string, unknown>
+  const visibility = getSlideEditLayerPaneObjectStateVisibilityValue(
+    record,
+    wrapper,
+  )
+  const lock = getSlideEditLayerPaneObjectStateLockValue(record, wrapper)
+
+  if (!visibility && !lock) {
+    return null
+  }
+
+  return {
+    ...(lock ? { lock } : {}),
+    surface: 'object-layer-pane-state',
+    ...(visibility ? { visibility } : {}),
+  }
+}
+
+function getSlideEditLayerPaneObjectStateWrappedJSONPasteValue(
+  value: unknown,
+): SlideEditLayerPaneObjectStateJSONPasteValue | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null
+  }
+
+  const record = value as Record<string, unknown>
+
+  for (const key of SLIDE_EDIT_LAYER_PANE_OBJECT_STATE_JSON_WRAPPER_KEYS) {
+    if (!Object.hasOwn(record, key)) {
+      continue
+    }
+
+    const pasteValue = getSlideEditLayerPaneObjectStateDirectJSONPasteValue(
+      record[key],
+      key,
+    )
+
+    if (pasteValue !== null) {
+      return pasteValue
+    }
+  }
+
+  return null
+}
+
+function getSlideEditLayerPaneObjectStateVisibilityValue(
+  record: Record<string, unknown>,
+  wrapper?: string,
+): SlideEditLayerPaneObjectStateVisibilityValue | null {
+  if (typeof record.visible === 'boolean') {
+    return {
+      isHidden: !record.visible,
+      sourceField: wrapper ? `${wrapper}.visible` : 'visible',
+    }
+  }
+
+  if (typeof record.hidden === 'boolean') {
+    return {
+      isHidden: record.hidden,
+      sourceField: wrapper ? `${wrapper}.hidden` : 'hidden',
+    }
+  }
+
+  return null
+}
+
+function getSlideEditLayerPaneObjectStateLockValue(
+  record: Record<string, unknown>,
+  wrapper?: string,
+): SlideEditLayerPaneObjectStateLockValue | null {
+  if (typeof record.locked !== 'boolean') {
+    return null
+  }
+
+  return {
+    isLocked: record.locked,
+    sourceField: wrapper ? `${wrapper}.locked` : 'locked',
   }
 }
 
