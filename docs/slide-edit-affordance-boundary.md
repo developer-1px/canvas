@@ -391,6 +391,9 @@
 | Field | `strokeLineStyle` segmented descriptor routes through `update-object-stroke-line-style` |
 | Metadata | `data-slide-object-stroke-line-style` carries the normalized value or `unsupported` |
 | Unsupported | objects without stroke can expose `isSupported: false` and reason `no-stroke` |
+| JSON candidates | custom MIME, `application/json`, `text/json`, and `text/plain` are checked in order |
+| JSON wrappers | generic JSON requires `objectStrokeLineStyle`, `strokeLineStyle`, or `strokeDash`; broad stroke style objects are ignored |
+| Direct values | custom direct strings and dash booleans map only to `solid`, `dash`, or `dot` |
 | Scope | applies to stroked slide content objects such as outlines, lines, connectors, and paths |
 | Updates | selected object id and normalized line style become host command effects |
 | Runtime | stage, thumbnail, presentation, inspector, and export can read the same metadata value |
