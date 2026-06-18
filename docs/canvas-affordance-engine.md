@@ -13,6 +13,16 @@
 7. Drawing Item은 Demo Host item이며 Core Contract에 포함하지 않는다.
 8. 사회적 약속이 된 캔버스 문법은 내부 Module이 관리하고, 제품별 의미는 Canvas App Assembly에서 외부 등록한다.
 
+## Text Paste Import Rich Text Contract
+
+| Area | Contract |
+| --- | --- |
+| Rich text source | HTML paste may produce `CanvasRichTextPasteSource` with paragraph/run metadata before host text replacement |
+| List metadata | `CanvasRichTextPasteParagraph.bullet` is the legacy list field and now accepts `'bullet'` for unordered lists and `'numbered'` for ordered lists |
+| Migration boundary | Consumers that only support unordered bullets can keep checking `paragraph.bullet === 'bullet'`; consumers that preserve ordered lists must handle `paragraph.bullet === 'numbered'` |
+| Parser paths | DOMParser and string fallback paths both preserve `<ul><li>` as `'bullet'` and `<ol><li>` as `'numbered'` |
+| Runtime | Host text models own conversion from rich text source paragraphs into their own text body/list schema |
+
 ## Layer / Concept / Role
 
 | Layer | Concept | Role |
@@ -119,7 +129,7 @@
 | `src/canvas/app/feature-packs/stamp-authoring` | Reaction stamp catalog, controls, insertion, voting quota hook integration을 폴더째 설치형 pack으로 제공한다 |
 | `src/canvas/app/feature-packs/status-bar` | Gesture/tool status projection과 selection count view를 폴더째 설치형 pack으로 제공한다 |
 | `src/canvas/app/feature-packs/table-import` | CSV/TSV paste/drop/file import, table insert position, table component creation request를 폴더째 설치형 pack으로 제공한다 |
-| `src/canvas/app/feature-packs/text-paste-import` | Plain/HTML text paste sources, importer contract, item creation, paste DOM listener를 폴더째 설치형 pack으로 제공한다 |
+| `src/canvas/app/feature-packs/text-paste-import` | Plain/HTML text paste sources, unordered/ordered rich text list metadata, importer contract, item creation, paste DOM listener를 폴더째 설치형 pack으로 제공한다 |
 | `src/canvas/app/feature-packs/toolbar` | Toolbar, context command menu, selection floating bar, command/tool item grammar와 dispatch를 폴더째 설치형 pack으로 제공한다 |
 | `src/canvas/app/feature-packs/zoom-controls` | Zoom in/out/reset/fit command overlay view를 폴더째 설치형 pack으로 제공한다 |
 | `src/canvas/app/workflow/CanvasAppAssembly.ts` | Host item adapter, component library, custom command, custom item module, inspector panel, initial items, SVG presentation registry 같은 제품별 의미를 외부 조립 seam으로 제공한다 |

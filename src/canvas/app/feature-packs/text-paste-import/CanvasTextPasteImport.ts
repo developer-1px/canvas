@@ -36,8 +36,10 @@ export type CanvasRichTextPasteRun = {
   underline?: boolean
 }
 
+export type CanvasRichTextPasteListType = 'bullet' | 'numbered'
+
 export type CanvasRichTextPasteParagraph = {
-  bullet?: 'bullet'
+  bullet?: CanvasRichTextPasteListType
   runs: readonly CanvasRichTextPasteRun[]
 }
 
@@ -428,6 +430,7 @@ function getCanvasRichTextParagraphsFromElement(root: Element) {
 
 function getCanvasRichTextParagraphFromBlock(
   node: Element,
+  listType?: CanvasRichTextPasteListType,
 ): CanvasRichTextPasteParagraph[] {
   const tagName = node.tagName.toLowerCase()
 
@@ -440,12 +443,14 @@ function getCanvasRichTextParagraphFromBlock(
   )
 
   if (nestedBlocks.length > 0 && !['li', 'p'].includes(tagName)) {
+    const childListType = getCanvasRichTextListType(tagName) ?? listType
+
     return nestedBlocks.flatMap((child) =>
-      getCanvasRichTextParagraphFromBlock(child))
+      getCanvasRichTextParagraphFromBlock(child, childListType))
   }
 
   const runs = getCanvasRichTextRunsFromNode(node, {})
-  const bullet = tagName === 'li' ? 'bullet' : undefined
+  const bullet = tagName === 'li' ? listType ?? 'bullet' : undefined
 
   return runs.length > 0
     ? [{
@@ -502,11 +507,12 @@ function getCanvasRichTextParagraphsFromString(value: string) {
   )
   const paragraphs: CanvasRichTextPasteParagraph[] = []
   let runs: CanvasRichTextPasteRun[] = []
-  let bullet: 'bullet' | undefined
+  let bullet: CanvasRichTextPasteListType | undefined
   let boldDepth = 0
   let italicDepth = 0
   let underlineDepth = 0
   const linkStack: string[] = []
+  const listStack: CanvasRichTextPasteListType[] = []
 
   const flushParagraph = () => {
     if (runs.length > 0) {
@@ -553,6 +559,9 @@ function getCanvasRichTextParagraphsFromString(value: string) {
         underlineDepth = Math.max(0, underlineDepth - 1)
       } else if (tag.name === 'a') {
         linkStack.pop()
+      } else if (tag.name === 'ul' || tag.name === 'ol') {
+        flushParagraph()
+        listStack.pop()
       } else if (isCanvasRichTextBlockName(tag.name)) {
         flushParagraph()
         if (tag.name === 'li') {
@@ -564,9 +573,12 @@ function getCanvasRichTextParagraphsFromString(value: string) {
 
     if (tag.name === 'br') {
       flushParagraph()
+    } else if (tag.name === 'ul' || tag.name === 'ol') {
+      flushParagraph()
+      listStack.push(getCanvasRichTextListType(tag.name) ?? 'bullet')
     } else if (tag.name === 'li') {
       flushParagraph()
-      bullet = 'bullet'
+      bullet = listStack.at(-1) ?? 'bullet'
     } else if (isCanvasRichTextBlockName(tag.name)) {
       flushParagraph()
     } else if (tag.name === 'b' || tag.name === 'strong') {
@@ -638,7 +650,7 @@ function hasCanvasRichTextFormatting(
   paragraphs: readonly CanvasRichTextPasteParagraph[],
 ) {
   return paragraphs.some((paragraph) =>
-    paragraph.bullet === 'bullet' ||
+    Boolean(paragraph.bullet) ||
     paragraph.runs.some((run) =>
       run.bold === true ||
       run.italic === true ||
@@ -653,6 +665,20 @@ function isCanvasRichTextBlock(node: Element) {
 
 function isCanvasRichTextBlockName(value: string) {
   return CANVAS_RICH_TEXT_BLOCK_TAGS.has(value)
+}
+
+function getCanvasRichTextListType(
+  tagName: string,
+): CanvasRichTextPasteListType | null {
+  if (tagName === 'ol') {
+    return 'numbered'
+  }
+
+  if (tagName === 'ul') {
+    return 'bullet'
+  }
+
+  return null
 }
 
 function normalizeCanvasRichTextHref(value: string | null) {

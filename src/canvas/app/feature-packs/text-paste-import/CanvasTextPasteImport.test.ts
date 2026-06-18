@@ -109,6 +109,156 @@ describe('CanvasTextPasteImport', () => {
     })
   })
 
+  it('preserves ordered and unordered list paragraphs through the DOMParser path', () => {
+    class FakeTextNode {
+      nodeType = 3
+
+      constructor(readonly textContent: string) {}
+    }
+
+    class FakeElement {
+      children: FakeElement[]
+      nodeType = 1
+
+      constructor(
+        readonly tagName: string,
+        readonly childNodes: Array<FakeElement | FakeTextNode> = [],
+        private readonly attributes: Record<string, string> = {},
+      ) {
+        this.children = childNodes.filter(
+          (child): child is FakeElement => child instanceof FakeElement,
+        )
+      }
+
+      getAttribute(name: string) {
+        return this.attributes[name] ?? null
+      }
+
+      querySelectorAll() {
+        return []
+      }
+    }
+
+    const text = (value: string) => new FakeTextNode(value)
+    const element = (
+      tagName: string,
+      childNodes: Array<FakeElement | FakeTextNode> = [],
+      attributes: Record<string, string> = {},
+    ) => new FakeElement(tagName.toUpperCase(), childNodes, attributes)
+    const body = element('body', [
+      element('p', [
+        text('Intro '),
+        element('strong', [text('Bold')]),
+      ]),
+      element('ul', [
+        element('li', [text('Bullet')]),
+      ]),
+      element('ol', [
+        element('li', [text('First')]),
+        element('li', [
+          element('a', [text('Second')], {
+            href: 'https://example.com',
+          }),
+        ]),
+      ]),
+    ])
+
+    vi.stubGlobal('Element', FakeElement)
+    vi.stubGlobal('DOMParser', class {
+      parseFromString() {
+        return {
+          body,
+        }
+      }
+    })
+
+    try {
+      expect(getCanvasRichTextPasteSourceFromHTML('<fixture />')).toEqual({
+        format: 'text-html-rich',
+        paragraphs: [
+          {
+            runs: [
+              { text: 'Intro ' },
+              { bold: true, text: 'Bold' },
+            ],
+          },
+          {
+            bullet: 'bullet',
+            runs: [
+              { text: 'Bullet' },
+            ],
+          },
+          {
+            bullet: 'numbered',
+            runs: [
+              { text: 'First' },
+            ],
+          },
+          {
+            bullet: 'numbered',
+            runs: [
+              {
+                color: '#2563eb',
+                link: 'https://example.com',
+                text: 'Second',
+                underline: true,
+              },
+            ],
+          },
+        ],
+        text: 'Intro Bold\nBullet\nFirst\nSecond',
+      })
+    } finally {
+      vi.unstubAllGlobals()
+    }
+  })
+
+  it('preserves ordered list paragraphs through the string fallback path', () => {
+    vi.stubGlobal('DOMParser', undefined)
+
+    try {
+      expect(getCanvasRichTextPasteSourceFromHTML(`
+        <p>Intro <strong>Bold</strong></p>
+        <ol>
+          <li>First</li>
+          <li><em>Second</em></li>
+        </ol>
+        <ul><li>Bullet</li></ul>
+      `)).toEqual({
+        format: 'text-html-rich',
+        paragraphs: [
+          {
+            runs: [
+              { text: 'Intro ' },
+              { bold: true, text: 'Bold' },
+            ],
+          },
+          {
+            bullet: 'numbered',
+            runs: [
+              { text: 'First' },
+            ],
+          },
+          {
+            bullet: 'numbered',
+            runs: [
+              { italic: true, text: 'Second' },
+            ],
+          },
+          {
+            bullet: 'bullet',
+            runs: [
+              { text: 'Bullet' },
+            ],
+          },
+        ],
+        text: 'Intro Bold\nFirst\nSecond\nBullet',
+      })
+    } finally {
+      vi.unstubAllGlobals()
+    }
+  })
+
   it('does not claim plain or conflicting HTML as rich text', () => {
     expect(getCanvasRichTextPasteSourceFromHTML('<p>Plain text</p>')).toBeNull()
     expect(getCanvasRichTextPasteSourceFromHTML(

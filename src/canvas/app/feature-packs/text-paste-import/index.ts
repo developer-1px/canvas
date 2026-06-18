@@ -14,6 +14,7 @@ export {
   insertCanvasTextPasteSource,
   routeCanvasTextPasteReplace,
   type CanvasPlainTextPasteSource,
+  type CanvasRichTextPasteListType,
   type CanvasRichTextPasteParagraph,
   type CanvasRichTextPasteRun,
   type CanvasRichTextPasteSource,

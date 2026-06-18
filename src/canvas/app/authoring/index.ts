@@ -127,6 +127,9 @@ export type {
 } from '../workspace/document/CanvasAppDocumentContracts'
 export type {
   CanvasPlainTextPasteSource,
+  CanvasRichTextPasteListType,
+  CanvasRichTextPasteParagraph,
+  CanvasRichTextPasteRun,
   CanvasRichTextPasteSource,
   CanvasTextPasteImporter,
   CanvasTextPasteImporterContext,

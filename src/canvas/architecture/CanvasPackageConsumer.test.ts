@@ -169,6 +169,10 @@ import {
   type CanvasImagePasteReplaceRoute,
   type CanvasMediaObjectHyperlinkRoute,
   type CanvasTableImportTargetReplaceRoute,
+  type CanvasRichTextPasteListType,
+  type CanvasRichTextPasteParagraph,
+  type CanvasRichTextPasteRun,
+  type CanvasRichTextPasteSource,
   type CanvasTextPasteReplaceRoute,
   type CanvasAppCustomItemModule,
   type CanvasAppCustomItemRenderKeyStrategy,
@@ -2034,6 +2038,19 @@ describe('Canvas package consumer imports', () => {
       status: 'routed',
       text: 'Consumer text',
     })
+    const richTextListType: CanvasRichTextPasteListType = 'numbered'
+    const richTextRun: CanvasRichTextPasteRun = { text: 'Consumer item' }
+    const richTextParagraph: CanvasRichTextPasteParagraph = {
+      bullet: richTextListType,
+      runs: [richTextRun],
+    }
+    const richTextSource: CanvasRichTextPasteSource = {
+      format: 'text-html-rich',
+      paragraphs: [richTextParagraph],
+      text: 'Consumer item',
+    }
+
+    expect(richTextSource.paragraphs[0]?.bullet).toBe('numbered')
     const tableImportTargetReplaceRoute: CanvasTableImportTargetReplaceRoute =
       routeCanvasTableImportTargetReplace({
         getTarget: ({ selection }) => ({
