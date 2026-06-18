@@ -10,8 +10,6 @@ import {
 } from 'react';
 import { useTranslation } from '../support/storyCanvasLanguage';
 import {
-  CANVAS_APP_READ_ONLY_CAPABILITIES,
-  CANVAS_APP_STORY_IMPORT_FEATURE_PACK_MANIFEST,
   CanvasApp,
   type CanvasAppAssemblyInput,
   type CanvasItem,
@@ -73,9 +71,7 @@ import StoryLayersPanel, {
   type StoryLayersPanelText,
 } from './StoryLayersPanel';
 import {
-  STORY_CANVAS_AFFORDANCE_CONFIG,
-  STORY_CANVAS_FEATURE_PACK_PROFILE,
-  createStoryPreviewFeaturePackManifest,
+  createStoryCanvasRuntimeAssemblyInput,
   createStoryViewStore,
 } from './storyCanvasModules';
 import {
@@ -494,13 +490,6 @@ export default function StoryCanvasPage({ preset = 'default' }: { preset?: Story
   useEffect(() => {
     storyViewStore.setState({ elementSelection, favoriteStoryIds, selectedStoryId, treeHover });
   }, [elementSelection, favoriteStoryIds, selectedStoryId, storyViewStore, treeHover]);
-  const storyPreviewManifest = useMemo(() => createStoryPreviewFeaturePackManifest({
-    onSelectElement: handleSelectElement,
-    onSelectStory: handleSelectStory,
-    onToggleFavorite: handleToggleFavorite,
-    storyRecordById,
-    store: storyViewStore,
-  }), [handleSelectElement, handleSelectStory, handleToggleFavorite, storyRecordById, storyViewStore]);
   const [storyImportState, setStoryImportState] = useState(
     EMPTY_STORY_CANVAS_IMPORT_STATE,
   );
@@ -575,19 +564,27 @@ export default function StoryCanvasPage({ preset = 'default' }: { preset?: Story
     scheduleUrlStateReplace();
   }, [elementSelection, scheduleUrlStateReplace, selectedPagePath, selectedStoryId]);
 
-  const assemblyInput = useMemo<CanvasAppAssemblyInput>(() => ({
-    additionalFeaturePackManifests: [
-      storyPreviewManifest,
-      CANVAS_APP_STORY_IMPORT_FEATURE_PACK_MANIFEST,
-    ],
-    affordanceConfig: STORY_CANVAS_AFFORDANCE_CONFIG,
-    capabilities: CANVAS_APP_READ_ONLY_CAPABILITIES,
-    featurePackProfile: STORY_CANVAS_FEATURE_PACK_PROFILE,
-    componentDefinitions: storyCanvasAssembly.componentDefinitions,
-    initialItems: storyCanvasAssembly.items,
-    initialSelection: [],
-    workspaceStorageProvider: storageProvider,
-  }), [storageProvider, storyCanvasAssembly.componentDefinitions, storyCanvasAssembly.items, storyPreviewManifest]);
+  const assemblyInput = useMemo<CanvasAppAssemblyInput>(() =>
+    createStoryCanvasRuntimeAssemblyInput({
+      componentDefinitions: storyCanvasAssembly.componentDefinitions,
+      initialItems: storyCanvasAssembly.items,
+      initialSelection: [],
+      onSelectElement: handleSelectElement,
+      onSelectStory: handleSelectStory,
+      onToggleFavorite: handleToggleFavorite,
+      storyRecordById,
+      store: storyViewStore,
+      workspaceStorageProvider: storageProvider,
+    }), [
+    handleSelectElement,
+    handleSelectStory,
+    handleToggleFavorite,
+    storageProvider,
+    storyCanvasAssembly.componentDefinitions,
+    storyCanvasAssembly.items,
+    storyRecordById,
+    storyViewStore,
+  ]);
   const storyImportKey = useMemo(
     () => `${hashString(storyImportState.items.map((item) => item.id).join('|'))}-${hashString(storyImportState.componentDefinitions.map((definition) => definition.id).join('|'))}`,
     [storyImportState.componentDefinitions, storyImportState.items],

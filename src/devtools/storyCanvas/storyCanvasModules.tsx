@@ -1,9 +1,12 @@
 import { useSyncExternalStore, type CSSProperties } from 'react';
 import {
+  CANVAS_APP_READ_ONLY_CAPABILITIES,
   CANVAS_STORY_CANVAS_SUITE_ID,
   DEFAULT_CANVAS_APP_FEATURE_PACK_SUITE_MANIFESTS,
   type CanvasAppAssemblyInput,
+  type CanvasWorkspaceStorageProvider,
   createCanvasAppFeaturePackProfile,
+  createCanvasStoryCanvasFeaturePackAssemblyInput,
   createCanvasStoryPreviewItemsFeaturePackManifest,
   type CanvasAppFeaturePackManifest,
   type CanvasAppFeaturePackProfile,
@@ -177,6 +180,21 @@ export function createStoryViewStore() {
 
 type StoryViewStore = ReturnType<typeof createStoryViewStore>;
 
+type StoryPreviewRendererInput = {
+  store: StoryViewStore;
+  storyRecordById: Map<string, StoryRecord>;
+  onSelectElement: (storyId: string, element: LayerElement | null, snapshot?: CanvasViewportLayerSnapshot | null) => void;
+  onSelectStory: (storyId: string) => void;
+  onToggleFavorite: (storyId: string) => void;
+};
+
+export type StoryCanvasRuntimeAssemblyInput = StoryPreviewRendererInput & Readonly<{
+  componentDefinitions: NonNullable<CanvasAppAssemblyInput['componentDefinitions']>;
+  initialItems: NonNullable<CanvasAppAssemblyInput['initialItems']>;
+  initialSelection?: CanvasAppAssemblyInput['initialSelection'];
+  workspaceStorageProvider: CanvasWorkspaceStorageProvider;
+}>;
+
 function StoryCanvasCardContainer({
   onSelectElement,
   onSelectStory,
@@ -215,6 +233,30 @@ function StoryCanvasCardContainer({
   );
 }
 
+function createStoryPreviewItemRenderer({
+  onSelectElement,
+  onSelectStory,
+  onToggleFavorite,
+  storyRecordById,
+  store,
+}: StoryPreviewRendererInput) {
+  return ({ item, storyId }: CanvasStoryPreviewItemRenderInput) => {
+    const story = storyRecordById.get(storyId);
+
+    return (
+      <foreignObject x={item.x} y={item.y} width={item.w} height={item.h}>
+        <StoryCanvasCardContainer
+          store={store}
+          story={story}
+          onSelectElement={onSelectElement}
+          onSelectStory={onSelectStory}
+          onToggleFavorite={onToggleFavorite}
+        />
+      </foreignObject>
+    );
+  };
+}
+
 export function createStoryPreviewFeaturePackManifest({
   onSelectElement,
   onSelectStory,
@@ -230,20 +272,48 @@ export function createStoryPreviewFeaturePackManifest({
 }): CanvasAppFeaturePackManifest {
   return createCanvasStoryPreviewItemsFeaturePackManifest({
     renderGroupItem: renderStoryGroupItem,
-    renderPreviewItem: ({ item, storyId }: CanvasStoryPreviewItemRenderInput) => {
-      const story = storyRecordById.get(storyId);
+    renderPreviewItem: createStoryPreviewItemRenderer({
+      onSelectElement,
+      onSelectStory,
+      onToggleFavorite,
+      storyRecordById,
+      store,
+    }),
+  });
+}
 
-      return (
-        <foreignObject x={item.x} y={item.y} width={item.w} height={item.h}>
-          <StoryCanvasCardContainer
-            store={store}
-            story={story}
-            onSelectElement={onSelectElement}
-            onSelectStory={onSelectStory}
-            onToggleFavorite={onToggleFavorite}
-          />
-        </foreignObject>
-      );
+export function createStoryCanvasRuntimeAssemblyInput({
+  componentDefinitions,
+  initialItems,
+  initialSelection = [],
+  onSelectElement,
+  onSelectStory,
+  onToggleFavorite,
+  storyRecordById,
+  store,
+  workspaceStorageProvider,
+}: StoryCanvasRuntimeAssemblyInput): CanvasAppAssemblyInput {
+  const featurePackAssemblyInput = createCanvasStoryCanvasFeaturePackAssemblyInput({
+    assemblyInput: {
+      featurePackProfile: STORY_CANVAS_FEATURE_PACK_PROFILE,
     },
+    renderGroupItem: renderStoryGroupItem,
+    renderPreviewItem: createStoryPreviewItemRenderer({
+      onSelectElement,
+      onSelectStory,
+      onToggleFavorite,
+      storyRecordById,
+      store,
+    }),
+  });
+
+  return Object.freeze({
+    ...featurePackAssemblyInput,
+    affordanceConfig: STORY_CANVAS_AFFORDANCE_CONFIG,
+    capabilities: CANVAS_APP_READ_ONLY_CAPABILITIES,
+    componentDefinitions,
+    initialItems,
+    initialSelection,
+    workspaceStorageProvider,
   });
 }
