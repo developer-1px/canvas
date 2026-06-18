@@ -310,6 +310,9 @@
 | Field | alt text and decorative fields route through `update-object-accessibility` |
 | Removal | `remove-object-alt-text` clears object description through a host command effect |
 | Metadata | `data-slide-object-accessibility` carries `none` or a JSON string for normalized accessibility metadata |
+| JSON candidates | custom MIME, `application/json`, `text/json`, and `text/plain` are checked in order |
+| JSON wrappers | generic JSON requires `objectAccessibility`, `accessibility`, or `objectAltText`; direct UI aria label strings are ignored |
+| Paste values | `null`, `false`, empty string, and `decorative: false` produce remove-alt-text; `decorative: true` produces a decorative paste value |
 | Scope | describes slide content objects, not app chrome, toolbar controls, or UI `aria-label` strings |
 | Runtime | stage, thumbnail, presentation, inspector, and export can read the same metadata value |
 
