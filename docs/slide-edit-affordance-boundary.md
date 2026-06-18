@@ -240,7 +240,11 @@
 | Values | `top`, `middle`, `bottom`; `top` is the default |
 | Field | `verticalAlignment` segmented-control descriptor |
 | Metadata | `data-slide-text-vertical-align` carries the normalized value |
+| JSON candidates | custom MIME, `application/json`, `text/json`, and `text/plain` are checked in order |
+| JSON payloads | custom MIME may carry a direct value or `value`; generic JSON requires `textVerticalAlign`, `textVerticalAlignment`, `verticalAlign`, `verticalAlignment`, or `alignItems` |
+| Alias values | `flex-start`/`start` map to `top`, `center` maps to `middle`, and `flex-end`/`end` map to `bottom` |
 | Updates | selected text object id and normalized alignment become host command effects |
+| No-op | empty target object lists produce an empty command list so hosts can continue paste fallback |
 | Runtime | stage, thumbnail, inspector, and export can read the same metadata value |
 
 ## Text Frame Inset Contract
