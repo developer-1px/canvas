@@ -189,6 +189,17 @@ export {
   type CanvasAppItemsChangeTransformer,
 } from '../extensions/items-change-transformers'
 export {
+  commitCanvasAppHostItemsChange,
+  createCanvasAppHostItemsChangeCommitter,
+  type CanvasAppHostItemsChangeCommitInput,
+  type CanvasAppHostItemsChangeCommitResult,
+  type CanvasAppHostItemsChangeCommittedResult,
+  type CanvasAppHostItemsChangeCommitter,
+  type CanvasAppHostItemsChangeSkippedResult,
+  type CommitCanvasAppHostItemsChangeArgs,
+  type CreateCanvasAppHostItemsChangeCommitterInput,
+} from '../workspace/document/CanvasAppItemsChangeCommitter'
+export {
   createCanvasAppDomEditStyleFeaturePackManifest,
   createCanvasDomEditStyleInspectorPanel,
   getCanvasDomEditStyle,

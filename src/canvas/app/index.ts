@@ -73,6 +73,17 @@ export {
   type CanvasAppItemsChangeTransformer,
 } from './extensions/items-change-transformers'
 export {
+  commitCanvasAppHostItemsChange,
+  createCanvasAppHostItemsChangeCommitter,
+  type CanvasAppHostItemsChangeCommitInput,
+  type CanvasAppHostItemsChangeCommitResult,
+  type CanvasAppHostItemsChangeCommittedResult,
+  type CanvasAppHostItemsChangeCommitter,
+  type CanvasAppHostItemsChangeSkippedResult,
+  type CommitCanvasAppHostItemsChangeArgs,
+  type CreateCanvasAppHostItemsChangeCommitterInput,
+} from './workspace/document/CanvasAppItemsChangeCommitter'
+export {
   CANVAS_TABS_KEYBOARD_MODEL,
   CANVAS_TABS_ROVING_FOCUS_MODEL,
   createCanvasTabsDescriptor,

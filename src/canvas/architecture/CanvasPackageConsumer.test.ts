@@ -164,6 +164,8 @@ import {
   getCanvasComponentInspectorPanelModel,
   syncCanvasComponentItemsChange,
   transformCanvasAppItemsChange,
+  commitCanvasAppHostItemsChange,
+  createCanvasAppHostItemsChangeCommitter,
   getCanvasFindInputKeyboardIntent,
   getCanvasFloatingAnchorForBounds,
   getCanvasInlineEditKeyboardIntent,
@@ -196,6 +198,11 @@ import {
   type CanvasAppAssemblySourceValue,
   type CanvasAppPrebuiltAssemblySource,
   type CanvasAppCommitItemsChange,
+  type CanvasAppHostItemsChangeCommitInput,
+  type CanvasAppHostItemsChangeCommitResult,
+  type CanvasAppHostItemsChangeCommitter,
+  type CommitCanvasAppHostItemsChangeArgs,
+  type CreateCanvasAppHostItemsChangeCommitterInput,
   type CanvasAppComponentLibrary,
   type CanvasAppComponentDefinition,
   type CanvasAppComponentTemplate,
@@ -545,6 +552,64 @@ describe('Canvas package consumer imports', () => {
       CanvasAppFacade.transformCanvasAppItemsChange<HostTransformItem>({
         ...hostTransformContext,
         transformers: [hostItemsChangeTransformer],
+      })
+    const hostCommitCalls: CanvasAppItemsChange<HostTransformItem>[] = []
+    let hostCommitCurrentItems = [hostTransformItem]
+    const hostCommitterInput:
+      CreateCanvasAppHostItemsChangeCommitterInput<HostTransformItem> = {
+        commitItemsChange: (change) => {
+          hostCommitCalls.push(change)
+
+          return true
+        },
+        getCurrentItems: () => hostCommitCurrentItems,
+        itemsChangeTransformers: [hostItemsChangeTransformer],
+      }
+    const hostItemsChangeCommitter:
+      CanvasAppHostItemsChangeCommitter<HostTransformItem> =
+        createCanvasAppHostItemsChangeCommitter(hostCommitterInput)
+    const hostCommitInput:
+      CanvasAppHostItemsChangeCommitInput<HostTransformItem> = {
+        change: hostItemsChange,
+      }
+    const hostCommitResult:
+      CanvasAppHostItemsChangeCommitResult<HostTransformItem> =
+        hostItemsChangeCommitter.commit(hostCommitInput)
+    const hostDirectCommitCalls: CanvasAppItemsChange<HostTransformItem>[] = []
+    const hostDirectCommitArgs:
+      CommitCanvasAppHostItemsChangeArgs<HostTransformItem> = {
+        change: hostItemsChange,
+        commitItemsChange: (change) => {
+          hostDirectCommitCalls.push(change)
+
+          return true
+        },
+        currentItems: hostCommitCurrentItems,
+        itemsChangeTransformers: [hostItemsChangeTransformer],
+      }
+    const hostDirectCommitResult =
+      commitCanvasAppHostItemsChange(hostDirectCommitArgs)
+    const hostStandardCommitItemsChange:
+      CanvasStandardCommandExecutionContext<HostTransformItem>['commitItemsChange'] =
+        hostItemsChangeCommitter
+    const hostClipboardCommitItemsChange:
+      CanvasClipboardCommandExecutionContext<HostTransformItem>['commitItemsChange'] =
+        hostItemsChangeCommitter
+    hostCommitCurrentItems = [{
+      ...hostTransformItem,
+      id: 'ppt-transform-current',
+      x: 20,
+    }]
+    const hostStandardCommitResult =
+      hostStandardCommitItemsChange(hostItemsChange)
+    const hostClipboardCommitResult =
+      hostClipboardCommitItemsChange({
+        afterItems: [{
+          ...hostTransformItem,
+          x: 30,
+        }],
+        beforeItems: [hostTransformItem],
+        type: 'transform',
       })
     const commitAppItemsChange: CanvasAppCommitItemsChange = () => true
     const validateCustomItem: CanvasAppCustomItemValidator = (item) =>
@@ -1913,10 +1978,67 @@ describe('Canvas package consumer imports', () => {
       throw new Error('Expected app host transformer replace-changed result')
     }
 
+    if (hostCommitResult.transformedChange.type !== 'replace-changed') {
+      throw new Error('Expected host committer replace-changed result')
+    }
+
+    if (hostDirectCommitResult.transformedChange.type !== 'replace-changed') {
+      throw new Error('Expected direct host commit replace-changed result')
+    }
+
     expect(hostTransformedItemsChange.items[0]?.slideId).toBe('slide-1')
     expect(hostTransformedItemsChange.items[0]?.x).toBe(13)
     expect(hostFacadeTransformedItemsChange.items[0]?.kind)
       .toBe('ppt-shape')
+    expect(hostCommitResult.committed).toBe(true)
+    expect(hostCommitResult.currentItems).toEqual([hostTransformItem])
+    expect(hostCommitResult.transformedChange.items[0]?.x).toBe(13)
+    expect(hostDirectCommitResult.committed).toBe(true)
+    expect(hostDirectCommitCalls).toEqual([{
+      items: [{
+        ...hostTransformItem,
+        x: 13,
+      }],
+      type: 'replace-changed',
+    }])
+    expect(hostStandardCommitResult).toBe(true)
+    expect(hostClipboardCommitResult).toBe(true)
+    expect(hostCommitCalls).toEqual([
+      {
+        items: [{
+          ...hostTransformItem,
+          x: 13,
+        }],
+        type: 'replace-changed',
+      },
+      {
+        items: [{
+          ...hostTransformItem,
+          x: 13,
+        }],
+        type: 'replace-changed',
+      },
+      {
+        afterItems: [{
+          ...hostTransformItem,
+          x: 30,
+        }],
+        beforeItems: [hostTransformItem],
+        type: 'transform',
+      },
+    ])
+    expect(CanvasPackage.commitCanvasAppHostItemsChange)
+      .toBe(commitCanvasAppHostItemsChange)
+    expect(CanvasPackage.createCanvasAppHostItemsChangeCommitter)
+      .toBe(createCanvasAppHostItemsChangeCommitter)
+    expect(CanvasAppFacade.commitCanvasAppHostItemsChange)
+      .toBe(commitCanvasAppHostItemsChange)
+    expect(CanvasAppFacade.createCanvasAppHostItemsChangeCommitter)
+      .toBe(createCanvasAppHostItemsChangeCommitter)
+    expect(CanvasAppAuthoring.commitCanvasAppHostItemsChange)
+      .toBe(commitCanvasAppHostItemsChange)
+    expect(CanvasAppAuthoring.createCanvasAppHostItemsChangeCommitter)
+      .toBe(createCanvasAppHostItemsChangeCommitter)
     const emptyComponentInspectorModel: CanvasComponentInspectorPanelModel | null =
       getCanvasComponentInspectorPanelModel({
         bounds: null,
