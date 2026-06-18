@@ -8,11 +8,13 @@ import {
   createCanvasAppAiLabsFeaturePackManifest,
   createCanvasAppFeaturePackManifest,
   getCanvasAppFeaturePackMarketplaceSelectionControlModel,
+  getCanvasAppFeaturePackMarketplaceSelectionExecutionModel,
   getCanvasAppFeaturePackMarketplaceTargetControl,
   getCanvasAppFeaturePackMarketplacePrimaryAction,
 } from '../feature-packs'
 import {
   applyCanvasAppAssemblySourceFeaturePackMarketplaceHostUpdate,
+  executeCanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransaction,
   executeCanvasAppAssemblySourceFeaturePackMarketplaceSelectionTargetControlApplyTransaction,
   executeCanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransaction,
   executeCanvasAppAssemblySourceFeaturePackMarketplaceTargetControlApplyTransaction,
@@ -412,6 +414,236 @@ describe('CanvasAppAssemblySource', () => {
         id: 'shell-selection-addon-pack',
         status: 'disabled',
       }])
+  })
+
+  it('applies ready marketplace selection execution controls as cumulative assembly input sources', async () => {
+    const firstAddonManifest = createCanvasAppFeaturePackManifest({
+      id: 'shell-batch-first-addon-pack',
+      label: 'Shell batch first addon pack',
+    })
+    const secondAddonManifest = createCanvasAppFeaturePackManifest({
+      id: 'shell-batch-second-addon-pack',
+      label: 'Shell batch second addon pack',
+    })
+    const model = getCanvasAppFeaturePackMarketplaceAssemblyModel({
+      assemblyInput: {
+        featurePackManifests: [firstAddonManifest, secondAddonManifest],
+        featurePackStates: [
+          {
+            id: 'shell-batch-first-addon-pack',
+            status: 'uninstalled',
+          },
+          {
+            id: 'shell-batch-second-addon-pack',
+            status: 'uninstalled',
+          },
+        ],
+      },
+      profiles: [],
+      suiteManifests: [],
+    })
+    const selection = getCanvasAppFeaturePackMarketplaceSelectionControlModel({
+      facetKind: 'ready',
+      model: model.marketplaceModel,
+      sectionKind: 'packs',
+    })
+    const execution =
+      getCanvasAppFeaturePackMarketplaceSelectionExecutionModel(selection)
+    const sourceTransactionResult =
+      await executeCanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransaction({
+        executeCleanupEffect: () => ({ kind: 'not-run' as const }),
+        execution,
+        model,
+      })
+
+    expect(execution.readyTargets).toEqual([
+      {
+        featurePackId: 'shell-batch-first-addon-pack',
+        kind: 'pack',
+      },
+      {
+        featurePackId: 'shell-batch-second-addon-pack',
+        kind: 'pack',
+      },
+    ])
+    expect(sourceTransactionResult.status).toBe('applied')
+    expect(sourceTransactionResult.applied).toBe(true)
+    expect(sourceTransactionResult.summary).toMatchObject({
+      appliedResultCount: 2,
+      attemptedControlCount: 2,
+      blockedControlCount: 0,
+      controlCount: 2,
+      readyControlCount: 2,
+      skippedControlCount: 0,
+      unappliedResultCount: 0,
+    })
+    expect(sourceTransactionResult.results.map((result) => result.actionKind))
+      .toEqual(['install', 'install'])
+    expect(sourceTransactionResult.source.assemblyInput?.featurePackStates)
+      .toEqual([
+        {
+          id: 'shell-batch-first-addon-pack',
+          status: 'disabled',
+        },
+        {
+          id: 'shell-batch-second-addon-pack',
+          status: 'disabled',
+        },
+      ])
+
+    const nextAssembly =
+      resolveCanvasAppAssemblySource(sourceTransactionResult.source)
+
+    expect(nextAssembly.installedFeaturePackIds)
+      .toContain('shell-batch-first-addon-pack')
+    expect(nextAssembly.installedFeaturePackIds)
+      .toContain('shell-batch-second-addon-pack')
+    expect(sourceTransactionResult.currentModel.marketplaceModel.packs.items
+      .map((item) => item.status)).toEqual(['disabled', 'disabled'])
+  })
+
+  it('applies ready marketplace selection execution controls while preserving skipped held controls', async () => {
+    const publicManifest = createCanvasAppFeaturePackManifest({
+      id: 'shell-batch-public-pack',
+      label: 'Shell batch public pack',
+    })
+    const privateManifest = createCanvasAppFeaturePackManifest({
+      id: 'shell-batch-private-pack',
+      label: 'Shell batch private pack',
+    })
+    const model = getCanvasAppFeaturePackMarketplaceAssemblyModel({
+      assemblyInput: {
+        featurePackManifests: [publicManifest, privateManifest],
+        featurePackStates: [
+          {
+            id: 'shell-batch-public-pack',
+            status: 'uninstalled',
+          },
+          {
+            id: 'shell-batch-private-pack',
+            status: 'uninstalled',
+          },
+        ],
+      },
+      listings: [{
+        access: 'private',
+        distribution: 'available',
+        featurePackId: 'shell-batch-private-pack',
+      }],
+      profiles: [],
+      suiteManifests: [],
+    })
+    const selection = getCanvasAppFeaturePackMarketplaceSelectionControlModel({
+      facetKind: 'all',
+      model: model.marketplaceModel,
+      sectionKind: 'packs',
+    })
+    const execution =
+      getCanvasAppFeaturePackMarketplaceSelectionExecutionModel(selection)
+    const sourceTransactionResult =
+      await executeCanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransaction({
+        executeCleanupEffect: () => ({ kind: 'not-run' as const }),
+        execution,
+        model,
+      })
+
+    expect(execution.summary).toMatchObject({
+      blockedControlCount: 1,
+      controlCount: 2,
+      heldControlCount: 1,
+      readyControlCount: 1,
+    })
+    expect(sourceTransactionResult.status).toBe('partial')
+    expect(sourceTransactionResult.summary).toMatchObject({
+      appliedResultCount: 1,
+      attemptedControlCount: 1,
+      blockedControlCount: 1,
+      controlCount: 2,
+      readyControlCount: 1,
+      skippedControlCount: 1,
+      unappliedResultCount: 0,
+    })
+    expect(sourceTransactionResult.skippedControls.map((control) =>
+      control.target
+    )).toEqual([{
+      featurePackId: 'shell-batch-private-pack',
+      kind: 'pack',
+    }])
+    expect(sourceTransactionResult.source.assemblyInput?.featurePackStates)
+      .toEqual([
+        {
+          id: 'shell-batch-public-pack',
+          status: 'disabled',
+        },
+        {
+          id: 'shell-batch-private-pack',
+          status: 'uninstalled',
+        },
+      ])
+  })
+
+  it('holds stale marketplace selection execution targets when the current action changed', async () => {
+    const staleManifest = createCanvasAppFeaturePackManifest({
+      id: 'shell-batch-stale-pack',
+      label: 'Shell batch stale pack',
+    })
+    const staleExecutionModel = getCanvasAppFeaturePackMarketplaceAssemblyModel({
+      assemblyInput: {
+        featurePackManifests: [staleManifest],
+        featurePackStates: [{
+          id: 'shell-batch-stale-pack',
+          status: 'uninstalled',
+        }],
+      },
+      profiles: [],
+      suiteManifests: [],
+    })
+    const currentModel = getCanvasAppFeaturePackMarketplaceAssemblyModel({
+      assemblyInput: {
+        featurePackManifests: [staleManifest],
+      },
+      profiles: [],
+      suiteManifests: [],
+    })
+    const selection = getCanvasAppFeaturePackMarketplaceSelectionControlModel({
+      facetKind: 'ready',
+      model: staleExecutionModel.marketplaceModel,
+      sectionKind: 'packs',
+    })
+    const execution =
+      getCanvasAppFeaturePackMarketplaceSelectionExecutionModel(selection)
+    const source = Object.freeze({
+      assemblyInput: currentModel.assemblyInput,
+    })
+    const sourceTransactionResult =
+      await executeCanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransaction({
+        executeCleanupEffect: () => ({ kind: 'not-run' as const }),
+        execution,
+        model: currentModel,
+        source,
+      })
+
+    expect(execution.readyControls[0]?.actionKind).toBe('install')
+    expect(sourceTransactionResult.status).toBe('held')
+    expect(sourceTransactionResult.applied).toBe(false)
+    expect(sourceTransactionResult.summary).toMatchObject({
+      appliedResultCount: 0,
+      attemptedControlCount: 1,
+      staleResultCount: 1,
+      unappliedResultCount: 1,
+    })
+    expect(sourceTransactionResult.staleResults[0]).toMatchObject({
+      actionKind: 'disable',
+      expectedActionKind: 'install',
+      holdReason: 'stale-target-action',
+      source,
+      status: 'stale-target-action',
+      target: {
+        featurePackId: 'shell-batch-stale-pack',
+        kind: 'pack',
+      },
+    })
+    expect(sourceTransactionResult.source).toBe(source)
   })
 
   it('keeps blocked marketplace selection target control transactions on the held source path', async () => {

@@ -2,16 +2,20 @@ import {
   applyCanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdate,
   createCanvasAppAssembly,
   executeCanvasAppFeaturePackMarketplaceAssemblyTargetApplyTransaction,
+  getCanvasAppFeaturePackMarketplaceAssemblyModel,
   type CanvasAppAssembly,
   type CanvasAppAssemblyInput,
   type CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateApplicationSource,
   type CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateAppliedResult,
   type CanvasAppFeaturePackMarketplaceAssemblyApplyHostUpdateHeldApplicationResult,
+  type CanvasAppFeaturePackMarketplaceAssemblyModel,
   type CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionResult,
   type CanvasAppFeaturePackMarketplaceAssemblyTargetApplyTransactionInput,
 } from '../workflow'
 import {
+  getCanvasAppFeaturePackMarketplaceTargetControl,
   getCanvasAppFeaturePackMarketplaceSelectionTargetControl,
+  type CanvasAppFeaturePackMarketplaceSelectionExecutionModel,
   type CanvasAppFeaturePackMarketplaceSelectionControlModel,
   type CanvasAppFeaturePackMarketplaceTarget,
   type CanvasAppFeaturePackMarketplaceTargetControl,
@@ -229,6 +233,112 @@ export type CanvasAppAssemblySourceFeaturePackMarketplaceSelectionTargetControlA
     source: CanvasAppAssemblySource
     sourceResult: null
     status: 'missing-selection-target'
+    target: CanvasAppFeaturePackMarketplaceTarget
+    transactionResult: null
+    update: null
+    updateMode: 'blocked'
+  }>
+
+export type CanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransactionInput<
+  TEffect,
+  TResult,
+> = Omit<
+  CanvasAppAssemblySourceFeaturePackMarketplaceTargetControlApplyTransactionInput<
+    TEffect,
+    TResult
+  >,
+  'control'
+> & Readonly<{
+  execution: CanvasAppFeaturePackMarketplaceSelectionExecutionModel
+}>
+
+export type CanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransactionStatus =
+  | 'applied'
+  | 'empty'
+  | 'held'
+  | 'partial'
+
+export type CanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransactionSummary =
+  Readonly<{
+    appliedResultCount: number
+    attemptedControlCount: number
+    blockedControlCount: number
+    controlCount: number
+    heldResultCount: number
+    missingResultCount: number
+    readyControlCount: number
+    skippedControlCount: number
+    staleResultCount: number
+    unappliedResultCount: number
+  }>
+
+export type CanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransactionStepResult<
+  TEffect,
+  TResult,
+> =
+  | CanvasAppAssemblySourceFeaturePackMarketplaceTargetControlApplyTransactionResult<
+    TEffect,
+    TResult
+  >
+  | CanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransactionStaleTargetActionResult
+
+export type CanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransactionResult<
+  TEffect,
+  TResult,
+> = Readonly<{
+  applied: boolean
+  appliedResults:
+    readonly CanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransactionAppliedResult<
+      TEffect,
+      TResult
+    >[]
+  blockedControls: readonly CanvasAppFeaturePackMarketplaceTargetControl[]
+  currentModel: CanvasAppFeaturePackMarketplaceAssemblyModel
+  execution: CanvasAppFeaturePackMarketplaceSelectionExecutionModel
+  heldResults:
+    readonly CanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransactionHeldResult<
+      TEffect,
+      TResult
+    >[]
+  initialSource: CanvasAppAssemblySource
+  missingResults:
+    readonly CanvasAppAssemblySourceFeaturePackMarketplaceTargetControlApplyTransactionMissingResult[]
+  model: CanvasAppFeaturePackMarketplaceAssemblyModel
+  readyControls: readonly CanvasAppFeaturePackMarketplaceTargetControl[]
+  results:
+    readonly CanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransactionStepResult<
+      TEffect,
+      TResult
+    >[]
+  skippedControls: readonly CanvasAppFeaturePackMarketplaceTargetControl[]
+  source: CanvasAppAssemblySource
+  staleResults:
+    readonly CanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransactionStaleTargetActionResult[]
+  status:
+    CanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransactionStatus
+  summary:
+    CanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransactionSummary
+  targets: readonly CanvasAppFeaturePackMarketplaceTarget[]
+  unappliedResults:
+    readonly CanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransactionStepResult<
+      TEffect,
+      TResult
+    >[]
+}>
+
+export type CanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransactionStaleTargetActionResult =
+  Readonly<{
+    actionKind: CanvasAppFeaturePackMarketplaceTargetControl['actionKind']
+    applied: false
+    control: CanvasAppFeaturePackMarketplaceTargetControl
+    expectedActionKind: CanvasAppFeaturePackMarketplaceTargetControl[
+      'actionKind'
+    ]
+    holdReason: 'stale-target-action'
+    hostUpdate: null
+    source: CanvasAppAssemblySource
+    sourceResult: null
+    status: 'stale-target-action'
     target: CanvasAppFeaturePackMarketplaceTarget
     transactionResult: null
     update: null
@@ -523,6 +633,90 @@ export async function executeCanvasAppAssemblySourceFeaturePackMarketplaceSelect
   )
 }
 
+export async function executeCanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransaction<
+  TEffect,
+  TResult,
+>({
+  cleanupHandlers,
+  executeCleanupEffect,
+  execution,
+  model,
+  source,
+}: CanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransactionInput<
+  TEffect,
+  TResult
+>): Promise<
+  CanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransactionResult<
+    TEffect,
+    TResult
+  >
+> {
+  let currentModel = model
+  let currentSource = source ?? Object.freeze({
+    assemblyInput: model.assemblyInput,
+  })
+  const initialSource = currentSource
+  const results:
+    CanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransactionStepResult<
+      TEffect,
+      TResult
+    >[] = []
+
+  for (const readyControl of execution.readyControls) {
+    const currentControl = getCanvasAppFeaturePackMarketplaceTargetControl({
+      model: currentModel.marketplaceModel,
+      target: readyControl.target,
+    })
+
+    if (
+      currentControl.item !== null &&
+      currentControl.actionKind !== readyControl.actionKind
+    ) {
+      results.push(createCanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionStaleTargetActionResult(
+        {
+          control: currentControl,
+          expectedActionKind: readyControl.actionKind,
+          source: currentSource,
+        },
+      ))
+      continue
+    }
+
+    const result =
+      await executeCanvasAppAssemblySourceFeaturePackMarketplaceTargetControlApplyTransaction(
+        {
+          cleanupHandlers,
+          control: currentControl,
+          executeCleanupEffect,
+          model: currentModel,
+          source: currentSource,
+        },
+      )
+
+    results.push(result)
+    currentSource = result.source
+
+    if (result.applied) {
+      currentModel =
+        getCanvasAppFeaturePackMarketplaceAssemblyModelFromSource({
+          model: currentModel,
+          source: result.source,
+        })
+    }
+  }
+
+  return getCanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransactionResult(
+    {
+      currentModel,
+      execution,
+      initialSource,
+      model,
+      results,
+      source: currentSource,
+    },
+  )
+}
+
 export type CanvasAppAssemblySourceValue = {
   assembly?: CanvasAppAssembly
   assemblyInput?: CanvasAppAssemblyInput
@@ -562,4 +756,207 @@ function snapshotCanvasAppAssemblySourceFeaturePackMarketplaceTarget(
     kind: 'suite',
     suiteId: target.suiteId,
   })
+}
+
+function getCanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransactionResult<
+  TEffect,
+  TResult,
+>({
+  currentModel,
+  execution,
+  initialSource,
+  model,
+  results,
+  source,
+}: {
+  currentModel: CanvasAppFeaturePackMarketplaceAssemblyModel
+  execution: CanvasAppFeaturePackMarketplaceSelectionExecutionModel
+  initialSource: CanvasAppAssemblySource
+  model: CanvasAppFeaturePackMarketplaceAssemblyModel
+  results:
+    readonly CanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransactionStepResult<
+      TEffect,
+      TResult
+    >[]
+  source: CanvasAppAssemblySource
+}): CanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransactionResult<
+  TEffect,
+  TResult
+> {
+  const appliedResults = Object.freeze(results.filter(
+    isCanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionAppliedResult,
+  ))
+  const heldResults = Object.freeze(results.filter(
+    isCanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionHeldResult,
+  ))
+  const missingResults = Object.freeze(results.filter(
+    isCanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionMissingResult,
+  ))
+  const staleResults = Object.freeze(results.filter(
+    isCanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionStaleResult,
+  ))
+  const unappliedResults = Object.freeze(results.filter((result) =>
+    !result.applied
+  ))
+  const skippedControls = execution.heldControls
+  const summary = Object.freeze({
+    appliedResultCount: appliedResults.length,
+    attemptedControlCount: results.length,
+    blockedControlCount: execution.blockedControls.length,
+    controlCount: execution.controls.length,
+    heldResultCount: heldResults.length,
+    missingResultCount: missingResults.length,
+    readyControlCount: execution.readyControls.length,
+    skippedControlCount: skippedControls.length,
+    staleResultCount: staleResults.length,
+    unappliedResultCount: unappliedResults.length,
+  })
+
+  return Object.freeze({
+    applied: appliedResults.length > 0,
+    appliedResults,
+    blockedControls: execution.blockedControls,
+    currentModel,
+    execution,
+    heldResults,
+    initialSource,
+    missingResults,
+    model,
+    readyControls: execution.readyControls,
+    results: Object.freeze([...results]),
+    skippedControls,
+    source,
+    staleResults,
+    status:
+      getCanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransactionStatus(
+        summary,
+      ),
+    summary,
+    targets: execution.readyTargets,
+    unappliedResults,
+  })
+}
+
+function getCanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransactionStatus(
+  summary:
+    CanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransactionSummary,
+):
+  CanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransactionStatus {
+  if (summary.controlCount === 0) {
+    return 'empty'
+  }
+
+  if (summary.appliedResultCount === 0) {
+    return 'held'
+  }
+
+  if (
+    summary.skippedControlCount > 0 ||
+    summary.unappliedResultCount > 0
+  ) {
+    return 'partial'
+  }
+
+  return 'applied'
+}
+
+function getCanvasAppFeaturePackMarketplaceAssemblyModelFromSource({
+  model,
+  source,
+}: {
+  model: CanvasAppFeaturePackMarketplaceAssemblyModel
+  source: CanvasAppAssemblyRequiredInputSource
+}): CanvasAppFeaturePackMarketplaceAssemblyModel {
+  return getCanvasAppFeaturePackMarketplaceAssemblyModel({
+    assemblyInput: source.assemblyInput,
+    listings: model.listings,
+    profiles: model.profiles,
+    suiteManifests: model.suiteManifests,
+  })
+}
+
+function createCanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionStaleTargetActionResult({
+  control,
+  expectedActionKind,
+  source,
+}: {
+  control: CanvasAppFeaturePackMarketplaceTargetControl
+  expectedActionKind: CanvasAppFeaturePackMarketplaceTargetControl['actionKind']
+  source: CanvasAppAssemblySource
+}): CanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransactionStaleTargetActionResult {
+  return Object.freeze({
+    actionKind: control.actionKind,
+    applied: false,
+    control,
+    expectedActionKind,
+    holdReason: 'stale-target-action',
+    hostUpdate: null,
+    source,
+    sourceResult: null,
+    status: 'stale-target-action',
+    target: snapshotCanvasAppAssemblySourceFeaturePackMarketplaceTarget(
+      control.target,
+    ),
+    transactionResult: null,
+    update: null,
+    updateMode: 'blocked',
+  })
+}
+
+function isCanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionAppliedResult<
+  TEffect,
+  TResult,
+>(
+  result:
+    CanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransactionStepResult<
+      TEffect,
+      TResult
+    >,
+): result is CanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransactionAppliedResult<
+  TEffect,
+  TResult
+> {
+  return result.applied
+}
+
+function isCanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionHeldResult<
+  TEffect,
+  TResult,
+>(
+  result:
+    CanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransactionStepResult<
+      TEffect,
+      TResult
+    >,
+): result is CanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransactionHeldResult<
+  TEffect,
+  TResult
+> {
+  return result.status === 'held'
+}
+
+function isCanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionMissingResult<
+  TEffect,
+  TResult,
+>(
+  result:
+    CanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransactionStepResult<
+      TEffect,
+      TResult
+    >,
+): result is CanvasAppAssemblySourceFeaturePackMarketplaceTargetControlApplyTransactionMissingResult {
+  return result.status === 'missing'
+}
+
+function isCanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionStaleResult<
+  TEffect,
+  TResult,
+>(
+  result:
+    CanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransactionStepResult<
+      TEffect,
+      TResult
+    >,
+): result is CanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransactionStaleTargetActionResult {
+  return result.status === 'stale-target-action'
 }

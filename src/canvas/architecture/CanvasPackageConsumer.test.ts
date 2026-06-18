@@ -50,6 +50,7 @@ import {
   createCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan,
   createCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan,
   createCanvasStoryCanvasFeaturePackAssemblyInput,
+  executeCanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransaction,
   executeCanvasAppAssemblySourceFeaturePackMarketplaceSelectionTargetControlApplyTransaction,
   executeCanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransaction,
   executeCanvasAppAssemblySourceFeaturePackMarketplaceTargetControlApplyTransaction,
@@ -254,6 +255,11 @@ import {
   type CanvasAppAssemblySourceFeaturePackMarketplaceHostUpdateHeldResult,
   type CanvasAppAssemblySourceFeaturePackMarketplaceHostUpdateInput,
   type CanvasAppAssemblySourceFeaturePackMarketplaceHostUpdateResult,
+  type CanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransactionInput,
+  type CanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransactionResult,
+  type CanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransactionStaleTargetActionResult,
+  type CanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransactionStatus,
+  type CanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransactionSummary,
   type CanvasAppAssemblySourceFeaturePackMarketplaceSelectionTargetControlApplyTransactionInput,
   type CanvasAppAssemblySourceFeaturePackMarketplaceSelectionTargetControlApplyTransactionMissingResult,
   type CanvasAppAssemblySourceFeaturePackMarketplaceSelectionTargetControlApplyTransactionResult,
@@ -506,6 +512,8 @@ import {
   runCanvasKeyboardToolIntent,
   type CanvasAppAssemblySourceFeaturePackMarketplaceHostUpdateResult
     as CanvasAppAssemblySourceFeaturePackMarketplaceHostUpdateResultFromApp,
+  type CanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransactionResult
+    as CanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransactionResultFromApp,
   type CanvasAppAssemblySourceFeaturePackMarketplaceSelectionTargetControlApplyTransactionResult
     as CanvasAppAssemblySourceFeaturePackMarketplaceSelectionTargetControlApplyTransactionResultFromApp,
   type CanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransactionResult
@@ -2191,6 +2199,45 @@ describe('Canvas package consumer imports', () => {
           .executeCanvasAppAssemblySourceFeaturePackMarketplaceSelectionTargetControlApplyTransaction(
             shellMarketplaceSelectionTargetControlSourceTransactionInput,
           )
+    const shellMarketplaceSelectionExecutionSourceTransactionInput:
+      CanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransactionInput<
+        SmokeUninstallCleanupEffect,
+        SmokeUninstallCleanupExecutionValue
+      > = {
+        cleanupHandlers: [featurePackMarketplaceUninstallCleanupScopeHandler],
+        executeCleanupEffect:
+          featurePackMarketplaceUninstallCleanupEffectExecutor,
+        execution: featurePackMarketplaceSelectionExecutionModel,
+        model: featurePackMarketplaceAssemblyModel,
+        source: shellPrebuiltSource,
+      }
+    const shellMarketplaceSelectionExecutionSourceTransactionResult:
+      CanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransactionResult<
+        SmokeUninstallCleanupEffect,
+        SmokeUninstallCleanupExecutionValue
+      > =
+        await executeCanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransaction(
+          shellMarketplaceSelectionExecutionSourceTransactionInput,
+        )
+    const shellSubpathMarketplaceSelectionExecutionSourceTransactionResult:
+      CanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransactionResultFromApp<
+        SmokeUninstallCleanupEffect,
+        SmokeUninstallCleanupExecutionValue
+      > =
+        await CanvasAppFacade
+          .executeCanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransaction(
+            shellMarketplaceSelectionExecutionSourceTransactionInput,
+          )
+    const shellMarketplaceSelectionExecutionSourceTransactionStatus:
+      CanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransactionStatus =
+        shellMarketplaceSelectionExecutionSourceTransactionResult.status
+    const shellMarketplaceSelectionExecutionSourceTransactionSummary:
+      CanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransactionSummary =
+        shellMarketplaceSelectionExecutionSourceTransactionResult.summary
+    const shellMarketplaceSelectionExecutionSourceTransactionStaleResult:
+      CanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransactionStaleTargetActionResult | null =
+        shellMarketplaceSelectionExecutionSourceTransactionResult
+          .staleResults[0] ?? null
     const shellMarketplaceMissingSelectionTargetControlSourceTransactionResult =
       await executeCanvasAppAssemblySourceFeaturePackMarketplaceSelectionTargetControlApplyTransaction(
         {
@@ -2384,6 +2431,30 @@ describe('Canvas package consumer imports', () => {
       .toEqual(shellMarketplaceTargetControlSourceTransactionResult.source)
     expect(shellSubpathMarketplaceSelectionTargetControlSourceTransactionResult.source)
       .toEqual(shellMarketplaceSelectionTargetControlSourceTransactionResult.source)
+    expect(shellMarketplaceSelectionExecutionSourceTransactionStatus)
+      .toBe('applied')
+    expect(shellMarketplaceSelectionExecutionSourceTransactionSummary)
+      .toMatchObject({
+        appliedResultCount: 1,
+        attemptedControlCount: 1,
+        readyControlCount: 1,
+        unappliedResultCount: 0,
+      })
+    expect(shellMarketplaceSelectionExecutionSourceTransactionStaleResult)
+      .toBeNull()
+    expect(shellMarketplaceSelectionExecutionSourceTransactionResult.source)
+      .toEqual(shellMarketplaceSelectionTargetControlSourceTransactionResult
+        .source)
+    expect(shellSubpathMarketplaceSelectionExecutionSourceTransactionResult
+      .source)
+      .toEqual(shellMarketplaceSelectionExecutionSourceTransactionResult
+        .source)
+    expect(CanvasPackage.executeCanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransaction)
+      .toBe(executeCanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransaction)
+    expect(CanvasAppFacade.executeCanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransaction)
+      .toBe(executeCanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransaction)
+    expect(CanvasAppAuthoring.executeCanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransaction)
+      .toBe(executeCanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransaction)
     expect(shellMarketplaceMissingSelectionTargetControlSourceTransactionMissingResult)
       .toMatchObject({
         actionKind: null,
