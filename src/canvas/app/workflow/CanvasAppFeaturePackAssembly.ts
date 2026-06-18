@@ -111,6 +111,67 @@ export type CanvasAppFeaturePackMarketplaceAssemblyUninstallDataPlan =
     unscopedFeaturePackIds: readonly CanvasAppFeaturePackId[]
   }>
 
+export type CanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlanStatus =
+  | 'empty'
+  | 'needs-handler'
+  | 'ready'
+
+export type CanvasAppFeaturePackMarketplaceUninstallCleanupScopeHandler<
+  TEffect,
+> = Readonly<{
+  createEffect: (
+    input: CanvasAppFeaturePackMarketplaceUninstallCleanupEffectInput,
+  ) => TEffect
+  scopeId: CanvasAppFeaturePackManifestOrphanedDataScopeId
+}>
+
+export type CanvasAppFeaturePackMarketplaceUninstallCleanupEffectInput =
+  Readonly<{
+    featurePackIds: readonly CanvasAppFeaturePackId[]
+    scopeId: CanvasAppFeaturePackManifestOrphanedDataScopeId
+    uninstallDataPlan:
+      CanvasAppFeaturePackMarketplaceAssemblyUninstallDataPlan
+  }>
+
+export type CanvasAppFeaturePackMarketplaceUninstallCleanupEffect<
+  TEffect,
+> = Readonly<{
+  effect: TEffect
+  featurePackIds: readonly CanvasAppFeaturePackId[]
+  scopeId: CanvasAppFeaturePackManifestOrphanedDataScopeId
+}>
+
+export type CanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlanInput<
+  TEffect,
+> = Readonly<{
+  handlers?:
+    readonly CanvasAppFeaturePackMarketplaceUninstallCleanupScopeHandler<
+      TEffect
+    >[]
+  uninstallDataPlan: CanvasAppFeaturePackMarketplaceAssemblyUninstallDataPlan
+}>
+
+export type CanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan<
+  TEffect,
+> = Readonly<{
+  effects:
+    readonly CanvasAppFeaturePackMarketplaceUninstallCleanupEffect<TEffect>[]
+  handledScopeIds:
+    readonly CanvasAppFeaturePackManifestOrphanedDataScopeId[]
+  hostManagedFeaturePackIds: readonly CanvasAppFeaturePackId[]
+  hostManagedScopeIds:
+    readonly CanvasAppFeaturePackManifestOrphanedDataScopeId[]
+  missingHandlerScopeIds:
+    readonly CanvasAppFeaturePackManifestOrphanedDataScopeId[]
+  preserveFeaturePackIds: readonly CanvasAppFeaturePackId[]
+  preserveScopeIds: readonly CanvasAppFeaturePackManifestOrphanedDataScopeId[]
+  removeFeaturePackIds: readonly CanvasAppFeaturePackId[]
+  removeScopeIds: readonly CanvasAppFeaturePackManifestOrphanedDataScopeId[]
+  status: CanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlanStatus
+  unscopedFeaturePackIds: readonly CanvasAppFeaturePackId[]
+  uninstallDataPlan: CanvasAppFeaturePackMarketplaceAssemblyUninstallDataPlan
+}>
+
 export type CanvasAppFeaturePackMarketplaceAssemblyModelInput = Readonly<{
   assemblyInput?: CanvasAppFeaturePackAssemblyInput
   listings?: readonly CanvasAppFeaturePackMarketplaceListingInput[]
@@ -351,6 +412,74 @@ export function getCanvasAppFeaturePackMarketplaceAssemblyApplyPlan(
   })
 }
 
+export function createCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan<
+  TEffect,
+>({
+  handlers = [],
+  uninstallDataPlan,
+}: CanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlanInput<TEffect>):
+  CanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan<TEffect> {
+  const handlerByScopeId =
+    getCanvasAppFeaturePackMarketplaceUninstallCleanupHandlerMap(handlers)
+  const featurePackIdsByScopeId =
+    getCanvasAppFeaturePackMarketplaceUninstallCleanupFeaturePackIdsByScopeId(
+      uninstallDataPlan,
+    )
+  const effects:
+    CanvasAppFeaturePackMarketplaceUninstallCleanupEffect<TEffect>[] = []
+  const handledScopeIds: CanvasAppFeaturePackManifestOrphanedDataScopeId[] = []
+  const missingHandlerScopeIds:
+    CanvasAppFeaturePackManifestOrphanedDataScopeId[] = []
+
+  for (const scopeId of uninstallDataPlan.removeScopeIds) {
+    const handler = handlerByScopeId.get(scopeId)
+    const featurePackIds = featurePackIdsByScopeId.get(scopeId) ?? []
+
+    if (!handler) {
+      missingHandlerScopeIds.push(scopeId)
+      continue
+    }
+
+    const effect = handler.createEffect({
+      featurePackIds: Object.freeze([...featurePackIds]),
+      scopeId,
+      uninstallDataPlan,
+    })
+
+    effects.push(Object.freeze({
+      effect,
+      featurePackIds: Object.freeze([...featurePackIds]),
+      scopeId,
+    }))
+    handledScopeIds.push(scopeId)
+  }
+
+  return Object.freeze({
+    effects: Object.freeze(effects),
+    handledScopeIds: Object.freeze(handledScopeIds),
+    hostManagedFeaturePackIds:
+      Object.freeze([...uninstallDataPlan.hostManagedFeaturePackIds]),
+    hostManagedScopeIds:
+      Object.freeze([...uninstallDataPlan.hostManagedScopeIds]),
+    missingHandlerScopeIds: Object.freeze(missingHandlerScopeIds),
+    preserveFeaturePackIds:
+      Object.freeze([...uninstallDataPlan.preserveFeaturePackIds]),
+    preserveScopeIds: Object.freeze([...uninstallDataPlan.preserveScopeIds]),
+    removeFeaturePackIds:
+      Object.freeze([...uninstallDataPlan.removeFeaturePackIds]),
+    removeScopeIds: Object.freeze([...uninstallDataPlan.removeScopeIds]),
+    status:
+      getCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlanStatus({
+        handledScopeIds,
+        missingHandlerScopeIds,
+        removeScopeIds: uninstallDataPlan.removeScopeIds,
+      }),
+    unscopedFeaturePackIds:
+      Object.freeze([...uninstallDataPlan.unscopedFeaturePackIds]),
+    uninstallDataPlan,
+  })
+}
+
 export function getCanvasAppFeaturePackMarketplaceAssemblyActionPlan({
   action,
   model,
@@ -434,6 +563,84 @@ export function getCanvasAppFeaturePackMarketplaceActionAssemblyPlan({
     uninstallDataPlan,
     uninstallPolicyEntries: action.uninstallPolicyEntries,
   })
+}
+
+function getCanvasAppFeaturePackMarketplaceUninstallCleanupHandlerMap<TEffect>(
+  handlers:
+    readonly CanvasAppFeaturePackMarketplaceUninstallCleanupScopeHandler<
+      TEffect
+    >[],
+): ReadonlyMap<
+  CanvasAppFeaturePackManifestOrphanedDataScopeId,
+  CanvasAppFeaturePackMarketplaceUninstallCleanupScopeHandler<TEffect>
+> {
+  const handlerByScopeId = new Map<
+    CanvasAppFeaturePackManifestOrphanedDataScopeId,
+    CanvasAppFeaturePackMarketplaceUninstallCleanupScopeHandler<TEffect>
+  >()
+
+  for (const handler of handlers) {
+    if (handlerByScopeId.has(handler.scopeId)) {
+      throw new Error(
+        `Duplicate canvas app feature pack uninstall cleanup handler: ${handler.scopeId}`,
+      )
+    }
+
+    handlerByScopeId.set(handler.scopeId, handler)
+  }
+
+  return handlerByScopeId
+}
+
+function getCanvasAppFeaturePackMarketplaceUninstallCleanupFeaturePackIdsByScopeId(
+  uninstallDataPlan: CanvasAppFeaturePackMarketplaceAssemblyUninstallDataPlan,
+): ReadonlyMap<
+  CanvasAppFeaturePackManifestOrphanedDataScopeId,
+  readonly CanvasAppFeaturePackId[]
+> {
+  const featurePackIdsByScopeId = new Map<
+    CanvasAppFeaturePackManifestOrphanedDataScopeId,
+    CanvasAppFeaturePackId[]
+  >()
+
+  for (const entry of uninstallDataPlan.entries) {
+    if (entry.orphanedDataPolicy !== 'remove') {
+      continue
+    }
+
+    for (const scopeId of entry.orphanedDataScopeIds) {
+      const featurePackIds = featurePackIdsByScopeId.get(scopeId) ?? []
+
+      appendCanvasAppFeaturePackMarketplaceUniqueId(
+        featurePackIds,
+        entry.featurePackId,
+      )
+      featurePackIdsByScopeId.set(scopeId, featurePackIds)
+    }
+  }
+
+  return featurePackIdsByScopeId
+}
+
+function getCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlanStatus({
+  handledScopeIds,
+  missingHandlerScopeIds,
+  removeScopeIds,
+}: {
+  handledScopeIds: readonly CanvasAppFeaturePackManifestOrphanedDataScopeId[]
+  missingHandlerScopeIds:
+    readonly CanvasAppFeaturePackManifestOrphanedDataScopeId[]
+  removeScopeIds: readonly CanvasAppFeaturePackManifestOrphanedDataScopeId[]
+}): CanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlanStatus {
+  if (removeScopeIds.length === 0 && handledScopeIds.length === 0) {
+    return 'empty'
+  }
+
+  if (missingHandlerScopeIds.length > 0) {
+    return 'needs-handler'
+  }
+
+  return 'ready'
 }
 
 function getCanvasAppFeaturePackMarketplaceAssemblyUninstallDataPlan(

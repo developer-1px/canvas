@@ -36,6 +36,7 @@ import {
   createCanvasAppFeaturePackExtensionBundle,
   createCanvasAppFeaturePackManifest,
   createCanvasAppFeaturePackMarketplaceListing,
+  createCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan,
   getCanvasAppFeaturePackMarketplaceAssemblyApplyResult,
   getCanvasAppFeaturePackMarketplaceAssemblyApplyPlan,
   getCanvasAppFeaturePackMarketplaceAssemblyActionInput,
@@ -185,6 +186,12 @@ import {
   type CanvasAppFeaturePackMarketplaceAssemblyApplyUpdateMode,
   type CanvasAppFeaturePackMarketplaceAssemblyModel,
   type CanvasAppFeaturePackMarketplaceAssemblyUninstallDataPlan,
+  type CanvasAppFeaturePackMarketplaceUninstallCleanupEffect,
+  type CanvasAppFeaturePackMarketplaceUninstallCleanupEffectInput,
+  type CanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan,
+  type CanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlanInput,
+  type CanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlanStatus,
+  type CanvasAppFeaturePackMarketplaceUninstallCleanupScopeHandler,
   type CanvasAppFeaturePackMarketplaceModel,
   type CanvasAppFeaturePackMarketplacePackSectionFacetKind,
   type CanvasAppFeaturePackMarketplacePackSectionFacetItemsInput,
@@ -928,6 +935,64 @@ describe('Canvas package consumer imports', () => {
         orphanedDataScopeIds: [featurePackManifestOrphanedDataScopeId],
         orphanedDataPolicy: featurePackManifestOrphanedDataPolicy,
       }
+    type SmokeUninstallCleanupEffect = Readonly<{
+      featurePackIds: readonly string[]
+      kind: 'cleanup-scope'
+      scopeId: CanvasAppFeaturePackManifestOrphanedDataScopeId
+    }>
+    const featurePackMarketplaceRemoveUninstallDataPlan:
+      CanvasAppFeaturePackMarketplaceAssemblyUninstallDataPlan = {
+        entries: [{
+          featurePackId: 'smoke-partial-pack',
+          orphanedDataScopeIds: [featurePackManifestOrphanedDataScopeId],
+          orphanedDataPolicy: 'remove',
+        }],
+        hostManagedFeaturePackIds: [],
+        hostManagedScopeIds: [],
+        preserveFeaturePackIds: [],
+        preserveScopeIds: [],
+        removeFeaturePackIds: ['smoke-partial-pack'],
+        removeScopeIds: [featurePackManifestOrphanedDataScopeId],
+        unscopedFeaturePackIds: [],
+      }
+    const featurePackMarketplaceUninstallCleanupScopeHandler:
+      CanvasAppFeaturePackMarketplaceUninstallCleanupScopeHandler<
+        SmokeUninstallCleanupEffect
+      > = {
+        createEffect: ({ featurePackIds, scopeId }) => ({
+          featurePackIds: [...featurePackIds],
+          kind: 'cleanup-scope',
+          scopeId,
+        }),
+        scopeId: featurePackManifestOrphanedDataScopeId,
+      }
+    const featurePackMarketplaceUninstallCleanupEffectPlanInput:
+      CanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlanInput<
+        SmokeUninstallCleanupEffect
+      > = {
+        handlers: [featurePackMarketplaceUninstallCleanupScopeHandler],
+        uninstallDataPlan: featurePackMarketplaceRemoveUninstallDataPlan,
+      }
+    const featurePackMarketplaceUninstallCleanupEffectPlan:
+      CanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan<
+        SmokeUninstallCleanupEffect
+      > =
+        createCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan(
+          featurePackMarketplaceUninstallCleanupEffectPlanInput,
+        )
+    const featurePackMarketplaceUninstallCleanupEffect:
+      CanvasAppFeaturePackMarketplaceUninstallCleanupEffect<
+        SmokeUninstallCleanupEffect
+      > = featurePackMarketplaceUninstallCleanupEffectPlan.effects[0]!
+    const featurePackMarketplaceUninstallCleanupEffectInput:
+      CanvasAppFeaturePackMarketplaceUninstallCleanupEffectInput = {
+        featurePackIds: ['smoke-partial-pack'],
+        scopeId: featurePackManifestOrphanedDataScopeId,
+        uninstallDataPlan: featurePackMarketplaceRemoveUninstallDataPlan,
+      }
+    const featurePackMarketplaceUninstallCleanupEffectPlanStatus:
+      CanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlanStatus =
+        featurePackMarketplaceUninstallCleanupEffectPlan.status
 
     const assembly = createCanvasAppAssembly({
       componentDefinitions: [appComponentDefinition],
@@ -1479,6 +1544,35 @@ describe('Canvas package consumer imports', () => {
       removeScopeIds: [],
       unscopedFeaturePackIds: [],
     })
+    expect(CanvasPackage
+      .createCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan)
+      .toBe(createCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan)
+    expect(CanvasAppFacade
+      .createCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan)
+      .toBe(createCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan)
+    expect(CanvasAppAuthoring
+      .createCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan)
+      .toBe(createCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan)
+    expect(featurePackMarketplaceUninstallCleanupEffectPlanStatus)
+      .toBe('ready')
+    expect(featurePackMarketplaceUninstallCleanupEffectPlan).toMatchObject({
+      handledScopeIds: [featurePackManifestOrphanedDataScopeId],
+      missingHandlerScopeIds: [],
+      removeFeaturePackIds: ['smoke-partial-pack'],
+      removeScopeIds: [featurePackManifestOrphanedDataScopeId],
+      status: 'ready',
+    })
+    expect(featurePackMarketplaceUninstallCleanupEffect).toMatchObject({
+      effect: {
+        featurePackIds: ['smoke-partial-pack'],
+        kind: 'cleanup-scope',
+        scopeId: featurePackManifestOrphanedDataScopeId,
+      },
+      featurePackIds: ['smoke-partial-pack'],
+      scopeId: featurePackManifestOrphanedDataScopeId,
+    })
+    expect(featurePackMarketplaceUninstallCleanupEffectInput.scopeId)
+      .toBe(featurePackManifestOrphanedDataScopeId)
     expect(featurePackMarketplaceAssemblyApplyResult.status).toBe('ready')
     if (featurePackMarketplaceAssemblyApplyResult.status !== 'ready') {
       throw new Error('Expected ready feature pack marketplace apply result')

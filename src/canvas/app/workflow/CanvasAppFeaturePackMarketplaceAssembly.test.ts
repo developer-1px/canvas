@@ -7,6 +7,7 @@ import {
 } from '../feature-packs'
 import { createCanvasAppAssembly } from './CanvasAppAssembly'
 import {
+  createCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan,
   getCanvasAppFeaturePackMarketplaceAssemblyApplyResult,
   getCanvasAppFeaturePackMarketplaceAssemblyApplyPlan,
   getCanvasAppFeaturePackMarketplaceAssemblyActionInput,
@@ -379,6 +380,116 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
       id: 'addon-pack',
       status: 'uninstalled',
     }])
+
+    const cleanupPlan =
+      createCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan({
+        handlers: [{
+          createEffect: ({ featurePackIds, scopeId }) => ({
+            featurePackIds: [...featurePackIds],
+            kind: 'remove-scope-data' as const,
+            scopeId,
+          }),
+          scopeId: 'addon-data',
+        }],
+        uninstallDataPlan: applyPlan.uninstallDataPlan,
+      })
+
+    expect(cleanupPlan).toMatchObject({
+      effects: [{
+        effect: {
+          featurePackIds: ['addon-pack'],
+          kind: 'remove-scope-data',
+          scopeId: 'addon-data',
+        },
+        featurePackIds: ['addon-pack'],
+        scopeId: 'addon-data',
+      }],
+      handledScopeIds: ['addon-data'],
+      missingHandlerScopeIds: [],
+      status: 'ready',
+    })
+  })
+
+  it('keeps non-remove uninstall data out of cleanup effects', () => {
+    const cleanupPlan =
+      createCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan({
+        handlers: [{
+          createEffect: ({ featurePackIds, scopeId }) => ({
+            featurePackIds: [...featurePackIds],
+            kind: 'remove-scope-data' as const,
+            scopeId,
+          }),
+          scopeId: 'remove-data',
+        }],
+        uninstallDataPlan: {
+          entries: [
+            {
+              featurePackId: 'remove-pack',
+              orphanedDataPolicy: 'remove',
+              orphanedDataScopeIds: ['remove-data'],
+            },
+            {
+              featurePackId: 'missing-pack',
+              orphanedDataPolicy: 'remove',
+              orphanedDataScopeIds: ['missing-data'],
+            },
+            {
+              featurePackId: 'preserve-pack',
+              orphanedDataPolicy: 'preserve',
+              orphanedDataScopeIds: ['preserve-data'],
+            },
+            {
+              featurePackId: 'host-pack',
+              orphanedDataPolicy: 'host-managed',
+              orphanedDataScopeIds: ['host-data'],
+            },
+            {
+              featurePackId: 'unscoped-pack',
+              orphanedDataPolicy: 'remove',
+              orphanedDataScopeIds: [],
+            },
+          ],
+          hostManagedFeaturePackIds: ['host-pack'],
+          hostManagedScopeIds: ['host-data'],
+          preserveFeaturePackIds: ['preserve-pack'],
+          preserveScopeIds: ['preserve-data'],
+          removeFeaturePackIds: [
+            'remove-pack',
+            'missing-pack',
+            'unscoped-pack',
+          ],
+          removeScopeIds: ['remove-data', 'missing-data'],
+          unscopedFeaturePackIds: ['unscoped-pack'],
+        },
+      })
+
+    expect(cleanupPlan).toMatchObject({
+      effects: [{
+        effect: {
+          featurePackIds: ['remove-pack'],
+          kind: 'remove-scope-data',
+          scopeId: 'remove-data',
+        },
+        featurePackIds: ['remove-pack'],
+        scopeId: 'remove-data',
+      }],
+      handledScopeIds: ['remove-data'],
+      hostManagedFeaturePackIds: ['host-pack'],
+      hostManagedScopeIds: ['host-data'],
+      missingHandlerScopeIds: ['missing-data'],
+      preserveFeaturePackIds: ['preserve-pack'],
+      preserveScopeIds: ['preserve-data'],
+      removeFeaturePackIds: [
+        'remove-pack',
+        'missing-pack',
+        'unscoped-pack',
+      ],
+      removeScopeIds: ['remove-data', 'missing-data'],
+      status: 'needs-handler',
+      unscopedFeaturePackIds: ['unscoped-pack'],
+    })
+    expect(cleanupPlan.effects.map((effect) => effect.scopeId))
+      .toEqual(['remove-data'])
   })
 
   it('keeps unscoped uninstall packs visible in the data plan', () => {

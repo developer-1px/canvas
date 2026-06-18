@@ -29,8 +29,15 @@ export type {
   CanvasAppFeaturePackMarketplaceAssemblyModel,
   CanvasAppFeaturePackMarketplaceAssemblyModelInput,
   CanvasAppFeaturePackMarketplaceAssemblyUninstallDataPlan,
+  CanvasAppFeaturePackMarketplaceUninstallCleanupEffect,
+  CanvasAppFeaturePackMarketplaceUninstallCleanupEffectInput,
+  CanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan,
+  CanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlanInput,
+  CanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlanStatus,
+  CanvasAppFeaturePackMarketplaceUninstallCleanupScopeHandler,
 } from './CanvasAppFeaturePackAssembly'
 export {
+  createCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan,
   getCanvasAppFeaturePackMarketplaceAssemblyApplyResult,
   getCanvasAppFeaturePackMarketplaceAssemblyApplyPlan,
   getCanvasAppFeaturePackMarketplaceAssemblyActionInput,
