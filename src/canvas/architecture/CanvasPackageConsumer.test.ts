@@ -5,6 +5,7 @@ import * as CanvasAppFacade from '@interactive-os/canvas/app'
 import type {
   CanvasDataTransferImportActionPlanRunInput,
   CanvasDataTransferImportActionPlanRunResult,
+  CanvasDataTransferJSONCandidateParseInput,
   CanvasDataTransferJSONCandidateReadResult,
   CanvasDataTransferTextCandidateReadResult,
   CanvasStoryImportAction,
@@ -119,6 +120,7 @@ import {
   createCanvasAppViewFeaturePack,
   createCanvasStoryCanvasFeaturePackManifests,
   createCanvasStoryPreviewItemsFeaturePackManifest,
+  CANVAS_DATA_TRANSFER_JSON_TEXT_FENCE_LANGUAGES,
   getCanvasDataTransferText,
   readCanvasDataTransferJSONCandidate,
   readCanvasDataTransferTextCandidate,
@@ -582,6 +584,11 @@ import {
   createCanvasSvgFreehandPathData as createCanvasSvgFreehandPathDataFromPrimitives,
   createCanvasSvgPathData as createCanvasSvgPathDataFromPrimitives,
 } from '@interactive-os/canvas/renderer/svg-drawing-primitives'
+
+type PackageHostCardJSONCandidate = Readonly<{
+  mimeType: string
+  source: string
+}>
 
 describe('Canvas package consumer imports', () => {
   it('supports assembling a canvas app from package exports', async () => {
@@ -6076,7 +6083,13 @@ describe('Canvas package consumer imports', () => {
           },
         ],
         dataTransfer: packageJsonDataTransfer,
-        parseValue: ({ json }) => {
+        parseValue: (
+          input: CanvasDataTransferJSONCandidateParseInput<
+            PackageHostCardJSONCandidate
+          >,
+        ) => {
+          const { json } = input
+
           if (
             typeof json !== 'object' ||
             json === null ||
@@ -6101,6 +6114,63 @@ describe('Canvas package consumer imports', () => {
         title: 'Package',
       },
     })
+    const packageJsonTextBlockResult:
+      CanvasDataTransferJSONCandidateReadResult<{
+        title: string
+      }> | null = readCanvasDataTransferJSONCandidate({
+        candidates: [{
+          mimeType: 'text/markdown',
+          source: 'markdown',
+        }],
+        dataTransfer: {
+          getData: (format) =>
+            format === 'text/markdown'
+              ? [
+                '```ppt-json',
+                '{"kind":"host-card","title":"Package fence"}',
+                '```',
+              ].join('\n')
+              : '',
+        },
+        extractTextJSON: true,
+        parseValue: (
+          input: CanvasDataTransferJSONCandidateParseInput<
+            PackageHostCardJSONCandidate
+          >,
+        ) => {
+          const { json } = input
+
+          if (
+            typeof json !== 'object' ||
+            json === null ||
+            !('kind' in json) ||
+            json.kind !== 'host-card' ||
+            !('title' in json)
+          ) {
+            throw new Error('Invalid package host card')
+          }
+
+          return {
+            title: String(json.title),
+          }
+        },
+      })
+
+    expect(packageJsonTextBlockResult).toMatchObject({
+      candidateIndex: 0,
+      jsonText: '{"kind":"host-card","title":"Package fence"}',
+      jsonTextKind: 'markdown-code-fence',
+      jsonTextLanguage: 'ppt-json',
+      mimeType: 'text/markdown',
+      source: 'markdown',
+      value: {
+        title: 'Package fence',
+      },
+    })
+    expect(CanvasAppFacade.CANVAS_DATA_TRANSFER_JSON_TEXT_FENCE_LANGUAGES)
+      .toBe(CANVAS_DATA_TRANSFER_JSON_TEXT_FENCE_LANGUAGES)
+    expect(CanvasPackage.CANVAS_DATA_TRANSFER_JSON_TEXT_FENCE_LANGUAGES)
+      .toBe(CANVAS_DATA_TRANSFER_JSON_TEXT_FENCE_LANGUAGES)
     expect(CanvasAppFacade.readCanvasDataTransferJSONCandidate)
       .toBe(readCanvasDataTransferJSONCandidate)
     expect(CanvasPackage.readCanvasDataTransferJSONCandidate)

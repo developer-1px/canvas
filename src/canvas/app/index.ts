@@ -378,6 +378,7 @@ export {
   type CanvasExternalClipboardReadSupportInput,
 } from './affordances/commands/CanvasExternalClipboardPasteActionPlan'
 export {
+  CANVAS_DATA_TRANSFER_JSON_TEXT_FENCE_LANGUAGES,
   CANVAS_DATA_TRANSFER_TEXT_MIME_TYPE,
   getCanvasDataTransferText,
   readCanvasDataTransferJSONCandidate,
@@ -390,6 +391,8 @@ export {
   type CanvasDataTransferJSONCandidateParseValue,
   type CanvasDataTransferJSONCandidateReadInput,
   type CanvasDataTransferJSONCandidateReadResult,
+  type CanvasDataTransferJSONTextBlockKind,
+  type CanvasDataTransferJSONTextBlockOptions,
   type CanvasDataTransferTextCandidate,
   type CanvasDataTransferTextCandidateReadInput,
   type CanvasDataTransferTextCandidateReadResult,

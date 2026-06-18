@@ -1,12 +1,19 @@
 import { describe, expect, it, vi } from 'vitest'
 import {
+  CANVAS_DATA_TRANSFER_JSON_TEXT_FENCE_LANGUAGES,
   getCanvasDataTransferText,
   readCanvasDataTransferJSONCandidate,
   readCanvasDataTransferTextCandidate,
   setCanvasDataTransferDropEffect,
   setCanvasDataTransferText,
+  type CanvasDataTransferJSONCandidateParseInput,
   type CanvasTextDataTransfer,
 } from './CanvasDataTransferText'
+
+type HostCardJSONCandidate = Readonly<{
+  mimeType: string
+  source: string
+}>
 
 describe('CanvasDataTransferText', () => {
   it('writes text/plain drag payloads and effectAllowed', () => {
@@ -180,7 +187,13 @@ describe('CanvasDataTransferText', () => {
         },
       ],
       dataTransfer: { getData },
-      parseValue: ({ json, source }) => {
+      parseValue: (
+        input: CanvasDataTransferJSONCandidateParseInput<
+          HostCardJSONCandidate
+        >,
+      ) => {
+        const { json, source } = input
+
         if (
           typeof json !== 'object' ||
           json === null ||
@@ -239,6 +252,207 @@ describe('CanvasDataTransferText', () => {
         ok: true,
       },
     })
+  })
+
+  it('extracts raw JSON text blocks when enabled', () => {
+    expect(readCanvasDataTransferJSONCandidate({
+      candidates: [{
+        mimeType: 'text/plain',
+        source: 'plain-text',
+      }],
+      dataTransfer: {
+        getData: (format) =>
+          format === 'text/plain'
+            ? '  [{"kind":"slide","title":"Intro"}]  '
+            : '',
+      },
+      extractTextJSON: true,
+    })).toEqual({
+      candidate: {
+        mimeType: 'text/plain',
+        source: 'plain-text',
+      },
+      candidateIndex: 0,
+      jsonText: '[{"kind":"slide","title":"Intro"}]',
+      jsonTextKind: 'raw-json',
+      mimeType: 'text/plain',
+      rawText: '  [{"kind":"slide","title":"Intro"}]  ',
+      source: 'plain-text',
+      value: [{
+        kind: 'slide',
+        title: 'Intro',
+      }],
+    })
+  })
+
+  it('extracts JSON from allowed Markdown code fences when enabled', () => {
+    const rawText = [
+      'Use this deck:',
+      '',
+      '```ppt-json',
+      '{"kind":"host-card","title":"Deck"}',
+      '```',
+    ].join('\n')
+
+    expect(readCanvasDataTransferJSONCandidate({
+      candidates: [{
+        mimeType: 'text/markdown',
+        source: 'markdown',
+      }],
+      dataTransfer: {
+        getData: (format) => format === 'text/markdown' ? rawText : '',
+      },
+      extractTextJSON: true,
+      parseValue: (
+        input: CanvasDataTransferJSONCandidateParseInput<
+          HostCardJSONCandidate
+        >,
+      ) => {
+        const {
+          json,
+          jsonText,
+          jsonTextKind,
+          jsonTextLanguage,
+        } = input
+
+        if (
+          typeof json !== 'object' ||
+          json === null ||
+          !('kind' in json) ||
+          json.kind !== 'host-card' ||
+          !('title' in json)
+        ) {
+          throw new Error('Invalid host card JSON')
+        }
+
+        return {
+          jsonText,
+          jsonTextKind,
+          jsonTextLanguage,
+          title: String(json.title),
+        }
+      },
+    })).toEqual({
+      candidate: {
+        mimeType: 'text/markdown',
+        source: 'markdown',
+      },
+      candidateIndex: 0,
+      jsonText: '{"kind":"host-card","title":"Deck"}',
+      jsonTextKind: 'markdown-code-fence',
+      jsonTextLanguage: 'ppt-json',
+      mimeType: 'text/markdown',
+      rawText,
+      source: 'markdown',
+      value: {
+        jsonText: '{"kind":"host-card","title":"Deck"}',
+        jsonTextKind: 'markdown-code-fence',
+        jsonTextLanguage: 'ppt-json',
+        title: 'Deck',
+      },
+    })
+  })
+
+  it('keeps fenced JSON disabled by default', () => {
+    const rawText = [
+      '```json',
+      '{"kind":"host-card"}',
+      '```',
+    ].join('\n')
+
+    expect(readCanvasDataTransferJSONCandidate({
+      candidates: [{
+        mimeType: 'text/markdown',
+      }],
+      dataTransfer: {
+        getData: (format) => format === 'text/markdown' ? rawText : '',
+      },
+    })).toBeNull()
+  })
+
+  it('skips JSON text extraction and host parser failures', () => {
+    const getData = vi.fn((format: string) => {
+      if (format === 'text/markdown') {
+        return [
+          '```json',
+          '{"kind":"draft","title":"Ignored"}',
+          '```',
+        ].join('\n')
+      }
+
+      if (format === 'text/plain') {
+        return [
+          'AI result:',
+          '',
+          '```json',
+          '{"kind":"host-card","title":"Final"}',
+          '```',
+        ].join('\n')
+      }
+
+      return ''
+    })
+
+    const result = readCanvasDataTransferJSONCandidate({
+      candidates: [
+        {
+          mimeType: 'application/json',
+          source: 'missing-json',
+        },
+        {
+          mimeType: 'text/markdown',
+          source: 'markdown',
+        },
+        {
+          mimeType: 'text/plain',
+          source: 'plain-text',
+        },
+      ],
+      dataTransfer: { getData },
+      extractTextJSON: {
+        fenceLanguages: CANVAS_DATA_TRANSFER_JSON_TEXT_FENCE_LANGUAGES,
+      },
+      parseValue: (
+        input: CanvasDataTransferJSONCandidateParseInput<
+          HostCardJSONCandidate
+        >,
+      ) => {
+        const { json, source } = input
+
+        if (
+          typeof json !== 'object' ||
+          json === null ||
+          !('kind' in json) ||
+          json.kind !== 'host-card' ||
+          !('title' in json)
+        ) {
+          throw new Error('Invalid host card JSON')
+        }
+
+        return {
+          source,
+          title: String(json.title),
+        }
+      },
+    })
+
+    expect(result).toMatchObject({
+      candidateIndex: 2,
+      jsonText: '{"kind":"host-card","title":"Final"}',
+      jsonTextKind: 'markdown-code-fence',
+      jsonTextLanguage: 'json',
+      mimeType: 'text/plain',
+      source: 'plain-text',
+      value: {
+        source: 'plain-text',
+        title: 'Final',
+      },
+    })
+    expect(getData.mock.calls.map(([format]) => format)).toEqual([
+      'application/json',
+      'text/markdown',
+      'text/plain',
+    ])
   })
 
   it('returns null when JSON candidates are unavailable or invalid', () => {
