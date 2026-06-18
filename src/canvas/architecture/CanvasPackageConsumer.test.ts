@@ -315,6 +315,10 @@ import {
   escapeCanvasXmlText,
   formatCanvasSvgNumber,
 } from '@interactive-os/canvas/renderer'
+import {
+  createCanvasSvgFreehandPathData as createCanvasSvgFreehandPathDataFromPrimitives,
+  createCanvasSvgPathData as createCanvasSvgPathDataFromPrimitives,
+} from '@interactive-os/canvas/renderer/svg-drawing-primitives'
 
 describe('Canvas package consumer imports', () => {
   it('supports assembling a canvas app from package exports', async () => {
@@ -2667,6 +2671,10 @@ describe('Canvas package consumer imports', () => {
     expect(CANVAS_SVG_ARROW_MARKER_IRI).toBe('url(#canvas-arrow-head)')
     expect(createCanvasSvgPathData([{ x: 1, y: 2 }, { x: 3, y: 4 }]))
       .toBe('M 1 2 L 3 4')
+    expect(createCanvasSvgPathDataFromPrimitives([
+      { x: 1, y: 2 },
+      { x: 3, y: 4 },
+    ])).toBe('M 1 2 L 3 4')
     expect(formatCanvasSvgNumber(1.2345)).toBe('1.234')
     expect(escapeCanvasXmlText('A&B <C>')).toBe('A&amp;B &lt;C&gt;')
     expect(escapeCanvasXmlAttribute('A&B "C"')).toBe('A&amp;B &quot;C&quot;')
@@ -2679,6 +2687,11 @@ describe('Canvas package consumer imports', () => {
       flipY: true,
     })).toBe('translate(30 30) scale(1 -1) translate(-30 -30)')
     expect(createCanvasSvgFreehandPathData([
+      { x: 1, y: 2 },
+      { x: 3, y: 4 },
+      { x: 5, y: 2 },
+    ])).toBe('M 1 2 Q 3 4 4 3 L 5 2')
+    expect(createCanvasSvgFreehandPathDataFromPrimitives([
       { x: 1, y: 2 },
       { x: 3, y: 4 },
       { x: 5, y: 2 },

@@ -33,11 +33,18 @@ const packageModules = import.meta.glob('../../../package.json', {
   query: '?raw',
 }) as Record<string, string>
 
-const sourceModules = import.meta.glob('../**/index.ts', {
-  eager: true,
-  import: 'default',
-  query: '?raw',
-}) as Record<string, string>
+const sourceModules = {
+  ...import.meta.glob('../**/index.ts', {
+    eager: true,
+    import: 'default',
+    query: '?raw',
+  }),
+  ...import.meta.glob('../renderer/svg-drawing-primitives.ts', {
+    eager: true,
+    import: 'default',
+    query: '?raw',
+  }),
+} as Record<string, string>
 
 const packageJson = JSON.parse(
   packageModules['../../../package.json'],
@@ -86,6 +93,9 @@ describe('Canvas package manifest', () => {
       './entities': createPackageExportEntry('./dist/package/canvas/entities/index'),
       './host': createPackageExportEntry('./dist/package/canvas/host/index'),
       './renderer': createPackageExportEntry('./dist/package/canvas/renderer/index'),
+      './renderer/svg-drawing-primitives': createPackageExportEntry(
+        './dist/package/canvas/renderer/svg-drawing-primitives',
+      ),
       './style.css': {
         default: './dist/package/canvas/app/shell/CanvasApp.css',
       },
@@ -97,9 +107,13 @@ describe('Canvas package manifest', () => {
       .filter(isPackageCodeExportEntry)
       .flatMap((entry) => [entry.types, entry.import, entry.default])
 
-    expect(exportedPaths).toHaveLength(27)
+    expect(exportedPaths).toHaveLength(30)
     expect(exportedPaths.every((path) => path.startsWith('./dist/package/canvas/'))).toBe(true)
-    expect(exportedPaths.every((path) => path.endsWith('/index.d.ts') || path.endsWith('/index.js'))).toBe(true)
+    expect(exportedPaths.every((path) =>
+      path.endsWith('/index.d.ts') ||
+      path.endsWith('/index.js') ||
+      path.endsWith('/svg-drawing-primitives.d.ts') ||
+      path.endsWith('/svg-drawing-primitives.js'))).toBe(true)
     expect(
       exportedPaths
         .filter((path) => path.endsWith('.js'))
@@ -113,7 +127,7 @@ describe('Canvas package manifest', () => {
         isPackageCodeExportEntry(entry) ? [[subpath, entry] as const] : [],
       )
 
-    expect(exportEntries).toHaveLength(9)
+    expect(exportEntries).toHaveLength(10)
     for (const [, entry] of exportEntries) {
       expect(entry.types).toBe(entry.import.replace(/\.js$/, '.d.ts'))
       expect(entry.import).toBe(entry.default)
