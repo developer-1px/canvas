@@ -5,6 +5,7 @@ import {
   getCanvasAppFeaturePackMarketplacePrimaryAction,
   getCanvasAppFeaturePackMarketplaceSectionControlModel,
   getCanvasAppFeaturePackMarketplaceSectionControlModels,
+  getCanvasAppFeaturePackMarketplaceSelectionControlModel,
   getCanvasAppFeaturePackMarketplaceSectionFacetTargetControls,
   getCanvasAppFeaturePackMarketplaceSectionTargetControls,
   getCanvasAppFeaturePackMarketplaceSectionPrimaryActionDiagnosticModel,
@@ -528,6 +529,115 @@ describe('CanvasAppFeaturePackMarketplace', () => {
           status: 'uninstalled',
         },
       ],
+    })
+  })
+
+  it('builds selected section and facet control models for marketplace hosts', () => {
+    const runtimeManifest = createCanvasAppFeaturePackManifest({
+      id: 'runtime-pack',
+      label: 'Runtime pack',
+    })
+    const addonManifest = createCanvasAppFeaturePackManifest({
+      id: 'addon-pack',
+      label: 'Addon pack',
+    })
+    const model = getCanvasAppFeaturePackMarketplaceModel({
+      listings: [{
+        access: 'private',
+        distribution: 'available',
+        featurePackId: 'addon-pack',
+      }],
+      manifests: [runtimeManifest, addonManifest],
+      options: {
+        featurePackStates: [{
+          id: 'addon-pack',
+          status: 'uninstalled',
+        }],
+      },
+      profiles: [],
+      suiteManifests: [],
+    })
+
+    const selectedPackModel =
+      getCanvasAppFeaturePackMarketplaceSelectionControlModel({
+        facetKind: 'private',
+        model,
+        sectionKind: 'packs',
+      })
+
+    expect(selectedPackModel).toMatchObject({
+      fallbackReasons: [],
+      requestedFacetKind: 'private',
+      requestedSectionKind: 'packs',
+      selectedFacetKind: 'private',
+      selectedSectionKind: 'packs',
+      status: 'selected',
+    })
+    expect(selectedPackModel.sectionControls.map((control) => ({
+      count: control.count,
+      kind: control.kind,
+      selected: control.selected,
+    }))).toEqual([
+      { count: 0, kind: 'profiles', selected: false },
+      { count: 0, kind: 'suites', selected: false },
+      { count: 2, kind: 'packs', selected: true },
+    ])
+    expect(selectedPackModel.facetControls.find((control) =>
+      control.kind === 'private'
+    )).toMatchObject({
+      count: 1,
+      kind: 'private',
+      label: 'Private',
+      selected: true,
+    })
+    expect(selectedPackModel.controls.map((control) => control.target))
+      .toEqual([{
+        featurePackId: 'addon-pack',
+        kind: 'pack',
+      }])
+    expect(selectedPackModel.sectionControlModel?.controls.map((control) =>
+      control.label
+    )).toEqual(['Runtime pack', 'Addon pack'])
+    expect(Object.isFrozen(selectedPackModel)).toBe(true)
+    expect(Object.isFrozen(selectedPackModel.controls)).toBe(true)
+    expect(Object.isFrozen(selectedPackModel.sectionControls)).toBe(true)
+    expect(Object.isFrozen(selectedPackModel.facetControls)).toBe(true)
+
+    const fallbackFacetModel =
+      getCanvasAppFeaturePackMarketplaceSelectionControlModel({
+        facetKind: 'private',
+        model,
+        sectionKind: 'profiles',
+      })
+
+    expect(fallbackFacetModel).toMatchObject({
+      fallbackReasons: ['missing-facet'],
+      requestedFacetKind: 'private',
+      requestedSectionKind: 'profiles',
+      selectedFacetKind: 'all',
+      selectedSectionKind: 'profiles',
+      status: 'fallback',
+    })
+    expect(fallbackFacetModel.controls).toEqual([])
+    expect(fallbackFacetModel.facetControls[0]).toMatchObject({
+      kind: 'all',
+      selected: true,
+    })
+
+    const fallbackSectionModel =
+      getCanvasAppFeaturePackMarketplaceSelectionControlModel({
+        facetKind: 'all',
+        model,
+        sectionKind: 'extensions',
+      })
+
+    expect(fallbackSectionModel).toMatchObject({
+      fallbackReasons: ['missing-section'],
+      requestedFacetKind: 'all',
+      requestedSectionKind: 'extensions',
+      selectedFacetKind: 'all',
+      selectedSectionKind: 'profiles',
+      status: 'fallback',
     })
   })
 

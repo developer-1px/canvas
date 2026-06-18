@@ -258,6 +258,59 @@ export type CanvasAppFeaturePackMarketplaceSectionControlModel = Readonly<{
   summary: CanvasAppFeaturePackMarketplaceSectionSummary
 }>
 
+export type CanvasAppFeaturePackMarketplaceSelectionControlModelInput =
+  Readonly<{
+    facetKind?: CanvasAppFeaturePackMarketplaceSectionFacetKind | string
+    model: CanvasAppFeaturePackMarketplaceModel
+    sectionKind?: CanvasAppFeaturePackMarketplaceSectionKind | string
+  }>
+
+export type CanvasAppFeaturePackMarketplaceSelectionControlModelStatus =
+  | 'empty'
+  | 'fallback'
+  | 'selected'
+
+export type CanvasAppFeaturePackMarketplaceSelectionFallbackReason =
+  | 'missing-facet'
+  | 'missing-section'
+
+export type CanvasAppFeaturePackMarketplaceSectionSelectionControl =
+  Readonly<{
+    count: number
+    kind: CanvasAppFeaturePackMarketplaceSectionKind
+    label: string
+    section: CanvasAppFeaturePackMarketplaceSection
+    selected: boolean
+  }>
+
+export type CanvasAppFeaturePackMarketplaceFacetSelectionControl =
+  CanvasAppFeaturePackMarketplaceSectionFacet & Readonly<{
+    selected: boolean
+  }>
+
+export type CanvasAppFeaturePackMarketplaceSelectionControlModel =
+  Readonly<{
+    controls: readonly CanvasAppFeaturePackMarketplaceTargetControl[]
+    facetControls: readonly CanvasAppFeaturePackMarketplaceFacetSelectionControl[]
+    fallbackReasons:
+      readonly CanvasAppFeaturePackMarketplaceSelectionFallbackReason[]
+    requestedFacetKind:
+      | CanvasAppFeaturePackMarketplaceSectionFacetKind
+      | string
+      | undefined
+    requestedSectionKind:
+      | CanvasAppFeaturePackMarketplaceSectionKind
+      | string
+      | undefined
+    sectionControlModel: CanvasAppFeaturePackMarketplaceSectionControlModel | null
+    sectionControls: readonly CanvasAppFeaturePackMarketplaceSectionSelectionControl[]
+    selectedFacet: CanvasAppFeaturePackMarketplaceSectionFacet | null
+    selectedFacetKind: CanvasAppFeaturePackMarketplaceSectionFacetKind | null
+    selectedSection: CanvasAppFeaturePackMarketplaceSection | null
+    selectedSectionKind: CanvasAppFeaturePackMarketplaceSectionKind | null
+    status: CanvasAppFeaturePackMarketplaceSelectionControlModelStatus
+  }>
+
 export type CanvasAppFeaturePackMarketplaceActionSectionSummary =
   Readonly<{
     blockedActionCount: number
@@ -448,6 +501,86 @@ export function getCanvasAppFeaturePackMarketplaceSectionFacetTargetControls(
   )
 }
 
+export function getCanvasAppFeaturePackMarketplaceSelectionControlModel({
+  facetKind,
+  model,
+  sectionKind,
+}: CanvasAppFeaturePackMarketplaceSelectionControlModelInput):
+  CanvasAppFeaturePackMarketplaceSelectionControlModel {
+  const fallbackReasons:
+    CanvasAppFeaturePackMarketplaceSelectionFallbackReason[] = []
+  const selectedSection =
+    model.sections.find((section) => section.kind === sectionKind) ??
+      model.sections[0] ??
+      null
+
+  if (sectionKind !== undefined && selectedSection?.kind !== sectionKind) {
+    fallbackReasons.push('missing-section')
+  }
+
+  if (!selectedSection) {
+    return Object.freeze({
+      controls: Object.freeze([]),
+      facetControls: Object.freeze([]),
+      fallbackReasons: Object.freeze(fallbackReasons),
+      requestedFacetKind: facetKind,
+      requestedSectionKind: sectionKind,
+      sectionControlModel: null,
+      sectionControls: getCanvasAppFeaturePackMarketplaceSectionSelectionControls(
+        {
+          sections: model.sections,
+          selectedSection: null,
+        },
+      ),
+      selectedFacet: null,
+      selectedFacetKind: null,
+      selectedSection: null,
+      selectedSectionKind: null,
+      status: 'empty',
+    })
+  }
+
+  const selectedFacet =
+    selectedSection.facets.find((facet) => facet.kind === facetKind) ??
+      selectedSection.facets[0] ??
+      null
+
+  if (facetKind !== undefined && selectedFacet?.kind !== facetKind) {
+    fallbackReasons.push('missing-facet')
+  }
+
+  const sectionControlModel =
+    getCanvasAppFeaturePackMarketplaceSectionControlModel(selectedSection)
+
+  return Object.freeze({
+    controls: selectedFacet
+      ? getCanvasAppFeaturePackMarketplaceFacetTargetControlsForSection({
+        facetKind: selectedFacet.kind,
+        section: selectedSection,
+      })
+      : Object.freeze([]),
+    facetControls: getCanvasAppFeaturePackMarketplaceFacetSelectionControls({
+      facets: selectedSection.facets,
+      selectedFacet,
+    }),
+    fallbackReasons: Object.freeze(fallbackReasons),
+    requestedFacetKind: facetKind,
+    requestedSectionKind: sectionKind,
+    sectionControlModel,
+    sectionControls: getCanvasAppFeaturePackMarketplaceSectionSelectionControls(
+      {
+        sections: model.sections,
+        selectedSection,
+      },
+    ),
+    selectedFacet,
+    selectedFacetKind: selectedFacet?.kind ?? null,
+    selectedSection,
+    selectedSectionKind: selectedSection.kind,
+    status: fallbackReasons.length > 0 ? 'fallback' : 'selected',
+  })
+}
+
 export function getCanvasAppFeaturePackMarketplaceTargetItem({
   model,
   target,
@@ -617,6 +750,79 @@ export function getCanvasAppFeaturePackMarketplaceSectionPrimaryActionDiagnostic
     )),
     ready: Object.freeze(all.filter((diagnostic) => diagnostic.ready)),
   })
+}
+
+function getCanvasAppFeaturePackMarketplaceSectionSelectionControls({
+  sections,
+  selectedSection,
+}: {
+  sections: readonly CanvasAppFeaturePackMarketplaceSection[]
+  selectedSection: CanvasAppFeaturePackMarketplaceSection | null
+}): readonly CanvasAppFeaturePackMarketplaceSectionSelectionControl[] {
+  return Object.freeze(sections.map((section) =>
+    Object.freeze({
+      count: section.summary.itemCount,
+      kind: section.kind,
+      label: section.label,
+      section,
+      selected: selectedSection?.kind === section.kind,
+    })
+  ))
+}
+
+function getCanvasAppFeaturePackMarketplaceFacetSelectionControls({
+  facets,
+  selectedFacet,
+}: {
+  facets: readonly CanvasAppFeaturePackMarketplaceSectionFacet[]
+  selectedFacet: CanvasAppFeaturePackMarketplaceSectionFacet | null
+}): readonly CanvasAppFeaturePackMarketplaceFacetSelectionControl[] {
+  return Object.freeze(facets.map((facet) =>
+    Object.freeze({
+      ...facet,
+      selected: selectedFacet?.kind === facet.kind,
+    })
+  ))
+}
+
+function getCanvasAppFeaturePackMarketplaceFacetTargetControlsForSection({
+  facetKind,
+  section,
+}: {
+  facetKind: CanvasAppFeaturePackMarketplaceSectionFacetKind
+  section: CanvasAppFeaturePackMarketplaceSection
+}): readonly CanvasAppFeaturePackMarketplaceTargetControl[] {
+  if (
+    section.kind === 'profiles' &&
+    isCanvasAppFeaturePackMarketplaceProfileSectionFacetKind(facetKind)
+  ) {
+    return getCanvasAppFeaturePackMarketplaceSectionFacetTargetControls({
+      facetKind,
+      section,
+    })
+  }
+
+  if (
+    section.kind === 'suites' &&
+    isCanvasAppFeaturePackMarketplaceSuiteSectionFacetKind(facetKind)
+  ) {
+    return getCanvasAppFeaturePackMarketplaceSectionFacetTargetControls({
+      facetKind,
+      section,
+    })
+  }
+
+  if (
+    section.kind === 'packs' &&
+    isCanvasAppFeaturePackMarketplacePackSectionFacetKind(facetKind)
+  ) {
+    return getCanvasAppFeaturePackMarketplaceSectionFacetTargetControls({
+      facetKind,
+      section,
+    })
+  }
+
+  return Object.freeze([])
 }
 
 function createMissingCanvasAppFeaturePackMarketplaceTargetControl(
@@ -815,6 +1021,40 @@ function isCanvasAppFeaturePackMarketplacePackSectionFacetItemsInput(
   input: CanvasAppFeaturePackMarketplaceSectionFacetItemsInput,
 ): input is CanvasAppFeaturePackMarketplacePackSectionFacetItemsInput {
   return input.section.kind === 'packs'
+}
+
+function isCanvasAppFeaturePackMarketplaceProfileSectionFacetKind(
+  facetKind: CanvasAppFeaturePackMarketplaceSectionFacetKind,
+): facetKind is CanvasAppFeaturePackMarketplaceProfileSectionFacetKind {
+  return facetKind === 'active' ||
+    facetKind === 'all' ||
+    facetKind === 'blocked' ||
+    facetKind === 'ready'
+}
+
+function isCanvasAppFeaturePackMarketplaceSuiteSectionFacetKind(
+  facetKind: CanvasAppFeaturePackMarketplaceSectionFacetKind,
+): facetKind is CanvasAppFeaturePackMarketplaceSuiteSectionFacetKind {
+  return facetKind === 'all' ||
+    facetKind === 'blocked' ||
+    facetKind === 'enabled' ||
+    facetKind === 'ready'
+}
+
+function isCanvasAppFeaturePackMarketplacePackSectionFacetKind(
+  facetKind: CanvasAppFeaturePackMarketplaceSectionFacetKind,
+): facetKind is CanvasAppFeaturePackMarketplacePackSectionFacetKind {
+  return facetKind === 'activation-failed' ||
+    facetKind === 'all' ||
+    facetKind === 'blocked' ||
+    facetKind === 'enabled' ||
+    facetKind === 'installed' ||
+    facetKind === 'paid' ||
+    facetKind === 'partially-updated' ||
+    facetKind === 'private' ||
+    facetKind === 'ready' ||
+    facetKind === 'rollback-available' ||
+    facetKind === 'updating'
 }
 
 function getCanvasAppFeaturePackMarketplaceProfileSectionFacets({

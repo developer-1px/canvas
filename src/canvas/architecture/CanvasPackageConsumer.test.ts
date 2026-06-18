@@ -187,6 +187,7 @@ import {
   getCanvasAppFeaturePackMarketplaceItemTargetControl,
   getCanvasAppFeaturePackMarketplacePrimaryActionDiagnostic,
   getCanvasAppFeaturePackMarketplacePrimaryAction,
+  getCanvasAppFeaturePackMarketplaceSelectionControlModel,
   getCanvasAppFeaturePackMarketplaceSectionControlModel,
   getCanvasAppFeaturePackMarketplaceSectionControlModels,
   getCanvasAppFeaturePackMarketplaceSectionFacetTargetControls,
@@ -358,6 +359,9 @@ import {
   type CanvasAppFeaturePackMarketplacePackSectionSummary,
   type CanvasAppFeaturePackMarketplacePrimaryAction,
   type CanvasAppFeaturePackMarketplacePrimaryActionDiagnostic,
+  type CanvasAppFeaturePackMarketplaceSelectionControlModel,
+  type CanvasAppFeaturePackMarketplaceSelectionControlModelInput,
+  type CanvasAppFeaturePackMarketplaceSelectionFallbackReason,
   type CanvasAppFeaturePackMarketplaceSectionControlModel,
   type CanvasAppFeaturePackMarketplaceSectionPrimaryActionDiagnosticModel,
   type CanvasAppFeaturePackMarketplaceSectionSummary,
@@ -498,6 +502,8 @@ import {
     as CanvasAppAssemblySourceFeaturePackMarketplaceTargetApplyTransactionResultFromApp,
   type CanvasAppAssemblySourceFeaturePackMarketplaceTargetControlApplyTransactionResult
     as CanvasAppAssemblySourceFeaturePackMarketplaceTargetControlApplyTransactionResultFromApp,
+  type CanvasAppFeaturePackMarketplaceSelectionControlModel
+    as CanvasAppFeaturePackMarketplaceSelectionControlModelFromApp,
   type CanvasAppAssemblySource as CanvasAppAssemblySourceFromApp,
   type CanvasAppProps as CanvasAppPropsFromApp,
   type CanvasCommandPaletteKeyboardIntentInput,
@@ -1101,6 +1107,29 @@ describe('Canvas package consumer imports', () => {
         getCanvasAppFeaturePackMarketplaceSectionFacetTargetControls(
           featurePackMarketplaceReadyPackFacetInput,
         )
+    const featurePackMarketplaceSelectionControlModelInput:
+      CanvasAppFeaturePackMarketplaceSelectionControlModelInput = {
+        facetKind: 'ready',
+        model: featurePackMarketplaceModel,
+        sectionKind: 'packs',
+      }
+    const featurePackMarketplaceSelectionControlModel:
+      CanvasAppFeaturePackMarketplaceSelectionControlModel =
+        getCanvasAppFeaturePackMarketplaceSelectionControlModel(
+          featurePackMarketplaceSelectionControlModelInput,
+        )
+    const featurePackMarketplaceSelectionControlModelFromApp:
+      CanvasAppFeaturePackMarketplaceSelectionControlModelFromApp =
+        CanvasAppFacade.getCanvasAppFeaturePackMarketplaceSelectionControlModel(
+          featurePackMarketplaceSelectionControlModelInput,
+        )
+    const featurePackMarketplaceSelectionFallbackReasons:
+      readonly CanvasAppFeaturePackMarketplaceSelectionFallbackReason[] =
+        getCanvasAppFeaturePackMarketplaceSelectionControlModel({
+          facetKind: 'private',
+          model: featurePackMarketplaceModel,
+          sectionKind: 'profiles',
+        }).fallbackReasons
     const featurePackMarketplaceMissingTargetControlStatus:
       CanvasAppFeaturePackMarketplaceTargetControlStatus =
         getCanvasAppFeaturePackMarketplaceTargetControl({
@@ -3115,6 +3144,38 @@ describe('Canvas package consumer imports', () => {
       featurePackId: 'smoke-partial-pack',
       kind: 'pack',
     }])
+    expect(featurePackMarketplaceSelectionControlModel).toMatchObject({
+      fallbackReasons: [],
+      requestedFacetKind: 'ready',
+      requestedSectionKind: 'packs',
+      selectedFacetKind: 'ready',
+      selectedSectionKind: 'packs',
+      status: 'selected',
+    })
+    expect(featurePackMarketplaceSelectionControlModel.sectionControls
+      .map((control) => ({
+        kind: control.kind,
+        selected: control.selected,
+      }))).toEqual([
+        { kind: 'profiles', selected: false },
+        { kind: 'suites', selected: false },
+        { kind: 'packs', selected: true },
+      ])
+    expect(featurePackMarketplaceSelectionControlModel.facetControls
+      .find((control) => control.kind === 'ready')).toMatchObject({
+        count: 1,
+        selected: true,
+      })
+    expect(featurePackMarketplaceSelectionControlModel.controls.map(
+      (control) => control.target,
+    )).toEqual([{
+      featurePackId: 'smoke-partial-pack',
+      kind: 'pack',
+    }])
+    expect(featurePackMarketplaceSelectionControlModelFromApp.controls)
+      .toEqual(featurePackMarketplaceSelectionControlModel.controls)
+    expect(featurePackMarketplaceSelectionFallbackReasons)
+      .toEqual(['missing-facet'])
     expect(featurePackMarketplaceMissingTargetControlStatus).toBe('missing')
     expect(featurePackMarketplaceActionAssemblyPlan.status).toBe('ready')
     if (featurePackMarketplaceActionAssemblyPlan.status !== 'ready') {
@@ -4629,6 +4690,12 @@ describe('Canvas package consumer imports', () => {
       .toBe(getCanvasAppFeaturePackMarketplaceSectionFacetTargetControls)
     expect(CanvasPackage.getCanvasAppFeaturePackMarketplaceSectionFacetTargetControls)
       .toBe(getCanvasAppFeaturePackMarketplaceSectionFacetTargetControls)
+    expect(CanvasAppAuthoring.getCanvasAppFeaturePackMarketplaceSelectionControlModel)
+      .toBe(getCanvasAppFeaturePackMarketplaceSelectionControlModel)
+    expect(CanvasAppFacade.getCanvasAppFeaturePackMarketplaceSelectionControlModel)
+      .toBe(getCanvasAppFeaturePackMarketplaceSelectionControlModel)
+    expect(CanvasPackage.getCanvasAppFeaturePackMarketplaceSelectionControlModel)
+      .toBe(getCanvasAppFeaturePackMarketplaceSelectionControlModel)
     expect(CanvasAppAuthoring.getCanvasAppFeaturePackMarketplaceActionAssemblyInput)
       .toBeTypeOf('function')
     expect(CanvasAppFacade.getCanvasAppFeaturePackMarketplaceActionAssemblyInput)
