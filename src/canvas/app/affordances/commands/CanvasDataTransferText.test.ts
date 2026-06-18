@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import {
   getCanvasDataTransferText,
   readCanvasDataTransferJSONCandidate,
+  readCanvasDataTransferTextCandidate,
   setCanvasDataTransferDropEffect,
   setCanvasDataTransferText,
   type CanvasTextDataTransfer,
@@ -31,6 +32,93 @@ describe('CanvasDataTransferText', () => {
       dataTransfer: { getData },
     })).toBe('item-1')
     expect(getData).toHaveBeenCalledWith('text/plain')
+  })
+
+  it('reads the first non-empty text candidate in MIME priority order', () => {
+    const getData = vi.fn((format: string) => {
+      if (format === 'text/markdown') {
+        return '   '
+      }
+
+      if (format === 'text/x-markdown') {
+        return '# Legacy Markdown'
+      }
+
+      if (format === 'text/plain') {
+        return '# Plain Markdown'
+      }
+
+      return ''
+    })
+    const legacyMarkdownCandidate = {
+      mimeType: 'text/x-markdown',
+      source: 'legacy-markdown',
+    }
+
+    const result = readCanvasDataTransferTextCandidate({
+      candidates: [
+        'text/markdown',
+        legacyMarkdownCandidate,
+        {
+          mimeType: 'text/plain',
+          source: 'plain-text',
+        },
+      ],
+      dataTransfer: { getData },
+    })
+
+    expect(result).toEqual({
+      candidate: legacyMarkdownCandidate,
+      candidateIndex: 1,
+      mimeType: 'text/x-markdown',
+      rawText: '# Legacy Markdown',
+      source: 'legacy-markdown',
+      text: '# Legacy Markdown',
+    })
+    expect(Object.isFrozen(result)).toBe(true)
+    expect(getData.mock.calls.map(([format]) => format)).toEqual([
+      'text/markdown',
+      'text/x-markdown',
+    ])
+  })
+
+  it('can trim returned text while preserving the raw DataTransfer payload', () => {
+    expect(readCanvasDataTransferTextCandidate({
+      candidates: [
+        {
+          mimeType: 'text/plain',
+          source: 'plain-text',
+        },
+      ],
+      dataTransfer: {
+        getData: (format) =>
+          format === 'text/plain' ? '  Hello canvas  ' : '',
+      },
+      trimText: true,
+    })).toEqual({
+      candidate: {
+        mimeType: 'text/plain',
+        source: 'plain-text',
+      },
+      candidateIndex: 0,
+      mimeType: 'text/plain',
+      rawText: '  Hello canvas  ',
+      source: 'plain-text',
+      text: 'Hello canvas',
+    })
+  })
+
+  it('returns null when text candidates are unavailable or blank', () => {
+    expect(readCanvasDataTransferTextCandidate({
+      candidates: ['text/markdown', 'text/plain'],
+      dataTransfer: null,
+    })).toBeNull()
+    expect(readCanvasDataTransferTextCandidate({
+      candidates: ['text/markdown', 'text/plain'],
+      dataTransfer: {
+        getData: () => '   ',
+      },
+    })).toBeNull()
   })
 
   it('sets dropEffect when supported', () => {

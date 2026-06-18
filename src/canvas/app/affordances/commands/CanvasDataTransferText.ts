@@ -10,6 +10,34 @@ export type CanvasDataTransferTextInput = {
   mimeType?: string
 }
 
+export type CanvasDataTransferTextCandidate =
+  | string
+  | Readonly<{
+    mimeType: string
+    source?: string
+  }>
+
+export type CanvasDataTransferTextCandidateReadInput<
+  TCandidate extends CanvasDataTransferTextCandidate =
+    CanvasDataTransferTextCandidate,
+> = Readonly<{
+  candidates: readonly TCandidate[]
+  dataTransfer: CanvasTextDataTransfer | null
+  trimText?: boolean
+}>
+
+export type CanvasDataTransferTextCandidateReadResult<
+  TCandidate extends CanvasDataTransferTextCandidate =
+    CanvasDataTransferTextCandidate,
+> = Readonly<{
+  candidate: TCandidate
+  candidateIndex: number
+  mimeType: string
+  rawText: string
+  source?: string
+  text: string
+}>
+
 export type CanvasDataTransferTextWriteInput =
   CanvasDataTransferTextInput & {
     effectAllowed?: DataTransfer['effectAllowed']
@@ -96,6 +124,47 @@ export function getCanvasDataTransferText({
   return dataTransfer?.getData?.(mimeType) ?? ''
 }
 
+export function readCanvasDataTransferTextCandidate<
+  TCandidate extends CanvasDataTransferTextCandidate =
+    CanvasDataTransferTextCandidate,
+>({
+  candidates,
+  dataTransfer,
+  trimText = false,
+}: CanvasDataTransferTextCandidateReadInput<TCandidate>):
+  CanvasDataTransferTextCandidateReadResult<TCandidate> | null {
+  if (!dataTransfer?.getData) {
+    return null
+  }
+
+  for (const [candidateIndex, candidate] of candidates.entries()) {
+    const mimeType = getCanvasDataTransferTextCandidateMimeType(candidate)
+
+    if (!mimeType) {
+      continue
+    }
+
+    const rawText = dataTransfer.getData(mimeType)
+
+    if (rawText.trim() === '') {
+      continue
+    }
+
+    const source = getCanvasDataTransferTextCandidateSource(candidate)
+
+    return Object.freeze({
+      candidate,
+      candidateIndex,
+      mimeType,
+      rawText,
+      ...(source === undefined ? {} : { source }),
+      text: trimText ? rawText.trim() : rawText,
+    })
+  }
+
+  return null
+}
+
 export function readCanvasDataTransferJSONCandidate<
   TCandidate extends CanvasDataTransferJSONCandidate =
     CanvasDataTransferJSONCandidate,
@@ -166,6 +235,18 @@ export function readCanvasDataTransferJSONCandidate<
   }
 
   return null
+}
+
+function getCanvasDataTransferTextCandidateMimeType(
+  candidate: CanvasDataTransferTextCandidate,
+) {
+  return typeof candidate === 'string' ? candidate : candidate.mimeType
+}
+
+function getCanvasDataTransferTextCandidateSource(
+  candidate: CanvasDataTransferTextCandidate,
+) {
+  return typeof candidate === 'string' ? undefined : candidate.source
 }
 
 export function setCanvasDataTransferDropEffect({

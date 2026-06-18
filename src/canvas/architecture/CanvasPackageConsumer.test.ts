@@ -6,6 +6,7 @@ import type {
   CanvasDataTransferImportActionPlanRunInput,
   CanvasDataTransferImportActionPlanRunResult,
   CanvasDataTransferJSONCandidateReadResult,
+  CanvasDataTransferTextCandidateReadResult,
   CanvasStoryImportAction,
   CanvasWheelViewportEvent,
   CanvasWheelViewportSetter,
@@ -120,6 +121,7 @@ import {
   createCanvasStoryPreviewItemsFeaturePackManifest,
   getCanvasDataTransferText,
   readCanvasDataTransferJSONCandidate,
+  readCanvasDataTransferTextCandidate,
   getCanvasEraserHitStrokeIds,
   getCanvasExternalClipboardPasteCommandRoute,
   getCanvasRichClipboardJSONFromHTML,
@@ -6103,6 +6105,40 @@ describe('Canvas package consumer imports', () => {
       .toBe(readCanvasDataTransferJSONCandidate)
     expect(CanvasPackage.readCanvasDataTransferJSONCandidate)
       .toBe(readCanvasDataTransferJSONCandidate)
+    const packageTextCandidateResult:
+      CanvasDataTransferTextCandidateReadResult | null =
+        readCanvasDataTransferTextCandidate({
+          candidates: [
+            'text/markdown',
+            {
+              mimeType: 'text/x-markdown',
+              source: 'legacy-markdown',
+            },
+            {
+              mimeType: 'text/plain',
+              source: 'plain-text',
+            },
+          ],
+          dataTransfer: {
+            getData: (format) =>
+              format === 'text/x-markdown'
+                ? '  # Package  '
+                : '',
+          },
+          trimText: true,
+        })
+
+    expect(packageTextCandidateResult).toMatchObject({
+      candidateIndex: 1,
+      mimeType: 'text/x-markdown',
+      rawText: '  # Package  ',
+      source: 'legacy-markdown',
+      text: '# Package',
+    })
+    expect(CanvasAppFacade.readCanvasDataTransferTextCandidate)
+      .toBe(readCanvasDataTransferTextCandidate)
+    expect(CanvasPackage.readCanvasDataTransferTextCandidate)
+      .toBe(readCanvasDataTransferTextCandidate)
     expect(setCanvasDataTransferText({
       dataTransfer: null,
       text: 'smoke',
