@@ -224,6 +224,7 @@
 | JSON candidates | text-body custom MIME, `application/json`, `text/json`, and `text/plain` are checked in order |
 | JSON payloads | custom MIME may carry direct string/object payload; generic JSON requires `textBody`, `body`, `content`, `text`, or `plainText` wrapper |
 | Body shapes | string payloads split into paragraphs; `{ paragraphs: [...] }` payloads preserve paragraph/run structure |
+| Rich raw payload | paste values expose `rawPayload` and located `rawBody` so a host normalizer can preserve product-specific paragraph/run fields while `body` remains the plain storage-policy projection |
 | Host policy | max paragraph, max runs, max text length, and final text body schema conversion stay host-owned |
 | Metadata | command effect metadata carries target ids, paragraph count, run count, format, and payload length |
 | No-op | missing/hidden/locked/non-text target, host normalizer rejection, parse failure, direct generic JSON, or empty body returns `null` |

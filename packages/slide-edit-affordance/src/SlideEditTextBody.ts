@@ -27,6 +27,8 @@ export type SlideEditTextBodyJSONPasteValue = {
   format: 'json'
   paragraphCount: number
   payloadLength: number
+  rawBody: unknown
+  rawPayload: unknown
   runCount: number
   sourceType: string
   surface: 'text-body'
@@ -127,6 +129,7 @@ export function getSlideEditTextBodyJSONPasteValue({
       const customValue = parseSlideEditTextBodyJSON(customText)
       const customPasteValue = getSlideEditTextBodyDirectJSONPasteValue({
         payloadLength: customText.length,
+        rawPayload: customValue,
         sourceType: jsonMimeType,
         storagePolicy,
         value: customValue,
@@ -228,6 +231,7 @@ function getSlideEditTextBodyWrappedJSONPasteValue({
 
     const pasteValue = getSlideEditTextBodyDirectJSONPasteValue({
       payloadLength,
+      rawPayload: value,
       sourceType,
       storagePolicy,
       value: record[key],
@@ -244,12 +248,14 @@ function getSlideEditTextBodyWrappedJSONPasteValue({
 
 function getSlideEditTextBodyDirectJSONPasteValue({
   payloadLength,
+  rawPayload,
   sourceType,
   storagePolicy,
   value,
   wrapper,
 }: {
   payloadLength: number
+  rawPayload: unknown
   sourceType: string
   storagePolicy: SlideEditTextBodyStoragePolicy
   value: unknown
@@ -266,6 +272,8 @@ function getSlideEditTextBodyDirectJSONPasteValue({
     format: 'json',
     paragraphCount: body.paragraphs.length,
     payloadLength,
+    rawBody: value,
+    rawPayload,
     runCount: body.paragraphs.reduce(
       (count, paragraph) => count + paragraph.runs.length,
       0,
