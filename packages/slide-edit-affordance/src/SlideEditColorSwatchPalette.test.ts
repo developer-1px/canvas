@@ -4,12 +4,19 @@ import {
   createSlideEditColorSwatchPaletteDescriptor,
   getSlideEditColorSwatchCommandEffect,
   getSlideEditColorSwatchId,
+  getSlideEditColorSwatchJSONPasteValue,
+  getSlideEditColorSwatchPasteCommandEffects,
   getSlideEditColorWithAlphaCSS,
+  normalizeSlideEditColorSwatchChannelId,
   normalizeSlideEditColorHex,
   normalizeSlideEditColorSwatchValue,
   SLIDE_EDIT_COLOR_SWATCH_CHANNELS,
   SLIDE_EDIT_COLOR_SWATCH_FIELD,
+  SLIDE_EDIT_COLOR_SWATCH_JSON_MIME_TYPE,
 } from './SlideEditColorSwatchPalette'
+import {
+  getSlideEditColorSwatchJSONPasteValue as getSlideEditColorSwatchJSONPasteValueFromPackage,
+} from './index'
 
 describe('SlideEditColorSwatchPalette', () => {
   const themeColorTokens = [
@@ -120,6 +127,12 @@ describe('SlideEditColorSwatchPalette', () => {
       id: 'colorSwatch',
       requiredAdapterSlot: 'command-effect',
     })
+    expect(normalizeSlideEditColorSwatchChannelId('text-color')).toBe('text')
+    expect(normalizeSlideEditColorSwatchChannelId('shape-fill')).toBe('fill')
+    expect(normalizeSlideEditColorSwatchChannelId('shape-stroke')).toBe(
+      'stroke',
+    )
+    expect(normalizeSlideEditColorSwatchChannelId('line')).toBe('line-stroke')
   })
 
   it('normalizes recent swatches and marks recent selections', () => {
@@ -238,6 +251,286 @@ describe('SlideEditColorSwatchPalette', () => {
     })
   })
 
+  it('reads custom MIME direct color swatch JSON values first', () => {
+    expect(getSlideEditColorSwatchJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_COLOR_SWATCH_JSON_MIME_TYPE]: JSON.stringify({
+          channel: 'text-color',
+          source: 'theme',
+          swatchId: 'theme:color-text',
+          tokenId: 'color-text',
+          value: ' #111827 ',
+        }),
+        'application/json':
+          '{"colorSwatch":{"color":"#ffffff","channel":"fill"}}',
+      }),
+    })).toEqual({
+      channelId: 'text',
+      source: 'theme',
+      swatchId: 'theme:color-text',
+      tokenId: 'color-text',
+      value: '#111827',
+    })
+    expect(getSlideEditColorSwatchJSONPasteValueFromPackage({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_COLOR_SWATCH_JSON_MIME_TYPE]: '"#ABC"',
+      }),
+    })).toEqual({
+      channelId: null,
+      source: 'recent',
+      swatchId: 'recent:#aabbcc',
+      value: '#aabbcc',
+    })
+  })
+
+  it('reads wrapped and explicit color swatch JSON candidates', () => {
+    expect(getSlideEditColorSwatchJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'application/json':
+          '{"colorSwatch":{"hex":"#ABC","channel":"shape-fill"}}',
+      }),
+    })).toEqual({
+      channelId: 'fill',
+      source: 'recent',
+      swatchId: 'recent:#aabbcc',
+      value: '#aabbcc',
+    })
+    expect(getSlideEditColorSwatchJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/json':
+          '{"swatch":{"value":"#123456","source":"theme","tokenId":"color-accent"}}',
+      }),
+    })).toEqual({
+      channelId: null,
+      source: 'theme',
+      swatchId: 'theme:color-accent',
+      tokenId: 'color-accent',
+      value: '#123456',
+    })
+    expect(getSlideEditColorSwatchJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"color":"#0f0","channel":"line"}',
+      }),
+    })).toEqual({
+      channelId: 'line-stroke',
+      source: 'recent',
+      swatchId: 'recent:#00ff00',
+      value: '#00ff00',
+    })
+  })
+
+  it('converts color swatch paste values into host command effects', () => {
+    const pasteValue = getSlideEditColorSwatchJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/json':
+          '{"swatch":{"value":"#111827","source":"theme","tokenId":"color-text"}}',
+      }),
+    })
+    const result = getSlideEditColorSwatchPasteCommandEffects({
+      isChannelSupported: ({ target }) => target.objectId !== 'policy-a',
+      pasteValue: pasteValue!,
+      slideId: 'slide-a',
+      targets: [
+        {
+          defaultChannelId: 'text',
+          objectId: 'text-a',
+          supportedChannelIds: ['text'],
+        },
+        {
+          defaultChannelId: 'fill',
+          objectId: 'shape-a',
+          supportedChannelIds: ['fill', 'stroke'],
+        },
+        {
+          defaultChannelId: 'fill',
+          isLocked: true,
+          objectId: 'locked-a',
+        },
+        {
+          defaultChannelId: 'fill',
+          isHidden: true,
+          objectId: 'hidden-a',
+        },
+        {
+          defaultChannelId: 'line-stroke',
+          objectId: 'line-a',
+          supportedChannelIds: ['stroke'],
+        },
+        {
+          objectId: 'missing-a',
+        },
+        {
+          defaultChannelId: 'fill',
+          objectId: 'policy-a',
+          supportedChannelIds: ['fill'],
+        },
+      ],
+    })
+
+    expect(result.effects).toEqual([
+      {
+        payload: {
+          channelId: 'text',
+          id: 'apply-color-swatch',
+          objectIds: ['text-a'],
+          slideId: 'slide-a',
+          swatch: {
+            source: 'theme',
+            swatchId: 'theme:color-text',
+            tokenId: 'color-text',
+            value: '#111827',
+          },
+        },
+        selection: {
+          objectIds: ['text-a'],
+          slideId: 'slide-a',
+        },
+        type: 'slide-command-effect',
+      },
+      {
+        payload: {
+          channelId: 'fill',
+          id: 'apply-color-swatch',
+          objectIds: ['shape-a'],
+          slideId: 'slide-a',
+          swatch: {
+            source: 'theme',
+            swatchId: 'theme:color-text',
+            tokenId: 'color-text',
+            value: '#111827',
+          },
+        },
+        selection: {
+          objectIds: ['shape-a'],
+          slideId: 'slide-a',
+        },
+        type: 'slide-command-effect',
+      },
+    ])
+    expect(result.appliedTargets).toEqual([
+      {
+        channelId: 'text',
+        commandId: 'apply-color-swatch',
+        effectType: 'slide-command-effect',
+        objectId: 'text-a',
+        source: 'theme',
+        swatchId: 'theme:color-text',
+        tokenId: 'color-text',
+        value: '#111827',
+      },
+      {
+        channelId: 'fill',
+        commandId: 'apply-color-swatch',
+        effectType: 'slide-command-effect',
+        objectId: 'shape-a',
+        source: 'theme',
+        swatchId: 'theme:color-text',
+        tokenId: 'color-text',
+        value: '#111827',
+      },
+    ])
+    expect(result.skippedTargets).toEqual([
+      {
+        objectId: 'locked-a',
+        reason: 'locked-target',
+      },
+      {
+        objectId: 'hidden-a',
+        reason: 'hidden-target',
+      },
+      {
+        channelId: 'line-stroke',
+        objectId: 'line-a',
+        reason: 'unsupported-channel',
+      },
+      {
+        objectId: 'missing-a',
+        reason: 'missing-channel',
+      },
+      {
+        channelId: 'fill',
+        objectId: 'policy-a',
+        reason: 'unsupported-channel',
+      },
+    ])
+  })
+
+  it('uses explicit paste channels before target default channels', () => {
+    const pasteValue = getSlideEditColorSwatchJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'application/json': '{"color":"#fff","channel":"shape-stroke"}',
+      }),
+    })
+
+    expect(getSlideEditColorSwatchPasteCommandEffects({
+      pasteValue: pasteValue!,
+      slideId: 'slide-a',
+      targets: [
+        {
+          defaultChannelId: 'fill',
+          objectId: 'shape-a',
+          supportedChannelIds: ['fill', 'stroke'],
+        },
+        {
+          defaultChannelId: 'text',
+          objectId: 'text-a',
+          supportedChannelIds: ['text'],
+        },
+      ],
+    })).toMatchObject({
+      appliedTargets: [
+        {
+          channelId: 'stroke',
+          objectId: 'shape-a',
+          value: '#ffffff',
+        },
+      ],
+      skippedTargets: [
+        {
+          channelId: 'stroke',
+          objectId: 'text-a',
+          reason: 'unsupported-channel',
+        },
+      ],
+    })
+  })
+
+  it('ignores invalid, unrelated, and unsafe color swatch JSON candidates', () => {
+    expect(getSlideEditColorSwatchJSONPasteValue({
+      dataTransfer: null,
+    })).toBeNull()
+    expect(getSlideEditColorSwatchJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '#fff',
+      }),
+    })).toBeNull()
+    expect(getSlideEditColorSwatchJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'application/json': '"#fff"',
+      }),
+    })).toBeNull()
+    expect(getSlideEditColorSwatchJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'application/json': '{"color":"#fff"}',
+      }),
+    })).toBeNull()
+    expect(getSlideEditColorSwatchJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/json': '{"color":"#fff","channel":"background"}',
+      }),
+    })).toBeNull()
+    expect(getSlideEditColorSwatchJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"colorSwatch":{"color":18,"channel":"fill"}}',
+      }),
+    })).toBeNull()
+    expect(getSlideEditColorSwatchJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_COLOR_SWATCH_JSON_MIME_TYPE]: 'not json',
+      }),
+    })).toBeNull()
+  })
+
   it('does not expose product model names or raw color input coupling', () => {
     const publicStrings = JSON.stringify({
       descriptor: createSlideEditColorSwatchPaletteDescriptor({
@@ -273,3 +566,9 @@ describe('SlideEditColorSwatchPalette', () => {
     }
   })
 })
+
+function createDataTransfer(values: Record<string, string>) {
+  return {
+    getData: (type: string) => values[type] ?? '',
+  }
+}

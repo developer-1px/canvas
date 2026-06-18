@@ -436,7 +436,11 @@
 | Recent swatches | recent color strings become deduplicated swatch items without requiring raw color input |
 | State | descriptor exposes selected swatch id, mixed state, disabled state, and disabled reason |
 | Field | `colorSwatch` palette descriptor routes through `apply-color-swatch` |
+| JSON candidates | custom MIME, `application/json`, `text/json`, and `text/plain` are checked in order |
+| JSON payloads | generic JSON requires `colorSwatch`/`swatch` wrapper, or direct `color`/`value`/`hex` plus `channel`; custom MIME may carry direct swatch JSON |
+| Channel aliases | `text`/`text-color`, `fill`/`shape-fill`, `stroke`/`shape-stroke`, and `line`/`line-stroke` normalize to package channel ids |
 | Updates | selected object ids, channel id, and swatch source/value become host command effects |
+| No-op | locked, hidden, missing-channel, and unsupported targets are returned as skipped target metadata |
 | Scope | applies color choices to object style channels; raw color picker UI remains host-owned |
 | Runtime | host maps theme token ids and recent color values to its fill, stroke, text, or line model |
 
