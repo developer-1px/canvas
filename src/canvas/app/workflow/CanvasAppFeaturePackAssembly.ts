@@ -217,13 +217,30 @@ export function getCanvasAppFeaturePackMarketplaceActionAssemblyPlan({
   return Object.freeze({
     action,
     actionKind: action.kind,
-    assemblyInput: Object.freeze({
-      ...assemblyInput,
-      featurePackStates: action.installOptions.featurePackStates,
+    assemblyInput: getCanvasAppFeaturePackMarketplaceActionCanonicalAssemblyInput({
+      action,
+      assemblyInput,
     }),
     changedFeaturePackIds: action.changedFeaturePackIds,
     partialUpdateSurfaceIds: action.partialUpdateSurfaceIds,
     status: 'ready',
+  })
+}
+
+function getCanvasAppFeaturePackMarketplaceActionCanonicalAssemblyInput({
+  action,
+  assemblyInput,
+}: CanvasAppFeaturePackMarketplaceActionAssemblyInput):
+  CanvasAppFeaturePackAssemblyInput {
+  const canonicalAssemblyInput: CanvasAppFeaturePackAssemblyInput = {
+    ...assemblyInput,
+  }
+
+  delete canonicalAssemblyInput.disabledFeaturePackIds
+
+  return Object.freeze({
+    ...canonicalAssemblyInput,
+    featurePackStates: action.installOptions.featurePackStates,
   })
 }
 
