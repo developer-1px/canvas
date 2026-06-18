@@ -5,13 +5,20 @@ import {
   getSlideEditLayerPaneCommandEffect,
   getSlideEditLayerPaneDropIndicator,
   getSlideEditLayerPaneKeyboardIntent,
+  getSlideEditLayerPaneRenameJSONPasteValue,
+  getSlideEditLayerPaneRenamePasteCommandEffect,
   getSlideEditLayerPaneResolvedFocusObjectId,
   SLIDE_EDIT_LAYER_PANE_ARIA_CONTRACT,
   SLIDE_EDIT_LAYER_PANE_COMMANDS,
   SLIDE_EDIT_LAYER_PANE_DROP_INDICATOR_MODEL,
   SLIDE_EDIT_LAYER_PANE_KEYBOARD_INTENT_MODEL,
   SLIDE_EDIT_LAYER_PANE_KEYBOARD_KEYS,
+  SLIDE_EDIT_LAYER_PANE_OBJECT_METADATA_JSON_MIME_TYPE,
+  SLIDE_EDIT_LAYER_PANE_OBJECT_NAME_JSON_MIME_TYPE,
 } from './SlideEditObjectLayerPane'
+import {
+  getSlideEditLayerPaneRenameJSONPasteValue as getSlideEditLayerPaneRenameJSONPasteValueFromPackage,
+} from './index'
 
 function createGroupedLayerPaneDescriptor() {
   return createSlideEditLayerPaneDescriptor({
@@ -742,6 +749,166 @@ describe('SlideEditObjectLayerPane', () => {
     })
   })
 
+  it('reads object-name custom MIME direct rename JSON first', () => {
+    expect(getSlideEditLayerPaneRenameJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_LAYER_PANE_OBJECT_METADATA_JSON_MIME_TYPE]:
+          '{"name":"Metadata name"}',
+        [SLIDE_EDIT_LAYER_PANE_OBJECT_NAME_JSON_MIME_TYPE]:
+          '{"name":"  Hero layer  "}',
+        'application/json':
+          '{"objectName":"Generic name"}',
+      }),
+    })).toEqual({
+      name: 'Hero layer',
+      nameField: 'name',
+      surface: 'object-layer-pane-rename',
+    })
+
+    expect(getSlideEditLayerPaneRenameJSONPasteValueFromPackage({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_LAYER_PANE_OBJECT_NAME_JSON_MIME_TYPE]:
+          '{"name":"Package export"}',
+      }),
+    })).toEqual({
+      name: 'Package export',
+      nameField: 'name',
+      surface: 'object-layer-pane-rename',
+    })
+  })
+
+  it('reads wrapped object metadata, object name, and layer name JSON', () => {
+    expect(getSlideEditLayerPaneRenameJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'application/json':
+          '{"objectMetadata":{"name":"  AI renamed layer  "}}',
+      }),
+    })).toEqual({
+      name: 'AI renamed layer',
+      nameField: 'objectMetadata.name',
+      surface: 'object-layer-pane-rename',
+    })
+
+    expect(getSlideEditLayerPaneRenameJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/json': '{"objectName":"Object wrapper"}',
+      }),
+    })).toMatchObject({
+      name: 'Object wrapper',
+      nameField: 'objectName',
+    })
+
+    expect(getSlideEditLayerPaneRenameJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"layerName":"Layer wrapper"}',
+      }),
+    })).toMatchObject({
+      name: 'Layer wrapper',
+      nameField: 'layerName',
+    })
+  })
+
+  it('converts rename paste values to layer pane rename command effects', () => {
+    const pasteValue = getSlideEditLayerPaneRenameJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'application/json': '{"objectName":{"name":"  Pasted layer  "}}',
+      }),
+    })!
+
+    expect(getSlideEditLayerPaneRenamePasteCommandEffect({
+      descriptor,
+      pasteValue,
+    })).toEqual({
+      payload: {
+        id: 'rename-object',
+        name: 'Pasted layer',
+        objectId: 'title',
+      },
+      selection: {
+        objectIds: ['title'],
+        slideId: 'slide-a',
+      },
+      type: 'slide-command-effect',
+    })
+
+    expect(getSlideEditLayerPaneRenamePasteCommandEffect({
+      descriptor,
+      objectId: 'image',
+      pasteValue,
+    })?.payload).toEqual({
+      id: 'rename-object',
+      name: 'Pasted layer',
+      objectId: 'image',
+    })
+  })
+
+  it('ignores unavailable object rename paste routes', () => {
+    const pasteValue = getSlideEditLayerPaneRenameJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_LAYER_PANE_OBJECT_NAME_JSON_MIME_TYPE]:
+          '{"name":"Name"}',
+      }),
+    })!
+    const multiSelectionDescriptor = createSlideEditLayerPaneDescriptor({
+      activeObjectId: null,
+      slideId: 'slide-multi',
+      selectedObjectIds: ['a', 'b'],
+      objects: [
+        {
+          displayName: 'A',
+          kindLabel: 'Text',
+          objectId: 'a',
+        },
+        {
+          displayName: 'B',
+          kindLabel: 'Text',
+          objectId: 'b',
+        },
+      ],
+    })
+    const nonRenamableDescriptor = createSlideEditLayerPaneDescriptor({
+      activeObjectId: 'fixed',
+      slideId: 'slide-fixed',
+      selectedObjectIds: ['fixed'],
+      objects: [
+        {
+          displayName: 'Fixed',
+          isRenamable: false,
+          kindLabel: 'Placeholder',
+          objectId: 'fixed',
+        },
+      ],
+    })
+
+    expect(getSlideEditLayerPaneRenamePasteCommandEffect({
+      descriptor: multiSelectionDescriptor,
+      pasteValue,
+    })).toBeNull()
+    expect(getSlideEditLayerPaneRenamePasteCommandEffect({
+      descriptor: nonRenamableDescriptor,
+      pasteValue,
+    })).toBeNull()
+    expect(getSlideEditLayerPaneRenameJSONPasteValue({
+      dataTransfer: null,
+    })).toBeNull()
+    expect(getSlideEditLayerPaneRenameJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'application/json': '{"name":"Direct generic name"}',
+      }),
+    })).toBeNull()
+    expect(getSlideEditLayerPaneRenameJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_LAYER_PANE_OBJECT_NAME_JSON_MIME_TYPE]:
+          '{"name":"   "}',
+      }),
+    })).toBeNull()
+    expect(getSlideEditLayerPaneRenameJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_LAYER_PANE_OBJECT_NAME_JSON_MIME_TYPE]: 'not json',
+      }),
+    })).toBeNull()
+  })
+
   it('guards unavailable row commands without mutating host state', () => {
     expect(getSlideEditLayerPaneCommandEffect(descriptor, {
       objectId: 'note',
@@ -772,3 +939,9 @@ describe('SlideEditObjectLayerPane', () => {
     expect(contractStrings).not.toContain('placeholder')
   })
 })
+
+function createDataTransfer(values: Record<string, string>) {
+  return {
+    getData: (type: string) => values[type] ?? '',
+  }
+}
