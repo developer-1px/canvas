@@ -26,6 +26,17 @@
 | Collision policy | Plain URLs stay plain text so media import can claim them; Markdown tables stay out of rich text so table import can claim them |
 | Runtime | Host text models own conversion from rich text source paragraphs into their own text body/list schema |
 
+## Table Import Markdown Contract
+
+| Area | Contract |
+| --- | --- |
+| Markdown source | `text/markdown`, `text/x-markdown`, or Markdown-shaped `text/plain` may produce `CanvasTableImportSource` |
+| Origin | Markdown tables use source `format: 'text-markdown'` so consumers can distinguish CSV/TSV/HTML origins |
+| Table block | The parser extracts the first pipe table block with header row, separator row, and at least one body row; surrounding prose is ignored |
+| Cell text | Escaped pipes stay inside a cell; inline code, bold/italic markers, and Markdown links normalize to plain cell text |
+| Priority | TSV, CSV, and HTML table sources keep priority over Markdown table text |
+| Runtime | Host table models own final row validation, sizing, component creation, persistence, and export mapping |
+
 ## Layer / Concept / Role
 
 | Layer | Concept | Role |
@@ -131,7 +142,7 @@
 | `src/canvas/app/feature-packs/shortcut-help` | Shortcut help item projection, grouping, overlay view를 폴더째 설치형 pack으로 제공한다 |
 | `src/canvas/app/feature-packs/stamp-authoring` | Reaction stamp catalog, controls, insertion, voting quota hook integration을 폴더째 설치형 pack으로 제공한다 |
 | `src/canvas/app/feature-packs/status-bar` | Gesture/tool status projection과 selection count view를 폴더째 설치형 pack으로 제공한다 |
-| `src/canvas/app/feature-packs/table-import` | CSV/TSV paste/drop/file import, table insert position, table component creation request를 폴더째 설치형 pack으로 제공한다 |
+| `src/canvas/app/feature-packs/table-import` | CSV/TSV/Markdown/HTML paste/drop/file import, table insert position, table component creation request를 폴더째 설치형 pack으로 제공한다 |
 | `src/canvas/app/feature-packs/text-paste-import` | Plain/HTML/Markdown text paste sources, unordered/ordered rich text list metadata, importer contract, item creation, paste DOM listener를 폴더째 설치형 pack으로 제공한다 |
 | `src/canvas/app/feature-packs/toolbar` | Toolbar, context command menu, selection floating bar, command/tool item grammar와 dispatch를 폴더째 설치형 pack으로 제공한다 |
 | `src/canvas/app/feature-packs/zoom-controls` | Zoom in/out/reset/fit command overlay view를 폴더째 설치형 pack으로 제공한다 |

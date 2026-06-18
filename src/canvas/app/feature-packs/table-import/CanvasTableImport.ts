@@ -300,6 +300,17 @@ export function getCanvasTableSourceFromDataTransfer(
     return htmlSource
   }
 
+  const markdownText =
+    dataTransfer.getData('text/markdown') ||
+    dataTransfer.getData('text/x-markdown')
+  const markdownSource = getCanvasTableSourceFromText(markdownText, {
+    format: 'text-markdown',
+  })
+
+  if (markdownSource) {
+    return markdownSource
+  }
+
   return getCanvasTableSourceFromText(dataTransfer.getData('text/plain'), {
     format: getCanvasTablePlainTextImportFormat(
       dataTransfer.getData('text/plain'),
@@ -532,11 +543,7 @@ function getCanvasTablePlainTextImportFormat(
 }
 
 function isCanvasMarkdownTableText(text: string) {
-  return text
-    .trim()
-    .split(/\r?\n/)
-    .filter((line) => line.trim().length > 0)
-    .some((line) => line.includes('|'))
+  return parseCanvasMarkdownTableRows(text).length > 0
 }
 
 function parseCanvasMarkdownTableRows(text: string) {
@@ -545,33 +552,123 @@ function parseCanvasMarkdownTableRows(text: string) {
     .split(/\r?\n/)
     .map((line) => line.trim())
     .filter((line) => line.length > 0)
-  const rows: string[][] = []
 
-  for (const line of lines) {
-    if (!line.includes('|')) {
-      return []
+  for (let index = 1; index < lines.length; index += 1) {
+    const dividerCells = parseCanvasMarkdownTableRowCells(lines[index] ?? '')
+
+    if (!isCanvasMarkdownTableDividerRow(dividerCells)) {
+      continue
     }
 
-    const cells = line
-      .replace(/^\|/, '')
-      .replace(/\|$/, '')
-      .split('|')
-      .map((cell) => cell.trim())
+    const headerCells = parseCanvasMarkdownTableRowCells(lines[index - 1] ?? '')
 
-    if (cells.length < 2) {
-      return []
+    if (headerCells.length < 2) {
+      continue
     }
 
-    if (!isCanvasMarkdownTableDividerRow(cells)) {
-      rows.push(cells)
+    const rows = [headerCells]
+
+    for (let rowIndex = index + 1; rowIndex < lines.length; rowIndex += 1) {
+      const rowCells = parseCanvasMarkdownTableRowCells(lines[rowIndex] ?? '')
+
+      if (rowCells.length < 2 || isCanvasMarkdownTableDividerRow(rowCells)) {
+        break
+      }
+
+      rows.push(rowCells)
     }
+
+    return rows.length > 1 ? rows : []
   }
 
-  return rows
+  return []
+}
+
+function parseCanvasMarkdownTableRowCells(line: string) {
+  const trimmedLine = line.trim()
+
+  if (!trimmedLine.includes('|')) {
+    return []
+  }
+
+  const rowText = trimCanvasMarkdownTableOuterPipes(trimmedLine)
+  const cells: string[] = []
+  let cell = ''
+  let isEscaped = false
+  let isInlineCode = false
+
+  for (let index = 0; index < rowText.length; index += 1) {
+    const char = rowText[index] ?? ''
+
+    if (isEscaped) {
+      cell += char
+      isEscaped = false
+      continue
+    }
+
+    if (char === '\\') {
+      const nextChar = rowText[index + 1]
+
+      if (nextChar === '|' || nextChar === '\\') {
+        isEscaped = true
+        continue
+      }
+
+      cell += char
+      continue
+    }
+
+    if (char === '`') {
+      isInlineCode = !isInlineCode
+      cell += char
+      continue
+    }
+
+    if (char === '|' && !isInlineCode) {
+      cells.push(normalizeCanvasMarkdownTableCellText(cell))
+      cell = ''
+      continue
+    }
+
+    cell += char
+  }
+
+  cells.push(normalizeCanvasMarkdownTableCellText(cell))
+
+  return cells
+}
+
+function trimCanvasMarkdownTableOuterPipes(line: string) {
+  let start = 0
+  let end = line.length
+
+  if (line[start] === '|') {
+    start += 1
+  }
+
+  if (line[end - 1] === '|' && line[end - 2] !== '\\') {
+    end -= 1
+  }
+
+  return line.slice(start, end)
+}
+
+function normalizeCanvasMarkdownTableCellText(value: string) {
+  return value
+    .trim()
+    .replace(/`([^`]+)`/g, '$1')
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .replace(/\*\*([^*]+)\*\*/g, '$1')
+    .replace(/__([^_]+)__/g, '$1')
+    .replace(/\*([^*]+)\*/g, '$1')
+    .replace(/_([^_]+)_/g, '$1')
+    .replace(/\s+/g, ' ')
+    .trim()
 }
 
 function isCanvasMarkdownTableDividerRow(cells: readonly string[]) {
-  return cells.every((cell) => /^:?-{3,}:?$/.test(cell.trim()))
+  return cells.length >= 2 &&
+    cells.every((cell) => /^:?-{3,}:?$/.test(cell.trim()))
 }
 
 function parseCanvasDelimitedRows(text: string, delimiter: string) {

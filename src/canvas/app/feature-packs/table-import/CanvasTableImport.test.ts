@@ -151,6 +151,56 @@ describe('CanvasTableImport', () => {
         ['Users', '42'],
       ],
     })
+    expect(getCanvasTableSourceFromDataTransfer({
+      getData: vi.fn((type: string) =>
+        type === 'text/markdown'
+          ? '| Phase | Owner |\n| --- | --- |\n| Import | Mina |'
+          : '',
+      ),
+    } as unknown as DataTransfer)).toEqual({
+      format: 'text-markdown',
+      rows: [
+        ['Phase', 'Owner'],
+        ['Import', 'Mina'],
+      ],
+    })
+  })
+
+  it('extracts a Markdown table block from surrounding text and normalizes cell text', () => {
+    expect(getCanvasTableSourceFromText([
+      'The table below should be imported.',
+      '',
+      '| Name | Notes | Link |',
+      '| --- | --- | --- |',
+      '| Alpha\\|Beta | `x|y` | [Docs](https://example.com) |',
+      '| **Bold** | _Italic_ | Plain |',
+      '| C:\\Temp | [Local](/guide) | Plain |',
+      '',
+      'Ignore this trailing paragraph.',
+    ].join('\n'), {
+      format: 'text-markdown',
+    })).toEqual({
+      format: 'text-markdown',
+      rows: [
+        ['Name', 'Notes', 'Link'],
+        ['Alpha|Beta', 'x|y', 'Docs'],
+        ['Bold', 'Italic', 'Plain'],
+        ['C:\\Temp', 'Local', 'Plain'],
+      ],
+    })
+  })
+
+  it('does not treat non-table pipe text as a Markdown table source', () => {
+    expect(getCanvasTableSourceFromText('Alpha | Beta', {
+      format: 'text-markdown',
+    })).toBeNull()
+    expect(getCanvasTableSourceFromDataTransfer({
+      getData: vi.fn((type: string) =>
+        type === 'text/plain'
+          ? 'Alpha | Beta'
+          : '',
+      ),
+    } as unknown as DataTransfer)).toBeNull()
   })
 
   it('ignores HTML that is not a useful table', () => {
