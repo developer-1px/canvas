@@ -59,6 +59,7 @@ import {
   getFigmaCloneDomText,
   getFigmaCloneDomNodeDepth,
   getFigmaCloneDomRootId,
+  listFigmaCloneDomComponentDefinitions,
   listFigmaCloneStoryImports,
   listFigmaCloneDomComponentSets,
   updateFigmaCloneDomComponentAutoLayoutField,
@@ -147,6 +148,8 @@ const FIGMA_CLONE_LAYER_TREE_BUTTON_SELECTOR =
 const FIGMA_CLONE_WIDGET_FRAME_ITEM_ID = 'figma-widget-frame'
 
 const FIGMA_CLONE_ITEMS = createFigmaCloneCanvasItems()
+const FIGMA_CLONE_DOM_COMPONENT_DEFINITIONS =
+  listFigmaCloneDomComponentDefinitions()
 const FIGMA_CLONE_DOM_COMPONENT_SETS = listFigmaCloneDomComponentSets()
 const FIGMA_CLONE_STORY_IMPORTS = listFigmaCloneStoryImports()
 const FIGMA_CLONE_COMPONENT_SOURCE_ORDER = [
@@ -466,6 +469,7 @@ export function FigmaCloneApp() {
   const assemblyInput = useMemo<CanvasAppAssemblyInput>(() => ({
     affordanceConfig: FIGMA_CLONE_AFFORDANCE_CONFIG,
     capabilities: CANVAS_APP_READ_ONLY_CAPABILITIES,
+    componentDefinitions: FIGMA_CLONE_DOM_COMPONENT_DEFINITIONS,
     // eslint-disable-next-line react-hooks/refs
     customItemModules: createFigmaCloneCanvasModules({
       isSectionSelected,

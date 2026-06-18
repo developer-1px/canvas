@@ -236,7 +236,7 @@ type FigmaCloneDomComponentInstance = {
   slots: Record<string, FigmaCloneDomNodeId>
 }
 
-type FigmaCloneDomComponentDefinition = {
+export type FigmaCloneDomComponentDefinition = {
   id: FigmaCloneDomComponentId
   instances: readonly FigmaCloneDomComponentInstance[]
   label: string
@@ -2540,6 +2540,11 @@ export function isFigmaCloneDomComponentRootNode(
 ): boolean {
   return FIGMA_CLONE_DOM_COMPONENT_DEFINITIONS.some((definition) =>
     definition.instances.some((instance) => instance.slots.root === nodeId))
+}
+
+export function listFigmaCloneDomComponentDefinitions():
+  readonly FigmaCloneDomComponentDefinition[] {
+  return FIGMA_CLONE_DOM_COMPONENT_DEFINITIONS
 }
 
 export function listFigmaCloneDomComponentSets():

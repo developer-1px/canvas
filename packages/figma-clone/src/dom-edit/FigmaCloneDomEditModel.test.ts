@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { createCanvasComponentDefinitionRegistry } from '../../../../src/canvas/host'
 import { getFigmaCloneDomOverlayVisibility } from './overlay'
 import {
   canFigmaCloneDomNodeEditText,
@@ -12,6 +13,7 @@ import {
   getFigmaCloneDomText,
   getFigmaCloneDomToggledAxisSizeMode,
   isFigmaCloneDomComponentRootNode,
+  listFigmaCloneDomComponentDefinitions,
   listFigmaCloneDomComponentSets,
   listFigmaCloneStoryImports,
   updateFigmaCloneDomAutoLayoutField,
@@ -155,6 +157,30 @@ describe('FigmaCloneDomEditModel', () => {
         source: 'shared',
         variants: ['Byline', 'Category', 'Reading time'],
       },
+    ])
+  })
+
+  it('adapts component definitions to the canvas component registry contract', () => {
+    const registry = createCanvasComponentDefinitionRegistry({
+      definitions: listFigmaCloneDomComponentDefinitions(),
+    })
+
+    expect(registry.getBinding('workspaceStatRevenueValue')).toMatchObject({
+      componentId: 'workspace-stat-card',
+      componentLabel: 'Stat card',
+      instanceCount: 3,
+      instanceLabel: 'Revenue',
+      slotId: 'value',
+    })
+    expect(registry.getSyncItemIds('workspaceStatRevenueValue')).toEqual([
+      'workspaceStatRevenueValue',
+      'workspaceStatConversionValue',
+      'workspaceStatTicketsValue',
+    ])
+    expect(registry.listSets().map((componentSet) => componentSet.id)).toEqual([
+      'workspace-stat-card',
+      'workspace-deal-row',
+      'home-meta-card',
     ])
   })
 
