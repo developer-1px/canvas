@@ -25,6 +25,11 @@ describe('CanvasAppFeaturePackActions', () => {
       enabled: true,
       featurePackId: 'overlay-pack',
       installed: true,
+      listing: {
+        access: 'free',
+        distribution: 'available',
+        featurePackId: 'overlay-pack',
+      },
       primaryActionKind: 'disable',
       status: 'enabled',
     })
@@ -82,6 +87,13 @@ describe('CanvasAppFeaturePackActions', () => {
     })
 
     const item = getCanvasAppFeaturePackMarketplaceActionModel({
+      listings: [{
+        access: 'paid',
+        distribution: 'available',
+        featurePackId: 'command-pack',
+        priceLabel: '$9/mo',
+        vendor: 'Interactive OS',
+      }],
       manifests: [manifest],
       options: {
         featurePackStates: [{
@@ -94,6 +106,13 @@ describe('CanvasAppFeaturePackActions', () => {
     expect(item).toMatchObject({
       enabled: false,
       installed: false,
+      listing: {
+        access: 'paid',
+        distribution: 'available',
+        featurePackId: 'command-pack',
+        priceLabel: '$9/mo',
+        vendor: 'Interactive OS',
+      },
       primaryActionKind: 'install',
       status: 'uninstalled',
     })

@@ -8,6 +8,9 @@ import {
   type CanvasAppFeaturePackManifestInstallOptions,
 } from './CanvasAppFeaturePackManifests'
 import {
+  type CanvasAppFeaturePackMarketplaceListingInput,
+} from './CanvasAppFeaturePackMarketplaceListings'
+import {
   getCanvasAppFeaturePackProfileMarketplaceActionModel,
   type CanvasAppFeaturePackProfileMarketplaceActionItem,
   type CanvasAppFeaturePackProfileMarketplaceActionModel,
@@ -64,11 +67,13 @@ export type CanvasAppFeaturePackMarketplacePackSection = Readonly<{
 }>
 
 export function getCanvasAppFeaturePackMarketplaceModel({
+  listings = [],
   manifests,
   options = {},
   profiles = DEFAULT_CANVAS_APP_FEATURE_PACK_PROFILES,
   suiteManifests = DEFAULT_CANVAS_APP_FEATURE_PACK_SUITE_MANIFESTS,
 }: {
+  listings?: readonly CanvasAppFeaturePackMarketplaceListingInput[]
   manifests: readonly CanvasAppFeaturePackManifest[]
   options?: CanvasAppFeaturePackManifestInstallOptions
   profiles?: readonly CanvasAppFeaturePackProfile[]
@@ -85,6 +90,7 @@ export function getCanvasAppFeaturePackMarketplaceModel({
     suiteManifests,
   })
   const packActions = getCanvasAppFeaturePackMarketplaceActionModel({
+    listings,
     manifests,
     options,
   })

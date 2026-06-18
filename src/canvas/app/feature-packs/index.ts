@@ -73,6 +73,14 @@ export {
   type CanvasAppFeaturePackMarketplaceSuiteSection,
 } from './CanvasAppFeaturePackMarketplace'
 export {
+  createCanvasAppFeaturePackMarketplaceListing,
+  getCanvasAppFeaturePackMarketplaceListingMap,
+  type CanvasAppFeaturePackMarketplaceListing,
+  type CanvasAppFeaturePackMarketplaceListingAccess,
+  type CanvasAppFeaturePackMarketplaceListingDistribution,
+  type CanvasAppFeaturePackMarketplaceListingInput,
+} from './CanvasAppFeaturePackMarketplaceListings'
+export {
   getCanvasAppFeaturePackProfileMarketplaceActionModel,
   type CanvasAppFeaturePackProfileMarketplaceAction,
   type CanvasAppFeaturePackProfileMarketplaceActionItem,

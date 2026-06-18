@@ -59,6 +59,12 @@ describe('CanvasAppFeaturePackMarketplace', () => {
     })
 
     const model = getCanvasAppFeaturePackMarketplaceModel({
+      listings: [{
+        access: 'private',
+        distribution: 'available',
+        featurePackId: 'addon-pack',
+        vendor: 'Internal',
+      }],
       manifests: [runtimeManifest, addonManifest],
       options: {
         featurePackStates: [{
@@ -80,6 +86,13 @@ describe('CanvasAppFeaturePackMarketplace', () => {
     ])
     expect(model.suites.items[0]?.status).toBe('partial')
     expect(model.packs.items[1]?.status).toBe('uninstalled')
+    expect(model.packs.items[1]?.listing).toEqual({
+      access: 'private',
+      distribution: 'available',
+      featurePackId: 'addon-pack',
+      priceLabel: undefined,
+      vendor: 'Internal',
+    })
     expect(model.profiles.items[0]?.actions[0]?.installOptions).toEqual({
       featurePackStates: [
         {

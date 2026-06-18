@@ -29,6 +29,7 @@ import {
   createCanvasAppFeaturePack,
   createCanvasAppFeaturePackExtensionBundle,
   createCanvasAppFeaturePackManifest,
+  createCanvasAppFeaturePackMarketplaceListing,
   createCanvasAppFeaturePackViewRenderers,
   createCanvasAppViewFeaturePack,
   createCanvasStoryPreviewItemsFeaturePackManifest,
@@ -81,6 +82,7 @@ import {
   getCanvasAppFeaturePackSuiteMarketplaceActionModel,
   getCanvasAppFeaturePackCatalog,
   getCanvasAppFeaturePackInstallPlan,
+  getCanvasAppFeaturePackMarketplaceListingMap,
   getCanvasAppFeaturePackPartialUpdatePlan,
   getCanvasAppFeaturePackStateTransitionPlan,
   getCanvasAppFeaturePackSuiteFeaturePackIds,
@@ -120,6 +122,7 @@ import {
   type CanvasAppFeaturePack,
   type CanvasAppFeaturePackMarketplaceActionModel,
   type CanvasAppFeaturePackMarketplaceModel,
+  type CanvasAppFeaturePackMarketplaceListing,
   type CanvasAppFeaturePackProfileMarketplaceActionModel,
   type CanvasAppFeaturePackSuiteMarketplaceActionModel,
   type CanvasAppFeaturePackCatalog,
@@ -443,6 +446,14 @@ describe('Canvas package consumer imports', () => {
         installedFeaturePackIds: ['smoke-partial-pack'],
         label: 'Smoke partial profile',
       })
+    const partialUpdateListing: CanvasAppFeaturePackMarketplaceListing =
+      createCanvasAppFeaturePackMarketplaceListing({
+        access: 'paid',
+        distribution: 'available',
+        featurePackId: 'smoke-partial-pack',
+        priceLabel: '$9/mo',
+        vendor: 'Interactive OS',
+      })
     const aiLabsManifest = createCanvasAppAiLabsFeaturePackManifest({
       provider: {
         complete: () => ({ text: 'Summary' }),
@@ -491,9 +502,15 @@ describe('Canvas package consumer imports', () => {
         })
     const featurePackMarketplaceModel: CanvasAppFeaturePackMarketplaceModel =
       getCanvasAppFeaturePackMarketplaceModel({
+        listings: [partialUpdateListing],
         manifests: [partialUpdateManifest],
         profiles: [partialUpdateProfile],
         suiteManifests: [partialUpdateSuiteManifest],
+      })
+    const featurePackMarketplaceListingMap =
+      getCanvasAppFeaturePackMarketplaceListingMap({
+        listings: [partialUpdateListing],
+        manifests: [partialUpdateManifest],
       })
     const featurePackProfileMarketplaceActionModel:
       CanvasAppFeaturePackProfileMarketplaceActionModel =
@@ -980,8 +997,17 @@ describe('Canvas package consumer imports', () => {
         'suites',
         'packs',
       ])
+    expect(featurePackMarketplaceListingMap.get('smoke-partial-pack'))
+      .toEqual(partialUpdateListing)
     expect(featurePackMarketplaceModel.packs.items[0]?.featurePackId)
       .toBe('smoke-partial-pack')
+    expect(featurePackMarketplaceModel.packs.items[0]?.listing).toEqual({
+      access: 'paid',
+      distribution: 'available',
+      featurePackId: 'smoke-partial-pack',
+      priceLabel: '$9/mo',
+      vendor: 'Interactive OS',
+    })
     expect(featurePackProfileMarketplaceActionModel.items[0]?.profileId)
       .toBe('smoke-partial-profile')
     expect(featurePackProfileMarketplaceActionModel.items[0]?.primaryActionKind)
@@ -1402,6 +1428,18 @@ describe('Canvas package consumer imports', () => {
     expect(CanvasAppFacade.getCanvasAppFeaturePackMarketplaceModel)
       .toBeTypeOf('function')
     expect(CanvasPackage.getCanvasAppFeaturePackMarketplaceModel)
+      .toBeTypeOf('function')
+    expect(CanvasAppAuthoring.createCanvasAppFeaturePackMarketplaceListing)
+      .toBeTypeOf('function')
+    expect(CanvasAppFacade.createCanvasAppFeaturePackMarketplaceListing)
+      .toBeTypeOf('function')
+    expect(CanvasPackage.createCanvasAppFeaturePackMarketplaceListing)
+      .toBeTypeOf('function')
+    expect(CanvasAppAuthoring.getCanvasAppFeaturePackMarketplaceListingMap)
+      .toBeTypeOf('function')
+    expect(CanvasAppFacade.getCanvasAppFeaturePackMarketplaceListingMap)
+      .toBeTypeOf('function')
+    expect(CanvasPackage.getCanvasAppFeaturePackMarketplaceListingMap)
       .toBeTypeOf('function')
     expect(CanvasAppAuthoring.getCanvasAppFeaturePackProfileMarketplaceActionModel)
       .toBeTypeOf('function')

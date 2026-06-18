@@ -9,6 +9,11 @@ import {
   type CanvasAppFeaturePackManifestInstallOptions,
 } from './CanvasAppFeaturePackManifests'
 import {
+  getCanvasAppFeaturePackMarketplaceListingMap,
+  type CanvasAppFeaturePackMarketplaceListing,
+  type CanvasAppFeaturePackMarketplaceListingInput,
+} from './CanvasAppFeaturePackMarketplaceListings'
+import {
   applyCanvasAppFeaturePackRuntimeStatePatch,
   type CanvasAppFeaturePackInstallOptions,
   type CanvasAppFeaturePackId,
@@ -38,6 +43,7 @@ export type CanvasAppFeaturePackMarketplaceActionItem = Readonly<{
   enabled: boolean
   featurePackId: CanvasAppFeaturePackId
   installed: boolean
+  listing: CanvasAppFeaturePackMarketplaceListing
   primaryActionKind: CanvasAppFeaturePackMarketplaceActionKind
   status: CanvasAppFeaturePackRuntimeStateStatus
 }>
@@ -63,18 +69,28 @@ const CANVAS_APP_FEATURE_PACK_MARKETPLACE_ACTION_KINDS = Object.freeze([
 ] as const satisfies readonly CanvasAppFeaturePackMarketplaceActionKind[])
 
 export function getCanvasAppFeaturePackMarketplaceActionModel({
+  listings = [],
   manifests,
   options = {},
 }: {
+  listings?: readonly CanvasAppFeaturePackMarketplaceListingInput[]
   manifests: readonly CanvasAppFeaturePackManifest[]
   options?: CanvasAppFeaturePackManifestInstallOptions
 }): CanvasAppFeaturePackMarketplaceActionModel {
   const catalog = getCanvasAppFeaturePackCatalog(manifests, options)
+  const listingById = getCanvasAppFeaturePackMarketplaceListingMap({
+    listings,
+    manifests,
+  })
 
   return Object.freeze({
     items: Object.freeze(catalog.items.map((catalogItem) =>
       getCanvasAppFeaturePackMarketplaceActionItem({
         catalogItem,
+        listing: getCanvasAppFeaturePackMarketplaceActionListing({
+          catalogItemId: catalogItem.id,
+          listingById,
+        }),
         manifests,
         options,
       }),
@@ -84,10 +100,12 @@ export function getCanvasAppFeaturePackMarketplaceActionModel({
 
 function getCanvasAppFeaturePackMarketplaceActionItem({
   catalogItem,
+  listing,
   manifests,
   options,
 }: {
   catalogItem: CanvasAppFeaturePackCatalogItem
+  listing: CanvasAppFeaturePackMarketplaceListing
   manifests: readonly CanvasAppFeaturePackManifest[]
   options: CanvasAppFeaturePackManifestInstallOptions
 }): CanvasAppFeaturePackMarketplaceActionItem {
@@ -105,10 +123,32 @@ function getCanvasAppFeaturePackMarketplaceActionItem({
     enabled: catalogItem.enabled,
     featurePackId: catalogItem.id,
     installed: catalogItem.installed,
+    listing,
     primaryActionKind:
       getCanvasAppFeaturePackMarketplacePrimaryActionKind(catalogItem),
     status: catalogItem.status,
   })
+}
+
+function getCanvasAppFeaturePackMarketplaceActionListing({
+  catalogItemId,
+  listingById,
+}: {
+  catalogItemId: CanvasAppFeaturePackId
+  listingById: ReadonlyMap<
+    CanvasAppFeaturePackId,
+    CanvasAppFeaturePackMarketplaceListing
+  >
+}): CanvasAppFeaturePackMarketplaceListing {
+  const listing = listingById.get(catalogItemId)
+
+  if (!listing) {
+    throw new Error(
+      `Missing canvas app feature pack marketplace listing: ${catalogItemId}`,
+    )
+  }
+
+  return listing
 }
 
 function getCanvasAppFeaturePackMarketplaceAction({
