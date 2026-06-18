@@ -641,6 +641,11 @@ export type CanvasAppFeaturePackMarketplaceAssemblyApplyTransactionResult<
       TResult
     >
   model: CanvasAppFeaturePackMarketplaceAssemblyModel
+  runtimeStatePatch:
+    CanvasAppFeaturePackMarketplaceAssemblyApplyRuntimeStatePatchResult<
+      TEffect,
+      TResult
+    >
   status: CanvasAppFeaturePackMarketplaceAssemblyApplyCommitResultStatus
   summary: CanvasAppFeaturePackMarketplaceAssemblyApplyExecutionSummary
   updateMode: CanvasAppFeaturePackMarketplaceAssemblyApplyUpdateMode
@@ -1253,6 +1258,10 @@ export async function executeCanvasAppFeaturePackMarketplaceAssemblyApplyTransac
     getCanvasAppFeaturePackMarketplaceAssemblyApplyCommitResult({
       commitPlan,
     })
+  const runtimeStatePatch =
+    getCanvasAppFeaturePackMarketplaceAssemblyApplyRuntimeStatePatch({
+      commitResult,
+    })
 
   return Object.freeze({
     action,
@@ -1263,6 +1272,7 @@ export async function executeCanvasAppFeaturePackMarketplaceAssemblyApplyTransac
     executionPlan,
     executionResult,
     model,
+    runtimeStatePatch,
     status: commitResult.status,
     summary: commitPlan.summary,
     updateMode: commitPlan.updateMode,

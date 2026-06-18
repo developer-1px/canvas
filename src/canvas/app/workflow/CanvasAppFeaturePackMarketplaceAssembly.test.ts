@@ -653,6 +653,13 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
         committed: true,
         status: 'committed',
       },
+      runtimeStatePatch: {
+        patch: {
+          changedFeaturePackIds: ['addon-pack'],
+        },
+        patched: true,
+        status: 'patched',
+      },
       status: 'committed',
       summary: {
         status: 'completed',
@@ -686,6 +693,16 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
       transactionResult.applyResult.nextModel,
     )
     expect(transactionCleanupExecutions).toEqual(['addon-data'])
+    expect(transactionResult.runtimeStatePatch.commitResult)
+      .toBe(transactionResult.commitResult)
+    if (!transactionResult.runtimeStatePatch.patched) {
+      throw new Error('Expected transaction runtime state patch')
+    }
+    expect(transactionResult.runtimeStatePatch.nextFeaturePackStates)
+      .toEqual([{
+        id: 'addon-pack',
+        status: 'uninstalled',
+      }])
     expect(getCanvasAppFeaturePackMarketplaceAssemblyApplyRuntimeStatePatch({
       commitResult: transactionResult.commitResult,
     })).toMatchObject({
@@ -823,6 +840,12 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
       executionResult: {
         status: 'needs-cleanup-handler',
       },
+      runtimeStatePatch: {
+        holdReason: 'needs-cleanup-handler',
+        patch: null,
+        patched: false,
+        status: 'held',
+      },
       status: 'held',
       summary: {
         status: 'needs-cleanup-handler',
@@ -832,6 +855,12 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
     expect(needsHandlerTransactionResult.commitResult.commitPlan).toBe(
       needsHandlerTransactionResult.commitPlan,
     )
+    expect(needsHandlerTransactionResult.runtimeStatePatch.commitResult)
+      .toBe(needsHandlerTransactionResult.commitResult)
+    expect(
+      'nextFeaturePackStates' in
+        needsHandlerTransactionResult.runtimeStatePatch,
+    ).toBe(false)
     expect('nextModel' in needsHandlerTransactionResult.commitResult).toBe(
       false,
     )
@@ -1416,6 +1445,12 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
       executionResult: {
         status: 'blocked',
       },
+      runtimeStatePatch: {
+        holdReason: 'blocked',
+        patch: null,
+        patched: false,
+        status: 'held',
+      },
       status: 'held',
       summary: {
         cleanup: {
@@ -1431,6 +1466,11 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
     expect(blockedTransactionResult.commitResult.commitPlan).toBe(
       blockedTransactionResult.commitPlan,
     )
+    expect(blockedTransactionResult.runtimeStatePatch.commitResult)
+      .toBe(blockedTransactionResult.commitResult)
+    expect(
+      'nextFeaturePackStates' in blockedTransactionResult.runtimeStatePatch,
+    ).toBe(false)
     expect('nextModel' in blockedTransactionResult.commitResult).toBe(false)
   })
 

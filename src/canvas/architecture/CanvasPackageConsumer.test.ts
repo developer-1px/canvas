@@ -2102,6 +2102,23 @@ describe('Canvas package consumer imports', () => {
       .toBe('committed')
     expect(featurePackMarketplaceAssemblyApplyTransactionResult.commitResult
       .committed).toBe(true)
+    expect(featurePackMarketplaceAssemblyApplyTransactionResult
+      .runtimeStatePatch.status).toBe('patched')
+    expect(featurePackMarketplaceAssemblyApplyTransactionResult
+      .runtimeStatePatch.patched).toBe(true)
+    expect(featurePackMarketplaceAssemblyApplyTransactionResult
+      .runtimeStatePatch.commitResult)
+      .toBe(featurePackMarketplaceAssemblyApplyTransactionResult.commitResult)
+    if (
+      !featurePackMarketplaceAssemblyApplyTransactionResult
+        .runtimeStatePatch.patched
+    ) {
+      throw new Error('Expected transaction runtime state patch')
+    }
+
+    expect(featurePackMarketplaceAssemblyApplyTransactionResult
+      .runtimeStatePatch.patch.changedFeaturePackIds)
+      .toEqual(['smoke-partial-pack'])
     expect(featurePackMarketplaceAssemblyApplyTransactionResult.summary.status)
       .toBe('completed')
     expect(CanvasPackage.executeCanvasAppFeaturePackMarketplaceAssemblyApplyTransaction)
