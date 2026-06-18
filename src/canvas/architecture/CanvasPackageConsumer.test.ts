@@ -78,6 +78,7 @@ import {
   getCanvasAppFeaturePackProfileRuntimeStates,
   getCanvasAppFeaturePackMarketplaceActionModel,
   getCanvasAppFeaturePackMarketplaceModel,
+  getCanvasAppFeaturePackMarketplacePrimaryAction,
   getCanvasAppFeaturePackMarketplaceSectionFacetItems,
   getCanvasAppFeaturePackProfileMarketplaceActionModel,
   getCanvasAppFeaturePackSuiteMarketplaceActionModel,
@@ -126,6 +127,7 @@ import {
   type CanvasAppFeaturePackMarketplacePackSectionFacetKind,
   type CanvasAppFeaturePackMarketplacePackSectionFacetItemsInput,
   type CanvasAppFeaturePackMarketplacePackSectionSummary,
+  type CanvasAppFeaturePackMarketplacePrimaryAction,
   type CanvasAppFeaturePackMarketplaceListing,
   type CanvasAppFeaturePackMarketplaceListingEntitlement,
   type CanvasAppFeaturePackProfileMarketplaceActionModel,
@@ -535,6 +537,11 @@ describe('Canvas package consumer imports', () => {
       getCanvasAppFeaturePackMarketplaceSectionFacetItems(
         featurePackMarketplaceReadyPackFacetInput,
       )
+    const featurePackMarketplacePrimaryAction:
+      CanvasAppFeaturePackMarketplacePrimaryAction =
+        getCanvasAppFeaturePackMarketplacePrimaryAction(
+          featurePackMarketplaceModel.packs.items[0]!,
+        )
     const featurePackMarketplaceListingMap =
       getCanvasAppFeaturePackMarketplaceListingMap({
         listings: [partialUpdateListing],
@@ -1068,6 +1075,13 @@ describe('Canvas package consumer imports', () => {
     expect(featurePackMarketplaceReadyPackFacetItems.map(
       (item) => item.featurePackId,
     )).toEqual(['smoke-partial-pack'])
+    expect(featurePackMarketplacePrimaryAction.kind).toBe('disable')
+    expect(featurePackMarketplacePrimaryAction.installOptions).toEqual({
+      featurePackStates: [{
+        id: 'smoke-partial-pack',
+        status: 'disabled',
+      }],
+    })
     expect(featurePackProfileMarketplaceActionModel.items[0]?.profileId)
       .toBe('smoke-partial-profile')
     expect(featurePackProfileMarketplaceActionModel.items[0]?.primaryActionKind)
@@ -1488,6 +1502,18 @@ describe('Canvas package consumer imports', () => {
     expect(CanvasAppFacade.getCanvasAppFeaturePackMarketplaceModel)
       .toBeTypeOf('function')
     expect(CanvasPackage.getCanvasAppFeaturePackMarketplaceModel)
+      .toBeTypeOf('function')
+    expect(CanvasAppAuthoring.getCanvasAppFeaturePackMarketplacePrimaryAction)
+      .toBeTypeOf('function')
+    expect(CanvasAppFacade.getCanvasAppFeaturePackMarketplacePrimaryAction)
+      .toBeTypeOf('function')
+    expect(CanvasPackage.getCanvasAppFeaturePackMarketplacePrimaryAction)
+      .toBeTypeOf('function')
+    expect(CanvasAppAuthoring.getCanvasAppFeaturePackMarketplaceSectionFacetItems)
+      .toBeTypeOf('function')
+    expect(CanvasAppFacade.getCanvasAppFeaturePackMarketplaceSectionFacetItems)
+      .toBeTypeOf('function')
+    expect(CanvasPackage.getCanvasAppFeaturePackMarketplaceSectionFacetItems)
       .toBeTypeOf('function')
     expect(CanvasAppAuthoring.createCanvasAppFeaturePackMarketplaceListing)
       .toBeTypeOf('function')

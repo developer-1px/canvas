@@ -65,8 +65,10 @@ export {
 } from './CanvasAppFeaturePackActions'
 export {
   getCanvasAppFeaturePackMarketplaceModel,
+  getCanvasAppFeaturePackMarketplacePrimaryAction,
   getCanvasAppFeaturePackMarketplaceSectionFacetItems,
   type CanvasAppFeaturePackMarketplaceActionSectionSummary,
+  type CanvasAppFeaturePackMarketplaceItem,
   type CanvasAppFeaturePackMarketplaceModel,
   type CanvasAppFeaturePackMarketplacePackSection,
   type CanvasAppFeaturePackMarketplacePackSectionFacetKind,
@@ -76,6 +78,7 @@ export {
   type CanvasAppFeaturePackMarketplaceProfileSectionFacetKind,
   type CanvasAppFeaturePackMarketplaceProfileSectionFacetItemsInput,
   type CanvasAppFeaturePackMarketplaceProfileSectionSummary,
+  type CanvasAppFeaturePackMarketplacePrimaryAction,
   type CanvasAppFeaturePackMarketplaceSection,
   type CanvasAppFeaturePackMarketplaceSectionFacet,
   type CanvasAppFeaturePackMarketplaceSectionFacetItems,

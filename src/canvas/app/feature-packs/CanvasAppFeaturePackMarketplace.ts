@@ -1,5 +1,6 @@
 import {
   getCanvasAppFeaturePackMarketplaceActionModel,
+  type CanvasAppFeaturePackMarketplaceAction,
   type CanvasAppFeaturePackMarketplaceActionItem,
   type CanvasAppFeaturePackMarketplaceActionModel,
 } from './CanvasAppFeaturePackActions'
@@ -12,6 +13,7 @@ import {
 } from './CanvasAppFeaturePackMarketplaceListings'
 import {
   getCanvasAppFeaturePackProfileMarketplaceActionModel,
+  type CanvasAppFeaturePackProfileMarketplaceAction,
   type CanvasAppFeaturePackProfileMarketplaceActionItem,
   type CanvasAppFeaturePackProfileMarketplaceActionModel,
 } from './CanvasAppFeaturePackProfileActions'
@@ -21,6 +23,7 @@ import {
 } from './CanvasAppFeaturePackProfiles'
 import {
   getCanvasAppFeaturePackSuiteMarketplaceActionModel,
+  type CanvasAppFeaturePackSuiteMarketplaceAction,
   type CanvasAppFeaturePackSuiteMarketplaceActionItem,
   type CanvasAppFeaturePackSuiteMarketplaceActionModel,
 } from './CanvasAppFeaturePackSuiteActions'
@@ -140,6 +143,16 @@ export type CanvasAppFeaturePackMarketplaceSectionFacetItems =
   | readonly CanvasAppFeaturePackMarketplaceActionItem[]
   | readonly CanvasAppFeaturePackProfileMarketplaceActionItem[]
   | readonly CanvasAppFeaturePackSuiteMarketplaceActionItem[]
+
+export type CanvasAppFeaturePackMarketplaceItem =
+  | CanvasAppFeaturePackMarketplaceActionItem
+  | CanvasAppFeaturePackProfileMarketplaceActionItem
+  | CanvasAppFeaturePackSuiteMarketplaceActionItem
+
+export type CanvasAppFeaturePackMarketplacePrimaryAction =
+  | CanvasAppFeaturePackMarketplaceAction
+  | CanvasAppFeaturePackProfileMarketplaceAction
+  | CanvasAppFeaturePackSuiteMarketplaceAction
 
 export type CanvasAppFeaturePackMarketplaceActionSectionSummary =
   Readonly<{
@@ -286,6 +299,31 @@ export function getCanvasAppFeaturePackMarketplaceSectionFacetItems(
   }
 
   throw new Error('Unknown canvas app feature pack marketplace section')
+}
+
+export function getCanvasAppFeaturePackMarketplacePrimaryAction(
+  item: CanvasAppFeaturePackProfileMarketplaceActionItem,
+): CanvasAppFeaturePackProfileMarketplaceAction
+export function getCanvasAppFeaturePackMarketplacePrimaryAction(
+  item: CanvasAppFeaturePackSuiteMarketplaceActionItem,
+): CanvasAppFeaturePackSuiteMarketplaceAction
+export function getCanvasAppFeaturePackMarketplacePrimaryAction(
+  item: CanvasAppFeaturePackMarketplaceActionItem,
+): CanvasAppFeaturePackMarketplaceAction
+export function getCanvasAppFeaturePackMarketplacePrimaryAction(
+  item: CanvasAppFeaturePackMarketplaceItem,
+): CanvasAppFeaturePackMarketplacePrimaryAction {
+  const action = item.actions.find((candidate) =>
+    candidate.kind === item.primaryActionKind
+  )
+
+  if (!action) {
+    throw new Error(
+      `Missing canvas app feature pack marketplace primary action: ${item.primaryActionKind}`,
+    )
+  }
+
+  return action
 }
 
 function getCanvasAppFeaturePackMarketplaceProfileSectionSummary(

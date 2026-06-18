@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  getCanvasAppFeaturePackMarketplacePrimaryAction,
   getCanvasAppFeaturePackMarketplaceSectionFacetItems,
   getCanvasAppFeaturePackMarketplaceModel,
 } from './CanvasAppFeaturePackMarketplace'
@@ -172,6 +173,30 @@ describe('CanvasAppFeaturePackMarketplace', () => {
       throw new Error('Expected packs section')
     }
 
+    const profileItem = profileSection.items[0]
+    const suiteItem = suiteSection.items[0]
+    const addonPackItem = packSection.items[1]
+
+    if (!profileItem || !suiteItem || !addonPackItem) {
+      throw new Error('Expected marketplace items')
+    }
+
+    const profilePrimaryAction =
+      getCanvasAppFeaturePackMarketplacePrimaryAction(profileItem)
+    const suitePrimaryAction =
+      getCanvasAppFeaturePackMarketplacePrimaryAction(suiteItem)
+    const addonPackPrimaryAction =
+      getCanvasAppFeaturePackMarketplacePrimaryAction(addonPackItem)
+
+    expect(profilePrimaryAction.kind).toBe('apply')
+    expect(profilePrimaryAction.status).toBe('active')
+    expect(suitePrimaryAction.kind).toBe('install')
+    expect(suitePrimaryAction.status).toBe('blocked')
+    expect(addonPackPrimaryAction.kind).toBe('install')
+    expect(addonPackPrimaryAction.status).toBe('blocked')
+    expect(addonPackPrimaryAction.marketplaceBlockedReasons.map(
+      (reason) => reason.kind,
+    )).toEqual(['marketplace-entitlement-required'])
     expect(getCanvasAppFeaturePackMarketplaceSectionFacetItems({
       facetKind: 'active',
       section: profileSection,
