@@ -497,7 +497,7 @@ function getSlideEditObjectAccessibilityWrappedPasteValue(
     )
   }
 
-  return null
+  return getSlideEditObjectAccessibilityObjectPasteValue(record, storagePolicy)
 }
 
 function getSlideEditObjectAccessibilityObjectPasteValue(

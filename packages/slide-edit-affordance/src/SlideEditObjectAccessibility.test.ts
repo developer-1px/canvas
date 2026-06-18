@@ -222,6 +222,53 @@ describe('SlideEditObjectAccessibility', () => {
     })
   })
 
+  it('reads standalone object accessibility payloads from general JSON candidates', () => {
+    expect(getSlideEditObjectAccessibilityJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'application/json': '{"altText":"Product screenshot"}',
+      }),
+    })).toEqual({
+      altText: 'Product screenshot',
+      kind: 'alt-text',
+      value: {
+        altText: 'Product screenshot',
+        decorative: false,
+      },
+    })
+    expect(getSlideEditObjectAccessibilityJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"decorative":true}',
+      }),
+    })).toEqual({
+      kind: 'decorative',
+      value: {
+        altText: '',
+        decorative: true,
+      },
+    })
+    expect(getSlideEditObjectAccessibilityJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"altText":"  Long product screenshot text  "}',
+      }),
+      storagePolicy: {
+        maxLength: 12,
+      },
+    })).toMatchObject({
+      altText: 'Long product',
+      kind: 'alt-text',
+    })
+    expect(getSlideEditObjectAccessibilityJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'application/json': '{"altText":"Bad\\u0007label"}',
+      }),
+    })).toBeNull()
+    expect(getSlideEditObjectAccessibilityJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"ariaLabel":"UI label"}',
+      }),
+    })).toBeNull()
+  })
+
   it('turns null, false, empty string, and decorative downgrade into command-ready values', () => {
     for (const payload of [
       'null',
