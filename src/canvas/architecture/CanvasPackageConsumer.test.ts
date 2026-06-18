@@ -79,6 +79,7 @@ import {
   getCanvasAppFeaturePackProfileRuntimeStates,
   getCanvasAppFeaturePackMarketplaceActionModel,
   getCanvasAppFeaturePackMarketplaceModel,
+  getCanvasAppFeaturePackMarketplacePrimaryActionDiagnostic,
   getCanvasAppFeaturePackMarketplacePrimaryAction,
   getCanvasAppFeaturePackMarketplaceSectionFacetItems,
   getCanvasAppFeaturePackProfileMarketplaceActionModel,
@@ -130,6 +131,7 @@ import {
   type CanvasAppFeaturePackMarketplacePackSectionFacetItemsInput,
   type CanvasAppFeaturePackMarketplacePackSectionSummary,
   type CanvasAppFeaturePackMarketplacePrimaryAction,
+  type CanvasAppFeaturePackMarketplacePrimaryActionDiagnostic,
   type CanvasAppFeaturePackMarketplaceListing,
   type CanvasAppFeaturePackMarketplaceListingEntitlement,
   type CanvasAppFeaturePackProfileMarketplaceActionModel,
@@ -542,6 +544,11 @@ describe('Canvas package consumer imports', () => {
     const featurePackMarketplacePrimaryAction:
       CanvasAppFeaturePackMarketplacePrimaryAction =
         getCanvasAppFeaturePackMarketplacePrimaryAction(
+          featurePackMarketplaceModel.packs.items[0]!,
+        )
+    const featurePackMarketplacePrimaryActionDiagnostic:
+      CanvasAppFeaturePackMarketplacePrimaryActionDiagnostic =
+        getCanvasAppFeaturePackMarketplacePrimaryActionDiagnostic(
           featurePackMarketplaceModel.packs.items[0]!,
         )
     const featurePackMarketplaceActionAssemblyInput:
@@ -1109,6 +1116,19 @@ describe('Canvas package consumer imports', () => {
         status: 'disabled',
       }],
     })
+    expect(featurePackMarketplacePrimaryActionDiagnostic.action)
+      .toBe(featurePackMarketplacePrimaryAction)
+    expect(featurePackMarketplacePrimaryActionDiagnostic).toMatchObject({
+      actionKind: 'disable',
+      applicable: true,
+      blockedReasonCount: 0,
+      changedFeaturePackIds: ['smoke-partial-pack'],
+      marketplaceBlockedReasonCount: 0,
+      partialUpdateSurfaceIds: ['overlay'],
+      ready: true,
+      status: 'ready',
+      totalBlockedReasonCount: 0,
+    })
     expect(featurePackMarketplaceAppliedAssemblyInput.featurePackStates)
       .toEqual([{
         id: 'smoke-partial-pack',
@@ -1546,6 +1566,12 @@ describe('Canvas package consumer imports', () => {
     expect(CanvasAppFacade.getCanvasAppFeaturePackMarketplacePrimaryAction)
       .toBeTypeOf('function')
     expect(CanvasPackage.getCanvasAppFeaturePackMarketplacePrimaryAction)
+      .toBeTypeOf('function')
+    expect(CanvasAppAuthoring.getCanvasAppFeaturePackMarketplacePrimaryActionDiagnostic)
+      .toBeTypeOf('function')
+    expect(CanvasAppFacade.getCanvasAppFeaturePackMarketplacePrimaryActionDiagnostic)
+      .toBeTypeOf('function')
+    expect(CanvasPackage.getCanvasAppFeaturePackMarketplacePrimaryActionDiagnostic)
       .toBeTypeOf('function')
     expect(CanvasAppAuthoring.getCanvasAppFeaturePackMarketplaceSectionFacetItems)
       .toBeTypeOf('function')

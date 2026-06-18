@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  getCanvasAppFeaturePackMarketplacePrimaryActionDiagnostic,
   getCanvasAppFeaturePackMarketplacePrimaryAction,
   getCanvasAppFeaturePackMarketplaceSectionFacetItems,
   getCanvasAppFeaturePackMarketplaceModel,
@@ -221,6 +222,23 @@ describe('CanvasAppFeaturePackMarketplace', () => {
     expect(addonPackPrimaryAction.marketplaceBlockedReasons.map(
       (reason) => reason.kind,
     )).toEqual(['marketplace-entitlement-required'])
+    const addonPackPrimaryActionDiagnostic =
+      getCanvasAppFeaturePackMarketplacePrimaryActionDiagnostic(addonPackItem)
+
+    expect(addonPackPrimaryActionDiagnostic.action)
+      .toBe(addonPackPrimaryAction)
+    expect(addonPackPrimaryActionDiagnostic).toMatchObject({
+      actionKind: 'install',
+      applicable: true,
+      blockedReasonCount: 0,
+      changedFeaturePackIds: ['addon-pack'],
+      marketplaceBlockedReasonCount: 1,
+      partialUpdateSurfaceIds: [],
+      ready: false,
+      status: 'blocked',
+      totalBlockedReasonCount: 1,
+    })
+    expect(Object.isFrozen(addonPackPrimaryActionDiagnostic)).toBe(true)
     expect(getCanvasAppFeaturePackMarketplaceSectionFacetItems({
       facetKind: 'active',
       section: profileSection,

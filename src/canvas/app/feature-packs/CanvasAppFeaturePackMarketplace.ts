@@ -5,6 +5,7 @@ import {
   type CanvasAppFeaturePackMarketplaceActionModel,
 } from './CanvasAppFeaturePackActions'
 import {
+  type CanvasAppFeaturePackContributionSurface,
   type CanvasAppFeaturePackManifest,
   type CanvasAppFeaturePackManifestInstallOptions,
 } from './CanvasAppFeaturePackManifests'
@@ -33,6 +34,9 @@ import {
 import {
   type CanvasAppFeaturePackSuiteManifest,
 } from './CanvasAppFeaturePackSuites'
+import {
+  type CanvasAppFeaturePackId,
+} from './CanvasAppFeaturePacks'
 
 export type CanvasAppFeaturePackMarketplaceSectionKind =
   | 'packs'
@@ -157,6 +161,26 @@ export type CanvasAppFeaturePackMarketplacePrimaryAction =
   | CanvasAppFeaturePackMarketplaceAction
   | CanvasAppFeaturePackProfileMarketplaceAction
   | CanvasAppFeaturePackSuiteMarketplaceAction
+
+export type CanvasAppFeaturePackMarketplacePrimaryActionKind =
+  CanvasAppFeaturePackMarketplacePrimaryAction['kind']
+
+export type CanvasAppFeaturePackMarketplacePrimaryActionStatus =
+  CanvasAppFeaturePackMarketplacePrimaryAction['status']
+
+export type CanvasAppFeaturePackMarketplacePrimaryActionDiagnostic =
+  Readonly<{
+    action: CanvasAppFeaturePackMarketplacePrimaryAction
+    actionKind: CanvasAppFeaturePackMarketplacePrimaryActionKind
+    applicable: boolean
+    blockedReasonCount: number
+    changedFeaturePackIds: readonly CanvasAppFeaturePackId[]
+    marketplaceBlockedReasonCount: number
+    partialUpdateSurfaceIds: readonly CanvasAppFeaturePackContributionSurface[]
+    ready: boolean
+    status: CanvasAppFeaturePackMarketplacePrimaryActionStatus
+    totalBlockedReasonCount: number
+  }>
 
 export type CanvasAppFeaturePackMarketplaceActionSectionSummary =
   Readonly<{
@@ -322,6 +346,9 @@ export function getCanvasAppFeaturePackMarketplacePrimaryAction(
 ): CanvasAppFeaturePackMarketplaceAction
 export function getCanvasAppFeaturePackMarketplacePrimaryAction(
   item: CanvasAppFeaturePackMarketplaceItem,
+): CanvasAppFeaturePackMarketplacePrimaryAction
+export function getCanvasAppFeaturePackMarketplacePrimaryAction(
+  item: CanvasAppFeaturePackMarketplaceItem,
 ): CanvasAppFeaturePackMarketplacePrimaryAction {
   const action = item.actions.find((candidate) =>
     candidate.kind === item.primaryActionKind
@@ -334,6 +361,28 @@ export function getCanvasAppFeaturePackMarketplacePrimaryAction(
   }
 
   return action
+}
+
+export function getCanvasAppFeaturePackMarketplacePrimaryActionDiagnostic(
+  item: CanvasAppFeaturePackMarketplaceItem,
+): CanvasAppFeaturePackMarketplacePrimaryActionDiagnostic {
+  const action = getCanvasAppFeaturePackMarketplacePrimaryAction(item)
+  const blockedReasonCount = action.blockedReasons.length
+  const marketplaceBlockedReasonCount = action.marketplaceBlockedReasons.length
+
+  return Object.freeze({
+    action,
+    actionKind: action.kind,
+    applicable: action.applicable,
+    blockedReasonCount,
+    changedFeaturePackIds: action.changedFeaturePackIds,
+    marketplaceBlockedReasonCount,
+    partialUpdateSurfaceIds: action.partialUpdateSurfaceIds,
+    ready: action.ready,
+    status: action.status,
+    totalBlockedReasonCount:
+      blockedReasonCount + marketplaceBlockedReasonCount,
+  })
 }
 
 function getCanvasAppFeaturePackMarketplaceProfileSectionSummary(
