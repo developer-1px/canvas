@@ -36,14 +36,24 @@ export type SlideEditObjectTransformAxisLockedMoveDelta =
 export type SlideEditObjectTransformMoveDragModifierState = {
   axisLock: boolean
   axisLockModifier: 'Shift'
+  duplicate: boolean
+  duplicateModifier: 'Alt Ctrl/Meta'
   model: 'slide-edit-object-transform-move-drag-modifiers'
 }
 
 export type SlideEditObjectTransformMoveDragModifierInput = {
   event: {
+    altKey?: boolean
+    ctrlKey?: boolean
+    metaKey?: boolean
     shiftKey?: boolean
   }
 }
+
+export type SlideEditObjectTransformMoveDragThresholdInput =
+  SlideEditObjectTransformMoveDelta & {
+    threshold?: number
+  }
 
 export type SlideEditObjectTransformSourceFields =
   Partial<Record<SlideEditObjectTransformFieldId, string>> & {
@@ -255,6 +265,8 @@ const SLIDE_EDIT_OBJECT_TRANSFORM_FIELD_KEYS = Object.freeze({
   readonly string[]
 >)
 
+export const SLIDE_EDIT_OBJECT_TRANSFORM_MOVE_DRAG_START_THRESHOLD = 4
+
 export function getSlideEditObjectTransformMoveDragModifierState({
   event,
 }: SlideEditObjectTransformMoveDragModifierInput):
@@ -262,8 +274,20 @@ export function getSlideEditObjectTransformMoveDragModifierState({
   return {
     axisLock: event.shiftKey === true,
     axisLockModifier: 'Shift',
+    duplicate: event.altKey === true ||
+      event.ctrlKey === true ||
+      event.metaKey === true,
+    duplicateModifier: 'Alt Ctrl/Meta',
     model: 'slide-edit-object-transform-move-drag-modifiers',
   }
+}
+
+export function hasSlideEditObjectTransformMoveDragExceededThreshold({
+  dx,
+  dy,
+  threshold = SLIDE_EDIT_OBJECT_TRANSFORM_MOVE_DRAG_START_THRESHOLD,
+}: SlideEditObjectTransformMoveDragThresholdInput): boolean {
+  return Math.hypot(dx, dy) > threshold
 }
 
 export function getSlideEditObjectTransformAxisLockedMoveDelta({

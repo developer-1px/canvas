@@ -9,11 +9,13 @@ import {
   getSlideEditObjectTransformJSONPasteValueFromValue,
   getSlideEditObjectTransformMoveDragModifierState,
   getSlideEditObjectTransformPasteCommandEffects,
+  hasSlideEditObjectTransformMoveDragExceededThreshold,
   normalizeSlideEditObjectTransform,
   normalizeSlideEditObjectTransformRotation,
   SLIDE_EDIT_OBJECT_TRANSFORM_JSON_MIME_TYPE,
   SLIDE_EDIT_OBJECT_TRANSFORM_JSON_TYPES,
   SLIDE_EDIT_OBJECT_TRANSFORM_JSON_WRAPPER_KEYS,
+  SLIDE_EDIT_OBJECT_TRANSFORM_MOVE_DRAG_START_THRESHOLD,
 } from './SlideEditObjectTransform'
 import {
   getSlideEditObjectTransformJSONPasteValue as getSlideEditObjectTransformJSONPasteValueFromPackage,
@@ -36,6 +38,8 @@ describe('SlideEditObjectTransform', () => {
     })).toEqual({
       axisLock: true,
       axisLockModifier: 'Shift',
+      duplicate: false,
+      duplicateModifier: 'Alt Ctrl/Meta',
       model: 'slide-edit-object-transform-move-drag-modifiers',
     })
     expect(getSlideEditObjectTransformMoveDragModifierState({
@@ -43,6 +47,52 @@ describe('SlideEditObjectTransform', () => {
         shiftKey: false,
       },
     }).axisLock).toBe(false)
+  })
+
+  it('maps Alt and Ctrl/Meta move drag to duplicate-drag modifier state', () => {
+    expect(getSlideEditObjectTransformMoveDragModifierState({
+      event: {
+        altKey: true,
+      },
+    }).duplicate).toBe(true)
+    expect(getSlideEditObjectTransformMoveDragModifierState({
+      event: {
+        ctrlKey: true,
+      },
+    })).toMatchObject({
+      duplicate: true,
+      duplicateModifier: 'Alt Ctrl/Meta',
+      model: 'slide-edit-object-transform-move-drag-modifiers',
+    })
+    expect(getSlideEditObjectTransformMoveDragModifierState({
+      event: {
+        metaKey: true,
+      },
+    }).duplicate).toBe(true)
+    expect(getSlideEditObjectTransformMoveDragModifierState({
+      event: {},
+    }).duplicate).toBe(false)
+  })
+
+  it('separates duplicate-drag start from modifier-only click by threshold', () => {
+    expect(SLIDE_EDIT_OBJECT_TRANSFORM_MOVE_DRAG_START_THRESHOLD).toBe(4)
+    expect(hasSlideEditObjectTransformMoveDragExceededThreshold({
+      dx: 3,
+      dy: 0,
+    })).toBe(false)
+    expect(hasSlideEditObjectTransformMoveDragExceededThreshold({
+      dx: 4,
+      dy: 0,
+    })).toBe(false)
+    expect(hasSlideEditObjectTransformMoveDragExceededThreshold({
+      dx: 5,
+      dy: 0,
+    })).toBe(true)
+    expect(hasSlideEditObjectTransformMoveDragExceededThreshold({
+      dx: 3,
+      dy: 4,
+      threshold: 4,
+    })).toBe(true)
   })
 
   it('locks move deltas to the dominant axis for Shift drag movement', () => {
