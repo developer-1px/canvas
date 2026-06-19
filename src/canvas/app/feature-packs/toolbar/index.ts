@@ -41,6 +41,17 @@ export {
   type RunCanvasMenuRovingKeyboardIntentInput,
 } from './CanvasMenuRovingFocus'
 export {
+  CANVAS_MENU_SURFACE_MODEL,
+  createCanvasMenuSurfaceDescriptor,
+  getCanvasMenuItemAttributes,
+  type CanvasMenuItemAttributes,
+  type CanvasMenuItemAttributesInput,
+  type CanvasMenuSeparatorAttributes,
+  type CanvasMenuSurfaceDescriptor,
+  type CanvasMenuSurfaceDescriptorInput,
+  type CanvasMenuSurfaceRootAttributes,
+} from './CanvasMenuSurfaceDescriptor'
+export {
   CANVAS_TOOLBAR_COMMAND_GROUPS,
   type CanvasToolbarCommandAction,
   type CanvasToolbarCommandDescriptor,

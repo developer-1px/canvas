@@ -6,6 +6,9 @@ import {
   renderCanvasToolbarItem,
   type CanvasToolbarItemRenderContext,
 } from './CanvasToolbarItemRenderer'
+import {
+  createCanvasMenuSurfaceDescriptor,
+} from './CanvasMenuSurfaceDescriptor'
 import { useCanvasMenuRovingFocus } from './CanvasMenuRovingFocus'
 import type { CanvasToolbarGroup } from './CanvasToolbarItems'
 
@@ -37,19 +40,23 @@ export function CanvasCommandMenuSurface({
     return null
   }
 
+  const menuDescriptor = createCanvasMenuSurfaceDescriptor({ ariaLabel })
+
   return (
     <div
       {...menuRovingFocus}
+      {...menuDescriptor.rootAttributes}
       className={className}
-      role="menu"
-      aria-label={ariaLabel}
       onClick={onClose}
       style={style}
     >
       {groups.map((group, index) => (
         <Fragment key={group.id}>
           {index > 0 ? (
-            <div className="toolbar-divider" role="separator" />
+            <div
+              className="toolbar-divider"
+              {...menuDescriptor.separatorAttributes}
+            />
           ) : null}
           {group.items.map((item) =>
             renderCanvasToolbarItem({

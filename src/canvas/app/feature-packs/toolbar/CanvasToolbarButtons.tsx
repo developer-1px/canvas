@@ -12,7 +12,7 @@ import {
   formatCanvasKeyboardShortcutAriaKey,
   type CanvasKeyboardShortcutChord,
 } from '../../affordances/interaction/keyboard/CanvasKeyboardShortcutChords'
-import { CANVAS_MENU_ITEM_PROPS } from './CanvasMenuRovingFocus'
+import { getCanvasMenuItemAttributes } from './CanvasMenuSurfaceDescriptor'
 import { CANVAS_TOOLBAR_ITEM_PROPS } from './CanvasToolbarRovingFocus'
 
 export type CanvasToolbarButtonSurface = 'menu' | 'toolbar'
@@ -108,7 +108,7 @@ export function CommandButton({
 
   return (
     <button
-      {...getCanvasToolbarButtonSurfaceProps({ surface })}
+      {...getCanvasToolbarButtonSurfaceProps({ disabled, surface })}
       type="button"
       className="tool-button"
       disabled={disabled}
@@ -142,7 +142,7 @@ export function CustomCommandButton({
 }) {
   return (
     <button
-      {...getCanvasToolbarButtonSurfaceProps({ surface })}
+      {...getCanvasToolbarButtonSurfaceProps({ disabled, surface })}
       type="button"
       className="tool-button custom-command-button"
       disabled={disabled}
@@ -157,17 +157,15 @@ export function CustomCommandButton({
 
 function getCanvasToolbarButtonSurfaceProps({
   checked,
+  disabled,
   surface,
 }: {
   checked?: boolean
+  disabled?: boolean
   surface: CanvasToolbarButtonSurface
 }) {
   if (surface === 'menu') {
-    return {
-      ...CANVAS_MENU_ITEM_PROPS,
-      role: checked === undefined ? 'menuitem' : 'menuitemcheckbox',
-      'aria-checked': checked,
-    } as const
+    return getCanvasMenuItemAttributes({ checked, disabled })
   }
 
   return CANVAS_TOOLBAR_ITEM_PROPS

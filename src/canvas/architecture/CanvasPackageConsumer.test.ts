@@ -70,6 +70,7 @@ import {
   createCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan,
   createCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan,
   createCanvasCommandPaletteListboxDescriptor,
+  createCanvasMenuSurfaceDescriptor,
   createCanvasShortcutHelpDialogDescriptor,
   createCanvasSelectionListDescriptor,
   createCanvasStoryCanvasFeaturePackAssemblyInput,
@@ -270,6 +271,7 @@ import {
   createCanvasAppHostItemsChangeCommitter,
   CANVAS_CONTEXT_MENU_DEFAULT_SIZE,
   CANVAS_MENU_FOCUS_RESTORE_MODEL,
+  CANVAS_MENU_SURFACE_MODEL,
   getCanvasFindInputKeyboardIntent,
   getCanvasFloatingAnchorForBounds,
   getCanvasFloatingAnchorSurfaceCoordinateStyle,
@@ -281,6 +283,7 @@ import {
   getCanvasContextMenuPointerIntent,
   getCanvasContextMenuPosition,
   getCanvasContextMenuPositionForClientPoint,
+  getCanvasMenuItemAttributes,
   getCanvasMenuRestoreFocusTarget,
   getCanvasModalBackdropPointerIntent,
   getCanvasModalKeyboardIntent,
@@ -540,8 +543,10 @@ import {
   type CanvasFindInputKeyboardIntentInput,
   type CanvasEraserStrokeHitTestStroke,
   type CanvasNextDrawingPointsInput,
+  type CanvasMenuItemAttributesInput,
   type CanvasMenuRovingActiveIndexInput,
   type CanvasMenuRovingKeyboardIntentInput,
+  type CanvasMenuSurfaceDescriptorInput,
   type CanvasMenuTriggerKeyboardIntentInput,
   type RunCanvasMenuRovingKeyboardIntentInput,
   type CanvasToolbarOrientation,
@@ -631,6 +636,8 @@ import {
   type CanvasCommandPaletteKeyboardIntentInput,
   type CanvasCommandPaletteKeyboardItem,
   type CanvasCommandPaletteListboxDescriptorInput,
+  type CanvasMenuItemAttributesInput as CanvasAppMenuItemAttributesInput,
+  type CanvasMenuSurfaceDescriptorInput as CanvasAppMenuSurfaceDescriptorInput,
   type CanvasShortcutHelpDialogDescriptorInput,
   type CanvasKeyboardToolHandlers,
 } from '@interactive-os/canvas/app'
@@ -4398,6 +4405,18 @@ describe('Canvas package consumer imports', () => {
           menuRovingMoveFocusCount += 1
         },
       }
+    const menuSurfaceDescriptorInput: CanvasMenuSurfaceDescriptorInput = {
+      ariaLabel: 'Package menu',
+    }
+    const appMenuSurfaceDescriptorInput: CanvasAppMenuSurfaceDescriptorInput = {
+      ariaLabel: 'App menu',
+    }
+    const menuItemAttributesInput: CanvasMenuItemAttributesInput = {
+      disabled: true,
+    }
+    const appMenuItemAttributesInput: CanvasAppMenuItemAttributesInput = {
+      checked: true,
+    }
     const tabsKeyboardInput: CanvasTabsKeyboardIntentInput<'inspector' | 'json'> = {
       currentId: 'inspector',
       key: 'ArrowRight',
@@ -5375,6 +5394,49 @@ describe('Canvas package consumer imports', () => {
     expect(menuRovingCloseCount).toBe(2)
     expect(menuRovingMoveFocusCount).toBe(0)
     expect(menuRovingActivateCount).toBe(0)
+    expect(CANVAS_MENU_SURFACE_MODEL).toBe('canvas-menu-surface')
+    expect(createCanvasMenuSurfaceDescriptor(
+      menuSurfaceDescriptorInput,
+    )).toEqual({
+      focusModel: 'enabled-menuitem-roving',
+      keyboardModel: 'arrow-left-right-up-down-home-end-enter-space-escape',
+      model: 'canvas-menu-surface',
+      rootAttributes: {
+        'aria-label': 'Package menu',
+        role: 'menu',
+      },
+      separatorAttributes: {
+        role: 'separator',
+      },
+    })
+    expect(CanvasAppFacade.createCanvasMenuSurfaceDescriptor(
+      appMenuSurfaceDescriptorInput,
+    )).toEqual({
+      focusModel: 'enabled-menuitem-roving',
+      keyboardModel: 'arrow-left-right-up-down-home-end-enter-space-escape',
+      model: 'canvas-menu-surface',
+      rootAttributes: {
+        'aria-label': 'App menu',
+        role: 'menu',
+      },
+      separatorAttributes: {
+        role: 'separator',
+      },
+    })
+    expect(getCanvasMenuItemAttributes(menuItemAttributesInput)).toEqual({
+      'aria-checked': undefined,
+      'aria-disabled': true,
+      'data-canvas-menu-item': '',
+      role: 'menuitem',
+    })
+    expect(CanvasAppFacade.getCanvasMenuItemAttributes(
+      appMenuItemAttributesInput,
+    )).toEqual({
+      'aria-checked': true,
+      'aria-disabled': undefined,
+      'data-canvas-menu-item': '',
+      role: 'menuitemcheckbox',
+    })
     expect(getCanvasTabsKeyboardIntent(tabsKeyboardInput)).toEqual({
       activate: true,
       id: 'json',
