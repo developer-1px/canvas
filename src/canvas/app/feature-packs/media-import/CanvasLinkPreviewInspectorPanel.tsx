@@ -10,7 +10,7 @@ import type {
   CanvasAppInspectorPanelContext,
 } from '../../extensions/inspector-panels'
 import {
-  getCanvasRadioTabIndex,
+  createCanvasRadioGroupDescriptor,
   handleCanvasRadioGroupKeyDown,
 } from '../../affordances/controls/radio/CanvasRadioGroup'
 
@@ -92,46 +92,47 @@ function renderCanvasLinkPreviewInspectorPanelContent({
   onChangeOrientation: (orientation: CanvasLinkPreviewOrientation) => void
   onChangeBackToText: () => void
 }) {
+  const orientationDescriptor = createCanvasRadioGroupDescriptor({
+    ariaLabel: 'Link preview orientation',
+    checkedId: currentOrientation,
+    groupId: 'canvas-link-preview-orientation',
+    items: [
+      {
+        ariaLabel: 'Display horizontal',
+        disabled,
+        id: 'horizontal',
+        label: 'H',
+      },
+      {
+        ariaLabel: 'Display vertical',
+        disabled,
+        id: 'vertical',
+        label: 'V',
+      },
+    ] as const,
+  })
+
   return (
     <div className="link-preview-inspector-actions">
       <div
         className="inspector-action-grid"
-        role="radiogroup"
-        aria-label="Link preview orientation"
+        {...orientationDescriptor.rootAttributes}
         onKeyDown={handleCanvasRadioGroupKeyDown}
       >
-        <button
-          type="button"
-          className="inspector-action-button"
-          aria-label="Display horizontal"
-          aria-checked={currentOrientation === 'horizontal'}
-          role="radio"
-          tabIndex={getCanvasRadioTabIndex({
-            checked: currentOrientation === 'horizontal',
-            disabled,
-          })}
-          title="Display horizontal"
-          disabled={disabled}
-          onClick={() => onChangeOrientation('horizontal')}
-        >
-          H
-        </button>
-        <button
-          type="button"
-          className="inspector-action-button"
-          aria-label="Display vertical"
-          aria-checked={currentOrientation === 'vertical'}
-          role="radio"
-          tabIndex={getCanvasRadioTabIndex({
-            checked: currentOrientation === 'vertical',
-            disabled,
-          })}
-          title="Display vertical"
-          disabled={disabled}
-          onClick={() => onChangeOrientation('vertical')}
-        >
-          V
-        </button>
+        {orientationDescriptor.items.map((option) => (
+          <button
+            {...option.attributes}
+            type="button"
+            className="inspector-action-button"
+            aria-label={option.ariaLabel}
+            title={option.ariaLabel}
+            disabled={option.isDisabled}
+            key={option.id}
+            onClick={() => onChangeOrientation(option.id)}
+          >
+            {option.label}
+          </button>
+        ))}
       </div>
       <a
         className="inspector-action-button"

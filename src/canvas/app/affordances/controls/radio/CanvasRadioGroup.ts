@@ -8,6 +8,82 @@ type CanvasRadioItem = HTMLElement & {
   disabled?: boolean
 }
 
+export type CanvasRadioGroupItemInput<TId extends string = string> = {
+  disabled?: boolean
+  id: TId
+  radioId?: string
+}
+
+export type CanvasRadioGroupRootAttributes = {
+  'aria-label': string
+  id: string | undefined
+  role: 'radiogroup'
+}
+
+export type CanvasRadioItemAttributes = {
+  'aria-checked': boolean
+  'aria-disabled': true | undefined
+  id: string
+  role: 'radio'
+  tabIndex: -1 | 0 | undefined
+}
+
+export type CanvasRadioGroupItemDescriptor<
+  TId extends string = string,
+  TItem extends CanvasRadioGroupItemInput<TId> =
+    CanvasRadioGroupItemInput<TId>,
+> =
+  TItem & {
+    attributes: CanvasRadioItemAttributes
+    id: TId
+    index: number
+    isChecked: boolean
+    isDisabled: boolean
+    isFocusable: boolean
+    radioId: string
+  }
+
+export type CanvasRadioGroupDescriptor<
+  TId extends string = string,
+  TItem extends CanvasRadioGroupItemInput<TId> =
+    CanvasRadioGroupItemInput<TId>,
+> = {
+  checkedId: TId | null
+  checkedRadioId: string | null
+  focusModel: typeof CANVAS_RADIO_GROUP_FOCUS_MODEL
+  focusableId: TId | null
+  focusableRadioId: string | null
+  keyboardModel: typeof CANVAS_RADIO_GROUP_KEYBOARD_MODEL
+  model: typeof CANVAS_RADIO_GROUP_MODEL
+  items: CanvasRadioGroupItemDescriptor<TId, TItem>[]
+  rootAttributes: CanvasRadioGroupRootAttributes
+}
+
+export type CanvasRadioGroupDescriptorInput<
+  TId extends string = string,
+  TItem extends CanvasRadioGroupItemInput<TId> =
+    CanvasRadioGroupItemInput<TId>,
+> = {
+  ariaLabel: string
+  checkedId?: TId | null
+  focusedId?: TId | null
+  getRadioId?: (id: TId, index: number) => string
+  groupId?: string
+  items: readonly TItem[]
+}
+
+export type CanvasRadioGroupRootAttributesInput = {
+  ariaLabel: string
+  groupId?: string
+}
+
+export type CanvasRadioItemAttributesInput = {
+  checked: boolean
+  disabled: boolean
+  focusable: boolean
+  radioId: string
+}
+
 export type CanvasRadioGroupKeyboardIntentInput = {
   count: number
   currentIndex: number
@@ -36,6 +112,110 @@ export type CanvasRadioGroupKeyboardEvent = {
 
 export type RunCanvasRadioGroupKeyboardIntentInput = {
   event: CanvasRadioGroupKeyboardEvent
+}
+
+export function createCanvasRadioGroupDescriptor<
+  TId extends string,
+  TItem extends CanvasRadioGroupItemInput<TId> =
+    CanvasRadioGroupItemInput<TId>,
+>({
+  ariaLabel,
+  checkedId = null,
+  focusedId,
+  getRadioId,
+  groupId,
+  items,
+}: CanvasRadioGroupDescriptorInput<TId, TItem>):
+  CanvasRadioGroupDescriptor<TId, TItem> {
+  const checkedIndex = checkedId
+    ? items.findIndex((item) => item.id === checkedId)
+    : -1
+  const focusableIndex = getCanvasRadioGroupFocusableIndex({
+    checkedId,
+    focusedId,
+    items,
+  })
+  const descriptors = items.map((item, index) => {
+    const isChecked = index === checkedIndex
+    const isDisabled = item.disabled === true
+    const isFocusable = index === focusableIndex
+    const radioId = item.radioId
+      ?? getRadioId?.(item.id, index)
+      ?? getDefaultCanvasRadioId({ groupId, index })
+
+    return {
+      ...item,
+      attributes: getCanvasRadioItemAttributes({
+        checked: isChecked,
+        disabled: isDisabled,
+        focusable: isFocusable,
+        radioId,
+      }),
+      id: item.id,
+      index,
+      isChecked,
+      isDisabled,
+      isFocusable,
+      radioId,
+    }
+  })
+  const checkedItem = checkedIndex >= 0 ? descriptors[checkedIndex] : null
+  const focusableItem = focusableIndex >= 0 ? descriptors[focusableIndex] : null
+
+  return {
+    checkedId: checkedItem?.id ?? null,
+    checkedRadioId: checkedItem?.radioId ?? null,
+    focusModel: CANVAS_RADIO_GROUP_FOCUS_MODEL,
+    focusableId: focusableItem?.id ?? null,
+    focusableRadioId: focusableItem?.radioId ?? null,
+    keyboardModel: CANVAS_RADIO_GROUP_KEYBOARD_MODEL,
+    model: CANVAS_RADIO_GROUP_MODEL,
+    items: descriptors,
+    rootAttributes: getCanvasRadioGroupRootAttributes({
+      ariaLabel,
+      groupId,
+    }),
+  }
+}
+
+export function getCanvasRadioGroupRootAttributes({
+  ariaLabel,
+  groupId,
+}: CanvasRadioGroupRootAttributesInput): CanvasRadioGroupRootAttributes {
+  return {
+    'aria-label': ariaLabel,
+    id: groupId,
+    role: 'radiogroup',
+  }
+}
+
+export function getCanvasRadioItemAttributes({
+  checked,
+  disabled,
+  focusable,
+  radioId,
+}: CanvasRadioItemAttributesInput): CanvasRadioItemAttributes {
+  return {
+    'aria-checked': checked,
+    'aria-disabled': disabled ? true : undefined,
+    id: radioId,
+    role: 'radio',
+    tabIndex: getCanvasRadioItemTabIndex({ disabled, focusable }),
+  }
+}
+
+export function getCanvasRadioItemTabIndex({
+  disabled,
+  focusable,
+}: {
+  disabled: boolean
+  focusable: boolean
+}): -1 | 0 | undefined {
+  if (disabled) {
+    return undefined
+  }
+
+  return focusable ? 0 : -1
 }
 
 export function handleCanvasRadioGroupKeyDown(
@@ -112,7 +292,7 @@ export function getCanvasRadioTabIndex({
 }: {
   checked: boolean
   disabled: boolean
-}) {
+}): -1 | 0 | undefined {
   if (disabled) {
     return undefined
   }
@@ -126,6 +306,47 @@ function getCanvasRadioItems(root: HTMLElement) {
 
 function isCanvasRadioItemEnabled(item: CanvasRadioItem) {
   return !item.disabled && item.getAttribute('aria-disabled') !== 'true'
+}
+
+function getCanvasRadioGroupFocusableIndex<
+  TId extends string,
+  TItem extends CanvasRadioGroupItemInput<TId>,
+>({
+  checkedId,
+  focusedId,
+  items,
+}: {
+  checkedId?: TId | null
+  focusedId?: TId | null
+  items: readonly TItem[]
+}) {
+  const focusedIndex = focusedId
+    ? items.findIndex((item) => item.id === focusedId && item.disabled !== true)
+    : -1
+
+  if (focusedIndex >= 0) {
+    return focusedIndex
+  }
+
+  const checkedIndex = checkedId
+    ? items.findIndex((item) => item.id === checkedId && item.disabled !== true)
+    : -1
+
+  if (checkedIndex >= 0) {
+    return checkedIndex
+  }
+
+  return items.findIndex((item) => item.disabled !== true)
+}
+
+function getDefaultCanvasRadioId({
+  groupId,
+  index,
+}: {
+  groupId?: string
+  index: number
+}) {
+  return groupId ? `${groupId}-radio-${index}` : `canvas-radio-${index}`
 }
 
 function getCanvasRadioKeyIndex({

@@ -79,11 +79,11 @@ test('opens as a minimal canvas affordance engine demo', async ({ page }) => {
     .getByRole('button', { exact: true, name: 'Shape' }))
     .toBeVisible()
   const shapeMenu = await openObjectToolbarMenu(page, 'Shape')
-  await expect(shapeMenu.getByRole('button', { name: 'Rect shape' }))
+  await expect(getObjectToolbarMenuAction(shapeMenu, 'Rect shape'))
     .toBeVisible()
-  await expect(shapeMenu.getByRole('button', { name: 'Ellipse shape' }))
+  await expect(getObjectToolbarMenuAction(shapeMenu, 'Ellipse shape'))
     .toBeVisible()
-  await expect(shapeMenu.getByRole('button', { name: 'Diamond shape' }))
+  await expect(getObjectToolbarMenuAction(shapeMenu, 'Diamond shape'))
     .toBeVisible()
   await expect(page.getByRole('button', { name: 'Fill color' }))
     .toBeVisible()
@@ -102,20 +102,20 @@ test('opens as a minimal canvas affordance engine demo', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Add ? stamp' }))
     .toBeVisible()
   const structureMenu = await openObjectToolbarMenu(page, 'Structure')
-  await expect(structureMenu.getByRole('button', { name: 'Section selection' }))
+  await expect(getObjectToolbarMenuAction(structureMenu, 'Section selection'))
     .toBeVisible()
-  await expect(structureMenu.getByRole('button', { name: 'Group selection' }))
+  await expect(getObjectToolbarMenuAction(structureMenu, 'Group selection'))
     .toHaveCount(0)
   const layerMenu = await openObjectToolbarMenu(page, 'Layer order')
-  await expect(layerMenu.getByRole('button', { name: 'Bring to front' }))
+  await expect(getObjectToolbarMenuAction(layerMenu, 'Bring to front'))
     .toBeVisible()
-  await expect(layerMenu.getByRole('button', { name: 'Bring forward' }))
+  await expect(getObjectToolbarMenuAction(layerMenu, 'Bring forward'))
     .toBeVisible()
-  await expect(layerMenu.getByRole('button', { name: 'Send backward' }))
+  await expect(getObjectToolbarMenuAction(layerMenu, 'Send backward'))
     .toBeDisabled()
-  await expect(layerMenu.getByRole('button', { name: 'Send to back' }))
+  await expect(getObjectToolbarMenuAction(layerMenu, 'Send to back'))
     .toBeDisabled()
-  await expect(page.getByRole('button', { name: 'Fill #C2E5FF' }))
+  await expect(page.getByRole('menuitemcheckbox', { name: 'Fill #C2E5FF' }))
     .toHaveCount(0)
   await expect(page.getByRole('button', { name: 'Duplicate selection' }))
     .toBeVisible()
@@ -186,7 +186,7 @@ test('applies object-specific toolbar actions to the selected item', async ({
   const initialItemCount = await page.locator('[data-canvas-item-id]').count()
 
   await page.getByRole('button', { name: 'Fill color' }).click()
-  await page.getByRole('button', { name: 'Fill #C2E5FF' }).click()
+  await page.getByRole('menuitemcheckbox', { name: 'Fill #C2E5FF' }).click()
   await expect(page.locator(
     '[data-canvas-item-id="engine-shape"] .shape-item',
   )).toHaveAttribute('fill', '#C2E5FF')
@@ -248,18 +248,18 @@ test('applies object-specific toolbar actions to the selected item', async ({
     .getByRole('button', { exact: true, name: 'Rotate' }))
     .toBeDisabled()
   const arrowMenu = await openObjectToolbarMenu(page, 'Arrow')
-  await expect(arrowMenu.getByRole('button', { name: 'Elbow connector' }))
-    .toHaveAttribute('aria-pressed', 'true')
+  await expect(getObjectToolbarMenuAction(arrowMenu, 'Elbow connector'))
+    .toHaveAttribute('aria-checked', 'true')
 
   await clickObjectToolbarMenuAction(page, 'Arrow', 'Straight connector')
   const straightArrowMenu = await openObjectToolbarMenu(page, 'Arrow')
-  await expect(straightArrowMenu.getByRole('button', {
-    name: 'Straight connector',
-  }))
-    .toHaveAttribute('aria-pressed', 'true')
+  await expect(getObjectToolbarMenuAction(
+    straightArrowMenu,
+    'Straight connector',
+  )).toHaveAttribute('aria-checked', 'true')
 
   await page.getByRole('button', { name: 'Stroke color' }).click()
-  await page.getByRole('button', { name: 'Stroke #9747FF' }).click()
+  await page.getByRole('menuitemcheckbox', { name: 'Stroke #9747FF' }).click()
   await expect(page.locator(
     '[data-canvas-item-id="engine-arrow"] .arrow-item',
   )).toHaveAttribute('stroke', '#9747FF')
@@ -1215,7 +1215,7 @@ test('quick-creates connected sticky notes with inherited style', async ({
   await expect(sourceEditor).toHaveCount(0)
 
   await page.getByRole('button', { name: 'Fill color' }).click()
-  await page.getByRole('button', { name: 'Fill #C2E5FF' }).click()
+  await page.getByRole('menuitemcheckbox', { name: 'Fill #C2E5FF' }).click()
   await expect(source.locator('.component-sticky-note'))
     .toHaveAttribute('fill', '#C2E5FF')
 
@@ -1316,7 +1316,8 @@ async function readCanvasScalePercent(page: Page) {
 
 async function openObjectToolbarMenu(page: Page, menuName: string) {
   const toolbar = page.getByRole('toolbar', { name: 'Object actions' })
-  const menu = page.getByRole('group', { exact: true, name: menuName })
+  const menu = page.getByRole('menu', { exact: true, name: menuName })
+    .or(page.getByRole('group', { exact: true, name: menuName }))
 
   if (await menu.isVisible().catch(() => false)) {
     return menu
@@ -1334,7 +1335,15 @@ async function clickObjectToolbarMenuAction(
   actionName: string,
 ) {
   const menu = await openObjectToolbarMenu(page, menuName)
-  await menu.getByRole('button', { exact: true, name: actionName }).click()
+  await getObjectToolbarMenuAction(menu, actionName).click()
+}
+
+function getObjectToolbarMenuAction(menu: Locator, actionName: string) {
+  const options = { exact: true, name: actionName } as const
+
+  return menu.getByRole('menuitemcheckbox', options)
+    .or(menu.getByRole('menuitem', options))
+    .or(menu.getByRole('button', options))
 }
 
 async function selectShapeAndSticky(page: Page) {

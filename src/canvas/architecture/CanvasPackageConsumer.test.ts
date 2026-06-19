@@ -71,6 +71,7 @@ import {
   createCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan,
   createCanvasCommandPaletteListboxDescriptor,
   createCanvasMenuSurfaceDescriptor,
+  createCanvasRadioGroupDescriptor,
   createCanvasShortcutHelpDialogDescriptor,
   createCanvasSelectionListDescriptor,
   createCanvasStoryCanvasFeaturePackAssemblyInput,
@@ -151,6 +152,9 @@ import {
   getCanvasMinimapReadModel,
   getCanvasPresentationKeyboardIntent,
   getCanvasRadioGroupKeyboardIntent,
+  getCanvasRadioGroupRootAttributes,
+  getCanvasRadioItemAttributes,
+  getCanvasRadioItemTabIndex,
   getCanvasRadioTabIndex,
   getCanvasTabsKeyboardIntent,
   getCanvasToolbarRovingActiveIndex,
@@ -534,6 +538,8 @@ import {
   type CanvasComponentPartSourceInput,
   type CanvasEditableFieldKeyboardIntentInput,
   type CanvasPresentationKeyboardIntentInput,
+  type CanvasRadioGroupDescriptorInput,
+  type CanvasRadioItemAttributesInput,
   type CanvasRadioGroupKeyboardIntentInput,
   type CanvasTabsKeyboardIntentInput,
   type CanvasInteractionTargetSelectorInput,
@@ -4633,6 +4639,31 @@ describe('Canvas package consumer imports', () => {
       currentIndex: 0,
       key: 'ArrowDown',
     }
+    const radioGroupDescriptorInput: CanvasRadioGroupDescriptorInput = {
+      ariaLabel: 'Package mode',
+      checkedId: 'inspect',
+      groupId: 'package-mode',
+      items: [
+        { id: 'select' },
+        { id: 'inspect' },
+        { disabled: true, id: 'disabled-mode' },
+      ],
+    }
+    const appRadioGroupDescriptorInput: CanvasRadioGroupDescriptorInput = {
+      ariaLabel: 'App mode',
+      checkedId: 'preview',
+      groupId: 'app-mode',
+      items: [
+        { id: 'edit' },
+        { id: 'preview' },
+      ],
+    }
+    const radioItemAttributesInput: CanvasRadioItemAttributesInput = {
+      checked: true,
+      disabled: true,
+      focusable: false,
+      radioId: 'package-radio',
+    }
     let radioGroupPreventDefaultCount = 0
     let radioGroupStopPropagationCount = 0
     let radioGroupFocusCount = 0
@@ -5713,6 +5744,127 @@ describe('Canvas package consumer imports', () => {
       preventDefault: true,
       stopPropagation: true,
     })
+    expect(createCanvasRadioGroupDescriptor(
+      radioGroupDescriptorInput,
+    )).toEqual({
+      checkedId: 'inspect',
+      checkedRadioId: 'package-mode-radio-1',
+      focusModel: 'roving-tabindex',
+      focusableId: 'inspect',
+      focusableRadioId: 'package-mode-radio-1',
+      keyboardModel: 'arrow-home-end',
+      model: 'canvas-radio-group',
+      items: [
+        {
+          attributes: {
+            'aria-checked': false,
+            'aria-disabled': undefined,
+            id: 'package-mode-radio-0',
+            role: 'radio',
+            tabIndex: -1,
+          },
+          id: 'select',
+          index: 0,
+          isChecked: false,
+          isDisabled: false,
+          isFocusable: false,
+          radioId: 'package-mode-radio-0',
+        },
+        {
+          attributes: {
+            'aria-checked': true,
+            'aria-disabled': undefined,
+            id: 'package-mode-radio-1',
+            role: 'radio',
+            tabIndex: 0,
+          },
+          id: 'inspect',
+          index: 1,
+          isChecked: true,
+          isDisabled: false,
+          isFocusable: true,
+          radioId: 'package-mode-radio-1',
+        },
+        {
+          attributes: {
+            'aria-checked': false,
+            'aria-disabled': true,
+            id: 'package-mode-radio-2',
+            role: 'radio',
+            tabIndex: undefined,
+          },
+          disabled: true,
+          id: 'disabled-mode',
+          index: 2,
+          isChecked: false,
+          isDisabled: true,
+          isFocusable: false,
+          radioId: 'package-mode-radio-2',
+        },
+      ],
+      rootAttributes: {
+        'aria-label': 'Package mode',
+        id: 'package-mode',
+        role: 'radiogroup',
+      },
+    })
+    expect(CanvasAppFacade.createCanvasRadioGroupDescriptor(
+      appRadioGroupDescriptorInput,
+    )).toMatchObject({
+      checkedId: 'preview',
+      checkedRadioId: 'app-mode-radio-1',
+      focusableId: 'preview',
+      focusableRadioId: 'app-mode-radio-1',
+      model: 'canvas-radio-group',
+      rootAttributes: {
+        'aria-label': 'App mode',
+        id: 'app-mode',
+        role: 'radiogroup',
+      },
+    })
+    expect(getCanvasRadioGroupRootAttributes({
+      ariaLabel: 'Package mode',
+      groupId: 'package-mode',
+    })).toEqual({
+      'aria-label': 'Package mode',
+      id: 'package-mode',
+      role: 'radiogroup',
+    })
+    expect(CanvasAppFacade.getCanvasRadioGroupRootAttributes({
+      ariaLabel: 'App mode',
+      groupId: 'app-mode',
+    })).toEqual({
+      'aria-label': 'App mode',
+      id: 'app-mode',
+      role: 'radiogroup',
+    })
+    expect(getCanvasRadioItemAttributes(radioItemAttributesInput)).toEqual({
+      'aria-checked': true,
+      'aria-disabled': true,
+      id: 'package-radio',
+      role: 'radio',
+      tabIndex: undefined,
+    })
+    expect(CanvasAppFacade.getCanvasRadioItemAttributes({
+      checked: false,
+      disabled: false,
+      focusable: true,
+      radioId: 'app-radio',
+    })).toEqual({
+      'aria-checked': false,
+      'aria-disabled': undefined,
+      id: 'app-radio',
+      role: 'radio',
+      tabIndex: 0,
+    })
+    expect(getCanvasRadioItemTabIndex({
+      disabled: false,
+      focusable: true,
+    })).toBe(0)
+    expect(CanvasAppFacade.getCanvasRadioItemTabIndex({
+      disabled: false,
+      focusable: false,
+    })).toBe(-1)
     expect(getCanvasRadioTabIndex({
       checked: true,
       disabled: false,

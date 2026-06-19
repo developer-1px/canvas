@@ -3,6 +3,9 @@ import {
   CANVAS_RADIO_GROUP_FOCUS_MODEL,
   CANVAS_RADIO_GROUP_KEYBOARD_MODEL,
   CANVAS_RADIO_GROUP_MODEL,
+  createCanvasRadioGroupDescriptor,
+  getCanvasRadioGroupRootAttributes,
+  getCanvasRadioItemAttributes,
   getCanvasRadioGroupKeyboardIntent,
   runCanvasRadioGroupKeyboardIntent,
 } from './CanvasRadioGroup'
@@ -12,6 +15,138 @@ describe('CanvasRadioGroup', () => {
     expect(CANVAS_RADIO_GROUP_MODEL).toBe('canvas-radio-group')
     expect(CANVAS_RADIO_GROUP_FOCUS_MODEL).toBe('roving-tabindex')
     expect(CANVAS_RADIO_GROUP_KEYBOARD_MODEL).toBe('arrow-home-end')
+  })
+
+  it('creates radiogroup and radio attributes for segmented controls', () => {
+    expect(createCanvasRadioGroupDescriptor({
+      ariaLabel: 'Connector routing',
+      checkedId: 'straight',
+      groupId: 'connector-routing',
+      items: [
+        { id: 'elbow' },
+        { id: 'straight' },
+        { disabled: true, id: 'curved' },
+      ],
+    })).toEqual({
+      checkedId: 'straight',
+      checkedRadioId: 'connector-routing-radio-1',
+      focusModel: CANVAS_RADIO_GROUP_FOCUS_MODEL,
+      focusableId: 'straight',
+      focusableRadioId: 'connector-routing-radio-1',
+      keyboardModel: CANVAS_RADIO_GROUP_KEYBOARD_MODEL,
+      model: CANVAS_RADIO_GROUP_MODEL,
+      items: [
+        {
+          attributes: {
+            'aria-checked': false,
+            'aria-disabled': undefined,
+            id: 'connector-routing-radio-0',
+            role: 'radio',
+            tabIndex: -1,
+          },
+          id: 'elbow',
+          index: 0,
+          isChecked: false,
+          isDisabled: false,
+          isFocusable: false,
+          radioId: 'connector-routing-radio-0',
+        },
+        {
+          attributes: {
+            'aria-checked': true,
+            'aria-disabled': undefined,
+            id: 'connector-routing-radio-1',
+            role: 'radio',
+            tabIndex: 0,
+          },
+          id: 'straight',
+          index: 1,
+          isChecked: true,
+          isDisabled: false,
+          isFocusable: true,
+          radioId: 'connector-routing-radio-1',
+        },
+        {
+          attributes: {
+            'aria-checked': false,
+            'aria-disabled': true,
+            id: 'connector-routing-radio-2',
+            role: 'radio',
+            tabIndex: undefined,
+          },
+          disabled: true,
+          id: 'curved',
+          index: 2,
+          isChecked: false,
+          isDisabled: true,
+          isFocusable: false,
+          radioId: 'connector-routing-radio-2',
+        },
+      ],
+      rootAttributes: {
+        'aria-label': 'Connector routing',
+        id: 'connector-routing',
+        role: 'radiogroup',
+      },
+    })
+  })
+
+  it('keeps checked disabled radios visible while focusing the first enabled item', () => {
+    const descriptor = createCanvasRadioGroupDescriptor({
+      ariaLabel: 'Size mode',
+      checkedId: 'fixed',
+      items: [
+        { disabled: true, id: 'fixed' },
+        { id: 'fill' },
+      ],
+    })
+
+    expect(descriptor.checkedId).toBe('fixed')
+    expect(descriptor.checkedRadioId).toBe('canvas-radio-0')
+    expect(descriptor.focusableId).toBe('fill')
+    expect(descriptor.items[0]).toMatchObject({
+      attributes: {
+        'aria-checked': true,
+        'aria-disabled': true,
+        tabIndex: undefined,
+      },
+      isChecked: true,
+      isDisabled: true,
+      isFocusable: false,
+    })
+    expect(descriptor.items[1]).toMatchObject({
+      attributes: {
+        'aria-checked': false,
+        'aria-disabled': undefined,
+        tabIndex: 0,
+      },
+      isChecked: false,
+      isDisabled: false,
+      isFocusable: true,
+    })
+  })
+
+  it('creates radiogroup root and radio attributes directly', () => {
+    expect(getCanvasRadioGroupRootAttributes({
+      ariaLabel: 'Text align',
+      groupId: 'text-align',
+    })).toEqual({
+      'aria-label': 'Text align',
+      id: 'text-align',
+      role: 'radiogroup',
+    })
+    expect(getCanvasRadioItemAttributes({
+      checked: true,
+      disabled: true,
+      focusable: false,
+      radioId: 'text-align-center',
+    })).toEqual({
+      'aria-checked': true,
+      'aria-disabled': true,
+      id: 'text-align-center',
+      role: 'radio',
+      tabIndex: undefined,
+    })
   })
 
   it('maps arrow home and end keys to consumed radio movement intents', () => {

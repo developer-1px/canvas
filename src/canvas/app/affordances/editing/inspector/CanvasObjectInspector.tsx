@@ -12,7 +12,7 @@ import type {
 } from './CanvasObjectStyleInspector'
 import type { CanvasObjectInspectorCommentThread } from './CanvasObjectInspectorCommentThread'
 import {
-  getCanvasRadioTabIndex,
+  createCanvasRadioGroupDescriptor,
   handleCanvasRadioGroupKeyDown,
 } from '../../controls/radio/CanvasRadioGroup'
 import { runCanvasEditableFieldKeyboardIntent } from '../../controls/editable-field/CanvasEditableFieldKeyboard'
@@ -233,27 +233,34 @@ function CanvasObjectInspectorSwatchStyleControl({
   control: CanvasObjectStyleSwatchControl
   disabled: boolean
 }) {
+  const isDisabled = disabled || control.disabled
+  const checkedSwatch = control.swatches.find((swatch) => swatch.selected)
+  const swatchDescriptor = createCanvasRadioGroupDescriptor({
+    ariaLabel: control.label,
+    checkedId: checkedSwatch?.color ?? null,
+    groupId: `canvas-object-style-${control.id}`,
+    items: control.swatches.map((swatch) => ({
+      ...swatch,
+      disabled: isDisabled,
+      id: swatch.color,
+    })),
+  })
+
   return (
     <div className="inspector-style-control">
       <div className="inspector-style-label">{control.label}</div>
       <div
         className="inspector-swatches"
-        role="radiogroup"
-        aria-label={control.label}
+        {...swatchDescriptor.rootAttributes}
         onKeyDown={handleCanvasRadioGroupKeyDown}
       >
-        {control.swatches.map((swatch) => (
+        {swatchDescriptor.items.map((swatch) => (
           <button
+            {...swatch.attributes}
             aria-label={`${control.label} ${swatch.color}`}
-            aria-checked={swatch.selected}
             className="inspector-swatch"
-            disabled={disabled || control.disabled}
+            disabled={swatch.isDisabled}
             key={swatch.color}
-            role="radio"
-            tabIndex={getCanvasRadioTabIndex({
-              checked: swatch.selected,
-              disabled: disabled || control.disabled,
-            })}
             onClick={() => control.onSelect(swatch.color)}
             style={{ backgroundColor: swatch.color }}
             title={swatch.color}
@@ -321,27 +328,34 @@ function CanvasObjectInspectorSegmentedStyleControl({
   control: CanvasObjectStyleSegmentedControl
   disabled: boolean
 }) {
+  const isDisabled = disabled || control.disabled
+  const checkedSegment = control.segments.find((segment) => segment.selected)
+  const segmentDescriptor = createCanvasRadioGroupDescriptor({
+    ariaLabel: control.label,
+    checkedId: checkedSegment?.value ?? control.value,
+    groupId: `canvas-object-style-${control.id}`,
+    items: control.segments.map((segment) => ({
+      ...segment,
+      disabled: isDisabled,
+      id: segment.value,
+    })),
+  })
+
   return (
     <div className="inspector-style-control">
       <div className="inspector-style-label">{control.label}</div>
       <div
         className="inspector-segments"
-        role="radiogroup"
-        aria-label={control.label}
+        {...segmentDescriptor.rootAttributes}
         onKeyDown={handleCanvasRadioGroupKeyDown}
       >
-        {control.segments.map((segment) => (
+        {segmentDescriptor.items.map((segment) => (
           <button
+            {...segment.attributes}
             aria-label={`${control.label} ${segment.label}`}
-            aria-checked={segment.selected}
             className="inspector-segment"
-            disabled={disabled || control.disabled}
+            disabled={segment.isDisabled}
             key={segment.value}
-            role="radio"
-            tabIndex={getCanvasRadioTabIndex({
-              checked: segment.selected,
-              disabled: disabled || control.disabled,
-            })}
             onClick={() => control.onSelect(segment.value)}
             type="button"
           >

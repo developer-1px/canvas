@@ -9,7 +9,7 @@ import type {
   CanvasAppInspectorPanelContext,
 } from '../../extensions/inspector-panels'
 import {
-  getCanvasRadioTabIndex,
+  createCanvasRadioGroupDescriptor,
   handleCanvasRadioGroupKeyDown,
 } from '../../affordances/controls/radio/CanvasRadioGroup'
 
@@ -60,45 +60,46 @@ function renderCanvasArrowRoutingInspectorPanelContent({
   disabled: boolean
   onChangeRouting: (routing: CanvasArrowRouting) => void
 }) {
+  const routingDescriptor = createCanvasRadioGroupDescriptor({
+    ariaLabel: 'Connector routing',
+    checkedId: currentRouting,
+    groupId: 'canvas-arrow-routing',
+    items: [
+      {
+        ariaLabel: 'Elbow connector',
+        disabled,
+        id: 'elbow',
+        label: 'Elbow',
+      },
+      {
+        ariaLabel: 'Straight connector',
+        disabled,
+        id: 'straight',
+        label: 'Straight',
+      },
+    ] as const,
+  })
+
   return (
     <div
       className="inspector-action-grid"
-      role="radiogroup"
-      aria-label="Connector routing"
+      {...routingDescriptor.rootAttributes}
       onKeyDown={handleCanvasRadioGroupKeyDown}
     >
-      <button
-        type="button"
-        className="inspector-action-button"
-        aria-label="Elbow connector"
-        aria-checked={currentRouting === 'elbow'}
-        role="radio"
-        tabIndex={getCanvasRadioTabIndex({
-          checked: currentRouting === 'elbow',
-          disabled,
-        })}
-        title="Elbow connector"
-        disabled={disabled}
-        onClick={() => onChangeRouting('elbow')}
-      >
-        Elbow
-      </button>
-      <button
-        type="button"
-        className="inspector-action-button"
-        aria-label="Straight connector"
-        aria-checked={currentRouting === 'straight'}
-        role="radio"
-        tabIndex={getCanvasRadioTabIndex({
-          checked: currentRouting === 'straight',
-          disabled,
-        })}
-        title="Straight connector"
-        disabled={disabled}
-        onClick={() => onChangeRouting('straight')}
-      >
-        Straight
-      </button>
+      {routingDescriptor.items.map((option) => (
+        <button
+          {...option.attributes}
+          type="button"
+          className="inspector-action-button"
+          aria-label={option.ariaLabel}
+          title={option.ariaLabel}
+          disabled={option.isDisabled}
+          key={option.id}
+          onClick={() => onChangeRouting(option.id)}
+        >
+          {option.label}
+        </button>
+      ))}
     </div>
   )
 }
