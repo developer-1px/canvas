@@ -185,8 +185,11 @@ export {
 } from './affordances/controls/radio/CanvasRadioGroup'
 export {
   getCanvasPresentationKeyboardIntent,
+  runCanvasPresentationKeyboardIntent,
+  type CanvasPresentationKeyboardEvent,
   type CanvasPresentationKeyboardIntent,
   type CanvasPresentationKeyboardIntentInput,
+  type RunCanvasPresentationKeyboardIntentInput,
 } from './affordances/controls/presentation/CanvasPresentationKeyboard'
 export {
   cancelCanvasDeferredFocus,

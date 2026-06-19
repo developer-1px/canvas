@@ -58,6 +58,7 @@ import {
   getCanvasClientViewportSize,
   getCanvasContextMenuKeyboardIntent,
   getCanvasContextMenuPosition,
+  runCanvasPresentationKeyboardIntent,
   useCanvasToolbarRovingFocus,
 } from '../canvas'
 import {
@@ -454,24 +455,11 @@ function CanvasEngineDemoSurface({
     event: ReactKeyboardEvent<HTMLElement>,
   ) => {
     if (presenting) {
-      if (event.key === 'Escape') {
-        event.preventDefault()
-        event.stopPropagation()
-        exitPresentation()
-        return
-      }
-
-      if (event.key === 'ArrowRight') {
-        event.preventDefault()
-        event.stopPropagation()
-        navigatePresentation(1)
-        return
-      }
-
-      if (event.key === 'ArrowLeft') {
-        event.preventDefault()
-        event.stopPropagation()
-        navigatePresentation(-1)
+      if (runCanvasPresentationKeyboardIntent({
+        event,
+        onExit: exitPresentation,
+        onNavigate: navigatePresentation,
+      })) {
         return
       }
 

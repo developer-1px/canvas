@@ -155,6 +155,7 @@ import {
   previewCanvasPointerPanInteraction,
   resetCanvasViewport,
   runCanvasEditableFieldKeyboardIntent,
+  runCanvasPresentationKeyboardIntent,
   runCanvasRadioGroupKeyboardIntent,
   runCanvasWheelViewport,
   startCanvasPointerLaserInteraction,
@@ -511,6 +512,7 @@ import {
   type RunCanvasModalKeyboardIntentInput,
   type RunCanvasEditableFieldKeyboardIntentInput,
   type RunCanvasRadioGroupKeyboardIntentInput,
+  type RunCanvasPresentationKeyboardIntentInput,
   type CanvasPointerClickMemory,
   type CanvasNextLaserTrailPointsInput,
   type CanvasPointerLocalGeometry,
@@ -4246,6 +4248,28 @@ describe('Canvas package consumer imports', () => {
     const presentationKeyboardInput: CanvasPresentationKeyboardIntentInput = {
       key: 'PageDown',
     }
+    let presentationPreventDefaultCount = 0
+    let presentationStopPropagationCount = 0
+    let presentationNavigateDirection: -1 | 1 | null = null
+    let presentationExitCount = 0
+    const presentationKeyboardRunInput:
+      RunCanvasPresentationKeyboardIntentInput = {
+        event: {
+          key: 'PageDown',
+          preventDefault: () => {
+            presentationPreventDefaultCount += 1
+          },
+          stopPropagation: () => {
+            presentationStopPropagationCount += 1
+          },
+        },
+        onExit: () => {
+          presentationExitCount += 1
+        },
+        onNavigate: (direction) => {
+          presentationNavigateDirection = direction
+        },
+      }
     const radioGroupKeyboardInput: CanvasRadioGroupKeyboardIntentInput = {
       count: 3,
       currentIndex: 0,
@@ -4856,6 +4880,7 @@ describe('Canvas package consumer imports', () => {
         direction: 1,
         kind: 'navigate',
         preventDefault: true,
+        stopPropagation: true,
       })
     expect(CanvasAppFacade.getCanvasPresentationKeyboardIntent(
       presentationKeyboardInput,
@@ -4863,7 +4888,18 @@ describe('Canvas package consumer imports', () => {
       direction: 1,
       kind: 'navigate',
       preventDefault: true,
+      stopPropagation: true,
     })
+    expect(runCanvasPresentationKeyboardIntent(
+      presentationKeyboardRunInput,
+    )).toBe(true)
+    expect(CanvasAppFacade.runCanvasPresentationKeyboardIntent(
+      presentationKeyboardRunInput,
+    )).toBe(true)
+    expect(presentationPreventDefaultCount).toBe(2)
+    expect(presentationStopPropagationCount).toBe(2)
+    expect(presentationNavigateDirection).toBe(1)
+    expect(presentationExitCount).toBe(0)
     expect(getCanvasRadioGroupKeyboardIntent(radioGroupKeyboardInput))
       .toEqual({
         kind: 'move-radio',
