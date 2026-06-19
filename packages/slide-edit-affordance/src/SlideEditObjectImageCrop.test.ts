@@ -3,6 +3,9 @@ import { describe, expect, it } from 'vitest'
 import {
   createSlideEditObjectImageCropDescriptor,
   getSlideEditObjectImageCropCommandEffect,
+  getSlideEditObjectImageCropJSONPasteValue,
+  getSlideEditObjectImageCropJSONPasteValueFromText,
+  getSlideEditObjectImageCropJSONPasteValueFromValue,
   getSlideEditObjectImageCropMetadata,
   getSlideEditObjectImageCropPositionCSS,
   normalizeSlideEditObjectImageCrop,
@@ -18,6 +21,11 @@ import {
   SLIDE_EDIT_OBJECT_IMAGE_CROP_LIMITS,
   toSlideEditObjectImageCropAttributeValue,
 } from './SlideEditObjectImageCrop'
+import {
+  getSlideEditObjectImageCropJSONPasteValue as getSlideEditObjectImageCropJSONPasteValueFromPackage,
+  getSlideEditObjectImageCropJSONPasteValueFromText as getSlideEditObjectImageCropJSONPasteValueFromTextFromPackage,
+  getSlideEditObjectImageCropJSONPasteValueFromValue as getSlideEditObjectImageCropJSONPasteValueFromValueFromPackage,
+} from './index'
 
 describe('SlideEditObjectImageCrop', () => {
   it('creates a supported image crop descriptor with fill centered by default', () => {
@@ -174,6 +182,191 @@ describe('SlideEditObjectImageCrop', () => {
       x: -10,
       y: Number.NaN,
     })).toBe('0% 50%')
+  })
+
+  it('reads custom MIME direct image crop JSON paste values first', () => {
+    expect(getSlideEditObjectImageCropJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_OBJECT_IMAGE_CROP_JSON_MIME_TYPE]: JSON.stringify({
+          crop: {
+            x: 120,
+            y: -5,
+          },
+          fit: 'contain',
+        }),
+        'application/json': JSON.stringify({
+          imageCrop: {
+            x: 10,
+          },
+        }),
+      }),
+    })).toEqual({
+      crop: {
+        x: 100,
+        y: 0,
+      },
+      fields: ['fit', 'x', 'y'],
+      fit: 'contain',
+      format: 'json',
+      payloadLength: expect.any(Number),
+      sourceFields: {
+        fit: 'fit',
+        x: 'crop.x',
+        y: 'crop.y',
+      },
+      sourceType: SLIDE_EDIT_OBJECT_IMAGE_CROP_JSON_MIME_TYPE,
+      surface: 'object-image-crop',
+    })
+  })
+
+  it('reads wrapped image crop values from generic JSON candidates', () => {
+    expect(getSlideEditObjectImageCropJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': JSON.stringify({
+          imageCrop: {
+            fit: 'stretch',
+            x: '25.555',
+            y: 70,
+          },
+        }),
+      }),
+    })).toEqual({
+      crop: {
+        x: 25.56,
+        y: 70,
+      },
+      fields: ['fit', 'x', 'y'],
+      fit: 'cover',
+      format: 'json',
+      payloadLength: expect.any(Number),
+      sourceFields: {
+        fit: 'fit',
+        wrapper: 'imageCrop',
+        x: 'x',
+        y: 'y',
+      },
+      sourceType: 'text/plain',
+      surface: 'object-image-crop',
+      wrapper: 'imageCrop',
+    })
+
+    expect(getSlideEditObjectImageCropJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'application/json': JSON.stringify({
+          objectImageCrop: {
+            crop: {
+              x: 5,
+            },
+          },
+        }),
+      }),
+    })).toMatchObject({
+      crop: {
+        x: 5,
+      },
+      fields: ['x'],
+      sourceType: 'application/json',
+      wrapper: 'objectImageCrop',
+    })
+    expect(getSlideEditObjectImageCropJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/json': JSON.stringify({
+          crop: {
+            y: 88,
+          },
+        }),
+      }),
+    })).toMatchObject({
+      crop: {
+        y: 88,
+      },
+      fields: ['y'],
+      sourceType: 'text/json',
+      wrapper: 'crop',
+    })
+
+    expect(getSlideEditObjectImageCropJSONPasteValueFromPackage({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_OBJECT_IMAGE_CROP_JSON_MIME_TYPE]:
+          '{"fit":"contain"}',
+      }),
+    })).toMatchObject({
+      fields: ['fit'],
+      fit: 'contain',
+    })
+  })
+
+  it('reads image crop JSON paste values from text and parsed values', () => {
+    const wrappedText = JSON.stringify({
+      objectImageCrop: {
+        crop: {
+          x: 20,
+        },
+        fit: 'contain',
+        y: 75,
+      },
+    })
+
+    expect(getSlideEditObjectImageCropJSONPasteValueFromText(wrappedText, {
+      mode: 'wrapped',
+      sourceType: 'application/json',
+    })).toEqual({
+      crop: {
+        x: 20,
+        y: 75,
+      },
+      fields: ['fit', 'x', 'y'],
+      fit: 'contain',
+      format: 'json',
+      payloadLength: wrappedText.length,
+      sourceFields: {
+        fit: 'fit',
+        wrapper: 'objectImageCrop',
+        x: 'crop.x',
+        y: 'y',
+      },
+      sourceType: 'application/json',
+      surface: 'object-image-crop',
+      wrapper: 'objectImageCrop',
+    })
+
+    expect(getSlideEditObjectImageCropJSONPasteValueFromValue({
+      crop: {
+        x: 42,
+      },
+    }, {
+      sourceType: SLIDE_EDIT_OBJECT_IMAGE_CROP_JSON_MIME_TYPE,
+    })).toMatchObject({
+      crop: {
+        x: 42,
+      },
+      fields: ['x'],
+      payloadLength: 0,
+      sourceFields: {
+        x: 'crop.x',
+      },
+      sourceType: SLIDE_EDIT_OBJECT_IMAGE_CROP_JSON_MIME_TYPE,
+    })
+
+    expect(getSlideEditObjectImageCropJSONPasteValueFromTextFromPackage(
+      JSON.stringify({
+        crop: {
+          y: 10,
+        },
+      }),
+      { mode: 'wrapped' },
+    )).toMatchObject({
+      crop: {
+        y: 10,
+      },
+      wrapper: 'crop',
+    })
+    expect(getSlideEditObjectImageCropJSONPasteValueFromValueFromPackage({
+      fit: 'contain',
+    })).toMatchObject({
+      fields: ['fit'],
+      fit: 'contain',
+    })
   })
 
   it('routes selected image crop and fit updates through host command effects', () => {

@@ -166,6 +166,122 @@ export type SlideEditObjectImageCropHostCommandEffect<
   type: 'slide-command-effect'
 }
 
+export type SlideEditObjectImageCropDataTransfer = Pick<DataTransfer, 'getData'>
+
+export type SlideEditObjectImageCropSourceFields =
+  Partial<Record<SlideEditObjectImageCropJSONFieldId, string>> & {
+    wrapper?: string
+  }
+
+export type SlideEditObjectImageCropJSONPasteValue = {
+  crop: Partial<SlideEditObjectImageCropPosition>
+  fields: readonly SlideEditObjectImageCropJSONFieldId[]
+  fit?: SlideEditObjectImageCropFit
+  format: 'json'
+  payloadLength: number
+  sourceFields: SlideEditObjectImageCropSourceFields
+  sourceType: string
+  surface: 'object-image-crop'
+  wrapper?: string
+}
+
+export type SlideEditObjectImageCropJSONPasteInput = {
+  dataTransfer: SlideEditObjectImageCropDataTransfer | null
+  jsonMimeType?: string
+}
+
+export type SlideEditObjectImageCropJSONPasteValueMode =
+  | 'direct'
+  | 'wrapped'
+
+export type SlideEditObjectImageCropJSONPasteValueOptions = {
+  mode?: SlideEditObjectImageCropJSONPasteValueMode
+  payloadLength?: number
+  sourceType?: string
+}
+
+export type SlideEditObjectImageCropPasteTarget<
+  TObjectId extends SlideEditObjectImageCropObjectId =
+    SlideEditObjectImageCropObjectId,
+> = {
+  crop?: Partial<SlideEditObjectImageCropPosition> | null
+  fit?: string | null
+  isHidden?: boolean
+  isLocked?: boolean
+  isSupported?: boolean
+  objectId: TObjectId
+}
+
+export type SlideEditObjectImageCropPasteSkipReason =
+  | 'hidden-target'
+  | 'locked-target'
+  | 'unsupported-target'
+
+export type SlideEditObjectImageCropPasteSkippedTarget<
+  TObjectId extends SlideEditObjectImageCropObjectId =
+    SlideEditObjectImageCropObjectId,
+> = {
+  objectId: TObjectId
+  reason: SlideEditObjectImageCropPasteSkipReason
+}
+
+export type SlideEditObjectImageCropPasteAppliedTarget<
+  TObjectId extends SlideEditObjectImageCropObjectId =
+    SlideEditObjectImageCropObjectId,
+> = {
+  commandId: 'update-object-image-crop'
+  crop: SlideEditObjectImageCropPosition
+  effectType: 'slide-command-effect'
+  fields: readonly SlideEditObjectImageCropJSONFieldId[]
+  fit: SlideEditObjectImageCropFit
+  objectId: TObjectId
+}
+
+export type SlideEditObjectImageCropTargetSupportInput<
+  TObjectId extends SlideEditObjectImageCropObjectId =
+    SlideEditObjectImageCropObjectId,
+> = {
+  pasteValue: SlideEditObjectImageCropJSONPasteValue
+  target: SlideEditObjectImageCropPasteTarget<TObjectId>
+}
+
+export type SlideEditObjectImageCropPasteCommandEffectsInput<
+  TSlideId extends SlideEditObjectImageCropSlideId =
+    SlideEditObjectImageCropSlideId,
+  TObjectId extends SlideEditObjectImageCropObjectId =
+    SlideEditObjectImageCropObjectId,
+> = {
+  isTargetSupported?: (
+    input: SlideEditObjectImageCropTargetSupportInput<TObjectId>
+  ) => boolean
+  pasteValue: SlideEditObjectImageCropJSONPasteValue
+  slideId: TSlideId
+  targets: readonly SlideEditObjectImageCropPasteTarget<TObjectId>[]
+}
+
+export type SlideEditObjectImageCropPasteCommandEffectsResult<
+  TSlideId extends SlideEditObjectImageCropSlideId =
+    SlideEditObjectImageCropSlideId,
+  TObjectId extends SlideEditObjectImageCropObjectId =
+    SlideEditObjectImageCropObjectId,
+> = {
+  appliedTargets: readonly SlideEditObjectImageCropPasteAppliedTarget<TObjectId>[]
+  effects: readonly SlideEditObjectImageCropHostCommandEffect<
+    TSlideId,
+    TObjectId
+  >[]
+  pasteValue: SlideEditObjectImageCropJSONPasteValue
+  skippedTargets: readonly SlideEditObjectImageCropPasteSkippedTarget<TObjectId>[]
+}
+
+export type SlideEditObjectImageCropForTargetInput<
+  TObjectId extends SlideEditObjectImageCropObjectId =
+    SlideEditObjectImageCropObjectId,
+> = {
+  pasteValue: SlideEditObjectImageCropJSONPasteValue
+  target: SlideEditObjectImageCropPasteTarget<TObjectId>
+}
+
 export const SLIDE_EDIT_OBJECT_IMAGE_CROP_DATA_ATTRIBUTE =
   'data-slide-object-image-crop'
 
@@ -286,6 +402,206 @@ export function getSlideEditObjectImageCropCommandEffect<
       slideId: command.slideId,
     },
     type: 'slide-command-effect',
+  }
+}
+
+export function getSlideEditObjectImageCropJSONPasteValue({
+  dataTransfer,
+  jsonMimeType = SLIDE_EDIT_OBJECT_IMAGE_CROP_JSON_MIME_TYPE,
+}: SlideEditObjectImageCropJSONPasteInput):
+  SlideEditObjectImageCropJSONPasteValue | null {
+  if (!dataTransfer) {
+    return null
+  }
+
+  if (jsonMimeType) {
+    const customText = dataTransfer.getData(jsonMimeType)
+
+    if (customText.trim()) {
+      const customPasteValue =
+        getSlideEditObjectImageCropJSONPasteValueFromText(
+          customText,
+          {
+            payloadLength: customText.length,
+            sourceType: jsonMimeType,
+          },
+        )
+
+      if (customPasteValue !== null) {
+        return customPasteValue
+      }
+    }
+  }
+
+  for (const type of SLIDE_EDIT_OBJECT_IMAGE_CROP_JSON_TYPES) {
+    const text = dataTransfer.getData(type)
+
+    if (!text.trim()) {
+      continue
+    }
+
+    const pasteValue = getSlideEditObjectImageCropJSONPasteValueFromText(
+      text,
+      {
+        mode: 'wrapped',
+        payloadLength: text.length,
+        sourceType: type,
+      },
+    )
+
+    if (pasteValue !== null) {
+      return pasteValue
+    }
+  }
+
+  return null
+}
+
+export function getSlideEditObjectImageCropJSONPasteValueFromText(
+  text: string,
+  options?: SlideEditObjectImageCropJSONPasteValueOptions,
+): SlideEditObjectImageCropJSONPasteValue | null {
+  return getSlideEditObjectImageCropJSONPasteValueFromValue(
+    parseSlideEditObjectImageCropJSON(text),
+    {
+      ...options,
+      payloadLength: options?.payloadLength ?? text.length,
+    },
+  )
+}
+
+export function getSlideEditObjectImageCropJSONPasteValueFromValue(
+  value: unknown,
+  {
+    mode = 'direct',
+    payloadLength = 0,
+    sourceType = 'json',
+  }: SlideEditObjectImageCropJSONPasteValueOptions = {},
+): SlideEditObjectImageCropJSONPasteValue | null {
+  return mode === 'wrapped'
+    ? getSlideEditObjectImageCropWrappedJSONPasteValue({
+      payloadLength,
+      sourceType,
+      value,
+    })
+    : getSlideEditObjectImageCropAnyJSONPasteValue({
+      payloadLength,
+      sourceType,
+      value,
+    })
+}
+
+export function getSlideEditObjectImageCropForTarget<
+  TObjectId extends SlideEditObjectImageCropObjectId,
+>({
+  pasteValue,
+  target,
+}: SlideEditObjectImageCropForTargetInput<TObjectId>): {
+  crop: SlideEditObjectImageCropPosition
+  fit: SlideEditObjectImageCropFit
+} {
+  const currentCrop = normalizeSlideEditObjectImageCrop(target.crop)
+  const currentFit = normalizeSlideEditObjectImageCropFit(target.fit)
+
+  return {
+    crop: {
+      x: pasteValue.crop.x ?? currentCrop.x,
+      y: pasteValue.crop.y ?? currentCrop.y,
+    },
+    fit: pasteValue.fit ?? currentFit,
+  }
+}
+
+export function getSlideEditObjectImageCropPasteCommandEffects<
+  TSlideId extends SlideEditObjectImageCropSlideId,
+  TObjectId extends SlideEditObjectImageCropObjectId,
+>({
+  isTargetSupported,
+  pasteValue,
+  slideId,
+  targets,
+}: SlideEditObjectImageCropPasteCommandEffectsInput<TSlideId, TObjectId>):
+  SlideEditObjectImageCropPasteCommandEffectsResult<TSlideId, TObjectId> {
+  const appliedTargets:
+    SlideEditObjectImageCropPasteAppliedTarget<TObjectId>[] = []
+  const effects:
+    SlideEditObjectImageCropHostCommandEffect<TSlideId, TObjectId>[] = []
+  const skippedTargets:
+    SlideEditObjectImageCropPasteSkippedTarget<TObjectId>[] = []
+
+  for (const target of targets) {
+    if (target.isLocked) {
+      skippedTargets.push({
+        objectId: target.objectId,
+        reason: 'locked-target',
+      })
+      continue
+    }
+
+    if (target.isHidden) {
+      skippedTargets.push({
+        objectId: target.objectId,
+        reason: 'hidden-target',
+      })
+      continue
+    }
+
+    if (target.isSupported === false) {
+      skippedTargets.push({
+        objectId: target.objectId,
+        reason: 'unsupported-target',
+      })
+      continue
+    }
+
+    if (
+      isTargetSupported &&
+      !isTargetSupported({
+        pasteValue,
+        target,
+      })
+    ) {
+      skippedTargets.push({
+        objectId: target.objectId,
+        reason: 'unsupported-target',
+      })
+      continue
+    }
+
+    const nextImageCrop = getSlideEditObjectImageCropForTarget({
+      pasteValue,
+      target,
+    })
+
+    for (const field of pasteValue.fields) {
+      const effect = getSlideEditObjectImageCropCommandEffect({
+        fieldId: field,
+        id: 'update-object-image-crop',
+        objectId: target.objectId,
+        slideId,
+        value: field === 'fit'
+          ? nextImageCrop.fit
+          : nextImageCrop.crop[field],
+      })
+
+      effects.push(effect)
+    }
+
+    appliedTargets.push({
+      commandId: 'update-object-image-crop',
+      crop: nextImageCrop.crop,
+      effectType: 'slide-command-effect',
+      fields: pasteValue.fields,
+      fit: nextImageCrop.fit,
+      objectId: target.objectId,
+    })
+  }
+
+  return {
+    appliedTargets,
+    effects,
+    pasteValue,
+    skippedTargets,
   }
 }
 
