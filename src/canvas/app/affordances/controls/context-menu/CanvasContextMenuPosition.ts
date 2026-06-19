@@ -44,6 +44,14 @@ export type CanvasContextMenuKeyboardIntent = {
   stopPropagation: true
 }
 
+export type CanvasContextMenuPointerIntentKind = 'open-context-menu'
+
+export type CanvasContextMenuPointerIntent = {
+  kind: CanvasContextMenuPointerIntentKind
+  preventDefault: true
+  stopPropagation: true
+}
+
 export type CanvasContextMenuDismissKeyboardIntentKind = 'close-context-menu'
 
 export type CanvasContextMenuDismissKeyboardIntent = {
@@ -84,6 +92,15 @@ export function getCanvasContextMenuKeyboardIntent({
   }
 
   return null
+}
+
+export function getCanvasContextMenuPointerIntent():
+  CanvasContextMenuPointerIntent {
+  return {
+    kind: 'open-context-menu',
+    preventDefault: true,
+    stopPropagation: true,
+  }
 }
 
 export function getCanvasContextMenuDismissKeyboardIntent({

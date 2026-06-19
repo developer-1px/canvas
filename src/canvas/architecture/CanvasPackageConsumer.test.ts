@@ -261,11 +261,13 @@ import {
   getCanvasInlineEditKeyboardIntent,
   getCanvasContextMenuDismissKeyboardIntent,
   getCanvasContextMenuKeyboardIntent,
+  getCanvasContextMenuPointerIntent,
   getCanvasContextMenuPosition,
   getCanvasContextMenuPositionForClientPoint,
   getCanvasMenuRestoreFocusTarget,
   getCanvasModalBackdropPointerIntent,
   getCanvasModalKeyboardIntent,
+  runCanvasMenuRovingKeyboardIntent,
   runCanvasModalBackdropPointerIntent,
   runCanvasModalKeyboardIntent,
   measureCanvasTextBlocks,
@@ -503,6 +505,7 @@ import {
   type CanvasContextMenuClientPointInput,
   type CanvasContextMenuDismissKeyboardIntentInput,
   type CanvasContextMenuKeyboardIntentInput,
+  type CanvasContextMenuPointerIntent,
   type CanvasContextMenuPositionInput,
   type CanvasFindInputKeyboardIntentInput,
   type CanvasEraserStrokeHitTestStroke,
@@ -510,6 +513,7 @@ import {
   type CanvasMenuRovingActiveIndexInput,
   type CanvasMenuRovingKeyboardIntentInput,
   type CanvasMenuTriggerKeyboardIntentInput,
+  type RunCanvasMenuRovingKeyboardIntentInput,
   type CanvasToolbarRovingActiveIndexInput,
   type CanvasToolbarRovingKeyboardIntentInput,
   type RunCanvasToolbarRovingKeyboardIntentInput,
@@ -4207,6 +4211,34 @@ describe('Canvas package consumer imports', () => {
     const menuTriggerKeyboardInput: CanvasMenuTriggerKeyboardIntentInput = {
       key: 'Enter',
     }
+    let menuRovingPreventDefaultCount = 0
+    let menuRovingStopPropagationCount = 0
+    let menuRovingCloseCount = 0
+    let menuRovingMoveFocusCount = 0
+    let menuRovingActivateCount = 0
+    const menuRovingKeyboardRunInput:
+      RunCanvasMenuRovingKeyboardIntentInput = {
+        count: 4,
+        currentIndex: 1,
+        event: {
+          key: 'Escape',
+          preventDefault: () => {
+            menuRovingPreventDefaultCount += 1
+          },
+          stopPropagation: () => {
+            menuRovingStopPropagationCount += 1
+          },
+        },
+        onActivateItem: () => {
+          menuRovingActivateCount += 1
+        },
+        onClose: () => {
+          menuRovingCloseCount += 1
+        },
+        onMoveFocus: () => {
+          menuRovingMoveFocusCount += 1
+        },
+      }
     const toolbarRovingActiveIndexInput:
       CanvasToolbarRovingActiveIndexInput = {
         count: 4,
@@ -4864,6 +4896,17 @@ describe('Canvas package consumer imports', () => {
       kind: 'open-menu',
       preventDefault: true,
     })
+    expect(runCanvasMenuRovingKeyboardIntent(
+      menuRovingKeyboardRunInput,
+    )).toBe(true)
+    expect(CanvasAppFacade.runCanvasMenuRovingKeyboardIntent(
+      menuRovingKeyboardRunInput,
+    )).toBe(true)
+    expect(menuRovingPreventDefaultCount).toBe(2)
+    expect(menuRovingStopPropagationCount).toBe(2)
+    expect(menuRovingCloseCount).toBe(2)
+    expect(menuRovingMoveFocusCount).toBe(0)
+    expect(menuRovingActivateCount).toBe(0)
     expect(getCanvasToolbarRovingActiveIndex(
       toolbarRovingActiveIndexInput,
     )).toBe(3)
@@ -5017,6 +5060,16 @@ describe('Canvas package consumer imports', () => {
       preventDefault: true,
       stopPropagation: true,
     })
+    const contextMenuPointerIntent: CanvasContextMenuPointerIntent =
+      getCanvasContextMenuPointerIntent()
+    expect(contextMenuPointerIntent).toEqual({
+      kind: 'open-context-menu',
+      preventDefault: true,
+      stopPropagation: true,
+    })
+    expect(CanvasAppFacade.getCanvasContextMenuPointerIntent()).toEqual(
+      contextMenuPointerIntent,
+    )
     expect(getCanvasContextMenuDismissKeyboardIntent(
       contextMenuDismissKeyboardInput,
     )).toEqual({

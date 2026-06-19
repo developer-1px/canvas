@@ -11,6 +11,7 @@ import {
   getCanvasMenuRestoreFocusTarget,
   getCanvasMenuTriggerKeyboardIntent,
   restoreCanvasMenuFocus,
+  runCanvasMenuRovingKeyboardIntent,
 } from './CanvasMenuRovingFocus'
 
 describe('CanvasMenuRovingFocus', () => {
@@ -152,6 +153,146 @@ describe('CanvasMenuRovingFocus', () => {
       preventDefault: false,
       stopPropagation: false,
     })
+  })
+
+  it('runs menu move-focus intents by consuming the event', () => {
+    let preventDefaultCount = 0
+    let stopPropagationCount = 0
+    let focusedIndex: number | null = null
+    let closeCount = 0
+    let activateCount = 0
+
+    expect(runCanvasMenuRovingKeyboardIntent({
+      count: 4,
+      currentIndex: 1,
+      event: {
+        key: 'End',
+        preventDefault: () => {
+          preventDefaultCount += 1
+        },
+        stopPropagation: () => {
+          stopPropagationCount += 1
+        },
+      },
+      onActivateItem: () => {
+        activateCount += 1
+      },
+      onClose: () => {
+        closeCount += 1
+      },
+      onMoveFocus: (nextIndex) => {
+        focusedIndex = nextIndex
+      },
+    })).toBe(true)
+
+    expect(preventDefaultCount).toBe(1)
+    expect(stopPropagationCount).toBe(1)
+    expect(focusedIndex).toBe(3)
+    expect(closeCount).toBe(0)
+    expect(activateCount).toBe(0)
+  })
+
+  it('runs menu close intents by consuming the event', () => {
+    let preventDefaultCount = 0
+    let stopPropagationCount = 0
+    let closeCount = 0
+    let moveFocusCount = 0
+    let activateCount = 0
+
+    expect(runCanvasMenuRovingKeyboardIntent({
+      count: 4,
+      currentIndex: 1,
+      event: {
+        key: 'Escape',
+        preventDefault: () => {
+          preventDefaultCount += 1
+        },
+        stopPropagation: () => {
+          stopPropagationCount += 1
+        },
+      },
+      onActivateItem: () => {
+        activateCount += 1
+      },
+      onClose: () => {
+        closeCount += 1
+      },
+      onMoveFocus: () => {
+        moveFocusCount += 1
+      },
+    })).toBe(true)
+
+    expect(preventDefaultCount).toBe(1)
+    expect(stopPropagationCount).toBe(1)
+    expect(closeCount).toBe(1)
+    expect(moveFocusCount).toBe(0)
+    expect(activateCount).toBe(0)
+  })
+
+  it('runs menu activation intents with the active item index', () => {
+    let preventDefaultCount = 0
+    let stopPropagationCount = 0
+    let activatedIndex: number | null = null
+
+    expect(runCanvasMenuRovingKeyboardIntent({
+      count: 4,
+      currentIndex: 2,
+      event: {
+        key: 'Enter',
+        preventDefault: () => {
+          preventDefaultCount += 1
+        },
+        stopPropagation: () => {
+          stopPropagationCount += 1
+        },
+      },
+      onActivateItem: (index) => {
+        activatedIndex = index
+      },
+      onClose: () => undefined,
+      onMoveFocus: () => undefined,
+    })).toBe(true)
+
+    expect(preventDefaultCount).toBe(1)
+    expect(stopPropagationCount).toBe(1)
+    expect(activatedIndex).toBe(2)
+  })
+
+  it('does not consume unsupported menu keys', () => {
+    let preventDefaultCount = 0
+    let stopPropagationCount = 0
+    let moveFocusCount = 0
+    let closeCount = 0
+    let activateCount = 0
+
+    expect(runCanvasMenuRovingKeyboardIntent({
+      count: 4,
+      currentIndex: 1,
+      event: {
+        key: 'Tab',
+        preventDefault: () => {
+          preventDefaultCount += 1
+        },
+        stopPropagation: () => {
+          stopPropagationCount += 1
+        },
+      },
+      onActivateItem: () => {
+        activateCount += 1
+      },
+      onClose: () => {
+        closeCount += 1
+      },
+      onMoveFocus: () => {
+        moveFocusCount += 1
+      },
+    })).toBe(false)
+
+    expect(preventDefaultCount).toBe(0)
+    expect(stopPropagationCount).toBe(0)
+    expect(moveFocusCount).toBe(0)
+    expect(closeCount).toBe(0)
+    expect(activateCount).toBe(0)
   })
 
   it('resolves active index from focused item before preferred index', () => {

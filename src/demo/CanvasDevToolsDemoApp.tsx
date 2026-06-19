@@ -57,6 +57,7 @@ import {
   getCanvasAppWidgetInteractions,
   getCanvasClientViewportSize,
   getCanvasContextMenuKeyboardIntent,
+  getCanvasContextMenuPointerIntent,
   getCanvasContextMenuPosition,
   runCanvasPresentationKeyboardIntent,
   useCanvasToolbarRovingFocus,
@@ -436,11 +437,13 @@ function CanvasEngineDemoSurface({
       return
     }
 
-    if (contextMenuKeyboardIntent.preventDefault) {
+    const contextMenuPointerIntent = getCanvasContextMenuPointerIntent()
+
+    if (contextMenuPointerIntent.preventDefault) {
       event.preventDefault()
     }
 
-    if (contextMenuKeyboardIntent.stopPropagation) {
+    if (contextMenuPointerIntent.stopPropagation) {
       event.stopPropagation()
     }
 

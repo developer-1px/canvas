@@ -28,14 +28,17 @@ export {
   getCanvasMenuRovingKeyIndex,
   getCanvasMenuTriggerKeyboardIntent,
   restoreCanvasMenuFocus,
+  runCanvasMenuRovingKeyboardIntent,
   useCanvasMenuRovingFocus,
   type CanvasMenuRovingActiveIndexInput,
   type CanvasMenuRovingFocusOptions,
+  type CanvasMenuRovingKeyboardEvent,
   type CanvasMenuRovingKeyboardIntent,
   type CanvasMenuRovingKeyboardIntentInput,
   type CanvasMenuRovingKeyIndexInput,
   type CanvasMenuTriggerKeyboardIntent,
   type CanvasMenuTriggerKeyboardIntentInput,
+  type RunCanvasMenuRovingKeyboardIntentInput,
 } from './CanvasMenuRovingFocus'
 export {
   CANVAS_TOOLBAR_COMMAND_GROUPS,

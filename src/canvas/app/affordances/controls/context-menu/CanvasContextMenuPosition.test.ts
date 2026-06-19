@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest'
 import {
   getCanvasContextMenuDismissKeyboardIntent,
   getCanvasContextMenuKeyboardIntent,
+  getCanvasContextMenuPointerIntent,
   getCanvasContextMenuPosition,
   getCanvasContextMenuPositionForClientPoint,
 } from './CanvasContextMenuPosition'
@@ -112,6 +113,16 @@ describe('getCanvasContextMenuKeyboardIntent', () => {
       event: { shiftKey: true },
       key: 'Escape',
     })).toBeNull()
+  })
+})
+
+describe('getCanvasContextMenuPointerIntent', () => {
+  it('maps contextmenu pointer events to a consumed open context menu intent', () => {
+    expect(getCanvasContextMenuPointerIntent()).toEqual({
+      kind: 'open-context-menu',
+      preventDefault: true,
+      stopPropagation: true,
+    })
   })
 })
 
