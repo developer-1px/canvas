@@ -264,9 +264,12 @@ export {
 export {
   getCanvasSelectionListModifierState,
   getCanvasSelectionListRangeIds,
+  getCanvasSelectionListSelectionPlan,
   type CanvasSelectionListModifierInput,
   type CanvasSelectionListModifierState,
   type CanvasSelectionListRangeInput,
+  type CanvasSelectionListSelectionPlan,
+  type CanvasSelectionListSelectionPlanInput,
   type CanvasSelectionListSelectionMode,
 } from './affordances/controls/selection-list/CanvasSelectionListRange'
 export {

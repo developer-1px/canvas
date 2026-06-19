@@ -281,6 +281,8 @@ import {
   getCanvasMenuRovingKeyboardIntent,
   getCanvasMenuTriggerKeyboardIntent,
   getCanvasSelectionListModifierState,
+  getCanvasSelectionListRangeIds,
+  getCanvasSelectionListSelectionPlan,
   getCanvasWorldClientPoint,
   isCanvasControlTarget,
   getCanvasAppFoundationExtensionCommands,
@@ -547,6 +549,9 @@ import {
   type CanvasPointerTransformModifierState,
   type CanvasSelectionListModifierInput,
   type CanvasSelectionListModifierState,
+  type CanvasSelectionListRangeInput,
+  type CanvasSelectionListSelectionPlan,
+  type CanvasSelectionListSelectionPlanInput,
   type CanvasSelectionListSelectionMode,
   type CanvasViewportSetter,
   type CanvasWorkspaceStorageProvider,
@@ -4202,6 +4207,27 @@ describe('Canvas package consumer imports', () => {
       getCanvasSelectionListModifierState(selectionListModifierInput)
     const selectionListModifierMode: CanvasSelectionListSelectionMode =
       selectionListModifierState.mode
+    const selectionListRangeInput:
+      CanvasSelectionListRangeInput<'title' | 'note' | 'image' | 'footer'> = {
+        anchorId: 'title',
+        ids: ['title', 'note', 'image', 'footer'],
+        targetId: 'image',
+      }
+    const selectionListSelectionPlanInput:
+      CanvasSelectionListSelectionPlanInput<
+        'title' | 'note' | 'image' | 'footer'
+      > = {
+        anchorId: 'title',
+        ctrlKey: false,
+        ids: ['title', 'note', 'image', 'footer'],
+        metaKey: false,
+        selectedIds: ['footer'],
+        shiftKey: true,
+        targetId: 'image',
+      }
+    const selectionListSelectionPlan:
+      CanvasSelectionListSelectionPlan<'title' | 'note' | 'image' | 'footer'> =
+        getCanvasSelectionListSelectionPlan(selectionListSelectionPlanInput)
     const menuRovingActiveIndexInput: CanvasMenuRovingActiveIndexInput = {
       count: 4,
       focusedIndex: -1,
@@ -4909,6 +4935,23 @@ describe('Canvas package consumer imports', () => {
     expect(CanvasAppFacade.getCanvasSelectionListModifierState(
       selectionListModifierInput,
     )).toEqual(selectionListModifierState)
+    expect(getCanvasSelectionListRangeIds(selectionListRangeInput)).toEqual([
+      'title',
+      'note',
+      'image',
+    ])
+    expect(CanvasAppFacade.getCanvasSelectionListRangeIds(
+      selectionListRangeInput,
+    )).toEqual(['title', 'note', 'image'])
+    expect(selectionListSelectionPlan).toEqual({
+      anchorId: 'title',
+      mode: 'range',
+      selectedIds: ['title', 'note', 'image'],
+      targetId: 'image',
+    })
+    expect(CanvasAppFacade.getCanvasSelectionListSelectionPlan(
+      selectionListSelectionPlanInput,
+    )).toEqual(selectionListSelectionPlan)
     expect(getCanvasMenuRovingActiveIndex(menuRovingActiveIndexInput)).toBe(3)
     expect(CanvasAppFacade.getCanvasMenuRovingActiveIndex(
       menuRovingActiveIndexInput,
