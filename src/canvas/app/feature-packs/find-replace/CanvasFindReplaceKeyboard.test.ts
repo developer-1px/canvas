@@ -8,6 +8,7 @@ describe('CanvasFindReplaceKeyboard', () => {
       direction: 1,
       kind: 'find-match',
       preventDefault: true,
+      stopPropagation: true,
     })
   })
 
@@ -19,6 +20,7 @@ describe('CanvasFindReplaceKeyboard', () => {
       direction: -1,
       kind: 'find-match',
       preventDefault: true,
+      stopPropagation: true,
     })
   })
 
@@ -26,6 +28,7 @@ describe('CanvasFindReplaceKeyboard', () => {
     expect(getCanvasFindInputKeyboardIntent({ key: 'Escape' })).toEqual({
       kind: 'close-find',
       preventDefault: true,
+      stopPropagation: true,
     })
   })
 
@@ -33,6 +36,7 @@ describe('CanvasFindReplaceKeyboard', () => {
     expect(getCanvasFindInputKeyboardIntent({ key: 'Tab' })).toEqual({
       kind: 'none',
       preventDefault: false,
+      stopPropagation: false,
     })
   })
 })

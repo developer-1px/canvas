@@ -4699,6 +4699,7 @@ describe('Canvas package consumer imports', () => {
       direction: -1,
       kind: 'find-match',
       preventDefault: true,
+      stopPropagation: true,
     })
     expect(CanvasAppFacade.getCanvasFindInputKeyboardIntent(
       findInputKeyboardInput,
@@ -4706,6 +4707,7 @@ describe('Canvas package consumer imports', () => {
       direction: -1,
       kind: 'find-match',
       preventDefault: true,
+      stopPropagation: true,
     })
     expect(getCanvasEditableFieldKeyboardIntent(editableFieldKeyboardInput))
       .toEqual({

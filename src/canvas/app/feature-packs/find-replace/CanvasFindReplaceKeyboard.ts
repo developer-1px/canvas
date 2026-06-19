@@ -8,14 +8,17 @@ export type CanvasFindInputKeyboardIntent =
       direction: -1 | 1
       kind: 'find-match'
       preventDefault: true
+      stopPropagation: true
     }
   | {
       kind: 'close-find'
       preventDefault: true
+      stopPropagation: true
     }
   | {
       kind: 'none'
       preventDefault: false
+      stopPropagation: false
     }
 
 export function getCanvasFindInputKeyboardIntent({
@@ -27,6 +30,7 @@ export function getCanvasFindInputKeyboardIntent({
       direction: shiftKey ? -1 : 1,
       kind: 'find-match',
       preventDefault: true,
+      stopPropagation: true,
     }
   }
 
@@ -34,11 +38,13 @@ export function getCanvasFindInputKeyboardIntent({
     return {
       kind: 'close-find',
       preventDefault: true,
+      stopPropagation: true,
     }
   }
 
   return {
     kind: 'none',
     preventDefault: false,
+    stopPropagation: false,
   }
 }

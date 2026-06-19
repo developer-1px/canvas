@@ -4,6 +4,9 @@ import {
   type FormEvent,
   type KeyboardEvent,
 } from 'react'
+import {
+  runCanvasFindReplacePanelKeyboardIntent,
+} from './CanvasFindReplacePanelKeyboard'
 
 type CanvasFindReplacePanelProps = {
   matchCount: number
@@ -55,10 +58,10 @@ export function CanvasFindReplacePanel({
   }
 
   function handleKeyDown(event: KeyboardEvent<HTMLFormElement>) {
-    if (event.key === 'Escape') {
-      event.preventDefault()
-      onClose()
-    }
+    runCanvasFindReplacePanelKeyboardIntent({
+      event,
+      onClose,
+    })
   }
 
   return (
