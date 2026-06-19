@@ -13,6 +13,7 @@ describe('CanvasCommandPaletteKeyboard', () => {
       activeIndex: 2,
       kind: 'move-active',
       preventDefault: true,
+      stopPropagation: true,
     })
 
     expect(getCanvasCommandPaletteKeyboardIntent({
@@ -23,6 +24,7 @@ describe('CanvasCommandPaletteKeyboard', () => {
       activeIndex: 0,
       kind: 'move-active',
       preventDefault: true,
+      stopPropagation: true,
     })
   })
 
@@ -35,6 +37,7 @@ describe('CanvasCommandPaletteKeyboard', () => {
       activeIndex: 2,
       kind: 'move-active',
       preventDefault: true,
+      stopPropagation: true,
     })
 
     expect(getCanvasCommandPaletteKeyboardIntent({
@@ -45,6 +48,7 @@ describe('CanvasCommandPaletteKeyboard', () => {
       activeIndex: 0,
       kind: 'move-active',
       preventDefault: true,
+      stopPropagation: true,
     })
   })
 
@@ -57,6 +61,7 @@ describe('CanvasCommandPaletteKeyboard', () => {
       activeIndex: 2,
       kind: 'run-active',
       preventDefault: true,
+      stopPropagation: true,
     })
   })
 
@@ -68,6 +73,7 @@ describe('CanvasCommandPaletteKeyboard', () => {
     })).toEqual({
       kind: 'none',
       preventDefault: false,
+      stopPropagation: false,
     })
   })
 
@@ -79,6 +85,7 @@ describe('CanvasCommandPaletteKeyboard', () => {
     })).toEqual({
       kind: 'none',
       preventDefault: false,
+      stopPropagation: false,
     })
   })
 })

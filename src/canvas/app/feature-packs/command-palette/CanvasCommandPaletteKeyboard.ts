@@ -9,15 +9,18 @@ export type CanvasCommandPaletteKeyboardIntent =
       kind: 'move-active'
       activeIndex: number
       preventDefault: true
+      stopPropagation: true
     }
   | {
       kind: 'run-active'
       activeIndex: number
       preventDefault: true
+      stopPropagation: true
     }
   | {
       kind: 'none'
       preventDefault: false
+      stopPropagation: false
     }
 
 export function getCanvasCommandPaletteKeyboardIntent({
@@ -38,6 +41,7 @@ export function getCanvasCommandPaletteKeyboardIntent({
       ),
       kind: 'move-active',
       preventDefault: true,
+      stopPropagation: true,
     }
   }
 
@@ -49,6 +53,7 @@ export function getCanvasCommandPaletteKeyboardIntent({
       ),
       kind: 'move-active',
       preventDefault: true,
+      stopPropagation: true,
     }
   }
 
@@ -57,12 +62,14 @@ export function getCanvasCommandPaletteKeyboardIntent({
       activeIndex: clampedActiveIndex,
       kind: 'run-active',
       preventDefault: true,
+      stopPropagation: true,
     }
   }
 
   return {
     kind: 'none',
     preventDefault: false,
+    stopPropagation: false,
   }
 }
 

@@ -105,8 +105,12 @@ function CanvasCommandPaletteDialog({
         key: event.key,
       })
 
-      event.preventDefault()
-      event.stopPropagation()
+      if (keyboardIntent.preventDefault) {
+        event.preventDefault()
+      }
+      if (keyboardIntent.stopPropagation) {
+        event.stopPropagation()
+      }
       if (keyboardIntent.kind === 'move-active') {
         setActiveIndex(keyboardIntent.activeIndex)
       }
@@ -122,6 +126,8 @@ function CanvasCommandPaletteDialog({
 
       if (keyboardIntent.preventDefault) {
         event.preventDefault()
+      }
+      if (keyboardIntent.stopPropagation) {
         event.stopPropagation()
       }
 

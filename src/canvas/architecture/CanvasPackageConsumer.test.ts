@@ -95,6 +95,7 @@ import {
   getCanvasAppFeaturePackMarketplaceAssemblyTargetApplyPlan,
   getCanvasAppFeaturePackMarketplaceAssemblyTargetApplyResult,
   getCanvasAppFeaturePackMarketplaceAssemblyTargetItem,
+  getCanvasCommandPaletteKeyboardIntent,
   getCanvasAppFeaturePackMarketplaceActionAssemblyPlan,
   getCanvasAppFeaturePackMarketplaceActionAssemblyInput,
   getCanvasStoryCanvasFeaturePackMarketplaceAssemblyModel,
@@ -4827,6 +4828,15 @@ describe('Canvas package consumer imports', () => {
       activeIndex: 1,
       kind: 'move-active',
       preventDefault: true,
+      stopPropagation: true,
+    })
+    expect(getCanvasCommandPaletteKeyboardIntent(
+      commandPaletteKeyboardInput,
+    )).toEqual({
+      activeIndex: 1,
+      kind: 'move-active',
+      preventDefault: true,
+      stopPropagation: true,
     })
     expect(CanvasAppAuthoring.createCanvasAppAssembly).toBeTypeOf('function')
     expect(CanvasAppAuthoring.getCanvasAppFoundationExtensionCommands)
