@@ -249,6 +249,7 @@ import {
   getCanvasFindInputKeyboardIntent,
   getCanvasFloatingAnchorForBounds,
   getCanvasInlineEditKeyboardIntent,
+  getCanvasContextMenuDismissKeyboardIntent,
   getCanvasContextMenuKeyboardIntent,
   getCanvasContextMenuPosition,
   getCanvasContextMenuPositionForClientPoint,
@@ -486,6 +487,7 @@ import {
   type CanvasInteractionTargetSelectorInput,
   type CanvasInlineEditKeyboardIntentInput,
   type CanvasContextMenuClientPointInput,
+  type CanvasContextMenuDismissKeyboardIntentInput,
   type CanvasContextMenuKeyboardIntentInput,
   type CanvasContextMenuPositionInput,
   type CanvasFindInputKeyboardIntentInput,
@@ -4222,6 +4224,10 @@ describe('Canvas package consumer imports', () => {
       event: { shiftKey: true },
       key: 'F10',
     }
+    const contextMenuDismissKeyboardInput:
+      CanvasContextMenuDismissKeyboardIntentInput = {
+        key: 'Escape',
+      }
     const contextMenuPositionInput: CanvasContextMenuPositionInput = {
       menuSize: { height: 100, width: 160 },
       point: { x: 790, y: 590 },
@@ -4712,6 +4718,20 @@ describe('Canvas package consumer imports', () => {
       contextMenuKeyboardInput,
     )).toEqual({
       kind: 'open-context-menu',
+      preventDefault: true,
+      stopPropagation: true,
+    })
+    expect(getCanvasContextMenuDismissKeyboardIntent(
+      contextMenuDismissKeyboardInput,
+    )).toEqual({
+      kind: 'close-context-menu',
+      preventDefault: true,
+      stopPropagation: true,
+    })
+    expect(CanvasAppFacade.getCanvasContextMenuDismissKeyboardIntent(
+      contextMenuDismissKeyboardInput,
+    )).toEqual({
+      kind: 'close-context-menu',
       preventDefault: true,
       stopPropagation: true,
     })

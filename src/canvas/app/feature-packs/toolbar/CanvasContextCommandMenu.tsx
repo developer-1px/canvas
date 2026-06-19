@@ -10,6 +10,7 @@ import { isCanvasTargetWithinSelector } from '../../affordances/interaction/dom/
 import {
   CANVAS_CONTEXT_MENU_DEFAULT_SIZE,
   DEFAULT_CANVAS_CONTEXT_MENU_MARGIN,
+  getCanvasContextMenuDismissKeyboardIntent,
 } from '../../affordances/controls/context-menu/CanvasContextMenuPosition'
 import { CanvasCommandMenuSurface } from './CanvasCommandMenuSurface'
 import {
@@ -48,9 +49,23 @@ export function CanvasContextCommandMenu({
     }
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        onClose()
+      const intent = getCanvasContextMenuDismissKeyboardIntent({
+        key: event.key,
+      })
+
+      if (!intent) {
+        return
       }
+
+      if (intent.preventDefault) {
+        event.preventDefault()
+      }
+
+      if (intent.stopPropagation) {
+        event.stopPropagation()
+      }
+
+      onClose()
     }
     const handlePointerDown = (event: PointerEvent) => {
       if (isCanvasTargetWithinSelector({

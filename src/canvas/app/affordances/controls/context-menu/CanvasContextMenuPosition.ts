@@ -44,10 +44,22 @@ export type CanvasContextMenuKeyboardIntent = {
   stopPropagation: true
 }
 
+export type CanvasContextMenuDismissKeyboardIntentKind = 'close-context-menu'
+
+export type CanvasContextMenuDismissKeyboardIntent = {
+  kind: CanvasContextMenuDismissKeyboardIntentKind
+  preventDefault: true
+  stopPropagation: true
+}
+
 export type CanvasContextMenuKeyboardIntentInput = {
   event: {
     shiftKey: boolean
   }
+  key: string
+}
+
+export type CanvasContextMenuDismissKeyboardIntentInput = {
   key: string
 }
 
@@ -66,6 +78,21 @@ export function getCanvasContextMenuKeyboardIntent({
   if (key === 'ContextMenu' || (key === 'F10' && event.shiftKey)) {
     return {
       kind: 'open-context-menu',
+      preventDefault: true,
+      stopPropagation: true,
+    }
+  }
+
+  return null
+}
+
+export function getCanvasContextMenuDismissKeyboardIntent({
+  key,
+}: CanvasContextMenuDismissKeyboardIntentInput):
+  CanvasContextMenuDismissKeyboardIntent | null {
+  if (key === 'Escape') {
+    return {
+      kind: 'close-context-menu',
       preventDefault: true,
       stopPropagation: true,
     }

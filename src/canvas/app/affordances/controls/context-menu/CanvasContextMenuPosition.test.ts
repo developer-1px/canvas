@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import {
+  getCanvasContextMenuDismissKeyboardIntent,
   getCanvasContextMenuKeyboardIntent,
   getCanvasContextMenuPosition,
   getCanvasContextMenuPositionForClientPoint,
@@ -111,5 +112,21 @@ describe('getCanvasContextMenuKeyboardIntent', () => {
       event: { shiftKey: true },
       key: 'Escape',
     })).toBeNull()
+  })
+})
+
+describe('getCanvasContextMenuDismissKeyboardIntent', () => {
+  it('maps Escape to a consumed close context menu intent', () => {
+    expect(getCanvasContextMenuDismissKeyboardIntent({ key: 'Escape' }))
+      .toEqual({
+        kind: 'close-context-menu',
+        preventDefault: true,
+        stopPropagation: true,
+      })
+  })
+
+  it('ignores unrelated keys', () => {
+    expect(getCanvasContextMenuDismissKeyboardIntent({ key: 'Enter' }))
+      .toBeNull()
   })
 })
