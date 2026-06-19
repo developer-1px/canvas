@@ -9,6 +9,7 @@ export type SlideEditTextFormattingKeyboardIntentKind =
 export type SlideEditTextRunFormattingFieldId =
   | 'bold'
   | 'color'
+  | 'highlight'
   | 'italic'
   | 'size'
   | 'strikethrough'
@@ -29,7 +30,7 @@ export type SlideEditTextRunFormattingValue<
     SlideEditTextRunFormattingFieldId,
 > = TFieldId extends 'size'
   ? SlideEditTextRunSizeValue
-  : TFieldId extends 'color'
+  : TFieldId extends 'color' | 'highlight'
     ? SlideEditTextRunColorValue
     : boolean
 
@@ -143,11 +144,17 @@ export type SlideEditTextRunSizeJSONPasteInput = {
 export type SlideEditTextRunColorJSONPasteInput =
   SlideEditTextRunSizeJSONPasteInput
 
+export type SlideEditTextRunHighlightJSONPasteInput =
+  SlideEditTextRunSizeJSONPasteInput
+
 export type SlideEditTextRunSizeJSONPasteValueOptions = {
   mode?: SlideEditTextRunFormattingJSONPasteValueMode
 }
 
 export type SlideEditTextRunColorJSONPasteValueOptions =
+  SlideEditTextRunSizeJSONPasteValueOptions
+
+export type SlideEditTextRunHighlightJSONPasteValueOptions =
   SlideEditTextRunSizeJSONPasteValueOptions
 
 export type SlideEditTextRunStyleCommandEffectInput<
@@ -230,6 +237,24 @@ export const SLIDE_EDIT_TEXT_RUN_FORMATTING_FIELDS = Object.freeze([
     id: 'color',
     jsonKeys: ['textRunColor', 'runColor', 'color', 'value'],
     jsonMimeType: `${SLIDE_EDIT_TEXT_RUN_FORMATTING_MIME_PREFIX}-color+json`,
+    requiredAdapterSlot: 'command-effect',
+  },
+  {
+    commandId: 'update-text-run-formatting',
+    control: 'color-swatch',
+    id: 'highlight',
+    jsonKeys: [
+      'textRunHighlight',
+      'textRunHighlightColor',
+      'runHighlight',
+      'runHighlightColor',
+      'highlight',
+      'highlightColor',
+      'backgroundColor',
+      'value',
+    ],
+    jsonMimeType:
+      `${SLIDE_EDIT_TEXT_RUN_FORMATTING_MIME_PREFIX}-highlight+json`,
     requiredAdapterSlot: 'command-effect',
   },
   {
@@ -527,6 +552,35 @@ export function getSlideEditTextRunColorJSONPasteValueFromValue(
   })
 }
 
+export function getSlideEditTextRunHighlightJSONPasteValue(
+  input: SlideEditTextRunHighlightJSONPasteInput,
+): SlideEditTextRunColorValue | null {
+  return getSlideEditTextRunFormattingJSONPasteValue({
+    ...input,
+    fieldId: 'highlight',
+  })
+}
+
+export function getSlideEditTextRunHighlightJSONPasteValueFromText(
+  text: string,
+  options?: SlideEditTextRunHighlightJSONPasteValueOptions,
+): SlideEditTextRunColorValue | null {
+  return getSlideEditTextRunFormattingJSONPasteValueFromText(text, {
+    ...options,
+    fieldId: 'highlight',
+  })
+}
+
+export function getSlideEditTextRunHighlightJSONPasteValueFromValue(
+  value: unknown,
+  options?: SlideEditTextRunHighlightJSONPasteValueOptions,
+): SlideEditTextRunColorValue | null {
+  return getSlideEditTextRunFormattingJSONPasteValueFromValue(value, {
+    ...options,
+    fieldId: 'highlight',
+  })
+}
+
 export function normalizeSlideEditTextRunFormattingValue(
   value: unknown,
 ): boolean | null {
@@ -619,6 +673,7 @@ function normalizeSlideEditTextRunFormattingFieldValue<
 ): SlideEditTextRunFormattingValue<TFieldId> | null {
   switch (fieldId) {
     case 'color':
+    case 'highlight':
       return normalizeSlideEditTextRunColorValue(value) as
         SlideEditTextRunFormattingValue<TFieldId> | null
     case 'size':

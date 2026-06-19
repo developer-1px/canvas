@@ -10,6 +10,9 @@ import {
   getSlideEditTextRunFormattingJSONPasteValue,
   getSlideEditTextRunFormattingJSONPasteValueFromText,
   getSlideEditTextRunFormattingJSONPasteValueFromValue,
+  getSlideEditTextRunHighlightJSONPasteValue,
+  getSlideEditTextRunHighlightJSONPasteValueFromText,
+  getSlideEditTextRunHighlightJSONPasteValueFromValue,
   getSlideEditTextRunSizeCommandEffect,
   getSlideEditTextRunSizeJSONPasteValue,
   getSlideEditTextRunSizeJSONPasteValueFromText,
@@ -24,6 +27,8 @@ import {
   createSlideEditTextRunFormattingDescriptor as createSlideEditTextRunFormattingDescriptorFromPackage,
   getSlideEditTextRunColorJSONPasteValue as getSlideEditTextRunColorJSONPasteValueFromPackage,
   getSlideEditTextRunColorJSONPasteValueFromText as getSlideEditTextRunColorJSONPasteValueFromTextFromPackage,
+  getSlideEditTextRunHighlightJSONPasteValue as getSlideEditTextRunHighlightJSONPasteValueFromPackage,
+  getSlideEditTextRunHighlightJSONPasteValueFromText as getSlideEditTextRunHighlightJSONPasteValueFromTextFromPackage,
   getSlideEditTextRunFormattingJSONPasteValueFromText as getSlideEditTextRunFormattingJSONPasteValueFromTextFromPackage,
   getSlideEditTextRunSizeJSONPasteValue as getSlideEditTextRunSizeJSONPasteValueFromPackage,
   getSlideEditTextRunSizeJSONPasteValueFromValue as getSlideEditTextRunSizeJSONPasteValueFromValueFromPackage,
@@ -115,6 +120,11 @@ describe('SlideEditTextFormattingKeyboard', () => {
         [SLIDE_EDIT_TEXT_RUN_FORMATTING_FIELDS[4].jsonMimeType]: '"#ABC"',
       }),
     })).toBe('#aabbcc')
+    expect(getSlideEditTextRunHighlightJSONPasteValueFromPackage({
+      dataTransfer: createDataTransfer({
+        [getFormattingField('highlight').jsonMimeType]: '"#FEF08A"',
+      }),
+    })).toBe('#fef08a')
     expect(getSlideEditTextRunFormattingJSONPasteValueFromTextFromPackage(
       '{"underline":true}',
       {
@@ -136,6 +146,10 @@ describe('SlideEditTextFormattingKeyboard', () => {
     expect(getSlideEditTextRunColorJSONPasteValueFromTextFromPackage(
       '"#ABC"',
     )).toBe('#aabbcc')
+    expect(getSlideEditTextRunHighlightJSONPasteValueFromTextFromPackage(
+      '{"highlightColor":"#fde047"}',
+      { mode: 'wrapped' },
+    )).toBe('#fde047')
   })
 
   it('creates product-neutral text run formatting descriptors', () => {
@@ -155,6 +169,7 @@ describe('SlideEditTextFormattingKeyboard', () => {
         'underline',
         'size',
         'color',
+        'highlight',
         'strikethrough',
       ])
   })
@@ -260,6 +275,26 @@ describe('SlideEditTextFormattingKeyboard', () => {
       },
       type: 'slide-command-effect',
     })
+    expect(getSlideEditTextRunFormattingCommandEffect({
+      fieldId: 'highlight',
+      id: 'update-text-run-formatting',
+      objectIds: ['object-a'],
+      slideId: 'slide-a',
+      value: 'FEF08A',
+    })).toEqual({
+      payload: {
+        fieldId: 'highlight',
+        id: 'update-text-run-formatting',
+        objectIds: ['object-a'],
+        slideId: 'slide-a',
+        value: '#fef08a',
+      },
+      selection: {
+        objectIds: ['object-a'],
+        slideId: 'slide-a',
+      },
+      type: 'slide-command-effect',
+    })
   })
 
   it('reads custom MIME direct JSON boolean values', () => {
@@ -300,6 +335,11 @@ describe('SlideEditTextFormattingKeyboard', () => {
         [SLIDE_EDIT_TEXT_RUN_FORMATTING_FIELDS[4].jsonMimeType]: '"#ABC"',
       }),
     })).toBe('#aabbcc')
+    expect(getSlideEditTextRunHighlightJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [getFormattingField('highlight').jsonMimeType]: '"FEF08A"',
+      }),
+    })).toBe('#fef08a')
   })
 
   it('reads explicit run formatting fields from general JSON payloads', () => {
@@ -357,6 +397,16 @@ describe('SlideEditTextFormattingKeyboard', () => {
         'text/plain': '{"color":"currentColor"}',
       }),
     })).toBe('currentColor')
+    expect(getSlideEditTextRunHighlightJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"textRunHighlight":"FDE047"}',
+      }),
+    })).toBe('#fde047')
+    expect(getSlideEditTextRunHighlightJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'application/json': '{"backgroundColor":"#FEF08A"}',
+      }),
+    })).toBe('#fef08a')
   })
 
   it('reads run formatting JSON from text and parsed values', () => {
@@ -390,6 +440,12 @@ describe('SlideEditTextFormattingKeyboard', () => {
       { textRunColor: 'currentColor' },
       { mode: 'wrapped' },
     )).toBe('currentColor')
+    expect(getSlideEditTextRunHighlightJSONPasteValueFromText('"#FEF08A"'))
+      .toBe('#fef08a')
+    expect(getSlideEditTextRunHighlightJSONPasteValueFromValue(
+      { highlightColor: 'FDE047' },
+      { mode: 'wrapped' },
+    )).toBe('#fde047')
     expect(getSlideEditTextRunColorJSONPasteValueFromText(
       '"#ABC"',
       { mode: 'wrapped' },
@@ -435,6 +491,11 @@ describe('SlideEditTextFormattingKeyboard', () => {
     expect(getSlideEditTextRunColorJSONPasteValue({
       dataTransfer: createDataTransfer({
         'text/plain': '"#ABC"',
+      }),
+    })).toBeNull()
+    expect(getSlideEditTextRunHighlightJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '"#FEF08A"',
       }),
     })).toBeNull()
   })
