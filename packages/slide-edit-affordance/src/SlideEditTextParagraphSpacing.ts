@@ -67,13 +67,23 @@ export type SlideEditTextParagraphBulletKeyboardIntentKind =
   | 'toggle-bullet'
   | 'toggle-numbered'
 
-export type SlideEditTextParagraphBulletKeyboardIntent = {
-  commandId: 'toggle-text-paragraph-bullet'
-  kind: SlideEditTextParagraphBulletKeyboardIntentKind
-  preventDefault: boolean
-  shortcut: string
-  value: Extract<SlideEditTextParagraphBulletValue, 'bullet' | 'numbered'>
-}
+export type SlideEditTextParagraphBulletKeyboardIntent =
+  | {
+      commandId: 'toggle-text-paragraph-bullet'
+      intent: typeof SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_KEYBOARD_INTENT
+      kind: Extract<SlideEditTextParagraphBulletKeyboardIntentKind, 'toggle-bullet'>
+      preventDefault: true
+      shortcut: typeof SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_KEYBOARD_SHORTCUT
+      value: Extract<SlideEditTextParagraphBulletValue, 'bullet'>
+    }
+  | {
+      commandId: 'toggle-text-paragraph-bullet'
+      intent: typeof SLIDE_EDIT_TEXT_PARAGRAPH_NUMBERED_KEYBOARD_INTENT
+      kind: Extract<SlideEditTextParagraphBulletKeyboardIntentKind, 'toggle-numbered'>
+      preventDefault: true
+      shortcut: typeof SLIDE_EDIT_TEXT_PARAGRAPH_NUMBERED_KEYBOARD_SHORTCUT
+      value: Extract<SlideEditTextParagraphBulletValue, 'numbered'>
+    }
 
 export type SlideEditTextParagraphBulletKeyboardIntentInput = {
   altKey?: boolean
@@ -350,6 +360,18 @@ export const SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_KEYBOARD_SHORTCUT =
 export const SLIDE_EDIT_TEXT_PARAGRAPH_NUMBERED_KEYBOARD_SHORTCUT =
   'Cmd/Ctrl+Shift+7'
 
+export const SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_KEYBOARD_MODEL =
+  'slide-edit-text-paragraph-bullet-keyboard-shortcuts'
+
+export const SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_KEYBOARD_INTENT =
+  'slide-edit-text-paragraph-bullet-keyboard-intent'
+
+export const SLIDE_EDIT_TEXT_PARAGRAPH_NUMBERED_KEYBOARD_INTENT =
+  'slide-edit-text-paragraph-numbered-keyboard-intent'
+
+export const SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_KEYBOARD_ROUTING_PRIORITY =
+  'text-selection-before-host-command'
+
 export const SLIDE_EDIT_TEXT_PARAGRAPH_SPACING_FIELDS = Object.freeze([
   {
     commandId: 'update-text-paragraph-spacing',
@@ -451,6 +473,7 @@ export function getSlideEditTextParagraphBulletKeyboardIntent({
   if (normalizedKey === 'l') {
     return {
       commandId: 'toggle-text-paragraph-bullet',
+      intent: SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_KEYBOARD_INTENT,
       kind: 'toggle-bullet',
       preventDefault: true,
       shortcut: SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_KEYBOARD_SHORTCUT,
@@ -461,6 +484,7 @@ export function getSlideEditTextParagraphBulletKeyboardIntent({
   if (key === '7' || code === 'Digit7') {
     return {
       commandId: 'toggle-text-paragraph-bullet',
+      intent: SLIDE_EDIT_TEXT_PARAGRAPH_NUMBERED_KEYBOARD_INTENT,
       kind: 'toggle-numbered',
       preventDefault: true,
       shortcut: SLIDE_EDIT_TEXT_PARAGRAPH_NUMBERED_KEYBOARD_SHORTCUT,

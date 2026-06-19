@@ -21,8 +21,12 @@ import {
   SLIDE_EDIT_DEFAULT_TEXT_PARAGRAPH_SPACING,
   SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_DEFAULT,
   SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_FIELD,
+  SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_KEYBOARD_INTENT,
+  SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_KEYBOARD_MODEL,
+  SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_KEYBOARD_ROUTING_PRIORITY,
   SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_KEYBOARD_SHORTCUT,
   SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_VALUES,
+  SLIDE_EDIT_TEXT_PARAGRAPH_NUMBERED_KEYBOARD_INTENT,
   SLIDE_EDIT_TEXT_PARAGRAPH_NUMBERED_KEYBOARD_SHORTCUT,
   SLIDE_EDIT_TEXT_PARAGRAPH_SPACING_FIELDS,
   SLIDE_EDIT_TEXT_PARAGRAPH_SPACING_JSON_MIME_TYPE,
@@ -33,6 +37,8 @@ import {
   getSlideEditTextParagraphBulletJSONPasteValueFromText as getSlideEditTextParagraphBulletJSONPasteValueFromTextFromPackage,
   getSlideEditTextParagraphBulletJSONPasteValueFromValue as getSlideEditTextParagraphBulletJSONPasteValueFromValueFromPackage,
   getSlideEditTextParagraphBulletKeyboardIntent as getSlideEditTextParagraphBulletKeyboardIntentFromPackage,
+  SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_KEYBOARD_INTENT as SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_KEYBOARD_INTENT_FROM_PACKAGE,
+  SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_KEYBOARD_MODEL as SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_KEYBOARD_MODEL_FROM_PACKAGE,
   SLIDE_EDIT_TEXT_PARAGRAPH_NUMBERED_KEYBOARD_SHORTCUT as SLIDE_EDIT_TEXT_PARAGRAPH_NUMBERED_KEYBOARD_SHORTCUT_FROM_PACKAGE,
   getSlideEditTextParagraphSpacingJSONPasteValue as getSlideEditTextParagraphSpacingJSONPasteValueFromPackage,
   getSlideEditTextParagraphSpacingJSONPasteValueFromText as getSlideEditTextParagraphSpacingJSONPasteValueFromTextFromPackage,
@@ -137,6 +143,7 @@ describe('SlideEditTextParagraphSpacing', () => {
       shiftKey: true,
     })).toEqual({
       commandId: 'toggle-text-paragraph-bullet',
+      intent: SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_KEYBOARD_INTENT,
       kind: 'toggle-bullet',
       preventDefault: true,
       shortcut: SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_KEYBOARD_SHORTCUT,
@@ -158,6 +165,7 @@ describe('SlideEditTextParagraphSpacing', () => {
       shiftKey: true,
     })).toEqual({
       commandId: 'toggle-text-paragraph-bullet',
+      intent: SLIDE_EDIT_TEXT_PARAGRAPH_NUMBERED_KEYBOARD_INTENT,
       kind: 'toggle-numbered',
       preventDefault: true,
       shortcut: SLIDE_EDIT_TEXT_PARAGRAPH_NUMBERED_KEYBOARD_SHORTCUT,
@@ -187,6 +195,25 @@ describe('SlideEditTextParagraphSpacing', () => {
       mod: true,
       shiftKey: true,
     })).toBeNull()
+  })
+
+  it('exports paragraph bullet keyboard metadata and routing priority', () => {
+    expect(SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_KEYBOARD_MODEL).toBe(
+      'slide-edit-text-paragraph-bullet-keyboard-shortcuts',
+    )
+    expect(SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_KEYBOARD_INTENT).toBe(
+      'slide-edit-text-paragraph-bullet-keyboard-intent',
+    )
+    expect(SLIDE_EDIT_TEXT_PARAGRAPH_NUMBERED_KEYBOARD_INTENT).toBe(
+      'slide-edit-text-paragraph-numbered-keyboard-intent',
+    )
+    expect(SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_KEYBOARD_ROUTING_PRIORITY).toBe(
+      'text-selection-before-host-command',
+    )
+    expect(SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_KEYBOARD_MODEL_FROM_PACKAGE)
+      .toBe(SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_KEYBOARD_MODEL)
+    expect(SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_KEYBOARD_INTENT_FROM_PACKAGE)
+      .toBe(SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_KEYBOARD_INTENT)
   })
 
   it('reads custom MIME direct paragraph bullet JSON values', () => {
