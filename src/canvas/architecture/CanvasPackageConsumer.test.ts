@@ -50,6 +50,7 @@ import {
   focusCanvasElement,
   focusCanvasElementBySelectorOnNextFrame,
   focusCanvasElementOnNextFrame,
+  isCanvasKeyboardControlTarget,
   isCanvasKeyboardTypingTarget,
   resolveCanvasElementBySelector,
   createCanvasAppAssembly,
@@ -4490,7 +4491,12 @@ describe('Canvas package consumer imports', () => {
     cleanupPackageStageWheelListener()
     expect(packageStageWheelListeners.size).toBe(0)
     expect(CANVAS_CONTROL_TARGET_SELECTOR).toContain('button')
+    expect(CANVAS_CONTROL_TARGET_SELECTOR).toContain('summary')
+    expect(CANVAS_CONTROL_TARGET_SELECTOR).toContain('[role="radio"]')
     expect(CanvasAppFacade.CANVAS_CONTROL_TARGET_SELECTOR).toContain('button')
+    expect(CanvasAppFacade.CANVAS_CONTROL_TARGET_SELECTOR).toContain('summary')
+    expect(CanvasAppFacade.CANVAS_CONTROL_TARGET_SELECTOR)
+      .toContain('[role="radio"]')
     expect(CANVAS_WHEEL_PASSTHROUGH_SELECTOR).toContain(
       'data-canvas-wheel-passthrough',
     )
@@ -6395,6 +6401,8 @@ describe('Canvas package consumer imports', () => {
       root: null,
       selector: '[data-canvas-focus-target]',
     })).toBeNull()
+    expect(isCanvasKeyboardControlTarget(null)).toBe(false)
+    expect(CanvasAppFacade.isCanvasKeyboardControlTarget(null)).toBe(false)
     expect(isCanvasKeyboardTypingTarget(null)).toBe(false)
     expect(CanvasAppFacade.isCanvasKeyboardTypingTarget(null)).toBe(false)
     expect(CanvasAppFacade.cancelCanvasDeferredFocus({

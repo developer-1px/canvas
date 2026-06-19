@@ -5,6 +5,7 @@ import type {
 import type {
   CanvasKeyboardShortcutIntent,
 } from './CanvasKeyboardShortcutIntentContracts'
+import { isCanvasControlTarget } from '../dom/CanvasInteractionTarget'
 import {
   getCanvasKeyboardCommandShortcutIntent,
 } from './CanvasKeyboardCommandShortcutIntent'
@@ -12,31 +13,6 @@ import {
   getCanvasKeyboardSystemShortcutIntent,
 } from './CanvasKeyboardSystemShortcuts'
 import { getCanvasKeyboardToolShortcutIntent } from './CanvasKeyboardToolShortcutIntent'
-
-const CANVAS_KEYBOARD_CONTROL_TARGET_SELECTOR = [
-  'a[href]',
-  'button',
-  'input',
-  'select',
-  'summary',
-  'textarea',
-  '[contenteditable=""]',
-  '[contenteditable="true"]',
-  '[role="button"]',
-  '[role="checkbox"]',
-  '[role="combobox"]',
-  '[role="menuitem"]',
-  '[role="menuitemcheckbox"]',
-  '[role="menuitemradio"]',
-  '[role="option"]',
-  '[role="radio"]',
-  '[role="searchbox"]',
-  '[role="slider"]',
-  '[role="spinbutton"]',
-  '[role="switch"]',
-  '[role="tab"]',
-  '[role="textbox"]',
-].join(',')
 
 export type CanvasKeyboardShortcutIntentInput = {
   config: CanvasAffordanceConfig
@@ -142,9 +118,5 @@ export function isCanvasKeyboardControlTarget(target: EventTarget | null) {
     return true
   }
 
-  if (typeof Element === 'undefined' || !(target instanceof Element)) {
-    return false
-  }
-
-  return target.closest(CANVAS_KEYBOARD_CONTROL_TARGET_SELECTOR) !== null
+  return isCanvasControlTarget({ target })
 }

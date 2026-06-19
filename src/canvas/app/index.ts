@@ -568,6 +568,7 @@ export {
   type RunCanvasWheelViewportArgs,
 } from './affordances/interaction/viewport/CanvasWheelViewportExecution'
 export {
+  isCanvasKeyboardControlTarget,
   isCanvasKeyboardTypingTarget,
   type CanvasKeyboardShortcutIntentInput,
 } from './affordances/interaction/keyboard/CanvasKeyboardShortcutIntent'

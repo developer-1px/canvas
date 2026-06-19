@@ -105,6 +105,7 @@ export {
   getCanvasSelectionListModifierState,
   getCanvasClientViewportSize,
   isCanvasControlTarget,
+  isCanvasKeyboardControlTarget,
   isCanvasKeyboardTypingTarget,
   isCanvasTargetWithinSelector,
   isCanvasWheelPassthroughTarget,

@@ -18,6 +18,31 @@ describe('CanvasInteractionTarget', () => {
     })
   })
 
+  it('detects common composite and semantic control targets', () => {
+    withFakeDom(() => {
+      for (const selector of [
+        'a[href]',
+        'summary',
+        '[contenteditable=""]',
+        '[contenteditable="true"]',
+        '[role="checkbox"]',
+        '[role="combobox"]',
+        '[role="menuitemcheckbox"]',
+        '[role="menuitemradio"]',
+        '[role="radio"]',
+        '[role="searchbox"]',
+        '[role="slider"]',
+        '[role="spinbutton"]',
+        '[role="switch"]',
+        '[role="textbox"]',
+      ]) {
+        expect(isCanvasControlTarget({
+          target: new FakeElement(selector),
+        })).toBe(true)
+      }
+    })
+  })
+
   it('allows consumers to add overlay selectors', () => {
     withFakeDom(() => {
       expect(isCanvasControlTarget({
