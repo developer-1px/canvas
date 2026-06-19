@@ -1,4 +1,5 @@
 export {
+  CANVAS_MENU_FOCUS_RESTORE_MODEL,
   CANVAS_MENU_ITEM_PROPS,
   CANVAS_MODAL_FOCUS_LIFECYCLE_MODEL,
   CANVAS_MODAL_FOCUSABLE_SELECTOR,
@@ -97,6 +98,7 @@ export {
   getCanvasContextMenuKeyboardIntent,
   getCanvasContextMenuPosition,
   getCanvasContextMenuPositionForClientPoint,
+  getCanvasMenuRestoreFocusTarget,
   getCanvasMenuRovingActiveIndex,
   getCanvasMenuRovingKeyIndex,
   getCanvasMenuTriggerKeyboardIntent,
@@ -106,6 +108,7 @@ export {
   isCanvasKeyboardTypingTarget,
   isCanvasTargetWithinSelector,
   isCanvasWheelPassthroughTarget,
+  restoreCanvasMenuFocus,
   restoreCanvasModalFocus,
   trapCanvasModalTabFocus,
   createCanvasTabsDescriptor,

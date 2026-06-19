@@ -15,6 +15,7 @@ type CanvasCommandMenuSurfaceProps = {
   context: CanvasToolbarItemRenderContext
   groups: readonly CanvasToolbarGroup[]
   onClose: () => void
+  restoreFocus?: boolean
   style?: CSSProperties
 }
 
@@ -24,10 +25,12 @@ export function CanvasCommandMenuSurface({
   context,
   groups,
   onClose,
+  restoreFocus = false,
   style,
 }: CanvasCommandMenuSurfaceProps) {
   const menuRovingFocus = useCanvasMenuRovingFocus<HTMLDivElement>({
     onClose,
+    restoreFocus,
   })
 
   if (groups.length === 0) {

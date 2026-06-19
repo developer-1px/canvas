@@ -95,6 +95,7 @@ export function CanvasContextCommandMenu({
       }}
       groups={groups}
       onClose={onClose}
+      restoreFocus
       style={{
         '--canvas-context-menu-height':
           `${CANVAS_CONTEXT_MENU_DEFAULT_SIZE.height}px`,

@@ -244,12 +244,14 @@ import {
   commitCanvasAppHostItemsChange,
   createCanvasAppHostItemsChangeCommitter,
   CANVAS_CONTEXT_MENU_DEFAULT_SIZE,
+  CANVAS_MENU_FOCUS_RESTORE_MODEL,
   getCanvasFindInputKeyboardIntent,
   getCanvasFloatingAnchorForBounds,
   getCanvasInlineEditKeyboardIntent,
   getCanvasContextMenuKeyboardIntent,
   getCanvasContextMenuPosition,
   getCanvasContextMenuPositionForClientPoint,
+  getCanvasMenuRestoreFocusTarget,
   getCanvasModalBackdropPointerIntent,
   getCanvasModalKeyboardIntent,
   measureCanvasTextBlocks,
@@ -266,6 +268,7 @@ import {
   getCanvasAppFoundationExtensionRendererSlots,
   getCanvasAppFoundationExtensionTools,
   isCanvasTargetWithinSelector,
+  restoreCanvasMenuFocus,
   isCanvasWheelPassthroughTarget,
   type CanvasAppAssemblyInputSource,
   type CanvasAppAssemblyRequiredInputSource,
@@ -4173,6 +4176,22 @@ describe('Canvas package consumer imports', () => {
     const menuTriggerKeyboardInput: CanvasMenuTriggerKeyboardIntentInput = {
       key: 'Enter',
     }
+    let menuRestorePreventScroll: boolean | undefined
+    const menuRestoreTarget = {
+      disabled: false,
+      focus: ({ preventScroll }: FocusOptions = {}) => {
+        menuRestorePreventScroll = preventScroll
+      },
+      getAttribute: () => null,
+      isConnected: true,
+    } as unknown as HTMLElement
+    const menuRoot = {
+      contains: () => false,
+      ownerDocument: {
+        activeElement: menuRestoreTarget,
+        body: {} as HTMLElement,
+      },
+    } as unknown as HTMLElement
     const findInputKeyboardInput: CanvasFindInputKeyboardIntentInput = {
       key: 'Enter',
       shiftKey: true,
@@ -4628,6 +4647,19 @@ describe('Canvas package consumer imports', () => {
       kind: 'open-menu',
       preventDefault: true,
     })
+    expect(CANVAS_MENU_FOCUS_RESTORE_MODEL).toBe('canvas-menu-focus-restore')
+    expect(getCanvasMenuRestoreFocusTarget({ root: menuRoot }))
+      .toBe(menuRestoreTarget)
+    expect(CanvasAppFacade.getCanvasMenuRestoreFocusTarget({ root: menuRoot }))
+      .toBe(menuRestoreTarget)
+    expect(restoreCanvasMenuFocus(menuRestoreTarget, { preventScroll: false }))
+      .toBe(true)
+    expect(menuRestorePreventScroll).toBe(false)
+    expect(CanvasAppFacade.restoreCanvasMenuFocus(
+      menuRestoreTarget,
+      { preventScroll: true },
+    )).toBe(true)
+    expect(menuRestorePreventScroll).toBe(true)
     expect(getCanvasFindInputKeyboardIntent(findInputKeyboardInput)).toEqual({
       direction: -1,
       kind: 'find-match',

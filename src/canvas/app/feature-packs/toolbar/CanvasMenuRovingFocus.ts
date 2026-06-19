@@ -12,6 +12,7 @@ export const CANVAS_MENU_ITEM_PROPS = {
 
 export const CANVAS_MENU_ROVING_FOCUS_MODEL = 'canvas-menu-roving-focus'
 export const CANVAS_MENU_FOCUS_MODEL = 'enabled-menuitem-roving'
+export const CANVAS_MENU_FOCUS_RESTORE_MODEL = 'canvas-menu-focus-restore'
 export const CANVAS_MENU_KEYBOARD_KEYS =
   'arrow-left-right-up-down-home-end-enter-space-escape'
 export const CANVAS_SELECTION_TOOLBAR_DROPDOWN_MENU_MODEL =
@@ -20,6 +21,10 @@ export const CANVAS_SELECTION_TOOLBAR_DROPDOWN_MENU_MODEL =
 const CANVAS_MENU_ITEM_SELECTOR = '[data-canvas-menu-item]'
 
 type CanvasMenuItem = HTMLElement & {
+  disabled?: boolean
+}
+
+type CanvasMenuFocusTarget = HTMLElement & {
   disabled?: boolean
 }
 
@@ -53,6 +58,8 @@ export type CanvasMenuRovingFocusOptions = {
   autoFocus?: boolean
   initialActiveIndex?: number
   onClose?: () => void
+  preventScroll?: boolean
+  restoreFocus?: boolean
 }
 
 export function useCanvasMenuRovingFocus<
@@ -61,10 +68,14 @@ export function useCanvasMenuRovingFocus<
   autoFocus = true,
   initialActiveIndex = 0,
   onClose,
+  preventScroll = true,
+  restoreFocus = false,
 }: CanvasMenuRovingFocusOptions = {}) {
   const rootRef = useRef<TElement | null>(null)
   const activeIndexRef = useRef(initialActiveIndex)
   const didAutoFocusRef = useRef(false)
+  const restoreFocusRef = useRef<HTMLElement | null>(null)
+  const didRestoreFocusRef = useRef(false)
 
   const syncItems = useCallback((preferredIndex?: number) => {
     const root = rootRef.current
@@ -113,14 +124,30 @@ export function useCanvasMenuRovingFocus<
     rootRef.current = root
 
     if (!root) {
+      if (restoreFocus && !didRestoreFocusRef.current) {
+        didRestoreFocusRef.current = true
+        restoreCanvasMenuFocus(restoreFocusRef.current, { preventScroll })
+      }
+
+      restoreFocusRef.current = null
       didAutoFocusRef.current = false
       return
     }
 
+    restoreFocusRef.current = restoreFocus
+      ? getCanvasMenuRestoreFocusTarget({ root })
+      : null
+    didRestoreFocusRef.current = false
     activeIndexRef.current = initialActiveIndex
     syncItems(initialActiveIndex)
     focusInitialItem()
-  }, [focusInitialItem, initialActiveIndex, syncItems])
+  }, [
+    focusInitialItem,
+    initialActiveIndex,
+    preventScroll,
+    restoreFocus,
+    syncItems,
+  ])
 
   useLayoutEffect(() => {
     syncItems()
@@ -183,6 +210,57 @@ function getCanvasMenuItems(root: HTMLElement) {
 
 function isCanvasMenuItemEnabled(item: CanvasMenuItem) {
   return !item.disabled && item.getAttribute('aria-disabled') !== 'true'
+}
+
+export function getCanvasMenuRestoreFocusTarget({
+  ownerDocument,
+  root,
+}: {
+  ownerDocument?: Document
+  root: HTMLElement | null
+}) {
+  const resolvedOwnerDocument = ownerDocument ?? root?.ownerDocument
+  const activeElement = resolvedOwnerDocument?.activeElement
+
+  if (
+    !activeElement ||
+    activeElement === resolvedOwnerDocument?.body ||
+    (root && root.contains(activeElement))
+  ) {
+    return null
+  }
+
+  return isCanvasMenuFocusableElement(activeElement)
+    ? activeElement
+    : null
+}
+
+export function restoreCanvasMenuFocus(
+  element: HTMLElement | null,
+  {
+    preventScroll = true,
+  }: {
+    preventScroll?: boolean
+  } = {},
+) {
+  if (!isCanvasMenuFocusableElement(element)) {
+    return false
+  }
+
+  element.focus({ preventScroll })
+  return true
+}
+
+function isCanvasMenuFocusableElement(
+  element: Element | null,
+): element is CanvasMenuFocusTarget {
+  const candidate = element as CanvasMenuFocusTarget | null
+
+  return !!candidate &&
+    candidate.isConnected !== false &&
+    candidate.disabled !== true &&
+    typeof candidate.focus === 'function' &&
+    candidate.getAttribute('aria-hidden') !== 'true'
 }
 
 export function getCanvasMenuRovingActiveIndex({

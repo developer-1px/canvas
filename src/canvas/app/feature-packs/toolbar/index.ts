@@ -17,13 +17,16 @@ export { CanvasSelectionFloatingBar } from './CanvasSelectionFloatingBar'
 export { CanvasToolbar } from './CanvasToolbar'
 export {
   CANVAS_MENU_FOCUS_MODEL,
+  CANVAS_MENU_FOCUS_RESTORE_MODEL,
   CANVAS_MENU_ITEM_PROPS,
   CANVAS_MENU_KEYBOARD_KEYS,
   CANVAS_MENU_ROVING_FOCUS_MODEL,
   CANVAS_SELECTION_TOOLBAR_DROPDOWN_MENU_MODEL,
+  getCanvasMenuRestoreFocusTarget,
   getCanvasMenuRovingActiveIndex,
   getCanvasMenuRovingKeyIndex,
   getCanvasMenuTriggerKeyboardIntent,
+  restoreCanvasMenuFocus,
   useCanvasMenuRovingFocus,
   type CanvasMenuRovingActiveIndexInput,
   type CanvasMenuRovingFocusOptions,
