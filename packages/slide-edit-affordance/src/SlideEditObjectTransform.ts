@@ -228,6 +228,10 @@ export type SlideEditObjectTransformForTargetInput<
   target: SlideEditObjectTransformPasteTarget<TObjectId>
 }
 
+export const SLIDE_EDIT_OBJECT_TRANSFORM_IMPORT_MODEL =
+  'slide-edit-object-transform-import' as const
+export const SLIDE_EDIT_OBJECT_TRANSFORM_JSON_IMPORT_FORMAT =
+  'application-json-slide-edit-object-transform' as const
 export const SLIDE_EDIT_OBJECT_TRANSFORM_JSON_MIME_TYPE =
   'application/vnd.interactive-os.slide-edit.object-transform+json'
 

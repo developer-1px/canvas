@@ -12,6 +12,8 @@ import {
   hasSlideEditObjectTransformMoveDragExceededThreshold,
   normalizeSlideEditObjectTransform,
   normalizeSlideEditObjectTransformRotation,
+  SLIDE_EDIT_OBJECT_TRANSFORM_IMPORT_MODEL,
+  SLIDE_EDIT_OBJECT_TRANSFORM_JSON_IMPORT_FORMAT,
   SLIDE_EDIT_OBJECT_TRANSFORM_JSON_MIME_TYPE,
   SLIDE_EDIT_OBJECT_TRANSFORM_JSON_TYPES,
   SLIDE_EDIT_OBJECT_TRANSFORM_JSON_WRAPPER_KEYS,
@@ -21,6 +23,8 @@ import {
   getSlideEditObjectTransformJSONPasteValue as getSlideEditObjectTransformJSONPasteValueFromPackage,
   getSlideEditObjectTransformJSONPasteValueFromText as getSlideEditObjectTransformJSONPasteValueFromTextFromPackage,
   getSlideEditObjectTransformJSONPasteValueFromValue as getSlideEditObjectTransformJSONPasteValueFromValueFromPackage,
+  SLIDE_EDIT_OBJECT_TRANSFORM_IMPORT_MODEL as SLIDE_EDIT_OBJECT_TRANSFORM_IMPORT_MODEL_FROM_PACKAGE,
+  SLIDE_EDIT_OBJECT_TRANSFORM_JSON_IMPORT_FORMAT as SLIDE_EDIT_OBJECT_TRANSFORM_JSON_IMPORT_FORMAT_FROM_PACKAGE,
 } from './index'
 
 function createDataTransfer(values: Record<string, string>) {
@@ -30,6 +34,21 @@ function createDataTransfer(values: Record<string, string>) {
 }
 
 describe('SlideEditObjectTransform', () => {
+  it('exposes shared object transform import metadata', () => {
+    expect(SLIDE_EDIT_OBJECT_TRANSFORM_IMPORT_MODEL).toBe(
+      'slide-edit-object-transform-import',
+    )
+    expect(SLIDE_EDIT_OBJECT_TRANSFORM_JSON_IMPORT_FORMAT).toBe(
+      'application-json-slide-edit-object-transform',
+    )
+    expect(SLIDE_EDIT_OBJECT_TRANSFORM_IMPORT_MODEL_FROM_PACKAGE).toBe(
+      SLIDE_EDIT_OBJECT_TRANSFORM_IMPORT_MODEL,
+    )
+    expect(SLIDE_EDIT_OBJECT_TRANSFORM_JSON_IMPORT_FORMAT_FROM_PACKAGE).toBe(
+      SLIDE_EDIT_OBJECT_TRANSFORM_JSON_IMPORT_FORMAT,
+    )
+  })
+
   it('maps Shift move drag to an axis-lock modifier state', () => {
     expect(getSlideEditObjectTransformMoveDragModifierState({
       event: {
