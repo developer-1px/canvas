@@ -223,6 +223,17 @@ export {
   type CanvasKeyboardTextEditStartReservedShortcutInput,
 } from './affordances/interaction/keyboard/CanvasKeyboardTextEditStart'
 export {
+  CANVAS_KEYBOARD_TEXT_FONT_SIZE_INTENT_MODEL,
+  CANVAS_KEYBOARD_TEXT_FONT_SIZE_KEYS,
+  CANVAS_KEYBOARD_TEXT_FONT_SIZE_MODEL,
+  CANVAS_KEYBOARD_TEXT_FONT_SIZE_STEP,
+  getCanvasKeyboardTextFontSizeShortcutIntent,
+  type CanvasKeyboardTextFontSizeDirection,
+  type CanvasKeyboardTextFontSizeIntent,
+  type CanvasKeyboardTextFontSizeKeyboardEvent,
+  type CanvasKeyboardTextFontSizeShortcutIntentInput,
+} from './affordances/interaction/keyboard/CanvasKeyboardTextFontSizeShortcuts'
+export {
   CANVAS_KEYBOARD_NUDGE_INTENT_MODEL,
   CANVAS_KEYBOARD_NUDGE_KEYS,
   CANVAS_KEYBOARD_NUDGE_LARGE_STEP,
