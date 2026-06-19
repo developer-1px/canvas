@@ -270,9 +270,12 @@ import {
   commitCanvasAppHostItemsChange,
   createCanvasAppHostItemsChangeCommitter,
   CANVAS_CONTEXT_MENU_DEFAULT_SIZE,
+  CANVAS_FIND_REPLACE_PANEL_MODEL,
   CANVAS_MENU_FOCUS_RESTORE_MODEL,
   CANVAS_MENU_SURFACE_MODEL,
+  createCanvasFindReplacePanelDescriptor,
   getCanvasFindInputKeyboardIntent,
+  getCanvasFindReplaceMatchCountLabel,
   getCanvasFloatingAnchorForBounds,
   getCanvasFloatingAnchorSurfaceCoordinateStyle,
   getCanvasFloatingAnchorSurfaceDescriptor,
@@ -540,6 +543,7 @@ import {
   type CanvasContextMenuKeyboardIntentInput,
   type CanvasContextMenuPointerIntent,
   type CanvasContextMenuPositionInput,
+  type CanvasFindReplacePanelDescriptorInput,
   type CanvasFindInputKeyboardIntentInput,
   type CanvasEraserStrokeHitTestStroke,
   type CanvasNextDrawingPointsInput,
@@ -636,6 +640,8 @@ import {
   type CanvasCommandPaletteKeyboardIntentInput,
   type CanvasCommandPaletteKeyboardItem,
   type CanvasCommandPaletteListboxDescriptorInput,
+  type CanvasFindReplacePanelDescriptorInput
+    as CanvasAppFindReplacePanelDescriptorInput,
   type CanvasMenuItemAttributesInput as CanvasAppMenuItemAttributesInput,
   type CanvasMenuSurfaceDescriptorInput as CanvasAppMenuSurfaceDescriptorInput,
   type CanvasShortcutHelpDialogDescriptorInput,
@@ -4560,6 +4566,18 @@ describe('Canvas package consumer imports', () => {
       key: 'Enter',
       shiftKey: true,
     }
+    const findReplacePanelDescriptorInput:
+      CanvasFindReplacePanelDescriptorInput = {
+        controlId: 'package-find',
+        matchCount: 2,
+        query: 'card',
+      }
+    const appFindReplacePanelDescriptorInput:
+      CanvasAppFindReplacePanelDescriptorInput = {
+        controlId: 'app-find',
+        matchCount: 1,
+        query: 'node',
+      }
     const editableFieldKeyboardInput: CanvasEditableFieldKeyboardIntentInput = {
       key: 'Escape',
     }
@@ -5573,6 +5591,64 @@ describe('Canvas package consumer imports', () => {
       kind: 'find-match',
       preventDefault: true,
       stopPropagation: true,
+    })
+    expect(CANVAS_FIND_REPLACE_PANEL_MODEL)
+      .toBe('canvas-find-replace-panel')
+    expect(getCanvasFindReplaceMatchCountLabel({
+      matchCount: 1,
+      query: 'node',
+    })).toBe('1 match')
+    expect(createCanvasFindReplacePanelDescriptor(
+      findReplacePanelDescriptorInput,
+    )).toEqual({
+      countStatusAttributes: {
+        'aria-atomic': true,
+        'aria-label': '2 matches',
+        'aria-live': 'polite',
+        id: 'package-find-count',
+        role: 'status',
+      },
+      countStatusId: 'package-find-count',
+      matchCountLabel: '2 matches',
+      model: 'canvas-find-replace-panel',
+      queryInputAttributes: {
+        'aria-describedby': 'package-find-count',
+        'aria-label': 'Find',
+        type: 'search',
+      },
+      replacementInputAttributes: {
+        'aria-label': 'Replace',
+      },
+      rootAttributes: {
+        'aria-label': 'Find and replace',
+        role: 'search',
+      },
+    })
+    expect(CanvasAppFacade.createCanvasFindReplacePanelDescriptor(
+      appFindReplacePanelDescriptorInput,
+    )).toEqual({
+      countStatusAttributes: {
+        'aria-atomic': true,
+        'aria-label': '1 match',
+        'aria-live': 'polite',
+        id: 'app-find-count',
+        role: 'status',
+      },
+      countStatusId: 'app-find-count',
+      matchCountLabel: '1 match',
+      model: 'canvas-find-replace-panel',
+      queryInputAttributes: {
+        'aria-describedby': 'app-find-count',
+        'aria-label': 'Find',
+        type: 'search',
+      },
+      replacementInputAttributes: {
+        'aria-label': 'Replace',
+      },
+      rootAttributes: {
+        'aria-label': 'Find and replace',
+        role: 'search',
+      },
     })
     expect(getCanvasEditableFieldKeyboardIntent(editableFieldKeyboardInput))
       .toEqual({

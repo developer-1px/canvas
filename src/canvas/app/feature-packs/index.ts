@@ -364,8 +364,18 @@ export {
   type CanvasAppFacilitationBundleOptions,
 } from './facilitation'
 export {
+  CANVAS_FIND_REPLACE_PANEL_MODEL,
+  createCanvasFindReplacePanelDescriptor,
   getCanvasFindInputKeyboardIntent,
+  getCanvasFindReplaceMatchCountLabel,
   useCanvasFindReplaceModel,
+  type CanvasFindReplaceCountStatusAttributes,
+  type CanvasFindReplaceMatchCountLabelInput,
+  type CanvasFindReplacePanelDescriptor,
+  type CanvasFindReplacePanelDescriptorInput,
+  type CanvasFindReplacePanelRootAttributes,
+  type CanvasFindReplaceQueryInputAttributes,
+  type CanvasFindReplaceReplacementInputAttributes,
   type CanvasFindInputKeyboardIntent,
   type CanvasFindInputKeyboardIntentInput,
 } from './find-replace'

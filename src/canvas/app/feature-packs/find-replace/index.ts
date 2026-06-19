@@ -9,6 +9,18 @@ import { CanvasFindReplacePanel } from './CanvasFindReplacePanel'
 
 export { CanvasFindReplacePanel } from './CanvasFindReplacePanel'
 export {
+  CANVAS_FIND_REPLACE_PANEL_MODEL,
+  createCanvasFindReplacePanelDescriptor,
+  getCanvasFindReplaceMatchCountLabel,
+  type CanvasFindReplaceCountStatusAttributes,
+  type CanvasFindReplaceMatchCountLabelInput,
+  type CanvasFindReplacePanelDescriptor,
+  type CanvasFindReplacePanelDescriptorInput,
+  type CanvasFindReplacePanelRootAttributes,
+  type CanvasFindReplaceQueryInputAttributes,
+  type CanvasFindReplaceReplacementInputAttributes,
+} from './CanvasFindReplacePanelDescriptor'
+export {
   getCanvasFindInputKeyboardIntent,
   type CanvasFindInputKeyboardIntent,
   type CanvasFindInputKeyboardIntentInput,
