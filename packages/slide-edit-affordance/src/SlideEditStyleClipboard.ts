@@ -21,6 +21,14 @@ export type SlideEditStyleClipboardKeyboardIntentKind =
   | 'copy-formatting'
   | 'paste-formatting'
 
+export type SlideEditStyleClipboardPaintMode = 'persistent' | 'single-use'
+
+export type SlideEditStyleClipboardStopPaintReason =
+  | 'escape'
+  | 'manual'
+  | 'selection-cleared'
+  | 'single-use-complete'
+
 export type SlideEditStyleClipboardKeyboardIntent = {
   commandId: 'copy-object-formatting' | 'paste-object-formatting'
   kind: SlideEditStyleClipboardKeyboardIntentKind
@@ -34,6 +42,12 @@ export type SlideEditStyleClipboardKeyboardIntentInput = {
   }
   key: string
   mod: boolean
+}
+
+export type SlideEditStyleClipboardPointerActivationInput = {
+  clickCount?: number
+  detail?: number
+  isDoubleClick?: boolean
 }
 
 export type SlideEditStyleClipboardCategoryDescriptor<
@@ -193,6 +207,62 @@ export type SlideEditStyleClipboardPasteFormattingCommand<
   targetSlideId: TSlideId
 }
 
+export type SlideEditStyleClipboardPaintSession<
+  TSlideId extends SlideEditStyleClipboardSlideId =
+    SlideEditStyleClipboardSlideId,
+  TObjectId extends SlideEditStyleClipboardObjectId =
+    SlideEditStyleClipboardObjectId,
+  TSourceKind extends SlideEditStyleClipboardSourceKind =
+    SlideEditStyleClipboardSourceKind,
+  TCategoryId extends SlideEditStyleClipboardCategoryId =
+    SlideEditStyleClipboardCategoryId,
+  TStyle = unknown,
+> = {
+  clipboard: SlideEditStyleClipboardDescriptor<
+    TSlideId,
+    TObjectId,
+    TSourceKind,
+    TCategoryId,
+    TStyle
+  >
+  mode: SlideEditStyleClipboardPaintMode
+  source: SlideEditStyleClipboardSource<TSlideId, TObjectId, TSourceKind>
+  type: 'slide-style-clipboard-paint-session'
+}
+
+export type SlideEditStyleClipboardStartPaintCommand<
+  TSlideId extends SlideEditStyleClipboardSlideId =
+    SlideEditStyleClipboardSlideId,
+  TObjectId extends SlideEditStyleClipboardObjectId =
+    SlideEditStyleClipboardObjectId,
+  TSourceKind extends SlideEditStyleClipboardSourceKind =
+    SlideEditStyleClipboardSourceKind,
+  TCategoryId extends SlideEditStyleClipboardCategoryId =
+    SlideEditStyleClipboardCategoryId,
+  TStyle = unknown,
+> = {
+  id: 'start-format-painter'
+  session: SlideEditStyleClipboardPaintSession<
+    TSlideId,
+    TObjectId,
+    TSourceKind,
+    TCategoryId,
+    TStyle
+  >
+}
+
+export type SlideEditStyleClipboardStopPaintCommand<
+  TSlideId extends SlideEditStyleClipboardSlideId =
+    SlideEditStyleClipboardSlideId,
+  TObjectId extends SlideEditStyleClipboardObjectId =
+    SlideEditStyleClipboardObjectId,
+> = {
+  id: 'stop-format-painter'
+  objectIds: readonly TObjectId[]
+  reason: SlideEditStyleClipboardStopPaintReason
+  slideId: TSlideId
+}
+
 export type SlideEditStyleClipboardHostCommandEffect<
   TSlideId extends SlideEditStyleClipboardSlideId =
     SlideEditStyleClipboardSlideId,
@@ -270,6 +340,17 @@ export function getSlideEditStyleClipboardKeyboardIntent({
     default:
       return null
   }
+}
+
+export function getSlideEditStyleClipboardPaintModeFromPointerActivation({
+  clickCount,
+  detail,
+  isDoubleClick = false,
+}: SlideEditStyleClipboardPointerActivationInput):
+  SlideEditStyleClipboardPaintMode {
+  return isDoubleClick || (clickCount ?? detail ?? 1) >= 2
+    ? 'persistent'
+    : 'single-use'
 }
 
 export function createSlideEditStyleClipboardDescriptor<
@@ -403,6 +484,108 @@ export function getSlideEditStyleClipboardCopyCommandEffect<
     selection: {
       objectIds: [clipboard.source.objectId],
       slideId: clipboard.source.slideId,
+    },
+    type: 'slide-command-effect',
+  }
+}
+
+export function createSlideEditStyleClipboardPaintSession<
+  TSlideId extends SlideEditStyleClipboardSlideId,
+  TObjectId extends SlideEditStyleClipboardObjectId,
+  TSourceKind extends SlideEditStyleClipboardSourceKind,
+  TCategoryId extends SlideEditStyleClipboardCategoryId,
+  TStyle = unknown,
+>({
+  clipboard,
+  mode,
+}: {
+  clipboard: SlideEditStyleClipboardDescriptor<
+    TSlideId,
+    TObjectId,
+    TSourceKind,
+    TCategoryId,
+    TStyle
+  >
+  mode: SlideEditStyleClipboardPaintMode
+}): SlideEditStyleClipboardPaintSession<
+  TSlideId,
+  TObjectId,
+  TSourceKind,
+  TCategoryId,
+  TStyle
+> {
+  return {
+    clipboard,
+    mode,
+    source: clipboard.source,
+    type: 'slide-style-clipboard-paint-session',
+  }
+}
+
+export function getSlideEditStyleClipboardStartPaintCommandEffect<
+  TSlideId extends SlideEditStyleClipboardSlideId,
+  TObjectId extends SlideEditStyleClipboardObjectId,
+  TSourceKind extends SlideEditStyleClipboardSourceKind,
+  TCategoryId extends SlideEditStyleClipboardCategoryId,
+  TStyle = unknown,
+>(
+  session: SlideEditStyleClipboardPaintSession<
+    TSlideId,
+    TObjectId,
+    TSourceKind,
+    TCategoryId,
+    TStyle
+  >,
+): SlideEditStyleClipboardHostCommandEffect<
+  TSlideId,
+  TObjectId,
+  SlideEditStyleClipboardStartPaintCommand<
+    TSlideId,
+    TObjectId,
+    TSourceKind,
+    TCategoryId,
+    TStyle
+  >
+> {
+  return {
+    payload: {
+      id: 'start-format-painter',
+      session,
+    },
+    selection: {
+      objectIds: [session.source.objectId],
+      slideId: session.source.slideId,
+    },
+    type: 'slide-command-effect',
+  }
+}
+
+export function getSlideEditStyleClipboardStopPaintCommandEffect<
+  TSlideId extends SlideEditStyleClipboardSlideId,
+  TObjectId extends SlideEditStyleClipboardObjectId,
+>({
+  objectIds = [],
+  reason,
+  slideId,
+}: {
+  objectIds?: readonly TObjectId[]
+  reason: SlideEditStyleClipboardStopPaintReason
+  slideId: TSlideId
+}): SlideEditStyleClipboardHostCommandEffect<
+  TSlideId,
+  TObjectId,
+  SlideEditStyleClipboardStopPaintCommand<TSlideId, TObjectId>
+> {
+  return {
+    payload: {
+      id: 'stop-format-painter',
+      objectIds,
+      reason,
+      slideId,
+    },
+    selection: {
+      objectIds,
+      slideId,
     },
     type: 'slide-command-effect',
   }

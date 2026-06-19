@@ -3,12 +3,16 @@ import { describe, expect, it } from 'vitest'
 import {
   createSlideEditStyleClipboardDescriptor,
   createSlideEditStyleClipboardPasteCommandEffect,
+  createSlideEditStyleClipboardPaintSession,
   createSlideEditStyleClipboardTextRunStylePayload,
   getSlideEditStyleClipboardCategoryDescriptors,
   getSlideEditStyleClipboardCategoryIds,
   getSlideEditStyleClipboardCopyCommandEffect,
   getSlideEditStyleClipboardKeyboardIntent,
+  getSlideEditStyleClipboardPaintModeFromPointerActivation,
   getSlideEditStyleClipboardPasteAvailability,
+  getSlideEditStyleClipboardStartPaintCommandEffect,
+  getSlideEditStyleClipboardStopPaintCommandEffect,
   SLIDE_EDIT_STYLE_CLIPBOARD_BUILT_IN_CATEGORIES,
 } from './SlideEditStyleClipboard'
 
@@ -215,6 +219,74 @@ describe('SlideEditStyleClipboard', () => {
         },
         type: 'slide-command-effect',
       })
+  })
+
+  it('maps pointer activation to single-use or persistent format painter mode', () => {
+    expect(getSlideEditStyleClipboardPaintModeFromPointerActivation({}))
+      .toBe('single-use')
+    expect(getSlideEditStyleClipboardPaintModeFromPointerActivation({
+      clickCount: 1,
+    })).toBe('single-use')
+    expect(getSlideEditStyleClipboardPaintModeFromPointerActivation({
+      clickCount: 2,
+    })).toBe('persistent')
+    expect(getSlideEditStyleClipboardPaintModeFromPointerActivation({
+      detail: 2,
+    })).toBe('persistent')
+    expect(getSlideEditStyleClipboardPaintModeFromPointerActivation({
+      isDoubleClick: true,
+    })).toBe('persistent')
+  })
+
+  it('describes persistent format painter sessions through host command effects', () => {
+    const clipboard = createClipboard()
+    const session = createSlideEditStyleClipboardPaintSession({
+      clipboard,
+      mode: 'persistent',
+    })
+
+    expect(session).toEqual({
+      clipboard,
+      mode: 'persistent',
+      source: {
+        kind: 'shape',
+        objectId: 'source-card',
+        slideId: 'slide-a',
+      },
+      type: 'slide-style-clipboard-paint-session',
+    })
+    expect(getSlideEditStyleClipboardStartPaintCommandEffect(session))
+      .toMatchObject({
+        payload: {
+          id: 'start-format-painter',
+          session: {
+            mode: 'persistent',
+            type: 'slide-style-clipboard-paint-session',
+          },
+        },
+        selection: {
+          objectIds: ['source-card'],
+          slideId: 'slide-a',
+        },
+        type: 'slide-command-effect',
+      })
+    expect(getSlideEditStyleClipboardStopPaintCommandEffect({
+      objectIds: ['target-a', 'target-b'],
+      reason: 'escape',
+      slideId: 'slide-b',
+    })).toEqual({
+      payload: {
+        id: 'stop-format-painter',
+        objectIds: ['target-a', 'target-b'],
+        reason: 'escape',
+        slideId: 'slide-b',
+      },
+      selection: {
+        objectIds: ['target-a', 'target-b'],
+        slideId: 'slide-b',
+      },
+      type: 'slide-command-effect',
+    })
   })
 
   it('maps style clipboard keyboard shortcuts to formatting intents', () => {
