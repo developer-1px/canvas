@@ -157,6 +157,24 @@ export {
   type SlideEditTextRunFormattingUpdateCommand,
 } from './SlideEditTextFormattingKeyboard'
 export {
+  createSlideEditTextClearFormattingDescriptor,
+  getSlideEditTextClearFormattingCommandEffect,
+  getSlideEditTextClearFormattingJSONPasteValue,
+  getSlideEditTextClearFormattingJSONPasteValueFromText,
+  getSlideEditTextClearFormattingJSONPasteValueFromValue,
+  normalizeSlideEditTextClearFormattingValue,
+  SLIDE_EDIT_TEXT_CLEAR_FORMATTING_JSON_KEYS,
+  SLIDE_EDIT_TEXT_CLEAR_FORMATTING_JSON_MIME_TYPE,
+  type SlideEditTextClearFormattingCommand,
+  type SlideEditTextClearFormattingCommandEffectInput,
+  type SlideEditTextClearFormattingDataTransfer,
+  type SlideEditTextClearFormattingDescriptor,
+  type SlideEditTextClearFormattingHostCommandEffect,
+  type SlideEditTextClearFormattingJSONPasteInput,
+  type SlideEditTextClearFormattingJSONPasteValueMode,
+  type SlideEditTextClearFormattingJSONPasteValueOptions,
+} from './SlideEditTextClearFormatting'
+export {
   getSlideEditTextAutoFitGestureCommandEffect,
   getSlideEditTextAutoFitJSONPasteValue,
   getSlideEditTextAutoFitJSONPasteValueFromText,
