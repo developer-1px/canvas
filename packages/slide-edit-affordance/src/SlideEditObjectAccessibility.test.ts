@@ -3,7 +3,11 @@ import { describe, expect, it } from 'vitest'
 import {
   createSlideEditObjectAccessibilityDescriptor,
   getSlideEditObjectAccessibilityCommandEffect,
+  getSlideEditObjectAccessibilityJSONPasteValue,
+  getSlideEditObjectAccessibilityJSONPasteValueFromText,
+  getSlideEditObjectAccessibilityJSONPasteValueFromValue,
   getSlideEditObjectAccessibilityMetadata,
+  getSlideEditObjectAccessibilityPasteCommand,
   normalizeSlideEditObjectAccessibility,
   normalizeSlideEditObjectAccessibilityFieldValue,
   normalizeSlideEditObjectAltTextStorageValue,
@@ -11,8 +15,14 @@ import {
   SLIDE_EDIT_OBJECT_ACCESSIBILITY_DATA_ATTRIBUTE,
   SLIDE_EDIT_OBJECT_ACCESSIBILITY_DEFAULT,
   SLIDE_EDIT_OBJECT_ACCESSIBILITY_FIELDS,
+  SLIDE_EDIT_OBJECT_ACCESSIBILITY_JSON_MIME_TYPE,
   toSlideEditObjectAccessibilityAttributeValue,
 } from './SlideEditObjectAccessibility'
+import {
+  getSlideEditObjectAccessibilityJSONPasteValue as getSlideEditObjectAccessibilityJSONPasteValueFromPackage,
+  getSlideEditObjectAccessibilityJSONPasteValueFromText as getSlideEditObjectAccessibilityJSONPasteValueFromTextFromPackage,
+  getSlideEditObjectAccessibilityJSONPasteValueFromValue as getSlideEditObjectAccessibilityJSONPasteValueFromValueFromPackage,
+} from './index'
 
 describe('SlideEditObjectAccessibility', () => {
   it('creates an object accessibility descriptor with no alt text by default', () => {
@@ -156,6 +166,268 @@ describe('SlideEditObjectAccessibility', () => {
     })
   })
 
+  it('reads custom MIME direct alt text before general JSON wrappers', () => {
+    expect(getSlideEditObjectAccessibilityJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_OBJECT_ACCESSIBILITY_JSON_MIME_TYPE]:
+          '"  Revenue chart summary  "',
+        'application/json': '{"objectAltText":"Ignored"}',
+      }),
+      storagePolicy: {
+        maxLength: 13,
+      },
+    })).toEqual({
+      altText: 'Revenue chart',
+      kind: 'alt-text',
+      value: {
+        altText: 'Revenue chart',
+        decorative: false,
+      },
+    })
+    expect(getSlideEditObjectAccessibilityJSONPasteValueFromPackage({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_OBJECT_ACCESSIBILITY_JSON_MIME_TYPE]:
+          '{"altText":"Product screenshot"}',
+      }),
+    })).toMatchObject({
+      altText: 'Product screenshot',
+      kind: 'alt-text',
+    })
+  })
+
+  it('reads explicit object accessibility wrappers from general JSON candidates', () => {
+    expect(getSlideEditObjectAccessibilityJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'application/json':
+          '{"objectAccessibility":{"altText":"Product photo"}}',
+      }),
+    })).toMatchObject({
+      altText: 'Product photo',
+      kind: 'alt-text',
+    })
+    expect(getSlideEditObjectAccessibilityJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/json': '{"accessibility":{"decorative":true}}',
+      }),
+    })).toEqual({
+      kind: 'decorative',
+      value: {
+        altText: '',
+        decorative: true,
+      },
+    })
+    expect(getSlideEditObjectAccessibilityJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"objectAltText":"Logo"}',
+      }),
+    })).toMatchObject({
+      altText: 'Logo',
+      kind: 'alt-text',
+    })
+  })
+
+  it('reads standalone object accessibility payloads from general JSON candidates', () => {
+    expect(getSlideEditObjectAccessibilityJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'application/json': '{"altText":"Product screenshot"}',
+      }),
+    })).toEqual({
+      altText: 'Product screenshot',
+      kind: 'alt-text',
+      value: {
+        altText: 'Product screenshot',
+        decorative: false,
+      },
+    })
+    expect(getSlideEditObjectAccessibilityJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"decorative":true}',
+      }),
+    })).toEqual({
+      kind: 'decorative',
+      value: {
+        altText: '',
+        decorative: true,
+      },
+    })
+    expect(getSlideEditObjectAccessibilityJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"altText":"  Long product screenshot text  "}',
+      }),
+      storagePolicy: {
+        maxLength: 12,
+      },
+    })).toMatchObject({
+      altText: 'Long product',
+      kind: 'alt-text',
+    })
+    expect(getSlideEditObjectAccessibilityJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'application/json': '{"altText":"Bad\\u0007label"}',
+      }),
+    })).toBeNull()
+    expect(getSlideEditObjectAccessibilityJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"ariaLabel":"UI label"}',
+      }),
+    })).toBeNull()
+  })
+
+  it('reads object accessibility JSON from text and parsed values', () => {
+    expect(getSlideEditObjectAccessibilityJSONPasteValueFromText(
+      '{"objectAltText":"  Long product screenshot text  "}',
+      {
+        mode: 'wrapped',
+        storagePolicy: {
+          maxLength: 12,
+        },
+      },
+    )).toMatchObject({
+      altText: 'Long product',
+      kind: 'alt-text',
+    })
+    expect(getSlideEditObjectAccessibilityJSONPasteValueFromValue({
+      decorative: true,
+    })).toEqual({
+      kind: 'decorative',
+      value: {
+        altText: '',
+        decorative: true,
+      },
+    })
+    expect(getSlideEditObjectAccessibilityJSONPasteValueFromTextFromPackage(
+      '{"accessibility":{"decorative":false}}',
+      { mode: 'wrapped' },
+    )).toEqual({
+      kind: 'remove-alt-text',
+      value: {
+        altText: '',
+        decorative: false,
+      },
+    })
+    expect(getSlideEditObjectAccessibilityJSONPasteValueFromValueFromPackage(
+      '  Product screenshot ',
+    )).toMatchObject({
+      altText: 'Product screenshot',
+      kind: 'alt-text',
+    })
+  })
+
+  it('turns null, false, empty string, and decorative downgrade into command-ready values', () => {
+    for (const payload of [
+      'null',
+      'false',
+      '""',
+      '{"decorative":false}',
+    ]) {
+      expect(getSlideEditObjectAccessibilityJSONPasteValue({
+        dataTransfer: createDataTransfer({
+          [SLIDE_EDIT_OBJECT_ACCESSIBILITY_JSON_MIME_TYPE]: payload,
+        }),
+      })).toEqual({
+        kind: 'remove-alt-text',
+        value: {
+          altText: '',
+          decorative: false,
+        },
+      })
+    }
+
+    const decorativePasteValue = getSlideEditObjectAccessibilityJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_OBJECT_ACCESSIBILITY_JSON_MIME_TYPE]:
+          '{"decorative":true}',
+      }),
+    })
+
+    expect(decorativePasteValue).toEqual({
+      kind: 'decorative',
+      value: {
+        altText: '',
+        decorative: true,
+      },
+    })
+    expect(getSlideEditObjectAccessibilityPasteCommand({
+      objectId: 'object-a',
+      pasteValue: decorativePasteValue!,
+      slideId: 'slide-a',
+    })).toEqual({
+      fieldId: 'decorative',
+      id: 'update-object-accessibility',
+      objectId: 'object-a',
+      slideId: 'slide-a',
+      value: true,
+    })
+    expect(getSlideEditObjectAccessibilityPasteCommand({
+      objectId: 'object-a',
+      pasteValue: decorativePasteValue!,
+      slideId: 'slide-a',
+      supportsDecorative: false,
+    })).toEqual({
+      id: 'remove-object-alt-text',
+      objectId: 'object-a',
+      slideId: 'slide-a',
+    })
+  })
+
+  it('converts paste values into host accessibility commands', () => {
+    const pasteValue = getSlideEditObjectAccessibilityJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"objectAltText":"Product screenshot"}',
+      }),
+    })
+
+    expect(getSlideEditObjectAccessibilityPasteCommand({
+      objectId: 'object-a',
+      pasteValue: pasteValue!,
+      slideId: 'slide-a',
+    })).toEqual({
+      fieldId: 'altText',
+      id: 'update-object-accessibility',
+      objectId: 'object-a',
+      slideId: 'slide-a',
+      value: 'Product screenshot',
+    })
+    expect(getSlideEditObjectAccessibilityCommandEffect(
+      getSlideEditObjectAccessibilityPasteCommand({
+        objectId: 'object-a',
+        pasteValue: pasteValue!,
+        slideId: 'slide-a',
+      }),
+    ).type).toBe('slide-command-effect')
+  })
+
+  it('ignores invalid, unrelated, and UI aria label JSON candidates', () => {
+    expect(getSlideEditObjectAccessibilityJSONPasteValue({
+      dataTransfer: null,
+    })).toBeNull()
+    expect(getSlideEditObjectAccessibilityJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '"UI aria label"',
+      }),
+    })).toBeNull()
+    expect(getSlideEditObjectAccessibilityJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"ariaLabel":"UI label"}',
+      }),
+    })).toBeNull()
+    expect(getSlideEditObjectAccessibilityJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"objectAltText":"Bad\\u0007label"}',
+      }),
+    })).toBeNull()
+    expect(getSlideEditObjectAccessibilityJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_OBJECT_ACCESSIBILITY_JSON_MIME_TYPE]: 'not json',
+      }),
+    })).toBeNull()
+    expect(getSlideEditObjectAccessibilityJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': 'not json',
+      }),
+    })).toBeNull()
+  })
+
   it('separates slide content alt text from UI aria label strings', () => {
     const publicStrings = JSON.stringify({
       descriptor: createSlideEditObjectAccessibilityDescriptor({
@@ -182,3 +454,13 @@ describe('SlideEditObjectAccessibility', () => {
     }
   })
 })
+
+function createDataTransfer(
+  values: Record<string, string>,
+): Pick<DataTransfer, 'getData'> {
+  return {
+    getData(type) {
+      return values[type] ?? ''
+    },
+  }
+}

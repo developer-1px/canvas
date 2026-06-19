@@ -218,7 +218,7 @@ export function getSlideEditObjectOpacityJSONPasteValue({
 export function getSlideEditObjectOpacityJSONPasteValueFromText(
   text: string,
   options?: SlideEditObjectOpacityJSONPasteValueOptions,
-) {
+): SlideEditObjectOpacityJSONPasteValue | null {
   return getSlideEditObjectOpacityJSONPasteValueFromValue(
     parseSlideEditObjectOpacityJSON(text),
     options,
