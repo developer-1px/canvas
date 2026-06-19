@@ -161,6 +161,7 @@ import {
   runCanvasEditableFieldKeyboardIntent,
   runCanvasPresentationKeyboardIntent,
   runCanvasRadioGroupKeyboardIntent,
+  runCanvasSelectionListKeyboardIntent,
   runCanvasTabsKeyboardIntent,
   runCanvasToolbarRovingKeyboardIntent,
   runCanvasWheelViewport,
@@ -280,6 +281,7 @@ import {
   getCanvasMenuRovingActiveIndex,
   getCanvasMenuRovingKeyboardIntent,
   getCanvasMenuTriggerKeyboardIntent,
+  getCanvasSelectionListKeyboardIntent,
   getCanvasSelectionListModifierState,
   getCanvasSelectionListRangeIds,
   getCanvasSelectionListSelectionPlan,
@@ -547,12 +549,14 @@ import {
   type CanvasResizeHandleDoubleClickIntentInput,
   type CanvasPointerTransformModifierInput,
   type CanvasPointerTransformModifierState,
+  type CanvasSelectionListKeyboardIntentInput,
   type CanvasSelectionListModifierInput,
   type CanvasSelectionListModifierState,
   type CanvasSelectionListRangeInput,
   type CanvasSelectionListSelectionPlan,
   type CanvasSelectionListSelectionPlanInput,
   type CanvasSelectionListSelectionMode,
+  type RunCanvasSelectionListKeyboardIntentInput,
   type CanvasViewportSetter,
   type CanvasWorkspaceStorageProvider,
   type CanvasWorldClientPointInput,
@@ -4228,6 +4232,55 @@ describe('Canvas package consumer imports', () => {
     const selectionListSelectionPlan:
       CanvasSelectionListSelectionPlan<'title' | 'note' | 'image' | 'footer'> =
         getCanvasSelectionListSelectionPlan(selectionListSelectionPlanInput)
+    const selectionListKeyboardInput:
+      CanvasSelectionListKeyboardIntentInput<
+        'title' | 'note' | 'image' | 'footer'
+      > = {
+        anchorId: 'title',
+        ctrlKey: false,
+        focusedId: 'note',
+        ids: ['title', 'note', 'image', 'footer'],
+        key: 'ArrowDown',
+        metaKey: false,
+        selectedIds: ['footer'],
+        shiftKey: true,
+      }
+    let selectionListKeyboardPreventDefaultCount = 0
+    let selectionListKeyboardStopPropagationCount = 0
+    let selectionListKeyboardFocusedId: string | null = null
+    let selectionListKeyboardFocusedIndex: number | null = null
+    let selectionListKeyboardAppliedPlan:
+      CanvasSelectionListSelectionPlan<
+        'title' | 'note' | 'image' | 'footer'
+      > | null = null
+    const selectionListKeyboardRunInput:
+      RunCanvasSelectionListKeyboardIntentInput<
+        'title' | 'note' | 'image' | 'footer'
+      > = {
+        anchorId: 'title',
+        event: {
+          ctrlKey: false,
+          key: 'ArrowDown',
+          metaKey: false,
+          preventDefault: () => {
+            selectionListKeyboardPreventDefaultCount += 1
+          },
+          shiftKey: true,
+          stopPropagation: () => {
+            selectionListKeyboardStopPropagationCount += 1
+          },
+        },
+        focusedId: 'note',
+        ids: ['title', 'note', 'image', 'footer'],
+        onFocusItem: (id, index) => {
+          selectionListKeyboardFocusedId = id
+          selectionListKeyboardFocusedIndex = index
+        },
+        onSelectionPlan: (plan) => {
+          selectionListKeyboardAppliedPlan = plan
+        },
+        selectedIds: ['footer'],
+      }
     const menuRovingActiveIndexInput: CanvasMenuRovingActiveIndexInput = {
       count: 4,
       focusedIndex: -1,
@@ -4952,6 +5005,36 @@ describe('Canvas package consumer imports', () => {
     expect(CanvasAppFacade.getCanvasSelectionListSelectionPlan(
       selectionListSelectionPlanInput,
     )).toEqual(selectionListSelectionPlan)
+    expect(getCanvasSelectionListKeyboardIntent(selectionListKeyboardInput))
+      .toEqual({
+        focusId: 'image',
+        index: 2,
+        kind: 'move-focus',
+        preventDefault: true,
+        selectionPlan: selectionListSelectionPlan,
+        stopPropagation: true,
+      })
+    expect(CanvasAppFacade.getCanvasSelectionListKeyboardIntent(
+      selectionListKeyboardInput,
+    )).toEqual({
+      focusId: 'image',
+      index: 2,
+      kind: 'move-focus',
+      preventDefault: true,
+      selectionPlan: selectionListSelectionPlan,
+      stopPropagation: true,
+    })
+    expect(runCanvasSelectionListKeyboardIntent(
+      selectionListKeyboardRunInput,
+    )).toBe(true)
+    expect(CanvasAppFacade.runCanvasSelectionListKeyboardIntent(
+      selectionListKeyboardRunInput,
+    )).toBe(true)
+    expect(selectionListKeyboardPreventDefaultCount).toBe(2)
+    expect(selectionListKeyboardStopPropagationCount).toBe(2)
+    expect(selectionListKeyboardFocusedId).toBe('image')
+    expect(selectionListKeyboardFocusedIndex).toBe(2)
+    expect(selectionListKeyboardAppliedPlan).toEqual(selectionListSelectionPlan)
     expect(getCanvasMenuRovingActiveIndex(menuRovingActiveIndexInput)).toBe(3)
     expect(CanvasAppFacade.getCanvasMenuRovingActiveIndex(
       menuRovingActiveIndexInput,

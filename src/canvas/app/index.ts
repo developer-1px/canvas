@@ -273,6 +273,14 @@ export {
   type CanvasSelectionListSelectionMode,
 } from './affordances/controls/selection-list/CanvasSelectionListRange'
 export {
+  getCanvasSelectionListKeyboardIntent,
+  runCanvasSelectionListKeyboardIntent,
+  type CanvasSelectionListKeyboardEvent,
+  type CanvasSelectionListKeyboardIntent,
+  type CanvasSelectionListKeyboardIntentInput,
+  type RunCanvasSelectionListKeyboardIntentInput,
+} from './affordances/controls/selection-list/CanvasSelectionListKeyboard'
+export {
   CANVAS_CONTEXT_MENU_DEFAULT_SIZE,
   DEFAULT_CANVAS_CONTEXT_MENU_MARGIN,
   getCanvasContextMenuDismissKeyboardIntent,
