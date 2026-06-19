@@ -122,6 +122,13 @@ describe('SlideEditTextFormattingKeyboard', () => {
         mode: 'wrapped',
       },
     )).toBe(true)
+    expect(getSlideEditTextRunFormattingJSONPasteValueFromTextFromPackage(
+      '{"strikeThrough":true}',
+      {
+        fieldId: 'strikethrough',
+        mode: 'wrapped',
+      },
+    )).toBe(true)
     expect(getSlideEditTextRunSizeJSONPasteValueFromValueFromPackage(
       { runSize: '19.25' },
       { mode: 'wrapped' },
@@ -142,7 +149,14 @@ describe('SlideEditTextFormattingKeyboard', () => {
       surface: 'text-run-formatting',
     })
     expect(SLIDE_EDIT_TEXT_RUN_FORMATTING_FIELDS.map((field) => field.id))
-      .toEqual(['bold', 'italic', 'underline', 'size', 'color'])
+      .toEqual([
+        'bold',
+        'italic',
+        'underline',
+        'size',
+        'color',
+        'strikethrough',
+      ])
   })
 
   it('normalizes boolean run formatting values and rejects invalid values', () => {
@@ -183,6 +197,26 @@ describe('SlideEditTextFormattingKeyboard', () => {
       },
       selection: {
         objectIds: ['object-a', 'object-b'],
+        slideId: 'slide-a',
+      },
+      type: 'slide-command-effect',
+    })
+    expect(getSlideEditTextRunFormattingCommandEffect({
+      fieldId: 'strikethrough',
+      id: 'update-text-run-formatting',
+      objectIds: ['object-a'],
+      slideId: 'slide-a',
+      value: true,
+    })).toEqual({
+      payload: {
+        fieldId: 'strikethrough',
+        id: 'update-text-run-formatting',
+        objectIds: ['object-a'],
+        slideId: 'slide-a',
+        value: true,
+      },
+      selection: {
+        objectIds: ['object-a'],
         slideId: 'slide-a',
       },
       type: 'slide-command-effect',
@@ -242,6 +276,12 @@ describe('SlideEditTextFormattingKeyboard', () => {
       }),
       fieldId: 'bold',
     })).toBe(false)
+    expect(getSlideEditTextRunFormattingJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [getFormattingField('strikethrough').jsonMimeType]: 'true',
+      }),
+      fieldId: 'strikethrough',
+    })).toBe(true)
   })
 
   it('reads custom MIME direct JSON run size and color values', () => {
@@ -270,6 +310,10 @@ describe('SlideEditTextFormattingKeyboard', () => {
       ['italic', { value: false }, false],
       ['underline', { textRunUnderline: true }, true],
       ['underline', { runUnderline: false }, false],
+      ['strikethrough', { textRunStrikethrough: true }, true],
+      ['strikethrough', { runStrikethrough: false }, false],
+      ['strikethrough', { strikeThrough: true }, true],
+      ['strikethrough', { strike: false }, false],
     ] as const) {
       expect(getSlideEditTextRunFormattingJSONPasteValue({
         dataTransfer: createDataTransfer({
@@ -324,6 +368,13 @@ describe('SlideEditTextFormattingKeyboard', () => {
       { runItalic: true },
       {
         fieldId: 'italic',
+        mode: 'wrapped',
+      },
+    )).toBe(true)
+    expect(getSlideEditTextRunFormattingJSONPasteValueFromValue(
+      { runStrikeThrough: true },
+      {
+        fieldId: 'strikethrough',
         mode: 'wrapped',
       },
     )).toBe(true)
@@ -393,4 +444,16 @@ function createDataTransfer(values: Record<string, string>) {
   return {
     getData: (type: string) => values[type] ?? '',
   }
+}
+
+function getFormattingField(fieldId: string) {
+  const field = SLIDE_EDIT_TEXT_RUN_FORMATTING_FIELDS.find(
+    (candidate) => candidate.id === fieldId,
+  )
+
+  if (!field) {
+    throw new Error(`Missing formatting field: ${fieldId}`)
+  }
+
+  return field
 }

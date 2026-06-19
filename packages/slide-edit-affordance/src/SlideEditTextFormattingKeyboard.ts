@@ -11,11 +11,13 @@ export type SlideEditTextRunFormattingFieldId =
   | 'color'
   | 'italic'
   | 'size'
+  | 'strikethrough'
   | 'underline'
 
 export type SlideEditTextRunFormattingBooleanFieldId =
   | 'bold'
   | 'italic'
+  | 'strikethrough'
   | 'underline'
 
 export type SlideEditTextRunSizeValue = number
@@ -228,6 +230,24 @@ export const SLIDE_EDIT_TEXT_RUN_FORMATTING_FIELDS = Object.freeze([
     id: 'color',
     jsonKeys: ['textRunColor', 'runColor', 'color', 'value'],
     jsonMimeType: `${SLIDE_EDIT_TEXT_RUN_FORMATTING_MIME_PREFIX}-color+json`,
+    requiredAdapterSlot: 'command-effect',
+  },
+  {
+    commandId: 'update-text-run-formatting',
+    control: 'toggle',
+    id: 'strikethrough',
+    jsonKeys: [
+      'textRunStrikethrough',
+      'textRunStrikeThrough',
+      'runStrikethrough',
+      'runStrikeThrough',
+      'strikethrough',
+      'strikeThrough',
+      'strike',
+      'value',
+    ],
+    jsonMimeType:
+      `${SLIDE_EDIT_TEXT_RUN_FORMATTING_MIME_PREFIX}-strikethrough+json`,
     requiredAdapterSlot: 'command-effect',
   },
 ] as const satisfies readonly SlideEditTextRunFormattingFieldDescriptor[])
@@ -606,6 +626,7 @@ function normalizeSlideEditTextRunFormattingFieldValue<
         SlideEditTextRunFormattingValue<TFieldId> | null
     case 'bold':
     case 'italic':
+    case 'strikethrough':
     case 'underline':
       return normalizeSlideEditTextRunFormattingValue(value) as
         SlideEditTextRunFormattingValue<TFieldId> | null
