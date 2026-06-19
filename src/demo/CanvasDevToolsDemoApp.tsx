@@ -60,6 +60,9 @@ import {
   getCanvasContextMenuPosition,
   useCanvasToolbarRovingFocus,
 } from '../canvas'
+import {
+  isCanvasEngineDemoControlTarget,
+} from './CanvasEngineDemoControlTarget'
 import { EngineSelectionToolbar } from './CanvasDevToolsSelectionToolbar'
 import {
   applyCanvasEngineDemoFeaturePackSwitchToAssemblySource,
@@ -347,7 +350,7 @@ function CanvasEngineDemoSurface({
       return
     }
 
-    if (isEngineDemoControlTarget(event.target)) {
+    if (isCanvasEngineDemoControlTarget(event.target)) {
       return
     }
 
@@ -393,7 +396,7 @@ function CanvasEngineDemoSurface({
       return
     }
 
-    if (isEngineDemoControlTarget(event.target)) {
+    if (isCanvasEngineDemoControlTarget(event.target)) {
       return
     }
 
@@ -419,7 +422,7 @@ function CanvasEngineDemoSurface({
       return
     }
 
-    if (isEngineDemoControlTarget(event.target)) {
+    if (isCanvasEngineDemoControlTarget(event.target)) {
       return
     }
 
@@ -475,7 +478,7 @@ function CanvasEngineDemoSurface({
       return
     }
 
-    if (isEngineDemoControlTarget(event.target)) {
+    if (isCanvasEngineDemoControlTarget(event.target)) {
       return
     }
 
@@ -949,29 +952,6 @@ function getEngineContextMenuPoint({
     },
     viewportSize,
   })
-}
-
-function isEngineDemoControlTarget(target: EventTarget) {
-  return target instanceof Element &&
-    target.closest(
-      [
-        '.context-command-menu',
-        '.command-palette',
-        '.engine-demo-controls',
-        '.engine-demo-feature-packs',
-        '.engine-demo-minimap',
-        '.engine-demo-viewport-controls',
-        '.engine-sticky-quick-create',
-        '.engine-selection-toolbar',
-        '.engine-stamp-pad',
-        '.engine-widget-play-overlay',
-        '.shortcut-help',
-        '.text-editor',
-        'button',
-        'input',
-        'textarea',
-      ].join(','),
-    ) !== null
 }
 
 function EngineTextEditor({
