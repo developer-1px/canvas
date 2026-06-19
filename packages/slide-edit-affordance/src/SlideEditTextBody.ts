@@ -27,6 +27,8 @@ export type SlideEditTextBodyJSONPasteValue = {
   format: 'json'
   paragraphCount: number
   payloadLength: number
+  rawBody: unknown
+  rawPayload: unknown
   runCount: number
   sourceType: string
   surface: 'text-body'
@@ -36,6 +38,16 @@ export type SlideEditTextBodyJSONPasteValue = {
 export type SlideEditTextBodyJSONPasteInput = {
   dataTransfer: SlideEditTextBodyDataTransfer | null
   jsonMimeType?: string
+  storagePolicy?: SlideEditTextBodyStoragePolicy
+}
+
+export type SlideEditTextBodyJSONPasteValueMode =
+  | 'direct'
+  | 'wrapped'
+
+export type SlideEditTextBodyJSONPasteValueOptions = {
+  mode?: SlideEditTextBodyJSONPasteValueMode
+  sourceType?: string
   storagePolicy?: SlideEditTextBodyStoragePolicy
 }
 
@@ -124,13 +136,14 @@ export function getSlideEditTextBodyJSONPasteValue({
     const customText = dataTransfer.getData(jsonMimeType)
 
     if (customText.trim()) {
-      const customValue = parseSlideEditTextBodyJSON(customText)
-      const customPasteValue = getSlideEditTextBodyDirectJSONPasteValue({
-        payloadLength: customText.length,
-        sourceType: jsonMimeType,
-        storagePolicy,
-        value: customValue,
-      })
+      const customPasteValue = getSlideEditTextBodyJSONPasteValueFromText(
+        customText,
+        {
+          mode: 'direct',
+          sourceType: jsonMimeType,
+          storagePolicy,
+        },
+      )
 
       if (customPasteValue !== null) {
         return customPasteValue
@@ -145,13 +158,14 @@ export function getSlideEditTextBodyJSONPasteValue({
       continue
     }
 
-    const value = parseSlideEditTextBodyJSON(text)
-    const pasteValue = getSlideEditTextBodyWrappedJSONPasteValue({
-      payloadLength: text.length,
-      sourceType: type,
-      storagePolicy,
-      value,
-    })
+    const pasteValue = getSlideEditTextBodyJSONPasteValueFromText(
+      text,
+      {
+        mode: 'wrapped',
+        sourceType: type,
+        storagePolicy,
+      },
+    )
 
     if (pasteValue !== null) {
       return pasteValue
@@ -159,6 +173,46 @@ export function getSlideEditTextBodyJSONPasteValue({
   }
 
   return null
+}
+
+export function getSlideEditTextBodyJSONPasteValueFromText(
+  text: string,
+  options?: SlideEditTextBodyJSONPasteValueOptions,
+): SlideEditTextBodyJSONPasteValue | null {
+  return getSlideEditTextBodyJSONPasteValueFromValue(
+    parseSlideEditTextBodyJSON(text),
+    {
+      ...options,
+      payloadLength: text.length,
+    },
+  )
+}
+
+export function getSlideEditTextBodyJSONPasteValueFromValue(
+  value: unknown,
+  {
+    mode = 'direct',
+    payloadLength = 0,
+    sourceType = 'value',
+    storagePolicy = {},
+  }: SlideEditTextBodyJSONPasteValueOptions & {
+    payloadLength?: number
+  } = {},
+): SlideEditTextBodyJSONPasteValue | null {
+  return mode === 'wrapped'
+    ? getSlideEditTextBodyWrappedJSONPasteValue({
+        payloadLength,
+        sourceType,
+        storagePolicy,
+        value,
+      })
+    : getSlideEditTextBodyDirectJSONPasteValue({
+        payloadLength,
+        rawPayload: value,
+        sourceType,
+        storagePolicy,
+        value,
+      })
 }
 
 export function getSlideEditTextBodyPasteCommandEffect<
@@ -228,6 +282,7 @@ function getSlideEditTextBodyWrappedJSONPasteValue({
 
     const pasteValue = getSlideEditTextBodyDirectJSONPasteValue({
       payloadLength,
+      rawPayload: value,
       sourceType,
       storagePolicy,
       value: record[key],
@@ -244,12 +299,14 @@ function getSlideEditTextBodyWrappedJSONPasteValue({
 
 function getSlideEditTextBodyDirectJSONPasteValue({
   payloadLength,
+  rawPayload,
   sourceType,
   storagePolicy,
   value,
   wrapper,
 }: {
   payloadLength: number
+  rawPayload: unknown
   sourceType: string
   storagePolicy: SlideEditTextBodyStoragePolicy
   value: unknown
@@ -266,6 +323,8 @@ function getSlideEditTextBodyDirectJSONPasteValue({
     format: 'json',
     paragraphCount: body.paragraphs.length,
     payloadLength,
+    rawBody: value,
+    rawPayload,
     runCount: body.paragraphs.reduce(
       (count, paragraph) => count + paragraph.runs.length,
       0,

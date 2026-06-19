@@ -1136,6 +1136,8 @@ export {
 } from './SlideEditColorSwatchPalette'
 export {
   getSlideEditTextBodyJSONPasteValue,
+  getSlideEditTextBodyJSONPasteValueFromText,
+  getSlideEditTextBodyJSONPasteValueFromValue,
   getSlideEditTextBodyPasteCommandEffect,
   SLIDE_EDIT_TEXT_BODY_JSON_MIME_TYPE,
   SLIDE_EDIT_TEXT_BODY_JSON_TYPES,
@@ -1144,6 +1146,8 @@ export {
   type SlideEditTextBodyDataTransfer,
   type SlideEditTextBodyJSONPasteInput,
   type SlideEditTextBodyJSONPasteValue,
+  type SlideEditTextBodyJSONPasteValueMode,
+  type SlideEditTextBodyJSONPasteValueOptions,
   type SlideEditTextBodyObjectId,
   type SlideEditTextBodyParagraph,
   type SlideEditTextBodyPasteCommandEffectInput,
