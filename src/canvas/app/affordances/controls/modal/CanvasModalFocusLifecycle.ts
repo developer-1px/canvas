@@ -35,8 +35,16 @@ export type CanvasModalBackdropPointerIntentInput = {
 }
 
 export type CanvasModalBackdropPointerIntent =
-  | { kind: 'dismiss' }
-  | { kind: 'none' }
+  | {
+      kind: 'dismiss'
+      preventDefault: true
+      stopPropagation: true
+    }
+  | {
+      kind: 'none'
+      preventDefault: false
+      stopPropagation: false
+    }
 
 export type CanvasModalKeyboardIntentInput = {
   key: string
@@ -155,9 +163,19 @@ export function getCanvasModalBackdropPointerIntent({
   currentTarget,
   target,
 }: CanvasModalBackdropPointerIntentInput): CanvasModalBackdropPointerIntent {
-  return currentTarget && target === currentTarget
-    ? { kind: 'dismiss' }
-    : { kind: 'none' }
+  if (currentTarget && target === currentTarget) {
+    return {
+      kind: 'dismiss',
+      preventDefault: true,
+      stopPropagation: true,
+    }
+  }
+
+  return {
+    kind: 'none',
+    preventDefault: false,
+    stopPropagation: false,
+  }
 }
 
 export function getCanvasModalKeyboardIntent({

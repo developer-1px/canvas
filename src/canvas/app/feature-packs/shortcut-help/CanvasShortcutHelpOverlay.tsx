@@ -52,7 +52,12 @@ function CanvasShortcutHelpDialog({
     })
 
     if (backdropPointerIntent.kind === 'dismiss') {
-      event.preventDefault()
+      if (backdropPointerIntent.preventDefault) {
+        event.preventDefault()
+      }
+      if (backdropPointerIntent.stopPropagation) {
+        event.stopPropagation()
+      }
       onClose()
     }
   }

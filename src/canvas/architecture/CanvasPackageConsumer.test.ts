@@ -4784,10 +4784,18 @@ describe('Canvas package consumer imports', () => {
       y: 110,
     })
     expect(getCanvasModalBackdropPointerIntent(modalBackdropPointerInput))
-      .toEqual({ kind: 'dismiss' })
+      .toEqual({
+        kind: 'dismiss',
+        preventDefault: true,
+        stopPropagation: true,
+      })
     expect(CanvasAppFacade.getCanvasModalBackdropPointerIntent(
       modalBackdropPointerInput,
-    )).toEqual({ kind: 'dismiss' })
+    )).toEqual({
+      kind: 'dismiss',
+      preventDefault: true,
+      stopPropagation: true,
+    })
     expect(getCanvasModalKeyboardIntent(modalKeyboardInput)).toEqual({
       kind: 'trap-focus',
       preventDefault: true,

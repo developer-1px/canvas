@@ -17,15 +17,27 @@ describe('CanvasModalFocusLifecycle', () => {
     expect(getCanvasModalBackdropPointerIntent({
       currentTarget: backdrop as EventTarget,
       target: backdrop as EventTarget,
-    })).toEqual({ kind: 'dismiss' })
+    })).toEqual({
+      kind: 'dismiss',
+      preventDefault: true,
+      stopPropagation: true,
+    })
     expect(getCanvasModalBackdropPointerIntent({
       currentTarget: backdrop as EventTarget,
       target: child as EventTarget,
-    })).toEqual({ kind: 'none' })
+    })).toEqual({
+      kind: 'none',
+      preventDefault: false,
+      stopPropagation: false,
+    })
     expect(getCanvasModalBackdropPointerIntent({
       currentTarget: null,
       target: null,
-    })).toEqual({ kind: 'none' })
+    })).toEqual({
+      kind: 'none',
+      preventDefault: false,
+      stopPropagation: false,
+    })
   })
 
   it('maps modal keyboard keys to close and trap focus intents', () => {

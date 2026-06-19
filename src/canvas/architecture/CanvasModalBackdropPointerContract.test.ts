@@ -25,6 +25,12 @@ describe('Canvas modal backdrop pointer contract', () => {
     expect(commandPaletteSource).toContain(
       'onPointerDown={handleBackdropPointerDown}',
     )
+    expect(commandPaletteSource).toMatch(
+      /if \(backdropPointerIntent\.preventDefault\) \{\s*event\.preventDefault\(\)\s*\}/,
+    )
+    expect(commandPaletteSource).toMatch(
+      /if \(backdropPointerIntent\.stopPropagation\) \{\s*event\.stopPropagation\(\)\s*\}/,
+    )
     expect(commandPaletteSource).not.toContain('onMouseDown=')
     expect(commandPaletteSource).not.toContain('type MouseEvent')
 
@@ -34,7 +40,10 @@ describe('Canvas modal backdrop pointer contract', () => {
       'onPointerDown={handleBackdropPointerDown}',
     )
     expect(shortcutHelpSource).toMatch(
-      /if \(backdropPointerIntent\.kind === 'dismiss'\) \{\s*event\.preventDefault\(\)\s*onClose\(\)\s*\}/,
+      /if \(backdropPointerIntent\.preventDefault\) \{\s*event\.preventDefault\(\)\s*\}/,
+    )
+    expect(shortcutHelpSource).toMatch(
+      /if \(backdropPointerIntent\.stopPropagation\) \{\s*event\.stopPropagation\(\)\s*\}/,
     )
     expect(shortcutHelpSource).not.toContain('onMouseDown=')
     expect(shortcutHelpSource).not.toContain('type MouseEvent')
