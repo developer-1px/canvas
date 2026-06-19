@@ -21,6 +21,30 @@ export type SlideEditObjectTransformSize = Pick<Bounds, 'h' | 'w'>
 
 export type SlideEditObjectTransformDataTransfer = Pick<DataTransfer, 'getData'>
 
+export type SlideEditObjectTransformMoveAxis = 'x' | 'y'
+
+export type SlideEditObjectTransformMoveDelta = {
+  dx: number
+  dy: number
+}
+
+export type SlideEditObjectTransformAxisLockedMoveDelta =
+  SlideEditObjectTransformMoveDelta & {
+    axis: SlideEditObjectTransformMoveAxis
+  }
+
+export type SlideEditObjectTransformMoveDragModifierState = {
+  axisLock: boolean
+  axisLockModifier: 'Shift'
+  model: 'slide-edit-object-transform-move-drag-modifiers'
+}
+
+export type SlideEditObjectTransformMoveDragModifierInput = {
+  event: {
+    shiftKey?: boolean
+  }
+}
+
 export type SlideEditObjectTransformSourceFields =
   Partial<Record<SlideEditObjectTransformFieldId, string>> & {
     wrapper?: string
@@ -230,6 +254,27 @@ const SLIDE_EDIT_OBJECT_TRANSFORM_FIELD_KEYS = Object.freeze({
   SlideEditObjectTransformFieldId,
   readonly string[]
 >)
+
+export function getSlideEditObjectTransformMoveDragModifierState({
+  event,
+}: SlideEditObjectTransformMoveDragModifierInput):
+  SlideEditObjectTransformMoveDragModifierState {
+  return {
+    axisLock: event.shiftKey === true,
+    axisLockModifier: 'Shift',
+    model: 'slide-edit-object-transform-move-drag-modifiers',
+  }
+}
+
+export function getSlideEditObjectTransformAxisLockedMoveDelta({
+  dx,
+  dy,
+}: SlideEditObjectTransformMoveDelta):
+  SlideEditObjectTransformAxisLockedMoveDelta {
+  return Math.abs(dx) >= Math.abs(dy)
+    ? { axis: 'x', dx, dy: 0 }
+    : { axis: 'y', dx: 0, dy }
+}
 
 export function getSlideEditObjectTransformJSONPasteValue({
   dataTransfer,

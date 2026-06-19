@@ -2,10 +2,12 @@ import { describe, expect, it } from 'vitest'
 
 import {
   clampSlideEditObjectTransformToFrame,
+  getSlideEditObjectTransformAxisLockedMoveDelta,
   getSlideEditObjectTransformForTarget,
   getSlideEditObjectTransformJSONPasteValue,
   getSlideEditObjectTransformJSONPasteValueFromText,
   getSlideEditObjectTransformJSONPasteValueFromValue,
+  getSlideEditObjectTransformMoveDragModifierState,
   getSlideEditObjectTransformPasteCommandEffects,
   normalizeSlideEditObjectTransform,
   normalizeSlideEditObjectTransformRotation,
@@ -26,6 +28,50 @@ function createDataTransfer(values: Record<string, string>) {
 }
 
 describe('SlideEditObjectTransform', () => {
+  it('maps Shift move drag to an axis-lock modifier state', () => {
+    expect(getSlideEditObjectTransformMoveDragModifierState({
+      event: {
+        shiftKey: true,
+      },
+    })).toEqual({
+      axisLock: true,
+      axisLockModifier: 'Shift',
+      model: 'slide-edit-object-transform-move-drag-modifiers',
+    })
+    expect(getSlideEditObjectTransformMoveDragModifierState({
+      event: {
+        shiftKey: false,
+      },
+    }).axisLock).toBe(false)
+  })
+
+  it('locks move deltas to the dominant axis for Shift drag movement', () => {
+    expect(getSlideEditObjectTransformAxisLockedMoveDelta({
+      dx: 96,
+      dy: 34,
+    })).toEqual({
+      axis: 'x',
+      dx: 96,
+      dy: 0,
+    })
+    expect(getSlideEditObjectTransformAxisLockedMoveDelta({
+      dx: -12,
+      dy: -40,
+    })).toEqual({
+      axis: 'y',
+      dx: 0,
+      dy: -40,
+    })
+    expect(getSlideEditObjectTransformAxisLockedMoveDelta({
+      dx: 10,
+      dy: -10,
+    })).toEqual({
+      axis: 'x',
+      dx: 10,
+      dy: 0,
+    })
+  })
+
   it('reads direct object transform JSON from the custom clipboard MIME type', () => {
     const pasteValue = getSlideEditObjectTransformJSONPasteValue({
       dataTransfer: createDataTransfer({
