@@ -4,6 +4,7 @@ import {
   CANVAS_TABS_ROVING_FOCUS_MODEL,
   createCanvasTabsDescriptor,
   getCanvasTabsKeyboardIntent,
+  runCanvasTabsKeyboardIntent,
 } from './CanvasTabsRovingFocus'
 
 const tabs = [
@@ -117,6 +118,7 @@ describe('CanvasTabsRovingFocus', () => {
       index: 1,
       kind: 'move-tab',
       preventDefault: true,
+      stopPropagation: true,
     })
     expect(getCanvasTabsKeyboardIntent({
       currentId: 'slide',
@@ -216,6 +218,7 @@ describe('CanvasTabsRovingFocus', () => {
     })).toEqual({
       kind: 'none',
       preventDefault: false,
+      stopPropagation: false,
     })
     expect(getCanvasTabsKeyboardIntent({
       currentId: 'missing',
@@ -224,6 +227,127 @@ describe('CanvasTabsRovingFocus', () => {
     })).toEqual({
       kind: 'none',
       preventDefault: false,
+      stopPropagation: false,
     })
+  })
+
+  it('runs automatic tab keyboard intents by consuming the event, focusing, and activating', () => {
+    let preventDefaultCount = 0
+    let stopPropagationCount = 0
+    let focusedId: string | null = null
+    let focusedIndex: number | null = null
+    let activatedId: string | null = null
+    let activatedIndex: number | null = null
+
+    expect(runCanvasTabsKeyboardIntent({
+      currentId: 'slide',
+      event: {
+        key: 'ArrowRight',
+        preventDefault: () => {
+          preventDefaultCount += 1
+        },
+        stopPropagation: () => {
+          stopPropagationCount += 1
+        },
+      },
+      onActivateTab: (id, index) => {
+        activatedId = id
+        activatedIndex = index
+      },
+      onFocusTab: (id, index) => {
+        focusedId = id
+        focusedIndex = index
+      },
+      tabs,
+    })).toBe(true)
+
+    expect(preventDefaultCount).toBe(1)
+    expect(stopPropagationCount).toBe(1)
+    expect(focusedId).toBe('selection')
+    expect(focusedIndex).toBe(1)
+    expect(activatedId).toBe('selection')
+    expect(activatedIndex).toBe(1)
+  })
+
+  it('runs manual tab keyboard intents without activating arrow navigation', () => {
+    let activatedCount = 0
+    let focusedId: string | null = null
+
+    expect(runCanvasTabsKeyboardIntent({
+      activation: 'manual',
+      currentId: 'slide',
+      event: {
+        key: 'ArrowRight',
+        preventDefault: () => undefined,
+        stopPropagation: () => undefined,
+      },
+      onActivateTab: () => {
+        activatedCount += 1
+      },
+      onFocusTab: (id) => {
+        focusedId = id
+      },
+      tabs,
+    })).toBe(true)
+
+    expect(focusedId).toBe('selection')
+    expect(activatedCount).toBe(0)
+  })
+
+  it('runs manual tab activation keys against the current tab', () => {
+    let activatedId: string | null = null
+    let focusedId: string | null = null
+
+    expect(runCanvasTabsKeyboardIntent({
+      activation: 'manual',
+      currentId: 'selection',
+      event: {
+        key: 'Enter',
+        preventDefault: () => undefined,
+        stopPropagation: () => undefined,
+      },
+      onActivateTab: (id) => {
+        activatedId = id
+      },
+      onFocusTab: (id) => {
+        focusedId = id
+      },
+      tabs,
+    })).toBe(true)
+
+    expect(focusedId).toBe('selection')
+    expect(activatedId).toBe('selection')
+  })
+
+  it('does not consume unsupported tab keys', () => {
+    let preventDefaultCount = 0
+    let stopPropagationCount = 0
+    let focusedCount = 0
+    let activatedCount = 0
+
+    expect(runCanvasTabsKeyboardIntent({
+      currentId: 'slide',
+      event: {
+        key: 'Escape',
+        preventDefault: () => {
+          preventDefaultCount += 1
+        },
+        stopPropagation: () => {
+          stopPropagationCount += 1
+        },
+      },
+      onActivateTab: () => {
+        activatedCount += 1
+      },
+      onFocusTab: () => {
+        focusedCount += 1
+      },
+      tabs,
+    })).toBe(false)
+
+    expect(preventDefaultCount).toBe(0)
+    expect(stopPropagationCount).toBe(0)
+    expect(focusedCount).toBe(0)
+    expect(activatedCount).toBe(0)
   })
 })

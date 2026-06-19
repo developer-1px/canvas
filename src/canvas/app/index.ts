@@ -116,14 +116,18 @@ export {
   getCanvasTabsPanelAttributes,
   getCanvasTabsTabAttributes,
   getCanvasTabsTabIndex,
+  runCanvasTabsKeyboardIntent,
+  type CanvasTabsKeyboardEvent,
   type CanvasTabsActivationMode,
   type CanvasTabsDescriptor,
   type CanvasTabsKeyboardIntent,
+  type CanvasTabsKeyboardIntentInput,
   type CanvasTabsPanelAttributes,
   type CanvasTabsPanelDescriptor,
   type CanvasTabsTabAttributes,
   type CanvasTabsTabDescriptor,
   type CanvasTabsTabInput,
+  type RunCanvasTabsKeyboardIntentInput,
 } from './affordances/controls/tabs/CanvasTabsRovingFocus'
 export {
   getCanvasEditableFieldKeyboardIntent,

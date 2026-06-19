@@ -141,6 +141,7 @@ import {
   getCanvasPresentationKeyboardIntent,
   getCanvasRadioGroupKeyboardIntent,
   getCanvasRadioTabIndex,
+  getCanvasTabsKeyboardIntent,
   getCanvasToolbarRovingActiveIndex,
   getCanvasToolbarRovingKeyboardIntent,
   getCanvasToolbarRovingKeyIndex,
@@ -160,6 +161,7 @@ import {
   runCanvasEditableFieldKeyboardIntent,
   runCanvasPresentationKeyboardIntent,
   runCanvasRadioGroupKeyboardIntent,
+  runCanvasTabsKeyboardIntent,
   runCanvasToolbarRovingKeyboardIntent,
   runCanvasWheelViewport,
   startCanvasPointerLaserInteraction,
@@ -500,6 +502,7 @@ import {
   type CanvasEditableFieldKeyboardIntentInput,
   type CanvasPresentationKeyboardIntentInput,
   type CanvasRadioGroupKeyboardIntentInput,
+  type CanvasTabsKeyboardIntentInput,
   type CanvasInteractionTargetSelectorInput,
   type CanvasInlineEditKeyboardIntentInput,
   type CanvasContextMenuClientPointInput,
@@ -523,6 +526,7 @@ import {
   type RunCanvasModalKeyboardIntentInput,
   type RunCanvasEditableFieldKeyboardIntentInput,
   type RunCanvasRadioGroupKeyboardIntentInput,
+  type RunCanvasTabsKeyboardIntentInput,
   type RunCanvasPresentationKeyboardIntentInput,
   type CanvasPointerClickMemory,
   type CanvasNextLaserTrailPointsInput,
@@ -4239,6 +4243,45 @@ describe('Canvas package consumer imports', () => {
           menuRovingMoveFocusCount += 1
         },
       }
+    const tabsKeyboardInput: CanvasTabsKeyboardIntentInput<'inspector' | 'json'> = {
+      currentId: 'inspector',
+      key: 'ArrowRight',
+      tabs: [
+        {
+          id: 'inspector',
+          panelId: 'panel-inspector',
+          tabId: 'tab-inspector',
+        },
+        {
+          id: 'json',
+          panelId: 'panel-json',
+          tabId: 'tab-json',
+        },
+      ],
+    }
+    let tabsPreventDefaultCount = 0
+    let tabsStopPropagationCount = 0
+    let focusedTabId: string | null = null
+    let activatedTabId: string | null = null
+    const tabsKeyboardRunInput:
+      RunCanvasTabsKeyboardIntentInput<'inspector' | 'json'> = {
+        ...tabsKeyboardInput,
+        event: {
+          key: 'ArrowRight',
+          preventDefault: () => {
+            tabsPreventDefaultCount += 1
+          },
+          stopPropagation: () => {
+            tabsStopPropagationCount += 1
+          },
+        },
+        onActivateTab: (id) => {
+          activatedTabId = id
+        },
+        onFocusTab: (id) => {
+          focusedTabId = id
+        },
+      }
     const toolbarRovingActiveIndexInput:
       CanvasToolbarRovingActiveIndexInput = {
         count: 4,
@@ -4907,6 +4950,31 @@ describe('Canvas package consumer imports', () => {
     expect(menuRovingCloseCount).toBe(2)
     expect(menuRovingMoveFocusCount).toBe(0)
     expect(menuRovingActivateCount).toBe(0)
+    expect(getCanvasTabsKeyboardIntent(tabsKeyboardInput)).toEqual({
+      activate: true,
+      id: 'json',
+      index: 1,
+      kind: 'move-tab',
+      preventDefault: true,
+      stopPropagation: true,
+    })
+    expect(CanvasAppFacade.getCanvasTabsKeyboardIntent(tabsKeyboardInput))
+      .toEqual({
+        activate: true,
+        id: 'json',
+        index: 1,
+        kind: 'move-tab',
+        preventDefault: true,
+        stopPropagation: true,
+      })
+    expect(runCanvasTabsKeyboardIntent(tabsKeyboardRunInput)).toBe(true)
+    expect(CanvasAppFacade.runCanvasTabsKeyboardIntent(
+      tabsKeyboardRunInput,
+    )).toBe(true)
+    expect(tabsPreventDefaultCount).toBe(2)
+    expect(tabsStopPropagationCount).toBe(2)
+    expect(focusedTabId).toBe('json')
+    expect(activatedTabId).toBe('json')
     expect(getCanvasToolbarRovingActiveIndex(
       toolbarRovingActiveIndexInput,
     )).toBe(3)

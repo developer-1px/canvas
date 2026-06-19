@@ -55,6 +55,7 @@ export type CanvasTabsKeyboardIntent<TId extends string = string> =
   | {
       kind: 'none'
       preventDefault: false
+      stopPropagation: false
     }
   | {
       activate: boolean
@@ -62,7 +63,31 @@ export type CanvasTabsKeyboardIntent<TId extends string = string> =
       index: number
       kind: 'move-tab'
       preventDefault: true
+      stopPropagation: true
     }
+
+export type CanvasTabsKeyboardIntentInput<
+  TId extends string = string,
+> = {
+  activation?: CanvasTabsActivationMode
+  currentId: TId
+  key: string
+  tabs: readonly CanvasTabsTabInput<TId>[]
+}
+
+export type CanvasTabsKeyboardEvent = {
+  key: string
+  preventDefault: () => void
+  stopPropagation: () => void
+}
+
+export type RunCanvasTabsKeyboardIntentInput<
+  TId extends string = string,
+> = Omit<CanvasTabsKeyboardIntentInput<TId>, 'key'> & {
+  event: CanvasTabsKeyboardEvent
+  onActivateTab: (id: TId, index: number) => void
+  onFocusTab: (id: TId, index: number) => void
+}
 
 export function createCanvasTabsDescriptor<
   TId extends string,
@@ -150,17 +175,16 @@ export function getCanvasTabsKeyboardIntent<TId extends string>({
   currentId,
   key,
   tabs,
-}: {
-  activation?: CanvasTabsActivationMode
-  currentId: TId
-  key: string
-  tabs: readonly CanvasTabsTabInput<TId>[]
-}): CanvasTabsKeyboardIntent<TId> {
+}: CanvasTabsKeyboardIntentInput<TId>): CanvasTabsKeyboardIntent<TId> {
   const enabledTabs = tabs.filter((tab) => tab.disabled !== true)
   const currentEnabledIndex = enabledTabs.findIndex((tab) => tab.id === currentId)
 
   if (enabledTabs.length === 0 || currentEnabledIndex < 0) {
-    return { kind: 'none', preventDefault: false }
+    return {
+      kind: 'none',
+      preventDefault: false,
+      stopPropagation: false,
+    }
   }
 
   const nextEnabledIndex = getCanvasTabsKeyIndex({
@@ -170,7 +194,11 @@ export function getCanvasTabsKeyboardIntent<TId extends string>({
   })
 
   if (nextEnabledIndex === null) {
-    return { kind: 'none', preventDefault: false }
+    return {
+      kind: 'none',
+      preventDefault: false,
+      stopPropagation: false,
+    }
   }
 
   const nextTab = enabledTabs[nextEnabledIndex]
@@ -182,7 +210,44 @@ export function getCanvasTabsKeyboardIntent<TId extends string>({
     index,
     kind: 'move-tab',
     preventDefault: true,
+    stopPropagation: true,
   }
+}
+
+export function runCanvasTabsKeyboardIntent<TId extends string>({
+  activation,
+  currentId,
+  event,
+  onActivateTab,
+  onFocusTab,
+  tabs,
+}: RunCanvasTabsKeyboardIntentInput<TId>) {
+  const intent = getCanvasTabsKeyboardIntent({
+    activation,
+    currentId,
+    key: event.key,
+    tabs,
+  })
+
+  if (intent.kind === 'none') {
+    return false
+  }
+
+  if (intent.preventDefault) {
+    event.preventDefault()
+  }
+
+  if (intent.stopPropagation) {
+    event.stopPropagation()
+  }
+
+  onFocusTab(intent.id, intent.index)
+
+  if (intent.activate) {
+    onActivateTab(intent.id, intent.index)
+  }
+
+  return true
 }
 
 function getCanvasTabsKeyIndex({
