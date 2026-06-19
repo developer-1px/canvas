@@ -2,11 +2,15 @@ import { describe, expect, it } from 'vitest'
 
 import {
   getSlideEditTextBodyJSONPasteValue,
+  getSlideEditTextBodyJSONPasteValueFromText,
+  getSlideEditTextBodyJSONPasteValueFromValue,
   getSlideEditTextBodyPasteCommandEffect,
   SLIDE_EDIT_TEXT_BODY_JSON_MIME_TYPE,
 } from './SlideEditTextBody'
 import {
   getSlideEditTextBodyJSONPasteValue as getSlideEditTextBodyJSONPasteValueFromPackage,
+  getSlideEditTextBodyJSONPasteValueFromText as getSlideEditTextBodyJSONPasteValueFromTextFromPackage,
+  getSlideEditTextBodyJSONPasteValueFromValue as getSlideEditTextBodyJSONPasteValueFromValueFromPackage,
 } from './index'
 
 describe('SlideEditTextBody', () => {
@@ -131,6 +135,119 @@ describe('SlideEditTextBody', () => {
       },
       wrapper: 'content',
     })
+  })
+
+  it('reads text body JSON from text and parsed values', () => {
+    const directText = '{"text":"Hello"}'
+
+    expect(getSlideEditTextBodyJSONPasteValueFromText(
+      directText,
+      { sourceType: 'custom/test' },
+    )).toEqual({
+      body: {
+        paragraphs: [
+          {
+            runs: [
+              {
+                text: 'Hello',
+              },
+            ],
+            text: 'Hello',
+          },
+        ],
+      },
+      format: 'json',
+      paragraphCount: 1,
+      payloadLength: directText.length,
+      rawBody: {
+        text: 'Hello',
+      },
+      rawPayload: {
+        text: 'Hello',
+      },
+      runCount: 1,
+      sourceType: 'custom/test',
+      surface: 'text-body',
+    })
+    expect(getSlideEditTextBodyJSONPasteValueFromValue({
+      textBody: {
+        plainText: 'Title\nBody',
+      },
+    }, { mode: 'wrapped', sourceType: 'application/json' })).toMatchObject({
+      body: {
+        paragraphs: [
+          {
+            text: 'Title',
+          },
+          {
+            text: 'Body',
+          },
+        ],
+      },
+      rawBody: {
+        plainText: 'Title\nBody',
+      },
+      rawPayload: {
+        textBody: {
+          plainText: 'Title\nBody',
+        },
+      },
+      sourceType: 'application/json',
+      wrapper: 'textBody',
+    })
+    expect(getSlideEditTextBodyJSONPasteValueFromTextFromPackage(
+      JSON.stringify({
+        content: {
+          text: 'Long text',
+        },
+      }),
+      {
+        mode: 'wrapped',
+        storagePolicy: {
+          maxParagraphs: 1,
+          maxRunsPerParagraph: 1,
+          maxTextLength: 4,
+        },
+      },
+    )).toMatchObject({
+      body: {
+        paragraphs: [
+          {
+            text: 'Long',
+          },
+        ],
+      },
+      wrapper: 'content',
+    })
+    expect(getSlideEditTextBodyJSONPasteValueFromValueFromPackage({
+      paragraphs: [
+        {
+          runs: ['Package', ' export'],
+        },
+      ],
+    })).toMatchObject({
+      body: {
+        paragraphs: [
+          {
+            runs: [
+              {
+                text: 'Package',
+              },
+              {
+                text: 'export',
+              },
+            ],
+            text: 'Packageexport',
+          },
+        ],
+      },
+      payloadLength: 0,
+      sourceType: 'value',
+    })
+    expect(getSlideEditTextBodyJSONPasteValueFromText(
+      '{"paragraphs":["Direct generic text"]}',
+      { mode: 'wrapped' },
+    )).toBeNull()
   })
 
   it('passes rich raw paragraph and run fields to host normalizers', () => {
