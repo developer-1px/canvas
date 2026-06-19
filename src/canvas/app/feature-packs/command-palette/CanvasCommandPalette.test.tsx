@@ -49,6 +49,31 @@ describe('CanvasCommandPalette', () => {
     expect(markup).toContain('aria-live="polite"')
     expect(markup).toContain('No matches')
   })
+
+  it('does not expose a disabled command result as the active descendant', () => {
+    const markup = renderToStaticMarkup(
+      <CanvasCommandPalette
+        open
+        items={[
+          createItem({ disabled: true, id: 'command:delete', title: 'Delete' }),
+          createItem({ id: 'command:duplicate', title: 'Duplicate' }),
+        ]}
+        onClose={vi.fn()}
+      />,
+    )
+    const activeDescendantMatch = markup.match(
+      /aria-activedescendant="([^"]+)"/,
+    )
+
+    expect(activeDescendantMatch?.[1]).toContain('option-command-duplicate')
+    expect(activeDescendantMatch?.[1]).not.toContain('option-command-delete')
+    expect(markup).toMatch(
+      /aria-disabled="true"[^>]+aria-selected="false"[^>]+id="[^"]+option-command-delete"/,
+    )
+    expect(markup).toMatch(
+      /aria-selected="true"[^>]+id="[^"]+option-command-duplicate"/,
+    )
+  })
 })
 
 function createItem(

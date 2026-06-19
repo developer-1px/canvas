@@ -67,6 +67,7 @@ function CanvasCommandPaletteDialog({
   })
   const activeOptionId =
     listboxDescriptor.activeOptionId ?? undefined
+  const keyboardActiveIndex = listboxDescriptor.activeIndex ?? activeItemIndex
 
   useCanvasModalFocusLifecycle({
     initialFocusRef: inputRef,
@@ -92,8 +93,9 @@ function CanvasCommandPaletteDialog({
 
     if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
       const keyboardIntent = getCanvasCommandPaletteKeyboardIntent({
-        activeIndex: activeItemIndex,
+        activeIndex: keyboardActiveIndex,
         itemCount: filteredItems.length,
+        items: filteredItems,
         key: event.key,
       })
 
@@ -111,8 +113,9 @@ function CanvasCommandPaletteDialog({
 
     if (event.key === 'Enter') {
       const keyboardIntent = getCanvasCommandPaletteKeyboardIntent({
-        activeIndex: activeItemIndex,
+        activeIndex: keyboardActiveIndex,
         itemCount: filteredItems.length,
+        items: filteredItems,
         key: event.key,
       })
 
@@ -182,7 +185,11 @@ function CanvasCommandPaletteDialog({
                   className="command-palette-item"
                   disabled={item.disabled}
                   onClick={() => runItem(item)}
-                  onMouseEnter={() => setActiveIndex(index)}
+                  onMouseEnter={() => {
+                    if (!item.disabled) {
+                      setActiveIndex(index)
+                    }
+                  }}
                 >
                   <span className="command-palette-item-main">
                     <span className="command-palette-item-title">

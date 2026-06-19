@@ -1,3 +1,7 @@
+import {
+  getCanvasCommandPaletteEnabledActiveIndex,
+} from './CanvasCommandPaletteKeyboard'
+
 export type CanvasCommandPaletteListboxItem = {
   disabled?: boolean
   id: string
@@ -32,6 +36,7 @@ export type CanvasCommandPaletteListboxOptionDescriptor = {
 }
 
 export type CanvasCommandPaletteListboxDescriptor = {
+  activeIndex: number | null
   activeOptionId: string | null
   emptyAttributes?: CanvasCommandPaletteEmptyAttributes
   emptyMessageId: string
@@ -54,12 +59,13 @@ export function createCanvasCommandPaletteListboxDescriptor({
   CanvasCommandPaletteListboxDescriptor {
   const emptyMessageId = getCanvasCommandPaletteEmptyMessageId(controlId)
   const isEmpty = items.length === 0
-  const clampedActiveIndex = getCanvasCommandPaletteListboxActiveIndex({
+  const enabledActiveIndex = getCanvasCommandPaletteEnabledActiveIndex({
     activeIndex,
     itemCount: items.length,
+    items,
   })
   const options = items.map((item, index) => {
-    const isActive = index === clampedActiveIndex
+    const isActive = index === enabledActiveIndex
 
     return {
       attributes: {
@@ -77,7 +83,10 @@ export function createCanvasCommandPaletteListboxDescriptor({
   })
 
   return {
-    activeOptionId: options[clampedActiveIndex]?.attributes.id ?? null,
+    activeIndex: enabledActiveIndex,
+    activeOptionId: enabledActiveIndex !== null
+      ? options[enabledActiveIndex]?.attributes.id ?? null
+      : null,
     ...(isEmpty
       ? {
           emptyAttributes: {
@@ -96,20 +105,6 @@ export function createCanvasCommandPaletteListboxDescriptor({
     },
     options,
   }
-}
-
-function getCanvasCommandPaletteListboxActiveIndex({
-  activeIndex,
-  itemCount,
-}: {
-  activeIndex: number
-  itemCount: number
-}) {
-  if (itemCount <= 0) {
-    return 0
-  }
-
-  return Math.max(0, Math.min(activeIndex, itemCount - 1))
 }
 
 function getCanvasCommandPaletteOptionId(controlId: string, itemId: string) {

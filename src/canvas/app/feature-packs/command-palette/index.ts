@@ -20,6 +20,7 @@ export {
   getCanvasCommandPaletteKeyboardIntent,
   type CanvasCommandPaletteKeyboardIntent,
   type CanvasCommandPaletteKeyboardIntentInput,
+  type CanvasCommandPaletteKeyboardItem,
 } from './CanvasCommandPaletteKeyboard'
 export {
   createCanvasCommandPaletteListboxDescriptor,

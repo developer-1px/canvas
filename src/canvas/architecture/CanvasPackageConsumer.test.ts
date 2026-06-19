@@ -628,6 +628,7 @@ import {
   type CanvasAppAssemblySource as CanvasAppAssemblySourceFromApp,
   type CanvasAppProps as CanvasAppPropsFromApp,
   type CanvasCommandPaletteKeyboardIntentInput,
+  type CanvasCommandPaletteKeyboardItem,
   type CanvasCommandPaletteListboxDescriptorInput,
   type CanvasKeyboardToolHandlers,
 } from '@interactive-os/canvas/app'
@@ -4713,10 +4714,19 @@ describe('Canvas package consumer imports', () => {
       margin: 10,
       menuSize: { height: 80, width: 120 },
     }
+    const commandPaletteKeyboardItems:
+      readonly CanvasCommandPaletteKeyboardItem[] = [{
+        disabled: false,
+      }, {
+        disabled: true,
+      }, {
+        disabled: false,
+      }]
     const commandPaletteKeyboardInput: CanvasCommandPaletteKeyboardIntentInput =
       {
         activeIndex: 0,
-        itemCount: 2,
+        itemCount: commandPaletteKeyboardItems.length,
+        items: commandPaletteKeyboardItems,
         key: 'ArrowDown',
       }
     const commandPaletteListboxDescriptorInput:
@@ -4724,6 +4734,9 @@ describe('Canvas package consumer imports', () => {
         activeIndex: 0,
         controlId: 'package-palette',
         items: [{
+          disabled: true,
+          id: 'command:delete',
+        }, {
           disabled: false,
           id: 'tool:select',
         }],
@@ -5691,7 +5704,7 @@ describe('Canvas package consumer imports', () => {
     expect(CanvasAppFacade.getCanvasCommandPaletteKeyboardIntent(
       commandPaletteKeyboardInput,
     )).toEqual({
-      activeIndex: 1,
+      activeIndex: 2,
       kind: 'move-active',
       preventDefault: true,
       stopPropagation: true,
@@ -5699,7 +5712,7 @@ describe('Canvas package consumer imports', () => {
     expect(getCanvasCommandPaletteKeyboardIntent(
       commandPaletteKeyboardInput,
     )).toEqual({
-      activeIndex: 1,
+      activeIndex: 2,
       kind: 'move-active',
       preventDefault: true,
       stopPropagation: true,
@@ -5707,18 +5720,31 @@ describe('Canvas package consumer imports', () => {
     expect(createCanvasCommandPaletteListboxDescriptor(
       commandPaletteListboxDescriptorInput,
     )).toEqual({
+      activeIndex: 1,
       activeOptionId: 'package-palette-option-tool-select',
       emptyMessageId: 'package-palette-empty',
       isEmpty: false,
       options: [{
         attributes: {
+          'aria-disabled': 'true',
           'aria-posinset': 1,
-          'aria-selected': true,
-          'aria-setsize': 1,
-          id: 'package-palette-option-tool-select',
+          'aria-selected': false,
+          'aria-setsize': 2,
+          id: 'package-palette-option-command-delete',
           role: 'option',
         },
         index: 0,
+        isActive: false,
+        itemId: 'command:delete',
+      }, {
+        attributes: {
+          'aria-posinset': 2,
+          'aria-selected': true,
+          'aria-setsize': 2,
+          id: 'package-palette-option-tool-select',
+          role: 'option',
+        },
+        index: 1,
         isActive: true,
         itemId: 'tool:select',
       }],
@@ -5732,6 +5758,7 @@ describe('Canvas package consumer imports', () => {
       controlId: 'package-palette',
       items: [],
     })).toEqual({
+      activeIndex: null,
       activeOptionId: null,
       emptyAttributes: {
         'aria-live': 'polite',

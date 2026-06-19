@@ -337,6 +337,7 @@ export {
   type CanvasCommandPaletteEmptyAttributes,
   type CanvasCommandPaletteKeyboardIntent,
   type CanvasCommandPaletteKeyboardIntentInput,
+  type CanvasCommandPaletteKeyboardItem,
   type CanvasCommandPaletteListboxDescriptor,
   type CanvasCommandPaletteListboxDescriptorInput,
   type CanvasCommandPaletteListboxItem,
