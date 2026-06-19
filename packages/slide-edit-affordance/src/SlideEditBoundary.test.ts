@@ -34,6 +34,7 @@ describe('slide-edit-affordance boundary', () => {
       'text-font-family',
       'text-frame-inset',
       'text-vertical-alignment',
+      'text-paragraph-list-level',
       'text-paragraph-spacing',
       'text-measurement',
     ])

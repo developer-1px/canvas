@@ -332,6 +332,47 @@ export {
   type SlideEditTextParagraphSpacingValues,
 } from './SlideEditTextParagraphSpacing'
 export {
+  createSlideEditTextParagraphListLevelDescriptor,
+  getSlideEditTextParagraphListLevelCommandEffect,
+  getSlideEditTextParagraphListLevelIndentCSSValue,
+  getSlideEditTextParagraphListLevelIndentEm,
+  getSlideEditTextParagraphListLevelJSONPasteValue,
+  getSlideEditTextParagraphListLevelJSONPasteValueFromText,
+  getSlideEditTextParagraphListLevelJSONPasteValueFromValue,
+  getSlideEditTextParagraphListLevelKeyboardIntent,
+  getSlideEditTextParagraphListLevelModelValue,
+  normalizeSlideEditTextParagraphListLevel,
+  normalizeSlideEditTextParagraphListLevelCommand,
+  SLIDE_EDIT_TEXT_PARAGRAPH_LIST_LEVEL_DECREASE_KEYBOARD_SHORTCUT,
+  SLIDE_EDIT_TEXT_PARAGRAPH_LIST_LEVEL_FIELD,
+  SLIDE_EDIT_TEXT_PARAGRAPH_LIST_LEVEL_INCREASE_KEYBOARD_SHORTCUT,
+  SLIDE_EDIT_TEXT_PARAGRAPH_LIST_LEVEL_JSON_MIME_TYPE,
+  SLIDE_EDIT_TEXT_PARAGRAPH_LIST_LEVEL_JSON_TYPES,
+  SLIDE_EDIT_TEXT_PARAGRAPH_LIST_LEVEL_JSON_WRAPPER_KEYS,
+  SLIDE_EDIT_TEXT_PARAGRAPH_LIST_LEVEL_KEYBOARD_INTENT,
+  SLIDE_EDIT_TEXT_PARAGRAPH_LIST_LEVEL_KEYBOARD_KEYS,
+  SLIDE_EDIT_TEXT_PARAGRAPH_LIST_LEVEL_KEYBOARD_MODEL,
+  SLIDE_EDIT_TEXT_PARAGRAPH_LIST_LEVEL_KEYBOARD_ROUTING_PRIORITY,
+  SLIDE_EDIT_TEXT_PARAGRAPH_LIST_LEVEL_LIMITS,
+  type SlideEditTextParagraphListLevelCommand,
+  type SlideEditTextParagraphListLevelCommandKind,
+  type SlideEditTextParagraphListLevelDataTransfer,
+  type SlideEditTextParagraphListLevelDescriptor,
+  type SlideEditTextParagraphListLevelFieldDescriptor,
+  type SlideEditTextParagraphListLevelHostCommandEffect,
+  type SlideEditTextParagraphListLevelJSONPasteInput,
+  type SlideEditTextParagraphListLevelJSONPasteValueMode,
+  type SlideEditTextParagraphListLevelJSONPasteValueOptions,
+  type SlideEditTextParagraphListLevelKeyboardIntent,
+  type SlideEditTextParagraphListLevelKeyboardIntentInput,
+  type SlideEditTextParagraphListLevelKeyboardIntentKind,
+  type SlideEditTextParagraphListLevelLimits,
+  type SlideEditTextParagraphListLevelObjectId,
+  type SlideEditTextParagraphListLevelSetCommand,
+  type SlideEditTextParagraphListLevelSlideId,
+  type SlideEditTextParagraphListLevelStepCommand,
+} from './SlideEditTextParagraphListLevel'
+export {
   createSlideEditTextFontFamilyDescriptor,
   getSlideEditTextFontFamilyCSS,
   getSlideEditTextFontFamilyCommandEffect,
@@ -1412,6 +1453,7 @@ export type SlideEditAdapterSlotId =
   | 'text-font-family'
   | 'text-frame-inset'
   | 'text-vertical-alignment'
+  | 'text-paragraph-list-level'
   | 'text-paragraph-spacing'
   | 'text-measurement'
 
@@ -1533,6 +1575,11 @@ export const SLIDE_EDIT_ADAPTER_SLOTS = Object.freeze([
     purpose: 'Provide selected text object vertical alignment values for stage, thumbnail, and export.',
   },
   {
+    id: 'text-paragraph-list-level',
+    owner: 'host',
+    purpose: 'Provide text paragraph list level values for object inspectors and keyboard intents.',
+  },
+  {
     id: 'text-paragraph-spacing',
     owner: 'host',
     purpose: 'Provide text paragraph spacing and line height values for object inspectors.',
@@ -1612,6 +1659,7 @@ export type SlideEditOwnedContractId =
   | 'text-font-family-affordance'
   | 'text-frame-inset-affordance'
   | 'text-overflow-affordance'
+  | 'text-paragraph-list-level-affordance'
   | 'text-paragraph-spacing-affordance'
   | 'text-vertical-alignment-affordance'
 
@@ -1751,6 +1799,11 @@ export const SLIDE_EDIT_OWNED_CONTRACTS = Object.freeze([
     id: 'text-vertical-alignment-affordance',
     owner: 'slide-edit-affordance',
     scope: 'Text frame vertical alignment values, metadata attribute, and update command effects.',
+  },
+  {
+    id: 'text-paragraph-list-level-affordance',
+    owner: 'slide-edit-affordance',
+    scope: 'Text paragraph list level, indent, step controls, paste fields, and keyboard intents.',
   },
   {
     id: 'text-paragraph-spacing-affordance',
