@@ -262,6 +262,7 @@ import {
   getCanvasPointerTransformModifierState,
   getCanvasResizeHandleDoubleClickIntent,
   getCanvasMenuRovingActiveIndex,
+  getCanvasMenuRovingKeyboardIntent,
   getCanvasMenuTriggerKeyboardIntent,
   getCanvasSelectionListModifierState,
   getCanvasWorldClientPoint,
@@ -494,6 +495,7 @@ import {
   type CanvasEraserStrokeHitTestStroke,
   type CanvasNextDrawingPointsInput,
   type CanvasMenuRovingActiveIndexInput,
+  type CanvasMenuRovingKeyboardIntentInput,
   type CanvasMenuTriggerKeyboardIntentInput,
   type CanvasModalBackdropPointerIntentInput,
   type CanvasModalKeyboardIntentInput,
@@ -4176,6 +4178,11 @@ describe('Canvas package consumer imports', () => {
       focusedIndex: -1,
       preferredIndex: 9,
     }
+    const menuRovingKeyboardInput: CanvasMenuRovingKeyboardIntentInput = {
+      count: 4,
+      currentIndex: 0,
+      key: 'ArrowDown',
+    }
     const menuTriggerKeyboardInput: CanvasMenuTriggerKeyboardIntentInput = {
       key: 'Enter',
     }
@@ -4648,6 +4655,21 @@ describe('Canvas package consumer imports', () => {
     expect(CanvasAppFacade.getCanvasMenuRovingActiveIndex(
       menuRovingActiveIndexInput,
     )).toBe(3)
+    expect(getCanvasMenuRovingKeyboardIntent(menuRovingKeyboardInput))
+      .toEqual({
+        kind: 'move-focus',
+        nextIndex: 1,
+        preventDefault: true,
+        stopPropagation: true,
+      })
+    expect(CanvasAppFacade.getCanvasMenuRovingKeyboardIntent(
+      menuRovingKeyboardInput,
+    )).toEqual({
+      kind: 'move-focus',
+      nextIndex: 1,
+      preventDefault: true,
+      stopPropagation: true,
+    })
     expect(getCanvasMenuTriggerKeyboardIntent(menuTriggerKeyboardInput))
       .toEqual({
         kind: 'open-menu',

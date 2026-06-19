@@ -3,6 +3,7 @@ import {
   CANVAS_MENU_FOCUS_MODEL,
   CANVAS_MENU_FOCUS_RESTORE_MODEL,
   getCanvasMenuRovingActiveIndex,
+  getCanvasMenuRovingKeyboardIntent,
   getCanvasMenuRovingKeyIndex,
   CANVAS_MENU_KEYBOARD_KEYS,
   CANVAS_MENU_ROVING_FOCUS_MODEL,
@@ -77,6 +78,80 @@ describe('CanvasMenuRovingFocus', () => {
       currentIndex: 0,
       key: 'Tab',
     })).toBeNull()
+  })
+
+  it('maps roving navigation keys to consumed move focus intents', () => {
+    expect(getCanvasMenuRovingKeyboardIntent({
+      count: 3,
+      currentIndex: 0,
+      key: 'ArrowDown',
+    })).toEqual({
+      kind: 'move-focus',
+      nextIndex: 1,
+      preventDefault: true,
+      stopPropagation: true,
+    })
+    expect(getCanvasMenuRovingKeyboardIntent({
+      count: 3,
+      currentIndex: 2,
+      key: 'Home',
+    })).toEqual({
+      kind: 'move-focus',
+      nextIndex: 0,
+      preventDefault: true,
+      stopPropagation: true,
+    })
+  })
+
+  it('maps menu close and activation keys to consumed roving intents', () => {
+    expect(getCanvasMenuRovingKeyboardIntent({
+      count: 3,
+      currentIndex: 1,
+      key: 'Escape',
+    })).toEqual({
+      kind: 'close-menu',
+      preventDefault: true,
+      stopPropagation: true,
+    })
+    expect(getCanvasMenuRovingKeyboardIntent({
+      count: 3,
+      currentIndex: 1,
+      key: 'Enter',
+    })).toEqual({
+      kind: 'activate-item',
+      preventDefault: true,
+      stopPropagation: true,
+    })
+    expect(getCanvasMenuRovingKeyboardIntent({
+      count: 3,
+      currentIndex: 1,
+      key: ' ',
+    })).toEqual({
+      kind: 'activate-item',
+      preventDefault: true,
+      stopPropagation: true,
+    })
+  })
+
+  it('ignores unrelated roving keyboard keys', () => {
+    expect(getCanvasMenuRovingKeyboardIntent({
+      count: 3,
+      currentIndex: 0,
+      key: 'Tab',
+    })).toEqual({
+      kind: 'none',
+      preventDefault: false,
+      stopPropagation: false,
+    })
+    expect(getCanvasMenuRovingKeyboardIntent({
+      count: 0,
+      currentIndex: 0,
+      key: 'ArrowDown',
+    })).toEqual({
+      kind: 'none',
+      preventDefault: false,
+      stopPropagation: false,
+    })
   })
 
   it('resolves active index from focused item before preferred index', () => {

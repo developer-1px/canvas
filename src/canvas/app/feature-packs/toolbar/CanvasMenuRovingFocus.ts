@@ -34,6 +34,32 @@ export type CanvasMenuRovingKeyIndexInput = {
   key: string
 }
 
+export type CanvasMenuRovingKeyboardIntentInput =
+  CanvasMenuRovingKeyIndexInput
+
+export type CanvasMenuRovingKeyboardIntent =
+  | {
+      kind: 'move-focus'
+      nextIndex: number
+      preventDefault: true
+      stopPropagation: true
+    }
+  | {
+      kind: 'close-menu'
+      preventDefault: true
+      stopPropagation: true
+    }
+  | {
+      kind: 'activate-item'
+      preventDefault: true
+      stopPropagation: true
+    }
+  | {
+      kind: 'none'
+      preventDefault: false
+      stopPropagation: false
+    }
+
 export type CanvasMenuRovingActiveIndexInput = {
   count: number
   focusedIndex: number
@@ -168,29 +194,35 @@ export function useCanvasMenuRovingFocus<
     const items = syncItems()
     const currentIndex = items.findIndex((item) =>
       item === event.currentTarget.ownerDocument.activeElement)
-    const nextIndex = getCanvasMenuRovingKeyIndex({
+    const intent = getCanvasMenuRovingKeyboardIntent({
       count: items.length,
       currentIndex,
       key: event.key,
     })
 
-    if (nextIndex !== null) {
-      event.preventDefault()
-      event.stopPropagation()
-      focusItem(nextIndex)
+    if (intent.kind === 'none') {
       return
     }
 
-    if (event.key === 'Escape') {
+    if (intent.preventDefault) {
       event.preventDefault()
+    }
+
+    if (intent.stopPropagation) {
       event.stopPropagation()
+    }
+
+    if (intent.kind === 'move-focus') {
+      focusItem(intent.nextIndex)
+      return
+    }
+
+    if (intent.kind === 'close-menu') {
       onClose?.()
       return
     }
 
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault()
-      event.stopPropagation()
+    if (intent.kind === 'activate-item') {
       items[currentIndex]?.click()
     }
   }, [focusItem, onClose, syncItems])
@@ -305,6 +337,49 @@ export function getCanvasMenuRovingKeyIndex({
   }
 
   return null
+}
+
+export function getCanvasMenuRovingKeyboardIntent({
+  count,
+  currentIndex,
+  key,
+}: CanvasMenuRovingKeyboardIntentInput): CanvasMenuRovingKeyboardIntent {
+  const nextIndex = getCanvasMenuRovingKeyIndex({
+    count,
+    currentIndex,
+    key,
+  })
+
+  if (nextIndex !== null) {
+    return {
+      kind: 'move-focus',
+      nextIndex,
+      preventDefault: true,
+      stopPropagation: true,
+    }
+  }
+
+  if (key === 'Escape') {
+    return {
+      kind: 'close-menu',
+      preventDefault: true,
+      stopPropagation: true,
+    }
+  }
+
+  if (key === 'Enter' || key === ' ') {
+    return {
+      kind: 'activate-item',
+      preventDefault: true,
+      stopPropagation: true,
+    }
+  }
+
+  return {
+    kind: 'none',
+    preventDefault: false,
+    stopPropagation: false,
+  }
 }
 
 export function getCanvasMenuTriggerKeyboardIntent({
