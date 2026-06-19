@@ -212,6 +212,17 @@ export {
   type CanvasKeyboardSelectionCycleTargetInput,
 } from './affordances/interaction/keyboard/CanvasKeyboardSelectionCycle'
 export {
+  CANVAS_KEYBOARD_TEXT_EDIT_START_INTENT_MODEL,
+  CANVAS_KEYBOARD_TEXT_EDIT_START_KEYS,
+  CANVAS_KEYBOARD_TEXT_EDIT_START_MODEL,
+  getCanvasKeyboardTextEditStartIntent,
+  isCanvasKeyboardTextEditStartKey,
+  type CanvasKeyboardTextEditStartIntent,
+  type CanvasKeyboardTextEditStartIntentInput,
+  type CanvasKeyboardTextEditStartKeyboardEvent,
+  type CanvasKeyboardTextEditStartReservedShortcutInput,
+} from './affordances/interaction/keyboard/CanvasKeyboardTextEditStart'
+export {
   CANVAS_KEYBOARD_NUDGE_INTENT_MODEL,
   CANVAS_KEYBOARD_NUDGE_KEYS,
   CANVAS_KEYBOARD_NUDGE_LARGE_STEP,
