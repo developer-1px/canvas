@@ -32,17 +32,26 @@ describe('CanvasTabsRovingFocus', () => {
 
   it('creates APG tab and tabpanel relationships', () => {
     const descriptor = createCanvasTabsDescriptor({
+      ariaLabel: 'Inspector panels',
       activeId: 'selection',
       tabs,
     })
 
     expect(descriptor.activation).toBe('automatic')
+    expect(descriptor.activeId).toBe('selection')
     expect(descriptor.keyboardModel).toBe(CANVAS_TABS_KEYBOARD_MODEL)
+    expect(descriptor.orientation).toBe('horizontal')
+    expect(descriptor.tablistAttributes).toEqual({
+      'aria-label': 'Inspector panels',
+      'aria-orientation': undefined,
+      role: 'tablist',
+    })
     expect(descriptor.tabs).toEqual([
       {
         ...tabs[0],
         attributes: {
           'aria-controls': 'panel-slide',
+          'aria-disabled': undefined,
           'aria-selected': false,
           id: 'tab-slide',
           role: 'tab',
@@ -54,6 +63,7 @@ describe('CanvasTabsRovingFocus', () => {
         ...tabs[1],
         attributes: {
           'aria-controls': 'panel-selection',
+          'aria-disabled': undefined,
           'aria-selected': true,
           id: 'tab-selection',
           role: 'tab',
@@ -65,6 +75,7 @@ describe('CanvasTabsRovingFocus', () => {
         ...tabs[2],
         attributes: {
           'aria-controls': 'panel-notes',
+          'aria-disabled': undefined,
           'aria-selected': false,
           id: 'tab-notes',
           role: 'tab',
@@ -105,6 +116,50 @@ describe('CanvasTabsRovingFocus', () => {
         isActive: false,
       },
     ])
+  })
+
+  it('describes vertical tablists and keeps arrow navigation on the active axis', () => {
+    const descriptor = createCanvasTabsDescriptor({
+      activeId: 'slide',
+      orientation: 'vertical',
+      tabs,
+    })
+
+    expect(descriptor.orientation).toBe('vertical')
+    expect(descriptor.tablistAttributes).toEqual({
+      'aria-label': undefined,
+      'aria-orientation': 'vertical',
+      role: 'tablist',
+    })
+    expect(getCanvasTabsKeyboardIntent({
+      currentId: 'slide',
+      key: 'ArrowDown',
+      orientation: 'vertical',
+      tabs,
+    })).toMatchObject({
+      id: 'selection',
+      index: 1,
+      kind: 'move-tab',
+    })
+    expect(getCanvasTabsKeyboardIntent({
+      currentId: 'slide',
+      key: 'ArrowRight',
+      orientation: 'vertical',
+      tabs,
+    })).toEqual({
+      kind: 'none',
+      preventDefault: false,
+      stopPropagation: false,
+    })
+    expect(getCanvasTabsKeyboardIntent({
+      currentId: 'slide',
+      key: 'ArrowDown',
+      tabs,
+    })).toEqual({
+      kind: 'none',
+      preventDefault: false,
+      stopPropagation: false,
+    })
   })
 
   it('moves and activates tabs with arrow home and end keys in automatic mode', () => {
@@ -195,11 +250,19 @@ describe('CanvasTabsRovingFocus', () => {
     ] as const
 
     const descriptor = createCanvasTabsDescriptor({
-      activeId: 'slide',
+      activeId: 'selection',
       tabs: tabsWithDisabled,
     })
 
-    expect(descriptor.tabs[1].attributes.tabIndex).toBeUndefined()
+    expect(descriptor.activeId).toBe('slide')
+    expect(descriptor.tabs[0].isActive).toBe(true)
+    expect(descriptor.tabs[1].attributes).toMatchObject({
+      'aria-disabled': true,
+      'aria-selected': false,
+      tabIndex: undefined,
+    })
+    expect(descriptor.panels[0].attributes.hidden).toBe(false)
+    expect(descriptor.panels[1].attributes.hidden).toBe(true)
     expect(getCanvasTabsKeyboardIntent({
       currentId: 'slide',
       key: 'ArrowRight',

@@ -2,6 +2,7 @@ export const CANVAS_TABS_ROVING_FOCUS_MODEL = 'canvas-tabs-roving-focus'
 export const CANVAS_TABS_KEYBOARD_MODEL = 'arrow-home-end-enter-space'
 
 export type CanvasTabsActivationMode = 'automatic' | 'manual'
+export type CanvasTabsOrientation = 'horizontal' | 'vertical'
 
 export type CanvasTabsTabInput<TId extends string = string> = {
   disabled?: boolean
@@ -10,8 +11,15 @@ export type CanvasTabsTabInput<TId extends string = string> = {
   tabId: string
 }
 
+export type CanvasTabsTablistAttributes = {
+  'aria-label': string | undefined
+  'aria-orientation': CanvasTabsOrientation | undefined
+  role: 'tablist'
+}
+
 export type CanvasTabsTabAttributes = {
   'aria-controls': string
+  'aria-disabled': true | undefined
   'aria-selected': boolean
   id: string
   role: 'tab'
@@ -45,9 +53,11 @@ export type CanvasTabsDescriptor<
   TTab extends CanvasTabsTabInput<TId> = CanvasTabsTabInput<TId>,
 > = {
   activation: CanvasTabsActivationMode
-  activeId: TId
+  activeId: string
   keyboardModel: typeof CANVAS_TABS_KEYBOARD_MODEL
+  orientation: CanvasTabsOrientation
   panels: CanvasTabsPanelDescriptor<TId>[]
+  tablistAttributes: CanvasTabsTablistAttributes
   tabs: CanvasTabsTabDescriptor<TId, TTab>[]
 }
 
@@ -70,8 +80,9 @@ export type CanvasTabsKeyboardIntentInput<
   TId extends string = string,
 > = {
   activation?: CanvasTabsActivationMode
-  currentId: TId
+  currentId: string
   key: string
+  orientation?: CanvasTabsOrientation
   tabs: readonly CanvasTabsTabInput<TId>[]
 }
 
@@ -90,31 +101,67 @@ export type RunCanvasTabsKeyboardIntentInput<
 }
 
 export function createCanvasTabsDescriptor<
-  TId extends string,
-  TTab extends CanvasTabsTabInput<TId> = CanvasTabsTabInput<TId>,
+  TTab extends CanvasTabsTabInput<string>,
 >({
+  ariaLabel,
   activation = 'automatic',
   activeId,
+  orientation = 'horizontal',
   tabs,
 }: {
+  ariaLabel?: string
   activation?: CanvasTabsActivationMode
-  activeId: TId
+  activeId: string
+  orientation?: CanvasTabsOrientation
   tabs: readonly TTab[]
-}): CanvasTabsDescriptor<TId, TTab> {
+}): CanvasTabsDescriptor<TTab['id'], TTab> {
+  const resolvedActiveId = getCanvasTabsResolvedActiveId({ activeId, tabs })
+
   return {
     activation,
-    activeId,
+    activeId: resolvedActiveId,
     keyboardModel: CANVAS_TABS_KEYBOARD_MODEL,
+    orientation,
     panels: tabs.map((tab) => ({
-      attributes: getCanvasTabsPanelAttributes({ activeId, tab }),
+      attributes: getCanvasTabsPanelAttributes({
+        activeId: resolvedActiveId,
+        tab,
+      }),
       id: tab.id,
-      isActive: tab.id === activeId,
+      isActive: isCanvasTabsTabActive({
+        activeId: resolvedActiveId,
+        tab,
+      }),
     })),
+    tablistAttributes: getCanvasTabsTablistAttributes({
+      ariaLabel,
+      orientation,
+    }),
     tabs: tabs.map((tab) => ({
       ...tab,
-      attributes: getCanvasTabsTabAttributes({ activeId, tab }),
-      isActive: tab.id === activeId,
+      attributes: getCanvasTabsTabAttributes({
+        activeId: resolvedActiveId,
+        tab,
+      }),
+      isActive: isCanvasTabsTabActive({
+        activeId: resolvedActiveId,
+        tab,
+      }),
     })),
+  }
+}
+
+export function getCanvasTabsTablistAttributes({
+  ariaLabel,
+  orientation = 'horizontal',
+}: {
+  ariaLabel?: string
+  orientation?: CanvasTabsOrientation
+}): CanvasTabsTablistAttributes {
+  return {
+    'aria-label': ariaLabel,
+    'aria-orientation': orientation === 'vertical' ? 'vertical' : undefined,
+    role: 'tablist',
   }
 }
 
@@ -122,13 +169,14 @@ export function getCanvasTabsTabAttributes<TId extends string>({
   activeId,
   tab,
 }: {
-  activeId: TId
+  activeId: string
   tab: CanvasTabsTabInput<TId>
 }): CanvasTabsTabAttributes {
-  const isActive = tab.id === activeId
+  const isActive = isCanvasTabsTabActive({ activeId, tab })
 
   return {
     'aria-controls': tab.panelId,
+    'aria-disabled': tab.disabled === true ? true : undefined,
     'aria-selected': isActive,
     id: tab.tabId,
     role: 'tab',
@@ -143,10 +191,10 @@ export function getCanvasTabsPanelAttributes<TId extends string>({
   activeId,
   tab,
 }: {
-  activeId: TId
+  activeId: string
   tab: CanvasTabsTabInput<TId>
 }): CanvasTabsPanelAttributes {
-  const isActive = tab.id === activeId
+  const isActive = isCanvasTabsTabActive({ activeId, tab })
 
   return {
     'aria-labelledby': tab.tabId,
@@ -174,6 +222,7 @@ export function getCanvasTabsKeyboardIntent<TId extends string>({
   activation = 'automatic',
   currentId,
   key,
+  orientation = 'horizontal',
   tabs,
 }: CanvasTabsKeyboardIntentInput<TId>): CanvasTabsKeyboardIntent<TId> {
   const enabledTabs = tabs.filter((tab) => tab.disabled !== true)
@@ -191,6 +240,7 @@ export function getCanvasTabsKeyboardIntent<TId extends string>({
     count: enabledTabs.length,
     currentIndex: currentEnabledIndex,
     key,
+    orientation,
   })
 
   if (nextEnabledIndex === null) {
@@ -220,12 +270,14 @@ export function runCanvasTabsKeyboardIntent<TId extends string>({
   event,
   onActivateTab,
   onFocusTab,
+  orientation,
   tabs,
 }: RunCanvasTabsKeyboardIntentInput<TId>) {
   const intent = getCanvasTabsKeyboardIntent({
     activation,
     currentId,
     key: event.key,
+    orientation,
     tabs,
   })
 
@@ -254,20 +306,28 @@ function getCanvasTabsKeyIndex({
   count,
   currentIndex,
   key,
+  orientation,
 }: {
   count: number
   currentIndex: number
   key: string
+  orientation: CanvasTabsOrientation
 }) {
   if (count === 0 || currentIndex < 0) {
     return null
   }
 
-  if (key === 'ArrowRight' || key === 'ArrowDown') {
+  if (
+    (orientation === 'horizontal' && key === 'ArrowRight') ||
+    (orientation === 'vertical' && key === 'ArrowDown')
+  ) {
     return (currentIndex + 1) % count
   }
 
-  if (key === 'ArrowLeft' || key === 'ArrowUp') {
+  if (
+    (orientation === 'horizontal' && key === 'ArrowLeft') ||
+    (orientation === 'vertical' && key === 'ArrowUp')
+  ) {
     return (currentIndex - 1 + count) % count
   }
 
@@ -284,4 +344,30 @@ function getCanvasTabsKeyIndex({
   }
 
   return null
+}
+
+function getCanvasTabsResolvedActiveId<TId extends string>({
+  activeId,
+  tabs,
+}: {
+  activeId: string
+  tabs: readonly CanvasTabsTabInput<TId>[]
+}) {
+  const activeTab = tabs.find((tab) => tab.id === activeId)
+
+  if (activeTab && activeTab.disabled !== true) {
+    return activeId
+  }
+
+  return tabs.find((tab) => tab.disabled !== true)?.id ?? activeId
+}
+
+function isCanvasTabsTabActive<TId extends string>({
+  activeId,
+  tab,
+}: {
+  activeId: string
+  tab: CanvasTabsTabInput<TId>
+}) {
+  return tab.disabled !== true && tab.id === activeId
 }
