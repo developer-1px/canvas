@@ -81,6 +81,14 @@ export type SlideEditObjectOpacityJSONPasteInput = {
   jsonMimeType?: string
 }
 
+export type SlideEditObjectOpacityJSONPasteValueMode =
+  | 'direct'
+  | 'wrapped'
+
+export type SlideEditObjectOpacityJSONPasteValueOptions = {
+  mode?: SlideEditObjectOpacityJSONPasteValueMode
+}
+
 export type SlideEditObjectOpacityPasteCommandInput<
   TSlideId extends SlideEditObjectOpacitySlideId =
     SlideEditObjectOpacitySlideId,
@@ -184,11 +192,10 @@ export function getSlideEditObjectOpacityJSONPasteValue({
   }
 
   if (jsonMimeType) {
-    const customValue = parseSlideEditObjectOpacityJSON(
-      dataTransfer.getData(jsonMimeType),
-    )
     const customPasteValue =
-      getSlideEditObjectOpacityDirectJSONPasteValue(customValue)
+      getSlideEditObjectOpacityJSONPasteValueFromText(
+        dataTransfer.getData(jsonMimeType),
+      )
 
     if (customPasteValue !== null) {
       return customPasteValue
@@ -202,9 +209,11 @@ export function getSlideEditObjectOpacityJSONPasteValue({
       continue
     }
 
-    const value = parseSlideEditObjectOpacityJSON(text)
     const pasteValue =
-      getSlideEditObjectOpacityWrappedJSONPasteValue(value)
+      getSlideEditObjectOpacityJSONPasteValueFromText(
+        text,
+        { mode: 'wrapped' },
+      )
 
     if (pasteValue !== null) {
       return pasteValue
@@ -212,6 +221,27 @@ export function getSlideEditObjectOpacityJSONPasteValue({
   }
 
   return null
+}
+
+export function getSlideEditObjectOpacityJSONPasteValueFromText(
+  text: string,
+  options?: SlideEditObjectOpacityJSONPasteValueOptions,
+): SlideEditObjectOpacityJSONPasteValue | null {
+  return getSlideEditObjectOpacityJSONPasteValueFromValue(
+    parseSlideEditObjectOpacityJSON(text),
+    options,
+  )
+}
+
+export function getSlideEditObjectOpacityJSONPasteValueFromValue(
+  value: unknown,
+  {
+    mode = 'direct',
+  }: SlideEditObjectOpacityJSONPasteValueOptions = {},
+): SlideEditObjectOpacityJSONPasteValue | null {
+  return mode === 'wrapped'
+    ? getSlideEditObjectOpacityWrappedJSONPasteValue(value)
+    : getSlideEditObjectOpacityDirectJSONPasteValue(value)
 }
 
 export function getSlideEditObjectOpacityPasteCommand<

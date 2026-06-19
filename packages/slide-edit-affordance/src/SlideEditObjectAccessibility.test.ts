@@ -4,6 +4,8 @@ import {
   createSlideEditObjectAccessibilityDescriptor,
   getSlideEditObjectAccessibilityCommandEffect,
   getSlideEditObjectAccessibilityJSONPasteValue,
+  getSlideEditObjectAccessibilityJSONPasteValueFromText,
+  getSlideEditObjectAccessibilityJSONPasteValueFromValue,
   getSlideEditObjectAccessibilityMetadata,
   getSlideEditObjectAccessibilityPasteCommand,
   normalizeSlideEditObjectAccessibility,
@@ -18,6 +20,8 @@ import {
 } from './SlideEditObjectAccessibility'
 import {
   getSlideEditObjectAccessibilityJSONPasteValue as getSlideEditObjectAccessibilityJSONPasteValueFromPackage,
+  getSlideEditObjectAccessibilityJSONPasteValueFromText as getSlideEditObjectAccessibilityJSONPasteValueFromTextFromPackage,
+  getSlideEditObjectAccessibilityJSONPasteValueFromValue as getSlideEditObjectAccessibilityJSONPasteValueFromValueFromPackage,
 } from './index'
 
 describe('SlideEditObjectAccessibility', () => {
@@ -267,6 +271,46 @@ describe('SlideEditObjectAccessibility', () => {
         'text/plain': '{"ariaLabel":"UI label"}',
       }),
     })).toBeNull()
+  })
+
+  it('reads object accessibility JSON from text and parsed values', () => {
+    expect(getSlideEditObjectAccessibilityJSONPasteValueFromText(
+      '{"objectAltText":"  Long product screenshot text  "}',
+      {
+        mode: 'wrapped',
+        storagePolicy: {
+          maxLength: 12,
+        },
+      },
+    )).toMatchObject({
+      altText: 'Long product',
+      kind: 'alt-text',
+    })
+    expect(getSlideEditObjectAccessibilityJSONPasteValueFromValue({
+      decorative: true,
+    })).toEqual({
+      kind: 'decorative',
+      value: {
+        altText: '',
+        decorative: true,
+      },
+    })
+    expect(getSlideEditObjectAccessibilityJSONPasteValueFromTextFromPackage(
+      '{"accessibility":{"decorative":false}}',
+      { mode: 'wrapped' },
+    )).toEqual({
+      kind: 'remove-alt-text',
+      value: {
+        altText: '',
+        decorative: false,
+      },
+    })
+    expect(getSlideEditObjectAccessibilityJSONPasteValueFromValueFromPackage(
+      '  Product screenshot ',
+    )).toMatchObject({
+      altText: 'Product screenshot',
+      kind: 'alt-text',
+    })
   })
 
   it('turns null, false, empty string, and decorative downgrade into command-ready values', () => {

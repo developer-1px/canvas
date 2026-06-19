@@ -118,6 +118,15 @@ export type SlideEditObjectAccessibilityJSONPasteInput = {
   storagePolicy?: SlideEditObjectAltTextStoragePolicy
 }
 
+export type SlideEditObjectAccessibilityJSONPasteValueMode =
+  | 'direct'
+  | 'wrapped'
+
+export type SlideEditObjectAccessibilityJSONPasteValueOptions = {
+  mode?: SlideEditObjectAccessibilityJSONPasteValueMode
+  storagePolicy?: SlideEditObjectAltTextStoragePolicy
+}
+
 export type SlideEditObjectAccessibilityPasteCommandInput<
   TSlideId extends SlideEditObjectAccessibilitySlideId =
     SlideEditObjectAccessibilitySlideId,
@@ -234,12 +243,9 @@ export function getSlideEditObjectAccessibilityJSONPasteValue({
       )
     }
 
-    const customValue = parseSlideEditObjectAccessibilityJSON(
+    const customPasteValue = getSlideEditObjectAccessibilityJSONPasteValueFromText(
       customText,
-    )
-    const customPasteValue = getSlideEditObjectAccessibilityDirectPasteValue(
-      customValue,
-      storagePolicy,
+      { storagePolicy },
     )
 
     if (customPasteValue !== null) {
@@ -264,10 +270,12 @@ function getSlideEditObjectAccessibilityGeneralJSONPasteValue(
       continue
     }
 
-    const value = parseSlideEditObjectAccessibilityJSON(text)
-    const pasteValue = getSlideEditObjectAccessibilityWrappedPasteValue(
-      value,
-      storagePolicy,
+    const pasteValue = getSlideEditObjectAccessibilityJSONPasteValueFromText(
+      text,
+      {
+        mode: 'wrapped',
+        storagePolicy,
+      },
     )
 
     if (pasteValue !== null) {
@@ -276,6 +284,28 @@ function getSlideEditObjectAccessibilityGeneralJSONPasteValue(
   }
 
   return null
+}
+
+export function getSlideEditObjectAccessibilityJSONPasteValueFromText(
+  text: string,
+  options?: SlideEditObjectAccessibilityJSONPasteValueOptions,
+): SlideEditObjectAccessibilityJSONPasteValue | null {
+  return getSlideEditObjectAccessibilityJSONPasteValueFromValue(
+    parseSlideEditObjectAccessibilityJSON(text),
+    options,
+  )
+}
+
+export function getSlideEditObjectAccessibilityJSONPasteValueFromValue(
+  value: unknown,
+  {
+    mode = 'direct',
+    storagePolicy = {},
+  }: SlideEditObjectAccessibilityJSONPasteValueOptions = {},
+): SlideEditObjectAccessibilityJSONPasteValue | null {
+  return mode === 'wrapped'
+    ? getSlideEditObjectAccessibilityWrappedPasteValue(value, storagePolicy)
+    : getSlideEditObjectAccessibilityDirectPasteValue(value, storagePolicy)
 }
 
 export function getSlideEditObjectAccessibilityPasteCommand<
