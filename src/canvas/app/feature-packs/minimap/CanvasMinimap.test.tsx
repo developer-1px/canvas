@@ -32,6 +32,10 @@ describe('CanvasMinimap', () => {
 
     expect(markup).toContain('class="canvas-minimap"')
     expect(markup).toContain('aria-label="Canvas minimap"')
+    expect(markup)
+      .toContain('aria-keyshortcuts="ArrowUp ArrowDown ArrowLeft ArrowRight Home End"')
+    expect(markup).toContain('role="application"')
+    expect(markup).toContain('tabindex="0"')
     expect(markup.match(/canvas-minimap-item/g)).toHaveLength(2)
     expect(markup).toContain('canvas-minimap-viewport')
   })

@@ -3,8 +3,10 @@ import {
   CANVAS_MINIMAP_READ_MODEL,
   getCanvasMinimapPointFromViewportOffset,
   getCanvasMinimapReadModel,
+  getCanvasMinimapKeyboardNavigationIntent,
   getCanvasMinimapViewportForWorldCenter,
   getCanvasMinimapWorldPoint,
+  runCanvasMinimapKeyboardNavigationIntent,
 } from './CanvasMinimapModel'
 
 describe('CanvasMinimapModel', () => {
@@ -110,6 +112,84 @@ describe('CanvasMinimapModel', () => {
       offset: { x: 94, y: 62 },
       viewportSize: { h: 0, w: 188 },
     })).toBeNull()
+  })
+
+  it('plans keyboard navigation from the current viewport center', () => {
+    const model = getCanvasMinimapReadModel({
+      items: [
+        { bounds: { h: 120, w: 200, x: 100, y: 80 }, id: 'card' },
+        { bounds: { h: 120, w: 200, x: 1600, y: 920 }, id: 'remote' },
+      ],
+      stageRect,
+      viewport: { scale: 1, x: 0, y: 0 },
+    })
+
+    expect(getCanvasMinimapKeyboardNavigationIntent({
+      key: 'ArrowRight',
+      model,
+    })).toEqual({
+      kind: 'navigate',
+      preventDefault: true,
+      stopPropagation: true,
+      worldPoint: {
+        x: 900,
+        y: 300,
+      },
+    })
+    expect(getCanvasMinimapKeyboardNavigationIntent({
+      key: 'Home',
+      model,
+    })).toEqual({
+      kind: 'navigate',
+      preventDefault: true,
+      stopPropagation: true,
+      worldPoint: {
+        x: model.worldBounds.x,
+        y: model.worldBounds.y,
+      },
+    })
+    expect(getCanvasMinimapKeyboardNavigationIntent({
+      key: 'Tab',
+      model,
+    })).toEqual({
+      kind: 'none',
+      preventDefault: false,
+      stopPropagation: false,
+    })
+  })
+
+  it('runs keyboard navigation intents by consuming handled keys', () => {
+    const model = getCanvasMinimapReadModel({
+      items: [
+        { bounds: { h: 120, w: 200, x: 100, y: 80 }, id: 'card' },
+        { bounds: { h: 120, w: 200, x: 1600, y: 920 }, id: 'remote' },
+      ],
+      stageRect,
+      viewport: { scale: 1, x: 0, y: 0 },
+    })
+    let preventDefaultCount = 0
+    let stopPropagationCount = 0
+    let navigatedPoint: { x: number; y: number } | null = null
+
+    expect(runCanvasMinimapKeyboardNavigationIntent({
+      event: {
+        key: 'ArrowDown',
+        preventDefault: () => {
+          preventDefaultCount += 1
+        },
+        stopPropagation: () => {
+          stopPropagationCount += 1
+        },
+      },
+      model,
+      onNavigateToWorldPoint: (point) => {
+        navigatedPoint = point
+      },
+    })).toBe(true)
+
+    expect(preventDefaultCount).toBe(1)
+    expect(stopPropagationCount).toBe(1)
+    expect(navigatedPoint).toEqual({ x: 450, y: 600 })
   })
 
   it('keeps empty and tiny documents renderable', () => {

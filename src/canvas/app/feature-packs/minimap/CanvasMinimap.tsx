@@ -1,11 +1,13 @@
 import {
   useState,
+  type KeyboardEvent,
   type PointerEvent,
 } from 'react'
 import type { Point } from '../../../entities'
 import {
   getCanvasMinimapPointFromViewportOffset,
   getCanvasMinimapWorldPoint,
+  runCanvasMinimapKeyboardNavigationIntent,
   type CanvasMinimapReadModel,
 } from './CanvasMinimapModel'
 
@@ -50,14 +52,24 @@ export function CanvasMinimap({
       setActivePointerId(null)
     }
   }
+  const handleKeyDown = (event: KeyboardEvent<SVGSVGElement>) => {
+    runCanvasMinimapKeyboardNavigationIntent({
+      event,
+      model,
+      onNavigateToWorldPoint,
+    })
+  }
 
   return (
     <div className="canvas-minimap" data-empty={model.isEmpty ? 'true' : 'false'}>
       <svg
+        aria-keyshortcuts="ArrowUp ArrowDown ArrowLeft ArrowRight Home End"
         aria-label="Canvas minimap"
         className="canvas-minimap-map"
-        role="img"
+        role="application"
+        tabIndex={0}
         viewBox={`0 0 ${model.size.w} ${model.size.h}`}
+        onKeyDown={handleKeyDown}
         onPointerCancel={clearPointer}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}

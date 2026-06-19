@@ -20,6 +20,8 @@ import {
   CanvasHost,
   CanvasRenderer,
   CANVAS_LASER_TRAIL_OVERLAY_MODEL,
+  CANVAS_MINIMAP_KEYBOARD_MODEL,
+  CANVAS_MINIMAP_READ_MODEL,
   CANVAS_APP_BOARD_IO_FEATURE_PACK_MANIFEST,
   CANVAS_CONTROL_TARGET_SELECTOR,
   CANVAS_SELECTION_LIST_FOCUS_MODEL,
@@ -142,6 +144,8 @@ import {
   downloadCanvasTextFile,
   fitCanvasViewportToBounds,
   getCanvasEditableFieldKeyboardIntent,
+  getCanvasMinimapKeyboardNavigationIntent,
+  getCanvasMinimapReadModel,
   getCanvasPresentationKeyboardIntent,
   getCanvasRadioGroupKeyboardIntent,
   getCanvasRadioTabIndex,
@@ -163,6 +167,7 @@ import {
   previewCanvasPointerPanInteraction,
   resetCanvasViewport,
   runCanvasEditableFieldKeyboardIntent,
+  runCanvasMinimapKeyboardNavigationIntent,
   runCanvasPresentationKeyboardIntent,
   runCanvasRadioGroupKeyboardIntent,
   runCanvasSelectionListKeyboardIntent,
@@ -544,8 +549,11 @@ import {
   type RunCanvasToolbarRovingKeyboardIntentInput,
   type CanvasModalBackdropPointerIntentInput,
   type CanvasModalKeyboardIntentInput,
+  type CanvasMinimapKeyboardNavigationIntentInput,
+  type CanvasMinimapReadModel,
   type RunCanvasModalBackdropPointerIntentInput,
   type RunCanvasModalKeyboardIntentInput,
+  type RunCanvasMinimapKeyboardNavigationIntentInput,
   type RunCanvasEditableFieldKeyboardIntentInput,
   type RunCanvasRadioGroupKeyboardIntentInput,
   type RunCanvasTabsKeyboardIntentInput,
@@ -4424,6 +4432,47 @@ describe('Canvas package consumer imports', () => {
           focusedTabId = id
         },
       }
+    const packageMinimapModel: CanvasMinimapReadModel =
+      getCanvasMinimapReadModel({
+        items: [{
+          bounds: { h: 120, w: 200, x: 100, y: 80 },
+          id: 'card',
+        }, {
+          bounds: { h: 120, w: 200, x: 1600, y: 920 },
+          id: 'remote',
+        }],
+        stageRect: {
+          height: 600,
+          left: 0,
+          top: 0,
+          width: 900,
+        },
+        viewport: { scale: 1, x: 0, y: 0 },
+      })
+    const minimapKeyboardInput:
+      CanvasMinimapKeyboardNavigationIntentInput = {
+        key: 'ArrowRight',
+        model: packageMinimapModel,
+      }
+    let minimapPreventDefaultCount = 0
+    let minimapStopPropagationCount = 0
+    let minimapWorldPoint: { x: number; y: number } | null = null
+    const minimapKeyboardRunInput:
+      RunCanvasMinimapKeyboardNavigationIntentInput = {
+        event: {
+          key: 'ArrowDown',
+          preventDefault: () => {
+            minimapPreventDefaultCount += 1
+          },
+          stopPropagation: () => {
+            minimapStopPropagationCount += 1
+          },
+        },
+        model: packageMinimapModel,
+        onNavigateToWorldPoint: (point) => {
+          minimapWorldPoint = point
+        },
+      }
     const toolbarRovingActiveIndexInput:
       CanvasToolbarRovingActiveIndexInput = {
         count: 4,
@@ -5320,6 +5369,42 @@ describe('Canvas package consumer imports', () => {
     expect(tabsStopPropagationCount).toBe(2)
     expect(focusedTabId).toBe('json')
     expect(activatedTabId).toBe('json')
+    expect(CANVAS_MINIMAP_READ_MODEL).toBe('canvas-minimap-read-model')
+    expect(CANVAS_MINIMAP_KEYBOARD_MODEL)
+      .toBe('canvas-minimap-keyboard-navigation')
+    expect(CanvasAppFacade.CANVAS_MINIMAP_KEYBOARD_MODEL)
+      .toBe(CANVAS_MINIMAP_KEYBOARD_MODEL)
+    expect(packageMinimapModel.isEmpty).toBe(false)
+    expect(getCanvasMinimapKeyboardNavigationIntent(minimapKeyboardInput))
+      .toEqual({
+        kind: 'navigate',
+        preventDefault: true,
+        stopPropagation: true,
+        worldPoint: {
+          x: 900,
+          y: 300,
+        },
+      })
+    expect(CanvasAppFacade.getCanvasMinimapKeyboardNavigationIntent(
+      minimapKeyboardInput,
+    )).toEqual({
+      kind: 'navigate',
+      preventDefault: true,
+      stopPropagation: true,
+      worldPoint: {
+        x: 900,
+        y: 300,
+      },
+    })
+    expect(runCanvasMinimapKeyboardNavigationIntent(
+      minimapKeyboardRunInput,
+    )).toBe(true)
+    expect(CanvasAppFacade.runCanvasMinimapKeyboardNavigationIntent(
+      minimapKeyboardRunInput,
+    )).toBe(true)
+    expect(minimapPreventDefaultCount).toBe(2)
+    expect(minimapStopPropagationCount).toBe(2)
+    expect(minimapWorldPoint).toEqual({ x: 450, y: 600 })
     expect(getCanvasToolbarRovingActiveIndex(
       toolbarRovingActiveIndexInput,
     )).toBe(3)

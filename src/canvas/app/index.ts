@@ -18,7 +18,24 @@ export {
   CanvasShortcutHelpOverlay,
 } from './feature-packs/shortcut-help'
 export {
+  CANVAS_MINIMAP_KEYBOARD_MODEL,
+  CANVAS_MINIMAP_READ_MODEL,
+  CANVAS_MINIMAP_DEFAULT_SIZE,
   CanvasMinimap,
+  getCanvasMinimapKeyboardNavigationIntent,
+  getCanvasMinimapPointFromViewportOffset,
+  getCanvasMinimapReadModel,
+  getCanvasMinimapViewportForWorldCenter,
+  getCanvasMinimapWorldPoint,
+  runCanvasMinimapKeyboardNavigationIntent,
+  type CanvasMinimapItemBounds,
+  type CanvasMinimapItemRect,
+  type CanvasMinimapKeyboardNavigationEvent,
+  type CanvasMinimapKeyboardNavigationIntent,
+  type CanvasMinimapKeyboardNavigationIntentInput,
+  type CanvasMinimapReadModel,
+  type CanvasMinimapSize,
+  type RunCanvasMinimapKeyboardNavigationIntentInput,
 } from './feature-packs/minimap'
 export {
   CANVAS_COMMENT_THREAD_MODEL,
