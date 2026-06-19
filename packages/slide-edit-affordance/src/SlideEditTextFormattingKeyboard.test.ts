@@ -4,10 +4,16 @@ import {
   createSlideEditTextRunFormattingDescriptor,
   getSlideEditTextRunColorCommandEffect,
   getSlideEditTextRunColorJSONPasteValue,
+  getSlideEditTextRunColorJSONPasteValueFromText,
+  getSlideEditTextRunColorJSONPasteValueFromValue,
   getSlideEditTextRunFormattingCommandEffect,
   getSlideEditTextRunFormattingJSONPasteValue,
+  getSlideEditTextRunFormattingJSONPasteValueFromText,
+  getSlideEditTextRunFormattingJSONPasteValueFromValue,
   getSlideEditTextRunSizeCommandEffect,
   getSlideEditTextRunSizeJSONPasteValue,
+  getSlideEditTextRunSizeJSONPasteValueFromText,
+  getSlideEditTextRunSizeJSONPasteValueFromValue,
   getSlideEditTextFormattingKeyboardIntent,
   normalizeSlideEditTextRunColorValue,
   normalizeSlideEditTextRunFormattingValue,
@@ -17,7 +23,10 @@ import {
 import {
   createSlideEditTextRunFormattingDescriptor as createSlideEditTextRunFormattingDescriptorFromPackage,
   getSlideEditTextRunColorJSONPasteValue as getSlideEditTextRunColorJSONPasteValueFromPackage,
+  getSlideEditTextRunColorJSONPasteValueFromText as getSlideEditTextRunColorJSONPasteValueFromTextFromPackage,
+  getSlideEditTextRunFormattingJSONPasteValueFromText as getSlideEditTextRunFormattingJSONPasteValueFromTextFromPackage,
   getSlideEditTextRunSizeJSONPasteValue as getSlideEditTextRunSizeJSONPasteValueFromPackage,
+  getSlideEditTextRunSizeJSONPasteValueFromValue as getSlideEditTextRunSizeJSONPasteValueFromValueFromPackage,
   getSlideEditTextFormattingKeyboardIntent as getSlideEditTextFormattingKeyboardIntentFromPackage,
 } from './index'
 
@@ -106,6 +115,20 @@ describe('SlideEditTextFormattingKeyboard', () => {
         [SLIDE_EDIT_TEXT_RUN_FORMATTING_FIELDS[4].jsonMimeType]: '"#ABC"',
       }),
     })).toBe('#aabbcc')
+    expect(getSlideEditTextRunFormattingJSONPasteValueFromTextFromPackage(
+      '{"underline":true}',
+      {
+        fieldId: 'underline',
+        mode: 'wrapped',
+      },
+    )).toBe(true)
+    expect(getSlideEditTextRunSizeJSONPasteValueFromValueFromPackage(
+      { runSize: '19.25' },
+      { mode: 'wrapped' },
+    )).toBe(19.25)
+    expect(getSlideEditTextRunColorJSONPasteValueFromTextFromPackage(
+      '"#ABC"',
+    )).toBe('#aabbcc')
   })
 
   it('creates product-neutral text run formatting descriptors', () => {
@@ -290,6 +313,36 @@ describe('SlideEditTextFormattingKeyboard', () => {
         'text/plain': '{"color":"currentColor"}',
       }),
     })).toBe('currentColor')
+  })
+
+  it('reads run formatting JSON from text and parsed values', () => {
+    expect(getSlideEditTextRunFormattingJSONPasteValueFromText(
+      'true',
+      { fieldId: 'bold' },
+    )).toBe(true)
+    expect(getSlideEditTextRunFormattingJSONPasteValueFromValue(
+      { runItalic: true },
+      {
+        fieldId: 'italic',
+        mode: 'wrapped',
+      },
+    )).toBe(true)
+    expect(getSlideEditTextRunSizeJSONPasteValueFromText('"18.456"'))
+      .toBe(18.46)
+    expect(getSlideEditTextRunSizeJSONPasteValueFromValue(
+      { textRunSize: 0 },
+      { mode: 'wrapped' },
+    )).toBe(1)
+    expect(getSlideEditTextRunColorJSONPasteValueFromText('"ABCDEF"'))
+      .toBe('#abcdef')
+    expect(getSlideEditTextRunColorJSONPasteValueFromValue(
+      { textRunColor: 'currentColor' },
+      { mode: 'wrapped' },
+    )).toBe('currentColor')
+    expect(getSlideEditTextRunColorJSONPasteValueFromText(
+      '"#ABC"',
+      { mode: 'wrapped' },
+    )).toBeNull()
   })
 
   it('does not treat generic text/plain direct values as run formatting', () => {

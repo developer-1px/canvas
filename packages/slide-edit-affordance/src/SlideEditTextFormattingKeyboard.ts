@@ -121,6 +121,18 @@ export type SlideEditTextRunFormattingJSONPasteInput = {
   jsonMimeType?: string
 }
 
+export type SlideEditTextRunFormattingJSONPasteValueMode =
+  | 'direct'
+  | 'wrapped'
+
+export type SlideEditTextRunFormattingJSONPasteValueOptions<
+  TFieldId extends SlideEditTextRunFormattingFieldId =
+    SlideEditTextRunFormattingFieldId,
+> = {
+  fieldId: TFieldId
+  mode?: SlideEditTextRunFormattingJSONPasteValueMode
+}
+
 export type SlideEditTextRunSizeJSONPasteInput = {
   dataTransfer: SlideEditTextRunFormattingDataTransfer | null
   jsonMimeType?: string
@@ -128,6 +140,13 @@ export type SlideEditTextRunSizeJSONPasteInput = {
 
 export type SlideEditTextRunColorJSONPasteInput =
   SlideEditTextRunSizeJSONPasteInput
+
+export type SlideEditTextRunSizeJSONPasteValueOptions = {
+  mode?: SlideEditTextRunFormattingJSONPasteValueMode
+}
+
+export type SlideEditTextRunColorJSONPasteValueOptions =
+  SlideEditTextRunSizeJSONPasteValueOptions
 
 export type SlideEditTextRunStyleCommandEffectInput<
   TSlideId extends string = string,
@@ -373,11 +392,14 @@ export function getSlideEditTextRunFormattingJSONPasteValue<
   }
 
   if (jsonMimeType) {
-    const customValue = parseSlideEditTextRunFormattingJSON(
-      dataTransfer.getData(jsonMimeType),
-    )
     const normalizedCustomValue =
-      normalizeSlideEditTextRunFormattingFieldValue(fieldId, customValue)
+      getSlideEditTextRunFormattingJSONPasteValueFromText(
+        dataTransfer.getData(jsonMimeType),
+        {
+          fieldId,
+          mode: 'direct',
+        },
+      )
 
     if (normalizedCustomValue !== null) {
       return normalizedCustomValue
@@ -385,9 +407,13 @@ export function getSlideEditTextRunFormattingJSONPasteValue<
   }
 
   for (const type of SLIDE_EDIT_TEXT_JSON_PASTE_TYPES) {
-    const value = parseSlideEditTextRunFormattingJSON(dataTransfer.getData(type))
-    const explicitValue =
-      getSlideEditTextRunFormattingExplicitJSONValue(fieldId, value)
+    const explicitValue = getSlideEditTextRunFormattingJSONPasteValueFromText(
+      dataTransfer.getData(type),
+      {
+        fieldId,
+        mode: 'wrapped',
+      },
+    )
 
     if (explicitValue !== null) {
       return explicitValue
@@ -395,6 +421,32 @@ export function getSlideEditTextRunFormattingJSONPasteValue<
   }
 
   return null
+}
+
+export function getSlideEditTextRunFormattingJSONPasteValueFromText<
+  TFieldId extends SlideEditTextRunFormattingFieldId,
+>(
+  text: string,
+  options: SlideEditTextRunFormattingJSONPasteValueOptions<TFieldId>,
+): SlideEditTextRunFormattingValue<TFieldId> | null {
+  return getSlideEditTextRunFormattingJSONPasteValueFromValue(
+    parseSlideEditTextRunFormattingJSON(text),
+    options,
+  )
+}
+
+export function getSlideEditTextRunFormattingJSONPasteValueFromValue<
+  TFieldId extends SlideEditTextRunFormattingFieldId,
+>(
+  value: unknown,
+  {
+    fieldId,
+    mode = 'direct',
+  }: SlideEditTextRunFormattingJSONPasteValueOptions<TFieldId>,
+): SlideEditTextRunFormattingValue<TFieldId> | null {
+  return mode === 'wrapped'
+    ? getSlideEditTextRunFormattingExplicitJSONValue(fieldId, value)
+    : normalizeSlideEditTextRunFormattingFieldValue(fieldId, value)
 }
 
 export function getSlideEditTextRunSizeJSONPasteValue(
@@ -406,11 +458,51 @@ export function getSlideEditTextRunSizeJSONPasteValue(
   })
 }
 
+export function getSlideEditTextRunSizeJSONPasteValueFromText(
+  text: string,
+  options?: SlideEditTextRunSizeJSONPasteValueOptions,
+): SlideEditTextRunSizeValue | null {
+  return getSlideEditTextRunFormattingJSONPasteValueFromText(text, {
+    ...options,
+    fieldId: 'size',
+  })
+}
+
+export function getSlideEditTextRunSizeJSONPasteValueFromValue(
+  value: unknown,
+  options?: SlideEditTextRunSizeJSONPasteValueOptions,
+): SlideEditTextRunSizeValue | null {
+  return getSlideEditTextRunFormattingJSONPasteValueFromValue(value, {
+    ...options,
+    fieldId: 'size',
+  })
+}
+
 export function getSlideEditTextRunColorJSONPasteValue(
   input: SlideEditTextRunColorJSONPasteInput,
 ): SlideEditTextRunColorValue | null {
   return getSlideEditTextRunFormattingJSONPasteValue({
     ...input,
+    fieldId: 'color',
+  })
+}
+
+export function getSlideEditTextRunColorJSONPasteValueFromText(
+  text: string,
+  options?: SlideEditTextRunColorJSONPasteValueOptions,
+): SlideEditTextRunColorValue | null {
+  return getSlideEditTextRunFormattingJSONPasteValueFromText(text, {
+    ...options,
+    fieldId: 'color',
+  })
+}
+
+export function getSlideEditTextRunColorJSONPasteValueFromValue(
+  value: unknown,
+  options?: SlideEditTextRunColorJSONPasteValueOptions,
+): SlideEditTextRunColorValue | null {
+  return getSlideEditTextRunFormattingJSONPasteValueFromValue(value, {
+    ...options,
     fieldId: 'color',
   })
 }
