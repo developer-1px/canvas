@@ -63,6 +63,24 @@ export type SlideEditTextParagraphBulletHostCommandEffect<
   type: 'slide-command-effect'
 }
 
+export type SlideEditTextParagraphBulletKeyboardIntentKind =
+  | 'toggle-bullet'
+
+export type SlideEditTextParagraphBulletKeyboardIntent = {
+  commandId: 'toggle-text-paragraph-bullet'
+  kind: SlideEditTextParagraphBulletKeyboardIntentKind
+  preventDefault: boolean
+  shortcut: string
+  value: 'bullet'
+}
+
+export type SlideEditTextParagraphBulletKeyboardIntentInput = {
+  altKey?: boolean
+  key: string
+  mod: boolean
+  shiftKey?: boolean
+}
+
 export type SlideEditTextParagraphBulletDataTransfer = Pick<
   DataTransfer,
   'getData'
@@ -324,6 +342,9 @@ export const SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_FIELD = Object.freeze({
   requiredAdapterSlot: 'command-effect',
 } as const satisfies SlideEditTextParagraphBulletFieldDescriptor)
 
+export const SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_KEYBOARD_SHORTCUT =
+  'Cmd/Ctrl+Shift+L'
+
 export const SLIDE_EDIT_TEXT_PARAGRAPH_SPACING_FIELDS = Object.freeze([
   {
     commandId: 'update-text-paragraph-spacing',
@@ -405,6 +426,26 @@ export function getSlideEditTextParagraphBulletCommandEffect<
       slideId: command.slideId,
     },
     type: 'slide-command-effect',
+  }
+}
+
+export function getSlideEditTextParagraphBulletKeyboardIntent({
+  altKey = false,
+  key,
+  mod,
+  shiftKey = false,
+}: SlideEditTextParagraphBulletKeyboardIntentInput):
+  SlideEditTextParagraphBulletKeyboardIntent | null {
+  if (!mod || !shiftKey || altKey || key.toLowerCase() !== 'l') {
+    return null
+  }
+
+  return {
+    commandId: 'toggle-text-paragraph-bullet',
+    kind: 'toggle-bullet',
+    preventDefault: true,
+    shortcut: SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_KEYBOARD_SHORTCUT,
+    value: 'bullet',
   }
 }
 

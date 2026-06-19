@@ -7,6 +7,7 @@ import {
   getSlideEditTextParagraphBulletJSONPasteValue,
   getSlideEditTextParagraphBulletJSONPasteValueFromText,
   getSlideEditTextParagraphBulletJSONPasteValueFromValue,
+  getSlideEditTextParagraphBulletKeyboardIntent,
   getSlideEditTextParagraphSpacingCommandEffect,
   getSlideEditTextParagraphSpacingCSSStyle,
   getSlideEditTextParagraphSpacingJSONPasteValue,
@@ -20,6 +21,7 @@ import {
   SLIDE_EDIT_DEFAULT_TEXT_PARAGRAPH_SPACING,
   SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_DEFAULT,
   SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_FIELD,
+  SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_KEYBOARD_SHORTCUT,
   SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_VALUES,
   SLIDE_EDIT_TEXT_PARAGRAPH_SPACING_FIELDS,
   SLIDE_EDIT_TEXT_PARAGRAPH_SPACING_JSON_MIME_TYPE,
@@ -29,6 +31,7 @@ import {
   createSlideEditTextParagraphBulletDescriptor as createSlideEditTextParagraphBulletDescriptorFromPackage,
   getSlideEditTextParagraphBulletJSONPasteValueFromText as getSlideEditTextParagraphBulletJSONPasteValueFromTextFromPackage,
   getSlideEditTextParagraphBulletJSONPasteValueFromValue as getSlideEditTextParagraphBulletJSONPasteValueFromValueFromPackage,
+  getSlideEditTextParagraphBulletKeyboardIntent as getSlideEditTextParagraphBulletKeyboardIntentFromPackage,
   getSlideEditTextParagraphSpacingJSONPasteValue as getSlideEditTextParagraphSpacingJSONPasteValueFromPackage,
   getSlideEditTextParagraphSpacingJSONPasteValueFromText as getSlideEditTextParagraphSpacingJSONPasteValueFromTextFromPackage,
   getSlideEditTextParagraphSpacingJSONPasteValueFromValue as getSlideEditTextParagraphSpacingJSONPasteValueFromValueFromPackage,
@@ -123,6 +126,44 @@ describe('SlideEditTextParagraphSpacing', () => {
       },
       type: 'slide-command-effect',
     })
+  })
+
+  it('maps paragraph bullet keyboard shortcut to a host toggle intent', () => {
+    expect(getSlideEditTextParagraphBulletKeyboardIntent({
+      key: 'L',
+      mod: true,
+      shiftKey: true,
+    })).toEqual({
+      commandId: 'toggle-text-paragraph-bullet',
+      kind: 'toggle-bullet',
+      preventDefault: true,
+      shortcut: SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_KEYBOARD_SHORTCUT,
+      value: 'bullet',
+    })
+    expect(getSlideEditTextParagraphBulletKeyboardIntentFromPackage({
+      key: 'l',
+      mod: true,
+      shiftKey: true,
+    })).toMatchObject({
+      kind: 'toggle-bullet',
+      shortcut: 'Cmd/Ctrl+Shift+L',
+      value: 'bullet',
+    })
+    expect(getSlideEditTextParagraphBulletKeyboardIntent({
+      key: 'l',
+      mod: true,
+    })).toBeNull()
+    expect(getSlideEditTextParagraphBulletKeyboardIntent({
+      altKey: true,
+      key: 'l',
+      mod: true,
+      shiftKey: true,
+    })).toBeNull()
+    expect(getSlideEditTextParagraphBulletKeyboardIntent({
+      key: 'x',
+      mod: true,
+      shiftKey: true,
+    })).toBeNull()
   })
 
   it('reads custom MIME direct paragraph bullet JSON values', () => {
