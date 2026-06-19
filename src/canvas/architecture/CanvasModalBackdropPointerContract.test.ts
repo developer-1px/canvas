@@ -23,28 +23,24 @@ describe('Canvas modal backdrop pointer contract', () => {
     expect(commandPaletteSource).toContain('type PointerEvent')
     expect(commandPaletteSource).toContain('handleBackdropPointerDown')
     expect(commandPaletteSource).toContain(
+      'runCanvasModalBackdropPointerIntent',
+    )
+    expect(commandPaletteSource).toContain(
       'onPointerDown={handleBackdropPointerDown}',
     )
-    expect(commandPaletteSource).toMatch(
-      /if \(backdropPointerIntent\.preventDefault\) \{\s*event\.preventDefault\(\)\s*\}/,
-    )
-    expect(commandPaletteSource).toMatch(
-      /if \(backdropPointerIntent\.stopPropagation\) \{\s*event\.stopPropagation\(\)\s*\}/,
-    )
+    expect(commandPaletteSource).not.toContain('backdropPointerIntent')
     expect(commandPaletteSource).not.toContain('onMouseDown=')
     expect(commandPaletteSource).not.toContain('type MouseEvent')
 
     expect(shortcutHelpSource).toContain('type PointerEvent')
     expect(shortcutHelpSource).toContain('handleBackdropPointerDown')
     expect(shortcutHelpSource).toContain(
+      'runCanvasModalBackdropPointerIntent',
+    )
+    expect(shortcutHelpSource).toContain(
       'onPointerDown={handleBackdropPointerDown}',
     )
-    expect(shortcutHelpSource).toMatch(
-      /if \(backdropPointerIntent\.preventDefault\) \{\s*event\.preventDefault\(\)\s*\}/,
-    )
-    expect(shortcutHelpSource).toMatch(
-      /if \(backdropPointerIntent\.stopPropagation\) \{\s*event\.stopPropagation\(\)\s*\}/,
-    )
+    expect(shortcutHelpSource).not.toContain('backdropPointerIntent')
     expect(shortcutHelpSource).not.toContain('onMouseDown=')
     expect(shortcutHelpSource).not.toContain('type MouseEvent')
   })

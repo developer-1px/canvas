@@ -29,6 +29,14 @@ export type CanvasModalTabFocusEvent = {
   stopPropagation: () => void
 }
 
+export type CanvasModalBackdropPointerEvent =
+  CanvasModalBackdropPointerIntentInput & {
+    preventDefault: () => void
+    stopPropagation: () => void
+  }
+
+export type CanvasModalKeyboardEvent = CanvasModalTabFocusEvent
+
 export type CanvasModalBackdropPointerIntentInput = {
   currentTarget: EventTarget | null
   target: EventTarget | null
@@ -66,6 +74,17 @@ export type CanvasModalKeyboardIntent =
       preventDefault: false
       stopPropagation: false
     }
+
+export type RunCanvasModalBackdropPointerIntentInput = {
+  event: CanvasModalBackdropPointerEvent
+  onDismiss: () => void
+}
+
+export type RunCanvasModalKeyboardIntentInput = {
+  event: CanvasModalKeyboardEvent
+  onClose: () => void
+  root: HTMLElement | null
+}
 
 export function useCanvasModalFocusLifecycle<
   TInitialFocusElement extends HTMLElement = HTMLElement,
@@ -202,6 +221,58 @@ export function getCanvasModalKeyboardIntent({
     preventDefault: false,
     stopPropagation: false,
   }
+}
+
+export function runCanvasModalBackdropPointerIntent({
+  event,
+  onDismiss,
+}: RunCanvasModalBackdropPointerIntentInput) {
+  const backdropPointerIntent = getCanvasModalBackdropPointerIntent({
+    currentTarget: event.currentTarget,
+    target: event.target,
+  })
+
+  if (backdropPointerIntent.kind !== 'dismiss') {
+    return false
+  }
+
+  if (backdropPointerIntent.preventDefault) {
+    event.preventDefault()
+  }
+  if (backdropPointerIntent.stopPropagation) {
+    event.stopPropagation()
+  }
+
+  onDismiss()
+  return true
+}
+
+export function runCanvasModalKeyboardIntent({
+  event,
+  onClose,
+  root,
+}: RunCanvasModalKeyboardIntentInput) {
+  const modalKeyboardIntent = getCanvasModalKeyboardIntent({ key: event.key })
+
+  if (modalKeyboardIntent.kind === 'close') {
+    if (modalKeyboardIntent.preventDefault) {
+      event.preventDefault()
+    }
+    if (modalKeyboardIntent.stopPropagation) {
+      event.stopPropagation()
+    }
+    onClose()
+    return true
+  }
+
+  if (modalKeyboardIntent.kind === 'trap-focus') {
+    return trapCanvasModalTabFocus({
+      event,
+      root,
+    })
+  }
+
+  return false
 }
 
 export function trapCanvasModalTabFocus({

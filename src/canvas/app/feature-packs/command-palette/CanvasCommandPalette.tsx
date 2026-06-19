@@ -7,9 +7,8 @@ import {
   type PointerEvent,
 } from 'react'
 import {
-  getCanvasModalBackdropPointerIntent,
-  getCanvasModalKeyboardIntent,
-  trapCanvasModalTabFocus,
+  runCanvasModalBackdropPointerIntent,
+  runCanvasModalKeyboardIntent,
   useCanvasModalFocusLifecycle,
 } from '../../affordances/controls/modal/CanvasModalFocusLifecycle'
 import {
@@ -77,24 +76,11 @@ function CanvasCommandPaletteDialog({
   }
 
   const handleKeyDown = (event: KeyboardEvent<HTMLElement>) => {
-    const modalKeyboardIntent = getCanvasModalKeyboardIntent({ key: event.key })
-
-    if (modalKeyboardIntent.kind === 'close') {
-      if (modalKeyboardIntent.preventDefault) {
-        event.preventDefault()
-      }
-      if (modalKeyboardIntent.stopPropagation) {
-        event.stopPropagation()
-      }
-      onClose()
-      return
-    }
-
-    if (modalKeyboardIntent.kind === 'trap-focus') {
-      trapCanvasModalTabFocus({
-        event,
-        root: dialogRef.current,
-      })
+    if (runCanvasModalKeyboardIntent({
+      event,
+      onClose,
+      root: dialogRef.current,
+    })) {
       return
     }
 
@@ -138,20 +124,10 @@ function CanvasCommandPaletteDialog({
   }
 
   const handleBackdropPointerDown = (event: PointerEvent<HTMLDivElement>) => {
-    const backdropPointerIntent = getCanvasModalBackdropPointerIntent({
-      currentTarget: event.currentTarget,
-      target: event.target,
+    runCanvasModalBackdropPointerIntent({
+      event,
+      onDismiss: onClose,
     })
-
-    if (backdropPointerIntent.kind === 'dismiss') {
-      if (backdropPointerIntent.preventDefault) {
-        event.preventDefault()
-      }
-      if (backdropPointerIntent.stopPropagation) {
-        event.stopPropagation()
-      }
-      onClose()
-    }
   }
 
   return (

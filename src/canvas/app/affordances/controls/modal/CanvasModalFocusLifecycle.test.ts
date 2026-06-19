@@ -6,6 +6,8 @@ import {
   getCanvasModalKeyboardIntent,
   getCanvasModalNextFocusIndex,
   restoreCanvasModalFocus,
+  runCanvasModalBackdropPointerIntent,
+  runCanvasModalKeyboardIntent,
   trapCanvasModalTabFocus,
 } from './CanvasModalFocusLifecycle'
 
@@ -114,6 +116,90 @@ describe('CanvasModalFocusLifecycle', () => {
     expect(second.focus).toHaveBeenCalledTimes(1)
   })
 
+  it('runs backdrop dismiss intents with event consumption', () => {
+    const backdrop = {}
+    const event = createPointerEvent({
+      currentTarget: backdrop as EventTarget,
+      target: backdrop as EventTarget,
+    })
+    const onDismiss = vi.fn()
+
+    expect(runCanvasModalBackdropPointerIntent({
+      event,
+      onDismiss,
+    })).toBe(true)
+    expect(event.preventDefault).toHaveBeenCalledTimes(1)
+    expect(event.stopPropagation).toHaveBeenCalledTimes(1)
+    expect(onDismiss).toHaveBeenCalledTimes(1)
+  })
+
+  it('leaves non-backdrop pointer events unhandled', () => {
+    const backdrop = {}
+    const child = {}
+    const event = createPointerEvent({
+      currentTarget: backdrop as EventTarget,
+      target: child as EventTarget,
+    })
+    const onDismiss = vi.fn()
+
+    expect(runCanvasModalBackdropPointerIntent({
+      event,
+      onDismiss,
+    })).toBe(false)
+    expect(event.preventDefault).not.toHaveBeenCalled()
+    expect(event.stopPropagation).not.toHaveBeenCalled()
+    expect(onDismiss).not.toHaveBeenCalled()
+  })
+
+  it('runs modal close keyboard intents with event consumption', () => {
+    const event = createKeyboardEvent({ key: 'Escape' })
+    const onClose = vi.fn()
+
+    expect(runCanvasModalKeyboardIntent({
+      event,
+      onClose,
+      root: null,
+    })).toBe(true)
+    expect(event.preventDefault).toHaveBeenCalledTimes(1)
+    expect(event.stopPropagation).toHaveBeenCalledTimes(1)
+    expect(onClose).toHaveBeenCalledTimes(1)
+  })
+
+  it('runs modal Tab trap keyboard intents through the focus trap', () => {
+    const first = createFocusableElement()
+    const second = createFocusableElement()
+    const event = createKeyboardEvent({ key: 'Tab', shiftKey: false })
+    const root = createRoot({
+      activeElement: first,
+      elements: [first, second],
+    })
+    const onClose = vi.fn()
+
+    expect(runCanvasModalKeyboardIntent({
+      event,
+      onClose,
+      root,
+    })).toBe(true)
+    expect(event.preventDefault).toHaveBeenCalledTimes(1)
+    expect(event.stopPropagation).toHaveBeenCalledTimes(1)
+    expect(second.focus).toHaveBeenCalledTimes(1)
+    expect(onClose).not.toHaveBeenCalled()
+  })
+
+  it('leaves non-modal keyboard intents unhandled', () => {
+    const event = createKeyboardEvent({ key: 'Enter' })
+    const onClose = vi.fn()
+
+    expect(runCanvasModalKeyboardIntent({
+      event,
+      onClose,
+      root: null,
+    })).toBe(false)
+    expect(event.preventDefault).not.toHaveBeenCalled()
+    expect(event.stopPropagation).not.toHaveBeenCalled()
+    expect(onClose).not.toHaveBeenCalled()
+  })
+
   it('traps Shift Tab focus to the final modal focus target', () => {
     const first = createFocusableElement()
     const second = createFocusableElement()
@@ -176,15 +262,30 @@ function createRoot({
 
 function createKeyboardEvent({
   key,
-  shiftKey,
+  shiftKey = false,
 }: {
   key: string
-  shiftKey: boolean
+  shiftKey?: boolean
 }) {
   return {
     key,
     preventDefault: vi.fn(),
     shiftKey,
     stopPropagation: vi.fn(),
+  }
+}
+
+function createPointerEvent({
+  currentTarget,
+  target,
+}: {
+  currentTarget: EventTarget
+  target: EventTarget
+}) {
+  return {
+    currentTarget,
+    preventDefault: vi.fn(),
+    stopPropagation: vi.fn(),
+    target,
   }
 }

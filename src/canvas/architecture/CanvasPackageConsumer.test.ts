@@ -257,6 +257,8 @@ import {
   getCanvasMenuRestoreFocusTarget,
   getCanvasModalBackdropPointerIntent,
   getCanvasModalKeyboardIntent,
+  runCanvasModalBackdropPointerIntent,
+  runCanvasModalKeyboardIntent,
   measureCanvasTextBlocks,
   getCanvasPointerLocalGeometry,
   getCanvasPointerLocalPoint,
@@ -500,6 +502,8 @@ import {
   type CanvasMenuTriggerKeyboardIntentInput,
   type CanvasModalBackdropPointerIntentInput,
   type CanvasModalKeyboardIntentInput,
+  type RunCanvasModalBackdropPointerIntentInput,
+  type RunCanvasModalKeyboardIntentInput,
   type CanvasPointerClickMemory,
   type CanvasNextLaserTrailPointsInput,
   type CanvasPointerLocalGeometry,
@@ -4221,6 +4225,43 @@ describe('Canvas package consumer imports', () => {
     const modalKeyboardInput: CanvasModalKeyboardIntentInput = {
       key: 'Tab',
     }
+    let modalBackdropDismissCount = 0
+    let modalBackdropPreventDefaultCount = 0
+    let modalBackdropStopPropagationCount = 0
+    const modalBackdropPointerRunInput:
+      RunCanvasModalBackdropPointerIntentInput = {
+        event: {
+          ...modalBackdropPointerInput,
+          preventDefault: () => {
+            modalBackdropPreventDefaultCount += 1
+          },
+          stopPropagation: () => {
+            modalBackdropStopPropagationCount += 1
+          },
+        },
+        onDismiss: () => {
+          modalBackdropDismissCount += 1
+        },
+      }
+    let modalKeyboardCloseCount = 0
+    let modalKeyboardPreventDefaultCount = 0
+    let modalKeyboardStopPropagationCount = 0
+    const modalKeyboardRunInput: RunCanvasModalKeyboardIntentInput = {
+      event: {
+        key: 'Escape',
+        preventDefault: () => {
+          modalKeyboardPreventDefaultCount += 1
+        },
+        shiftKey: false,
+        stopPropagation: () => {
+          modalKeyboardStopPropagationCount += 1
+        },
+      },
+      onClose: () => {
+        modalKeyboardCloseCount += 1
+      },
+      root: null,
+    }
     const inlineEditKeyboardInput: CanvasInlineEditKeyboardIntentInput = {
       altKey: false,
       ctrlKey: false,
@@ -4811,6 +4852,22 @@ describe('Canvas package consumer imports', () => {
       preventDefault: true,
       stopPropagation: true,
     })
+    expect(runCanvasModalBackdropPointerIntent(
+      modalBackdropPointerRunInput,
+    )).toBe(true)
+    expect(CanvasAppFacade.runCanvasModalBackdropPointerIntent(
+      modalBackdropPointerRunInput,
+    )).toBe(true)
+    expect(modalBackdropPreventDefaultCount).toBe(2)
+    expect(modalBackdropStopPropagationCount).toBe(2)
+    expect(modalBackdropDismissCount).toBe(2)
+    expect(runCanvasModalKeyboardIntent(modalKeyboardRunInput)).toBe(true)
+    expect(CanvasAppFacade.runCanvasModalKeyboardIntent(
+      modalKeyboardRunInput,
+    )).toBe(true)
+    expect(modalKeyboardPreventDefaultCount).toBe(2)
+    expect(modalKeyboardStopPropagationCount).toBe(2)
+    expect(modalKeyboardCloseCount).toBe(2)
     expect(getCanvasInlineEditKeyboardIntent(inlineEditKeyboardInput))
       .toEqual({
         inputType: 'insertParagraph',
