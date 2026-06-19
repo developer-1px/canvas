@@ -5,6 +5,8 @@ import {
   getSlideEditTextParagraphAlignCommandEffect,
   getSlideEditTextParagraphAlignCSSValue,
   getSlideEditTextParagraphAlignJSONPasteValue,
+  getSlideEditTextParagraphAlignJSONPasteValueFromText,
+  getSlideEditTextParagraphAlignJSONPasteValueFromValue,
   normalizeSlideEditTextParagraphAlign,
   SLIDE_EDIT_TEXT_PARAGRAPH_ALIGN_DEFAULT,
   SLIDE_EDIT_TEXT_PARAGRAPH_ALIGN_FIELD,
@@ -12,6 +14,8 @@ import {
 } from './SlideEditTextParagraphAlign'
 import {
   createSlideEditTextParagraphAlignDescriptor as createSlideEditTextParagraphAlignDescriptorFromPackage,
+  getSlideEditTextParagraphAlignJSONPasteValueFromText as getSlideEditTextParagraphAlignJSONPasteValueFromTextFromPackage,
+  getSlideEditTextParagraphAlignJSONPasteValueFromValue as getSlideEditTextParagraphAlignJSONPasteValueFromValueFromPackage,
 } from './index'
 
 describe('SlideEditTextParagraphAlign', () => {
@@ -134,6 +138,25 @@ describe('SlideEditTextParagraphAlign', () => {
         'text/json': '{"paragraphAlign":"center"}',
       }),
     })).toBe('center')
+  })
+
+  it('reads paragraph align JSON from text and parsed values', () => {
+    expect(getSlideEditTextParagraphAlignJSONPasteValueFromText('"right"'))
+      .toBe('right')
+    expect(getSlideEditTextParagraphAlignJSONPasteValueFromValue({
+      align: 'center',
+    }, { mode: 'wrapped' })).toBe('center')
+    expect(getSlideEditTextParagraphAlignJSONPasteValueFromTextFromPackage(
+      '{"value":"left"}',
+      { mode: 'wrapped' },
+    )).toBe('left')
+    expect(getSlideEditTextParagraphAlignJSONPasteValueFromValueFromPackage(
+      'center',
+    )).toBe('center')
+    expect(getSlideEditTextParagraphAlignJSONPasteValueFromText(
+      '"center"',
+      { mode: 'wrapped' },
+    )).toBeNull()
   })
 
   it('does not treat unrelated JSON or direct text/plain values as paragraph align', () => {

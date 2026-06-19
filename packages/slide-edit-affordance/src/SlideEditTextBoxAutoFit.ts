@@ -140,6 +140,14 @@ export type SlideEditTextAutoFitJSONPasteInput = {
   jsonMimeType?: string
 }
 
+export type SlideEditTextAutoFitJSONPasteValueMode =
+  | 'direct'
+  | 'wrapped'
+
+export type SlideEditTextAutoFitJSONPasteValueOptions = {
+  mode?: SlideEditTextAutoFitJSONPasteValueMode
+}
+
 export type SlideEditTextAutoFitPasteTarget<
   TObjectId extends SlideEditTextObjectId = SlideEditTextObjectId,
 > = SlideEditTextAutoSizeInput & {
@@ -338,9 +346,11 @@ export function getSlideEditTextAutoFitJSONPasteValue({
     const customText = dataTransfer.getData(jsonMimeType)
 
     if (customText.trim()) {
-      const customValue = parseSlideEditTextAutoFitJSON(customText)
       const customPasteValue =
-        getSlideEditTextAutoFitDirectPasteValue(customValue)
+        getSlideEditTextAutoFitJSONPasteValueFromText(
+          customText,
+          { mode: 'direct' },
+        )
 
       if (customPasteValue !== null) {
         return customPasteValue
@@ -355,8 +365,10 @@ export function getSlideEditTextAutoFitJSONPasteValue({
       continue
     }
 
-    const value = parseSlideEditTextAutoFitJSON(text)
-    const pasteValue = getSlideEditTextAutoFitWrappedPasteValue(value)
+    const pasteValue = getSlideEditTextAutoFitJSONPasteValueFromText(
+      text,
+      { mode: 'wrapped' },
+    )
 
     if (pasteValue !== null) {
       return pasteValue
@@ -364,6 +376,25 @@ export function getSlideEditTextAutoFitJSONPasteValue({
   }
 
   return null
+}
+
+export function getSlideEditTextAutoFitJSONPasteValueFromText(
+  text: string,
+  options?: SlideEditTextAutoFitJSONPasteValueOptions,
+): SlideEditTextAutoFitJSONPasteValue | null {
+  return getSlideEditTextAutoFitJSONPasteValueFromValue(
+    parseSlideEditTextAutoFitJSON(text),
+    options,
+  )
+}
+
+export function getSlideEditTextAutoFitJSONPasteValueFromValue(
+  value: unknown,
+  { mode = 'direct' }: SlideEditTextAutoFitJSONPasteValueOptions = {},
+): SlideEditTextAutoFitJSONPasteValue | null {
+  return mode === 'wrapped'
+    ? getSlideEditTextAutoFitWrappedPasteValue(value)
+    : getSlideEditTextAutoFitDirectPasteValue(value)
 }
 
 export function getSlideEditTextAutoFitPasteCommandEffects<

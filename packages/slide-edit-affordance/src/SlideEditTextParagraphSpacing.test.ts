@@ -5,6 +5,8 @@ import {
   createSlideEditTextParagraphSpacingDescriptor,
   getSlideEditTextParagraphBulletCommandEffect,
   getSlideEditTextParagraphBulletJSONPasteValue,
+  getSlideEditTextParagraphBulletJSONPasteValueFromText,
+  getSlideEditTextParagraphBulletJSONPasteValueFromValue,
   getSlideEditTextParagraphSpacingCommandEffect,
   getSlideEditTextParagraphSpacingCSSStyle,
   getSlideEditTextParagraphSpacingJSONPasteValue,
@@ -25,6 +27,8 @@ import {
 } from './SlideEditTextParagraphSpacing'
 import {
   createSlideEditTextParagraphBulletDescriptor as createSlideEditTextParagraphBulletDescriptorFromPackage,
+  getSlideEditTextParagraphBulletJSONPasteValueFromText as getSlideEditTextParagraphBulletJSONPasteValueFromTextFromPackage,
+  getSlideEditTextParagraphBulletJSONPasteValueFromValue as getSlideEditTextParagraphBulletJSONPasteValueFromValueFromPackage,
   getSlideEditTextParagraphSpacingJSONPasteValue as getSlideEditTextParagraphSpacingJSONPasteValueFromPackage,
   getSlideEditTextParagraphSpacingJSONPasteValueFromText as getSlideEditTextParagraphSpacingJSONPasteValueFromTextFromPackage,
   getSlideEditTextParagraphSpacingJSONPasteValueFromValue as getSlideEditTextParagraphSpacingJSONPasteValueFromValueFromPackage,
@@ -160,6 +164,25 @@ describe('SlideEditTextParagraphSpacing', () => {
         'text/json': '{"paragraphBullet":"bullet"}',
       }),
     })).toBe('bullet')
+  })
+
+  it('reads paragraph bullet JSON from text and parsed values', () => {
+    expect(getSlideEditTextParagraphBulletJSONPasteValueFromText('"bullet"'))
+      .toBe('bullet')
+    expect(getSlideEditTextParagraphBulletJSONPasteValueFromValue({
+      paragraphBullet: 'numbered',
+    }, { mode: 'wrapped' })).toBe('numbered')
+    expect(getSlideEditTextParagraphBulletJSONPasteValueFromTextFromPackage(
+      '{"value":"none"}',
+      { mode: 'wrapped' },
+    )).toBe('none')
+    expect(getSlideEditTextParagraphBulletJSONPasteValueFromValueFromPackage(
+      'bullet',
+    )).toBe('bullet')
+    expect(getSlideEditTextParagraphBulletJSONPasteValueFromText(
+      '"bullet"',
+      { mode: 'wrapped' },
+    )).toBeNull()
   })
 
   it('does not treat generic text/plain direct values as paragraph bullet', () => {

@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest'
 import {
   getSlideEditTextAutoFitGestureCommandEffect,
   getSlideEditTextAutoFitJSONPasteValue,
+  getSlideEditTextAutoFitJSONPasteValueFromText,
+  getSlideEditTextAutoFitJSONPasteValueFromValue,
   getSlideEditTextAutoFitPasteCommandEffects,
   getSlideEditTextAutoSizeBounds,
   getSlideEditTextOverflowIndicatorState,
@@ -13,6 +15,8 @@ import {
 } from './SlideEditTextBoxAutoFit'
 import {
   getSlideEditTextAutoFitJSONPasteValue as getSlideEditTextAutoFitJSONPasteValueFromPackage,
+  getSlideEditTextAutoFitJSONPasteValueFromText as getSlideEditTextAutoFitJSONPasteValueFromTextFromPackage,
+  getSlideEditTextAutoFitJSONPasteValueFromValue as getSlideEditTextAutoFitJSONPasteValueFromValueFromPackage,
 } from './index'
 
 describe('SlideEditTextBoxAutoFit', () => {
@@ -246,6 +250,63 @@ describe('SlideEditTextBoxAutoFit', () => {
       },
       surface: 'text-auto-fit',
     })
+  })
+
+  it('reads text auto-fit JSON from text and parsed values', () => {
+    expect(getSlideEditTextAutoFitJSONPasteValueFromText(
+      '{"mode":"resize-to-fit","handle":"sw"}',
+    )).toEqual({
+      handle: 'sw',
+      mode: 'resize-to-fit',
+      sourceFields: {
+        handle: 'handle',
+        mode: 'mode',
+      },
+      surface: 'text-auto-fit',
+    })
+    expect(getSlideEditTextAutoFitJSONPasteValueFromValue({
+      textAutoFit: {
+        mode: 'fit',
+        resizeHandle: 'e',
+      },
+    }, { mode: 'wrapped' })).toEqual({
+      handle: 'e',
+      mode: 'resize-to-fit',
+      sourceFields: {
+        handle: 'resizeHandle',
+        mode: 'mode',
+        wrapper: 'textAutoFit',
+      },
+      surface: 'text-auto-fit',
+    })
+    expect(getSlideEditTextAutoFitJSONPasteValueFromTextFromPackage(
+      '{"autoFit":true}',
+      { mode: 'wrapped' },
+    )).toEqual({
+      handle: 'se',
+      mode: 'resize-to-fit',
+      sourceFields: {
+        mode: 'value',
+        wrapper: 'autoFit',
+      },
+      surface: 'text-auto-fit',
+    })
+    expect(getSlideEditTextAutoFitJSONPasteValueFromValueFromPackage({
+      mode: 'auto',
+      resizeHandle: 'n',
+    })).toEqual({
+      handle: 'n',
+      mode: 'resize-to-fit',
+      sourceFields: {
+        handle: 'resizeHandle',
+        mode: 'mode',
+      },
+      surface: 'text-auto-fit',
+    })
+    expect(getSlideEditTextAutoFitJSONPasteValueFromText(
+      '{"mode":"fit"}',
+      { mode: 'wrapped' },
+    )).toBeNull()
   })
 
   it('converts text auto-fit paste values into host command effects', () => {

@@ -73,6 +73,14 @@ export type SlideEditTextParagraphBulletJSONPasteInput = {
   jsonMimeType?: string
 }
 
+export type SlideEditTextParagraphBulletJSONPasteValueMode =
+  | 'direct'
+  | 'wrapped'
+
+export type SlideEditTextParagraphBulletJSONPasteValueOptions = {
+  mode?: SlideEditTextParagraphBulletJSONPasteValueMode
+}
+
 export type SlideEditTextParagraphSpacingUnit =
   | 'px'
   | 'slide-unit'
@@ -422,11 +430,11 @@ export function getSlideEditTextParagraphBulletJSONPasteValue({
   }
 
   if (jsonMimeType) {
-    const customValue = parseSlideEditTextParagraphBulletJSON(
-      dataTransfer.getData(jsonMimeType),
-    )
     const normalizedCustomValue =
-      normalizeSlideEditTextParagraphBulletValue(customValue)
+      getSlideEditTextParagraphBulletJSONPasteValueFromText(
+        dataTransfer.getData(jsonMimeType),
+        { mode: 'direct' },
+      )
 
     if (normalizedCustomValue !== null) {
       return normalizedCustomValue
@@ -434,11 +442,11 @@ export function getSlideEditTextParagraphBulletJSONPasteValue({
   }
 
   for (const type of SLIDE_EDIT_TEXT_JSON_PASTE_TYPES) {
-    const value = parseSlideEditTextParagraphBulletJSON(
-      dataTransfer.getData(type),
-    )
     const explicitValue =
-      getSlideEditTextParagraphBulletExplicitJSONValue(value)
+      getSlideEditTextParagraphBulletJSONPasteValueFromText(
+        dataTransfer.getData(type),
+        { mode: 'wrapped' },
+      )
 
     if (explicitValue !== null) {
       return explicitValue
@@ -446,6 +454,25 @@ export function getSlideEditTextParagraphBulletJSONPasteValue({
   }
 
   return null
+}
+
+export function getSlideEditTextParagraphBulletJSONPasteValueFromText(
+  text: string,
+  options?: SlideEditTextParagraphBulletJSONPasteValueOptions,
+): SlideEditTextParagraphBulletValue | null {
+  return getSlideEditTextParagraphBulletJSONPasteValueFromValue(
+    parseSlideEditTextParagraphBulletJSON(text),
+    options,
+  )
+}
+
+export function getSlideEditTextParagraphBulletJSONPasteValueFromValue(
+  value: unknown,
+  { mode = 'direct' }: SlideEditTextParagraphBulletJSONPasteValueOptions = {},
+): SlideEditTextParagraphBulletValue | null {
+  return mode === 'wrapped'
+    ? getSlideEditTextParagraphBulletExplicitJSONValue(value)
+    : normalizeSlideEditTextParagraphBulletValue(value)
 }
 
 export function normalizeSlideEditTextParagraphBulletValue(

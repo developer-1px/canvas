@@ -79,6 +79,14 @@ export type SlideEditTextParagraphAlignJSONPasteInput = {
   jsonMimeType?: string
 }
 
+export type SlideEditTextParagraphAlignJSONPasteValueMode =
+  | 'direct'
+  | 'wrapped'
+
+export type SlideEditTextParagraphAlignJSONPasteValueOptions = {
+  mode?: SlideEditTextParagraphAlignJSONPasteValueMode
+}
+
 export const SLIDE_EDIT_TEXT_PARAGRAPH_ALIGN_DEFAULT = 'left'
 
 export const SLIDE_EDIT_TEXT_PARAGRAPH_ALIGN_VALUES = Object.freeze([
@@ -189,11 +197,11 @@ export function getSlideEditTextParagraphAlignJSONPasteValue({
   }
 
   if (jsonMimeType) {
-    const customValue = parseSlideEditTextParagraphAlignJSON(
-      dataTransfer.getData(jsonMimeType),
-    )
     const normalizedCustomValue =
-      normalizeSlideEditTextParagraphAlignJSONValue(customValue)
+      getSlideEditTextParagraphAlignJSONPasteValueFromText(
+        dataTransfer.getData(jsonMimeType),
+        { mode: 'direct' },
+      )
 
     if (normalizedCustomValue !== null) {
       return normalizedCustomValue
@@ -201,10 +209,11 @@ export function getSlideEditTextParagraphAlignJSONPasteValue({
   }
 
   for (const type of SLIDE_EDIT_TEXT_JSON_PASTE_TYPES) {
-    const value = parseSlideEditTextParagraphAlignJSON(
-      dataTransfer.getData(type),
-    )
-    const explicitValue = getSlideEditTextParagraphAlignExplicitJSONValue(value)
+    const explicitValue =
+      getSlideEditTextParagraphAlignJSONPasteValueFromText(
+        dataTransfer.getData(type),
+        { mode: 'wrapped' },
+      )
 
     if (explicitValue !== null) {
       return explicitValue
@@ -212,6 +221,25 @@ export function getSlideEditTextParagraphAlignJSONPasteValue({
   }
 
   return null
+}
+
+export function getSlideEditTextParagraphAlignJSONPasteValueFromText(
+  text: string,
+  options?: SlideEditTextParagraphAlignJSONPasteValueOptions,
+): SlideEditTextParagraphAlignValue | null {
+  return getSlideEditTextParagraphAlignJSONPasteValueFromValue(
+    parseSlideEditTextParagraphAlignJSON(text),
+    options,
+  )
+}
+
+export function getSlideEditTextParagraphAlignJSONPasteValueFromValue(
+  value: unknown,
+  { mode = 'direct' }: SlideEditTextParagraphAlignJSONPasteValueOptions = {},
+): SlideEditTextParagraphAlignValue | null {
+  return mode === 'wrapped'
+    ? getSlideEditTextParagraphAlignExplicitJSONValue(value)
+    : normalizeSlideEditTextParagraphAlignJSONValue(value)
 }
 
 export function normalizeSlideEditTextParagraphAlign(
