@@ -99,6 +99,14 @@ export type SlideEditObjectCornerRadiusJSONPasteInput = {
   jsonMimeType?: string
 }
 
+export type SlideEditObjectCornerRadiusJSONPasteValueMode =
+  | 'direct'
+  | 'wrapped'
+
+export type SlideEditObjectCornerRadiusJSONPasteValueOptions = {
+  mode?: SlideEditObjectCornerRadiusJSONPasteValueMode
+}
+
 export type SlideEditObjectCornerRadiusPasteCommandInput<
   TSlideId extends SlideEditObjectCornerRadiusSlideId =
     SlideEditObjectCornerRadiusSlideId,
@@ -219,14 +227,18 @@ export function getSlideEditObjectCornerRadiusJSONPasteValue({
   }
 
   if (jsonMimeType) {
-    const customValue = parseSlideEditObjectCornerRadiusJSON(
-      dataTransfer.getData(jsonMimeType),
-    )
-    const customPasteValue =
-      getSlideEditObjectCornerRadiusDirectJSONPasteValue(customValue)
+    const customText = dataTransfer.getData(jsonMimeType)
 
-    if (customPasteValue !== null) {
-      return customPasteValue
+    if (customText.trim()) {
+      const customPasteValue =
+        getSlideEditObjectCornerRadiusJSONPasteValueFromText(
+          customText,
+          { mode: 'direct' },
+        )
+
+      if (customPasteValue !== null) {
+        return customPasteValue
+      }
     }
   }
 
@@ -237,9 +249,10 @@ export function getSlideEditObjectCornerRadiusJSONPasteValue({
       continue
     }
 
-    const value = parseSlideEditObjectCornerRadiusJSON(text)
-    const pasteValue =
-      getSlideEditObjectCornerRadiusWrappedJSONPasteValue(value)
+    const pasteValue = getSlideEditObjectCornerRadiusJSONPasteValueFromText(
+      text,
+      { mode: 'wrapped' },
+    )
 
     if (pasteValue !== null) {
       return pasteValue
@@ -247,6 +260,27 @@ export function getSlideEditObjectCornerRadiusJSONPasteValue({
   }
 
   return null
+}
+
+export function getSlideEditObjectCornerRadiusJSONPasteValueFromText(
+  text: string,
+  options?: SlideEditObjectCornerRadiusJSONPasteValueOptions,
+): SlideEditObjectCornerRadiusJSONPasteValue | null {
+  return getSlideEditObjectCornerRadiusJSONPasteValueFromValue(
+    parseSlideEditObjectCornerRadiusJSON(text),
+    options,
+  )
+}
+
+export function getSlideEditObjectCornerRadiusJSONPasteValueFromValue(
+  value: unknown,
+  {
+    mode = 'direct',
+  }: SlideEditObjectCornerRadiusJSONPasteValueOptions = {},
+): SlideEditObjectCornerRadiusJSONPasteValue | null {
+  return mode === 'wrapped'
+    ? getSlideEditObjectCornerRadiusWrappedJSONPasteValue(value)
+    : getSlideEditObjectCornerRadiusDirectJSONPasteValue(value)
 }
 
 export function getSlideEditObjectCornerRadiusPasteCommand<

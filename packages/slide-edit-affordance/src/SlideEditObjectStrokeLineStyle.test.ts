@@ -6,6 +6,8 @@ import {
   getSlideEditObjectStrokeLineStyleBorderStyle,
   getSlideEditObjectStrokeLineStyleDashArray,
   getSlideEditObjectStrokeLineStyleJSONPasteValue,
+  getSlideEditObjectStrokeLineStyleJSONPasteValueFromText,
+  getSlideEditObjectStrokeLineStyleJSONPasteValueFromValue,
   getSlideEditObjectStrokeLineStyleMetadata,
   getSlideEditObjectStrokeLineStylePasteCommand,
   isSlideEditObjectStrokeLineStyleValue,
@@ -20,6 +22,8 @@ import {
   getSlideEditObjectStrokeLineStyleBorderStyle as getSlideEditObjectStrokeLineStyleBorderStyleFromPackage,
   getSlideEditObjectStrokeLineStyleDashArray as getSlideEditObjectStrokeLineStyleDashArrayFromPackage,
   getSlideEditObjectStrokeLineStyleJSONPasteValue as getSlideEditObjectStrokeLineStyleJSONPasteValueFromPackage,
+  getSlideEditObjectStrokeLineStyleJSONPasteValueFromText as getSlideEditObjectStrokeLineStyleJSONPasteValueFromTextFromPackage,
+  getSlideEditObjectStrokeLineStyleJSONPasteValueFromValue as getSlideEditObjectStrokeLineStyleJSONPasteValueFromValueFromPackage,
   type SlideEditObjectStrokeLineStyleBorderStyle,
 } from './index'
 
@@ -209,6 +213,23 @@ describe('SlideEditObjectStrokeLineStyle', () => {
         'text/plain': '{"strokeDash":true}',
       }),
     })).toBe('dash')
+  })
+
+  it('reads line style JSON from text and parsed values', () => {
+    expect(getSlideEditObjectStrokeLineStyleJSONPasteValueFromText(
+      '"dot"',
+    )).toBe('dot')
+    expect(getSlideEditObjectStrokeLineStyleJSONPasteValueFromValue({
+      dash: true,
+    })).toBe('dash')
+    expect(getSlideEditObjectStrokeLineStyleJSONPasteValueFromTextFromPackage(
+      '{"strokeLineStyle":"dot"}',
+      { mode: 'wrapped' },
+    )).toBe('dot')
+    expect(getSlideEditObjectStrokeLineStyleJSONPasteValueFromValueFromPackage(
+      { strokeDash: false },
+      { mode: 'wrapped' },
+    )).toBe('solid')
   })
 
   it('converts pasted line style into a host command', () => {

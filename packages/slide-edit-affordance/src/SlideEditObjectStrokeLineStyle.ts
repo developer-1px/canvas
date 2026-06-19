@@ -90,6 +90,14 @@ export type SlideEditObjectStrokeLineStyleJSONPasteInput = {
   jsonMimeType?: string
 }
 
+export type SlideEditObjectStrokeLineStyleJSONPasteValueMode =
+  | 'direct'
+  | 'wrapped'
+
+export type SlideEditObjectStrokeLineStyleJSONPasteValueOptions = {
+  mode?: SlideEditObjectStrokeLineStyleJSONPasteValueMode
+}
+
 export type SlideEditObjectStrokeLineStylePasteCommandInput<
   TSlideId extends SlideEditObjectStrokeLineStyleSlideId =
     SlideEditObjectStrokeLineStyleSlideId,
@@ -213,9 +221,11 @@ export function getSlideEditObjectStrokeLineStyleJSONPasteValue({
     const customText = dataTransfer.getData(jsonMimeType)
 
     if (customText.trim()) {
-      const customValue = parseSlideEditObjectStrokeLineStyleJSON(customText)
       const customLineStyle =
-        getSlideEditObjectStrokeLineStyleDirectPasteValue(customValue)
+        getSlideEditObjectStrokeLineStyleJSONPasteValueFromText(
+          customText,
+          { mode: 'direct' },
+        )
 
       if (customLineStyle !== null) {
         return customLineStyle
@@ -230,9 +240,10 @@ export function getSlideEditObjectStrokeLineStyleJSONPasteValue({
       continue
     }
 
-    const value = parseSlideEditObjectStrokeLineStyleJSON(text)
-    const lineStyle =
-      getSlideEditObjectStrokeLineStyleWrappedPasteValue(value)
+    const lineStyle = getSlideEditObjectStrokeLineStyleJSONPasteValueFromText(
+      text,
+      { mode: 'wrapped' },
+    )
 
     if (lineStyle !== null) {
       return lineStyle
@@ -240,6 +251,27 @@ export function getSlideEditObjectStrokeLineStyleJSONPasteValue({
   }
 
   return null
+}
+
+export function getSlideEditObjectStrokeLineStyleJSONPasteValueFromText(
+  text: string,
+  options?: SlideEditObjectStrokeLineStyleJSONPasteValueOptions,
+): SlideEditObjectStrokeLineStyleValue | null {
+  return getSlideEditObjectStrokeLineStyleJSONPasteValueFromValue(
+    parseSlideEditObjectStrokeLineStyleJSON(text),
+    options,
+  )
+}
+
+export function getSlideEditObjectStrokeLineStyleJSONPasteValueFromValue(
+  value: unknown,
+  {
+    mode = 'direct',
+  }: SlideEditObjectStrokeLineStyleJSONPasteValueOptions = {},
+): SlideEditObjectStrokeLineStyleValue | null {
+  return mode === 'wrapped'
+    ? getSlideEditObjectStrokeLineStyleWrappedPasteValue(value)
+    : getSlideEditObjectStrokeLineStyleDirectPasteValue(value)
 }
 
 export function getSlideEditObjectStrokeLineStylePasteCommand<

@@ -4,6 +4,8 @@ import {
   clampSlideEditObjectTransformToFrame,
   getSlideEditObjectTransformForTarget,
   getSlideEditObjectTransformJSONPasteValue,
+  getSlideEditObjectTransformJSONPasteValueFromText,
+  getSlideEditObjectTransformJSONPasteValueFromValue,
   getSlideEditObjectTransformPasteCommandEffects,
   normalizeSlideEditObjectTransform,
   normalizeSlideEditObjectTransformRotation,
@@ -13,6 +15,8 @@ import {
 } from './SlideEditObjectTransform'
 import {
   getSlideEditObjectTransformJSONPasteValue as getSlideEditObjectTransformJSONPasteValueFromPackage,
+  getSlideEditObjectTransformJSONPasteValueFromText as getSlideEditObjectTransformJSONPasteValueFromTextFromPackage,
+  getSlideEditObjectTransformJSONPasteValueFromValue as getSlideEditObjectTransformJSONPasteValueFromValueFromPackage,
 } from './index'
 
 function createDataTransfer(values: Record<string, string>) {
@@ -95,6 +99,96 @@ describe('SlideEditObjectTransform', () => {
     expect(SLIDE_EDIT_OBJECT_TRANSFORM_JSON_WRAPPER_KEYS).toContain(
       'objectTransform',
     )
+  })
+
+  it('reads object transform JSON from text and parsed values', () => {
+    const wrappedText = JSON.stringify({
+      objectGeometry: {
+        bounds: {
+          height: 90,
+          left: 12,
+          top: 18,
+          width: 160,
+        },
+        rotation: -30,
+      },
+    })
+
+    expect(getSlideEditObjectTransformJSONPasteValueFromText(
+      wrappedText,
+      {
+        mode: 'wrapped',
+        sourceType: 'application/json',
+      },
+    )).toMatchObject({
+      fields: ['x', 'y', 'w', 'h', 'rotation'],
+      payloadLength: wrappedText.length,
+      sourceFields: {
+        h: 'bounds.height',
+        rotation: 'rotation',
+        w: 'bounds.width',
+        wrapper: 'objectGeometry',
+        x: 'bounds.left',
+        y: 'bounds.top',
+      },
+      sourceType: 'application/json',
+      transform: {
+        h: 90,
+        rotation: 330,
+        w: 160,
+        x: 12,
+        y: 18,
+      },
+      wrapper: 'objectGeometry',
+    })
+    expect(getSlideEditObjectTransformJSONPasteValueFromValue(
+      {
+        rotation: 405,
+        x: 24.555,
+      },
+      {
+        payloadLength: 27,
+        sourceType: SLIDE_EDIT_OBJECT_TRANSFORM_JSON_MIME_TYPE,
+      },
+    )).toMatchObject({
+      fields: ['x', 'rotation'],
+      payloadLength: 27,
+      sourceFields: {
+        rotation: 'rotation',
+        x: 'x',
+      },
+      sourceType: SLIDE_EDIT_OBJECT_TRANSFORM_JSON_MIME_TYPE,
+      transform: {
+        rotation: 45,
+        x: 24.56,
+      },
+    })
+    expect(getSlideEditObjectTransformJSONPasteValueFromTextFromPackage(
+      JSON.stringify({
+        transform: {
+          h: 50,
+          y: 24,
+        },
+      }),
+      { mode: 'wrapped' },
+    )).toMatchObject({
+      fields: ['y', 'h'],
+      wrapper: 'transform',
+    })
+    expect(getSlideEditObjectTransformJSONPasteValueFromValueFromPackage(
+      {
+        objectTransform: {
+          w: '200.126',
+        },
+      },
+      { mode: 'wrapped' },
+    )).toMatchObject({
+      fields: ['w'],
+      transform: {
+        w: 200.13,
+      },
+      wrapper: 'objectTransform',
+    })
   })
 
   it('preserves missing fields and clamps bounds with frame and minimum size policy', () => {

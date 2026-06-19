@@ -42,6 +42,17 @@ export type SlideEditObjectTransformJSONPasteInput = {
   jsonMimeType?: string
 }
 
+export type SlideEditObjectTransformJSONPasteValueMode =
+  | 'any'
+  | 'direct'
+  | 'wrapped'
+
+export type SlideEditObjectTransformJSONPasteValueOptions = {
+  mode?: SlideEditObjectTransformJSONPasteValueMode
+  payloadLength?: number
+  sourceType?: string
+}
+
 export type SlideEditObjectTransformPasteTarget<
   TObjectId extends SlideEditObjectTransformObjectId =
     SlideEditObjectTransformObjectId,
@@ -233,12 +244,14 @@ export function getSlideEditObjectTransformJSONPasteValue({
     const customText = dataTransfer.getData(jsonMimeType)
 
     if (customText.trim()) {
-      const customValue = parseSlideEditObjectTransformJSON(customText)
-      const customPasteValue = getSlideEditObjectTransformAnyJSONPasteValue({
-        payloadLength: customText.length,
-        sourceType: jsonMimeType,
-        value: customValue,
-      })
+      const customPasteValue = getSlideEditObjectTransformJSONPasteValueFromText(
+        customText,
+        {
+          mode: 'any',
+          payloadLength: customText.length,
+          sourceType: jsonMimeType,
+        },
+      )
 
       if (customPasteValue !== null) {
         return customPasteValue
@@ -253,12 +266,14 @@ export function getSlideEditObjectTransformJSONPasteValue({
       continue
     }
 
-    const value = parseSlideEditObjectTransformJSON(text)
-    const pasteValue = getSlideEditObjectTransformWrappedJSONPasteValue({
-      payloadLength: text.length,
-      sourceType: type,
-      value,
-    })
+    const pasteValue = getSlideEditObjectTransformJSONPasteValueFromText(
+      text,
+      {
+        mode: 'wrapped',
+        payloadLength: text.length,
+        sourceType: type,
+      },
+    )
 
     if (pasteValue !== null) {
       return pasteValue
@@ -266,6 +281,49 @@ export function getSlideEditObjectTransformJSONPasteValue({
   }
 
   return null
+}
+
+export function getSlideEditObjectTransformJSONPasteValueFromText(
+  text: string,
+  options?: SlideEditObjectTransformJSONPasteValueOptions,
+): SlideEditObjectTransformJSONPasteValue | null {
+  return getSlideEditObjectTransformJSONPasteValueFromValue(
+    parseSlideEditObjectTransformJSON(text),
+    {
+      ...options,
+      payloadLength: options?.payloadLength ?? text.length,
+    },
+  )
+}
+
+export function getSlideEditObjectTransformJSONPasteValueFromValue(
+  value: unknown,
+  {
+    mode = 'direct',
+    payloadLength = 0,
+    sourceType = 'value',
+  }: SlideEditObjectTransformJSONPasteValueOptions = {},
+): SlideEditObjectTransformJSONPasteValue | null {
+  switch (mode) {
+    case 'any':
+      return getSlideEditObjectTransformAnyJSONPasteValue({
+        payloadLength,
+        sourceType,
+        value,
+      })
+    case 'direct':
+      return getSlideEditObjectTransformDirectJSONPasteValue({
+        payloadLength,
+        sourceType,
+        value,
+      })
+    case 'wrapped':
+      return getSlideEditObjectTransformWrappedJSONPasteValue({
+        payloadLength,
+        sourceType,
+        value,
+      })
+  }
 }
 
 export function getSlideEditObjectTransformForTarget<

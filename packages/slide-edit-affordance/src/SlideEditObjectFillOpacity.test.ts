@@ -4,6 +4,8 @@ import {
   createSlideEditObjectFillOpacityDescriptor,
   getSlideEditObjectFillOpacityCommandEffect,
   getSlideEditObjectFillOpacityJSONPasteValue,
+  getSlideEditObjectFillOpacityJSONPasteValueFromText,
+  getSlideEditObjectFillOpacityJSONPasteValueFromValue,
   getSlideEditObjectFillOpacityMetadata,
   getSlideEditObjectFillOpacityPasteCommand,
   normalizeSlideEditObjectFillOpacity,
@@ -16,6 +18,8 @@ import {
 } from './SlideEditObjectFillOpacity'
 import {
   getSlideEditObjectFillOpacityJSONPasteValue as getSlideEditObjectFillOpacityJSONPasteValueFromPackage,
+  getSlideEditObjectFillOpacityJSONPasteValueFromText as getSlideEditObjectFillOpacityJSONPasteValueFromTextFromPackage,
+  getSlideEditObjectFillOpacityJSONPasteValueFromValue as getSlideEditObjectFillOpacityJSONPasteValueFromValueFromPackage,
 } from './index'
 
 describe('SlideEditObjectFillOpacity', () => {
@@ -186,6 +190,31 @@ describe('SlideEditObjectFillOpacity', () => {
       }),
     })).toEqual({
       value: 0,
+    })
+  })
+
+  it('reads fill opacity JSON from text and parsed values', () => {
+    expect(getSlideEditObjectFillOpacityJSONPasteValueFromText(
+      '"0.62"',
+    )).toEqual({
+      value: 0.62,
+    })
+    expect(getSlideEditObjectFillOpacityJSONPasteValueFromValue({
+      opacity: '0.335',
+    })).toEqual({
+      value: 0.34,
+    })
+    expect(getSlideEditObjectFillOpacityJSONPasteValueFromTextFromPackage(
+      '{"shapeFillOpacity":0.335}',
+      { mode: 'wrapped' },
+    )).toEqual({
+      value: 0.34,
+    })
+    expect(getSlideEditObjectFillOpacityJSONPasteValueFromValueFromPackage(
+      { fillOpacity: { value: 1.2 } },
+      { mode: 'wrapped' },
+    )).toEqual({
+      value: 1,
     })
   })
 

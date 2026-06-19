@@ -5,6 +5,8 @@ import {
   getSlideEditObjectCornerRadiusCommandEffect,
   getSlideEditObjectCornerRadiusCSS,
   getSlideEditObjectCornerRadiusJSONPasteValue,
+  getSlideEditObjectCornerRadiusJSONPasteValueFromText,
+  getSlideEditObjectCornerRadiusJSONPasteValueFromValue,
   getSlideEditObjectCornerRadiusMetadata,
   getSlideEditObjectCornerRadiusPasteCommand,
   getSlideEditObjectCornerRadiusPreviewCSS,
@@ -18,6 +20,8 @@ import {
 } from './SlideEditObjectCornerRadius'
 import {
   getSlideEditObjectCornerRadiusJSONPasteValue as getSlideEditObjectCornerRadiusJSONPasteValueFromPackage,
+  getSlideEditObjectCornerRadiusJSONPasteValueFromText as getSlideEditObjectCornerRadiusJSONPasteValueFromTextFromPackage,
+  getSlideEditObjectCornerRadiusJSONPasteValueFromValue as getSlideEditObjectCornerRadiusJSONPasteValueFromValueFromPackage,
 } from './index'
 
 describe('SlideEditObjectCornerRadius', () => {
@@ -208,6 +212,31 @@ describe('SlideEditObjectCornerRadius', () => {
       }),
     })).toEqual({
       value: 0,
+    })
+  })
+
+  it('reads corner radius JSON from text and parsed values', () => {
+    expect(getSlideEditObjectCornerRadiusJSONPasteValueFromText(
+      '"18"',
+    )).toEqual({
+      value: 18,
+    })
+    expect(getSlideEditObjectCornerRadiusJSONPasteValueFromValue({
+      radius: '24.126',
+    })).toEqual({
+      value: 24.13,
+    })
+    expect(getSlideEditObjectCornerRadiusJSONPasteValueFromTextFromPackage(
+      '{"shapeCornerRadius":12.345}',
+      { mode: 'wrapped' },
+    )).toEqual({
+      value: 12.35,
+    })
+    expect(getSlideEditObjectCornerRadiusJSONPasteValueFromValueFromPackage(
+      { cornerRadius: { radius: 1200 } },
+      { mode: 'wrapped' },
+    )).toEqual({
+      value: 1000,
     })
   })
 
