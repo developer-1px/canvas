@@ -54,6 +54,16 @@ describe('CanvasKeyboardCommandShortcutIntent', () => {
     })
   })
 
+  it('maps F2 to edit selection through the command shortcut intent seam', () => {
+    expect(getCanvasKeyboardCommandShortcutIntent(createInput({
+      event: createKeyboardEvent({ code: 'F2', key: 'F2' }),
+      key: 'F2',
+    }))).toEqual({
+      kind: 'edit-selection',
+      preventDefault: true,
+    })
+  })
+
   it('maps sticky quick create before typing-target suppression', () => {
     expect(getCanvasKeyboardCommandShortcutIntent(createInput({
       event: createKeyboardEvent({ key: 'Enter', metaKey: true }),

@@ -24,6 +24,14 @@ describe('CanvasKeyboardCommandShortcuts', () => {
     })
 
     expect(getCanvasKeyboardBuiltinCommandShortcutIntent(createInput({
+      event: createKeyboardEvent({ code: 'F2', key: 'F2' }),
+      key: 'F2',
+    }))).toEqual({
+      kind: 'edit-selection',
+      preventDefault: true,
+    })
+
+    expect(getCanvasKeyboardBuiltinCommandShortcutIntent(createInput({
       event: createKeyboardEvent({ key: 'z', metaKey: true }),
       key: 'z',
       mod: true,
@@ -110,6 +118,39 @@ describe('CanvasKeyboardCommandShortcuts', () => {
       event: createKeyboardEvent({ key: 'Enter' }),
       key: 'enter',
       selection: ['a', 'b'],
+    }))).toEqual({
+      kind: 'none',
+      preventDefault: false,
+    })
+  })
+
+  it('does not edit selection when F2 has no single selected item or modifiers', () => {
+    expect(getCanvasKeyboardBuiltinCommandShortcutIntent(createInput({
+      event: createKeyboardEvent({ code: 'F2', key: 'F2' }),
+      key: 'F2',
+      selection: [],
+    }))).toEqual({
+      kind: 'none',
+      preventDefault: false,
+    })
+
+    expect(getCanvasKeyboardBuiltinCommandShortcutIntent(createInput({
+      event: createKeyboardEvent({ code: 'F2', key: 'F2' }),
+      key: 'F2',
+      selection: ['a', 'b'],
+    }))).toEqual({
+      kind: 'none',
+      preventDefault: false,
+    })
+
+    expect(getCanvasKeyboardBuiltinCommandShortcutIntent(createInput({
+      event: createKeyboardEvent({ code: 'F2', key: 'F2', shiftKey: true }),
+      key: 'F2',
+    }))).toBeNull()
+
+    expect(getCanvasKeyboardBuiltinCommandShortcutIntent(createInput({
+      event: createKeyboardEvent({ altKey: true, code: 'F2', key: 'F2' }),
+      key: 'F2',
     }))).toEqual({
       kind: 'none',
       preventDefault: false,
