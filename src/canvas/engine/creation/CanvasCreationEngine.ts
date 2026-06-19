@@ -79,6 +79,7 @@ export type CanvasCreatedRectBoundsInput = {
   defaultSize?: CanvasCreatedRectSize
   dragThreshold?: number
   preserveAspectRatio?: boolean
+  resizeFromCenter?: boolean
   startWorld: Point
 }
 
@@ -87,6 +88,18 @@ export type CanvasAspectLockedCreationPointInput = {
   startWorld: Point
 }
 
+export type CanvasCenterOutCreationPointsInput = {
+  currentWorld: Point
+  startWorld: Point
+}
+
+export type CanvasCenterOutCreationPoints = Readonly<{
+  current: Point
+  start: Point
+}>
+
+export const CANVAS_CENTER_OUT_CREATION_POINTS_MODEL =
+  'canvas-center-out-creation-points'
 export const CANVAS_CREATED_RECT_BOUNDS_MODEL = 'canvas-created-rect-bounds'
 
 const DEFAULT_RECT_SIZE = {
@@ -110,24 +123,40 @@ export function getCanvasCreatedRectBounds({
   defaultSize = DEFAULT_RECT_SIZE,
   dragThreshold = DEFAULT_RECT_DRAG_THRESHOLD,
   preserveAspectRatio = false,
+  resizeFromCenter = false,
   startWorld,
 }: CanvasCreatedRectBoundsInput): Bounds {
   const rawBounds = normalizeBounds(startWorld, currentWorld)
 
   if (rawBounds.w > dragThreshold && rawBounds.h > dragThreshold) {
-    return preserveAspectRatio
-      ? normalizeBounds(
+    const effectiveCurrent = preserveAspectRatio
+      ? getCanvasAspectLockedCreationPoint({ currentWorld, startWorld })
+      : currentWorld
+    const creationPoints = resizeFromCenter
+      ? getCanvasCenterOutCreationPoints({
+        currentWorld: effectiveCurrent,
         startWorld,
-        getCanvasAspectLockedCreationPoint({ currentWorld, startWorld }),
-      )
-      : rawBounds
+      })
+      : {
+          current: effectiveCurrent,
+          start: startWorld,
+        }
+
+    return normalizeBounds(creationPoints.start, creationPoints.current)
   }
 
-  return {
-    x: startWorld.x,
-    y: startWorld.y,
-    ...defaultSize,
-  }
+  return resizeFromCenter
+    ? {
+        h: defaultSize.h,
+        w: defaultSize.w,
+        x: startWorld.x - defaultSize.w / 2,
+        y: startWorld.y - defaultSize.h / 2,
+      }
+    : {
+        x: startWorld.x,
+        y: startWorld.y,
+        ...defaultSize,
+      }
 }
 
 export function getCanvasAspectLockedCreationPoint({
@@ -141,6 +170,22 @@ export function getCanvasAspectLockedCreationPoint({
   return {
     x: startWorld.x + getCanvasCreationDirectionSign(dx) * size,
     y: startWorld.y + getCanvasCreationDirectionSign(dy) * size,
+  }
+}
+
+export function getCanvasCenterOutCreationPoints({
+  currentWorld,
+  startWorld,
+}: CanvasCenterOutCreationPointsInput): CanvasCenterOutCreationPoints {
+  const dx = currentWorld.x - startWorld.x
+  const dy = currentWorld.y - startWorld.y
+
+  return {
+    current: currentWorld,
+    start: {
+      x: startWorld.x - dx,
+      y: startWorld.y - dy,
+    },
   }
 }
 
@@ -232,16 +277,25 @@ export function createCanvasShape<TItem extends CanvasCreationItem>({
   adapter,
   createId,
   currentWorld,
+  preserveAspectRatio = false,
+  resizeFromCenter = false,
   shapeType = 'rect',
   startWorld,
 }: {
   adapter: CanvasCreationAdapter<TItem>
   createId: (prefix: string) => string
   currentWorld: Point
+  preserveAspectRatio?: boolean
+  resizeFromCenter?: boolean
   shapeType?: CanvasCreatedShapeKind
   startWorld: Point
 }) {
-  const bounds = getCanvasCreatedRectBounds({ currentWorld, startWorld })
+  const bounds = getCanvasCreatedRectBounds({
+    currentWorld,
+    preserveAspectRatio,
+    resizeFromCenter,
+    startWorld,
+  })
 
   if (adapter.createShape) {
     return adapter.createShape({

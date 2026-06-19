@@ -7,6 +7,7 @@ import {
   createCanvasRect,
   createCanvasShape,
   getCanvasAspectLockedCreationPoint,
+  getCanvasCenterOutCreationPoints,
   getCanvasCreatedArrowEnd,
   getCanvasCreatedDrawingPoints,
   getCanvasCreatedPathSegments,
@@ -43,6 +44,7 @@ type CreatedItem =
       type: 'arrow'
     }
   | {
+      bounds?: { h: number; w: number; x: number; y: number }
       id: string
       shape?: 'diamond' | 'ellipse' | 'rect'
       shapeType?: 'diamond' | 'ellipse' | 'rect'
@@ -75,7 +77,12 @@ const adapter: CanvasCreationAdapter<CreatedItem> = {
     style,
     type: 'path',
   }),
-  createShape: ({ id, shapeType }) => ({ id, shapeType, type: 'shape' }),
+  createShape: ({ bounds, id, shapeType }) => ({
+    bounds,
+    id,
+    shapeType,
+    type: 'shape',
+  }),
   createText: ({ id }) => ({
     editValue: 'Text',
     item: { id, type: 'text' },
@@ -215,6 +222,12 @@ describe('CanvasCreationEngine drawing tools', () => {
         startWorld: { x: 10, y: 20 },
       }),
     ).toEqual({
+      bounds: {
+        h: 80,
+        w: 80,
+        x: 10,
+        y: 20,
+      },
       id: 'ellipse-1',
       shapeType: 'ellipse',
       type: 'shape',
@@ -288,6 +301,97 @@ describe('CanvasCreationEngine drawing tools', () => {
     })
   })
 
+  test('creates rect bounds from the pointer start as center', () => {
+    expect(
+      getCanvasCenterOutCreationPoints({
+        currentWorld: { x: 38, y: 29 },
+        startWorld: { x: 10, y: 20 },
+      }),
+    ).toEqual({
+      current: { x: 38, y: 29 },
+      start: { x: -18, y: 11 },
+    })
+
+    expect(
+      getCanvasCreatedRectBounds({
+        currentWorld: { x: 38, y: 29 },
+        resizeFromCenter: true,
+        startWorld: { x: 10, y: 20 },
+      }),
+    ).toEqual({
+      h: 18,
+      w: 56,
+      x: -18,
+      y: 11,
+    })
+
+    expect(
+      getCanvasCreatedRectBounds({
+        currentWorld: { x: 12, y: 21 },
+        resizeFromCenter: true,
+        startWorld: { x: 30, y: 40 },
+      }),
+    ).toEqual({
+      h: 38,
+      w: 36,
+      x: 12,
+      y: 21,
+    })
+  })
+
+  test('centers default rect bounds when center creation barely moves', () => {
+    expect(
+      getCanvasCreatedRectBounds({
+        currentWorld: { x: 12, y: 22 },
+        resizeFromCenter: true,
+        startWorld: { x: 10, y: 20 },
+      }),
+    ).toEqual({
+      h: 112,
+      w: 168,
+      x: -74,
+      y: -36,
+    })
+  })
+
+  test('combines aspect-locked and center-out rect creation', () => {
+    expect(
+      getCanvasCreatedRectBounds({
+        currentWorld: { x: 38, y: 29 },
+        preserveAspectRatio: true,
+        resizeFromCenter: true,
+        startWorld: { x: 10, y: 20 },
+      }),
+    ).toEqual({
+      h: 56,
+      w: 56,
+      x: -18,
+      y: -8,
+    })
+
+    expect(
+      createCanvasShape({
+        adapter,
+        createId: (prefix) => `${prefix}-1`,
+        currentWorld: { x: 38, y: 29 },
+        preserveAspectRatio: true,
+        resizeFromCenter: true,
+        shapeType: 'ellipse',
+        startWorld: { x: 10, y: 20 },
+      }),
+    ).toEqual({
+      bounds: {
+        h: 56,
+        w: 56,
+        x: -18,
+        y: -8,
+      },
+      id: 'ellipse-1',
+      shapeType: 'ellipse',
+      type: 'shape',
+    })
+  })
+
   test('accepts host-provided default rect size and drag threshold', () => {
     expect(
       getCanvasCreatedRectBounds({
@@ -338,6 +442,12 @@ describe('CanvasCreationEngine drawing tools', () => {
         startWorld: { x: 10, y: 20 },
       }),
     ).toEqual({
+      bounds: {
+        h: 80,
+        w: 80,
+        x: 10,
+        y: 20,
+      },
       id: 'diamond-1',
       shapeType: 'diamond',
       type: 'shape',
