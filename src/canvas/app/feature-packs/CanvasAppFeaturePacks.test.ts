@@ -33,12 +33,14 @@ import {
 } from './CanvasAppFeaturePackManifests'
 import {
   applyCanvasAppFeaturePackRuntimeStatePatch,
+  getCanvasAppFeatureFlagRuntimeStateInputs,
   createCanvasAppFeaturePack,
   createCanvasAppFeaturePackExtensionBundle,
   getCanvasAppEnabledFeaturePackIds,
   getCanvasAppInstalledFeaturePackIds,
   getCanvasAppInstalledFeaturePacks,
   getCanvasAppResolvedFeaturePackStates,
+  setCanvasAppFeatureFlagSetting,
 } from './CanvasAppFeaturePacks'
 import {
   CANVAS_APP_CORE_ONLY_FEATURE_PACK_PROFILE,
@@ -233,6 +235,147 @@ describe('CanvasAppFeaturePacks', () => {
         ],
       }),
     ).toThrow('Unknown canvas app feature pack state: missing-pack')
+  })
+
+  it('resolves feature flag settings as runtime on/off states', () => {
+    const packs = [
+      createCanvasAppFeaturePack({
+        extensionBundle: createCanvasAppExtensionBundle({
+          customCommands: [createCommand('publish')],
+        }),
+        id: 'publish-pack',
+        label: 'Publish pack',
+      }),
+      createCanvasAppFeaturePack({
+        extensionBundle: createCanvasAppExtensionBundle({
+          customCommands: [createCommand('archive')],
+        }),
+        id: 'archive-pack',
+        label: 'Archive pack',
+      }),
+    ]
+    const packIds = packs.map((pack) => pack.id)
+
+    expect(getCanvasAppFeatureFlagRuntimeStateInputs([
+      {
+        enabled: false,
+        id: 'publish-pack',
+      },
+      {
+        enabled: true,
+        id: 'archive-pack',
+      },
+    ])).toEqual([
+      {
+        id: 'publish-pack',
+        status: 'disabled',
+      },
+      {
+        id: 'archive-pack',
+        status: 'enabled',
+      },
+    ])
+    expect(getCanvasAppResolvedFeaturePackStates(packIds, {
+      featureFlagSettings: [
+        {
+          enabled: false,
+          id: 'publish-pack',
+        },
+      ],
+    })).toEqual([
+      {
+        enabled: false,
+        id: 'publish-pack',
+        installed: true,
+        status: 'disabled',
+      },
+      {
+        enabled: true,
+        id: 'archive-pack',
+        installed: true,
+        status: 'enabled',
+      },
+    ])
+    expect(getCanvasAppEnabledFeaturePackIds(packIds, {
+      featureFlagSettings: [
+        {
+          enabled: false,
+          id: 'publish-pack',
+        },
+      ],
+    })).toEqual(['archive-pack'])
+    expect(createCanvasAppFeaturePackExtensionBundle(packs, {
+      featureFlagSettings: [
+        {
+          enabled: false,
+          id: 'publish-pack',
+        },
+      ],
+    }).customCommands.map((command) => command.id)).toEqual(['archive'])
+    expect(getCanvasAppResolvedFeaturePackStates(packIds, {
+      featureFlagSettings: [
+        {
+          enabled: false,
+          id: 'publish-pack',
+        },
+      ],
+      featurePackStates: [
+        {
+          id: 'publish-pack',
+          status: 'enabled',
+        },
+      ],
+    })[0]).toMatchObject({
+      enabled: true,
+      id: 'publish-pack',
+      status: 'enabled',
+    })
+  })
+
+  it('updates feature flag settings by feature pack id', () => {
+    const settings = setCanvasAppFeatureFlagSetting([
+      {
+        enabled: true,
+        id: 'publish-pack',
+      },
+      {
+        enabled: true,
+        id: 'archive-pack',
+      },
+    ], {
+      enabled: false,
+      id: 'publish-pack',
+    })
+
+    expect(settings).toEqual([
+      {
+        enabled: false,
+        id: 'publish-pack',
+      },
+      {
+        enabled: true,
+        id: 'archive-pack',
+      },
+    ])
+    expect(Object.isFrozen(settings)).toBe(true)
+    expect(Object.isFrozen(settings[0])).toBe(true)
+    expect(setCanvasAppFeatureFlagSetting(settings, {
+      enabled: false,
+      id: 'export-pack',
+    })).toEqual([
+      {
+        enabled: false,
+        id: 'publish-pack',
+      },
+      {
+        enabled: true,
+        id: 'archive-pack',
+      },
+      {
+        enabled: false,
+        id: 'export-pack',
+      },
+    ])
   })
 
   it('applies feature pack runtime state patches to canonical options', () => {

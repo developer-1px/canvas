@@ -14,6 +14,16 @@ describe('CanvasDevToolsDemoApp', () => {
       'component-sync': true,
     })
     expect(getCanvasEngineDemoFeaturePackSwitchState({
+      featureFlagSettings: [{
+        enabled: false,
+        id: 'component-sync',
+      }],
+    })).toEqual({
+      'component-inspector': true,
+      'component-source-outline': true,
+      'component-sync': false,
+    })
+    expect(getCanvasEngineDemoFeaturePackSwitchState({
       featurePackStates: [{
         id: 'component-source-outline',
         status: 'disabled',
@@ -72,7 +82,7 @@ describe('CanvasDevToolsDemoApp', () => {
     ])
   })
 
-  it('applies engine feature pack switches through marketplace target source transactions', async () => {
+  it('applies engine feature pack switches through feature flag settings', async () => {
     const source = createCanvasEngineDemoFeaturePackAssemblySource()
     const result = await applyCanvasEngineDemoFeaturePackSwitchToAssemblySource({
       enabled: false,
@@ -86,12 +96,37 @@ describe('CanvasDevToolsDemoApp', () => {
       featurePackId: 'component-source-outline',
       status: 'applied',
     })
+    expect(result.source.assemblyInput?.featureFlagSettings).toEqual([{
+      enabled: false,
+      id: 'component-source-outline',
+    }])
     expect(result.source.assemblyInput?.featurePackStates?.find((state) =>
       state.id === 'component-source-outline'
-    )).toEqual({
-      id: 'component-source-outline',
-      status: 'disabled',
+    )).toBeUndefined()
+    expect(getCanvasEngineDemoFeaturePackSwitchState(
+      result.source.assemblyInput,
+    )['component-source-outline']).toBe(false)
+  })
+
+  it('lets feature flag switch settings override existing source state for the same pack', async () => {
+    const source = createCanvasEngineDemoFeaturePackAssemblySource({
+      featurePackStates: [{
+        id: 'component-source-outline',
+        status: 'enabled',
+      }],
     })
+    const result = await applyCanvasEngineDemoFeaturePackSwitchToAssemblySource({
+      enabled: false,
+      featurePackId: 'component-source-outline',
+      source,
+    })
+
+    expect(result.applied).toBe(true)
+    expect(result.source.assemblyInput?.featureFlagSettings).toEqual([{
+      enabled: false,
+      id: 'component-source-outline',
+    }])
+    expect(result.source.assemblyInput?.featurePackStates).toEqual([])
     expect(getCanvasEngineDemoFeaturePackSwitchState(
       result.source.assemblyInput,
     )['component-source-outline']).toBe(false)

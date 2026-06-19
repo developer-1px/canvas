@@ -95,6 +95,49 @@ describe('CanvasAppFeaturePackMarketplaceAssembly', () => {
     expect(Object.isFrozen(model.assemblyInput)).toBe(true)
   })
 
+  it('normalizes feature flag settings into marketplace runtime states', () => {
+    const baseManifest = createCanvasAppFeaturePackManifest({
+      id: 'base-pack',
+      label: 'Base pack',
+    })
+    const addonManifest = createCanvasAppFeaturePackManifest({
+      id: 'addon-pack',
+      label: 'Addon pack',
+    })
+    const model = getCanvasAppFeaturePackMarketplaceAssemblyModel({
+      assemblyInput: {
+        featureFlagSettings: [
+          {
+            enabled: false,
+            id: 'base-pack',
+          },
+        ],
+        featurePackManifests: [baseManifest, addonManifest],
+      },
+      profiles: [],
+      suiteManifests: [],
+    })
+
+    expect(model.installOptions).toEqual({
+      featurePackStates: [
+        {
+          id: 'base-pack',
+          status: 'disabled',
+        },
+        {
+          id: 'addon-pack',
+          status: 'enabled',
+        },
+      ],
+    })
+    expect('featureFlagSettings' in model.assemblyInput).toBe(false)
+    expect(model.assemblyInput.featurePackStates).toEqual(
+      model.installOptions.featurePackStates,
+    )
+    expect(model.marketplaceModel.packs.items.map((item) => item.status))
+      .toEqual(['disabled', 'enabled'])
+  })
+
   it('applies pack marketplace actions from the assembly model', () => {
     const baseManifest = createCanvasAppFeaturePackManifest({
       id: 'base-pack',

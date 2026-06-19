@@ -17,6 +17,7 @@ import {
   getCanvasAppFeaturePackMarketplacePrimaryAction,
   getCanvasAppFeaturePackMarketplaceTargetItem,
   getCanvasAppResolvedFeaturePackStates,
+  getCanvasAppFeatureFlagRuntimeStateInputs,
   type CanvasAppFeaturePackProfile,
   type CanvasAppFeaturePackProfileId,
   type CanvasAppFeaturePackId,
@@ -52,6 +53,9 @@ export type CanvasAppFeaturePackAssemblyInput = {
   ]
   disabledViewFeaturePackIds?: CanvasAppFeaturePackInstallOptions[
     'disabledFeaturePackIds'
+  ]
+  featureFlagSettings?: CanvasAppFeaturePackInstallOptions[
+    'featureFlagSettings'
   ]
   featurePackStates?: CanvasAppFeaturePackInstallOptions['featurePackStates']
   featurePackManifests?: readonly CanvasAppFeaturePackManifest[]
@@ -1160,6 +1164,7 @@ export function createCanvasAppFeaturePackAssembly(
     input.featurePackManifests ||
     input.additionalFeaturePackManifests ||
     input.disabledFeaturePackIds ||
+    input.featureFlagSettings ||
     input.featurePackProfile ||
     input.featurePackProfileId ||
     input.featurePackStates
@@ -2548,6 +2553,7 @@ function getCanvasAppFeaturePackMarketplaceCanonicalAssemblyInput({
   }
 
   delete canonicalAssemblyInput.disabledFeaturePackIds
+  delete canonicalAssemblyInput.featureFlagSettings
   delete canonicalAssemblyInput.featurePackProfile
   delete canonicalAssemblyInput.featurePackProfileId
 
@@ -2617,6 +2623,7 @@ function getCanvasAppAssemblyFeaturePackInstallOptions(
   if (!profile) {
     return {
       disabledFeaturePackIds: input.disabledFeaturePackIds,
+      featureFlagSettings: input.featureFlagSettings,
       featurePackStates: input.featurePackStates,
     }
   }
@@ -2631,6 +2638,7 @@ function getCanvasAppAssemblyFeaturePackInstallOptions(
         id,
         status: 'uninstalled' as const,
       })),
+      ...getCanvasAppFeatureFlagRuntimeStateInputs(input.featureFlagSettings),
       ...(input.featurePackStates ?? []),
     ],
   }

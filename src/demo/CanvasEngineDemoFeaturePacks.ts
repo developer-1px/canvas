@@ -5,11 +5,11 @@ import type {
   CanvasAppFeaturePackMarketplaceTarget,
 } from '../canvas'
 import {
-  executeCanvasAppAssemblySourceFeaturePackMarketplaceSelectionTargetControlApplyTransaction,
   getCanvasAppFeaturePackMarketplaceAssemblyModel,
   getCanvasAppFeaturePackMarketplaceSelectionControlModel,
   getCanvasAppFeaturePackMarketplaceSelectionTargetControl,
   getCanvasAppFeaturePackMarketplaceTargetControl,
+  setCanvasAppFeatureFlagSetting,
 } from '../canvas'
 
 export type EngineDemoFeaturePackSwitchId =
@@ -145,23 +145,42 @@ export async function applyCanvasEngineDemoFeaturePackSwitchToAssemblySource({
     })
   }
 
-  const result =
-    await executeCanvasAppAssemblySourceFeaturePackMarketplaceSelectionTargetControlApplyTransaction(
+  if (currentControl.disabled) {
+    return Object.freeze({
+      applied: false,
+      enabled,
+      featurePackId,
+      source: currentSource,
+      status: 'held',
+    })
+  }
+
+  const sourceAssemblyInput = currentSource.assemblyInput ?? {}
+  const nextAssemblyInput: CanvasAppAssemblyInput = {
+    ...sourceAssemblyInput,
+    featureFlagSettings: setCanvasAppFeatureFlagSetting(
+      sourceAssemblyInput.featureFlagSettings,
       {
-        executeCleanupEffect: () => undefined,
-        model,
-        selection,
-        source: currentSource,
-        target,
+        enabled,
+        id: featurePackId,
       },
-    )
+    ),
+  }
+
+  if (sourceAssemblyInput.featurePackStates) {
+    nextAssemblyInput.featurePackStates = sourceAssemblyInput.featurePackStates
+      .filter((state) => state.id !== featurePackId)
+  }
+
+  const nextSource =
+    createCanvasEngineDemoFeaturePackAssemblySource(nextAssemblyInput)
 
   return Object.freeze({
-    applied: result.applied,
+    applied: true,
     enabled,
     featurePackId,
-    source: result.source,
-    status: result.status,
+    source: nextSource,
+    status: 'applied',
   })
 }
 

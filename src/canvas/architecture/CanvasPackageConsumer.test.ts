@@ -255,6 +255,7 @@ import {
   getCanvasAppFeaturePackMarketplaceListingMap,
   getCanvasAppFeaturePackSuiteMarketplaceListingMap,
   getCanvasAppFeaturePackPartialUpdatePlan,
+  getCanvasAppFeatureFlagRuntimeStateInputs,
   getCanvasAppFeaturePackStateTransitionPlan,
   getCanvasAppFeaturePackSuiteFeaturePackIds,
   getCanvasAppManifestViewFeaturePacks,
@@ -270,6 +271,7 @@ import {
   readCanvasStoryImportDataTransfer,
   runCanvasStoryImportDataTransferHostStateImport,
   syncCanvasComponentItemsChange,
+  setCanvasAppFeatureFlagSetting,
   transformCanvasAppItemsChange,
   commitCanvasAppHostItemsChange,
   createCanvasAppHostItemsChangeCommitter,
@@ -467,6 +469,7 @@ import {
   type CanvasAppFeaturePackSuiteMarketplaceListing,
   type CanvasAppFeaturePackCatalog,
   type CanvasAppFeaturePackCatalogItem,
+  type CanvasAppFeatureFlagSettingInput,
   type CanvasAppFeaturePackInstallPlan,
   type CanvasAppFeaturePackInstallPlanInput,
   type CanvasAppFeaturePackPartialUpdatePlan,
@@ -1486,11 +1489,24 @@ describe('Canvas package consumer imports', () => {
     const disabledFeaturePackStates:
       readonly CanvasAppFeaturePackRuntimeState[] =
         getCanvasAppResolvedFeaturePackStates(['smoke-pack'], {
-          featurePackStates: [{
+          featureFlagSettings: [{
+            enabled: false,
             id: 'smoke-pack',
-            status: 'disabled',
           }],
         })
+    const featureFlagSetting: CanvasAppFeatureFlagSettingInput = {
+      enabled: true,
+      id: 'smoke-pack',
+    }
+    const featureFlagSettings = setCanvasAppFeatureFlagSetting(
+      [{
+        enabled: false,
+        id: 'smoke-pack',
+      }],
+      featureFlagSetting,
+    )
+    const featureFlagStates =
+      getCanvasAppFeatureFlagRuntimeStateInputs(featureFlagSettings)
     const runtimeStatePatch: CanvasAppFeaturePackRuntimeStatePatch =
       applyCanvasAppFeaturePackRuntimeStatePatch({
         featurePackIds: ['smoke-pack'],
@@ -2679,6 +2695,10 @@ describe('Canvas package consumer imports', () => {
       id: 'smoke-pack',
       installed: true,
       status: 'disabled',
+    }])
+    expect(featureFlagStates).toEqual([{
+      id: 'smoke-pack',
+      status: 'enabled',
     }])
     expect(runtimeStatePatch.changedFeaturePackIds).toEqual(['smoke-pack'])
     expect(runtimeStatePatch.options).toEqual({
@@ -6656,6 +6676,12 @@ describe('Canvas package consumer imports', () => {
       .toBeTypeOf('function')
     expect(CanvasPackage.getCanvasAppFeaturePackPartialUpdatePlan)
       .toBeTypeOf('function')
+    expect(CanvasAppAuthoring.getCanvasAppFeatureFlagRuntimeStateInputs)
+      .toBeTypeOf('function')
+    expect(CanvasAppFacade.getCanvasAppFeatureFlagRuntimeStateInputs)
+      .toBeTypeOf('function')
+    expect(CanvasPackage.getCanvasAppFeatureFlagRuntimeStateInputs)
+      .toBeTypeOf('function')
     expect(CanvasAppAuthoring.getCanvasAppFeaturePackStateTransitionPlan)
       .toBeTypeOf('function')
     expect(CanvasAppFacade.getCanvasAppFeaturePackStateTransitionPlan)
@@ -6667,6 +6693,12 @@ describe('Canvas package consumer imports', () => {
     expect(CanvasAppFacade.applyCanvasAppFeaturePackRuntimeStatePatch)
       .toBeTypeOf('function')
     expect(CanvasPackage.applyCanvasAppFeaturePackRuntimeStatePatch)
+      .toBeTypeOf('function')
+    expect(CanvasAppAuthoring.setCanvasAppFeatureFlagSetting)
+      .toBeTypeOf('function')
+    expect(CanvasAppFacade.setCanvasAppFeatureFlagSetting)
+      .toBeTypeOf('function')
+    expect(CanvasPackage.setCanvasAppFeatureFlagSetting)
       .toBeTypeOf('function')
     expect(CanvasAppAuthoring.createCanvasAppAiLabsFeaturePackManifest)
       .toBeTypeOf('function')
