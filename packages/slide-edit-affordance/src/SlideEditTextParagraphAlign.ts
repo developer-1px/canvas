@@ -280,7 +280,7 @@ export function getSlideEditTextParagraphAlignJSONPasteValue({
 export function getSlideEditTextParagraphAlignJSONPasteValueFromText(
   text: string,
   options?: SlideEditTextParagraphAlignJSONPasteValueOptions,
-) {
+): SlideEditTextParagraphAlignValue | null {
   return getSlideEditTextParagraphAlignJSONPasteValueFromValue(
     parseSlideEditTextParagraphAlignJSON(text),
     options,

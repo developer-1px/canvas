@@ -137,7 +137,9 @@ export type SlideEditTextAutoFitJSONPasteInput = {
   jsonMimeType?: string
 }
 
-export type SlideEditTextAutoFitJSONPasteValueMode = 'direct' | 'wrapped'
+export type SlideEditTextAutoFitJSONPasteValueMode =
+  | 'direct'
+  | 'wrapped'
 
 export type SlideEditTextAutoFitJSONPasteValueOptions = {
   mode?: SlideEditTextAutoFitJSONPasteValueMode
@@ -378,7 +380,7 @@ export function getSlideEditTextAutoFitJSONPasteValue({
 export function getSlideEditTextAutoFitJSONPasteValueFromText(
   text: string,
   options?: SlideEditTextAutoFitJSONPasteValueOptions,
-) {
+): SlideEditTextAutoFitJSONPasteValue | null {
   return getSlideEditTextAutoFitJSONPasteValueFromValue(
     parseSlideEditTextAutoFitJSON(text),
     options,
