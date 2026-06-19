@@ -537,7 +537,9 @@ import {
   type CanvasMenuRovingKeyboardIntentInput,
   type CanvasMenuTriggerKeyboardIntentInput,
   type RunCanvasMenuRovingKeyboardIntentInput,
+  type CanvasToolbarOrientation,
   type CanvasToolbarRovingActiveIndexInput,
+  type CanvasToolbarRovingFocusOptions,
   type CanvasToolbarRovingKeyboardIntentInput,
   type RunCanvasToolbarRovingKeyboardIntentInput,
   type CanvasModalBackdropPointerIntentInput,
@@ -4434,6 +4436,17 @@ describe('Canvas package consumer imports', () => {
         currentIndex: 0,
         key: 'ArrowRight',
       }
+    const toolbarOrientation: CanvasToolbarOrientation = 'vertical'
+    const toolbarRovingFocusOptions: CanvasToolbarRovingFocusOptions = {
+      orientation: toolbarOrientation,
+    }
+    const toolbarVerticalRovingKeyboardInput:
+      CanvasToolbarRovingKeyboardIntentInput = {
+        count: 4,
+        currentIndex: 0,
+        key: 'ArrowDown',
+        orientation: toolbarRovingFocusOptions.orientation,
+      }
     let toolbarRovingPreventDefaultCount = 0
     let toolbarRovingStopPropagationCount = 0
     let toolbarRovingFocusedIndex: number | null = null
@@ -5317,6 +5330,13 @@ describe('Canvas package consumer imports', () => {
     expect(CanvasAppFacade.getCanvasToolbarRovingKeyIndex(
       toolbarRovingKeyboardInput,
     )).toBe(1)
+    expect(getCanvasToolbarRovingKeyIndex(
+      toolbarVerticalRovingKeyboardInput,
+    )).toBe(1)
+    expect(CanvasAppFacade.getCanvasToolbarRovingKeyIndex({
+      ...toolbarVerticalRovingKeyboardInput,
+      key: 'ArrowRight',
+    })).toBeNull()
     expect(getCanvasToolbarRovingKeyboardIntent(toolbarRovingKeyboardInput))
       .toEqual({
         kind: 'move-focus',
@@ -5324,6 +5344,14 @@ describe('Canvas package consumer imports', () => {
         preventDefault: true,
         stopPropagation: true,
       })
+    expect(getCanvasToolbarRovingKeyboardIntent(
+      toolbarVerticalRovingKeyboardInput,
+    )).toEqual({
+      kind: 'move-focus',
+      nextIndex: 1,
+      preventDefault: true,
+      stopPropagation: true,
+    })
     expect(CanvasAppFacade.getCanvasToolbarRovingKeyboardIntent(
       toolbarRovingKeyboardInput,
     )).toEqual({

@@ -64,6 +64,33 @@ describe('CanvasToolbarRovingFocus', () => {
     })).toBeNull()
   })
 
+  it('maps roving toolbar arrow keys by orientation', () => {
+    expect(getCanvasToolbarRovingKeyIndex({
+      count: 3,
+      currentIndex: 0,
+      key: 'ArrowRight',
+      orientation: 'horizontal',
+    })).toBe(1)
+    expect(getCanvasToolbarRovingKeyIndex({
+      count: 3,
+      currentIndex: 0,
+      key: 'ArrowDown',
+      orientation: 'horizontal',
+    })).toBeNull()
+    expect(getCanvasToolbarRovingKeyIndex({
+      count: 3,
+      currentIndex: 0,
+      key: 'ArrowDown',
+      orientation: 'vertical',
+    })).toBe(1)
+    expect(getCanvasToolbarRovingKeyIndex({
+      count: 3,
+      currentIndex: 0,
+      key: 'ArrowRight',
+      orientation: 'vertical',
+    })).toBeNull()
+  })
+
   it('returns a move-focus intent for toolbar navigation keys', () => {
     expect(getCanvasToolbarRovingKeyboardIntent({
       count: 3,
@@ -74,6 +101,19 @@ describe('CanvasToolbarRovingFocus', () => {
       nextIndex: 1,
       preventDefault: true,
       stopPropagation: true,
+    })
+  })
+
+  it('does not consume arrows outside the toolbar orientation', () => {
+    expect(getCanvasToolbarRovingKeyboardIntent({
+      count: 3,
+      currentIndex: 0,
+      key: 'ArrowRight',
+      orientation: 'vertical',
+    })).toEqual({
+      kind: 'none',
+      preventDefault: false,
+      stopPropagation: false,
     })
   })
 

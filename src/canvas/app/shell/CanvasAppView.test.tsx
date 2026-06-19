@@ -76,6 +76,20 @@ describe('CanvasAppView', () => {
     expect(markup).toContain('zoom-controls')
   })
 
+  it('describes command surface orientation for assistive tech', () => {
+    const markup = renderToStaticMarkup(<CanvasAppView {...createViewProps()} />)
+    const toolbarTag = markup.match(/<div class="toolbar"[^>]*>/)?.[0] ?? ''
+    const selectionFloatingBarTag =
+      markup.match(/<div class="selection-floating-bar"[^>]*>/)?.[0] ?? ''
+
+    expect(toolbarTag).toContain('role="toolbar"')
+    expect(toolbarTag).toContain('aria-label="Tools"')
+    expect(toolbarTag).toContain('aria-orientation="vertical"')
+    expect(selectionFloatingBarTag).toContain('role="toolbar"')
+    expect(selectionFloatingBarTag)
+      .toContain('aria-orientation="horizontal"')
+  })
+
   it('keeps selection floating bar placement in CSS while injecting anchor variables', () => {
     const markup = renderToStaticMarkup(<CanvasAppView {...createViewProps()} />)
     const selectionFloatingBarTag =

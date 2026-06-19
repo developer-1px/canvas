@@ -7,7 +7,10 @@ import {
   renderCanvasToolbarItem,
   type CanvasToolbarItemRenderContext,
 } from './CanvasToolbarItemRenderer'
-import { useCanvasToolbarRovingFocus } from './CanvasToolbarRovingFocus'
+import {
+  type CanvasToolbarOrientation,
+  useCanvasToolbarRovingFocus,
+} from './CanvasToolbarRovingFocus'
 import type { CanvasToolbarGroup } from './CanvasToolbarItems'
 
 type CanvasCommandSurfaceProps = {
@@ -17,6 +20,7 @@ type CanvasCommandSurfaceProps = {
   dataPlacement?: string
   groups: readonly CanvasToolbarGroup[]
   onClick?: () => void
+  orientation?: Extract<CanvasToolbarOrientation, 'horizontal' | 'vertical'>
   style?: CSSProperties
 }
 
@@ -27,9 +31,12 @@ export function CanvasCommandSurface({
   dataPlacement,
   groups,
   onClick,
+  orientation = 'horizontal',
   style,
 }: CanvasCommandSurfaceProps) {
-  const toolbarRovingFocus = useCanvasToolbarRovingFocus<HTMLDivElement>()
+  const toolbarRovingFocus = useCanvasToolbarRovingFocus<HTMLDivElement>({
+    orientation,
+  })
 
   if (groups.length === 0) {
     return null
@@ -41,6 +48,7 @@ export function CanvasCommandSurface({
       className={className}
       role="toolbar"
       aria-label={ariaLabel}
+      aria-orientation={orientation}
       data-placement={dataPlacement}
       onClick={onClick}
       style={style}

@@ -17,6 +17,8 @@ export const CANVAS_TOOLBAR_KEYBOARD_MODEL = 'arrow-home-end'
 
 const CANVAS_TOOLBAR_ITEM_SELECTOR = '[data-canvas-toolbar-item]'
 
+export type CanvasToolbarOrientation = 'both' | 'horizontal' | 'vertical'
+
 type CanvasToolbarRovingItem = HTMLElement & {
   disabled?: boolean
 }
@@ -31,6 +33,7 @@ export type CanvasToolbarRovingKeyIndexInput = {
   count: number
   currentIndex: number
   key: string
+  orientation?: CanvasToolbarOrientation
 }
 
 export type CanvasToolbarRovingKeyboardIntentInput =
@@ -60,11 +63,18 @@ export type RunCanvasToolbarRovingKeyboardIntentInput = {
   currentIndex: number
   event: CanvasToolbarRovingKeyboardEvent
   onMoveFocus: (nextIndex: number) => void
+  orientation?: CanvasToolbarOrientation
+}
+
+export type CanvasToolbarRovingFocusOptions = {
+  orientation?: CanvasToolbarOrientation
 }
 
 export function useCanvasToolbarRovingFocus<
   TElement extends HTMLElement = HTMLElement,
->() {
+>({
+  orientation = 'both',
+}: CanvasToolbarRovingFocusOptions = {}) {
   const rootRef = useRef<TElement | null>(null)
   const activeIndexRef = useRef(0)
 
@@ -131,8 +141,9 @@ export function useCanvasToolbarRovingFocus<
       currentIndex,
       event,
       onMoveFocus: focusItem,
+      orientation,
     })
-  }, [focusItem, syncItems])
+  }, [focusItem, orientation, syncItems])
 
   return {
     ref: setRoot,
@@ -173,16 +184,17 @@ export function getCanvasToolbarRovingKeyIndex({
   count,
   currentIndex,
   key,
+  orientation = 'both',
 }: CanvasToolbarRovingKeyIndexInput) {
   if (count === 0 || currentIndex < 0) {
     return null
   }
 
-  if (key === 'ArrowRight' || key === 'ArrowDown') {
+  if (isCanvasToolbarForwardKey({ key, orientation })) {
     return (currentIndex + 1) % count
   }
 
-  if (key === 'ArrowLeft' || key === 'ArrowUp') {
+  if (isCanvasToolbarBackwardKey({ key, orientation })) {
     return (currentIndex - 1 + count) % count
   }
 
@@ -201,11 +213,13 @@ export function getCanvasToolbarRovingKeyboardIntent({
   count,
   currentIndex,
   key,
+  orientation,
 }: CanvasToolbarRovingKeyboardIntentInput): CanvasToolbarRovingKeyboardIntent {
   const nextIndex = getCanvasToolbarRovingKeyIndex({
     count,
     currentIndex,
     key,
+    orientation,
   })
 
   if (nextIndex === null) {
@@ -229,11 +243,13 @@ export function runCanvasToolbarRovingKeyboardIntent({
   currentIndex,
   event,
   onMoveFocus,
+  orientation,
 }: RunCanvasToolbarRovingKeyboardIntentInput) {
   const intent = getCanvasToolbarRovingKeyboardIntent({
     count,
     currentIndex,
     key: event.key,
+    orientation,
   })
 
   if (intent.kind === 'none') {
@@ -249,4 +265,40 @@ export function runCanvasToolbarRovingKeyboardIntent({
 
   onMoveFocus(intent.nextIndex)
   return true
+}
+
+function isCanvasToolbarForwardKey({
+  key,
+  orientation,
+}: {
+  key: string
+  orientation: CanvasToolbarOrientation
+}) {
+  if (orientation === 'horizontal') {
+    return key === 'ArrowRight'
+  }
+
+  if (orientation === 'vertical') {
+    return key === 'ArrowDown'
+  }
+
+  return key === 'ArrowRight' || key === 'ArrowDown'
+}
+
+function isCanvasToolbarBackwardKey({
+  key,
+  orientation,
+}: {
+  key: string
+  orientation: CanvasToolbarOrientation
+}) {
+  if (orientation === 'horizontal') {
+    return key === 'ArrowLeft'
+  }
+
+  if (orientation === 'vertical') {
+    return key === 'ArrowUp'
+  }
+
+  return key === 'ArrowLeft' || key === 'ArrowUp'
 }

@@ -39,6 +39,7 @@ export function CanvasToolbar(props: CanvasToolbarProps) {
       className="toolbar"
       context={renderContext}
       groups={groups}
+      orientation="vertical"
     />
   )
 }

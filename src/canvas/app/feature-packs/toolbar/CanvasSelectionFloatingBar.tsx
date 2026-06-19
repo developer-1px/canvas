@@ -71,6 +71,7 @@ export function CanvasSelectionFloatingBar({
       }}
       groups={groups}
       dataPlacement={anchorSurface?.attributes['data-placement']}
+      orientation="horizontal"
       style={anchorStyle as CSSProperties}
     />
   )
