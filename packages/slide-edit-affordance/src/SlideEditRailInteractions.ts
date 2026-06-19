@@ -70,6 +70,8 @@ export const SLIDE_EDIT_RAIL_COMMANDS = Object.freeze([
 
 export const SLIDE_EDIT_RAIL_KEYBOARD_KEYS =
   'ArrowUp ArrowDown Home End Enter Space'
+export const SLIDE_EDIT_RAIL_REORDER_KEYBOARD_SHORTCUT_KEYS =
+  'Cmd/Ctrl+Up Cmd/Ctrl+Down Cmd/Ctrl+Shift+Up Cmd/Ctrl+Shift+Down'
 
 export type SlideEditRailCommand<
   TSlideId extends SlideEditRailSlideId = SlideEditRailSlideId,
@@ -135,6 +137,12 @@ export type SlideEditRailKeyboardIntent<
     type: 'move-active'
   }
   | {
+    activeSlideId: TSlideId | null
+    boundary: 'first' | 'last'
+    slideOrder: readonly TSlideId[]
+    type: 'move-active-to-boundary'
+  }
+  | {
     boundary: 'first' | 'last'
     slideOrder: readonly TSlideId[]
     type: 'select-boundary'
@@ -153,6 +161,17 @@ export type SlideEditRailListboxKeyboardKey =
   | 'End'
   | 'Enter'
   | 'Home'
+
+export type SlideEditRailReorderKeyboardShortcutIntentInput<
+  TSlideId extends SlideEditRailSlideId = SlideEditRailSlideId,
+> = {
+  activeSlideId: TSlideId | null
+  altKey: boolean
+  key: string
+  mod: boolean
+  shiftKey: boolean
+  slideOrder: readonly TSlideId[]
+}
 
 export type SlideEditRailPointerIntent<
   TSlideId extends SlideEditRailSlideId = SlideEditRailSlideId,
@@ -309,6 +328,56 @@ export function getSlideEditRailListboxKeyboardIntent<
   return null
 }
 
+export function getSlideEditRailReorderKeyboardShortcutIntent<
+  TSlideId extends SlideEditRailSlideId,
+>({
+  activeSlideId,
+  altKey,
+  key,
+  mod,
+  shiftKey,
+  slideOrder,
+}: SlideEditRailReorderKeyboardShortcutIntentInput<TSlideId>):
+  SlideEditRailKeyboardIntent<TSlideId> | null {
+  if (!mod || altKey) {
+    return null
+  }
+
+  if (key === 'ArrowUp') {
+    return shiftKey
+      ? {
+          activeSlideId,
+          boundary: 'first',
+          slideOrder,
+          type: 'move-active-to-boundary',
+        }
+      : {
+          activeSlideId,
+          direction: 'previous',
+          slideOrder,
+          type: 'move-active',
+        }
+  }
+
+  if (key === 'ArrowDown') {
+    return shiftKey
+      ? {
+          activeSlideId,
+          boundary: 'last',
+          slideOrder,
+          type: 'move-active-to-boundary',
+        }
+      : {
+          activeSlideId,
+          direction: 'next',
+          slideOrder,
+          type: 'move-active',
+        }
+  }
+
+  return null
+}
+
 export function getSlideEditRailKeyboardCommandEffect<
   TSlideId extends SlideEditRailSlideId,
 >(
@@ -343,6 +412,8 @@ export function getSlideEditRailKeyboardCommandEffect<
         : null
     case 'move-active':
       return getSlideEditRailMoveActiveEffect(intent)
+    case 'move-active-to-boundary':
+      return getSlideEditRailMoveActiveToBoundaryEffect(intent)
     case 'select-boundary':
       return getSlideEditRailSelectBoundaryEffect(intent)
     case 'select-relative':
@@ -423,6 +494,27 @@ function getSlideEditRailMoveActiveEffect<
     slideId: activeSlideId,
     slideOrder,
     toIndex: direction === 'next' ? fromIndex + 1 : fromIndex - 1,
+  })
+}
+
+function getSlideEditRailMoveActiveToBoundaryEffect<
+  TSlideId extends SlideEditRailSlideId,
+>({
+  activeSlideId,
+  boundary,
+  slideOrder,
+}: Extract<
+  SlideEditRailKeyboardIntent<TSlideId>,
+  { type: 'move-active-to-boundary' }
+>) {
+  if (!activeSlideId) {
+    return null
+  }
+
+  return getSlideEditRailReorderEffect({
+    slideId: activeSlideId,
+    slideOrder,
+    toIndex: boundary === 'first' ? 0 : slideOrder.length - 1,
   })
 }
 

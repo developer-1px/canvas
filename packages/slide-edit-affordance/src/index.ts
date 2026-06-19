@@ -34,8 +34,10 @@ export {
   getSlideEditRailKeyboardCommandEffect,
   getSlideEditRailListboxKeyboardIntent,
   getSlideEditRailPointerCommandEffect,
+  getSlideEditRailReorderKeyboardShortcutIntent,
   SLIDE_EDIT_RAIL_COMMANDS,
   SLIDE_EDIT_RAIL_KEYBOARD_KEYS,
+  SLIDE_EDIT_RAIL_REORDER_KEYBOARD_SHORTCUT_KEYS,
   toSlideEditRailHostCommandEffect,
   type SlideEditRailCommand,
   type SlideEditRailCommandDescriptor,
@@ -47,6 +49,7 @@ export {
   type SlideEditRailListboxKeyboardKey,
   type SlideEditRailListboxOptionDescriptor,
   type SlideEditRailPointerIntent,
+  type SlideEditRailReorderKeyboardShortcutIntentInput,
   type SlideEditRailSlideId,
   type SlideEditRailThumbnailDescriptor,
 } from './SlideEditRailInteractions'
