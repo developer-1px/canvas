@@ -7,6 +7,10 @@ import {
   type CanvasCommandAvailability,
 } from '../../../engine'
 import { isCanvasTargetWithinSelector } from '../../affordances/interaction/dom/CanvasInteractionTarget'
+import {
+  CANVAS_CONTEXT_MENU_DEFAULT_SIZE,
+  DEFAULT_CANVAS_CONTEXT_MENU_MARGIN,
+} from '../../affordances/controls/context-menu/CanvasContextMenuPosition'
 import { CanvasCommandMenuSurface } from './CanvasCommandMenuSurface'
 import {
   getCanvasCommandSurfaceGroups,
@@ -92,6 +96,12 @@ export function CanvasContextCommandMenu({
       groups={groups}
       onClose={onClose}
       style={{
+        '--canvas-context-menu-height':
+          `${CANVAS_CONTEXT_MENU_DEFAULT_SIZE.height}px`,
+        '--canvas-context-menu-margin':
+          `${DEFAULT_CANVAS_CONTEXT_MENU_MARGIN}px`,
+        '--canvas-context-menu-width':
+          `${CANVAS_CONTEXT_MENU_DEFAULT_SIZE.width}px`,
         '--canvas-context-menu-x': `${menu.x}px`,
         '--canvas-context-menu-y': `${menu.y}px`,
       } as CSSProperties}

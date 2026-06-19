@@ -1642,14 +1642,35 @@
 .context-command-menu {
   z-index: 7;
   top: max(
-    10px,
-    min(var(--canvas-context-menu-y), calc(100vh - 86px))
+    var(--canvas-context-menu-margin, 8px),
+    min(
+      var(--canvas-context-menu-y),
+      calc(
+        100vh -
+        var(--canvas-context-menu-height, 160px) -
+        var(--canvas-context-menu-margin, 8px)
+      )
+    )
   );
   left: max(
-    10px,
-    min(var(--canvas-context-menu-x), calc(100vw - 260px))
+    var(--canvas-context-menu-margin, 8px),
+    min(
+      var(--canvas-context-menu-x),
+      calc(
+        100vw -
+        var(--canvas-context-menu-width, 250px) -
+        var(--canvas-context-menu-margin, 8px)
+      )
+    )
   );
-  max-width: min(250px, calc(100vw - 20px));
+  max-width: min(
+    var(--canvas-context-menu-width, 250px),
+    calc(100vw - (var(--canvas-context-menu-margin, 8px) * 2))
+  );
+  max-height: calc(
+    100vh - (var(--canvas-context-menu-margin, 8px) * 2)
+  );
+  overflow: auto;
   flex-wrap: wrap;
 }
 

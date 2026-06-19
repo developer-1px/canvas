@@ -1,8 +1,15 @@
+import { readFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import {
   getCanvasContextMenuKeyboardIntent,
   getCanvasContextMenuPosition,
+  getCanvasContextMenuPositionForClientPoint,
 } from './CanvasContextMenuPosition'
+
+const CANVAS_APP_CSS = fileURLToPath(
+  new URL('../../../shell/CanvasApp.css', import.meta.url),
+)
 
 describe('getCanvasContextMenuPosition', () => {
   it('keeps an in-bounds context menu point unchanged', () => {
@@ -38,6 +45,39 @@ describe('getCanvasContextMenuPosition', () => {
       point: { x: 80, y: 70 },
       viewportSize: { height: 320, width: 480 },
     })).toEqual({ x: 12, y: 12 })
+  })
+
+  it('converts client coordinates into the container before clamping', () => {
+    expect(getCanvasContextMenuPositionForClientPoint({
+      clientPoint: { x: 390, y: 230 },
+      containerRect: {
+        height: 200,
+        left: 100,
+        top: 50,
+        width: 300,
+      },
+      margin: 10,
+      menuSize: { height: 80, width: 120 },
+    })).toEqual({ x: 170, y: 110 })
+  })
+
+  it('uses the client point directly when the container rect is unavailable', () => {
+    expect(getCanvasContextMenuPositionForClientPoint({
+      clientPoint: { x: 96, y: 72 },
+      menuSize: { height: 80, width: 120 },
+    })).toEqual({ x: 96, y: 72 })
+  })
+})
+
+describe('Canvas context menu surface styles', () => {
+  it('keeps the rendered menu constrained when measured height is unavailable', () => {
+    const source = readFileSync(CANVAS_APP_CSS, 'utf8')
+
+    expect(source).toContain('--canvas-context-menu-width')
+    expect(source).toContain('--canvas-context-menu-height')
+    expect(source).toContain('--canvas-context-menu-margin')
+    expect(source).toContain('max-height: calc(')
+    expect(source).toContain('overflow: auto')
   })
 })
 

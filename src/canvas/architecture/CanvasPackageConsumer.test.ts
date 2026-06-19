@@ -243,11 +243,13 @@ import {
   transformCanvasAppItemsChange,
   commitCanvasAppHostItemsChange,
   createCanvasAppHostItemsChangeCommitter,
+  CANVAS_CONTEXT_MENU_DEFAULT_SIZE,
   getCanvasFindInputKeyboardIntent,
   getCanvasFloatingAnchorForBounds,
   getCanvasInlineEditKeyboardIntent,
   getCanvasContextMenuKeyboardIntent,
   getCanvasContextMenuPosition,
+  getCanvasContextMenuPositionForClientPoint,
   getCanvasModalBackdropPointerIntent,
   getCanvasModalKeyboardIntent,
   measureCanvasTextBlocks,
@@ -479,6 +481,7 @@ import {
   type CanvasPresentationKeyboardIntentInput,
   type CanvasInteractionTargetSelectorInput,
   type CanvasInlineEditKeyboardIntentInput,
+  type CanvasContextMenuClientPointInput,
   type CanvasContextMenuKeyboardIntentInput,
   type CanvasContextMenuPositionInput,
   type CanvasFindInputKeyboardIntentInput,
@@ -4204,6 +4207,17 @@ describe('Canvas package consumer imports', () => {
       point: { x: 790, y: 590 },
       viewportSize: { height: 600, width: 800 },
     }
+    const contextMenuClientPointInput: CanvasContextMenuClientPointInput = {
+      clientPoint: { x: 390, y: 230 },
+      containerRect: {
+        height: 200,
+        left: 100,
+        top: 50,
+        width: 300,
+      },
+      margin: 10,
+      menuSize: { height: 80, width: 120 },
+    }
     const commandPaletteKeyboardInput: CanvasCommandPaletteKeyboardIntentInput =
       {
         activeIndex: 0,
@@ -4670,6 +4684,22 @@ describe('Canvas package consumer imports', () => {
     )).toEqual({
       x: 632,
       y: 492,
+    })
+    expect(CANVAS_CONTEXT_MENU_DEFAULT_SIZE).toEqual({
+      height: 160,
+      width: 250,
+    })
+    expect(getCanvasContextMenuPositionForClientPoint(
+      contextMenuClientPointInput,
+    )).toEqual({
+      x: 170,
+      y: 110,
+    })
+    expect(CanvasAppFacade.getCanvasContextMenuPositionForClientPoint(
+      contextMenuClientPointInput,
+    )).toEqual({
+      x: 170,
+      y: 110,
     })
     expect(getCanvasModalBackdropPointerIntent(modalBackdropPointerInput))
       .toEqual({ kind: 'dismiss' })

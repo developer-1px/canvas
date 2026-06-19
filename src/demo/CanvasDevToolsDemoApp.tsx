@@ -55,7 +55,9 @@ import {
   getCanvasAppCommandAriaKeyshortcuts,
   getCanvasKeyboardToolAriaKeyshortcuts,
   getCanvasAppWidgetInteractions,
+  getCanvasClientViewportSize,
   getCanvasContextMenuKeyboardIntent,
+  getCanvasContextMenuPosition,
   useCanvasToolbarRovingFocus,
 } from '../canvas'
 import { EngineSelectionToolbar } from './CanvasDevToolsSelectionToolbar'
@@ -426,6 +428,7 @@ function CanvasEngineDemoSurface({
     setContextMenu(getEngineContextMenuPoint({
       app,
       fallback: { x: event.clientX, y: event.clientY },
+      viewportSize: getCanvasClientViewportSize() ?? undefined,
     }))
   }
   const handleWorkspaceKeyDownCapture = (
@@ -478,7 +481,10 @@ function CanvasEngineDemoSurface({
 
     event.preventDefault()
     setSelectionToolbarVisible(false)
-    setContextMenu(getEngineContextMenuPoint({ app }))
+    setContextMenu(getEngineContextMenuPoint({
+      app,
+      viewportSize: getCanvasClientViewportSize() ?? undefined,
+    }))
   }
 
   return (
@@ -914,24 +920,35 @@ function getEngineWidgetInteraction(
 function getEngineContextMenuPoint({
   app,
   fallback,
+  viewportSize,
 }: {
   app: CanvasEngineDemoModel
   fallback?: CanvasContextCommandMenuState
+  viewportSize?: { height: number; width: number }
 }): CanvasContextCommandMenuState {
-  if (fallback && (fallback.x !== 0 || fallback.y !== 0)) {
-    return fallback
+  if (fallback) {
+    return getCanvasContextMenuPosition({
+      point: fallback,
+      viewportSize,
+    })
   }
 
   const anchor = app.selection.anchor
 
   if (anchor) {
-    return { x: anchor.x, y: anchor.y }
+    return getCanvasContextMenuPosition({
+      point: { x: anchor.x, y: anchor.y },
+      viewportSize,
+    })
   }
 
-  return {
-    x: globalThis.innerWidth / 2,
-    y: globalThis.innerHeight / 2,
-  }
+  return getCanvasContextMenuPosition({
+    point: {
+      x: (viewportSize?.width ?? globalThis.innerWidth) / 2,
+      y: (viewportSize?.height ?? globalThis.innerHeight) / 2,
+    },
+    viewportSize,
+  })
 }
 
 function isEngineDemoControlTarget(target: EventTarget) {

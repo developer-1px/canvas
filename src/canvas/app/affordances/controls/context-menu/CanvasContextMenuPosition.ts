@@ -15,11 +15,25 @@ export type CanvasContextMenuViewportSize = {
   width: number
 }
 
+export type CanvasContextMenuContainerRect = {
+  height: number
+  left: number
+  top: number
+  width: number
+}
+
 export type CanvasContextMenuPositionInput = {
   margin?: number
-  menuSize: CanvasContextMenuSize
+  menuSize?: CanvasContextMenuSize
   point: Point
   viewportSize?: CanvasContextMenuViewportSize | null
+}
+
+export type CanvasContextMenuClientPointInput = {
+  clientPoint: Point
+  containerRect?: CanvasContextMenuContainerRect | null
+  margin?: number
+  menuSize?: CanvasContextMenuSize
 }
 
 export type CanvasContextMenuKeyboardIntentKind = 'open-context-menu'
@@ -36,7 +50,12 @@ export type CanvasContextMenuKeyboardIntentInput = {
   key: string
 }
 
-const DEFAULT_CANVAS_CONTEXT_MENU_MARGIN = 8
+export const CANVAS_CONTEXT_MENU_DEFAULT_SIZE = {
+  height: 160,
+  width: 250,
+} as const satisfies CanvasContextMenuSize
+
+export const DEFAULT_CANVAS_CONTEXT_MENU_MARGIN = 8
 
 export function getCanvasContextMenuKeyboardIntent({
   event,
@@ -55,7 +74,7 @@ export function getCanvasContextMenuKeyboardIntent({
 
 export function getCanvasContextMenuPosition({
   margin = DEFAULT_CANVAS_CONTEXT_MENU_MARGIN,
-  menuSize,
+  menuSize = CANVAS_CONTEXT_MENU_DEFAULT_SIZE,
   point,
   viewportSize,
 }: CanvasContextMenuPositionInput): CanvasContextMenuPosition {
@@ -87,6 +106,34 @@ export function getCanvasContextMenuPosition({
       Math.max(safeMargin, height - safeMenuHeight - safeMargin),
     ),
   }
+}
+
+export function getCanvasContextMenuPositionForClientPoint({
+  clientPoint,
+  containerRect,
+  margin,
+  menuSize = CANVAS_CONTEXT_MENU_DEFAULT_SIZE,
+}: CanvasContextMenuClientPointInput): CanvasContextMenuPosition {
+  if (!containerRect) {
+    return getCanvasContextMenuPosition({
+      margin,
+      menuSize,
+      point: clientPoint,
+    })
+  }
+
+  return getCanvasContextMenuPosition({
+    margin,
+    menuSize,
+    point: {
+      x: clientPoint.x - containerRect.left,
+      y: clientPoint.y - containerRect.top,
+    },
+    viewportSize: {
+      height: containerRect.height,
+      width: containerRect.width,
+    },
+  })
 }
 
 function getCanvasContextMenuViewportDimension({

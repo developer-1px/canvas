@@ -32,6 +32,9 @@ import {
 } from '../feature-packs'
 import { CanvasObjectInspector } from '../affordances/editing/inspector/CanvasObjectInspector'
 import { CanvasTextEditor } from '../affordances/editing/text-editor/CanvasTextEditor'
+import {
+  getCanvasContextMenuPosition,
+} from '../affordances/controls/context-menu/CanvasContextMenuPosition'
 import { getCanvasAppSurfaceVisibility } from './CanvasAppSurfaceModel'
 
 type ToolbarProps = CanvasAppToolbarProps
@@ -145,7 +148,10 @@ export function CanvasAppView({
     }
 
     event.preventDefault()
-    setContextMenu({ x: event.clientX, y: event.clientY })
+    setContextMenu(getCanvasContextMenuPosition({
+      point: { x: event.clientX, y: event.clientY },
+      viewportSize: getCanvasAppViewViewportSize(),
+    }))
   }, [setContextMenu])
   const surfaces = getCanvasAppSurfaceVisibility({
     'canvas-status': showStatus && featurePackViews.status !== undefined,
@@ -348,6 +354,21 @@ export function CanvasAppView({
       {surfaces['text-editor'] ? <CanvasTextEditor {...textEditorProps} /> : null}
     </main>
   )
+}
+
+function getCanvasAppViewViewportSize() {
+  const height = globalThis.innerHeight
+  const width = globalThis.innerWidth
+
+  return typeof height === 'number' &&
+      typeof width === 'number' &&
+      Number.isFinite(height) &&
+      Number.isFinite(width)
+    ? {
+      height: Math.max(0, height),
+      width: Math.max(0, width),
+    }
+    : null
 }
 
 function isAppControlTarget(target: EventTarget) {
