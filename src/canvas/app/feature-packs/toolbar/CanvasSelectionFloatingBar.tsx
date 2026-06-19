@@ -10,6 +10,10 @@ import {
   type CanvasToolbarCustomCommand,
 } from './CanvasToolbarItems'
 import type { CanvasToolbarItemRenderContext } from './CanvasToolbarItemRenderer'
+import {
+  getCanvasFloatingAnchorSurfaceCoordinateStyle,
+  getCanvasFloatingAnchorSurfaceDescriptor,
+} from '../../affordances/controls/floating-anchor/CanvasFloatingAnchor'
 
 export type CanvasSelectionCommandAnchor = Point & {
   placement: 'above' | 'below'
@@ -38,6 +42,16 @@ export function CanvasSelectionFloatingBar({
     return null
   }
 
+  const anchorSurface = getCanvasFloatingAnchorSurfaceDescriptor({
+    anchor,
+    xProperty: '--canvas-selection-command-x',
+    yProperty: '--canvas-selection-command-y',
+  })
+  const anchorStyle = getCanvasFloatingAnchorSurfaceCoordinateStyle({
+    anchor,
+    xProperty: '--canvas-selection-command-x',
+    yProperty: '--canvas-selection-command-y',
+  })
   const groups = getCanvasCommandSurfaceGroups({
     commandAvailability,
     config,
@@ -56,11 +70,8 @@ export function CanvasSelectionFloatingBar({
         onToolChange: noopToolChange,
       }}
       groups={groups}
-      dataPlacement={anchor.placement}
-      style={{
-        '--canvas-selection-command-x': `${anchor.x}px`,
-        '--canvas-selection-command-y': `${anchor.y}px`,
-      } as CSSProperties}
+      dataPlacement={anchorSurface?.attributes['data-placement']}
+      style={anchorStyle as CSSProperties}
     />
   )
 }

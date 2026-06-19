@@ -265,6 +265,9 @@ import {
   CANVAS_MENU_FOCUS_RESTORE_MODEL,
   getCanvasFindInputKeyboardIntent,
   getCanvasFloatingAnchorForBounds,
+  getCanvasFloatingAnchorSurfaceCoordinateStyle,
+  getCanvasFloatingAnchorSurfaceDescriptor,
+  getCanvasFloatingAnchorSurfaceStyle,
   getCanvasInlineEditKeyboardIntent,
   getCanvasContextMenuDismissKeyboardIntent,
   getCanvasContextMenuKeyboardIntent,
@@ -339,6 +342,12 @@ import {
   type CanvasFloatingAnchorForBoundsInput,
   type CanvasFloatingAnchorPlacement,
   type CanvasFloatingAnchorSize,
+  type CanvasFloatingAnchorSurfaceCoordinateStyle,
+  type CanvasFloatingAnchorSurfaceCoordinateStyleInput,
+  type CanvasFloatingAnchorSurfaceDescriptor,
+  type CanvasFloatingAnchorSurfaceDescriptorInput,
+  type CanvasFloatingAnchorSurfaceStyle,
+  type CanvasFloatingAnchorSurfaceStyleInput,
   type CanvasAppFeaturePack,
   type CanvasAppFeaturePackMarketplaceActionModel,
   type CanvasAppFeaturePackMarketplaceActionAssemblyInput,
@@ -4723,6 +4732,46 @@ describe('Canvas package consumer imports', () => {
         x: 0,
         y: 0,
       }
+    const packageFloatingAnchorSurfaceCoordinateStyleInput:
+      CanvasFloatingAnchorSurfaceCoordinateStyleInput = {
+        anchor: packageFloatingAnchor,
+        xProperty: '--package-floating-x',
+        yProperty: '--package-floating-y',
+      }
+    const packageFloatingAnchorSurfaceCoordinateStyle:
+      CanvasFloatingAnchorSurfaceCoordinateStyle =
+        getCanvasFloatingAnchorSurfaceCoordinateStyle(
+          packageFloatingAnchorSurfaceCoordinateStyleInput,
+        )
+    const packageFloatingAnchorSurfaceStyleInput:
+      CanvasFloatingAnchorSurfaceStyleInput = {
+        anchor: packageFloatingAnchor,
+        offset: 6,
+        xProperty: '--package-floating-x',
+        yProperty: '--package-floating-y',
+      }
+    const packageFloatingAnchorSurfaceStyle:
+      CanvasFloatingAnchorSurfaceStyle =
+        getCanvasFloatingAnchorSurfaceStyle(
+          packageFloatingAnchorSurfaceStyleInput,
+        )
+    const packageFloatingAnchorSurfaceDescriptorInput:
+      CanvasFloatingAnchorSurfaceDescriptorInput = {
+        anchor: packageFloatingAnchor,
+        offset: 6,
+        xProperty: '--package-floating-x',
+        yProperty: '--package-floating-y',
+      }
+    const packageFloatingAnchorSurfaceDescriptor:
+      CanvasFloatingAnchorSurfaceDescriptor =
+        getCanvasFloatingAnchorSurfaceDescriptor(
+          packageFloatingAnchorSurfaceDescriptorInput,
+        ) ?? {
+          anchor: packageFloatingAnchor,
+          attributes: { 'data-placement': 'above' },
+          placement: 'above',
+          style: packageFloatingAnchorSurfaceStyle,
+        }
     const packageEraserStrokes: CanvasEraserStrokeHitTestStroke[] = [{
       id: 'freeform-1',
       points: [{ x: 0, y: 0 }, { x: 100, y: 0 }],
@@ -4846,11 +4895,40 @@ describe('Canvas package consumer imports', () => {
       .toBe(createCanvasAppStageElement)
     expect(CanvasAppFacade.getCanvasFloatingAnchorForBounds)
       .toBe(getCanvasFloatingAnchorForBounds)
+    expect(CanvasAppFacade.getCanvasFloatingAnchorSurfaceCoordinateStyle)
+      .toBe(getCanvasFloatingAnchorSurfaceCoordinateStyle)
+    expect(CanvasAppFacade.getCanvasFloatingAnchorSurfaceStyle)
+      .toBe(getCanvasFloatingAnchorSurfaceStyle)
+    expect(CanvasAppFacade.getCanvasFloatingAnchorSurfaceDescriptor)
+      .toBe(getCanvasFloatingAnchorSurfaceDescriptor)
     expect(packageFloatingAnchor).toEqual({
       placement: packageFloatingAnchorPlacement,
       x: 140,
       y: 60,
     })
+    expect(packageFloatingAnchorSurfaceCoordinateStyle).toEqual({
+      '--package-floating-x': '140px',
+      '--package-floating-y': '60px',
+    })
+    expect(packageFloatingAnchorSurfaceStyle).toEqual({
+      '--package-floating-x': '140px',
+      '--package-floating-y': '60px',
+      left: 'var(--package-floating-x)',
+      top: 'var(--package-floating-y)',
+      transform: 'translate(-50%, 6px)',
+      transformOrigin: '50% 0',
+    })
+    expect(packageFloatingAnchorSurfaceDescriptor).toEqual({
+      anchor: packageFloatingAnchor,
+      attributes: {
+        'data-placement': 'below',
+      },
+      placement: 'below',
+      style: packageFloatingAnchorSurfaceStyle,
+    })
+    expect(CanvasAppFacade.getCanvasFloatingAnchorSurfaceDescriptor({
+      anchor: null,
+    })).toBeNull()
     expect(getCanvasEraserHitStrokeIds({
       points: [{ x: 50, y: 6 }],
       radius: 6,

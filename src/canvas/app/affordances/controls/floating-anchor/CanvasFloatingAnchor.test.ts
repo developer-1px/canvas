@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { getCanvasFloatingAnchorForBounds } from './CanvasFloatingAnchor'
+import {
+  getCanvasFloatingAnchorForBounds,
+  getCanvasFloatingAnchorSurfaceCoordinateStyle,
+  getCanvasFloatingAnchorSurfaceDescriptor,
+  getCanvasFloatingAnchorSurfaceStyle,
+} from './CanvasFloatingAnchor'
 
 describe('CanvasFloatingAnchor', () => {
   it('returns null when bounds are missing', () => {
@@ -87,6 +92,59 @@ describe('CanvasFloatingAnchor', () => {
       placement: 'above',
       x: 150,
       y: 110,
+    })
+  })
+
+  it('returns null surface descriptors when anchor is missing', () => {
+    expect(getCanvasFloatingAnchorSurfaceDescriptor({
+      anchor: null,
+    })).toBeNull()
+  })
+
+  it('creates a reusable above surface descriptor from an anchor', () => {
+    expect(getCanvasFloatingAnchorSurfaceDescriptor({
+      anchor: { placement: 'above', x: 140, y: 60 },
+    })).toEqual({
+      anchor: { placement: 'above', x: 140, y: 60 },
+      attributes: {
+        'data-placement': 'above',
+      },
+      placement: 'above',
+      style: {
+        '--canvas-floating-anchor-x': '140px',
+        '--canvas-floating-anchor-y': '60px',
+        left: 'var(--canvas-floating-anchor-x)',
+        top: 'var(--canvas-floating-anchor-y)',
+        transform: 'translate(-50%, calc(-100% - 10px))',
+        transformOrigin: '50% 100%',
+      },
+    })
+  })
+
+  it('creates below surface styles with custom variables and offset', () => {
+    expect(getCanvasFloatingAnchorSurfaceStyle({
+      anchor: { placement: 'below', x: 174, y: 50 },
+      offset: 6,
+      xProperty: '--canvas-selection-command-x',
+      yProperty: '--canvas-selection-command-y',
+    })).toEqual({
+      '--canvas-selection-command-x': '174px',
+      '--canvas-selection-command-y': '50px',
+      left: 'var(--canvas-selection-command-x)',
+      top: 'var(--canvas-selection-command-y)',
+      transform: 'translate(-50%, 6px)',
+      transformOrigin: '50% 0',
+    })
+  })
+
+  it('creates coordinate-only styles for surfaces with their own CSS placement', () => {
+    expect(getCanvasFloatingAnchorSurfaceCoordinateStyle({
+      anchor: { placement: 'above', x: 92, y: 42 },
+      xProperty: '--surface-anchor-x',
+      yProperty: '--surface-anchor-y',
+    })).toEqual({
+      '--surface-anchor-x': '92px',
+      '--surface-anchor-y': '42px',
     })
   })
 })

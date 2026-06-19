@@ -76,6 +76,20 @@ describe('CanvasAppView', () => {
     expect(markup).toContain('zoom-controls')
   })
 
+  it('keeps selection floating bar placement in CSS while injecting anchor variables', () => {
+    const markup = renderToStaticMarkup(<CanvasAppView {...createViewProps()} />)
+    const selectionFloatingBarTag =
+      markup.match(/<div class="selection-floating-bar"[^>]*>/)?.[0] ?? ''
+
+    expect(selectionFloatingBarTag).toContain('data-placement="above"')
+    expect(selectionFloatingBarTag)
+      .toContain('--canvas-selection-command-x:120px')
+    expect(selectionFloatingBarTag)
+      .toContain('--canvas-selection-command-y:120px')
+    expect(selectionFloatingBarTag).not.toContain('left:')
+    expect(selectionFloatingBarTag).not.toContain('transform:')
+  })
+
   it('omits optional feature-pack surfaces when view renderers are uninstalled', () => {
     const markup = renderToStaticMarkup(
       <CanvasAppView

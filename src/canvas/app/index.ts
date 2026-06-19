@@ -321,10 +321,20 @@ export {
 } from './affordances/controls/context-menu/CanvasContextMenuPosition'
 export {
   getCanvasFloatingAnchorForBounds,
+  getCanvasFloatingAnchorSurfaceCoordinateStyle,
+  getCanvasFloatingAnchorSurfaceDescriptor,
+  getCanvasFloatingAnchorSurfaceStyle,
   type CanvasFloatingAnchor,
   type CanvasFloatingAnchorForBoundsInput,
   type CanvasFloatingAnchorPlacement,
   type CanvasFloatingAnchorSize,
+  type CanvasFloatingAnchorSurfaceAttributes,
+  type CanvasFloatingAnchorSurfaceCoordinateStyle,
+  type CanvasFloatingAnchorSurfaceCoordinateStyleInput,
+  type CanvasFloatingAnchorSurfaceDescriptor,
+  type CanvasFloatingAnchorSurfaceDescriptorInput,
+  type CanvasFloatingAnchorSurfaceStyle,
+  type CanvasFloatingAnchorSurfaceStyleInput,
 } from './affordances/controls/floating-anchor/CanvasFloatingAnchor'
 export {
   CANVAS_RICH_CLIPBOARD_DEFAULT_FALLBACK_HTML,
