@@ -298,6 +298,96 @@ describe('CanvasAppFeaturePackSuiteActions', () => {
       })
   })
 
+  it('blocks suite install with suite marketplace listing requirements', () => {
+    const runtimeManifest = createCanvasAppFeaturePackManifest({
+      id: 'runtime-pack',
+      label: 'Runtime pack',
+      lifecycle: {
+        partialUpdate: ['runtime-model'],
+        runtimeToggleable: true,
+      },
+    })
+    const addonManifest = createCanvasAppFeaturePackManifest({
+      id: 'addon-pack',
+      label: 'Addon pack',
+      lifecycle: {
+        partialUpdate: ['inspector'],
+        runtimeToggleable: true,
+      },
+    })
+    const suiteManifest = createCanvasAppFeaturePackSuiteManifest({
+      featurePackIds: [
+        'runtime-pack',
+        'addon-pack',
+      ],
+      id: 'component-system',
+      label: 'Component system',
+    })
+
+    const item = getCanvasAppFeaturePackSuiteMarketplaceActionModel({
+      listings: [{
+        access: 'private',
+        featurePackId: 'addon-pack',
+      }],
+      manifests: [
+        runtimeManifest,
+        addonManifest,
+      ],
+      options: {
+        featurePackStates: [
+          {
+            id: 'runtime-pack',
+            status: 'uninstalled',
+          },
+          {
+            id: 'addon-pack',
+            status: 'uninstalled',
+          },
+        ],
+      },
+      suiteListings: [{
+        access: 'paid',
+        distribution: 'coming-soon',
+        priceLabel: '$19/mo',
+        suiteId: 'component-system',
+        vendor: 'Interactive OS',
+      }],
+      suiteManifests: [suiteManifest],
+    }).items[0]
+
+    expect(item?.listing).toEqual({
+      access: 'paid',
+      distribution: 'coming-soon',
+      entitlement: 'required',
+      priceLabel: '$19/mo',
+      suiteId: 'component-system',
+      vendor: 'Interactive OS',
+    })
+    expect(item?.actions.find((action) => action.kind === 'install'))
+      .toMatchObject({
+        applicable: true,
+        marketplaceBlockedReasons: [
+          {
+            access: 'paid',
+            kind: 'marketplace-entitlement-required',
+            suiteId: 'component-system',
+          },
+          {
+            distribution: 'coming-soon',
+            kind: 'marketplace-distribution-unavailable',
+            suiteId: 'component-system',
+          },
+          {
+            access: 'private',
+            featurePackId: 'addon-pack',
+            kind: 'marketplace-entitlement-required',
+          },
+        ],
+        ready: false,
+        status: 'blocked',
+      })
+  })
+
   it('keeps suite disable and uninstall available for installed paid members', () => {
     const paidManifest = createCanvasAppFeaturePackManifest({
       id: 'paid-pack',
@@ -322,6 +412,57 @@ describe('CanvasAppFeaturePackSuiteActions', () => {
       suiteManifests: [suiteManifest],
     }).items[0]
 
+    expect(item?.actions.find((action) => action.kind === 'disable'))
+      .toMatchObject({
+        marketplaceBlockedReasons: [],
+        ready: true,
+        status: 'ready',
+      })
+    expect(item?.actions.find((action) => action.kind === 'uninstall'))
+      .toMatchObject({
+        marketplaceBlockedReasons: [],
+        ready: true,
+        status: 'ready',
+      })
+  })
+
+  it('keeps installed suite disable and uninstall available for paid suite listings', () => {
+    const paidManifest = createCanvasAppFeaturePackManifest({
+      id: 'paid-pack',
+      label: 'Paid pack',
+      lifecycle: {
+        partialUpdate: ['command'],
+        runtimeToggleable: true,
+      },
+    })
+    const suiteManifest = createCanvasAppFeaturePackSuiteManifest({
+      featurePackIds: ['paid-pack'],
+      id: 'paid-suite',
+      label: 'Paid suite',
+    })
+
+    const item = getCanvasAppFeaturePackSuiteMarketplaceActionModel({
+      manifests: [paidManifest],
+      suiteListings: [{
+        access: 'paid',
+        distribution: 'coming-soon',
+        suiteId: 'paid-suite',
+      }],
+      suiteManifests: [suiteManifest],
+    }).items[0]
+
+    expect(item?.actions.find((action) => action.kind === 'enable'))
+      .toMatchObject({
+        marketplaceBlockedReasons: [
+          {
+            access: 'paid',
+            kind: 'marketplace-entitlement-required',
+            suiteId: 'paid-suite',
+          },
+        ],
+        ready: false,
+        status: 'blocked',
+      })
     expect(item?.actions.find((action) => action.kind === 'disable'))
       .toMatchObject({
         marketplaceBlockedReasons: [],

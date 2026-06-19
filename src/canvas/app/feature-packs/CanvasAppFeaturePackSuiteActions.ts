@@ -6,9 +6,14 @@ import {
 import {
   getCanvasAppFeaturePackMarketplaceListingBlockedReasons,
   getCanvasAppFeaturePackMarketplaceListingMap,
+  getCanvasAppFeaturePackSuiteMarketplaceListingBlockedReasons as getCanvasAppFeaturePackSuiteMarketplaceListingBlockedReasonsForListing,
+  getCanvasAppFeaturePackSuiteMarketplaceListingMap,
   type CanvasAppFeaturePackMarketplaceListing,
   type CanvasAppFeaturePackMarketplaceListingBlockedReason,
   type CanvasAppFeaturePackMarketplaceListingInput,
+  type CanvasAppFeaturePackSuiteMarketplaceListing,
+  type CanvasAppFeaturePackSuiteMarketplaceListingBlockedReason,
+  type CanvasAppFeaturePackSuiteMarketplaceListingInput,
 } from './CanvasAppFeaturePackMarketplaceListings'
 import {
   applyCanvasAppFeaturePackRuntimeStatePatch,
@@ -52,11 +57,16 @@ export type CanvasAppFeaturePackSuiteMarketplaceActionItem = Readonly<{
   featurePackIds: readonly CanvasAppFeaturePackId[]
   installedFeaturePackIds: readonly CanvasAppFeaturePackId[]
   label: string
+  listing: CanvasAppFeaturePackSuiteMarketplaceListing
   missingFeaturePackIds: readonly CanvasAppFeaturePackId[]
   primaryActionKind: CanvasAppFeaturePackSuiteMarketplaceActionKind
   status: CanvasAppFeaturePackSuiteMarketplaceStatus
   suiteId: CanvasAppFeaturePackSuiteId
 }>
+
+export type CanvasAppFeaturePackSuiteMarketplaceBlockedReason =
+  | CanvasAppFeaturePackMarketplaceListingBlockedReason
+  | CanvasAppFeaturePackSuiteMarketplaceListingBlockedReason
 
 export type CanvasAppFeaturePackSuiteMarketplaceAction = Readonly<{
   applicable: boolean
@@ -66,7 +76,7 @@ export type CanvasAppFeaturePackSuiteMarketplaceAction = Readonly<{
   installOptions: CanvasAppFeaturePackInstallOptions
   kind: CanvasAppFeaturePackSuiteMarketplaceActionKind
   marketplaceBlockedReasons:
-    readonly CanvasAppFeaturePackMarketplaceListingBlockedReason[]
+    readonly CanvasAppFeaturePackSuiteMarketplaceBlockedReason[]
   partialUpdateSurfaceIds: readonly CanvasAppFeaturePackContributionSurface[]
   ready: boolean
   stateChanges: readonly CanvasAppFeaturePackStateTransitionChange[]
@@ -86,11 +96,13 @@ export function getCanvasAppFeaturePackSuiteMarketplaceActionModel({
   listings = [],
   manifests,
   options = {},
+  suiteListings = [],
   suiteManifests,
 }: {
   listings?: readonly CanvasAppFeaturePackMarketplaceListingInput[]
   manifests: readonly CanvasAppFeaturePackManifest[]
   options?: CanvasAppFeaturePackManifestInstallOptions
+  suiteListings?: readonly CanvasAppFeaturePackSuiteMarketplaceListingInput[]
   suiteManifests: readonly CanvasAppFeaturePackSuiteManifest[]
 }): CanvasAppFeaturePackSuiteMarketplaceActionModel {
   assertCanvasAppFeaturePackSuiteManifests(suiteManifests)
@@ -102,6 +114,10 @@ export function getCanvasAppFeaturePackSuiteMarketplaceActionModel({
     listings,
     manifests,
   })
+  const suiteListingById = getCanvasAppFeaturePackSuiteMarketplaceListingMap({
+    listings: suiteListings,
+    suiteManifests,
+  })
 
   return Object.freeze({
     items: Object.freeze(suiteManifests.map((suiteManifest) =>
@@ -110,6 +126,7 @@ export function getCanvasAppFeaturePackSuiteMarketplaceActionModel({
         manifests,
         options,
         states,
+        suiteListingById,
         suiteManifest,
       }),
     )),
@@ -121,6 +138,7 @@ function getCanvasAppFeaturePackSuiteMarketplaceActionItem({
   manifests,
   options,
   states,
+  suiteListingById,
   suiteManifest,
 }: {
   listingById: ReadonlyMap<
@@ -130,6 +148,10 @@ function getCanvasAppFeaturePackSuiteMarketplaceActionItem({
   manifests: readonly CanvasAppFeaturePackManifest[]
   options: CanvasAppFeaturePackManifestInstallOptions
   states: readonly CanvasAppFeaturePackRuntimeState[]
+  suiteListingById: ReadonlyMap<
+    CanvasAppFeaturePackSuiteId,
+    CanvasAppFeaturePackSuiteMarketplaceListing
+  >
   suiteManifest: CanvasAppFeaturePackSuiteManifest
 }): CanvasAppFeaturePackSuiteMarketplaceActionItem {
   const memberState = getCanvasAppFeaturePackSuiteMarketplaceMemberState({
@@ -141,6 +163,13 @@ function getCanvasAppFeaturePackSuiteMarketplaceActionItem({
     memberState,
     suiteManifest,
   })
+  const listing = suiteListingById.get(suiteManifest.id)
+
+  if (!listing) {
+    throw new Error(
+      `Missing canvas app feature pack suite marketplace listing: ${suiteManifest.id}`,
+    )
+  }
 
   return Object.freeze({
     actions: Object.freeze(
@@ -148,6 +177,7 @@ function getCanvasAppFeaturePackSuiteMarketplaceActionItem({
         getCanvasAppFeaturePackSuiteMarketplaceAction({
           kind,
           listingById,
+          listing,
           manifests,
           memberState,
           options,
@@ -159,6 +189,7 @@ function getCanvasAppFeaturePackSuiteMarketplaceActionItem({
     featurePackIds: suiteManifest.featurePackIds,
     installedFeaturePackIds: memberState.installedFeaturePackIds,
     label: suiteManifest.label,
+    listing,
     missingFeaturePackIds: memberState.missingFeaturePackIds,
     primaryActionKind:
       getCanvasAppFeaturePackSuiteMarketplacePrimaryActionKind(status),
@@ -239,6 +270,7 @@ function getCanvasAppFeaturePackSuiteMarketplaceStatus({
 function getCanvasAppFeaturePackSuiteMarketplaceAction({
   kind,
   listingById,
+  listing,
   manifests,
   memberState,
   options,
@@ -249,6 +281,7 @@ function getCanvasAppFeaturePackSuiteMarketplaceAction({
     CanvasAppFeaturePackId,
     CanvasAppFeaturePackMarketplaceListing
   >
+  listing: CanvasAppFeaturePackSuiteMarketplaceListing
   manifests: readonly CanvasAppFeaturePackManifest[]
   memberState: ReturnType<typeof getCanvasAppFeaturePackSuiteMarketplaceMemberState>
   options: CanvasAppFeaturePackManifestInstallOptions
@@ -276,10 +309,13 @@ function getCanvasAppFeaturePackSuiteMarketplaceAction({
     installOptions: runtimeStatePatch.options,
     kind,
     marketplaceBlockedReasons:
-      getCanvasAppFeaturePackSuiteMarketplaceListingBlockedReasons({
+      getCanvasAppFeaturePackSuiteMarketplaceActionListingBlockedReasons({
         kind,
+        listing,
         listingById,
+        memberState,
         stateChanges: transitionPlan.stateChanges,
+        suiteManifest,
       }),
     transitionPlan,
   })
@@ -296,7 +332,7 @@ function createCanvasAppFeaturePackSuiteMarketplaceAction({
   installOptions: CanvasAppFeaturePackInstallOptions
   kind: CanvasAppFeaturePackSuiteMarketplaceActionKind
   marketplaceBlockedReasons:
-    readonly CanvasAppFeaturePackMarketplaceListingBlockedReason[]
+    readonly CanvasAppFeaturePackSuiteMarketplaceBlockedReason[]
   transitionPlan: CanvasAppFeaturePackStateTransitionPlan
 }): CanvasAppFeaturePackSuiteMarketplaceAction {
   const status = applicable &&
@@ -321,34 +357,47 @@ function createCanvasAppFeaturePackSuiteMarketplaceAction({
   })
 }
 
-function getCanvasAppFeaturePackSuiteMarketplaceListingBlockedReasons({
+function getCanvasAppFeaturePackSuiteMarketplaceActionListingBlockedReasons({
   kind,
+  listing,
   listingById,
+  memberState,
   stateChanges,
+  suiteManifest,
 }: {
   kind: CanvasAppFeaturePackSuiteMarketplaceActionKind
+  listing: CanvasAppFeaturePackSuiteMarketplaceListing
   listingById: ReadonlyMap<
     CanvasAppFeaturePackId,
     CanvasAppFeaturePackMarketplaceListing
   >
+  memberState: ReturnType<typeof getCanvasAppFeaturePackSuiteMarketplaceMemberState>
   stateChanges: readonly CanvasAppFeaturePackStateTransitionChange[]
-}): readonly CanvasAppFeaturePackMarketplaceListingBlockedReason[] {
+  suiteManifest: CanvasAppFeaturePackSuiteManifest
+}): readonly CanvasAppFeaturePackSuiteMarketplaceBlockedReason[] {
   if (kind === 'disable' || kind === 'uninstall') {
     return []
   }
 
-  return Object.freeze(stateChanges.flatMap((stateChange) => {
-    const listing = listingById.get(stateChange.id)
-
-    if (!listing) {
-      return []
-    }
-
-    return getCanvasAppFeaturePackMarketplaceListingBlockedReasons({
-      installed: stateChange.from.installed,
+  return Object.freeze([
+    ...getCanvasAppFeaturePackSuiteMarketplaceListingBlockedReasonsForListing({
+      installed: memberState.installedFeaturePackIds.length ===
+        suiteManifest.featurePackIds.length,
       listing,
-    })
-  }))
+    }),
+    ...stateChanges.flatMap((stateChange) => {
+      const featurePackListing = listingById.get(stateChange.id)
+
+      if (!featurePackListing) {
+        return []
+      }
+
+      return getCanvasAppFeaturePackMarketplaceListingBlockedReasons({
+        installed: stateChange.from.installed,
+        listing: featurePackListing,
+      })
+    }),
+  ])
 }
 
 function isCanvasAppFeaturePackSuiteMarketplaceActionApplicable({

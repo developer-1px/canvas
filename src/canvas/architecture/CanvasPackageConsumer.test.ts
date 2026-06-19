@@ -60,6 +60,7 @@ import {
   createCanvasAppFeaturePackExtensionBundle,
   createCanvasAppFeaturePackManifest,
   createCanvasAppFeaturePackMarketplaceListing,
+  createCanvasAppFeaturePackSuiteMarketplaceListing,
   createCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan,
   createCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan,
   createCanvasStoryCanvasFeaturePackAssemblyInput,
@@ -222,6 +223,7 @@ import {
   getCanvasAppFeaturePackCatalog,
   getCanvasAppFeaturePackInstallPlan,
   getCanvasAppFeaturePackMarketplaceListingMap,
+  getCanvasAppFeaturePackSuiteMarketplaceListingMap,
   getCanvasAppFeaturePackPartialUpdatePlan,
   getCanvasAppFeaturePackStateTransitionPlan,
   getCanvasAppFeaturePackSuiteFeaturePackIds,
@@ -401,6 +403,7 @@ import {
   type CanvasAppFeaturePackMarketplaceListingEntitlement,
   type CanvasAppFeaturePackProfileMarketplaceActionModel,
   type CanvasAppFeaturePackSuiteMarketplaceActionModel,
+  type CanvasAppFeaturePackSuiteMarketplaceListing,
   type CanvasAppFeaturePackCatalog,
   type CanvasAppFeaturePackCatalogItem,
   type CanvasAppFeaturePackInstallPlan,
@@ -1018,6 +1021,15 @@ describe('Canvas package consumer imports', () => {
     const partialUpdateListingEntitlement:
       CanvasAppFeaturePackMarketplaceListingEntitlement =
         partialUpdateListing.entitlement
+    const partialUpdateSuiteListing:
+      CanvasAppFeaturePackSuiteMarketplaceListing =
+        createCanvasAppFeaturePackSuiteMarketplaceListing({
+          access: 'paid',
+          distribution: 'coming-soon',
+          priceLabel: '$19/mo',
+          suiteId: 'smoke-partial-suite',
+          vendor: 'Interactive OS',
+        })
     const aiLabsManifest = createCanvasAppAiLabsFeaturePackManifest({
       provider: {
         complete: () => ({ text: 'Summary' }),
@@ -1331,6 +1343,11 @@ describe('Canvas package consumer imports', () => {
         listings: [partialUpdateListing],
         manifests: [partialUpdateManifest],
       })
+    const featurePackSuiteMarketplaceListingMap =
+      getCanvasAppFeaturePackSuiteMarketplaceListingMap({
+        listings: [partialUpdateSuiteListing],
+        suiteManifests: [partialUpdateSuiteManifest],
+      })
     const featurePackProfileMarketplaceActionModel:
       CanvasAppFeaturePackProfileMarketplaceActionModel =
         getCanvasAppFeaturePackProfileMarketplaceActionModel({
@@ -1341,6 +1358,7 @@ describe('Canvas package consumer imports', () => {
       CanvasAppFeaturePackSuiteMarketplaceActionModel =
         getCanvasAppFeaturePackSuiteMarketplaceActionModel({
           manifests: [partialUpdateManifest],
+          suiteListings: [partialUpdateSuiteListing],
           suiteManifests: [partialUpdateSuiteManifest],
         })
     const featurePackPartialUpdatePlan:
@@ -3245,6 +3263,8 @@ describe('Canvas package consumer imports', () => {
       ])
     expect(featurePackMarketplaceListingMap.get('smoke-partial-pack'))
       .toEqual(partialUpdateListing)
+    expect(featurePackSuiteMarketplaceListingMap.get('smoke-partial-suite'))
+      .toEqual(partialUpdateSuiteListing)
     expect(partialUpdateListingEntitlement).toBe('required')
     expect(featurePackMarketplaceModel.packs.items[0]?.featurePackId)
       .toBe('smoke-partial-pack')
@@ -3938,6 +3958,8 @@ describe('Canvas package consumer imports', () => {
     })
     expect(featurePackSuiteMarketplaceActionModel.items[0]?.suiteId)
       .toBe('smoke-partial-suite')
+    expect(featurePackSuiteMarketplaceActionModel.items[0]?.listing)
+      .toEqual(partialUpdateSuiteListing)
     expect(featurePackSuiteMarketplaceActionModel.items[0]?.primaryActionKind)
       .toBe('disable')
     expect(featurePackSuiteMarketplaceActionModel.items[0]?.actions.map(
@@ -5178,11 +5200,23 @@ describe('Canvas package consumer imports', () => {
       .toBeTypeOf('function')
     expect(CanvasPackage.createCanvasAppFeaturePackMarketplaceListing)
       .toBeTypeOf('function')
+    expect(CanvasAppAuthoring.createCanvasAppFeaturePackSuiteMarketplaceListing)
+      .toBeTypeOf('function')
+    expect(CanvasAppFacade.createCanvasAppFeaturePackSuiteMarketplaceListing)
+      .toBeTypeOf('function')
+    expect(CanvasPackage.createCanvasAppFeaturePackSuiteMarketplaceListing)
+      .toBeTypeOf('function')
     expect(CanvasAppAuthoring.getCanvasAppFeaturePackMarketplaceListingMap)
       .toBeTypeOf('function')
     expect(CanvasAppFacade.getCanvasAppFeaturePackMarketplaceListingMap)
       .toBeTypeOf('function')
     expect(CanvasPackage.getCanvasAppFeaturePackMarketplaceListingMap)
+      .toBeTypeOf('function')
+    expect(CanvasAppAuthoring.getCanvasAppFeaturePackSuiteMarketplaceListingMap)
+      .toBeTypeOf('function')
+    expect(CanvasAppFacade.getCanvasAppFeaturePackSuiteMarketplaceListingMap)
+      .toBeTypeOf('function')
+    expect(CanvasPackage.getCanvasAppFeaturePackSuiteMarketplaceListingMap)
       .toBeTypeOf('function')
     expect(CanvasAppAuthoring.getCanvasAppFeaturePackProfileMarketplaceActionModel)
       .toBeTypeOf('function')

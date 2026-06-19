@@ -5,8 +5,13 @@ import {
 } from './CanvasAppFeaturePackManifests'
 import {
   createCanvasAppFeaturePackMarketplaceListing,
+  createCanvasAppFeaturePackSuiteMarketplaceListing,
   getCanvasAppFeaturePackMarketplaceListingMap,
+  getCanvasAppFeaturePackSuiteMarketplaceListingMap,
 } from './CanvasAppFeaturePackMarketplaceListings'
+import {
+  createCanvasAppFeaturePackSuiteManifest,
+} from './CanvasAppFeaturePackSuites'
 
 describe('CanvasAppFeaturePackMarketplaceListings', () => {
   it('creates a default free listing', () => {
@@ -87,6 +92,96 @@ describe('CanvasAppFeaturePackMarketplaceListings', () => {
       }),
     ).toThrow(
       'Duplicate canvas app feature pack marketplace listing: ai-pack',
+    )
+  })
+
+  it('creates default and paid suite listings', () => {
+    expect(createCanvasAppFeaturePackSuiteMarketplaceListing({
+      suiteId: 'component-system',
+    })).toEqual({
+      access: 'free',
+      distribution: 'available',
+      entitlement: 'granted',
+      priceLabel: undefined,
+      suiteId: 'component-system',
+      vendor: undefined,
+    })
+    expect(createCanvasAppFeaturePackSuiteMarketplaceListing({
+      access: 'paid',
+      priceLabel: '$19/mo',
+      suiteId: 'component-system',
+      vendor: 'Interactive OS',
+    })).toEqual({
+      access: 'paid',
+      distribution: 'available',
+      entitlement: 'required',
+      priceLabel: '$19/mo',
+      suiteId: 'component-system',
+      vendor: 'Interactive OS',
+    })
+  })
+
+  it('overrides suite manifests with marketplace metadata', () => {
+    const suiteManifest = createCanvasAppFeaturePackSuiteManifest({
+      featurePackIds: ['component-library'],
+      id: 'component-system',
+      label: 'Component system',
+    })
+    const listingById = getCanvasAppFeaturePackSuiteMarketplaceListingMap({
+      listings: [{
+        access: 'private',
+        distribution: 'coming-soon',
+        entitlement: 'granted',
+        priceLabel: 'Workspace plan',
+        suiteId: 'component-system',
+        vendor: 'Internal',
+      }],
+      suiteManifests: [suiteManifest],
+    })
+
+    expect(listingById.get('component-system')).toEqual({
+      access: 'private',
+      distribution: 'coming-soon',
+      entitlement: 'granted',
+      priceLabel: 'Workspace plan',
+      suiteId: 'component-system',
+      vendor: 'Internal',
+    })
+  })
+
+  it('rejects unknown and duplicate suite listing targets', () => {
+    const suiteManifest = createCanvasAppFeaturePackSuiteManifest({
+      featurePackIds: ['component-library'],
+      id: 'component-system',
+      label: 'Component system',
+    })
+
+    expect(() =>
+      getCanvasAppFeaturePackSuiteMarketplaceListingMap({
+        listings: [{
+          suiteId: 'missing-suite',
+        }],
+        suiteManifests: [suiteManifest],
+      }),
+    ).toThrow(
+      'Unknown canvas app feature pack suite marketplace listing: missing-suite',
+    )
+    expect(() =>
+      getCanvasAppFeaturePackSuiteMarketplaceListingMap({
+        listings: [
+          {
+            access: 'paid',
+            suiteId: 'component-system',
+          },
+          {
+            access: 'private',
+            suiteId: 'component-system',
+          },
+        ],
+        suiteManifests: [suiteManifest],
+      }),
+    ).toThrow(
+      'Duplicate canvas app feature pack suite marketplace listing: component-system',
     )
   })
 })
