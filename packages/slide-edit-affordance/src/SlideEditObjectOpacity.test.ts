@@ -12,6 +12,8 @@ import {
   SLIDE_EDIT_OBJECT_OPACITY_DATA_ATTRIBUTE,
   SLIDE_EDIT_OBJECT_OPACITY_DEFAULT,
   SLIDE_EDIT_OBJECT_OPACITY_FIELD,
+  SLIDE_EDIT_OBJECT_OPACITY_IMPORT_MODEL,
+  SLIDE_EDIT_OBJECT_OPACITY_JSON_IMPORT_FORMAT,
   SLIDE_EDIT_OBJECT_OPACITY_JSON_MIME_TYPE,
   SLIDE_EDIT_OBJECT_OPACITY_LIMITS,
   toSlideEditObjectOpacityAttributeValue,
@@ -20,9 +22,26 @@ import {
   getSlideEditObjectOpacityJSONPasteValue as getSlideEditObjectOpacityJSONPasteValueFromPackage,
   getSlideEditObjectOpacityJSONPasteValueFromText as getSlideEditObjectOpacityJSONPasteValueFromTextFromPackage,
   getSlideEditObjectOpacityJSONPasteValueFromValue as getSlideEditObjectOpacityJSONPasteValueFromValueFromPackage,
+  SLIDE_EDIT_OBJECT_OPACITY_IMPORT_MODEL as SLIDE_EDIT_OBJECT_OPACITY_IMPORT_MODEL_FROM_PACKAGE,
+  SLIDE_EDIT_OBJECT_OPACITY_JSON_IMPORT_FORMAT as SLIDE_EDIT_OBJECT_OPACITY_JSON_IMPORT_FORMAT_FROM_PACKAGE,
 } from './index'
 
 describe('SlideEditObjectOpacity', () => {
+  it('exposes shared object opacity import metadata', () => {
+    expect(SLIDE_EDIT_OBJECT_OPACITY_IMPORT_MODEL).toBe(
+      'slide-edit-object-opacity-import',
+    )
+    expect(SLIDE_EDIT_OBJECT_OPACITY_JSON_IMPORT_FORMAT).toBe(
+      'application-json-slide-edit-object-opacity',
+    )
+    expect(SLIDE_EDIT_OBJECT_OPACITY_IMPORT_MODEL_FROM_PACKAGE).toBe(
+      SLIDE_EDIT_OBJECT_OPACITY_IMPORT_MODEL,
+    )
+    expect(SLIDE_EDIT_OBJECT_OPACITY_JSON_IMPORT_FORMAT_FROM_PACKAGE).toBe(
+      SLIDE_EDIT_OBJECT_OPACITY_JSON_IMPORT_FORMAT,
+    )
+  })
+
   it('creates an object opacity descriptor with fully opaque as default', () => {
     expect(createSlideEditObjectOpacityDescriptor({
       objectId: 'object-a',

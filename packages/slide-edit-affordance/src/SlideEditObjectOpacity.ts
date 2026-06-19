@@ -121,6 +121,10 @@ export const SLIDE_EDIT_OBJECT_OPACITY_FIELD = Object.freeze({
   unit: 'ratio',
 } as const satisfies SlideEditObjectOpacityFieldDescriptor)
 
+export const SLIDE_EDIT_OBJECT_OPACITY_IMPORT_MODEL =
+  'slide-edit-object-opacity-import' as const
+export const SLIDE_EDIT_OBJECT_OPACITY_JSON_IMPORT_FORMAT =
+  'application-json-slide-edit-object-opacity' as const
 export const SLIDE_EDIT_OBJECT_OPACITY_JSON_MIME_TYPE =
   'application/vnd.interactive-os.slide-edit.object-opacity+json'
 
