@@ -5,6 +5,8 @@ import {
   getSlideEditTextFontFamilyCSS,
   getSlideEditTextFontFamilyCommandEffect,
   getSlideEditTextFontFamilyJSONPasteValue,
+  getSlideEditTextFontFamilyJSONPasteValueFromText,
+  getSlideEditTextFontFamilyJSONPasteValueFromValue,
   normalizeSlideEditTextFontFamily,
   normalizeSlideEditTextFontFamilyOptions,
   SLIDE_EDIT_TEXT_FONT_FAMILY_FALLBACK,
@@ -13,6 +15,8 @@ import {
 } from './SlideEditTextFontFamily'
 import {
   getSlideEditTextFontFamilyJSONPasteValue as getSlideEditTextFontFamilyJSONPasteValueFromPackage,
+  getSlideEditTextFontFamilyJSONPasteValueFromText as getSlideEditTextFontFamilyJSONPasteValueFromTextFromPackage,
+  getSlideEditTextFontFamilyJSONPasteValueFromValue as getSlideEditTextFontFamilyJSONPasteValueFromValueFromPackage,
 } from './index'
 
 describe('SlideEditTextFontFamily', () => {
@@ -181,6 +185,46 @@ describe('SlideEditTextFontFamily', () => {
       fallbackFontFamily: 'Body Sans',
       options: [],
     })).toBe('Inter')
+  })
+
+  it('reads font family JSON from text and parsed values', () => {
+    expect(getSlideEditTextFontFamilyJSONPasteValueFromText(
+      '"Title Serif"',
+      {
+        fallbackFontFamily: 'Body Sans',
+        options,
+      },
+    )).toBe('Title Serif')
+    expect(getSlideEditTextFontFamilyJSONPasteValueFromValue(
+      { fontFamily: 'Unknown' },
+      {
+        fallbackFontFamily: 'Body Sans',
+        mode: 'wrapped',
+        options,
+      },
+    )).toBe('Body Sans')
+    expect(getSlideEditTextFontFamilyJSONPasteValueFromTextFromPackage(
+      '{"value":"Custom Sans"}',
+      {
+        mode: 'wrapped',
+        options: [],
+      },
+    )).toBe('Custom Sans')
+    expect(getSlideEditTextFontFamilyJSONPasteValueFromValueFromPackage(
+      { value: 'Title Serif' },
+      {
+        fallbackFontFamily: 'Body Sans',
+        mode: 'any',
+        options,
+      },
+    )).toBe('Title Serif')
+    expect(getSlideEditTextFontFamilyJSONPasteValueFromText(
+      '"Title Serif"',
+      {
+        mode: 'wrapped',
+        options,
+      },
+    )).toBeNull()
   })
 
   it('does not treat unrelated JSON or direct text/plain values as font family', () => {

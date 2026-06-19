@@ -5,6 +5,8 @@ import {
   getSlideEditTextFontSizeCommandEffect,
   getSlideEditTextFontSizeCSSValue,
   getSlideEditTextFontSizeJSONPasteValue,
+  getSlideEditTextFontSizeJSONPasteValueFromText,
+  getSlideEditTextFontSizeJSONPasteValueFromValue,
   getSlideEditTextFontSizeMetadata,
   normalizeSlideEditTextFontSize,
   SLIDE_EDIT_TEXT_FONT_SIZE_DATA_ATTRIBUTE,
@@ -15,6 +17,8 @@ import {
 } from './SlideEditTextFontSize'
 import {
   createSlideEditTextFontSizeDescriptor as createSlideEditTextFontSizeDescriptorFromPackage,
+  getSlideEditTextFontSizeJSONPasteValueFromText as getSlideEditTextFontSizeJSONPasteValueFromTextFromPackage,
+  getSlideEditTextFontSizeJSONPasteValueFromValue as getSlideEditTextFontSizeJSONPasteValueFromValueFromPackage,
 } from './index'
 
 describe('SlideEditTextFontSize', () => {
@@ -142,6 +146,25 @@ describe('SlideEditTextFontSize', () => {
         'text/json': '{"fontSize":42}',
       }),
     })).toBe(42)
+  })
+
+  it('reads font size JSON from text and parsed values', () => {
+    expect(getSlideEditTextFontSizeJSONPasteValueFromText('24.126'))
+      .toBe(24.13)
+    expect(getSlideEditTextFontSizeJSONPasteValueFromValue({
+      fontSize: 999,
+    }, { mode: 'wrapped' })).toBe(400)
+    expect(getSlideEditTextFontSizeJSONPasteValueFromTextFromPackage(
+      '{"textFontSize":0}',
+      { mode: 'wrapped' },
+    )).toBe(1)
+    expect(getSlideEditTextFontSizeJSONPasteValueFromValueFromPackage(
+      '18.126',
+    )).toBe(18.13)
+    expect(getSlideEditTextFontSizeJSONPasteValueFromText(
+      '"18"',
+      { mode: 'wrapped' },
+    )).toBeNull()
   })
 
   it('does not treat unrelated JSON or direct text/plain values as font size', () => {

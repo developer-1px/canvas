@@ -83,6 +83,14 @@ export type SlideEditTextFontSizeJSONPasteInput = {
   jsonMimeType?: string
 }
 
+export type SlideEditTextFontSizeJSONPasteValueMode =
+  | 'direct'
+  | 'wrapped'
+
+export type SlideEditTextFontSizeJSONPasteValueOptions = {
+  mode?: SlideEditTextFontSizeJSONPasteValueMode
+}
+
 export const SLIDE_EDIT_TEXT_FONT_SIZE_DEFAULT = 16
 
 export const SLIDE_EDIT_TEXT_FONT_SIZE_DATA_ATTRIBUTE =
@@ -195,11 +203,10 @@ export function getSlideEditTextFontSizeJSONPasteValue({
   }
 
   if (jsonMimeType) {
-    const customValue = parseSlideEditTextFontSizeJSON(
+    const normalizedCustomValue = getSlideEditTextFontSizeJSONPasteValueFromText(
       dataTransfer.getData(jsonMimeType),
+      { mode: 'direct' },
     )
-    const normalizedCustomValue =
-      normalizeSlideEditTextFontSizeJSONValue(customValue)
 
     if (normalizedCustomValue !== null) {
       return normalizedCustomValue
@@ -207,8 +214,10 @@ export function getSlideEditTextFontSizeJSONPasteValue({
   }
 
   for (const type of SLIDE_EDIT_TEXT_FONT_SIZE_JSON_TYPES) {
-    const value = parseSlideEditTextFontSizeJSON(dataTransfer.getData(type))
-    const explicitValue = getSlideEditTextFontSizeExplicitJSONValue(value)
+    const explicitValue = getSlideEditTextFontSizeJSONPasteValueFromText(
+      dataTransfer.getData(type),
+      { mode: 'wrapped' },
+    )
 
     if (explicitValue !== null) {
       return explicitValue
@@ -216,6 +225,25 @@ export function getSlideEditTextFontSizeJSONPasteValue({
   }
 
   return null
+}
+
+export function getSlideEditTextFontSizeJSONPasteValueFromText(
+  text: string,
+  options?: SlideEditTextFontSizeJSONPasteValueOptions,
+): SlideEditTextFontSizeValue | null {
+  return getSlideEditTextFontSizeJSONPasteValueFromValue(
+    parseSlideEditTextFontSizeJSON(text),
+    options,
+  )
+}
+
+export function getSlideEditTextFontSizeJSONPasteValueFromValue(
+  value: unknown,
+  { mode = 'direct' }: SlideEditTextFontSizeJSONPasteValueOptions = {},
+): SlideEditTextFontSizeValue | null {
+  return mode === 'wrapped'
+    ? getSlideEditTextFontSizeExplicitJSONValue(value)
+    : normalizeSlideEditTextFontSizeJSONValue(value)
 }
 
 export function normalizeSlideEditTextFontSize(

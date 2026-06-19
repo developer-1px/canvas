@@ -92,6 +92,17 @@ export type SlideEditTextFontFamilyJSONPasteInput<
   jsonMimeType?: string
 }
 
+export type SlideEditTextFontFamilyJSONPasteValueMode =
+  | 'any'
+  | 'direct'
+  | 'wrapped'
+
+export type SlideEditTextFontFamilyJSONPasteValueOptions<
+  TFontFamily extends SlideEditTextFontFamily = SlideEditTextFontFamily,
+> = Omit<SlideEditTextFontFamilyNormalizeInput<TFontFamily>, 'fontFamily'> & {
+  mode?: SlideEditTextFontFamilyJSONPasteValueMode
+}
+
 export const SLIDE_EDIT_TEXT_FONT_FAMILY_FALLBACK = 'sans-serif'
 
 export const SLIDE_EDIT_TEXT_FONT_FAMILY_FIELD = Object.freeze({
@@ -309,14 +320,13 @@ export function getSlideEditTextFontFamilyJSONPasteValue<
   }
 
   if (jsonMimeType) {
-    const customValue = parseSlideEditTextFontFamilyJSON(
-      dataTransfer.getData(jsonMimeType),
-    )
     const normalizedCustomValue =
-      getSlideEditTextFontFamilyCandidateValue(customValue, normalizeInput) ??
-      getSlideEditTextFontFamilyExplicitJSONValue(
-        customValue,
-        normalizeInput,
+      getSlideEditTextFontFamilyJSONPasteValueFromText(
+        dataTransfer.getData(jsonMimeType),
+        {
+          ...normalizeInput,
+          mode: 'any',
+        },
       )
 
     if (normalizedCustomValue !== null) {
@@ -325,10 +335,12 @@ export function getSlideEditTextFontFamilyJSONPasteValue<
   }
 
   for (const type of SLIDE_EDIT_TEXT_JSON_PASTE_TYPES) {
-    const value = parseSlideEditTextFontFamilyJSON(dataTransfer.getData(type))
-    const explicitValue = getSlideEditTextFontFamilyExplicitJSONValue(
-      value,
-      normalizeInput,
+    const explicitValue = getSlideEditTextFontFamilyJSONPasteValueFromText(
+      dataTransfer.getData(type),
+      {
+        ...normalizeInput,
+        mode: 'wrapped',
+      },
     )
 
     if (explicitValue !== null) {
@@ -337,6 +349,45 @@ export function getSlideEditTextFontFamilyJSONPasteValue<
   }
 
   return null
+}
+
+export function getSlideEditTextFontFamilyJSONPasteValueFromText<
+  TFontFamily extends SlideEditTextFontFamily = SlideEditTextFontFamily,
+>(
+  text: string,
+  options?: SlideEditTextFontFamilyJSONPasteValueOptions<TFontFamily>,
+): TFontFamily | null {
+  return getSlideEditTextFontFamilyJSONPasteValueFromValue(
+    parseSlideEditTextFontFamilyJSON(text),
+    options,
+  )
+}
+
+export function getSlideEditTextFontFamilyJSONPasteValueFromValue<
+  TFontFamily extends SlideEditTextFontFamily = SlideEditTextFontFamily,
+>(
+  value: unknown,
+  {
+    fallbackFontFamily = SLIDE_EDIT_TEXT_FONT_FAMILY_FALLBACK as TFontFamily,
+    mode = 'direct',
+    options = [],
+  }: SlideEditTextFontFamilyJSONPasteValueOptions<TFontFamily> = {},
+): TFontFamily | null {
+  const normalizeInput = {
+    fallbackFontFamily,
+    options,
+  }
+
+  if (mode === 'direct') {
+    return getSlideEditTextFontFamilyCandidateValue(value, normalizeInput)
+  }
+
+  if (mode === 'wrapped') {
+    return getSlideEditTextFontFamilyExplicitJSONValue(value, normalizeInput)
+  }
+
+  return getSlideEditTextFontFamilyCandidateValue(value, normalizeInput) ??
+    getSlideEditTextFontFamilyExplicitJSONValue(value, normalizeInput)
 }
 
 function normalizeSlideEditTextFontFamilyName(

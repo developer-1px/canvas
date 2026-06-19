@@ -79,6 +79,14 @@ export type SlideEditTextFontWeightJSONPasteInput = {
   jsonMimeType?: string
 }
 
+export type SlideEditTextFontWeightJSONPasteValueMode =
+  | 'direct'
+  | 'wrapped'
+
+export type SlideEditTextFontWeightJSONPasteValueOptions = {
+  mode?: SlideEditTextFontWeightJSONPasteValueMode
+}
+
 export const SLIDE_EDIT_TEXT_FONT_WEIGHT_DEFAULT = 'regular'
 
 export const SLIDE_EDIT_TEXT_FONT_WEIGHT_VALUES = Object.freeze([
@@ -193,11 +201,11 @@ export function getSlideEditTextFontWeightJSONPasteValue({
   }
 
   if (jsonMimeType) {
-    const customValue = parseSlideEditTextFontWeightJSON(
-      dataTransfer.getData(jsonMimeType),
-    )
     const normalizedCustomValue =
-      normalizeSlideEditTextFontWeightJSONValue(customValue)
+      getSlideEditTextFontWeightJSONPasteValueFromText(
+        dataTransfer.getData(jsonMimeType),
+        { mode: 'direct' },
+      )
 
     if (normalizedCustomValue !== null) {
       return normalizedCustomValue
@@ -205,8 +213,10 @@ export function getSlideEditTextFontWeightJSONPasteValue({
   }
 
   for (const type of SLIDE_EDIT_TEXT_FONT_WEIGHT_JSON_TYPES) {
-    const value = parseSlideEditTextFontWeightJSON(dataTransfer.getData(type))
-    const explicitValue = getSlideEditTextFontWeightExplicitJSONValue(value)
+    const explicitValue = getSlideEditTextFontWeightJSONPasteValueFromText(
+      dataTransfer.getData(type),
+      { mode: 'wrapped' },
+    )
 
     if (explicitValue !== null) {
       return explicitValue
@@ -214,6 +224,25 @@ export function getSlideEditTextFontWeightJSONPasteValue({
   }
 
   return null
+}
+
+export function getSlideEditTextFontWeightJSONPasteValueFromText(
+  text: string,
+  options?: SlideEditTextFontWeightJSONPasteValueOptions,
+): SlideEditTextFontWeightValue | null {
+  return getSlideEditTextFontWeightJSONPasteValueFromValue(
+    parseSlideEditTextFontWeightJSON(text),
+    options,
+  )
+}
+
+export function getSlideEditTextFontWeightJSONPasteValueFromValue(
+  value: unknown,
+  { mode = 'direct' }: SlideEditTextFontWeightJSONPasteValueOptions = {},
+): SlideEditTextFontWeightValue | null {
+  return mode === 'wrapped'
+    ? getSlideEditTextFontWeightExplicitJSONValue(value)
+    : normalizeSlideEditTextFontWeightJSONValue(value)
 }
 
 export function normalizeSlideEditTextFontWeight(
