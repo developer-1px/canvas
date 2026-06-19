@@ -141,6 +141,9 @@ import {
   getCanvasPresentationKeyboardIntent,
   getCanvasRadioGroupKeyboardIntent,
   getCanvasRadioTabIndex,
+  getCanvasToolbarRovingActiveIndex,
+  getCanvasToolbarRovingKeyboardIntent,
+  getCanvasToolbarRovingKeyIndex,
   setCanvasDataTransferText,
   stringifyCanvasRichClipboardPayload,
   readCanvasRichClipboardFromDataTransfer,
@@ -157,6 +160,7 @@ import {
   runCanvasEditableFieldKeyboardIntent,
   runCanvasPresentationKeyboardIntent,
   runCanvasRadioGroupKeyboardIntent,
+  runCanvasToolbarRovingKeyboardIntent,
   runCanvasWheelViewport,
   startCanvasPointerLaserInteraction,
   startCanvasPointerPanInteraction,
@@ -506,6 +510,9 @@ import {
   type CanvasMenuRovingActiveIndexInput,
   type CanvasMenuRovingKeyboardIntentInput,
   type CanvasMenuTriggerKeyboardIntentInput,
+  type CanvasToolbarRovingActiveIndexInput,
+  type CanvasToolbarRovingKeyboardIntentInput,
+  type RunCanvasToolbarRovingKeyboardIntentInput,
   type CanvasModalBackdropPointerIntentInput,
   type CanvasModalKeyboardIntentInput,
   type RunCanvasModalBackdropPointerIntentInput,
@@ -4200,6 +4207,38 @@ describe('Canvas package consumer imports', () => {
     const menuTriggerKeyboardInput: CanvasMenuTriggerKeyboardIntentInput = {
       key: 'Enter',
     }
+    const toolbarRovingActiveIndexInput:
+      CanvasToolbarRovingActiveIndexInput = {
+        count: 4,
+        focusedIndex: -1,
+        preferredIndex: 9,
+      }
+    const toolbarRovingKeyboardInput:
+      CanvasToolbarRovingKeyboardIntentInput = {
+        count: 4,
+        currentIndex: 0,
+        key: 'ArrowRight',
+      }
+    let toolbarRovingPreventDefaultCount = 0
+    let toolbarRovingStopPropagationCount = 0
+    let toolbarRovingFocusedIndex: number | null = null
+    const toolbarRovingKeyboardRunInput:
+      RunCanvasToolbarRovingKeyboardIntentInput = {
+        count: 4,
+        currentIndex: 0,
+        event: {
+          key: 'End',
+          preventDefault: () => {
+            toolbarRovingPreventDefaultCount += 1
+          },
+          stopPropagation: () => {
+            toolbarRovingStopPropagationCount += 1
+          },
+        },
+        onMoveFocus: (nextIndex) => {
+          toolbarRovingFocusedIndex = nextIndex
+        },
+      }
     let menuRestorePreventScroll: boolean | undefined
     const menuRestoreTarget = {
       disabled: false,
@@ -4825,6 +4864,40 @@ describe('Canvas package consumer imports', () => {
       kind: 'open-menu',
       preventDefault: true,
     })
+    expect(getCanvasToolbarRovingActiveIndex(
+      toolbarRovingActiveIndexInput,
+    )).toBe(3)
+    expect(CanvasAppFacade.getCanvasToolbarRovingActiveIndex(
+      toolbarRovingActiveIndexInput,
+    )).toBe(3)
+    expect(getCanvasToolbarRovingKeyIndex(toolbarRovingKeyboardInput)).toBe(1)
+    expect(CanvasAppFacade.getCanvasToolbarRovingKeyIndex(
+      toolbarRovingKeyboardInput,
+    )).toBe(1)
+    expect(getCanvasToolbarRovingKeyboardIntent(toolbarRovingKeyboardInput))
+      .toEqual({
+        kind: 'move-focus',
+        nextIndex: 1,
+        preventDefault: true,
+        stopPropagation: true,
+      })
+    expect(CanvasAppFacade.getCanvasToolbarRovingKeyboardIntent(
+      toolbarRovingKeyboardInput,
+    )).toEqual({
+      kind: 'move-focus',
+      nextIndex: 1,
+      preventDefault: true,
+      stopPropagation: true,
+    })
+    expect(runCanvasToolbarRovingKeyboardIntent(
+      toolbarRovingKeyboardRunInput,
+    )).toBe(true)
+    expect(CanvasAppFacade.runCanvasToolbarRovingKeyboardIntent(
+      toolbarRovingKeyboardRunInput,
+    )).toBe(true)
+    expect(toolbarRovingPreventDefaultCount).toBe(2)
+    expect(toolbarRovingStopPropagationCount).toBe(2)
+    expect(toolbarRovingFocusedIndex).toBe(3)
     expect(CANVAS_MENU_FOCUS_RESTORE_MODEL).toBe('canvas-menu-focus-restore')
     expect(getCanvasMenuRestoreFocusTarget({ root: menuRoot }))
       .toBe(menuRestoreTarget)

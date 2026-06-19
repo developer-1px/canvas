@@ -538,11 +538,21 @@ export {
 } from './text-paste-import'
 export {
   getCanvasToolbarCommandGroups,
+  getCanvasToolbarRovingActiveIndex,
+  getCanvasToolbarRovingKeyboardIntent,
+  getCanvasToolbarRovingKeyIndex,
   getCanvasToolbarToolItems,
+  runCanvasToolbarRovingKeyboardIntent,
   type CanvasToolbarCommandGroup,
   type CanvasToolbarCommandItemsInput,
+  type CanvasToolbarRovingActiveIndexInput,
+  type CanvasToolbarRovingKeyboardEvent,
+  type CanvasToolbarRovingKeyboardIntent,
+  type CanvasToolbarRovingKeyboardIntentInput,
+  type CanvasToolbarRovingKeyIndexInput,
   type CanvasToolbarToolItem,
   type CanvasToolbarToolItemsInput,
+  type RunCanvasToolbarRovingKeyboardIntentInput,
 } from './toolbar'
 export {
   getCanvasAppRuntimeFeatureConfig,

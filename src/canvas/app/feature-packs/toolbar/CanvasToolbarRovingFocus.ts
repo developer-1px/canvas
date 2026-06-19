@@ -21,6 +21,47 @@ type CanvasToolbarRovingItem = HTMLElement & {
   disabled?: boolean
 }
 
+export type CanvasToolbarRovingActiveIndexInput = {
+  count: number
+  focusedIndex: number
+  preferredIndex: number
+}
+
+export type CanvasToolbarRovingKeyIndexInput = {
+  count: number
+  currentIndex: number
+  key: string
+}
+
+export type CanvasToolbarRovingKeyboardIntentInput =
+  CanvasToolbarRovingKeyIndexInput
+
+export type CanvasToolbarRovingKeyboardIntent =
+  | {
+      kind: 'move-focus'
+      nextIndex: number
+      preventDefault: true
+      stopPropagation: true
+    }
+  | {
+      kind: 'none'
+      preventDefault: false
+      stopPropagation: false
+    }
+
+export type CanvasToolbarRovingKeyboardEvent = {
+  key: string
+  preventDefault: () => void
+  stopPropagation: () => void
+}
+
+export type RunCanvasToolbarRovingKeyboardIntentInput = {
+  count: number
+  currentIndex: number
+  event: CanvasToolbarRovingKeyboardEvent
+  onMoveFocus: (nextIndex: number) => void
+}
+
 export function useCanvasToolbarRovingFocus<
   TElement extends HTMLElement = HTMLElement,
 >() {
@@ -85,19 +126,12 @@ export function useCanvasToolbarRovingFocus<
     const items = syncItems()
     const currentIndex = items.findIndex((item) =>
       item === event.currentTarget.ownerDocument.activeElement)
-    const nextIndex = getCanvasToolbarRovingKeyIndex({
+    runCanvasToolbarRovingKeyboardIntent({
       count: items.length,
       currentIndex,
-      key: event.key,
+      event,
+      onMoveFocus: focusItem,
     })
-
-    if (nextIndex === null) {
-      return
-    }
-
-    event.preventDefault()
-    event.stopPropagation()
-    focusItem(nextIndex)
   }, [focusItem, syncItems])
 
   return {
@@ -119,15 +153,11 @@ function isCanvasToolbarRovingItemEnabled(item: CanvasToolbarRovingItem) {
   return !item.disabled && item.getAttribute('aria-disabled') !== 'true'
 }
 
-function getCanvasToolbarRovingActiveIndex({
+export function getCanvasToolbarRovingActiveIndex({
   count,
   focusedIndex,
   preferredIndex,
-}: {
-  count: number
-  focusedIndex: number
-  preferredIndex: number
-}) {
+}: CanvasToolbarRovingActiveIndexInput) {
   if (count === 0) {
     return 0
   }
@@ -139,15 +169,11 @@ function getCanvasToolbarRovingActiveIndex({
   return Math.max(0, Math.min(preferredIndex, count - 1))
 }
 
-function getCanvasToolbarRovingKeyIndex({
+export function getCanvasToolbarRovingKeyIndex({
   count,
   currentIndex,
   key,
-}: {
-  count: number
-  currentIndex: number
-  key: string
-}) {
+}: CanvasToolbarRovingKeyIndexInput) {
   if (count === 0 || currentIndex < 0) {
     return null
   }
@@ -169,4 +195,58 @@ function getCanvasToolbarRovingKeyIndex({
   }
 
   return null
+}
+
+export function getCanvasToolbarRovingKeyboardIntent({
+  count,
+  currentIndex,
+  key,
+}: CanvasToolbarRovingKeyboardIntentInput): CanvasToolbarRovingKeyboardIntent {
+  const nextIndex = getCanvasToolbarRovingKeyIndex({
+    count,
+    currentIndex,
+    key,
+  })
+
+  if (nextIndex === null) {
+    return {
+      kind: 'none',
+      preventDefault: false,
+      stopPropagation: false,
+    }
+  }
+
+  return {
+    kind: 'move-focus',
+    nextIndex,
+    preventDefault: true,
+    stopPropagation: true,
+  }
+}
+
+export function runCanvasToolbarRovingKeyboardIntent({
+  count,
+  currentIndex,
+  event,
+  onMoveFocus,
+}: RunCanvasToolbarRovingKeyboardIntentInput) {
+  const intent = getCanvasToolbarRovingKeyboardIntent({
+    count,
+    currentIndex,
+    key: event.key,
+  })
+
+  if (intent.kind === 'none') {
+    return false
+  }
+
+  if (intent.preventDefault) {
+    event.preventDefault()
+  }
+  if (intent.stopPropagation) {
+    event.stopPropagation()
+  }
+
+  onMoveFocus(intent.nextIndex)
+  return true
 }

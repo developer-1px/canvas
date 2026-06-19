@@ -29,7 +29,17 @@ export {
   CANVAS_TOOLBAR_ITEM_PROPS,
   CANVAS_TOOLBAR_KEYBOARD_MODEL,
   CANVAS_TOOLBAR_ROVING_FOCUS_MODEL,
+  getCanvasToolbarRovingActiveIndex,
+  getCanvasToolbarRovingKeyboardIntent,
+  getCanvasToolbarRovingKeyIndex,
+  runCanvasToolbarRovingKeyboardIntent,
   useCanvasToolbarRovingFocus,
+  type CanvasToolbarRovingActiveIndexInput,
+  type CanvasToolbarRovingKeyboardEvent,
+  type CanvasToolbarRovingKeyboardIntent,
+  type CanvasToolbarRovingKeyboardIntentInput,
+  type CanvasToolbarRovingKeyIndexInput,
+  type RunCanvasToolbarRovingKeyboardIntentInput,
 } from './feature-packs/toolbar'
 export {
   CANVAS_MENU_FOCUS_MODEL,
