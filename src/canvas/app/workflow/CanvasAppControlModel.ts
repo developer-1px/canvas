@@ -112,6 +112,7 @@ export function getCanvasAppControlModel({
         gesture,
         selectionLength: selection.length,
         tool,
+        viewport,
       }),
       visible: config.overlays.status,
     },

@@ -3,6 +3,7 @@ import {
   CANVAS_APP_READ_ONLY_CAPABILITIES,
   CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST,
   CANVAS_APP_COMPONENT_SOURCE_OUTLINE_FEATURE_PACK_MANIFEST,
+  CANVAS_APP_STATUS_BAR_FEATURE_PACK_MANIFEST,
   CANVAS_APP_STORY_IMPORT_FEATURE_PACK_MANIFEST,
   CANVAS_STORY_CANVAS_SUITE_ID,
   CANVAS_STORY_PREVIEW_GROUP_PRESENTATION,
@@ -37,7 +38,7 @@ describe('storyCanvasModules', () => {
       .toHaveProperty(CANVAS_STORY_PREVIEW_ITEM_PRESENTATION);
   });
 
-  it('keeps story canvas profile scoped to story, source outline, and zoom packs', () => {
+  it('keeps story canvas profile scoped to story, source outline, status, and zoom packs', () => {
     expect(STORY_CANVAS_FEATURE_PACK_PROFILE.installedSuiteIds).toEqual([
       CANVAS_STORY_CANVAS_SUITE_ID,
     ]);
@@ -46,6 +47,7 @@ describe('storyCanvasModules', () => {
       CANVAS_APP_STORY_IMPORT_FEATURE_PACK_MANIFEST.id,
       CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST.id,
       CANVAS_APP_COMPONENT_SOURCE_OUTLINE_FEATURE_PACK_MANIFEST.id,
+      CANVAS_APP_STATUS_BAR_FEATURE_PACK_MANIFEST.id,
       'zoom-controls',
     ]);
     expect(STORY_CANVAS_FEATURE_PACK_PROFILE.enabledFeaturePackIds).toEqual([
@@ -53,8 +55,11 @@ describe('storyCanvasModules', () => {
       CANVAS_APP_STORY_IMPORT_FEATURE_PACK_MANIFEST.id,
       CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST.id,
       CANVAS_APP_COMPONENT_SOURCE_OUTLINE_FEATURE_PACK_MANIFEST.id,
+      CANVAS_APP_STATUS_BAR_FEATURE_PACK_MANIFEST.id,
       'zoom-controls',
     ]);
+    expect(STORY_CANVAS_AFFORDANCE_CONFIG?.overlays?.status).toBe(true);
+    expect(STORY_CANVAS_AFFORDANCE_CONFIG?.overlays?.zoomControls).toBe(true);
   });
 
   it('builds route assembly input through the Story Canvas suite helper', () => {

@@ -1,4 +1,7 @@
-import { isCanvasCustomToolId } from '../../../core'
+import {
+  getCanvasViewportScale,
+  isCanvasCustomToolId,
+} from '../../../core'
 import {
   CANVAS_GESTURE_STATUS_LABELS,
   CANVAS_TOOL_AFFORDANCES,
@@ -6,6 +9,7 @@ import {
 import type {
   CanvasInteractionKind,
   Tool,
+  Viewport,
 } from '../../../entities'
 import type {
   CanvasAppCustomCreationToolState,
@@ -16,16 +20,23 @@ export function getCanvasStatusModel({
   gesture,
   selectionLength,
   tool,
+  viewport,
 }: {
   customTools: readonly CanvasAppCustomCreationToolState[]
   gesture: CanvasInteractionKind
   selectionLength: number
   tool: Tool
+  viewport: Pick<Viewport, 'scale'>
 }) {
   return {
     mode: getCanvasStatusMode({ customTools, gesture, tool }),
+    scalePercent: getCanvasStatusScalePercent(viewport),
     selectionLength,
   }
+}
+
+function getCanvasStatusScalePercent(viewport: Pick<Viewport, 'scale'>) {
+  return Math.round(getCanvasViewportScale(viewport) * 100)
 }
 
 function getCanvasStatusMode({

@@ -232,6 +232,7 @@ export function createViewProps(
     },
     status: {
       mode: 'Select',
+      scalePercent: 100,
       selectionLength: 1,
       visible: visible.status ?? true,
     },

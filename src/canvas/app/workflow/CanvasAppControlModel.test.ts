@@ -65,6 +65,7 @@ describe('CanvasAppControlModel', () => {
     )
     expect(model.status).toMatchObject({
       mode: 'Risk',
+      scalePercent: 150,
       selectionLength: 2,
       visible: true,
     })

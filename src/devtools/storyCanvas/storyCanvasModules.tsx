@@ -1,6 +1,7 @@
 import { useSyncExternalStore, type CSSProperties } from 'react';
 import {
   CANVAS_APP_READ_ONLY_CAPABILITIES,
+  CANVAS_APP_STATUS_BAR_FEATURE_PACK_MANIFEST,
   CANVAS_STORY_CANVAS_SUITE_ID,
   DEFAULT_CANVAS_APP_FEATURE_PACK_SUITE_MANIFESTS,
   type CanvasAppAssemblyInput,
@@ -86,7 +87,7 @@ export const STORY_CANVAS_AFFORDANCE_CONFIG: CanvasAppAssemblyInput['affordanceC
     spotlight: false,
     stampControls: false,
     stickyQuickCreate: false,
-    status: false,
+    status: true,
     textEditor: false,
     toolbar: false,
     votingSession: false,
@@ -142,6 +143,7 @@ export const STORY_CANVAS_FEATURE_PACK_PROFILE: CanvasAppFeaturePackProfile =
     installedFeaturePackIds: [
       'component-library',
       'component-source-outline',
+      CANVAS_APP_STATUS_BAR_FEATURE_PACK_MANIFEST.id,
       'zoom-controls',
     ],
     installedSuiteIds: [CANVAS_STORY_CANVAS_SUITE_ID],
