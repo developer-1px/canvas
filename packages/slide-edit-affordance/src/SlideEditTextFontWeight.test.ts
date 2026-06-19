@@ -5,6 +5,8 @@ import {
   getSlideEditTextFontWeightCommandEffect,
   getSlideEditTextFontWeightCSSValue,
   getSlideEditTextFontWeightJSONPasteValue,
+  getSlideEditTextFontWeightJSONPasteValueFromText,
+  getSlideEditTextFontWeightJSONPasteValueFromValue,
   normalizeSlideEditTextFontWeight,
   SLIDE_EDIT_TEXT_FONT_WEIGHT_DEFAULT,
   SLIDE_EDIT_TEXT_FONT_WEIGHT_FIELD,
@@ -12,6 +14,8 @@ import {
 } from './SlideEditTextFontWeight'
 import {
   createSlideEditTextFontWeightDescriptor as createSlideEditTextFontWeightDescriptorFromPackage,
+  getSlideEditTextFontWeightJSONPasteValueFromText as getSlideEditTextFontWeightJSONPasteValueFromTextFromPackage,
+  getSlideEditTextFontWeightJSONPasteValueFromValue as getSlideEditTextFontWeightJSONPasteValueFromValueFromPackage,
 } from './index'
 
 describe('SlideEditTextFontWeight', () => {
@@ -134,6 +138,24 @@ describe('SlideEditTextFontWeight', () => {
         'application/json': '{"fontWeight":"bold"}',
       }),
     })).toBe('bold')
+  })
+
+  it('reads font weight JSON from text and parsed values', () => {
+    expect(getSlideEditTextFontWeightJSONPasteValueFromText('"bold"'))
+      .toBe('bold')
+    expect(getSlideEditTextFontWeightJSONPasteValueFromValue({
+      weight: 600,
+    }, { mode: 'wrapped' })).toBe('semibold')
+    expect(getSlideEditTextFontWeightJSONPasteValueFromTextFromPackage(
+      '{"bold":true}',
+      { mode: 'wrapped' },
+    )).toBe('bold')
+    expect(getSlideEditTextFontWeightJSONPasteValueFromValueFromPackage(false))
+      .toBe('regular')
+    expect(getSlideEditTextFontWeightJSONPasteValueFromText(
+      '"bold"',
+      { mode: 'wrapped' },
+    )).toBeNull()
   })
 
   it('does not treat unrelated JSON or direct text/plain values as font weight', () => {

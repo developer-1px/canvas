@@ -110,7 +110,9 @@ export type SlideEditTextFontSizeJSONPasteInput = {
   jsonMimeType?: string
 }
 
-export type SlideEditTextFontSizeJSONPasteValueMode = 'direct' | 'wrapped'
+export type SlideEditTextFontSizeJSONPasteValueMode =
+  | 'direct'
+  | 'wrapped'
 
 export type SlideEditTextFontSizeJSONPasteValueOptions = {
   mode?: SlideEditTextFontSizeJSONPasteValueMode
@@ -293,7 +295,7 @@ export function getSlideEditTextFontSizeJSONPasteValue({
 export function getSlideEditTextFontSizeJSONPasteValueFromText(
   text: string,
   options?: SlideEditTextFontSizeJSONPasteValueOptions,
-) {
+): SlideEditTextFontSizeValue | null {
   return getSlideEditTextFontSizeJSONPasteValueFromValue(
     parseSlideEditTextFontSizeJSON(text),
     options,
