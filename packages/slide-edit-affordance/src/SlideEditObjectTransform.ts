@@ -343,7 +343,7 @@ export function getSlideEditObjectTransformJSONPasteValue({
 export function getSlideEditObjectTransformJSONPasteValueFromText(
   text: string,
   options?: SlideEditObjectTransformJSONPasteValueOptions,
-) {
+): SlideEditObjectTransformJSONPasteValue | null {
   return getSlideEditObjectTransformJSONPasteValueFromValue(
     parseSlideEditObjectTransformJSON(text),
     {

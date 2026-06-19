@@ -80,10 +80,55 @@ export type SlideEditObjectStrokeLineStyleHostCommandEffect<
   type: 'slide-command-effect'
 }
 
+export type SlideEditObjectStrokeLineStyleDataTransfer = Pick<
+  DataTransfer,
+  'getData'
+>
+
+export type SlideEditObjectStrokeLineStyleJSONPasteInput = {
+  dataTransfer: SlideEditObjectStrokeLineStyleDataTransfer | null
+  jsonMimeType?: string
+}
+
+export type SlideEditObjectStrokeLineStyleJSONPasteValueMode =
+  | 'direct'
+  | 'wrapped'
+
+export type SlideEditObjectStrokeLineStyleJSONPasteValueOptions = {
+  mode?: SlideEditObjectStrokeLineStyleJSONPasteValueMode
+}
+
+export type SlideEditObjectStrokeLineStylePasteCommandInput<
+  TSlideId extends SlideEditObjectStrokeLineStyleSlideId =
+    SlideEditObjectStrokeLineStyleSlideId,
+  TObjectId extends SlideEditObjectStrokeLineStyleObjectId =
+    SlideEditObjectStrokeLineStyleObjectId,
+> = {
+  objectId: TObjectId
+  slideId: TSlideId
+  value: SlideEditObjectStrokeLineStyleValue
+}
+
 export const SLIDE_EDIT_OBJECT_STROKE_LINE_STYLE_DATA_ATTRIBUTE =
   'data-slide-object-stroke-line-style'
 
 export const SLIDE_EDIT_OBJECT_STROKE_LINE_STYLE_DEFAULT = 'solid'
+
+export const SLIDE_EDIT_OBJECT_STROKE_LINE_STYLE_JSON_MIME_TYPE =
+  'application/vnd.interactive-os.slide-edit.object-stroke-line-style+json'
+
+export const SLIDE_EDIT_OBJECT_STROKE_LINE_STYLE_JSON_TYPES = Object.freeze([
+  'application/json',
+  'text/json',
+  'text/plain',
+] as const)
+
+export const SLIDE_EDIT_OBJECT_STROKE_LINE_STYLE_JSON_WRAPPER_KEYS =
+  Object.freeze([
+    'objectStrokeLineStyle',
+    'strokeLineStyle',
+    'strokeDash',
+  ] as const)
 
 export const SLIDE_EDIT_OBJECT_STROKE_LINE_STYLE_OPTIONS = Object.freeze([
   {
@@ -160,6 +205,90 @@ export function getSlideEditObjectStrokeLineStyleCommandEffect<
       slideId: command.slideId,
     },
     type: 'slide-command-effect',
+  }
+}
+
+export function getSlideEditObjectStrokeLineStyleJSONPasteValue({
+  dataTransfer,
+  jsonMimeType = SLIDE_EDIT_OBJECT_STROKE_LINE_STYLE_JSON_MIME_TYPE,
+}: SlideEditObjectStrokeLineStyleJSONPasteInput):
+  SlideEditObjectStrokeLineStyleValue | null {
+  if (!dataTransfer) {
+    return null
+  }
+
+  if (jsonMimeType) {
+    const customText = dataTransfer.getData(jsonMimeType)
+
+    if (customText.trim()) {
+      const customLineStyle =
+        getSlideEditObjectStrokeLineStyleJSONPasteValueFromText(
+          customText,
+          { mode: 'direct' },
+        )
+
+      if (customLineStyle !== null) {
+        return customLineStyle
+      }
+    }
+  }
+
+  for (const type of SLIDE_EDIT_OBJECT_STROKE_LINE_STYLE_JSON_TYPES) {
+    const text = dataTransfer.getData(type)
+
+    if (!text.trim()) {
+      continue
+    }
+
+    const lineStyle = getSlideEditObjectStrokeLineStyleJSONPasteValueFromText(
+      text,
+      { mode: 'wrapped' },
+    )
+
+    if (lineStyle !== null) {
+      return lineStyle
+    }
+  }
+
+  return null
+}
+
+export function getSlideEditObjectStrokeLineStyleJSONPasteValueFromText(
+  text: string,
+  options?: SlideEditObjectStrokeLineStyleJSONPasteValueOptions,
+): SlideEditObjectStrokeLineStyleValue | null {
+  return getSlideEditObjectStrokeLineStyleJSONPasteValueFromValue(
+    parseSlideEditObjectStrokeLineStyleJSON(text),
+    options,
+  )
+}
+
+export function getSlideEditObjectStrokeLineStyleJSONPasteValueFromValue(
+  value: unknown,
+  {
+    mode = 'direct',
+  }: SlideEditObjectStrokeLineStyleJSONPasteValueOptions = {},
+): SlideEditObjectStrokeLineStyleValue | null {
+  return mode === 'wrapped'
+    ? getSlideEditObjectStrokeLineStyleWrappedPasteValue(value)
+    : getSlideEditObjectStrokeLineStyleDirectPasteValue(value)
+}
+
+export function getSlideEditObjectStrokeLineStylePasteCommand<
+  TSlideId extends SlideEditObjectStrokeLineStyleSlideId,
+  TObjectId extends SlideEditObjectStrokeLineStyleObjectId,
+>({
+  objectId,
+  slideId,
+  value,
+}: SlideEditObjectStrokeLineStylePasteCommandInput<TSlideId, TObjectId>):
+  SlideEditObjectStrokeLineStyleUpdateCommand<TSlideId, TObjectId> {
+  return {
+    fieldId: 'strokeLineStyle',
+    id: 'update-object-stroke-line-style',
+    objectId,
+    slideId,
+    value,
   }
 }
 
@@ -258,4 +387,80 @@ export function isSlideEditObjectStrokeLineStyleValue(
   value: string | null | undefined,
 ): value is SlideEditObjectStrokeLineStyleValue {
   return value === 'dash' || value === 'dot' || value === 'solid'
+}
+
+function getSlideEditObjectStrokeLineStyleDirectPasteValue(
+  value: unknown,
+): SlideEditObjectStrokeLineStyleValue | null {
+  if (typeof value === 'string') {
+    return isSlideEditObjectStrokeLineStyleValue(value) ? value : null
+  }
+
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null
+  }
+
+  const record = value as Record<string, unknown>
+
+  for (const key of ['value', 'strokeLineStyle'] as const) {
+    if (Object.hasOwn(record, key)) {
+      return getSlideEditObjectStrokeLineStyleDirectPasteValue(record[key])
+    }
+  }
+
+  for (const key of ['dash', 'strokeDash'] as const) {
+    if (Object.hasOwn(record, key)) {
+      return getSlideEditObjectStrokeDashPasteValue(record[key])
+    }
+  }
+
+  return null
+}
+
+function getSlideEditObjectStrokeLineStyleWrappedPasteValue(
+  value: unknown,
+): SlideEditObjectStrokeLineStyleValue | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null
+  }
+
+  const record = value as Record<string, unknown>
+
+  for (const key of SLIDE_EDIT_OBJECT_STROKE_LINE_STYLE_JSON_WRAPPER_KEYS) {
+    if (!Object.hasOwn(record, key)) {
+      continue
+    }
+
+    return key === 'strokeDash'
+      ? getSlideEditObjectStrokeDashPasteValue(record[key])
+      : getSlideEditObjectStrokeLineStyleDirectPasteValue(record[key])
+  }
+
+  return null
+}
+
+function getSlideEditObjectStrokeDashPasteValue(
+  value: unknown,
+): SlideEditObjectStrokeLineStyleValue | null {
+  if (value === true) {
+    return 'dash'
+  }
+
+  if (value === false) {
+    return 'solid'
+  }
+
+  return getSlideEditObjectStrokeLineStyleDirectPasteValue(value)
+}
+
+function parseSlideEditObjectStrokeLineStyleJSON(value: string) {
+  if (!value.trim()) {
+    return null
+  }
+
+  try {
+    return JSON.parse(value) as unknown
+  } catch {
+    return null
+  }
 }

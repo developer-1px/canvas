@@ -5,14 +5,27 @@ import {
   getSlideEditObjectStrokeLineStyleCommandEffect,
   getSlideEditObjectStrokeLineStyleBorderStyle,
   getSlideEditObjectStrokeLineStyleDashArray,
+  getSlideEditObjectStrokeLineStyleJSONPasteValue,
+  getSlideEditObjectStrokeLineStyleJSONPasteValueFromText,
+  getSlideEditObjectStrokeLineStyleJSONPasteValueFromValue,
   getSlideEditObjectStrokeLineStyleMetadata,
+  getSlideEditObjectStrokeLineStylePasteCommand,
   isSlideEditObjectStrokeLineStyleValue,
   normalizeSlideEditObjectStrokeLineStyle,
   SLIDE_EDIT_OBJECT_STROKE_LINE_STYLE_DATA_ATTRIBUTE,
   SLIDE_EDIT_OBJECT_STROKE_LINE_STYLE_DEFAULT,
   SLIDE_EDIT_OBJECT_STROKE_LINE_STYLE_FIELD,
+  SLIDE_EDIT_OBJECT_STROKE_LINE_STYLE_JSON_MIME_TYPE,
   SLIDE_EDIT_OBJECT_STROKE_LINE_STYLE_OPTIONS,
 } from './SlideEditObjectStrokeLineStyle'
+import {
+  getSlideEditObjectStrokeLineStyleBorderStyle as getSlideEditObjectStrokeLineStyleBorderStyleFromPackage,
+  getSlideEditObjectStrokeLineStyleDashArray as getSlideEditObjectStrokeLineStyleDashArrayFromPackage,
+  getSlideEditObjectStrokeLineStyleJSONPasteValue as getSlideEditObjectStrokeLineStyleJSONPasteValueFromPackage,
+  getSlideEditObjectStrokeLineStyleJSONPasteValueFromText as getSlideEditObjectStrokeLineStyleJSONPasteValueFromTextFromPackage,
+  getSlideEditObjectStrokeLineStyleJSONPasteValueFromValue as getSlideEditObjectStrokeLineStyleJSONPasteValueFromValueFromPackage,
+  type SlideEditObjectStrokeLineStyleBorderStyle,
+} from './index'
 
 describe('SlideEditObjectStrokeLineStyle', () => {
   it('creates a supported stroke line style descriptor with solid as default', () => {
@@ -140,6 +153,122 @@ describe('SlideEditObjectStrokeLineStyle', () => {
     })
   })
 
+  it('reads custom MIME direct line style before general JSON wrappers', () => {
+    expect(getSlideEditObjectStrokeLineStyleJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_OBJECT_STROKE_LINE_STYLE_JSON_MIME_TYPE]: '"dot"',
+        'application/json': '{"strokeLineStyle":"dash"}',
+      }),
+    })).toBe('dot')
+    expect(getSlideEditObjectStrokeLineStyleJSONPasteValueFromPackage({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_OBJECT_STROKE_LINE_STYLE_JSON_MIME_TYPE]: '"dash"',
+      }),
+    })).toBe('dash')
+  })
+
+  it('reads custom MIME line style wrappers', () => {
+    expect(getSlideEditObjectStrokeLineStyleJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_OBJECT_STROKE_LINE_STYLE_JSON_MIME_TYPE]:
+          '{"value":"dash"}',
+      }),
+    })).toBe('dash')
+    expect(getSlideEditObjectStrokeLineStyleJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_OBJECT_STROKE_LINE_STYLE_JSON_MIME_TYPE]:
+          '{"strokeLineStyle":"dot"}',
+      }),
+    })).toBe('dot')
+    expect(getSlideEditObjectStrokeLineStyleJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_OBJECT_STROKE_LINE_STYLE_JSON_MIME_TYPE]:
+          '{"dash":true}',
+      }),
+    })).toBe('dash')
+    expect(getSlideEditObjectStrokeLineStyleJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_OBJECT_STROKE_LINE_STYLE_JSON_MIME_TYPE]:
+          '{"strokeDash":false}',
+      }),
+    })).toBe('solid')
+  })
+
+  it('reads explicit line style wrappers from general JSON candidates', () => {
+    expect(getSlideEditObjectStrokeLineStyleJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'application/json': '{"objectStrokeLineStyle":"dash"}',
+      }),
+    })).toBe('dash')
+    expect(getSlideEditObjectStrokeLineStyleJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/json': '{"strokeLineStyle":"dot"}',
+      }),
+    })).toBe('dot')
+    expect(getSlideEditObjectStrokeLineStyleJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"strokeDash":true}',
+      }),
+    })).toBe('dash')
+  })
+
+  it('reads line style JSON from text and parsed values', () => {
+    expect(getSlideEditObjectStrokeLineStyleJSONPasteValueFromText(
+      '"dot"',
+    )).toBe('dot')
+    expect(getSlideEditObjectStrokeLineStyleJSONPasteValueFromValue({
+      dash: true,
+    })).toBe('dash')
+    expect(getSlideEditObjectStrokeLineStyleJSONPasteValueFromTextFromPackage(
+      '{"strokeLineStyle":"dot"}',
+      { mode: 'wrapped' },
+    )).toBe('dot')
+    expect(getSlideEditObjectStrokeLineStyleJSONPasteValueFromValueFromPackage(
+      { strokeDash: false },
+      { mode: 'wrapped' },
+    )).toBe('solid')
+  })
+
+  it('converts pasted line style into a host command', () => {
+    expect(getSlideEditObjectStrokeLineStylePasteCommand({
+      objectId: 'object-a',
+      slideId: 'slide-a',
+      value: 'dot',
+    })).toEqual({
+      fieldId: 'strokeLineStyle',
+      id: 'update-object-stroke-line-style',
+      objectId: 'object-a',
+      slideId: 'slide-a',
+      value: 'dot',
+    })
+  })
+
+  it('ignores invalid, unrelated, and broad style JSON candidates', () => {
+    expect(getSlideEditObjectStrokeLineStyleJSONPasteValue({
+      dataTransfer: null,
+    })).toBeNull()
+    expect(getSlideEditObjectStrokeLineStyleJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '"dash"',
+      }),
+    })).toBeNull()
+    expect(getSlideEditObjectStrokeLineStyleJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"strokeLineStyle":"long-dash"}',
+      }),
+    })).toBeNull()
+    expect(getSlideEditObjectStrokeLineStyleJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"stroke":{"lineStyle":"dash"}}',
+      }),
+    })).toBeNull()
+    expect(getSlideEditObjectStrokeLineStyleJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"strokeDash":"6 4"}',
+      }),
+    })).toBeNull()
+  })
+
   it('does not expose product names or canvas sample item names', () => {
     const publicStrings = JSON.stringify({
       descriptor: createSlideEditObjectStrokeLineStyleDescriptor({
@@ -164,3 +293,13 @@ describe('SlideEditObjectStrokeLineStyle', () => {
     }
   })
 })
+
+function createDataTransfer(
+  values: Record<string, string>,
+): Pick<DataTransfer, 'getData'> {
+  return {
+    getData(type) {
+      return values[type] ?? ''
+    },
+  }
+}

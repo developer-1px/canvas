@@ -76,6 +76,39 @@ export type SlideEditObjectFillOpacityHostCommandEffect<
   type: 'slide-command-effect'
 }
 
+export type SlideEditObjectFillOpacityDataTransfer = Pick<
+  DataTransfer,
+  'getData'
+>
+
+export type SlideEditObjectFillOpacityJSONPasteValue = {
+  value: SlideEditObjectFillOpacityValue
+}
+
+export type SlideEditObjectFillOpacityJSONPasteInput = {
+  dataTransfer: SlideEditObjectFillOpacityDataTransfer | null
+  jsonMimeType?: string
+}
+
+export type SlideEditObjectFillOpacityJSONPasteValueMode =
+  | 'direct'
+  | 'wrapped'
+
+export type SlideEditObjectFillOpacityJSONPasteValueOptions = {
+  mode?: SlideEditObjectFillOpacityJSONPasteValueMode
+}
+
+export type SlideEditObjectFillOpacityPasteCommandInput<
+  TSlideId extends SlideEditObjectFillOpacitySlideId =
+    SlideEditObjectFillOpacitySlideId,
+  TObjectId extends SlideEditObjectFillOpacityObjectId =
+    SlideEditObjectFillOpacityObjectId,
+> = {
+  objectId: TObjectId
+  pasteValue: SlideEditObjectFillOpacityJSONPasteValue
+  slideId: TSlideId
+}
+
 export const SLIDE_EDIT_OBJECT_FILL_OPACITY_DATA_ATTRIBUTE =
   'data-slide-object-fill-opacity'
 
@@ -96,6 +129,28 @@ export const SLIDE_EDIT_OBJECT_FILL_OPACITY_FIELD = Object.freeze({
   step: 0.01,
   unit: 'ratio',
 } as const satisfies SlideEditObjectFillOpacityFieldDescriptor)
+
+export const SLIDE_EDIT_OBJECT_FILL_OPACITY_JSON_MIME_TYPE =
+  'application/vnd.interactive-os.slide-edit.object-fill-opacity+json'
+
+export const SLIDE_EDIT_OBJECT_FILL_OPACITY_JSON_TYPES = Object.freeze([
+  'application/json',
+  'text/json',
+  'text/plain',
+] as const)
+
+export const SLIDE_EDIT_OBJECT_FILL_OPACITY_JSON_WRAPPER_KEYS =
+  Object.freeze([
+    'objectFillOpacity',
+    'shapeFillOpacity',
+    'fillOpacity',
+  ] as const)
+
+const SLIDE_EDIT_OBJECT_FILL_OPACITY_DIRECT_JSON_KEYS = Object.freeze([
+  'fillOpacity',
+  'opacity',
+  'value',
+] as const)
 
 export function createSlideEditObjectFillOpacityDescriptor<
   TSlideId extends SlideEditObjectFillOpacitySlideId,
@@ -150,6 +205,90 @@ export function getSlideEditObjectFillOpacityCommandEffect<
       slideId: command.slideId,
     },
     type: 'slide-command-effect',
+  }
+}
+
+export function getSlideEditObjectFillOpacityJSONPasteValue({
+  dataTransfer,
+  jsonMimeType = SLIDE_EDIT_OBJECT_FILL_OPACITY_JSON_MIME_TYPE,
+}: SlideEditObjectFillOpacityJSONPasteInput):
+  SlideEditObjectFillOpacityJSONPasteValue | null {
+  if (!dataTransfer) {
+    return null
+  }
+
+  if (jsonMimeType) {
+    const customText = dataTransfer.getData(jsonMimeType)
+
+    if (customText.trim()) {
+      const customPasteValue =
+        getSlideEditObjectFillOpacityJSONPasteValueFromText(
+          customText,
+          { mode: 'direct' },
+        )
+
+      if (customPasteValue !== null) {
+        return customPasteValue
+      }
+    }
+  }
+
+  for (const type of SLIDE_EDIT_OBJECT_FILL_OPACITY_JSON_TYPES) {
+    const text = dataTransfer.getData(type)
+
+    if (!text.trim()) {
+      continue
+    }
+
+    const pasteValue = getSlideEditObjectFillOpacityJSONPasteValueFromText(
+      text,
+      { mode: 'wrapped' },
+    )
+
+    if (pasteValue !== null) {
+      return pasteValue
+    }
+  }
+
+  return null
+}
+
+export function getSlideEditObjectFillOpacityJSONPasteValueFromText(
+  text: string,
+  options?: SlideEditObjectFillOpacityJSONPasteValueOptions,
+): SlideEditObjectFillOpacityJSONPasteValue | null {
+  return getSlideEditObjectFillOpacityJSONPasteValueFromValue(
+    parseSlideEditObjectFillOpacityJSON(text),
+    options,
+  )
+}
+
+export function getSlideEditObjectFillOpacityJSONPasteValueFromValue(
+  value: unknown,
+  {
+    mode = 'direct',
+  }: SlideEditObjectFillOpacityJSONPasteValueOptions = {},
+): SlideEditObjectFillOpacityJSONPasteValue | null {
+  return mode === 'wrapped'
+    ? getSlideEditObjectFillOpacityWrappedJSONPasteValue(value)
+    : getSlideEditObjectFillOpacityDirectJSONPasteValue(value)
+}
+
+export function getSlideEditObjectFillOpacityPasteCommand<
+  TSlideId extends SlideEditObjectFillOpacitySlideId,
+  TObjectId extends SlideEditObjectFillOpacityObjectId,
+>({
+  objectId,
+  pasteValue,
+  slideId,
+}: SlideEditObjectFillOpacityPasteCommandInput<TSlideId, TObjectId>):
+  SlideEditObjectFillOpacityUpdateCommand<TSlideId, TObjectId> {
+  return {
+    fieldId: 'fillOpacity',
+    id: 'update-object-fill-opacity',
+    objectId,
+    slideId,
+    value: pasteValue.value,
   }
 }
 
@@ -209,4 +348,88 @@ export function toSlideEditObjectFillOpacityAttributeValue(
   value: number | null | undefined,
 ) {
   return String(normalizeSlideEditObjectFillOpacity(value))
+}
+
+function getSlideEditObjectFillOpacityDirectJSONPasteValue(
+  value: unknown,
+): SlideEditObjectFillOpacityJSONPasteValue | null {
+  const normalizedValue = normalizeSlideEditObjectFillOpacityJSONValue(value)
+
+  if (normalizedValue !== null) {
+    return {
+      value: normalizedValue,
+    }
+  }
+
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null
+  }
+
+  const record = value as Record<string, unknown>
+
+  for (const key of SLIDE_EDIT_OBJECT_FILL_OPACITY_DIRECT_JSON_KEYS) {
+    if (Object.hasOwn(record, key)) {
+      return getSlideEditObjectFillOpacityDirectJSONPasteValue(record[key])
+    }
+  }
+
+  return null
+}
+
+function getSlideEditObjectFillOpacityWrappedJSONPasteValue(
+  value: unknown,
+): SlideEditObjectFillOpacityJSONPasteValue | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null
+  }
+
+  const record = value as Record<string, unknown>
+
+  for (const key of SLIDE_EDIT_OBJECT_FILL_OPACITY_JSON_WRAPPER_KEYS) {
+    if (Object.hasOwn(record, key)) {
+      return getSlideEditObjectFillOpacityDirectJSONPasteValue(record[key])
+    }
+  }
+
+  return null
+}
+
+function normalizeSlideEditObjectFillOpacityJSONValue(value: unknown) {
+  const numericValue = getSlideEditObjectFillOpacityNumber(value)
+
+  return numericValue === null
+    ? null
+    : normalizeSlideEditObjectFillOpacity(numericValue)
+}
+
+function getSlideEditObjectFillOpacityNumber(value: unknown) {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value
+  }
+
+  if (typeof value !== 'string') {
+    return null
+  }
+
+  const trimmedValue = value.trim()
+
+  if (!trimmedValue) {
+    return null
+  }
+
+  const numericValue = Number(trimmedValue)
+
+  return Number.isFinite(numericValue) ? numericValue : null
+}
+
+function parseSlideEditObjectFillOpacityJSON(value: string) {
+  if (!value.trim()) {
+    return null
+  }
+
+  try {
+    return JSON.parse(value) as unknown
+  } catch {
+    return null
+  }
 }
