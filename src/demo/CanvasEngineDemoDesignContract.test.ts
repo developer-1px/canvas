@@ -45,4 +45,14 @@ describe('CanvasEngineDemoDesignContract', () => {
 
     expect(violations).toEqual([])
   })
+
+  it('keeps keyboard focus visible on engine demo controls', () => {
+    const source = readFileSync(`${HERE}CanvasDevToolsDemoApp.css`, 'utf8')
+
+    expect(source).toContain('--engine-control-focus-ring')
+    expect(source).toContain('.engine-demo-controls button:focus-visible')
+    expect(source).toContain('.engine-selection-toolbar button:focus-visible')
+    expect(source).toContain('.engine-stamp-pad button:focus-visible')
+    expect(source).not.toMatch(/button:focus-visible\s*\{[^}]*outline:\s*0\b/)
+  })
 })

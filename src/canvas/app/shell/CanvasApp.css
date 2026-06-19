@@ -17,6 +17,26 @@
     var(--canvas-line-strong) 32%,
     var(--canvas-panel)
   );
+  --canvas-control-focus-bg: color-mix(
+    in srgb,
+    var(--canvas-cool-blue) 10%,
+    var(--canvas-panel)
+  );
+  --canvas-control-focus-ring: color-mix(
+    in srgb,
+    var(--canvas-blue) 76%,
+    transparent
+  );
+  --canvas-control-active-bg: color-mix(
+    in srgb,
+    var(--canvas-cool-blue) 16%,
+    var(--canvas-panel)
+  );
+  --canvas-control-active-border: color-mix(
+    in srgb,
+    var(--canvas-cool-blue) 42%,
+    transparent
+  );
   position: relative;
   width: 100vw;
   height: 100svh;
@@ -2625,21 +2645,26 @@ button.component-palette-part:focus-visible {
 .voting-session button:hover,
 .sticky-quick-create:hover,
 .find-replace-panel button:hover,
-.tool-button[data-active='true'] {
+.tool-button[data-active='true'],
+.tool-button[aria-pressed='true'],
+.tool-button[aria-checked='true'] {
   border-color: color-mix(in srgb, var(--canvas-cool-blue) 48%, transparent);
   background: var(--canvas-control-hover);
   color: var(--canvas-ink);
   box-shadow: none;
 }
 
-.tool-button[data-active='true'] {
-  border-color: color-mix(in srgb, var(--canvas-cool-blue) 42%, transparent);
-  background: color-mix(in srgb, var(--canvas-cool-blue) 16%, var(--canvas-panel));
+.tool-button[data-active='true'],
+.tool-button[aria-pressed='true'],
+.tool-button[aria-checked='true'] {
+  border-color: var(--canvas-control-active-border);
+  background: var(--canvas-control-active-bg);
   color: var(--canvas-plum-noir);
   box-shadow: none;
 }
 
 .tool-button:disabled,
+.zoom-value:disabled,
 .image-controls button:disabled,
 .stamp-button:disabled,
 .emote-button:disabled,
@@ -2652,6 +2677,7 @@ button.component-palette-part:focus-visible {
 }
 
 .tool-button:disabled:hover,
+.zoom-value:disabled:hover,
 .image-controls button:disabled:hover,
 .stamp-button:disabled:hover,
 .emote-button:disabled:hover,
@@ -2660,6 +2686,7 @@ button.component-palette-part:focus-visible {
 .voting-session button:disabled:hover,
 .find-replace-panel button:disabled:hover {
   background: transparent;
+  border-color: transparent;
   color: var(--canvas-control-disabled);
   box-shadow: none;
 }
@@ -2700,8 +2727,31 @@ button.component-palette-part:focus-visible {
 .inspector-swatch:focus-visible,
 .inspector-action-button:focus-visible,
 .text-editor:focus-visible {
-  outline: 2px solid var(--canvas-blue);
+  outline: 2px solid var(--canvas-control-focus-ring);
   outline-offset: 2px;
+}
+
+.tool-button:focus-visible,
+.zoom-value:focus-visible,
+.component-button:focus-visible,
+.image-controls button:focus-visible,
+.stamp-button:focus-visible,
+.emote-button:focus-visible,
+.session-timer button:focus-visible,
+.spotlight button:focus-visible,
+.voting-session button:focus-visible,
+.sticky-quick-create:focus-visible,
+.find-replace-panel button:focus-visible {
+  border-color: var(--canvas-control-active-border);
+  background: var(--canvas-control-focus-bg);
+  color: var(--canvas-ink);
+}
+
+.tool-button[data-active='true']:focus-visible,
+.tool-button[aria-pressed='true']:focus-visible,
+.tool-button[aria-checked='true']:focus-visible {
+  background: var(--canvas-control-active-bg);
+  color: var(--canvas-plum-noir);
 }
 
 .text-editor {

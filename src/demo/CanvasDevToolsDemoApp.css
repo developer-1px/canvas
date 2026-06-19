@@ -1,4 +1,14 @@
 .engine-demo-app {
+  --engine-control-focus-ring: color-mix(
+    in srgb,
+    var(--canvas-blue) 72%,
+    transparent
+  );
+  --engine-control-pressed-bg: color-mix(
+    in srgb,
+    var(--canvas-cool-blue) 12%,
+    var(--canvas-panel)
+  );
   position: relative;
   width: 100vw;
   height: 100svh;
@@ -98,16 +108,43 @@
 }
 
 .engine-demo-controls button:hover,
-.engine-demo-controls button:focus-visible,
 .engine-demo-controls button[aria-pressed='true'],
 .engine-demo-feature-packs button:hover,
-.engine-demo-feature-packs button:focus-visible,
 .engine-demo-feature-packs button[aria-pressed='true'],
 .engine-demo-viewport-controls button:hover,
-.engine-demo-viewport-controls button:focus-visible {
+.engine-demo-viewport-controls button[aria-pressed='true'] {
   color: var(--canvas-ink);
   background: var(--canvas-panel);
   outline: 0;
+}
+
+.engine-demo-controls button[aria-pressed='true'],
+.engine-demo-feature-packs button[aria-pressed='true'],
+.engine-demo-viewport-controls button[aria-pressed='true'] {
+  background: var(--engine-control-pressed-bg);
+}
+
+.engine-demo-controls button:focus-visible,
+.engine-demo-feature-packs button:focus-visible,
+.engine-demo-viewport-controls button:focus-visible {
+  color: var(--canvas-ink);
+  background: var(--canvas-panel);
+  outline: 2px solid var(--engine-control-focus-ring);
+  outline-offset: 1px;
+}
+
+.engine-demo-controls button[aria-pressed='true']:focus-visible,
+.engine-demo-feature-packs button[aria-pressed='true']:focus-visible,
+.engine-demo-viewport-controls button[aria-pressed='true']:focus-visible {
+  background: var(--engine-control-pressed-bg);
+}
+
+.engine-demo-controls button:disabled,
+.engine-demo-feature-packs button:disabled,
+.engine-demo-viewport-controls button:disabled {
+  color: color-mix(in srgb, var(--canvas-muted) 58%, transparent);
+  background: transparent;
+  cursor: default;
 }
 
 .engine-demo-viewport-controls span {
@@ -165,7 +202,8 @@
 .engine-sticky-quick-create:focus-visible {
   color: var(--canvas-ink);
   background: var(--canvas-panel);
-  outline: 0;
+  outline: 2px solid var(--engine-control-focus-ring);
+  outline-offset: 2px;
 }
 
 .engine-selection-toolbar {
@@ -208,7 +246,6 @@
 }
 
 .engine-selection-toolbar button:hover,
-.engine-selection-toolbar button:focus-visible,
 .engine-selection-toolbar button[aria-pressed='true'],
 .engine-selection-toolbar button[data-open='true'] {
   color: var(--canvas-ink);
@@ -216,8 +253,21 @@
   outline: 0;
 }
 
+.engine-selection-toolbar button:focus-visible {
+  color: var(--canvas-ink);
+  background: color-mix(in srgb, var(--canvas-paper) 72%, transparent);
+  outline: 2px solid var(--engine-control-focus-ring);
+  outline-offset: 1px;
+}
+
+.engine-selection-toolbar button[aria-pressed='true']:focus-visible,
+.engine-selection-toolbar button[data-open='true']:focus-visible {
+  background: color-mix(in srgb, var(--canvas-paper) 72%, transparent);
+}
+
 .engine-selection-toolbar button:disabled {
   color: color-mix(in srgb, var(--canvas-muted) 58%, transparent);
+  background: transparent;
   cursor: default;
 }
 
@@ -335,7 +385,8 @@
 .engine-stamp-pad button:focus-visible {
   color: var(--canvas-ink);
   background: var(--canvas-paper);
-  outline: 0;
+  outline: 2px solid var(--engine-control-focus-ring);
+  outline-offset: 1px;
 }
 
 .engine-stamp-pad button:disabled {
