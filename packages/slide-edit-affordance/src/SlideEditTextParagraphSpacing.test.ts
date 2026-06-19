@@ -4,13 +4,23 @@ import {
   createSlideEditTextParagraphSpacingDescriptor,
   getSlideEditTextParagraphSpacingCommandEffect,
   getSlideEditTextParagraphSpacingCSSStyle,
+  getSlideEditTextParagraphSpacingJSONPasteValue,
+  getSlideEditTextParagraphSpacingJSONPasteValueFromText,
+  getSlideEditTextParagraphSpacingJSONPasteValueFromValue,
+  getSlideEditTextParagraphSpacingPasteCommands,
   normalizeSlideEditTextLineHeightRatio,
   normalizeSlideEditTextParagraphSpacingAmount,
   normalizeSlideEditTextParagraphSpacingNumber,
   SLIDE_EDIT_DEFAULT_TEXT_PARAGRAPH_SPACING,
   SLIDE_EDIT_TEXT_PARAGRAPH_SPACING_FIELDS,
+  SLIDE_EDIT_TEXT_PARAGRAPH_SPACING_JSON_MIME_TYPE,
   SLIDE_EDIT_TEXT_PARAGRAPH_SPACING_LIMITS,
 } from './SlideEditTextParagraphSpacing'
+import {
+  getSlideEditTextParagraphSpacingJSONPasteValue as getSlideEditTextParagraphSpacingJSONPasteValueFromPackage,
+  getSlideEditTextParagraphSpacingJSONPasteValueFromText as getSlideEditTextParagraphSpacingJSONPasteValueFromTextFromPackage,
+  getSlideEditTextParagraphSpacingJSONPasteValueFromValue as getSlideEditTextParagraphSpacingJSONPasteValueFromValueFromPackage,
+} from './index'
 
 describe('SlideEditTextParagraphSpacing', () => {
   it('creates a product-neutral text paragraph spacing descriptor', () => {
@@ -78,6 +88,316 @@ describe('SlideEditTextParagraphSpacing', () => {
       unit: 'slide-unit',
       value: 0,
     })
+  })
+
+  it('reads custom MIME direct paragraph spacing JSON values first', () => {
+    expect(getSlideEditTextParagraphSpacingJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_TEXT_PARAGRAPH_SPACING_JSON_MIME_TYPE]: JSON.stringify({
+          lineHeightRatio: '1.234',
+          spacingAfter: {
+            unit: 'slide-unit',
+            value: 1001,
+          },
+          spacingBefore: '12px',
+        }),
+        'application/json': '{"paragraphSpacing":{"lineHeight":3}}',
+      }),
+    })).toEqual({
+      fields: [
+        {
+          fieldId: 'lineHeightRatio',
+          value: 1.23,
+        },
+        {
+          fieldId: 'paragraphBefore',
+          value: {
+            unit: 'px',
+            value: 12,
+          },
+        },
+        {
+          fieldId: 'paragraphAfter',
+          value: {
+            unit: 'slide-unit',
+            value: 1000,
+          },
+        },
+      ],
+      surface: 'text-paragraph-spacing',
+      values: {
+        lineHeightRatio: 1.23,
+        paragraphAfter: {
+          unit: 'slide-unit',
+          value: 1000,
+        },
+        paragraphBefore: {
+          unit: 'px',
+          value: 12,
+        },
+      },
+    })
+    expect(getSlideEditTextParagraphSpacingJSONPasteValueFromPackage({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_TEXT_PARAGRAPH_SPACING_JSON_MIME_TYPE]: JSON.stringify({
+          after: '8px',
+          before: '4px',
+          lineHeight: 1.5,
+        }),
+      }),
+    })).toMatchObject({
+      fields: [
+        {
+          fieldId: 'lineHeightRatio',
+          value: 1.5,
+        },
+        {
+          fieldId: 'paragraphBefore',
+          value: {
+            value: 4,
+          },
+        },
+        {
+          fieldId: 'paragraphAfter',
+          value: {
+            value: 8,
+          },
+        },
+      ],
+    })
+  })
+
+  it('reads explicit paragraph spacing wrappers from general JSON candidates', () => {
+    expect(getSlideEditTextParagraphSpacingJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'application/json':
+          '{"textParagraphSpacing":{"lineHeight":0.1}}',
+      }),
+    })).toEqual({
+      fields: [
+        {
+          fieldId: 'lineHeightRatio',
+          value: 0.5,
+        },
+      ],
+      surface: 'text-paragraph-spacing',
+      values: {
+        lineHeightRatio: 0.5,
+      },
+    })
+    expect(getSlideEditTextParagraphSpacingJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/json':
+          '{"paragraphStyle":{"marginTop":"8px","marginBottom":"10"}}',
+      }),
+    })).toMatchObject({
+      fields: [
+        {
+          fieldId: 'paragraphBefore',
+          value: {
+            unit: 'px',
+            value: 8,
+          },
+        },
+        {
+          fieldId: 'paragraphAfter',
+          value: {
+            unit: 'px',
+            value: 10,
+          },
+        },
+      ],
+    })
+    expect(getSlideEditTextParagraphSpacingJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"spacing":{"paragraphAfter":{"value":12}}}',
+      }),
+    })).toMatchObject({
+      values: {
+        paragraphAfter: {
+          unit: 'px',
+          value: 12,
+        },
+      },
+    })
+  })
+
+  it('reads paragraph spacing JSON from text and parsed values', () => {
+    expect(getSlideEditTextParagraphSpacingJSONPasteValueFromText(
+      JSON.stringify({
+        lineHeightRatio: '1.234',
+        spacingAfter: {
+          unit: 'slide-unit',
+          value: 1001,
+        },
+        spacingBefore: '12px',
+      }),
+    )).toMatchObject({
+      fields: [
+        {
+          fieldId: 'lineHeightRatio',
+          value: 1.23,
+        },
+        {
+          fieldId: 'paragraphBefore',
+          value: {
+            unit: 'px',
+            value: 12,
+          },
+        },
+        {
+          fieldId: 'paragraphAfter',
+          value: {
+            unit: 'slide-unit',
+            value: 1000,
+          },
+        },
+      ],
+      values: {
+        lineHeightRatio: 1.23,
+      },
+    })
+    expect(getSlideEditTextParagraphSpacingJSONPasteValueFromValue({
+      after: '8px',
+      before: '4px',
+      lineHeight: 1.5,
+    })).toMatchObject({
+      values: {
+        lineHeightRatio: 1.5,
+        paragraphAfter: {
+          value: 8,
+        },
+        paragraphBefore: {
+          value: 4,
+        },
+      },
+    })
+    expect(getSlideEditTextParagraphSpacingJSONPasteValueFromTextFromPackage(
+      '{"paragraphStyle":{"marginTop":"8px","marginBottom":"10"}}',
+      { mode: 'wrapped' },
+    )).toMatchObject({
+      fields: [
+        {
+          fieldId: 'paragraphBefore',
+          value: {
+            unit: 'px',
+            value: 8,
+          },
+        },
+        {
+          fieldId: 'paragraphAfter',
+          value: {
+            unit: 'px',
+            value: 10,
+          },
+        },
+      ],
+    })
+    expect(getSlideEditTextParagraphSpacingJSONPasteValueFromValueFromPackage(
+      {
+        spacing: {
+          lineHeight: 0.1,
+        },
+      },
+      { mode: 'wrapped' },
+    )).toEqual({
+      fields: [
+        {
+          fieldId: 'lineHeightRatio',
+          value: 0.5,
+        },
+      ],
+      surface: 'text-paragraph-spacing',
+      values: {
+        lineHeightRatio: 0.5,
+      },
+    })
+  })
+
+  it('converts paragraph spacing paste values into host commands', () => {
+    const pasteValue = getSlideEditTextParagraphSpacingJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': JSON.stringify({
+          paragraphSpacing: {
+            after: 8,
+            before: 4,
+            lineHeight: 1.25,
+          },
+        }),
+      }),
+    })
+
+    expect(getSlideEditTextParagraphSpacingPasteCommands({
+      objectId: 'object-a',
+      pasteValue: pasteValue!,
+      slideId: 'slide-a',
+    })).toEqual([
+      {
+        fieldId: 'lineHeightRatio',
+        id: 'update-text-paragraph-spacing',
+        objectId: 'object-a',
+        slideId: 'slide-a',
+        value: 1.25,
+      },
+      {
+        fieldId: 'paragraphBefore',
+        id: 'update-text-paragraph-spacing',
+        objectId: 'object-a',
+        slideId: 'slide-a',
+        value: {
+          unit: 'px',
+          value: 4,
+        },
+      },
+      {
+        fieldId: 'paragraphAfter',
+        id: 'update-text-paragraph-spacing',
+        objectId: 'object-a',
+        slideId: 'slide-a',
+        value: {
+          unit: 'px',
+          value: 8,
+        },
+      },
+    ])
+    expect(getSlideEditTextParagraphSpacingCommandEffect(
+      getSlideEditTextParagraphSpacingPasteCommands({
+        objectId: 'object-a',
+        pasteValue: pasteValue!,
+        slideId: 'slide-a',
+      })[0],
+    ).type).toBe('slide-command-effect')
+  })
+
+  it('ignores invalid, unrelated, and direct generic paragraph spacing JSON', () => {
+    expect(getSlideEditTextParagraphSpacingJSONPasteValue({
+      dataTransfer: null,
+    })).toBeNull()
+    expect(getSlideEditTextParagraphSpacingJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"lineHeight":1.2}',
+      }),
+    })).toBeNull()
+    expect(getSlideEditTextParagraphSpacingJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"paragraphSpacing":{}}',
+      }),
+    })).toBeNull()
+    expect(getSlideEditTextParagraphSpacingJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"paragraphSpacing":{"lineHeight":"wide"}}',
+      }),
+    })).toBeNull()
+    expect(getSlideEditTextParagraphSpacingJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"paragraphSpacing":{"list":"bullet"}}',
+      }),
+    })).toBeNull()
+    expect(getSlideEditTextParagraphSpacingJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_TEXT_PARAGRAPH_SPACING_JSON_MIME_TYPE]: 'not json',
+      }),
+    })).toBeNull()
   })
 
   it('normalizes numeric boundaries before host application', () => {
@@ -167,3 +487,9 @@ describe('SlideEditTextParagraphSpacing', () => {
     }
   })
 })
+
+function createDataTransfer(values: Record<string, string>) {
+  return {
+    getData: (type: string) => values[type] ?? '',
+  }
+}
