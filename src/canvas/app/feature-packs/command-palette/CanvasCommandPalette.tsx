@@ -4,7 +4,7 @@ import {
   useRef,
   useState,
   type KeyboardEvent,
-  type MouseEvent,
+  type PointerEvent,
 } from 'react'
 import {
   getCanvasModalBackdropPointerIntent,
@@ -131,7 +131,7 @@ function CanvasCommandPaletteDialog({
     }
   }
 
-  const handleBackdropMouseDown = (event: MouseEvent<HTMLDivElement>) => {
+  const handleBackdropPointerDown = (event: PointerEvent<HTMLDivElement>) => {
     const backdropPointerIntent = getCanvasModalBackdropPointerIntent({
       currentTarget: event.currentTarget,
       target: event.target,
@@ -146,7 +146,7 @@ function CanvasCommandPaletteDialog({
   return (
     <div
       className="command-palette-backdrop"
-      onMouseDown={handleBackdropMouseDown}
+      onPointerDown={handleBackdropPointerDown}
     >
       <section
         ref={dialogRef}

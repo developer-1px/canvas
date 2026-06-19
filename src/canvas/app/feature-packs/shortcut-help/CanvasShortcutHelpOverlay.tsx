@@ -2,7 +2,7 @@ import {
   useMemo,
   useRef,
   type KeyboardEvent,
-  type MouseEvent,
+  type PointerEvent,
 } from 'react'
 import {
   getCanvasModalBackdropPointerIntent,
@@ -45,13 +45,14 @@ function CanvasShortcutHelpDialog({
     initialFocusRef: closeButtonRef,
   })
 
-  const handleBackdropMouseDown = (event: MouseEvent<HTMLDivElement>) => {
+  const handleBackdropPointerDown = (event: PointerEvent<HTMLDivElement>) => {
     const backdropPointerIntent = getCanvasModalBackdropPointerIntent({
       currentTarget: event.currentTarget,
       target: event.target,
     })
 
     if (backdropPointerIntent.kind === 'dismiss') {
+      event.preventDefault()
       onClose()
     }
   }
@@ -81,7 +82,7 @@ function CanvasShortcutHelpDialog({
   return (
     <div
       className="shortcut-help-backdrop"
-      onMouseDown={handleBackdropMouseDown}
+      onPointerDown={handleBackdropPointerDown}
     >
       <section
         ref={dialogRef}
