@@ -8,6 +8,7 @@ import type {
 } from '../../../extensions/CanvasAppExtensionStateContracts'
 import {
   getCanvasKeyboardShortcutIntent,
+  isCanvasKeyboardControlTarget,
   isCanvasKeyboardTypingTarget,
 } from './CanvasKeyboardShortcutIntent'
 
@@ -111,6 +112,56 @@ describe('CanvasKeyboardShortcutIntent', () => {
     })
   })
 
+  it('keeps global overlay shortcuts available from focused controls', () => {
+    withKeyboardControlTarget('button', (target) => {
+      const intent = getCanvasKeyboardShortcutIntent(createInput({
+        event: createKeyboardEvent({
+          key: 'k',
+          metaKey: true,
+          target,
+        }),
+      }))
+
+      expect(intent).toEqual({
+        kind: 'open-command-palette',
+        preventDefault: true,
+      })
+    })
+  })
+
+  it('suppresses canvas editing shortcuts from focused controls', () => {
+    withKeyboardControlTarget('button', (target) => {
+      expect(getCanvasKeyboardShortcutIntent(createInput({
+        event: createKeyboardEvent({
+          code: 'Space',
+          key: ' ',
+          target,
+        }),
+      }))).toEqual({ kind: 'none', preventDefault: false })
+
+      expect(getCanvasKeyboardShortcutIntent(createInput({
+        event: createKeyboardEvent({
+          key: 'Enter',
+          target,
+        }),
+      }))).toEqual({ kind: 'none', preventDefault: false })
+
+      expect(getCanvasKeyboardShortcutIntent(createInput({
+        event: createKeyboardEvent({
+          key: 'ArrowRight',
+          target,
+        }),
+      }))).toEqual({ kind: 'none', preventDefault: false })
+
+      expect(getCanvasKeyboardShortcutIntent(createInput({
+        event: createKeyboardEvent({
+          key: 'v',
+          target,
+        }),
+      }))).toEqual({ kind: 'none', preventDefault: false })
+    })
+  })
+
   it('honors find/replace shortcut and overlay toggles', () => {
     expect(getCanvasKeyboardShortcutIntent(createInput({
       config: createCanvasAffordanceConfig({
@@ -188,6 +239,19 @@ describe('CanvasKeyboardShortcutIntent', () => {
     })
     expect(isCanvasKeyboardTypingTarget(null)).toBe(false)
   })
+
+  it('detects control targets and descendants', () => {
+    withKeyboardControlTarget('button', (target) => {
+      expect(isCanvasKeyboardControlTarget(target)).toBe(true)
+    })
+    withKeyboardControlTarget('[role="tab"]', (target) => {
+      expect(isCanvasKeyboardControlTarget(target)).toBe(true)
+    })
+    withKeyboardControlTarget(null, (target) => {
+      expect(isCanvasKeyboardControlTarget(target)).toBe(false)
+    })
+    expect(isCanvasKeyboardControlTarget(null)).toBe(false)
+  })
 })
 
 function createInput(
@@ -257,5 +321,28 @@ function withTypingTargetConstructor<
     run(new TestTarget())
   } finally {
     globalThis[key] = previous as never
+  }
+}
+
+function withKeyboardControlTarget(
+  matchedSelector: string | null,
+  run: (target: EventTarget) => void,
+) {
+  const previous = globalThis.Element
+
+  class TestElement extends EventTarget {
+    closest(selector: string) {
+      return matchedSelector && selector.includes(matchedSelector)
+        ? this
+        : null
+    }
+  }
+
+  globalThis.Element = TestElement as never
+
+  try {
+    run(new TestElement())
+  } finally {
+    globalThis.Element = previous as never
   }
 }

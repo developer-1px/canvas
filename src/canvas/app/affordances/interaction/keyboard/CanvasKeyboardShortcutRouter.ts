@@ -19,6 +19,10 @@ export function handleCanvasKeyboardShortcut(
   event: globalThis.KeyboardEvent,
   handlers: CanvasKeyboardShortcutHandlers,
 ) {
+  if (event.defaultPrevented) {
+    return
+  }
+
   const intent = getCanvasKeyboardShortcutIntent({
     config: handlers.config,
     customCreationTools: handlers.customCreationTools,

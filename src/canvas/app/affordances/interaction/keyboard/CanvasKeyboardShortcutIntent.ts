@@ -13,6 +13,31 @@ import {
 } from './CanvasKeyboardSystemShortcuts'
 import { getCanvasKeyboardToolShortcutIntent } from './CanvasKeyboardToolShortcutIntent'
 
+const CANVAS_KEYBOARD_CONTROL_TARGET_SELECTOR = [
+  'a[href]',
+  'button',
+  'input',
+  'select',
+  'summary',
+  'textarea',
+  '[contenteditable=""]',
+  '[contenteditable="true"]',
+  '[role="button"]',
+  '[role="checkbox"]',
+  '[role="combobox"]',
+  '[role="menuitem"]',
+  '[role="menuitemcheckbox"]',
+  '[role="menuitemradio"]',
+  '[role="option"]',
+  '[role="radio"]',
+  '[role="searchbox"]',
+  '[role="slider"]',
+  '[role="spinbutton"]',
+  '[role="switch"]',
+  '[role="tab"]',
+  '[role="textbox"]',
+].join(',')
+
 export type CanvasKeyboardShortcutIntentInput = {
   config: CanvasAffordanceConfig
   customCreationTools: readonly CanvasAppCustomCreationToolState[]
@@ -54,7 +79,7 @@ export function getCanvasKeyboardShortcutIntent({
     return preTypingCommandIntent
   }
 
-  if (isCanvasKeyboardTypingTarget(event.target)) {
+  if (isCanvasKeyboardControlTarget(event.target)) {
     return { kind: 'none', preventDefault: false }
   }
 
@@ -110,4 +135,16 @@ export function isCanvasKeyboardTypingTarget(target: EventTarget | null) {
       target instanceof HTMLElement &&
       target.isContentEditable)
   )
+}
+
+export function isCanvasKeyboardControlTarget(target: EventTarget | null) {
+  if (isCanvasKeyboardTypingTarget(target)) {
+    return true
+  }
+
+  if (typeof Element === 'undefined' || !(target instanceof Element)) {
+    return false
+  }
+
+  return target.closest(CANVAS_KEYBOARD_CONTROL_TARGET_SELECTOR) !== null
 }

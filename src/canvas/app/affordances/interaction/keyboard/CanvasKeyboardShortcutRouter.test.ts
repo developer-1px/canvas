@@ -80,6 +80,20 @@ describe('CanvasKeyboardShortcutRouter', () => {
     expect(setTool).not.toHaveBeenCalled()
   })
 
+  it('ignores keydown events already handled by focused controls', () => {
+    const moveSelection = vi.fn()
+    const handlers = createHandlers({ moveSelection })
+    const event = createKeyboardEvent({
+      defaultPrevented: true,
+      key: 'ArrowRight',
+    })
+
+    handleCanvasKeyboardShortcut(event, handlers)
+
+    expect(event.preventDefault).not.toHaveBeenCalled()
+    expect(moveSelection).not.toHaveBeenCalled()
+  })
+
   it('routes shortcut help before custom tool shortcuts', () => {
     const openShortcutHelp = vi.fn()
     const setTool = vi.fn()
@@ -198,6 +212,7 @@ function createKeyboardEvent(
     altKey: false,
     code: 'KeyK',
     ctrlKey: false,
+    defaultPrevented: false,
     key: 'k',
     metaKey: false,
     preventDefault: vi.fn(),
