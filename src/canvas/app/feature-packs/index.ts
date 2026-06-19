@@ -309,13 +309,21 @@ export {
   CANVAS_APP_BOARD_IO_FEATURE_PACK_MANIFEST,
 } from './board-io'
 export {
+  createCanvasCommandPaletteListboxDescriptor,
   getCanvasCommandPaletteKeyboardIntent,
   getCanvasCommandPaletteItems,
+  type CanvasCommandPaletteEmptyAttributes,
   type CanvasCommandPaletteComponent,
   type CanvasCommandPaletteItem,
   type CanvasCommandPaletteItemsInput,
   type CanvasCommandPaletteKeyboardIntent,
   type CanvasCommandPaletteKeyboardIntentInput,
+  type CanvasCommandPaletteListboxDescriptor,
+  type CanvasCommandPaletteListboxDescriptorInput,
+  type CanvasCommandPaletteListboxItem,
+  type CanvasCommandPaletteListboxOptionDescriptor,
+  type CanvasCommandPaletteListboxRootAttributes,
+  type CanvasCommandPaletteOptionAttributes,
 } from './command-palette'
 export {
   CanvasComponentPalette,

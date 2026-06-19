@@ -18,6 +18,9 @@ import {
 import {
   getCanvasCommandPaletteKeyboardIntent,
 } from './CanvasCommandPaletteKeyboard'
+import {
+  createCanvasCommandPaletteListboxDescriptor,
+} from './CanvasCommandPaletteListbox'
 
 type CanvasCommandPaletteProps = {
   items: readonly CanvasCommandPaletteItem[]
@@ -57,10 +60,13 @@ function CanvasCommandPaletteDialog({
   )
   const maxActiveIndex = Math.max(0, filteredItems.length - 1)
   const activeItemIndex = Math.min(activeIndex, maxActiveIndex)
-  const activeItem = filteredItems[activeItemIndex]
-  const activeOptionId = activeItem
-    ? getCanvasCommandPaletteOptionId(controlId, activeItem.id)
-    : undefined
+  const listboxDescriptor = createCanvasCommandPaletteListboxDescriptor({
+    activeIndex: activeItemIndex,
+    controlId,
+    items: filteredItems,
+  })
+  const activeOptionId =
+    listboxDescriptor.activeOptionId ?? undefined
 
   useCanvasModalFocusLifecycle({
     initialFocusRef: inputRef,
@@ -160,49 +166,50 @@ function CanvasCommandPaletteDialog({
           }}
         />
         <div
+          {...listboxDescriptor.rootAttributes}
           className="command-palette-list"
           id={listboxId}
-          role="listbox"
-          aria-label="Command results"
         >
           {filteredItems.length > 0 ? (
-            filteredItems.map((item, index) => (
-              <button
-                key={item.id}
-                type="button"
-                className="command-palette-item"
-                id={getCanvasCommandPaletteOptionId(controlId, item.id)}
-                aria-disabled={item.disabled ? 'true' : undefined}
-                aria-selected={index === activeItemIndex}
-                disabled={item.disabled}
-                role="option"
-                onClick={() => runItem(item)}
-                onMouseEnter={() => setActiveIndex(index)}
-              >
-                <span className="command-palette-item-main">
-                  <span className="command-palette-item-title">
-                    {item.title}
+            filteredItems.map((item, index) => {
+              const option = listboxDescriptor.options[index]
+
+              return (
+                <button
+                  key={item.id}
+                  {...(option?.attributes ?? {})}
+                  type="button"
+                  className="command-palette-item"
+                  disabled={item.disabled}
+                  onClick={() => runItem(item)}
+                  onMouseEnter={() => setActiveIndex(index)}
+                >
+                  <span className="command-palette-item-main">
+                    <span className="command-palette-item-title">
+                      {item.title}
+                    </span>
+                    <span className="command-palette-item-section">
+                      {item.section}
+                    </span>
                   </span>
-                  <span className="command-palette-item-section">
-                    {item.section}
-                  </span>
-                </span>
-                {item.shortcut ? (
-                  <kbd className="command-palette-shortcut">
-                    {item.shortcut}
-                  </kbd>
-                ) : null}
-              </button>
-            ))
+                  {item.shortcut ? (
+                    <kbd className="command-palette-shortcut">
+                      {item.shortcut}
+                    </kbd>
+                  ) : null}
+                </button>
+              )
+            })
           ) : (
-            <div className="command-palette-empty">No matches</div>
+            <div
+              {...listboxDescriptor.emptyAttributes}
+              className="command-palette-empty"
+            >
+              No matches
+            </div>
           )}
         </div>
       </section>
     </div>
   )
-}
-
-function getCanvasCommandPaletteOptionId(controlId: string, itemId: string) {
-  return `${controlId}-option-${itemId.replace(/[^a-zA-Z0-9_-]/g, '-')}`
 }

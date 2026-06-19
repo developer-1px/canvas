@@ -31,6 +31,24 @@ describe('CanvasCommandPalette', () => {
     expect(markup).toContain('aria-selected="true"')
     expect(markup).toContain('aria-disabled="true"')
   })
+
+  it('announces empty command results', () => {
+    const markup = renderToStaticMarkup(
+      <CanvasCommandPalette
+        open
+        items={[]}
+        onClose={vi.fn()}
+      />,
+    )
+    const describedByMatch = markup.match(/aria-describedby="([^"]+)"/)
+
+    expect(markup).not.toContain('aria-activedescendant')
+    expect(describedByMatch?.[1]).toBeTruthy()
+    expect(markup).toContain(`id="${describedByMatch?.[1]}"`)
+    expect(markup).toContain('role="status"')
+    expect(markup).toContain('aria-live="polite"')
+    expect(markup).toContain('No matches')
+  })
 })
 
 function createItem(

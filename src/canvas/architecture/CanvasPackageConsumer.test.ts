@@ -69,6 +69,7 @@ import {
   createCanvasAppFeaturePackSuiteMarketplaceListing,
   createCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan,
   createCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan,
+  createCanvasCommandPaletteListboxDescriptor,
   createCanvasSelectionListDescriptor,
   createCanvasStoryCanvasFeaturePackAssemblyInput,
   executeCanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransaction,
@@ -627,6 +628,7 @@ import {
   type CanvasAppAssemblySource as CanvasAppAssemblySourceFromApp,
   type CanvasAppProps as CanvasAppPropsFromApp,
   type CanvasCommandPaletteKeyboardIntentInput,
+  type CanvasCommandPaletteListboxDescriptorInput,
   type CanvasKeyboardToolHandlers,
 } from '@interactive-os/canvas/app'
 import {
@@ -4717,6 +4719,15 @@ describe('Canvas package consumer imports', () => {
         itemCount: 2,
         key: 'ArrowDown',
       }
+    const commandPaletteListboxDescriptorInput:
+      CanvasCommandPaletteListboxDescriptorInput = {
+        activeIndex: 0,
+        controlId: 'package-palette',
+        items: [{
+          disabled: false,
+          id: 'tool:select',
+        }],
+      }
     const appFacadeHtmlImageSourceHTML =
       '<figure><img alt="One" src="data:image/webp;base64,aW1hZ2U="></figure>'
     const appFacadeHtmlImageDataTransfer = {
@@ -5692,6 +5703,49 @@ describe('Canvas package consumer imports', () => {
       kind: 'move-active',
       preventDefault: true,
       stopPropagation: true,
+    })
+    expect(createCanvasCommandPaletteListboxDescriptor(
+      commandPaletteListboxDescriptorInput,
+    )).toEqual({
+      activeOptionId: 'package-palette-option-tool-select',
+      emptyMessageId: 'package-palette-empty',
+      isEmpty: false,
+      options: [{
+        attributes: {
+          'aria-posinset': 1,
+          'aria-selected': true,
+          'aria-setsize': 1,
+          id: 'package-palette-option-tool-select',
+          role: 'option',
+        },
+        index: 0,
+        isActive: true,
+        itemId: 'tool:select',
+      }],
+      rootAttributes: {
+        'aria-label': 'Command results',
+        role: 'listbox',
+      },
+    })
+    expect(CanvasAppFacade.createCanvasCommandPaletteListboxDescriptor({
+      activeIndex: 0,
+      controlId: 'package-palette',
+      items: [],
+    })).toEqual({
+      activeOptionId: null,
+      emptyAttributes: {
+        'aria-live': 'polite',
+        id: 'package-palette-empty',
+        role: 'status',
+      },
+      emptyMessageId: 'package-palette-empty',
+      isEmpty: true,
+      options: [],
+      rootAttributes: {
+        'aria-describedby': 'package-palette-empty',
+        'aria-label': 'Command results',
+        role: 'listbox',
+      },
     })
     expect(CanvasAppAuthoring.createCanvasAppAssembly).toBeTypeOf('function')
     expect(CanvasAppAuthoring.getCanvasAppFoundationExtensionCommands)

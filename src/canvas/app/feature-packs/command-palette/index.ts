@@ -21,6 +21,16 @@ export {
   type CanvasCommandPaletteKeyboardIntent,
   type CanvasCommandPaletteKeyboardIntentInput,
 } from './CanvasCommandPaletteKeyboard'
+export {
+  createCanvasCommandPaletteListboxDescriptor,
+  type CanvasCommandPaletteEmptyAttributes,
+  type CanvasCommandPaletteListboxDescriptor,
+  type CanvasCommandPaletteListboxDescriptorInput,
+  type CanvasCommandPaletteListboxItem,
+  type CanvasCommandPaletteListboxOptionDescriptor,
+  type CanvasCommandPaletteListboxRootAttributes,
+  type CanvasCommandPaletteOptionAttributes,
+} from './CanvasCommandPaletteListbox'
 
 export const CANVAS_APP_COMMAND_PALETTE_VIEW_FEATURE_PACK =
   createCanvasAppViewFeaturePack({

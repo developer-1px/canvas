@@ -10,9 +10,17 @@ export {
 } from './feature-packs/toolbar'
 export {
   CanvasCommandPalette,
+  createCanvasCommandPaletteListboxDescriptor,
   getCanvasCommandPaletteKeyboardIntent,
+  type CanvasCommandPaletteEmptyAttributes,
   type CanvasCommandPaletteKeyboardIntent,
   type CanvasCommandPaletteKeyboardIntentInput,
+  type CanvasCommandPaletteListboxDescriptor,
+  type CanvasCommandPaletteListboxDescriptorInput,
+  type CanvasCommandPaletteListboxItem,
+  type CanvasCommandPaletteListboxOptionDescriptor,
+  type CanvasCommandPaletteListboxRootAttributes,
+  type CanvasCommandPaletteOptionAttributes,
 } from './feature-packs/command-palette'
 export {
   CanvasShortcutHelpOverlay,
