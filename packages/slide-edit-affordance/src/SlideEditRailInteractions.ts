@@ -70,6 +70,21 @@ export const SLIDE_EDIT_RAIL_COMMANDS = Object.freeze([
 
 export const SLIDE_EDIT_RAIL_KEYBOARD_KEYS =
   'ArrowUp ArrowDown Home End Enter Space'
+export const SLIDE_EDIT_RAIL_ADD_KEYBOARD_SHORTCUT = 'Cmd/Ctrl+M'
+export const SLIDE_EDIT_RAIL_COPY_KEYBOARD_SHORTCUT = 'Cmd/Ctrl+C'
+export const SLIDE_EDIT_RAIL_CUT_KEYBOARD_SHORTCUT = 'Cmd/Ctrl+X'
+export const SLIDE_EDIT_RAIL_PASTE_KEYBOARD_SHORTCUT = 'Cmd/Ctrl+V'
+export const SLIDE_EDIT_RAIL_DUPLICATE_KEYBOARD_SHORTCUT = 'Cmd/Ctrl+D'
+export const SLIDE_EDIT_RAIL_DELETE_KEYBOARD_SHORTCUT_KEYS =
+  'Delete Backspace'
+export const SLIDE_EDIT_RAIL_COMMAND_KEYBOARD_SHORTCUT_KEYS =
+  `${SLIDE_EDIT_RAIL_ADD_KEYBOARD_SHORTCUT} ${SLIDE_EDIT_RAIL_COPY_KEYBOARD_SHORTCUT} ${SLIDE_EDIT_RAIL_CUT_KEYBOARD_SHORTCUT} ${SLIDE_EDIT_RAIL_PASTE_KEYBOARD_SHORTCUT} ${SLIDE_EDIT_RAIL_DUPLICATE_KEYBOARD_SHORTCUT} ${SLIDE_EDIT_RAIL_DELETE_KEYBOARD_SHORTCUT_KEYS}`
+export const SLIDE_EDIT_RAIL_COMMAND_KEYBOARD_SHORTCUT_MODEL =
+  'slide-edit-rail-command-keyboard-shortcuts'
+export const SLIDE_EDIT_RAIL_COMMAND_KEYBOARD_SHORTCUT_INTENT =
+  'slide-edit-rail-command-keyboard-intent'
+export const SLIDE_EDIT_RAIL_COMMAND_KEYBOARD_ROUTING_PRIORITY =
+  'rail-focus-before-host-command'
 export const SLIDE_EDIT_RAIL_REORDER_MOVE_UP_SHORTCUT = 'Cmd/Ctrl+Up'
 export const SLIDE_EDIT_RAIL_REORDER_MOVE_DOWN_SHORTCUT = 'Cmd/Ctrl+Down'
 export const SLIDE_EDIT_RAIL_REORDER_MOVE_TO_START_SHORTCUT =
@@ -173,6 +188,46 @@ export type SlideEditRailListboxKeyboardKey =
   | 'End'
   | 'Enter'
   | 'Home'
+
+export type SlideEditRailCommandKeyboardShortcut =
+  | typeof SLIDE_EDIT_RAIL_ADD_KEYBOARD_SHORTCUT
+  | typeof SLIDE_EDIT_RAIL_COPY_KEYBOARD_SHORTCUT
+  | typeof SLIDE_EDIT_RAIL_CUT_KEYBOARD_SHORTCUT
+  | typeof SLIDE_EDIT_RAIL_PASTE_KEYBOARD_SHORTCUT
+  | typeof SLIDE_EDIT_RAIL_DUPLICATE_KEYBOARD_SHORTCUT
+  | 'Backspace'
+  | 'Delete'
+
+export type SlideEditRailCommandKeyboardShortcutIntentKind =
+  | 'add-slide'
+  | 'copy-slide'
+  | 'cut-slide'
+  | 'delete-slide'
+  | 'duplicate-slide'
+  | 'paste-slide'
+
+export type SlideEditRailCommandKeyboardShortcutIntent<
+  TSlideId extends SlideEditRailSlideId = SlideEditRailSlideId,
+> = {
+  activeSlideId: TSlideId | null
+  intent: typeof SLIDE_EDIT_RAIL_COMMAND_KEYBOARD_SHORTCUT_INTENT
+  keyboardModel: typeof SLIDE_EDIT_RAIL_COMMAND_KEYBOARD_SHORTCUT_MODEL
+  kind: SlideEditRailCommandKeyboardShortcutIntentKind
+  preventDefault: true
+  shortcut: SlideEditRailCommandKeyboardShortcut
+}
+
+export type SlideEditRailCommandKeyboardShortcutIntentInput<
+  TSlideId extends SlideEditRailSlideId = SlideEditRailSlideId,
+> = {
+  activeSlideId: TSlideId | null
+  altKey?: boolean
+  canDelete?: boolean
+  canPaste?: boolean
+  key: string
+  mod: boolean
+  shiftKey?: boolean
+}
 
 export type SlideEditRailReorderKeyboardShortcutIntentInput<
   TSlideId extends SlideEditRailSlideId = SlideEditRailSlideId,
@@ -340,6 +395,87 @@ export function getSlideEditRailListboxKeyboardIntent<
   return null
 }
 
+export function getSlideEditRailCommandKeyboardShortcutIntent<
+  TSlideId extends SlideEditRailSlideId,
+>({
+  activeSlideId,
+  altKey = false,
+  canDelete = true,
+  canPaste = true,
+  key,
+  mod,
+  shiftKey = false,
+}: SlideEditRailCommandKeyboardShortcutIntentInput<TSlideId>):
+  SlideEditRailCommandKeyboardShortcutIntent<TSlideId> | null {
+  if (altKey || shiftKey) {
+    return null
+  }
+
+  const normalizedKey = key.toLowerCase()
+
+  if (mod) {
+    if (normalizedKey === 'm') {
+      return createSlideEditRailCommandKeyboardShortcutIntent({
+        activeSlideId,
+        kind: 'add-slide',
+        shortcut: SLIDE_EDIT_RAIL_ADD_KEYBOARD_SHORTCUT,
+      })
+    }
+
+    if (!activeSlideId) {
+      return null
+    }
+
+    if (normalizedKey === 'c') {
+      return createSlideEditRailCommandKeyboardShortcutIntent({
+        activeSlideId,
+        kind: 'copy-slide',
+        shortcut: SLIDE_EDIT_RAIL_COPY_KEYBOARD_SHORTCUT,
+      })
+    }
+
+    if (normalizedKey === 'x' && canDelete) {
+      return createSlideEditRailCommandKeyboardShortcutIntent({
+        activeSlideId,
+        kind: 'cut-slide',
+        shortcut: SLIDE_EDIT_RAIL_CUT_KEYBOARD_SHORTCUT,
+      })
+    }
+
+    if (normalizedKey === 'v' && canPaste) {
+      return createSlideEditRailCommandKeyboardShortcutIntent({
+        activeSlideId,
+        kind: 'paste-slide',
+        shortcut: SLIDE_EDIT_RAIL_PASTE_KEYBOARD_SHORTCUT,
+      })
+    }
+
+    if (normalizedKey === 'd') {
+      return createSlideEditRailCommandKeyboardShortcutIntent({
+        activeSlideId,
+        kind: 'duplicate-slide',
+        shortcut: SLIDE_EDIT_RAIL_DUPLICATE_KEYBOARD_SHORTCUT,
+      })
+    }
+
+    return null
+  }
+
+  if (
+    activeSlideId &&
+    canDelete &&
+    (key === 'Delete' || key === 'Backspace')
+  ) {
+    return createSlideEditRailCommandKeyboardShortcutIntent({
+      activeSlideId,
+      kind: 'delete-slide',
+      shortcut: key,
+    })
+  }
+
+  return null
+}
+
 export function getSlideEditRailReorderKeyboardShortcutIntent<
   TSlideId extends SlideEditRailSlideId,
 >({
@@ -388,6 +524,27 @@ export function getSlideEditRailReorderKeyboardShortcutIntent<
   }
 
   return null
+}
+
+function createSlideEditRailCommandKeyboardShortcutIntent<
+  TSlideId extends SlideEditRailSlideId,
+>({
+  activeSlideId,
+  kind,
+  shortcut,
+}: {
+  activeSlideId: TSlideId | null
+  kind: SlideEditRailCommandKeyboardShortcutIntentKind
+  shortcut: SlideEditRailCommandKeyboardShortcut
+}): SlideEditRailCommandKeyboardShortcutIntent<TSlideId> {
+  return {
+    activeSlideId,
+    intent: SLIDE_EDIT_RAIL_COMMAND_KEYBOARD_SHORTCUT_INTENT,
+    keyboardModel: SLIDE_EDIT_RAIL_COMMAND_KEYBOARD_SHORTCUT_MODEL,
+    kind,
+    preventDefault: true,
+    shortcut,
+  }
 }
 
 export function getSlideEditRailKeyboardCommandEffect<

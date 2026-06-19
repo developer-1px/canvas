@@ -3,12 +3,23 @@ import { describe, expect, it } from 'vitest'
 import {
   createSlideEditRailDescriptor,
   createSlideEditRailListboxDescriptor,
+  getSlideEditRailCommandKeyboardShortcutIntent,
   getSlideEditRailKeyboardCommandEffect,
   getSlideEditRailListboxKeyboardIntent,
   getSlideEditRailPointerCommandEffect,
   getSlideEditRailReorderKeyboardShortcutIntent,
+  SLIDE_EDIT_RAIL_ADD_KEYBOARD_SHORTCUT,
+  SLIDE_EDIT_RAIL_COMMAND_KEYBOARD_ROUTING_PRIORITY,
+  SLIDE_EDIT_RAIL_COMMAND_KEYBOARD_SHORTCUT_INTENT,
+  SLIDE_EDIT_RAIL_COMMAND_KEYBOARD_SHORTCUT_KEYS,
+  SLIDE_EDIT_RAIL_COMMAND_KEYBOARD_SHORTCUT_MODEL,
   SLIDE_EDIT_RAIL_COMMANDS,
+  SLIDE_EDIT_RAIL_COPY_KEYBOARD_SHORTCUT,
+  SLIDE_EDIT_RAIL_CUT_KEYBOARD_SHORTCUT,
+  SLIDE_EDIT_RAIL_DELETE_KEYBOARD_SHORTCUT_KEYS,
+  SLIDE_EDIT_RAIL_DUPLICATE_KEYBOARD_SHORTCUT,
   SLIDE_EDIT_RAIL_KEYBOARD_KEYS,
+  SLIDE_EDIT_RAIL_PASTE_KEYBOARD_SHORTCUT,
   SLIDE_EDIT_RAIL_REORDER_KEYBOARD_ROUTING_PRIORITY,
   SLIDE_EDIT_RAIL_REORDER_KEYBOARD_SHORTCUT_INTENT,
   SLIDE_EDIT_RAIL_REORDER_KEYBOARD_SHORTCUT_KEYS,
@@ -19,6 +30,7 @@ import {
   SLIDE_EDIT_RAIL_REORDER_MOVE_UP_SHORTCUT,
 } from './SlideEditRailInteractions'
 import {
+  SLIDE_EDIT_RAIL_COMMAND_KEYBOARD_SHORTCUT_MODEL as SLIDE_EDIT_RAIL_COMMAND_KEYBOARD_SHORTCUT_MODEL_FROM_PACKAGE,
   SLIDE_EDIT_RAIL_REORDER_KEYBOARD_SHORTCUT_MODEL as SLIDE_EDIT_RAIL_REORDER_KEYBOARD_SHORTCUT_MODEL_FROM_PACKAGE,
   SLIDE_EDIT_RAIL_REORDER_MOVE_UP_SHORTCUT as SLIDE_EDIT_RAIL_REORDER_MOVE_UP_SHORTCUT_FROM_PACKAGE,
 } from './index'
@@ -127,6 +139,26 @@ describe('SlideEditRailInteractions', () => {
     expect(SLIDE_EDIT_RAIL_KEYBOARD_KEYS).toBe(
       'ArrowUp ArrowDown Home End Enter Space',
     )
+    expect(SLIDE_EDIT_RAIL_ADD_KEYBOARD_SHORTCUT).toBe('Cmd/Ctrl+M')
+    expect(SLIDE_EDIT_RAIL_COPY_KEYBOARD_SHORTCUT).toBe('Cmd/Ctrl+C')
+    expect(SLIDE_EDIT_RAIL_CUT_KEYBOARD_SHORTCUT).toBe('Cmd/Ctrl+X')
+    expect(SLIDE_EDIT_RAIL_PASTE_KEYBOARD_SHORTCUT).toBe('Cmd/Ctrl+V')
+    expect(SLIDE_EDIT_RAIL_DUPLICATE_KEYBOARD_SHORTCUT).toBe('Cmd/Ctrl+D')
+    expect(SLIDE_EDIT_RAIL_DELETE_KEYBOARD_SHORTCUT_KEYS).toBe(
+      'Delete Backspace',
+    )
+    expect(SLIDE_EDIT_RAIL_COMMAND_KEYBOARD_SHORTCUT_KEYS).toBe(
+      'Cmd/Ctrl+M Cmd/Ctrl+C Cmd/Ctrl+X Cmd/Ctrl+V Cmd/Ctrl+D Delete Backspace',
+    )
+    expect(SLIDE_EDIT_RAIL_COMMAND_KEYBOARD_SHORTCUT_MODEL).toBe(
+      'slide-edit-rail-command-keyboard-shortcuts',
+    )
+    expect(SLIDE_EDIT_RAIL_COMMAND_KEYBOARD_SHORTCUT_INTENT).toBe(
+      'slide-edit-rail-command-keyboard-intent',
+    )
+    expect(SLIDE_EDIT_RAIL_COMMAND_KEYBOARD_ROUTING_PRIORITY).toBe(
+      'rail-focus-before-host-command',
+    )
     expect(SLIDE_EDIT_RAIL_REORDER_MOVE_UP_SHORTCUT).toBe('Cmd/Ctrl+Up')
     expect(SLIDE_EDIT_RAIL_REORDER_MOVE_DOWN_SHORTCUT).toBe('Cmd/Ctrl+Down')
     expect(SLIDE_EDIT_RAIL_REORDER_MOVE_TO_START_SHORTCUT).toBe(
@@ -149,8 +181,98 @@ describe('SlideEditRailInteractions', () => {
     )
     expect(SLIDE_EDIT_RAIL_REORDER_KEYBOARD_SHORTCUT_MODEL_FROM_PACKAGE)
       .toBe(SLIDE_EDIT_RAIL_REORDER_KEYBOARD_SHORTCUT_MODEL)
+    expect(SLIDE_EDIT_RAIL_COMMAND_KEYBOARD_SHORTCUT_MODEL_FROM_PACKAGE)
+      .toBe(SLIDE_EDIT_RAIL_COMMAND_KEYBOARD_SHORTCUT_MODEL)
     expect(SLIDE_EDIT_RAIL_REORDER_MOVE_UP_SHORTCUT_FROM_PACKAGE)
       .toBe(SLIDE_EDIT_RAIL_REORDER_MOVE_UP_SHORTCUT)
+  })
+
+  it('maps rail command shortcuts to stable intents', () => {
+    expect(getSlideEditRailCommandKeyboardShortcutIntent({
+      activeSlideId: 'slide-b',
+      key: 'm',
+      mod: true,
+    })).toEqual({
+      activeSlideId: 'slide-b',
+      intent: 'slide-edit-rail-command-keyboard-intent',
+      keyboardModel: 'slide-edit-rail-command-keyboard-shortcuts',
+      kind: 'add-slide',
+      preventDefault: true,
+      shortcut: 'Cmd/Ctrl+M',
+    })
+    expect(getSlideEditRailCommandKeyboardShortcutIntent({
+      activeSlideId: 'slide-b',
+      key: 'c',
+      mod: true,
+    })?.kind).toBe('copy-slide')
+    expect(getSlideEditRailCommandKeyboardShortcutIntent({
+      activeSlideId: 'slide-b',
+      key: 'x',
+      mod: true,
+    })?.kind).toBe('cut-slide')
+    expect(getSlideEditRailCommandKeyboardShortcutIntent({
+      activeSlideId: 'slide-b',
+      key: 'v',
+      mod: true,
+    })?.kind).toBe('paste-slide')
+    expect(getSlideEditRailCommandKeyboardShortcutIntent({
+      activeSlideId: 'slide-b',
+      key: 'd',
+      mod: true,
+    })?.kind).toBe('duplicate-slide')
+    expect(getSlideEditRailCommandKeyboardShortcutIntent({
+      activeSlideId: 'slide-b',
+      key: 'Delete',
+      mod: false,
+    })).toMatchObject({
+      kind: 'delete-slide',
+      shortcut: 'Delete',
+    })
+    expect(getSlideEditRailCommandKeyboardShortcutIntent({
+      activeSlideId: 'slide-b',
+      key: 'Backspace',
+      mod: false,
+    })).toMatchObject({
+      kind: 'delete-slide',
+      shortcut: 'Backspace',
+    })
+  })
+
+  it('does not consume unavailable or modified rail command shortcuts', () => {
+    expect(getSlideEditRailCommandKeyboardShortcutIntent({
+      activeSlideId: null,
+      key: 'm',
+      mod: true,
+    })?.kind).toBe('add-slide')
+    expect(getSlideEditRailCommandKeyboardShortcutIntent({
+      activeSlideId: null,
+      key: 'd',
+      mod: true,
+    })).toBeNull()
+    expect(getSlideEditRailCommandKeyboardShortcutIntent({
+      activeSlideId: 'slide-b',
+      canDelete: false,
+      key: 'Delete',
+      mod: false,
+    })).toBeNull()
+    expect(getSlideEditRailCommandKeyboardShortcutIntent({
+      activeSlideId: 'slide-b',
+      canPaste: false,
+      key: 'v',
+      mod: true,
+    })).toBeNull()
+    expect(getSlideEditRailCommandKeyboardShortcutIntent({
+      activeSlideId: 'slide-b',
+      altKey: true,
+      key: 'd',
+      mod: true,
+    })).toBeNull()
+    expect(getSlideEditRailCommandKeyboardShortcutIntent({
+      activeSlideId: 'slide-b',
+      key: 'd',
+      mod: true,
+      shiftKey: true,
+    })).toBeNull()
   })
 
   it('converts keyboard intents to host command effects', () => {
