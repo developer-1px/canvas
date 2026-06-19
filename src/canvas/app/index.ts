@@ -200,6 +200,18 @@ export {
   getCanvasKeyboardReservedCommandShortcuts,
 } from './affordances/interaction/keyboard/CanvasKeyboardCommandShortcuts'
 export {
+  CANVAS_KEYBOARD_SELECTION_CYCLE_INTENT_MODEL,
+  CANVAS_KEYBOARD_SELECTION_CYCLE_KEYS,
+  CANVAS_KEYBOARD_SELECTION_CYCLE_MODEL,
+  getCanvasKeyboardSelectionCycleIntent,
+  isCanvasKeyboardSelectionCycleTarget,
+  type CanvasKeyboardSelectionCycleDirection,
+  type CanvasKeyboardSelectionCycleIntent,
+  type CanvasKeyboardSelectionCycleIntentInput,
+  type CanvasKeyboardSelectionCycleKeyboardEvent,
+  type CanvasKeyboardSelectionCycleTargetInput,
+} from './affordances/interaction/keyboard/CanvasKeyboardSelectionCycle'
+export {
   CANVAS_KEYBOARD_NUDGE_INTENT_MODEL,
   CANVAS_KEYBOARD_NUDGE_KEYS,
   CANVAS_KEYBOARD_NUDGE_LARGE_STEP,
