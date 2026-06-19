@@ -65,17 +65,19 @@ export type SlideEditTextParagraphBulletHostCommandEffect<
 
 export type SlideEditTextParagraphBulletKeyboardIntentKind =
   | 'toggle-bullet'
+  | 'toggle-numbered'
 
 export type SlideEditTextParagraphBulletKeyboardIntent = {
   commandId: 'toggle-text-paragraph-bullet'
   kind: SlideEditTextParagraphBulletKeyboardIntentKind
   preventDefault: boolean
   shortcut: string
-  value: 'bullet'
+  value: Extract<SlideEditTextParagraphBulletValue, 'bullet' | 'numbered'>
 }
 
 export type SlideEditTextParagraphBulletKeyboardIntentInput = {
   altKey?: boolean
+  code?: string
   key: string
   mod: boolean
   shiftKey?: boolean
@@ -345,6 +347,9 @@ export const SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_FIELD = Object.freeze({
 export const SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_KEYBOARD_SHORTCUT =
   'Cmd/Ctrl+Shift+L'
 
+export const SLIDE_EDIT_TEXT_PARAGRAPH_NUMBERED_KEYBOARD_SHORTCUT =
+  'Cmd/Ctrl+Shift+7'
+
 export const SLIDE_EDIT_TEXT_PARAGRAPH_SPACING_FIELDS = Object.freeze([
   {
     commandId: 'update-text-paragraph-spacing',
@@ -431,22 +436,39 @@ export function getSlideEditTextParagraphBulletCommandEffect<
 
 export function getSlideEditTextParagraphBulletKeyboardIntent({
   altKey = false,
+  code,
   key,
   mod,
   shiftKey = false,
 }: SlideEditTextParagraphBulletKeyboardIntentInput):
   SlideEditTextParagraphBulletKeyboardIntent | null {
-  if (!mod || !shiftKey || altKey || key.toLowerCase() !== 'l') {
+  if (!mod || !shiftKey || altKey) {
     return null
   }
 
-  return {
-    commandId: 'toggle-text-paragraph-bullet',
-    kind: 'toggle-bullet',
-    preventDefault: true,
-    shortcut: SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_KEYBOARD_SHORTCUT,
-    value: 'bullet',
+  const normalizedKey = key.toLowerCase()
+
+  if (normalizedKey === 'l') {
+    return {
+      commandId: 'toggle-text-paragraph-bullet',
+      kind: 'toggle-bullet',
+      preventDefault: true,
+      shortcut: SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_KEYBOARD_SHORTCUT,
+      value: 'bullet',
+    }
   }
+
+  if (key === '7' || code === 'Digit7') {
+    return {
+      commandId: 'toggle-text-paragraph-bullet',
+      kind: 'toggle-numbered',
+      preventDefault: true,
+      shortcut: SLIDE_EDIT_TEXT_PARAGRAPH_NUMBERED_KEYBOARD_SHORTCUT,
+      value: 'numbered',
+    }
+  }
+
+  return null
 }
 
 export function normalizeSlideEditTextParagraphBulletUpdateCommand<

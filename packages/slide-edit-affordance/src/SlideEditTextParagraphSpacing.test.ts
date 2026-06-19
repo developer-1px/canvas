@@ -23,6 +23,7 @@ import {
   SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_FIELD,
   SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_KEYBOARD_SHORTCUT,
   SLIDE_EDIT_TEXT_PARAGRAPH_BULLET_VALUES,
+  SLIDE_EDIT_TEXT_PARAGRAPH_NUMBERED_KEYBOARD_SHORTCUT,
   SLIDE_EDIT_TEXT_PARAGRAPH_SPACING_FIELDS,
   SLIDE_EDIT_TEXT_PARAGRAPH_SPACING_JSON_MIME_TYPE,
   SLIDE_EDIT_TEXT_PARAGRAPH_SPACING_LIMITS,
@@ -32,6 +33,7 @@ import {
   getSlideEditTextParagraphBulletJSONPasteValueFromText as getSlideEditTextParagraphBulletJSONPasteValueFromTextFromPackage,
   getSlideEditTextParagraphBulletJSONPasteValueFromValue as getSlideEditTextParagraphBulletJSONPasteValueFromValueFromPackage,
   getSlideEditTextParagraphBulletKeyboardIntent as getSlideEditTextParagraphBulletKeyboardIntentFromPackage,
+  SLIDE_EDIT_TEXT_PARAGRAPH_NUMBERED_KEYBOARD_SHORTCUT as SLIDE_EDIT_TEXT_PARAGRAPH_NUMBERED_KEYBOARD_SHORTCUT_FROM_PACKAGE,
   getSlideEditTextParagraphSpacingJSONPasteValue as getSlideEditTextParagraphSpacingJSONPasteValueFromPackage,
   getSlideEditTextParagraphSpacingJSONPasteValueFromText as getSlideEditTextParagraphSpacingJSONPasteValueFromTextFromPackage,
   getSlideEditTextParagraphSpacingJSONPasteValueFromValue as getSlideEditTextParagraphSpacingJSONPasteValueFromValueFromPackage,
@@ -148,6 +150,27 @@ describe('SlideEditTextParagraphSpacing', () => {
       kind: 'toggle-bullet',
       shortcut: 'Cmd/Ctrl+Shift+L',
       value: 'bullet',
+    })
+    expect(getSlideEditTextParagraphBulletKeyboardIntent({
+      code: 'Digit7',
+      key: '&',
+      mod: true,
+      shiftKey: true,
+    })).toEqual({
+      commandId: 'toggle-text-paragraph-bullet',
+      kind: 'toggle-numbered',
+      preventDefault: true,
+      shortcut: SLIDE_EDIT_TEXT_PARAGRAPH_NUMBERED_KEYBOARD_SHORTCUT,
+      value: 'numbered',
+    })
+    expect(getSlideEditTextParagraphBulletKeyboardIntentFromPackage({
+      key: '7',
+      mod: true,
+      shiftKey: true,
+    })).toMatchObject({
+      kind: 'toggle-numbered',
+      shortcut: SLIDE_EDIT_TEXT_PARAGRAPH_NUMBERED_KEYBOARD_SHORTCUT_FROM_PACKAGE,
+      value: 'numbered',
     })
     expect(getSlideEditTextParagraphBulletKeyboardIntent({
       key: 'l',
