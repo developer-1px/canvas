@@ -3,6 +3,7 @@ import { createCanvasAffordanceConfig } from '../../../../engine'
 import {
   getCanvasKeyboardBuiltinToolShortcut,
   getCanvasKeyboardReservedToolShortcuts,
+  getCanvasKeyboardToolAriaKeyshortcuts,
 } from './CanvasKeyboardToolShortcuts'
 
 describe('CanvasKeyboardToolShortcuts', () => {
@@ -64,6 +65,25 @@ describe('CanvasKeyboardToolShortcuts', () => {
       event: createKeyboardEvent({ key: 'R' }),
       key: 'r',
     })).toBeNull()
+  })
+
+  it('projects enabled built-in tool shortcuts to aria-keyshortcuts tokens', () => {
+    expect(getCanvasKeyboardToolAriaKeyshortcuts({
+      config: createCanvasAffordanceConfig(),
+      tool: 'rect',
+    })).toBe('r')
+
+    expect(getCanvasKeyboardToolAriaKeyshortcuts({
+      config: createCanvasAffordanceConfig(),
+      tool: 'section',
+    })).toBe('Shift+S')
+
+    expect(getCanvasKeyboardToolAriaKeyshortcuts({
+      config: createCanvasAffordanceConfig({
+        shortcuts: { rectTool: false },
+      }),
+      tool: 'rect',
+    })).toBeUndefined()
   })
 
   it('exports reserved shortcuts for custom creation tool contracts', () => {

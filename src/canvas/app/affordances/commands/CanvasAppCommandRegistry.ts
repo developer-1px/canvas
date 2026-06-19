@@ -13,7 +13,11 @@ import {
   type CanvasAppCommandBindingDefinition,
   type CanvasAppCommandDefinition,
   type CanvasAppCommandDefinitionSection,
+  type CanvasAppCommandShortcutDefinition,
 } from './CanvasAppCommandDefinitions'
+import {
+  normalizeCanvasKeyboardShortcutKey,
+} from '../interaction/keyboard/CanvasKeyboardShortcutChords'
 
 export type CanvasAppCommandMappingSection =
   CanvasAppCommandDefinitionSection
@@ -55,6 +59,40 @@ export function getCanvasAppCommandMappingShortcut({
   })
 }
 
+export function getCanvasAppCommandAriaKeyshortcuts({
+  config,
+  id,
+}: {
+  config: CanvasAffordanceConfig
+  id: string
+}) {
+  return getCanvasAppCommandMappingAriaKeyshortcuts({
+    config,
+    mapping: getCanvasAppCommandMapping(id),
+  })
+}
+
+export function getCanvasAppCommandMappingAriaKeyshortcuts({
+  config,
+  mapping,
+}: {
+  config: CanvasAffordanceConfig
+  mapping: CanvasAppCommandMapping | undefined
+}) {
+  if (!mapping) {
+    return undefined
+  }
+
+  const shortcuts = mapping.bindings.flatMap((binding) =>
+    binding.kind === 'keyboard' &&
+      isCanvasAppCommandBindingEnabled(binding, config)
+      ? [formatCanvasAppCommandShortcutAriaKey(binding.shortcut)]
+      : [],
+  )
+
+  return shortcuts.length > 0 ? shortcuts.join(' ') : undefined
+}
+
 function isCanvasAppCommandBindingEnabled(
   binding: CanvasAppCommandBinding,
   config: CanvasAffordanceConfig,
@@ -68,4 +106,33 @@ function isCanvasAppCommandBindingEnabled(
   }
 
   return binding.overlayId ? config.overlays[binding.overlayId] : true
+}
+
+function formatCanvasAppCommandShortcutAriaKey(
+  shortcut: CanvasAppCommandShortcutDefinition,
+) {
+  const key = normalizeCanvasKeyboardShortcutKey(shortcut.key)
+  const modifiers = getCanvasAppCommandShortcutAriaModifiers(shortcut)
+  const hasShift = modifiers.includes('Shift')
+  const ariaKey = hasShift && key.length === 1
+    ? key.toUpperCase()
+    : key
+
+  return [...modifiers, ariaKey].join('+')
+}
+
+function getCanvasAppCommandShortcutAriaModifiers({
+  modifier,
+  modifiers,
+  shiftKey,
+}: CanvasAppCommandShortcutDefinition) {
+  const values = [...(modifiers ?? (modifier ? [modifier] : []))]
+
+  if (shiftKey === true && !values.includes('Shift')) {
+    values.push('Shift')
+  }
+
+  return values.map((value) =>
+    value === 'primary' ? 'Meta' : value
+  )
 }

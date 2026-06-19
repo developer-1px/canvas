@@ -4,7 +4,9 @@ import {
   CANVAS_APP_COMMAND_DEFINITIONS,
 } from './CanvasAppCommandDefinitions'
 import {
+  getCanvasAppCommandAriaKeyshortcuts,
   getCanvasAppCommandMapping,
+  getCanvasAppCommandMappingAriaKeyshortcuts,
   getCanvasAppCommandMappingShortcut,
 } from './CanvasAppCommandRegistry'
 
@@ -62,6 +64,32 @@ describe('CanvasAppCommandRegistry', () => {
     expect(commandShortcut('command:duplicate', config)).toBeUndefined()
     expect(commandShortcut('system:commandPalette', config)).toBeUndefined()
   })
+
+  it('projects enabled keyboard bindings to aria-keyshortcuts tokens', () => {
+    expect(commandAriaKeyshortcuts('command:duplicate')).toBe('Meta+d')
+    expect(commandAriaKeyshortcuts('command:delete')).toBe('Delete Backspace')
+    expect(commandAriaKeyshortcuts('system:shortcutHelp')).toBe('Shift+/')
+    expect(commandAriaKeyshortcuts('viewport:zoom-in')).toBe('Meta+=')
+
+    expect(getCanvasAppCommandMappingAriaKeyshortcuts({
+      config: createCanvasAffordanceConfig(),
+      mapping: getCanvasAppCommandMapping('command:duplicate'),
+    })).toBe('Meta+d')
+  })
+
+  it('filters aria-keyshortcuts through affordance config', () => {
+    const config = createCanvasAffordanceConfig({
+      shortcuts: {
+        duplicate: false,
+        zoomIn: false,
+      },
+    })
+
+    expect(commandAriaKeyshortcuts('command:duplicate', config))
+      .toBeUndefined()
+    expect(commandAriaKeyshortcuts('viewport:zoom-in', config))
+      .toBeUndefined()
+  })
 })
 
 function commandShortcut(
@@ -72,6 +100,13 @@ function commandShortcut(
     config,
     mapping: getCanvasAppCommandMapping(id),
   })
+}
+
+function commandAriaKeyshortcuts(
+  id: string,
+  config = createCanvasAffordanceConfig(),
+) {
+  return getCanvasAppCommandAriaKeyshortcuts({ config, id })
 }
 
 function requireMapping(id: string) {

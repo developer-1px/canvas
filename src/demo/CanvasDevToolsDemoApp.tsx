@@ -50,8 +50,10 @@ import {
   type CanvasItem,
   type CanvasJsonObject,
   type CanvasStampKind,
-  type Tool,
+  type CanvasBuiltinTool,
   CANVAS_TOOLBAR_ITEM_PROPS,
+  getCanvasAppCommandAriaKeyshortcuts,
+  getCanvasKeyboardToolAriaKeyshortcuts,
   getCanvasAppWidgetInteractions,
   getCanvasContextMenuKeyboardIntent,
   useCanvasToolbarRovingFocus,
@@ -89,7 +91,7 @@ const ENGINE_DEMO_TOOLS = [
   { icon: ArrowUpRight, id: 'arrow', label: 'Arrow tool' },
 ] as const satisfies readonly {
   icon: typeof MousePointer2
-  id: Tool
+  id: CanvasBuiltinTool
   label: string
 }[]
 
@@ -567,6 +569,10 @@ function CanvasEngineDemoSurface({
             <button
               {...CANVAS_TOOLBAR_ITEM_PROPS}
               aria-label={label}
+              aria-keyshortcuts={getCanvasKeyboardToolAriaKeyshortcuts({
+                config: app.toolbar.config,
+                tool: id,
+              })}
               aria-pressed={app.toolbar.tool === id}
               key={id}
               onClick={() => {
@@ -591,6 +597,10 @@ function CanvasEngineDemoSurface({
         <button
           {...CANVAS_TOOLBAR_ITEM_PROPS}
           aria-label="Zoom out"
+          aria-keyshortcuts={getCanvasAppCommandAriaKeyshortcuts({
+            config: app.toolbar.config,
+            id: 'viewport:zoom-out',
+          })}
           onClick={app.zoomControls.onZoomOut}
           type="button"
         >
@@ -599,6 +609,10 @@ function CanvasEngineDemoSurface({
         <button
           {...CANVAS_TOOLBAR_ITEM_PROPS}
           aria-label="Zoom in"
+          aria-keyshortcuts={getCanvasAppCommandAriaKeyshortcuts({
+            config: app.toolbar.config,
+            id: 'viewport:zoom-in',
+          })}
           onClick={app.zoomControls.onZoomIn}
           type="button"
         >
@@ -607,6 +621,10 @@ function CanvasEngineDemoSurface({
         <button
           {...CANVAS_TOOLBAR_ITEM_PROPS}
           aria-label="Fit selection"
+          aria-keyshortcuts={getCanvasAppCommandAriaKeyshortcuts({
+            config: app.toolbar.config,
+            id: 'viewport:fit',
+          })}
           onClick={app.zoomControls.onFit}
           type="button"
         >
@@ -648,6 +666,10 @@ function CanvasEngineDemoSurface({
         <button
           {...CANVAS_TOOLBAR_ITEM_PROPS}
           aria-label="Reset viewport"
+          aria-keyshortcuts={getCanvasAppCommandAriaKeyshortcuts({
+            config: app.toolbar.config,
+            id: 'viewport:reset-zoom',
+          })}
           onClick={app.zoomControls.onReset}
           type="button"
         >
@@ -656,6 +678,10 @@ function CanvasEngineDemoSurface({
         <button
           {...CANVAS_TOOLBAR_ITEM_PROPS}
           aria-label="Unlock all"
+          aria-keyshortcuts={getCanvasAppCommandAriaKeyshortcuts({
+            config: app.toolbar.config,
+            id: 'command:unlockAll',
+          })}
           onClick={app.toolbar.commandHandlers.onUnlockAll}
           type="button"
         >

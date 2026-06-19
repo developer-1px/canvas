@@ -12,6 +12,9 @@ import {
   CANVAS_TOOLBAR_ITEM_PROPS,
   useCanvasToolbarRovingFocus,
 } from '../toolbar'
+import {
+  getCanvasAppCommandAriaKeyshortcuts,
+} from '../../affordances/commands/CanvasAppCommandRegistry'
 
 export type ZoomControlsProps = {
   config: CanvasAffordanceConfig
@@ -57,6 +60,10 @@ export function ZoomControls({
           type="button"
           className="tool-button"
           aria-label={CANVAS_COMMAND_AFFORDANCES.zoomOut.ariaLabel}
+          aria-keyshortcuts={getZoomControlAriaKeyshortcuts({
+            config,
+            id: 'viewport:zoom-out',
+          })}
           aria-disabled={canZoomOut ? undefined : true}
           disabled={!canZoomOut}
           title={CANVAS_COMMAND_AFFORDANCES.zoomOut.title}
@@ -71,6 +78,10 @@ export function ZoomControls({
           type="button"
           className="zoom-value"
           aria-label={CANVAS_COMMAND_AFFORDANCES.zoomReset.ariaLabel}
+          aria-keyshortcuts={getZoomControlAriaKeyshortcuts({
+            config,
+            id: 'viewport:reset-zoom',
+          })}
           title={CANVAS_COMMAND_AFFORDANCES.zoomReset.title}
           onClick={onReset}
         >
@@ -83,6 +94,10 @@ export function ZoomControls({
           type="button"
           className="tool-button"
           aria-label={CANVAS_COMMAND_AFFORDANCES.fitView.ariaLabel}
+          aria-keyshortcuts={getZoomControlAriaKeyshortcuts({
+            config,
+            id: 'viewport:fit',
+          })}
           title={CANVAS_COMMAND_AFFORDANCES.fitView.title}
           onClick={onFit}
         >
@@ -95,6 +110,10 @@ export function ZoomControls({
           type="button"
           className="tool-button"
           aria-label={CANVAS_COMMAND_AFFORDANCES.zoomIn.ariaLabel}
+          aria-keyshortcuts={getZoomControlAriaKeyshortcuts({
+            config,
+            id: 'viewport:zoom-in',
+          })}
           aria-disabled={canZoomIn ? undefined : true}
           disabled={!canZoomIn}
           title={CANVAS_COMMAND_AFFORDANCES.zoomIn.title}
@@ -105,4 +124,14 @@ export function ZoomControls({
       ) : null}
     </div>
   )
+}
+
+function getZoomControlAriaKeyshortcuts({
+  config,
+  id,
+}: {
+  config: CanvasAffordanceConfig
+  id: string
+}) {
+  return getCanvasAppCommandAriaKeyshortcuts({ config, id })
 }

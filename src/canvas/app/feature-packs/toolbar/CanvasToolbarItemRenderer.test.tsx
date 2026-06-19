@@ -1,6 +1,7 @@
 import { isValidElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
+import { createCanvasAffordanceConfig } from '../../../engine'
 import {
   renderCanvasToolbarItem,
   type CanvasToolbarItemRenderContext,
@@ -67,6 +68,8 @@ describe('CanvasToolbarItemRenderer', () => {
     })
 
     expect(renderToStaticMarkup(<>{command}</>)).toContain('Duplicate')
+    expect(renderToStaticMarkup(<>{command}</>))
+      .toContain('aria-keyshortcuts="Meta+d"')
     expect(renderToStaticMarkup(<>{customCommand}</>)).toContain('Publish')
     clickRenderedItem(command)
     clickRenderedItem(customCommand)
@@ -99,6 +102,7 @@ function createContext(): CanvasToolbarItemRenderContext {
       onUngroup: vi.fn(),
       onUnlockAll: vi.fn(),
     },
+    config: createCanvasAffordanceConfig(),
     onCustomCommand: vi.fn(),
     onToolChange: vi.fn(),
   }

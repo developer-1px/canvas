@@ -28,6 +28,7 @@ export function CanvasToolbar(props: CanvasToolbarProps) {
   const groups = getCanvasToolbarGroups(props)
   const renderContext: CanvasToolbarItemRenderContext = {
     commandHandlers: props.commandHandlers,
+    config: props.config,
     onCustomCommand: props.onCustomCommand,
     onToolChange: props.onToolChange,
   }

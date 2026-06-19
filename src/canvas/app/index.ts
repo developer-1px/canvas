@@ -106,6 +106,9 @@ export {
   type CanvasEditableFieldKeyboardIntentInput,
 } from './affordances/controls/editable-field/CanvasEditableFieldKeyboard'
 export {
+  getCanvasAppCommandAriaKeyshortcuts,
+} from './affordances/commands/CanvasAppCommandRegistry'
+export {
   CANVAS_KEYBOARD_COMMAND_DISPATCH_MODEL,
   isCanvasKeyboardCommandIntent,
   runCanvasKeyboardCommandIntent,
@@ -133,6 +136,9 @@ export {
   type CanvasKeyboardToolHandlers,
   type CanvasKeyboardToolIntent,
 } from './affordances/interaction/keyboard/CanvasKeyboardToolDispatch'
+export {
+  getCanvasKeyboardToolAriaKeyshortcuts,
+} from './affordances/interaction/keyboard/CanvasKeyboardToolShortcuts'
 export {
   getCanvasKeyboardToolShortcutIntent,
   type CanvasKeyboardToolShortcutIntentInput,

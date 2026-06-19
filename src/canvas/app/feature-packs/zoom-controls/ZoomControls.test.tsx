@@ -31,6 +31,19 @@ describe('ZoomControls', () => {
     expect(invalidMarkup).not.toContain('NaN')
   })
 
+  it('exposes viewport command shortcuts to assistive technology', () => {
+    const markup = renderZoomControls()
+
+    expect(markup).toContain('aria-label="Zoom out"')
+    expect(markup).toContain('aria-keyshortcuts="Meta+-"')
+    expect(markup).toContain('aria-label="Reset zoom"')
+    expect(markup).toContain('aria-keyshortcuts="Meta+0"')
+    expect(markup).toContain('aria-label="Fit view"')
+    expect(markup).toContain('aria-keyshortcuts="0 1"')
+    expect(markup).toContain('aria-label="Zoom in"')
+    expect(markup).toContain('aria-keyshortcuts="Meta+="')
+  })
+
   it('disables zoom out at the minimum scale and zoom in at the maximum scale', () => {
     const minMarkup = renderZoomControls({ scale: MIN_SCALE })
     const maxMarkup = renderZoomControls({ scale: MAX_SCALE })

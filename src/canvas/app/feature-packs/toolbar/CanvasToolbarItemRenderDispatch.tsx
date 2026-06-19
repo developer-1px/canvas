@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import {
   CANVAS_TOOL_AFFORDANCES,
+  type CanvasAffordanceConfig,
   type CanvasCommandId,
 } from '../../../engine'
 import type {
@@ -57,6 +58,7 @@ import type { CanvasToolbarItem } from './CanvasToolbarItems'
 
 export type CanvasToolbarItemRenderContext = {
   commandHandlers: CanvasToolbarCommandHandlers
+  config: CanvasAffordanceConfig
   onCustomCommand: (commandId: string) => void
   onToolChange: (tool: Tool) => void
   surface?: CanvasToolbarButtonSurface
@@ -219,6 +221,7 @@ function renderCanvasToolbarCommandItem({
     <CommandButton
       key={item.command}
       command={item.command}
+      config={context.config}
       disabled={item.disabled}
       surface={context.surface}
       onClick={() =>

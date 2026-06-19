@@ -1,8 +1,12 @@
 import type {
   CanvasAffordanceConfig,
 } from '../../../../engine'
-import type { Tool } from '../../../../entities'
+import type {
+  CanvasBuiltinTool,
+  Tool,
+} from '../../../../entities'
 import {
+  formatCanvasKeyboardShortcutAriaKey,
   normalizeCanvasKeyboardShortcutKey,
   reserveCanvasKeyboardShortcut,
   type CanvasKeyboardReservedShortcut,
@@ -39,6 +43,24 @@ export function getCanvasKeyboardReservedToolShortcuts():
       },
     ),
   )
+}
+
+export function getCanvasKeyboardToolAriaKeyshortcuts({
+  config,
+  tool,
+}: {
+  config: CanvasAffordanceConfig
+  tool: CanvasBuiltinTool
+}) {
+  const shortcut = CANVAS_KEYBOARD_TOOL_SHORTCUTS.find((candidate) =>
+    candidate.tool === tool &&
+      config.shortcuts[candidate.shortcutId] &&
+      config.tools[candidate.tool]
+  )
+
+  return shortcut
+    ? formatCanvasKeyboardShortcutAriaKey(shortcut.shortcut)
+    : undefined
 }
 
 function isCanvasKeyboardToolShortcutMatch({

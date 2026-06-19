@@ -51,6 +51,7 @@ export function CanvasSelectionFloatingBar({
       className="selection-floating-bar"
       context={{
         commandHandlers,
+        config,
         onCustomCommand,
         onToolChange: noopToolChange,
       }}

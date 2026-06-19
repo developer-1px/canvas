@@ -85,6 +85,7 @@ export function CanvasContextCommandMenu({
       className="context-command-menu"
       context={{
         commandHandlers,
+        config,
         onCustomCommand,
         onToolChange: noopToolChange,
       }}

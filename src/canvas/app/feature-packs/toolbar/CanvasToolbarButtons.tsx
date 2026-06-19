@@ -2,8 +2,12 @@ import type { ReactNode } from 'react'
 import {
   CANVAS_COMMAND_AFFORDANCES,
   CANVAS_TOOL_AFFORDANCES,
+  type CanvasAffordanceConfig,
 } from '../../../engine'
 import type { CanvasBuiltinTool } from '../../../entities'
+import {
+  getCanvasAppCommandAriaKeyshortcuts,
+} from '../../affordances/commands/CanvasAppCommandRegistry'
 import {
   formatCanvasKeyboardShortcutAriaKey,
   type CanvasKeyboardShortcutChord,
@@ -88,12 +92,14 @@ export function ToolbarDivider() {
 export function CommandButton({
   children,
   command,
+  config,
   disabled,
   onClick,
   surface = 'toolbar',
 }: {
   children: ReactNode
   command: keyof typeof CANVAS_COMMAND_AFFORDANCES
+  config: CanvasAffordanceConfig
   disabled: boolean
   onClick: () => void
   surface?: CanvasToolbarButtonSurface
@@ -107,6 +113,10 @@ export function CommandButton({
       className="tool-button"
       disabled={disabled}
       aria-label={affordance.ariaLabel}
+      aria-keyshortcuts={getCanvasCommandButtonAriaKeyshortcuts({
+        command,
+        config,
+      })}
       title={affordance.title}
       onClick={onClick}
     >
@@ -169,4 +179,17 @@ function getCanvasToolButtonAriaKeyshortcuts(
   return shortcut
     ? formatCanvasKeyboardShortcutAriaKey(shortcut)
     : undefined
+}
+
+function getCanvasCommandButtonAriaKeyshortcuts({
+  command,
+  config,
+}: {
+  command: keyof typeof CANVAS_COMMAND_AFFORDANCES
+  config: CanvasAffordanceConfig
+}) {
+  return getCanvasAppCommandAriaKeyshortcuts({
+    config,
+    id: `command:${command}`,
+  })
 }
