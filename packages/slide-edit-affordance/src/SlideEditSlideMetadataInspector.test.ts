@@ -4,12 +4,25 @@ import { createSlideEditRailDescriptor } from './SlideEditRailInteractions'
 import {
   createSlideEditSlideMetadataInspectorDescriptor,
   getSlideEditInspectorSurface,
+  getSlideEditSlideNotesPasteValue,
+  getSlideEditSlideNotesPasteValueFromText,
+  getSlideEditSlideNotesPasteValueFromValue,
   getSlideEditSlideMetadataFieldDescriptors,
+  SLIDE_EDIT_SLIDE_NOTES_IMPORT_MODEL,
+  SLIDE_EDIT_SLIDE_NOTES_JSON_IMPORT_FORMAT,
+  SLIDE_EDIT_SLIDE_NOTES_JSON_MIME_TYPE,
+  SLIDE_EDIT_SLIDE_NOTES_MARKDOWN_IMPORT_FORMAT,
+  SLIDE_EDIT_SLIDE_NOTES_TEXT_IMPORT_FORMAT,
   SLIDE_EDIT_INSPECTOR_DISPLAY_PRIORITY,
   SLIDE_EDIT_SLIDE_METADATA_FIELDS,
+  toSlideEditSlideNotesPasteCommandEffect,
   toSlideEditSlideMetadataHostCommandEffect,
   type SlideEditSlideMetadataReadModel,
 } from './SlideEditSlideMetadataInspector'
+import {
+  getSlideEditSlideNotesPasteValue as getSlideEditSlideNotesPasteValueFromPackage,
+  SLIDE_EDIT_SLIDE_NOTES_IMPORT_MODEL as SLIDE_EDIT_SLIDE_NOTES_IMPORT_MODEL_FROM_PACKAGE,
+} from './index'
 
 describe('SlideEditSlideMetadataInspector', () => {
   type SlideId = 'slide-a' | 'slide-b' | 'slide-c'
@@ -143,6 +156,110 @@ describe('SlideEditSlideMetadataInspector', () => {
     })
   })
 
+  it('reads custom MIME slide notes JSON values before generic formats', () => {
+    const dataTransfer = createDataTransfer({
+      [SLIDE_EDIT_SLIDE_NOTES_JSON_MIME_TYPE]:
+        JSON.stringify('Presenter cue from custom MIME.'),
+      'application/json': JSON.stringify({
+        notes: 'Generic note should not win.',
+      }),
+    })
+
+    expect(getSlideEditSlideNotesPasteValue({ dataTransfer })).toEqual({
+      format: SLIDE_EDIT_SLIDE_NOTES_JSON_IMPORT_FORMAT,
+      model: SLIDE_EDIT_SLIDE_NOTES_IMPORT_MODEL,
+      notes: 'Presenter cue from custom MIME.',
+      sourceType: SLIDE_EDIT_SLIDE_NOTES_JSON_MIME_TYPE,
+      textLength: 33,
+    })
+    expect(getSlideEditSlideNotesPasteValueFromPackage({ dataTransfer }))
+      .toMatchObject({
+        model: SLIDE_EDIT_SLIDE_NOTES_IMPORT_MODEL_FROM_PACKAGE,
+        notes: 'Presenter cue from custom MIME.',
+      })
+  })
+
+  it('reads wrapped slide notes from JSON and fenced JSON text', () => {
+    expect(getSlideEditSlideNotesPasteValueFromValue({
+      slideNotes: {
+        speakerNotes: 'Review assumptions before chart.',
+      },
+    })).toMatchObject({
+      format: SLIDE_EDIT_SLIDE_NOTES_JSON_IMPORT_FORMAT,
+      notes: 'Review assumptions before chart.',
+      sourceType: SLIDE_EDIT_SLIDE_NOTES_JSON_MIME_TYPE,
+    })
+
+    expect(getSlideEditSlideNotesPasteValueFromText(
+      '```json\n{"slide":{"notes":"Close with next steps."}}\n```',
+    )).toMatchObject({
+      notes: 'Close with next steps.',
+    })
+  })
+
+  it('reads marked speaker notes from markdown and plain text only with markers', () => {
+    expect(getSlideEditSlideNotesPasteValueFromText(
+      '# Speaker notes\nStart with the customer problem.\n\nKeep it short.',
+      {
+        format: SLIDE_EDIT_SLIDE_NOTES_MARKDOWN_IMPORT_FORMAT,
+        sourceType: 'text/markdown',
+      },
+    )).toEqual({
+      format: SLIDE_EDIT_SLIDE_NOTES_MARKDOWN_IMPORT_FORMAT,
+      model: SLIDE_EDIT_SLIDE_NOTES_IMPORT_MODEL,
+      notes: 'Start with the customer problem.\n\nKeep it short.',
+      sourceType: 'text/markdown',
+      textLength: 64,
+    })
+
+    expect(getSlideEditSlideNotesPasteValueFromText(
+      'Presenter notes: Rehearse the timing.',
+      {
+        format: SLIDE_EDIT_SLIDE_NOTES_TEXT_IMPORT_FORMAT,
+        sourceType: 'text/plain',
+      },
+    )).toMatchObject({
+      notes: 'Rehearse the timing.',
+    })
+    expect(getSlideEditSlideNotesPasteValueFromText(
+      'This is regular slide body text.',
+      {
+        format: SLIDE_EDIT_SLIDE_NOTES_TEXT_IMPORT_FORMAT,
+        sourceType: 'text/plain',
+      },
+    )).toBeNull()
+  })
+
+  it('routes slide notes paste values through update-slide-notes command effects', () => {
+    const pasteValue = getSlideEditSlideNotesPasteValueFromValue({
+      notes: 'Add contrast callout.',
+    })
+
+    expect(pasteValue).not.toBeNull()
+    expect(toSlideEditSlideNotesPasteCommandEffect({
+      pasteValue: pasteValue ?? {
+        format: SLIDE_EDIT_SLIDE_NOTES_JSON_IMPORT_FORMAT,
+        model: SLIDE_EDIT_SLIDE_NOTES_IMPORT_MODEL,
+        notes: '',
+        sourceType: SLIDE_EDIT_SLIDE_NOTES_JSON_MIME_TYPE,
+        textLength: 0,
+      },
+      slideId: 'slide-b',
+    })).toEqual({
+      payload: {
+        fieldId: 'notes',
+        id: 'update-slide-notes',
+        slideId: 'slide-b',
+        value: 'Add contrast callout.',
+      },
+      selection: {
+        objectIds: [],
+        slideId: 'slide-b',
+      },
+      type: 'slide-command-effect',
+    })
+  })
+
   it('does not expose product names or host storage names in runtime strings', () => {
     const publicStrings = JSON.stringify({
       descriptor: createSlideEditSlideMetadataInspectorDescriptor({
@@ -164,3 +281,11 @@ describe('SlideEditSlideMetadataInspector', () => {
     }
   })
 })
+
+function createDataTransfer(
+  data: Record<string, string>,
+): Pick<DataTransfer, 'getData'> {
+  return {
+    getData: (type) => data[type] ?? '',
+  }
+}
