@@ -114,8 +114,11 @@ export {
 } from './affordances/controls/tabs/CanvasTabsRovingFocus'
 export {
   getCanvasEditableFieldKeyboardIntent,
+  runCanvasEditableFieldKeyboardIntent,
+  type CanvasEditableFieldKeyboardEvent,
   type CanvasEditableFieldKeyboardIntent,
   type CanvasEditableFieldKeyboardIntentInput,
+  type RunCanvasEditableFieldKeyboardIntentInput,
 } from './affordances/controls/editable-field/CanvasEditableFieldKeyboard'
 export {
   getCanvasAppCommandAriaKeyshortcuts,

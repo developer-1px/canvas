@@ -15,7 +15,7 @@ import {
   getCanvasRadioTabIndex,
   handleCanvasRadioGroupKeyDown,
 } from '../../controls/radio/CanvasRadioGroup'
-import { getCanvasEditableFieldKeyboardIntent } from '../../controls/editable-field/CanvasEditableFieldKeyboard'
+import { runCanvasEditableFieldKeyboardIntent } from '../../controls/editable-field/CanvasEditableFieldKeyboard'
 
 type CanvasObjectInspectorPanel = {
   content: ReactNode
@@ -89,23 +89,16 @@ export function CanvasObjectInspector({
       return
     }
 
-    const intent = getCanvasEditableFieldKeyboardIntent({
-      key: event.key,
+    runCanvasEditableFieldKeyboardIntent({
+      event,
+      onCancel: () => {
+        event.currentTarget.value = formatBoundsValue(bounds[field])
+        event.currentTarget.blur()
+      },
+      onCommit: () => {
+        event.currentTarget.blur()
+      },
     })
-
-    if (intent.preventDefault) {
-      event.preventDefault()
-    }
-
-    if (intent.kind === 'commit') {
-      event.currentTarget.blur()
-      return
-    }
-
-    if (intent.kind === 'cancel') {
-      event.currentTarget.value = formatBoundsValue(bounds[field])
-      event.currentTarget.blur()
-    }
   }
 
   return (
@@ -287,23 +280,16 @@ function CanvasObjectInspectorNumberStyleControl({
     }
   }
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    const intent = getCanvasEditableFieldKeyboardIntent({
-      key: event.key,
+    runCanvasEditableFieldKeyboardIntent({
+      event,
+      onCancel: () => {
+        event.currentTarget.value = formatStyleNumberValue(control.value)
+        event.currentTarget.blur()
+      },
+      onCommit: () => {
+        event.currentTarget.blur()
+      },
     })
-
-    if (intent.preventDefault) {
-      event.preventDefault()
-    }
-
-    if (intent.kind === 'commit') {
-      event.currentTarget.blur()
-      return
-    }
-
-    if (intent.kind === 'cancel') {
-      event.currentTarget.value = formatStyleNumberValue(control.value)
-      event.currentTarget.blur()
-    }
   }
 
   return (

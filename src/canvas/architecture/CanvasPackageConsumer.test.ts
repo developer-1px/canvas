@@ -154,6 +154,7 @@ import {
   previewCanvasPointerLaserInteraction,
   previewCanvasPointerPanInteraction,
   resetCanvasViewport,
+  runCanvasEditableFieldKeyboardIntent,
   runCanvasRadioGroupKeyboardIntent,
   runCanvasWheelViewport,
   startCanvasPointerLaserInteraction,
@@ -508,6 +509,7 @@ import {
   type CanvasModalKeyboardIntentInput,
   type RunCanvasModalBackdropPointerIntentInput,
   type RunCanvasModalKeyboardIntentInput,
+  type RunCanvasEditableFieldKeyboardIntentInput,
   type RunCanvasRadioGroupKeyboardIntentInput,
   type CanvasPointerClickMemory,
   type CanvasNextLaserTrailPointsInput,
@@ -4219,6 +4221,28 @@ describe('Canvas package consumer imports', () => {
     const editableFieldKeyboardInput: CanvasEditableFieldKeyboardIntentInput = {
       key: 'Escape',
     }
+    let editableFieldPreventDefaultCount = 0
+    let editableFieldStopPropagationCount = 0
+    let editableFieldCancelCount = 0
+    let editableFieldCommitCount = 0
+    const editableFieldKeyboardRunInput:
+      RunCanvasEditableFieldKeyboardIntentInput = {
+        event: {
+          key: 'Escape',
+          preventDefault: () => {
+            editableFieldPreventDefaultCount += 1
+          },
+          stopPropagation: () => {
+            editableFieldStopPropagationCount += 1
+          },
+        },
+        onCancel: () => {
+          editableFieldCancelCount += 1
+        },
+        onCommit: () => {
+          editableFieldCommitCount += 1
+        },
+      }
     const presentationKeyboardInput: CanvasPresentationKeyboardIntentInput = {
       key: 'PageDown',
     }
@@ -4808,13 +4832,25 @@ describe('Canvas package consumer imports', () => {
       .toEqual({
         kind: 'cancel',
         preventDefault: true,
+        stopPropagation: true,
       })
     expect(CanvasAppFacade.getCanvasEditableFieldKeyboardIntent(
       editableFieldKeyboardInput,
     )).toEqual({
       kind: 'cancel',
       preventDefault: true,
+      stopPropagation: true,
     })
+    expect(runCanvasEditableFieldKeyboardIntent(
+      editableFieldKeyboardRunInput,
+    )).toBe(true)
+    expect(CanvasAppFacade.runCanvasEditableFieldKeyboardIntent(
+      editableFieldKeyboardRunInput,
+    )).toBe(true)
+    expect(editableFieldPreventDefaultCount).toBe(2)
+    expect(editableFieldStopPropagationCount).toBe(2)
+    expect(editableFieldCancelCount).toBe(2)
+    expect(editableFieldCommitCount).toBe(0)
     expect(getCanvasPresentationKeyboardIntent(presentationKeyboardInput))
       .toEqual({
         direction: 1,
