@@ -415,9 +415,16 @@ export {
   type CanvasMinimapSize,
 } from './minimap'
 export {
+  createCanvasShortcutHelpDialogDescriptor,
   getCanvasShortcutHelpItems,
+  type CanvasShortcutHelpDialogDescriptor,
+  type CanvasShortcutHelpDialogDescriptorInput,
+  type CanvasShortcutHelpDialogHeadingAttributes,
+  type CanvasShortcutHelpDialogRootAttributes,
   type CanvasShortcutHelpItem,
   type CanvasShortcutHelpItemsInput,
+  type CanvasShortcutHelpSectionDescriptor,
+  type CanvasShortcutHelpSectionRootAttributes,
 } from './shortcut-help'
 export {
   useCanvasStampControls,

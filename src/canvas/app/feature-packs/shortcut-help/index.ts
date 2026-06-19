@@ -15,6 +15,15 @@ export {
   type CanvasShortcutHelpSection,
   type CanvasShortcutHelpSectionGroup,
 } from './CanvasShortcutHelpItems'
+export {
+  createCanvasShortcutHelpDialogDescriptor,
+  type CanvasShortcutHelpDialogDescriptor,
+  type CanvasShortcutHelpDialogDescriptorInput,
+  type CanvasShortcutHelpDialogHeadingAttributes,
+  type CanvasShortcutHelpDialogRootAttributes,
+  type CanvasShortcutHelpSectionDescriptor,
+  type CanvasShortcutHelpSectionRootAttributes,
+} from './CanvasShortcutHelpDialog'
 export { CanvasShortcutHelpOverlay } from './CanvasShortcutHelpOverlay'
 
 export const CANVAS_APP_SHORTCUT_HELP_VIEW_FEATURE_PACK =

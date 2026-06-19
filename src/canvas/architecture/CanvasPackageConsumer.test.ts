@@ -70,6 +70,7 @@ import {
   createCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan,
   createCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan,
   createCanvasCommandPaletteListboxDescriptor,
+  createCanvasShortcutHelpDialogDescriptor,
   createCanvasSelectionListDescriptor,
   createCanvasStoryCanvasFeaturePackAssemblyInput,
   executeCanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransaction,
@@ -630,6 +631,7 @@ import {
   type CanvasCommandPaletteKeyboardIntentInput,
   type CanvasCommandPaletteKeyboardItem,
   type CanvasCommandPaletteListboxDescriptorInput,
+  type CanvasShortcutHelpDialogDescriptorInput,
   type CanvasKeyboardToolHandlers,
 } from '@interactive-os/canvas/app'
 import {
@@ -4741,6 +4743,11 @@ describe('Canvas package consumer imports', () => {
           id: 'tool:select',
         }],
       }
+    const shortcutHelpDialogDescriptorInput:
+      CanvasShortcutHelpDialogDescriptorInput = {
+        controlId: 'package-shortcuts',
+        sections: ['Tools', 'Commands'],
+      }
     const appFacadeHtmlImageSourceHTML =
       '<figure><img alt="One" src="data:image/webp;base64,aW1hZ2U="></figure>'
     const appFacadeHtmlImageDataTransfer = {
@@ -5773,6 +5780,57 @@ describe('Canvas package consumer imports', () => {
         'aria-label': 'Command results',
         role: 'listbox',
       },
+    })
+    expect(createCanvasShortcutHelpDialogDescriptor(
+      shortcutHelpDialogDescriptorInput,
+    )).toEqual({
+      headingAttributes: {
+        id: 'package-shortcuts-heading',
+      },
+      rootAttributes: {
+        'aria-labelledby': 'package-shortcuts-heading',
+        'aria-modal': true,
+        role: 'dialog',
+      },
+      sectionDescriptors: [{
+        headingAttributes: {
+          id: 'package-shortcuts-section-tools-heading',
+        },
+        rootAttributes: {
+          'aria-labelledby': 'package-shortcuts-section-tools-heading',
+        },
+        section: 'Tools',
+      }, {
+        headingAttributes: {
+          id: 'package-shortcuts-section-commands-heading',
+        },
+        rootAttributes: {
+          'aria-labelledby': 'package-shortcuts-section-commands-heading',
+        },
+        section: 'Commands',
+      }],
+    })
+    expect(CanvasAppFacade.createCanvasShortcutHelpDialogDescriptor({
+      controlId: 'app-shortcuts',
+      sections: ['View'],
+    })).toEqual({
+      headingAttributes: {
+        id: 'app-shortcuts-heading',
+      },
+      rootAttributes: {
+        'aria-labelledby': 'app-shortcuts-heading',
+        'aria-modal': true,
+        role: 'dialog',
+      },
+      sectionDescriptors: [{
+        headingAttributes: {
+          id: 'app-shortcuts-section-view-heading',
+        },
+        rootAttributes: {
+          'aria-labelledby': 'app-shortcuts-section-view-heading',
+        },
+        section: 'View',
+      }],
     })
     expect(CanvasAppAuthoring.createCanvasAppAssembly).toBeTypeOf('function')
     expect(CanvasAppAuthoring.getCanvasAppFoundationExtensionCommands)

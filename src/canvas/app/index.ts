@@ -25,6 +25,13 @@ export {
 } from './feature-packs/command-palette'
 export {
   CanvasShortcutHelpOverlay,
+  createCanvasShortcutHelpDialogDescriptor,
+  type CanvasShortcutHelpDialogDescriptor,
+  type CanvasShortcutHelpDialogDescriptorInput,
+  type CanvasShortcutHelpDialogHeadingAttributes,
+  type CanvasShortcutHelpDialogRootAttributes,
+  type CanvasShortcutHelpSectionDescriptor,
+  type CanvasShortcutHelpSectionRootAttributes,
 } from './feature-packs/shortcut-help'
 export {
   CANVAS_MINIMAP_KEYBOARD_MODEL,

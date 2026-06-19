@@ -38,7 +38,15 @@ describe('CanvasShortcutHelpOverlay', () => {
     )
 
     expect(markup).toContain('class="shortcut-help"')
-    expect(markup).toContain('aria-label="Keyboard shortcuts"')
+    const labelledByMatch = markup.match(/aria-labelledby="([^"]+)"/)
+
+    expect(labelledByMatch?.[1]).toBeTruthy()
+    expect(markup).toContain(`<h2 id="${labelledByMatch?.[1]}">`)
+    expect(markup).toContain('aria-labelledby="')
+    expect(markup).not.toContain('aria-label="Keyboard shortcuts"')
+    expect(markup).toMatch(
+      /<section[^>]+aria-labelledby="[^"]+section-tools-heading"[^>]+class="shortcut-help-section"/,
+    )
     expect(markup).toContain('Select Tool')
     expect(markup).toContain('Shift+/')
   })
