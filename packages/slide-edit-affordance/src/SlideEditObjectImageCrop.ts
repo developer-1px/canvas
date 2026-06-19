@@ -193,6 +193,16 @@ export type SlideEditObjectImageCropJSONPasteInput = {
   jsonMimeType?: string
 }
 
+export type SlideEditObjectImageCropJSONPasteValueMode =
+  | 'direct'
+  | 'wrapped'
+
+export type SlideEditObjectImageCropJSONPasteValueOptions = {
+  mode?: SlideEditObjectImageCropJSONPasteValueMode
+  payloadLength?: number
+  sourceType?: string
+}
+
 export type SlideEditObjectImageCropPasteTarget<
   TObjectId extends SlideEditObjectImageCropObjectId =
     SlideEditObjectImageCropObjectId,
@@ -432,12 +442,14 @@ export function getSlideEditObjectImageCropJSONPasteValue({
     const customText = dataTransfer.getData(jsonMimeType)
 
     if (customText.trim()) {
-      const customValue = parseSlideEditObjectImageCropJSON(customText)
-      const customPasteValue = getSlideEditObjectImageCropAnyJSONPasteValue({
-        payloadLength: customText.length,
-        sourceType: jsonMimeType,
-        value: customValue,
-      })
+      const customPasteValue =
+        getSlideEditObjectImageCropJSONPasteValueFromText(
+          customText,
+          {
+            payloadLength: customText.length,
+            sourceType: jsonMimeType,
+          },
+        )
 
       if (customPasteValue !== null) {
         return customPasteValue
@@ -452,12 +464,14 @@ export function getSlideEditObjectImageCropJSONPasteValue({
       continue
     }
 
-    const value = parseSlideEditObjectImageCropJSON(text)
-    const pasteValue = getSlideEditObjectImageCropWrappedJSONPasteValue({
-      payloadLength: text.length,
-      sourceType: type,
-      value,
-    })
+    const pasteValue = getSlideEditObjectImageCropJSONPasteValueFromText(
+      text,
+      {
+        mode: 'wrapped',
+        payloadLength: text.length,
+        sourceType: type,
+      },
+    )
 
     if (pasteValue !== null) {
       return pasteValue
@@ -465,6 +479,40 @@ export function getSlideEditObjectImageCropJSONPasteValue({
   }
 
   return null
+}
+
+export function getSlideEditObjectImageCropJSONPasteValueFromText(
+  text: string,
+  options?: SlideEditObjectImageCropJSONPasteValueOptions,
+): SlideEditObjectImageCropJSONPasteValue | null {
+  return getSlideEditObjectImageCropJSONPasteValueFromValue(
+    parseSlideEditObjectImageCropJSON(text),
+    {
+      ...options,
+      payloadLength: options?.payloadLength ?? text.length,
+    },
+  )
+}
+
+export function getSlideEditObjectImageCropJSONPasteValueFromValue(
+  value: unknown,
+  {
+    mode = 'direct',
+    payloadLength = 0,
+    sourceType = 'json',
+  }: SlideEditObjectImageCropJSONPasteValueOptions = {},
+): SlideEditObjectImageCropJSONPasteValue | null {
+  return mode === 'wrapped'
+    ? getSlideEditObjectImageCropWrappedJSONPasteValue({
+      payloadLength,
+      sourceType,
+      value,
+    })
+    : getSlideEditObjectImageCropAnyJSONPasteValue({
+      payloadLength,
+      sourceType,
+      value,
+    })
 }
 
 export function getSlideEditObjectImageCropForTarget<

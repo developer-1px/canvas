@@ -4,6 +4,8 @@ import {
   createSlideEditObjectImageCropDescriptor,
   getSlideEditObjectImageCropCommandEffect,
   getSlideEditObjectImageCropJSONPasteValue,
+  getSlideEditObjectImageCropJSONPasteValueFromText,
+  getSlideEditObjectImageCropJSONPasteValueFromValue,
   getSlideEditObjectImageCropMetadata,
   getSlideEditObjectImageCropPasteCommandEffects,
   getSlideEditObjectImageCropPositionCSS,
@@ -23,6 +25,8 @@ import {
 } from './SlideEditObjectImageCrop'
 import {
   getSlideEditObjectImageCropJSONPasteValue as getSlideEditObjectImageCropJSONPasteValueFromPackage,
+  getSlideEditObjectImageCropJSONPasteValueFromText as getSlideEditObjectImageCropJSONPasteValueFromTextFromPackage,
+  getSlideEditObjectImageCropJSONPasteValueFromValue as getSlideEditObjectImageCropJSONPasteValueFromValueFromPackage,
 } from './index'
 
 describe('SlideEditObjectImageCrop', () => {
@@ -288,6 +292,79 @@ describe('SlideEditObjectImageCrop', () => {
         [SLIDE_EDIT_OBJECT_IMAGE_CROP_JSON_MIME_TYPE]:
           '{"fit":"contain"}',
       }),
+    })).toMatchObject({
+      fields: ['fit'],
+      fit: 'contain',
+    })
+  })
+
+  it('reads image crop JSON paste values from text and parsed values', () => {
+    const wrappedText = JSON.stringify({
+      objectImageCrop: {
+        crop: {
+          x: 20,
+        },
+        fit: 'contain',
+        y: 75,
+      },
+    })
+
+    expect(getSlideEditObjectImageCropJSONPasteValueFromText(wrappedText, {
+      mode: 'wrapped',
+      sourceType: 'application/json',
+    })).toEqual({
+      crop: {
+        x: 20,
+        y: 75,
+      },
+      fields: ['fit', 'x', 'y'],
+      fit: 'contain',
+      format: 'json',
+      payloadLength: wrappedText.length,
+      sourceFields: {
+        fit: 'fit',
+        wrapper: 'objectImageCrop',
+        x: 'crop.x',
+        y: 'y',
+      },
+      sourceType: 'application/json',
+      surface: 'object-image-crop',
+      wrapper: 'objectImageCrop',
+    })
+
+    expect(getSlideEditObjectImageCropJSONPasteValueFromValue({
+      crop: {
+        x: 42,
+      },
+    }, {
+      sourceType: SLIDE_EDIT_OBJECT_IMAGE_CROP_JSON_MIME_TYPE,
+    })).toMatchObject({
+      crop: {
+        x: 42,
+      },
+      fields: ['x'],
+      payloadLength: 0,
+      sourceFields: {
+        x: 'crop.x',
+      },
+      sourceType: SLIDE_EDIT_OBJECT_IMAGE_CROP_JSON_MIME_TYPE,
+    })
+
+    expect(getSlideEditObjectImageCropJSONPasteValueFromTextFromPackage(
+      JSON.stringify({
+        crop: {
+          y: 10,
+        },
+      }),
+      { mode: 'wrapped' },
+    )).toMatchObject({
+      crop: {
+        y: 10,
+      },
+      wrapper: 'crop',
+    })
+    expect(getSlideEditObjectImageCropJSONPasteValueFromValueFromPackage({
+      fit: 'contain',
     })).toMatchObject({
       fields: ['fit'],
       fit: 'contain',

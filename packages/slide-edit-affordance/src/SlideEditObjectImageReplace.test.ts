@@ -4,6 +4,8 @@ import {
   createSlideEditObjectImageReplaceDescriptor,
   getSlideEditObjectImageReplaceCommandEffect,
   getSlideEditObjectImageReplaceJSONPasteValue,
+  getSlideEditObjectImageReplaceJSONPasteValueFromText,
+  getSlideEditObjectImageReplaceJSONPasteValueFromValue,
   getSlideEditObjectImageReplaceMetadata,
   getSlideEditObjectImageReplacePasteCommandEffect,
   normalizeSlideEditObjectImageReplaceCommand,
@@ -14,6 +16,8 @@ import {
 } from './SlideEditObjectImageReplace'
 import {
   getSlideEditObjectImageReplaceJSONPasteValue as getSlideEditObjectImageReplaceJSONPasteValueFromPackage,
+  getSlideEditObjectImageReplaceJSONPasteValueFromText as getSlideEditObjectImageReplaceJSONPasteValueFromTextFromPackage,
+  getSlideEditObjectImageReplaceJSONPasteValueFromValue as getSlideEditObjectImageReplaceJSONPasteValueFromValueFromPackage,
 } from './index'
 
 describe('SlideEditObjectImageReplace', () => {
@@ -231,6 +235,79 @@ describe('SlideEditObjectImageReplace', () => {
         wrapper: 'imageSource',
       },
       surface: 'object-image-replace',
+    })
+  })
+
+  it('reads image source JSON paste values from text and parsed values', () => {
+    const wrappedText = JSON.stringify({
+      imageSource: {
+        altText: 'Remote',
+        mimeType: 'image/png',
+        naturalSize: {
+          height: 120,
+          width: 240,
+        },
+        url: 'https://example.com/remote.png',
+      },
+    })
+
+    expect(getSlideEditObjectImageReplaceJSONPasteValueFromText(
+      wrappedText,
+      { mode: 'wrapped' },
+    )).toEqual({
+      source: {
+        altText: 'Remote',
+        mimeType: 'image/png',
+        naturalHeight: 120,
+        naturalWidth: 240,
+        src: 'https://example.com/remote.png',
+      },
+      sourceFields: {
+        altText: 'altText',
+        mimeType: 'mimeType',
+        naturalHeight: 'naturalSize.height',
+        naturalWidth: 'naturalSize.width',
+        src: 'url',
+        wrapper: 'imageSource',
+      },
+      surface: 'object-image-replace',
+    })
+
+    expect(getSlideEditObjectImageReplaceJSONPasteValueFromValue({
+      dataUrl: 'data:image/png;base64,aW1hZ2U=',
+    })).toMatchObject({
+      source: {
+        mimeType: 'image/png',
+        src: 'data:image/png;base64,aW1hZ2U=',
+      },
+      sourceFields: {
+        src: 'dataUrl',
+      },
+    })
+
+    expect(getSlideEditObjectImageReplaceJSONPasteValueFromTextFromPackage(
+      '{"src":"data:image/svg+xml;base64,PHN2Zy8+"}',
+    )).toMatchObject({
+      source: {
+        mimeType: 'image/svg+xml',
+        src: 'data:image/svg+xml;base64,PHN2Zy8+',
+      },
+    })
+    expect(getSlideEditObjectImageReplaceJSONPasteValueFromValueFromPackage({
+      replacementImage: {
+        url: 'https://example.com/replacement.png',
+      },
+    }, {
+      mode: 'wrapped',
+    })).toMatchObject({
+      source: {
+        mimeType: 'image/unknown',
+        src: 'https://example.com/replacement.png',
+      },
+      sourceFields: {
+        src: 'url',
+        wrapper: 'replacementImage',
+      },
     })
   })
 

@@ -99,6 +99,14 @@ export type SlideEditObjectImageReplaceJSONPasteInput = {
   jsonMimeType?: string
 }
 
+export type SlideEditObjectImageReplaceJSONPasteValueMode =
+  | 'direct'
+  | 'wrapped'
+
+export type SlideEditObjectImageReplaceJSONPasteValueOptions = {
+  mode?: SlideEditObjectImageReplaceJSONPasteValueMode
+}
+
 export type SlideEditObjectImageReplacePasteTarget<
   TObjectId extends SlideEditObjectImageReplaceObjectId =
     SlideEditObjectImageReplaceObjectId,
@@ -245,9 +253,8 @@ export function getSlideEditObjectImageReplaceJSONPasteValue({
     const customText = dataTransfer.getData(jsonMimeType)
 
     if (customText.trim()) {
-      const customValue = parseSlideEditObjectImageReplaceJSON(customText)
       const customPasteValue =
-        getSlideEditObjectImageReplaceDirectPasteValue(customValue)
+        getSlideEditObjectImageReplaceJSONPasteValueFromText(customText)
 
       if (customPasteValue !== null) {
         return customPasteValue
@@ -262,8 +269,10 @@ export function getSlideEditObjectImageReplaceJSONPasteValue({
       continue
     }
 
-    const value = parseSlideEditObjectImageReplaceJSON(text)
-    const pasteValue = getSlideEditObjectImageReplaceWrappedPasteValue(value)
+    const pasteValue = getSlideEditObjectImageReplaceJSONPasteValueFromText(
+      text,
+      { mode: 'wrapped' },
+    )
 
     if (pasteValue !== null) {
       return pasteValue
@@ -271,6 +280,27 @@ export function getSlideEditObjectImageReplaceJSONPasteValue({
   }
 
   return null
+}
+
+export function getSlideEditObjectImageReplaceJSONPasteValueFromText(
+  text: string,
+  options?: SlideEditObjectImageReplaceJSONPasteValueOptions,
+): SlideEditObjectImageReplaceJSONPasteValue | null {
+  return getSlideEditObjectImageReplaceJSONPasteValueFromValue(
+    parseSlideEditObjectImageReplaceJSON(text),
+    options,
+  )
+}
+
+export function getSlideEditObjectImageReplaceJSONPasteValueFromValue(
+  value: unknown,
+  {
+    mode = 'direct',
+  }: SlideEditObjectImageReplaceJSONPasteValueOptions = {},
+): SlideEditObjectImageReplaceJSONPasteValue | null {
+  return mode === 'wrapped'
+    ? getSlideEditObjectImageReplaceWrappedPasteValue(value)
+    : getSlideEditObjectImageReplaceDirectPasteValue(value)
 }
 
 export function getSlideEditObjectImageReplacePasteCommandEffect<
