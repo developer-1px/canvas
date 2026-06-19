@@ -210,6 +210,10 @@ export type SlideEditTextAutoFitPasteCommandEffectsResult<
   skippedTargets: readonly SlideEditTextAutoFitPasteSkippedTarget<TObjectId>[]
 }
 
+export const SLIDE_EDIT_TEXT_AUTO_FIT_IMPORT_MODEL =
+  'slide-edit-text-auto-fit-import' as const
+export const SLIDE_EDIT_TEXT_AUTO_FIT_JSON_IMPORT_FORMAT =
+  'application-json-slide-edit-text-auto-fit' as const
 export const SLIDE_EDIT_TEXT_AUTO_FIT_JSON_MIME_TYPE =
   'application/vnd.interactive-os.slide-edit.text-auto-fit+json'
 

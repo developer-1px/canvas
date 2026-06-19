@@ -10,6 +10,8 @@ import {
   getSlideEditTextOverflowIndicatorState,
   normalizeSlideEditTextAutoFitHandle,
   normalizeSlideEditTextAutoFitMode,
+  SLIDE_EDIT_TEXT_AUTO_FIT_IMPORT_MODEL,
+  SLIDE_EDIT_TEXT_AUTO_FIT_JSON_IMPORT_FORMAT,
   SLIDE_EDIT_TEXT_AUTO_FIT_JSON_MIME_TYPE,
   SLIDE_EDIT_TEXT_BOX_SIZE_MODES,
 } from './SlideEditTextBoxAutoFit'
@@ -17,9 +19,26 @@ import {
   getSlideEditTextAutoFitJSONPasteValue as getSlideEditTextAutoFitJSONPasteValueFromPackage,
   getSlideEditTextAutoFitJSONPasteValueFromText as getSlideEditTextAutoFitJSONPasteValueFromTextFromPackage,
   getSlideEditTextAutoFitJSONPasteValueFromValue as getSlideEditTextAutoFitJSONPasteValueFromValueFromPackage,
+  SLIDE_EDIT_TEXT_AUTO_FIT_IMPORT_MODEL as SLIDE_EDIT_TEXT_AUTO_FIT_IMPORT_MODEL_FROM_PACKAGE,
+  SLIDE_EDIT_TEXT_AUTO_FIT_JSON_IMPORT_FORMAT as SLIDE_EDIT_TEXT_AUTO_FIT_JSON_IMPORT_FORMAT_FROM_PACKAGE,
 } from './index'
 
 describe('SlideEditTextBoxAutoFit', () => {
+  it('exposes shared text auto-fit import metadata', () => {
+    expect(SLIDE_EDIT_TEXT_AUTO_FIT_IMPORT_MODEL).toBe(
+      'slide-edit-text-auto-fit-import',
+    )
+    expect(SLIDE_EDIT_TEXT_AUTO_FIT_JSON_IMPORT_FORMAT).toBe(
+      'application-json-slide-edit-text-auto-fit',
+    )
+    expect(SLIDE_EDIT_TEXT_AUTO_FIT_IMPORT_MODEL_FROM_PACKAGE).toBe(
+      SLIDE_EDIT_TEXT_AUTO_FIT_IMPORT_MODEL,
+    )
+    expect(SLIDE_EDIT_TEXT_AUTO_FIT_JSON_IMPORT_FORMAT_FROM_PACKAGE).toBe(
+      SLIDE_EDIT_TEXT_AUTO_FIT_JSON_IMPORT_FORMAT,
+    )
+  })
+
   it('defines product-neutral text box size modes', () => {
     expect(SLIDE_EDIT_TEXT_BOX_SIZE_MODES).toEqual([
       {
