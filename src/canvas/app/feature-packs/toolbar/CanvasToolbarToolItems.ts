@@ -7,11 +7,15 @@ import type {
   CanvasCustomToolId,
   Tool,
 } from '../../../entities'
+import type {
+  CanvasKeyboardShortcutChord,
+} from '../../affordances/interaction/keyboard/CanvasKeyboardShortcutChords'
 
 export type CanvasToolbarCustomTool = {
   ariaLabel: string
   id: CanvasCustomToolId
   label: string
+  shortcut?: CanvasKeyboardShortcutChord
   title: string
 }
 
@@ -26,6 +30,7 @@ export type CanvasToolbarToolItem =
       ariaLabel: string
       kind: 'custom-tool'
       label: string
+      shortcut?: CanvasKeyboardShortcutChord
       title: string
       tool: CanvasCustomToolId
     }
@@ -54,6 +59,7 @@ export function getCanvasToolbarToolItems({
       ariaLabel: customTool.ariaLabel,
       kind: 'custom-tool' as const,
       label: customTool.label,
+      ...(customTool.shortcut ? { shortcut: customTool.shortcut } : {}),
       title: customTool.title,
       tool: customTool.id,
     })),

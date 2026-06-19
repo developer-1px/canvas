@@ -4,6 +4,10 @@ import {
   CANVAS_TOOL_AFFORDANCES,
 } from '../../../engine'
 import type { CanvasBuiltinTool } from '../../../entities'
+import {
+  formatCanvasKeyboardShortcutAriaKey,
+  type CanvasKeyboardShortcutChord,
+} from '../../affordances/interaction/keyboard/CanvasKeyboardShortcutChords'
 import { CANVAS_MENU_ITEM_PROPS } from './CanvasMenuRovingFocus'
 import { CANVAS_TOOLBAR_ITEM_PROPS } from './CanvasToolbarRovingFocus'
 
@@ -31,6 +35,9 @@ export function ToolButton({
       className="tool-button"
       data-active={active}
       aria-label={affordance.ariaLabel}
+      aria-keyshortcuts={getCanvasToolButtonAriaKeyshortcuts(
+        affordance.keyboardShortcut,
+      )}
       aria-pressed={surface === 'toolbar' ? active : undefined}
       title={affordance.title}
       onClick={onClick}
@@ -45,6 +52,7 @@ export function CustomToolButton({
   ariaLabel,
   label,
   onClick,
+  shortcut,
   surface = 'toolbar',
   title,
 }: {
@@ -52,6 +60,7 @@ export function CustomToolButton({
   ariaLabel: string
   label: string
   onClick: () => void
+  shortcut?: CanvasKeyboardShortcutChord
   surface?: CanvasToolbarButtonSurface
   title: string
 }) {
@@ -62,6 +71,7 @@ export function CustomToolButton({
       className="tool-button custom-tool-button"
       data-active={active}
       aria-label={ariaLabel}
+      aria-keyshortcuts={getCanvasToolButtonAriaKeyshortcuts(shortcut)}
       aria-pressed={surface === 'toolbar' ? active : undefined}
       title={title}
       onClick={onClick}
@@ -151,4 +161,12 @@ function getCanvasToolbarButtonSurfaceProps({
   }
 
   return CANVAS_TOOLBAR_ITEM_PROPS
+}
+
+function getCanvasToolButtonAriaKeyshortcuts(
+  shortcut: CanvasKeyboardShortcutChord | undefined,
+) {
+  return shortcut
+    ? formatCanvasKeyboardShortcutAriaKey(shortcut)
+    : undefined
 }

@@ -178,6 +178,7 @@ function renderCanvasToolbarCustomToolItem({
       active={item.active}
       ariaLabel={item.ariaLabel}
       label={item.label}
+      shortcut={item.shortcut}
       surface={context.surface}
       title={item.title}
       onClick={() => context.onToolChange(item.tool)}

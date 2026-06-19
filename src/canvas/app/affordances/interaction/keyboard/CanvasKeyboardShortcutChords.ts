@@ -42,6 +42,17 @@ export function formatCanvasKeyboardShortcutChord(
   return shortcut.shiftKey ? `Shift+${key}` : key
 }
 
+export function formatCanvasKeyboardShortcutAriaKey(
+  shortcut: CanvasKeyboardShortcutChord,
+) {
+  const key = normalizeCanvasKeyboardShortcutKey(shortcut.key)
+  const ariaKey = shortcut.shiftKey && key.length === 1
+    ? key.toUpperCase()
+    : key
+
+  return shortcut.shiftKey ? `Shift+${ariaKey}` : ariaKey
+}
+
 export function reserveCanvasKeyboardShortcut(
   label: string,
   shortcut: CanvasKeyboardShortcutChord,

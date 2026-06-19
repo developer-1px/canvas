@@ -24,13 +24,18 @@ describe('CanvasToolbarItemRenderer', () => {
         ariaLabel: 'Risk tool',
         kind: 'custom-tool',
         label: '!',
+        shortcut: { key: 'k', shiftKey: true },
         title: 'Risk',
         tool: 'custom:risk',
       },
     })
+    const builtinMarkup = renderToStaticMarkup(<>{builtin}</>)
+    const customMarkup = renderToStaticMarkup(<>{custom}</>)
 
-    expect(renderToStaticMarkup(<>{builtin}</>)).toContain('Rectangle')
-    expect(renderToStaticMarkup(<>{custom}</>)).toContain('Risk tool')
+    expect(builtinMarkup).toContain('Rectangle')
+    expect(builtinMarkup).toContain('aria-keyshortcuts="r"')
+    expect(customMarkup).toContain('Risk tool')
+    expect(customMarkup).toContain('aria-keyshortcuts="Shift+K"')
     clickRenderedItem(builtin)
     clickRenderedItem(custom)
 
