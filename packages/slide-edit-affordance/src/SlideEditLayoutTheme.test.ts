@@ -6,6 +6,8 @@ import {
   getSlideEditLayoutApplyCommandEffect,
   getSlideEditLayoutJSONPasteCommandEffects,
   getSlideEditLayoutJSONPasteValue,
+  getSlideEditLayoutJSONPasteValueFromText,
+  getSlideEditLayoutJSONPasteValueFromValue,
   getSlideEditLayoutPlaceholderVisibilityCommandEffect,
   getSlideEditLayoutPlaceholderVisibilityDescriptor,
   getSlideEditResolvedLayoutPlaceholder,
@@ -18,6 +20,8 @@ import {
 import {
   getSlideEditLayoutPlaceholderVisibilityCommandEffect as getSlideEditLayoutPlaceholderVisibilityCommandEffectFromPackage,
   getSlideEditLayoutJSONPasteValue as getSlideEditLayoutJSONPasteValueFromPackage,
+  getSlideEditLayoutJSONPasteValueFromText as getSlideEditLayoutJSONPasteValueFromTextFromPackage,
+  getSlideEditLayoutJSONPasteValueFromValue as getSlideEditLayoutJSONPasteValueFromValueFromPackage,
 } from './index'
 
 describe('SlideEditLayoutTheme', () => {
@@ -382,6 +386,63 @@ describe('SlideEditLayoutTheme', () => {
         {
           isVisible: true,
           placeholderId: 'title-slot',
+        },
+      ],
+    })
+  })
+
+  it('reads layout JSON from text and parsed values', () => {
+    expect(getSlideEditLayoutJSONPasteValueFromText(
+      JSON.stringify({
+        hiddenPlaceholderIds: ['body-slot'],
+        layoutId: 'layout-title-body',
+      }),
+      { mode: 'direct' },
+    )).toEqual({
+      layoutId: 'layout-title-body',
+      placeholderVisibility: [
+        {
+          isVisible: false,
+          placeholderId: 'body-slot',
+          sourceField: 'hiddenPlaceholderIds',
+        },
+      ],
+      surface: 'layout-placeholder',
+    })
+
+    expect(getSlideEditLayoutJSONPasteValueFromValue({
+      layoutPlaceholder: {
+        themeId: 'theme-a',
+        visiblePlaceholderIds: ['title-slot'],
+      },
+    }, { mode: 'wrapped' })).toEqual({
+      placeholderVisibility: [
+        {
+          isVisible: true,
+          placeholderId: 'title-slot',
+          sourceField: 'visiblePlaceholderIds',
+        },
+      ],
+      surface: 'layout-placeholder',
+      themeId: 'theme-a',
+    })
+
+    expect(getSlideEditLayoutJSONPasteValueFromTextFromPackage(
+      '{"placeholderLayout":{"layoutId":"layout-title-body"}}',
+      { mode: 'wrapped' },
+    )).toMatchObject({
+      layoutId: 'layout-title-body',
+      surface: 'layout-placeholder',
+    })
+
+    expect(getSlideEditLayoutJSONPasteValueFromValueFromPackage({
+      hiddenPlaceholderIds: ['body-slot'],
+    }, { mode: 'direct' })).toMatchObject({
+      placeholderVisibility: [
+        {
+          isVisible: false,
+          placeholderId: 'body-slot',
+          sourceField: 'hiddenPlaceholderIds',
         },
       ],
     })

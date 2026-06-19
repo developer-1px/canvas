@@ -93,6 +93,14 @@ export type SlideEditTextFrameInsetJSONPasteInput = {
   jsonMimeType?: string
 }
 
+export type SlideEditTextFrameInsetJSONPasteValueMode =
+  | 'direct'
+  | 'wrapped'
+
+export type SlideEditTextFrameInsetJSONPasteValueOptions = {
+  mode?: SlideEditTextFrameInsetJSONPasteValueMode
+}
+
 export type SlideEditTextFrameInsetPasteCommandsInput<
   TSlideId extends SlideEditTextFrameInsetSlideId =
     SlideEditTextFrameInsetSlideId,
@@ -243,9 +251,11 @@ export function getSlideEditTextFrameInsetJSONPasteValue({
     const customText = dataTransfer.getData(jsonMimeType)
 
     if (customText.trim()) {
-      const customValue = parseSlideEditTextFrameInsetJSON(customText)
       const customPasteValue =
-        getSlideEditTextFrameInsetDirectPasteValue(customValue)
+        getSlideEditTextFrameInsetJSONPasteValueFromText(
+          customText,
+          { mode: 'direct' },
+        )
 
       if (customPasteValue !== null) {
         return customPasteValue
@@ -260,8 +270,10 @@ export function getSlideEditTextFrameInsetJSONPasteValue({
       continue
     }
 
-    const value = parseSlideEditTextFrameInsetJSON(text)
-    const pasteValue = getSlideEditTextFrameInsetWrappedPasteValue(value)
+    const pasteValue = getSlideEditTextFrameInsetJSONPasteValueFromText(
+      text,
+      { mode: 'wrapped' },
+    )
 
     if (pasteValue !== null) {
       return pasteValue
@@ -269,6 +281,27 @@ export function getSlideEditTextFrameInsetJSONPasteValue({
   }
 
   return null
+}
+
+export function getSlideEditTextFrameInsetJSONPasteValueFromText(
+  text: string,
+  options?: SlideEditTextFrameInsetJSONPasteValueOptions,
+): SlideEditTextFrameInsetJSONPasteValue | null {
+  return getSlideEditTextFrameInsetJSONPasteValueFromValue(
+    parseSlideEditTextFrameInsetJSON(text),
+    options,
+  )
+}
+
+export function getSlideEditTextFrameInsetJSONPasteValueFromValue(
+  value: unknown,
+  {
+    mode = 'direct',
+  }: SlideEditTextFrameInsetJSONPasteValueOptions = {},
+): SlideEditTextFrameInsetJSONPasteValue | null {
+  return mode === 'wrapped'
+    ? getSlideEditTextFrameInsetWrappedPasteValue(value)
+    : getSlideEditTextFrameInsetDirectPasteValue(value)
 }
 
 export function getSlideEditTextFrameInsetPasteCommands<

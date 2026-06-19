@@ -322,6 +322,15 @@ export type SlideEditLayoutJSONPasteInput = {
   jsonMimeType?: string
 }
 
+export type SlideEditLayoutJSONPasteValueMode =
+  | 'any'
+  | 'direct'
+  | 'wrapped'
+
+export type SlideEditLayoutJSONPasteValueOptions = {
+  mode?: SlideEditLayoutJSONPasteValueMode
+}
+
 export type SlideEditLayoutJSONPasteCommandEffectsInput<
   TSlideId extends SlideEditLayoutSlideId = SlideEditLayoutSlideId,
   TThemeId extends SlideEditThemeId = SlideEditThemeId,
@@ -623,8 +632,10 @@ export function getSlideEditLayoutJSONPasteValue({
     const customText = dataTransfer.getData(jsonMimeType)
 
     if (customText.trim()) {
-      const customValue = parseSlideEditLayoutJSON(customText)
-      const customPasteValue = getSlideEditLayoutAnyJSONPasteValue(customValue)
+      const customPasteValue = getSlideEditLayoutJSONPasteValueFromText(
+        customText,
+        { mode: 'any' },
+      )
 
       if (customPasteValue !== null) {
         return customPasteValue
@@ -639,8 +650,10 @@ export function getSlideEditLayoutJSONPasteValue({
       continue
     }
 
-    const value = parseSlideEditLayoutJSON(text)
-    const pasteValue = getSlideEditLayoutAnyJSONPasteValue(value)
+    const pasteValue = getSlideEditLayoutJSONPasteValueFromText(
+      text,
+      { mode: 'any' },
+    )
 
     if (pasteValue !== null) {
       return pasteValue
@@ -648,6 +661,31 @@ export function getSlideEditLayoutJSONPasteValue({
   }
 
   return null
+}
+
+export function getSlideEditLayoutJSONPasteValueFromText(
+  text: string,
+  options?: SlideEditLayoutJSONPasteValueOptions,
+): SlideEditLayoutJSONPasteValue | null {
+  return getSlideEditLayoutJSONPasteValueFromValue(
+    parseSlideEditLayoutJSON(text),
+    options,
+  )
+}
+
+export function getSlideEditLayoutJSONPasteValueFromValue(
+  value: unknown,
+  { mode = 'any' }: SlideEditLayoutJSONPasteValueOptions = {},
+): SlideEditLayoutJSONPasteValue | null {
+  if (mode === 'direct') {
+    return getSlideEditLayoutDirectJSONPasteValue(value)
+  }
+
+  if (mode === 'wrapped') {
+    return getSlideEditLayoutWrappedJSONPasteValue(value)
+  }
+
+  return getSlideEditLayoutAnyJSONPasteValue(value)
 }
 
 export function getSlideEditLayoutJSONPasteCommandEffects<

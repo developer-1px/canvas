@@ -8,6 +8,8 @@ import {
   getSlideEditTextParagraphSpacingCommandEffect,
   getSlideEditTextParagraphSpacingCSSStyle,
   getSlideEditTextParagraphSpacingJSONPasteValue,
+  getSlideEditTextParagraphSpacingJSONPasteValueFromText,
+  getSlideEditTextParagraphSpacingJSONPasteValueFromValue,
   getSlideEditTextParagraphSpacingPasteCommands,
   normalizeSlideEditTextParagraphBulletValue,
   normalizeSlideEditTextLineHeightRatio,
@@ -24,6 +26,8 @@ import {
 import {
   createSlideEditTextParagraphBulletDescriptor as createSlideEditTextParagraphBulletDescriptorFromPackage,
   getSlideEditTextParagraphSpacingJSONPasteValue as getSlideEditTextParagraphSpacingJSONPasteValueFromPackage,
+  getSlideEditTextParagraphSpacingJSONPasteValueFromText as getSlideEditTextParagraphSpacingJSONPasteValueFromTextFromPackage,
+  getSlideEditTextParagraphSpacingJSONPasteValueFromValue as getSlideEditTextParagraphSpacingJSONPasteValueFromValueFromPackage,
 } from './index'
 
 describe('SlideEditTextParagraphSpacing', () => {
@@ -351,6 +355,98 @@ describe('SlideEditTextParagraphSpacing', () => {
           unit: 'px',
           value: 12,
         },
+      },
+    })
+  })
+
+  it('reads paragraph spacing JSON from text and parsed values', () => {
+    expect(getSlideEditTextParagraphSpacingJSONPasteValueFromText(
+      JSON.stringify({
+        lineHeightRatio: '1.234',
+        spacingAfter: {
+          unit: 'slide-unit',
+          value: 1001,
+        },
+        spacingBefore: '12px',
+      }),
+    )).toMatchObject({
+      fields: [
+        {
+          fieldId: 'lineHeightRatio',
+          value: 1.23,
+        },
+        {
+          fieldId: 'paragraphBefore',
+          value: {
+            unit: 'px',
+            value: 12,
+          },
+        },
+        {
+          fieldId: 'paragraphAfter',
+          value: {
+            unit: 'slide-unit',
+            value: 1000,
+          },
+        },
+      ],
+      values: {
+        lineHeightRatio: 1.23,
+      },
+    })
+    expect(getSlideEditTextParagraphSpacingJSONPasteValueFromValue({
+      after: '8px',
+      before: '4px',
+      lineHeight: 1.5,
+    })).toMatchObject({
+      values: {
+        lineHeightRatio: 1.5,
+        paragraphAfter: {
+          value: 8,
+        },
+        paragraphBefore: {
+          value: 4,
+        },
+      },
+    })
+    expect(getSlideEditTextParagraphSpacingJSONPasteValueFromTextFromPackage(
+      '{"paragraphStyle":{"marginTop":"8px","marginBottom":"10"}}',
+      { mode: 'wrapped' },
+    )).toMatchObject({
+      fields: [
+        {
+          fieldId: 'paragraphBefore',
+          value: {
+            unit: 'px',
+            value: 8,
+          },
+        },
+        {
+          fieldId: 'paragraphAfter',
+          value: {
+            unit: 'px',
+            value: 10,
+          },
+        },
+      ],
+    })
+    expect(getSlideEditTextParagraphSpacingJSONPasteValueFromValueFromPackage(
+      {
+        spacing: {
+          lineHeight: 0.1,
+        },
+      },
+      { mode: 'wrapped' },
+    )).toEqual({
+      fields: [
+        {
+          fieldId: 'lineHeightRatio',
+          value: 0.5,
+        },
+      ],
+      surface: 'text-paragraph-spacing',
+      values: {
+        lineHeightRatio: 0.5,
       },
     })
   })

@@ -5,6 +5,8 @@ import {
   getSlideEditTextVerticalAlignmentCommandEffect,
   getSlideEditTextVerticalAlignmentFlexAlignItems,
   getSlideEditTextVerticalAlignmentJSONPasteValue,
+  getSlideEditTextVerticalAlignmentJSONPasteValueFromText,
+  getSlideEditTextVerticalAlignmentJSONPasteValueFromValue,
   getSlideEditTextVerticalAlignmentMetadata,
   getSlideEditTextVerticalAlignmentPasteCommands,
   normalizeSlideEditTextVerticalAlignment,
@@ -16,6 +18,8 @@ import {
 } from './SlideEditTextVerticalAlignment'
 import {
   getSlideEditTextVerticalAlignmentJSONPasteValue as getSlideEditTextVerticalAlignmentJSONPasteValueFromPackage,
+  getSlideEditTextVerticalAlignmentJSONPasteValueFromText as getSlideEditTextVerticalAlignmentJSONPasteValueFromTextFromPackage,
+  getSlideEditTextVerticalAlignmentJSONPasteValueFromValue as getSlideEditTextVerticalAlignmentJSONPasteValueFromValueFromPackage,
 } from './index'
 
 describe('SlideEditTextVerticalAlignment', () => {
@@ -135,6 +139,37 @@ describe('SlideEditTextVerticalAlignment', () => {
         'text/plain': '{"verticalAlignment":"flex-start"}',
       }),
     })).toEqual({
+      surface: 'text-vertical-alignment',
+      value: 'top',
+    })
+  })
+
+  it('reads vertical alignment JSON from text and parsed values', () => {
+    expect(getSlideEditTextVerticalAlignmentJSONPasteValueFromText(
+      '"bottom"',
+    )).toEqual({
+      surface: 'text-vertical-alignment',
+      value: 'bottom',
+    })
+    expect(getSlideEditTextVerticalAlignmentJSONPasteValueFromValue({
+      value: 'flex-end',
+    })).toEqual({
+      surface: 'text-vertical-alignment',
+      value: 'bottom',
+    })
+    expect(getSlideEditTextVerticalAlignmentJSONPasteValueFromTextFromPackage(
+      '{"alignItems":"center"}',
+      { mode: 'wrapped' },
+    )).toEqual({
+      surface: 'text-vertical-alignment',
+      value: 'middle',
+    })
+    expect(getSlideEditTextVerticalAlignmentJSONPasteValueFromValueFromPackage(
+      {
+        verticalAlignment: 'flex-start',
+      },
+      { mode: 'wrapped' },
+    )).toEqual({
       surface: 'text-vertical-alignment',
       value: 'top',
     })

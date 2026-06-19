@@ -214,6 +214,14 @@ export type SlideEditTextParagraphSpacingJSONPasteInput = {
   jsonMimeType?: string
 }
 
+export type SlideEditTextParagraphSpacingJSONPasteValueMode =
+  | 'direct'
+  | 'wrapped'
+
+export type SlideEditTextParagraphSpacingJSONPasteValueOptions = {
+  mode?: SlideEditTextParagraphSpacingJSONPasteValueMode
+}
+
 export type SlideEditTextParagraphSpacingPasteCommandsInput<
   TSlideId extends SlideEditTextParagraphSlideId =
     SlideEditTextParagraphSlideId,
@@ -531,9 +539,11 @@ export function getSlideEditTextParagraphSpacingJSONPasteValue({
     const customText = dataTransfer.getData(jsonMimeType)
 
     if (customText.trim()) {
-      const customValue = parseSlideEditTextParagraphSpacingJSON(customText)
       const customPasteValue =
-        getSlideEditTextParagraphSpacingDirectPasteValue(customValue)
+        getSlideEditTextParagraphSpacingJSONPasteValueFromText(
+          customText,
+          { mode: 'direct' },
+        )
 
       if (customPasteValue !== null) {
         return customPasteValue
@@ -548,9 +558,11 @@ export function getSlideEditTextParagraphSpacingJSONPasteValue({
       continue
     }
 
-    const value = parseSlideEditTextParagraphSpacingJSON(text)
     const pasteValue =
-      getSlideEditTextParagraphSpacingWrappedPasteValue(value)
+      getSlideEditTextParagraphSpacingJSONPasteValueFromText(
+        text,
+        { mode: 'wrapped' },
+      )
 
     if (pasteValue !== null) {
       return pasteValue
@@ -558,6 +570,27 @@ export function getSlideEditTextParagraphSpacingJSONPasteValue({
   }
 
   return null
+}
+
+export function getSlideEditTextParagraphSpacingJSONPasteValueFromText(
+  text: string,
+  options?: SlideEditTextParagraphSpacingJSONPasteValueOptions,
+): SlideEditTextParagraphSpacingJSONPasteValue | null {
+  return getSlideEditTextParagraphSpacingJSONPasteValueFromValue(
+    parseSlideEditTextParagraphSpacingJSON(text),
+    options,
+  )
+}
+
+export function getSlideEditTextParagraphSpacingJSONPasteValueFromValue(
+  value: unknown,
+  {
+    mode = 'direct',
+  }: SlideEditTextParagraphSpacingJSONPasteValueOptions = {},
+): SlideEditTextParagraphSpacingJSONPasteValue | null {
+  return mode === 'wrapped'
+    ? getSlideEditTextParagraphSpacingWrappedPasteValue(value)
+    : getSlideEditTextParagraphSpacingDirectPasteValue(value)
 }
 
 export function getSlideEditTextParagraphSpacingPasteCommands<

@@ -88,6 +88,14 @@ export type SlideEditTextVerticalAlignmentJSONPasteInput = {
   jsonMimeType?: string
 }
 
+export type SlideEditTextVerticalAlignmentJSONPasteValueMode =
+  | 'direct'
+  | 'wrapped'
+
+export type SlideEditTextVerticalAlignmentJSONPasteValueOptions = {
+  mode?: SlideEditTextVerticalAlignmentJSONPasteValueMode
+}
+
 export type SlideEditTextVerticalAlignmentPasteCommandsInput<
   TSlideId extends SlideEditTextVerticalAlignmentSlideId =
     SlideEditTextVerticalAlignmentSlideId,
@@ -201,9 +209,11 @@ export function getSlideEditTextVerticalAlignmentJSONPasteValue({
     const customText = dataTransfer.getData(jsonMimeType)
 
     if (customText.trim()) {
-      const customValue = parseSlideEditTextVerticalAlignmentJSON(customText)
       const customPasteValue =
-        getSlideEditTextVerticalAlignmentDirectPasteValue(customValue)
+        getSlideEditTextVerticalAlignmentJSONPasteValueFromText(
+          customText,
+          { mode: 'direct' },
+        )
 
       if (customPasteValue !== null) {
         return customPasteValue
@@ -218,9 +228,11 @@ export function getSlideEditTextVerticalAlignmentJSONPasteValue({
       continue
     }
 
-    const value = parseSlideEditTextVerticalAlignmentJSON(text)
     const pasteValue =
-      getSlideEditTextVerticalAlignmentExplicitJSONPasteValue(value)
+      getSlideEditTextVerticalAlignmentJSONPasteValueFromText(
+        text,
+        { mode: 'wrapped' },
+      )
 
     if (pasteValue !== null) {
       return pasteValue
@@ -228,6 +240,27 @@ export function getSlideEditTextVerticalAlignmentJSONPasteValue({
   }
 
   return null
+}
+
+export function getSlideEditTextVerticalAlignmentJSONPasteValueFromText(
+  text: string,
+  options?: SlideEditTextVerticalAlignmentJSONPasteValueOptions,
+): SlideEditTextVerticalAlignmentJSONPasteValue | null {
+  return getSlideEditTextVerticalAlignmentJSONPasteValueFromValue(
+    parseSlideEditTextVerticalAlignmentJSON(text),
+    options,
+  )
+}
+
+export function getSlideEditTextVerticalAlignmentJSONPasteValueFromValue(
+  value: unknown,
+  {
+    mode = 'direct',
+  }: SlideEditTextVerticalAlignmentJSONPasteValueOptions = {},
+): SlideEditTextVerticalAlignmentJSONPasteValue | null {
+  return mode === 'wrapped'
+    ? getSlideEditTextVerticalAlignmentExplicitJSONPasteValue(value)
+    : getSlideEditTextVerticalAlignmentDirectPasteValue(value)
 }
 
 export function getSlideEditTextVerticalAlignmentPasteCommands<

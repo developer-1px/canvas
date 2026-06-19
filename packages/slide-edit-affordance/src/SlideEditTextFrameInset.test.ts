@@ -5,6 +5,8 @@ import {
   getSlideEditTextFrameInsetPaddingCSS,
   getSlideEditTextFrameInsetCommandEffect,
   getSlideEditTextFrameInsetJSONPasteValue,
+  getSlideEditTextFrameInsetJSONPasteValueFromText,
+  getSlideEditTextFrameInsetJSONPasteValueFromValue,
   getSlideEditTextFrameInsetMetadata,
   getSlideEditTextFrameInsetPasteCommands,
   normalizeSlideEditTextFrameInset,
@@ -18,6 +20,8 @@ import {
 } from './SlideEditTextFrameInset'
 import {
   getSlideEditTextFrameInsetJSONPasteValue as getSlideEditTextFrameInsetJSONPasteValueFromPackage,
+  getSlideEditTextFrameInsetJSONPasteValueFromText as getSlideEditTextFrameInsetJSONPasteValueFromTextFromPackage,
+  getSlideEditTextFrameInsetJSONPasteValueFromValue as getSlideEditTextFrameInsetJSONPasteValueFromValueFromPackage,
 } from './index'
 
 describe('SlideEditTextFrameInset', () => {
@@ -229,6 +233,70 @@ describe('SlideEditTextFrameInset', () => {
         'text/plain': '{"padding":"10px"}',
       }),
     })).toMatchObject({
+      inset: {
+        bottom: 10,
+        left: 10,
+        right: 10,
+        top: 10,
+      },
+    })
+  })
+
+  it('reads text frame inset JSON from text and parsed values', () => {
+    expect(getSlideEditTextFrameInsetJSONPasteValueFromText(
+      JSON.stringify({
+        bottom: 16,
+        left: 20,
+        right: 12,
+        top: 8,
+      }),
+    )).toMatchObject({
+      inset: {
+        bottom: 16,
+        left: 20,
+        right: 12,
+        top: 8,
+      },
+    })
+    expect(getSlideEditTextFrameInsetJSONPasteValueFromValue(6)).toMatchObject({
+      inset: {
+        bottom: 6,
+        left: 6,
+        right: 6,
+        top: 6,
+      },
+    })
+    expect(getSlideEditTextFrameInsetJSONPasteValueFromTextFromPackage(
+      '{"textPadding":[1,2,"bad",4]}',
+      { mode: 'wrapped' },
+    )).toEqual({
+      fields: [
+        {
+          fieldId: 'top',
+          value: 1,
+        },
+        {
+          fieldId: 'right',
+          value: 2,
+        },
+        {
+          fieldId: 'left',
+          value: 4,
+        },
+      ],
+      inset: {
+        left: 4,
+        right: 2,
+        top: 1,
+      },
+      surface: 'text-frame-inset',
+    })
+    expect(getSlideEditTextFrameInsetJSONPasteValueFromValueFromPackage(
+      {
+        padding: '10px',
+      },
+      { mode: 'wrapped' },
+    )).toMatchObject({
       inset: {
         bottom: 10,
         left: 10,
