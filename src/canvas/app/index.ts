@@ -171,8 +171,14 @@ export {
   CANVAS_RADIO_GROUP_FOCUS_MODEL,
   CANVAS_RADIO_GROUP_KEYBOARD_MODEL,
   CANVAS_RADIO_GROUP_MODEL,
+  getCanvasRadioGroupKeyboardIntent,
   getCanvasRadioTabIndex,
   handleCanvasRadioGroupKeyDown,
+  runCanvasRadioGroupKeyboardIntent,
+  type CanvasRadioGroupKeyboardEvent,
+  type CanvasRadioGroupKeyboardIntent,
+  type CanvasRadioGroupKeyboardIntentInput,
+  type RunCanvasRadioGroupKeyboardIntentInput,
 } from './affordances/controls/radio/CanvasRadioGroup'
 export {
   getCanvasPresentationKeyboardIntent,

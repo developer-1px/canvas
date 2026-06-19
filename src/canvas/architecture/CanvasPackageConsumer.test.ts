@@ -139,6 +139,8 @@ import {
   fitCanvasViewportToBounds,
   getCanvasEditableFieldKeyboardIntent,
   getCanvasPresentationKeyboardIntent,
+  getCanvasRadioGroupKeyboardIntent,
+  getCanvasRadioTabIndex,
   setCanvasDataTransferText,
   stringifyCanvasRichClipboardPayload,
   readCanvasRichClipboardFromDataTransfer,
@@ -152,6 +154,7 @@ import {
   previewCanvasPointerLaserInteraction,
   previewCanvasPointerPanInteraction,
   resetCanvasViewport,
+  runCanvasRadioGroupKeyboardIntent,
   runCanvasWheelViewport,
   startCanvasPointerLaserInteraction,
   startCanvasPointerPanInteraction,
@@ -488,6 +491,7 @@ import {
   type CanvasComponentPartSourceInput,
   type CanvasEditableFieldKeyboardIntentInput,
   type CanvasPresentationKeyboardIntentInput,
+  type CanvasRadioGroupKeyboardIntentInput,
   type CanvasInteractionTargetSelectorInput,
   type CanvasInlineEditKeyboardIntentInput,
   type CanvasContextMenuClientPointInput,
@@ -504,6 +508,7 @@ import {
   type CanvasModalKeyboardIntentInput,
   type RunCanvasModalBackdropPointerIntentInput,
   type RunCanvasModalKeyboardIntentInput,
+  type RunCanvasRadioGroupKeyboardIntentInput,
   type CanvasPointerClickMemory,
   type CanvasNextLaserTrailPointsInput,
   type CanvasPointerLocalGeometry,
@@ -4217,6 +4222,55 @@ describe('Canvas package consumer imports', () => {
     const presentationKeyboardInput: CanvasPresentationKeyboardIntentInput = {
       key: 'PageDown',
     }
+    const radioGroupKeyboardInput: CanvasRadioGroupKeyboardIntentInput = {
+      count: 3,
+      currentIndex: 0,
+      key: 'ArrowDown',
+    }
+    let radioGroupPreventDefaultCount = 0
+    let radioGroupStopPropagationCount = 0
+    let radioGroupFocusCount = 0
+    let radioGroupClickCount = 0
+    const radioGroupFirstItem = {
+      disabled: false,
+      getAttribute: () => null,
+    } as unknown as HTMLElement
+    const radioGroupDisabledItem = {
+      disabled: true,
+      getAttribute: () => null,
+    } as unknown as HTMLElement & { disabled: boolean }
+    const radioGroupNextItem = {
+      disabled: false,
+      focus: () => {
+        radioGroupFocusCount += 1
+      },
+      getAttribute: () => null,
+      click: () => {
+        radioGroupClickCount += 1
+      },
+    } as unknown as HTMLElement
+    const radioGroupRoot = {
+      ownerDocument: {
+        activeElement: radioGroupFirstItem,
+      },
+      querySelectorAll: () => [
+        radioGroupFirstItem,
+        radioGroupDisabledItem,
+        radioGroupNextItem,
+      ],
+    } as unknown as HTMLElement
+    const radioGroupRunInput: RunCanvasRadioGroupKeyboardIntentInput = {
+      event: {
+        currentTarget: radioGroupRoot,
+        key: 'ArrowDown',
+        preventDefault: () => {
+          radioGroupPreventDefaultCount += 1
+        },
+        stopPropagation: () => {
+          radioGroupStopPropagationCount += 1
+        },
+      },
+    }
     const modalBackdropPointerTarget = {} as EventTarget
     const modalBackdropPointerInput: CanvasModalBackdropPointerIntentInput = {
       currentTarget: modalBackdropPointerTarget,
@@ -4774,6 +4828,37 @@ describe('Canvas package consumer imports', () => {
       kind: 'navigate',
       preventDefault: true,
     })
+    expect(getCanvasRadioGroupKeyboardIntent(radioGroupKeyboardInput))
+      .toEqual({
+        kind: 'move-radio',
+        nextIndex: 1,
+        preventDefault: true,
+        stopPropagation: true,
+      })
+    expect(CanvasAppFacade.getCanvasRadioGroupKeyboardIntent(
+      radioGroupKeyboardInput,
+    )).toEqual({
+      kind: 'move-radio',
+      nextIndex: 1,
+      preventDefault: true,
+      stopPropagation: true,
+    })
+    expect(getCanvasRadioTabIndex({
+      checked: true,
+      disabled: false,
+    })).toBe(0)
+    expect(CanvasAppFacade.getCanvasRadioTabIndex({
+      checked: false,
+      disabled: false,
+    })).toBe(-1)
+    expect(runCanvasRadioGroupKeyboardIntent(radioGroupRunInput)).toBe(true)
+    expect(CanvasAppFacade.runCanvasRadioGroupKeyboardIntent(
+      radioGroupRunInput,
+    )).toBe(true)
+    expect(radioGroupPreventDefaultCount).toBe(2)
+    expect(radioGroupStopPropagationCount).toBe(2)
+    expect(radioGroupFocusCount).toBe(2)
+    expect(radioGroupClickCount).toBe(2)
     expect(getCanvasContextMenuKeyboardIntent(contextMenuKeyboardInput))
       .toEqual({
         kind: 'open-context-menu',

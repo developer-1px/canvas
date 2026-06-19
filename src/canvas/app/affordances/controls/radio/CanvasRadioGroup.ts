@@ -8,27 +8,102 @@ type CanvasRadioItem = HTMLElement & {
   disabled?: boolean
 }
 
+export type CanvasRadioGroupKeyboardIntentInput = {
+  count: number
+  currentIndex: number
+  key: string
+}
+
+export type CanvasRadioGroupKeyboardIntent =
+  | {
+      kind: 'none'
+      preventDefault: false
+      stopPropagation: false
+    }
+  | {
+      kind: 'move-radio'
+      nextIndex: number
+      preventDefault: true
+      stopPropagation: true
+    }
+
+export type CanvasRadioGroupKeyboardEvent = {
+  currentTarget: HTMLElement
+  key: string
+  preventDefault: () => void
+  stopPropagation: () => void
+}
+
+export type RunCanvasRadioGroupKeyboardIntentInput = {
+  event: CanvasRadioGroupKeyboardEvent
+}
+
 export function handleCanvasRadioGroupKeyDown(
   event: KeyboardEvent<HTMLElement>,
 ) {
+  runCanvasRadioGroupKeyboardIntent({ event })
+}
+
+export function runCanvasRadioGroupKeyboardIntent({
+  event,
+}: RunCanvasRadioGroupKeyboardIntentInput) {
   const items = getCanvasRadioItems(event.currentTarget)
     .filter(isCanvasRadioItemEnabled)
   const currentIndex = items.findIndex((item) =>
     item === event.currentTarget.ownerDocument.activeElement)
-  const nextIndex = getCanvasRadioKeyIndex({
+  const intent = getCanvasRadioGroupKeyboardIntent({
     count: items.length,
     currentIndex,
     key: event.key,
   })
 
-  if (nextIndex === null) {
-    return
+  if (intent.kind !== 'move-radio') {
+    return false
   }
 
-  event.preventDefault()
-  event.stopPropagation()
-  items[nextIndex]?.focus()
-  items[nextIndex]?.click()
+  const nextItem = items[intent.nextIndex]
+
+  if (!nextItem) {
+    return false
+  }
+
+  if (intent.preventDefault) {
+    event.preventDefault()
+  }
+  if (intent.stopPropagation) {
+    event.stopPropagation()
+  }
+
+  nextItem.focus()
+  nextItem.click()
+  return true
+}
+
+export function getCanvasRadioGroupKeyboardIntent({
+  count,
+  currentIndex,
+  key,
+}: CanvasRadioGroupKeyboardIntentInput): CanvasRadioGroupKeyboardIntent {
+  const nextIndex = getCanvasRadioKeyIndex({
+    count,
+    currentIndex,
+    key,
+  })
+
+  if (nextIndex === null) {
+    return {
+      kind: 'none',
+      preventDefault: false,
+      stopPropagation: false,
+    }
+  }
+
+  return {
+    kind: 'move-radio',
+    nextIndex,
+    preventDefault: true,
+    stopPropagation: true,
+  }
 }
 
 export function getCanvasRadioTabIndex({
