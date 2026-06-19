@@ -45,6 +45,7 @@ export {
   type DuplicateCanvasCommandResult,
 } from './command/CanvasCommandEngine'
 export {
+  CANVAS_ANGLE_CONSTRAINED_LINE_ENDPOINT_MODEL,
   CANVAS_CENTER_OUT_CREATION_POINTS_MODEL,
   CANVAS_CREATED_RECT_BOUNDS_MODEL,
   createCanvasArrow,
@@ -54,12 +55,14 @@ export {
   createCanvasRect,
   createCanvasShape,
   createCanvasText,
+  getCanvasAngleConstrainedLineEndPoint,
   getCanvasAspectLockedCreationPoint,
   getCanvasCenterOutCreationPoints,
   getCanvasCreatedArrowEnd,
   getCanvasCreatedDrawingPoints,
   getCanvasCreatedPathSegments,
   getCanvasCreatedRectBounds,
+  type CanvasAngleConstrainedLineEndPointInput,
   type CanvasAspectLockedCreationPointInput,
   type CanvasCenterOutCreationPoints,
   type CanvasCenterOutCreationPointsInput,

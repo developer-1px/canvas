@@ -98,8 +98,15 @@ export type CanvasCenterOutCreationPoints = Readonly<{
   start: Point
 }>
 
+export type CanvasAngleConstrainedLineEndPointInput = {
+  currentWorld: Point
+  startWorld: Point
+}
+
 export const CANVAS_CENTER_OUT_CREATION_POINTS_MODEL =
   'canvas-center-out-creation-points'
+export const CANVAS_ANGLE_CONSTRAINED_LINE_ENDPOINT_MODEL =
+  'canvas-angle-constrained-line-endpoint'
 export const CANVAS_CREATED_RECT_BOUNDS_MODEL = 'canvas-created-rect-bounds'
 
 const DEFAULT_RECT_SIZE = {
@@ -189,6 +196,26 @@ export function getCanvasCenterOutCreationPoints({
   }
 }
 
+export function getCanvasAngleConstrainedLineEndPoint({
+  currentWorld,
+  startWorld,
+}: CanvasAngleConstrainedLineEndPointInput): Point {
+  const distance = pointDistance(startWorld, currentWorld)
+
+  if (distance === 0) {
+    return currentWorld
+  }
+
+  const angleStep = Math.PI / 4
+  const angle = Math.atan2(currentWorld.y - startWorld.y, currentWorld.x - startWorld.x)
+  const constrainedAngle = Math.round(angle / angleStep) * angleStep
+
+  return {
+    x: startWorld.x + Math.cos(constrainedAngle) * distance,
+    y: startWorld.y + Math.sin(constrainedAngle) * distance,
+  }
+}
+
 function getCanvasCreationDirectionSign(value: number) {
   return value < 0 ? -1 : 1
 }
@@ -257,14 +284,18 @@ export function getCanvasCreatedPathSegments({
 }
 
 export function getCanvasCreatedArrowEnd({
+  constrainAngle = false,
   currentWorld,
   startWorld,
 }: {
+  constrainAngle?: boolean
   currentWorld: Point
   startWorld: Point
 }): Point {
   if (pointDistance(startWorld, currentWorld) > 6) {
-    return currentWorld
+    return constrainAngle
+      ? getCanvasAngleConstrainedLineEndPoint({ currentWorld, startWorld })
+      : currentWorld
   }
 
   return {
@@ -394,6 +425,7 @@ export function createCanvasPath<TItem extends CanvasCreationItem>({
 
 export function createCanvasArrow<TItem extends CanvasCreationItem>({
   adapter,
+  constrainAngle = false,
   createId,
   currentWorld,
   endAttachedTo,
@@ -401,6 +433,7 @@ export function createCanvasArrow<TItem extends CanvasCreationItem>({
   startWorld,
 }: {
   adapter: CanvasCreationAdapter<TItem>
+  constrainAngle?: boolean
   createId: (prefix: string) => string
   currentWorld: Point
   endAttachedTo?: string
@@ -408,7 +441,11 @@ export function createCanvasArrow<TItem extends CanvasCreationItem>({
   startWorld: Point
 }) {
   return adapter.createArrow({
-    end: getCanvasCreatedArrowEnd({ currentWorld, startWorld }),
+    end: getCanvasCreatedArrowEnd({
+      constrainAngle,
+      currentWorld,
+      startWorld,
+    }),
     endAttachedTo,
     id: createId('arrow'),
     routing: 'elbow',

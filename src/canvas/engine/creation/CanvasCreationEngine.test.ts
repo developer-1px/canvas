@@ -6,6 +6,7 @@ import {
   createCanvasPath,
   createCanvasRect,
   createCanvasShape,
+  getCanvasAngleConstrainedLineEndPoint,
   getCanvasAspectLockedCreationPoint,
   getCanvasCenterOutCreationPoints,
   getCanvasCreatedArrowEnd,
@@ -210,6 +211,68 @@ describe('CanvasCreationEngine drawing tools', () => {
         startWorld: { x: 10, y: 20 },
       }),
     ).toEqual({ x: 154, y: 20 })
+  })
+
+  test('constrains created arrow endpoints to 45 degree increments', () => {
+    const horizontal = getCanvasAngleConstrainedLineEndPoint({
+      currentWorld: { x: 92, y: 51 },
+      startWorld: { x: 10, y: 20 },
+    })
+
+    expect(horizontal.x).toBeGreaterThan(97)
+    expect(horizontal.y).toBeCloseTo(20)
+
+    const diagonal = getCanvasAngleConstrainedLineEndPoint({
+      currentWorld: { x: 40, y: 60 },
+      startWorld: { x: 10, y: 20 },
+    })
+
+    expect(diagonal.x).toBeCloseTo(45.35533905932738)
+    expect(diagonal.y).toBeCloseTo(55.35533905932738)
+
+    const vertical = getCanvasAngleConstrainedLineEndPoint({
+      currentWorld: { x: 30, y: 80 },
+      startWorld: { x: 10, y: 20 },
+    })
+
+    expect(vertical.x).toBeCloseTo(10)
+    expect(vertical.y).toBeCloseTo(83.24555320336759)
+  })
+
+  test('applies angle constraint to arrow creation only after drag threshold', () => {
+    const constrained = getCanvasCreatedArrowEnd({
+      constrainAngle: true,
+      currentWorld: { x: 92, y: 51 },
+      startWorld: { x: 10, y: 20 },
+    })
+
+    expect(constrained.x).toBeCloseTo(97.66413177340314)
+    expect(constrained.y).toBeCloseTo(20)
+
+    expect(
+      getCanvasCreatedArrowEnd({
+        constrainAngle: true,
+        currentWorld: { x: 12, y: 22 },
+        startWorld: { x: 10, y: 20 },
+      }),
+    ).toEqual({ x: 154, y: 20 })
+
+    const arrow = createCanvasArrow({
+      adapter,
+      constrainAngle: true,
+      createId: () => 'arrow-1',
+      currentWorld: { x: 92, y: 51 },
+      startWorld: { x: 10, y: 20 },
+    })
+
+    expect(arrow).toMatchObject({
+      id: 'arrow-1',
+      routing: 'elbow',
+      start: { x: 10, y: 20 },
+      type: 'arrow',
+    })
+    expect(arrow.end.x).toBeCloseTo(97.66413177340314)
+    expect(arrow.end.y).toBeCloseTo(20)
   })
 
   test('creates ellipse shapes through the shape creation adapter seam', () => {
