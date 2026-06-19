@@ -232,15 +232,17 @@ export function createSlideEditRailListboxDescriptor<
     selectedIds: activeSlideId ? [activeSlideId] : [],
     selectionMode: 'single',
   })
-  const options = descriptor.options.map((option) => ({
-    id: option.optionId,
-    index: option.index,
-    isActive: option.isSelected,
-    isFocusable: option.isFocusable,
-    isSelected: option.isSelected,
-    slideId: option.id,
-    tabIndex: option.attributes.tabIndex === 0 ? 0 : -1,
-  }))
+  const options = descriptor.options.map(
+    (option): SlideEditRailListboxOptionDescriptor<TSlideId> => ({
+      id: option.optionId,
+      index: option.index,
+      isActive: option.isSelected,
+      isFocusable: option.isFocusable,
+      isSelected: option.isSelected,
+      slideId: option.id,
+      tabIndex: option.attributes.tabIndex === 0 ? 0 : -1,
+    }),
+  )
 
   return {
     activeOptionId: descriptor.selectedOptionIds[0] ?? null,
