@@ -76,4 +76,17 @@ describe('CanvasFloatingAnchor', () => {
       y: 280,
     })
   })
+
+  it('caps an oversized floating surface to the available stage width', () => {
+    expect(getCanvasFloatingAnchorForBounds({
+      bounds: { h: 40, w: 80, x: 20, y: 120 },
+      floatingSize: { height: 40, width: 500 },
+      stageRect: { height: 400, width: 300 },
+      viewport: { scale: 1, x: 0, y: 0 },
+    })).toEqual({
+      placement: 'above',
+      x: 150,
+      y: 110,
+    })
+  })
 })

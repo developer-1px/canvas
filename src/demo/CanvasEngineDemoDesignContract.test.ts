@@ -55,4 +55,13 @@ describe('CanvasEngineDemoDesignContract', () => {
     expect(source).toContain('.engine-stamp-pad button:focus-visible')
     expect(source).not.toMatch(/button:focus-visible\s*\{[^}]*outline:\s*0\b/)
   })
+
+  it('keeps the engine selection toolbar inside narrow viewports', () => {
+    const source = readFileSync(`${HERE}CanvasDevToolsDemoApp.css`, 'utf8')
+
+    expect(source).toMatch(/\.engine-selection-toolbar\s*\{[^}]*box-sizing:\s*border-box/)
+    expect(source).toMatch(/\.engine-selection-toolbar\s*\{[^}]*flex-wrap:\s*wrap/)
+    expect(source).toMatch(/\.engine-selection-toolbar\s*\{[^}]*justify-content:\s*center/)
+    expect(source).toContain('max-width: calc(100vw - 20px)')
+  })
 })

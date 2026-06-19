@@ -211,8 +211,11 @@
   left: var(--engine-selection-x);
   top: var(--engine-selection-y);
   z-index: 7;
+  box-sizing: border-box;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
+  justify-content: center;
   max-width: calc(100vw - 20px);
   min-height: 28px;
   gap: 1px;
@@ -421,8 +424,6 @@
   .engine-selection-toolbar {
     right: 10px;
     left: 10px;
-    flex-wrap: wrap;
-    justify-content: center;
     max-width: none;
     transform: translateY(calc(-100% - 10px));
   }

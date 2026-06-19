@@ -45,7 +45,12 @@ export function getCanvasFloatingAnchorForBounds({
   }
 
   const worldGap = screenGap / viewport.scale
-  const floatingHalfWidth = floatingSize.width / 2 / viewport.scale
+  const floatingWidth = getCanvasFloatingAnchorScreenWidth({
+    floatingWidth: floatingSize.width,
+    screenMargin,
+    stageRect,
+  })
+  const floatingHalfWidth = floatingWidth / 2 / viewport.scale
   const frameLeft = frameBounds?.x ?? Number.NEGATIVE_INFINITY
   const frameRight = frameBounds
     ? frameBounds.x + frameBounds.w
@@ -75,6 +80,25 @@ export function getCanvasFloatingAnchorForBounds({
     x: clamp(centerX, xRange.min, xRange.max),
     y: placement === 'above' ? aboveY : belowY,
   }
+}
+
+function getCanvasFloatingAnchorScreenWidth({
+  floatingWidth,
+  screenMargin,
+  stageRect,
+}: {
+  floatingWidth: number
+  screenMargin: number
+  stageRect: CanvasViewportRect | null | undefined
+}) {
+  if (!stageRect) {
+    return floatingWidth
+  }
+
+  return Math.min(
+    floatingWidth,
+    Math.max(0, stageRect.width - screenMargin * 2),
+  )
 }
 
 function getCanvasFloatingAnchorXRange({
