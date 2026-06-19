@@ -273,6 +273,22 @@ export {
   type CanvasSelectionListSelectionMode,
 } from './affordances/controls/selection-list/CanvasSelectionListRange'
 export {
+  CANVAS_SELECTION_LIST_FOCUS_MODEL,
+  CANVAS_SELECTION_LIST_KEYBOARD_MODEL,
+  CANVAS_SELECTION_LIST_MODEL,
+  createCanvasSelectionListDescriptor,
+  getCanvasSelectionListOptionAttributes,
+  getCanvasSelectionListOptionTabIndex,
+  getCanvasSelectionListRootAttributes,
+  type CanvasSelectionListDescriptor,
+  type CanvasSelectionListDescriptorInput,
+  type CanvasSelectionListDescriptorSelectionMode,
+  type CanvasSelectionListItemInput,
+  type CanvasSelectionListOptionAttributes,
+  type CanvasSelectionListOptionDescriptor,
+  type CanvasSelectionListRootAttributes,
+} from './affordances/controls/selection-list/CanvasSelectionListDescriptor'
+export {
   getCanvasSelectionListKeyboardIntent,
   runCanvasSelectionListKeyboardIntent,
   type CanvasSelectionListKeyboardEvent,

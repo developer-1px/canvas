@@ -22,6 +22,9 @@ import {
   CANVAS_LASER_TRAIL_OVERLAY_MODEL,
   CANVAS_APP_BOARD_IO_FEATURE_PACK_MANIFEST,
   CANVAS_CONTROL_TARGET_SELECTOR,
+  CANVAS_SELECTION_LIST_FOCUS_MODEL,
+  CANVAS_SELECTION_LIST_KEYBOARD_MODEL,
+  CANVAS_SELECTION_LIST_MODEL,
   CANVAS_WHEEL_VIEWPORT_HORIZONTAL_PAN_MODIFIER,
   CANVAS_WHEEL_VIEWPORT_MODEL,
   CANVAS_WHEEL_VIEWPORT_PAN_MODE,
@@ -64,6 +67,7 @@ import {
   createCanvasAppFeaturePackSuiteMarketplaceListing,
   createCanvasAppFeaturePackMarketplaceAssemblyApplyExecutionPlan,
   createCanvasAppFeaturePackMarketplaceUninstallCleanupEffectPlan,
+  createCanvasSelectionListDescriptor,
   createCanvasStoryCanvasFeaturePackAssemblyInput,
   executeCanvasAppAssemblySourceFeaturePackMarketplaceSelectionExecutionApplyTransaction,
   executeCanvasAppAssemblySourceFeaturePackMarketplaceSelectionTargetControlApplyTransaction,
@@ -281,6 +285,9 @@ import {
   getCanvasMenuRovingActiveIndex,
   getCanvasMenuRovingKeyboardIntent,
   getCanvasMenuTriggerKeyboardIntent,
+  getCanvasSelectionListOptionAttributes,
+  getCanvasSelectionListOptionTabIndex,
+  getCanvasSelectionListRootAttributes,
   getCanvasSelectionListKeyboardIntent,
   getCanvasSelectionListModifierState,
   getCanvasSelectionListRangeIds,
@@ -549,10 +556,17 @@ import {
   type CanvasResizeHandleDoubleClickIntentInput,
   type CanvasPointerTransformModifierInput,
   type CanvasPointerTransformModifierState,
+  type CanvasSelectionListDescriptor,
+  type CanvasSelectionListDescriptorInput,
+  type CanvasSelectionListDescriptorSelectionMode,
+  type CanvasSelectionListItemInput,
   type CanvasSelectionListKeyboardIntentInput,
   type CanvasSelectionListModifierInput,
   type CanvasSelectionListModifierState,
+  type CanvasSelectionListOptionAttributes,
+  type CanvasSelectionListOptionDescriptor,
   type CanvasSelectionListRangeInput,
+  type CanvasSelectionListRootAttributes,
   type CanvasSelectionListSelectionPlan,
   type CanvasSelectionListSelectionPlanInput,
   type CanvasSelectionListSelectionMode,
@@ -4232,6 +4246,44 @@ describe('Canvas package consumer imports', () => {
     const selectionListSelectionPlan:
       CanvasSelectionListSelectionPlan<'title' | 'note' | 'image' | 'footer'> =
         getCanvasSelectionListSelectionPlan(selectionListSelectionPlanInput)
+    type PackageSelectionListId = 'title' | 'note' | 'image' | 'footer'
+    const selectionListDescriptorSelectionMode:
+      CanvasSelectionListDescriptorSelectionMode = 'multiple'
+    const selectionListDescriptorInput:
+      CanvasSelectionListDescriptorInput<PackageSelectionListId> = {
+        focusedId: 'note',
+        getOptionId: (_id, index) => `package-option-${index}`,
+        items: [
+          { id: 'title' },
+          { id: 'note' },
+          { disabled: true, id: 'image' },
+          { id: 'footer' },
+        ],
+        listId: 'package-selection-list',
+        selectedIds: ['footer', 'image', 'note'],
+        selectionMode: selectionListDescriptorSelectionMode,
+      }
+    const selectionListDescriptor:
+      CanvasSelectionListDescriptor<PackageSelectionListId> =
+        createCanvasSelectionListDescriptor(selectionListDescriptorInput)
+    const selectionListFirstItem:
+      CanvasSelectionListItemInput<PackageSelectionListId> =
+        selectionListDescriptorInput.items[0]!
+    const selectionListFirstOption:
+      CanvasSelectionListOptionDescriptor<PackageSelectionListId> =
+        selectionListDescriptor.options[0]!
+    const selectionListRootAttributes: CanvasSelectionListRootAttributes =
+      getCanvasSelectionListRootAttributes({
+        listId: 'package-selection-list',
+        selectionMode: selectionListDescriptorSelectionMode,
+      })
+    const selectionListOptionAttributes: CanvasSelectionListOptionAttributes =
+      getCanvasSelectionListOptionAttributes({
+        disabled: true,
+        focusable: false,
+        optionId: 'package-option-2',
+        selected: true,
+      })
     const selectionListKeyboardInput:
       CanvasSelectionListKeyboardIntentInput<
         'title' | 'note' | 'image' | 'footer'
@@ -5005,6 +5057,82 @@ describe('Canvas package consumer imports', () => {
     expect(CanvasAppFacade.getCanvasSelectionListSelectionPlan(
       selectionListSelectionPlanInput,
     )).toEqual(selectionListSelectionPlan)
+    expect(CANVAS_SELECTION_LIST_MODEL).toBe('canvas-selection-list')
+    expect(CanvasAppFacade.CANVAS_SELECTION_LIST_MODEL)
+      .toBe(CANVAS_SELECTION_LIST_MODEL)
+    expect(CANVAS_SELECTION_LIST_FOCUS_MODEL).toBe('roving-tabindex')
+    expect(CanvasAppFacade.CANVAS_SELECTION_LIST_FOCUS_MODEL)
+      .toBe(CANVAS_SELECTION_LIST_FOCUS_MODEL)
+    expect(CANVAS_SELECTION_LIST_KEYBOARD_MODEL)
+      .toBe('aria-listbox-roving-focus')
+    expect(CanvasAppFacade.CANVAS_SELECTION_LIST_KEYBOARD_MODEL)
+      .toBe(CANVAS_SELECTION_LIST_KEYBOARD_MODEL)
+    expect(selectionListDescriptor.selectionMode).toBe('multiple')
+    expect(selectionListDescriptor.focusedId).toBe('note')
+    expect(selectionListDescriptor.focusableOptionId).toBe('package-option-1')
+    expect(selectionListDescriptor.selectedIds).toEqual([
+      'note',
+      'image',
+      'footer',
+    ])
+    expect(selectionListDescriptor.selectedOptionIds).toEqual([
+      'package-option-1',
+      'package-option-2',
+      'package-option-3',
+    ])
+    expect(selectionListDescriptor.rootAttributes).toEqual({
+      'aria-multiselectable': true,
+      id: 'package-selection-list',
+      role: 'listbox',
+    })
+    expect(selectionListFirstItem.id).toBe('title')
+    expect(selectionListFirstOption).toMatchObject({
+      attributes: {
+        'aria-disabled': undefined,
+        'aria-selected': false,
+        id: 'package-option-0',
+        role: 'option',
+        tabIndex: -1,
+      },
+      id: 'title',
+      index: 0,
+      isFocusable: false,
+      isSelected: false,
+      optionId: 'package-option-0',
+    })
+    expect(CanvasAppFacade.createCanvasSelectionListDescriptor(
+      selectionListDescriptorInput,
+    )).toEqual(selectionListDescriptor)
+    expect(selectionListRootAttributes).toEqual({
+      'aria-multiselectable': true,
+      id: 'package-selection-list',
+      role: 'listbox',
+    })
+    expect(CanvasAppFacade.getCanvasSelectionListRootAttributes({
+      listId: 'package-selection-list',
+      selectionMode: selectionListDescriptorSelectionMode,
+    })).toEqual(selectionListRootAttributes)
+    expect(selectionListOptionAttributes).toEqual({
+      'aria-disabled': true,
+      'aria-selected': true,
+      id: 'package-option-2',
+      role: 'option',
+      tabIndex: undefined,
+    })
+    expect(CanvasAppFacade.getCanvasSelectionListOptionAttributes({
+      disabled: true,
+      focusable: false,
+      optionId: 'package-option-2',
+      selected: true,
+    })).toEqual(selectionListOptionAttributes)
+    expect(getCanvasSelectionListOptionTabIndex({
+      disabled: false,
+      focusable: true,
+    })).toBe(0)
+    expect(CanvasAppFacade.getCanvasSelectionListOptionTabIndex({
+      disabled: false,
+      focusable: false,
+    })).toBe(-1)
     expect(getCanvasSelectionListKeyboardIntent(selectionListKeyboardInput))
       .toEqual({
         focusId: 'image',

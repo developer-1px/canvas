@@ -1,4 +1,8 @@
 import type { Bounds } from '../../../src/canvas/core'
+import {
+  CANVAS_SELECTION_LIST_KEYBOARD_MODEL,
+  createCanvasSelectionListDescriptor,
+} from '../../../src/canvas/app/affordances/controls/selection-list/CanvasSelectionListDescriptor'
 
 export type SlideEditRailSlideId = string
 
@@ -221,32 +225,29 @@ export function createSlideEditRailListboxDescriptor<
   getOptionId?: (slideId: TSlideId, index: number) => string
   slideOrder: readonly TSlideId[]
 }): SlideEditRailListboxDescriptor<TSlideId> {
-  const activeIndex = activeSlideId ? slideOrder.indexOf(activeSlideId) : -1
-  const focusableIndex = activeIndex >= 0 ? activeIndex : 0
-  const options = slideOrder.map((slideId, index) => {
-    const isActive = activeSlideId === slideId
-    const isFocusable = index === focusableIndex
-    const tabIndex: -1 | 0 = isFocusable ? 0 : -1
-
-    return {
-      id: getOptionId(slideId, index),
-      index,
-      isActive,
-      isFocusable,
-      isSelected: isActive,
-      slideId,
-      tabIndex,
-    }
+  const descriptor = createCanvasSelectionListDescriptor({
+    focusedId: activeSlideId,
+    getOptionId,
+    items: slideOrder.map((slideId) => ({ id: slideId })),
+    selectedIds: activeSlideId ? [activeSlideId] : [],
+    selectionMode: 'single',
   })
-  const activeOption = options.find((option) => option.isActive) ?? null
-  const focusableOption = options.find((option) => option.isFocusable) ?? null
+  const options = descriptor.options.map((option) => ({
+    id: option.optionId,
+    index: option.index,
+    isActive: option.isSelected,
+    isFocusable: option.isFocusable,
+    isSelected: option.isSelected,
+    slideId: option.id,
+    tabIndex: option.attributes.tabIndex === 0 ? 0 : -1,
+  }))
 
   return {
-    activeOptionId: activeOption?.id ?? null,
-    focusableOptionId: focusableOption?.id ?? null,
-    keyboardModel: 'aria-listbox-roving-focus',
+    activeOptionId: descriptor.selectedOptionIds[0] ?? null,
+    focusableOptionId: descriptor.focusableOptionId,
+    keyboardModel: CANVAS_SELECTION_LIST_KEYBOARD_MODEL,
     options,
-    role: 'listbox',
+    role: descriptor.rootAttributes.role,
     selectionMode: 'single',
   }
 }
