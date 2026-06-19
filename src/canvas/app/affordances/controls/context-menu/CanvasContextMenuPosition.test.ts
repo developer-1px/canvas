@@ -89,6 +89,7 @@ describe('getCanvasContextMenuKeyboardIntent', () => {
     })).toEqual({
       kind: 'open-context-menu',
       preventDefault: true,
+      stopPropagation: true,
     })
 
     expect(getCanvasContextMenuKeyboardIntent({
@@ -97,6 +98,7 @@ describe('getCanvasContextMenuKeyboardIntent', () => {
     })).toEqual({
       kind: 'open-context-menu',
       preventDefault: true,
+      stopPropagation: true,
     })
   })
 

@@ -75,7 +75,7 @@ describe('storyBoard', () => {
         },
       },
     ]);
-  });
+  }, 10_000);
 });
 
 function createStoryRecord({

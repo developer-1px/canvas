@@ -4706,12 +4706,14 @@ describe('Canvas package consumer imports', () => {
       .toEqual({
         kind: 'open-context-menu',
         preventDefault: true,
+        stopPropagation: true,
       })
     expect(CanvasAppFacade.getCanvasContextMenuKeyboardIntent(
       contextMenuKeyboardInput,
     )).toEqual({
       kind: 'open-context-menu',
       preventDefault: true,
+      stopPropagation: true,
     })
     expect(getCanvasContextMenuPosition(contextMenuPositionInput)).toEqual({
       x: 632,

@@ -435,7 +435,14 @@ function CanvasEngineDemoSurface({
       return
     }
 
-    event.preventDefault()
+    if (contextMenuKeyboardIntent.preventDefault) {
+      event.preventDefault()
+    }
+
+    if (contextMenuKeyboardIntent.stopPropagation) {
+      event.stopPropagation()
+    }
+
     setSelectionToolbarVisible(false)
     setContextMenu(getEngineContextMenuPoint({
       app,

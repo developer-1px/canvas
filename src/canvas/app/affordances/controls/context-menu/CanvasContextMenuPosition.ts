@@ -41,6 +41,7 @@ export type CanvasContextMenuKeyboardIntentKind = 'open-context-menu'
 export type CanvasContextMenuKeyboardIntent = {
   kind: CanvasContextMenuKeyboardIntentKind
   preventDefault: true
+  stopPropagation: true
 }
 
 export type CanvasContextMenuKeyboardIntentInput = {
@@ -66,6 +67,7 @@ export function getCanvasContextMenuKeyboardIntent({
     return {
       kind: 'open-context-menu',
       preventDefault: true,
+      stopPropagation: true,
     }
   }
 
