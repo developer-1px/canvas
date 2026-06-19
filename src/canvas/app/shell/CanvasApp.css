@@ -1675,20 +1675,33 @@
 }
 
 .command-palette-backdrop {
+  --canvas-dialog-inset: 14px;
+  --canvas-dialog-top: clamp(10px, 10vh, 72px);
+
   position: absolute;
   inset: 0;
   z-index: 8;
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: 72px 14px 14px;
+  padding:
+    var(--canvas-dialog-top)
+    var(--canvas-dialog-inset)
+    var(--canvas-dialog-inset);
   background: var(--canvas-overlay);
   pointer-events: auto;
 }
 
 .command-palette {
   display: grid;
-  width: min(560px, calc(100vw - 28px));
+  grid-template-rows: auto minmax(0, 1fr);
+  box-sizing: border-box;
+  width: min(560px, calc(100vw - (var(--canvas-dialog-inset, 14px) * 2)));
+  max-height: calc(
+    100vh -
+    var(--canvas-dialog-top, 72px) -
+    var(--canvas-dialog-inset, 14px)
+  );
   overflow: hidden;
   border: 1px solid var(--canvas-floating-border);
   border-radius: 8px;
@@ -1716,7 +1729,16 @@
 .command-palette-list {
   display: grid;
   gap: 2px;
-  max-height: min(420px, calc(100vh - 154px));
+  min-height: 0;
+  max-height: min(
+    420px,
+    calc(
+      100vh -
+      var(--canvas-dialog-top, 72px) -
+      var(--canvas-dialog-inset, 14px) -
+      44px
+    )
+  );
   overflow: auto;
   padding: 6px;
 }
@@ -1783,22 +1805,37 @@
 }
 
 .shortcut-help-backdrop {
+  --canvas-dialog-inset: 14px;
+  --canvas-dialog-top: clamp(10px, 10vh, 72px);
+
   position: absolute;
   inset: 0;
   z-index: 8;
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: 72px 14px 14px;
+  padding:
+    var(--canvas-dialog-top)
+    var(--canvas-dialog-inset)
+    var(--canvas-dialog-inset);
   background: var(--canvas-overlay);
   pointer-events: auto;
 }
 
 .shortcut-help {
   display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
   gap: 0;
-  width: min(640px, calc(100vw - 28px));
-  max-height: min(620px, calc(100vh - 96px));
+  box-sizing: border-box;
+  width: min(640px, calc(100vw - (var(--canvas-dialog-inset, 14px) * 2)));
+  max-height: min(
+    620px,
+    calc(
+      100vh -
+      var(--canvas-dialog-top, 72px) -
+      var(--canvas-dialog-inset, 14px)
+    )
+  );
   overflow: hidden;
   border: 1px solid var(--canvas-floating-border);
   border-radius: 8px;
@@ -1841,6 +1878,7 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px 18px;
+  min-height: 0;
   overflow: auto;
   padding: 14px;
 }
