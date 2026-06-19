@@ -9,8 +9,19 @@ import {
   getSlideEditRailReorderKeyboardShortcutIntent,
   SLIDE_EDIT_RAIL_COMMANDS,
   SLIDE_EDIT_RAIL_KEYBOARD_KEYS,
+  SLIDE_EDIT_RAIL_REORDER_KEYBOARD_ROUTING_PRIORITY,
+  SLIDE_EDIT_RAIL_REORDER_KEYBOARD_SHORTCUT_INTENT,
   SLIDE_EDIT_RAIL_REORDER_KEYBOARD_SHORTCUT_KEYS,
+  SLIDE_EDIT_RAIL_REORDER_KEYBOARD_SHORTCUT_MODEL,
+  SLIDE_EDIT_RAIL_REORDER_MOVE_DOWN_SHORTCUT,
+  SLIDE_EDIT_RAIL_REORDER_MOVE_TO_END_SHORTCUT,
+  SLIDE_EDIT_RAIL_REORDER_MOVE_TO_START_SHORTCUT,
+  SLIDE_EDIT_RAIL_REORDER_MOVE_UP_SHORTCUT,
 } from './SlideEditRailInteractions'
+import {
+  SLIDE_EDIT_RAIL_REORDER_KEYBOARD_SHORTCUT_MODEL as SLIDE_EDIT_RAIL_REORDER_KEYBOARD_SHORTCUT_MODEL_FROM_PACKAGE,
+  SLIDE_EDIT_RAIL_REORDER_MOVE_UP_SHORTCUT as SLIDE_EDIT_RAIL_REORDER_MOVE_UP_SHORTCUT_FROM_PACKAGE,
+} from './index'
 
 describe('SlideEditRailInteractions', () => {
   const slideOrder = ['slide-a', 'slide-b', 'slide-c'] as const
@@ -116,9 +127,30 @@ describe('SlideEditRailInteractions', () => {
     expect(SLIDE_EDIT_RAIL_KEYBOARD_KEYS).toBe(
       'ArrowUp ArrowDown Home End Enter Space',
     )
+    expect(SLIDE_EDIT_RAIL_REORDER_MOVE_UP_SHORTCUT).toBe('Cmd/Ctrl+Up')
+    expect(SLIDE_EDIT_RAIL_REORDER_MOVE_DOWN_SHORTCUT).toBe('Cmd/Ctrl+Down')
+    expect(SLIDE_EDIT_RAIL_REORDER_MOVE_TO_START_SHORTCUT).toBe(
+      'Cmd/Ctrl+Shift+Up',
+    )
+    expect(SLIDE_EDIT_RAIL_REORDER_MOVE_TO_END_SHORTCUT).toBe(
+      'Cmd/Ctrl+Shift+Down',
+    )
     expect(SLIDE_EDIT_RAIL_REORDER_KEYBOARD_SHORTCUT_KEYS).toBe(
       'Cmd/Ctrl+Up Cmd/Ctrl+Down Cmd/Ctrl+Shift+Up Cmd/Ctrl+Shift+Down',
     )
+    expect(SLIDE_EDIT_RAIL_REORDER_KEYBOARD_SHORTCUT_MODEL).toBe(
+      'slide-edit-rail-reorder-keyboard-shortcuts',
+    )
+    expect(SLIDE_EDIT_RAIL_REORDER_KEYBOARD_SHORTCUT_INTENT).toBe(
+      'slide-edit-rail-reorder-keyboard-intent',
+    )
+    expect(SLIDE_EDIT_RAIL_REORDER_KEYBOARD_ROUTING_PRIORITY).toBe(
+      'rail-focus-before-host-command',
+    )
+    expect(SLIDE_EDIT_RAIL_REORDER_KEYBOARD_SHORTCUT_MODEL_FROM_PACKAGE)
+      .toBe(SLIDE_EDIT_RAIL_REORDER_KEYBOARD_SHORTCUT_MODEL)
+    expect(SLIDE_EDIT_RAIL_REORDER_MOVE_UP_SHORTCUT_FROM_PACKAGE)
+      .toBe(SLIDE_EDIT_RAIL_REORDER_MOVE_UP_SHORTCUT)
   })
 
   it('converts keyboard intents to host command effects', () => {

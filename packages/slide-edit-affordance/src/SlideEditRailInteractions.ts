@@ -70,8 +70,20 @@ export const SLIDE_EDIT_RAIL_COMMANDS = Object.freeze([
 
 export const SLIDE_EDIT_RAIL_KEYBOARD_KEYS =
   'ArrowUp ArrowDown Home End Enter Space'
+export const SLIDE_EDIT_RAIL_REORDER_MOVE_UP_SHORTCUT = 'Cmd/Ctrl+Up'
+export const SLIDE_EDIT_RAIL_REORDER_MOVE_DOWN_SHORTCUT = 'Cmd/Ctrl+Down'
+export const SLIDE_EDIT_RAIL_REORDER_MOVE_TO_START_SHORTCUT =
+  'Cmd/Ctrl+Shift+Up'
+export const SLIDE_EDIT_RAIL_REORDER_MOVE_TO_END_SHORTCUT =
+  'Cmd/Ctrl+Shift+Down'
 export const SLIDE_EDIT_RAIL_REORDER_KEYBOARD_SHORTCUT_KEYS =
-  'Cmd/Ctrl+Up Cmd/Ctrl+Down Cmd/Ctrl+Shift+Up Cmd/Ctrl+Shift+Down'
+  `${SLIDE_EDIT_RAIL_REORDER_MOVE_UP_SHORTCUT} ${SLIDE_EDIT_RAIL_REORDER_MOVE_DOWN_SHORTCUT} ${SLIDE_EDIT_RAIL_REORDER_MOVE_TO_START_SHORTCUT} ${SLIDE_EDIT_RAIL_REORDER_MOVE_TO_END_SHORTCUT}`
+export const SLIDE_EDIT_RAIL_REORDER_KEYBOARD_SHORTCUT_MODEL =
+  'slide-edit-rail-reorder-keyboard-shortcuts'
+export const SLIDE_EDIT_RAIL_REORDER_KEYBOARD_SHORTCUT_INTENT =
+  'slide-edit-rail-reorder-keyboard-intent'
+export const SLIDE_EDIT_RAIL_REORDER_KEYBOARD_ROUTING_PRIORITY =
+  'rail-focus-before-host-command'
 
 export type SlideEditRailCommand<
   TSlideId extends SlideEditRailSlideId = SlideEditRailSlideId,
