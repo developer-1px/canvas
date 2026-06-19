@@ -119,8 +119,89 @@ export type SlideEditObjectHyperlinkHostCommandEffect<
   type: 'slide-command-effect'
 }
 
+export type SlideEditObjectHyperlinkDataTransfer = Pick<
+  DataTransfer,
+  'getData'
+>
+
+export type SlideEditObjectHyperlinkPasteFieldValue = {
+  fieldId: SlideEditObjectHyperlinkFieldId
+  value: string | null
+}
+
+export type SlideEditObjectHyperlinkJSONPasteValue =
+  | {
+    fields: readonly SlideEditObjectHyperlinkPasteFieldValue[]
+    hyperlink: SlideEditObjectHyperlink
+    kind: 'set-hyperlink'
+    surface: 'object-hyperlink'
+  }
+  | {
+    hyperlink: SlideEditObjectHyperlink
+    kind: 'remove-hyperlink'
+    surface: 'object-hyperlink'
+  }
+
+export type SlideEditObjectHyperlinkJSONPasteInput = {
+  allowedSchemes?: readonly string[]
+  dataTransfer: SlideEditObjectHyperlinkDataTransfer | null
+  jsonMimeType?: string
+  storagePolicy?: SlideEditObjectHyperlinkUrlStoragePolicy
+}
+
+export type SlideEditObjectHyperlinkJSONPasteValueMode =
+  | 'direct'
+  | 'wrapped'
+
+export type SlideEditObjectHyperlinkJSONPasteValueOptions = {
+  allowedSchemes?: readonly string[]
+  mode?: SlideEditObjectHyperlinkJSONPasteValueMode
+  storagePolicy?: SlideEditObjectHyperlinkUrlStoragePolicy
+}
+
+export type SlideEditObjectHyperlinkPasteCommandsInput<
+  TSlideId extends SlideEditObjectHyperlinkSlideId =
+    SlideEditObjectHyperlinkSlideId,
+  TObjectId extends SlideEditObjectHyperlinkObjectId =
+    SlideEditObjectHyperlinkObjectId,
+> = {
+  objectId: TObjectId
+  pasteValue: SlideEditObjectHyperlinkJSONPasteValue
+  slideId: TSlideId
+}
+
+type SlideEditObjectHyperlinkJSONPasteOptions = {
+  allowedSchemes: readonly string[]
+  storagePolicy: SlideEditObjectHyperlinkUrlStoragePolicy
+}
+
 export const SLIDE_EDIT_OBJECT_HYPERLINK_DATA_ATTRIBUTE =
   'data-slide-object-hyperlink'
+
+export const SLIDE_EDIT_OBJECT_HYPERLINK_JSON_MIME_TYPE =
+  'application/vnd.interactive-os.slide-edit.object-hyperlink+json'
+
+export const SLIDE_EDIT_OBJECT_HYPERLINK_JSON_TYPES = Object.freeze([
+  'application/json',
+  'text/json',
+  'text/plain',
+] as const)
+
+export const SLIDE_EDIT_OBJECT_HYPERLINK_JSON_WRAPPER_KEYS = Object.freeze([
+  'objectHyperlink',
+  'hyperlink',
+  'link',
+] as const)
+
+const SLIDE_EDIT_OBJECT_HYPERLINK_DIRECT_URL_KEYS = Object.freeze([
+  'url',
+  'href',
+  'value',
+] as const)
+
+const SLIDE_EDIT_OBJECT_HYPERLINK_INVALID_JSON = Symbol(
+  'slide-edit-object-hyperlink-invalid-json',
+)
 
 export const SLIDE_EDIT_OBJECT_HYPERLINK_DEFAULT = Object.freeze({
   target: 'same-context',
@@ -213,6 +294,116 @@ export function getSlideEditObjectHyperlinkCommandEffect<
     },
     type: 'slide-command-effect',
   }
+}
+
+export function getSlideEditObjectHyperlinkJSONPasteValue({
+  allowedSchemes = SLIDE_EDIT_OBJECT_HYPERLINK_ALLOWED_SCHEMES,
+  dataTransfer,
+  jsonMimeType = SLIDE_EDIT_OBJECT_HYPERLINK_JSON_MIME_TYPE,
+  storagePolicy = {},
+}: SlideEditObjectHyperlinkJSONPasteInput):
+  SlideEditObjectHyperlinkJSONPasteValue | null {
+  if (!dataTransfer) {
+    return null
+  }
+
+  if (jsonMimeType) {
+    const customText = dataTransfer.getData(jsonMimeType)
+
+    if (customText.trim()) {
+      const customPasteValue = getSlideEditObjectHyperlinkJSONPasteValueFromText(
+        customText,
+        {
+          allowedSchemes,
+          mode: 'direct',
+          storagePolicy,
+        },
+      )
+
+      if (customPasteValue !== null) {
+        return customPasteValue
+      }
+    }
+  }
+
+  for (const type of SLIDE_EDIT_OBJECT_HYPERLINK_JSON_TYPES) {
+    const text = dataTransfer.getData(type)
+
+    if (!text.trim()) {
+      continue
+    }
+
+    const pasteValue = getSlideEditObjectHyperlinkJSONPasteValueFromText(
+      text,
+      {
+        allowedSchemes,
+        mode: 'wrapped',
+        storagePolicy,
+      },
+    )
+
+    if (pasteValue !== null) {
+      return pasteValue
+    }
+  }
+
+  return null
+}
+
+export function getSlideEditObjectHyperlinkJSONPasteValueFromText(
+  text: string,
+  options?: SlideEditObjectHyperlinkJSONPasteValueOptions,
+): SlideEditObjectHyperlinkJSONPasteValue | null {
+  return getSlideEditObjectHyperlinkJSONPasteValueFromValue(
+    parseSlideEditObjectHyperlinkJSON(text),
+    options,
+  )
+}
+
+export function getSlideEditObjectHyperlinkJSONPasteValueFromValue(
+  value: unknown,
+  {
+    allowedSchemes = SLIDE_EDIT_OBJECT_HYPERLINK_ALLOWED_SCHEMES,
+    mode = 'direct',
+    storagePolicy = {},
+  }: SlideEditObjectHyperlinkJSONPasteValueOptions = {},
+): SlideEditObjectHyperlinkJSONPasteValue | null {
+  const options = {
+    allowedSchemes,
+    storagePolicy,
+  } satisfies SlideEditObjectHyperlinkJSONPasteOptions
+
+  return mode === 'wrapped'
+    ? getSlideEditObjectHyperlinkWrappedPasteValue(value, options)
+    : getSlideEditObjectHyperlinkDirectPasteValue(value, options)
+}
+
+export function getSlideEditObjectHyperlinkPasteCommands<
+  TSlideId extends SlideEditObjectHyperlinkSlideId,
+  TObjectId extends SlideEditObjectHyperlinkObjectId,
+>({
+  objectId,
+  pasteValue,
+  slideId,
+}: SlideEditObjectHyperlinkPasteCommandsInput<TSlideId, TObjectId>):
+  readonly SlideEditObjectHyperlinkCommand<TSlideId, TObjectId>[] {
+  if (pasteValue.kind === 'remove-hyperlink') {
+    return [
+      {
+        id: 'remove-object-hyperlink',
+        objectId,
+        slideId,
+      },
+    ]
+  }
+
+  return pasteValue.fields.map((field) => ({
+    fieldId: field.fieldId,
+    id: 'update-object-hyperlink',
+    objectId,
+    slideId,
+    value: field.value,
+  }))
 }
 
 export function normalizeSlideEditObjectHyperlinkCommand<
@@ -417,4 +608,193 @@ function hasSlideEditObjectHyperlinkControlCharacter(value: string) {
 
     return code <= 31 || code === 127
   })
+}
+
+function getSlideEditObjectHyperlinkDirectPasteValue(
+  value: unknown,
+  options: SlideEditObjectHyperlinkJSONPasteOptions,
+): SlideEditObjectHyperlinkJSONPasteValue | null {
+  const directUrlPasteValue = getSlideEditObjectHyperlinkURLPasteValue(
+    value,
+    options,
+  )
+
+  if (directUrlPasteValue !== null) {
+    return directUrlPasteValue
+  }
+
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null
+  }
+
+  const record = value as Record<string, unknown>
+
+  for (const key of SLIDE_EDIT_OBJECT_HYPERLINK_DIRECT_URL_KEYS) {
+    if (!Object.hasOwn(record, key)) {
+      continue
+    }
+
+    const pasteValue = getSlideEditObjectHyperlinkURLPasteValue(
+      record[key],
+      options,
+      record,
+    )
+
+    if (pasteValue !== null) {
+      return pasteValue
+    }
+  }
+
+  return null
+}
+
+function getSlideEditObjectHyperlinkWrappedPasteValue(
+  value: unknown,
+  options: SlideEditObjectHyperlinkJSONPasteOptions,
+): SlideEditObjectHyperlinkJSONPasteValue | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null
+  }
+
+  const record = value as Record<string, unknown>
+
+  for (const key of SLIDE_EDIT_OBJECT_HYPERLINK_JSON_WRAPPER_KEYS) {
+    if (!Object.hasOwn(record, key)) {
+      continue
+    }
+
+    const pasteValue = getSlideEditObjectHyperlinkDirectPasteValue(
+      record[key],
+      options,
+    )
+
+    if (pasteValue !== null) {
+      return pasteValue
+    }
+  }
+
+  return null
+}
+
+function getSlideEditObjectHyperlinkURLPasteValue(
+  value: unknown,
+  {
+    allowedSchemes,
+    storagePolicy,
+  }: SlideEditObjectHyperlinkJSONPasteOptions,
+  context?: Record<string, unknown>,
+): SlideEditObjectHyperlinkJSONPasteValue | null {
+  if (value === null || value === false) {
+    return getSlideEditObjectHyperlinkRemovePasteValue()
+  }
+
+  if (typeof value !== 'string') {
+    return null
+  }
+
+  if (!value.trim()) {
+    return getSlideEditObjectHyperlinkRemovePasteValue()
+  }
+
+  const normalizedUrl = normalizeSlideEditObjectHyperlinkStorageUrl(
+    value,
+    storagePolicy,
+  )
+
+  if (normalizedUrl === null) {
+    return null
+  }
+
+  const validation = getSlideEditObjectHyperlinkValidation({
+    allowedSchemes,
+    url: normalizedUrl,
+  })
+
+  if (!validation.isAllowed) {
+    return null
+  }
+
+  return getSlideEditObjectHyperlinkSetPasteValue({
+    context,
+    url: normalizedUrl,
+  })
+}
+
+function getSlideEditObjectHyperlinkSetPasteValue({
+  context,
+  url,
+}: {
+  context?: Record<string, unknown>
+  url: string
+}): SlideEditObjectHyperlinkJSONPasteValue {
+  const hasTarget = context ? Object.hasOwn(context, 'target') : false
+  const hasTitle = context ? Object.hasOwn(context, 'title') : false
+  const target = hasTarget
+    ? normalizeSlideEditObjectHyperlinkTarget(
+      getSlideEditObjectHyperlinkString(context?.target),
+    )
+    : SLIDE_EDIT_OBJECT_HYPERLINK_DEFAULT.target
+  const title = hasTitle
+    ? normalizeSlideEditObjectHyperlinkTitle(
+      getSlideEditObjectHyperlinkString(context?.title),
+    )
+    : SLIDE_EDIT_OBJECT_HYPERLINK_DEFAULT.title
+  const fields: SlideEditObjectHyperlinkPasteFieldValue[] = [
+    {
+      fieldId: 'url',
+      value: url,
+    },
+  ]
+
+  if (hasTarget) {
+    fields.push({
+      fieldId: 'target',
+      value: target,
+    })
+  }
+
+  if (hasTitle) {
+    fields.push({
+      fieldId: 'title',
+      value: title,
+    })
+  }
+
+  return {
+    fields,
+    hyperlink: {
+      target,
+      title,
+      url,
+    },
+    kind: 'set-hyperlink',
+    surface: 'object-hyperlink',
+  }
+}
+
+function getSlideEditObjectHyperlinkRemovePasteValue():
+  SlideEditObjectHyperlinkJSONPasteValue {
+  return {
+    hyperlink: {
+      ...SLIDE_EDIT_OBJECT_HYPERLINK_DEFAULT,
+    },
+    kind: 'remove-hyperlink',
+    surface: 'object-hyperlink',
+  }
+}
+
+function getSlideEditObjectHyperlinkString(value: unknown) {
+  return typeof value === 'string' ? value : null
+}
+
+function parseSlideEditObjectHyperlinkJSON(value: string) {
+  if (!value.trim()) {
+    return null
+  }
+
+  try {
+    return JSON.parse(value) as unknown
+  } catch {
+    return SLIDE_EDIT_OBJECT_HYPERLINK_INVALID_JSON
+  }
 }

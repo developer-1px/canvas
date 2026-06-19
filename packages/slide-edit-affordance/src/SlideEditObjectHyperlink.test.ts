@@ -3,7 +3,11 @@ import { describe, expect, it } from 'vitest'
 import {
   createSlideEditObjectHyperlinkDescriptor,
   getSlideEditObjectHyperlinkCommandEffect,
+  getSlideEditObjectHyperlinkJSONPasteValue,
+  getSlideEditObjectHyperlinkJSONPasteValueFromText,
+  getSlideEditObjectHyperlinkJSONPasteValueFromValue,
   getSlideEditObjectHyperlinkMetadata,
+  getSlideEditObjectHyperlinkPasteCommands,
   getSlideEditObjectHyperlinkValidation,
   normalizeSlideEditObjectHyperlink,
   normalizeSlideEditObjectHyperlinkFieldValue,
@@ -13,9 +17,15 @@ import {
   SLIDE_EDIT_OBJECT_HYPERLINK_DATA_ATTRIBUTE,
   SLIDE_EDIT_OBJECT_HYPERLINK_DEFAULT,
   SLIDE_EDIT_OBJECT_HYPERLINK_FIELDS,
+  SLIDE_EDIT_OBJECT_HYPERLINK_JSON_MIME_TYPE,
   SLIDE_EDIT_OBJECT_HYPERLINK_TARGET_OPTIONS,
   toSlideEditObjectHyperlinkAttributeValue,
 } from './SlideEditObjectHyperlink'
+import {
+  getSlideEditObjectHyperlinkJSONPasteValue as getSlideEditObjectHyperlinkJSONPasteValueFromPackage,
+  getSlideEditObjectHyperlinkJSONPasteValueFromText as getSlideEditObjectHyperlinkJSONPasteValueFromTextFromPackage,
+  getSlideEditObjectHyperlinkJSONPasteValueFromValue as getSlideEditObjectHyperlinkJSONPasteValueFromValueFromPackage,
+} from './index'
 
 describe('SlideEditObjectHyperlink', () => {
   it('creates a disabled object hyperlink descriptor by default', () => {
@@ -194,6 +204,293 @@ describe('SlideEditObjectHyperlink', () => {
     })
   })
 
+  it('reads custom MIME direct object hyperlink JSON values first', () => {
+    expect(getSlideEditObjectHyperlinkJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_OBJECT_HYPERLINK_JSON_MIME_TYPE]:
+          '" https://example.com/reference "',
+        'application/json': '{"link":false}',
+      }),
+      storagePolicy: {
+        maxLength: 19,
+      },
+    })).toEqual({
+      fields: [
+        {
+          fieldId: 'url',
+          value: 'https://example.com',
+        },
+      ],
+      hyperlink: {
+        target: 'same-context',
+        title: '',
+        url: 'https://example.com',
+      },
+      kind: 'set-hyperlink',
+      surface: 'object-hyperlink',
+    })
+    expect(getSlideEditObjectHyperlinkJSONPasteValueFromPackage({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_OBJECT_HYPERLINK_JSON_MIME_TYPE]: JSON.stringify({
+          href: 'mailto:hello@example.com',
+          target: 'new-context',
+          title: ' Contact ',
+        }),
+      }),
+    })).toEqual({
+      fields: [
+        {
+          fieldId: 'url',
+          value: 'mailto:hello@example.com',
+        },
+        {
+          fieldId: 'target',
+          value: 'new-context',
+        },
+        {
+          fieldId: 'title',
+          value: 'Contact',
+        },
+      ],
+      hyperlink: {
+        target: 'new-context',
+        title: 'Contact',
+        url: 'mailto:hello@example.com',
+      },
+      kind: 'set-hyperlink',
+      surface: 'object-hyperlink',
+    })
+  })
+
+  it('reads explicit object hyperlink wrappers from general JSON candidates', () => {
+    expect(getSlideEditObjectHyperlinkJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'application/json':
+          '{"objectHyperlink":{"url":"https://example.com/docs"}}',
+      }),
+    })).toMatchObject({
+      fields: [
+        {
+          fieldId: 'url',
+          value: 'https://example.com/docs',
+        },
+      ],
+      kind: 'set-hyperlink',
+    })
+    expect(getSlideEditObjectHyperlinkJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/json': '{"hyperlink":{"href":"http://example.com"}}',
+      }),
+    })).toMatchObject({
+      hyperlink: {
+        url: 'http://example.com',
+      },
+      kind: 'set-hyperlink',
+    })
+    expect(getSlideEditObjectHyperlinkJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"link":false}',
+      }),
+    })).toEqual({
+      hyperlink: SLIDE_EDIT_OBJECT_HYPERLINK_DEFAULT,
+      kind: 'remove-hyperlink',
+      surface: 'object-hyperlink',
+    })
+  })
+
+  it('reads object hyperlink JSON from text and parsed values', () => {
+    expect(getSlideEditObjectHyperlinkJSONPasteValueFromText(
+      '" https://example.com/reference "',
+      {
+        storagePolicy: {
+          maxLength: 19,
+        },
+      },
+    )).toEqual({
+      fields: [
+        {
+          fieldId: 'url',
+          value: 'https://example.com',
+        },
+      ],
+      hyperlink: {
+        target: 'same-context',
+        title: '',
+        url: 'https://example.com',
+      },
+      kind: 'set-hyperlink',
+      surface: 'object-hyperlink',
+    })
+
+    expect(getSlideEditObjectHyperlinkJSONPasteValueFromValue({
+      href: 'mailto:hello@example.com',
+      target: 'new-context',
+      title: ' Contact ',
+    })).toEqual({
+      fields: [
+        {
+          fieldId: 'url',
+          value: 'mailto:hello@example.com',
+        },
+        {
+          fieldId: 'target',
+          value: 'new-context',
+        },
+        {
+          fieldId: 'title',
+          value: 'Contact',
+        },
+      ],
+      hyperlink: {
+        target: 'new-context',
+        title: 'Contact',
+        url: 'mailto:hello@example.com',
+      },
+      kind: 'set-hyperlink',
+      surface: 'object-hyperlink',
+    })
+
+    expect(getSlideEditObjectHyperlinkJSONPasteValueFromTextFromPackage(
+      '{"hyperlink":{"href":"http://example.com"}}',
+      { mode: 'wrapped' },
+    )).toMatchObject({
+      hyperlink: {
+        url: 'http://example.com',
+      },
+      kind: 'set-hyperlink',
+    })
+
+    expect(getSlideEditObjectHyperlinkJSONPasteValueFromValueFromPackage(
+      { link: false },
+      { mode: 'wrapped' },
+    )).toEqual({
+      hyperlink: SLIDE_EDIT_OBJECT_HYPERLINK_DEFAULT,
+      kind: 'remove-hyperlink',
+      surface: 'object-hyperlink',
+    })
+  })
+
+  it('converts object hyperlink paste values into host commands', () => {
+    const pasteValue = getSlideEditObjectHyperlinkJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': JSON.stringify({
+          link: {
+            target: 'new-context',
+            title: 'Docs',
+            url: 'https://example.com/docs',
+          },
+        }),
+      }),
+    })
+
+    expect(getSlideEditObjectHyperlinkPasteCommands({
+      objectId: 'object-a',
+      pasteValue: pasteValue!,
+      slideId: 'slide-a',
+    })).toEqual([
+      {
+        fieldId: 'url',
+        id: 'update-object-hyperlink',
+        objectId: 'object-a',
+        slideId: 'slide-a',
+        value: 'https://example.com/docs',
+      },
+      {
+        fieldId: 'target',
+        id: 'update-object-hyperlink',
+        objectId: 'object-a',
+        slideId: 'slide-a',
+        value: 'new-context',
+      },
+      {
+        fieldId: 'title',
+        id: 'update-object-hyperlink',
+        objectId: 'object-a',
+        slideId: 'slide-a',
+        value: 'Docs',
+      },
+    ])
+    expect(getSlideEditObjectHyperlinkCommandEffect(
+      getSlideEditObjectHyperlinkPasteCommands({
+        objectId: 'object-a',
+        pasteValue: pasteValue!,
+        slideId: 'slide-a',
+      })[0],
+    ).type).toBe('slide-command-effect')
+
+    const removePasteValue = getSlideEditObjectHyperlinkJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_OBJECT_HYPERLINK_JSON_MIME_TYPE]: 'null',
+      }),
+    })
+
+    expect(getSlideEditObjectHyperlinkPasteCommands({
+      objectId: 'object-a',
+      pasteValue: removePasteValue!,
+      slideId: 'slide-a',
+    })).toEqual([
+      {
+        id: 'remove-object-hyperlink',
+        objectId: 'object-a',
+        slideId: 'slide-a',
+      },
+    ])
+    expect(getSlideEditObjectHyperlinkCommandEffect(
+      getSlideEditObjectHyperlinkPasteCommands({
+        objectId: 'object-a',
+        pasteValue: removePasteValue!,
+        slideId: 'slide-a',
+      })[0],
+    ).payload.id).toBe('remove-object-hyperlink')
+  })
+
+  it('ignores invalid, unrelated, and direct generic hyperlink JSON', () => {
+    expect(getSlideEditObjectHyperlinkJSONPasteValue({
+      dataTransfer: null,
+    })).toBeNull()
+    expect(getSlideEditObjectHyperlinkJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '"https://example.com"',
+      }),
+    })).toBeNull()
+    expect(getSlideEditObjectHyperlinkJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"url":"https://example.com"}',
+      }),
+    })).toBeNull()
+    expect(getSlideEditObjectHyperlinkJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"unrelated":false}',
+      }),
+    })).toBeNull()
+    expect(getSlideEditObjectHyperlinkJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"linkPreview":{"url":"https://example.com"}}',
+      }),
+    })).toBeNull()
+    expect(getSlideEditObjectHyperlinkJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"link":"example.com"}',
+      }),
+    })).toBeNull()
+    expect(getSlideEditObjectHyperlinkJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"link":"javascript:alert(1)"}',
+      }),
+    })).toBeNull()
+    expect(getSlideEditObjectHyperlinkJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_OBJECT_HYPERLINK_JSON_MIME_TYPE]:
+          '"https://example.com/\\u0007bad"',
+      }),
+    })).toBeNull()
+    expect(getSlideEditObjectHyperlinkJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_OBJECT_HYPERLINK_JSON_MIME_TYPE]: 'not json',
+      }),
+    })).toBeNull()
+  })
+
   it('separates object action metadata from link preview import strings', () => {
     const publicStrings = JSON.stringify({
       descriptor: createSlideEditObjectHyperlinkDescriptor({
@@ -220,3 +517,13 @@ describe('SlideEditObjectHyperlink', () => {
     }
   })
 })
+
+function createDataTransfer(
+  values: Record<string, string>,
+): Pick<DataTransfer, 'getData'> {
+  return {
+    getData(type) {
+      return values[type] ?? ''
+    },
+  }
+}
