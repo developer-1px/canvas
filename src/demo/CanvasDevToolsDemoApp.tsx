@@ -63,6 +63,9 @@ import {
 import {
   isCanvasEngineDemoControlTarget,
 } from './CanvasEngineDemoControlTarget'
+import {
+  isCanvasEngineDemoSelectionPointerButton,
+} from './CanvasEngineDemoPointerIntent'
 import { EngineSelectionToolbar } from './CanvasDevToolsSelectionToolbar'
 import {
   applyCanvasEngineDemoFeaturePackSwitchToAssemblySource,
@@ -350,7 +353,10 @@ function CanvasEngineDemoSurface({
       return
     }
 
-    if (isCanvasEngineDemoControlTarget(event.target)) {
+    if (
+      !isCanvasEngineDemoSelectionPointerButton(event) ||
+      isCanvasEngineDemoControlTarget(event.target)
+    ) {
       return
     }
 
@@ -396,7 +402,10 @@ function CanvasEngineDemoSurface({
       return
     }
 
-    if (isCanvasEngineDemoControlTarget(event.target)) {
+    if (
+      !isCanvasEngineDemoSelectionPointerButton(event) ||
+      isCanvasEngineDemoControlTarget(event.target)
+    ) {
       return
     }
 
