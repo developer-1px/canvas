@@ -225,6 +225,15 @@ export type SlideEditLayerPaneRenameJSONPasteInput = {
   jsonMimeTypes?: readonly string[]
 }
 
+export type SlideEditLayerPaneRenameJSONPasteValueMode =
+  | 'any'
+  | 'direct'
+  | 'wrapped'
+
+export type SlideEditLayerPaneRenameJSONPasteValueOptions = {
+  mode?: SlideEditLayerPaneRenameJSONPasteValueMode
+}
+
 export type SlideEditLayerPaneRenamePasteCommandEffectInput<
   TSlideId extends SlideEditLayerPaneSlideId = SlideEditLayerPaneSlideId,
   TObjectId extends SlideEditLayerPaneObjectId = SlideEditLayerPaneObjectId,
@@ -260,6 +269,15 @@ export type SlideEditLayerPaneObjectLayerJSONPasteInput = {
   jsonMimeType?: string
 }
 
+export type SlideEditLayerPaneObjectLayerJSONPasteValueMode =
+  | 'any'
+  | 'direct'
+  | 'wrapped'
+
+export type SlideEditLayerPaneObjectLayerJSONPasteValueOptions = {
+  mode?: SlideEditLayerPaneObjectLayerJSONPasteValueMode
+}
+
 export type SlideEditLayerPaneObjectLayerPasteCommandEffectInput<
   TSlideId extends SlideEditLayerPaneSlideId = SlideEditLayerPaneSlideId,
   TObjectId extends SlideEditLayerPaneObjectId = SlideEditLayerPaneObjectId,
@@ -289,6 +307,15 @@ export type SlideEditLayerPaneObjectStateJSONPasteValue = {
 export type SlideEditLayerPaneObjectStateJSONPasteInput = {
   dataTransfer: SlideEditLayerPaneDataTransfer | null
   jsonMimeType?: string
+}
+
+export type SlideEditLayerPaneObjectStateJSONPasteValueMode =
+  | 'any'
+  | 'direct'
+  | 'wrapped'
+
+export type SlideEditLayerPaneObjectStateJSONPasteValueOptions = {
+  mode?: SlideEditLayerPaneObjectStateJSONPasteValueMode
 }
 
 export type SlideEditLayerPaneObjectStatePasteCommandEffectsInput<
@@ -641,19 +668,13 @@ export function getSlideEditLayerPaneRenameJSONPasteValue({
       continue
     }
 
-    const value = parseSlideEditLayerPaneRenameJSON(text)
-    const directPasteValue =
-      getSlideEditLayerPaneRenameDirectJSONPasteValue(value)
+    const pasteValue = getSlideEditLayerPaneRenameJSONPasteValueFromText(
+      text,
+      { mode: 'any' },
+    )
 
-    if (directPasteValue !== null) {
-      return directPasteValue
-    }
-
-    const wrappedPasteValue =
-      getSlideEditLayerPaneRenameWrappedJSONPasteValue(value)
-
-    if (wrappedPasteValue !== null) {
-      return wrappedPasteValue
+    if (pasteValue !== null) {
+      return pasteValue
     }
   }
 
@@ -664,8 +685,10 @@ export function getSlideEditLayerPaneRenameJSONPasteValue({
       continue
     }
 
-    const value = parseSlideEditLayerPaneRenameJSON(text)
-    const pasteValue = getSlideEditLayerPaneRenameWrappedJSONPasteValue(value)
+    const pasteValue = getSlideEditLayerPaneRenameJSONPasteValueFromText(
+      text,
+      { mode: 'wrapped' },
+    )
 
     if (pasteValue !== null) {
       return pasteValue
@@ -673,6 +696,33 @@ export function getSlideEditLayerPaneRenameJSONPasteValue({
   }
 
   return null
+}
+
+export function getSlideEditLayerPaneRenameJSONPasteValueFromText(
+  text: string,
+  options?: SlideEditLayerPaneRenameJSONPasteValueOptions,
+): SlideEditLayerPaneRenameJSONPasteValue | null {
+  return getSlideEditLayerPaneRenameJSONPasteValueFromValue(
+    parseSlideEditLayerPaneRenameJSON(text),
+    options,
+  )
+}
+
+export function getSlideEditLayerPaneRenameJSONPasteValueFromValue(
+  value: unknown,
+  {
+    mode = 'direct',
+  }: SlideEditLayerPaneRenameJSONPasteValueOptions = {},
+): SlideEditLayerPaneRenameJSONPasteValue | null {
+  switch (mode) {
+    case 'direct':
+      return getSlideEditLayerPaneRenameDirectJSONPasteValue(value)
+    case 'wrapped':
+      return getSlideEditLayerPaneRenameWrappedJSONPasteValue(value)
+    case 'any':
+      return getSlideEditLayerPaneRenameDirectJSONPasteValue(value) ??
+        getSlideEditLayerPaneRenameWrappedJSONPasteValue(value)
+  }
 }
 
 export function getSlideEditLayerPaneRenamePasteCommandEffect<
@@ -712,9 +762,11 @@ export function getSlideEditLayerPaneObjectLayerJSONPasteValue({
     const customText = dataTransfer.getData(jsonMimeType)
 
     if (customText.trim()) {
-      const customValue = parseSlideEditLayerPaneJSON(customText)
       const customPasteValue =
-        getSlideEditLayerPaneObjectLayerAnyJSONPasteValue(customValue)
+        getSlideEditLayerPaneObjectLayerJSONPasteValueFromText(
+          customText,
+          { mode: 'any' },
+        )
 
       if (customPasteValue !== null) {
         return customPasteValue
@@ -729,9 +781,10 @@ export function getSlideEditLayerPaneObjectLayerJSONPasteValue({
       continue
     }
 
-    const value = parseSlideEditLayerPaneJSON(text)
-    const pasteValue =
-      getSlideEditLayerPaneObjectLayerAnyJSONPasteValue(value)
+    const pasteValue = getSlideEditLayerPaneObjectLayerJSONPasteValueFromText(
+      text,
+      { mode: 'any' },
+    )
 
     if (pasteValue !== null) {
       return pasteValue
@@ -739,6 +792,32 @@ export function getSlideEditLayerPaneObjectLayerJSONPasteValue({
   }
 
   return null
+}
+
+export function getSlideEditLayerPaneObjectLayerJSONPasteValueFromText(
+  text: string,
+  options?: SlideEditLayerPaneObjectLayerJSONPasteValueOptions,
+): SlideEditLayerPaneObjectLayerJSONPasteValue | null {
+  return getSlideEditLayerPaneObjectLayerJSONPasteValueFromValue(
+    parseSlideEditLayerPaneJSON(text),
+    options,
+  )
+}
+
+export function getSlideEditLayerPaneObjectLayerJSONPasteValueFromValue(
+  value: unknown,
+  {
+    mode = 'direct',
+  }: SlideEditLayerPaneObjectLayerJSONPasteValueOptions = {},
+): SlideEditLayerPaneObjectLayerJSONPasteValue | null {
+  switch (mode) {
+    case 'direct':
+      return getSlideEditLayerPaneObjectLayerDirectJSONPasteValue(value)
+    case 'wrapped':
+      return getSlideEditLayerPaneObjectLayerWrappedJSONPasteValue(value)
+    case 'any':
+      return getSlideEditLayerPaneObjectLayerAnyJSONPasteValue(value)
+  }
 }
 
 export function getSlideEditLayerPaneObjectLayerPasteCommandEffect<
@@ -797,9 +876,11 @@ export function getSlideEditLayerPaneObjectStateJSONPasteValue({
     const customText = dataTransfer.getData(jsonMimeType)
 
     if (customText.trim()) {
-      const customValue = parseSlideEditLayerPaneJSON(customText)
       const customPasteValue =
-        getSlideEditLayerPaneObjectStateAnyJSONPasteValue(customValue)
+        getSlideEditLayerPaneObjectStateJSONPasteValueFromText(
+          customText,
+          { mode: 'any' },
+        )
 
       if (customPasteValue !== null) {
         return customPasteValue
@@ -814,9 +895,10 @@ export function getSlideEditLayerPaneObjectStateJSONPasteValue({
       continue
     }
 
-    const value = parseSlideEditLayerPaneJSON(text)
-    const pasteValue =
-      getSlideEditLayerPaneObjectStateAnyJSONPasteValue(value)
+    const pasteValue = getSlideEditLayerPaneObjectStateJSONPasteValueFromText(
+      text,
+      { mode: 'any' },
+    )
 
     if (pasteValue !== null) {
       return pasteValue
@@ -824,6 +906,32 @@ export function getSlideEditLayerPaneObjectStateJSONPasteValue({
   }
 
   return null
+}
+
+export function getSlideEditLayerPaneObjectStateJSONPasteValueFromText(
+  text: string,
+  options?: SlideEditLayerPaneObjectStateJSONPasteValueOptions,
+): SlideEditLayerPaneObjectStateJSONPasteValue | null {
+  return getSlideEditLayerPaneObjectStateJSONPasteValueFromValue(
+    parseSlideEditLayerPaneJSON(text),
+    options,
+  )
+}
+
+export function getSlideEditLayerPaneObjectStateJSONPasteValueFromValue(
+  value: unknown,
+  {
+    mode = 'direct',
+  }: SlideEditLayerPaneObjectStateJSONPasteValueOptions = {},
+): SlideEditLayerPaneObjectStateJSONPasteValue | null {
+  switch (mode) {
+    case 'direct':
+      return getSlideEditLayerPaneObjectStateDirectJSONPasteValue(value)
+    case 'wrapped':
+      return getSlideEditLayerPaneObjectStateWrappedJSONPasteValue(value)
+    case 'any':
+      return getSlideEditLayerPaneObjectStateAnyJSONPasteValue(value)
+  }
 }
 
 export function getSlideEditLayerPaneObjectStatePasteCommandEffects<

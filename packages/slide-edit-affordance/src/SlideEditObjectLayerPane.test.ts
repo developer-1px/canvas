@@ -6,10 +6,16 @@ import {
   getSlideEditLayerPaneDropIndicator,
   getSlideEditLayerPaneKeyboardIntent,
   getSlideEditLayerPaneObjectLayerJSONPasteValue,
+  getSlideEditLayerPaneObjectLayerJSONPasteValueFromText,
+  getSlideEditLayerPaneObjectLayerJSONPasteValueFromValue,
   getSlideEditLayerPaneObjectLayerPasteCommandEffect,
   getSlideEditLayerPaneObjectStateJSONPasteValue,
+  getSlideEditLayerPaneObjectStateJSONPasteValueFromText,
+  getSlideEditLayerPaneObjectStateJSONPasteValueFromValue,
   getSlideEditLayerPaneObjectStatePasteCommandEffects,
   getSlideEditLayerPaneRenameJSONPasteValue,
+  getSlideEditLayerPaneRenameJSONPasteValueFromText,
+  getSlideEditLayerPaneRenameJSONPasteValueFromValue,
   getSlideEditLayerPaneRenamePasteCommandEffect,
   getSlideEditLayerPaneResolvedFocusObjectId,
   SLIDE_EDIT_LAYER_PANE_ARIA_CONTRACT,
@@ -24,8 +30,14 @@ import {
 } from './SlideEditObjectLayerPane'
 import {
   getSlideEditLayerPaneObjectLayerJSONPasteValue as getSlideEditLayerPaneObjectLayerJSONPasteValueFromPackage,
+  getSlideEditLayerPaneObjectLayerJSONPasteValueFromText as getSlideEditLayerPaneObjectLayerJSONPasteValueFromTextFromPackage,
+  getSlideEditLayerPaneObjectLayerJSONPasteValueFromValue as getSlideEditLayerPaneObjectLayerJSONPasteValueFromValueFromPackage,
   getSlideEditLayerPaneObjectStateJSONPasteValue as getSlideEditLayerPaneObjectStateJSONPasteValueFromPackage,
+  getSlideEditLayerPaneObjectStateJSONPasteValueFromText as getSlideEditLayerPaneObjectStateJSONPasteValueFromTextFromPackage,
+  getSlideEditLayerPaneObjectStateJSONPasteValueFromValue as getSlideEditLayerPaneObjectStateJSONPasteValueFromValueFromPackage,
   getSlideEditLayerPaneRenameJSONPasteValue as getSlideEditLayerPaneRenameJSONPasteValueFromPackage,
+  getSlideEditLayerPaneRenameJSONPasteValueFromText as getSlideEditLayerPaneRenameJSONPasteValueFromTextFromPackage,
+  getSlideEditLayerPaneRenameJSONPasteValueFromValue as getSlideEditLayerPaneRenameJSONPasteValueFromValueFromPackage,
 } from './index'
 
 function createGroupedLayerPaneDescriptor() {
@@ -826,6 +838,43 @@ describe('SlideEditObjectLayerPane', () => {
     })
   })
 
+  it('reads layer order JSON from text and parsed values', () => {
+    expect(getSlideEditLayerPaneObjectLayerJSONPasteValueFromText(
+      '{"objectLayer":{"position":"front"}}',
+      { mode: 'wrapped' },
+    )).toEqual({
+      position: 'front',
+      sourceField: 'objectLayer.position',
+      surface: 'object-layer-pane-order',
+      type: 'position',
+    })
+    expect(getSlideEditLayerPaneObjectLayerJSONPasteValueFromValue({
+      toIndex: 2.4,
+    })).toEqual({
+      sourceField: 'toIndex',
+      surface: 'object-layer-pane-order',
+      toIndex: 2,
+      type: 'to-index',
+    })
+    expect(getSlideEditLayerPaneObjectLayerJSONPasteValueFromTextFromPackage(
+      '{"zOrder":{"position":"sendBackward"}}',
+      { mode: 'wrapped' },
+    )).toMatchObject({
+      position: 'backward',
+      sourceField: 'zOrder.position',
+    })
+    expect(getSlideEditLayerPaneObjectLayerJSONPasteValueFromValueFromPackage({
+      layerOrder: {
+        toIndex: 0,
+      },
+    }, { mode: 'any' })).toEqual({
+      sourceField: 'layerOrder.toIndex',
+      surface: 'object-layer-pane-order',
+      toIndex: 0,
+      type: 'to-index',
+    })
+  })
+
   it('converts layer order paste values to reorder command effects', () => {
     const frontPasteValue = getSlideEditLayerPaneObjectLayerJSONPasteValue({
       dataTransfer: createDataTransfer({
@@ -1031,6 +1080,51 @@ describe('SlideEditObjectLayerPane', () => {
         'application/json': '{"selectionState":{"visible":true}}',
       }),
     })).toMatchObject({
+      visibility: {
+        isHidden: false,
+        sourceField: 'selectionState.visible',
+      },
+    })
+  })
+
+  it('reads object state JSON from text and parsed values', () => {
+    expect(getSlideEditLayerPaneObjectStateJSONPasteValueFromText(
+      '{"objectState":{"visible":false,"locked":true}}',
+      { mode: 'wrapped' },
+    )).toEqual({
+      lock: {
+        isLocked: true,
+        sourceField: 'objectState.locked',
+      },
+      surface: 'object-layer-pane-state',
+      visibility: {
+        isHidden: true,
+        sourceField: 'objectState.visible',
+      },
+    })
+    expect(getSlideEditLayerPaneObjectStateJSONPasteValueFromValue({
+      hidden: true,
+    })).toEqual({
+      surface: 'object-layer-pane-state',
+      visibility: {
+        isHidden: true,
+        sourceField: 'hidden',
+      },
+    })
+    expect(getSlideEditLayerPaneObjectStateJSONPasteValueFromTextFromPackage(
+      '{"layerState":{"locked":false}}',
+      { mode: 'wrapped' },
+    )).toMatchObject({
+      lock: {
+        isLocked: false,
+        sourceField: 'layerState.locked',
+      },
+    })
+    expect(getSlideEditLayerPaneObjectStateJSONPasteValueFromValueFromPackage({
+      selectionState: {
+        visible: true,
+      },
+    }, { mode: 'any' })).toMatchObject({
       visibility: {
         isHidden: false,
         sourceField: 'selectionState.visible',
@@ -1244,6 +1338,39 @@ describe('SlideEditObjectLayerPane', () => {
     })).toMatchObject({
       name: 'Layer wrapper',
       nameField: 'layerName',
+    })
+  })
+
+  it('reads object rename JSON from text and parsed values', () => {
+    expect(getSlideEditLayerPaneRenameJSONPasteValueFromText(
+      '{"objectMetadata":{"name":"  Metadata title  "}}',
+      { mode: 'wrapped' },
+    )).toEqual({
+      name: 'Metadata title',
+      nameField: 'objectMetadata.name',
+      surface: 'object-layer-pane-rename',
+    })
+    expect(getSlideEditLayerPaneRenameJSONPasteValueFromValue({
+      name: 'Direct title',
+    })).toEqual({
+      name: 'Direct title',
+      nameField: 'name',
+      surface: 'object-layer-pane-rename',
+    })
+    expect(getSlideEditLayerPaneRenameJSONPasteValueFromTextFromPackage(
+      '{"layerName":"Package layer"}',
+      { mode: 'wrapped' },
+    )).toMatchObject({
+      name: 'Package layer',
+      nameField: 'layerName',
+    })
+    expect(getSlideEditLayerPaneRenameJSONPasteValueFromValueFromPackage({
+      objectName: {
+        name: 'Package object',
+      },
+    }, { mode: 'any' })).toMatchObject({
+      name: 'Package object',
+      nameField: 'objectName.name',
     })
   })
 
