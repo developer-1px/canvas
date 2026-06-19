@@ -45,6 +45,7 @@ export {
   type DuplicateCanvasCommandResult,
 } from './command/CanvasCommandEngine'
 export {
+  CANVAS_CREATED_RECT_BOUNDS_MODEL,
   createCanvasArrow,
   createCanvasHighlight,
   createCanvasMarker,
@@ -52,10 +53,12 @@ export {
   createCanvasRect,
   createCanvasShape,
   createCanvasText,
+  getCanvasAspectLockedCreationPoint,
   getCanvasCreatedArrowEnd,
   getCanvasCreatedDrawingPoints,
   getCanvasCreatedPathSegments,
   getCanvasCreatedRectBounds,
+  type CanvasAspectLockedCreationPointInput,
   type CanvasCreatedArrowRouting,
   type CanvasCreatedDrawingStyle,
   type CanvasCreatedPathSegment,

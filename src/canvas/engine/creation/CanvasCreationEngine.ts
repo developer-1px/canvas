@@ -78,8 +78,16 @@ export type CanvasCreatedRectBoundsInput = {
   currentWorld: Point
   defaultSize?: CanvasCreatedRectSize
   dragThreshold?: number
+  preserveAspectRatio?: boolean
   startWorld: Point
 }
+
+export type CanvasAspectLockedCreationPointInput = {
+  currentWorld: Point
+  startWorld: Point
+}
+
+export const CANVAS_CREATED_RECT_BOUNDS_MODEL = 'canvas-created-rect-bounds'
 
 const DEFAULT_RECT_SIZE = {
   w: 168,
@@ -101,12 +109,18 @@ export function getCanvasCreatedRectBounds({
   currentWorld,
   defaultSize = DEFAULT_RECT_SIZE,
   dragThreshold = DEFAULT_RECT_DRAG_THRESHOLD,
+  preserveAspectRatio = false,
   startWorld,
 }: CanvasCreatedRectBoundsInput): Bounds {
   const rawBounds = normalizeBounds(startWorld, currentWorld)
 
   if (rawBounds.w > dragThreshold && rawBounds.h > dragThreshold) {
-    return rawBounds
+    return preserveAspectRatio
+      ? normalizeBounds(
+        startWorld,
+        getCanvasAspectLockedCreationPoint({ currentWorld, startWorld }),
+      )
+      : rawBounds
   }
 
   return {
@@ -114,6 +128,24 @@ export function getCanvasCreatedRectBounds({
     y: startWorld.y,
     ...defaultSize,
   }
+}
+
+export function getCanvasAspectLockedCreationPoint({
+  currentWorld,
+  startWorld,
+}: CanvasAspectLockedCreationPointInput): Point {
+  const dx = currentWorld.x - startWorld.x
+  const dy = currentWorld.y - startWorld.y
+  const size = Math.max(Math.abs(dx), Math.abs(dy))
+
+  return {
+    x: startWorld.x + getCanvasCreationDirectionSign(dx) * size,
+    y: startWorld.y + getCanvasCreationDirectionSign(dy) * size,
+  }
+}
+
+function getCanvasCreationDirectionSign(value: number) {
+  return value < 0 ? -1 : 1
 }
 
 export function getCanvasCreatedDrawingPoints({

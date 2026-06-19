@@ -6,6 +6,7 @@ import {
   createCanvasPath,
   createCanvasRect,
   createCanvasShape,
+  getCanvasAspectLockedCreationPoint,
   getCanvasCreatedArrowEnd,
   getCanvasCreatedDrawingPoints,
   getCanvasCreatedPathSegments,
@@ -231,6 +232,59 @@ describe('CanvasCreationEngine drawing tools', () => {
       w: 168,
       x: 10,
       y: 20,
+    })
+  })
+
+  test('preserves aspect ratio for dragged rect creation only', () => {
+    expect(
+      getCanvasAspectLockedCreationPoint({
+        currentWorld: { x: 38, y: 29 },
+        startWorld: { x: 10, y: 20 },
+      }),
+    ).toEqual({
+      x: 38,
+      y: 48,
+    })
+
+    expect(
+      getCanvasCreatedRectBounds({
+        currentWorld: { x: 38, y: 29 },
+        preserveAspectRatio: true,
+        startWorld: { x: 10, y: 20 },
+      }),
+    ).toEqual({
+      h: 28,
+      w: 28,
+      x: 10,
+      y: 20,
+    })
+
+    expect(
+      getCanvasCreatedRectBounds({
+        currentWorld: { x: 12, y: 22 },
+        preserveAspectRatio: true,
+        startWorld: { x: 10, y: 20 },
+      }),
+    ).toEqual({
+      h: 112,
+      w: 168,
+      x: 10,
+      y: 20,
+    })
+  })
+
+  test('preserves aspect ratio across negative creation directions', () => {
+    expect(
+      getCanvasCreatedRectBounds({
+        currentWorld: { x: 12, y: 21 },
+        preserveAspectRatio: true,
+        startWorld: { x: 30, y: 40 },
+      }),
+    ).toEqual({
+      h: 19,
+      w: 19,
+      x: 11,
+      y: 21,
     })
   })
 
