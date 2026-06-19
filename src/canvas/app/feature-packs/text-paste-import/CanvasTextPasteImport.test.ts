@@ -384,6 +384,87 @@ describe('CanvasTextPasteImport', () => {
     }
   })
 
+  it('reads strikethrough tags and line-through style through the DOMParser path', () => {
+    class FakeTextNode {
+      nodeType = 3
+
+      constructor(readonly textContent: string) {}
+    }
+
+    class FakeElement {
+      children: FakeElement[]
+      nodeType = 1
+
+      constructor(
+        readonly tagName: string,
+        readonly childNodes: Array<FakeElement | FakeTextNode> = [],
+        private readonly attributes: Record<string, string> = {},
+      ) {
+        this.children = childNodes.filter(
+          (child): child is FakeElement => child instanceof FakeElement,
+        )
+      }
+
+      getAttribute(name: string) {
+        return this.attributes[name] ?? null
+      }
+
+      querySelectorAll() {
+        return []
+      }
+    }
+
+    const text = (value: string) => new FakeTextNode(value)
+    const element = (
+      tagName: string,
+      childNodes: Array<FakeElement | FakeTextNode> = [],
+      attributes: Record<string, string> = {},
+    ) => new FakeElement(tagName.toUpperCase(), childNodes, attributes)
+    const body = element('body', [
+      element('p', [
+        text('Keep '),
+        element('s', [text('S')]),
+        text(' '),
+        element('strike', [text('Strike')]),
+        text(' '),
+        element('del', [text('Del')]),
+        text(' '),
+        element('span', [text('Styled')], {
+          style: 'text-decoration: underline line-through',
+        }),
+      ]),
+    ])
+
+    vi.stubGlobal('Element', FakeElement)
+    vi.stubGlobal('DOMParser', class {
+      parseFromString() {
+        return {
+          body,
+        }
+      }
+    })
+
+    try {
+      expect(getCanvasRichTextPasteSourceFromHTML('<fixture />')).toEqual({
+        format: 'text-html-rich',
+        paragraphs: [
+          {
+            runs: [
+              { text: 'Keep ' },
+              { strikethrough: true, text: 'S' },
+              { strikethrough: true, text: 'Strike' },
+              { strikethrough: true, text: 'Del' },
+              { strikethrough: true, text: 'Styled' },
+            ],
+          },
+        ],
+        text: 'Keep SStrikeDelStyled',
+      })
+    } finally {
+      vi.unstubAllGlobals()
+    }
+  })
+
   it('reads font size and paragraph spacing metadata through the DOMParser path', () => {
     class FakeTextNode {
       nodeType = 3
@@ -522,6 +603,8 @@ describe('CanvasTextPasteImport', () => {
       expect(getCanvasRichTextPasteSourceFromHTML(`
         <p style="text-align: right; line-height: 1.25; margin-top: 4px; margin-bottom: 6px">
           <span style="font-size: 16px">Sized</span> <em>Text</em>
+          <span style="text-decoration-line: line-through">Gone</span>
+          <s>S</s><strike>Strike</strike><del>Del</del>
         </p>
       `)).toEqual({
         format: 'text-html-rich',
@@ -532,12 +615,16 @@ describe('CanvasTextPasteImport', () => {
             runs: [
               { fontSize: 16, text: 'Sized' },
               { italic: true, text: 'Text' },
+              { strikethrough: true, text: 'Gone' },
+              { strikethrough: true, text: 'S' },
+              { strikethrough: true, text: 'Strike' },
+              { strikethrough: true, text: 'Del' },
             ],
             spacingAfter: 6,
             spacingBefore: 4,
           },
         ],
-        text: 'SizedText',
+        text: 'SizedTextGoneSStrikeDel',
       })
     } finally {
       vi.unstubAllGlobals()
