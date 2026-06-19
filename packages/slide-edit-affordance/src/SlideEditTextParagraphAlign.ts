@@ -13,6 +13,16 @@ export type SlideEditTextParagraphAlignCSSValue =
   | 'left'
   | 'right'
 
+export type SlideEditTextParagraphAlignKeyboardValue =
+  | SlideEditTextParagraphAlignValue
+  | 'justify'
+
+export type SlideEditTextParagraphAlignKeyboardShortcut =
+  | 'Cmd/Ctrl+E'
+  | 'Cmd/Ctrl+J'
+  | 'Cmd/Ctrl+L'
+  | 'Cmd/Ctrl+R'
+
 export type SlideEditTextParagraphAlignOption = {
   cssTextAlign: SlideEditTextParagraphAlignCSSValue
   id: SlideEditTextParagraphAlignValue
@@ -55,6 +65,22 @@ export type SlideEditTextParagraphAlignUpdateCommand<
   value: SlideEditTextParagraphAlignValue
 }
 
+export type SlideEditTextParagraphAlignKeyboardIntent = {
+  align: SlideEditTextParagraphAlignKeyboardValue
+  commandId: 'update-text-paragraph-align'
+  intent: typeof SLIDE_EDIT_TEXT_PARAGRAPH_ALIGN_KEYBOARD_INTENT
+  kind: 'set-text-paragraph-align'
+  preventDefault: true
+  shortcut: SlideEditTextParagraphAlignKeyboardShortcut
+}
+
+export type SlideEditTextParagraphAlignKeyboardIntentInput = {
+  altKey?: boolean
+  key: string
+  mod: boolean
+  shiftKey?: boolean
+}
+
 export type SlideEditTextParagraphAlignHostCommandEffect<
   TSlideId extends SlideEditTextParagraphAlignSlideId =
     SlideEditTextParagraphAlignSlideId,
@@ -94,6 +120,18 @@ export const SLIDE_EDIT_TEXT_PARAGRAPH_ALIGN_VALUES = Object.freeze([
   'center',
   'right',
 ] as const satisfies readonly SlideEditTextParagraphAlignValue[])
+
+export const SLIDE_EDIT_TEXT_PARAGRAPH_ALIGN_KEYBOARD_MODEL =
+  'slide-edit-text-paragraph-align-keyboard-shortcuts'
+
+export const SLIDE_EDIT_TEXT_PARAGRAPH_ALIGN_KEYBOARD_INTENT =
+  'slide-edit-text-paragraph-align-keyboard-intent'
+
+export const SLIDE_EDIT_TEXT_PARAGRAPH_ALIGN_KEYBOARD_KEYS =
+  'Cmd/Ctrl+L Cmd/Ctrl+E Cmd/Ctrl+R Cmd/Ctrl+J'
+
+export const SLIDE_EDIT_TEXT_PARAGRAPH_ALIGN_KEYBOARD_ROUTING_PRIORITY =
+  'text-selection-before-host-command'
 
 export const SLIDE_EDIT_TEXT_PARAGRAPH_ALIGN_OPTIONS = Object.freeze([
   {
@@ -166,6 +204,62 @@ export function getSlideEditTextParagraphAlignCommandEffect<
       slideId: command.slideId,
     },
     type: 'slide-command-effect',
+  }
+}
+
+export function getSlideEditTextParagraphAlignKeyboardIntent({
+  altKey = false,
+  key,
+  mod,
+  shiftKey = false,
+}: SlideEditTextParagraphAlignKeyboardIntentInput):
+  SlideEditTextParagraphAlignKeyboardIntent | null {
+  if (!mod || shiftKey || altKey) {
+    return null
+  }
+
+  const normalizedKey = key.toLowerCase()
+
+  switch (normalizedKey) {
+    case 'l':
+      return createSlideEditTextParagraphAlignKeyboardIntent({
+        align: 'left',
+        shortcut: 'Cmd/Ctrl+L',
+      })
+    case 'e':
+      return createSlideEditTextParagraphAlignKeyboardIntent({
+        align: 'center',
+        shortcut: 'Cmd/Ctrl+E',
+      })
+    case 'r':
+      return createSlideEditTextParagraphAlignKeyboardIntent({
+        align: 'right',
+        shortcut: 'Cmd/Ctrl+R',
+      })
+    case 'j':
+      return createSlideEditTextParagraphAlignKeyboardIntent({
+        align: 'justify',
+        shortcut: 'Cmd/Ctrl+J',
+      })
+    default:
+      return null
+  }
+}
+
+function createSlideEditTextParagraphAlignKeyboardIntent({
+  align,
+  shortcut,
+}: {
+  align: SlideEditTextParagraphAlignKeyboardValue
+  shortcut: SlideEditTextParagraphAlignKeyboardShortcut
+}): SlideEditTextParagraphAlignKeyboardIntent {
+  return {
+    align,
+    commandId: 'update-text-paragraph-align',
+    intent: SLIDE_EDIT_TEXT_PARAGRAPH_ALIGN_KEYBOARD_INTENT,
+    kind: 'set-text-paragraph-align',
+    preventDefault: true,
+    shortcut,
   }
 }
 

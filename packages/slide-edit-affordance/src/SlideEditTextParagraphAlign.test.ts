@@ -7,15 +7,22 @@ import {
   getSlideEditTextParagraphAlignJSONPasteValue,
   getSlideEditTextParagraphAlignJSONPasteValueFromText,
   getSlideEditTextParagraphAlignJSONPasteValueFromValue,
+  getSlideEditTextParagraphAlignKeyboardIntent,
   normalizeSlideEditTextParagraphAlign,
   SLIDE_EDIT_TEXT_PARAGRAPH_ALIGN_DEFAULT,
   SLIDE_EDIT_TEXT_PARAGRAPH_ALIGN_FIELD,
+  SLIDE_EDIT_TEXT_PARAGRAPH_ALIGN_KEYBOARD_INTENT,
+  SLIDE_EDIT_TEXT_PARAGRAPH_ALIGN_KEYBOARD_KEYS,
+  SLIDE_EDIT_TEXT_PARAGRAPH_ALIGN_KEYBOARD_MODEL,
+  SLIDE_EDIT_TEXT_PARAGRAPH_ALIGN_KEYBOARD_ROUTING_PRIORITY,
   SLIDE_EDIT_TEXT_PARAGRAPH_ALIGN_OPTIONS,
 } from './SlideEditTextParagraphAlign'
 import {
   createSlideEditTextParagraphAlignDescriptor as createSlideEditTextParagraphAlignDescriptorFromPackage,
   getSlideEditTextParagraphAlignJSONPasteValueFromText as getSlideEditTextParagraphAlignJSONPasteValueFromTextFromPackage,
   getSlideEditTextParagraphAlignJSONPasteValueFromValue as getSlideEditTextParagraphAlignJSONPasteValueFromValueFromPackage,
+  getSlideEditTextParagraphAlignKeyboardIntent as getSlideEditTextParagraphAlignKeyboardIntentFromPackage,
+  SLIDE_EDIT_TEXT_PARAGRAPH_ALIGN_KEYBOARD_KEYS as SLIDE_EDIT_TEXT_PARAGRAPH_ALIGN_KEYBOARD_KEYS_FROM_PACKAGE,
 } from './index'
 
 describe('SlideEditTextParagraphAlign', () => {
@@ -102,6 +109,80 @@ describe('SlideEditTextParagraphAlign', () => {
       },
       type: 'slide-command-effect',
     })
+  })
+
+  it('maps paragraph align keyboard shortcuts to align intents', () => {
+    expect(getSlideEditTextParagraphAlignKeyboardIntent({
+      key: 'l',
+      mod: true,
+    })).toEqual({
+      align: 'left',
+      commandId: 'update-text-paragraph-align',
+      intent: SLIDE_EDIT_TEXT_PARAGRAPH_ALIGN_KEYBOARD_INTENT,
+      kind: 'set-text-paragraph-align',
+      preventDefault: true,
+      shortcut: 'Cmd/Ctrl+L',
+    })
+    expect(getSlideEditTextParagraphAlignKeyboardIntent({
+      key: 'E',
+      mod: true,
+    })).toMatchObject({
+      align: 'center',
+      shortcut: 'Cmd/Ctrl+E',
+    })
+    expect(getSlideEditTextParagraphAlignKeyboardIntentFromPackage({
+      key: 'r',
+      mod: true,
+    })).toMatchObject({
+      align: 'right',
+      shortcut: 'Cmd/Ctrl+R',
+    })
+    expect(getSlideEditTextParagraphAlignKeyboardIntent({
+      key: 'j',
+      mod: true,
+    })).toMatchObject({
+      align: 'justify',
+      shortcut: 'Cmd/Ctrl+J',
+    })
+  })
+
+  it('does not route shifted, alternate, or unrelated keys', () => {
+    expect(getSlideEditTextParagraphAlignKeyboardIntent({
+      key: 'l',
+      mod: true,
+      shiftKey: true,
+    })).toBeNull()
+    expect(getSlideEditTextParagraphAlignKeyboardIntent({
+      altKey: true,
+      key: 'l',
+      mod: true,
+    })).toBeNull()
+    expect(getSlideEditTextParagraphAlignKeyboardIntent({
+      key: 'x',
+      mod: true,
+    })).toBeNull()
+    expect(getSlideEditTextParagraphAlignKeyboardIntent({
+      key: 'l',
+      mod: false,
+    })).toBeNull()
+  })
+
+  it('exports paragraph align keyboard metadata and routing priority', () => {
+    expect(SLIDE_EDIT_TEXT_PARAGRAPH_ALIGN_KEYBOARD_MODEL).toBe(
+      'slide-edit-text-paragraph-align-keyboard-shortcuts',
+    )
+    expect(SLIDE_EDIT_TEXT_PARAGRAPH_ALIGN_KEYBOARD_INTENT).toBe(
+      'slide-edit-text-paragraph-align-keyboard-intent',
+    )
+    expect(SLIDE_EDIT_TEXT_PARAGRAPH_ALIGN_KEYBOARD_KEYS).toBe(
+      'Cmd/Ctrl+L Cmd/Ctrl+E Cmd/Ctrl+R Cmd/Ctrl+J',
+    )
+    expect(SLIDE_EDIT_TEXT_PARAGRAPH_ALIGN_KEYBOARD_KEYS_FROM_PACKAGE).toBe(
+      SLIDE_EDIT_TEXT_PARAGRAPH_ALIGN_KEYBOARD_KEYS,
+    )
+    expect(SLIDE_EDIT_TEXT_PARAGRAPH_ALIGN_KEYBOARD_ROUTING_PRIORITY).toBe(
+      'text-selection-before-host-command',
+    )
   })
 
   it('reads custom MIME direct paragraph align JSON values first', () => {
