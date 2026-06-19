@@ -2,6 +2,11 @@ import {
   CANVAS_COMMAND_AFFORDANCES,
   type CanvasAffordanceConfig,
 } from '../../../engine'
+import {
+  getCanvasViewportScale,
+  MAX_SCALE,
+  MIN_SCALE,
+} from '../../../core'
 import { FitIcon, MinusIcon, PlusIcon } from '../../../ui/icons/CanvasIcons'
 import {
   CANVAS_TOOLBAR_ITEM_PROPS,
@@ -26,6 +31,9 @@ export function ZoomControls({
   onZoomOut,
 }: ZoomControlsProps) {
   const toolbarRovingFocus = useCanvasToolbarRovingFocus<HTMLDivElement>()
+  const viewportScale = getCanvasViewportScale({ scale })
+  const canZoomOut = viewportScale > MIN_SCALE
+  const canZoomIn = viewportScale < MAX_SCALE
   const hasZoomCommand =
     config.commands.zoomOut ||
     config.commands.zoomReset ||
@@ -49,6 +57,8 @@ export function ZoomControls({
           type="button"
           className="tool-button"
           aria-label={CANVAS_COMMAND_AFFORDANCES.zoomOut.ariaLabel}
+          aria-disabled={canZoomOut ? undefined : true}
+          disabled={!canZoomOut}
           title={CANVAS_COMMAND_AFFORDANCES.zoomOut.title}
           onClick={onZoomOut}
         >
@@ -64,7 +74,7 @@ export function ZoomControls({
           title={CANVAS_COMMAND_AFFORDANCES.zoomReset.title}
           onClick={onReset}
         >
-          {Math.round(scale * 100)}%
+          {Math.round(viewportScale * 100)}%
         </button>
       ) : null}
       {config.commands.fitView ? (
@@ -85,6 +95,8 @@ export function ZoomControls({
           type="button"
           className="tool-button"
           aria-label={CANVAS_COMMAND_AFFORDANCES.zoomIn.ariaLabel}
+          aria-disabled={canZoomIn ? undefined : true}
+          disabled={!canZoomIn}
           title={CANVAS_COMMAND_AFFORDANCES.zoomIn.title}
           onClick={onZoomIn}
         >
