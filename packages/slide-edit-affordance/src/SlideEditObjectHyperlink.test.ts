@@ -4,6 +4,8 @@ import {
   createSlideEditObjectHyperlinkDescriptor,
   getSlideEditObjectHyperlinkCommandEffect,
   getSlideEditObjectHyperlinkJSONPasteValue,
+  getSlideEditObjectHyperlinkJSONPasteValueFromText,
+  getSlideEditObjectHyperlinkJSONPasteValueFromValue,
   getSlideEditObjectHyperlinkMetadata,
   getSlideEditObjectHyperlinkPasteCommands,
   getSlideEditObjectHyperlinkValidation,
@@ -21,6 +23,8 @@ import {
 } from './SlideEditObjectHyperlink'
 import {
   getSlideEditObjectHyperlinkJSONPasteValue as getSlideEditObjectHyperlinkJSONPasteValueFromPackage,
+  getSlideEditObjectHyperlinkJSONPasteValueFromText as getSlideEditObjectHyperlinkJSONPasteValueFromTextFromPackage,
+  getSlideEditObjectHyperlinkJSONPasteValueFromValue as getSlideEditObjectHyperlinkJSONPasteValueFromValueFromPackage,
   normalizeSlideEditObjectHyperlinkStorageUrl as normalizeSlideEditObjectHyperlinkStorageUrlFromPackage,
   type SlideEditObjectHyperlinkUrlStoragePolicy,
 } from './index'
@@ -292,6 +296,78 @@ describe('SlideEditObjectHyperlink', () => {
         'text/plain': '{"link":false}',
       }),
     })).toEqual({
+      hyperlink: SLIDE_EDIT_OBJECT_HYPERLINK_DEFAULT,
+      kind: 'remove-hyperlink',
+      surface: 'object-hyperlink',
+    })
+  })
+
+  it('reads object hyperlink JSON from text and parsed values', () => {
+    expect(getSlideEditObjectHyperlinkJSONPasteValueFromText(
+      '" https://example.com/reference "',
+      {
+        storagePolicy: {
+          maxLength: 19,
+        },
+      },
+    )).toEqual({
+      fields: [
+        {
+          fieldId: 'url',
+          value: 'https://example.com',
+        },
+      ],
+      hyperlink: {
+        target: 'same-context',
+        title: '',
+        url: 'https://example.com',
+      },
+      kind: 'set-hyperlink',
+      surface: 'object-hyperlink',
+    })
+
+    expect(getSlideEditObjectHyperlinkJSONPasteValueFromValue({
+      href: 'mailto:hello@example.com',
+      target: 'new-context',
+      title: ' Contact ',
+    })).toEqual({
+      fields: [
+        {
+          fieldId: 'url',
+          value: 'mailto:hello@example.com',
+        },
+        {
+          fieldId: 'target',
+          value: 'new-context',
+        },
+        {
+          fieldId: 'title',
+          value: 'Contact',
+        },
+      ],
+      hyperlink: {
+        target: 'new-context',
+        title: 'Contact',
+        url: 'mailto:hello@example.com',
+      },
+      kind: 'set-hyperlink',
+      surface: 'object-hyperlink',
+    })
+
+    expect(getSlideEditObjectHyperlinkJSONPasteValueFromTextFromPackage(
+      '{"hyperlink":{"href":"http://example.com"}}',
+      { mode: 'wrapped' },
+    )).toMatchObject({
+      hyperlink: {
+        url: 'http://example.com',
+      },
+      kind: 'set-hyperlink',
+    })
+
+    expect(getSlideEditObjectHyperlinkJSONPasteValueFromValueFromPackage(
+      { link: false },
+      { mode: 'wrapped' },
+    )).toEqual({
       hyperlink: SLIDE_EDIT_OBJECT_HYPERLINK_DEFAULT,
       kind: 'remove-hyperlink',
       surface: 'object-hyperlink',

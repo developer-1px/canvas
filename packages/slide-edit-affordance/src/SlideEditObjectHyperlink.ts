@@ -149,6 +149,16 @@ export type SlideEditObjectHyperlinkJSONPasteInput = {
   storagePolicy?: SlideEditObjectHyperlinkUrlStoragePolicy
 }
 
+export type SlideEditObjectHyperlinkJSONPasteValueMode =
+  | 'direct'
+  | 'wrapped'
+
+export type SlideEditObjectHyperlinkJSONPasteValueOptions = {
+  allowedSchemes?: readonly string[]
+  mode?: SlideEditObjectHyperlinkJSONPasteValueMode
+  storagePolicy?: SlideEditObjectHyperlinkUrlStoragePolicy
+}
+
 export type SlideEditObjectHyperlinkPasteCommandsInput<
   TSlideId extends SlideEditObjectHyperlinkSlideId =
     SlideEditObjectHyperlinkSlideId,
@@ -297,19 +307,17 @@ export function getSlideEditObjectHyperlinkJSONPasteValue({
     return null
   }
 
-  const options = {
-    allowedSchemes,
-    storagePolicy,
-  } satisfies SlideEditObjectHyperlinkJSONPasteOptions
-
   if (jsonMimeType) {
     const customText = dataTransfer.getData(jsonMimeType)
 
     if (customText.trim()) {
-      const customValue = parseSlideEditObjectHyperlinkJSON(customText)
-      const customPasteValue = getSlideEditObjectHyperlinkDirectPasteValue(
-        customValue,
-        options,
+      const customPasteValue = getSlideEditObjectHyperlinkJSONPasteValueFromText(
+        customText,
+        {
+          allowedSchemes,
+          mode: 'direct',
+          storagePolicy,
+        },
       )
 
       if (customPasteValue !== null) {
@@ -325,10 +333,13 @@ export function getSlideEditObjectHyperlinkJSONPasteValue({
       continue
     }
 
-    const value = parseSlideEditObjectHyperlinkJSON(text)
-    const pasteValue = getSlideEditObjectHyperlinkWrappedPasteValue(
-      value,
-      options,
+    const pasteValue = getSlideEditObjectHyperlinkJSONPasteValueFromText(
+      text,
+      {
+        allowedSchemes,
+        mode: 'wrapped',
+        storagePolicy,
+      },
     )
 
     if (pasteValue !== null) {
@@ -337,6 +348,34 @@ export function getSlideEditObjectHyperlinkJSONPasteValue({
   }
 
   return null
+}
+
+export function getSlideEditObjectHyperlinkJSONPasteValueFromText(
+  text: string,
+  options?: SlideEditObjectHyperlinkJSONPasteValueOptions,
+): SlideEditObjectHyperlinkJSONPasteValue | null {
+  return getSlideEditObjectHyperlinkJSONPasteValueFromValue(
+    parseSlideEditObjectHyperlinkJSON(text),
+    options,
+  )
+}
+
+export function getSlideEditObjectHyperlinkJSONPasteValueFromValue(
+  value: unknown,
+  {
+    allowedSchemes = SLIDE_EDIT_OBJECT_HYPERLINK_ALLOWED_SCHEMES,
+    mode = 'direct',
+    storagePolicy = {},
+  }: SlideEditObjectHyperlinkJSONPasteValueOptions = {},
+): SlideEditObjectHyperlinkJSONPasteValue | null {
+  const options = {
+    allowedSchemes,
+    storagePolicy,
+  } satisfies SlideEditObjectHyperlinkJSONPasteOptions
+
+  return mode === 'wrapped'
+    ? getSlideEditObjectHyperlinkWrappedPasteValue(value, options)
+    : getSlideEditObjectHyperlinkDirectPasteValue(value, options)
 }
 
 export function getSlideEditObjectHyperlinkPasteCommands<
