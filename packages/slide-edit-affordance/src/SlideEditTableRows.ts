@@ -35,6 +35,16 @@ export type SlideEditTableRowsJSONPasteInput = {
   storagePolicy?: SlideEditTableRowsStoragePolicy
 }
 
+export type SlideEditTableRowsJSONPasteValueMode =
+  | 'direct'
+  | 'wrapped'
+
+export type SlideEditTableRowsJSONPasteValueOptions = {
+  mode?: SlideEditTableRowsJSONPasteValueMode
+  sourceType?: string
+  storagePolicy?: SlideEditTableRowsStoragePolicy
+}
+
 export type SlideEditTableRowsReplaceTarget<
   TObjectId extends SlideEditTableRowsObjectId = SlideEditTableRowsObjectId,
 > = {
@@ -112,13 +122,14 @@ export function getSlideEditTableRowsJSONPasteValue({
     const customText = dataTransfer.getData(jsonMimeType)
 
     if (customText.trim()) {
-      const customValue = parseSlideEditTableRowsJSON(customText)
-      const customPasteValue = getSlideEditTableRowsDirectJSONPasteValue({
-        payloadLength: customText.length,
-        sourceType: jsonMimeType,
-        storagePolicy,
-        value: customValue,
-      })
+      const customPasteValue = getSlideEditTableRowsJSONPasteValueFromText(
+        customText,
+        {
+          mode: 'direct',
+          sourceType: jsonMimeType,
+          storagePolicy,
+        },
+      )
 
       if (customPasteValue !== null) {
         return customPasteValue
@@ -133,13 +144,14 @@ export function getSlideEditTableRowsJSONPasteValue({
       continue
     }
 
-    const value = parseSlideEditTableRowsJSON(text)
-    const pasteValue = getSlideEditTableRowsWrappedJSONPasteValue({
-      payloadLength: text.length,
-      sourceType: type,
-      storagePolicy,
-      value,
-    })
+    const pasteValue = getSlideEditTableRowsJSONPasteValueFromText(
+      text,
+      {
+        mode: 'wrapped',
+        sourceType: type,
+        storagePolicy,
+      },
+    )
 
     if (pasteValue !== null) {
       return pasteValue
@@ -147,6 +159,42 @@ export function getSlideEditTableRowsJSONPasteValue({
   }
 
   return null
+}
+
+export function getSlideEditTableRowsJSONPasteValueFromText(
+  text: string,
+  options?: SlideEditTableRowsJSONPasteValueOptions,
+): SlideEditTableRowsJSONPasteValue | null {
+  return getSlideEditTableRowsJSONPasteValueFromValue(
+    parseSlideEditTableRowsJSON(text),
+    {
+      ...options,
+      payloadLength: text.length,
+    },
+  )
+}
+
+export function getSlideEditTableRowsJSONPasteValueFromValue(
+  value: unknown,
+  {
+    mode = 'direct',
+    payloadLength = 0,
+    sourceType = 'value',
+    storagePolicy = {},
+  }: SlideEditTableRowsJSONPasteValueOptions & {
+    payloadLength?: number
+  } = {},
+): SlideEditTableRowsJSONPasteValue | null {
+  const input = {
+    payloadLength,
+    sourceType,
+    storagePolicy,
+    value,
+  }
+
+  return mode === 'wrapped'
+    ? getSlideEditTableRowsWrappedJSONPasteValue(input)
+    : getSlideEditTableRowsDirectJSONPasteValue(input)
 }
 
 export function getSlideEditTableRowsPasteCommandEffect<

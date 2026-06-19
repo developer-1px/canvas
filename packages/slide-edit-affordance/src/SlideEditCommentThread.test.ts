@@ -2,11 +2,15 @@ import { describe, expect, it } from 'vitest'
 
 import {
   getSlideEditCommentThreadJSONPasteValue,
+  getSlideEditCommentThreadJSONPasteValueFromText,
+  getSlideEditCommentThreadJSONPasteValueFromValue,
   getSlideEditCommentThreadPasteCommandEffect,
   SLIDE_EDIT_COMMENT_THREAD_JSON_MIME_TYPE,
 } from './SlideEditCommentThread'
 import {
   getSlideEditCommentThreadJSONPasteValue as getSlideEditCommentThreadJSONPasteValueFromPackage,
+  getSlideEditCommentThreadJSONPasteValueFromText as getSlideEditCommentThreadJSONPasteValueFromTextFromPackage,
+  getSlideEditCommentThreadJSONPasteValueFromValue as getSlideEditCommentThreadJSONPasteValueFromValueFromPackage,
 } from './index'
 
 describe('SlideEditCommentThread', () => {
@@ -125,6 +129,91 @@ describe('SlideEditCommentThread', () => {
       },
       wrapper: 'reviewComment',
     })
+  })
+
+  it('reads comment thread JSON from text and parsed values', () => {
+    const directText = '{"body":"Body"}'
+
+    expect(getSlideEditCommentThreadJSONPasteValueFromText(
+      directText,
+      { sourceType: 'custom/test' },
+    )).toEqual({
+      fields: ['body', 'messages'],
+      format: 'json',
+      patch: {
+        body: 'Body',
+        messages: [
+          {
+            body: 'Body',
+          },
+        ],
+      },
+      payloadLength: directText.length,
+      sourceType: 'custom/test',
+      surface: 'comment-thread',
+    })
+    expect(getSlideEditCommentThreadJSONPasteValueFromValue({
+      comment: {
+        body: 'Wrapped',
+        resolved: true,
+      },
+    }, { mode: 'wrapped', sourceType: 'application/json' })).toMatchObject({
+      fields: ['body', 'messages', 'resolved'],
+      patch: {
+        body: 'Wrapped',
+        messages: [
+          {
+            body: 'Wrapped',
+          },
+        ],
+        resolved: true,
+      },
+      sourceType: 'application/json',
+      wrapper: 'comment',
+    })
+    expect(getSlideEditCommentThreadJSONPasteValueFromTextFromPackage(
+      JSON.stringify({
+        reviewComment: {
+          body: 'Keep this concise',
+          replies: ['Reply one'],
+        },
+      }),
+      {
+        mode: 'wrapped',
+        storagePolicy: {
+          maxBodyLength: 9,
+          maxMessageBodyLength: 5,
+        },
+      },
+    )).toMatchObject({
+      patch: {
+        body: 'Keep this',
+        messages: [
+          {
+            body: 'Keep this',
+          },
+        ],
+      },
+      wrapper: 'reviewComment',
+    })
+    expect(getSlideEditCommentThreadJSONPasteValueFromValueFromPackage({
+      text: 'Package export',
+    })).toMatchObject({
+      payloadLength: 0,
+      patch: {
+        body: 'Package export',
+        messages: [
+          {
+            body: 'Package export',
+          },
+        ],
+      },
+      sourceType: 'value',
+    })
+    expect(getSlideEditCommentThreadJSONPasteValueFromText(
+      '{"body":"Direct generic body"}',
+      { mode: 'wrapped' },
+    )).toBeNull()
   })
 
   it('converts comment thread paste values to patch command effects', () => {

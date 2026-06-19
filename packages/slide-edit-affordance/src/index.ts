@@ -1022,6 +1022,8 @@ export {
   getSlideEditColorSwatchCommandEffect,
   getSlideEditColorSwatchId,
   getSlideEditColorSwatchJSONPasteValue,
+  getSlideEditColorSwatchJSONPasteValueFromText,
+  getSlideEditColorSwatchJSONPasteValueFromValue,
   getSlideEditColorSwatchPasteCommandEffects,
   getSlideEditColorWithAlphaCSS,
   normalizeSlideEditColorSwatchChannelId,
@@ -1044,6 +1046,8 @@ export {
   type SlideEditColorSwatchItem,
   type SlideEditColorSwatchJSONPasteInput,
   type SlideEditColorSwatchJSONPasteValue,
+  type SlideEditColorSwatchJSONPasteValueMode,
+  type SlideEditColorSwatchJSONPasteValueOptions,
   type SlideEditColorSwatchObjectId,
   type SlideEditColorSwatchPaletteDescriptor,
   type SlideEditColorSwatchPasteAppliedTarget,
@@ -1060,6 +1064,8 @@ export {
 } from './SlideEditColorSwatchPalette'
 export {
   getSlideEditCommentThreadJSONPasteValue,
+  getSlideEditCommentThreadJSONPasteValueFromText,
+  getSlideEditCommentThreadJSONPasteValueFromValue,
   getSlideEditCommentThreadPasteCommandEffect,
   SLIDE_EDIT_COMMENT_THREAD_JSON_MIME_TYPE,
   SLIDE_EDIT_COMMENT_THREAD_JSON_TYPES,
@@ -1068,6 +1074,8 @@ export {
   type SlideEditCommentThreadDataTransfer,
   type SlideEditCommentThreadJSONPasteInput,
   type SlideEditCommentThreadJSONPasteValue,
+  type SlideEditCommentThreadJSONPasteValueMode,
+  type SlideEditCommentThreadJSONPasteValueOptions,
   type SlideEditCommentThreadMessage,
   type SlideEditCommentThreadMessageId,
   type SlideEditCommentThreadMessageIdInput,
@@ -1083,6 +1091,8 @@ export {
 } from './SlideEditCommentThread'
 export {
   getSlideEditTableRowsJSONPasteValue,
+  getSlideEditTableRowsJSONPasteValueFromText,
+  getSlideEditTableRowsJSONPasteValueFromValue,
   getSlideEditTableRowsPasteCommandEffect,
   SLIDE_EDIT_TABLE_ROWS_JSON_MIME_TYPE,
   SLIDE_EDIT_TABLE_ROWS_JSON_TYPES,
@@ -1090,6 +1100,8 @@ export {
   type SlideEditTableRowsDataTransfer,
   type SlideEditTableRowsJSONPasteInput,
   type SlideEditTableRowsJSONPasteValue,
+  type SlideEditTableRowsJSONPasteValueMode,
+  type SlideEditTableRowsJSONPasteValueOptions,
   type SlideEditTableRowsMatrix,
   type SlideEditTableRowsNormalizeCellInput,
   type SlideEditTableRowsObjectId,

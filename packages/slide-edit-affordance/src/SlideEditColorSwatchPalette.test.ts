@@ -5,6 +5,8 @@ import {
   getSlideEditColorSwatchCommandEffect,
   getSlideEditColorSwatchId,
   getSlideEditColorSwatchJSONPasteValue,
+  getSlideEditColorSwatchJSONPasteValueFromText,
+  getSlideEditColorSwatchJSONPasteValueFromValue,
   getSlideEditColorSwatchPasteCommandEffects,
   getSlideEditColorWithAlphaCSS,
   normalizeSlideEditColorSwatchChannelId,
@@ -16,6 +18,8 @@ import {
 } from './SlideEditColorSwatchPalette'
 import {
   getSlideEditColorSwatchJSONPasteValue as getSlideEditColorSwatchJSONPasteValueFromPackage,
+  getSlideEditColorSwatchJSONPasteValueFromText as getSlideEditColorSwatchJSONPasteValueFromTextFromPackage,
+  getSlideEditColorSwatchJSONPasteValueFromValue as getSlideEditColorSwatchJSONPasteValueFromValueFromPackage,
   getSlideEditColorWithAlphaCSS as getSlideEditColorWithAlphaCSSFromPackage,
   normalizeSlideEditColorHex as normalizeSlideEditColorHexFromPackage,
 } from './index'
@@ -318,6 +322,50 @@ describe('SlideEditColorSwatchPalette', () => {
       source: 'recent',
       swatchId: 'recent:#00ff00',
       value: '#00ff00',
+    })
+  })
+
+  it('reads color swatch JSON from text and parsed values', () => {
+    expect(getSlideEditColorSwatchJSONPasteValueFromText('"#ABC"'))
+      .toEqual({
+        channelId: null,
+        source: 'recent',
+        swatchId: 'recent:#aabbcc',
+        value: '#aabbcc',
+      })
+    expect(getSlideEditColorSwatchJSONPasteValueFromValue({
+      color: '#fff',
+    }, { mode: 'direct-with-channel' })).toBeNull()
+    expect(getSlideEditColorSwatchJSONPasteValueFromValue({
+      color: '#fff',
+      channel: 'shape-stroke',
+    }, { mode: 'direct-with-channel' })).toEqual({
+      channelId: 'stroke',
+      source: 'recent',
+      swatchId: 'recent:#ffffff',
+      value: '#ffffff',
+    })
+    expect(getSlideEditColorSwatchJSONPasteValueFromTextFromPackage(
+      '{"colorSwatch":{"hex":"#ABC","channel":"shape-fill"}}',
+      { mode: 'wrapped' },
+    )).toEqual({
+      channelId: 'fill',
+      source: 'recent',
+      swatchId: 'recent:#aabbcc',
+      value: '#aabbcc',
+    })
+    expect(getSlideEditColorSwatchJSONPasteValueFromValueFromPackage({
+      swatch: {
+        source: 'theme',
+        tokenId: 'color-accent',
+        value: '#123456',
+      },
+    }, { mode: 'wrapped' })).toEqual({
+      channelId: null,
+      source: 'theme',
+      swatchId: 'theme:color-accent',
+      tokenId: 'color-accent',
+      value: '#123456',
     })
   })
 

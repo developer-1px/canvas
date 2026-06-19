@@ -156,6 +156,15 @@ export type SlideEditColorSwatchJSONPasteInput = {
   jsonMimeType?: string
 }
 
+export type SlideEditColorSwatchJSONPasteValueMode =
+  | 'direct'
+  | 'direct-with-channel'
+  | 'wrapped'
+
+export type SlideEditColorSwatchJSONPasteValueOptions = {
+  mode?: SlideEditColorSwatchJSONPasteValueMode
+}
+
 export type SlideEditColorSwatchPasteTarget<
   TObjectId extends SlideEditColorSwatchObjectId =
     SlideEditColorSwatchObjectId,
@@ -444,12 +453,9 @@ export function getSlideEditColorSwatchJSONPasteValue({
     const customText = dataTransfer.getData(jsonMimeType)
 
     if (customText.trim()) {
-      const customValue = parseSlideEditColorSwatchJSON(customText)
-      const customPasteValue = getSlideEditColorSwatchDirectPasteValue(
-        customValue,
-        {
-          requireChannel: false,
-        },
+      const customPasteValue = getSlideEditColorSwatchJSONPasteValueFromText(
+        customText,
+        { mode: 'direct' },
       )
 
       if (customPasteValue !== null) {
@@ -465,16 +471,19 @@ export function getSlideEditColorSwatchJSONPasteValue({
       continue
     }
 
-    const value = parseSlideEditColorSwatchJSON(text)
-    const wrappedPasteValue = getSlideEditColorSwatchWrappedPasteValue(value)
+    const wrappedPasteValue = getSlideEditColorSwatchJSONPasteValueFromText(
+      text,
+      { mode: 'wrapped' },
+    )
 
     if (wrappedPasteValue !== null) {
       return wrappedPasteValue
     }
 
-    const directPasteValue = getSlideEditColorSwatchDirectPasteValue(value, {
-      requireChannel: true,
-    })
+    const directPasteValue = getSlideEditColorSwatchJSONPasteValueFromText(
+      text,
+      { mode: 'direct-with-channel' },
+    )
 
     if (directPasteValue !== null) {
       return directPasteValue
@@ -482,6 +491,34 @@ export function getSlideEditColorSwatchJSONPasteValue({
   }
 
   return null
+}
+
+export function getSlideEditColorSwatchJSONPasteValueFromText(
+  text: string,
+  options?: SlideEditColorSwatchJSONPasteValueOptions,
+): SlideEditColorSwatchJSONPasteValue | null {
+  return getSlideEditColorSwatchJSONPasteValueFromValue(
+    parseSlideEditColorSwatchJSON(text),
+    options,
+  )
+}
+
+export function getSlideEditColorSwatchJSONPasteValueFromValue(
+  value: unknown,
+  { mode = 'direct' }: SlideEditColorSwatchJSONPasteValueOptions = {},
+): SlideEditColorSwatchJSONPasteValue | null {
+  switch (mode) {
+    case 'direct':
+      return getSlideEditColorSwatchDirectPasteValue(value, {
+        requireChannel: false,
+      })
+    case 'direct-with-channel':
+      return getSlideEditColorSwatchDirectPasteValue(value, {
+        requireChannel: true,
+      })
+    case 'wrapped':
+      return getSlideEditColorSwatchWrappedPasteValue(value)
+  }
 }
 
 export function getSlideEditColorSwatchPasteCommandEffects<

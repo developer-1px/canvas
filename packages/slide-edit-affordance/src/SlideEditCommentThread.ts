@@ -54,6 +54,16 @@ export type SlideEditCommentThreadJSONPasteInput = {
   storagePolicy?: SlideEditCommentThreadStoragePolicy
 }
 
+export type SlideEditCommentThreadJSONPasteValueMode =
+  | 'direct'
+  | 'wrapped'
+
+export type SlideEditCommentThreadJSONPasteValueOptions = {
+  mode?: SlideEditCommentThreadJSONPasteValueMode
+  sourceType?: string
+  storagePolicy?: SlideEditCommentThreadStoragePolicy
+}
+
 export type SlideEditCommentThreadPatchTarget<
   TCommentId extends SlideEditCommentThreadCommentId =
     SlideEditCommentThreadCommentId,
@@ -157,13 +167,14 @@ export function getSlideEditCommentThreadJSONPasteValue({
     const customText = dataTransfer.getData(jsonMimeType)
 
     if (customText.trim()) {
-      const customValue = parseSlideEditCommentThreadJSON(customText)
-      const customPasteValue = getSlideEditCommentThreadDirectJSONPasteValue({
-        payloadLength: customText.length,
-        sourceType: jsonMimeType,
-        storagePolicy,
-        value: customValue,
-      })
+      const customPasteValue = getSlideEditCommentThreadJSONPasteValueFromText(
+        customText,
+        {
+          mode: 'direct',
+          sourceType: jsonMimeType,
+          storagePolicy,
+        },
+      )
 
       if (customPasteValue !== null) {
         return customPasteValue
@@ -178,13 +189,14 @@ export function getSlideEditCommentThreadJSONPasteValue({
       continue
     }
 
-    const value = parseSlideEditCommentThreadJSON(text)
-    const pasteValue = getSlideEditCommentThreadWrappedJSONPasteValue({
-      payloadLength: text.length,
-      sourceType: type,
-      storagePolicy,
-      value,
-    })
+    const pasteValue = getSlideEditCommentThreadJSONPasteValueFromText(
+      text,
+      {
+        mode: 'wrapped',
+        sourceType: type,
+        storagePolicy,
+      },
+    )
 
     if (pasteValue !== null) {
       return pasteValue
@@ -192,6 +204,42 @@ export function getSlideEditCommentThreadJSONPasteValue({
   }
 
   return null
+}
+
+export function getSlideEditCommentThreadJSONPasteValueFromText(
+  text: string,
+  options?: SlideEditCommentThreadJSONPasteValueOptions,
+): SlideEditCommentThreadJSONPasteValue | null {
+  return getSlideEditCommentThreadJSONPasteValueFromValue(
+    parseSlideEditCommentThreadJSON(text),
+    {
+      ...options,
+      payloadLength: text.length,
+    },
+  )
+}
+
+export function getSlideEditCommentThreadJSONPasteValueFromValue(
+  value: unknown,
+  {
+    mode = 'direct',
+    payloadLength = 0,
+    sourceType = 'value',
+    storagePolicy = {},
+  }: SlideEditCommentThreadJSONPasteValueOptions & {
+    payloadLength?: number
+  } = {},
+): SlideEditCommentThreadJSONPasteValue | null {
+  const input = {
+    payloadLength,
+    sourceType,
+    storagePolicy,
+    value,
+  }
+
+  return mode === 'wrapped'
+    ? getSlideEditCommentThreadWrappedJSONPasteValue(input)
+    : getSlideEditCommentThreadDirectJSONPasteValue(input)
 }
 
 export function getSlideEditCommentThreadPasteCommandEffect<

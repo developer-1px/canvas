@@ -2,11 +2,15 @@ import { describe, expect, it } from 'vitest'
 
 import {
   getSlideEditTableRowsJSONPasteValue,
+  getSlideEditTableRowsJSONPasteValueFromText,
+  getSlideEditTableRowsJSONPasteValueFromValue,
   getSlideEditTableRowsPasteCommandEffect,
   SLIDE_EDIT_TABLE_ROWS_JSON_MIME_TYPE,
 } from './SlideEditTableRows'
 import {
   getSlideEditTableRowsJSONPasteValue as getSlideEditTableRowsJSONPasteValueFromPackage,
+  getSlideEditTableRowsJSONPasteValueFromText as getSlideEditTableRowsJSONPasteValueFromTextFromPackage,
+  getSlideEditTableRowsJSONPasteValueFromValue as getSlideEditTableRowsJSONPasteValueFromValueFromPackage,
 } from './index'
 
 describe('SlideEditTableRows', () => {
@@ -104,6 +108,80 @@ describe('SlideEditTableRows', () => {
       ],
       wrapper: 'table',
     })
+  })
+
+  it('reads table rows JSON from text and parsed values', () => {
+    const directText = '[["Name","Count"],["A",1]]'
+
+    expect(getSlideEditTableRowsJSONPasteValueFromText(
+      directText,
+      { sourceType: 'custom/test' },
+    )).toEqual({
+      columnCount: 2,
+      format: 'json',
+      payloadLength: directText.length,
+      rowCount: 2,
+      rows: [
+        ['Name', 'Count'],
+        ['A', '1'],
+      ],
+      sourceType: 'custom/test',
+      surface: 'table-rows',
+    })
+    expect(getSlideEditTableRowsJSONPasteValueFromValue({
+      tableRows: [
+        ['Name', 'Count'],
+        ['B', 2],
+      ],
+    }, { mode: 'wrapped', sourceType: 'application/json' })).toMatchObject({
+      rows: [
+        ['Name', 'Count'],
+        ['B', '2'],
+      ],
+      sourceType: 'application/json',
+      wrapper: 'tableRows',
+    })
+    expect(getSlideEditTableRowsJSONPasteValueFromTextFromPackage(
+      JSON.stringify({
+        table: {
+          headers: ['Name', 'Count'],
+          rows: [{ Count: 2, Name: 'B' }],
+        },
+      }),
+      {
+        mode: 'wrapped',
+        sourceType: 'text/json',
+        storagePolicy: {
+          maxCellLength: 4,
+          maxColumns: 2,
+          maxRows: 2,
+          normalizeCell: ({ value }) => value.toUpperCase(),
+        },
+      },
+    )).toMatchObject({
+      rowCount: 2,
+      rows: [
+        ['NAME', 'COUN'],
+        ['B', '2'],
+      ],
+      sourceType: 'text/json',
+      wrapper: 'table',
+    })
+    expect(getSlideEditTableRowsJSONPasteValueFromValueFromPackage([
+      ['Direct'],
+      ['A'],
+    ])).toMatchObject({
+      payloadLength: 0,
+      rows: [
+        ['Direct'],
+        ['A'],
+      ],
+      sourceType: 'value',
+    })
+    expect(getSlideEditTableRowsJSONPasteValueFromText(
+      '[["Direct generic"]]',
+      { mode: 'wrapped' },
+    )).toBeNull()
   })
 
   it('converts table rows paste values to replace command effects', () => {
