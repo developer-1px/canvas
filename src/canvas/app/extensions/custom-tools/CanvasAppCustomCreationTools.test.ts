@@ -70,6 +70,26 @@ describe('CanvasAppCustomCreationTools', () => {
         shortcut: { key: 'Space' },
       }),
     ).toBe(true)
+    expect(
+      matchesCanvasAppCustomToolShortcut({
+        event: {
+          altKey: true,
+          key: 'K',
+          shiftKey: true,
+        } as KeyboardEvent,
+        shortcut: { key: 'k', shiftKey: true },
+      }),
+    ).toBe(false)
+    expect(
+      matchesCanvasAppCustomToolShortcut({
+        event: {
+          key: 'K',
+          metaKey: true,
+          shiftKey: true,
+        } as KeyboardEvent,
+        shortcut: { key: 'k', shiftKey: true },
+      }),
+    ).toBe(false)
   })
 
   it('normalizes custom tool shortcut keys', () => {

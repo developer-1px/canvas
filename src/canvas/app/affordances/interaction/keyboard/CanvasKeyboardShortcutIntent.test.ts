@@ -13,6 +13,96 @@ import {
 } from './CanvasKeyboardShortcutIntent'
 
 describe('CanvasKeyboardShortcutIntent', () => {
+  it('routes core editing and creation shortcuts from the canvas surface', () => {
+    expect(getCanvasKeyboardShortcutIntent(createInput({
+      event: createKeyboardEvent({ key: 'Delete' }),
+    }))).toEqual({
+      kind: 'delete-selection',
+      preventDefault: true,
+    })
+
+    expect(getCanvasKeyboardShortcutIntent(createInput({
+      event: createKeyboardEvent({ key: 'Backspace' }),
+    }))).toEqual({
+      kind: 'delete-selection',
+      preventDefault: true,
+    })
+
+    expect(getCanvasKeyboardShortcutIntent(createInput({
+      event: createKeyboardEvent({ key: 'z', metaKey: true }),
+    }))).toEqual({
+      kind: 'undo-history',
+      preventDefault: true,
+    })
+
+    expect(getCanvasKeyboardShortcutIntent(createInput({
+      event: createKeyboardEvent({
+        key: 'z',
+        metaKey: true,
+        shiftKey: true,
+      }),
+    }))).toEqual({
+      kind: 'redo-history',
+      preventDefault: true,
+    })
+
+    expect(getCanvasKeyboardShortcutIntent(createInput({
+      event: createKeyboardEvent({ key: 'y', metaKey: true }),
+    }))).toEqual({
+      kind: 'redo-history',
+      preventDefault: true,
+    })
+
+    expect(getCanvasKeyboardShortcutIntent(createInput({
+      event: createKeyboardEvent({ code: 'Space', key: ' ' }),
+    }))).toEqual({
+      kind: 'temporary-pan',
+      preventDefault: true,
+    })
+
+    expect(getCanvasKeyboardShortcutIntent(createInput({
+      event: createKeyboardEvent({ key: 'h' }),
+    }))).toEqual({
+      kind: 'set-tool',
+      preventDefault: false,
+      tool: 'pan',
+    })
+
+    expect(getCanvasKeyboardShortcutIntent(createInput({
+      event: createKeyboardEvent({ key: 'm' }),
+    }))).toEqual({
+      kind: 'set-tool',
+      preventDefault: false,
+      tool: 'marker',
+    })
+  })
+
+  it('does not route canvas shortcuts when extra command modifiers are present', () => {
+    expect(getCanvasKeyboardShortcutIntent(createInput({
+      event: createKeyboardEvent({ key: 'Delete', metaKey: true }),
+    }))).toEqual({ kind: 'none', preventDefault: false })
+
+    expect(getCanvasKeyboardShortcutIntent(createInput({
+      event: createKeyboardEvent({
+        altKey: true,
+        key: 'z',
+        metaKey: true,
+      }),
+    }))).toEqual({ kind: 'none', preventDefault: false })
+
+    expect(getCanvasKeyboardShortcutIntent(createInput({
+      event: createKeyboardEvent({
+        code: 'Space',
+        key: ' ',
+        metaKey: true,
+      }),
+    }))).toEqual({ kind: 'none', preventDefault: false })
+
+    expect(getCanvasKeyboardShortcutIntent(createInput({
+      event: createKeyboardEvent({ altKey: true, key: 'm' }),
+    }))).toEqual({ kind: 'none', preventDefault: false })
+  })
+
   it('resolves custom creation tool shortcuts through the external tool seam', () => {
     const intent = getCanvasKeyboardShortcutIntent(createInput({
       event: createKeyboardEvent({ key: 'K', shiftKey: true }),

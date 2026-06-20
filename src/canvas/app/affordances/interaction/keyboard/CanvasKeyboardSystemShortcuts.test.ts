@@ -57,6 +57,53 @@ describe('CanvasKeyboardSystemShortcuts', () => {
     })
   })
 
+  it('requires exact system shortcut modifiers', () => {
+    expect(getCanvasKeyboardSystemShortcutIntent({
+      config: createCanvasAffordanceConfig(),
+      event: createKeyboardEvent({ key: 'k' }),
+      key: 'k',
+      mod: false,
+      phase: 'before-typing-target',
+    })).toBeNull()
+
+    expect(getCanvasKeyboardSystemShortcutIntent({
+      config: createCanvasAffordanceConfig(),
+      event: createKeyboardEvent({
+        altKey: true,
+        key: 'k',
+        metaKey: true,
+      }),
+      key: 'k',
+      mod: true,
+      phase: 'before-typing-target',
+    })).toBeNull()
+
+    expect(getCanvasKeyboardSystemShortcutIntent({
+      config: createCanvasAffordanceConfig(),
+      event: createKeyboardEvent({
+        code: 'Space',
+        key: ' ',
+        metaKey: true,
+      }),
+      key: ' ',
+      mod: true,
+      phase: 'after-typing-target',
+    })).toBeNull()
+
+    expect(getCanvasKeyboardSystemShortcutIntent({
+      config: createCanvasAffordanceConfig(),
+      event: createKeyboardEvent({
+        code: 'Slash',
+        key: '?',
+        metaKey: true,
+        shiftKey: true,
+      }),
+      key: '?',
+      mod: true,
+      phase: 'after-typing-target',
+    })).toBeNull()
+  })
+
   it('honors system shortcut feature toggles', () => {
     expect(getCanvasKeyboardSystemShortcutIntent({
       config: createCanvasAffordanceConfig({

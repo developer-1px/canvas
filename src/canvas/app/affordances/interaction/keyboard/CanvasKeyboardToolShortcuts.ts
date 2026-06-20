@@ -7,7 +7,7 @@ import type {
 } from '../../../../entities'
 import {
   formatCanvasKeyboardShortcutAriaKey,
-  normalizeCanvasKeyboardShortcutKey,
+  matchesCanvasKeyboardShortcutBinding,
   reserveCanvasKeyboardShortcut,
   type CanvasKeyboardReservedShortcut,
 } from './CanvasKeyboardShortcutChords'
@@ -81,16 +81,12 @@ function isCanvasKeyboardToolShortcutMatch({
     return false
   }
 
-  if (
-    key !== normalizeCanvasKeyboardShortcutKey(shortcut.shortcut.key)
-      .toLowerCase()
-  ) {
-    return false
-  }
-
-  if (shortcut.shiftInsensitive) {
-    return true
-  }
-
-  return event.shiftKey === (shortcut.shortcut.shiftKey ?? false)
+  return matchesCanvasKeyboardShortcutBinding({
+    event,
+    options: {
+      key,
+      shiftInsensitive: shortcut.shiftInsensitive,
+    },
+    shortcut: shortcut.shortcut,
+  })
 }

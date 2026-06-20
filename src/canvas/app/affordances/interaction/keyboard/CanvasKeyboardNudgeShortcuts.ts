@@ -1,5 +1,5 @@
 import {
-  normalizeCanvasKeyboardShortcutKey,
+  matchesCanvasKeyboardShortcutBinding,
   reserveCanvasKeyboardShortcut,
   type CanvasKeyboardReservedShortcut,
 } from './CanvasKeyboardShortcutChords'
@@ -57,18 +57,9 @@ function isCanvasKeyboardNudgeShortcutMatch(
   input: CanvasKeyboardCommandShortcutIntentInput,
   shortcut: CanvasKeyboardNudgeShortcutDescriptor,
 ) {
-  return (
-    isCanvasKeyboardNudgeShortcutKeyMatch(input.key, shortcut) &&
-    input.event.shiftKey === (shortcut.shortcut.shiftKey ?? false)
-  )
-}
-
-function isCanvasKeyboardNudgeShortcutKeyMatch(
-  key: string,
-  shortcut: CanvasKeyboardNudgeShortcutDescriptor,
-) {
-  return (
-    normalizeCanvasKeyboardShortcutKey(key).toLowerCase() ===
-    normalizeCanvasKeyboardShortcutKey(shortcut.shortcut.key).toLowerCase()
-  )
+  return matchesCanvasKeyboardShortcutBinding({
+    event: input.event,
+    options: { key: input.key },
+    shortcut: shortcut.shortcut,
+  })
 }

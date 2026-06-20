@@ -58,6 +58,24 @@ describe('CanvasKeyboardViewportShortcuts', () => {
     })
   })
 
+  it('requires exact viewport shortcut modifiers', () => {
+    expect(getCanvasKeyboardViewportShortcutIntent(createInput({
+      event: createKeyboardEvent({
+        altKey: true,
+        key: '=',
+        metaKey: true,
+      }),
+      key: '=',
+      mod: true,
+    }))).toBeNull()
+
+    expect(getCanvasKeyboardViewportShortcutIntent(createInput({
+      event: createKeyboardEvent({ key: '1', metaKey: true }),
+      key: '1',
+      mod: true,
+    }))).toBeNull()
+  })
+
   it('exports reserved viewport shortcuts for custom tool contracts', () => {
     expect(getCanvasKeyboardReservedViewportShortcuts()).toEqual([
       { label: 'fit all', shortcut: { key: '0' } },

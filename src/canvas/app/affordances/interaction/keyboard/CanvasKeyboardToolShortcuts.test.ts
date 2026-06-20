@@ -49,6 +49,20 @@ describe('CanvasKeyboardToolShortcuts', () => {
     })).toBe('select')
   })
 
+  it('does not resolve tool shortcuts with command modifiers', () => {
+    expect(getCanvasKeyboardBuiltinToolShortcut({
+      config: createCanvasAffordanceConfig(),
+      event: createKeyboardEvent({ key: 'M', metaKey: true }),
+      key: 'm',
+    })).toBeNull()
+
+    expect(getCanvasKeyboardBuiltinToolShortcut({
+      config: createCanvasAffordanceConfig(),
+      event: createKeyboardEvent({ altKey: true, key: 'H' }),
+      key: 'h',
+    })).toBeNull()
+  })
+
   it('honors tool shortcut feature toggles', () => {
     expect(getCanvasKeyboardBuiltinToolShortcut({
       config: createCanvasAffordanceConfig({
@@ -91,6 +105,8 @@ describe('CanvasKeyboardToolShortcuts', () => {
       expect.arrayContaining([
         { label: 'select tool', shortcut: { key: 'v' } },
         { label: 'select tool', shortcut: { key: 'v', shiftKey: true } },
+        { label: 'pan tool', shortcut: { key: 'h' } },
+        { label: 'pan tool', shortcut: { key: 'h', shiftKey: true } },
         { label: 'sticky note tool', shortcut: { key: 's' } },
         { label: 'section tool', shortcut: { key: 's', shiftKey: true } },
         { label: 'ellipse tool', shortcut: { key: 'o' } },

@@ -61,6 +61,19 @@ describe('CanvasKeyboardNudgeShortcuts', () => {
     })
   })
 
+  it('does not resolve nudge shortcuts with command modifiers', () => {
+    expect(getCanvasKeyboardNudgeShortcutIntent(createInput({
+      event: createKeyboardEvent({ key: 'ArrowLeft', metaKey: true }),
+      key: 'arrowleft',
+      mod: true,
+    }))).toBeNull()
+
+    expect(getCanvasKeyboardNudgeShortcutIntent(createInput({
+      event: createKeyboardEvent({ altKey: true, key: 'ArrowLeft' }),
+      key: 'arrowleft',
+    }))).toBeNull()
+  })
+
   it('exports reserved nudge shortcuts for custom tool contracts', () => {
     expect(getCanvasKeyboardReservedNudgeShortcuts()).toEqual(
       expect.arrayContaining([

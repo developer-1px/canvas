@@ -1,5 +1,5 @@
 import {
-  normalizeCanvasKeyboardShortcutKey,
+  matchesCanvasKeyboardShortcutBinding,
   reserveCanvasKeyboardShortcut,
   type CanvasKeyboardReservedShortcut,
 } from './CanvasKeyboardShortcutChords'
@@ -59,34 +59,15 @@ function isCanvasKeyboardCommandShortcutMatch(
     return false
   }
 
-  if (shortcut.modifier === 'mod' && !input.mod) {
-    return false
-  }
-
-  if (shortcut.code && input.event.code !== shortcut.code) {
-    return false
-  }
-
-  if (
-    !shortcut.ignoreKey &&
-    !isCanvasKeyboardShortcutKeyMatch(input.key, shortcut)
-  ) {
-    return false
-  }
-
-  if (shortcut.shiftInsensitive) {
-    return true
-  }
-
-  return input.event.shiftKey === (shortcut.shortcut.shiftKey ?? false)
-}
-
-function isCanvasKeyboardShortcutKeyMatch(
-  key: string,
-  shortcut: CanvasKeyboardCommandShortcutDescriptor,
-) {
-  return (
-    normalizeCanvasKeyboardShortcutKey(key).toLowerCase() ===
-    normalizeCanvasKeyboardShortcutKey(shortcut.shortcut.key).toLowerCase()
-  )
+  return matchesCanvasKeyboardShortcutBinding({
+    event: input.event,
+    options: {
+      code: shortcut.code,
+      ignoreKey: shortcut.ignoreKey,
+      key: input.key,
+      modifier: shortcut.modifier,
+      shiftInsensitive: shortcut.shiftInsensitive,
+    },
+    shortcut: shortcut.shortcut,
+  })
 }

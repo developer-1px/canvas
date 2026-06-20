@@ -98,10 +98,7 @@ describe('CanvasKeyboardCommandShortcuts', () => {
       event: createKeyboardEvent({ key: 'Enter', metaKey: true }),
       key: 'enter',
       mod: true,
-    }))).toEqual({
-      kind: 'none',
-      preventDefault: false,
-    })
+    }))).toBeNull()
   })
 
   it('does not edit selection when Enter has no single selected item', () => {
@@ -151,10 +148,31 @@ describe('CanvasKeyboardCommandShortcuts', () => {
     expect(getCanvasKeyboardBuiltinCommandShortcutIntent(createInput({
       event: createKeyboardEvent({ altKey: true, code: 'F2', key: 'F2' }),
       key: 'F2',
-    }))).toEqual({
-      kind: 'none',
-      preventDefault: false,
-    })
+    }))).toBeNull()
+  })
+
+  it('requires exact command shortcut modifiers', () => {
+    expect(getCanvasKeyboardBuiltinCommandShortcutIntent(createInput({
+      event: createKeyboardEvent({ key: 'Delete', metaKey: true }),
+      key: 'delete',
+      mod: true,
+    }))).toBeNull()
+
+    expect(getCanvasKeyboardBuiltinCommandShortcutIntent(createInput({
+      event: createKeyboardEvent({ key: 'z' }),
+      key: 'z',
+      mod: false,
+    }))).toBeNull()
+
+    expect(getCanvasKeyboardBuiltinCommandShortcutIntent(createInput({
+      event: createKeyboardEvent({
+        altKey: true,
+        key: 'z',
+        metaKey: true,
+      }),
+      key: 'z',
+      mod: true,
+    }))).toBeNull()
   })
 })
 

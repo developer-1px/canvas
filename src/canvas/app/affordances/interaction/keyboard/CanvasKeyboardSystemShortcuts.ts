@@ -2,7 +2,7 @@ import type {
   CanvasAffordanceConfig,
 } from '../../../../engine'
 import {
-  normalizeCanvasKeyboardShortcutKey,
+  matchesCanvasKeyboardShortcutBinding,
   reserveCanvasKeyboardShortcut,
   type CanvasKeyboardReservedShortcut,
 } from './CanvasKeyboardShortcutChords'
@@ -87,25 +87,15 @@ function isCanvasKeyboardSystemShortcutMatch(
     return false
   }
 
-  if (shortcut.modifier === 'mod' && !input.mod) {
-    return false
-  }
-
-  if (shortcut.code && input.event.code !== shortcut.code) {
-    return false
-  }
-
-  if (
-    !shortcut.ignoreKey &&
-    normalizeCanvasKeyboardShortcutKey(input.key).toLowerCase() !==
-      normalizeCanvasKeyboardShortcutKey(shortcut.shortcut.key).toLowerCase()
-  ) {
-    return false
-  }
-
-  if (shortcut.shiftInsensitive) {
-    return true
-  }
-
-  return input.event.shiftKey === (shortcut.shortcut.shiftKey ?? false)
+  return matchesCanvasKeyboardShortcutBinding({
+    event: input.event,
+    options: {
+      code: shortcut.code,
+      ignoreKey: shortcut.ignoreKey,
+      key: input.key,
+      modifier: shortcut.modifier,
+      shiftInsensitive: shortcut.shiftInsensitive,
+    },
+    shortcut: shortcut.shortcut,
+  })
 }
