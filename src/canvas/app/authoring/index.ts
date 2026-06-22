@@ -2,6 +2,12 @@ export {
   createCanvasAppAssembly,
   type CanvasAppItemAdapters,
 } from '../workflow/CanvasAppAssembly'
+export {
+  CANVAS_APP_MINIMAL_VIEWER_STARTER_PROFILE_ID,
+  createCanvasAppMinimalViewerAssembly,
+  createCanvasAppMinimalViewerAssemblyInput,
+  type CanvasAppMinimalViewerStarterInput,
+} from '../workflow/CanvasAppMinimalViewerStarter'
 export type {
   CanvasAppAssembly,
   CanvasAppAssemblyInput,

@@ -284,6 +284,12 @@ Profiles
    `-- basic-editor + collaboration-facilitation-suite
 ```
 
+Current starter helpers:
+
+| Starter | Public helper | Pack selection |
+|---|---|---|
+| `minimal-viewer` | `createCanvasAppMinimalViewerAssembly` | read-only capabilities + `zoom-controls` |
+
 ## Current Package Entry Interpretation
 
 | Import path | Consumer meaning |

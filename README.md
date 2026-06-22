@@ -45,6 +45,19 @@ consumer-facing boundary map.
 @interactive-os/canvas/style.css   app shell CSS surface
 ```
 
+## Starters
+
+```ts
+import {
+  createCanvasAppMinimalViewerAssembly,
+} from '@interactive-os/canvas/app/authoring'
+
+const assembly = createCanvasAppMinimalViewerAssembly()
+```
+
+`minimal-viewer` applies the read-only app capability set and installs only the
+viewer control pack required for zoom controls.
+
 ## Run
 
 ```sh

@@ -6,6 +6,12 @@ export {
   createCanvasAppAssembly,
   type CanvasAppItemAdapters,
 } from './CanvasAppAssembly'
+export {
+  CANVAS_APP_MINIMAL_VIEWER_STARTER_PROFILE_ID,
+  createCanvasAppMinimalViewerAssembly,
+  createCanvasAppMinimalViewerAssemblyInput,
+  type CanvasAppMinimalViewerStarterInput,
+} from './CanvasAppMinimalViewerStarter'
 export type {
   CanvasAppAssembly,
   CanvasAppAssemblyInput,
