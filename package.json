@@ -187,6 +187,11 @@
       "import": "./dist/package/canvas/app/feature-packs/zoom-controls/index.js",
       "default": "./dist/package/canvas/app/feature-packs/zoom-controls/index.js"
     },
+    "./marketplace": {
+      "types": "./dist/package/canvas/marketplace/index.d.ts",
+      "import": "./dist/package/canvas/marketplace/index.js",
+      "default": "./dist/package/canvas/marketplace/index.js"
+    },
     "./core": {
       "types": "./dist/package/canvas/core/index.d.ts",
       "import": "./dist/package/canvas/core/index.js",

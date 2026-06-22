@@ -1,0 +1,75 @@
+import {
+  assertCanvasAppFeaturePackManifest,
+  assertCanvasAppFeaturePackManifests,
+  createCanvasAppFeaturePackManifest,
+  getCanvasAppEnabledFeaturePackManifestIds,
+  getCanvasAppEnabledFeaturePackManifests,
+  getCanvasAppInstalledFeaturePackManifestIds,
+  getCanvasAppInstalledFeaturePackManifests,
+  getCanvasAppManifestExtensionFeaturePacks,
+  getCanvasAppManifestViewFeaturePacks,
+  type CanvasAppFeaturePackContributionSurface,
+  type CanvasAppFeaturePackManifest,
+  type CanvasAppFeaturePackManifestCategory,
+  type CanvasAppFeaturePackManifestCompatibility,
+  type CanvasAppFeaturePackManifestCompatibilityInput,
+  type CanvasAppFeaturePackManifestContributions,
+  type CanvasAppFeaturePackManifestContributionsInput,
+  type CanvasAppFeaturePackManifestInput,
+  type CanvasAppFeaturePackManifestLifecycle,
+  type CanvasAppFeaturePackManifestLifecycleInput,
+  type CanvasAppFeaturePackManifestOrphanedDataPolicy,
+  type CanvasAppFeaturePackManifestOrphanedDataScopeId,
+  type CanvasAppFeaturePackManifestPackage,
+  type CanvasAppFeaturePackManifestPackageInput,
+} from '../app/feature-packs'
+
+export const assertCanvasMarketplaceFeaturePackManifest =
+  assertCanvasAppFeaturePackManifest
+export const assertCanvasMarketplaceFeaturePackManifests =
+  assertCanvasAppFeaturePackManifests
+export const createCanvasMarketplaceFeaturePackManifest =
+  createCanvasAppFeaturePackManifest
+export const getCanvasMarketplaceEnabledFeaturePackManifestIds =
+  getCanvasAppEnabledFeaturePackManifestIds
+export const getCanvasMarketplaceEnabledFeaturePackManifests =
+  getCanvasAppEnabledFeaturePackManifests
+export const getCanvasMarketplaceInstalledFeaturePackManifestIds =
+  getCanvasAppInstalledFeaturePackManifestIds
+export const getCanvasMarketplaceInstalledFeaturePackManifests =
+  getCanvasAppInstalledFeaturePackManifests
+export const getCanvasMarketplaceManifestExtensionFeaturePacks =
+  getCanvasAppManifestExtensionFeaturePacks
+export const getCanvasMarketplaceManifestViewFeaturePacks =
+  getCanvasAppManifestViewFeaturePacks
+
+export type CanvasMarketplaceFeaturePackContributionSurface =
+  CanvasAppFeaturePackContributionSurface
+export type CanvasMarketplaceFeaturePackManifest<
+  TRuntimeFeaturePacks = unknown,
+> = CanvasAppFeaturePackManifest<TRuntimeFeaturePacks>
+export type CanvasMarketplaceFeaturePackManifestCategory =
+  CanvasAppFeaturePackManifestCategory
+export type CanvasMarketplaceFeaturePackManifestCompatibility =
+  CanvasAppFeaturePackManifestCompatibility
+export type CanvasMarketplaceFeaturePackManifestCompatibilityInput =
+  CanvasAppFeaturePackManifestCompatibilityInput
+export type CanvasMarketplaceFeaturePackManifestContributions =
+  CanvasAppFeaturePackManifestContributions
+export type CanvasMarketplaceFeaturePackManifestContributionsInput =
+  CanvasAppFeaturePackManifestContributionsInput
+export type CanvasMarketplaceFeaturePackManifestInput<
+  TRuntimeFeaturePacks = unknown,
+> = CanvasAppFeaturePackManifestInput<TRuntimeFeaturePacks>
+export type CanvasMarketplaceFeaturePackManifestLifecycle =
+  CanvasAppFeaturePackManifestLifecycle
+export type CanvasMarketplaceFeaturePackManifestLifecycleInput =
+  CanvasAppFeaturePackManifestLifecycleInput
+export type CanvasMarketplaceFeaturePackManifestOrphanedDataPolicy =
+  CanvasAppFeaturePackManifestOrphanedDataPolicy
+export type CanvasMarketplaceFeaturePackManifestOrphanedDataScopeId =
+  CanvasAppFeaturePackManifestOrphanedDataScopeId
+export type CanvasMarketplaceFeaturePackManifestPackage =
+  CanvasAppFeaturePackManifestPackage
+export type CanvasMarketplaceFeaturePackManifestPackageInput =
+  CanvasAppFeaturePackManifestPackageInput

@@ -130,6 +130,11 @@ Smallest Complete Feature Pack
 
 ## Feature Pack Manifest Contract
 
+The public package boundary for installable feature-pack lifecycle contracts is
+`@interactive-os/canvas/marketplace`. Existing
+`@interactive-os/canvas/app/feature-packs/*` exports remain as first-party pack
+and compatibility entry points.
+
 Every feature pack manifest is also a package contract. It must say what the
 pack is, where it is distributed from, what it contributes, what it depends on,
 and how it behaves through lifecycle transitions.

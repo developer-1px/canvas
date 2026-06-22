@@ -1,0 +1,127 @@
+import {
+  assertCanvasAppFeaturePackProfile,
+  assertCanvasAppFeaturePackProfiles,
+  assertCanvasAppFeaturePackSuiteIds,
+  assertCanvasAppFeaturePackSuiteManifest,
+  assertCanvasAppFeaturePackSuiteManifests,
+  createCanvasAppFeaturePackProfile,
+  createCanvasAppFeaturePackSuiteManifest,
+  getCanvasAppFeaturePackProfileById,
+  getCanvasAppFeaturePackProfileMarketplaceActionModel,
+  getCanvasAppFeaturePackProfileRuntimeStates,
+  getCanvasAppFeaturePackSuiteFeaturePackIds,
+  getCanvasAppFeaturePackSuiteMarketplaceActionModel,
+  type CanvasAppFeaturePackProfile,
+  type CanvasAppFeaturePackProfileId,
+  type CanvasAppFeaturePackProfileInput,
+  type CanvasAppFeaturePackProfileMarketplaceAction,
+  type CanvasAppFeaturePackProfileMarketplaceActionItem,
+  type CanvasAppFeaturePackProfileMarketplaceActionKind,
+  type CanvasAppFeaturePackProfileMarketplaceActionModel,
+  type CanvasAppFeaturePackProfileMarketplaceBlockScope,
+  type CanvasAppFeaturePackProfileMarketplaceBlockedReason,
+  type CanvasAppFeaturePackProfileMarketplaceConflictReason,
+  type CanvasAppFeaturePackProfileMarketplaceConflictReasonKind,
+  type CanvasAppFeaturePackProfileMarketplaceLifecycleReason,
+  type CanvasAppFeaturePackProfileMarketplacePartialUpdateReason,
+  type CanvasAppFeaturePackProfileMarketplaceRequiredReason,
+  type CanvasAppFeaturePackProfileMarketplaceRequiredReasonKind,
+  type CanvasAppFeaturePackProfileMarketplaceStateChange,
+  type CanvasAppFeaturePackProfileMarketplaceStatus,
+  type CanvasAppFeaturePackProfileMarketplaceUninstallPolicyEntry,
+  type CanvasAppFeaturePackProfileMarketplaceUnknownPackReason,
+  type CanvasAppFeaturePackProfileRuntimeStatesInput,
+  type CanvasAppFeaturePackSuiteId,
+  type CanvasAppFeaturePackSuiteManifest,
+  type CanvasAppFeaturePackSuiteManifestInput,
+  type CanvasAppFeaturePackSuiteMarketplaceAction,
+  type CanvasAppFeaturePackSuiteMarketplaceActionItem,
+  type CanvasAppFeaturePackSuiteMarketplaceActionKind,
+  type CanvasAppFeaturePackSuiteMarketplaceActionModel,
+  type CanvasAppFeaturePackSuiteMarketplaceBlockedReason,
+  type CanvasAppFeaturePackSuiteMarketplaceStatus,
+} from '../app/feature-packs'
+
+export const assertCanvasMarketplaceFeaturePackProfile =
+  assertCanvasAppFeaturePackProfile
+export const assertCanvasMarketplaceFeaturePackProfiles =
+  assertCanvasAppFeaturePackProfiles
+export const assertCanvasMarketplaceFeaturePackSuiteIds =
+  assertCanvasAppFeaturePackSuiteIds
+export const assertCanvasMarketplaceFeaturePackSuiteManifest =
+  assertCanvasAppFeaturePackSuiteManifest
+export const assertCanvasMarketplaceFeaturePackSuiteManifests =
+  assertCanvasAppFeaturePackSuiteManifests
+export const createCanvasMarketplaceFeaturePackProfile =
+  createCanvasAppFeaturePackProfile
+export const createCanvasMarketplaceFeaturePackSuiteManifest =
+  createCanvasAppFeaturePackSuiteManifest
+export const getCanvasMarketplaceFeaturePackProfileById =
+  getCanvasAppFeaturePackProfileById
+export const getCanvasMarketplaceFeaturePackProfileActionModel =
+  getCanvasAppFeaturePackProfileMarketplaceActionModel
+export const getCanvasMarketplaceFeaturePackProfileRuntimeStates =
+  getCanvasAppFeaturePackProfileRuntimeStates
+export const getCanvasMarketplaceFeaturePackSuiteFeaturePackIds =
+  getCanvasAppFeaturePackSuiteFeaturePackIds
+export const getCanvasMarketplaceFeaturePackSuiteActionModel =
+  getCanvasAppFeaturePackSuiteMarketplaceActionModel
+
+export type CanvasMarketplaceFeaturePackProfile =
+  CanvasAppFeaturePackProfile
+export type CanvasMarketplaceFeaturePackProfileId =
+  CanvasAppFeaturePackProfileId
+export type CanvasMarketplaceFeaturePackProfileInput =
+  CanvasAppFeaturePackProfileInput
+export type CanvasMarketplaceFeaturePackProfileAction =
+  CanvasAppFeaturePackProfileMarketplaceAction
+export type CanvasMarketplaceFeaturePackProfileActionItem =
+  CanvasAppFeaturePackProfileMarketplaceActionItem
+export type CanvasMarketplaceFeaturePackProfileActionKind =
+  CanvasAppFeaturePackProfileMarketplaceActionKind
+export type CanvasMarketplaceFeaturePackProfileActionModel =
+  CanvasAppFeaturePackProfileMarketplaceActionModel
+export type CanvasMarketplaceFeaturePackProfileBlockScope =
+  CanvasAppFeaturePackProfileMarketplaceBlockScope
+export type CanvasMarketplaceFeaturePackProfileBlockedReason =
+  CanvasAppFeaturePackProfileMarketplaceBlockedReason
+export type CanvasMarketplaceFeaturePackProfileConflictReason =
+  CanvasAppFeaturePackProfileMarketplaceConflictReason
+export type CanvasMarketplaceFeaturePackProfileConflictReasonKind =
+  CanvasAppFeaturePackProfileMarketplaceConflictReasonKind
+export type CanvasMarketplaceFeaturePackProfileLifecycleReason =
+  CanvasAppFeaturePackProfileMarketplaceLifecycleReason
+export type CanvasMarketplaceFeaturePackProfilePartialUpdateReason =
+  CanvasAppFeaturePackProfileMarketplacePartialUpdateReason
+export type CanvasMarketplaceFeaturePackProfileRequiredReason =
+  CanvasAppFeaturePackProfileMarketplaceRequiredReason
+export type CanvasMarketplaceFeaturePackProfileRequiredReasonKind =
+  CanvasAppFeaturePackProfileMarketplaceRequiredReasonKind
+export type CanvasMarketplaceFeaturePackProfileStateChange =
+  CanvasAppFeaturePackProfileMarketplaceStateChange
+export type CanvasMarketplaceFeaturePackProfileStatus =
+  CanvasAppFeaturePackProfileMarketplaceStatus
+export type CanvasMarketplaceFeaturePackProfileUninstallPolicyEntry =
+  CanvasAppFeaturePackProfileMarketplaceUninstallPolicyEntry
+export type CanvasMarketplaceFeaturePackProfileUnknownPackReason =
+  CanvasAppFeaturePackProfileMarketplaceUnknownPackReason
+export type CanvasMarketplaceFeaturePackProfileRuntimeStatesInput =
+  CanvasAppFeaturePackProfileRuntimeStatesInput
+export type CanvasMarketplaceFeaturePackSuiteId =
+  CanvasAppFeaturePackSuiteId
+export type CanvasMarketplaceFeaturePackSuiteManifest =
+  CanvasAppFeaturePackSuiteManifest
+export type CanvasMarketplaceFeaturePackSuiteManifestInput =
+  CanvasAppFeaturePackSuiteManifestInput
+export type CanvasMarketplaceFeaturePackSuiteAction =
+  CanvasAppFeaturePackSuiteMarketplaceAction
+export type CanvasMarketplaceFeaturePackSuiteActionItem =
+  CanvasAppFeaturePackSuiteMarketplaceActionItem
+export type CanvasMarketplaceFeaturePackSuiteActionKind =
+  CanvasAppFeaturePackSuiteMarketplaceActionKind
+export type CanvasMarketplaceFeaturePackSuiteActionModel =
+  CanvasAppFeaturePackSuiteMarketplaceActionModel
+export type CanvasMarketplaceFeaturePackSuiteBlockedReason =
+  CanvasAppFeaturePackSuiteMarketplaceBlockedReason
+export type CanvasMarketplaceFeaturePackSuiteStatus =
+  CanvasAppFeaturePackSuiteMarketplaceStatus

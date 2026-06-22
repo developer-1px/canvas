@@ -1,0 +1,70 @@
+import {
+  applyCanvasAppFeaturePackRuntimeStatePatch,
+  assertCanvasAppFeaturePack,
+  assertCanvasAppFeaturePackIds,
+  assertCanvasAppFeaturePacks,
+  createCanvasAppFeaturePack,
+  createCanvasAppFeaturePackExtensionBundle,
+  getCanvasAppEnabledFeaturePackIds,
+  getCanvasAppFeatureFlagRuntimeStateInputs,
+  getCanvasAppInstalledFeaturePackIds,
+  getCanvasAppInstalledFeaturePacks,
+  getCanvasAppResolvedFeaturePackStates,
+  setCanvasAppFeatureFlagSetting,
+  type CanvasAppFeatureFlagSettingInput,
+  type CanvasAppFeatureFlagSettings,
+  type CanvasAppFeaturePack,
+  type CanvasAppFeaturePackId,
+  type CanvasAppFeaturePackInput,
+  type CanvasAppFeaturePackInstallOptions,
+  type CanvasAppFeaturePackRuntimeState,
+  type CanvasAppFeaturePackRuntimeStateInput,
+  type CanvasAppFeaturePackRuntimeStatePatch,
+  type CanvasAppFeaturePackRuntimeStatePatchChange,
+  type CanvasAppFeaturePackRuntimeStatePatchInput,
+  type CanvasAppFeaturePackRuntimeStateStatus,
+} from '../app/feature-packs'
+
+export const applyCanvasMarketplaceFeaturePackRuntimeStatePatch =
+  applyCanvasAppFeaturePackRuntimeStatePatch
+export const assertCanvasMarketplaceFeaturePack = assertCanvasAppFeaturePack
+export const assertCanvasMarketplaceFeaturePackIds =
+  assertCanvasAppFeaturePackIds
+export const assertCanvasMarketplaceFeaturePacks = assertCanvasAppFeaturePacks
+export const createCanvasMarketplaceFeaturePack = createCanvasAppFeaturePack
+export const createCanvasMarketplaceFeaturePackExtensionBundle =
+  createCanvasAppFeaturePackExtensionBundle
+export const getCanvasMarketplaceEnabledFeaturePackIds =
+  getCanvasAppEnabledFeaturePackIds
+export const getCanvasMarketplaceFeatureFlagRuntimeStateInputs =
+  getCanvasAppFeatureFlagRuntimeStateInputs
+export const getCanvasMarketplaceInstalledFeaturePackIds =
+  getCanvasAppInstalledFeaturePackIds
+export const getCanvasMarketplaceInstalledFeaturePacks =
+  getCanvasAppInstalledFeaturePacks
+export const getCanvasMarketplaceResolvedFeaturePackStates =
+  getCanvasAppResolvedFeaturePackStates
+export const setCanvasMarketplaceFeatureFlagSetting =
+  setCanvasAppFeatureFlagSetting
+
+export type CanvasMarketplaceFeatureFlagSettingInput =
+  CanvasAppFeatureFlagSettingInput
+export type CanvasMarketplaceFeatureFlagSettings =
+  CanvasAppFeatureFlagSettings
+export type CanvasMarketplaceFeaturePack = CanvasAppFeaturePack
+export type CanvasMarketplaceFeaturePackId = CanvasAppFeaturePackId
+export type CanvasMarketplaceFeaturePackInput = CanvasAppFeaturePackInput
+export type CanvasMarketplaceFeaturePackInstallOptions =
+  CanvasAppFeaturePackInstallOptions
+export type CanvasMarketplaceFeaturePackRuntimeState =
+  CanvasAppFeaturePackRuntimeState
+export type CanvasMarketplaceFeaturePackRuntimeStateInput =
+  CanvasAppFeaturePackRuntimeStateInput
+export type CanvasMarketplaceFeaturePackRuntimeStatePatch =
+  CanvasAppFeaturePackRuntimeStatePatch
+export type CanvasMarketplaceFeaturePackRuntimeStatePatchChange =
+  CanvasAppFeaturePackRuntimeStatePatchChange
+export type CanvasMarketplaceFeaturePackRuntimeStatePatchInput =
+  CanvasAppFeaturePackRuntimeStatePatchInput
+export type CanvasMarketplaceFeaturePackRuntimeStateStatus =
+  CanvasAppFeaturePackRuntimeStateStatus

@@ -1,0 +1,31 @@
+import {
+  getCanvasAppFeaturePackCatalog,
+  type CanvasAppFeaturePackCatalog,
+  type CanvasAppFeaturePackCatalogBlockedReason,
+  type CanvasAppFeaturePackCatalogBlockScope,
+  type CanvasAppFeaturePackCatalogConflictBlockReason,
+  type CanvasAppFeaturePackCatalogConflictBlockReasonKind,
+  type CanvasAppFeaturePackCatalogItem,
+  type CanvasAppFeaturePackCatalogRequiredBlockReason,
+  type CanvasAppFeaturePackCatalogRequiredBlockReasonKind,
+} from '../app/feature-packs'
+
+export const getCanvasMarketplaceFeaturePackCatalog =
+  getCanvasAppFeaturePackCatalog
+
+export type CanvasMarketplaceFeaturePackCatalog =
+  CanvasAppFeaturePackCatalog
+export type CanvasMarketplaceFeaturePackCatalogBlockedReason =
+  CanvasAppFeaturePackCatalogBlockedReason
+export type CanvasMarketplaceFeaturePackCatalogBlockScope =
+  CanvasAppFeaturePackCatalogBlockScope
+export type CanvasMarketplaceFeaturePackCatalogConflictBlockReason =
+  CanvasAppFeaturePackCatalogConflictBlockReason
+export type CanvasMarketplaceFeaturePackCatalogConflictBlockReasonKind =
+  CanvasAppFeaturePackCatalogConflictBlockReasonKind
+export type CanvasMarketplaceFeaturePackCatalogItem =
+  CanvasAppFeaturePackCatalogItem
+export type CanvasMarketplaceFeaturePackCatalogRequiredBlockReason =
+  CanvasAppFeaturePackCatalogRequiredBlockReason
+export type CanvasMarketplaceFeaturePackCatalogRequiredBlockReasonKind =
+  CanvasAppFeaturePackCatalogRequiredBlockReasonKind
