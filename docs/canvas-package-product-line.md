@@ -432,6 +432,65 @@ import-export-suite
 install this suite. The broad default editor profile installs IO through
 `import-export-suite`.
 
+## Marketplace Catalog Contract
+
+Issue: https://github.com/developer-1px/canvas/issues/591
+
+The marketplace model is a package contract projection, not a billing system.
+It lets a host UI show what can be installed, enabled, disabled, updated, or
+removed without moving account policy into Canvas core.
+
+```text
+Marketplace Package Contract
+|-- pack packageContract
+|  |-- manifest package.name / package.subpath
+|  |-- category / version / compatibility
+|  |-- contributes / requires / provides / conflicts
+|  |-- lifecycle installable / uninstallable / runtimeToggleable
+|  `-- marketplace listing access / distribution / entitlement
+|-- suite packageContract
+|  |-- suite id / label
+|  |-- member feature pack ids
+|  |-- member package contracts
+|  `-- optional suite listing access / distribution / entitlement
+|-- profile packageContract
+|  |-- profile id / label
+|  |-- target installed feature pack ids
+|  |-- target enabled feature pack ids
+|  `-- member package contracts
+`-- packageState
+   |-- primaryStatus
+   |-- statuses
+   |  |-- available
+   |  |-- installed
+   |  |-- enabled
+   |  |-- disabled
+   |  |-- blocked
+   |  |-- updating
+   |  `-- partially-updated
+   |-- actionKind: install / enable / disable / uninstall / apply
+   |-- actionStatus: ready / blocked / active
+   |-- blockedReasonCount
+   |-- marketplaceBlockedReasonCount
+   `-- partialUpdateSurfaceIds
+```
+
+`paid`, `private`, `coming-soon`, `deprecated`, and `unavailable` are
+marketplace listing states. They are represented by `packageContract.listing`
+and `packageState.marketplaceBlockedReasonCount`; they do not imply that Canvas
+core owns billing, accounts, workspace policy, or entitlement resolution.
+
+Pack actions still come from the lifecycle state machine. The marketplace item
+only exposes the result:
+
+| User action | Source of truth |
+|---|---|
+| install | manifest lifecycle `installable`, dependency graph, listing entitlement/distribution |
+| enable | manifest lifecycle `runtimeToggleable`, dependency graph, listing entitlement/distribution |
+| disable | manifest lifecycle `runtimeToggleable` |
+| uninstall | manifest lifecycle `uninstallable`, orphaned data policy |
+| partial update | manifest lifecycle `partialUpdate` surfaces |
+
 ## Starter Profiles
 
 ```text

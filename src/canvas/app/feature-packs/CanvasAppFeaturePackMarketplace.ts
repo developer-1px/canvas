@@ -14,7 +14,12 @@ import {
 } from './CanvasAppFeaturePackStateTransitionPlan'
 import {
   type CanvasAppFeaturePackMarketplaceListingInput,
+  type CanvasAppFeaturePackSuiteMarketplaceListingInput,
 } from './CanvasAppFeaturePackMarketplaceListings'
+import {
+  type CanvasAppFeaturePackMarketplacePackageContract,
+  type CanvasAppFeaturePackMarketplacePackageState,
+} from './CanvasAppFeaturePackMarketplacePackages'
 import {
   getCanvasAppFeaturePackProfileMarketplaceActionModel,
   type CanvasAppFeaturePackProfileMarketplaceAction,
@@ -232,6 +237,8 @@ export type CanvasAppFeaturePackMarketplaceTargetControl = Readonly<{
   installed: boolean
   item: CanvasAppFeaturePackMarketplaceItem | null
   label: string
+  packageContract: CanvasAppFeaturePackMarketplacePackageContract | null
+  packageState: CanvasAppFeaturePackMarketplacePackageState | null
   ready: boolean
   status: CanvasAppFeaturePackMarketplaceTargetControlStatus
   target: CanvasAppFeaturePackMarketplaceTarget
@@ -384,12 +391,14 @@ export function getCanvasAppFeaturePackMarketplaceModel({
   manifests,
   options = {},
   profiles = DEFAULT_CANVAS_APP_FEATURE_PACK_PROFILES,
+  suiteListings = [],
   suiteManifests = DEFAULT_CANVAS_APP_FEATURE_PACK_SUITE_MANIFESTS,
 }: {
   listings?: readonly CanvasAppFeaturePackMarketplaceListingInput[]
   manifests: readonly CanvasAppFeaturePackManifest[]
   options?: CanvasAppFeaturePackManifestInstallOptions
   profiles?: readonly CanvasAppFeaturePackProfile[]
+  suiteListings?: readonly CanvasAppFeaturePackSuiteMarketplaceListingInput[]
   suiteManifests?: readonly CanvasAppFeaturePackSuiteManifest[]
 }): CanvasAppFeaturePackMarketplaceModel {
   const profileActions = getCanvasAppFeaturePackProfileMarketplaceActionModel({
@@ -402,6 +411,7 @@ export function getCanvasAppFeaturePackMarketplaceModel({
     listings,
     manifests,
     options,
+    suiteListings,
     suiteManifests,
   })
   const packActions = getCanvasAppFeaturePackMarketplaceActionModel({
@@ -757,6 +767,8 @@ export function getCanvasAppFeaturePackMarketplaceItemTargetControl(
     installed: isCanvasAppFeaturePackMarketplaceItemInstalled(item),
     item,
     label: getCanvasAppFeaturePackMarketplaceItemLabel(item),
+    packageContract: item.packageContract,
+    packageState: item.packageState,
     ready: diagnostic.ready,
     status: diagnostic.status,
     target: getCanvasAppFeaturePackMarketplaceItemTarget(item),
@@ -940,6 +952,8 @@ function createMissingCanvasAppFeaturePackMarketplaceTargetControl(
     installed: false,
     item: null,
     label: getCanvasAppFeaturePackMarketplaceTargetFallbackLabel(target),
+    packageContract: null,
+    packageState: null,
     ready: false,
     status: 'missing',
     target: snapshotCanvasAppFeaturePackMarketplaceTarget(target),

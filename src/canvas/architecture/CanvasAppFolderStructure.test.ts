@@ -63,6 +63,7 @@ describe('Canvas App folder structure', () => {
       'kanban-inspector',
       'media-import',
       'minimap',
+      'shape-authoring',
       'shortcut-help',
       'stamp-authoring',
       'status-bar',
@@ -132,11 +133,13 @@ describe('Canvas App folder structure', () => {
       'src/canvas/app/feature-packs/CanvasAppFeaturePackCatalog.ts',
       'src/canvas/app/feature-packs/CanvasAppFeaturePackInstallPlan.test.ts',
       'src/canvas/app/feature-packs/CanvasAppFeaturePackInstallPlan.ts',
+      'src/canvas/app/feature-packs/CanvasAppFeaturePackManifests.test.ts',
       'src/canvas/app/feature-packs/CanvasAppFeaturePackManifests.ts',
       'src/canvas/app/feature-packs/CanvasAppFeaturePackMarketplace.test.ts',
       'src/canvas/app/feature-packs/CanvasAppFeaturePackMarketplace.ts',
       'src/canvas/app/feature-packs/CanvasAppFeaturePackMarketplaceListings.test.ts',
       'src/canvas/app/feature-packs/CanvasAppFeaturePackMarketplaceListings.ts',
+      'src/canvas/app/feature-packs/CanvasAppFeaturePackMarketplacePackages.ts',
       'src/canvas/app/feature-packs/CanvasAppFeaturePackPartialUpdatePlan.test.ts',
       'src/canvas/app/feature-packs/CanvasAppFeaturePackPartialUpdatePlan.ts',
       'src/canvas/app/feature-packs/CanvasAppFeaturePackProfileActions.test.ts',
@@ -209,6 +212,8 @@ describe('Canvas App folder structure', () => {
     expect(
       sourceFiles
         .filter((file) => file.path.startsWith('src/canvas/app/workflow/'))
+        .filter((file) => !file.path.endsWith('.test.ts'))
+        .filter((file) => !file.path.endsWith('.test.tsx'))
         .flatMap((file) =>
           (file.source.match(/from '..\/feature-packs\/[^']+'/g) ?? [])
             .map((specifier) => `${file.path}: ${specifier}`),

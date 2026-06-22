@@ -87,7 +87,7 @@ describe('CanvasAppCapabilityAssembly', () => {
     }))).toBeNull()
     expect(getCanvasKeyboardCommandShortcutIntent(createKeyboardInput({
       config,
-      event: createKeyboardEvent({ key: '=' }),
+      event: createKeyboardEvent({ key: '=', metaKey: true }),
       key: '=',
       mod: true,
     }))).toEqual({

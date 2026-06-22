@@ -391,6 +391,8 @@ describe('CanvasAppFeaturePackMarketplace', () => {
       installed: false,
       item: null,
       label: 'missing-pack',
+      packageContract: null,
+      packageState: null,
       ready: false,
       status: 'missing',
       target: {
@@ -780,6 +782,251 @@ describe('CanvasAppFeaturePackMarketplace', () => {
       },
       targets: [],
     })
+  })
+
+  it('exposes package contract and state for packs, suites, and profiles', () => {
+    const runtimeManifest = createCanvasAppFeaturePackManifest({
+      category: 'foundation',
+      contributes: {
+        surfaces: ['runtime-model'],
+      },
+      id: 'runtime-pack',
+      label: 'Runtime pack',
+      lifecycle: {
+        partialUpdate: ['runtime-model'],
+      },
+      package: {
+        name: '@interactive-os/canvas-runtime-pack',
+        subpath: './runtime-pack',
+      },
+      version: '1.2.3',
+    })
+    const paidManifest = createCanvasAppFeaturePackManifest({
+      category: 'authoring',
+      id: 'paid-pack',
+      label: 'Paid pack',
+      package: {
+        name: '@interactive-os/canvas-paid-pack',
+        subpath: './paid-pack',
+      },
+    })
+    const unavailableManifest = createCanvasAppFeaturePackManifest({
+      id: 'unavailable-pack',
+      label: 'Unavailable pack',
+    })
+    const lockedManifest = createCanvasAppFeaturePackManifest({
+      id: 'locked-pack',
+      label: 'Locked pack',
+      lifecycle: {
+        installable: false,
+      },
+    })
+    const updatingManifest = createCanvasAppFeaturePackManifest({
+      id: 'updating-pack',
+      label: 'Updating pack',
+    })
+    const partialManifest = createCanvasAppFeaturePackManifest({
+      id: 'partial-pack',
+      label: 'Partial pack',
+    })
+    const suiteManifest = createCanvasAppFeaturePackSuiteManifest({
+      featurePackIds: ['runtime-pack', 'paid-pack'],
+      id: 'paid-suite',
+      label: 'Paid suite',
+    })
+    const profile = createCanvasAppFeaturePackProfile({
+      enabledFeaturePackIds: ['paid-pack'],
+      id: 'paid-profile',
+      installedFeaturePackIds: ['paid-pack'],
+      label: 'Paid profile',
+    })
+
+    const model = getCanvasAppFeaturePackMarketplaceModel({
+      listings: [
+        {
+          access: 'paid',
+          featurePackId: 'paid-pack',
+          priceLabel: 'Pro',
+          vendor: 'Canvas Store',
+        },
+        {
+          distribution: 'unavailable',
+          featurePackId: 'unavailable-pack',
+        },
+      ],
+      manifests: [
+        runtimeManifest,
+        paidManifest,
+        unavailableManifest,
+        lockedManifest,
+        updatingManifest,
+        partialManifest,
+      ],
+      options: {
+        featurePackStates: [
+          {
+            id: 'paid-pack',
+            status: 'uninstalled',
+          },
+          {
+            id: 'unavailable-pack',
+            status: 'uninstalled',
+          },
+          {
+            id: 'locked-pack',
+            status: 'uninstalled',
+          },
+          {
+            id: 'updating-pack',
+            status: 'updating',
+          },
+          {
+            id: 'partial-pack',
+            status: 'partially-updated',
+          },
+        ],
+      },
+      profiles: [profile],
+      suiteListings: [{
+        access: 'private',
+        distribution: 'unavailable',
+        suiteId: 'paid-suite',
+      }],
+      suiteManifests: [suiteManifest],
+    })
+    const paidPack = model.packs.items.find((item) =>
+      item.featurePackId === 'paid-pack'
+    )
+    const unavailablePack = model.packs.items.find((item) =>
+      item.featurePackId === 'unavailable-pack'
+    )
+    const lockedPack = model.packs.items.find((item) =>
+      item.featurePackId === 'locked-pack'
+    )
+    const updatingPack = model.packs.items.find((item) =>
+      item.featurePackId === 'updating-pack'
+    )
+    const partialPack = model.packs.items.find((item) =>
+      item.featurePackId === 'partial-pack'
+    )
+    const suite = model.suites.items[0]
+    const profileItem = model.profiles.items[0]
+
+    expect(paidPack?.packageContract).toMatchObject({
+      category: 'authoring',
+      featurePackId: 'paid-pack',
+      kind: 'pack',
+      listing: {
+        access: 'paid',
+        blocked: true,
+        blockedReasonCount: 1,
+        distribution: 'available',
+        entitlement: 'required',
+        priceLabel: 'Pro',
+        vendor: 'Canvas Store',
+      },
+      package: {
+        name: '@interactive-os/canvas-paid-pack',
+        subpath: './paid-pack',
+      },
+    })
+    expect(paidPack?.packageState).toMatchObject({
+      actionKind: 'install',
+      actionStatus: 'blocked',
+      blockedReasonCount: 0,
+      enabled: false,
+      installed: false,
+      marketplaceBlockedReasonCount: 1,
+      primaryStatus: 'blocked',
+      statuses: ['available', 'blocked'],
+      totalBlockedReasonCount: 1,
+    })
+    expect(unavailablePack?.packageContract.listing).toMatchObject({
+      access: 'free',
+      blocked: true,
+      blockedReasonCount: 1,
+      distribution: 'unavailable',
+      entitlement: 'granted',
+    })
+    expect(lockedPack?.packageContract.lifecycle.installable).toBe(false)
+    expect(lockedPack?.packageState).toMatchObject({
+      actionKind: 'install',
+      actionStatus: 'blocked',
+      blockedReasonCount: 1,
+      marketplaceBlockedReasonCount: 0,
+      statuses: ['available', 'blocked'],
+    })
+    expect(updatingPack?.packageState).toMatchObject({
+      primaryStatus: 'updating',
+      statuses: ['installed', 'enabled', 'updating', 'blocked'],
+    })
+    expect(partialPack?.packageState).toMatchObject({
+      primaryStatus: 'partially-updated',
+      statuses: ['installed', 'enabled', 'partially-updated', 'blocked'],
+    })
+    expect(suite?.packageContract).toMatchObject({
+      featurePackIds: ['runtime-pack', 'paid-pack'],
+      kind: 'suite',
+      listing: {
+        access: 'private',
+        blocked: true,
+        blockedReasonCount: 2,
+        distribution: 'unavailable',
+        entitlement: 'required',
+      },
+      memberPackages: [
+        {
+          featurePackId: 'runtime-pack',
+          package: {
+            name: '@interactive-os/canvas-runtime-pack',
+            subpath: './runtime-pack',
+          },
+          status: 'enabled',
+        },
+        {
+          featurePackId: 'paid-pack',
+          package: {
+            name: '@interactive-os/canvas-paid-pack',
+            subpath: './paid-pack',
+          },
+          status: 'uninstalled',
+        },
+      ],
+      suiteId: 'paid-suite',
+    })
+    expect(suite?.packageState).toMatchObject({
+      actionKind: 'install',
+      actionStatus: 'blocked',
+      enabled: false,
+      installed: false,
+      marketplaceBlockedReasonCount: 3,
+      primaryStatus: 'partial',
+      statuses: ['partial', 'blocked'],
+    })
+    expect(profileItem?.packageContract).toMatchObject({
+      kind: 'profile',
+      memberPackages: [{
+        featurePackId: 'paid-pack',
+        status: 'uninstalled',
+      }],
+      profileId: 'paid-profile',
+      targetEnabledFeaturePackIds: ['paid-pack'],
+      targetInstalledFeaturePackIds: ['paid-pack'],
+    })
+    expect(profileItem?.packageState).toMatchObject({
+      actionKind: 'apply',
+      actionStatus: 'blocked',
+      marketplaceBlockedReasonCount: 1,
+      primaryStatus: 'blocked',
+      statuses: ['available', 'blocked'],
+    })
+    expect(getCanvasAppFeaturePackMarketplaceTargetControl({
+      model,
+      target: {
+        featurePackId: 'paid-pack',
+        kind: 'pack',
+      },
+    }).packageState).toBe(paidPack?.packageState)
   })
 
   it('surfaces pack lifecycle status facets for update and rollback states', () => {

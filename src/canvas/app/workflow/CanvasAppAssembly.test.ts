@@ -15,7 +15,6 @@ import {
   createCanvasAppExtensionBundle,
 } from '../extensions/CanvasAppExtensionBundle'
 import {
-  CANVAS_APP_BOARD_IO_FEATURE_PACK_MANIFEST,
   DEFAULT_CANVAS_APP_FEATURE_PACK_VIEW_RENDERERS,
   createCanvasAppAiLabsFeaturePackManifest,
   createCanvasAppDomEditStyleFeaturePackManifest,
@@ -616,7 +615,6 @@ describe('CanvasAppAssembly seams', () => {
       additionalFeaturePackManifests: [
         aiLabsManifest,
         domEditStyleManifest,
-        CANVAS_APP_BOARD_IO_FEATURE_PACK_MANIFEST,
       ],
     })
 

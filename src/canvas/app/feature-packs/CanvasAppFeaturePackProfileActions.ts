@@ -14,6 +14,13 @@ import {
   type CanvasAppFeaturePackMarketplaceListingInput,
 } from './CanvasAppFeaturePackMarketplaceListings'
 import {
+  createCanvasAppFeaturePackMarketplacePackageState,
+  createCanvasAppFeaturePackMarketplaceProfilePackageContract,
+  getCanvasAppFeaturePackMarketplaceProfilePackageStatuses,
+  type CanvasAppFeaturePackMarketplacePackageState,
+  type CanvasAppFeaturePackMarketplaceProfilePackageContract,
+} from './CanvasAppFeaturePackMarketplacePackages'
+import {
   getCanvasAppFeaturePackPartialUpdatePlan,
   type CanvasAppFeaturePackPartialUpdatePlanBlockedReason,
 } from './CanvasAppFeaturePackPartialUpdatePlan'
@@ -50,6 +57,8 @@ export type CanvasAppFeaturePackProfileMarketplaceActionItem = Readonly<{
   currentInstalledFeaturePackIds: readonly CanvasAppFeaturePackId[]
   label: string
   missingFeaturePackIds: readonly CanvasAppFeaturePackId[]
+  packageContract: CanvasAppFeaturePackMarketplaceProfilePackageContract
+  packageState: CanvasAppFeaturePackMarketplacePackageState
   primaryActionKind: CanvasAppFeaturePackProfileMarketplaceActionKind
   profile: CanvasAppFeaturePackProfile
   profileId: CanvasAppFeaturePackProfileId
@@ -329,6 +338,29 @@ function createCanvasAppFeaturePackProfileMarketplaceActionItem({
         manifestById,
         profile,
       }),
+    packageContract:
+      createCanvasAppFeaturePackMarketplaceProfilePackageContract({
+        currentStates,
+        manifests,
+        profile,
+      }),
+    packageState: createCanvasAppFeaturePackMarketplacePackageState({
+      actionKind: action.kind,
+      actionStatus: action.status,
+      active: status === 'active',
+      blockedReasonCount: action.blockedReasons.length,
+      enabled: status === 'active',
+      id: profile.id,
+      installed: status === 'active',
+      kind: 'profile',
+      marketplaceBlockedReasonCount: action.marketplaceBlockedReasons.length,
+      partialUpdateSurfaceIds: action.partialUpdateSurfaceIds,
+      primaryStatus: status,
+      ready: action.ready,
+      statuses: getCanvasAppFeaturePackMarketplaceProfilePackageStatuses({
+        status,
+      }),
+    }),
     primaryActionKind: 'apply',
     profile,
     profileId: profile.id,
