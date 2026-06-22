@@ -228,7 +228,6 @@ First-Party Packages
 |  `-- shortcut help
 |-- authoring-basics-suite
 |  |-- shape-authoring-pack
-|  |-- text-authoring-pack
 |  |-- drawing-tools-pack
 |  |-- stamp-authoring-pack
 |  |-- toolbar-pack
@@ -305,6 +304,40 @@ The pack is part of the default editor profile, but not part of `core-only` or
 `minimal-viewer`. Disabling or uninstalling it must leave the host running while
 shape creation affordances are masked.
 
+## Authoring Basics Suite
+
+Issue: https://github.com/developer-1px/canvas/issues/587
+
+`authoring-basics-suite` is the first complete basic editor install unit. It is
+not core. It groups the packs that make a small authoring experience coherent,
+while leaving component, Story Canvas, import/export, collaboration, and
+inspection packs outside.
+
+```text
+authoring-basics-suite
+|-- included packs
+|  |-- shape-authoring-pack
+|  |-- drawing-tools-pack
+|  |-- stamp-authoring-pack
+|  |-- toolbar-pack
+|  `-- command-palette-pack
+|-- explicit exclusions
+|  |-- component-system-suite
+|  |-- story-canvas-suite
+|  |-- import-export-suite
+|  |-- collaboration-facilitation-suite
+|  |-- minimap-pack
+|  |-- status-bar-pack
+|  |-- shortcut-help-pack
+|  `-- image-io / media-import / table-import / text-paste-import
+`-- pending extraction
+   `-- text-authoring-pack
+```
+
+`toolbar-pack` and `command-palette-pack` are authoring experience packs, not
+Canvas runtime core. They can be installed or disabled independently, but the
+basic editor starter installs them through `authoring-basics-suite`.
+
 ## Starter Profiles
 
 ```text
@@ -328,6 +361,7 @@ Current starter helpers:
 | Starter | Public helper | Pack selection |
 |---|---|---|
 | `minimal-viewer` | `createCanvasAppMinimalViewerAssembly` | read-only capabilities + `zoom-controls` |
+| `basic-editor` | `createCanvasAppBasicEditorAssembly` | editor capabilities + `authoring-basics-suite` + `zoom-controls` |
 
 ## Current Package Entry Interpretation
 

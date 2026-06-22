@@ -7,6 +7,12 @@ export {
   type CanvasAppItemAdapters,
 } from './CanvasAppAssembly'
 export {
+  CANVAS_APP_BASIC_EDITOR_STARTER_PROFILE_ID,
+  createCanvasAppBasicEditorAssembly,
+  createCanvasAppBasicEditorAssemblyInput,
+  type CanvasAppBasicEditorStarterInput,
+} from './CanvasAppBasicEditorStarter'
+export {
   CANVAS_APP_MINIMAL_VIEWER_STARTER_PROFILE_ID,
   createCanvasAppMinimalViewerAssembly,
   createCanvasAppMinimalViewerAssemblyInput,

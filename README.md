@@ -49,14 +49,17 @@ consumer-facing boundary map.
 
 ```ts
 import {
+  createCanvasAppBasicEditorAssembly,
   createCanvasAppMinimalViewerAssembly,
 } from '@interactive-os/canvas/app/authoring'
 
 const assembly = createCanvasAppMinimalViewerAssembly()
+const editorAssembly = createCanvasAppBasicEditorAssembly()
 ```
 
 `minimal-viewer` applies the read-only app capability set and installs only the
-viewer control pack required for zoom controls.
+viewer control pack required for zoom controls. `basic-editor` applies the
+editor capability set and installs `authoring-basics` plus zoom controls.
 
 ## Run
 

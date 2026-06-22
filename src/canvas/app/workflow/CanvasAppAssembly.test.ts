@@ -463,6 +463,32 @@ describe('CanvasAppAssembly seams', () => {
     expect(minimalAssembly.featurePackViewRenderers.toolbar).toBeUndefined()
     expect(minimalAssembly.inspectorPanels).toEqual([])
 
+    const basicEditorAssembly = createCanvasAppAssembly({
+      featurePackProfileId: 'basic-editor',
+    })
+
+    expect(basicEditorAssembly.installedFeaturePackIds).toEqual([
+      'shape-authoring',
+      'command-palette',
+      'drawing-tools',
+      'stamp-authoring',
+      'toolbar',
+      'zoom-controls',
+    ])
+    expect(basicEditorAssembly.enabledFeaturePackIds)
+      .toEqual(basicEditorAssembly.installedFeaturePackIds)
+    expect(basicEditorAssembly.featurePackViewRenderers.toolbar).toBe(
+      DEFAULT_CANVAS_APP_FEATURE_PACK_VIEW_RENDERERS.toolbar,
+    )
+    expect(basicEditorAssembly.featurePackViewRenderers.commandPalette).toBe(
+      DEFAULT_CANVAS_APP_FEATURE_PACK_VIEW_RENDERERS.commandPalette,
+    )
+    expect(basicEditorAssembly.featurePackViewRenderers.componentPalette)
+      .toBeUndefined()
+    expect(basicEditorAssembly.featurePackViewRenderers.imageControls)
+      .toBeUndefined()
+    expect(basicEditorAssembly.featurePackViewRenderers.minimap).toBeUndefined()
+
     const renderStatus = () => null
     const statusManifest = createCanvasAppFeaturePackManifest({
       extensionFeaturePack: createCanvasAppFeaturePack({

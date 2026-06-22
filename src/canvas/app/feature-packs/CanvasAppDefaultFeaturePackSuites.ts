@@ -14,18 +14,47 @@ import {
   CANVAS_APP_COMPONENT_SOURCE_OUTLINE_FEATURE_PACK_MANIFEST,
 } from './component-source-outline'
 import {
+  CANVAS_APP_COMMAND_PALETTE_FEATURE_PACK_MANIFEST,
+} from './command-palette'
+import {
+  CANVAS_APP_DRAWING_TOOLS_FEATURE_PACK_MANIFEST,
+} from './drawing-tools'
+import {
+  CANVAS_APP_SHAPE_AUTHORING_FEATURE_PACK_MANIFEST,
+} from './shape-authoring'
+import {
+  CANVAS_APP_STAMP_AUTHORING_FEATURE_PACK_MANIFEST,
+} from './stamp-authoring'
+import {
   CANVAS_STORY_PREVIEW_ITEMS_FEATURE_PACK_ID,
 } from './story-preview'
 import {
   CANVAS_APP_STORY_IMPORT_FEATURE_PACK_MANIFEST,
 } from './story-import'
 import {
+  CANVAS_APP_TOOLBAR_FEATURE_PACK_MANIFEST,
+} from './toolbar'
+import {
   createCanvasAppFeaturePackSuiteManifest,
   type CanvasAppFeaturePackSuiteManifest,
 } from './CanvasAppFeaturePackSuites'
 
+export const CANVAS_AUTHORING_BASICS_SUITE_ID = 'authoring-basics'
 export const CANVAS_COMPONENT_SYSTEM_SUITE_ID = 'component-system'
 export const CANVAS_STORY_CANVAS_SUITE_ID = 'story-canvas'
+
+export const CANVAS_AUTHORING_BASICS_FEATURE_PACK_SUITE_MANIFEST =
+  createCanvasAppFeaturePackSuiteManifest({
+    featurePackIds: [
+      CANVAS_APP_SHAPE_AUTHORING_FEATURE_PACK_MANIFEST.id,
+      CANVAS_APP_DRAWING_TOOLS_FEATURE_PACK_MANIFEST.id,
+      CANVAS_APP_STAMP_AUTHORING_FEATURE_PACK_MANIFEST.id,
+      CANVAS_APP_TOOLBAR_FEATURE_PACK_MANIFEST.id,
+      CANVAS_APP_COMMAND_PALETTE_FEATURE_PACK_MANIFEST.id,
+    ],
+    id: CANVAS_AUTHORING_BASICS_SUITE_ID,
+    label: 'Authoring basics',
+  })
 
 export const CANVAS_COMPONENT_SYSTEM_FEATURE_PACK_SUITE_MANIFEST =
   createCanvasAppFeaturePackSuiteManifest({
@@ -51,6 +80,7 @@ export const CANVAS_STORY_CANVAS_FEATURE_PACK_SUITE_MANIFEST =
   })
 
 export const DEFAULT_CANVAS_APP_FEATURE_PACK_SUITE_MANIFESTS = Object.freeze([
+  CANVAS_AUTHORING_BASICS_FEATURE_PACK_SUITE_MANIFEST,
   CANVAS_COMPONENT_SYSTEM_FEATURE_PACK_SUITE_MANIFEST,
   CANVAS_STORY_CANVAS_FEATURE_PACK_SUITE_MANIFEST,
 ]) satisfies readonly CanvasAppFeaturePackSuiteManifest[]

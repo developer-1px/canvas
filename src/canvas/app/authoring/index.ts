@@ -3,6 +3,12 @@ export {
   type CanvasAppItemAdapters,
 } from '../workflow/CanvasAppAssembly'
 export {
+  CANVAS_APP_BASIC_EDITOR_STARTER_PROFILE_ID,
+  createCanvasAppBasicEditorAssembly,
+  createCanvasAppBasicEditorAssemblyInput,
+  type CanvasAppBasicEditorStarterInput,
+} from '../workflow/CanvasAppBasicEditorStarter'
+export {
   CANVAS_APP_MINIMAL_VIEWER_STARTER_PROFILE_ID,
   createCanvasAppMinimalViewerAssembly,
   createCanvasAppMinimalViewerAssemblyInput,
@@ -387,6 +393,8 @@ export {
   CANVAS_APP_MEDIA_IMPORT_FEATURE_PACK_MANIFEST,
   CANVAS_APP_MEDIA_IMPORT_FEATURE_PACK,
   CANVAS_APP_STORY_IMPORT_FEATURE_PACK_MANIFEST,
+  CANVAS_AUTHORING_BASICS_FEATURE_PACK_SUITE_MANIFEST,
+  CANVAS_AUTHORING_BASICS_SUITE_ID,
   CANVAS_COMPONENT_SYSTEM_FEATURE_PACK_SUITE_MANIFEST,
   CANVAS_COMPONENT_SYSTEM_SUITE_ID,
   CANVAS_STORY_CANVAS_FEATURE_PACK_SUITE_MANIFEST,
@@ -520,6 +528,7 @@ export {
   setCanvasAppFeatureFlagSetting,
   getCanvasComponentInspectorPanelModel,
   syncCanvasComponentItemsChange,
+  CANVAS_APP_BASIC_EDITOR_FEATURE_PACK_PROFILE,
   CANVAS_APP_CORE_ONLY_FEATURE_PACK_PROFILE,
   CANVAS_APP_MINIMAL_VIEWER_FEATURE_PACK_PROFILE,
   CANVAS_APP_SHAPE_AUTHORING_FEATURE_PACK_ID,
