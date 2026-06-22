@@ -11,6 +11,7 @@ export const CANVAS_APP_STORY_IMPORT_FEATURE_PACK_MANIFEST =
     id: 'story-import',
     label: 'Story import',
     lifecycle: {
+      orphanedDataPolicy: 'preserve',
       partialUpdate: ['importer', 'item-schema'],
       runtimeToggleable: true,
     },

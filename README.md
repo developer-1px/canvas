@@ -52,17 +52,23 @@ import {
   createCanvasAppBasicEditorAssembly,
   createCanvasAppComponentEditorAssembly,
   createCanvasAppMinimalViewerAssembly,
+  createCanvasAppStoryViewerAssembly,
 } from '@interactive-os/canvas/app/authoring'
 
 const assembly = createCanvasAppMinimalViewerAssembly()
 const editorAssembly = createCanvasAppBasicEditorAssembly()
 const componentEditorAssembly = createCanvasAppComponentEditorAssembly()
+const storyAssembly = createCanvasAppStoryViewerAssembly({
+  renderGroupItem: ({ groupLabel }) => groupLabel,
+  renderPreviewItem: ({ storyId }) => storyId,
+})
 ```
 
 `minimal-viewer` applies the read-only app capability set and installs only the
 viewer control pack required for zoom controls. `basic-editor` applies the
 editor capability set and installs `authoring-basics` plus zoom controls.
-`component-editor` adds the component system suite.
+`component-editor` adds the component system suite. `story-viewer` adds Story
+Canvas preview/import packs with host-provided preview renderers.
 
 ## Run
 

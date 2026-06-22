@@ -24,6 +24,12 @@ export {
   createCanvasAppMinimalViewerAssemblyInput,
   type CanvasAppMinimalViewerStarterInput,
 } from './CanvasAppMinimalViewerStarter'
+export {
+  CANVAS_APP_STORY_VIEWER_STARTER_PROFILE_ID,
+  createCanvasAppStoryViewerAssembly,
+  createCanvasAppStoryViewerAssemblyInput,
+  type CanvasAppStoryViewerStarterInput,
+} from './CanvasAppStoryViewerStarter'
 export type {
   CanvasAppAssembly,
   CanvasAppAssemblyInput,

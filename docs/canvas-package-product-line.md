@@ -372,6 +372,35 @@ component pack preserves component-owned data by default; the host remains
 responsible for deciding whether preserved orphaned component data should be
 shown, migrated, or cleaned.
 
+## Story Canvas Suite
+
+Issue: https://github.com/developer-1px/canvas/issues/589
+
+`story-canvas-suite` is a viewer-oriented canvas product mode, not core and not
+demo glue. It demonstrates that a host can use the canvas engine without
+authoring tools.
+
+```text
+story-canvas-suite
+|-- story-preview-pack
+|  |-- contributes: item-schema / item-renderer
+|  |-- owns story preview custom item kinds
+|  `-- orphanedDataPolicy: preserve
+|-- story-import-pack
+|  |-- requires: story-preview-items
+|  |-- contributes: importer / item-schema
+|  `-- orphanedDataPolicy: preserve
+`-- story-viewer starter
+   |-- read-only capabilities
+   |-- zoom-controls
+   |-- story-canvas-suite
+   `-- host-provided preview/group renderers
+```
+
+Story preview renderers are supplied by the host or demo route. The package
+contract owns the manifest, item kinds, import format, and starter assembly
+path; concrete visual rendering remains host/reference glue.
+
 ## Starter Profiles
 
 ```text
@@ -397,6 +426,7 @@ Current starter helpers:
 | `minimal-viewer` | `createCanvasAppMinimalViewerAssembly` | read-only capabilities + `zoom-controls` |
 | `basic-editor` | `createCanvasAppBasicEditorAssembly` | editor capabilities + `authoring-basics-suite` + `zoom-controls` |
 | `component-editor` | `createCanvasAppComponentEditorAssembly` | editor capabilities + `authoring-basics-suite` + `component-system-suite` + `zoom-controls` |
+| `story-viewer` | `createCanvasAppStoryViewerAssembly` | read-only capabilities + `story-canvas-suite` + `zoom-controls` + host preview renderers |
 
 ## Current Package Entry Interpretation
 

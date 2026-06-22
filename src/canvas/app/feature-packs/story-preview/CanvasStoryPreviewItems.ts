@@ -128,6 +128,8 @@ export function createCanvasStoryPreviewItemsFeaturePackManifest(
     id: CANVAS_STORY_PREVIEW_ITEMS_FEATURE_PACK_ID,
     label: extensionFeaturePack.label,
     lifecycle: {
+      orphanedDataPolicy: 'preserve',
+      orphanedDataScopeIds: [CANVAS_STORY_PREVIEW_ITEMS_FEATURE_PACK_ID],
       partialUpdate: ['item-renderer', 'item-schema'],
       runtimeToggleable: true,
     },

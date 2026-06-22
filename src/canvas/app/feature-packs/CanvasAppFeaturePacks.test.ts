@@ -102,6 +102,9 @@ import {
   CANVAS_APP_STORY_IMPORT_FEATURE_PACK_MANIFEST,
 } from './story-import'
 import {
+  createCanvasStoryCanvasFeaturePackManifests,
+} from './story-canvas'
+import {
   CANVAS_APP_SHAPE_AUTHORING_FEATURE_PACK_MANIFEST,
 } from './shape-authoring'
 
@@ -1040,6 +1043,28 @@ describe('CanvasAppFeaturePacks', () => {
         CANVAS_STORY_PREVIEW_ITEMS_FEATURE_PACK_ID,
         CANVAS_APP_STORY_IMPORT_FEATURE_PACK_MANIFEST.id,
       ])
+    const storyCanvasManifests = createCanvasStoryCanvasFeaturePackManifests({
+      renderGroupItem: ({ groupLabel }) => groupLabel,
+      renderPreviewItem: ({ storyId }) => storyId,
+    })
+    expect(storyCanvasManifests.map((manifest) => manifest.id)).toEqual([
+      CANVAS_STORY_PREVIEW_ITEMS_FEATURE_PACK_ID,
+      CANVAS_APP_STORY_IMPORT_FEATURE_PACK_MANIFEST.id,
+    ])
+    expect(storyCanvasManifests[0]).toMatchObject({
+      category: 'view',
+      lifecycle: {
+        orphanedDataPolicy: 'preserve',
+        orphanedDataScopeIds: [CANVAS_STORY_PREVIEW_ITEMS_FEATURE_PACK_ID],
+      },
+    })
+    expect(CANVAS_APP_STORY_IMPORT_FEATURE_PACK_MANIFEST).toMatchObject({
+      category: 'import-export',
+      lifecycle: {
+        orphanedDataPolicy: 'preserve',
+      },
+      requires: [CANVAS_STORY_PREVIEW_ITEMS_FEATURE_PACK_ID],
+    })
     expect(() =>
       getCanvasAppFeaturePackSuiteFeaturePackIds(
         [suiteManifest],
@@ -1078,12 +1103,14 @@ describe('CanvasAppFeaturePacks', () => {
       enabledFeaturePackIds: [
         CANVAS_STORY_PREVIEW_ITEMS_FEATURE_PACK_ID,
         CANVAS_APP_STORY_IMPORT_FEATURE_PACK_MANIFEST.id,
+        'zoom-controls',
       ],
       enabledSuiteIds: [CANVAS_STORY_CANVAS_SUITE_ID],
       id: 'story-viewer',
       installedFeaturePackIds: [
         CANVAS_STORY_PREVIEW_ITEMS_FEATURE_PACK_ID,
         CANVAS_APP_STORY_IMPORT_FEATURE_PACK_MANIFEST.id,
+        'zoom-controls',
       ],
       installedSuiteIds: [CANVAS_STORY_CANVAS_SUITE_ID],
       label: 'Story viewer',
@@ -1238,7 +1265,7 @@ describe('CanvasAppFeaturePacks', () => {
       },
       {
         id: 'zoom-controls',
-        status: 'uninstalled',
+        status: 'enabled',
       },
     ])
     expect(() =>

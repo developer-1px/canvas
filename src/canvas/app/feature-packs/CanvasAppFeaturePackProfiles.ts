@@ -226,6 +226,7 @@ export const CANVAS_APP_MINIMAL_VIEWER_FEATURE_PACK_PROFILE =
 export const CANVAS_APP_STORY_VIEWER_FEATURE_PACK_PROFILE =
   createCanvasAppFeaturePackProfile({
     id: 'story-viewer',
+    installedFeaturePackIds: ['zoom-controls'],
     installedSuiteIds: [CANVAS_STORY_CANVAS_SUITE_ID],
     label: 'Story viewer',
     suiteManifests: DEFAULT_CANVAS_APP_FEATURE_PACK_SUITE_MANIFESTS,
