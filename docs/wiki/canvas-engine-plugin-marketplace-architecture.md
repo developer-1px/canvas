@@ -72,8 +72,41 @@ Architecture Decision
 - 반대로 너무 잘게 쪼개면 pack을 켜고 끄는 의미가 사라진다.
 - 따라서 경계는 "기술 파일 크기"가 아니라 "사용자가 이해하는 기능 응집도"로
   나눠야 한다.
+- 패키지는 충분히 작아야 하지만, 설치했을 때 하나의 사용자 기능 경험이
+  완결되어야 한다.
+- package consumer에게 보이는 public boundary는 code folder보다 중요하다.
 
 ## 3. 용어
+
+### 3.0 Package Product Line
+
+Canvas는 하나의 root export가 아니라 다음 제품군으로 읽혀야 한다.
+
+```text
+Canvas Package Product Line
+|-- External immutable foundations
+|-- Canvas runtime core
+|-- Platform bridges
+|-- Plugin / marketplace contracts
+|-- Complete first-party feature packs
+|-- Starter / profile / suite packages
+`-- Demo / reference only
+```
+
+각 경계의 의미:
+
+| Boundary | Owns | Must not own |
+|---|---|---|
+| External immutable foundation | Canvas보다 아래의 안정 문서/텍스트/상호작용 기반 | Canvas 제품 기능 |
+| Canvas runtime core | concrete item kind 없이도 유효한 runtime/protocol | shape, text UI, component, story, toolbar, import/export UI |
+| Platform bridge | React, SVG, DOM, pointer, keyboard 같은 실행 환경 연결 | domain-specific canvas 기능 |
+| Plugin / marketplace contract | pack identity, lifecycle, install state, compatibility, dependency, listing | 실제 billing, account, workspace policy |
+| Feature pack | 하나의 완결 user-facing 기능 | unrelated 기능 묶음 |
+| Suite | 함께 설치되어야 의미 있는 pack 묶음 | member pack이 소유해야 할 runtime behavior |
+| Profile / starter | 바로 시작 가능한 기본 pack 조합 | core protocol 자체 |
+| Demo / reference | routes, sample data, fixtures, comparison glue | public package contract |
+
+상세 분류표는 `docs/canvas-package-product-line.md`를 기준으로 한다.
 
 ### 3.1 Immutable Foundation
 
@@ -232,6 +265,20 @@ Feature Pack
 |-- view surfaces
 |-- tests
 `-- docs
+```
+
+정확히는 "가장 작은 완결 기능 패키지"여야 한다.
+
+```
+Smallest Complete Feature Pack Test
+|-- 사용자가 왜 설치하는지 한 문장으로 말할 수 있다.
+|-- 설치하면 하나의 사용자 기능 경험이 완성된다.
+|-- manifest가 identity, lifecycle, compatibility, contributions를 가진다.
+|-- 필요한 schema, renderer, tool, command, shortcut, inspector를 포함하거나 dependency로 선언한다.
+|-- enable/disable 동작이 정의되어 있다.
+|-- uninstall과 orphaned data policy가 정의되어 있다.
+|-- 문서화된 dependency 외에는 독립 테스트가 가능하다.
+`-- 제거되어도 host app은 계속 실행된다.
 ```
 
 Feature pack이 가져야 할 lifecycle:
