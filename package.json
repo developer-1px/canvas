@@ -32,6 +32,161 @@
       "import": "./dist/package/canvas/app/authoring/index.js",
       "default": "./dist/package/canvas/app/authoring/index.js"
     },
+    "./app/feature-packs": {
+      "types": "./dist/package/canvas/app/feature-packs/index.d.ts",
+      "import": "./dist/package/canvas/app/feature-packs/index.js",
+      "default": "./dist/package/canvas/app/feature-packs/index.js"
+    },
+    "./app/feature-packs/ai-labs": {
+      "types": "./dist/package/canvas/app/feature-packs/ai-labs/index.d.ts",
+      "import": "./dist/package/canvas/app/feature-packs/ai-labs/index.js",
+      "default": "./dist/package/canvas/app/feature-packs/ai-labs/index.js"
+    },
+    "./app/feature-packs/arrow-routing-inspector": {
+      "types": "./dist/package/canvas/app/feature-packs/arrow-routing-inspector/index.d.ts",
+      "import": "./dist/package/canvas/app/feature-packs/arrow-routing-inspector/index.js",
+      "default": "./dist/package/canvas/app/feature-packs/arrow-routing-inspector/index.js"
+    },
+    "./app/feature-packs/board-io": {
+      "types": "./dist/package/canvas/app/feature-packs/board-io/index.d.ts",
+      "import": "./dist/package/canvas/app/feature-packs/board-io/index.js",
+      "default": "./dist/package/canvas/app/feature-packs/board-io/index.js"
+    },
+    "./app/feature-packs/checklist-inspector": {
+      "types": "./dist/package/canvas/app/feature-packs/checklist-inspector/index.d.ts",
+      "import": "./dist/package/canvas/app/feature-packs/checklist-inspector/index.js",
+      "default": "./dist/package/canvas/app/feature-packs/checklist-inspector/index.js"
+    },
+    "./app/feature-packs/command-palette": {
+      "types": "./dist/package/canvas/app/feature-packs/command-palette/index.d.ts",
+      "import": "./dist/package/canvas/app/feature-packs/command-palette/index.js",
+      "default": "./dist/package/canvas/app/feature-packs/command-palette/index.js"
+    },
+    "./app/feature-packs/component-authoring": {
+      "types": "./dist/package/canvas/app/feature-packs/component-authoring/index.d.ts",
+      "import": "./dist/package/canvas/app/feature-packs/component-authoring/index.js",
+      "default": "./dist/package/canvas/app/feature-packs/component-authoring/index.js"
+    },
+    "./app/feature-packs/component-inspector": {
+      "types": "./dist/package/canvas/app/feature-packs/component-inspector/index.d.ts",
+      "import": "./dist/package/canvas/app/feature-packs/component-inspector/index.js",
+      "default": "./dist/package/canvas/app/feature-packs/component-inspector/index.js"
+    },
+    "./app/feature-packs/component-library": {
+      "types": "./dist/package/canvas/app/feature-packs/component-library/index.d.ts",
+      "import": "./dist/package/canvas/app/feature-packs/component-library/index.js",
+      "default": "./dist/package/canvas/app/feature-packs/component-library/index.js"
+    },
+    "./app/feature-packs/component-source-outline": {
+      "types": "./dist/package/canvas/app/feature-packs/component-source-outline/index.d.ts",
+      "import": "./dist/package/canvas/app/feature-packs/component-source-outline/index.js",
+      "default": "./dist/package/canvas/app/feature-packs/component-source-outline/index.js"
+    },
+    "./app/feature-packs/component-sync": {
+      "types": "./dist/package/canvas/app/feature-packs/component-sync/index.d.ts",
+      "import": "./dist/package/canvas/app/feature-packs/component-sync/index.js",
+      "default": "./dist/package/canvas/app/feature-packs/component-sync/index.js"
+    },
+    "./app/feature-packs/cursor-chat": {
+      "types": "./dist/package/canvas/app/feature-packs/cursor-chat/index.d.ts",
+      "import": "./dist/package/canvas/app/feature-packs/cursor-chat/index.js",
+      "default": "./dist/package/canvas/app/feature-packs/cursor-chat/index.js"
+    },
+    "./app/feature-packs/dom-edit-style": {
+      "types": "./dist/package/canvas/app/feature-packs/dom-edit-style/index.d.ts",
+      "import": "./dist/package/canvas/app/feature-packs/dom-edit-style/index.js",
+      "default": "./dist/package/canvas/app/feature-packs/dom-edit-style/index.js"
+    },
+    "./app/feature-packs/drawing-tools": {
+      "types": "./dist/package/canvas/app/feature-packs/drawing-tools/index.d.ts",
+      "import": "./dist/package/canvas/app/feature-packs/drawing-tools/index.js",
+      "default": "./dist/package/canvas/app/feature-packs/drawing-tools/index.js"
+    },
+    "./app/feature-packs/facilitation": {
+      "types": "./dist/package/canvas/app/feature-packs/facilitation/index.d.ts",
+      "import": "./dist/package/canvas/app/feature-packs/facilitation/index.js",
+      "default": "./dist/package/canvas/app/feature-packs/facilitation/index.js"
+    },
+    "./app/feature-packs/find-replace": {
+      "types": "./dist/package/canvas/app/feature-packs/find-replace/index.d.ts",
+      "import": "./dist/package/canvas/app/feature-packs/find-replace/index.js",
+      "default": "./dist/package/canvas/app/feature-packs/find-replace/index.js"
+    },
+    "./app/feature-packs/image-io": {
+      "types": "./dist/package/canvas/app/feature-packs/image-io/index.d.ts",
+      "import": "./dist/package/canvas/app/feature-packs/image-io/index.js",
+      "default": "./dist/package/canvas/app/feature-packs/image-io/index.js"
+    },
+    "./app/feature-packs/kanban-inspector": {
+      "types": "./dist/package/canvas/app/feature-packs/kanban-inspector/index.d.ts",
+      "import": "./dist/package/canvas/app/feature-packs/kanban-inspector/index.js",
+      "default": "./dist/package/canvas/app/feature-packs/kanban-inspector/index.js"
+    },
+    "./app/feature-packs/media-import": {
+      "types": "./dist/package/canvas/app/feature-packs/media-import/index.d.ts",
+      "import": "./dist/package/canvas/app/feature-packs/media-import/index.js",
+      "default": "./dist/package/canvas/app/feature-packs/media-import/index.js"
+    },
+    "./app/feature-packs/minimap": {
+      "types": "./dist/package/canvas/app/feature-packs/minimap/index.d.ts",
+      "import": "./dist/package/canvas/app/feature-packs/minimap/index.js",
+      "default": "./dist/package/canvas/app/feature-packs/minimap/index.js"
+    },
+    "./app/feature-packs/shape-authoring": {
+      "types": "./dist/package/canvas/app/feature-packs/shape-authoring/index.d.ts",
+      "import": "./dist/package/canvas/app/feature-packs/shape-authoring/index.js",
+      "default": "./dist/package/canvas/app/feature-packs/shape-authoring/index.js"
+    },
+    "./app/feature-packs/shortcut-help": {
+      "types": "./dist/package/canvas/app/feature-packs/shortcut-help/index.d.ts",
+      "import": "./dist/package/canvas/app/feature-packs/shortcut-help/index.js",
+      "default": "./dist/package/canvas/app/feature-packs/shortcut-help/index.js"
+    },
+    "./app/feature-packs/stamp-authoring": {
+      "types": "./dist/package/canvas/app/feature-packs/stamp-authoring/index.d.ts",
+      "import": "./dist/package/canvas/app/feature-packs/stamp-authoring/index.js",
+      "default": "./dist/package/canvas/app/feature-packs/stamp-authoring/index.js"
+    },
+    "./app/feature-packs/status-bar": {
+      "types": "./dist/package/canvas/app/feature-packs/status-bar/index.d.ts",
+      "import": "./dist/package/canvas/app/feature-packs/status-bar/index.js",
+      "default": "./dist/package/canvas/app/feature-packs/status-bar/index.js"
+    },
+    "./app/feature-packs/story-canvas": {
+      "types": "./dist/package/canvas/app/feature-packs/story-canvas/index.d.ts",
+      "import": "./dist/package/canvas/app/feature-packs/story-canvas/index.js",
+      "default": "./dist/package/canvas/app/feature-packs/story-canvas/index.js"
+    },
+    "./app/feature-packs/story-import": {
+      "types": "./dist/package/canvas/app/feature-packs/story-import/index.d.ts",
+      "import": "./dist/package/canvas/app/feature-packs/story-import/index.js",
+      "default": "./dist/package/canvas/app/feature-packs/story-import/index.js"
+    },
+    "./app/feature-packs/story-preview": {
+      "types": "./dist/package/canvas/app/feature-packs/story-preview/index.d.ts",
+      "import": "./dist/package/canvas/app/feature-packs/story-preview/index.js",
+      "default": "./dist/package/canvas/app/feature-packs/story-preview/index.js"
+    },
+    "./app/feature-packs/table-import": {
+      "types": "./dist/package/canvas/app/feature-packs/table-import/index.d.ts",
+      "import": "./dist/package/canvas/app/feature-packs/table-import/index.js",
+      "default": "./dist/package/canvas/app/feature-packs/table-import/index.js"
+    },
+    "./app/feature-packs/text-paste-import": {
+      "types": "./dist/package/canvas/app/feature-packs/text-paste-import/index.d.ts",
+      "import": "./dist/package/canvas/app/feature-packs/text-paste-import/index.js",
+      "default": "./dist/package/canvas/app/feature-packs/text-paste-import/index.js"
+    },
+    "./app/feature-packs/toolbar": {
+      "types": "./dist/package/canvas/app/feature-packs/toolbar/index.d.ts",
+      "import": "./dist/package/canvas/app/feature-packs/toolbar/index.js",
+      "default": "./dist/package/canvas/app/feature-packs/toolbar/index.js"
+    },
+    "./app/feature-packs/zoom-controls": {
+      "types": "./dist/package/canvas/app/feature-packs/zoom-controls/index.d.ts",
+      "import": "./dist/package/canvas/app/feature-packs/zoom-controls/index.js",
+      "default": "./dist/package/canvas/app/feature-packs/zoom-controls/index.js"
+    },
     "./core": {
       "types": "./dist/package/canvas/core/index.d.ts",
       "import": "./dist/package/canvas/core/index.js",
@@ -73,10 +228,16 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "npm run build:package && tsc -b && vite build",
+    "build": "npm run build:package && npm run build:package:dom-edit-affordance && npm --prefix packages/figma-clone run build && tsc -b && vite build",
     "build:package": "rm -rf dist/package && tsc -p tsconfig.package.json && node scripts/copy-package-assets.mjs && node scripts/resolve-package-imports.mjs",
+    "build:package:dom-edit-affordance": "npm --prefix packages/dom-edit-affordance run build",
+    "build:package:figma-clone": "npm run build:package && npm run build:package:dom-edit-affordance && npm --prefix packages/figma-clone run build",
+    "build:package:slide-edit-affordance": "npm run build:package && npm --prefix packages/slide-edit-affordance run build",
     "lint": "eslint .",
     "pack:dry-run": "npm pack --dry-run",
+    "pack:dry-run:dom-edit-affordance": "cd packages/dom-edit-affordance && npm pack --dry-run",
+    "pack:dry-run:figma-clone": "cd packages/figma-clone && npm pack --dry-run",
+    "pack:dry-run:slide-edit-affordance": "cd packages/slide-edit-affordance && npm pack --dry-run",
     "prepack": "npm run build:package",
     "preview": "vite preview",
     "release:check": "npm run build:package && npm run smoke:package && npm run test -- src/canvas/host/document src/canvas/architecture && npm run build",

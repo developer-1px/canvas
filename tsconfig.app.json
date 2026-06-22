@@ -14,6 +14,17 @@
     "moduleDetection": "force",
     "noEmit": true,
     "jsx": "react-jsx",
+    "paths": {
+      "@interactive-os/figma-clone": [
+        "./packages/figma-clone/dist/index.d.ts"
+      ],
+      "@interactive-os/figma-clone/dom-editor": [
+        "./packages/figma-clone/dist/dom-editor/index.d.ts"
+      ],
+      "@interactive-os/figma-clone/style.css": [
+        "./packages/figma-clone/dist/FigmaCloneApp.css"
+      ]
+    },
 
     /* Linting */
     "noUnusedLocals": true,
@@ -21,10 +32,10 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": [
-    "src",
-    "packages/dom-edit-affordance/src",
-    "packages/slide-edit-affordance/src",
-    "packages/figma-clone/src"
+  "include": ["src"],
+  "exclude": [
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
+    "src/canvas/architecture/**"
   ]
 }

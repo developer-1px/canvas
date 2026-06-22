@@ -1,245 +1,55 @@
-import type {
-  Bounds,
-  CanvasItem,
-  Viewport,
-} from '../../../entities'
 import {
-  getCanvasItemsBounds,
-  getCanvasValidSelection,
-  type CanvasItemValidationOptions,
-} from '../../../host'
+  CANVAS_BOARD_IO_PLUGIN_ID,
+  CANVAS_BOARD_JSON_MIME_TYPE,
+  CANVAS_BOARD_SVG_MIME_TYPE,
+  DEFAULT_BOARD_JSON_FILENAME,
+  type CanvasBoardIoPlugin,
+  type CanvasBoardIoPluginOptions,
+} from './CanvasBoardIoContracts'
 import {
-  CANVAS_WORKSPACE_VERSION,
-  createCanvasWorkspaceSnapshot,
-  parseCanvasWorkspaceSnapshot,
-} from '../../workspace/document/CanvasWorkspaceSnapshot'
+  createCanvasBoardJsonExportFile,
+  createCanvasBoardSvgExportFile,
+} from './CanvasBoardExportFiles'
 import {
-  createCanvasItemsImageExport,
-  type CanvasImageExportPayload,
-} from '../image-io'
+  createCanvasBoardExportPayload,
+  parseCanvasBoardExportPayload,
+} from './CanvasBoardJsonPayload'
+import {
+  createCanvasBoardSvgExport,
+} from './CanvasBoardSvgExport'
 
-export const CANVAS_BOARD_IO_PLUGIN_ID = 'canvas-board-io'
-export const CANVAS_BOARD_EXPORT_KIND = 'interactive-os.canvas.board'
-export const CANVAS_BOARD_EXPORT_VERSION = 1
-export const CANVAS_BOARD_JSON_MIME_TYPE =
-  'application/vnd.interactive-os.canvas.board+json'
-export const CANVAS_BOARD_SVG_MIME_TYPE = 'image/svg+xml'
-
-export type CanvasBoardSelectionPolicy = 'preserve'
-
-export type CanvasBoardExportMetadata = {
-  itemCount: number
-  selectedItemCount: number
-}
-
-export type CanvasBoardExportPayload = {
-  items: CanvasItem[]
-  kind: typeof CANVAS_BOARD_EXPORT_KIND
-  metadata: CanvasBoardExportMetadata
-  selection: string[]
-  selectionPolicy: CanvasBoardSelectionPolicy
-  version: typeof CANVAS_BOARD_EXPORT_VERSION
-  viewport: Viewport
-}
-
-export type CanvasBoardExportInput = {
-  items: CanvasItem[]
-  selection: string[]
-  validation?: CanvasItemValidationOptions
-  viewport: Viewport
-}
-
-export type CanvasBoardSvgExportScope = 'board' | 'selection'
-
-export type CanvasBoardSvgExportInput = {
-  filename?: string
-  items: CanvasItem[]
-  scope?: CanvasBoardSvgExportScope
-  selection?: string[]
-}
-
-export type CanvasBoardIoTextFile<TPayload = unknown> = {
-  filename: string
-  mimeType: string
-  payload: TPayload
-  text: string
-}
-
-export type CanvasBoardIoFileNameAdapter = {
-  createJsonFileName?: (payload: CanvasBoardExportPayload) => string
-  createSvgFileName?: (context: CanvasBoardSvgExportFileNameContext) => string
-}
-
-export type CanvasBoardSvgExportFileNameContext = {
-  itemCount: number
-  scope: CanvasBoardSvgExportScope
-  selectedItemCount: number
-}
-
-export type CanvasBoardIoMimeTypes = {
-  json?: string
-  svg?: string
-}
-
-export type CanvasBoardIoStorageAdapter = {
-  readText?: () => Promise<string | null> | string | null
-  writeText?: (
-    file: CanvasBoardIoTextFile<CanvasBoardExportPayload | CanvasImageExportPayload>,
-  ) => Promise<void> | void
-}
-
-export type CanvasBoardIoPluginOptions = {
-  fileNames?: CanvasBoardIoFileNameAdapter
-  mimeTypes?: CanvasBoardIoMimeTypes
-  storage?: CanvasBoardIoStorageAdapter
-}
-
-export type CanvasBoardIoPlugin = {
-  createJsonExportFile: (
-    input: CanvasBoardExportInput,
-  ) => CanvasBoardIoTextFile<CanvasBoardExportPayload>
-  createSvgExportFile: (
-    input: CanvasBoardSvgExportInput,
-  ) => CanvasBoardIoTextFile<CanvasImageExportPayload> | null
-  id: typeof CANVAS_BOARD_IO_PLUGIN_ID
-  jsonMimeType: string
-  parseJsonImport: (
-    value: string | null,
-    validation?: CanvasItemValidationOptions,
-  ) => CanvasBoardExportPayload | null
-  readJsonImport: (
-    validation?: CanvasItemValidationOptions,
-  ) => Promise<CanvasBoardExportPayload | null>
-  svgMimeType: string
-  writeJsonExportFile: (
-    input: CanvasBoardExportInput,
-  ) => Promise<CanvasBoardIoTextFile<CanvasBoardExportPayload>>
-  writeSvgExportFile: (
-    input: CanvasBoardSvgExportInput,
-  ) => Promise<CanvasBoardIoTextFile<CanvasImageExportPayload> | null>
-}
-
-const EMPTY_BOARD_BOUNDS: Bounds = {
-  h: 0,
-  w: 0,
-  x: 0,
-  y: 0,
-}
-
-const DEFAULT_BOARD_JSON_FILENAME = 'canvas-board.canvas.json'
-const DEFAULT_BOARD_SVG_FILENAME = 'canvas-board.svg'
-const DEFAULT_SELECTION_SVG_FILENAME = 'canvas-selection.svg'
-
-export function createCanvasBoardExportPayload({
-  items,
-  selection,
-  validation,
-  viewport,
-}: CanvasBoardExportInput): CanvasBoardExportPayload {
-  const snapshot = createCanvasWorkspaceSnapshot({
-    items,
-    selection,
-    validation,
-    viewport,
-  })
-
-  return {
-    items: snapshot.items,
-    kind: CANVAS_BOARD_EXPORT_KIND,
-    metadata: {
-      itemCount: snapshot.items.length,
-      selectedItemCount: snapshot.selection.length,
-    },
-    selection: snapshot.selection,
-    selectionPolicy: 'preserve',
-    version: CANVAS_BOARD_EXPORT_VERSION,
-    viewport: snapshot.viewport,
-  }
-}
-
-export function stringifyCanvasBoardExportPayload(
-  payload: CanvasBoardExportPayload,
-) {
-  return JSON.stringify(payload, null, 2)
-}
-
-export function parseCanvasBoardExportPayload(
-  value: string | null,
-  validation: CanvasItemValidationOptions = {},
-): CanvasBoardExportPayload | null {
-  if (!value) {
-    return null
-  }
-
-  try {
-    return normalizeCanvasBoardExportPayload(JSON.parse(value), validation)
-  } catch {
-    return null
-  }
-}
-
-export function createCanvasBoardSvgExport({
-  filename,
-  items,
-  scope = 'board',
-  selection = [],
-}: CanvasBoardSvgExportInput): CanvasImageExportPayload | null {
-  const targetItems =
-    scope === 'selection'
-      ? getSelectedCanvasBoardItems(items, selection)
-      : items
-
-  if (scope === 'selection' && targetItems.length === 0) {
-    return null
-  }
-
-  const bounds = getCanvasItemsBounds(targetItems) ?? EMPTY_BOARD_BOUNDS
-  const exportPayload = createCanvasItemsImageExport({
-    bounds,
-    items: targetItems,
-  })
-
-  return {
-    ...exportPayload,
-    filename:
-      filename ??
-      (scope === 'selection'
-        ? DEFAULT_SELECTION_SVG_FILENAME
-        : DEFAULT_BOARD_SVG_FILENAME),
-  }
-}
-
-export function createCanvasBoardJsonExportFile({
-  filename = DEFAULT_BOARD_JSON_FILENAME,
-  mimeType = CANVAS_BOARD_JSON_MIME_TYPE,
-  payload,
-}: {
-  filename?: string
-  mimeType?: string
-  payload: CanvasBoardExportPayload
-}): CanvasBoardIoTextFile<CanvasBoardExportPayload> {
-  return {
-    filename,
-    mimeType,
-    payload,
-    text: stringifyCanvasBoardExportPayload(payload),
-  }
-}
-
-export function createCanvasBoardSvgExportFile({
-  mimeType = CANVAS_BOARD_SVG_MIME_TYPE,
-  payload,
-}: {
-  mimeType?: string
-  payload: CanvasImageExportPayload
-}): CanvasBoardIoTextFile<CanvasImageExportPayload> {
-  return {
-    filename: payload.filename,
-    mimeType,
-    payload,
-    text: payload.svg,
-  }
-}
+export {
+  CANVAS_BOARD_EXPORT_KIND,
+  CANVAS_BOARD_EXPORT_VERSION,
+  CANVAS_BOARD_IO_PLUGIN_ID,
+  CANVAS_BOARD_JSON_MIME_TYPE,
+  CANVAS_BOARD_SVG_MIME_TYPE,
+  type CanvasBoardExportInput,
+  type CanvasBoardExportMetadata,
+  type CanvasBoardExportPayload,
+  type CanvasBoardIoFileNameAdapter,
+  type CanvasBoardIoMimeTypes,
+  type CanvasBoardIoPlugin,
+  type CanvasBoardIoPluginOptions,
+  type CanvasBoardIoStorageAdapter,
+  type CanvasBoardIoTextFile,
+  type CanvasBoardSelectionPolicy,
+  type CanvasBoardSvgExportFileNameContext,
+  type CanvasBoardSvgExportInput,
+  type CanvasBoardSvgExportScope,
+} from './CanvasBoardIoContracts'
+export {
+  createCanvasBoardJsonExportFile,
+  createCanvasBoardSvgExportFile,
+} from './CanvasBoardExportFiles'
+export {
+  createCanvasBoardExportPayload,
+  parseCanvasBoardExportPayload,
+  stringifyCanvasBoardExportPayload,
+} from './CanvasBoardJsonPayload'
+export {
+  createCanvasBoardSvgExport,
+} from './CanvasBoardSvgExport'
 
 export function createCanvasBoardIoPlugin({
   fileNames = {},
@@ -307,72 +117,4 @@ export function createCanvasBoardIoPlugin({
   }
 
   return Object.freeze(plugin)
-}
-
-function normalizeCanvasBoardExportPayload(
-  value: unknown,
-  validation: CanvasItemValidationOptions,
-): CanvasBoardExportPayload | null {
-  if (!isRecord(value)) {
-    return null
-  }
-
-  if (
-    value.kind !== CANVAS_BOARD_EXPORT_KIND ||
-    value.version !== CANVAS_BOARD_EXPORT_VERSION ||
-    value.selectionPolicy !== 'preserve'
-  ) {
-    return null
-  }
-
-  const snapshot = parseCanvasWorkspaceSnapshot(
-    JSON.stringify({
-      items: value.items,
-      selection: value.selection,
-      version: CANVAS_WORKSPACE_VERSION,
-      viewport: value.viewport,
-    }),
-    validation,
-  )
-
-  if (!snapshot) {
-    return null
-  }
-
-  return createCanvasBoardExportPayload({
-    items: snapshot.items,
-    selection: snapshot.selection,
-    validation,
-    viewport: snapshot.viewport,
-  })
-}
-
-function getSelectedCanvasBoardItems(
-  items: CanvasItem[],
-  selection: string[],
-) {
-  const selected = new Set(getCanvasValidSelection(items, selection))
-
-  return collectSelectedCanvasBoardItems(items, selected)
-}
-
-function collectSelectedCanvasBoardItems(
-  items: CanvasItem[],
-  selected: Set<string>,
-): CanvasItem[] {
-  return items.flatMap((item) => {
-    if (selected.has(item.id)) {
-      return [item]
-    }
-
-    if (item.type === 'group') {
-      return collectSelectedCanvasBoardItems(item.children, selected)
-    }
-
-    return []
-  })
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null
 }

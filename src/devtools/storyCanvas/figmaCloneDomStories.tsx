@@ -14,8 +14,8 @@ import {
   type FigmaCloneSectionFrameMode,
   type FigmaCloneSectionOverflow,
   type FigmaCloneSectionViewport,
-} from '../../../packages/figma-clone/src/dom-editor'
-import '../../../packages/figma-clone/src/FigmaCloneApp.css'
+} from '@interactive-os/figma-clone/dom-editor'
+import '@interactive-os/figma-clone/style.css'
 import type {
   CstarStoryParameters,
   StoryComponent,

@@ -1,4 +1,4 @@
-import { getCanvasSelectionListRangeIds } from '../../../src/canvas/app/affordances/controls/selection-list/CanvasSelectionListRange'
+import { getCanvasSelectionListRangeIds } from '@interactive-os/canvas/app'
 
 export type SlideEditLayerPaneSlideId = string
 export type SlideEditLayerPaneObjectId = string

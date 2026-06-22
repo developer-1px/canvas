@@ -5,103 +5,52 @@ import {
   type FocusEvent,
   type KeyboardEvent,
 } from 'react'
+import {
+  getCanvasMenuRestoreFocusTarget,
+  restoreCanvasMenuFocus,
+} from './CanvasMenuFocusRestore'
+import {
+  getCanvasMenuItems,
+  isCanvasMenuItemEnabled,
+} from './CanvasMenuItems'
+import {
+  getCanvasMenuRovingActiveIndex,
+  runCanvasMenuRovingKeyboardIntent,
+} from './CanvasMenuKeyboard'
+import type {
+  CanvasMenuRovingFocusOptions,
+} from './CanvasMenuRovingFocusContracts'
 
-export const CANVAS_MENU_ITEM_PROPS = {
-  'data-canvas-menu-item': '',
-} as const
-
-export const CANVAS_MENU_ROVING_FOCUS_MODEL = 'canvas-menu-roving-focus'
-export const CANVAS_MENU_FOCUS_MODEL = 'enabled-menuitem-roving'
-export const CANVAS_MENU_FOCUS_RESTORE_MODEL = 'canvas-menu-focus-restore'
-export const CANVAS_MENU_KEYBOARD_KEYS =
-  'arrow-left-right-up-down-home-end-enter-space-escape'
-export const CANVAS_SELECTION_TOOLBAR_DROPDOWN_MENU_MODEL =
-  'canvas-selection-toolbar-dropdown-menu'
-
-const CANVAS_MENU_ITEM_SELECTOR = '[data-canvas-menu-item]'
-
-type CanvasMenuItem = HTMLElement & {
-  disabled?: boolean
-}
-
-type CanvasMenuFocusTarget = HTMLElement & {
-  disabled?: boolean
-}
-
-export type CanvasMenuRovingKeyIndexInput = {
-  count: number
-  currentIndex: number
-  key: string
-}
-
-export type CanvasMenuRovingKeyboardIntentInput =
-  CanvasMenuRovingKeyIndexInput
-
-export type CanvasMenuRovingKeyboardIntent =
-  | {
-      kind: 'move-focus'
-      nextIndex: number
-      preventDefault: true
-      stopPropagation: true
-    }
-  | {
-      kind: 'close-menu'
-      preventDefault: true
-      stopPropagation: true
-    }
-  | {
-      kind: 'activate-item'
-      preventDefault: true
-      stopPropagation: true
-    }
-  | {
-      kind: 'none'
-      preventDefault: false
-      stopPropagation: false
-    }
-
-export type CanvasMenuRovingKeyboardEvent = {
-  key: string
-  preventDefault: () => void
-  stopPropagation: () => void
-}
-
-export type RunCanvasMenuRovingKeyboardIntentInput = {
-  count: number
-  currentIndex: number
-  event: CanvasMenuRovingKeyboardEvent
-  onActivateItem: (currentIndex: number) => void
-  onClose: () => void
-  onMoveFocus: (nextIndex: number) => void
-}
-
-export type CanvasMenuRovingActiveIndexInput = {
-  count: number
-  focusedIndex: number
-  preferredIndex: number
-}
-
-export type CanvasMenuTriggerKeyboardIntentInput = {
-  key: string
-}
-
-export type CanvasMenuTriggerKeyboardIntent =
-  | {
-      kind: 'open-menu'
-      preventDefault: true
-    }
-  | {
-      kind: 'none'
-      preventDefault: false
-    }
-
-export type CanvasMenuRovingFocusOptions = {
-  autoFocus?: boolean
-  initialActiveIndex?: number
-  onClose?: () => void
-  preventScroll?: boolean
-  restoreFocus?: boolean
-}
+export {
+  getCanvasMenuRestoreFocusTarget,
+  restoreCanvasMenuFocus,
+} from './CanvasMenuFocusRestore'
+export {
+  getCanvasMenuRovingActiveIndex,
+  getCanvasMenuRovingKeyboardIntent,
+  getCanvasMenuRovingKeyIndex,
+  getCanvasMenuTriggerKeyboardIntent,
+  runCanvasMenuRovingKeyboardIntent,
+} from './CanvasMenuKeyboard'
+export {
+  CANVAS_MENU_FOCUS_MODEL,
+  CANVAS_MENU_FOCUS_RESTORE_MODEL,
+  CANVAS_MENU_ITEM_PROPS,
+  CANVAS_MENU_KEYBOARD_KEYS,
+  CANVAS_MENU_ROVING_FOCUS_MODEL,
+  CANVAS_SELECTION_TOOLBAR_DROPDOWN_MENU_MODEL,
+} from './CanvasMenuRovingFocusContracts'
+export type {
+  CanvasMenuRovingActiveIndexInput,
+  CanvasMenuRovingFocusOptions,
+  CanvasMenuRovingKeyboardEvent,
+  CanvasMenuRovingKeyboardIntent,
+  CanvasMenuRovingKeyboardIntentInput,
+  CanvasMenuRovingKeyIndexInput,
+  CanvasMenuTriggerKeyboardIntent,
+  CanvasMenuTriggerKeyboardIntentInput,
+  RunCanvasMenuRovingKeyboardIntentInput,
+} from './CanvasMenuRovingFocusContracts'
 
 export function useCanvasMenuRovingFocus<
   TElement extends HTMLElement = HTMLElement,
@@ -227,211 +176,5 @@ export function useCanvasMenuRovingFocus<
     ref: setRoot,
     onFocus,
     onKeyDown,
-  }
-}
-
-function getCanvasMenuItems(root: HTMLElement) {
-  return Array.from(
-    root.querySelectorAll<CanvasMenuItem>(CANVAS_MENU_ITEM_SELECTOR),
-  )
-}
-
-function isCanvasMenuItemEnabled(item: CanvasMenuItem) {
-  return !item.disabled && item.getAttribute('aria-disabled') !== 'true'
-}
-
-export function getCanvasMenuRestoreFocusTarget({
-  ownerDocument,
-  root,
-}: {
-  ownerDocument?: Document
-  root: HTMLElement | null
-}) {
-  const resolvedOwnerDocument = ownerDocument ?? root?.ownerDocument
-  const activeElement = resolvedOwnerDocument?.activeElement
-
-  if (
-    !activeElement ||
-    activeElement === resolvedOwnerDocument?.body ||
-    (root && root.contains(activeElement))
-  ) {
-    return null
-  }
-
-  return isCanvasMenuFocusableElement(activeElement)
-    ? activeElement
-    : null
-}
-
-export function restoreCanvasMenuFocus(
-  element: HTMLElement | null,
-  {
-    preventScroll = true,
-  }: {
-    preventScroll?: boolean
-  } = {},
-) {
-  if (!isCanvasMenuFocusableElement(element)) {
-    return false
-  }
-
-  element.focus({ preventScroll })
-  return true
-}
-
-function isCanvasMenuFocusableElement(
-  element: Element | null,
-): element is CanvasMenuFocusTarget {
-  const candidate = element as CanvasMenuFocusTarget | null
-
-  return !!candidate &&
-    candidate.isConnected !== false &&
-    candidate.disabled !== true &&
-    typeof candidate.focus === 'function' &&
-    candidate.getAttribute('aria-hidden') !== 'true'
-}
-
-export function getCanvasMenuRovingActiveIndex({
-  count,
-  focusedIndex,
-  preferredIndex,
-}: CanvasMenuRovingActiveIndexInput) {
-  if (count === 0) {
-    return 0
-  }
-
-  if (focusedIndex >= 0) {
-    return focusedIndex
-  }
-
-  return Math.max(0, Math.min(preferredIndex, count - 1))
-}
-
-export function getCanvasMenuRovingKeyIndex({
-  count,
-  currentIndex,
-  key,
-}: CanvasMenuRovingKeyIndexInput) {
-  if (count === 0 || currentIndex < 0) {
-    return null
-  }
-
-  if (key === 'ArrowDown' || key === 'ArrowRight') {
-    return (currentIndex + 1) % count
-  }
-
-  if (key === 'ArrowUp' || key === 'ArrowLeft') {
-    return (currentIndex - 1 + count) % count
-  }
-
-  if (key === 'Home') {
-    return 0
-  }
-
-  if (key === 'End') {
-    return count - 1
-  }
-
-  return null
-}
-
-export function getCanvasMenuRovingKeyboardIntent({
-  count,
-  currentIndex,
-  key,
-}: CanvasMenuRovingKeyboardIntentInput): CanvasMenuRovingKeyboardIntent {
-  const nextIndex = getCanvasMenuRovingKeyIndex({
-    count,
-    currentIndex,
-    key,
-  })
-
-  if (nextIndex !== null) {
-    return {
-      kind: 'move-focus',
-      nextIndex,
-      preventDefault: true,
-      stopPropagation: true,
-    }
-  }
-
-  if (key === 'Escape') {
-    return {
-      kind: 'close-menu',
-      preventDefault: true,
-      stopPropagation: true,
-    }
-  }
-
-  if (key === 'Enter' || key === ' ') {
-    return {
-      kind: 'activate-item',
-      preventDefault: true,
-      stopPropagation: true,
-    }
-  }
-
-  return {
-    kind: 'none',
-    preventDefault: false,
-    stopPropagation: false,
-  }
-}
-
-export function runCanvasMenuRovingKeyboardIntent({
-  count,
-  currentIndex,
-  event,
-  onActivateItem,
-  onClose,
-  onMoveFocus,
-}: RunCanvasMenuRovingKeyboardIntentInput) {
-  const intent = getCanvasMenuRovingKeyboardIntent({
-    count,
-    currentIndex,
-    key: event.key,
-  })
-
-  if (intent.kind === 'none') {
-    return false
-  }
-
-  if (intent.preventDefault) {
-    event.preventDefault()
-  }
-
-  if (intent.stopPropagation) {
-    event.stopPropagation()
-  }
-
-  if (intent.kind === 'move-focus') {
-    onMoveFocus(intent.nextIndex)
-    return true
-  }
-
-  if (intent.kind === 'close-menu') {
-    onClose()
-    return true
-  }
-
-  if (currentIndex >= 0) {
-    onActivateItem(currentIndex)
-  }
-  return true
-}
-
-export function getCanvasMenuTriggerKeyboardIntent({
-  key,
-}: CanvasMenuTriggerKeyboardIntentInput): CanvasMenuTriggerKeyboardIntent {
-  if (key === 'ArrowDown' || key === 'Enter' || key === ' ') {
-    return {
-      kind: 'open-menu',
-      preventDefault: true,
-    }
-  }
-
-  return {
-    kind: 'none',
-    preventDefault: false,
   }
 }

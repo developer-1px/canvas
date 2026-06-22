@@ -1,4 +1,4 @@
-import type { Bounds } from '../../../src/canvas/core'
+import type { Bounds } from '@interactive-os/canvas/core'
 
 export type SlideEditFrameBounds = Bounds
 export type SlideEditFrameGuideAxis = 'x' | 'y'

@@ -1,4 +1,4 @@
-import type { Bounds, Point } from '../../../src/canvas/core'
+import type { Bounds, Point } from '@interactive-os/canvas/core'
 
 export type SlideEditClipboardSlideId = string
 export type SlideEditClipboardObjectId = string

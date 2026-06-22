@@ -1,4 +1,4 @@
-import type { CanvasCustomItem } from '../../../src/canvas'
+import type { CanvasCustomItem } from '@interactive-os/canvas'
 import {
   createFigmaCloneDomEditorCanvasItems,
   createFigmaCloneDomEditorFrameModule,

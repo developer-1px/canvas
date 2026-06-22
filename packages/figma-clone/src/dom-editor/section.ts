@@ -1,4 +1,4 @@
-import type { CanvasJsonObject } from '../../../../src/canvas'
+import type { CanvasJsonObject } from '@interactive-os/canvas'
 import {
   getFigmaCloneDomEditStyle,
   getFigmaCloneDomRootId,

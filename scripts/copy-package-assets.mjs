@@ -1,10 +1,15 @@
 import { cp, mkdir, readdir, stat } from 'node:fs/promises'
-import { dirname, join, relative } from 'node:path'
+import { dirname, join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const root = dirname(fileURLToPath(new URL('../package.json', import.meta.url)))
-const sourceRoot = join(root, 'src', 'canvas')
-const outputRoot = join(root, 'dist', 'package', 'canvas')
+const [sourceRootInput, outputRootInput] = process.argv.slice(2)
+const sourceRoot = sourceRootInput
+  ? resolve(process.cwd(), sourceRootInput)
+  : join(root, 'src', 'canvas')
+const outputRoot = outputRootInput
+  ? resolve(process.cwd(), outputRootInput)
+  : join(root, 'dist', 'package', 'canvas')
 
 await copyCssFiles(sourceRoot)
 

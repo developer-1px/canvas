@@ -1,10 +1,28 @@
 {
   "name": "@interactive-os/slide-edit-affordance",
-  "private": true,
-  "version": "0.0.0",
+  "private": false,
+  "version": "0.1.0",
   "type": "module",
+  "sideEffects": false,
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true,
+    "registry": "https://registry.npmjs.org/"
+  },
   "exports": {
-    ".": "./src/index.ts"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "rm -rf dist && tsc -p tsconfig.package.json && node ../../scripts/resolve-package-imports.mjs dist",
+    "pack:dry-run": "npm pack --dry-run"
   },
   "peerDependencies": {
     "@interactive-os/canvas": "^0.1.1"

@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "target": "es2023",
+    "lib": ["ES2023", "DOM"],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "skipLibCheck": true,
+    "declaration": true,
+    "declarationMap": false,
+    "sourceMap": false,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "paths": {
+      "@interactive-os/canvas": ["../../dist/package/canvas/index.d.ts"],
+      "@interactive-os/canvas/*": [
+        "../../dist/package/canvas/*/index.d.ts"
+      ],
+      "@interactive-os/dom-edit-affordance": [
+        "../dom-edit-affordance/dist/index.d.ts"
+      ],
+      "@interactive-os/dom-edit-affordance/*": [
+        "../dom-edit-affordance/dist/*.d.ts"
+      ]
+    },
+    "types": ["vite/client"],
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+    "noFallthroughCasesInSwitch": true
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx"]
+}

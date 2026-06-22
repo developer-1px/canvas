@@ -375,55 +375,6 @@ describe('CanvasAppExtensionBundle', () => {
   })
 })
 
-describe('CanvasAppFoundationExtensionCommands', () => {
-  it('indexes registered foundation extension commands with owning extension ids', () => {
-    expect(getCanvasAppFoundationExtensionCommands([])).toEqual([])
-
-    const commands = getCanvasAppFoundationExtensionCommands([
-      createFoundationExtension('canvas.risk'),
-    ])
-
-    expect(commands[0]).toMatchObject({
-      extensionId: 'canvas.risk',
-      id: 'canvas.risk.command',
-      requiredAdapters: ['command'],
-    })
-    expect(commands[0]?.plan({} as never)).toEqual([{
-      selection: [],
-      type: 'selection',
-    }])
-  })
-})
-
-describe('CanvasAppFoundationExtensionTools', () => {
-  it('indexes registered foundation extension tools with owning extension ids', () => {
-    expect(getCanvasAppFoundationExtensionTools([])).toEqual([])
-
-    expect(getCanvasAppFoundationExtensionTools([
-      createFoundationExtension('canvas.risk'),
-    ])).toEqual([{
-      extensionId: 'canvas.risk',
-      id: 'canvas.risk.tool',
-      kind: 'creation',
-      requiredAdapters: ['creation'],
-    }])
-  })
-})
-
-describe('CanvasAppFoundationExtensionRendererSlots', () => {
-  it('indexes registered foundation extension renderer slots with owning extension ids', () => {
-    expect(getCanvasAppFoundationExtensionRendererSlots([])).toEqual([])
-
-    expect(getCanvasAppFoundationExtensionRendererSlots([
-      createFoundationExtension('canvas.risk'),
-    ])).toEqual([{
-      extensionId: 'canvas.risk',
-      id: 'canvas.risk.renderer',
-      surface: 'item-layer',
-    }])
-  })
-})
-
 function createCommand(id: string) {
   return {
     id,

@@ -4,17 +4,25 @@ import { dirname, extname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const root = dirname(fileURLToPath(new URL('../package.json', import.meta.url)))
-const packageRoot = join(root, 'dist', 'package', 'canvas')
 const sourceExtensions = new Set(['.js', '.d.ts'])
+const packageRoots = process.argv.slice(2).map((argument) =>
+  resolve(process.cwd(), argument),
+)
 
-const files = await listSourceFiles(packageRoot)
+if (packageRoots.length === 0) {
+  packageRoots.push(join(root, 'dist', 'package', 'canvas'))
+}
 
-for (const filePath of files) {
-  const source = await readFile(filePath, 'utf8')
-  const rewritten = rewriteModuleSpecifiers(filePath, source)
+for (const packageRoot of packageRoots) {
+  const files = await listSourceFiles(packageRoot)
 
-  if (rewritten !== source) {
-    await writeFile(filePath, rewritten)
+  for (const filePath of files) {
+    const source = await readFile(filePath, 'utf8')
+    const rewritten = rewriteModuleSpecifiers(filePath, source)
+
+    if (rewritten !== source) {
+      await writeFile(filePath, rewritten)
+    }
   }
 }
 

@@ -3,7 +3,7 @@ import {
   defineCanvasAppReactWidgetModule,
   type CanvasCustomItem,
   type CanvasJsonObject,
-} from '../../../../src/canvas'
+} from '@interactive-os/canvas'
 
 export const FIGMA_CLONE_WIDGET_KIND = 'figma-clone-react-widget'
 export const FIGMA_CLONE_WIDGET_PRESENTATION = 'figma-clone-widget-card'

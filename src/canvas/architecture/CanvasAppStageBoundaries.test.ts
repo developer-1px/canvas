@@ -149,6 +149,12 @@ describe('Canvas App stage boundaries', () => {
     const assemblySourceFile = getSourceFile(
       'src/canvas/app/shell/CanvasAppAssemblySource.ts',
     )
+    const assemblySourceContractsFile = getSourceFile(
+      'src/canvas/app/shell/CanvasAppAssemblySourceContracts.ts',
+    )
+    const assemblySourceResolutionFile = getSourceFile(
+      'src/canvas/app/shell/CanvasAppAssemblySourceResolution.ts',
+    )
     const appFacadeFile = getSourceFile('src/canvas/app/index.ts')
     const packageFacadeFile = getSourceFile('src/canvas/index.ts')
     const mainFile = getSourceFile('src/main.tsx')
@@ -156,11 +162,14 @@ describe('Canvas App stage boundaries', () => {
     const routerFile = getSourceFile('src/CanvasAppRouter.tsx')
 
     expect(shellFile.source).toContain('resolveCanvasAppAssemblySource')
-    expect(assemblySourceFile.source).toContain(
+    expect(assemblySourceContractsFile.source).toContain(
       'assemblyInput?: CanvasAppAssemblyInput',
     )
-    expect(assemblySourceFile.source).toContain(
+    expect(assemblySourceResolutionFile.source).toContain(
       'createCanvasAppAssembly(assemblyInput)',
+    )
+    expect(assemblySourceFile.source).toContain(
+      'CanvasAppAssemblySourceMarketplaceTargetTransactions',
     )
     expect(appFacadeFile.source).toContain('CanvasAppAssemblySource')
     expect(packageFacadeFile.source).toContain('CanvasAppAssemblySource')

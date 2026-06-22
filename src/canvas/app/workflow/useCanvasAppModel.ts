@@ -1,8 +1,9 @@
 import {
-  useCallback,
   useMemo,
-  useState,
 } from 'react'
+import {
+  createCanvasComponentPartSourceInputs,
+} from './CanvasAppComponentPartSourceInputs'
 import { getCanvasAppAffordanceModel } from './CanvasAppAffordanceModel'
 import { getCanvasAppAssemblyModel } from './CanvasAppAssemblyModel'
 import { getCanvasAppControlModel } from './CanvasAppControlModel'
@@ -29,6 +30,7 @@ import { useCanvasAppPointerModel } from './useCanvasAppPointerModel'
 import { useCanvasAppSelectionModel } from './useCanvasAppSelectionModel'
 import { useCanvasAppStampModel } from './useCanvasAppStampModel'
 import { useCanvasAppStageElementModel } from './useCanvasAppStageElementModel'
+import { useCanvasAppShellDialogState } from './useCanvasAppShellDialogState'
 import { useCanvasAppTableImportModel } from './useCanvasAppTableImportModel'
 import { useCanvasAppTextPasteImportModel } from './useCanvasAppTextPasteImportModel'
 import { useCanvasAppTextModel } from './useCanvasAppTextModel'
@@ -41,10 +43,8 @@ import {
 } from './CanvasAppAssembly'
 import type { CanvasAppAssembly } from './CanvasAppAssemblyTypes'
 import type {
-  CanvasComponentPartSourceInput,
   CanvasPresenceOverlay,
 } from '../../engine'
-import type { CanvasComponentSetSummary } from '../../host'
 
 export function useCanvasAppModel({
   assembly = DEFAULT_CANVAS_APP_ASSEMBLY,
@@ -57,21 +57,14 @@ export function useCanvasAppModel({
     () => getCanvasAppAssemblyModel(assertCanvasAppAssembly(assembly)),
     [assembly],
   )
-  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false)
-  const [shortcutHelpOpen, setShortcutHelpOpen] = useState(false)
-  const openCommandPalette = useCallback(() => {
-    setCommandPaletteOpen(true)
-  }, [])
-  const closeCommandPalette = useCallback(() => {
-    setCommandPaletteOpen(false)
-  }, [])
-  const openShortcutHelp = useCallback(() => {
-    setShortcutHelpOpen(true)
-    setCommandPaletteOpen(false)
-  }, [])
-  const closeShortcutHelp = useCallback(() => {
-    setShortcutHelpOpen(false)
-  }, [])
+  const {
+    closeCommandPalette,
+    closeShortcutHelp,
+    commandPaletteOpen,
+    openCommandPalette,
+    openShortcutHelp,
+    shortcutHelpOpen,
+  } = useCanvasAppShellDialogState()
   const affordance = useMemo(
     () => getCanvasAppAffordanceModel(appAssembly.affordance.config),
     [appAssembly],
@@ -376,19 +369,4 @@ export function useCanvasAppModel({
     votingSession: featurePackTransients.votingSession.view,
     zoomControls: controls.zoomControls,
   }
-}
-
-function createCanvasComponentPartSourceInputs(
-  componentSets: readonly CanvasComponentSetSummary[],
-): readonly CanvasComponentPartSourceInput[] {
-  return componentSets.flatMap((componentSet) =>
-    componentSet.parts.map((part) => ({
-      componentId: componentSet.id,
-      componentLabel: componentSet.label,
-      id: `${componentSet.id}:${part.slotId}`,
-      itemIds: part.itemIds,
-      label: part.label,
-      slotId: part.slotId,
-    })),
-  )
 }

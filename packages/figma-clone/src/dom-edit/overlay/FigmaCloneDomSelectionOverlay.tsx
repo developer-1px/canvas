@@ -1,6 +1,6 @@
 import { DomEditSelectionOverlay } from '@interactive-os/dom-edit-affordance/react'
 import type { RefObject } from 'react'
-import type { Viewport } from '../../../../../src/canvas'
+import type { Viewport } from '@interactive-os/canvas'
 import {
   FIGMA_CLONE_DOM_EDIT_ADAPTER,
   type FigmaCloneDomAutoLayoutField,

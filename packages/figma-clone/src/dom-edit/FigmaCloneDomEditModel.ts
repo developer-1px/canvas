@@ -27,7 +27,8 @@ import {
 } from '@interactive-os/dom-edit-affordance'
 import {
   createCanvasComponentDefinitionRegistry,
-} from '../../../../src/canvas/host'
+} from '@interactive-os/canvas/host'
+import type { FigmaCloneDomSectionRootId } from '../dom-editor/section'
 
 export type FigmaCloneDomNodeId =
   | 'workspacePage'
@@ -2556,6 +2557,10 @@ export function listFigmaCloneDomComponentSets():
 
     const pageRootId = getFigmaCloneDomRootId(firstRootNodeId)
 
+    if (!isFigmaCloneDomComponentPageRootId(pageRootId)) {
+      throw new Error(`Missing page root for ${componentSet.id}`)
+    }
+
     return {
       id: componentSet.id as FigmaCloneDomComponentId,
       instances: componentSet.instances.map((instance) => ({
@@ -2585,6 +2590,12 @@ export function listFigmaCloneDomComponentSets():
       syncDescription: componentSet.syncDescription ?? '',
     }
   })
+}
+
+function isFigmaCloneDomComponentPageRootId(
+  nodeId: FigmaCloneDomNodeId,
+): nodeId is FigmaCloneDomSectionRootId {
+  return nodeId === 'workspacePage' || nodeId === 'homePage'
 }
 
 export function listFigmaCloneStoryImports():

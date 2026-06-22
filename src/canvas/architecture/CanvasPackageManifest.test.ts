@@ -60,11 +60,52 @@ const publishedRuntimeDependencies = [
   '@interactive-os/preview-surface',
   'lucide-react',
 ]
+const featurePackPackageExportSlugs = [
+  'ai-labs',
+  'arrow-routing-inspector',
+  'board-io',
+  'checklist-inspector',
+  'command-palette',
+  'component-authoring',
+  'component-inspector',
+  'component-library',
+  'component-source-outline',
+  'component-sync',
+  'cursor-chat',
+  'dom-edit-style',
+  'drawing-tools',
+  'facilitation',
+  'find-replace',
+  'image-io',
+  'kanban-inspector',
+  'media-import',
+  'minimap',
+  'shape-authoring',
+  'shortcut-help',
+  'stamp-authoring',
+  'status-bar',
+  'story-canvas',
+  'story-import',
+  'story-preview',
+  'table-import',
+  'text-paste-import',
+  'toolbar',
+  'zoom-controls',
+] as const
 const sourcePaths = new Set(
   Object.keys(sourceModules).map((path) =>
     path.replace(/^\.\.\//, './src/canvas/'),
   ),
 )
+const featurePackSourceFolderSlugs = Object.keys(sourceModules)
+  .flatMap((path) => {
+    const match = path.match(
+      /^\.\.\/app\/feature-packs\/([^/]+)\/index\.ts$/,
+    )
+
+    return match?.[1] ? [match[1]] : []
+  })
+  .sort()
 
 describe('Canvas package manifest', () => {
   it('keeps the reusable canvas package entry explicit', () => {
@@ -84,6 +125,17 @@ describe('Canvas package manifest', () => {
       './app': createPackageExportEntry('./dist/package/canvas/app/index'),
       './app/authoring': createPackageExportEntry(
         './dist/package/canvas/app/authoring/index',
+      ),
+      './app/feature-packs': createPackageExportEntry(
+        './dist/package/canvas/app/feature-packs/index',
+      ),
+      ...Object.fromEntries(
+        featurePackPackageExportSlugs.map((slug) => [
+          `./app/feature-packs/${slug}`,
+          createPackageExportEntry(
+            `./dist/package/canvas/app/feature-packs/${slug}/index`,
+          ),
+        ]),
       ),
       './core': createPackageExportEntry('./dist/package/canvas/core/index'),
       './foundation': createPackageExportEntry(
@@ -107,7 +159,7 @@ describe('Canvas package manifest', () => {
       .filter(isPackageCodeExportEntry)
       .flatMap((entry) => [entry.types, entry.import, entry.default])
 
-    expect(exportedPaths).toHaveLength(30)
+    expect(exportedPaths).toHaveLength(123)
     expect(exportedPaths.every((path) => path.startsWith('./dist/package/canvas/'))).toBe(true)
     expect(exportedPaths.every((path) =>
       path.endsWith('/index.d.ts') ||
@@ -127,10 +179,22 @@ describe('Canvas package manifest', () => {
         isPackageCodeExportEntry(entry) ? [[subpath, entry] as const] : [],
       )
 
-    expect(exportEntries).toHaveLength(10)
+    expect(exportEntries).toHaveLength(41)
     for (const [, entry] of exportEntries) {
       expect(entry.types).toBe(entry.import.replace(/\.js$/, '.d.ts'))
       expect(entry.import).toBe(entry.default)
+    }
+  })
+
+  it('exports every installable feature pack folder as a package subpath', () => {
+    expect([...featurePackPackageExportSlugs].sort()).toEqual(
+      featurePackSourceFolderSlugs,
+    )
+
+    for (const slug of featurePackSourceFolderSlugs) {
+      expect(packageJson.exports).toHaveProperty(
+        `./app/feature-packs/${slug}`,
+      )
     }
   })
 

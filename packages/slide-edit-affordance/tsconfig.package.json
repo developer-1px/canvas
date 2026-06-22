@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "target": "es2023",
+    "lib": ["ES2023", "DOM"],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "skipLibCheck": true,
+    "declaration": true,
+    "declarationMap": false,
+    "sourceMap": false,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "paths": {
+      "@interactive-os/canvas": ["../../dist/package/canvas/index.d.ts"],
+      "@interactive-os/canvas/app": [
+        "../../dist/package/canvas/app/index.d.ts"
+      ],
+      "@interactive-os/canvas/core": [
+        "../../dist/package/canvas/core/index.d.ts"
+      ],
+      "@interactive-os/canvas/foundation": [
+        "../../dist/package/canvas/foundation/index.d.ts"
+      ]
+    },
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+    "noFallthroughCasesInSwitch": true
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["src/**/*.test.ts"]
+}

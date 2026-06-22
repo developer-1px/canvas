@@ -5,7 +5,7 @@ import {
   createRoute,
   createRouter,
 } from '@tanstack/react-router'
-import { FigmaCloneApp } from '../packages/figma-clone/src'
+import { FigmaCloneApp } from '@interactive-os/figma-clone'
 import { PageStoryCanvas } from './devtools/PageStoryCanvas'
 import { CanvasDevToolsDemoApp } from './demo/CanvasDevToolsDemoApp'
 import { DEMO_CANVAS_APP_ASSEMBLY_INPUT } from './demo/CanvasDemoAssembly'

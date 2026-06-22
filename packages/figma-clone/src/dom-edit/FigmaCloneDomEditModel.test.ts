@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createCanvasComponentDefinitionRegistry } from '../../../../src/canvas/host'
+import { createCanvasComponentDefinitionRegistry } from '@interactive-os/canvas/host'
 import { getFigmaCloneDomOverlayVisibility } from './overlay'
 import {
   canFigmaCloneDomNodeEditText,

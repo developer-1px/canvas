@@ -1,8 +1,8 @@
-import type { Bounds } from '../../../src/canvas/core'
+import type { Bounds } from '@interactive-os/canvas/core'
 import {
   CANVAS_SELECTION_LIST_KEYBOARD_MODEL,
   createCanvasSelectionListDescriptor,
-} from '../../../src/canvas/app/affordances/controls/selection-list/CanvasSelectionListDescriptor'
+} from '@interactive-os/canvas/app'
 
 export type SlideEditRailSlideId = string
 

@@ -2,89 +2,46 @@ import {
   useEffect,
   useRef,
 } from 'react'
+import {
+  focusCanvasModalElement,
+  getCanvasModalRestoreFocusTarget,
+  restoreCanvasModalFocus,
+} from './CanvasModalFocusLifecycleFocus'
+import type {
+  CanvasModalFocusRef,
+} from './CanvasModalFocusLifecycleContracts'
 
-export const CANVAS_MODAL_FOCUS_LIFECYCLE_MODEL = 'canvas-modal-focus-lifecycle'
-
-export const CANVAS_MODAL_FOCUSABLE_SELECTOR = [
-  'a[href]',
-  'button:not([disabled])',
-  'input:not([disabled])',
-  'select:not([disabled])',
-  'textarea:not([disabled])',
-  '[tabindex]:not([tabindex="-1"])',
-].join(',')
-
-export type CanvasModalFocusTarget = HTMLElement & {
-  disabled?: boolean
-}
-
-export type CanvasModalFocusRef<TElement extends HTMLElement = HTMLElement> = {
-  current: TElement | null
-}
-
-export type CanvasModalTabFocusEvent = {
-  key: string
-  shiftKey: boolean
-  preventDefault: () => void
-  stopPropagation: () => void
-}
-
-export type CanvasModalBackdropPointerEvent =
-  CanvasModalBackdropPointerIntentInput & {
-    preventDefault: () => void
-    stopPropagation: () => void
-  }
-
-export type CanvasModalKeyboardEvent = CanvasModalTabFocusEvent
-
-export type CanvasModalBackdropPointerIntentInput = {
-  currentTarget: EventTarget | null
-  target: EventTarget | null
-}
-
-export type CanvasModalBackdropPointerIntent =
-  | {
-      kind: 'dismiss'
-      preventDefault: true
-      stopPropagation: true
-    }
-  | {
-      kind: 'none'
-      preventDefault: false
-      stopPropagation: false
-    }
-
-export type CanvasModalKeyboardIntentInput = {
-  key: string
-}
-
-export type CanvasModalKeyboardIntent =
-  | {
-      kind: 'close'
-      preventDefault: true
-      stopPropagation: true
-    }
-  | {
-      kind: 'trap-focus'
-      preventDefault: true
-      stopPropagation: true
-    }
-  | {
-      kind: 'none'
-      preventDefault: false
-      stopPropagation: false
-    }
-
-export type RunCanvasModalBackdropPointerIntentInput = {
-  event: CanvasModalBackdropPointerEvent
-  onDismiss: () => void
-}
-
-export type RunCanvasModalKeyboardIntentInput = {
-  event: CanvasModalKeyboardEvent
-  onClose: () => void
-  root: HTMLElement | null
-}
+export {
+  CANVAS_MODAL_FOCUSABLE_SELECTOR,
+  CANVAS_MODAL_FOCUS_LIFECYCLE_MODEL,
+} from './CanvasModalFocusLifecycleContracts'
+export {
+  focusCanvasModalElement,
+  getCanvasModalFocusableElements,
+  getCanvasModalNextFocusIndex,
+  getCanvasModalRestoreFocusTarget,
+  restoreCanvasModalFocus,
+} from './CanvasModalFocusLifecycleFocus'
+export {
+  getCanvasModalBackdropPointerIntent,
+  getCanvasModalKeyboardIntent,
+  runCanvasModalBackdropPointerIntent,
+  runCanvasModalKeyboardIntent,
+  trapCanvasModalTabFocus,
+} from './CanvasModalFocusLifecycleIntent'
+export type {
+  CanvasModalBackdropPointerEvent,
+  CanvasModalBackdropPointerIntent,
+  CanvasModalBackdropPointerIntentInput,
+  CanvasModalFocusRef,
+  CanvasModalFocusTarget,
+  CanvasModalKeyboardEvent,
+  CanvasModalKeyboardIntent,
+  CanvasModalKeyboardIntentInput,
+  CanvasModalTabFocusEvent,
+  RunCanvasModalBackdropPointerIntentInput,
+  RunCanvasModalKeyboardIntentInput,
+} from './CanvasModalFocusLifecycleContracts'
 
 export function useCanvasModalFocusLifecycle<
   TInitialFocusElement extends HTMLElement = HTMLElement,
@@ -127,221 +84,4 @@ export function useCanvasModalFocusLifecycle<
   return {
     restoreFocusRef,
   }
-}
-
-export function getCanvasModalRestoreFocusTarget({
-  ownerDocument = typeof document === 'undefined' ? undefined : document,
-  root,
-}: {
-  ownerDocument?: Document
-  root?: HTMLElement | null
-} = {}) {
-  const activeElement = ownerDocument?.activeElement
-
-  if (
-    !activeElement ||
-    activeElement === ownerDocument?.body ||
-    (root && root.contains(activeElement))
-  ) {
-    return null
-  }
-
-  return isCanvasModalFocusableElement(activeElement)
-    ? activeElement
-    : null
-}
-
-export function focusCanvasModalElement(
-  element: HTMLElement | null,
-  {
-    preventScroll = true,
-  }: {
-    preventScroll?: boolean
-  } = {},
-) {
-  if (!isCanvasModalFocusableElement(element)) {
-    return false
-  }
-
-  element.focus({ preventScroll })
-  return true
-}
-
-export function restoreCanvasModalFocus(
-  element: HTMLElement | null,
-  {
-    preventScroll = true,
-  }: {
-    preventScroll?: boolean
-  } = {},
-) {
-  return focusCanvasModalElement(element, { preventScroll })
-}
-
-export function getCanvasModalBackdropPointerIntent({
-  currentTarget,
-  target,
-}: CanvasModalBackdropPointerIntentInput): CanvasModalBackdropPointerIntent {
-  if (currentTarget && target === currentTarget) {
-    return {
-      kind: 'dismiss',
-      preventDefault: true,
-      stopPropagation: true,
-    }
-  }
-
-  return {
-    kind: 'none',
-    preventDefault: false,
-    stopPropagation: false,
-  }
-}
-
-export function getCanvasModalKeyboardIntent({
-  key,
-}: CanvasModalKeyboardIntentInput): CanvasModalKeyboardIntent {
-  if (key === 'Escape') {
-    return {
-      kind: 'close',
-      preventDefault: true,
-      stopPropagation: true,
-    }
-  }
-
-  if (key === 'Tab') {
-    return {
-      kind: 'trap-focus',
-      preventDefault: true,
-      stopPropagation: true,
-    }
-  }
-
-  return {
-    kind: 'none',
-    preventDefault: false,
-    stopPropagation: false,
-  }
-}
-
-export function runCanvasModalBackdropPointerIntent({
-  event,
-  onDismiss,
-}: RunCanvasModalBackdropPointerIntentInput) {
-  const backdropPointerIntent = getCanvasModalBackdropPointerIntent({
-    currentTarget: event.currentTarget,
-    target: event.target,
-  })
-
-  if (backdropPointerIntent.kind !== 'dismiss') {
-    return false
-  }
-
-  if (backdropPointerIntent.preventDefault) {
-    event.preventDefault()
-  }
-  if (backdropPointerIntent.stopPropagation) {
-    event.stopPropagation()
-  }
-
-  onDismiss()
-  return true
-}
-
-export function runCanvasModalKeyboardIntent({
-  event,
-  onClose,
-  root,
-}: RunCanvasModalKeyboardIntentInput) {
-  const modalKeyboardIntent = getCanvasModalKeyboardIntent({ key: event.key })
-
-  if (modalKeyboardIntent.kind === 'close') {
-    if (modalKeyboardIntent.preventDefault) {
-      event.preventDefault()
-    }
-    if (modalKeyboardIntent.stopPropagation) {
-      event.stopPropagation()
-    }
-    onClose()
-    return true
-  }
-
-  if (modalKeyboardIntent.kind === 'trap-focus') {
-    return trapCanvasModalTabFocus({
-      event,
-      root,
-    })
-  }
-
-  return false
-}
-
-export function trapCanvasModalTabFocus({
-  event,
-  root,
-}: {
-  event: CanvasModalTabFocusEvent
-  root: HTMLElement | null
-}) {
-  if (event.key !== 'Tab' || !root) {
-    return false
-  }
-
-  const focusableElements = getCanvasModalFocusableElements(root)
-
-  event.preventDefault()
-  event.stopPropagation()
-
-  const nextIndex = getCanvasModalNextFocusIndex({
-    count: focusableElements.length,
-    currentIndex: focusableElements.findIndex((element) =>
-      element === root.ownerDocument.activeElement),
-    shiftKey: event.shiftKey,
-  })
-
-  if (nextIndex === null) {
-    return true
-  }
-
-  focusableElements[nextIndex]?.focus()
-  return true
-}
-
-export function getCanvasModalFocusableElements(root: HTMLElement) {
-  return Array.from(
-    root.querySelectorAll<HTMLElement>(CANVAS_MODAL_FOCUSABLE_SELECTOR),
-  ).filter(isCanvasModalFocusableElement)
-}
-
-export function getCanvasModalNextFocusIndex({
-  count,
-  currentIndex,
-  shiftKey,
-}: {
-  count: number
-  currentIndex: number
-  shiftKey: boolean
-}) {
-  if (count === 0) {
-    return null
-  }
-
-  if (currentIndex < 0) {
-    return 0
-  }
-
-  const direction = shiftKey ? -1 : 1
-
-  return (currentIndex + direction + count) % count
-}
-
-function isCanvasModalFocusableElement(
-  element: Element | null,
-): element is CanvasModalFocusTarget {
-  const candidate = element as CanvasModalFocusTarget | null
-
-  return !!candidate &&
-    candidate.isConnected !== false &&
-    candidate.disabled !== true &&
-    typeof candidate.focus === 'function' &&
-    candidate.getAttribute('aria-hidden') !== 'true'
 }

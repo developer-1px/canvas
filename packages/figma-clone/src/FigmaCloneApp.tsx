@@ -32,7 +32,7 @@ import {
   type CanvasWorkspaceStorage,
   type CanvasWorkspaceStorageProvider,
   useCanvasToolbarRovingFocus,
-} from '../../../src/canvas'
+} from '@interactive-os/canvas'
 import {
   DEFAULT_DOM_EDIT_OVERLAY_LAYER_VISIBILITY,
   DomEditInspector,

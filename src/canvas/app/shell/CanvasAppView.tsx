@@ -1,7 +1,5 @@
 import type {
-  ComponentProps,
   MouseEvent,
-  ReactNode,
 } from 'react'
 import {
   useCallback,
@@ -9,84 +7,17 @@ import {
 } from 'react'
 import {
   DEFAULT_CANVAS_APP_FEATURE_PACK_VIEW_RENDERERS,
-  type CanvasAppCommandPaletteProps,
-  type CanvasAppComponentPaletteProps,
-  type CanvasAppContextCommandMenuState,
-  type CanvasAppCursorChatProps,
-  type CanvasAppDrawingControlsProps,
-  type CanvasAppEmoteControlsProps,
-  type CanvasAppFeaturePackViewRenderers,
-  type CanvasAppFindReplacePanelProps,
-  type CanvasAppImageControlsProps,
-  type CanvasAppMinimapProps,
-  type CanvasAppSelectionFloatingBarProps,
-  type CanvasAppSessionTimerProps,
-  type CanvasAppShortcutHelpOverlayProps,
-  type CanvasAppSpotlightProps,
-  type CanvasAppStampControlsProps,
-  type CanvasAppStatusProps,
-  type CanvasAppStickyQuickCreateControlProps,
-  type CanvasAppToolbarProps,
-  type CanvasAppVotingSessionProps,
-  type CanvasAppZoomControlsProps,
 } from '../feature-packs'
 import { CanvasObjectInspector } from '../affordances/editing/inspector/CanvasObjectInspector'
 import { CanvasTextEditor } from '../affordances/editing/text-editor/CanvasTextEditor'
 import {
-  getCanvasContextMenuPosition,
-} from '../affordances/controls/context-menu/CanvasContextMenuPosition'
+  getCanvasAppViewContextMenuState,
+} from './CanvasAppViewContextMenu'
+import type {
+  CanvasAppViewContextMenuState,
+  CanvasAppViewProps,
+} from './CanvasAppViewContracts'
 import { getCanvasAppSurfaceVisibility } from './CanvasAppSurfaceModel'
-
-type ToolbarProps = CanvasAppToolbarProps
-type CommandPaletteProps = CanvasAppCommandPaletteProps
-type SelectionFloatingBarProps = CanvasAppSelectionFloatingBarProps
-type CursorChatProps = CanvasAppCursorChatProps
-type EmoteControlsProps = CanvasAppEmoteControlsProps
-type SessionTimerProps = CanvasAppSessionTimerProps
-type ShortcutHelpProps = CanvasAppShortcutHelpOverlayProps
-type SpotlightProps = CanvasAppSpotlightProps
-type VotingSessionProps = CanvasAppVotingSessionProps
-type TextEditorProps = ComponentProps<typeof CanvasTextEditor>
-type DrawingControlsProps = CanvasAppDrawingControlsProps
-type FindReplaceProps = CanvasAppFindReplacePanelProps
-type ImageControlsProps = CanvasAppImageControlsProps
-type StampControlsProps = CanvasAppStampControlsProps
-type StickyQuickCreateProps = CanvasAppStickyQuickCreateControlProps
-type InspectorProps = ComponentProps<typeof CanvasObjectInspector>
-type PaletteProps = CanvasAppComponentPaletteProps
-type ZoomControlsProps = CanvasAppZoomControlsProps
-type StatusProps = CanvasAppStatusProps
-type MinimapProps = CanvasAppMinimapProps
-type VisibleProps<TProps> = TProps & {
-  visible: boolean
-}
-type ToolbarViewProps = VisibleProps<ToolbarProps> & {
-  selectionCommandAnchor: SelectionFloatingBarProps['anchor']
-}
-
-type CanvasAppViewProps = {
-  commandPalette: CommandPaletteProps
-  componentPalette: VisibleProps<PaletteProps>
-  cursorChat: CursorChatProps
-  drawingControls: VisibleProps<DrawingControlsProps>
-  emoteControls: EmoteControlsProps
-  featurePackViewRenderers?: CanvasAppFeaturePackViewRenderers
-  findReplace: FindReplaceProps
-  imageControls: VisibleProps<ImageControlsProps>
-  inspector: VisibleProps<InspectorProps>
-  minimap: VisibleProps<MinimapProps>
-  sessionTimer: SessionTimerProps
-  shortcutHelp: ShortcutHelpProps
-  spotlight: SpotlightProps
-  stage: ReactNode
-  stampControls: VisibleProps<StampControlsProps>
-  stickyQuickCreate: VisibleProps<StickyQuickCreateProps>
-  status: VisibleProps<StatusProps>
-  textEditor: VisibleProps<TextEditorProps>
-  toolbar: ToolbarViewProps
-  votingSession: VotingSessionProps
-  zoomControls: VisibleProps<ZoomControlsProps>
-}
 
 export function CanvasAppView({
   commandPalette,
@@ -132,7 +63,7 @@ export function CanvasAppView({
   const { visible: showZoomControls, ...zoomControlProps } = zoomControls
   const { visible: showStatus, ...statusProps } = status
   const [contextMenu, setContextMenu] =
-    useState<CanvasAppContextCommandMenuState | null>(null)
+    useState<CanvasAppViewContextMenuState | null>(null)
   const featurePackViews = featurePackViewRenderers
   const inspectorHasContent = showInspector && (
     inspectorProps.customPanels.length > 0 ||
@@ -143,15 +74,11 @@ export function CanvasAppView({
     setContextMenu(null)
   }, [setContextMenu])
   const openContextMenu = useCallback((event: MouseEvent<HTMLElement>) => {
-    if (isAppControlTarget(event.target)) {
-      return
-    }
+    const nextContextMenu = getCanvasAppViewContextMenuState(event)
 
-    event.preventDefault()
-    setContextMenu(getCanvasContextMenuPosition({
-      point: { x: event.clientX, y: event.clientY },
-      viewportSize: getCanvasAppViewViewportSize(),
-    }))
+    if (nextContextMenu !== undefined) {
+      setContextMenu(nextContextMenu)
+    }
   }, [setContextMenu])
   const surfaces = getCanvasAppSurfaceVisibility({
     'canvas-status': showStatus && featurePackViews.status !== undefined,
@@ -354,42 +281,4 @@ export function CanvasAppView({
       {surfaces['text-editor'] ? <CanvasTextEditor {...textEditorProps} /> : null}
     </main>
   )
-}
-
-function getCanvasAppViewViewportSize() {
-  const height = globalThis.innerHeight
-  const width = globalThis.innerWidth
-
-  return typeof height === 'number' &&
-      typeof width === 'number' &&
-      Number.isFinite(height) &&
-      Number.isFinite(width)
-    ? {
-      height: Math.max(0, height),
-      width: Math.max(0, width),
-    }
-    : null
-}
-
-function isAppControlTarget(target: EventTarget) {
-  return target instanceof Element &&
-    target.closest(
-      [
-        'a',
-        'button',
-        'input',
-        'select',
-        'textarea',
-        '[role="toolbar"]',
-        '.canvas-status',
-        '.command-palette',
-        '.component-palette',
-        '.cursor-chat',
-        '.find-replace-panel',
-        '.canvas-minimap',
-        '.object-inspector',
-        '.shortcut-help',
-        '.text-editor',
-      ].join(','),
-    ) !== null
 }

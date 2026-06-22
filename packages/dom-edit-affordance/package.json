@@ -1,19 +1,54 @@
 {
   "name": "@interactive-os/dom-edit-affordance",
-  "private": true,
-  "version": "0.0.0",
+  "private": false,
+  "version": "0.1.0",
   "type": "module",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true,
+    "registry": "https://registry.npmjs.org/"
+  },
   "exports": {
-    ".": "./src/index.ts",
-    "./metadata": "./src/metadata.ts",
-    "./react": "./src/react.ts",
-    "./canvas": "./src/canvas.ts",
-    "./interaction": "./src/interaction.ts",
-    "./style.css": "./src/style.css"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./metadata": {
+      "types": "./dist/metadata.d.ts",
+      "import": "./dist/metadata.js",
+      "default": "./dist/metadata.js"
+    },
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "import": "./dist/react.js",
+      "default": "./dist/react.js"
+    },
+    "./canvas": {
+      "types": "./dist/canvas.d.ts",
+      "import": "./dist/canvas.js",
+      "default": "./dist/canvas.js"
+    },
+    "./interaction": {
+      "types": "./dist/interaction.d.ts",
+      "import": "./dist/interaction.js",
+      "default": "./dist/interaction.js"
+    },
+    "./style.css": {
+      "default": "./dist/style.css"
+    }
   },
   "sideEffects": [
     "**/*.css"
   ],
+  "scripts": {
+    "build": "rm -rf dist && tsc -p tsconfig.package.json && node ../../scripts/copy-package-assets.mjs src dist && node ../../scripts/resolve-package-imports.mjs dist",
+    "pack:dry-run": "npm pack --dry-run"
+  },
   "peerDependencies": {
     "@interactive-os/interaction": "^0.1.0",
     "react": "^19.0.0",

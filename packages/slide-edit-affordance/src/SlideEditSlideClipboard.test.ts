@@ -5,7 +5,7 @@ import {
   readCanvasRichClipboardFromDataTransfer,
   stringifyCanvasRichClipboardPayload,
   type CanvasRichClipboardDataTransfer,
-} from '../../../src/canvas/app/affordances/commands/CanvasRichClipboardIO'
+} from '@interactive-os/canvas/app'
 import { SLIDE_EDIT_RAIL_COMMANDS } from './SlideEditRailInteractions'
 import {
   createSlideEditSlideClipboardPasteCommandEffect,

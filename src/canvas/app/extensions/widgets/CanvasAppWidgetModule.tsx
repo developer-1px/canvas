@@ -1,114 +1,50 @@
-import type { ReactNode } from 'react'
 import type {
-  CanvasCustomItem,
   CanvasJsonObject,
 } from '../../../entities'
-import type { CanvasAppCustomCommand } from '../custom-commands'
-import type { CanvasAppInspectorPanel } from '../inspector-panels'
-import type {
-  CanvasTextPasteImporter,
-} from '../../feature-packs/text-paste-import'
 import {
   defineCanvasAppCustomItemModule,
-  type CanvasAppCustomItemModuleCreationTool,
 } from '../custom-item-modules/CanvasAppCustomItemModules'
-import type { CanvasAppCustomToolShortcut } from '../custom-tools/CanvasAppCustomCreationTools'
 import {
-  CanvasWidgetIsolationHost,
-  type CanvasWidgetIsolationMode,
-} from './CanvasWidgetIsolationHost'
+  createCanvasAppHtmlWidgetData,
+  isCanvasAppHtmlWidgetData,
+} from './CanvasAppHtmlWidgetData'
+import type {
+  CanvasAppHtmlWidgetData,
+} from './CanvasAppHtmlWidgetData'
+import {
+  createCanvasAppWidgetCreationTool,
+} from './CanvasAppWidgetCreationTool'
+import {
+  getCanvasAppWidgetRenderKey,
+  renderCanvasAppWidgetItem,
+} from './CanvasAppWidgetItemRenderer'
+import type {
+  CanvasAppHtmlWidgetModuleInput,
+  CanvasAppReactWidgetModuleInput,
+  CanvasAppWidgetInteraction,
+  CanvasAppWidgetItem,
+  CanvasAppWidgetModule,
+  CanvasAppWidgetModuleInput,
+} from './CanvasAppWidgetModuleTypes'
 
-export type CanvasAppWidgetIsolationMode = CanvasWidgetIsolationMode
-
-export type CanvasAppWidgetItem<
-  TData extends CanvasJsonObject = CanvasJsonObject,
-> = CanvasCustomItem & {
-  data: TData
-}
-
-export type CanvasAppWidgetRenderContext<
-  TData extends CanvasJsonObject = CanvasJsonObject,
-> = {
-  data: TData
-  item: CanvasAppWidgetItem<TData>
-}
-
-export type CanvasAppWidgetInteractionRenderContext<
-  TData extends CanvasJsonObject = CanvasJsonObject,
-> = CanvasAppWidgetRenderContext<TData> & {
-  onChangeData: (data: TData) => void
-}
-
-export type CanvasAppWidgetInteraction<
-  TData extends CanvasJsonObject = CanvasJsonObject,
-> = {
-  render: (context: CanvasAppWidgetInteractionRenderContext<TData>) => ReactNode
-}
-
-export type CanvasAppWidgetInteractions = Readonly<
-  Record<string, CanvasAppWidgetInteraction>
->
-
-export type CanvasAppWidgetModule<
-  TData extends CanvasJsonObject = CanvasJsonObject,
-> = ReturnType<typeof defineCanvasAppCustomItemModule> & {
-  widgetInteraction?: CanvasAppWidgetInteraction<TData>
-}
-
-type CanvasAppWidgetInteractionCarrier =
-  ReturnType<typeof defineCanvasAppCustomItemModule> & {
-    widgetInteraction?: CanvasAppWidgetInteraction
-  }
-
-export type CanvasAppHtmlWidgetData = CanvasJsonObject & {
-  css?: string
-  html: string
-}
-
-export type CanvasAppWidgetCreationOptions = {
-  ariaLabel?: string
-  label?: string
-  shortcut?: CanvasAppCustomToolShortcut
-  statusLabel?: string
-  title?: string
-}
-
-type CanvasAppWidgetModuleBaseInput<
-  TData extends CanvasJsonObject,
-> = {
-  customCommands?: readonly CanvasAppCustomCommand[]
-  defaultData?: TData | (() => TData)
-  defaultSize?: {
-    h: number
-    w: number
-  }
-  id: string
-  inspectorPanels?: readonly CanvasAppInspectorPanel[]
-  isolation?: CanvasAppWidgetIsolationMode
-  label?: string
-  presentation?: string
-  textPasteImporters?: readonly CanvasTextPasteImporter[]
-  title: string
-  tool?: false | CanvasAppWidgetCreationOptions
-  validateData?: (data: CanvasJsonObject) => data is TData
-}
-
-export type CanvasAppReactWidgetModuleInput<
-  TData extends CanvasJsonObject = CanvasJsonObject,
-> = CanvasAppWidgetModuleBaseInput<TData> & {
-  interaction?: {
-    render: (
-      context: CanvasAppWidgetInteractionRenderContext<TData>,
-    ) => ReactNode
-  }
-  render: (context: CanvasAppWidgetRenderContext<TData>) => ReactNode
-}
-
-export type CanvasAppHtmlWidgetModuleInput =
-  CanvasAppWidgetModuleBaseInput<CanvasAppHtmlWidgetData> & {
-    defaultCss?: string
-    defaultHtml: string
-  }
+export {
+  getCanvasAppWidgetInteractions,
+} from './CanvasAppWidgetInteractions'
+export type {
+  CanvasAppHtmlWidgetData,
+} from './CanvasAppHtmlWidgetData'
+export type {
+  CanvasAppHtmlWidgetModuleInput,
+  CanvasAppReactWidgetModuleInput,
+  CanvasAppWidgetCreationOptions,
+  CanvasAppWidgetInteraction,
+  CanvasAppWidgetInteractionRenderContext,
+  CanvasAppWidgetInteractions,
+  CanvasAppWidgetIsolationMode,
+  CanvasAppWidgetItem,
+  CanvasAppWidgetModule,
+  CanvasAppWidgetRenderContext,
+} from './CanvasAppWidgetModuleTypes'
 
 export function defineCanvasAppReactWidgetModule<
   TData extends CanvasJsonObject = CanvasJsonObject,
@@ -166,10 +102,7 @@ function defineCanvasAppWidgetModule<
   title,
   tool = {},
   validateData,
-}: CanvasAppWidgetModuleBaseInput<TData> & {
-  interaction?: CanvasAppReactWidgetModuleInput<TData>['interaction']
-  renderWidget: (context: CanvasAppWidgetRenderContext<TData>) => ReactNode
-}): CanvasAppWidgetModule<TData> {
+}: CanvasAppWidgetModuleInput<TData>): CanvasAppWidgetModule<TData> {
   const getDefaultData = () => {
     if (typeof defaultData === 'function') {
       return defaultData()
@@ -196,53 +129,16 @@ function defineCanvasAppWidgetModule<
     getRenderKey: getCanvasAppWidgetRenderKey,
     inspectorPanels,
     presentation,
-    renderItem: ({ item }) => {
-      const widgetItem = item as CanvasAppWidgetItem<TData>
-      const data = isWidgetData(widgetItem.data)
-        ? widgetItem.data
-        : getDefaultData()
-
-      return (
-        <>
-          <foreignObject
-            x={item.x}
-            y={item.y}
-            width={item.w}
-            height={item.h}
-          >
-            <div
-              className="canvas-widget"
-              data-canvas-widget-kind={id}
-              style={{
-                height: '100%',
-                pointerEvents: 'none',
-                width: '100%',
-              }}
-            >
-              <CanvasWidgetIsolationHost
-                fallbackLabel={`${title} unavailable`}
-                mode={isolation}
-              >
-                {renderWidget({
-                  data,
-                  item: widgetItem,
-                })}
-              </CanvasWidgetIsolationHost>
-            </div>
-          </foreignObject>
-          <rect
-            className="canvas-widget-hit"
-            data-canvas-widget-hit={id}
-            fill="transparent"
-            height={item.h}
-            pointerEvents="all"
-            width={item.w}
-            x={item.x}
-            y={item.y}
-          />
-        </>
-      )
-    },
+    renderItem: ({ item }) =>
+      renderCanvasAppWidgetItem({
+        getDefaultData,
+        id,
+        isWidgetData,
+        isolation,
+        item,
+        renderWidget,
+        title,
+      }),
     textPasteImporters,
     validateItem: (item) =>
       item.kind === id &&
@@ -270,104 +166,4 @@ function defineCanvasAppWidgetModule<
     ...module,
     widgetInteraction,
   })
-}
-
-function getCanvasAppWidgetRenderKey({ item }: { item: CanvasCustomItem }) {
-  return [
-    item.id,
-    item.x,
-    item.y,
-    item.w,
-    item.h,
-    item.hidden === true ? 1 : 0,
-    item.locked === true ? 1 : 0,
-    item.title,
-    JSON.stringify(item.data),
-  ].join('|')
-}
-
-export function getCanvasAppWidgetInteractions(
-  modules: readonly ReturnType<typeof defineCanvasAppCustomItemModule>[] = [],
-): CanvasAppWidgetInteractions {
-  const interactions: Record<string, CanvasAppWidgetInteraction> = {}
-
-  for (const module of modules) {
-    const widgetInteraction =
-      (module as CanvasAppWidgetInteractionCarrier).widgetInteraction
-
-    if (widgetInteraction) {
-      interactions[module.id] = widgetInteraction
-    }
-  }
-
-  return Object.freeze(interactions)
-}
-
-function createCanvasAppWidgetCreationTool<
-  TData extends CanvasJsonObject,
->({
-  defaultSize,
-  getDefaultData,
-  id,
-  label,
-  title,
-  tool,
-}: {
-  defaultSize: {
-    h: number
-    w: number
-  }
-  getDefaultData: () => TData
-  id: string
-  label: string
-  title: string
-  tool: CanvasAppWidgetCreationOptions
-}): CanvasAppCustomItemModuleCreationTool {
-  return {
-    ariaLabel: tool.ariaLabel ?? `${title} tool`,
-    id,
-    label,
-    shortcut: tool.shortcut,
-    statusLabel: tool.statusLabel ?? title,
-    title: tool.title ?? title,
-    createItem: ({ currentWorld, moved, startWorld }) => {
-      const bounds = moved
-        ? {
-            h: Math.max(defaultSize.h, Math.abs(currentWorld.y - startWorld.y)),
-            w: Math.max(defaultSize.w, Math.abs(currentWorld.x - startWorld.x)),
-            x: Math.min(startWorld.x, currentWorld.x),
-            y: Math.min(startWorld.y, currentWorld.y),
-          }
-        : {
-            ...defaultSize,
-            x: startWorld.x,
-            y: startWorld.y,
-          }
-
-      return {
-        ...bounds,
-        data: getDefaultData(),
-        title,
-      }
-    },
-  }
-}
-
-function createCanvasAppHtmlWidgetData({
-  css,
-  html,
-}: {
-  css?: string
-  html: string
-}): CanvasAppHtmlWidgetData {
-  return css ? { css, html } : { html }
-}
-
-function isCanvasAppHtmlWidgetData(
-  data: CanvasJsonObject,
-): data is CanvasAppHtmlWidgetData {
-  return (
-    typeof data.html === 'string' &&
-    (data.css === undefined || typeof data.css === 'string')
-  )
 }

@@ -19,8 +19,11 @@ describe('Canvas App IO boundaries', () => {
     const imageInsertionFile = getSourceFile(
       'src/canvas/app/feature-packs/image-io/CanvasImageInsertion.ts',
     )
-    const imageImportFile = getSourceFile(
-      'src/canvas/app/feature-packs/image-io/CanvasImageImport.ts',
+    const imageImportFilesFile = getSourceFile(
+      'src/canvas/app/feature-packs/image-io/CanvasImageImportFiles.ts',
+    )
+    const imagePasteReplaceFile = getSourceFile(
+      'src/canvas/app/feature-packs/image-io/CanvasImagePasteReplace.ts',
     )
     const imageIndexFile = getSourceFile(
       'src/canvas/app/feature-packs/image-io/index.ts',
@@ -36,6 +39,9 @@ describe('Canvas App IO boundaries', () => {
     )
     const stageElementFile = getSourceFile(
       'src/canvas/app/rendering/stage/CanvasAppStageElement.ts',
+    )
+    const stageSnapshotFile = getSourceFile(
+      'src/canvas/app/rendering/stage/CanvasSelectionSvgSnapshot.ts',
     )
     const browserImageHow =
       /\b(FileReader|ClipboardItem|XMLSerializer|toBlob|readAsDataURL|createObjectURL|navigator\.clipboard)\b/
@@ -56,9 +62,9 @@ describe('Canvas App IO boundaries', () => {
     expect(imageInsertionFile.source).toContain(
       'export function getCanvasImageInsertCenter',
     )
-    expect(imageImportFile.source).toContain('FileReader')
-    expect(imageImportFile.source).toContain('readAsDataURL')
-    expect(imageImportFile.source).toContain(
+    expect(imageImportFilesFile.source).toContain('FileReader')
+    expect(imageImportFilesFile.source).toContain('readAsDataURL')
+    expect(imagePasteReplaceFile.source).toContain(
       'export function routeCanvasImagePasteReplace',
     )
     expect(imageIndexFile.source).toContain('routeCanvasImagePasteReplace')
@@ -68,7 +74,7 @@ describe('Canvas App IO boundaries', () => {
     expect(imageExportFile.source).toContain('toBlob')
     expect(imageExportFile.source).toContain('createObjectURL')
     expect(stageElementFile.source).toContain('getSelectionSvgSnapshot')
-    expect(stageElementFile.source).toContain('XMLSerializer')
+    expect(stageSnapshotFile.source).toContain('XMLSerializer')
     expect(stageElementFile.source).not.toContain('toBlob')
     expect(stageElementFile.source).not.toContain('ClipboardItem')
   })
@@ -84,8 +90,11 @@ describe('Canvas App IO boundaries', () => {
     const tableImportHookFile = getSourceFile(
       'src/canvas/app/feature-packs/table-import/useCanvasTableImport.ts',
     )
-    const tableImportFile = getSourceFile(
-      'src/canvas/app/feature-packs/table-import/CanvasTableImport.ts',
+    const tableImportFilesFile = getSourceFile(
+      'src/canvas/app/feature-packs/table-import/CanvasTableImportFiles.ts',
+    )
+    const tableImportInsertionFile = getSourceFile(
+      'src/canvas/app/feature-packs/table-import/CanvasTableImportInsertion.ts',
     )
     const tableImportIndexFile = getSourceFile(
       'src/canvas/app/feature-packs/table-import/index.ts',
@@ -106,10 +115,12 @@ describe('Canvas App IO boundaries', () => {
     expect(tableImportHookFile.source).toContain('window.addEventListener')
     expect(tableImportHookFile.source).toContain('ClipboardEvent')
     expect(tableImportHookFile.source).toContain('DragEvent')
-    expect(tableImportFile.source).toContain('FileReader')
-    expect(tableImportFile.source).toContain('readAsText')
-    expect(tableImportFile.source).toContain('createCanvasTableComponentItem')
-    expect(tableImportFile.source).toContain(
+    expect(tableImportFilesFile.source).toContain('FileReader')
+    expect(tableImportFilesFile.source).toContain('readAsText')
+    expect(tableImportInsertionFile.source).toContain(
+      'createCanvasTableComponentItem',
+    )
+    expect(tableImportInsertionFile.source).toContain(
       'export function routeCanvasTableImportTargetReplace',
     )
     expect(tableImportIndexFile.source).toContain(
@@ -132,8 +143,11 @@ describe('Canvas App IO boundaries', () => {
     const linkPreviewImportHookFile = getSourceFile(
       'src/canvas/app/feature-packs/media-import/useCanvasLinkPreviewImport.ts',
     )
-    const mediaImportFile = getSourceFile(
-      'src/canvas/app/feature-packs/media-import/CanvasMediaImport.ts',
+    const mediaInsertionFile = getSourceFile(
+      'src/canvas/app/feature-packs/media-import/CanvasMediaInsertion.ts',
+    )
+    const mediaHyperlinkRouteFile = getSourceFile(
+      'src/canvas/app/feature-packs/media-import/CanvasMediaObjectHyperlinkRoute.ts',
     )
     const linkPreviewInspectorPanelFile = getSourceFile(
       'src/canvas/app/feature-packs/media-import/CanvasLinkPreviewInspectorPanel.tsx',
@@ -172,16 +186,16 @@ describe('Canvas App IO boundaries', () => {
     expect(linkPreviewImportHookFile.source).toContain(
       'isCanvasKeyboardTypingTarget',
     )
-    expect(mediaImportFile.source).toContain(
+    expect(mediaInsertionFile.source).toContain(
       'export function insertCanvasMediaSource',
     )
-    expect(mediaImportFile.source).toContain(
+    expect(mediaHyperlinkRouteFile.source).toContain(
       'export function routeCanvasMediaSourceObjectHyperlink',
     )
-    expect(mediaImportFile.source).toContain(
+    expect(mediaInsertionFile.source).toContain(
       'export function getCanvasMediaInsertPosition',
     )
-    expect(mediaImportFile.source).toContain(
+    expect(mediaInsertionFile.source).toContain(
       'createCanvasLinkPreviewComponentItem',
     )
     expect(linkPreviewInspectorPanelFile.source).toContain(
@@ -238,8 +252,14 @@ describe('Canvas App IO boundaries', () => {
     const textPasteHookFile = getSourceFile(
       'src/canvas/app/feature-packs/text-paste-import/useCanvasTextPasteImport.ts',
     )
-    const textPasteImportFile = getSourceFile(
-      'src/canvas/app/feature-packs/text-paste-import/CanvasTextPasteImport.ts',
+    const textPasteInsertionFile = getSourceFile(
+      'src/canvas/app/feature-packs/text-paste-import/CanvasTextPasteInsertion.ts',
+    )
+    const textPasteReplaceFile = getSourceFile(
+      'src/canvas/app/feature-packs/text-paste-import/CanvasTextPasteReplace.ts',
+    )
+    const textPasteSourcesFile = getSourceFile(
+      'src/canvas/app/feature-packs/text-paste-import/CanvasTextPasteSources.ts',
     )
     const textPasteIndexFile = getSourceFile(
       'src/canvas/app/feature-packs/text-paste-import/index.ts',
@@ -260,11 +280,11 @@ describe('Canvas App IO boundaries', () => {
     expect(textPasteHookFile.source).toContain('window.addEventListener')
     expect(textPasteHookFile.source).toContain('ClipboardEvent')
     expect(textPasteHookFile.source).toContain('isCanvasKeyboardTypingTarget')
-    expect(textPasteImportFile.source).toContain('DataTransfer')
-    expect(textPasteImportFile.source).toContain(
+    expect(textPasteSourcesFile.source).toContain('DataTransfer')
+    expect(textPasteInsertionFile.source).toContain(
       'export function insertCanvasTextPasteSource',
     )
-    expect(textPasteImportFile.source).toContain(
+    expect(textPasteReplaceFile.source).toContain(
       'export function routeCanvasTextPasteReplace',
     )
     expect(textPasteIndexFile.source).toContain('routeCanvasTextPasteReplace')
