@@ -59,6 +59,7 @@ export const CANVAS_APP_COMPONENT_AUTHORING_FEATURE_PACK_MANIFEST =
     label: 'Component authoring',
     lifecycle: {
       hotReloadable: true,
+      orphanedDataPolicy: 'preserve',
       partialUpdate: ['view-renderer'],
       runtimeToggleable: true,
     },

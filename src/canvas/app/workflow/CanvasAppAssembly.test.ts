@@ -489,6 +489,33 @@ describe('CanvasAppAssembly seams', () => {
       .toBeUndefined()
     expect(basicEditorAssembly.featurePackViewRenderers.minimap).toBeUndefined()
 
+    const componentEditorAssembly = createCanvasAppAssembly({
+      featurePackProfileId: 'component-editor',
+    })
+
+    expect(componentEditorAssembly.installedFeaturePackIds).toEqual([
+      'shape-authoring',
+      'component-library',
+      'component-source-outline',
+      'command-palette',
+      'component-authoring',
+      'drawing-tools',
+      'stamp-authoring',
+      'toolbar',
+      'zoom-controls',
+      'component-sync',
+      'component-inspector',
+    ])
+    expect(componentEditorAssembly.enabledFeaturePackIds)
+      .toEqual(componentEditorAssembly.installedFeaturePackIds)
+    expect(componentEditorAssembly.featurePackViewRenderers.componentPalette)
+      .toBe(DEFAULT_CANVAS_APP_FEATURE_PACK_VIEW_RENDERERS.componentPalette)
+    expect(componentEditorAssembly.itemsChangeTransformers.map(
+      (transformer) => transformer.id,
+    )).toEqual(['component-sync-items-change'])
+    expect(componentEditorAssembly.inspectorPanels.map((panel) => panel.id))
+      .toEqual(['component-binding'])
+
     const renderStatus = () => null
     const statusManifest = createCanvasAppFeaturePackManifest({
       extensionFeaturePack: createCanvasAppFeaturePack({

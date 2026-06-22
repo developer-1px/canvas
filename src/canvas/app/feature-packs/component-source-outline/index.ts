@@ -15,6 +15,7 @@ export const CANVAS_APP_COMPONENT_SOURCE_OUTLINE_FEATURE_PACK_MANIFEST =
     label: 'Component source outline',
     lifecycle: {
       hotReloadable: true,
+      orphanedDataPolicy: 'preserve',
       partialUpdate: ['overlay'],
       runtimeToggleable: true,
     },

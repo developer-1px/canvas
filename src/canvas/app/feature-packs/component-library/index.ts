@@ -24,6 +24,8 @@ export const CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST =
     label: 'Component library',
     lifecycle: {
       hotReloadable: true,
+      orphanedDataPolicy: 'preserve',
+      orphanedDataScopeIds: ['component-library'],
       partialUpdate: ['runtime-model'],
       runtimeToggleable: true,
     },

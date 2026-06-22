@@ -9,6 +9,12 @@ export {
   type CanvasAppBasicEditorStarterInput,
 } from '../workflow/CanvasAppBasicEditorStarter'
 export {
+  CANVAS_APP_COMPONENT_EDITOR_STARTER_PROFILE_ID,
+  createCanvasAppComponentEditorAssembly,
+  createCanvasAppComponentEditorAssemblyInput,
+  type CanvasAppComponentEditorStarterInput,
+} from '../workflow/CanvasAppComponentEditorStarter'
+export {
   CANVAS_APP_MINIMAL_VIEWER_STARTER_PROFILE_ID,
   createCanvasAppMinimalViewerAssembly,
   createCanvasAppMinimalViewerAssemblyInput,
@@ -529,6 +535,7 @@ export {
   getCanvasComponentInspectorPanelModel,
   syncCanvasComponentItemsChange,
   CANVAS_APP_BASIC_EDITOR_FEATURE_PACK_PROFILE,
+  CANVAS_APP_COMPONENT_EDITOR_FEATURE_PACK_PROFILE,
   CANVAS_APP_CORE_ONLY_FEATURE_PACK_PROFILE,
   CANVAS_APP_MINIMAL_VIEWER_FEATURE_PACK_PROFILE,
   CANVAS_APP_SHAPE_AUTHORING_FEATURE_PACK_ID,

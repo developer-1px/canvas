@@ -50,16 +50,19 @@ consumer-facing boundary map.
 ```ts
 import {
   createCanvasAppBasicEditorAssembly,
+  createCanvasAppComponentEditorAssembly,
   createCanvasAppMinimalViewerAssembly,
 } from '@interactive-os/canvas/app/authoring'
 
 const assembly = createCanvasAppMinimalViewerAssembly()
 const editorAssembly = createCanvasAppBasicEditorAssembly()
+const componentEditorAssembly = createCanvasAppComponentEditorAssembly()
 ```
 
 `minimal-viewer` applies the read-only app capability set and installs only the
 viewer control pack required for zoom controls. `basic-editor` applies the
 editor capability set and installs `authoring-basics` plus zoom controls.
+`component-editor` adds the component system suite.
 
 ## Run
 

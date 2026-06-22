@@ -13,6 +13,12 @@ export {
   type CanvasAppBasicEditorStarterInput,
 } from './CanvasAppBasicEditorStarter'
 export {
+  CANVAS_APP_COMPONENT_EDITOR_STARTER_PROFILE_ID,
+  createCanvasAppComponentEditorAssembly,
+  createCanvasAppComponentEditorAssemblyInput,
+  type CanvasAppComponentEditorStarterInput,
+} from './CanvasAppComponentEditorStarter'
+export {
   CANVAS_APP_MINIMAL_VIEWER_STARTER_PROFILE_ID,
   createCanvasAppMinimalViewerAssembly,
   createCanvasAppMinimalViewerAssemblyInput,

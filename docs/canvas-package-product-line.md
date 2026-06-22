@@ -338,6 +338,40 @@ authoring-basics-suite
 Canvas runtime core. They can be installed or disabled independently, but the
 basic editor starter installs them through `authoring-basics-suite`.
 
+## Component System Suite
+
+Issue: https://github.com/developer-1px/canvas/issues/588
+
+`component-system-suite` is the complete component editing install unit. It is
+not core. Component schema/model responsibility belongs to
+`component-library-pack` and the current host adapter bridge until it is
+promoted into a standalone component package.
+
+```text
+component-system-suite
+|-- component-library-pack
+|  |-- provides: component-runtime
+|  |-- owns component templates / definition registry / runtime model
+|  `-- orphanedDataPolicy: preserve
+|-- component-source-outline-pack
+|  |-- requires: component-runtime
+|  `-- contributes: overlay
+|-- component-sync-pack
+|  |-- requires: component-runtime
+|  `-- contributes: document-change
+|-- component-inspector-pack
+|  |-- requires: component-runtime
+|  `-- contributes: inspector
+`-- component-authoring-pack
+   |-- requires: component-runtime
+   `-- contributes: view-renderer
+```
+
+`component-editor` is `basic-editor` plus `component-system-suite`. Removing a
+component pack preserves component-owned data by default; the host remains
+responsible for deciding whether preserved orphaned component data should be
+shown, migrated, or cleaned.
+
 ## Starter Profiles
 
 ```text
@@ -362,6 +396,7 @@ Current starter helpers:
 |---|---|---|
 | `minimal-viewer` | `createCanvasAppMinimalViewerAssembly` | read-only capabilities + `zoom-controls` |
 | `basic-editor` | `createCanvasAppBasicEditorAssembly` | editor capabilities + `authoring-basics-suite` + `zoom-controls` |
+| `component-editor` | `createCanvasAppComponentEditorAssembly` | editor capabilities + `authoring-basics-suite` + `component-system-suite` + `zoom-controls` |
 
 ## Current Package Entry Interpretation
 

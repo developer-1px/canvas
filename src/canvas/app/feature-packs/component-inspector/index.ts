@@ -40,6 +40,7 @@ export const CANVAS_APP_COMPONENT_INSPECTOR_FEATURE_PACK_MANIFEST =
     label: 'Component inspector',
     lifecycle: {
       hotReloadable: true,
+      orphanedDataPolicy: 'preserve',
       partialUpdate: ['inspector'],
       runtimeToggleable: true,
     },

@@ -39,6 +39,7 @@ export const CANVAS_APP_COMPONENT_SYNC_FEATURE_PACK_MANIFEST =
     label: 'Component sync',
     lifecycle: {
       hotReloadable: true,
+      orphanedDataPolicy: 'preserve',
       partialUpdate: ['document-change'],
       runtimeToggleable: true,
     },
