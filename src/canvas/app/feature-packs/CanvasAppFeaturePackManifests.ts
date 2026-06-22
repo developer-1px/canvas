@@ -29,6 +29,7 @@ export type CanvasAppFeaturePackManifest<TRuntimeFeaturePacks = unknown> =
     label: string
     lifecycle: CanvasAppFeaturePackManifestLifecycle
     optionalRequires: readonly CanvasAppFeaturePackId[]
+    package: CanvasAppFeaturePackManifestPackage
     provides: readonly CanvasAppFeaturePackId[]
     requires: readonly CanvasAppFeaturePackId[]
     runtimeFeaturePacks?: TRuntimeFeaturePacks
@@ -47,6 +48,7 @@ export type CanvasAppFeaturePackManifestInput<TRuntimeFeaturePacks = unknown> =
     label: string
     lifecycle?: CanvasAppFeaturePackManifestLifecycleInput
     optionalRequires?: readonly CanvasAppFeaturePackId[]
+    package?: CanvasAppFeaturePackManifestPackageInput
     provides?: readonly CanvasAppFeaturePackId[]
     requires?: readonly CanvasAppFeaturePackId[]
     runtimeFeaturePacks?: TRuntimeFeaturePacks
@@ -132,10 +134,21 @@ export type CanvasAppFeaturePackManifestCompatibilityInput = Readonly<{
   featureStateVersion?: string
 }>
 
+export type CanvasAppFeaturePackManifestPackage = Readonly<{
+  name: string
+  subpath?: string
+}>
+
+export type CanvasAppFeaturePackManifestPackageInput = Readonly<{
+  name?: string
+  subpath?: string
+}>
+
 const CANVAS_APP_FEATURE_PACK_DEFAULT_CATEGORY =
   'view' satisfies CanvasAppFeaturePackManifestCategory
 const CANVAS_APP_FEATURE_PACK_DEFAULT_VERSION = '0.1.0'
 const CANVAS_APP_FEATURE_PACK_DEFAULT_ENGINE_VERSION = '0.1.x'
+const CANVAS_APP_FEATURE_PACK_DEFAULT_PACKAGE_NAME = '@interactive-os/canvas'
 const CANVAS_APP_FEATURE_PACK_CONTRIBUTION_SURFACES =
   Object.freeze([
     'asset',
@@ -196,6 +209,10 @@ export function createCanvasAppFeaturePackManifest<TRuntimeFeaturePacks>(
     optionalRequires: snapshotCanvasAppFeaturePackManifestIds(
       input.optionalRequires ?? [],
       'feature pack manifest optional requires',
+    ),
+    package: createCanvasAppFeaturePackManifestPackage(
+      input.package,
+      `feature pack manifest ${input.id}`,
     ),
     provides: snapshotCanvasAppFeaturePackManifestIds(
       input.provides ?? [],
@@ -365,6 +382,10 @@ export function assertCanvasAppFeaturePackManifest(
     compatibility: manifest.compatibility,
     owner: `feature pack manifest ${manifestId}`,
   })
+  assertCanvasAppFeaturePackManifestPackage({
+    owner: `feature pack manifest ${manifestId}`,
+    packageInfo: manifest.package,
+  })
   assertCanvasAppFeaturePackManifestIdList({
     ids: manifest.requires,
     owner: `feature pack manifest ${manifestId} requires`,
@@ -449,6 +470,13 @@ function assertCanvasAppFeaturePackManifestInput<TRuntimeFeaturePacks>(
       input.compatibility,
     ),
     owner: `feature pack manifest ${input.id}`,
+  })
+  assertCanvasAppFeaturePackManifestPackage({
+    owner: `feature pack manifest ${input.id}`,
+    packageInfo: createCanvasAppFeaturePackManifestPackage(
+      input.package,
+      `feature pack manifest ${input.id}`,
+    ),
   })
   assertCanvasAppFeaturePackManifestIdList({
     ids: input.requires ?? [],
@@ -602,6 +630,23 @@ function createCanvasAppFeaturePackManifestCompatibility(
   return Object.freeze(compatibility)
 }
 
+function createCanvasAppFeaturePackManifestPackage(
+  input?: CanvasAppFeaturePackManifestPackageInput,
+  owner = 'feature pack manifest package',
+): CanvasAppFeaturePackManifestPackage {
+  const packageInfo = {
+    name: input?.name ?? CANVAS_APP_FEATURE_PACK_DEFAULT_PACKAGE_NAME,
+    subpath: input?.subpath,
+  }
+
+  assertCanvasAppFeaturePackManifestPackage({
+    owner,
+    packageInfo,
+  })
+
+  return Object.freeze(packageInfo)
+}
+
 function snapshotCanvasAppFeaturePackManifestIds(
   ids: readonly CanvasAppFeaturePackId[],
   owner: string,
@@ -737,6 +782,45 @@ function assertCanvasAppFeaturePackManifestCompatibility({
     ) {
       throw new Error(`Expected ${owner} compatibility ${field} string`)
     }
+  }
+}
+
+function assertCanvasAppFeaturePackManifestPackage({
+  owner,
+  packageInfo,
+}: {
+  owner: string
+  packageInfo: unknown
+}) {
+  assertCanvasAppDescriptorObject(packageInfo, `${owner} package`)
+  const typedPackageInfo = packageInfo as {
+    name?: unknown
+    subpath?: unknown
+  }
+
+  assertCanvasAppDescriptorStringField({
+    field: 'name',
+    owner: `${owner} package`,
+    value: typedPackageInfo.name,
+  })
+
+  if (typedPackageInfo.subpath === undefined) {
+    return
+  }
+
+  assertCanvasAppDescriptorStringField({
+    field: 'subpath',
+    owner: `${owner} package`,
+    value: typedPackageInfo.subpath,
+  })
+
+  if (
+    typeof typedPackageInfo.subpath === 'string' &&
+    !typedPackageInfo.subpath.startsWith('.')
+  ) {
+    throw new Error(
+      `Invalid ${owner} package subpath: ${String(typedPackageInfo.subpath)}`,
+    )
   }
 }
 

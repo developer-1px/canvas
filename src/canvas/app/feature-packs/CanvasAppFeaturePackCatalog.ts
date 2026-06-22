@@ -7,6 +7,7 @@ import {
   type CanvasAppFeaturePackManifestContributions,
   type CanvasAppFeaturePackManifestInstallOptions,
   type CanvasAppFeaturePackManifestLifecycle,
+  type CanvasAppFeaturePackManifestPackage,
 } from './CanvasAppFeaturePackManifests'
 import {
   type CanvasAppFeaturePackId,
@@ -31,6 +32,7 @@ export type CanvasAppFeaturePackCatalogItem = Readonly<{
   label: string
   lifecycle: CanvasAppFeaturePackManifestLifecycle
   optionalRequires: readonly CanvasAppFeaturePackId[]
+  package: CanvasAppFeaturePackManifestPackage
   partialUpdate: readonly CanvasAppFeaturePackContributionSurface[]
   provides: readonly CanvasAppFeaturePackId[]
   requires: readonly CanvasAppFeaturePackId[]
@@ -150,6 +152,7 @@ function createCanvasAppFeaturePackCatalogItem({
     label: manifest.label,
     lifecycle: manifest.lifecycle,
     optionalRequires: manifest.optionalRequires,
+    package: manifest.package,
     partialUpdate: manifest.lifecycle.partialUpdate,
     provides: manifest.provides,
     requires: manifest.requires,

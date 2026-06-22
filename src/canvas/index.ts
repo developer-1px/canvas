@@ -1094,6 +1094,8 @@ export {
   type CanvasAppFeaturePackManifestLifecycleInput,
   type CanvasAppFeaturePackManifestOrphanedDataScopeId,
   type CanvasAppFeaturePackManifestOrphanedDataPolicy,
+  type CanvasAppFeaturePackManifestPackage,
+  type CanvasAppFeaturePackManifestPackageInput,
   type CanvasAppFeaturePackProfile,
   type CanvasAppFeaturePackProfileId,
   type CanvasAppFeaturePackProfileInput,

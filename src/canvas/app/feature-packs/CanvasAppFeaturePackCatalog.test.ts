@@ -49,6 +49,7 @@ describe('CanvasAppFeaturePackCatalog', () => {
       enabled: item.enabled,
       id: item.id,
       installed: item.installed,
+      package: item.package,
       partialUpdate: item.partialUpdate,
       provides: item.provides,
       requires: item.requires,
@@ -58,6 +59,10 @@ describe('CanvasAppFeaturePackCatalog', () => {
       {
         blockedReasons: [],
         category: 'foundation',
+        package: {
+          name: '@interactive-os/canvas',
+          subpath: undefined,
+        },
         enabled: true,
         id: 'runtime-pack',
         installed: true,
@@ -70,6 +75,10 @@ describe('CanvasAppFeaturePackCatalog', () => {
       {
         blockedReasons: [],
         category: 'inspection',
+        package: {
+          name: '@interactive-os/canvas',
+          subpath: undefined,
+        },
         enabled: false,
         id: 'inspector-pack',
         installed: true,

@@ -128,6 +128,43 @@ Smallest Complete Feature Pack
 `-- Does removing it leave the host app running?
 ```
 
+## Feature Pack Manifest Contract
+
+Every feature pack manifest is also a package contract. It must say what the
+pack is, where it is distributed from, what it contributes, what it depends on,
+and how it behaves through lifecycle transitions.
+
+```text
+Feature Pack Manifest
+|-- id
+|-- label
+|-- version
+|-- package
+|  |-- name
+|  `-- subpath
+|-- category
+|-- compatibility
+|  |-- engineVersion
+|  |-- documentSchemaVersion
+|  `-- featureStateVersion
+|-- contributes
+|  `-- surfaces
+|-- requires / optionalRequires / conflicts / provides
+`-- lifecycle
+   |-- installable
+   |-- uninstallable
+   |-- runtimeToggleable
+   |-- hotReloadable
+   |-- partialUpdate
+   |-- orphanedDataPolicy
+   `-- orphanedDataScopeIds
+```
+
+`package.name` defaults to `@interactive-os/canvas` for current first-party
+packs. Future standalone packs can use names such as
+`@interactive-os/canvas-pack-story`. `package.subpath` is optional, but when
+present it must map to a package export subpath such as `./story-canvas`.
+
 Too small:
 
 ```text
