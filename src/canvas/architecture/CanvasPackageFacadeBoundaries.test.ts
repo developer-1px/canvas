@@ -34,6 +34,7 @@ describe('Canvas package facade boundaries', () => {
           'src/canvas/foundation',
           'src/canvas/engine',
           'src/canvas/entities',
+          'src/canvas/marketplace',
           'src/canvas/host',
           'src/canvas/renderer',
         ].includes(reference.target),

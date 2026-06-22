@@ -9,6 +9,7 @@ import { FigmaCloneApp } from '@interactive-os/figma-clone'
 import { PageStoryCanvas } from './devtools/PageStoryCanvas'
 import { CanvasDevToolsDemoApp } from './demo/CanvasDevToolsDemoApp'
 import { DEMO_CANVAS_APP_ASSEMBLY_INPUT } from './demo/CanvasDemoAssembly'
+import { CanvasMarketplaceDemo } from './demo/CanvasMarketplaceDemo'
 
 const rootRoute = createRootRoute({
   component: CanvasRouterOutlet,
@@ -30,6 +31,12 @@ const engineRoute = createRoute({
   component: CanvasEngineRoute,
   getParentRoute: () => rootRoute,
   path: '/engine',
+})
+
+const marketplaceRoute = createRoute({
+  component: MarketplaceRoute,
+  getParentRoute: () => rootRoute,
+  path: '/marketplace',
 })
 
 const storyCanvasRoute = createRoute({
@@ -54,6 +61,7 @@ const routeTree = rootRoute.addChildren([
   indexRoute,
   figmaRoute,
   engineRoute,
+  marketplaceRoute,
   storyCanvasRoute,
   storyCanvasFoundationRoute,
   storyCanvasEntitiesRoute,
@@ -99,6 +107,12 @@ function CanvasEngineRoute() {
       assemblyInput={DEMO_CANVAS_APP_ASSEMBLY_INPUT}
       featurePackSwitches
     />
+  )
+}
+
+function MarketplaceRoute() {
+  return (
+    <CanvasMarketplaceDemo />
   )
 }
 

@@ -1372,5 +1372,6 @@ export type {
 export * as CanvasCore from './core'
 export * as CanvasFoundation from './foundation'
 export * as CanvasEngine from './engine'
+export * as CanvasMarketplace from './marketplace'
 export * as CanvasHost from './host'
 export * as CanvasRenderer from './renderer'
