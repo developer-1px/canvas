@@ -83,7 +83,17 @@ export const CANVAS_APP_IMAGE_IO_VIEW_FEATURE_PACK =
 
 export const CANVAS_APP_IMAGE_IO_FEATURE_PACK_MANIFEST =
   createCanvasAppFeaturePackManifest({
+    category: 'import-export',
+    contributes: {
+      surfaces: ['exporter', 'importer', 'view-renderer'],
+    },
     id: 'image-io',
     label: 'Image IO',
+    lifecycle: {
+      orphanedDataPolicy: 'preserve',
+      orphanedDataScopeIds: ['image-io'],
+      partialUpdate: ['exporter', 'importer', 'view-renderer'],
+      runtimeToggleable: true,
+    },
     viewFeaturePack: CANVAS_APP_IMAGE_IO_VIEW_FEATURE_PACK,
   })

@@ -50,8 +50,18 @@ export {
 
 export const CANVAS_APP_TEXT_PASTE_IMPORT_FEATURE_PACK_MANIFEST =
   createCanvasAppFeaturePackManifest({
+    category: 'import-export',
+    contributes: {
+      surfaces: ['importer', 'item-schema'],
+    },
     id: 'text-paste-import',
     label: 'Text paste import',
+    lifecycle: {
+      orphanedDataPolicy: 'preserve',
+      orphanedDataScopeIds: ['text-paste-import'],
+      partialUpdate: ['importer', 'item-schema'],
+      runtimeToggleable: true,
+    },
     runtimeFeaturePacks: {
       textPasteImport: true,
     },

@@ -4,6 +4,7 @@ import {
   createCanvasAppExtensionBundle,
 } from '../extensions/CanvasAppExtensionBundle'
 import {
+  CANVAS_APP_MEDIA_IMPORT_FEATURE_PACK_MANIFEST,
   DEFAULT_CANVAS_APP_EXTENSION_FEATURE_PACK_MANIFESTS,
   DEFAULT_CANVAS_APP_FEATURE_PACK_EXTENSION_BUNDLE,
   DEFAULT_CANVAS_APP_FEATURE_PACKS,
@@ -11,6 +12,7 @@ import {
 import {
   CANVAS_APP_COMMAND_PALETTE_FEATURE_PACK_MANIFEST,
   CANVAS_APP_DRAWING_TOOLS_FEATURE_PACK_MANIFEST,
+  CANVAS_APP_IMAGE_IO_FEATURE_PACK_MANIFEST,
   DEFAULT_CANVAS_APP_FEATURE_PACK_VIEW_RENDERERS,
   DEFAULT_CANVAS_APP_VIEW_FEATURE_PACK_MANIFESTS,
   DEFAULT_CANVAS_APP_VIEW_FEATURE_PACKS,
@@ -25,6 +27,8 @@ import {
   CANVAS_AUTHORING_BASICS_SUITE_ID,
   CANVAS_COMPONENT_SYSTEM_FEATURE_PACK_SUITE_MANIFEST,
   CANVAS_COMPONENT_SYSTEM_SUITE_ID,
+  CANVAS_IMPORT_EXPORT_FEATURE_PACK_SUITE_MANIFEST,
+  CANVAS_IMPORT_EXPORT_SUITE_ID,
   CANVAS_STORY_CANVAS_FEATURE_PACK_SUITE_MANIFEST,
   CANVAS_STORY_CANVAS_SUITE_ID,
   DEFAULT_CANVAS_APP_FEATURE_PACK_SUITE_MANIFESTS,
@@ -98,6 +102,12 @@ import {
 import {
   CANVAS_STORY_PREVIEW_ITEMS_FEATURE_PACK_ID,
 } from './story-preview'
+import {
+  CANVAS_APP_TABLE_IMPORT_FEATURE_PACK_MANIFEST,
+} from './table-import'
+import {
+  CANVAS_APP_TEXT_PASTE_IMPORT_FEATURE_PACK_MANIFEST,
+} from './text-paste-import'
 import {
   CANVAS_APP_STORY_IMPORT_FEATURE_PACK_MANIFEST,
 } from './story-import'
@@ -650,6 +660,9 @@ describe('CanvasAppFeaturePacks', () => {
     )).toContain('text-paste-import')
     expect(getCanvasAppInstalledFeaturePackManifestIds(
       DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS,
+    )).toContain(CANVAS_APP_BOARD_IO_FEATURE_PACK_MANIFEST.id)
+    expect(getCanvasAppInstalledFeaturePackManifestIds(
+      DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS,
     )).toContain(CANVAS_APP_SHAPE_AUTHORING_FEATURE_PACK_MANIFEST.id)
     expect(getCanvasAppInstalledFeaturePackManifestIds(
       DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS,
@@ -999,6 +1012,7 @@ describe('CanvasAppFeaturePacks', () => {
     )).toEqual([
       CANVAS_AUTHORING_BASICS_SUITE_ID,
       CANVAS_COMPONENT_SYSTEM_SUITE_ID,
+      CANVAS_IMPORT_EXPORT_SUITE_ID,
       CANVAS_STORY_CANVAS_SUITE_ID,
     ])
     expect(CANVAS_AUTHORING_BASICS_FEATURE_PACK_SUITE_MANIFEST.featurePackIds)
@@ -1036,6 +1050,40 @@ describe('CanvasAppFeaturePacks', () => {
           orphanedDataPolicy: 'preserve',
         },
         requires: [CANVAS_COMPONENT_RUNTIME_FEATURE_PACK_CAPABILITY],
+      })
+    }
+    expect(CANVAS_IMPORT_EXPORT_FEATURE_PACK_SUITE_MANIFEST.featurePackIds)
+      .toEqual([
+        CANVAS_APP_IMAGE_IO_FEATURE_PACK_MANIFEST.id,
+        CANVAS_APP_MEDIA_IMPORT_FEATURE_PACK_MANIFEST.id,
+        CANVAS_APP_TABLE_IMPORT_FEATURE_PACK_MANIFEST.id,
+        CANVAS_APP_TEXT_PASTE_IMPORT_FEATURE_PACK_MANIFEST.id,
+        CANVAS_APP_BOARD_IO_FEATURE_PACK_MANIFEST.id,
+      ])
+    expect(CANVAS_APP_IMAGE_IO_FEATURE_PACK_MANIFEST).toMatchObject({
+      category: 'import-export',
+      contributes: {
+        surfaces: ['exporter', 'importer', 'view-renderer'],
+      },
+      lifecycle: {
+        orphanedDataPolicy: 'preserve',
+        orphanedDataScopeIds: ['image-io'],
+        runtimeToggleable: true,
+      },
+    })
+    for (const manifest of [
+      CANVAS_APP_MEDIA_IMPORT_FEATURE_PACK_MANIFEST,
+      CANVAS_APP_TABLE_IMPORT_FEATURE_PACK_MANIFEST,
+      CANVAS_APP_TEXT_PASTE_IMPORT_FEATURE_PACK_MANIFEST,
+      CANVAS_APP_BOARD_IO_FEATURE_PACK_MANIFEST,
+    ]) {
+      expect(manifest).toMatchObject({
+        category: 'import-export',
+        lifecycle: {
+          orphanedDataPolicy: 'preserve',
+          orphanedDataScopeIds: [manifest.id],
+          runtimeToggleable: true,
+        },
       })
     }
     expect(CANVAS_STORY_CANVAS_FEATURE_PACK_SUITE_MANIFEST.featurePackIds)
@@ -1180,11 +1228,13 @@ describe('CanvasAppFeaturePacks', () => {
       .toEqual([
         CANVAS_AUTHORING_BASICS_SUITE_ID,
         CANVAS_COMPONENT_SYSTEM_SUITE_ID,
+        CANVAS_IMPORT_EXPORT_SUITE_ID,
       ])
     expect(DEFAULT_CANVAS_APP_EDITOR_FEATURE_PACK_PROFILE.enabledSuiteIds)
       .toEqual([
         CANVAS_AUTHORING_BASICS_SUITE_ID,
         CANVAS_COMPONENT_SYSTEM_SUITE_ID,
+        CANVAS_IMPORT_EXPORT_SUITE_ID,
       ])
     expect(DEFAULT_CANVAS_APP_EDITOR_FEATURE_PACK_PROFILE.installedFeaturePackIds)
       .toContain('toolbar')

@@ -32,8 +32,18 @@ export {
 
 export const CANVAS_APP_BOARD_IO_FEATURE_PACK_MANIFEST =
   createCanvasAppFeaturePackManifest({
+    category: 'import-export',
+    contributes: {
+      surfaces: ['exporter', 'importer'],
+    },
     id: 'board-io',
     label: 'Board IO',
+    lifecycle: {
+      orphanedDataPolicy: 'preserve',
+      orphanedDataScopeIds: ['board-io'],
+      partialUpdate: ['exporter', 'importer'],
+      runtimeToggleable: true,
+    },
     runtimeFeaturePacks: {
       boardIo: true,
     },

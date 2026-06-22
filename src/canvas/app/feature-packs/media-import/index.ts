@@ -64,7 +64,17 @@ export const CANVAS_APP_MEDIA_IMPORT_FEATURE_PACK = createCanvasAppFeaturePack({
 
 export const CANVAS_APP_MEDIA_IMPORT_FEATURE_PACK_MANIFEST =
   createCanvasAppFeaturePackManifest({
+    category: 'import-export',
+    contributes: {
+      surfaces: ['importer', 'inspector'],
+    },
     extensionFeaturePack: CANVAS_APP_MEDIA_IMPORT_FEATURE_PACK,
     id: 'media-import',
     label: 'Media import',
+    lifecycle: {
+      orphanedDataPolicy: 'preserve',
+      orphanedDataScopeIds: ['media-import'],
+      partialUpdate: ['importer', 'inspector'],
+      runtimeToggleable: true,
+    },
   })

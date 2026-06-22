@@ -401,6 +401,37 @@ Story preview renderers are supplied by the host or demo route. The package
 contract owns the manifest, item kinds, import format, and starter assembly
 path; concrete visual rendering remains host/reference glue.
 
+## Import Export Suite
+
+Issue: https://github.com/developer-1px/canvas/issues/590
+
+`import-export-suite` groups IO packs by what users bring in or send out. It is
+not core. Each member pack owns one IO outcome, and the suite only installs them
+together for full editor profiles.
+
+```text
+import-export-suite
+|-- image-io-pack
+|  |-- contributes: importer / exporter / view-renderer
+|  `-- orphanedDataPolicy: preserve
+|-- media-import-pack
+|  |-- contributes: importer / inspector
+|  `-- orphanedDataPolicy: preserve
+|-- table-import-pack
+|  |-- contributes: importer / item-schema
+|  `-- orphanedDataPolicy: preserve
+|-- text-paste-import-pack
+|  |-- contributes: importer / item-schema
+|  `-- orphanedDataPolicy: preserve
+`-- board-io-pack
+   |-- contributes: importer / exporter
+   `-- orphanedDataPolicy: preserve
+```
+
+`minimal-viewer`, `basic-editor`, `component-editor`, and `story-viewer` do not
+install this suite. The broad default editor profile installs IO through
+`import-export-suite`.
+
 ## Starter Profiles
 
 ```text

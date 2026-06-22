@@ -51,8 +51,18 @@ export {
 
 export const CANVAS_APP_TABLE_IMPORT_FEATURE_PACK_MANIFEST =
   createCanvasAppFeaturePackManifest({
+    category: 'import-export',
+    contributes: {
+      surfaces: ['importer', 'item-schema'],
+    },
     id: 'table-import',
     label: 'Table import',
+    lifecycle: {
+      orphanedDataPolicy: 'preserve',
+      orphanedDataScopeIds: ['table-import'],
+      partialUpdate: ['importer', 'item-schema'],
+      runtimeToggleable: true,
+    },
     runtimeFeaturePacks: {
       tableImport: true,
     },
