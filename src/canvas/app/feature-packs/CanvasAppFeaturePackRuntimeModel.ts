@@ -11,6 +11,9 @@ import {
 import {
   CANVAS_APP_FACILITATION_RUNTIME_FEATURE_PACKS,
 } from './facilitation'
+import {
+  CANVAS_APP_SHAPE_AUTHORING_RUNTIME_FEATURE_PACK,
+} from './shape-authoring'
 import type { CanvasAppFeaturePackId } from './CanvasAppFeaturePacks'
 
 type CanvasAppRuntimeFeaturePackDescriptor = Readonly<{
@@ -50,6 +53,11 @@ export type CanvasAppTransientFeaturePackModelInput = {
 
 export type CanvasAppToolFeaturePackModelInput = {
   drawing: DrawingModelInput
+  enabledFeaturePackIds: readonly CanvasAppFeaturePackId[]
+}
+
+export type CanvasAppShapeAuthoringFeatureConfigInput = {
+  config: CanvasAffordanceConfig
   enabledFeaturePackIds: readonly CanvasAppFeaturePackId[]
 }
 
@@ -155,6 +163,21 @@ export function useCanvasAppToolFeaturePackModel({
       }),
     }),
   }
+}
+
+export function getCanvasAppShapeAuthoringFeatureConfig({
+  config,
+  enabledFeaturePackIds,
+}: CanvasAppShapeAuthoringFeatureConfigInput): CanvasAffordanceConfig {
+  return getCanvasAppRuntimeFeatureConfig({
+    config,
+    disabledConfig:
+      CANVAS_APP_SHAPE_AUTHORING_RUNTIME_FEATURE_PACK.disabledConfig,
+    enabled: isCanvasAppRuntimeFeaturePackEnabled({
+      enabledFeaturePackIds,
+      featurePack: CANVAS_APP_SHAPE_AUTHORING_RUNTIME_FEATURE_PACK,
+    }),
+  })
 }
 
 export function getCanvasAppRuntimeFeatureConfig({

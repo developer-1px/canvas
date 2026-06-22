@@ -16,6 +16,7 @@ import { useCanvasAppCustomFocusModel } from './useCanvasAppCustomFocusModel'
 import {
   CANVAS_APP_COMPONENT_SOURCE_OUTLINE_FEATURE_PACK_MANIFEST,
   getCanvasAppRuntimeFeatureConfig,
+  getCanvasAppShapeAuthoringFeatureConfig,
   useCanvasAppToolFeaturePackModel,
   useCanvasAppTransientFeaturePackModel,
 } from '../feature-packs'
@@ -113,9 +114,18 @@ export function useCanvasAppModel({
     },
     votingSession: affordance.facilitation,
   })
+  const interactionConfig = useMemo(
+    () =>
+      getCanvasAppShapeAuthoringFeatureConfig({
+        config: affordance.interaction.config,
+        enabledFeaturePackIds,
+      }),
+    [affordance.interaction.config, enabledFeaturePackIds],
+  )
   const interaction = useCanvasInteractionModel({
     ...affordance.interaction,
     componentPartSources,
+    config: interactionConfig,
     emoteBursts: featurePackTransients.emotes.overlay.bursts,
     presence: providedPresence,
     ...workspace.interaction,

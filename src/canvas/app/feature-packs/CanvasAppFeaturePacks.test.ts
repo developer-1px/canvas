@@ -93,6 +93,9 @@ import {
 import {
   CANVAS_APP_STORY_IMPORT_FEATURE_PACK_MANIFEST,
 } from './story-import'
+import {
+  CANVAS_APP_SHAPE_AUTHORING_FEATURE_PACK_MANIFEST,
+} from './shape-authoring'
 
 describe('CanvasAppFeaturePacks', () => {
   it('installs feature pack extension bundles in pack order', () => {
@@ -636,6 +639,9 @@ describe('CanvasAppFeaturePacks', () => {
     )).toContain('text-paste-import')
     expect(getCanvasAppInstalledFeaturePackManifestIds(
       DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS,
+    )).toContain(CANVAS_APP_SHAPE_AUTHORING_FEATURE_PACK_MANIFEST.id)
+    expect(getCanvasAppInstalledFeaturePackManifestIds(
+      DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS,
     )).toContain(CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST.id)
     expect(CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST.provides)
       .toContain(CANVAS_COMPONENT_RUNTIME_FEATURE_PACK_CAPABILITY)
@@ -1053,6 +1059,10 @@ describe('CanvasAppFeaturePacks', () => {
       .toContain('toolbar')
     expect(DEFAULT_CANVAS_APP_EDITOR_FEATURE_PACK_PROFILE.enabledFeaturePackIds)
       .toContain('toolbar')
+    expect(DEFAULT_CANVAS_APP_EDITOR_FEATURE_PACK_PROFILE.installedFeaturePackIds)
+      .toContain(CANVAS_APP_SHAPE_AUTHORING_FEATURE_PACK_MANIFEST.id)
+    expect(DEFAULT_CANVAS_APP_EDITOR_FEATURE_PACK_PROFILE.enabledFeaturePackIds)
+      .toContain(CANVAS_APP_SHAPE_AUTHORING_FEATURE_PACK_MANIFEST.id)
     expect(DEFAULT_CANVAS_APP_EDITOR_FEATURE_PACK_PROFILE.installedFeaturePackIds)
       .toContain(CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST.id)
     expect(DEFAULT_CANVAS_APP_EDITOR_FEATURE_PACK_PROFILE.enabledFeaturePackIds)

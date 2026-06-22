@@ -266,6 +266,45 @@ Inspector packs follow the domain that makes them meaningful. For example,
 component and checklist inspectors belong with the component system unless they
 become useful as independent diagnostics.
 
+## Shape Authoring Tracer Bullet
+
+Issue: https://github.com/developer-1px/canvas/issues/586
+
+`shape-authoring-pack` is the first concrete domain pack extracted from the
+current editor. It is intentionally a tracer bullet, not a full source-tree move
+yet.
+
+```text
+shape-authoring-pack
+|-- manifest id: shape-authoring
+|-- package contract
+|  |-- package.name: @interactive-os/canvas
+|  `-- category: authoring
+|-- contribution surfaces
+|  |-- command
+|  |-- inspector
+|  |-- item-renderer
+|  |-- item-schema
+|  |-- migration
+|  `-- tool
+|-- runtime disabled affordances
+|  |-- gestures.createShape
+|  |-- overlays.draftRect
+|  |-- shortcuts.ellipseTool
+|  |-- shortcuts.rectTool
+|  |-- tools.diamond
+|  |-- tools.ellipse
+|  `-- tools.rect
+`-- lifecycle
+   |-- runtimeToggleable
+   |-- partialUpdate: item-renderer / inspector / tool
+   `-- orphanedDataPolicy: preserve
+```
+
+The pack is part of the default editor profile, but not part of `core-only` or
+`minimal-viewer`. Disabling or uninstalling it must leave the host running while
+shape creation affordances are masked.
+
 ## Starter Profiles
 
 ```text

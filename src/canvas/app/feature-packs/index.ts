@@ -443,6 +443,11 @@ export {
   type CanvasShortcutHelpSectionRootAttributes,
 } from './shortcut-help'
 export {
+  CANVAS_APP_SHAPE_AUTHORING_FEATURE_PACK_ID,
+  CANVAS_APP_SHAPE_AUTHORING_FEATURE_PACK_MANIFEST,
+  CANVAS_APP_SHAPE_AUTHORING_RUNTIME_FEATURE_PACK,
+} from './shape-authoring'
+export {
   useCanvasStampControls,
   type CanvasStampControlsInput,
   type CanvasStampControlsModel,
@@ -597,8 +602,10 @@ export {
 } from './toolbar'
 export {
   getCanvasAppRuntimeFeatureConfig,
+  getCanvasAppShapeAuthoringFeatureConfig,
   useCanvasAppToolFeaturePackModel,
   useCanvasAppTransientFeaturePackModel,
+  type CanvasAppShapeAuthoringFeatureConfigInput,
   type CanvasAppToolFeaturePackModelInput,
   type CanvasAppTransientFeaturePackModelInput,
 } from './CanvasAppFeaturePackRuntimeModel'
