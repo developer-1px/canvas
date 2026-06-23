@@ -10,6 +10,18 @@ export {
   type CanvasMarketplaceFeaturePackCatalogRequiredBlockReasonKind,
 } from './CanvasMarketplaceCatalog'
 export {
+  CanvasMarketplacePanel,
+  type CanvasMarketplacePanelProps,
+} from './CanvasMarketplacePanel'
+export {
+  getCanvasMarketplacePanelActionKey,
+  getCanvasMarketplacePanelItemId,
+  getCanvasMarketplacePanelTargetId,
+  type CanvasMarketplacePanelActionInput,
+  type CanvasMarketplacePanelItemId,
+  type CanvasMarketplacePanelTransaction,
+} from './CanvasMarketplacePanelActions'
+export {
   applyCanvasMarketplaceFeaturePackRuntimeStatePatch,
   assertCanvasMarketplaceFeaturePack,
   assertCanvasMarketplaceFeaturePackIds,

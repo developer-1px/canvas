@@ -52,7 +52,7 @@ const CANVAS_MARKETPLACE_DEMO_SEED_ASSEMBLY_INPUT =
 
 export const CANVAS_MARKETPLACE_DEMO_INITIAL_ASSEMBLY_INPUT = Object.freeze({
   ...CANVAS_MARKETPLACE_DEMO_SEED_ASSEMBLY_INPUT,
-  featurePackProfileId: 'minimal-viewer',
+  featurePackProfileId: 'core-only',
 } satisfies CanvasAppAssemblyInput)
 
 export function createCanvasMarketplaceDemoSource(

@@ -32,16 +32,34 @@ describe('CanvasMarketplaceDemoModel', () => {
     expect(suiteIds).toContain('story-canvas')
   })
 
-  it('starts from the minimal viewer profile as a real assembly source', () => {
+  it('starts from core only as a real assembly source', () => {
     const model = createCanvasMarketplaceDemoModel()
 
     expect(model.runtimeStates).toContainEqual({
       id: 'zoom-controls',
-      status: 'enabled',
+      status: 'uninstalled',
     })
     expect(model.assemblyInput.featurePackProfileId).toBeUndefined()
     expect(createCanvasAppAssembly(model.assemblyInput).enabledFeaturePackIds)
-      .toContain('zoom-controls')
+      .not.toContain('zoom-controls')
+  })
+
+  it('applies a starter profile on top of the core baseline', async () => {
+    const result = await applyCanvasMarketplaceDemoOperation({
+      actionKind: 'apply',
+      itemId: 'profile:minimal-viewer',
+      source: createCanvasMarketplaceDemoSource(),
+    })
+    const assembly = createCanvasAppAssembly(
+      createCanvasMarketplaceDemoModel(result.source).assemblyInput,
+    )
+
+    expect(result).toMatchObject({
+      applied: true,
+      status: 'applied',
+    })
+    expect(result.action?.changedFeaturePackIds).toEqual(['zoom-controls'])
+    expect(assembly.enabledFeaturePackIds).toContain('zoom-controls')
   })
 
   it('installs and enables an existing feature pack through assembly transactions', async () => {
