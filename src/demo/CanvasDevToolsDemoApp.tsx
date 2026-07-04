@@ -35,24 +35,28 @@ import {
 } from 'react'
 import {
   CanvasApp,
+  type CanvasAppAssemblyInput,
+  type CanvasAppProps,
+  type CanvasItem,
+  type CanvasJsonObject,
+  type CanvasStampKind,
+  type Tool,
+} from '../canvas'
+import {
+  CANVAS_TOOLBAR_ITEM_PROPS,
   CanvasCommandPalette,
   CanvasContextCommandMenu,
   CanvasMinimap,
   CanvasObjectInspector,
   CanvasShortcutHelpOverlay,
-  type CanvasAppAssemblyInput,
-  type CanvasAppProps,
-  type CanvasAppWidgetInteractions,
   type CanvasContextCommandMenuState,
-  type CanvasItem,
-  type CanvasJsonObject,
-  type CanvasStampKind,
-  type Tool,
-  CANVAS_TOOLBAR_ITEM_PROPS,
-  getCanvasAppWidgetInteractions,
   getCanvasContextMenuKeyboardIntent,
   useCanvasToolbarRovingFocus,
-} from '../canvas'
+} from '../canvas/app'
+import {
+  getCanvasAppWidgetInteractions,
+  type CanvasAppWidgetInteractions,
+} from '../canvas/app/authoring'
 import { EngineSelectionToolbar } from './CanvasDevToolsSelectionToolbar'
 import {
   getCanvasPresentationFrames,

@@ -25,6 +25,7 @@ import {
   type DomEditStyle,
   type DomEditTextState,
 } from '@interactive-os/dom-edit-affordance'
+import type { FigmaCloneDomSectionRootId } from '../dom-editor/section'
 
 export type FigmaCloneDomNodeId =
   | 'workspacePage'
@@ -2571,6 +2572,10 @@ export function listFigmaCloneDomComponentSets():
 
     const pageRootId = getFigmaCloneDomRootId(firstRootNodeId)
 
+    if (!isFigmaCloneDomComponentPageRootId(pageRootId)) {
+      throw new Error(`Invalid component page root for ${definition.id}`)
+    }
+
     return {
       id: definition.id,
       instances,
@@ -2587,6 +2592,12 @@ export function listFigmaCloneDomComponentSets():
 export function listFigmaCloneStoryImports():
   readonly FigmaCloneStoryImportSummary[] {
   return FIGMA_CLONE_STORY_IMPORTS
+}
+
+function isFigmaCloneDomComponentPageRootId(
+  rootId: FigmaCloneDomNodeId,
+): rootId is FigmaCloneDomSectionRootId {
+  return rootId === 'workspacePage' || rootId === 'homePage'
 }
 
 function getFigmaCloneDomComponentParts(

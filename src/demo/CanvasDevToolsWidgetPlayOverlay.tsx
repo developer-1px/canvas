@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import type {
-  CanvasAppWidgetInteraction,
   CanvasCustomItem,
   CanvasJsonObject,
 } from '../canvas'
+import type {
+  CanvasAppWidgetInteraction,
+} from '../canvas/app/authoring'
 
 type OverlayRect = {
   height: number

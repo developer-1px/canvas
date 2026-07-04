@@ -8,7 +8,11 @@ import {
 describe('CanvasFileDownload', () => {
   it('downloads Blob payloads through a temporary object URL', () => {
     const anchor = createAnchor()
-    const createObjectURL = vi.fn(() => 'blob:download')
+    const createObjectURL = vi.fn((blob: Blob) => {
+      void blob
+
+      return 'blob:download'
+    })
     const revokeObjectURL = vi.fn()
     const setTimeout = vi.fn((callback: () => void) => {
       callback()
@@ -31,7 +35,11 @@ describe('CanvasFileDownload', () => {
 
   it('downloads text payloads by creating a typed Blob', () => {
     const anchor = createAnchor()
-    const createObjectURL = vi.fn(() => 'blob:text')
+    const createObjectURL = vi.fn((blob: Blob) => {
+      void blob
+
+      return 'blob:text'
+    })
     const revokeObjectURL = vi.fn()
 
     expect(downloadCanvasTextFile({
@@ -42,7 +50,7 @@ describe('CanvasFileDownload', () => {
       type: 'image/svg+xml;charset=utf-8',
       url: { createObjectURL, revokeObjectURL },
     })).toBe(true)
-    const blob = createObjectURL.mock.calls[0]?.[0] as Blob
+    const blob = createObjectURL.mock.calls[0]?.[0]
 
     expect(blob.type).toBe('image/svg+xml;charset=utf-8')
     expect(anchor.download).toBe('selection.svg')

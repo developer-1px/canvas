@@ -1,8 +1,10 @@
 import {
-  defineCanvasAppReactWidgetModule,
   type CanvasCustomItem,
   type CanvasJsonObject,
 } from '../../canvas'
+import {
+  defineCanvasAppReactWidgetModule,
+} from '../../canvas/app/authoring'
 
 export const TODO_WIDGET_KIND = 'todo-widget'
 export const TODO_WIDGET_PRESENTATION = 'todo-widget-card'

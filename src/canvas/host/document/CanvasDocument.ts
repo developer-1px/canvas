@@ -156,7 +156,10 @@ export function commitCanvasItemsPatch({
       ? {
           label: 'canvas items',
           origin: 'canvas',
-          selection: createCanvasSelectionSnapshot(next.items, selection.after),
+          selectionAfter: createCanvasSelectionSnapshot(
+            next.items,
+            selection.after,
+          ),
         }
       : {
           label: 'canvas items',

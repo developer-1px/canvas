@@ -24,15 +24,19 @@ import {
 } from 'react'
 import { useJSONDocument } from '@interactive-os/json-document/react'
 import {
-  CANVAS_TOOLBAR_ITEM_PROPS,
-  CANVAS_APP_READ_ONLY_CAPABILITIES,
   CanvasApp,
   type CanvasAppAssemblyInput,
   type Viewport,
+} from '../../../src/canvas'
+import {
+  CANVAS_TOOLBAR_ITEM_PROPS,
+  useCanvasToolbarRovingFocus,
+} from '../../../src/canvas/app'
+import {
+  CANVAS_APP_READ_ONLY_CAPABILITIES,
   type CanvasWorkspaceStorage,
   type CanvasWorkspaceStorageProvider,
-  useCanvasToolbarRovingFocus,
-} from '../../../src/canvas'
+} from '../../../src/canvas/app/authoring'
 import {
   DEFAULT_DOM_EDIT_OVERLAY_LAYER_VISIBILITY,
   DomEditInspector,

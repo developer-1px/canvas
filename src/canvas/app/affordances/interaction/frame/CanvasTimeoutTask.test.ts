@@ -22,7 +22,9 @@ describe('CanvasTimeoutTask', () => {
     expect(setTimeout).toHaveBeenCalledWith(expect.any(Function), 120)
     expect(task).not.toHaveBeenCalled()
 
-    pendingCallback?.()
+    const callback = pendingCallback as (() => void) | null
+
+    callback?.()
 
     expect(task).toHaveBeenCalledTimes(1)
   })

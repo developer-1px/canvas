@@ -68,7 +68,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "npm run build:package && tsc -b && vite build",
+    "build": "tsc -b && vite build && npm run build:package",
     "build:package": "rm -rf dist/package && tsc -p tsconfig.package.json && node scripts/copy-package-assets.mjs && node scripts/resolve-package-imports.mjs",
     "lint": "eslint .",
     "pack:dry-run": "npm pack --dry-run",

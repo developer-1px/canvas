@@ -8,7 +8,13 @@ import {
   CanvasFoundation as CanvasFoundationFromPackage,
   CanvasHost,
   CanvasRenderer,
-  CANVAS_APP_BOARD_IO_FEATURE_PACK_MANIFEST,
+  type CanvasAppAssemblySource,
+  type CanvasAppProps,
+  type CanvasCustomItem,
+  type CanvasEditableTextItem,
+  type CanvasItem,
+} from '@interactive-os/canvas'
+import {
   CANVAS_CONTROL_TARGET_SELECTOR,
   CANVAS_WHEEL_PASSTHROUGH_SELECTOR,
   bindCanvasEventListener,
@@ -21,15 +27,6 @@ import {
   focusCanvasElementOnNextFrame,
   isCanvasKeyboardTypingTarget,
   resolveCanvasElementBySelector,
-  createCanvasAppAssembly,
-  createCanvasAppExtensionBundle,
-  createCanvasAppAiLabsFeaturePackManifest,
-  createCanvasAppDomEditStyleFeaturePackManifest,
-  createCanvasAppFeaturePack,
-  createCanvasAppFeaturePackExtensionBundle,
-  createCanvasAppFeaturePackManifest,
-  createCanvasAppFeaturePackViewRenderers,
-  createCanvasAppViewFeaturePack,
   getCanvasDataTransferText,
   downloadCanvasBlobFile,
   downloadCanvasTextFile,
@@ -38,15 +35,6 @@ import {
   setCanvasDataTransferText,
   scheduleCanvasAnimationFrameTask,
   writeCanvasClipboardText,
-  defineCanvasAppCustomItemModule,
-  DEFAULT_CANVAS_APP_VIEW_FEATURE_PACKS,
-  DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS,
-  DEFAULT_CANVAS_APP_VIEW_FEATURE_PACK_MANIFESTS,
-  getCanvasAppInstalledFeaturePacks,
-  getCanvasAppInstalledFeaturePackManifestIds,
-  getCanvasAppInstalledFeaturePackManifests,
-  getCanvasAppInstalledViewFeaturePacks,
-  getCanvasAppManifestViewFeaturePacks,
   getCanvasFindInputKeyboardIntent,
   getCanvasInlineEditKeyboardIntent,
   getCanvasModalBackdropPointerIntent,
@@ -59,61 +47,80 @@ import {
   getCanvasSelectionListModifierState,
   getCanvasWorldClientPoint,
   isCanvasControlTarget,
+  isCanvasTargetWithinSelector,
+  isCanvasWheelPassthroughTarget,
+  type CanvasControlTargetInput,
+  type CanvasEditableFieldKeyboardIntentInput,
+  type CanvasInteractionTargetSelectorInput,
+  type CanvasInlineEditKeyboardIntentInput,
+  type CanvasMenuRovingActiveIndexInput,
+  type CanvasMenuTriggerKeyboardIntentInput,
+  type CanvasModalBackdropPointerIntentInput,
+  type CanvasModalKeyboardIntentInput,
+  type CanvasPresentationKeyboardIntentInput,
+  type CanvasPointerClickMemory,
+  type CanvasPointerTransformModifierInput,
+  type CanvasPointerTransformModifierState,
+  type CanvasResizeHandleDoubleClickIntentInput,
+  type CanvasSelectionListModifierInput,
+  type CanvasSelectionListModifierState,
+  type CanvasSelectionListSelectionMode,
+  type CanvasWorldClientPointInput,
+  type CanvasWorldClientPointStageElement,
+} from '@interactive-os/canvas/app'
+import {
+  CANVAS_APP_BOARD_IO_FEATURE_PACK_MANIFEST,
+  DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS,
+  DEFAULT_CANVAS_APP_VIEW_FEATURE_PACK_MANIFESTS,
+  DEFAULT_CANVAS_APP_VIEW_FEATURE_PACKS,
+  createCanvasAppAiLabsFeaturePackManifest,
+  createCanvasAppAssembly,
+  createCanvasAppDomEditStyleFeaturePackManifest,
+  createCanvasAppExtensionBundle,
+  createCanvasAppFeaturePack,
+  createCanvasAppFeaturePackExtensionBundle,
+  createCanvasAppFeaturePackManifest,
+  createCanvasAppFeaturePackViewRenderers,
+  createCanvasAppViewFeaturePack,
+  defineCanvasAppCustomItemModule,
+  defineCanvasAppFeaturePack,
+  getCanvasAppFeaturePackCatalog,
   getCanvasAppFoundationExtensionCommands,
   getCanvasAppFoundationExtensionRendererSlots,
   getCanvasAppFoundationExtensionTools,
-  isCanvasTargetWithinSelector,
-  isCanvasWheelPassthroughTarget,
-  type CanvasAppAssemblySource,
+  getCanvasAppInstalledFeaturePackManifestIds,
+  getCanvasAppInstalledFeaturePackManifests,
+  getCanvasAppInstalledFeaturePacks,
+  getCanvasAppInstalledViewFeaturePacks,
+  getCanvasAppManifestViewFeaturePacks,
+  resolveCanvasAppFeaturePacks,
   type CanvasAppCommitItemsChange,
   type CanvasAppComponentLibrary,
-  type CanvasAppComponentTemplate,
   type CanvasAppComponentRendererStrategy,
-  type CanvasAppFeaturePack,
-  type CanvasAppFeaturePackAssemblyInput,
-  type CanvasAppFeaturePackManifest,
-  type CanvasAppFeaturePackViewRenderers,
+  type CanvasAppComponentTemplate,
   type CanvasAppCustomItemModule,
   type CanvasAppCustomItemRenderKeyStrategy,
   type CanvasAppCustomItemRendererDescriptor,
   type CanvasAppCustomItemRendererStrategy,
   type CanvasAppCustomItemValidator,
+  type CanvasAppFeaturePack,
+  type CanvasAppFeaturePackAssemblyInput,
+  type CanvasAppFeaturePackManifest,
+  type CanvasAppFeaturePackViewRenderers,
   type CanvasAppFoundationExtension,
   type CanvasAppFoundationExtensionCommand,
   type CanvasAppFoundationExtensionRendererSlot,
   type CanvasAppFoundationExtensionTool,
   type CanvasAppItemLayerAdapter,
-  type CanvasAppProps,
-  type CanvasAppPointerInput,
-  type CanvasAppStageExternalOverlaySlot,
-  type CanvasAppStageAdapter,
-  type CanvasAppStageMount,
-  type CanvasControlTargetInput,
   type CanvasAppItemsChange,
+  type CanvasAppPointerInput,
+  type CanvasAppStageAdapter,
+  type CanvasAppStageExternalOverlaySlot,
+  type CanvasAppStageMount,
   type CanvasAppViewFeaturePack,
-  type CanvasEditableFieldKeyboardIntentInput,
-  type CanvasPresentationKeyboardIntentInput,
-  type CanvasInteractionTargetSelectorInput,
-  type CanvasInlineEditKeyboardIntentInput,
   type CanvasFindInputKeyboardIntentInput,
-  type CanvasMenuRovingActiveIndexInput,
-  type CanvasMenuTriggerKeyboardIntentInput,
-  type CanvasModalBackdropPointerIntentInput,
-  type CanvasModalKeyboardIntentInput,
-  type CanvasPointerClickMemory,
-  type CanvasResizeHandleDoubleClickIntentInput,
-  type CanvasPointerTransformModifierInput,
-  type CanvasPointerTransformModifierState,
-  type CanvasSelectionListModifierInput,
-  type CanvasSelectionListModifierState,
-  type CanvasSelectionListSelectionMode,
   type CanvasWorkspaceStorageProvider,
-  type CanvasWorldClientPointInput,
-  type CanvasWorldClientPointStageElement,
-  type CanvasCustomItem,
-  type CanvasEditableTextItem,
-  type CanvasItem,
-} from '@interactive-os/canvas'
+} from '@interactive-os/canvas/app/authoring'
 import * as CanvasFoundation from '@interactive-os/canvas/foundation'
 import {
   CanvasApp,
@@ -321,6 +328,21 @@ describe('Canvas package consumer imports', () => {
         itemKind: 'smoke',
         targetId: 'card',
       })
+    const consumerFeaturePackManifest = defineCanvasAppFeaturePack({
+      id: 'consumer-pack',
+      label: 'Consumer pack',
+      extensions: {
+        customCommands: [{
+          id: 'consumer-command',
+          label: 'Consumer',
+          run: () => undefined,
+          title: 'Consumer command',
+        }],
+      },
+    })
+    const featurePackCatalog = getCanvasAppFeaturePackCatalog()
+    const resolvedFeaturePackManifests =
+      resolveCanvasAppFeaturePacks(['minimap'])
     const manifestViewFeaturePacks =
       getCanvasAppManifestViewFeaturePacks([viewManifest])
 
@@ -436,13 +458,20 @@ describe('Canvas package consumer imports', () => {
     ])
     expect(viewRenderers.status).toBe(renderStatus)
     expect(defaultFeaturePackManifestIds).toContain('table-import')
+    expect(featurePackCatalog.some((manifest) => manifest.id === 'minimap'))
+      .toBe(true)
+    expect(resolvedFeaturePackManifests.map((manifest) => manifest.id))
+      .toEqual(['minimap'])
+    expect(consumerFeaturePackManifest.id).toBe('consumer-pack')
     expect(getCanvasAppInstalledFeaturePackManifestIds([
       aiLabsManifest,
       domEditStyleManifest,
+      consumerFeaturePackManifest,
       CANVAS_APP_BOARD_IO_FEATURE_PACK_MANIFEST,
     ])).toEqual([
       'ai-labs',
       'smoke-dom-card-style',
+      'consumer-pack',
       'board-io',
     ])
     expect(getCanvasAppInstalledFeaturePackManifests([
@@ -574,6 +603,15 @@ describe('Canvas package consumer imports', () => {
     expect('createCanvasComponentLibrary' in CanvasPackage).toBe(false)
     expect('CanvasSvgStage' in CanvasPackage).toBe(false)
     expect('isCanvasCustomToolId' in CanvasPackage).toBe(false)
+    expect('createCanvasAppAssembly' in CanvasPackage).toBe(false)
+    expect('defineCanvasAppCustomItemModule' in CanvasPackage).toBe(false)
+    expect('defineCanvasAppFeaturePack' in CanvasPackage).toBe(false)
+    expect('getCanvasAppFeaturePackCatalog' in CanvasPackage).toBe(false)
+    expect('resolveCanvasAppFeaturePacks' in CanvasPackage).toBe(false)
+    expect('CANVAS_APP_MINIMAP_FEATURE_PACK_MANIFEST' in CanvasPackage)
+      .toBe(false)
+    expect('DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS' in CanvasPackage)
+      .toBe(false)
     expect(CanvasAppFacade.useCanvasAppModel).toBeTypeOf('function')
     expect(CanvasAppFacade.DEFAULT_CANVAS_APP_ASSEMBLY).toBeTypeOf('object')
     expect(CanvasAppFacade.assertCanvasAppAssembly).toBeTypeOf('function')
@@ -798,6 +836,15 @@ describe('Canvas package consumer imports', () => {
     expect(CanvasAppAuthoring.DEFAULT_CANVAS_APP_VIEW_FEATURE_PACKS)
       .toBeTypeOf('object')
     expect(CanvasAppAuthoring.defineCanvasAppCustomItemModule).toBeTypeOf(
+      'function',
+    )
+    expect(CanvasAppAuthoring.defineCanvasAppFeaturePack).toBeTypeOf(
+      'function',
+    )
+    expect(CanvasAppAuthoring.getCanvasAppFeaturePackCatalog).toBeTypeOf(
+      'function',
+    )
+    expect(CanvasAppAuthoring.resolveCanvasAppFeaturePacks).toBeTypeOf(
       'function',
     )
     expect(CanvasAppAuthoring.createCanvasAppComponentPresentationRenderers)
