@@ -17,23 +17,50 @@ import {
   CANVAS_APP_COMMAND_PALETTE_FEATURE_PACK_MANIFEST,
 } from './command-palette'
 import {
+  CANVAS_APP_ARROW_ROUTING_INSPECTOR_FEATURE_PACK_MANIFEST,
+} from './arrow-routing-inspector'
+import {
   CANVAS_APP_BOARD_IO_FEATURE_PACK_MANIFEST,
 } from './board-io'
+import {
+  CANVAS_APP_CHECKLIST_INSPECTOR_FEATURE_PACK_MANIFEST,
+} from './checklist-inspector'
+import {
+  CANVAS_APP_CURSOR_CHAT_FEATURE_PACK_MANIFEST,
+} from './cursor-chat'
 import {
   CANVAS_APP_DRAWING_TOOLS_FEATURE_PACK_MANIFEST,
 } from './drawing-tools'
 import {
+  CANVAS_APP_FACILITATION_FEATURE_PACK_MANIFEST,
+} from './facilitation'
+import {
+  CANVAS_APP_FIND_REPLACE_FEATURE_PACK_MANIFEST,
+} from './find-replace'
+import {
   CANVAS_APP_IMAGE_IO_FEATURE_PACK_MANIFEST,
 } from './image-io'
+import {
+  CANVAS_APP_KANBAN_INSPECTOR_FEATURE_PACK_MANIFEST,
+} from './kanban-inspector'
 import {
   CANVAS_APP_MEDIA_IMPORT_FEATURE_PACK_MANIFEST,
 } from './media-import'
 import {
+  CANVAS_APP_MINIMAP_FEATURE_PACK_MANIFEST,
+} from './minimap'
+import {
   CANVAS_APP_SHAPE_AUTHORING_FEATURE_PACK_MANIFEST,
 } from './shape-authoring'
 import {
+  CANVAS_APP_SHORTCUT_HELP_FEATURE_PACK_MANIFEST,
+} from './shortcut-help'
+import {
   CANVAS_APP_STAMP_AUTHORING_FEATURE_PACK_MANIFEST,
 } from './stamp-authoring'
+import {
+  CANVAS_APP_STATUS_BAR_FEATURE_PACK_MANIFEST,
+} from './status-bar'
 import {
   CANVAS_APP_TABLE_IMPORT_FEATURE_PACK_MANIFEST,
 } from './table-import'
@@ -50,14 +77,171 @@ import {
   CANVAS_APP_TOOLBAR_FEATURE_PACK_MANIFEST,
 } from './toolbar'
 import {
+  CANVAS_APP_ZOOM_CONTROLS_FEATURE_PACK_MANIFEST,
+} from './zoom-controls'
+import {
   createCanvasAppFeaturePackSuiteManifest,
   type CanvasAppFeaturePackSuiteManifest,
 } from './CanvasAppFeaturePackSuites'
 
 export const CANVAS_AUTHORING_BASICS_SUITE_ID = 'authoring-basics'
+export const CANVAS_BOARD_FILES_SUITE_ID = 'board-files'
+export const CANVAS_COLLABORATION_TOOLS_SUITE_ID = 'collaboration-tools'
+export const CANVAS_COMMAND_SURFACES_SUITE_ID = 'command-surfaces'
+export const CANVAS_COMPONENT_AUTOMATION_SUITE_ID = 'component-automation'
+export const CANVAS_COMPONENT_EDITING_SUITE_ID = 'component-editing'
+export const CANVAS_COMPONENT_RUNTIME_SUITE_ID = 'component-runtime-pack'
 export const CANVAS_COMPONENT_SYSTEM_SUITE_ID = 'component-system'
+export const CANVAS_CREATION_TOOLS_SUITE_ID = 'creation-tools'
+export const CANVAS_DATA_IMPORT_SUITE_ID = 'data-import'
 export const CANVAS_IMPORT_EXPORT_SUITE_ID = 'import-export'
+export const CANVAS_MEDIA_ASSETS_SUITE_ID = 'media-assets'
+export const CANVAS_REVIEW_INSPECTORS_SUITE_ID = 'review-inspectors'
+export const CANVAS_SEARCH_TOOLS_SUITE_ID = 'search-tools'
 export const CANVAS_STORY_CANVAS_SUITE_ID = 'story-canvas'
+export const CANVAS_STORY_IMPORT_SUITE_ID = 'story-import-workflow'
+export const CANVAS_STORY_PREVIEW_SUITE_ID = 'story-preview'
+export const CANVAS_VIEW_NAVIGATION_SUITE_ID = 'view-navigation'
+
+export const CANVAS_VIEW_NAVIGATION_FEATURE_PACK_SUITE_MANIFEST =
+  createCanvasAppFeaturePackSuiteManifest({
+    featurePackIds: [
+      CANVAS_APP_ZOOM_CONTROLS_FEATURE_PACK_MANIFEST.id,
+      CANVAS_APP_MINIMAP_FEATURE_PACK_MANIFEST.id,
+      CANVAS_APP_STATUS_BAR_FEATURE_PACK_MANIFEST.id,
+      CANVAS_APP_SHORTCUT_HELP_FEATURE_PACK_MANIFEST.id,
+    ],
+    id: CANVAS_VIEW_NAVIGATION_SUITE_ID,
+    label: 'View navigation',
+  })
+
+export const CANVAS_COMMAND_SURFACES_FEATURE_PACK_SUITE_MANIFEST =
+  createCanvasAppFeaturePackSuiteManifest({
+    featurePackIds: [
+      CANVAS_APP_TOOLBAR_FEATURE_PACK_MANIFEST.id,
+      CANVAS_APP_COMMAND_PALETTE_FEATURE_PACK_MANIFEST.id,
+    ],
+    id: CANVAS_COMMAND_SURFACES_SUITE_ID,
+    label: 'Command surfaces',
+  })
+
+export const CANVAS_CREATION_TOOLS_FEATURE_PACK_SUITE_MANIFEST =
+  createCanvasAppFeaturePackSuiteManifest({
+    featurePackIds: [
+      CANVAS_APP_SHAPE_AUTHORING_FEATURE_PACK_MANIFEST.id,
+      CANVAS_APP_DRAWING_TOOLS_FEATURE_PACK_MANIFEST.id,
+      CANVAS_APP_STAMP_AUTHORING_FEATURE_PACK_MANIFEST.id,
+    ],
+    id: CANVAS_CREATION_TOOLS_SUITE_ID,
+    label: 'Creation tools',
+  })
+
+export const CANVAS_COMPONENT_RUNTIME_FEATURE_PACK_SUITE_MANIFEST =
+  createCanvasAppFeaturePackSuiteManifest({
+    featurePackIds: [
+      CANVAS_APP_COMPONENT_LIBRARY_FEATURE_PACK_MANIFEST.id,
+      CANVAS_APP_COMPONENT_SOURCE_OUTLINE_FEATURE_PACK_MANIFEST.id,
+    ],
+    id: CANVAS_COMPONENT_RUNTIME_SUITE_ID,
+    label: 'Component runtime',
+  })
+
+export const CANVAS_COMPONENT_EDITING_FEATURE_PACK_SUITE_MANIFEST =
+  createCanvasAppFeaturePackSuiteManifest({
+    featurePackIds: [
+      CANVAS_APP_COMPONENT_AUTHORING_FEATURE_PACK_MANIFEST.id,
+      CANVAS_APP_COMPONENT_INSPECTOR_FEATURE_PACK_MANIFEST.id,
+    ],
+    id: CANVAS_COMPONENT_EDITING_SUITE_ID,
+    label: 'Component editing',
+  })
+
+export const CANVAS_COMPONENT_AUTOMATION_FEATURE_PACK_SUITE_MANIFEST =
+  createCanvasAppFeaturePackSuiteManifest({
+    featurePackIds: [
+      CANVAS_APP_COMPONENT_SYNC_FEATURE_PACK_MANIFEST.id,
+    ],
+    id: CANVAS_COMPONENT_AUTOMATION_SUITE_ID,
+    label: 'Component automation',
+  })
+
+export const CANVAS_MEDIA_ASSETS_FEATURE_PACK_SUITE_MANIFEST =
+  createCanvasAppFeaturePackSuiteManifest({
+    featurePackIds: [
+      CANVAS_APP_IMAGE_IO_FEATURE_PACK_MANIFEST.id,
+      CANVAS_APP_MEDIA_IMPORT_FEATURE_PACK_MANIFEST.id,
+    ],
+    id: CANVAS_MEDIA_ASSETS_SUITE_ID,
+    label: 'Media assets',
+  })
+
+export const CANVAS_DATA_IMPORT_FEATURE_PACK_SUITE_MANIFEST =
+  createCanvasAppFeaturePackSuiteManifest({
+    featurePackIds: [
+      CANVAS_APP_TABLE_IMPORT_FEATURE_PACK_MANIFEST.id,
+      CANVAS_APP_TEXT_PASTE_IMPORT_FEATURE_PACK_MANIFEST.id,
+    ],
+    id: CANVAS_DATA_IMPORT_SUITE_ID,
+    label: 'Data import',
+  })
+
+export const CANVAS_BOARD_FILES_FEATURE_PACK_SUITE_MANIFEST =
+  createCanvasAppFeaturePackSuiteManifest({
+    featurePackIds: [
+      CANVAS_APP_BOARD_IO_FEATURE_PACK_MANIFEST.id,
+    ],
+    id: CANVAS_BOARD_FILES_SUITE_ID,
+    label: 'Board files',
+  })
+
+export const CANVAS_STORY_PREVIEW_FEATURE_PACK_SUITE_MANIFEST =
+  createCanvasAppFeaturePackSuiteManifest({
+    featurePackIds: [
+      CANVAS_STORY_PREVIEW_ITEMS_FEATURE_PACK_ID,
+    ],
+    id: CANVAS_STORY_PREVIEW_SUITE_ID,
+    label: 'Story preview',
+  })
+
+export const CANVAS_STORY_IMPORT_FEATURE_PACK_SUITE_MANIFEST =
+  createCanvasAppFeaturePackSuiteManifest({
+    featurePackIds: [
+      CANVAS_STORY_PREVIEW_ITEMS_FEATURE_PACK_ID,
+      CANVAS_APP_STORY_IMPORT_FEATURE_PACK_MANIFEST.id,
+    ],
+    id: CANVAS_STORY_IMPORT_SUITE_ID,
+    label: 'Story import',
+  })
+
+export const CANVAS_REVIEW_INSPECTORS_FEATURE_PACK_SUITE_MANIFEST =
+  createCanvasAppFeaturePackSuiteManifest({
+    featurePackIds: [
+      CANVAS_APP_ARROW_ROUTING_INSPECTOR_FEATURE_PACK_MANIFEST.id,
+      CANVAS_APP_CHECKLIST_INSPECTOR_FEATURE_PACK_MANIFEST.id,
+      CANVAS_APP_KANBAN_INSPECTOR_FEATURE_PACK_MANIFEST.id,
+    ],
+    id: CANVAS_REVIEW_INSPECTORS_SUITE_ID,
+    label: 'Review inspectors',
+  })
+
+export const CANVAS_COLLABORATION_TOOLS_FEATURE_PACK_SUITE_MANIFEST =
+  createCanvasAppFeaturePackSuiteManifest({
+    featurePackIds: [
+      CANVAS_APP_CURSOR_CHAT_FEATURE_PACK_MANIFEST.id,
+      CANVAS_APP_FACILITATION_FEATURE_PACK_MANIFEST.id,
+    ],
+    id: CANVAS_COLLABORATION_TOOLS_SUITE_ID,
+    label: 'Collaboration tools',
+  })
+
+export const CANVAS_SEARCH_TOOLS_FEATURE_PACK_SUITE_MANIFEST =
+  createCanvasAppFeaturePackSuiteManifest({
+    featurePackIds: [
+      CANVAS_APP_FIND_REPLACE_FEATURE_PACK_MANIFEST.id,
+    ],
+    id: CANVAS_SEARCH_TOOLS_SUITE_ID,
+    label: 'Search tools',
+  })
 
 export const CANVAS_AUTHORING_BASICS_FEATURE_PACK_SUITE_MANIFEST =
   createCanvasAppFeaturePackSuiteManifest({
@@ -109,6 +293,20 @@ export const CANVAS_STORY_CANVAS_FEATURE_PACK_SUITE_MANIFEST =
   })
 
 export const DEFAULT_CANVAS_APP_FEATURE_PACK_SUITE_MANIFESTS = Object.freeze([
+  CANVAS_VIEW_NAVIGATION_FEATURE_PACK_SUITE_MANIFEST,
+  CANVAS_COMMAND_SURFACES_FEATURE_PACK_SUITE_MANIFEST,
+  CANVAS_CREATION_TOOLS_FEATURE_PACK_SUITE_MANIFEST,
+  CANVAS_COMPONENT_RUNTIME_FEATURE_PACK_SUITE_MANIFEST,
+  CANVAS_COMPONENT_EDITING_FEATURE_PACK_SUITE_MANIFEST,
+  CANVAS_COMPONENT_AUTOMATION_FEATURE_PACK_SUITE_MANIFEST,
+  CANVAS_MEDIA_ASSETS_FEATURE_PACK_SUITE_MANIFEST,
+  CANVAS_DATA_IMPORT_FEATURE_PACK_SUITE_MANIFEST,
+  CANVAS_BOARD_FILES_FEATURE_PACK_SUITE_MANIFEST,
+  CANVAS_STORY_PREVIEW_FEATURE_PACK_SUITE_MANIFEST,
+  CANVAS_STORY_IMPORT_FEATURE_PACK_SUITE_MANIFEST,
+  CANVAS_REVIEW_INSPECTORS_FEATURE_PACK_SUITE_MANIFEST,
+  CANVAS_COLLABORATION_TOOLS_FEATURE_PACK_SUITE_MANIFEST,
+  CANVAS_SEARCH_TOOLS_FEATURE_PACK_SUITE_MANIFEST,
   CANVAS_AUTHORING_BASICS_FEATURE_PACK_SUITE_MANIFEST,
   CANVAS_COMPONENT_SYSTEM_FEATURE_PACK_SUITE_MANIFEST,
   CANVAS_IMPORT_EXPORT_FEATURE_PACK_SUITE_MANIFEST,
