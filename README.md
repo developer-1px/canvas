@@ -25,6 +25,7 @@ pnpm build
 ### Basic app
 
 ```tsx
+import '@interactive-os/canvas/style.css'
 import { CanvasApp, type CanvasAppProps } from '@interactive-os/canvas'
 
 const basicCanvasProps = {
@@ -41,6 +42,7 @@ export function BasicCanvas() {
 ### Feature packs and a custom item
 
 ```tsx
+import '@interactive-os/canvas/style.css'
 import {
   CanvasApp,
   type CanvasAppProps,
@@ -97,6 +99,7 @@ export function CanvasWithFeaturePacks() {
 ### Custom feature pack
 
 ```tsx
+import '@interactive-os/canvas/style.css'
 import { CanvasApp } from '@interactive-os/canvas'
 import { defineCanvasAppFeaturePack } from '@interactive-os/canvas/app/authoring'
 

@@ -7,18 +7,12 @@ import {
 
 describe('Canvas App stage boundaries', () => {
   it('keeps raw stage DOM operations inside the app stage element module', () => {
-    const allowedRawStageDomFiles = new Set([
-      'src/canvas/app/affordances/editing/text-editor/CanvasTextMeasurementDom.ts',
-      'src/canvas/app/affordances/interaction/pointer/CanvasPointerCapture.ts',
-      'src/canvas/app/affordances/interaction/pointer/CanvasPointerGeometry.ts',
-    ])
     const rawStageDomTerms =
-      /\b(svgRef|RefObject<SVGSVGElement|stageElement\.current|getBoundingClientRect|hasPointerCapture|setPointerCapture|releasePointerCapture)\b|\b(?:addEventListener|removeEventListener)\(['"]wheel['"]/
+      /\b(svgRef|RefObject<SVGSVGElement|stageElement\.current)\b|\b(?:stageElement|stageRef|svg|svgElement|currentTarget)\??\.(?:getBoundingClientRect|hasPointerCapture|setPointerCapture|releasePointerCapture)\s*\(|\b(?:addEventListener|removeEventListener)\(['"]wheel['"]/
     const violations = sourceFiles
       .filter((file) =>
         file.path.startsWith('src/canvas/app/') &&
         !file.path.startsWith('src/canvas/app/rendering/stage/') &&
-        !allowedRawStageDomFiles.has(file.path) &&
         !file.path.endsWith('.test.ts') &&
         !file.path.endsWith('.test.tsx'),
       )

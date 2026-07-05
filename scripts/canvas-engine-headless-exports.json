@@ -1,0 +1,12 @@
+[
+  "assertCanvasAffordanceConfig",
+  "createCanvasAffordanceConfig",
+  "createCanvasSceneAdapter",
+  "getCanvasCommandAvailability",
+  "getCanvasCommandSelectionState",
+  "getCanvasMarqueeSelection",
+  "getCanvasPointerGesture",
+  "getCanvasWheelViewport",
+  "moveCanvasSelection",
+  "resizeCanvasSelection"
+]

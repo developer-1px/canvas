@@ -33,17 +33,23 @@ Engine command or gesture modules into document persistence code.
    attempts to apply a local `CanvasAppItemsChange` and returns `false` on
    containment failure. `subscribe` reports local and remote item snapshots and
    returns an unsubscribe callback.
-3. Remote changes do not create local undo/redo history entries. Local history
+3. `CanvasAppItemsChange` is sufficient as the v1 local commit granularity.
+   Remote delivery remains snapshot-based at the adapter event boundary, so
+   field-level merge, CRDT operation shape, server patch shape, and conflict
+   resolution are owned by the Host adapter rather than the canvas package. A
+   future sync implementation can introduce a narrower remote operation contract
+   only if a concrete adapter proves the snapshot boundary too coarse.
+4. Remote changes do not create local undo/redo history entries. Local history
    remains owned by the Host document controller. A Host may keep separate CRDT
    or server history behind the adapter, but the canvas package does not model
    it.
-4. If `commitChange` returns `false`, App workflow must keep the current state
+5. If `commitChange` returns `false`, App workflow must keep the current state
    and must not throw. This matches the existing containment rule for invalid or
    rejected document mutations.
-5. If no adapter is provided, the current local Host document controller path
+6. If no adapter is provided, the current local Host document controller path
    continues unchanged. The App must not inject a default no-op adapter because
    absence means the document sync seam is disabled.
-6. Core, Foundation, and Engine must not import the adapter type or any
+7. Core, Foundation, and Engine must not import the adapter type or any
    collaboration transport concept. They continue to consume only headless
    geometry, scene, gesture, command, and viewport contracts.
 
@@ -84,6 +90,9 @@ export type CanvasAppCollaborationAssemblyInput = {
 
 - Host apps can bind the canvas package to CRDT, OT, server patch, or polling
   systems without the package choosing a backend or conflict algorithm.
+- Fine-grained remote merge is intentionally outside the v1 package contract.
+  Hosts that need it translate their backend operations into adapter snapshots
+  and local `CanvasAppItemsChange` commits.
 - Local undo/redo remains deterministic because remote events are explicitly
   excluded from local history.
 - Presence stays ephemeral and renderer-facing, while document sync is

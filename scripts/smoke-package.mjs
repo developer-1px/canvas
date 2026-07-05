@@ -60,18 +60,12 @@ async function assertHeadlessEngineExport() {
   }
 
   const engine = await import(pathToFileURL(join(root, engineEntry)).href)
-  const expectedFunctions = [
-    'assertCanvasAffordanceConfig',
-    'createCanvasAffordanceConfig',
-    'createCanvasSceneAdapter',
-    'getCanvasCommandAvailability',
-    'getCanvasCommandSelectionState',
-    'getCanvasMarqueeSelection',
-    'getCanvasPointerGesture',
-    'getCanvasWheelViewport',
-    'moveCanvasSelection',
-    'resizeCanvasSelection',
-  ]
+  const expectedFunctions = JSON.parse(
+    await readFile(
+      join(root, 'scripts/canvas-engine-headless-exports.json'),
+      'utf8',
+    ),
+  )
 
   for (const name of expectedFunctions) {
     if (typeof engine[name] !== 'function') {

@@ -2,6 +2,9 @@ import {
   DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS,
 } from './CanvasAppDefaultFeaturePackManifests'
 import {
+  CANVAS_APP_BOARD_IO_FEATURE_PACK_MANIFEST,
+} from './board-io'
+import {
   assertCanvasAppFeaturePackIds,
   type CanvasAppFeaturePackId,
 } from './CanvasAppFeaturePacks'
@@ -9,8 +12,10 @@ import type {
   CanvasAppFeaturePackManifest,
 } from './CanvasAppFeaturePackManifests'
 
-const CANVAS_APP_FEATURE_PACK_CATALOG =
-  DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS
+const CANVAS_APP_FEATURE_PACK_CATALOG = Object.freeze([
+  ...DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS,
+  CANVAS_APP_BOARD_IO_FEATURE_PACK_MANIFEST,
+]) satisfies readonly CanvasAppFeaturePackManifest[]
 const CANVAS_APP_FEATURE_PACK_CATALOG_BY_ID = new Map(
   CANVAS_APP_FEATURE_PACK_CATALOG.map((manifest) => [manifest.id, manifest]),
 )

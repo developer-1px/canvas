@@ -3,23 +3,13 @@
 
 import {
   readFileSync,
-  readdirSync,
 } from 'node:fs'
-import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
+import * as CanvasEngine from '../engine'
 import {
-  assertCanvasAffordanceConfig,
-  createCanvasAffordanceConfig,
-  createCanvasSceneAdapter,
-  getCanvasCommandAvailability,
-  getCanvasCommandSelectionState,
-  getCanvasMarqueeSelection,
-  getCanvasPointerGesture,
-  getCanvasWheelViewport,
-  moveCanvasSelection,
-  resizeCanvasSelection,
-} from '../engine'
+  sourceFiles,
+} from './CanvasArchitectureTestSources'
 
 const HEADLESS_LAYER_DIRS = [
   'src/canvas/entities',
@@ -28,26 +18,44 @@ const HEADLESS_LAYER_DIRS = [
   'src/canvas/engine',
 ] as const
 
-const REACT_IMPORT_PATTERN =
-  /from\s+['"]react(?:-dom)?(?:\/|['"])/
+const REACT_MODULE_PATTERN =
+  /(?:from\s*|import\s*\(\s*|require\s*\(\s*|^\s*import\s+)['"]react(?:-dom)?(?:\/[^'"]*)?['"]/m
+
+const CANVAS_ENGINE_HEADLESS_EXPORTS = JSON.parse(
+  readFileSync('scripts/canvas-engine-headless-exports.json', 'utf8'),
+) as ReadonlyArray<keyof typeof CanvasEngine>
 
 describe('Canvas engine headless contract', () => {
   it('keeps entities, core, foundation, and engine free of React imports', () => {
-    const violations = HEADLESS_LAYER_DIRS.flatMap((directory) =>
-      listTypeScriptFiles(directory).flatMap((file) =>
-        REACT_IMPORT_PATTERN.test(file.source) ? [file.path] : [],
-      ),
-    )
+    const violations = sourceFiles
+      .filter((file) =>
+        HEADLESS_LAYER_DIRS.some((directory) =>
+          file.path.startsWith(`${directory}/`),
+        ) &&
+        /\.(ts|tsx)$/.test(file.path) &&
+        !/\.test\.(ts|tsx)$/.test(file.path),
+      )
+      .flatMap((file) =>
+        REACT_MODULE_PATTERN.test(file.source) ? [file.path] : [],
+      )
 
     expect(violations).toEqual([])
   })
 
+  it('keeps the smoke-tested headless engine functions exported', () => {
+    for (const name of CANVAS_ENGINE_HEADLESS_EXPORTS) {
+      expect(CanvasEngine[name]).toBeTypeOf('function')
+    }
+  })
+
   it('runs affordance grammar through the engine facade in node', () => {
-    const config = createCanvasAffordanceConfig({})
+    const config = CanvasEngine.createCanvasAffordanceConfig({})
 
-    expect(() => assertCanvasAffordanceConfig(config)).not.toThrow()
+    expect(() =>
+      CanvasEngine.assertCanvasAffordanceConfig(config),
+    ).not.toThrow()
 
-    const scene = createCanvasSceneAdapter([
+    const scene = CanvasEngine.createCanvasSceneAdapter([
       {
         bounds: { h: 80, w: 120, x: 0, y: 0 },
         id: 'group',
@@ -72,7 +80,7 @@ describe('Canvas engine headless contract', () => {
     ])
 
     expect(scene.getBounds(['child'])).toEqual({ h: 30, w: 40, x: 10, y: 10 })
-    expect(getCanvasMarqueeSelection({
+    expect(CanvasEngine.getCanvasMarqueeSelection({
       additive: false,
       baseSelection: [],
       bounds: { h: 12, w: 12, x: 5, y: 5 },
@@ -101,14 +109,14 @@ describe('Canvas engine headless contract', () => {
         ),
     }
 
-    expect(moveCanvasSelection({
+    expect(CanvasEngine.moveCanvasSelection({
       adapter: transformAdapter,
       dx: 5,
       dy: -3,
       items: [{ h: 10, id: 'selected', w: 20, x: 1, y: 2 }],
       selection: ['selected'],
     })).toEqual([{ h: 10, id: 'selected', w: 20, x: 6, y: -1 }])
-    expect(resizeCanvasSelection({
+    expect(CanvasEngine.resizeCanvasSelection({
       adapter: transformAdapter,
       bounds: { h: 20, w: 40, x: 10, y: 10 },
       handle: 'se',
@@ -117,7 +125,7 @@ describe('Canvas engine headless contract', () => {
       selection: ['selected'],
     })).toEqual([{ h: 40, id: 'selected', w: 60, x: 10, y: 10 }])
 
-    expect(getCanvasCommandSelectionState({
+    expect(CanvasEngine.getCanvasCommandSelectionState({
       selection: ['a', 'b', 'c'],
     })).toEqual({
       canAlign: true,
@@ -125,7 +133,7 @@ describe('Canvas engine headless contract', () => {
       canGroup: true,
       hasSelection: true,
     })
-    expect(getCanvasCommandAvailability({
+    expect(CanvasEngine.getCanvasCommandAvailability({
       canRedo: false,
       canUndo: true,
       config,
@@ -139,7 +147,7 @@ describe('Canvas engine headless contract', () => {
       ungroup: true,
     })
 
-    expect(getCanvasPointerGesture({
+    expect(CanvasEngine.getCanvasPointerGesture({
       config,
       input: {
         altKey: false,
@@ -151,7 +159,7 @@ describe('Canvas engine headless contract', () => {
       spaceDown: false,
       tool: 'select',
     })).toBe('marquee')
-    expect(getCanvasWheelViewport({
+    expect(CanvasEngine.getCanvasWheelViewport({
       config,
       input: {
         ctrlKey: false,
@@ -166,26 +174,3 @@ describe('Canvas engine headless contract', () => {
     })).toEqual({ scale: 1, x: -10, y: -20 })
   })
 })
-
-function listTypeScriptFiles(directory: string): Array<{
-  path: string
-  source: string
-}> {
-  return readdirSync(join(process.cwd(), directory), { withFileTypes: true })
-    .flatMap((entry) => {
-      const path = `${directory}/${entry.name}`
-
-      if (entry.isDirectory()) {
-        return listTypeScriptFiles(path)
-      }
-
-      if (!entry.isFile() || !/\.(ts|tsx)$/.test(entry.name)) {
-        return []
-      }
-
-      return [{
-        path,
-        source: readFileSync(join(process.cwd(), path), 'utf8'),
-      }]
-    })
-}

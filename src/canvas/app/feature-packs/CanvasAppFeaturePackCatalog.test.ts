@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  CANVAS_APP_BOARD_IO_FEATURE_PACK_MANIFEST,
+} from './board-io'
+import {
   DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS,
 } from './CanvasAppDefaultFeaturePackManifests'
 import {
@@ -12,8 +15,11 @@ describe('CanvasAppFeaturePackCatalog', () => {
   it('returns the built-in feature pack manifest catalog in default order', () => {
     const catalog = getCanvasAppFeaturePackCatalog()
 
-    expect(catalog).toBe(DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS)
     expect(Object.isFrozen(catalog)).toBe(true)
+    expect(catalog).toEqual([
+      ...DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS,
+      CANVAS_APP_BOARD_IO_FEATURE_PACK_MANIFEST,
+    ])
     expect(catalog.map((manifest) => manifest.id)).toEqual([
       'command-palette',
       'component-authoring',
@@ -34,12 +40,18 @@ describe('CanvasAppFeaturePackCatalog', () => {
       'arrow-routing-inspector',
       'checklist-inspector',
       'kanban-inspector',
+      'board-io',
     ])
+    expect(catalog.map((manifest) => manifest.id)).not.toContain('ai-labs')
+    expect(catalog.map((manifest) => manifest.id)).not.toContain(
+      'dom-edit-style',
+    )
   })
 
-  it('resolves feature pack ids in requested order', () => {
+  it('resolves static first-party feature pack ids in requested order', () => {
     const resolved = resolveCanvasAppFeaturePacks([
       'minimap',
+      'board-io',
       'find-replace',
       'toolbar',
     ])
@@ -47,6 +59,7 @@ describe('CanvasAppFeaturePackCatalog', () => {
     expect(Object.isFrozen(resolved)).toBe(true)
     expect(resolved.map((manifest) => manifest.id)).toEqual([
       'minimap',
+      'board-io',
       'find-replace',
       'toolbar',
     ])

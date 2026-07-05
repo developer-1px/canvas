@@ -1,8 +1,5 @@
 import { createElement } from 'react'
 import {
-  type CanvasAppViewFeaturePack,
-} from '../CanvasAppFeaturePackViews'
-import {
   defineCanvasAppFeaturePack,
 } from '../defineCanvasAppFeaturePack'
 import { CanvasMinimap } from './CanvasMinimap'
@@ -34,14 +31,4 @@ export const CANVAS_APP_MINIMAP_FEATURE_PACK_MANIFEST =
   })
 
 export const CANVAS_APP_MINIMAP_VIEW_FEATURE_PACK =
-  getCanvasAppMinimapViewFeaturePack()
-
-function getCanvasAppMinimapViewFeaturePack(): CanvasAppViewFeaturePack {
-  const { viewFeaturePack } = CANVAS_APP_MINIMAP_FEATURE_PACK_MANIFEST
-
-  if (viewFeaturePack === undefined) {
-    throw new Error('Feature pack minimap must provide viewRenderers')
-  }
-
-  return viewFeaturePack
-}
+  CANVAS_APP_MINIMAP_FEATURE_PACK_MANIFEST.viewFeaturePack!
