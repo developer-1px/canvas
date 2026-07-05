@@ -11,7 +11,7 @@ const NESTED_SELECTION_PATH = [
 test('verifies default selection and nested click descent in the preview', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
   await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
 
   await expect(selectionGuide(page)).toHaveCount(1)
@@ -41,7 +41,7 @@ test('verifies default selection and nested click descent in the preview', async
 test('verifies measure and X-ray overlays stay state-specific', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
   await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
   await selectLayer(page, 'Select layer Hero panel', 'workspaceHero')
 
@@ -75,7 +75,7 @@ test('verifies measure and X-ray overlays stay state-specific', async ({
 test('verifies flex spacing and flex-child participation controls', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
   await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
   await selectLayer(page, 'Select layer Pipeline list', 'workspacePipelineList')
 
@@ -130,7 +130,7 @@ test('verifies flex spacing and flex-child participation controls', async ({
 test('verifies grid and out-of-flow affordances in the preview', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
   await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
   await selectLayer(page, 'Select layer Content grid', 'workspaceContent')
 
@@ -165,7 +165,7 @@ test('verifies grid and out-of-flow affordances in the preview', async ({
 test('verifies selected overlay tracking through pan and zoom', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
   await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
   await selectLayer(page, 'Select layer Content grid', 'workspaceContent')
   await expectSelectionMatchesNode(page, 'workspaceContent')

@@ -1,7 +1,7 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
 
 test('shows flex child sizing only inside flex parents', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
 
   await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
   await expect(page.locator('.figma-size-mode-capsule')).toHaveCount(1)
@@ -48,7 +48,7 @@ test('shows flex child sizing only inside flex parents', async ({ page }) => {
 test('shows margin outside selected bounds without mixing with container gap', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
   await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
   await selectLayer(page, 'Select layer Deal row 1', 'workspaceDealOne')
 
@@ -64,7 +64,7 @@ test('shows margin outside selected bounds without mixing with container gap', a
 test('shows align-self cross-axis guide from the child marker', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
   await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
 
   await expectAlignSelfGuide(page, 'Select layer Sidebar', {

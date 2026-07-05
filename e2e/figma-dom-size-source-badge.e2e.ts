@@ -3,7 +3,7 @@ import { expect, test, type Page } from '@playwright/test'
 test('shows size source badges and updates them after mode changes', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
   await page.getByRole('button', { name: 'Select layer Workspace page' })
     .click()
 

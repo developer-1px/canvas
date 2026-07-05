@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test'
 test('exposes figma clone layers as a keyboard treeview', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
 
   const tree = page.getByRole('tree', { name: 'Layers' })
   const workspaceSection = tree.getByRole('treeitem', {
@@ -64,7 +64,7 @@ test('exposes figma clone layers as a keyboard treeview', async ({
 test('filters and favorites figma clone layers for component management', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
 
   const tree = page.getByRole('tree', { name: 'Layers' })
   const search = page.getByRole('searchbox', { name: 'Search layers' })
@@ -98,7 +98,7 @@ test('filters and favorites figma clone layers for component management', async 
 test('groups figma clone components by page in a variant board', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
 
   const layers = page.getByRole('complementary', { name: 'Layers' })
   const inspector = page.getByRole('complementary', { name: 'Design' })
@@ -133,7 +133,7 @@ test('groups figma clone components by page in a variant board', async ({
 test('shows reusable component imports and selectable parts', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
 
   const layers = page.getByRole('complementary', { name: 'Layers' })
   const imports = page.getByRole('complementary', { name: 'Imports' })
@@ -192,7 +192,7 @@ test('shows reusable component imports and selectable parts', async ({
 test('focuses figma clone component variants and fits the selected frame', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
 
   const layers = page.getByRole('complementary', { name: 'Layers' })
   const viewport = page.getByRole('toolbar', { name: 'Viewport' })

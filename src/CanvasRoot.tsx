@@ -1,17 +1,15 @@
-import { CanvasDevToolsDemoApp } from './demo/CanvasDevToolsDemoApp'
+import { CanvasEngineDemoApp } from './demo/CanvasEngineDemoApp'
 import { DEMO_CANVAS_APP_ASSEMBLY_INPUT } from './demo/CanvasDemoAssembly'
 import { FigmaCloneApp } from '../packages/figma-clone/src'
 
 export function CanvasRoot() {
   const demo = new URLSearchParams(window.location.search).get('demo')
 
-  if (demo === 'engine') {
-    return (
-      <CanvasDevToolsDemoApp assemblyInput={DEMO_CANVAS_APP_ASSEMBLY_INPUT} />
-    )
+  if (demo === 'figma') {
+    return <FigmaCloneApp />
   }
 
   return (
-    <FigmaCloneApp />
+    <CanvasEngineDemoApp assemblyInput={DEMO_CANVAS_APP_ASSEMBLY_INPUT} />
   )
 }

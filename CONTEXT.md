@@ -344,8 +344,8 @@
 - Canvas App Custom Item Module Creation Tool은 bounds/title/data만 반환하고, `id`, `type`, `kind`, `presentation`은 Canvas App Custom Item Module이 주입한다.
 - Canvas App Custom Item Module Creation Tool의 실행/반환값은 Module assembly가 현재 item 저장 계약과 module validator로 검증하고, 실패하면 null/false로 containment 한다.
 - Canvas App Inspector Panel Context는 내부 Canvas Workflow Contract를 외부 authoring Interface로 노출하지 않고 필요한 commit/document slot을 자체 public context 계약으로 명시한다.
-- Demo custom item module은 `src/demo/custom-items/<name>/index.ts` convention으로 자동 수집한다.
-- Demo와 Demo custom item module은 `src/canvas` package public entry만 사용하고 canvas 하위 구현 경로를 직접 import하지 않는다.
+- Demo는 custom item module을 조립하지 않는다. 제품별 custom item module 예시는 `packages/` 소비자가 소유한다.
+- Demo는 `src/canvas` package public entry만 사용하고 canvas 하위 구현 경로를 직접 import하지 않는다.
 - package manifest는 `canvas`, `canvas/app`, `canvas/app/authoring`, `canvas/core`, `canvas/engine`, `canvas/entities`, `canvas/host`, `canvas/renderer` export만 열고 각 export는 public facade `index.ts`를 가리킨다.
 - package manifest의 각 export entry는 `types`, `import`, `default` target을 같은 public facade `index.ts`로 맞춘다.
 - package public entry는 package manifest의 layer facade만 알고 app 내부 submodule을 직접 export target으로 삼지 않는다.

@@ -3,7 +3,7 @@ import { expect, test, type Locator, type Page } from '@playwright/test'
 test('shows grid track lines, line numbers, and hovered track sizes', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
   await page.getByRole('button', { name: 'Select layer Workspace page' })
     .click()
 

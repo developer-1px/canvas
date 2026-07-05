@@ -35,42 +35,6 @@ test('exposes the canvas context command popup as a keyboard menu', async ({
   await expect.poll(() => items.count()).toBe(beforeCount + 1)
 })
 
-test('exposes selection toolbar dropdowns as menu buttons and menus', async ({
-  page,
-}) => {
-  await page.goto('/?demo=engine')
-  await expect(page.locator('main.engine-demo-app')).toBeVisible()
-
-  await page.locator('[data-canvas-item-id="engine-shape"]').click()
-
-  const toolbar = page.getByRole('toolbar', { name: 'Object actions' })
-  const trigger = toolbar.getByRole('button', { exact: true, name: 'Shape' })
-
-  await expect(trigger).toHaveAttribute('aria-haspopup', 'menu')
-  await expect(trigger).toHaveAttribute('aria-expanded', 'false')
-  await trigger.click()
-  await expect(trigger).toHaveAttribute('aria-expanded', 'true')
-
-  const controls = await trigger.getAttribute('aria-controls')
-  const menu = page.getByRole('menu', { name: 'Shape' })
-
-  expect(controls).toBeTruthy()
-  await expect(menu).toHaveAttribute('id', controls!)
-  await expect(menu.getByRole('menuitemcheckbox', { name: 'Rect shape' }))
-    .toHaveAttribute('aria-checked', 'true')
-  await expectMenuKeyboardNavigation(page, menu)
-
-  await page.keyboard.press('Escape')
-  await expect(menu).toHaveCount(0)
-  await expect(trigger).toBeFocused()
-
-  await trigger.click()
-  await expect(menu).toBeVisible()
-  await page.keyboard.press('Enter')
-  await expect(menu).toHaveCount(0)
-  await expect(trigger).toBeFocused()
-})
-
 async function expectMenuKeyboardNavigation(page: Page, menu: Locator) {
   const items = menu.locator(MENU_ITEM_SELECTOR)
 

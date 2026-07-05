@@ -164,7 +164,7 @@ describe('Canvas App stage boundaries', () => {
     expect(appFacadeFile.source).toContain('CanvasAppAssemblySource')
     expect(packageFacadeFile.source).toContain('CanvasAppAssemblySource')
     expect(mainFile.source).toContain('<CanvasRoot')
-    expect(rootFile.source).toContain('CanvasDevToolsDemoApp')
+    expect(rootFile.source).toContain('CanvasEngineDemoApp')
     expect(rootFile.source).toContain('assemblyInput=')
     expect(mainFile.source).not.toContain('createCanvasAppAssembly')
     expect(rootFile.source).not.toContain('createCanvasAppAssembly')

@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test'
 
 test('shows selected DOM layout context badges', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
 
   await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
   await expect(contextBadge(page)).toHaveAttribute(

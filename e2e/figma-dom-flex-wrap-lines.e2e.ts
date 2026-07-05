@@ -1,7 +1,7 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
 
 test('shows flex-wrap line guides and line gap values', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
   await page.getByRole('button', { name: 'Select layer Workspace page' })
     .click()
 

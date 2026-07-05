@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test'
 test('shows DOM smart guide families around the workspace stat row', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
 
   await page.getByRole('button', { name: 'Select layer Workspace page' })
     .click()

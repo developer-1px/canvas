@@ -3,7 +3,7 @@ import { expect, test, type Page } from '@playwright/test'
 test('shows read-only margin ghost bands in X-ray and measure modes', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
   await page.getByRole('button', { name: 'Select layer Workspace page' })
     .click()
   await page.getByRole('button', { name: 'Select layer Secondary action' })
@@ -44,7 +44,7 @@ test('shows read-only margin ghost bands in X-ray and measure modes', async ({
 test('distinguishes margin-derived spacing without margin handles', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
   await page.getByRole('button', { name: 'Select layer Workspace page' })
     .click()
   await page.getByRole('button', { name: 'Select layer Deal row 1' })

@@ -3,7 +3,7 @@ import { expect, test, type Page } from '@playwright/test'
 test('exposes DOM edit direction controls as a keyboard radiogroup', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
   await selectLayer(page, 'Select layer Workspace page')
   await selectLayer(page, 'Select layer Pipeline list')
 

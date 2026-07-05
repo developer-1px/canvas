@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 
 test('toggles DOM overlay layer families independently', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
 
   await page.getByRole('button', { name: 'Select layer Workspace page' })
     .click()

@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test'
 test('exposes figma clone inspector modes as keyboard tabs', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
   await page.getByRole('button', { name: 'Select layer Workspace page' })
     .click()
 
@@ -45,7 +45,7 @@ test('exposes figma clone inspector modes as keyboard tabs', async ({
 test('syncs figma clone component edits across instances', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
 
   const layers = page.getByRole('complementary', { name: 'Layers' })
   const inspector = page.getByRole('complementary', { name: 'Design' })
@@ -74,7 +74,7 @@ test('stores figma clone review notes and copies source references', async ({
   page,
 }) => {
   await context.grantPermissions(['clipboard-write'])
-  await page.goto('/')
+  await page.goto('/?demo=figma')
 
   const layers = page.getByRole('complementary', { name: 'Layers' })
   const inspector = page.getByRole('complementary', { name: 'Design' })
@@ -113,7 +113,7 @@ test('stores figma clone review notes and copies source references', async ({
 test('edits figma clone CSS declarations in the dev inspector', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
 
   const layers = page.getByRole('complementary', { name: 'Layers' })
   const inspector = page.getByRole('complementary', { name: 'Design' })

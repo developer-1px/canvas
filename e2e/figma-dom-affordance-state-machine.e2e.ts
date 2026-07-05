@@ -1,7 +1,7 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
 
 test('keeps DOM affordance states mutually exclusive', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
 
   await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
   await expect(page.locator('.figma-dom-moveable')).toHaveCount(0)

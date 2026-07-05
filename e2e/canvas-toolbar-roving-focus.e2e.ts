@@ -18,17 +18,12 @@ test('keeps engine demo toolbars on one tab stop with arrow navigation', async (
     page.getByRole('toolbar', { name: 'Viewport controls' }),
   )
 
-  await page.locator('[data-canvas-item-id="engine-shape"]').click()
-  await expectToolbarRovingFocus(
-    page,
-    page.getByRole('toolbar', { name: 'Object actions' }),
-  )
 })
 
 test('keeps figma clone toolbars on one tab stop with arrow navigation', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
   await expect(page.locator('.figma-clone')).toBeVisible()
 
   await expectToolbarRovingFocus(

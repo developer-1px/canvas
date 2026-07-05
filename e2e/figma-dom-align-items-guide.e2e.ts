@@ -1,7 +1,7 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
 
 test('shows flex cross-axis align-items guides', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
   await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
   await expect(alignGuide(page)).toHaveCount(0)
   await openAlignmentEditor(page)
