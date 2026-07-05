@@ -77,7 +77,7 @@ describe('Canvas App folder structure', () => {
         ),
       ).toBe(true)
       expect(getSourceFile(indexPath).source).toMatch(
-        /FeaturePackManifest|createCanvasAppFeaturePackManifest/,
+        /FeaturePackManifest|createCanvasAppFeaturePackManifest|defineCanvasAppFeaturePack/,
       )
     }
   })
@@ -118,11 +118,15 @@ describe('Canvas App folder structure', () => {
       'src/canvas/app/feature-packs/CanvasAppDefaultFeaturePackManifests.ts',
       'src/canvas/app/feature-packs/CanvasAppDefaultFeaturePacks.ts',
       'src/canvas/app/feature-packs/CanvasAppDefaultViewFeaturePacks.ts',
+      'src/canvas/app/feature-packs/CanvasAppFeaturePackCatalog.test.ts',
+      'src/canvas/app/feature-packs/CanvasAppFeaturePackCatalog.ts',
       'src/canvas/app/feature-packs/CanvasAppFeaturePackManifests.ts',
       'src/canvas/app/feature-packs/CanvasAppFeaturePackRuntimeModel.ts',
       'src/canvas/app/feature-packs/CanvasAppFeaturePackViews.tsx',
       'src/canvas/app/feature-packs/CanvasAppFeaturePacks.test.ts',
       'src/canvas/app/feature-packs/CanvasAppFeaturePacks.ts',
+      'src/canvas/app/feature-packs/defineCanvasAppFeaturePack.test.ts',
+      'src/canvas/app/feature-packs/defineCanvasAppFeaturePack.ts',
       'src/canvas/app/feature-packs/index.ts',
     ])
     expect(defaultAssemblyFile.source).toContain(

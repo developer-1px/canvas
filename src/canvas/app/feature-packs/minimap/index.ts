@@ -1,10 +1,7 @@
 import { createElement } from 'react'
 import {
-  createCanvasAppFeaturePackManifest,
-} from '../CanvasAppFeaturePackManifests'
-import {
-  createCanvasAppViewFeaturePack,
-} from '../CanvasAppFeaturePackViews'
+  defineCanvasAppFeaturePack,
+} from '../defineCanvasAppFeaturePack'
 import { CanvasMinimap } from './CanvasMinimap'
 
 export {
@@ -24,8 +21,8 @@ export {
   type CanvasMinimapSize,
 } from './CanvasMinimapModel'
 
-export const CANVAS_APP_MINIMAP_VIEW_FEATURE_PACK =
-  createCanvasAppViewFeaturePack({
+export const CANVAS_APP_MINIMAP_FEATURE_PACK_MANIFEST =
+  defineCanvasAppFeaturePack({
     id: 'minimap',
     label: 'Minimap',
     viewRenderers: {
@@ -33,9 +30,5 @@ export const CANVAS_APP_MINIMAP_VIEW_FEATURE_PACK =
     },
   })
 
-export const CANVAS_APP_MINIMAP_FEATURE_PACK_MANIFEST =
-  createCanvasAppFeaturePackManifest({
-    id: 'minimap',
-    label: 'Minimap',
-    viewFeaturePack: CANVAS_APP_MINIMAP_VIEW_FEATURE_PACK,
-  })
+export const CANVAS_APP_MINIMAP_VIEW_FEATURE_PACK =
+  CANVAS_APP_MINIMAP_FEATURE_PACK_MANIFEST.viewFeaturePack!

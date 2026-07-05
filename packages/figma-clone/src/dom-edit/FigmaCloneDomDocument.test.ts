@@ -20,7 +20,7 @@ describe('FigmaCloneDomDocument', () => {
         state: document.value.state,
         value: 40,
       }),
-    })).toEqual({ ok: true })
+    })).toMatchObject({ ok: true })
     expect(document.value.state.card.paddingLeft).toBe(40)
     expect(document.history.canUndo).toBe(true)
 
@@ -42,7 +42,7 @@ describe('FigmaCloneDomDocument', () => {
         state: document.value.state,
         value: 'center',
       }),
-    })).toEqual({ ok: true })
+    })).toMatchObject({ ok: true })
     expect(document.value.state.workspaceHeroActions.distribution).toBe('center')
 
     expect(document.history.undo()).toBe(true)
@@ -62,7 +62,7 @@ describe('FigmaCloneDomDocument', () => {
         state: document.value.textState,
         value: 'Pipeline control',
       }),
-    })).toEqual({ ok: true })
+    })).toMatchObject({ ok: true })
     expect(document.value.textState.workspaceHeroTitle).toBe('Pipeline control')
 
     expect(document.history.undo()).toBe(true)

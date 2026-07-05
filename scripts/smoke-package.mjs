@@ -42,12 +42,38 @@ for (const [subpath, entry] of Object.entries(packageJson.exports ?? {})) {
   }
 }
 
+await assertHeadlessEngineExport()
+
 async function assertFile(relativePath, label) {
   await access(join(root, relativePath)).catch((error) => {
     throw new Error(`missing package export file for ${label}: ${relativePath}`, {
       cause: error,
     })
   })
+}
+
+async function assertHeadlessEngineExport() {
+  const engineEntry = packageJson.exports?.['./engine']?.import
+
+  if (typeof engineEntry !== 'string') {
+    throw new Error('missing package engine import export')
+  }
+
+  const engine = await import(pathToFileURL(join(root, engineEntry)).href)
+  const expectedFunctions = JSON.parse(
+    await readFile(
+      join(root, 'scripts/canvas-engine-headless-exports.json'),
+      'utf8',
+    ),
+  )
+
+  for (const name of expectedFunctions) {
+    if (typeof engine[name] !== 'function') {
+      throw new Error(`missing headless engine export: ${name}`)
+    }
+  }
+
+  engine.assertCanvasAffordanceConfig(engine.createCanvasAffordanceConfig({}))
 }
 
 async function importJavaScriptExport(relativePath, label) {

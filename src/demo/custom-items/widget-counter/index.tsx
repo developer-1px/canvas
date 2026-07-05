@@ -1,12 +1,14 @@
 import {
   CanvasCore,
-  defineCanvasAppReactWidgetModule,
-  type CanvasAppCustomCommand,
-  type CanvasAppCustomCommandContext,
   type CanvasCustomItem,
   type CanvasItem,
   type CanvasJsonObject,
 } from '../../../canvas'
+import {
+  defineCanvasAppReactWidgetModule,
+  type CanvasAppCustomCommand,
+  type CanvasAppCustomCommandContext,
+} from '../../../canvas/app/authoring'
 
 export const WIDGET_COUNTER_KIND = 'widget-counter'
 export const WIDGET_COUNTER_PRESENTATION = 'widget-counter-card'

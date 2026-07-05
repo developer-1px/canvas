@@ -1,4 +1,6 @@
-import type { CanvasAppCustomItemModule } from '../../canvas'
+import type {
+  CanvasAppCustomItemModule,
+} from '../../canvas/app/authoring'
 import { METRIC_WIDGET_MODULE } from '../widget-catalog/MetricWidget'
 import { TODO_WIDGET_MODULE } from '../widget-catalog/TodoWidget'
 

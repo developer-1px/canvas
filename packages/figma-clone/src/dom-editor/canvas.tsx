@@ -1,7 +1,9 @@
 import {
-  defineCanvasAppCustomItemModule,
   type CanvasCustomItem,
 } from '../../../../src/canvas'
+import {
+  defineCanvasAppCustomItemModule,
+} from '../../../../src/canvas/app/authoring'
 import { isDomEditCanvasPanTarget } from '@interactive-os/dom-edit-affordance/canvas'
 import { FigmaCloneDomEditSurface } from '../dom-edit/FigmaCloneDomEditSurface'
 import type {

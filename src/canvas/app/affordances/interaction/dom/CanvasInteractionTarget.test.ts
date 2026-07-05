@@ -69,8 +69,12 @@ class FakeNode extends EventTarget {
 }
 
 class FakeElement extends FakeNode {
-  constructor(private readonly matchingSelector: string) {
+  private readonly matchingSelector: string
+
+  constructor(matchingSelector: string) {
     super()
+
+    this.matchingSelector = matchingSelector
   }
 
   closest = vi.fn((selector: string) => {

@@ -15,6 +15,14 @@ export {
   DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS,
 } from './CanvasAppDefaultFeaturePackManifests'
 export {
+  getCanvasAppFeaturePackCatalog,
+  resolveCanvasAppFeaturePacks,
+} from './CanvasAppFeaturePackCatalog'
+export {
+  defineCanvasAppFeaturePack,
+  type CanvasAppFeaturePackDefinition,
+} from './defineCanvasAppFeaturePack'
+export {
   CANVAS_APP_COMMAND_PALETTE_FEATURE_PACK_MANIFEST,
   CANVAS_APP_COMMAND_PALETTE_VIEW_FEATURE_PACK,
   CANVAS_APP_COMPONENT_AUTHORING_FEATURE_PACK_MANIFEST,

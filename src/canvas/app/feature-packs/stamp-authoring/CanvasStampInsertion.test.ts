@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import type { Bounds } from '../../../entities'
-import type { CanvasAppStageElement } from '../../../rendering/stage/CanvasAppStageElement'
+import type { CanvasAppStageElement } from '../../rendering/stage/CanvasAppStageElement'
 import {
   getCanvasStampInsertPlacement,
   insertCanvasStamp,

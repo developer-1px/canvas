@@ -1,9 +1,11 @@
 import type { CSSProperties } from 'react'
 import {
-  defineCanvasAppReactWidgetModule,
   type CanvasCustomItem,
   type CanvasJsonObject,
 } from '../../../../src/canvas'
+import {
+  defineCanvasAppReactWidgetModule,
+} from '../../../../src/canvas/app/authoring'
 
 export const FIGMA_CLONE_WIDGET_KIND = 'figma-clone-react-widget'
 export const FIGMA_CLONE_WIDGET_PRESENTATION = 'figma-clone-widget-card'

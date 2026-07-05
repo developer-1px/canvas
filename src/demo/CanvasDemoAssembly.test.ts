@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createCanvasAppAssembly } from '../canvas'
+import { createCanvasAppAssembly } from '../canvas/app/authoring'
 import {
   DEMO_CANVAS_AI_LABS_ASSEMBLY_INPUT,
   DEMO_CANVAS_AI_LABS_FEATURE_PACK_MANIFEST,

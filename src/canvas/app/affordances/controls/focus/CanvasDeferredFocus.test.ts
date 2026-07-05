@@ -39,14 +39,16 @@ describe('CanvasDeferredFocus', () => {
     expect(element.focus).not.toHaveBeenCalled()
     expect(element.select).not.toHaveBeenCalled()
 
-    pendingCallback?.(0)
+    const callback = pendingCallback as FrameRequestCallback | null
+
+    callback?.(0)
 
     expect(element.focus).toHaveBeenCalledWith({ preventScroll: false })
     expect(element.select).toHaveBeenCalledTimes(1)
   })
 
   it('resolves selector targets from a root node', () => {
-    const target = createElement() as Element & CanvasFocusableElement
+    const target = createElement()
     const root = createQueryRoot([target])
 
     expect(resolveCanvasElementBySelector({
@@ -58,8 +60,8 @@ describe('CanvasDeferredFocus', () => {
   })
 
   it('resolves selector targets with a match predicate', () => {
-    const first = createElement() as Element & CanvasFocusableElement
-    const second = createElement() as Element & CanvasFocusableElement
+    const first = createElement()
+    const second = createElement()
     const root = createQueryRoot([first, second])
 
     expect(resolveCanvasElementBySelector({
@@ -73,7 +75,7 @@ describe('CanvasDeferredFocus', () => {
   })
 
   it('schedules selector focus on the next animation frame', () => {
-    const element = createElement() as Element & CanvasFocusableElement
+    const element = createElement()
     const root = createQueryRoot([element])
     let pendingCallback: FrameRequestCallback | null = null
     const requestAnimationFrame = vi.fn((callback: FrameRequestCallback) => {
@@ -91,7 +93,9 @@ describe('CanvasDeferredFocus', () => {
     expect(element.focus).not.toHaveBeenCalled()
     expect(element.select).not.toHaveBeenCalled()
 
-    pendingCallback?.(0)
+    const callback = pendingCallback as FrameRequestCallback | null
+
+    callback?.(0)
 
     expect(root.querySelector).toHaveBeenCalledWith('[data-canvas-focus-target]')
     expect(element.focus).toHaveBeenCalledWith({ preventScroll: true })
@@ -169,12 +173,15 @@ function createThrowingQueryRoot() {
   } as unknown as ParentNode
 }
 
-function createElement(): CanvasFocusableElement & {
+function createElement(): Element & CanvasFocusableElement & {
   focus: ReturnType<typeof vi.fn>
   select: ReturnType<typeof vi.fn>
 } {
   return {
     focus: vi.fn(),
     select: vi.fn(),
+  } as unknown as Element & CanvasFocusableElement & {
+    focus: ReturnType<typeof vi.fn>
+    select: ReturnType<typeof vi.fn>
   }
 }

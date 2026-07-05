@@ -7,7 +7,12 @@ import {
 } from './CanvasArchitectureTestSources'
 
 describe('Canvas package facade boundaries', () => {
-  it('keeps demo app code behind the canvas package public entry', () => {
+  it('keeps demo app code behind canvas package public facades', () => {
+    const publicCanvasFacades = new Set([
+      'src/canvas',
+      'src/canvas/app',
+      'src/canvas/app/authoring',
+    ])
     const violations = sourceFiles
       .filter((file) =>
         file.path === 'src/main.tsx' || file.path.startsWith('src/demo/'),
@@ -15,7 +20,7 @@ describe('Canvas package facade boundaries', () => {
       .flatMap(getImportReferences)
       .filter((reference) =>
         reference.target.startsWith('src/canvas/') &&
-        reference.target !== 'src/canvas',
+        !publicCanvasFacades.has(reference.target),
       )
 
     expect(violations).toEqual([])
@@ -29,7 +34,6 @@ describe('Canvas package facade boundaries', () => {
         reference.target.startsWith('src/canvas/') &&
         ![
           'src/canvas/app',
-          'src/canvas/app/authoring',
           'src/canvas/core',
           'src/canvas/foundation',
           'src/canvas/engine',
@@ -50,17 +54,26 @@ describe('Canvas package facade boundaries', () => {
     )
     const packageFacadeFile = getSourceFile('src/canvas/index.ts')
 
-    expect(packageFacadeFile.source).toContain("from './app/authoring'")
     expect(packageFacadeFile.source).toContain("from './app'")
     expect(packageFacadeFile.source).toContain('CanvasAppAssemblySource')
-    expect(packageFacadeFile.source).toContain('createCanvasAppAssembly')
-    expect(packageFacadeFile.source).toContain(
+    expect(packageFacadeFile.source).not.toContain("from './app/authoring'")
+    expect(packageFacadeFile.source).not.toContain('createCanvasAppAssembly')
+    expect(packageFacadeFile.source).not.toContain(
       'defineCanvasAppCustomItemModule',
+    )
+    expect(packageFacadeFile.source).not.toContain('defineCanvasAppFeaturePack')
+    expect(packageFacadeFile.source).not.toContain(
+      'DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS',
     )
     expect(authoringFacadeFile.source).toContain('createCanvasAppAssembly')
     expect(authoringFacadeFile.source).toContain(
       'defineCanvasAppCustomItemModule',
     )
+    expect(authoringFacadeFile.source).toContain('defineCanvasAppFeaturePack')
+    expect(authoringFacadeFile.source).toContain(
+      'getCanvasAppFeaturePackCatalog',
+    )
+    expect(authoringFacadeFile.source).toContain('resolveCanvasAppFeaturePacks')
     expect(appFacadeFile.source).toContain('useCanvasAppModel')
     expect(packageFacadeFile.source).not.toContain('useCanvasAppModel')
     expect(appFacadeFile.source).toContain('DEFAULT_CANVAS_APP_ASSEMBLY')
@@ -118,8 +131,11 @@ describe('Canvas package facade boundaries', () => {
       'createCanvasAppExtensionBundle',
       'createCanvasAppFeaturePack',
       'createCanvasAppFeaturePackExtensionBundle',
+      'defineCanvasAppFeaturePack',
       'defineCanvasAppCustomItemModule',
+      'getCanvasAppFeaturePackCatalog',
       'getCanvasAppInstalledFeaturePacks',
+      'resolveCanvasAppFeaturePacks',
       'createCanvasAppComponentPresentationRenderers',
       'createCanvasAppCustomItemRenderers',
       'CanvasAppCommitItemsChange',

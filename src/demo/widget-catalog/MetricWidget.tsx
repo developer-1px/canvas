@@ -1,8 +1,10 @@
 import {
-  defineCanvasAppReactWidgetModule,
   type CanvasCustomItem,
   type CanvasJsonObject,
 } from '../../canvas'
+import {
+  defineCanvasAppReactWidgetModule,
+} from '../../canvas/app/authoring'
 
 export const METRIC_WIDGET_KIND = 'metric-widget'
 export const METRIC_WIDGET_PRESENTATION = 'metric-widget-card'

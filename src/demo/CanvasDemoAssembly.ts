@@ -2,15 +2,15 @@ import {
   CANVAS_APP_COMMENT_ONLY_CAPABILITIES,
   CANVAS_APP_EDITOR_CAPABILITIES,
   CANVAS_APP_READ_ONLY_CAPABILITIES,
-  createCanvasAppAiLabsFeaturePackManifest,
   createCanvasAppAiLabsDemoSummaryProvider,
+  createCanvasAppAiLabsFeaturePackManifest,
   createCanvasAppAiLabsSummarizeSelectionCommand,
   createCanvasAppAssembly,
   type CreateCanvasAppAiLabsSummarizeSelectionCommandInput,
   type CanvasAppAssemblyInput,
   type CanvasWorkspaceStorage,
   type CanvasWorkspaceStorageProvider,
-} from '../canvas'
+} from '../canvas/app/authoring'
 import {
   DEMO_CANVAS_INITIAL_SELECTION,
   DEMO_CANVAS_REFERENCE_BOUNDS,

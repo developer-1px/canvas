@@ -33,7 +33,7 @@ export function commitCanvasDocumentSelection(
     {
       label: 'canvas selection',
       origin: 'canvas',
-      selection: afterSnapshot,
+      selectionAfter: afterSnapshot,
     },
   )
 

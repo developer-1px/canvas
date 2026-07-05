@@ -20,7 +20,9 @@ describe('CanvasAnimationFrameTask', () => {
     })).toBe(17)
     expect(task).not.toHaveBeenCalled()
 
-    pendingCallback?.(123)
+    const callback = pendingCallback as FrameRequestCallback | null
+
+    callback?.(123)
 
     expect(requestAnimationFrame).toHaveBeenCalledTimes(1)
     expect(task).toHaveBeenCalledWith(123)

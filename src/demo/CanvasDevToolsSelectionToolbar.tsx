@@ -47,16 +47,18 @@ import {
   type CSSProperties,
 } from 'react'
 import {
-  CANVAS_MENU_ITEM_PROPS,
-  CANVAS_TOOLBAR_ITEM_PROPS,
   CanvasHost,
   type CanvasAppProps,
   type CanvasItem,
   type CanvasShapeLikeItem,
   type CanvasShapeType,
+} from '../canvas'
+import {
+  CANVAS_MENU_ITEM_PROPS,
+  CANVAS_TOOLBAR_ITEM_PROPS,
   useCanvasMenuRovingFocus,
   useCanvasToolbarRovingFocus,
-} from '../canvas'
+} from '../canvas/app'
 
 type CanvasEngineDemoModel =
   Parameters<NonNullable<CanvasAppProps['renderApp']>>[0]

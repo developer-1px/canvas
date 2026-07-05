@@ -4,9 +4,10 @@ import {
   CANVAS_TABS_ROVING_FOCUS_MODEL,
   createCanvasTabsDescriptor,
   getCanvasTabsKeyboardIntent,
+  type CanvasTabsTabInput,
 } from './CanvasTabsRovingFocus'
 
-const tabs = [
+const tabs: readonly CanvasTabsTabInput[] = [
   {
     id: 'slide',
     panelId: 'panel-slide',
@@ -22,7 +23,7 @@ const tabs = [
     panelId: 'panel-notes',
     tabId: 'tab-notes',
   },
-] as const
+]
 
 describe('CanvasTabsRovingFocus', () => {
   it('exposes a stable roving focus model metadata value', () => {
@@ -30,7 +31,7 @@ describe('CanvasTabsRovingFocus', () => {
   })
 
   it('creates APG tab and tabpanel relationships', () => {
-    const descriptor = createCanvasTabsDescriptor({
+    const descriptor = createCanvasTabsDescriptor<string>({
       activeId: 'selection',
       tabs,
     })
@@ -183,16 +184,16 @@ describe('CanvasTabsRovingFocus', () => {
   })
 
   it('skips disabled tabs when moving focus', () => {
-    const tabsWithDisabled = [
+    const tabsWithDisabled: readonly CanvasTabsTabInput[] = [
       tabs[0],
       {
         ...tabs[1],
         disabled: true,
       },
       tabs[2],
-    ] as const
+    ]
 
-    const descriptor = createCanvasTabsDescriptor({
+    const descriptor = createCanvasTabsDescriptor<string>({
       activeId: 'slide',
       tabs: tabsWithDisabled,
     })
