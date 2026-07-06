@@ -1,3 +1,5 @@
+import { parseSlideEditJSONPasteTextValue } from './SlideEditTextJSONPaste'
+
 export type SlideEditObjectStrokeLineStyleSlideId = string
 export type SlideEditObjectStrokeLineStyleObjectId = string
 
@@ -454,13 +456,5 @@ function getSlideEditObjectStrokeDashPasteValue(
 }
 
 function parseSlideEditObjectStrokeLineStyleJSON(value: string) {
-  if (!value.trim()) {
-    return null
-  }
-
-  try {
-    return JSON.parse(value) as unknown
-  } catch {
-    return null
-  }
+  return parseSlideEditJSONPasteTextValue(value)
 }

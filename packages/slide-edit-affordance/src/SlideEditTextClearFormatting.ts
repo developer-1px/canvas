@@ -1,4 +1,7 @@
-import { SLIDE_EDIT_TEXT_JSON_PASTE_TYPES } from './SlideEditTextJSONPaste'
+import {
+  parseSlideEditJSONPasteTextValue,
+  SLIDE_EDIT_TEXT_JSON_PASTE_TYPES,
+} from './SlideEditTextJSONPaste'
 
 export type SlideEditTextClearFormattingDataTransfer = Pick<
   DataTransfer,
@@ -189,13 +192,5 @@ function getSlideEditTextClearFormattingExplicitJSONValue(value: unknown) {
 }
 
 function parseSlideEditTextClearFormattingJSON(value: string) {
-  if (!value.trim()) {
-    return null
-  }
-
-  try {
-    return JSON.parse(value) as unknown
-  } catch {
-    return null
-  }
+  return parseSlideEditJSONPasteTextValue(value)
 }

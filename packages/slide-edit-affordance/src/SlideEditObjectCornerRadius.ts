@@ -1,3 +1,5 @@
+import { parseSlideEditJSONPasteTextValue } from './SlideEditTextJSONPaste'
+
 export type SlideEditObjectCornerRadiusSlideId = string
 export type SlideEditObjectCornerRadiusObjectId = string
 
@@ -465,13 +467,5 @@ function getSlideEditObjectCornerRadiusNumber(value: unknown) {
 }
 
 function parseSlideEditObjectCornerRadiusJSON(value: string) {
-  if (!value.trim()) {
-    return null
-  }
-
-  try {
-    return JSON.parse(value) as unknown
-  } catch {
-    return null
-  }
+  return parseSlideEditJSONPasteTextValue(value)
 }

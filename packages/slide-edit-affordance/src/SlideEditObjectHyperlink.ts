@@ -1,3 +1,5 @@
+import { getSlideEditJSONPasteTextCandidates } from './SlideEditTextJSONPaste'
+
 export type SlideEditObjectHyperlinkSlideId = string
 export type SlideEditObjectHyperlinkObjectId = string
 
@@ -788,13 +790,19 @@ function getSlideEditObjectHyperlinkString(value: unknown) {
 }
 
 function parseSlideEditObjectHyperlinkJSON(value: string) {
-  if (!value.trim()) {
+  const candidates = getSlideEditJSONPasteTextCandidates(value)
+
+  if (candidates.length === 0) {
     return null
   }
 
-  try {
-    return JSON.parse(value) as unknown
-  } catch {
-    return SLIDE_EDIT_OBJECT_HYPERLINK_INVALID_JSON
+  for (const candidate of candidates) {
+    try {
+      return JSON.parse(candidate) as unknown
+    } catch {
+      // Try the next candidate before marking the payload invalid.
+    }
   }
+
+  return SLIDE_EDIT_OBJECT_HYPERLINK_INVALID_JSON
 }

@@ -1,3 +1,5 @@
+import { parseSlideEditJSONPasteTextValue } from './SlideEditTextJSONPaste'
+
 export type SlideEditObjectFillOpacitySlideId = string
 export type SlideEditObjectFillOpacityObjectId = string
 
@@ -423,13 +425,5 @@ function getSlideEditObjectFillOpacityNumber(value: unknown) {
 }
 
 function parseSlideEditObjectFillOpacityJSON(value: string) {
-  if (!value.trim()) {
-    return null
-  }
-
-  try {
-    return JSON.parse(value) as unknown
-  } catch {
-    return null
-  }
+  return parseSlideEditJSONPasteTextValue(value)
 }

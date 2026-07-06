@@ -14,7 +14,6 @@ import {
   SLIDE_EDIT_TEXT_BOX_SIZE_MODES,
 } from './SlideEditTextBoxAutoFit'
 import {
-  getSlideEditTextAutoFitJSONPasteValue as getSlideEditTextAutoFitJSONPasteValueFromPackage,
   getSlideEditTextAutoFitJSONPasteValueFromText as getSlideEditTextAutoFitJSONPasteValueFromTextFromPackage,
   getSlideEditTextAutoFitJSONPasteValueFromValue as getSlideEditTextAutoFitJSONPasteValueFromValueFromPackage,
   SLIDE_EDIT_TEXT_AUTO_FIT_IMPORT_MODEL as SLIDE_EDIT_TEXT_AUTO_FIT_IMPORT_MODEL_FROM_PACKAGE,

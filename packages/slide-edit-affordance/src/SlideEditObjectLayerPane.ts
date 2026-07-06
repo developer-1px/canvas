@@ -1,3 +1,5 @@
+import { parseSlideEditJSONPasteTextValue } from './SlideEditTextJSONPaste'
+
 import { getCanvasSelectionListRangeIds } from '../../../src/canvas/app/affordances/controls/selection-list/CanvasSelectionListRange'
 
 export type SlideEditLayerPaneSlideId = string
@@ -1365,15 +1367,7 @@ function parseSlideEditLayerPaneRenameJSON(value: string) {
 }
 
 function parseSlideEditLayerPaneJSON(value: string) {
-  if (!value.trim()) {
-    return null
-  }
-
-  try {
-    return JSON.parse(value) as unknown
-  } catch {
-    return null
-  }
+  return parseSlideEditJSONPasteTextValue(value)
 }
 
 function getSlideEditLayerPaneKeyboardReorderIntent<

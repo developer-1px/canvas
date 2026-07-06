@@ -1,3 +1,5 @@
+import { parseSlideEditJSONPasteTextValue } from './SlideEditTextJSONPaste'
+
 export type SlideEditTextBodySlideId = string
 export type SlideEditTextBodyObjectId = string
 
@@ -470,13 +472,5 @@ function getSlideEditTextBodyText(value: unknown) {
 }
 
 function parseSlideEditTextBodyJSON(value: string) {
-  if (!value.trim()) {
-    return null
-  }
-
-  try {
-    return JSON.parse(value) as unknown
-  } catch {
-    return null
-  }
+  return parseSlideEditJSONPasteTextValue(value)
 }

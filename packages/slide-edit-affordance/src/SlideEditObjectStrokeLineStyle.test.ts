@@ -19,12 +19,9 @@ import {
   SLIDE_EDIT_OBJECT_STROKE_LINE_STYLE_OPTIONS,
 } from './SlideEditObjectStrokeLineStyle'
 import {
-  getSlideEditObjectStrokeLineStyleBorderStyle as getSlideEditObjectStrokeLineStyleBorderStyleFromPackage,
-  getSlideEditObjectStrokeLineStyleDashArray as getSlideEditObjectStrokeLineStyleDashArrayFromPackage,
   getSlideEditObjectStrokeLineStyleJSONPasteValue as getSlideEditObjectStrokeLineStyleJSONPasteValueFromPackage,
   getSlideEditObjectStrokeLineStyleJSONPasteValueFromText as getSlideEditObjectStrokeLineStyleJSONPasteValueFromTextFromPackage,
   getSlideEditObjectStrokeLineStyleJSONPasteValueFromValue as getSlideEditObjectStrokeLineStyleJSONPasteValueFromValueFromPackage,
-  type SlideEditObjectStrokeLineStyleBorderStyle,
 } from './index'
 
 describe('SlideEditObjectStrokeLineStyle', () => {

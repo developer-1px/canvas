@@ -1,3 +1,5 @@
+import { parseSlideEditJSONPasteTextValue } from './SlideEditTextJSONPaste'
+
 export type SlideEditObjectShadowSlideId = string
 export type SlideEditObjectShadowObjectId = string
 
@@ -638,13 +640,5 @@ function createSlideEditObjectShadowJSONPasteValue(
 }
 
 function parseSlideEditObjectShadowJSON(value: string) {
-  if (!value.trim()) {
-    return null
-  }
-
-  try {
-    return JSON.parse(value) as unknown
-  } catch {
-    return null
-  }
+  return parseSlideEditJSONPasteTextValue(value)
 }

@@ -204,7 +204,7 @@ describe('SlideEditObjectOpacity', () => {
 
     expect(getSlideEditObjectOpacityPasteCommand({
       objectId: 'object-a',
-      pasteValue,
+      pasteValue: pasteValue!,
       slideId: 'slide-a',
     })).toEqual({
       fieldId: 'opacity',

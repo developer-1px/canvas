@@ -1,3 +1,5 @@
+import { parseSlideEditJSONPasteTextValue } from './SlideEditTextJSONPaste'
+
 import type { Bounds } from '../../../src/canvas/core'
 
 export type SlideEditObjectTransformSlideId = string
@@ -875,9 +877,5 @@ function getRecordValue(value: unknown) {
 }
 
 function parseSlideEditObjectTransformJSON(value: string) {
-  try {
-    return JSON.parse(value) as unknown
-  } catch {
-    return null
-  }
+  return parseSlideEditJSONPasteTextValue(value)
 }

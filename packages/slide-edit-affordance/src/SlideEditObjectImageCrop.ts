@@ -1,3 +1,5 @@
+import { parseSlideEditJSONPasteTextValue } from './SlideEditTextJSONPaste'
+
 export type SlideEditObjectImageCropSlideId = string
 export type SlideEditObjectImageCropObjectId = string
 
@@ -13,6 +15,9 @@ export type SlideEditObjectImageCropFieldId =
   | 'reset'
   | 'x'
   | 'y'
+
+export type SlideEditObjectImageCropJSONFieldId =
+  Exclude<SlideEditObjectImageCropFieldId, 'reset'>
 
 export type SlideEditObjectImageCropUnsupportedReason =
   | 'mixed-selection'
@@ -343,6 +348,27 @@ export const SLIDE_EDIT_OBJECT_IMAGE_CROP_FIELDS = Object.freeze({
     unit: 'percent',
   },
 } as const satisfies SlideEditObjectImageCropFieldsDescriptor)
+
+export const SLIDE_EDIT_OBJECT_IMAGE_CROP_JSON_MIME_TYPE =
+  'application/vnd.interactive-os.slide-edit.object-image-crop+json'
+
+export const SLIDE_EDIT_OBJECT_IMAGE_CROP_JSON_TYPES = Object.freeze([
+  'application/json',
+  'text/json',
+  'text/plain',
+] as const)
+
+export const SLIDE_EDIT_OBJECT_IMAGE_CROP_JSON_WRAPPER_KEYS = Object.freeze([
+  'imageCrop',
+  'objectImageCrop',
+  'crop',
+] as const)
+
+const SLIDE_EDIT_OBJECT_IMAGE_CROP_JSON_FIELDS = Object.freeze([
+  'fit',
+  'x',
+  'y',
+] as const satisfies readonly SlideEditObjectImageCropJSONFieldId[])
 
 export function createSlideEditObjectImageCropDescriptor<
   TSlideId extends SlideEditObjectImageCropSlideId,
@@ -731,4 +757,174 @@ export function getSlideEditObjectImageCropPositionCSS(
   const normalizedCrop = normalizeSlideEditObjectImageCrop(crop)
 
   return `${normalizedCrop.x}% ${normalizedCrop.y}%`
+}
+
+function getSlideEditObjectImageCropAnyJSONPasteValue({
+  payloadLength,
+  sourceType,
+  value,
+}: {
+  payloadLength: number
+  sourceType: string
+  value: unknown
+}) {
+  return getSlideEditObjectImageCropDirectJSONPasteValue({
+    payloadLength,
+    sourceType,
+    value,
+  }) ?? getSlideEditObjectImageCropWrappedJSONPasteValue({
+    payloadLength,
+    sourceType,
+    value,
+  })
+}
+
+function getSlideEditObjectImageCropWrappedJSONPasteValue({
+  payloadLength,
+  sourceType,
+  value,
+}: {
+  payloadLength: number
+  sourceType: string
+  value: unknown
+}): SlideEditObjectImageCropJSONPasteValue | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null
+  }
+
+  const record = value as Record<string, unknown>
+
+  for (const key of SLIDE_EDIT_OBJECT_IMAGE_CROP_JSON_WRAPPER_KEYS) {
+    if (!Object.hasOwn(record, key)) {
+      continue
+    }
+
+    const pasteValue = getSlideEditObjectImageCropDirectJSONPasteValue({
+      payloadLength,
+      sourceType,
+      value: record[key],
+      wrapper: key,
+    })
+
+    if (pasteValue !== null) {
+      return pasteValue
+    }
+  }
+
+  return null
+}
+
+function getSlideEditObjectImageCropDirectJSONPasteValue({
+  payloadLength,
+  sourceType,
+  value,
+  wrapper,
+}: {
+  payloadLength: number
+  sourceType: string
+  value: unknown
+  wrapper?: string
+}): SlideEditObjectImageCropJSONPasteValue | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null
+  }
+
+  const record = value as Record<string, unknown>
+  const sourceFields: SlideEditObjectImageCropSourceFields = wrapper
+    ? { wrapper }
+    : {}
+  const crop: Partial<SlideEditObjectImageCropPosition> = {}
+  let fit: SlideEditObjectImageCropFit | undefined
+
+  if (Object.hasOwn(record, 'fit')) {
+    fit = normalizeSlideEditObjectImageCropFit(
+      typeof record.fit === 'string' ? record.fit : String(record.fit ?? ''),
+    )
+    sourceFields.fit = 'fit'
+  }
+
+  readSlideEditObjectImageCropPositionFields({
+    crop,
+    record: getSlideEditObjectImageCropRecord(record.crop),
+    sourceFields,
+    sourcePrefix: 'crop',
+  })
+  readSlideEditObjectImageCropPositionFields({
+    crop,
+    record,
+    sourceFields,
+    sourcePrefix: '',
+  })
+
+  const fields = SLIDE_EDIT_OBJECT_IMAGE_CROP_JSON_FIELDS.filter((field) =>
+    field === 'fit' ? fit !== undefined : crop[field] !== undefined
+  )
+
+  if (fields.length === 0) {
+    return null
+  }
+
+  return {
+    crop,
+    fields,
+    ...(fit === undefined ? {} : { fit }),
+    format: 'json',
+    payloadLength,
+    sourceFields,
+    sourceType,
+    surface: 'object-image-crop',
+    ...(wrapper ? { wrapper } : {}),
+  }
+}
+
+function readSlideEditObjectImageCropPositionFields({
+  crop,
+  record,
+  sourceFields,
+  sourcePrefix,
+}: {
+  crop: Partial<SlideEditObjectImageCropPosition>
+  record: Record<string, unknown> | null
+  sourceFields: SlideEditObjectImageCropSourceFields
+  sourcePrefix: string
+}) {
+  if (!record) {
+    return
+  }
+
+  for (const field of ['x', 'y'] as const) {
+    if (!Object.hasOwn(record, field)) {
+      continue
+    }
+
+    const fieldValue = getSlideEditObjectImageCropJSONNumber(record[field])
+
+    crop[field] = normalizeSlideEditObjectImageCropValue(
+      fieldValue,
+      SLIDE_EDIT_OBJECT_IMAGE_CROP_DEFAULT[field],
+    )
+    sourceFields[field] = sourcePrefix ? `${sourcePrefix}.${field}` : field
+  }
+}
+
+function getSlideEditObjectImageCropRecord(value: unknown) {
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : null
+}
+
+function getSlideEditObjectImageCropJSONNumber(value: unknown) {
+  if (typeof value === 'number') {
+    return value
+  }
+
+  if (typeof value === 'string' && value.trim()) {
+    return Number(value)
+  }
+
+  return null
+}
+
+function parseSlideEditObjectImageCropJSON(value: string) {
+  return parseSlideEditJSONPasteTextValue(value)
 }

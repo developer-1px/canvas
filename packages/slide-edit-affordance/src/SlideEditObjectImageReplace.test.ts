@@ -7,10 +7,12 @@ import {
   getSlideEditObjectImageReplaceJSONPasteValueFromText,
   getSlideEditObjectImageReplaceJSONPasteValueFromValue,
   getSlideEditObjectImageReplaceMetadata,
+  getSlideEditObjectImageReplacePasteCommandEffect,
   normalizeSlideEditObjectImageReplaceCommand,
   normalizeSlideEditObjectImageReplaceSource,
   SLIDE_EDIT_OBJECT_IMAGE_REPLACE_DATA_ATTRIBUTE,
   SLIDE_EDIT_OBJECT_IMAGE_REPLACE_FIELD,
+  SLIDE_EDIT_OBJECT_IMAGE_REPLACE_JSON_MIME_TYPE,
 } from './SlideEditObjectImageReplace'
 import {
   getSlideEditObjectImageReplaceJSONPasteValue as getSlideEditObjectImageReplaceJSONPasteValueFromPackage,
@@ -466,3 +468,11 @@ describe('SlideEditObjectImageReplace', () => {
     }
   })
 })
+
+function createDataTransfer(values: Record<string, string>) {
+  return {
+    getData(type: string) {
+      return values[type] ?? ''
+    },
+  }
+}

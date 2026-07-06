@@ -165,6 +165,23 @@ describe('SlideEditTextBody', () => {
       sourceType: 'custom/test',
       surface: 'text-body',
     })
+    expect(getSlideEditTextBodyJSONPasteValueFromText(
+      [
+        '```json',
+        '{"text":"Fenced JSON"}',
+        '```',
+      ].join('\n'),
+    )).toMatchObject({
+      body: {
+        paragraphs: [
+          {
+            text: 'Fenced JSON',
+          },
+        ],
+      },
+      paragraphCount: 1,
+      runCount: 1,
+    })
     expect(getSlideEditTextBodyJSONPasteValueFromValue({
       textBody: {
         plainText: 'Title\nBody',

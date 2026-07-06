@@ -1,3 +1,5 @@
+import { parseSlideEditJSONPasteTextValue } from './SlideEditTextJSONPaste'
+
 export type SlideEditTableRowsSlideId = string
 export type SlideEditTableRowsObjectId = string
 
@@ -442,13 +444,5 @@ function getSlideEditTableRowsColumnCount(rows: SlideEditTableRowsMatrix) {
 }
 
 function parseSlideEditTableRowsJSON(value: string) {
-  if (!value.trim()) {
-    return null
-  }
-
-  try {
-    return JSON.parse(value) as unknown
-  } catch {
-    return null
-  }
+  return parseSlideEditJSONPasteTextValue(value)
 }

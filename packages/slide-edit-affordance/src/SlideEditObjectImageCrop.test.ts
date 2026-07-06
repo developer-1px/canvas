@@ -18,6 +18,7 @@ import {
   SLIDE_EDIT_OBJECT_IMAGE_CROP_DEFAULT_FIT,
   SLIDE_EDIT_OBJECT_IMAGE_CROP_FIELDS,
   SLIDE_EDIT_OBJECT_IMAGE_CROP_FIT_OPTIONS,
+  SLIDE_EDIT_OBJECT_IMAGE_CROP_JSON_MIME_TYPE,
   SLIDE_EDIT_OBJECT_IMAGE_CROP_LIMITS,
   toSlideEditObjectImageCropAttributeValue,
 } from './SlideEditObjectImageCrop'
@@ -483,3 +484,11 @@ describe('SlideEditObjectImageCrop', () => {
     }
   })
 })
+
+function createDataTransfer(values: Record<string, string>) {
+  return {
+    getData(type: string) {
+      return values[type] ?? ''
+    },
+  }
+}

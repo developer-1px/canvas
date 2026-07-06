@@ -1,5 +1,8 @@
 import { normalizeSlideEditColorHex } from './SlideEditColorSwatchPalette'
-import { SLIDE_EDIT_TEXT_JSON_PASTE_TYPES } from './SlideEditTextJSONPaste'
+import {
+  parseSlideEditJSONPasteTextValue,
+  SLIDE_EDIT_TEXT_JSON_PASTE_TYPES,
+} from './SlideEditTextJSONPaste'
 
 const SLIDE_EDIT_TEXT_RUN_FORMATTING_MIME_PREFIX =
   'application/vnd.interactive-os.slide-edit.text-run'
@@ -717,13 +720,5 @@ function getSlideEditTextRunSizeNumber(value: unknown) {
 }
 
 function parseSlideEditTextRunFormattingJSON(value: string) {
-  if (!value.trim()) {
-    return null
-  }
-
-  try {
-    return JSON.parse(value) as unknown
-  } catch {
-    return null
-  }
+  return parseSlideEditJSONPasteTextValue(value)
 }

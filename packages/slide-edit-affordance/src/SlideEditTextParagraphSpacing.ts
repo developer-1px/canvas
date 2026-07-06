@@ -1,4 +1,7 @@
-import { SLIDE_EDIT_TEXT_JSON_PASTE_TYPES } from './SlideEditTextJSONPaste'
+import {
+  parseSlideEditJSONPasteTextValue,
+  SLIDE_EDIT_TEXT_JSON_PASTE_TYPES,
+} from './SlideEditTextJSONPaste'
 
 export type SlideEditTextParagraphSlideId = string
 export type SlideEditTextParagraphObjectId = string
@@ -688,15 +691,7 @@ function getSlideEditTextParagraphSpacingJSONNumber(
 }
 
 function parseSlideEditTextParagraphSpacingJSON(value: string) {
-  if (!value.trim()) {
-    return null
-  }
-
-  try {
-    return JSON.parse(value) as unknown
-  } catch {
-    return null
-  }
+  return parseSlideEditJSONPasteTextValue(value)
 }
 
 function normalizeSlideEditTextParagraphSpacingUnit(

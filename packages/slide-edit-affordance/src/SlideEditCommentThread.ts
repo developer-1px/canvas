@@ -1,3 +1,5 @@
+import { parseSlideEditJSONPasteTextValue } from './SlideEditTextJSONPaste'
+
 export type SlideEditCommentThreadSlideId = string
 export type SlideEditCommentThreadCommentId = string
 export type SlideEditCommentThreadMessageId = string
@@ -533,13 +535,5 @@ function getSlideEditCommentThreadText(value: unknown) {
 }
 
 function parseSlideEditCommentThreadJSON(value: string) {
-  if (!value.trim()) {
-    return null
-  }
-
-  try {
-    return JSON.parse(value) as unknown
-  } catch {
-    return null
-  }
+  return parseSlideEditJSONPasteTextValue(value)
 }

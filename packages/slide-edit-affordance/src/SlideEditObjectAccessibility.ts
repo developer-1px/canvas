@@ -1,3 +1,5 @@
+import { getSlideEditJSONPasteTextCandidates } from './SlideEditTextJSONPaste'
+
 export type SlideEditObjectAccessibilitySlideId = string
 export type SlideEditObjectAccessibilityObjectId = string
 
@@ -593,15 +595,21 @@ function getSlideEditObjectAccessibilityRemovePasteValue():
 }
 
 function parseSlideEditObjectAccessibilityJSON(value: string) {
-  if (!value.trim()) {
+  const candidates = getSlideEditJSONPasteTextCandidates(value)
+
+  if (candidates.length === 0) {
     return null
   }
 
-  try {
-    return JSON.parse(value) as unknown
-  } catch {
-    return SLIDE_EDIT_OBJECT_ACCESSIBILITY_INVALID_JSON
+  for (const candidate of candidates) {
+    try {
+      return JSON.parse(candidate) as unknown
+    } catch {
+      // Try the next candidate before marking the payload invalid.
+    }
   }
+
+  return SLIDE_EDIT_OBJECT_ACCESSIBILITY_INVALID_JSON
 }
 
 function normalizeSlideEditObjectAltText(value: string | null | undefined) {

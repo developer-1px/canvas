@@ -3,19 +3,15 @@ import { describe, expect, it } from 'vitest'
 import {
   createSlideEditTextParagraphAlignDescriptor,
   getSlideEditTextParagraphAlignCommandEffect,
-  getSlideEditTextParagraphAlignCSSValue,
   getSlideEditTextParagraphAlignJSONPasteValue,
   getSlideEditTextParagraphAlignJSONPasteValueFromText,
   getSlideEditTextParagraphAlignJSONPasteValueFromValue,
   getSlideEditTextParagraphAlignKeyboardIntent,
-  normalizeSlideEditTextParagraphAlign,
-  SLIDE_EDIT_TEXT_PARAGRAPH_ALIGN_DEFAULT,
   SLIDE_EDIT_TEXT_PARAGRAPH_ALIGN_FIELD,
   SLIDE_EDIT_TEXT_PARAGRAPH_ALIGN_KEYBOARD_KEYS,
   SLIDE_EDIT_TEXT_PARAGRAPH_ALIGN_OPTIONS,
 } from './SlideEditTextParagraphAlign'
 import {
-  createSlideEditTextParagraphAlignDescriptor as createSlideEditTextParagraphAlignDescriptorFromPackage,
   getSlideEditTextParagraphAlignJSONPasteValueFromText as getSlideEditTextParagraphAlignJSONPasteValueFromTextFromPackage,
   getSlideEditTextParagraphAlignJSONPasteValueFromValue as getSlideEditTextParagraphAlignJSONPasteValueFromValueFromPackage,
 } from './index'

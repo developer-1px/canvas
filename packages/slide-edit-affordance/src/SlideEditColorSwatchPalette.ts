@@ -1,3 +1,5 @@
+import { parseSlideEditJSONPasteTextValue } from './SlideEditTextJSONPaste'
+
 import type {
   SlideEditThemeColorRole,
   SlideEditThemeColorToken,
@@ -1103,13 +1105,5 @@ function getSlideEditColorSwatchTelemetryFromPasteValue<
 }
 
 function parseSlideEditColorSwatchJSON(value: string) {
-  if (!value.trim()) {
-    return null
-  }
-
-  try {
-    return JSON.parse(value) as unknown
-  } catch {
-    return null
-  }
+  return parseSlideEditJSONPasteTextValue(value)
 }

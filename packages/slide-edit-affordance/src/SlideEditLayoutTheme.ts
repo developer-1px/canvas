@@ -1,3 +1,5 @@
+import { parseSlideEditJSONPasteTextValue } from './SlideEditTextJSONPaste'
+
 import type { Bounds } from '../../../src/canvas/core'
 
 import {
@@ -1042,13 +1044,5 @@ function getSlideEditLayoutJSONText(value: unknown) {
 }
 
 function parseSlideEditLayoutJSON(value: string) {
-  if (!value.trim()) {
-    return null
-  }
-
-  try {
-    return JSON.parse(value) as unknown
-  } catch {
-    return null
-  }
+  return parseSlideEditJSONPasteTextValue(value)
 }
