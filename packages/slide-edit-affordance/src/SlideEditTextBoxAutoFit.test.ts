@@ -1,11 +1,19 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  getSlideEditTextAutoFitJSONPasteValueFromValue,
   getSlideEditTextAutoFitGestureCommandEffect,
+  getSlideEditTextAutoFitPasteCommandEffects,
   getSlideEditTextAutoSizeBounds,
   getSlideEditTextOverflowIndicatorState,
+  SLIDE_EDIT_TEXT_AUTO_FIT_IMPORT_MODEL,
+  SLIDE_EDIT_TEXT_AUTO_FIT_JSON_IMPORT_FORMAT,
   SLIDE_EDIT_TEXT_BOX_SIZE_MODES,
 } from './SlideEditTextBoxAutoFit'
+import {
+  SLIDE_EDIT_TEXT_AUTO_FIT_IMPORT_MODEL as SLIDE_EDIT_TEXT_AUTO_FIT_IMPORT_MODEL_FROM_PACKAGE,
+  SLIDE_EDIT_TEXT_AUTO_FIT_JSON_IMPORT_FORMAT as SLIDE_EDIT_TEXT_AUTO_FIT_JSON_IMPORT_FORMAT_FROM_PACKAGE,
+} from './index'
 
 describe('SlideEditTextBoxAutoFit', () => {
   it('defines product-neutral text box size modes', () => {
@@ -32,6 +40,17 @@ describe('SlideEditTextBoxAutoFit', () => {
         requiredAdapterSlot: 'text-measurement',
       },
     ])
+  })
+
+  it('exports text auto-fit import model and format metadata', () => {
+    expect(SLIDE_EDIT_TEXT_AUTO_FIT_IMPORT_MODEL)
+      .toBe('slide-edit-text-auto-fit-import')
+    expect(SLIDE_EDIT_TEXT_AUTO_FIT_JSON_IMPORT_FORMAT)
+      .toBe('application-json-slide-edit-text-auto-fit')
+    expect(SLIDE_EDIT_TEXT_AUTO_FIT_IMPORT_MODEL_FROM_PACKAGE)
+      .toBe(SLIDE_EDIT_TEXT_AUTO_FIT_IMPORT_MODEL)
+    expect(SLIDE_EDIT_TEXT_AUTO_FIT_JSON_IMPORT_FORMAT_FROM_PACKAGE)
+      .toBe(SLIDE_EDIT_TEXT_AUTO_FIT_JSON_IMPORT_FORMAT)
   })
 
   it('computes auto-size target bounds from host text measurement', () => {
@@ -148,6 +167,54 @@ describe('SlideEditTextBoxAutoFit', () => {
         slideId: 'slide-a',
       },
       type: 'slide-command-effect',
+    })
+  })
+
+  it('parses auto-fit JSON paste values into resize command effects', () => {
+    const pasteValue = getSlideEditTextAutoFitJSONPasteValueFromValue(
+      {
+        textAutoFit: {
+          handle: 's',
+          mode: 'resize-to-fit',
+        },
+      },
+      { mode: 'wrapped' },
+    )
+
+    expect(pasteValue).toEqual({
+      handle: 's',
+      mode: 'resize-to-fit',
+      sourceFields: {
+        handle: 'handle',
+        mode: 'mode',
+        wrapper: 'textAutoFit',
+      },
+      surface: 'text-auto-fit',
+    })
+    expect(pasteValue && getSlideEditTextAutoFitPasteCommandEffects({
+      pasteValue,
+      slideId: 'slide-a',
+      targets: [
+        {
+          bounds: { h: 40, w: 100, x: 10, y: 20 },
+          measurement: {
+            hasOverflow: true,
+            measuredSize: { h: 90, w: 120 },
+          },
+          objectId: 'title',
+        },
+      ],
+    }).effects[0]).toMatchObject({
+      payload: {
+        handle: 's',
+        id: 'resize-text-box-to-fit',
+        objectId: 'title',
+        sizeMode: 'resize-to-fit',
+      },
+      selection: {
+        objectIds: ['title'],
+        slideId: 'slide-a',
+      },
     })
   })
 })
