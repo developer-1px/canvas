@@ -16,7 +16,9 @@
 | Slide command effects | `slide-edit-affordance` | product-neutral command envelopes routed to the host |
 | Slide rail interaction | `slide-edit-affordance` | active slide, slide order, thumbnail hit target, rail command intent |
 | Color swatch palette | `slide-edit-affordance` | theme/recent color swatches, channel state, and color apply command effect |
+| Comment thread patch | `slide-edit-affordance` | comment/thread JSON paste parsing, common patch normalization, and host command effect |
 | Placeholder visibility affordance | `slide-edit-affordance` | slide placeholder structure and object hide/show read model |
+| Table rows patch | `slide-edit-affordance` | table rows JSON paste parsing, row matrix normalization, and host command effect |
 | Object layer pane | `slide-edit-affordance` | object row descriptor, selection pane command intent, ARIA tree contract |
 | Object accessibility | `slide-edit-affordance` | object alt text, decorative state, metadata attribute, and host command effect |
 | Object animation build order | `slide-edit-affordance` | object animation type, trigger, timing, and slide-local build order |
@@ -31,7 +33,9 @@
 | Slide metadata inspector | `slide-edit-affordance` | active slide name, background, notes, size, orientation fields |
 | Style clipboard | `slide-edit-affordance` | source object style categories, target applicability, and format painter command effects |
 | Slide transition timing | `slide-edit-affordance` | transition type, duration, click/after advance policy |
+| Text body patch | `slide-edit-affordance` | text body JSON paste parsing, paragraph/run normalization, and host command effect |
 | Text font family | `slide-edit-affordance` | selected text object font family options and command effects |
+| Text font weight | `slide-edit-affordance` | selected text object font weight JSON paste and command effects |
 | Text frame inset | `slide-edit-affordance` | text frame top/right/bottom/left inset metadata and command effects |
 | Text vertical alignment | `slide-edit-affordance` | text frame internal vertical alignment metadata and command effects |
 | Text paragraph spacing | `slide-edit-affordance` | line height and paragraph before/after spacing descriptors |
@@ -146,6 +150,42 @@
 | Updates | field edits become host command effects with object id and normalized value |
 | Runtime | host owns text layout, preview rendering, export mapping, and persistence |
 
+## Text Paragraph Align JSON Paste Contract
+
+| Area | Contract |
+| --- | --- |
+| Values | `left`, `center`, and `right`; unknown values fall back to `left` outside paste parsing |
+| Field | `paragraphAlign` segmented-control descriptor routes through `update-text-paragraph-align` |
+| CSS | helper returns stable `text-align` values matching the normalized align value |
+| Custom MIME | `application/vnd.interactive-os.slide-edit.text-paragraph-align+json` may carry a direct JSON string value |
+| General JSON | `application/json` and `text/plain` require an explicit field key such as `textParagraphAlign`, `paragraphAlign`, `textAlign`, `align`, or `value` |
+| Plain text | generic `text/plain` direct values such as `"center"` are not interpreted as paragraph align |
+| Updates | selected slide id, text object id, field id, and normalized align value become host command effects |
+| Scope | horizontal paragraph alignment only; text frame vertical alignment remains a separate affordance |
+
+## Text Paragraph Bullet/List JSON Paste Contract
+
+| Area | Contract |
+| --- | --- |
+| Values | `none`, `bullet`, and `numbered`; unknown list values are rejected |
+| Field | `paragraphBullet` segmented-control descriptor routes through `update-text-paragraph-bullet` |
+| Custom MIME | `application/vnd.interactive-os.slide-edit.text-paragraph-bullet+json` may carry a direct JSON string value |
+| General JSON | `application/json` and `text/plain` require an explicit field key such as `paragraphBullet`, `textParagraphBullet`, `bullet`, `list`, or `value` |
+| Plain text | generic `text/plain` direct values such as `"bullet"` are not interpreted as list state |
+| Updates | selected slide id, text object id, field id, and normalized list value become host command effects |
+| Scope | complements rich text paste paragraph metadata without owning host text storage or HTML import rules |
+
+## Text Body Patch Contract
+
+| Area | Contract |
+| --- | --- |
+| JSON candidates | text-body custom MIME, `application/json`, `text/json`, and `text/plain` are checked in order |
+| JSON payloads | custom MIME may carry direct string/object payload; generic JSON requires `textBody`, `body`, `content`, `text`, or `plainText` wrapper |
+| Body shapes | string payloads split into paragraphs; `{ paragraphs: [...] }` payloads preserve paragraph/run structure |
+| Host policy | max paragraph, max runs, max text length, and final text body schema conversion stay host-owned |
+| Metadata | command effect metadata carries target ids, paragraph count, run count, format, and payload length |
+| No-op | missing/hidden/locked/non-text target, host normalizer rejection, parse failure, direct generic JSON, or empty body returns `null` |
+
 ## Text Font Family Contract
 
 | Area | Contract |
@@ -156,6 +196,32 @@
 | Fallback | unknown or empty family normalizes to fallback or first allowed option |
 | Updates | selected object id and normalized font family value become host command effects |
 | Runtime | host owns actual font loading, text layout, export mapping, and persistence |
+
+## Text Font Weight JSON Paste Contract
+
+| Area | Contract |
+| --- | --- |
+| Values | `regular`, `semibold`, and `bold`; unknown values fall back to `regular` outside paste parsing |
+| Field | `fontWeight` segmented-control descriptor routes through `update-text-font-weight` |
+| Boolean wrapper | explicit JSON `bold: true` maps to `bold`; `bold: false` maps to `regular` |
+| CSS | helper returns stable CSS font-weight values `400`, `600`, and `700` |
+| Custom MIME | `application/vnd.interactive-os.slide-edit.text-font-weight+json` may carry a direct JSON string value |
+| General JSON | `application/json` and `text/plain` require an explicit field key such as `textFontWeight`, `fontWeight`, `weight`, `bold`, or `value` |
+| Plain text | generic `text/plain` direct values such as `"bold"` or `true` are not interpreted as font weight |
+| Updates | selected slide id, text object id, field id, and normalized font weight value become host command effects |
+| Scope | text font weight field values only; keyboard bold toggle and text run formatting remain separate affordances |
+
+## Text Run Formatting JSON Paste Contract
+
+| Area | Contract |
+| --- | --- |
+| Fields | built-in fields are `bold`, `italic`, and `underline` |
+| Values | each field accepts boolean values only; strings and numeric truthy values are rejected |
+| Custom MIME | `application/vnd.interactive-os.slide-edit.text-run-{field}+json` may carry a direct JSON boolean |
+| General JSON | `application/json` and `text/plain` require an explicit field key such as `textRunItalic`, `runItalic`, `italic`, or `value` |
+| Plain text | generic `text/plain` direct values such as `true` are not interpreted as run formatting |
+| Updates | selected slide id, object ids, field id, and boolean value become `update-text-run-formatting` command effects |
+| Scope | complements keyboard toggle intents and rich text paste run metadata without owning host text storage |
 
 ## Text Vertical Alignment Contract
 
@@ -349,6 +415,42 @@
 | `bounds` / `defaultBounds` | default slot geometry before host object mapping | current placeholder geometry on a concrete slide |
 | `isLocked` | layout slot cannot be casually remapped | placeholder or object is not user-editable |
 | `isVisible` | layout slot may be hidden by default | placeholder/object can be hidden while still represented in controls |
+
+## Object Image Replace Contract
+
+| Area | Contract |
+| --- | --- |
+| Field | `source` file-input descriptor routes through `replace-object-image` |
+| Source fields | `src`, `mimeType`, `name`, `altText`, `naturalWidth`, and `naturalHeight` are normalized before host application |
+| JSON candidates | custom MIME and wrapped `application/json` are checked in order |
+| JSON payloads | generic JSON requires `imageReplace`, `imageSource`, `objectImage`, or `replacementImage` wrapper; custom MIME may carry direct source JSON |
+| Selection | exactly one supported image target can produce a command effect |
+| No-op | locked, hidden, mixed, and unsupported targets return unavailable route metadata |
+
+## Comment Thread Patch Contract
+
+| Area | Contract |
+| --- | --- |
+| JSON candidates | comment-thread custom MIME, `application/json`, `text/json`, and `text/plain` are checked in order |
+| JSON payloads | custom MIME may carry direct payload; generic JSON requires `comment`, `commentThread`, or `reviewComment` wrapper |
+| Fields | `body`/`text`, `resolved`, `createdAt`, `thread`, `messages`, and `replies` normalize into one comment patch |
+| Messages | string messages and `{ id, authorName, createdAt, body/text }` objects are accepted |
+| Body sync | when body is present, the first thread message body is synchronized with it |
+| Host policy | body length, reply length, message id creation, storage mutation, and hidden/locked target policy stay host-owned |
+| Metadata | command effect metadata carries target ids, fields, message count, resolved state, format, and payload length |
+| No-op | missing selected comment, hidden/locked target, parse failure, direct generic JSON, or missing patch fields returns `null` |
+
+## Table Rows Patch Contract
+
+| Area | Contract |
+| --- | --- |
+| JSON candidates | table-rows custom MIME, `application/json`, `text/json`, and `text/plain` are checked in order |
+| JSON payloads | custom MIME may carry direct rows/object payload; generic JSON requires `tableRows`, `table`, or `rows` wrapper |
+| Row shapes | `columns`/`headers` + rows, two-dimensional rows, and object row arrays normalize into one string matrix |
+| Headers | `columns` or `headers` become a header row before body rows |
+| Host policy | max row, max column, max cell length, cell normalization, and final table schema conversion stay host-owned |
+| Metadata | command effect metadata carries target ids, row count, column count, format, and payload length |
+| No-op | missing/hidden/locked/non-table target, parse failure, direct generic JSON, or empty rows returns `null` |
 
 ## Slide Object Clipboard Contract
 

@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest'
 import {
   createSlideEditObjectOpacityDescriptor,
   getSlideEditObjectOpacityCommandEffect,
+  getSlideEditObjectOpacityJSONPasteValue,
+  getSlideEditObjectOpacityJSONPasteValueFromText,
   getSlideEditObjectOpacityJSONPasteValueFromValue,
   getSlideEditObjectOpacityMetadata,
   getSlideEditObjectOpacityPasteCommand,
@@ -16,6 +18,9 @@ import {
   toSlideEditObjectOpacityAttributeValue,
 } from './SlideEditObjectOpacity'
 import {
+  getSlideEditObjectOpacityJSONPasteValue as getSlideEditObjectOpacityJSONPasteValueFromPackage,
+  getSlideEditObjectOpacityJSONPasteValueFromText as getSlideEditObjectOpacityJSONPasteValueFromTextFromPackage,
+  getSlideEditObjectOpacityJSONPasteValueFromValue as getSlideEditObjectOpacityJSONPasteValueFromValueFromPackage,
   SLIDE_EDIT_OBJECT_OPACITY_IMPORT_MODEL as SLIDE_EDIT_OBJECT_OPACITY_IMPORT_MODEL_FROM_PACKAGE,
   SLIDE_EDIT_OBJECT_OPACITY_JSON_IMPORT_FORMAT as SLIDE_EDIT_OBJECT_OPACITY_JSON_IMPORT_FORMAT_FROM_PACKAGE,
 } from './index'
@@ -134,6 +139,80 @@ describe('SlideEditObjectOpacity', () => {
       slideId: 'slide-a',
       value: 0.38,
     })
+
+    expect(getSlideEditObjectOpacityJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/json': '{"objectOpacityValue":0.335}',
+      }),
+    })).toEqual({
+      value: 0.34,
+    })
+    expect(getSlideEditObjectOpacityJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"objectOpacity":{"opacity":1.2}}',
+      }),
+    })).toEqual({
+      value: 1,
+    })
+    expect(getSlideEditObjectOpacityJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"objectOpacity":0}',
+      }),
+    })).toEqual({
+      value: 0,
+    })
+  })
+
+  it('reads object opacity JSON from text and parsed values', () => {
+    expect(getSlideEditObjectOpacityJSONPasteValueFromText(
+      '{"objectOpacity":{"value":"0.67"}}',
+      { mode: 'wrapped' },
+    )).toEqual({
+      value: 0.67,
+    })
+    expect(getSlideEditObjectOpacityJSONPasteValueFromValue({
+      opacity: 0.335,
+    })).toEqual({
+      value: 0.34,
+    })
+    expect(getSlideEditObjectOpacityJSONPasteValueFromTextFromPackage(
+      '{"objectOpacityValue":0}',
+      { mode: 'wrapped' },
+    )).toEqual({
+      value: 0,
+    })
+    expect(getSlideEditObjectOpacityJSONPasteValueFromValueFromPackage({
+      value: '1.2',
+    })).toEqual({
+      value: 1,
+    })
+    expect(getSlideEditObjectOpacityJSONPasteValueFromPackage({
+      dataTransfer: createDataTransfer({
+        'application/json': '{"objectOpacityValue":0.25}',
+      }),
+    })).toEqual({
+      value: 0.25,
+    })
+  })
+
+  it('converts object opacity paste values into host commands', () => {
+    const pasteValue = getSlideEditObjectOpacityJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"objectOpacity":"0.67"}',
+      }),
+    })
+
+    expect(getSlideEditObjectOpacityPasteCommand({
+      objectId: 'object-a',
+      pasteValue: pasteValue!,
+      slideId: 'slide-a',
+    })).toEqual({
+      fieldId: 'opacity',
+      id: 'update-object-opacity',
+      objectId: 'object-a',
+      slideId: 'slide-a',
+      value: 0.67,
+    })
   })
 
   it('does not expose product names or host storage names in runtime strings', () => {
@@ -158,3 +237,13 @@ describe('SlideEditObjectOpacity', () => {
     }
   })
 })
+
+function createDataTransfer(
+  values: Record<string, string>,
+): Pick<DataTransfer, 'getData'> {
+  return {
+    getData(type) {
+      return values[type] ?? ''
+    },
+  }
+}

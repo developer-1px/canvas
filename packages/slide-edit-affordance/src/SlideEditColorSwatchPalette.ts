@@ -1,3 +1,5 @@
+import { parseSlideEditJSONPasteTextValue } from './SlideEditTextJSONPaste'
+
 import type {
   SlideEditThemeColorRole,
   SlideEditThemeColorToken,
@@ -136,6 +138,144 @@ export type SlideEditColorSwatchHostCommandEffect<
   type: 'slide-command-effect'
 }
 
+export type SlideEditColorSwatchDataTransfer = Pick<DataTransfer, 'getData'>
+
+export type SlideEditColorSwatchJSONPasteValue<
+  TChannelId extends SlideEditColorSwatchChannelId =
+    SlideEditColorSwatchBuiltInChannelId,
+  TColorTokenId extends SlideEditThemeColorTokenId =
+    SlideEditThemeColorTokenId,
+> = {
+  channelId: TChannelId | null
+  source: SlideEditColorSwatchSource
+  swatchId: string
+  tokenId?: TColorTokenId
+  value: string
+}
+
+export type SlideEditColorSwatchJSONPasteInput = {
+  dataTransfer: SlideEditColorSwatchDataTransfer | null
+  jsonMimeType?: string
+}
+
+export type SlideEditColorSwatchJSONPasteValueMode =
+  | 'direct'
+  | 'direct-with-channel'
+  | 'wrapped'
+
+export type SlideEditColorSwatchJSONPasteValueOptions = {
+  mode?: SlideEditColorSwatchJSONPasteValueMode
+}
+
+export type SlideEditColorSwatchPasteTarget<
+  TObjectId extends SlideEditColorSwatchObjectId =
+    SlideEditColorSwatchObjectId,
+  TChannelId extends SlideEditColorSwatchChannelId =
+    SlideEditColorSwatchBuiltInChannelId,
+> = {
+  defaultChannelId?: TChannelId | null
+  isHidden?: boolean
+  isLocked?: boolean
+  objectId: TObjectId
+  supportedChannelIds?: readonly TChannelId[]
+}
+
+export type SlideEditColorSwatchPasteSkipReason =
+  | 'hidden-target'
+  | 'locked-target'
+  | 'missing-channel'
+  | 'unsupported-channel'
+
+export type SlideEditColorSwatchPasteSkippedTarget<
+  TObjectId extends SlideEditColorSwatchObjectId =
+    SlideEditColorSwatchObjectId,
+  TChannelId extends SlideEditColorSwatchChannelId =
+    SlideEditColorSwatchBuiltInChannelId,
+> = {
+  channelId?: TChannelId
+  objectId: TObjectId
+  reason: SlideEditColorSwatchPasteSkipReason
+}
+
+export type SlideEditColorSwatchPasteAppliedTarget<
+  TObjectId extends SlideEditColorSwatchObjectId =
+    SlideEditColorSwatchObjectId,
+  TChannelId extends SlideEditColorSwatchChannelId =
+    SlideEditColorSwatchBuiltInChannelId,
+  TColorTokenId extends SlideEditThemeColorTokenId =
+    SlideEditThemeColorTokenId,
+> = {
+  channelId: TChannelId
+  commandId: 'apply-color-swatch'
+  effectType: 'slide-command-effect'
+  objectId: TObjectId
+  source: SlideEditColorSwatchSource
+  swatchId: string
+  tokenId?: TColorTokenId
+  value: string
+}
+
+export type SlideEditColorSwatchChannelSupportInput<
+  TObjectId extends SlideEditColorSwatchObjectId =
+    SlideEditColorSwatchObjectId,
+  TChannelId extends SlideEditColorSwatchChannelId =
+    SlideEditColorSwatchBuiltInChannelId,
+  TColorTokenId extends SlideEditThemeColorTokenId =
+    SlideEditThemeColorTokenId,
+> = {
+  channelId: TChannelId
+  pasteValue: SlideEditColorSwatchJSONPasteValue<TChannelId, TColorTokenId>
+  target: SlideEditColorSwatchPasteTarget<TObjectId, TChannelId>
+}
+
+export type SlideEditColorSwatchPasteCommandEffectsInput<
+  TSlideId extends SlideEditColorSwatchSlideId = SlideEditColorSwatchSlideId,
+  TObjectId extends SlideEditColorSwatchObjectId =
+    SlideEditColorSwatchObjectId,
+  TChannelId extends SlideEditColorSwatchChannelId =
+    SlideEditColorSwatchBuiltInChannelId,
+  TColorTokenId extends SlideEditThemeColorTokenId =
+    SlideEditThemeColorTokenId,
+> = {
+  isChannelSupported?: (
+    input: SlideEditColorSwatchChannelSupportInput<
+      TObjectId,
+      TChannelId,
+      TColorTokenId
+    >,
+  ) => boolean
+  pasteValue: SlideEditColorSwatchJSONPasteValue<TChannelId, TColorTokenId>
+  slideId: TSlideId
+  targets: readonly SlideEditColorSwatchPasteTarget<TObjectId, TChannelId>[]
+}
+
+export type SlideEditColorSwatchPasteCommandEffectsResult<
+  TSlideId extends SlideEditColorSwatchSlideId = SlideEditColorSwatchSlideId,
+  TObjectId extends SlideEditColorSwatchObjectId =
+    SlideEditColorSwatchObjectId,
+  TChannelId extends SlideEditColorSwatchChannelId =
+    SlideEditColorSwatchBuiltInChannelId,
+  TColorTokenId extends SlideEditThemeColorTokenId =
+    SlideEditThemeColorTokenId,
+> = {
+  appliedTargets: readonly SlideEditColorSwatchPasteAppliedTarget<
+    TObjectId,
+    TChannelId,
+    TColorTokenId
+  >[]
+  effects: readonly SlideEditColorSwatchHostCommandEffect<
+    TSlideId,
+    TObjectId,
+    TChannelId,
+    TColorTokenId
+  >[]
+  pasteValue: SlideEditColorSwatchJSONPasteValue<TChannelId, TColorTokenId>
+  skippedTargets: readonly SlideEditColorSwatchPasteSkippedTarget<
+    TObjectId,
+    TChannelId
+  >[]
+}
+
 export const SLIDE_EDIT_COLOR_SWATCH_CHANNELS = Object.freeze([
   {
     id: 'fill',
@@ -163,6 +303,31 @@ export const SLIDE_EDIT_COLOR_SWATCH_FIELD = Object.freeze({
   id: 'colorSwatch',
   requiredAdapterSlot: 'command-effect',
 } as const satisfies SlideEditColorSwatchFieldDescriptor)
+
+export const SLIDE_EDIT_COLOR_SWATCH_JSON_MIME_TYPE =
+  'application/vnd.interactive-os.slide-edit.color-swatch+json'
+
+export const SLIDE_EDIT_COLOR_SWATCH_JSON_TYPES = Object.freeze([
+  'application/json',
+  'text/json',
+  'text/plain',
+] as const)
+
+export const SLIDE_EDIT_COLOR_SWATCH_JSON_WRAPPER_KEYS = Object.freeze([
+  'colorSwatch',
+  'swatch',
+] as const)
+
+const SLIDE_EDIT_COLOR_SWATCH_VALUE_KEYS = Object.freeze([
+  'color',
+  'value',
+  'hex',
+] as const)
+
+const SLIDE_EDIT_COLOR_SWATCH_CHANNEL_KEYS = Object.freeze([
+  'channel',
+  'channelId',
+] as const)
 
 export function createSlideEditColorSwatchPaletteDescriptor<
   TSlideId extends SlideEditColorSwatchSlideId,
@@ -277,6 +442,205 @@ export function getSlideEditColorSwatchCommandEffect<
   }
 }
 
+export function getSlideEditColorSwatchJSONPasteValue({
+  dataTransfer,
+  jsonMimeType = SLIDE_EDIT_COLOR_SWATCH_JSON_MIME_TYPE,
+}: SlideEditColorSwatchJSONPasteInput):
+  SlideEditColorSwatchJSONPasteValue | null {
+  if (!dataTransfer) {
+    return null
+  }
+
+  if (jsonMimeType) {
+    const customText = dataTransfer.getData(jsonMimeType)
+
+    if (customText.trim()) {
+      const customPasteValue = getSlideEditColorSwatchJSONPasteValueFromText(
+        customText,
+        { mode: 'direct' },
+      )
+
+      if (customPasteValue !== null) {
+        return customPasteValue
+      }
+    }
+  }
+
+  for (const type of SLIDE_EDIT_COLOR_SWATCH_JSON_TYPES) {
+    const text = dataTransfer.getData(type)
+
+    if (!text.trim()) {
+      continue
+    }
+
+    const wrappedPasteValue = getSlideEditColorSwatchJSONPasteValueFromText(
+      text,
+      { mode: 'wrapped' },
+    )
+
+    if (wrappedPasteValue !== null) {
+      return wrappedPasteValue
+    }
+
+    const directPasteValue = getSlideEditColorSwatchJSONPasteValueFromText(
+      text,
+      { mode: 'direct-with-channel' },
+    )
+
+    if (directPasteValue !== null) {
+      return directPasteValue
+    }
+  }
+
+  return null
+}
+
+export function getSlideEditColorSwatchJSONPasteValueFromText(
+  text: string,
+  options?: SlideEditColorSwatchJSONPasteValueOptions,
+): SlideEditColorSwatchJSONPasteValue | null {
+  return getSlideEditColorSwatchJSONPasteValueFromValue(
+    parseSlideEditColorSwatchJSON(text),
+    options,
+  )
+}
+
+export function getSlideEditColorSwatchJSONPasteValueFromValue(
+  value: unknown,
+  { mode = 'direct' }: SlideEditColorSwatchJSONPasteValueOptions = {},
+): SlideEditColorSwatchJSONPasteValue | null {
+  switch (mode) {
+    case 'direct':
+      return getSlideEditColorSwatchDirectPasteValue(value, {
+        requireChannel: false,
+      })
+    case 'direct-with-channel':
+      return getSlideEditColorSwatchDirectPasteValue(value, {
+        requireChannel: true,
+      })
+    case 'wrapped':
+      return getSlideEditColorSwatchWrappedPasteValue(value)
+  }
+}
+
+export function getSlideEditColorSwatchPasteCommandEffects<
+  TSlideId extends SlideEditColorSwatchSlideId,
+  TObjectId extends SlideEditColorSwatchObjectId,
+  TChannelId extends SlideEditColorSwatchChannelId,
+  TColorTokenId extends SlideEditThemeColorTokenId,
+>({
+  isChannelSupported,
+  pasteValue,
+  slideId,
+  targets,
+}: SlideEditColorSwatchPasteCommandEffectsInput<
+  TSlideId,
+  TObjectId,
+  TChannelId,
+  TColorTokenId
+>): SlideEditColorSwatchPasteCommandEffectsResult<
+  TSlideId,
+  TObjectId,
+  TChannelId,
+  TColorTokenId
+> {
+  const objectIdsByChannel = new Map<TChannelId, TObjectId[]>()
+  const appliedTargets: SlideEditColorSwatchPasteAppliedTarget<
+    TObjectId,
+    TChannelId,
+    TColorTokenId
+  >[] = []
+  const skippedTargets: SlideEditColorSwatchPasteSkippedTarget<
+    TObjectId,
+    TChannelId
+  >[] = []
+
+  for (const target of targets) {
+    if (target.isLocked) {
+      skippedTargets.push({
+        objectId: target.objectId,
+        reason: 'locked-target',
+      })
+      continue
+    }
+
+    if (target.isHidden) {
+      skippedTargets.push({
+        objectId: target.objectId,
+        reason: 'hidden-target',
+      })
+      continue
+    }
+
+    const channelId = pasteValue.channelId ?? target.defaultChannelId ?? null
+
+    if (channelId === null) {
+      skippedTargets.push({
+        objectId: target.objectId,
+        reason: 'missing-channel',
+      })
+      continue
+    }
+
+    if (
+      target.supportedChannelIds &&
+      !target.supportedChannelIds.includes(channelId)
+    ) {
+      skippedTargets.push({
+        channelId,
+        objectId: target.objectId,
+        reason: 'unsupported-channel',
+      })
+      continue
+    }
+
+    if (
+      isChannelSupported &&
+      !isChannelSupported({
+        channelId,
+        pasteValue,
+        target,
+      })
+    ) {
+      skippedTargets.push({
+        channelId,
+        objectId: target.objectId,
+        reason: 'unsupported-channel',
+      })
+      continue
+    }
+
+    const objectIds = objectIdsByChannel.get(channelId) ?? []
+
+    objectIds.push(target.objectId)
+    objectIdsByChannel.set(channelId, objectIds)
+    appliedTargets.push({
+      channelId,
+      commandId: 'apply-color-swatch',
+      effectType: 'slide-command-effect',
+      objectId: target.objectId,
+      ...getSlideEditColorSwatchTelemetryFromPasteValue(pasteValue),
+    })
+  }
+
+  const effects = [...objectIdsByChannel].map(([channelId, objectIds]) =>
+    getSlideEditColorSwatchCommandEffect({
+      channelId,
+      id: 'apply-color-swatch',
+      objectIds,
+      slideId,
+      swatch: getSlideEditColorSwatchSelectionFromPasteValue(pasteValue),
+    })
+  )
+
+  return {
+    appliedTargets,
+    effects,
+    pasteValue,
+    skippedTargets,
+  }
+}
+
 export function getSlideEditColorSwatchId({
   source,
   tokenId,
@@ -297,6 +661,35 @@ export function normalizeSlideEditColorSwatchValue(
   const normalizedValue = value?.trim()
 
   return normalizedValue ? normalizedValue : null
+}
+
+export function normalizeSlideEditColorSwatchChannelId(
+  channelId: unknown,
+): SlideEditColorSwatchBuiltInChannelId | null {
+  if (typeof channelId !== 'string') {
+    return null
+  }
+
+  switch (channelId.trim().toLowerCase()) {
+    case 'fill':
+    case 'shape-fill':
+      return 'fill'
+    case 'line':
+    case 'line-stroke':
+    case 'line_stroke':
+    case 'linestroke':
+      return 'line-stroke'
+    case 'shape-stroke':
+    case 'stroke':
+      return 'stroke'
+    case 'text':
+    case 'text-color':
+    case 'text_color':
+    case 'textcolor':
+      return 'text'
+    default:
+      return null
+  }
 }
 
 export function normalizeSlideEditColorHex(
@@ -450,4 +843,267 @@ function normalizeSlideEditColorAlpha(value: number) {
   const rounded = Math.round(value * 100) / 100
 
   return Math.min(1, Math.max(0, rounded))
+}
+
+function getSlideEditColorSwatchDirectPasteValue(
+  value: unknown,
+  {
+    requireChannel,
+  }: {
+    requireChannel: boolean
+  },
+): SlideEditColorSwatchJSONPasteValue | null {
+  if (typeof value === 'string') {
+    return requireChannel
+      ? null
+      : createSlideEditColorSwatchPasteValue({
+        channelId: null,
+        source: 'recent',
+        value,
+      })
+  }
+
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null
+  }
+
+  const wrappedPasteValue = getSlideEditColorSwatchWrappedPasteValue(value)
+
+  if (wrappedPasteValue !== null) {
+    return wrappedPasteValue
+  }
+
+  const record = value as Record<string, unknown>
+  const channelId = getSlideEditColorSwatchRecordChannelId(record)
+
+  if (requireChannel && channelId === null) {
+    return null
+  }
+
+  const colorValue = getSlideEditColorSwatchRecordColorValue(record)
+
+  if (colorValue === null) {
+    return null
+  }
+
+  const tokenId = getSlideEditColorSwatchOptionalString(record.tokenId)
+  const source = getSlideEditColorSwatchSource(record.source, tokenId)
+  const swatchId = getSlideEditColorSwatchOptionalString(record.swatchId) ??
+    getSlideEditColorSwatchId({
+      source,
+      tokenId,
+      value: colorValue,
+    })
+
+  return createSlideEditColorSwatchPasteValue({
+    channelId,
+    source,
+    swatchId,
+    tokenId,
+    value: colorValue,
+  })
+}
+
+function getSlideEditColorSwatchWrappedPasteValue(
+  value: unknown,
+): SlideEditColorSwatchJSONPasteValue | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null
+  }
+
+  const record = value as Record<string, unknown>
+
+  for (const key of SLIDE_EDIT_COLOR_SWATCH_JSON_WRAPPER_KEYS) {
+    if (!Object.hasOwn(record, key)) {
+      continue
+    }
+
+    const pasteValue = getSlideEditColorSwatchDirectPasteValue(record[key], {
+      requireChannel: false,
+    })
+
+    if (pasteValue !== null) {
+      return pasteValue
+    }
+  }
+
+  return null
+}
+
+function createSlideEditColorSwatchPasteValue({
+  channelId,
+  source,
+  swatchId,
+  tokenId,
+  value,
+}: {
+  channelId: SlideEditColorSwatchBuiltInChannelId | null
+  source: SlideEditColorSwatchSource
+  swatchId?: string
+  tokenId?: string
+  value: string
+}): SlideEditColorSwatchJSONPasteValue | null {
+  const normalizedValue = normalizeSlideEditColorSwatchJSONValue(value)
+
+  if (normalizedValue === null) {
+    return null
+  }
+
+  const normalizedSwatchId = swatchId ??
+    getSlideEditColorSwatchId({
+      source,
+      tokenId,
+      value: normalizedValue,
+    })
+  const pasteValue = {
+    channelId,
+    source,
+    swatchId: normalizedSwatchId,
+    value: normalizedValue,
+  }
+
+  return tokenId
+    ? {
+      ...pasteValue,
+      tokenId,
+    }
+    : pasteValue
+}
+
+function getSlideEditColorSwatchRecordChannelId(
+  record: Record<string, unknown>,
+) {
+  for (const key of SLIDE_EDIT_COLOR_SWATCH_CHANNEL_KEYS) {
+    if (!Object.hasOwn(record, key)) {
+      continue
+    }
+
+    const channelId = normalizeSlideEditColorSwatchChannelId(record[key])
+
+    if (channelId !== null) {
+      return channelId
+    }
+  }
+
+  return null
+}
+
+function getSlideEditColorSwatchRecordColorValue(
+  record: Record<string, unknown>,
+) {
+  for (const key of SLIDE_EDIT_COLOR_SWATCH_VALUE_KEYS) {
+    if (!Object.hasOwn(record, key)) {
+      continue
+    }
+
+    const value = record[key]
+    const normalizedValue = key === 'hex'
+      ? normalizeSlideEditColorSwatchJSONHexValue(value)
+      : normalizeSlideEditColorSwatchJSONValue(value)
+
+    if (normalizedValue !== null) {
+      return normalizedValue
+    }
+  }
+
+  return null
+}
+
+function normalizeSlideEditColorSwatchJSONHexValue(value: unknown) {
+  if (typeof value !== 'string') {
+    return null
+  }
+
+  const trimmedValue = value.trim()
+
+  if (!trimmedValue) {
+    return null
+  }
+
+  return normalizeSlideEditColorHex(
+    trimmedValue.startsWith('#') ? trimmedValue : `#${trimmedValue}`,
+  )
+}
+
+function normalizeSlideEditColorSwatchJSONValue(value: unknown) {
+  if (typeof value !== 'string') {
+    return null
+  }
+
+  const normalizedValue = normalizeSlideEditColorSwatchValue(value)
+
+  if (normalizedValue === null) {
+    return null
+  }
+
+  return normalizeSlideEditColorHex(normalizedValue) ?? normalizedValue
+}
+
+function getSlideEditColorSwatchOptionalString(value: unknown) {
+  if (typeof value !== 'string') {
+    return undefined
+  }
+
+  const normalizedValue = value.trim()
+
+  return normalizedValue ? normalizedValue : undefined
+}
+
+function getSlideEditColorSwatchSource(
+  value: unknown,
+  tokenId: string | undefined,
+): SlideEditColorSwatchSource {
+  return value === 'theme' || value === 'recent'
+    ? value
+    : tokenId
+    ? 'theme'
+    : 'recent'
+}
+
+function getSlideEditColorSwatchSelectionFromPasteValue<
+  TColorTokenId extends SlideEditThemeColorTokenId,
+>(
+  pasteValue: SlideEditColorSwatchJSONPasteValue<
+    SlideEditColorSwatchChannelId,
+    TColorTokenId
+  >,
+): SlideEditColorSwatchSelection<TColorTokenId> {
+  const selection = {
+    source: pasteValue.source,
+    swatchId: pasteValue.swatchId,
+    value: pasteValue.value,
+  }
+
+  return pasteValue.tokenId
+    ? {
+      ...selection,
+      tokenId: pasteValue.tokenId,
+    }
+    : selection
+}
+
+function getSlideEditColorSwatchTelemetryFromPasteValue<
+  TColorTokenId extends SlideEditThemeColorTokenId,
+>(
+  pasteValue: SlideEditColorSwatchJSONPasteValue<
+    SlideEditColorSwatchChannelId,
+    TColorTokenId
+  >,
+) {
+  const telemetry = {
+    source: pasteValue.source,
+    swatchId: pasteValue.swatchId,
+    value: pasteValue.value,
+  }
+
+  return pasteValue.tokenId
+    ? {
+      ...telemetry,
+      tokenId: pasteValue.tokenId,
+    }
+    : telemetry
+}
+
+function parseSlideEditColorSwatchJSON(value: string) {
+  return parseSlideEditJSONPasteTextValue(value)
 }

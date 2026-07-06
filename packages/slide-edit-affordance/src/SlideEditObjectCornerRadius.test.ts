@@ -4,15 +4,25 @@ import {
   createSlideEditObjectCornerRadiusDescriptor,
   getSlideEditObjectCornerRadiusCommandEffect,
   getSlideEditObjectCornerRadiusCSS,
+  getSlideEditObjectCornerRadiusJSONPasteValue,
+  getSlideEditObjectCornerRadiusJSONPasteValueFromText,
+  getSlideEditObjectCornerRadiusJSONPasteValueFromValue,
   getSlideEditObjectCornerRadiusMetadata,
+  getSlideEditObjectCornerRadiusPasteCommand,
   getSlideEditObjectCornerRadiusPreviewCSS,
   normalizeSlideEditObjectCornerRadius,
   SLIDE_EDIT_OBJECT_CORNER_RADIUS_DATA_ATTRIBUTE,
   SLIDE_EDIT_OBJECT_CORNER_RADIUS_DEFAULT,
   SLIDE_EDIT_OBJECT_CORNER_RADIUS_FIELD,
+  SLIDE_EDIT_OBJECT_CORNER_RADIUS_JSON_MIME_TYPE,
   SLIDE_EDIT_OBJECT_CORNER_RADIUS_LIMITS,
   toSlideEditObjectCornerRadiusAttributeValue,
 } from './SlideEditObjectCornerRadius'
+import {
+  getSlideEditObjectCornerRadiusJSONPasteValue as getSlideEditObjectCornerRadiusJSONPasteValueFromPackage,
+  getSlideEditObjectCornerRadiusJSONPasteValueFromText as getSlideEditObjectCornerRadiusJSONPasteValueFromTextFromPackage,
+  getSlideEditObjectCornerRadiusJSONPasteValueFromValue as getSlideEditObjectCornerRadiusJSONPasteValueFromValueFromPackage,
+} from './index'
 
 describe('SlideEditObjectCornerRadius', () => {
   it('creates a supported corner radius descriptor with square corners as default', () => {
@@ -155,6 +165,144 @@ describe('SlideEditObjectCornerRadius', () => {
     }).payload.value).toBe(0)
   })
 
+  it('reads custom MIME direct corner radius JSON values first', () => {
+    expect(getSlideEditObjectCornerRadiusJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_OBJECT_CORNER_RADIUS_JSON_MIME_TYPE]: '"18"',
+        'application/json': '{"cornerRadius":4}',
+      }),
+    })).toEqual({
+      value: 18,
+    })
+    expect(getSlideEditObjectCornerRadiusJSONPasteValueFromPackage({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_OBJECT_CORNER_RADIUS_JSON_MIME_TYPE]:
+          '{"radius":"24.126"}',
+      }),
+    })).toEqual({
+      value: 24.13,
+    })
+  })
+
+  it('reads explicit corner radius wrappers from general JSON candidates', () => {
+    expect(getSlideEditObjectCornerRadiusJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'application/json': '{"objectCornerRadius":{"value":"18"}}',
+      }),
+    })).toEqual({
+      value: 18,
+    })
+    expect(getSlideEditObjectCornerRadiusJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/json': '{"shapeCornerRadius":12.345}',
+      }),
+    })).toEqual({
+      value: 12.35,
+    })
+    expect(getSlideEditObjectCornerRadiusJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"cornerRadius":{"radius":1200}}',
+      }),
+    })).toEqual({
+      value: 1000,
+    })
+    expect(getSlideEditObjectCornerRadiusJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"cornerRadius":0}',
+      }),
+    })).toEqual({
+      value: 0,
+    })
+  })
+
+  it('reads corner radius JSON from text and parsed values', () => {
+    expect(getSlideEditObjectCornerRadiusJSONPasteValueFromText(
+      '"18"',
+    )).toEqual({
+      value: 18,
+    })
+    expect(getSlideEditObjectCornerRadiusJSONPasteValueFromValue({
+      radius: '24.126',
+    })).toEqual({
+      value: 24.13,
+    })
+    expect(getSlideEditObjectCornerRadiusJSONPasteValueFromTextFromPackage(
+      '{"shapeCornerRadius":12.345}',
+      { mode: 'wrapped' },
+    )).toEqual({
+      value: 12.35,
+    })
+    expect(getSlideEditObjectCornerRadiusJSONPasteValueFromValueFromPackage(
+      { cornerRadius: { radius: 1200 } },
+      { mode: 'wrapped' },
+    )).toEqual({
+      value: 1000,
+    })
+  })
+
+  it('converts corner radius paste values into host commands', () => {
+    const pasteValue = getSlideEditObjectCornerRadiusJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"cornerRadius":"18"}',
+      }),
+    })
+
+    expect(getSlideEditObjectCornerRadiusPasteCommand({
+      objectId: 'object-a',
+      pasteValue: pasteValue!,
+      slideId: 'slide-a',
+    })).toEqual({
+      fieldId: 'cornerRadius',
+      id: 'update-object-corner-radius',
+      objectId: 'object-a',
+      slideId: 'slide-a',
+      value: 18,
+    })
+    expect(getSlideEditObjectCornerRadiusCommandEffect(
+      getSlideEditObjectCornerRadiusPasteCommand({
+        objectId: 'object-a',
+        pasteValue: pasteValue!,
+        slideId: 'slide-a',
+      }),
+    ).type).toBe('slide-command-effect')
+  })
+
+  it('ignores invalid, direct generic, and unrelated corner radius JSON', () => {
+    expect(getSlideEditObjectCornerRadiusJSONPasteValue({
+      dataTransfer: null,
+    })).toBeNull()
+    expect(getSlideEditObjectCornerRadiusJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '18',
+      }),
+    })).toBeNull()
+    expect(getSlideEditObjectCornerRadiusJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"radius":18}',
+      }),
+    })).toBeNull()
+    expect(getSlideEditObjectCornerRadiusJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"unrelated":18}',
+      }),
+    })).toBeNull()
+    expect(getSlideEditObjectCornerRadiusJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        'text/plain': '{"cornerRadius":"wide"}',
+      }),
+    })).toBeNull()
+    expect(getSlideEditObjectCornerRadiusJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_OBJECT_CORNER_RADIUS_JSON_MIME_TYPE]: 'not json',
+      }),
+    })).toBeNull()
+    expect(getSlideEditObjectCornerRadiusJSONPasteValue({
+      dataTransfer: createDataTransfer({
+        [SLIDE_EDIT_OBJECT_CORNER_RADIUS_JSON_MIME_TYPE]: '"NaN"',
+      }),
+    })).toBeNull()
+  })
+
   it('does not expose host renderer names or product model terms', () => {
     const publicStrings = JSON.stringify({
       descriptor: createSlideEditObjectCornerRadiusDescriptor({
@@ -181,3 +329,13 @@ describe('SlideEditObjectCornerRadius', () => {
     }
   })
 })
+
+function createDataTransfer(
+  values: Record<string, string>,
+): Pick<DataTransfer, 'getData'> {
+  return {
+    getData(type) {
+      return values[type] ?? ''
+    },
+  }
+}

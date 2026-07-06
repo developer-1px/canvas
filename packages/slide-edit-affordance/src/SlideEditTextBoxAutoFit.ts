@@ -1,5 +1,8 @@
 import type { Bounds } from '../../../src/canvas/core'
-import { SLIDE_EDIT_TEXT_JSON_PASTE_TYPES } from './SlideEditTextJSONPaste'
+import {
+  parseSlideEditJSONPasteTextValue,
+  SLIDE_EDIT_TEXT_JSON_PASTE_TYPES,
+} from './SlideEditTextJSONPaste'
 
 export type SlideEditTextSlideId = string
 export type SlideEditTextObjectId = string
@@ -137,7 +140,9 @@ export type SlideEditTextAutoFitJSONPasteInput = {
   jsonMimeType?: string
 }
 
-export type SlideEditTextAutoFitJSONPasteValueMode = 'direct' | 'wrapped'
+export type SlideEditTextAutoFitJSONPasteValueMode =
+  | 'direct'
+  | 'wrapped'
 
 export type SlideEditTextAutoFitJSONPasteValueOptions = {
   mode?: SlideEditTextAutoFitJSONPasteValueMode
@@ -378,7 +383,7 @@ export function getSlideEditTextAutoFitJSONPasteValue({
 export function getSlideEditTextAutoFitJSONPasteValueFromText(
   text: string,
   options?: SlideEditTextAutoFitJSONPasteValueOptions,
-) {
+): SlideEditTextAutoFitJSONPasteValue | null {
   return getSlideEditTextAutoFitJSONPasteValueFromValue(
     parseSlideEditTextAutoFitJSON(text),
     options,
@@ -735,13 +740,5 @@ function isSlideEditTextResizeHandle(
 }
 
 function parseSlideEditTextAutoFitJSON(value: string) {
-  if (!value.trim()) {
-    return null
-  }
-
-  try {
-    return JSON.parse(value) as unknown
-  } catch {
-    return null
-  }
+  return parseSlideEditJSONPasteTextValue(value)
 }

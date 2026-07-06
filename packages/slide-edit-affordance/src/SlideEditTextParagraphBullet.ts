@@ -1,4 +1,7 @@
-import { SLIDE_EDIT_TEXT_JSON_PASTE_TYPES } from './SlideEditTextJSONPaste'
+import {
+  parseSlideEditJSONPasteTextValue,
+  SLIDE_EDIT_TEXT_JSON_PASTE_TYPES,
+} from './SlideEditTextJSONPaste'
 
 export type SlideEditTextParagraphBulletSlideId = string
 export type SlideEditTextParagraphBulletObjectId = string
@@ -335,13 +338,5 @@ function getSlideEditTextParagraphBulletExplicitJSONValue(value: unknown) {
 }
 
 function parseSlideEditTextParagraphBulletJSON(value: string) {
-  if (!value.trim()) {
-    return null
-  }
-
-  try {
-    return JSON.parse(value) as unknown
-  } catch {
-    return null
-  }
+  return parseSlideEditJSONPasteTextValue(value)
 }
