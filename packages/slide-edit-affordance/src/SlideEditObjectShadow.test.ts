@@ -6,15 +6,23 @@ import {
   getSlideEditObjectShadowColorCSS,
   getSlideEditObjectShadowFilter,
   getSlideEditObjectShadowFilterCSS,
+  getSlideEditObjectShadowJSONPasteValueFromValue,
   getSlideEditObjectShadowMetadata,
+  getSlideEditObjectShadowPasteCommands,
   normalizeSlideEditObjectShadow,
   normalizeSlideEditObjectShadowFieldValue,
   shouldEmitSlideEditObjectShadowMetadata,
   SLIDE_EDIT_OBJECT_SHADOW_DATA_ATTRIBUTE,
   SLIDE_EDIT_OBJECT_SHADOW_DEFAULT,
   SLIDE_EDIT_OBJECT_SHADOW_FIELDS,
+  SLIDE_EDIT_OBJECT_SHADOW_IMPORT_MODEL,
+  SLIDE_EDIT_OBJECT_SHADOW_JSON_IMPORT_FORMAT,
   toSlideEditObjectShadowAttributeValue,
 } from './SlideEditObjectShadow'
+import {
+  SLIDE_EDIT_OBJECT_SHADOW_IMPORT_MODEL as SLIDE_EDIT_OBJECT_SHADOW_IMPORT_MODEL_FROM_PACKAGE,
+  SLIDE_EDIT_OBJECT_SHADOW_JSON_IMPORT_FORMAT as SLIDE_EDIT_OBJECT_SHADOW_JSON_IMPORT_FORMAT_FROM_PACKAGE,
+} from './index'
 
 describe('SlideEditObjectShadow', () => {
   it('creates a disabled object shadow descriptor by default', () => {
@@ -51,6 +59,17 @@ describe('SlideEditObjectShadow', () => {
       field.commandId === 'update-object-shadow' &&
       field.requiredAdapterSlot === 'command-effect'
     )).toBe(true)
+  })
+
+  it('exports object shadow import model and format metadata', () => {
+    expect(SLIDE_EDIT_OBJECT_SHADOW_IMPORT_MODEL)
+      .toBe('slide-edit-object-shadow-import')
+    expect(SLIDE_EDIT_OBJECT_SHADOW_JSON_IMPORT_FORMAT)
+      .toBe('application-json-slide-edit-object-shadow')
+    expect(SLIDE_EDIT_OBJECT_SHADOW_IMPORT_MODEL_FROM_PACKAGE)
+      .toBe(SLIDE_EDIT_OBJECT_SHADOW_IMPORT_MODEL)
+    expect(SLIDE_EDIT_OBJECT_SHADOW_JSON_IMPORT_FORMAT_FROM_PACKAGE)
+      .toBe(SLIDE_EDIT_OBJECT_SHADOW_JSON_IMPORT_FORMAT)
   })
 
   it('uses disabled metadata that hosts can omit or render as none', () => {
@@ -164,6 +183,69 @@ describe('SlideEditObjectShadow', () => {
       },
       type: 'slide-command-effect',
     })
+  })
+
+  it('parses object shadow JSON paste values into update commands', () => {
+    const pasteValue = getSlideEditObjectShadowJSONPasteValueFromValue(
+      {
+        objectShadow: {
+          blur: 10,
+          enabled: true,
+          opacity: '0.5',
+        },
+      },
+      { mode: 'wrapped' },
+    )
+
+    expect(pasteValue).toMatchObject({
+      fields: [
+        {
+          fieldId: 'enabled',
+          value: true,
+        },
+        {
+          fieldId: 'opacity',
+          value: 0.5,
+        },
+        {
+          fieldId: 'blur',
+          value: 10,
+        },
+      ],
+      shadow: {
+        blur: 10,
+        enabled: true,
+        opacity: 0.5,
+      },
+      surface: 'object-shadow',
+    })
+    expect(pasteValue && getSlideEditObjectShadowPasteCommands({
+      objectId: 'object-a',
+      pasteValue,
+      slideId: 'slide-a',
+    })).toEqual([
+      {
+        fieldId: 'enabled',
+        id: 'update-object-shadow',
+        objectId: 'object-a',
+        slideId: 'slide-a',
+        value: true,
+      },
+      {
+        fieldId: 'opacity',
+        id: 'update-object-shadow',
+        objectId: 'object-a',
+        slideId: 'slide-a',
+        value: 0.5,
+      },
+      {
+        fieldId: 'blur',
+        id: 'update-object-shadow',
+        objectId: 'object-a',
+        slideId: 'slide-a',
+        value: 10,
+      },
+    ])
   })
 
   it('distinguishes content object shadow from demo chrome shadow strings', () => {

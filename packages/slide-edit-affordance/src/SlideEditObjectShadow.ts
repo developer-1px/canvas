@@ -78,6 +78,40 @@ export type SlideEditObjectShadowHostCommandEffect<
   type: 'slide-command-effect'
 }
 
+export type SlideEditObjectShadowDataTransfer = Pick<DataTransfer, 'getData'>
+
+export type SlideEditObjectShadowPasteFieldValue = {
+  fieldId: SlideEditObjectShadowFieldId
+  value: boolean | number | string
+}
+
+export type SlideEditObjectShadowJSONPasteValue = {
+  fields: readonly SlideEditObjectShadowPasteFieldValue[]
+  shadow: SlideEditObjectShadow
+  surface: 'object-shadow'
+}
+
+export type SlideEditObjectShadowJSONPasteInput = {
+  dataTransfer: SlideEditObjectShadowDataTransfer | null
+  jsonMimeType?: string
+}
+
+export type SlideEditObjectShadowJSONPasteValueMode = 'direct' | 'wrapped'
+
+export type SlideEditObjectShadowJSONPasteValueOptions = {
+  mode?: SlideEditObjectShadowJSONPasteValueMode
+}
+
+export type SlideEditObjectShadowPasteCommandsInput<
+  TSlideId extends SlideEditObjectShadowSlideId = SlideEditObjectShadowSlideId,
+  TObjectId extends SlideEditObjectShadowObjectId =
+    SlideEditObjectShadowObjectId,
+> = {
+  objectId: TObjectId
+  pasteValue: SlideEditObjectShadowJSONPasteValue
+  slideId: TSlideId
+}
+
 export type SlideEditObjectShadowNumericLimits = {
   max: number
   min: number
@@ -92,6 +126,23 @@ export type SlideEditObjectShadowLimits = {
 
 export const SLIDE_EDIT_OBJECT_SHADOW_DATA_ATTRIBUTE =
   'data-slide-object-shadow'
+
+export const SLIDE_EDIT_OBJECT_SHADOW_IMPORT_MODEL =
+  'slide-edit-object-shadow-import'
+export const SLIDE_EDIT_OBJECT_SHADOW_JSON_IMPORT_FORMAT =
+  'application-json-slide-edit-object-shadow'
+export const SLIDE_EDIT_OBJECT_SHADOW_JSON_MIME_TYPE =
+  'application/vnd.interactive-os.slide-edit.object-shadow+json'
+export const SLIDE_EDIT_OBJECT_SHADOW_JSON_TYPES = Object.freeze([
+  'application/json',
+  'text/json',
+  'text/plain',
+] as const)
+export const SLIDE_EDIT_OBJECT_SHADOW_JSON_WRAPPER_KEYS = Object.freeze([
+  'objectShadow',
+  'objectEffectShadow',
+  'shadow',
+] as const)
 
 export const SLIDE_EDIT_OBJECT_SHADOW_DEFAULT = Object.freeze({
   angle: 45,
@@ -216,6 +267,85 @@ export function getSlideEditObjectShadowCommandEffect<
     },
     type: 'slide-command-effect',
   }
+}
+
+export function getSlideEditObjectShadowJSONPasteValue({
+  dataTransfer,
+  jsonMimeType = SLIDE_EDIT_OBJECT_SHADOW_JSON_MIME_TYPE,
+}: SlideEditObjectShadowJSONPasteInput):
+  SlideEditObjectShadowJSONPasteValue | null {
+  if (!dataTransfer) {
+    return null
+  }
+
+  if (jsonMimeType) {
+    const customText = dataTransfer.getData(jsonMimeType)
+
+    if (customText.trim()) {
+      const customPasteValue = getSlideEditObjectShadowJSONPasteValueFromText(
+        customText,
+      )
+
+      if (customPasteValue !== null) {
+        return customPasteValue
+      }
+    }
+  }
+
+  for (const type of SLIDE_EDIT_OBJECT_SHADOW_JSON_TYPES) {
+    const text = dataTransfer.getData(type)
+
+    if (!text.trim()) {
+      continue
+    }
+
+    const pasteValue = getSlideEditObjectShadowJSONPasteValueFromText(text, {
+      mode: 'wrapped',
+    })
+
+    if (pasteValue !== null) {
+      return pasteValue
+    }
+  }
+
+  return null
+}
+
+export function getSlideEditObjectShadowJSONPasteValueFromText(
+  text: string,
+  options?: SlideEditObjectShadowJSONPasteValueOptions,
+) {
+  return getSlideEditObjectShadowJSONPasteValueFromValue(
+    parseSlideEditObjectShadowJSON(text),
+    options,
+  )
+}
+
+export function getSlideEditObjectShadowJSONPasteValueFromValue(
+  value: unknown,
+  { mode = 'direct' }: SlideEditObjectShadowJSONPasteValueOptions = {},
+): SlideEditObjectShadowJSONPasteValue | null {
+  return mode === 'wrapped'
+    ? getSlideEditObjectShadowWrappedPasteValue(value)
+    : getSlideEditObjectShadowDirectPasteValue(value)
+}
+
+export function getSlideEditObjectShadowPasteCommands<
+  TSlideId extends SlideEditObjectShadowSlideId,
+  TObjectId extends SlideEditObjectShadowObjectId,
+>({
+  objectId,
+  pasteValue,
+  slideId,
+}: SlideEditObjectShadowPasteCommandsInput<TSlideId, TObjectId>):
+  SlideEditObjectShadowUpdateCommand<TSlideId, TObjectId>[] {
+  return pasteValue.fields.map((field) => ({
+    fieldId: field.fieldId,
+    id: 'update-object-shadow',
+    objectId,
+    slideId,
+    value: field.value,
+  }))
 }
 
 export function normalizeSlideEditObjectShadowUpdateCommand<
@@ -415,4 +545,106 @@ function normalizeSlideEditObjectShadowNumber(
 
 function formatSlideEditObjectShadowCSSNumber(value: number) {
   return String(Number(value.toFixed(2)))
+}
+
+function getSlideEditObjectShadowDirectPasteValue(
+  value: unknown,
+): SlideEditObjectShadowJSONPasteValue | null {
+  if (value === null || value === false) {
+    return createSlideEditObjectShadowJSONPasteValue([
+      {
+        fieldId: 'enabled',
+        value: false,
+      },
+    ])
+  }
+
+  if (value === true) {
+    return createSlideEditObjectShadowJSONPasteValue([
+      {
+        fieldId: 'enabled',
+        value: true,
+      },
+    ])
+  }
+
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null
+  }
+
+  const record = value as Record<string, unknown>
+
+  if (Object.hasOwn(record, 'value')) {
+    return getSlideEditObjectShadowDirectPasteValue(record.value)
+  }
+
+  if (Object.hasOwn(record, 'shadow')) {
+    return getSlideEditObjectShadowDirectPasteValue(record.shadow)
+  }
+
+  return getSlideEditObjectShadowObjectPasteValue(record)
+}
+
+function getSlideEditObjectShadowWrappedPasteValue(value: unknown) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null
+  }
+
+  const record = value as Record<string, unknown>
+
+  for (const key of SLIDE_EDIT_OBJECT_SHADOW_JSON_WRAPPER_KEYS) {
+    if (Object.hasOwn(record, key)) {
+      return getSlideEditObjectShadowDirectPasteValue(record[key])
+    }
+  }
+
+  return null
+}
+
+function getSlideEditObjectShadowObjectPasteValue(
+  record: Record<string, unknown>,
+) {
+  const fields = SLIDE_EDIT_OBJECT_SHADOW_FIELDS.flatMap((field) => {
+    if (!Object.hasOwn(record, field.id)) {
+      return []
+    }
+
+    return [
+      {
+        fieldId: field.id,
+        value: normalizeSlideEditObjectShadowFieldValue(
+          field.id,
+          record[field.id] as boolean | number | string,
+        ),
+      },
+    ]
+  })
+
+  return fields.length > 0
+    ? createSlideEditObjectShadowJSONPasteValue(fields)
+    : null
+}
+
+function createSlideEditObjectShadowJSONPasteValue(
+  fields: readonly SlideEditObjectShadowPasteFieldValue[],
+): SlideEditObjectShadowJSONPasteValue {
+  return {
+    fields,
+    shadow: normalizeSlideEditObjectShadow(
+      Object.fromEntries(fields.map((field) => [field.fieldId, field.value])),
+    ),
+    surface: 'object-shadow',
+  }
+}
+
+function parseSlideEditObjectShadowJSON(value: string) {
+  if (!value.trim()) {
+    return null
+  }
+
+  try {
+    return JSON.parse(value) as unknown
+  } catch {
+    return null
+  }
 }
