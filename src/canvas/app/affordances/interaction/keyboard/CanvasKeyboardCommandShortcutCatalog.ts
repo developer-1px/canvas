@@ -40,11 +40,20 @@ export const CANVAS_KEYBOARD_COMMAND_SHORTCUTS:
   },
   {
     getIntent: ({ event, mod, selection }) =>
-      !mod && !event.shiftKey && selection.length === 1
+      !mod && !event.altKey && !event.shiftKey && selection.length === 1
         ? { kind: 'edit-selection', preventDefault: true }
         : { kind: 'none', preventDefault: false },
     label: 'edit selection',
     shortcut: { key: 'Enter' },
+    shortcutId: 'editSelection',
+  },
+  {
+    getIntent: ({ event, mod, selection }) =>
+      !mod && !event.altKey && !event.shiftKey && selection.length === 1
+        ? { kind: 'edit-selection', preventDefault: true }
+        : { kind: 'none', preventDefault: false },
+    label: 'edit selection',
+    shortcut: { key: 'F2' },
     shortcutId: 'editSelection',
   },
   {

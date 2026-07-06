@@ -37,6 +37,7 @@ import {
   writeCanvasClipboardText,
   getCanvasFindInputKeyboardIntent,
   getCanvasInlineEditKeyboardIntent,
+  getCanvasKeyboardSelectionCycleIntent,
   getCanvasModalBackdropPointerIntent,
   getCanvasModalKeyboardIntent,
   measureCanvasTextBlocks,
@@ -53,6 +54,7 @@ import {
   type CanvasEditableFieldKeyboardIntentInput,
   type CanvasInteractionTargetSelectorInput,
   type CanvasInlineEditKeyboardIntentInput,
+  type CanvasKeyboardSelectionCycleInput,
   type CanvasMenuRovingActiveIndexInput,
   type CanvasMenuTriggerKeyboardIntentInput,
   type CanvasModalBackdropPointerIntentInput,
@@ -581,6 +583,18 @@ describe('Canvas package consumer imports', () => {
       metaKey: false,
       shiftKey: false,
     }
+    const selectionCycleInput: CanvasKeyboardSelectionCycleInput = {
+      event: {
+        altKey: false,
+        ctrlKey: false,
+        key: 'Tab',
+        metaKey: false,
+        shiftKey: false,
+        target: null,
+      },
+      selectableIds: ['rect-1'],
+      selection: [],
+    }
     const commandPaletteKeyboardInput: CanvasCommandPaletteKeyboardIntentInput =
       {
         activeIndex: 0,
@@ -786,6 +800,20 @@ describe('Canvas package consumer imports', () => {
       inputType: 'insertParagraph',
       kind: 'line-break',
       preventDefault: false,
+    })
+    expect(getCanvasKeyboardSelectionCycleIntent(selectionCycleInput)).toEqual({
+      direction: 'next',
+      kind: 'cycle-selection',
+      preventDefault: true,
+      selection: ['rect-1'],
+    })
+    expect(CanvasAppFacade.getCanvasKeyboardSelectionCycleIntent(
+      selectionCycleInput,
+    )).toEqual({
+      direction: 'next',
+      kind: 'cycle-selection',
+      preventDefault: true,
+      selection: ['rect-1'],
     })
     expect(CanvasAppFacade.getCanvasCommandPaletteKeyboardIntent(
       commandPaletteKeyboardInput,
