@@ -36,9 +36,11 @@ import type { CanvasStatus } from './status-bar'
 import type {
   CanvasContextCommandMenu,
   CanvasContextCommandMenuState as ToolbarContextCommandMenuState,
-  CanvasSelectionFloatingBar,
   CanvasToolbar,
 } from './toolbar'
+import type {
+  CanvasSelectionFloatingBar,
+} from './selection-toolbar'
 import type { ZoomControls } from './zoom-controls'
 
 export type CanvasAppCommandPaletteProps =

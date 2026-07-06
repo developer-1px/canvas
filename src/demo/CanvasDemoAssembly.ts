@@ -115,6 +115,7 @@ const DEMO_CANVAS_FOCUSED_AFFORDANCE_CONFIG = {
     presence: false,
     presentationMode: false,
     resizeHandles: true,
+    selectionToolbar: true,
     selectionBounds: true,
     sessionTimer: false,
     shortcutHelp: true,

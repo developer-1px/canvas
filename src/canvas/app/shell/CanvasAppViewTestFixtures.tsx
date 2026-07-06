@@ -16,6 +16,7 @@ export function createViewProps(
     inspector?: boolean
     minimap?: boolean
     sessionTimer?: boolean
+    selectionToolbar?: boolean
     shortcutHelp?: boolean
     spotlight?: boolean
     stampControls?: boolean
@@ -243,6 +244,7 @@ export function createViewProps(
       },
       tool: 'select',
       selectionCommandAnchor: { placement: 'above', x: 120, y: 120 },
+      selectionFloatingBarVisible: visible.selectionToolbar ?? true,
       visible: visible.toolbar ?? true,
       onCustomCommand: noop,
       onToolChange: noop,

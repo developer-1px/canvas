@@ -166,6 +166,7 @@ describe('CanvasAppFeaturePacks', () => {
       'find-replace',
       'image-io',
       'minimap',
+      'selection-toolbar',
       'shortcut-help',
       'stamp-authoring',
       'status-bar',
@@ -182,6 +183,7 @@ describe('CanvasAppFeaturePacks', () => {
         'find-replace',
         'image-io',
         'minimap',
+        'selection-toolbar',
         'shortcut-help',
         'stamp-authoring',
         'status-bar',
@@ -190,22 +192,42 @@ describe('CanvasAppFeaturePacks', () => {
       ])
     expect(DEFAULT_CANVAS_APP_FEATURE_PACK_VIEW_RENDERERS.toolbar)
       .toBeTypeOf('function')
+    expect(DEFAULT_CANVAS_APP_FEATURE_PACK_VIEW_RENDERERS.selectionFloatingBar)
+      .toBeTypeOf('function')
     expect(DEFAULT_CANVAS_APP_FEATURE_PACK_VIEW_RENDERERS.contextCommandMenu)
       .toBeTypeOf('function')
 
-    const renderers = createCanvasAppFeaturePackViewRenderers(
+    const renderersWithoutToolbar = createCanvasAppFeaturePackViewRenderers(
       DEFAULT_CANVAS_APP_VIEW_FEATURE_PACKS,
       {
         disabledFeaturePackIds: ['toolbar', 'component-authoring'],
       },
     )
 
-    expect(renderers.toolbar).toBeUndefined()
-    expect(renderers.selectionFloatingBar).toBeUndefined()
-    expect(renderers.contextCommandMenu).toBeUndefined()
-    expect(renderers.componentPalette).toBeUndefined()
-    expect(renderers.stickyQuickCreate).toBeUndefined()
-    expect(renderers.cursorChat)
+    expect(renderersWithoutToolbar.toolbar).toBeUndefined()
+    expect(renderersWithoutToolbar.selectionFloatingBar)
+      .toBe(DEFAULT_CANVAS_APP_FEATURE_PACK_VIEW_RENDERERS.selectionFloatingBar)
+    expect(renderersWithoutToolbar.contextCommandMenu).toBeUndefined()
+    expect(renderersWithoutToolbar.componentPalette).toBeUndefined()
+    expect(renderersWithoutToolbar.stickyQuickCreate).toBeUndefined()
+    expect(renderersWithoutToolbar.cursorChat)
+      .toBe(DEFAULT_CANVAS_APP_FEATURE_PACK_VIEW_RENDERERS.cursorChat)
+
+    const renderersWithoutSelectionToolbar =
+      createCanvasAppFeaturePackViewRenderers(
+        DEFAULT_CANVAS_APP_VIEW_FEATURE_PACKS,
+        {
+          disabledFeaturePackIds: ['selection-toolbar'],
+        },
+      )
+
+    expect(renderersWithoutSelectionToolbar.toolbar)
+      .toBe(DEFAULT_CANVAS_APP_FEATURE_PACK_VIEW_RENDERERS.toolbar)
+    expect(renderersWithoutSelectionToolbar.contextCommandMenu)
+      .toBe(DEFAULT_CANVAS_APP_FEATURE_PACK_VIEW_RENDERERS.contextCommandMenu)
+    expect(renderersWithoutSelectionToolbar.selectionFloatingBar)
+      .toBeUndefined()
+    expect(renderersWithoutSelectionToolbar.cursorChat)
       .toBe(DEFAULT_CANVAS_APP_FEATURE_PACK_VIEW_RENDERERS.cursorChat)
   })
 

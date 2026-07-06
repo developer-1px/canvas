@@ -59,7 +59,7 @@ test('keeps equal spacing labels stable under zoom and pan', async ({
   await page.keyboard.press('v')
 })
 
-test('marks margin-derived spacing without adding margin handles', async ({
+test('marks margin-derived equal spacing without adding margin handles', async ({
   page,
 }) => {
   await page.goto('/?demo=figma')
@@ -70,13 +70,13 @@ test('marks margin-derived spacing without adding margin handles', async ({
 
   const marginDistance = spacingGuide(page, {
     axis: 'y',
-    family: 'distance',
-    kind: 'nearest',
+    family: 'equal-spacing',
+    kind: 'equal',
     source: 'margin',
   })
 
-  await expect(marginDistance).toHaveCount(1)
-  await expect(spacingLabel(marginDistance)).toContainText(/\d+ px/)
+  await expect(marginDistance).toHaveCount(2)
+  await expect(spacingLabel(marginDistance.first())).toContainText(/\d+ px/)
   await expect(page.locator('[data-dom-edit-margin-kind]')).toHaveCount(0)
   await expect(page.locator('.figma-autolayout-margin')).toHaveCount(0)
 })

@@ -127,6 +127,7 @@ export function getCanvasAppControlModel({
         bounds: scene.getBounds(selection),
         viewport,
       }),
+      selectionFloatingBarVisible: config.overlays.selectionToolbar,
       tool,
       visible: config.overlays.toolbar,
       onToolChange,

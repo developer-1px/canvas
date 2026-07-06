@@ -59,6 +59,7 @@ type VisibleProps<TProps> = TProps & {
 }
 type ToolbarViewProps = VisibleProps<ToolbarProps> & {
   selectionCommandAnchor: SelectionFloatingBarProps['anchor']
+  selectionFloatingBarVisible: boolean
 }
 
 type CanvasAppViewProps = {
@@ -72,6 +73,7 @@ type CanvasAppViewProps = {
   imageControls: VisibleProps<ImageControlsProps>
   inspector: VisibleProps<InspectorProps>
   minimap: VisibleProps<MinimapProps>
+  selection?: SelectionFloatingBarProps['selection']
   sessionTimer: SessionTimerProps
   shortcutHelp: ShortcutHelpProps
   spotlight: SpotlightProps
@@ -96,6 +98,7 @@ export function CanvasAppView({
   imageControls,
   inspector,
   minimap,
+  selection,
   sessionTimer,
   shortcutHelp,
   spotlight,
@@ -124,6 +127,7 @@ export function CanvasAppView({
   const {
     visible: showToolbar,
     selectionCommandAnchor,
+    selectionFloatingBarVisible: showSelectionFloatingBar,
     ...toolbarProps
   } = toolbar
   const { visible: showZoomControls, ...zoomControlProps } = zoomControls
@@ -170,7 +174,7 @@ export function CanvasAppView({
       minimapProps.model !== null &&
       featurePackViews.minimap !== undefined,
     'object-inspector': inspectorHasContent,
-    'selection-floating-bar': showToolbar &&
+    'selection-floating-bar': showSelectionFloatingBar &&
       statusProps.selectionLength > 0 &&
       selectionCommandAnchor !== null &&
       featurePackViews.selectionFloatingBar !== undefined,
@@ -312,7 +316,13 @@ export function CanvasAppView({
           config: toolbarProps.config,
           customCommands: toolbarProps.customCommands,
           commandHandlers: toolbarProps.commandHandlers,
+          imageControls: imageControlProps,
+          inspector: inspectorProps,
+          selection,
+          textEditor: textEditorProps,
+          tool: toolbarProps.tool,
           visible: true,
+          zoomControls: zoomControlProps,
           onCustomCommand: toolbarProps.onCustomCommand,
         })
         : null}

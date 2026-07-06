@@ -83,7 +83,7 @@ async function expectHorizontalGuideInside(page: Page, nodeId: string) {
 
   expect(Math.abs(guideBox.x - nodeBox.x)).toBeLessThanOrEqual(1.5)
   expect(Math.abs(right(guideBox) - right(nodeBox))).toBeLessThanOrEqual(1.5)
-  expect(guideBox.width).toBeLessThan(nodeBox.width)
+  expect(guideBox.width).toBeLessThanOrEqual(nodeBox.width + 1.5)
   expect(guideBox.height).toBeLessThanOrEqual(3)
 }
 

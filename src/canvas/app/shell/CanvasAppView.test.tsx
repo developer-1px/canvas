@@ -17,6 +17,7 @@ describe('CanvasAppView', () => {
           inspector: false,
           minimap: false,
           sessionTimer: false,
+          selectionToolbar: false,
           shortcutHelp: false,
           spotlight: false,
           stampControls: false,
@@ -39,6 +40,7 @@ describe('CanvasAppView', () => {
     expect(markup).not.toContain('canvas-minimap')
     expect(markup).not.toContain('object-inspector')
     expect(markup).not.toContain('session-timer')
+    expect(markup).not.toContain('selection-floating-bar')
     expect(markup).not.toContain('shortcut-help')
     expect(markup).not.toContain('spotlight')
     expect(markup).not.toContain('stamp-controls')
