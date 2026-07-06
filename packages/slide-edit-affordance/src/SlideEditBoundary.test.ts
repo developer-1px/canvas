@@ -31,11 +31,17 @@ describe('slide-edit-affordance boundary', () => {
       'slide-metadata',
       'style-clipboard',
       'slide-transition',
+      'text-clear-formatting',
       'text-font-family',
+      'text-font-size',
       'text-frame-inset',
+      'text-paragraph-align',
+      'text-paragraph-bullet',
+      'text-paragraph-list-level',
       'text-vertical-alignment',
       'text-paragraph-spacing',
       'text-measurement',
+      'text-run-formatting',
     ])
     expect(SLIDE_EDIT_ADAPTER_SLOTS.every((slot) => slot.owner === 'host'))
       .toBe(true)

@@ -32,6 +32,7 @@ export type CanvasRichTextPasteRun = {
   color?: string
   italic?: boolean
   link?: string
+  strikethrough?: boolean
   text: string
   underline?: boolean
 }
@@ -306,6 +307,10 @@ function getCanvasRichTextRunsFromNode(
     ...(['b', 'strong'].includes(tagName) ? { bold: true } : {}),
     ...(['em', 'i'].includes(tagName) ? { italic: true } : {}),
     ...(['a', 'u'].includes(tagName) ? { underline: true } : {}),
+    ...(isCanvasRichTextStrikethroughTagName(tagName) ||
+        hasCanvasRichTextLineThroughTextDecoration(node.getAttribute('style'))
+      ? { strikethrough: true }
+      : {}),
     ...(href ? { color: CANVAS_RICH_TEXT_LINK_COLOR, link: href } : {}),
   }
 
@@ -323,8 +328,10 @@ function getCanvasRichTextParagraphsFromString(value: string) {
   let bullet: 'bullet' | undefined
   let boldDepth = 0
   let italicDepth = 0
+  let strikethroughDepth = 0
   let underlineDepth = 0
   const linkStack: string[] = []
+  const strikethroughTagStack: string[] = []
 
   const flushParagraph = () => {
     if (runs.length > 0) {
@@ -348,6 +355,7 @@ function getCanvasRichTextParagraphsFromString(value: string) {
         runs.push({
           ...(boldDepth > 0 ? { bold: true } : {}),
           ...(italicDepth > 0 ? { italic: true } : {}),
+          ...(strikethroughDepth > 0 ? { strikethrough: true } : {}),
           ...(underlineDepth > 0 || link ? { underline: true } : {}),
           ...(link ? { color: CANVAS_RICH_TEXT_LINK_COLOR, link } : {}),
           text,
@@ -371,7 +379,18 @@ function getCanvasRichTextParagraphsFromString(value: string) {
         underlineDepth = Math.max(0, underlineDepth - 1)
       } else if (tag.name === 'a') {
         linkStack.pop()
-      } else if (isCanvasRichTextBlockName(tag.name)) {
+      }
+
+      const removed = removeCanvasRichTextStrikethroughStackTag(
+        strikethroughTagStack,
+        tag.name,
+      )
+
+      if (removed) {
+        strikethroughDepth = Math.max(0, strikethroughDepth - 1)
+      }
+
+      if (isCanvasRichTextBlockName(tag.name)) {
         flushParagraph()
         if (tag.name === 'li') {
           bullet = undefined
@@ -401,8 +420,29 @@ function getCanvasRichTextParagraphsFromString(value: string) {
       linkStack.push(href ?? '')
     }
 
+    if (
+      isCanvasRichTextStrikethroughTagName(tag.name) ||
+      hasCanvasRichTextLineThroughTextDecoration(
+        getCanvasHTMLAttribute(tag.attributes, 'style'),
+      )
+    ) {
+      strikethroughDepth += 1
+      strikethroughTagStack.push(tag.name)
+    }
+
     if (tag.selfClosing && tag.name === 'a') {
       linkStack.pop()
+    }
+
+    if (tag.selfClosing) {
+      const removed = removeCanvasRichTextStrikethroughStackTag(
+        strikethroughTagStack,
+        tag.name,
+      )
+
+      if (removed) {
+        strikethroughDepth = Math.max(0, strikethroughDepth - 1)
+      }
     }
   }
 
@@ -460,6 +500,7 @@ function hasCanvasRichTextFormatting(
     paragraph.runs.some((run) =>
       run.bold === true ||
       run.italic === true ||
+      run.strikethrough === true ||
       run.underline === true ||
       Boolean(run.color) ||
       Boolean(run.link)))
@@ -471,6 +512,32 @@ function isCanvasRichTextBlock(node: Element) {
 
 function isCanvasRichTextBlockName(value: string) {
   return CANVAS_RICH_TEXT_BLOCK_TAGS.has(value)
+}
+
+function isCanvasRichTextStrikethroughTagName(value: string) {
+  return value === 'del' || value === 's' || value === 'strike'
+}
+
+function hasCanvasRichTextLineThroughTextDecoration(value: string | null) {
+  return Boolean(
+    value &&
+      /text-decoration(?:-line)?\s*:[^;]*\bline-through\b/i.test(value),
+  )
+}
+
+function removeCanvasRichTextStrikethroughStackTag(
+  stack: string[],
+  tagName: string,
+) {
+  const index = stack.lastIndexOf(tagName)
+
+  if (index < 0) {
+    return false
+  }
+
+  stack.splice(index, 1)
+
+  return true
 }
 
 function normalizeCanvasRichTextHref(value: string | null) {

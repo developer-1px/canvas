@@ -3,11 +3,15 @@ import { describe, expect, it } from 'vitest'
 import {
   createSlideEditRailDescriptor,
   createSlideEditRailListboxDescriptor,
+  getSlideEditRailCommandKeyboardShortcutIntent,
   getSlideEditRailKeyboardCommandEffect,
   getSlideEditRailListboxKeyboardIntent,
   getSlideEditRailPointerCommandEffect,
+  getSlideEditRailReorderKeyboardShortcutIntent,
+  SLIDE_EDIT_RAIL_COMMAND_KEYBOARD_SHORTCUT_KEYS,
   SLIDE_EDIT_RAIL_COMMANDS,
   SLIDE_EDIT_RAIL_KEYBOARD_KEYS,
+  SLIDE_EDIT_RAIL_REORDER_KEYBOARD_SHORTCUT_KEYS,
 } from './SlideEditRailInteractions'
 
 describe('SlideEditRailInteractions', () => {
@@ -114,6 +118,12 @@ describe('SlideEditRailInteractions', () => {
     expect(SLIDE_EDIT_RAIL_KEYBOARD_KEYS).toBe(
       'ArrowUp ArrowDown Home End Enter Space',
     )
+    expect(SLIDE_EDIT_RAIL_COMMAND_KEYBOARD_SHORTCUT_KEYS).toBe(
+      'Cmd/Ctrl+M Cmd/Ctrl+C Cmd/Ctrl+X Cmd/Ctrl+V Cmd/Ctrl+D Delete Backspace',
+    )
+    expect(SLIDE_EDIT_RAIL_REORDER_KEYBOARD_SHORTCUT_KEYS).toBe(
+      'Cmd/Ctrl+Up Cmd/Ctrl+Down Cmd/Ctrl+Shift+Up Cmd/Ctrl+Shift+Down',
+    )
   })
 
   it('converts keyboard intents to host command effects', () => {
@@ -163,6 +173,24 @@ describe('SlideEditRailInteractions', () => {
       selection: {
         objectIds: [],
         slideId: 'slide-a',
+      },
+      type: 'slide-command-effect',
+    })
+    expect(getSlideEditRailKeyboardCommandEffect({
+      activeSlideId: 'slide-c',
+      boundary: 'first',
+      slideOrder,
+      type: 'move-active-to-boundary',
+    })).toEqual({
+      payload: {
+        fromIndex: 2,
+        id: 'reorder-slide',
+        slideId: 'slide-c',
+        toIndex: 0,
+      },
+      selection: {
+        objectIds: [],
+        slideId: 'slide-c',
       },
       type: 'slide-command-effect',
     })
@@ -247,6 +275,93 @@ describe('SlideEditRailInteractions', () => {
       slideId: 'slide-b',
       type: 'thumbnail-press',
     })
+  })
+
+  it('maps rail command keyboard shortcuts without consuming unavailable targets', () => {
+    expect(getSlideEditRailCommandKeyboardShortcutIntent({
+      activeSlideId: 'slide-b',
+      key: 'm',
+      mod: true,
+    })).toMatchObject({
+      activeSlideId: 'slide-b',
+      kind: 'add-slide',
+      shortcut: 'Cmd/Ctrl+M',
+    })
+    expect(getSlideEditRailCommandKeyboardShortcutIntent({
+      activeSlideId: 'slide-b',
+      key: 'd',
+      mod: true,
+    })?.kind).toBe('duplicate-slide')
+    expect(getSlideEditRailCommandKeyboardShortcutIntent({
+      activeSlideId: 'slide-b',
+      key: 'Backspace',
+      mod: false,
+    })?.kind).toBe('delete-slide')
+    expect(getSlideEditRailCommandKeyboardShortcutIntent({
+      activeSlideId: null,
+      key: 'm',
+      mod: true,
+    })?.kind).toBe('add-slide')
+    expect(getSlideEditRailCommandKeyboardShortcutIntent({
+      activeSlideId: null,
+      key: 'd',
+      mod: true,
+    })).toBeNull()
+    expect(getSlideEditRailCommandKeyboardShortcutIntent({
+      activeSlideId: 'slide-b',
+      canPaste: false,
+      key: 'v',
+      mod: true,
+    })).toBeNull()
+    expect(getSlideEditRailCommandKeyboardShortcutIntent({
+      activeSlideId: 'slide-b',
+      key: 'd',
+      mod: true,
+      shiftKey: true,
+    })).toBeNull()
+  })
+
+  it('maps rail reorder keyboard shortcuts separately from list navigation', () => {
+    expect(getSlideEditRailReorderKeyboardShortcutIntent({
+      activeSlideId: 'slide-b',
+      altKey: false,
+      key: 'ArrowUp',
+      mod: true,
+      shiftKey: false,
+      slideOrder,
+    })).toEqual({
+      activeSlideId: 'slide-b',
+      direction: 'previous',
+      slideOrder,
+      type: 'move-active',
+    })
+    expect(getSlideEditRailReorderKeyboardShortcutIntent({
+      activeSlideId: 'slide-b',
+      altKey: false,
+      key: 'ArrowDown',
+      mod: true,
+      shiftKey: true,
+      slideOrder,
+    })).toEqual({
+      activeSlideId: 'slide-b',
+      boundary: 'last',
+      slideOrder,
+      type: 'move-active-to-boundary',
+    })
+    expect(getSlideEditRailKeyboardCommandEffect({
+      activeSlideId: 'slide-a',
+      direction: 'previous',
+      slideOrder,
+      type: 'move-active',
+    })).toBeNull()
+    expect(getSlideEditRailReorderKeyboardShortcutIntent({
+      activeSlideId: 'slide-b',
+      altKey: true,
+      key: 'ArrowUp',
+      mod: true,
+      shiftKey: false,
+      slideOrder,
+    })).toBeNull()
   })
 
   it('converts pointer intents to host command effects', () => {

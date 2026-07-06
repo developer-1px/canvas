@@ -43,7 +43,7 @@ describe('CanvasTextPasteImport', () => {
     expect(getCanvasRichTextPasteSourceFromHTML(`
       <section>
         <p>Hello <strong>Bold</strong><br><a href="https://example.com">Link</a></p>
-        <ul><li><em>Item</em> <u>Done</u></li></ul>
+        <ul><li><em>Item</em> <u>Done</u> <s>Old</s></li></ul>
       </section>
     `)).toEqual({
       format: 'text-html-rich',
@@ -69,11 +69,36 @@ describe('CanvasTextPasteImport', () => {
           runs: [
             { italic: true, text: 'Item' },
             { text: 'Done', underline: true },
+            { strikethrough: true, text: 'Old' },
           ],
         },
       ],
-      text: 'Hello Bold\nLink\nItemDone',
+      text: 'Hello Bold\nLink\nItemDoneOld',
     })
+  })
+
+  it('parses strikethrough rich HTML tags and styles without DOMParser', () => {
+    const originalDOMParser = globalThis.DOMParser
+
+    vi.stubGlobal('DOMParser', undefined)
+    try {
+      expect(getCanvasRichTextPasteSourceFromHTML(`
+        <p><del>Deleted</del> <span style="text-decoration: underline line-through;">Styled</span></p>
+      `)).toEqual({
+        format: 'text-html-rich',
+        paragraphs: [
+          {
+            runs: [
+              { strikethrough: true, text: 'Deleted' },
+              { strikethrough: true, text: 'Styled' },
+            ],
+          },
+        ],
+        text: 'DeletedStyled',
+      })
+    } finally {
+      vi.stubGlobal('DOMParser', originalDOMParser)
+    }
   })
 
   it('does not claim plain or conflicting HTML as rich text', () => {
