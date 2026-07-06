@@ -7,6 +7,7 @@ import type {
   Bounds,
   CanvasItem,
   EditingText,
+  Point,
   Tool,
   Viewport,
 } from '../../../../entities'
@@ -46,6 +47,7 @@ import {
 } from './CanvasPointerDragSession'
 
 type UseCanvasPointerDragHandlersArgs = {
+  cloneItems: (ids: string[], offset: Point) => CanvasItem[]
   componentLibrary: CanvasAppComponentLibrary
   commitSelection: CommitCanvasSelection
   commitItemsChange: CommitCanvasItemsChange
@@ -75,6 +77,7 @@ type UseCanvasPointerDragHandlersArgs = {
 }
 
 export function useCanvasPointerDragHandlers({
+  cloneItems,
   componentLibrary,
   commitSelection,
   commitItemsChange,
@@ -133,6 +136,7 @@ export function useCanvasPointerDragHandlers({
 
     const preview = previewCanvasPointerInteraction({
       config,
+      cloneItems,
       currentScreen: drag.currentScreen,
       currentWorld: drag.currentWorld,
       input: event,

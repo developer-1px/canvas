@@ -16,6 +16,7 @@ export type {
 export type CanvasItemPointerIntent = {
   additive: boolean
   altDragDuplicate: boolean
+  dragDuplicate: boolean
   textEdit: boolean
 }
 
@@ -78,6 +79,10 @@ export function getCanvasItemPointerIntent({
   isDoubleClick: boolean
 }): CanvasItemPointerIntent {
   const additive = isAdditivePointerInput(input)
+  const dragDuplicate =
+    (input.altKey || input.ctrlKey || input.metaKey) &&
+    config.gestures.altDragDuplicate &&
+    config.commands.duplicate
 
   return {
     additive,
@@ -85,6 +90,7 @@ export function getCanvasItemPointerIntent({
       input.altKey &&
       config.gestures.altDragDuplicate &&
       config.commands.duplicate,
+    dragDuplicate,
     textEdit: isDoubleClick && !additive && config.gestures.textEdit,
   }
 }

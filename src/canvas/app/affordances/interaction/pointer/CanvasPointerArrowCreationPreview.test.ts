@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { createCanvasAffordanceConfig } from '../../../../engine'
 import type { CanvasSceneAdapter } from '../../../../engine'
+import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import { previewCanvasPointerShapeCreation } from './CanvasPointerShapeCreation'
 
 const config = createCanvasAffordanceConfig()
@@ -8,7 +9,9 @@ const config = createCanvasAffordanceConfig()
 describe('CanvasPointerShapeCreation arrow previews', () => {
   it('previews attached arrows from the source edge to the hovered target edge', () => {
     const preview = previewCanvasPointerShapeCreation({
-      config,
+      config: createCanvasAffordanceConfig({
+        gestures: { snapToGrid: false },
+      }),
       currentScreen: { x: 190, y: 100 },
       currentWorld: { x: 190, y: 100 },
       interaction: {
@@ -70,7 +73,67 @@ describe('CanvasPointerShapeCreation arrow previews', () => {
       kind: 'preview',
     })
   })
+
+  it('constrains arrow creation previews to 45 degree increments', () => {
+    const preview = previewCanvasPointerShapeCreation({
+      config: createCanvasAffordanceConfig({
+        gestures: { snapToGrid: false },
+      }),
+      currentScreen: { x: 70, y: 18 },
+      currentWorld: { x: 70, y: 18 },
+      input: createPointerInput({ shiftKey: true }),
+      interaction: {
+        currentWorld: { x: 0, y: 0 },
+        kind: 'create-arrow',
+        moved: false,
+        pointerId: 1,
+        startScreen: { x: 0, y: 0 },
+        startWorld: { x: 0, y: 0 },
+      },
+      scene: createEmptySceneAdapter(),
+    })
+
+    expect(preview).toMatchObject({
+      draftArrow: {
+        end: { x: 70, y: 0 },
+        start: { x: 0, y: 0 },
+      },
+      interaction: {
+        constrainAngle: true,
+        currentWorld: { x: 70, y: 0 },
+      },
+      kind: 'preview',
+    })
+  })
 })
+
+function createPointerInput(
+  overrides: Partial<CanvasAppPointerInput> = {},
+): CanvasAppPointerInput {
+  return {
+    altKey: false,
+    button: 0,
+    clientX: 0,
+    clientY: 0,
+    ctrlKey: false,
+    metaKey: false,
+    pointerId: 1,
+    preventDefault: vi.fn(),
+    shiftKey: false,
+    stopPropagation: vi.fn(),
+    ...overrides,
+  }
+}
+
+function createEmptySceneAdapter(): CanvasSceneAdapter {
+  return {
+    entries: [],
+    getBounds: vi.fn(() => null),
+    getParentId: vi.fn(() => null),
+    getSelectedAncestorId: vi.fn(() => null),
+    isGroup: vi.fn(() => false),
+  }
+}
 
 function createSceneAdapter(): CanvasSceneAdapter {
   return {

@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import type { CanvasItem } from '../../../../entities'
 import {
   createCanvasAffordanceConfig,
@@ -40,6 +40,56 @@ describe('CanvasPointerTransformPreview', () => {
       currentWorld: { x: 1, y: 0 },
       interaction: createMoveInteraction(),
     }))).toEqual({ kind: 'none' })
+  })
+
+  it('locks move previews to the dominant axis while Shift is pressed', () => {
+    expect(previewCanvasPointerTransform(createInput({
+      currentScreen: { x: 40, y: 12 },
+      currentWorld: { x: 40, y: 12 },
+      input: createPointerInput({ shiftKey: true }),
+      interaction: createMoveInteraction(),
+    }))).toMatchObject({
+      interaction: {
+        currentItems: [createRectItem('rect-1', { x: 40, y: 0 })],
+        kind: 'move',
+        moved: true,
+      },
+      kind: 'preview',
+      liveItems: [createRectItem('rect-1', { x: 40, y: 0 })],
+    })
+  })
+
+  it('starts Ctrl/Meta duplicate drags after the drag threshold', () => {
+    const clone = createRectItem('rect-copy')
+    const cloneItems = vi.fn(() => [clone])
+
+    expect(previewCanvasPointerTransform(createInput({
+      cloneItems,
+      currentScreen: { x: 30, y: 0 },
+      currentWorld: { x: 30, y: 0 },
+      interaction: createMoveInteraction({
+        clickSelection: [],
+        duplicateOnDrag: true,
+      }),
+    }))).toMatchObject({
+      interaction: {
+        currentItems: [
+          rectItem,
+          createRectItem('rect-copy', { x: 30 }),
+        ],
+        duplicateOnDrag: false,
+        ids: ['rect-copy'],
+        kind: 'move',
+        moved: true,
+      },
+      kind: 'preview',
+      liveItems: [
+        rectItem,
+        createRectItem('rect-copy', { x: 30 }),
+      ],
+      selection: ['rect-copy'],
+    })
+    expect(cloneItems).toHaveBeenCalledWith(['rect-1'], { x: 0, y: 0 })
   })
 
   it('updates live items for resize previews after grid snapping', () => {
@@ -134,6 +184,7 @@ function createInput(
 ): Parameters<typeof previewCanvasPointerTransform>[0] {
   return {
     config: createCanvasAffordanceConfig(),
+    cloneItems: () => [],
     currentScreen: { x: 0, y: 0 },
     currentWorld: { x: 0, y: 0 },
     input: createPointerInput(),
@@ -145,7 +196,12 @@ function createInput(
   }
 }
 
-function createMoveInteraction(): Extract<
+function createMoveInteraction(
+  overrides: Partial<Extract<
+    Parameters<typeof previewCanvasPointerTransform>[0]['interaction'],
+    { kind: 'move' }
+  >> = {},
+): Extract<
   Parameters<typeof previewCanvasPointerTransform>[0]['interaction'],
   { kind: 'move' }
 > {
@@ -161,6 +217,7 @@ function createMoveInteraction(): Extract<
     startItems: [rectItem],
     startScreen: { x: 0, y: 0 },
     startWorld: { x: 0, y: 0 },
+    ...overrides,
   }
 }
 

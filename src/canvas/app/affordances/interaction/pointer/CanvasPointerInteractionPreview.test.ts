@@ -196,6 +196,7 @@ function createInput(
 ): CanvasPointerInteractionPreviewInput {
   return {
     config,
+    cloneItems: () => [],
     currentScreen: { x: 0, y: 0 },
     currentWorld: { x: 0, y: 0 },
     input: createPointerInput(),

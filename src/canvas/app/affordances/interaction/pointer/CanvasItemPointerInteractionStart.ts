@@ -93,28 +93,31 @@ export function startCanvasItemPointerInteraction({
     scene,
     selection,
   })
-  let nextSelection = itemSelection.nextSelection
+  const deferAdditiveSelectedClick =
+    itemIntent.additive && itemSelection.alreadySelected
+  let nextSelection = deferAdditiveSelectedClick
+    ? selection
+    : itemSelection.nextSelection
   const historySelection = nextSelection
   const moveBounds = scene.getBounds(nextSelection)
   const commitSelection =
-    itemIntent.additive || nextSelection !== selection
+    !deferAdditiveSelectedClick &&
+      (itemIntent.additive || nextSelection !== selection)
       ? nextSelection
       : undefined
+  const clickSelection = deferAdditiveSelectedClick
+    ? itemSelection.nextSelection
+    : undefined
   const clearLastClick = editItem ? true : undefined
-
-  if (itemIntent.additive && itemSelection.alreadySelected) {
-    return {
-      capturePointer: false,
-      clearLastClick,
-      commitSelection,
-      kind: 'none',
-    }
-  }
 
   let startItems = items
   let liveItems: CanvasItem[] | undefined
   let liveSelection: string[] | undefined
   const historyItems = items
+  const duplicateOnDrag =
+    itemIntent.dragDuplicate &&
+    itemIntent.additive &&
+    itemSelection.alreadySelected
 
   if (itemIntent.altDragDuplicate) {
     const clones = cloneItems(nextSelection, { x: 0, y: 0 })
@@ -131,7 +134,7 @@ export function startCanvasItemPointerInteraction({
     return {
       capturePointer: false,
       clearLastClick,
-      commitSelection,
+      commitSelection: clickSelection ?? commitSelection,
       kind: 'none',
       liveItems,
       selection: liveSelection,
@@ -149,6 +152,8 @@ export function startCanvasItemPointerInteraction({
       startWorld,
       ids: nextSelection,
       bounds: moveBounds,
+      clickSelection,
+      duplicateOnDrag,
       historySelection,
       startItems,
       currentItems: startItems,

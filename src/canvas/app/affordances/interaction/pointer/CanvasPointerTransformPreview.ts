@@ -25,6 +25,9 @@ import {
   type CanvasAppPointerInput,
 } from './CanvasAppPointerInput'
 import {
+  getCanvasAxisLockedDragDelta,
+} from './CanvasPointerDragModifiers'
+import {
   findCanvasSceneTargetAtPoint,
   resolveCanvasArrowEndpoints,
 } from './CanvasPointerArrowAnchors'
@@ -37,6 +40,7 @@ type CanvasPointerTransformPreviewInput = {
   currentWorld: Point
   input: CanvasAppPointerInput
   interaction: CanvasPointerTransformInteraction
+  cloneItems: (ids: string[], offset: Point) => CanvasItem[]
   scene: CanvasSceneAdapter
   transformAdapter: CanvasTransformAdapter<CanvasItem>
   viewport: Viewport
@@ -48,6 +52,7 @@ export type CanvasPointerTransformPreviewResult =
       interaction: CanvasPointerTransformInteraction
       kind: 'preview'
       liveItems: CanvasItem[]
+      selection?: string[]
       snapGuides: CanvasSnapGuides
     }
 
@@ -57,6 +62,7 @@ export function previewCanvasPointerTransform({
   currentWorld,
   input,
   interaction,
+  cloneItems,
   scene,
   transformAdapter,
   viewport,
@@ -114,39 +120,52 @@ export function previewCanvasPointerTransform({
       return { kind: 'none' }
     }
 
-    const dx = currentWorld.x - interaction.startWorld.x
-    const dy = currentWorld.y - interaction.startWorld.y
-    const snap = interaction.bounds
+    const moveInteraction = startCanvasPointerMoveDragPreview({
+      cloneItems,
+      interaction,
+    })
+    const rawDelta = {
+      dx: currentWorld.x - moveInteraction.startWorld.x,
+      dy: currentWorld.y - moveInteraction.startWorld.y,
+    }
+    const delta = input.shiftKey
+      ? getCanvasAxisLockedDragDelta(rawDelta)
+      : rawDelta
+    const snap = moveInteraction.bounds
       ? getCanvasMoveSnap({
-          bounds: interaction.bounds,
+          bounds: moveInteraction.bounds,
           config,
-          dx,
-          dy,
+          dx: delta.dx,
+          dy: delta.dy,
           scene,
-          selection: interaction.ids,
+          selection: moveInteraction.ids,
           viewport,
         })
       : {
           ...EMPTY_CANVAS_SNAP_GUIDES,
-          dx,
-          dy,
+          dx: delta.dx,
+          dy: delta.dy,
         }
     const nextItems = moveCanvasSelection({
       adapter: transformAdapter,
       dx: snap.dx,
       dy: snap.dy,
-      items: interaction.startItems,
-      selection: interaction.ids,
+      items: moveInteraction.startItems,
+      selection: moveInteraction.ids,
     })
+    const { selection: previewSelection, ...nextInteraction } =
+      moveInteraction
 
     return {
       interaction: {
-        ...interaction,
+        ...nextInteraction,
         currentItems: nextItems,
+        duplicateOnDrag: false,
         moved: true,
       },
       kind: 'preview',
       liveItems: nextItems,
+      selection: previewSelection,
       snapGuides: {
         alignmentGuides: snap.alignmentGuides,
         spacingGuides: snap.spacingGuides,
@@ -192,6 +211,42 @@ export function previewCanvasPointerTransform({
     kind: 'preview',
     liveItems: nextItems,
     snapGuides: EMPTY_CANVAS_SNAP_GUIDES,
+  }
+}
+
+function startCanvasPointerMoveDragPreview({
+  cloneItems,
+  interaction,
+}: {
+  cloneItems: (ids: string[], offset: Point) => CanvasItem[]
+  interaction: Extract<CanvasPointerTransformInteraction, { kind: 'move' }>
+}): Extract<CanvasPointerTransformInteraction, { kind: 'move' }> & {
+  selection?: string[]
+} {
+  if (!interaction.duplicateOnDrag) {
+    return interaction
+  }
+
+  const clones = cloneItems(interaction.ids, { x: 0, y: 0 })
+
+  if (clones.length === 0) {
+    return {
+      ...interaction,
+      duplicateOnDrag: false,
+    }
+  }
+
+  const selection = clones.map((item) => item.id)
+  const startItems = [...interaction.startItems, ...clones]
+
+  return {
+    ...interaction,
+    clickSelection: undefined,
+    currentItems: startItems,
+    duplicateOnDrag: false,
+    ids: selection,
+    selection,
+    startItems,
   }
 }
 

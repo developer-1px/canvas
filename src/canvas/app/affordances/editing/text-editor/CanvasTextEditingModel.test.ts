@@ -9,7 +9,9 @@ import type {
 } from '../../../../entities'
 import {
   commitCanvasTextEditing,
+  getCanvasPrintableTextEditStartIntent,
   getCanvasTextEditorStyle,
+  isCanvasPrintableKeyboardKey,
   shouldUseCanvasContentEditableText,
 } from './CanvasTextEditingModel'
 
@@ -31,6 +33,72 @@ describe('CanvasTextEditingModel', () => {
       { before: ['text-1'], after: ['text-1'] },
     )
     expect(setEditing).toHaveBeenCalledWith(null)
+  })
+
+  it('starts selected editable text editing from printable keys', () => {
+    const intent = getCanvasPrintableTextEditStartIntent({
+      editingItem: createTextItem({ text: 'Original' }),
+      event: createKeyboardEvent({ key: 'A' }),
+      selection: ['text-1'],
+    })
+
+    expect(intent).toEqual({
+      editing: { id: 'text-1', value: 'A' },
+      initialText: 'A',
+      kind: 'start-editing',
+      preventDefault: true,
+    })
+    expect(isCanvasPrintableKeyboardKey('A')).toBe(true)
+    expect(isCanvasPrintableKeyboardKey('Enter')).toBe(false)
+  })
+
+  it('lets hosts reserve printable keys before edit start', () => {
+    expect(getCanvasPrintableTextEditStartIntent({
+      editingItem: createTextItem(),
+      event: createKeyboardEvent({ key: 'r' }),
+      isReservedShortcut: (event) => event.key === 'r',
+      selection: ['text-1'],
+    })).toEqual({ kind: 'none', preventDefault: false })
+    expect(getCanvasPrintableTextEditStartIntent({
+      editingItem: createTextItem(),
+      event: createKeyboardEvent({ ctrlKey: true, key: 'a' }),
+      selection: ['text-1'],
+    })).toEqual({ kind: 'none', preventDefault: false })
+    expect(getCanvasPrintableTextEditStartIntent({
+      editingItem: createTextItem(),
+      event: createKeyboardEvent({ key: 'a', target: new EventTarget() }),
+      isTypingTarget: () => true,
+      selection: ['text-1'],
+    })).toEqual({ kind: 'none', preventDefault: false })
+  })
+
+  it('commits printable start text through the text editing model', () => {
+    const started = getCanvasPrintableTextEditStartIntent({
+      editingItem: createTextItem({ text: 'Original' }),
+      event: createKeyboardEvent({ key: 'B' }),
+      selection: ['text-1'],
+    })
+    const commitItemsChange = vi.fn()
+    const setEditing = vi.fn()
+
+    if (started.kind !== 'start-editing') {
+      throw new Error('Expected printable key edit start')
+    }
+
+    commitCanvasTextEditing({
+      commitItemsChange,
+      editing: started.editing,
+      editingItem: createTextItem({ text: 'Original' }),
+      selection: ['text-1'],
+      setEditing,
+    })
+
+    expect(commitItemsChange).toHaveBeenCalledWith(
+      { type: 'set-text', id: 'text-1', text: 'B' },
+      { before: ['text-1'], after: ['text-1'] },
+    )
+    expect(setEditing).toHaveBeenCalledWith(null)
+
   })
 
   it('uses the default text placeholder only for empty text items', () => {
@@ -193,6 +261,19 @@ function createEditing(value: string, id = 'text-1'): EditingText {
   return {
     id,
     value,
+  }
+}
+
+function createKeyboardEvent(
+  overrides: Partial<KeyboardEvent> = {},
+): Pick<KeyboardEvent, 'altKey' | 'ctrlKey' | 'key' | 'metaKey' | 'target'> {
+  return {
+    altKey: false,
+    ctrlKey: false,
+    key: 'a',
+    metaKey: false,
+    target: null,
+    ...overrides,
   }
 }
 

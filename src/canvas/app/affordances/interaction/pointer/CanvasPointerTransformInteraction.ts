@@ -27,6 +27,15 @@ export function commitCanvasPointerTransformInteraction({
   setEditing: (editing: EditingText | null) => void
   setTool: (tool: Tool) => void
 }) {
+  if (
+    interaction.kind === 'move' &&
+    !interaction.moved &&
+    interaction.clickSelection
+  ) {
+    commitSelection(interaction.clickSelection)
+    return
+  }
+
   commitItemsChange(
     {
       type: 'transform',

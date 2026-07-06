@@ -37,9 +37,11 @@ import {
   writeCanvasClipboardText,
   getCanvasFindInputKeyboardIntent,
   getCanvasInlineEditKeyboardIntent,
+  getCanvasAxisLockedDragDelta,
   getCanvasKeyboardSelectionCycleIntent,
   getCanvasModalBackdropPointerIntent,
   getCanvasModalKeyboardIntent,
+  getCanvasPrintableTextEditStartIntent,
   measureCanvasTextBlocks,
   getCanvasPointerTransformModifierState,
   getCanvasResizeHandleDoubleClickIntent,
@@ -50,6 +52,7 @@ import {
   isCanvasControlTarget,
   isCanvasTargetWithinSelector,
   isCanvasWheelPassthroughTarget,
+  type CanvasAxisLockedDragDeltaInput,
   type CanvasControlTargetInput,
   type CanvasEditableFieldKeyboardIntentInput,
   type CanvasInteractionTargetSelectorInput,
@@ -61,6 +64,7 @@ import {
   type CanvasModalKeyboardIntentInput,
   type CanvasPresentationKeyboardIntentInput,
   type CanvasPointerClickMemory,
+  type CanvasPrintableTextEditStartInput,
   type CanvasPointerTransformModifierInput,
   type CanvasPointerTransformModifierState,
   type CanvasResizeHandleDoubleClickIntentInput,
@@ -150,6 +154,8 @@ import {
 import {
   assertCanvasAffordanceConfig as assertCanvasAffordanceConfigFromEngine,
   createCanvasAffordanceConfig,
+  getCanvasAngleConstrainedPoint,
+  getCanvasAspectRatioLockedPoint,
 } from '@interactive-os/canvas/engine'
 import type { CanvasItem as CanvasEntityItem } from '@interactive-os/canvas/entities'
 import { createCanvasComponentLibrary } from '@interactive-os/canvas/host'
@@ -527,6 +533,10 @@ describe('Canvas package consumer imports', () => {
     }
     const pointerTransformModifierState: CanvasPointerTransformModifierState =
       getCanvasPointerTransformModifierState(pointerTransformModifierInput)
+    const axisLockedDragDeltaInput: CanvasAxisLockedDragDeltaInput = {
+      dx: 8,
+      dy: 30,
+    }
     const resizeHandleLastClick: CanvasPointerClickMemory = {
       id: 'selection:se',
       point: { x: 20, y: 30 },
@@ -594,6 +604,25 @@ describe('Canvas package consumer imports', () => {
       },
       selectableIds: ['rect-1'],
       selection: [],
+    }
+    const printableTextEditStartInput: CanvasPrintableTextEditStartInput = {
+      editingItem: {
+        h: 40,
+        id: 'text-1',
+        text: 'Title',
+        type: 'text',
+        w: 120,
+        x: 0,
+        y: 0,
+      },
+      event: {
+        altKey: false,
+        ctrlKey: false,
+        key: 'N',
+        metaKey: false,
+        target: null,
+      },
+      selection: ['text-1'],
     }
     const commandPaletteKeyboardInput: CanvasCommandPaletteKeyboardIntentInput =
       {
@@ -670,6 +699,13 @@ describe('Canvas package consumer imports', () => {
     expect(CanvasAppFacade.getCanvasPointerTransformModifierState(
       pointerTransformModifierInput,
     )).toEqual(pointerTransformModifierState)
+    expect(getCanvasAxisLockedDragDelta(axisLockedDragDeltaInput)).toEqual({
+      dx: 0,
+      dy: 30,
+    })
+    expect(CanvasAppFacade.getCanvasAxisLockedDragDelta(
+      axisLockedDragDeltaInput,
+    )).toEqual({ dx: 0, dy: 30 })
     expect(getCanvasResizeHandleDoubleClickIntent(
       resizeHandleDoubleClickInput,
     ).intent).toEqual({
@@ -814,6 +850,22 @@ describe('Canvas package consumer imports', () => {
       kind: 'cycle-selection',
       preventDefault: true,
       selection: ['rect-1'],
+    })
+    expect(getCanvasPrintableTextEditStartIntent(
+      printableTextEditStartInput,
+    )).toEqual({
+      editing: { id: 'text-1', value: 'N' },
+      initialText: 'N',
+      kind: 'start-editing',
+      preventDefault: true,
+    })
+    expect(CanvasAppFacade.getCanvasPrintableTextEditStartIntent(
+      printableTextEditStartInput,
+    )).toEqual({
+      editing: { id: 'text-1', value: 'N' },
+      initialText: 'N',
+      kind: 'start-editing',
+      preventDefault: true,
     })
     expect(CanvasAppFacade.getCanvasCommandPaletteKeyboardIntent(
       commandPaletteKeyboardInput,
@@ -997,6 +1049,22 @@ describe('Canvas package consumer imports', () => {
       selection: ['rect-1'],
       viewport: { scale: 1, x: 0, y: 0 },
     }).dx).toBe(40)
+    expect(getCanvasAspectRatioLockedPoint({
+      currentWorld: { x: 20, y: 70 },
+      startWorld: { x: 0, y: 0 },
+    })).toEqual({ x: 70, y: 70 })
+    expect(CanvasEngine.getCanvasAspectRatioLockedPoint({
+      currentWorld: { x: 20, y: 70 },
+      startWorld: { x: 0, y: 0 },
+    })).toEqual({ x: 70, y: 70 })
+    expect(getCanvasAngleConstrainedPoint({
+      currentWorld: { x: 70, y: 18 },
+      startWorld: { x: 0, y: 0 },
+    })).toEqual({ x: 70, y: 0 })
+    expect(CanvasEngine.getCanvasAngleConstrainedPoint({
+      currentWorld: { x: 70, y: 18 },
+      startWorld: { x: 0, y: 0 },
+    })).toEqual({ x: 70, y: 0 })
     expect(CanvasFoundation.defineCanvasExtension({
       id: 'whiteboard-comment',
       requiredAdapters: ['document', 'scene'],

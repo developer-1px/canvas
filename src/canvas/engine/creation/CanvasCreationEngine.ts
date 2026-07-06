@@ -32,6 +32,30 @@ export type CanvasCreatedDrawingStyle = Readonly<{
 
 export type CanvasCreatedPathSegment = CanvasPathSegment
 
+export type CanvasCreatedRectBoundsInput = {
+  currentWorld: Point
+  preserveAspectRatio?: boolean
+  resizeFromCenter?: boolean
+  startWorld: Point
+}
+
+export type CanvasCreatedArrowEndInput = {
+  constrainAngle?: boolean
+  currentWorld: Point
+  startWorld: Point
+}
+
+export type CanvasAspectRatioLockedPointInput = {
+  currentWorld: Point
+  startWorld: Point
+}
+
+export type CanvasAngleConstrainedPointInput = {
+  angleStepDegrees?: number
+  currentWorld: Point
+  startWorld: Point
+}
+
 export type CanvasCreationAdapter<TItem extends CanvasCreationItem> = {
   createArrow: (input: {
     end: Point
@@ -86,22 +110,32 @@ const DEFAULT_DRAWING_OFFSET = {
 
 export function getCanvasCreatedRectBounds({
   currentWorld,
+  preserveAspectRatio = false,
+  resizeFromCenter = false,
   startWorld,
-}: {
-  currentWorld: Point
-  startWorld: Point
-}): Bounds {
-  const rawBounds = normalizeBounds(startWorld, currentWorld)
+}: CanvasCreatedRectBoundsInput): Bounds {
+  const endWorld = preserveAspectRatio
+    ? getCanvasAspectRatioLockedPoint({ currentWorld, startWorld })
+    : currentWorld
+  const rawBounds = resizeFromCenter
+    ? normalizeBounds(getCanvasMirrorPoint(startWorld, endWorld), endWorld)
+    : normalizeBounds(startWorld, endWorld)
 
   if (rawBounds.w > 6 && rawBounds.h > 6) {
     return rawBounds
   }
 
-  return {
-    x: startWorld.x,
-    y: startWorld.y,
-    ...DEFAULT_RECT_SIZE,
-  }
+  return resizeFromCenter
+    ? {
+        x: startWorld.x - DEFAULT_RECT_SIZE.w / 2,
+        y: startWorld.y - DEFAULT_RECT_SIZE.h / 2,
+        ...DEFAULT_RECT_SIZE,
+      }
+    : {
+        x: startWorld.x,
+        y: startWorld.y,
+        ...DEFAULT_RECT_SIZE,
+      }
 }
 
 export function getCanvasCreatedDrawingPoints({
@@ -168,14 +202,14 @@ export function getCanvasCreatedPathSegments({
 }
 
 export function getCanvasCreatedArrowEnd({
+  constrainAngle = false,
   currentWorld,
   startWorld,
-}: {
-  currentWorld: Point
-  startWorld: Point
-}): Point {
+}: CanvasCreatedArrowEndInput): Point {
   if (pointDistance(startWorld, currentWorld) > 6) {
-    return currentWorld
+    return constrainAngle
+      ? getCanvasAngleConstrainedPoint({ currentWorld, startWorld })
+      : currentWorld
   }
 
   return {
@@ -184,20 +218,85 @@ export function getCanvasCreatedArrowEnd({
   }
 }
 
+export function getCanvasAspectRatioLockedPoint({
+  currentWorld,
+  startWorld,
+}: CanvasAspectRatioLockedPointInput): Point {
+  const dx = currentWorld.x - startWorld.x
+  const dy = currentWorld.y - startWorld.y
+  const size = Math.max(Math.abs(dx), Math.abs(dy))
+
+  return {
+    x: startWorld.x + Math.sign(dx || 1) * size,
+    y: startWorld.y + Math.sign(dy || 1) * size,
+  }
+}
+
+export function getCanvasAngleConstrainedPoint({
+  angleStepDegrees = 45,
+  currentWorld,
+  startWorld,
+}: CanvasAngleConstrainedPointInput): Point {
+  const dx = currentWorld.x - startWorld.x
+  const dy = currentWorld.y - startWorld.y
+
+  if (dx === 0 && dy === 0) {
+    return currentWorld
+  }
+
+  const stepRadians = angleStepDegrees * (Math.PI / 180)
+  const angle = Math.atan2(dy, dx)
+  const snappedAngle = Math.round(angle / stepRadians) * stepRadians
+  const unit = {
+    x: Math.cos(snappedAngle),
+    y: Math.sin(snappedAngle),
+  }
+  const dominantDelta = Math.max(Math.abs(dx), Math.abs(dy))
+  const dominantUnit = Math.max(Math.abs(unit.x), Math.abs(unit.y))
+  const length = dominantUnit === 0
+    ? dominantDelta
+    : dominantDelta / dominantUnit
+
+  return {
+    x: roundCanvasCreationCoordinate(startWorld.x + unit.x * length),
+    y: roundCanvasCreationCoordinate(startWorld.y + unit.y * length),
+  }
+}
+
+function getCanvasMirrorPoint(origin: Point, point: Point): Point {
+  return {
+    x: origin.x - (point.x - origin.x),
+    y: origin.y - (point.y - origin.y),
+  }
+}
+
+function roundCanvasCreationCoordinate(value: number) {
+  return Number(value.toFixed(6))
+}
+
 export function createCanvasShape<TItem extends CanvasCreationItem>({
   adapter,
   createId,
   currentWorld,
+  preserveAspectRatio,
+  resizeFromCenter,
   shapeType = 'rect',
   startWorld,
 }: {
   adapter: CanvasCreationAdapter<TItem>
   createId: (prefix: string) => string
   currentWorld: Point
+  preserveAspectRatio?: boolean
+  resizeFromCenter?: boolean
   shapeType?: CanvasCreatedShapeKind
   startWorld: Point
 }) {
-  const bounds = getCanvasCreatedRectBounds({ currentWorld, startWorld })
+  const bounds = getCanvasCreatedRectBounds({
+    currentWorld,
+    preserveAspectRatio,
+    resizeFromCenter,
+    startWorld,
+  })
 
   if (adapter.createShape) {
     return adapter.createShape({
@@ -298,19 +397,25 @@ export function createCanvasArrow<TItem extends CanvasCreationItem>({
   adapter,
   createId,
   currentWorld,
+  constrainAngle,
   endAttachedTo,
   startAttachedTo,
   startWorld,
 }: {
   adapter: CanvasCreationAdapter<TItem>
   createId: (prefix: string) => string
+  constrainAngle?: boolean
   currentWorld: Point
   endAttachedTo?: string
   startAttachedTo?: string
   startWorld: Point
 }) {
   return adapter.createArrow({
-    end: getCanvasCreatedArrowEnd({ currentWorld, startWorld }),
+    end: getCanvasCreatedArrowEnd({
+      constrainAngle,
+      currentWorld,
+      startWorld,
+    }),
     endAttachedTo,
     id: createId('arrow'),
     routing: 'elbow',

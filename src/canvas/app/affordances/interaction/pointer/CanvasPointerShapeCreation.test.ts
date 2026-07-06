@@ -165,6 +165,58 @@ describe('CanvasPointerShapeCreation start and preview', () => {
     expect(disabled).toEqual({ kind: 'none' })
   })
 
+  it('applies shape creation drag modifiers during preview', () => {
+    const aspectLocked = previewCanvasPointerShapeCreation({
+      config: createCanvasAffordanceConfig({
+        gestures: { snapToGrid: false },
+      }),
+      currentScreen: { x: 30, y: 80 },
+      currentWorld: { x: 30, y: 80 },
+      input: createPointerInput({ shiftKey: true }),
+      interaction: {
+        currentWorld: { x: 0, y: 0 },
+        kind: 'create-shape',
+        moved: false,
+        pointerId: 1,
+        shapeType: 'rect',
+        startScreen: { x: 0, y: 0 },
+        startWorld: { x: 0, y: 0 },
+      },
+      scene: createSceneAdapter(),
+    })
+    const centerBased = previewCanvasPointerShapeCreation({
+      config: createCanvasAffordanceConfig({
+        gestures: { snapToGrid: false },
+      }),
+      currentScreen: { x: 30, y: 20 },
+      currentWorld: { x: 30, y: 20 },
+      input: createPointerInput({ altKey: true }),
+      interaction: {
+        currentWorld: { x: 0, y: 0 },
+        kind: 'create-shape',
+        moved: false,
+        pointerId: 1,
+        shapeType: 'ellipse',
+        startScreen: { x: 0, y: 0 },
+        startWorld: { x: 0, y: 0 },
+      },
+      scene: createSceneAdapter(),
+    })
+
+    expect(aspectLocked).toMatchObject({
+      draftRect: { h: 80, shapeType: 'rect', w: 80, x: 0, y: 0 },
+      interaction: {
+        preserveAspectRatio: true,
+      },
+    })
+    expect(centerBased).toMatchObject({
+      draftRect: { h: 40, shapeType: 'ellipse', w: 60, x: -30, y: -20 },
+      interaction: {
+        resizeFromCenter: true,
+      },
+    })
+  })
+
 })
 
 function createPointerInput(

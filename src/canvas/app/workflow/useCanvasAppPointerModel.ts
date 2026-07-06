@@ -46,6 +46,7 @@ export function useCanvasAppPointerModel({
     viewport: workspace.viewport,
   })
   const dragHandlers = useCanvasPointerDragHandlers({
+    cloneItems: command.cloneItems,
     componentLibrary,
     commitItemsChange: command.commitItemsChange,
     commitSelection: command.commitSelection,
