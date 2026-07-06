@@ -4,10 +4,12 @@ export {
 } from './shell/LazyCanvasApp'
 export {
   CanvasContextCommandMenu,
-  CanvasSelectionFloatingBar,
   CanvasToolbar,
   type CanvasContextCommandMenuState,
 } from './feature-packs/toolbar'
+export {
+  CanvasSelectionFloatingBar,
+} from './feature-packs/selection-toolbar'
 export {
   CanvasCommandPalette,
   getCanvasCommandPaletteKeyboardIntent,
@@ -504,6 +506,8 @@ export {
   CANVAS_APP_IMAGE_IO_VIEW_FEATURE_PACK,
   CANVAS_APP_MINIMAP_FEATURE_PACK_MANIFEST,
   CANVAS_APP_MINIMAP_VIEW_FEATURE_PACK,
+  CANVAS_APP_SELECTION_TOOLBAR_FEATURE_PACK_MANIFEST,
+  CANVAS_APP_SELECTION_TOOLBAR_VIEW_FEATURE_PACK,
   CANVAS_APP_SHORTCUT_HELP_FEATURE_PACK_MANIFEST,
   CANVAS_APP_SHORTCUT_HELP_VIEW_FEATURE_PACK,
   CANVAS_APP_STAMP_AUTHORING_FEATURE_PACK_MANIFEST,

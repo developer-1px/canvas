@@ -23,8 +23,9 @@ test('uses hatch patterns for fixed flex and grid gaps', async ({ page }) => {
   await page.mouse.up()
 
   await selectLayer(page, 'Select layer Hero panel', 'workspaceHero')
-  const betweenGap = page.locator('.figma-autolayout-gap--between').first()
+  const betweenGap = page.locator('.figma-autolayout-gap--between').nth(1)
 
+  await expect(betweenGap).toBeVisible()
   await betweenGap.hover()
   await expect.poll(() => readBackgroundImage(betweenGap))
     .not.toContain('repeating-linear-gradient')

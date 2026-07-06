@@ -115,6 +115,7 @@ describe('CanvasAppControlModel', () => {
           toolbar: false,
           zoomControls: false,
           minimap: false,
+          selectionToolbar: false,
         },
       }),
       onFitItems,
@@ -135,6 +136,7 @@ describe('CanvasAppControlModel', () => {
     expect(selectedModel.shortcutHelp.visible).toBe(false)
     expect(selectedModel.status.visible).toBe(false)
     expect(selectedModel.toolbar.visible).toBe(false)
+    expect(selectedModel.toolbar.selectionFloatingBarVisible).toBe(false)
     expect(selectedModel.zoomControls.visible).toBe(false)
     expect(selectedModel.minimap.visible).toBe(false)
     expect(selectedModel.minimap.model).toBeNull()

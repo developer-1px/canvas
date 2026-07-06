@@ -6,14 +6,12 @@ import {
   createCanvasAppViewFeaturePack,
 } from '../CanvasAppFeaturePackViews'
 import { CanvasContextCommandMenu } from './CanvasContextCommandMenu'
-import { CanvasSelectionFloatingBar } from './CanvasSelectionFloatingBar'
 import { CanvasToolbar } from './CanvasToolbar'
 
 export {
   CanvasContextCommandMenu,
   type CanvasContextCommandMenuState,
 } from './CanvasContextCommandMenu'
-export { CanvasSelectionFloatingBar } from './CanvasSelectionFloatingBar'
 export { CanvasToolbar } from './CanvasToolbar'
 export {
   CANVAS_MENU_FOCUS_MODEL,
@@ -69,14 +67,12 @@ export const CANVAS_APP_TOOLBAR_VIEW_FEATURE_PACK =
   createCanvasAppViewFeaturePack({
     id: 'toolbar',
     label: 'Toolbar',
-    viewRenderers: {
-      contextCommandMenu: (props) =>
-        createElement(CanvasContextCommandMenu, props),
-      selectionFloatingBar: (props) =>
-        createElement(CanvasSelectionFloatingBar, props),
-      toolbar: (props) => createElement(CanvasToolbar, props),
-    },
-  })
+  viewRenderers: {
+    contextCommandMenu: (props) =>
+      createElement(CanvasContextCommandMenu, props),
+    toolbar: (props) => createElement(CanvasToolbar, props),
+  },
+})
 
 export const CANVAS_APP_TOOLBAR_FEATURE_PACK_MANIFEST =
   createCanvasAppFeaturePackManifest({

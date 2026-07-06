@@ -265,7 +265,7 @@ describe('CanvasAppAssembly seams', () => {
     expect(assembly.featurePackViewRenderers.toolbar).toBeUndefined()
     expect(assembly.featurePackViewRenderers.contextCommandMenu).toBeUndefined()
     expect(assembly.featurePackViewRenderers.selectionFloatingBar)
-      .toBeUndefined()
+      .toBe(DEFAULT_CANVAS_APP_FEATURE_PACK_VIEW_RENDERERS.selectionFloatingBar)
     expect(assembly.featurePackViewRenderers.componentPalette).toBeUndefined()
     expect(assembly.featurePackViewRenderers.stickyQuickCreate).toBeUndefined()
     expect(assembly.featurePackViewRenderers.status).toBe(
@@ -289,6 +289,17 @@ describe('CanvasAppAssembly seams', () => {
       .toBe(renderStatus)
     expect(statusOnlyAssembly.featurePackViewRenderers.toolbar).toBeUndefined()
 
+    const selectionToolbarDisabledAssembly = createCanvasAppAssembly({
+      disabledViewFeaturePackIds: ['selection-toolbar'],
+    })
+
+    expect(selectionToolbarDisabledAssembly.featurePackViewRenderers.toolbar)
+      .toBe(DEFAULT_CANVAS_APP_FEATURE_PACK_VIEW_RENDERERS.toolbar)
+    expect(
+      selectionToolbarDisabledAssembly.featurePackViewRenderers
+        .selectionFloatingBar,
+    ).toBeUndefined()
+
     const directAssembly = createCanvasAppAssembly({
       featurePackViewRenderers: {
         status: renderStatus,
@@ -307,6 +318,8 @@ describe('CanvasAppAssembly seams', () => {
     expect(disabledAssembly.featurePackViewRenderers.toolbar).toBeUndefined()
     expect(disabledAssembly.featurePackViewRenderers.contextCommandMenu)
       .toBeUndefined()
+    expect(disabledAssembly.featurePackViewRenderers.selectionFloatingBar)
+      .toBe(DEFAULT_CANVAS_APP_FEATURE_PACK_VIEW_RENDERERS.selectionFloatingBar)
     expect(disabledAssembly.featurePackViewRenderers.status).toBe(
       DEFAULT_CANVAS_APP_FEATURE_PACK_VIEW_RENDERERS.status,
     )

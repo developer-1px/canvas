@@ -103,6 +103,7 @@ export const CANVAS_AFFORDANCE_CONFIG_DEFAULTS = Object.freeze({
     selectionBounds: true,
     sessionTimer: true,
     shortcutHelp: true,
+    selectionToolbar: true,
     spotlight: true,
     spacingGuides: true,
     stampControls: false,

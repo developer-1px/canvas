@@ -29,6 +29,7 @@ describe('CanvasAppFeaturePackCatalog', () => {
       'find-replace',
       'image-io',
       'minimap',
+      'selection-toolbar',
       'shortcut-help',
       'stamp-authoring',
       'status-bar',
@@ -53,6 +54,7 @@ describe('CanvasAppFeaturePackCatalog', () => {
       'minimap',
       'board-io',
       'find-replace',
+      'selection-toolbar',
       'toolbar',
     ])
 
@@ -61,6 +63,7 @@ describe('CanvasAppFeaturePackCatalog', () => {
       'minimap',
       'board-io',
       'find-replace',
+      'selection-toolbar',
       'toolbar',
     ])
     expect(resolved[0]).toBe(getCanvasAppFeaturePackCatalog()[7])

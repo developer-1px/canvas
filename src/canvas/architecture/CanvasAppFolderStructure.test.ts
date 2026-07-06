@@ -59,6 +59,7 @@ describe('Canvas App folder structure', () => {
       'kanban-inspector',
       'media-import',
       'minimap',
+      'selection-toolbar',
       'shortcut-help',
       'stamp-authoring',
       'status-bar',

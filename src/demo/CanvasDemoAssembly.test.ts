@@ -59,6 +59,7 @@ describe('CanvasDemoAssembly', () => {
     const overlays = DEMO_CANVAS_APP_ASSEMBLY.affordanceConfig.overlays
 
     expect(overlays.toolbar).toBe(false)
+    expect(overlays.selectionToolbar).toBe(true)
     expect(overlays.inspector).toBe(false)
     expect(overlays.minimap).toBe(false)
     expect(overlays.presentationMode).toBe(false)

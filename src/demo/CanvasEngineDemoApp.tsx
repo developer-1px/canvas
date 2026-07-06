@@ -67,6 +67,15 @@ const ENGINE_DEMO_TOOLS = [
   label: string
 }[]
 
+type EngineSelectionPointerState = {
+  dragging: boolean
+  pointerId: number
+  x: number
+  y: number
+}
+
+const ENGINE_SELECTION_DRAG_THRESHOLD = 3
+
 export function CanvasEngineDemoApp({
   assemblyInput,
 }: {
@@ -86,12 +95,20 @@ function CanvasEngineDemoSurface({
   app: CanvasEngineDemoModel
 }) {
   const viewportPercent = `${Math.round(app.zoomControls.scale * 100)}%`
+  const [selectionToolbarVisible, setSelectionToolbarVisible] = useState(false)
   const [theme, setTheme] = useState<'dark' | 'light'>('light')
   const [contextMenu, setContextMenu] =
     useState<CanvasContextCommandMenuState | null>(null)
+  const [, setSelectionPointer] =
+    useState<EngineSelectionPointerState | null>(null)
   const toolToolbarRovingFocus = useCanvasToolbarRovingFocus<HTMLDivElement>()
   const viewportToolbarRovingFocus =
     useCanvasToolbarRovingFocus<HTMLDivElement>()
+  const selectionFloatingBar =
+    app.featurePackViewRenderers.selectionFloatingBar
+  const hideSelectionToolbar = () => {
+    setSelectionToolbarVisible(false)
+  }
   const closeContextMenu = () => {
     setContextMenu(null)
   }
@@ -102,7 +119,51 @@ function CanvasEngineDemoSurface({
       return
     }
 
+    setSelectionToolbarVisible(false)
     setContextMenu(null)
+    setSelectionPointer({
+      dragging: false,
+      pointerId: event.pointerId,
+      x: event.clientX,
+      y: event.clientY,
+    })
+  }
+  const handleWorkspacePointerMoveCapture = (
+    event: ReactPointerEvent<HTMLElement>,
+  ) => {
+    setSelectionPointer((current) => {
+      if (!current || current.pointerId !== event.pointerId) {
+        return current
+      }
+
+      const dx = event.clientX - current.x
+      const dy = event.clientY - current.y
+
+      return current.dragging ||
+          Math.hypot(dx, dy) <= ENGINE_SELECTION_DRAG_THRESHOLD
+        ? current
+        : { ...current, dragging: true }
+    })
+  }
+  const handleWorkspacePointerUpCapture = (
+    event: ReactPointerEvent<HTMLElement>,
+  ) => {
+    if (isEngineDemoControlTarget(event.target)) {
+      return
+    }
+
+    setSelectionPointer((current) => {
+      if (!current || current.pointerId !== event.pointerId) {
+        return null
+      }
+
+      setSelectionToolbarVisible(!current.dragging)
+      return null
+    })
+  }
+  const handleWorkspacePointerCancelCapture = () => {
+    setSelectionPointer(null)
+    setSelectionToolbarVisible(false)
   }
   const handleWorkspaceContextMenuCapture = (
     event: ReactMouseEvent<HTMLElement>,
@@ -112,6 +173,7 @@ function CanvasEngineDemoSurface({
     }
 
     event.preventDefault()
+    setSelectionToolbarVisible(false)
     setContextMenu(getEngineContextMenuPoint({
       app,
       fallback: { x: event.clientX, y: event.clientY },
@@ -134,6 +196,7 @@ function CanvasEngineDemoSurface({
     }
 
     event.preventDefault()
+    setSelectionToolbarVisible(false)
     setContextMenu(getEngineContextMenuPoint({ app }))
   }
 
@@ -145,12 +208,33 @@ function CanvasEngineDemoSurface({
         tabIndex={0}
         onContextMenuCapture={handleWorkspaceContextMenuCapture}
         onKeyDownCapture={handleWorkspaceKeyDownCapture}
+        onPointerCancelCapture={handleWorkspacePointerCancelCapture}
         onPointerDownCapture={handleWorkspacePointerDownCapture}
+        onPointerMoveCapture={handleWorkspacePointerMoveCapture}
+        onPointerUpCapture={handleWorkspacePointerUpCapture}
       >
         {app.stage}
         <EngineStickyQuickCreateControls
           stickyQuickCreate={app.stickyQuickCreate}
         />
+        {selectionToolbarVisible && selectionFloatingBar ? (
+          selectionFloatingBar({
+            anchor: app.selection.anchor,
+            commandAvailability: app.toolbar.commandAvailability,
+            config: app.toolbar.config,
+            customCommands: app.toolbar.customCommands,
+            commandHandlers: app.toolbar.commandHandlers,
+            imageControls: app.imageControls,
+            inspector: app.inspector,
+            selection: app.selection,
+            textEditor: app.textEditor,
+            tool: app.toolbar.tool,
+            visible: true,
+            zoomControls: app.zoomControls,
+            onClose: hideSelectionToolbar,
+            onCustomCommand: app.toolbar.onCustomCommand,
+          })
+        ) : null}
         <EngineTextEditor {...app.textEditor} />
         <CanvasContextCommandMenu
           commandAvailability={app.toolbar.commandAvailability}
@@ -175,6 +259,7 @@ function CanvasEngineDemoSurface({
             aria-pressed={app.toolbar.tool === id}
             key={id}
             onClick={() => {
+              hideSelectionToolbar()
               app.toolbar.onToolChange(id)
             }}
             type="button"
@@ -317,6 +402,9 @@ function isEngineDemoControlTarget(target: EventTarget) {
         '.engine-demo-controls',
         '.engine-demo-viewport-controls',
         '.engine-sticky-quick-create',
+        '.selection-floating-bar',
+        '.selection-toolbar-menu',
+        '.selection-toolbar-stamp-pad',
         '.shortcut-help',
         '.text-editor',
         'button',
