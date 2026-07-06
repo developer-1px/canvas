@@ -3,7 +3,7 @@ import { expect, test, type Locator, type Page } from '@playwright/test'
 test('shows box-model X-ray layers for selected and hovered nodes', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
   await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
   await selectLayer(page, 'Select layer Main area', 'workspaceMain')
   await page.getByRole('spinbutton', { name: 'Mar' }).fill('12')
@@ -30,7 +30,7 @@ test('shows box-model X-ray layers for selected and hovered nodes', async ({
 test('keeps zero padding and margin X-ray labels minimized', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
   await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
   await selectLayer(page, 'Select layer Pipeline list', 'workspacePipelineList')
 
@@ -46,7 +46,7 @@ test('keeps zero padding and margin X-ray labels minimized', async ({
 })
 
 test('keeps X-ray bands out of active gap editing', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
   await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
   await selectLayer(page, 'Select layer Deal row 1', 'workspaceDealOne')
 

@@ -45,7 +45,7 @@ test('matches opposite padding side and merges drag history', async ({ page }) =
 })
 
 async function selectHeroPanel(page: Page) {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
   await page.getByRole('button', { name: 'Select layer Workspace page' })
     .click()
   await page.getByRole('button', { name: 'Select layer Hero panel' }).click()

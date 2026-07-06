@@ -3,7 +3,7 @@ import { expect, test, type Locator, type Page } from '@playwright/test'
 test('shows nearest horizontal and vertical distance labels', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
   await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
   await selectLayer(page, 'Select layer Hero actions', 'workspaceHeroActions')
   await page.getByRole('button', { name: 'Measure tool' }).click()
@@ -33,7 +33,7 @@ test('shows nearest horizontal and vertical distance labels', async ({
 test('keeps equal spacing labels stable under zoom and pan', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
   await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
   await selectLayer(page, 'Select layer Revenue stat', 'workspaceStatRevenue')
   await page.getByRole('button', { name: 'Measure tool' }).click()
@@ -62,7 +62,7 @@ test('keeps equal spacing labels stable under zoom and pan', async ({
 test('marks margin-derived spacing without adding margin handles', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
   await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
   await selectLayer(page, 'Select layer Deal row 1', 'workspaceDealOne')
   await page.getByRole('spinbutton', { name: 'Mar' }).fill('10')

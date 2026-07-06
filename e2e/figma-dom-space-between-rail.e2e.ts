@@ -16,7 +16,7 @@ const BETWEEN_SAMPLES = [
 ] as const
 
 test('shows read-only rails for space-between lanes', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
   await page.getByRole('button', { name: 'Select layer Workspace page' })
     .click()
 
@@ -41,7 +41,7 @@ test('shows read-only rails for space-between lanes', async ({ page }) => {
 })
 
 test('keeps space-between lanes read-only on pointer drag', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
   await page.getByRole('button', { name: 'Select layer Workspace page' })
     .click()
   await selectLayer(page, 'Select layer Deal row 1', 'workspaceDealOne')

@@ -70,57 +70,6 @@ test('opens as a minimal canvas affordance engine demo', async ({ page }) => {
   await expect(page.getByRole('toolbar', { name: 'Object actions' }))
     .toHaveCount(0)
 
-  await page.locator('[data-canvas-item-id="engine-shape"]').click()
-  await expect(page.getByRole('toolbar', { name: 'Object actions' }))
-    .toBeVisible()
-  await expect(page.getByRole('button', { name: 'Edit text' }))
-    .toBeVisible()
-  await expect(page.getByRole('toolbar', { name: 'Object actions' })
-    .getByRole('button', { exact: true, name: 'Shape' }))
-    .toBeVisible()
-  const shapeMenu = await openObjectToolbarMenu(page, 'Shape')
-  await expect(shapeMenu.getByRole('button', { name: 'Rect shape' }))
-    .toBeVisible()
-  await expect(shapeMenu.getByRole('button', { name: 'Ellipse shape' }))
-    .toBeVisible()
-  await expect(shapeMenu.getByRole('button', { name: 'Diamond shape' }))
-    .toBeVisible()
-  await expect(page.getByRole('button', { name: 'Fill color' }))
-    .toBeVisible()
-  await expect(page.getByRole('button', { name: 'Stroke color' }))
-    .toBeVisible()
-  await expect(page.getByRole('toolbar', {
-    name: 'Object actions',
-  }).getByRole('button', { name: /stamp/i }))
-    .toHaveCount(0)
-  await expect(page.getByRole('group', { name: 'Stamp reactions' }))
-    .toBeVisible()
-  await expect(page.getByRole('button', { name: 'Add +1 stamp' }))
-    .toBeVisible()
-  await expect(page.getByRole('button', { name: 'Add ! stamp' }))
-    .toBeVisible()
-  await expect(page.getByRole('button', { name: 'Add ? stamp' }))
-    .toBeVisible()
-  const structureMenu = await openObjectToolbarMenu(page, 'Structure')
-  await expect(structureMenu.getByRole('button', { name: 'Section selection' }))
-    .toBeVisible()
-  await expect(structureMenu.getByRole('button', { name: 'Group selection' }))
-    .toHaveCount(0)
-  const layerMenu = await openObjectToolbarMenu(page, 'Layer order')
-  await expect(layerMenu.getByRole('button', { name: 'Bring to front' }))
-    .toBeVisible()
-  await expect(layerMenu.getByRole('button', { name: 'Bring forward' }))
-    .toBeVisible()
-  await expect(layerMenu.getByRole('button', { name: 'Send backward' }))
-    .toBeDisabled()
-  await expect(layerMenu.getByRole('button', { name: 'Send to back' }))
-    .toBeDisabled()
-  await expect(page.getByRole('button', { name: 'Fill #C2E5FF' }))
-    .toHaveCount(0)
-  await expect(page.getByRole('button', { name: 'Duplicate selection' }))
-    .toBeVisible()
-  await expect(page.getByRole('button', { name: 'Delete selection' }))
-    .toBeVisible()
   await expect(page.getByRole('button', { name: 'Shape tool' }))
     .toBeVisible()
   await expect(page.getByRole('button', { name: 'Ellipse tool' }))
@@ -174,171 +123,6 @@ test('keeps desktop and mobile canvas screenshots nonblank', async ({
   }
 })
 
-test('applies object-specific toolbar actions to the selected item', async ({
-  page,
-}) => {
-  await page.goto('/engine')
-  const shape = page.locator('[data-canvas-item-id="engine-shape"]')
-
-  await expect(shape).toBeVisible()
-  await shape.click()
-
-  const initialItemCount = await page.locator('[data-canvas-item-id]').count()
-
-  await page.getByRole('button', { name: 'Fill color' }).click()
-  await page.getByRole('button', { name: 'Fill #C2E5FF' }).click()
-  await expect(page.locator(
-    '[data-canvas-item-id="engine-shape"] .shape-item',
-  )).toHaveAttribute('fill', '#C2E5FF')
-  await expect.poll(() => page.locator('[data-canvas-item-id]').count())
-    .toBe(initialItemCount)
-
-  await clickObjectToolbarMenuAction(page, 'Shape', 'Ellipse shape')
-  await expect(page.locator(
-    '[data-canvas-item-id="engine-shape"] ellipse.shape-item',
-  )).toBeVisible()
-  await expect(shape.locator('.canvas-shape-text')).toHaveCSS(
-    'display',
-    'grid',
-  )
-  await expect(shape.locator('.canvas-shape-text')).toHaveCSS(
-    'align-items',
-    'center',
-  )
-  await expect(shape.locator('.canvas-shape-text')).toHaveCSS(
-    'justify-items',
-    'center',
-  )
-
-  const shapeBox = await getRequiredBox(shape)
-  const resizeHandle = page.locator('.resize-handle[data-handle="se"]')
-  const resizeHandleBox = await getRequiredBox(resizeHandle)
-
-  await page.mouse.move(
-    resizeHandleBox.x + resizeHandleBox.width / 2,
-    resizeHandleBox.y + resizeHandleBox.height / 2,
-  )
-  await page.mouse.down()
-  await page.mouse.move(
-    resizeHandleBox.x + resizeHandleBox.width / 2 + 80,
-    resizeHandleBox.y + resizeHandleBox.height / 2 + 42,
-  )
-  await page.mouse.up()
-  await expect.poll(async () => (await getRequiredBox(shape)).width)
-    .toBeGreaterThan(shapeBox.width)
-  await expect(shape.locator('.canvas-shape-text')).toHaveCSS(
-    'align-items',
-    'center',
-  )
-
-  await shape.click()
-  await clickObjectToolbarMenuAction(page, 'Rotate', 'Rotate clockwise')
-  await expect(shape).toHaveAttribute('data-rotation', '15')
-  await expect(shape.locator('.canvas-item-rotation'))
-    .toHaveAttribute('transform', /rotate\(15 /)
-  await expect(shape.locator('.item-outline')).toBeVisible()
-  await expect(page.locator('.resize-handle')).toHaveCount(0)
-
-  await clickObjectToolbarMenuAction(page, 'Rotate', 'Reset rotation')
-  await expect(shape).not.toHaveAttribute('data-rotation')
-  await expect(page.locator('.resize-handle').first()).toBeVisible()
-
-  await page.locator('[data-canvas-item-id="engine-arrow"]').click()
-  await expect(page.getByRole('toolbar', { name: 'Object actions' })
-    .getByRole('button', { exact: true, name: 'Rotate' }))
-    .toBeDisabled()
-  const arrowMenu = await openObjectToolbarMenu(page, 'Arrow')
-  await expect(arrowMenu.getByRole('button', { name: 'Elbow connector' }))
-    .toHaveAttribute('aria-pressed', 'true')
-
-  await clickObjectToolbarMenuAction(page, 'Arrow', 'Straight connector')
-  const straightArrowMenu = await openObjectToolbarMenu(page, 'Arrow')
-  await expect(straightArrowMenu.getByRole('button', {
-    name: 'Straight connector',
-  }))
-    .toHaveAttribute('aria-pressed', 'true')
-
-  await page.getByRole('button', { name: 'Stroke color' }).click()
-  await page.getByRole('button', { name: 'Stroke #9747FF' }).click()
-  await expect(page.locator(
-    '[data-canvas-item-id="engine-arrow"] .arrow-item',
-  )).toHaveAttribute('stroke', '#9747FF')
-
-  await page.locator('[data-canvas-item-id="engine-text"]').click()
-  await expect(page.locator(
-    '[data-text-item-id="engine-text"].canvas-content-editable-text-active',
-  )).toBeVisible()
-})
-
-test('adds reaction stamps as independent annotation objects', async ({
-  page,
-}) => {
-  await page.goto('/engine')
-
-  const shape = page.locator('[data-canvas-item-id="engine-shape"]')
-  const stamps = page.locator('[data-type="stamp"]')
-
-  await shape.click()
-  await expect(page.getByRole('group', { name: 'Stamp reactions' }))
-    .toBeVisible()
-  await expect(page.getByRole('button', { name: 'Add +1 stamp' }))
-    .toBeVisible()
-
-  const shapeBox = await getRequiredBox(shape)
-  const stampCount = await stamps.count()
-
-  await page.getByRole('button', { name: 'Add +1 stamp' }).click()
-  await expect.poll(() => stamps.count()).toBe(stampCount + 1)
-
-  const stamp = stamps.last()
-
-  await expect(stamp).toHaveAttribute('data-selected', 'true')
-  await expect(stamp).toContainText('+1')
-
-  const stampBox = await getRequiredBox(stamp)
-
-  expect(stampBox.x).toBeGreaterThan(shapeBox.x + shapeBox.width - 48)
-  expect(stampBox.y).toBeLessThan(shapeBox.y + 24)
-
-  await stamp.click()
-  await expect(page.getByRole('button', { name: 'Duplicate selection' }))
-    .toBeVisible()
-  await expect(page.getByRole('group', { name: 'Stamp reactions' }))
-    .toHaveCount(0)
-
-  await page.getByRole('button', { name: 'Duplicate selection' }).click()
-  await expect.poll(() => stamps.count()).toBe(stampCount + 2)
-
-  await page.getByRole('button', { name: 'Delete selection' }).click()
-  await expect.poll(() => stamps.count()).toBe(stampCount + 1)
-})
-
-test('mirrors multi-selected objects with flip', async ({ page }) => {
-  await page.goto('/engine')
-
-  const shape = page.locator('[data-canvas-item-id="engine-shape"]')
-  const image = page.locator('[data-canvas-item-id="engine-image"]')
-
-  await expect(shape).toBeVisible()
-  await expect(image).toBeVisible()
-
-  await shape.click()
-  await image.click({ modifiers: ['Shift'] })
-
-  const beforeShape = await getRequiredBox(shape)
-  const beforeImage = await getRequiredBox(image)
-
-  await clickObjectToolbarMenuAction(page, 'Arrange', 'Flip horizontal')
-
-  // mirroring two horizontally-separated objects swaps their screen positions.
-  await expect
-    .poll(async () => (await getRequiredBox(shape)).x)
-    .not.toBe(beforeShape.x)
-  await expect
-    .poll(async () => (await getRequiredBox(image)).x)
-    .not.toBe(beforeImage.x)
-})
-
 test('toggles the token-driven dark theme', async ({ page }) => {
   await page.goto('/engine')
 
@@ -361,181 +145,6 @@ test('toggles the token-driven dark theme', async ({ page }) => {
 
   await page.getByRole('button', { name: 'Switch to light theme' }).click()
   await expect(root).toHaveAttribute('data-theme', 'light')
-})
-
-test('presents section frames without edit chrome', async ({ page }) => {
-  await page.goto('/engine')
-
-  const root = page.locator('main.engine-demo-app')
-  const shape = page.locator('[data-canvas-item-id="engine-shape"]')
-  await page.getByRole('button', { name: 'Reset viewport' }).click()
-  await expect(page.getByLabel('Canvas scale')).toHaveText('100%')
-  await shape.click()
-  await expect(page.getByRole('toolbar', { name: 'Object actions' }))
-    .toBeVisible()
-
-  await page.getByRole('button', { name: 'Enter presentation' }).click()
-  await expect(root).toHaveAttribute('data-presenting', 'true')
-  await expect(page.getByLabel('Canvas scale')).not.toHaveText('100%')
-  await expect(page.getByLabel('Presentation frame')).toHaveText('1/1')
-  await expect(
-    page.getByRole('toolbar', { name: 'Engine affordances' }),
-  ).toHaveCount(0)
-
-  await shape.click()
-  await expect(page.getByRole('toolbar', { name: 'Object actions' }))
-    .toHaveCount(0)
-
-  await page.locator('.engine-demo-workspace').focus()
-  await page.keyboard.press('Backspace')
-  await page.keyboard.press('ArrowRight')
-  await expect(page.getByLabel('Presentation frame')).toHaveText('1/1')
-  await page.keyboard.press('Escape')
-  await expect(root).toHaveAttribute('data-presenting', 'false')
-  await expect(shape).toBeVisible()
-  await expect(page.getByRole('toolbar', { name: 'Engine affordances' }))
-    .toBeVisible()
-})
-
-test('renders a widget in an isolated shadow root without leaking styles', async ({
-  page,
-}) => {
-  await page.goto('/engine')
-
-  const widget = page.locator('[data-canvas-item-id="engine-metric-widget"]')
-  await expect(widget).toBeVisible()
-  // Playwright pierces open shadow roots, so widget content is still reachable.
-  await expect(widget.getByText('1,284')).toBeVisible()
-
-  // the widget content lives inside a shadow root (style/DOM encapsulation).
-  const hasShadowRoot = await page.evaluate(() => {
-    const host = document
-      .querySelector('[data-canvas-item-id="engine-metric-widget"]')
-      ?.querySelector('.canvas-widget-shadow-host')
-    return Boolean(host && host.shadowRoot)
-  })
-  expect(hasShadowRoot).toBe(true)
-
-  // the widget's <style> probe must not escape onto the document canvas stage.
-  const leaked = await page.evaluate(() => {
-    const stage = document.querySelector('.canvas-stage')
-    return stage
-      ? getComputedStyle(stage).getPropertyValue('--metric-widget-leak').trim()
-      : 'no-stage'
-  })
-  expect(leaked).toBe('')
-})
-
-test('toggles Todo items in play mode and persists the change', async ({
-  page,
-}) => {
-  await page.goto('/engine')
-
-  const playTodo = page.locator('[data-canvas-item-id="engine-todo-widget"]')
-  await expect(playTodo).toBeVisible()
-  await playTodo.click()
-
-  await page.getByRole('button', { name: 'Play widget' }).click()
-  const overlay = page.locator('.engine-widget-play-overlay')
-  await expect(overlay).toBeVisible()
-
-  const checkbox = overlay.getByRole('checkbox', {
-    name: 'Ship the isolation host',
-  })
-  await expect(checkbox).not.toBeChecked()
-  await checkbox.click()
-  // the checkbox reflects committed document data after the round-trip.
-  await expect(checkbox).toBeChecked()
-
-  await page.getByRole('button', { name: 'Stop widget' }).click()
-  await expect(overlay).toHaveCount(0)
-
-  // re-entering play re-reads the document: the toggle persisted.
-  await page.getByRole('button', { name: 'Play widget' }).click()
-  await expect(
-    overlay.getByRole('checkbox', { name: 'Ship the isolation host' }),
-  ).toBeChecked()
-})
-
-test('leaves widget play mode when the selection changes', async ({ page }) => {
-  await page.goto('/engine')
-
-  await page.locator('[data-canvas-item-id="engine-todo-widget"]').click()
-  await page.getByRole('button', { name: 'Play widget' }).click()
-  await expect(page.locator('.engine-widget-play-overlay')).toBeVisible()
-
-  // selecting another object exits play mode.
-  await page.locator('[data-canvas-item-id="engine-shape"]').click()
-  await expect(page.locator('.engine-widget-play-overlay')).toHaveCount(0)
-
-  // re-selecting the widget starts in stop mode, not resumed play.
-  await page.locator('[data-canvas-item-id="engine-todo-widget"]').click()
-  await expect(page.getByRole('button', { name: 'Play widget' })).toBeVisible()
-  await expect(page.locator('.engine-widget-play-overlay')).toHaveCount(0)
-})
-
-test('renders the Todo widget with its checklist items', async ({ page }) => {
-  await page.goto('/engine')
-
-  const todo = page.locator('[data-canvas-item-id="engine-todo-widget"]')
-  await expect(todo).toBeVisible()
-  // shadow-root content is reachable through Playwright's shadow piercing.
-  await expect(todo.getByText('Today')).toBeVisible()
-  await expect(todo.getByText('Ship the isolation host')).toBeVisible()
-  await expect(todo.getByText('Add a Todo widget')).toBeVisible()
-})
-
-test('toggles an arrow between arrowhead and plain line', async ({ page }) => {
-  await page.goto('/engine')
-
-  await page.locator('[data-canvas-item-id="engine-arrow"]').click()
-  const arrowPath = page.locator(
-    '[data-canvas-item-id="engine-arrow"] .arrow-item',
-  )
-
-  // arrows ship with an arrowhead marker by default.
-  await expect(arrowPath).toHaveAttribute('marker-end', /.+/)
-
-  await clickObjectToolbarMenuAction(page, 'Arrow', 'Line (no arrow head)')
-  await expect(arrowPath).not.toHaveAttribute('marker-end', /.+/)
-
-  await clickObjectToolbarMenuAction(page, 'Arrow', 'Arrow head')
-  await expect(arrowPath).toHaveAttribute('marker-end', /.+/)
-})
-
-test('exports the selected objects as a downloadable image', async ({
-  page,
-}) => {
-  await page.goto('/engine')
-
-  const shape = page.locator('[data-canvas-item-id="engine-shape"]')
-  await expect(shape).toBeVisible()
-  await shape.click()
-
-  const downloadPromise = page.waitForEvent('download', { timeout: 20_000 })
-  await clickObjectToolbarMenuAction(page, 'More actions', 'Export selection as image')
-  const download = await downloadPromise
-
-  expect(download.suggestedFilename()).toMatch(/\.png$/)
-})
-
-test('selects every same-type object with select same', async ({ page }) => {
-  await page.goto('/engine')
-
-  const shape = page.locator('[data-canvas-item-id="engine-shape"]')
-
-  await expect(shape).toBeVisible()
-  await shape.click()
-
-  // only the clicked shape is selected to start with.
-  await expect(page.locator('[data-canvas-item-id][data-selected="true"]'))
-    .toHaveCount(1)
-
-  await clickObjectToolbarMenuAction(page, 'More actions', 'Select same type')
-
-  // the seed has three shape objects (rect, ellipse, diamond).
-  await expect(page.locator('[data-canvas-item-id][data-selected="true"]'))
-    .toHaveCount(3)
 })
 
 test('creates and edits comments as independent annotation objects', async ({
@@ -572,30 +181,6 @@ test('creates and edits comments as independent annotation objects', async ({
 
   await page.keyboard.press('Delete')
   await expect.poll(() => comments.count()).toBe(initialCommentCount + 1)
-})
-
-test('keeps object toolbar quiet while dragging selection', async ({ page }) => {
-  await page.goto('/engine')
-
-  const item = page.locator('[data-canvas-item-id="engine-shape"]')
-  await item.click()
-  await expect(page.getByRole('toolbar', { name: 'Object actions' }))
-    .toBeVisible()
-
-  const box = await item.boundingBox()
-
-  if (!box) {
-    throw new Error('expected selected item bounds')
-  }
-
-  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)
-  await page.mouse.down()
-  await page.mouse.move(box.x + box.width / 2 + 72, box.y + box.height / 2)
-  await expect(page.getByRole('toolbar', { name: 'Object actions' }))
-    .toHaveCount(0)
-  await page.mouse.up()
-  await expect(page.getByRole('toolbar', { name: 'Object actions' }))
-    .toHaveCount(0)
 })
 
 test('shows snap guides only while moving near aligned objects', async ({
@@ -666,12 +251,6 @@ test('keeps shell controls usable on a mobile viewport', async ({ page }) => {
   expect(isWithinViewport(viewportControlsBox, viewport)).toBe(true)
   expect(boxesOverlap(toolRailBox, viewportControlsBox)).toBe(false)
 
-  await page.locator('[data-canvas-item-id="engine-shape"]').click()
-  const objectActions = page.getByRole('toolbar', { name: 'Object actions' })
-
-  await expect(objectActions).toBeVisible()
-  expect(isWithinViewport(await getRequiredBox(objectActions), viewport))
-    .toBe(true)
 })
 
 test('routes selection keyboard commands through the engine demo', async ({
@@ -739,11 +318,10 @@ test('runs selection and history commands from the context menu', async ({
   const beforeDuplicateCount = await items.count()
 
   await page.keyboard.press('Shift+F10')
-  const menu = page.getByRole('toolbar', { name: 'Canvas context commands' })
+  const menu = page.getByRole('menu', { name: 'Canvas context commands' })
 
   await expect(menu).toBeVisible()
-  await page.keyboard.press('Tab')
-  const duplicateCommand = menu.getByRole('button', { name: 'Duplicate' })
+  const duplicateCommand = menu.getByRole('menuitem', { name: 'Duplicate' })
 
   await expect(duplicateCommand).toBeFocused()
   await duplicateCommand.click()
@@ -754,7 +332,7 @@ test('runs selection and history commands from the context menu', async ({
     .first()
     .click({ button: 'right' })
   await expect(menu).toBeVisible()
-  await menu.getByRole('button', { name: 'Undo' }).click()
+  await menu.getByRole('menuitem', { name: 'Undo' }).click()
   await expect(menu).toHaveCount(0)
   await expect.poll(() => items.count()).toBe(beforeDuplicateCount)
 
@@ -769,7 +347,7 @@ test('runs selection and history commands from the context menu', async ({
   await expect(menu).toHaveCount(0)
 })
 
-test('reorders selected objects through layer controls and shortcuts', async ({
+test('reorders selected objects through layer shortcuts', async ({
   page,
 }) => {
   await page.goto('/engine')
@@ -781,17 +359,6 @@ test('reorders selected objects through layer controls and shortcuts', async ({
   await expect(shape).toHaveAttribute('data-selected', 'true')
   await expectCanvasItemBefore(page, 'engine-shape', 'engine-sticky')
 
-  await clickObjectToolbarMenuAction(page, 'Layer order', 'Bring to front')
-  await expectCanvasItemBefore(page, 'engine-sticky', 'engine-shape')
-  const layerMenu = await openObjectToolbarMenu(page, 'Layer order')
-  await expect(layerMenu.getByRole('button', { name: 'Bring to front' }))
-    .toBeDisabled()
-  await expect(layerMenu.getByRole('button', { name: 'Send backward' }))
-    .toBeEnabled()
-
-  await clickObjectToolbarMenuAction(page, 'Layer order', 'Send to back')
-  await expectCanvasItemBefore(page, 'engine-shape', 'engine-sticky')
-
   await page.keyboard.press('Control+]')
   await expectCanvasItemBefore(page, 'engine-sticky', 'engine-shape')
 
@@ -801,119 +368,32 @@ test('reorders selected objects through layer controls and shortcuts', async ({
   await expect(sticky).toBeVisible()
 })
 
-test('exposes group and section structure actions as canvas parts', async ({
+test('groups and ungroups the selection with keyboard shortcuts', async ({
   page,
 }) => {
   await page.goto('/engine')
 
   await selectShapeAndSticky(page)
-  const groupMenu = await openObjectToolbarMenu(page, 'Structure')
-  await expect(groupMenu.getByRole('button', { name: 'Group selection' }))
-    .toBeVisible()
+  await page.keyboard.press('Control+G')
 
-  await clickObjectToolbarMenuAction(page, 'Structure', 'Group selection')
   const groups = page.locator('[data-type="group"]')
 
   await expect(groups).toHaveCount(1)
-  await expect(groups.first())
-    .toHaveAttribute('data-selected', 'true')
+  await expect(groups.first()).toHaveAttribute('data-selected', 'true')
 
-  await groups.first().click()
-  await expect(page.getByRole('button', { name: 'Duplicate selection' }))
-    .toBeVisible()
-  await page.getByRole('button', { name: 'Duplicate selection' }).click()
-  await expect.poll(() => groups.count()).toBe(2)
-  await expect(page.locator('[data-type="group"][data-selected="true"]'))
-    .toHaveCount(1)
-
-  await page.getByRole('button', { name: 'Delete selection' }).click()
-  await expect.poll(() => groups.count()).toBe(1)
-
-  await groups.first().click()
-  const ungroupMenu = await openObjectToolbarMenu(page, 'Structure')
-  await expect(ungroupMenu.getByRole('button', { name: 'Ungroup selection' }))
-    .toBeVisible()
-  await clickObjectToolbarMenuAction(page, 'Structure', 'Ungroup selection')
-  await expect.poll(() => groups.count()).toBe(0)
+  await page.keyboard.press('Control+Shift+G')
+  await expect(groups).toHaveCount(0)
   await expect(page.locator('[data-canvas-item-id="engine-shape"]'))
     .toHaveAttribute('data-selected', 'true')
   await expect(page.locator('[data-canvas-item-id="engine-sticky"]'))
     .toHaveAttribute('data-selected', 'true')
-
-  await selectShapeAndSticky(page)
-  const sectionCount = await page.locator(
-    '[data-type="component"][data-component="section"]',
-  ).count()
-
-  const sectionMenu = await openObjectToolbarMenu(page, 'Structure')
-  await expect(sectionMenu.getByRole('button', { name: 'Section selection' }))
-    .toBeVisible()
-  await clickObjectToolbarMenuAction(page, 'Structure', 'Section selection')
-  await expect.poll(() =>
-    page.locator('[data-type="component"][data-component="section"]').count(),
-  ).toBe(sectionCount + 1)
-  await expect(page.locator(
-    '[data-type="component"][data-component="section"][data-selected="true"]',
-  )).toBeVisible()
-
-  const selectedSection = page.locator(
-    '[data-type="component"][data-component="section"][data-selected="true"]',
-  )
-  const shape = page.locator('[data-canvas-item-id="engine-shape"]')
-  const sticky = page.locator('[data-canvas-item-id="engine-sticky"]')
-
-  await selectedSection.click({ position: { x: 96, y: 128 } })
-  await page.getByRole('button', { name: 'Edit text' }).click()
-  await expect(page.locator('textarea.text-editor')).toBeVisible()
-  await page.locator('textarea.text-editor').fill('Planning')
-  await page.keyboard.press('Enter')
-  await expect(page.locator('textarea.text-editor')).toHaveCount(0)
-  await expect(selectedSection.locator('.component-section-title'))
-    .toContainText('Planning')
-
-  const hideSectionMenu = await openObjectToolbarMenu(page, 'Structure')
-  await expect(hideSectionMenu.getByRole('button', {
-    name: 'Hide section contents',
-  }))
-    .toBeVisible()
-  await clickObjectToolbarMenuAction(page, 'Structure', 'Hide section contents')
-  await expect(shape).toHaveCount(0)
-  await expect(sticky).toHaveCount(0)
-  await expect(selectedSection).toBeVisible()
-
-  await clickObjectToolbarMenuAction(page, 'Structure', 'Show section contents')
-  await expect(shape).toBeVisible()
-  await expect(sticky).toBeVisible()
-
-  await clickObjectToolbarMenuAction(page, 'Structure', 'Lock section')
-  await expect(selectedSection).toHaveAttribute('data-locked', 'true')
-  await expect(shape).toHaveAttribute('data-locked', 'true')
-  await expect(sticky).toHaveAttribute('data-locked', 'true')
-
-  await page.getByRole('button', { name: 'Unlock all' }).click()
-  await expect(selectedSection).not.toHaveAttribute('data-locked', 'true')
-  await expect(shape).not.toHaveAttribute('data-locked', 'true')
-  await expect(sticky).not.toHaveAttribute('data-locked', 'true')
-
-  await selectedSection.click({ position: { x: 16, y: 80 } })
-  const deleteSectionMenu = await openObjectToolbarMenu(page, 'Structure')
-  await expect(deleteSectionMenu.getByRole('button', {
-    name: 'Delete section frame',
-  }))
-    .toBeVisible()
-  await clickObjectToolbarMenuAction(page, 'Structure', 'Delete section frame')
-  await expect.poll(() =>
-    page.locator('[data-type="component"][data-component="section"]').count(),
-  ).toBe(sectionCount)
-  await expect(shape).toBeVisible()
-  await expect(sticky).toBeVisible()
 })
 
 test('direct-selects and edits a child inside a group', async ({ page }) => {
   await page.goto('/engine')
 
   await selectShapeAndSticky(page)
-  await clickObjectToolbarMenuAction(page, 'Structure', 'Group selection')
+  await page.keyboard.press('Control+G')
 
   const group = page.locator('[data-type="group"]').first()
   const shape = page.locator('[data-canvas-item-id="engine-shape"]')
@@ -985,44 +465,6 @@ test('direct-selects and edits a child inside a group', async ({ page }) => {
   await expect(shape).not.toHaveAttribute('data-selected', 'true')
 })
 
-test('arranges and tidies selected layout objects', async ({ page }) => {
-  await page.goto('/engine')
-
-  await selectShapeStickyTextAndArrow(page)
-
-  const arrangeMenu = await openObjectToolbarMenu(page, 'Arrange')
-  await expect(arrangeMenu.getByRole('button', { name: 'Align left' }))
-    .toBeVisible()
-  await expect(arrangeMenu.getByRole('button', {
-    name: 'Distribute horizontally',
-  }))
-    .toBeVisible()
-  await expect(arrangeMenu.getByRole('button', { name: 'Tidy selection' }))
-    .toBeVisible()
-
-  const arrow = page.locator('[data-canvas-item-id="engine-arrow"]')
-  const text = page.locator('[data-canvas-item-id="engine-text"]')
-  const arrowBefore = await getRequiredBox(arrow)
-  const textBefore = await getRequiredBox(text)
-
-  await clickObjectToolbarMenuAction(page, 'Arrange', 'Tidy selection')
-  await expect.poll(async () => Math.round((await getRequiredBox(text)).y))
-    .not.toBe(Math.round(textBefore.y))
-
-  const arrowAfterTidy = await getRequiredBox(arrow)
-
-  expect(Math.round(arrowAfterTidy.x)).toBe(Math.round(arrowBefore.x))
-  expect(Math.round(arrowAfterTidy.y)).toBe(Math.round(arrowBefore.y))
-
-  await clickObjectToolbarMenuAction(page, 'Arrange', 'Align left')
-  const left = Math.round((await getRequiredBox(
-    page.locator('[data-canvas-item-id="engine-shape"]'),
-  )).x)
-
-  await expect.poll(async () => Math.round((await getRequiredBox(text)).x))
-    .toBe(left)
-})
-
 test('shows expected selection feedback while marquee selecting', async ({
   page,
 }) => {
@@ -1060,7 +502,13 @@ test('keeps text editing and drawing as engine affordances', async ({
     return text?.startsWith('Edited text') === true &&
       text.includes('\n')
   }).toBe(true)
-  await page.keyboard.press('Escape')
+  const workspaceBox = await page.locator('.canvas-stage').boundingBox()
+
+  if (!workspaceBox) {
+    throw new Error('expected canvas stage')
+  }
+
+  await page.mouse.click(workspaceBox.x + 12, workspaceBox.y + 12)
   await expect(textEditor).toHaveCount(0)
   await expect(page.locator('[data-canvas-item-id="engine-text"]'))
     .toContainText('Edited text')
@@ -1214,10 +662,12 @@ test('quick-creates connected sticky notes with inherited style', async ({
   await sourceEditor.press('Escape')
   await expect(sourceEditor).toHaveCount(0)
 
-  await page.getByRole('button', { name: 'Fill color' }).click()
-  await page.getByRole('button', { name: 'Fill #C2E5FF' }).click()
-  await expect(source.locator('.component-sticky-note'))
-    .toHaveAttribute('fill', '#C2E5FF')
+  const sourceFill = await source.locator('.component-sticky-note')
+    .getAttribute('fill')
+
+  if (!sourceFill) {
+    throw new Error('expected source sticky fill')
+  }
 
   const stickyItems = page.locator(
     '[data-type="component"][data-component="sticky"]',
@@ -1240,7 +690,7 @@ test('quick-creates connected sticky notes with inherited style', async ({
   const selectedStickyNote = selectedSticky.locator('.component-sticky-note')
 
   await expect(selectedSticky).toHaveCount(1)
-  await expect(selectedStickyNote).toHaveAttribute('fill', '#C2E5FF')
+  await expect(selectedStickyNote).toHaveAttribute('fill', sourceFill)
 
   const initialHeight = await getSvgNumberAttribute(
     selectedStickyNote,
@@ -1250,9 +700,26 @@ test('quick-creates connected sticky notes with inherited style', async ({
   await stickyEditor.fill(
     'This sticky expands when the text crosses multiple lines in the same compact object.',
   )
-  await stickyEditor.press('Escape')
+
+  const stageBox = await page.locator('.canvas-stage').boundingBox()
+
+  if (!stageBox) {
+    throw new Error('expected canvas stage')
+  }
+
+  const createdStickyId = await selectedSticky.getAttribute('data-canvas-item-id')
+
+  if (!createdStickyId) {
+    throw new Error('expected created sticky id')
+  }
+
+  const createdStickyNote = page
+    .locator(`[data-canvas-item-id="${createdStickyId}"]`)
+    .locator('.component-sticky-note')
+
+  await page.mouse.click(stageBox.x + 12, stageBox.y + 12)
   await expect(stickyEditor).toHaveCount(0)
-  await expect.poll(() => getSvgNumberAttribute(selectedStickyNote, 'height'))
+  await expect.poll(() => getSvgNumberAttribute(createdStickyNote, 'height'))
     .toBeGreaterThan(initialHeight)
 })
 
@@ -1314,29 +781,6 @@ async function readCanvasScalePercent(page: Page) {
   return Number.parseInt(text ?? '0', 10)
 }
 
-async function openObjectToolbarMenu(page: Page, menuName: string) {
-  const toolbar = page.getByRole('toolbar', { name: 'Object actions' })
-  const menu = page.getByRole('group', { exact: true, name: menuName })
-
-  if (await menu.isVisible().catch(() => false)) {
-    return menu
-  }
-
-  await toolbar.getByRole('button', { exact: true, name: menuName }).click()
-  await expect(menu).toBeVisible()
-
-  return menu
-}
-
-async function clickObjectToolbarMenuAction(
-  page: Page,
-  menuName: string,
-  actionName: string,
-) {
-  const menu = await openObjectToolbarMenu(page, menuName)
-  await menu.getByRole('button', { exact: true, name: actionName }).click()
-}
-
 async function selectShapeAndSticky(page: Page) {
   const shape = page.locator('[data-canvas-item-id="engine-shape"]')
   const sticky = page.locator('[data-canvas-item-id="engine-sticky"]')
@@ -1353,34 +797,6 @@ async function selectShapeAndSticky(page: Page) {
   await page.keyboard.up('Shift')
   await expect(shape).toHaveAttribute('data-selected', 'true')
   await expect(sticky).toHaveAttribute('data-selected', 'true')
-  await expect(page.getByRole('toolbar', { name: 'Object actions' }))
-    .toBeVisible()
-}
-
-async function selectShapeStickyTextAndArrow(page: Page) {
-  const shape = page.locator('[data-canvas-item-id="engine-shape"]')
-  const sticky = page.locator('[data-canvas-item-id="engine-sticky"]')
-  const text = page.locator('[data-canvas-item-id="engine-text"]')
-  const arrow = page.locator('[data-canvas-item-id="engine-arrow"]')
-  const stageBox = await page.locator('.canvas-stage').boundingBox()
-
-  if (!stageBox) {
-    throw new Error('expected canvas stage')
-  }
-
-  await page.mouse.click(stageBox.x + 12, stageBox.y + 12)
-  await shape.click()
-  await page.keyboard.down('Shift')
-  await sticky.click()
-  await text.click()
-  await arrow.click()
-  await page.keyboard.up('Shift')
-  await expect(shape).toHaveAttribute('data-selected', 'true')
-  await expect(sticky).toHaveAttribute('data-selected', 'true')
-  await expect(text).toHaveAttribute('data-selected', 'true')
-  await expect(arrow).toHaveAttribute('data-selected', 'true')
-  await expect(page.getByRole('toolbar', { name: 'Object actions' }))
-    .toBeVisible()
 }
 
 async function getRequiredBox(locator: Locator) {

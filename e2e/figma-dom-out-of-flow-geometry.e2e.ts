@@ -3,7 +3,7 @@ import { expect, test, type Locator, type Page } from '@playwright/test'
 test('shows geometry handles only for out-of-flow DOM nodes', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
   await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
 
   await selectLayer(page, 'Select layer Main area', 'workspaceMain')
@@ -30,7 +30,7 @@ test('shows geometry handles only for out-of-flow DOM nodes', async ({
 test('shows smart guides while dragging absolute DOM geometry', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
   await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
   await selectLayer(page, 'Select layer Floating note', 'workspaceFloatingNote')
 
@@ -57,7 +57,7 @@ test('shows smart guides while dragging absolute DOM geometry', async ({
 test('keeps smart guides aligned after zooming the absolute sample', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
   await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
   await selectLayer(page, 'Select layer Floating note', 'workspaceFloatingNote')
 

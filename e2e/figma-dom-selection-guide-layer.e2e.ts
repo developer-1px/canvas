@@ -22,7 +22,7 @@ const SELECTION_CASES = [
 ] as const
 
 test('normalizes the DOM selection guide layer', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
 
   for (const selection of SELECTION_CASES) {
     await selectLayer(page, selection.buttonName, selection.nodeId)
@@ -31,7 +31,7 @@ test('normalizes the DOM selection guide layer', async ({ page }) => {
 })
 
 test('keeps selected DOM guide aligned while panning', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
   await selectLayer(
     page,
     'Select layer Workspace page',
@@ -70,7 +70,7 @@ test('keeps selected DOM guide aligned while panning', async ({ page }) => {
 test('keeps widget selection separate from DOM edit selection', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
   await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
   await expect(selectionGuide(page)).toHaveCount(1)
 

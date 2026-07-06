@@ -3,7 +3,7 @@ import { expect, test, type Locator, type Page } from '@playwright/test'
 test('shows flex main-axis flow guides inside content lanes', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
   await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
 
   await selectLayer(page, 'Select layer Hero actions', 'workspaceHeroActions')
@@ -37,7 +37,7 @@ test('shows flex main-axis flow guides inside content lanes', async ({
 })
 
 test('shows flex main-axis guides in measure state', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
   await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
   await selectLayer(page, 'Select layer Hero panel', 'workspaceHero')
   await page.getByRole('button', { name: 'Measure tool' }).click()
@@ -52,7 +52,7 @@ test('shows flex main-axis guides in measure state', async ({ page }) => {
 test('keeps main-axis guides visible while gap affordances are active', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
   await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
   await selectLayer(page, 'Select layer Hero actions', 'workspaceHeroActions')
 

@@ -3,7 +3,7 @@ import { expect, test, type Locator, type Page } from '@playwright/test'
 test('shows flex container controls only for flex containers', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
   await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
   await expect(horizontalDirection(page)).toHaveAttribute('aria-checked', 'true')
   await expect(verticalDirection(page)).toHaveAttribute('aria-checked', 'false')
@@ -30,7 +30,7 @@ test('shows flex container controls only for flex containers', async ({
 test('edits flex direction and shared gap from canvas controls', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
   await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
   await selectLayer(page, 'Select layer Pipeline list', 'workspacePipelineList')
 
@@ -58,7 +58,7 @@ test('edits flex direction and shared gap from canvas controls', async ({
 test('scales padding bands and keeps gap/padding active states exclusive', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
   await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
   await selectLayer(page, 'Select layer Main area', 'workspaceMain')
 

@@ -1,12 +1,6 @@
 import {
-  CANVAS_APP_COMMENT_ONLY_CAPABILITIES,
   CANVAS_APP_EDITOR_CAPABILITIES,
-  CANVAS_APP_READ_ONLY_CAPABILITIES,
-  createCanvasAppAiLabsDemoSummaryProvider,
-  createCanvasAppAiLabsFeaturePackManifest,
-  createCanvasAppAiLabsSummarizeSelectionCommand,
   createCanvasAppAssembly,
-  type CreateCanvasAppAiLabsSummarizeSelectionCommandInput,
   type CanvasAppAssemblyInput,
   type CanvasWorkspaceStorage,
   type CanvasWorkspaceStorageProvider,
@@ -16,7 +10,6 @@ import {
   DEMO_CANVAS_REFERENCE_BOUNDS,
   DEMO_CANVAS_SEED_ITEMS,
 } from './CanvasDemoSeedItems'
-import { DEMO_CUSTOM_ITEM_MODULES } from './custom-items'
 
 function createDemoCanvasInitialWorkspace() {
   return JSON.stringify({
@@ -114,13 +107,13 @@ const DEMO_CANVAS_FOCUSED_AFFORDANCE_CONFIG = {
     findReplace: false,
     grid: false,
     imageControls: false,
-    inspector: true,
+    inspector: false,
     itemOutline: true,
     laserTrail: false,
     marquee: true,
-    minimap: true,
+    minimap: false,
     presence: false,
-    presentationMode: true,
+    presentationMode: false,
     resizeHandles: true,
     selectionBounds: true,
     sessionTimer: false,
@@ -199,52 +192,12 @@ const DEMO_CANVAS_FOCUSED_AFFORDANCE_CONFIG = {
   },
 } satisfies CanvasAppAssemblyInput['affordanceConfig']
 
-const DEMO_CANVAS_BASE_ASSEMBLY_INPUT = {
+export const DEMO_CANVAS_APP_ASSEMBLY_INPUT = {
   affordanceConfig: DEMO_CANVAS_FOCUSED_AFFORDANCE_CONFIG,
-  customItemModules: DEMO_CUSTOM_ITEM_MODULES,
+  capabilities: CANVAS_APP_EDITOR_CAPABILITIES,
   initialItems: DEMO_CANVAS_SEED_ITEMS,
   initialSelection: DEMO_CANVAS_INITIAL_SELECTION,
   workspaceStorageProvider: DEMO_CANVAS_STORAGE_PROVIDER,
-} satisfies CanvasAppAssemblyInput
-
-export const DEMO_CANVAS_APP_ASSEMBLY_INPUT = {
-  ...DEMO_CANVAS_BASE_ASSEMBLY_INPUT,
-  capabilities: CANVAS_APP_EDITOR_CAPABILITIES,
-} satisfies CanvasAppAssemblyInput
-
-const DEMO_CANVAS_AI_LABS_COMMAND_INPUT = {
-  provider: createCanvasAppAiLabsDemoSummaryProvider(),
-  requestReview: () => ({
-    kind: 'cancel',
-    reason: 'demo fixture requires a host review UI',
-  }),
-} satisfies CreateCanvasAppAiLabsSummarizeSelectionCommandInput
-
-export const DEMO_CANVAS_AI_LABS_SUMMARIZE_SELECTION_COMMAND =
-  createCanvasAppAiLabsSummarizeSelectionCommand(
-    DEMO_CANVAS_AI_LABS_COMMAND_INPUT,
-  )
-
-export const DEMO_CANVAS_AI_LABS_FEATURE_PACK_MANIFEST =
-  createCanvasAppAiLabsFeaturePackManifest(
-    DEMO_CANVAS_AI_LABS_COMMAND_INPUT,
-  )
-
-export const DEMO_CANVAS_AI_LABS_ASSEMBLY_INPUT = {
-  ...DEMO_CANVAS_APP_ASSEMBLY_INPUT,
-  additionalFeaturePackManifests: [
-    DEMO_CANVAS_AI_LABS_FEATURE_PACK_MANIFEST,
-  ],
-} satisfies CanvasAppAssemblyInput
-
-export const DEMO_CANVAS_READ_ONLY_ASSEMBLY_INPUT = {
-  ...DEMO_CANVAS_BASE_ASSEMBLY_INPUT,
-  capabilities: CANVAS_APP_READ_ONLY_CAPABILITIES,
-} satisfies CanvasAppAssemblyInput
-
-export const DEMO_CANVAS_COMMENT_ONLY_ASSEMBLY_INPUT = {
-  ...DEMO_CANVAS_BASE_ASSEMBLY_INPUT,
-  capabilities: CANVAS_APP_COMMENT_ONLY_CAPABILITIES,
 } satisfies CanvasAppAssemblyInput
 
 export const DEMO_CANVAS_APP_ASSEMBLY = createCanvasAppAssembly(

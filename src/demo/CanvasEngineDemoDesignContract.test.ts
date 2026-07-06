@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 const HERE = fileURLToPath(new URL('.', import.meta.url))
 
 const DEMO_CSS_FILES = [
-  `${HERE}CanvasDevToolsDemoApp.css`,
+  `${HERE}CanvasEngineDemoApp.css`,
   fileURLToPath(new URL('../index.css', import.meta.url)),
 ]
 

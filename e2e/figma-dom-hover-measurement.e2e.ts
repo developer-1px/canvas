@@ -1,7 +1,7 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
 
 test('shows selected-to-hover DOM measurement redlines', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
 
   await page.getByRole('button', { name: 'Select layer Workspace page' })
     .click()
@@ -33,7 +33,7 @@ test('shows selected-to-hover DOM measurement redlines', async ({ page }) => {
 test('hides DOM measurement redlines while spacing affordances drag', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
 
   await page.getByRole('button', { name: 'Select layer Workspace page' })
     .click()

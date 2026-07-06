@@ -3,7 +3,7 @@ import { expect, test, type Locator } from '@playwright/test'
 test('shows frame-local DOM guides and responsive layout columns', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
 
   await page.getByRole('button', { name: 'Select layer Workspace page' })
     .click()

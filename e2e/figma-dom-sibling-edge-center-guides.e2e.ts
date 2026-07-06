@@ -3,7 +3,7 @@ import { expect, test, type Locator, type Page } from '@playwright/test'
 test('shows parent and sibling smart guides only in guide states', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
   await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
   await selectLayer(page, 'Select layer Revenue stat', 'workspaceStatRevenue')
 
@@ -23,7 +23,7 @@ test('shows parent and sibling smart guides only in guide states', async ({
 test('keeps smart edge and center guides aligned through pan and zoom', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
   await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
   await selectLayer(page, 'Select layer Revenue stat', 'workspaceStatRevenue')
   await page.getByRole('button', { name: 'Measure tool' }).click()

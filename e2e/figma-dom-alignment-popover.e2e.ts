@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test'
 
 test('edits DOM alignment from the canvas popover', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/?demo=figma')
 
   await page.getByRole('button', { name: 'Select layer Workspace page' })
     .click()
