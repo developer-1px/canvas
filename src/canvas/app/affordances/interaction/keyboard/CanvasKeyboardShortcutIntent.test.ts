@@ -111,6 +111,28 @@ describe('CanvasKeyboardShortcutIntent', () => {
     })
   })
 
+  it('maps F2 to edit-selection only outside typing targets', () => {
+    expect(getCanvasKeyboardShortcutIntent(createInput({
+      event: createKeyboardEvent({ key: 'F2' }),
+      selection: ['item-1'],
+    }))).toEqual({
+      kind: 'edit-selection',
+      preventDefault: true,
+    })
+
+    expect(getCanvasKeyboardShortcutIntent(createInput({
+      event: createKeyboardEvent({ key: 'F2' }),
+      selection: ['a', 'b'],
+    }))).toEqual({ kind: 'none', preventDefault: false })
+
+    withTextAreaTarget((target) => {
+      expect(getCanvasKeyboardShortcutIntent(createInput({
+        event: createKeyboardEvent({ key: 'F2', target }),
+        selection: ['item-1'],
+      }))).toEqual({ kind: 'none', preventDefault: false })
+    })
+  })
+
   it('honors find/replace shortcut and overlay toggles', () => {
     expect(getCanvasKeyboardShortcutIntent(createInput({
       config: createCanvasAffordanceConfig({
