@@ -383,7 +383,7 @@ export {
   createCanvasAppCustomItemModuleAssembly,
   type CanvasAppCustomItemModuleAssembly,
   type CanvasAppCustomItemModuleAssemblyOptions,
-  useCanvasDevToolsAppModel,
+  useCanvasAppPreviewModel,
   useCanvasAppModel,
 } from './workflow'
 export {

@@ -1,7 +1,7 @@
 ---
 version: alpha
-name: Canvas DevTools
-description: Light-first, plane-based, content-first design contract for a canvas-based internal web development tool.
+name: Canvas Engine Demo
+description: Light-first, plane-based, content-first design contract for the reusable canvas engine demo.
 defaultMode: light
 tokens:
   color:
@@ -48,15 +48,15 @@ modes:
     border-strong: "#4A4D53"
 ---
 
-# Canvas DevTools Design Contract
+# Canvas Engine Demo Design Contract
 
 ## Product Identity
 
-This is a lightweight workbench for inspecting and editing real web UI on a canvas. The product surface is the app preview, selected DOM target, CSS rules, editable values, controls, and verification evidence. Controls exist because this is a web app, not a static webpage.
+This is a lightweight verification shell for reusable canvas engine affordances. The product surface is the canvas stage, selected canvas item, compact tool controls, viewport state, command surfaces, and verification evidence. Controls exist because this is an editor surface, not a static webpage.
 
-One sentence: content first, surface planes over lines, precise editing, visible app controls, one quiet floating dock.
+One sentence: canvas first, surface planes over lines, precise editing, visible app controls, one quiet floating dock.
 
-The closest product tone is a Codex-style workbench: quiet left navigation, central work content, and a small right-side status/control island. It is not Figma chrome, Chrome DevTools chrome, or a decorative SaaS dashboard.
+The closest product tone is a Codex-style workbench: quiet navigation, central work content, and small status/control islands. It is not Figma chrome, browser inspector chrome, or a decorative SaaS dashboard.
 
 ## Non-Negotiables
 
@@ -93,17 +93,17 @@ Do not use a large right-side color block as the main control model. Controls sh
 
 ## Layer Affordances
 
-This product edits UI content on a canvas, so the three layers must not blur together.
+This product edits canvas content, so the three layers must not blur together.
 
 - Canvas is the quiet spatial stage. It needs subtle operability cues: sparse low-contrast grid or origin ticks, zoom or scale state, and object placement cues. These cues must be quieter than content.
-- Content is the app being edited. It needs real product controls, state, dense data, hover/selection, inputs, menus, toggles, checkboxes, and actions.
-- Controls are editing instruments. They need selector/source/CSS/patch semantics, utility actions, mode state, and inline editable values.
+- Content is the canvas document being edited. It needs real item state, hover/selection, inputs, menus, toggles, checkboxes, and actions.
+- Controls are editing instruments. They need tool, command, viewport, selection, and item-style semantics.
 
 If canvas affordance is missing, the screen reads as a webpage. If content affordance is missing, the sample reads as editorial mock content. If control affordance is missing, the user cannot tell editing tools from the app's own controls.
 
 ## Surface Tone
 
-The target tone is Codex-like surface workbench, not Chrome DevTools, Figma canvas, or a SaaS dashboard. Separate areas with subtle filled planes rather than borders.
+The target tone is a Codex-like surface workbench, not browser inspector chrome, Figma chrome, or a SaaS dashboard. Separate areas with subtle filled planes rather than borders.
 
 Use by default:
 
@@ -125,22 +125,22 @@ Avoid by default:
 
 ## Floating Selection Dock
 
-Controls for the current selection belong in one compact dock. The dock may move with, or sit near, the selected content. It should feel like a tool instrument orbiting the selected object, not a right-side DevTools panel, side sheet, or static inspector.
+Controls for the current selection belong in one compact dock. The dock may move with, or sit near, the selected content. It should feel like a tool instrument orbiting the selected object, not a right-side inspector panel, side sheet, or static property editor.
 
 Required dock areas:
 
-- `Target`: selected selector, component/source path, inspect/edit mode state.
-- `Style`: key CSS declarations with inline editable values.
-- `Patch`: concise patch summary and preview.
-- `Actions`: copy, export, revert, apply/ship patch.
+- `Target`: selected item type, id, and edit mode state.
+- `Style`: key fill, stroke, text, and transform values.
+- `State`: concise selection, viewport, and command availability summary.
+- `Actions`: duplicate, delete, arrange, group, export, and fit commands.
 
 The dock uses calm collapsible sections:
 
 - Collapsed does not mean hidden. Collapsed means summarized.
 - Expanded means editable.
-- `Target` collapsed still shows selector and source path.
-- `Style` collapsed still shows 3-5 key declarations and affected node count.
-- `Patch` collapsed still shows update/insert count and readiness.
+- `Target` collapsed still shows item type and id.
+- `Style` collapsed still shows 3-5 key visual values.
+- `State` collapsed still shows selection count and viewport scale.
 - `Actions` stays visible enough for copy/export/revert/apply.
 
 Internal dock grouping should use spacing, tiny chevrons, and summary text. Avoid section boxes, heavy rules, large headers, and many typography styles.
@@ -152,12 +152,12 @@ The demo must read as an operating web app, not an editorial webpage. Removing d
 Required visible controls:
 
 - Mode or target control for inspect/edit state.
-- Current selected target and source path.
+- Current selected item target.
 - Undo/redo or clear recovery affordance when edits exist.
-- Copy/export controls for HTML/CSS or patch output.
-- Apply/ship/publish action for the proposed patch.
+- Copy/export controls for canvas content.
+- Apply/commit action for the current canvas command where relevant.
 - Search or filter where the surface contains many rows or nodes.
-- Editable CSS values that clearly accept input.
+- Editable item values that clearly accept input.
 - Collapsible dock sections whose collapsed state still summarizes the work.
 
 Controls should be compact and integrated into the surface. They may be icon-only when the icon is familiar and accessible. They should not be hidden behind explanatory copy, oversized bars, or decorative chrome.
@@ -203,7 +203,7 @@ Use the UI sans font for almost everything. Use monospace only for code, selecto
 
 Avoid oversized type inside tools. Labels, tables, forms, and inspector rows should be compact and scannable. Letter spacing is `0`.
 
-Limit control typography to three tones: primary UI text, muted labels, and code values. Too many type voices make the dock feel like a code editor or DevTools clone.
+Limit control typography to three tones: primary UI text, muted labels, and code values. Too many type voices make the dock feel like a code editor or inspector clone.
 
 Weight contract:
 
@@ -291,7 +291,7 @@ Every interactive element needs a visible focus state and accessible name. Color
 - Nested cards.
 - Multiple floating cards for one selection.
 - Border-heavy sectioning.
-- Fixed right DevTools inspector as the primary control surface.
+- Fixed right inspector as the primary control surface.
 - Large right color sheet as the primary control surface.
 - Webpage-like editorial composition without app controls.
 - Hidden accordion content that removes essential target/style/patch context.

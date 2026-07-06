@@ -126,8 +126,8 @@ Current cleanup pass:
 - Stamp reactions now stack vertically away from the selected-object toolbar so
   toolbar actions remain clickable when the object toolbar grows.
 - Removed the `html-specimen-css` special case from the shared app shell.
-- Removed the `object-inspector-devtools` takeover mode from the shared inspector.
-- Removed the matching devtools rail CSS from shared app styles.
+- Removed the inspector takeover mode from the shared inspector.
+- Removed the matching special rail CSS from shared app styles.
 - Kept the custom item extension seam empty in the default demo.
 - Added mobile shell smoke coverage for the engine demo and moved mobile viewport controls away from the bottom tool rail.
 - Added plain Enter edit selection routing through the shared keyboard command path.

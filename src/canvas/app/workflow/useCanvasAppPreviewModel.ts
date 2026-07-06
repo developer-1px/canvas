@@ -45,7 +45,7 @@ const EMPTY_CANVAS_OVERLAYS: CanvasOverlayState = {
   spacingGuides: [],
 }
 
-export function useCanvasDevToolsAppModel({
+export function useCanvasAppPreviewModel({
   assemblyInput,
 }: {
   assemblyInput?: CanvasAppAssemblyInput
@@ -93,7 +93,7 @@ export function useCanvasDevToolsAppModel({
         componentPresentationRenderers:
           assembly.componentPresentationRenderers,
         customItemRenderers: assembly.customItemRenderers,
-        getComponentPresentation: getCanvasDevToolsComponentPresentation,
+        getComponentPresentation: getCanvasAppPreviewComponentPresentation,
         items: workspace.itemLayer.items,
         onArrowEndpointPointerDown: noop,
         onItemPointerDown: noop,
@@ -103,7 +103,7 @@ export function useCanvasDevToolsAppModel({
       }),
       gesture: 'none',
       onCanvasPointerDown: noop,
-      onContextMenu: preventCanvasDevToolsContextMenu,
+      onContextMenu: preventCanvasAppPreviewContextMenu,
       onPointerCancel: noop,
       onPointerMove: noop,
       onPointerUp: noop,
@@ -117,11 +117,13 @@ export function useCanvasDevToolsAppModel({
   }
 }
 
-function getCanvasDevToolsComponentPresentation(component: string) {
+function getCanvasAppPreviewComponentPresentation(component: string) {
   return component
 }
 
-function preventCanvasDevToolsContextMenu(event: { preventDefault: () => void }) {
+function preventCanvasAppPreviewContextMenu(
+  event: { preventDefault: () => void },
+) {
   event.preventDefault()
 }
 

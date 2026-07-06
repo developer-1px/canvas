@@ -613,6 +613,7 @@ describe('Canvas package consumer imports', () => {
     expect('DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS' in CanvasPackage)
       .toBe(false)
     expect(CanvasAppFacade.useCanvasAppModel).toBeTypeOf('function')
+    expect(CanvasAppFacade.useCanvasAppPreviewModel).toBeTypeOf('function')
     expect(CanvasAppFacade.DEFAULT_CANVAS_APP_ASSEMBLY).toBeTypeOf('object')
     expect(CanvasAppFacade.assertCanvasAppAssembly).toBeTypeOf('function')
     expect(CanvasAppFacade.assertCanvasAppExtensionRecordKeys).toBeTypeOf(

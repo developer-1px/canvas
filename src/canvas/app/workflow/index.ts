@@ -1,5 +1,5 @@
 export { useCanvasAppModel } from './useCanvasAppModel'
-export { useCanvasDevToolsAppModel } from './useCanvasDevToolsAppModel'
+export { useCanvasAppPreviewModel } from './useCanvasAppPreviewModel'
 export {
   DEFAULT_CANVAS_APP_ASSEMBLY,
   assertCanvasAppAssembly,

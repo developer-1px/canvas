@@ -259,7 +259,7 @@ exports[`Canvas package public surface > snapshots facade runtime value exports 
     "stringifyCanvasRichClipboardPayload",
     "trapCanvasModalTabFocus",
     "useCanvasAppModel",
-    "useCanvasDevToolsAppModel",
+    "useCanvasAppPreviewModel",
     "useCanvasMenuRovingFocus",
     "useCanvasModalFocusLifecycle",
     "useCanvasToolbarRovingFocus",

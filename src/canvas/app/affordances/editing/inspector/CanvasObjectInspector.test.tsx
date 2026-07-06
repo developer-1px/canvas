@@ -150,7 +150,7 @@ describe('CanvasObjectInspector', () => {
     )
 
     expect(markup).toContain('Styles')
-    expect(markup).not.toContain('object-inspector-devtools')
+    expect(markup).not.toContain('inspector-takeover')
     expect(markup).toContain('inspector-grid')
     expect(markup).toContain('inspector-style-controls')
   })

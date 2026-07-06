@@ -157,7 +157,7 @@ describe('CanvasAppView', () => {
     const markup = renderToStaticMarkup(<CanvasAppView {...props} />)
 
     expect(markup).toContain('Styles')
-    expect(markup).not.toContain('object-inspector-devtools')
+    expect(markup).not.toContain('inspector-takeover')
     expect(markup).toContain('selection-floating-bar')
     expect(markup).toContain('zoom-controls')
   })

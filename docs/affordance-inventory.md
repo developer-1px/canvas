@@ -43,12 +43,11 @@ top of the public authoring API.
 
 | Path | 판정 | 이유 |
 |------|------|------|
-| `src/demo/CanvasDevToolsDemoApp.tsx` | keep | default engine demo shell. FigJam-like controls and canvas stage만 보여준다 |
-| `src/demo/CanvasDevToolsDemoApp.css` | keep | demo-specific minimal layout only |
+| `src/demo/CanvasEngineDemoApp.tsx` | keep | default engine demo shell. minimal controls and canvas stage만 보여준다 |
+| `src/demo/CanvasEngineDemoApp.css` | keep | demo-specific minimal layout only |
 | `src/demo/CanvasDemoAssembly.ts` | keep | demo assembly entry. built-in affordance wiring의 canonical path |
 | `src/demo/CanvasDemoSeedItems.ts` | keep | engine demo seed document |
-| `src/demo/custom-items/index.ts` | keep seam | custom object extension point. default exports stay empty |
-| `src/demo/custom-items/widget-counter/**` | extension fixture | FigJam widget-like seam 검증용 sample module. default demo에서 import하지 않는다 |
+| `src/demo/custom-items/**` | removed fixture | widget-like seam 검증은 package tests가 소유하고 default demo fixture는 제거 |
 | `src/canvas/app/extensions/widgets/**` | keep seam | React/HTML widget을 `<foreignObject>` custom item으로 렌더링하는 authoring helper |
 | `src/demo/custom-items/html-specimen/**` | removed | DOM/CSS editor consumer demo는 public API 공급 경로가 아니어서 제거 |
 | `e2e/legacy/html-specimen-paste-to-edit.legacy.ts` | removed | 제거된 consumer demo의 비기본 regression suite |
@@ -61,10 +60,10 @@ top of the public authoring API.
 | 항목 | 판정 | 이유 |
 |------|------|------|
 | `html-specimen-css` branch in app shell | 제거 | custom panel id가 selection bar와 zoom controls를 숨기는 것은 core affordance 오염 |
-| `object-inspector-devtools` mode | 제거 | HTML/CSS demo만을 위한 takeover chrome이며 inspector compose 규칙과 충돌 |
-| `canvas-floating-zone-devtools-rail` CSS | 제거 | 위 특수 모드 제거 후 존재 이유 없음 |
+| inspector takeover mode | 제거 | HTML/CSS demo만을 위한 takeover chrome이며 inspector compose 규칙과 충돌 |
+| special right rail CSS | 제거 | 위 특수 모드 제거 후 존재 이유 없음 |
 | `DEMO_CUSTOM_ITEM_MODULES = []` | 유지 | widget-like/custom-object seam은 남기되 default product 기능을 붙이지 않는 경계 |
-| `widget-counter` sample module | fixture 유지 | custom item module 계약 검증용이며 default demo surface로 승격하지 않는다 |
+| `widget-counter` sample module | 제거 | custom item module 계약은 package tests가 검증하며 default demo surface로 승격하지 않는다 |
 
 ## Drop From Default Demo
 
