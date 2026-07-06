@@ -64,21 +64,45 @@ describe('CanvasTextEditor', () => {
     expect(preventDefault).not.toHaveBeenCalled()
     expect(onCommit).not.toHaveBeenCalled()
   })
+
+  it('routes blur to commit and Escape to cancel', () => {
+    const onBlur = vi.fn()
+    const onCancel = vi.fn()
+    const preventDefault = vi.fn()
+    const editor = renderTextEditor({ onBlur, onCancel, onCommit: vi.fn() })
+
+    editor.props.onBlur()
+    editor.props.onKeyDown({
+      ctrlKey: false,
+      key: 'Escape',
+      metaKey: false,
+      preventDefault,
+      shiftKey: false,
+    })
+
+    expect(onBlur).toHaveBeenCalledTimes(1)
+    expect(preventDefault).toHaveBeenCalledTimes(1)
+    expect(onCancel).toHaveBeenCalledTimes(1)
+  })
 })
 
 function renderTextEditor({
   commitOnEnter,
+  onBlur = () => undefined,
+  onCancel = () => undefined,
   onCommit,
 }: {
   commitOnEnter?: boolean
+  onBlur?: () => void
+  onCancel?: () => void
   onCommit: () => void
 }) {
   const rendered = CanvasTextEditor({
     commitOnEnter,
     editing: { id: 'sticky-1', value: 'Text' },
     editorRef: createRef<HTMLTextAreaElement>(),
-    onBlur: () => undefined,
-    onCancel: () => undefined,
+    onBlur,
+    onCancel,
     onChange: () => undefined,
     onCommit,
     style: {
@@ -96,6 +120,7 @@ function renderTextEditor({
   }
 
   return rendered as ReactElement<{
+    onBlur: () => void
     onKeyDown: (event: {
       ctrlKey: boolean
       key: string

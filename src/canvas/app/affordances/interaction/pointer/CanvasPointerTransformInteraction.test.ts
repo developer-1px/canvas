@@ -90,6 +90,25 @@ describe('CanvasPointerTransformInteraction', () => {
     )
   })
 
+  it('commits deferred additive clicks as selection-only updates', () => {
+    const commitItemsChange = vi.fn<CommitCanvasItemsChange>(() => true)
+    const commitSelection = vi.fn<CommitCanvasSelection>(() => true)
+
+    commitCanvasPointerTransformInteraction({
+      commitItemsChange,
+      commitSelection,
+      interaction: createMoveInteraction({
+        clickSelection: [],
+        moved: false,
+      }),
+      setEditing: () => undefined,
+      setTool: () => undefined,
+    })
+
+    expect(commitItemsChange).not.toHaveBeenCalled()
+    expect(commitSelection).toHaveBeenCalledWith([])
+  })
+
 
   it('enters text editing after a non-moved move click', () => {
     const commitSelection = vi.fn<CommitCanvasSelection>(() => true)

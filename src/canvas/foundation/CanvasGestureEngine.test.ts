@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'vitest'
 import {
+  getCanvasItemPointerIntent,
   getCanvasPointerGesture,
   shouldRouteCanvasItemPointerToCanvasGesture,
   type CanvasPointerGestureConfig,
@@ -251,6 +252,43 @@ describe('CanvasGestureEngine drawing tools', () => {
         tool: 'custom:risk',
       }),
     ).toBe('create-custom')
+  })
+
+  test('expresses duplicate drag modifiers separately from additive selection', () => {
+    expect(
+      getCanvasItemPointerIntent({
+        config,
+        input: { ...baseInput, altKey: true },
+        isDoubleClick: false,
+      }),
+    ).toMatchObject({
+      additive: false,
+      altDragDuplicate: true,
+      dragDuplicate: true,
+    })
+    expect(
+      getCanvasItemPointerIntent({
+        config,
+        input: { ...baseInput, metaKey: true },
+        isDoubleClick: false,
+      }),
+    ).toMatchObject({
+      additive: true,
+      altDragDuplicate: false,
+      dragDuplicate: true,
+    })
+    expect(
+      getCanvasItemPointerIntent({
+        config: createCanvasGestureConfig({
+          commands: { duplicate: false },
+        }),
+        input: { ...baseInput, ctrlKey: true },
+        isDoubleClick: false,
+      }),
+    ).toMatchObject({
+      additive: true,
+      dragDuplicate: false,
+    })
   })
 
   test('routes item pointer events back to the stage for drawing and creation tools', () => {

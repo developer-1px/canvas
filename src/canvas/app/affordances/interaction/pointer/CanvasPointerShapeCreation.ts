@@ -13,10 +13,14 @@ import {
   type CanvasDraftShapeOverlay,
   type CanvasPointerGesture,
   type CanvasSnapGuides,
+  getCanvasCreatedArrowEnd,
 } from '../../../../engine'
 import { getCanvasToolShapeKind } from '../../../../host'
 import type { CommitCanvasItemsChange } from '../../../workflow/CanvasWorkflowContract'
-import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
+import {
+  getCanvasPointerTransformModifierState,
+  type CanvasAppPointerInput,
+} from './CanvasAppPointerInput'
 import type { Interaction } from './CanvasInteractionState'
 import type {
   CanvasPointerShapeCreationKind,
@@ -139,12 +143,14 @@ export function previewCanvasPointerShapeCreation({
   config,
   currentScreen,
   currentWorld,
+  input,
   interaction,
   scene,
 }: {
   config: CanvasAffordanceConfig
   currentScreen: Point
   currentWorld: Point
+  input?: CanvasAppPointerInput
   interaction: Interaction
   scene: CanvasSceneAdapter
 }): CanvasPointerShapeCreationPreviewResult | null {
@@ -168,12 +174,38 @@ export function previewCanvasPointerShapeCreation({
     config,
     point: currentWorld,
   })
+  const modifierState = input
+    ? getCanvasPointerTransformModifierState(input)
+    : {
+        constrainAngle: false,
+        preserveAspectRatio: false,
+        resizeFromCenter: false,
+      }
+  const adjustedCurrentWorld =
+    interaction.kind === 'create-arrow' && moved
+      ? getCanvasCreatedArrowEnd({
+          constrainAngle: modifierState.constrainAngle,
+          currentWorld: snappedCurrentWorld,
+          startWorld: interaction.startWorld,
+        })
+      : snappedCurrentWorld
+  const adjustedInteraction: CanvasPointerShapeCreationInteraction =
+    interaction.kind === 'create-arrow'
+      ? {
+          ...interaction,
+          constrainAngle: modifierState.constrainAngle,
+          currentWorld: adjustedCurrentWorld,
+          moved,
+        }
+      : {
+          ...interaction,
+          currentWorld: adjustedCurrentWorld,
+          moved,
+          preserveAspectRatio: modifierState.preserveAspectRatio,
+          resizeFromCenter: modifierState.resizeFromCenter,
+        }
   const nextInteraction = resolveCanvasPointerShapeCreationArrowAnchors({
-    interaction: {
-      ...interaction,
-      currentWorld: snappedCurrentWorld,
-      moved,
-    },
+    interaction: adjustedInteraction,
     scene,
   })
 

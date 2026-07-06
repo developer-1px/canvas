@@ -26,6 +26,8 @@ export type Interaction =
       startWorld: Point
       ids: string[]
       bounds: Bounds | null
+      clickSelection?: string[]
+      duplicateOnDrag?: boolean
       historySelection: string[]
       startItems: CanvasItem[]
       currentItems: CanvasItem[]
@@ -58,6 +60,8 @@ export type Interaction =
       startScreen: Point
       startWorld: Point
       currentWorld: Point
+      preserveAspectRatio?: boolean
+      resizeFromCenter?: boolean
       moved: boolean
     }
   | {
@@ -115,6 +119,7 @@ export type Interaction =
       startScreen: Point
       startWorld: Point
       currentWorld: Point
+      constrainAngle?: boolean
       endAttachedTo?: string
       startAttachedTo?: string
       moved: boolean

@@ -3,6 +3,7 @@ import type { Point } from '../../../../entities'
 import {
   createCanvasArrow,
   createCanvasShape,
+  getCanvasCreatedRectBounds,
   type CanvasAffordanceConfig,
   type CanvasCreationAdapter,
   type CanvasCreationItem,
@@ -59,6 +60,7 @@ const CANVAS_POINTER_SHAPE_CREATION_DESCRIPTORS = Object.freeze({
 
       return createCanvasArrow({
         adapter,
+        constrainAngle: arrowInteraction?.constrainAngle,
         createId,
         currentWorld: interaction.currentWorld,
         endAttachedTo: arrowInteraction?.endAttachedTo,
@@ -71,14 +73,26 @@ const CANVAS_POINTER_SHAPE_CREATION_DESCRIPTORS = Object.freeze({
     selectAfterCommit: false,
   }),
   'create-shape': Object.freeze({
-    createDraft: ({ currentWorld, interaction, startWorld }) => ({
-      draftRect: {
-        ...normalizeBounds(startWorld, currentWorld),
-        shapeType: interaction.kind === 'create-shape'
-          ? interaction.shapeType
-          : undefined,
-      },
-    }),
+    createDraft: ({ currentWorld, interaction, startWorld }) => {
+      const bounds =
+        interaction.kind === 'create-shape' && interaction.moved
+          ? getCanvasCreatedRectBounds({
+              currentWorld,
+              preserveAspectRatio: interaction.preserveAspectRatio,
+              resizeFromCenter: interaction.resizeFromCenter,
+              startWorld,
+            })
+          : normalizeBounds(startWorld, currentWorld)
+
+      return {
+        draftRect: {
+          ...bounds,
+          shapeType: interaction.kind === 'create-shape'
+            ? interaction.shapeType
+            : undefined,
+        },
+      }
+    },
     createItem: <TItem extends CanvasCreationItem>({
       adapter,
       createId,
@@ -92,6 +106,12 @@ const CANVAS_POINTER_SHAPE_CREATION_DESCRIPTORS = Object.freeze({
         adapter,
         createId,
         currentWorld: interaction.currentWorld,
+        preserveAspectRatio: interaction.kind === 'create-shape'
+          ? interaction.preserveAspectRatio
+          : undefined,
+        resizeFromCenter: interaction.kind === 'create-shape'
+          ? interaction.resizeFromCenter
+          : undefined,
         shapeType: interaction.kind === 'create-shape'
           ? interaction.shapeType
           : undefined,

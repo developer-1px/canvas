@@ -26,6 +26,7 @@ export type CanvasPointerInteractionPreviewInput = {
   config: CanvasAffordanceConfig
   currentScreen: Point
   currentWorld: Point
+  cloneItems: (ids: string[], offset: Point) => CanvasItem[]
   input: CanvasAppPointerInput
   interaction: Interaction
   itemReadModel: CanvasAppItemReadModel
@@ -38,6 +39,7 @@ export function previewCanvasPointerInteraction({
   config,
   currentScreen,
   currentWorld,
+  cloneItems,
   input,
   interaction,
   itemReadModel,
@@ -91,6 +93,7 @@ export function previewCanvasPointerInteraction({
       transform: (interaction) =>
         previewCanvasPointerTransform({
           config,
+          cloneItems,
           currentScreen,
           currentWorld,
           input,

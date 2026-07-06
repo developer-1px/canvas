@@ -6,10 +6,13 @@ import {
   createCanvasPath,
   createCanvasRect,
   createCanvasShape,
+  getCanvasAngleConstrainedPoint,
+  getCanvasAspectRatioLockedPoint,
   getCanvasCreatedArrowEnd,
   getCanvasCreatedDrawingPoints,
   getCanvasCreatedPathSegments,
   type CanvasCreationAdapter,
+  getCanvasCreatedRectBounds,
 } from './CanvasCreationEngine'
 
 type CreatedItem =
@@ -201,6 +204,57 @@ describe('CanvasCreationEngine drawing tools', () => {
         startWorld: { x: 10, y: 20 },
       }),
     ).toEqual({ x: 154, y: 20 })
+  })
+
+  test('creates center-based rect bounds without changing default creation', () => {
+    expect(getCanvasCreatedRectBounds({
+      currentWorld: { x: 130, y: 120 },
+      resizeFromCenter: true,
+      startWorld: { x: 100, y: 100 },
+    })).toEqual({ h: 40, w: 60, x: 70, y: 80 })
+    expect(getCanvasCreatedRectBounds({
+      currentWorld: { x: 80, y: 70 },
+      resizeFromCenter: true,
+      startWorld: { x: 100, y: 100 },
+    })).toEqual({ h: 60, w: 40, x: 80, y: 70 })
+    expect(getCanvasCreatedRectBounds({
+      currentWorld: { x: 102, y: 103 },
+      resizeFromCenter: true,
+      startWorld: { x: 100, y: 100 },
+    })).toEqual({ h: 112, w: 168, x: 16, y: 44 })
+    expect(getCanvasCreatedRectBounds({
+      currentWorld: { x: 102, y: 103 },
+      startWorld: { x: 100, y: 100 },
+    })).toEqual({ h: 112, w: 168, x: 100, y: 100 })
+  })
+
+  test('locks shape creation points to a square aspect ratio', () => {
+    expect(getCanvasAspectRatioLockedPoint({
+      currentWorld: { x: 40, y: 100 },
+      startWorld: { x: 10, y: 20 },
+    })).toEqual({ x: 90, y: 100 })
+    expect(getCanvasCreatedRectBounds({
+      currentWorld: { x: 40, y: 100 },
+      preserveAspectRatio: true,
+      startWorld: { x: 10, y: 20 },
+    })).toEqual({ h: 80, w: 80, x: 10, y: 20 })
+  })
+
+  test('constrains arrow endpoints to 45 degree increments', () => {
+    expect(getCanvasAngleConstrainedPoint({
+      currentWorld: { x: 70, y: 18 },
+      startWorld: { x: 0, y: 0 },
+    })).toEqual({ x: 70, y: 0 })
+    expect(getCanvasCreatedArrowEnd({
+      constrainAngle: true,
+      currentWorld: { x: 50, y: 80 },
+      startWorld: { x: 0, y: 0 },
+    })).toEqual({ x: 80, y: 80 })
+    expect(getCanvasCreatedArrowEnd({
+      constrainAngle: true,
+      currentWorld: { x: 2, y: 3 },
+      startWorld: { x: 0, y: 0 },
+    })).toEqual({ x: 144, y: 0 })
   })
 
   test('creates ellipse shapes through the shape creation adapter seam', () => {

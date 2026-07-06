@@ -317,6 +317,18 @@ export {
   type CanvasInlineEditKeyboardIntentInput,
 } from './affordances/editing/text-editor/CanvasInlineEditDom'
 export {
+  commitCanvasTextEditing,
+  getCanvasPrintableTextEditStartIntent,
+  getCanvasTextEditorStyle,
+  isCanvasPrintableKeyboardKey,
+  shouldUseCanvasContentEditableText,
+  type CanvasPrintableTextEditStartInput,
+  type CanvasPrintableTextEditStartIntent,
+  type CanvasPrintableTextEditStartKeyboardEvent,
+  type CanvasTextEditorStyle,
+  type EditableCanvasTextItem,
+} from './affordances/editing/text-editor/CanvasTextEditingModel'
+export {
   getCanvasImportedImageSize,
   type CanvasImportedImageSize,
   type CanvasImportedImageSizeOptions,
@@ -365,6 +377,11 @@ export {
   type CanvasPointerTransformModifierInput,
   type CanvasPointerTransformModifierState,
 } from './affordances/interaction/pointer/CanvasAppPointerInput'
+export {
+  getCanvasAxisLockedDragDelta,
+  type CanvasAxisLockedDragDelta,
+  type CanvasAxisLockedDragDeltaInput,
+} from './affordances/interaction/pointer/CanvasPointerDragModifiers'
 export {
   getCanvasPointerLocalGeometry,
   getCanvasPointerLocalPoint,

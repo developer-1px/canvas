@@ -33,17 +33,23 @@ describe('CanvasItemPointerInteractionStart', () => {
     })
   })
 
-  it('turns additive clicks on selected items into selection-only updates', () => {
+  it('defers additive clicks on selected items until pointer up', () => {
     const result = startCanvasItemPointerInteraction(createInput({
       input: createPointerInput({ shiftKey: true }),
       selection: ['rect-1'],
     }))
 
-    expect(result).toEqual({
-      capturePointer: false,
-      commitSelection: [],
-      kind: 'none',
+    expect(result).toMatchObject({
+      capturePointer: true,
+      interaction: {
+        clickSelection: [],
+        duplicateOnDrag: false,
+        ids: ['rect-1'],
+        kind: 'move',
+      },
+      kind: 'move',
     })
+    expect(result.commitSelection).toBeUndefined()
   })
 
   it('starts alt-drag duplicate moves with cloned live items', () => {
@@ -66,6 +72,28 @@ describe('CanvasItemPointerInteractionStart', () => {
       kind: 'move',
       liveItems: [rectItem, clone],
       selection: ['rect-copy'],
+    })
+  })
+
+  it('marks Ctrl/Meta drags on selected items for threshold duplicate', () => {
+    const cloneItems = vi.fn(() => [createRectItem('rect-copy')])
+    const result = startCanvasItemPointerInteraction(createInput({
+      cloneItems,
+      input: createPointerInput({ metaKey: true }),
+      selection: ['rect-1'],
+    }))
+
+    expect(cloneItems).not.toHaveBeenCalled()
+    expect(result).toMatchObject({
+      capturePointer: true,
+      interaction: {
+        clickSelection: [],
+        duplicateOnDrag: true,
+        historySelection: ['rect-1'],
+        ids: ['rect-1'],
+        kind: 'move',
+      },
+      kind: 'move',
     })
   })
 

@@ -14,6 +14,9 @@ import {
   isCanvasStickyComponentItem,
 } from '../../../../host'
 import type { CommitCanvasItemsChange } from '../../../workflow/CanvasWorkflowContract'
+import {
+  isCanvasKeyboardTypingTarget,
+} from '../../interaction/keyboard/CanvasKeyboardShortcutIntent'
 
 export type EditableCanvasTextItem = CanvasEditableTextItem
 
@@ -23,6 +26,33 @@ type CommitCanvasTextEditingArgs = {
   editingItem: CanvasEditableTextItem | null
   selection: string[]
   setEditing: (nextEditing: EditingText | null) => void
+}
+
+export type CanvasPrintableTextEditStartIntent =
+  | {
+      editing: EditingText
+      initialText: string
+      kind: 'start-editing'
+      preventDefault: true
+    }
+  | {
+      kind: 'none'
+      preventDefault: false
+    }
+
+export type CanvasPrintableTextEditStartKeyboardEvent = Pick<
+  KeyboardEvent,
+  'altKey' | 'ctrlKey' | 'key' | 'metaKey' | 'target'
+>
+
+export type CanvasPrintableTextEditStartInput = {
+  editingItem: CanvasEditableTextItem | null
+  event: CanvasPrintableTextEditStartKeyboardEvent
+  isReservedShortcut?: (
+    event: CanvasPrintableTextEditStartKeyboardEvent,
+  ) => boolean
+  isTypingTarget?: (target: EventTarget | null) => boolean
+  selection: readonly string[]
 }
 
 export type CanvasTextEditorStyle = {
@@ -61,6 +91,42 @@ export function commitCanvasTextEditing({
     after: selection,
   })
   setEditing(null)
+}
+
+export function getCanvasPrintableTextEditStartIntent({
+  editingItem,
+  event,
+  isReservedShortcut = () => false,
+  isTypingTarget = isCanvasKeyboardTypingTarget,
+  selection,
+}: CanvasPrintableTextEditStartInput): CanvasPrintableTextEditStartIntent {
+  if (
+    event.altKey ||
+    event.ctrlKey ||
+    event.metaKey ||
+    isTypingTarget(event.target) ||
+    isReservedShortcut(event) ||
+    selection.length !== 1 ||
+    !editingItem ||
+    editingItem.id !== selection[0] ||
+    !isCanvasPrintableKeyboardKey(event.key)
+  ) {
+    return { kind: 'none', preventDefault: false }
+  }
+
+  return {
+    editing: {
+      id: editingItem.id,
+      value: event.key,
+    },
+    initialText: event.key,
+    kind: 'start-editing',
+    preventDefault: true,
+  }
+}
+
+export function isCanvasPrintableKeyboardKey(key: string): boolean {
+  return key.length === 1
 }
 
 export function getCanvasTextEditorStyle({

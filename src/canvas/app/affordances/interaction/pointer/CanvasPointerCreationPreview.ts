@@ -46,6 +46,7 @@ export function previewCanvasPointerCreation({
     config,
     currentScreen,
     currentWorld,
+    input,
     interaction,
     scene,
   })
