@@ -17,7 +17,10 @@ import type {
   EditingText,
   Tool,
 } from '../../entities'
-import type { CanvasAppCustomCreationToolState } from '../extensions/CanvasAppExtensionStateContracts'
+import type {
+  CanvasAppCustomCommandState,
+  CanvasAppCustomCreationToolState,
+} from '../extensions/CanvasAppExtensionStateContracts'
 import type { Interaction } from '../affordances/interaction/pointer/CanvasInteractionState'
 import type { CanvasAppComponentKeyboardContext } from './CanvasAppComponentConsumerContracts'
 import type { CanvasWorkspaceKeyboardContext } from './CanvasWorkspaceConsumerContracts'
@@ -68,8 +71,10 @@ export type CanvasAppKeyboardModelInput = {
   component: CanvasAppComponentKeyboardContext
   config: CanvasAffordanceConfig
   cursorChat: CanvasAppKeyboardCursorChatContext
+  customCommands: readonly CanvasAppCustomCommandState[]
   customCreationTools: readonly CanvasAppCustomCreationToolState[]
   interaction: CanvasAppKeyboardInteractionContext
+  runCustomCommand: (commandId: string) => void
   openCommandPalette: () => void
   openFindReplace: () => void
   openShortcutHelp: () => void

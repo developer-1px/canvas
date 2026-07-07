@@ -1,3 +1,4 @@
+import { CANVAS_APP_TEXT_TARGET } from '../../affordances/editing/text-editor/CanvasAppTextTarget'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
 import { createCanvasAffordanceConfig } from '../../../engine'
@@ -139,7 +140,8 @@ function createReadModel(
   bounds: ReturnType<CanvasAppItemReadModel['getSelectionBounds']>,
 ): CanvasAppItemReadModel {
   return {
-    findEditableTextItem: vi.fn(() => null),
+    findTextEditTarget: vi.fn(() => null),
+    textTarget: CANVAS_APP_TEXT_TARGET,
     findItem: vi.fn(() => undefined),
     getAllIds: vi.fn(() => []),
     getAllItems: vi.fn(() => []),

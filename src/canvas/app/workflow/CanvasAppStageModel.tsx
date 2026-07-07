@@ -59,6 +59,7 @@ export function renderCanvasAppStageModel({
           endpoint,
         )
       },
+      canEditText: pointer.itemLayerHandlers.canEditText,
       onTextDoubleClick: pointer.itemLayerHandlers.onTextDoubleClick,
       onItemPointerDown: (event, itemId) => {
         cursorChat.onPointerDown(event)

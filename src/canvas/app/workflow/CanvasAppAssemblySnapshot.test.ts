@@ -1,3 +1,4 @@
+import { CANVAS_APP_TEXT_TARGET } from '../affordances/editing/text-editor/CanvasAppTextTarget'
 import { describe, expect, it } from 'vitest'
 import { defineCanvasExtension } from '../../foundation'
 import { createCanvasComponentLibrary } from '../../host'
@@ -307,6 +308,7 @@ function createItemLayerInput(
     items: [],
     onArrowEndpointPointerDown: () => undefined,
     onItemPointerDown: () => undefined,
+    canEditText: (item) => CANVAS_APP_TEXT_TARGET.canEdit(item),
     onTextDoubleClick: () => undefined,
     outlineIds: new Set(),
     selected: new Set(),

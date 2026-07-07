@@ -1,3 +1,4 @@
+import { CANVAS_APP_TEXT_TARGET } from '../affordances/editing/text-editor/CanvasAppTextTarget'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import type { CanvasItem } from '../../entities'
@@ -177,6 +178,7 @@ function renderItemLayer(
         selected={new Set()}
         onArrowEndpointPointerDown={() => undefined}
         onItemPointerDown={() => undefined}
+        canEditText={(item) => CANVAS_APP_TEXT_TARGET.canEdit(item)}
         onTextDoubleClick={() => undefined}
         {...options}
       />

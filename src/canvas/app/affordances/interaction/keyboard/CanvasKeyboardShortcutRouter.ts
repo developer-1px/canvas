@@ -1,5 +1,6 @@
 import type { CanvasAffordanceConfig } from '../../../../engine'
 import type {
+  CanvasAppCustomCommandState,
   CanvasAppCustomCreationToolState,
 } from '../../../extensions/CanvasAppExtensionStateContracts'
 import {
@@ -11,6 +12,7 @@ import { getCanvasKeyboardShortcutIntent } from './CanvasKeyboardShortcutIntent'
 export type CanvasKeyboardShortcutHandlers =
   CanvasKeyboardShortcutDispatchHandlers & {
     config: CanvasAffordanceConfig
+    customCommands?: readonly CanvasAppCustomCommandState[]
     customCreationTools: readonly CanvasAppCustomCreationToolState[]
     selection: string[]
   }
@@ -21,6 +23,7 @@ export function handleCanvasKeyboardShortcut(
 ) {
   const intent = getCanvasKeyboardShortcutIntent({
     config: handlers.config,
+    customCommands: handlers.customCommands,
     customCreationTools: handlers.customCreationTools,
     event,
     selection: handlers.selection,

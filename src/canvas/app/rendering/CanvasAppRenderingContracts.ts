@@ -8,7 +8,6 @@ import type {
   CanvasCustomItem,
   CanvasArrowEndpoint,
   CanvasInteractionKind,
-  CanvasEditableTextItem,
   CanvasItem,
   ResizeHandle,
   Tool,
@@ -89,7 +88,8 @@ export type CanvasAppItemLayerRenderInput = {
     itemId: string,
     endpoint: CanvasArrowEndpoint,
   ) => void
-  onTextDoubleClick: (item: CanvasEditableTextItem) => void
+  canEditText: (item: CanvasItem) => boolean
+  onTextDoubleClick: (item: CanvasItem) => void
 }
 
 export type CanvasAppItemLayerAdapter = {

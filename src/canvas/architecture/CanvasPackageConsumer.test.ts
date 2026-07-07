@@ -108,6 +108,7 @@ import {
   type CanvasAppCustomItemRenderKeyStrategy,
   type CanvasAppCustomItemRendererDescriptor,
   type CanvasAppCustomItemRendererStrategy,
+  type CanvasAppCustomItemTextTarget,
   type CanvasAppCustomItemValidator,
   type CanvasAppFeaturePack,
   type CanvasAppFeaturePackAssemblyInput,
@@ -202,11 +203,45 @@ describe('Canvas package consumer imports', () => {
     const commitAppItemsChange: CanvasAppCommitItemsChange = () => true
     const validateCustomItem: CanvasAppCustomItemValidator = (item) =>
       item.data.severity === 'high'
+    const customItemTextTarget: CanvasAppCustomItemTextTarget = {
+      canEdit: () => true,
+      commitsOnEnter: () => true,
+      getCommittedValue: ({ value }) => value,
+      getEditorBounds: (item) => ({ h: item.h, w: item.w, x: item.x, y: item.y }),
+      getValue: (item) =>
+        typeof item.data.severity === 'string' ? item.data.severity : '',
+      planCommitUpdates: (_item, text) => [
+        { field: 'data/severity', operation: 'replace', value: text },
+      ],
+    }
     const module: CanvasAppCustomItemModule =
       defineCanvasAppCustomItemModule({
+        customCommands: [{
+          id: 'smoke-note',
+          label: 'Note',
+          run: () => undefined,
+          shortcut: { key: 'j' },
+          title: 'Smoke note',
+        }],
+        customCreationTools: [{
+          createItem: ({ currentWorld }) => ({
+            data: { severity: 'high' },
+            h: 80,
+            title: 'Smoke',
+            w: 120,
+            x: currentWorld.x,
+            y: currentWorld.y,
+          }),
+          enterTextEdit: true,
+          id: 'smoke-note-tool',
+          label: 'N',
+          shortcut: { key: 'q' },
+          title: 'Smoke note tool',
+        }],
         id: 'smoke',
         presentation: 'smoke-node',
         renderItem: ({ item }) => item.title,
+        textTarget: customItemTextTarget,
         validateItem: validateCustomItem,
       })
     const renderComponent: CanvasAppComponentRendererStrategy = ({ item }) =>
@@ -437,6 +472,7 @@ describe('Canvas package consumer imports', () => {
 
     expect(entityItem.id).toBe('rect-1')
     expect(assembly.itemLayerAdapter.renderItems({
+      canEditText: () => false,
       componentPresentationRenderers: {},
       customItemRenderers: {},
       getComponentPresentation: () => 'note-card',
@@ -503,6 +539,26 @@ describe('Canvas package consumer imports', () => {
       customItemModules: [module],
     }).customItemValidators.smoke(customItem)).toBe(true)
     expect(assembly.customItemValidators.smoke(customItem)).toBe(true)
+    expect(assembly.customItemTextTargets.smoke?.getValue(customItem)).toBe(
+      'high',
+    )
+    expect(
+      assembly.customItemTextTargets.smoke?.planCommitUpdates(
+        customItem,
+        'low',
+      ),
+    ).toEqual([
+      { field: 'data/severity', operation: 'replace', value: 'low' },
+    ])
+    expect(
+      assembly.customCommands.find((command) => command.id === 'smoke-note')
+        ?.shortcut,
+    ).toEqual({ key: 'j' })
+    expect(
+      assembly.customCreationTools.find(
+        (tool) => tool.id === 'smoke-note-tool',
+      )?.enterTextEdit,
+    ).toBe(true)
     expect(createCanvasAppAssemblyFromApp().initialItems.length).toBeGreaterThan(
       0,
     )

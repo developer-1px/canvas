@@ -12,6 +12,7 @@ import {
   type CanvasDocumentController,
   type CanvasItemValidationOptions,
 } from '../../../host'
+import type { CanvasAppTextTarget } from '../../affordances/editing/text-editor/CanvasAppTextTarget'
 import type {
   CommitCanvasItemsChange,
   CommitCanvasSelection,
@@ -31,9 +32,15 @@ export function useCanvasDocument(
   initialItems: CanvasItem[],
   initialSelection: string[] = [],
   validation: CanvasItemValidationOptions = {},
+  textTarget?: CanvasAppTextTarget,
 ) {
   const [document] = useState<CanvasDocumentController>(() =>
-    createCanvasDocumentController(initialItems, initialSelection, validation),
+    createCanvasDocumentController(
+      initialItems,
+      initialSelection,
+      validation,
+      textTarget,
+    ),
   )
   const [items, setItemsState] = useState(() => document.readItems())
   const [selection, setSelectionState] = useState(() => document.readSelection())

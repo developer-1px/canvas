@@ -82,6 +82,9 @@ export function getCanvasAppCustomItemModuleExtensionBundle(
     customCommands: module.customCommands,
     customCreationTools: getCanvasAppCustomItemModuleCreationTools(module),
     customItemRenderers: getCanvasAppCustomItemModuleRenderers(module),
+    customItemTextTargets: module.textTarget
+      ? { [module.id]: module.textTarget }
+      : {},
     customItemValidators: getCanvasAppCustomItemModuleValidators(module),
     inspectorPanels: module.inspectorPanels,
     mediaImporters: module.mediaImporters,

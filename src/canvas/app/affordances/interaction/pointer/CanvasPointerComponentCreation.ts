@@ -20,9 +20,7 @@ import type {
   CanvasAppComponentLibrary,
   CanvasAppComponentTemplate,
 } from '../../../workflow/CanvasAppComponentAssemblyContracts'
-import {
-  getCanvasEditableTextValue,
-} from '../../../../host'
+import { CANVAS_APP_TEXT_TARGET } from '../../editing/text-editor/CanvasAppTextTarget'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import type { Interaction } from './CanvasInteractionState'
 import {
@@ -161,7 +159,7 @@ export function startCanvasPointerComponentCreation({
   return {
     capturePointer: false,
     edit: descriptor.enterTextEdit
-      ? { id: item.id, value: getCanvasEditableTextValue(item) }
+      ? { id: item.id, value: CANVAS_APP_TEXT_TARGET.getValue(item) }
       : undefined,
     item,
     kind: 'created-item',

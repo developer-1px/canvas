@@ -13,4 +13,5 @@ export type CanvasKeyboardShortcutIntent =
   | { kind: 'none'; preventDefault: false }
   | CanvasKeyboardSystemShortcutIntent
   | CanvasKeyboardCommandShortcutIntent
+  | { commandId: string; kind: 'run-custom-command'; preventDefault: true }
   | { kind: 'set-tool'; preventDefault: false; tool: Tool }

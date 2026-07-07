@@ -200,11 +200,11 @@ describe('Canvas pointer start boundaries', () => {
     )
     expect(itemStartFile.source).toContain('getCanvasItemPointerIntent')
     expect(itemStartFile.source).toContain('getCanvasItemPointerSelection')
-    expect(itemStartFile.source).toContain('findEditableTextItem')
+    expect(itemStartFile.source).toContain('findTextEditTarget')
     expect(itemStartFile.source).toContain('altDragDuplicate')
     expect(itemStartFile.source).toContain('historySelection')
     expect(itemStartFile.source).toContain('config.gestures.textEdit')
-    expect(itemStartFile.source).toContain('getCanvasEditableTextValue')
+    expect(itemStartFile.source).toContain('textTarget.getValue')
     expect(itemStartFile.source).toContain('selection: [item.id]')
   })
 

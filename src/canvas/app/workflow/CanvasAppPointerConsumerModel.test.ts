@@ -63,6 +63,7 @@ function createDownHandlers() {
     handleCanvasPointerDown: vi.fn(),
     handleItemPointerDown: vi.fn(),
     handleResizePointerDown: vi.fn(),
+    canEditText: () => true,
     handleTextDoubleClick: vi.fn(),
   }
 }

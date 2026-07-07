@@ -97,6 +97,7 @@ export function useCanvasAppPreviewModel({
         items: workspace.itemLayer.items,
         onArrowEndpointPointerDown: noop,
         onItemPointerDown: noop,
+        canEditText: () => false,
         onTextDoubleClick: noop,
         outlineIds: EMPTY_CANVAS_OVERLAYS.itemOutlineIds,
         selected: workspace.itemLayer.selected,

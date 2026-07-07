@@ -58,5 +58,9 @@ export function snapshotCanvasAppCustomItemModule(
     )
   }
 
+  if (module.textTarget) {
+    snapshot.textTarget = Object.freeze({ ...module.textTarget })
+  }
+
   return Object.freeze(snapshot)
 }

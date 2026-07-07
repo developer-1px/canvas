@@ -177,6 +177,7 @@ export function useCanvasPointerDragHandlers({
       setEditing,
       setSelection,
       setTool,
+      textTarget: itemReadModel.textTarget,
     })
 
     applyCanvasPointerInteractionEndEffect({

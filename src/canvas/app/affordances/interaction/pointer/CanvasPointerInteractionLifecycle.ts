@@ -12,6 +12,7 @@ import type {
   CommitCanvasSelection,
 } from '../../../workflow/CanvasWorkflowContract'
 import type { CanvasAppCustomCreationTool } from '../../../extensions/custom-tools/CanvasAppCustomCreationTools'
+import type { CanvasAppTextTarget } from '../../editing/text-editor/CanvasAppTextTarget'
 import type { CanvasAppComponentLibrary } from '../../../workflow/CanvasAppComponentAssemblyContracts'
 import type { Interaction } from './CanvasInteractionState'
 import { commitCanvasPointerCreation } from './CanvasPointerCreationCommit'
@@ -39,6 +40,7 @@ export type CanvasPointerInteractionCommitInput = {
   setEditing: (editing: EditingText | null) => void
   setSelection: (selection: string[]) => void
   setTool: (tool: Tool) => void
+  textTarget?: CanvasAppTextTarget
 }
 
 export function commitCanvasPointerInteraction({
@@ -54,6 +56,7 @@ export function commitCanvasPointerInteraction({
   setEditing,
   setSelection,
   setTool,
+  textTarget,
 }: CanvasPointerInteractionCommitInput) {
   routeCanvasPointerInteraction(interaction, {
     creation: (interaction) =>
@@ -66,7 +69,9 @@ export function commitCanvasPointerInteraction({
         interaction,
         scene,
         selection,
+        setEditing,
         setTool,
+        textTarget,
       }),
     fallback: () => undefined,
     eraser: (interaction) =>

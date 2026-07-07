@@ -5,6 +5,7 @@ import {
   type CanvasItemsDocument,
 } from './CanvasDocument'
 import type { CanvasItemValidationOptions } from './CanvasItemSchema'
+import type { CanvasItemTextTarget } from '../text/CanvasWhiteboardTextTarget'
 import {
   createCanvasItemsChangePatch,
   type CanvasItemsChange,
@@ -17,11 +18,13 @@ export function commitCanvasItemsChange({
   currentItems,
   document,
   selection,
+  textTarget,
   validation,
 }: {
   change: CanvasItemsChange
   currentItems: CanvasItem[]
   document: CanvasItemsDocument
+  textTarget?: CanvasItemTextTarget
   validation?: CanvasItemValidationOptions
   selection?: {
     after: CanvasSelectionIds
@@ -30,7 +33,7 @@ export function commitCanvasItemsChange({
 }) {
   return commitCanvasItemsPatch({
     document,
-    patch: createCanvasItemsChangePatch(currentItems, change),
+    patch: createCanvasItemsChangePatch(currentItems, change, textTarget),
     selection,
     validation,
   })

@@ -7,10 +7,9 @@ import {
   type CanvasZOrderMode,
 } from '../operations/CanvasOperations'
 import {
-  getCanvasEditableTextPatchUpdates,
-  getCanvasEditableTextValue,
-  isCanvasEditableTextItem,
-} from '../text/CanvasEditableTextItem'
+  CANVAS_WHITEBOARD_TEXT_TARGET,
+  type CanvasItemTextTarget,
+} from '../text/CanvasWhiteboardTextTarget'
 import {
   findCanvasItemEntry,
 } from '../tree/CanvasTree'
@@ -119,17 +118,18 @@ export function createSetCanvasItemTextPatch(
   items: CanvasItem[],
   id: string,
   text: string,
+  textTarget: CanvasItemTextTarget = CANVAS_WHITEBOARD_TEXT_TARGET,
 ): JSONPatchOperation[] {
   const entry = findCanvasItemEntry(items, id)
 
   if (
     !entry ||
-    !isCanvasEditableTextItem(entry.item) ||
-    getCanvasEditableTextValue(entry.item) === text
+    !textTarget.canEdit(entry.item) ||
+    textTarget.getValue(entry.item) === text
   ) {
     return []
   }
-  return getCanvasEditableTextPatchUpdates(entry.item, text)
+  return textTarget.planCommitUpdates(entry.item, text)
     .map((update): JSONPatchOperation => ({
       op: update.operation,
       path: `${canvasItemPathToPointer(entry.path)}/${update.field}` as Pointer,

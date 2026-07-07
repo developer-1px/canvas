@@ -18,6 +18,7 @@ export function getCanvasAppCustomCommandStates({
     disabled: isCanvasAppCustomCommandDisabled(command, context),
     id: command.id,
     label: command.label,
+    shortcut: command.shortcut,
     title: command.title,
   }))
 }

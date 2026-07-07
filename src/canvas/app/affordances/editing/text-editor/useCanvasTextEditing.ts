@@ -9,6 +9,7 @@ import type {
   Viewport,
 } from '../../../../entities'
 import type { CommitCanvasItemsChange } from '../../../workflow/CanvasWorkflowContract'
+import type { CanvasAppTextTarget } from './CanvasAppTextTarget'
 import {
   commitCanvasTextEditing,
   getCanvasTextEditorStyle,
@@ -22,6 +23,7 @@ type UseCanvasTextEditingArgs = {
   editorRef: RefObject<HTMLElement | null>
   selection: string[]
   setEditing: Dispatch<SetStateAction<EditingText | null>>
+  textTarget?: CanvasAppTextTarget
   viewport: Viewport
 }
 
@@ -32,6 +34,7 @@ export function useCanvasTextEditing({
   editorRef,
   selection,
   setEditing,
+  textTarget,
   viewport,
 }: UseCanvasTextEditingArgs) {
   const editingId = editing?.id
@@ -60,6 +63,7 @@ export function useCanvasTextEditing({
       editingItem,
       selection,
       setEditing,
+      textTarget,
     })
   }
 
@@ -74,6 +78,7 @@ export function useCanvasTextEditing({
   const editorStyle = getCanvasTextEditorStyle({
     editing,
     editingItem,
+    textTarget,
     viewport,
   })
 

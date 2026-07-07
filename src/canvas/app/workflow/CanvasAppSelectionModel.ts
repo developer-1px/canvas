@@ -10,7 +10,6 @@ import {
   canReorderCanvasItems,
   canRotateCanvasSelection,
   canSelectSameTypeCanvasSelection,
-  getCanvasEditableTextValue,
   getCanvasSelectionRotation,
   hasCanvasSelectionRotation,
   canTidyCanvasSelection,
@@ -382,7 +381,7 @@ export function editCanvasAppSelectionText({
   }
 
   const [id] = selection
-  const item = id ? itemReadModel.findEditableTextItem(id) : null
+  const item = id ? itemReadModel.findTextEditTarget(id) : null
 
   if (!item) {
     return false
@@ -390,7 +389,7 @@ export function editCanvasAppSelectionText({
 
   setEditing({
     id: item.id,
-    value: getCanvasEditableTextValue(item),
+    value: itemReadModel.textTarget.getValue(item),
   })
   return true
 }

@@ -58,13 +58,13 @@ import type {
 } from '../../../entities'
 import {
   getCanvasShapeKind,
-  isCanvasEditableTextItem,
   isCanvasSectionComponentItem,
   isCanvasShapeItem,
   normalizeCanvasArrowRouting,
   setCanvasArrowRouting,
   setCanvasShapeKind,
 } from '../../../host'
+import { CANVAS_APP_TEXT_TARGET } from '../../affordances/editing/text-editor/CanvasAppTextTarget'
 import type {
   CanvasObjectStyleControl,
   CanvasObjectStyleSwatchControl,
@@ -302,7 +302,7 @@ const SELECTION_TOOLBAR_DESCRIPTORS = [
     onSelect: (context) => context.selection.onEditText(),
     visible: (context) =>
       context.selectedItem
-        ? isCanvasEditableTextItem(context.selectedItem)
+        ? CANVAS_APP_TEXT_TARGET.canEdit(context.selectedItem)
         : false,
   },
   {

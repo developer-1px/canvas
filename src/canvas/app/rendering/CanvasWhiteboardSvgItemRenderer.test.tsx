@@ -1,3 +1,4 @@
+import { CANVAS_APP_TEXT_TARGET } from '../affordances/editing/text-editor/CanvasAppTextTarget'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import type { CanvasItem } from '../../entities'
@@ -233,6 +234,7 @@ function renderItem(
         locked: false,
         onArrowEndpointPointerDown: () => undefined,
         onItemPointerDown: () => undefined,
+        canEditText: (item) => CANVAS_APP_TEXT_TARGET.canEdit(item),
         onTextDoubleClick: () => undefined,
         outlineIds: new Set(),
         selected: options.selected ?? new Set(),

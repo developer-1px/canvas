@@ -23,6 +23,12 @@ export function assertCanvasCustomItemValidators(
   })
 }
 
+export function isCanvasCustomItem(
+  item: CanvasItem,
+): item is CanvasCustomItem {
+  return item.type === 'custom'
+}
+
 export function isCanvasCustomItemStorageEnvelope(
   value: Record<string, unknown>,
 ): value is CanvasCustomItem {

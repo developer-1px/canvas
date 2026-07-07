@@ -5,6 +5,10 @@ import type {
 } from '../../entities'
 import { createCanvasItemReadModel } from '../../host'
 import {
+  CANVAS_APP_TEXT_TARGET,
+  type CanvasAppTextTarget,
+} from '../affordances/editing/text-editor/CanvasAppTextTarget'
+import {
   getCanvasItemIdSeed,
   type CanvasWorkspaceSnapshot,
 } from '../workspace/document/CanvasWorkspaceSnapshot'
@@ -18,6 +22,7 @@ type CanvasWorkspaceInitialStateArgs = {
 type CanvasWorkspaceRuntimeModelArgs = {
   items: CanvasItem[]
   selection: string[]
+  textTarget?: CanvasAppTextTarget
 }
 
 export function getCanvasWorkspaceInitialState({
@@ -51,9 +56,19 @@ export function createCanvasWorkspaceIdGenerator(items: CanvasItem[]) {
 export function getCanvasWorkspaceRuntimeModel({
   items,
   selection,
+  textTarget = CANVAS_APP_TEXT_TARGET,
 }: CanvasWorkspaceRuntimeModelArgs) {
   const selected = new Set<string>(selection)
-  const itemReadModel = createCanvasItemReadModel(items)
+  const hostItemReadModel = createCanvasItemReadModel(items)
+  const itemReadModel = {
+    ...hostItemReadModel,
+    findTextEditTarget: (id: string) => {
+      const item = hostItemReadModel.findItem(id)
+
+      return item && textTarget.canEdit(item) ? item : null
+    },
+    textTarget,
+  }
   const scene = itemReadModel.scene
   const selectedBounds = scene.getBounds(selection)
 

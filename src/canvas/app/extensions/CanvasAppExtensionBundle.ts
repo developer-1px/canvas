@@ -1,6 +1,9 @@
 import type { CanvasAppCustomCommand } from './custom-commands'
 import type { CanvasAppInspectorPanel } from './inspector-panels'
 import type {
+  CanvasAppCustomItemTextTargets,
+} from './custom-item-modules/CanvasAppCustomItemTextTargetContracts'
+import type {
   CanvasAppCustomItemValidators,
 } from './custom-item-modules/CanvasAppCustomItemValidatorContracts'
 import {
@@ -27,6 +30,7 @@ export type CanvasAppExtensionBundle = {
   customCommands: readonly CanvasAppCustomCommand[]
   customCreationTools: readonly CanvasAppCustomCreationTool[]
   customItemRenderers: CanvasAppCustomItemRenderers
+  customItemTextTargets: CanvasAppCustomItemTextTargets
   customItemValidators: CanvasAppCustomItemValidators
   foundationExtensions: readonly CanvasAppFoundationExtension[]
   inspectorPanels: readonly CanvasAppInspectorPanel[]
@@ -38,6 +42,7 @@ export type CanvasAppExtensionBundleInput = {
   customCommands?: readonly CanvasAppCustomCommand[]
   customCreationTools?: readonly CanvasAppCustomCreationTool[]
   customItemRenderers?: CanvasAppCustomItemRenderers
+  customItemTextTargets?: CanvasAppCustomItemTextTargets
   customItemValidators?: CanvasAppCustomItemValidators
   foundationExtensions?: readonly CanvasAppFoundationExtension[]
   inspectorPanels?: readonly CanvasAppInspectorPanel[]
@@ -50,6 +55,7 @@ export function createEmptyCanvasAppExtensionBundle(): CanvasAppExtensionBundle 
     customCommands: [],
     customCreationTools: [],
     customItemRenderers: {},
+    customItemTextTargets: {},
     customItemValidators: {},
     foundationExtensions: [],
     inspectorPanels: [],
@@ -62,6 +68,7 @@ export function createCanvasAppExtensionBundle({
   customCommands = [],
   customCreationTools = [],
   customItemRenderers = {},
+  customItemTextTargets = {},
   customItemValidators = {},
   foundationExtensions = [],
   inspectorPanels = [],
@@ -72,6 +79,7 @@ export function createCanvasAppExtensionBundle({
     customCommands,
     customCreationTools,
     customItemRenderers,
+    customItemTextTargets,
     customItemValidators,
     foundationExtensions,
     inspectorPanels,
@@ -106,6 +114,12 @@ export function mergeCanvasAppExtensionBundle({
       current: current.customItemRenderers,
       entries: entries.customItemRenderers,
       label: 'custom item renderer',
+      owner,
+    }),
+    customItemTextTargets: mergeUniqueCanvasAppExtensionRecord({
+      current: current.customItemTextTargets,
+      entries: entries.customItemTextTargets,
+      label: 'custom item text target',
       owner,
     }),
     customItemValidators: mergeUniqueCanvasAppExtensionRecord({
@@ -152,6 +166,7 @@ export function snapshotCanvasAppExtensionBundle(
       bundle.foundationExtensions,
     ),
     customItemRenderers: snapshotCanvasAppRecord(bundle.customItemRenderers),
+    customItemTextTargets: snapshotCanvasAppRecord(bundle.customItemTextTargets),
     customItemValidators: snapshotCanvasAppRecord(bundle.customItemValidators),
     inspectorPanels: snapshotCanvasAppDescriptorArray(bundle.inspectorPanels),
     mediaImporters: snapshotCanvasAppDescriptorArray(

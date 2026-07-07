@@ -14,6 +14,9 @@ import type {
 } from '../extensions/custom-commands'
 import type { CanvasWorkspaceStorageProvider } from '../workspace/document/CanvasWorkspacePersistence'
 import type {
+  CanvasAppCustomItemTextTargets,
+} from '../extensions/custom-item-modules/CanvasAppCustomItemTextTargetContracts'
+import type {
   CanvasAppCustomItemValidators,
 } from '../extensions/custom-item-modules/CanvasAppCustomItemValidatorContracts'
 import type {
@@ -90,6 +93,7 @@ export type CanvasAppAssemblyRenderingModel = {
 }
 
 export type CanvasAppAssemblyWorkspaceModel = {
+  customItemTextTargets: CanvasAppCustomItemTextTargets
   customItemValidators: CanvasAppCustomItemValidators
   initialItems: CanvasItem[]
   initialSelection: readonly string[]

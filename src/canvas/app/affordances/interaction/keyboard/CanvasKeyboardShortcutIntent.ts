@@ -1,7 +1,11 @@
 import type { CanvasAffordanceConfig } from '../../../../engine'
 import type {
+  CanvasAppCustomCommandState,
   CanvasAppCustomCreationToolState,
 } from '../../../extensions/CanvasAppExtensionStateContracts'
+import {
+  getCanvasKeyboardCustomCommandShortcutIntent,
+} from './CanvasKeyboardExtensionShortcutIntent'
 import type {
   CanvasKeyboardShortcutIntent,
 } from './CanvasKeyboardShortcutIntentContracts'
@@ -15,6 +19,7 @@ import { getCanvasKeyboardToolShortcutIntent } from './CanvasKeyboardToolShortcu
 
 export type CanvasKeyboardShortcutIntentInput = {
   config: CanvasAffordanceConfig
+  customCommands?: readonly CanvasAppCustomCommandState[]
   customCreationTools: readonly CanvasAppCustomCreationToolState[]
   event: globalThis.KeyboardEvent
   selection: readonly string[]
@@ -22,6 +27,7 @@ export type CanvasKeyboardShortcutIntentInput = {
 
 export function getCanvasKeyboardShortcutIntent({
   config,
+  customCommands = [],
   customCreationTools,
   event,
   selection,
@@ -84,6 +90,19 @@ export function getCanvasKeyboardShortcutIntent({
 
   if (event.metaKey || event.ctrlKey || event.altKey) {
     return { kind: 'none', preventDefault: false }
+  }
+
+  const customCommandId = getCanvasKeyboardCustomCommandShortcutIntent({
+    customCommands,
+    event,
+  })
+
+  if (customCommandId) {
+    return {
+      commandId: customCommandId,
+      kind: 'run-custom-command',
+      preventDefault: true,
+    }
   }
 
   const tool = getCanvasKeyboardToolShortcutIntent({

@@ -1,7 +1,6 @@
 import type { PointerEvent } from 'react'
 import type {
   CanvasArrowEndpoint,
-  CanvasEditableTextItem,
   CanvasItem,
 } from '../../entities'
 import {
@@ -29,7 +28,8 @@ export type CanvasWhiteboardSvgItemRenderArgs = {
     itemId: string,
     endpoint: CanvasArrowEndpoint,
   ) => void
-  onTextDoubleClick: (item: CanvasEditableTextItem) => void
+  canEditText: (item: CanvasItem) => boolean
+  onTextDoubleClick: (item: CanvasItem) => void
   outlineIds: Set<string>
   selected: Set<string>
 }
@@ -42,6 +42,7 @@ export function renderCanvasWhiteboardSvgItem({
   locked,
   onArrowEndpointPointerDown,
   onItemPointerDown,
+  canEditText,
   onTextDoubleClick,
   outlineIds,
   selected,
@@ -64,6 +65,7 @@ export function renderCanvasWhiteboardSvgItem({
     item,
     locked: isLocked,
     onArrowEndpointPointerDown,
+    canEditText,
     onTextDoubleClick,
     selected: isSelected,
     renderChild: (child, childLocked) =>
@@ -75,6 +77,7 @@ export function renderCanvasWhiteboardSvgItem({
         locked: childLocked,
         onArrowEndpointPointerDown,
         onItemPointerDown,
+        canEditText,
         onTextDoubleClick,
         outlineIds,
         selected,

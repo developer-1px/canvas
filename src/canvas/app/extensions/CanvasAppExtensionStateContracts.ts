@@ -1,5 +1,8 @@
 import type { CanvasCustomToolId } from '../../entities'
 import type {
+  CanvasAppCustomCommandShortcut,
+} from './custom-commands/CanvasAppCustomCommands'
+import type {
   CanvasAppCustomToolShortcut,
 } from './custom-tools/CanvasAppCustomCreationTools'
 
@@ -8,6 +11,7 @@ export type CanvasAppCustomCommandState = {
   disabled: boolean
   id: string
   label: string
+  shortcut?: CanvasAppCustomCommandShortcut
   title: string
 }
 

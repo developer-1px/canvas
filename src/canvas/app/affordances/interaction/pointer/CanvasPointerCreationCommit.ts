@@ -1,5 +1,6 @@
 import type {
   CanvasItem,
+  EditingText,
   Tool,
 } from '../../../../entities'
 import {
@@ -7,6 +8,7 @@ import {
   type CanvasCreationAdapter,
 } from '../../../../engine'
 import type { CanvasAppCustomCreationTool } from '../../../extensions/custom-tools/CanvasAppCustomCreationTools'
+import type { CanvasAppTextTarget } from '../../editing/text-editor/CanvasAppTextTarget'
 import type { CanvasAppComponentLibrary } from '../../../workflow/CanvasAppComponentAssemblyContracts'
 import type { CommitCanvasItemsChange } from '../../../workflow/CanvasWorkflowContract'
 import type {
@@ -38,7 +40,9 @@ export type CanvasPointerCreationCommitInput = {
   interaction: CanvasPointerCreationInteraction
   scene: CanvasSceneAdapter
   selection: string[]
+  setEditing?: (editing: EditingText | null) => void
   setTool: (tool: Tool) => void
+  textTarget?: CanvasAppTextTarget
 }
 
 export function commitCanvasPointerCreation({
@@ -50,7 +54,9 @@ export function commitCanvasPointerCreation({
   interaction,
   scene,
   selection,
+  setEditing,
   setTool,
+  textTarget,
 }: CanvasPointerCreationCommitInput) {
   if (isCanvasPointerComponentCreationInteraction(interaction)) {
     commitCanvasPointerComponentCreation({
@@ -95,6 +101,8 @@ export function commitCanvasPointerCreation({
       customCreationTools,
       interaction,
       selection,
+      setEditing,
+      textTarget,
     })
   }
 }

@@ -22,6 +22,9 @@ import {
   assertCanvasAppCustomItemModule,
 } from './CanvasAppCustomItemModuleContracts'
 import type {
+  CanvasAppCustomItemTextTarget,
+} from './CanvasAppCustomItemTextTargetContracts'
+import type {
   CanvasAppCustomItemValidator,
 } from './CanvasAppCustomItemValidatorContracts'
 import {
@@ -39,6 +42,7 @@ export type CanvasAppCustomItemModuleCreationTool = {
   createItem: (
     context: CanvasAppCustomCreationToolContext,
   ) => CanvasAppCustomItemModuleCreationItem | null
+  enterTextEdit?: boolean
   id: string
   label: string
   shortcut?: CanvasAppCustomToolShortcut
@@ -56,6 +60,7 @@ export type CanvasAppCustomItemModule = {
   getRenderKey?: CanvasAppCustomItemRenderKeyStrategy
   renderItem: CanvasAppCustomItemRendererStrategy
   textPasteImporters?: readonly CanvasTextPasteImporter[]
+  textTarget?: CanvasAppCustomItemTextTarget
   validateItem: CanvasAppCustomItemValidator
 }
 

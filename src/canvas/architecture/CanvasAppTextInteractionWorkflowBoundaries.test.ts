@@ -131,7 +131,7 @@ describe('Canvas App text interaction workflow boundaries', () => {
       'export type CanvasTextEditorStyle',
     )
     expect(textEditingModelFile.source).toContain(
-      'getCommittedCanvasEditableTextValue',
+      'textTarget.getCommittedValue',
     )
     expect(textEditingModelFile.source).not.toContain("'Text'")
     expect(textEditingModelFile.source).not.toContain(

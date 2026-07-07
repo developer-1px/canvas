@@ -14,6 +14,7 @@ import {
 } from '../../feature-packs/media-import'
 import { assertCanvasAppCustomCreationTools } from '../custom-tools/CanvasAppCustomCreationToolContracts'
 import type { CanvasAppCustomItemModuleAssembly } from './CanvasAppCustomItemModuleAssembly'
+import { assertCanvasAppCustomItemTextTarget } from './CanvasAppCustomItemTextTargetContracts'
 import type {
   CanvasAppCustomItemModule,
 } from './CanvasAppCustomItemModules'
@@ -77,6 +78,13 @@ export function assertCanvasAppCustomItemModule(
     moduleId: module.id,
   })
   assertCanvasAppInspectorPanels(module.inspectorPanels ?? [])
+
+  if (module.textTarget) {
+    assertCanvasAppCustomItemTextTarget({
+      owner: `custom item module ${module.id} text target`,
+      textTarget: module.textTarget,
+    })
+  }
 }
 
 export function assertCanvasAppCustomItemModuleAssembly(

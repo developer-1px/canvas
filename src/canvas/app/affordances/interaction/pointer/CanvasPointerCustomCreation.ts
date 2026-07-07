@@ -1,5 +1,6 @@
 import type {
   CanvasCustomItem,
+  EditingText,
   Point,
   Tool,
 } from '../../../../entities'
@@ -13,6 +14,7 @@ import {
 } from '../../../../engine'
 import { getCanvasAppCustomCreationTool } from '../../../extensions/custom-tools/CanvasAppCustomCreationToolRuntime'
 import type { CanvasAppCustomCreationTool } from '../../../extensions/custom-tools/CanvasAppCustomCreationTools'
+import type { CanvasAppTextTarget } from '../../editing/text-editor/CanvasAppTextTarget'
 import type { CommitCanvasItemsChange } from '../../../workflow/CanvasWorkflowContract'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import type { Interaction } from './CanvasInteractionState'
@@ -50,6 +52,8 @@ export type CanvasPointerCustomCreationCommitInput = {
   customCreationTools: readonly CanvasAppCustomCreationTool[]
   interaction: CanvasPointerCustomCreationInteraction
   selection: string[]
+  setEditing?: (editing: EditingText | null) => void
+  textTarget?: CanvasAppTextTarget
 }
 
 export function isCanvasPointerCustomCreationGesture(
@@ -158,6 +162,8 @@ export function commitCanvasPointerCustomCreation({
   customCreationTools,
   interaction,
   selection,
+  setEditing,
+  textTarget,
 }: CanvasPointerCustomCreationCommitInput) {
   const customTool = getCanvasAppCustomCreationTool(
     customCreationTools,
@@ -176,13 +182,29 @@ export function commitCanvasPointerCustomCreation({
       startWorld: interaction.startWorld,
     })
 
-    return nextItem && isCanvasCustomCreationItem(nextItem)
-      ? commitCanvasCustomItem({
-          commitItemsChange,
-          item: nextItem,
-          selection,
-        })
-      : false
+    if (!nextItem || !isCanvasCustomCreationItem(nextItem)) {
+      return false
+    }
+
+    const committed = commitCanvasCustomItem({
+      commitItemsChange,
+      item: nextItem,
+      selection,
+    })
+
+    if (
+      committed &&
+      customTool.enterTextEdit &&
+      setEditing &&
+      textTarget?.canEdit(nextItem)
+    ) {
+      setEditing({
+        id: nextItem.id,
+        value: textTarget.getValue(nextItem),
+      })
+    }
+
+    return committed
   } catch {
     // External creation tools must not strand the pointer lifecycle.
     return false
