@@ -56,7 +56,7 @@ describe('Canvas module layer boundaries', () => {
   })
 
 
-  it('keeps shared ui primitives independent from app workflow and the demo host', () => {
+  it('keeps shared ui primitives independent from app workflow and the whiteboard host', () => {
     const violations = getImportsFrom('src/canvas/ui/')
       .filter((reference) =>
         reference.target === 'src/canvas/host' ||
@@ -98,7 +98,7 @@ describe('Canvas module layer boundaries', () => {
   })
 
 
-  it('keeps demo app assembly details at the workflow assembly seam', () => {
+  it('keeps default app assembly details at the workflow assembly seam', () => {
     const assemblyTerms =
       /\b(CANVAS_COMPONENT_LIBRARY|CANVAS_ITEM_ENGINE_ADAPTERS|INITIAL_ITEMS)\b/
     const violations = sourceFiles
@@ -154,12 +154,12 @@ describe('Canvas module layer boundaries', () => {
   })
 
 
-  it('keeps renderer stage orchestration independent from demo canvas items', () => {
-    const demoItemTerms =
+  it('keeps renderer stage orchestration independent from whiteboard canvas items', () => {
+    const whiteboardItemTerms =
       /\b(CanvasItem|RectItem|TextItem|GroupItem|CanvasComponentItem|getCanvasItemBounds|getCanvasItemsBounds|CANVAS_COMPONENT_LIBRARY)\b/
     const violations = sourceFiles
       .filter((file) => file.path.startsWith('src/canvas/renderer/'))
-      .flatMap((file) => demoItemTerms.test(file.source) ? [file.path] : [])
+      .flatMap((file) => whiteboardItemTerms.test(file.source) ? [file.path] : [])
 
     expect(violations).toEqual([])
   })

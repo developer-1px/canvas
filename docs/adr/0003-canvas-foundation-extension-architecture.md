@@ -17,7 +17,7 @@ grouping, search/replace, and patch preview live as packages or labs extensions.
 Applications own their domain data, UI, persistence, and concrete product
 policy.
 
-Canvas needs the same split. The reusable part is not the Demo `CanvasItem`
+Canvas needs the same split. The reusable part is not the Whiteboard `CanvasItem`
 model. The reusable part is the geometry, scene, selection, gesture, transform,
 command, and patch-planning grammar that can run through adapters.
 
@@ -28,7 +28,7 @@ command, and patch-planning grammar that can run through adapters.
    planners, command availability grammar, document patch planning contracts,
    and renderer adapter contracts.
 2. Canvas Foundation must not import Host, App, UI, Renderer, or Engine
-   implementation modules, or concrete Demo `CanvasItem` variants.
+   implementation modules, or concrete Whiteboard `CanvasItem` variants.
    Host-specific item storage enters through adapters such as scene, transform,
    text target, document, and renderer item-layer adapters.
 3. Canvas Extensions provide reusable affordance or planner bundles on top of
@@ -45,7 +45,7 @@ command, and patch-planning grammar that can run through adapters.
    affordances, not product-specific custom item modules.
 5. Host/Demo continues to own concrete `CanvasItem` storage, validation,
    component templates, item-specific bounds derivation, json-document document
-   adapters, and Demo SVG item rendering.
+   adapters, and Whiteboard SVG item rendering.
 6. App continues to own React workflow, toolbar and inspector UI, local
    workspace persistence, browser clipboard/file/download details, and product
    assembly.
@@ -78,7 +78,7 @@ command, and patch-planning grammar that can run through adapters.
   affordance config remains compatible without becoming a Foundation import.
 - `CANVAS_STICKY_NOTE_EXTENSION` is the first concrete first-party extension
   descriptor. It names the sticky note creation affordance and adapter slots
-  without moving Demo component storage, SVG rendering, or App workflow.
+  without moving whiteboard component storage, SVG rendering, or App workflow.
 - `CanvasAppExtensionBundle.foundationExtensions` is the App-owned bridge for
   Foundation descriptor metadata. App assembly can carry descriptors for
   discovery and future assembly work, but command planner execution, toolbar
@@ -103,7 +103,7 @@ command, and patch-planning grammar that can run through adapters.
 - `defineCanvasExtension` fixes the first extension descriptor shape. It keeps
   reusable extension planning separate from App Assembly and Host item storage.
 - `CanvasItemReadModel`, `CanvasItemSchema`, component library templates, and
-  Demo SVG item renderers remain Host/App-owned adapters.
+  Whiteboard SVG item renderers remain Host/App-owned adapters.
 - Built-in whiteboard affordances can become first-party extensions without
   becoming product-specific custom modules.
 - External apps can swap Host item models or renderers without reimplementing

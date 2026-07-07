@@ -152,7 +152,7 @@ describe('Canvas App stage boundaries', () => {
     const appFacadeFile = getSourceFile('src/canvas/app/index.ts')
     const packageFacadeFile = getSourceFile('src/canvas/index.ts')
     const mainFile = getSourceFile('src/main.tsx')
-    const rootFile = getSourceFile('src/CanvasRoot.tsx')
+    const rootFile = getSourceFile('src/demo/CanvasRoot.tsx')
 
     expect(shellFile.source).toContain('resolveCanvasAppAssemblySource')
     expect(assemblySourceFile.source).toContain(

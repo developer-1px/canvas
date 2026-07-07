@@ -13,7 +13,7 @@ import {
 } from './CanvasWorkspaceRuntimeModel'
 
 describe('CanvasWorkspaceRuntimeModel', () => {
-  it('uses stored workspace state before demo defaults', () => {
+  it('uses stored workspace state before baseline defaults', () => {
     const initialItems = [createRectItem('rect-1')]
     const storedItems = [createRectItem('rect-5')]
     const storedWorkspace: CanvasWorkspaceSnapshot = {

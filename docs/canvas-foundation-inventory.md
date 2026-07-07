@@ -13,11 +13,11 @@ extensions.
 
 | Owner | Owns | Must not own |
 |---|---|---|
-| Foundation | geometry, scene, selection, gesture, transform, command, patch-planning contracts | Demo `CanvasItem`, React workflow, UI layout, browser IO, persistence |
+| Foundation | geometry, scene, selection, gesture, transform, command, patch-planning contracts | Whiteboard `CanvasItem`, React workflow, UI layout, browser IO, persistence |
 | First-party extension | reusable whiteboard affordance bundles on foundation contracts | product-specific storage policy or app shell composition |
 | Host | concrete item model, validation, tree adapters, document adapters | app workflow and UI chrome |
 | App | React state, assembly, command effects, pointer lifecycle effects, toolbar/inspector wiring | concrete document internals or json-document APIs |
-| Renderer | stage and overlay orchestration through injected item layers | Demo item variants or Host tree helpers |
+| Renderer | stage and overlay orchestration through injected item layers | Whiteboard item variants or Host tree helpers |
 | UI | shared controls and icons | app workflow state or Host document internals |
 
 ## Current Module Map
@@ -34,7 +34,7 @@ extensions.
 | `src/canvas/foundation/CanvasGestureEngine.ts` | Foundation | promoted | Owns pointer input to gesture classification over a structural gesture config contract. |
 | `src/canvas/foundation/CanvasGridSnap.ts` | Foundation | promoted | Owns grid snap calculations over a structural grid snap config contract. |
 | `src/canvas/foundation/CanvasHeadlessGeometry.ts` | Foundation | promoted | Owns measured rect union, padding, local coordinate conversion, and edge-distance calculations for selection/measurement overlays without DOM or product data ownership. |
-| `src/canvas/foundation/CanvasSceneAdapter.ts` | Foundation | promoted | Owns scene entries, parent/path/bounds read contracts, and scene-derived bounds without Demo item variants. |
+| `src/canvas/foundation/CanvasSceneAdapter.ts` | Foundation | promoted | Owns scene entries, parent/path/bounds read contracts, and scene-derived bounds without Whiteboard item variants. |
 | `src/canvas/foundation/CanvasSelectionEngine.ts` | Foundation | promoted | Owns pointer click and marquee selection policy over `CanvasSceneAdapter`. |
 | `src/canvas/foundation/CanvasSnapEngine.ts` | Foundation | promoted | Owns move snap planning over structural snap config and `CanvasSceneAdapter`. |
 | `src/canvas/foundation/CanvasSnapGeometry.ts` | Foundation | promoted | Owns snap bounds translation primitives. |
@@ -47,14 +47,14 @@ extensions.
 | `src/canvas/engine/gesture` | Engine public facade | retired | Gesture source moved to Foundation; Engine keeps compatibility exports from the public facade. |
 | `src/canvas/engine/command` | Engine / first-party extension | split started | Availability, selection, and generic command contracts moved to Foundation; execution actions remain Engine-owned. |
 | `src/canvas/engine/snap` | Engine public facade | retired | Snap source moved to Foundation; Engine keeps compatibility exports from the public facade. |
-| `src/canvas/host/read` | Host adapter | keep | Converts Demo `CanvasItem` trees into scene/read contracts. |
+| `src/canvas/host/read` | Host adapter | keep | Converts Whiteboard `CanvasItem` trees into scene/read contracts. |
 | `src/canvas/host/document` | Host adapter | keep | Owns json-document document adapter, validation, patch factories, and item-specific field mapping. |
-| `src/canvas/host/tree` | Host | keep | Encodes Demo group children, bounds sync, pruning, and item traversal. |
-| `src/canvas/host/component` | Host | keep | Demo component templates and component storage rules. |
+| `src/canvas/host/tree` | Host | keep | Encodes whiteboard group children, bounds sync, pruning, and item traversal. |
+| `src/canvas/host/component` | Host | keep | whiteboard component templates and component storage rules. |
 | `src/canvas/host/text` | Host | keep | Maps item variants to editable values and patch fields. |
 | `src/canvas/app/workflow` | App | keep | React state fan-out, command effects, pointer lifecycle effects, and assembly wiring. |
 | `src/canvas/app/extensions` | App / first-party extension bridge | split started | App bundles now carry and index foundation extension descriptor metadata; current assembly output remains App-owned. |
-| `src/canvas/app/rendering` | App adapter | keep | Demo SVG item layer adapter and presentation resolution. |
+| `src/canvas/app/rendering` | App adapter | keep | Whiteboard SVG item layer adapter and presentation resolution. |
 | `src/canvas/renderer` | Renderer | keep | Stage and overlay renderer should remain item-model independent. |
 | `src/canvas/ui` | UI | keep | Shared icons and controls only. |
 
@@ -92,7 +92,7 @@ patches.
 
 `CANVAS_STICKY_NOTE_EXTENSION` is the first concrete first-party extension
 descriptor. It names sticky note creation as a creation tool and declares the
-creation, document, renderer, and text-target adapter slots without moving Demo
+creation, document, renderer, and text-target adapter slots without moving whiteboard
 component templates, item schemas, SVG rendering, or app workflow.
 
 `CanvasAppExtensionBundle.foundationExtensions` is the app-owned bridge for
@@ -121,8 +121,8 @@ rendering, overlay wiring, or Host item storage.
 - Foundation candidates must not import `src/canvas/engine`, `src/canvas/host`,
   `src/canvas/app`, `src/canvas/renderer`, or `src/canvas/ui` implementation
   modules.
-- Foundation contracts must not mention Demo `CanvasItem`, `RectItem`,
+- Foundation contracts must not mention Whiteboard `CanvasItem`, `RectItem`,
   `CanvasComponentItem`, or component library constants.
 - json-document imports stay inside Host document adapters unless an explicit
   document/patch contract issue justifies moving them.
-- Renderer stage remains independent from Demo item variants.
+- Renderer stage remains independent from Whiteboard item variants.

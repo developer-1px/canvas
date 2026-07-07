@@ -22,8 +22,7 @@ const demoModules = import.meta.glob('../../demo/**/*.{ts,tsx,css}', {
 }) as Record<string, string>
 
 const appEntryModules = import.meta.glob([
-  '../../main.tsx',
-  '../../CanvasRoot.tsx',
+  '../../*.{ts,tsx}',
 ], {
   eager: true,
   import: 'default',

@@ -9,20 +9,20 @@
 - Canvas Affordance Metadata: built-in tool/command label, status label, keyboard shortcut, toolbar tool order를 소유하고 tool title/shortcut display를 keyboard shortcut에서 파생하는 immutable Engine-owned what 계약.
 - Host App: 엔진을 사용하는 실제 제품. 데이터 모델, 저장, 도메인 명령, 화면 구성을 소유한다.
 - Core Contract: 특정 Host App, Renderer, React 상태에 묶이지 않는 재사용 부품의 입력과 출력 계약.
-- Canvas Foundation: 특정 Host App, Renderer, React 상태, Demo `CanvasItem` 저장 shape에 묶이지 않는 geometry, scene, selection, gesture, transform, command, patch-planning grammar를 소유하는 재사용 Module 집합.
+- Canvas Foundation: 특정 Host App, Renderer, React 상태, Whiteboard `CanvasItem` 저장 shape에 묶이지 않는 geometry, scene, selection, gesture, transform, command, patch-planning grammar를 소유하는 재사용 Module 집합.
 - Canvas Foundation Contract: Canvas Foundation이 외부에 노출하는 Adapter 중심 Interface. Host App은 item tree, bounds, editable target, document commit 같은 concrete 의미를 Adapter로 제공하고 Foundation은 `CanvasItem` variant를 import하지 않는다.
 - Canvas Extension: Canvas Foundation Contract를 소비해 reusable affordance나 document/gesture/command planner를 제공하는 Module. Extension은 제품 storage, UI layout, browser IO, persistence를 소유하지 않고 patch/effect descriptor 또는 renderer/command registration을 산출한다.
-- Canvas First-party Whiteboard Extension: sticky note, shape, drawing stroke, connector, comment, stamp처럼 de-facto whiteboard affordance를 Foundation 위에 올리는 내부 Extension bundle. 제품별 custom item module은 아니지만 Demo Host storage와도 동일하지 않다.
+- Canvas First-party Whiteboard Extension: sticky note, shape, drawing stroke, connector, comment, stamp처럼 de-facto whiteboard affordance를 Foundation 위에 올리는 내부 Extension bundle. 제품별 custom item module은 아니지만 Whiteboard Host storage와도 동일하지 않다.
 - Canvas Bounds Resize: bounds resize, aspect ratio lock, center resize, handle point, item bounds scaling을 제공하는 Core geometry Module.
 - Canvas Stable Id: persisted kind, presentation key, registry key에 쓰는 lower-kebab 문자열 계약.
-- Entities Contract: 런타임 구현 없이 Core geometry type, Demo canvas item type, stable item subtype alias를 노출하는 type-only 계약. Runtime helper는 Core/Host/App seam에 둔다.
+- Entities Contract: 런타임 구현 없이 Core geometry type, whiteboard canvas item type, stable item subtype alias를 노출하는 type-only 계약. Runtime helper는 Core/Host/App seam에 둔다.
 - Engine Public Facade: Host App, Demo App, UI, Renderer Adapter가 Engine을 사용할 때 import하는 안정된 Module 경계.
-- Host Document Controller: Demo `CanvasItem` 문서의 history, selection, clipboard, text search, item commit을 React와 json-document 세부 구현 없이 제공하는 Module.
+- Host Document Controller: Whiteboard `CanvasItem` 문서의 history, selection, clipboard, text search, item commit을 React와 json-document 세부 구현 없이 제공하는 Module.
 - Canvas Document Change Patch: CanvasItemsChange별 patch builder table과 Host-owned JSON Patch factory 호출을 소유하는 change-to-patch grammar Module.
-- Canvas Document Patch Tree Diff: before/after Demo item tree를 patch factory가 쓰는 topmost changed entry, changed group entry, removal entry로 변환하고 patch applier가 명시 `CanvasDocumentPatchTreeDiff` contract를 소비하게 하는 Host-owned tree diff Module.
-- Canvas Document Reorder Patch: before/after Demo item tree의 sibling order 차이를 json-document JSON Patch `move` operation으로 변환하는 Host-owned patch Module.
+- Canvas Document Patch Tree Diff: before/after Whiteboard item tree를 patch factory가 쓰는 topmost changed entry, changed group entry, removal entry로 변환하고 patch applier가 명시 `CanvasDocumentPatchTreeDiff` contract를 소비하게 하는 Host-owned tree diff Module.
+- Canvas Document Reorder Patch: before/after Whiteboard item tree의 sibling order 차이를 json-document JSON Patch `move` operation으로 변환하는 Host-owned patch Module.
 - Canvas Group Item: group item 판정과 recursive children 저장 shape를 소유하는 Host tree structural contract Module.
-- Host Public Facade: Demo Host model type, read model, component library, document controller를 외부 레이어에 노출하는 안정된 Module 경계.
+- Host Public Facade: Whiteboard Host model type, read model, component library, document controller를 외부 레이어에 노출하는 안정된 Module 경계.
 - Canvas Package Public Entry: 외부 조립자와 Demo가 사용하는 `src/canvas` 단일 entry. App Shell, assembly input, descriptor authoring contract, stable entity type, layer facade namespace를 노출하고 workflow hook, assembly default/validator, custom module assembly helper, layer별 function export 같은 runtime how는 직접 노출하지 않는다.
 - Canvas App Public Facade: Canvas App Shell, Canvas App Assembly Source, workflow 조립 계약과 고급 App runtime hook을 노출하는 `src/canvas/app` entry.
 - Canvas App Authoring Facade: `canvas/app/authoring` subpath로 외부 조립자가 쓰는 assembly input, custom command, custom item module, module-owned creation tool, inspector, renderer descriptor 계약을 모으고 runtime hook, default assembly, assembled tool/state, validator, custom module assembly output은 제외하는 App public authoring Module.
@@ -34,10 +34,10 @@
 - Canvas App Capability Snapshot: Host-owned share/permission policy를 `view`, `editDocument`, `comment`, `export`, `present`, `follow` boolean으로 App assembly에 주입하는 contract. Core는 account/role/share link를 소유하지 않고, App은 capability snapshot으로 affordance config를 좁혀 UI, keyboard, pointer gate에 반영한다.
 - Canvas App Presence Provider: Host가 live collaborator cursor/selection snapshot을 App assembly에 공급하는 ephemeral provider contract. Provider output은 `CanvasPresenceOverlay`로 renderer overlay에만 흐르고 `CanvasItem` 문서 state에는 저장되지 않는다.
 - Canvas App AI Automation Labs: provider 선택, prompt policy, provenance, generated patch review가 안정되기 전까지 AI-assisted canvas generation/cleanup을 Core/Engine 밖 App extension으로 격리하는 labs-only boundary. Provider에는 선택된 item의 id/type/bounds/text snapshot만 전달하고, 결과는 human apply/cancel review 전 `CanvasAppItemsChange` draft로만 존재한다.
-- Canvas Item Read Model: Demo `CanvasItem` tree의 조회, bounds, selection 정규화, Scene Adapter 생성을 tree helper 세부 구현 없이 제공하고 `scene`을 Engine `CanvasSceneAdapter` contract로 노출하는 Module.
-- Canvas Component Library: Demo component template, presentation key, component item 생성 how를 함께 제공하는 Host-owned concrete Module. App 공개 조립 계약은 이 concrete 타입 대신 Canvas App Component Library Interface를 소비한다.
-- Canvas Built-in Component Templates: Sticky, label, card 같은 기본 Demo component catalogue를 소유하는 Host-owned Module.
-- Canvas Component Presentation: Demo component kind를 Renderer Adapter의 그리기 전략과 연결하는 key. 새 component kind는 기존 presentation을 재사용할 수 있다.
+- Canvas Item Read Model: Whiteboard `CanvasItem` tree의 조회, bounds, selection 정규화, Scene Adapter 생성을 tree helper 세부 구현 없이 제공하고 `scene`을 Engine `CanvasSceneAdapter` contract로 노출하는 Module.
+- Canvas Component Library: whiteboard component template, presentation key, component item 생성 how를 함께 제공하는 Host-owned concrete Module. App 공개 조립 계약은 이 concrete 타입 대신 Canvas App Component Library Interface를 소비한다.
+- Canvas Built-in Component Templates: Sticky, label, card 같은 기본 whiteboard component catalogue를 소유하는 Host-owned Module.
+- Canvas Component Presentation: whiteboard component kind를 Renderer Adapter의 그리기 전략과 연결하는 key. 새 component kind는 기존 presentation을 재사용할 수 있다.
 - Canvas Component Item Validation: component item의 stable component id, title/style string, optional text list 저장 shape 검증을 소유하는 Host-owned validation Module.
 - Canvas Editable Text Item: `RectItem | TextItem | CanvasComponentItem` stable entity type은 Entities Contract가 소유하고, rect/text/sticky component body가 공유하는 editable target 판정, 저장 shape, edit initial value, commit fallback, patch field/operation은 Host-owned text Module이 소유한다.
 - Canvas Image Item: 업로드/붙여넣기/다운로드 대상이 되는 persisted image item type은 Entities Contract가 소유하고, data URL, mime type, natural size, positive bounds 저장 shape 검증은 Host-owned image Module이 소유한다.
@@ -61,14 +61,14 @@
 - Canvas App Assembly Snapshot: 조립된 assembly output을 외부 mutation에서 보호하기 위해 component library, extension registry, initial item, adapter를 snapshot/freeze 하는 App-owned Module.
 - Canvas App Adapter Snapshot: Host item adapter, item layer Adapter, stage Adapter의 snapshot/freeze 규칙을 소유하는 App-owned Module.
 - Canvas App Rendering Contracts: 외부 조립자가 component/custom item renderer, stage Adapter, item layer Adapter를 등록할 때 쓰는 App-owned authoring Interface. Default SVG Adapter 구현 파일에 기대지 않는다.
-- Canvas App Renderer Registries: App-named component/custom item renderer registry 생성, 검증, default를 소유하고 Demo SVG registry 구현명을 외부 authoring seam 뒤에 숨기는 Module.
+- Canvas App Renderer Registries: App-named component/custom item renderer registry 생성, 검증, default를 소유하고 Whiteboard SVG registry 구현명을 외부 authoring seam 뒤에 숨기는 Module.
 - Canvas App Stage Adapter: App Shell이 concrete Renderer Stage를 직접 import하지 않고 stage ReactNode를 받도록 만드는 Adapter. Interface는 Canvas App Rendering Contracts가 소유하고 default SVG 구현은 별도 파일에 둔다.
 - Canvas App Stage Element: stage DOM element의 bounds, pointer capture, wheel listener를 한 Module에 숨기는 App-owned element Adapter.
 - Canvas App Stage Element Model: App Model이 Stage Element Adapter 생성 세부를 직접 알지 않도록 숨기는 workflow Module.
 - Canvas App Stage Element Consumer Model: Stage Element Adapter를 command, component, pointer, viewport, stage render consumer별 context로 변환하는 workflow Module.
 - Canvas App Consumer Contracts: command, component, control, extension, inspector, interaction, keyboard, pointer, stage, stage element, text, viewport 같은 workflow runtime fan-out의 입력, command/extension/pointer/text/viewport runtime callback, consumer별 출력 Interface를 한곳에 모아 구현 mapping과 분리하고, 외부 등록 descriptor와 내부 runtime state의 노출 범위를 고정하는 App-owned type 계약.
 - Canvas App Item Read Model Contracts: App workflow/inspector/viewport/text/pointer가 요구하는 item read slot을 Host Canvas Item Read Model concrete 타입 없이 명시하는 App-owned Interface 계약. Host Canvas Item Read Model은 이 Interface를 만족하는 Adapter다.
-- Canvas App Item Layer Adapter: App workflow가 concrete Demo SVG item layer를 직접 알지 않고 items를 stage children으로 렌더링하도록 주입받는 Adapter. Interface는 Canvas App Rendering Contracts가 소유하고 default Demo SVG 구현은 별도 파일에 둔다.
+- Canvas App Item Layer Adapter: App workflow가 concrete Whiteboard SVG item layer를 직접 알지 않고 items를 stage children으로 렌더링하도록 주입받는 Adapter. Interface는 Canvas App Rendering Contracts가 소유하고 default Whiteboard SVG 구현은 별도 파일에 둔다.
 - Canvas App Extension Id: custom command, creation tool, item module, component presentation renderer key, custom item renderer key, validator key, inspector panel에서 공유하는 안정 lower-kebab 외부 계약.
 - Canvas App Extension Registry: assembly 단계에서 extension entry와 record key를 검증하고 중복을 실패시키는 내부 merge 계약.
 - Canvas App Extension Bundle: custom command, custom creation tool, custom item renderer, custom item validator, inspector panel output slot과 slot별 중복 병합/snapshot/defaulting 규칙을 소유하고 Canvas App Assembly output 계약에 합성되는 App-owned extension output 계약.
@@ -137,19 +137,19 @@
 - Canvas Custom Item Renderer Registry: `Canvas Custom Item`의 presentation key를 SVG rendering strategy에 연결하는 외부 조립 가능한 registry.
 - Canvas Custom Item Validator: `Canvas Custom Item`의 `kind`별 domain-specific payload 규칙을 document validation에 주입하는 App-owned validator. Host document validation은 같은 구조의 registry를 소비하지만 authoring type은 App contract가 소유한다.
 - Canvas App Custom Item Validator Contracts: custom item validator function type, registry type, registry key, validate strategy slot을 검증하는 App-owned contract Module.
-- Canvas Component Presentation Registry: Demo component presentation key를 SVG rendering strategy에 연결하는 외부 조립 가능한 registry.
-- Demo SVG Built-in Component Presentation Renderers: 기본 Demo component presentation key와 SVG renderer strategy mapping을 소유하는 App rendering Module.
-- Demo SVG Item Renderer: Demo SVG Item Frame composition과 selection/lock frame state를 소유하고 item type dispatch는 Demo SVG Item Render Routing에 위임하는 App rendering Module.
-- Demo SVG Item Render Routing: Demo `CanvasItem` type별 frame metadata, recursive group content, component/custom/drawing/rect-text renderer dispatch를 소유하는 App rendering Module.
+- Canvas Component Presentation Registry: whiteboard component presentation key를 SVG rendering strategy에 연결하는 외부 조립 가능한 registry.
+- Whiteboard SVG Built-in Component Presentation Renderers: 기본 whiteboard component presentation key와 SVG renderer strategy mapping을 소유하는 App rendering Module.
+- Whiteboard SVG Item Renderer: Whiteboard SVG Item Frame composition과 selection/lock frame state를 소유하고 item type dispatch는 Whiteboard SVG Item Render Routing에 위임하는 App rendering Module.
+- Whiteboard SVG Item Render Routing: Whiteboard `CanvasItem` type별 frame metadata, recursive group content, component/custom/drawing/rect-text renderer dispatch를 소유하는 App rendering Module.
 - Canvas App Renderer Registry Contracts: component/custom item renderer registry key와 render strategy slot 검증을 공유하는 App rendering contract Module.
-- Demo SVG Component Presentation Registry Contracts: component presentation renderer registry key와 render strategy slot을 검증하는 App rendering contract Module.
-- Demo SVG Component Renderer Execution: component presentation resolver 호출, renderer lookup, render 실행, throw 시 fallback containment를 소유하는 App rendering Module.
+- Whiteboard SVG Component Presentation Registry Contracts: component presentation renderer registry key와 render strategy slot을 검증하는 App rendering contract Module.
+- Whiteboard SVG Component Renderer Execution: component presentation resolver 호출, renderer lookup, render 실행, throw 시 fallback containment를 소유하는 App rendering Module.
 - Canvas Component Library Contracts: component library input, component template descriptor shape, stable id/presentation, duplicate template id를 검증하는 Host-owned contract Module.
-- Demo SVG Component Render Fallback: component presentation resolver/renderer 실패 때 쓰는 기본 component card fallback shape를 소유하는 App rendering 내부 Module.
-- Demo SVG Custom Item Renderer Registry Contracts: custom item renderer registry key와 render strategy slot을 검증하는 App rendering contract Module.
-- Demo SVG Custom Item Renderer Execution: custom item renderer lookup, render 실행, throw 시 fallback containment를 소유하는 App rendering Module.
-- Demo SVG Custom Item Render Fallback: custom item renderer 누락/실패 때 쓰는 unknown custom item card fallback shape를 소유하는 App rendering 내부 Module.
-- Drawing Item: Demo `CanvasItem` 중 marker, highlighter, arrow처럼 캔버스 위에 빠르게 주석을 그리는 항목. `points` 또는 `start/end`가 실제 geometry이고 `x/y/w/h`는 Host가 동기화하는 bounds cache다.
+- Whiteboard SVG Component Render Fallback: component presentation resolver/renderer 실패 때 쓰는 기본 component card fallback shape를 소유하는 App rendering 내부 Module.
+- Whiteboard SVG Custom Item Renderer Registry Contracts: custom item renderer registry key와 render strategy slot을 검증하는 App rendering contract Module.
+- Whiteboard SVG Custom Item Renderer Execution: custom item renderer lookup, render 실행, throw 시 fallback containment를 소유하는 App rendering Module.
+- Whiteboard SVG Custom Item Render Fallback: custom item renderer 누락/실패 때 쓰는 unknown custom item card fallback shape를 소유하는 App rendering 내부 Module.
+- Drawing Item: Whiteboard `CanvasItem` 중 marker, highlighter, arrow처럼 캔버스 위에 빠르게 주석을 그리는 항목. `points` 또는 `start/end`가 실제 geometry이고 `x/y/w/h`는 Host가 동기화하는 bounds cache다.
 - Drawing Item Geometry: built-in marker, highlighter, arrow의 type guard, geometry bounds, translate/scale, bounds cache sync 규칙을 소유하는 Host-owned geometry Module.
 - Drawing Item Validation: built-in marker, highlighter, arrow의 visible geometry와 renderable style 저장 shape 검증을 소유하는 Host-owned validation Module.
 - Drawing Item Style: built-in marker, highlighter, arrow의 stroke/opacity 기본값과 style field shape. Draft overlay와 Host item creation이 같은 Host-owned 계약을 쓴다.
@@ -221,7 +221,7 @@
 - Canvas Keyboard Tool Shortcut Intent: built-in tool shortcut precedence와 custom creation tool shortcut matching을 소유하는 App-owned runtime Module.
 - Canvas Interaction Model: tool, gesture, marquee, draft, snap guide, overlay state 생명주기와 consumer별 interaction context를 App Shell에 숨기는 workflow Module.
 - Canvas Interaction Consumer Model: Interaction runtime state와 setter를 component, control, keyboard, pointer, stage consumer별 context로 변환하는 workflow Module.
-- Canvas Workspace Model: Demo workspace의 저장된 snapshot, document history, viewport, read model, id 생성, persistence wiring을 App Shell에 숨기는 workflow Module.
+- Canvas Workspace Model: whiteboard workspace의 저장된 snapshot, document history, viewport, read model, id 생성, persistence wiring을 App Shell에 숨기는 workflow Module.
 - Canvas Workspace Runtime Model: stored workspace fallback, App Assembly가 넘긴 initial selection, initial viewport, id generator seed, selected/read model/selected bounds derivation을 소유하는 workflow Module.
 - Canvas Workspace Consumer Model: Workspace document/read/viewport state를 command, component, control, extension, inspector, interaction, item layer, keyboard, pointer, stage, text, viewport consumer context로 변환하는 workflow Module.
 - Canvas Workspace Consumer Contracts: Workspace document/read/viewport state fan-out의 입력과 consumer별 출력 Interface를 명시하고, mapping 구현에서 document field shape를 분리하는 workflow type 계약.
@@ -236,15 +236,15 @@
 - Canvas Toolbar Tool Items: built-in tool stable order, feature toggle, custom tool 상태를 tool item group grammar로 변환하는 UI-owned Module.
 - Canvas Toolbar Command Catalog: built-in toolbar command group과 command action descriptor 목록을 소유하는 immutable UI-owned what 계약.
 - Canvas Toolbar Command Items: built-in toolbar command catalog를 feature toggle, availability와 결합해 command item group grammar로 변환하는 UI-owned Module.
-- Renderer Adapter: Affordance 상태와 주입된 item layer를 SVG, Canvas, DOM, WebGL 등으로 배치하고 그리는 Adapter. Demo `CanvasItem`을 직접 알지 않는다.
+- Renderer Adapter: Affordance 상태와 주입된 item layer를 SVG, Canvas, DOM, WebGL 등으로 배치하고 그리는 Adapter. Whiteboard `CanvasItem`을 직접 알지 않는다.
 - Canvas SVG Drawing Primitives: SVG path data와 marker id/IRI처럼 Renderer Stage defs와 App-owned item layer가 공유해야 하는 SVG drawing primitive 계약.
-- Demo SVG Item Layer Adapter: Demo `CanvasItem` tree와 component presentation을 SVG item layer로 바꾸어 Renderer Adapter에 주입하는 App-owned Adapter.
-- Demo SVG Item Frame: Demo SVG item의 lock, selected, pointer event, outline wrapper 문법을 item type별 shape rendering과 분리해 소유하는 Module.
-- Demo SVG Drawing Item Renderer: drawing item type guard와 public render entry를 소유하고 SVG shape dispatch는 Demo SVG Drawing Item Render Routing에 위임하는 App rendering Module.
-- Demo SVG Drawing Item Render Routing: marker/highlighter stroke path rendering과 arrow line/marker rendering strategy를 소유하는 App rendering Module.
-- Demo SVG Rect/Text Item Renderer: editable text item public render entry를 소유하고 rect/text SVG shape dispatch는 Demo SVG Rect/Text Item Render Routing에 위임하는 App rendering Module.
-- Demo SVG Rect/Text Item Render Routing: rect geometry, embedded rect text, standalone text foreignObject rendering strategy를 소유하는 App rendering Module.
-- Renderer Component Presentation Resolver: Demo component kind를 Renderer Adapter가 이해하는 presentation key로 바꾸는 함수. App workflow는 Canvas App Component Library Interface의 `getPresentation` slot을 Renderer Adapter에 주입한다.
+- Whiteboard SVG Item Layer Adapter: Whiteboard `CanvasItem` tree와 component presentation을 SVG item layer로 바꾸어 Renderer Adapter에 주입하는 App-owned Adapter.
+- Whiteboard SVG Item Frame: Whiteboard SVG item의 lock, selected, pointer event, outline wrapper 문법을 item type별 shape rendering과 분리해 소유하는 Module.
+- Whiteboard SVG Drawing Item Renderer: drawing item type guard와 public render entry를 소유하고 SVG shape dispatch는 Whiteboard SVG Drawing Item Render Routing에 위임하는 App rendering Module.
+- Whiteboard SVG Drawing Item Render Routing: marker/highlighter stroke path rendering과 arrow line/marker rendering strategy를 소유하는 App rendering Module.
+- Whiteboard SVG Rect/Text Item Renderer: editable text item public render entry를 소유하고 rect/text SVG shape dispatch는 Whiteboard SVG Rect/Text Item Render Routing에 위임하는 App rendering Module.
+- Whiteboard SVG Rect/Text Item Render Routing: rect geometry, embedded rect text, standalone text foreignObject rendering strategy를 소유하는 App rendering Module.
+- Renderer Component Presentation Resolver: whiteboard component kind를 Renderer Adapter가 이해하는 presentation key로 바꾸는 함수. App workflow는 Canvas App Component Library Interface의 `getPresentation` slot을 Renderer Adapter에 주입한다.
 - Renderer Public Facade: App과 UI가 Renderer Adapter를 사용할 때 import하는 안정된 Module 경계. SVG 내부 파일 구조를 숨긴다.
 - Scene Adapter: Host App의 항목 트리, bounds, hit target, editable target을 엔진이 읽을 수 있게 맞추는 Adapter.
 - Canvas Module Boundary Guardrail: Engine, Host, App Shell, UI, Renderer seam import 규칙을 고정하는 architecture test.
@@ -278,26 +278,26 @@
 - Attached object 이동 판정은 comment 같은 whole-item attachment에 대해 Host Canvas Item Attachment Module이 소유한다. Arrow connector endpoint attachment는 whole-item attachment와 구분해 Host Drawing Item Geometry가 start/end endpoint 단위로 관리한다.
 - Group item 판정과 recursive children 저장 shape는 Host Canvas Group Item Module이 소유하고 Host tree/document/operation Module은 named predicate를 호출한다.
 - 엔진은 Fabric.js 같은 완성형 객체 모델을 감싸기보다, 커스텀 가능한 Affordance 문법을 작은 Interface로 제공한다.
-- Demo `CanvasItem`과 SVG 렌더링 방식은 재사용 Core Contract에 포함하지 않는다.
+- Whiteboard `CanvasItem`과 SVG 렌더링 방식은 재사용 Core Contract에 포함하지 않는다.
 - Core primitive facade는 resize/handle/scale 규칙을 직접 구현하지 않고 Canvas Bounds Resize에 위임한다.
-- Renderer Stage는 Demo `CanvasItem`, Host read model, component library를 import하지 않는다.
-- Demo item SVG 렌더링은 App의 Demo SVG Item Layer Adapter가 소유한다.
+- Renderer Stage는 Whiteboard `CanvasItem`, Host read model, component library를 import하지 않는다.
+- Whiteboard item SVG 렌더링은 App의 Whiteboard SVG Item Layer Adapter가 소유한다.
 - SVG drawing path data와 arrow marker id/IRI는 Canvas SVG Drawing Primitives가 소유한다.
-- Demo SVG item의 lock/selected/pointer/outline wrapper 문법은 Demo SVG Item Frame이 소유한다.
-- Demo SVG Item Layer Adapter는 item layer list injection을 맡고, frame orchestration은 Demo SVG Item Renderer가, recursive tree content와 item type dispatch는 Demo SVG Item Render Routing이 소유한다. marker/highlighter/arrow shape 렌더링 strategy는 Demo SVG Drawing Item Render Routing이 소유한다.
-- Demo SVG Item Layer Adapter는 rect/text shape와 embedded text foreignObject 문법을 알지 않고 Demo SVG Rect/Text Item Renderer에 위임하고, rect/text shape strategy는 Demo SVG Rect/Text Item Render Routing이 소유한다.
+- Whiteboard SVG item의 lock/selected/pointer/outline wrapper 문법은 Whiteboard SVG Item Frame이 소유한다.
+- Whiteboard SVG Item Layer Adapter는 item layer list injection을 맡고, frame orchestration은 Whiteboard SVG Item Renderer가, recursive tree content와 item type dispatch는 Whiteboard SVG Item Render Routing이 소유한다. marker/highlighter/arrow shape 렌더링 strategy는 Whiteboard SVG Drawing Item Render Routing이 소유한다.
+- Whiteboard SVG Item Layer Adapter는 rect/text shape와 embedded text foreignObject 문법을 알지 않고 Whiteboard SVG Rect/Text Item Renderer에 위임하고, rect/text shape strategy는 Whiteboard SVG Rect/Text Item Render Routing이 소유한다.
 - 안정 entity type은 `src/canvas/entities`에서 import한다. `entities` public facade는 type-only로 유지한다.
 - persisted kind와 registry key는 Canvas Stable Id 형식을 사용한다.
 - 알 수 없는 stable component kind는 fallback할 수 있지만, malformed component kind는 validation/lookup 단계에서 실패해야 한다.
 - 모든 기능은 on/off 가능해야 한다.
 - Canvas Affordance Catalog는 built-in Affordance 목록과 default toggle matrix를 소유하고, Canvas Affordance Config는 Engine public contract로서 catalog-driven 생성/검증/snapshot을 소유한다.
 - Canvas Affordance Metadata는 built-in tool/command 표시 정보, built-in tool keyboard shortcut, toolbar tool order를 소유하고, tool title/shortcut display는 keyboard shortcut에서 파생한다. Toolbar Tool Items와 Keyboard Tool Shortcut Catalog는 자체 built-in tool 목록/shortcut table을 반복하지 않는다.
-- 새 Demo component kind가 기존 presentation을 재사용하면 Canvas Built-in Component Templates만 수정한다.
-- 새 Demo component kind와 새 SVG presentation은 Canvas App Assembly에서 component library와 presentation registry를 조립해 붙인다.
+- 새 whiteboard component kind가 기존 presentation을 재사용하면 Canvas Built-in Component Templates만 수정한다.
+- 새 whiteboard component kind와 새 SVG presentation은 Canvas App Assembly에서 component library와 presentation registry를 조립해 붙인다.
 - Canvas Component Library의 모든 presentation은 Canvas App Assembly의 component presentation renderer registry에 있어야 한다.
 - 외부 조립자는 Host concrete `CanvasComponentLibrary` 타입을 알 필요 없이 Canvas App Component Library Interface를 만족하는 Adapter를 넘긴다. Host `createCanvasComponentLibrary`는 기본 Adapter 구현이다.
-- 기본 component presentation renderer mapping은 Demo SVG Built-in Component Presentation Renderers가 소유하고, 제품별 renderer는 Canvas App Assembly에서 extension으로 조립한다.
-- 제품별 renderer registry shape는 Canvas App Renderer Registry Contracts에서 공통 검증하고, Demo SVG Component Presentation Registry Contracts와 Demo SVG Custom Item Renderer Registry Contracts는 registry 종류만 지정한다.
+- 기본 component presentation renderer mapping은 Whiteboard SVG Built-in Component Presentation Renderers가 소유하고, 제품별 renderer는 Canvas App Assembly에서 extension으로 조립한다.
+- 제품별 renderer registry shape는 Canvas App Renderer Registry Contracts에서 공통 검증하고, Whiteboard SVG Component Presentation Registry Contracts와 Whiteboard SVG Custom Item Renderer Registry Contracts는 registry 종류만 지정한다.
 - Canvas Component Template은 id/presentation뿐 아니라 필수 label/title/style string, 양수 크기, optional string list shape도 Canvas Component Library Contracts에서 실패해야 하며, 생성된 library는 외부 template mutation에 흔들리지 않는 snapshot을 보관한다.
 - Canvas Component Item은 component id와 렌더링에 필요한 title/style/string list 저장 shape를 Host Component Item Validation Module에서 검증한다.
 - Canvas App Assembly는 주입된 Canvas Component Library의 `templates`, `getTemplate`, `getPresentation` 결과가 일관되지 않으면 실패해야 한다.
@@ -311,11 +311,11 @@
 - App Model은 Canvas Affordance config를 직접 fan-out하지 않고 Canvas App Affordance Model에서 consumer별 affordance context를 받는다.
 - Canvas App Assembly는 component library defaulting과 presentation renderer registry 합성 세부를 직접 알지 않고 Canvas App Component Assembly에 위임한다.
 - Canvas App Assembly는 제품별 extension bundle merge/duplicate/disabled module 조립 세부를 직접 알지 않고 Canvas App Extension Assembly에 위임한다.
-- Canvas App Default Assembly는 built-in app baseline과 Demo default initial selection을 소유하고, Canvas App Assembly는 default 상수 구성을 직접 알지 않는다.
+- Canvas App Default Assembly는 built-in app baseline과 baseline default initial selection을 소유하고, Canvas App Assembly는 default 상수 구성을 직접 알지 않는다.
 - Canvas App Assembly composition, output contract validation, output snapshot/freeze는 분리하고, validation은 Canvas App Assembly Contracts가, mutation 방어는 Canvas App Assembly Snapshot이 소유한다.
 - Canvas App Custom Item Module define, Canvas App Custom Item Module Assembly, Canvas App Assembly는 외부 descriptor/adapter/item mutation이 define/조립 후 동작을 바꾸지 않도록 snapshot을 보관한다.
 - Canvas App Assembly의 component presentation renderer input은 기본 registry를 대체하지 않고 extension/override로 합성한다.
-- Component presentation resolver와 renderer lookup/실행 실패 containment는 Demo SVG Component Renderer Execution이 소유하고, fallback shape는 Demo SVG Component Render Fallback이 소유한다.
+- Component presentation resolver와 renderer lookup/실행 실패 containment는 Whiteboard SVG Component Renderer Execution이 소유하고, fallback shape는 Whiteboard SVG Component Render Fallback이 소유한다.
 - Canvas App Assembly의 initial items는 조립된 Canvas Custom Item Validator로 assembly 단계에서 검증한다.
 - Canvas App Assembly input은 custom item renderer/validator/creation registry를 직접 받지 않고 Canvas App Custom Item Module만 받는다.
 - 제품별 business action은 Engine command union에 넣지 않고 Canvas App Custom Command로 등록한다.
@@ -357,8 +357,8 @@
 - package public entry와 subpath export는 `canvas` package self-import consumer smoke test로 검증한다.
 - package manifest는 CSS import가 bundler tree-shaking에서 제거되지 않도록 `sideEffects`에 CSS를 명시한다.
 - package manifest는 React, React DOM, Zod를 shared runtime peer dependency로 선언한다.
-- Custom item authoring Interface는 `CanvasApp*Renderer*` 이름을 쓰고, `CanvasDemoSvg*` 구현명은 App rendering Adapter 내부에 둔다.
-- Canvas App Rendering Contracts는 App-owned `CanvasApp*Renderer*` type을 소유하고, Demo SVG registry type은 그 계약을 구현하는 내부 alias로 둔다.
+- Custom item authoring Interface는 `CanvasApp*Renderer*` 이름을 쓰고, `CanvasWhiteboardSvg*` 구현명은 App rendering Adapter 내부에 둔다.
+- Canvas App Rendering Contracts는 App-owned `CanvasApp*Renderer*` type을 소유하고, Whiteboard SVG registry type은 그 계약을 구현하는 내부 alias로 둔다.
 - App authoring/workflow module은 renderer what type을 Canvas App Rendering Contracts에서 가져오고, registry default/create/assert/get how만 `CanvasAppRendererRegistries` named seam에서 가져오며 `../rendering` barrel에 직접 기대지 않는다.
 - Canvas App extension id와 registry key는 lower-kebab 안정 id만 허용하고, 잘못된 id는 define/assembly 단계에서 실패해야 한다.
 - Canvas App descriptor는 id뿐 아니라 필수 string/function/shortcut slot과 registry shape도 define/assembly 단계에서 실패해야 한다. 실행 중 throw는 runtime containment로 처리하지만, malformed descriptor shape는 등록되지 않아야 한다.
@@ -370,16 +370,16 @@
 - Canvas App Inspector Panel descriptor shape 검증과 visibility/render execution은 분리하고, validation은 Canvas App Inspector Panel Contracts가, 실행 실패 omit은 Canvas App Inspector Panel Execution이 소유한다. Descriptor Module은 validation/execution helper를 재노출하지 않는다.
 - Object Inspector hook은 read model 조회와 memoization만 맡고, selection label grammar는 Canvas Object Inspector Label이, disabled state, custom panel context, bounds resize commit 규칙은 Canvas Object Inspector Model이 소유한다.
 - Toolbar shell은 group layout만 맡고, Canvas Toolbar Item Renderer는 rendering entry만 제공하며 item kind별 button/icon/command dispatch wiring은 Canvas Toolbar Item Render Dispatch가 소유한다.
-- Custom item renderer lookup과 실행 실패 containment는 Demo SVG Custom Item Renderer Execution이 소유하고, fallback shape는 Demo SVG Custom Item Render Fallback이 소유한다.
-- App workflow는 Demo SVG Item Layer를 직접 생성하지 않고 Canvas App Item Layer Adapter를 통해 stage children을 만든다.
+- Custom item renderer lookup과 실행 실패 containment는 Whiteboard SVG Custom Item Renderer Execution이 소유하고, fallback shape는 Whiteboard SVG Custom Item Render Fallback이 소유한다.
+- App workflow는 Whiteboard SVG Item Layer를 직접 생성하지 않고 Canvas App Item Layer Adapter를 통해 stage children을 만든다.
 - Canvas App Adapter Assembly는 item, item layer, stage adapter fallback 조립을 소유하고, Canvas App Assembly는 adapter 선택 규칙을 직접 알지 않는다.
 - 제품별 inspector UI는 기본 Object Inspector를 수정하지 않고 Canvas App Inspector Panel로 등록한다.
 - 제품별 저장 payload는 Canvas Custom Item의 JSON `data` 안에 두고, payload 의미 검증은 Canvas Custom Item Validator로 등록한다.
 - 저장된 workspace snapshot은 현재 Canvas Custom Item Validator로 다시 검증하고, 실패하면 앱 초기화 대신 저장 snapshot을 제거한 뒤 버려야 한다.
 - Canvas Workspace Persistence는 storage IO와 debounce만 맡고, 저장 payload contract는 Canvas Workspace Snapshot이 소유한다.
 - Canvas App Assembly는 `workspaceStorageProvider`를 받아 Workspace Persistence에 전달하고, App workflow가 browser `localStorage`를 직접 선택하지 않게 한다.
-- Canvas App Assembly는 `initialSelection`을 받아 Workspace Runtime에 전달하고, Demo 기본 선택 id는 default assembly에만 둔다. 제품별 `initialItems`가 있으면 명시 `initialSelection` 없이는 빈 selection으로 시작한다.
-- Canvas App Workspace Assembly는 initial items normalization, Demo default selection fallback, workspace storage provider fallback을 소유한다.
+- Canvas App Assembly는 `initialSelection`을 받아 Workspace Runtime에 전달하고, baseline 기본 선택 id는 default assembly에만 둔다. 제품별 `initialItems`가 있으면 명시 `initialSelection` 없이는 빈 selection으로 시작한다.
+- Canvas App Workspace Assembly는 initial items normalization, baseline default selection fallback, workspace storage provider fallback을 소유한다.
 - Canvas App Workspace Assembly Contracts는 initial items, initial selection, storage provider 검증을 소유하고, initial selection이 assembled initial items에 맞지 않으면 App runtime 진입 전에 실패시킨다.
 - Clipboard payload는 Host Document Controller에서 현재 item 저장 계약으로 다시 검증하고, 실패하면 command loop로 throw하지 않고 빈 clipboard/false로 containment 한다.
 - Host Document Controller는 invalid item mutation을 App workflow로 throw하지 않고 false/current items로 containment 한다.
@@ -430,7 +430,7 @@
 - Clipboard command hook은 paste index ref/current read, execution context, runner memoization을 맡고, clone/duplicate/copy/paste/cut callback grammar와 supplied paste index descriptor injection은 Canvas Clipboard Command Handlers가 소유한다. Canvas Clipboard Command Execution은 plan 생성과 effect 적용만 조립한다. Clone/duplicate/paste/cut command 호출과 paste offset 계산은 Canvas Clipboard Command Effect Plan이, clipboard result-to-effect descriptor mapping은 Canvas Clipboard Command Result Effects가, Host clipboard/document/editing effect routing은 Canvas Clipboard Command Effects가 소유한다.
 - Clipboard command의 what union은 Canvas Clipboard Command Contracts가, clipboard effect/result/context what은 Canvas Clipboard Command Effect Contracts가 소유하고, Effect Plan/Execution/Handlers/Effects는 그 계약을 소비해 각자의 how만 구현한다.
 - 이미지 업로드, drag/drop upload, Clipboard API paste image, selected composition copy/download는 App Model이나 UI가 직접 FileReader, ClipboardItem, SVG serialization, canvas `toBlob`, anchor download how를 알지 않고 Canvas Image Import/Export/Controls Module 뒤에서 처리한다. Selection export는 현재 Stage SVG snapshot을 우선 사용하고 snapshot이 없을 때 item data fallback을 쓴다.
-- UI controls는 Demo Host를 직접 import하지 않는다.
+- UI controls는 Whiteboard Host를 직접 import하지 않는다.
 - Canvas Toolbar는 item render entry 호출만 맡고, group composition은 Canvas Toolbar Items가, built-in/custom tool group grammar는 Canvas Toolbar Tool Items가, built-in command group descriptor 목록은 Canvas Toolbar Command Catalog가, command group feature toggle과 Canvas Command Availability 소비는 Canvas Toolbar Command Items가, item kind별 button render dispatch는 Canvas Toolbar Item Render Dispatch가, command action runner table과 handler routing은 Canvas Toolbar Command Dispatch가 소유한다.
 - Toolbar command handler bundle의 what 계약은 Canvas Toolbar Command Contracts가 소유하고, Dispatch와 Item Renderer는 그 계약을 소비한다.
 - Keyboard shortcut router는 keydown intent 생성과 event preventDefault 적용만 맡고, keyboard hook은 React latest handler ref bridge만 맡는다. DOM listener binding/cleanup과 keydown/keyup/blur dispatch는 Canvas Keyboard Shortcut Listeners가, command/system/viewport/tool intent family routing과 none no-op은 Canvas Keyboard Shortcut Dispatch가, intent dispatch runner mechanics는 Canvas Keyboard Intent Dispatch Table이, 실행 가능한 intent union은 Canvas Keyboard Shortcut Intent Contracts가, document command intent runner entries는 Canvas Keyboard Command Dispatch가, system intent runner entries와 temporary pan release는 Canvas Keyboard System Dispatch가, viewport intent runner entries는 Canvas Keyboard Viewport Dispatch가, tool intent runner entry는 Canvas Keyboard Tool Dispatch가, keydown orchestration은 Canvas Keyboard Shortcut Intent가, built-in document command shortcut descriptor 목록은 Canvas Keyboard Command Shortcut Catalog가, command shortcut matching/reserved command shortcut projection은 Canvas Keyboard Command Shortcuts가, built-in viewport shortcut descriptor 목록은 Canvas Keyboard Viewport Shortcut Catalog가, viewport shortcut matching/reserved viewport shortcut projection은 Canvas Keyboard Viewport Shortcuts가, built-in nudge shortcut descriptor 목록은 Canvas Keyboard Nudge Shortcut Catalog가, nudge shortcut matching/reserved nudge shortcut projection은 Canvas Keyboard Nudge Shortcuts가, built-in global system shortcut descriptor 목록은 Canvas Keyboard System Shortcut Catalog가, global system shortcut matching/release/reserved system shortcut projection은 Canvas Keyboard System Shortcuts가, built-in tool shortcut descriptor projection은 Canvas Keyboard Tool Shortcut Catalog가, built-in/custom tool shortcut precedence는 Canvas Keyboard Tool Shortcut Intent가 소유한다.

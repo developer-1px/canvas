@@ -10,7 +10,7 @@
 4. Engine은 intent, gesture, selection, creation result, overlay state, command routing을 소유한다.
 5. Renderer Adapter는 그리기만 한다.
 6. Scene Adapter는 bounds, hit target, parent/group, editable target만 제공한다.
-7. Drawing Item은 Demo Host item이며 Core Contract에 포함하지 않는다.
+7. Drawing Item은 Whiteboard Host item이며 Core Contract에 포함하지 않는다.
 8. 사회적 약속이 된 캔버스 문법은 내부 Module이 관리하고, 제품별 의미는 Canvas App Assembly에서 외부 등록한다.
 
 ## Layer / Concept / Role
@@ -56,23 +56,23 @@
 | `src/canvas/app/feature-packs/facilitation/useCanvasSpotlightModel.ts` | 회의 진행용 spotlight start/stop과 follower count 표시를 문서 item 밖의 App transient state로 숨긴다 |
 | `src/canvas/app/feature-packs/facilitation/useCanvasVotingSessionModel.ts` | 회의 진행용 voting session prompt/status/quota를 문서 item 밖의 App transient state로 숨긴다 |
 | `src/canvas/app/stage/CanvasAppStageElement.ts` | stage DOM element의 bounds, pointer capture, wheel listener를 caller Interface 뒤에 숨기고 mount ref bridge는 Controller로 분리한다 |
-| `src/canvas/app/rendering` | Demo `CanvasItem` tree를 SVG item layer로 바꾸는 App-owned Adapter |
-| `src/canvas/app/rendering/CanvasAppRenderingContracts.ts` | 외부 조립자가 쓰는 App-owned renderer authoring Interface를 Demo SVG registry type name과 분리한다 |
-| `src/canvas/app/rendering/CanvasAppRendererRegistries.ts` | App-named component/custom item renderer registry 생성, 검증, default를 소유하고 Demo SVG registry 구현명을 외부 authoring seam 뒤에 숨긴다 |
+| `src/canvas/app/rendering` | Whiteboard `CanvasItem` tree를 SVG item layer로 바꾸는 App-owned Adapter |
+| `src/canvas/app/rendering/CanvasAppRenderingContracts.ts` | 외부 조립자가 쓰는 App-owned renderer authoring Interface를 Whiteboard SVG registry type name과 분리한다 |
+| `src/canvas/app/rendering/CanvasAppRendererRegistries.ts` | App-named component/custom item renderer registry 생성, 검증, default를 소유하고 Whiteboard SVG registry 구현명을 외부 authoring seam 뒤에 숨긴다 |
 | `src/canvas/app/rendering/CanvasAppStageAdapter.tsx` | App Shell이 stage props를 알지 않도록 stage ReactNode를 만드는 Adapter Interface를 제공하고, stage mount Interface를 기본 SVG Stage ref로 매핑한다 |
-| `src/canvas/app/rendering/CanvasAppItemLayerAdapter.tsx` | App workflow가 concrete Demo SVG item layer 없이 stage children을 만들도록 하는 Adapter Interface를 제공하고, SVG item pointer event를 App pointer Interface로 매핑한다 |
-| `src/canvas/app/rendering/CanvasDemoSvgItemFrame.tsx` | Demo SVG item의 lock, selected, pointer event, outline wrapper 문법을 item type별 shape rendering과 분리해 소유한다 |
-| `src/canvas/app/rendering/CanvasDemoSvgDrawingItemRenderer.tsx` | Marker, highlighter, vector path, arrow의 SVG path/line shape와 arrow marker 사용을 소유한다 |
-| `src/canvas/app/rendering/CanvasDemoSvgRectTextItemRenderer.tsx` | Rect와 text item의 embedded text foreignObject 문법을 소유하고, bounded shape SVG geometry는 Host shape 계약에 위임한다 |
-| `src/canvas/app/rendering/CanvasDemoSvgComponentPresentationRegistry.ts` | Demo component presentation key와 SVG rendering strategy를 외부 조립 가능한 registry로 연결한다 |
-| `src/canvas/app/rendering/CanvasDemoSvgBuiltInComponentPresentationRenderers.tsx` | 기본 Demo component presentation key와 SVG renderer strategy mapping을 소유한다 |
-| `src/canvas/app/rendering/CanvasDemoSvgComponentPresentationRegistryContracts.ts` | Component presentation renderer registry key와 render strategy slot을 검증한다 |
-| `src/canvas/app/rendering/CanvasDemoSvgComponentRendererExecution.tsx` | Component presentation resolver 호출, renderer lookup, render 실행, throw 시 fallback containment를 소유한다 |
-| `src/canvas/app/rendering/CanvasDemoSvgComponentRenderFallback.tsx` | Component presentation resolver/renderer 실패 때 쓰는 기본 component card fallback shape를 소유한다 |
-| `src/canvas/app/rendering/CanvasDemoSvgCustomItemRendererRegistry.tsx` | Custom item presentation key와 SVG rendering strategy를 외부 조립 가능한 registry로 연결한다 |
-| `src/canvas/app/rendering/CanvasDemoSvgCustomItemRendererRegistryContracts.ts` | Custom item renderer registry key와 render strategy slot을 검증한다 |
-| `src/canvas/app/rendering/CanvasDemoSvgCustomItemRendererExecution.tsx` | Custom item renderer lookup, render 실행, throw 시 fallback containment를 소유한다 |
-| `src/canvas/app/rendering/CanvasDemoSvgCustomItemRenderFallback.tsx` | Custom item renderer 누락/실패 때 쓰는 unknown custom item card fallback shape를 소유한다 |
+| `src/canvas/app/rendering/CanvasAppItemLayerAdapter.tsx` | App workflow가 concrete Whiteboard SVG item layer 없이 stage children을 만들도록 하는 Adapter Interface를 제공하고, SVG item pointer event를 App pointer Interface로 매핑한다 |
+| `src/canvas/app/rendering/CanvasWhiteboardSvgItemFrame.tsx` | Whiteboard SVG item의 lock, selected, pointer event, outline wrapper 문법을 item type별 shape rendering과 분리해 소유한다 |
+| `src/canvas/app/rendering/CanvasWhiteboardSvgDrawingItemRenderer.tsx` | Marker, highlighter, vector path, arrow의 SVG path/line shape와 arrow marker 사용을 소유한다 |
+| `src/canvas/app/rendering/CanvasWhiteboardSvgRectTextItemRenderer.tsx` | Rect와 text item의 embedded text foreignObject 문법을 소유하고, bounded shape SVG geometry는 Host shape 계약에 위임한다 |
+| `src/canvas/app/rendering/CanvasWhiteboardSvgComponentPresentationRegistry.ts` | whiteboard component presentation key와 SVG rendering strategy를 외부 조립 가능한 registry로 연결한다 |
+| `src/canvas/app/rendering/CanvasWhiteboardSvgBuiltInComponentPresentationRenderers.tsx` | 기본 whiteboard component presentation key와 SVG renderer strategy mapping을 소유한다 |
+| `src/canvas/app/rendering/CanvasWhiteboardSvgComponentPresentationRegistryContracts.ts` | Component presentation renderer registry key와 render strategy slot을 검증한다 |
+| `src/canvas/app/rendering/CanvasWhiteboardSvgComponentRendererExecution.tsx` | Component presentation resolver 호출, renderer lookup, render 실행, throw 시 fallback containment를 소유한다 |
+| `src/canvas/app/rendering/CanvasWhiteboardSvgComponentRenderFallback.tsx` | Component presentation resolver/renderer 실패 때 쓰는 기본 component card fallback shape를 소유한다 |
+| `src/canvas/app/rendering/CanvasWhiteboardSvgCustomItemRendererRegistry.tsx` | Custom item presentation key와 SVG rendering strategy를 외부 조립 가능한 registry로 연결한다 |
+| `src/canvas/app/rendering/CanvasWhiteboardSvgCustomItemRendererRegistryContracts.ts` | Custom item renderer registry key와 render strategy slot을 검증한다 |
+| `src/canvas/app/rendering/CanvasWhiteboardSvgCustomItemRendererExecution.tsx` | Custom item renderer lookup, render 실행, throw 시 fallback containment를 소유한다 |
+| `src/canvas/app/rendering/CanvasWhiteboardSvgCustomItemRenderFallback.tsx` | Custom item renderer 누락/실패 때 쓰는 unknown custom item card fallback shape를 소유한다 |
 | `src/canvas/app/workflow` | React state와 engine/host/renderer wiring |
 | `src/canvas/app/affordances/commands/CanvasStandardCommandExecution.ts` | 내부 canvas command grammar 실행을 effect plan 생성과 document effect 적용으로 조립한다 |
 | `src/canvas/app/affordances/commands/CanvasStandardCommandEffectPlan.ts` | 내부 canvas command grammar와 Engine command 결과를 App document effect descriptor로 변환한다 |
@@ -130,8 +130,8 @@
 | `src/canvas/app/workflow/CanvasAppAdapterAssembly.ts` | Item, item layer, stage adapter fallback을 조립한다 |
 | `src/canvas/app/workflow/CanvasAppAffordanceAssembly.ts` | 제품별 affordance feature toggle override와 default affordance config fallback을 조립한다 |
 | `src/canvas/app/workflow/CanvasAppAssemblyContracts.ts` | 조립된 assembly output의 component library resolver, renderer coverage, custom extension registry, initial item, adapter shape를 검증한다 |
-| `src/canvas/app/workflow/CanvasAppDefaultAssembly.ts` | Built-in app baseline과 Demo default initial selection을 소유한다 |
-| `src/canvas/app/workflow/CanvasAppWorkspaceAssembly.ts` | Workspace 초기 items normalization, Demo default selection fallback, storage provider fallback을 조립한다 |
+| `src/canvas/app/workflow/CanvasAppDefaultAssembly.ts` | Built-in app baseline과 baseline default initial selection을 소유한다 |
+| `src/canvas/app/workflow/CanvasAppWorkspaceAssembly.ts` | Workspace 초기 items normalization, baseline default selection fallback, storage provider fallback을 조립한다 |
 | `src/canvas/app/workflow/CanvasAppWorkspaceAssemblyContracts.ts` | Workspace 초기 items, 초기 selection, storage provider 계약을 검증하고, selection과 item tree 불일치를 runtime 진입 전에 차단한다 |
 | `src/canvas/app/workflow/CanvasAppAssemblySnapshot.ts` | 조립된 assembly output을 외부 mutation에서 보호하도록 component library, extension registry, initial item, adapter를 snapshot/freeze 한다 |
 | `src/canvas/app/workflow/CanvasAppAssemblyModelContracts.ts` | Public Assembly output과 workflow 내부 consumer context를 분리하는 App Assembly Model type 계약을 소유한다 |
@@ -182,13 +182,13 @@
 | `src/canvas/core` | Host item과 renderer를 모르는 geometry, viewport, id, primitive math 같은 재사용 계약 |
 | `src/canvas/core/CanvasBoundsResize.ts` | Bounds resize, aspect ratio lock, center resize, handle point, item bounds scaling을 소유한다 |
 | `src/canvas/core/CanvasStableIds.ts` | persisted kind, presentation key, registry key에 쓰는 lower-kebab 안정 id 계약 |
-| `src/canvas/entities` | Core geometry와 Demo canvas item의 안정적인 type-only entity 계약. Runtime helper는 Core/Host/App seam에 둔다 |
+| `src/canvas/entities` | Core geometry와 whiteboard canvas item의 안정적인 type-only entity 계약. Runtime helper는 Core/Host/App seam에 둔다 |
 | `src/canvas/engine` | Host item과 renderer를 모르는 조작 규칙. 외부 소비자는 `src/canvas/engine` public facade를 사용한다 |
 | `src/canvas/engine/snap` | Grid, alignment, spacing snap과 guide 계산 |
-| `src/canvas/host/model` | Demo canvas item model. Core 재사용 계약에 포함하지 않는다 |
-| `src/canvas/host` | Demo canvas item public facade |
-| `src/canvas/host/component/CanvasBuiltInComponentTemplates.ts` | Sticky, label, card 같은 기본 Demo component catalogue를 소유한다 |
-| `src/canvas/host/component/CanvasComponentLibrary.ts` | Demo component template, presentation key, component item 생성을 함께 제공한다 |
+| `src/canvas/host/model` | whiteboard canvas item model. Core 재사용 계약에 포함하지 않는다 |
+| `src/canvas/host` | whiteboard canvas item public facade |
+| `src/canvas/host/component/CanvasBuiltInComponentTemplates.ts` | Sticky, label, card 같은 기본 whiteboard component catalogue를 소유한다 |
+| `src/canvas/host/component/CanvasComponentLibrary.ts` | whiteboard component template, presentation key, component item 생성을 함께 제공한다 |
 | `src/canvas/host/component/CanvasComponentLibraryContracts.ts` | Component library input, component template descriptor shape, stable id/presentation, duplicate template id를 검증한다 |
 | `src/canvas/host/component/CanvasChecklistComponent.ts` | Built-in checklist component kind, checked item index 정규화, 항목 text/add/remove/toggle 저장 변경 계약을 소유한다 |
 | `src/canvas/host/component/CanvasKanbanComponent.ts` | Built-in Queue/Kanban component kind, card text/add/remove/reorder 저장 변경과 높이 보정 계약을 소유한다 |
@@ -201,15 +201,15 @@
 | `src/canvas/host/shape/CanvasShapeGeometry.ts` | Bounded shape kind를 SVG primitive geometry로 변환하는 descriptor를 소유해 renderer가 concrete shape kind 분기를 반복하지 않게 한다 |
 | `src/canvas/host/document/CanvasDocumentController.ts` | App workflow가 사용하는 Host Document Controller. json-document, JSON Patch, selection snapshot, clipboard 구현을 숨긴다 |
 | `src/canvas/host/document/CanvasDocumentChangePatch.ts` | High-level CanvasItemsChange를 Host-owned JSON Patch factory 호출로 변환하는 change-to-patch grammar를 소유한다 |
-| `src/canvas/host/document/CanvasDocumentPatchTreeDiff.ts` | before/after Demo item tree를 patch factory용 topmost changed entry, changed group entry, removal entry로 변환한다 |
-| `src/canvas/host/document/CanvasDocumentReorderPatch.ts` | before/after Demo item tree의 sibling order 차이를 json-document JSON Patch `move` operation으로 변환한다 |
-| `src/canvas/host/read/CanvasItemReadModel.ts` | Demo item tree 조회, bounds, selection 정규화, Scene Adapter 생성을 tree helper 구현 없이 제공한다 |
+| `src/canvas/host/document/CanvasDocumentPatchTreeDiff.ts` | before/after Whiteboard item tree를 patch factory용 topmost changed entry, changed group entry, removal entry로 변환한다 |
+| `src/canvas/host/document/CanvasDocumentReorderPatch.ts` | before/after Whiteboard item tree의 sibling order 차이를 json-document JSON Patch `move` operation으로 변환한다 |
+| `src/canvas/host/read/CanvasItemReadModel.ts` | Whiteboard item tree 조회, bounds, selection 정규화, Scene Adapter 생성을 tree helper 구현 없이 제공한다 |
 | `src/canvas/host/operations` | Transform, text, clone, remove, group item operations |
 | `src/canvas/host/tree` | Bounds, traversal, selection tree helpers |
-| `src/canvas/host/adapters` | Demo host item을 engine interface에 맞추는 adapter |
+| `src/canvas/host/adapters` | whiteboard host item을 engine interface에 맞추는 adapter |
 | `src/canvas/renderer` | Renderer public facade |
 | `src/canvas/renderer/svg/CanvasSvgDrawingPrimitives.ts` | SVG freehand/vector-path/connector path data와 arrow marker id/IRI를 Renderer-owned drawing primitive 계약으로 제공한다 |
-| `src/canvas/renderer/svg` | Demo item을 모르는 SVG stage/overlay adapter |
+| `src/canvas/renderer/svg` | Whiteboard item을 모르는 SVG stage/overlay adapter |
 | `src/canvas/index.ts` | 외부 조립자와 Demo가 사용하는 Canvas package public entry |
 | `src/canvas/ui` | Toolbar, palette, status, editor controls |
 | `src/canvas/app/feature-packs/cursor-chat/CanvasCursorChat.tsx` | cursor 위치에 붙는 transient chat textarea를 순수 view props로 렌더링한다 |
@@ -246,7 +246,7 @@ type CanvasAffordanceConfig = {
 - Toggle이 꺼져도 문서 상태는 손상하지 않는다.
 - Toggle 기본값은 모두 on이다. App workflow가 필요한 것만 끈다.
 - Canvas App Affordance Assembly는 제품별 feature toggle override와 default affordance config fallback 조립을 소유한다.
-- Canvas App Default Assembly는 built-in app baseline과 Demo default initial selection을 소유한다.
+- Canvas App Default Assembly는 built-in app baseline과 baseline default initial selection을 소유한다.
 
 ## Extraction State
 
@@ -256,23 +256,23 @@ type CanvasAffordanceConfig = {
 2. `CanvasAffordances`: 안정적인 tool/command/gesture/overlay/shortcut id와 label, title, default toggle. 완료.
 3. `CanvasOverlayEngine`: Renderer Adapter가 그릴 renderer-independent overlay state 생성. `CanvasSceneAdapter` 입력 사용.
 4. `CanvasSvgOverlayRenderer`: SVG Renderer Adapter로 overlay state를 그린다.
-5. `CanvasDemoSvgItemLayer`: App-owned Adapter로 Demo Host item을 SVG item layer로 그린다.
-6. `CanvasCommandEngine`: command availability와 command result routing. Demo item 변경은 `CanvasItemCommandAdapter`가 수행한다.
+5. `CanvasWhiteboardSvgItemLayer`: App-owned Adapter로 Whiteboard Host item을 SVG item layer로 그린다.
+6. `CanvasCommandEngine`: command availability와 command result routing. Whiteboard item 변경은 `CanvasItemCommandAdapter`가 수행한다.
 7. `CanvasSelectionEngine`: item click selection과 marquee hit selection 계산. `CanvasSceneAdapter` 입력 사용.
-8. `CanvasTransformEngine`: move/resize transform routing. Demo item 변경은 `CanvasItemTransformAdapter`가 수행한다.
+8. `CanvasTransformEngine`: move/resize transform routing. Whiteboard item 변경은 `CanvasItemTransformAdapter`가 수행한다.
 9. `CanvasGestureEngine`: pointer input을 canvas/item gesture intent로 변환한다.
-10. `CanvasCreationEngine`: create tool result routing. Demo item 생성은 `CanvasItemCreationAdapter`가 수행한다.
-11. `CanvasItemSceneAdapter`: Demo item tree를 renderer-independent scene entry로 변환한다.
+10. `CanvasCreationEngine`: create tool result routing. Whiteboard item 생성은 `CanvasItemCreationAdapter`가 수행한다.
+11. `CanvasItemSceneAdapter`: Whiteboard item tree를 renderer-independent scene entry로 변환한다.
 12. `CanvasSnapEngine`: move/create/resize에서 grid, alignment, spacing snap과 renderer-independent guide state를 계산한다.
 
 ## Boundary Check
 
 - Engine Module은 `core`, `CanvasAffordances`, `CanvasSceneAdapter` 같은 renderer-independent 입력만 사용한다.
-- Engine Module은 Demo `CanvasItem`, `CanvasOperations`, `CanvasTree`, SVG Renderer를 import하지 않는다.
+- Engine Module은 Whiteboard `CanvasItem`, `CanvasOperations`, `CanvasTree`, SVG Renderer를 import하지 않는다.
 - Entities Module은 `core` type만 사용하고 app, engine, host, renderer, ui 구현을 import하지 않는다.
 - Host domain Module은 Engine 구현 파일을 import하지 않는다. Engine Adapter 타입은 `src/canvas/engine` public facade에서 받는다.
-- App과 Renderer는 Demo Host 내부 subpath를 import하지 않는다. 안정 entity type은 `src/canvas/entities` type-only public contract에서 받는다.
-- UI controls는 Demo Host를 import하지 않는다. Host component/template/text editing 값은 App workflow가 UI prop으로 주입한다.
+- App과 Renderer는 Whiteboard Host 내부 subpath를 import하지 않는다. 안정 entity type은 `src/canvas/entities` type-only public contract에서 받는다.
+- UI controls는 Whiteboard Host를 import하지 않는다. Host component/template/text editing 값은 App workflow가 UI prop으로 주입한다.
 - App workflow는 Host document 구현 파일을 import하지 않는다. 문서 변경, history, selection, clipboard, text search는 명시적인 Host Document Controller interface를 통해 사용한다.
 - json-document document, JSON Patch, selection snapshot, clipboard 구현은 Host document layer 밖으로 새지 않는다.
 - Canvas Document Changes는 document commit orchestration을 맡고, CanvasItemsChange별 JSON Patch factory 선택은 Canvas Document Change Patch가 소유한다.
@@ -295,18 +295,18 @@ type CanvasAffordanceConfig = {
 - Canvas App Assembly initial items는 조립된 custom item validator로 assembly 단계에서 검증되어 잘못된 Host seed가 React document 생성까지 넘어가지 않는다.
 - App과 UI는 Renderer Adapter 내부 파일을 import하지 않는다. SVG stage는 `src/canvas/renderer` public facade에서 사용한다.
 - Renderer Adapter는 `CanvasOverlayState`와 주입된 item layer를 받아 SVG로 배치하며, Engine은 SVG/DOM 구현을 모른다.
-- Renderer Stage는 Demo `CanvasItem`, Host read model, Canvas Component Library를 import하지 않는다.
+- Renderer Stage는 Whiteboard `CanvasItem`, Host read model, Canvas Component Library를 import하지 않는다.
 - Canvas SVG Drawing Primitives가 freehand smoothing path, typed vector path, connector path data, arrow marker id/IRI를 소유해서 Renderer Stage defs와 App-owned item layer가 문자열 계약을 중복하지 않는다.
-- Demo SVG Item Layer Adapter는 App-owned Adapter로 Demo component presentation key resolver와 presentation registry를 받아 그리기 전략을 고른다.
-- Demo SVG Item Frame이 lock/selected/pointer/outline wrapper 문법을 소유해서 item type별 shape renderer branch가 공통 interaction frame을 복사하지 않는다.
-- Demo SVG Item Layer Adapter는 tree/frame orchestration을 맡고, marker/highlighter/path/arrow shape 렌더링은 Demo SVG Drawing Item Renderer가 소유한다.
-- Demo SVG Item Layer Adapter는 rect/text shape와 embedded text foreignObject 문법을 알지 않고 Demo SVG Rect/Text Item Renderer에 위임한다.
-- Demo SVG Rect/Text Item Renderer와 SVG Overlay Renderer는 concrete bounded shape kind를 알지 않고 Host Shape Geometry가 제공하는 SVG primitive geometry만 렌더링한다.
-- Demo SVG Built-in Component Presentation Renderers가 기본 component presentation renderer mapping을 소유하고, Demo SVG Component Presentation Registry Contracts가 외부 renderer registry shape를 검증한다.
-- Demo SVG Component Renderer Execution이 component presentation resolver와 renderer lookup/실행 실패 containment를 소유하고, Demo SVG Component Render Fallback이 기본 component card fallback shape를 소유한다.
-- Demo SVG Custom Item Renderer Registry Contracts가 외부 custom item renderer registry shape를 검증한다.
-- Demo SVG Custom Item Renderer Execution이 custom item renderer lookup과 실행 실패 containment를 소유하고, Demo SVG Custom Item Render Fallback이 unknown custom item card shape를 소유한다.
-- 새 Demo component kind가 기존 presentation을 재사용하면 Canvas Built-in Component Templates만 바꾼다. 제품별 component kind는 외부 조립된 `CanvasComponentLibrary`로 등록한다. 새 presentation은 Canvas App Assembly에 presentation renderer를 함께 등록한다.
+- Whiteboard SVG Item Layer Adapter는 App-owned Adapter로 whiteboard component presentation key resolver와 presentation registry를 받아 그리기 전략을 고른다.
+- Whiteboard SVG Item Frame이 lock/selected/pointer/outline wrapper 문법을 소유해서 item type별 shape renderer branch가 공통 interaction frame을 복사하지 않는다.
+- Whiteboard SVG Item Layer Adapter는 tree/frame orchestration을 맡고, marker/highlighter/path/arrow shape 렌더링은 Whiteboard SVG Drawing Item Renderer가 소유한다.
+- Whiteboard SVG Item Layer Adapter는 rect/text shape와 embedded text foreignObject 문법을 알지 않고 Whiteboard SVG Rect/Text Item Renderer에 위임한다.
+- Whiteboard SVG Rect/Text Item Renderer와 SVG Overlay Renderer는 concrete bounded shape kind를 알지 않고 Host Shape Geometry가 제공하는 SVG primitive geometry만 렌더링한다.
+- Whiteboard SVG Built-in Component Presentation Renderers가 기본 component presentation renderer mapping을 소유하고, Whiteboard SVG Component Presentation Registry Contracts가 외부 renderer registry shape를 검증한다.
+- Whiteboard SVG Component Renderer Execution이 component presentation resolver와 renderer lookup/실행 실패 containment를 소유하고, Whiteboard SVG Component Render Fallback이 기본 component card fallback shape를 소유한다.
+- Whiteboard SVG Custom Item Renderer Registry Contracts가 외부 custom item renderer registry shape를 검증한다.
+- Whiteboard SVG Custom Item Renderer Execution이 custom item renderer lookup과 실행 실패 containment를 소유하고, Whiteboard SVG Custom Item Render Fallback이 unknown custom item card shape를 소유한다.
+- 새 whiteboard component kind가 기존 presentation을 재사용하면 Canvas Built-in Component Templates만 바꾼다. 제품별 component kind는 외부 조립된 `CanvasComponentLibrary`로 등록한다. 새 presentation은 Canvas App Assembly에 presentation renderer를 함께 등록한다.
 - Canvas Component Library의 presentation key가 component presentation renderer registry에 없으면 Canvas App Assembly가 실패한다.
 - Canvas Component Library Contracts는 외부 component template의 id/presentation, 필수 display/style string, 양수 크기, optional string list shape를 생성 단계에서 검증하고, Canvas Component Library는 생성 후 외부 template mutation에 흔들리지 않도록 snapshot을 보관한다.
 - Canvas App Assembly는 주입된 Canvas Component Library의 template 목록과 `getTemplate`, `getPresentation` resolver 결과가 어긋나면 실패한다.
@@ -347,13 +347,13 @@ type CanvasAffordanceConfig = {
 - package public entry와 subpath export는 `canvas` package self-import consumer smoke test로 검증한다.
 - package manifest는 CSS import가 bundler tree-shaking에서 제거되지 않도록 `sideEffects`에 CSS를 명시한다.
 - package manifest는 React, React DOM, Zod를 shared runtime peer dependency로 선언한다.
-- Custom item authoring Interface는 `CanvasApp*Renderer*` 이름을 쓰고, `CanvasDemoSvg*` 구현명은 App rendering Adapter 내부에 둔다. Canvas App Rendering Contracts가 App-owned renderer type을 소유하고 Demo SVG registry type은 그 계약을 구현하는 내부 alias로 둔다.
+- Custom item authoring Interface는 `CanvasApp*Renderer*` 이름을 쓰고, `CanvasWhiteboardSvg*` 구현명은 App rendering Adapter 내부에 둔다. Canvas App Rendering Contracts가 App-owned renderer type을 소유하고 Whiteboard SVG registry type은 그 계약을 구현하는 내부 alias로 둔다.
 - App authoring/workflow module은 renderer registry what을 `CanvasAppRendererRegistries` named seam에서 가져오고 `../rendering` barrel에 직접 기대지 않는다.
 - Canvas App extension id와 registry key는 lower-kebab 안정 id만 허용한다. 잘못된 module id, command id, tool id, renderer key, validator key, inspector id는 define 또는 assembly 단계에서 실패한다.
 - Canvas App descriptor는 id뿐 아니라 필수 string/function/shortcut slot과 registry shape도 define 또는 assembly 단계에서 검증한다. malformed command, creation tool, inspector panel, renderer strategy는 등록 전에 실패하고, 실행 중 throw는 별도의 containment로 처리한다.
 - Canvas App Inspector Panel descriptor shape 검증과 visibility/render execution은 분리하고, validation은 Canvas App Inspector Panel Contracts가, 실행 실패 omit은 Canvas App Inspector Panel Execution이 소유한다. Descriptor Module은 validation/execution helper를 재노출하지 않는다.
 - Custom item `kind`/`presentation`과 Component Template `id`/`presentation`도 같은 안정 id 계약을 따르며, 잘못된 persisted key는 Host validation 또는 component library 생성 단계에서 실패한다.
-- App workflow는 Demo SVG Item Layer를 직접 생성하지 않고 Canvas App Item Layer Adapter를 통해 stage children을 만든다.
+- App workflow는 Whiteboard SVG Item Layer를 직접 생성하지 않고 Canvas App Item Layer Adapter를 통해 stage children을 만든다.
 - App Shell은 concrete Renderer Stage를 직접 import하지 않고 Canvas App Stage Adapter가 만든 stage ReactNode를 배치한다.
 - Canvas App Adapter Assembly는 item, item layer, stage adapter fallback 조립을 소유하고, Canvas App Assembly는 adapter 선택 규칙을 직접 알지 않는다.
 - App workflow와 command/pointer/viewport hook은 raw SVG ref를 직접 읽지 않고 Canvas App Stage Element를 통해 stage DOM 기능을 사용한다.
@@ -362,8 +362,8 @@ type CanvasAffordanceConfig = {
 - 알 수 없는 stable component kind는 forward compatibility를 위해 기본 template로 fallback할 수 있지만, malformed component kind는 schema validation 또는 component lookup 단계에서 실패한다.
 - 저장된 workspace snapshot은 현재 custom item validator로 다시 검증한다. validator가 바뀌어 저장 payload가 더 이상 유효하지 않으면 저장 snapshot을 제거하고 앱 초기값으로 시작한다.
 - Canvas App Assembly는 `workspaceStorageProvider`를 받아 Workspace Persistence에 전달하고, App workflow가 browser `localStorage`를 직접 선택하지 않게 한다.
-- Canvas App Assembly는 `initialSelection`을 받아 Workspace Runtime에 전달하고, Demo 기본 선택 id는 default assembly에만 둔다. 제품별 `initialItems`가 있으면 명시 `initialSelection` 없이는 빈 selection으로 시작한다.
-- Canvas App Workspace Assembly는 initial items normalization, Demo default selection fallback, workspace storage provider fallback을 소유한다.
+- Canvas App Assembly는 `initialSelection`을 받아 Workspace Runtime에 전달하고, baseline 기본 선택 id는 default assembly에만 둔다. 제품별 `initialItems`가 있으면 명시 `initialSelection` 없이는 빈 selection으로 시작한다.
+- Canvas App Workspace Assembly는 initial items normalization, baseline default selection fallback, workspace storage provider fallback을 소유한다.
 - Canvas App Workspace Assembly Contracts는 initial selection이 assembled initial items에 맞지 않으면 App runtime 진입 전에 실패시킨다.
 - Custom Item Module 간 module id, tool id, renderer key, validator key, inspector id, command id가 겹치면 조용히 덮어쓰지 않고 assembly 단계에서 실패한다.
 - Host App은 `disabledCustomItemModuleIds`로 custom item module을 끌 수 있고, 알 수 없는 module id를 끄려고 하면 assembly 단계에서 실패한다.

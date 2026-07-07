@@ -5,38 +5,38 @@ import {
 } from './CanvasArchitectureTestSources'
 
 describe('Canvas rendering item boundaries', () => {
-  it('keeps Demo SVG drawing item rendering behind a named module', () => {
+  it('keeps Whiteboard SVG drawing item rendering behind a named module', () => {
     const itemLayerFile = getSourceFile(
-      'src/canvas/app/rendering/CanvasDemoSvgItemLayer.tsx',
+      'src/canvas/app/rendering/CanvasWhiteboardSvgItemLayer.tsx',
     )
     const itemRenderRoutingFile = getSourceFile(
-      'src/canvas/app/rendering/CanvasDemoSvgItemRenderRouting.tsx',
+      'src/canvas/app/rendering/CanvasWhiteboardSvgItemRenderRouting.tsx',
     )
     const drawingRendererFile = getSourceFile(
-      'src/canvas/app/rendering/CanvasDemoSvgDrawingItemRenderer.tsx',
+      'src/canvas/app/rendering/CanvasWhiteboardSvgDrawingItemRenderer.tsx',
     )
     const drawingRoutingFile = getSourceFile(
-      'src/canvas/app/rendering/CanvasDemoSvgDrawingItemRenderRouting.tsx',
+      'src/canvas/app/rendering/CanvasWhiteboardSvgDrawingItemRenderRouting.tsx',
     )
 
     expect(itemRenderRoutingFile.source).toContain(
-      "from './CanvasDemoSvgDrawingItemRenderer'",
+      "from './CanvasWhiteboardSvgDrawingItemRenderer'",
     )
     expect(itemLayerFile.source).not.toContain(
-      "from './CanvasDemoSvgDrawingItemRenderer'",
+      "from './CanvasWhiteboardSvgDrawingItemRenderer'",
     )
     expect(itemLayerFile.source).not.toContain('createCanvasSvgPathData')
     expect(itemLayerFile.source).not.toContain('createCanvasSvgFreehandPathData')
     expect(itemLayerFile.source).not.toContain('CANVAS_SVG_ARROW_MARKER_IRI')
     expect(itemLayerFile.source).not.toContain('className="arrow-item"')
     expect(drawingRendererFile.source).toContain(
-      'export function renderCanvasDemoSvgDrawingItem',
+      'export function renderCanvasWhiteboardSvgDrawingItem',
     )
     expect(drawingRendererFile.source).toContain(
-      'export function isCanvasDemoSvgDrawingItem',
+      'export function isCanvasWhiteboardSvgDrawingItem',
     )
     expect(drawingRendererFile.source).toContain(
-      "from './CanvasDemoSvgDrawingItemRenderRouting'",
+      "from './CanvasWhiteboardSvgDrawingItemRenderRouting'",
     )
     expect(drawingRendererFile.source).not.toContain("item.type === 'arrow'")
     expect(drawingRendererFile.source).not.toContain('createCanvasSvgPathData')
@@ -47,10 +47,10 @@ describe('Canvas rendering item boundaries', () => {
       'CANVAS_SVG_ARROW_MARKER_IRI',
     )
     expect(drawingRoutingFile.source).toContain(
-      'CANVAS_DEMO_SVG_DRAWING_ITEM_RENDER_STRATEGIES',
+      'CANVAS_WHITEBOARD_SVG_DRAWING_ITEM_RENDER_STRATEGIES',
     )
     expect(drawingRoutingFile.source).toContain(
-      'export function renderCanvasDemoSvgDrawingItemByRoute',
+      'export function renderCanvasWhiteboardSvgDrawingItemByRoute',
     )
     expect(drawingRoutingFile.source).toContain('createCanvasSvgArrowPathData')
     expect(drawingRoutingFile.source).toContain(
@@ -60,44 +60,44 @@ describe('Canvas rendering item boundaries', () => {
   })
 
 
-  it('keeps Demo SVG rect and text item rendering behind a named module', () => {
+  it('keeps Whiteboard SVG rect and text item rendering behind a named module', () => {
     const itemLayerFile = getSourceFile(
-      'src/canvas/app/rendering/CanvasDemoSvgItemLayer.tsx',
+      'src/canvas/app/rendering/CanvasWhiteboardSvgItemLayer.tsx',
     )
     const itemRenderRoutingFile = getSourceFile(
-      'src/canvas/app/rendering/CanvasDemoSvgItemRenderRouting.tsx',
+      'src/canvas/app/rendering/CanvasWhiteboardSvgItemRenderRouting.tsx',
     )
     const rectTextRendererFile = getSourceFile(
-      'src/canvas/app/rendering/CanvasDemoSvgRectTextItemRenderer.tsx',
+      'src/canvas/app/rendering/CanvasWhiteboardSvgRectTextItemRenderer.tsx',
     )
     const rectTextRoutingFile = getSourceFile(
-      'src/canvas/app/rendering/CanvasDemoSvgRectTextItemRenderRouting.tsx',
+      'src/canvas/app/rendering/CanvasWhiteboardSvgRectTextItemRenderRouting.tsx',
     )
 
     expect(itemRenderRoutingFile.source).toContain(
-      "from './CanvasDemoSvgRectTextItemRenderer'",
+      "from './CanvasWhiteboardSvgRectTextItemRenderer'",
     )
     expect(itemLayerFile.source).not.toContain(
-      "from './CanvasDemoSvgRectTextItemRenderer'",
+      "from './CanvasWhiteboardSvgRectTextItemRenderer'",
     )
     expect(itemLayerFile.source).not.toContain('className="shape-item"')
     expect(itemLayerFile.source).not.toContain('canvas-shape-text')
     expect(itemLayerFile.source).not.toContain('<foreignObject')
     expect(rectTextRendererFile.source).toContain(
-      'export function renderCanvasDemoSvgRectTextItem',
+      'export function renderCanvasWhiteboardSvgRectTextItem',
     )
     expect(rectTextRendererFile.source).toContain(
-      "from './CanvasDemoSvgRectTextItemRenderRouting'",
+      "from './CanvasWhiteboardSvgRectTextItemRenderRouting'",
     )
     expect(rectTextRendererFile.source).not.toContain("item.type === 'rect'")
     expect(rectTextRendererFile.source).not.toContain('className="shape-item"')
     expect(rectTextRendererFile.source).not.toContain('canvas-shape-text')
     expect(rectTextRendererFile.source).not.toContain('<foreignObject')
     expect(rectTextRoutingFile.source).toContain(
-      'CANVAS_DEMO_SVG_RECT_TEXT_ITEM_RENDER_STRATEGIES',
+      'CANVAS_WHITEBOARD_SVG_RECT_TEXT_ITEM_RENDER_STRATEGIES',
     )
     expect(rectTextRoutingFile.source).toContain(
-      'export function renderCanvasDemoSvgRectTextItemByRoute',
+      'export function renderCanvasWhiteboardSvgRectTextItemByRoute',
     )
     expect(rectTextRoutingFile.source).toContain('isCanvasTextItem')
     expect(rectTextRoutingFile.source).toContain('className="shape-item"')
@@ -106,81 +106,81 @@ describe('Canvas rendering item boundaries', () => {
   })
 
 
-  it('keeps Demo SVG component render fallback behind a named module', () => {
+  it('keeps Whiteboard SVG component render fallback behind a named module', () => {
     const componentRendererFile = getSourceFile(
-      'src/canvas/app/rendering/CanvasDemoSvgComponentRenderer.tsx',
+      'src/canvas/app/rendering/CanvasWhiteboardSvgComponentRenderer.tsx',
     )
     const executionFile = getSourceFile(
-      'src/canvas/app/rendering/CanvasDemoSvgComponentRendererExecution.tsx',
+      'src/canvas/app/rendering/CanvasWhiteboardSvgComponentRendererExecution.tsx',
     )
     const fallbackFile = getSourceFile(
-      'src/canvas/app/rendering/CanvasDemoSvgComponentRenderFallback.tsx',
+      'src/canvas/app/rendering/CanvasWhiteboardSvgComponentRenderFallback.tsx',
     )
 
     expect(componentRendererFile.source).toContain(
-      "from './CanvasDemoSvgComponentRendererExecution'",
+      "from './CanvasWhiteboardSvgComponentRendererExecution'",
     )
     expect(componentRendererFile.source).not.toContain(
-      'getCanvasDemoSvgComponentPresentationRenderer',
+      'getCanvasWhiteboardSvgComponentPresentationRenderer',
     )
     expect(componentRendererFile.source).not.toContain(
-      'renderCanvasDemoSvgComponentFallback',
+      'renderCanvasWhiteboardSvgComponentFallback',
     )
     expect(executionFile.source).toContain(
-      'export function renderCanvasDemoSvgComponentPresentation',
+      'export function renderCanvasWhiteboardSvgComponentPresentation',
     )
     expect(executionFile.source).toContain(
-      'getCanvasDemoSvgComponentPresentationRenderer',
+      'getCanvasWhiteboardSvgComponentPresentationRenderer',
     )
     expect(executionFile.source).toContain(
-      'renderCanvasDemoSvgComponentFallback',
+      'renderCanvasWhiteboardSvgComponentFallback',
     )
     expect(componentRendererFile.source).not.toMatch(
-      /DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS\[['"]/,
+      /DEFAULT_CANVAS_WHITEBOARD_SVG_COMPONENT_PRESENTATION_RENDERERS\[['"]/,
     )
     expect(componentRendererFile.source).not.toContain(
-      'CanvasDemoSvgCardComponent',
+      'CanvasWhiteboardSvgCardComponent',
     )
     expect(fallbackFile.source).toContain(
-      'CANVAS_DEMO_SVG_COMPONENT_FALLBACK_PRESENTATION',
+      'CANVAS_WHITEBOARD_SVG_COMPONENT_FALLBACK_PRESENTATION',
     )
-    expect(fallbackFile.source).toContain('CanvasDemoSvgCardComponent')
+    expect(fallbackFile.source).toContain('CanvasWhiteboardSvgCardComponent')
   })
 
 
-  it('keeps Demo SVG component presentation defaults and contracts behind named modules', () => {
+  it('keeps Whiteboard SVG component presentation defaults and contracts behind named modules', () => {
     const registryFile = getSourceFile(
-      'src/canvas/app/rendering/CanvasDemoSvgComponentPresentationRegistry.ts',
+      'src/canvas/app/rendering/CanvasWhiteboardSvgComponentPresentationRegistry.ts',
     )
     const defaultsFile = getSourceFile(
-      'src/canvas/app/rendering/CanvasDemoSvgBuiltInComponentPresentationRenderers.tsx',
+      'src/canvas/app/rendering/CanvasWhiteboardSvgBuiltInComponentPresentationRenderers.tsx',
     )
     const contractsFile = getSourceFile(
-      'src/canvas/app/rendering/CanvasDemoSvgComponentPresentationRegistryContracts.ts',
+      'src/canvas/app/rendering/CanvasWhiteboardSvgComponentPresentationRegistryContracts.ts',
     )
     const rendererRegistryContractsFile = getSourceFile(
       'src/canvas/app/rendering/CanvasAppRendererRegistryContracts.ts',
     )
 
     expect(registryFile.source).toContain(
-      "from './CanvasDemoSvgBuiltInComponentPresentationRenderers'",
+      "from './CanvasWhiteboardSvgBuiltInComponentPresentationRenderers'",
     )
     expect(registryFile.source).toContain(
-      "from './CanvasDemoSvgComponentPresentationRegistryContracts'",
+      "from './CanvasWhiteboardSvgComponentPresentationRegistryContracts'",
     )
     expect(registryFile.source).not.toContain(
-      'CanvasDemoSvgChecklistComponent',
+      'CanvasWhiteboardSvgChecklistComponent',
     )
     expect(registryFile.source).not.toContain(
       'assertCanvasAppExtensionRecordKeys',
     )
     expect(defaultsFile.source).toContain(
-      'DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS',
+      'DEFAULT_CANVAS_WHITEBOARD_SVG_COMPONENT_PRESENTATION_RENDERERS',
     )
-    expect(defaultsFile.source).toContain('CanvasDemoSvgChecklistComponent')
+    expect(defaultsFile.source).toContain('CanvasWhiteboardSvgChecklistComponent')
     expect(defaultsFile.source).toContain("'note-card'")
     expect(contractsFile.source).toContain(
-      'export function assertCanvasDemoSvgComponentPresentationRenderers',
+      'export function assertCanvasWhiteboardSvgComponentPresentationRenderers',
     )
     expect(contractsFile.source).toContain(
       'assertCanvasAppRendererRegistry',

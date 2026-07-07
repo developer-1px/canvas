@@ -5,73 +5,73 @@ import {
 } from './CanvasArchitectureTestSources'
 
 describe('Canvas rendering custom item boundaries', () => {
-  it('keeps Demo SVG custom item render fallback behind a named module', () => {
+  it('keeps Whiteboard SVG custom item render fallback behind a named module', () => {
     const itemLayerFile = getSourceFile(
-      'src/canvas/app/rendering/CanvasDemoSvgItemLayer.tsx',
+      'src/canvas/app/rendering/CanvasWhiteboardSvgItemLayer.tsx',
     )
     const itemRenderRoutingFile = getSourceFile(
-      'src/canvas/app/rendering/CanvasDemoSvgItemRenderRouting.tsx',
+      'src/canvas/app/rendering/CanvasWhiteboardSvgItemRenderRouting.tsx',
     )
     const executionFile = getSourceFile(
-      'src/canvas/app/rendering/CanvasDemoSvgCustomItemRendererExecution.tsx',
+      'src/canvas/app/rendering/CanvasWhiteboardSvgCustomItemRendererExecution.tsx',
     )
     const customRegistryFile = getSourceFile(
-      'src/canvas/app/rendering/CanvasDemoSvgCustomItemRendererRegistry.tsx',
+      'src/canvas/app/rendering/CanvasWhiteboardSvgCustomItemRendererRegistry.tsx',
     )
     const fallbackFile = getSourceFile(
-      'src/canvas/app/rendering/CanvasDemoSvgCustomItemRenderFallback.tsx',
+      'src/canvas/app/rendering/CanvasWhiteboardSvgCustomItemRenderFallback.tsx',
     )
 
     expect(itemRenderRoutingFile.source).toContain(
-      "from './CanvasDemoSvgCustomItemRendererExecution'",
+      "from './CanvasWhiteboardSvgCustomItemRendererExecution'",
     )
     expect(itemLayerFile.source).not.toContain(
-      "from './CanvasDemoSvgCustomItemRendererExecution'",
+      "from './CanvasWhiteboardSvgCustomItemRendererExecution'",
     )
     expect(itemLayerFile.source).not.toContain(
-      'getCanvasDemoSvgCustomItemRenderer',
+      'getCanvasWhiteboardSvgCustomItemRenderer',
     )
     expect(itemLayerFile.source).not.toContain(
-      'renderCanvasDemoSvgCustomItemFallback',
+      'renderCanvasWhiteboardSvgCustomItemFallback',
     )
     expect(executionFile.source).toContain(
-      'export function renderCanvasDemoSvgCustomItem',
+      'export function renderCanvasWhiteboardSvgCustomItem',
     )
-    expect(executionFile.source).toContain('getCanvasDemoSvgCustomItemRenderer')
+    expect(executionFile.source).toContain('getCanvasWhiteboardSvgCustomItemRenderer')
     expect(executionFile.source).toContain(
-      'renderCanvasDemoSvgCustomItemFallback',
+      'renderCanvasWhiteboardSvgCustomItemFallback',
     )
     expect(customRegistryFile.source).toContain(
-      'getCanvasDemoSvgCustomItemFallbackRenderer',
+      'getCanvasWhiteboardSvgCustomItemFallbackRenderer',
     )
-    expect(itemLayerFile.source).not.toContain('CanvasDemoSvgUnknownCustomItem')
+    expect(itemLayerFile.source).not.toContain('CanvasWhiteboardSvgUnknownCustomItem')
     expect(customRegistryFile.source).not.toContain(
-      'CanvasDemoSvgUnknownCustomItem',
+      'CanvasWhiteboardSvgUnknownCustomItem',
     )
-    expect(fallbackFile.source).toContain('CanvasDemoSvgUnknownCustomItem')
+    expect(fallbackFile.source).toContain('CanvasWhiteboardSvgUnknownCustomItem')
   })
 
 
-  it('keeps Demo SVG custom item renderer contracts behind a named module', () => {
+  it('keeps Whiteboard SVG custom item renderer contracts behind a named module', () => {
     const registryFile = getSourceFile(
-      'src/canvas/app/rendering/CanvasDemoSvgCustomItemRendererRegistry.tsx',
+      'src/canvas/app/rendering/CanvasWhiteboardSvgCustomItemRendererRegistry.tsx',
     )
     const contractsFile = getSourceFile(
-      'src/canvas/app/rendering/CanvasDemoSvgCustomItemRendererRegistryContracts.ts',
+      'src/canvas/app/rendering/CanvasWhiteboardSvgCustomItemRendererRegistryContracts.ts',
     )
     const rendererRegistryContractsFile = getSourceFile(
       'src/canvas/app/rendering/CanvasAppRendererRegistryContracts.ts',
     )
 
     expect(registryFile.source).toContain(
-      "from './CanvasDemoSvgCustomItemRendererRegistryContracts'",
+      "from './CanvasWhiteboardSvgCustomItemRendererRegistryContracts'",
     )
     expect(registryFile.source).not.toContain(
       'assertCanvasAppExtensionRecordKeys',
     )
     expect(registryFile.source).not.toContain('render strategy')
     expect(contractsFile.source).toContain(
-      'export function assertCanvasDemoSvgCustomItemRenderers',
+      'export function assertCanvasWhiteboardSvgCustomItemRenderers',
     )
     expect(contractsFile.source).toContain(
       'assertCanvasAppRendererRegistry',

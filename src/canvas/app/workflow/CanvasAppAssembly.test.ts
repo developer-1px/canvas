@@ -461,7 +461,7 @@ describe('CanvasAppAssembly seams', () => {
     })).toEqual([])
   })
 
-  it('keeps demo default selection inside the default assembly only', () => {
+  it('keeps baseline default selection inside the default assembly only', () => {
     const customInitialItems = [{
       fill: '#ffffff',
       h: 40,

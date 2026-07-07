@@ -9,7 +9,7 @@ import type {
 import { createCanvasAppWorkspaceAssembly } from './CanvasAppWorkspaceAssembly'
 
 describe('CanvasAppWorkspaceAssembly', () => {
-  it('keeps demo defaults only when host does not provide initial items', () => {
+  it('keeps baseline defaults only when host does not provide initial items', () => {
     const defaults = createDefaults()
     const customItems = [createRectItem('rect-1')]
 

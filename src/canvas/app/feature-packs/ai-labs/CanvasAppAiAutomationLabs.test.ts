@@ -12,7 +12,7 @@ import {
   type CanvasAppAiAutomationDraft,
   commitCanvasAppAiAutomationDraft,
   createCanvasAppAiAutomationProviderRequest,
-  createCanvasAppAiLabsDemoSummaryProvider,
+  createCanvasAppAiLabsSampleSummaryProvider,
   createCanvasAppAiLabsSummarizeSelectionCommand,
   createCanvasAppAiLabsSummarizeSelectionDraft,
   runCanvasAppAiLabsSummarizeSelectionCommand,
@@ -77,7 +77,7 @@ describe('CanvasAppAiAutomationLabs', () => {
         createRectItem({ id: 'rect-1', text: 'Launch checklist' }),
         createRectItem({ id: 'rect-2', text: 'Risk review' }),
       ],
-      provider: createCanvasAppAiLabsDemoSummaryProvider(),
+      provider: createCanvasAppAiLabsSampleSummaryProvider(),
       selection: ['rect-1', 'rect-2'],
       viewport: createViewport(),
     })
@@ -85,8 +85,8 @@ describe('CanvasAppAiAutomationLabs', () => {
     expect(draft).toMatchObject({
       operationId: CANVAS_APP_AI_LABS_SUMMARIZE_SELECTION_OPERATION_ID,
       provenance: {
-        model: 'demo-rule-based',
-        providerId: 'demo-ai-labs-summary',
+        model: 'sample-rule-based',
+        providerId: 'sample-ai-labs-summary',
       },
       title: 'Summarize selected text',
     })
@@ -144,7 +144,7 @@ describe('CanvasAppAiAutomationLabs', () => {
     expect(commits).toHaveLength(1)
   })
 
-  it('runs the demo command only after the review callback applies the draft', async () => {
+  it('runs the sample command only after the review callback applies the draft', async () => {
     const commits: CanvasAppItemsChange[] = []
     const context = createCustomCommandContext({
       commitItemsChange: (change) => {
@@ -162,7 +162,7 @@ describe('CanvasAppAiAutomationLabs', () => {
 
     const result = await runCanvasAppAiLabsSummarizeSelectionCommand({
       context,
-      provider: createCanvasAppAiLabsDemoSummaryProvider(),
+      provider: createCanvasAppAiLabsSampleSummaryProvider(),
       requestReview,
     })
 
@@ -176,7 +176,7 @@ describe('CanvasAppAiAutomationLabs', () => {
 
   it('specifies a labs-only summarize command without auto-apply behavior', () => {
     const command = createCanvasAppAiLabsSummarizeSelectionCommand({
-      provider: createCanvasAppAiLabsDemoSummaryProvider(),
+      provider: createCanvasAppAiLabsSampleSummaryProvider(),
       requestReview: () => ({ kind: 'cancel' }),
     })
 

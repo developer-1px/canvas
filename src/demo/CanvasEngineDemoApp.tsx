@@ -48,6 +48,8 @@ import './CanvasEngineDemoApp.css'
 type CanvasEngineDemoModel =
   Parameters<NonNullable<CanvasAppProps['renderApp']>>[0]
 
+type CanvasEngineDemoVariant = 'engine' | 'figjam'
+
 const ENGINE_DEMO_TOOLS = [
   { icon: MousePointer2, id: 'select', label: 'Select tool' },
   { icon: Move, id: 'pan', label: 'Pan tool' },
@@ -78,21 +80,27 @@ const ENGINE_SELECTION_DRAG_THRESHOLD = 3
 
 export function CanvasEngineDemoApp({
   assemblyInput,
+  variant = 'engine',
 }: {
   assemblyInput?: CanvasAppAssemblyInput
+  variant?: CanvasEngineDemoVariant
 }) {
   return (
     <CanvasApp
       assemblyInput={assemblyInput}
-      renderApp={(app) => <CanvasEngineDemoSurface app={app} />}
+      renderApp={(app) => (
+        <CanvasEngineDemoSurface app={app} variant={variant} />
+      )}
     />
   )
 }
 
 function CanvasEngineDemoSurface({
   app,
+  variant,
 }: {
   app: CanvasEngineDemoModel
+  variant: CanvasEngineDemoVariant
 }) {
   const viewportPercent = `${Math.round(app.zoomControls.scale * 100)}%`
   const [selectionToolbarVisible, setSelectionToolbarVisible] = useState(false)
@@ -250,7 +258,7 @@ function CanvasEngineDemoSurface({
         {...toolToolbarRovingFocus}
         className="engine-demo-controls"
         role="toolbar"
-        aria-label="Engine affordances"
+        aria-label={variant === 'figjam' ? 'FigJam tools' : 'Engine affordances'}
       >
         {ENGINE_DEMO_TOOLS.map(({ icon: Icon, id, label }) => (
           <button

@@ -25,7 +25,7 @@ describe('Canvas foundation architecture plan', () => {
     expect(foundationAdr).toContain('@interactive-os/json-document')
     expect(foundationAdr).toContain('must not import Host, App, UI, Renderer')
     expect(foundationAdr).toContain('or Engine')
-    expect(foundationAdr).toContain('Demo `CanvasItem`')
+    expect(foundationAdr).toContain('Whiteboard `CanvasItem`')
     expect(foundationAdr).toContain('Issue #69')
   })
 
@@ -58,7 +58,7 @@ describe('Canvas foundation architecture plan', () => {
       expect(foundationInventory).toContain(row)
     }
 
-    expect(foundationInventory).toContain('must not mention Demo `CanvasItem`')
+    expect(foundationInventory).toContain('must not mention Whiteboard `CanvasItem`')
     expect(foundationInventory).toContain('json-document imports stay inside Host document adapters')
     expect(foundationInventory).toContain('`CanvasExtensionDescriptor` answers')
     expect(foundationInventory).toContain('first concrete first-party extension descriptor')

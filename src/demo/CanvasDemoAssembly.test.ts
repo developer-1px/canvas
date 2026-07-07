@@ -13,7 +13,7 @@ const modules = import.meta.glob('./**/*.{ts,tsx,css}', {
 describe('CanvasDemoAssembly', () => {
   it('keeps the top-level demo assembly focused on module composition', () => {
     expect(modules['./CanvasDemoAssembly.ts']).not.toMatch(
-      /RISK|DECISION|defineCanvasAppCustomItemModule|createCanvasDemoSvgCustomItemRenderers|risk-node|decision-node|demo-risk-text|demo-decision|kind:\s*['"](risk|decision)['"]/,
+      /RISK|DECISION|defineCanvasAppCustomItemModule|createCanvasWhiteboardSvgCustomItemRenderers|risk-node|decision-node|demo-risk-text|demo-decision|kind:\s*['"](risk|decision)['"]/,
     )
   })
 
