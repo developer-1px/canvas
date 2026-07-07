@@ -431,7 +431,7 @@ export {
   createCanvasAppCapabilityAffordanceConfigInput,
   createCanvasAppAiAutomationProviderRequest,
   createCanvasAppAiLabsFeaturePackManifest,
-  createCanvasAppAiLabsDemoSummaryProvider,
+  createCanvasAppAiLabsSampleSummaryProvider,
   createCanvasAppAiLabsSummarizeSelectionCommand,
   createCanvasAppAiLabsSummarizeSelectionDraft,
   createCanvasAppComponentPresentationRenderers,

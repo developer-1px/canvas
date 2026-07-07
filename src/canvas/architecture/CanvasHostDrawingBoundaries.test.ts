@@ -23,7 +23,7 @@ describe('Canvas host drawing boundaries', () => {
       'src/canvas/host/operations/CanvasItemTransformOperations.ts',
     )
     const drawingRendererFile = getSourceFile(
-      'src/canvas/app/rendering/CanvasDemoSvgDrawingItemRenderer.tsx',
+      'src/canvas/app/rendering/CanvasWhiteboardSvgDrawingItemRenderer.tsx',
     )
     const arrowRoutingInspectorFile = getSourceFile(
       'src/canvas/app/feature-packs/arrow-routing-inspector/CanvasArrowRoutingInspectorPanel.tsx',

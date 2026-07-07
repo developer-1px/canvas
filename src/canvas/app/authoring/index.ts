@@ -304,7 +304,7 @@ export {
   commitCanvasAppAiAutomationDraft,
   createCanvasAppAiAutomationProviderRequest,
   createCanvasAppAiLabsFeaturePackManifest,
-  createCanvasAppAiLabsDemoSummaryProvider,
+  createCanvasAppAiLabsSampleSummaryProvider,
   createCanvasAppAiLabsSummarizeSelectionCommand,
   createCanvasAppAiLabsSummarizeSelectionDraft,
   runCanvasAppAiLabsSummarizeSelectionCommand,

@@ -88,7 +88,7 @@ describe('Canvas App component workflow boundaries', () => {
 
   it('keeps checklist component editing behind Host and App checklist modules', () => {
     const structuredRendererFile = getSourceFile(
-      'src/canvas/app/rendering/CanvasDemoSvgStructuredComponentRenderer.tsx',
+      'src/canvas/app/rendering/CanvasWhiteboardSvgStructuredComponentRenderer.tsx',
     )
     const checklistInspectorPanelFile = getSourceFile(
       'src/canvas/app/feature-packs/checklist-inspector/CanvasChecklistInspectorPanel.tsx',
@@ -158,7 +158,7 @@ describe('Canvas App component workflow boundaries', () => {
 
   it('keeps kanban component editing behind Host and App kanban modules', () => {
     const structuredRendererFile = getSourceFile(
-      'src/canvas/app/rendering/CanvasDemoSvgStructuredComponentRenderer.tsx',
+      'src/canvas/app/rendering/CanvasWhiteboardSvgStructuredComponentRenderer.tsx',
     )
     const kanbanInspectorPanelFile = getSourceFile(
       'src/canvas/app/feature-packs/kanban-inspector/CanvasKanbanInspectorPanel.tsx',

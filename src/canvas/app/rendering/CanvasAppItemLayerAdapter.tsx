@@ -4,7 +4,7 @@ import {
 import {
   createCanvasAppPointerInput,
 } from '../affordances/interaction/pointer/CanvasAppPointerInput'
-import { CanvasDemoSvgItemLayer } from './CanvasDemoSvgItemLayer'
+import { CanvasWhiteboardSvgItemLayer } from './CanvasWhiteboardSvgItemLayer'
 import type {
   CanvasAppItemLayerAdapter,
 } from './CanvasAppRenderingContracts'
@@ -25,7 +25,7 @@ export type {
 export const DEFAULT_CANVAS_APP_ITEM_LAYER_ADAPTER: CanvasAppItemLayerAdapter =
   Object.freeze({
     renderItems: (input) =>
-      createElement(CanvasDemoSvgItemLayer, {
+      createElement(CanvasWhiteboardSvgItemLayer, {
         ...input,
         onArrowEndpointPointerDown: (event, itemId, endpoint) =>
           input.onArrowEndpointPointerDown(

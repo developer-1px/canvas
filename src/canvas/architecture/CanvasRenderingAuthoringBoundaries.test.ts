@@ -6,7 +6,7 @@ import {
 } from './CanvasArchitectureTestSources'
 
 describe('Canvas rendering authoring boundaries', () => {
-  it('keeps app rendering authoring contracts independent from Demo SVG registry names', () => {
+  it('keeps app rendering authoring contracts independent from Whiteboard SVG registry names', () => {
     const contractsFile = getSourceFile(
       'src/canvas/app/rendering/CanvasAppRenderingContracts.ts',
     )
@@ -39,7 +39,7 @@ describe('Canvas rendering authoring boundaries', () => {
     expect(contractsFile.source).toContain(
       'renderItems: (input: CanvasAppItemLayerRenderInput)',
     )
-    expect(contractsFile.source).not.toContain('CanvasDemoSvg')
+    expect(contractsFile.source).not.toContain('CanvasWhiteboardSvg')
     expect(contractsFile.source).not.toContain("from '../../host'")
     expect(registriesFile.source).toContain(
       'export function createCanvasAppComponentPresentationRenderers',
@@ -48,10 +48,10 @@ describe('Canvas rendering authoring boundaries', () => {
       'export function createCanvasAppCustomItemRenderers',
     )
     expect(registriesFile.source).toContain(
-      "from './CanvasDemoSvgComponentPresentationRegistry'",
+      "from './CanvasWhiteboardSvgComponentPresentationRegistry'",
     )
     expect(registriesFile.source).toContain(
-      "from './CanvasDemoSvgCustomItemRendererRegistry'",
+      "from './CanvasWhiteboardSvgCustomItemRendererRegistry'",
     )
     expect(registriesFile.source).not.toContain('Parameters<typeof')
     expect(registriesFile.source).not.toContain('export type {')
@@ -81,7 +81,7 @@ describe('Canvas rendering authoring boundaries', () => {
     )
     expect(authoringFacadeFile.source).not.toContain("from '../rendering'")
     expect(itemLayerAdapterFile.source).not.toMatch(
-      /CanvasDemoSvg(?:Component|Custom).*Renderer/,
+      /CanvasWhiteboardSvg(?:Component|Custom).*Renderer/,
     )
   })
 
@@ -108,38 +108,38 @@ describe('Canvas rendering authoring boundaries', () => {
   })
 
 
-  it('keeps Demo SVG item frame concerns out of item rendering branches', () => {
+  it('keeps Whiteboard SVG item frame concerns out of item rendering branches', () => {
     const itemLayerFile = getSourceFile(
-      'src/canvas/app/rendering/CanvasDemoSvgItemLayer.tsx',
+      'src/canvas/app/rendering/CanvasWhiteboardSvgItemLayer.tsx',
     )
     const itemRendererFile = getSourceFile(
-      'src/canvas/app/rendering/CanvasDemoSvgItemRenderer.tsx',
+      'src/canvas/app/rendering/CanvasWhiteboardSvgItemRenderer.tsx',
     )
     const itemRenderRoutingFile = getSourceFile(
-      'src/canvas/app/rendering/CanvasDemoSvgItemRenderRouting.tsx',
+      'src/canvas/app/rendering/CanvasWhiteboardSvgItemRenderRouting.tsx',
     )
     const itemFrameFile = getSourceFile(
-      'src/canvas/app/rendering/CanvasDemoSvgItemFrame.tsx',
+      'src/canvas/app/rendering/CanvasWhiteboardSvgItemFrame.tsx',
     )
 
     expect(itemLayerFile.source).toContain(
-      "from './CanvasDemoSvgItemRenderer'",
+      "from './CanvasWhiteboardSvgItemRenderer'",
     )
-    expect(itemLayerFile.source).not.toContain('CanvasDemoSvgItemFrame')
+    expect(itemLayerFile.source).not.toContain('CanvasWhiteboardSvgItemFrame')
     expect(itemLayerFile.source).not.toContain("item.type === '")
-    expect(itemRendererFile.source).toContain('CanvasDemoSvgItemFrame')
+    expect(itemRendererFile.source).toContain('CanvasWhiteboardSvgItemFrame')
     expect(itemRendererFile.source).toContain(
-      'export function renderCanvasDemoSvgItem',
+      'export function renderCanvasWhiteboardSvgItem',
     )
     expect(itemRendererFile.source).toContain(
-      "from './CanvasDemoSvgItemRenderRouting'",
+      "from './CanvasWhiteboardSvgItemRenderRouting'",
     )
     expect(itemRendererFile.source).not.toContain("item.type === '")
     expect(itemRenderRoutingFile.source).toContain(
-      'CANVAS_DEMO_SVG_ITEM_RENDER_STRATEGIES',
+      'CANVAS_WHITEBOARD_SVG_ITEM_RENDER_STRATEGIES',
     )
     expect(itemRenderRoutingFile.source).toContain(
-      'export function getCanvasDemoSvgItemRenderRoute',
+      'export function getCanvasWhiteboardSvgItemRenderRoute',
     )
     expect(itemLayerFile.source).not.toContain('data-locked')
     expect(itemLayerFile.source).not.toContain('data-selected')

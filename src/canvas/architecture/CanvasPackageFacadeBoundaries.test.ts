@@ -15,7 +15,8 @@ describe('Canvas package facade boundaries', () => {
     ])
     const violations = sourceFiles
       .filter((file) =>
-        file.path === 'src/main.tsx' || file.path.startsWith('src/demo/'),
+        /^src\/[^/]+\.(ts|tsx)$/.test(file.path) ||
+        file.path.startsWith('src/demo/'),
       )
       .flatMap(getImportReferences)
       .filter((reference) =>
@@ -181,7 +182,7 @@ describe('Canvas package facade boundaries', () => {
   })
 
 
-  it('keeps Demo SVG renderer names out of app authoring seams', () => {
+  it('keeps Whiteboard SVG renderer names out of app authoring seams', () => {
     const publicAuthoringFiles = new Set([
       'src/canvas/index.ts',
       'src/canvas/app/index.ts',
@@ -196,7 +197,7 @@ describe('Canvas package facade boundaries', () => {
         file.path.startsWith('src/demo/custom-items/'),
       )
       .flatMap((file) =>
-        /CanvasDemoSvg|createCanvasDemoSvg/.test(file.source)
+        /CanvasWhiteboardSvg|createCanvasWhiteboardSvg/.test(file.source)
           ? [file.path]
           : [],
       )

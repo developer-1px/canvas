@@ -18,7 +18,7 @@ export {
   CANVAS_APP_AI_LABS_SUMMARIZE_SELECTION_OPERATION_ID,
   commitCanvasAppAiAutomationDraft,
   createCanvasAppAiAutomationProviderRequest,
-  createCanvasAppAiLabsDemoSummaryProvider,
+  createCanvasAppAiLabsSampleSummaryProvider,
   createCanvasAppAiLabsSummarizeSelectionCommand,
   createCanvasAppAiLabsSummarizeSelectionDraft,
   runCanvasAppAiLabsSummarizeSelectionCommand,

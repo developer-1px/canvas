@@ -15,13 +15,70 @@ const SCREENSHOT_SMOKE_VIEWPORTS = [
   },
 ] as const
 
-test('opens the engine demo on the default route', async ({ page }) => {
+test('opens the app launcher on the default route', async ({ page }) => {
   await page.goto('/')
 
+  await expect(page.getByRole('main', { name: 'Choose a canvas' }))
+    .toBeVisible()
+  await expect(page.getByRole('link', { name: 'Open FigJam canvas' }))
+    .toHaveAttribute('href', '/figjam')
+  await expect(page.getByRole('link', { name: 'Open Figma editor' }))
+    .toHaveAttribute('href', '/figma')
+  await expect(page.getByRole('link', { name: 'Open Engine playground' }))
+    .toHaveAttribute('href', '/engine')
+
+  await page.getByRole('link', { name: 'Open FigJam canvas' }).click()
+  await expect(page).toHaveURL(/\/figjam$/)
   await expect(page.locator('main.engine-demo-app')).toBeVisible()
   await expect(page.getByRole('toolbar', {
-    name: 'Engine affordances',
+    name: 'FigJam tools',
   })).toBeVisible()
+})
+
+test('keeps the app launcher usable on a mobile viewport', async ({ page }) => {
+  const viewport = { height: 844, width: 390 }
+
+  await page.setViewportSize(viewport)
+  await page.goto('/')
+
+  const launcher = page.locator('.canvas-app-launcher')
+  const links = page.getByRole('link', { name: /Open / })
+
+  await expect(launcher).toBeVisible()
+  await expect(links).toHaveCount(3)
+  await expect(page.getByRole('heading', { name: 'Choose a canvas' }))
+    .toBeVisible()
+
+  const launcherWidth = await launcher.evaluate((element) => element.scrollWidth)
+  const launcherClientWidth = await launcher.evaluate(
+    (element) => element.clientWidth,
+  )
+
+  expect(launcherWidth).toBeLessThanOrEqual(launcherClientWidth + 1)
+
+  const horizontalOverflow = await links.evaluateAll((elements) =>
+    elements.some((element) => {
+      const rect = element.getBoundingClientRect()
+
+      return rect.left < 0 || rect.right > window.innerWidth
+    }),
+  )
+
+  expect(horizontalOverflow).toBe(false)
+})
+
+test('opens the figjam canvas route directly', async ({ page }) => {
+  await page.goto('/figjam')
+
+  await expect(page.locator('main.engine-demo-app')).toBeVisible()
+  await expect(page.getByRole('toolbar', { name: 'FigJam tools' }))
+    .toBeVisible()
+})
+
+test('opens the figma-like editor route directly', async ({ page }) => {
+  await page.goto('/figma')
+
+  await expect(page.locator('.figma-clone')).toBeVisible()
 })
 
 test('opens as a minimal canvas affordance engine demo', async ({ page }) => {

@@ -8,47 +8,47 @@ import type {
   CanvasAppCustomItemRenderers,
 } from './CanvasAppRenderingContracts'
 import {
-  DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS,
-  assertCanvasDemoSvgComponentPresentationRenderers,
-  createCanvasDemoSvgComponentPresentationRenderers,
-  getCanvasDemoSvgComponentPresentationRenderer,
-} from './CanvasDemoSvgComponentPresentationRegistry'
+  DEFAULT_CANVAS_WHITEBOARD_SVG_COMPONENT_PRESENTATION_RENDERERS,
+  assertCanvasWhiteboardSvgComponentPresentationRenderers,
+  createCanvasWhiteboardSvgComponentPresentationRenderers,
+  getCanvasWhiteboardSvgComponentPresentationRenderer,
+} from './CanvasWhiteboardSvgComponentPresentationRegistry'
 import {
-  DEFAULT_CANVAS_DEMO_SVG_CUSTOM_ITEM_RENDERERS,
-  assertCanvasDemoSvgCustomItemRenderers,
-  createCanvasDemoSvgCustomItemRenderers,
-  getCanvasDemoSvgCustomItemRenderer,
-} from './CanvasDemoSvgCustomItemRendererRegistry'
+  DEFAULT_CANVAS_WHITEBOARD_SVG_CUSTOM_ITEM_RENDERERS,
+  assertCanvasWhiteboardSvgCustomItemRenderers,
+  createCanvasWhiteboardSvgCustomItemRenderers,
+  getCanvasWhiteboardSvgCustomItemRenderer,
+} from './CanvasWhiteboardSvgCustomItemRendererRegistry'
 
 export const DEFAULT_CANVAS_APP_COMPONENT_PRESENTATION_RENDERERS:
   CanvasAppComponentPresentationRenderers =
-    DEFAULT_CANVAS_DEMO_SVG_COMPONENT_PRESENTATION_RENDERERS
+    DEFAULT_CANVAS_WHITEBOARD_SVG_COMPONENT_PRESENTATION_RENDERERS
 
 export const DEFAULT_CANVAS_APP_CUSTOM_ITEM_RENDERERS:
-  CanvasAppCustomItemRenderers = DEFAULT_CANVAS_DEMO_SVG_CUSTOM_ITEM_RENDERERS
+  CanvasAppCustomItemRenderers = DEFAULT_CANVAS_WHITEBOARD_SVG_CUSTOM_ITEM_RENDERERS
 
 export function assertCanvasAppComponentPresentationRenderers(
   renderers: CanvasAppComponentPresentationRenderers,
 ) {
-  assertCanvasDemoSvgComponentPresentationRenderers(renderers)
+  assertCanvasWhiteboardSvgComponentPresentationRenderers(renderers)
 }
 
 export function assertCanvasAppCustomItemRenderers(
   renderers: CanvasAppCustomItemRenderers,
 ) {
-  assertCanvasDemoSvgCustomItemRenderers(renderers)
+  assertCanvasWhiteboardSvgCustomItemRenderers(renderers)
 }
 
 export function createCanvasAppComponentPresentationRenderers(
   extensions: CanvasAppComponentPresentationRenderers = {},
 ): CanvasAppComponentPresentationRenderers {
-  return createCanvasDemoSvgComponentPresentationRenderers(extensions)
+  return createCanvasWhiteboardSvgComponentPresentationRenderers(extensions)
 }
 
 export function createCanvasAppCustomItemRenderers(
   extensions: CanvasAppCustomItemRenderers = {},
 ): CanvasAppCustomItemRenderers {
-  return createCanvasDemoSvgCustomItemRenderers(extensions)
+  return createCanvasWhiteboardSvgCustomItemRenderers(extensions)
 }
 
 export function getCanvasAppComponentPresentationRenderer({
@@ -58,7 +58,7 @@ export function getCanvasAppComponentPresentationRenderer({
   presentation: string
   renderers: CanvasAppComponentPresentationRenderers
 }): CanvasAppComponentRendererStrategy {
-  return getCanvasDemoSvgComponentPresentationRenderer({
+  return getCanvasWhiteboardSvgComponentPresentationRenderer({
     presentation,
     renderers,
   })
@@ -71,7 +71,7 @@ export function getCanvasAppCustomItemRenderer({
   item: CanvasCustomItem
   renderers: CanvasAppCustomItemRenderers
 }): CanvasAppCustomItemRendererEntry {
-  return getCanvasDemoSvgCustomItemRenderer({
+  return getCanvasWhiteboardSvgCustomItemRenderer({
     item,
     renderers,
   })

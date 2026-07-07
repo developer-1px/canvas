@@ -166,7 +166,7 @@ Current cleanup pass:
 
 | Date | Command | Result |
 | --- | --- | --- |
-| 2026-05-31 | `pnpm exec vitest run src/canvas/host/operations/CanvasItemRotationOperations.test.ts src/canvas/host/document/CanvasItemSchema.test.ts src/canvas/engine/overlay/CanvasOverlayEngine.test.ts src/canvas/app/rendering/CanvasDemoSvgItemFrame.test.tsx src/canvas/app/rendering/CanvasDemoSvgItemRenderer.test.tsx src/canvas/app/workflow/CanvasAppSelectionModel.test.ts` | Passed after #30 focused unit coverage: 6 files / 45 tests |
+| 2026-05-31 | `pnpm exec vitest run src/canvas/host/operations/CanvasItemRotationOperations.test.ts src/canvas/host/document/CanvasItemSchema.test.ts src/canvas/engine/overlay/CanvasOverlayEngine.test.ts src/canvas/app/rendering/CanvasWhiteboardSvgItemFrame.test.tsx src/canvas/app/rendering/CanvasWhiteboardSvgItemRenderer.test.tsx src/canvas/app/workflow/CanvasAppSelectionModel.test.ts` | Passed after #30 focused unit coverage: 6 files / 45 tests |
 | 2026-05-31 | `pnpm exec vitest run src/canvas/architecture/CanvasHostItemBoundaries.test.ts src/canvas/host/document/CanvasItemSchema.test.ts` | Passed after #30 architecture/schema boundary check: 2 files / 23 tests |
 | 2026-05-31 | `pnpm exec playwright test -g "object-specific toolbar"` | Passed after #30 focused e2e: 1 test |
 | 2026-05-31 | `pnpm exec tsc -b --pretty false` | Passed after #30 |
@@ -199,7 +199,7 @@ Current cleanup pass:
 | 2026-05-31 | `pnpm lint` | Passed after #25 |
 | 2026-05-31 | `pnpm exec playwright test -g "group and section\|layer controls\|minimal canvas affordance"` | Passed after #25 focused e2e: 3 tests |
 | 2026-05-31 | `pnpm test:e2e` | Passed after #25 layer-order coverage: 16 tests |
-| 2026-05-31 | `pnpm exec vitest run src/demo/CanvasDemoAssembly.test.ts src/canvas/host/comment/CanvasCommentItem.test.ts src/canvas/app/rendering/CanvasDemoSvgItemRenderer.test.tsx src/canvas/app/affordances/interaction/pointer/CanvasPointerInteractionStart.test.ts src/canvas/app/affordances/interaction/pointer/CanvasPointerCreationStart.test.ts src/canvas/app/affordances/editing/text-editor/CanvasTextEditingModel.test.ts` | Passed after #26: 6 files / 37 tests |
+| 2026-05-31 | `pnpm exec vitest run src/demo/CanvasDemoAssembly.test.ts src/canvas/host/comment/CanvasCommentItem.test.ts src/canvas/app/rendering/CanvasWhiteboardSvgItemRenderer.test.tsx src/canvas/app/affordances/interaction/pointer/CanvasPointerInteractionStart.test.ts src/canvas/app/affordances/interaction/pointer/CanvasPointerCreationStart.test.ts src/canvas/app/affordances/editing/text-editor/CanvasTextEditingModel.test.ts` | Passed after #26: 6 files / 37 tests |
 | 2026-05-31 | `pnpm exec tsc -b --pretty false` | Passed after #26 |
 | 2026-05-31 | `pnpm lint` | Passed after #26 |
 | 2026-05-31 | `pnpm exec playwright test -g "comments as independent|minimal canvas affordance"` | Passed after #26 focused e2e: 2 tests |
@@ -217,7 +217,7 @@ Current cleanup pass:
 | 2026-05-31 | `pnpm lint` | Passed after #14 |
 | 2026-05-31 | `pnpm test` | Passed after #14: 251 files / 930 tests |
 | 2026-05-31 | `pnpm build` | Passed after #14 |
-| 2026-05-31 | `pnpm exec vitest run src/canvas/host/shape/CanvasShapeItem.test.ts src/canvas/app/rendering/CanvasDemoSvgRectTextItemRenderer.test.tsx src/demo/CanvasDemoAssembly.test.ts` | Passed: 3 files / 9 tests |
+| 2026-05-31 | `pnpm exec vitest run src/canvas/host/shape/CanvasShapeItem.test.ts src/canvas/app/rendering/CanvasWhiteboardSvgRectTextItemRenderer.test.tsx src/demo/CanvasDemoAssembly.test.ts` | Passed: 3 files / 9 tests |
 | 2026-05-31 | `pnpm exec tsc -b --pretty false` | Passed after #15 |
 | 2026-05-31 | `pnpm test:e2e` | Passed after #15 shape resize/variant coverage: 10 tests |
 | 2026-05-31 | `pnpm lint` | Passed after #15 |
@@ -229,13 +229,13 @@ Current cleanup pass:
 | 2026-05-31 | `pnpm lint` | Passed after #16 |
 | 2026-05-31 | `pnpm test` | Passed after #16: 252 files / 932 tests |
 | 2026-05-31 | `pnpm build` | Passed after #16 |
-| 2026-05-31 | `pnpm exec vitest run src/canvas/app/workflow/CanvasAppSelectionModel.test.ts src/canvas/host/document/CanvasItemSchema.test.ts src/canvas/host/operations/CanvasItemLockOperations.test.ts src/canvas/app/rendering/CanvasDemoSvgItemRenderer.test.tsx src/demo/CanvasDemoAssembly.test.ts` | Passed after #17: 5 files / 36 tests |
+| 2026-05-31 | `pnpm exec vitest run src/canvas/app/workflow/CanvasAppSelectionModel.test.ts src/canvas/host/document/CanvasItemSchema.test.ts src/canvas/host/operations/CanvasItemLockOperations.test.ts src/canvas/app/rendering/CanvasWhiteboardSvgItemRenderer.test.tsx src/demo/CanvasDemoAssembly.test.ts` | Passed after #17: 5 files / 36 tests |
 | 2026-05-31 | `pnpm exec tsc -b --pretty false` | Passed after #17 |
 | 2026-05-31 | `pnpm test:e2e` | Passed after #17 section lifecycle coverage: 11 tests |
 | 2026-05-31 | `pnpm lint` | Passed after #17 |
 | 2026-05-31 | `pnpm test` | Passed after #17: 253 files / 938 tests |
 | 2026-05-31 | `pnpm build` | Passed after #17 |
-| 2026-05-31 | `pnpm exec vitest run src/canvas/host/operations/CanvasItemGroupOperations.test.ts src/canvas/host/operations/CanvasItemRemovalOperations.test.ts src/canvas/host/operations/CanvasItemCloneOperations.test.ts src/canvas/host/operations/CanvasItemTransformOperations.test.ts src/canvas/app/rendering/CanvasDemoSvgItemRenderer.test.tsx` | Passed after #18: 5 files / 21 tests |
+| 2026-05-31 | `pnpm exec vitest run src/canvas/host/operations/CanvasItemGroupOperations.test.ts src/canvas/host/operations/CanvasItemRemovalOperations.test.ts src/canvas/host/operations/CanvasItemCloneOperations.test.ts src/canvas/host/operations/CanvasItemTransformOperations.test.ts src/canvas/app/rendering/CanvasWhiteboardSvgItemRenderer.test.tsx` | Passed after #18: 5 files / 21 tests |
 | 2026-05-31 | `pnpm test:e2e` | Passed after #18 group duplicate/delete coverage: 11 tests |
 | 2026-05-31 | `pnpm exec tsc -b --pretty false` | Passed after #18 |
 | 2026-05-31 | `pnpm lint` | Passed after #18 |

@@ -1,6 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { CanvasRoot } from './CanvasRoot'
+import { CanvasRoot } from './demo/CanvasRoot'
 import './index.css'
 
 const themeMode = new URLSearchParams(window.location.search).get('theme')

@@ -16,13 +16,13 @@ describe('Canvas foundation boundaries', () => {
     expect(violations).toEqual([])
   })
 
-  it('keeps foundation free of Demo item storage vocabulary and json-document ownership', () => {
-    const demoItemTerms =
+  it('keeps foundation free of Whiteboard item storage vocabulary and json-document ownership', () => {
+    const whiteboardItemTerms =
       /\b(CanvasItem|RectItem|TextItem|GroupItem|CanvasComponentItem|CANVAS_COMPONENT_LIBRARY)\b/
     const violations = sourceFiles
       .filter((file) => file.path.startsWith('src/canvas/foundation/'))
       .flatMap((file) =>
-        demoItemTerms.test(file.source) ||
+        whiteboardItemTerms.test(file.source) ||
           file.source.includes('@interactive-os/json-document') ||
           file.source.includes('@interactive-os/json-document-')
           ? [file.path]
