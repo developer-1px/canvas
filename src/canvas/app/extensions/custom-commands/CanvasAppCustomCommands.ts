@@ -8,6 +8,11 @@ import type {
   CanvasAppCommitItemsChange,
   CanvasAppCommitSelection,
 } from '../../workspace/document/CanvasAppDocumentContracts'
+import type {
+  CanvasKeyboardShortcutChord,
+} from '../../affordances/interaction/keyboard/CanvasKeyboardShortcutChords'
+
+export type CanvasAppCustomCommandShortcut = CanvasKeyboardShortcutChord
 
 export type CanvasAppCustomCommandCommitItemsChange =
   CanvasAppCommitItemsChange
@@ -31,5 +36,6 @@ export type CanvasAppCustomCommand = {
   isEnabled?: (context: CanvasAppCustomCommandContext) => boolean
   label: string
   run: (context: CanvasAppCustomCommandContext) => void
+  shortcut?: CanvasAppCustomCommandShortcut
   title: string
 }

@@ -3,6 +3,11 @@ import {
   runCanvasKeyboardCommandIntent,
   type CanvasKeyboardCommandHandlers,
 } from './CanvasKeyboardCommandDispatch'
+import {
+  isCanvasKeyboardExtensionIntent,
+  runCanvasKeyboardExtensionIntent,
+  type CanvasKeyboardExtensionHandlers,
+} from './CanvasKeyboardExtensionDispatch'
 import type {
   CanvasKeyboardShortcutIntent,
 } from './CanvasKeyboardShortcutIntentContracts'
@@ -24,6 +29,7 @@ import {
 
 export type CanvasKeyboardShortcutDispatchHandlers =
   CanvasKeyboardCommandHandlers &
+  CanvasKeyboardExtensionHandlers &
   CanvasKeyboardSystemHandlers &
   CanvasKeyboardToolHandlers &
   CanvasKeyboardViewportHandlers
@@ -47,6 +53,11 @@ export function runCanvasKeyboardShortcutIntent({
 
   if (isCanvasKeyboardViewportIntent(intent)) {
     runCanvasKeyboardViewportIntent({ handlers, intent })
+    return true
+  }
+
+  if (isCanvasKeyboardExtensionIntent(intent)) {
+    runCanvasKeyboardExtensionIntent({ handlers, intent })
     return true
   }
 

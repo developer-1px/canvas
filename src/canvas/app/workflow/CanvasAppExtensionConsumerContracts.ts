@@ -44,7 +44,9 @@ export type CanvasAppExtensionControlContext = {
 }
 
 export type CanvasAppExtensionKeyboardContext = {
+  customCommands: readonly CanvasAppCustomCommandState[]
   customCreationTools: readonly CanvasAppCustomCreationToolState[]
+  runCustomCommand: (commandId: string) => void
 }
 
 export type CanvasAppExtensionPointerContext = {

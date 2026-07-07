@@ -280,6 +280,7 @@
 - App workflow, pointer interaction, text editing, feature pack은 Host editable text how를 직접 import하지 않고 App read model의 text target 계약 인스턴스를 소비한다. Whiteboard SVG renderer는 first-party whiteboard 구현으로 직접 사용이 허용되지만 item별 편집 판정은 주입된 `canEditText`를 따른다.
 - Custom item의 editable text는 내부 editable text union 확장이 아니라 custom item module의 textTarget 슬롯으로 등록한다. Host document set-text patch는 하드코딩된 판정 대신 주입된 text target 계약으로 판정·계획하며, 미주입 시 whiteboard 기본 구현을 쓴다.
 - Custom creation tool은 `enterTextEdit` descriptor로 생성 직후 edit 진입을 선언한다. Edit 상태는 commit 성공과 text target의 편집 허용을 모두 만족할 때만 만들어지고, 불만족은 실패가 아니라 edit 생략으로 containment 한다.
+- Custom command는 `shortcut` descriptor로 keyboard chord를 등록한다. 예약 built-in shortcut, custom tool shortcut, 다른 custom command shortcut과의 충돌은 Canvas App Extension Shortcut Contracts가 assembly 단계에서 실패시키고, keydown 매칭은 disabled command를 건너뛰며 실행은 extension runtime의 containment를 그대로 쓴다.
 - Image의 stable item type은 Entities Contract가 소유하고, image data URL/mime/natural size/bounds 저장 shape 검증은 Host Canvas Image Item Module이 소유한다.
 - Comment의 stable item type은 Entities Contract가 소유하고, body/attached target/resolved/bounds 저장 shape 검증은 Host Canvas Comment Item Module이 소유한다.
 - Stamp/sticker의 stable item type은 Entities Contract가 소유하고, stamp id/label/bounds 저장 shape 검증은 Host Canvas Stamp Item Module이 소유한다.

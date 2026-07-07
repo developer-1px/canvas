@@ -125,6 +125,7 @@ function createHandlers(
     setGesture: vi.fn(),
     setMarquee: vi.fn(),
     setSpaceDown: vi.fn(),
+    runCustomCommand: vi.fn(),
     setTool: vi.fn(),
     undoHistory: vi.fn(),
     ungroupSelection: vi.fn(),

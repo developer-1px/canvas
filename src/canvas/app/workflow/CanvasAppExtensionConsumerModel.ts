@@ -16,7 +16,9 @@ export function getCanvasAppExtensionConsumerModel({
       onRunCustomCommand: runCustomCommand,
     },
     keyboard: {
+      customCommands: customCommandStates,
       customCreationTools: customCreationToolStates,
+      runCustomCommand,
     },
     pointer: {
       customCreationTools,

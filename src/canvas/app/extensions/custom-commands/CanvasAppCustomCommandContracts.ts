@@ -1,6 +1,8 @@
 import {
   assertCanvasAppDescriptorFunctionField,
+  assertCanvasAppDescriptorObject,
   assertCanvasAppDescriptorStringField,
+  assertCanvasAppOptionalDescriptorBooleanField,
   assertCanvasAppOptionalDescriptorFunctionField,
   assertCanvasAppOptionalDescriptorStringField,
 } from '../CanvasAppDescriptorContracts'
@@ -43,5 +45,19 @@ export function assertCanvasAppCustomCommands(
       owner,
       value: command.isEnabled,
     })
+
+    if (command.shortcut !== undefined) {
+      assertCanvasAppDescriptorObject(command.shortcut, `${owner} shortcut`)
+      assertCanvasAppDescriptorStringField({
+        field: 'shortcut.key',
+        owner,
+        value: command.shortcut.key,
+      })
+      assertCanvasAppOptionalDescriptorBooleanField({
+        field: 'shortcut.shiftKey',
+        owner,
+        value: command.shortcut.shiftKey,
+      })
+    }
   }
 }
