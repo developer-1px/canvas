@@ -1,3 +1,4 @@
+import { CANVAS_APP_TEXT_TARGET } from '../../editing/text-editor/CanvasAppTextTarget'
 import { describe, expect, it, vi } from 'vitest'
 import type { CanvasItem } from '../../../../entities'
 import {
@@ -300,7 +301,8 @@ const creationAdapter: CanvasCreationAdapter<CanvasItem> = {
 }
 
 const emptyItemReadModel: CanvasAppItemReadModel = {
-  findEditableTextItem: () => null,
+  findTextEditTarget: () => null,
+  textTarget: CANVAS_APP_TEXT_TARGET,
   findItem: () => undefined,
   getAllIds: () => [],
   getAllItems: () => [],

@@ -11,7 +11,6 @@ import type {
   Viewport,
 } from '../../entities'
 import type { CanvasAffordanceConfig } from '../../engine'
-import { CANVAS_APP_TEXT_TARGET } from '../affordances/editing/text-editor/CanvasAppTextTarget'
 import { useCanvasTextEditing } from '../affordances/editing/text-editor/useCanvasTextEditing'
 import {
   shouldUseCanvasContentEditableText,
@@ -61,10 +60,10 @@ export function useCanvasTextEditorModel({
   const [dismissedInlineTextId, setDismissedInlineTextId] =
     useState<string | null>(null)
   const editingItem = editing
-    ? itemReadModel.findEditableTextItem(editing.id)
+    ? itemReadModel.findTextEditTarget(editing.id)
     : null
   const selectedInlineTextItem = selection.length === 1
-    ? itemReadModel.findEditableTextItem(selection[0] ?? '')
+    ? itemReadModel.findTextEditTarget(selection[0] ?? '')
     : null
   const selectedInlineTextId =
     shouldUseCanvasContentEditableText(selectedInlineTextItem)
@@ -83,6 +82,7 @@ export function useCanvasTextEditorModel({
     editorRef,
     selection,
     setEditing,
+    textTarget: itemReadModel.textTarget,
     viewport,
   })
 
@@ -112,7 +112,7 @@ export function useCanvasTextEditorModel({
           ? current
           : {
             id: selectedInlineTextId,
-            value: CANVAS_APP_TEXT_TARGET.getValue(selectedInlineTextItem),
+            value: itemReadModel.textTarget.getValue(selectedInlineTextItem),
           }
       )
     })
@@ -121,12 +121,13 @@ export function useCanvasTextEditorModel({
   }, [
     config.overlays.textEditor,
     dismissedInlineTextId,
+    itemReadModel.textTarget,
     selectedInlineTextId,
     selectedInlineTextItem,
   ])
 
   const commitOnEnter = editingItem
-    ? CANVAS_APP_TEXT_TARGET.commitsOnEnter(editingItem)
+    ? itemReadModel.textTarget.commitsOnEnter(editingItem)
     : true
   const useContentEditableText = shouldUseCanvasContentEditableText(editingItem)
   const setEditorElement = useCallback((element: HTMLElement | null) => {

@@ -17,7 +17,6 @@ import type {
 import type {
   Bounds,
   CanvasArrowEndpoint,
-  CanvasEditableTextItem,
   CanvasItem,
   EditingText,
   Point,
@@ -47,7 +46,8 @@ export type CanvasAppPointerItemLayerHandlers = {
     event: CanvasAppPointerInput,
     itemId: string,
   ) => void
-  onTextDoubleClick: (item: CanvasEditableTextItem) => void
+  canEditText: (item: CanvasItem) => boolean
+  onTextDoubleClick: (item: CanvasItem) => void
 }
 
 export type CanvasAppPointerStageHandlers = {
@@ -81,7 +81,8 @@ export type CanvasAppPointerDownRuntime = {
     event: CanvasAppPointerInput,
     handle: ResizeHandle,
   ) => void
-  handleTextDoubleClick: (item: CanvasEditableTextItem) => void
+  canEditText: (item: CanvasItem) => boolean
+  handleTextDoubleClick: (item: CanvasItem) => void
 }
 
 export type CanvasAppPointerDragRuntime = {

@@ -1,5 +1,4 @@
 import type {
-  CanvasEditableTextItem,
   CanvasItem,
   EditingText,
   Point,
@@ -11,7 +10,10 @@ import {
   type CanvasAffordanceConfig,
   type CanvasSceneAdapter,
 } from '../../../../engine'
-import { CANVAS_APP_TEXT_TARGET } from '../../editing/text-editor/CanvasAppTextTarget'
+import {
+  CANVAS_APP_TEXT_TARGET,
+  type CanvasAppTextTarget,
+} from '../../editing/text-editor/CanvasAppTextTarget'
 import type { CanvasAppItemReadModel } from '../../../workflow/CanvasAppItemReadModelContracts'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import type { Interaction } from './CanvasInteractionState'
@@ -51,7 +53,8 @@ export type CanvasItemPointerInteractionStartInput = {
 
 export type CanvasTextEditInteractionStartInput = {
   config: CanvasAffordanceConfig
-  item: CanvasEditableTextItem
+  item: CanvasItem
+  textTarget?: CanvasAppTextTarget
 }
 
 export type CanvasTextEditInteractionStartResult =
@@ -83,7 +86,7 @@ export function startCanvasItemPointerInteraction({
   })
   const editItem =
     itemIntent.textEdit
-      ? itemReadModel.findEditableTextItem(itemId)
+      ? itemReadModel.findTextEditTarget(itemId)
       : null
   const itemSelection = getCanvasItemPointerSelection({
     additive: itemIntent.additive,
@@ -156,7 +159,9 @@ export function startCanvasItemPointerInteraction({
       startItems,
       currentItems: startItems,
       historyItems,
-      edit: editItem ? createCanvasItemEditState(editItem) : undefined,
+      edit: editItem
+        ? createCanvasItemEditState(editItem, itemReadModel.textTarget)
+        : undefined,
       moved: false,
     },
     kind: 'move',
@@ -168,13 +173,14 @@ export function startCanvasItemPointerInteraction({
 export function startCanvasTextEditInteraction({
   config,
   item,
+  textTarget = CANVAS_APP_TEXT_TARGET,
 }: CanvasTextEditInteractionStartInput): CanvasTextEditInteractionStartResult {
   if (!config.gestures.textEdit) {
     return { kind: 'none' }
   }
 
   return {
-    editing: createCanvasItemEditState(item),
+    editing: createCanvasItemEditState(item, textTarget),
     kind: 'text-edit',
     selection: [item.id],
     tool: 'select',
@@ -182,10 +188,11 @@ export function startCanvasTextEditInteraction({
 }
 
 function createCanvasItemEditState(
-  item: CanvasEditableTextItem,
+  item: CanvasItem,
+  textTarget: CanvasAppTextTarget,
 ): EditingText {
   return {
     id: item.id,
-    value: CANVAS_APP_TEXT_TARGET.getValue(item),
+    value: textTarget.getValue(item),
   }
 }

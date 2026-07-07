@@ -9,8 +9,12 @@ import {
   useCanvasWorkspacePersistence,
 } from '../workspace/document/CanvasWorkspacePersistence'
 import type {
+  CanvasAppCustomItemTextTargets,
+} from '../extensions/custom-item-modules/CanvasAppCustomItemTextTargetContracts'
+import type {
   CanvasAppCustomItemValidators,
 } from '../extensions/custom-item-modules/CanvasAppCustomItemValidatorContracts'
+import { createCanvasAppTextTarget } from '../affordances/editing/text-editor/CanvasAppTextTarget'
 import { useCanvasDocument } from '../workspace/document/useCanvasDocument'
 import { getCanvasWorkspaceConsumerModel } from './CanvasWorkspaceConsumerModel'
 import {
@@ -20,11 +24,13 @@ import {
 } from './CanvasWorkspaceRuntimeModel'
 
 export function useCanvasWorkspaceModel({
+  customItemTextTargets,
   customItemValidators,
   initialItems,
   initialSelection,
   storageProvider,
 }: {
+  customItemTextTargets?: CanvasAppCustomItemTextTargets
   customItemValidators?: CanvasAppCustomItemValidators
   initialItems: CanvasItem[]
   initialSelection: readonly string[]
@@ -33,6 +39,10 @@ export function useCanvasWorkspaceModel({
   const validation = useMemo(
     () => ({ customItemValidators }),
     [customItemValidators],
+  )
+  const textTarget = useMemo(
+    () => createCanvasAppTextTarget(customItemTextTargets),
+    [customItemTextTargets],
   )
   const storedWorkspace = useMemo(
     () => readStoredCanvasWorkspace(storageProvider(), validation),
@@ -50,6 +60,7 @@ export function useCanvasWorkspaceModel({
     initialState.items,
     initialState.selection,
     validation,
+    textTarget,
   )
   const [viewport, setViewport] = useState(() => initialState.viewport)
   const {
@@ -62,8 +73,9 @@ export function useCanvasWorkspaceModel({
       getCanvasWorkspaceRuntimeModel({
         items: document.items,
         selection: document.selection,
+        textTarget,
       }),
-    [document.items, document.selection],
+    [document.items, document.selection, textTarget],
   )
 
   useCanvasWorkspacePersistence({

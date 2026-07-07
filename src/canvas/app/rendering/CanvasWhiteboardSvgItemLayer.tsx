@@ -1,7 +1,6 @@
 import type { PointerEvent } from 'react'
 import type {
   CanvasArrowEndpoint,
-  CanvasEditableTextItem,
   CanvasItem,
 } from '../../entities'
 import {
@@ -30,7 +29,8 @@ type CanvasWhiteboardSvgItemLayerProps = {
     itemId: string,
     endpoint: CanvasArrowEndpoint,
   ) => void
-  onTextDoubleClick: (item: CanvasEditableTextItem) => void
+  canEditText: (item: CanvasItem) => boolean
+  onTextDoubleClick: (item: CanvasItem) => void
 }
 
 export function CanvasWhiteboardSvgItemLayer({
@@ -41,6 +41,7 @@ export function CanvasWhiteboardSvgItemLayer({
   items,
   onArrowEndpointPointerDown,
   onItemPointerDown,
+  canEditText,
   onTextDoubleClick,
   outlineIds,
   selected,
@@ -56,6 +57,7 @@ export function CanvasWhiteboardSvgItemLayer({
           locked: false,
           onArrowEndpointPointerDown,
           onItemPointerDown,
+          canEditText,
           onTextDoubleClick,
           outlineIds,
           selected,

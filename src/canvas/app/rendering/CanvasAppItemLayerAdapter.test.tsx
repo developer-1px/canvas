@@ -1,3 +1,4 @@
+import { CANVAS_APP_TEXT_TARGET } from '../affordances/editing/text-editor/CanvasAppTextTarget'
 import {
   isValidElement,
   type ReactElement,
@@ -17,6 +18,7 @@ describe('CanvasAppItemLayerAdapter', () => {
       items: [],
       onArrowEndpointPointerDown,
       onItemPointerDown,
+      canEditText: (item) => CANVAS_APP_TEXT_TARGET.canEdit(item),
       onTextDoubleClick: () => undefined,
       outlineIds: new Set(),
       selected: new Set(),

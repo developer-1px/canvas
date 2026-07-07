@@ -1,3 +1,4 @@
+import { CANVAS_APP_TEXT_TARGET } from '../affordances/editing/text-editor/CanvasAppTextTarget'
 import { describe, expect, it, vi } from 'vitest'
 import type { CanvasItem } from '../../entities'
 import type { CanvasAppItemReadModel } from './CanvasAppItemReadModelContracts'
@@ -419,11 +420,12 @@ function createSelectionModel({
 
 function createItemReadModel(items: CanvasItem[]): CanvasAppItemReadModel {
   return {
-    findEditableTextItem: (id) => {
+    findTextEditTarget: (id: string) => {
       const item = items.find((candidate) => candidate.id === id)
 
       return item?.type === 'text' ? item : null
     },
+    textTarget: CANVAS_APP_TEXT_TARGET,
     findItem: (id) => items.find((item) => item.id === id),
     getAllIds: () => items.map((item) => item.id),
     getAllItems: () => items,

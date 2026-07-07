@@ -42,7 +42,8 @@
 - Canvas Editable Text Item: `RectItem | TextItem | CanvasComponentItem` stable entity type은 Entities Contract가 소유하고, rect/text/sticky component body가 공유하는 editable target 판정, 저장 shape, edit initial value, commit fallback, patch field/operation은 Host-owned text Module이 소유한다.
 - Canvas Extension Text Target Contract: item 저장 shape를 import하지 않고 editable text 판정, 현재 값, commit 값 보정, editor bounds projection, enter commit 규칙, commit patch update 계획을 명시하는 Foundation-owned capability 계약.
 - Canvas Whiteboard Text Target: Whiteboard Host editable text 규칙을 Canvas Extension Text Target Contract 구현으로 노출하는 Host-owned first-party text target Adapter.
-- Canvas App Text Target: App workflow, pointer interaction, text editing, feature pack이 소비하는 활성 text target 계약 인스턴스를 노출하는 App-owned seam Module. 향후 assembly 주입과 custom item module text target 합성의 단일 교체 지점이다.
+- Canvas App Text Target: App workflow, pointer interaction, text editing, feature pack이 소비하는 활성 text target 계약 인스턴스를 노출하는 App-owned seam Module. custom item text target registry를 whiteboard 기본 구현과 합성하는 composite factory를 소유한다.
+- Canvas App Custom Item Text Target: custom item module이 자신의 item kind에 editable text capability를 선언하는 App-owned text target descriptor. Module assembly가 kind별 registry로 합성하고 Canvas App Text Target composite와 Host document set-text가 소비한다.
 - Canvas Image Item: 업로드/붙여넣기/다운로드 대상이 되는 persisted image item type은 Entities Contract가 소유하고, data URL, mime type, natural size, positive bounds 저장 shape 검증은 Host-owned image Module이 소유한다.
 - Canvas Comment Item: 공통 화이트보드 comment persisted item type은 Entities Contract가 소유하고, body, optional attached item id, resolved state, positive bounds 저장 shape 검증은 Host-owned comment Module이 소유한다.
 - Canvas Stamp Item: 공통 화이트보드 스티커/스탬프 persisted item type은 Entities Contract가 소유하고, stable stamp id, visible label, positive bounds 저장 shape 검증은 Host-owned stamp Module이 소유한다. Stamp는 선택 객체에 붙는 reaction이 아니라 sticky처럼 독립적으로 생성·선택되는 item이다.
@@ -276,7 +277,8 @@
 - 기본 드로잉 item의 style 기본값은 Host Drawing Item Style Module이 소유하고 draft overlay와 item creation이 재사용한다.
 - Rect/text/sticky component body의 stable editable text item type은 Entities Contract가 소유하고, editable text 판정, 저장 shape 검증, initial edit value, empty text fallback, field별 add/replace patch 여부는 Host Canvas Editable Text Item Module이 소유한다.
 - Editable text capability의 계약 shape는 Foundation Canvas Extension Text Target Contract가 소유하고, Whiteboard Host 구현은 Canvas Whiteboard Text Target이 소유한다. 새 text-editable item 계열은 closed union 확장이 아니라 이 계약 구현 등록으로 수렴한다.
-- App workflow, pointer interaction, text editing, feature pack은 Host editable text how를 직접 import하지 않고 Canvas App Text Target seam의 계약 인스턴스를 소비한다. Whiteboard SVG renderer는 first-party whiteboard 구현으로 직접 사용이 허용된다.
+- App workflow, pointer interaction, text editing, feature pack은 Host editable text how를 직접 import하지 않고 App read model의 text target 계약 인스턴스를 소비한다. Whiteboard SVG renderer는 first-party whiteboard 구현으로 직접 사용이 허용되지만 item별 편집 판정은 주입된 `canEditText`를 따른다.
+- Custom item의 editable text는 내부 editable text union 확장이 아니라 custom item module의 textTarget 슬롯으로 등록한다. Host document set-text patch는 하드코딩된 판정 대신 주입된 text target 계약으로 판정·계획하며, 미주입 시 whiteboard 기본 구현을 쓴다.
 - Image의 stable item type은 Entities Contract가 소유하고, image data URL/mime/natural size/bounds 저장 shape 검증은 Host Canvas Image Item Module이 소유한다.
 - Comment의 stable item type은 Entities Contract가 소유하고, body/attached target/resolved/bounds 저장 shape 검증은 Host Canvas Comment Item Module이 소유한다.
 - Stamp/sticker의 stable item type은 Entities Contract가 소유하고, stamp id/label/bounds 저장 shape 검증은 Host Canvas Stamp Item Module이 소유한다.

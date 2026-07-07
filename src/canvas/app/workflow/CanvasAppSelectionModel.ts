@@ -25,7 +25,6 @@ import {
   type CanvasFlipAxis,
   type CanvasZOrderMode,
 } from '../../host'
-import { CANVAS_APP_TEXT_TARGET } from '../affordances/editing/text-editor/CanvasAppTextTarget'
 import type { CanvasAppItemReadModel } from './CanvasAppItemReadModelContracts'
 import type { CanvasAppStampVotingSessionContext } from './CanvasAppStampConsumerContracts'
 import type {
@@ -382,7 +381,7 @@ export function editCanvasAppSelectionText({
   }
 
   const [id] = selection
-  const item = id ? itemReadModel.findEditableTextItem(id) : null
+  const item = id ? itemReadModel.findTextEditTarget(id) : null
 
   if (!item) {
     return false
@@ -390,7 +389,7 @@ export function editCanvasAppSelectionText({
 
   setEditing({
     id: item.id,
-    value: CANVAS_APP_TEXT_TARGET.getValue(item),
+    value: itemReadModel.textTarget.getValue(item),
   })
   return true
 }

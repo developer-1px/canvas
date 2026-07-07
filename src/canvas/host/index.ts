@@ -265,7 +265,10 @@ export {
   isCanvasTextItem,
   shouldCommitCanvasEditableTextOnEnter,
 } from './text/CanvasEditableTextItem'
-export { CANVAS_WHITEBOARD_TEXT_TARGET } from './text/CanvasWhiteboardTextTarget'
+export {
+  CANVAS_WHITEBOARD_TEXT_TARGET,
+  type CanvasItemTextTarget,
+} from './text/CanvasWhiteboardTextTarget'
 
 export type { CanvasItemsChange } from './document/CanvasDocumentChanges'
 export {
@@ -282,7 +285,8 @@ export {
   validateCanvasItems as normalizeCanvasItems,
   type CanvasItemValidationOptions,
 } from './document/CanvasItemSchema'
-export type {
-  CanvasCustomItemValidator,
-  CanvasCustomItemValidators,
+export {
+  isCanvasCustomItem,
+  type CanvasCustomItemValidator,
+  type CanvasCustomItemValidators,
 } from './document/CanvasCustomItemValidation'

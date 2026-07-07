@@ -1,3 +1,4 @@
+import { CANVAS_APP_TEXT_TARGET } from '../affordances/editing/text-editor/CanvasAppTextTarget'
 import {
   isValidElement,
   type ReactElement,
@@ -293,6 +294,7 @@ function createPointerModel(): CanvasAppStageModelInput['pointer'] {
     itemLayerHandlers: {
       onArrowEndpointPointerDown: vi.fn(),
       onItemPointerDown: vi.fn(),
+      canEditText: (item) => CANVAS_APP_TEXT_TARGET.canEdit(item),
       onTextDoubleClick: vi.fn(),
     },
     stageHandlers: {

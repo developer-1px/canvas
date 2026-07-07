@@ -7,7 +7,6 @@ import { useRef } from 'react'
 import type {
   Bounds,
   CanvasArrowEndpoint,
-  CanvasEditableTextItem,
   CanvasItem,
   EditingText,
   Point,
@@ -278,8 +277,12 @@ export function useCanvasPointerDownHandlers({
     })
   }
 
-  function handleTextDoubleClick(item: CanvasEditableTextItem) {
-    const start = startCanvasTextEditInteraction({ config, item })
+  function handleTextDoubleClick(item: CanvasItem) {
+    const start = startCanvasTextEditInteraction({
+      config,
+      item,
+      textTarget: itemReadModel.textTarget,
+    })
 
     applyCanvasTextEditInteractionStartEffect({
       context: startEffectContext,
@@ -288,6 +291,7 @@ export function useCanvasPointerDownHandlers({
   }
 
   return {
+    canEditText: (item: CanvasItem) => itemReadModel.textTarget.canEdit(item),
     handleArrowEndpointPointerDown,
     handleCanvasPointerDown,
     handleItemPointerDown,

@@ -9,6 +9,8 @@ import {
   shouldCommitCanvasEditableTextOnEnter,
 } from './CanvasEditableTextItem'
 
+export type CanvasItemTextTarget = CanvasExtensionTextTargetContract<CanvasItem>
+
 export const CANVAS_WHITEBOARD_TEXT_TARGET = {
   canEdit: (item) => isCanvasEditableTextItem(item),
   commitsOnEnter: (item) =>

@@ -22,6 +22,9 @@ import {
   assertCanvasAppCustomItemModule,
 } from './CanvasAppCustomItemModuleContracts'
 import type {
+  CanvasAppCustomItemTextTarget,
+} from './CanvasAppCustomItemTextTargetContracts'
+import type {
   CanvasAppCustomItemValidator,
 } from './CanvasAppCustomItemValidatorContracts'
 import {
@@ -56,6 +59,7 @@ export type CanvasAppCustomItemModule = {
   getRenderKey?: CanvasAppCustomItemRenderKeyStrategy
   renderItem: CanvasAppCustomItemRendererStrategy
   textPasteImporters?: readonly CanvasTextPasteImporter[]
+  textTarget?: CanvasAppCustomItemTextTarget
   validateItem: CanvasAppCustomItemValidator
 }
 

@@ -1,3 +1,4 @@
+import { CANVAS_APP_TEXT_TARGET } from '../affordances/editing/text-editor/CanvasAppTextTarget'
 import { describe, expect, it, vi } from 'vitest'
 import type { CanvasSceneAdapter } from '../../engine'
 import type { CanvasItem } from '../../entities'
@@ -198,7 +199,8 @@ function createItemReadModel({
   items: CanvasItem[]
 }): CanvasAppItemReadModel {
   return {
-    findEditableTextItem: vi.fn(() => null),
+    findTextEditTarget: vi.fn(() => null),
+    textTarget: CANVAS_APP_TEXT_TARGET,
     findItem: vi.fn((id: string) => items.find((item) => item.id === id)),
     getAllIds: vi.fn(() => items.map((item) => item.id)),
     getAllItems: vi.fn(() => items),

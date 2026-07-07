@@ -1,3 +1,4 @@
+import { CANVAS_APP_TEXT_TARGET } from '../affordances/editing/text-editor/CanvasAppTextTarget'
 import { describe, expect, it, vi } from 'vitest'
 import { renderToStaticMarkup } from 'react-dom/server'
 import type {
@@ -19,14 +20,17 @@ describe('CanvasWhiteboardSvgItemRenderRouting', () => {
 
     const stickyRoute = getCanvasWhiteboardSvgItemRenderRoute({
       ...createInput(sticky),
+      canEditText: (item: CanvasItem) => CANVAS_APP_TEXT_TARGET.canEdit(item),
       onTextDoubleClick,
     })
     const cardRoute = getCanvasWhiteboardSvgItemRenderRoute({
       ...createInput(card),
+      canEditText: (item: CanvasItem) => CANVAS_APP_TEXT_TARGET.canEdit(item),
       onTextDoubleClick,
     })
     const sectionRoute = getCanvasWhiteboardSvgItemRenderRoute({
       ...createInput(section),
+      canEditText: (item: CanvasItem) => CANVAS_APP_TEXT_TARGET.canEdit(item),
       onTextDoubleClick,
     })
 
@@ -46,6 +50,7 @@ describe('CanvasWhiteboardSvgItemRenderRouting', () => {
 
     const route = getCanvasWhiteboardSvgItemRenderRoute({
       ...createInput(arrow),
+      canEditText: (item: CanvasItem) => CANVAS_APP_TEXT_TARGET.canEdit(item),
       onTextDoubleClick,
     })
 
@@ -60,6 +65,7 @@ describe('CanvasWhiteboardSvgItemRenderRouting', () => {
 
     const route = getCanvasWhiteboardSvgItemRenderRoute({
       ...createInput(comment),
+      canEditText: (item: CanvasItem) => CANVAS_APP_TEXT_TARGET.canEdit(item),
       onTextDoubleClick,
     })
 
@@ -112,6 +118,7 @@ function createInput(item: CanvasItem) {
     item,
     locked: false,
     onArrowEndpointPointerDown: () => undefined,
+    canEditText: (item: CanvasItem) => CANVAS_APP_TEXT_TARGET.canEdit(item),
     onTextDoubleClick: () => undefined,
     renderChild: () => null,
     selected: false,

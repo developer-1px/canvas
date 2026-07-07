@@ -1,6 +1,7 @@
 import type { JSONPatchOperation } from '@interactive-os/json-document'
 import type { Bounds, CanvasSelectionIds } from '../../core'
 import type { CanvasItem } from '../model'
+import type { CanvasItemTextTarget } from '../text/CanvasWhiteboardTextTarget'
 import {
   createAddCanvasItemsPatch,
   createGroupCanvasItemsPatch,
@@ -44,6 +45,7 @@ type CanvasItemsChangePatchBuilder<
 > = (args: {
   change: Extract<CanvasItemsChange, { type: TType }>
   currentItems: CanvasItem[]
+  textTarget?: CanvasItemTextTarget
 }) => JSONPatchOperation[]
 
 type CanvasItemsChangePatchBuilders = {
@@ -53,6 +55,7 @@ type CanvasItemsChangePatchBuilders = {
 type CanvasItemsAnyChangePatchBuilder = (args: {
   change: CanvasItemsChange
   currentItems: CanvasItem[]
+  textTarget?: CanvasItemTextTarget
 }) => JSONPatchOperation[]
 
 const CANVAS_ITEMS_CHANGE_PATCH_BUILDERS = Object.freeze({
@@ -80,8 +83,13 @@ const CANVAS_ITEMS_CHANGE_PATCH_BUILDERS = Object.freeze({
       change.from,
       change.to,
     ),
-  'set-text': ({ change, currentItems }) =>
-    createSetCanvasItemTextPatch(currentItems, change.id, change.text),
+  'set-text': ({ change, currentItems, textTarget }) =>
+    createSetCanvasItemTextPatch(
+      currentItems,
+      change.id,
+      change.text,
+      textTarget,
+    ),
   transform: ({ change }) =>
     createTransformCanvasItemsPatch(change.beforeItems, change.afterItems),
   'ungroup-selection': ({ change, currentItems }) =>
@@ -91,10 +99,11 @@ const CANVAS_ITEMS_CHANGE_PATCH_BUILDERS = Object.freeze({
 export function createCanvasItemsChangePatch(
   currentItems: CanvasItem[],
   change: CanvasItemsChange,
+  textTarget?: CanvasItemTextTarget,
 ) {
   const builder = CANVAS_ITEMS_CHANGE_PATCH_BUILDERS[
     change.type
   ] as CanvasItemsAnyChangePatchBuilder
 
-  return builder({ change, currentItems })
+  return builder({ change, currentItems, textTarget })
 }

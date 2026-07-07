@@ -1,5 +1,5 @@
 import type {
-  CanvasEditableTextItem,
+  CanvasItem,
   EditingText,
   Viewport,
 } from '../../../../entities'
@@ -11,20 +11,24 @@ import {
   isCanvasTextItem,
   isCanvasStickyComponentItem,
 } from '../../../../host'
-import { CANVAS_APP_TEXT_TARGET } from './CanvasAppTextTarget'
+import {
+  CANVAS_APP_TEXT_TARGET,
+  type CanvasAppTextTarget,
+} from './CanvasAppTextTarget'
 import type { CommitCanvasItemsChange } from '../../../workflow/CanvasWorkflowContract'
 import {
   isCanvasKeyboardTypingTarget,
 } from '../../interaction/keyboard/CanvasKeyboardShortcutIntent'
 
-export type EditableCanvasTextItem = CanvasEditableTextItem
+export type EditableCanvasTextItem = CanvasItem
 
 type CommitCanvasTextEditingArgs = {
   commitItemsChange: CommitCanvasItemsChange
   editing: EditingText | null
-  editingItem: CanvasEditableTextItem | null
+  editingItem: CanvasItem | null
   selection: string[]
   setEditing: (nextEditing: EditingText | null) => void
+  textTarget?: CanvasAppTextTarget
 }
 
 export type CanvasPrintableTextEditStartIntent =
@@ -45,7 +49,7 @@ export type CanvasPrintableTextEditStartKeyboardEvent = Pick<
 >
 
 export type CanvasPrintableTextEditStartInput = {
-  editingItem: CanvasEditableTextItem | null
+  editingItem: CanvasItem | null
   event: CanvasPrintableTextEditStartKeyboardEvent
   isReservedShortcut?: (
     event: CanvasPrintableTextEditStartKeyboardEvent,
@@ -73,6 +77,7 @@ export function commitCanvasTextEditing({
   editingItem,
   selection,
   setEditing,
+  textTarget = CANVAS_APP_TEXT_TARGET,
 }: CommitCanvasTextEditingArgs) {
   if (!editing) {
     return
@@ -83,7 +88,7 @@ export function commitCanvasTextEditing({
     return
   }
 
-  const value = getCommittedCanvasTextValue({ editing, editingItem })
+  const value = getCommittedCanvasTextValue({ editing, editingItem, textTarget })
 
   commitItemsChange({ type: 'set-text', id: editing.id, text: value }, {
     before: selection,
@@ -131,16 +136,18 @@ export function isCanvasPrintableKeyboardKey(key: string): boolean {
 export function getCanvasTextEditorStyle({
   editing,
   editingItem,
+  textTarget = CANVAS_APP_TEXT_TARGET,
   viewport,
 }: {
   editing: EditingText | null
-  editingItem: CanvasEditableTextItem | null
+  editingItem: CanvasItem | null
+  textTarget?: CanvasAppTextTarget
   viewport: Viewport
 }): CanvasTextEditorStyle | undefined {
   if (!editing || !editingItem) {
     return undefined
   }
-  const bounds = CANVAS_APP_TEXT_TARGET.getEditorBounds(editingItem)
+  const bounds = textTarget.getEditorBounds(editingItem)
 
   if (!bounds) {
     return undefined
@@ -160,13 +167,13 @@ export function getCanvasTextEditorStyle({
 }
 
 export function shouldUseCanvasContentEditableText(
-  item: CanvasEditableTextItem | null,
+  item: CanvasItem | null,
 ) {
   return item !== null &&
     (isCanvasStickyComponentItem(item) || isCanvasTextItem(item))
 }
 
-function getCanvasTextEditorFontSize(item: CanvasEditableTextItem) {
+function getCanvasTextEditorFontSize(item: CanvasItem) {
   return 'fontSize' in item && typeof item.fontSize === 'number'
     ? item.fontSize
     : CANVAS_TEXT_EDITOR_DEFAULT_STYLE.fontSize
@@ -175,11 +182,13 @@ function getCanvasTextEditorFontSize(item: CanvasEditableTextItem) {
 function getCommittedCanvasTextValue({
   editing,
   editingItem,
+  textTarget,
 }: {
   editing: EditingText
-  editingItem: CanvasEditableTextItem
+  editingItem: CanvasItem
+  textTarget: CanvasAppTextTarget
 }) {
-  return CANVAS_APP_TEXT_TARGET.getCommittedValue({
+  return textTarget.getCommittedValue({
     item: editingItem,
     value: editing.value,
   })

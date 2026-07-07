@@ -1,3 +1,4 @@
+import { CANVAS_APP_TEXT_TARGET } from '../../editing/text-editor/CanvasAppTextTarget'
 import { describe, expect, it, vi } from 'vitest'
 import type { CanvasItem } from '../../../../entities'
 import {
@@ -216,11 +217,12 @@ function createTestCanvasItemReadModel(
   scene: ReturnType<typeof createTestCanvasScene>,
 ): CanvasAppItemReadModel {
   return {
-    findEditableTextItem: (id) => {
+    findTextEditTarget: (id: string) => {
       const item = items.find((item) => item.id === id)
 
       return item && isCanvasEditableTextItem(item) ? item : null
     },
+    textTarget: CANVAS_APP_TEXT_TARGET,
     findItem: (id) => items.find((item) => item.id === id),
     getAllIds: () => items.map((item) => item.id),
     getAllItems: () => items,

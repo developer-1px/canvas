@@ -21,6 +21,7 @@ describe('CanvasAppExtensionBundle', () => {
       customCommands: [],
       customCreationTools: [],
       customItemRenderers: {},
+      customItemTextTargets: {},
       customItemValidators: {},
       foundationExtensions: [],
       inspectorPanels: [],

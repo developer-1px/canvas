@@ -66,10 +66,10 @@ describe('Canvas host item boundaries', () => {
       "item?.type === 'rect' || item?.type === 'text'",
     )
     expect(documentPatchesFile.source).toContain(
-      'isCanvasEditableTextItem(entry.item)',
+      'textTarget.canEdit(entry.item)',
     )
     expect(documentPatchesFile.source).toContain(
-      'getCanvasEditableTextPatchUpdates(entry.item, text)',
+      'textTarget.planCommitUpdates(entry.item, text)',
     )
     expect(documentPatchesFile.source).not.toContain(
       'getCanvasEditableTextPatchOperation(entry.item)',
@@ -86,12 +86,12 @@ describe('Canvas host item boundaries', () => {
     expect(documentPatchesFile.source).not.toContain(
       "entry.item.type === 'rect' && entry.item.text === undefined",
     )
-    expect(itemStartFile.source).toContain('CANVAS_APP_TEXT_TARGET.getValue(item)')
+    expect(itemStartFile.source).toContain('textTarget.getValue(item)')
     expect(itemStartFile.source).not.toContain(
       "item.type === 'rect' ? item.text ?? '' : item.text",
     )
     expect(textEditingModelFile.source).toContain(
-      'CANVAS_APP_TEXT_TARGET.getCommittedValue',
+      'textTarget.getCommittedValue',
     )
     expect(textEditingModelFile.source).not.toContain(
       "editingItem.type === 'text'",

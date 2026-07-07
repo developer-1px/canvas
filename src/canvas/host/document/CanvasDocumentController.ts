@@ -5,6 +5,7 @@ import {
   type CanvasItemsChange,
 } from './CanvasDocumentChanges'
 import type { CanvasItemValidationOptions } from './CanvasItemSchema'
+import type { CanvasItemTextTarget } from '../text/CanvasWhiteboardTextTarget'
 import {
   commitCanvasDocumentSelection,
   commitCanvasItemsPatch,
@@ -90,6 +91,7 @@ export function createCanvasDocumentController(
   initialItems: CanvasItem[],
   initialSelection: CanvasSelectionIds = [],
   validation: CanvasItemValidationOptions = {},
+  textTarget?: CanvasItemTextTarget,
 ): CanvasDocumentController {
   const document = createCanvasItemsDocument(initialItems, {
     selection: initialSelection,
@@ -108,6 +110,7 @@ export function createCanvasDocumentController(
           currentItems,
           document,
           selection,
+          textTarget,
           validation,
         }),
       )

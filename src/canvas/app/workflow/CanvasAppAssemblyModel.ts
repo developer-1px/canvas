@@ -9,6 +9,7 @@ export function getCanvasAppAssemblyModel({
   customCommands,
   customCreationTools,
   customItemRenderers,
+  customItemTextTargets,
   customItemValidators,
   featurePackViewRenderers,
   installedFeaturePackIds,
@@ -69,6 +70,7 @@ export function getCanvasAppAssemblyModel({
       stageAdapter,
     },
     workspace: {
+      customItemTextTargets,
       customItemValidators,
       initialItems,
       initialSelection,

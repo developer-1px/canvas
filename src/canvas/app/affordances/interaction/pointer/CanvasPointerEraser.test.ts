@@ -1,3 +1,4 @@
+import { CANVAS_APP_TEXT_TARGET } from '../../editing/text-editor/CanvasAppTextTarget'
 import { describe, expect, it, vi } from 'vitest'
 import type { CanvasItem } from '../../../../entities'
 import {
@@ -25,7 +26,8 @@ const farMarker = createMarkerItem('marker-2', [
 const rect = createRectItem('rect-1')
 const items = [marker, farMarker, rect]
 const itemReadModel: CanvasAppItemReadModel = {
-  findEditableTextItem: () => null,
+  findTextEditTarget: () => null,
+  textTarget: CANVAS_APP_TEXT_TARGET,
   findItem: (id) => items.find((item) => item.id === id),
   getAllIds: () => items.map((item) => item.id),
   getAllItems: () => items,

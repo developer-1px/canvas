@@ -12,6 +12,7 @@ export function getCanvasAppPointerConsumerModel({
       onArrowEndpointPointerDown:
         downHandlers.handleArrowEndpointPointerDown,
       onItemPointerDown: downHandlers.handleItemPointerDown,
+      canEditText: downHandlers.canEditText,
       onTextDoubleClick: downHandlers.handleTextDoubleClick,
     },
     stageHandlers: {

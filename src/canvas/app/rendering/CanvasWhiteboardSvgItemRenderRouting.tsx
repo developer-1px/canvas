@@ -8,7 +8,6 @@ import type {
   CanvasCommentItem,
   CanvasComponentItem,
   CanvasCustomItem,
-  CanvasEditableTextItem,
   CanvasImageItem,
   CanvasItem,
   CanvasShapeItem,
@@ -31,7 +30,6 @@ import { renderCanvasWhiteboardSvgCustomItem } from './CanvasWhiteboardSvgCustom
 import { renderCanvasWhiteboardSvgStampItem } from './CanvasWhiteboardSvgStampItemRenderer'
 import {
   isCanvasArrowDrawingItem,
-  isCanvasEditableTextItem,
   isCanvasPathDrawingItem,
 } from '../../host'
 
@@ -47,7 +45,8 @@ export type CanvasWhiteboardSvgItemRenderRouteInput = {
     itemId: string,
     endpoint: CanvasArrowEndpoint,
   ) => void
-  onTextDoubleClick: (item: CanvasEditableTextItem) => void
+  canEditText: (item: CanvasItem) => boolean
+  onTextDoubleClick: (item: CanvasItem) => void
   renderChild: (item: CanvasItem, locked: boolean) => ReactNode
   selected: boolean
 }
@@ -129,11 +128,12 @@ function renderCanvasWhiteboardSvgComponentItemRoute({
   componentPresentationRenderers,
   getComponentPresentation,
   item,
+  canEditText,
   onTextDoubleClick,
 }: CanvasWhiteboardSvgItemRenderRouteInput & {
   item: CanvasComponentItem
 }): CanvasWhiteboardSvgItemRenderRoute {
-  const editable = isCanvasEditableTextItem(item)
+  const editable = canEditText(item)
 
   return {
     children: renderCanvasWhiteboardSvgOpacityGroup(item.opacity, (
@@ -150,12 +150,13 @@ function renderCanvasWhiteboardSvgComponentItemRoute({
 
 function renderCanvasWhiteboardSvgCommentItemRoute({
   item,
+  canEditText,
   onTextDoubleClick,
   selected,
 }: CanvasWhiteboardSvgItemRenderRouteInput & {
   item: CanvasCommentItem
 }): CanvasWhiteboardSvgItemRenderRoute {
-  const editable = isCanvasEditableTextItem(item)
+  const editable = canEditText(item)
 
   return {
     children: renderCanvasWhiteboardSvgCommentItem({ item, selected }),
@@ -164,29 +165,35 @@ function renderCanvasWhiteboardSvgCommentItemRoute({
 }
 
 function renderCanvasWhiteboardSvgCustomItemRoute({
+  canEditText,
   customItemRenderers,
   item,
+  onTextDoubleClick,
 }: CanvasWhiteboardSvgItemRenderRouteInput & {
   item: CanvasCustomItem
 }): CanvasWhiteboardSvgItemRenderRoute {
+  const editable = canEditText(item)
+
   return {
     children: renderCanvasWhiteboardSvgCustomItem({
       item,
       renderers: customItemRenderers,
     }),
     customKind: item.kind,
+    onDoubleClick: editable ? () => onTextDoubleClick(item) : undefined,
   }
 }
 
 function renderCanvasWhiteboardSvgDrawingItemRoute({
   item,
   onArrowEndpointPointerDown,
+  canEditText,
   onTextDoubleClick,
   selected,
 }: CanvasWhiteboardSvgItemRenderRouteInput & {
   item: CanvasWhiteboardSvgDrawingItem
 }): CanvasWhiteboardSvgItemRenderRoute {
-  const editable = isCanvasEditableTextItem(item)
+  const editable = canEditText(item)
 
   return {
     children: (
