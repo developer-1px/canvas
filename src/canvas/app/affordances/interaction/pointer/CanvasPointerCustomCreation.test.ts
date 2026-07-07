@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import type { CanvasCustomItem } from '../../../../entities'
 import { createCanvasAffordanceConfig } from '../../../../engine'
 import type { CommitCanvasItemsChange } from '../../../workflow/CanvasWorkflowContract'
+import type { CanvasAppTextTarget } from '../../editing/text-editor/CanvasAppTextTarget'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import {
   commitCanvasPointerCustomCreation,
@@ -119,6 +120,50 @@ describe('CanvasPointerCustomCreation', () => {
     )
   })
 
+  it('enters text edit after commit when the tool and text target allow it', () => {
+    const setEditing = vi.fn()
+
+    expect(
+      commitCanvasPointerCustomCreation(createCommitInput({
+        customCreationTools: [createTool({ enterTextEdit: true })],
+        setEditing,
+        textTarget: createTextTarget('Risk note'),
+      })),
+    ).toBe(true)
+    expect(setEditing).toHaveBeenCalledWith({
+      id: 'risk-1',
+      value: 'Risk note',
+    })
+  })
+
+  it('keeps commit without edit entry when the tool or target declines', () => {
+    const setEditing = vi.fn()
+
+    expect(
+      commitCanvasPointerCustomCreation(createCommitInput({
+        customCreationTools: [createTool()],
+        setEditing,
+        textTarget: createTextTarget('Risk note'),
+      })),
+    ).toBe(true)
+    expect(
+      commitCanvasPointerCustomCreation(createCommitInput({
+        customCreationTools: [createTool({ enterTextEdit: true })],
+        setEditing,
+        textTarget: {
+          ...createTextTarget('Risk note'),
+          canEdit: () => false,
+        },
+      })),
+    ).toBe(true)
+    expect(
+      commitCanvasPointerCustomCreation(createCommitInput({
+        customCreationTools: [createTool({ enterTextEdit: true })],
+      })),
+    ).toBe(true)
+    expect(setEditing).not.toHaveBeenCalled()
+  })
+
   it('contains missing, declined, invalid, and throwing custom creation tools', () => {
     const commitItemsChange = vi.fn<CommitCanvasItemsChange>(() => true)
     const rectItem = {
@@ -214,6 +259,7 @@ function createCommitInput(
 function createTool(
   overrides: Partial<{
     createItem: () => CanvasCustomItem | null
+    enterTextEdit: boolean
   }> = {},
 ) {
   return {
@@ -222,5 +268,16 @@ function createTool(
     title: 'Risk',
     createItem: () => customItem,
     ...overrides,
+  }
+}
+
+function createTextTarget(value: string): CanvasAppTextTarget {
+  return {
+    canEdit: (item) => item.id === customItem.id,
+    commitsOnEnter: () => true,
+    getCommittedValue: ({ value: committed }) => committed,
+    getEditorBounds: () => null,
+    getValue: () => value,
+    planCommitUpdates: () => [],
   }
 }

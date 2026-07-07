@@ -437,6 +437,7 @@ describe('Canvas package consumer imports', () => {
 
     expect(entityItem.id).toBe('rect-1')
     expect(assembly.itemLayerAdapter.renderItems({
+      canEditText: () => false,
       componentPresentationRenderers: {},
       customItemRenderers: {},
       getComponentPresentation: () => 'note-card',

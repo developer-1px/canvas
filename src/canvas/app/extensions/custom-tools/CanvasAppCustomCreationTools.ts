@@ -20,6 +20,7 @@ export type CanvasAppCustomCreationTool = {
   createItem: (
     context: CanvasAppCustomCreationToolContext,
   ) => CanvasCustomItem | null
+  enterTextEdit?: boolean
   id: string
   label: string
   shortcut?: CanvasAppCustomToolShortcut

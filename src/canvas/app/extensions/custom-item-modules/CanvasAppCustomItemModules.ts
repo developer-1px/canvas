@@ -42,6 +42,7 @@ export type CanvasAppCustomItemModuleCreationTool = {
   createItem: (
     context: CanvasAppCustomCreationToolContext,
   ) => CanvasAppCustomItemModuleCreationItem | null
+  enterTextEdit?: boolean
   id: string
   label: string
   shortcut?: CanvasAppCustomToolShortcut
