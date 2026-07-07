@@ -48,6 +48,10 @@ export {
   type CanvasAppCustomItemModuleCreationItem,
   type CanvasAppCustomItemModuleCreationTool,
 } from '../extensions/custom-item-modules/CanvasAppCustomItemModules'
+export type {
+  CanvasAppCustomItemTextTarget,
+  CanvasAppCustomItemTextTargets,
+} from '../extensions/custom-item-modules/CanvasAppCustomItemTextTargetContracts'
 export {
   defineCanvasAppHtmlWidgetModule,
   defineCanvasAppReactWidgetModule,
@@ -100,6 +104,9 @@ export type {
   CanvasAppCustomCreationToolContext,
   CanvasAppCustomToolShortcut,
 } from '../extensions/custom-tools/CanvasAppCustomCreationTools'
+export type {
+  CanvasAppCustomCommandShortcut,
+} from '../extensions/custom-commands/CanvasAppCustomCommands'
 export type {
   CanvasAppCommitItemsChange,
   CanvasAppCommitSelection,

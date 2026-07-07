@@ -54,6 +54,21 @@ import {
 } from '@interactive-os/canvas/app/authoring'
 
 const kpiCardModule = defineCanvasAppCustomItemModule({
+  customCreationTools: [{
+    createItem: ({ currentWorld }) => ({
+      data: { value: '0%' },
+      h: 96,
+      title: 'KPI',
+      w: 180,
+      x: currentWorld.x,
+      y: currentWorld.y,
+    }),
+    enterTextEdit: true,
+    id: 'kpi-card-tool',
+    label: 'K',
+    shortcut: { key: 'k' },
+    title: 'KPI card',
+  }],
   id: 'kpi-card',
   presentation: 'kpi-card',
   renderItem: ({ item }) => (
@@ -62,6 +77,16 @@ const kpiCardModule = defineCanvasAppCustomItemModule({
       <span>{String(item.data.value)}</span>
     </div>
   ),
+  textTarget: {
+    canEdit: () => true,
+    commitsOnEnter: () => true,
+    getCommittedValue: ({ value }) => value,
+    getEditorBounds: (item) => ({ h: item.h, w: item.w, x: item.x, y: item.y }),
+    getValue: (item) => String(item.data.value ?? ''),
+    planCommitUpdates: (_item, text) => [
+      { field: 'data/value', operation: 'replace', value: text },
+    ],
+  },
   validateItem: (item): item is CanvasCustomItem =>
     item.type === 'custom' && item.kind === 'kpi-card',
 })
