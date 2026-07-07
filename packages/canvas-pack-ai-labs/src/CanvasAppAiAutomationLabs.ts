@@ -3,18 +3,16 @@ import type {
   CanvasItem,
   RectItem,
   Viewport,
-} from '../../../entities'
+} from '@interactive-os/canvas'
 import {
   getCanvasViewportWorldPoint,
-} from '../../../core'
-import type {
-  CanvasAppCustomCommand,
-  CanvasAppCustomCommandContext,
-} from '../../extensions/custom-commands'
+} from '@interactive-os/canvas/core'
 import type {
   CanvasAppCommitItemsChange,
+  CanvasAppCustomCommand,
+  CanvasAppCustomCommandContext,
   CanvasAppItemsChange,
-} from '../../workspace/document/CanvasAppDocumentContracts'
+} from '@interactive-os/canvas/app/authoring'
 
 type MaybePromise<TValue> = TValue | Promise<TValue>
 

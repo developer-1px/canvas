@@ -44,7 +44,6 @@ describe('Canvas App folder structure', () => {
     ).sort()
 
     expect(featurePackFolders).toEqual([
-      'ai-labs',
       'arrow-routing-inspector',
       'board-io',
       'checklist-inspector',

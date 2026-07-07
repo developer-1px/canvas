@@ -100,7 +100,7 @@
 | `src/canvas/app/extensions/custom-tools/CanvasAppCustomCreationTools.ts` | 내부 Tool union에 구체 id를 추가하지 않고 제품별 생성 도구를 등록하는 descriptor를 제공한다 |
 | `src/canvas/app/extensions/custom-tools/CanvasAppCustomCreationToolContracts.ts` | Custom creation tool descriptor shape와 reserved/duplicate shortcut conflict를 검증한다 |
 | `src/canvas/app/extensions/custom-tools/CanvasAppCustomCreationToolRuntime.ts` | Custom creation tool id 변환, toolbar state, lookup, shortcut matching을 소유한다 |
-| `src/canvas/app/feature-packs/ai-labs` | AI summarize command, provider data policy, review-before-apply automation draft와 provider/review 옵션 manifest factory를 폴더째 설치형 pack으로 제공한다 |
+| `packages/canvas-pack-ai-labs` | AI summarize command, provider data policy, review-before-apply automation draft와 provider/review 옵션 manifest factory를 외부 opt-in feature pack으로 제공한다 |
 | `src/canvas/app/feature-packs/arrow-routing-inspector` | 선택한 connector의 elbow/straight routing action을 폴더째 설치형 inspector pack으로 제공한다 |
 | `src/canvas/app/feature-packs/board-io` | Board JSON/SVG export/import plugin, host storage/file-name adapter 계약, runtime-only manifest를 폴더째 설치형 pack으로 제공한다 |
 | `src/canvas/app/feature-packs/checklist-inspector` | 선택한 checklist의 item check/text/add/remove action을 폴더째 설치형 inspector pack으로 제공한다 |

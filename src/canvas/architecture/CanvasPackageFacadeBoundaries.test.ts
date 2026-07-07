@@ -205,4 +205,27 @@ describe('Canvas package facade boundaries', () => {
     expect(violations).toEqual([])
   })
 
+  it('keeps extracted canvas packs on public canvas package imports', () => {
+    const violations = sourceFiles
+      .filter((file) => file.path.startsWith('packages/canvas-pack-'))
+      .flatMap(getImportReferences)
+      .filter((reference) => reference.target.startsWith('src/canvas/'))
+
+    expect(violations).toEqual([])
+  })
+
+  it('keeps canvas runtime source independent from extracted canvas packs', () => {
+    const violations = sourceFiles
+      .filter((file) =>
+        file.path.startsWith('src/canvas/') &&
+        !file.path.includes('.test.') &&
+        !file.path.startsWith('src/canvas/architecture/'),
+      )
+      .flatMap(getImportReferences)
+      .filter((reference) =>
+        reference.specifier.startsWith('@interactive-os/canvas-pack-'),
+      )
+
+    expect(violations).toEqual([])
+  })
 })

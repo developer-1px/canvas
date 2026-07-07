@@ -79,11 +79,6 @@ export {
   type CanvasAppFeaturePackInstallOptions,
 } from './CanvasAppFeaturePacks'
 export {
-  createCanvasAppAiLabsFeaturePackManifest,
-  type CanvasAppAiLabsFeaturePackManifestInput,
-  type CreateCanvasAppAiLabsSummarizeSelectionCommandInput,
-} from './ai-labs'
-export {
   CANVAS_APP_BOARD_IO_FEATURE_PACK_MANIFEST,
 } from './board-io'
 export {

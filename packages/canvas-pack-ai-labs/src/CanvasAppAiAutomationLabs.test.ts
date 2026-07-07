@@ -2,9 +2,11 @@ import { describe, expect, it, vi } from 'vitest'
 import type {
   CanvasItem,
   Viewport,
-} from '../../../entities'
-import type { CanvasAppCustomCommandContext } from '../../extensions/custom-commands'
-import type { CanvasAppItemsChange } from '../../workspace/document/CanvasAppDocumentContracts'
+} from '@interactive-os/canvas'
+import type {
+  CanvasAppCustomCommandContext,
+  CanvasAppItemsChange,
+} from '@interactive-os/canvas/app/authoring'
 import {
   CANVAS_APP_AI_AUTOMATION_LABS_DATA_POLICY,
   CANVAS_APP_AI_LABS_SUMMARIZE_SELECTION_COMMAND_ID,
