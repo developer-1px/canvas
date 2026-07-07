@@ -8,11 +8,10 @@ import {
   getCanvasViewportScreenBounds,
 } from '../../../../core'
 import {
-  getCanvasEditableTextBounds,
-  getCommittedCanvasEditableTextValue,
   isCanvasTextItem,
   isCanvasStickyComponentItem,
 } from '../../../../host'
+import { CANVAS_APP_TEXT_TARGET } from './CanvasAppTextTarget'
 import type { CommitCanvasItemsChange } from '../../../workflow/CanvasWorkflowContract'
 import {
   isCanvasKeyboardTypingTarget,
@@ -141,7 +140,12 @@ export function getCanvasTextEditorStyle({
   if (!editing || !editingItem) {
     return undefined
   }
-  const bounds = getCanvasEditableTextBounds(editingItem)
+  const bounds = CANVAS_APP_TEXT_TARGET.getEditorBounds(editingItem)
+
+  if (!bounds) {
+    return undefined
+  }
+
   const screenBounds = getCanvasViewportScreenBounds(viewport, bounds)
   const scale = getCanvasViewportScale(viewport)
 
@@ -175,7 +179,7 @@ function getCommittedCanvasTextValue({
   editing: EditingText
   editingItem: CanvasEditableTextItem
 }) {
-  return getCommittedCanvasEditableTextValue({
+  return CANVAS_APP_TEXT_TARGET.getCommittedValue({
     item: editingItem,
     value: editing.value,
   })

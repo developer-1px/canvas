@@ -10,7 +10,6 @@ import {
   canReorderCanvasItems,
   canRotateCanvasSelection,
   canSelectSameTypeCanvasSelection,
-  getCanvasEditableTextValue,
   getCanvasSelectionRotation,
   hasCanvasSelectionRotation,
   canTidyCanvasSelection,
@@ -26,6 +25,7 @@ import {
   type CanvasFlipAxis,
   type CanvasZOrderMode,
 } from '../../host'
+import { CANVAS_APP_TEXT_TARGET } from '../affordances/editing/text-editor/CanvasAppTextTarget'
 import type { CanvasAppItemReadModel } from './CanvasAppItemReadModelContracts'
 import type { CanvasAppStampVotingSessionContext } from './CanvasAppStampConsumerContracts'
 import type {
@@ -390,7 +390,7 @@ export function editCanvasAppSelectionText({
 
   setEditing({
     id: item.id,
-    value: getCanvasEditableTextValue(item),
+    value: CANVAS_APP_TEXT_TARGET.getValue(item),
   })
   return true
 }

@@ -11,9 +11,7 @@ import {
   type CanvasAffordanceConfig,
   type CanvasSceneAdapter,
 } from '../../../../engine'
-import {
-  getCanvasEditableTextValue,
-} from '../../../../host'
+import { CANVAS_APP_TEXT_TARGET } from '../../editing/text-editor/CanvasAppTextTarget'
 import type { CanvasAppItemReadModel } from '../../../workflow/CanvasAppItemReadModelContracts'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import type { Interaction } from './CanvasInteractionState'
@@ -188,6 +186,6 @@ function createCanvasItemEditState(
 ): EditingText {
   return {
     id: item.id,
-    value: getCanvasEditableTextValue(item),
+    value: CANVAS_APP_TEXT_TARGET.getValue(item),
   }
 }

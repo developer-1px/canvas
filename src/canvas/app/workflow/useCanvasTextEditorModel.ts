@@ -11,10 +11,7 @@ import type {
   Viewport,
 } from '../../entities'
 import type { CanvasAffordanceConfig } from '../../engine'
-import {
-  getCanvasEditableTextValue,
-  shouldCommitCanvasEditableTextOnEnter,
-} from '../../host'
+import { CANVAS_APP_TEXT_TARGET } from '../affordances/editing/text-editor/CanvasAppTextTarget'
 import { useCanvasTextEditing } from '../affordances/editing/text-editor/useCanvasTextEditing'
 import {
   shouldUseCanvasContentEditableText,
@@ -115,7 +112,7 @@ export function useCanvasTextEditorModel({
           ? current
           : {
             id: selectedInlineTextId,
-            value: getCanvasEditableTextValue(selectedInlineTextItem),
+            value: CANVAS_APP_TEXT_TARGET.getValue(selectedInlineTextItem),
           }
       )
     })
@@ -129,7 +126,7 @@ export function useCanvasTextEditorModel({
   ])
 
   const commitOnEnter = editingItem
-    ? shouldCommitCanvasEditableTextOnEnter(editingItem)
+    ? CANVAS_APP_TEXT_TARGET.commitsOnEnter(editingItem)
     : true
   const useContentEditableText = shouldUseCanvasContentEditableText(editingItem)
   const setEditorElement = useCallback((element: HTMLElement | null) => {
