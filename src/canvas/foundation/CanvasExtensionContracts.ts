@@ -1,4 +1,5 @@
 import type {
+  Bounds,
   CanvasSelectionIds,
   Viewport,
 } from '../core'
@@ -46,6 +47,24 @@ export type CanvasExtensionPlanner<
   TInput = unknown,
   TEffect extends CanvasExtensionEffect = CanvasExtensionEffect,
 > = (input: TInput) => readonly TEffect[]
+
+export type CanvasExtensionTextPatchUpdate = {
+  field: string
+  operation: 'add' | 'replace'
+  value: unknown
+}
+
+export type CanvasExtensionTextTargetContract<TItem = unknown> = {
+  canEdit: (item: TItem) => boolean
+  commitsOnEnter: (item: TItem) => boolean
+  getCommittedValue: (input: { item: TItem; value: string }) => string
+  getEditorBounds: (item: TItem) => Bounds | null
+  getValue: (item: TItem) => string
+  planCommitUpdates: (
+    item: TItem,
+    text: string,
+  ) => readonly CanvasExtensionTextPatchUpdate[]
+}
 
 export type CanvasExtensionCommandDescriptor<
   TCommandId extends CanvasExtensionId = CanvasExtensionId,

@@ -265,6 +265,7 @@ export {
   isCanvasTextItem,
   shouldCommitCanvasEditableTextOnEnter,
 } from './text/CanvasEditableTextItem'
+export { CANVAS_WHITEBOARD_TEXT_TARGET } from './text/CanvasWhiteboardTextTarget'
 
 export type { CanvasItemsChange } from './document/CanvasDocumentChanges'
 export {

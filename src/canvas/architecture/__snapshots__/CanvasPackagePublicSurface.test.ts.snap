@@ -618,6 +618,7 @@ exports[`Canvas package public surface > snapshots facade runtime value exports 
     "CANVAS_STAMP_ITEM_SIZE",
     "CANVAS_STICKY_COMPONENT_KIND",
     "CANVAS_TABLE_COMPONENT_KIND",
+    "CANVAS_WHITEBOARD_TEXT_TARGET",
     "DEFAULT_CANVAS_COMPONENT_TEMPLATES",
     "INITIAL_ITEMS",
     "addCanvasChecklistItem",

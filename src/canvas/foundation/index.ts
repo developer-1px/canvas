@@ -52,6 +52,8 @@ export {
   type CanvasExtensionRendererSlot,
   type CanvasExtensionSelectionEffect,
   type CanvasExtensionSelectionHistory,
+  type CanvasExtensionTextPatchUpdate,
+  type CanvasExtensionTextTargetContract,
   type CanvasExtensionToolDescriptor,
   type CanvasExtensionToolKind,
   type CanvasExtensionViewportEffect,
