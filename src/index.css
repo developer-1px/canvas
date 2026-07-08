@@ -42,6 +42,17 @@
   --canvas-accent: var(--canvas-blue);
   --canvas-success: var(--canvas-green);
   --canvas-danger: var(--canvas-red);
+  --demo-type-1: 10px;
+  --demo-type-2: 12px;
+  --demo-type-3: 14px;
+  --demo-type-4: 20px;
+  --demo-type-5: 36px;
+  --demo-space-1: 4px;
+  --demo-space-2: 8px;
+  --demo-space-3: 12px;
+  --demo-radius: 6px;
+  --demo-control: 28px;
+  --demo-font: var(--sans);
 }
 
 [data-theme='dark'] {

@@ -5,6 +5,7 @@
   overflow: hidden;
   color: var(--canvas-ink);
   background: var(--canvas-paper);
+  font-family: var(--demo-font);
 }
 
 .engine-demo-workspace {
@@ -41,11 +42,11 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 2px;
+  gap: var(--demo-space-1);
   max-width: min(760px, calc(100vw - 20px));
   min-height: 32px;
-  padding: 2px;
-  border-radius: 5px;
+  padding: var(--demo-space-1);
+  border-radius: var(--demo-radius);
   outline: 1px solid color-mix(in srgb, var(--canvas-line) 30%, transparent);
   background: color-mix(in srgb, var(--canvas-panel) 88%, transparent);
   transform: translateX(-50%);
@@ -58,10 +59,10 @@
   z-index: 6;
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: var(--demo-space-1);
   min-height: 32px;
-  padding: 2px;
-  border-radius: 5px;
+  padding: var(--demo-space-1);
+  border-radius: var(--demo-radius);
   outline: 1px solid color-mix(in srgb, var(--canvas-line) 30%, transparent);
   background: color-mix(in srgb, var(--canvas-panel) 88%, transparent);
 }
@@ -70,9 +71,9 @@
 .engine-demo-viewport-controls button {
   display: inline-grid;
   place-items: center;
-  width: 28px;
-  min-width: 28px;
-  height: 28px;
+  width: var(--demo-control);
+  min-width: var(--demo-control);
+  height: var(--demo-control);
   padding: 0;
   border: 0;
   border-radius: 3px;
@@ -94,7 +95,7 @@
 .engine-demo-viewport-controls span {
   min-width: 42px;
   color: var(--canvas-muted);
-  font: 560 11px/1 var(--sans);
+  font: 560 var(--demo-type-1)/1 var(--sans);
   text-align: center;
 }
 
