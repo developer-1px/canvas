@@ -1,0 +1,12 @@
+{
+  "name": "@interactive-os/canvas-pack-ai-labs",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "peerDependencies": {
+    "@interactive-os/canvas": "^0.1.1"
+  }
+}

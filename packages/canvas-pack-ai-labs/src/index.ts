@@ -1,12 +1,8 @@
 import {
   createCanvasAppExtensionBundle,
-} from '../../extensions/CanvasAppExtensionBundle'
-import {
-  createCanvasAppFeaturePackManifest,
-} from '../CanvasAppFeaturePackManifests'
-import {
   createCanvasAppFeaturePack,
-} from '../CanvasAppFeaturePacks'
+  createCanvasAppFeaturePackManifest,
+} from '@interactive-os/canvas/app/authoring'
 import {
   createCanvasAppAiLabsSummarizeSelectionCommand,
   type CreateCanvasAppAiLabsSummarizeSelectionCommandInput,

@@ -36,7 +36,7 @@ import {
 } from './CanvasAppFeaturePackViews'
 import {
   createCanvasAppAiLabsFeaturePackManifest,
-} from './ai-labs'
+} from '@interactive-os/canvas-pack-ai-labs'
 import {
   CANVAS_APP_BOARD_IO_FEATURE_PACK_MANIFEST,
 } from './board-io'

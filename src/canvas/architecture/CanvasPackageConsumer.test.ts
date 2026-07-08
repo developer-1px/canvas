@@ -2,6 +2,10 @@ import { describe, expect, it } from 'vitest'
 import * as CanvasPackage from '@interactive-os/canvas'
 import * as CanvasAppAuthoring from '@interactive-os/canvas/app/authoring'
 import * as CanvasAppFacade from '@interactive-os/canvas/app'
+import * as CanvasPackAiLabs from '@interactive-os/canvas-pack-ai-labs'
+import {
+  createCanvasAppAiLabsFeaturePackManifest,
+} from '@interactive-os/canvas-pack-ai-labs'
 import {
   CanvasCore,
   CanvasEngine,
@@ -79,7 +83,6 @@ import {
   DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS,
   DEFAULT_CANVAS_APP_VIEW_FEATURE_PACK_MANIFESTS,
   DEFAULT_CANVAS_APP_VIEW_FEATURE_PACKS,
-  createCanvasAppAiLabsFeaturePackManifest,
   createCanvasAppAssembly,
   createCanvasAppDomEditStyleFeaturePackManifest,
   createCanvasAppExtensionBundle,
@@ -946,8 +949,10 @@ describe('Canvas package consumer imports', () => {
       .toBeTypeOf('function')
     expect(CanvasAppAuthoring.createCanvasAppFeaturePackManifest)
       .toBeTypeOf('function')
-    expect(CanvasAppAuthoring.createCanvasAppAiLabsFeaturePackManifest)
+    expect(CanvasPackAiLabs.createCanvasAppAiLabsFeaturePackManifest)
       .toBeTypeOf('function')
+    expect('createCanvasAppAiLabsFeaturePackManifest' in CanvasAppAuthoring)
+      .toBe(false)
     expect(CanvasAppAuthoring.createCanvasAppDomEditStyleFeaturePackManifest)
       .toBeTypeOf('function')
     expect(CanvasAppAuthoring.CANVAS_APP_BOARD_IO_FEATURE_PACK_MANIFEST)

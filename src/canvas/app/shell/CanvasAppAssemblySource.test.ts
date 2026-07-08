@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { DEFAULT_CANVAS_APP_ASSEMBLY } from '../workflow'
 import {
   createCanvasAppAiLabsFeaturePackManifest,
-} from '../feature-packs'
+} from '@interactive-os/canvas-pack-ai-labs'
+import { DEFAULT_CANVAS_APP_ASSEMBLY } from '../workflow'
 import { resolveCanvasAppAssemblySource } from './CanvasAppAssemblySource'
 
 describe('CanvasAppAssemblySource', () => {

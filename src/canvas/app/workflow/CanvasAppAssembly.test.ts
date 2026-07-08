@@ -1,5 +1,8 @@
 import { CANVAS_APP_TEXT_TARGET } from '../affordances/editing/text-editor/CanvasAppTextTarget'
 import { describe, expect, it } from 'vitest'
+import {
+  createCanvasAppAiLabsFeaturePackManifest,
+} from '@interactive-os/canvas-pack-ai-labs'
 import { createCanvasComponentLibrary } from '../../host'
 import {
   DEFAULT_CANVAS_APP_ASSEMBLY,
@@ -13,7 +16,6 @@ import {
 import {
   CANVAS_APP_BOARD_IO_FEATURE_PACK_MANIFEST,
   DEFAULT_CANVAS_APP_FEATURE_PACK_VIEW_RENDERERS,
-  createCanvasAppAiLabsFeaturePackManifest,
   createCanvasAppDomEditStyleFeaturePackManifest,
   createCanvasAppFeaturePack,
   createCanvasAppFeaturePackManifest,
