@@ -205,11 +205,17 @@ describe('Canvas package facade boundaries', () => {
     expect(violations).toEqual([])
   })
 
-  it('keeps extracted canvas packs on public canvas package imports', () => {
+  it('keeps extracted canvas packages on public canvas package imports and away from demo source', () => {
     const violations = sourceFiles
-      .filter((file) => file.path.startsWith('packages/canvas-pack-'))
+      .filter((file) =>
+        file.path.startsWith('packages/canvas-pack-') ||
+        file.path.startsWith('packages/canvas-devtools-affordance/'),
+      )
       .flatMap(getImportReferences)
-      .filter((reference) => reference.target.startsWith('src/canvas/'))
+      .filter((reference) =>
+        reference.target.startsWith('src/canvas/') ||
+        reference.target.startsWith('src/demo/'),
+      )
 
     expect(violations).toEqual([])
   })
@@ -223,7 +229,10 @@ describe('Canvas package facade boundaries', () => {
       )
       .flatMap(getImportReferences)
       .filter((reference) =>
-        reference.specifier.startsWith('@interactive-os/canvas-pack-'),
+        reference.specifier.startsWith('@interactive-os/canvas-pack-') ||
+        reference.specifier.startsWith(
+          '@interactive-os/canvas-devtools-affordance',
+        ),
       )
 
     expect(violations).toEqual([])

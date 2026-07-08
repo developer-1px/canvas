@@ -3,9 +3,13 @@ import * as CanvasPackage from '@interactive-os/canvas'
 import * as CanvasAppAuthoring from '@interactive-os/canvas/app/authoring'
 import * as CanvasAppFacade from '@interactive-os/canvas/app'
 import * as CanvasPackAiLabs from '@interactive-os/canvas-pack-ai-labs'
+import * as CanvasPackDevtools from '@interactive-os/canvas-pack-devtools'
 import {
   createCanvasAppAiLabsFeaturePackManifest,
 } from '@interactive-os/canvas-pack-ai-labs'
+import {
+  createCanvasDevtoolsFeaturePackManifest,
+} from '@interactive-os/canvas-pack-devtools'
 import {
   CanvasCore,
   CanvasEngine,
@@ -368,6 +372,9 @@ describe('Canvas package consumer imports', () => {
       },
       requestReview: () => ({ kind: 'cancel' }),
     })
+    const devtoolsManifest = createCanvasDevtoolsFeaturePackManifest({
+      initialMode: 'measure',
+    })
     const domEditStyleManifest =
       createCanvasAppDomEditStyleFeaturePackManifest({
         id: 'smoke-dom-card-style',
@@ -512,11 +519,13 @@ describe('Canvas package consumer imports', () => {
     expect(consumerFeaturePackManifest.id).toBe('consumer-pack')
     expect(getCanvasAppInstalledFeaturePackManifestIds([
       aiLabsManifest,
+      devtoolsManifest,
       domEditStyleManifest,
       consumerFeaturePackManifest,
       CANVAS_APP_BOARD_IO_FEATURE_PACK_MANIFEST,
     ])).toEqual([
       'ai-labs',
+      'devtools',
       'smoke-dom-card-style',
       'consumer-pack',
       'board-io',
@@ -952,6 +961,15 @@ describe('Canvas package consumer imports', () => {
     expect(CanvasPackAiLabs.createCanvasAppAiLabsFeaturePackManifest)
       .toBeTypeOf('function')
     expect('createCanvasAppAiLabsFeaturePackManifest' in CanvasAppAuthoring)
+      .toBe(false)
+    expect(CanvasPackDevtools.createCanvasDevtoolsMeasureSnapshot)
+      .toBeTypeOf('function')
+    expect(CanvasPackDevtools.createCanvasDevtoolsInspectSnapshot)
+      .toBeTypeOf('function')
+    expect(CanvasPackDevtools.CanvasDevtoolsOverlay).toBeTypeOf('function')
+    expect(CanvasPackDevtools.createCanvasDevtoolsFeaturePackManifest)
+      .toBeTypeOf('function')
+    expect('createCanvasDevtoolsFeaturePackManifest' in CanvasAppAuthoring)
       .toBe(false)
     expect(CanvasAppAuthoring.createCanvasAppDomEditStyleFeaturePackManifest)
       .toBeTypeOf('function')

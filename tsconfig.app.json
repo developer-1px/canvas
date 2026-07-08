@@ -23,7 +23,9 @@
   },
   "include": [
     "src",
+    "packages/canvas-devtools-affordance/src",
     "packages/canvas-pack-ai-labs/src",
+    "packages/canvas-pack-devtools/src",
     "packages/dom-edit-affordance/src",
     "packages/slide-edit-affordance/src",
     "packages/figma-clone/src"

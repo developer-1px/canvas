@@ -1,0 +1,15 @@
+{
+  "name": "@interactive-os/canvas-pack-devtools",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@interactive-os/canvas-devtools-affordance": "workspace:*"
+  },
+  "peerDependencies": {
+    "@interactive-os/canvas": "^0.1.1"
+  }
+}

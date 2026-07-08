@@ -17,18 +17,31 @@ describe('CanvasDemoAssembly', () => {
     )
   })
 
-  it('keeps the demo free of custom modules and product fixtures', () => {
+  it('keeps the demo free of custom item modules and product fixtures', () => {
     expect(DEMO_CANVAS_APP_ASSEMBLY_INPUT).not.toHaveProperty(
       'customItemModules',
     )
+    expect(DEMO_CANVAS_APP_ASSEMBLY_INPUT).not.toHaveProperty(
+      'additionalFeaturePackManifests',
+    )
     expect(DEMO_CANVAS_APP_ASSEMBLY.customCreationTools).toEqual([])
-    expect(DEMO_CANVAS_APP_ASSEMBLY.customCommands).toEqual([])
+    expect(DEMO_CANVAS_APP_ASSEMBLY.customCommands.map((command) => command.id))
+      .toEqual([])
     expect(DEMO_CANVAS_APP_ASSEMBLY.textPasteImporters).toEqual([])
     expect(
       DEMO_CANVAS_APP_ASSEMBLY.initialItems.every(
         (item) => item.type !== 'custom',
       ),
     ).toBe(true)
+  })
+
+  it('keeps product devtools out of the engine and figjam demo surface', () => {
+    expect(modules['./CanvasDemoAssembly.ts']).not.toContain(
+      'createCanvasDevtoolsFeaturePackManifest',
+    )
+    expect(modules['./CanvasEngineDemoApp.tsx']).not.toContain(
+      'CanvasDevtoolsOverlay',
+    )
   })
 
   it('assembles the minimal engine demo seed and selection', () => {

@@ -98,6 +98,7 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@interactive-os/canvas-pack-ai-labs": "workspace:*",
+    "@interactive-os/canvas-pack-devtools": "workspace:*",
     "@playwright/test": "^1.60.0",
     "@types/node": "^24.12.3",
     "@types/react": "^19.2.14",
