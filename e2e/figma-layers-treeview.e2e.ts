@@ -61,7 +61,7 @@ test('exposes figma clone layers as a keyboard treeview', async ({
   await expect(workspaceSection).toHaveAttribute('aria-selected', 'true')
 })
 
-test('filters and favorites figma clone layers for component management', async ({
+test('filters figma clone layers for component management', async ({
   page,
 }) => {
   await page.goto('/?demo=figma')
@@ -78,18 +78,10 @@ test('filters and favorites figma clone layers for component management', async 
     tree.getByRole('treeitem', { name: 'Workspace page section' }),
   ).toHaveCount(0)
 
-  await search.fill('')
-  await page.getByRole('button', {
-    name: 'Add Workspace page section to favorites',
-  }).click()
-  await page.getByRole('button', { name: 'Show favorite layers' }).click()
-
+  await search.fill('workspace')
   await expect(
     tree.getByRole('treeitem', { name: 'Workspace page section' }),
   ).toBeVisible()
-  await expect(
-    tree.getByRole('treeitem', { name: 'React widget' }),
-  ).toHaveCount(0)
   await expect(
     tree.getByRole('treeitem', { name: 'Editorial homepage section' }),
   ).toHaveCount(0)
@@ -130,63 +122,27 @@ test('groups figma clone components by page in a variant board', async ({
   await expect(inspector).toContainText('Conversion')
 })
 
-test('shows reusable component imports and selectable parts', async ({
+test('keeps component source context in devtools without an imports rail', async ({
   page,
 }) => {
   await page.goto('/?demo=figma')
 
   const layers = page.getByRole('complementary', { name: 'Layers' })
-  const imports = page.getByRole('complementary', { name: 'Imports' })
-  const inspector = page.getByRole('complementary', { name: 'Design' })
-  const library = imports.getByLabel('Component library')
   const search = layers.getByRole('searchbox', { name: 'Search layers' })
 
-  await expect(imports).toBeVisible()
-  await expect(imports).toHaveCSS('border-right-color', 'rgb(124, 58, 237)')
-  await expect(library).toBeVisible()
   await expect(
-    imports.getByRole('region', { name: 'Story imports' }),
-  ).toContainText('Workspace dashboard')
-  await imports.getByRole('button', {
-    name: 'Import Workspace dashboard story',
-  }).click()
-  await expect(imports.getByRole('button', {
-    name: 'Import Workspace dashboard story',
-  })).toHaveAttribute('aria-pressed', 'true')
-  await expect(
-    library.getByRole('region', { name: 'widgets component imports' }),
-  ).toContainText('Stat card')
-  await expect(
-    library.getByRole('region', { name: 'features component imports' }),
-  ).toContainText('Deal row')
-  await expect(
-    library.getByRole('region', { name: 'shared component imports' }),
-  ).toContainText('Article meta card')
-  await expect(library).toContainText('src/widgets/workspace-stat-card')
-
-  await library.getByRole('button', {
-    name: 'Import Stat card component',
-  }).click()
-
-  await expect(inspector).toContainText('Stat card')
-  await expect(page.locator('[data-figma-dom-node="workspaceStatRevenue"]'))
-    .toHaveAttribute('data-figma-component-root', 'true')
-  await expect(page.locator('[data-figma-dom-node="workspaceStatRevenue"]'))
-    .toHaveCSS('outline-color', 'rgb(124, 58, 237)')
-
-  await library.getByRole('button', {
-    name: 'Select Stat card Value part',
-  }).click()
-
-  await expect(inspector).toContainText('Revenue value')
-
-  await search.fill('shared')
-  await expect(
-    library.getByRole('region', { name: 'shared component imports' }),
-  ).toContainText('Article meta card')
-  await expect(
-    library.getByRole('region', { name: 'widgets component imports' }),
+    page.getByRole('complementary', { name: 'Imports' }),
   ).toHaveCount(0)
+
+  await search.fill('stat card revenue')
+  await page.getByRole('button', { name: 'Select layer Revenue stat' })
+    .click()
+  await page.getByRole('button', { name: 'Inspect' }).click()
+
+  const devtools = page.getByRole('region', { name: 'Canvas devtools' })
+
+  await expect(devtools).toContainText('Stat card')
+  await expect(devtools).toContainText('src/widgets/workspace-stat-card')
 })
 
 test('focuses figma clone component variants and fits the selected frame', async ({

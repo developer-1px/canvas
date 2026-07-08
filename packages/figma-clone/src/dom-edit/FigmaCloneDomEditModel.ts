@@ -285,18 +285,6 @@ export type FigmaCloneDomComponentSetSummary = {
   syncDescription: string
 }
 
-export type FigmaCloneStoryImportId =
-  | 'editorial-home-story'
-  | 'workspace-dashboard-story'
-
-export type FigmaCloneStoryImportSummary = {
-  componentIds: readonly FigmaCloneDomComponentId[]
-  id: FigmaCloneStoryImportId
-  label: string
-  rootId: FigmaCloneDomSectionRootId
-  source: string
-}
-
 const FIGMA_CLONE_DOM_COMPONENT_DEFINITIONS = [
   {
     id: 'workspace-stat-card',
@@ -413,23 +401,6 @@ const FIGMA_CLONE_DOM_COMPONENT_DEFINITIONS = [
     ],
   },
 ] satisfies readonly FigmaCloneDomComponentDefinition[]
-
-const FIGMA_CLONE_STORY_IMPORTS = [
-  {
-    componentIds: ['workspace-stat-card', 'workspace-deal-row'],
-    id: 'workspace-dashboard-story',
-    label: 'Workspace dashboard',
-    rootId: 'workspacePage',
-    source: 'src/stories/workspace-dashboard.stories.tsx',
-  },
-  {
-    componentIds: ['home-meta-card'],
-    id: 'editorial-home-story',
-    label: 'Editorial home',
-    rootId: 'homePage',
-    source: 'src/stories/editorial-home.stories.tsx',
-  },
-] satisfies readonly FigmaCloneStoryImportSummary[]
 
 const FIGMA_CLONE_DOM_COMPONENT_PART_ORDER = [
   'root',
@@ -2587,11 +2558,6 @@ export function listFigmaCloneDomComponentSets():
       syncDescription: definition.syncDescription,
     }
   })
-}
-
-export function listFigmaCloneStoryImports():
-  readonly FigmaCloneStoryImportSummary[] {
-  return FIGMA_CLONE_STORY_IMPORTS
 }
 
 function isFigmaCloneDomComponentPageRootId(
