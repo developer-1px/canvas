@@ -11,7 +11,10 @@ type CanvasViteConfig = {
     }
   }
   resolve?: {
-    alias?: unknown
+    alias?: readonly {
+      find: RegExp
+      replacement: string
+    }[]
     dedupe?: string[]
   }
   server?: {
@@ -34,10 +37,38 @@ const e2eConfig = playwrightConfig as {
 }
 describe('Canvas build config', () => {
   it('keeps linked peer dependencies deduped', () => {
-    expect(config.resolve?.alias).toBeUndefined()
     expect(config.resolve?.dedupe).toEqual(
       expect.arrayContaining(['react', 'react-dom', 'zod']),
     )
+  })
+
+  it('resolves canvas package imports to source entries for the dev server', () => {
+    expect(config.resolve?.alias?.map((alias) => String(alias.find)))
+      .toEqual([
+        '/^@interactive-os\\/canvas$/',
+        '/^@interactive-os\\/canvas\\/app$/',
+        '/^@interactive-os\\/canvas\\/app\\/authoring$/',
+        '/^@interactive-os\\/canvas\\/core$/',
+        '/^@interactive-os\\/canvas\\/engine$/',
+        '/^@interactive-os\\/canvas\\/entities$/',
+        '/^@interactive-os\\/canvas\\/foundation$/',
+        '/^@interactive-os\\/canvas\\/host$/',
+        '/^@interactive-os\\/canvas\\/renderer$/',
+        '/^@interactive-os\\/canvas\\/style\\.css$/',
+      ])
+    expect(config.resolve?.alias?.map((alias) => alias.replacement))
+      .toEqual([
+        expect.stringContaining('src/canvas/index.ts'),
+        expect.stringContaining('src/canvas/app/index.ts'),
+        expect.stringContaining('src/canvas/app/authoring/index.ts'),
+        expect.stringContaining('src/canvas/core/index.ts'),
+        expect.stringContaining('src/canvas/engine/index.ts'),
+        expect.stringContaining('src/canvas/entities/index.ts'),
+        expect.stringContaining('src/canvas/foundation/index.ts'),
+        expect.stringContaining('src/canvas/host/index.ts'),
+        expect.stringContaining('src/canvas/renderer/index.ts'),
+        expect.stringContaining('src/canvas/app/shell/CanvasApp.css'),
+      ])
   })
 
   it('keeps React in a separate production chunk', () => {

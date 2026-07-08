@@ -1,0 +1,14 @@
+{
+  "name": "@interactive-os/canvas-devtools-affordance",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./style.css": "./src/style.css"
+  },
+  "peerDependencies": {
+    "@interactive-os/canvas": "^0.1.1",
+    "react": "^19.0.0"
+  }
+}

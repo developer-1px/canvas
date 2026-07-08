@@ -38,6 +38,15 @@ const canvasPackModules = import.meta.glob(
   },
 ) as Record<string, string>
 
+const canvasDevtoolsAffordanceModules = import.meta.glob(
+  '../../../packages/canvas-devtools-affordance/src/**/*.{ts,tsx,css}',
+  {
+    eager: true,
+    import: 'default',
+    query: '?raw',
+  },
+) as Record<string, string>
+
 export const sourceFiles = [
   ...Object.entries(modules).map(([path, source]) => ({
     path: normalizeCanvasSourcePath(path),
@@ -52,6 +61,10 @@ export const sourceFiles = [
     source,
   })),
   ...Object.entries(canvasPackModules).map(([path, source]) => ({
+    path: path.replace(/^\.\.\/\.\.\/\.\.\//, ''),
+    source,
+  })),
+  ...Object.entries(canvasDevtoolsAffordanceModules).map(([path, source]) => ({
     path: path.replace(/^\.\.\/\.\.\/\.\.\//, ''),
     source,
   })),

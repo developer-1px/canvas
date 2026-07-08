@@ -26,6 +26,7 @@ import { useJSONDocument } from '@interactive-os/json-document/react'
 import {
   CanvasApp,
   type CanvasAppAssemblyInput,
+  type CanvasItem,
   type Viewport,
 } from '../../../src/canvas'
 import {
@@ -37,6 +38,12 @@ import {
   type CanvasWorkspaceStorage,
   type CanvasWorkspaceStorageProvider,
 } from '../../../src/canvas/app/authoring'
+import {
+  CanvasDevtoolsOverlay,
+  createCanvasDevtoolsFeaturePackManifest,
+  type CanvasDevtoolsMode,
+  type CanvasDevtoolsNoteSummary,
+} from '@interactive-os/canvas-pack-devtools'
 import {
   DEFAULT_DOM_EDIT_OVERLAY_LAYER_VISIBILITY,
   DomEditInspector,
@@ -127,6 +134,11 @@ type FigmaCloneLayerFavoriteId =
 type FigmaCloneLayerNotesState = Partial<
   Record<FigmaCloneLayerFavoriteId, string>
 >
+
+const FIGMA_CLONE_INITIAL_LAYER_NOTES = {
+  'section:workspacePage': 'Validate workspace spacing before handoff.',
+  widget: 'Check widget state against the source component.',
+} satisfies FigmaCloneLayerNotesState
 
 type FigmaCloneComponentPageGroup = {
   components: readonly FigmaCloneDomComponentSetSummary[]
@@ -259,7 +271,11 @@ export function FigmaCloneApp() {
     useState<Set<FigmaCloneDomComponentId>>(() => new Set())
   const [importedStoryIds, setImportedStoryIds] =
     useState<Set<FigmaCloneStoryImportId>>(() => new Set())
-  const [layerNotes, setLayerNotes] = useState<FigmaCloneLayerNotesState>({})
+  const [layerNotes, setLayerNotes] = useState<FigmaCloneLayerNotesState>(
+    () => ({ ...FIGMA_CLONE_INITIAL_LAYER_NOTES }),
+  )
+  const [devtoolsMode, setDevtoolsMode] =
+    useState<CanvasDevtoolsMode>('measure')
   const [sourceCopyState, setSourceCopyState] = useState('')
   const domState = domDocument.value.state
   const domTextState = domDocument.value.textState
@@ -468,6 +484,9 @@ export function FigmaCloneApp() {
     return false
   }, [domDocument])
   const assemblyInput = useMemo<CanvasAppAssemblyInput>(() => ({
+    additionalFeaturePackManifests: [
+      createCanvasDevtoolsFeaturePackManifest({ initialMode: 'measure' }),
+    ],
     affordanceConfig: FIGMA_CLONE_AFFORDANCE_CONFIG,
     capabilities: CANVAS_APP_READ_ONLY_CAPABILITIES,
     // eslint-disable-next-line react-hooks/refs
@@ -530,6 +549,12 @@ export function FigmaCloneApp() {
             getFigmaCloneCanvasItemIdForNode(story.rootId),
           ])
         }
+        const selectedCanvasItemId = getFigmaCloneSelectedCanvasItemId(selection)
+        const devtoolsNotes = createFigmaCloneDevtoolsNotes({
+          items: app.items,
+          layerNotes,
+          selection,
+        })
 
         return (
           <main className="figma-clone">
@@ -616,21 +641,31 @@ export function FigmaCloneApp() {
                 />
               </div>
               {app.stageOverlaySlot.render(
-                <DomEditSelectionOverlay
-                  adapter={FIGMA_CLONE_DOM_EDIT_ADAPTER}
-                  affordanceState={affordanceState}
-                  frameGuides={frameGuides}
-                  isCanvasPanActive={app.activeMode === 'pan' || app.gesture === 'pan'}
-                  overlayLayers={overlayLayers}
-                  selectedNodeId={selectedNodeId}
-                  shellRef={canvasRegionRef as RefObject<HTMLElement | null>}
-                  state={domState}
-                  viewport={app.viewport}
-                  onAffordanceStateChange={changeAffordanceState}
-                  onChangeAutoLayout={changeDomAutoLayoutField}
-                  onChange={changeDomField}
-                  onCommand={runDomEditCommand}
-                />,
+                <>
+                  <DomEditSelectionOverlay
+                    adapter={FIGMA_CLONE_DOM_EDIT_ADAPTER}
+                    affordanceState={affordanceState}
+                    frameGuides={frameGuides}
+                    isCanvasPanActive={app.activeMode === 'pan' || app.gesture === 'pan'}
+                    overlayLayers={overlayLayers}
+                    selectedNodeId={selectedNodeId}
+                    shellRef={canvasRegionRef as RefObject<HTMLElement | null>}
+                    state={domState}
+                    viewport={app.viewport}
+                    onAffordanceStateChange={changeAffordanceState}
+                    onChangeAutoLayout={changeDomAutoLayoutField}
+                    onChange={changeDomField}
+                    onCommand={runDomEditCommand}
+                  />
+                  <CanvasDevtoolsOverlay
+                    activeMode={devtoolsMode}
+                    items={app.items}
+                    notes={devtoolsNotes}
+                    selectedItemIds={[selectedCanvasItemId]}
+                    viewport={app.viewport}
+                    onModeChange={setDevtoolsMode}
+                  />
+                </>,
               )}
             </section>
             <FigmaCloneInspectorPanel
@@ -662,7 +697,7 @@ export function FigmaCloneApp() {
               onFit={app.viewportFocus.fitAll}
               onFitSelection={() =>
                 app.viewportFocus.fitItems([
-                  getFigmaCloneSelectedCanvasItemId(selection),
+                  selectedCanvasItemId,
                 ])}
               onZoomIn={app.zoomControls.onZoomIn}
               onZoomOut={app.zoomControls.onZoomOut}
@@ -1507,6 +1542,87 @@ function getFigmaCloneSelectedCanvasItemId(selection: FigmaCloneSelection) {
     : selection.rootId
 
   return getFigmaCloneDomCanvasFrameItemId(rootId)
+}
+
+function createFigmaCloneDevtoolsNotes({
+  items,
+  layerNotes,
+  selection,
+}: {
+  items: readonly CanvasItem[]
+  layerNotes: FigmaCloneLayerNotesState
+  selection: FigmaCloneSelection
+}): readonly CanvasDevtoolsNoteSummary[] {
+  const itemById = new Map(items.map((item) => [item.id, item]))
+  const selectedLayerId = getFigmaCloneSelectedLayerFavoriteId(selection)
+
+  return (Object.entries(layerNotes) as ReadonlyArray<readonly [
+    FigmaCloneLayerFavoriteId,
+    string | undefined,
+  ]>).flatMap(([layerId, body]) => {
+    if (!body) {
+      return []
+    }
+
+    const item = itemById.get(
+      getFigmaCloneCanvasItemIdForLayerFavoriteId(layerId),
+    )
+
+    if (!item) {
+      return []
+    }
+
+    return [{
+      attachedTo: getFigmaCloneLayerLabelForFavoriteId(layerId),
+      body,
+      bounds: {
+        h: item.h,
+        w: item.w,
+        x: item.x,
+        y: item.y,
+      },
+      id: `figma-note:${layerId}`,
+      messageCount: 1,
+      resolved: false,
+      selected: layerId === selectedLayerId,
+    }]
+  })
+}
+
+function getFigmaCloneCanvasItemIdForLayerFavoriteId(
+  layerId: FigmaCloneLayerFavoriteId,
+) {
+  if (layerId === 'widget') {
+    return FIGMA_CLONE_WIDGET_FRAME_ITEM_ID
+  }
+
+  if (layerId.startsWith('section:')) {
+    return getFigmaCloneDomCanvasFrameItemId(
+      layerId.slice('section:'.length) as FigmaCloneDomSectionRootId,
+    )
+  }
+
+  return getFigmaCloneCanvasItemIdForNode(
+    layerId.slice('node:'.length) as FigmaCloneDomNodeId,
+  )
+}
+
+function getFigmaCloneLayerLabelForFavoriteId(
+  layerId: FigmaCloneLayerFavoriteId,
+) {
+  if (layerId === 'widget') {
+    return 'React widget'
+  }
+
+  if (layerId.startsWith('section:')) {
+    const rootId = layerId.slice('section:'.length) as FigmaCloneDomSectionRootId
+
+    return `${FIGMA_CLONE_DOM_NODE_BY_ID[rootId].label} section`
+  }
+
+  return FIGMA_CLONE_DOM_NODE_BY_ID[
+    layerId.slice('node:'.length) as FigmaCloneDomNodeId
+  ].label
 }
 
 function getFigmaCloneCanvasItemIdForNode(nodeId: FigmaCloneDomNodeId) {

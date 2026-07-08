@@ -51,6 +51,9 @@ importers:
       '@interactive-os/canvas-pack-ai-labs':
         specifier: workspace:*
         version: link:packages/canvas-pack-ai-labs
+      '@interactive-os/canvas-pack-devtools':
+        specifier: workspace:*
+        version: link:packages/canvas-pack-devtools
       '@playwright/test':
         specifier: ^1.60.0
         version: 1.60.0
@@ -209,11 +212,29 @@ importers:
         specifier: ~6.0.2
         version: 6.0.3
 
+  packages/canvas-devtools-affordance:
+    dependencies:
+      '@interactive-os/canvas':
+        specifier: ^0.1.1
+        version: link:../..
+      react:
+        specifier: ^19.0.0
+        version: 19.2.6
+
   packages/canvas-pack-ai-labs:
     dependencies:
       '@interactive-os/canvas':
         specifier: ^0.1.1
         version: link:../..
+
+  packages/canvas-pack-devtools:
+    dependencies:
+      '@interactive-os/canvas':
+        specifier: ^0.1.1
+        version: link:../..
+      '@interactive-os/canvas-devtools-affordance':
+        specifier: workspace:*
+        version: link:../canvas-devtools-affordance
 
   packages/dom-edit-affordance:
     dependencies:
@@ -235,6 +256,9 @@ importers:
       '@interactive-os/canvas':
         specifier: ^0.1.1
         version: link:../..
+      '@interactive-os/canvas-pack-devtools':
+        specifier: workspace:*
+        version: link:../canvas-pack-devtools
       '@interactive-os/dom-edit-affordance':
         specifier: workspace:*
         version: link:../dom-edit-affordance
