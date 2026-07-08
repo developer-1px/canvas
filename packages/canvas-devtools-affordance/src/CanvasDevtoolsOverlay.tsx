@@ -127,7 +127,7 @@ export function CanvasDevtoolsOverlay({
         <div className="canvas-devtools__meta">
           {activeModeLabel} · {selectedCount > 0 ? `${selectedCount} selected` : 'No selection'} · {formatScale(viewport.scale)}
         </div>
-        {context ? (
+        {activeMode === 'inspect' && context ? (
           <CanvasDevtoolsContextPanel context={context} />
         ) : null}
         {activeMode === 'inspect' ? (

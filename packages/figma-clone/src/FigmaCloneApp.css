@@ -3287,6 +3287,7 @@
 
 .figma-autolayout-toolbar {
   position: absolute;
+  z-index: 9;
   display: flex;
   align-items: center;
   gap: 2px;
