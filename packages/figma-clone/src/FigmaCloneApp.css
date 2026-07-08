@@ -73,8 +73,10 @@
 }
 
 .figma-canvas-region .canvas-devtools__panel {
-  top: 50px;
-  right: 16px;
+  top: 58px;
+  right: auto;
+  left: 16px;
+  width: min(300px, calc(100% - 32px));
 }
 
 .figma-layers,
@@ -3285,6 +3287,7 @@
 
 .figma-autolayout-toolbar {
   position: absolute;
+  z-index: 9;
   display: flex;
   align-items: center;
   gap: 2px;
