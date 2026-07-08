@@ -28,6 +28,32 @@ test('places the Figma devtools panel away from the fitted section frame', async
   await expect.poll(() => readSelectedFrameAndPanelOverlap(page)).toBe(false)
 })
 
+test('surfaces Figma source context inside canvas devtools', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 1000 })
+  await page.goto('/figma')
+  await expect(page.locator('.figma-clone')).toBeVisible()
+
+  const layers = page.getByRole('complementary', { name: 'Layers' })
+
+  await layers.getByRole('searchbox', { name: 'Search layers' })
+    .fill('stat card revenue')
+  await page.getByRole('button', { name: 'Select layer Revenue stat' })
+    .click()
+  await page.getByRole('button', { name: 'Inspect' }).click()
+
+  const devtools = page.getByRole('region', { name: 'Canvas devtools' })
+
+  await expect(devtools).toContainText('Revenue stat')
+  await expect(devtools).toContainText(
+    'packages/figma-clone/src/dom-edit/FigmaCloneDomEditSurface.tsx#workspaceStatRevenue',
+  )
+  await expect(devtools).toContainText('Stat card')
+  await expect(devtools).toContainText('src/widgets/workspace-stat-card')
+  await expect(devtools).toContainText('root')
+})
+
 async function expectSelectedFrameInsideCanvas(page: Page) {
   await expect.poll(() => readSelectedFrameFit(page)).toEqual({
     bottomInside: true,

@@ -14,6 +14,8 @@ export {
   type CanvasDevtoolsDistance,
   type CanvasDevtoolsDistanceAxis,
   type CanvasDevtoolsCommentSummary,
+  type CanvasDevtoolsContextField,
+  type CanvasDevtoolsContextSummary,
   type CanvasDevtoolsInspectField,
   type CanvasDevtoolsInspectSnapshot,
   type CanvasDevtoolsMeasuredItem,

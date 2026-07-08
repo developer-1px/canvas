@@ -42,6 +42,7 @@ import {
 import {
   CanvasDevtoolsOverlay,
   createCanvasDevtoolsFeaturePackManifest,
+  type CanvasDevtoolsContextSummary,
   type CanvasDevtoolsMode,
   type CanvasDevtoolsNoteSummary,
 } from '@interactive-os/canvas-pack-devtools'
@@ -564,6 +565,7 @@ export function FigmaCloneApp() {
           layerNotes,
           selection,
         })
+        const devtoolsContext = createFigmaCloneDevtoolsContext(selection)
 
         return (
           <main className="figma-clone">
@@ -670,6 +672,7 @@ export function FigmaCloneApp() {
                   />
                   <CanvasDevtoolsOverlay
                     activeMode={devtoolsMode}
+                    context={devtoolsContext}
                     items={app.items}
                     notes={devtoolsNotes}
                     selectedItemIds={[selectedCanvasItemId]}
@@ -1631,6 +1634,68 @@ function createFigmaCloneDevtoolsNotes({
       selected: layerId === selectedLayerId,
     }]
   })
+}
+
+function createFigmaCloneDevtoolsContext(
+  selection: FigmaCloneSelection,
+): CanvasDevtoolsContextSummary {
+  const sourceReference = getFigmaCloneInspectorSourceReference(selection)
+
+  if (selection.frameId === 'widget') {
+    return {
+      fields: [
+        { name: 'layer', value: 'widgets' },
+        { name: 'item', value: FIGMA_CLONE_WIDGET_FRAME_ITEM_ID },
+        { name: 'kind', value: 'figma-clone-react-widget' },
+      ],
+      subtitle: sourceReference,
+      title: 'React widget',
+    }
+  }
+
+  if (!selection.nodeId) {
+    return {
+      fields: [
+        { name: 'layer', value: 'page' },
+        { name: 'root', value: selection.rootId },
+        {
+          name: 'item',
+          value: getFigmaCloneDomCanvasFrameItemId(selection.rootId),
+        },
+      ],
+      subtitle: sourceReference,
+      title: `${FIGMA_CLONE_DOM_NODE_BY_ID[selection.rootId].label} section`,
+    }
+  }
+
+  const binding = getFigmaCloneDomComponentBinding(selection.nodeId)
+  const component = binding
+    ? FIGMA_CLONE_DOM_COMPONENT_SETS.find((candidate) =>
+      candidate.id === binding.componentId)
+    : null
+  const fields = [
+    { name: 'node', value: selection.nodeId },
+    { name: 'root', value: getFigmaCloneSectionRootIdForNode(selection.nodeId) },
+    ...(binding
+      ? [
+          { name: 'component', value: binding.componentLabel },
+          { name: 'instance', value: binding.instanceLabel },
+          { name: 'slot', value: binding.slotLabel },
+        ]
+      : []),
+    ...(component
+      ? [
+          { name: 'layer', value: component.source.layer },
+          { name: 'source', value: component.source.importPath },
+        ]
+      : [{ name: 'layer', value: 'local node' }]),
+  ]
+
+  return {
+    fields,
+    subtitle: sourceReference,
+    title: FIGMA_CLONE_DOM_NODE_BY_ID[selection.nodeId].label,
+  }
 }
 
 function getFigmaCloneCanvasItemIdForLayerFavoriteId(

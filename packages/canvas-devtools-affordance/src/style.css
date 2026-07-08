@@ -168,6 +168,58 @@
   font: 520 10px/1.25 var(--sans, system-ui, sans-serif);
 }
 
+.canvas-devtools__context {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+  padding-top: 2px;
+}
+
+.canvas-devtools__context strong,
+.canvas-devtools__context small {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.canvas-devtools__context strong {
+  color: var(--canvas-ink, #111827);
+  font: 620 11px/1.2 var(--sans, system-ui, sans-serif);
+}
+
+.canvas-devtools__context small {
+  color: var(--canvas-muted, #6b7280);
+  font: 500 10px/1.2 var(--sans, system-ui, sans-serif);
+}
+
+.canvas-devtools__context-fields {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+}
+
+.canvas-devtools__context-field {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr);
+  gap: 6px;
+  color: var(--canvas-muted, #6b7280);
+  font: 500 10px/1.2 var(--sans, system-ui, sans-serif);
+}
+
+.canvas-devtools__context-field dt,
+.canvas-devtools__context-field dd {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.canvas-devtools__context-field dd {
+  color: var(--canvas-ink, #111827);
+}
+
 .canvas-devtools__panel-body {
   display: grid;
   gap: 6px;

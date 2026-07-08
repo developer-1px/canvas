@@ -18,6 +18,8 @@ export {
 } from './CanvasDevtoolsInspectionModel'
 export {
   CanvasDevtoolsOverlay,
+  type CanvasDevtoolsContextField,
+  type CanvasDevtoolsContextSummary,
   type CanvasDevtoolsMode,
   type CanvasDevtoolsOverlayProps,
 } from './CanvasDevtoolsOverlay'

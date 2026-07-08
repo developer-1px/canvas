@@ -30,8 +30,20 @@ export type CanvasDevtoolsMode = 'inspect' | 'measure' | 'notes' | 'off'
 
 const CANVAS_DEVTOOLS_MODES = ['measure', 'inspect', 'notes'] as const
 
+export type CanvasDevtoolsContextField = Readonly<{
+  name: string
+  value: string
+}>
+
+export type CanvasDevtoolsContextSummary = Readonly<{
+  fields?: readonly CanvasDevtoolsContextField[]
+  subtitle?: string
+  title: string
+}>
+
 export type CanvasDevtoolsOverlayProps = Readonly<{
   activeMode: CanvasDevtoolsMode
+  context?: CanvasDevtoolsContextSummary
   items: readonly CanvasItem[]
   notes?: readonly CanvasDevtoolsNoteSummary[]
   onModeChange?: (mode: CanvasDevtoolsMode) => void
@@ -60,6 +72,7 @@ type CanvasDevtoolsDistanceStyle = CSSProperties & {
 
 export function CanvasDevtoolsOverlay({
   activeMode,
+  context,
   items,
   notes,
   onModeChange,
@@ -114,6 +127,9 @@ export function CanvasDevtoolsOverlay({
         <div className="canvas-devtools__meta">
           {activeModeLabel} · {selectedCount > 0 ? `${selectedCount} selected` : 'No selection'} · {formatScale(viewport.scale)}
         </div>
+        {context ? (
+          <CanvasDevtoolsContextPanel context={context} />
+        ) : null}
         {activeMode === 'inspect' ? (
           <CanvasDevtoolsInspectPanel snapshot={inspectSnapshot} />
         ) : null}
@@ -122,6 +138,34 @@ export function CanvasDevtoolsOverlay({
         ) : null}
       </div>
     </div>
+  )
+}
+
+function CanvasDevtoolsContextPanel({
+  context,
+}: {
+  context: CanvasDevtoolsContextSummary
+}) {
+  return (
+    <section className="canvas-devtools__context">
+      <strong>{context.title}</strong>
+      {context.subtitle ? (
+        <small>{context.subtitle}</small>
+      ) : null}
+      {context.fields && context.fields.length > 0 ? (
+        <dl className="canvas-devtools__context-fields">
+          {context.fields.map((field) => (
+            <div
+              className="canvas-devtools__context-field"
+              key={`${field.name}:${field.value}`}
+            >
+              <dt>{field.name}</dt>
+              <dd>{field.value}</dd>
+            </div>
+          ))}
+        </dl>
+      ) : null}
+    </section>
   )
 }
 
