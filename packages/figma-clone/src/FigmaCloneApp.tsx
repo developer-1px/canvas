@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import {
   useCallback,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -516,11 +517,22 @@ export function FigmaCloneApp() {
     <CanvasApp
       assemblyInput={assemblyInput}
       renderApp={(app) => {
+        const focusCanvasItem = (canvasItemId: string) => {
+          app.viewportFocus.fitItems([canvasItemId])
+        }
+        const selectWidgetFrameAndFocus = () => {
+          setSelection({ frameId: 'widget', nodeId: null })
+          focusCanvasItem(FIGMA_CLONE_WIDGET_FRAME_ITEM_ID)
+        }
+        const selectSectionAndFocus = (
+          rootId: FigmaCloneDomSectionRootId,
+        ) => {
+          selectSection(rootId)
+          focusCanvasItem(getFigmaCloneDomCanvasFrameItemId(rootId))
+        }
         const selectNodeAndFocus = (nodeId: FigmaCloneDomNodeId) => {
           selectDomNode(nodeId)
-          app.viewportFocus.fitItems([
-            getFigmaCloneCanvasItemIdForNode(nodeId),
-          ])
+          focusCanvasItem(getFigmaCloneCanvasItemIdForNode(nodeId))
         }
         const importComponent = (
           component: FigmaCloneDomComponentSetSummary,
@@ -544,10 +556,7 @@ export function FigmaCloneApp() {
             next.add(story.id)
             return next
           })
-          selectSection(story.rootId)
-          app.viewportFocus.fitItems([
-            getFigmaCloneCanvasItemIdForNode(story.rootId),
-          ])
+          selectSectionAndFocus(story.rootId)
         }
         const selectedCanvasItemId = getFigmaCloneSelectedCanvasItemId(selection)
         const devtoolsNotes = createFigmaCloneDevtoolsNotes({
@@ -558,6 +567,10 @@ export function FigmaCloneApp() {
 
         return (
           <main className="figma-clone">
+            <FigmaCloneSelectionViewportFocus
+              canvasItemId={selectedCanvasItemId}
+              onFitItems={app.viewportFocus.fitItems}
+            />
             <FigmaCloneLayersPanel
               favoriteLayerIds={favoriteLayerIds}
               favoritesOnly={favoriteLayersOnly}
@@ -565,11 +578,9 @@ export function FigmaCloneApp() {
               selection={selection}
               onFavoritesOnlyChange={setFavoriteLayersOnly}
               onQueryChange={setLayerQuery}
-              onSelectWidgetFrame={() => {
-                setSelection({ frameId: 'widget', nodeId: null })
-              }}
-              onSelectSection={selectSection}
-              onSelectNode={selectDomNode}
+              onSelectWidgetFrame={selectWidgetFrameAndFocus}
+              onSelectSection={selectSectionAndFocus}
+              onSelectNode={selectNodeAndFocus}
               onSelectNodeAndFocus={selectNodeAndFocus}
               onToggleFavorite={toggleFavoriteLayer}
             />
@@ -707,6 +718,39 @@ export function FigmaCloneApp() {
       }}
     />
   )
+}
+
+function FigmaCloneSelectionViewportFocus({
+  canvasItemId,
+  onFitItems,
+}: {
+  canvasItemId: string
+  onFitItems: (ids: readonly string[]) => void
+}) {
+  const lastFocusedItemIdRef = useRef<string | null>(null)
+
+  useEffect(() => {
+    if (lastFocusedItemIdRef.current === canvasItemId) {
+      return undefined
+    }
+
+    let cancelled = false
+    const frame = window.requestAnimationFrame(() => {
+      if (cancelled) {
+        return
+      }
+
+      lastFocusedItemIdRef.current = canvasItemId
+      onFitItems([canvasItemId])
+    })
+
+    return () => {
+      cancelled = true
+      window.cancelAnimationFrame(frame)
+    }
+  }, [canvasItemId, onFitItems])
+
+  return null
 }
 
 function FigmaCloneGuideLayerControls({
