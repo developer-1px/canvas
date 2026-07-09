@@ -6,7 +6,7 @@ test('shows box-model X-ray layers for selected and hovered nodes', async ({
   await page.goto('/?demo=figma')
   await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
   await selectLayer(page, 'Select layer Main area', 'workspaceMain')
-  await page.getByRole('spinbutton', { name: 'Mar' }).fill('12')
+  await page.getByRole('spinbutton', { name: 'CSS margin' }).fill('12')
 
   await page.getByRole('button', { name: 'Toggle box model X-ray' }).click()
   await expect(page.locator('.figma-autolayout-padding')).toHaveCount(0)

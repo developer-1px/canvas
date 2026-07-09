@@ -83,7 +83,7 @@ async function expectBadgeBelowSelection(page: Page, nodeId: string) {
 }
 
 function designPanel(page: Page) {
-  return page.getByRole('complementary', { name: 'Design' })
+  return page.getByRole('complementary', { name: 'CSS Inspector' })
 }
 
 function heightSourceBadge(page: Page) {

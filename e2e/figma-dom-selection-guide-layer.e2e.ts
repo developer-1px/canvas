@@ -82,7 +82,7 @@ test('keeps widget selection separate from DOM edit selection', async ({
   await expect(page.locator('[data-figma-dom-node][data-selected="true"]'))
     .toHaveCount(0)
   await expect(
-    page.getByRole('complementary', { name: 'Design' })
+    page.getByRole('complementary', { name: 'CSS Inspector' })
       .getByRole('heading', { name: 'React widget' }),
   ).toBeVisible()
 })

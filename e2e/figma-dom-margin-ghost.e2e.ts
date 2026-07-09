@@ -50,7 +50,7 @@ test('distinguishes margin-derived spacing without margin handles', async ({
   await page.getByRole('button', { name: 'Select layer Deal row 1' })
     .click()
 
-  await page.getByRole('spinbutton', { name: 'Mar' }).fill('10')
+  await page.getByRole('spinbutton', { name: 'CSS margin' }).fill('10')
   await page.getByRole('button', { name: 'Measure tool' }).click()
 
   await expect(page.locator(

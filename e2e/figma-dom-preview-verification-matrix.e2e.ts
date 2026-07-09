@@ -58,7 +58,7 @@ test('verifies measure and X-ray overlays stay state-specific', async ({
   await expect(page.locator('.figma-guide-distance')).toHaveCount(0)
 
   await selectLayer(page, 'Select layer Main area', 'workspaceMain')
-  await page.getByRole('spinbutton', { name: 'Mar' }).fill('12')
+  await page.getByRole('spinbutton', { name: 'CSS margin' }).fill('12')
   await page.getByRole('button', { name: 'Toggle box model X-ray' }).click()
   await expect(selectedBoxModelLayer(page, 'content')).toHaveCount(1)
   await expect(selectedBoxModelLayer(page, 'border')).toHaveCount(1)
@@ -102,7 +102,7 @@ test('verifies flex spacing and flex-child participation controls', async ({
 
   await selectLayer(page, 'Select layer Main area', 'workspaceMain')
   const initialPaddingHeight = await readBoxHeight(sideHandle(page, 'top'))
-  await page.getByRole('spinbutton', { name: 'Pad' }).fill('36')
+  await page.getByRole('spinbutton', { name: 'CSS padding' }).fill('36')
   await expect.poll(() => readBoxHeight(sideHandle(page, 'top')))
     .toBeGreaterThan(initialPaddingHeight + 2)
 
