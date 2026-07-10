@@ -524,7 +524,11 @@ export function DomEditSelectionOverlay<
 
     for (const edit of edits) {
       if (edit.kind === 'number') {
-        onChange(selectedNodeId, edit.field, edit.value)
+        onChange(
+          selectedNodeId,
+          edit.field,
+          roundDomEditNumber(edit.value),
+        )
       } else {
         onChangeAutoLayout(selectedNodeId, edit.field, edit.value)
       }
@@ -785,6 +789,10 @@ function hasDomEditResizeDelta(dist: number[], scale: number): boolean {
   const [dx = 0, dy = 0] = dist
 
   return Math.abs(dx / scale) >= 0.5 || Math.abs(dy / scale) >= 0.5
+}
+
+function roundDomEditNumber(value: number): number {
+  return Math.round(value * 10) / 10
 }
 
 function isDomEditCancelledInput(input: unknown) {
