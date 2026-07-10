@@ -197,6 +197,78 @@ describe('DesignDocument', () => {
     expect(document.redo()).toBe(false)
   })
 
+  it('merges adjacent commands from one explicit history group', () => {
+    const document = createDesignDocument(createRepresentativeSnapshot())
+
+    expect(document.execute({
+      label: 'Drag title 1',
+      historyGroup: 'title-drag:1',
+      changes: [{
+        type: 'update',
+        nodeId: 'workspaceHeroTitle',
+        values: { style: { x: 12 } },
+      }],
+    })).toEqual({ changed: true, ok: true })
+    expect(document.execute({
+      label: 'Drag title 2',
+      historyGroup: 'title-drag:1',
+      changes: [{
+        type: 'update',
+        nodeId: 'workspaceHeroTitle',
+        values: { style: { x: 24 } },
+      }],
+    })).toEqual({ changed: true, ok: true })
+
+    expect(document.undo()).toBe(true)
+    expect(document.read.node('workspaceHeroTitle')?.style).toEqual({
+      color: '#0f172a',
+    })
+    expect(document.undo()).toBe(false)
+
+    expect(document.redo()).toBe(true)
+    expect(document.read.node('workspaceHeroTitle')?.style).toEqual({ x: 24 })
+  })
+
+  it('does not merge different or interrupted history groups', () => {
+    const document = createDesignDocument(createRepresentativeSnapshot())
+
+    document.execute({
+      label: 'First drag',
+      historyGroup: 'title-drag:1',
+      changes: [{
+        type: 'update',
+        nodeId: 'workspaceHeroTitle',
+        values: { style: { x: 12 } },
+      }],
+    })
+    document.execute({
+      label: 'Keyboard edit',
+      changes: [{
+        type: 'update',
+        nodeId: 'workspaceHeroTitle',
+        values: { style: { x: 18 } },
+      }],
+    })
+    document.execute({
+      label: 'Second drag',
+      historyGroup: 'title-drag:1',
+      changes: [{
+        type: 'update',
+        nodeId: 'workspaceHeroTitle',
+        values: { style: { x: 24 } },
+      }],
+    })
+
+    expect(document.undo()).toBe(true)
+    expect(document.read.node('workspaceHeroTitle')?.style).toEqual({ x: 18 })
+    expect(document.undo()).toBe(true)
+    expect(document.read.node('workspaceHeroTitle')?.style).toEqual({ x: 12 })
+    expect(document.undo()).toBe(true)
+    expect(document.read.node('workspaceHeroTitle')?.style).toEqual({
+      color: '#0f172a',
+    })
+  })
+
   it('adds, reparents, and removes nodes through ordered structural commands', () => {
     const document = createDesignDocument(createRepresentativeSnapshot())
     const note = {

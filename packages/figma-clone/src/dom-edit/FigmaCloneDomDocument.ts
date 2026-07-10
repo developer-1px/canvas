@@ -20,9 +20,19 @@ export type FigmaCloneDomDocumentValue = {
 export type FigmaCloneDomDocument =
   JSONDocument<FigmaCloneDomDocumentValue>
 
+const FigmaCloneLegacyRecordSchema = z.custom<Record<string, unknown>>(
+  isRecordLike,
+).refine(
+  hasNoWorkspaceEntries,
+  'Workspace nodes belong to the canonical DesignDocument',
+)
+
 export const FIGMA_CLONE_DOM_DOCUMENT_SCHEMA = z.object({
-  state: z.custom<FigmaCloneDomEditState>(isRecordLike),
-  textState: z.custom<FigmaCloneDomTextState>(isRecordLike),
+  state: FigmaCloneLegacyRecordSchema as unknown as
+    z.ZodType<FigmaCloneDomEditState>,
+  textState:
+    FigmaCloneLegacyRecordSchema as unknown as
+      z.ZodType<FigmaCloneDomTextState>,
 }) satisfies z.ZodType<FigmaCloneDomDocumentValue>
 
 export function createFigmaCloneDomDocument(): FigmaCloneDomDocument {
@@ -39,9 +49,19 @@ export function createFigmaCloneDomDocument(): FigmaCloneDomDocument {
 
 export function createFigmaCloneDomDocumentValue(): FigmaCloneDomDocumentValue {
   return {
-    state: createFigmaCloneDomEditState(),
-    textState: createFigmaCloneDomTextState(),
+    state: withoutWorkspaceEntries(createFigmaCloneDomEditState()),
+    textState: withoutWorkspaceEntries(createFigmaCloneDomTextState()),
   }
+}
+
+function withoutWorkspaceEntries<TValue extends object>(value: TValue): TValue {
+  return Object.fromEntries(
+    Object.entries(value).filter(([key]) => !key.startsWith('workspace')),
+  ) as TValue
+}
+
+function hasNoWorkspaceEntries(value: Record<string, unknown>) {
+  return Object.keys(value).every((key) => !key.startsWith('workspace'))
 }
 
 function isRecordLike(value: unknown) {

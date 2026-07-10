@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   createFigmaCloneDomDocument,
+  createFigmaCloneDomDocumentValue,
 } from './FigmaCloneDomDocument'
 import {
   updateFigmaCloneDomAutoLayoutField,
@@ -9,6 +10,26 @@ import {
 } from './FigmaCloneDomEditModel'
 
 describe('FigmaCloneDomDocument', () => {
+  it('keeps workspace-owned nodes out of the legacy document value', () => {
+    const value = createFigmaCloneDomDocumentValue()
+
+    expect(Object.keys(value.state).filter(isWorkspaceKey)).toEqual([])
+    expect(Object.keys(value.textState).filter(isWorkspaceKey)).toEqual([])
+  })
+
+  it('rejects attempts to dual-write workspace nodes', () => {
+    const document = createFigmaCloneDomDocument()
+
+    expect(document.replace('', {
+      ...document.value,
+      state: {
+        ...document.value.state,
+        workspaceHeroTitle: document.value.state.homeHeroTitle,
+      },
+    })).toMatchObject({ ok: false })
+    expect(document.value.state).not.toHaveProperty('workspaceHeroTitle')
+  })
+
   it('commits DOM style edits through json-document history', () => {
     const document = createFigmaCloneDomDocument()
 
@@ -38,18 +59,18 @@ describe('FigmaCloneDomDocument', () => {
       ...document.value,
       state: updateFigmaCloneDomAutoLayoutField({
         field: 'distribution',
-        nodeId: 'workspaceHeroActions',
+        nodeId: 'homeHeroActions',
         state: document.value.state,
         value: 'center',
       }),
     })).toMatchObject({ ok: true })
-    expect(document.value.state.workspaceHeroActions.distribution).toBe('center')
+    expect(document.value.state.homeHeroActions.distribution).toBe('center')
 
     expect(document.history.undo()).toBe(true)
-    expect(document.value.state.workspaceHeroActions.distribution).toBe('packed')
+    expect(document.value.state.homeHeroActions.distribution).toBe('packed')
 
     expect(document.history.redo()).toBe(true)
-    expect(document.value.state.workspaceHeroActions.distribution).toBe('center')
+    expect(document.value.state.homeHeroActions.distribution).toBe('center')
   })
 
   it('commits DOM text edits through json-document history', () => {
@@ -58,14 +79,22 @@ describe('FigmaCloneDomDocument', () => {
     expect(document.replace('', {
       ...document.value,
       textState: updateFigmaCloneDomText({
-        nodeId: 'workspaceHeroTitle',
+        nodeId: 'homeHeroTitle',
         state: document.value.textState,
-        value: 'Pipeline control',
+        value: 'Layout is editorial rhythm',
       }),
     })).toMatchObject({ ok: true })
-    expect(document.value.textState.workspaceHeroTitle).toBe('Pipeline control')
+    expect(document.value.textState.homeHeroTitle).toBe(
+      'Layout is editorial rhythm',
+    )
 
     expect(document.history.undo()).toBe(true)
-    expect(document.value.textState.workspaceHeroTitle).toBe('Revenue operations')
+    expect(document.value.textState.homeHeroTitle).toBe(
+      'The homepage is an article before it is an interface',
+    )
   })
 })
+
+function isWorkspaceKey(key: string) {
+  return key.startsWith('workspace')
+}
