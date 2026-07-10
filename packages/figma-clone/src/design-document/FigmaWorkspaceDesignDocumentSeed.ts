@@ -2,6 +2,7 @@ import {
   createDesignDocument,
   type DesignDocument,
   type DesignDocumentSnapshot,
+  type DesignJSONObject,
   type DesignNode,
   type DesignNodeComponentBinding,
 } from '../../../../src/canvas/design-document'
@@ -399,6 +400,83 @@ const WORKSPACE_TREE: readonly FigmaWorkspaceNodeSeed[] = [
     ],
   },
 ]
+
+const WORKSPACE_AUTHORED_PROPS: Partial<Record<
+  FigmaWorkspaceDesignNodeId,
+  DesignJSONObject
+>> = {
+  workspaceActivity: {
+    className:
+      'figma-dom-workspace__panel figma-dom-workspace__panel--activity',
+  },
+  workspaceActivityList: { className: 'figma-dom-workspace__activity-list' },
+  workspaceActivityOne: { className: 'figma-dom-workspace__activity' },
+  workspaceActivityThree: { className: 'figma-dom-workspace__activity' },
+  workspaceActivityTwo: { className: 'figma-dom-workspace__activity' },
+  workspaceAudienceTagEnterprise: { className: 'figma-dom-workspace__tag' },
+  workspaceAudienceTagExpansion: { className: 'figma-dom-workspace__tag' },
+  workspaceAudienceTagRenewal: { className: 'figma-dom-workspace__tag' },
+  workspaceAudienceTagRisk: { className: 'figma-dom-workspace__tag' },
+  workspaceAudienceTags: {
+    className: 'figma-dom-workspace__tags',
+    flexWrap: 'wrap',
+  },
+  workspaceBrand: { className: 'figma-dom-workspace__brand' },
+  workspaceBrandMark: { className: 'figma-dom-workspace__brand-mark' },
+  workspaceBrandText: { className: 'figma-dom-workspace__brand-text' },
+  workspaceContent: {
+    className: 'figma-dom-workspace__content',
+    display: 'grid',
+    gridTemplateColumns: 'minmax(0, 1fr) max-content',
+  },
+  workspaceDealOne: { className: 'figma-dom-workspace__deal' },
+  workspaceDealThree: { className: 'figma-dom-workspace__deal' },
+  workspaceDealTwo: { className: 'figma-dom-workspace__deal' },
+  workspaceFloatingNote: {
+    className: 'figma-dom-workspace__floating-note',
+    position: 'absolute',
+  },
+  workspaceHero: { className: 'figma-dom-workspace__hero' },
+  workspaceHeroActions: { className: 'figma-dom-workspace__hero-actions' },
+  workspaceHeroCopy: { className: 'figma-dom-workspace__hero-copy' },
+  workspaceMain: { className: 'figma-dom-workspace__main' },
+  workspaceNav: { className: 'figma-dom-workspace__nav' },
+  workspaceNavCustomers: { className: 'figma-dom-workspace__nav-item' },
+  workspaceNavOverview: {
+    className:
+      'figma-dom-workspace__nav-item figma-dom-workspace__nav-item--active',
+  },
+  workspaceNavRoadmap: { className: 'figma-dom-workspace__nav-item' },
+  workspacePage: { className: 'figma-dom-workspace' },
+  workspacePipeline: {
+    className:
+      'figma-dom-workspace__panel figma-dom-workspace__panel--pipeline',
+  },
+  workspacePipelineList: { className: 'figma-dom-workspace__list' },
+  workspacePrimaryAction: { className: 'figma-dom-workspace__primary' },
+  workspaceProfile: { className: 'figma-dom-workspace__profile' },
+  workspaceSearch: { className: 'figma-dom-workspace__search' },
+  workspaceSecondaryAction: { className: 'figma-dom-workspace__secondary' },
+  workspaceSidebar: { className: 'figma-dom-workspace__sidebar' },
+  workspaceStatConversion: {
+    className: 'figma-dom-workspace__stat',
+    display: 'grid',
+    gridTemplateRows: 'auto auto auto',
+  },
+  workspaceStats: { className: 'figma-dom-workspace__stats' },
+  workspaceStatRevenue: {
+    className: 'figma-dom-workspace__stat',
+    display: 'grid',
+    gridTemplateRows: 'auto auto auto',
+  },
+  workspaceStatTickets: {
+    className: 'figma-dom-workspace__stat',
+    display: 'grid',
+    gridTemplateRows: 'auto auto auto',
+  },
+  workspaceTopbar: { className: 'figma-dom-workspace__topbar' },
+  workspaceUpgrade: { className: 'figma-dom-workspace__usage' },
+}
 
 const EMPTY_STYLE: FigmaCloneDomEditNodeState = {
   align: 'stretch',
@@ -1003,7 +1081,10 @@ function flattenWorkspaceNodes(
         ? { kind: 'component', id: component.definitionId }
         : { kind: 'intrinsic', id: seed.intrinsic },
       children: seed.children?.map((child) => child.id) ?? [],
-      props: {},
+      props: {
+        ...WORKSPACE_AUTHORED_PROPS[seed.id],
+        ...(seed.intrinsic === 'button' ? { type: 'button' } : {}),
+      },
       text: (WORKSPACE_TEXT as Partial<
         Record<FigmaWorkspaceDesignNodeId, string>
       >)[seed.id] ?? null,

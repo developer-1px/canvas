@@ -19,6 +19,13 @@ describe('CanvasRootRoutes', () => {
       .toBe('engine')
   })
 
+  it('resolves the direct DOM shadow route without advertising it', () => {
+    expect(resolveCanvasRootRoute({ pathname: '/figma-dom', search: '' }))
+      .toBe('figma-dom')
+    expect(CANVAS_APP_LAUNCH_OPTIONS.map((option) => option.href))
+      .not.toContain('/figma-dom')
+  })
+
   it('keeps legacy demo query routes working', () => {
     expect(resolveCanvasRootRoute({ pathname: '/', search: '?demo=figma' }))
       .toBe('figma')

@@ -60,6 +60,33 @@ describe('Figma workspace DesignDocument', () => {
     expect(projection.textState.workspaceUpgradeText).toBe(
       "68% of this quarter's workspace budget is allocated.",
     )
+    expect(snapshot.nodes.find((node) => node.id === 'workspacePage')?.props)
+      .toEqual({ className: 'figma-dom-workspace' })
+    expect(snapshot.nodes.find(
+      (node) => node.id === 'workspaceNavOverview',
+    )?.props).toEqual({
+      className:
+        'figma-dom-workspace__nav-item figma-dom-workspace__nav-item--active',
+      type: 'button',
+    })
+    expect(snapshot.nodes.find(
+      (node) => node.id === 'workspaceFloatingNote',
+    )?.props).toMatchObject({ position: 'absolute' })
+    expect(snapshot.nodes.find(
+      (node) => node.id === 'workspaceAudienceTags',
+    )?.props).toMatchObject({ flexWrap: 'wrap' })
+    expect(snapshot.nodes.find(
+      (node) => node.id === 'workspaceContent',
+    )?.props).toMatchObject({
+      display: 'grid',
+      gridTemplateColumns: 'minmax(0, 1fr) max-content',
+    })
+    expect(snapshot.nodes.find(
+      (node) => node.id === 'workspaceStatRevenue',
+    )?.props).toMatchObject({
+      display: 'grid',
+      gridTemplateRows: 'auto auto auto',
+    })
     expect(projection.state.workspacePage).toMatchObject({
       align: 'stretch',
       direction: 'row',
