@@ -7,8 +7,12 @@ import {
 import { isDomEditCanvasPanTarget } from '@interactive-os/dom-edit-affordance/canvas'
 import { FigmaCloneDomEditSurface } from '../dom-edit/FigmaCloneDomEditSurface'
 import type {
+  FigmaWorkspaceDesignDocumentProjection,
+} from '../design-document/FigmaWorkspaceDesignDocumentProjection'
+import type {
   FigmaCloneDomEditState,
   FigmaCloneDomNodeId,
+  FigmaCloneDomReadModel,
   FigmaCloneDomTextState,
 } from '../dom-edit/FigmaCloneDomEditModel'
 import {
@@ -27,26 +31,43 @@ import {
 
 export type FigmaCloneDomEditorFrameModuleOptions = {
   isSectionSelected: (rootId: FigmaCloneDomSectionRootId) => boolean
-  sectionViewport: FigmaCloneSectionViewport
+  readModel: FigmaCloneDomReadModel
+  sectionViewports: Readonly<
+    Record<FigmaCloneDomSectionRootId, FigmaCloneSectionViewport>
+  >
   selectedNodeId: FigmaCloneDomNodeId | null
   state: FigmaCloneDomEditState
   textState: FigmaCloneDomTextState
+  workspaceDefinitionByNodeId:
+    FigmaWorkspaceDesignDocumentProjection['definitionByNodeId']
   onSelectSection: (rootId: FigmaCloneDomSectionRootId) => void
   onSelectNode: (nodeId: FigmaCloneDomNodeId) => void
   onChangeText: (nodeId: FigmaCloneDomNodeId, value: string) => void
 }
 
-export function createFigmaCloneDomEditorCanvasItems(): CanvasCustomItem[] {
-  const defaultState = {} as FigmaCloneDomEditState
+export type FigmaCloneDomEditorCanvasItemsOptions = {
+  readonly workspaceFrame?: {
+    readonly x: number
+    readonly y: number
+  }
+  readonly workspaceState?: FigmaCloneDomEditState
+  readonly workspaceViewport?: FigmaCloneSectionViewport
+}
+
+export function createFigmaCloneDomEditorCanvasItems({
+  workspaceFrame = { x: 40, y: 76 },
+  workspaceState = {} as FigmaCloneDomEditState,
+  workspaceViewport = FIGMA_CLONE_DEFAULT_SECTION_VIEWPORT,
+}: FigmaCloneDomEditorCanvasItemsOptions = {}): CanvasCustomItem[] {
   const workspaceFrameSize = getFigmaCloneDomFrameSize({
     rootId: 'workspacePage',
-    sectionViewport: FIGMA_CLONE_DEFAULT_SECTION_VIEWPORT,
-    state: defaultState,
+    sectionViewport: workspaceViewport,
+    state: workspaceState,
   })
   const homeFrameSize = getFigmaCloneDomFrameSize({
     rootId: 'homePage',
     sectionViewport: FIGMA_CLONE_DEFAULT_SECTION_VIEWPORT,
-    state: defaultState,
+    state: {} as FigmaCloneDomEditState,
   })
 
   return [
@@ -55,8 +76,8 @@ export function createFigmaCloneDomEditorCanvasItems(): CanvasCustomItem[] {
       id: 'figma-dom-workspace-frame',
       rootId: 'workspacePage',
       title: 'Workspace section',
-      x: 40,
-      y: 76,
+      x: workspaceFrame.x,
+      y: workspaceFrame.y,
     }),
     createFigmaCloneDomEditorFrameItem({
       frameSize: homeFrameSize,
@@ -71,10 +92,12 @@ export function createFigmaCloneDomEditorCanvasItems(): CanvasCustomItem[] {
 
 export function createFigmaCloneDomEditorFrameModule({
   isSectionSelected,
-  sectionViewport,
+  readModel,
+  sectionViewports,
   selectedNodeId,
   state,
   textState,
+  workspaceDefinitionByNodeId,
   onSelectSection,
   onSelectNode,
   onChangeText,
@@ -84,6 +107,7 @@ export function createFigmaCloneDomEditorFrameModule({
     presentation: FIGMA_CLONE_DOM_FRAME_PRESENTATION,
     renderItem: ({ item }) => {
       const rootId = getFigmaCloneDomFrameRootId(item.data)
+      const sectionViewport = sectionViewports[rootId]
       const frameSize = getFigmaCloneDomFrameSize({
         rootId,
         sectionViewport,
@@ -117,11 +141,13 @@ export function createFigmaCloneDomEditorFrameModule({
             </div>
             <FigmaCloneDomEditSurface
               isSectionSelected={isSectionSelected(rootId)}
+              readModel={readModel}
               rootId={rootId}
               sectionViewport={sectionViewport}
               selectedNodeId={selectedNodeId}
               state={state}
               textState={textState}
+              workspaceDefinitionByNodeId={workspaceDefinitionByNodeId}
               onSelectSection={() => onSelectSection(rootId)}
               onSelectNode={onSelectNode}
               onChangeText={onChangeText}

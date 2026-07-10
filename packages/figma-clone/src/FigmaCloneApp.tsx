@@ -16,6 +16,7 @@ import {
   useMemo,
   useRef,
   useState,
+  useSyncExternalStore,
   type KeyboardEvent,
   type RefObject,
 } from 'react'
@@ -23,6 +24,7 @@ import { useJSONDocument } from '@interactive-os/json-document/react'
 import {
   CanvasApp,
   type CanvasAppAssemblyInput,
+  type Viewport,
 } from '../../../src/canvas'
 import {
   CANVAS_TOOLBAR_ITEM_PROPS,
@@ -50,13 +52,14 @@ import {
   type FigmaCloneDomDocumentValue,
 } from './dom-edit/FigmaCloneDomDocument'
 import {
-  FIGMA_CLONE_DOM_EDIT_ADAPTER,
-  FIGMA_CLONE_DOM_NODE_BY_ID,
-  canFigmaCloneDomNodeEditText,
+  FIGMA_CLONE_DOM_READ_MODEL,
+  createFigmaCloneDomReadModel,
+  createFigmaCloneDomEditAdapter,
   getFigmaCloneDomComponentBinding,
+  getFigmaCloneDomEditStyle,
+  getFigmaCloneDomLayoutContext,
   getFigmaCloneDomToggledAxisSizeMode,
   getFigmaCloneDomText,
-  getFigmaCloneDomNodeDepth,
   getFigmaCloneDomRootId,
   updateFigmaCloneDomComponentAutoLayoutField,
   updateFigmaCloneDomComponentEditField,
@@ -70,8 +73,23 @@ import {
   type FigmaCloneDomDisplay,
   type FigmaCloneDomNode,
   type FigmaCloneDomNodeId,
+  type FigmaCloneDomReadModel,
   type FigmaCloneDomTextState,
 } from './dom-edit/FigmaCloneDomEditModel'
+import {
+  applyFigmaWorkspaceFramePreset,
+  createFigmaWorkspaceDesignDocument,
+  getFigmaWorkspaceLegacyComponentBinding,
+  projectFigmaWorkspaceDesignDocument,
+  routeFigmaWorkspaceOwnedEdit,
+  routeFigmaWorkspaceOwnedSectionEdit,
+  updateFigmaWorkspaceAutoLayoutField,
+  updateFigmaWorkspaceFrame,
+  updateFigmaWorkspaceNumericField,
+  updateFigmaWorkspaceText,
+  type FigmaWorkspaceDesignDocumentProjection,
+  type FigmaWorkspaceDesignNodeId,
+} from './design-document'
 import {
   createFigmaCloneCanvasItems,
   createFigmaCloneCanvasModules,
@@ -100,11 +118,24 @@ type FigmaCloneSelection =
     }
 
 type FigmaCloneDomDragHistorySession = {
+  historyGroup: string
   mergeKey: string
   undoDepth: number
 }
 
+type FigmaCloneCanvasItems = NonNullable<
+  CanvasAppAssemblyInput['initialItems']
+>
+
+type FigmaCloneCanvasRuntimeMemory = {
+  readFocusedItemId: () => string | null
+  readViewport: () => Viewport
+  rememberFocusedItemId: (itemId: string) => void
+  rememberViewport: (viewport: Viewport) => void
+}
+
 type FigmaCloneLayerTreeHandlers = {
+  nodeById: FigmaCloneDomReadModel['nodeById']
   onSelectNode: (nodeId: FigmaCloneDomNodeId) => void
   onSelectSection: (rootId: FigmaCloneDomSectionRootId) => void
 }
@@ -114,7 +145,15 @@ const FIGMA_CLONE_LAYER_TREE_BUTTON_SELECTOR =
 
 const FIGMA_CLONE_WIDGET_FRAME_ITEM_ID = 'figma-widget-frame'
 
-const FIGMA_CLONE_ITEMS = createFigmaCloneCanvasItems()
+const FIGMA_CLONE_INITIAL_CANVAS_VIEWPORT = {
+  scale: 0.38,
+  x: 300,
+  y: 72,
+} satisfies Viewport
+
+const FIGMA_CLONE_LEGACY_TREE = FIGMA_CLONE_DOM_READ_MODEL.tree.filter(
+  (node) => node.id !== 'workspacePage',
+)
 const FIGMA_CLONE_EDITOR_OVERLAY_LAYERS: DomEditOverlayLayerVisibility =
   DEFAULT_DOM_EDIT_OVERLAY_LAYER_VISIBILITY
 
@@ -167,9 +206,23 @@ const FIGMA_CLONE_AFFORDANCE_CONFIG = {
 
 export function FigmaCloneApp() {
   const canvasRegionRef = useRef<HTMLElement | null>(null)
+  const [canvasRuntimeMemory] = useState(
+    createFigmaCloneCanvasRuntimeMemory,
+  )
   const domDragHistoryRef =
     useRef<FigmaCloneDomDragHistorySession | null>(null)
+  const domDragHistorySequenceRef = useRef(0)
   const toolToolbarRovingFocus = useCanvasToolbarRovingFocus<HTMLDivElement>()
+  const [workspaceDocument] = useState(createFigmaWorkspaceDesignDocument)
+  const workspaceSnapshot = useSyncExternalStore(
+    workspaceDocument.subscribe,
+    () => workspaceDocument.snapshot,
+    () => workspaceDocument.snapshot,
+  )
+  const workspace = useMemo(
+    () => projectFigmaWorkspaceDesignDocument(workspaceSnapshot),
+    [workspaceSnapshot],
+  )
   const domDocument = useJSONDocument(
     FIGMA_CLONE_DOM_DOCUMENT_SCHEMA,
     createFigmaCloneDomDocumentValue(),
@@ -179,21 +232,55 @@ export function FigmaCloneApp() {
       trustedInitial: true,
     },
   )
-  const [sectionViewport, setSectionViewport] =
+  const [legacySectionViewport, setLegacySectionViewport] =
     useState<FigmaCloneSectionViewport>(
       FIGMA_CLONE_DEFAULT_SECTION_VIEWPORT,
     )
-  const [selection, setSelection] = useState<FigmaCloneSelection>({
+  const [selectionState, setSelection] = useState<FigmaCloneSelection>({
     frameId: 'dom',
     rootId: 'workspacePage',
     nodeId: null,
   })
+  const selection = reconcileFigmaCloneSelection(selectionState, workspace)
   const overlayLayers = FIGMA_CLONE_EDITOR_OVERLAY_LAYERS
+  const domReadModel = useMemo(
+    () => createFigmaCloneDomReadModel([
+      ...workspace.tree,
+      ...FIGMA_CLONE_LEGACY_TREE,
+    ]),
+    [workspace.tree],
+  )
+  const domEditAdapter = useMemo(
+    () => createFigmaCloneDomEditAdapter(domReadModel),
+    [domReadModel],
+  )
   const [affordanceState, setAffordanceState] =
     useState<DomEditAffordanceState>({ mode: 'idle' })
   const [layerQuery, setLayerQuery] = useState('')
-  const domState = domDocument.value.state
-  const domTextState = domDocument.value.textState
+  const domState = useMemo(() => ({
+    ...domDocument.value.state,
+    ...workspace.state,
+  }) as FigmaCloneDomEditState, [domDocument.value.state, workspace.state])
+  const domTextState = useMemo(() => ({
+    ...domDocument.value.textState,
+    ...workspace.textState,
+  }) as FigmaCloneDomTextState, [
+    domDocument.value.textState,
+    workspace.textState,
+  ])
+  const sectionViewports = useMemo(() => ({
+    homePage: legacySectionViewport,
+    workspacePage: workspace.sectionViewport,
+  }), [legacySectionViewport, workspace.sectionViewport])
+  const getComponentBinding = useCallback(
+    (nodeId: FigmaCloneDomNodeId) => isFigmaWorkspaceNode(
+      workspace,
+      nodeId,
+    )
+      ? getFigmaWorkspaceLegacyComponentBinding(workspace, nodeId)
+      : getFigmaCloneDomComponentBinding(nodeId),
+    [workspace],
+  )
   const changeAffordanceState = useCallback((
     nextState: DomEditAffordanceState,
   ) => {
@@ -207,7 +294,9 @@ export function FigmaCloneApp() {
     const mergeKey = getFigmaCloneDomDragHistoryMergeKey(nextState.property)
 
     if (domDragHistoryRef.current?.mergeKey !== mergeKey) {
+      domDragHistorySequenceRef.current += 1
       domDragHistoryRef.current = {
+        historyGroup: `figma-dom-drag:${domDragHistorySequenceRef.current}`,
         mergeKey,
         undoDepth: domDocument.history.undoDepth,
       }
@@ -241,150 +330,263 @@ export function FigmaCloneApp() {
   const selectedNodeId = selection.frameId === 'dom' ? selection.nodeId : null
   const selectedSectionRootId =
     selection.frameId === 'dom' ? selection.rootId : null
+  const selectedSectionViewport = selectedSectionRootId
+    ? sectionViewports[selectedSectionRootId]
+    : workspace.sectionViewport
   const frameGuides = useMemo(() => selectedSectionRootId
     ? getFigmaCloneDomFrameGuides({
         rootId: selectedSectionRootId,
-        sectionViewport,
+        sectionViewport: selectedSectionViewport,
       })
     : null,
-  [sectionViewport, selectedSectionRootId])
+  [selectedSectionRootId, selectedSectionViewport])
   const isSectionSelected = useCallback(
     (rootId: FigmaCloneDomSectionRootId) =>
       selectedSectionRootId === rootId && selectedNodeId === null,
     [selectedNodeId, selectedSectionRootId],
   )
-  const selectSection = (rootId: FigmaCloneDomSectionRootId) => {
+  const selectSection = useCallback((rootId: FigmaCloneDomSectionRootId) => {
     setSelection({ frameId: 'dom', rootId, nodeId: null })
-  }
-  const selectDomNode = (nodeId: FigmaCloneDomNodeId) => {
+  }, [])
+  const selectDomNode = useCallback((nodeId: FigmaCloneDomNodeId) => {
     setSelection({
       frameId: 'dom',
-      rootId: getFigmaCloneSectionRootIdForNode(nodeId),
+      rootId: getFigmaCloneSectionRootIdForNode(
+        nodeId,
+        domReadModel.tree,
+      ),
       nodeId,
     })
-  }
-  const changeSectionViewportField = (
+  }, [domReadModel.tree])
+  const changeSectionViewportField = useCallback((
     field: 'h' | 'w',
     value: number,
   ) => {
-    setSectionViewport((current) => ({
-      ...current,
-      [field]: clampFigmaCloneSectionViewportField(field, value),
-    }))
-  }
-  const changeSectionOverflow = (overflow: FigmaCloneSectionOverflow) => {
-    setSectionViewport((current) => ({
-      ...current,
-      overflow,
-    }))
-  }
-  const changeSectionFrameMode = (frameMode: FigmaCloneSectionFrameMode) => {
-    setSectionViewport((current) => ({
-      ...current,
-      frameMode,
-    }))
-  }
-  const applySectionViewportPreset = (
+    routeFigmaWorkspaceOwnedSectionEdit({
+      rootId: selectedSectionRootId,
+      writeLegacy: () => setLegacySectionViewport((current) => ({
+        ...current,
+        [field]: clampFigmaCloneSectionViewportField(field, value),
+      })),
+      writeWorkspace: () => assertFigmaWorkspaceCommand(
+        updateFigmaWorkspaceFrame(
+          workspaceDocument,
+          {
+            [field === 'w' ? 'width' : 'height']:
+              clampFigmaCloneSectionViewportField(field, value),
+          },
+        ),
+      ),
+    })
+  }, [selectedSectionRootId, workspaceDocument])
+  const changeSectionOverflow = useCallback((
+    overflow: FigmaCloneSectionOverflow,
+  ) => {
+    routeFigmaWorkspaceOwnedSectionEdit({
+      rootId: selectedSectionRootId,
+      writeLegacy: () => setLegacySectionViewport((current) => ({
+        ...current,
+        overflow,
+      })),
+      writeWorkspace: () => assertFigmaWorkspaceCommand(
+        updateFigmaWorkspaceFrame(workspaceDocument, { overflow }),
+      ),
+    })
+  }, [selectedSectionRootId, workspaceDocument])
+  const changeSectionFrameMode = useCallback((
+    frameMode: FigmaCloneSectionFrameMode,
+  ) => {
+    routeFigmaWorkspaceOwnedSectionEdit({
+      rootId: selectedSectionRootId,
+      writeLegacy: () => setLegacySectionViewport((current) => ({
+        ...current,
+        frameMode,
+      })),
+      writeWorkspace: () => assertFigmaWorkspaceCommand(
+        updateFigmaWorkspaceFrame(workspaceDocument, {
+          heightMode: frameMode === 'page' ? 'content' : 'fixed',
+        }),
+      ),
+    })
+  }, [selectedSectionRootId, workspaceDocument])
+  const applySectionViewportPreset = useCallback((
     preset: Pick<FigmaCloneSectionViewport, 'h' | 'w'>,
   ) => {
-    setSectionViewport((current) => ({
-      ...current,
-      h: preset.h,
-      w: preset.w,
-    }))
-  }
-  const changeDomField = (
+    routeFigmaWorkspaceOwnedSectionEdit({
+      rootId: selectedSectionRootId,
+      writeLegacy: () => setLegacySectionViewport((current) => ({
+        ...current,
+        h: preset.h,
+        w: preset.w,
+      })),
+      writeWorkspace: () => assertFigmaWorkspaceCommand(
+        applyFigmaWorkspaceFramePreset(workspaceDocument, preset),
+      ),
+    })
+  }, [selectedSectionRootId, workspaceDocument])
+  const changeDomField = useCallback((
     nodeId: FigmaCloneDomNodeId,
     field: FigmaCloneDomEditField,
     value: number,
   ) => {
-    updateDomDocument((current) => {
-      const state = updateFigmaCloneDomComponentEditField({
-        field,
-        nodeId,
-        state: current.state,
-        value,
-      })
+    routeFigmaWorkspaceOwnedEdit({
+      nodeId,
+      projection: workspace,
+      writeLegacy: (legacyNodeId) => updateDomDocument((current) => {
+        const state = updateFigmaCloneDomComponentEditField({
+          field,
+          nodeId: legacyNodeId,
+          state: current.state,
+          value,
+        })
 
-      return state === current.state ? current : { ...current, state }
+        return state === current.state ? current : { ...current, state }
+      }),
+      writeWorkspace: (workspaceNodeId) => {
+        assertFigmaWorkspaceCommand(updateFigmaWorkspaceNumericField(
+          workspaceDocument,
+          {
+            field,
+            historyGroup: domDragHistoryRef.current?.historyGroup,
+            nodeId: workspaceNodeId,
+            value,
+          },
+        ))
+      },
     })
-  }
-  const changeDomAutoLayoutField = (
+  }, [updateDomDocument, workspace, workspaceDocument])
+  const changeDomAutoLayoutField = useCallback((
     nodeId: FigmaCloneDomNodeId,
     field: FigmaCloneDomAutoLayoutField,
     value: FigmaCloneDomEditNodeState[FigmaCloneDomAutoLayoutField],
   ) => {
-    updateDomDocument((current) => {
-      const state = updateFigmaCloneDomComponentAutoLayoutField({
-        field,
-        nodeId,
-        state: current.state,
-        value,
-      })
+    routeFigmaWorkspaceOwnedEdit({
+      nodeId,
+      projection: workspace,
+      writeLegacy: (legacyNodeId) => updateDomDocument((current) => {
+        const state = updateFigmaCloneDomComponentAutoLayoutField({
+          field,
+          nodeId: legacyNodeId,
+          state: current.state,
+          value,
+        })
 
-      return state === current.state ? current : { ...current, state }
+        return state === current.state ? current : { ...current, state }
+      }),
+      writeWorkspace: (workspaceNodeId) => {
+        assertFigmaWorkspaceCommand(updateFigmaWorkspaceAutoLayoutField(
+          workspaceDocument,
+          {
+            field,
+            historyGroup: domDragHistoryRef.current?.historyGroup,
+            nodeId: workspaceNodeId,
+            value,
+          },
+        ))
+      },
     })
-  }
+  }, [updateDomDocument, workspace, workspaceDocument])
   const changeDomText = useCallback((
     nodeId: FigmaCloneDomNodeId,
     value: string,
   ) => {
-    updateDomDocument((current) => {
-      const textState = updateFigmaCloneDomText({
-        nodeId,
-        state: current.textState,
-        value,
-      })
+    routeFigmaWorkspaceOwnedEdit({
+      nodeId,
+      projection: workspace,
+      writeLegacy: (legacyNodeId) => updateDomDocument((current) => {
+        const textState = updateFigmaCloneDomText({
+          nodeId: legacyNodeId,
+          state: current.textState,
+          value,
+        })
 
-      return textState === current.textState
-        ? current
-        : { ...current, textState }
+        return textState === current.textState
+          ? current
+          : { ...current, textState }
+      }),
+      writeWorkspace: (workspaceNodeId) => {
+        assertFigmaWorkspaceCommand(updateFigmaWorkspaceText(
+          workspaceDocument,
+          { nodeId: workspaceNodeId, value },
+        ))
+      },
     })
-  }, [updateDomDocument])
+  }, [updateDomDocument, workspace, workspaceDocument])
   const runDomEditCommand = useCallback((action: DomEditInteractionAction) => {
     if (action.type === 'dom-edit.command.undo') {
-      domDocument.history.undo()
+      routeFigmaWorkspaceOwnedSectionEdit({
+        rootId: selectedSectionRootId,
+        writeLegacy: domDocument.history.undo,
+        writeWorkspace: workspaceDocument.undo,
+      })
       return true
     }
 
     if (action.type === 'dom-edit.command.redo') {
-      domDocument.history.redo()
+      routeFigmaWorkspaceOwnedSectionEdit({
+        rootId: selectedSectionRootId,
+        writeLegacy: domDocument.history.redo,
+        writeWorkspace: workspaceDocument.redo,
+      })
       return true
     }
 
     return false
-  }, [domDocument])
+  }, [domDocument, selectedSectionRootId, workspaceDocument])
+  const canvasItems = useMemo(() => createFigmaCloneCanvasItems({
+    workspaceFrame: workspace.frame,
+    workspaceState: domState,
+    workspaceViewport: workspace.sectionViewport,
+  }), [domState, workspace.frame, workspace.sectionViewport])
+  const canvasGeometryKey = getFigmaCloneCanvasGeometryKey(canvasItems)
   const assemblyInput = useMemo<CanvasAppAssemblyInput>(() => ({
     affordanceConfig: FIGMA_CLONE_AFFORDANCE_CONFIG,
     capabilities: CANVAS_APP_READ_ONLY_CAPABILITIES,
     // eslint-disable-next-line react-hooks/refs
     customItemModules: createFigmaCloneCanvasModules({
       isSectionSelected,
-      sectionViewport,
+      readModel: domReadModel,
+      sectionViewports,
       selectedNodeId,
       state: domState,
       textState: domTextState,
+      workspaceDefinitionByNodeId: workspace.definitionByNodeId,
       onSelectSection: selectSection,
       onSelectNode: selectDomNode,
       onChangeText: changeDomText,
     }),
-    initialItems: FIGMA_CLONE_ITEMS,
+    initialItems: canvasItems,
     initialSelection: [],
-    workspaceStorageProvider: createFigmaCloneStorageProvider(),
+    workspaceStorageProvider: createFigmaCloneStorageProvider(
+      canvasItems,
+      canvasRuntimeMemory,
+    ),
   }), [
+    canvasItems,
+    canvasRuntimeMemory,
     changeDomText,
     domState,
     domTextState,
+    domReadModel,
     isSectionSelected,
+    sectionViewports,
+    selectDomNode,
+    selectSection,
     selectedNodeId,
-    sectionViewport,
+    workspace.definitionByNodeId,
   ])
 
   return (
     <CanvasApp
       assemblyInput={assemblyInput}
+      key={canvasGeometryKey}
       renderApp={(app) => {
         const focusCanvasItem = (canvasItemId: string) => {
+          if (canvasRuntimeMemory.readFocusedItemId() === canvasItemId) {
+            return
+          }
+
+          canvasRuntimeMemory.rememberFocusedItemId(canvasItemId)
           app.viewportFocus.fitItems([canvasItemId])
         }
         const selectWidgetFrameAndFocus = () => {
@@ -399,18 +601,31 @@ export function FigmaCloneApp() {
         }
         const selectNodeAndFocus = (nodeId: FigmaCloneDomNodeId) => {
           selectDomNode(nodeId)
-          focusCanvasItem(getFigmaCloneCanvasItemIdForNode(nodeId))
+          focusCanvasItem(getFigmaCloneCanvasItemIdForNode(
+            nodeId,
+            domReadModel.tree,
+          ))
         }
-        const selectedCanvasItemId = getFigmaCloneSelectedCanvasItemId(selection)
+        const selectedCanvasItemId = getFigmaCloneSelectedCanvasItemId(
+          selection,
+          domReadModel.tree,
+        )
 
         return (
           <main className="figma-clone">
+            <FigmaCloneCanvasViewportMemory
+              runtimeMemory={canvasRuntimeMemory}
+              viewport={app.viewport}
+            />
             <FigmaCloneSelectionViewportFocus
               canvasItemId={selectedCanvasItemId}
+              runtimeMemory={canvasRuntimeMemory}
               onFitItems={app.viewportFocus.fitItems}
             />
             <FigmaCloneLayersPanel
+              getComponentBinding={getComponentBinding}
               query={layerQuery}
+              readModel={domReadModel}
               selection={selection}
               onQueryChange={setLayerQuery}
               onSelectWidgetFrame={selectWidgetFrameAndFocus}
@@ -470,7 +685,7 @@ export function FigmaCloneApp() {
               </div>
               {app.stageOverlaySlot.render(
                 <DomEditSelectionOverlay
-                  adapter={FIGMA_CLONE_DOM_EDIT_ADAPTER}
+                  adapter={domEditAdapter}
                   affordanceState={affordanceState}
                   frameGuides={frameGuides}
                   isCanvasPanActive={app.activeMode === 'pan' || app.gesture === 'pan'}
@@ -489,7 +704,9 @@ export function FigmaCloneApp() {
             <FigmaCloneInspectorPanel
               domState={domState}
               domTextState={domTextState}
-              sectionViewport={sectionViewport}
+              getComponentBinding={getComponentBinding}
+              readModel={domReadModel}
+              sectionViewport={selectedSectionViewport}
               selection={selection}
               onApplySectionViewportPreset={applySectionViewportPreset}
               onChangeDomAutoLayoutField={changeDomAutoLayoutField}
@@ -524,15 +741,15 @@ export function FigmaCloneApp() {
 
 function FigmaCloneSelectionViewportFocus({
   canvasItemId,
+  runtimeMemory,
   onFitItems,
 }: {
   canvasItemId: string
+  runtimeMemory: FigmaCloneCanvasRuntimeMemory
   onFitItems: (ids: readonly string[]) => void
 }) {
-  const lastFocusedItemIdRef = useRef<string | null>(null)
-
   useEffect(() => {
-    if (lastFocusedItemIdRef.current === canvasItemId) {
+    if (runtimeMemory.readFocusedItemId() === canvasItemId) {
       return undefined
     }
 
@@ -542,7 +759,7 @@ function FigmaCloneSelectionViewportFocus({
         return
       }
 
-      lastFocusedItemIdRef.current = canvasItemId
+      runtimeMemory.rememberFocusedItemId(canvasItemId)
       onFitItems([canvasItemId])
     })
 
@@ -550,20 +767,40 @@ function FigmaCloneSelectionViewportFocus({
       cancelled = true
       window.cancelAnimationFrame(frame)
     }
-  }, [canvasItemId, onFitItems])
+  }, [canvasItemId, onFitItems, runtimeMemory])
+
+  return null
+}
+
+function FigmaCloneCanvasViewportMemory({
+  runtimeMemory,
+  viewport,
+}: {
+  runtimeMemory: FigmaCloneCanvasRuntimeMemory
+  viewport: Viewport
+}) {
+  useEffect(() => {
+    runtimeMemory.rememberViewport(viewport)
+  }, [runtimeMemory, viewport])
 
   return null
 }
 
 function FigmaCloneLayersPanel({
+  getComponentBinding,
   query,
+  readModel,
   selection,
   onQueryChange,
   onSelectWidgetFrame,
   onSelectSection,
   onSelectNode,
 }: {
+  getComponentBinding: (
+    nodeId: FigmaCloneDomNodeId,
+  ) => FigmaCloneDomComponentBinding | null
   query: string
+  readModel: FigmaCloneDomReadModel
   selection: FigmaCloneSelection
   onQueryChange: (value: string) => void
   onSelectWidgetFrame: () => void
@@ -571,11 +808,13 @@ function FigmaCloneLayersPanel({
   onSelectNode: (nodeId: FigmaCloneDomNodeId) => void
 }) {
   const activeRootId = selection.frameId === 'dom' && selection.nodeId
-    ? getFigmaCloneDomRootId(selection.nodeId)
+    ? getFigmaCloneDomRootId(selection.nodeId, readModel.tree)
     : null
   const normalizedQuery = normalizeFigmaCloneLayerQuery(query)
   const visibleSections = getFigmaCloneVisibleLayerSections({
+    getComponentBinding,
     query: normalizedQuery,
+    readModel,
   })
   const showWidgetLayer = matchesFigmaCloneLayerQuery(
     'React widget',
@@ -635,6 +874,7 @@ function FigmaCloneLayersPanel({
               onClick={onSelectWidgetFrame}
               onKeyDown={(event) =>
                 handleFigmaCloneLayerTreeKeyDown(event, {
+                  nodeById: readModel.nodeById,
                   onSelectNode,
                   onSelectSection,
                 })}
@@ -645,7 +885,11 @@ function FigmaCloneLayersPanel({
           </div>
         ) : null}
         {visibleSections.map(({ rootId, rootNode }, index) => {
-          const fullRootNode = FIGMA_CLONE_DOM_NODE_BY_ID[rootId]
+          const fullRootNode = readModel.nodeById[rootId]
+
+          if (!fullRootNode) {
+            return null
+          }
           const isSelectedSection = selection.frameId === 'dom' &&
             selection.rootId === rootId &&
             selection.nodeId === null
@@ -679,6 +923,7 @@ function FigmaCloneLayersPanel({
                 onClick={() => onSelectSection(rootId)}
                 onKeyDown={(event) =>
                   handleFigmaCloneLayerTreeKeyDown(event, {
+                    nodeById: readModel.nodeById,
                     onSelectNode,
                     onSelectSection,
                   })}
@@ -689,6 +934,7 @@ function FigmaCloneLayersPanel({
               <div className="figma-layer-tree" role="group">
                 <FigmaCloneLayerNode
                   activeRootId={activeRootId}
+                  depth={0}
                   forceExpanded={forceExpandedLayers}
                   node={rootNode}
                   parentTreeItemId={sectionTreeItemId}
@@ -701,6 +947,7 @@ function FigmaCloneLayersPanel({
                   setSize={1}
                   onSelectSection={onSelectSection}
                   onSelectNode={onSelectNode}
+                  nodeById={readModel.nodeById}
                 />
               </div>
             </div>
@@ -713,6 +960,7 @@ function FigmaCloneLayersPanel({
 
 function FigmaCloneLayerNode({
   activeRootId,
+  depth,
   forceExpanded,
   node,
   parentTreeItemId,
@@ -721,10 +969,12 @@ function FigmaCloneLayerNode({
   selectedNodeId,
   selectedTreeItemId,
   setSize,
+  nodeById,
   onSelectSection,
   onSelectNode,
 }: {
   activeRootId: FigmaCloneDomNodeId | null
+  depth: number
   forceExpanded: boolean
   node: FigmaCloneDomNode
   parentTreeItemId: string
@@ -733,10 +983,10 @@ function FigmaCloneLayerNode({
   selectedNodeId: FigmaCloneDomNodeId | null
   selectedTreeItemId: string
   setSize: number
+  nodeById: FigmaCloneDomReadModel['nodeById']
   onSelectSection: (rootId: FigmaCloneDomSectionRootId) => void
   onSelectNode: (nodeId: FigmaCloneDomNodeId) => void
 }) {
-  const depth = getFigmaCloneDomNodeDepth(node.id)
   const isTopLevel = depth === 0
   const hasChildren = Boolean(node.children?.length)
   const isExpanded = hasChildren &&
@@ -771,6 +1021,7 @@ function FigmaCloneLayerNode({
         onClick={() => onSelectNode(node.id)}
         onKeyDown={(event) =>
           handleFigmaCloneLayerTreeKeyDown(event, {
+            nodeById,
             onSelectNode,
             onSelectSection,
           })}
@@ -790,6 +1041,7 @@ function FigmaCloneLayerNode({
             <FigmaCloneLayerNode
               key={child.id}
               activeRootId={activeRootId}
+              depth={depth + 1}
               forceExpanded={forceExpanded}
               node={child}
               parentTreeItemId={treeItemId}
@@ -798,6 +1050,7 @@ function FigmaCloneLayerNode({
               selectedNodeId={selectedNodeId}
               selectedTreeItemId={selectedTreeItemId}
               setSize={node.children?.length ?? 0}
+              nodeById={nodeById}
               onSelectSection={onSelectSection}
               onSelectNode={onSelectNode}
             />
@@ -894,7 +1147,7 @@ function focusFigmaCloneLayerTreeButton(
 function moveFigmaCloneLayerTreeRight(
   button: HTMLButtonElement,
   buttons: readonly HTMLButtonElement[],
-  { onSelectNode }: FigmaCloneLayerTreeHandlers,
+  { nodeById, onSelectNode }: FigmaCloneLayerTreeHandlers,
 ) {
   if (button.dataset.figmaLayerHasChildren !== 'true') {
     return
@@ -907,7 +1160,7 @@ function moveFigmaCloneLayerTreeRight(
 
   const nodeId = button.dataset.figmaLayerNodeId
 
-  if (isFigmaCloneDomNodeId(nodeId)) {
+  if (isFigmaCloneDomNodeId(nodeId, nodeById)) {
     onSelectNode(nodeId)
   }
 }
@@ -977,21 +1230,27 @@ function getFigmaCloneSelectedLayerTreeItemId(
   return getFigmaCloneSectionTreeItemId(selection.rootId)
 }
 
-function getFigmaCloneSelectedCanvasItemId(selection: FigmaCloneSelection) {
+function getFigmaCloneSelectedCanvasItemId(
+  selection: FigmaCloneSelection,
+  nodes: readonly FigmaCloneDomNode[],
+) {
   if (selection.frameId === 'widget') {
     return FIGMA_CLONE_WIDGET_FRAME_ITEM_ID
   }
 
   const rootId = selection.nodeId
-    ? getFigmaCloneSectionRootIdForNode(selection.nodeId)
+    ? getFigmaCloneSectionRootIdForNode(selection.nodeId, nodes)
     : selection.rootId
 
   return getFigmaCloneDomCanvasFrameItemId(rootId)
 }
 
-function getFigmaCloneCanvasItemIdForNode(nodeId: FigmaCloneDomNodeId) {
+function getFigmaCloneCanvasItemIdForNode(
+  nodeId: FigmaCloneDomNodeId,
+  nodes: readonly FigmaCloneDomNode[],
+) {
   return getFigmaCloneDomCanvasFrameItemId(
-    getFigmaCloneSectionRootIdForNode(nodeId),
+    getFigmaCloneSectionRootIdForNode(nodeId, nodes),
   )
 }
 
@@ -1017,12 +1276,22 @@ type FigmaCloneVisibleLayerSection = {
 }
 
 function getFigmaCloneVisibleLayerSections({
+  getComponentBinding,
   query,
+  readModel,
 }: {
+  getComponentBinding: (
+    nodeId: FigmaCloneDomNodeId,
+  ) => FigmaCloneDomComponentBinding | null
   query: string
+  readModel: FigmaCloneDomReadModel
 }): FigmaCloneVisibleLayerSection[] {
   return FIGMA_CLONE_DOM_SECTION_ROOT_IDS.flatMap((rootId) => {
-    const fullRootNode = FIGMA_CLONE_DOM_NODE_BY_ID[rootId]
+    const fullRootNode = readModel.nodeById[rootId]
+
+    if (!fullRootNode) {
+      return []
+    }
     const sectionMatches = matchesFigmaCloneLayerQuery(
       `${fullRootNode.label} section`,
       query,
@@ -1033,6 +1302,7 @@ function getFigmaCloneVisibleLayerSections({
     }
 
     const rootNode = getFigmaCloneVisibleLayerNode(fullRootNode, {
+      getComponentBinding,
       query,
     })
 
@@ -1043,11 +1313,14 @@ function getFigmaCloneVisibleLayerSections({
 function getFigmaCloneVisibleLayerNode(
   node: FigmaCloneDomNode,
   filter: {
+    getComponentBinding: (
+      nodeId: FigmaCloneDomNodeId,
+    ) => FigmaCloneDomComponentBinding | null
     query: string
   },
 ): FigmaCloneDomNode | null {
   const matchesSelf = matchesFigmaCloneLayerQuery(
-    getFigmaCloneLayerSearchLabel(node),
+    getFigmaCloneLayerSearchLabel(node, filter.getComponentBinding),
     filter.query,
   )
 
@@ -1069,8 +1342,13 @@ function getFigmaCloneVisibleLayerNode(
   }
 }
 
-function getFigmaCloneLayerSearchLabel(node: FigmaCloneDomNode) {
-  const componentBinding = getFigmaCloneDomComponentBinding(node.id)
+function getFigmaCloneLayerSearchLabel(
+  node: FigmaCloneDomNode,
+  getComponentBinding: (
+    nodeId: FigmaCloneDomNodeId,
+  ) => FigmaCloneDomComponentBinding | null,
+) {
+  const componentBinding = getComponentBinding(node.id)
 
   if (!componentBinding) {
     return `${node.label} ${node.id}`
@@ -1136,13 +1414,16 @@ function isFigmaCloneDomSectionRootId(
 
 function isFigmaCloneDomNodeId(
   value: string | undefined,
+  nodeById: FigmaCloneDomReadModel['nodeById'],
 ): value is FigmaCloneDomNodeId {
-  return Boolean(value && value in FIGMA_CLONE_DOM_NODE_BY_ID)
+  return Boolean(value && value in nodeById)
 }
 
 function FigmaCloneInspectorPanel({
   domState,
   domTextState,
+  getComponentBinding,
+  readModel,
   sectionViewport,
   selection,
   onApplySectionViewportPreset,
@@ -1157,6 +1438,10 @@ function FigmaCloneInspectorPanel({
 }: {
   domState: FigmaCloneDomEditState
   domTextState: FigmaCloneDomTextState
+  getComponentBinding: (
+    nodeId: FigmaCloneDomNodeId,
+  ) => FigmaCloneDomComponentBinding | null
+  readModel: FigmaCloneDomReadModel
   sectionViewport: FigmaCloneSectionViewport
   selection: FigmaCloneSelection
   onApplySectionViewportPreset: (
@@ -1212,6 +1497,7 @@ function FigmaCloneInspectorPanel({
           <>
             <FigmaCloneCssPanel
               nodeId={selection.nodeId}
+              readModel={readModel}
               state={domState}
               textState={domTextState}
               onChangeAutoLayout={onChangeDomAutoLayoutField}
@@ -1219,7 +1505,8 @@ function FigmaCloneInspectorPanel({
               onChangeText={onChangeDomText}
             />
             <FigmaCloneComponentInspector
-              binding={getFigmaCloneDomComponentBinding(selection.nodeId)}
+              binding={getComponentBinding(selection.nodeId)}
+              nodeById={readModel.nodeById}
               onSelectNode={onSelectNode}
             />
           </>
@@ -1231,6 +1518,7 @@ function FigmaCloneInspectorPanel({
 
 function FigmaCloneCssPanel({
   nodeId,
+  readModel,
   state,
   textState,
   onChangeAutoLayout,
@@ -1238,6 +1526,7 @@ function FigmaCloneCssPanel({
   onChangeText,
 }: {
   nodeId: FigmaCloneDomNodeId
+  readModel: FigmaCloneDomReadModel
   state: FigmaCloneDomEditState
   textState: FigmaCloneDomTextState
   onChangeAutoLayout: (
@@ -1252,12 +1541,12 @@ function FigmaCloneCssPanel({
   ) => void
   onChangeText: (nodeId: FigmaCloneDomNodeId, value: string) => void
 }) {
-  const context = FIGMA_CLONE_DOM_EDIT_ADAPTER.getLayoutContext(nodeId)
-  const style = FIGMA_CLONE_DOM_EDIT_ADAPTER.getStyle(state, nodeId)
+  const context = getFigmaCloneDomLayoutContext(nodeId, readModel)
+  const style = getFigmaCloneDomEditStyle(state, nodeId)
   const distributionValue = style.distribution === 'packed'
     ? 'start'
     : style.distribution
-  const canEditText = canFigmaCloneDomNodeEditText(nodeId)
+  const canEditText = Object.prototype.hasOwnProperty.call(textState, nodeId)
 
   return (
     <section className="figma-panel-section">
@@ -1567,9 +1856,11 @@ function FigmaCloneCssTextDeclaration({
 
 function FigmaCloneComponentInspector({
   binding,
+  nodeById,
   onSelectNode,
 }: {
   binding: FigmaCloneDomComponentBinding | null
+  nodeById: FigmaCloneDomReadModel['nodeById']
   onSelectNode: (nodeId: FigmaCloneDomNodeId) => void
 }) {
   if (!binding) {
@@ -1599,7 +1890,7 @@ function FigmaCloneComponentInspector({
       >
         {binding.slotNodeIds.map((nodeId) => {
           const isCurrent = nodeId === binding.currentNodeId
-          const nodeLabel = FIGMA_CLONE_DOM_NODE_BY_ID[nodeId].label
+          const nodeLabel = nodeById[nodeId]?.label ?? nodeId
 
           return (
             <button
@@ -1844,17 +2135,78 @@ function getFigmaCloneDomDragHistoryMergeKey(
   return `dom-edit-drag:${property}`
 }
 
-function createFigmaCloneStorageProvider(): CanvasWorkspaceStorageProvider {
-  const workspace = JSON.stringify({
-    items: FIGMA_CLONE_ITEMS,
-    selection: [],
-    version: 1,
-    viewport: { scale: 0.38, x: 300, y: 72 },
-  })
+function isFigmaWorkspaceNode(
+  workspace: FigmaWorkspaceDesignDocumentProjection,
+  nodeId: FigmaCloneDomNodeId,
+): nodeId is FigmaWorkspaceDesignNodeId {
+  return Object.hasOwn(workspace.nodeById, nodeId)
+}
+
+function reconcileFigmaCloneSelection(
+  selection: FigmaCloneSelection,
+  workspace: FigmaWorkspaceDesignDocumentProjection,
+): FigmaCloneSelection {
+  if (
+    selection.frameId !== 'dom' ||
+    selection.rootId !== 'workspacePage' ||
+    selection.nodeId === null ||
+    isFigmaWorkspaceNode(workspace, selection.nodeId)
+  ) {
+    return selection
+  }
+
+  return { frameId: 'dom', rootId: 'workspacePage', nodeId: null }
+}
+
+function assertFigmaWorkspaceCommand(
+  result: ReturnType<typeof updateFigmaWorkspaceText>,
+) {
+  if (!result.ok) {
+    throw new Error(result.reason)
+  }
+}
+
+function getFigmaCloneCanvasGeometryKey(
+  items: FigmaCloneCanvasItems,
+) {
+  const frame = items.find((item) => item.id === 'figma-dom-workspace-frame')
+
+  if (!frame) {
+    throw new Error('Missing Figma workspace canvas frame')
+  }
+
+  return [frame.x, frame.y, frame.w, frame.h].join(':')
+}
+
+function createFigmaCloneStorageProvider(
+  items: FigmaCloneCanvasItems,
+  runtimeMemory: FigmaCloneCanvasRuntimeMemory,
+): CanvasWorkspaceStorageProvider {
   const storage: CanvasWorkspaceStorage = {
-    getItem: () => workspace,
+    getItem: () => JSON.stringify({
+      items,
+      selection: [],
+      version: 1,
+      viewport: runtimeMemory.readViewport(),
+    }),
     setItem: () => undefined,
   }
 
   return () => storage
+}
+
+function createFigmaCloneCanvasRuntimeMemory(): FigmaCloneCanvasRuntimeMemory {
+  let focusedItemId: string | null = null
+  let viewport: Viewport = { ...FIGMA_CLONE_INITIAL_CANVAS_VIEWPORT }
+
+  return {
+    readFocusedItemId: () => focusedItemId,
+    readViewport: () => viewport,
+    rememberFocusedItemId: (itemId) => {
+      focusedItemId = itemId
+    },
+    rememberViewport: (nextViewport) => {
+      viewport = { ...nextViewport }
+    },
+  }
 }

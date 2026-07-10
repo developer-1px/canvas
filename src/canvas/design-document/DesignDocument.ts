@@ -24,6 +24,7 @@ export function createDesignDocument(
   const initial = parseDesignDocumentSnapshot(initialSnapshot)
   let snapshot = freezeSnapshot(initial)
   let graph = validateAndIndexDesignDocument(snapshot)
+  let previousHistoryGroup: string | null = null
   const listeners = new Set<() => void>()
   const store = createJSONDocument(
     DesignDocumentSnapshotSchema as never,
@@ -81,12 +82,21 @@ export function createDesignDocument(
       }
     }
 
+    const historyGroup = normalizeHistoryGroup(command.historyGroup)
+
+    if (historyGroup && historyGroup === previousHistoryGroup) {
+      store.history.mergeLast({ mergeKey: historyGroup })
+    }
+
+    previousHistoryGroup = historyGroup
+
     synchronizeSnapshot()
 
     return { ok: true, changed: true }
   }
 
   function restoreHistory(direction: 'redo' | 'undo') {
+    previousHistoryGroup = null
     const result = direction === 'undo' ? store.undo() : store.redo()
 
     if (!result.ok) {
@@ -161,6 +171,12 @@ export function restoreDesignDocument(serialized: string): DesignDocument {
 
 function getErrorMessage(error: unknown) {
   return error instanceof Error ? error.message : String(error)
+}
+
+function normalizeHistoryGroup(historyGroup: string | undefined) {
+  const normalized = historyGroup?.trim()
+
+  return normalized ? normalized : null
 }
 
 function requireNode(

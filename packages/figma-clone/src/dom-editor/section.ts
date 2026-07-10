@@ -3,6 +3,7 @@ import {
   getFigmaCloneDomEditStyle,
   getFigmaCloneDomRootId,
   type FigmaCloneDomEditState,
+  type FigmaCloneDomNode,
   type FigmaCloneDomNodeId,
 } from '../dom-edit/FigmaCloneDomEditModel'
 
@@ -56,8 +57,9 @@ export function isFigmaCloneDomSectionRootId(
 
 export function getFigmaCloneSectionRootIdForNode(
   nodeId: FigmaCloneDomNodeId,
+  nodes?: readonly FigmaCloneDomNode[],
 ): FigmaCloneDomSectionRootId {
-  const rootId = getFigmaCloneDomRootId(nodeId)
+  const rootId = getFigmaCloneDomRootId(nodeId, nodes)
 
   return isFigmaCloneDomSectionRootId(rootId) ? rootId : 'workspacePage'
 }

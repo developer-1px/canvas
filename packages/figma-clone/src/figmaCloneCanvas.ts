@@ -2,6 +2,7 @@ import type { CanvasCustomItem } from '../../../src/canvas'
 import {
   createFigmaCloneDomEditorCanvasItems,
   createFigmaCloneDomEditorFrameModule,
+  type FigmaCloneDomEditorCanvasItemsOptions,
   type FigmaCloneDomEditorFrameModuleOptions,
 } from './dom-editor'
 export {
@@ -30,10 +31,12 @@ import {
   FIGMA_CLONE_WIDGET_MODULE,
 } from './widget/FigmaCloneWidgetModule'
 
-export function createFigmaCloneCanvasItems(): CanvasCustomItem[] {
+export function createFigmaCloneCanvasItems(
+  options?: FigmaCloneDomEditorCanvasItemsOptions,
+): CanvasCustomItem[] {
   return [
     createFigmaCloneWidgetItem(),
-    ...createFigmaCloneDomEditorCanvasItems(),
+    ...createFigmaCloneDomEditorCanvasItems(options),
   ]
 }
 

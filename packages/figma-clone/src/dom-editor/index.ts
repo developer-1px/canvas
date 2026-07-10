@@ -3,6 +3,7 @@ export {
   createFigmaCloneDomEditorCanvasModules,
   createFigmaCloneDomEditorFrameItem,
   createFigmaCloneDomEditorFrameModule,
+  type FigmaCloneDomEditorCanvasItemsOptions,
   type FigmaCloneDomEditorFrameModuleOptions,
 } from './canvas'
 export {

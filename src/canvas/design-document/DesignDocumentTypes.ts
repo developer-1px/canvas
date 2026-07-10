@@ -99,6 +99,7 @@ export type DesignDocumentChange =
 export type DesignDocumentCommand = {
   readonly label: string
   readonly changes: readonly DesignDocumentChange[]
+  readonly historyGroup?: string
 }
 
 export type DesignDocumentCommandResult =

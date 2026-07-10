@@ -216,6 +216,12 @@ export type FigmaCloneDomAutoLayout = DomEditAutoLayout
 export type FigmaCloneDomEditNodeState = DomEditNodeState
 export type FigmaCloneDomEditState = DomEditState<FigmaCloneDomNodeId>
 export type FigmaCloneDomTextState = DomEditTextState<FigmaCloneDomNodeId>
+export type FigmaCloneDomReadModel = {
+  readonly nodeById: Readonly<
+    Partial<Record<FigmaCloneDomNodeId, FigmaCloneDomNode>>
+  >
+  readonly tree: readonly FigmaCloneDomNode[]
+}
 export type FigmaCloneDomComponentId =
   | 'home-meta-card'
   | 'workspace-deal-row'
@@ -978,6 +984,20 @@ export const FIGMA_CLONE_DOM_TREE: readonly FigmaCloneDomNode[] = [
 
 export const FIGMA_CLONE_DOM_NODE_BY_ID =
   createFigmaCloneDomNodeMap(FIGMA_CLONE_DOM_TREE)
+
+export const FIGMA_CLONE_DOM_READ_MODEL: FigmaCloneDomReadModel = {
+  nodeById: FIGMA_CLONE_DOM_NODE_BY_ID,
+  tree: FIGMA_CLONE_DOM_TREE,
+}
+
+export function createFigmaCloneDomReadModel(
+  tree: readonly FigmaCloneDomNode[],
+): FigmaCloneDomReadModel {
+  return {
+    nodeById: createFigmaCloneDomNodeMap(tree),
+    tree,
+  }
+}
 
 const DEFAULT_STYLES = mapFigmaCloneDomEditState(
   normalizeFigmaCloneDomEditStyle,
@@ -2634,26 +2654,37 @@ export function getFigmaCloneDomToggledAxisSizeMode({
 
 export function canFigmaCloneDomNodeUseAutoLayout(
   nodeId: FigmaCloneDomNodeId,
+  readModel: FigmaCloneDomReadModel = FIGMA_CLONE_DOM_READ_MODEL,
 ): boolean {
-  return Boolean(FIGMA_CLONE_DOM_NODE_BY_ID[nodeId].children?.length) &&
+  return Boolean(readModel.nodeById[nodeId]?.children?.length) &&
     !isFigmaCloneDomStaticComposite(nodeId)
 }
 
 export function getFigmaCloneDomLayoutContext(
   nodeId: FigmaCloneDomNodeId,
+  readModel: FigmaCloneDomReadModel = FIGMA_CLONE_DOM_READ_MODEL,
 ): FigmaCloneDomLayoutContext {
-  const node = FIGMA_CLONE_DOM_NODE_BY_ID[nodeId]
-  const parentId = getFigmaCloneDomParentId(nodeId)
+  const node = readModel.nodeById[nodeId]
+
+  if (!node) {
+    throw new Error(`Unknown Figma clone DOM node: ${nodeId}`)
+  }
+
+  const parentId = getFigmaCloneDomParentId(nodeId, readModel.tree)
   const display = getFigmaCloneDomRuntimeDisplay(nodeId) ??
-    getFigmaCloneDomDisplay(nodeId)
+    getFigmaCloneDomDisplay(nodeId, readModel)
   const parentDisplay = parentId
-    ? getFigmaCloneDomRuntimeDisplay(parentId) ?? getFigmaCloneDomDisplay(parentId)
+    ? getFigmaCloneDomRuntimeDisplay(parentId) ??
+      getFigmaCloneDomDisplay(parentId, readModel)
     : null
   const position = getFigmaCloneDomRuntimePosition(nodeId) ??
     getFigmaCloneDomPosition()
   const contentType = getFigmaCloneDomContentType(nodeId)
   const hasChildren = Boolean(node.children?.length)
-  const supportsAutoLayout = canFigmaCloneDomNodeUseAutoLayout(nodeId)
+  const supportsAutoLayout = canFigmaCloneDomNodeUseAutoLayout(
+    nodeId,
+    readModel,
+  )
   const showFlexLayout = supportsAutoLayout && display === 'flex' && hasChildren
   const showGridLayout = supportsAutoLayout && display === 'grid' && hasChildren
 
@@ -2702,15 +2733,16 @@ export function getFigmaCloneDomParentId(
 
 export function getFigmaCloneDomRootId(
   nodeId: FigmaCloneDomNodeId | null,
+  nodes: readonly FigmaCloneDomNode[] = FIGMA_CLONE_DOM_TREE,
 ): FigmaCloneDomNodeId {
   if (!nodeId) {
-    return FIGMA_CLONE_DOM_TREE[0].id
+    return nodes[0]?.id ?? 'workspacePage'
   }
 
-  const root = FIGMA_CLONE_DOM_TREE.find((candidate) =>
+  const root = nodes.find((candidate) =>
     candidate.id === nodeId || containsFigmaCloneDomNode(candidate, nodeId))
 
-  return root?.id ?? FIGMA_CLONE_DOM_TREE[0].id
+  return root?.id ?? nodes[0]?.id ?? 'workspacePage'
 }
 
 export function getFigmaCloneDomElement(
@@ -2725,11 +2757,13 @@ export function getFigmaCloneDomElement(
 
 export function resolveFigmaCloneDomClickTarget({
   exactTarget = false,
+  nodeById = FIGMA_CLONE_DOM_NODE_BY_ID,
   root,
   selectedNodeId,
   target,
 }: {
   exactTarget?: boolean
+  nodeById?: FigmaCloneDomReadModel['nodeById']
   root: HTMLElement
   selectedNodeId: FigmaCloneDomNodeId | null
   target: EventTarget | null
@@ -2745,21 +2779,21 @@ export function resolveFigmaCloneDomClickTarget({
   }
 
   if (!selectedNodeId) {
-    return readFigmaCloneDomNodeId(chain[0])
+    return readFigmaCloneDomNodeId(chain[0], nodeById)
   }
 
   if (exactTarget) {
-    return readFigmaCloneDomNodeId(chain.at(-1) ?? null)
+    return readFigmaCloneDomNodeId(chain.at(-1) ?? null, nodeById)
   }
 
   const selectedIndex = chain.findIndex((element) =>
     element.dataset.figmaDomNode === selectedNodeId)
 
   if (selectedIndex >= 0 && selectedIndex < chain.length - 1) {
-    return readFigmaCloneDomNodeId(chain[selectedIndex + 1])
+    return readFigmaCloneDomNodeId(chain[selectedIndex + 1], nodeById)
   }
 
-  return readFigmaCloneDomNodeId(chain.at(-1) ?? null)
+  return readFigmaCloneDomNodeId(chain.at(-1) ?? null, nodeById)
 }
 
 export function getFigmaCloneDomNodeDepth(
@@ -2796,6 +2830,7 @@ function containsFigmaCloneDomNode(
 
 function getFigmaCloneDomDisplay(
   nodeId: FigmaCloneDomNodeId,
+  readModel: FigmaCloneDomReadModel,
 ): FigmaCloneDomDisplay {
   if (isFigmaCloneDomGridContainer(nodeId)) {
     return 'grid'
@@ -2817,7 +2852,9 @@ function getFigmaCloneDomDisplay(
     return 'inline'
   }
 
-  return canFigmaCloneDomNodeUseAutoLayout(nodeId) ? 'flex' : 'block'
+  return canFigmaCloneDomNodeUseAutoLayout(nodeId, readModel)
+    ? 'flex'
+    : 'block'
 }
 
 export function isFigmaCloneDomGridContainer(
@@ -3046,21 +3083,35 @@ function getFigmaCloneDomElementChain(root: HTMLElement, target: Element) {
 
 export function readFigmaCloneDomNodeId(
   element: HTMLElement | null,
+  nodeById: FigmaCloneDomReadModel['nodeById'] =
+    FIGMA_CLONE_DOM_NODE_BY_ID,
 ): FigmaCloneDomNodeId | null {
   const nodeId = element?.dataset.domEditNode ?? element?.dataset.figmaDomNode
 
-  return nodeId && nodeId in FIGMA_CLONE_DOM_NODE_BY_ID
+  return nodeId && nodeId in nodeById
     ? nodeId as FigmaCloneDomNodeId
     : null
 }
 
-export const FIGMA_CLONE_DOM_EDIT_ADAPTER = {
-  getElement: getFigmaCloneDomElement,
-  getLayoutContext: getFigmaCloneDomLayoutContext,
-  getParentId: getFigmaCloneDomParentId,
-  getStyle: getFigmaCloneDomEditStyle,
-  readNodeId: readFigmaCloneDomNodeId,
-} satisfies DomEditModelAdapter<FigmaCloneDomNodeId, FigmaCloneDomEditState>
+export function createFigmaCloneDomEditAdapter(
+  readModel: FigmaCloneDomReadModel,
+): DomEditModelAdapter<FigmaCloneDomNodeId, FigmaCloneDomEditState> {
+  return {
+    getElement: getFigmaCloneDomElement,
+    getLayoutContext: (nodeId) =>
+      getFigmaCloneDomLayoutContext(nodeId, readModel),
+    getParentId: (nodeId) =>
+      getFigmaCloneDomParentId(nodeId, readModel.tree),
+    getStyle: getFigmaCloneDomEditStyle,
+    readNodeId: (element) => readFigmaCloneDomNodeId(
+      element,
+      readModel.nodeById,
+    ),
+  }
+}
+
+export const FIGMA_CLONE_DOM_EDIT_ADAPTER =
+  createFigmaCloneDomEditAdapter(FIGMA_CLONE_DOM_READ_MODEL)
 
 const PADDING_SIDE_BY_FIELD = Object.fromEntries(
   Object.entries(DOM_EDIT_PADDING_SIDE_FIELDS).map(([side, field]) => [

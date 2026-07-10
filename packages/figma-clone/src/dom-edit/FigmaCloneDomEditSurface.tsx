@@ -1,4 +1,5 @@
 import {
+  createElement,
   type CSSProperties,
   type FocusEvent,
   type KeyboardEvent,
@@ -8,9 +9,11 @@ import { isDomEditCanvasPanTarget } from '@interactive-os/dom-edit-affordance/ca
 import {
   type FigmaCloneSectionViewport,
 } from '../figmaCloneCanvas'
+import type {
+  FigmaWorkspaceDesignDocumentProjection,
+} from '../design-document/FigmaWorkspaceDesignDocumentProjection'
 import {
   canFigmaCloneDomNodeUseAutoLayout,
-  canFigmaCloneDomNodeEditText,
   getFigmaCloneDomElement,
   getFigmaCloneDomEditStyle,
   getFigmaCloneDomParentId,
@@ -22,32 +25,39 @@ import {
   resolveFigmaCloneDomClickTarget,
   type FigmaCloneDomEditState,
   type FigmaCloneDomNodeId,
+  type FigmaCloneDomReadModel,
   type FigmaCloneDomTextState,
 } from './FigmaCloneDomEditModel'
 
 export function FigmaCloneDomEditSurface({
   isSectionSelected,
+  readModel,
   rootId,
   sectionViewport,
   selectedNodeId,
   state,
   textState,
+  workspaceDefinitionByNodeId,
   onSelectSection,
   onSelectNode,
   onChangeText,
 }: {
   isSectionSelected: boolean
+  readModel: FigmaCloneDomReadModel
   rootId: FigmaCloneDomNodeId
   sectionViewport: FigmaCloneSectionViewport
   selectedNodeId: FigmaCloneDomNodeId | null
   state: FigmaCloneDomEditState
   textState: FigmaCloneDomTextState
+  workspaceDefinitionByNodeId:
+    FigmaWorkspaceDesignDocumentProjection['definitionByNodeId']
   onSelectSection: () => void
   onSelectNode: (nodeId: FigmaCloneDomNodeId) => void
   onChangeText: (nodeId: FigmaCloneDomNodeId, value: string) => void
 }) {
   const selectedNodeIdInRoot =
-    selectedNodeId && getFigmaCloneDomRootId(selectedNodeId) === rootId
+    selectedNodeId &&
+      getFigmaCloneDomRootId(selectedNodeId, readModel.tree) === rootId
       ? selectedNodeId
       : null
   const isMockFrame = sectionViewport.frameMode === 'mock'
@@ -64,6 +74,7 @@ export function FigmaCloneDomEditSurface({
 
     const target = resolveFigmaCloneDomClickTarget({
       exactTarget: event.metaKey || event.ctrlKey,
+      nodeById: readModel.nodeById,
       root: event.currentTarget,
       selectedNodeId: selectedNodeIdInRoot,
       target: event.target,
@@ -87,12 +98,16 @@ export function FigmaCloneDomEditSurface({
 
     const target = resolveFigmaCloneDomClickTarget({
       exactTarget: true,
+      nodeById: readModel.nodeById,
       root: event.currentTarget,
       selectedNodeId: selectedNodeIdInRoot,
       target: event.target,
     })
 
-    if (!target || !canFigmaCloneDomNodeEditText(target)) {
+    if (
+      !target ||
+      !Object.prototype.hasOwnProperty.call(textState, target)
+    ) {
       if (!target) {
         event.preventDefault()
         event.stopPropagation()
@@ -145,7 +160,14 @@ export function FigmaCloneDomEditSurface({
         >
           <div className="figma-dom-document">
             {rootId === 'workspacePage'
-              ? renderWorkspacePage(state, textState, selectedNodeIdInRoot, onChangeText)
+              ? renderWorkspacePage({
+                  definitionByNodeId: workspaceDefinitionByNodeId,
+                  readModel,
+                  selectedNodeId: selectedNodeIdInRoot,
+                  state,
+                  textState,
+                  onChangeText,
+                })
               : null}
             {rootId === 'homePage'
               ? renderEditorialHomePage(state, textState, selectedNodeIdInRoot, onChangeText)
@@ -166,579 +188,160 @@ export function FigmaCloneDomEditSurface({
   )
 }
 
-function renderWorkspacePage(
-  state: FigmaCloneDomEditState,
-  textState: FigmaCloneDomTextState,
-  selectedNodeId: FigmaCloneDomNodeId | null,
-  onChangeText: (nodeId: FigmaCloneDomNodeId, value: string) => void,
-) {
-  return (
-    <section
-      className="figma-dom-workspace"
-      {...createDomNodeProps(state, selectedNodeId, 'workspacePage')}
-    >
-      <aside
-        className="figma-dom-workspace__sidebar"
-        {...createDomNodeProps(state, selectedNodeId, 'workspaceSidebar')}
-      >
-        <div
-          className="figma-dom-workspace__brand"
-          {...createDomNodeProps(state, selectedNodeId, 'workspaceBrand')}
-        >
-          <div
-            className="figma-dom-workspace__brand-mark"
-            {...createEditableDomNodeProps(
-              state,
-              textState,
-              selectedNodeId,
-              'workspaceBrandMark',
-              onChangeText,
-            )}
-          >
-            {getFigmaCloneDomText(textState, 'workspaceBrandMark')}
-          </div>
-          <strong
-            className="figma-dom-workspace__brand-text"
-            {...createEditableDomNodeProps(
-              state,
-              textState,
-              selectedNodeId,
-              'workspaceBrandText',
-              onChangeText,
-            )}
-          >
-            {getFigmaCloneDomText(textState, 'workspaceBrandText')}
-          </strong>
-        </div>
-
-        <nav
-          className="figma-dom-workspace__nav"
-          {...createDomNodeProps(state, selectedNodeId, 'workspaceNav')}
-        >
-          <button
-            className="figma-dom-workspace__nav-item figma-dom-workspace__nav-item--active"
-            {...createEditableDomNodeProps(
-              state,
-              textState,
-              selectedNodeId,
-              'workspaceNavOverview',
-              onChangeText,
-            )}
-            type="button"
-          >
-            {getFigmaCloneDomText(textState, 'workspaceNavOverview')}
-          </button>
-          <button
-            className="figma-dom-workspace__nav-item"
-            {...createEditableDomNodeProps(
-              state,
-              textState,
-              selectedNodeId,
-              'workspaceNavRoadmap',
-              onChangeText,
-            )}
-            type="button"
-          >
-            {getFigmaCloneDomText(textState, 'workspaceNavRoadmap')}
-          </button>
-          <button
-            className="figma-dom-workspace__nav-item"
-            {...createEditableDomNodeProps(
-              state,
-              textState,
-              selectedNodeId,
-              'workspaceNavCustomers',
-              onChangeText,
-            )}
-            type="button"
-          >
-            {getFigmaCloneDomText(textState, 'workspaceNavCustomers')}
-          </button>
-        </nav>
-
-        <div
-          className="figma-dom-workspace__usage"
-          {...createDomNodeProps(state, selectedNodeId, 'workspaceUpgrade')}
-        >
-          <strong
-            {...createEditableDomNodeProps(
-              state,
-              textState,
-              selectedNodeId,
-              'workspaceUpgradeTitle',
-              onChangeText,
-            )}
-          >
-            {getFigmaCloneDomText(textState, 'workspaceUpgradeTitle')}
-          </strong>
-          <span
-            {...createEditableDomNodeProps(
-              state,
-              textState,
-              selectedNodeId,
-              'workspaceUpgradeText',
-              onChangeText,
-            )}
-          >
-            {getFigmaCloneDomText(textState, 'workspaceUpgradeText')}
-          </span>
-        </div>
-      </aside>
-
-      <main
-        className="figma-dom-workspace__main"
-        {...createDomNodeProps(state, selectedNodeId, 'workspaceMain')}
-      >
-        <header
-          className="figma-dom-workspace__topbar"
-          {...createDomNodeProps(state, selectedNodeId, 'workspaceTopbar')}
-        >
-          <span
-            {...createEditableDomNodeProps(
-              state,
-              textState,
-              selectedNodeId,
-              'workspaceBreadcrumb',
-              onChangeText,
-            )}
-          >
-            {getFigmaCloneDomText(textState, 'workspaceBreadcrumb')}
-          </span>
-          <div
-            className="figma-dom-workspace__search"
-            {...createEditableDomNodeProps(
-              state,
-              textState,
-              selectedNodeId,
-              'workspaceSearch',
-              onChangeText,
-            )}
-          >
-            {getFigmaCloneDomText(textState, 'workspaceSearch')}
-          </div>
-          <button
-            className="figma-dom-workspace__profile"
-            {...createEditableDomNodeProps(
-              state,
-              textState,
-              selectedNodeId,
-              'workspaceProfile',
-              onChangeText,
-            )}
-            type="button"
-          >
-            {getFigmaCloneDomText(textState, 'workspaceProfile')}
-          </button>
-        </header>
-
-        <section
-          className="figma-dom-workspace__hero"
-          {...createDomNodeProps(state, selectedNodeId, 'workspaceHero')}
-        >
-          <span
-            className="figma-dom-workspace__floating-note"
-            {...createDomNodeProps(state, selectedNodeId, 'workspaceFloatingNote')}
-          >
-            {getFigmaCloneDomText(textState, 'workspaceFloatingNote')}
-          </span>
-          <div
-            className="figma-dom-workspace__hero-copy"
-            {...createDomNodeProps(state, selectedNodeId, 'workspaceHeroCopy')}
-          >
-            <h2
-              {...createEditableDomNodeProps(
-                state,
-                textState,
-                selectedNodeId,
-                'workspaceHeroTitle',
-                onChangeText,
-              )}
-            >
-              {getFigmaCloneDomText(textState, 'workspaceHeroTitle')}
-            </h2>
-            <p
-              {...createEditableDomNodeProps(
-                state,
-                textState,
-                selectedNodeId,
-                'workspaceHeroText',
-                onChangeText,
-              )}
-            >
-              {getFigmaCloneDomText(textState, 'workspaceHeroText')}
-            </p>
-            <div
-              className="figma-dom-workspace__tags"
-              {...createDomNodeProps(state, selectedNodeId, 'workspaceAudienceTags')}
-            >
-              {([
-                'workspaceAudienceTagEnterprise',
-                'workspaceAudienceTagRenewal',
-                'workspaceAudienceTagExpansion',
-                'workspaceAudienceTagRisk',
-              ] as const).map((nodeId) => (
-                <span
-                  key={nodeId}
-                  className="figma-dom-workspace__tag"
-                  {...createEditableDomNodeProps(
-                    state,
-                    textState,
-                    selectedNodeId,
-                    nodeId,
-                    onChangeText,
-                  )}
-                >
-                  {getFigmaCloneDomText(textState, nodeId)}
-                </span>
-              ))}
-            </div>
-          </div>
-          <div
-            className="figma-dom-workspace__hero-actions"
-            {...createDomNodeProps(state, selectedNodeId, 'workspaceHeroActions')}
-          >
-            <button
-              className="figma-dom-workspace__primary"
-              {...createEditableDomNodeProps(
-                state,
-                textState,
-                selectedNodeId,
-                'workspacePrimaryAction',
-                onChangeText,
-              )}
-              type="button"
-            >
-              {getFigmaCloneDomText(textState, 'workspacePrimaryAction')}
-            </button>
-            <button
-              className="figma-dom-workspace__secondary"
-              {...createEditableDomNodeProps(
-                state,
-                textState,
-                selectedNodeId,
-                'workspaceSecondaryAction',
-                onChangeText,
-              )}
-              type="button"
-            >
-              {getFigmaCloneDomText(textState, 'workspaceSecondaryAction')}
-            </button>
-          </div>
-        </section>
-
-        <section
-          className="figma-dom-workspace__stats"
-          {...createDomNodeProps(state, selectedNodeId, 'workspaceStats')}
-        >
-          <div
-            className="figma-dom-workspace__stat"
-            {...createDomNodeProps(state, selectedNodeId, 'workspaceStatRevenue')}
-          >
-            <span
-              {...createEditableDomNodeProps(
-                state,
-                textState,
-                selectedNodeId,
-                'workspaceStatRevenueLabel',
-                onChangeText,
-              )}
-            >
-              {getFigmaCloneDomText(textState, 'workspaceStatRevenueLabel')}
-            </span>
-            <strong
-              {...createEditableDomNodeProps(
-                state,
-                textState,
-                selectedNodeId,
-                'workspaceStatRevenueValue',
-                onChangeText,
-              )}
-            >
-              {getFigmaCloneDomText(textState, 'workspaceStatRevenueValue')}
-            </strong>
-            <em
-              {...createEditableDomNodeProps(
-                state,
-                textState,
-                selectedNodeId,
-                'workspaceStatRevenueDelta',
-                onChangeText,
-              )}
-            >
-              {getFigmaCloneDomText(textState, 'workspaceStatRevenueDelta')}
-            </em>
-          </div>
-          <div
-            className="figma-dom-workspace__stat"
-            {...createDomNodeProps(state, selectedNodeId, 'workspaceStatConversion')}
-          >
-            <span
-              {...createEditableDomNodeProps(
-                state,
-                textState,
-                selectedNodeId,
-                'workspaceStatConversionLabel',
-                onChangeText,
-              )}
-            >
-              {getFigmaCloneDomText(textState, 'workspaceStatConversionLabel')}
-            </span>
-            <strong
-              {...createEditableDomNodeProps(
-                state,
-                textState,
-                selectedNodeId,
-                'workspaceStatConversionValue',
-                onChangeText,
-              )}
-            >
-              {getFigmaCloneDomText(textState, 'workspaceStatConversionValue')}
-            </strong>
-            <em
-              {...createEditableDomNodeProps(
-                state,
-                textState,
-                selectedNodeId,
-                'workspaceStatConversionDelta',
-                onChangeText,
-              )}
-            >
-              {getFigmaCloneDomText(textState, 'workspaceStatConversionDelta')}
-            </em>
-          </div>
-          <div
-            className="figma-dom-workspace__stat"
-            {...createDomNodeProps(state, selectedNodeId, 'workspaceStatTickets')}
-          >
-            <span
-              {...createEditableDomNodeProps(
-                state,
-                textState,
-                selectedNodeId,
-                'workspaceStatTicketsLabel',
-                onChangeText,
-              )}
-            >
-              {getFigmaCloneDomText(textState, 'workspaceStatTicketsLabel')}
-            </span>
-            <strong
-              {...createEditableDomNodeProps(
-                state,
-                textState,
-                selectedNodeId,
-                'workspaceStatTicketsValue',
-                onChangeText,
-              )}
-            >
-              {getFigmaCloneDomText(textState, 'workspaceStatTicketsValue')}
-            </strong>
-            <em
-              {...createEditableDomNodeProps(
-                state,
-                textState,
-                selectedNodeId,
-                'workspaceStatTicketsDelta',
-                onChangeText,
-              )}
-            >
-              {getFigmaCloneDomText(textState, 'workspaceStatTicketsDelta')}
-            </em>
-          </div>
-        </section>
-
-        <section
-          className="figma-dom-workspace__content"
-          {...createDomNodeProps(state, selectedNodeId, 'workspaceContent')}
-        >
-          <section
-            className="figma-dom-workspace__panel figma-dom-workspace__panel--pipeline"
-            {...createDomNodeProps(state, selectedNodeId, 'workspacePipeline')}
-          >
-            <header
-              {...createEditableDomNodeProps(
-                state,
-                textState,
-                selectedNodeId,
-                'workspacePipelineHeader',
-                onChangeText,
-              )}
-            >
-              {getFigmaCloneDomText(textState, 'workspacePipelineHeader')}
-            </header>
-            <div
-              className="figma-dom-workspace__list"
-              {...createDomNodeProps(state, selectedNodeId, 'workspacePipelineList')}
-            >
-              {renderWorkspaceDeal(
-                state,
-                textState,
-                selectedNodeId,
-                'workspaceDealOne',
-                'workspaceDealOneTitle',
-                'workspaceDealOneValue',
-                onChangeText,
-              )}
-              {renderWorkspaceDeal(
-                state,
-                textState,
-                selectedNodeId,
-                'workspaceDealTwo',
-                'workspaceDealTwoTitle',
-                'workspaceDealTwoValue',
-                onChangeText,
-              )}
-              {renderWorkspaceDeal(
-                state,
-                textState,
-                selectedNodeId,
-                'workspaceDealThree',
-                'workspaceDealThreeTitle',
-                'workspaceDealThreeValue',
-                onChangeText,
-              )}
-            </div>
-          </section>
-
-          <section
-            className="figma-dom-workspace__panel figma-dom-workspace__panel--activity"
-            {...createDomNodeProps(state, selectedNodeId, 'workspaceActivity')}
-          >
-            <header
-              {...createEditableDomNodeProps(
-                state,
-                textState,
-                selectedNodeId,
-                'workspaceActivityHeader',
-                onChangeText,
-              )}
-            >
-              {getFigmaCloneDomText(textState, 'workspaceActivityHeader')}
-            </header>
-            <div
-              className="figma-dom-workspace__activity-list"
-              {...createDomNodeProps(state, selectedNodeId, 'workspaceActivityList')}
-            >
-              {renderWorkspaceActivity(
-                state,
-                textState,
-                selectedNodeId,
-                'workspaceActivityOne',
-                'workspaceActivityOneText',
-                onChangeText,
-              )}
-              {renderWorkspaceActivity(
-                state,
-                textState,
-                selectedNodeId,
-                'workspaceActivityTwo',
-                'workspaceActivityTwoText',
-                onChangeText,
-              )}
-              {renderWorkspaceActivity(
-                state,
-                textState,
-                selectedNodeId,
-                'workspaceActivityThree',
-                'workspaceActivityThreeText',
-                onChangeText,
-              )}
-            </div>
-          </section>
-        </section>
-      </main>
-    </section>
-  )
+type FigmaWorkspaceNodeDefinition = {
+  readonly id: string
+  readonly kind: 'component' | 'intrinsic' | 'widget'
 }
 
-function renderWorkspaceDeal(
-  state: FigmaCloneDomEditState,
-  textState: FigmaCloneDomTextState,
-  selectedNodeId: FigmaCloneDomNodeId | null,
-  nodeId: Extract<
-    FigmaCloneDomNodeId,
-    'workspaceDealOne' | 'workspaceDealTwo' | 'workspaceDealThree'
-  >,
-  titleNodeId: Extract<
-    FigmaCloneDomNodeId,
-    | 'workspaceDealOneTitle'
-    | 'workspaceDealTwoTitle'
-    | 'workspaceDealThreeTitle'
-  >,
-  valueNodeId: Extract<
-    FigmaCloneDomNodeId,
-    | 'workspaceDealOneValue'
-    | 'workspaceDealTwoValue'
-    | 'workspaceDealThreeValue'
-  >,
-  onChangeText: (nodeId: FigmaCloneDomNodeId, value: string) => void,
-) {
-  return (
-    <article
-      className="figma-dom-workspace__deal"
-      {...createDomNodeProps(state, selectedNodeId, nodeId)}
-    >
-      <strong
-        {...createEditableDomNodeProps(
+const FIGMA_WORKSPACE_COMPONENT_INTRINSICS: Readonly<Record<string, string>> = {
+  'workspace-deal-row': 'article',
+  'workspace-stat-card': 'div',
+}
+
+const FIGMA_WORKSPACE_CLASS_NAMES: Readonly<
+  Partial<Record<FigmaCloneDomNodeId, string>>
+> = {
+  workspaceActivity:
+    'figma-dom-workspace__panel figma-dom-workspace__panel--activity',
+  workspaceActivityList: 'figma-dom-workspace__activity-list',
+  workspaceActivityOne: 'figma-dom-workspace__activity',
+  workspaceActivityThree: 'figma-dom-workspace__activity',
+  workspaceActivityTwo: 'figma-dom-workspace__activity',
+  workspaceAudienceTagEnterprise: 'figma-dom-workspace__tag',
+  workspaceAudienceTagExpansion: 'figma-dom-workspace__tag',
+  workspaceAudienceTagRenewal: 'figma-dom-workspace__tag',
+  workspaceAudienceTagRisk: 'figma-dom-workspace__tag',
+  workspaceAudienceTags: 'figma-dom-workspace__tags',
+  workspaceBrand: 'figma-dom-workspace__brand',
+  workspaceBrandMark: 'figma-dom-workspace__brand-mark',
+  workspaceBrandText: 'figma-dom-workspace__brand-text',
+  workspaceContent: 'figma-dom-workspace__content',
+  workspaceDealOne: 'figma-dom-workspace__deal',
+  workspaceDealThree: 'figma-dom-workspace__deal',
+  workspaceDealTwo: 'figma-dom-workspace__deal',
+  workspaceFloatingNote: 'figma-dom-workspace__floating-note',
+  workspaceHero: 'figma-dom-workspace__hero',
+  workspaceHeroActions: 'figma-dom-workspace__hero-actions',
+  workspaceHeroCopy: 'figma-dom-workspace__hero-copy',
+  workspaceMain: 'figma-dom-workspace__main',
+  workspaceNav: 'figma-dom-workspace__nav',
+  workspaceNavCustomers: 'figma-dom-workspace__nav-item',
+  workspaceNavOverview:
+    'figma-dom-workspace__nav-item figma-dom-workspace__nav-item--active',
+  workspaceNavRoadmap: 'figma-dom-workspace__nav-item',
+  workspacePage: 'figma-dom-workspace',
+  workspacePipeline:
+    'figma-dom-workspace__panel figma-dom-workspace__panel--pipeline',
+  workspacePipelineList: 'figma-dom-workspace__list',
+  workspacePrimaryAction: 'figma-dom-workspace__primary',
+  workspaceProfile: 'figma-dom-workspace__profile',
+  workspaceSearch: 'figma-dom-workspace__search',
+  workspaceSecondaryAction: 'figma-dom-workspace__secondary',
+  workspaceSidebar: 'figma-dom-workspace__sidebar',
+  workspaceStatConversion: 'figma-dom-workspace__stat',
+  workspaceStats: 'figma-dom-workspace__stats',
+  workspaceStatRevenue: 'figma-dom-workspace__stat',
+  workspaceStatTickets: 'figma-dom-workspace__stat',
+  workspaceTopbar: 'figma-dom-workspace__topbar',
+  workspaceUpgrade: 'figma-dom-workspace__usage',
+}
+
+function renderWorkspacePage({
+  definitionByNodeId,
+  readModel,
+  selectedNodeId,
+  state,
+  textState,
+  onChangeText,
+}: {
+  definitionByNodeId:
+    FigmaWorkspaceDesignDocumentProjection['definitionByNodeId']
+  readModel: FigmaCloneDomReadModel
+  selectedNodeId: FigmaCloneDomNodeId | null
+  state: FigmaCloneDomEditState
+  textState: FigmaCloneDomTextState
+  onChangeText: (nodeId: FigmaCloneDomNodeId, value: string) => void
+}) {
+  const root = readModel.nodeById.workspacePage
+
+  if (!root) {
+    throw new Error('Missing projected Figma workspace root')
+  }
+
+  return renderWorkspaceNode(root)
+
+  function renderWorkspaceNode(
+    node: NonNullable<typeof root>,
+  ): ReturnType<typeof createElement> {
+    const definition = (
+      definitionByNodeId as Readonly<
+        Partial<Record<FigmaCloneDomNodeId, FigmaWorkspaceNodeDefinition>>
+      >
+    )[node.id]
+
+    if (!definition) {
+      throw new Error('Missing projected Figma workspace definition: ' + node.id)
+    }
+
+    const intrinsic = resolveFigmaWorkspaceIntrinsic(definition)
+    const hasText = Object.prototype.hasOwnProperty.call(textState, node.id)
+    const isEditable = hasText && node.id !== 'workspaceFloatingNote'
+    const nodeProps = isEditable
+      ? createEditableDomNodeProps(
           state,
           textState,
           selectedNodeId,
-          titleNodeId,
+          node.id,
           onChangeText,
-        )}
-      >
-        {getFigmaCloneDomText(textState, titleNodeId)}
-      </strong>
-      <span
-        {...createEditableDomNodeProps(
+          readModel,
+          definition.kind === 'component',
+        )
+      : createDomNodeProps(
           state,
-          textState,
           selectedNodeId,
-          valueNodeId,
-          onChangeText,
-        )}
-      >
-        {getFigmaCloneDomText(textState, valueNodeId)}
-      </span>
-    </article>
-  )
+          node.id,
+          readModel,
+          definition.kind === 'component',
+        )
+    const content = hasText
+      ? getFigmaCloneDomText(textState, node.id)
+      : node.children?.map(renderWorkspaceNode)
+
+    return createElement(
+      intrinsic,
+      {
+        ...nodeProps,
+        className: FIGMA_WORKSPACE_CLASS_NAMES[node.id],
+        key: node.id,
+        type: intrinsic === 'button' ? 'button' : undefined,
+      },
+      content,
+    )
+  }
 }
 
-function renderWorkspaceActivity(
-  state: FigmaCloneDomEditState,
-  textState: FigmaCloneDomTextState,
-  selectedNodeId: FigmaCloneDomNodeId | null,
-  nodeId: Extract<
-    FigmaCloneDomNodeId,
-    'workspaceActivityOne' | 'workspaceActivityTwo' | 'workspaceActivityThree'
-  >,
-  textNodeId: Extract<
-    FigmaCloneDomNodeId,
-    | 'workspaceActivityOneText'
-    | 'workspaceActivityTwoText'
-    | 'workspaceActivityThreeText'
-  >,
-  onChangeText: (nodeId: FigmaCloneDomNodeId, value: string) => void,
-) {
-  return (
-    <article
-      className="figma-dom-workspace__activity"
-      {...createDomNodeProps(state, selectedNodeId, nodeId)}
-    >
-      <span
-        {...createEditableDomNodeProps(
-          state,
-          textState,
-          selectedNodeId,
-          textNodeId,
-          onChangeText,
-        )}
-      >
-        {getFigmaCloneDomText(textState, textNodeId)}
-      </span>
-    </article>
+function resolveFigmaWorkspaceIntrinsic(
+  definition: FigmaWorkspaceNodeDefinition,
+): string {
+  if (definition.kind === 'intrinsic') {
+    return definition.id
+  }
+
+  if (definition.kind === 'component') {
+    const intrinsic = FIGMA_WORKSPACE_COMPONENT_INTRINSICS[definition.id]
+
+    if (intrinsic) {
+      return intrinsic
+    }
+  }
+
+  throw new Error(
+    'Unsupported Figma workspace definition: ' +
+    definition.kind +
+    ':' +
+    definition.id,
   )
 }
-
 function renderEditorialHomePage(
   state: FigmaCloneDomEditState,
   textState: FigmaCloneDomTextState,
@@ -1647,14 +1250,16 @@ function createDomNodeProps(
   state: FigmaCloneDomEditState,
   selectedNodeId: FigmaCloneDomNodeId | null,
   nodeId: FigmaCloneDomNodeId,
+  readModel?: FigmaCloneDomReadModel,
+  isComponentRoot = isFigmaCloneDomComponentRootNode(nodeId),
 ) {
   return {
     'data-dom-edit-node': nodeId,
     'data-figma-component-root':
-      isFigmaCloneDomComponentRootNode(nodeId) ? 'true' : 'false',
+      isComponentRoot ? 'true' : 'false',
     'data-figma-dom-node': nodeId,
     'data-selected': selectedNodeId === nodeId ? 'true' : 'false',
-    style: createNodeStyle(state, nodeId),
+    style: createNodeStyle(state, nodeId, readModel),
   } as const
 }
 
@@ -1664,12 +1269,21 @@ function createEditableDomNodeProps(
   selectedNodeId: FigmaCloneDomNodeId | null,
   nodeId: FigmaCloneDomNodeId,
   onChangeText: (nodeId: FigmaCloneDomNodeId, value: string) => void,
+  readModel?: FigmaCloneDomReadModel,
+  isComponentRoot = isFigmaCloneDomComponentRootNode(nodeId),
 ) {
   const isEditing =
-    selectedNodeId === nodeId && canFigmaCloneDomNodeEditText(nodeId)
+    selectedNodeId === nodeId &&
+    Object.prototype.hasOwnProperty.call(textState, nodeId)
 
   return {
-    ...createDomNodeProps(state, selectedNodeId, nodeId),
+    ...createDomNodeProps(
+      state,
+      selectedNodeId,
+      nodeId,
+      readModel,
+      isComponentRoot,
+    ),
     'aria-label': isEditing
       ? `Edit ${getFigmaCloneDomText(textState, nodeId)}`
       : undefined,
@@ -1718,17 +1332,21 @@ function focusFigmaCloneEditableDomNode(nodeId: FigmaCloneDomNodeId) {
 function createNodeStyle(
   state: FigmaCloneDomEditState,
   nodeId: FigmaCloneDomNodeId,
+  readModel?: FigmaCloneDomReadModel,
 ): CSSProperties {
   const style = getFigmaCloneDomEditStyle(state, nodeId)
-  const parentId = getFigmaCloneDomParentId(nodeId)
+  const parentId = getFigmaCloneDomParentId(nodeId, readModel?.tree)
   const parentDirection = parentId
     ? getFigmaCloneDomEditStyle(state, parentId).direction
     : null
   const parentUsesFlex = parentId
-    ? canFigmaCloneDomNodeUseAutoLayout(parentId) &&
+    ? canFigmaCloneDomNodeUseAutoLayout(parentId, readModel) &&
       !isFigmaCloneDomGridContainer(parentId)
     : false
-  const canUseAutoLayout = canFigmaCloneDomNodeUseAutoLayout(nodeId)
+  const canUseAutoLayout = canFigmaCloneDomNodeUseAutoLayout(
+    nodeId,
+    readModel,
+  )
   const isGridContainer = isFigmaCloneDomGridContainer(nodeId)
   const fillsParentRow =
     parentUsesFlex && parentDirection === 'row' && style.widthMode === 'fill'
