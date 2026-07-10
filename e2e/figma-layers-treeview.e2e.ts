@@ -61,7 +61,7 @@ test('exposes figma clone layers as a keyboard treeview', async ({
   await expect(workspaceSection).toHaveAttribute('aria-selected', 'true')
 })
 
-test('filters and favorites figma clone layers for component management', async ({
+test('filters figma clone layers for component management', async ({
   page,
 }) => {
   await page.goto('/?demo=figma')
@@ -78,118 +78,72 @@ test('filters and favorites figma clone layers for component management', async 
     tree.getByRole('treeitem', { name: 'Workspace page section' }),
   ).toHaveCount(0)
 
-  await search.fill('')
-  await page.getByRole('button', {
-    name: 'Add Workspace page section to favorites',
-  }).click()
-  await page.getByRole('button', { name: 'Show favorite layers' }).click()
-
+  await search.fill('workspace')
   await expect(
     tree.getByRole('treeitem', { name: 'Workspace page section' }),
   ).toBeVisible()
-  await expect(
-    tree.getByRole('treeitem', { name: 'React widget' }),
-  ).toHaveCount(0)
   await expect(
     tree.getByRole('treeitem', { name: 'Editorial homepage section' }),
   ).toHaveCount(0)
 })
 
-test('groups figma clone components by page in a variant board', async ({
+test('filters component-backed DOM nodes without a variant board', async ({
   page,
 }) => {
   await page.goto('/?demo=figma')
 
   const layers = page.getByRole('complementary', { name: 'Layers' })
-  const inspector = page.getByRole('complementary', { name: 'Design' })
-  const board = layers.getByLabel('Component variants')
+  const inspector = page.getByRole('complementary', {
+    name: 'CSS Inspector',
+  })
   const search = layers.getByRole('searchbox', { name: 'Search layers' })
+  const tree = layers.getByRole('tree', { name: 'Layers' })
 
-  await expect(board).toBeVisible()
-  await expect(
-    layers.getByRole('region', { name: 'Workspace page components' }),
-  ).toContainText('Stat card')
-  await expect(
-    layers.getByRole('region', { name: 'Editorial homepage components' }),
-  ).toContainText('Article meta card')
+  await expect(layers.getByLabel('Component variants')).toHaveCount(0)
 
-  await search.fill('stat card')
+  await search.fill('stat card revenue')
 
   await expect(
-    board.getByRole('button', { name: 'Select Stat card Revenue variant' }),
+    tree.getByRole('treeitem', { name: 'Revenue stat' }),
   ).toBeVisible()
   await expect(
-    board.getByRole('button', { name: 'Select Deal row Deal 1 variant' }),
+    tree.getByRole('treeitem', { name: 'Deal 1' }),
   ).toHaveCount(0)
 
-  await board.getByRole('button', {
-    name: 'Select Stat card Conversion variant',
-  }).click()
+  await page.getByRole('button', { name: 'Select layer Revenue stat' })
+    .click()
 
   await expect(inspector).toContainText('Stat card')
-  await expect(inspector).toContainText('Conversion')
+  await expect(inspector).toContainText('Revenue')
 })
 
-test('shows reusable component imports and selectable parts', async ({
+test('keeps Figma chrome focused on the CSS inspector', async ({
   page,
 }) => {
   await page.goto('/?demo=figma')
 
   const layers = page.getByRole('complementary', { name: 'Layers' })
-  const imports = page.getByRole('complementary', { name: 'Imports' })
-  const inspector = page.getByRole('complementary', { name: 'Design' })
-  const library = imports.getByLabel('Component library')
+  const inspector = page.getByRole('complementary', {
+    name: 'CSS Inspector',
+  })
   const search = layers.getByRole('searchbox', { name: 'Search layers' })
 
-  await expect(imports).toBeVisible()
-  await expect(imports).toHaveCSS('border-right-color', 'rgb(124, 58, 237)')
-  await expect(library).toBeVisible()
   await expect(
-    imports.getByRole('region', { name: 'Story imports' }),
-  ).toContainText('Workspace dashboard')
-  await imports.getByRole('button', {
-    name: 'Import Workspace dashboard story',
-  }).click()
-  await expect(imports.getByRole('button', {
-    name: 'Import Workspace dashboard story',
-  })).toHaveAttribute('aria-pressed', 'true')
-  await expect(
-    library.getByRole('region', { name: 'widgets component imports' }),
-  ).toContainText('Stat card')
-  await expect(
-    library.getByRole('region', { name: 'features component imports' }),
-  ).toContainText('Deal row')
-  await expect(
-    library.getByRole('region', { name: 'shared component imports' }),
-  ).toContainText('Article meta card')
-  await expect(library).toContainText('src/widgets/workspace-stat-card')
-
-  await library.getByRole('button', {
-    name: 'Import Stat card component',
-  }).click()
-
-  await expect(inspector).toContainText('Stat card')
-  await expect(page.locator('[data-figma-dom-node="workspaceStatRevenue"]'))
-    .toHaveAttribute('data-figma-component-root', 'true')
-  await expect(page.locator('[data-figma-dom-node="workspaceStatRevenue"]'))
-    .toHaveCSS('outline-color', 'rgb(124, 58, 237)')
-
-  await library.getByRole('button', {
-    name: 'Select Stat card Value part',
-  }).click()
-
-  await expect(inspector).toContainText('Revenue value')
-
-  await search.fill('shared')
-  await expect(
-    library.getByRole('region', { name: 'shared component imports' }),
-  ).toContainText('Article meta card')
-  await expect(
-    library.getByRole('region', { name: 'widgets component imports' }),
+    page.getByRole('complementary', { name: 'Imports' }),
   ).toHaveCount(0)
+  await expect(
+    page.getByRole('region', { name: 'Canvas devtools' }),
+  ).toHaveCount(0)
+
+  await search.fill('stat card revenue')
+  await page.getByRole('button', { name: 'Select layer Revenue stat' })
+    .click()
+
+  await expect(inspector).toContainText('CSS')
+  await expect(inspector).toContainText('Stat card')
 })
 
-test('focuses figma clone component variants and fits the selected frame', async ({
+test('focuses selected DOM layers and fits the selected frame', async ({
   page,
 }) => {
   await page.goto('/?demo=figma')
@@ -204,8 +158,10 @@ test('focuses figma clone component variants and fits the selected frame', async
   const zoomedTransform = await world.getAttribute('transform')
   expect(zoomedTransform).not.toBe(initialTransform)
 
+  await layers.getByRole('searchbox', { name: 'Search layers' })
+    .fill('reading time')
   await layers.getByRole('button', {
-    name: 'Select Article meta card Reading time variant',
+    name: 'Select layer Reading time',
   }).click()
 
   const focusedTransform = await world.getAttribute('transform')

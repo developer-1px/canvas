@@ -13,7 +13,6 @@ import {
   getFigmaCloneDomToggledAxisSizeMode,
   isFigmaCloneDomComponentRootNode,
   listFigmaCloneDomComponentSets,
-  listFigmaCloneStoryImports,
   updateFigmaCloneDomAutoLayoutField,
   updateFigmaCloneDomComponentAutoLayoutField,
   updateFigmaCloneDomComponentEditField,
@@ -154,25 +153,6 @@ describe('FigmaCloneDomEditModel', () => {
         parts: ['Root', 'Label', 'Value', 'Note'],
         source: 'shared',
         variants: ['Byline', 'Category', 'Reading time'],
-      },
-    ])
-  })
-
-  it('lists importable stories with their component sets', () => {
-    expect(listFigmaCloneStoryImports()).toEqual([
-      {
-        componentIds: ['workspace-stat-card', 'workspace-deal-row'],
-        id: 'workspace-dashboard-story',
-        label: 'Workspace dashboard',
-        rootId: 'workspacePage',
-        source: 'src/stories/workspace-dashboard.stories.tsx',
-      },
-      {
-        componentIds: ['home-meta-card'],
-        id: 'editorial-home-story',
-        label: 'Editorial home',
-        rootId: 'homePage',
-        source: 'src/stories/editorial-home.stories.tsx',
       },
     ])
   })

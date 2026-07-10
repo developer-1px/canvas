@@ -1,34 +1,37 @@
 import { expect, test, type Page } from '@playwright/test'
 
-test('keeps Figma section selections fitted inside the canvas devtools work area', async ({
+test('keeps selected Figma DOM nodes fitted inside the canvas work area', async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1440, height: 1000 })
   await page.goto('/figma')
   await expect(page.locator('.figma-clone')).toBeVisible()
 
-  await expectSelectedFrameInsideCanvas(page)
+  await page.getByRole('button', { name: 'Select layer Workspace page' })
+    .click()
+  await expectSelectedGuideInsideCanvas(page)
 
   await page.locator('[data-figma-layer-tree-id="section:homePage"]')
     .click()
-
-  await expectSelectedFrameInsideCanvas(page)
+  await page.getByRole('button', { name: 'Select layer Editorial homepage' })
+    .click()
+  await expectSelectedGuideInsideCanvas(page)
 })
 
-test('places the Figma devtools panel away from the fitted section frame', async ({
+test('does not render the generic canvas devtools panel in Figma mode', async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1960, height: 1040 })
   await page.goto('/figma')
   await expect(page.locator('.figma-clone')).toBeVisible()
 
-  await page.locator('[data-figma-layer-tree-id="section:homePage"]')
-    .click()
-
-  await expect.poll(() => readSelectedFrameAndPanelOverlap(page)).toBe(false)
+  await expect(
+    page.getByRole('region', { name: 'Canvas devtools' }),
+  ).toHaveCount(0)
+  await expect(page.locator('.canvas-devtools__panel')).toHaveCount(0)
 })
 
-test('surfaces Figma source context inside canvas devtools', async ({
+test('surfaces Figma component context inside the CSS inspector', async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1440, height: 1000 })
@@ -36,26 +39,25 @@ test('surfaces Figma source context inside canvas devtools', async ({
   await expect(page.locator('.figma-clone')).toBeVisible()
 
   const layers = page.getByRole('complementary', { name: 'Layers' })
+  const inspector = page.getByRole('complementary', {
+    name: 'CSS Inspector',
+  })
 
   await layers.getByRole('searchbox', { name: 'Search layers' })
     .fill('stat card revenue')
   await page.getByRole('button', { name: 'Select layer Revenue stat' })
     .click()
-  await page.getByRole('button', { name: 'Inspect' }).click()
 
-  const devtools = page.getByRole('region', { name: 'Canvas devtools' })
-
-  await expect(devtools).toContainText('Revenue stat')
-  await expect(devtools).toContainText(
-    'packages/figma-clone/src/dom-edit/FigmaCloneDomEditSurface.tsx#workspaceStatRevenue',
+  await expect(inspector).toContainText('Revenue stat')
+  await expect(inspector).toContainText('Stat card')
+  await expect(inspector).toContainText('root')
+  await expect(inspector).toContainText(
+    'Layout and style edits sync across stat instances.',
   )
-  await expect(devtools).toContainText('Stat card')
-  await expect(devtools).toContainText('src/widgets/workspace-stat-card')
-  await expect(devtools).toContainText('root')
 })
 
-async function expectSelectedFrameInsideCanvas(page: Page) {
-  await expect.poll(() => readSelectedFrameFit(page)).toEqual({
+async function expectSelectedGuideInsideCanvas(page: Page) {
+  await expect.poll(() => readSelectedGuideFit(page)).toEqual({
     bottomInside: true,
     leftInside: true,
     rightInside: true,
@@ -63,10 +65,10 @@ async function expectSelectedFrameInsideCanvas(page: Page) {
   })
 }
 
-async function readSelectedFrameFit(page: Page) {
+async function readSelectedGuideFit(page: Page) {
   return page.evaluate(() => {
     const canvas = document.querySelector('.figma-canvas-region')
-    const selected = document.querySelector('.canvas-devtools__selection-outline')
+    const selected = document.querySelector('.figma-guide-selected')
 
     if (!canvas || !selected) {
       return {
@@ -86,26 +88,5 @@ async function readSelectedFrameFit(page: Page) {
       rightInside: selectedRect.right <= canvasRect.right - 8,
       topInside: selectedRect.top >= canvasRect.top + 8,
     }
-  })
-}
-
-async function readSelectedFrameAndPanelOverlap(page: Page) {
-  return page.evaluate(() => {
-    const panel = document.querySelector('.canvas-devtools__panel')
-    const selected = document.querySelector('.canvas-devtools__selection-outline')
-
-    if (!panel || !selected) {
-      return true
-    }
-
-    const panelRect = panel.getBoundingClientRect()
-    const selectedRect = selected.getBoundingClientRect()
-
-    return !(
-      panelRect.right <= selectedRect.left ||
-      panelRect.left >= selectedRect.right ||
-      panelRect.bottom <= selectedRect.top ||
-      panelRect.top >= selectedRect.bottom
-    )
   })
 }

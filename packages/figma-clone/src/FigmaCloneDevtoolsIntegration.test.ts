@@ -6,18 +6,17 @@ const modules = import.meta.glob('./FigmaCloneApp.tsx', {
   query: '?raw',
 }) as Record<string, string>
 
-describe('Figma clone devtools integration', () => {
+describe('Figma clone editor chrome', () => {
   const source = modules['./FigmaCloneApp.tsx']
 
-  it('opts the Figma work surface into the canvas devtools pack', () => {
-    expect(source).toContain('createCanvasDevtoolsFeaturePackManifest')
-    expect(source).toContain('<CanvasDevtoolsOverlay')
-    expect(source).toContain('createFigmaCloneDevtoolsNotes')
+  it('keeps generic canvas devtools out of the Figma CSS editor surface', () => {
+    expect(source).not.toContain('createCanvasDevtoolsFeaturePackManifest')
+    expect(source).not.toContain('<CanvasDevtoolsOverlay')
+    expect(source).not.toContain('createFigmaCloneDevtoolsNotes')
   })
 
-  it('renders DOM edit and devtools overlays through one stage overlay slot', () => {
+  it('renders the DOM edit overlay through one stage overlay slot', () => {
     expect(source.match(/stageOverlaySlot\.render/g) ?? []).toHaveLength(1)
     expect(source).toContain('<DomEditSelectionOverlay')
-    expect(source).toContain('<CanvasDevtoolsOverlay')
   })
 })

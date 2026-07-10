@@ -52,7 +52,7 @@ test('shows margin outside selected bounds without mixing with container gap', a
   await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
   await selectLayer(page, 'Select layer Deal row 1', 'workspaceDealOne')
 
-  await page.getByRole('spinbutton', { name: 'Mar' }).fill('10')
+  await page.getByRole('spinbutton', { name: 'CSS margin' }).fill('10')
   await expect(marginGhost(page)).toHaveCount(4)
   await expectMarginOutsideSelection(page, 'workspaceDealOne')
 

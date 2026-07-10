@@ -1,16 +1,12 @@
 import {
-  BookOpen,
   ChevronDown,
   ChevronRight,
-  Copy,
   Inspect,
   Layers,
   Maximize2,
   MousePointer2,
-  PackagePlus,
   Ruler,
   Search,
-  Star,
   ZoomIn,
   ZoomOut,
 } from 'lucide-react'
@@ -27,8 +23,6 @@ import { useJSONDocument } from '@interactive-os/json-document/react'
 import {
   CanvasApp,
   type CanvasAppAssemblyInput,
-  type CanvasItem,
-  type Viewport,
 } from '../../../src/canvas'
 import {
   CANVAS_TOOLBAR_ITEM_PROPS,
@@ -40,19 +34,10 @@ import {
   type CanvasWorkspaceStorageProvider,
 } from '../../../src/canvas/app/authoring'
 import {
-  CanvasDevtoolsOverlay,
-  createCanvasDevtoolsFeaturePackManifest,
-  type CanvasDevtoolsContextSummary,
-  type CanvasDevtoolsMode,
-  type CanvasDevtoolsNoteSummary,
-} from '@interactive-os/canvas-pack-devtools'
-import {
   DEFAULT_DOM_EDIT_OVERLAY_LAYER_VISIBILITY,
-  DomEditInspector,
   DomEditSelectionOverlay,
   type DomEditAffordanceProperty,
   type DomEditAffordanceState,
-  type DomEditOverlayLayer,
   type DomEditOverlayLayerVisibility,
 } from '@interactive-os/dom-edit-affordance/react'
 import type {
@@ -69,28 +54,23 @@ import {
   FIGMA_CLONE_DOM_NODE_BY_ID,
   canFigmaCloneDomNodeEditText,
   getFigmaCloneDomComponentBinding,
+  getFigmaCloneDomToggledAxisSizeMode,
   getFigmaCloneDomText,
   getFigmaCloneDomNodeDepth,
   getFigmaCloneDomRootId,
-  listFigmaCloneStoryImports,
-  listFigmaCloneDomComponentSets,
   updateFigmaCloneDomComponentAutoLayoutField,
   updateFigmaCloneDomComponentEditField,
   updateFigmaCloneDomText,
   type FigmaCloneDomAutoLayoutField,
+  type FigmaCloneDomAutoLayoutSizeMode,
   type FigmaCloneDomComponentBinding,
-  type FigmaCloneDomComponentId,
-  type FigmaCloneDomComponentPartSummary,
-  type FigmaCloneDomComponentSetSummary,
-  type FigmaCloneDomComponentSourceLayer,
   type FigmaCloneDomEditField,
   type FigmaCloneDomEditNodeState,
   type FigmaCloneDomEditState,
+  type FigmaCloneDomDisplay,
   type FigmaCloneDomNode,
   type FigmaCloneDomNodeId,
   type FigmaCloneDomTextState,
-  type FigmaCloneStoryImportId,
-  type FigmaCloneStoryImportSummary,
 } from './dom-edit/FigmaCloneDomEditModel'
 import {
   createFigmaCloneCanvasItems,
@@ -124,36 +104,6 @@ type FigmaCloneDomDragHistorySession = {
   undoDepth: number
 }
 
-type FigmaCloneGuideLayer = Exclude<DomEditOverlayLayer, 'selection'>
-
-type FigmaCloneInspectorTab = 'design' | 'dev'
-
-type FigmaCloneLayerFavoriteId =
-  | 'widget'
-  | `section:${FigmaCloneDomSectionRootId}`
-  | `node:${FigmaCloneDomNodeId}`
-
-type FigmaCloneLayerNotesState = Partial<
-  Record<FigmaCloneLayerFavoriteId, string>
->
-
-const FIGMA_CLONE_INITIAL_LAYER_NOTES = {
-  'section:workspacePage': 'Validate workspace spacing before handoff.',
-  widget: 'Check widget state against the source component.',
-} satisfies FigmaCloneLayerNotesState
-
-type FigmaCloneComponentPageGroup = {
-  components: readonly FigmaCloneDomComponentSetSummary[]
-  pageLabel: string
-  pageRootId: FigmaCloneDomSectionRootId
-}
-
-type FigmaCloneComponentSourceGroup = {
-  components: readonly FigmaCloneDomComponentSetSummary[]
-  label: string
-  layer: FigmaCloneDomComponentSourceLayer
-}
-
 type FigmaCloneLayerTreeHandlers = {
   onSelectNode: (nodeId: FigmaCloneDomNodeId) => void
   onSelectSection: (rootId: FigmaCloneDomSectionRootId) => void
@@ -165,29 +115,8 @@ const FIGMA_CLONE_LAYER_TREE_BUTTON_SELECTOR =
 const FIGMA_CLONE_WIDGET_FRAME_ITEM_ID = 'figma-widget-frame'
 
 const FIGMA_CLONE_ITEMS = createFigmaCloneCanvasItems()
-const FIGMA_CLONE_DOM_COMPONENT_SETS = listFigmaCloneDomComponentSets()
-const FIGMA_CLONE_STORY_IMPORTS = listFigmaCloneStoryImports()
-const FIGMA_CLONE_COMPONENT_SOURCE_ORDER = [
-  'widgets',
-  'features',
-  'shared',
-] as const satisfies readonly FigmaCloneDomComponentSourceLayer[]
-const FIGMA_CLONE_COMPONENT_SOURCE_LABELS = {
-  features: 'features',
-  shared: 'shared',
-  widgets: 'widgets',
-} as const satisfies Record<FigmaCloneDomComponentSourceLayer, string>
-
-const FIGMA_CLONE_GUIDE_LAYER_CONTROLS = [
-  { label: 'Flex', layer: 'flex' },
-  { label: 'Grid', layer: 'grid' },
-  { label: 'Spacing', layer: 'spacing' },
-  { label: 'Guides', layer: 'guides' },
-  { label: 'Box', layer: 'boxModel' },
-] satisfies Array<{
-  label: string
-  layer: FigmaCloneGuideLayer
-}>
+const FIGMA_CLONE_EDITOR_OVERLAY_LAYERS: DomEditOverlayLayerVisibility =
+  DEFAULT_DOM_EDIT_OVERLAY_LAYER_VISIBILITY
 
 const FIGMA_CLONE_AFFORDANCE_CONFIG = {
   gestures: {
@@ -259,26 +188,10 @@ export function FigmaCloneApp() {
     rootId: 'workspacePage',
     nodeId: null,
   })
-  const [overlayLayers, setOverlayLayers] =
-    useState<DomEditOverlayLayerVisibility>(
-      DEFAULT_DOM_EDIT_OVERLAY_LAYER_VISIBILITY,
-    )
+  const overlayLayers = FIGMA_CLONE_EDITOR_OVERLAY_LAYERS
   const [affordanceState, setAffordanceState] =
     useState<DomEditAffordanceState>({ mode: 'idle' })
   const [layerQuery, setLayerQuery] = useState('')
-  const [favoriteLayersOnly, setFavoriteLayersOnly] = useState(false)
-  const [favoriteLayerIds, setFavoriteLayerIds] =
-    useState<Set<FigmaCloneLayerFavoriteId>>(() => new Set())
-  const [importedComponentIds, setImportedComponentIds] =
-    useState<Set<FigmaCloneDomComponentId>>(() => new Set())
-  const [importedStoryIds, setImportedStoryIds] =
-    useState<Set<FigmaCloneStoryImportId>>(() => new Set())
-  const [layerNotes, setLayerNotes] = useState<FigmaCloneLayerNotesState>(
-    () => ({ ...FIGMA_CLONE_INITIAL_LAYER_NOTES }),
-  )
-  const [devtoolsMode, setDevtoolsMode] =
-    useState<CanvasDevtoolsMode>('measure')
-  const [sourceCopyState, setSourceCopyState] = useState('')
   const domState = domDocument.value.state
   const domTextState = domDocument.value.textState
   const changeAffordanceState = useCallback((
@@ -335,13 +248,6 @@ export function FigmaCloneApp() {
       })
     : null,
   [sectionViewport, selectedSectionRootId])
-  const toggleOverlayLayer = useCallback((layer: FigmaCloneGuideLayer) => {
-    setOverlayLayers((current) => ({
-      ...current,
-      [layer]: !current[layer],
-      selection: true,
-    }))
-  }, [])
   const isSectionSelected = useCallback(
     (rootId: FigmaCloneDomSectionRootId) =>
       selectedSectionRootId === rootId && selectedNodeId === null,
@@ -357,43 +263,6 @@ export function FigmaCloneApp() {
       nodeId,
     })
   }
-  const toggleFavoriteLayer = useCallback((
-    favoriteId: FigmaCloneLayerFavoriteId,
-  ) => {
-    setFavoriteLayerIds((current) => {
-      const next = new Set(current)
-
-      if (next.has(favoriteId)) {
-        next.delete(favoriteId)
-      } else {
-        next.add(favoriteId)
-      }
-
-      return next
-    })
-  }, [])
-  const changeLayerNote = useCallback((
-    layerId: FigmaCloneLayerFavoriteId,
-    note: string,
-  ) => {
-    setLayerNotes((current) => {
-      const next = { ...current }
-
-      if (note) {
-        next[layerId] = note
-      } else {
-        delete next[layerId]
-      }
-
-      return next
-    })
-  }, [])
-  const copySourceReference = useCallback((sourceReference: string) => {
-    void writeFigmaCloneClipboardText(sourceReference).then((copied) => {
-      setSourceCopyState(copied ? 'Copied source' : 'Copy unavailable')
-      window.setTimeout(() => setSourceCopyState(''), 1200)
-    })
-  }, [])
   const changeSectionViewportField = (
     field: 'h' | 'w',
     value: number,
@@ -486,9 +355,6 @@ export function FigmaCloneApp() {
     return false
   }, [domDocument])
   const assemblyInput = useMemo<CanvasAppAssemblyInput>(() => ({
-    additionalFeaturePackManifests: [
-      createCanvasDevtoolsFeaturePackManifest({ initialMode: 'measure' }),
-    ],
     affordanceConfig: FIGMA_CLONE_AFFORDANCE_CONFIG,
     capabilities: CANVAS_APP_READ_ONLY_CAPABILITIES,
     // eslint-disable-next-line react-hooks/refs
@@ -535,37 +401,7 @@ export function FigmaCloneApp() {
           selectDomNode(nodeId)
           focusCanvasItem(getFigmaCloneCanvasItemIdForNode(nodeId))
         }
-        const importComponent = (
-          component: FigmaCloneDomComponentSetSummary,
-        ) => {
-          const importTarget = component.instances[0]?.rootNodeId
-
-          if (!importTarget) {
-            return
-          }
-
-          setImportedComponentIds((current) => {
-            const next = new Set(current)
-            next.add(component.id)
-            return next
-          })
-          selectNodeAndFocus(importTarget)
-        }
-        const importStory = (story: FigmaCloneStoryImportSummary) => {
-          setImportedStoryIds((current) => {
-            const next = new Set(current)
-            next.add(story.id)
-            return next
-          })
-          selectSectionAndFocus(story.rootId)
-        }
         const selectedCanvasItemId = getFigmaCloneSelectedCanvasItemId(selection)
-        const devtoolsNotes = createFigmaCloneDevtoolsNotes({
-          items: app.items,
-          layerNotes,
-          selection,
-        })
-        const devtoolsContext = createFigmaCloneDevtoolsContext(selection)
 
         return (
           <main className="figma-clone">
@@ -574,28 +410,11 @@ export function FigmaCloneApp() {
               onFitItems={app.viewportFocus.fitItems}
             />
             <FigmaCloneLayersPanel
-              favoriteLayerIds={favoriteLayerIds}
-              favoritesOnly={favoriteLayersOnly}
               query={layerQuery}
               selection={selection}
-              onFavoritesOnlyChange={setFavoriteLayersOnly}
               onQueryChange={setLayerQuery}
               onSelectWidgetFrame={selectWidgetFrameAndFocus}
               onSelectSection={selectSectionAndFocus}
-              onSelectNode={selectNodeAndFocus}
-              onSelectNodeAndFocus={selectNodeAndFocus}
-              onToggleFavorite={toggleFavoriteLayer}
-            />
-            <FigmaCloneImportRail
-              favoriteLayerIds={favoriteLayerIds}
-              favoritesOnly={favoriteLayersOnly}
-              importedComponentIds={importedComponentIds}
-              importedStoryIds={importedStoryIds}
-              query={layerQuery}
-              selection={selection}
-              stories={FIGMA_CLONE_STORY_IMPORTS}
-              onImportComponent={importComponent}
-              onImportStory={importStory}
               onSelectNode={selectNodeAndFocus}
             />
             <section
@@ -648,48 +467,30 @@ export function FigmaCloneApp() {
                 >
                   <Inspect aria-hidden="true" size={14} />
                 </button>
-                <FigmaCloneGuideLayerControls
-                  visibility={overlayLayers}
-                  onToggle={toggleOverlayLayer}
-                />
               </div>
               {app.stageOverlaySlot.render(
-                <>
-                  <DomEditSelectionOverlay
-                    adapter={FIGMA_CLONE_DOM_EDIT_ADAPTER}
-                    affordanceState={affordanceState}
-                    frameGuides={frameGuides}
-                    isCanvasPanActive={app.activeMode === 'pan' || app.gesture === 'pan'}
-                    overlayLayers={overlayLayers}
-                    selectedNodeId={selectedNodeId}
-                    shellRef={canvasRegionRef as RefObject<HTMLElement | null>}
-                    state={domState}
-                    viewport={app.viewport}
-                    onAffordanceStateChange={changeAffordanceState}
-                    onChangeAutoLayout={changeDomAutoLayoutField}
-                    onChange={changeDomField}
-                    onCommand={runDomEditCommand}
-                  />
-                  <CanvasDevtoolsOverlay
-                    activeMode={devtoolsMode}
-                    context={devtoolsContext}
-                    items={app.items}
-                    notes={devtoolsNotes}
-                    selectedItemIds={[selectedCanvasItemId]}
-                    viewport={app.viewport}
-                    onModeChange={setDevtoolsMode}
-                  />
-                </>,
+                <DomEditSelectionOverlay
+                  adapter={FIGMA_CLONE_DOM_EDIT_ADAPTER}
+                  affordanceState={affordanceState}
+                  frameGuides={frameGuides}
+                  isCanvasPanActive={app.activeMode === 'pan' || app.gesture === 'pan'}
+                  overlayLayers={overlayLayers}
+                  selectedNodeId={selectedNodeId}
+                  shellRef={canvasRegionRef as RefObject<HTMLElement | null>}
+                  state={domState}
+                  viewport={app.viewport}
+                  onAffordanceStateChange={changeAffordanceState}
+                  onChangeAutoLayout={changeDomAutoLayoutField}
+                  onChange={changeDomField}
+                  onCommand={runDomEditCommand}
+                />,
               )}
             </section>
             <FigmaCloneInspectorPanel
-              copyState={sourceCopyState}
               domState={domState}
               domTextState={domTextState}
-              layerNotes={layerNotes}
               sectionViewport={sectionViewport}
               selection={selection}
-              viewport={app.viewport}
               onApplySectionViewportPreset={applySectionViewportPreset}
               onChangeDomAutoLayoutField={changeDomAutoLayoutField}
               onChangeDomField={changeDomField}
@@ -697,8 +498,6 @@ export function FigmaCloneApp() {
               onChangeSectionFrameMode={changeSectionFrameMode}
               onChangeSectionOverflow={changeSectionOverflow}
               onChangeSectionViewportField={changeSectionViewportField}
-              onChangeLayerNote={changeLayerNote}
-              onCopySourceReference={copySourceReference}
               onSelectNode={selectDomNode}
               onSelectDocumentRoot={() => {
                 selectDomNode(selection.frameId === 'dom'
@@ -756,183 +555,32 @@ function FigmaCloneSelectionViewportFocus({
   return null
 }
 
-function FigmaCloneGuideLayerControls({
-  visibility,
-  onToggle,
-}: {
-  visibility: DomEditOverlayLayerVisibility
-  onToggle: (layer: FigmaCloneGuideLayer) => void
-}) {
-  return (
-    <div className="figma-guide-layer-control" role="group" aria-label="Guide layers">
-      {FIGMA_CLONE_GUIDE_LAYER_CONTROLS.map((control) => (
-        <label className="figma-guide-layer-toggle" key={control.layer}>
-          <input
-            {...CANVAS_TOOLBAR_ITEM_PROPS}
-            aria-label={`${control.label} overlays`}
-            checked={visibility[control.layer]}
-            type="checkbox"
-            onChange={() => onToggle(control.layer)}
-          />
-          <span>{control.label}</span>
-        </label>
-      ))}
-    </div>
-  )
-}
-
-function FigmaCloneImportRail({
-  favoriteLayerIds,
-  favoritesOnly,
-  importedComponentIds,
-  importedStoryIds,
-  query,
-  selection,
-  stories,
-  onImportComponent,
-  onImportStory,
-  onSelectNode,
-}: {
-  favoriteLayerIds: Set<FigmaCloneLayerFavoriteId>
-  favoritesOnly: boolean
-  importedComponentIds: Set<FigmaCloneDomComponentId>
-  importedStoryIds: Set<FigmaCloneStoryImportId>
-  query: string
-  selection: FigmaCloneSelection
-  stories: readonly FigmaCloneStoryImportSummary[]
-  onImportComponent: (component: FigmaCloneDomComponentSetSummary) => void
-  onImportStory: (story: FigmaCloneStoryImportSummary) => void
-  onSelectNode: (nodeId: FigmaCloneDomNodeId) => void
-}) {
-  const componentSourceGroups = getFigmaCloneVisibleComponentSourceGroups({
-    favoriteLayerIds,
-    favoritesOnly,
-    query: normalizeFigmaCloneLayerQuery(query),
-  })
-
-  return (
-    <aside className="figma-import-rail" aria-label="Imports">
-      <header>
-        <PackagePlus aria-hidden="true" size={14} />
-        <h1>Imports</h1>
-      </header>
-      <FigmaCloneStoryImportPanel
-        importedStoryIds={importedStoryIds}
-        stories={stories}
-        onImportStory={onImportStory}
-      />
-      <FigmaCloneComponentLibrary
-        favoriteLayerIds={favoriteLayerIds}
-        groups={componentSourceGroups}
-        importedComponentIds={importedComponentIds}
-        selection={selection}
-        onImportComponent={onImportComponent}
-        onSelectNode={onSelectNode}
-      />
-    </aside>
-  )
-}
-
-function FigmaCloneStoryImportPanel({
-  importedStoryIds,
-  stories,
-  onImportStory,
-}: {
-  importedStoryIds: Set<FigmaCloneStoryImportId>
-  stories: readonly FigmaCloneStoryImportSummary[]
-  onImportStory: (story: FigmaCloneStoryImportSummary) => void
-}) {
-  return (
-    <section className="figma-story-imports" aria-label="Story imports">
-      <div className="figma-story-imports__head">
-        <BookOpen aria-hidden="true" size={13} />
-        <span>Stories</span>
-        <strong>{stories.length}</strong>
-      </div>
-      {stories.map((story) => {
-        const imported = importedStoryIds.has(story.id)
-
-        return (
-          <article
-            className="figma-story-import-card"
-            data-figma-story-imported={imported ? 'true' : 'false'}
-            key={story.id}
-          >
-            <div className="figma-story-import-card__head">
-              <div>
-                <strong>{story.label}</strong>
-                <code>{story.source}</code>
-              </div>
-              <button
-                aria-label={`Import ${story.label} story`}
-                aria-pressed={imported}
-                type="button"
-                onClick={() => onImportStory(story)}
-              >
-                <PackagePlus aria-hidden="true" size={13} />
-              </button>
-            </div>
-            <div
-              aria-label={`${story.label} imported components`}
-              className="figma-story-import-card__components"
-            >
-              {story.componentIds.map((componentId) => (
-                <span key={componentId}>
-                  {getFigmaCloneStoryComponentLabel(componentId)}
-                </span>
-              ))}
-            </div>
-          </article>
-        )
-      })}
-    </section>
-  )
-}
-
 function FigmaCloneLayersPanel({
-  favoriteLayerIds,
-  favoritesOnly,
   query,
   selection,
-  onFavoritesOnlyChange,
   onQueryChange,
   onSelectWidgetFrame,
   onSelectSection,
   onSelectNode,
-  onSelectNodeAndFocus,
-  onToggleFavorite,
 }: {
-  favoriteLayerIds: Set<FigmaCloneLayerFavoriteId>
-  favoritesOnly: boolean
   query: string
   selection: FigmaCloneSelection
-  onFavoritesOnlyChange: (value: boolean) => void
   onQueryChange: (value: string) => void
   onSelectWidgetFrame: () => void
   onSelectSection: (rootId: FigmaCloneDomSectionRootId) => void
   onSelectNode: (nodeId: FigmaCloneDomNodeId) => void
-  onSelectNodeAndFocus: (nodeId: FigmaCloneDomNodeId) => void
-  onToggleFavorite: (favoriteId: FigmaCloneLayerFavoriteId) => void
 }) {
   const activeRootId = selection.frameId === 'dom' && selection.nodeId
     ? getFigmaCloneDomRootId(selection.nodeId)
     : null
-  const selectedLayerFavoriteId =
-    getFigmaCloneSelectedLayerFavoriteId(selection)
-  const selectedLayerLabel = getFigmaCloneSelectedLayerLabel(selection)
   const normalizedQuery = normalizeFigmaCloneLayerQuery(query)
   const visibleSections = getFigmaCloneVisibleLayerSections({
-    favoriteLayerIds,
-    favoritesOnly,
     query: normalizedQuery,
   })
-  const showWidgetLayer = matchesFigmaCloneLayerFilters({
-    favoriteId: 'widget',
-    favoriteLayerIds,
-    favoritesOnly,
-    label: 'React widget',
-    query: normalizedQuery,
-  })
+  const showWidgetLayer = matchesFigmaCloneLayerQuery(
+    'React widget',
+    normalizedQuery,
+  )
   const topLevelSize =
     (showWidgetLayer ? 1 : 0) + visibleSections.length
   const rawSelectedTreeItemId = getFigmaCloneSelectedLayerTreeItemId(selection)
@@ -943,77 +591,26 @@ function FigmaCloneLayersPanel({
   const selectedTreeItemId = visibleTreeItemIds.includes(rawSelectedTreeItemId)
     ? rawSelectedTreeItemId
     : visibleTreeItemIds[0] ?? ''
-  const visibleLayerCount = getFigmaCloneVisibleLayerCount({
-    showWidgetLayer,
-    visibleSections,
-  })
-  const favoriteCount = favoriteLayerIds.size
-  const totalLayerCount = getFigmaCloneTotalLayerCount()
-  const selectedLayerIsFavorite = favoriteLayerIds.has(selectedLayerFavoriteId)
-  const forceExpandedLayers = Boolean(normalizedQuery || favoritesOnly)
-  const componentPageGroups = getFigmaCloneVisibleComponentPageGroups({
-    favoriteLayerIds,
-    favoritesOnly,
-    query: normalizedQuery,
-  })
+  const forceExpandedLayers = Boolean(normalizedQuery)
 
   return (
     <aside className="figma-layers" aria-label="Layers">
       <header>
         <Layers aria-hidden="true" size={14} />
         <h1>Layers</h1>
-        <span className="figma-layer-count">
-          {visibleLayerCount}/{totalLayerCount}
-        </span>
-        <button
-          aria-label={selectedLayerIsFavorite
-            ? `Remove ${selectedLayerLabel} from favorites`
-            : `Add ${selectedLayerLabel} to favorites`}
-          aria-pressed={selectedLayerIsFavorite}
-          className="figma-layer-favorite-action"
-          title={selectedLayerIsFavorite ? 'Remove favorite' : 'Add favorite'}
-          type="button"
-          onClick={() => onToggleFavorite(selectedLayerFavoriteId)}
-        >
-          <Star
-            aria-hidden="true"
-            fill={selectedLayerIsFavorite ? 'currentColor' : 'none'}
-            size={14}
-          />
-        </button>
       </header>
       <div className="figma-layer-tools">
         <label className="figma-layer-search">
           <Search aria-hidden="true" size={13} />
           <input
             aria-label="Search layers"
-            placeholder="Search components, layers"
+            placeholder="Search DOM nodes"
             type="search"
             value={query}
             onChange={(event) => onQueryChange(event.currentTarget.value)}
           />
         </label>
-        <button
-          aria-label="Show favorite layers"
-          aria-pressed={favoritesOnly}
-          className="figma-layer-filter"
-          type="button"
-          onClick={() => onFavoritesOnlyChange(!favoritesOnly)}
-        >
-          <Star
-            aria-hidden="true"
-            fill={favoritesOnly ? 'currentColor' : 'none'}
-            size={12}
-          />
-          <span>{favoriteCount}</span>
-        </button>
       </div>
-      <FigmaCloneComponentVariantBoard
-        favoriteLayerIds={favoriteLayerIds}
-        groups={componentPageGroups}
-        selection={selection}
-        onSelectNode={onSelectNodeAndFocus}
-      />
       <div className="figma-layer-list" role="tree" aria-label="Layers">
         {topLevelSize === 0 ? (
           <div className="figma-layer-empty">No layers</div>
@@ -1030,7 +627,6 @@ function FigmaCloneLayersPanel({
             <button
               aria-label="Select React widget frame"
               className={`figma-layer-row${selection.frameId === 'widget' ? ' figma-layer-row--selected' : ''}`}
-              data-figma-layer-favorite={favoriteLayerIds.has('widget') ? 'true' : 'false'}
               data-figma-layer-kind="widget"
               data-figma-layer-tree-button
               data-figma-layer-tree-id="widget"
@@ -1045,9 +641,6 @@ function FigmaCloneLayersPanel({
             >
               <ChevronRight aria-hidden="true" size={12} />
               <span>React widget</span>
-              <FigmaCloneLayerFavoriteMark
-                favorite={favoriteLayerIds.has('widget')}
-              />
             </button>
           </div>
         ) : null}
@@ -1057,8 +650,6 @@ function FigmaCloneLayersPanel({
             selection.rootId === rootId &&
             selection.nodeId === null
           const sectionTreeItemId = getFigmaCloneSectionTreeItemId(rootId)
-          const sectionFavoriteId =
-            getFigmaCloneLayerFavoriteIdForSection(rootId)
 
           return (
             <div
@@ -1077,7 +668,6 @@ function FigmaCloneLayersPanel({
               <button
                 aria-label={`Select ${fullRootNode.label} section`}
                 className={`figma-layer-row${isSelectedSection ? ' figma-layer-row--selected' : ''}`}
-                data-figma-layer-favorite={favoriteLayerIds.has(sectionFavoriteId) ? 'true' : 'false'}
                 data-figma-layer-expanded="true"
                 data-figma-layer-has-children="true"
                 data-figma-layer-kind="section"
@@ -1095,14 +685,10 @@ function FigmaCloneLayersPanel({
               >
                 <ChevronDown aria-hidden="true" size={12} />
                 <span>Section · {fullRootNode.label}</span>
-                <FigmaCloneLayerFavoriteMark
-                  favorite={favoriteLayerIds.has(sectionFavoriteId)}
-                />
               </button>
               <div className="figma-layer-tree" role="group">
                 <FigmaCloneLayerNode
                   activeRootId={activeRootId}
-                  favoriteLayerIds={favoriteLayerIds}
                   forceExpanded={forceExpandedLayers}
                   node={rootNode}
                   parentTreeItemId={sectionTreeItemId}
@@ -1125,174 +711,8 @@ function FigmaCloneLayersPanel({
   )
 }
 
-function FigmaCloneComponentLibrary({
-  favoriteLayerIds,
-  groups,
-  importedComponentIds,
-  selection,
-  onImportComponent,
-  onSelectNode,
-}: {
-  favoriteLayerIds: Set<FigmaCloneLayerFavoriteId>
-  groups: readonly FigmaCloneComponentSourceGroup[]
-  importedComponentIds: Set<FigmaCloneDomComponentId>
-  selection: FigmaCloneSelection
-  onImportComponent: (component: FigmaCloneDomComponentSetSummary) => void
-  onSelectNode: (nodeId: FigmaCloneDomNodeId) => void
-}) {
-  if (groups.length === 0) {
-    return null
-  }
-
-  return (
-    <div className="figma-component-library" aria-label="Component library">
-      {groups.map((group) => (
-        <section
-          aria-label={`${group.label} component imports`}
-          className="figma-component-source-group"
-          key={group.layer}
-        >
-          <div className="figma-component-source-group__head">
-            <span>{group.label}</span>
-            <strong>{group.components.length}</strong>
-          </div>
-          {group.components.map((component) => {
-            const favorite = component.instances.some((instance) =>
-              favoriteLayerIds.has(
-                getFigmaCloneLayerFavoriteIdForNode(instance.rootNodeId),
-              ))
-            const importTarget = component.instances[0]?.rootNodeId
-            const imported = importedComponentIds.has(component.id)
-
-            return (
-              <div className="figma-component-library-card" key={component.id}>
-                <div className="figma-component-library-card__head">
-                  <div>
-                    <strong>{component.label}</strong>
-                    <code>{component.source.importPath}</code>
-                  </div>
-                  {importTarget ? (
-                    <button
-                      aria-label={`Import ${component.label} component`}
-                      aria-pressed={imported}
-                      data-figma-component-import-source={
-                        component.source.layer
-                      }
-                      type="button"
-                      onClick={() => onImportComponent(component)}
-                    >
-                      <PackagePlus aria-hidden="true" size={13} />
-                    </button>
-                  ) : null}
-                </div>
-                <div
-                  aria-label={`${component.label} parts`}
-                  className="figma-component-part-list"
-                >
-                  {component.parts.map((part) => (
-                    <button
-                      aria-label={`Select ${component.label} ${part.label} part`}
-                      data-figma-component-part-favorite={favorite
-                        ? 'true'
-                        : 'false'}
-                      key={part.slotLabel}
-                      type="button"
-                      onClick={() =>
-                        onSelectNode(getFigmaCloneComponentPartTargetNodeId({
-                          component,
-                          part,
-                          selection,
-                        }))}
-                    >
-                      <span>{part.label}</span>
-                      <small>{part.nodeIds.length}</small>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )
-          })}
-        </section>
-      ))}
-    </div>
-  )
-}
-
-function FigmaCloneComponentVariantBoard({
-  favoriteLayerIds,
-  groups,
-  selection,
-  onSelectNode,
-}: {
-  favoriteLayerIds: Set<FigmaCloneLayerFavoriteId>
-  groups: readonly FigmaCloneComponentPageGroup[]
-  selection: FigmaCloneSelection
-  onSelectNode: (nodeId: FigmaCloneDomNodeId) => void
-}) {
-  if (groups.length === 0) {
-    return null
-  }
-
-  const selectedNodeId = selection.frameId === 'dom' ? selection.nodeId : null
-
-  return (
-    <div className="figma-component-board" aria-label="Component variants">
-      {groups.map((group) => (
-        <section
-          aria-label={`${group.pageLabel} components`}
-          className="figma-component-page-group"
-          key={group.pageRootId}
-        >
-          <div className="figma-component-page-group__head">
-            <span>{group.pageLabel}</span>
-            <strong>{group.components.length}</strong>
-          </div>
-          {group.components.map((component) => (
-            <div className="figma-component-set" key={component.id}>
-              <div className="figma-component-set__head">
-                <strong>{component.label}</strong>
-                <span>{component.instances.length} variants</span>
-              </div>
-              <div
-                aria-label={`${component.label} variants`}
-                className="figma-component-variant-list"
-                role="group"
-              >
-                {component.instances.map((instance) => {
-                  const isSelected = selectedNodeId !== null &&
-                    instance.nodeIds.includes(selectedNodeId)
-                  const isFavorite = favoriteLayerIds.has(
-                    getFigmaCloneLayerFavoriteIdForNode(instance.rootNodeId),
-                  )
-
-                  return (
-                    <button
-                      aria-label={`Select ${component.label} ${instance.label} variant`}
-                      aria-pressed={isSelected}
-                      data-figma-component-variant-favorite={isFavorite
-                        ? 'true'
-                        : 'false'}
-                      key={instance.rootNodeId}
-                      type="button"
-                      onClick={() => onSelectNode(instance.rootNodeId)}
-                    >
-                      <span>{instance.label}</span>
-                      <FigmaCloneLayerFavoriteMark favorite={isFavorite} />
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
-          ))}
-        </section>
-      ))}
-    </div>
-  )
-}
-
 function FigmaCloneLayerNode({
   activeRootId,
-  favoriteLayerIds,
   forceExpanded,
   node,
   parentTreeItemId,
@@ -1305,7 +725,6 @@ function FigmaCloneLayerNode({
   onSelectNode,
 }: {
   activeRootId: FigmaCloneDomNodeId | null
-  favoriteLayerIds: Set<FigmaCloneLayerFavoriteId>
   forceExpanded: boolean
   node: FigmaCloneDomNode
   parentTreeItemId: string
@@ -1323,8 +742,6 @@ function FigmaCloneLayerNode({
   const isExpanded = hasChildren &&
     (forceExpanded || !isTopLevel || activeRootId === node.id)
   const treeItemId = getFigmaCloneNodeTreeItemId(node.id)
-  const favoriteId = getFigmaCloneLayerFavoriteIdForNode(node.id)
-  const isFavorite = favoriteLayerIds.has(favoriteId)
 
   return (
     <div
@@ -1339,7 +756,6 @@ function FigmaCloneLayerNode({
       <button
         aria-label={`Select layer ${node.label}`}
         className={`figma-layer-row figma-layer-row--node${selectedNodeId === node.id ? ' figma-layer-row--selected' : ''}`}
-        data-figma-layer-favorite={isFavorite ? 'true' : 'false'}
         data-figma-layer-depth={depth}
         data-figma-layer-expanded={isExpanded}
         data-figma-layer-has-children={hasChildren}
@@ -1367,7 +783,6 @@ function FigmaCloneLayerNode({
           <span className="figma-layer-dot" />
         )}
         <span>{node.label}</span>
-        <FigmaCloneLayerFavoriteMark favorite={isFavorite} />
       </button>
       {isExpanded ? (
         <div className="figma-layer-tree" role="group">
@@ -1375,7 +790,6 @@ function FigmaCloneLayerNode({
             <FigmaCloneLayerNode
               key={child.id}
               activeRootId={activeRootId}
-              favoriteLayerIds={favoriteLayerIds}
               forceExpanded={forceExpanded}
               node={child}
               parentTreeItemId={treeItemId}
@@ -1391,22 +805,6 @@ function FigmaCloneLayerNode({
         </div>
       ) : null}
     </div>
-  )
-}
-
-function FigmaCloneLayerFavoriteMark({
-  favorite,
-}: {
-  favorite: boolean
-}) {
-  return (
-    <Star
-      aria-hidden="true"
-      className="figma-layer-favorite-mark"
-      data-favorite={favorite ? 'true' : 'false'}
-      fill={favorite ? 'currentColor' : 'none'}
-      size={11}
-    />
   )
 }
 
@@ -1591,149 +989,6 @@ function getFigmaCloneSelectedCanvasItemId(selection: FigmaCloneSelection) {
   return getFigmaCloneDomCanvasFrameItemId(rootId)
 }
 
-function createFigmaCloneDevtoolsNotes({
-  items,
-  layerNotes,
-  selection,
-}: {
-  items: readonly CanvasItem[]
-  layerNotes: FigmaCloneLayerNotesState
-  selection: FigmaCloneSelection
-}): readonly CanvasDevtoolsNoteSummary[] {
-  const itemById = new Map(items.map((item) => [item.id, item]))
-  const selectedLayerId = getFigmaCloneSelectedLayerFavoriteId(selection)
-
-  return (Object.entries(layerNotes) as ReadonlyArray<readonly [
-    FigmaCloneLayerFavoriteId,
-    string | undefined,
-  ]>).flatMap(([layerId, body]) => {
-    if (!body) {
-      return []
-    }
-
-    const item = itemById.get(
-      getFigmaCloneCanvasItemIdForLayerFavoriteId(layerId),
-    )
-
-    if (!item) {
-      return []
-    }
-
-    return [{
-      attachedTo: getFigmaCloneLayerLabelForFavoriteId(layerId),
-      body,
-      bounds: {
-        h: item.h,
-        w: item.w,
-        x: item.x,
-        y: item.y,
-      },
-      id: `figma-note:${layerId}`,
-      messageCount: 1,
-      resolved: false,
-      selected: layerId === selectedLayerId,
-    }]
-  })
-}
-
-function createFigmaCloneDevtoolsContext(
-  selection: FigmaCloneSelection,
-): CanvasDevtoolsContextSummary {
-  const sourceReference = getFigmaCloneInspectorSourceReference(selection)
-
-  if (selection.frameId === 'widget') {
-    return {
-      fields: [
-        { name: 'layer', value: 'widgets' },
-        { name: 'item', value: FIGMA_CLONE_WIDGET_FRAME_ITEM_ID },
-        { name: 'kind', value: 'figma-clone-react-widget' },
-      ],
-      subtitle: sourceReference,
-      title: 'React widget',
-    }
-  }
-
-  if (!selection.nodeId) {
-    return {
-      fields: [
-        { name: 'layer', value: 'page' },
-        { name: 'root', value: selection.rootId },
-        {
-          name: 'item',
-          value: getFigmaCloneDomCanvasFrameItemId(selection.rootId),
-        },
-      ],
-      subtitle: sourceReference,
-      title: `${FIGMA_CLONE_DOM_NODE_BY_ID[selection.rootId].label} section`,
-    }
-  }
-
-  const binding = getFigmaCloneDomComponentBinding(selection.nodeId)
-  const component = binding
-    ? FIGMA_CLONE_DOM_COMPONENT_SETS.find((candidate) =>
-      candidate.id === binding.componentId)
-    : null
-  const fields = [
-    { name: 'node', value: selection.nodeId },
-    { name: 'root', value: getFigmaCloneSectionRootIdForNode(selection.nodeId) },
-    ...(binding
-      ? [
-          { name: 'component', value: binding.componentLabel },
-          { name: 'instance', value: binding.instanceLabel },
-          { name: 'slot', value: binding.slotLabel },
-        ]
-      : []),
-    ...(component
-      ? [
-          { name: 'layer', value: component.source.layer },
-          { name: 'source', value: component.source.importPath },
-        ]
-      : [{ name: 'layer', value: 'local node' }]),
-  ]
-
-  return {
-    fields,
-    subtitle: sourceReference,
-    title: FIGMA_CLONE_DOM_NODE_BY_ID[selection.nodeId].label,
-  }
-}
-
-function getFigmaCloneCanvasItemIdForLayerFavoriteId(
-  layerId: FigmaCloneLayerFavoriteId,
-) {
-  if (layerId === 'widget') {
-    return FIGMA_CLONE_WIDGET_FRAME_ITEM_ID
-  }
-
-  if (layerId.startsWith('section:')) {
-    return getFigmaCloneDomCanvasFrameItemId(
-      layerId.slice('section:'.length) as FigmaCloneDomSectionRootId,
-    )
-  }
-
-  return getFigmaCloneCanvasItemIdForNode(
-    layerId.slice('node:'.length) as FigmaCloneDomNodeId,
-  )
-}
-
-function getFigmaCloneLayerLabelForFavoriteId(
-  layerId: FigmaCloneLayerFavoriteId,
-) {
-  if (layerId === 'widget') {
-    return 'React widget'
-  }
-
-  if (layerId.startsWith('section:')) {
-    const rootId = layerId.slice('section:'.length) as FigmaCloneDomSectionRootId
-
-    return `${FIGMA_CLONE_DOM_NODE_BY_ID[rootId].label} section`
-  }
-
-  return FIGMA_CLONE_DOM_NODE_BY_ID[
-    layerId.slice('node:'.length) as FigmaCloneDomNodeId
-  ].label
-}
-
 function getFigmaCloneCanvasItemIdForNode(nodeId: FigmaCloneDomNodeId) {
   return getFigmaCloneDomCanvasFrameItemId(
     getFigmaCloneSectionRootIdForNode(nodeId),
@@ -1748,49 +1003,11 @@ function getFigmaCloneDomCanvasFrameItemId(
     : 'figma-dom-workspace-frame'
 }
 
-function getFigmaCloneSelectedLayerFavoriteId(
-  selection: FigmaCloneSelection,
-): FigmaCloneLayerFavoriteId {
-  if (selection.frameId === 'widget') {
-    return 'widget'
-  }
-
-  if (selection.nodeId) {
-    return getFigmaCloneLayerFavoriteIdForNode(selection.nodeId)
-  }
-
-  return getFigmaCloneLayerFavoriteIdForSection(selection.rootId)
-}
-
-function getFigmaCloneSelectedLayerLabel(selection: FigmaCloneSelection) {
-  if (selection.frameId === 'widget') {
-    return 'React widget'
-  }
-
-  if (selection.nodeId) {
-    return FIGMA_CLONE_DOM_NODE_BY_ID[selection.nodeId].label
-  }
-
-  return `${FIGMA_CLONE_DOM_NODE_BY_ID[selection.rootId].label} section`
-}
-
 function getFigmaCloneSectionTreeItemId(rootId: FigmaCloneDomSectionRootId) {
   return `section:${rootId}`
 }
 
 function getFigmaCloneNodeTreeItemId(nodeId: FigmaCloneDomNodeId) {
-  return `node:${nodeId}`
-}
-
-function getFigmaCloneLayerFavoriteIdForSection(
-  rootId: FigmaCloneDomSectionRootId,
-): FigmaCloneLayerFavoriteId {
-  return `section:${rootId}`
-}
-
-function getFigmaCloneLayerFavoriteIdForNode(
-  nodeId: FigmaCloneDomNodeId,
-): FigmaCloneLayerFavoriteId {
   return `node:${nodeId}`
 }
 
@@ -1800,32 +1017,22 @@ type FigmaCloneVisibleLayerSection = {
 }
 
 function getFigmaCloneVisibleLayerSections({
-  favoriteLayerIds,
-  favoritesOnly,
   query,
 }: {
-  favoriteLayerIds: Set<FigmaCloneLayerFavoriteId>
-  favoritesOnly: boolean
   query: string
 }): FigmaCloneVisibleLayerSection[] {
   return FIGMA_CLONE_DOM_SECTION_ROOT_IDS.flatMap((rootId) => {
     const fullRootNode = FIGMA_CLONE_DOM_NODE_BY_ID[rootId]
-    const sectionFavoriteId = getFigmaCloneLayerFavoriteIdForSection(rootId)
-    const sectionMatches = matchesFigmaCloneLayerFilters({
-      favoriteId: sectionFavoriteId,
-      favoriteLayerIds,
-      favoritesOnly,
-      label: `${fullRootNode.label} section`,
+    const sectionMatches = matchesFigmaCloneLayerQuery(
+      `${fullRootNode.label} section`,
       query,
-    })
+    )
 
     if (sectionMatches) {
       return [{ rootId, rootNode: fullRootNode }]
     }
 
     const rootNode = getFigmaCloneVisibleLayerNode(fullRootNode, {
-      favoriteLayerIds,
-      favoritesOnly,
       query,
     })
 
@@ -1836,18 +1043,13 @@ function getFigmaCloneVisibleLayerSections({
 function getFigmaCloneVisibleLayerNode(
   node: FigmaCloneDomNode,
   filter: {
-    favoriteLayerIds: Set<FigmaCloneLayerFavoriteId>
-    favoritesOnly: boolean
     query: string
   },
 ): FigmaCloneDomNode | null {
-  const matchesSelf = matchesFigmaCloneLayerFilters({
-    favoriteId: getFigmaCloneLayerFavoriteIdForNode(node.id),
-    favoriteLayerIds: filter.favoriteLayerIds,
-    favoritesOnly: filter.favoritesOnly,
-    label: getFigmaCloneLayerSearchLabel(node),
-    query: filter.query,
-  })
+  const matchesSelf = matchesFigmaCloneLayerQuery(
+    getFigmaCloneLayerSearchLabel(node),
+    filter.query,
+  )
 
   if (matchesSelf) {
     return node
@@ -1865,176 +1067,6 @@ function getFigmaCloneVisibleLayerNode(
     ...node,
     children,
   }
-}
-
-function getFigmaCloneVisibleComponentPageGroups({
-  favoriteLayerIds,
-  favoritesOnly,
-  query,
-}: {
-  favoriteLayerIds: Set<FigmaCloneLayerFavoriteId>
-  favoritesOnly: boolean
-  query: string
-}): FigmaCloneComponentPageGroup[] {
-  const groups = new Map<FigmaCloneDomSectionRootId, FigmaCloneComponentPageGroup>()
-
-  for (const component of FIGMA_CLONE_DOM_COMPONENT_SETS) {
-    const componentMatchesQuery = matchesFigmaCloneLayerQuery(
-      getFigmaCloneComponentSetSearchLabel(component),
-      query,
-    )
-    const instances = component.instances.filter((instance) =>
-      (!favoritesOnly ||
-        isFigmaCloneComponentInstanceFavorite(instance, favoriteLayerIds)) &&
-      (componentMatchesQuery ||
-        matchesFigmaCloneLayerQuery(
-          getFigmaCloneComponentInstanceSearchLabel(component, instance),
-          query,
-        )))
-
-    if (instances.length === 0) {
-      continue
-    }
-
-    const pageGroup = groups.get(component.pageRootId) ?? {
-      components: [],
-      pageLabel: component.pageLabel,
-      pageRootId: component.pageRootId,
-    }
-
-    groups.set(component.pageRootId, {
-      ...pageGroup,
-      components: [
-        ...pageGroup.components,
-        {
-          ...component,
-          instances,
-        },
-      ],
-    })
-  }
-
-  return Array.from(groups.values())
-}
-
-function getFigmaCloneVisibleComponentSourceGroups({
-  favoriteLayerIds,
-  favoritesOnly,
-  query,
-}: {
-  favoriteLayerIds: Set<FigmaCloneLayerFavoriteId>
-  favoritesOnly: boolean
-  query: string
-}): FigmaCloneComponentSourceGroup[] {
-  return FIGMA_CLONE_COMPONENT_SOURCE_ORDER.flatMap((layer) => {
-    const components = FIGMA_CLONE_DOM_COMPONENT_SETS
-      .filter((component) => component.source.layer === layer)
-      .filter((component) => {
-        const hasFavorite = component.instances.some((instance) =>
-          isFigmaCloneComponentInstanceFavorite(instance, favoriteLayerIds))
-
-        return (!favoritesOnly || hasFavorite) &&
-          matchesFigmaCloneLayerQuery(
-            getFigmaCloneComponentSetSearchLabel(component),
-            query,
-          )
-      })
-
-    if (components.length === 0) {
-      return []
-    }
-
-    return [{
-      components,
-      label: FIGMA_CLONE_COMPONENT_SOURCE_LABELS[layer],
-      layer,
-    }]
-  })
-}
-
-function getFigmaCloneStoryComponentLabel(
-  componentId: FigmaCloneDomComponentId,
-) {
-  return FIGMA_CLONE_DOM_COMPONENT_SETS.find((component) =>
-    component.id === componentId)?.label ?? componentId
-}
-
-function getFigmaCloneComponentSetSearchLabel(
-  component: FigmaCloneDomComponentSetSummary,
-) {
-  return [
-    component.label,
-    component.id,
-    component.pageLabel,
-    component.source.exportName,
-    component.source.importPath,
-    component.source.layer,
-    ...component.parts.flatMap((part) => [part.label, part.slotLabel]),
-  ].join(' ')
-}
-
-function getFigmaCloneComponentInstanceSearchLabel(
-  component: FigmaCloneDomComponentSetSummary,
-  instance: FigmaCloneDomComponentSetSummary['instances'][number],
-) {
-  return [
-    component.label,
-    instance.label,
-    component.pageLabel,
-    instance.rootNodeId,
-    ...instance.slots.flatMap((slot) => [slot.label, slot.nodeId]),
-  ].join(' ')
-}
-
-function isFigmaCloneComponentInstanceFavorite(
-  instance: FigmaCloneDomComponentSetSummary['instances'][number],
-  favoriteLayerIds: Set<FigmaCloneLayerFavoriteId>,
-) {
-  return instance.nodeIds.some((nodeId) =>
-    favoriteLayerIds.has(getFigmaCloneLayerFavoriteIdForNode(nodeId)))
-}
-
-function getFigmaCloneComponentPartTargetNodeId({
-  component,
-  part,
-  selection,
-}: {
-  component: FigmaCloneDomComponentSetSummary
-  part: FigmaCloneDomComponentPartSummary
-  selection: FigmaCloneSelection
-}): FigmaCloneDomNodeId {
-  const selectedNodeId = selection.frameId === 'dom' ? selection.nodeId : null
-  const selectedInstance = selectedNodeId
-    ? component.instances.find((instance) =>
-      instance.nodeIds.includes(selectedNodeId))
-    : null
-  const selectedPartNodeId = selectedInstance?.slots.find((slot) =>
-    slot.label === part.slotLabel)?.nodeId
-
-  const fallbackNodeId = part.nodeIds[0] ?? component.instances[0]?.rootNodeId
-
-  if (!fallbackNodeId) {
-    throw new Error(`Missing component part target for ${component.id}`)
-  }
-
-  return selectedPartNodeId ?? fallbackNodeId
-}
-
-function matchesFigmaCloneLayerFilters({
-  favoriteId,
-  favoriteLayerIds,
-  favoritesOnly,
-  label,
-  query,
-}: {
-  favoriteId: FigmaCloneLayerFavoriteId
-  favoriteLayerIds: Set<FigmaCloneLayerFavoriteId>
-  favoritesOnly: boolean
-  label: string
-  query: string
-}) {
-  return matchesFigmaCloneLayerQuery(label, query) &&
-    (!favoritesOnly || favoriteLayerIds.has(favoriteId))
 }
 
 function getFigmaCloneLayerSearchLabel(node: FigmaCloneDomNode) {
@@ -2096,37 +1128,6 @@ function pushFigmaCloneLayerNodeTreeItemIds(
   }
 }
 
-function getFigmaCloneVisibleLayerCount({
-  showWidgetLayer,
-  visibleSections,
-}: {
-  showWidgetLayer: boolean
-  visibleSections: readonly FigmaCloneVisibleLayerSection[]
-}) {
-  return (showWidgetLayer ? 1 : 0) +
-    visibleSections.reduce(
-      (total, section) =>
-        total + 1 + getFigmaCloneLayerNodeCount(section.rootNode),
-      0,
-    )
-}
-
-function getFigmaCloneTotalLayerCount() {
-  return 1 + FIGMA_CLONE_DOM_SECTION_ROOT_IDS.length +
-    FIGMA_CLONE_DOM_SECTION_ROOT_IDS.reduce(
-      (total, rootId) =>
-        total + getFigmaCloneLayerNodeCount(FIGMA_CLONE_DOM_NODE_BY_ID[rootId]),
-      0,
-    )
-}
-
-function getFigmaCloneLayerNodeCount(node: FigmaCloneDomNode): number {
-  return 1 + (node.children ?? []).reduce(
-    (total, child) => total + getFigmaCloneLayerNodeCount(child),
-    0,
-  )
-}
-
 function isFigmaCloneDomSectionRootId(
   value: string | undefined,
 ): value is FigmaCloneDomSectionRootId {
@@ -2140,13 +1141,10 @@ function isFigmaCloneDomNodeId(
 }
 
 function FigmaCloneInspectorPanel({
-  copyState,
   domState,
   domTextState,
-  layerNotes,
   sectionViewport,
   selection,
-  viewport,
   onApplySectionViewportPreset,
   onChangeDomAutoLayoutField,
   onChangeDomField,
@@ -2154,18 +1152,13 @@ function FigmaCloneInspectorPanel({
   onChangeSectionFrameMode,
   onChangeSectionOverflow,
   onChangeSectionViewportField,
-  onChangeLayerNote,
-  onCopySourceReference,
   onSelectDocumentRoot,
   onSelectNode,
 }: {
-  copyState: string
   domState: FigmaCloneDomEditState
   domTextState: FigmaCloneDomTextState
-  layerNotes: FigmaCloneLayerNotesState
   sectionViewport: FigmaCloneSectionViewport
   selection: FigmaCloneSelection
-  viewport: Viewport
   onApplySectionViewportPreset: (
     preset: Pick<FigmaCloneSectionViewport, 'h' | 'w'>,
   ) => void
@@ -2183,185 +1176,70 @@ function FigmaCloneInspectorPanel({
   onChangeSectionFrameMode: (frameMode: FigmaCloneSectionFrameMode) => void
   onChangeSectionOverflow: (overflow: FigmaCloneSectionOverflow) => void
   onChangeSectionViewportField: (field: 'h' | 'w', value: number) => void
-  onChangeLayerNote: (
-    layerId: FigmaCloneLayerFavoriteId,
-    note: string,
-  ) => void
-  onCopySourceReference: (sourceReference: string) => void
   onSelectDocumentRoot: () => void
   onSelectNode: (nodeId: FigmaCloneDomNodeId) => void
 }) {
-  const [activeTab, setActiveTab] = useState<FigmaCloneInspectorTab>('design')
-  const selectedLayerId = getFigmaCloneSelectedLayerFavoriteId(selection)
-  const selectedLayerNote = layerNotes[selectedLayerId] ?? ''
-  const sourceReference = getFigmaCloneInspectorSourceReference(selection)
-
   return (
-    <aside className="figma-inspector" aria-label="Design">
-      <header role="tablist" aria-label="Inspector panels">
-        <FigmaCloneInspectorTabButton
-          activeTab={activeTab}
-          tab="design"
-          onActivate={setActiveTab}
-        />
-        <FigmaCloneInspectorTabButton
-          activeTab={activeTab}
-          tab="dev"
-          onActivate={setActiveTab}
-        />
+    <aside className="figma-inspector" aria-label="CSS Inspector">
+      <header>
+        <h1>CSS</h1>
       </header>
-      {activeTab === 'design' ? (
-        <div
-          aria-labelledby="figma-inspector-design-tab"
-          id="figma-inspector-design-panel"
-          role="tabpanel"
-        >
-          {selection.frameId === 'widget' ? (
-            <section className="figma-panel-section">
-              <h2>React widget</h2>
-              <dl className="figma-meta">
-                <div>
-                  <dt>Kind</dt>
-                  <dd>React</dd>
-                </div>
-                <div>
-                  <dt>Edit</dt>
-                  <dd>Widget data</dd>
-                </div>
-              </dl>
-            </section>
-          ) : selection.nodeId === null ? (
-            <FigmaCloneSectionInspector
-              viewport={sectionViewport}
-              onApplyPreset={onApplySectionViewportPreset}
-              onChangeField={onChangeSectionViewportField}
-              onChangeFrameMode={onChangeSectionFrameMode}
-              onChangeOverflow={onChangeSectionOverflow}
-              onSelectDocumentRoot={onSelectDocumentRoot}
-            />
-          ) : (
-            <>
-              <FigmaCloneComponentInspector
-                binding={getFigmaCloneDomComponentBinding(selection.nodeId)}
-                onSelectNode={onSelectNode}
-              />
-              <DomEditInspector
-                adapter={FIGMA_CLONE_DOM_EDIT_ADAPTER}
-                canEditText={canFigmaCloneDomNodeEditText}
-                getText={(nodeId) => getFigmaCloneDomText(domTextState, nodeId)}
-                selectedNodeId={selection.nodeId}
-                state={domState}
-                viewport={viewport}
-                onChangeAutoLayout={onChangeDomAutoLayoutField}
-                onChange={onChangeDomField}
-                onChangeText={onChangeDomText}
-              />
-            </>
-          )}
-          <FigmaCloneReviewNotePanel
-            note={selectedLayerNote}
-            selection={selection}
-            onChange={(note) => onChangeLayerNote(selectedLayerId, note)}
+      <div className="figma-inspector-body">
+        {selection.frameId === 'widget' ? (
+          <section className="figma-panel-section">
+            <h2>React widget</h2>
+            <dl className="figma-meta">
+              <div>
+                <dt>Kind</dt>
+                <dd>React</dd>
+              </div>
+              <div>
+                <dt>Edit</dt>
+                <dd>Outside DOM CSS</dd>
+              </div>
+            </dl>
+          </section>
+        ) : selection.nodeId === null ? (
+          <FigmaCloneSectionInspector
+            viewport={sectionViewport}
+            onApplyPreset={onApplySectionViewportPreset}
+            onChangeField={onChangeSectionViewportField}
+            onChangeFrameMode={onChangeSectionFrameMode}
+            onChangeOverflow={onChangeSectionOverflow}
+            onSelectDocumentRoot={onSelectDocumentRoot}
           />
-        </div>
-      ) : (
-        <div
-          aria-labelledby="figma-inspector-dev-tab"
-          id="figma-inspector-dev-panel"
-          role="tabpanel"
-        >
-          <FigmaCloneSourcePanel
-            copyState={copyState}
-            sourceLabel={getFigmaCloneInspectorSourceLabel(selection)}
-            sourceReference={sourceReference}
-            onCopy={onCopySourceReference}
-          />
-          {selection.frameId === 'dom' && selection.nodeId ? (
+        ) : (
+          <>
             <FigmaCloneCssPanel
               nodeId={selection.nodeId}
               state={domState}
+              textState={domTextState}
               onChangeAutoLayout={onChangeDomAutoLayoutField}
               onChange={onChangeDomField}
+              onChangeText={onChangeDomText}
             />
-          ) : null}
-        </div>
-      )}
-    </aside>
-  )
-}
-
-function FigmaCloneReviewNotePanel({
-  note,
-  selection,
-  onChange,
-}: {
-  note: string
-  selection: FigmaCloneSelection
-  onChange: (note: string) => void
-}) {
-  return (
-    <section className="figma-panel-section">
-      <h2>Review</h2>
-      <textarea
-        aria-label={`Review note for ${getFigmaCloneSelectedLayerLabel(selection)}`}
-        className="figma-review-note"
-        placeholder="Leave note"
-        rows={4}
-        value={note}
-        onChange={(event) => onChange(event.currentTarget.value)}
-      />
-    </section>
-  )
-}
-
-function FigmaCloneSourcePanel({
-  copyState,
-  sourceLabel,
-  sourceReference,
-  onCopy,
-}: {
-  copyState: string
-  sourceLabel: string
-  sourceReference: string
-  onCopy: (sourceReference: string) => void
-}) {
-  return (
-    <section className="figma-panel-section">
-      <div className="figma-panel-section__heading-row">
-        <h2>Source</h2>
-        {copyState ? (
-          <span aria-live="polite" className="figma-copy-state">
-            {copyState}
-          </span>
-        ) : null}
+            <FigmaCloneComponentInspector
+              binding={getFigmaCloneDomComponentBinding(selection.nodeId)}
+              onSelectNode={onSelectNode}
+            />
+          </>
+        )}
       </div>
-      <dl className="figma-context-meta">
-        <div>
-          <dt>Target</dt>
-          <dd>{sourceLabel}</dd>
-        </div>
-      </dl>
-      <button
-        aria-label="Copy source reference"
-        className="figma-source-copy-button"
-        type="button"
-        onClick={() => onCopy(sourceReference)}
-      >
-        <Copy aria-hidden="true" size={13} />
-        <code>{sourceReference}</code>
-      </button>
-    </section>
+    </aside>
   )
 }
 
 function FigmaCloneCssPanel({
   nodeId,
   state,
+  textState,
   onChangeAutoLayout,
   onChange,
+  onChangeText,
 }: {
   nodeId: FigmaCloneDomNodeId
   state: FigmaCloneDomEditState
+  textState: FigmaCloneDomTextState
   onChangeAutoLayout: (
     nodeId: FigmaCloneDomNodeId,
     field: FigmaCloneDomAutoLayoutField,
@@ -2372,17 +1250,39 @@ function FigmaCloneCssPanel({
     field: FigmaCloneDomEditField,
     value: number,
   ) => void
+  onChangeText: (nodeId: FigmaCloneDomNodeId, value: string) => void
 }) {
   const context = FIGMA_CLONE_DOM_EDIT_ADAPTER.getLayoutContext(nodeId)
   const style = FIGMA_CLONE_DOM_EDIT_ADAPTER.getStyle(state, nodeId)
   const distributionValue = style.distribution === 'packed'
     ? 'start'
     : style.distribution
+  const canEditText = canFigmaCloneDomNodeEditText(nodeId)
 
   return (
     <section className="figma-panel-section">
       <h2>CSS</h2>
       <div className="figma-css-declarations">
+        <FigmaCloneCssSizeModeDeclaration
+          axis="W"
+          field="widthMode"
+          mode={style.widthMode}
+          name="width"
+          nodeId={nodeId}
+          parentDisplay={context.parentDisplay}
+          value={style.w}
+          onChange={onChangeAutoLayout}
+        />
+        <FigmaCloneCssSizeModeDeclaration
+          axis="H"
+          field="heightMode"
+          mode={style.heightMode}
+          name="height"
+          nodeId={nodeId}
+          parentDisplay={context.parentDisplay}
+          value={style.h}
+          onChange={onChangeAutoLayout}
+        />
         <FigmaCloneCssReadOnlyDeclaration
           name="display"
           value={context.display}
@@ -2488,8 +1388,63 @@ function FigmaCloneCssPanel({
           value={style.opacity}
           onChange={onChange}
         />
+        {canEditText ? (
+          <FigmaCloneCssTextDeclaration
+            nodeId={nodeId}
+            value={getFigmaCloneDomText(textState, nodeId)}
+            onChange={onChangeText}
+          />
+        ) : null}
       </div>
     </section>
+  )
+}
+
+function FigmaCloneCssSizeModeDeclaration({
+  axis,
+  field,
+  mode,
+  name,
+  nodeId,
+  parentDisplay,
+  value,
+  onChange,
+}: {
+  axis: 'H' | 'W'
+  field: Extract<FigmaCloneDomAutoLayoutField, 'heightMode' | 'widthMode'>
+  mode: FigmaCloneDomAutoLayoutSizeMode
+  name: string
+  nodeId: FigmaCloneDomNodeId
+  parentDisplay: FigmaCloneDomDisplay | null
+  value: number
+  onChange: (
+    nodeId: FigmaCloneDomNodeId,
+    field: FigmaCloneDomAutoLayoutField,
+    value: FigmaCloneDomEditNodeState[FigmaCloneDomAutoLayoutField],
+  ) => void
+}) {
+  const modeLabel = formatFigmaCloneCssSizeMode(mode)
+
+  return (
+    <button
+      aria-label={`${axis} ${Math.round(value)} ${modeLabel}`}
+      className="figma-css-declaration figma-css-size-mode-button"
+      data-mode={mode}
+      type="button"
+      onClick={() => {
+        onChange(
+          nodeId,
+          field,
+          getFigmaCloneDomToggledAxisSizeMode({ mode, parentDisplay }),
+        )
+      }}
+    >
+      <code>{name}</code>
+      <span>
+        <strong>{Math.round(value)}</strong>
+        <em>{modeLabel}</em>
+      </span>
+    </button>
   )
 }
 
@@ -2574,6 +1529,42 @@ function FigmaCloneCssSelectDeclaration<
   )
 }
 
+function formatFigmaCloneCssSizeMode(
+  mode: FigmaCloneDomAutoLayoutSizeMode,
+) {
+  if (mode === 'fill') {
+    return 'Fill'
+  }
+
+  if (mode === 'hug') {
+    return 'Hug'
+  }
+
+  return 'Fixed'
+}
+
+function FigmaCloneCssTextDeclaration({
+  nodeId,
+  value,
+  onChange,
+}: {
+  nodeId: FigmaCloneDomNodeId
+  value: string
+  onChange: (nodeId: FigmaCloneDomNodeId, value: string) => void
+}) {
+  return (
+    <label className="figma-css-declaration figma-css-declaration--text">
+      <code>text-content</code>
+      <textarea
+        aria-label="CSS text content"
+        rows={Math.min(3, Math.max(1, value.split('\n').length))}
+        value={value}
+        onChange={(event) => onChange(nodeId, event.currentTarget.value)}
+      />
+    </label>
+  )
+}
+
 function FigmaCloneComponentInspector({
   binding,
   onSelectNode,
@@ -2627,123 +1618,6 @@ function FigmaCloneComponentInspector({
       </p>
     </section>
   )
-}
-
-function FigmaCloneInspectorTabButton({
-  activeTab,
-  tab,
-  onActivate,
-}: {
-  activeTab: FigmaCloneInspectorTab
-  tab: FigmaCloneInspectorTab
-  onActivate: (tab: FigmaCloneInspectorTab) => void
-}) {
-  const selected = activeTab === tab
-  const label = getFigmaCloneInspectorTabLabel(tab)
-
-  return (
-    <button
-      aria-controls={`figma-inspector-${tab}-panel`}
-      aria-selected={selected}
-      id={`figma-inspector-${tab}-tab`}
-      role="tab"
-      tabIndex={selected ? 0 : -1}
-      type="button"
-      onClick={() => onActivate(tab)}
-      onKeyDown={(event) =>
-        handleFigmaCloneInspectorTabKeyDown(event, tab, onActivate)}
-    >
-      {label}
-    </button>
-  )
-}
-
-function handleFigmaCloneInspectorTabKeyDown(
-  event: KeyboardEvent<HTMLButtonElement>,
-  tab: FigmaCloneInspectorTab,
-  onActivate: (tab: FigmaCloneInspectorTab) => void,
-) {
-  const nextTab = getFigmaCloneInspectorKeyboardTab(event.key, tab)
-
-  if (!nextTab) {
-    return
-  }
-
-  event.preventDefault()
-  onActivate(nextTab)
-  requestAnimationFrame(() => {
-    document.getElementById(`figma-inspector-${nextTab}-tab`)?.focus()
-  })
-}
-
-function getFigmaCloneInspectorKeyboardTab(
-  key: string,
-  tab: FigmaCloneInspectorTab,
-): FigmaCloneInspectorTab | null {
-  if (key === 'ArrowLeft' || key === 'ArrowUp') {
-    return tab === 'design' ? 'dev' : 'design'
-  }
-
-  if (key === 'ArrowRight' || key === 'ArrowDown') {
-    return tab === 'design' ? 'dev' : 'design'
-  }
-
-  if (key === 'Home') {
-    return 'design'
-  }
-
-  if (key === 'End') {
-    return 'dev'
-  }
-
-  if (key === 'Enter' || key === ' ') {
-    return tab
-  }
-
-  return null
-}
-
-function getFigmaCloneInspectorTabLabel(tab: FigmaCloneInspectorTab) {
-  return tab === 'design' ? 'Design' : 'Dev'
-}
-
-function getFigmaCloneInspectorSourceLabel(selection: FigmaCloneSelection) {
-  if (selection.frameId === 'widget') {
-    return 'React widget'
-  }
-
-  if (selection.nodeId) {
-    return FIGMA_CLONE_DOM_NODE_BY_ID[selection.nodeId].label
-  }
-
-  return `${FIGMA_CLONE_DOM_NODE_BY_ID[selection.rootId].label} section`
-}
-
-function getFigmaCloneInspectorSourceReference(selection: FigmaCloneSelection) {
-  if (selection.frameId === 'widget') {
-    return 'packages/figma-clone/src/widget/FigmaCloneWidgetModule.tsx#widget'
-  }
-
-  const targetId = selection.nodeId ?? selection.rootId
-
-  return `packages/figma-clone/src/dom-edit/FigmaCloneDomEditSurface.tsx#${targetId}`
-}
-
-async function writeFigmaCloneClipboardText(value: string) {
-  if (
-    typeof navigator === 'undefined' ||
-    !navigator.clipboard ||
-    typeof navigator.clipboard.writeText !== 'function'
-  ) {
-    return false
-  }
-
-  try {
-    await navigator.clipboard.writeText(value)
-    return true
-  } catch {
-    return false
-  }
 }
 
 function FigmaCloneSectionInspector({
